@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: svg.trm,v 1.106 2010/10/06 05:44:57 sfeam Exp $
+ * $Id: svg.trm,v 1.107 2011/01/26 06:09:19 sfeam Exp $
  */
 
 /*------------------------------------------------------------------------------------------------------------------------------------
@@ -131,6 +131,7 @@ static struct SVG_PEN SVG_pens[16];	/* pen descriptors*/
 
 static int SVG_fillPattern = -1; /* active fill pattern (-1 == undefined) */
 static unsigned int SVG_fillPatternIndex = 0;
+static int SVG_background = -1;
 
 static int SVG_fontAscent = 0;	/* estimated current font ascent*/
 static int SVG_fontDescent = 0;	/* estimated current font descent*/
@@ -556,6 +557,12 @@ SVG_options ()
 	    SVG_dashed = TRUE;
 	    continue;
 	}
+
+	if (almost_equals(c_token, "backg$round")) {
+	    c_token++;
+	    SVG_background = parse_color_name();
+	    continue;
+	}
 									
 	int_error(c_token, "unrecognized terminal option");
     }
@@ -584,6 +591,11 @@ SVG_options ()
     if (SVG_linewidth_factor != 1.0) {
 	sprintf(term_options + strlen(term_options),
 	    "linewidth %3.1f ", SVG_linewidth_factor);
+    }
+
+    if (SVG_background >= 0) {
+	sprintf(term_options + strlen(term_options),
+	    "background \"#%06x\" ", SVG_background);
     }
 
 }
@@ -644,6 +656,12 @@ SVG_init ()
     sprintf (SVG_pens[14].color, "#%2.2X%2.2X%2.2X", 214, 0, 120); /* mulberry*/
     SVG_pens[15].width = SVG_LineWidth;
     sprintf (SVG_pens[15].color, "#%2.2X%2.2X%2.2X", 171, 214, 0); /* green yellow*/
+
+    if (SVG_background >= 0)
+	sprintf(SVG_pens[0].color, "#%2.2X%2.2X%2.2X",
+		(SVG_background >> 16)&0xff,
+		(SVG_background >> 8)&0xff,
+		(SVG_background)&0xff);
 
     SVG_LineType = LT_NODRAW;
 
@@ -770,6 +788,10 @@ SVG_init ()
 	     , stroke_width
 	     , stroke_width
 	);
+
+    /* Fill with background color */
+    if (SVG_background >=0)
+	SVG_fillbox(FS_EMPTY,0,0,term->xmax,term->ymax);
 }
 
 /*------------------------------------------------------------------------------------------------------------------------------------
@@ -1152,8 +1174,7 @@ SVG_filled_polygon(int points, gpiPoint* corners)
 
     switch (style) {
 	case FS_EMPTY: /* fill with background color */
-	    /* TODO: and what if the background color is not white ? */
-	    fputs(" fill = 'white'", gpoutfile);
+	    fprintf(gpoutfile," fill = '%s'", SVG_pens[0].color);
 	    break;
 	case FS_SOLID: /* solid fill */
 	case FS_TRANSPARENT_SOLID:
@@ -1538,6 +1559,7 @@ START_HELP(svg)
 "                        {font \"<fontname>{,<fontsize>}\"}",
 "                        {fontfile <filename>}",
 "                        {rounded|butt} {solid|dashed} {linewidth <lw>}",
+"                        {background <rgb_color>}",
 "",
 " where <x> and <y> are the size of the SVG plot to generate,",
 " `dynamic` allows a svg-viewer to resize plot, whereas the default",

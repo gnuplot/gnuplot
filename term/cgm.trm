@@ -1,5 +1,5 @@
 /* Hey Emacs this is -*- C -*-
- * $Id: cgm.trm,v 1.94 2010/02/24 20:15:56 sfeam Exp $
+ * $Id: cgm.trm,v 1.95 2010/03/14 06:43:17 sfeam Exp $
  */
 
 /* GNUPLOT - cgm.trm */
@@ -168,6 +168,7 @@ static unsigned int cgm_linetype = 1;
 static unsigned int cgm_linetypes = CGM_LINE_TYPES + 3;
 static unsigned int cgm_dashtype = 0;
 static unsigned int cgm_color = 0;
+static unsigned int cgm_background = 0xffffff;
 static int *cgm_polyline; /* stored polyline coordinates */
 static int cgm_coords = 0;	/* # polyline coordinates saved */
 static int cgm_doing_polygon = 0; /* nonzero if creating polygon, else
@@ -313,7 +314,8 @@ enum CGM_id {
     /* rotation */
     CGM_ROTATE, CGM_NOROTATE,
     CGM_DASHED, CGM_SOLID,
-    CGM_LINEWIDTH, CGM_WIDTH, CGM_NOFONTLIST, CGM_OTHER
+    CGM_LINEWIDTH, CGM_WIDTH, CGM_NOFONTLIST, CGM_BACKGROUND,
+    CGM_OTHER
 };
 
 static struct gen_table CGM_opts[] =
@@ -333,6 +335,7 @@ static struct gen_table CGM_opts[] =
     { "li$newidth", CGM_LINEWIDTH },
     { "lw", CGM_LINEWIDTH },
     { "wid$th", CGM_WIDTH },
+    { "backg$round", CGM_BACKGROUND },
     { NULL, CGM_OTHER }
 };
 
@@ -410,6 +413,18 @@ CGM_options()
 		    cgm_plotwidth = 6 * 72;
 		}
 	    }
+	    break;
+	case CGM_BACKGROUND:
+	    c_token++;
+	    cgm_background = parse_color_name();
+	    if (cgm_user_color_count == 0) {
+		cgm_user_color_count = 1;
+		cgm_user_color_table = gp_alloc(4 * sizeof(int), "CGM color table");
+		cgm_user_color_table[0] = 0;
+	    }
+	    cgm_user_color_table[1] = cgm_background>>16 & 0xff;
+	    cgm_user_color_table[2] = cgm_background>>8 & 0xff;
+	    cgm_user_color_table[3] = cgm_background & 0xff;
 	    break;
 	case CGM_OTHER:
 	default:
@@ -1751,7 +1766,8 @@ START_HELP(cgm)
 "       set terminal cgm {color | monochrome} {solid | dashed} {{no}rotate}",
 "                        {<mode>} {width <plot_width>} {linewidth <line_width>}",
 "                        {font \"<fontname>,<fontsize>\"}",
-"                        {<color0> <color1> <color2> ...}",
+"                        {background <rgb_color>}",
+"   [deprecated]         {<color0> <color1> <color2> ...}",
 "",
 " `solid` draws all curves with solid lines, overriding any dashed patterns;",
 " <mode> is `landscape`, `portrait`, or `default`;",
@@ -1763,10 +1779,13 @@ START_HELP(cgm)
 " The first six options can be in any order.  Selecting `default` sets all",
 " options to their default values.",
 "",
-" Each color must be of the form 'xrrggbb', where x is the literal",
-" character 'x' and 'rrggbb' are the red, green and blue components in",
-" hex.  For example, 'x00ff00' is green.  The background color is set",
-" first, then the plotting colors.",
+" The mechanism of setting line colors in the `set term` command is",
+" deprecated.  Instead you should set the background using a separate",
+" keyword and set the line colors using `set linetype`.",
+" The deprecated mechanism accepted colors of the form 'xrrggbb', where x is",
+" the literal character 'x' and 'rrggbb' are the red, green and blue components",
+" in hex. The first color was used for the background, subsequent colors are",
+" assigned to successive line types.",
 "",
 " Examples:",
 "       set terminal cgm landscape color rotate dashed width 432 \\",

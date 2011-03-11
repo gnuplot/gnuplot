@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: cairo.trm,v 1.41 2010/11/08 19:33:12 sfeam Exp $
+ * $Id: cairo.trm,v 1.42 2011/02/12 21:53:24 sfeam Exp $
  */
 
 /* GNUPLOT - cairo.trm */
@@ -97,6 +97,7 @@ typedef struct cairo_params_t {
     TBOOLEAN enhanced;
     TBOOLEAN dashed;
     float dash_length;
+    rgb_color background;
     TBOOLEAN mono;
     TBOOLEAN rounded;                 /* rounded linecaps and linejoins */
     TBOOLEAN transparent;
@@ -111,14 +112,14 @@ typedef struct cairo_params_t {
 } cairo_params_t;
 
 #define CAIROPDF_PARAMS_DEFAULT { \
-    CAIROTERM_PDF, INCHES, FALSE, FALSE, 1.0, FALSE, FALSE, FALSE, FALSE, "", \
+    CAIROTERM_PDF, INCHES, FALSE, FALSE, 1.0, {1.,1.,1.}, FALSE, FALSE, FALSE, FALSE, "", \
     12, 0.5, 5*72., 3*72., 0.25, 1.0 \
 }
 static cairo_params_t cairopdf_params = CAIROPDF_PARAMS_DEFAULT;
 static const cairo_params_t cairopdf_params_default = CAIROPDF_PARAMS_DEFAULT;
 
 #define CAIROPNG_PARAMS_DEFAULT { \
-    CAIROTERM_PNG, PIXELS, FALSE, FALSE, 1.0, FALSE, FALSE, FALSE, FALSE, "", \
+    CAIROTERM_PNG, PIXELS, FALSE, FALSE, 1.0, {1.,1.,1.}, FALSE, FALSE, FALSE, FALSE, "", \
     12, 1.0, 640., 480., 1.0, 1.0 \
 }
 static cairo_params_t cairopng_params = CAIROPNG_PARAMS_DEFAULT;
@@ -147,6 +148,7 @@ enum CAIROTRM_id {
     CAIROTRM_NOTRANSPARENT,
     CAIROTRM_CROP,
     CAIROTRM_NOCROP,
+    CAIROTRM_BACKGROUND,
     CAIROTRM_OTHER
 };
 
@@ -171,6 +173,7 @@ static struct gen_table cairotrm_opts[] = {
     {"notransp$arent", CAIROTRM_NOTRANSPARENT},
     {"crop", CAIROTRM_CROP},
     {"nocrop", CAIROTRM_NOCROP},
+    {"backg$round", CAIROTRM_BACKGROUND},
     {NULL, CAIROTRM_OTHER}
 };
 
@@ -314,6 +317,17 @@ TERM_PUBLIC void cairotrm_options()
 			if (!strcmp(term->name,"pngcairo"))
 			    cairo_params->crop = FALSE;
 			break;
+		case CAIROTRM_BACKGROUND:
+			{
+			int wxt_background;
+			c_token++;
+			wxt_background = parse_color_name();
+			cairo_params->background.r = (double)((wxt_background >> 16) & 0xff) / 255.;
+			cairo_params->background.g = (double)((wxt_background >>  8) & 0xff) / 255.;
+			cairo_params->background.b = (double)( wxt_background        & 0xff) / 255.;
+			break;
+			}
+
 		case CAIROTRM_OTHER:
 			/* Ignore irrelevant keywords used by other png/pdf drivers */
 			if (almost_equals(c_token,"true$color")
@@ -463,7 +477,11 @@ void cairotrm_init()
  * Should clear the terminal. */
 void cairotrm_graphics()
 {
-	/* Initialize background to solid white */
+	/* Initialize background */
+	plot.background.r = cairo_params->background.r;
+	plot.background.g = cairo_params->background.g;
+	plot.background.b = cairo_params->background.b;
+	gp_cairo_set_background(cairo_params->background);
 	if (cairo_params->transparent)
 		gp_cairo_clear_background(&plot);
 	else
@@ -1054,7 +1072,7 @@ START_HELP(pngcairo)
 " Syntax:",
 "         set term pngcairo",
 "                      {{no}enhanced} {mono|color} {solid|dashed}",
-"                      {{no}transparent} {{no}crop}",
+"                      {{no}transparent} {{no}crop} {background <rgbcolor>",
 "                      {font <font>} {fontscale <scale>}",
 "                      {linewidth <lw>} {rounded|butt} {dashlength <dl>}",
 "                      {size <XX>{unit},<YY>{unit}}",

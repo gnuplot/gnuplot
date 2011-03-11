@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_term.h,v 1.12 2009/06/13 05:23:56 sfeam Exp $
+ * $Id: wxt_term.h,v 1.13 2010/03/18 04:52:53 sfeam Exp $
  */
 
 /* GNUPLOT - wxt_term.h */
@@ -103,6 +103,8 @@ extern int wxt_window_number;
 extern TBOOLEAN wxt_enhanced_enabled;
 extern TBOOLEAN wxt_dashed;
 extern double wxt_dashlength;
+extern int wxt_background;
+extern rgb_color wxt_rgb_background;
 extern int wxt_persist;
 extern int wxt_raise;
 extern int wxt_ctrl;

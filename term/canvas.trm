@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: canvas.trm,v 1.40 2010/11/25 06:07:03 sfeam Exp $
+ * $Id: canvas.trm,v 1.41 2010/11/26 23:37:41 sfeam Exp $
  *
  */
 
@@ -35,6 +35,8 @@
  *   Ethan A Merritt, Nov 2010
  *	Dashed line support, butt/rounded line properties
  *	revised javascript with all methods and variables in container gnuplot()
+ *   Ethan A Merritt, Feb 2011
+ *	Optional explicit background
  *
  * send your comments or suggestions to (gnuplot-info@lists.sourceforge.net).
  *
@@ -106,6 +108,7 @@ static TBOOLEAN canvas_dashed = FALSE;
 static TBOOLEAN canvas_rounded = FALSE;
 static TBOOLEAN CANVAS_mouseable = FALSE;
 static TBOOLEAN CANVAS_standalone = TRUE;
+static char CANVAS_background[18] = {'\0'};
 static char *CANVAS_name = NULL;
 static char *CANVAS_scriptdir = NULL;
 static char *CANVAS_title = NULL;
@@ -121,7 +124,7 @@ enum CANVAS_case {
     CANVAS_SIZE, CANVAS_FSIZE, CANVAS_NAME, CANVAS_STANDALONE, CANVAS_TITLE,
     CANVAS_LINEWIDTH, CANVAS_MOUSING, CANVAS_JSDIR, CANVAS_ENH, CANVAS_NOENH,
     CANVAS_FONTSCALE, CANVAS_SOLID, CANVAS_DASHED, CANVAS_DASHLENGTH,
-    CANVAS_ROUNDED, CANVAS_BUTT, CANVAS_OTHER
+    CANVAS_ROUNDED, CANVAS_BUTT, CANVAS_BACKGROUND, CANVAS_OTHER
 };
 
 static struct gen_table CANVAS_opts[] =
@@ -145,6 +148,7 @@ static struct gen_table CANVAS_opts[] =
     { "dl", CANVAS_DASHLENGTH },
     { "round$ed", CANVAS_ROUNDED },
     { "butt", CANVAS_BUTT },
+    { "backg$round", CANVAS_BACKGROUND },
     { NULL, CANVAS_OTHER }
 };
 
@@ -174,6 +178,8 @@ CANVAS_finish (void)
 TERM_PUBLIC void
 CANVAS_options()
 {
+    int canvas_background = 0;
+
     /* (c_token == 2) only in the case of 'set termoption'	*/
     /* which is after we have already initialized everything.	*/
     if (c_token != 2) {
@@ -191,6 +197,7 @@ CANVAS_options()
 	canvas_linewidth = 1.0;
 	canvas_dashed = FALSE;
 	canvas_dashlength_factor = 1.0;
+	CANVAS_background[0] = '\0';
     }
 
     while (!END_OF_COMMAND) {
@@ -292,6 +299,14 @@ CANVAS_options()
 	    canvas_rounded = FALSE;
 	    break;
 
+	case CANVAS_BACKGROUND:
+	    canvas_background = parse_color_name();
+	    sprintf(CANVAS_background,"rgb(%03d,%03d,%03d)",
+		(canvas_background >> 16) & 0xff,
+		(canvas_background >> 8) & 0xff, 
+		canvas_background & 0xff);
+	    break;
+
 	default:
 	    int_warn(c_token-1,"unrecognized terminal option");
  	    break;
@@ -310,6 +325,8 @@ CANVAS_options()
 	term->put_text == ENHCANVAS_put_text ? " enhanced" : "",
 	canvas_font_size, canvas_linewidth);
     sprintf(term_options + strlen(term_options), " fontscale %g", canvas_fontscale);
+    if (*CANVAS_background)
+	sprintf(term_options + strlen(term_options), " background \"#%06x\"", canvas_background);
     if (CANVAS_name)
 	sprintf(term_options + strlen(term_options), " name \"%s\"", CANVAS_name);
     else {
@@ -485,10 +502,19 @@ CANVAS_graphics()
 	canvas_rounded ? "round" : "miter"
     );
 
+    if (*CANVAS_background) {
+	fprintf(gpoutfile,
+	    "ctx.fillStyle = \"%s\";\n"
+	    "ctx.fillRect(0,0,%d,%d);\n",
+	    CANVAS_background,
+	    (int)(term->xmax / CANVAS_OVERSAMPLE),
+	    (int)(term->ymax / CANVAS_OVERSAMPLE));
+    }
+
     fprintf(gpoutfile,
 	    "CanvasTextFunctions.enable(ctx);\n"
 	    "ctx.strokeStyle = \"rgb(215,215,215)\";\n"
-	    "ctx.lineWidth = %.1g;\n",
+	    "ctx.lineWidth = %.1g;\n\n",
 	canvas_linewidth
     );
 }
@@ -693,9 +719,12 @@ CANVAS_linetype(int linetype)
 
     if (linetype >= 14)
 	linetype %= 14;
-    if (linetype <= LT_BACKGROUND) /* LT_NODRAW, LT_BACKGROUND, LT_UNDEFINED */
+    if (linetype <= LT_NODRAW) /* LT_NODRAW, LT_BACKGROUND, LT_UNDEFINED */
 	linetype = -3;
-    strcpy(canvas_state.color,pen_type[linetype + 3]);
+    if (linetype == -3 && *CANVAS_background)
+	strcpy(canvas_state.color,CANVAS_background);
+    else
+	strcpy(canvas_state.color,pen_type[linetype + 3]);
     if (strcmp(canvas_state.color, canvas_state.previous_color)) {
 	fprintf(gpoutfile, "ctx.strokeStyle = \"%s\";\n", canvas_state.color);
 	strcpy(canvas_state.previous_color, canvas_state.color);
@@ -1225,7 +1254,8 @@ START_HELP(canvas)
 "?term canvas",
 "",
 " Syntax:",
-"       set terminal canvas {size <xsize>, <ysize>} {fsize <fontsize>}",
+"       set terminal canvas {size <xsize>, <ysize>} {background <rgb_color>}",
+"                           {fsize <fontsize>}",
 "                           {{no}enhanced} {linewidth <lw>}",
 "                           {rounded | butt}",
 "                           {solid | dashed {dashlength <dl>}}",

@@ -1,5 +1,5 @@
 /*
- * $Id: gp_cairo.c,v 1.52 2010/08/26 18:17:21 sfeam Exp $
+ * $Id: gp_cairo.c,v 1.53 2011/01/19 03:15:00 sfeam Exp $
  */
 
 /* GNUPLOT - gp_cairo.c */
@@ -140,12 +140,17 @@ static rgb_color gp_cairo_colorlist[12] = {
 };
 
 /* correspondance between gnuplot linetypes and terminal colors */
+void gp_cairo_set_background( rgb_color background )
+{
+	gp_cairo_colorlist[0] = background;
+}
+
 rgb_color gp_cairo_linetype2color( int linetype )
 {
 	if (linetype<=LT_NODRAW)
-		linetype = LT_NODRAW; /* background color*/
-
-	return gp_cairo_colorlist[ linetype%9 +3 ];
+		return gp_cairo_colorlist[ 0 ];
+	else
+		return gp_cairo_colorlist[ linetype%9 +3 ];
 }
 
 /* initialize all fields of the plot structure */
@@ -163,6 +168,7 @@ void gp_cairo_initialize_plot(plot_struct *plot)
 	plot->dashlength = 1.0;
 	plot->text_angle = 0.0;
 	plot->color.r = 0.0; plot->color.g = 0.0; plot->color.b = 0.0;
+	plot->background.r = 1.0; plot->background.g = 1.0; plot->background.b = 1.0;
 
 	plot->opened_path = FALSE;
 
@@ -1557,7 +1563,7 @@ void gp_cairo_fill(plot_struct *plot, int fillstyle, int fillpar)
 		FPRINTF((stderr,"pattern fillpar = %d %lf %lf %lf\n",fillpar, plot->color.r, plot->color.g, plot->color.b));
 		return;
 	case FS_EMPTY: /* fill with background plot->color */
-		cairo_set_source_rgb(plot->cr, 1, 1, 1);
+		cairo_set_source_rgb(plot->cr, plot->background.r, plot->background.g, plot->background.b);
 		FPRINTF((stderr,"empty\n"));
 		return;
 	default:
@@ -1716,7 +1722,7 @@ void gp_cairo_solid_background(plot_struct *plot)
 			cairo_status_to_string (cairo_status (plot->cr)));
 		exit(0);
 	}
-	cairo_set_source_rgb(plot->cr, 1.0, 1.0, 1.0);
+	cairo_set_source_rgb(plot->cr, plot->background.r, plot->background.g, plot->background.b);
 	cairo_paint(plot->cr);
 }
 

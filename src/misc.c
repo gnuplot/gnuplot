@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.129 2011/02/10 21:27:43 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.130 2011/02/20 23:17:11 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -1128,6 +1128,8 @@ parse_color_name()
     int index;
     int color = -1;
 
+    if (almost_equals(c_token,"rgb$color"))
+	c_token++;
     if ((string = try_to_get_string())) {
 	color = lookup_table_nth(pm3d_color_names_tbl, string);
 	if (color >= 0)

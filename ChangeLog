@@ -1,4 +1,4 @@
-2011-03-10  Bastian Maerkisch  <bmaerkisch@web.de>
+2011-03-11  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/makefile.nt: implement suggestions by Shigeharu Takeno:
 	Do not use "+=" to be compatible with Visual C++ 2005; add/update
@@ -14,6 +14,13 @@
 	* term/svg.trm: Demarcate plot elements using the svg <title> and
 	<g id=foo> elements rather than <a xlink:foo>
 	Bug #3205257
+
+	* src/misc.c src/wxterminal/gp_cairo.c src/wxterminal/gp_cairo.h
+	src/wxterminal/wxt_gui.cpp src/wxterminal/wxt_term.h term/cairo.trm
+	term/canvas.trm term/cgm.trm term/emf.trm term/gd.trm term/svg.trm
+	term/wxt.trm term/x11.trm:
+	Add option to specify a background color in "set term".
+	NB: Not yet implemented for terminals:  win post qt pm
 
 2011-03-11  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 

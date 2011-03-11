@@ -1,5 +1,5 @@
 /* Hey Emacs this is -*- C -*-
- * $Id: emf.trm,v 1.69 2010/12/14 04:56:38 sfeam Exp $
+ * $Id: emf.trm,v 1.70 2011/02/10 21:14:49 sfeam Exp $
  */
 
 /* GNUPLOT - emf.trm */
@@ -344,6 +344,7 @@ static unsigned int emf_polyline[EMF_MAX_SEGMENTS];	/* stored polyline coordinat
 static unsigned int emf_graphics = FALSE;
 static unsigned int emf_dashed = TRUE;
 static unsigned int emf_monochrome = FALSE;
+static unsigned int emf_background = 0xffffff; /* defaults to white */
 static double emf_linewidth;	/* line width in plot units */
 static double emf_linewidth_factor = 1.0;
 static double emf_dashlength = 1.0;
@@ -597,6 +598,7 @@ TERM_PUBLIC void
 EMF_options()
 {
     char *s;
+    int emf_bgnd_rgb = 0;
 
     /* Annoying hack to handle the case of 'set termoption' after */
     /* we have already initialized the terminal.                  */
@@ -605,6 +607,7 @@ EMF_options()
 	term->ymax = EMF_YMAX;
 	emf_dashed = TRUE;
 	emf_monochrome = FALSE;
+	emf_background = 0xffffff;
 	emf_tweak = TRUE;
     }
 
@@ -674,6 +677,14 @@ EMF_options()
 	    c_token++;
 	    term->put_text = EMF_put_text;
 	    term->flags &= ~TERM_ENHANCED_TEXT;
+	}
+
+	if (almost_equals(c_token,"back$ground")) {
+	    c_token++;
+	    emf_bgnd_rgb = parse_color_name();
+	    emf_background = RGB((emf_bgnd_rgb>>16)&0xFF,
+			(emf_bgnd_rgb>>8)&0xFF, 
+			emf_bgnd_rgb&0xFF);
 	}
 
 	if (almost_equals(c_token,"nopro$portional")) {
@@ -754,6 +765,9 @@ EMF_options()
     if (emf_dashlength != 1.0)
 	sprintf(&(term_options[strlen(term_options)]), " dashlength %.1f",
 		emf_dashlength);
+    if (emf_bgnd_rgb)
+	sprintf(&(term_options[strlen(term_options)]), " background \"#%06x\"",
+		emf_bgnd_rgb);
 }
 
 TERM_PUBLIC void 
@@ -806,6 +820,11 @@ EMF_graphics()
     EMF_SetMapMode(8);		/* forcing anisotropic mode */
     EMF_SetWindowExtEx(term->xmax, term->ymax);		/* setting logical (himetric) size      */
     EMF_SetViewportExtEx(term->xmax / EMF_PX2HM, term->ymax / EMF_PX2HM);	/* setting device (pixel) size */
+
+    /* Paint with background color */
+    if (emf_background != 0xffffff)
+	EMF_fillbox(FS_EMPTY, 0, 0, term->xmax, term->ymax);
+
     EMF_CreatePen(EMF_HANDLE_PEN, emf_pentype, 1, 0x000000);	/* init default pen */
     EMF_SelectObject(EMF_HANDLE_PEN);
     EMF_SetBkMode(1);		/* transparent background for text */
@@ -910,7 +929,7 @@ EMF_linecolor(int linecolor)
     };
 
     if (linecolor == LT_BACKGROUND)
-	emf_color = RGB(255, 255, 255);	/* white (background) */
+	emf_color = emf_background;
     else {
 	linecolor = (linecolor < 0 || emf_monochrome) ? 7 : (linecolor % EMF_COLORS);
 	emf_color = color_table_data[linecolor];
@@ -966,7 +985,7 @@ EMF_filled_polygon(int points, gpiPoint *corners)
 
     switch (style) {
 	case FS_EMPTY: /* fill with background color */
-		color = RGB(255,255,255);
+		color = emf_background;
 		break;
 	case FS_PATTERN: /* pattern fill implemented as partial density */
 		fillpar *= 12;
@@ -1284,7 +1303,7 @@ EMF_point(unsigned int x, unsigned int y, int number)
     /* A few special point types */
     if (69 <= number && number <= 73) {
 	int emf_color_save = emf_color;
-	emf_color = RGB(255,255,255);	/* Should be background */
+	emf_color = emf_background;
 	switch (number) {
 	case 69:  EMF_point(x,y,4); break;
 	case 70:  EMF_point(x,y,6); break;
@@ -1715,7 +1734,8 @@ START_HELP(emf)
 "       set terminal emf {color | monochrome} {solid | dashed}",
 "                        {enhanced {noproportional}}",
 "                        {rounded | butt}",
-"                        {linewidth <LW>} {dashlength <DL>} {size XX,YY}",
+"                        {linewidth <LW>} {dashlength <DL>}",
+"                        {size XX,YY} {background <rgb_color>}",
 "                        {\"<fontname>\"} {<fontsize>}    #old syntax",
 "                        {font \"<fontname>,<fontsize>\"} #new syntax",
 "                        {fontscale <scale>}",

@@ -1,5 +1,5 @@
 /*
- * $Id: wxt.trm,v 1.25 2009/06/13 05:23:56 sfeam Exp $
+ * $Id: wxt.trm,v 1.26 2010/03/18 04:52:54 sfeam Exp $
  */
 
 /* GNUPLOT - wxt.trm */
@@ -61,6 +61,8 @@ int wxt_window_number = 0;
 TBOOLEAN wxt_enhanced_enabled = FALSE;
 TBOOLEAN wxt_dashed = FALSE;
 double wxt_dashlength = 1.0;
+int wxt_background = 0xffffff;
+rgb_color wxt_rgb_background = {1.,1.,1.};
 int wxt_persist = UNSET;
 int wxt_raise = UNSET;
 int wxt_ctrl = UNSET;
@@ -100,6 +102,7 @@ enum WXT_id {
     WXT_SOLID,
     WXT_DASHED,
     WXT_DASHLENGTH,
+    WXT_BACKGROUND,
     WXT_OTHER
 };
 
@@ -123,6 +126,7 @@ static struct gen_table wxt_opts[] = {
     {"dash$ed", WXT_DASHED},
     {"dashl$ength", WXT_DASHLENGTH},
     {"dl", WXT_DASHLENGTH},
+    {"backg$round", WXT_BACKGROUND},
     {NULL, WXT_OTHER}
 };
 
@@ -278,6 +282,15 @@ TERM_PUBLIC void wxt_options()
 			c_token++;
 			wxt_dashed = FALSE;
 			break;
+		case WXT_BACKGROUND:
+			{
+			c_token++;
+			wxt_background = parse_color_name();
+			wxt_rgb_background.r = (double)((wxt_background >> 16) & 0xff) / 255.;
+			wxt_rgb_background.g = (double)((wxt_background >>  8) & 0xff) / 255.;
+			wxt_rgb_background.b = (double)( wxt_background        & 0xff) / 255.;
+			break;
+			}
 		case WXT_OTHER:
 		default:
 			wxt_window_number = int_expression();
@@ -308,6 +321,12 @@ TERM_PUBLIC void wxt_options()
 	if (wxt_dashlength != 1.0) {
 		char tmp_term_options[MAX_LINE_LEN+1] = "";
 		snprintf(tmp_term_options,sizeof(tmp_term_options), " dashlength %g", wxt_dashlength);
+		strncat(term_options, tmp_term_options, sizeof(term_options)-strlen(term_options));
+	}
+
+	if (wxt_background != 0xffffff) {
+		char tmp_term_options[MAX_LINE_LEN+1] = "";
+		snprintf(tmp_term_options,sizeof(tmp_term_options), " background '#%06x'", wxt_background);
 		strncat(term_options, tmp_term_options, sizeof(term_options)-strlen(term_options));
 	}
 
@@ -434,7 +453,7 @@ START_HELP(wxt)
 "",
 " Syntax:",
 "         set term wxt {<n>}",
-"                      {size <width>,<height>}",
+"                      {size <width>,<height>} {background <rgb_color>}",
 "                      {{no}enhanced}",
 "                      {font <font>} {fontscale <scale>}",
 "                      {title \"title\"}",

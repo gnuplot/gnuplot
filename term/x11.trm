@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: x11.trm,v 1.188 2010/08/15 00:00:59 sfeam Exp $
+ * $Id: x11.trm,v 1.189 2010/09/16 02:50:51 sfeam Exp $
  *
  */
 
@@ -187,6 +187,7 @@ static FILE *X11_ipc = (FILE *) 0;
 
 /* reserve a minimum 10 driver opts */
 static char *optvec[2 * X11_nopts + 1 + 10];
+static char x11_userbkg[] = "#RRGGBB";
 
 /* gnuplot_x11 has extension .exe on OS/2 and Windows (and on RSX/VMS, but
    these construct their own full path GNUPLOT_X11 in their build script).
@@ -371,6 +372,7 @@ enum X11_id {
     X11_NOCTRLQ,
     X11_SIZE,
     X11_POSITION,
+    X11_BACKGROUND,
 #ifdef EXTERNAL_X11_WINDOW
     X11_WINDOW,
 #endif
@@ -397,6 +399,7 @@ static struct gen_table X11_opts[] = {
     {"noctrl$q", X11_NOCTRLQ},
     {"si$ze", X11_SIZE},
     {"pos$ition", X11_POSITION},
+    {"backg$round", X11_BACKGROUND},
 #ifdef EXTERNAL_X11_WINDOW
     {"w$indow", X11_WINDOW},
 #endif
@@ -412,6 +415,7 @@ X11_options()
 
     int c_title_token = 0;
     int new_term_number = 0;
+    int background;
     TBOOLEAN duplication = FALSE;
     TBOOLEAN set_reset = FALSE, set_persist = FALSE, set_raise = FALSE, set_font = FALSE;
     TBOOLEAN set_ctrlq = FALSE;
@@ -424,6 +428,7 @@ X11_options()
     do_raise = dashedlines = ctrlq = UNSET;
     set_size = set_position = UNSET;
     persist = persist_cl;	/* previously set from command line */
+    strcpy(x11_userbkg,"#RRGGBB");
 
     while (!END_OF_COMMAND) {
 	switch (lookup_table(&X11_opts[0], c_token)) {
@@ -562,6 +567,11 @@ X11_options()
 		}
 		set_position = yes;
 	    }
+	    break;
+	case X11_BACKGROUND:
+	    c_token++;
+	    background = parse_color_name();
+	    sprintf(x11_userbkg,"#%06x",background);
 	    break;
 
 #ifdef EXTERNAL_X11_WINDOW
@@ -975,9 +985,19 @@ X11_init()
 		*++ptr = (char *) 0;	/* terminate */
 	    }
 # endif	/* PIPE_IPC */
+
+	    /* Add user-specified background to list of command options */
+	    if (strcmp(x11_userbkg,"#RRGGBB")) {
+		char **ptr;
+		for (ptr = optvec; ptr && *ptr; ptr++)
+		    ;		/* do nothing: skip over set arguments */
+		*ptr++ = "-bg";
+		*ptr++ = x11_userbkg;
+		*ptr = (char *) 0;	/* terminate */
+	    }
+
 	    /* close the write side of the child's forward fd */
 	    close(fdes[1]);
-
 	    dup2(fdes[0], 0);	/* stdin from pipe */
 	    execvp(X11_full_command_path, optvec);
 	    /* if we get here, something went wrong */

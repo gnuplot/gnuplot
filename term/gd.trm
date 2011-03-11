@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: gd.trm,v 1.149 2010/09/16 04:58:45 sfeam Exp $
+ * $Id: gd.trm,v 1.152 2011/03/11 21:18:50 sfeam Exp $
  * based on gif.trm,v 1.26.2.1 2000/05/01 00:17:20 joze
  */
 
@@ -58,14 +58,13 @@
  *
  * font name (TrueType or Adobe Type 1 font name is passed to libgd)
  *
+ * EAM Dec 2010: Obsolete!
  * xrrggbb - sets the next color.  x is the literal character 'x',
  * rrggbb are the red green and blue components in hex.  For example
  * x00ff00 is green.  The background color is set first, then the
  * color borders, then the X & Y axis, then the plotting colors.
  * (The wierd color spec is in order to get around limitations
  * in gnuplot's scanner.)
- * EAM Feb 2010: This mechanism is totally obsolete except for setting the
- * background color.  Revise the documentation accordingly.
  *
  * This driver is modeled after the PBM driver pbm.trm.
  *
@@ -271,7 +270,7 @@ enum PNG_id {
     /* Font size */
     PNG_TINY, PNG_SMALL, PNG_MEDIUM, PNG_LARGE, PNG_GIANT,
     PNG_FONT, PNG_FONTSCALE,
-    PNG_SIZE,
+    PNG_SIZE, PNG_BACKGROUND,
     PNG_ENHANCED, PNG_NOENHANCED,
     PNG_TRUECOLOR, PNG_NOTRUECOLOR,
     PNG_LINEWIDTH, PNG_BUTT, PNG_ROUNDED, PNG_DASHLENGTH,
@@ -320,6 +319,7 @@ static struct gen_table PNG_opts[] =
     { "round$ed", PNG_ROUNDED},
     { "dashl$ength", PNG_DASHLENGTH},
     { "dl", PNG_DASHLENGTH},
+    { "backg$round", PNG_BACKGROUND},
     { NULL, PNG_OTHER }
 };
 
@@ -640,7 +640,6 @@ PNG_options()
     int i;
     char *string;
     unsigned long color;
-    TBOOLEAN new_colors = FALSE;
     TBOOLEAN gif_anim_option = FALSE; /* set to TRUE if an animated gif option given */
 
     if (!PNG_initialized) {
@@ -950,6 +949,12 @@ PNG_options()
 	    c_token++;
 	    break;
 
+	case PNG_BACKGROUND:
+	    c_token++;
+	    png_state.rgb_table[0] = parse_color_name();
+	    png_state.n_colors = 1;
+	    break;
+
 	case PNG_OTHER:
 	default:
 	    /* not "size" */
@@ -967,19 +972,8 @@ PNG_options()
 	    }
 #endif
 
-	    if (sscanf(string, "x%lx", &color) != 1) {
-		int_error(c_token, "invalid color spec, must be xRRGGBB");
-	    } else if (png_state.n_colors == PNG_MAX_COLORS && new_colors) {
-		int_warn(c_token, "too many colors, ignoring");
-		++c_token;
-	    } else {
-	        if (!new_colors) {
-		    new_colors = TRUE;
-		    png_state.n_colors = 0;
-		}
-		png_state.rgb_table[png_state.n_colors++] = color;
-		++c_token;
-	    }
+	    if (sscanf(string, "x%lx", &color) == 1)
+		int_error(c_token, "obsolete color option");
 	    break;
 	}
     }
@@ -1128,12 +1122,10 @@ PNG_options()
     sprintf(term_options + strlen(term_options),
 	    "size %d,%d ", PNG_XMAX, PNG_YMAX);
 
-    if (new_colors)
-	for (i = 0; strlen(term_options) + 9 < MAX_LINE_LEN &&
-	     i < png_state.n_colors; i++) {
-	    sprintf(term_options + strlen(term_options),
-		"x%06x ", png_state.rgb_table[i]);
-	}
+    if (png_state.n_colors == 1)
+	sprintf(term_options + strlen(term_options),
+	    "background \"#%06x\" ", png_state.rgb_table[0]);
+
 }
 
 
@@ -2360,7 +2352,7 @@ START_HELP(png)
 "              {tiny | small | medium | large | giant}",
 "              {font \"<face> {,<pointsize>}\"} {fontscale <scale>}",
 "              {size <x>,<y>} {{no}crop}",
-"              {<background_color>}",
+"              {background <rgb_color>}",
 "",
 " PNG, JPEG and GIF images are created using the external library libgd.",
 " PNG plots may be viewed interactively by piping the output to the",
@@ -2515,7 +2507,7 @@ START_HELP(jpeg)
 "              {tiny | small | medium | large | giant}",
 "              {font \"<face> {,<pointsize>}\"} {fontscale <scale>}",
 "              {size <x>,<y>} {{no}crop}",
-"              {<background_color>}",
+"              {background <rgb_color>}",
 "",
 " PNG, JPEG and GIF images are created using the external library libgd.",
 " In most cases, PNG is to be preferred for single plots, and GIF for",
@@ -2670,7 +2662,7 @@ START_HELP(gif)
 "              {font \"<face> {,<pointsize>}\"} {fontscale <scale>}",
 "              {size <x>,<y>} {{no}crop}",
 "              {animate {delay <d>} {loop <n>} {{no}optimize}}",
-"              {<background_color>}",
+"              {background <rgb_color>}",
 "",
 " PNG, JPEG and GIF images are created using the external library libgd.",
 " GIF plots may be viewed interactively by piping the output to the",
