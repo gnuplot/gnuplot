@@ -339,7 +339,6 @@ static double PNG_dashlength_factor = 1.0;
 #ifdef HAVE_ICONV
 #include <iconv.h>
 #endif
-static char *iconv_string = NULL;
 
 /* EAM - gdImage structure to hold brushes for linewidth */
 /* We will allocate and initialize these on demand */
@@ -1649,6 +1648,8 @@ PNG_linewidth(double linewidth)
 TERM_PUBLIC void
 PNG_put_text(unsigned int x, unsigned int y, const char *string)
 {
+    char *iconv_string = NULL;
+
     if (contains8bit(string)) {
 #ifdef HAVE_ICONV
 	size_t len1 = strlen(string)+1;
