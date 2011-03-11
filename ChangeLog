@@ -11,6 +11,10 @@
 	* configure.in: Check for iconv library and iconv.h, since gd uses iconv
 	to convert between UTF-8 and SJIS encodings if it is available.
 
+	* term/svg.trm: Demarcate plot elements using the svg <title> and
+	<g id=foo> elements rather than <a xlink:foo>
+	Bug #3205257
+
 2011-03-11  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* term/gd.trm: libgd can be customized for Japanese use such that
