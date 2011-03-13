@@ -1,5 +1,5 @@
 #
-# $Id: makefile.nt,v 1.27 2011/03/09 16:07:41 markisch Exp $
+# $Id: makefile.nt,v 1.28 2011/03/11 20:46:03 markisch Exp $
 #
 # GNUPLOT Makefile Microsoft Visual C++ 2005 or newer
 
@@ -82,7 +82,7 @@ TERMFLAGS = /I..\\term /DGNUPLOT_PS_DIR=\"$(GNUPLOT_PS_DIR)\" /DGNUPLOT_JS_DIR=\
 # linker flags, append paths for external libs later
 LDFLAGS = /nologo /MACHINE:$(MACHINE)
 COMMONLIBS = kernel32.lib user32.lib gdi32.lib winspool.lib \
-             comdlg32.lib advapi32.lib shell32.lib msimg32.lib
+             comdlg32.lib comctl32.lib advapi32.lib shell32.lib msimg32.lib
 CONSOLELIBS = ole32.lib oleaut32.lib comctl32.lib
 
 !IF "$(GDLIB)" == "1"

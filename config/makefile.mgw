@@ -1,5 +1,5 @@
 # Hello, emacs: this is a -*- Makefile -*-
-# $Id: makefile.mgw,v 1.61 2011/03/07 11:25:09 markisch Exp $
+# $Id: makefile.mgw,v 1.62 2011/03/07 21:41:36 markisch Exp $
 #
 # GNUPLOT Makefile for MinGW32 on Win95/98/NT/2k/..
 # This assumes usual installation of the MinGW32 toolkit, the free
@@ -387,7 +387,7 @@ endif
 .c.o:
 	$(CC) -c $(CFLAGS) $*.c
 
-LDLIBS = -lkernel32 -lgdi32 -lwinspool -lcomdlg32 -ladvapi32 -lshell32 -ladvapi32 -lmsimg32 
+LDLIBS = -lkernel32 -lgdi32 -lwinspool -lcomdlg32 -lcomctl32 -ladvapi32 -lshell32 -lmsimg32 
 
 #
 # Create config.h

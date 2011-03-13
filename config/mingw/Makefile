@@ -1,5 +1,5 @@
 # Hello, emacs: this is a -*- Makefile -*-
-# $Id: Makefile,v 1.2 2011/03/07 11:25:08 markisch Exp $
+# $Id: Makefile,v 1.3 2011/03/07 21:41:36 markisch Exp $
 #
 # GNUPLOT Makefile for MinGW32 on Win95/98/NT/2k/..
 # This assumes usual installation of the MinGW32 toolkit, the free
@@ -394,7 +394,7 @@ endif
 .c.$(O):
 	$(CC) -c $(CFLAGS) $<
 
-LDLIBS = -lkernel32 -lgdi32 -lwinspool -lcomdlg32 -ladvapi32 -lshell32 -ladvapi32 -lmsimg32
+LDLIBS = -lkernel32 -lgdi32 -lwinspool -lcomdlg32 -lcomctl32 -ladvapi32 -lshell32 -lmsimg32
 
 
 $(TARGET): $(OBJS) $(WINOBJS) $(W)/wgnuplot.def wgplt_res.$(O) texticon.ico grpicon.ico

@@ -1,3 +1,14 @@
+2011-03-13  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/win/wingraph.c (UpdateStatusLine, DisplaySatusLine): use common
+	controls
+	* src/win/winmain.c (WinMain): init common controls
+	* src/win/winmenu.c (IShellFolder_BindToObject),
+	(IShellFolder_GetDisplayNameOf): protect definition by #ifdef,
+	(SendMacro) use newer variant of directory dialog
+	* config/mingw/Makefile, config/magefile.mgw, config/makefile.nt,
+	conig/watcom/Makefile: add library comctl32
+
 2011-03-11  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/makefile.nt: implement suggestions by Shigeharu Takeno:

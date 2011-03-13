@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.94 2011/02/28 12:19:12 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.95 2011/03/10 19:58:21 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - win/wgraph.c */
@@ -56,6 +56,7 @@ static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.94 2011/02/28 12:19:12 ma
 #if WINVER >= 0x030a
 #  include <commdlg.h>
 #endif
+#include <commctrl.h>
 #ifndef __MSC__
 # include <mem.h>
 #endif
@@ -3271,32 +3272,11 @@ DisplayStatusLine(LPGW lpgw)
 {
 	RECT rc;
 	HDC hdc;
-	SIZE size;
 
 	hdc = GetDC(lpgw->hWndGraph);
-	SetBkMode(hdc, OPAQUE);
 	GetClientRect(lpgw->hWndGraph, &rc);
-	
-	/* determine length of text */
-	size.cx = size.cy = 0;
-	if (sl_curr_text)
-	    GetTextExtentPoint(hdc, sl_curr_text, strlen(sl_curr_text), &size);
-
-	/* erase the rest of status line */
-	rc.left = size.cx;
-	rc.top  = rc.bottom - lpgw->statuslineheight;
-	FillRect(hdc, &rc, (HBRUSH) (COLOR_WINDOW+1));
-	if (size.cx) {
-	    rc.left = 0;
-	    rc.right = size.cx;
-	    rc.top  = rc.bottom - lpgw->statuslineheight + size.cy;
-	    FillRect(hdc, &rc, (HBRUSH) (COLOR_WINDOW+1));
-	}
-
-	/* draw the text */
-	if (sl_curr_text)
-	    TextOut(hdc,  0, rc.bottom - lpgw->statuslineheight, sl_curr_text, strlen(sl_curr_text));
-
+	rc.top = rc.bottom - lpgw->statuslineheight;
+	DrawStatusText(hdc, &rc, sl_curr_text, SBT_POPOUT);
 	ReleaseDC(lpgw->hWndGraph, hdc);
 }
 
@@ -3306,47 +3286,9 @@ DisplayStatusLine(LPGW lpgw)
 static void
 UpdateStatusLine(LPGW lpgw, const char text[])
 {
-	RECT rc;
-	HDC hdc;
-	SIZE size, size2;
-
-	hdc = GetDC(lpgw->hWndGraph);
-	GetClientRect(lpgw->hWndGraph, &rc);
-
-	/* determine length of previous text */
-	size.cx = size.cy = 0;
-	if (sl_curr_text) {
-		GetTextExtentPoint(hdc, sl_curr_text, strlen(sl_curr_text), &size);
-		free(sl_curr_text);
-	}
-
-	/* determine length of new text */
-	if (!text || !*text) {
-		sl_curr_text = 0;
-		size2.cx = size2.cy = 0;
-	} else {
-		sl_curr_text = strdup(text);
-		GetTextExtentPoint(hdc, sl_curr_text, strlen(sl_curr_text), &size2);
-	}
-
-	/* erase the rest of the status line */
-	rc.left = size2.cx;
-	rc.top  = rc.bottom - lpgw->statuslineheight;
-	FillRect(hdc, &rc, (HBRUSH) (COLOR_WINDOW+1));
-	if (size2.cy) {
-	    rc.left = 0;
-	    rc.right = size2.cx;
-	    rc.top  = rc.bottom - lpgw->statuslineheight + size.cy;
-	    FillRect(hdc, &rc, (HBRUSH) (COLOR_WINDOW+1));
-	}
-
-	/* overwrite previous text */
-	if (text && *text) {
-	    SetBkMode(hdc, OPAQUE);
-	    TextOut(hdc,  0, rc.bottom - lpgw->statuslineheight, sl_curr_text, strlen(sl_curr_text));
-	}
-
-	ReleaseDC(lpgw->hWndGraph, hdc);
+	free(sl_curr_text);
+	sl_curr_text = strdup(text);
+	DisplayStatusLine(lpgw);
 }
 
 /* Draw the ruler.

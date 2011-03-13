@@ -1,5 +1,5 @@
 # Hello, emacs: this is a -*- Makefile -*-
-# $Id: Makefile,v 1.5 2011/03/07 11:25:09 markisch Exp $
+# $Id: Makefile,v 1.6 2011/03/08 23:12:42 broeker Exp $
 #
 # GNUPLOT Makefile OpenWatcom 1.3 on Win32
 
@@ -157,7 +157,7 @@ FILE {
  $(WINOBJS)
 }
 LIBRARY kernel32.lib,user32.lib,gdi32.lib,winspool.lib,comdlg32.lib
-LIBRARY advapi32.lib,shell32.lib
+LIBRARY comctl32.lib,advapi32.lib,shell32.lib
 LIBRARY msimg32.lib
 OPTION map
 OPTION SYMFILE
