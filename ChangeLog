@@ -3,9 +3,17 @@
 	* src/win/wgnuplot.rc, src/win/wgnuplot.exe.manifest: add new
 	manifest for wgnuplot to enable visual styles
 	
-	* src/win/wmenu.c, src/win/wtext.c: remove unused variables to make
-	compiler happy, avoid C++ style comments
+	* src/win/wmenu.c, src/win/wtext.c: remove unused variables to
+	make compiler happy, avoid C++ style comments
 	
+	* src/win/wtext.c (TextInit), src/win/wmenu.c, src/win/wgnuplib.h,
+	src/win/wresourc.h: add a statusbar to the text window,
+	reduce size of text area accordingly
+	
+	* src/win/wtext.c (WndParentProc): [WM_GETMINMAXINFO] use active
+	font to calculate minimum window size; take menu, toolbar and
+	statusbar into account
+
 2011-03-13  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* config/cygwin/Makefile (LDLIBS): Add newly needed library.

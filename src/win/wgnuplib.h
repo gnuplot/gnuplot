@@ -1,5 +1,5 @@
 /*
- * $Id: wgnuplib.h,v 1.33 2011/03/13 14:49:48 markisch Exp $
+ * $Id: wgnuplib.h,v 1.34 2011/03/13 19:55:29 markisch Exp $
  */
 
 /* GNUPLOT - win/wgnuplib.h */
@@ -167,6 +167,7 @@ typedef struct tagTW
 	HMENU	hPopMenu;
 	HWND	hWndText;
 	HWND	hWndParent;
+	HWND	hStatusbar;
 	POINT	Origin;
 	POINT	Size;
 	SB	ScreenBuffer;
@@ -184,6 +185,7 @@ typedef struct tagTW
 	HFONT	hfont;
 	int	CharAscent;
 	int	ButtonHeight;
+	int	StatusHeight;
 	int	CaretHeight;
 	int	CursorFlag;		/* scroll to cursor after \n & \r */
 	POINT	CursorPos;		/* cursor position on screen */

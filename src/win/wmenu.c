@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: wmenu.c,v 1.13 2011/03/13 19:55:29 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: wmenu.c,v 1.14 2011/03/14 19:43:10 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - win/wmenu.c */
@@ -906,7 +906,7 @@ char FAR *ButtonText[BUTTONMAX];
 	lptw->ButtonHeight++;
 	GetClientRect(lptw->hWndParent, &rect);
 	SetWindowPos(lptw->hWndText, (HWND)NULL, 0, lptw->ButtonHeight,
-			rect.right, rect.bottom-lptw->ButtonHeight,
+			rect.right, rect.bottom - lptw->ButtonHeight - lptw->StatusHeight,
 			SWP_NOZORDER | SWP_NOACTIVATE);
 
 	goto cleanup;

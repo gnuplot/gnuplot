@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: wtext.c,v 1.25 2011/03/13 19:55:29 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: wtext.c,v 1.26 2011/03/14 19:43:10 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - win/wtext.c */
@@ -62,6 +62,7 @@ static char *RCSid() { return RCSid("$Id: wtext.c,v 1.25 2011/03/13 19:55:29 mar
 #include <windows.h>
 #include <windowsx.h>
 #include <commdlg.h>
+#include <commctrl.h>
 
 #include "wgnuplib.h"
 #include "wresourc.h"
@@ -231,11 +232,31 @@ TextInit(LPTW lptw)
     lptw->hWndText = CreateWindow(szTextClass, lptw->Title,
 				  WS_CHILD | WS_VSCROLL | WS_HSCROLL,
 				  0, lptw->ButtonHeight,
-				  rect.right, rect.bottom-lptw->ButtonHeight,
+				  rect.right, rect.bottom - lptw->ButtonHeight,
 				  lptw->hWndParent, NULL, lptw->hInstance, lptw);
     if (lptw->hWndText == (HWND)NULL) {
 	MessageBox((HWND)NULL,"Couldn't open text window",(LPSTR)NULL, MB_ICONHAND | MB_SYSTEMMODAL);
 	return(1);
+    }
+
+    lptw->hStatusbar = CreateWindowEx(0, STATUSCLASSNAME, (LPSTR)NULL,
+				  WS_CHILD | SBARS_SIZEGRIP,
+				  0, 0, 0, 0, 
+				  lptw->hWndParent, (HMENU)ID_TEXTSTATUS, 
+				  lptw->hInstance, lptw);
+    if (lptw->hStatusbar) {
+	RECT rect;
+	/* auto-adjust size */
+	SendMessage(lptw->hStatusbar, WM_SIZE, (WPARAM)0, (LPARAM)0);
+
+	/* make room */
+	GetClientRect(lptw->hStatusbar, &rect);
+	lptw->StatusHeight = rect.bottom - rect.top;
+	GetClientRect(lptw->hWndParent, &rect);
+	SetWindowPos(lptw->hWndText, (HWND)NULL, 0, 0,
+			rect.right, rect.bottom - lptw->StatusHeight,
+			SWP_NOZORDER | SWP_NOACTIVATE);
+	ShowWindow(lptw->hStatusbar, TRUE);
     }
 
     lptw->hPopMenu = CreatePopupMenu();
@@ -1008,25 +1029,22 @@ WndParentProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
     case WM_GETMINMAXINFO:
     {
 	POINT FAR * MMinfo = (POINT FAR *)lParam;
-	TEXTMETRIC tm;
-
-	hdc = GetDC(hwnd);
-	SelectObject(hdc, GetStockObject(OEM_FIXED_FONT));
-	GetTextMetrics(hdc,(LPTEXTMETRIC)&tm);
-	ReleaseDC(hwnd,hdc);
-	/* minimum size */
-	MMinfo[3].x = ScreenMinSize.x*tm.tmAveCharWidth
-	    + GetSystemMetrics(SM_CXVSCROLL) + 2*GetSystemMetrics(SM_CXFRAME);
-	MMinfo[3].y = ScreenMinSize.y*tm.tmHeight
-	    + GetSystemMetrics(SM_CYHSCROLL) + 2*GetSystemMetrics(SM_CYFRAME)
-	    + GetSystemMetrics(SM_CYCAPTION);
+        MMinfo[3].x = GetSystemMetrics(SM_CXVSCROLL) + 2*GetSystemMetrics(SM_CXFRAME);
+	MMinfo[3].y = GetSystemMetrics(SM_CYHSCROLL) + 2*GetSystemMetrics(SM_CYFRAME)
+	    + GetSystemMetrics(SM_CYCAPTION) + GetSystemMetrics(SM_CYMENU);
+	if (lptw) {
+	    MMinfo[3].x += ScreenMinSize.x * lptw->CharSize.x;
+	    MMinfo[3].y += ScreenMinSize.y * lptw->CharSize.y;
+	    MMinfo[3].y += lptw->ButtonHeight + lptw->StatusHeight;
+	}
 	return(0);
     }
     case WM_SIZE:
 	SetWindowPos(lptw->hWndText, (HWND)NULL, 0, lptw->ButtonHeight,
-		     LOWORD(lParam), HIWORD(lParam)-lptw->ButtonHeight,
+		     LOWORD(lParam), HIWORD(lParam) - lptw->ButtonHeight - lptw->StatusHeight,
 		     SWP_NOZORDER | SWP_NOACTIVATE);
 	SendMessage(lptw->lpmw->hToolbar, WM_SIZE, wParam, lParam);
+	SendMessage(lptw->hStatusbar, WM_SIZE, wParam, lParam);
 	return(0);
     case WM_COMMAND:
 	if (IsWindow(lptw->hWndText))
