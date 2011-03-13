@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: wmenu.c,v 1.10 2010/12/14 23:02:23 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: wmenu.c,v 1.11 2011/03/13 12:14:02 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - win/wmenu.c */
@@ -53,6 +53,7 @@ static char *RCSid() { return RCSid("$Id: wmenu.c,v 1.10 2010/12/14 23:02:23 bro
 #if WINVER >= 0x030a
 # include <commdlg.h>
 #endif
+#include <commctrl.h>
 #include <string.h>	/* only use far items */
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -69,7 +70,6 @@ static char *RCSid() { return RCSid("$Id: wmenu.c,v 1.10 2010/12/14 23:02:23 bro
 #endif
 
 BOOL CALLBACK WINEXPORT InputBoxDlgProc(HWND, UINT, WPARAM, LPARAM);
-LRESULT CALLBACK WINEXPORT MenuButtonProc(HWND, UINT, WPARAM, LPARAM);
 
 /* limits */
 #define MAXSTR 255
@@ -742,9 +742,7 @@ HGLOBAL hmacro, hmacrobuf;
 
 int i;
 HDC hdc;
-TEXTMETRIC tm;
 RECT rect;
-int ButtonX, ButtonY;
 char FAR *ButtonText[BUTTONMAX];
 
 	lpmw = lptw->lpmw;
@@ -914,37 +912,42 @@ char FAR *ButtonText[BUTTONMAX];
 	if (!lpmw->nButton)
 		goto cleanup;		/* no buttons */
 
-	/* calculate size of buttons */
-	hdc = GetDC(lptw->hWndParent);
-	SelectObject(hdc, GetStockObject(SYSTEM_FIXED_FONT));
-	GetTextMetrics(hdc, &tm);
-	ButtonX = 8 * tm.tmAveCharWidth;
-	ButtonY = 6 * (tm.tmHeight + tm.tmExternalLeading) / 4;
-	ReleaseDC(lptw->hWndParent,hdc);
+	/* create a toolbar */
+	lpmw->hToolbar = CreateWindowEx(0, TOOLBARCLASSNAME, "GnuplotToolbar", 
+		WS_CHILD, // TBSTYLE_WRAPABLE
+		0, 0, 0, 0,
+		lptw->hWndParent, (HMENU)ID_TOOLBAR, lptw->hInstance, NULL);
+	if (lpmw->hToolbar == NULL)
+	    goto cleanup;
+	    
+	/* we don't have any icons yet, so set size to zero */
+	SendMessage(lpmw->hToolbar, TB_SETBITMAPSIZE, (WPARAM)0, (LPARAM)(0<<16 + 0));  // height, widthx, y // default 16,15
+	/* create buttons */
+	SendMessage(lpmw->hToolbar, TB_BUTTONSTRUCTSIZE, (WPARAM)sizeof(TBBUTTON), 0);
+	for (i = 0; i < lpmw->nButton; i++) {
+		TBBUTTON button;
+		BOOL ret;
+		ZeroMemory(&button, sizeof(button));
+		button.iBitmap = I_IMAGENONE;
+		button.idCommand = lpmw->hButtonID[i];
+		button.fsState = TBSTATE_ENABLED;
+		button.fsStyle = BTNS_AUTOSIZE | BTNS_SHOWTEXT | BTNS_NOPREFIX | TBSTYLE_LIST;
+		button.iString = (UINT_PTR)ButtonText[i];
+		ret = SendMessage(lpmw->hToolbar, TB_INSERTBUTTON, (WPARAM)i+1, (LPARAM)&button);
+	}
+	
+	/* auto-resize and show */
+	SendMessage(lpmw->hToolbar, TB_AUTOSIZE, (WPARAM)0, (LPARAM)0);
+	ShowWindow(lpmw->hToolbar, TRUE);
 
-	/* move top of client text window down to allow space for buttons */
-	lptw->ButtonHeight = ButtonY+1;
+	/* move top of client text window down to allow space for toolbar */
+	GetClientRect(lpmw->hToolbar, &rect);
+	lptw->ButtonHeight = rect.bottom + 1;
+	lptw->ButtonHeight++;
 	GetClientRect(lptw->hWndParent, &rect);
 	SetWindowPos(lptw->hWndText, (HWND)NULL, 0, lptw->ButtonHeight,
 			rect.right, rect.bottom-lptw->ButtonHeight,
 			SWP_NOZORDER | SWP_NOACTIVATE);
-
-	/* create the buttons */
-#ifdef __DLL__
-	lpmw->lpfnMenuButtonProc = (WNDPROC)GetProcAddress(hdllInstance, "MenuButtonProc");
-#else
-	lpmw->lpfnMenuButtonProc = (WNDPROC)MakeProcInstance((FARPROC)MenuButtonProc, hdllInstance);
-#endif
-	for (i=0; i<lpmw->nButton; i++) {
-		lpmw->hButton[i] = CreateWindow("button", ButtonText[i],
-			WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON,
-				i * ButtonX, 0,
-				ButtonX, ButtonY,
-				lptw->hWndParent, (HMENU)i,
-				lptw->hInstance, lptw);
-		lpmw->lpfnButtonProc[i] = (WNDPROC) GetWindowLong(lpmw->hButton[i], GWL_WNDPROC);
-		SetWindowLong(lpmw->hButton[i], GWL_WNDPROC, (LONG)lpmw->lpfnMenuButtonProc);
-	}
 
 	goto cleanup;
 
@@ -981,12 +984,6 @@ HGLOBAL hglobal;
 LPMW lpmw;
 	lpmw = lptw->lpmw;
 
-#ifndef WIN32
-#ifndef __DLL__
-	if (lpmw->lpfnMenuButtonProc)
-		FreeProcInstance((FARPROC)lpmw->lpfnMenuButtonProc);
-#endif
-#endif
 	hglobal = (HGLOBAL)GlobalHandle( SELECTOROF(lpmw->macro) );
 	if (hglobal) {
 		GlobalUnlock(hglobal);
@@ -1043,33 +1040,3 @@ LPMW lpmw;
             return( FALSE);
         }
     }
-
-
-LRESULT CALLBACK WINEXPORT
-MenuButtonProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
-{
-LPTW lptw;
-LPMW lpmw;
-#ifdef WIN32
-LONG n = GetWindowLong(hwnd, GWL_ID);
-#else
-WORD n = GetWindowWord(hwnd, GWW_ID);
-#endif
-	lptw = (LPTW)GetWindowLong(GetParent(hwnd), 0);
-	lpmw = lptw->lpmw;
-
-	switch(message) {
-		case WM_LBUTTONUP:
-			{
-			RECT rect;
-			POINT pt;
-			GetWindowRect(hwnd, &rect);
-			GetCursorPos(&pt);
-			if (PtInRect(&rect, pt))
-				SendMessage(lptw->hWndText, WM_COMMAND, lpmw->hButtonID[n], 0L);
-			SetFocus(lptw->hWndText);
-			}
-			break;
-	}
-	return CallWindowProc((lpmw->lpfnButtonProc[n]), hwnd, message, wParam, lParam);
-}

@@ -1,13 +1,23 @@
 2011-03-13  Bastian Maerkisch  <bmaerkisch@web.de>
 
+	* src/win/winmain.c (WinMain): init common controls
+	* config/mingw/Makefile, config/magefile.mgw, config/makefile.nt,
+	conig/watcom/Makefile: add library comctl32
+
+	* src/win/wmwenu.c (LoadMacros, CloseMacros, MenuBottonProc): use
+	common controls toolbar, remove MenuBottonProc
+	* src/win/wgnuplib.h (MW): add handle for toolbar, remove pointer
+	to MenuBottonProc
+	* src/win/wresourc.h: add ID for toolbar
+	* src/win/wtext.c (WndParentProc): [WM_SIZE] forward msg to toolbar,
+	[WM_PAINT] remove completely
+
 	* src/win/wingraph.c (UpdateStatusLine, DisplaySatusLine): use common
 	controls
-	* src/win/winmain.c (WinMain): init common controls
+
 	* src/win/winmenu.c (IShellFolder_BindToObject),
 	(IShellFolder_GetDisplayNameOf): protect definition by #ifdef,
 	(SendMacro) use newer variant of directory dialog
-	* config/mingw/Makefile, config/magefile.mgw, config/makefile.nt,
-	conig/watcom/Makefile: add library comctl32
 
 2011-03-11  Bastian Maerkisch  <bmaerkisch@web.de>
 

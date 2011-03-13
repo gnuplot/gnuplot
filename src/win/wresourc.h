@@ -1,5 +1,5 @@
 /*
- * $Id: wresourc.h,v 1.8 2011/02/28 12:19:12 markisch Exp $
+ * $Id: wresourc.h,v 1.9 2011/03/07 21:41:36 markisch Exp $
  */
 
 /* GNUPLOT - win/wresourc.h */
@@ -52,6 +52,7 @@
 #define ID_PROMPT 300
 #define ID_ANSWER 302
 #define NUMMENU 512
+#define ID_TOOLBAR NUMMENU+42
 
 /* wpause.c */
 

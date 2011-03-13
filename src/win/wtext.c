@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: wtext.c,v 1.22 2011/02/23 19:58:16 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: wtext.c,v 1.23 2011/03/07 21:41:36 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - win/wtext.c */
@@ -1039,6 +1039,7 @@ WndParentProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 	SetWindowPos(lptw->hWndText, (HWND)NULL, 0, lptw->ButtonHeight,
 		     LOWORD(lParam), HIWORD(lParam)-lptw->ButtonHeight,
 		     SWP_NOZORDER | SWP_NOACTIVATE);
+	SendMessage(lptw->lpmw->hToolbar, WM_SIZE, wParam, lParam);
 	return(0);
     case WM_COMMAND:
 	if (IsWindow(lptw->hWndText))
@@ -1047,31 +1048,6 @@ WndParentProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 	return(0);
     case WM_ERASEBKGND:
 	return 1;
-    case WM_PAINT:
-	hdc = BeginPaint(hwnd, &ps);
-	if (lptw->ButtonHeight) {
-	    HBRUSH hbrush;
-	    TEXTMETRIC tm;
-	    int ButtonX;
-	    GetClientRect(hwnd, &rect);
-
-	    /* seperation line */
-	    SelectObject(hdc, GetStockObject(BLACK_PEN));
-	    MoveTo(hdc, rect.left, lptw->ButtonHeight-1);
-	    LineTo(hdc, rect.right, lptw->ButtonHeight-1);
-
-	    /* fill area */
-	    hbrush = CreateSolidBrush(GetSysColor(COLOR_BTNSHADOW));
-	    SelectObject(hdc, GetStockObject(SYSTEM_FIXED_FONT));
-	    GetTextMetrics(hdc, &tm);
-	    ButtonX = 8 * tm.tmAveCharWidth;
-	    rect.bottom = lptw->ButtonHeight - 1;
-	    rect.left = lptw->lpmw->nButton * ButtonX;
-	    FillRect(hdc, &rect, hbrush);
-	    DeleteObject(hbrush);
-	}
-	EndPaint(hwnd, &ps);
-	return 0;
 #if WINVER >= 0x030a
     case WM_DROPFILES:
     {
