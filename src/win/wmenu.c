@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: wmenu.c,v 1.9 2010/02/16 07:14:11 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: wmenu.c,v 1.10 2010/12/14 23:02:23 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - win/wmenu.c */
@@ -143,10 +143,14 @@ INT CALLBACK BrowseCallbackProc(HWND hwnd, UINT uMsg, LPARAM lp, LPARAM pData)
 /* Yes, you can use Windows shell functions even without C++ !
    These functions are not defined in shlobj.h, so we do it ourselves:
 */
+#ifndef IShellFolder_BindToObject
 #define IShellFolder_BindToObject(This,pidl,pbcReserved,riid,ppvOut) \
 		(This)->lpVtbl -> BindToObject(This,pidl,pbcReserved,riid,ppvOut)
+#endif
+#ifndef IShellFolder_GetDisplayNameOf
 #define IShellFolder_GetDisplayNameOf(This,pidl,uFlags,lpName) \
 		(This)->lpVtbl -> GetDisplayNameOf(This,pidl,uFlags,lpName)
+#endif
 
 /* My windows header files do not define these: */
 #ifndef WC_NO_BEST_FIT_CHARS      
@@ -491,7 +495,8 @@ char *szFilter;
 						bi.pidlRoot = NULL;
 						bi.pszDisplayName = NULL;
 						bi.lpszTitle = szTitle;
-						bi.ulFlags = BIF_EDITBOX | 
+						/* BIF_NEWDIALOGSTYLE is supported by Win 2000 or later (Version 5.0)*/
+						bi.ulFlags = BIF_NEWDIALOGSTYLE | BIF_EDITBOX | 
 									 BIF_STATUSTEXT |
 									 BIF_RETURNONLYFSDIRS | BIF_RETURNFSANCESTORS;
 						bi.lpfn = BrowseCallbackProc;
