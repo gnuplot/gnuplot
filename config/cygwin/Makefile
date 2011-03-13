@@ -1,5 +1,5 @@
 # Hey, Emacs, this is a -*- Makefile -*- #
-# $Id: Makefile,v 1.1 2011/02/26 20:27:49 broeker Exp $
+# $Id: Makefile,v 1.2 2011/03/08 23:09:58 broeker Exp $
 #
 #
 # GNUPLOT Makefile for Cygwin on WinNT and Win95/98/2000
@@ -282,7 +282,7 @@ WINDOWS = makefile.win makefile.nt README.win $(W)/wcommon.h \
 .c.o:
 	$(CC) -c $(CFLAGS) $<
 
-LDLIBS = -L/usr/local/lib -lkernel32 -lgdi32 -lmsimg32
+LDLIBS = -L/usr/local/lib -lkernel32 -lgdi32 -lmsimg32 -lcomctl32
 
 $(TARGET): $(OBJS) $(WINOBJS) $(W)/wgnuplot.def wgplt_res.$(O) texticon.ico grpicon.ico
 	$(LD) $(LDFLAGS) $(LDFLAGS2) -mwindows -mno-cygwin -o $@ \

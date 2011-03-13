@@ -1,3 +1,7 @@
+2011-03-13  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* config/cygwin/Makefile (LDLIBS): Add newly needed library.
+
 2011-03-13  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/win/winmain.c (WinMain): init common controls
