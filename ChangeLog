@@ -1,3 +1,11 @@
+2011-03-13  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/win/wgnuplot.rc, src/win/wgnuplot.exe.manifest: add new
+	manifest for wgnuplot to enable visual styles
+	
+	* src/win/wmenu.c, src/win/wtext.c: remove unused variables to make
+	compiler happy, avoid C++ style comments
+	
 2011-03-13  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* config/cygwin/Makefile (LDLIBS): Add newly needed library.
