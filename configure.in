@@ -629,7 +629,7 @@ dnl The iconv library can be used to switch character encodings.
 dnl So far this is only used by gd.trm.
 AC_SEARCH_LIBS(iconv_open, iconv,
   AC_CHECK_HEADER(iconv.h,
-    AC_DEFINE(HAVE_ICONV,1,[define if you have libiconv and iconv.h]),
+    [AC_DEFINE(HAVE_ICONV,1,[define if you have libiconv and iconv.h])],
   )
 )
 
