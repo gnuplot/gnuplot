@@ -1,5 +1,5 @@
 /*
- * $Id: syscfg.h,v 1.43 2010/08/13 23:36:58 sfeam Exp $
+ * $Id: syscfg.h,v 1.44 2010/12/14 22:57:05 broeker Exp $
  */
 
 /* GNUPLOT - syscfg.h */
@@ -103,7 +103,6 @@
 # ifndef _Windows
 #  define _Windows
 # endif
-# ifdef WIN32
 #  define OS "MS-Windows 32 bit"
 /* introduced by Pedro Mendes, prm@aber.ac.uk */
 #  define far
@@ -111,7 +110,6 @@
  * See stdfn.h
  */
 #  define S_IFIFO  _S_IFIFO
-# endif /* WIN32 */
 # define HOME    "GNUPLOT"
 # define PLOTRC  "gnuplot.ini"
 # define SHELL   "\\command.com"

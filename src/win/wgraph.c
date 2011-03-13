@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.95 2011/03/10 19:58:21 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.96 2011/03/13 12:15:56 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - win/wgraph.c */
@@ -45,17 +45,15 @@ static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.95 2011/03/10 19:58:21 ma
 #endif
 
 #define STRICT
-#if defined(WIN32) && defined(USE_MOUSE)
+#ifdef USE_MOUSE
 /* shige: for mouse wheel */
 #define _WIN32_WINNT 0x0400
+#endif
 /* BM: for AlphaBlend/TransparentBlt */
 #define WINVER 0x0410
-#endif
 #include <windows.h>
 #include <windowsx.h>
-#if WINVER >= 0x030a
-#  include <commdlg.h>
-#endif
+#include <commdlg.h>
 #include <commctrl.h>
 #ifndef __MSC__
 # include <mem.h>
@@ -211,8 +209,8 @@ static TBOOLEAN brushes_initialized = FALSE;
 
 /* prototypes for module-local functions */
 
-LRESULT CALLBACK WINEXPORT WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);
-BOOL CALLBACK WINEXPORT LineStyleDlgProc(HWND hdlg, UINT wmsg, WPARAM wparam, LPARAM lparam);
+LRESULT CALLBACK WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);
+BOOL CALLBACK LineStyleDlgProc(HWND hdlg, UINT wmsg, WPARAM wparam, LPARAM lparam);
 
 static void	DestroyBlocks(LPGW lpgw);
 static BOOL	AddBlock(LPGW lpgw);
@@ -413,11 +411,9 @@ GraphInit(LPGW lpgw)
 		M_DOUBLEBUFFER, "&Double buffer");
 	AppendMenu(lpgw->hPopMenu, MF_STRING | (lpgw->oversample ? MF_CHECKED : MF_UNCHECKED),
 		M_OVERSAMPLE, "O&versampling");
-#if WINVER >= 0x030a
 	AppendMenu(lpgw->hPopMenu, MF_STRING, M_BACKGROUND, "&Background...");
 	AppendMenu(lpgw->hPopMenu, MF_STRING, M_CHOOSE_FONT, "Choose &Font...");
 	AppendMenu(lpgw->hPopMenu, MF_STRING, M_LINESTYLE, "&Line Styles...");
-#endif
 	/* save settings */
 	AppendMenu(lpgw->hPopMenu, MF_SEPARATOR, 0, NULL);
 	if (lpgw->IniFile != (LPSTR)NULL) {
@@ -644,21 +640,11 @@ DestroyPens(LPGW lpgw)
 static void
 Wnd_GetTextSize(HDC hdc, LPCSTR str, size_t len, int *cx, int *cy)
 {
-#ifdef WIN32
 	SIZE size;
 
 	GetTextExtentPoint(hdc, str, len, &size);
 	*cx = size.cx;
 	*cy = size.cy;
-#else
-	/* Hmm... if not for compatibility to Win 3.0 and earlier, we could
-	 * use GetTextExtentPoint on Win16, too :-( */
-	DWORD extent;
-
-	extent = GetTextExtent(hdc, str, len);
-	*cx = LOWORD(extent);
-	*cy = HIWORD(extent);
-#endif
 }
 
 
@@ -761,10 +747,8 @@ MakeFonts(LPGW lpgw, LPRECT lprect, HDC hdc)
 	GetTextMetrics(hdc,(TEXTMETRIC FAR *)&tm);
 	if (tm.tmPitchAndFamily & TMPF_VECTOR)
 		lpgw->rotate = TRUE;	/* vector fonts can all be rotated */
-#if WINVER >=0x030a
 	if (tm.tmPitchAndFamily & TMPF_TRUETYPE)
 		lpgw->rotate = TRUE;	/* truetype fonts can all be rotated */
-#endif
 	SelectObject(hdc, hfontold);
 	return;
 }
@@ -803,7 +787,6 @@ SetFont(LPGW lpgw, HDC hdc)
 static void
 SelFont(LPGW lpgw)
 {
-#if WINVER >= 0x030a
 	LOGFONT lf;
 	CHOOSEFONT cf;
 	HDC hdc;
@@ -846,7 +829,6 @@ SelFont(LPGW lpgw)
 		/* DBT 2010-02-22 replot to force immediate font change, volatile data OK */
 		do_string_replot("");
 	}
-#endif
 }
 
 #ifdef USE_MOUSE
@@ -1789,16 +1771,9 @@ CopyClip(LPGW lpgw)
 static void
 CopyPrint(LPGW lpgw)
 {
-#ifdef WIN32
 	DOCINFO docInfo;
-#endif
 
-#if WINVER >= 0x030a	/* If Win 3.0, this whole function does nothing at all ... */
 	HDC printer;
-#ifndef WIN32
-	DLGPROC lpfnAbortProc;
-	DLGPROC lpfnPrintDlgProc;
-#endif
 	PAGESETUPDLG pg;
 	DEVNAMES* pDevNames;
 	DEVMODE* pDevMode;
@@ -1844,13 +1819,10 @@ CopyPrint(LPGW lpgw)
 
 	pr.hdcPrn = printer;
 	SetWindowLong(hwnd, 4, (LONG)((GP_LPPRINT)&pr));
-#ifdef WIN32
 	PrintRegister((GP_LPPRINT)&pr);
-#endif
 
 	EnableWindow(hwnd,FALSE);
 	pr.bUserAbort = FALSE;
-#ifdef WIN32
 	pr.hDlgPrint = CreateDialogParam(hdllInstance,"CancelDlgBox",hwnd,PrintDlgProc,(LPARAM)lpgw->Title);
 	SetAbortProc(printer,PrintAbortProc);
 
@@ -1859,54 +1831,26 @@ CopyPrint(LPGW lpgw)
 	docInfo.lpszDocName = lpgw->Title;
 
 	if (StartDoc(printer, &docInfo) > 0) {
-#else /* not WIN32 */
-#  ifdef __DLL__
-	lpfnPrintDlgProc = (DLGPROC)GetProcAddress(hdllInstance, "PrintDlgProc");
-	lpfnAbortProc = (DLGPROC)GetProcAddress(hdllInstance, "PrintAbortProc");
-#  else /* __DLL__ */
-	lpfnPrintDlgProc = (DLGPROC)MakeProcInstance((FARPROC)PrintDlgProc, hdllInstance);
-	lpfnAbortProc = (DLGPROC)MakeProcInstance((FARPROC)PrintAbortProc, hdllInstance);
-#  endif /* __DLL__ */
-	pr.hDlgPrint = CreateDialogParam(hdllInstance,"CancelDlgBox",hwnd,lpfnPrintDlgProc,(LPARAM)lpgw->Title);
-	Escape(printer,SETABORTPROC,0,(LPSTR)lpfnAbortProc,NULL);
-	if (Escape(printer, STARTDOC, lstrlen(lpgw->Title),lpgw->Title, NULL) > 0) {
-#endif
 		SetMapMode(printer, MM_TEXT);
 		SetBkMode(printer,OPAQUE);
-#ifdef WIN32
 		StartPage(printer);
-#endif
 		DestroyFonts(lpgw);
 		MakeFonts(lpgw, (RECT FAR *)&rect, printer);
 		DestroyPens(lpgw);	/* rebuild pens */
 		MakePens(lpgw, printer);
 		drawgraph(lpgw, printer, (void *) &rect);
-#ifdef WIN32
 		if (EndPage(printer) > 0)
 			EndDoc(printer);
-# else /* WIN32 */
-		if (Escape(printer,NEWFRAME,0,NULL,NULL) > 0)
-			Escape(printer,ENDDOC,0,NULL,NULL);
-# endif /* WIN32 */
 	}
 	if (!pr.bUserAbort) {
 		EnableWindow(hwnd,TRUE);
 		DestroyWindow(pr.hDlgPrint);
 	}
-#ifndef WIN32
-#ifndef __DLL__
-	FreeProcInstance((FARPROC)lpfnPrintDlgProc);
-	FreeProcInstance((FARPROC)lpfnAbortProc);
-# endif /* __DLL__ */
-#endif /* WIN32 */
 	DeleteDC(printer);
 	SetWindowLong(hwnd, 4, (LONG)(0L));
-#ifdef WIN32
 	PrintUnregister((GP_LPPRINT)&pr);
-#endif /* WIN32 */
 	/* make certain that the screen pen set is restored */
 	SendMessage(lpgw->hWndGraph,WM_COMMAND,M_REBUILDTOOLS,0L);
-#endif /* WIN Version >= 3.1 */
 	return;
 }
 
@@ -2008,12 +1952,8 @@ ReadGraphIni(LPGW lpgw)
 		_fstrcpy(lpgw->fontname, profile);
 		if (lpgw->fontsize == 0)
 			lpgw->fontsize = WINFONTSIZE;
-		if (!(*lpgw->fontname)) {
-			if (LOWORD(GetVersion()) == 3)
-				_fstrcpy(lpgw->fontname,WIN30FONT);
-			else
-				_fstrcpy(lpgw->fontname,WINFONT);
-		}
+		if (!(*lpgw->fontname))
+		    _fstrcpy(lpgw->fontname,WINFONT);
 		/* set current font as default font */
 		_fstrcpy(lpgw->deffontname, lpgw->fontname);
 		lpgw->deffontsize = lpgw->fontsize;
@@ -2147,7 +2087,7 @@ UpdateColorSample(HWND hdlg)
 }
 
 /* Window handler function for the "Line Styles" dialog */
-BOOL CALLBACK WINEXPORT
+BOOL CALLBACK 
 LineStyleDlgProc(HWND hdlg, UINT wmsg, WPARAM wparam, LPARAM lparam)
 {
 	char buf[16];
@@ -2334,34 +2274,17 @@ LineStyle(LPGW lpgw)
 {
 	BOOL status = FALSE;
 	LS ls;
-#ifndef WIN32
-	DLGPROC lpfnLineStyleDlgProc;
-#endif
 
 	SetWindowLong(lpgw->hWndGraph, 4, (LONG)((LPLS)&ls));
 	_fmemcpy(&ls.colorpen, &lpgw->colorpen, (WGNUMPENS + 2) * sizeof(LOGPEN));
 	_fmemcpy(&ls.monopen, &lpgw->monopen, (WGNUMPENS + 2) * sizeof(LOGPEN));
 
-#ifdef WIN32
 	if (DialogBox (hdllInstance, "LineStyleDlgBox", lpgw->hWndGraph, LineStyleDlgProc)
-#else
-# ifdef __DLL__
-	lpfnLineStyleDlgProc = (DLGPROC)GetProcAddress(hdllInstance, "LineStyleDlgProc");
-# else
-	lpfnLineStyleDlgProc = (DLGPROC)MakeProcInstance((FARPROC)LineStyleDlgProc, hdllInstance);
-# endif
-	if (DialogBox (hdllInstance, "LineStyleDlgBox", lpgw->hWndGraph, lpfnLineStyleDlgProc)
-#endif
 		== IDOK) {
 		_fmemcpy(&lpgw->colorpen, &ls.colorpen, (WGNUMPENS + 2) * sizeof(LOGPEN));
 		_fmemcpy(&lpgw->monopen, &ls.monopen, (WGNUMPENS + 2) * sizeof(LOGPEN));
 		status = TRUE;
 	}
-#ifndef WIN32
-# ifndef __DLL__
-	FreeProcInstance((FARPROC)lpfnLineStyleDlgProc);
-# endif
-#endif
 	SetWindowLong(lpgw->hWndGraph, 4, (LONG)(0L));
 	return status;
 }
@@ -2414,7 +2337,7 @@ Wnd_refresh_ruler_lineto(LPGW lpgw, LPARAM lParam)
 /* ================================== */
 
 /* The toplevel function of this module: Window handler function of the graph window */
-LRESULT CALLBACK WINEXPORT
+LRESULT CALLBACK 
 WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	HDC hdc;
@@ -2823,15 +2746,8 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			GetPlotRect(lpgw, &rect);
 			MakeFonts(lpgw, (LPRECT)&rect, hdc);
 			ReleaseDC(hwnd, hdc);
-#if WINVER >= 0x030a
-			{
-			WORD version = LOWORD(GetVersion());
-
-			if ((LOBYTE(version)*100 + HIBYTE(version)) >= 310)
-				if ( lpgw->lptw && (lpgw->lptw->DragPre!=(LPSTR)NULL) && (lpgw->lptw->DragPost!=(LPSTR)NULL) )
-					DragAcceptFiles(hwnd, TRUE);
-			}
-#endif
+			if ( lpgw->lptw && (lpgw->lptw->DragPre!=(LPSTR)NULL) && (lpgw->lptw->DragPost!=(LPSTR)NULL) )
+			    DragAcceptFiles(hwnd, TRUE);
 			return(0);
 		case WM_ERASEBKGND:
 			return(1); /* we erase the background ourselves */
@@ -2846,11 +2762,7 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			SetMapMode(hdc, MM_TEXT);
 			SetBkMode(hdc,OPAQUE);
 			GetPlotRect(lpgw, &rect);
-#ifdef WIN32
 			SetViewportExtEx(hdc, rect.right, rect.bottom, NULL);
-#else
-			SetViewportExt(hdc, rect.right, rect.bottom);
-#endif
 			/* double buffering */
 			if (lpgw->doublebuffer) {
 			    /* choose oversampling */
@@ -2919,16 +2831,10 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 				lpgw->Size.y = rect.bottom-rect.top;
 			}
 			break;
-#if WINVER >= 0x030a
 		case WM_DROPFILES:
-			{
-			WORD version = LOWORD(GetVersion());
-			if ((LOBYTE(version)*100 + HIBYTE(version)) >= 310)
-				if (lpgw->lptw)
-					DragFunc(lpgw->lptw, (HDROP)wParam);
-			}
+			if (lpgw->lptw)
+				DragFunc(lpgw->lptw, (HDROP)wParam);
 			break;
-#endif
 		case WM_DESTROY:
 			DestroyPens(lpgw);
 			DestroyFonts(lpgw);

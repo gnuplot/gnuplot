@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.205 2011/02/21 15:54:44 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.206 2011/03/10 20:18:02 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -2740,24 +2740,12 @@ winsystem(const char *s)
     LPCSTR p;
 
     /* get COMSPEC environment variable */
-#  ifdef WIN32
     char envbuf[81];
     GetEnvironmentVariable("COMSPEC", envbuf, 80);
     if (*envbuf == NUL)
 	comspec = "\\command.com";
     else
 	comspec = envbuf;
-#  else
-    p = GetDOSEnvironment();
-    comspec = "\\command.com";
-    while (*p) {
-	if (!strncmp(p, "COMSPEC=", 8)) {
-	    comspec = p + 8;
-	    break;
-	}
-	p += strlen(p) + 1;
-    }
-#  endif
     /* if the command is blank we must use command.com */
     p = s;
     while ((*p == ' ') || (*p == '\n') || (*p == '\r'))

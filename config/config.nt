@@ -524,11 +524,6 @@
  */
 
 
-/* FIXME: __WIN32__ is only refered to in plot.c */
-#ifndef __WIN32__
-# define __WIN32__
-#endif
-
 #ifndef WIN32
 # define WIN32
 #endif

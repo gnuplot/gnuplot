@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: fit.c,v 1.73 2010/10/10 04:44:34 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: fit.c,v 1.74 2010/12/06 22:28:27 sfeam Exp $"); }
 #endif
 
 /*  NOTICE: Change of Copyright Status
@@ -78,9 +78,7 @@ static void Dblfn __PROTO(());
 
 #if defined(MSDOS) 	/* non-blocking IO stuff */
 # include <io.h>
-# ifndef _Windows		/* WIN16 does define MSDOS .... */
-#  include <conio.h>
-# endif
+# include <conio.h>
 # include <dos.h>
 #else /* !(MSDOS) */
 # ifndef VMS

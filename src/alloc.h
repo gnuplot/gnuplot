@@ -1,5 +1,5 @@
 /*
- * $Id: alloc.h,v 1.9 2004/07/01 17:10:03 broeker Exp $
+ * $Id: alloc.h,v 1.10 2010/03/14 06:43:17 sfeam Exp $
  */
 
 /* GNUPLOT - alloc.h */
@@ -74,7 +74,7 @@ void end_leak_check(char *file,int line);
 # define END_LEAK_CHECK() /*nowt*/
 #endif
 
-#if defined(MSDOS) && defined(__TURBOC__) || defined(_Windows) && !defined(WIN32)
+#if defined(MSDOS) && defined(__TURBOC__)
 #define FARALLOC
 void gpfree __PROTO((generic *p));
 #define free gpfree

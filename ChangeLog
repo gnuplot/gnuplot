@@ -4,6 +4,14 @@
 
 2011-03-13  Bastian Maerkisch  <bmaerkisch@web.de>
 
+	* config/config.nt, src/alloc.c, src/alloc.h, src/command.c,
+	src/eval.c, src/fit.c, src/gpexecute.c, src/plot.c, src/syscfg.h,
+	src/win/wcommon.h, src/win/wgnuplib.c, src/win/wgnuplib.h,
+	src/win/wgnuplot.mnu, src/win/wgnuplot.rc, src/win/wgraph.c,
+	src/win/winmain.c, src/win/wmenu.c, src/win/wpause.c,
+	src/win/wprinter.c, src/win/wtext.c, term/win.trm:
+	Remove Win16 support.
+
 	* src/win/winmain.c (WinMain): init common controls
 	* config/mingw/Makefile, config/magefile.mgw, config/makefile.nt,
 	conig/watcom/Makefile: add library comctl32

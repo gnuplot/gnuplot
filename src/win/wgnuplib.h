@@ -1,5 +1,5 @@
 /*
- * $Id: wgnuplib.h,v 1.32 2011/03/07 21:41:36 markisch Exp $
+ * $Id: wgnuplib.h,v 1.33 2011/03/13 14:49:48 markisch Exp $
  */
 
 /* GNUPLOT - win/wgnuplib.h */
@@ -40,8 +40,6 @@
  *   Russell Lang
  */
 
-/* this file contains items to be visible outside wgnuplot.dll */
-
 #include <windows.h>
 #include "screenbuf.h"
 
@@ -51,28 +49,9 @@
 # endif
 #endif
 
-/* HBB 19990506: The following used to be #ifdef __DLL__.
- * But  _export is needed outside the DLL, as well. The long-standing
- * bug crashing 16bit wgnuplot on Alt-F4 or pressing the 'close' button
- * stemmed here.  */
-#ifndef WIN32
-#define WINEXPORT _export
-#else
-#define WINEXPORT
-#endif
-
 /* Functions flagged WDPROC are to be export by the DLL, so they can be called
  * directly from win.trm or the gnuplot core */
-#define WDPROC WINAPI WINEXPORT
-
-/* HBB: bumped version for pointsize, linewidth and PM3D implementation */
-/* HBB: bumped version for massive changes due to mouse-ing and removal of
- *      variables no longer needed, in struct GW */
-/* HBB: bumped version because of changes in PM3D interface and pointtypes */
-/* HBB: bumped version for filledboxes support */
-/* HBB: bumped version for larger NUMMENU in wresourc.h */
-#define WGNUPLOTVERSION  "1.6   2003-01-23"
-BOOL WDPROC CheckWGNUPLOTVersion(LPSTR str);
+#define WDPROC WINAPI
 
 /* ================================== */
 /* symbols for the two icons          */
@@ -81,17 +60,13 @@ BOOL WDPROC CheckWGNUPLOTVersion(LPSTR str);
 
 /* ================================== */
 /* For WIN32 API's */
-#ifdef WIN32
 /* #define DEFAULT_CHARSET ANSI_CHARSET */
-# define OFFSETOF(x)  (x)
-# define SELECTOROF(x)  (x)
 # define MoveTo(hdc,x,y) MoveToEx(hdc,x,y,(LPPOINT)NULL);
 # if !defined(__TURBOC__) || (__TURBOC__>=0x410) /* Borland C has these defines, already... */
 #  define farmalloc(x) malloc(x)
 #  define farrealloc(s,n) realloc(s,n)
 #  define farfree(s) free(s)
 # endif /* __TURBOC__ */
-#endif
 
 #if defined(__MINGW32__) && (__GNUC__ < 3) && !defined(CYGWIN)
 /* windowsx.h in MinGW32 2.x doesn't define some of the more traditional
@@ -367,7 +342,6 @@ typedef struct tagGW {
 typedef GW FAR*  LPGW;
 
 #define WINFONTSIZE 10
-#define WIN30FONT "Courier"
 #define WINFONT "Arial"
 
 #define MAXTITLELEN 120

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot.c,v 1.120 2010/10/01 23:10:46 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot.c,v 1.121 2011/02/20 14:52:47 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - plot.c */
@@ -435,7 +435,7 @@ main(int argc, char **argv)
      * can be registered to be executed before the terminal is reset. */
     GP_ATEXIT(term_reset);
 
-# if ((defined(__MSC__) && defined(_Windows)) || defined(__WIN32__)) && ! defined(WGP_CONSOLE)
+# if defined(_Windows) && ! defined(WGP_CONSOLE)
     interactive = TRUE;
 # else
     interactive = isatty(fileno(stdin));

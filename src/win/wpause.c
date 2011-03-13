@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: wpause.c,v 1.16 2009/08/31 18:31:07 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: wpause.c,v 1.17 2010/12/14 23:02:23 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - win/wpause.c */
@@ -57,8 +57,8 @@ static char *RCSid() { return RCSid("$Id: wpause.c,v 1.16 2009/08/31 18:31:07 sf
 #include "wcommon.h"
 
 /* Pause Window */
-LRESULT CALLBACK WINEXPORT WndPauseProc(HWND, UINT, WPARAM, LPARAM);
-LRESULT CALLBACK WINEXPORT PauseButtonProc(HWND, UINT, WPARAM, LPARAM);
+LRESULT CALLBACK WndPauseProc(HWND, UINT, WPARAM, LPARAM);
+LRESULT CALLBACK PauseButtonProc(HWND, UINT, WPARAM, LPARAM);
 
 /* We need to hide "OK" and "Cancel" buttons on the pause dialog during
  * "pause mouse".
@@ -158,14 +158,6 @@ PauseBox(LPPW lppw)
 	height = 28 * (tm.tmHeight + tm.tmExternalLeading) / 4;
 	ReleaseDC(NULL,hdc);
 
-#ifndef WIN32
-	lppw->lpfnPauseButtonProc =
-#ifdef __DLL__
-		(WNDPROC)GetProcAddress(hdllInstance, "PauseButtonProc");
-#else
-		(WNDPROC)MakeProcInstance((FARPROC)PauseButtonProc ,hdllInstance);
-#endif
-#endif
 	lppw->hWndPause = CreateWindowEx(
         WS_EX_DLGMODALFRAME | WS_EX_TOPMOST
 #ifdef WS_EX_APPWINDOW
@@ -212,16 +204,11 @@ PauseBox(LPPW lppw)
 	}
 
 	DestroyWindow(lppw->hWndPause);
-#ifndef WIN32
-#ifndef __DLL__
-	FreeProcInstance((FARPROC)lppw->lpfnPauseButtonProc);
-#endif
-#endif
 
 	return(lppw->bPauseCancel);
 }
 
-LRESULT CALLBACK WINEXPORT
+LRESULT CALLBACK 
 WndPauseProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	HDC hdc;
@@ -298,17 +285,9 @@ WndPauseProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 					hwnd, (HMENU)IDCANCEL,
 					((LPCREATESTRUCT) lParam)->hInstance, NULL);
 			lppw->lpfnOK = (WNDPROC) GetWindowLong(lppw->hOK, GWL_WNDPROC);
-#ifdef WIN32
 			SetWindowLong(lppw->hOK, GWL_WNDPROC, (LONG)PauseButtonProc);
-#else
-			SetWindowLong(lppw->hOK, GWL_WNDPROC, (LONG)lppw->lpfnPauseButtonProc);
-#endif
 			lppw->lpfnCancel = (WNDPROC) GetWindowLong(lppw->hCancel, GWL_WNDPROC);
-#ifdef WIN32
 			SetWindowLong(lppw->hCancel, GWL_WNDPROC, (LONG)PauseButtonProc);
-#else
-			SetWindowLong(lppw->hCancel, GWL_WNDPROC, (LONG)lppw->lpfnPauseButtonProc);
-#endif
 			if (GetParent(hwnd))
 				EnableWindow(GetParent(hwnd),FALSE);
 #if 0 /* HBB 981203 */
@@ -335,15 +314,11 @@ WndPauseProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 }
 
 
-LRESULT CALLBACK WINEXPORT
+LRESULT CALLBACK
 PauseButtonProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	LPPW lppw;
-#ifdef WIN32
 	LONG n = GetWindowLong(hwnd, GWL_ID);
-#else
-	WORD n = GetWindowWord(hwnd, GWW_ID);
-#endif
 	lppw = (LPPW)GetWindowLong(GetParent(hwnd), 0);
 	switch(message) {
 		case WM_KEYDOWN:

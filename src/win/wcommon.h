@@ -1,5 +1,5 @@
 /*
- * $Id: wcommon.h,v 1.9 2006/03/28 09:55:22 broeker Exp $
+ * $Id: wcommon.h,v 1.10 2011/02/23 19:58:16 markisch Exp $
  */
 
 /* GNUPLOT - wcommon.h */
@@ -41,35 +41,23 @@
  *   Russell Lang
  */
 
-#if WINVER >= 0x030a
 #ifndef CYGWIN
 #include <shellapi.h>
 #endif
-#endif
-/* this file contains items that are internal to wgnuplot.dll */
 
-#ifdef WIN32
+/* Choose between the directory dialog of the windows shell and
+   a modified version of the "file open" dialog */
+#define SHELL_DIR_DIALOG 
 
-  /* Enable new directory dialogs on Win32 */
-# define WITH_ADV_DIR_DIALOG
-
-  /* Choose between the directory dialog of the windows shell and
-     a modified version of the "file open" dialog */
-# define SHELL_DIR_DIALOG 
-
-#endif
-  
 #ifndef CLEARTYPE_QUALITY
 #define CLEARTYPE_QUALITY       5
 #endif
 
 /* winmain.c */
-#ifdef WIN32
 # define PACKVERSION(major,minor) MAKELONG(minor,major)
 extern DWORD GetDllVersion(LPCTSTR lpszDllName);
 extern BOOL IsWindowsXPorLater(void);
 extern char *appdata_directory(void);
-#endif
 
 /* wgnuplib.c */
 extern HINSTANCE hdllInstance;
@@ -91,9 +79,7 @@ void NewLine(LPTW);
 void TextPutStr(LPTW lptw, LPSTR str);
 void WriteTextIni(LPTW lptw);
 void ReadTextIni(LPTW lptw);
-#if WINVER >= 0x030a
 void DragFunc(LPTW lptw, HDROP hdrop);
-#endif
 
 /* wmenu.c - Menu */
 void SendMacro(LPTW lptw, UINT m);
@@ -104,10 +90,8 @@ void CloseMacros(LPTW lptw);
 BOOL PrintSize(HDC printer, HWND hwnd, LPRECT lprect);
 void PrintRegister(GP_LPPRINT lpr);
 void PrintUnregister(GP_LPPRINT lpr);
-#if WINVER >= 0x030a
-BOOL CALLBACK WINEXPORT PrintAbortProc(HDC hdcPrn, int code);
-BOOL CALLBACK WINEXPORT PrintDlgProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
-#endif
+BOOL CALLBACK PrintAbortProc(HDC hdcPrn, int code);
+BOOL CALLBACK PrintDlgProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
 
 /* wgraph.c */
 

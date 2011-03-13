@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: wprinter.c,v 1.5 2005/08/03 16:55:40 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: wprinter.c,v 1.6 2010/12/14 23:02:23 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - win/wprinter.c */
@@ -49,13 +49,9 @@ static char *RCSid() { return RCSid("$Id: wprinter.c,v 1.5 2005/08/03 16:55:40 m
 #define STRICT
 #include <windows.h>
 #include <windowsx.h>
-#if WINVER >= 0x030a
 #include <commdlg.h>
-#endif
-#ifdef WIN32
 #include <stdio.h>
 #include <stdlib.h>
-#endif
 #ifdef __MSC__
 #include <memory.h>
 #else
@@ -67,9 +63,9 @@ static char *RCSid() { return RCSid("$Id: wprinter.c,v 1.5 2005/08/03 16:55:40 m
 
 GP_LPPRINT prlist = NULL;
 
-BOOL CALLBACK WINEXPORT PrintSizeDlgProc(HWND hdlg, UINT wmsg, WPARAM wparam, LPARAM lparam);
+BOOL CALLBACK PrintSizeDlgProc(HWND hdlg, UINT wmsg, WPARAM wparam, LPARAM lparam);
 
-BOOL CALLBACK WINEXPORT
+BOOL CALLBACK
 PrintSizeDlgProc(HWND hdlg, UINT wmsg, WPARAM wparam, LPARAM lparam)
 {
     char buf[8];
@@ -145,9 +141,6 @@ BOOL
 PrintSize(HDC printer, HWND hwnd, LPRECT lprect)
 {
     HDC hdc;
-#ifndef WIN32
-    DLGPROC lpfnPrintSizeDlgProc;
-#endif
     BOOL status = FALSE;
     GP_PRINT pr;
 
@@ -162,20 +155,8 @@ PrintSize(HDC printer, HWND hwnd, LPRECT lprect)
     pr.pdef.y = MulDiv(lprect->bottom-lprect->top, 254, 10*GetDeviceCaps(hdc, LOGPIXELSX));
     ReleaseDC(hwnd,hdc);
 
-#ifdef WIN32
     if (DialogBox (hdllInstance, "PrintSizeDlgBox", hwnd, PrintSizeDlgProc)
 	== IDOK)
-#else
-# ifdef __DLL__
-    lpfnPrintSizeDlgProc = (DLGPROC) GetProcAddress(hdllInstance,
-						    "PrintSizeDlgProc");
-# else
-    lpfnPrintSizeDlgProc = (DLGPROC) MakeProcInstance(
-	(FARPROC) PrintSizeDlgProc, hdllInstance);
-# endif
-    if (DialogBox (hdllInstance, "PrintSizeDlgBox", hwnd, lpfnPrintSizeDlgProc)
-	== IDOK)
-#endif
 	{
 	    lprect->left = MulDiv(pr.poff.x*10, GetDeviceCaps(printer, LOGPIXELSX), 254);
 	    lprect->top = MulDiv(pr.poff.y*10, GetDeviceCaps(printer, LOGPIXELSY), 254);
@@ -183,17 +164,11 @@ PrintSize(HDC printer, HWND hwnd, LPRECT lprect)
 	    lprect->bottom = lprect->top + MulDiv(pr.psize.y*10, GetDeviceCaps(printer, LOGPIXELSY), 254);
 	    status = TRUE;
 	}
-#ifndef WIN32
-# ifndef __DLL__
-    FreeProcInstance((FARPROC)lpfnPrintSizeDlgProc);
-# endif
-#endif
     SetWindowLong(hwnd, 4, (LONG)(0L));
 
     return status;
 }
 
-#ifdef WIN32
 /* Win32 doesn't support OpenJob() etc. so we must use some old code
  * which attempts to sneak the output through a Windows printer driver */
 void
@@ -237,7 +212,7 @@ PrintUnregister(GP_LPPRINT lpr)
 
 
 /* GetWindowLong(GetParent(hDlg), 4) must be available for use */
-BOOL CALLBACK WINEXPORT
+BOOL CALLBACK
 PrintDlgProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 {
     GP_LPPRINT lpr;
@@ -260,7 +235,7 @@ PrintDlgProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 }
 
 
-BOOL CALLBACK WINEXPORT
+BOOL CALLBACK
 PrintAbortProc(HDC hdcPrn, int code)
 {
     MSG msg;
@@ -355,167 +330,3 @@ DumpPrinter(HWND hwnd, LPSTR szAppName, LPSTR szFileName)
     }
     fclose(f);
 }
-
-#else  /* !WIN32 */
-
-/* documented in Device Driver Adaptation Guide */
-/* Prototypes taken from print.h */
- DECLARE_HANDLE(HPJOB);
-
-HPJOB   WINAPI OpenJob(LPSTR, LPSTR, HPJOB);
-int     WINAPI StartSpoolPage(HPJOB);
-int     WINAPI EndSpoolPage(HPJOB);
-int     WINAPI WriteSpool(HPJOB, LPSTR, int);
-int     WINAPI CloseJob(HPJOB);
-int     WINAPI DeleteJob(HPJOB, int);
-int     WINAPI WriteDialog(HPJOB, LPSTR, int);
-int     WINAPI DeleteSpoolPage(HPJOB);
-
-/* Modeless dialog box - Cancel printing */
-BOOL CALLBACK WINEXPORT
-CancelDlgProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
-{
-    switch(message) {
-    case WM_INITDIALOG:
-	SetWindowText(hDlg,(LPSTR)lParam);
-	return TRUE;
-    case WM_COMMAND:
-	switch(LOWORD(wParam)) {
-	case IDCANCEL:
-	    DestroyWindow(hDlg);
-	    return TRUE;
-	}
-    }
-    return FALSE;
-}
-
-
-
-/* Dialog box to select printer port */
-BOOL CALLBACK WINEXPORT
-SpoolDlgProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
-{
-    LPSTR entry;
-
-    switch(message) {
-    case WM_INITDIALOG:
-	entry = (LPSTR)lParam;
-	while (*entry) {
-	    SendDlgItemMessage(hDlg, SPOOL_PORT, LB_ADDSTRING, 0, (LPARAM)entry);
-	    entry += lstrlen(entry)+1;
-	}
-	SendDlgItemMessage(hDlg, SPOOL_PORT, LB_SETCURSEL, 0, (LPARAM)0);
-	return TRUE;
-    case WM_COMMAND:
-	switch(LOWORD(wParam)) {
-	case SPOOL_PORT:
-	    if (HIWORD(lParam) == LBN_DBLCLK)
-		PostMessage(hDlg, WM_COMMAND, IDOK, 0L);
-	    return FALSE;
-	case IDOK:
-	    EndDialog(hDlg, 1+(int)SendDlgItemMessage(hDlg, SPOOL_PORT, LB_GETCURSEL, 0, 0L));
-	    return TRUE;
-	case IDCANCEL:
-	    EndDialog(hDlg, 0);
-	    return TRUE;
-	}
-    }
-    return FALSE;
-}
-
-/* Print File to port */
-void WDPROC
-DumpPrinter(HWND hwnd, LPSTR szAppName, LPSTR szFileName)
-{
-#define PRINT_BUF_SIZE 4096
-    char *buffer;
-    char *portname;
-    int i, iport;
-    DLGPROC lpfnSpoolProc;
-    HPJOB hJob;
-    UINT count;
-    HFILE hf;
-    int error = FALSE;
-    DLGPROC lpfnCancelProc;
-    long lsize;
-    long ldone;
-    char pcdone[10];
-    MSG msg;
-    HWND hDlgModeless;
-
-    if ((buffer = LocalAllocPtr(LHND, PRINT_BUF_SIZE)) == (char *)NULL)
-	return;
-    /* get list of ports */
-    GetProfileString("ports", NULL, "", buffer, PRINT_BUF_SIZE);
-    /* select a port */
-    lpfnSpoolProc = (DLGPROC)MakeProcInstance((FARPROC)SpoolDlgProc, hdllInstance);
-    iport = DialogBoxParam(hdllInstance, "SpoolDlgBox", hwnd, lpfnSpoolProc, (LPARAM)buffer);
-    FreeProcInstance((FARPROC)lpfnSpoolProc);
-    if (!iport) {
-	LocalFreePtr((void NEAR *)buffer);
-	return;
-    }
-    portname = buffer;
-    for (i=1; i<iport && lstrlen(portname)!=0; i++)
-	portname += lstrlen(portname)+1;
-
-    /* open file and get length */
-    hf = _lopen(szFileName, OF_READ);
-    if (hf == HFILE_ERROR) {
-	LocalFreePtr((void NEAR *)buffer);
-	return;
-    }
-    lsize = _llseek(hf, 0L, 2);
-    (void) _llseek(hf, 0L, 0);
-    if (lsize <= 0)
-	lsize = 1;
-
-    hJob = OpenJob(portname, szFileName, (HDC)NULL);
-    switch ((int)hJob) {
-    case SP_APPABORT:
-    case SP_ERROR:
-    case SP_OUTOFDISK:
-    case SP_OUTOFMEMORY:
-    case SP_USERABORT:
-	_lclose(hf);
-	LocalFreePtr((void NEAR *)buffer);
-	return;
-    }
-    if (StartSpoolPage(hJob) < 0)
-	error = TRUE;
-
-    ldone = 0;
-    lpfnCancelProc = (DLGPROC)MakeProcInstance((FARPROC)CancelDlgProc, hdllInstance);
-    hDlgModeless = CreateDialogParam(hdllInstance, "CancelDlgBox", hwnd, lpfnCancelProc, (LPARAM)szAppName);
-
-    while (!error && hDlgModeless && IsWindow(hDlgModeless)
-	   && ((count = _lread(hf, buffer, PRINT_BUF_SIZE))!= 0) ) {
-	wsprintf(pcdone, "%d%% done", (int)(ldone * 100 / lsize));
-	SetWindowText(GetDlgItem(hDlgModeless, CANCEL_PCDONE), pcdone);
-	if (WriteSpool(hJob, buffer, count) < 0)
-	    error = TRUE;
-	ldone += count;
-	while (IsWindow(hDlgModeless) && PeekMessage(&msg, hDlgModeless, 0, 0, PM_REMOVE)) {
-	    if (!IsDialogMessage(hDlgModeless, &msg)) {
-		TranslateMessage(&msg);
-		DispatchMessage(&msg);
-	    }
-	}
-    }
-    LocalFreePtr((void NEAR *)buffer);
-    _lclose(hf);
-
-    if (!hDlgModeless || !IsWindow(hDlgModeless))
-	error=TRUE;
-    if (IsWindow(hDlgModeless))
-	DestroyWindow(hDlgModeless);
-    hDlgModeless = 0;
-    FreeProcInstance((FARPROC)lpfnCancelProc);
-    EndSpoolPage(hJob);
-    if (error)
-	DeleteJob(hJob, 0);
-    else
-	CloseJob(hJob);
-}
-#endif /* !WIN32 */
-

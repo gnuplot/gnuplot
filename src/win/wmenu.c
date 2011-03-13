@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: wmenu.c,v 1.11 2011/03/13 12:14:02 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: wmenu.c,v 1.12 2011/03/13 14:49:48 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - win/wmenu.c */
@@ -50,11 +50,12 @@ static char *RCSid() { return RCSid("$Id: wmenu.c,v 1.11 2011/03/13 12:14:02 mar
 #define _WIN32_IE 0x0501
 #include <windows.h>
 #include <windowsx.h>
-#if WINVER >= 0x030a
-# include <commdlg.h>
-#endif
+#include <commdlg.h>
 #include <commctrl.h>
-#include <string.h>	/* only use far items */
+#include <shlobj.h>
+#include <winuser.h>
+#include <shlwapi.h>
+#include <string.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include "wgnuplib.h"
@@ -62,14 +63,7 @@ static char *RCSid() { return RCSid("$Id: wmenu.c,v 1.11 2011/03/13 12:14:02 mar
 #include "stdfn.h"
 #include "wcommon.h"
 
-/* WITH_ADV_DIR_DIALOG is defined in wcommon.h */
-#ifdef WITH_ADV_DIR_DIALOG
-# include <shlobj.h>
-# include <winuser.h>
-# include <shlwapi.h>
-#endif
-
-BOOL CALLBACK WINEXPORT InputBoxDlgProc(HWND, UINT, WPARAM, LPARAM);
+BOOL CALLBACK InputBoxDlgProc(HWND, UINT, WPARAM, LPARAM);
 
 /* limits */
 #define MAXSTR 255
@@ -102,8 +96,6 @@ BYTE keyeq[] = {
 	25, 26, 28, 29, 30, 31,
 	0};
 
-
-#ifdef WITH_ADV_DIR_DIALOG
 
 #ifdef SHELL_DIR_DIALOG
 
@@ -318,7 +310,6 @@ UINT_PTR CALLBACK OFNHookProc(HWND hdlg, UINT uiMsg, WPARAM wParam, LPARAM lPara
 }
 
 #endif /* !SHELL_DIR_DIALOG */
-#endif /* WITH_ADV_DIR_DIALOG */
 
 
 /* Send a macro to the text window */
@@ -331,12 +322,10 @@ char *buf;
 BOOL flag=TRUE;
 int i;
 LPMW lpmw = lptw->lpmw;
-#if WINVER >= 0x030a
 OPENFILENAME ofn;
 char *szTitle;
 char *szFile;
 char *szFilter;
-#endif
 
 	if ( (buf = LocalAllocPtr(LHND, MAXSTR+1)) == (char *)NULL )
 		return;
@@ -351,9 +340,6 @@ char *szFilter;
 		switch (*s) {
 			case SAVE: /* [SAVE] - get a save filename from a file list box */
 			case OPEN: /* [OPEN] - get a filename from a file list box */
-#if WINVER >= 0x030a
-				/* This uses COMMDLG.DLL from Windows 3.1
-				   COMMDLG.DLL is redistributable */
 				{
 				BOOL save;
 				char cwd[MAX_PATH];
@@ -391,7 +377,6 @@ char *szFilter;
 				szFilter[i++]='\0';	/* add a second NULL */
 				flag = 0;
 
-				/* the Windows 3.1 implentation - MC */
 				szFile[0] = '\0';
 				/* clear the structrure */
 				_fmemset(&ofn, 0, sizeof(OPENFILENAME));
@@ -417,49 +402,25 @@ char *szFilter;
 						*d++=ofn.lpstrFile[i];
 				}
 
-				LocalFreePtr((void NEAR *)OFFSETOF(szTitle));
-				LocalFreePtr((void NEAR *)OFFSETOF(szFilter));
-				LocalFreePtr((void NEAR *)OFFSETOF(szFile));
+				LocalFreePtr((void NEAR *)szTitle);
+				LocalFreePtr((void NEAR *)szFilter);
+				LocalFreePtr((void NEAR *)szFile);
 
 				}
 				break;
-#else
-				/* Use InputBox if you don't have COMMDLG.DLL */
-				s++;	/* skip list box title */
-				for(i=0; (*s >= 32 && *s <= 126); i++)
-					s++;
-#endif
 
-#ifndef WITH_ADV_DIR_DIALOG
-			case DIRECTORY: /* [DIRECTORY] fall back to INPUT dialog */
-#endif
 			case INPUT: /* [INPUT] - input a string of characters */
 				s++;
 				for(i=0; (*s >= 32 && *s <= 126); i++)
 					lpmw->szPrompt[i] = *s++;
 				lpmw->szPrompt[i]='\0';
-#ifdef WIN32
 				flag = DialogBox( hdllInstance, "InputDlgBox", lptw->hWndParent, InputBoxDlgProc);
-#else
-#ifdef __DLL__
-				lpmw->lpProcInput = (DLGPROC)GetProcAddress(hdllInstance, "InputBoxDlgProc");
-#else
-				lpmw->lpProcInput = (DLGPROC)MakeProcInstance((FARPROC)InputBoxDlgProc, hdllInstance);
-#endif
-				flag = DialogBox( hdllInstance, "InputDlgBox", lptw->hWndParent, lpmw->lpProcInput);
-#endif
 				if( flag ) {
 					for (i=0; i<lpmw->nChar; i++)
 						*d++ = lpmw->szAnswer[i];
 				}
-#ifndef WIN32
-#ifndef __DLL__
-				FreeProcInstance((FARPROC)lpmw->lpProcInput);
-#endif
-#endif
 				break;
 
-#ifdef WITH_ADV_DIR_DIALOG
 			case DIRECTORY: /* [DIRECTORY] - show standard directory dialog */
 				{
 #ifdef SHELL_DIR_DIALOG
@@ -574,7 +535,7 @@ char *szFilter;
 							for (i=0; i<len; i++)
 								*d++ = ofn.lpstrFile[i];
 						}			
-						LocalFreePtr((void NEAR *)OFFSETOF(szFile));
+						LocalFreePtr((void NEAR *)szFile);
 					}
 #endif /* !SHELL_DIR_DIALOG */
 					else {
@@ -585,10 +546,9 @@ char *szFilter;
 								*d++ = lpmw->szAnswer[i];
 						}
 					}	
-					LocalFreePtr((void NEAR *)OFFSETOF(szTitle));
+					LocalFreePtr((void NEAR *)szTitle);
 				}
 				break;
-#endif /* WITH_ADV_DIR_DIALOG */
 
 		    case EOS: /* [EOS] - End Of String - do nothing */
 				default:
@@ -633,7 +593,7 @@ GFILE *gfile;
 
 	gfile->hfile = _lopen(lpszFileName, fnOpenMode);
 	if (gfile->hfile == HFILE_ERROR) {
-		LocalFreePtr((void NEAR *)OFFSETOF(gfile));
+		LocalFreePtr((void NEAR *)gfile);
 		return NULL;
 	}
 	gfile->getleft = 0;
@@ -645,7 +605,7 @@ void Gfclose(GFILE * gfile)
 {
 
 	_lclose(gfile->hfile);
-	LocalFreePtr((void NEAR *)OFFSETOF(gfile));
+	LocalFreePtr((void NEAR *)gfile);
 	return;
 }
 
@@ -964,13 +924,13 @@ errorcleanup:
 		GlobalFree(hmacrobuf);
 	}
 	if (lpmw->szPrompt != (char *)NULL)
-		LocalFreePtr((void NEAR *)OFFSETOF(lpmw->szPrompt));
+		LocalFreePtr((void NEAR *)lpmw->szPrompt);
 	if (lpmw->szAnswer != (char *)NULL)
-		LocalFreePtr((void NEAR *)OFFSETOF(lpmw->szAnswer));
+		LocalFreePtr((void NEAR *)lpmw->szAnswer);
 
 cleanup:
 	if (buf != (char *)NULL)
-		LocalFreePtr((void NEAR *)OFFSETOF(buf));
+		LocalFreePtr((void NEAR *)buf);
 	if (menufile != (GFILE *)NULL)
 		Gfclose(menufile);
 	return;
@@ -984,20 +944,20 @@ HGLOBAL hglobal;
 LPMW lpmw;
 	lpmw = lptw->lpmw;
 
-	hglobal = (HGLOBAL)GlobalHandle( SELECTOROF(lpmw->macro) );
+	hglobal = (HGLOBAL)GlobalHandle(lpmw->macro);
 	if (hglobal) {
 		GlobalUnlock(hglobal);
 		GlobalFree(hglobal);
 	}
-	hglobal = (HGLOBAL)GlobalHandle( SELECTOROF(lpmw->macrobuf) );
+	hglobal = (HGLOBAL)GlobalHandle(lpmw->macrobuf);
 	if (hglobal) {
 		GlobalUnlock(hglobal);
 		GlobalFree(hglobal);
 	}
 	if (lpmw->szPrompt != (char *)NULL)
-		LocalFreePtr((void NEAR *)OFFSETOF(lpmw->szPrompt));
+		LocalFreePtr(lpmw->szPrompt);
 	if (lpmw->szAnswer != (char *)NULL)
-		LocalFreePtr((void NEAR *)OFFSETOF(lpmw->szAnswer));
+		LocalFreePtr(lpmw->szAnswer);
 }
 
 
@@ -1005,7 +965,7 @@ LPMW lpmw;
 /* InputBoxDlgProc() -  Message handling routine for Input dialog box         */
 /***********************************************************************/
 
-BOOL CALLBACK WINEXPORT
+BOOL CALLBACK
 InputBoxDlgProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 {
 LPTW lptw;

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: winmain.c,v 1.35 2011/03/10 19:57:35 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: winmain.c,v 1.36 2011/03/13 12:15:56 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - win/winmain.c */
@@ -54,10 +54,12 @@ static char *RCSid() { return RCSid("$Id: winmain.c,v 1.35 2011/03/10 19:57:35 m
 # include "config.h"
 #endif
 #define STRICT
-#define _WIN32_IE 0x300
+#define _WIN32_IE 0x0400
 #include <windows.h>
 #include <windowsx.h>
 #include <commctrl.h>
+#include <shlobj.h>
+#include <shlwapi.h>
 #include <dos.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -82,16 +84,9 @@ static char *RCSid() { return RCSid("$Id: winmain.c,v 1.35 2011/03/10 19:57:35 m
 #include "wtext.h"
 #include "wcommon.h"
 
-#ifdef WIN32
-# ifndef _WIN32_IE
-#  define _WIN32_IE 0x0400
-# endif
-# include <shlobj.h>
-# include <shlwapi.h>
-  /* workaround for old header files */
-# ifndef CSIDL_APPDATA
-#  define CSIDL_APPDATA (0x001a)
-# endif
+/* workaround for old header files */
+#ifndef CSIDL_APPDATA
+# define CSIDL_APPDATA (0x001a)
 #endif
 
 /* limits */
@@ -144,11 +139,6 @@ kill_pending_Pause_dialog ()
             return;
         /* Pause dialog displayed, thus kill it */
         DestroyWindow(pausewin.hWndPause);
-#ifndef WIN32
-#ifndef __DLL__
-        FreeProcInstance((FARPROC)pausewin.lpfnPauseButtonProc);
-#endif
-#endif
         pausewin.bPause = FALSE;
 }
 
@@ -176,14 +166,13 @@ WinExit(void)
 }
 
 /* call back function from Text Window WM_CLOSE */
-int CALLBACK WINEXPORT
+int CALLBACK
 ShutDown()
 {
         exit(0);
         return 0;
 }
 
-#ifdef WIN32
 
 /* This function can be used to retrieve version information from
  * Window's Shell and common control libraries such (Comctl32.dll,
@@ -272,7 +261,6 @@ appdata_directory(void)
     return NULL;
 }
 
-#endif /* WIN32 */
 
 #ifndef WGP_CONSOLE
 int PASCAL WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
@@ -290,37 +278,17 @@ int main(int argc, char **argv)
         HINSTANCE hInstance = GetModuleHandle(NULL), hPrevInstance = NULL;
         int nCmdShow = 0;
 #else
-#ifdef __MSC__  /* MSC doesn't give us _argc and _argv[] so ...   */
-# ifdef WIN32    /* WIN32 has __argc and __argv */
+#if defined(__MSC__) || defined(__WATCOMC__)
 #  define _argv __argv
 #  define _argc __argc
-# else
-#  define MAXCMDTOKENS 128
-        int     _argc=0;
-        LPSTR   _argv[MAXCMDTOKENS];
-        _argv[_argc] = "wgnuplot.exe";
-        _argv[++_argc] = _fstrtok( lpszCmdLine, " ");
-        while (_argv[_argc] != NULL)
-                _argv[++_argc] = _fstrtok( NULL, " ");
-# endif /* WIN32 */
-#endif /* __MSC__ */
-#ifdef  __WATCOMC__
-# define _argv __argv
-# define _argc __argc
 #endif
 #endif /* WGP_CONSOLE */
 
-        szModuleName = (LPSTR)farmalloc(MAXSTR+1);
+        szModuleName = (LPSTR)malloc(MAXSTR+1);
         CheckMemory(szModuleName);
 
         /* get path to EXE */
         GetModuleFileName(hInstance, (LPSTR) szModuleName, MAXSTR);
-#ifndef WIN32
-        if (CheckWGNUPLOTVersion(WGNUPLOTVERSION)) {
-                MessageBox(NULL, "Wrong version of WGNUPLOT.DLL", szModuleName, MB_ICONSTOP | MB_OK);
-                exit(1);
-        }
-#endif
         if ((tail = (LPSTR)_fstrrchr(szModuleName,'\\')) != (LPSTR)NULL)
         {
                 tail++;
@@ -332,7 +300,7 @@ int main(int argc, char **argv)
         if (_fstrlen(szModuleName) >= 5 && _fstrnicmp(&szModuleName[_fstrlen(szModuleName)-5], "\\bin\\", 5) == 0)
         {
                 int len = _fstrlen(szModuleName)-4;
-                szPackageDir = (LPSTR)farmalloc(len+1);
+                szPackageDir = (LPSTR)malloc(len+1);
                 CheckMemory(szPackageDir);
                 _fstrncpy(szPackageDir, szModuleName, len);
                 szPackageDir[len] = '\0';
@@ -340,12 +308,12 @@ int main(int argc, char **argv)
         else
                 szPackageDir = szModuleName;
 
-        winhelpname = (LPSTR)farmalloc(_fstrlen(szModuleName)+_fstrlen(HELPFILE)+1);
+        winhelpname = (LPSTR)malloc(_fstrlen(szModuleName)+_fstrlen(HELPFILE)+1);
         CheckMemory(winhelpname);
         _fstrcpy(winhelpname,szModuleName);
         _fstrcat(winhelpname,HELPFILE);
 
-        szMenuName = (LPSTR)farmalloc(_fstrlen(szModuleName)+_fstrlen(MENUNAME)+1);
+        szMenuName = (LPSTR)malloc(_fstrlen(szModuleName)+_fstrlen(MENUNAME)+1);
         CheckMemory(szMenuName);
         _fstrcpy(szMenuName,szModuleName);
         _fstrcat(szMenuName,MENUNAME);
@@ -374,7 +342,7 @@ int main(int argc, char **argv)
         textwin.KeyBufSize = 2048;
         textwin.CursorFlag = 1; /* scroll to cursor after \n & \r */
         textwin.shutdown = MakeProcInstance((FARPROC)ShutDown, hInstance);
-        textwin.AboutText = (LPSTR)farmalloc(1024);
+        textwin.AboutText = (LPSTR)malloc(1024);
         CheckMemory(textwin.AboutText);
         sprintf(textwin.AboutText,"Version %s\nPatchlevel %s\nLast Modified %s\n%s\n%s, %s and many others",
                 gnuplot_version, gnuplot_patchlevel, gnuplot_date, gnuplot_copyright, authors[1], authors[0]);
@@ -408,11 +376,7 @@ int main(int argc, char **argv)
         if (TextInit(&textwin))
                 exit(1);
         textwin.hIcon = LoadIcon(hInstance, "TEXTICON");
-#ifdef WIN32
         SetClassLong(textwin.hWndParent, GCL_HICON, (DWORD)textwin.hIcon);
-#else
-        SetClassWord(textwin.hWndParent, GCW_HICON, (WORD)textwin.hIcon);
-#endif
         if (_argc>1) {
                 int i,noend=FALSE;
                 for (i=0; i<_argc; ++i)
@@ -475,11 +439,7 @@ int main(int argc, char **argv)
 #undef fwrite
 #undef fread
 
-#if defined(__MSC__)|| defined(WIN32)
 #define isterm(f) (f==stdin || f==stdout || f==stderr)
-#else
-#define isterm(f) isatty(fileno(f))
-#endif
 
 int
 MyPutCh(int ch)

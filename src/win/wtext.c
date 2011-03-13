@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: wtext.c,v 1.23 2011/03/07 21:41:36 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: wtext.c,v 1.24 2011/03/13 14:49:48 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - win/wtext.c */
@@ -57,16 +57,11 @@ static char *RCSid() { return RCSid("$Id: wtext.c,v 1.23 2011/03/07 21:41:36 mar
 #endif
 #include <sys/stat.h>
 
-#ifdef WIN32
 /* needed for mouse scroll wheel support */
 #define _WIN32_WINNT 0x0400
-#endif
-
 #include <windows.h>
 #include <windowsx.h>
-#if WINVER >= 0x030a
-# include <commdlg.h>
-#endif
+#include <commdlg.h>
 
 #include "wgnuplib.h"
 #include "wresourc.h"
@@ -87,8 +82,8 @@ static char *RCSid() { return RCSid("$Id: wtext.c,v 1.23 2011/03/07 21:41:36 mar
 /* limits */
 POINT ScreenMinSize = {16,4};
 
-LRESULT CALLBACK WINEXPORT WndParentProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);
-LRESULT CALLBACK WINEXPORT WndTextProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);
+LRESULT CALLBACK WndParentProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);
+LRESULT CALLBACK WndTextProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);
 
 void ReadTextIni(LPTW lptw);
 void LimitMark(LPTW lptw, POINT FAR *lppt);
@@ -142,9 +137,7 @@ CreateTextClass(LPTW lptw)
 {
     WNDCLASS wndclass;
 
-#ifdef WIN32
     hdllInstance = lptw->hInstance;	/* not using a DLL */
-#endif
     wndclass.style = CS_HREDRAW | CS_VREDRAW;
     wndclass.lpfnWndProc = WndTextProc;
     wndclass.cbClsExtra = 0;
@@ -249,9 +242,7 @@ TextInit(LPTW lptw)
     AppendMenu(lptw->hPopMenu, MF_STRING, M_COPY_CLIP, "&Copy to Clipboard\tCtrl-Ins");
     AppendMenu(lptw->hPopMenu, MF_STRING, M_PASTE, "&Paste\tShift-Ins");
     AppendMenu(lptw->hPopMenu, MF_SEPARATOR, 0, NULL);
-#if WINVER >= 0x030a
     AppendMenu(lptw->hPopMenu, MF_STRING, M_CHOOSE_FONT, "Choose &Font...");
-#endif
 /*  FIXME: Currently not implemented
     AppendMenu(lptw->hPopMenu, MF_STRING | (lptw->bSysColors ? MF_CHECKED : MF_UNCHECKED),
 	       M_SYSCOLORS, "&System Colors");
@@ -294,7 +285,7 @@ TextClose(LPTW lptw)
     /* free the screen buffer */
     sb_free(&(lptw->ScreenBuffer));
 
-    hglobal = (HGLOBAL)GlobalHandle( SELECTOROF(lptw->KeyBuf) );
+    hglobal = (HGLOBAL)GlobalHandle(lptw->KeyBuf);
     if (hglobal) {
 	GlobalUnlock(hglobal);
 	GlobalFree(hglobal);
@@ -937,7 +928,6 @@ TextMakeFont(LPTW lptw)
 
 void
 TextSelectFont(LPTW lptw) {
-#if WINVER >= 0x030a
     LOGFONT lf;
     CHOOSEFONT cf;
     HDC hdc;
@@ -984,12 +974,11 @@ TextSelectFont(LPTW lptw) {
 	InvalidateRect(lptw->hWndText, (LPRECT) &rect, 1);
 	UpdateWindow(lptw->hWndText);
     }
-#endif
 }
 
 
 /* parent overlapped window */
-LRESULT CALLBACK WINEXPORT
+LRESULT CALLBACK
 WndParentProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     HDC hdc;
@@ -1048,16 +1037,9 @@ WndParentProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 	return(0);
     case WM_ERASEBKGND:
 	return 1;
-#if WINVER >= 0x030a
     case WM_DROPFILES:
-    {
-	WORD version = LOWORD(GetVersion());
-
-	if ((LOBYTE(version)*100 + HIBYTE(version)) >= 310)
-	    DragFunc(lptw, (HDROP)wParam);
-    }
-    break;
-#endif
+	DragFunc(lptw, (HDROP)wParam);
+	break;
 
     case WM_CREATE:
     {
@@ -1075,32 +1057,17 @@ WndParentProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 	lptw->CharSize.x = tm.tmAveCharWidth;
 	lptw->CharAscent = tm.tmAscent;
 	ReleaseDC(hwnd,hdc);
-    }
 
-#if WINVER >= 0x030a
-    {
-	WORD version = LOWORD(GetVersion());
-
-	if ((LOBYTE(version)*100 + HIBYTE(version)) >= 310)
-	    if ( (lptw->DragPre!=(LPSTR)NULL) && (lptw->DragPost!=(LPSTR)NULL) )
-		DragAcceptFiles(hwnd, TRUE);
+	if ( (lptw->DragPre!=(LPSTR)NULL) && (lptw->DragPost!=(LPSTR)NULL) )
+	    DragAcceptFiles(hwnd, TRUE);
     }
-#endif
     break;
 
     case WM_DESTROY:
-#if WINVER >= 0x030a
-    {
-	WORD version = LOWORD(GetVersion());
-
-	if ((LOBYTE(version)*100 + HIBYTE(version)) >= 310)
-	    DragAcceptFiles(hwnd, FALSE);
-    }
-#endif
-
-    DeleteObject(lptw->hfont);
-    lptw->hfont = 0;
-    break;
+	DragAcceptFiles(hwnd, FALSE);
+	DeleteObject(lptw->hfont);
+	lptw->hfont = 0;
+	break;
 
     case WM_CLOSE:
 	if (lptw->shutdown) {
@@ -1119,7 +1086,7 @@ int
 ReallocateKeyBuf(LPTW lptw)
 {
     int newbufsize = lptw->KeyBufSize + 16*1024; /* new buffer size */
-    HGLOBAL h_old = (HGLOBAL)GlobalHandle( SELECTOROF(lptw->KeyBuf) );
+    HGLOBAL h_old = (HGLOBAL)GlobalHandle(lptw->KeyBuf);
     HGLOBAL h = GlobalAlloc(LHND, newbufsize);
     int pos_in = lptw->KeyBufIn - lptw->KeyBuf;
     int pos_out = lptw->KeyBufOut - lptw->KeyBuf;
@@ -1166,7 +1133,7 @@ void UpdateCaretPos(LPTW lptw)
 
 
 /* child text window */
-LRESULT CALLBACK WINEXPORT
+LRESULT CALLBACK
 WndTextProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     HDC hdc;
@@ -1942,8 +1909,6 @@ TextAttr(LPTW lptw, BYTE attr)
 #endif /* WGP_CONSOLE */
 
 
-#if WINVER >= 0x030a
-/* Windows 3.1 drag-drop feature */
 void
 DragFunc(LPTW lptw, HDROP hdrop)
 {
@@ -1972,7 +1937,6 @@ DragFunc(LPTW lptw, HDROP hdrop)
     }
     DragFinish(hdrop);
 }
-#endif /* WINVER >= 0x030a */
 
 
 void
@@ -2081,7 +2045,7 @@ ReadTextIni(LPTW lptw)
 
 
 /* About Box */
-BOOL CALLBACK WINEXPORT
+BOOL CALLBACK
 AboutDlgProc(HWND hDlg, UINT wMsg, WPARAM wParam, LPARAM lParam)
 {
     switch (wMsg) {
@@ -2092,20 +2056,12 @@ AboutDlgProc(HWND hDlg, UINT wMsg, WPARAM wParam, LPARAM lParam)
 	GetWindowText(GetParent(hDlg),buf,80);
 	SetDlgItemText(hDlg, AB_TEXT1, buf);
 	SetDlgItemText(hDlg, AB_TEXT2, (LPSTR)lParam);
-#ifdef __DLL__
-	wsprintf(buf,"WGNUPLOT.DLL Version %s",(LPSTR)WGNUPLOTVERSION);
-	SetDlgItemText(hDlg, AB_TEXT3, buf);
-#endif
 	return TRUE;
     }
     case WM_DRAWITEM:
     {
 	LPDRAWITEMSTRUCT lpdis = (LPDRAWITEMSTRUCT)lParam;
-#ifdef WIN32
 	DrawIcon(lpdis->hDC, 0, 0, (HICON)GetClassLong(GetParent(hDlg), GCL_HICON));
-#else
-	DrawIcon(lpdis->hDC, 0, 0, (HICON)GetClassWord(GetParent(hDlg), GCW_HICON));
-#endif
 	return FALSE;
     }
     case WM_COMMAND:
@@ -2124,23 +2080,6 @@ AboutDlgProc(HWND hDlg, UINT wMsg, WPARAM wParam, LPARAM lParam)
 void WDPROC
 AboutBox(HWND hwnd, LPSTR str)
 {
-#ifdef WIN32
     DialogBoxParam(hdllInstance, "AboutDlgBox", hwnd,
 		   AboutDlgProc, (LPARAM)str);
-#else
-    DLGPROC lpfnAboutDlgProc;
-
-# ifdef __DLL__
-    lpfnAboutDlgProc = (DLGPROC)GetProcAddress(hdllInstance, "AboutDlgProc");
-# else
-    lpfnAboutDlgProc = (DLGPROC)MakeProcInstance((FARPROC)AboutDlgProc,
-						 hdllInstance);
-# endif /* __DLL__ */
-    DialogBoxParam(hdllInstance,"AboutDlgBox", hwnd, lpfnAboutDlgProc,
-		   (LPARAM)str);
-    EnableWindow(hwnd,TRUE);
-# ifndef __DLL__
-    FreeProcInstance((FARPROC)lpfnAboutDlgProc);
-# endif /* __DLL__ */
-#endif /* WIN32 */
 }
