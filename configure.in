@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot on Unix.
 dnl
-dnl $Id: configure.in,v 1.276 2011/02/20 20:42:50 sfeam Exp $
+dnl $Id: configure.in,v 1.277 2011/03/11 19:19:57 sfeam Exp $
 dnl
 dnl this is actually major.minor ...
 dnl note that for a non-beta release, we need to
@@ -630,7 +630,7 @@ dnl So far this is only used by gd.trm.
 AC_SEARCH_LIBS(iconv_open, iconv,
   AC_CHECK_HEADER(iconv.h,
     AC_DEFINE(HAVE_ICONV,1,[define if you have libiconv and iconv.h]),
-  ,)
+  )
 )
 
 dnl The Portable Document Format (PDF) terminal
