@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: wtext.c,v 1.24 2011/03/13 14:49:48 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: wtext.c,v 1.25 2011/03/13 19:55:29 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - win/wtext.c */
@@ -982,8 +982,6 @@ LRESULT CALLBACK
 WndParentProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     HDC hdc;
-    PAINTSTRUCT ps;
-    RECT rect;
     LPTW lptw;
 
     lptw = (LPTW)GetWindowLong(hwnd, 0);

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: wmenu.c,v 1.12 2011/03/13 14:49:48 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: wmenu.c,v 1.13 2011/03/13 19:55:29 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - win/wmenu.c */
@@ -701,7 +701,6 @@ int nInc;
 HGLOBAL hmacro, hmacrobuf;
 
 int i;
-HDC hdc;
 RECT rect;
 char FAR *ButtonText[BUTTONMAX];
 
@@ -881,7 +880,8 @@ char FAR *ButtonText[BUTTONMAX];
 	    goto cleanup;
 	    
 	/* we don't have any icons yet, so set size to zero */
-	SendMessage(lpmw->hToolbar, TB_SETBITMAPSIZE, (WPARAM)0, (LPARAM)(0<<16 + 0));  // height, widthx, y // default 16,15
+	/* lparam is (height<<16 + width) / default 16,15 */
+	SendMessage(lpmw->hToolbar, TB_SETBITMAPSIZE, (WPARAM)0, (LPARAM)((0<<16) + 0));
 	/* create buttons */
 	SendMessage(lpmw->hToolbar, TB_BUTTONSTRUCTSIZE, (WPARAM)sizeof(TBBUTTON), 0);
 	for (i = 0; i < lpmw->nButton; i++) {
