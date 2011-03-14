@@ -4,6 +4,7 @@
 #
 set key default
 set key box
+set key samplen .2
 
 set multiplot layout 3,3
 set key ins vert

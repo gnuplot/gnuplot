@@ -1,3 +1,8 @@
+2011-03-14  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/graphics.c: Auto-placement of the left margin of the plot
+	was failing to allow room for "set key outside left".
+
 2011-03-13  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/win/wgnuplot.rc, src/win/wgnuplot.exe.manifest: add new
