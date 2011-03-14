@@ -1,3 +1,8 @@
+2011-03-14  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/graphics.c: Auto-placement of the left margin of the plot
+	was failing to allow room for "set key outside left".
+
 2011-03-10  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/plot2d.c(get_data) src/graphics.c(plot_boxes):

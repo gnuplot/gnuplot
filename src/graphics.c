@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.302.2.25 2010/12/18 04:26:25 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.302.2.26 2011/03/11 05:43:03 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -333,6 +333,7 @@ boundary(struct curve_points *plots, int count)
     int xtic_height;
     int ytic_width;
     int y2tic_width;
+    int key_xleft = 0;		/* Amount of space on the left required by the key */
 
     int key_cols = 1;		/* # columns of keys */
 
@@ -723,7 +724,8 @@ boundary(struct curve_points *plots, int count)
 		if (plot_bounds.xleft + more > plot_bounds.xright)
 		    key_panic = TRUE;
 		else
-		    plot_bounds.xleft += more;
+		    key_xleft = more;
+		plot_bounds.xleft += key_xleft;
 	    } else if (key->margin == GPKEY_RMARGIN && rmargin.x < 0) {
 		more = key_col_wth * key_cols;
 		if (plot_bounds.xright - more < plot_bounds.xleft)
@@ -821,11 +823,15 @@ boundary(struct curve_points *plots, int count)
     if (lmargin.x < 0) {	
 	/* Auto-calculation */
 	double tmpx, tmpy;
+	int space_to_left = key_xleft;
 
+	if (space_to_left < timelabel_textwidth)
+	    space_to_left = timelabel_textwidth;
+	if (space_to_left < ylabel_textwidth)
+	    space_to_left = ylabel_textwidth;
 	plot_bounds.xleft = xoffset * t->xmax;
-	plot_bounds.xleft += (timelabel_textwidth > ylabel_textwidth
-		  ? timelabel_textwidth : ylabel_textwidth)
-	    + ytic_width + ytic_textwidth;
+	plot_bounds.xleft += space_to_left;
+	plot_bounds.xleft += ytic_width + ytic_textwidth;
 
 	/* make sure plot_bounds.xleft is wide enough for a negatively
 	 * x-offset horizontal timestamp
