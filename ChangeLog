@@ -3,6 +3,10 @@
 	* src/graphics.c: Auto-placement of the left margin of the plot
 	was failing to allow room for "set key outside left".
 
+	* term/post.trm: Add a %%Page statement in *.eps files, as current
+	versions of standard tools seem to expect it.
+	Bug #3046700
+
 2011-03-13  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/win/wgnuplot.rc, src/win/wgnuplot.exe.manifest: add new

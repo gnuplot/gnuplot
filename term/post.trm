@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: post.trm,v 1.258 2011/01/19 20:49:26 sfeam Exp $
+ * $Id: post.trm,v 1.259 2011/01/26 06:09:19 sfeam Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -1792,7 +1792,7 @@ PS_graphics()
 {
     struct termentry *t = term;
     ps_page++;
-    if (ps_params->psformat != PSTERM_EPS)
+    /* if (ps_params->psformat != PSTERM_EPS) */
 	fprintf(gppsfile,"%%%%Page: %d %d\n",ps_page,ps_page);
 
     /* If we are about to use enhanced text mode for the first time in a plot that */
