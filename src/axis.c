@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.87 2010/11/18 23:59:59 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.88 2010/12/04 05:05:52 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -460,6 +460,15 @@ copy_or_invent_formatstring(AXIS_INDEX axis)
 	|| !axis_array[axis].format_is_numeric) {
 	/* The simple case: formatstring is usable, so use it! */
 	strcpy(ticfmt[axis], axis_array[axis].formatstring);
+	/* Ensure enough precision to distinguish tics */
+	if (!strcmp(ticfmt[axis],"% g")) {
+	    double axmin = AXIS_DE_LOG_VALUE(axis,axis_array[axis].min);
+	    double axmax = AXIS_DE_LOG_VALUE(axis,axis_array[axis].max);
+	    int precision = (ceil(-log10(fabs(axmax-axmin))));
+	    if (precision > 4)
+		sprintf(ticfmt[axis],"%%.%df", (precision>14) ? 14 : precision);
+	}
+
 	return ticfmt[axis];
     }
 

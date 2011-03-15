@@ -1,3 +1,9 @@
+2011-03-15  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* axis.c(copy_or_invent_formatstring): If the default tic format has
+	insufficient precision to distinguish the two extremes of the axis
+	range, increase the precision.
+
 2011-03-14  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c: Auto-placement of the left margin of the plot
