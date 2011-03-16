@@ -5,7 +5,11 @@
 
 	* src/win/wgraph.c (drawgraph, GraphGetTextLength) NEWS: support 
 	"set encoding" for all currently defined encodings
-	
+
+	* src/win/wtext.c (ReadTextIni): select default font according to
+	the Windows version. Avoid font "Terminal" since it might not 
+	contain all glyphs of the current character set.
+
 2011-03-15  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* axis.c(copy_or_invent_formatstring): If the default tic format has

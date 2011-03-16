@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: wtext.c,v 1.26 2011/03/14 19:43:10 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: wtext.c,v 1.27 2011/03/14 20:01:30 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - win/wtext.c */
@@ -71,7 +71,6 @@ static char *RCSid() { return RCSid("$Id: wtext.c,v 1.26 2011/03/14 19:43:10 mar
 
 /* font stuff */
 #define TEXTFONTSIZE 9
-#define TEXTFONTNAME "Terminal"
 
 
 #ifndef WGP_CONSOLE
@@ -2027,11 +2026,23 @@ ReadTextIni(LPTW lptw)
 	    if ( (p = GetInt(size, &lptw->fontsize)) == NULL)
 		lptw->fontsize = TEXTFONTSIZE;
 	}
-	_fstrcpy(lptw->fontname, profile);
 	if (lptw->fontsize == 0)
 	    lptw->fontsize = TEXTFONTSIZE;
-	if (!(*lptw->fontname))
-	    _fstrcpy(lptw->fontname,TEXTFONTNAME);
+
+	_fstrcpy(lptw->fontname, profile);
+        if (!(*lptw->fontname)) {
+            /* select a default type face depending on the OS version */
+            OSVERSIONINFO versionInfo;
+            ZeroMemory(&versionInfo, sizeof(OSVERSIONINFO));
+            versionInfo.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
+            GetVersionEx(&versionInfo);
+            if (versionInfo.dwMajorVersion >= 6) /* Vista or later */
+                strcpy(lptw->fontname, "Consolas");
+            else if ((versionInfo.dwMajorVersion == 5) && (versionInfo.dwMinorVersion >= 1)) /* Windows XP */
+                strcpy(lptw->fontname, "Lucida Console");
+            else /* Windows 2000 or earlier */
+                strcpy(lptw->fontname, "Courier New");
+        }
     }
 
     if (bOKINI) {
