@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: gd.trm,v 1.152 2011/03/11 21:18:50 sfeam Exp $
+ * $Id: gd.trm,v 1.153 2011/03/11 22:20:59 sfeam Exp $
  * based on gif.trm,v 1.26.2.1 2000/05/01 00:17:20 joze
  */
 
@@ -665,6 +665,23 @@ PNG_options()
 	gdFontMediumBold = gdFontGetMediumBold();
 	gdFontGiant = gdFontGetGiant();
 	gdFontTiny = gdFontGetTiny();
+#endif
+#ifdef _Windows
+	/* Set the default search path for fonts to something useful. */
+	if (getenv("GDFONTPATH") == NULL) {
+	    const char fonts[] = "\\fonts";
+	    char *windir = getenv("windir");
+	    if (windir) {
+		char *gdfontpath = (char *) 
+		    gp_alloc(strlen(windir) + strlen(fonts) + 1, "GDFONTPATH");
+		if (gdfontpath) {
+		   strcpy(gdfontpath, windir); 
+		   strcat(gdfontpath, fonts);
+		   SetEnvironmentVariable("GDFONTPATH", gdfontpath);
+		   free(gdfontpath);
+		}
+	    }
+	}
 #endif
     } else {
 	/* FIXME EAM - these should never happen! */
