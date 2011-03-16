@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: win.trm,v 1.87 2011/03/07 21:41:36 markisch Exp $
+ * $Id: win.trm,v 1.88 2011/03/13 19:55:29 markisch Exp $
  */
 
 /* GNUPLOT - win.trm */
@@ -215,7 +215,7 @@ WIN_options()
 		int_error(c_token, "size is out of range");
 	    
 	    graphwin.Size.x = win_width;
-	    graphwin.Size.y = win_height + graphwin.statuslineheight;
+	    graphwin.Size.y = win_height + graphwin.StatusHeight;
 	    break;
 	}
 	case WIN_POSITION:

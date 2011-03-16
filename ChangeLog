@@ -10,9 +10,10 @@
 	the Windows version. Avoid font "Terminal" since it might not 
 	contain all glyphs of the current character set.
 
-	* src/win/wgnuplib.h, src/win/wgraph.c: use child window for status
-	bar, allow right button mouse click on status bar to activate the
-	`graph-menu` popup.
+	* src/win/wgnuplib.h, src/win/wgraph.c, term/win.trm: use child
+	window for status bar, allow right button mouse click on status
+	bar to activate the `graph-menu` popup. Change name of
+	GW.statuslineheight for consistency with TW.
 
 2011-03-15  Ethan A Merritt  <merritt@u.washington.edu>
 
