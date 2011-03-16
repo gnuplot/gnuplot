@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.96 2011/03/13 12:15:56 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.97 2011/03/13 19:55:29 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - win/wgraph.c */
@@ -119,8 +119,6 @@ static void	DestroyCursors(LPGW lpgw);
 #endif /* USE_MOUSE */
 
 /* ================================== */
-
-#define MAXSTR 255
 
 #define WGDEFCOLOR 15
 COLORREF wginitcolor[WGDEFCOLOR] =  {
@@ -775,7 +773,7 @@ SetFont(LPGW lpgw, HDC hdc)
 	    DeleteObject(lpgw->hfontv);
 	lpgw->lf.lfEscapement = lpgw->lf.lfOrientation  = lpgw->angle * 10;
 	lpgw->hfontv = CreateFontIndirect((LOGFONT FAR *)&(lpgw->lf));
-       if (lpgw->hfontv)
+	if (lpgw->hfontv)
 	    SelectObject(hdc, lpgw->hfontv);
     } else {
 	if (lpgw->hfonth)
@@ -830,6 +828,43 @@ SelFont(LPGW lpgw)
 		do_string_replot("");
 	}
 }
+
+
+LPWSTR
+UnicodeText(const char *str, enum set_encoding_id encoding)
+{
+    UINT codepage = 0;
+    LPWSTR textw = NULL;
+
+    switch (encoding) {
+        case S_ENC_ISO8859_1:  codepage = 28591; break;
+        case S_ENC_ISO8859_2:  codepage = 28592; break;
+        case S_ENC_ISO8859_9:  codepage = 28599; break;
+        case S_ENC_ISO8859_15: codepage = 28605; break;
+        case S_ENC_CP437:      codepage =   437; break;
+        case S_ENC_CP850:      codepage =   850; break;
+        case S_ENC_CP852:      codepage =   852; break;
+        case S_ENC_CP950:      codepage =   950; break;
+        case S_ENC_CP1251:     codepage =  1251; break;
+        case S_ENC_CP1254:     codepage =  1254; break;
+        case S_ENC_KOI8_R:     codepage = 20866; break;
+        case S_ENC_KOI8_U:     codepage = 21866; break;
+        case S_ENC_SJIS:       codepage =   932; break;
+        case S_ENC_UTF8:       codepage = CP_UTF8; break;
+    }
+    if (codepage != 0) {
+        int length;
+
+        /* get length of converted string */
+        length = MultiByteToWideChar(codepage, 0, str, -1, NULL, 0);
+        textw = (LPWSTR) malloc(sizeof(WCHAR) * length);
+
+        /* convert string to UTF-16 */
+        length = MultiByteToWideChar(codepage, 0, str, -1, textw, length);
+    }
+    return textw;
+}
+
 
 #ifdef USE_MOUSE
 /* ================================== */
@@ -891,6 +926,7 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
     unsigned int fillstyle = 0.0;
     int idx;
     COLORREF last_color = 0;
+    static BOOL encoding_error = false;
 
     if (lpgw->locked)
 	return;
@@ -1029,8 +1065,26 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 		    ydash += vshift;
 
 		    SetBkMode(hdc,TRANSPARENT);
-		    TextOut(hdc,xdash,ydash,str,lstrlen(str));
-		    SetBkMode(hdc,OPAQUE);
+
+                    /* support text encoding */
+                    if ((encoding == S_ENC_DEFAULT) || (encoding == S_ENC_INVALID)) {
+                        TextOut(hdc, xdash, ydash, str, lstrlen(str));
+                    } else {
+                        LPWSTR textw = UnicodeText(str, encoding);
+                        if (textw) {
+                            TextOutW(hdc, xdash, ydash, textw, wcslen(textw));
+                            free(textw);
+                        } else {
+                            /* print this only once */
+                            if (!encoding_error) {
+                                fprintf(stderr, "windows terminal: encoding %s not supported\n", encoding_names[encoding]);
+                                encoding_error = TRUE;
+                            }
+                            /* fall back to standard encoding */
+                            TextOut(hdc, xdash, ydash, str, strlen(str));
+                        }
+                    }
+                    SetBkMode(hdc,OPAQUE);
 		}
 		LocalUnlock(curptr->htext);
 	    }
@@ -2924,6 +2978,7 @@ GraphGetTextLength(LPGW lpgw, LPCSTR text, LPCSTR fontname, int fontsize)
     RECT rect;
     SIZE size;
     HGDIOBJ hprevfont;
+    LPWSTR textw;
 
     hdc = GetDC(lpgw->hWndGraph);
 	GetPlotRect(lpgw, &rect);
@@ -2931,7 +2986,13 @@ GraphGetTextLength(LPGW lpgw, LPCSTR text, LPCSTR fontname, int fontsize)
     GraphChangeFont(lpgw, fontname, fontsize, hdc, rect);
 
     hprevfont = SelectObject(hdc, lpgw->hfonth);
-    GetTextExtentPoint(hdc, text, strlen(text), &size);
+
+    textw = UnicodeText(text, encoding);
+    if (textw) {
+        GetTextExtentPointW(hdc, textw, wcslen(textw), &size);
+        free(textw);
+    } else
+        GetTextExtentPoint(hdc, text, strlen(text), &size);
     SelectObject(hdc, hprevfont);
     
     size.cx += GetTextCharacterExtra(hdc);

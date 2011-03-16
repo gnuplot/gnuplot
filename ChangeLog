@@ -1,3 +1,11 @@
+2011-03-16  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/win/wgraph.c (UnicodeText): new function to convert a string 
+	to UTF-16
+
+	* src/win/wgraph.c (drawgraph, GraphGetTextLength) NEWS: support 
+	"set encoding" for all currently defined encodings
+	
 2011-03-15  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* axis.c(copy_or_invent_formatstring): If the default tic format has

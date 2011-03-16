@@ -18,7 +18,8 @@ New features, changes and fixes since gnuplot version 4.4
 * NEW option "kdensity2d" for two-dimensional kernel density plots
 * NEW configuration option --without-bitmap-terminals (see note in INSTALL)
 * NEW polar mode raxis, rtics, rrange, log-scaling, bounded filledcurves
-* NEW Shift-JIS encoding recognized by postscript, gd, and svg terminals
+* NEW Shift-JIS encoding recognized by postscript, gd, svg, and win terminals
+* NEW windows terminal supports encodings
 * FIX length estimation of UTF-8 strings
 * FIX accurate placement of color boundaries in the colorbar
 * CHANGE 3D zoom using middle mouse button is now a logarithmic response
