@@ -4,6 +4,9 @@
 	marked region in case the marking exceeds the length of that
 	line.
 
+	* src/win/wgnuplib.rc (), src/win/resourc.h: Remove dialog resource
+	which was only used on Win16.
+
 2011-03-17  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* axis.c(gen_tics): Make sure the axis tic label format string is
