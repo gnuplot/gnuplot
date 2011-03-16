@@ -1,5 +1,5 @@
 /*
- * $Id: wgnuplib.h,v 1.34 2011/03/13 19:55:29 markisch Exp $
+ * $Id: wgnuplib.h,v 1.35 2011/03/14 20:01:30 markisch Exp $
  */
 
 /* GNUPLOT - win/wgnuplib.h */
@@ -307,6 +307,7 @@ typedef struct tagGW {
 	LPSTR	IniFile;	/* optional */
 	LPSTR	IniSection;	/* optional */
 	HWND	hWndGraph;	/* window handle */
+	HWND	hStatusbar;
 	HMENU	hPopMenu;	/* popup menu */
 	int	pen;		/* current pen number */
 	int	htic;		/* horizontal size of point symbol (xmax units) */
@@ -336,7 +337,7 @@ typedef struct tagGW {
 	unsigned int nGWOP;
 	BOOL	locked;		/* locked if being written */
 	double  org_pointsize;	/* Original Pointsize */
-	int     statuslineheight;	/* height of status line area */
+	int	StatusHeight;	/* height of status line area */
 	BOOL    doublebuffer;   /* double buffering? */
 	BOOL    oversample;	/* oversampling? */
 	int     sampling;	/* current sampling factor */

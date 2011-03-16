@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.97 2011/03/13 19:55:29 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.98 2011/03/16 20:40:10 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - win/wgraph.c */
@@ -109,7 +109,6 @@ static void	Wnd_refresh_zoombox(LPGW lpgw, LPARAM lParam);
 static void	Wnd_refresh_ruler_lineto(LPGW lpgw, LPARAM lParam);
 static void     GetMousePosViewport(LPGW lpgw, int *mx, int *my);
 static void	Draw_XOR_Text(LPGW lpgw, const char *text, size_t length, int x, int y);
-static void     DisplayStatusLine(LPGW lpgw);
 static void     UpdateStatusLine(LPGW lpgw, const char text[]);
 static void	DrawRuler(LPGW lpgw);
 static void	DrawRulerLineTo(LPGW lpgw);
@@ -360,8 +359,6 @@ GraphInit(LPGW lpgw)
 	HMENU sysmenu;
 	WNDCLASS wndclass;
 	char buf[MAX_PATH];
-	HDC hdc;
-	TEXTMETRIC metric;
 
 	if (!lpgw->hPrevInstance) {
 		wndclass.style = CS_HREDRAW | CS_VREDRAW;
@@ -388,11 +385,21 @@ GraphInit(LPGW lpgw)
 		lpgw->Size.x, lpgw->Size.y,
 		NULL, NULL, lpgw->hInstance, lpgw);
 
-	/* determine height of status line */
-	hdc = GetDC(lpgw->hWndGraph);
-	GetTextMetrics(hdc, &metric);
-	lpgw->statuslineheight = metric.tmHeight * 1.2;
-	ReleaseDC(lpgw->hWndGraph, hdc);
+	lpgw->hStatusbar = CreateWindowEx(0, STATUSCLASSNAME, (LPSTR)NULL,
+				  WS_CHILD | SBARS_SIZEGRIP,
+				  0, 0, 0, 0, 
+				  lpgw->hWndGraph, (HMENU)ID_GRAPHSTATUS, 
+				  lpgw->hInstance, lpgw);
+	if (lpgw->hStatusbar) {
+	    RECT rect;
+	    /* auto-adjust size */
+	    SendMessage(lpgw->hStatusbar, WM_SIZE, (WPARAM)0, (LPARAM)0);
+	    ShowWindow(lpgw->hStatusbar, TRUE);
+
+	    /* make room */
+	    GetClientRect(lpgw->hStatusbar, &rect);
+	    lpgw->StatusHeight = rect.bottom - rect.top;
+	}
 
 	lpgw->hPopMenu = CreatePopupMenu();
 	/* actions */
@@ -650,7 +657,7 @@ void
 GetPlotRect(LPGW lpgw, LPRECT rect)
 {
 	GetClientRect(lpgw->hWndGraph, rect);
-	rect->bottom -= lpgw->statuslineheight; /* leave some room for the status line */
+	rect->bottom -= lpgw->StatusHeight; /* leave some room for the status line */
 	if (rect->bottom < rect->top) rect->bottom = rect->top;
 }
 
@@ -2775,6 +2782,12 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 					return 0;
 			}
 			return 0;
+                case WM_PARENTNOTIFY:
+                        /* right button click in the status bar */
+                        if (LOWORD(wParam) != WM_RBUTTONDOWN) {
+                            return 1; /* not handled */
+                        }
+                        /* intentionally fall through */
 		case WM_RBUTTONDOWN:
 			/* HBB 20010218: note that this only works in mouse-off
 			 * mode, now. You'll need to go via the System menu to
@@ -2869,7 +2882,6 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			 * it has completed, all the 'real-time' stuff the gnuplot core
 			 * doesn't know anything about has to be redrawn */
 			DrawRuler(lpgw);
-			DisplayStatusLine(lpgw);
 			DrawRulerLineTo(lpgw);
 			DrawZoomBox(lpgw);
 #endif
@@ -2877,6 +2889,7 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 	}
 		case WM_SIZE:
 			/* update font sizes if graph resized */
+			SendMessage(lpgw->hStatusbar, WM_SIZE, wParam, lParam);
 			if ((wParam == SIZE_MAXIMIZED) || (wParam == SIZE_RESTORED)) {
 				RECT rect;
 				SendMessage(hwnd,WM_SYSCOMMAND,M_REBUILDTOOLS,0L);
@@ -2994,7 +3007,6 @@ GraphGetTextLength(LPGW lpgw, LPCSTR text, LPCSTR fontname, int fontsize)
     } else
         GetTextExtentPoint(hdc, text, strlen(text), &size);
     SelectObject(hdc, hprevfont);
-    
     size.cx += GetTextCharacterExtra(hdc);
     /* shige: restore original font */
     GraphChangeFont(lpgw, lpgw->deffontname, lpgw->deffontsize, hdc, rect);
@@ -3230,32 +3242,13 @@ Draw_XOR_Text(LPGW lpgw, const char *text, size_t length, int x, int y)
 
 /* Status line routines. */
 
-/* Saved text currently contained in status line */
-static char *sl_curr_text = NULL;
-
-/* Display the status line text */
-static void
-DisplayStatusLine(LPGW lpgw)
-{
-	RECT rc;
-	HDC hdc;
-
-	hdc = GetDC(lpgw->hWndGraph);
-	GetClientRect(lpgw->hWndGraph, &rc);
-	rc.top = rc.bottom - lpgw->statuslineheight;
-	DrawStatusText(hdc, &rc, sl_curr_text, SBT_POPOUT);
-	ReleaseDC(lpgw->hWndGraph, hdc);
-}
-
 /*
  * Update the status line by the text; erase the previous text
  */
 static void
 UpdateStatusLine(LPGW lpgw, const char text[])
 {
-	free(sl_curr_text);
-	sl_curr_text = strdup(text);
-	DisplayStatusLine(lpgw);
+    SendMessage(lpgw->hStatusbar, WM_SETTEXT, (WPARAM)0, (LPARAM)text);
 }
 
 /* Draw the ruler.
