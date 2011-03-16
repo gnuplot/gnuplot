@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: wtext.c,v 1.27 2011/03/14 20:01:30 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: wtext.c,v 1.28 2011/03/16 22:46:48 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - win/wtext.c */
@@ -878,8 +878,8 @@ TextCopyClip(LPTW lptw)
     count = end.x - pt.x;
     if (count > 0) {
 	lb = sb_get(&(lptw->ScreenBuffer), pt.y);
-	if (lb->len >= pt.x + count) {
-	    memcpy(cp, lb->str + pt.x, count);
+	if (lb->len > pt.x) {
+	    memcpy(cp, lb->str + pt.x, GPMIN(count, lb->len - pt.x));
 	    cp += count;
 	}
     }
