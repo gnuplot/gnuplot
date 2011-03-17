@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.77.2.6 2010/10/14 17:40:16 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.77.2.7 2010/12/04 05:06:39 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -872,7 +872,7 @@ gen_tics(AXIS_INDEX axis, tic_callback callback)
 	    ? axis_array[R_AXIS].min : 0;
 
 	for (mark = def->def.user; mark; mark = mark->next) {
-	    char label[64];
+	    char label[MAX_ID_LEN];
 	    double internal = AXIS_LOG_VALUE(axis,mark->position);
 
 	    internal -= polar_shift;
@@ -883,7 +883,7 @@ gen_tics(AXIS_INDEX axis, tic_callback callback)
 	    if (mark->level < 0) /* label read from data file */
 		strncpy(label, mark->label, sizeof(label));
 	    else if (axis_array[axis].is_timedata)
-		gstrftime(label, 24, mark->label ? mark->label : ticfmt[axis], mark->position);
+		gstrftime(label, MAX_ID_LEN-1, mark->label ? mark->label : ticfmt[axis], mark->position);
 	    else
 		gprintf(label, sizeof(label), mark->label ? mark->label : ticfmt[axis], log10_base, mark->position);
 	    /* use NULL instead of label for minitic */
@@ -1120,10 +1120,10 @@ gen_tics(AXIS_INDEX axis, tic_callback callback)
 			break;
 		    }
 		default:{	/* comp or series */
-			char label[64];
+			char label[MAX_ID_LEN]; /* Leave room for enhanced text markup */
 			if (axis_array[axis].is_timedata) {
 			    /* If they are doing polar time plot, good luck to them */
-			    gstrftime(label, 24, ticfmt[axis], (double) user);
+			    gstrftime(label, MAX_ID_LEN-1, ticfmt[axis], (double) user);
 			} else if (polar) {
 			    /* if rmin is set, we stored internally with r-rmin */
 			    double r = fabs(user) +

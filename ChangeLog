@@ -1,3 +1,8 @@
+2011-03-17  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* axis.c(gen_tics): Make sure the axis tic label format string is
+	long enough to hold enhanced text markup.  Fixes buffer overflow.
+
 2011-03-14  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c: Auto-placement of the left margin of the plot
