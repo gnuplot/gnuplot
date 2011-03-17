@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.88 2010/12/04 05:05:52 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.89 2011/03/16 06:12:38 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -1150,10 +1150,10 @@ gen_tics(AXIS_INDEX axis, tic_callback callback)
 			break;
 		    }
 		default:{	/* comp or series */
-			char label[64];
+			char label[MAX_ID_LEN]; /* Leave room for enhanced text markup */
 			if (axis_array[axis].is_timedata) {
 			    /* If they are doing polar time plot, good luck to them */
-			    gstrftime(label, 24, ticfmt[axis], (double) user);
+			    gstrftime(label, MAX_ID_LEN-1, ticfmt[axis], (double) user);
 			} else if (polar) {
 			    double min = (R_AXIS.autoscale & AUTOSCALE_MIN) ? 0 : R_AXIS.min;
 			    double r = fabs(user) + min;
