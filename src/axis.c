@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.89 2011/03/16 06:12:38 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.90 2011/03/17 23:01:38 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -880,7 +880,7 @@ gen_tics(AXIS_INDEX axis, tic_callback callback)
 	}
 
 	for (mark = def->def.user; mark; mark = mark->next) {
-	    char label[64];
+	    char label[MAX_ID_LEN];
 	    double internal;
 
 	    /* This condition is only possible if we are in polar mode */
@@ -896,7 +896,7 @@ gen_tics(AXIS_INDEX axis, tic_callback callback)
 	    if (mark->level < 0) /* label read from data file */
 		strncpy(label, mark->label, sizeof(label));
 	    else if (axis_array[axis].is_timedata)
-		gstrftime(label, 24, mark->label ? mark->label : ticfmt[axis], mark->position);
+		gstrftime(label, MAX_ID_LEN-1, mark->label ? mark->label : ticfmt[axis], mark->position);
 	    else
 		gprintf(label, sizeof(label), mark->label ? mark->label : ticfmt[axis], log10_base, mark->position);
 
