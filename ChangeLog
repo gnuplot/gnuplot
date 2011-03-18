@@ -1,4 +1,4 @@
-2011-03-16  Bastian Maerkisch  <bmaerkisch@web.de>
+2011-03-18  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/win/wtext.c (TextCopyClip): Fix copying of last line of a
 	marked region in case the marking exceeds the length of that
@@ -9,7 +9,13 @@
 
 	* term/gd.trm (PNG_init): On Windows, set GDFONTPATH to %windir%\Fonts
 	if not set previously.
-	
+
+	* src/plot.c (main), src/win/winmain.c (WinMain, WinExt): Always use 
+	the ANSI codepage (instead of OEM) to ensure sure that the console 
+	of gnuplot.exe and the graph window use the same codepage. Warn 
+	users that raster fonts won't display all characters correctly and
+	restore the codepage on exit.
+
 2011-03-17  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* axis.c(gen_tics): Make sure the axis tic label format string is

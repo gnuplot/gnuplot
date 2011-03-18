@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot.c,v 1.121 2011/02/20 14:52:47 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot.c,v 1.122 2011/03/13 19:55:29 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - plot.c */
@@ -490,6 +490,13 @@ main(int argc, char **argv)
 	show_version(stderr);
     else
 	show_version(NULL); /* Only load GPVAL_COMPILE_OPTIONS */
+
+#ifdef WGP_CONSOLE
+    fprintf(stderr,
+	"\ngnuplot changed the codepage of this console to %i to match\n" \
+	"the graph window. Some characters might only display correctly\n" \
+	"if you change the font to a non-raster type.\n", GetConsoleCP());
+#endif
 
     update_gpval_variables(3);  /* update GPVAL_ variables available to user */
 

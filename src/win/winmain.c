@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: winmain.c,v 1.36 2011/03/13 12:15:56 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: winmain.c,v 1.37 2011/03/13 19:55:29 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - win/winmain.c */
@@ -103,6 +103,8 @@ LPSTR szModuleName;
 LPSTR szPackageDir;
 LPSTR winhelpname;
 LPSTR szMenuName;
+static UINT cp_input;  /* save previous codepage settings */
+static UINT cp_output;
 #define MENUNAME "wgnuplot.mnu"
 #ifndef HELPFILE /* HBB 981203: makefile.win predefines this... */
 #define HELPFILE "wgnuplot.hlp"
@@ -161,6 +163,11 @@ WinExit(void)
 #endif
 #ifndef WGP_CONSOLE
         TextMessage();  /* process messages */
+#else
+        /* restore console codepages */
+        SetConsoleCP(cp_input);
+        SetConsoleOutputCP(cp_output);
+        /* file APIs are per process */
 #endif
         return;
 }
@@ -394,6 +401,17 @@ int main(int argc, char **argv)
                 InvalidateRect(textwin.hWndParent, (LPRECT) &rect, 1);
                 UpdateWindow(textwin.hWndParent);
         }
+#else /* WGP_CONSOLE */
+        /* Change codepage of console to match that of the graph window.
+           Attention: display of characters does not work correctly with 
+           "Terminal" font! Users will have to use "Lucida Console" or similar.
+           WinExit() reverts this.
+        */
+        cp_input = GetConsoleCP();
+        cp_output = GetConsoleOutputCP();
+        SetConsoleCP(GetACP()); /* keyboard input */
+        SetConsoleOutputCP(GetACP()); /* screen output */
+        SetFileApisToANSI(); /* file names etc. */
 #endif
 
 
