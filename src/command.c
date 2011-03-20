@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.206 2011/03/10 20:18:02 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.207 2011/03/13 19:55:29 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -988,7 +988,7 @@ if_command()
 	    while (!END_OF_COMMAND) {
 		++c_token;
 	    }
-	    if (++c_token < num_tokens && (equals(c_token, "else"))) {
+	    if (equals(++c_token, "else")) {
 		/* break if an "else" was found */
 		if_condition = FALSE;
 		--c_token; /* go back to ';' */

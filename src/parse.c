@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: parse.c,v 1.57 2009/04/01 00:02:40 vanzandt Exp $"); }
+static char *RCSid() { return RCSid("$Id: parse.c,v 1.58 2010/09/28 17:14:38 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - parse.c */
@@ -362,7 +362,7 @@ static int
 parse_assignment_expression()
 {
     /* Check for assignment operator */
-    if (isletter(c_token) && (c_token + 1 < num_tokens) && equals(c_token + 1, "=")) {
+    if (isletter(c_token) && equals(c_token + 1, "=")) {
 	/* push the variable name */
 	union argument *foo = add_action(PUSHC);
 	char *varname = NULL;
@@ -423,7 +423,7 @@ parse_primary_expression()
 	/* Found an identifier --- check whether its a function or a
 	 * variable by looking for the parentheses of a function
 	 * argument list */
-	if ((c_token + 1 < num_tokens) && equals(c_token + 1, "(")) {
+	if (equals(c_token + 1, "(")) {
 	    enum operators whichfunc = is_builtin_function(c_token);
 	    struct value num_params;
 	    num_params.type = INTGR;
@@ -736,8 +736,7 @@ parse_relational_expression()
 	    (void) add_action(GT);
 	} else if (equals(c_token, "<")) {
 	    /*  Workaround for * in syntax of range constraints  */
-	    if (scanning_range_in_progress && 
-		c_token+1<num_tokens && equals(c_token+1, "*") ) {
+	    if (scanning_range_in_progress && equals(c_token+1, "*") ) {
 		break;
 	    }
 	    c_token++;

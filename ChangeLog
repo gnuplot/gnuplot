@@ -1,3 +1,10 @@
+2011-03-20  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/util.c (equals): Test here for token index in range, rather than
+	trusting all callers to get it right.
+
+	* src/command.c src/parse.c: Token index range test is now redundant.
+
 2011-03-20  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/win/winmain.c (WinExit): Explicitly close help window on exit.

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: util.c,v 1.91 2010/09/19 03:18:45 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: util.c,v 1.92 2010/09/28 17:14:38 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - util.c */
@@ -99,6 +99,8 @@ equals(int t_num, const char *str)
 {
     int i;
 
+    if (t_num >= num_tokens)	/* safer to test here than to trust all callers */
+	return (FALSE);
     if (!token[t_num].is_token)
 	return (FALSE);		/* must be a value--can't be equal */
     for (i = 0; i < token[t_num].length; i++) {
