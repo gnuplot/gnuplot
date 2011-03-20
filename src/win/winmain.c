@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: winmain.c,v 1.37 2011/03/13 19:55:29 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: winmain.c,v 1.38 2011/03/18 19:41:51 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - win/winmain.c */
@@ -60,6 +60,9 @@ static char *RCSid() { return RCSid("$Id: winmain.c,v 1.37 2011/03/13 19:55:29 m
 #include <commctrl.h>
 #include <shlobj.h>
 #include <shlwapi.h>
+#ifdef WITH_HTML_HELP
+#include <htmlhelp.h>
+#endif
 #include <dos.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -158,7 +161,9 @@ WinExit(void)
 #ifndef WGP_CONSOLE
         TextMessage();  /* process messages */
 #endif
-#ifndef WITH_HTML_HELP
+#ifdef WITH_HTML_HELP
+        HtmlHelp(NULL, NULL, HH_CLOSE_ALL, (DWORD_PTR)NULL);
+#else
         WinHelp(textwin.hWndText,(LPSTR)winhelpname,HELP_QUIT,(DWORD)NULL);
 #endif
 #ifndef WGP_CONSOLE

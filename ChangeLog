@@ -1,10 +1,14 @@
 2011-03-20  Bastian Maerkisch  <bmaerkisch@web.de>
 
+	* src/win/winmain.c (WinExit): Explicitly close help window on exit.
+	Fixes hangs of gnuplot when it is closed via the Windows taskbar 
+	and help window	and graph window open.
+
 	* src/win/wmenu.c (LoadMacros), src/win/wgnuplot.mnu ([Button]): Add
 	icons to the text-window toolbar.
 
 	* docs/windows/doc2html.c (process_line): Don't include '=' items in
-	index. This	avoids duplicate entries which caused wgnuplot to stall 
+	index. This avoids duplicate entries which caused wgnuplot to stall 
 	when an e.g. 'set term png; help "png"' was issued.
 
 2011-03-18  Bastian Maerkisch  <bmaerkisch@web.de>
