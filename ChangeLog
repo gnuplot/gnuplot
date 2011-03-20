@@ -5,6 +5,8 @@
 
 	* src/command.c src/parse.c: Token index range test is now redundant.
 
+	* docs/gnuplot.doc: Document that ^D from an empty line acts as EOF.
+
 2011-03-20  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/win/wgnuplib.c|h, src/win/wgraph.c, src/win/winmain.c, 
