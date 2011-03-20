@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.192 2010/10/01 23:10:46 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.193 2010/11/07 11:54:23 juhaszp Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -2973,7 +2973,7 @@ plot_option_binary(TBOOLEAN set_matrix, TBOOLEAN set_default)
 			    binary_input_function = df_bin_filetype_table[i].value;
 		}
 		if (binary_input_function == auto_filetype_function)
-		    int_warn(NO_CARET, "Unrecognized filetype; try \"show datafile binary filetypes\"");
+		    int_error(NO_CARET, "Unrecognized filetype; try \"show datafile binary filetypes\"");
 	    }
 
 	    /* Unless only querying settings, call the routine to prep binary data parameters. */
