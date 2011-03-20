@@ -717,27 +717,30 @@ Fu&nctions
 [EndMenu]
 
 ; now some buttons
+;   a number after a semicolon in the title string is interpreted as icon index
+;   see the article "Toolbar Standard Button Image Index Values" on MSDN
+;   http://msdn.microsoft.com/en-us/library/bb760433%28v=vs.85%29.aspx
 [Button]
-	Replot
+	Replot;4
 		replot{ENTER}
 [Button]
-	Open
+	Open;7
 		load '[OPEN]load[EOS]*.plt[EOS]'{ENTER}
 [Button]
-	Save
+	Save;8
 		save '[SAVE]save[EOS]*.plt[EOS]'{ENTER}
 [Button]
-	ChDir
+	ChDir;31
 		cd '[DIRECTORY]New directory?[EOS]'{ENTER}
 [Button]
-	Print
+	Print;14
 		set terminal [INPUT]Terminal type?{ENTER}set output "PRN"{ENTER}replot{ENTER}set terminal win{ENTER}set output{ENTER}
 [Button]
-	PrtSc
+	PrtSc;14
 		screendump{ENTER}
 [Button]
-	Prev
+	Prev;15
 		{^P}
 [Button]
-	Next
+	Next;16
 		{^N}

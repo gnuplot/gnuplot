@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: wmenu.c,v 1.14 2011/03/14 19:43:10 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: wmenu.c,v 1.15 2011/03/14 20:01:30 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - win/wmenu.c */
@@ -702,7 +702,8 @@ HGLOBAL hmacro, hmacrobuf;
 
 int i;
 RECT rect;
-char FAR *ButtonText[BUTTONMAX];
+char *ButtonText[BUTTONMAX];
+int ButtonIcon[BUTTONMAX];
 
 	lpmw = lptw->lpmw;
 
@@ -772,6 +773,7 @@ char FAR *ButtonText[BUTTONMAX];
 	  }
 	  else if (!lstrcmpi(buf,"[Button]")) {
 		/* button macro */
+		char *icon;
 		if (lpmw->nButton >= BUTTONMAX) {
 			wsprintf(buf,"Too many buttons at line %d of %s\n",nLine,lpmw->szMenuName);
            			MessageBox(lptw->hWndParent,(LPSTR) buf,lptw->Title, MB_ICONEXCLAMATION);
@@ -792,6 +794,11 @@ char FAR *ButtonText[BUTTONMAX];
 			goto errorcleanup;
 		}
 		ButtonText[lpmw->nButton] = (char FAR *)macroptr;
+		ButtonIcon[lpmw->nButton] = I_IMAGENONE;
+		if ((icon = strchr(macroptr, ';'))) {
+			*icon = NUL;
+			ButtonIcon[lpmw->nButton] = atoi(++icon);
+		}
 		macroptr += lstrlen((char FAR *)macroptr)+1;
 		*macroptr = '\0';
 		if (!(nInc = GetLine(buf,MAXSTR,menufile))) {
@@ -873,25 +880,30 @@ char FAR *ButtonText[BUTTONMAX];
 
 	/* create a toolbar */
 	lpmw->hToolbar = CreateWindowEx(0, TOOLBARCLASSNAME, "GnuplotToolbar", 
-		WS_CHILD, // TBSTYLE_WRAPABLE
+		WS_CHILD | TBSTYLE_LIST, // TBSTYLE_WRAPABLE
 		0, 0, 0, 0,
 		lptw->hWndParent, (HMENU)ID_TOOLBAR, lptw->hInstance, NULL);
 	if (lpmw->hToolbar == NULL)
 	    goto cleanup;
 	    
-	/* we don't have any icons yet, so set size to zero */
+	/* set size of toolbar icons */
 	/* lparam is (height<<16 + width) / default 16,15 */
-	SendMessage(lpmw->hToolbar, TB_SETBITMAPSIZE, (WPARAM)0, (LPARAM)((0<<16) + 0));
+	SendMessage(lpmw->hToolbar, TB_SETBITMAPSIZE, (WPARAM)0, (LPARAM)((16<<16) + 16));
+	/* load standard toolbar icons: standard, history & view */
+	SendMessage(lpmw->hToolbar, TB_LOADIMAGES, (WPARAM)IDB_STD_SMALL_COLOR, (LPARAM)HINST_COMMCTRL);
+	SendMessage(lpmw->hToolbar, TB_LOADIMAGES, (WPARAM)IDB_HIST_SMALL_COLOR, (LPARAM)HINST_COMMCTRL);
+	SendMessage(lpmw->hToolbar, TB_LOADIMAGES, (WPARAM)IDB_VIEW_SMALL_COLOR, (LPARAM)HINST_COMMCTRL);
+
 	/* create buttons */
 	SendMessage(lpmw->hToolbar, TB_BUTTONSTRUCTSIZE, (WPARAM)sizeof(TBBUTTON), 0);
 	for (i = 0; i < lpmw->nButton; i++) {
 		TBBUTTON button;
 		BOOL ret;
 		ZeroMemory(&button, sizeof(button));
-		button.iBitmap = I_IMAGENONE;
+		button.iBitmap = ButtonIcon[i];
 		button.idCommand = lpmw->hButtonID[i];
 		button.fsState = TBSTATE_ENABLED;
-		button.fsStyle = BTNS_AUTOSIZE | BTNS_SHOWTEXT | BTNS_NOPREFIX | TBSTYLE_LIST;
+		button.fsStyle = BTNS_AUTOSIZE | BTNS_SHOWTEXT | BTNS_NOPREFIX;
 		button.iString = (UINT_PTR)ButtonText[i];
 		ret = SendMessage(lpmw->hToolbar, TB_INSERTBUTTON, (WPARAM)i+1, (LPARAM)&button);
 	}
