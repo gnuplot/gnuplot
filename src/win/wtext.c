@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: wtext.c,v 1.28 2011/03/16 22:46:48 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: wtext.c,v 1.29 2011/03/18 08:48:08 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - win/wtext.c */
@@ -48,7 +48,7 @@ static char *RCSid() { return RCSid("$Id: wtext.c,v 1.28 2011/03/16 22:46:48 mar
 
 #define STRICT
 
-#include <string.h>	/* use only far items */
+#include <string.h>
 #include <stdlib.h>
 #include <ctype.h>
 #include <dos.h>
@@ -86,7 +86,7 @@ LRESULT CALLBACK WndParentProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lP
 LRESULT CALLBACK WndTextProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);
 
 void ReadTextIni(LPTW lptw);
-void LimitMark(LPTW lptw, POINT FAR *lppt);
+void LimitMark(LPTW lptw, POINT *lppt);
 void UpdateScrollBars(LPTW lptw);
 void UpdateCaretPos(LPTW lptw);
 
@@ -141,7 +141,7 @@ CreateTextClass(LPTW lptw)
     wndclass.style = CS_HREDRAW | CS_VREDRAW;
     wndclass.lpfnWndProc = WndTextProc;
     wndclass.cbClsExtra = 0;
-    wndclass.cbWndExtra = 2 * sizeof(void FAR *);
+    wndclass.cbWndExtra = 2 * sizeof(void *);
     wndclass.hInstance = lptw->hInstance;
     wndclass.hIcon = LoadIcon(NULL, IDI_APPLICATION);
     wndclass.hCursor = LoadCursor(NULL, IDC_ARROW);
@@ -155,7 +155,7 @@ CreateTextClass(LPTW lptw)
     wndclass.style = CS_HREDRAW | CS_VREDRAW;
     wndclass.lpfnWndProc = WndParentProc;
     wndclass.cbClsExtra = 0;
-    wndclass.cbWndExtra = 2 * sizeof(void FAR *);
+    wndclass.cbWndExtra = 2 * sizeof(void *);
     wndclass.hInstance = lptw->hInstance;
     if (lptw->hIcon)
 	wndclass.hIcon = lptw->hIcon;
@@ -210,8 +210,8 @@ TextInit(LPTW lptw)
     sb_append(&(lptw->ScreenBuffer), &lb);
 
     hglobal = GlobalAlloc(LHND, lptw->KeyBufSize);
-    lptw->KeyBuf = (BYTE FAR *)GlobalLock(hglobal);
-    if (lptw->KeyBuf == (BYTE FAR *)NULL) {
+    lptw->KeyBuf = (BYTE *)GlobalLock(hglobal);
+    if (lptw->KeyBuf == (BYTE *)NULL) {
 	MessageBox((HWND)NULL,szNoMemory,(LPSTR)NULL, MB_ICONHAND | MB_SYSTEMMODAL);
 	return(1);
     }
@@ -537,7 +537,6 @@ TextPutCh(LPTW lptw, BYTE ch)
 	    /* maximum line size may have changed, so update scroll bars */
 	    UpdateScrollBars(lptw);
 	    TextToCursor(lptw);
-//	    }
 	}
     }
     return ch;
@@ -586,7 +585,7 @@ TextPutStr(LPTW lptw, LPSTR str)
 
 
 void
-LimitMark(LPTW lptw, POINT FAR *lppt)
+LimitMark(LPTW lptw, POINT *lppt)
 {
     int length;
 
@@ -891,7 +890,7 @@ TextCopyClip(LPTW lptw)
     /* find out what type to put into clipboard */
     hdc = GetDC(lptw->hWndText);
     SelectObject(hdc, lptw->hfont);
-    GetTextMetrics(hdc,(TEXTMETRIC FAR *)&tm);
+    GetTextMetrics(hdc,(TEXTMETRIC *)&tm);
     if (tm.tmCharSet == OEM_CHARSET)
 	type = CF_OEMTEXT;
     else
@@ -933,10 +932,10 @@ TextMakeFont(LPTW lptw)
     }
     if (lptw->hfont != 0)
 	DeleteObject(lptw->hfont);
-    lptw->hfont = CreateFontIndirect((LOGFONT FAR *)&lf);
+    lptw->hfont = CreateFontIndirect((LOGFONT *)&lf);
     /* get text size */
     SelectObject(hdc, lptw->hfont);
-    GetTextMetrics(hdc,(TEXTMETRIC FAR *)&tm);
+    GetTextMetrics(hdc,(TEXTMETRIC *)&tm);
     lptw->CharSize.y = tm.tmHeight;
     lptw->CharSize.x = tm.tmAveCharWidth;
     lptw->CharAscent = tm.tmAscent;
@@ -1027,7 +1026,7 @@ WndParentProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 	break;
     case WM_GETMINMAXINFO:
     {
-	POINT FAR * MMinfo = (POINT FAR *)lParam;
+	POINT * MMinfo = (POINT *)lParam;
         MMinfo[3].x = GetSystemMetrics(SM_CXVSCROLL) + 2*GetSystemMetrics(SM_CXFRAME);
 	MMinfo[3].y = GetSystemMetrics(SM_CYHSCROLL) + 2*GetSystemMetrics(SM_CYFRAME)
 	    + GetSystemMetrics(SM_CYCAPTION) + GetSystemMetrics(SM_CYMENU);
@@ -1060,7 +1059,7 @@ WndParentProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
     {
 	TEXTMETRIC tm;
 
-	lptw = ((CREATESTRUCT FAR *)lParam)->lpCreateParams;
+	lptw = ((CREATESTRUCT *)lParam)->lpCreateParams;
 	SetWindowLong(hwnd, 0, (LONG)lptw);
 	lptw->hWndParent = hwnd;
 	/* get character size */
@@ -1105,9 +1104,9 @@ ReallocateKeyBuf(LPTW lptw)
     HGLOBAL h = GlobalAlloc(LHND, newbufsize);
     int pos_in = lptw->KeyBufIn - lptw->KeyBuf;
     int pos_out = lptw->KeyBufOut - lptw->KeyBuf;
-    BYTE FAR *NewKeyBuf = (BYTE FAR *)GlobalLock(h);
+    BYTE *NewKeyBuf = (BYTE *)GlobalLock(h);
 
-    if (NewKeyBuf == (BYTE FAR *)NULL) {
+    if (NewKeyBuf == (BYTE *)NULL) {
 	MessageBox((HWND)NULL, szNoMemory, (LPSTR)NULL,
 		   MB_ICONHAND | MB_SYSTEMMODAL);
 	return 1;
@@ -1573,14 +1572,14 @@ WndTextProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 	    case M_PASTE:
 	    {
 		HGLOBAL hGMem;
-		BYTE FAR *cbuf;
+		BYTE *cbuf;
 		TEXTMETRIC tm;
 		UINT type;
 
 		/* find out what type to get from clipboard */
 		hdc = GetDC(hwnd);
 		SelectObject(hdc, lptw->hfont);
-		GetTextMetrics(hdc,(TEXTMETRIC FAR *)&tm);
+		GetTextMetrics(hdc,(TEXTMETRIC *)&tm);
 		if (tm.tmCharSet == OEM_CHARSET)
 		    type = CF_OEMTEXT;
 		else
@@ -1590,7 +1589,7 @@ WndTextProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		OpenClipboard(hwnd);
 		hGMem = GetClipboardData(type);
 		if (hGMem) {
-		    cbuf = (BYTE FAR *) GlobalLock(hGMem);
+		    cbuf = (BYTE *) GlobalLock(hGMem);
 		    while (*cbuf) {
 			if (*cbuf != '\n')
 			    SendMessage(lptw->hWndText,WM_CHAR,*cbuf,1L);
@@ -1816,7 +1815,7 @@ WndTextProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 	return 0;
     }
     case WM_CREATE:
-	lptw = ((CREATESTRUCT FAR *)lParam)->lpCreateParams;
+	lptw = ((CREATESTRUCT *)lParam)->lpCreateParams;
 	SetWindowLong(hwnd, 0, (LONG)lptw);
 	lptw->hWndText = hwnd;
 	break;
@@ -2019,7 +2018,7 @@ ReadTextIni(LPTW lptw)
     if (bOKINI)
 	GetPrivateProfileString(section, "TextFont", "", profile, 80, file);
     {
-	char FAR *size;
+	char *size;
 	size = _fstrchr(profile,',');
 	if (size) {
 	    *size++ = '\0';

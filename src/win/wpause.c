@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: wpause.c,v 1.17 2010/12/14 23:02:23 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: wpause.c,v 1.18 2011/03/13 19:55:29 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - win/wpause.c */
@@ -118,7 +118,7 @@ CreatePauseClass(LPPW lppw)
 	wndclass.style = 0;
 	wndclass.lpfnWndProc = (WNDPROC)WndPauseProc;
 	wndclass.cbClsExtra = 0;
-	wndclass.cbWndExtra = sizeof(void FAR *);
+	wndclass.cbWndExtra = sizeof(void *);
 	wndclass.hInstance = lppw->hInstance;
 	wndclass.hIcon = NULL;
 	wndclass.hCursor = LoadCursor(NULL, IDC_ARROW);
@@ -261,7 +261,7 @@ WndPauseProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			if (!paused_for_mouse) /* don't show buttons during pausing for mouse or key */
 			    ws_opts |= WS_VISIBLE;
 			/* HBB 981202 HMENU sysmenu = GetSystemMenu(hwnd, FALSE); */
-			lppw = ((CREATESTRUCT FAR *)lParam)->lpCreateParams;
+			lppw = ((CREATESTRUCT *)lParam)->lpCreateParams;
 			SetWindowLong(hwnd, 0, (LONG)lppw);
 			lppw->hWndPause = hwnd;
 			hdc = GetDC(hwnd);

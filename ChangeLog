@@ -7,6 +7,10 @@
 
 2011-03-20  Bastian Maerkisch  <bmaerkisch@web.de>
 
+	* src/win/wgnuplib.c|h, src/win/wgraph.c, src/win/winmain.c, 
+	src/win/wmenu.c, src/win/wpause.c, src/win/wtext.c: FAR pointers are
+	no longer required.
+
 	* src/win/winmain.c (WinExit): Explicitly close help window on exit.
 	Fixes hangs of gnuplot when it is closed via the Windows taskbar 
 	and help window	and graph window open.

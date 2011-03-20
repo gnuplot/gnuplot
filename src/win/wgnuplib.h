@@ -1,5 +1,5 @@
 /*
- * $Id: wgnuplib.h,v 1.35 2011/03/14 20:01:30 markisch Exp $
+ * $Id: wgnuplib.h,v 1.36 2011/03/16 22:57:32 markisch Exp $
  */
 
 /* GNUPLOT - win/wgnuplib.h */
@@ -62,11 +62,6 @@
 /* For WIN32 API's */
 /* #define DEFAULT_CHARSET ANSI_CHARSET */
 # define MoveTo(hdc,x,y) MoveToEx(hdc,x,y,(LPPOINT)NULL);
-# if !defined(__TURBOC__) || (__TURBOC__>=0x410) /* Borland C has these defines, already... */
-#  define farmalloc(x) malloc(x)
-#  define farrealloc(s,n) realloc(s,n)
-#  define farfree(s) free(s)
-# endif /* __TURBOC__ */
 
 #if defined(__MINGW32__) && (__GNUC__ < 3) && !defined(CYGWIN)
 /* windowsx.h in MinGW32 2.x doesn't define some of the more traditional
@@ -92,9 +87,9 @@ typedef struct tagPRINT {
 	POINT	pdef;
 	POINT	psize;
 	POINT	poff;
-	struct tagPRINT FAR *next;
+	struct tagPRINT *next;
 } GP_PRINT;
-typedef GP_PRINT FAR*  GP_LPPRINT;
+typedef GP_PRINT *  GP_LPPRINT;
 
 
 /* ================================== */
@@ -117,7 +112,7 @@ typedef struct tagPW
 	WNDPROC	lpfnCancel;
 	WNDPROC	lpfnPauseButtonProc;
 } PW;
-typedef PW FAR*  LPPW;
+typedef PW *  LPPW;
 
 int WDPROC PauseBox(LPPW lppw);
 
@@ -128,8 +123,8 @@ typedef struct tagMW
 {
 	LPSTR	szMenuName;		/* required */
 	HMENU	hMenu;
-	BYTE FAR * FAR *macro;
-	BYTE FAR *macrobuf;
+	BYTE	**macro;
+	BYTE	*macrobuf;
 	int		nCountMenu;
 	DLGPROC	lpProcInput;
 	char	*szPrompt;
@@ -140,7 +135,7 @@ typedef struct tagMW
 	HWND	hButton[BUTTONMAX];
 	int		hButtonID[BUTTONMAX];
 } MW;
-typedef MW FAR * LPMW;
+typedef MW * LPMW;
 
 
 /* ================================== */
@@ -172,9 +167,9 @@ typedef struct tagTW
 	POINT	Size;
 	SB	ScreenBuffer;
 	BOOL	bWrap;			/* wrap long lines */
-	BYTE FAR *KeyBuf;
-	BYTE FAR *KeyBufIn;
-	BYTE FAR *KeyBufOut;
+	BYTE	*KeyBuf;
+	BYTE	*KeyBufIn;
+	BYTE	*KeyBufOut;
 	BYTE	Attr;
 	BOOL	bFocus;
 	BOOL	bGetCh;
@@ -197,7 +192,7 @@ typedef struct tagTW
 	POINT	MarkEnd;
 	BOOL	Marking;
 } TW;
-typedef TW FAR*  LPTW;
+typedef TW *  LPTW;
 
 
 #ifndef WGP_CONSOLE
@@ -254,7 +249,7 @@ struct GWOP {
 struct GWOPBLK {			/* kept in local memory */
 	struct GWOPBLK *next;
 	HGLOBAL hblk;			/* handle to a global block */
-	struct GWOP FAR *gwop;	/* pointer to global block if locked */
+	struct GWOP *gwop;	/* pointer to global block if locked */
 	UINT used;				/* number of GWOP's used */
 };
 
@@ -342,7 +337,7 @@ typedef struct tagGW {
 	BOOL    oversample;	/* oversampling? */
 	int     sampling;	/* current sampling factor */
 } GW;
-typedef GW FAR*  LPGW;
+typedef GW *  LPGW;
 
 #define WINFONTSIZE 10
 #define WINFONT "Arial"

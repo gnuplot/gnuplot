@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.98 2011/03/16 20:40:10 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.99 2011/03/16 22:57:32 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - win/wgraph.c */
@@ -241,14 +241,14 @@ static void
 DestroyBlocks(LPGW lpgw)
 {
     struct GWOPBLK *this, *next;
-    struct GWOP FAR *gwop;
+    struct GWOP *gwop;
     unsigned int i;
 
 	this = lpgw->gwopblk_head;
 	while (this != NULL) {
 		next = this->next;
 		if (!this->gwop) {
-			this->gwop = (struct GWOP FAR *)GlobalLock(this->hblk);
+			this->gwop = (struct GWOP *)GlobalLock(this->hblk);
 		}
 		if (this->gwop) {
 			/* free all text strings within this block */
@@ -286,7 +286,7 @@ AddBlock(LPGW lpgw)
 	if (hblk == NULL)
 		return FALSE;
 	next->hblk = hblk;
-	next->gwop = (struct GWOP FAR *)NULL;
+	next->gwop = (struct GWOP *)NULL;
 	next->next = (struct GWOPBLK *)NULL;
 	next->used = 0;
 
@@ -296,12 +296,12 @@ AddBlock(LPGW lpgw)
 		lpgw->gwopblk_head = next;
 	} else {
 		this->next = next;
-		this->gwop = (struct GWOP FAR *)NULL;
+		this->gwop = (struct GWOP *)NULL;
 		GlobalUnlock(this->hblk);
 	}
 	lpgw->gwopblk_tail = next;
-	next->gwop = (struct GWOP FAR *)GlobalLock(next->hblk);
-	if (next->gwop == (struct GWOP FAR *)NULL)
+	next->gwop = (struct GWOP *)GlobalLock(next->hblk);
+	if (next->gwop == (struct GWOP *)NULL)
 		return FALSE;
 
 	return TRUE;
@@ -322,7 +322,7 @@ void WDPROC
 GraphOpSize(LPGW lpgw, WORD op, WORD x, WORD y, LPCSTR str, DWORD size)
 {
 	struct GWOPBLK *this;
-	struct GWOP FAR *gwop;
+	struct GWOP *gwop;
 	char *npstr;
 
 	this = lpgw->gwopblk_tail;
@@ -364,7 +364,7 @@ GraphInit(LPGW lpgw)
 		wndclass.style = CS_HREDRAW | CS_VREDRAW;
 		wndclass.lpfnWndProc = WndGraphProc;
 		wndclass.cbClsExtra = 0;
-		wndclass.cbWndExtra = 2 * sizeof(void FAR *);
+		wndclass.cbWndExtra = 2 * sizeof(void *);
 		wndclass.hInstance = lpgw->hInstance;
 		wndclass.hIcon = LoadIcon(NULL, IDI_APPLICATION);
 		wndclass.hCursor = LoadCursor(NULL, IDC_ARROW);
@@ -534,7 +534,7 @@ GraphRedraw(LPGW lpgw)
 static void
 StorePen(LPGW lpgw, int i, COLORREF ref, int colorstyle, int monostyle)
 {
-	LOGPEN FAR *plp;
+	LOGPEN *plp;
 
 	plp = &lpgw->colorpen[i];
 	plp->lopnColor = ref;
@@ -568,12 +568,12 @@ MakePens(LPGW lpgw, HDC hdc)
 	int i;
 
 	if ((GetDeviceCaps(hdc,NUMCOLORS) == 2) || !lpgw->color) {
-		lpgw->hapen = CreatePenIndirect((LOGPEN FAR *)&lpgw->monopen[1]); 	/* axis */
+		lpgw->hapen = CreatePenIndirect((LOGPEN *)&lpgw->monopen[1]); 	/* axis */
 		lpgw->hbrush = CreateSolidBrush(RGB(255,255,255));
 		for (i=0; i<WGNUMPENS+2; i++)
 			lpgw->colorbrush[i] = CreateSolidBrush(RGB(0,0,0));
 	} else {
-		lpgw->hapen = CreatePenIndirect((LOGPEN FAR *)&lpgw->colorpen[1]); 	/* axis */
+		lpgw->hapen = CreatePenIndirect((LOGPEN *)&lpgw->colorpen[1]); 	/* axis */
 		lpgw->hbrush = CreateSolidBrush(lpgw->background);
 		for (i=0; i<WGNUMPENS+2; i++)
 			lpgw->colorbrush[i] = CreateSolidBrush(lpgw->colorpen[i].lopnColor);
@@ -702,7 +702,7 @@ MakeFonts(LPGW lpgw, LPRECT lprect, HDC hdc)
 	HFONT hfontold;
 	TEXTMETRIC tm;
 	int result;
-	char FAR *p;
+	char *p;
 	int cx, cy;
 
 	lpgw->rotate = FALSE;
@@ -724,7 +724,7 @@ MakeFonts(LPGW lpgw, LPRECT lprect, HDC hdc)
 	lpgw->lf.lfQuality = IsWindowsXPorLater() ? CLEARTYPE_QUALITY : PROOF_QUALITY;
 
 	if (lpgw->hfonth == 0) {
-		lpgw->hfonth = CreateFontIndirect((LOGFONT FAR *)&(lpgw->lf));
+		lpgw->hfonth = CreateFontIndirect((LOGFONT *)&(lpgw->lf));
 	}
 
 	/* we do need a 90 degree font */
@@ -732,7 +732,7 @@ MakeFonts(LPGW lpgw, LPRECT lprect, HDC hdc)
 		DeleteObject(lpgw->hfontv);
 	lpgw->lf.lfEscapement = 900;
 	lpgw->lf.lfOrientation = 900;
-	lpgw->hfontv = CreateFontIndirect((LOGFONT FAR *)&(lpgw->lf));
+	lpgw->hfontv = CreateFontIndirect((LOGFONT *)&(lpgw->lf));
 
 	/* save text size */
 	hfontold = SelectObject(hdc, lpgw->hfonth);
@@ -749,7 +749,7 @@ MakeFonts(LPGW lpgw, LPRECT lprect, HDC hdc)
 	result = GetDeviceCaps(hdc, TEXTCAPS);
 	if ((result & TC_CR_90) || (result & TC_CR_ANY))
 		lpgw->rotate = TRUE;
-	GetTextMetrics(hdc,(TEXTMETRIC FAR *)&tm);
+	GetTextMetrics(hdc,(TEXTMETRIC *)&tm);
 	if (tm.tmPitchAndFamily & TMPF_VECTOR)
 		lpgw->rotate = TRUE;	/* vector fonts can all be rotated */
 	if (tm.tmPitchAndFamily & TMPF_TRUETYPE)
@@ -779,7 +779,7 @@ SetFont(LPGW lpgw, HDC hdc)
 	if (lpgw->hfontv)
 	    DeleteObject(lpgw->hfontv);
 	lpgw->lf.lfEscapement = lpgw->lf.lfOrientation  = lpgw->angle * 10;
-	lpgw->hfontv = CreateFontIndirect((LOGFONT FAR *)&(lpgw->lf));
+	lpgw->hfontv = CreateFontIndirect((LOGFONT *)&(lpgw->lf));
 	if (lpgw->hfontv)
 	    SelectObject(hdc, lpgw->hfontv);
     } else {
@@ -796,7 +796,7 @@ SelFont(LPGW lpgw)
 	CHOOSEFONT cf;
 	HDC hdc;
 	char lpszStyle[LF_FACESIZE];
-	char FAR *p;
+	char *p;
 
 	/* Set all structure fields to zero. */
 	_fmemset(&cf, 0, sizeof(CHOOSEFONT));
@@ -917,7 +917,7 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 {
     int xdash, ydash;			/* the transformed coordinates */
     int rr, rl, rt, rb;
-    struct GWOP FAR *curptr;
+    struct GWOP *curptr;
     struct GWOPBLK *blkptr;
     int htic, vtic;
     int hshift, vshift;
@@ -980,10 +980,10 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
     curptr = NULL;
     if (blkptr) {
 	if (!blkptr->gwop)
-	    blkptr->gwop = (struct GWOP FAR *)GlobalLock(blkptr->hblk);
+	    blkptr->gwop = (struct GWOP *)GlobalLock(blkptr->hblk);
 	if (!blkptr->gwop)
 	    return;
-	curptr = (struct GWOP FAR *)blkptr->gwop;
+	curptr = (struct GWOP *)blkptr->gwop;
     }
 
     while(ngwop < lpgw->nGWOP) {
@@ -1048,7 +1048,7 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 
 		/* shige: work-around for Windows clipboard bug */
 		if (line_width==1)
-		  lpgw->hapen = CreatePenIndirect((LOGPEN FAR *) &cur_penstruct);
+		  lpgw->hapen = CreatePenIndirect((LOGPEN *) &cur_penstruct);
 		else
 		  lpgw->hapen = ExtCreatePen(
 		        PS_GEOMETRIC | cur_penstruct.lopnStyle | PS_ENDCAP_FLAT | PS_JOIN_BEVEL, 
@@ -1321,7 +1321,7 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 		/* shige: work-around for Windows clipboard bug */
 		if (line_width == 1) {
 		    cur_penstruct.lopnColor = c;
-		    lpgw->hapen = CreatePenIndirect((LOGPEN FAR *) &cur_penstruct);
+		    lpgw->hapen = CreatePenIndirect((LOGPEN *) &cur_penstruct);
 		} else
 		    lpgw->hapen = ExtCreatePen(
 			PS_GEOMETRIC | cur_penstruct.lopnStyle | PS_ENDCAP_FLAT | PS_JOIN_BEVEL, 
@@ -1667,17 +1667,17 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 	curptr++;
 	if ((unsigned)(curptr - blkptr->gwop) >= GWOPMAX) {
 	    GlobalUnlock(blkptr->hblk);
-	    blkptr->gwop = (struct GWOP FAR *)NULL;
+	    blkptr->gwop = (struct GWOP *)NULL;
 	    if ((blkptr = blkptr->next) == NULL)
 		/* If exact multiple of GWOPMAX entries are queued,
 		 * next will be NULL. Only the next GraphOp() call would
 		 * have allocated a new block */
 		return;
 	    if (!blkptr->gwop)
-		blkptr->gwop = (struct GWOP FAR *)GlobalLock(blkptr->hblk);
+		blkptr->gwop = (struct GWOP *)GlobalLock(blkptr->hblk);
 	    if (!blkptr->gwop)
 		return;
-	    curptr = (struct GWOP FAR *)blkptr->gwop;
+	    curptr = (struct GWOP *)blkptr->gwop;
 	}
     }
     if (polyi >= 2)
@@ -1896,7 +1896,7 @@ CopyPrint(LPGW lpgw)
 		SetBkMode(printer,OPAQUE);
 		StartPage(printer);
 		DestroyFonts(lpgw);
-		MakeFonts(lpgw, (RECT FAR *)&rect, printer);
+		MakeFonts(lpgw, (RECT *)&rect, printer);
 		DestroyPens(lpgw);	/* rebuild pens */
 		MakePens(lpgw, printer);
 		drawgraph(lpgw, printer, (void *) &rect);
@@ -2003,7 +2003,7 @@ ReadGraphIni(LPGW lpgw)
 	if (bOKINI)
 	  GetPrivateProfileString(section, "GraphFont", "", profile, 80, file);
 	{
-		char FAR *size;
+		char *size;
 		size = _fstrchr(profile,',');
 		if (size) {
 			*size++ = '\0';
@@ -2101,7 +2101,7 @@ typedef struct tagLS {
 	LOGPEN	colorpen[WGNUMPENS+2];	/* logical color pens */
 	LOGPEN	monopen[WGNUMPENS+2];	/* logical mono pens */
 } LS;
-typedef LS FAR*  LPLS;
+typedef LS *  LPLS;
 
 
 static COLORREF
@@ -2802,7 +2802,7 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			}
 			return(0);
 		case WM_CREATE:
-			lpgw = ((CREATESTRUCT FAR *)lParam)->lpCreateParams;
+			lpgw = ((CREATESTRUCT *)lParam)->lpCreateParams;
 			SetWindowLong(hwnd, 0, (LONG)lpgw);
 			lpgw->hWndGraph = hwnd;
 			hdc = GetDC(hwnd);

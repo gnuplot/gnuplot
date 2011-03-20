@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: winmain.c,v 1.38 2011/03/18 19:41:51 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: winmain.c,v 1.39 2011/03/20 15:30:21 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - win/winmain.c */
@@ -306,7 +306,7 @@ int main(int argc, char **argv)
                 tail++;
                 *tail = 0;
         }
-        szModuleName = (LPSTR)farrealloc(szModuleName, _fstrlen(szModuleName)+1);
+        szModuleName = (LPSTR)realloc(szModuleName, _fstrlen(szModuleName)+1);
         CheckMemory(szModuleName);
 
         if (_fstrlen(szModuleName) >= 5 && _fstrnicmp(&szModuleName[_fstrlen(szModuleName)-5], "\\bin\\", 5) == 0)
@@ -358,7 +358,7 @@ int main(int argc, char **argv)
         CheckMemory(textwin.AboutText);
         sprintf(textwin.AboutText,"Version %s\nPatchlevel %s\nLast Modified %s\n%s\n%s, %s and many others",
                 gnuplot_version, gnuplot_patchlevel, gnuplot_date, gnuplot_copyright, authors[1], authors[0]);
-        textwin.AboutText = (LPSTR)farrealloc(textwin.AboutText, _fstrlen(textwin.AboutText)+1);
+        textwin.AboutText = (LPSTR)realloc(textwin.AboutText, _fstrlen(textwin.AboutText)+1);
         CheckMemory(textwin.AboutText);
 
         menuwin.szMenuName = szMenuName;
@@ -511,11 +511,11 @@ MyGetS(char *str)
 char *
 MyFGetS(char *str, unsigned int size, FILE *file)
 {
-    char FAR *p;
+    char *p;
 
     if (isterm(file)) {
         p = TextGetS(&textwin, str, size);
-        if (p != (char FAR *)NULL)
+        if (p != (char *)NULL)
             return str;
         return (char *)NULL;
     }

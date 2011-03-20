@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: wmenu.c,v 1.15 2011/03/14 20:01:30 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: wmenu.c,v 1.16 2011/03/20 14:25:05 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - win/wmenu.c */
@@ -316,7 +316,7 @@ UINT_PTR CALLBACK OFNHookProc(HWND hdlg, UINT uiMsg, WPARAM wParam, LPARAM lPara
 void
 SendMacro(LPTW lptw, UINT m)
 {
-BYTE FAR *s;
+BYTE *s;
 char *d;
 char *buf;
 BOOL flag=TRUE;
@@ -557,7 +557,7 @@ char *szFilter;
 		}
 		if (!flag) { /* abort */
 			d = buf;
-			s = (BYTE FAR *)"";
+			s = (BYTE *)"";
 		}
 	    }
 	    else {
@@ -691,7 +691,7 @@ void
 LoadMacros(LPTW lptw)
 {
 GFILE *menufile;
-BYTE FAR *macroptr;
+BYTE *macroptr;
 char *buf;
 int nMenuLevel;
 HMENU hMenu[MENUDEPTH+1];
@@ -711,8 +711,8 @@ int ButtonIcon[BUTTONMAX];
 	buf = (char *)NULL;
 	hmacro = 0;
 	hmacrobuf = 0;
-	lpmw->macro = (BYTE FAR * FAR *)NULL;
-	lpmw->macrobuf = (BYTE FAR *)NULL;
+	lpmw->macro = (BYTE **)NULL;
+	lpmw->macrobuf = (BYTE *)NULL;
 	lpmw->szPrompt = (char *)NULL;
 	lpmw->szAnswer = (char *)NULL;
 	menufile = (GFILE *)NULL;
@@ -724,11 +724,11 @@ int ButtonIcon[BUTTONMAX];
 	/* allocate buffers */
 	if ((buf = LocalAllocPtr(LHND, MAXSTR)) == (char *)NULL)
 		goto nomemory;
-	hmacro = GlobalAlloc(GHND,(NUMMENU) * sizeof(BYTE FAR *));
-	if ((lpmw->macro = (BYTE FAR * FAR *)GlobalLock(hmacro))  == (BYTE FAR * FAR *)NULL)
+	hmacro = GlobalAlloc(GHND,(NUMMENU) * sizeof(BYTE *));
+	if ((lpmw->macro = (BYTE **)GlobalLock(hmacro))  == (BYTE **)NULL)
 		goto nomemory;
 	hmacrobuf = GlobalAlloc(GHND, MACROLEN);
-	if ((lpmw->macrobuf = (BYTE FAR*)GlobalLock(hmacrobuf)) == (BYTE FAR *)NULL)
+	if ((lpmw->macrobuf = (BYTE *)GlobalLock(hmacrobuf)) == (BYTE *)NULL)
 		goto nomemory;
 	if ((lpmw->szPrompt = LocalAllocPtr(LHND, MAXSTR)) == (char *)NULL)
 		goto nomemory;
@@ -787,19 +787,19 @@ int ButtonIcon[BUTTONMAX];
 		}
 		LeftJustify(buf,buf);
 		if (lstrlen(buf)+1 < MACROLEN - (macroptr-lpmw->macrobuf))
-			lstrcpy((char FAR *)macroptr,buf);
+			lstrcpy((char *)macroptr,buf);
 		else {
 			wsprintf(buf,"Out of space for storing menu macros\n at line %d of \n",nLine,lpmw->szMenuName);
            			MessageBox(lptw->hWndParent,(LPSTR) buf,lptw->Title, MB_ICONEXCLAMATION);
 			goto errorcleanup;
 		}
-		ButtonText[lpmw->nButton] = (char FAR *)macroptr;
+		ButtonText[lpmw->nButton] = (char *)macroptr;
 		ButtonIcon[lpmw->nButton] = I_IMAGENONE;
 		if ((icon = strchr(macroptr, ';'))) {
 			*icon = NUL;
 			ButtonIcon[lpmw->nButton] = atoi(++icon);
 		}
-		macroptr += lstrlen((char FAR *)macroptr)+1;
+		macroptr += lstrlen((char *)macroptr)+1;
 		*macroptr = '\0';
 		if (!(nInc = GetLine(buf,MAXSTR,menufile))) {
 			nLine += nInc;
@@ -810,7 +810,7 @@ int ButtonIcon[BUTTONMAX];
 		LeftJustify(buf,buf);
 		TranslateMacro(buf);
 		if (lstrlen(buf)+1 < MACROLEN - (macroptr - lpmw->macrobuf))
-			lstrcpy((char FAR *)macroptr,buf);
+			lstrcpy((char *)macroptr,buf);
 		else {
 			wsprintf(buf,"Out of space for storing menu macros\n at line %d of \n",nLine,lpmw->szMenuName);
            			MessageBox(lptw->hWndParent,(LPSTR) buf,lptw->Title, MB_ICONEXCLAMATION);
@@ -818,7 +818,7 @@ int ButtonIcon[BUTTONMAX];
 		}
 		lpmw->hButtonID[lpmw->nButton] = lpmw->nCountMenu;
 		lpmw->macro[lpmw->nCountMenu] = macroptr;
-		macroptr += lstrlen((char FAR *)macroptr)+1;
+		macroptr += lstrlen((char *)macroptr)+1;
 		*macroptr = '\0';
 		lpmw->nCountMenu++;
 		lpmw->nButton++;
@@ -855,14 +855,14 @@ int ButtonIcon[BUTTONMAX];
 			LeftJustify(buf,buf);
 			TranslateMacro(buf);
 			if (lstrlen(buf)+1 < MACROLEN - (macroptr - lpmw->macrobuf))
-				lstrcpy((char FAR *)macroptr,buf);
+				lstrcpy((char *)macroptr,buf);
 			else {
 				wsprintf(buf,"Out of space for storing menu macros\n at line %d of %s\n",nLine,lpmw->szMenuName);
             			MessageBox(lptw->hWndParent,(LPSTR) buf,lptw->Title, MB_ICONEXCLAMATION);
 				goto errorcleanup;
 			}
 			lpmw->macro[lpmw->nCountMenu] = macroptr;
-			macroptr += lstrlen((char FAR *)macroptr)+1;
+			macroptr += lstrlen((char *)macroptr)+1;
 			*macroptr = '\0';
 			lpmw->nCountMenu++;
 		}
