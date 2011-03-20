@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: doc2html.c,v 1.3 2011/02/28 11:53:40 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: doc2html.c,v 1.4 2011/03/07 11:27:27 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - doc2html.c */
@@ -330,8 +330,9 @@ process_line(char *line, FILE *b, FILE *c, FILE *d)
     }
 
     switch (line[0]) {		/* control character */
-    case '?':			/* interactive help entry */
     case '=': 			/* latex index entry */
+	    break;
+    case '?':			/* interactive help entry */
             if ((line2[1] != NUL) && (line2[1] != ' ')) {
 #ifndef CREATE_INDEX
                 if (!inkey) {

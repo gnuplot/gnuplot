@@ -1,3 +1,9 @@
+2011-03-20  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* docs/windows/doc2html.c (): Don't include '=' items in index. This
+	avoids duplicate entries which caused wgnuplot to stall when an e.g.
+	'help "png"' was issued.
+
 2011-03-18  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/win/wtext.c (TextCopyClip): Fix copying of last line of a
