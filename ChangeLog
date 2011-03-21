@@ -1,3 +1,8 @@
+2011-03-21  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/win/wgraph.c (WIN_image): Fix regression: rotation of images
+	with reversed axis was not working since rev. 1.92.
+
 2011-03-20  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/util.c (equals): Test here for token index in range, rather than

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.99 2011/03/16 22:57:32 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.100 2011/03/20 18:47:47 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - win/wgraph.c */
@@ -1519,8 +1519,8 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 			    bmi.bmiHeader.biBitCount = 24;
 
 			    rc = StretchDIBits(hdc, 
-			        corners[2].x, corners[2].y, 
-			        corners[3].x - corners[2].x, corners[3].y - corners[2].y,
+			        GPMIN(corners[2].x, corners[3].x) , GPMIN(corners[2].y, corners[3].y), 
+			        abs(corners[3].x - corners[2].x), abs(corners[3].y - corners[2].y),
 			        0, 0, width, height,
 			        image, &bmi, DIB_RGB_COLORS, SRCCOPY);
 			} else {
@@ -1540,9 +1540,10 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 			    ftn.BlendFlags = 0;
 			    ftn.AlphaFormat = AC_SRC_ALPHA; /* bitmap has an alpha channel */
 			    ftn.SourceConstantAlpha = 0xff;
-			    AlphaBlend(hdc, corners[2].x, corners[2].y, 
-			               corners[3].x - corners[2].x, corners[3].y - corners[2].y,
-			               memdc, 0, 0, width, height, ftn);
+			    AlphaBlend(hdc, 
+			        GPMIN(corners[2].x, corners[3].x) , GPMIN(corners[2].y, corners[3].y), 
+			        abs(corners[3].x - corners[2].x), abs(corners[3].y - corners[2].y),
+			        memdc, 0, 0, width, height, ftn);
 
 			    SelectObject(memdc, oldbmp);
 			    DeleteObject(membmp);
