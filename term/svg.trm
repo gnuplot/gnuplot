@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: svg.trm,v 1.101.2.3 2010/03/04 17:16:38 sfeam Exp $
+ * $Id: svg.trm,v 1.101.2.4 2010/10/07 05:31:42 sfeam Exp $
  */
 
 /*------------------------------------------------------------------------------------------------------------------------------------
@@ -1194,14 +1194,15 @@ SVG_layer(t_termlayer syncpoint)
 	case TERM_LAYER_BEFORE_PLOT:
 		SVG_PathClose();
 		SVG_GroupClose();
-		fprintf(gpoutfile, "\t<a xlink:title=\"Plot #%d\">\n", ++plotno);
+		++plotno;
+		fprintf(gpoutfile, "\t<g id=\"Plot_%d\"><title>Plot_%d</title>\n", plotno,plotno);
 		SVG_LineType = LT_UNDEFINED; /* Force a new group on next stroke */
 		break;
 
 	case TERM_LAYER_AFTER_PLOT:
 		SVG_PathClose();
 		SVG_GroupClose();
-		fprintf(gpoutfile, "\t</a>\n");
+		fprintf(gpoutfile, "\t</g>\n");
 		SVG_LineType = LT_UNDEFINED; /* Force a new group on next stroke */
 		break;
 

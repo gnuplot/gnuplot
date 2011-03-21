@@ -1,3 +1,9 @@
+2011-03-21  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/svg.trm: Demarcate plot elements using the svg <title> and
+	<g id=foo> elements rather than <a xlink:foo>
+	Bug #3205257
+
 2011-03-17  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* axis.c(gen_tics): Make sure the axis tic label format string is
