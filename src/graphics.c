@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.357 2011/02/20 23:17:11 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.358 2011/03/15 04:57:13 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -2024,7 +2024,8 @@ do_plot(struct curve_points *plots, int pcount)
 	    /* we deferred point sample until now */
 	    if (this_plot->plot_style == LINESPOINTS
 	         &&  this_plot->lp_properties.p_interval < 0) {
-		(*t->set_color)(&background_fill);
+		if (t->set_color)
+		    (*t->set_color)(&background_fill);
 		(*t->pointsize)(pointsize * pointintervalbox);
 		(*t->point)(xl + key_point_offset, yl, 6);
 		term_apply_lp_properties(&this_plot->lp_properties);
@@ -3742,7 +3743,8 @@ plot_points(struct curve_points *plot)
 		/* modification to all terminal drivers. It might be worth it.  */
 		/* term_apply_lp_properties will restore the point type and size*/
 		if (plot->plot_style == LINESPOINTS && interval < 0) {
-		    (*t->set_color)(&background_fill);
+		    if (t->set_color)
+			(*t->set_color)(&background_fill);
 		    (*t->pointsize)(pointsize * pointintervalbox);
 		    (*t->point) (x, y, 6);
 		    term_apply_lp_properties(&(plot->lp_properties));
@@ -4352,7 +4354,6 @@ filter_boxplot(struct curve_points *plot)
 static void
 plot_boxplot(struct curve_points *plot)
 {
-    int i;
     int N;
     struct coordinate *save_points = plot->points;
     struct coordinate candle;

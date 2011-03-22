@@ -1,3 +1,8 @@
+2011-03-22  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/graphics.c (do_plot, plot_points): Test wether the terminal 
+	actually supports set_color. Fixes crashes with terminal dumb.
+
 2011-03-21  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/win/wgraph.c (WIN_image): Fix regression: rotation of images
