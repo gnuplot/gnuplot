@@ -15,6 +15,8 @@ file_version := $(shell sed -n 's/.*gnuplot_version.*"\(.*\)".*/\1/p' ./version.
 patchlevel := $(shell cat ../PATCHLEVEL)
 file_pl := $(shell sed -n 's/.*gnuplot_patchlevel.*"\(.*\)".*/\1/p' ./version.c|tr -d ' ')
 
+last_change := $(shell head -c 11 ../ChangeLog)
+
 date := $(shell date)
 
 makefile.all: Makefile.maint
@@ -30,7 +32,7 @@ makefile.all: Makefile.maint
 	 | tr @% '\012\012' >>$@t
 	@if cmp -s $@ $@t; then rm -f $@t; else mv $@t $@; fi
 
-version.c: ../VERSION ../PATCHLEVEL
+version.c: ../VERSION ../PATCHLEVEL ../ChangeLog
 	@echo Making $@
 	@if [ "$(version)" != "$(file_version)" -o \
 	     "$(patchlevel)" != "$(file_pl)" ]; then \
@@ -41,3 +43,7 @@ version.c: ../VERSION ../PATCHLEVEL
 	      -e "s/@DATE@/$(date)/" $@ >$@t; \
 	  if cmp -s $@ $@t; then rm -f $@t; else mv $@t $@; fi \
 	fi
+#	Take most recent change date from the very top of ChangeLog
+	sed -e '/^const char gnuplot_date/ s/"[^"]*"/"$(last_change)"/' \
+	    $@ > $@t;
+	mv $@t $@

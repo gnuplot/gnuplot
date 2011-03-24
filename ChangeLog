@@ -1,3 +1,10 @@
+2011-03-24  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/Makefile.maint: Fill in the "last modified" date from the most
+	recent entry in the ChangeLog rather than the using the current date,
+	and only then if the VERSION or PATCHLEVEL has been changed.
+	Caution: tested only under linux with gnu make.
+
 2011-03-22  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/graphics.c (do_plot, plot_points): Test wether the terminal 
