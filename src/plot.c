@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot.c,v 1.122 2011/03/13 19:55:29 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot.c,v 1.123 2011/03/18 19:41:51 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - plot.c */
@@ -492,10 +492,23 @@ main(int argc, char **argv)
 	show_version(NULL); /* Only load GPVAL_COMPILE_OPTIONS */
 
 #ifdef WGP_CONSOLE
-    fprintf(stderr,
-	"\ngnuplot changed the codepage of this console to %i to match\n" \
-	"the graph window. Some characters might only display correctly\n" \
-	"if you change the font to a non-raster type.\n", GetConsoleCP());
+#ifdef CONSOLE_SWITCH_CP
+    if (cp_changed) {
+	fprintf(stderr,
+	    "\ngnuplot changed the codepage of this console from %i to %i to\n" \
+	    "match the graph window. Some characters might only display correctly\n" \
+	    "if you change the font to a non-raster type.\n", 
+	    cp_input, GetConsoleCP());
+    }
+#else
+    if (GetConsoleCP() != GetACP()) {
+	fprintf(stderr,
+	    "\nWarning: The codepage of the graph window (%i) and that of the\n" \
+	    "console (%i) differ. Use `set encoding` or `!chcp` if extended\n" \
+	    "characters don't display correctly.\n", 
+	    GetACP(), GetConsoleCP());
+    }
+#endif
 #endif
 
     update_gpval_variables(3);  /* update GPVAL_ variables available to user */

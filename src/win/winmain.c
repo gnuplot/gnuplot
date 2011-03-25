@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: winmain.c,v 1.39 2011/03/20 15:30:21 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: winmain.c,v 1.40 2011/03/20 18:47:47 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - win/winmain.c */
@@ -106,8 +106,11 @@ LPSTR szModuleName;
 LPSTR szPackageDir;
 LPSTR winhelpname;
 LPSTR szMenuName;
-static UINT cp_input;  /* save previous codepage settings */
-static UINT cp_output;
+#if defined(WGP_CONSOLE) && defined(CONSOLE_SWITCH_CP)
+BOOL cp_changed = FALSE;
+UINT cp_input;  /* save previous codepage settings */
+UINT cp_output;
+#endif
 #define MENUNAME "wgnuplot.mnu"
 #ifndef HELPFILE /* HBB 981203: makefile.win predefines this... */
 #define HELPFILE "wgnuplot.hlp"
@@ -169,10 +172,14 @@ WinExit(void)
 #ifndef WGP_CONSOLE
         TextMessage();  /* process messages */
 #else
+#ifdef CONSOLE_SWITCH_CP
         /* restore console codepages */
-        SetConsoleCP(cp_input);
-        SetConsoleOutputCP(cp_output);
-        /* file APIs are per process */
+        if (cp_changed) {
+            SetConsoleCP(cp_input);
+            SetConsoleOutputCP(cp_output);
+            /* file APIs are per process */
+        }
+#endif
 #endif
         return;
 }
@@ -407,16 +414,21 @@ int main(int argc, char **argv)
                 UpdateWindow(textwin.hWndParent);
         }
 #else /* WGP_CONSOLE */
+#ifdef CONSOLE_SWITCH_CP
         /* Change codepage of console to match that of the graph window.
+           WinExit() will revert this.
            Attention: display of characters does not work correctly with 
            "Terminal" font! Users will have to use "Lucida Console" or similar.
-           WinExit() reverts this.
         */
         cp_input = GetConsoleCP();
         cp_output = GetConsoleOutputCP();
-        SetConsoleCP(GetACP()); /* keyboard input */
-        SetConsoleOutputCP(GetACP()); /* screen output */
-        SetFileApisToANSI(); /* file names etc. */
+        if (cp_input != GetACP()) {
+            cp_changed = TRUE;
+            SetConsoleCP(GetACP()); /* keyboard input */
+            SetConsoleOutputCP(GetACP()); /* screen output */
+            SetFileApisToANSI(); /* file names etc. */
+        }
+#endif
 #endif
 
 

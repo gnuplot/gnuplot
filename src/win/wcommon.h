@@ -1,5 +1,5 @@
 /*
- * $Id: wcommon.h,v 1.10 2011/02/23 19:58:16 markisch Exp $
+ * $Id: wcommon.h,v 1.11 2011/03/13 19:55:29 markisch Exp $
  */
 
 /* GNUPLOT - wcommon.h */
@@ -58,6 +58,9 @@
 extern DWORD GetDllVersion(LPCTSTR lpszDllName);
 extern BOOL IsWindowsXPorLater(void);
 extern char *appdata_directory(void);
+extern BOOL cp_changed;
+extern UINT cp_input;
+extern UINT cp_output;
 
 /* wgnuplib.c */
 extern HINSTANCE hdllInstance;
