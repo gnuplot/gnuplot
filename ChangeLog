@@ -1,3 +1,8 @@
+2011-03-25  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/pm3d.c docs/gnuplot.doc:  Allow pm3d plots to use the fourth
+	column of data as "rgb variable" rather than "palette z".
+
 2011-03-25  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/win/wtext.c: Make more stuff module-local.  Resolve several

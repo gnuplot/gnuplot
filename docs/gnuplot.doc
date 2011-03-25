@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.656 2011/03/05 14:43:49 broeker Exp $
+C RCS $Id: gnuplot.doc,v 1.657 2011/03/20 22:48:31 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -9910,6 +9910,8 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/population.gif" alt="[popu
 =median
 =min
 =max
+ `3 columns of data (x,y,z)`:
+
  The coloring setup as well as the color box drawing are determined by
  `set palette`.  There can be only one palette for the current plot.  Drawing
  of several surfaces with different palettes can be achieved by `multiplot`
@@ -9932,6 +9934,17 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/population.gif" alt="[popu
  contributing to the color of any quadrangle.  For example, applying the pm3d
  algorithm to the 4x4 grid of data points in script `demo/pm3d.dem` (please have
  a look) produces only (4-1)x(4-1)=9 colored rectangles.
+
+ `4 columns of data (x,y,z,color)`:
+
+ If a fourth column of data is provided, it is normally interpreted as a 
+ separate palette-mapped gray value. The coloring of individual quadrangles
+ works as above, except that the color value is distinct from the z value.
+ As a separate coloring option, the fourth data column may provide instead
+ an RGB color. See `rgbcolor variable`. In this case the plotting command
+ must be
+
+       splot ... using 1:2:3:4 with pm3d lc rgb variable
 
  Another drawing algorithm, which would draw quadrangles around a given node
  by taking corners from averaged (x,y)-coordinates of its surrounding 4 nodes
