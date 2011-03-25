@@ -1,10 +1,16 @@
+2011-03-25  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/win/wtext.c: Make more stuff module-local.  Resolve several
+	signedness conflicts introduced by functions in new screenbuf.c
+	module.
+
 2011-03-25  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/plot.c (main), src/win/winmain.c (WinMain, WinExit),
-	src/win/wcommon.h: The code which changes the codepages for console 
-	gnuplot	is only compiled in if CONSOLE_SWITCH_CP is defined. 
-	Otherwise gnuplot will only display a warning if codepages differ.
-	Handle the case when codepages already match.
+	src/win/wcommon.h: The code which changes the codepages for
+	console gnuplot is only compiled in if CONSOLE_SWITCH_CP is
+	defined.  Otherwise gnuplot will only display a warning if
+	codepages differ.  Handle the case when codepages already match.
 
 2011-03-24  Ethan A Merritt  <merritt@u.washington.edu>
 

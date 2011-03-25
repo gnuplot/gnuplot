@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: wtext.c,v 1.29 2011/03/18 08:48:08 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: wtext.c,v 1.30 2011/03/20 18:47:47 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - win/wtext.c */
@@ -76,22 +76,22 @@ static char *RCSid() { return RCSid("$Id: wtext.c,v 1.29 2011/03/18 08:48:08 mar
 #ifndef WGP_CONSOLE
 
 #ifndef EOF /* HBB 980809: for MinGW32 */
-#define EOF -1		/* instead of using <stdio.h> */
+# define EOF -1		/* instead of using <stdio.h> */
 #endif
 
 /* limits */
-POINT ScreenMinSize = {16,4};
+static POINT ScreenMinSize = {16,4};
 
-LRESULT CALLBACK WndParentProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);
-LRESULT CALLBACK WndTextProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);
+static LRESULT CALLBACK WndParentProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);
+static LRESULT CALLBACK WndTextProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);
+static void LimitMark(LPTW lptw, POINT *lppt);
+static void UpdateScrollBars(LPTW lptw);
+static void UpdateCaretPos(LPTW lptw);
+static LPSTR GetUInt(LPSTR str, uint *pval);
 
-void ReadTextIni(LPTW lptw);
-void LimitMark(LPTW lptw, POINT *lppt);
-void UpdateScrollBars(LPTW lptw);
-void UpdateCaretPos(LPTW lptw);
+static char szNoMemory[] = "out of memory";
 
-char szNoMemory[] = "out of memory";
-COLORREF TextColorTable[16] = {
+static const COLORREF TextColorTable[16] = {
 	RGB(0,0,0),		/* black */
 	RGB(0,0,128),		/* dark blue */
 	RGB(0,128,0),		/* dark green */
@@ -404,7 +404,7 @@ NewLine(LPTW lptw)
 }
 
 
-void
+static void
 UpdateScrollBars(LPTW lptw)
 {
     signed int length;  /* this must be signed for this to work! */
@@ -531,7 +531,9 @@ TextPutCh(LPTW lptw, BYTE ch)
 		lptw->CursorPos.y = 0;
 	    break;
 	default: {
-	    sb_last_insert_str(&(lptw->ScreenBuffer), lptw->CursorPos.x, &ch, 1);
+	    char c = (char)ch;
+	    
+	    sb_last_insert_str(&(lptw->ScreenBuffer), lptw->CursorPos.x, &c, 1);
 	    /* TODO: add attribute support */
 	    UpdateText(lptw, 1);
 	    /* maximum line size may have changed, so update scroll bars */
@@ -584,7 +586,7 @@ TextPutStr(LPTW lptw, LPSTR str)
 }
 
 
-void
+static void
 LimitMark(LPTW lptw, POINT *lppt)
 {
     int length;
@@ -1133,7 +1135,7 @@ ReallocateKeyBuf(LPTW lptw)
 
 
 /* update the position of the cursor */
-void UpdateCaretPos(LPTW lptw)
+static void UpdateCaretPos(LPTW lptw)
 {
     if (lptw->bWrap)
 	SetCaretPos((lptw->CursorPos.x % lptw->ScreenBuffer.wrap_at) * lptw->CharSize.x - lptw->ScrollPos.x,
@@ -1184,18 +1186,18 @@ WndTextProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 	/* update scroll bar position */
 	if (!caret_visible) {
-	    POINT new_scroll;
+	    uint new_x, new_y;
 
 	    /* keep upper left corner in place */
 	    sb_find_new_pos(&(lptw->ScreenBuffer), 
 		lptw->ScrollPos.x / lptw->CharSize.x, lptw->ScrollPos.y / lptw->CharSize.y, 
-		new_wrap, & new_scroll.x, & new_scroll.y);
-	    lptw->ScrollPos.x = lptw->CharSize.x * new_scroll.x + lptw->ScrollPos.x % lptw->CharSize.x;
-	    lptw->ScrollPos.y = lptw->CharSize.y * new_scroll.y + lptw->ScrollPos.y % lptw->CharSize.y;
+		new_wrap, & new_x, & new_y);
+	    lptw->ScrollPos.x = lptw->CharSize.x * new_x + lptw->ScrollPos.x % lptw->CharSize.x;
+	    lptw->ScrollPos.y = lptw->CharSize.y * new_y + lptw->ScrollPos.y % lptw->CharSize.y;
 	} else {
 	    int xold, yold; 
 	    int deltax, deltay;
-	    int xnew, ynew;
+	    uint xnew, ynew;
 
 	    /* keep cursor in place */
 	    xold = lptw->CursorPos.x;
@@ -1229,13 +1231,16 @@ WndTextProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 	    /* update markers, if necessary */
 	    if ((lptw->MarkBegin.x != lptw->MarkEnd.x) ||
 		(lptw->MarkBegin.y != lptw->MarkEnd.y) ) {
-		POINT MarkBegin, MarkEnd;
+		uint new_x, new_y;
+		
 		sb_find_new_pos(&(lptw->ScreenBuffer), lptw->MarkBegin.x, lptw->MarkBegin.y, 
-		    lptw->ScreenSize.x - 1, & MarkBegin.x, & MarkBegin.y);
-		lptw->MarkBegin = MarkBegin;
+		    lptw->ScreenSize.x - 1, & new_x, & new_y);
+		lptw->MarkBegin.x = new_x;
+		lptw->MarkBegin.y = new_y;
 		sb_find_new_pos(&(lptw->ScreenBuffer), lptw->MarkEnd.x, lptw->MarkEnd.y, 
-		    lptw->ScreenSize.x - 1, & MarkEnd.x, & MarkEnd.y);
-		lptw->MarkEnd = MarkEnd;
+		    lptw->ScreenSize.x - 1, & new_x, & new_y);
+		lptw->MarkEnd.x = new_x;
+		lptw->MarkEnd.y = new_y;
 	    }
 	    /* set new wrapping: the character at ScreenSize.x is only partially
 	       visible, so we wrap one character before */
@@ -1630,14 +1635,16 @@ WndTextProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		/* update markers, if necessary */
 		if ((lptw->MarkBegin.x != lptw->MarkEnd.x) ||
 		    (lptw->MarkBegin.y != lptw->MarkEnd.y) ) {
-		    POINT MarkBegin, MarkEnd;
+		    uint new_x, new_y;
 		    
 		    sb_find_new_pos(&(lptw->ScreenBuffer), lptw->MarkBegin.x, lptw->MarkBegin.y, 
-			new_wrap, & MarkBegin.x, & MarkBegin.y);
-		    lptw->MarkBegin = MarkBegin;
+			new_wrap, & new_x, & new_y);
+		    lptw->MarkBegin.x = new_x;
+		    lptw->MarkBegin.y = new_y;
 		    sb_find_new_pos(&(lptw->ScreenBuffer), lptw->MarkEnd.x, lptw->MarkEnd.y, 
-			new_wrap, & MarkEnd.x, & MarkEnd.y);
-		    lptw->MarkEnd = MarkEnd;
+			new_wrap, & new_x, & new_y);
+		    lptw->MarkEnd.x = new_x;
+		    lptw->MarkEnd.y = new_y;
 		}
 
 		/* is caret visible? */
@@ -1646,18 +1653,18 @@ WndTextProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 		/* update scroll bar position */
 		if (!caret_visible) {
-		    POINT new_scroll;
+		    uint new_x, new_y;
 
 		    /* keep upper left corner in place */
 		    sb_find_new_pos(&(lptw->ScreenBuffer), 
 			lptw->ScrollPos.x / lptw->CharSize.x, lptw->ScrollPos.y / lptw->CharSize.y, 
-			new_wrap, & new_scroll.x, & new_scroll.y);
-		    lptw->ScrollPos.x = lptw->CharSize.x * new_scroll.x;
-		    lptw->ScrollPos.y = lptw->CharSize.y * new_scroll.y;
+			new_wrap, & new_x, & new_y);
+		    lptw->ScrollPos.x = lptw->CharSize.x * new_x;
+		    lptw->ScrollPos.y = lptw->CharSize.y * new_y;
 		} else {
 		    int xold, yold; 
 		    int deltax, deltay;
-		    int xnew, ynew;
+		    uint xnew, ynew;
 
 		    /* keep cursor in place */
 		    xold = lptw->CursorPos.x;
@@ -1989,6 +1996,15 @@ WriteTextIni(LPTW lptw)
     return;
 }
 
+/* Helper function to avoid signedness conflict --- windows delivers an INT, we want an uint */
+static LPSTR GetUInt(LPSTR str, uint *pval) 
+{
+    INT val_fromGetInt;
+
+    str = GetInt(str, &val_fromGetInt);
+    *pval = (uint)val_fromGetInt;
+    return str;
+}
 
 void
 ReadTextIni(LPTW lptw)
@@ -2065,7 +2081,7 @@ ReadTextIni(LPTW lptw)
 
     /* length of screen buffer (unwrapped lines) */
     GetPrivateProfileString(section, "TextLines", "", profile, 80, file);
-    if ((p = GetInt(profile, &lptw->ScreenBuffer.size)) == NULL)
+    if ((p = GetUInt(profile, &lptw->ScreenBuffer.size)) == NULL)
 	lptw->ScreenBuffer.size = 400;
 }
 
