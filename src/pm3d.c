@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.76 2009/03/24 11:18:15 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.77 2009/03/26 00:49:16 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - pm3d.c */
@@ -68,6 +68,7 @@ static void pm3d_plot __PROTO((struct surface_points *, int));
 static void pm3d_option_at_error __PROTO((void));
 static void pm3d_rearrange_part __PROTO((struct iso_curve *, const int, struct iso_curve ***, int *));
 static void filled_color_contour_plot  __PROTO((struct surface_points *, int));
+static TBOOLEAN color_from_rgbvar = FALSE;
 
 /*
  * Utility routines.
@@ -395,7 +396,10 @@ void pm3d_depth_queue_flush(void)
 
 	for (qp = quadrangles, qe = quadrangles + current_quadrangle; qp != qe; qp++) {
 
-	    set_color(qp->gray);
+	    if (color_from_rgbvar)
+		set_rgbcolor(qp->gray);
+	    else
+		set_color(qp->gray);
 	    ifilled_quadrangle(qp->icorners);
 	}
     }
@@ -430,6 +434,9 @@ pm3d_plot(struct surface_points *this_plot, int at_which_z)
 
     /* just a shortcut */
     TBOOLEAN color_from_column = this_plot->pm3d_color_from_column;
+    
+    color_from_rgbvar = (this_plot->lp_properties.pm3d_color.type == TC_RGB
+			&&  this_plot->lp_properties.pm3d_color.value == -1);
 
     if (this_plot == NULL)
 	return;
@@ -671,7 +678,20 @@ pm3d_plot(struct surface_points *this_plot, int at_which_z)
 		    cb4 = z2cb(pointsB[ii1].z);
 		}
 		switch (pm3d.which_corner_color) {
-		    case PM3D_WHICHCORNER_MEAN: avgC = (cb1 + cb2 + cb3 + cb4) * 0.25; break;
+		    default:
+		    case PM3D_WHICHCORNER_MEAN:
+			if (color_from_rgbvar) {
+			    int r = (((int)cb1)&0xff0000)+(((int)cb2)&0xff0000)
+			    	  + (((int)cb3)&0xff0000)+(((int)cb4)&0xff0000);
+			    int g = (((int)cb1)&0xff00)+(((int)cb2)&0xff00)
+			    	  + (((int)cb3)&0xff00)+(((int)cb4)&0xff00);
+			    int b = (((int)cb1)&0xff)+(((int)cb2)&0xff)
+			    	  + (((int)cb3)&0xff)+(((int)cb4)&0xff);
+			    avgC = ((r>>2)&0xff0000) + ((g>>2)&0xff00) + ((b>>2)&0xff);
+			} else {
+    			    avgC = (cb1 + cb2 + cb3 + cb4) * 0.25;
+			}
+			break;
 		    case PM3D_WHICHCORNER_GEOMEAN: avgC = geomean4(cb1, cb2, cb3, cb4); break;
 		    case PM3D_WHICHCORNER_MEDIAN: avgC = median4(cb1, cb2, cb3, cb4); break;
 		    case PM3D_WHICHCORNER_MIN: avgC = minimum4(cb1, cb2, cb3, cb4); break;
@@ -680,10 +700,12 @@ pm3d_plot(struct surface_points *this_plot, int at_which_z)
 		    case PM3D_WHICHCORNER_C2: avgC = cb2; break;
 		    case PM3D_WHICHCORNER_C3: avgC = cb3; break;
 		    case PM3D_WHICHCORNER_C4: avgC = cb4; break;
-		    default: int_error(NO_CARET, "cannot be here"); avgC = 0;
 		}
-		/* transform z value to gray, i.e. to interval [0,1] */
-		gray = cb2gray(avgC);
+
+		if (color_from_rgbvar) /* we were given an explicit color */
+			gray = avgC;
+		else /* transform z value to gray, i.e. to interval [0,1] */
+			gray = cb2gray(avgC);
 
 		/* print the quadrangle with the given color */
 		FPRINTF((stderr, "averageColor %g\tgray=%g\tM %g %g L %g %g L %g %g L %g %g\n",
@@ -691,8 +713,12 @@ pm3d_plot(struct surface_points *this_plot, int at_which_z)
 		       pointsB[ii1].x, pointsB[ii1].y, pointsA[i1].x, pointsA[i1].y));
 
 		/* set the color */
-		if (pm3d.direction != PM3D_DEPTH)
-		    set_color(gray);
+		if (pm3d.direction != PM3D_DEPTH) {
+		    if (color_from_rgbvar)
+			set_rgbcolor(gray);
+		    else
+			set_color(gray);
+		}
 #ifdef EXTENDED_COLOR_SPECS
 	      }
 #endif
@@ -852,10 +878,17 @@ pm3d_plot(struct surface_points *this_plot, int at_which_z)
 			    case PM3D_WHICHCORNER_C4: avgC = cb4; break;
 			    default: int_error(NO_CARET, "cannot be here"); avgC = 0;
 			}
-			/* transform z value to gray, i.e. to interval [0,1] */
-			gray = cb2gray(avgC);
+
+			if (color_from_rgbvar) /* we were given an explicit color */
+				gray = avgC;
+			else /* transform z value to gray, i.e. to interval [0,1] */
+				gray = cb2gray(avgC);
+
 			if (pm3d.direction != PM3D_DEPTH) {
-			    set_color(gray);
+			    if (color_from_rgbvar)
+				set_rgbcolor(gray);
+			    else
+				set_color(gray);
 			    filled_quadrangle(corners);
 			} else {
 			    /* copy quadrangle */

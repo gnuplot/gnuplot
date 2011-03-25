@@ -2,6 +2,7 @@ New features, changes and fixes in gnuplot version 4.4.4
 ========================================================
 
 * NEW plot style boxxyerrors allows variable color
+* NEW splot with pm3d allows variable rgb color
 * CHANGE Demarcate plots in svg output using <g id="Plot_#"><title>...
 * FIX incorrect space allowed for outside left key box
 * FIX buffer overflow from enhanced text timefmt tic labels
