@@ -2305,7 +2305,7 @@ gd_iconv(char **string)
 	    if (iconv(cd, string, &len1, &stmp, &len2) == (size_t)-1)
 		int_warn(NO_CARET, "iconv failed");
 	    else
-		string = &iconv_string;
+		*string = iconv_string;
 	    iconv_close(cd);
 	}
     }
@@ -2320,7 +2320,7 @@ gd_iconv(char **string)
 	    if (iconv(cd, (char **)(string), &len1, &stmp, &len2) == (size_t)-1)
 		int_warn(NO_CARET, "iconv failed");
 	    else
-		string = &iconv_string;
+		*string = iconv_string;
 	    iconv_close(cd);
 	}
     }
