@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: gd.trm,v 1.153 2011/03/11 22:20:59 sfeam Exp $
+ * $Id: gd.trm,v 1.154 2011/03/18 11:29:45 markisch Exp $
  * based on gif.trm,v 1.26.2.1 2000/05/01 00:17:20 joze
  */
 
@@ -339,6 +339,7 @@ static double PNG_dashlength_factor = 1.0;
 #ifdef HAVE_ICONV
 #include <iconv.h>
 #endif
+static void gd_iconv __PROTO((char **string));
 
 /* EAM - gdImage structure to hold brushes for linewidth */
 /* We will allocate and initialize these on demand */
@@ -1657,58 +1658,9 @@ PNG_linewidth(double linewidth)
 TERM_PUBLIC void
 PNG_put_text(unsigned int x, unsigned int y, const char *string)
 {
-    char *iconv_string = NULL;
-
+    /* Mar 2011 - added to handle SJIS/UTF8 conversion */
     if (contains8bit(string)) {
-#ifdef HAVE_ICONV
-	size_t len1 = strlen(string)+1;
-	size_t len2;
-	iconv_t cd;
-	size_t stat;
-	char *stmp;
-
-#ifdef JIS_GDLIB
-	if (encoding == S_ENC_UTF8) { /* UTF-8 -> Shift_JIS by iconv */
-	    len2 = len1;
-	    iconv_string = gp_alloc(len2, "iconv string");
-	    stmp = iconv_string;
-	    if ((cd = iconv_open("Shift_JIS", "UTF-8")) == (iconv_t)-1) 
-	      int_warn(NO_CARET, "iconv_open failed");
-	    else {
-		if (iconv(cd, &string, &len1, &stmp, &len2) == (size_t)-1)
-		    int_warn(NO_CARET, "iconv failed");
-		else
-		    string = iconv_string;
-		iconv_close(cd);
-	    }
-	}
-#else /* ! JIS_GDLIB */
-	if (encoding == S_ENC_SJIS) { /* Shift_JIS -> UTF-8 by iconv */
-	    len2 = len1*3/2+2;
-	    iconv_string = gp_alloc(len2, "iconv string");
-	    stmp = iconv_string;
-	    if ((cd = iconv_open("UTF-8", "Shift_JIS")) == (iconv_t)-1)
-	      int_warn(NO_CARET, "iconv_open failed");
-	    else {
-		if (iconv(cd, (char **)(&string), &len1, &stmp, &len2) == (size_t)-1)
-		    int_warn(NO_CARET, "iconv failed");
-		else
-		    string = iconv_string;
-		iconv_close(cd);
-	    }
-	}
-#endif /* JIS_GDLIB */
-#else /* ! HAVE_ICONV */
-#ifdef JIS_GDLIB
-	if (encoding == S_ENC_UTF8)
-	    int_warn(NO_CARET, 
-		     "This gdlib supports Shift_JIS encoding, but not UTF-8.");
-#else /* ! JIS_GDLIB */
-	if (encoding == S_ENC_SJIS) /* Shift_JIS -> UTF-8 */
-	    int_warn(NO_CARET, 
-		     "This gdlib supports UTF-8 encoding, but not Shift_JIS.");
-#endif  /* JIS_GDLIB */
-#endif /* HAVE_ICONV */
+	gd_iconv((char **)(&string));
     }
 
     if (png_state.ttffont) {
@@ -1773,8 +1725,6 @@ PNG_put_text(unsigned int x, unsigned int y, const char *string)
 		      (unsigned char *)string, png_state.color);
     }
 
-    if (iconv_string)
-	free(iconv_string);
 }
 
 #else  /* not HAVE_GD_TTF */
@@ -2044,73 +1994,81 @@ ENHGD_FLUSH()
 {
     int brect[8]; char *err;
     unsigned int x, y;
+    char *fragment = enhanced_text;
 
-	if (ENHgd_opened_string) {
-	    ENHgd_opened_string = FALSE;
-	    *enhanced_cur_text = '\0';
-	    x = png_state.x;
-	    y = png_state.y;
-	    x -= sin((double)png_state.angle * M_PI_2/90.) * ENHgd_base;
-	    y += cos((double)png_state.angle * M_PI_2/90.) * ENHgd_base;
-	    x += sin((double)png_state.angle * M_PI_2/90.) * (double)png_state.charh/4.;
-	    y -= cos((double)png_state.angle * M_PI_2/90.) * (double)png_state.charh/4.;
+    if (!ENHgd_opened_string)
+	return;
 
-	    /* First try the old GDFONTPATH mechanism for locating fonts */
-	    (void)gdUseFontConfig(0);
+    ENHgd_opened_string = FALSE;
+    *enhanced_cur_text = '\0';
+
+    /* Mar 2011 - added to handle SJIS/UTF8 conversion */
+    if (contains8bit(fragment)) {
+	gd_iconv(&fragment);
+    }
+
+    x = png_state.x;
+    y = png_state.y;
+    x -= sin((double)png_state.angle * M_PI_2/90.) * ENHgd_base;
+    y += cos((double)png_state.angle * M_PI_2/90.) * ENHgd_base;
+    x += sin((double)png_state.angle * M_PI_2/90.) * (double)png_state.charh/4.;
+    y -= cos((double)png_state.angle * M_PI_2/90.) * (double)png_state.charh/4.;
+
+    /* First try the old GDFONTPATH mechanism for locating fonts */
+    (void)gdUseFontConfig(0);
 #ifdef gdFTEX_Adobe_Custom
-	    /* libgd defaults to UTF-8 encodings. We have limited options for	*/
-	    /* over-riding this, but we can try					*/
-	    if (encoding != S_ENC_UTF8 && ENHgd_font && !strcmp(ENHgd_font,"Symbol")) {
-		PNG_FONT_INFO.flags |= gdFTEX_CHARMAP;
-		PNG_FONT_INFO.charmap = gdFTEX_Adobe_Custom;
-	    } else {
-		PNG_FONT_INFO.flags &= ~gdFTEX_CHARMAP;
-		PNG_FONT_INFO.charmap = 0;   /* gdFTEX_Adobe_Custom */
-	    }
-	    err = gdImageStringFTEx(
-			(ENHgd_show && !ENHgd_sizeonly) ? png_state.image : NULL,
-			brect, png_state.color,
-			ENHgd_font, ENHgd_fontsize,
-			(double)png_state.angle * M_PI_2/90.,
-			x, Y(y), enhanced_text, &PNG_FONT_INFO);
-	    if (err && gdUseFontConfig(1)) {
-		err = gdImageStringFTEx(
-			(ENHgd_show && !ENHgd_sizeonly) ? png_state.image : NULL,
-			brect, png_state.color,
-			ENHgd_font, ENHgd_fontsize,
-			(double)png_state.angle * M_PI_2/90.,
-			x, Y(y), enhanced_text, &PNG_FONT_INFO);
-	    }
+    /* libgd defaults to UTF-8 encodings. We have limited options for	*/
+    /* over-riding this, but we can try					*/
+    if (encoding != S_ENC_UTF8 && ENHgd_font && !strcmp(ENHgd_font,"Symbol")) {
+	PNG_FONT_INFO.flags |= gdFTEX_CHARMAP;
+	PNG_FONT_INFO.charmap = gdFTEX_Adobe_Custom;
+    } else {
+	PNG_FONT_INFO.flags &= ~gdFTEX_CHARMAP;
+	PNG_FONT_INFO.charmap = 0;   /* gdFTEX_Adobe_Custom */
+    }
+    err = gdImageStringFTEx(
+		(ENHgd_show && !ENHgd_sizeonly) ? png_state.image : NULL,
+		brect, png_state.color,
+		ENHgd_font, ENHgd_fontsize,
+		(double)png_state.angle * M_PI_2/90.,
+		x, Y(y), fragment, &PNG_FONT_INFO);
+    if (err && gdUseFontConfig(1)) {
+	err = gdImageStringFTEx(
+		(ENHgd_show && !ENHgd_sizeonly) ? png_state.image : NULL,
+		brect, png_state.color,
+		ENHgd_font, ENHgd_fontsize,
+		(double)png_state.angle * M_PI_2/90.,
+		x, Y(y), fragment, &PNG_FONT_INFO);
+    }
 #else
-	    err = gdImageStringFT(
-			(ENHgd_show && !ENHgd_sizeonly) ? png_state.image : NULL,
-			brect, png_state.color,
-			ENHgd_font, ENHgd_fontsize,
-			(double)png_state.angle * M_PI_2/90.,
-			x, Y(y), enhanced_text);
-	    if (err && gdUseFontConfig(1)) {
-		err = gdImageStringFT(
-			(ENHgd_show && !ENHgd_sizeonly) ? png_state.image : NULL,
-			brect, png_state.color,
-			ENHgd_font, ENHgd_fontsize,
-			(double)png_state.angle * M_PI_2/90.,
-			x, Y(y), enhanced_text);
-	    }
+    err = gdImageStringFT(
+		(ENHgd_show && !ENHgd_sizeonly) ? png_state.image : NULL,
+		brect, png_state.color,
+		ENHgd_font, ENHgd_fontsize,
+		(double)png_state.angle * M_PI_2/90.,
+		x, Y(y), fragment);
+    if (err && gdUseFontConfig(1)) {
+	err = gdImageStringFT(
+		(ENHgd_show && !ENHgd_sizeonly) ? png_state.image : NULL,
+		brect, png_state.color,
+		ENHgd_font, ENHgd_fontsize,
+		(double)png_state.angle * M_PI_2/90.,
+		x, Y(y), fragment);
+    }
 #endif
-	    if (err) 
-		fprintf(stderr,"gdImageStringFT: %s while printing string %s with font %s\n",
-		    err,enhanced_text,ENHgd_font);
+    if (err) 
+	fprintf(stderr,"gdImageStringFT: %s while printing string %s with font %s\n",
+	    err,enhanced_text,ENHgd_font);
 
-	    FPRINTF((stderr,"outputstring: %s boundingbox: %d %d %d %d\n",
-			enhanced_text, brect[6], brect[7], brect[2], brect[3]));
-	    if (ENHgd_overprint == 1) {
-		png_state.x += ((brect[2] - brect[0]))/2;
-		png_state.y -= (brect[3] - brect[1]);
-	    } else if (ENHgd_widthflag) {
-		png_state.x += (brect[2] - brect[0]);
-		png_state.y -= (brect[3] - brect[1]);
-	    }
-	}
+    FPRINTF((stderr,"outputstring: %s boundingbox: %d %d %d %d\n",
+		enhanced_text, brect[6], brect[7], brect[2], brect[3]));
+    if (ENHgd_overprint == 1) {
+	png_state.x += ((brect[2] - brect[0]))/2;
+	png_state.y -= (brect[3] - brect[1]);
+    } else if (ENHgd_widthflag) {
+	png_state.x += (brect[2] - brect[0]);
+	png_state.y -= (brect[3] - brect[1]);
+    }
 }
 
 TERM_PUBLIC void
@@ -2313,6 +2271,71 @@ PNG_image (unsigned int M, unsigned int N, coordval * image, gpiPoint * corner, 
     gdImageSetClip(png_state.image, x1, y1, x2, y2);
 #endif
 
+}
+
+
+/* Mar 2011 - shige takeno
+ * libgd can be built to prefer UTF-8 or SJIS encoding for Japanese.
+ * If it wants SJIS and we are currently in UTF8, convert.
+ * If it wants UTF8 and we are currently in SJIS, convert.
+ */
+static void
+gd_iconv(char **string)
+{
+#ifdef HAVE_ICONV
+    size_t len1 = strlen(*string)+1;
+    size_t len2;
+    iconv_t cd;
+    size_t stat;
+    char *stmp;
+
+    /* We will return this to the caller and free it next time */
+    static char *iconv_string = NULL;
+    free(iconv_string);
+    iconv_string = NULL;
+
+#ifdef JIS_GDLIB
+    if (encoding == S_ENC_UTF8) { /* UTF-8 -> Shift_JIS by iconv */
+	len2 = len1;
+	iconv_string = gp_alloc(len2, "iconv string");
+	stmp = iconv_string;
+	if ((cd = iconv_open("Shift_JIS", "UTF-8")) == (iconv_t)-1) 
+	  int_warn(NO_CARET, "iconv_open failed");
+	else {
+	    if (iconv(cd, string, &len1, &stmp, &len2) == (size_t)-1)
+		int_warn(NO_CARET, "iconv failed");
+	    else
+		string = &iconv_string;
+	    iconv_close(cd);
+	}
+    }
+#else /* ! JIS_GDLIB */
+    if (encoding == S_ENC_SJIS) { /* Shift_JIS -> UTF-8 by iconv */
+	len2 = len1*3/2+2;
+	iconv_string = gp_alloc(len2, "iconv string");
+	stmp = iconv_string;
+	if ((cd = iconv_open("UTF-8", "Shift_JIS")) == (iconv_t)-1)
+	  int_warn(NO_CARET, "iconv_open failed");
+	else {
+	    if (iconv(cd, (char **)(string), &len1, &stmp, &len2) == (size_t)-1)
+		int_warn(NO_CARET, "iconv failed");
+	    else
+		string = &iconv_string;
+	    iconv_close(cd);
+	}
+    }
+#endif /* JIS_GDLIB */
+#else /* ! HAVE_ICONV */
+#ifdef JIS_GDLIB
+    if (encoding == S_ENC_UTF8)
+	int_warn(NO_CARET, 
+		 "This gdlib supports Shift_JIS encoding, but not UTF-8.");
+#else /* ! JIS_GDLIB */
+    if (encoding == S_ENC_SJIS) /* Shift_JIS -> UTF-8 */
+	int_warn(NO_CARET, 
+		 "This gdlib supports UTF-8 encoding, but not Shift_JIS.");
+#endif  /* JIS_GDLIB */
+#endif /* HAVE_ICONV */
 }
 
 #undef MAXLINEWIDTH
