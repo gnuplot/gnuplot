@@ -1,3 +1,13 @@
+2011-03-26  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* config/mingw/Makefile: Add missing paths to wxt/cairo/pango
+	files. Update build instructions.  WX_LOCATION is no longer
+	required since gnuplot has it's own manifest file now and the one
+	supplied by wxWidgets is no longer included. htmlhelp.lib is
+	included in LDLIBS not TERMFLAGS. Replace '=' by ':=' for shell
+	commands. Filter out drive specifications "c:" in results from
+	pkg-config which would confuse make.
+
 2011-03-25  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/pm3d.c docs/gnuplot.doc:  Allow pm3d plots to use the fourth

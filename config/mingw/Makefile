@@ -1,15 +1,15 @@
 # Hello, emacs: this is a -*- Makefile -*-
-# $Id: Makefile,v 1.3 2011/03/07 21:41:36 markisch Exp $
+# $Id: Makefile,v 1.4 2011/03/13 12:15:56 markisch Exp $
 #
 # GNUPLOT Makefile for MinGW32 on Win95/98/NT/2k/..
 # This assumes usual installation of the MinGW32 toolkit, the free
 # GNU gcc. See www.mingw.org for more details.
 
-# To compile gnuplot for WinXX:
+# To compile gnuplot for Windows:
 #
-# - compile the package: go to directory 'gnuplot' and issue the command
-#	 make -C src -f ../config/makefile.mgw
-#	 make install -C src -f ../config/makefile.mgw
+# - compile the package: go to directory 'gnuplot/config/mingw' and issue the command
+#	 make
+#	 make install
 #
 # This makefile was tested with MSYS, MingW32 and Microsoft Help
 # Workshop 4.03 / Microsoft HTML Help 1.4 SDK.
@@ -30,7 +30,7 @@
 # Comment for programs using gnuplot as their plotting engine:
 # Both wgnuplot*.exe compile also pgnuplot.exe. This small helper program was
 # used when gnuplot.exe was not available on Windows. Nowadays, pgnuplot.exe
-# is deprecated -- plese use gnuplot.exe instead.
+# is deprecated -- please use gnuplot.exe instead.
 
 #TARGET=wgnuplot.exe
 #TARGET=wgnuplot_pipes.exe
@@ -45,7 +45,7 @@ HTML_HELP=1
 # GIF, PNG, JPEG device drivers
 # Requires gd library. There are two possibilities how to configure these
 # drivers for use in gnuplot, depending on the gd version. See README.1ST for
-# more details. 
+# more details.
 #
 # You should compile gnuplot with GD library v2.0 or newer.
 # This library writes PNG, GIF and JPEG images.
@@ -60,7 +60,7 @@ HTML_HELP=1
 #JPEG=1
 #FREETYPE=1
 #GDAUTOCONFIGLIBS=1
-	
+
 # PDF device driver
 # Requires PNG and Z libraries based on particular PDF library used, and
 # optionally also TIFF library according to
@@ -87,14 +87,12 @@ MOUSE=1
 # terminals
 #CAIROTERMS=1
 #CAIROLIBS=1
-#
 
 # WXWIDGETS interactive terminal
 # Requires wxWidgets, Cairo, Pango, and their respective dependencies.
 # Uncomment the following lines to compile it.
 # WXT_LOCATION should give the path where can be found wx/*.h headers
 #WXT=1
-#WX_LOCATION=/usr/local/include/wx-2.6
 #CAIROLIBS=1
 
 # Uncomment the following line to select the lua/tikz terminal
@@ -102,11 +100,11 @@ MOUSE=1
 
 # Below you can adapt paths according to your software setup:
 
-# Where to place gnuplot.gih helpfile:
+# Where to place the helpfile:
 ifdef HTML_HELP
   HELPFILE = wgnuplot.chm
 else
-HELPFILE = wgnuplot.hlp
+  HELPFILE = wgnuplot.hlp
 endif
 
 # Where to install the PostScript prologue files, relatively to the executable
@@ -136,7 +134,7 @@ ifdef HTML_HELP
 # To compile the .chm file you need the Microsoft HTML Help 1.4 SDK
 # It can be obtained here:
 # http://go.microsoft.com/fwlink/?LinkId=154968
-# We need to explicitly set the correct path here since we also need 
+# We need to explicitly set the correct path here since we also need
 # adjust the include and linrary paths.
 HHWPATH = /c/Program\ Files/HTML\ Help\ Workshop/
 HHC = $(HHWPATH)hhc
@@ -238,10 +236,10 @@ M=$(TOP)/demo/
 
 VPATH = $(S)
 
-TERMFLAGS = -DGNUPLOT_PS_DIR=\"$(GNUPLOT_PS_DIR)\" -DGNUPLOT_JS_DIR=\"$(GNUPLOT_JS_DIR)\" 
+TERMFLAGS = -DGNUPLOT_PS_DIR=\"$(GNUPLOT_PS_DIR)\" -DGNUPLOT_JS_DIR=\"$(GNUPLOT_JS_DIR)\"
 TERMFLAGS += -DGNUPLOT_LUA_DIR=\"$(GNUPLOT_LUA_DIR)\" -I$(TOP)/term
 
-TERMLIBS = 
+TERMLIBS =
 
 CFLAGS += -I. -I$(S) -D_Windows -DHAVE_CONFIG_H $(OPTS)
 
@@ -251,7 +249,6 @@ endif
 
 ifdef HTML_HELP
   CFLAGS += -DWITH_HTML_HELP -I$(HHWPATH)include
-  TERMLIBS += -L$(HHWPATH)lib -lhtmlhelp
   BUILDHELPFILE = $(D)windows/$(HELPFILE)
 else
   BUILDHELPFILE = $(HELPFILE)
@@ -315,12 +312,11 @@ endif
 endif
 
 ifdef CAIROLIBS
-	CAIRO_CFLAGS = $(shell pkg-config --cflags cairo)
-	CAIRO_LIBS = $(shell pkg-config --libs cairo)
-	PANGO_CFLAGS = $(shell pkg-config --cflags pangocairo)
-	PANGO_LIBS = $(shell pkg-config --libs pangocairo)
-	CAIRO_OBJS = gp_cairo.$(O) gp_cairo_helpers.$(O)
-	TERMFLAGS += $(CAIRO_CFLAGS) $(PANGO_CFLAGS)
+	CAIRO_CFLAGS := $(shell pkg-config --cflags cairo | sed s_-Ic:_-I/c_g)
+	PANGOCAIRO_CFLAGS := $(shell pkg-config --cflags pangocairo cairo | sed s_-Ic:_-I/c_g)
+	PANGOCAIRO_LIBS := $(shell pkg-config --libs pangocairo cairo | sed s_-Lc:_-L/c_g)
+	CAIRO_OBJS := gp_cairo.$(O) gp_cairo_helpers.$(O)
+	TERMFLAGS += $(PANGOCAIRO_CFLAGS)
 endif
 
 ifdef CAIROTERMS
@@ -329,8 +325,9 @@ endif
 
 ifdef WXT
 	CFLAGS += -DWXWIDGETS
-	CXXFLAGS += $(shell wx-config --cxxflags)
-	WX_LIBS = $(shell wx-config --libs | sed -e "s+-Wl,--subsystem,windows++g" -e "s+-mwindows++g")
+	WXT_CXXFLAGS := $(shell wx-config --cxxflags)
+	CXXFLAGS += $(WXT_CXXFLAGS)
+	WX_LIBS := $(shell wx-config --libs | sed -e "s+-Wl,--subsystem,windows++g" -e "s+-mwindows++g")
 	WX_OBJS = wxt_gui.$(O)
 endif
 
@@ -347,17 +344,11 @@ ifdef GNU_RC
 	--include-dir=win \
 	--define __WIN32__ --define __WIN95__ --define MSRC \
 	--define __GNUWIN32__ --use-temp-file
-  ifdef WXT
-	RCFLAGS += --define WXWIDGETS --include-dir=$(WX_LOCATION)
-  endif
   RCOUT = wgplt_res.$(O)
   RES2COFF = echo wgplt_res.$(O)
 else
   RC = $(MSSDK)/bin/rc
   RCFLAGS = -v -i$(MSSDK)/include -iwin -dWIN32 -dMSRC
-  ifdef WXT
-	RCFLAGS += -dWXWIDGETS -i$(WX_LOCATION)
-  endif
   RCOUT = -fowgnuplot.res
   RES2COFF = res2coff -i wgnuplot.res -o wgplt_res.$(O)
 endif
@@ -396,10 +387,14 @@ endif
 
 LDLIBS = -lkernel32 -lgdi32 -lwinspool -lcomdlg32 -lcomctl32 -ladvapi32 -lshell32 -lmsimg32
 
+ifdef HTML_HELP
+  LDLIBS += -lhtmlhelp
+  LDFLAGS2 += -L$(HHWPATH)lib
+endif
 
 $(TARGET): $(OBJS) $(WINOBJS) $(W)/wgnuplot.def wgplt_res.$(O) texticon.ico grpicon.ico
 	$(LDX) $(LDFLAGS) $(LDFLAGS2) -o $@ $(OBJS) $(WINOBJS) wgplt_res.$(O) $(LDLIBS)\
-	$(TERMLIBS) $(WX_LIBS) $(CAIRO_LIBS) $(PANGO_LIBS)
+	$(TERMLIBS) $(WX_LIBS) $(PANGOCAIRO_LIBS)
 
 $(PGNUPLOT): $(W)/pgnuplot.c version.$(O)
 	$(CC) -O2 -DHAVE_STDBOOL_H -s -o $@ $(W)/pgnuplot.c version.$(O) -I$(W) -I$(S) -luser32
@@ -435,7 +430,7 @@ wtext.$(O): $(W)/wtext.c $(WINDEPS)
 screenbuf.$(O): $(W)/screenbuf.c $(WINDEPS)
 	$(CC) -c $(CFLAGS) $(W)/screenbuf.c
 
-wpause.$(O): $(W)/wpause.c wxterminal/wxt_term.h $(WINDEPS)
+wpause.$(O): $(W)/wpause.c $(S)/wxterminal/wxt_term.h $(WINDEPS)
 	$(CC) -c $(CFLAGS) $(W)/wpause.c
 
 wprinter.$(O): $(W)/wprinter.c $(WINDEPS)
@@ -447,14 +442,14 @@ wgraph.$(O): $(W)/wgraph.c $(WINDEPS)
 wgnuplot.mnu: $(W)/wgnuplot.mnu
 	$(CP) $^ $@
 
-wxt_gui.$(O): wxterminal/wxt_gui.cpp wxterminal/wxt_gui.h $(WX_LOCATION)
-	$(CXX) -c $(CFLAGS) $(CXXFLAGS) $(CAIRO_CFLAGS) wxterminal/wxt_gui.cpp
+wxt_gui.$(O): $(S)/wxterminal/wxt_gui.cpp $(S)/wxterminal/wxt_gui.h
+	$(CXX) -c $(CFLAGS) $(CXXFLAGS) $(CAIRO_CFLAGS) $(S)/wxterminal/wxt_gui.cpp
 
-gp_cairo.$(O): wxterminal/gp_cairo.c wxterminal/gp_cairo.h
-	$(CC) -c $(CFLAGS) $(CXXFLAGS) $(CAIRO_CFLAGS) $(PANGO_CFLAGS) wxterminal/gp_cairo.c
+gp_cairo.$(O): $(S)/wxterminal/gp_cairo.c $(S)/wxterminal/gp_cairo.h
+	$(CC) -c $(CFLAGS) $(CXXFLAGS) $(PANGOCAIRO_CFLAGS) $(S)/wxterminal/gp_cairo.c
 
-gp_cairo_helpers.$(O): wxterminal/gp_cairo_helpers.c wxterminal/gp_cairo_helpers.h
-	$(CC) -c $(CFLAGS) wxterminal/gp_cairo_helpers.c
+gp_cairo_helpers.$(O): $(S)/wxterminal/gp_cairo_helpers.c $(S)/wxterminal/gp_cairo_helpers.h
+	$(CC) -c $(CFLAGS) $(S)/wxterminal/gp_cairo_helpers.c
 
 # extract icons from wgnuplot.rc
 texticon.ico: grpicon.ico
@@ -563,11 +558,10 @@ gnuplot.pdf: gnuplot.tex $(D)titlepag.tex
 # clean up temporary files
 clean:
 	$(RM) config.h *.$(O) wgnuplot.map wgnuplot.res $(W)/gnuplot.rtf
-	$(RM) wxterminal/*.$(O)
 	$(RM) doc2*.exe $(W)/wgnuplib.res wgnuplib.map wgnuplot.lib
 	$(RM) $(M)bf_test.exe *.ico geticon.exe allterm.h allterm.c
 	$(RM) gnuplot.tex gnuplot.dvi gnuplot.ps gnuplot.pdf
-	$(RM) $(D)windows/wgnuplot.log $(D)windows/wgnuplot.hhc 
+	$(RM) $(D)windows/wgnuplot.log $(D)windows/wgnuplot.hhc
 	$(RM) $(D)windows/*.png $(D)windows/wgnuplot.html
 
 realclean: veryclean
@@ -584,7 +578,7 @@ install: default
 	cp wgnuplot_pipes.exe $(DESTDIR)/wgnuplot_pipes.exe
 	cp pgnuplot.exe $(DESTDIR)/pgnuplot.exe
 	cp $(W)/wgnuplot.mnu $(DESTDIR)/wgnuplot.mnu
-ifdef HTML_HELP	
+ifdef HTML_HELP
 	cp $(D)windows/wgnuplot.chm $(DESTDIR)/wgnuplot.chm
 else
 	cp wgnuplot.hlp $(DESTDIR)/wgnuplot.hlp
