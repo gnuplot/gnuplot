@@ -1,5 +1,5 @@
 /*
- * $Id: wgnuplib.h,v 1.36 2011/03/16 22:57:32 markisch Exp $
+ * $Id: wgnuplib.h,v 1.37 2011/03/20 18:47:47 markisch Exp $
  */
 
 /* GNUPLOT - win/wgnuplib.h */
@@ -43,11 +43,6 @@
 #include <windows.h>
 #include "screenbuf.h"
 
-#ifdef _WINDOWS
-# ifndef _Windows
-#  define _Windows
-# endif
-#endif
 
 /* Functions flagged WDPROC are to be export by the DLL, so they can be called
  * directly from win.trm or the gnuplot core */
@@ -201,7 +196,6 @@ typedef TW *  LPTW;
 void WDPROC TextMessage(void);
 int WDPROC TextInit(LPTW lptw);
 void WDPROC TextClose(LPTW lptw);
-void WDPROC TextToCursor(LPTW lptw);
 int WDPROC  TextKBHit(LPTW);
 int WDPROC TextGetCh(LPTW);
 int WDPROC TextGetChE(LPTW);

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: wtext.c,v 1.30 2011/03/20 18:47:47 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: wtext.c,v 1.31 2011/03/25 21:17:46 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - win/wtext.c */
@@ -84,8 +84,22 @@ static POINT ScreenMinSize = {16,4};
 
 static LRESULT CALLBACK WndParentProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);
 static LRESULT CALLBACK WndTextProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);
-static void LimitMark(LPTW lptw, POINT *lppt);
+
+static void CreateTextClass(LPTW lptw);
+static void TextToCursor(LPTW lptw);
+static void NewLine(LPTW lptw);
 static void UpdateScrollBars(LPTW lptw);
+static void UpdateText(LPTW, int);
+static void TextPutStr(LPTW lptw, LPSTR str);
+static void LimitMark(LPTW lptw, POINT *lppt);
+static void ClearMark(LPTW lptw, POINT pt);
+static void DoLine(LPTW lptw, HDC hdc, int xpos, int ypos, int x, int y, int count);
+static void DoMark(LPTW lptw, POINT pt, POINT end, BOOL mark);
+static void UpdateMark(LPTW lptw, POINT pt);
+static void TextCopyClip(LPTW lptw);
+static void TextMakeFont(LPTW lptw);
+static void TextSelectFont(LPTW lptw);
+static int ReallocateKeyBuf(LPTW lptw);
 static void UpdateCaretPos(LPTW lptw);
 static LPSTR GetUInt(LPSTR str, uint *pval);
 
@@ -318,7 +332,7 @@ TextClose(LPTW lptw)
 
 
 /* Bring Cursor into text window */
-void WDPROC
+static void
 TextToCursor(LPTW lptw)
 {
     int nXinc=0;
@@ -442,7 +456,7 @@ UpdateScrollBars(LPTW lptw)
 
 /* Update count characters in window at cursor position */
 /* Updates cursor position */
-void
+static void
 UpdateText(LPTW lptw, int count)
 {
     HDC hdc;
@@ -610,7 +624,7 @@ LimitMark(LPTW lptw, POINT *lppt)
 }
 
 
-void
+static void
 ClearMark(LPTW lptw, POINT pt)
 {
     RECT rect1, rect2, rect3;
@@ -659,7 +673,7 @@ ClearMark(LPTW lptw, POINT pt)
 
 
 /* output a line including attribute changes as needed */
-void
+static void
 DoLine(LPTW lptw, HDC hdc, int xpos, int ypos, int x, int y, int count)
 {
     int idx, num;
@@ -719,7 +733,7 @@ DoLine(LPTW lptw, HDC hdc, int xpos, int ypos, int x, int y, int count)
 }
 
 
-void
+static void
 DoMark(LPTW lptw, POINT pt, POINT end, BOOL mark)
 {
     int xpos, ypos;
@@ -784,7 +798,7 @@ DoMark(LPTW lptw, POINT pt, POINT end, BOOL mark)
 }
 
 
-void
+static void
 UpdateMark(LPTW lptw, POINT pt)
 {
     int begin, point, end;
@@ -826,7 +840,7 @@ UpdateMark(LPTW lptw, POINT pt)
 }
 
 
-void
+static void
 TextCopyClip(LPTW lptw)
 {
     int size, count;
@@ -906,7 +920,7 @@ TextCopyClip(LPTW lptw)
 }
 
 
-void
+static void
 TextMakeFont(LPTW lptw)
 {
     LOGFONT lf;
@@ -947,7 +961,7 @@ TextMakeFont(LPTW lptw)
     return;
 }
 
-void
+static void
 TextSelectFont(LPTW lptw) {
     LOGFONT lf;
     CHOOSEFONT cf;
@@ -1098,7 +1112,7 @@ WndParentProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 
 /* PM 20011218: Reallocate larger keyboard buffer */
-int
+static int
 ReallocateKeyBuf(LPTW lptw)
 {
     int newbufsize = lptw->KeyBufSize + 16*1024; /* new buffer size */
@@ -1135,7 +1149,8 @@ ReallocateKeyBuf(LPTW lptw)
 
 
 /* update the position of the cursor */
-static void UpdateCaretPos(LPTW lptw)
+static void
+UpdateCaretPos(LPTW lptw)
 {
     if (lptw->bWrap)
 	SetCaretPos((lptw->CursorPos.x % lptw->ScreenBuffer.wrap_at) * lptw->CharSize.x - lptw->ScrollPos.x,
@@ -1997,7 +2012,8 @@ WriteTextIni(LPTW lptw)
 }
 
 /* Helper function to avoid signedness conflict --- windows delivers an INT, we want an uint */
-static LPSTR GetUInt(LPSTR str, uint *pval) 
+static LPSTR
+GetUInt(LPSTR str, uint *pval) 
 {
     INT val_fromGetInt;
 

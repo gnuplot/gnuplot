@@ -1,5 +1,11 @@
 2011-03-28  Bastian Maerkisch  <bmaerkisch@web.de>
 
+	* src/win/wgnuplib.h, src/win/wcommonh.h, src/win/wtext.c:
+	Continue to make more stuff module-local.
+	
+	* src/win/wgnuplib.h, src/win/wmenu.c: Move definition of
+	SHELL_DIR_DIALOG.
+
 	* config/config.nt: Sync with config.h created by autoconf.
 
 2011-03-26  Shigeharu Takeno  <shige@iee.niit.ac.jp>
