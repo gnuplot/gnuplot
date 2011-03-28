@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: wtext.c,v 1.31 2011/03/25 21:17:46 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: wtext.c,v 1.32 2011/03/28 10:09:41 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - win/wtext.c */
@@ -480,26 +480,18 @@ UpdateText(LPTW lptw, int count)
     SelectObject(hdc, lptw->hfont);
 
     if (lptw->bWrap) {
-	int n;
+	int n, yofs;
 	uint width = lptw->ScreenBuffer.wrap_at;
 	uint x = lptw->CursorPos.x;
 	uint y = lptw->CursorPos.y;
-	
-	for (n = count; n > 0; ) {
-	    uint num;
-	    char *outp;
 
-	    lb = sb_get(&(lptw->ScreenBuffer), y + lptw->CursorPos.x / width);
-	    assert(lb != NULL);
-	    xpos = (x % width) * lptw->CharSize.x - lptw->ScrollPos.x;
-	    ypos = (y + lptw->CursorPos.x / width) * lptw->CharSize.y - lptw->ScrollPos.y;
-	    num = min(n, width - (x % width));
-	    outp = lb_substr(lb, x % width, num);
-	    TextOut(hdc, xpos, ypos, outp, num);
-	    free(outp);
-	    n -= num;
-	    if (n > 0) y++; 
-	    x = 0;
+	/* Always draw complete lines to avoid character overlap 
+	   when using Cleartype. */
+	yofs = lptw->CursorPos.x / width; /* first line to draw */
+	n    = (lptw->CursorPos.x + count - 1) / width + 1 - yofs; /* number of lines */
+	for (; n > 0; y++, n--) {
+	    ypos = (y + yofs) * lptw->CharSize.y - lptw->ScrollPos.y;
+	    DoLine(lptw, hdc, 0, ypos, 0, y + yofs, width);
 	}
     } else {
 	lb = sb_get_last(&(lptw->ScreenBuffer));

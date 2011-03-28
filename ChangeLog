@@ -1,5 +1,9 @@
 2011-03-28  Bastian Maerkisch  <bmaerkisch@web.de>
 
+	* src/win/wtext.c: Always update complete lines of text instead
+	of drawing single characters, since character boxes might
+	overlap when using ClearType.
+
 	* docs/README: Document recent changes to Windows help.
 
 	* src/win/wgnuplib.h, src/win/wcommonh.h, src/win/wtext.c:
