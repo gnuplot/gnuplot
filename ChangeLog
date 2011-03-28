@@ -18,7 +18,7 @@
 
 	* term/gd.trm (PNG_put_text ENHGD_FLUSH gd_iconv):  Invoke the
 	SJIS/UTF8 conversion for both enhanced and non-enhanced text.
-	EAM - and collapse the share code into a subroutine.
+	EAM - and collapse the shared code into a subroutine.
 
 2011-03-26  Bastian Maerkisch  <bmaerkisch@web.de>
 
