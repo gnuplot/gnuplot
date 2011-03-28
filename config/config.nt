@@ -1,21 +1,24 @@
 /* config.h for makefile.nt
  *
  * Prepared according to config.h from ./configure and by means of
- * config_strip.sh as of gnuplot 4.3 in February 2008.
+ * config_strip.sh as of gnuplot 4.5 in March 2011.
  */
 
 
 /* Define to allow use of deprecated syntax and terminal behaviour. */
-#define BACKWARDS_COMPATIBLE 1
-
-/* Define if you want to support files in binary format. */
-#define BINARY_DATA_FILE 1
+/* #undef BACKWARDS_COMPATIBLE */
 
 /* Define if you want to use the CGI terminal under SCO. */
 /* #undef CGI */
 
 /* Define if you want online help and subtopic tables sorted by column. */
 /* #undef COLUMN_HELP */
+
+/* Define to treat spacebar like any other keystroke. */
+/* #undef DISABLE_SPACE_RAISES_CONSOLE */
+
+/* Contact address for modified and binary distributed gnuplot versions */
+/* #undef DIST_CONTACT */
 
 /* Define if you want to use libgrx20 with MSDOS/djgpp. */
 /* #undef DJSVGA */
@@ -45,7 +48,7 @@
 /* Define if you want to use a gnuplot history file. */
 #define GNUPLOT_HISTORY 1
 
-/* Define to allow command line macros. EXPERIMENTAL */
+/* Define to allow command line macros. */
 #define GP_MACROS 1
 
 /* Define if you want to use a newer version of libgrx under MSDOS/djgpp. */
@@ -75,6 +78,9 @@
 
 /* Define to 1 if you have the `doprnt' function. */
 /* #undef HAVE_DOPRNT */
+
+/* Define to 1 if you have the <editline/readline.h> header file. */
+/* #undef HAVE_EDITLINE_READLINE_H */
 
 /* Define to 1 if you have the `erf' function. */
 /* #undef HAVE_ERF */
@@ -150,6 +156,9 @@
 /* Define to 1 if you have the <libc.h> header file. */
 /* #undef HAVE_LIBC_H */
 
+/* Define if you are using the BSD editline library. */
+/* #undef HAVE_LIBEDITLINE */
+
 /* Define if you have gd library. */
 /* #undef HAVE_LIBGD */
 /* Don't change it here -- this define is set in config/makefile.nt. */
@@ -176,6 +185,12 @@
 
 /* Define to 1 if you have the <locale.h> header file. */
 #define HAVE_LOCALE_H 1
+
+/* Define if you want the lua/TikZ terminal. */
+/* #undef HAVE_LUA */
+
+/* Define to 1 if you have the <lua.h> header file. */
+/* #undef HAVE_LUA_H */
 
 /* Define to 1 if you have the <malloc.h> header file. */
 #define HAVE_MALLOC_H 1
@@ -395,14 +410,29 @@
 /* Define if this is a Linux system with SuperVGA library. */
 /* #undef LINUXVGA */
 
+/* Define to 1 if malloc(0)==0 */
+/* #undef MALLOC_ZERO_RETURNS_ZERO */
+
 /* Define if you want to use the MGR Window system. */
 /* #undef MGR */
+
+/* Define if your libreadline has no rl_ding */
+/* #undef MISSING_RL_DING */
+
+/* Define if your libreadline has no rl_force_update_display */
+/* #undef MISSING_RL_FORCED_UPDATE_DISPLAY */
+
+/* Define if your libreadline has no rl_complete_with_tilde_expansion */
+/* #undef MISSING_RL_TILDE_EXPANSION */
 
 /* Define if this is an MSDOS system. */
 /* #undef MSDOS */
 
 /* Define if you do not want to read .gnuplot in the current directory. */
 /* #undef NOCWDRC */
+
+/* Define to disable terminals that depend on code in bitmap.c */
+/* #undef NO_BITMAP_SUPPORT */
 
 /* Name of package */
 /* #undef PACKAGE */
@@ -430,6 +460,9 @@
 
 /* Define to 1 if the C compiler supports function prototypes. */
 #define PROTOTYPES 1
+
+/* Define if you want the Qt terminal. */
+/* #undef QTTERM */
 
 /* Define if you want to use the included readline function. */
 #define READLINE 1
@@ -506,7 +539,9 @@
 
 /* Define to `__inline__' or `__inline' if that's what the C compiler
    calls it, or to nothing if 'inline' is not supported under any name.  */
+#ifndef __cplusplus
 /* #undef inline */
+#endif
 
 /* Define to `int' if <sys/types.h> does not define. */
 /* #undef pid_t */

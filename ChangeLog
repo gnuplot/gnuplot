@@ -1,3 +1,7 @@
+2011-03-28  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* config/config.nt: Sync with config.h created by autoconf.
+
 2011-03-26  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* term/gd.trm (PNG_put_text ENHGD_FLUSH gd_iconv):  Invoke the
