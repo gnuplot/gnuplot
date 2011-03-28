@@ -1,3 +1,9 @@
+2011-03-28  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/plot2d.c (get_data):  Fix array bounds underflow if every
+	point in a data file is invalid.
+	Bug #3254653
+
 2011-03-28  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/win/wtext.c: Always update complete lines of text instead
