@@ -24,6 +24,7 @@ gnuplot.doc -> gnuplot.gih
             -> gnuplot.ms
             -> gnuplot.rnh
             -> gnuplot.rtf
+            -> wgnuplot.html
             -> gnuplot.tex
     	   	  	 	    		
 On Unix and MSDOS the interactive help is built into the
@@ -52,8 +53,11 @@ the file "gnuplot.ms".  For nroff, use 'make nroff'. For troff, type
 'make ms' and then 'troff -ms gnuplot.ms' in whatever way you use troff.
 For groff (on linux), use  'groff -t -e -mgs gnuplot.ms'
 
-On MS-Windows, the Microsoft help compiler converts the file "gnuplot.rtf"
-to an 'hlp' file which is used by the standard Windows help program.
+On MS-Windows, the Microsoft HTML help compiler converts the file
+"wgnuplot.html" to a 'chm' file which is used by the standard Windows
+help program. Hyperlinks and sample plots are included. Alternatively,
+the Microsoft help compiler converts the file "gnuplot.rtf" to a 'hlp'
+file.
 
 Manual entries for the terminals are not included in "gnuplot.doc";
 instead, each "driver.trm" file (in the directory /term) contains its
@@ -69,7 +73,7 @@ The printed manual generators and the html generator contain information
 about all terminals.  This is accomplished by concatenating all of the
 ".trm" files into a single one, "allterm.h".
 
-The file "termdoc.c" is used by each of the eight processing programs
+The file "termdoc.c" is used by each of the nine processing programs
 ("doc2gih.c", etc.); it #includes either "term.h" or "allterm.h", as is
 appropriate.  If you wish to override the default decision about which
 terminals are to appear in the documentation, edit the appropriate target
@@ -144,13 +148,13 @@ Backquote pairs are converted by the doc2tex program into boldface;
 
 Control characters in first column:
 ?    used by .gih format, for builtin interactive help - keyword
-0-9  used by VMS help and by doc2{tex,ms} formatters to define level,keyword
+0-9  used by VMS help and by doc2{tex,ms,html} formatters to define level,keyword
 @    used by doc2{tex,ms,rnh} to define table start/end
 #    used by doc2tex: table entry
 =    used by doc2tex: index entry
-F    used by doc2tex: embedded figure (followed by base name of the pdf file)
+F    used by doc2{tex,html}: embedded figure (followed by base name of the pdf file)
 %    used by doc2ms: table entry
-^    used by doc2html : hypertext link
+^    used by doc2{tex,html}: hypertext link / HTML code
 <    the help from the terminal driver files is inserted at this point.
 C    comment (mainly for RCS ID line)
 C#   reserved form of comment (used internally by termdoc.c)

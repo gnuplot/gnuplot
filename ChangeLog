@@ -1,5 +1,7 @@
 2011-03-28  Bastian Maerkisch  <bmaerkisch@web.de>
 
+	* docs/README: Document recent changes to Windows help.
+
 	* src/win/wgnuplib.h, src/win/wcommonh.h, src/win/wtext.c:
 	Continue to make more stuff module-local.
 	
