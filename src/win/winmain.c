@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: winmain.c,v 1.40 2011/03/20 18:47:47 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: winmain.c,v 1.41 2011/03/25 10:35:48 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - win/winmain.c */
@@ -363,8 +363,14 @@ int main(int argc, char **argv)
         textwin.shutdown = MakeProcInstance((FARPROC)ShutDown, hInstance);
         textwin.AboutText = (LPSTR)malloc(1024);
         CheckMemory(textwin.AboutText);
-        sprintf(textwin.AboutText,"Version %s\nPatchlevel %s\nLast Modified %s\n%s\n%s, %s and many others",
-                gnuplot_version, gnuplot_patchlevel, gnuplot_date, gnuplot_copyright, authors[1], authors[0]);
+        sprintf(textwin.AboutText,
+	    "Version %s patchlevel %s\n" \
+	    "last modified %s\n" \
+	    "%s\n%s, %s and many others\n" \
+	    "gnuplot home:     http://www.gnuplot.info\n",
+            gnuplot_version, gnuplot_patchlevel, 
+	    gnuplot_date,
+	    gnuplot_copyright, authors[1], authors[0]);
         textwin.AboutText = (LPSTR)realloc(textwin.AboutText, _fstrlen(textwin.AboutText)+1);
         CheckMemory(textwin.AboutText);
 
