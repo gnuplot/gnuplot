@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: wmenu.c,v 1.17 2011/03/20 18:47:47 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: wmenu.c,v 1.18 2011/03/28 10:09:41 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - win/wmenu.c */
@@ -65,7 +65,7 @@ static char *RCSid() { return RCSid("$Id: wmenu.c,v 1.17 2011/03/20 18:47:47 mar
 
 /* Choose between the directory dialog of the windows shell and
    a modified version of the "file open" dialog */
-#define SHELL_DIR_DIALOG 
+#define SHELL_DIR_DIALOG
 
 BOOL CALLBACK InputBoxDlgProc(HWND, UINT, WPARAM, LPARAM);
 
@@ -82,9 +82,10 @@ BOOL CALLBACK InputBoxDlgProc(HWND, UINT, WPARAM, LPARAM);
 #define OPEN 131
 #define SAVE 132
 #define DIRECTORY 133
-#define CMDMAX 133
+#define OPTIONS 134
+#define CMDMAX 134
 char * keyword[] = {
-	"[INPUT]", "[EOS]", "[OPEN]", "[SAVE]", "[DIRECTORY]",
+	"[INPUT]", "[EOS]", "[OPEN]", "[SAVE]", "[DIRECTORY]", "[OPTIONS]",
         "{ENTER}", "{ESC}", "{TAB}",
         "{^A}", "{^B}", "{^C}", "{^D}", "{^E}", "{^F}", "{^G}", "{^H}",
 	"{^I}", "{^J}", "{^K}", "{^L}", "{^M}", "{^N}", "{^O}", "{^P}",
@@ -92,7 +93,7 @@ char * keyword[] = {
 	"{^Y}", "{^Z}", "{^[}", "{^\\}", "{^]}", "{^^}", "{^_}",
 	NULL};
 BYTE keyeq[] = {
-	INPUT, EOS, OPEN, SAVE, DIRECTORY,
+	INPUT, EOS, OPEN, SAVE, DIRECTORY, OPTIONS,
         13, 27, 9,
         1, 2, 3, 4, 5, 6, 7, 8,
 	9, 10, 11, 12, 13, 14, 15, 16,
@@ -104,7 +105,7 @@ BYTE keyeq[] = {
 #ifdef SHELL_DIR_DIALOG
 
 /* This is missing in MingW 2.95 */
-#ifndef BIF_EDITBOX	
+#ifndef BIF_EDITBOX
 # define BIF_EDITBOX 0x0010
 #endif
 
@@ -149,32 +150,32 @@ INT CALLBACK BrowseCallbackProc(HWND hwnd, UINT uMsg, LPARAM lp, LPARAM pData)
 #endif
 
 /* My windows header files do not define these: */
-#ifndef WC_NO_BEST_FIT_CHARS      
+#ifndef WC_NO_BEST_FIT_CHARS
 #define WC_NO_BEST_FIT_CHARS      0x00000400  /* do not use best fit chars */
 #endif
 
 /* We really need this struct which is used by newer Windows versions */
-typedef struct tagOFN { 
-  DWORD         lStructSize; 
-  HWND          hwndOwner; 
-  HINSTANCE     hInstance; 
-  LPCTSTR       lpstrFilter; 
-  LPTSTR        lpstrCustomFilter; 
-  DWORD         nMaxCustFilter; 
-  DWORD         nFilterIndex; 
-  LPTSTR        lpstrFile; 
-  DWORD         nMaxFile; 
-  LPTSTR        lpstrFileTitle; 
-  DWORD         nMaxFileTitle; 
-  LPCTSTR       lpstrInitialDir; 
-  LPCTSTR       lpstrTitle; 
-  DWORD         Flags; 
-  WORD          nFileOffset; 
-  WORD          nFileExtension; 
-  LPCTSTR       lpstrDefExt; 
-  LPARAM        lCustData; 
-  LPOFNHOOKPROC lpfnHook; 
-  LPCTSTR       lpTemplateName; 
+typedef struct tagOFN {
+  DWORD         lStructSize;
+  HWND          hwndOwner;
+  HINSTANCE     hInstance;
+  LPCTSTR       lpstrFilter;
+  LPTSTR        lpstrCustomFilter;
+  DWORD         nMaxCustFilter;
+  DWORD         nFilterIndex;
+  LPTSTR        lpstrFile;
+  DWORD         nMaxFile;
+  LPTSTR        lpstrFileTitle;
+  DWORD         nMaxFileTitle;
+  LPCTSTR       lpstrInitialDir;
+  LPCTSTR       lpstrTitle;
+  DWORD         Flags;
+  WORD          nFileOffset;
+  WORD          nFileExtension;
+  LPCTSTR       lpstrDefExt;
+  LPARAM        lCustData;
+  LPOFNHOOKPROC lpfnHook;
+  LPCTSTR       lpTemplateName;
 /* #if (_WIN32_WINNT >= 0x0500) */
   void *        pvReserved;
   DWORD         dwReserved;
@@ -187,7 +188,7 @@ UINT_PTR CALLBACK OFNHookProc(HWND hdlg, UINT uiMsg, WPARAM wParam, LPARAM lPara
 {
 	switch(uiMsg) {
 	case WM_INITDIALOG: {
-		HWND parent;	
+		HWND parent;
 		parent = GetParent(hdlg);
 		/* Hint: The control codes for this can be found on MSDN */
 		/* Hide "file type" display */
@@ -253,15 +254,15 @@ UINT_PTR CALLBACK OFNHookProc(HWND hdlg, UINT uiMsg, WPARAM wParam, LPARAM lPara
 				{
 					const ULONG flags = SHGDN_NORMAL | SHGDN_FORPARSING;
 					LVITEM lvitem;
-					LPCITEMIDLIST pidl;				
+					LPCITEMIDLIST pidl;
 #if 0
-					/* The normal code to retrieve the item's text is 
-					   not very useful since user may select "hide common 
+					/* The normal code to retrieve the item's text is
+					   not very useful since user may select "hide common
 					   extensions" */
 					path = (char *)malloc(MAX_PATH+1);
 					ListView_GetItemText(list, i, 0, path, MAX_PATH );
 #endif
-					/* The following code retrieves the real path of every 
+					/* The following code retrieves the real path of every
 					   item in any case */
 					/* Retrieve PIDL of current item */
 					ZeroMemory(&lvitem,sizeof(lvitem));
@@ -281,10 +282,10 @@ UINT_PTR CALLBACK OFNHookProc(HWND hdlg, UINT uiMsg, WPARAM wParam, LPARAM lPara
 						   hr = StrRetToBuf( str, pidl, path, MAX_PATH); */
 						if (str.uType == STRRET_WSTR) {
 							unsigned wlen = wcslen(str.pOleStr);
-							wlen = WideCharToMultiByte(CP_ACP, WC_NO_BEST_FIT_CHARS, 
-														str.pOleStr, wlen+1, path, MAX_PATH, 
+							wlen = WideCharToMultiByte(CP_ACP, WC_NO_BEST_FIT_CHARS,
+														str.pOleStr, wlen+1, path, MAX_PATH,
 														NULL, NULL);
-							_wstat(str.pOleStr, &itemStat);						
+							_wstat(str.pOleStr, &itemStat);
 							/* Must free memory allocated by shell using shell's IMalloc  */
 							IMalloc_Free(pMalloc, (LPVOID)str.pOleStr);
 						} else if (str.uType == STRRET_CSTR) {
@@ -298,17 +299,17 @@ UINT_PTR CALLBACK OFNHookProc(HWND hdlg, UINT uiMsg, WPARAM wParam, LPARAM lPara
 						/* discard all non-directories from list */
 						if ((itemStat.st_mode & _S_IFDIR) == 0) {
 							ListView_DeleteItem(list, i);
-						}						
+						}
 					}
-				}  /* Enumerate listview items */							
+				}  /* Enumerate listview items */
 				IMalloc_Free(pMalloc, (void*)pidlFolder);
-			}			
+			}
 			IMalloc_Release(pMalloc);
 			break;
 			} /* CDN_FOLDERCHANGE */
 		} /* switch(hdr.code) */
 		break;
-		} /* WM_NOTIFY */			
+		} /* WM_NOTIFY */
 	}; /* switch(uiMsg) */
 	return 0;
 }
@@ -440,7 +441,7 @@ char *szFilter;
 					/* get dialog box title */
 					s++;
 					for(i=0; (*s >= 32 && *s <= 126); i++)
-						szTitle[i] = *s++;	
+						szTitle[i] = *s++;
 					szTitle[i] = '\0';
 
 					flag = 0;
@@ -461,7 +462,7 @@ char *szFilter;
 						bi.pszDisplayName = NULL;
 						bi.lpszTitle = szTitle;
 						/* BIF_NEWDIALOGSTYLE is supported by Win 2000 or later (Version 5.0)*/
-						bi.ulFlags = BIF_NEWDIALOGSTYLE | BIF_EDITBOX | 
+						bi.ulFlags = BIF_NEWDIALOGSTYLE | BIF_EDITBOX |
 									 BIF_STATUSTEXT |
 									 BIF_RETURNONLYFSDIRS | BIF_RETURNFSANCESTORS;
 						bi.lpfn = BrowseCallbackProc;
@@ -481,7 +482,7 @@ char *szFilter;
 
 							len = strlen( szPath );
 							flag = len > 0;
-							if (flag) 
+							if (flag)
 								for (i=0; i<len; i++)
 									*d++ = szPath[i];
 
@@ -524,21 +525,21 @@ char *szFilter;
 						ofn.nMaxFileTitle = MAXSTR;
 						ofn.lpstrTitle = szTitle;
 						ofn.lpstrInitialDir = (LPSTR)NULL;
-						ofn.Flags = OFN_PATHMUSTEXIST | OFN_NOVALIDATE | 
-									OFN_HIDEREADONLY | OFN_ENABLESIZING | 
+						ofn.Flags = OFN_PATHMUSTEXIST | OFN_NOVALIDATE |
+									OFN_HIDEREADONLY | OFN_ENABLESIZING |
 									OFN_EXPLORER | OFN_ENABLEHOOK;
 						ofn.lpfnHook = OFNHookProc;
 						flag = GetOpenFileName((LPOPENFILENAME)&ofn);
-				
+
 						if ((flag) && (ofn.nFileOffset >0)) {
 							unsigned int len;
-						
+
 							/* strip filename from result */
 							len = ofn.nFileOffset - 1;
-							ofn.lpstrFile[len] = '\0';			
+							ofn.lpstrFile[len] = '\0';
 							for (i=0; i<len; i++)
 								*d++ = ofn.lpstrFile[i];
-						}			
+						}
 						LocalFreePtr((void NEAR *)szFile);
 					}
 #endif /* !SHELL_DIR_DIALOG */
@@ -549,10 +550,29 @@ char *szFilter;
 							for (i=0; i<lpmw->nChar; i++)
 								*d++ = lpmw->szAnswer[i];
 						}
-					}	
+					}
 					LocalFreePtr((void NEAR *)szTitle);
 				}
 				break;
+
+		    case OPTIONS: { /* [OPTIONS] - open popup menu */
+				POINT pt;
+				RECT rect;
+				int index;
+				s++;
+				/* align popup with toolbar button */
+				index = lpmw->nButton - (lpmw->nCountMenu - m);
+				if (SendMessage(lpmw->hToolbar, TB_GETITEMRECT, (WPARAM)index, (LPARAM)&rect)) {
+					pt.x = rect.left;
+					pt.y = rect.bottom + 1;
+					ClientToScreen(lptw->hWndParent, &pt);
+				} else {
+					GetCursorPos(&pt);
+				}
+				TrackPopupMenu(lptw->hPopMenu, TPM_LEFTALIGN | TPM_TOPALIGN,
+				    pt.x, pt.y, 0, lptw->hWndParent, NULL);
+				break;
+			}
 
 		    case EOS: /* [EOS] - End Of String - do nothing */
 				default:
@@ -883,13 +903,13 @@ int ButtonIcon[BUTTONMAX];
 		goto cleanup;		/* no buttons */
 
 	/* create a toolbar */
-	lpmw->hToolbar = CreateWindowEx(0, TOOLBARCLASSNAME, "GnuplotToolbar", 
+	lpmw->hToolbar = CreateWindowEx(0, TOOLBARCLASSNAME, NULL,
 		WS_CHILD | TBSTYLE_LIST, // TBSTYLE_WRAPABLE
 		0, 0, 0, 0,
 		lptw->hWndParent, (HMENU)ID_TOOLBAR, lptw->hInstance, NULL);
 	if (lpmw->hToolbar == NULL)
 	    goto cleanup;
-	    
+
 	/* set size of toolbar icons */
 	/* lparam is (height<<16 + width) / default 16,15 */
 	SendMessage(lpmw->hToolbar, TB_SETBITMAPSIZE, (WPARAM)0, (LPARAM)((16<<16) + 16));
@@ -911,7 +931,7 @@ int ButtonIcon[BUTTONMAX];
 		button.iString = (UINT_PTR)ButtonText[i];
 		ret = SendMessage(lpmw->hToolbar, TB_INSERTBUTTON, (WPARAM)i+1, (LPARAM)&button);
 	}
-	
+
 	/* auto-resize and show */
 	SendMessage(lpmw->hToolbar, TB_AUTOSIZE, (WPARAM)0, (LPARAM)0);
 	ShowWindow(lpmw->hToolbar, TRUE);

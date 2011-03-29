@@ -1,3 +1,8 @@
+2011-03-29  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/win/wmenu.c (SendMacro), src/win/wgnuplot.mnu: Add
+	Options menu to toolbar.
+
 2011-03-28  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/plot2d.c (get_data):  Fix array bounds underflow if every
@@ -14,7 +19,7 @@
 
 	* src/win/wgnuplib.h, src/win/wcommonh.h, src/win/wtext.c:
 	Continue to make more stuff module-local.
-	
+
 	* src/win/wgnuplib.h, src/win/wmenu.c: Move definition of
 	SHELL_DIR_DIALOG.
 
@@ -64,7 +69,7 @@
 
 2011-03-22  Bastian Maerkisch  <bmaerkisch@web.de>
 
-	* src/graphics.c (do_plot, plot_points): Test wether the terminal 
+	* src/graphics.c (do_plot, plot_points): Test wether the terminal
 	actually supports set_color. Fixes crashes with terminal dumb.
 
 2011-03-21  Bastian Maerkisch  <bmaerkisch@web.de>
@@ -83,19 +88,19 @@
 
 2011-03-20  Bastian Maerkisch  <bmaerkisch@web.de>
 
-	* src/win/wgnuplib.c|h, src/win/wgraph.c, src/win/winmain.c, 
+	* src/win/wgnuplib.c|h, src/win/wgraph.c, src/win/winmain.c,
 	src/win/wmenu.c, src/win/wpause.c, src/win/wtext.c: FAR pointers are
 	no longer required.
 
 	* src/win/winmain.c (WinExit): Explicitly close help window on exit.
-	Fixes hangs of gnuplot when it is closed via the Windows taskbar 
+	Fixes hangs of gnuplot when it is closed via the Windows taskbar
 	and help window	and graph window open.
 
 	* src/win/wmenu.c (LoadMacros), src/win/wgnuplot.mnu ([Button]): Add
 	icons to the text-window toolbar.
 
 	* docs/windows/doc2html.c (process_line): Don't include '=' items in
-	index. This avoids duplicate entries which caused wgnuplot to stall 
+	index. This avoids duplicate entries which caused wgnuplot to stall
 	when an e.g. 'set term png; help "png"' was issued.
 
 2011-03-18  Bastian Maerkisch  <bmaerkisch@web.de>
@@ -110,9 +115,9 @@
 	* term/gd.trm (PNG_init): On Windows, set GDFONTPATH to %windir%\Fonts
 	if not set previously.
 
-	* src/plot.c (main), src/win/winmain.c (WinMain, WinExt): Always use 
-	the ANSI codepage (instead of OEM) to ensure sure that the console 
-	of gnuplot.exe and the graph window use the same codepage. Warn 
+	* src/plot.c (main), src/win/winmain.c (WinMain, WinExt): Always use
+	the ANSI codepage (instead of OEM) to ensure sure that the console
+	of gnuplot.exe and the graph window use the same codepage. Warn
 	users that raster fonts won't display all characters correctly and
 	restore the codepage on exit.
 
@@ -123,14 +128,14 @@
 
 2011-03-16  Bastian Maerkisch  <bmaerkisch@web.de>
 
-	* src/win/wgraph.c (UnicodeText): new function to convert a string 
+	* src/win/wgraph.c (UnicodeText): new function to convert a string
 	to UTF-16
 
-	* src/win/wgraph.c (drawgraph, GraphGetTextLength) NEWS: support 
+	* src/win/wgraph.c (drawgraph, GraphGetTextLength) NEWS: support
 	"set encoding" for all currently defined encodings
 
 	* src/win/wtext.c (ReadTextIni): select default font according to
-	the Windows version. Avoid font "Terminal" since it might not 
+	the Windows version. Avoid font "Terminal" since it might not
 	contain all glyphs of the current character set.
 
 	* src/win/wgnuplib.h, src/win/wgraph.c, term/win.trm: use child
@@ -157,14 +162,14 @@
 
 	* src/win/wgnuplot.rc, src/win/wgnuplot.exe.manifest: add new
 	manifest for wgnuplot to enable visual styles
-	
+
 	* src/win/wmenu.c, src/win/wtext.c: remove unused variables to
 	make compiler happy, avoid C++ style comments
-	
+
 	* src/win/wtext.c (TextInit), src/win/wmenu.c, src/win/wgnuplib.h,
 	src/win/wresourc.h: add a statusbar to the text window,
 	reduce size of text area accordingly
-	
+
 	* src/win/wtext.c (WndParentProc): [WM_GETMINMAXINFO] use active
 	font to calculate minimum window size; take menu, toolbar and
 	statusbar into account
@@ -207,9 +212,9 @@
 	* src/makefile.nt: implement suggestions by Shigeharu Takeno:
 	Do not use "+=" to be compatible with Visual C++ 2005; add/update
 	links wo libgd and wxWidgets; add a scheme to easily select options
-	[GDLIB, PDFLIB, WXT]; use linker option files for compilation of 
+	[GDLIB, PDFLIB, WXT]; use linker option files for compilation of
 	wgnuplot.exe and gnuplot.exe
-	
+
 2011-03-11  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* configure.in: Check for iconv library and iconv.h, since gd uses iconv
@@ -237,15 +242,15 @@
 
 	* src/command.c (test_palette): tmpfile() always fails on a modern
 	Windows. Open a file in the user's temp directory instead.
-	
+
 	* src/win/winmain.c (WinExit): add missing void parameter
 
 	* src/win/wgraph.c (drawgraph): add missing init
-	
+
 2011-03-09  Bastian Maerkisch  <bmaerkisch@web.de>
 
-	* config/makefile.nt: add chm help (update of SF patch 3191892 by 
-	Shigeharu Takeno), (HCWPATH, HHWPATH) use PROGRAMFILES variable 
+	* config/makefile.nt: add chm help (update of SF patch 3191892 by
+	Shigeharu Takeno), (HCWPATH, HHWPATH) use PROGRAMFILES variable
 	instead of hard coded path
 
 2011-03-08  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
@@ -331,17 +336,17 @@
 
 	* docs/xref.c (refs): Only emit start and stop strings if we
 	write any items at all.
-	
+
 	Request by Mojca Miklavec
 	* docs/windows/doc2html.c: Include list of subtopics. Optionally
 	use hard links instead of index lookup (HTML_HARDLINKS).
-	
+
 	Feature Request #874572
-	* term/win.trm src/win/wgraph.c src/win/wgnuplib.h 
-	src/win/wresourc.h: Add double buffering to the windows terminal 
+	* term/win.trm src/win/wgraph.c src/win/wgnuplib.h
+	src/win/wresourc.h: Add double buffering to the windows terminal
 	to avoid flicker on redraw. Add a poor man's version of antialiasing:
 	draw on a bitmap twice the size of the window on screen, then
-	scale down using halftone mode. Both settings are optional and can 
+	scale down using halftone mode. Both settings are optional and can
 	be changed via the `graph-menu` and `wgnuplot.ini`.
 
 2011-02-26  Ethan A Merritt  <merritt@u.washington.edu>
@@ -666,12 +671,12 @@
 
 2011-01-01  Peter Juhasz  <juhaszp@users.sourceforge.net>
 
-	* src/eval.c src/internal.c src/internal.h: 
+	* src/eval.c src/internal.c src/internal.h:
 	New time() function to get the current system time
-	
+
 	* docs/gnuplot.doc demo/timedat.dem:
 	Documentation and demo for time()
-	
+
 2010-12-29  Daniel Sebald  <daniel.sebald@ieee.org>
 
 	* src/specfun.c (ranf):  Place more restrictions on seed values
@@ -697,7 +702,7 @@
 2010-12-17  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* term/win.trm: (WIN_point WIN_filled_polygon):
-	Always draw point symbols using a solid line, even if the current 
+	Always draw point symbols using a solid line, even if the current
 	line type is dashed.  Unfortunately this fix is limited to monochrome
 	mode.
 	Bug #1952364
@@ -751,7 +756,7 @@
 
 2010-12-06  Ethan A Merritt  <merritt@u.washington.edu>
 
-	* src/fit.x (fit_command): Do not use axis_array[SECOND_Z_AXIS] as 
+	* src/fit.x (fit_command): Do not use axis_array[SECOND_Z_AXIS] as
 	temporary storage, because leaving junk in it can cause an erroneous
 	free() operation later on.
 	Bug #3130115
@@ -769,7 +774,7 @@
 	* src/pm3d.c (pm3d_depth_queue_flush): Restore deleted code needed for
 	extended color support.  (There are still some svga users after all!)
 
-	* term/emf.trm: 
+	* term/emf.trm:
 	Use the EMR_ELLIPSE primitive to draw point types 6 and 7.
 	Make point types 4 and 5 slightly larger (looks better on MSWin).
 	Switch to using linecap=flat and linejoin=miter by default,
@@ -783,7 +788,7 @@
 2010-11-28  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/gadgets.c src/gadgets.h src/graphics.c demo/dashcolor.dem:
-	Fix breakage to the pointinterval property that was caused by 
+	Fix breakage to the pointinterval property that was caused by
 	opaque key support.  Add a demo plot illustrating pointinterval.
 
 2010-11-26  Ethan A Merritt  <merritt@u.washington.edu>
@@ -799,8 +804,8 @@
 	Move all global variables into a single object "gnuplot" declared in
 	gnuplot_common.js.  This revision also adds polar mode mousing support.
 
-	* demo/html/Makefile.canvas demo/html/index.canvas 
-	demo/html/mouseable.dem demo/html/mousebox.template 
+	* demo/html/Makefile.canvas demo/html/index.canvas
+	demo/html/mouseable.dem demo/html/mousebox.template
 	demo/html/webify_canvas.pl:
 	Revamp the demos and build scripts to use the new javascript syntax.
 
@@ -818,7 +823,7 @@
 
 2010-11-20  Casey Carter   <ctcarter@users.sourceforge.net>
 
-	* demo/html/index.canvas demo/html/index.save demo/html/index.svg 
+	* demo/html/index.canvas demo/html/index.save demo/html/index.svg
 	term/canvas.trm:  syntax error in link record of standalone mode.
 
 2010-11-18  Ethan A Merritt  <merritt@u.washington.edu>
@@ -828,7 +833,7 @@
 	src/show.c src/tables.c src/tables.h src/unset.c
  	demo/polar.dem demo/poldat.dem docs/gnuplot.doc:
 
-	Improved support for polar coordinate mode. 
+	Improved support for polar coordinate mode.
 	The polar axis gets syntax and properties equivalent to the x/y/z axes.
 	- set/unset raxis (always drawn through the origin)
 	- set rrange controls the extent of the axes and of the plot itself;
@@ -854,7 +859,7 @@
 	clip_line() at the time that needed the variant test, but if so they no
 	longer exist.  There is now only one other caller of clip_line().
 	Restore the test to the version that is correct for draw_clip_line().
-	
+
 	* src/graphics.c (place_grid xtick2d_callback plot_impulses)
 	src/term.c (do_arrow): Simplify these routines to use draw_clip_line().
 
@@ -888,7 +893,7 @@
 	Previously, commands like "set logscale tuv" were silently accepted,
 	leading to strange internal state.
 
-	* src/plot2d.c:  Issue an error message if the user tries to plot in 
+	* src/plot2d.c:  Issue an error message if the user tries to plot in
 	polar mode with a style that is not supported.
 	Bug #3072150
 
@@ -899,17 +904,17 @@
 
 2010-11-07  Peter Juhasz  <juhaszp@users.sourceforge.net>
 
-	* src/datafile.c (df_readascii): The "labels" style did not work with 
-	pseudocolumns (e.g. "using 1:2:0"). Now it correctly handles pseudocolumns 
+	* src/datafile.c (df_readascii): The "labels" style did not work with
+	pseudocolumns (e.g. "using 1:2:0"). Now it correctly handles pseudocolumns
 	0, -1, -2.
-	
-	* term/cairo.trm: Documentation fix: the section on the default size 
+
+	* term/cairo.trm: Documentation fix: the section on the default size
 	for the pngcairo terminal was incorrect.
 
 2010-11-06  Peter Juhasz  <juhaszp@users.sourceforge.net>
 
 	* src/plot3d.c src/plot3d.h src/set.c src/show.c src/save.c
-	docs/gnuplot.doc demo/kdensity2d.dem: New option "kdensity2d" for 
+	docs/gnuplot.doc demo/kdensity2d.dem: New option "kdensity2d" for
 	"set dgrid3d" to create two-dimensional kernel density plots.
 
 2010-11-03  Shigeharu Takeno  <shige@iee.niit.ac.jp>
@@ -948,7 +953,7 @@
 	* src/plot2d.c (eval_plots):  fillcolor was not taking into account
 	user-defined linetypes.
 
-	* src/plot3d.c src/misc.c:  Simplify calls to load_linetype() 
+	* src/plot3d.c src/misc.c:  Simplify calls to load_linetype()
 
 	* lisp/gnuplot.el: Emacs 24 does not have make-local-hook
 	contributed patch #3095458
@@ -961,7 +966,7 @@
 
 	* configure.in: The AC_CHECK_LIB macro apparently always appends
 	to LIBS (despite what the documentation says). We want to accummulate
-	readline-associated libraries in TERMLIBS rather than LIBS, 
+	readline-associated libraries in TERMLIBS rather than LIBS,
 	so save and restore LIBS around the checks.
 
 2010-10-21  Ethan A Merritt  <merritt@u.washington.edu>
@@ -992,7 +997,7 @@
 
 2010-10-14  Ethan A Merritt  <merritt@u.washington.edu>
 
-	* src/axis.c (gen_tics): A smart (or maybe that's dumb) compiler may 
+	* src/axis.c (gen_tics): A smart (or maybe that's dumb) compiler may
 	optimize out our tests for step size less that the machine precision.
 	Try to forestall this by marking the steps as (float)(volatile double).
 	Bug #3085168
@@ -1019,7 +1024,7 @@
 	command string at the first semicolon before passing it to lua.
 
 	* src/fit.c src/fit.h src/set.c docs/gnuplot.doc:
-	New option "set fit quiet" prevents fit information sent to the log 
+	New option "set fit quiet" prevents fit information sent to the log
 	file from being echoed also to stderr.
 	Bug #2355210
 
@@ -1079,7 +1084,7 @@
 	Up until now, `set palette maxcolors N` meant both "allocate N colors"
 	and "divide the color range into N equal parts".  This meant that a
 	user-defined palette that used unequal divisions of the total range
-	interacted badly with a limited number of palette colors.  Now we 
+	interacted badly with a limited number of palette colors.  Now we
 	guarantee that in the case of defined palette ranges, a gray value is
 	never mapped to a color outside its proper range even if the ranges
 	are very unevenly spaced.  If more color ranges are defined than the
@@ -1089,14 +1094,14 @@
 
 	* configure.in src/datafile.c src/eval.c src/plot.c src/show.c
 	term/lua.trm:  Remove conditional flag HAVE_ISNAN.
-	Apparently we have been getting along OK with an unprotected call 
-	to isnan() since Oct 2009.  That would seem to be good evidence 
+	Apparently we have been getting along OK with an unprotected call
+	to isnan() since Oct 2009.  That would seem to be good evidence
 	that we can remove the #ifdef protection elsewhere as well.
 
 2010-09-30  Peter Juhasz  <juhaszp@users.sourceforge.net>
 
 	* src/plot2d.c (store_label eval_plots): Fix bug introduced by my patch
-	of 2010-09-08 (references to uninitialized variables were found by 
+	of 2010-09-08 (references to uninitialized variables were found by
 	valgrind).
 
 2010-09-29  Ethan A Merritt  <merritt@u.washington.edu>
@@ -1117,7 +1122,7 @@
 	* src/graphics.c (plot_image_or_update_axes): Add support for log-scale
 	transformation of 2D image data.
 
-	* src/hidden3d.c: Disentangle variable color from the direction of 
+	* src/hidden3d.c: Disentangle variable color from the direction of
 	arrows.  Bug #3074212
 
 2010-09-28  Volker Dobler  <vdobler@users.sourceforge.net>
@@ -1134,7 +1139,7 @@
 
 2010-09-27  Peter Juhasz  <juhaszp@users.sourceforge.net>
 
-	* src/datafile.c (f_stringcolumn): The stringcolumn function didn't 
+	* src/datafile.c (f_stringcolumn): The stringcolumn function didn't
 	recognize columns 0, -1, and -2. Now it treats them the same as the
 	column function does.
 
@@ -1204,7 +1209,7 @@
 
 2010-09-16  Ethan A Merritt  <merritt@u.washington.edu>
 
-	* tutorial/eg2.plt tutorial/eg6.plt tutorial/test_tikz.plt 
+	* tutorial/eg2.plt tutorial/eg6.plt tutorial/test_tikz.plt
 	tutorial/Makefile.am.in tutorial/header.tex tutorial/tutorial.tex:
 	Update the LaTeX tutorial a bit.  More could be done.
 
@@ -1212,13 +1217,13 @@
 
 	* src/graph3d.c src/graph3d.h src/mouse.c src/set.c src/unset.c:
 	Switch the middle button left/right mouse zoom behaviour in 3D plots
-	so that the zoom response is logarithmic.  
+	so that the zoom response is logarithmic.
 
 2010-09-15  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* term/gd.trm:  As of libgd 2.0.36 you can now specify a TrueType font
 	using either Fontconfig syntax or using the font file name directly.
-	But switching from one form to the other was only possible as an 
+	But switching from one form to the other was only possible as an
 	option of "set terminal".  This patch enables us to specify these two
 	forms of the font name in "set title", "set xlabel", and so on.
 
@@ -1231,7 +1236,7 @@
 	Bug #1603348 and others
 
 	* term/latex.trm term/lua.trm term/pslatex.trm: Set flag TERM_IS_LATEX
-	so that strings passed to these terminals are sent to strlen_tex() 
+	so that strings passed to these terminals are sent to strlen_tex()
 	rather than the normal enhanced text string length estimation.
 
 2010-09-10  Ethan A Merritt  <merritt@u.washington.edu>
@@ -1259,9 +1264,9 @@
 	for LABELPOINTS style by allowing "with labels tc X lc Y" where X, Y is
 	one of "lc variable", "lc palette z", or "lc rgb variable".
 
-	* src/misc.c (lp_parse): Revert the patch of 2010-07-08 because 
+	* src/misc.c (lp_parse): Revert the patch of 2010-07-08 because
 	it accidentally disabled the coloring option "lc N".
-	* src/graph3d.c (key_sample_line_pm3d key_sample_point_pm3d): 
+	* src/graph3d.c (key_sample_line_pm3d key_sample_point_pm3d):
 	More correct fix to bug #3026477: the functions above failed to call
 	the simpler key sample routines in case of plots with coloring option
 	"lc N" and "lc rgb 'color'".
@@ -1319,7 +1324,7 @@
 2010-08-13  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/ansichek.h src/gplt_x11.c src/plot.c src/readline.c src/show.c
-	src/stdfn.h src/syscfg.h term/x11.trm:  Remove conditional code for 
+	src/stdfn.h src/syscfg.h term/x11.trm:  Remove conditional code for
 	another obsolete platform (OSK/OS9, used for example on TRS-80).
 
 2010-08-12  Ethan A Merritt  <merritt@u.washington.edu>
@@ -1366,7 +1371,7 @@
 	missing function in configure and deal with it if it's missing.  There
 	may still be an issue with autoconfiguring support for the history
 	functions.
-	Bug #1839048 and others 
+	Bug #1839048 and others
 
 2010-07-30  Ethan A Merritt  <merritt@u.washington.edu>
 
@@ -1475,9 +1480,9 @@
 
 2010-07-07  Ethan A Merritt  <merritt@u.washington.edu>
 
-	* term/PostScript/prologue.ps:  Add a default definition 
+	* term/PostScript/prologue.ps:  Add a default definition
 	    /g {setgray} def
-	so that a missing palette initialization will result in normal 
+	so that a missing palette initialization will result in normal
 	grayscale rather than an invalid PostScript file.
 	Bug #3026477
 
@@ -1505,9 +1510,9 @@
 	like any other binary value.
 	Thanks to Thomas Sefzick for pointing this out.
 
-	* src/datafile.c (df_readbinary): In binary mode, string-valued 
+	* src/datafile.c (df_readbinary): In binary mode, string-valued
 	functions were silently ignored.  Fix this, thus allowing binary files
-	to be plotted "with labels".  For example: 
+	to be plotted "with labels".  For example:
 	plot 'foo' binary format='%double' using 0:1:("A") with labels
 
 2010-07-01  Ethan A Merritt  <merritt@u.washington.edu>
@@ -1516,14 +1521,14 @@
 	src/internal.c src/time.c:
 
 	Track time coordinates to sub-second precision.
-	
+
 	Time data read using the %S format specifier in "set timefmt" is now
 	treated as a floating point number rather than an integer. This affects
 	data read from an input file ("set xdata time"), the axis range and tic
 	locations given for an axis using time coordinates ("set xrange",
 	"set xtics"), and time conversions performed via calls to strptime().
 
-	Time data output formats ("set format" strftime()) now accept a 
+	Time data output formats ("set format" strftime()) now accept a
 	precision modifier to the %S format. For example, "%H:%M:%.3S" will
 	print hour, minute, seconds to a precision of milliseconds.
 	gnuplot> print strftime("%Y %D %H:%M:%.3S", 12345.6789)
@@ -1562,7 +1567,7 @@
 
 	* src/color.h: New flag TC_VARIABLE (only used for textcolor)
 
-	* src/misc.c (parse_colorspec) src/set.c (set_key) 
+	* src/misc.c (parse_colorspec) src/set.c (set_key)
 	src/graphics.c (do_key_sample):  Accept "set key tc variable"
 
 2010-06-27  Peter Juhasz
@@ -1633,17 +1638,17 @@
 
 	* src/misc.c (need_fill_border): The fillstyle border color was not
 	taking account of linetype redefinitions.
-	
+
 2010-05-30  Ethan A Merritt  <merritt@u.washington.edu>
-	
+
 	* docs/gnuplot.doc:  Document recently added %s time format
 	(seconds since start of 2000).
 
 2010-05-24  Ethan A Merritt  <merritt@u.washington.edu>
-	
+
 	* src/graph3d.c (do_3dplot):  Remove a restriction that limited depth-
 	sorting of pm3d surfaces to those which were adjacent in the splot
-	command.  If there was a reason for the original restriction, that 
+	command.  If there was a reason for the original restriction, that
 	reason is now not remembered.
 	Bug #3004793
 
@@ -1751,7 +1756,7 @@
 2010-04-20  John Naylon  <jpbn@users.sourceforge.net>
 
 	* src/gp_types.h src/interpol.c src/plot2d.c src/tables.c
-	docs/gnuplot.doc: New option "smooth cnormal", equivalent to 
+	docs/gnuplot.doc: New option "smooth cnormal", equivalent to
 	"smooth cummulative" with automatic normalization to the range
 	[0:1].
 
@@ -1788,7 +1793,7 @@
 2010-03-22  Ethan A Merritt  <merritt@u.washington.edu
 
 	* src/misc.c (lp_parse): Re-write the lp_parse() routine to prevent the
-	loading of a user-defined linetype from undoing other linestyle 
+	loading of a user-defined linetype from undoing other linestyle
 	properties given earlier in the same command.
 
 	* src/util3d.h src/util3d.c (draw3d_line_unconditional)
@@ -1827,7 +1832,7 @@
 	term/pdf.trm term/post.h term/post.trm term/wxt.trm:
 
 	New terminal option "fontscale <scale>".  This scale factor is applied
-	to the nominal font size before use, so that you can scale the font 
+	to the nominal font size before use, so that you can scale the font
 	size up or down in parallel with scaling the output page up or down.
 	This is mostly relevant for hardcopy output or embedded figures.
 
@@ -1841,7 +1846,7 @@
 	src/plot.c src/scanner.c src/stdfn.c src/stdfn.h src/syscfg.h src/term.c
 	src/term.h src/variable.c term/amiga.trm:
 
-	Remove code specific to amiga platforms. 
+	Remove code specific to amiga platforms.
 	30 files changed, 43 insertions(+), 1941 deletions(-)
 
 	* config/makefile.dj2 config/makefile.unx config/term_pc.h
@@ -1958,7 +1963,7 @@
 2010-02-24  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/cgm.trm (find_nearest_color):  When looking for RGB colors, check
-	both the user-loaded colors and the default set of colors.  Otherwise 
+	both the user-loaded colors and the default set of colors.  Otherwise
 	RGB fails if the user has loaded no colors.
 
 	* term/gd.trm:  Documentation for the mechanism for setting line colors
@@ -1969,7 +1974,7 @@
 2010-02-23  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/specfun.c (ibeta) docs/gnuplot.doc:
-	The approximation used for the function ibeta(a,b,x) was taken from 
+	The approximation used for the function ibeta(a,b,x) was taken from
 	Abramowitz & Stegun. However we failed to document that it is only
 	usable on the domain x < (a-1)/(a+b-2).  Add this warning to the docs
 	and make sure that the function itself returns a consistant error
@@ -1978,7 +1983,7 @@
 
 2010-02-22  Don Taber  <dtaber@topaflyers.com>
 
-	* src/win/wgraph.c (SelFont):  After a font change, call 
+	* src/win/wgraph.c (SelFont):  After a font change, call
 	do_string_replot("") so that it is immediately visible.
 
 2010-02-18  Ethan A Merritt  <merritt@u.washington.edu>
@@ -1986,7 +1991,7 @@
 	* term/svg.trm: Use dynamic allocation for all font names. This prevents
 	buffer overflow problems for very long font names.
 
-	* term/post.trm: Truncate over-long font names rather than allowing 
+	* term/post.trm: Truncate over-long font names rather than allowing
 	buffer overflow.
 
 2010-02-17  Christoph Junghans (ottxor)
@@ -2040,14 +2045,14 @@
 	* src/win/wgraph.c src/win/wresourc.h: Add the possibility to
 	save the current graph window as EMF file. Add a Ctrl+S shortcut for
 	the graph window and add an entry to the window's system menu.
-	
+
 	* term/win.trm: Update documentation accordingly.
 
 2010-02-15  Benjamin Lindner  <lindnerb@users.sourceforge.net>
 
 	* src/win/wgraph.c: Update code to copy to clipboard as enhanced
 	metafile, add Ctrl+C shortcut for graph window.
-	
+
 	* term/win.trm: Update documentation accordingly.
 
 2010-02-15  Ethan A Merritt  <merritt@u.washington.edu>
@@ -2063,7 +2068,7 @@
 
 2010-02-11  Ethan A Merritt  <merritt@u.washington.edu>
 
-	* src/graphics.c (plot_boxes): Amazingly old bug that fails to apply 
+	* src/graphics.c (plot_boxes): Amazingly old bug that fails to apply
 	absolute boxwidth in the case where previous point was undefined.
 
 2010-02-10  Shigeharu Takeno  <shige@iee.niit.ac.jp>
@@ -2205,7 +2210,7 @@
 	initialize all fields.
 	Bug #2930705
 
-	* src/plot2d.c (store2d_point): steps, fsteps, and histeps were 
+	* src/plot2d.c (store2d_point): steps, fsteps, and histeps were
 	incorrectly auto-scaling to yhigh (which is really variable color).
 	Bug #2929314
 
@@ -2273,7 +2278,7 @@
 	New command:
 		set linetype N {various line properties}
 		set linetype cycle M
-	
+
 	The new line colors and widths can be set to cycle after going through
 	M linetypes.  E.g. for M=8, the color of linetypes 9, 17, 25 ... are the
 	same as that of linetype 1.
@@ -2322,7 +2327,7 @@
 
 	* src/tabulate: Fix buffer overflow.
 
-	* configure.in:  The cross-compilation patch causes a recursive 
+	* configure.in:  The cross-compilation patch causes a recursive
 	definition of CC in docs/Makefile.  I have attempted to fix this by
 	revising the definition of CC_FOR_BUILD, but I don't know if this
 	will break cross-compilation again.
@@ -2374,7 +2379,7 @@
 2009-12-12  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* docs/plotstyles.gnu demo/bldg.png demo/barchart_art.dem Makefile.am.in
-	New demo showing 
+	New demo showing
 	a) input of png image using binary filetype=png
 	b) rescaling rectangular images to act as plot elements
 
@@ -2502,7 +2507,7 @@
 2009-10-31  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/plot.h src/util.h:  Tell gcc that routines bail_to_command_line(),
-	int_error(), graph_error(), and os_error() do not return. 
+	int_error(), graph_error(), and os_error() do not return.
 	#ifdef __GNUC__ ...  __attribute__((noreturn));
 	This avoids spurious warnings about uninitialized variables from
 	call sites like:
@@ -2516,7 +2521,7 @@
 	* src/command.c, src/command.h (do_string, do_string_and_free):
 	Use to different functions depending on whether the command string has
 	to be freed.  Don't reset screen_ok.
-	
+
 	* src/command.c, src/command.h (do_string_replot), src/fit.c
 	(fit_interrupt): Use do_string() instead of do_line().
 

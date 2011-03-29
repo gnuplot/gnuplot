@@ -22,7 +22,7 @@
 	&Printer Output
 		set output "PRN"{ENTER}
 	&Window Output
-		 set output{ENTER}set terminal win{ENTER} 
+		 set output{ENTER}set terminal win{ENTER}
 	Show Output
 		show output{ENTER}
 	Ou&tput Device ...
@@ -73,9 +73,9 @@
 [Menu]
 &Plot
 	Plot
-		plot 
+		plot
 	3D Plot
-		splot 
+		splot
 	Replot
 		replot{ENTER}
 	Clear device
@@ -112,7 +112,7 @@
 		Fsteps
 			with fsteps
 		Histeps
-			with histeps		
+			with histeps
 	[EndMenu]
 	[Menu]
 	with Style (compound)
@@ -150,7 +150,7 @@
 [Menu]
 &Expressions
 	Evaluate
-		print 
+		print
 	Complex number ...
 		{[INPUT]Real part?[EOS],[INPUT]Imaginary part?[EOS]}
 	[Menu]
@@ -273,7 +273,7 @@ Fu&nctions
 	[EndMenu]
 	[Menu]
 	Special
-		error 
+		error
 			erf([INPUT]Argument[EOS])
 		error c
 			erfc([INPUT]Argument[EOS])
@@ -744,3 +744,6 @@ Fu&nctions
 [Button]
 	Next;16
 		{^N}
+[Button]
+	Options;10
+		[OPTIONS]
