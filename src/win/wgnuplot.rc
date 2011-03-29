@@ -1,3 +1,4 @@
+#define WINVER 0x0410
 #include <windows.h>
 #include "wgnuplib.rc"
 

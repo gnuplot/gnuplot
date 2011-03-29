@@ -1,5 +1,5 @@
 /*
- * $Id: wresourc.h,v 1.11 2011/03/14 20:01:30 markisch Exp $
+ * $Id: wresourc.h,v 1.12 2011/03/18 09:41:45 markisch Exp $
  */
 
 /* GNUPLOT - win/wresourc.h */
@@ -40,10 +40,6 @@
  *   Maurice Castro
  *   Russell Lang
  */
-
-#ifndef DS_3DLOOK
-#define DS_3DLOOK 0x0004L
-#endif
 
 /* This contains items internal to wgnuplot.dll
    that are used by the Resource Compiler */
