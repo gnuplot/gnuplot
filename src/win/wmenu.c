@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: wmenu.c,v 1.18 2011/03/28 10:09:41 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: wmenu.c,v 1.19 2011/03/29 15:29:16 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - win/wmenu.c */
@@ -83,9 +83,11 @@ BOOL CALLBACK InputBoxDlgProc(HWND, UINT, WPARAM, LPARAM);
 #define SAVE 132
 #define DIRECTORY 133
 #define OPTIONS 134
-#define CMDMAX 134
+#define ABOUT 135
+#define CMDMAX 135
 char * keyword[] = {
-	"[INPUT]", "[EOS]", "[OPEN]", "[SAVE]", "[DIRECTORY]", "[OPTIONS]",
+	"[INPUT]", "[EOS]", "[OPEN]", "[SAVE]", "[DIRECTORY]",
+	"[OPTIONS]", "[ABOUT]",
         "{ENTER}", "{ESC}", "{TAB}",
         "{^A}", "{^B}", "{^C}", "{^D}", "{^E}", "{^F}", "{^G}", "{^H}",
 	"{^I}", "{^J}", "{^K}", "{^L}", "{^M}", "{^N}", "{^O}", "{^P}",
@@ -93,7 +95,8 @@ char * keyword[] = {
 	"{^Y}", "{^Z}", "{^[}", "{^\\}", "{^]}", "{^^}", "{^_}",
 	NULL};
 BYTE keyeq[] = {
-	INPUT, EOS, OPEN, SAVE, DIRECTORY, OPTIONS,
+	INPUT, EOS, OPEN, SAVE, DIRECTORY,
+	OPTIONS, ABOUT,
         13, 27, 9,
         1, 2, 3, 4, 5, 6, 7, 8,
 	9, 10, 11, 12, 13, 14, 15, 16,
@@ -573,6 +576,11 @@ char *szFilter;
 				    pt.x, pt.y, 0, lptw->hWndParent, NULL);
 				break;
 			}
+
+		    case ABOUT: /* [ABOUT] - display About box */
+				s++;
+				SendMessage(lptw->hWndText, WM_COMMAND, M_ABOUT, (LPARAM)0);
+				break;
 
 		    case EOS: /* [EOS] - End Of String - do nothing */
 				default:
