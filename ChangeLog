@@ -1,7 +1,7 @@
 2011-03-30  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* term/gd.trm: Don't try to reuse names of gd font pointers for
-	local variables. Fixes build with MinGW and 
+	local variables. Fixes build with MinGW and DLL version of libgd.
 
 	* config/mingw/Makefile: Optionally, use pre-built DLL version
 	of libgd. Use environment variable PROGRAMFILES to access help

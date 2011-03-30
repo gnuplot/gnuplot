@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: gd.trm,v 1.154 2011/03/18 11:29:45 markisch Exp $
+ * $Id: gd.trm,v 1.156 2011/03/26 20:03:16 sfeam Exp $
  * based on gif.trm,v 1.26.2.1 2000/05/01 00:17:20 joze
  */
 
@@ -199,11 +199,12 @@ BGD_EXPORT_DATA_PROT gdFontPtr gdFontMediumBold;	/* 7x13 */
 BGD_EXPORT_DATA_PROT gdFontPtr gdFontGiant;  /* 9x15 */
 BGD_EXPORT_DATA_PROT gdFontPtr gdFontTiny;  /* 5x8 */
 #else
-static gdFontPtr gdFontSmall;	/* 6x12 */
-static gdFontPtr gdFontLarge;	/* 8x16 */
-static gdFontPtr gdFontMediumBold;	/* 7x13 */
-static gdFontPtr gdFontGiant;  /* 9x15 */
-static gdFontPtr gdFontTiny;  /* 5x8 */
+static gdFontPtr gp_gdFonts[5];
+#define gdFontSmall gp_gdFonts[0]
+#define gdFontLarge gp_gdFonts[1]
+#define gdFontMediumBold gp_gdFonts[2]
+#define gdFontGiant gp_gdFonts[3]
+#define gdFontTiny gp_gdFonts[4]
 #endif
 
 #define GREG_XMAX 640
