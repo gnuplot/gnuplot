@@ -1,5 +1,5 @@
 # Hello, emacs: this is a -*- Makefile -*-
-# $Id: Makefile,v 1.4 2011/03/13 12:15:56 markisch Exp $
+# $Id: Makefile,v 1.5 2011/03/26 13:23:14 markisch Exp $
 #
 # GNUPLOT Makefile for MinGW32 on Win95/98/NT/2k/..
 # This assumes usual installation of the MinGW32 toolkit, the free
@@ -55,11 +55,12 @@ HTML_HELP=1
 # In some cases, libfreetype can depend on additional libraries such as
 # fontconfig or iconv; then, uncomment GDAUTOCONFIGLIBS so that all of the
 # libraries needed for linking will be taken by running 'gdlib-config'.
-#
+# Uncomment BGD if you want to use the binary DLL version of libgd.
 #NEWGD=1
 #JPEG=1
 #FREETYPE=1
 #GDAUTOCONFIGLIBS=1
+#BGD=1
 
 # PDF device driver
 # Requires PNG and Z libraries based on particular PDF library used, and
@@ -127,7 +128,7 @@ DESTDIR = /local/opt/gnuplot-4.5
 # Do you want some special optimization?
 # -mpentium means optimise for Pentium processor
 # -mpentiumpro means optimize for Pentium II and Pro procesors
-CFLAGS =
+#CFLAGS =
 
 ifdef HTML_HELP
 
@@ -136,7 +137,7 @@ ifdef HTML_HELP
 # http://go.microsoft.com/fwlink/?LinkId=154968
 # We need to explicitly set the correct path here since we also need
 # adjust the include and linrary paths.
-HHWPATH = /c/Program\ Files/HTML\ Help\ Workshop/
+HHWPATH = "$(PROGRAMFILES)/HTML Help Workshop/"
 HHC = $(HHWPATH)hhc
 
 else
@@ -146,7 +147,7 @@ else
 # ftp://ftp.microsoft.com/softlib/mslfiles/hcwsetup.exe
 # http://www.microsoft.com/downloads/details.aspx?displaylang=en&FamilyID=34D35502-4DE9-4676-952C-34CC7F64F098
 # Put the path to hcw here unless it is already in PATH:
-HCWPATH = /c/Program\ Files/Help\ Workshop/
+HCWPATH = "$(PROGRAMFILES)/Help\ Workshop/"
 HCW = $(HCWPATH)hcw
 # Switches are for HCW 4.03:
 HCWFLAG =
@@ -261,13 +262,19 @@ endif
 
 ifdef GD
   CFLAGS += -DHAVE_LIBGD
-  TERMLIBS += -lgd
+  ifndef BGD
+    TERMLIBS += -lgd
+  else
+    TERMLIBS += -lbgd
+  endif
 endif
 
 ifdef PNG
   CFLAGS += -DHAVE_LIBPNG
+  ifndef BGD
   ifndef GDAUTOCONFIGLIBS
     TERMLIBS += -lpng -lz
+  endif
   endif
 endif
 
@@ -275,14 +282,18 @@ ifdef NEWGD
   CFLAGS += -DHAVE_GD_GIF -DGIF_ANIMATION -DHAVE_GD_PNG
 ifdef JPEG
   CFLAGS += -DHAVE_GD_JPEG
+  ifndef BGD
   ifndef GDAUTOCONFIGLIBS
     TERMLIBS += -ljpeg
+  endif
   endif
 endif
 ifdef FREETYPE
   CFLAGS += -DHAVE_GD_TTF
+  ifndef BGD
   ifndef GDAUTOCONFIGLIBS
     TERMLIBS += -lfreetype
+  endif
   endif
 endif
 ifdef GDAUTOCONFIGLIBS
@@ -409,7 +420,7 @@ show.$(O): show.c plot.h setshow.h
 	$(CC) -c $(CFLAGS) -DHELPFILE=\"$(HELPFILE)\" -DBINDIR=\"$(bindir)\" $<
 
 term.$(O): term.c term.h plot.h setshow.h bitmap.h $(CORETERM)
-	$(CC) -c $(CFLAGS) $(TERMFLAGS) $<
+	$(CC) -c $(CFLAGS) $(TERMFLAGS) $(S)/term.c
 
 version.$(O): version.c
 
