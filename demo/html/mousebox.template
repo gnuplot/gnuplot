@@ -9,7 +9,20 @@
   <td class="icon" onclick="gnuplot.unzoom();"><img src="previouszoom.png" id="gnuplot_unzoom_icon" align=right alt="unzoom" title="unzoom"></td>
   <td class="icon" onclick="gnuplot.rezoom();"><img src="nextzoom.png" id="gnuplot_rezoom_icon" align=right alt="rezoom" title="rezoom"></td>
   <td class="icon" onclick="gnuplot.toggle_zoom_text();"><img src="textzoom.png" id="gnuplot_textzoom_icon" align=right alt="zoom text" title="zoom text with plot"></td>
-  <td class="icon"><img src="help.png" id="gnuplot_help_icon" align=right alt="?" title="help"></td>
+  <td class="icon" onclick="gnuplot.popup_help();"><img src="help.png" id="gnuplot_help_icon" align=right alt="?" title="help"></td>
 
 </tr>
+<tr>
+  <td class="blank">&nbsp;</td>
+  <td class="blank">&nbsp;</td>
+  <td class="icon">&nbsp;</td>
+  <td class="icon" onclick=gnuplot.toggle_plot("1")>1</td>
+  <td class="icon" onclick=gnuplot.toggle_plot("2")>2</td>
+  <td class="icon" onclick=gnuplot.toggle_plot("3")>3</td>
+  <td class="icon" onclick=gnuplot.toggle_plot("4")>4</td>
+  <td class="icon" onclick=gnuplot.toggle_plot("5")>5</td>
+  <td class="icon" onclick=gnuplot.toggle_plot("6")>6</td>
+  <td class="icon" onclick=gnuplot.toggle_plot("7")>7</td>
+</tr>
+
 </table>

@@ -1,9 +1,11 @@
 /*
- * $Id: gnuplot_common.js,v 1.4 2010/11/25 04:29:35 sfeam Exp $
+ * $Id: gnuplot_common.js,v 1.5 2010/11/26 23:37:42 sfeam Exp $
  */
 // Shared routines for gnuplot's HTML5 canvas terminal driver.
 
 var gnuplot = { };
+
+gnuplot.common_version = "30 March 2011";
 
 gnuplot.L = function (x,y) {
   if (gnuplot.zoomed) {

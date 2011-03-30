@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: canvas.trm,v 1.41 2010/11/26 23:37:41 sfeam Exp $
+ * $Id: canvas.trm,v 1.42 2011/03/11 22:20:59 sfeam Exp $
  *
  */
 
@@ -118,6 +118,7 @@ static struct {
     char color[18];		/* rgb(rrr,ggg,bbb) */
     char previous_color[18];	/* rgb(rrr,ggg,bbb) */
     char previous_fill[24];	/* rgba(rrr,ggg,bbb,aaaa) */
+    int  plotno;		/* Which plot are we in? */
 } canvas_state;
 
 enum CANVAS_case {
@@ -360,6 +361,7 @@ CANVAS_graphics()
     canvas_state.previous_color[0] = '\0';
     canvas_state.previous_fill[0] = '\0';
     strcpy(canvas_state.color,"rgb(000,000,000)");
+    canvas_state.plotno = 0;
 
     /* Figure out where the javascript should come from when the page is viewed */
     if (CANVAS_scriptdir == NULL) {
@@ -424,14 +426,19 @@ CANVAS_graphics()
 	    fprintf(gpoutfile,
 		"<script src=\"%sgnuplot_dashedlines.js\"></script>\n"
 		, CANVAS_scriptdir);
-	if (CANVAS_mouseable)
+	if (CANVAS_mouseable) {
 	    fprintf(gpoutfile,
 		"<script src=\"%sgnuplot_mouse.js\"></script>\n"
 		, CANVAS_scriptdir);
-	else
+	    fprintf(gpoutfile,
+		"<script type=\"text/javascript\"> "
+		"gnuplot.help_URL = \"%s/canvas_help.html\"; </script>\n"
+		, CANVAS_scriptdir);
+	} else {
 	    fprintf(gpoutfile,
 		"<script type=\"text/javascript\">"
 		"gnuplot.init = function() {};</script>\n");
+	}
 	fprintf(gpoutfile,
 		"<script type=\"text/javascript\">\n"
 		"var canvas, ctx;\n"
@@ -473,6 +480,7 @@ CANVAS_graphics()
 	);
     }
 
+    fprintf(gpoutfile, "// Gnuplot version %s.%s\n", gnuplot_version, gnuplot_patchlevel);
     fprintf(gpoutfile,
 	"// short forms of commands provided by gnuplot_common.js\n"
 	"function DT  (dt)  {gnuplot.dashtype(dt);};\n"
@@ -603,6 +611,7 @@ CANVAS_text()
 	 * file and provide his own wrapping HTML document.
 	 */
 	if (CANVAS_mouseable) {
+	    int i;
 	    fprintf(gpoutfile,
 		"<table class=\"mbleft\"><tr><td class=\"mousebox\">\n"
 
@@ -618,14 +627,31 @@ CANVAS_text()
 		"	  <td class=\"icon\" onclick=gnuplot.unzoom><img src=\"%spreviouszoom.png\" id=\"gnuplot_unzoom_icon\" align=right alt=\"unzoom\" title=\"unzoom\"></td>\n"
 		"	  <td class=\"icon\" onclick=gnuplot.rezoom><img src=\"%snextzoom.png\" id=\"gnuplot_rezoom_icon\" align=right alt=\"rezoom\" title=\"rezoom\"></td>\n"
 		"	  <td class=\"icon\" onclick=gnuplot.toggle_zoom_text><img src=\"%stextzoom.png\" id=\"gnuplot_textzoom_icon\" align=right alt=\"zoom text\" title=\"zoom text with plot\"></td>\n"
-		"	  <td class=\"icon\"><img src=\"%shelp.png\" id=\"gnuplot_help_icon\" align=right alt=\"?\" title=\"help\"></td>\n"
-		"	</tr>\n"
-		"      </table>\n"
-		"  </td></tr>\n"
-		"</table></td></tr><tr><td class=\"mousebox\">\n",
+		"	  <td class=\"icon\" onclick=gnuplot.popup_help()><img src=\"%shelp.png\" id=\"gnuplot_help_icon\" align=right alt=\"?\" title=\"help\"></td>\n"
+		"	</tr>\n",
 		CANVAS_scriptdir ? CANVAS_scriptdir : "", CANVAS_scriptdir ? CANVAS_scriptdir : "",
 		CANVAS_scriptdir ? CANVAS_scriptdir : "", CANVAS_scriptdir ? CANVAS_scriptdir : "",
 		CANVAS_scriptdir ? CANVAS_scriptdir : ""
+	    );
+
+	    /* Table row of plot toggle icons goes here */
+	    for (i=1; i<=6*((canvas_state.plotno+5)/6); i++) {
+		if ((i%6) == 1)
+		    fprintf(gpoutfile, "	<tr>\n");
+		if (i<=canvas_state.plotno)
+		    fprintf(gpoutfile,
+			"	  <td class=\"icon\" onclick=gnuplot.toggle_plot(\"%d\")>%d</td>\n",i,i);
+		else
+		    fprintf(gpoutfile,
+			"	  <td class=\"icon\" > </td>\n");
+		if ((i%6) == 0)
+		    fprintf(gpoutfile, "	</tr>\n");
+	    }
+
+	    fprintf(gpoutfile,
+		"      </table>\n"
+		"  </td></tr>\n"
+		"</table></td></tr><tr><td class=\"mousebox\">\n"
 	    );
 
 	    fprintf(gpoutfile,
@@ -1016,15 +1042,45 @@ CANVAS_fillbox(int style, unsigned int x1, unsigned int y1, unsigned int width, 
 TERM_PUBLIC void 
 CANVAS_layer(t_termlayer layer)
 {
-	if (layer == TERM_LAYER_BEGIN_GRID) {
+    switch (layer) {
+
+    case TERM_LAYER_BEFORE_PLOT:
+	    canvas_state.plotno++;
+	    CANVAS_finish();
+	    fprintf(gpoutfile,
+		"if (typeof(gnuplot.hide_plot_%d) == \"undefined\""
+		"|| !gnuplot.hide_plot_%d) {\n",
+		canvas_state.plotno, canvas_state.plotno);
+	    break;
+
+    case TERM_LAYER_AFTER_PLOT:
+	    CANVAS_finish();
+	    fprintf(gpoutfile,"} // End plot %d \n", canvas_state.plotno);
+	    canvas_line_type = LT_UNDEFINED;
+	    canvas_state.previous_linewidth = -1;
+	    canvas_state.previous_color[0] = '\0';
+	    canvas_state.previous_fill[0] = '\0';
+	    break;
+
+    case TERM_LAYER_BEGIN_GRID:
 	    fprintf(gpoutfile, "if (gnuplot.grid_lines) {\n"
 			"var saveWidth = ctx.lineWidth;\n"
 			"ctx.lineWidth = ctx.lineWidth * 0.5;\n");
-	} else if (layer == TERM_LAYER_END_GRID) {
+	    break;
+
+    case TERM_LAYER_END_GRID:
 	    fprintf(gpoutfile,
 			"ctx.lineWidth = saveWidth;\n"
 			"} // grid_lines\n");
-	}
+	    break;
+
+    case TERM_LAYER_RESET:
+	    canvas_state.plotno = 0;
+	    break;
+
+    default:
+	    break;
+    }
 }
 
 TERM_PUBLIC void

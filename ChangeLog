@@ -1,3 +1,21 @@
+2011-03-30  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* demo/html/index.canvas demo/html/Makefile.canvas 
+	demo/html/mousebox.template demo/html/webify_canvas.pl:
+	Separate make targets for 2D and 3D plots. Add buttons for toggling
+	individual plots. Default to mousing enabled for all demo plots.
+
+	* term/canvas.trm:
+	Wrap each component plot in if (gnuplot.hide_plot_N) { ... }.
+	Add plot-toggling buttons to the standalone mousebox.
+	Include gnuplot version in each plot generated.
+
+	* term/gnuplot_common.js term/gnuplot_mouse.css term/js/canvas_help.html
+	term/gnuplot_mouse.js (popup_help(URL) toggle_plot(N)):
+	Add version number to shared javascript and emitted code.
+	Add support for linking help button to plot-specific URL.
+	Add support for toggling individual component plots on/off.
+
 2011-03-30  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* term/gd.trm: Don't try to reuse names of gd font pointers for

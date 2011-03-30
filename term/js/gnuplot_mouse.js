@@ -1,6 +1,8 @@
 /*
- * $Id: gnuplot_mouse.js,v 1.8 2010/03/24 05:38:18 sfeam Exp $
+ * $Id: gnuplot_mouse.js,v 1.11 2010/11/25 05:53:49 sfeam Exp $
  */
+    gnuplot.mouse_version = "30 March 2011";
+
 // Mousing code for use with gnuplot's 'canvas' terminal driver.
 // The functions defined here assume that the javascript plot produced by
 // gnuplot initializes the plot boundary and scaling parameters.
@@ -384,6 +386,26 @@ gnuplot.zoomXY = function(x,y)
 
 gnuplot.zoomW = function (w) { return (w*gnuplot.plot_axis_width/gnuplot.zoom_axis_width); }
 gnuplot.zoomH = function (h) { return (h*gnuplot.plot_axis_height/gnuplot.zoom_axis_height); }
+
+gnuplot.popup_help = function(URL) {
+    if (typeof(URL) != "string") {
+	if (typeof(gnuplot.help_URL) == "string") 
+	    URL = gnuplot.help_URL;
+	else
+	    return;
+    }
+    // FIXME: Placeholder for useful action
+    if (URL != "")
+	window.open (URL,"gnuplot help");
+}
+
+gnuplot.toggle_plot = function(num) {
+    if (typeof(gnuplot["hide_plot_"+num]) == "unknown")
+    	gnuplot["hide_plot_"+num] = false;
+    gnuplot["hide_plot_"+num] = !gnuplot["hide_plot_"+num];
+    ctx.clearRect(0,0,gnuplot.plot_term_xmax,gnuplot.plot_term_ymax);
+    gnuplot_canvas();
+}
 
 gnuplot.do_hotkey = function(event) {
     keychar = String.fromCharCode(event.charCode ? event.charCode : event.keyCode);

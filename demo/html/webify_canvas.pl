@@ -102,7 +102,7 @@ print STDERR $name, "\n";
 	print OUT "<script src=\"gnuplot_common.js\"></script>\n";
 	print OUT "<script src=\"gnuplot_dashedlines.js\"></script>\n";
 	print OUT "<script src=\"gnuplot_mouse.js\"></script>\n"
-		  if ($mousing && -e "gnuplot_mouse.js");
+		  if ($mousing);
 
 	print OUT "<script type=\"text/javascript\">\n";
 	print OUT "var canvas, ctx;\n";
@@ -110,6 +110,7 @@ print STDERR $name, "\n";
 	print OUT "gnuplot.zoomed = false;\n";
 	print OUT "gnuplot.active_plot_name = \"gnuplot_canvas\";\n";
 	print OUT "gnuplot.active_plot = gnuplot.dummyplot;\n";
+	print OUT "gnuplot.help_URL = \"canvas_help.html\";\n";
 	print OUT "gnuplot.dummyplot = function() {};\n";
 	print OUT "function gnuplot_canvas( plot ) { gnuplot.active_plot(); };\n";
 	print OUT "</script>\n";
