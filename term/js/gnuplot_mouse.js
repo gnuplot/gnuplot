@@ -1,5 +1,5 @@
 /*
- * $Id: gnuplot_mouse.js,v 1.11 2010/11/25 05:53:49 sfeam Exp $
+ * $Id: gnuplot_mouse.js,v 1.12 2011/03/31 03:54:25 sfeam Exp $
  */
     gnuplot.mouse_version = "30 March 2011";
 
@@ -280,7 +280,7 @@ gnuplot.zoom_in = function (event)
 	gnuplot.zoom_axis_ymax = gnuplot.zoom_temp_ymin;
 	if (gnuplot.plot_axis_y2min != "none") {
             gnuplot.zoom_axis_y2min = y2;
-	    gnuplot.zoom_axis_y2max = zoom_temp_y2min;
+	    gnuplot.zoom_axis_y2max = gnuplot.zoom_temp_y2min;
 	}
     }
     gnuplot.zoom_axis_width = gnuplot.zoom_axis_xmax - gnuplot.zoom_axis_xmin;
