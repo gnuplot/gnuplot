@@ -6,13 +6,13 @@
 	individual plots. Default to mousing enabled for all demo plots.
 
 	* term/canvas.trm:
-	Wrap each component plot in if (gnuplot.hide_plot_N) { ... }.
+	Wrap each component plot in a test for (gnuplot.hide_plot_N).
 	Add plot-toggling buttons to the standalone mousebox.
-	Include gnuplot version in each plot generated.
+	Report gnuplot version in each plot generated.
 
 	* term/gnuplot_common.js term/gnuplot_mouse.css term/js/canvas_help.html
 	term/gnuplot_mouse.js (popup_help(URL) toggle_plot(N)):
-	Add version number to shared javascript and emitted code.
+	Add version number to shared javascript code modules.
 	Add support for linking help button to plot-specific URL.
 	Add support for toggling individual component plots on/off.
 
