@@ -1,5 +1,8 @@
+<!DOCTYPE HTML>
 <html>
-<head><title>Gnuplot demo scripts run through the HTML canvas terminal</title>
+<head>
+<meta charset="UTF-8"> 
+<title>Gnuplot demo scripts run through the HTML canvas terminal</title>
 <link type="text/css" href="gnuplot_demo.css" rel="stylesheet">
 <link type="text/css" href="gnuplot_mouse.css" rel="stylesheet">
 </head>
@@ -18,6 +21,7 @@
 <p>
 The canvas driver for gnuplot was contributed by Bruce Lueckenhoff, and extended by Ethan Merritt (sfeam).
 To view the results you need a browser that supports the HTML 5 'canvas' element.
+</p>
 
 
 <table border="0" width="100%">
@@ -102,7 +106,6 @@ To view the results you need a browser that supports the HTML 5 'canvas' element
     <ul>
     <li><a href="controls.html">control models</a></li>
     <li><a href="discrete.html">discrete&nbsp;contours</a></li>
-    <!--- <li><a href="electron.html">electron</a></li> --->
     <li><a href="finance.html">financial data</a></li>
     <li><a href="scatter.html">non-gridded data</a></li>
     <li><a href="running_avg.html">running averages</a></li>
@@ -173,7 +176,7 @@ To view the results you need a browser that supports the HTML 5 'canvas' element
 		<td class="icon" onclick="gnuplot.rezoom();"><img src="nextzoom.png" id="gnuplot_rezoom_icon" align=right alt="rezoom" title="rezoom"></td>
 		<td class="icon"><a href="canvas_help.html">
 		                 <img src="help.png" align=right alt="help" title="help"></a></td>
-		<td class="icon" onclick=gnuplot.toggle_plot("1")>&#10112;</td>
+		<td class="icon" onclick='gnuplot.toggle_plot("1")'>&#10112;</td>
 	        <td class="mb0">x</td>
 	        <td class="mb1"><span id="gnuplot_canvas_x">&nbsp;</span></td>
 	        <td class="mb0">y</td>
@@ -191,7 +194,6 @@ To view the results you need a browser that supports the HTML 5 'canvas' element
 </td></tr>
 
 </tbody></table>
-</p>
 <hr>
 
 
