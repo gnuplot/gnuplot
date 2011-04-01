@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.657 2011/03/20 22:48:31 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.658 2011/03/26 02:39:44 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -2583,6 +2583,18 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/userdefined.gif" alt="[use
 
  Macro expansion does not occur inside either single or double quotes.
  However macro expansion does occur inside backquotes.
+
+ Macro expansion is handled as the very first thing the interpreter does when
+ looking at a new line of commands and is only done once. Therefore, code like
+ the following will execute correctly:
+
+      A = "c=1"
+      @A
+
+ but this line will not, since the macro is defined on the same line
+ and will not be expanded in time
+
+      A = "c=1"; @A   # will not expand to c=1
 
  For execution of complete commands the `evaluate` command may also be handy.
 3 String variables, macros, and command line substitution
