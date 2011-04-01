@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.214 2011/01/26 06:09:19 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.215 2011/02/20 23:17:11 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -224,6 +224,7 @@ static void UP_redirect __PROTO((int called));
 static int null_text_angle __PROTO((int ang));
 static int null_justify_text __PROTO((enum JUSTIFY just));
 static int null_scale __PROTO((double x, double y));
+static void null_layer __PROTO((t_termlayer layer));
 static void options_null __PROTO((void));
 static void UNKNOWN_null __PROTO((void));
 static void MOVE_null __PROTO((unsigned int, unsigned int));
@@ -570,8 +571,7 @@ term_start_plot()
     }
 
     /* Sync point for epslatex text positioning */
-    if (term->layer)
-	(term->layer)(TERM_LAYER_RESET);
+    (*term->layer)(TERM_LAYER_RESET);
 
     /* Because PostScript plots may be viewed out of order, make sure */
     /* Each new plot makes no assumption about the previous palette.  */
@@ -595,8 +595,7 @@ term_end_plot()
 	return;
 
     /* Sync point for epslatex text positioning */
-    if (term->layer)
-	(term->layer)(TERM_LAYER_END_TEXT);
+    (*term->layer)(TERM_LAYER_END_TEXT);
     
     if (!multiplot) {
 	FPRINTF((stderr, "- calling term->text()\n"));
@@ -1445,6 +1444,12 @@ null_scale(double x, double y)
 }
 
 static void
+null_layer(t_termlayer layer)
+{
+    (void) layer;               /* avoid -Wunused warning */
+}
+
+static void
 options_null()
 {
     term_options[0] = '\0';     /* we have no options */
@@ -1665,6 +1670,8 @@ change_term(const char *origname, int length)
 	term->pointsize = do_pointsize;
     if (term->linewidth == 0)
 	term->linewidth = null_linewidth;
+    if (term->layer == 0)
+	term->layer = null_layer;
     if (term->tscale <= 0)
 	term->tscale = 1.0;
 
@@ -1967,8 +1974,7 @@ test_term()
 	key_entry_height = t->v_char;
 
     /* Sync point for epslatex text positioning */
-    if (term->layer)
-	(term->layer)(TERM_LAYER_FRONTTEXT);
+    (*t->layer)(TERM_LAYER_FRONTTEXT);
 
     /* border linetype */
     (*t->linewidth) (1.0);
