@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.243 2011/01/23 23:01:33 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.244 2011/02/20 23:17:11 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -643,8 +643,7 @@ do_3dplot(
     screen_ok = FALSE;
 
     /* Sync point for epslatex text positioning */
-    if (term->layer)
-	(term->layer)(TERM_LAYER_BACKTEXT);
+    (term->layer)(TERM_LAYER_BACKTEXT);
 
     /* now compute boundary for plot */
     boundary3d(plots, pcount);
@@ -813,8 +812,7 @@ do_3dplot(
     place_arrows3d(0);
 
     /* Sync point for epslatex text positioning */
-    if (term->layer)
-	(term->layer)(TERM_LAYER_FRONTTEXT);
+    (term->layer)(TERM_LAYER_FRONTTEXT);
 
     if (hidden3d && draw_surface && !quick) {
 	init_hidden_line_removal();
@@ -945,8 +943,11 @@ do_3dplot(
 
     /* DRAW SURFACES AND CONTOURS */
 
-    if (hidden3d && (hidden3d_layer == LAYER_BACK) && draw_surface && !quick)
+    if (hidden3d && (hidden3d_layer == LAYER_BACK) && draw_surface && !quick) {
+	(term->layer)(TERM_LAYER_BEFORE_PLOT);
 	plot3d_hidden(plots, pcount);
+	(term->layer)(TERM_LAYER_AFTER_PLOT);
+    }
 
     /* Set up bookkeeping for the individual key titles */
 #define NEXT_KEY_LINE()					\
@@ -989,19 +990,14 @@ do_3dplot(
 	    if (this_plot->plot_type == NODATA)
 		continue;
 
-	    if (can_pm3d && PM3D_IMPLICIT == pm3d.implicit)
+	    if (can_pm3d && PM3D_IMPLICIT == pm3d.implicit) {
+		(term->layer)(TERM_LAYER_BEFORE_PLOT);
 		pm3d_draw_one(this_plot);
+		(term->layer)(TERM_LAYER_AFTER_PLOT);
+	    }
 
 	    /* Sync point for start of new curve (used by svg, post, ...) */
-	    if (term->layer)
-		(term->layer)(TERM_LAYER_BEFORE_PLOT);
-
-#if (0)
-	    /* Versions through 4.4.0 used this to limit depth-sorting of pm3d */
-	    /* surfaces to those which are adjacent in the splot command. Why? */
-	    if (pm3d_order_depth && this_plot->plot_style != PM3DSURFACE)
-		pm3d_depth_queue_flush(); /* draw pending plots */
-#endif
+	    (term->layer)(TERM_LAYER_BEFORE_PLOT);
 
 	    lkey = (key->visible && this_plot->title && this_plot->title[0]
 				 && !this_plot->title_is_suppressed);
@@ -1355,8 +1351,7 @@ do_3dplot(
 	    } /* draw contours */
 	    
 	    /* Sync point for end of this curve (used by svg, post, ...) */
-	    if (term->layer)
-		(term->layer)(TERM_LAYER_AFTER_PLOT);
+	    (term->layer)(TERM_LAYER_AFTER_PLOT);
 
 	} /* loop over surfaces */
 
@@ -1364,8 +1359,11 @@ do_3dplot(
 	pm3d_depth_queue_flush(); /* draw pending plots */
     }
 
-    if (hidden3d && (hidden3d_layer == LAYER_FRONT) && draw_surface && !quick)
+    if (hidden3d && (hidden3d_layer == LAYER_FRONT) && draw_surface && !quick) {
+	(term->layer)(TERM_LAYER_BEFORE_PLOT);
 	plot3d_hidden(plots, pcount);
+	(term->layer)(TERM_LAYER_AFTER_PLOT);
+    }
 
     /* DRAW GRID AND BORDER */
 #ifndef USE_GRID_LAYERS
@@ -2590,13 +2588,11 @@ xtick_callback(
 
     map3d_xyz(place, xaxis_y, base_z, &v1);
     if (grid.l_type > LT_NODRAW) {
-	if (t->layer)
-	    (t->layer)(TERM_LAYER_BEGIN_GRID);
+	(t->layer)(TERM_LAYER_BEGIN_GRID);
 	/* to save mapping twice, map non-axis y */
 	map3d_xyz(place, other_end, base_z, &v2);
 	draw3d_line(&v1, &v2, &grid);
-	if (t->layer)
-	    (t->layer)(TERM_LAYER_END_GRID);
+	(t->layer)(TERM_LAYER_END_GRID);
     }
     if ((X_AXIS.ticmode & TICS_ON_AXIS)
 	&& !Y_AXIS.log
@@ -2673,12 +2669,10 @@ ytick_callback(
 
     map3d_xyz(yaxis_x, place, base_z, &v1);
     if (grid.l_type > LT_NODRAW) {
-	if (t->layer)
-	    (t->layer)(TERM_LAYER_BEGIN_GRID);
+	(t->layer)(TERM_LAYER_BEGIN_GRID);
 	map3d_xyz(other_end, place, base_z, &v2);
 	draw3d_line(&v1, &v2, &grid);
-	if (t->layer)
-	    (t->layer)(TERM_LAYER_END_GRID);
+	(t->layer)(TERM_LAYER_END_GRID);
     }
     if (Y_AXIS.ticmode & TICS_ON_AXIS
 	&& !X_AXIS.log
@@ -2759,14 +2753,12 @@ ztick_callback(
     else
 	map3d_xyz(zaxis_x, zaxis_y, place, &v1);
     if (grid.l_type > LT_NODRAW) {
-	if (t->layer)
-	    (t->layer)(TERM_LAYER_BEGIN_GRID);
+	(t->layer)(TERM_LAYER_BEGIN_GRID);
 	map3d_xyz(back_x, back_y, place, &v2);
 	map3d_xyz(right_x, right_y, place, &v3);
 	draw3d_line(&v1, &v2, &grid);
 	draw3d_line(&v2, &v3, &grid);
-	if (t->layer)
-	    (t->layer)(TERM_LAYER_END_GRID);
+	(t->layer)(TERM_LAYER_END_GRID);
     }
     v2.x = v1.x + len / (double)xscaler;
     v2.y = v1.y;

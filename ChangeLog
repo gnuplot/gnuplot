@@ -1,3 +1,18 @@
+2011-04-01  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/canvas.trm demo/html/webify_canvas.pl:
+	Add HTML5-conformant doctype and meta-information to output html.
+
+	* src/graph3d.c:
+	Wrap pm3d surfaces and hidden3d ensembles in BEFORE_PLOT/AFTER_PLOT
+	flags via term->layer(). This allows them to be toggled on/off like
+	other plots in HTML canvas output.
+
+	* src/term.c(null_layer) src/graphics.c src/graph3d.c:
+	Provide a null_layer() routine for all terminals that do not provide
+	term->layer().  This allows us to remove explicit checks for support by
+	the current terminal.
+
 2011-03-30  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* demo/html/index.canvas demo/html/Makefile.canvas 

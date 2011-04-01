@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.358 2011/03/15 04:57:13 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.359 2011/03/22 12:29:11 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -1607,8 +1607,7 @@ do_plot(struct curve_points *plots, int pcount)
     screen_ok = FALSE;
 
     /* Sync point for epslatex text positioning */
-    if (term->layer)
-	(term->layer)(TERM_LAYER_BACKTEXT);
+    (term->layer)(TERM_LAYER_BACKTEXT);
 
     /* DRAW TICS AND GRID */
     if (grid_layer == 0 || grid_layer == -1)
@@ -1792,8 +1791,7 @@ do_plot(struct curve_points *plots, int pcount)
     place_arrows( 0 );
 
     /* Sync point for epslatex text positioning */
-    if (term->layer)
-	(term->layer)(TERM_LAYER_FRONTTEXT);
+    (term->layer)(TERM_LAYER_FRONTTEXT);
 
     /* Draw the key, or at least reserve space for it (pass 1) */
     if (lkey)
@@ -1807,8 +1805,7 @@ do_plot(struct curve_points *plots, int pcount)
 	TBOOLEAN localkey = lkey;	/* a local copy */
 
 	/* Sync point for start of new curve (used by svg, post, ...) */
-	if (term->layer)
-	    (term->layer)(TERM_LAYER_BEFORE_PLOT);
+	(term->layer)(TERM_LAYER_BEFORE_PLOT);
 
 	/* set scaling for this plot's axes */
 	x_axis = this_plot->x_axis;
@@ -2056,8 +2053,7 @@ do_plot(struct curve_points *plots, int pcount)
 	}
 
 	/* Sync point for end of this curve (used by svg, post, ...) */
-	if (term->layer)
-	    (term->layer)(TERM_LAYER_AFTER_PLOT);
+	(term->layer)(TERM_LAYER_AFTER_PLOT);
 
     }
 
@@ -5140,8 +5136,7 @@ xtick2d_callback(
     }
 
     if (grid.l_type > LT_NODRAW) {
-	if (t->layer)
-	    (t->layer)(TERM_LAYER_BEGIN_GRID);
+	(t->layer)(TERM_LAYER_BEGIN_GRID);
 	term_apply_lp_properties(&grid);
 	if (polar_grid_angle) {
 	    double x = place, y = 0, s = sin(0.1), c = cos(0.1);
@@ -5186,8 +5181,7 @@ xtick2d_callback(
 	    }
 	}
 	term_apply_lp_properties(&border_lp);	/* border linetype */
-	if (t->layer)
-	    (t->layer)(TERM_LAYER_END_GRID);
+	(t->layer)(TERM_LAYER_END_GRID);
     }	/* End of grid code */
 
 
@@ -5243,8 +5237,7 @@ ytick2d_callback(
     }
 
     if (grid.l_type > LT_NODRAW) {
-	if (t->layer)
-	    (t->layer)(TERM_LAYER_BEGIN_GRID);
+	(t->layer)(TERM_LAYER_BEGIN_GRID);
 	term_apply_lp_properties(&grid);
 	if (polar_grid_angle) {
 	    double x = 0, y = place, s = sin(0.1), c = cos(0.1);
@@ -5283,8 +5276,7 @@ ytick2d_callback(
 	    }
 	}
 	term_apply_lp_properties(&border_lp);	/* border linetype */
-	if (t->layer)
-	    (t->layer)(TERM_LAYER_END_GRID);
+	(t->layer)(TERM_LAYER_END_GRID);
     }
     /* we precomputed tic posn and text posn */
 
