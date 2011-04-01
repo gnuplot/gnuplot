@@ -91,6 +91,7 @@ print STDERR $name, "\n";
 	close FOO if ($savescripts);
 
 # Boiler plate header
+	print OUT "<!DOCTYPE HTML>\n";
 	print OUT "<html>\n<head>\n<title>gnuplot demo script: $name.dem </title>\n";
 	print OUT "<link rel=\"stylesheet\" href=\"gnuplot_demo.css\" type=\"text/css\">\n"
 		  if (-e "gnuplot_demo.css");

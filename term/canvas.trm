@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: canvas.trm,v 1.42 2011/03/11 22:20:59 sfeam Exp $
+ * $Id: canvas.trm,v 1.43 2011/03/31 03:54:25 sfeam Exp $
  *
  */
 
@@ -407,12 +407,13 @@ CANVAS_graphics()
 
     if (CANVAS_standalone) {
 	fprintf(gpoutfile,
+		"<!DOCTYPE HTML>\n"
 		"<html>\n"
 		"<head>\n"
 		"<title>%s</title>\n",
 		CANVAS_title ? CANVAS_title : "Gnuplot Canvas Graph"
 		);
-	if (encoding == S_ENC_UTF8)
+	if (encoding == S_ENC_UTF8 || encoding == S_ENC_DEFAULT)
 	    fprintf(gpoutfile,
 		"<meta http-equiv=\"content-type\" content=\"text/html; charset=UTF-8\">\n"
 	    );
