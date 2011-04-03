@@ -1,8 +1,8 @@
 <table class="mbright" tabindex=0>
 <tr>
 
- <td class="mb0">x&nbsp;</td> <td class="mb1"><span id="ACTIVE_PLOT_NAME_x">&nbsp;</span></td>
- <td class="mb0">y&nbsp;</td> <td class="mb1"><span id="ACTIVE_PLOT_NAME_y">&nbsp;</span></td>
+ <td class="mb0">x&nbsp;</td> <td class="mb1"><span id="ACTIVE_PLOT_NAME_x">&nbsp;&nbsp;&nbsp;&nbsp;</span></td>
+ <td class="mb0">y&nbsp;</td> <td class="mb1"><span id="ACTIVE_PLOT_NAME_y">&nbsp;&nbsp;&nbsp;&nbsp;</span></td>
 
   <td class="icon"></td>
   <td class="icon" onclick="gnuplot.toggle_grid();"><img src="grid.png" id="gnuplot_grid_icon" align=right alt="#" title="toggle grid"></td>
@@ -16,13 +16,13 @@
   <td class="blank">&nbsp;</td>
   <td class="blank">&nbsp;</td>
   <td class="icon">&nbsp;</td>
-  <td class="icon" onclick=gnuplot.toggle_plot("1")>1</td>
-  <td class="icon" onclick=gnuplot.toggle_plot("2")>2</td>
-  <td class="icon" onclick=gnuplot.toggle_plot("3")>3</td>
-  <td class="icon" onclick=gnuplot.toggle_plot("4")>4</td>
-  <td class="icon" onclick=gnuplot.toggle_plot("5")>5</td>
-  <td class="icon" onclick=gnuplot.toggle_plot("6")>6</td>
-  <td class="icon" onclick=gnuplot.toggle_plot("7")>7</td>
+  <td class="icon" onclick='gnuplot.toggle_plot("1")'>&#9312;</td>
+  <td class="icon" onclick='gnuplot.toggle_plot("2")'>&#9313;</td>
+  <td class="icon" onclick='gnuplot.toggle_plot("3")'>&#9314;</td>
+  <td class="icon" onclick='gnuplot.toggle_plot("4")'>&#9315;</td>
+  <td class="icon" onclick='gnuplot.toggle_plot("5")'>&#9316;</td>
+  <td class="icon" onclick='gnuplot.toggle_plot("6")'>&#9317;</td>
+  <td class="icon" onclick='gnuplot.toggle_plot("7")'>&#9318;</td>
 </tr>
 
 </table>

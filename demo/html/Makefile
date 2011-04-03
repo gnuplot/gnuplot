@@ -2,7 +2,7 @@ all: html
 
 distclean: clean
 clean:
-	rm -f *.png *.gnu *.html *.dat epslatex* fit.log soundfit.par *.tmp *.js *.?.svg *.??.svg
+	rm -f *.png *.gnu *.html *.dat epslatex* fit.log soundfit.par *.tmp *.js *.?.svg *.??.svg jsdir
 
 GNUPLOT_LIB = ..
 

@@ -1,7 +1,7 @@
 /*
- * $Id: gnuplot_mouse.js,v 1.12 2011/03/31 03:54:25 sfeam Exp $
+ * $Id: gnuplot_mouse.js,v 1.13 2011/03/31 04:18:11 sfeam Exp $
  */
-    gnuplot.mouse_version = "30 March 2011";
+    gnuplot.mouse_version = "03 April 2011";
 
 // Mousing code for use with gnuplot's 'canvas' terminal driver.
 // The functions defined here assume that the javascript plot produced by
@@ -347,6 +347,9 @@ gnuplot.zoomXY = function(x,y)
 	yreal = gnuplot.plot_axis_ymin + (gnuplot.plot_ybot - y) * (gnuplot.plot_axis_height/gnuplot.plot_height);
 	zoom.y = gnuplot.plot_ybot - (yreal - gnuplot.zoom_axis_ymin) * (gnuplot.plot_height/gnuplot.zoom_axis_height);
   }
+
+  // Report unclipped coords also
+  zoom.xraw = zoom.x; zoom.yraw = zoom.y;
 
   // Limit the zoomed plot to the original plot area
   if (x > gnuplot.plot_xmax) {

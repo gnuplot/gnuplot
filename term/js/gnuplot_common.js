@@ -1,11 +1,11 @@
 /*
- * $Id: gnuplot_common.js,v 1.5 2010/11/26 23:37:42 sfeam Exp $
+ * $Id: gnuplot_common.js,v 1.6 2011/03/31 03:54:25 sfeam Exp $
  */
 // Shared routines for gnuplot's HTML5 canvas terminal driver.
 
 var gnuplot = { };
 
-gnuplot.common_version = "30 March 2011";
+gnuplot.common_version = "03 April 2011";
 
 gnuplot.L = function (x,y) {
   if (gnuplot.zoomed) {
@@ -120,6 +120,38 @@ gnuplot.Pt = function (N,x,y,w) {
 	ctx.fill();
 	break;
     }
+}
+
+// Zoomable image
+gnuplot.ZI = function (image, m, n, x1, y1, x2, y2) {
+  if (gnuplot.zoomed) {
+    var sx, sy, sw, sh, dx, dy, dw, dh;
+
+    zoom = gnuplot.zoomXY(x1/10.0,y1/10.0);
+    if (zoom.x >= gnuplot.plot_xmax) return;
+    if (zoom.y >= gnuplot.plot_ybot) return;
+    x1raw = zoom.xraw; y1raw = zoom.yraw;
+    dx = zoom.x; dy = zoom.y;
+
+    zoom = gnuplot.zoomXY((x2)/10.,(y2)/10.);
+    if (zoom.xraw <= gnuplot.plot_xmin) return;
+    if (zoom.yraw <= gnuplot.plot_ytop) return;
+    x2raw = zoom.xraw; y2raw = zoom.yraw;
+    dw = zoom.x - dx;  dh = zoom.y - dy;
+
+    // FIXME: This is sometimes flaky. Needs integer truncation?
+    sx = 0; sy = 0; sw = m; sh = n;
+    if (x1raw < dx) sx = m * (dx - x1raw) / (x2raw - x1raw);
+    if (y1raw < dy) sy = n * (dy - y1raw) / (y2raw - y1raw);
+    if (x2raw > zoom.x)
+	sw = m * (1. - ((x2raw - zoom.x) / (x2raw - x1raw)));
+    if (y2raw > zoom.y)
+	sh = n * (1. - ((y2raw - zoom.y) / (y2raw - y1raw)));
+    sw = sw - sx; sh = sh - sy;
+
+    ctx.drawImage(image, sx, sy, sw, sh, dx, dy, dw, dh);
+} else
+    ctx.drawImage(image, x1/10.0, y1/10.0, (x2-x1)/10.0, (y2-y1)/10.0);
 }
 
 // These methods are place holders that are loaded by gnuplot_dashedlines.js

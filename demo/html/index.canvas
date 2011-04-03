@@ -88,9 +88,8 @@ To view the results you need a browser that supports the HTML 5 'canvas' element
     <h4>Binary and Image data </h4>
     <ul>
     <li><a href="binary.html">binary data</a></li>
-    <li><font color=gray>image data - works OK</font></li>
-    <li><font color=gray>&nbsp;&nbsp;but output is huge</font></li>
     <li><a href="rgbalpha.html">RGB + alpha channel</a></li>
+    <li><a href="barchart_art.html">rescaled images</a></li>
     </ul>
 
     <h4>Colors</h4>

@@ -7,6 +7,21 @@
 	image support to the lua terminals and (in prospect) to the HTML5
 	canvas terminal.
 
+	* src/save.c: Echo most recent range of autoscaled axes on "show" but
+	not "save".  This simplifies the output of gpsavediff in most cases.
+
+	* gnuplot-cvs/term/js/gnuplot_mouse.js term/js/gnuplot_common.js
+	gnuplot-cvs/term/canvas.trm (CANVAS_image):
+	Implement support for image handling in the canvas terminal using the
+	HTML5 canvas primitive drawImage().  Image data is written to a png file
+	in parallel to generation of the main plot.  The png image can then be
+	loaded from the javascript handler for the plot it belongs to.
+
+	* demo/html/Makefile demo/html/Makefile.canvas demo/html/index.canvas
+	demo/html/mousebox.template: Update the demo collection to show the new
+	image handling.
+
+
 2011-04-01  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/canvas.trm demo/html/webify_canvas.pl:

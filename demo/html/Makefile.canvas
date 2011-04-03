@@ -2,7 +2,7 @@ all: html
 
 distclean: clean
 clean:
-	rm -f *.gnu *.html *.dat *.tmp *.js *.par jsdir
+	rm -f *.gnu *.html *.dat *.tmp *.js *.par *.png jsdir
 
 GNUPLOT_LIB = ..
 
@@ -11,7 +11,7 @@ GNUPLOT_LIB = ..
 #
 html_3d: binary.html bivariat.html contours.html datastrings.html discrete.html hidden.html hidden2.html margins.html multimsh.html pm3dcolors.html pm3d.html pointsize.html random.html rgb_variable.html scatter.html singulr.html surface1.html surface2.html transparent_solids.html textcolor.html vector.html world.html world2.html
 
-html_2d: airfoil.html approximate.html arrowstyle.html boxplot.html candlesticks.html canvas_utf8.html circles.html cities.html controls.html electron.html enhanced_utf8.html fillbetween.html fillcrvs.html fillstyle.html finance.html histograms.html histograms2.html index.html iterate.html key.html layout.html mgr.html multiaxis.html multiplt.html param.html polar.html poldat.html prob2.html prob.html rainbow.html ellipse.html rectangle.html rgbalpha.html running_avg.html simple.html smooth.html spline.html steps.html transparent.html textrotate.html timedat.html using.html world.html dashcolor.html heatmaps.html
+html_2d: airfoil.html approximate.html arrowstyle.html barchart_art.html boxplot.html candlesticks.html canvas_utf8.html circles.html cities.html controls.html electron.html enhanced_utf8.html fillbetween.html fillcrvs.html fillstyle.html finance.html histograms.html histograms2.html index.html iterate.html key.html layout.html mgr.html multiaxis.html multiplt.html param.html polar.html poldat.html prob2.html prob.html rainbow.html ellipse.html rectangle.html rgbalpha.html running_avg.html simple.html smooth.html spline.html steps.html transparent.html textrotate.html timedat.html using.html world.html dashcolor.html heatmaps.html
 
 html: html_2d html_3d
 

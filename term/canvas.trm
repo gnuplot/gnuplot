@@ -35,8 +35,10 @@
  *   Ethan A Merritt, Nov 2010
  *	Dashed line support, butt/rounded line properties
  *	revised javascript with all methods and variables in container gnuplot()
- *   Ethan A Merritt, Feb 2011
+ *   Ethan A Merritt, Feb/Mar/Apr 2011
  *	Optional explicit background
+ *	Wrap each plot in a test for gnuplot.hide_plot_N
+ *	Handle image data by storing it in a parallel PNG file
  *
  * send your comments or suggestions to (gnuplot-info@lists.sourceforge.net).
  *
@@ -112,6 +114,18 @@ static char CANVAS_background[18] = {'\0'};
 static char *CANVAS_name = NULL;
 static char *CANVAS_scriptdir = NULL;
 static char *CANVAS_title = NULL;
+
+/*
+ * Stuff for tracking images stored in separate files
+ * to be referenced by canvas.drawImage();
+ */
+static int CANVAS_imageno = 0;
+typedef struct canvas_imagefile {
+    int imageno;	/* Used to generate the internal name */
+    char *filename;	/* The parallel file that it maps to  */
+    struct canvas_imagefile *next;
+} canvas_imagefile;
+static canvas_imagefile *imagelist = NULL;
 
 static struct {
     int  previous_linewidth;
@@ -593,7 +607,29 @@ CANVAS_text()
 
     } /* End of section writing out variables for mousing */
 
+    /* This is the end of the javascript plot */
     fprintf(gpoutfile, "}\n");
+
+#ifdef WRITE_PNG_IMAGE
+    /* Link internal image structures to external PNG files */
+    if (imagelist) {
+	canvas_imagefile *thisimage = imagelist;
+	char *base_name = CANVAS_name ? CANVAS_name : "gp";
+
+	while (thisimage != NULL) {
+	    fprintf(stderr," linking image %d to external file %s\n",
+		thisimage->imageno, thisimage->filename);
+	    fprintf(gpoutfile, "  var %s_image_%02d = new Image();",
+		base_name, thisimage->imageno);
+	    fprintf(gpoutfile, "  %s_image_%02d.src = \"%s\";\n",
+		base_name, thisimage->imageno, thisimage->filename);
+	    imagelist = thisimage->next;
+	    free(thisimage->filename);
+	    free(thisimage);
+	    thisimage = imagelist;
+	}
+    }
+#endif
 
     if (CANVAS_standalone) {
 	fprintf(gpoutfile,
@@ -1271,6 +1307,36 @@ ENHCANVAS_put_text(unsigned int x, unsigned int y, const char *str)
     return;
 }
 
+#ifdef WRITE_PNG_IMAGE
+TERM_PUBLIC void
+CANVAS_image (unsigned m, unsigned n, coordval *image, gpiPoint *corner, t_imagecolor color_mode) 
+{
+    char *image_file;
+    char *base_name = CANVAS_name ? CANVAS_name : "gp";
+    canvas_imagefile *thisimage = NULL;
+   
+    /* Write the image to a png file */
+    image_file = gp_alloc(strlen(base_name)+16, "CANVAS_image");
+    sprintf(image_file, "%s_image_%02d.png", base_name, ++CANVAS_imageno);
+    write_png_image (m, n, image, color_mode, image_file);
+
+    /* Map it onto the terminals coordinate system. */
+    fprintf(gpoutfile, "gnuplot.ZI(%s_image_%02d, %d, %d, %d, %d, %d, %d);\n",
+	base_name, CANVAS_imageno, m, n,
+	corner[0].x, canvas_ymax - corner[0].y, 
+	corner[1].x, canvas_ymax - corner[1].y);
+
+    /* Maintain a linked list of imageno|filename pairs */
+    /* so that we can load them at the end of the plot. */
+    thisimage = gp_alloc(sizeof(canvas_imagefile), "canvas imagefile");
+    thisimage->imageno = CANVAS_imageno;
+    thisimage->filename = image_file;
+    thisimage->next = imagelist;
+    imagelist = thisimage;
+
+}
+#endif
+
 #endif /* TERM_BODY */
 
 #ifdef TERM_TABLE
@@ -1290,7 +1356,11 @@ TERM_TABLE_START(canvas_driver)
 #endif
     , CANVAS_make_palette, NULL, CANVAS_set_color
     , CANVAS_filled_polygon
-    , NULL /* image */
+#ifdef WRITE_PNG_IMAGE
+    , CANVAS_image
+#else
+    , NULL
+#endif
     , ENHCANVAS_OPEN, ENHCANVAS_FLUSH, do_enh_writec
     , CANVAS_layer
     , CANVAS_path		/* path */
