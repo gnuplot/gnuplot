@@ -1,5 +1,5 @@
 /*
- * $Id: term.h,v 1.46 2010/07/30 19:11:41 sfeam Exp $
+ * $Id: term.h,v 1.47 2010/11/14 00:06:53 sfeam Exp $
  */
 
 /* GNUPLOT - term.h */
@@ -271,6 +271,9 @@
 /* #include "ai.trm" */
 
 /* HTML Canvas terminal */
+#if (defined(HAVE_GD_PNG) || defined(HAVE_LUA))
+# include "write_png_image.c"
+#endif
 #include "canvas.trm"
 
 /* Computer Graphics Metafile (eg ms office) */

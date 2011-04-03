@@ -1,3 +1,12 @@
+2011-04-03  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/term.c src/term.h term/Makefile.am.in term/lua.trm
+	term/write_png_image.c:  Move the routine write_png_image() out of
+	lua.trm so that it can be shared by other terminal drivers.
+	It requires support from either libgd or cairo, and provides bitmapped
+	image support to the lua terminals and (in prospect) to the HTML5
+	canvas terminal.
+
 2011-04-01  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/canvas.trm demo/html/webify_canvas.pl:
