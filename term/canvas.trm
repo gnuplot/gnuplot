@@ -660,11 +660,11 @@ CANVAS_text()
 		"      <table class=\"mousebox\">\n"
 		"	<tr>\n"
 		"	  <td class=\"icon\"></td>\n"
-		"	  <td class=\"icon\" onclick=gnuplot.toggle_grid><img src=\"%sgrid.png\" id=\"gnuplot_grid_icon\" align=right alt=\"#\" title=\"toggle grid\"></td>\n"
-		"	  <td class=\"icon\" onclick=gnuplot.unzoom><img src=\"%spreviouszoom.png\" id=\"gnuplot_unzoom_icon\" align=right alt=\"unzoom\" title=\"unzoom\"></td>\n"
-		"	  <td class=\"icon\" onclick=gnuplot.rezoom><img src=\"%snextzoom.png\" id=\"gnuplot_rezoom_icon\" align=right alt=\"rezoom\" title=\"rezoom\"></td>\n"
-		"	  <td class=\"icon\" onclick=gnuplot.toggle_zoom_text><img src=\"%stextzoom.png\" id=\"gnuplot_textzoom_icon\" align=right alt=\"zoom text\" title=\"zoom text with plot\"></td>\n"
-		"	  <td class=\"icon\" onclick=gnuplot.popup_help()><img src=\"%shelp.png\" id=\"gnuplot_help_icon\" align=right alt=\"?\" title=\"help\"></td>\n"
+		"	  <td class=\"icon\" onclick=gnuplot.toggle_grid><img src=\"%sgrid.png\" id=\"gnuplot_grid_icon\" class=\"icon-image\" alt=\"#\" title=\"toggle grid\"></td>\n"
+		"	  <td class=\"icon\" onclick=gnuplot.unzoom><img src=\"%spreviouszoom.png\" id=\"gnuplot_unzoom_icon\" class=\"icon-image\" alt=\"unzoom\" title=\"unzoom\"></td>\n"
+		"	  <td class=\"icon\" onclick=gnuplot.rezoom><img src=\"%snextzoom.png\" id=\"gnuplot_rezoom_icon\" class=\"icon-image\" alt=\"rezoom\" title=\"rezoom\"></td>\n"
+		"	  <td class=\"icon\" onclick=gnuplot.toggle_zoom_text><img src=\"%stextzoom.png\" id=\"gnuplot_textzoom_icon\" class=\"icon-image\" alt=\"zoom text\" title=\"zoom text with plot\"></td>\n"
+		"	  <td class=\"icon\" onclick=gnuplot.popup_help()><img src=\"%shelp.png\" id=\"gnuplot_help_icon\" class=\"icon-image\" alt=\"?\" title=\"help\"></td>\n"
 		"	</tr>\n",
 		CANVAS_scriptdir ? CANVAS_scriptdir : "", CANVAS_scriptdir ? CANVAS_scriptdir : "",
 		CANVAS_scriptdir ? CANVAS_scriptdir : "", CANVAS_scriptdir ? CANVAS_scriptdir : "",
