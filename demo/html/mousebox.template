@@ -16,13 +16,13 @@
   <td class="blank">&nbsp;</td>
   <td class="blank">&nbsp;</td>
   <td class="icon">&nbsp;</td>
-  <td class="icon" onclick='gnuplot.toggle_plot("1")'>&#9312;</td>
-  <td class="icon" onclick='gnuplot.toggle_plot("2")'>&#9313;</td>
-  <td class="icon" onclick='gnuplot.toggle_plot("3")'>&#9314;</td>
-  <td class="icon" onclick='gnuplot.toggle_plot("4")'>&#9315;</td>
-  <td class="icon" onclick='gnuplot.toggle_plot("5")'>&#9316;</td>
-  <td class="icon" onclick='gnuplot.toggle_plot("6")'>&#9317;</td>
-  <td class="icon" onclick='gnuplot.toggle_plot("7")'>&#9318;</td>
+  <td class="icon" onclick='gnuplot.toggle_plot("ACTIVE_PLOT_NAME_plot_1")'>&#9312;</td>
+  <td class="icon" onclick='gnuplot.toggle_plot("ACTIVE_PLOT_NAME_plot_2")'>&#9313;</td>
+  <td class="icon" onclick='gnuplot.toggle_plot("ACTIVE_PLOT_NAME_plot_3")'>&#9314;</td>
+  <td class="icon" onclick='gnuplot.toggle_plot("ACTIVE_PLOT_NAME_plot_4")'>&#9315;</td>
+  <td class="icon" onclick='gnuplot.toggle_plot("ACTIVE_PLOT_NAME_plot_5")'>&#9316;</td>
+  <td class="icon" onclick='gnuplot.toggle_plot("ACTIVE_PLOT_NAME_plot_6")'>&#9317;</td>
+  <td class="icon" onclick='gnuplot.toggle_plot("ACTIVE_PLOT_NAME_plot_7")'>&#9318;</td>
 </tr>
 
 </table>

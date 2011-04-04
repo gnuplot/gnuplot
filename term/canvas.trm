@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: canvas.trm,v 1.43 2011/03/31 03:54:25 sfeam Exp $
+ * $Id: canvas.trm,v 1.46 2011/04/03 23:11:58 sfeam Exp $
  *
  */
 
@@ -677,7 +677,7 @@ CANVAS_text()
 		    fprintf(gpoutfile, "	<tr>\n");
 		if (i<=canvas_state.plotno)
 		    fprintf(gpoutfile,
-			"	  <td class=\"icon\" onclick=gnuplot.toggle_plot(\"%d\")>%d</td>\n",i,i);
+			"	  <td class=\"icon\" onclick=gnuplot.toggle_plot(\"gp_plot_%d\")>%d</td>\n",i,i);
 		else
 		    fprintf(gpoutfile,
 			"	  <td class=\"icon\" > </td>\n");
@@ -1079,20 +1079,22 @@ CANVAS_fillbox(int style, unsigned int x1, unsigned int y1, unsigned int width, 
 TERM_PUBLIC void 
 CANVAS_layer(t_termlayer layer)
 {
+    char *basename = (CANVAS_name) ? CANVAS_name : "gp";
+
     switch (layer) {
 
     case TERM_LAYER_BEFORE_PLOT:
 	    canvas_state.plotno++;
 	    CANVAS_finish();
 	    fprintf(gpoutfile,
-		"if (typeof(gnuplot.hide_plot_%d) == \"undefined\""
-		"|| !gnuplot.hide_plot_%d) {\n",
-		canvas_state.plotno, canvas_state.plotno);
+		"if (typeof(gnuplot.hide_%s_plot_%d) == \"undefined\""
+		"|| !gnuplot.hide_%s_plot_%d) {\n",
+		basename, canvas_state.plotno, basename, canvas_state.plotno);
 	    break;
 
     case TERM_LAYER_AFTER_PLOT:
 	    CANVAS_finish();
-	    fprintf(gpoutfile,"} // End plot %d \n", canvas_state.plotno);
+	    fprintf(gpoutfile,"} // End %s_plot_%d \n", basename, canvas_state.plotno);
 	    canvas_line_type = LT_UNDEFINED;
 	    canvas_state.previous_linewidth = -1;
 	    canvas_state.previous_color[0] = '\0';
@@ -1435,6 +1437,10 @@ START_HELP(canvas)
 "           </canvas>",
 "       </body>",
 "       </html>",
+"",
+" The individual plots drawn on this canvas will have names fishplot_plot_1,",
+" fishplot_plot_2, and so on. These can be referenced by external javascript",
+" routines, for example gnuplot.toggle_visibility(\"fishplot_plot_2\").",
 ""
 END_HELP(canvas)
 #endif /* TERM_HELP */

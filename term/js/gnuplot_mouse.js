@@ -1,5 +1,5 @@
 /*
- * $Id: gnuplot_mouse.js,v 1.13 2011/03/31 04:18:11 sfeam Exp $
+ * $Id: gnuplot_mouse.js,v 1.14 2011/04/03 19:31:15 sfeam Exp $
  */
     gnuplot.mouse_version = "03 April 2011";
 
@@ -402,10 +402,10 @@ gnuplot.popup_help = function(URL) {
 	window.open (URL,"gnuplot help");
 }
 
-gnuplot.toggle_plot = function(num) {
-    if (typeof(gnuplot["hide_plot_"+num]) == "unknown")
-    	gnuplot["hide_plot_"+num] = false;
-    gnuplot["hide_plot_"+num] = !gnuplot["hide_plot_"+num];
+gnuplot.toggle_plot = function(plotid) {
+    if (typeof(gnuplot["hide_"+plotid]) == "unknown")
+    	gnuplot["hide_"+plotid] = false;
+    gnuplot["hide_"+plotid] = !gnuplot["hide_"+plotid];
     ctx.clearRect(0,0,gnuplot.plot_term_xmax,gnuplot.plot_term_ymax);
     gnuplot_canvas();
 }

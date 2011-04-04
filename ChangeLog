@@ -1,3 +1,10 @@
+2011-04-04  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/canvas.trm demo/html/mousebox.template term/js/gnuplot_mouse.js:
+	Incorporate the plot name (from 'set term canvas name "foo") into the
+	flag used by the toggleVisibility() routine so that plots in other canvas
+	elements on the same page are not affected.
+
 2011-04-03  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/term.c src/term.h term/Makefile.am.in term/lua.trm
