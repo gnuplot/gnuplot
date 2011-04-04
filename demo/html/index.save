@@ -13,8 +13,8 @@ Interactive demo scripts are not included on this page.
 
 
 
-<table border="0" width="100%">
-<tbody><tr valign="top">
+<table>
+<tbody><tr>
 
 <td rowspan=2>
     <h4>Basic 2D plot styles</h4>
@@ -143,7 +143,7 @@ Interactive demo scripts are not included on this page.
 </td>
 </tr>
 
-<tr valign=top><td align=center>
+<tr><td align=center>
 <img src="showcase_plot.png">
 </td></tr>
 
@@ -152,11 +152,11 @@ Interactive demo scripts are not included on this page.
 <hr>
 
 
-<table border="0" width="100%">
-<tbody><tr valign="top">
+<table>
+<tbody><tr>
 
     <td>
-    <i>This page created by Ethan Merritt<br>January 2008</i>
+    <i>This page created by Ethan Merritt<br>April 2011</i>
     </td>
 
     <td>
@@ -164,9 +164,9 @@ Interactive demo scripts are not included on this page.
     <li><a href="http://sourceforge.net/projects/gnuplot/">
 	Gnuplot development pages on SourceForge</a></li>
     <li>On-line documentation in
-	<a href="http://gnuplot.sourceforge.net/docs_4.2/index.html">HTML</a>
+	<a href="http://gnuplot.sourceforge.net/docs/index.html">HTML</a>
 	and
-	<a href="http://gnuplot.sourceforge.net/docs_4.2/gnuplot.pdf">PDF</a></li>
+	<a href="http://gnuplot.sourceforge.net/docs/gnuplot.pdf">PDF</a></li>
     </ul>
     </td>
     

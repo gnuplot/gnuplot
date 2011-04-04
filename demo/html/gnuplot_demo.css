@@ -78,6 +78,10 @@
  	list-style-type: none;
 	}
 
+ table	{ border: 0; vertical-align: text-top; }
+
+ .icon-image	{ float:right; margin: 0 0 0 0; }
+
  div.box	{ border: none; border-width: thin; 
  		  margin-top: 5; margin-bottom: 5; 
 		  background: #AADDFF;
