@@ -170,12 +170,12 @@ To view the results you need a browser that supports the HTML 5 'canvas' element
 	<tr><td>
 	    <table id="gnuplot_mousebox" class="mbunder">
 	    <tr>
-		<td class="icon" onclick="gnuplot.toggle_grid();"><img src="grid.png" id="gnuplot_grid_icon" align=right alt="#" title="toggle grid"></td>
-		<td class="icon" onclick="gnuplot.unzoom();"><img src="previouszoom.png" id="gnuplot_unzoom_icon" align=right alt="unzoom" title="unzoom"></td>
-		<td class="icon" onclick="gnuplot.rezoom();"><img src="nextzoom.png" id="gnuplot_rezoom_icon" align=right alt="rezoom" title="rezoom"></td>
+		<td class="icon" onclick="gnuplot.toggle_grid();"><img src="grid.png" id="gnuplot_grid_icon" alt="#" title="toggle grid"></td>
+		<td class="icon" onclick="gnuplot.unzoom();"><img src="previouszoom.png" id="gnuplot_unzoom_icon" alt="unzoom" title="unzoom"></td>
+		<td class="icon" onclick="gnuplot.rezoom();"><img src="nextzoom.png" id="gnuplot_rezoom_icon" alt="rezoom" title="rezoom"></td>
 		<td class="icon"><a href="canvas_help.html">
 		                 <img src="help.png" align=right alt="help" title="help"></a></td>
-		<td class="icon" onclick='gnuplot.toggle_plot("1")'>&#10112;</td>
+		<td class="icon" onclick='gnuplot.toggle_plot("gnuplot_canvas_plot_1")'>&#10112;</td>
 	        <td class="mb0">x</td>
 	        <td class="mb1"><span id="gnuplot_canvas_x">&nbsp;</span></td>
 	        <td class="mb0">y</td>
