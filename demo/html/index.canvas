@@ -24,7 +24,7 @@ To view the results you need a browser that supports the HTML 5 'canvas' element
 </p>
 
 
-<table border="0" width="100%">
+<table width="100%">
 <tbody><tr valign="top">
 
 <td rowspan=2>
@@ -196,11 +196,11 @@ To view the results you need a browser that supports the HTML 5 'canvas' element
 <hr>
 
 
-<table border="0" width="100%">
+<table width="100%">
 <tbody><tr valign="top">
 
     <td>
-    <i>This page created by Ethan Merritt<br>Mar 2011</i>
+    <i>This page created by Ethan Merritt<br>April 2011</i>
     </td>
 
     <td>

@@ -37,6 +37,10 @@
 	margin-top: 3;
       }
 
+ TABLE	{
+ 	border: 0;
+	}
+
  TD.TD0 { 
  	font-weight: bold; font-size: 67%; 
 	color:#006600; 
