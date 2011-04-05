@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: color.c,v 1.93 2010/10/06 23:20:50 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: color.c,v 1.94 2010/10/12 21:11:25 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - color.c */
@@ -213,7 +213,9 @@ void ifilled_quadrangle(gpiPoint* icorners)
     if (pm3d.hidden3d_tag) {
 	int i;
 
-	apply_pm3dcolor(&pm3d_border_lp.pm3d_color, term);
+	/* It should be sufficient to set only the color, but for some */
+	/* reason this causes the svg terminal to lose the fill type.  */
+	term_apply_lp_properties(&pm3d_border_lp);
 
 	term->move(icorners[0].x, icorners[0].y);
 	for (i = 3; i >= 0; i--) {

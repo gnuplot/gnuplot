@@ -1,3 +1,8 @@
+2011-04-05  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/color.c (ifilled_quadrangle): See note in the code.  For some
+	reason this fixes rendering of pm3d surfaces in the svg terminal.
+
 2011-04-04  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/canvas.trm demo/html/mousebox.template term/js/gnuplot_mouse.js:
