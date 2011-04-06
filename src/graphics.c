@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.360 2011/04/01 22:35:45 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.361 2011/04/06 06:00:18 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -2013,11 +2013,13 @@ do_plot(struct curve_points *plots, int pcount)
 	}
 
 
-	if (localkey && this_plot->title && !this_plot->title_is_suppressed) {
-	    /* If there are two passes, defer point sample till the second */
-	    if (key->front && !key_pass)
-		continue; /* Do nothing during first pass */
-
+	/* If there are two passes, defer key sample till the second */
+	if (key->front && !key_pass)
+		/* FIXME: This breaks svg's click-on-key-sample approach, */
+		/* because the index number for the plot gets out of sync */
+		/* with the index number of the key sample. */
+		;
+	else if (localkey && this_plot->title && !this_plot->title_is_suppressed) {
 	    /* we deferred point sample until now */
 	    if (this_plot->plot_style == LINESPOINTS
 	         &&  this_plot->lp_properties.p_interval < 0) {
