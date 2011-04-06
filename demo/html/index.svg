@@ -1,24 +1,28 @@
-<html><head><title>Demo scripts for SVG terminal in gnuplot CVS version</title>
+<!DOCTYPE HTML>
+<html>
+<head><title>Gnuplot Version 4.5 SVG terminal demos</title>
+<link type="text/css" href="gnuplot_demo.css" rel="stylesheet">
+<meta charset="UTF-8">
+</head>
 
-<link type="text/css" href="gnuplot_demo.css" rel="stylesheet"></head><body>
-
-
+<body>
 
 <h2 align=center>
-    Demo scripts for gnuplot CVS version (SVG terminal)<br>
+    Gnuplot Version 4.5 SVG terminal demos<br>
     See also the demo output for the 
        <a href="../demo_cvs/">PNG</a> and
        <a href="../demo_canvas/">canvas</a> terminals.
 </h2>
 
 <p>
-Gnuplot is distributed with a large set of scripts that demonstrate
-various features.  Collected below are the results of running
-many of these through the CVS version of gnuplot using the svg terminal.
-Viewing these is a fairly stringent test of your browser's svg support.
+Gnuplot is distributed with a large set of demonstration scripts.
+Here are samples of SVG output from some of the demos generated
+using the <i>April 2011:</i> CVS version of gnuplot.
+Note that individual plots can be toggled on/off by clicking on
+the corresponding key entry.
+</p>
 
-
-<table border="0" width="100%">
+<table width="100%">
 <tbody><tr valign="top">
 
 <td rowspan=2>
@@ -115,7 +119,6 @@ Viewing these is a fairly stringent test of your browser's svg support.
 
     <h4>Page Layout</h4>
     <ul>
-    <li><a href="key.html">plot key</a></li>
     <li><a href="layout.html">multiplot&nbsp;layout</a></li>
     <li><a href="multiplt.html">multiple plots</a></li>
     <li><a href="margins.html">aligned plots</a></li>
@@ -136,34 +139,33 @@ Viewing these is a fairly stringent test of your browser's svg support.
 <td align=center valign=bot>
 	<h4></h4>
 	These plots were generated using
-	<font size="-1"><pre>set term svg enhanced font 'arial,11' size 600,400</pre></font>
+	<pre><font size="-1">set term svg enhanced mouse size 600,400</font></pre>
 </td>
 </tr>
 
 <tr valign=top><td align=center>
-	<table border=0 width=500><tr><td colspan=3>
-	    	<embed src="href.svg" type="image/svg+xml" width=500 height=350 align=right>
+	<table width=500><tr><td colspan=3>
+	    	<embed src="showcase_plot.svg" type="image/svg+xml" width=500 height=350 class="float-right">
 	    </td></tr>
 	    <tr> <td width=50></td><td>
-	    	Figure showing hyperlinks attached to individual plot elements and labels.
+	    	Click on the figure legend to toggle plot elements on/off.
 	    </td><td>
 		<a href="http://validator.w3.org/check?uri=referer"><img
 		src="http://www.w3.org/Icons/valid-svg11"
-		alt="Valid SVG 1.1 align=right"   /></a>
+		alt="Valid SVG 1.1"   /></a>
 	    </td></tr>
 	</table>
 </td></tr>
 
 </tbody></table>
-</p>
 <hr>
 
 
-<table border="0" width="100%">
+<table width="100%">
 <tbody><tr valign="top">
 
     <td>
-    <i>This page created by Ethan Merritt<br>May 2009</i>
+    <i>This page created by Ethan Merritt<br>April 2011</i>
     </td>
 
     <td>

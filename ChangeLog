@@ -1,3 +1,16 @@
+2011-04-06  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/graph3d.c src/graphics.c src/term_api.h:  Add layering flags
+	for BEGIN/END KEYSAMPLE.
+	
+	* term/js/gnuplot_svg.js term/svg.trm: Elementary mousing support for
+	the svg terminal based on Patches #2477391 #2478169 (yeah, those are
+	from 2 years ago).  Toggle plot on/off in response to mouse click on
+	the corresponding key entry.
+
+	* demo/html/Makefile.svg demo/html/index.svg demo/html/webify_svg.pl:
+	Revise the svg demo set to use mousing.
+
 2011-04-05  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/color.c (ifilled_quadrangle): See note in the code.  For some

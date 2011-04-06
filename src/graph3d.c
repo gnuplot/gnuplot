@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.244 2011/02/20 23:17:11 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.245 2011/04/01 22:35:45 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -990,14 +990,11 @@ do_3dplot(
 	    if (this_plot->plot_type == NODATA)
 		continue;
 
-	    if (can_pm3d && PM3D_IMPLICIT == pm3d.implicit) {
-		(term->layer)(TERM_LAYER_BEFORE_PLOT);
-		pm3d_draw_one(this_plot);
-		(term->layer)(TERM_LAYER_AFTER_PLOT);
-	    }
-
 	    /* Sync point for start of new curve (used by svg, post, ...) */
 	    (term->layer)(TERM_LAYER_BEFORE_PLOT);
+
+	    if (can_pm3d && PM3D_IMPLICIT == pm3d.implicit)
+		pm3d_draw_one(this_plot);
 
 	    lkey = (key->visible && this_plot->title && this_plot->title[0]
 				 && !this_plot->title_is_suppressed);
@@ -1232,6 +1229,7 @@ do_3dplot(
 		    }
 		    NEXT_KEY_LINE();
 		}
+
 		while (cntrs) {
 		    if (label_contours && cntrs->isNewLevel) {
 			if (key->visible) {
@@ -2958,6 +2956,7 @@ key_text(int xl, int yl, char *text)
 {
     legend_key *key = &keyT;
 
+    (term->layer)(TERM_LAYER_BEGIN_KEYSAMPLE);
     if (key->just == GPKEY_LEFT && key->region != GPKEY_USER_PLACEMENT) {
 	(*term->justify_text) (LEFT);
 	(*term->put_text) (xl + key_text_left, yl, text);
@@ -2969,6 +2968,7 @@ key_text(int xl, int yl, char *text)
 	    (*term->put_text) (x, yl, text);
 	}
     }
+    (term->layer)(TERM_LAYER_END_KEYSAMPLE);
 }
 
 static void
@@ -2982,7 +2982,9 @@ key_sample_line(int xl, int yl)
     else
 	clip_area = &canvas;
 
+    (term->layer)(TERM_LAYER_BEGIN_KEYSAMPLE);
     draw_clip_line(xl + key_sample_left, yl, xl + key_sample_right, yl);
+    (term->layer)(TERM_LAYER_END_KEYSAMPLE);
 
     clip_area = clip_save;
 }
@@ -2998,8 +3000,10 @@ key_sample_point(int xl, int yl, int pointtype)
     else
 	clip_area = &canvas;
 
+    (term->layer)(TERM_LAYER_BEGIN_KEYSAMPLE);
     if (!clip_point(xl + key_point_offset, yl))
 	(*term->point) (xl + key_point_offset, yl, pointtype);
+    (term->layer)(TERM_LAYER_END_KEYSAMPLE);
 
     clip_area = clip_save;
 }

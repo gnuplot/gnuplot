@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.359 2011/03/22 12:29:11 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.360 2011/04/01 22:35:45 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -2038,8 +2038,10 @@ do_plot(struct curve_points *plots, int pcount)
 	    } else if (this_plot->plot_style & PLOT_STYLE_HAS_POINT) {
 		if (this_plot->lp_properties.p_size == PTSZ_VARIABLE)
 		    (*t->pointsize)(pointsize);
+		(t->layer)(TERM_LAYER_BEGIN_KEYSAMPLE);
 		if (on_page(xl + key_point_offset, yl))
 		    (*t->point) (xl + key_point_offset, yl, this_plot->lp_properties.p_type);
+		(t->layer)(TERM_LAYER_END_KEYSAMPLE);
 	    }
 
 	    if (key->invert)
@@ -5674,6 +5676,8 @@ do_key_sample(
     else
 	clip_area = &canvas;
 
+    (*t->layer)(TERM_LAYER_BEGIN_KEYSAMPLE);
+
     if (key->textcolor.type == TC_VARIABLE)
 	/* Draw key text in same color as plot */
 	;
@@ -5784,6 +5788,8 @@ do_key_sample(
      * when drawing a point, but does not restore it. We must wait
      then draw the point sample at the end of do_plot (line 2058)
      */
+
+    (*t->layer)(TERM_LAYER_END_KEYSAMPLE);
 
     /* Restore previous clipping area */
     clip_area = clip_save;

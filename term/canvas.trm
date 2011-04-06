@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: canvas.trm,v 1.46 2011/04/03 23:11:58 sfeam Exp $
+ * $Id: canvas.trm,v 1.47 2011/04/04 21:40:46 sfeam Exp $
  *
  */
 
@@ -377,7 +377,11 @@ CANVAS_graphics()
     strcpy(canvas_state.color,"rgb(000,000,000)");
     canvas_state.plotno = 0;
 
-    /* Figure out where the javascript should come from when the page is viewed */
+    /*
+     * FIXME: This code could be shared with svg.trm
+     *        Figure out where to find javascript support routines
+     *        when the page is viewed.
+     */
     if (CANVAS_scriptdir == NULL) {
 	char *canvas_default_jsdir = "";
 #ifdef GNUPLOT_JS_DIR
