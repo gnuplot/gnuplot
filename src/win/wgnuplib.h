@@ -1,5 +1,5 @@
 /*
- * $Id: wgnuplib.h,v 1.38 2011/03/28 10:09:41 markisch Exp $
+ * $Id: wgnuplib.h,v 1.39 2011/04/06 06:24:28 markisch Exp $
  */
 
 /* GNUPLOT - win/wgnuplib.h */
@@ -330,6 +330,7 @@ typedef struct tagGW {
 	BOOL    doublebuffer;   /* double buffering? */
 	BOOL    oversample;	/* oversampling? */
 	int     sampling;	/* current sampling factor */
+	int	encoding_error; /* last unknown encoding */
 } GW;
 typedef GW *  LPGW;
 

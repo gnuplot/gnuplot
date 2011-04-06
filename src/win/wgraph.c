@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.101 2011/03/21 19:09:32 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.102 2011/04/06 06:24:28 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - win/wgraph.c */
@@ -843,6 +843,9 @@ UnicodeText(const char *str, enum set_encoding_id encoding)
     UINT codepage = 0;
     LPWSTR textw = NULL;
 
+    /* For a list of code page identifiers see
+       http://msdn.microsoft.com/en-us/library/dd317756%28v=vs.85%29.aspx 
+    */
     switch (encoding) {
         case S_ENC_ISO8859_1:  codepage = 28591; break;
         case S_ENC_ISO8859_2:  codepage = 28592; break;
@@ -933,7 +936,6 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
     unsigned int fillstyle = 0.0;
     int idx;
     COLORREF last_color = 0;
-    static BOOL encoding_error = false;
 
     if (lpgw->locked)
 	return;
@@ -1083,9 +1085,9 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
                             free(textw);
                         } else {
                             /* print this only once */
-                            if (!encoding_error) {
+                            if (encoding != lpgw->encoding_error) {
                                 fprintf(stderr, "windows terminal: encoding %s not supported\n", encoding_names[encoding]);
-                                encoding_error = TRUE;
+                                lpgw->encoding_error = encoding;
                             }
                             /* fall back to standard encoding */
                             TextOut(hdc, xdash, ydash, str, strlen(str));

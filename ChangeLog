@@ -2,6 +2,10 @@
 
 	* term/win.trm, src/win/wgnuplib.h, src/win/wgraph.c: Use UINTs
 	instead of DWORDs in struct GWOP.
+	
+	* src/win/wgraph.c, src/win/wgnuplib.h: Move static flag for 
+	unsupported encodings to struct LPGW. This ensures that errors
+	are reported only once.
 
 2011-04-06  Ethan A Merritt  <merritt@u.washington.edu>
 
