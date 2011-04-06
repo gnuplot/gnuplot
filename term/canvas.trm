@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: canvas.trm,v 1.47 2011/04/04 21:40:46 sfeam Exp $
+ * $Id: canvas.trm,v 1.48 2011/04/06 06:00:18 sfeam Exp $
  *
  */
 
@@ -1118,6 +1118,7 @@ CANVAS_layer(t_termlayer layer)
 	    break;
 
     case TERM_LAYER_RESET:
+    case TERM_LAYER_RESET_PLOTNO:
 	    canvas_state.plotno = 0;
 	    break;
 

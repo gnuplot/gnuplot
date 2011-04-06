@@ -20,11 +20,11 @@
 	* demo/html/Makefile.svg demo/html/index.svg demo/html/webify_svg.pl:
 	Revise the svg demo set to use mousing.
 
-	* src/graphics.c (do_plot):  The "set key opaque" option was causing
+	* src/graphics.c (do_plot) src/term_api.h (TERM_LAYER_RESET_PLOTNO)
+	term/svg.trm term/canvas.trm: The "set key opaque" option was causing
 	mismatched begin/end plot pairs in output from the svg and canvas
-	terminals (begin/begin/end).  With this fix there is no missing "end"
-	but unfortunately the numbering of the key samples is out of sync with
-	the plot it belongs to.
+	terminals (begin/begin/end).  Revise this so that the plot and the key
+	sample numbering is out of sync.
 
 2011-04-05  Ethan A Merritt  <merritt@u.washington.edu>
 

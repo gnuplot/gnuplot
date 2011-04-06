@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.361 2011/04/06 06:00:18 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.362 2011/04/07 00:06:27 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -1797,6 +1797,9 @@ do_plot(struct curve_points *plots, int pcount)
     if (lkey)
 	do_key_layout( key, key_pass, &xl, &yl );
     SECOND_KEY_PASS:
+	/* This tells the canvas and svg terminals to restart the plot count */
+	/* so that the key titles are in sync with the plots they describe.  */
+	(*t->layer)(TERM_LAYER_RESET_PLOTNO);
 
     /* DRAW CURVES */
     this_plot = plots;
@@ -2015,10 +2018,7 @@ do_plot(struct curve_points *plots, int pcount)
 
 	/* If there are two passes, defer key sample till the second */
 	if (key->front && !key_pass)
-		/* FIXME: This breaks svg's click-on-key-sample approach, */
-		/* because the index number for the plot gets out of sync */
-		/* with the index number of the key sample. */
-		;
+	    ;
 	else if (localkey && this_plot->title && !this_plot->title_is_suppressed) {
 	    /* we deferred point sample until now */
 	    if (this_plot->plot_style == LINESPOINTS
