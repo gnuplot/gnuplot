@@ -1,5 +1,5 @@
 /*
- * $Id: wgnuplib.h,v 1.37 2011/03/20 18:47:47 markisch Exp $
+ * $Id: wgnuplib.h,v 1.38 2011/03/28 10:09:41 markisch Exp $
  */
 
 /* GNUPLOT - win/wgnuplib.h */
@@ -234,8 +234,8 @@ void WDPROC AboutBox(HWND hwnd, LPSTR str);
 /* Information about one graphical operation to be stored by the
  * driver for the sake of redraws. Array of GWOP kept in global block */
 struct GWOP {
-	WORD op;
-	WORD x, y;
+	UINT op;
+	UINT x, y;
 	HLOCAL htext;
 };
 
@@ -279,7 +279,7 @@ struct GWOPBLK {			/* kept in local memory */
 #define W_pm3d_filled_polygon_pt   39
 #define W_pm3d_filled_polygon_draw 40
 #define W_boxfill 41
-#define W_fillstyle 42		/* NOTE HBB 20010916: used #if _FILLEDBOXES */
+#define W_fillstyle 42
 #define W_font 43
 #define W_image 50
 
@@ -339,20 +339,14 @@ typedef GW *  LPGW;
 #define MAXTITLELEN 120
 #define WINGRAPHTITLE "gnuplot graph"
 
-#if 0
-enum JUSTIFY {
-	LEFT, CENTRE, RIGHT
-};
-#endif
-
 void WDPROC GraphInit(LPGW lpgw);
 void WDPROC GraphClose(LPGW lpgw);
 void WDPROC GraphStart(LPGW lpgw, double pointsize);
 void WDPROC GraphEnd(LPGW lpgw);
 void WDPROC GraphChangeTitle(LPGW lpgw);
 void WDPROC GraphResume(LPGW lpgw);
-void WDPROC GraphOp(LPGW lpgw, WORD op, WORD x, WORD y, LPCSTR str);
-void WDPROC GraphOpSize(LPGW lpgw, WORD op, WORD x, WORD y, LPCSTR str, DWORD size);
+void WDPROC GraphOp(LPGW lpgw, UINT op, UINT x, UINT y, LPCSTR str);
+void WDPROC GraphOpSize(LPGW lpgw, UINT op, UINT x, UINT y, LPCSTR str, DWORD size);
 void WDPROC GraphPrint(LPGW lpgw);
 void WDPROC GraphRedraw(LPGW lpgw);
 void WDPROC GraphChangeFont(LPGW lpgw, LPCSTR font, int fontsize, HDC hdc, RECT rect);

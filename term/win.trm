@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: win.trm,v 1.88 2011/03/13 19:55:29 markisch Exp $
+ * $Id: win.trm,v 1.89 2011/03/17 00:28:17 markisch Exp $
  */
 
 /* GNUPLOT - win.trm */
@@ -382,9 +382,6 @@ WIN_graphics()
 TERM_PUBLIC void
 WIN_move(unsigned int x, unsigned int y)
 {
-    /* Notice HBB 20010208: on Win32 platforms, passing int or
-     * unsigned int arguments to GraphOp() might cause problems: int
-     * is 32bits, but GraphOp() args are 16bit WORDS. */
     GraphOp(&graphwin, W_move, x, y, NULL);
 
     /* save current position, only needed for enhanced text */
@@ -395,7 +392,6 @@ WIN_move(unsigned int x, unsigned int y)
 TERM_PUBLIC void
 WIN_vector(unsigned int x, unsigned int y)
 {
-    /* Notice HBB 20010208: --> WIN_move() */
     GraphOp(&graphwin, W_vect, x, y, NULL);
 }
 
@@ -403,7 +399,6 @@ TERM_PUBLIC void
 WIN_linetype(int lt)
 {
     if (lt != WIN_last_linetype) {
-	/* Notice HBB 20010208: --> see WIN_move() */
     	GraphOp(&graphwin, W_line_type, lt, 0, NULL);
 	WIN_last_linetype = lt;
     }
@@ -412,14 +407,12 @@ WIN_linetype(int lt)
 TERM_PUBLIC void
 WIN_put_text(unsigned int x, unsigned int y, const char *str)
 {
-    /* Notice HBB 20010208: --> WIN_move() */
     GraphOp(&graphwin, W_put_text, x, y, str);
 }
 
 TERM_PUBLIC int
 WIN_justify_text(enum JUSTIFY mode)
 {
-    /* Notice HBB 20010208: --> WIN_move() */
     GraphOp(&graphwin, W_justify, mode, 0, NULL);
     /* store text justification, only needed for enhanced text */
     WIN_justification = mode;
@@ -430,7 +423,6 @@ TERM_PUBLIC int
 WIN_text_angle(int ang)
 {
     if (graphwin.rotate) {
-	/* Notice HBB 20010208: --> WIN_move() */
  	GraphOp(&graphwin, W_text_angle, ang, 0, NULL);
 
         /* store text angle, only needed for enhanced text */
@@ -458,7 +450,6 @@ WIN_point(unsigned int x, unsigned int y, int number)
     if (number >= 0)
 	number %= WIN_POINT_TYPES;
     number += 1;
-    /* Notice HBB 20010208: --> WIN_move() */
     GraphOp(&graphwin, W_dot + number, x, y, NULL);
     if (!graphwin.color)
       WIN_linetype(oldlinetype);
@@ -481,7 +472,6 @@ WIN_set_pointsize(double s)
     sprintf(scale, "%.15g", s);
     /* Pass the scale as a scaled-up integer. For the sake of compatibility,
      * pass the string as well. */
-    /* Notice HBB 20010208: --> WIN_move() */
     GraphOp(&graphwin, W_pointsize, (int) 100 * s, 0, scale);
 }
 
@@ -490,7 +480,6 @@ WIN_linewidth(double linewidth)
 {
     /* HBB 20000813: New routine */
     WIN_last_linetype = LT_NODRAW;        /* invalidate cached linetype */
-    /* Notice HBB 20010208: --> WIN_move() */
     GraphOp(&graphwin, W_line_width, (int) 100 * linewidth, 0, NULL);
 }
 

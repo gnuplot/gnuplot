@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.100 2011/03/20 18:47:47 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.101 2011/03/21 19:09:32 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - win/wgraph.c */
@@ -309,7 +309,7 @@ AddBlock(LPGW lpgw)
 
 
 void WDPROC
-GraphOp(LPGW lpgw, WORD op, WORD x, WORD y, LPCSTR str)
+GraphOp(LPGW lpgw, UINT op, UINT x, UINT y, LPCSTR str)
 {
     if (str)
 	GraphOpSize(lpgw, op, x, y, str, _fstrlen(str)+1);
@@ -319,7 +319,7 @@ GraphOp(LPGW lpgw, WORD op, WORD x, WORD y, LPCSTR str)
 
 
 void WDPROC
-GraphOpSize(LPGW lpgw, WORD op, WORD x, WORD y, LPCSTR str, DWORD size)
+GraphOpSize(LPGW lpgw, UINT op, UINT x, UINT y, LPCSTR str, DWORD size)
 {
 	struct GWOPBLK *this;
 	struct GWOP *gwop;
@@ -1217,8 +1217,8 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 	    break;
 	}
   	case W_text_angle:
- 	    if (lpgw->angle != (short int)curptr->x) {
- 		lpgw->angle = (short int)curptr->x;
+ 	    if (lpgw->angle != (int)curptr->x) {
+ 		lpgw->angle = (int)curptr->x;
  		/* correctly calculate shifting of rotated text */
  		hshift = sin(M_PI/180. * lpgw->angle) * MulDiv(lpgw->vchar, rr-rl, lpgw->xmax) / 2;
  		vshift = cos(M_PI/180. * lpgw->angle) * MulDiv(lpgw->vchar, rb-rt, lpgw->ymax) / 2;
@@ -1291,7 +1291,7 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 		    c = RGB(rgb255.r, rgb255.g, rgb255.b);
 		}
 		else if (curptr->y == (TC_LT << 8)) {	/* TC_LT */
-		    short pen = curptr->x;
+		    int pen = curptr->x;
 		    if (pen > WGNUMPENS) pen = pen % WGNUMPENS;
 		    if (pen <= LT_BACKGROUND) {
 			pen = 1;
@@ -1487,7 +1487,7 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 		*/
 		static int seq = 0;  /* sequence counter */
 		static POINT corners[4];
-		static color_mode = 0;
+		static int color_mode = 0;
 
 		if (seq == 0) {
 		    /* First OP contains only the color mode */
