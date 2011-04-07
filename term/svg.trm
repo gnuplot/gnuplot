@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: svg.trm,v 1.110 2011/04/06 06:00:18 sfeam Exp $
+ * $Id: svg.trm,v 1.111 2011/04/07 03:30:33 sfeam Exp $
  */
 
 /*------------------------------------------------------------------------------------------------------------------------------------
@@ -45,6 +45,7 @@
  *   Wrap each plot in a named group <g id="name_plot_%02d">
  *   Set the name using 'set term svg name "foo"'
  *   Background option
+ *   Bitmap image support by creating and linking to external png files
  *
  * Contributed by <forgery69@users.sf.net>
  *   Javascript code to toggle plots on/off
@@ -85,6 +86,10 @@ TERM_PUBLIC void ENHsvg_put_text __PROTO((unsigned int, unsigned int, const char
 TERM_PUBLIC void ENHsvg_writec __PROTO((int));
 
 TERM_PUBLIC void SVG_path __PROTO((int p));
+
+#ifdef WRITE_PNG_IMAGE
+TERM_PUBLIC void SVG_image __PROTO((unsigned m, unsigned n, coordval *image, gpiPoint *corner, t_imagecolor color_mode));
+#endif
 
 #define SVG_SCALE	10.
 #define Y(y) ((float)((int)term->ymax - (int)y) / SVG_SCALE)
@@ -144,6 +149,8 @@ static struct SVG_PEN SVG_pens[16];	/* pen descriptors*/
 static int SVG_fillPattern = -1; /* active fill pattern (-1 == undefined) */
 static unsigned int SVG_fillPatternIndex = 0;
 static int SVG_background = -1;
+static int SVG_imageno = 0;
+static int SVG_plotno = 0;
 
 static int SVG_fontAscent = 0;	/* estimated current font ascent*/
 static int SVG_fontDescent = 0;	/* estimated current font descent*/
@@ -1313,7 +1320,6 @@ SVG_filled_polygon(int points, gpiPoint* corners)
 TERM_PUBLIC void
 SVG_layer(t_termlayer syncpoint)
 {
-    static int plotno = 0;
     char *name = NULL;
 
     /* We must ignore all syncpoints that we don't recognize */
@@ -1325,10 +1331,10 @@ SVG_layer(t_termlayer syncpoint)
 	case TERM_LAYER_BEFORE_PLOT:
 		SVG_PathClose();
 		SVG_GroupClose();
-		++plotno;
+		++SVG_plotno;
 		name = (SVG_name) ? SVG_name : "gnuplot";
-		fprintf(gpoutfile, "\t<g id=\"%s_plot_%d\" ", name,plotno);
-		fprintf(gpoutfile, "><title>%s_plot_%d</title>\n", name,plotno);
+		fprintf(gpoutfile, "\t<g id=\"%s_plot_%d\" ", name,SVG_plotno);
+		fprintf(gpoutfile, "><title>%s_plot_%d</title>\n", name,SVG_plotno);
 		SVG_LineType = LT_UNDEFINED; /* Force a new group on next stroke */
 		break;
 
@@ -1347,7 +1353,7 @@ SVG_layer(t_termlayer syncpoint)
 		    fprintf(gpoutfile, "\t<g visibility=\"visible\" ");
 		    fprintf(gpoutfile,
 			"onclick=\"gnuplot_svg.toggleVisibility(evt,'%s_plot_%d')\"",
-			name,plotno);
+			name,SVG_plotno);
 		    fprintf(gpoutfile, ">\n");
 		}
 		break;
@@ -1363,10 +1369,36 @@ SVG_layer(t_termlayer syncpoint)
 
 	case TERM_LAYER_RESET:
 	case TERM_LAYER_RESET_PLOTNO:
-		plotno = 0;
+		SVG_plotno = 0;
 		break;
     }
 }
+
+/*------------------------------------------------------------------------------------------------------------------------------------
+	SVG_image
+------------------------------------------------------------------------------------------------------------------------------------*/
+#ifdef WRITE_PNG_IMAGE
+TERM_PUBLIC void
+SVG_image (unsigned m, unsigned n, coordval *image, gpiPoint *corner, t_imagecolor color_mode) 
+{
+    char *image_file;
+    char *base_name = SVG_name ? SVG_name : "gp";
+   
+    /* Write the image to a png file */
+    image_file = gp_alloc(strlen(base_name)+16, "SVG_image");
+    sprintf(image_file, "%s_image_%02d.png", base_name, ++SVG_imageno);
+    write_png_image (m, n, image, color_mode, image_file);
+
+    /* Map it onto the terminals coordinate system. */
+    fprintf(gpoutfile, "<image x='%.1f' y='%.1f' width='%.1f' height='%.1f' preserveAspectRatio='none' ",
+	X(corner[0].x), Y(corner[0].y), 
+	X(corner[1].x) - X(corner[0].x), Y(corner[1].y) - Y(corner[0].y));
+
+    fprintf(gpoutfile, "xlink:href='%s_image_%02d.png'/>;\n",
+	base_name, SVG_imageno);
+
+}
+#endif
 
 
 /* Enhanced text mode support starts here */
@@ -1662,7 +1694,11 @@ TERM_TABLE_START (svg_driver)
    SVG_previous_palette,
    SVG_set_color,
    SVG_filled_polygon
+#ifdef WRITE_PNG_IMAGE
+    , SVG_image
+#else
     , NULL	/* image */
+#endif
    , ENHsvg_OPEN, ENHsvg_FLUSH, ENHsvg_writec
    , SVG_layer	/* layer */
    , SVG_path 	/* path */

@@ -85,8 +85,8 @@ the corresponding key entry.
     <h4>Binary and Image data </h4>
     <ul>
     <li><a href="binary.html">binary data</a></li>
-    <li><font color=gray>image data</font></li>
-    <li><font color=gray>binary and image tricks</font></li>
+    <li><a href="rgbalpha.html">RGB + alpha channel</a></li>
+    <li><a href="barchart_art.html">rescaled images</a></li>
     </ul>
 
     <h4>Colors</h4>

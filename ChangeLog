@@ -1,3 +1,10 @@
+2011-04-07  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/term.h term/svg.trm demo/html/webify_svg.pl demo/html/Makefile.svg
+	demo/html/Makefile.svg:  Add bitmap image handling to the svg terminal
+	using the same mechanism of external png files used by the canvas and 
+	tikz terminals.
+
 2011-04-06  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* term/win.trm, src/win/wgnuplib.h, src/win/wgraph.c: Use UINTs
