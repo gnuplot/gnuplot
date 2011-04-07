@@ -5,6 +5,10 @@
 	using the same mechanism of external png files used by the canvas and 
 	tikz terminals.
 
+	* term/svg.trm(SVG_init): Konqueror (KDE 4.5) crashes if the xlink to
+	gnuplot_svg.js fails to load.  Work around this by adding a test for the
+	presence of gnuplot_svg before initializing.
+
 2011-04-06  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* term/win.trm, src/win/wgnuplib.h, src/win/wgraph.c: Use UINTs

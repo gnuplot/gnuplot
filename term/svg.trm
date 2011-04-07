@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: svg.trm,v 1.111 2011/04/07 03:30:33 sfeam Exp $
+ * $Id: svg.trm,v 1.112 2011/04/07 04:14:42 sfeam Exp $
  */
 
 /*------------------------------------------------------------------------------------------------------------------------------------
@@ -770,14 +770,14 @@ SVG_init ()
 	     "<svg ", svg_encoding);
 
     if (SVG_mouseable)
-	fprintf (gpoutfile, "onload=\"gnuplot_svg.Init(evt)\" ");
+	fprintf (gpoutfile, "onload=\"if (typeof(gnuplot_svg)!='undefined') gnuplot_svg.Init(evt)\" ");
 
     if (SVG_fixed_size)
-	fprintf (gpoutfile, "width=\"%u\" height=\"%u\" ",
+	fprintf (gpoutfile, "\n width=\"%u\" height=\"%u\" ",
 		 (unsigned int) (term->xmax / SVG_SCALE),
 		 (unsigned int) (term->ymax / SVG_SCALE));
 
-    fprintf (gpoutfile, "viewBox=\"0 0 %u %u\"\n",
+    fprintf (gpoutfile, "\n viewBox=\"0 0 %u %u\"\n",
 	     (unsigned int) (term->xmax / SVG_SCALE),
 	     (unsigned int) (term->ymax / SVG_SCALE));
     fprintf (gpoutfile, " xmlns=\"http://www.w3.org/2000/svg\"\n");
