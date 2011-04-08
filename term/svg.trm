@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: svg.trm,v 1.113 2011/04/07 21:48:25 sfeam Exp $
+ * $Id: svg.trm,v 1.114 2011/04/08 23:45:42 sfeam Exp $
  */
 
 /*------------------------------------------------------------------------------------------------------------------------------------
@@ -45,6 +45,7 @@
  *   Set the name using 'set term svg name "foo"'
  *   Background option
  *   Bitmap image support by creating and linking to external png files
+ *   Mouse-tracking with coordinate readout.
  *
  * Contributed by <forgery69@users.sf.net>
  *   Javascript code to toggle plots on/off
@@ -836,10 +837,33 @@ SVG_init ()
 #endif
 
     if (SVG_mouseable) {
-	fprintf(gpoutfile,"<defs>\n");
-	fprintf(gpoutfile,"<script type=\"text/ecmascript\" xlink:href=\"%sgnuplot_svg.js\"/>\n",
+	/* This is sufficient to support toggling plots on/off */
+	fprintf(gpoutfile,"<script type=\"text/javascript\" xlink:href=\"%sgnuplot_svg.js\"/>\n",
 	    SVG_scriptdir);
-	fprintf(gpoutfile,"</defs>\n");
+    }
+
+    if (SVG_mouseable) {   /* FIXME: Should only do this for 2D plots */
+	/* This is extra code to support tracking the mouse coordinates */
+	fprintf(gpoutfile,"\n<!-- Tie mousing to entire bounding box of the plot -->\n");
+	fprintf(gpoutfile,"<rect x=\"%d\" y=\"%d\" width=\"%d\" height=\"%d\"",
+		0, 0, (int)(term->xmax/SVG_SCALE), (int)(term->ymax/SVG_SCALE));
+	fprintf(gpoutfile," fill=\"#%06x\" stroke=\"black\" stroke-width=\"1\"\n",
+		SVG_background>0 ? SVG_background : 0xffffff);
+	fprintf(gpoutfile,"onclick=\"gnuplot_svg.toggleCoordBox(evt)\"  onmousemove=\"gnuplot_svg.moveCoordBox(evt)\"/>\n");
+	fprintf(gpoutfile,"\n  <text id=\"coord_text\" text-anchor=\"start\" pointer-events=\"none\"\n");
+	fprintf(gpoutfile,"  font-size=\"12\" font-family=\"Arial\"\n");
+	fprintf(gpoutfile,"  visibility=\"hidden\"> </text>\n");
+	fprintf(gpoutfile,"\n<!-- Also track mouse when it is on a plot element -->\n");
+	fprintf(gpoutfile,"<g id=\"gnuplot_canvas\" onclick=\"gnuplot_svg.toggleCoordBox(evt)\" onmousemove=\"gnuplot_svg.moveCoordBox(evt)\">\n\n");
+    } else {
+	fprintf(gpoutfile,"<g id=\"gnuplot_canvas\">\n\n");
+	fprintf(gpoutfile,"<rect x=\"%d\" y=\"%d\" width=\"%d\" height=\"%d\"",
+		0, 0, (int)(term->xmax/SVG_SCALE), (int)(term->ymax/SVG_SCALE));
+	if (SVG_background > 0)
+		fprintf(gpoutfile," fill=\"#%06x\"", SVG_background);
+	else
+		fprintf(gpoutfile," fill=\"none\"");
+	fprintf(gpoutfile,"/>\n");
     }
 
     /* Start prologue section of output file, and load fonts if requested */
@@ -900,10 +924,6 @@ SVG_init ()
 	     , stroke_width
 	     , stroke_width
 	);
-
-    /* Fill with background color */
-    if (SVG_background >=0)
-	SVG_fillbox(FS_EMPTY,0,0,term->xmax,term->ymax);
 }
 
 /*------------------------------------------------------------------------------------------------------------------------------------
@@ -935,6 +955,70 @@ SVG_text ()
 {
     SVG_PathClose ();
     SVG_GroupClose ();
+
+    if (SVG_mouseable) {
+	struct udvt_entry *udv;
+	char *name = (SVG_name) ? SVG_name : "gnuplot";
+
+	fprintf(gpoutfile, "\n<script type=\"text/javascript\"><![CDATA[\n");
+	fprintf(gpoutfile, "// plot boundaries and axis scaling information for mousing \n");
+	fprintf(gpoutfile, "gnuplot_svg.plot_term_xmax = %d;\n", (int)(term->xmax / CANVAS_OVERSAMPLE));
+	fprintf(gpoutfile, "gnuplot_svg.plot_term_ymax = %d;\n", (int)(term->ymax / CANVAS_OVERSAMPLE));
+	fprintf(gpoutfile, "gnuplot_svg.plot_xmin = %.1f;\n", (double)plot_bounds.xleft / CANVAS_OVERSAMPLE);
+	fprintf(gpoutfile, "gnuplot_svg.plot_xmax = %.1f;\n", (double)plot_bounds.xright / CANVAS_OVERSAMPLE);
+	fprintf(gpoutfile, "gnuplot_svg.plot_ybot = %.1f;\n", (double)(term->ymax-plot_bounds.ybot) / CANVAS_OVERSAMPLE);
+	fprintf(gpoutfile, "gnuplot_svg.plot_ytop = %.1f;\n", (double)(term->ymax-plot_bounds.ytop) / CANVAS_OVERSAMPLE);
+	fprintf(gpoutfile, "gnuplot_svg.plot_width = %.1f;\n", (double)(plot_bounds.xright - plot_bounds.xleft) / CANVAS_OVERSAMPLE);
+	fprintf(gpoutfile, "gnuplot_svg.plot_height = %.1f;\n", (double)(plot_bounds.ytop - plot_bounds.ybot) / CANVAS_OVERSAMPLE);
+
+	/* Get true axis ranges as used in the plot */
+	update_gpval_variables(1);
+
+#define	MOUSE_PARAM( GP_NAME, js_NAME ) \
+	if ((udv = add_udv_by_name(GP_NAME))) { \
+	    if (udv->udv_value.type == INTGR)   \
+		fprintf(gpoutfile, "gnuplot_svg.%s = %d;\n", \
+			js_NAME, udv->udv_value.v.int_val); \
+	    else if (udv->udv_value.type == CMPLX) \
+		fprintf(gpoutfile, "gnuplot_svg.%s = %g;\n", \
+			js_NAME, udv->udv_value.v.cmplx_val.real); \
+	}
+	MOUSE_PARAM("GPVAL_X_MIN", "plot_axis_xmin");
+	MOUSE_PARAM("GPVAL_X_MAX", "plot_axis_xmax");
+	MOUSE_PARAM("GPVAL_Y_MIN", "plot_axis_ymin");
+	MOUSE_PARAM("GPVAL_Y_MAX", "plot_axis_ymax");
+
+	fprintf(gpoutfile, "gnuplot_svg.polar_mode = %s;\n",
+		polar ? "true" : "false");
+	if (polar)
+	    fprintf(gpoutfile, "gnuplot_svg.plot_axis_rmin = %g;\n",
+		(R_AXIS.autoscale & AUTOSCALE_MIN) ? 0.0 : R_AXIS.set_min);
+
+	if ((axis_array[SECOND_X_AXIS].ticmode & TICS_MASK) != NO_TICS) {
+	    MOUSE_PARAM("GPVAL_X2_MIN", "plot_axis_x2min");
+	    MOUSE_PARAM("GPVAL_X2_MAX", "plot_axis_x2max");
+	} else
+	    fprintf(gpoutfile, "gnuplot_svg.plot_axis_x2min = \"none\"\n");
+	if ((axis_array[SECOND_Y_AXIS].ticmode & TICS_MASK) != NO_TICS) {
+	    MOUSE_PARAM("GPVAL_Y2_MIN", "plot_axis_y2min");
+	    MOUSE_PARAM("GPVAL_Y2_MAX", "plot_axis_y2max");
+	} else
+	    fprintf(gpoutfile, "gnuplot_svg.plot_axis_y2min = \"none\"\n");
+#undef MOUSE_PARAM
+
+	fprintf(gpoutfile, "gnuplot_svg.plot_logaxis_x = %d;\n",
+		axis_array[FIRST_X_AXIS].log ? 1: 0);
+	fprintf(gpoutfile, "gnuplot_svg.plot_logaxis_y = %d;\n",
+		axis_array[FIRST_Y_AXIS].log ? 1: 0);
+	if (polar)
+	    fprintf(gpoutfile, "gnuplot_svg.plot_logaxis_r = %d;\n",
+		axis_array[POLAR_AXIS].log ? 1: 0);
+
+	fprintf(gpoutfile,"]]>\n</script>\n");
+    } /* End of section writing out variables for mousing */
+
+    /* Close off the group with id=gnuplot_canvas that wraps the entire plot */
+    fprintf(gpoutfile,"</g>\n");
 }
 
 /*------------------------------------------------------------------------------------------------------------------------------------

@@ -15,11 +15,13 @@
 </h2>
 
 <p>
-Gnuplot is distributed with a large set of demonstration scripts.
-Here are samples of SVG output from some of the demos generated
-using the <i>April 2011:</i> CVS version of gnuplot.
+Here are samples of SVG output from demos included with the gnuplot
+distribution. They were generated using the <i>April 2011</i>
+CVS version of gnuplot.
 Note that individual plots can be toggled on/off by clicking on
-the corresponding key entry.
+the corresponding key entry.  Clicking in the plot area should turn
+on mouse-coordinate tracking.
+The mousing code is new. You may see some browser-dependent glitches.
 </p>
 
 <table width="100%">
@@ -148,6 +150,7 @@ the corresponding key entry.
 	    	<embed src="showcase_plot.svg" type="image/svg+xml" width=500 height=350 class="float-right">
 	    </td></tr>
 	    <tr> <td width=50></td><td>
+		Click on the plot to enable mouse tracking.
 	    	Click on the figure legend to toggle plot elements on/off.
 	    </td><td>
 		<a href="http://validator.w3.org/check?uri=referer"><img
