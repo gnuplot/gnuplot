@@ -30,11 +30,11 @@
 	color:#006600;
 	font-weight: bold; 
 	margin-left: 4%; margin-right: 4%; 
-	margin-top: 3;
+	margin-top: 3px;
       }
  DD   {
 	margin-left: 8%; margin-right: 8%; 
-	margin-top: 3;
+	margin-top: 3px;
       }
 
  TABLE	{
@@ -83,15 +83,15 @@
  .icon-image	{ float:right; margin: 0 0 0 0; }
 
  div.box	{ border: none; border-width: thin; 
- 		  margin-top: 5; margin-bottom: 5; 
+ 		  margin-top: 5px; margin-bottom: 5px; 
 		  background: #AADDFF;
 		  text-align: center;
 		}
  div.color1	{ border: none;  background: #AADDFF; padding: 0.5em; }
  div.footer	{ border: solid; border-width: thin; 
- 		  margin-top: 20; 
+ 		  margin-top: 20px; 
 		  margin-left: 0%; margin-right: 0%;
-		  padding: 10;
+		  padding: 10px;
 		}
 
 .float-right	{ float: right; }
