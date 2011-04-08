@@ -1,3 +1,8 @@
+2011-04-08  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/svg.trm: Adjust enhanced text placement, removing some kludges
+	that appear not to be necessary with the current generation of browsers.
+
 2011-04-07  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/term.h term/svg.trm demo/html/webify_svg.pl demo/html/Makefile.svg
