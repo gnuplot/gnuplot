@@ -1,5 +1,5 @@
 /*
- * $Id: gnuplot_svg.js,v 1.1 2011/04/06 06:00:18 sfeam Exp $
+ * $Id: gnuplot_svg.js,v 1.2 2011/04/07 21:48:25 sfeam Exp $
  */
 // Shared routines for interaction with SVG fragments produced by 
 // gnuplot's SVG terminal driver.
@@ -14,7 +14,7 @@ gnuplot_svg.SVGRoot = null;
 gnuplot_svg.Init = function(e)
 {
    gnuplot_svg.SVGDoc = e.target.ownerDocument;
-   gnuplot_svg.SVGRoot = SVGDoc.documentElement;
+   gnuplot_svg.SVGRoot = gnuplot_svg.SVGDoc.documentElement;
 }
 
 gnuplot_svg.toggleVisibility = function(evt, targetId)
