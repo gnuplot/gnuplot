@@ -6,6 +6,11 @@
 	the end of the output *.svg file so that they cannot be occluded by plot
 	elements.
 
+	* term/svg.trm (SVG_PathClose): Firefox 3.x fails to render purely
+	vertical lines. This is particularly noticeable because all vertical
+	grid lines are missing.  Work around this by adding 0.01 to the final
+	x coordinate.
+
 2011-04-08  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/svg.trm: Adjust enhanced text placement, removing some kludges

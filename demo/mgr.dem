@@ -1,5 +1,5 @@
 #
-# $Id: mgr.dem,v 1.8 2004/01/13 07:01:10 sfeam Exp $
+# $Id: mgr.dem,v 1.9 2011/04/09 20:56:43 sfeam Exp $
 #
 print "Watch some  cubic splines"
 set samples 50
@@ -34,7 +34,7 @@ plot "silver.dat" t "rate" w errorb,\
                "" u 1:2:($2/($3*1.e5)) sm acs t "         Y/(Z*1.e5)"
 pause -1 "Accentuate the relative changes with a log-scale (-> return)"
 set logscale y
-set grid xy
+set grid x y mx my
 replot
 pause -1 "Now approximate the data with a bezier curve between the endpoints (-> return)"
 unset logscale y
