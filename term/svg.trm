@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: svg.trm,v 1.114 2011/04/08 23:45:42 sfeam Exp $
+ * $Id: svg.trm,v 1.115 2011/04/09 04:22:00 sfeam Exp $
  */
 
 /*------------------------------------------------------------------------------------------------------------------------------------
@@ -151,6 +151,8 @@ static unsigned int SVG_fillPatternIndex = 0;
 static int SVG_background = -1;
 static int SVG_imageno = 0;
 static int SVG_plotno = 0;
+static TBOOLEAN SVG_gridline = FALSE;
+static TBOOLEAN SVG_hasgrid = FALSE;
 
 static int SVG_fontAscent = 0;	/* estimated current font ascent*/
 static int SVG_fontDescent = 0;	/* estimated current font descent*/
@@ -269,7 +271,11 @@ SVG_PathOpen ()
 	if (SVG_dashed && SVG_LineType % SVG_dashtypes > 0)
 	    fprintf(gpoutfile, "stroke-dasharray='%s' ",
 	 	    SVG_dashpattern[SVG_LineType % SVG_dashtypes]);
-	
+
+	/* Mark grid lines so that we can toggle them on/off */
+	if (SVG_gridline)
+	    fprintf(gpoutfile, "class = \"gridline\" ");
+
 	fputs (" d='", gpoutfile);
 
 	SVG_pathIsOpen = TRUE;
@@ -668,6 +674,8 @@ SVG_local_reset()
     SVG_name = NULL;
     free(SVG_scriptdir);
     SVG_scriptdir = NULL;
+    SVG_gridline = FALSE;
+    SVG_hasgrid = FALSE;
 }
 
 /*------------------------------------------------------------------------------------------------------------------------------------
@@ -850,9 +858,6 @@ SVG_init ()
 	fprintf(gpoutfile," fill=\"#%06x\" stroke=\"black\" stroke-width=\"1\"\n",
 		SVG_background>0 ? SVG_background : 0xffffff);
 	fprintf(gpoutfile,"onclick=\"gnuplot_svg.toggleCoordBox(evt)\"  onmousemove=\"gnuplot_svg.moveCoordBox(evt)\"/>\n");
-	fprintf(gpoutfile,"\n  <text id=\"coord_text\" text-anchor=\"start\" pointer-events=\"none\"\n");
-	fprintf(gpoutfile,"  font-size=\"12\" font-family=\"Arial\"\n");
-	fprintf(gpoutfile,"  visibility=\"hidden\"> </text>\n");
 	fprintf(gpoutfile,"\n<!-- Also track mouse when it is on a plot element -->\n");
 	fprintf(gpoutfile,"<g id=\"gnuplot_canvas\" onclick=\"gnuplot_svg.toggleCoordBox(evt)\" onmousemove=\"gnuplot_svg.moveCoordBox(evt)\">\n\n");
     } else {
@@ -1019,6 +1024,21 @@ SVG_text ()
 
     /* Close off the group with id=gnuplot_canvas that wraps the entire plot */
     fprintf(gpoutfile,"</g>\n");
+
+    /* Now create a text element to hold the mouse-tracking text. */
+    /* It comes _after_ the plot group so that it floats on top.  */
+    if (SVG_mouseable) {
+	fprintf(gpoutfile,"\n  <text id=\"coord_text\" text-anchor=\"start\" pointer-events=\"none\"\n");
+	fprintf(gpoutfile,"  font-size=\"12\" font-family=\"Arial\"\n");
+	fprintf(gpoutfile,"  visibility=\"hidden\"> </text>\n");
+    }
+
+    /* If there were any grid lines in this plot, add a button to toggle them */
+    if (SVG_mouseable && SVG_hasgrid) {
+	fprintf(gpoutfile,"\n  <image x='10' y='%d' width='16' height='16' xlink:href='grid.png'\n",
+	(int)(term->ymax/SVG_SCALE)-26);
+	fprintf(gpoutfile,"    onclick='gnuplot_svg.toggleGrid();'/>\n");
+    }
 }
 
 /*------------------------------------------------------------------------------------------------------------------------------------
@@ -1425,6 +1445,15 @@ SVG_layer(t_termlayer syncpoint)
 		SVG_GroupClose();
 		fprintf(gpoutfile, "\t</g>\n");
 		SVG_LineType = LT_UNDEFINED; /* Force a new group on next stroke */
+		break;
+
+	case TERM_LAYER_BEGIN_GRID:
+		SVG_gridline = TRUE;
+		SVG_hasgrid = TRUE;
+		break;
+
+	case TERM_LAYER_END_GRID:
+		SVG_gridline = FALSE;
 		break;
 
 	case TERM_LAYER_BEGIN_KEYSAMPLE:

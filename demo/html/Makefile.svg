@@ -19,6 +19,7 @@ dashcolor.html: $(GNUPLOT_LIB)/dashcolor.dem ./webify_svg.pl
 
 jsdir:
 	cp ../../term/js/gnuplot_svg.js .
+	cp ../../term/js/grid.png .
 	touch jsdir
 
 %.html: $(GNUPLOT_LIB)/%.dem ./webify_svg.pl jsdir

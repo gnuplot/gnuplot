@@ -1,3 +1,11 @@
+2011-04-09  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/svg.trm term/js/gnuplot_svg.js:  Draw all grid lines with
+	attribute class="gridline". Add an icon to toggle on/off lines with this
+	attribute.  Move both this icon and the mouse coordinate tracking box to
+	the end of the output *.svg file so that they cannot be occluded by plot
+	elements.
+
 2011-04-08  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/svg.trm: Adjust enhanced text placement, removing some kludges

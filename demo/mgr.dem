@@ -1,5 +1,5 @@
 #
-# $Id: mgr.dem,v 1.7 2003/10/28 05:35:54 sfeam Exp $
+# $Id: mgr.dem,v 1.8 2004/01/13 07:01:10 sfeam Exp $
 #
 print "Watch some  cubic splines"
 set samples 50
@@ -34,6 +34,7 @@ plot "silver.dat" t "rate" w errorb,\
                "" u 1:2:($2/($3*1.e5)) sm acs t "         Y/(Z*1.e5)"
 pause -1 "Accentuate the relative changes with a log-scale (-> return)"
 set logscale y
+set grid xy
 replot
 pause -1 "Now approximate the data with a bezier curve between the endpoints (-> return)"
 unset logscale y
@@ -47,6 +48,7 @@ plot "silver.dat" t "rate" w errorb, \
 pause -1 "Errorbar demo (-> return)"
 set samples 100
 unset logscale
+unset grid
 set xlabel "Resistance [Ohm]"
 set ylabel "Power [W]"
 set title "UM1-Cell Power"

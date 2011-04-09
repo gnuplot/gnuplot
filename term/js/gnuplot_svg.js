@@ -1,5 +1,5 @@
 /*
- * $Id: gnuplot_svg.js,v 1.3 2011/04/08 16:42:21 sfeam Exp $
+ * $Id: gnuplot_svg.js,v 1.4 2011/04/09 04:22:00 sfeam Exp $
  */
 // Javascript routines for interaction with SVG documents produced by 
 // gnuplot's SVG terminal driver.
@@ -97,12 +97,22 @@ gnuplot_svg.hideCoordBox = function(evt) {
 gnuplot_svg.toggleCoordBox = function(evt) {
     var t = gnuplot_svg.getText();
     if (null != t) {
-	state = t.getAttribute('visibility')
+	state = t.getAttribute('visibility');
 	if ('hidden' != state)
 	    state = 'hidden';
 	else
 	    state = 'visible';
 	t.setAttribute('visibility', state);
+    }
+}
+
+gnuplot_svg.toggleGrid = function() {
+    if (!gnuplot_svg.SVGDoc.getElementsByClassName) // Old browsers
+	return;
+    var grid = gnuplot_svg.SVGDoc.getElementsByClassName('gridline');
+    for (var i=0; i<grid.length; i++) {
+	state = grid[i].getAttribute('visibility');
+	grid[i].setAttribute('visibility', (state == 'hidden') ? 'visible' : 'hidden');
     }
 }
 
