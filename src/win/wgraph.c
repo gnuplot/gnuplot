@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.106 2011/04/10 16:47:47 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.107 2011/04/10 16:50:10 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - win/wgraph.c */
@@ -405,6 +405,10 @@ GraphInit(LPGW lpgw)
 		lpgw->Origin.x, lpgw->Origin.y,
 		lpgw->Size.x, lpgw->Size.y,
 		NULL, NULL, lpgw->hInstance, lpgw);
+
+	if (lpgw->hWndGraph)
+		SetClassLong(lpgw->hWndGraph, GCL_HICON, 
+			(LONG) LoadIcon(lpgw->hInstance, "GRPICON"));
 
 	lpgw->hStatusbar = CreateWindowEx(0, STATUSCLASSNAME, (LPSTR)NULL,
 				  WS_CHILD | SBARS_SIZEGRIP,

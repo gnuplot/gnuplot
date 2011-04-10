@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: win.trm,v 1.91 2011/04/10 11:34:56 markisch Exp $
+ * $Id: win.trm,v 1.92 2011/04/10 16:47:48 markisch Exp $
  */
 
 /* GNUPLOT - win.trm */
@@ -302,24 +302,6 @@ WIN_options()
     GraphRedraw(&graphwin);
 }
 
-/* We don't actually do scaling, but we need to fix up the text size
- * if the user has resized the window.
- * Routine unused -- terminals are not allowed to do their own scale().
- */
-#if 0
-int
-WIN_scale()
-{
-    term->h_char = graphwin.hchar;
-    term->v_char = graphwin.vchar;
-    term->h_tic = graphwin.htic;
-    term->v_tic = graphwin.vtic;
-    sprintf(term_options, "%s \"%s\" %d",
-	    graphwin.color ? "color" : "monochrome",
-	    graphwin.fontname, graphwin.fontsize);
-    return FALSE;		/* can't be done */
-}
-#endif
 
 TERM_PUBLIC void
 WIN_init()
@@ -330,7 +312,6 @@ WIN_init()
 	graphwin.htic = WIN_HTIC;
 	graphwin.vtic = WIN_VTIC;
 	GraphInit(&graphwin);
-	SetClassLong(graphwin.hWndGraph, GCL_HICON, (LONG) LoadIcon(graphwin.hInstance, "GRPICON"));
     }
     WIN_last_linetype = LT_NODRAW;	/* HBB 20000813: linetype caching */
 	WIN_term = term;
@@ -342,11 +323,13 @@ WIN_reset()
 {
 }
 
+
 TERM_PUBLIC void
 WIN_text()
 {
     GraphEnd(&graphwin);
 }
+
 
 TERM_PUBLIC void
 WIN_graphics()
@@ -360,17 +343,20 @@ WIN_graphics()
     WIN_last_linetype = LT_NODRAW;		/* HBB 20000813: linetype caching */
 }
 
+
 TERM_PUBLIC void
 WIN_move(unsigned int x, unsigned int y)
 {
     GraphOp(&graphwin, W_move, x, y, NULL);
 }
 
+
 TERM_PUBLIC void
 WIN_vector(unsigned int x, unsigned int y)
 {
     GraphOp(&graphwin, W_vect, x, y, NULL);
 }
+
 
 TERM_PUBLIC void
 WIN_linetype(int lt)
@@ -380,6 +366,7 @@ WIN_linetype(int lt)
 	WIN_last_linetype = lt;
     }
 }
+
 
 TERM_PUBLIC void
 WIN_put_text(unsigned int x, unsigned int y, const char *str)
@@ -394,12 +381,14 @@ WIN_put_text(unsigned int x, unsigned int y, const char *str)
 		GraphOp(&graphwin, W_enhanced_text, x, y, str);
 }
 
+
 TERM_PUBLIC int
 WIN_justify_text(enum JUSTIFY mode)
 {
     GraphOp(&graphwin, W_justify, mode, 0, NULL);
     return (TRUE);
 }
+
 
 TERM_PUBLIC int
 WIN_text_angle(int ang)

@@ -19,6 +19,13 @@
 	* term/win.trm, src/win/wgnuplib.h, src/win/wgraph.c: Remove LPGW.resized,
 	rename commands no longer exclusively used for pm3d.
 
+	* src/win/wgraph.c (UnicodeText): Add codepage 1250.
+
+	* term/win.trm (WIN_Init), src/win/wgraph.c (GraphInit): Move loading of
+	icon.
+
+	* term/win.trm (WIN_scale): Removed.
+
 2011-04-09  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/svg.trm term/js/gnuplot_svg.js:  Draw all grid lines with
