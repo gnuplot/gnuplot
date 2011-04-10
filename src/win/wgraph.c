@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.107 2011/04/10 16:50:10 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.108 2011/04/10 16:58:09 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - win/wgraph.c */
@@ -148,9 +148,6 @@ int wginitstyle[WGDEFSTYLE] = {PS_SOLID, PS_DASH, PS_DOT, PS_DASHDOT, PS_DASHDOT
 
 /* bitmaps for filled boxes (ULIG) */
 /* zeros represent the foreground color and ones represent the background color */
-/* FIXME HBB 20010916: *never* extern in a C source! */
-/*  extern int filldensity; */
-/*  extern int fillpattern; */
 
 static unsigned char halftone_bitmaps[][16] ={
   { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
@@ -193,7 +190,6 @@ static unsigned char pattern_bitmaps[][16] = {
    0x3F, 0x3F, 0xCF, 0xCF, 0xF3, 0xF3, 0xFC, 0xFC}  /* shallow diagonals (old 6) */
 #endif
 };
-
 #define pattern_num (sizeof(pattern_bitmaps)/(sizeof(*pattern_bitmaps)))
 static HBRUSH pattern_brush[pattern_num];
 static BITMAP pattern_bitdata[pattern_num];
@@ -696,13 +692,11 @@ GetPlotRectInMM(LPGW lpgw, LPRECT rect, HDC hdc)
 	/* Taken from 
 	http://msdn.microsoft.com/en-us/library/dd183519(VS.85).aspx
 	 */
-	
 	// Determine the picture frame dimensions.  
 	// iWidthMM is the display width in millimeters.  
 	// iHeightMM is the display height in millimeters.  
 	// iWidthPels is the display width in pixels.  
 	// iHeightPels is the display height in pixels  
-	
 	iWidthMM = GetDeviceCaps(hdc, HORZSIZE); 
 	iHeightMM = GetDeviceCaps(hdc, VERTSIZE); 
 	iWidthPels = GetDeviceCaps(hdc, HORZRES); 
@@ -713,7 +707,6 @@ GetPlotRectInMM(LPGW lpgw, LPRECT rect, HDC hdc)
 	// iHeightPels to determine the number of  
 	// .01-millimeter units per pixel in the x-  
 	//  and y-directions.  
-	
 	rect->left = (rect->left * iWidthMM * 100)/iWidthPels; 
 	rect->top = (rect->top * iHeightMM * 100)/iHeightPels; 
 	rect->right = (rect->right * iWidthMM * 100)/iWidthPels; 
@@ -783,6 +776,7 @@ MakeFonts(LPGW lpgw, LPRECT lprect, HDC hdc)
 	return;
 }
 
+
 static void
 DestroyFonts(LPGW lpgw)
 {
@@ -796,6 +790,7 @@ DestroyFonts(LPGW lpgw)
 	}
 	return;
 }
+
 
 static void
 SetFont(LPGW lpgw, HDC hdc)
@@ -813,6 +808,7 @@ SetFont(LPGW lpgw, HDC hdc)
     }
     return;
 }
+
 
 static void
 SelFont(LPGW lpgw)
@@ -1211,6 +1207,8 @@ draw_put_text(LPGW lpgw, HDC hdc, int x, int y, char * str)
 	}
 	SetBkMode(hdc, OPAQUE);
 }
+
+
 /* This one is really the heart of this module: it executes the stored set of
  * commands, whenever it changed or a redraw is necessary */
 static void
@@ -1231,19 +1229,17 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
     BOOL isColor;
     int sampling = lpgw->sampling;
     double line_width = 1.0 * sampling;
-    unsigned int fillstyle = 0.0;
+    unsigned int fillstyle = 0;
     int idx;
     COLORREF last_color = 0;
 
-    if (lpgw->locked)
-	return;
+    if (lpgw->locked) return;
 
     /* HBB 20010218: the GDI status query functions don't work on Metafile
      * handles, so can't know whether the screen is actually showing
      * color or not, if drawgraph() is being called from CopyClip().
      * Solve by defaulting isColor to 1 if hdc is a metafile. */
-    isColor = (((GetDeviceCaps(hdc, PLANES) * GetDeviceCaps(hdc,BITSPIXEL))
-		> 2)
+    isColor = (((GetDeviceCaps(hdc, PLANES) * GetDeviceCaps(hdc,BITSPIXEL))	> 2)
 	       || (GetDeviceCaps(hdc, TECHNOLOGY) == DT_METAFILE));
 
     if (lpgw->color && isColor) {
@@ -1291,15 +1287,17 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 	/* transform the coordinates */
 	xdash = MulDiv(curptr->x, rr-rl-1, lpgw->xmax) + rl;
 	ydash = MulDiv(curptr->y, rt-rb+1, lpgw->ymax) + rb - 1;
+
+		/* finish last polygon */
 	if ((lastop == W_vect) && (curptr->op != W_vect)) {
 	    if (polyi >= 2) {
 		Polyline(hdc, ppt, polyi);
-		/* EAM - why isn't this a move to ppt[polyi-1] ? */
-		MoveTo(hdc, ppt[0].x, ppt[0].y);
-	    }
-	    /* EAM - I think this is not necessary */
-	    else if (polyi == 1)
+				/* move internal state to last point */
+				MoveTo(hdc, ppt[polyi-1].x, ppt[polyi-1].y);
+			} else if (polyi == 1) {
+				/* degenerate case e.g. when using 'linecolor variable' */
 		LineTo(hdc, ppt[0].x, ppt[0].y);
+			}
 	    polyi = 0;
 	}
 
@@ -1325,9 +1323,8 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 	    break;
 	case W_line_type:
 	    {
-		LOGBRUSH lb;
 		LOGPEN cur_penstruct;
-		short cur_pen = curptr->x;
+			int cur_pen = curptr->x;
 
 		if (cur_pen >= WGNUMPENS)
 		    cur_pen = cur_pen % WGNUMPENS;
@@ -1343,18 +1340,19 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 		if (line_width != 1)
 		    cur_penstruct.lopnWidth.x *= line_width;
 	
+			if (line_width == 1) {
+				/* shige: work-around for Windows clipboard bug */
+				lpgw->hapen = CreatePenIndirect(&cur_penstruct);
+			} else {
 		    /* use ExtCreatePen instead of CreatePen/CreatePenIndirect
 		     * to support dashed lines if line_width > 1 */
+				LOGBRUSH lb;
 		    lb.lbStyle = BS_SOLID;
 		    lb.lbColor = cur_penstruct.lopnColor;
-
-		/* shige: work-around for Windows clipboard bug */
-		if (line_width==1)
-		  lpgw->hapen = CreatePenIndirect((LOGPEN *) &cur_penstruct);
-		else
 		    lpgw->hapen = ExtCreatePen(
 			PS_GEOMETRIC | cur_penstruct.lopnStyle | PS_ENDCAP_FLAT | PS_JOIN_BEVEL, 
 			cur_penstruct.lopnWidth.x, &lb, 0, 0);
+			}
 		DeleteObject(SelectObject(hdc, lpgw->hapen));
 
 		pen = cur_pen;
@@ -1388,7 +1386,7 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 
 	case W_fillstyle:
 	    /* HBB 20010916: new entry, needed to squeeze the many
-	     * parameters of a filled box call through the bottlneck
+			 * parameters of a filled box call through the bottleneck
 	     * of the fixed number of parameters in GraphOp() and
 	     * struct GWOP, respectively. */
 	    fillstyle = curptr->x;
@@ -1500,6 +1498,7 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 		DeleteObject(membmp);
 		DeleteDC(memdc);
 	    } else {
+				/* not transparent */
 		PatBlt(hdc, ppt[0].x, ppt[0].y, xdash, ydash, PATCOPY);
 	    }
 	    polyi = 0;
@@ -1537,20 +1536,9 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 		double pointsize = curptr->x / 100.0;
 		htic = pointsize*MulDiv(lpgw->htic, rr-rl, lpgw->xmax) + 1;
 		vtic = pointsize*MulDiv(lpgw->vtic, rb-rt, lpgw->ymax) + 1;
-	    } else {
-		char *str;
-		str = LocalLock(curptr->htext);
-		if (str) {
-		    double pointsize;
-		    sscanf(str, "%lg", &pointsize);
-		    htic = lpgw->org_pointsize
-			* MulDiv(lpgw->htic, rr-rl, lpgw->xmax) + 1;
-		    vtic = lpgw->org_pointsize
-			* MulDiv(lpgw->vtic, rb-rt, lpgw->ymax) + 1;
-		}
-		LocalUnlock(curptr->htext);
 	    }
 	    break;
+
 	case W_line_width:
 	    /* HBB 20000813: this may look strange, but it ensures
 	     * that linewidth is exactly 1 iff it's in default
@@ -1764,6 +1752,7 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
                 polyi = 0;
 	    }
 	    break;
+
 	case W_image:
 	    {
 		/* Due to the structure of gwop in total 6 entries are needed.
@@ -1839,6 +1828,7 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 		seq = (seq + 1) % 6;
 	    }
 	    break;
+
 	case W_dot:
 	    dot(hdc, xdash, ydash);
 	    break;
@@ -1980,15 +1970,11 @@ SaveAsEMF(LPGW lpgw)
 {
     char *cwd;
     static OPENFILENAME Ofn;
-    
     static char lpstrCustomFilter[256] = { '\0' };
     static char lpstrFileName[MAX_PATH] = { '\0' };
     static char lpstrFileTitle[MAX_PATH] = { '\0' };
-    
-    HWND hwnd;
-    
-    hwnd = lpgw->hWndGraph;
-    
+    HWND hwnd = lpgw->hWndGraph;
+
     Ofn.lStructSize = sizeof(OPENFILENAME);
     Ofn.hwndOwner = hwnd;
     Ofn.lpstrInitialDir = (LPSTR)NULL;
@@ -2004,10 +1990,10 @@ SaveAsEMF(LPGW lpgw)
     Ofn.lpstrTitle = (LPSTR)NULL;
     Ofn.Flags = OFN_OVERWRITEPROMPT;
     Ofn.lpstrDefExt = (LPSTR) "emf";
-    
+
     /* save cwd as GetSaveFileName apparently changes it */
     cwd = _getcwd( NULL, 0 );
-    
+
     if( GetSaveFileName(&Ofn) != 0 ) {
 	RECT rect, mfrect;
 	HDC hdc;
@@ -2030,7 +2016,7 @@ SaveAsEMF(LPGW lpgw)
 	if (cwd != NULL) 
 	    _chdir( cwd );
     }
-    
+
     /* free the cwd buffer allcoated by _getcwd */
     free(cwd);
 }
@@ -2102,7 +2088,6 @@ CopyClip(LPGW lpgw)
 
 	/* Now we have the Metafile and Bitmap prepared, post their contents to
 	 * the Clipboard */
-
 	OpenClipboard(hwnd);
 	EmptyClipboard();
 	SetClipboardData(CF_ENHMETAFILE,hemf);
@@ -2112,6 +2097,7 @@ CopyClip(LPGW lpgw)
 	DeleteEnhMetaFile(hemf);
 	return;
 }
+
 
 /* copy graph window to printer */
 static void
@@ -2200,6 +2186,7 @@ CopyPrint(LPGW lpgw)
 	return;
 }
 
+
 /* ================================== */
 /*  INI file stuff */
 static void
@@ -2255,6 +2242,7 @@ WriteGraphIni(LPGW lpgw)
 	}
 	return;
 }
+
 
 void
 ReadGraphIni(LPGW lpgw)
@@ -2353,8 +2341,7 @@ ReadGraphIni(LPGW lpgw)
 	     ((p = GetInt(p, (LPINT)&monostyle)) != NULL) )
 			StorePen(lpgw,1,RGB(r,g,b),colorstyle,monostyle);
 
-	for (i=0; i<WGNUMPENS; i++)
-	{
+	for (i=0; i<WGNUMPENS; i++) {
 		ref = wginitcolor[ i%WGDEFCOLOR ];
 		colorstyle = wginitstyle[ (i/WGDEFCOLOR) % WGDEFSTYLE ];
 		monostyle  = wginitstyle[ i%WGDEFSTYLE ];

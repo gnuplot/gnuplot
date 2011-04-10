@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: win.trm,v 1.93 2011/04/10 16:58:09 markisch Exp $
+ * $Id: win.trm,v 1.94 2011/04/10 17:08:01 markisch Exp $
  */
 
 /* GNUPLOT - win.trm */
@@ -153,12 +153,11 @@ WIN_options()
     char *s;
     TBOOLEAN set_font = FALSE, set_fontsize = FALSE;
     TBOOLEAN set_title=FALSE, set_close = FALSE;
-    /* shige */
-    static int readinit=0;
+    static BOOL readinit = TRUE;
 
-    if (!readinit){
-	ReadGraphIni(&graphwin);
-	readinit=1;
+    if (readinit) {
+		ReadGraphIni(&graphwin);
+		readinit = FALSE;
     }
 
     while (!END_OF_COMMAND) {
@@ -399,6 +398,7 @@ WIN_text_angle(int ang)
     return graphwin.rotate;
 }
 
+
 TERM_PUBLIC void
 WIN_point(unsigned int x, unsigned int y, int number)
 {
@@ -420,25 +420,22 @@ WIN_point(unsigned int x, unsigned int y, int number)
       WIN_linetype(oldlinetype);
 }
 
+
 TERM_PUBLIC void
 WIN_resume()
 {
     GraphResume(&graphwin);
 }
 
+
 TERM_PUBLIC void
 WIN_set_pointsize(double s)
 {
-    /* Save new pointsize as string */
-    char scale[30];
-
-    if (s < 0)
-	s = 1;
-    sprintf(scale, "%.15g", s);
-    /* Pass the scale as a scaled-up integer. For the sake of compatibility,
-     * pass the string as well. */
-    GraphOp(&graphwin, W_pointsize, (int) 100 * s, 0, scale);
+    if (s < 0) s = 1;
+    /* Pass the scale as a scaled-up integer. */
+    GraphOp(&graphwin, W_pointsize, (int) 100 * s, 0, NULL);
 }
+
 
 TERM_PUBLIC void
 WIN_linewidth(double linewidth)
@@ -447,6 +444,7 @@ WIN_linewidth(double linewidth)
     WIN_last_linetype = LT_NODRAW;        /* invalidate cached linetype */
     GraphOp(&graphwin, W_line_width, (int) 100 * linewidth, 0, NULL);
 }
+
 
 #ifdef USE_MOUSE
 
@@ -460,11 +458,13 @@ WIN_put_tmptext ( int i, const char str[] )
     Graph_put_tmptext(&graphwin, i, str );
 }
 
+
 TERM_PUBLIC void
 WIN_set_ruler ( int x, int y )
 {
     Graph_set_ruler(&graphwin, x, y );
 }
+
 
 TERM_PUBLIC void
 WIN_set_cursor ( int c, int x, int y )
@@ -472,11 +472,13 @@ WIN_set_cursor ( int c, int x, int y )
     Graph_set_cursor(&graphwin, c, x, y );
 }
 
+
 TERM_PUBLIC void
 WIN_set_clipboard ( const char s[] )
 {
     Graph_set_clipboard(&graphwin, s);
 }
+
 
 #ifdef WGP_CONSOLE
 
@@ -506,9 +508,8 @@ WIN_image(unsigned int M, unsigned int N, coordval *image,
         - sequence of lines is reversed 
         - each line starts at a 4 byte boundary
         - 24bits RGB  for IC_PALETTE and IC_RGB
-        - 32bist RGBA for IC_RGBA
+        - 32bits RGBA for IC_RGBA
     */
-
     if ((color_mode == IC_PALETTE) || (color_mode == IC_RGB)) {
 	pad_bytes = (4 - (3 * M) % 4) % 4; /* scan lines start on ULONG boundaries */
 	image_size = (M + pad_bytes ) * N * 3;
@@ -580,7 +581,7 @@ WIN_image(unsigned int M, unsigned int N, coordval *image,
         GraphOp(&graphwin, W_image, corner[3].x, corner[3].y, NULL);
 	/* GraphOp() cannot be used here since the image might 
 	   contain char(0), so use  GraphOpSize() instead */
-        GraphOpSize(&graphwin, W_image, M, N, rgb_image, image_size);
+		GraphOpSize(&graphwin, W_image, M, N, (LPCSTR)rgb_image, image_size);
     }
 
     free(rgb_image);
@@ -599,6 +600,7 @@ WIN_make_palette(t_sm_palette *palette)
     return WIN_PAL_COLORS;
 }
 
+
 TERM_PUBLIC void
 WIN_set_color(t_colorspec *colorspec)
 {
@@ -615,6 +617,7 @@ WIN_set_color(t_colorspec *colorspec)
     }
     WIN_last_linetype = LT_NODRAW;
 }
+
 
 TERM_PUBLIC void
 WIN_filled_polygon(int points, gpiPoint *corners)
@@ -644,6 +647,7 @@ WIN_filled_polygon(int points, gpiPoint *corners)
     if (!graphwin.color)
       WIN_linetype(oldlinetype);
 }
+
 
 TERM_PUBLIC void
 WIN_boxfill(

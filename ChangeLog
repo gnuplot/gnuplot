@@ -13,18 +13,20 @@
 	positioning of enhanced text with oversampling.
 
 	* term/win.trm (WIN_graphics): Update character and window size.
-
 	* src/win/wgraph.c (WndGraphProc): Remove another Win16 relict.
-
 	* term/win.trm, src/win/wgnuplib.h, src/win/wgraph.c: Remove LPGW.resized,
 	rename commands no longer exclusively used for pm3d.
-
 	* src/win/wgraph.c (UnicodeText): Add codepage 1250.
-
 	* term/win.trm (WIN_Init), src/win/wgraph.c (GraphInit): Move loading of
 	icon.
-
 	* term/win.trm (WIN_scale): Removed.
+	* term/win.trm (WIN_options), src/win/winmain.c (WinMain): Eliminate need
+	for static variable WIN_gtitle.
+	* term/win.trm (WIN_set_pointsize), src/win/wgraph.c (drawgraph) 
+	[W_pointsize]: Don't pass size as string.
+	* src/win/wgraph.c (drawgraph) [W_line_type]: Only init LOGBRUSH lb
+	if it is used.
+	* term/win.trm, src/win/wgraph.c: Various small code cleanups.
 
 2011-04-09  Ethan A Merritt  <merritt@u.washington.edu>
 
