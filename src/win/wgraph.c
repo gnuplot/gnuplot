@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.104 2011/04/10 11:34:56 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.105 2011/04/10 16:42:29 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - win/wgraph.c */
@@ -1553,7 +1553,8 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 	    line_width = curptr->x == 100 ? 1 : (curptr->x / 100.0);
 	    line_width *= sampling;
 	    break;
-	case W_pm3d_setcolor:
+
+		case W_setcolor:
 	    {
 		static HBRUSH last_pm3d_brush = NULL;
 		HBRUSH this_brush;
@@ -1609,7 +1610,8 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 		SetTextColor(hdc, last_color = c);
 	    }
 	    break;
-	case W_pm3d_filled_polygon_pt:
+
+		case W_filled_polygon_pt:
 	    {
 		/* a point of the polygon is coming */
 		if (polyi >= polymax) {
@@ -1621,7 +1623,7 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 		polyi++;
 	    }
 	    break;
-	case W_pm3d_filled_polygon_draw:
+		case W_filled_polygon_draw:
 	    {
 		BOOL transparent = FALSE;
 		double alpha = 0.;
@@ -3030,7 +3032,6 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 						WriteTextIni(lpgw->lptw);
 					return 0;
 				case M_REBUILDTOOLS:
-					lpgw->resized = TRUE;
 					if (lpgw->color)
 						CheckMenuItem(lpgw->hPopMenu, M_COLOR, MF_BYCOMMAND | MF_CHECKED);
 					else

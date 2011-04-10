@@ -14,7 +14,10 @@
 
 	* term/win.trm (WIN_graphics): Update character and window size.
 
-	* src/win/wgraph (WndGraphProc): Remove another Win16 relict.
+	* src/win/wgraph.c (WndGraphProc): Remove another Win16 relict.
+
+	* term/win.trm, src/win/wgnuplib.h, src/win/wgraph.c: Remove LPGW.resized,
+	rename commands no longer exclusively used for pm3d.
 
 2011-04-09  Ethan A Merritt  <merritt@u.washington.edu>
 

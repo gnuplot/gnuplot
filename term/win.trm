@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: win.trm,v 1.90 2011/04/06 06:24:29 markisch Exp $
+ * $Id: win.trm,v 1.91 2011/04/10 11:34:56 markisch Exp $
  */
 
 /* GNUPLOT - win.trm */
@@ -331,7 +331,6 @@ WIN_init()
 	graphwin.vtic = WIN_VTIC;
 	GraphInit(&graphwin);
 	SetClassLong(graphwin.hWndGraph, GCL_HICON, (LONG) LoadIcon(graphwin.hInstance, "GRPICON"));
-	graphwin.resized = FALSE;
     }
     WIN_last_linetype = LT_NODRAW;	/* HBB 20000813: linetype caching */
 	WIN_term = term;
@@ -615,13 +614,13 @@ WIN_set_color(t_colorspec *colorspec)
 {
     switch (colorspec->type ) {
 	case TC_FRAC:
-	    GraphOp(&graphwin, W_pm3d_setcolor, (int)(WIN_PAL_COLORS*colorspec->value), 0, NULL);
+	    GraphOp(&graphwin, W_setcolor, (int)(WIN_PAL_COLORS*colorspec->value), 0, NULL);
 	    break;
 	case TC_RGB:
-	    GraphOp(&graphwin, W_pm3d_setcolor, (colorspec->lt) & 0xffff, 0xff00 | ((colorspec->lt >> 16) & 0x00ff), NULL);
+	    GraphOp(&graphwin, W_setcolor, (colorspec->lt) & 0xffff, 0xff00 | ((colorspec->lt >> 16) & 0x00ff), NULL);
 	    break;
 	case TC_LT:
-	    GraphOp(&graphwin, W_pm3d_setcolor, colorspec->lt, TC_LT << 8, NULL);
+	    GraphOp(&graphwin, W_setcolor, colorspec->lt, TC_LT << 8, NULL);
 	    break;
     }
     WIN_last_linetype = LT_NODRAW;
@@ -649,9 +648,9 @@ WIN_filled_polygon(int points, gpiPoint *corners)
 	WIN_boxfill(corners->style, corners->x, corners->y, 0, 1);
 
     for (i=0; i<points; i++)
-    	GraphOp(&graphwin, W_pm3d_filled_polygon_pt, corners[i].x, corners[i].y, NULL);
+    	GraphOp(&graphwin, W_filled_polygon_pt, corners[i].x, corners[i].y, NULL);
     /* finish series: */
-    GraphOp(&graphwin, W_pm3d_filled_polygon_draw, points, corners->style, NULL);
+    GraphOp(&graphwin, W_filled_polygon_draw, points, corners->style, NULL);
     if (!graphwin.color)
       WIN_linetype(oldlinetype);
 }

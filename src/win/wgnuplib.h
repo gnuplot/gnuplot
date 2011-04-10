@@ -1,5 +1,5 @@
 /*
- * $Id: wgnuplib.h,v 1.40 2011/04/06 06:32:44 markisch Exp $
+ * $Id: wgnuplib.h,v 1.41 2011/04/10 11:34:56 markisch Exp $
  */
 
 /* GNUPLOT - win/wgnuplib.h */
@@ -275,9 +275,9 @@ struct GWOPBLK {			/* kept in local memory */
 #define W_text_angle 35
 #define W_pointsize 36
 #define W_line_width 37
-#define W_pm3d_setcolor 38
-#define W_pm3d_filled_polygon_pt   39
-#define W_pm3d_filled_polygon_draw 40
+#define W_setcolor 38
+#define W_filled_polygon_pt   39
+#define W_filled_polygon_draw 40
 #define W_boxfill 41
 #define W_fillstyle 42
 #define W_font 43
@@ -314,7 +314,7 @@ typedef struct tagGW {
 	HFONT	hfonth;		/* horizonal font */
 	HFONT	hfontv;		/* rotated font (arbitrary angle) */
 	LOGFONT lf;		/* cached to speed up rotated fonts */
-	BOOL	resized;	/* has graph window been resized? */
+
 	BOOL	graphtotop;	/* bring graph window to top after every plot? */
 	BOOL	color;		/* color pens? */
 	HPEN	hapen;		/* stored current pen */
