@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.105 2011/04/10 16:42:29 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.106 2011/04/10 16:47:47 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - win/wgraph.c */
@@ -876,6 +876,7 @@ UnicodeText(const char *str, enum set_encoding_id encoding)
         case S_ENC_CP850:      codepage =   850; break;
         case S_ENC_CP852:      codepage =   852; break;
         case S_ENC_CP950:      codepage =   950; break;
+        case S_ENC_CP1250:     codepage =  1250; break;
         case S_ENC_CP1251:     codepage =  1251; break;
         case S_ENC_CP1254:     codepage =  1254; break;
         case S_ENC_KOI8_R:     codepage = 20866; break;
