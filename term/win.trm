@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: win.trm,v 1.92 2011/04/10 16:47:48 markisch Exp $
+ * $Id: win.trm,v 1.93 2011/04/10 16:58:09 markisch Exp $
  */
 
 /* GNUPLOT - win.trm */
@@ -85,7 +85,9 @@ TERM_PUBLIC void WIN_set_ruler __PROTO((int, int));
 TERM_PUBLIC void WIN_set_cursor __PROTO((int, int, int));
 TERM_PUBLIC void WIN_put_tmptext __PROTO((int, const char str[]));
 TERM_PUBLIC void WIN_set_clipboard __PROTO((const char[]));
+# ifdef WGP_CONSOLE
 TERM_PUBLIC int WIN_waitforinput __PROTO((void));
+#endif
 #endif
 TERM_PUBLIC int WIN_make_palette __PROTO((t_sm_palette *palette));
 TERM_PUBLIC void WIN_set_color __PROTO((t_colorspec *));
@@ -142,8 +144,6 @@ static struct gen_table WIN_opts[] =
     { NULL, WIN_OTHER }
 };
 
-static char *WIN_gtitle = NULL;
-
 static int WIN_last_linetype = LT_NODRAW; /* HBB 20000813: linetype caching */
 termentry * WIN_term = NULL;
 
@@ -169,7 +169,7 @@ WIN_options()
 	    graphwin.fontsize = WINFONTSIZE;
 	    strcpy(graphwin.deffontname, WINFONT);
 	    graphwin.deffontsize = WINFONTSIZE;
-	    graphwin.Title = WINGRAPHTITLE;
+			graphwin.Title = strdup(WINGRAPHTITLE);
 	    set_title = TRUE;
 	    c_token++;
 	    break;
@@ -230,8 +230,10 @@ WIN_options()
 	case WIN_GTITLE:
 	    c_token++;
 	    set_title = TRUE;
-	    free(WIN_gtitle);
-	    WIN_gtitle = try_to_get_string();
+			free (graphwin.Title);
+			graphwin.Title = try_to_get_string();
+			if (!graphwin.Title)
+				graphwin.Title = strdup(WINGRAPHTITLE);
 	    break;
 	case WIN_CLOSE:
 	    c_token++;
@@ -296,7 +298,6 @@ WIN_options()
     /* font initialization */
     WIN_set_font(NULL);
 
-    graphwin.Title = (WIN_gtitle ? WIN_gtitle : WINGRAPHTITLE);
     if (set_title) GraphChangeTitle(&graphwin);
 
     GraphRedraw(&graphwin);

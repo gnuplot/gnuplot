@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: winmain.c,v 1.41 2011/03/25 10:35:48 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: winmain.c,v 1.42 2011/03/29 18:56:36 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - win/winmain.c */
@@ -382,7 +382,7 @@ int main(int argc, char **argv)
 
         graphwin.hInstance = hInstance;
         graphwin.hPrevInstance = hPrevInstance;
-        graphwin.Title = WINGRAPHTITLE;
+        graphwin.Title = strdup(WINGRAPHTITLE);
         graphwin.lptw = &textwin;
         graphwin.IniFile = textwin.IniFile;
         graphwin.IniSection = textwin.IniSection;
