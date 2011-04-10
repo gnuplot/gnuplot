@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.103 2011/04/06 06:32:44 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.104 2011/04/10 11:34:56 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - win/wgraph.c */
@@ -1118,8 +1118,7 @@ draw_enhanced_text(LPGW lpgw, HDC hdc, LPRECT rect, int x, int y, char * str)
 
 	/* enhanced_recursion() uses the callback functions
 	   of the current terminal. So we have to temporarily 
-	   switch terminal in case gnuplot has switched 
-	   to another terminal. */
+	   switch terminal. */
 	if (WIN_term) {
 		tsave = term;
 		term = WIN_term;
@@ -1134,7 +1133,7 @@ draw_enhanced_text(LPGW lpgw, HDC hdc, LPRECT rect, int x, int y, char * str)
 		* we get stuck in an infinite loop) and try again.
 		*/
 		while (*(str = enhanced_recursion((char *)str, TRUE,
-				enhstate.fontname, enhstate.fontsize,
+				save_fontname, save_fontsize,
 				0.0, TRUE, TRUE, 0))) {
 			GraphEnhancedFlush();
 			if (!*++str)
