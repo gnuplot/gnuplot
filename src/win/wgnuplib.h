@@ -1,5 +1,5 @@
 /*
- * $Id: wgnuplib.h,v 1.39 2011/04/06 06:24:28 markisch Exp $
+ * $Id: wgnuplib.h,v 1.40 2011/04/06 06:32:44 markisch Exp $
  */
 
 /* GNUPLOT - win/wgnuplib.h */
@@ -42,7 +42,7 @@
 
 #include <windows.h>
 #include "screenbuf.h"
-
+#include "term_api.h"
 
 /* Functions flagged WDPROC are to be export by the DLL, so they can be called
  * directly from win.trm or the gnuplot core */
@@ -281,6 +281,7 @@ struct GWOPBLK {			/* kept in local memory */
 #define W_boxfill 41
 #define W_fillstyle 42
 #define W_font 43
+#define W_enhanced_text 44
 #define W_image 50
 
 typedef struct tagGW {
@@ -309,6 +310,7 @@ typedef struct tagGW {
 	int	fontsize;	/* font size in pts */
 	char	deffontname[MAXFONTNAME]; /* default font name */
 	int	deffontsize;	/* default font size */
+	int     justify;    /* text justification */
 	HFONT	hfonth;		/* horizonal font */
 	HFONT	hfontv;		/* rotated font (arbitrary angle) */
 	LOGFONT lf;		/* cached to speed up rotated fonts */
@@ -340,6 +342,7 @@ typedef GW *  LPGW;
 #define MAXTITLELEN 120
 #define WINGRAPHTITLE "gnuplot graph"
 
+extern termentry * WIN_term;
 void WDPROC GraphInit(LPGW lpgw);
 void WDPROC GraphClose(LPGW lpgw);
 void WDPROC GraphStart(LPGW lpgw, double pointsize);
@@ -351,8 +354,6 @@ void WDPROC GraphOpSize(LPGW lpgw, UINT op, UINT x, UINT y, LPCSTR str, DWORD si
 void WDPROC GraphPrint(LPGW lpgw);
 void WDPROC GraphRedraw(LPGW lpgw);
 void WDPROC GraphChangeFont(LPGW lpgw, LPCSTR font, int fontsize, HDC hdc, RECT rect);
-unsigned int WDPROC GraphGetTextLength(LPGW lpgw, LPCSTR text, LPCSTR fontname, int fontsize);
-int WDPROC GraphGetFontScaling(LPGW lpgw, LPCSTR font, int fontsize);
 void	ReadGraphIni(LPGW lpgw);
 void WDPROC win_close_terminal_window(LPGW lpgw);
 
@@ -362,5 +363,11 @@ void WDPROC Graph_set_ruler (LPGW lpgw, int x, int y );
 void WDPROC Graph_put_tmptext(LPGW lpgw, int i, LPCSTR str);
 void WDPROC Graph_set_clipboard (LPGW lpgw, LPCSTR s);
 #endif
+
+/* BM: callback functions for enhanced text */
+void WDPROC GraphEnhancedOpen(char *fontname, double fontsize, double base,
+    BOOL widthflag, BOOL showflag, int overprint);
+void WDPROC GraphEnhancedFlush(void);
+
 
 /* ================================== */

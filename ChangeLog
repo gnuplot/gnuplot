@@ -1,3 +1,21 @@
+2011-04-10  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/term/win.trm, src/win/wgraph.c, src/win/wgnuplib.h: Renew text
+	handling: Process enhanced text in drawgraph(), new functions
+	GraphEnhancedOpen(), GraphEnhancedFlush(), revised GraphGetTextLength().
+	This most notably fixes behaviour when resizing the graph window. Collect
+	static variables used for the internal state of enhanced text processing
+	into a struct. Move code out of main loop of drawgraph: New functions
+	draw_put_text(), draw_text_justify(), draw_enhanced_text(). Fix baseline
+	alignment of normal and enhanced text. Text position was moving in wrong
+	direction for rotated enhanced text (fix replaces change dated 
+	2011-02-11). Remove unused function GraphGetFontScaling(). Fix text
+	positioning of enhanced text with oversampling.
+
+	* term/win.trm (WIN_graphics): Update character and window size.
+
+	* src/win/wgraph (WndGraphProc): Remove another Win16 relict.
+
 2011-04-09  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/svg.trm term/js/gnuplot_svg.js:  Draw all grid lines with
