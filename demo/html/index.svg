@@ -43,6 +43,7 @@ The mousing code is new. You may see some browser-dependent glitches.
     <li><a href="param.html">parametric&nbsp;functions</a></li>
     <li><a href="vector.html">vector fields</a></li>
     <li><a href="circles.html">circles</a></li>
+    <li><a href="boxplot.html">boxplot</a></li>
     </ul>
 
     <h4>Math functions</h4>
@@ -113,10 +114,10 @@ The mousing code is new. You may see some browser-dependent glitches.
 
     <h4>Text options</h4>
     <ul>
-    <li><a href="textcolor.html">colored text</a></li>
-    <li><a href="enhanced_utf8.html">'enhanced' text</a></li>
+    <li><a href="enhanced_utf8.html">enhanced text</a></li>
     <li><a href="datastrings.html">string data</a></li>
     <li><a href="stringvar.html">string variables</a></li>
+    <li><a href="cities.html">variable font size</a></li>
     </ul>
 
     <h4>Page Layout</h4>

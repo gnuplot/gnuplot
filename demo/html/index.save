@@ -110,7 +110,7 @@ Interactive demo scripts are not included on this page.
     <ul>
     <li><a href="textcolor.html">colored text</a></li>
     <li><a href="textrotate.html">rotated text</a></li>
-    <li><a href="enhancedtext.html">'enhanced' text</a></li>
+    <li><a href="enhancedtext.html">enhanced text</a></li>
     <li><a href="datastrings.html">string data</a></li>
     <li><a href="stringvar.html">string variables</a></li>
     </ul>

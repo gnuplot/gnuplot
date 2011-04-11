@@ -114,7 +114,6 @@ To view the results you need a browser that supports the HTML 5 'canvas' element
 
     <h4>Text options</h4>
     <ul>
-    <li><a href="textcolor.html">colored text</a></li>
     <li><a href="enhanced_utf8.html">enhanced text</a></li>
     <li><a href="datastrings.html">string data</a></li>
     <li><a href="cities.html">variable font size</a></li>
