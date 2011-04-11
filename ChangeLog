@@ -1,3 +1,8 @@
+2011-04-11  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/js/gnuplot_common.js: Fix the clipping of filled rectangles
+	when zoomed.
+
 2011-04-11  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/config/mingw/Makefile: Fixed relative directories in RCFLAGS.
