@@ -119,17 +119,25 @@ print STDERR $name, "\n";
 			print OUT "</td><td valign=top>\n";
 
 			print OUT "<pre>\n";
-			if ($mousing) {
-			    print GNUPLOT "set term svg enhanced font 'arial,10' mouse name \"$name"."_$plot\" jsdir '.' size 600,400 dynamic\n";
+			if ((defined $ENV{DEMOTERM}) && $DEMOTERM ne "") {
+			    print GNUPLOT "set term $DEMOTERM\n";
 			} else {
-			    print GNUPLOT "set term svg enhanced font 'arial,10' name \"$name"."_$plot\" jsdir '.' size 600,400 dynamic\n";
+			    if ($mousing) {
+				print GNUPLOT "set term svg enhanced font 'arial,10' mouse name \"$name"."_$plot\" jsdir '.' size 600,400 dynamic\n";
+			    } else {
+				print GNUPLOT "set term svg enhanced font 'arial,10' name \"$name"."_$plot\" jsdir '.' size 600,400 dynamic\n";
+			    }
 			}
 			print GNUPLOT "set output \"$name.$plot.svg\"\n";
 		} elsif (/^pause/) {
-			if ($mousing) {
-			    print GNUPLOT "set term svg enhanced font 'arial,10' mouse name \"$name"."_$plot\" jsdir '.' size 600,400 dynamic\n";
+			if ((defined $ENV{DEMOTERM}) && $DEMOTERM ne "") {
+			    print GNUPLOT "set term $DEMOTERM\n";
 			} else {
-			    print GNUPLOT "set term svg enhanced font 'arial,10' name \"$name"."_$plot\" jsdir '.' size 600,400 dynamic\n";
+			    if ($mousing) {
+				print GNUPLOT "set term svg enhanced font 'arial,10' mouse name \"$name"."_$plot\" jsdir '.' size 600,400 dynamic\n";
+			    } else {
+				print GNUPLOT "set term svg enhanced font 'arial,10' name \"$name"."_$plot\" jsdir '.' size 600,400 dynamic\n";
+			    }
 			}
 			print GNUPLOT "set output \"$name.$plot.svg\"\n";
 		} else {

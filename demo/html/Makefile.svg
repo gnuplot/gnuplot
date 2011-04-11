@@ -17,6 +17,11 @@ index.html: index.svg
 dashcolor.html: $(GNUPLOT_LIB)/dashcolor.dem ./webify_svg.pl
 	export DEMOTERM="svg dashed enhanced font 'arial,11' size 600,400 dynamic"; ./webify_svg.pl dashcolor
 
+showcase_plot.svg:
+	export DEMOTERM="svg dashed enhanced font 'arial,11' mouse size 500,350 dynamic jsdir '.'"; ./webify_svg.pl --mouse transparent
+	mv transparent.2.svg showcase_plot.svg
+	rm transparent.html
+
 jsdir:
 	cp ../../term/js/gnuplot_svg.js .
 	cp ../../term/js/grid.png .
