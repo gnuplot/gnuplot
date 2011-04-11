@@ -20,6 +20,7 @@ New features, changes and fixes since gnuplot version 4.4
 * NEW polar mode raxis, rtics, rrange, log-scaling, bounded filledcurves
 * NEW Shift-JIS encoding recognized by postscript, gd, svg, and win terminals
 * NEW windows terminal supports encodings
+* NEW mouse tracking for SVG terminal
 * FIX length estimation of UTF-8 strings
 * FIX accurate placement of color boundaries in the colorbar
 * CHANGE 3D zoom using middle mouse button is now a logarithmic response
