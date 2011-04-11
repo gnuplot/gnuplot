@@ -1,5 +1,5 @@
 /*
- * $Id: gnuplot_common.js,v 1.6 2011/03/31 03:54:25 sfeam Exp $
+ * $Id: gnuplot_common.js,v 1.7 2011/04/03 19:31:15 sfeam Exp $
  */
 // Shared routines for gnuplot's HTML5 canvas terminal driver.
 
@@ -23,8 +23,16 @@ gnuplot.M = function (x,y) {
 }
 gnuplot.R = function (x,y,w,h) {
   if (gnuplot.zoomed) {
+    var dx, dy, dw, dh;
     zoom = gnuplot.zoomXY(x/10.0,y/10.0);
-    ctx.fillRect(zoom.x, zoom.y, gnuplot.zoomW(w/10.0), gnuplot.zoomH(h/10.0));
+    if (zoom.x >= gnuplot.plot_xmax) return;
+    if (zoom.y >= gnuplot.plot_ybot) return;
+    dx = zoom.x; dy = zoom.y;
+    zoom = gnuplot.zoomXY((x+w)/10.,(y+h)/10.);
+    if (zoom.xraw <= gnuplot.plot_xmin) return;
+    if (zoom.yraw <= gnuplot.plot_ytop) return;
+    dw = zoom.x - dx; dh = zoom.y -dy;
+    ctx.fillRect(dx, dy, dw, dh);
   } else
     ctx.fillRect(x/10.0, y/10.0, w/10.0, h/10.0);
 }
