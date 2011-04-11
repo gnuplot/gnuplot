@@ -1,5 +1,5 @@
 # Hello, emacs: this is a -*- Makefile -*-
-# $Id: Makefile,v 1.5 2011/03/26 13:23:14 markisch Exp $
+# $Id: Makefile,v 1.6 2011/03/30 17:23:59 markisch Exp $
 #
 # GNUPLOT Makefile for MinGW32 on Win95/98/NT/2k/..
 # This assumes usual installation of the MinGW32 toolkit, the free
@@ -351,15 +351,14 @@ endif
 ifdef GNU_RC
   # RC = d:/cygnus/cygwin-b20/H-i586-cygwin32/bin/windres
   RC  = $(GCCPATH)windres
-  RCFLAGS = --include-dir /mingw32/include \
-	--include-dir=win \
+  RCFLAGS = --include-dir=$(W) \
 	--define __WIN32__ --define __WIN95__ --define MSRC \
 	--define __GNUWIN32__ --use-temp-file
   RCOUT = wgplt_res.$(O)
   RES2COFF = echo wgplt_res.$(O)
 else
   RC = $(MSSDK)/bin/rc
-  RCFLAGS = -v -i$(MSSDK)/include -iwin -dWIN32 -dMSRC
+  RCFLAGS = -v -i$(MSSDK)/include -i$(W) -dWIN32 -dMSRC
   RCOUT = -fowgnuplot.res
   RES2COFF = res2coff -i wgnuplot.res -o wgplt_res.$(O)
 endif
@@ -413,7 +412,7 @@ $(PGNUPLOT): $(W)/pgnuplot.c version.$(O)
 # rules
 
 wgplt_res.$(O) :  $(W)/wgnuplot.rc $(W)/wgnuplib.rc $(W)/wresourc.h texticon.ico grpicon.ico
-	$(RC) $(RCFLAGS) --include-dir=win $(W)/wgnuplot.rc $(RCOUT)
+	$(RC) $(RCFLAGS) $(W)/wgnuplot.rc $(RCOUT)
 	$(RES2COFF)
 
 show.$(O): show.c plot.h setshow.h
