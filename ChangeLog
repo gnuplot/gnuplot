@@ -1,3 +1,8 @@
+2011-04-12  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/win/wtext.c (WndParentProc) [WM_SIZE]: Ignore requests to set 
+	window size to 0,0. Fixes crash on Vista if Windows-D is pressed.
+
 2011-04-11  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/js/gnuplot_common.js: Fix the clipping of filled rectangles

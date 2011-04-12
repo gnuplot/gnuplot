@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: wtext.c,v 1.32 2011/03/28 10:09:41 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: wtext.c,v 1.33 2011/03/28 10:25:19 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - win/wtext.c */
@@ -1046,11 +1046,13 @@ WndParentProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 	return(0);
     }
     case WM_SIZE:
-	SetWindowPos(lptw->hWndText, (HWND)NULL, 0, lptw->ButtonHeight,
-		     LOWORD(lParam), HIWORD(lParam) - lptw->ButtonHeight - lptw->StatusHeight,
-		     SWP_NOZORDER | SWP_NOACTIVATE);
-	SendMessage(lptw->lpmw->hToolbar, WM_SIZE, wParam, lParam);
-	SendMessage(lptw->hStatusbar, WM_SIZE, wParam, lParam);
+	if (lParam > 0) { /* Vista sets window size to 0,0 when Windows-D is pressed */
+		SetWindowPos(lptw->hWndText, (HWND)NULL, 0, lptw->ButtonHeight,
+			     LOWORD(lParam), HIWORD(lParam) - lptw->ButtonHeight - lptw->StatusHeight,
+			     SWP_NOZORDER | SWP_NOACTIVATE);
+		SendMessage(lptw->lpmw->hToolbar, WM_SIZE, wParam, lParam);
+		SendMessage(lptw->hStatusbar, WM_SIZE, wParam, lParam);
+	}
 	return(0);
     case WM_COMMAND:
 	if (IsWindow(lptw->hWndText))
