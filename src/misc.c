@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.130 2011/02/20 23:17:11 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.131 2011/03/11 22:20:59 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -1126,7 +1126,7 @@ parse_color_name()
 {
     char *string;
     int index;
-    int color = -1;
+    long color = -1;
 
     if (almost_equals(c_token,"rgb$color"))
 	c_token++;
@@ -1135,13 +1135,14 @@ parse_color_name()
 	if (color >= 0)
 	    color = pm3d_color_names_tbl[color].value;
 	else
-	    sscanf(string,"#%x",&color);
+	    sscanf(string,"#%lx",&color);
 	free(string);
     }
-    if ((color & 0xff000000) != 0)
+
+    if (color == -1)
 	int_error(c_token, "not recognized as a color name or a string of form \"#RRGGBB\"");
 
-    return color;
+    return (unsigned int)(color);
 }
 
 /* arrow parsing...

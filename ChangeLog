@@ -1,3 +1,8 @@
+2011-04-13  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/canvas.trm term/gd.trm term/svg.trm term/x11.trm src/misc.c:
+	Stricter checks that the red component of RGB colors stays in range.
+
 2011-04-13  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/win/wgraph.c (WndGraphProc), src/win/wtext.c (WndTextProc):

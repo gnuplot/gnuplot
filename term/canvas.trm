@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: canvas.trm,v 1.48 2011/04/06 06:00:18 sfeam Exp $
+ * $Id: canvas.trm,v 1.49 2011/04/07 03:30:33 sfeam Exp $
  *
  */
 
@@ -960,7 +960,7 @@ CANVAS_set_color(t_colorspec *colorspec)
 	CANVAS_linetype(colorspec->lt);
 	return;
     } else if (colorspec->type == TC_RGB) {
-	rgb255.r = colorspec->lt >> 16;
+	rgb255.r = (colorspec->lt >> 16) & 0xff;
 	rgb255.g = (colorspec->lt >> 8) & 0xff;
 	rgb255.b = colorspec->lt & 0xff;
     } else if (colorspec->type == TC_FRAC) {

@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: x11.trm,v 1.189 2010/09/16 02:50:51 sfeam Exp $
+ * $Id: x11.trm,v 1.190 2011/03/11 22:21:00 sfeam Exp $
  *
  */
 
@@ -1635,7 +1635,7 @@ X11_set_color(t_colorspec *colorspec)
 {
     if (colorspec->type == TC_RGB) {
 	fputc(X11_GR_SET_RGBCOLOR, X11_ipc);
-	PRINT1("%6.6x\n", colorspec->lt);
+	PRINT1("%6.6x\n", colorspec->lt & 0xffffff);
 	FFLUSH();
 	return;
     }
