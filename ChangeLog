@@ -1,3 +1,7 @@
+2011-04-13  Peter Hedwig <peter@affenbande.org>
+
+	* term/lua/gnuplot-tikz.lua:  Fix "charsize" option.
+
 2011-04-13  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/canvas.trm term/gd.trm term/svg.trm term/x11.trm src/misc.c:

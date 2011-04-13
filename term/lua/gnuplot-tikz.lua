@@ -37,7 +37,7 @@
 
 
 
-  $Date: 2011/02/24 04:47:22 $
+  $Date: 2011/02/25 03:40:20 $
   $Author: sfeam $
   $Rev: 98 $
 
@@ -81,7 +81,7 @@ pgf.DEFAULT_FONT_V_CHAR = 308
 pgf.STYLE_FILE_BASENAME = "gnuplot-lua-tikz"  -- \usepackage{gnuplot-lua-tikz}
 
 pgf.REVISION = string.sub("$Rev: 98 $",7,-3)
-pgf.REVISION_DATE = string.gsub("$Date: 2011/02/24 04:47:22 $",
+pgf.REVISION_DATE = string.gsub("$Date: 2011/02/25 03:40:20 $",
                                 "$Date: ([0-9]+).([0-9]+).([0-9]+) .*","%1/%2/%3")
 
 pgf.styles = {}
@@ -1794,7 +1794,7 @@ term.options = function(opt_str, initial, t_count)
       term.ymax = plotsize_y*pgf.DEFAULT_RESOLUTION
     elseif almost_equals(o_next, "char$size") then
       get_next_token()
-      local charsize_h, charsize_v = get_two_sizes(o_next)
+      charsize_h, charsize_v = get_two_sizes(o_next)
       if not charsize_h then
         gp.int_error(t_count, string.format("error: two comma seperated lengths expected, got `%s'.", o_next))
       end
