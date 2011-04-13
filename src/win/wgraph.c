@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.108 2011/04/10 16:58:09 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.109 2011/04/10 17:32:12 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - win/wgraph.c */
@@ -461,6 +461,7 @@ GraphInit(LPGW lpgw)
 	ShowWindow(lpgw->hWndGraph, SW_SHOWNORMAL);
 }
 
+
 /* close a graph window */
 void WDPROC
 GraphClose(LPGW lpgw)
@@ -506,6 +507,7 @@ GraphStart(LPGW lpgw, double pointsize)
 	}
 }
 
+
 void WDPROC
 GraphEnd(LPGW lpgw)
 {
@@ -520,12 +522,14 @@ GraphEnd(LPGW lpgw)
 #endif
 }
 
+
 /* shige */
 void WDPROC
 GraphChangeTitle(LPGW lpgw)
 {
-	SetWindowText(lpgw->hWndGraph,lpgw->Title);
+	SetWindowText(lpgw->hWndGraph, lpgw->Title);
 }
+
 
 void WDPROC
 GraphResume(LPGW lpgw)
@@ -533,19 +537,22 @@ GraphResume(LPGW lpgw)
 	lpgw->locked = TRUE;
 }
 
+
 void WDPROC
 GraphPrint(LPGW lpgw)
 {
 	if (lpgw->hWndGraph && IsWindow(lpgw->hWndGraph))
-		SendMessage(lpgw->hWndGraph,WM_COMMAND,M_PRINT,0L);
+		SendMessage(lpgw->hWndGraph, WM_COMMAND, M_PRINT, 0L);
 }
+
 
 void WDPROC
 GraphRedraw(LPGW lpgw)
 {
 	if (lpgw->hWndGraph && IsWindow(lpgw->hWndGraph))
-		SendMessage(lpgw->hWndGraph,WM_COMMAND,M_REBUILDTOOLS,0L);
+		SendMessage(lpgw->hWndGraph, WM_COMMAND, M_REBUILDTOOLS, 0L);
 }
+
 /* ================================== */
 
 /* Helper functions for bookkeeping of pens, brushes and fonts */
@@ -579,6 +586,7 @@ StorePen(LPGW lpgw, int i, COLORREF ref, int colorstyle, int monostyle)
 	}
 	plp->lopnWidth.y = 0;
 }
+
 
 /* Prepare pens and brushes (--> colors) for use by the driver. Pens are (now) created
  * on-the-fly (--> DeleteObject(SelectObject(...)) idiom), but the brushes are still
@@ -632,6 +640,7 @@ MakePens(LPGW lpgw, HDC hdc)
 	}
 }
 
+
 /* Undo effect of MakePens(). To be called just before the window is closed. */
 static void
 DestroyPens(LPGW lpgw)
@@ -682,6 +691,7 @@ GetPlotRect(LPGW lpgw, LPRECT rect)
 	if (rect->bottom < rect->top) rect->bottom = rect->top;
 }
 
+
 static void 
 GetPlotRectInMM(LPGW lpgw, LPRECT rect, HDC hdc)
 {
@@ -707,10 +717,10 @@ GetPlotRectInMM(LPGW lpgw, LPRECT rect, HDC hdc)
 	// iHeightPels to determine the number of  
 	// .01-millimeter units per pixel in the x-  
 	//  and y-directions.  
-	rect->left = (rect->left * iWidthMM * 100)/iWidthPels; 
-	rect->top = (rect->top * iHeightMM * 100)/iHeightPels; 
-	rect->right = (rect->right * iWidthMM * 100)/iWidthPels; 
-	rect->bottom = (rect->bottom * iHeightMM * 100)/iHeightPels; 
+	rect->left = (rect->left * iWidthMM * 100) / iWidthPels;
+	rect->top = (rect->top * iHeightMM * 100) / iHeightPels;
+	rect->right = (rect->right * iWidthMM * 100) / iWidthPels;
+	rect->bottom = (rect->bottom * iHeightMM * 100) / iHeightPels;
 }
 
 
@@ -1363,7 +1373,7 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 	break;
 
 		case W_put_text: {
-		char *str;
+			char * str;
 		str = LocalLock(curptr->htext);
 		if (str) {
 		    /* shift correctly for rotated text */
@@ -1391,7 +1401,6 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 	     * struct GWOP, respectively. */
 	    fillstyle = curptr->x;
 	    break;
-
 	case W_boxfill: {  /* ULIG */
 	    double alpha = 0.;
 	    BOOL transparent = FALSE;
@@ -1534,8 +1543,8 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 	case W_pointsize:
 	    if (curptr->x != 0) {
 		double pointsize = curptr->x / 100.0;
-		htic = pointsize*MulDiv(lpgw->htic, rr-rl, lpgw->xmax) + 1;
-		vtic = pointsize*MulDiv(lpgw->vtic, rb-rt, lpgw->ymax) + 1;
+				htic = pointsize * MulDiv(lpgw->htic, rr-rl, lpgw->xmax) + 1;
+				vtic = pointsize * MulDiv(lpgw->vtic, rb-rt, lpgw->ymax) + 1;
 	    }
 	    break;
 
@@ -1992,9 +2001,9 @@ SaveAsEMF(LPGW lpgw)
     Ofn.lpstrDefExt = (LPSTR) "emf";
 
     /* save cwd as GetSaveFileName apparently changes it */
-    cwd = _getcwd( NULL, 0 );
+    cwd = _getcwd(NULL, 0);
 
-    if( GetSaveFileName(&Ofn) != 0 ) {
+    if (GetSaveFileName(&Ofn) != 0) {
 	RECT rect, mfrect;
 	HDC hdc;
 	HENHMETAFILE hemf;
@@ -3053,25 +3062,27 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 					return 0;
 			}
 			return 0;
-                case WM_PARENTNOTIFY:
-                        /* right button click in the status bar */
-                        if (LOWORD(wParam) != WM_RBUTTONDOWN) {
-                            return 1; /* not handled */
-                        }
-                        /* intentionally fall through */
-		case WM_RBUTTONDOWN:
-			/* HBB 20010218: note that this only works in mouse-off
-			 * mode, now. You'll need to go via the System menu to
-			 * access this popup, instead */
-			{
+		case WM_PARENTNOTIFY:
+			/* Message from status bar: anything but context menu 
+			   is not handled */
+			if (LOWORD(wParam) != WM_CONTEXTMENU)
+				return 1;
+			/* intentionally fall through */
+		case WM_CONTEXTMENU:
+		{	/* Note that this only works via mouse in `unset mouse`
+			 * mode. You can access the popup via the System menu,
+			 * status bar or keyboard (Shift-F10, Menu-Key) instead. */
 			POINT pt;
-			pt.x = LOWORD(lParam);
-			pt.y = HIWORD(lParam);
-			ClientToScreen(hwnd,&pt);
+			pt.x = GET_X_LPARAM(lParam);
+			pt.y = GET_Y_LPARAM(lParam);
+			if (pt.x == -1) { /* keyboard activation */
+				pt.x = pt.y = 0;
+				ClientToScreen(hwnd, &pt);
+			}
 			TrackPopupMenu(lpgw->hPopMenu, TPM_LEFTALIGN,
 				pt.x, pt.y, 0, hwnd, NULL);
-			}
-			return(0);
+			return 0;
+		}
 		case WM_CREATE:
 			lpgw = ((CREATESTRUCT *)lParam)->lpCreateParams;
 			SetWindowLong(hwnd, 0, (LONG)lpgw);
@@ -3214,6 +3225,7 @@ GraphChangeFont(LPGW lpgw, LPCSTR font, int fontsize, HDC hdc, RECT rect)
         MakeFonts(lpgw, &rect, hdc);
     }
 }
+
 
 /* close the terminal window */
 void WDPROC

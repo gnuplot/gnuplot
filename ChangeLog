@@ -1,3 +1,8 @@
+2011-04-13  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/win/wgraph.c (WndGraphProc), src/win/wtext.c (WndTextProc):
+	Enable access to popup menu via status bar and keyboard.
+
 2011-04-12  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/win/wtext.c (WndParentProc) [WM_SIZE]: Ignore requests to set 

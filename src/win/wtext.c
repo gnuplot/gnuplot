@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: wtext.c,v 1.33 2011/03/28 10:25:19 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: wtext.c,v 1.34 2011/04/12 20:44:04 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - win/wtext.c */
@@ -1064,7 +1064,9 @@ WndParentProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
     case WM_DROPFILES:
 	DragFunc(lptw, (HDROP)wParam);
 	break;
-
+	case WM_CONTEXTMENU:
+		SendMessage(lptw->hWndText, WM_CONTEXTMENU, wParam, lParam);
+		return 0;
     case WM_CREATE:
     {
 	TEXTMETRIC tm;
@@ -1416,17 +1418,18 @@ WndTextProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 	    } /* switch(wparam) */
 	} /* if(Ctrl) */
 	break;
-
-    case WM_RBUTTONDOWN:
-    {
+	case WM_CONTEXTMENU:
+	{
 	POINT pt;
-
-	pt.x = LOWORD(lParam);
-	pt.y = HIWORD(lParam);
-	ClientToScreen(hwnd,&pt);
+		pt.x = GET_X_LPARAM(lParam);
+		pt.y = GET_Y_LPARAM(lParam);
+		if (pt.x == -1) { /* keyboard activation */
+			pt.x = pt.y = 0;
+			ClientToScreen(hwnd, &pt);
+		}
 	TrackPopupMenu(lptw->hPopMenu, TPM_LEFTALIGN,
 		       pt.x, pt.y, 0, hwnd, NULL);
-	return(0);
+		return 0;
     }
     case WM_LBUTTONDOWN:
     { /* start marking text */
