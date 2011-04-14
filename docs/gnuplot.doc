@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.658 2011/03/26 02:39:44 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.659 2011/04/01 05:15:32 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -5409,7 +5409,8 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/population.gif" alt="[popu
  externally or by using `fit` with an appropriate model.
 
  Syntax:
-       smooth {unique | frequency | cumulative | cnormal | kdensity | csplines | acsplines | bezier | sbezier}
+       smooth {unique | frequency | cumulative | cnormal | kdensity 
+                      | csplines | acsplines | bezier | sbezier}
 
  `unique`, `frequency`, `cumulative` and `cnormal` plot the data after
  making them monotonic.  Each of the other routines uses the data to
@@ -10171,11 +10172,11 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/population.gif" alt="[popu
 ?set palette defined
 ?palette defined
 =colors
- Gray-to-rgb mapping can be manually set by use of `palette defined`:  A color gradient
- is defined and used to give the rgb values.  Such a  gradient is a piecewise
- linear mapping from gray values in [0,1] to the RGB space [0,1]x[0,1]x[0,1].
- You have to specify the gray values and the corresponding RGB values in
- between a linear interpolation shall take place:
+ Gray-to-rgb mapping can be manually set by use of `palette defined`:
+ A color gradient is defined and used to give the rgb values.  Such a gradient
+ is a piecewise linear mapping from gray values in [0,1] to the RGB space
+ [0,1]x[0,1]x[0,1].  You must specify the gray values and the corresponding RGB
+ values between which linear interpolation will be done.
 
  Syntax:
        set palette  defined { ( <gray1> <color1> {, <grayN> <colorN>}... ) }
