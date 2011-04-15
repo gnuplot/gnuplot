@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: winmain.c,v 1.42 2011/03/29 18:56:36 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: winmain.c,v 1.43 2011/04/10 17:08:01 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - win/winmain.c */
@@ -735,7 +735,7 @@ int ConsoleGetch()
                             case VK_RIGHT: return 006;
                             case VK_HOME: return 001;
                             case VK_END: return 005;
-                            case VK_DELETE: return 004;
+                            case VK_DELETE: return 0117;
                         }
                 }
             }

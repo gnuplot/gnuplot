@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: readline.c,v 1.49 2010/09/03 20:21:09 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: readline.c,v 1.50 2011/02/21 08:03:13 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - readline.c */
@@ -246,6 +246,7 @@ static char win_getch __PROTO((void));
 #  define special_getc() msdos_getch()
 #  endif /* WGP_CONSOLE */
 static char msdos_getch __PROTO((void));	/* HBB 980308: PROTO'ed it */
+#  define DEL_ERASES_CURRENT_CHAR
 # endif				/* _Windows */
 
 # if defined(MSDOS)
@@ -258,6 +259,7 @@ static char msdos_getch __PROTO((void));	/* HBB 980308: PROTO'ed it */
 #  endif			/* __EMX__ */
 #  define special_getc() msdos_getch()
 static char msdos_getch();
+#  define DEL_ERASES_CURRENT_CHAR
 # endif				/* MSDOS */
 
 #endif /* MSDOS or _Windows */
@@ -269,6 +271,7 @@ static char msdos_getch();
 # define special_getc() os2_getch()
 static char msdos_getch __PROTO((void));	/* HBB 980308: PROTO'ed it */
 static char os2_getch __PROTO((void));
+#  define DEL_ERASES_CURRENT_CHAR
 #endif /* OS2 */
 
 
@@ -553,7 +556,9 @@ readline(const char *prompt)
 		putc(NEWLINE, stderr);	/* go to a fresh line */
 		redraw_line(prompt);
 		break;
+#ifndef DEL_ERASES_CURRENT_CHAR
 	    case 0177:		/* DEL */
+#endif
 	    case 010:		/* ^H */
 		if (cur_pos > 0) {
 		    cur_pos -= 1;
@@ -569,6 +574,10 @@ readline(const char *prompt)
 		    reset_termio();
 		    return ((char *) NULL);
 		}
+		/* intentionally omitting break */
+#ifdef DEL_ERASES_CURRENT_CHAR
+	    case 0177:		/* DEL */
+#endif
 		if (cur_pos < max_pos) {
 		    for (i = cur_pos; i < max_pos; i++)
 			cur_line[i] = cur_line[i + 1];
@@ -644,7 +653,6 @@ fix_line()
     /* backup to original position */
     for (i = max_pos + 1; i > cur_pos; i--)
 	backspace();
-
 }
 
 /* redraw the entire line, putting the cursor where it belongs */
@@ -818,7 +826,7 @@ msdos_getch()
 	    c = 005;
 	    break;
 	case 83:		/* Delete */
-	    c = 004;
+	    c = 0177;
 	    break;
 	default:
 	    c = 0;

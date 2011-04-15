@@ -1,3 +1,10 @@
+2011-04-15  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/readline.c (msdos_getch, readline), src/win/winmain.c 
+	(ConsoleGetch): Don't quit on DEL on an empty line. Map DEL key to del
+	character 127 instead of ^D, but keep old behaviour of deleting current
+	character on platforms Windows, MSDOS and OS/2. SF Bug #3285571
+
 2011-04-13  Peter Hedwig <peter@affenbande.org>
 
 	* term/lua/gnuplot-tikz.lua:  Fix "charsize" option.
