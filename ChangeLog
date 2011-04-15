@@ -1,3 +1,14 @@
+2011-04-15  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/graphics.c (plot_steps) src/gp_types.h src/graph3d.c src/tables.c
+	docs/gnuplot.doc docs/plotstyles.gnu:
+	New plot style "with fillsteps" is identical to "with steps" except
+	that the area between the stepped line and the baseline at y=0
+	is filled using the currently active fill style.
+
+	* src/graphics.c (plot_fsteps histeps_vertical histeps_horizontal):
+	Simplify the code to use clip_line() rather than lots of in-line tests.
+
 2011-04-15  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/readline.c (msdos_getch, readline), src/win/winmain.c 

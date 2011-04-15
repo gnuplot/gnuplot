@@ -45,7 +45,9 @@ set output out . 'figure_fsteps' . ext
 plot demo . 'silver.dat' u 1:($2-10.) title 'with fsteps' with fsteps
 #
 set output out . 'figure_steps' . ext
-plot demo . 'silver.dat' u 1:($2-10.) title 'with steps' with steps
+set style fill solid 0.25 noborder
+plot demo . 'silver.dat' u 1:($2-10.) title 'with fillsteps' with fillsteps, \
+                      '' u 1:($2-10.) title 'with steps' with steps lw 4
 #
 set output out . 'figure_histeps' . ext
 plot demo . 'silver.dat' u 1:($2-10.) title 'with histeps' with histeps

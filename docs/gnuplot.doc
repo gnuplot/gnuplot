@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.659 2011/04/01 05:15:32 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.660 2011/04/14 19:27:33 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -3248,6 +3248,13 @@ Ffigure_fsteps
 ^ <a href="http://www.gnuplot.info/demo/steps.html">
  steps demo.
 ^ </a>
+2 fillsteps
+?commands set style fillsteps
+?set style fillsteps
+?style fillsteps
+?fillsteps
+ The `fillsteps` style is exactly like `steps` except that the area between
+ the curve and y=0 is filled in the current fill style.  See `steps`.
 2 histeps
 ?commands set style histeps
 ?set style histeps
@@ -3667,7 +3674,8 @@ Ffigure_steps
  second from (x2,y1) to (x2,y2).  The input column requires are the same as for
  plot styles `lines` and `points`.  The difference between `fsteps` and `steps`
  is that `fsteps` traces first the change in y and then the change in x.
- `steps` traces first the change in x and then the change in y.
+ `steps` traces first the change in x and then the change in y.  To fill the
+ area between the curve and the baseline at y=0, use `fillsteps`.
  See also
 ^ <a href="http://www.gnuplot.info/demo/steps.html">
  steps demo.

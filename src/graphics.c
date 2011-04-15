@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.362 2011/04/07 00:06:27 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.363 2011/04/07 03:30:33 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -1892,6 +1892,7 @@ do_plot(struct curve_points *plots, int pcount)
 		plot_lines(this_plot);
 		break;
 	    case STEPS:
+	    case FILLSTEPS:
 		plot_steps(this_plot);
 		break;
 	    case FSTEPS:
@@ -2823,69 +2824,100 @@ struct curve_points *plot)
 
 /* XXX - JG  */
 /* plot_steps:
- * Plot the curves in STEPS style
+ * Plot the curves in STEPS or FILLSTEPS style
  */
 static void
 plot_steps(struct curve_points *plot)
 {
     int i;			/* point index */
-    int x, y;			/* point in terminal coordinates */
+    int x=0, y=0;		/* point in terminal coordinates */
     struct termentry *t = term;
     enum coord_type prev = UNDEFINED;	/* type of previous point */
     double ex, ey;		/* an edge point */
     double lx[2], ly[2];	/* two edge points */
-    int yprev = 0;		/* previous point coordinates */
+    int xprev, yprev;		/* previous point coordinates */
+    int y0;			/* baseline */
+    int style = 0;
+
+    /* EAM April 2011:  Default to lines only, but allow filled boxes */
+    if ((plot->plot_style & PLOT_STYLE_HAS_FILL) && t->fillbox) {
+	style = style_from_fill(&plot->fill_properties);
+	ey = 0;
+	cliptorange(ey, Y_AXIS.min, Y_AXIS.max);
+	y0 = map_y(ey);
+    }
 
     for (i = 0; i < plot->p_count; i++) {
+	xprev = x; yprev = y;
+
 	switch (plot->points[i].type) {
-	case INRANGE:{
+	case INRANGE:
 		x = map_x(plot->points[i].x);
 		y = map_y(plot->points[i].y);
 
 		if (prev == INRANGE) {
-		    (*t->vector) (x, yprev);
-		    (*t->vector) (x, y);
-		} else if (prev == OUTRANGE) {
-		    /* from outrange to inrange */
-		    if (!clip_lines1) {
-			(*t->move) (x, y);
-		    } else {	/* find edge intersection */
-			edge_intersect_steps(plot->points, i, &ex, &ey);
-			(*t->move) (map_x(ex), map_y(ey));
-			(*t->vector) (x, map_y(ey));
+		    if (style) {
+			(*t->fillbox)(style, xprev,y0,(x-xprev),yprev-y0);
+		    } else {
+			(*t->vector) (x, yprev);
 			(*t->vector) (x, y);
 		    }
-		} else {	/* prev == UNDEFINED */
-		    (*t->move) (x, y);
-		    (*t->vector) (x, y);
-		}
-		yprev = y;
+		} else if (prev == OUTRANGE) {
+		    /* from outrange to inrange */
+		    if (clip_lines1) {	/* find edge intersection */
+			edge_intersect_steps(plot->points, i, &ex, &ey);
+			xprev = map_x(ex);
+			yprev = map_y(ey);
+			if (style) {
+			    (*t->fillbox)(style, xprev,y0,(x-xprev),yprev-y0);
+			} else {
+			    (*t->move) (xprev,yprev);
+			    (*t->vector) (x, yprev);
+			    (*t->vector) (x, y);
+			}
+		    }
+		} /* remaining case (prev == UNDEFINED) do nothing */
+
+		(*t->move)(x, y);
 		break;
-	    }
-	case OUTRANGE:{
+
+	case OUTRANGE:
 		if (prev == INRANGE) {
 		    /* from inrange to outrange */
 		    if (clip_lines1) {
 			edge_intersect_steps(plot->points, i, &ex, &ey);
-			(*t->vector) (map_x(ex), yprev);
-			(*t->vector) (map_x(ex), map_y(ey));
+			x = map_x(ex); y = map_y(ey);
+			if (style) {
+			    (*t->fillbox)(style, xprev,y0,(x-xprev),yprev-y0);
+			} else {
+			    (*t->vector) (x, yprev);
+			    (*t->vector) (x, y);
+			}
 		    }
 		} else if (prev == OUTRANGE) {
 		    /* from outrange to outrange */
 		    if (clip_lines2) {
 			if (two_edge_intersect_steps(plot->points, i, lx, ly)) {
-			    (*t->move) (map_x(lx[0]), map_y(ly[0]));
-			    (*t->vector) (map_x(lx[1]), map_y(ly[0]));
-			    (*t->vector) (map_x(lx[1]), map_y(ly[1]));
+			    xprev = map_x(lx[0]);
+			    yprev = map_y(ly[0]);
+			    x = map_x(lx[1]);
+			    y = map_y(ly[1]);
+			    if (style) {
+				(*t->fillbox)(style, xprev,y0,(x-xprev),yprev-y0);
+			    } else {
+				(*t->move) (xprev, yprev);
+				(*t->vector) (x, yprev);
+				(*t->vector) (x, y);
+			    }
 			}
 		    }
 		}
+		(*t->move)(x, y);
 		break;
-	    }
+
 	default:		/* just a safety */
-	case UNDEFINED:{
+	case UNDEFINED:
 		break;
-	    }
 	}
 	prev = plot->points[i].type;
     }
@@ -2899,16 +2931,18 @@ static void
 plot_fsteps(struct curve_points *plot)
 {
     int i;			/* point index */
-    int x, y;			/* point in terminal coordinates */
+    int x=0, y=0;		/* point in terminal coordinates */
     struct termentry *t = term;
     enum coord_type prev = UNDEFINED;	/* type of previous point */
     double ex, ey;		/* an edge point */
     double lx[2], ly[2];	/* two edge points */
-    int xprev = 0;		/* previous point coordinates */
+    int xprev, yprev;		/* previous point coordinates */
 
     for (i = 0; i < plot->p_count; i++) {
+	xprev = x; yprev = y;
+
 	switch (plot->points[i].type) {
-	case INRANGE:{
+	case INRANGE:
 		x = map_x(plot->points[i].x);
 		y = map_y(plot->points[i].y);
 
@@ -2917,45 +2951,48 @@ plot_fsteps(struct curve_points *plot)
 		    (*t->vector) (x, y);
 		} else if (prev == OUTRANGE) {
 		    /* from outrange to inrange */
-		    if (!clip_lines1) {
-			(*t->move) (x, y);
-		    } else {	/* find edge intersection */
+		    if (clip_lines1) {	/* find edge intersection */
 			edge_intersect_fsteps(plot->points, i, &ex, &ey);
-			(*t->move) (map_x(ex), map_y(ey));
-			(*t->vector) (map_x(ex), y);
+			xprev = map_x(ex);
+			yprev = map_y(ey);
+			(*t->move) (xprev, yprev);
+			(*t->vector) (xprev, y);
 			(*t->vector) (x, y);
 		    }
-		} else {	/* prev == UNDEFINED */
-		    (*t->move) (x, y);
-		    (*t->vector) (x, y);
-		}
-		xprev = x;
+		} /* remaining case (prev == UNDEFINED) do nothing */
+
+		(*t->move)(x, y);
 		break;
-	    }
-	case OUTRANGE:{
+
+	case OUTRANGE:
 		if (prev == INRANGE) {
 		    /* from inrange to outrange */
 		    if (clip_lines1) {
 			edge_intersect_fsteps(plot->points, i, &ex, &ey);
-			(*t->vector) (xprev, map_y(ey));
-			(*t->vector) (map_x(ex), map_y(ey));
+			x = map_x(ex);  y = map_y(ey);
+			(*t->vector) (xprev, y);
+			(*t->vector) (x, y);
 		    }
 		} else if (prev == OUTRANGE) {
 		    /* from outrange to outrange */
 		    if (clip_lines2) {
 			if (two_edge_intersect_fsteps(plot->points, i, lx, ly)) {
-			    (*t->move) (map_x(lx[0]), map_y(ly[0]));
-			    (*t->vector) (map_x(lx[0]), map_y(ly[1]));
-			    (*t->vector) (map_x(lx[1]), map_y(ly[1]));
+			    xprev = map_x(lx[0]);
+			    yprev = map_y(ly[0]);
+			    x = map_x(lx[1]);
+			    y = map_y(ly[1]);
+			    (*t->move) (xprev, yprev);
+			    (*t->vector) (xprev, y);
+			    (*t->vector) (x, y);
 			}
 		    }
 		}
+		(*t->move)(x, y);
 		break;
-	    }
+
 	default:		/* just a safety */
-	case UNDEFINED:{
+	case UNDEFINED:
 		break;
-	    }
 	}
 	prev = plot->points[i].type;
     }
@@ -3059,8 +3096,6 @@ plot_histeps(struct curve_points *plot)
  * Draw vertical line for the histeps routine.
  * Performs clipping.
  */
-/* HBB 20010214: renamed parameters. xl vs. x1 is just _too_ easy to
- * mis-read */
 static void
 histeps_vertical(
     int *cur_x, int *cur_y,	/* keeps track of "cursor" position */
@@ -3070,55 +3105,15 @@ histeps_vertical(
     struct termentry *t = term;
     int xm, y1m, y2m;
 
-    /* FIXME HBB 20010215: wouldn't it be simpler to call
-     * draw_clip_line() instead? And in histeps_horizontal(), too, of
-     * course? */
-
-    /* HBB 20010215: reversed axes need special treatment, here: */
-    if (X_AXIS.min <= X_AXIS.max) {
-	if ((x < X_AXIS.min) || (x > X_AXIS.max))
-	    return;
-    } else {
-	if ((x < X_AXIS.max) || (x > X_AXIS.min))
-	    return;
-    }
-
-    if (Y_AXIS.min <= Y_AXIS.max) {
-	if ((y1 < Y_AXIS.min && y2 < Y_AXIS.min)
-	    || (y1 > Y_AXIS.max && y2 > Y_AXIS.max))
-	    return;
-	if (y1 < Y_AXIS.min)
-	    y1 = Y_AXIS.min;
-	if (y1 > Y_AXIS.max)
-	    y1 = Y_AXIS.max;
-	if (y2 < Y_AXIS.min)
-	    y2 = Y_AXIS.min;
-	if (y2 > Y_AXIS.max)
-	    y2 = Y_AXIS.max;
-    } else {
-	if ((y1 < Y_AXIS.max && y2 < Y_AXIS.max)
-	    || (y1 > Y_AXIS.min && y2 > Y_AXIS.min))
-	    return;
-
-	if (y1 < Y_AXIS.max)
-	    y1 = Y_AXIS.max;
-	if (y1 > Y_AXIS.min)
-	    y1 = Y_AXIS.min;
-	if (y2 < Y_AXIS.max)
-	    y2 = Y_AXIS.max;
-	if (y2 > Y_AXIS.min)
-	    y2 = Y_AXIS.min;
-    }
     xm = map_x(x);
     y1m = map_y(y1);
     y2m = map_y(y2);
-
-    if (y1m != *cur_y || xm != *cur_x)
-	(*t->move) (xm, y1m);
-    (*t->vector) (xm, y2m);
-    *cur_x = xm;
-    *cur_y = y2m;
-
+    if (clip_line(&xm, &y1m, &xm, &y2m)) {
+	(*t->move)(xm, y1m);
+	(*t->vector)(xm, y2m);
+	*cur_x = xm;
+	*cur_y = y2m;
+    }
     return;
 }
 
@@ -3135,53 +3130,15 @@ histeps_horizontal(
     struct termentry *t = term;
     int x1m, x2m, ym;
 
-    /* HBB 20010215: reversed axes need special treatment, here: */
-
-    if (Y_AXIS.min <= Y_AXIS.max) {
-	if ((y < Y_AXIS.min) || (y > Y_AXIS.max))
-	    return;
-    } else {
-	if ((y < Y_AXIS.max) || (y > Y_AXIS.min))
-	    return;
-    }
-
-    if (X_AXIS.min <= X_AXIS.max) {
-	if ((x1 < X_AXIS.min && x2 < X_AXIS.min)
-	    || (x1 > X_AXIS.max && x2 > X_AXIS.max))
-	    return;
-
-	if (x1 < X_AXIS.min)
-	    x1 = X_AXIS.min;
-	if (x1 > X_AXIS.max)
-	    x1 = X_AXIS.max;
-	if (x2 < X_AXIS.min)
-	    x2 = X_AXIS.min;
-	if (x2 > X_AXIS.max)
-	    x2 = X_AXIS.max;
-    } else {
-	if ((x1 < X_AXIS.max && x2 < X_AXIS.max)
-	    || (x1 > X_AXIS.min && x2 > X_AXIS.min))
-	    return;
-
-	if (x1 < X_AXIS.max)
-	    x1 = X_AXIS.max;
-	if (x1 > X_AXIS.min)
-	    x1 = X_AXIS.min;
-	if (x2 < X_AXIS.max)
-	    x2 = X_AXIS.max;
-	if (x2 > X_AXIS.min)
-	    x2 = X_AXIS.min;
-    }
-    ym = map_y(y);
     x1m = map_x(x1);
     x2m = map_x(x2);
-
-    if (x1m != *cur_x || ym != *cur_y)
-	(*t->move) (x1m, ym);
-    (*t->vector) (x2m, ym);
-    *cur_x = x2m;
-    *cur_y = ym;
-
+    ym = map_y(y);
+    if (clip_line(&x1m, &ym, &x2m, &ym)) {
+	(*t->move)(x1m, ym);
+	(*t->vector)(x2m, ym);
+	*cur_x = x2m;
+	*cur_y = ym;
+    }
     return;
 }
 
