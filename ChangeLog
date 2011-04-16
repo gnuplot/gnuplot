@@ -1,3 +1,11 @@
+2011-04-16  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* config/config.amg, config/makefile.msc, config/makefile.msc, 
+	config/term.pc.h, config/makefile.win, config/makefile.ztc,
+	src/win/wgnuplot.def, src/win/wgnupl32.def:
+	Remove build files for no longer supported platforms DOS16, WIN16, 
+	Amiga and compilers.
+
 2011-04-15  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c (plot_steps) src/gp_types.h src/graph3d.c src/tables.c
