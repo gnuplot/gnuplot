@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: dumb.trm,v 1.29 2008/08/16 05:38:38 sfeam Exp $
+ * $Id: dumb.trm,v 1.30 2009/03/26 00:49:19 sfeam Exp $
  *
  */
 
@@ -571,20 +571,33 @@ START_HELP(dumb)
 "?terminal dumb",
 "?term dumb",
 "?dumb",
-" The `dumb` terminal driver has an optional size specification and trailing",
-" linefeed control.",
+" The `dumb` terminal driver plots into a text block using ascii characters.",
+" It has an optional size specification and a trailing linefeed flag.",
 "",
 " Syntax:",
-"       set terminal dumb {[no]feed} {<xsize> <ysize>}",
+"       set terminal dumb {size <xchars>,<ychars>} {[no]feed}",
 #ifndef NO_DUMB_ENHANCED_SUPPORT
 "                         {[no]enhanced}",
 #endif
 "",
-" where <xsize> and <ysize> set the size of the dumb terminals. Default is",
+" where <xchars> and <ychars> set the size of the text block. The default is",
 " 79 by 24. The last newline is printed only if `feed` is enabled.",
 "",
-" Examples:",
-"       set term dumb nofeed",
-"       set term dumb 79 49 # VGA screen---why would anyone do that?"
+" Example:",
+"       set term dumb size 60,15",
+"       plot [-5:6.5] sin(x) with impulse",
+"        ",
+"            1 +-------------------------------------------------+",
+"          0.8 +|||++                   ++||||++   sin(x) +----+ |",
+"          0.6 +|||||+                 ++|||||||+                |",
+"          0.4 +||||||+               ++|||||||||+               |",
+"          0.2 +|||||||+             ++|||||||||||+             +|",
+"            0 ++++++++++++++++++++++++++++++++++++++++++++++++++|",
+"         -0.2 +        +|||||||||||+              +|||||||||||+ |",
+"         -0.4 +         +|||||||||+                +|||||||||+  |",
+"         -0.6 +          +|||||||+                  +|||||||+   |",
+"         -0.8 +   +       ++||||+   +       +        ++||||+  + |",
+"           -1 +---+--------+--------+-------+--------+--------+-+",
+"                 -4       -2        0       2        4        6  "
 END_HELP(dumb)
 #endif /* TERM_HELP */
