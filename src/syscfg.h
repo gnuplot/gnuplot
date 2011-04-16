@@ -1,5 +1,5 @@
 /*
- * $Id: syscfg.h,v 1.44 2010/12/14 22:57:05 broeker Exp $
+ * $Id: syscfg.h,v 1.45 2011/03/13 19:55:29 markisch Exp $
  */
 
 /* GNUPLOT - syscfg.h */
@@ -200,11 +200,7 @@
 #  include <process.h>
 # endif                         /* !DJGPP */
 
-# ifdef __ZTC__
-#  define HAVE_SLEEP 1
-#  define P_WAIT 0
-
-# elif defined(__TURBOC__)
+# if defined(__TURBOC__)
 #  include <dos.h>		/* for sleep() prototype */
 #  ifndef _Windows
 #   define HAVE_SLEEP 1

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.216 2011/04/01 22:33:32 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.217 2011/04/03 16:46:08 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -299,11 +299,6 @@ static struct {
     double title_height;   /* fractional height reserved for title */
 } mp_layout = MP_LAYOUT_DEFAULT;
 
-
-#ifdef __ZTC__
-char *ztc_init();
-/* #undef TGIF */
-#endif
 
 #ifdef VMS
 char *vms_init();
@@ -1719,10 +1714,6 @@ init_terminal()
 	term_name = gnuterm;
     } else {
 
-#ifdef __ZTC__
-	term_name = ztc_init();
-#endif
-
 #ifdef VMS
 	term_name = vms_init();
 #endif /* VMS */
@@ -1853,47 +1844,6 @@ init_terminal()
     }
     change_term("unknown", 7);
 }
-
-
-#ifdef __ZTC__
-char *
-ztc_init()
-{
-    int g_mode;
-    char *term_name = NULL;
-
-    g_mode = fg_init();
-
-    switch (g_mode) {
-    case FG_NULL:
-	fputs("Graphics card not detected or not supported.\n", stderr);
-	exit(1);
-    case FG_HERCFULL:
-	term_name = "hercules";
-	break;
-    case FG_EGAMONO:
-	term_name = "egamono";
-	break;
-    case FG_EGAECD:
-	term_name = "egalib";
-	break;
-    case FG_VGA11:
-	term_name = "vgamono";
-	break;
-    case FG_VGA12:
-	term_name = "vgalib";
-	break;
-    case FG_VESA6A:
-	term_name = "svgalib";
-	break;
-    case FG_VESA5:
-	term_name = "ssvgalib";
-	break;
-    }
-    fg_term();
-    return (term_name);
-}
-#endif /* __ZTC__ */
 
 
 /*

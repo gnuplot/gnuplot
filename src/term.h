@@ -1,5 +1,5 @@
 /*
- * $Id: term.h,v 1.48 2011/04/03 16:46:08 sfeam Exp $
+ * $Id: term.h,v 1.49 2011/04/07 04:14:42 sfeam Exp $
  */
 
 /* GNUPLOT - term.h */
@@ -124,11 +124,6 @@
 /* MSDOS with djgpp compiler */
 # if defined(DJGPP) && (!defined(DJSVGA) || (DJSVGA != 0))
 #  include "djsvga.trm"
-# endif
-
-/* MSDOS with Zortech-C++ Compiler */
-# ifdef __ZTC__
-#  include "fg.trm"
 # endif
 
 /* All other Compilers */

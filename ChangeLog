@@ -6,6 +6,11 @@
 	Remove build files for no longer supported platforms DOS16, WIN16, 
 	Amiga and compilers.
 
+	* src/ansicheck.h src/command.c src/eval.h src/stdfn.h src/syscfg.h
+	src/term.c src/term.h src/makefile.all src/makefile.awc docs/Makefile.in
+	term/fg.trm : Remove suport for the Zortech	compiler and the no longer 
+	available Flash Graphics library.
+
 2011-04-15  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c (plot_steps) src/gp_types.h src/graph3d.c src/tables.c
