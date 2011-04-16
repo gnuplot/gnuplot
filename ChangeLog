@@ -8,7 +8,7 @@
 
 	* src/ansicheck.h src/command.c src/eval.h src/stdfn.h src/syscfg.h
 	src/term.c src/term.h src/makefile.all src/makefile.awc docs/Makefile.in
-	term/fg.trm : Remove suport for the Zortech	compiler and the no longer 
+	term/fg.trm : Remove suport for the Zortech compiler and the no longer 
 	available Flash Graphics library.
 
 2011-04-15  Ethan A Merritt  <merritt@u.washington.edu>
@@ -21,6 +21,8 @@
 
 	* src/graphics.c (plot_fsteps histeps_vertical histeps_horizontal):
 	Simplify the code to use clip_line() rather than lots of in-line tests.
+
+	* term/dumb.trm docs/gnuplot.doc: Updates
 
 2011-04-15  Bastian Maerkisch  <bmaerkisch@web.de>
 

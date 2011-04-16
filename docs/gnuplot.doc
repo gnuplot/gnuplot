@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.660 2011/04/14 19:27:33 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.661 2011/04/16 04:55:25 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -103,10 +103,11 @@ C
 
  Gnuplot supports many different types of output: interactive screen terminals
  (with mouse and hotkey input), direct output to pen plotters or modern
- printers, and output to many file formats (eps, fig, jpeg, LaTeX, metafont,
- pbm, pdf, png, postscript, svg, ...). Gnuplot is easily extensible to include
- new output modes. Recent additions include interactive terminals based on
- aquaterm (OSX), wxWidgets (multiple platforms), and Qt. 
+ printers, and output to many file formats (eps, emf, fig, jpeg, LaTeX, pdf, png,
+ postscript, ...). Gnuplot is easily extensible to include new output modes.
+ Recent additions include interactive terminals based on aquaterm (OSX),
+ wxWidgets (multiple platforms), and Qt.  Mouseable plots embedded in web pages
+ can be generated using the svg or HTML5 canvas terminal drivers.
 
  The command language of `gnuplot` is case sensitive, i.e. commands and
  function names written in lowercase are not the same as those written in
@@ -118,11 +119,6 @@ C
 
        load "filename"
        cd 'dir'
-
- Many `gnuplot` commands have multiple options. Version 4 is less sensitive
- to the order of these options than earlier versions, but some order-dependence
- remains. If you see error messages about unrecognized options, please try
- again using the exact order listed in the documentation.
 
  Commands may extend over several input lines by ending each line but the last
  with a backslash (\).  The backslash must be the _last_ character on each
@@ -298,10 +294,19 @@ C
 =kdensity
 =cumulative
  New smoothing algorithms have been added for both 2- and 3-dimensional plots.
- `smooth kdensity` and `smooth cumul` can be used with `plot` to draw 
- smooth histograms and cumulative distribution functions, resp. For use
- with `splot` several new smoothing kernels have been added to `dgrid3d`.
+ `smooth kdensity` and `smooth cumulative` can be used with `plot` to draw 
+ smooth histograms and cumulative distribution functions.  Several new smoothing
+ kernels have been added to `dgrid3d` for use with `splot`.
  See `smooth` `dgrid3d`.
+
+3 New time/date handling
+=time
+ Gnuplot now tracks time to millisecond precision. Time formats have been
+ modified to match this. The new built-in function time() returns the current
+ time of day according to the system clock.
+ Example: print the current time to msec precision
+      print strftime("%H:%M:%.3S %d-%b-%Y",time(0.0))
+      18:15:04.253 16-Apr-2011
 
 2 Backwards compatibility
 ?backwards compatibility
@@ -13013,21 +13018,13 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/splot.gif" alt="[splot.gif
 
 1 Bugs
 ?bugs
- Bugs reported since the current release as well as older ones
- may be located via the official distribution site on SourceForge.
-
- Please e-mail bug reports to the gnuplot-bugs mailing list.
- Or upload the report to the gnuplot web site on SourceForge.
+ Please e-mail bug reports to the gnuplot-bugs mailing list or
+ upload the report to the gnuplot web site on SourceForge.
  Please give complete information on the version of gnuplot you are using
  and, if possible, a test script that demonstrates the bug.
  See `seeking-assistance`.
 
- The sections below list problems known to be present in gnuplot version 4.4 at
- the time of release.  Some of these are actually bugs in external support
- libraries and may have been fixed independent of any changes in gnuplot.
-
-2 Gnuplot limitations
-?bugs gnuplot
+2 known limitations
 =gamma
 =bessel
 =timefmt
@@ -13046,11 +13043,8 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/splot.gif" alt="[splot.gif
  This means that multiplots whose constituent plots use different palettes
  will not display correctly in x11.
 
- Coordinates specified as "time" wrap at 24 hours, and have a precision limited
- to 1 second.  This is in particular a limitation in using time format to
- handle geographic coordinates.
-
- Error bars are not handled properly in polar/spherical coordinate plot modes.
+ Coordinates specified as "time" wrap at 24 hours. This is in particular
+ a limitation in using time format to handle geographic coordinates.
 
  The 'nohidden3d' option that is supposed to exempt individual plots from the
  global property 'set hidden3d' does not work for parametric curves.
