@@ -6,6 +6,8 @@ wgnuplot.hlp
 wgnuplot.chm
 *.err
 *.obj
+*.cobj
+*.pobj
 geticon.exe
 GRPICON.ico
 TEXTICON.ico

@@ -1,34 +1,77 @@
+2011-04-17  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	Building the three different types of executable for Windows
+	was quite cumbersome (change make variable, make clean, build,
+	all that thrice).  Compiling to three different object file name
+	extensions helps with that.
+
+	* config/watcom/Makefile (VARIANT): New macro to choose among
+	targets.
+	(TARGETS_PLAIN, EXTRA_CPPFLAGS_PLAIN, TARGETS_PIPES)
+	(EXTRA_CPPFLAGS_PIPES, TARGETS_CONSOLE, EXTRA_CPPFLAGS_CONSOLE):
+	New macros for settings particular to one variant.
+	(DEFAULT_TARGETS): Changed definition to use new per-variant
+	macros.
+	(ALL_TARGETS): New macro listing all things that can be built.
+	(all): New target building all variants without the need to make
+	clean in between.
+	(WIN_EXTRA_INPUTS): Removed $(WINOBJS)
+	(OBJS): Add $(WINOBJS) here instead.
+	(CONSOLE_OBJS, PIPE_OBJS): Copies of $(OBJS) with different object
+	filename extension.
+	Use $(O) in favour of fixed .obj, to allow renaming trick.
+	(.EXTENSIONS): Add .cobj and .pobj to list of recognized file name
+	extensions.
+	(.c.cobj): New implicit rule to compile sources for the console build.
+	(.c.pobj): New implicit rule for pipe-enabled build.
+	(wgnuplot.exe): $(WINOBJS) is contained in $(OBJS) now.
+	(wgnuplot_pipes.exe): Use $(PIPE_OBJS) instead of $(OBJS)
+	(gnuplot.exe): USE $(CONSOLE_OBJS) instead of $(OBJS)
+	(term.cobj): New explicit rule to compile term.c for the console build.
+	(term.pobj): New explicit rule to compile term.c for the pipe build.
+	(.c): Added windows source subdirectory to VPATH search list.
+	(w*.obj): Removed unnecessary explicit rules for Windows-specific
+	files.
+	(clean): Remove object files with new names.
+
+	* config/watcom/.cvsignore: Add new file name extensions to ignore.
+
 2011-04-17  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* config/makefile.cyg config/makefile.mgw config/makefile.unx
-	cygwin/Makefile mingw/Makefile: Remove dependencies on wgnuplot.def 
-	and wgnuplib.def.
+	cygwin/Makefile mingw/Makefile: Remove dependencies on
+	wgnuplot.def and wgnuplib.def.
 
 	* src/wgnuplib.def: Removed
 
 2011-04-16  Bastian Maerkisch  <bmaerkisch@web.de>
 
-	* config/config.amg, config/makefile.msc, config/makefile.msc, 
+	* config/config.amg, config/makefile.msc, config/makefile.msc,
 	config/term.pc.h, config/makefile.win, config/makefile.ztc,
-	src/win/wgnuplot.def, src/win/wgnupl32.def:
-	Remove build files for no longer supported platforms DOS16, WIN16, 
-	Amiga and compilers.
+	src/win/wgnuplot.def, src/win/wgnupl32.def: Remove build files for
+	no longer supported platforms DOS16, WIN16, Amiga and compilers.
 
-	* src/ansicheck.h src/command.c src/eval.h src/stdfn.h src/syscfg.h
-	src/term.c src/term.h src/makefile.all src/makefile.awc docs/Makefile.in
-	term/fg.trm : Remove suport for the Zortech compiler and the no longer 
-	available Flash Graphics library.
+	* src/ansicheck.h src/command.c src/eval.h src/stdfn.h
+	src/syscfg.h src/term.c src/term.h src/makefile.all
+	src/makefile.awc docs/Makefile.in term/fg.trm : Remove suport for
+	the Zortech compiler and the no longer available Flash Graphics
+	library.
 
 2011-04-15  Ethan A Merritt  <merritt@u.washington.edu>
 
-	* src/graphics.c (plot_steps) src/gp_types.h src/graph3d.c src/tables.c
-	docs/gnuplot.doc docs/plotstyles.gnu:
-	New plot style "with fillsteps" is identical to "with steps" except
-	that the area between the stepped line and the baseline at y=0
-	is filled using the currently active fill style.
+	* src/graphics.c (plot_steps)
+	* src/gp_types.h
+	* src/graph3d.c
+	* src/tables.c
+	* docs/gnuplot.doc
+	* docs/plotstyles.gnu: New plot style
+	"with fillsteps" is identical to "with steps" except that the area
+	between the stepped line and the baseline at y=0 is filled using
+	the currently active fill style.
 
-	* src/graphics.c (plot_fsteps histeps_vertical histeps_horizontal):
-	Simplify the code to use clip_line() rather than lots of in-line tests.
+	* src/graphics.c (plot_fsteps, histeps_vertical)
+	(histeps_horizontal): Simplify the code to use clip_line() rather
+	than lots of in-line tests.
 
 	* term/dumb.trm docs/gnuplot.doc: Updates
 
