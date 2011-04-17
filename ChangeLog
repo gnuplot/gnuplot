@@ -1,3 +1,12 @@
+2011-04-17  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* config/mingw/Makefile: Use $^ and $< where applicable. Patch
+	by Benjamin Lindner, SF Patch 2468650. Set TARGET only if it's
+	not already defined. GNUPLOT_LUA_DIR was included twice in
+	TERMOPTIONS. GNUPLOT_PS_DIR is required by show.c. [wgnuplot.chm]
+	Avoid changing directory via shell which seem not to work reliably
+	on all systems.
+
 2011-04-17  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* config/Makefile.am.in:  Fix package-build breakage.

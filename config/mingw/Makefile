@@ -1,5 +1,5 @@
 # Hello, emacs: this is a -*- Makefile -*-
-# $Id: Makefile,v 1.7 2011/04/11 09:12:12 mikulik Exp $
+# $Id: Makefile,v 1.8 2011/04/17 10:05:11 markisch Exp $
 #
 # GNUPLOT Makefile for MinGW32 on Win95/98/NT/2k/..
 # This assumes usual installation of the MinGW32 toolkit, the free
@@ -32,9 +32,11 @@
 # used when gnuplot.exe was not available on Windows. Nowadays, pgnuplot.exe
 # is deprecated -- please use gnuplot.exe instead.
 
+ifndef TARGET
 TARGET=wgnuplot.exe
 #TARGET=wgnuplot_pipes.exe
 #TARGET=gnuplot.exe
+endif
 
 # Comment out the definition lines to disable the according features:
 
@@ -205,7 +207,7 @@ RM = rm -f
 CP = cp -p
 
 ifdef DEBUG
-  CFLAGS += -g
+  CFLAGS += -g -Wall
   LDFLAGS += -g
 else
   CFLAGS += -O2
@@ -237,7 +239,7 @@ M=$(TOP)/demo/
 VPATH = $(S)
 
 TERMFLAGS = -DGNUPLOT_PS_DIR=\"$(GNUPLOT_PS_DIR)\" -DGNUPLOT_JS_DIR=\"$(GNUPLOT_JS_DIR)\"
-TERMFLAGS += -DGNUPLOT_LUA_DIR=\"$(GNUPLOT_LUA_DIR)\" -I$(TOP)/term
+TERMFLAGS += -I$(TOP)/term
 
 TERMLIBS =
 
@@ -375,7 +377,7 @@ OBJS = $(COREOBJS) version.$(O) gpexecute.$(O) $(WX_OBJS) $(CAIRO_OBJS)
 WINOBJS = winmain.$(O) wgnuplib.$(O) wgraph.$(O) wprinter.$(O) wtext.$(O) \
 	  wpause.$(O) wmenu.$(O) screenbuf.$(O)
 
-WINDOWS = makefile.win makefile.nt README.win $(W)/wcommon.h \
+WINDOWS = makefile.nt README.win $(W)/wcommon.h \
 	$(W)/wgnuplib.c $(W)/wgnuplib.h $(W)/wgnuplib.rc \
 	$(W)/wgnuplot.hpj $(W)/wgnuplot.mnu $(W)/wgraph.c \
 	$(W)/winmain.c $(W)/wmenu.c $(W)/wpause.c $(W)/wprinter.c \
@@ -406,59 +408,59 @@ $(TARGET): $(OBJS) $(WINOBJS) wgplt_res.$(O) texticon.ico grpicon.ico
 	$(TERMLIBS) $(WX_LIBS) $(PANGOCAIRO_LIBS)
 
 $(PGNUPLOT): $(W)/pgnuplot.c version.$(O)
-	$(CC) -O2 -DHAVE_STDBOOL_H -s -o $@ $(W)/pgnuplot.c version.$(O) -I$(W) -I$(S) -luser32
+	$(CC) -O2 -DHAVE_STDBOOL_H -s -o $@ $^ -I$(W) -I$(S) -luser32
 
 # rules
 
 wgplt_res.$(O) :  $(W)/wgnuplot.rc $(W)/wgnuplib.rc $(W)/wresourc.h texticon.ico grpicon.ico
-	$(RC) $(RCFLAGS) $(W)/wgnuplot.rc $(RCOUT)
+	$(RC) $(RCFLAGS) $< $(RCOUT)
 	$(RES2COFF)
 
 show.$(O): show.c plot.h setshow.h
-	$(CC) -c $(CFLAGS) -DHELPFILE=\"$(HELPFILE)\" -DBINDIR=\"$(bindir)\" $<
+	$(CC) -c $(CFLAGS) -DHELPFILE=\"$(HELPFILE)\" -DBINDIR=\"$(bindir)\" -DGNUPLOT_PS_DIR=\"$(GNUPLOT_PS_DIR)\" $<
 
 term.$(O): term.c term.h plot.h setshow.h bitmap.h $(CORETERM)
-	$(CC) -c $(CFLAGS) $(TERMFLAGS) $(S)/term.c
+	$(CC) -c $(CFLAGS) $(TERMFLAGS) $<
 
 version.$(O): version.c
 
 WINDEPS = $(W)/wgnuplib.h $(W)/wcommon.h $(W)/wresourc.h $(W)/screenbuf.h
 
 winmain.$(O): $(W)/winmain.c $(W)/wgnuplib.h $(W)/wtext.h plot.h
-	$(CC) -c $(CFLAGS) -DHELPFILE=\"$(HELPFILE)\"  $(W)/winmain.c
+	$(CC) -c $(CFLAGS) -DHELPFILE=\"$(HELPFILE)\" $<
 
 wgnuplib.$(O): $(W)/wgnuplib.c $(WINDEPS)
-	$(CC) -c $(CFLAGS) $(W)/wgnuplib.c
+	$(CC) -c $(CFLAGS) $<
 
 wmenu.$(O): $(W)/wmenu.c $(WINDEPS)
-	$(CC) -c $(CFLAGS) $(W)/wmenu.c
+	$(CC) -c $(CFLAGS) $<
 
 wtext.$(O): $(W)/wtext.c $(WINDEPS)
-	$(CC) -c $(CFLAGS) $(W)/wtext.c
+	$(CC) -c $(CFLAGS) $<
 
 screenbuf.$(O): $(W)/screenbuf.c $(WINDEPS)
-	$(CC) -c $(CFLAGS) $(W)/screenbuf.c
+	$(CC) -c $(CFLAGS) $<
 
 wpause.$(O): $(W)/wpause.c $(S)/wxterminal/wxt_term.h $(WINDEPS)
-	$(CC) -c $(CFLAGS) $(W)/wpause.c
+	$(CC) -c $(CFLAGS) $<
 
 wprinter.$(O): $(W)/wprinter.c $(WINDEPS)
-	$(CC) -c $(CFLAGS) $(W)/wprinter.c
+	$(CC) -c $(CFLAGS) $<
 
 wgraph.$(O): $(W)/wgraph.c $(WINDEPS)
-	$(CC) -c $(CFLAGS) $(W)/wgraph.c
+	$(CC) -c $(CFLAGS) $<
 
 wgnuplot.mnu: $(W)/wgnuplot.mnu
 	$(CP) $^ $@
 
 wxt_gui.$(O): $(S)/wxterminal/wxt_gui.cpp $(S)/wxterminal/wxt_gui.h
-	$(CXX) -c $(CFLAGS) $(CXXFLAGS) $(CAIRO_CFLAGS) $(S)/wxterminal/wxt_gui.cpp
+	$(CXX) -c $(CFLAGS) $(CXXFLAGS) $(CAIRO_CFLAGS) $<
 
 gp_cairo.$(O): $(S)/wxterminal/gp_cairo.c $(S)/wxterminal/gp_cairo.h
-	$(CC) -c $(CFLAGS) $(CXXFLAGS) $(PANGOCAIRO_CFLAGS) $(S)/wxterminal/gp_cairo.c
+	$(CC) -c $(CFLAGS) $(CXXFLAGS) $(PANGOCAIRO_CFLAGS) $<
 
 gp_cairo_helpers.$(O): $(S)/wxterminal/gp_cairo_helpers.c $(S)/wxterminal/gp_cairo_helpers.h
-	$(CC) -c $(CFLAGS) $(S)/wxterminal/gp_cairo_helpers.c
+	$(CC) -c $(CFLAGS) $<
 
 # extract icons from wgnuplot.rc
 texticon.ico: grpicon.ico
@@ -467,14 +469,14 @@ grpicon.ico: geticon.exe $(W)/wgnuplot.rc
 	./geticon $(W)/wgnuplot.rc
 
 geticon.exe: $(W)/geticon.c
-	$(LD) $(LDFLAGS) -o $@ $(W)/geticon.c
+	$(LD) $(LDFLAGS) -o $@ $<
 
 ifdef HTML_HELP
 # convert gnuplot.doc to windows/wgnuplot.html
 $(BUILDHELPFILE): doc2html.exe $(D)gnuplot.doc $(D)windows/wgnuplot.hhp $(D)windows/wgnuplot.hhk \
                   $(D)windows/wgnuplot.stp $(D)plotstyles.gnu
 	./doc2html $(D)gnuplot.doc $(D)windows/
-	-( cd $(D) ; ../config/mingw/$(TARGET) -e "winhelp=1" plotstyles.gnu )
+	-$(TARGET) -e "winhelp=1; cd '$(D)'" plotstyles.gnu
 	-$(HHC) $(D)windows/wgnuplot.hhp
 
 $(HELPFILE): $(BUILDHELPFILE)
