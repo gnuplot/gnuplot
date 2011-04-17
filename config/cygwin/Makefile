@@ -1,5 +1,5 @@
 # Hey, Emacs, this is a -*- Makefile -*- #
-# $Id: Makefile,v 1.2 2011/03/08 23:09:58 broeker Exp $
+# $Id: Makefile,v 1.3 2011/03/13 16:14:45 broeker Exp $
 #
 #
 # GNUPLOT Makefile for Cygwin on WinNT and Win95/98/2000
@@ -269,8 +269,8 @@ WINOBJS = winmain.$(O) wgnuplib.$(O) wgraph.$(O) wprinter.$(O) wtext.$(O) \
 	wpause.$(O) wmenu.$(O) screenbuf.$(O)
 
 WINDOWS = makefile.win makefile.nt README.win $(W)/wcommon.h \
-	$(W)/wgnuplib.c $(W)/wgnuplib.def $(W)/wgnuplib.h $(W)/wgnuplib.rc \
-	$(W)/wgnuplot.def $(W)/wgnuplot.hpj $(W)/wgnuplot.mnu $(W)/wgraph.c \
+	$(W)/wgnuplib.c $(W)/wgnuplib.h $(W)/wgnuplib.rc \
+	$(W)/wgnuplot.hpj $(W)/wgnuplot.mnu $(W)/wgraph.c \
 	$(W)/winmain.c $(W)/wmenu.c $(W)/wpause.c $(W)/wprinter.c \
 	$(W)/wresourc.h $(W)/wtext.c $(W)/wtext.h $(W)/geticon.c \
 	$(W)/screenbuf.c $(W)/screenbuf.h \
@@ -284,7 +284,7 @@ WINDOWS = makefile.win makefile.nt README.win $(W)/wcommon.h \
 
 LDLIBS = -L/usr/local/lib -lkernel32 -lgdi32 -lmsimg32 -lcomctl32
 
-$(TARGET): $(OBJS) $(WINOBJS) $(W)/wgnuplot.def wgplt_res.$(O) texticon.ico grpicon.ico
+$(TARGET): $(OBJS) $(WINOBJS) wgplt_res.$(O) texticon.ico grpicon.ico
 	$(LD) $(LDFLAGS) $(LDFLAGS2) -mwindows -mno-cygwin -o $@ \
 		$(OBJS) $(WINOBJS) wgplt_res.$(O) $(LDLIBS) $(TERMLIBS)
 

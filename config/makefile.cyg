@@ -1,6 +1,6 @@
 # Hey, Emacs, this is a -*- Makefile -*-
 #
-# $Id: makefile.cyg,v 1.33 2009/12/05 07:01:39 sfeam Exp $
+# $Id: makefile.cyg,v 1.34 2010/03/07 00:26:56 sfeam Exp $
 #
 #
 # GNUPLOT Makefile for Cygwin on WinNT and Win95/98/2000
@@ -265,8 +265,8 @@ WINOBJS = winmain.$(O) wgnuplib.$(O) wgraph.$(O) wprinter.$(O) wtext.$(O) \
 	wpause.$(O) wmenu.$(O)
 
 WINDOWS = makefile.win makefile.nt README.win win/wcommon.h \
-	win/wgnuplib.c win/wgnuplib.def win/wgnuplib.h win/wgnuplib.rc \
-	win/wgnuplot.def win/wgnuplot.hpj win/wgnuplot.mnu win/wgraph.c \
+	win/wgnuplib.c win/wgnuplib.h win/wgnuplib.rc \
+	win/wgnuplot.hpj win/wgnuplot.mnu win/wgraph.c \
 	win/winmain.c win/wmenu.c win/wpause.c win/wprinter.c \
 	win/wresourc.h win/wtext.c win/wtext.h win/geticon.c \
 	$(D)doc2rtf.c $(T)win.trm win/grpicon.ico win/texticon.ico
@@ -279,7 +279,7 @@ WINDOWS = makefile.win makefile.nt README.win win/wcommon.h \
 
 LDLIBS = -L/usr/local/lib -lkernel32 -lgdi32
 
-$(TARGET): $(OBJS) $(WINOBJS) win/wgnuplot.def wgplt_res.$(O) texticon.ico grpicon.ico
+$(TARGET): $(OBJS) $(WINOBJS) wgplt_res.$(O) texticon.ico grpicon.ico
 	$(LD) $(LDFLAGS) $(LDFLAGS2) -mwindows -mno-cygwin -o $@ \
 		$(OBJS) $(WINOBJS) wgplt_res.$(O) $(LDLIBS) $(TERMLIBS)
 

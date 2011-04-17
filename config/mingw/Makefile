@@ -1,5 +1,5 @@
 # Hello, emacs: this is a -*- Makefile -*-
-# $Id: Makefile,v 1.6 2011/03/30 17:23:59 markisch Exp $
+# $Id: Makefile,v 1.7 2011/04/11 09:12:12 mikulik Exp $
 #
 # GNUPLOT Makefile for MinGW32 on Win95/98/NT/2k/..
 # This assumes usual installation of the MinGW32 toolkit, the free
@@ -32,9 +32,9 @@
 # used when gnuplot.exe was not available on Windows. Nowadays, pgnuplot.exe
 # is deprecated -- please use gnuplot.exe instead.
 
-#TARGET=wgnuplot.exe
+TARGET=wgnuplot.exe
 #TARGET=wgnuplot_pipes.exe
-TARGET=gnuplot.exe
+#TARGET=gnuplot.exe
 
 # Comment out the definition lines to disable the according features:
 
@@ -92,7 +92,6 @@ MOUSE=1
 # WXWIDGETS interactive terminal
 # Requires wxWidgets, Cairo, Pango, and their respective dependencies.
 # Uncomment the following lines to compile it.
-# WXT_LOCATION should give the path where can be found wx/*.h headers
 #WXT=1
 #CAIROLIBS=1
 
@@ -377,8 +376,8 @@ WINOBJS = winmain.$(O) wgnuplib.$(O) wgraph.$(O) wprinter.$(O) wtext.$(O) \
 	  wpause.$(O) wmenu.$(O) screenbuf.$(O)
 
 WINDOWS = makefile.win makefile.nt README.win $(W)/wcommon.h \
-	$(W)/wgnuplib.c $(W)/wgnuplib.def $(W)/wgnuplib.h $(W)/wgnuplib.rc \
-	$(W)/wgnuplot.def $(W)/wgnuplot.hpj $(W)/wgnuplot.mnu $(W)/wgraph.c \
+	$(W)/wgnuplib.c $(W)/wgnuplib.h $(W)/wgnuplib.rc \
+	$(W)/wgnuplot.hpj $(W)/wgnuplot.mnu $(W)/wgraph.c \
 	$(W)/winmain.c $(W)/wmenu.c $(W)/wpause.c $(W)/wprinter.c \
 	$(W)/wresourc.h $(W)/wtext.c $(W)/wtext.h $(W)/geticon.c \
 	$(W)/screenbuf.c $(W)/screenbuf.h \
@@ -402,7 +401,7 @@ ifdef HTML_HELP
   LDFLAGS2 += -L$(HHWPATH)lib
 endif
 
-$(TARGET): $(OBJS) $(WINOBJS) $(W)/wgnuplot.def wgplt_res.$(O) texticon.ico grpicon.ico
+$(TARGET): $(OBJS) $(WINOBJS) wgplt_res.$(O) texticon.ico grpicon.ico
 	$(LDX) $(LDFLAGS) $(LDFLAGS2) -o $@ $(OBJS) $(WINOBJS) wgplt_res.$(O) $(LDLIBS)\
 	$(TERMLIBS) $(WX_LIBS) $(PANGOCAIRO_LIBS)
 

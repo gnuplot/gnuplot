@@ -1,5 +1,5 @@
 # Hello, emacs: this is a -*- Makefile -*-
-# $Id: makefile.mgw,v 1.62 2011/03/07 21:41:36 markisch Exp $
+# $Id: makefile.mgw,v 1.63 2011/03/13 12:15:56 markisch Exp $
 #
 # GNUPLOT Makefile for MinGW32 on Win95/98/NT/2k/..
 # This assumes usual installation of the MinGW32 toolkit, the free
@@ -370,8 +370,8 @@ WINOBJS = winmain.$(O) wgnuplib.$(O) wgraph.$(O) wprinter.$(O) wtext.$(O) \
 	  wpause.$(O) wmenu.$(O) screenbuf.$(O)
 
 WINDOWS = makefile.win makefile.nt README.win win/wcommon.h \
-	win/wgnuplib.c win/wgnuplib.def win/wgnuplib.h win/wgnuplib.rc \
-	win/wgnuplot.def win/wgnuplot.hpj win/wgnuplot.mnu win/wgraph.c \
+	win/wgnuplib.c win/wgnuplib.h win/wgnuplib.rc \
+	win/wgnuplot.hpj win/wgnuplot.mnu win/wgraph.c \
 	win/winmain.c win/wmenu.c win/wpause.c win/wprinter.c \
 	win/wresourc.h win/wtext.c win/wtext.h win/geticon.c win/screenbuf.c \
 	$(T)win.trm win/grpicon.ico win/texticon.ico
@@ -397,7 +397,7 @@ config.h: ../config/config.mgw
 
 $(OBJS) $(WINOBJS) dbinary.$(O): config.h
 
-$(TARGET): $(OBJS) $(WINOBJS) win/wgnuplot.def wgplt_res.o texticon.ico grpicon.ico
+$(TARGET): $(OBJS) $(WINOBJS) wgplt_res.o texticon.ico grpicon.ico
 	$(LDX) $(LDFLAGS) $(LDFLAGS2) -o $@ $(OBJS) $(WINOBJS) wgplt_res.o $(LDLIBS)\
 	$(TERMLIBS) $(WX_LIBS) $(CAIRO_LIBS) $(PANGO_LIBS)
 

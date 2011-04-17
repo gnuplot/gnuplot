@@ -1,3 +1,11 @@
+2011-04-17  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* config/makefile.cyg config/makefile.mgw config/makefile.unx
+	cygwin/Makefile mingw/Makefile: Remove dependencies on wgnuplot.def 
+	and wgnuplib.def.
+
+	* src/wgnuplib.def: Removed
+
 2011-04-16  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* config/config.amg, config/makefile.msc, config/makefile.msc, 

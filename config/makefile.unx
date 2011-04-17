@@ -1,5 +1,5 @@
 #
-# $Id: makefile.unx,v 1.12 2010/03/14 18:01:46 sfeam Exp $
+# $Id: makefile.unx,v 1.13 2010/03/14 18:52:42 sfeam Exp $
 #
 #
 ############################################################
@@ -481,8 +481,8 @@ PC = corgraph.asm corplot.c header.mac hrcgraph.asm lineproc.mac \
 	pcgraph.asm makefile.emx \
 	makefile.ztc linkopt.ztc term/fg.trm term/pc.trm 
 WINDOWS = makefile.win makefile.msw README.win win/wcommon.h \
-	win/wgnuplib.c win/wgnuplib.def win/wgnuplib.h win/wgnuplib.rc \
-	win/wgnuplot.def win/wgnuplot.hpj win/wgnuplot.mnu win/wgnuplot.rc \
+	win/wgnuplib.c win/wgnuplib.h win/wgnuplib.rc \
+	win/wgnuplot.hpj win/wgnuplot.mnu win/wgnuplot.rc \
 	win/wgraph.c win/winmain.c win/wmenu.c win/wpause.c \
 	win/wprinter.c win/wresourc.h win/wtext.c win/wtext.h \
 	win/geticon.c docs/doc2rtf.c term/win.trm
