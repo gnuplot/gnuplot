@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.661 2011/04/16 04:55:25 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.662 2011/04/16 18:23:27 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -3655,9 +3655,7 @@ Ffigure_points
  1 or 2 columns of basic input data are required in 2D plots; 1 or 3 columns are
  required in 3D plots.  See `style lines`.  Additional input columns may be used
  to provide information such as variable point size or variable point color.
-       
-       
-       
+
 2 polar
 Ffigure_polar
  Polar plots are not really a separate plot style but are listed here for
@@ -3666,7 +3664,7 @@ Ffigure_polar
  Many, but not all, 2D plotting styles work in polar mode.
  The figure shows a combination of plot styles `lines` and `filledcurves`.
  See `set polar`, `set rrange`, `set size square`.
-       
+
 2 steps
 ?commands set style steps
 ?set style steps
