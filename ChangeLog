@@ -1,14 +1,29 @@
+2011-04-18  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* term/Makefile.am.in: Use $< where applicable.
+	($(srcdir)/lua/gnuplot-tikz.help): Make workable outside the
+	source tree.  Use $< and $@ where applicable.
+
+	* docs/Makefile.in (CLEANFILES): Fix broken directory name;
+	indent.
+	(gnuplot.htb): Fix broken directory name.  Make workable in
+	out-of-source builds.
+	(windows/wgnuplot.html, windows/doc2html.o, windows/doc2html): Fix
+	wrong directory name.
+
+	* Makefile.maint (amfiles): Missing semicolon.
+
 2011-04-18  Bastian Maerkisch  <bmaerkisch@web.de>
 
-	* src/win/wgraph.c (drawgraph): Fractional solid fill based on 
-	SF Patch 2905570 by Shigeharu Takeno. Remove halftone brushes. 
+	* src/win/wgraph.c (drawgraph): Fractional solid fill based on SF
+	Patch 2905570 by Shigeharu Takeno. Remove halftone brushes.
 	Eliminate static variable to keep track of pm3d brushes.
 
 2011-04-17  Bastian Maerkisch  <bmaerkisch@web.de>
 
-	* config/mingw/Makefile: Use $^ and $< where applicable. Patch
-	by Benjamin Lindner, SF Patch 2468650. Set TARGET only if it's
-	not already defined. GNUPLOT_LUA_DIR was included twice in
+	* config/mingw/Makefile: Use $^ and $< where applicable. Patch by
+	Benjamin Lindner, SF Patch 2468650. Set TARGET only if it's not
+	already defined. GNUPLOT_LUA_DIR was included twice in
 	TERMOPTIONS. GNUPLOT_PS_DIR is required by show.c. [wgnuplot.chm]
 	Avoid changing directory via shell which seem not to work reliably
 	on all systems.
