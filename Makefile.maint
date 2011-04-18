@@ -97,5 +97,5 @@ alpha:
 
 amfiles:
 	for subdir in config demo m4 term tutorial ; do \
-	  make -C $$subdir -f Makefile.am.in Makefile.am \
+	  make -C $$subdir -f Makefile.am.in Makefile.am ; \
 	done
