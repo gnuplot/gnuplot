@@ -16,7 +16,7 @@ jsdir = $(pkgdatadir)/$(VERSION_MAJOR)/js
 
 Makefile.am: Makefile.am.in
 	rm -f $@ $@t
-	sed -n '1,/^##trm-files-begin/p' Makefile.am.in > $@t
+	sed -n '1,/^##trm-files-begin/p' $< > $@t
 	echo CORETERM = *.trm | fmt | (tr '\012' @; echo) \
 	  |sed 's/@$$/%/;s/@/ \\@/g' | tr @% '\012 ' \
 	  >> $@t
@@ -35,12 +35,12 @@ Makefile.am: Makefile.am.in
 	echo else >> $@t
 	echo     build_lua = >> $@t
 	echo endif >> $@t
-	sed -n '/^##trm-files-end/,$$p' Makefile.am.in >> $@t
+	sed -n '/^##trm-files-end/,$$p' $< >> $@t
 	chmod a-w $@t
 	mv $@t $@
 
 all: lua/gnuplot-tikz.help
 
-lua/gnuplot-tikz.help: lua/gnuplot-tikz.lua
-	test -z "$(build_lua)" || lua lua/gnuplot-tikz.lua termhelp > lua/gnuplot-tikz.help
+$(srcdir)/lua/gnuplot-tikz.help: $(srcdir)/lua/gnuplot-tikz.lua
+	test -z "$(build_lua)" || lua $< termhelp > $@
 
