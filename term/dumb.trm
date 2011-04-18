@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: dumb.trm,v 1.30 2009/03/26 00:49:19 sfeam Exp $
+ * $Id: dumb.trm,v 1.31 2011/04/16 06:05:34 sfeam Exp $
  *
  */
 
@@ -586,7 +586,7 @@ START_HELP(dumb)
 " Example:",
 "       set term dumb size 60,15",
 "       plot [-5:6.5] sin(x) with impulse",
-"        ",
+"",
 "            1 +-------------------------------------------------+",
 "          0.8 +|||++                   ++||||++   sin(x) +----+ |",
 "          0.6 +|||||+                 ++|||||||+                |",
