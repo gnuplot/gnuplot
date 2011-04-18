@@ -1,3 +1,9 @@
+2011-04-18  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/win/wgraph.c (drawgraph): Fractional solid fill based on 
+	SF Patch 2905570 by Shigeharu Takeno. Remove halftone brushes. 
+	Eliminate static variable to keep track of pm3d brushes.
+
 2011-04-17  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* config/mingw/Makefile: Use $^ and $< where applicable. Patch

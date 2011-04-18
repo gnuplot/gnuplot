@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.109 2011/04/10 17:32:12 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.110 2011/04/13 06:46:48 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - win/wgraph.c */
@@ -145,27 +145,10 @@ int wginitstyle[WGDEFSTYLE] = {PS_SOLID, PS_DASH, PS_DOT, PS_DASHDOT, PS_DASHDOT
  * need to know about it */
 #define GWOPMAX 4096
 
+#define MINMAX(a,val,b) (((val) <= (a)) ? (a) : ((val) <= (b) ? (val) : (b)))
 
 /* bitmaps for filled boxes (ULIG) */
 /* zeros represent the foreground color and ones represent the background color */
-
-static unsigned char halftone_bitmaps[][16] ={
-  { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
-    0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF },   /* no fill */
-  { 0xEE, 0xEE, 0xBB, 0xBB, 0xEE, 0xEE, 0xBB, 0xBB,
-    0xEE, 0xEE, 0xBB, 0xBB, 0xEE, 0xEE, 0xBB, 0xBB },   /* 25% pattern */
-  { 0xAA, 0xAA, 0x55, 0x55, 0xAA, 0xAA, 0x55, 0x55,
-    0xAA, 0xAA, 0x55, 0x55, 0xAA, 0xAA, 0x55, 0x55 },   /* 50% pattern */
-  { 0x88, 0x88, 0x22, 0x22, 0x88, 0x88, 0x22, 0x22,
-    0x88, 0x88, 0x22, 0x22, 0x88, 0x88, 0x22, 0x22 },   /* 75% pattern */
-  { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }    /* solid pattern */
-};
-#define halftone_num (sizeof(halftone_bitmaps) / sizeof (*halftone_bitmaps))
-static HBRUSH halftone_brush[halftone_num];
-static BITMAP halftone_bitdata[halftone_num];
-static HBITMAP halftone_bitmap[halftone_num];
-
 static unsigned char pattern_bitmaps[][16] = {
   {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
    0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF}, /* no fill */
@@ -612,18 +595,6 @@ MakePens(LPGW lpgw, HDC hdc)
 	if( ! brushes_initialized ) {
 		int i;
 
-		for(i=0; i < halftone_num; i++) {
-			halftone_bitdata[i].bmType       = 0;
-			halftone_bitdata[i].bmWidth      = 16;
-			halftone_bitdata[i].bmHeight     = 8;
-			halftone_bitdata[i].bmWidthBytes = 2;
-			halftone_bitdata[i].bmPlanes     = 1;
-			halftone_bitdata[i].bmBitsPixel  = 1;
-			halftone_bitdata[i].bmBits       = halftone_bitmaps[i];
-			halftone_bitmap[i] = CreateBitmapIndirect(&halftone_bitdata[i]);
-			halftone_brush[i] = CreatePatternBrush(halftone_bitmap[i]);
-		}
-
 		for(i=0; i < pattern_num; i++) {
 			pattern_bitdata[i].bmType       = 0;
 			pattern_bitdata[i].bmWidth      = 16;
@@ -656,10 +627,6 @@ DestroyPens(LPGW lpgw)
 	if( brushes_initialized ) {
 		int i;
 
-		for( i=0; i<halftone_num; i++ ) {
-			DeleteObject(halftone_bitmap[i]);
-			DeleteObject(halftone_brush[i]);
-		}
 		for( i=0; i<pattern_num; i++ ) {
 			DeleteObject(pattern_bitmap[i]);
 			DeleteObject(pattern_brush[i]);
@@ -1242,6 +1209,7 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
     unsigned int fillstyle = 0;
     int idx;
     COLORREF last_color = 0;
+    HBRUSH last_disposable_brush = 0;
 
     if (lpgw->locked) return;
 
@@ -1277,7 +1245,7 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
     /* calculate text shifting for horizontal text */
     hshift = 0;
     vshift = MulDiv(lpgw->vchar, rb - rt, lpgw->ymax)/2;
-  
+
     pen = 2;
     SelectObject(hdc, lpgw->hapen);
     SelectObject(hdc, lpgw->colorbrush[pen]);
@@ -1417,16 +1385,19 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 		    transparent = TRUE;
 		    /* intentionally fall through */
 		case FS_SOLID:
-		    /* style == 1 --> use halftone fill pattern
-		     * according to filldensity. Density is from
-		     * 0..100 percent: */
-		    idx = ((fillstyle >> 4) * (halftone_num - 1) / 100 );
-		    if (idx < 0)
-			idx = 0;
-		    if (idx > halftone_num - 1)
-			idx = halftone_num - 1;
-		    SelectObject(hdc, halftone_brush[idx]);
-		    break;
+		{
+			double density = MINMAX(0, (int)(fillstyle >> 4), 100) * 0.01;
+			COLORREF color =
+				RGB(255 - density * (255 - GetRValue(last_color)),
+				    255 - density * (255 - GetGValue(last_color)),
+				    255 - density * (255 - GetBValue(last_color)));
+			HBRUSH brush = CreateSolidBrush(color);
+			SelectObject(hdc, brush);
+			if (last_disposable_brush)
+				DeleteObject(last_disposable_brush);
+			last_disposable_brush = brush;
+			break;
+		}
 		case FS_TRANSPARENT_PATTERN:
 		    transparent = TRUE;
 		    /* intentionally fall through */
@@ -1434,10 +1405,7 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 		    /* style == 2 --> use fill pattern according to
                      * fillpattern. Pattern number is enumerated */
 		    idx = fillstyle >> 4;
-		    if (idx < 0)
-			idx = 0;
-		    if (idx > pattern_num - 1)
-			idx = idx % pattern_num;
+		    idx = MINMAX(0, idx, pattern_num - 1);
 		    SelectObject(hdc, pattern_brush[idx]);
 		    break;
 		case FS_DEFAULT:
@@ -1446,7 +1414,7 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 		case FS_EMPTY:
 		default:
 		    /* fill with background color */
-		    SelectObject(hdc, halftone_brush[0]);
+		    SelectObject(hdc, lpgw->hbrush);
 		    break;
 	    }
 
@@ -1558,7 +1526,6 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 
 		case W_setcolor:
 	    {
-		static HBRUSH last_pm3d_brush = NULL;
 		HBRUSH this_brush;
 		COLORREF c;
 		LOGPEN cur_penstruct;
@@ -1588,9 +1555,9 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 		/* Solid fill brush */
 		this_brush = CreateSolidBrush(c);
 		SelectObject(hdc, this_brush);
-		if (last_pm3d_brush != NULL)
-		    DeleteObject(last_pm3d_brush);
-		last_pm3d_brush = this_brush;
+		if (last_disposable_brush != NULL)
+			DeleteObject(last_disposable_brush);
+		last_disposable_brush = this_brush;
 
 		/* create new pen, too */
 		cur_penstruct = (lpgw->color && isColor) ?  lpgw->colorpen[pen] : lpgw->monopen[pen];
