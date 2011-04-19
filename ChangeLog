@@ -9,6 +9,12 @@
 	allows, for example, 
 	'plot for [i=3:6] ... title "Results of ".columnhead(i)'
 
+2011-04-19  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* docs/Makefile.in (wxhelp/doc2html, gnuplot.htb): Ooops.
+	Yesterday's directory name change to windows was wrong.  Undoing
+	it.
+
 2011-04-18  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* term/Makefile.am.in: Use $< where applicable.
