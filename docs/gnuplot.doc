@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.568.2.40 2010/12/05 00:01:23 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.568.2.41 2011/03/26 02:39:24 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -536,6 +536,10 @@ C
  the remainder of columns 2 and 4 to draw the required line:
 
    plot 'datafile' using 1:(f($2)/$4) with lines title columnhead(2)
+
+ Another example:
+
+   plot for [i=2:6] 'datafile' using i title "Results for ".columnhead(i)
 
  See `set style labels`, `using xticlabels`, `plot title`, `using`.
 2 Enhanced text mode
@@ -1237,6 +1241,15 @@ C
  `column(x)` may be used only in expressions as part of `using` manipulations
  to fits or datafile plots.  It evaluates to the numerical value of the contents
  of column x. See `plot datafile using`.
+4 columnhead
+?expressions functions columnhead
+?functions columnhead
+?columnhead
+#columnhead(x) & int & string containing first entry of column $x$ in datafile. \\
+%columnhead(x)@int@ string containing first entry of column $x$ in datafile.
+ `columnhead(x)` may only be used in expressions as part of `using` manipulations
+ to fits or datafile plots.  It evaluates to a string containing the contents of
+ column x in the first line of data. See `plot datafile using`.
 4 defined
 ?expressions functions defined
 ?functions defined
@@ -5681,24 +5694,19 @@ Ffigure_mapcontours
 ?plot title
 ?splot title
 ?columnheader
- A line title for each function and data set appears in the key, accompanied
- by a sample of the line and/or symbol used to represent it.  It can be
- changed by using the `title` option.
+ By default each plot is listed in the key by the corresponding function or file
+ name. You can give an explicit plot title instead using the `title` option.
 
  Syntax:
        title <text> | notitle [<ignored text>]
        title columnheader | title columnheader(N)
 
- where <text> must either be a quoted string or a string variable.
- The quotes will not be shown in the key.  A special character may be given as
- a backslash followed by its octal value ("\345").  The tab character "\t" is
- understood.  Note that backslash processing occurs only for strings enclosed
- in double quotes---use single quotes to prevent such processing.  The newline
- character "\n" is not processed in key entries in either type of string.
+ where <text> is a quoted string or an expression that evaluates to a string.
+ The quotes will not be shown in the key.
 
  There is also an option that will interpret the first entry in a column of
  input data (i.e. the column header) as a text field, and use it as the key
- title.  See `datastrings`.  This can be made the default by speicifying
+ title.  See `datastrings`.  This can be made the default by specifying
  `set key autotitle columnhead`.
 
  The line title and sample can be omitted from the key by using the keyword
