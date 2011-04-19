@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.240 2011/02/20 23:17:11 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.241 2011/03/29 01:54:40 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -1904,20 +1904,17 @@ eval_plots()
 		    }
 		    c_token++;
 
-		    if (almost_equals(c_token,"col$umnheader")) {
+		    /* This ugliness is because columnheader can be either a keyword */
+		    /* or a function name.  Yes, the design could have been better. */
+		    if (almost_equals(c_token,"col$umnheader")
+		    && !(equals(c_token,"columnhead") && equals(c_token+1,"(")) ) {
 			df_set_key_title_columnhead(this_plot->plot_type);
-		    } else 
-
-#ifdef BACKWARDS_COMPATIBLE
-		    /* Annoying backwards-compatibility hack - deprecate! */
-		    if (isanumber(c_token)) {
-			c_token--;
-			df_set_key_title_columnhead(this_plot->plot_type);
-		    } else
-#endif
-
-		    if (!(this_plot->title = try_to_get_string()))
-			int_error(c_token, "expecting \"title\" for plot");
+		    } else {
+			evaluate_inside_using = TRUE;
+			if (!(this_plot->title = try_to_get_string()))
+			    int_error(c_token, "expecting \"title\" for plot");
+			evaluate_inside_using = FALSE; 
+		    }
 		    set_title = TRUE;
 		    continue;
 		}

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.193 2010/11/07 11:54:23 juhaszp Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.194 2011/03/20 17:27:57 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -2150,6 +2150,22 @@ f_stringcolumn(union argument *arg)
     }
 }
 
+/*{{{  void f_columnhead() */
+void
+f_columnhead(union argument *arg)
+{
+    struct value a;
+
+    if (!evaluate_inside_using)
+	int_error(c_token-1, "columnhead() called from invalid context");
+
+    (void) arg;                 /* avoid -Wunused warning */
+    (void) pop(&a);
+    column_for_key_title = (int) real(&a);
+    push(Gstring(&a, "@COLUMNHEAD@"));
+}
+
+
 /*{{{  void f_valid() */
 void
 f_valid(union argument *arg)
@@ -2349,8 +2365,17 @@ df_set_key_title(struct curve_points *plot)
     }
 
     /* What if there was already a title specified? */
-    if (plot->title && !plot->title_is_filename)
-	return;
+    if (plot->title && !plot->title_is_filename) {
+	char *placeholder = strstr(plot->title, "@COLUMNHEAD@");
+	char *newtitle = NULL;
+	if (!placeholder)
+	    return;
+	newtitle = gp_alloc(strlen(plot->title) + strlen(df_key_title),"plot title");
+	*placeholder = '\0';
+	sprintf(newtitle, "%s%s%s", plot->title, df_key_title, placeholder+12);
+	free(df_key_title);
+	df_key_title = newtitle;
+    }
     if (plot->title_is_suppressed)
 	return;
     if (plot->title)

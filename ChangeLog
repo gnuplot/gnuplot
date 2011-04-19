@@ -1,3 +1,14 @@
+2011-04-19  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/datafile.c (f_columnhead df_set_key_title) src/datafile.h
+	src/eval.c src/plot2d.c (eval_plots) docs/gnuplot.doc:
+
+	New function columnhead(N) that returns a string containing column N
+	from the first line of a data set. 'plot ... title columnhead(i)'
+	was already implemented as a keyword; making it a function instead
+	allows, for example, 
+	'plot for [i=3:6] ... title "Results of ".columnhead(i)'
+
 2011-04-18  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* term/Makefile.am.in: Use $< where applicable.
