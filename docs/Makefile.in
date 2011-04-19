@@ -111,26 +111,25 @@ PDFLATEX = @PDFLATEX@
 DVIPS = @DVIPS@
 
 T = $(top_srcdir)/term/
-CORETERM = $(T)aed.trm $(T)ai.trm \
-$(T)aquaterm.trm $(T)be.trm $(T)cairo.trm $(T)canvas.trm \
-$(T)cgi.trm $(T)cgm.trm $(T)corel.trm $(T)debug.trm $(T)djsvga.trm $(T)dumb.trm \
-$(T)dxf.trm $(T)dxy.trm $(T)eepic.trm $(T)emf.trm $(T)emxvga.trm \
-$(T)epson.trm $(T)excl.trm $(T)fig.trm $(T)gd.trm \
-$(T)ggi.trm $(T)gnugraph.trm $(T)gpic.trm \
-$(T)grass.trm $(T)hp26.trm $(T)hp2648.trm $(T)hp500c.trm $(T)hpgl.trm \
-$(T)hpljii.trm $(T)hppj.trm $(T)imagen.trm $(T)kyo.trm $(T)lua.trm \
-$(T)latex.trm $(T)linux.trm $(T)mac.trm $(T)metafont.trm $(T)metapost.trm \
-$(T)mgr.trm $(T)mif.trm $(T)next.trm $(T)openstep.trm \
-$(T)pbm.trm $(T)pc.trm $(T)pdf.trm $(T)pm.trm $(T)post.trm \
-$(T)pslatex.trm $(T)pstricks.trm $(T)qms.trm $(T)regis.trm $(T)rgip.trm \
-$(T)sun.trm $(T)svg.trm $(T)t410x.trm $(T)tek.trm \
-$(T)texdraw.trm $(T)tgif.trm $(T)tkcanvas.trm $(T)tpic.trm $(T)unixpc.trm \
-$(T)unixplot.trm $(T)v384.trm $(T)vgagl.trm $(T)vws.trm $(T)win.trm \
-$(T)wxt.trm $(T)x11.trm $(T)xlib.trm $(T)qt.trm
+CORETERM = $(T)aed.trm $(T)ai.trm $(T)aquaterm.trm $(T)be.trm		\
+$(T)cairo.trm $(T)canvas.trm $(T)cgi.trm $(T)cgm.trm $(T)corel.trm	\
+$(T)debug.trm $(T)djsvga.trm $(T)dumb.trm $(T)dxf.trm $(T)dxy.trm	\
+$(T)eepic.trm $(T)emf.trm $(T)emxvga.trm $(T)epson.trm $(T)excl.trm	\
+$(T)fig.trm $(T)gd.trm $(T)ggi.trm $(T)gnugraph.trm $(T)gpic.trm	\
+$(T)grass.trm $(T)hp26.trm $(T)hp2648.trm $(T)hp500c.trm $(T)hpgl.trm	\
+$(T)hpljii.trm $(T)hppj.trm $(T)imagen.trm $(T)kyo.trm $(T)lua.trm	\
+$(T)latex.trm $(T)linux.trm $(T)mac.trm $(T)metafont.trm		\
+$(T)metapost.trm $(T)mgr.trm $(T)mif.trm $(T)next.trm $(T)openstep.trm	\
+$(T)pbm.trm $(T)pc.trm $(T)pdf.trm $(T)pm.trm $(T)post.trm		\
+$(T)pslatex.trm $(T)pstricks.trm $(T)qms.trm $(T)regis.trm		\
+$(T)rgip.trm $(T)sun.trm $(T)svg.trm $(T)t410x.trm $(T)tek.trm		\
+$(T)texdraw.trm $(T)tgif.trm $(T)tkcanvas.trm $(T)tpic.trm		\
+$(T)unixpc.trm $(T)unixplot.trm $(T)v384.trm $(T)vgagl.trm $(T)vws.trm	\
+$(T)win.trm $(T)wxt.trm $(T)x11.trm $(T)xlib.trm $(T)qt.trm
 
 DIST_COMMON = README Makefile.in
 
-SOURCES = checkdoc.c doc2gih.c doc2hlp.c doc2ipf.c doc2ms.c doc2rnh.c \
+SOURCES = checkdoc.c doc2gih.c doc2hlp.c doc2ipf.c doc2ms.c doc2rnh.c	\
 doc2rtf.c doc2tex.c windows/doc2html.c termdoc.c xref.c
 
 TERM_H = $(top_srcdir)/src/term.h
@@ -139,10 +138,10 @@ BUILT_SOURCES = allterm.h
 
 HEADERS = doc2x.h xref.h
 
-EXTRA_DIST = doc2texi.el gnuplot.doc gnuplot.texi gpcard.tex makefile.ami \
-makefile.dst titlepag.ipf titlepag.ms titlepag.tex toc_entr.sty old psdoc \
-faq-ja.tex gnuplot-ja.doc README.ja term-ja.diff plotstyles.gnu \
-pdffigures.tex gnuplot.pdf windows
+EXTRA_DIST = doc2texi.el gnuplot.doc gnuplot.texi gpcard.tex	\
+makefile.ami makefile.dst titlepag.ipf titlepag.ms titlepag.tex	\
+toc_entr.sty old psdoc faq-ja.tex gnuplot-ja.doc README.ja	\
+term-ja.diff plotstyles.gnu pdffigures.tex gnuplot.pdf windows
 
 CLEANFILES = doc2tex gnuplot.tex gnuplot.dvi gnuplot.aux gnuplot.log	\
 gnuplot.toc gnuplot.ps gpcard.dvi gpcard.log gpcard.ps alldoc2gih	\
@@ -151,8 +150,7 @@ gnuplot.ind gnuplot.info* gnuplot.out doc2ipf gnuplot.ipf doc2ms	\
 gnuplot.ms doc2rnh gnuplot.rnh doc2rtf gnuplot.rtf gnuplot.nroff	\
 checkdoc gnuplot.txt gnuplot.tmp VERSION gnuplot.4tc gnuplot.4ct	\
 gnuplot.idv gnuplot.xref gnuplot.lg figure*.pdf pdffigures.*		\
-windows/*.html windows/wgnuplot.htc windows/wgnuplot.htk gnuplot.htb	\
-gnuplot.pdf
+wxhelp/*.html wxhelp/wgnuplot.htc windows/wgnuplot.htk gnuplot.htb
 
 DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(EXTRA_DIST)
 
@@ -365,20 +363,21 @@ alldoc2gih.o: doc2gih.c $(BUILT_SOURCES)
 	$(COMPILE) -DALL_TERM_DOC -c $(srcdir)/doc2gih.c
 	@mv doc2gih.o alldoc2gih.o
 
-### windows HTML help format
+### wxhelp format
 htb: gnuplot.htb
 
-gnuplot.htb: windows/wgnuplot.html
+gnuplot.htb: wxhelp/wgnuplot.html
 	GNUPLOT_LIB=$(srcdir)/../demo ../src/gnuplot -e "winhelp=1;" $(srcdir)/plotstyles.gnu
-	zip -j9 gnuplot.htb windows/wgnuplot.hhp windows/wgnuplot.hhc windows/wgnuplot.hhk windows/*.html windows/*.png
+	zip -j9 gnuplot.htb windows/wgnuplot.hhp wxhelp/wgnuplot.hhc wxhelp/wgnuplot.hhk wxhelp/*.html windows/*.png
 
-windows/wgnuplot.html: windows/doc2html gnuplot.doc 
-	./windows/doc2html $(srcdir)/gnuplot.doc windows/
+wxhelp/wgnuplot.html: wxhelp/doc2html $(srcdir)/gnuplot.doc 
+	./wxhelp/doc2html $(srcdir)/gnuplot.doc wxhelp/
 
-windows/doc2html.o: $(srcdir)/windows/doc2html.c $(BUILT_SOURCES)
-	$(COMPILE) -c -o windows/doc2html.o -I.. -DALL_TERM_DOC -DWINDOWS $<
+wxhelp/doc2html.o: $(srcdir)/windows/doc2html.c $(BUILT_SOURCES)
+	[ -d wxhelp] || mkdir wxhelp
+	$(COMPILE) -c -o $@ -I.. -DALL_TERM_DOC -DWXHELP $<
 
-windows/doc2html: windows/doc2html.o termdoc.o xref.o ../src/version.o
+wxhelp/doc2html: wxhelp/doc2html.o termdoc.o xref.o ../src/version.o
 	$(LINK) $^
 
 ### GNU info format
