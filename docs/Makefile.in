@@ -150,7 +150,8 @@ gnuplot.ind gnuplot.info* gnuplot.out doc2ipf gnuplot.ipf doc2ms	\
 gnuplot.ms doc2rnh gnuplot.rnh doc2rtf gnuplot.rtf gnuplot.nroff	\
 checkdoc gnuplot.txt gnuplot.tmp VERSION gnuplot.4tc gnuplot.4ct	\
 gnuplot.idv gnuplot.xref gnuplot.lg figure*.pdf pdffigures.*		\
-wxhelp/*.html wxhelp/wgnuplot.htc windows/wgnuplot.htk gnuplot.htb
+wxhelp/*.html wxhelp/wgnuplot.htc windows/wgnuplot.htk gnuplot.pdf	\
+gnuplot.htb
 
 DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(EXTRA_DIST)
 
