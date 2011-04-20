@@ -1,3 +1,9 @@
+2011-04-20  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/gplt_x11.c:  Most of the messages passed via the title bar
+	of the X Display window are controlled by #ifdef TITLE_BAR_DRAWING_MSG.
+	Do the same for the "allocating colors..." message.
+
 2011-04-19  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/datafile.c (f_columnhead df_set_key_title) src/datafile.h
@@ -5,7 +11,7 @@
 
 	New function columnhead(N) that returns a string containing column N
 	from the first line of a data set. 'plot ... title columnhead(i)'
-	was already implemented as a keyword; making it a function instead
+	was previously implemented as a keyword; making it a function instead
 	allows, for example, 
 	'plot for [i=3:6] ... title "Results of ".columnhead(i)'
 
