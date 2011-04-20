@@ -1,3 +1,9 @@
+2011-04-20  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/gplt_x11.c:  Most of the messages passed via the title bar
+	of the X Display window are controlled by #ifdef TITLE_BAR_DRAWING_MSG.
+	Do the same for the "allocating colors..." message.
+
 2011-04-19  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* config/Makefile.am.in (Makefile.am): Additional files to become
@@ -10,7 +16,7 @@
 
 	New function columnhead(N) that returns a string containing column N
 	from the first line of a data set. 'plot ... title columnhead(i)'
-	was already implemented as a keyword; making it a function instead
+	was previously implemented as a keyword; making it a function instead
 	allows, for example,
 	'plot for [i=3:6] ... title "Results of ".columnhead(i)'
 
@@ -115,15 +121,11 @@
 
 2011-04-15  Ethan A Merritt  <merritt@u.washington.edu>
 
-	* src/graphics.c (plot_steps)
-	* src/gp_types.h
-	* src/graph3d.c
-	* src/tables.c
-	* docs/gnuplot.doc
-	* docs/plotstyles.gnu: New plot style
-	"with fillsteps" is identical to "with steps" except that the area
-	between the stepped line and the baseline at y=0 is filled using
-	the currently active fill style.
+	* src/graphics.c (plot_steps) src/gp_types.h src/graph3d.c
+	src/tables.c docs/gnuplot.doc docs/plotstyles.gnu: 
+	New plot style "with fillsteps" is identical to "with steps" except
+	that the area between the stepped line and the baseline at y=0 is
+	filled using the currently active fill style.
 
 	* src/graphics.c (plot_fsteps, histeps_vertical)
 	(histeps_horizontal): Simplify the code to use clip_line() rather

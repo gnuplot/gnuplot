@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.201 2010/10/06 00:19:50 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.202 2010/10/07 18:29:42 sfeam Exp $"); }
 #endif
 
 #define X11_POLYLINE 1
@@ -3551,6 +3551,7 @@ PaletteMake(t_sm_palette * tpal)
 
 	if (current_plot) {
 
+#ifdef TITLE_BAR_DRAWING_MSG
 	    if (current_plot->window) {
 		char *msg;
 		char *added_text = " allocating colors ...";
@@ -3566,6 +3567,7 @@ PaletteMake(t_sm_palette * tpal)
 		    free(msg);
 		}
 	    }
+#endif
 
 	    if (!num_colormaps) {
 		XFree(XListInstalledColormaps(dpy, current_plot->window, &num_colormaps));
@@ -3675,6 +3677,7 @@ PaletteMake(t_sm_palette * tpal)
 
     }
 
+#ifdef TITLE_BAR_DRAWING_MSG
     if (save_title) {
 	/* Restore window title (current_plot and current_plot->window are
 	 * valid, otherwise would not have been able to get save_title.
@@ -3682,6 +3685,7 @@ PaletteMake(t_sm_palette * tpal)
 	XStoreName(dpy, current_plot->window, save_title);
 	XFree(save_title);
     }
+#endif
 
 }
 
