@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.663 2011/04/18 19:53:39 broeker Exp $
+C RCS $Id: gnuplot.doc,v 1.664 2011/04/19 20:22:24 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -382,8 +382,9 @@ C
  built-in equivalent.  This choice is a configuration option at the time
  gnuplot is built.
 
- The editing commands of the built-in version are given below. The gnu
- readline and BSD libedit libraries have their own documentation.
+ The editing commands of the built-in version are given below. Please note that
+ the action of the DEL key is system-dependent. The gnu readline and BSD libedit
+ libraries have their own documentation.
 
 @start table - first is interactive cleartext form
        `Line-editing`:
@@ -392,12 +393,13 @@ C
        ^F    moves forward a single character.
        ^A    moves to the beginning of the line.
        ^E    moves to the end of the line.
-       ^H    and <DEL> key delete the previous character.
+       ^H    deletes the previous character.
+       DEL   deletes the current character.
        ^D    deletes current character, sends EOF if the line is empty.
        ^K    deletes from current position to the end of line.
        ^L,^R redraws line in case it gets trashed.
        ^U    deletes the entire line.
-       ^W    deletes from the current word to the end of line.
+       ^W    deletes previous word.
 
        `History`:
 
@@ -411,12 +413,13 @@ C
 #\verb~^F~ & move forward a single character.\\
 #\verb~^A~ & move to the beginning of the line.\\
 #\verb~^E~ & move to the end of the line.\\
-#\verb~^H, DEL~ & delete the previous character.\\
+#\verb~^H~ & delete the previous character.\\
+#\verb~DEL~ & delete the current character.\\
 #\verb~^D~ & delete current character. EOF if line is empty.\\
 #\verb~^K~ & delete from current position to the end of line.\\
 #\verb~^L, ^R~ & redraw line in case it gets trashed.\\
 #\verb~^U~ & delete the entire line. \\
-#\verb~^W~ & delete from the current word to the end of line. \\ \hline
+#\verb~^W~ & delete previous word. \\ \hline
 # & \multicolumn{1}{|c|}{History} \\ \cline{2-2}
 #\verb~^P~ & move back through history.\\
 #\verb~^N~ & move forward through history.\\
@@ -428,12 +431,13 @@ C
 %^F@move forward a single character.
 %^A@move to the beginning of the line.
 %^E@move to the end of the line.
-%^H, DEL@delete the previous character.
+%^H@delete the previous character.
+%DEL@delete the current character.
 %^D@delete current character. EOF if line is empty.
 %^K@delete from current position to the end of line.
 %^L, ^R@redraw line in case it gets trashed.
 %^U@delete the entire line.
-%^W@delete from the current word to the end of line.
+%^W@delete previous word.
 %_
 %@History
 %^P@move back through history.
@@ -454,12 +458,13 @@ C
 ^<tr>    <td><tt>^F</tt></td>    <td>move forward a single character.</td></tr>
 ^<tr>    <td><tt>^A</tt></td>    <td>move to the beginning of the line.</td></tr>
 ^<tr>    <td><tt>^E</tt></td>    <td>move to the end of the line.</td></tr>
-^<tr>    <td><tt>^H, DEL</tt></td>    <td>delete the previous character.</td></tr>
+^<tr>    <td><tt>^H</tt></td>    <td>delete the previous character.</td></tr>
+^<tr>    <td><tt>DEL</tt></td>    <td>delete the current character.</td></tr>
 ^<tr>    <td><tt>^D</tt></td>    <td>delete current character. EOF if line is empty</td></tr>
 ^<tr>    <td><tt>^K</tt></td>    <td>delete from current position to the end of line.</td></tr>
 ^<tr>    <td><tt>^L, ^R</tt></td>    <td>redraw line in case it gets trashed.</td></tr>
 ^<tr>    <td><tt>^U</tt></td>    <td>delete the entire line.</td></tr>
-^<tr>    <td><tt>^W</tt></td>    <td>delete from the current word to the end of line.</td></tr>
+^<tr>    <td><tt>^W</tt></td>    <td>delete previous word.</td></tr>
 ^</tbody>
 ^<tbody>
 ^<tr>    <th></th>                <th>History</th></tr>

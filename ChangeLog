@@ -1,3 +1,18 @@
+2011-04-22  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/readline.c docs/gnuplot.doc:  Built-in readline did not recognize
+	the character sequence produced by the DEL key on many keyboards.  Trap
+	this sequence for interpretation as "forward delete", which is what the
+	same key does under windows and gnu libreadline.  This does not affect 
+	keyboards or xmodmap configurations where the DEL key produces another
+	sequence entirely.
+
+2011-04-22  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/readline.c:  The behavior of ^W was not consistent with the 
+	documentation. Change it to match gnu libreadline (delete previous
+	partial or full word).
+
 2011-04-20  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/gplt_x11.c:  Most of the messages passed via the title bar

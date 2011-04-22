@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: readline.c,v 1.50 2011/02/21 08:03:13 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: readline.c,v 1.51 2011/04/15 14:18:44 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - readline.c */
@@ -103,11 +103,11 @@ readline_ipc(const char* prompt)
 
 #if defined(READLINE) && !(defined(HAVE_LIBREADLINE) || defined(HAVE_LIBEDITLINE))
 
-/* a small portable version of GNU's readline
- * this is not the BASH or GNU EMACS version of READLINE due to Copyleft
- * restrictions
- * do not need any terminal capabilities except backspace,
- * and space overwrites a character
+/* This is a small portable version of GNU's readline that does not require
+ * any terminal capabilities except backspace and space overwrites a character.
+ * It is not the BASH or GNU EMACS version of READLINE due to Copyleft
+ * restrictions.
+ * Configuration option:   ./configure --with-readline=builtin
  */
 
 /* NANO-EMACS line editing facility
@@ -119,12 +119,13 @@ readline_ipc(const char* prompt)
  * ^K kills from current position to the end of line
  * ^P moves back through history
  * ^N moves forward through history
- * ^H and DEL delete the previous character
+ * ^H deletes the previous character
  * ^D deletes the current character, or EOF if line is empty
  * ^L/^R redraw line in case it gets trashed
  * ^U kills the entire line
- * ^W kills last word
+ * ^W deletes previous full or partial word
  * LF and CR return the entire line regardless of the cursor postition
+ * DEL deletes previous or current character (configuration dependent)
  * EOF with an empty line returns (char *)NULL
  *
  * all other characters are ignored
@@ -230,6 +231,7 @@ static int term_set = 0;	/* =1 if rl_termio set */
 
 #define special_getc() ansi_getc()
 static int ansi_getc __PROTO((void));
+#define DEL_ERASES_CURRENT_CHAR
 
 #else /* MSDOS or _Windows */
 
@@ -291,6 +293,7 @@ static void fix_line __PROTO((void));
 static void redraw_line __PROTO((const char *prompt));
 static void clear_line __PROTO((const char *prompt));
 static void clear_eoline __PROTO((void));
+static void delete_previous_word __PROTO((void));
 static void copy_line __PROTO((char *line));
 static void set_termio __PROTO((void));
 static void reset_termio __PROTO((void));
@@ -449,7 +452,7 @@ readline(const char *prompt)
 		reset_termio();
 		return ((char *) NULL);
 	    }
-	    if ((cur_pos < max_pos) && (cur_char == 004)) {	/* ^D */
+	    if ((cur_pos < max_pos) && (cur_char == 004)) {	/* DEL? */
 		size_t i;
 		for (i = cur_pos; i < max_pos; i++)
 		    cur_line[i] = cur_line[i + 1];
@@ -463,18 +466,7 @@ readline(const char *prompt)
 #endif /* VKILL */
 #ifdef VWERASE
 	} else if (cur_char == term_chars[VWERASE]) {	/* ^W? */
-	    while ((cur_pos > 0) &&
-		   (cur_line[cur_pos - 1] == SPACE)) {
-		cur_pos -= 1;
-		backspace();
-	    }
-	    while ((cur_pos > 0) &&
-		   (cur_line[cur_pos - 1] != SPACE)) {
-		cur_pos -= 1;
-		backspace();
-	    }
-	    clear_eoline();
-	    max_pos = cur_pos;
+	    delete_previous_word();
 #endif /* VWERASE */
 #ifdef VREPRINT
 	} else if (cur_char == term_chars[VREPRINT]) {	/* ^R? */
@@ -558,6 +550,7 @@ readline(const char *prompt)
 		break;
 #ifndef DEL_ERASES_CURRENT_CHAR
 	    case 0177:		/* DEL */
+	    case 023:		/* Re-mapped from CSI~3 in ansi_getc() */
 #endif
 	    case 010:		/* ^H */
 		if (cur_pos > 0) {
@@ -577,6 +570,7 @@ readline(const char *prompt)
 		/* intentionally omitting break */
 #ifdef DEL_ERASES_CURRENT_CHAR
 	    case 0177:		/* DEL */
+	    case 023:		/* Re-mapped from CSI~3 in ansi_getc() */
 #endif
 		if (cur_pos < max_pos) {
 		    for (i = cur_pos; i < max_pos; i++)
@@ -589,18 +583,7 @@ readline(const char *prompt)
 		clear_line(prompt);
 		break;
 	    case 027:		/* ^W */
-		while ((cur_pos > 0) &&
-		       (cur_line[cur_pos - 1] == SPACE)) {
-		    cur_pos -= 1;
-		    backspace();
-		}
-		while ((cur_pos > 0) &&
-		       (cur_line[cur_pos - 1] != SPACE)) {
-		    cur_pos -= 1;
-		    backspace();
-		}
-		clear_eoline();
-		max_pos = cur_pos;
+		delete_previous_word();
 		break;
 	    case '\n':		/* ^J */
 	    case '\r':		/* ^M */
@@ -704,6 +687,35 @@ clear_eoline()
 	backspace();
 }
 
+/* delete the full or partial word immediately before cursor position */
+static void
+delete_previous_word()
+{
+    size_t save_pos = cur_pos;
+    /* skip whitespace */
+    while ((cur_pos > 0) &&
+	   (cur_line[cur_pos - 1] == SPACE)) {
+	cur_pos -= 1;
+	backspace();
+    }
+    /* find start of previous word */
+    while ((cur_pos > 0) &&
+	   (cur_line[cur_pos - 1] != SPACE)) {
+	cur_pos -= 1;
+	backspace();
+    }
+    if (cur_pos != save_pos) {
+	size_t m = max_pos - save_pos;
+	/* overwrite previous word with trailing characters */
+	memmove(cur_line + cur_pos, cur_line + save_pos, m);
+	/* overwrite characters at end of string with spaces */
+	memset(cur_line + cur_pos + m, SPACE, save_pos - cur_pos);
+	/* update display and line length */
+	fix_line();
+	max_pos = cur_pos + m;
+    }
+}
+
 /* copy line to cur_line, draw it and set cur_pos and max_pos */
 static void
 copy_line(char *line)
@@ -753,6 +765,9 @@ ansi_getc()
 	    case 'H':		/* home key */
 		c = 001;
 		break;
+	    case '3':		/* DEL can be <esc>[3~ */
+		getc(stdin);	/* eat the ~ */
+		c = 023;	/* DC3 ^S NB: non-standard!! */
 	    }
 	}
     }

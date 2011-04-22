@@ -30,6 +30,9 @@ New features, changes and fixes since gnuplot version 4.4
 * CHANGE extend formats x/X/o/O to 64 bits if necessary to represent the value
 * CHANGE "set palette maxcolors" no longer fights with "set palette defined"
 * CHANGE javascript support for HTML5 canvas does not use global variables
+* CHANGE Built-in readline DEL recognized as forward-delete (system-dependent)
+* CHANGE Built-in readline ^W deletes previous full or partial word
+
 
 New features, changes and fixes in gnuplot version 4.4.0
 ========================================================
