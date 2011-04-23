@@ -375,7 +375,7 @@ wxhelp/wgnuplot.html: wxhelp/doc2html $(srcdir)/gnuplot.doc
 	./wxhelp/doc2html $(srcdir)/gnuplot.doc wxhelp/
 
 wxhelp/doc2html.o: $(srcdir)/windows/doc2html.c $(BUILT_SOURCES)
-	[ -d wxhelp] || mkdir wxhelp
+	[ -d wxhelp ] || mkdir wxhelp
 	$(COMPILE) -c -o $@ -I.. -DALL_TERM_DOC -DWXHELP $<
 
 wxhelp/doc2html: wxhelp/doc2html.o termdoc.o xref.o ../src/version.o

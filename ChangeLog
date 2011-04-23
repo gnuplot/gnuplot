@@ -1,3 +1,7 @@
+2011-04-23  Shigeharu Takeno  <shige@iee.niit.ac.jp>
+
+	* docs/Makefile.in (wxhelp/doc2html.o): Add missing space.
+
 2011-04-22  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/readline.c docs/gnuplot.doc:  Built-in readline did not recognize
