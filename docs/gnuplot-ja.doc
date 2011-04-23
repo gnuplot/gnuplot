@@ -1,5 +1,5 @@
-C RCS $Id: gnuplot-ja.doc,v 1.360 2011-02-22 19:55:22+09 shige Exp $
-C corresponding original gnuplot.doc revision: 1.651
+C RCS $Id: gnuplot-ja.doc,v 1.374 2011-04-22 10:49:04+09 shige Exp $
+C corresponding original gnuplot.doc revision: 1.664
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -153,11 +153,12 @@ C 行が長いのは、できればなんとかしたい
 
  gnuplot は多くの異なる出力をサポートしています: 対話型スクリーン出力形
  式 (マウスやホットキー入力も可能)、ペンプロッタや現在のプリンタへの直
- 接出力、または多くのファイル形式への出力 (eps, fig, jpeg, LaTeX,
- metafont, pbm, pdf, png, postscript, svg, ...)。gnuplot は、容易に新し
- い出力形式を追加するよう拡張することができます。最近追加された対話型出
- 力形式には、aquaterm (OSX) や wxWidgets (マルチプラットホーム), Qt を
- 元にしたものがあります。
+ 接出力、または多くのファイル形式への出力 (eps, emf, fig, jpeg, LaTeX,
+ pdf, png, postscript, ...)。gnuplot は、容易に新しい出力形式を追加する
+ よう拡張することができます。最近追加された対話型出力形式には、aquaterm
+ (OSX) や wxWidgets (マルチプラットホーム), Qt を元にしたものがあります。
+ svg や HTML5 canvas 出力形式を利用すれば、グラフを Web ページ内にマウ
+ ス利用可能な形で埋め込んだ出力を生成することもできます。
 
  `gnuplot` のコマンド言語は大文字小文字を区別します。すなわち、小文字で
  書かれたコマンドや関数名は、それらを大文字で書いたものとは同じではあり
@@ -169,23 +170,16 @@ C 行が長いのは、できればなんとかしたい
        load "filename"
        cd 'dir'
 
- `gnuplot` のコマンドの多くは複数のオプションを持っています。Version 4
- は以前の版に比べて、それらのオプションの順序に関しては許容的になってい
- ますが、しかし順序に依存するものも残ってはいます。オプションが認識され
- ないといったエラーメッセージが現われたら、正確にドキュメントに書かれて
- いる通りの順番で指定して試してみてください。
-
  コマンドは、複数行にまたがることができます。その場合は、最終行以外の
- 全ての行の行末にバックスラッシュ (\) を書く必要があります。バックス
- ラッシュは必ず各行 *最後* の文字でなくてはなりません。その結果として
- バックスラッシュと、それに続く改行文字が存在しなかったかのように扱わ
- れます。つまり、改行文字がスペースの役をすることもありませんし、改行
- によってコメントが終了することもありません。ですから複数行にまたがる
- 行の先頭をコメントアウトすると、そのコマンド全体がコメントアウトされ
- ることになります (以下参照: `comments`)。なお注意しますが、もし、複数
- 行のコマンドのどこかでエラーが起きたとき、パーサはその場所を正確には
- 指示することができませんし、また、正しい行に指示する必要もないでしょ
- う。
+ 全ての行の行末にバックスラッシュ (\) を書く必要があります。バックスラ
+ ッシュは必ず各行 *最後* の文字でなくてはなりません。その結果としてバッ
+ クスラッシュと、それに続く改行文字が存在しなかったかのように扱われます。
+ つまり、改行文字がスペースの役をすることもありませんし、改行によってコ
+ メントが終了することもありません。ですから複数行にまたがる行の先頭をコ
+ メントアウトすると、そのコマンド全体がコメントアウトされることになりま
+ す (以下参照: `comments`)。なお注意しますが、もし、複数行のコマンドの
+ どこかでエラーが起きたとき、パーサはその場所を正確には指示することがで
+ きませんし、また、正しい行に指示する必要もないでしょう。
 
  このドキュメントにおいて、中括弧 ({}) は省略可能な引数を表すものとし、
  縦棒 (|) は、互いに排他的な引数を区切るものとします。`gnuplot` のキー
@@ -239,7 +233,6 @@ C 行が長いのは、できればなんとかしたい
 2 探し出す手助け (Seeking-assistance)
 ?help-desk
 ?seeking-assistance
-C^ <a name="seeking-assistance"></a>
  公式の gnuplot Web ページは以下にあります。
 ^ <a href="http://www.gnuplot.info">
            http://www.gnuplot.info
@@ -369,9 +362,18 @@ C^ <a name="seeking-assistance"></a>
 =cumulative
  2 次元、3 次元描画の両方に、新しい平滑化アルゴリズムが追加されていて、
  滑らかなヒストグラムや累積分布関数の `plot` による描画に、それぞれ
- `smooth kdensity` や `smooth cumul` が使えます。`splot` での使用に対し
- ては、`dgrid3d` にいくつかの新しい平滑化重み付け関数 (kernel) が追加さ
- れています。以下参照: `smooth`, `dgrid3d`。
+ `smooth kdensity` や `smooth cumulative` が使えます。`dgrid3d` には、
+ `splot` 用に新しい平滑化重み付け関数 (kernel) がいくつか追加されていま
+ す。以下参照: `smooth`, `dgrid3d`。
+
+3 新しい日時 (time/date) の取扱い
+=time
+ 現在の gnuplot は、時刻をミリ秒精度で追跡し、時刻のフォーマットもそれ
+ に伴って変更されています。新しい組み込み関数 time() は、システム時計に
+ 従った時刻を返します。
+ 例: 現在の時刻をミリ秒精度で表示
+      print strftime("%H:%M:%.3S %d-%b-%Y",time(0.0))
+      18:15:04.253 16-Apr-2011
 
 2 後方互換性 (Backwards compatibility)
 ?backwards compatibility
@@ -458,8 +460,8 @@ C^ <a name="seeking-assistance"></a>
        ^F    1 文字先へ進める
        ^A    行の先頭に移動
        ^E    行の最後に移動
-       ^H,DEL  直前の文字を削除
-       ^D    現在位置の文字を削除
+       ^H, <DEL> キー 直前の文字を削除
+       ^D    現在位置の文字を削除、空行なら EOF を送信
        ^K    現在位置から行末まで削除
        ^L,^R 壊れた表示の行を再表示
        ^U    行全体の削除
@@ -478,7 +480,7 @@ C^ <a name="seeking-assistance"></a>
 #\verb~^A~ & 行の先頭へ移動\\
 #\verb~^E~ & 行の最後へ移動\\
 #\verb~^H, DEL~ & 直前の文字を削除\\
-#\verb~^D~ & 現在位置の文字を削除\\
+#\verb~^D~ & 現在位置の文字を削除、空行なら EOF\\
 #\verb~^K~ & 現在位置から行末まで削除\\
 #\verb~^L, ^R~ & 壊れた表示の行を再表示\\
 #\verb~^U~ & 行全体の削除\\
@@ -495,7 +497,7 @@ C^ <a name="seeking-assistance"></a>
 %^A@行の先頭に移動
 %^E@行の最後に移動
 %^H, DEL@直前の文字を削除
-%^D@現在位置の文字を削除
+%^D@現在位置の文字を削除、空行なら EOF
 %^K@現在位置から行末まで削除
 %^L, ^R@壊れた表示の行を再表示
 %^U@行全体の削除
@@ -512,34 +514,34 @@ C^ <a name="seeking-assistance"></a>
 ^  <col align="left">
 ^</colgroup>
 ^<thead>
-^<tr>	<th>文字</th>		<th>機能</th></tr>
+^<tr>    <th>文字</th>    <th>機能</th></tr>
 ^</thead>
 ^<tbody>
-^<tr>	<td></td>				<th>行編集</th></tr>
-^<tr>	<td><tt>^B</tt></td>	<td>1 文字前へ戻す</td></tr>
-^<tr>	<td><tt>^F</tt></td>	<td>1 文字先へ進める</td></tr>
-^<tr>	<td><tt>^A</tt></td>	<td>行の先頭へ移動</td></tr>
-^<tr>	<td><tt>^E</tt></td>	<td>行の最後へ移動</td></tr>
-^<tr>	<td><tt>^H, DEL</tt></td>	<td>直前の文字を削除</td></tr>
-^<tr>	<td><tt>^D</tt></td>	<td>現在位置の文字を削除</td></tr>
-^<tr>	<td><tt>^K</tt></td>	<td>現在位置から行末まで削除</td></tr>
-^<tr>	<td><tt>^L, ^R</tt></td>	<td>壊れた表示の行を再表示</td></tr>
-^<tr>	<td><tt>^U</tt></td>	<td>行全体の削除</td></tr>
-^<tr>	<td><tt>^W</tt></td>	<td>カーソル手前の単語から行末まで削除</td></tr>
+^<tr>    <td></td>    <th>行編集</th></tr>
+^<tr>    <td><tt>^B</tt></td>    <td>1 文字前へ戻す</td></tr>
+^<tr>    <td><tt>^F</tt></td>    <td>1 文字先へ進める</td></tr>
+^<tr>    <td><tt>^A</tt></td>    <td>行の先頭へ移動</td></tr>
+^<tr>    <td><tt>^E</tt></td>    <td>行の最後へ移動</td></tr>
+^<tr>    <td><tt>^H, DEL</tt></td>    <td>直前の文字を削除</td></tr>
+^<tr>    <td><tt>^D</tt></td>    <td>現在位置の文字を削除、空行なら EOF</td></tr>
+^<tr>    <td><tt>^K</tt></td>    <td>現在位置から行末まで削除</td></tr>
+^<tr>    <td><tt>^L, ^R</tt></td>    <td>壊れた表示の行を再表示</td></tr>
+^<tr>    <td><tt>^U</tt></td>    <td>行全体の削除</td></tr>
+^<tr>    <td><tt>^W</tt></td>    <td>カーソル手前の単語から行末まで削除</td></tr>
 ^</tbody>
 ^<tbody>
-^<tr>	<th></th>				<th>履歴</th></tr>
-^<tr>	<td><tt>^P</tt></td>	<td>前の履歴へ移動</td></tr>
-^<tr>	<td><tt>^N</tt></td>	<td>次の履歴へ移動</td></tr>
+^<tr>    <th></th>    <th>履歴</th></tr>
+^<tr>    <td><tt>^P</tt></td>    <td>前の履歴へ移動</td></tr>
+^<tr>    <td><tt>^N</tt></td>    <td>次の履歴へ移動</td></tr>
 ^</tbody>
 ^</table>
 2 コメント (Comments)
 ?comments
  コメントは次のように実装されています: 文字 '#' は、行中のたいていの場
- 所に書くことができます。このとき `gnuplot` はその行の残りの部分を無視し
- ます。ただし、引用符の中、数 (複素数を含む) の中、コマンド置換 (command
- substitution) の中などではこの効果がありません。簡単に言うと、意味
- のあるような使い方をしさえすれば、正しく動作すると言うことです。
+ 所に書くことができます。このとき `gnuplot` はその行の残りの部分を無視
+ します。ただし、引用符の中、数 (複素数を含む) の中、コマンド置換
+ (command substitution) の中などではこの効果がありません。簡単に言うと
+ 意味のあるような使い方をしさえすれば、正しく動作すると言うことです。
 
  データファイル中のコメント文字の指定については、以下参照:
  `set datafile commentschars`。コメント行が '\' で終わっている場合、次
@@ -618,6 +620,10 @@ C^ <a name="seeking-assistance"></a>
 
    plot 'datafile' using 1:(f($2)/$4) with lines title columnhead(2)
 
+ 別の例:
+
+   plot for [i=2:6] 'datafile' using i title "Results for ".columnhead(i)
+
  以下参照: `set style labels`, `using xticlabels`, `plot title`,
  `using`。
 2 拡張文字列処理モード (Enhanced text mode)
@@ -670,14 +676,14 @@ C^ <a name="seeking-assistance"></a>
 ^  <col align="left">
 ^</colgroup>
 ^<thead>
-^<tr>	<th>制御記号</th>	<th>例</th>	<th>説明</th></tr>
+^<tr>    <th>制御記号</th>    <th>例</th>    <th>説明</th></tr>
 ^</thead>
 ^<tbody>
-^<tr>	<td><tt> ^ </tt></td>	<td><tt>a^x</tt></td>	<td>上付き文字</td></tr>
-^<tr>	<td><tt> _ </tt></td>	<td><tt>a_x</tt></td>	<td>下付き文字</td></tr>
-^<tr>	<td><tt> @ </tt></td>	<td><tt> @x</tt>, <tt>a@^b_{cd}</tt></td>	<td>空ボックス (幅がない)</td></tr>
-^<tr>	<td><tt> &amp;</tt></td>	<td><tt> &amp;{space}</tt></td>	<td>指定した長さのスペースを挿入</td></tr>
-^<tr>	<td><tt> ~ </tt></td>	<td><tt> ~a{.8-}</tt></td>	<td>'a' の上に '-' を、現在のフォントサ<br>イズの .8 倍持ち上げた位置に重ね書き</td></tr>
+^<tr>    <td><tt> ^ </tt></td>    <td><tt>a^x</tt></td>    <td>上付き文字</td></tr>
+^<tr>    <td><tt> _ </tt></td>    <td><tt>a_x</tt></td>    <td>下付き文字</td></tr>
+^<tr>    <td><tt> @ </tt></td>    <td><tt> @x</tt>, <tt>a@^b_{cd}</tt></td>    <td>空ボックス (幅がない)</td></tr>
+^<tr>    <td><tt> &amp;</tt></td>    <td><tt> &amp;{space}</tt></td>    <td>指定した長さのスペースを挿入</td></tr>
+^<tr>    <td><tt> ~ </tt></td>    <td><tt> ~a{.8-}</tt></td>    <td>'a' の上に '-' を、現在のフォントサ<br>イズの .8 倍持ち上げた位置に重ね書き</td></tr>
 ^</tbody>
 ^</table>
 
@@ -846,10 +852,9 @@ C^ <a name="seeking-assistance"></a>
  `gnuplot` の関数は、Unix 数学ライブラリの関数とほぼ同じですが、特に注
  意がなければ全ての関数が整数、実数、複素数の引数を取ることができます。
 
- 度、あるいはラジアンのどちらかで角度を引数としたり戻り値としたりする関
- 数 (sin(x), cos(x), tan(x), asin(x), acos(x), atan(x), atan2(x), arg(z))
- に対しては、その単位は `set angles` で選択でき、デフォルトはラジアンで
- す。
+ 度かラジアンのいずれかの角の値を引数や戻り値とする関数 (sin(x), cos(x),
+ tan(x), asin(x), acos(x), atan(x), atan2(x), arg(z)) に対しては、その
+ 単位は `set angles` で選択でき、デフォルトはラジアンです。
 
 ^<table align="center" border="1" rules="groups" frame="hsides" cellpadding="3" width="90%">
 ^<colgroup>
@@ -858,57 +863,57 @@ C^ <a name="seeking-assistance"></a>
 ^  <col align="left">
 ^</colgroup>
 ^<thead>
-^<tr>   <th colspan="3"> 数学ライブラリ関数 </th></tr>
-^<tr>	<th>関数</th>	<th>引数</th>	<th>戻り値</th></tr>
+^<tr>    <th colspan="3"> 数学ライブラリ関数 </th></tr>
+^<tr>    <th>関数</th>    <th>引数</th>    <th>戻り値</th></tr>
 ^</thead>
 ^<tbody>
-^<tr>	<td>abs(x)</td>	<td>任意</td>	<td>|<i>x</i>|, <i>x</i> の絶対値; 同じ型</td></tr>
-^<tr>	<td>abs(x)</td>	<td>複素数</td>	<td>length of <i>x</i>, &radic;( Re(<i>x</i>)<sup>2</sup> + Im(<i>x</i>)<sup>2</sup> )</td></tr>
-^<tr>	<td>acos(x)</td>	<td>任意</td>	<td>cos<sup>-1</sup> <i>x</i> (アークコサイン)</td></tr>
-^<tr>	<td>acosh(x)</td>	<td>任意</td>	<td>ラジアンでの cosh<sup>-1</sup> <i>x</i> (逆双曲余弦)</td></tr>
-^<tr>	<td>airy(x)</td>	<td>任意</td>	<td>エアリー (Airy) 関数 Ai(<i>x</i>)</td></tr>
-^<tr>	<td>arg(x)</td>	<td>複素数</td>	<td><i>x</i> の偏角</td></tr>
-^<tr>	<td>asin(x)</td>	<td>任意</td>	<td>sin<sup>-1</sup> <i>x</i> (アークサイン)</td></tr>
-^<tr>	<td>asinh(x)</td>	<td>任意</td>	<td>ラジアンでの sinh<sup>-1</sup> <i>x</i> (逆双曲正弦)</td></tr>
-^<tr>	<td>atan(x)</td>	<td>任意</td>	<td>tan<sup>-1</sup> <i>x</i> (アークタンジェント)</td></tr>
-^<tr>	<td>atan2(y,x)</td>	<td>整数または実数</td>	<td>tan<sup>-1</sup>(<i>y/x</i>) (アークタンジェント)</td></tr>
-^<tr>	<td>atanh(x)</td>	<td>任意</td>	<td>ラジアンでの tanh<sup>-1</sup> <i>x</i> (逆双曲正接)</td></tr>
-^<tr>	<td>EllipticK(k)</td>	<td>(-1:1) 内の実数 k</td>	<td><i>K(k)</i> 第 1 種完全楕円積分</td></tr>
-^<tr>	<td>EllipticE(k)</td>	<td>[-1:1] 内の実数 k</td>	<td><i>E(k)</i> 第 2 種完全楕円積分</td></tr>
-^<tr>	<td>EllipticPi(n,k)</td>	<td>実数 n&lt;1, (-1:1) 内の実数 k</td>	<td> &Pi;(<i>n,k</i>) 第 3 種完全楕円積分</td></tr>
-^<tr>	<td>besj0(x)</td>	<td>整数または実数</td>	<td>ラジアンでの <i>j</i><sub>0</sub> ベッセル関数 (0 次ベッセル関数)</td></tr>
-^<tr>	<td>besj1(x)</td>	<td>整数または実数</td>	<td>ラジアンでの <i>j</i><sub>1</sub> ベッセル関数 (1 次ベッセル関数)</td></tr>
-^<tr>	<td>besy0(x)</td>	<td>整数または実数</td>	<td>ラジアンでの <i>y</i><sub>0</sub> ベッセル関数 (0 次ノイマン関数)</td></tr>
-^<tr>	<td>besy1(x)</td>	<td>整数または実数</td>	<td>ラジアンでの <i>y</i><sub>1</sub> ベッセル関数 (1 次ノイマン関数)</td></tr>
-^<tr>	<td>ceil(x)</td>	<td>任意</td>	<td>&lceil;<i>x</i>&rceil;, <i>x</i> (の実部) 以上の最小の整数</td></tr>
-^<tr>	<td>cos(x)</td>	<td>radians</td>	<td>cos <i>x</i>, <i>x</i> のコサイン</td></tr>
-^<tr>	<td>cosh(x)</td>	<td>任意</td>	<td>cosh <i>x</i>, ラジアンでの <i>x</i> のハイパボリックコサイン</td></tr>
-^<tr>	<td>erf(x)</td>	<td>任意</td>	<td>erf(Re(<i>x</i>)), <i>x</i> の実部の誤差関数</td></tr>
-^<tr>	<td>erfc(x)</td>	<td>任意</td>	<td>erfc(Re(<i>x</i>)), 1.0 - (<i>x</i> の実部の誤差関数)</td></tr>
-^<tr>	<td>exp(x)</td>	<td>任意</td>	<td><i>e<sup>x</sup></i>, <i>x</i> の指数関数</td></tr>
-^<tr>	<td>expint(n,x)</td>	<td>任意</td>	<td><i>E<sub>n</sub></i>(<i>x</i>), <i>x</i> の指数積分</td></tr>
-^<tr>	<td>floor(x)</td>	<td>任意</td>	<td>&lfloor;<i>x</i>&rfloor;, <i>x</i> (の実部) 以下の最大の整数</td></tr>
-^<tr>	<td>gamma(x)</td>	<td>任意</td>	<td>&Gamma;(Re(<i>x</i>)), <i>x</i> の実部のガンマ関数</td></tr>
-^<tr>	<td>ibeta(p,q,x)</td>	<td>任意</td>	<td>ibeta(Re(<i>p,q,x</i>)), <i>p</i>,<i>q</i>,<i>x</i> の実部の不完全ベータ関数</td></tr>
-^<tr>	<td>inverf(x)</td>	<td>任意</td>	<td><i>x</i> の実部の逆誤差関数</td></tr>
-^<tr>	<td>igamma(a,x)</td>	<td>任意</td>	<td>igamma(Re(<i>a,x</i>)), <a>a</a>,<i>x</i> の実部の不完全ガンマ関数</td></tr>
-^<tr>	<td>imag(x)</td>	<td>複素数</td>	<td>Im(<i>x</i>), <i>x</i> の虚数部分 (実数)</td></tr>
-^<tr>	<td>invnorm(x)</td>	<td>任意</td>	<td><i>x</i> の実部の逆正規分布関数</td></tr>
-^<tr>	<td>int(x)</td>	<td>実数</td>	<td><i>x</i> の整数部分 (0 に向かって丸め)</td></tr>
-^<tr>	<td>lambertw(x)</td>	<td>実数</td>	<td>Lambert W 関数</td></tr>
-^<tr>	<td>lgamma(x)</td>	<td>任意</td>	<td>lgamma(Re(<i>x</i>)), <i>x</i> の実部のガンマ対数関数</td></tr>
-^<tr>	<td>log(x)</td>	<td>任意</td>	<td>ln <i>x</i>, <i>x</i> の自然対数 (底 <i>e</i>)</td></tr>
-^<tr>	<td>log10(x)</td>	<td>任意</td>	<td>log<sub>10</sub> <i>x</i>, <i>x</i> の対数 (底 10)</td></tr>
-^<tr>	<td>norm(x)</td>	<td>任意</td>	<td>norm(<i>x</i>), <i>x</i> の実部の正規分布関数</td></tr>
-^<tr>	<td>rand(x)</td>	<td>整数</td>	<td>区間 [0:1] 内の疑似乱数</td></tr>
-^<tr>	<td>real(x)</td>	<td>任意</td>	<td>Re(<i>x</i>), <i>x</i> の実数部分</td></tr>
-^<tr>	<td>sgn(x)</td>	<td>任意</td>	<td><i>x</i> &gt; 0 なら 1, <i>x</i> &lt; 0 なら -1, <i>x</i> = 0 なら 0. <i>x</i> の虚部は無視</td></tr>
-^<tr>	<td>sin(x)</td>	<td>任意</td>	<td>sin <i>x</i>, <i>x</i> のサイン</td></tr>
-^<tr>	<td>sinh(x)</td>	<td>任意</td>	<td>sinh <i>x</i>,ラジアンでの <i>x</i> のハイパボリックサイン</td></tr>
-^<tr>	<td>sqrt(x)</td>	<td>任意</td>	<td>&radic;<i>x</i>, <i>x</i></td> の平方根</tr>
-^<tr>	<td>tan(x)</td>	<td>任意</td>	<td>tan <i>x</i>, <i>x</i> のタンジェント</td></tr>
-^<tr>	<td>tanh(x)</td>	<td>任意</td>	<td>tanh <i>x</i>, ラジアンでの <i>x</i> のハイパボリックタンジェント</td></tr>
-^<tr>	<td>voigt(x,y)</td>	<td>実数</td>	<td>ガウス関数とローレンツ関数の畳みこみ</td></tr>
+^<tr>    <td>abs(x)</td>    <td>任意</td>    <td>|<i>x</i>|, <i>x</i> の絶対値; 同じ型</td></tr>
+^<tr>    <td>abs(x)</td>    <td>複素数</td>    <td>length of <i>x</i>, &radic;( Re(<i>x</i>)<sup>2</sup> + Im(<i>x</i>)<sup>2</sup> )</td></tr>
+^<tr>    <td>acos(x)</td>    <td>任意</td>    <td>cos<sup>-1</sup> <i>x</i> (アークコサイン)</td></tr>
+^<tr>    <td>acosh(x)</td>    <td>任意</td>    <td>ラジアンでの cosh<sup>-1</sup> <i>x</i> (逆双曲余弦)</td></tr>
+^<tr>    <td>airy(x)</td>    <td>任意</td>    <td>エアリー (Airy) 関数 Ai(<i>x</i>)</td></tr>
+^<tr>    <td>arg(x)</td>    <td>複素数</td>    <td><i>x</i> の偏角</td></tr>
+^<tr>    <td>asin(x)</td>    <td>任意</td>    <td>sin<sup>-1</sup> <i>x</i> (アークサイン)</td></tr>
+^<tr>    <td>asinh(x)</td>    <td>任意</td>    <td>ラジアンでの sinh<sup>-1</sup> <i>x</i> (逆双曲正弦)</td></tr>
+^<tr>    <td>atan(x)</td>    <td>任意</td>    <td>tan<sup>-1</sup> <i>x</i> (アークタンジェント)</td></tr>
+^<tr>    <td>atan2(y,x)</td>    <td>整数または実数</td>    <td>tan<sup>-1</sup>(<i>y/x</i>) (アークタンジェント)</td></tr>
+^<tr>    <td>atanh(x)</td>    <td>任意</td>    <td>ラジアンでの tanh<sup>-1</sup> <i>x</i> (逆双曲正接)</td></tr>
+^<tr>    <td>EllipticK(k)</td>    <td>(-1:1) 内の実数 k</td>    <td><i>K(k)</i> 第 1 種完全楕円積分</td></tr>
+^<tr>    <td>EllipticE(k)</td>    <td>[-1:1] 内の実数 k</td>    <td><i>E(k)</i> 第 2 種完全楕円積分</td></tr>
+^<tr>    <td>EllipticPi(n,k)</td>    <td>実数 n&lt;1, (-1:1) 内の実数 k</td>    <td> &Pi;(<i>n,k</i>) 第 3 種完全楕円積分</td></tr>
+^<tr>    <td>besj0(x)</td>    <td>整数または実数</td>    <td>ラジアンでの <i>j</i><sub>0</sub> ベッセル関数 (0 次ベッセル関数)</td></tr>
+^<tr>    <td>besj1(x)</td>    <td>整数または実数</td>    <td>ラジアンでの <i>j</i><sub>1</sub> ベッセル関数 (1 次ベッセル関数)</td></tr>
+^<tr>    <td>besy0(x)</td>    <td>整数または実数</td>    <td>ラジアンでの <i>y</i><sub>0</sub> ベッセル関数 (0 次ノイマン関数)</td></tr>
+^<tr>    <td>besy1(x)</td>    <td>整数または実数</td>    <td>ラジアンでの <i>y</i><sub>1</sub> ベッセル関数 (1 次ノイマン関数)</td></tr>
+^<tr>    <td>ceil(x)</td>    <td>任意</td>    <td>&lceil;<i>x</i>&rceil;, <i>x</i> (の実部) 以上の最小の整数</td></tr>
+^<tr>    <td>cos(x)</td>    <td>radians</td>    <td>cos <i>x</i>, <i>x</i> のコサイン</td></tr>
+^<tr>    <td>cosh(x)</td>    <td>任意</td>    <td>cosh <i>x</i>, ラジアンでの <i>x</i> のハイパボリックコサイン</td></tr>
+^<tr>    <td>erf(x)</td>    <td>任意</td>    <td>erf(Re(<i>x</i>)), <i>x</i> の実部の誤差関数</td></tr>
+^<tr>    <td>erfc(x)</td>    <td>任意</td>    <td>erfc(Re(<i>x</i>)), 1.0 - (<i>x</i> の実部の誤差関数)</td></tr>
+^<tr>    <td>exp(x)</td>    <td>任意</td>    <td><i>e<sup>x</sup></i>, <i>x</i> の指数関数</td></tr>
+^<tr>    <td>expint(n,x)</td>    <td>任意</td>    <td><i>E<sub>n</sub></i>(<i>x</i>), <i>x</i> の指数積分</td></tr>
+^<tr>    <td>floor(x)</td>    <td>任意</td>    <td>&lfloor;<i>x</i>&rfloor;, <i>x</i> (の実部) 以下の最大の整数</td></tr>
+^<tr>    <td>gamma(x)</td>    <td>任意</td>    <td>&Gamma;(Re(<i>x</i>)), <i>x</i> の実部のガンマ関数</td></tr>
+^<tr>    <td>ibeta(p,q,x)</td>    <td>任意</td>    <td>ibeta(Re(<i>p,q,x</i>)), <i>p</i>,<i>q</i>,<i>x</i> の実部の不完全ベータ関数</td></tr>
+^<tr>    <td>inverf(x)</td>    <td>任意</td>    <td><i>x</i> の実部の逆誤差関数</td></tr>
+^<tr>    <td>igamma(a,x)</td>    <td>任意</td>    <td>igamma(Re(<i>a,x</i>)), <a>a</a>,<i>x</i> の実部の不完全ガンマ関数</td></tr>
+^<tr>    <td>imag(x)</td>    <td>複素数</td>    <td>Im(<i>x</i>), <i>x</i> の虚数部分 (実数)</td></tr>
+^<tr>    <td>invnorm(x)</td>    <td>任意</td>    <td><i>x</i> の実部の逆正規分布関数</td></tr>
+^<tr>    <td>int(x)</td>    <td>実数</td>    <td><i>x</i> の整数部分 (0 に向かって丸め)</td></tr>
+^<tr>    <td>lambertw(x)</td>    <td>実数</td>    <td>Lambert W 関数</td></tr>
+^<tr>    <td>lgamma(x)</td>    <td>任意</td>    <td>lgamma(Re(<i>x</i>)), <i>x</i> の実部のガンマ対数関数</td></tr>
+^<tr>    <td>log(x)</td>    <td>任意</td>    <td>ln <i>x</i>, <i>x</i> の自然対数 (底 <i>e</i>)</td></tr>
+^<tr>    <td>log10(x)</td>    <td>任意</td>    <td>log<sub>10</sub> <i>x</i>, <i>x</i> の対数 (底 10)</td></tr>
+^<tr>    <td>norm(x)</td>    <td>任意</td>    <td>norm(<i>x</i>), <i>x</i> の実部の正規分布関数</td></tr>
+^<tr>    <td>rand(x)</td>    <td>整数</td>    <td>区間 [0:1] 内の疑似乱数</td></tr>
+^<tr>    <td>real(x)</td>    <td>任意</td>    <td>Re(<i>x</i>), <i>x</i> の実数部分</td></tr>
+^<tr>    <td>sgn(x)</td>    <td>任意</td>    <td><i>x</i> &gt; 0 なら 1, <i>x</i> &lt; 0 なら -1, <i>x</i> = 0 なら 0. <i>x</i> の虚部は無視</td></tr>
+^<tr>    <td>sin(x)</td>    <td>任意</td>    <td>sin <i>x</i>, <i>x</i> のサイン</td></tr>
+^<tr>    <td>sinh(x)</td>    <td>任意</td>    <td>sinh <i>x</i>,ラジアンでの <i>x</i> のハイパボリックサイン</td></tr>
+^<tr>    <td>sqrt(x)</td>    <td>任意</td>    <td>&radic;<i>x</i>, <i>x</i> の平方根</td></tr>
+^<tr>    <td>tan(x)</td>    <td>任意</td>    <td>tan <i>x</i>, <i>x</i> のタンジェント</td></tr>
+^<tr>    <td>tanh(x)</td>    <td>任意</td>    <td>tanh <i>x</i>, ラジアンでの <i>x</i> のハイパボリックタンジェント</td></tr>
+^<tr>    <td>voigt(x,y)</td>    <td>実数</td>    <td>ガウス関数とローレンツ関数の畳みこみ</td></tr>
 ^</tbody>
 ^</table>
 
@@ -921,20 +926,20 @@ C^ <a name="seeking-assistance"></a>
 ^  <col align="left">
 ^</colgroup>
 ^<thead>
-^<tr>   <th colspan="3"> String functions </th></tr>
-^<tr>	<th>関数</th>	<th>引数</th>	<th>戻り値</th></tr>
+^<tr>    <th colspan="3"> 文字列関数 </th></tr>
+^<tr>    <th>関数</th>    <th>引数</th>    <th>戻り値</th></tr>
 ^</thead>
 ^<tbody>
-^<tr>	<td>gprintf("format",x)</td>	<td>任意</td>	<td>gnuplot の書式解析器を適用した結果の文字列</td></tr>
-^<tr>	<td>sprintf("format",x,...)</td>	<td>複数個</td>	<td>C 言語の sprintf の返す文字列</td></tr>
-^<tr>	<td>strlen("string")</td>	<td>文字列</td>	<td>文字列の長さ (整数)</td></tr>
-^<tr>	<td>strstrt("string","key")</td>	<td>文字列</td>	<td>部分文字列 "key" が現れる先頭位置</td></tr>
-^<tr>	<td>substr("string",beg,end)</td>	<td>複数個</td>	<td>文字列 "string"[beg:end]</td></tr>
-^<tr>	<td>strftime("timeformat",t)</td>	<td>任意</td>	<td>gnuplot による時刻解析結果の文字列</td></tr>
-^<tr>	<td>strptime("timeformat",s)</td>	<td>文字列</td>	<td>文字列 s を変換した 2000 年からの秒数</td></tr>
-^<tr>	<td>system("command")</td>	<td>文字列</td>	<td>シェルコマンドの出力を持つ文字列</td></tr>
-^<tr>	<td>word("string",n)</td>	<td>string, int</td>	<td>文字列 "string" の n 番目の単語</td></tr>
-^<tr>	<td>words("string")</td>	<td>文字列</td>	<td>文字列 "string" 中の単語数</td></tr>
+^<tr>    <td>gprintf("format",x,...)</td>    <td>任意</td>    <td>gnuplot の書式解析器を適用した結果の文字列</td></tr>
+^<tr>    <td>sprintf("format",x,...)</td>    <td>複数個</td>    <td>C 言語の sprintf の返す文字列</td></tr>
+^<tr>    <td>strlen("string")</td>    <td>文字列</td>    <td>文字列の長さ (整数)</td></tr>
+^<tr>    <td>strstrt("string","key")</td>    <td>文字列</td>    <td>部分文字列 "key" が現れる先頭位置</td></tr>
+^<tr>    <td>substr("string",beg,end)</td>    <td>複数個</td>    <td>文字列 "string"[beg:end]</td></tr>
+^<tr>    <td>strftime("timeformat",t)</td>    <td>任意</td>    <td>gnuplot による時刻解析結果の文字列</td></tr>
+^<tr>    <td>strptime("timeformat",s)</td>    <td>文字列</td>    <td>文字列 s を変換した 2000 年からの秒数</td></tr>
+^<tr>    <td>system("command")</td>    <td>文字列</td>    <td>シェルコマンドの出力を持つ文字列</td></tr>
+^<tr>    <td>word("string",n)</td>    <td>string, int</td>    <td>文字列 "string" の n 番目の単語</td></tr>
+^<tr>    <td>words("string")</td>    <td>文字列</td>    <td>文字列 "string" 中の単語数</td></tr>
 ^</tbody>
 ^</table>
 
@@ -947,26 +952,27 @@ C^ <a name="seeking-assistance"></a>
 ^  <col align="left">
 ^</colgroup>
 ^<thead>
-^<tr>   <th colspan="3"> other gnuplot functions </th></tr>
-^<tr>	<th>Function</th>	<th>Arguments</th>	<th>Returns</th></tr>
+^<tr>    <th colspan="3"> 他の gnuplot の関数 </th></tr>
+^<tr>    <th>関数</th>    <th>引数</th>    <th>戻り値</th></tr>
 ^</thead>
 ^<tbody>
-^<tr>	<td>column(x)</td>	<td>整数</td>	<td> データファイル処理中の <i>x</i> 列目</td></tr>
-^<tr>	<td>defined(X)</td>	<td>変数名</td>	<td> [非推奨] X が定義されていれば 1, そうでなければ 0</td></tr>
-^<tr>	<td>exists("X")</td>	<td>文字列</td>	<td> 変数名 X が定義されていれば 1, そうでなければ 0</td></tr>
-^<tr>	<td>stringcolumn(x)</td>	<td>整数</td>	<td> 文字列としての <i>x</i> 列目の内容</td></tr>
-^<tr>	<td>timecolumn(x)</td>	<td>整数</td>	<td> データファイル処理中の <i>x</i> 列目の日時データ</td></tr>
-^<tr>	<td>tm_hour(x)</td>	<td>整数</td>	<td>時</td></tr>
-^<tr>	<td>tm_mday(x)</td>	<td>整数</td>	<td>日</td></tr>
-^<tr>	<td>tm_min(x)</td>	<td>整数</td>	<td>分</td></tr>
-^<tr>	<td>tm_mon(x)</td>	<td>整数</td>	<td>月</td></tr>
-^<tr>	<td>tm_sec(x)</td>	<td>整数</td>	<td>秒</td></tr>
-^<tr>	<td>tm_wday(x)</td>	<td>整数</td>	<td>その週の何日目</td></tr>
-^<tr>	<td>tm_yday(x)</td>	<td>整数</td>	<td>その年の何日目</td></tr>
-^<tr>	<td>tm_year(x)</td>	<td>整数</td>	<td>西暦</td></tr>
-^<tr>	<td>time(x)</td>	<td>任意</td>	<td>現在のシステム時刻</td></tr>
-^<tr>	<td>valid(x)</td>	<td>整数</td>	<td> データ中の column(<i>x</i>) の正当性</td></tr>
-^<tr>	<td>value("name")</td>	<td>文字列</td>	<td> 名前 name の変数の現在の値</td></tr>
+^<tr>    <td>column(x)</td>    <td>整数</td>    <td> データファイル処理中の <i>x</i> 列目</td></tr>
+^<tr>    <td>columnhead(x)</td>    <td>整数</td>    <td> データファイルの最初の <i>x</i> 列目中の文字列</td></tr>
+^<tr>    <td>defined(X)</td>    <td>変数名</td>    <td> [非推奨] X が定義されていれば 1, そうでなければ 0</td></tr>
+^<tr>    <td>exists("X")</td>    <td>文字列</td>    <td> 変数名 X が定義されていれば 1, そうでなければ 0</td></tr>
+^<tr>    <td>stringcolumn(x)</td>    <td>整数</td>    <td> 文字列としての <i>x</i> 列目の内容</td></tr>
+^<tr>    <td>timecolumn(x)</td>    <td>整数</td>    <td> データファイル処理中の <i>x</i> 列目の日時データ</td></tr>
+^<tr>    <td>tm_hour(x)</td>    <td>整数</td>    <td>時</td></tr>
+^<tr>    <td>tm_mday(x)</td>    <td>整数</td>    <td>日</td></tr>
+^<tr>    <td>tm_min(x)</td>    <td>整数</td>    <td>分</td></tr>
+^<tr>    <td>tm_mon(x)</td>    <td>整数</td>    <td>月</td></tr>
+^<tr>    <td>tm_sec(x)</td>    <td>整数</td>    <td>秒</td></tr>
+^<tr>    <td>tm_wday(x)</td>    <td>整数</td>    <td>その週の何日目</td></tr>
+^<tr>    <td>tm_yday(x)</td>    <td>整数</td>    <td>その年の何日目</td></tr>
+^<tr>    <td>tm_year(x)</td>    <td>整数</td>    <td>西暦</td></tr>
+^<tr>    <td>time(x)</td>    <td>任意</td>    <td>現在のシステム時刻</td></tr>
+^<tr>    <td>valid(x)</td>    <td>整数</td>    <td> データ中の column(<i>x</i>) の正当性</td></tr>
+^<tr>    <td>value("name")</td>    <td>文字列</td>    <td> 名前 name の変数の現在の値</td></tr>
 ^</tbody>
 ^</table>
 
@@ -1109,7 +1115,7 @@ C マーカを doc2html へのこのシグナルとして使用します。
 ?expressions functions besy1
 ?functions besy1
 ?besy1
-#besy1(x) & 整数または実数 &  $y_{1}$ ベッセル関数 (1 次ノイマン関数)\\
+#besy1(x) & 整数または実数 & $y_{1}$ ベッセル関数 (1 次ノイマン関数)\\
 %besy1(x)@整数または実数@$y sub 1$ ベッセル関数 (1 次ノイマン関数)
  関数 `besy1(x)` は引数の y1 ベッセル関数 (1 次の第 2 種円柱関数 Y1、1
  次ノイマン関数) の値を返します。`besy1` には引数はラジアンで与えます。
@@ -1285,10 +1291,7 @@ C マーカを doc2html へのこのシグナルとして使用します。
 ?rand
 #rand(x) & 整数 & 区間 [0:1] 内の疑似乱数生成器 \\
 %rand(x)@整数@区間 [0:1] 内の疑似乱数生成器
-  `rand(0)`  区間 [0:1] 内の疑似乱数を返す
-  `rand(-1)` 2 つの種の値を標準値に戻す
-  `rand(x)`  0 < x < 2^31-1 の整数なら内部種の両方を x に設定する
-  `rand({x,y})` 0 < x,y < 2^31-1 の整数なら seed1 を x に seed2 を y に設定
+ `rand(0)`  区間 [0:1] 内の疑似乱数を返す。詳しくは以下参照: `random`。
 4 real
 ?expressions functions real
 ?functions real
@@ -1364,8 +1367,8 @@ C マーカを doc2html へのこのシグナルとして使用します。
 4 gprintf
 ?expressions functions gprintf
 ?functions gprintf
-#gprintf("format",x) & 任意 & gnuplot の書式解析器を適用した結果の文字列 \\
-%gprintf("format",x)@任意@gnuplot の書式解析器を適用した結果の文字列 \\
+#gprintf("format",x,...) & 任意 & gnuplot の書式解析器を適用した結果の文字列 \\
+%gprintf("format",x,...)@任意@gnuplot の書式解析器を適用した結果の文字列 \\
  `gprintf("format",x)` は、gnuplot 独自の書式指定子に一つの変数 x を適
  用し、その結果の文字列を返します。標準的な C 言語書式指定子を使いたい
  場合は、代わりに `sprintf("format",x)` を使う必要があります。
@@ -1476,6 +1479,16 @@ C マーカを doc2html へのこのシグナルとして使用します。
  `column(x)` は fit あるいはデータファイルプロットでの `using` の処理中
  の数式の一部としてのみ使われます。これは $x$ 列目の内容を数値として評
  価します。以下参照: `plot datafile using`。
+4 columnhead
+?expressions functions columnhead
+?functions columnhead
+?columnhead
+#columnhead(x) & 整数 & データファイルの最初の $x$ 列目中の文字列 \\
+%columnhead(x)@整数@ データファイルの最初の $x$ 列目中の文字列
+ `columnhead(x)` は、非線形のあてはめ (fit) の際の `using` 処理内の数式
+ として、あるいはデータファイル描画でのいずれかのみで使えます。これは、
+ データの最初の行の x 列目の内容を含む文字列と評価されます。以下参照:
+ `plot datafile using`。
 4 defined
 ?expressions functions defined
 ?functions defined
@@ -1634,16 +1647,17 @@ C マーカを doc2html へのこのシグナルとして使用します。
 ?functions random
 ?random
 =rand
- 関数 rand() は 0 と 1 の間の疑似乱数列を生成します。これは以下からのア
- ルゴリズムを使用しています: P. L'Ecuyer and S. Cote, "Implementing a
+ 関数 `rand()` は 0 と 1 の間の疑似乱数列を生成します。これは以下からの
+ アルゴリズムを使用しています: P. L'Ecuyer and S. Cote, "Implementing a
  random number package with splitting facilities", ACM Transactions on
  Mathematical Software, 17:98-111 (1991).
-  `rand(0)`  内部に持つ 2 つの 32bit の種 (seed) の現在の値から生成され
-             る [0:1] 区間内の疑似乱数値を返す
-  `rand(-1)` 2 つの種の値を標準値に戻す
-  `rand(x)`  0 < x < 2^31-1 の整数なら種の両方を x に設定する
-  `rand({x,y})` 0 < x,y < 2^31-1 の整数なら seed1 を x に seed2 を y に
-                設定する
+
+       rand(0)     内部に持つ 2 つの 32bit の種 (seed) の現在の値から生
+                   成される [0:1] 区間内の疑似乱数値を返す
+       rand(-1)    2 つの種の値を標準値に戻す
+       rand(x)     0 < x < 2^31-1 の整数なら種の両方を x に設定する
+       rand({x,y}) 0 < x,y < 2^31-1 の整数なら seed1 を x に seed2 を y
+                   に設定する
 4 value
 ?expressions functions value
 ?functions value
@@ -1722,15 +1736,15 @@ C ... and restart the table:
 ^  <col align="left">
 ^</colgroup>
 ^<thead>
-^<tr>	<th>記号</th>		<th>例</th>		<th>説明</th></tr>
+^<tr>    <th>記号</th>    <th>例</th>    <th>説明</th></tr>
 ^</thead>
 ^<tbody>
-^<tr>	<td><tt>-</tt></td>	<td><tt>-a</tt></td>	<td>マイナス符号</td></tr>
-^<tr>	<td><tt>+</tt></td>	<td><tt>+a</tt></td>	<td>プラス符号 (何もしない)</td></tr>
-^<tr>	<td><tt>~</tt></td>	<td><tt>~a</tt></td>	<td>* 1 の補数 (ビット反転)</td></tr>
-^<tr>	<td><tt>!</tt></td>	<td><tt>!a</tt></td>	<td>* 論理的否定</td></tr>
-^<tr>	<td><tt>!</tt></td>	<td><tt>a!</tt></td>	<td>* 階乗</td></tr>
-^<tr>	<td><tt>$</tt></td>	<td><tt>$3</tt></td>	<td>* `using` 内での引数/列指定</td></tr>
+^<tr>    <td><tt>-</tt></td>    <td><tt>-a</tt></td>    <td>マイナス符号</td></tr>
+^<tr>    <td><tt>+</tt></td>    <td><tt>+a</tt></td>    <td>プラス符号 (何もしない)</td></tr>
+^<tr>    <td><tt>~</tt></td>    <td><tt>~a</tt></td>    <td>* 1 の補数 (ビット反転)</td></tr>
+^<tr>    <td><tt>!</tt></td>    <td><tt>!a</tt></td>    <td>* 論理的否定</td></tr>
+^<tr>    <td><tt>!</tt></td>    <td><tt>a!</tt></td>    <td>* 階乗</td></tr>
+^<tr>    <td><tt>$</tt></td>    <td><tt>$3</tt></td>    <td>* `using` 内での引数/列指定</td></tr>
 ^</tbody>
 ^</table>
 
@@ -1834,31 +1848,31 @@ C ... and restart the table:
 ^  <col align="left">
 ^</colgroup>
 ^<thead>
-^<tr>	<th>記号</th>		<th>例</th>		<th>説明</th></tr>
+^<tr>    <th>記号</th>    <th>例</th>    <th>説明</th></tr>
 ^</thead>
 ^<tbody>
-^<tr>	<td><tt>**</tt></td>	<td><tt>a**b</tt></td>	<td>累乗</td></tr>
-^<tr>	<td><tt>*</tt></td>	<td><tt>a*b</tt></td>	<td>積</td></tr>
-^<tr>	<td><tt>/</tt></td>	<td><tt>a/b</tt></td>	<td>商</td></tr>
-^<tr>	<td><tt>%</tt></td>	<td><tt>a%b</tt></td>	<td>* 余り</td></tr>
-^<tr>	<td><tt>+</tt></td>	<td><tt>a+b</tt></td>	<td>和</td></tr>
-^<tr>	<td><tt>-</tt></td>	<td><tt>a-b</tt></td>	<td>差</td></tr>
-^<tr>	<td><tt>==</tt></td>	<td><tt>a==b</tt></td>	<td>等しい</td></tr>
-^<tr>	<td><tt>!=</tt></td>	<td><tt>a!=b</tt></td>	<td>等しくない</td></tr>
-^<tr>	<td><tt>&lt;</tt></td>	<td><tt>a&lt;b</tt></td>	<td>より小さい</td></tr>
-^<tr>	<td><tt>&lt;=</tt></td>	<td><tt>a&lt;=b</tt></td>	<td>以下</td></tr>
-^<tr>	<td><tt>&gt;</tt></td>	<td><tt>a&gt;b</tt></td>	<td>より大きい</td></tr>
-^<tr>	<td><tt>&gt;=</tt></td>	<td><tt>a&gt;=b</tt></td>	<td>以上</td></tr>
-^<tr>	<td><tt>&amp;</tt></td>	<td><tt>a&amp;b</tt></td>	<td>* ビット積 (AND)</td></tr>
-^<tr>	<td><tt>^</tt></td>	<td><tt>a^b</tt></td>	<td>* ビット排他的論理和 (XOR)</td></tr>
-^<tr>	<td><tt>|</tt></td>	<td><tt>a|b</tt></td>	<td>* ビット和 (OR)</td></tr>
-^<tr>	<td><tt>&amp;&amp;</tt></td>	<td><tt>a&amp;&amp;b</tt></td>	<td>* 論理的 AND</td></tr>
-^<tr>	<td><tt>||</tt></td>	<td><tt>a||b</tt></td>	<td>* 論理的 OR</td></tr>
-^<tr>	<td><tt>=</tt></td>	<td><tt>a = b</tt></td>	<td>代入</td></tr>
-^<tr>	<td><tt>,</tt></td>	<td><tt>(a,b)</tt></td>	<td>累次評価</td></tr>
-^<tr>	<td><tt>.</tt></td>	<td><tt>a.b</tt></td>	<td>文字列の連結</td></tr>
-^<tr>	<td><tt>eq</tt></td>	<td><tt>A eq B</tt></td>	<td>文字列が等しい</td></tr>
-^<tr>	<td><tt>ne</tt></td>	<td><tt>A ne B</tt></td>	<td>文字列が等しくない</td></tr>
+^<tr>    <td><tt>**</tt></td>    <td><tt>a**b</tt></td>    <td>累乗</td></tr>
+^<tr>    <td><tt>*</tt></td>    <td><tt>a*b</tt></td>    <td>積</td></tr>
+^<tr>    <td><tt>/</tt></td>    <td><tt>a/b</tt></td>    <td>商</td></tr>
+^<tr>    <td><tt>%</tt></td>    <td><tt>a%b</tt></td>    <td>* 余り</td></tr>
+^<tr>    <td><tt>+</tt></td>    <td><tt>a+b</tt></td>    <td>和</td></tr>
+^<tr>    <td><tt>-</tt></td>    <td><tt>a-b</tt></td>    <td>差</td></tr>
+^<tr>    <td><tt>==</tt></td>    <td><tt>a==b</tt></td>    <td>等しい</td></tr>
+^<tr>    <td><tt>!=</tt></td>    <td><tt>a!=b</tt></td>    <td>等しくない</td></tr>
+^<tr>    <td><tt>&lt;</tt></td>    <td><tt>a&lt;b</tt></td>    <td>より小さい</td></tr>
+^<tr>    <td><tt>&lt;=</tt></td>    <td><tt>a&lt;=b</tt></td>    <td>以下</td></tr>
+^<tr>    <td><tt>&gt;</tt></td>    <td><tt>a&gt;b</tt></td>    <td>より大きい</td></tr>
+^<tr>    <td><tt>&gt;=</tt></td>    <td><tt>a&gt;=b</tt></td>    <td>以上</td></tr>
+^<tr>    <td><tt>&amp;</tt></td>    <td><tt>a&amp;b</tt></td>    <td>* ビット積 (AND)</td></tr>
+^<tr>    <td><tt>^</tt></td>    <td><tt>a^b</tt></td>    <td>* ビット排他的論理和 (XOR)</td></tr>
+^<tr>    <td><tt>|</tt></td>    <td><tt>a|b</tt></td>    <td>* ビット和 (OR)</td></tr>
+^<tr>    <td><tt>&amp;&amp;</tt></td>    <td><tt>a&amp;&amp;b</tt></td>    <td>* 論理的 AND</td></tr>
+^<tr>    <td><tt>||</tt></td>    <td><tt>a||b</tt></td>    <td>* 論理的 OR</td></tr>
+^<tr>    <td><tt>=</tt></td>    <td><tt>a = b</tt></td>    <td>代入</td></tr>
+^<tr>    <td><tt>,</tt></td>    <td><tt>(a,b)</tt></td>    <td>累次評価</td></tr>
+^<tr>    <td><tt>.</tt></td>    <td><tt>a.b</tt></td>    <td>文字列の連結</td></tr>
+^<tr>    <td><tt>eq</tt></td>    <td><tt>A eq B</tt></td>    <td>文字列が等しい</td></tr>
+^<tr>    <td><tt>ne</tt></td>    <td><tt>A ne B</tt></td>    <td>文字列が等しくない</td></tr>
 ^</tbody>
 ^</table>
 
@@ -1898,10 +1912,10 @@ C ... and restart the table:
 ^  <col align="left">
 ^</colgroup>
 ^<thead>
-^<tr>	<th>記号</th>		<th>例</th>		<th>説明</th></tr>
+^<tr>    <th>記号</th>    <th>例</th>    <th>説明</th></tr>
 ^</thead>
 ^<tbody>
-^<tr>	<td><tt>?:</tt></td>	<td><tt>a?b:c</tt></td>	<td>* 三項演算子</td></tr>
+^<tr>    <td><tt>?:</tt></td>    <td><tt>a?b:c</tt></td>    <td>* 三項演算子</td></tr>
 ^</tbody>
 ^</table>
 
@@ -2531,8 +2545,8 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/userdefined.gif" alt="[use
 2 起動 (Startup)
 ?startup
 ?start
+?start-up
 ?.gnuplot
-C^ <a name="startup"></a>
  `gnuplot` が起動されるとき、初期設定ファイルを読み込もうとします。この
  ファイルは Unix 系のシステムでは、`.gnuplot` であり、その他の処理系で
  は `GNUPLOT.INI` となっています。このファイルがカレントディレクトリに
@@ -2657,6 +2671,17 @@ C^ <a name="startup"></a>
 
  マクロの展開は、単一引用符内、または二重引用符内では行なわれませんが、
  バッククォート内ではマクロ展開されます。
+
+ マクロの展開は、gnuplot が新しいコマンド行を見たときに非常に早い段階で
+ gnuplot が処理し、そしてただ一度だけそれを行います。よって、
+
+      A = "c=1"
+      @A
+
+ のようなコードは正しく実行しますが、以下のような行はだめです。それは、
+ マクロの定義が同じ行にあるため展開に間に合わないからです。
+
+      A = "c=1"; @A   # will not expand to c=1
 
  コマンドを完成させて実行するには、コマンド `evaluate` も有用でしょう。
 3 文字列変数、マクロ、コマンドライン置換 (mixing_macros_backquotes)
@@ -2784,8 +2809,6 @@ C^ <a name="startup"></a>
  を囲むのに使います。以下参照: `substitution`。
 2 時間/日付データ (Time/Date)
 ?time/date
-C^ <a name="Time/Date data"></a>
-C^ <a name="Time/date"></a>
  `gnuplot` は入力データとして時間/日付情報の使用をサポートしています。
  この機能は `set xdata time`, `set ydata time` などのコマンドによって有
  効になります。
@@ -2995,8 +3018,8 @@ Ffigure_boxplot
 
  デフォルトでは、箱ひげは箱の端から、y の値が四分位範囲の 1.5 倍の中に
  収まっていて最も離れているような点まで延長されます。デフォルトでは、範
- 囲外の点 (outliner) は円 (pointtype 7) で描かれます。箱ひげの端の棒の
- 幅は `set bars` を使って制御できます。
+ 囲外の点 (outlier) は円 (pointtype 7) で描かれます。箱ひげの端の棒の幅
+ は `set bars` を使って制御できます。
 
  これらのデフォルトの性質は `set style boxplot` コマンドで変更できます。
  以下参照: `set style boxplot`, `bars`, `boxwidth`, `fillstyle`,
@@ -3313,6 +3336,13 @@ Ffigure_fsteps
 ^ <a href="http://www.gnuplot.info/demo/steps.html">
  steps デモ。
 ^ </a>
+2 fillsteps
+?commands set style fillsteps
+?set style fillsteps
+?style fillsteps
+?fillsteps
+ `fillsteps` スタイルは、`steps` とほぼ同じですが、曲線と y=0 との間の
+ 領域を現在の fillstyle で塗り潰します。以下参照: `steps`。
 2 histeps
 ?commands set style histeps
 ?set style histeps
@@ -3321,7 +3351,7 @@ Ffigure_fsteps
 ?histeps
 Ffigure_histeps
  `histeps` スタイルは 2 次元描画でのみ利用可能です。これはヒストグラム
- の描画での利用を意図しています。y の値は、x の値を中心に置くと考え、
+ の描画での利用を意図しています。y の値は、x の値を中心に置くと考え、 
  x1 での点は ((x0+x1)/2,y1) から ((x1+x2)/2,y1) までの水平線として表現
  されます。端の点では、その線はその x 座標が中心になるように延長されま
  す。隣り合う点同士の水平線の端は、その両者の平均値のところでの鉛直線、
@@ -3718,6 +3748,19 @@ Ffigure_points
  描画では 1 列、または 3 列のデータが必要です。以下参照: `style lines`。
  余分な入力列は、点のサイズや点色の変更などの情報が提供されたものとして
  使用されます。
+
+2 polar
+Ffigure_polar
+ 極座標描画 (polar) は、実際には描画スタイルの一つではありませんが、完
+ 全を期すためにこの一覧に上げておきます。オプション `set polar` は、入
+ 力する 2 次元座標を <x>,<y> の代わりに <角>,<半径> と解釈することを
+ gnuplot に指示します。すべてではないが、多くの 2 次元描画スタイルが極
+ 座標モードでも機能します。図は、描画スタイル `lines` と `filledcurves`
+ の組み合わせを示しています。(訳注: ここで述べている図とは、pdflatex を
+ 使用したマニュアルだけに現れますので、日本語のマニュアルにはこの図は含
+ まれていないでしょう。) 以下参照: `set polar`, `set rrange`,
+ `set size square`。
+
 2 steps
 ?commands set style steps
 ?set style steps
@@ -3725,12 +3768,13 @@ Ffigure_points
 ?style steps
 ?steps
 Ffigure_steps
- `steps` スタイルは 2 次元描画でのみ利用可能です。これは 2 本の線分で
- 隣り合う点をつなぎます: 1 本目は (x1,y1) から (x2,y1) まで、2 本目は
+ `steps` スタイルは 2 次元描画でのみ利用可能です。これは 2 本の線分で隣
+ り合う点をつなぎます: 1 本目は (x1,y1) から (x2,y1) まで、2 本目は
  (x2,y1) から (x2,y2) まで。入力列の条件は、`lines` や `points` に対す
  るものと同じです。`fsteps` と `steps` の違いは、`fsteps` は、折れ線を
  先に y 方向に書いてから次に x 方向に書くのに対し、`steps` は先に x 方
- 向に書いてから次に y 方向に書きます。
+ 向に書いてから次に y 方向に書きます。曲線とベースラインである y=0 との
+ 間の領域を塗り潰すには、`fillsteps` を使用してください。
  以下も参照
 ^ <a href="http://www.gnuplot.info/demo/steps.html">
  steps デモ。
@@ -5495,7 +5539,7 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/population.gif" alt="[popu
 
  書式:
        smooth {unique | frequency | cumulative | cnormal | kdensity
-               | csplines | acsplines | bezier | sbezier}
+                      | csplines | acsplines | bezier | sbezier}
 
  `unique`, `frequency`, `cumulative`, `cnormal` は、データを単調に揃え
  た後でそれらを plot します。他のルーチンはいずれも、データの両端の点の
@@ -6261,21 +6305,16 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/population.gif" alt="[popu
 ?plot title
 ?splot title
 ?columnheader
- 各関数やデータに対する曲線のタイトルは、その曲線のサンプル、および
- (または) それを表示されるのに使われる記号とともにキーの中に表示されま
- す。それは `title` オプションで変更できます。
+ デフォルトでは各曲線は、対応する関数やファイル名でキーの中に一覧表示さ
+ れますが、plot のオプション `title` を使うことで、明示的なタイトルを与
+ えることもできます。
 
  書式:
        title <text> | notitle [<ignored text>]
        title columnheader | title columnheader(N)
 
- ここで <text> は引用符で囲まれた文字列か、文字列変数のいずれかです。引
- 用符はキーには表示されません。特殊文字も、バックスラッシュに続く 8 進
- 値 (例えば "\345" のように) を使うことで用いることができます。タブ文字
- "\t" は認識されます。バックスラッシュのそのような作用は二重引用符で囲
- まれた文字列でしか効きません。逆にその作用を働かさないようにするには、
- 単一引用符を使ってください。改行文字 "\n" はどちらの型の引用符でもキー
- では働きません。
+ ここで <text> は、引用符で囲まれた文字列か、文字列と評価される式のいず
+ れかです。引用符はキーには表示されません。
 
  入力データの列の最初の項目 (すなわち列の先頭) を文字列フィールドと解釈
  し、それをキータイトルとして利用するオプションもあります。以下参照:
@@ -6640,8 +6679,8 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/population.gif" alt="[popu
  `reset bind` は、キー定義をデフォルトの状態に復帰します。
 2 save
 ?commands save
+?save set
 ?save
-C^ <a name="save set"></a>
  `save` コマンドは、ユーザ定義関数、変数、`set term` の状態、`set` で設
  定する全てのオプションのいずれかか、あるいはこれらすべてと、それに加え
  て最後に実行した `plot` (または `splot`) コマンドを、指定したファイル
@@ -7138,21 +7177,21 @@ C^ <a name="save set"></a>
 ^  <col align="center">
 ^</colgroup>
 ^<thead>
-^<tr>	<th>ビット</th>	<th>plot</th>	<th>splot</th></tr>
+^<tr>    <th>ビット</th>    <th>plot</th>    <th>splot</th></tr>
 ^</thead>
 ^<tbody>
-^<tr>	<td>1</td>	<td>下</td>	<td>底の左手前</td></tr>
-^<tr>	<td>2</td>	<td>左</td>	<td>底の左後ろ</td></tr>
-^<tr>	<td>4</td>	<td>上</td>	<td>底の右手前</td></tr>
-^<tr>	<td>8</td>	<td>右</td>	<td>底の右後ろ</td></tr>
-^<tr>	<td>16</td>	<td>効果なし</td>	<td>鉛直左</td></tr>
-^<tr>	<td>32</td>	<td>効果なし</td>	<td>鉛直後ろ</td></tr>
-^<tr>	<td>64</td>	<td>効果なし</td>	<td>鉛直右</td></tr>
-^<tr>	<td>128</td>	<td>効果なし</td>	<td>鉛直手前</td></tr>
-^<tr>	<td>256</td>	<td>効果なし</td>	<td>天井の左後ろ</td></tr>
-^<tr>	<td>512</td>	<td>効果なし</td>	<td>天井の右後ろ</td></tr>
-^<tr>	<td>1024</td>	<td>効果なし</td>	<td>天井の左手前</td></tr>
-^<tr>	<td>2048</td>	<td>効果なし</td>	<td>天井の右手前</td></tr>
+^<tr>    <td>1</td>    <td>下</td>    <td>底の左手前</td></tr>
+^<tr>    <td>2</td>    <td>左</td>    <td>底の左後ろ</td></tr>
+^<tr>    <td>4</td>    <td>上</td>    <td>底の右手前</td></tr>
+^<tr>    <td>8</td>    <td>右</td>    <td>底の右後ろ</td></tr>
+^<tr>    <td>16</td>    <td>効果なし</td>    <td>鉛直左</td></tr>
+^<tr>    <td>32</td>    <td>効果なし</td>    <td>鉛直後ろ</td></tr>
+^<tr>    <td>64</td>    <td>効果なし</td>    <td>鉛直右</td></tr>
+^<tr>    <td>128</td>    <td>効果なし</td>    <td>鉛直手前</td></tr>
+^<tr>    <td>256</td>    <td>効果なし</td>    <td>天井の左後ろ</td></tr>
+^<tr>    <td>512</td>    <td>効果なし</td>    <td>天井の右後ろ</td></tr>
+^<tr>    <td>1024</td>    <td>効果なし</td>    <td>天井の左手前</td></tr>
+^<tr>    <td>2048</td>    <td>効果なし</td>    <td>天井の右手前</td></tr>
 ^</tbody>
 ^</table>
 
@@ -7292,7 +7331,7 @@ C^ <a name="save set"></a>
  `gnuplot` は点や線に対するクリップ型 (clip-type) として、`points`,
  `one`, `two` の 3 種類をサポートしています。ある描画に対して、これらの
  クリップ型は任意の組み合せで設定することができます。`pm3d` の色地図や
- カラー曲面で塗りつぶされた四辺形はこのコマンドでは制御できませんが、
+ カラー曲面で塗りつぶされた四角形はこのコマンドでは制御できませんが、
  `set pm3d clip1in` や `set pm3d clip4in` によって可能であることに注意
  してください。
 
@@ -8155,24 +8194,24 @@ C^ <a name="save set"></a>
 ^  <col align="left">
 ^</colgroup>
 ^<thead>
-^<tr>	<th>書式</th>		<th>説明</th></tr>
+^<tr>    <th>書式</th>    <th>説明</th></tr>
 ^</thead>
 ^<tbody>
-^<tr>	<td><tt>%f</tt></td>	<td>固定小数点表記</td></tr>
-^<tr>	<td><tt>%e</tt>, <tt>%E</tt></td>	<td>指数表記; 指数の前に "e", "E" をつける</td></tr>
-^<tr>	<td><tt>%g</tt>, <tt>%G</tt></td>	<td><tt>%e</tt> (または <tt>%E</tt>) と <tt>%f</tt>の略記</td></tr>
-^<tr>	<td><tt>%x</tt>, <tt>%X</tt></td>	<td>16 進表記</td></tr>
-^<tr>	<td><tt>%o</tt>, <tt>%O</tt></td>	<td>8 進表記</td></tr>
-^<tr>	<td><tt>%t</tt></td>	<td>10 進の仮数部</td></tr>
-^<tr>	<td><tt>%l</tt></td>	<td>現在の対数尺の底を基数とする仮数部</td></tr>
-^<tr>	<td><tt>%s</tt></td>	<td>現在の対数尺の底を基数とする仮数部; 補助単位 (scientific power)</td></tr>
-^<tr>	<td><tt>%T</tt></td>	<td>10 進の指数部</td></tr>
-^<tr>	<td><tt>%L</tt></td>	<td>現在の対数尺の底を基数とする指数部</td></tr>
-^<tr>	<td><tt>%S</tt></td>	<td>補助単位の指数部 (scientific power)</td></tr>
-^<tr>	<td><tt>%c</tt></td>	<td>補助単位文字</td></tr>
-^<tr>	<td><tt>%b</tt></td>	<td>ISO/IEC 80000 記法 (ki, Mi, Gi, Ti, Pi, Ei, Zi, Yi) の仮数部</td></tr>
-^<tr>	<td><tt>%B</tt></td>	<td>ISO/IEC 80000 記法 (ki, Mi, Gi, Ti, Pi, Ei, Zi, Yi) の接頭辞</td></tr>
-^<tr>	<td><tt>%P</tt></td>	<td>&pi; の倍数</td></tr>
+^<tr>    <td><tt>%f</tt></td>    <td>固定小数点表記</td></tr>
+^<tr>    <td><tt>%e</tt>, <tt>%E</tt></td>    <td>指数表記; 指数の前に "e", "E" をつける</td></tr>
+^<tr>    <td><tt>%g</tt>, <tt>%G</tt></td>    <td><tt>%e</tt> (または <tt>%E</tt>) と <tt>%f</tt>の略記</td></tr>
+^<tr>    <td><tt>%x</tt>, <tt>%X</tt></td>    <td>16 進表記</td></tr>
+^<tr>    <td><tt>%o</tt>, <tt>%O</tt></td>    <td>8 進表記</td></tr>
+^<tr>    <td><tt>%t</tt></td>    <td>10 進の仮数部</td></tr>
+^<tr>    <td><tt>%l</tt></td>    <td>現在の対数尺の底を基数とする仮数部</td></tr>
+^<tr>    <td><tt>%s</tt></td>    <td>現在の対数尺の底を基数とする仮数部; 補助単位 (scientific power)</td></tr>
+^<tr>    <td><tt>%T</tt></td>    <td>10 進の指数部</td></tr>
+^<tr>    <td><tt>%L</tt></td>    <td>現在の対数尺の底を基数とする指数部</td></tr>
+^<tr>    <td><tt>%S</tt></td>    <td>補助単位の指数部 (scientific power)</td></tr>
+^<tr>    <td><tt>%c</tt></td>    <td>補助単位文字</td></tr>
+^<tr>    <td><tt>%b</tt></td>    <td>ISO/IEC 80000 記法 (ki, Mi, Gi, Ti, Pi, Ei, Zi, Yi) の仮数部</td></tr>
+^<tr>    <td><tt>%B</tt></td>    <td>ISO/IEC 80000 記法 (ki, Mi, Gi, Ti, Pi, Ei, Zi, Yi) の接頭辞</td></tr>
+^<tr>    <td><tt>%P</tt></td>    <td>&pi; の倍数</td></tr>
 ^</tbody>
 ^</table>
 
@@ -8319,34 +8358,34 @@ C^ <a name="save set"></a>
 ^  <col align="left">
 ^</colgroup>
 ^<thead>
-^<tr>	<th>書式</th>		<th>説明</th></tr>
+^<tr>    <th>書式</th>    <th>説明</th></tr>
 ^</thead>
 ^<tbody>
-^<tr>	<td><tt>%a</tt></td>	<td>曜日名の省略形 (Sun,Mon,...)</td></tr>
-^<tr>	<td><tt>%A</tt></td>	<td>曜日名 (Sunday,Monday,...)</td></tr>
-^<tr>	<td><tt>%b</tt>, <tt>%h</tt></td>	<td>月名の省略形 (Jan,Feb,...)</td></tr>
-^<tr>	<td><tt>%B</tt></td>	<td>月名 (January,February,...)</td></tr>
-^<tr>	<td><tt>%d</tt></td>	<td>日 (01&ndash;31)</td></tr>
-^<tr>	<td><tt>%D</tt></td>	<td><tt>%m/%d/%y</tt> の簡略形 (出力のみ)</td></tr>
-^<tr>	<td><tt>%F</tt></td>	<td><tt>%Y-%m-%d</tt> の簡略形 (出力のみ)</td></tr>
-^<tr>	<td><tt>%k</tt></td>	<td>時 (0&ndash;23; 1 桁または 2 桁)</td></tr>
-^<tr>	<td><tt>%H</tt></td>	<td>時 (00&ndash;23; 常に 2 桁)</td></tr>
-^<tr>	<td><tt>%l</tt></td>	<td>時 (1&ndash;12; 1 桁または 2 桁)</td></tr>
-^<tr>	<td><tt>%I</tt></td>	<td>時 (01&ndash;12; 常に 2 桁)</td></tr>
-^<tr>	<td><tt>%j</tt></td>	<td>その年の通算日 (1&ndash;366)</td></tr>
-^<tr>	<td><tt>%m</tt></td>	<td>月 (01&ndash;12)</td></tr>
-^<tr>	<td><tt>%M</tt></td>	<td>分 (0&ndash;60)</td></tr>
-^<tr>	<td><tt>%p</tt></td>	<td>"am" または "pm"</td></tr>
-^<tr>	<td><tt>%r</tt></td>	<td><tt>%I:%M:%S %p</tt> の簡略形 (出力のみ)</td></tr>
-^<tr>	<td><tt>%R</tt></td>	<td><tt>%H:%M</tt> の簡略形 (出力のみ)</td></tr>
-^<tr>	<td><tt>%S</tt></td>	<td>秒 (出力では 0&ndash;60 の整数、入力では実数)</td></tr>
-^<tr>	<td><tt>%s</tt></td>	<td>2000 年最初からの秒数</td></tr>
-^<tr>	<td><tt>%T</tt></td>	<td><tt>%H:%M:%S</tt> の簡略形 (出力のみ)</td></tr>
-^<tr>	<td><tt>%U</tt></td>	<td>その年の通算週 (週は日曜日からと数える)</td></tr>
-^<tr>	<td><tt>%w</tt></td>	<td>曜日番号 (0&ndash;6, 日曜 = 0)</td></tr>
-^<tr>	<td><tt>%W</tt></td>	<td>その年の通算週 (週は月曜日からと数える)</td></tr>
-^<tr>	<td><tt>%y</tt></td>	<td>西暦 (0-99、1969-2068 年の下 2 桁)</td></tr>
-^<tr>	<td><tt>%Y</tt></td>	<td>西暦 (4 桁)</td></tr>
+^<tr>    <td><tt>%a</tt></td>    <td>曜日名の省略形 (Sun,Mon,...)</td></tr>
+^<tr>    <td><tt>%A</tt></td>    <td>曜日名 (Sunday,Monday,...)</td></tr>
+^<tr>    <td><tt>%b</tt>, <tt>%h</tt></td>    <td>月名の省略形 (Jan,Feb,...)</td></tr>
+^<tr>    <td><tt>%B</tt></td>    <td>月名 (January,February,...)</td></tr>
+^<tr>    <td><tt>%d</tt></td>    <td>日 (01&ndash;31)</td></tr>
+^<tr>    <td><tt>%D</tt></td>    <td><tt>%m/%d/%y</tt> の簡略形 (出力のみ)</td></tr>
+^<tr>    <td><tt>%F</tt></td>    <td><tt>%Y-%m-%d</tt> の簡略形 (出力のみ)</td></tr>
+^<tr>    <td><tt>%k</tt></td>    <td>時 (0&ndash;23; 1 桁または 2 桁)</td></tr>
+^<tr>    <td><tt>%H</tt></td>    <td>時 (00&ndash;23; 常に 2 桁)</td></tr>
+^<tr>    <td><tt>%l</tt></td>    <td>時 (1&ndash;12; 1 桁または 2 桁)</td></tr>
+^<tr>    <td><tt>%I</tt></td>    <td>時 (01&ndash;12; 常に 2 桁)</td></tr>
+^<tr>    <td><tt>%j</tt></td>    <td>その年の通算日 (1&ndash;366)</td></tr>
+^<tr>    <td><tt>%m</tt></td>    <td>月 (01&ndash;12)</td></tr>
+^<tr>    <td><tt>%M</tt></td>    <td>分 (0&ndash;60)</td></tr>
+^<tr>    <td><tt>%p</tt></td>    <td>"am" または "pm"</td></tr>
+^<tr>    <td><tt>%r</tt></td>    <td><tt>%I:%M:%S %p</tt> の簡略形 (出力のみ)</td></tr>
+^<tr>    <td><tt>%R</tt></td>    <td><tt>%H:%M</tt> の簡略形 (出力のみ)</td></tr>
+^<tr>    <td><tt>%S</tt></td>    <td>秒 (出力では 0&ndash;60 の整数、入力では実数)</td></tr>
+^<tr>    <td><tt>%s</tt></td>    <td>2000 年最初からの秒数</td></tr>
+^<tr>    <td><tt>%T</tt></td>    <td><tt>%H:%M:%S</tt> の簡略形 (出力のみ)</td></tr>
+^<tr>    <td><tt>%U</tt></td>    <td>その年の通算週 (週は日曜日からと数える)</td></tr>
+^<tr>    <td><tt>%w</tt></td>    <td>曜日番号 (0&ndash;6, 日曜 = 0)</td></tr>
+^<tr>    <td><tt>%W</tt></td>    <td>その年の通算週 (週は月曜日からと数える)</td></tr>
+^<tr>    <td><tt>%y</tt></td>    <td>西暦 (0-99、1969-2068 年の下 2 桁)</td></tr>
+^<tr>    <td><tt>%Y</tt></td>    <td>西暦 (4 桁)</td></tr>
 ^</tbody>
 ^</table>
 
@@ -8669,9 +8708,9 @@ C^ <a name="save set"></a>
  キー内の各要素は `vertical` (縦) または `horizontal` (横) に従って重ね
  られます。`vertical` の場合、key は可能ならば 2,3 個の縦の列を使います。
  すなわち、各要素は垂直スペースがなくなるまでは 1 つの列に整列されます
- が、そこから新しい列が開始されます。垂直スペースは、'maxrows' を使って
- 制限できます。`horizontal` の場合は、key は可能ならば 2,3 個の横の行を
- 使用します。水平スペースは、'maxcols' を使って制限できます。
+ が、そこから新しい列が開始されます。垂直スペースは、`maxrows` を使って
+ 制限できます。`horizontal` の場合は、key は横の行をできるだけ少なく使
+ おうとします。水平方向のスペースは `maxcols` により制限できます。
 
  デフォルトでは、key はグラフ領域の内側の右上の角に置かれます。キーワー
  ド `left`, `right`, `top`, `bottom`, `center`, `inside`, `outside`,
@@ -9963,7 +10002,7 @@ C^ <a name="save set"></a>
  曲面の色づけは、以下のような入力データに関して行われます:
 
  1. 関数、または 1 つか 3 つのデータ列からなるデータの splot: 上に述べ
- た四辺形の 4 つの角の z 座標の平均値 (または `corners2color`) から、灰
+ た四角形の 4 つの角の z 座標の平均値 (または `corners2color`) から、灰
  色の範囲 [0:1] を与える `zrange` または `cbrange` の範囲
  [min_color_z,max_color_z] への対応により、灰色/カラーの値が得られます。
  この値は、直接灰色の色地図用の灰色の値として使うことができます。正規化
@@ -9998,13 +10037,13 @@ C^ <a name="save set"></a>
  面に描いて次に天井面に色地図を描きますし、`at bstbst` は ... 真面目な
  話、こんなものは使いません。
 
- 塗られた四辺形は、次から次へと描画されて行きます。曲面を描画する場合
- (`at s`)、後の四辺形が前のものに重なり (上書きし) ます (gnuplot は塗ら
+ 塗られた四角形は、次から次へと描画されて行きます。曲面を描画する場合
+ (`at s`)、後の四角形が前のものに重なり (上書きし) ます (gnuplot は塗ら
  れた多角形の網の重なりの相互作用を計算するような仮想現実ツールではあり
  ません)。 最初に走査されるデータを最初に描くか最後に描くかを切替えるス
  イッチオプション `scansforward` と `scansbackward` を試してみてくださ
  い。デフォルトは `scansautomatic` で、これは gnuplot 自身に走査の順を
- 推測させます。一方で、オプション `depthorder` は四辺形の順序を完全に再
+ 推測させます。一方で、オプション `depthorder` は四角形の順序を完全に再
  構成します。塗りつぶしは深さ順に並び変えされた後で行われ、これによりか
  なり複雑な曲面でも視覚的なものにすることができます。詳細は、以下参照:
  `pm3d depthorder`。
@@ -10023,7 +10062,7 @@ C^ <a name="save set"></a>
  `scansautomatic`|`scansforward`|`scansbackward` で制御できます。これら
  の走査 (scan) オプションは、一般には隠面処理とは両立しません。
 
- 2 回の連続する走査で点の数が同じでなかった場合、四辺形の点の取り始めを、
+ 2 回の連続する走査で点の数が同じでなかった場合、四角形の点の取り始めを、
  両方の走査の最初から (`flush begin`) にするか、最後から (`flush end`)
  にするか、真中から (`flush center`) にするかを決定しなければいけません。
  `flush (center|end)` は `scansautomatic` とは両立せず、よって
@@ -10045,10 +10084,10 @@ C^ <a name="save set"></a>
 
 4 クリッピング (clipping)
 ?pm3d clipping
- 四辺形の x,y 座標に関するクリッピングは 2 つの方法で行われます。
- `clip1in`: 各四辺形の全ての 4 点が定義されていなければならず、少なくと
+ 四角形の x,y 座標に関するクリッピングは 2 つの方法で行われます。
+ `clip1in`: 各四角形の全ての 4 点が定義されていなければならず、少なくと
  もそのうちの 1 点が x, y の範囲におさまっていなければなりません。
- `clip4in`: 各四辺形の全ての 4 点が x, y の範囲におさまっていなければな
+ `clip4in`: 各四角形の全ての 4 点が x, y の範囲におさまっていなければな
  りません。
 
 4 色の割り当て
@@ -10058,30 +10097,42 @@ C^ <a name="save set"></a>
 =median
 =min
 =max
+ `3 列のデータ (x,y,z) の場合`:
+
  色づけの設定はカラーボックスの描画と同様に `set palette` で決定されま
  す。一つの描画では一つのパレットのみが存在し得ます。いくつもの曲面を異
  なるパレットで描画するには、`origin` と `size` を固定して `mutiplot`
  を使うことで行えます。出力ドライバが利用できる色を使い尽くしてしまう場
  合には `set palette maxcolors` を使うことを忘れずに。
 
- 描画される各 pm3d 四辺形には一つの灰色/カラー値が対応します (4 頂点間
+ 描画される各 pm3d 四角形には一つの灰色/カラー値が対応します (4 頂点間
  で滑らかなカラー変化は起こりません)。その値は、`corners2color <option>`
  に従って周囲の角の z 座標から計算されます。<option> は 'mean' (デフォ
  ルト)、'geomean', 'median' で、曲面のカラーの平滑化に幾つかの種類を与
  え、'min','max' はそれぞれ最小値、最大値を選択します。これらは鋭敏な、
  あるいは急激なピーク値を持つようなピクセルイメージや色地図を作るときに
  は必要ありません。そのような場合には、むしろオプション 'c1', 'c2',
- 'c3', 'c4' を使って、四辺形の色の割当にただ一つの角の z 座標を使うよう
+ 'c3', 'c4' を使って、四角形の色の割当にただ一つの角の z 座標を使うよう
  にすればいいでしょう。どの角が 'c1' に対応するのかを知るためには何回か
  実験してみる必要があるでしょう。その向きは描画の方向に依存しています。
  pm3d アルゴリズムは、カラー曲面を入力データ点の範囲の外には描かないの
  で、オプション 'c<j>' は、格子の 2 つのへりに沿ったピクセルが、どの四
- 辺形の色にも寄与しない、という結果をもたらします。例えば、pm3d アルゴ
+ 角形の色にも寄与しない、という結果をもたらします。例えば、pm3d アルゴ
  リズムを 4x4 のデータ点の格子に適用するスクリプト `demo/pm3d.dem` (是
  非見てください) では、(4-1)x(4-1)=9 色しかない長方形が生成されます。
 
+ `4 列のデータ (x,y,z,color) の場合`:
+
+ 4 列目にデータを与えた場合、それを通常は別にパレットに割り当てる灰色階
+ 調値とみなします。個々の四角形の彩色は上と同様に行いますが、色の値は z
+ の値とは切り離されます。別の彩色オプションにより、4 列目のデータに RGB
+ 色を与えることもできます。以下参照: `rgbcolor variable`。この場合、描
+ 画コマンドは以下のようにする必要があります:
+
+       splot ... using 1:2:3:4 with pm3d lc rgb variable
+
  与えられた節点に対して、その周りの 4 つの節点の平均化された (x,y) 座標
- から角を得て四辺形を作って、その四辺形を節点の色で塗る、といったような
+ から角を得て四角形を作って、その四角形を節点の色で塗る、といったような
  他の描画アルゴリズムが将来実装されるかもしれません。
  これは、イメージの描画 (2 次元の格子) に対しては `image` と `rgbimage`
  スタイルによって既に行なわれています。
@@ -10093,7 +10144,7 @@ C^ <a name="save set"></a>
 4 hidden3d
 ?set pm3d hidden3d
 ?pm3d hidden3d
- オプション `set pm3d hidden3d` は、各四辺形の境界線を、四辺形それ自身
+ オプション `set pm3d hidden3d` は、各四角形の境界線を、四角形それ自身
  が描画されるのと同時に描画します。通常は、それは擬似的な隠線処理を達成
  するために、オプション `depthorder` とともに使用します。これは、コマン
  ド `set hidden3d` を用いるよりもずっと効果的でしょう。このコマンドは、
@@ -10114,7 +10165,7 @@ C^ <a name="save set"></a>
  滑らかにし、曲面の色の尖りを補正します。関数描画に対しては、この補間は
  細かさの代わりにメモリを消費してしまう、といったことくらいの意味しかあ
  りませんから、関数描画の場合は普通 `samples` や `isosamples` を使うべ
- きでしょう。正の m, n に対しては、各四辺形、または三角形は、それぞれの
+ きでしょう。正の m, n に対しては、各四角形、または三角形は、それぞれの
  方向に m 回、n 回補間されます。負の m, n では補間の頻度は、少なくとも
  |m|, |n| 点が描画されるように選択されます。これは特別な格子関数と見な
  すことができます。0 の場合、すなわち `interpolate 0,0` は、自動的に最
@@ -10192,7 +10243,7 @@ C^ <a name="save set"></a>
 
  このパレットを使用する図は、`gray` か `color` になります。例えば、
  `pm3d` カラー曲面では、範囲 [min_z,max_z] が灰色の範囲 [0:1] に対応し
- ていて、微小曲面四辺形の 4 つの角の z 座標の平均値をこの範囲の中に対応
+ ていて、微小曲面四角形の 4 つの角の z 座標の平均値をこの範囲の中に対応
  させることで各微小部分の灰色の値 (gray) が得られます。この値は、灰色階
  調の色地図での灰色の値として直接使うことができますし、カラーの色地図で
  は、その灰色の値から (R,G,B) への変換、すなわち [0:1] から
@@ -10287,8 +10338,8 @@ C 下記の以下参照: オプション `positive`, `negative`)。
  もしれないということに注意してください。
 
  図の色を反転させるには `positive` や `negative` を使ってください。
-C^ <a name="positive"></a>
-C^ <a name="negative"></a>
+^ <a name="positive"></a>
+^ <a name="negative"></a>
 
  他の色体系に対する最も良い rgbformulae の集合は、以下のコマンドで見つ
  けることができることを覚えておいてください。
@@ -10674,6 +10725,8 @@ C^ <a name="negative"></a>
 ?show size
 ?size
 ?aspect ratio
+?set size square
+?set size ratio
  書式:
        set size {{no}square | ratio <r> | noratio} {<xscale>,<yscale>}
        show size
@@ -10744,7 +10797,6 @@ C^ <a name="negative"></a>
 ?set style
 ?show style
 ?unset style
-C^ <a name="set style <style>"></a>
  デフォルトの描画スタイルは、`set style data` と `set style function`
  で設定できます。関数やデータのデフォルトの描画スタイルを個々に変更す
  る方法については、以下参照: `plot with`。スタイルの一覧全体は、以下参
@@ -10779,8 +10831,6 @@ C^ <a name="set style <style>"></a>
 ?unset style arrow
 ?show style arrow
 ?arrowstyle
-C^ <a name="arrowtype"></a>
-C^ <a name="arrowwidth"></a>
  各出力形式は矢や点の形のデフォルトの集合を持っていて、それはコマンド
  `test` で参照できます。`set style arrow` は矢の形、幅、点の形、サイズ
  を定義し、それらを後で使うときにいちいち同じ情報を繰り返して指定しなく
@@ -10970,6 +11020,7 @@ C^ <a name="arrowwidth"></a>
        png    TrueColor   index     yes
        post          no     yes      no
        svg          yes      no     yes
+       win          yes     yes     yes
        wxt          yes     yes     yes
        x11           no     yes      no
 #\begin{tabular}{|cccl|} \hline
@@ -10980,6 +11031,7 @@ C^ <a name="arrowwidth"></a>
 #png        &TrueColor&   index &     yes \\
 #post       &      no &     yes &      no \\
 #svg        &     yes &      no &     yes \\
+#win        &     yes &     yes &     yes \\
 #wxt        &     yes &     yes &     yes \\
 #x11        &      no &     yes &      no \\
 %c l .
@@ -10991,6 +11043,7 @@ C^ <a name="arrowwidth"></a>
 %png@TrueColor@index@yes
 %post@no@yes@no
 %svg@yes@yes@yes
+%win@yes@yes@yes
 %wxt@yes@yes@yes
 %x11@no@yes@no
 %_
@@ -11004,17 +11057,18 @@ C^ <a name="arrowwidth"></a>
 ^  <col align="center">
 ^</colgroup>
 ^<thead>
-^<tr>	<th>出力形式</th>	<th>solid</th>	<th>pattern</th>	<th>pm3d</th></tr>
+^<tr>    <th>出力形式</th>    <th>solid</th>    <th>pattern</th>    <th>pm3d</th></tr>
 ^</thead>
 ^<tbody>
-^<tr>	<td>gif</td>	<td>no</td>	<td>yes</td>	<td>no</td></tr>
-^<tr>	<td>jpeg</td>	<td>yes</td>	<td>no</td>	<td>yes</td></tr>
-^<tr>	<td>pdf</td>	<td>yes</td>	<td>yes</td>	<td>yes</td></tr>
-^<tr>	<td>png</td>	<td>TrueColor</td>	<td>index</td>	<td>yes</td></tr>
-^<tr>	<td>post</td>	<td>no</td>	<td>yes</td>	<td>no</td></tr>
-^<tr>	<td>svg</td>	<td>yes</td>	<td>yes</td>	<td>yes</td></tr>
-^<tr>	<td>wxt</td>	<td>yes</td>	<td>yes</td>	<td>yes</td></tr>
-^<tr>	<td>x11</td>	<td>no</td>	<td>yes</td>	<td>no</td></tr>
+^<tr>    <td>gif</td>    <td>no</td>    <td>yes</td>    <td>no</td></tr>
+^<tr>    <td>jpeg</td>    <td>yes</td>    <td>no</td>    <td>yes</td></tr>
+^<tr>    <td>pdf</td>    <td>yes</td>    <td>yes</td>    <td>yes</td></tr>
+^<tr>    <td>png</td>    <td>TrueColor</td>    <td>index</td>    <td>yes</td></tr>
+^<tr>    <td>post</td>    <td>no</td>    <td>yes</td>    <td>no</td></tr>
+^<tr>    <td>svg</td>    <td>yes</td>    <td>yes</td>    <td>yes</td></tr>
+^<tr>    <td>win</td>    <td>yes</td>    <td>yes</td>    <td>yes</td></tr>
+^<tr>    <td>wxt</td>    <td>yes</td>    <td>yes</td>    <td>yes</td></tr>
+^<tr>    <td>x11</td>    <td>no</td>    <td>yes</td>    <td>no</td></tr>
 ^</tbody>
 ^</table>
 
@@ -11567,20 +11621,20 @@ C^ <a name="arrowwidth"></a>
 ^  <col align="left">
 ^</colgroup>
 ^<thead>
-^<tr>	<th>書式</th>	<th>説明</th></tr>
+^<tr>    <th>書式</th>    <th>説明</th></tr>
 ^</thead>
 ^<tbody>
-^<tr>	<td><tt>%d</tt></td>	<td>何日, 1&ndash;31</td></tr>
-^<tr>	<td><tt>%m</tt></td>	<td>何月, 1&ndash;12</td></tr>
-^<tr>	<td><tt>%y</tt></td>	<td>何年, 0&ndash;99</td></tr>
-^<tr>	<td><tt>%Y</tt></td>	<td>何年, 4-digit</td></tr>
-^<tr>	<td><tt>%j</tt></td>	<td>1 年の何日目, 1&ndash;365</td></tr>
-^<tr>	<td><tt>%H</tt></td>	<td>何時, 0&ndash;24</td></tr>
-^<tr>	<td><tt>%M</tt></td>	<td>何分, 0&ndash;60</td></tr>
-^<tr>	<td><tt>%s</tt></td>	<td>Unix epoch (1970-01-01 00:00 UTC) からの秒数</td></tr>
-^<tr>	<td><tt>%S</tt></td>	<td>何秒 (出力では 0&ndash;60 の整数、入力では実数)</td></tr>
-^<tr>	<td><tt>%b</tt></td>	<td>月名 (英語) の 3 文字省略形</td></tr>
-^<tr>	<td><tt>%B</tt></td>	<td>月名 (英語)</td></tr>
+^<tr>    <td><tt>%d</tt></td>    <td>何日, 1&ndash;31</td></tr>
+^<tr>    <td><tt>%m</tt></td>    <td>何月, 1&ndash;12</td></tr>
+^<tr>    <td><tt>%y</tt></td>    <td>何年, 0&ndash;99</td></tr>
+^<tr>    <td><tt>%Y</tt></td>    <td>何年, 4-digit</td></tr>
+^<tr>    <td><tt>%j</tt></td>    <td>1 年の何日目, 1&ndash;365</td></tr>
+^<tr>    <td><tt>%H</tt></td>    <td>何時, 0&ndash;24</td></tr>
+^<tr>    <td><tt>%M</tt></td>    <td>何分, 0&ndash;60</td></tr>
+^<tr>    <td><tt>%s</tt></td>    <td>Unix epoch (1970-01-01 00:00 UTC) からの秒数</td></tr>
+^<tr>    <td><tt>%S</tt></td>    <td>何秒 (出力では 0&ndash;60 の整数、入力では実数)</td></tr>
+^<tr>    <td><tt>%b</tt></td>    <td>月名 (英語) の 3 文字省略形</td></tr>
+^<tr>    <td><tt>%B</tt></td>    <td>月名 (英語)</td></tr>
 ^</tbody>
 ^</table>
 
@@ -13169,21 +13223,13 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/splot.gif" alt="[splot.gif
 
 1 バグ (Bugs)
 ?bugs
- 以前のものと現在のリリースに関して報告されたバグは SourceForge 上の公
- 式配布サイトに置かれています。
+ バグリポートは e-mail で gnuplot-bugs メーリングリストへ送るか、または
+ SourceForge の gnuplot ウェブサイトにその報告を投稿してください。その
+ 際、あなたが使用している gnuplot のバージョンの完全な情報、そして可能
+ ならばそのバグを実証するテストスクリプトを送ってください。以下参照:
+ `seeking-assistance`。
 
- バグリポートは e-mail で gnuplot-bugs メーリングリストへ送って下さい。
- または、SourceForge の gnuplot ウェブサイトにその報告を投稿してくださ
- い。その際、あなたが使用している gnuplot のバージョンの完全な情報、そ
- して可能ならばそのバグを実証するテストスクリプトを送ってください。以下
- 参照: `seeking-assistance`。
-
- 以下のセクションは、gnuplot 4.4 のリリース時現在に知られている問題の一
- 覧を示しています。これらには外部のサポートライブラリのバグも含まれてい
- るので、gnuplot の修正とは関係なく改良されるかもしれません。
-
-2 gnuplot の制限 (limitations)
-?bugs gnuplot
+2 知られている制限 (limitations)
 =gamma
 =bessel
 =timefmt
@@ -13202,11 +13248,8 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/splot.gif" alt="[splot.gif
  有効です。これは、異なるパレットを使用する描画を含んだ multiplot では
  x11 上では正しく表示されない、ということを意味します。
 
- "時刻" として指定された座標は 24 時で折り返し、精度の最小単位は 1 秒で
- す。これは、特に地理上の座標に基づく時刻を使っている場合には制限になり
- ます。
-
- 誤差指示線 (errorbars) は、極座標/球面座標描画モードでは使えません。
+ "時刻" として指定された座標は 24 時で折り返します。これは、特に地理上
+ の座標に基づく時刻を使っている場合には制限になります。
 
  `nohidden3d` は、全体的な設定である `set hidden3d` を、個々の描画に対
  して免除するためのオプションですが、これは媒介変数の曲線 (parametric)
