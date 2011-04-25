@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot.c,v 1.104.2.7 2010/08/09 06:34:49 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot.c,v 1.104.2.8 2010/08/10 05:40:45 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot.c */
@@ -645,7 +645,6 @@ main(int argc, char **argv)
 		do_string(*argv, FALSE);
 
 	    } else {
-		c_token = NO_CARET;	/* in case of file not found */
 		load_file(loadpath_fopen(*argv, "r"), gp_strdup(*argv), FALSE);
 	    }
 	}
