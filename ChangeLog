@@ -1,5 +1,12 @@
 2011-04-25  Ethan A Merritt  <merritt@u.washington.edu>
 
+	* src/readline.c:  Revise the built-in readline code to handle UTF-8
+	encoded character input. The revised code is only active if the user
+	has explicitly done "set encoding utf8" or "set encoding locale", but
+	probably it should be the default in a UTF-8 locale.
+
+2011-04-25  Ethan A Merritt  <merritt@u.washington.edu>
+
 	* src/plot.c (main) src/misc.c (load_file): Initializing c_token to an
 	illegal value is not a good idea.
 	Bug #3292512
