@@ -1,3 +1,9 @@
+2011-04-25  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/plot.c (main) src/misc.c (load_file): Initializing c_token to an
+	illegal value is not a good idea.
+	Bug #3292512
+
 2011-04-23  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* docs/gnuplot-ja.doc docs/term-ja.diff:  sync to docs version 1.664.
