@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: readline.c,v 1.52 2011/04/23 00:02:10 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: readline.c,v 1.53 2011/04/26 17:54:28 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - readline.c */
@@ -761,19 +761,22 @@ redraw_line(const char *prompt)
 static void
 clear_line(const char *prompt)
 {
-    size_t i = max_pos;
+    putc('\r', stderr);
+    fputs(prompt, stderr);
+    cur_pos = 0;
 
-    while (cur_pos > 0)
-	backspace();
-    while (cur_pos < max_pos)
-	delete_forward();
-    while (i < 0)
-	cur_line[i--] = '\0';
+    while (cur_pos < max_pos) {
+	user_putc(SPACE);
+	if (isdoublewidth(cur_line[cur_pos]))
+	    user_putc(SPACE);
+	cur_pos += char_seqlen();
+    }
+    while (max_pos > 0)
+	cur_line[--max_pos] = '\0';
 
     putc('\r', stderr);
     fputs(prompt, stderr);
-
-    max_pos = 0;
+    cur_pos = 0;
 }
 
 /* clear to end of line and the screen end of line */

@@ -1,9 +1,11 @@
-2011-04-25  Ethan A Merritt  <merritt@u.washington.edu>
+2011-04-26  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/readline.c:  Revise the built-in readline code to handle UTF-8
 	encoded character input. The revised code is only active if the user
 	has explicitly done "set encoding utf8" or "set encoding locale", but
 	probably it should be the default in a UTF-8 locale.
+
+	* src/readline.c (clear_line): More efficient clear line algorithm.
 
 2011-04-25  Ethan A Merritt  <merritt@u.washington.edu>
 
