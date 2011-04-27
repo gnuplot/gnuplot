@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.363 2011/04/07 03:30:33 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.364 2011/04/16 04:55:26 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -1840,8 +1840,8 @@ do_plot(struct curve_points *plots, int pcount)
 	    localkey = 0;
 	    if (this_plot->labels && (key_pass || !key->front)) {
 		struct lp_style_type save_lp = this_plot->lp_properties;
-		for (key_entry = this_plot->labels->next; key_entry; key_entry = key_entry->next) {
-		    key_count++;
+		for (key_entry = this_plot->labels->next; key_entry;
+		     key_entry = key_entry->next) {
 		    this_plot->lp_properties.l_type = key_entry->tag;
 		    this_plot->fill_properties.fillpattern = key_entry->tag;
 		    if (key_entry->text) {
@@ -1851,7 +1851,12 @@ do_plot(struct curve_points *plots, int pcount)
 			    load_linetype(&this_plot->lp_properties, key_entry->tag + 1);
 			do_key_sample(this_plot, key, key_entry->text, t, xl, yl);
 		    }
-		    yl = yl - key_entry_height;
+		    if (++key_count >= key_rows) {
+			yl = yl_ref;
+			xl += key_col_wth;
+			key_count = 0;
+		    } else
+			yl = yl - key_entry_height;
 		}
 		free_labels(this_plot->labels);
 		this_plot->labels = NULL;

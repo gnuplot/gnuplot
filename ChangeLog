@@ -1,8 +1,14 @@
+2011-04-27  <wtf3@users.sourceforge.net>
+
+	* src/graphics.c:  The autotitle option for column-stacked histograms
+	should honor "set key maxrows N".
+	Bug #3281635
+
 2011-04-27  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/command.c (help_command) src/win/winmain.h src/win/winmain.c
 	(WinExit, ShutDown, WinCloseHelp, WinMain): Work-around for apparently
-	well known html help bug, which causes spurious crahes on exit. Keep
+	well known html help bug, which causes spurious crashes on exit. Keep
 	track of help window handle and try to close the window as soon as 
 	possible. New function WinCloseHelp.
 
