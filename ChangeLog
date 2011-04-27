@@ -1,3 +1,40 @@
+2011-04-27  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	Extensive update to color, linetype and fillstyle handling in windows
+	terminal. Fixes several bugs and implements new options.
+	* term/win.trm (WIN_id, WIN_opts, WIN_options): Add options "solid",
+	"dashed", "background", "fontscale"	and "linewidth". Call new function
+	GraphInitStruct to initialize graphwin. Inlcude font in term_options.
+	* term/win.trm (WIN_point, WIN_filled_polygon): Handle dashed lines
+	in drawgraph, not here. (WIN_filled_polygon): Use generalized
+	W_fillstyle	call, shared with WIN_boxfill. (WIN_boxfill): Pass second
+	corner as parameter, not width and height. Fixes spurious rounding
+	errors during translation to graph coordinates. (help text): Document
+	new options.
+	* src/win/wgnuplib.h (GW): Reorder entries according to function.
+	* src/win/wgraph.c (pattern_bitmaps): Fix double cross-hatch.
+	(GraphInitStruct): New function. (MakePens, DestroyPens): Account for
+	linewidth and sampling and create an additional "null" pen which is
+	used for filled polygons and boxes. (MakeFonts, GraphEnhancedOpen)
+	Account for fontscale. (draw_new_pens, draw_new_brush) New functions
+	to (re)create brushes and pens. Always create a "solid" partner for
+	the possibly "dashed" pen. Called by drawgraph.
+	* src/win/wgraph.c (drawgraph): Reorder variables according to
+	function. [W_line_type]: Save last LOGPEN instead of pen index. Make 
+	use of draw_new_pens. Select background brush for line-type <= 
+	LT_NODRAW (fix by Shigeharu Takeno, Bug 3192205). [W_fillstyle]: Unify
+	code for filled boxes and polygons. Use draw_new_brush. [W_boxfill]:
+	Fillstyle is now set by previous call to W_fillstyle. Change interface
+	from relative (width, height) to absolute position to avoid off by one
+	rounding errors. Deselect brush use for transparent fill before
+	deleting it. [W_line_width] Scale by linewidth option. [W_setcolor]
+	Use save LPOGEN to create pens with new color. Use draw_new_brush and
+	draw_new_pens to recreate brushes and pens. [W_filled_polygon_draw]
+	Fillstyle is now set by previous call to W_fillstyle. Use "null" pen
+	to avoid drawing a border around filled area. [W_image] Avoid static
+	variables. [W_plus,...] Use solid pen. Fixes point symbols drawn with 
+	dashed lines. Adresses Bug 1952364.
+
 2011-04-26  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/readline.c:  Revise the built-in readline code to handle UTF-8
@@ -29,7 +66,7 @@
 
 2011-04-22  Bastian Maerkisch  <bmaerkisch@web.de>
 
-	* src/readline.c:  The behavior of ^W was not consistent with the 
+	* src/readline.c:  The behavior of ^W was not consistent with the
 	documentation. Change it to match gnu libreadline (delete previous
 	partial or full word).
 
@@ -170,7 +207,7 @@
 
 2011-04-15  Bastian Maerkisch  <bmaerkisch@web.de>
 
-	* src/readline.c (msdos_getch, readline), src/win/winmain.c 
+	* src/readline.c (msdos_getch, readline), src/win/winmain.c
 	(ConsoleGetch): Don't quit on DEL on an empty line. Map DEL key to del
 	character 127 instead of ^D, but keep old behaviour of deleting current
 	character on platforms Windows, MSDOS and OS/2. SF Bug #3285571
@@ -191,7 +228,7 @@
 
 2011-04-12  Bastian Maerkisch  <bmaerkisch@web.de>
 
-	* src/win/wtext.c (WndParentProc) [WM_SIZE]: Ignore requests to set 
+	* src/win/wtext.c (WndParentProc) [WM_SIZE]: Ignore requests to set
 	window size to 0,0. Fixes crash on Vista if Windows-D is pressed.
 
 2011-04-11  Ethan A Merritt  <merritt@u.washington.edu>
@@ -213,7 +250,7 @@
 	into a struct. Move code out of main loop of drawgraph: New functions
 	draw_put_text(), draw_text_justify(), draw_enhanced_text(). Fix baseline
 	alignment of normal and enhanced text. Text position was moving in wrong
-	direction for rotated enhanced text (fix replaces change dated 
+	direction for rotated enhanced text (fix replaces change dated
 	2011-02-11). Remove unused function GraphGetFontScaling(). Fix text
 	positioning of enhanced text with oversampling.
 
@@ -227,7 +264,7 @@
 	* term/win.trm (WIN_scale): Removed.
 	* term/win.trm (WIN_options), src/win/winmain.c (WinMain): Eliminate need
 	for static variable WIN_gtitle.
-	* term/win.trm (WIN_set_pointsize), src/win/wgraph.c (drawgraph) 
+	* term/win.trm (WIN_set_pointsize), src/win/wgraph.c (drawgraph)
 	[W_pointsize]: Don't pass size as string.
 	* src/win/wgraph.c (drawgraph) [W_line_type]: Only init LOGBRUSH lb
 	if it is used.
@@ -270,7 +307,7 @@
 	* term/win.trm, src/win/wgnuplib.h, src/win/wgraph.c: Use UINTs
 	instead of DWORDs in struct GWOP.
 
-	* src/win/wgraph.c, src/win/wgnuplib.h: Move static flag for 
+	* src/win/wgraph.c, src/win/wgnuplib.h: Move static flag for
 	unsupported encodings to struct LPGW. This ensures that errors
 	are reported only once.
 
@@ -451,7 +488,7 @@
 
 2011-03-22  Bastian Maerkisch  <bmaerkisch@web.de>
 
-	* src/graphics.c (do_plot, plot_points): Test wether the terminal 
+	* src/graphics.c (do_plot, plot_points): Test wether the terminal
 	actually supports set_color. Fixes crashes with terminal dumb.
 
 2011-03-21  Bastian Maerkisch  <bmaerkisch@web.de>
@@ -470,12 +507,12 @@
 
 2011-03-20  Bastian Maerkisch  <bmaerkisch@web.de>
 
-	* src/win/wgnuplib.c|h, src/win/wgraph.c, src/win/winmain.c, 
+	* src/win/wgnuplib.c|h, src/win/wgraph.c, src/win/winmain.c,
 	src/win/wmenu.c, src/win/wpause.c, src/win/wtext.c: FAR pointers are
 	no longer required.
 
 	* src/win/winmain.c (WinExit): Explicitly close help window on exit.
-	Fixes hangs of gnuplot when it is closed via the Windows taskbar 
+	Fixes hangs of gnuplot when it is closed via the Windows taskbar
 	and help window	and graph window open.
 
 	* src/win/wmenu.c (LoadMacros), src/win/wgnuplot.mnu ([Button]): Add
@@ -497,9 +534,9 @@
 	* term/gd.trm (PNG_init): On Windows, set GDFONTPATH to %windir%\Fonts
 	if not set previously.
 
-	* src/plot.c (main), src/win/winmain.c (WinMain, WinExt): Always use 
-	the ANSI codepage (instead of OEM) to ensure sure that the console 
-	of gnuplot.exe and the graph window use the same codepage. Warn 
+	* src/plot.c (main), src/win/winmain.c (WinMain, WinExt): Always use
+	the ANSI codepage (instead of OEM) to ensure sure that the console
+	of gnuplot.exe and the graph window use the same codepage. Warn
 	users that raster fonts won't display all characters correctly and
 	restore the codepage on exit.
 
@@ -510,14 +547,14 @@
 
 2011-03-16  Bastian Maerkisch  <bmaerkisch@web.de>
 
-	* src/win/wgraph.c (UnicodeText): new function to convert a string 
+	* src/win/wgraph.c (UnicodeText): new function to convert a string
 	to UTF-16
 
-	* src/win/wgraph.c (drawgraph, GraphGetTextLength) NEWS: support 
+	* src/win/wgraph.c (drawgraph, GraphGetTextLength) NEWS: support
 	"set encoding" for all currently defined encodings
 
 	* src/win/wtext.c (ReadTextIni): select default font according to
-	the Windows version. Avoid font "Terminal" since it might not 
+	the Windows version. Avoid font "Terminal" since it might not
 	contain all glyphs of the current character set.
 
 	* src/win/wgnuplib.h, src/win/wgraph.c, term/win.trm: use child
@@ -594,7 +631,7 @@
 	* src/makefile.nt: implement suggestions by Shigeharu Takeno:
 	Do not use "+=" to be compatible with Visual C++ 2005; add/update
 	links wo libgd and wxWidgets; add a scheme to easily select options
-	[GDLIB, PDFLIB, WXT]; use linker option files for compilation of 
+	[GDLIB, PDFLIB, WXT]; use linker option files for compilation of
 	wgnuplot.exe and gnuplot.exe
 
 2011-03-11  Ethan A Merritt  <merritt@u.washington.edu>
@@ -631,8 +668,8 @@
 
 2011-03-09  Bastian Maerkisch  <bmaerkisch@web.de>
 
-	* config/makefile.nt: add chm help (update of SF patch 3191892 by 
-	Shigeharu Takeno), (HCWPATH, HHWPATH) use PROGRAMFILES variable 
+	* config/makefile.nt: add chm help (update of SF patch 3191892 by
+	Shigeharu Takeno), (HCWPATH, HHWPATH) use PROGRAMFILES variable
 	instead of hard coded path
 
 2011-03-08  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
@@ -724,11 +761,11 @@
 	use hard links instead of index lookup (HTML_HARDLINKS).
 
 	Feature Request #874572
-	* term/win.trm src/win/wgraph.c src/win/wgnuplib.h 
-	src/win/wresourc.h: Add double buffering to the windows terminal 
+	* term/win.trm src/win/wgraph.c src/win/wgnuplib.h
+	src/win/wresourc.h: Add double buffering to the windows terminal
 	to avoid flicker on redraw. Add a poor man's version of antialiasing:
 	draw on a bitmap twice the size of the window on screen, then
-	scale down using halftone mode. Both settings are optional and can 
+	scale down using halftone mode. Both settings are optional and can
 	be changed via the `graph-menu` and `wgnuplot.ini`.
 
 2011-02-26  Ethan A Merritt  <merritt@u.washington.edu>

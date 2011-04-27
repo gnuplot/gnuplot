@@ -1,5 +1,5 @@
 /*
- * $Id: wgnuplib.h,v 1.41 2011/04/10 11:34:56 markisch Exp $
+ * $Id: wgnuplib.h,v 1.42 2011/04/10 16:47:47 markisch Exp $
  */
 
 /* GNUPLOT - win/wgnuplib.h */
@@ -289,50 +289,61 @@ typedef struct tagGW {
 	HINSTANCE hInstance;	/* required */
 	HINSTANCE hPrevInstance;	/* required */
 	LPSTR	Title;		/* required */
-	int	xmax;		/* required */
-	int	ymax;		/* required */
+	int		xmax;		/* required */
+	int		ymax;		/* required */
 	LPTW	lptw;		/* optional */  /* associated text window */
 	POINT	Origin;		/* optional */	/* origin of graph window */
 	POINT	Size;		/* optional */	/* size of graph window */
 	LPSTR	IniFile;	/* optional */
 	LPSTR	IniSection;	/* optional */
 	HWND	hWndGraph;	/* window handle */
-	HWND	hStatusbar;
+	HWND	hStatusbar;	/* window handle of status bar */
+	int		StatusHeight;	/* height of status line area */
 	HMENU	hPopMenu;	/* popup menu */
-	int	pen;		/* current pen number */
-	int	htic;		/* horizontal size of point symbol (xmax units) */
-	int 	vtic;		/* vertical size of point symbol (ymax units)*/
-	int	hchar;		/* horizontal size of character (xmax units) */
-	int	vchar;		/* vertical size of character (ymax units)*/
-	int	angle;		/* text angle */
-	BOOL	rotate;		/* can text be rotated 90 degrees ? */
-	char	fontname[MAXFONTNAME];	/* font name */
-	int	fontsize;	/* font size in pts */
-	char	deffontname[MAXFONTNAME]; /* default font name */
-	int	deffontsize;	/* default font size */
-	int     justify;    /* text justification */
-	HFONT	hfonth;		/* horizonal font */
-	HFONT	hfontv;		/* rotated font (arbitrary angle) */
-	LOGFONT lf;		/* cached to speed up rotated fonts */
 
-	BOOL	graphtotop;	/* bring graph window to top after every plot? */
-	BOOL	color;		/* color pens? */
-	HPEN	hapen;		/* stored current pen */
-	LOGPEN	colorpen[WGNUMPENS+2];	/* color pen definitions */
-	LOGPEN	monopen[WGNUMPENS+2];	/* mono pen definitions */
-	COLORREF background;		/* background color */
-	HBRUSH	hbrush;		/* background brush */
-	HBRUSH	colorbrush[WGNUMPENS+2];   /* brushes to fill points */
 	struct GWOPBLK *gwopblk_head;
 	struct GWOPBLK *gwopblk_tail;
 	unsigned int nGWOP;
 	BOOL	locked;		/* locked if being written */
-	double  org_pointsize;	/* Original Pointsize */
-	int	StatusHeight;	/* height of status line area */
-	BOOL    doublebuffer;   /* double buffering? */
-	BOOL    oversample;	/* oversampling? */
-	int     sampling;	/* current sampling factor */
-	int	encoding_error; /* last unknown encoding */
+
+	BOOL	initialized;	/* already initialized? */
+	BOOL	graphtotop;	/* bring graph window to top after every plot? */
+	BOOL	color;		/* color pens? */
+	BOOL	dashed;		/* dashed lines? */
+	BOOL	doublebuffer;	/* double buffering? */
+	BOOL	oversample;	/* oversampling? */
+
+	int		htic;		/* horizontal size of point symbol (xmax units) */
+	int 	vtic;		/* vertical size of point symbol (ymax units)*/
+	int		hchar;		/* horizontal size of character (xmax units) */
+	int		vchar;		/* vertical size of character (ymax units)*/
+
+	char	fontname[MAXFONTNAME];	/* font name */
+	int		fontsize;	/* font size in pts */
+	char	deffontname[MAXFONTNAME]; /* default font name */
+	int		deffontsize;	/* default font size */
+	int		angle;		/* text angle */
+	BOOL	rotate;		/* can text be rotated 90 degrees ? */
+	int		justify;	/* text justification */
+	HFONT	hfonth;		/* horizonal font */
+	HFONT	hfontv;		/* rotated font (arbitrary angle) */
+	LOGFONT	lf;			/* cached to speed up rotated fonts */
+	double	org_pointsize;	/* Original Pointsize */
+	int		encoding_error; /* last unknown encoding */
+	double	fontscale;	/* scale factor for font sizes */
+
+	HPEN	hapen;		/* stored current pen */
+	HPEN	hsolid;		/* solid sibling of current pen */
+	HPEN	hnull;		/* empty null pen */
+	LOGPEN	colorpen[WGNUMPENS+2];	/* color pen definitions */
+	LOGPEN	monopen[WGNUMPENS+2];	/* mono pen definitions */
+	double	linewidth;	/* scale factor for linewidth */
+
+	HBRUSH	colorbrush[WGNUMPENS+2];   /* brushes to fill points */
+	COLORREF background;		/* background color */
+	HBRUSH	hbrush;				/* background brush */
+	HBRUSH	hcolorbrush;		/* */
+	int		sampling;	/* current sampling factor */
 } GW;
 typedef GW *  LPGW;
 
@@ -343,6 +354,7 @@ typedef GW *  LPGW;
 #define WINGRAPHTITLE "gnuplot graph"
 
 extern termentry * WIN_term;
+void WDPROC GraphInitStruct(LPGW lpgw);
 void WDPROC GraphInit(LPGW lpgw);
 void WDPROC GraphClose(LPGW lpgw);
 void WDPROC GraphStart(LPGW lpgw, double pointsize);
@@ -354,7 +366,6 @@ void WDPROC GraphOpSize(LPGW lpgw, UINT op, UINT x, UINT y, LPCSTR str, DWORD si
 void WDPROC GraphPrint(LPGW lpgw);
 void WDPROC GraphRedraw(LPGW lpgw);
 void WDPROC GraphChangeFont(LPGW lpgw, LPCSTR font, int fontsize, HDC hdc, RECT rect);
-void	ReadGraphIni(LPGW lpgw);
 void WDPROC win_close_terminal_window(LPGW lpgw);
 
 #ifdef USE_MOUSE
