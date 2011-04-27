@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.208 2011/03/20 17:51:25 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.209 2011/04/16 11:15:55 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -2139,8 +2139,13 @@ help_command()
     c_token++;
 #ifdef WITH_HTML_HELP
     /* open help file if necessary */
-    if (HtmlHelp(textwin.hWndParent, winhelpname, HH_DISPLAY_TOPIC, (DWORD_PTR)NULL) == NULL) {
-        fprintf(stderr, "Error: Could not open help file \"%s\"\n", winhelpname);
+    help_window = HtmlHelp(textwin.hWndParent, winhelpname, HH_GET_WIN_HANDLE, (DWORD_PTR)NULL);
+    if (help_window == NULL) {
+        help_window = HtmlHelp(textwin.hWndParent, winhelpname, HH_DISPLAY_TOPIC, (DWORD_PTR)NULL);
+        if (help_window == NULL) {
+            fprintf(stderr, "Error: Could not open help file \"%s\"\n", winhelpname);
+            return;
+        }
     }
     if (END_OF_COMMAND) {
         /* show table of contents */

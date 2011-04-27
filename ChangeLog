@@ -1,7 +1,14 @@
 2011-04-27  Bastian Maerkisch  <bmaerkisch@web.de>
 
+	* src/command.c (help_command) src/win/winmain.h src/win/winmain.c
+	(WinExit, ShutDown, WinCloseHelp, WinMain): Work-around for apparently
+	well known html help bug, which causes spurious crahes on exit. Keep
+	track of help window handle and try to close the window as soon as 
+	possible. New function WinCloseHelp.
+
 	Extensive update to color, linetype and fillstyle handling in windows
 	terminal. Fixes several bugs and implements new options.
+
 	* term/win.trm (WIN_id, WIN_opts, WIN_options): Add options "solid",
 	"dashed", "background", "fontscale"	and "linewidth". Call new function
 	GraphInitStruct to initialize graphwin. Inlcude font in term_options.

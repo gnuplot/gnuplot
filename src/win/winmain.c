@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: winmain.c,v 1.43 2011/04/10 17:08:01 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: winmain.c,v 1.44 2011/04/15 14:18:44 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - win/winmain.c */
@@ -115,6 +115,9 @@ UINT cp_output;
 #ifndef HELPFILE /* HBB 981203: makefile.win predefines this... */
 #define HELPFILE "wgnuplot.hlp"
 #endif
+#ifdef WITH_HTML_HELP
+HWND help_window = NULL;
+#endif
 
 char *authors[]={
                  "Colin Kelley",
@@ -123,6 +126,8 @@ char *authors[]={
 
 void WinExit(void);
 int gnu_main(int argc, char *argv[], char *env[]);
+static void WinCloseHelp(void);
+
 
 void
 CheckMemory(LPSTR str)
@@ -154,6 +159,9 @@ kill_pending_Pause_dialog ()
 void
 WinExit(void)
 {
+        /* Last chance, call before anything else to avoid a crash. */
+        WinCloseHelp();
+
         term_reset();
 
 #ifndef __MINGW32__ /* HBB 980809: FIXME: doesn't exist for MinGW32. So...? */
@@ -164,9 +172,7 @@ WinExit(void)
 #ifndef WGP_CONSOLE
         TextMessage();  /* process messages */
 #endif
-#ifdef WITH_HTML_HELP
-        HtmlHelp(NULL, NULL, HH_CLOSE_ALL, (DWORD_PTR)NULL);
-#else
+#ifndef WITH_HTML_HELP
         WinHelp(textwin.hWndText,(LPSTR)winhelpname,HELP_QUIT,(DWORD)NULL);
 #endif
 #ifndef WGP_CONSOLE
@@ -188,8 +194,10 @@ WinExit(void)
 int CALLBACK
 ShutDown()
 {
-        exit(0);
-        return 0;
+	/* First chance for wgnuplot to close help system. */
+	WinCloseHelp();
+	exit(0);
+	return 0;
 }
 
 
@@ -278,6 +286,21 @@ appdata_directory(void)
     }
 
     return NULL;
+}
+
+
+static void
+WinCloseHelp(void)
+{
+#ifdef WITH_HTML_HELP
+	/* Due to a known bug in the HTML help system we have to
+	 * call this as soon as possible before the end of the program. 
+	 * See e.g. http://helpware.net/FAR/far_faq.htm#HH_CLOSE_ALL
+	 */
+	if (IsWindow(help_window))
+		SendMessage(help_window, WM_CLOSE, 0, 0);
+	Sleep(0);
+#endif
 }
 
 
@@ -445,6 +468,9 @@ int main(int argc, char **argv)
 
         gnu_main(_argc, _argv, environ);
 
+        /* First chance to close help system for console gnuplot,
+        second for wgnuplot */
+        WinCloseHelp();
         return 0;
 }
 
