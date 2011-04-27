@@ -1,3 +1,9 @@
+2011-04-27  <wtf3@users.sourceforge.net>
+
+	* src/graphics.c:  The autotitle option for column-stacked histograms
+	should honor "set key maxrows N".
+	Bug #3281635
+
 2011-04-25  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/plot.c (main) src/misc.c (load_file): Initializing c_token to an
