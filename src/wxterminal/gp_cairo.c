@@ -1,5 +1,5 @@
 /*
- * $Id: gp_cairo.c,v 1.54 2011/03/11 22:20:59 sfeam Exp $
+ * $Id: gp_cairo.c,v 1.55 2011/04/28 06:23:10 markisch Exp $
  */
 
 /* GNUPLOT - gp_cairo.c */
@@ -121,9 +121,6 @@ static int avg_vchar = 150;
 /* set a cairo pattern or solid fill depending on parameters */
 static void gp_cairo_fill(plot_struct *plot, int fillstyle, int fillpar);
 static void gp_cairo_fill_pattern(plot_struct *plot, int fillstyle, int fillpar);
-
-/* determine default font to use */
-static const char *gp_cairo_default_font(void);
 
 /* array of colors
  * FIXME could be shared with all gnuplot terminals */
@@ -1758,7 +1755,7 @@ const char* gp_cairo_enhanced_get_fontname(plot_struct *plot)
 /* BM: New function to determine the default font.
  * On Windows, the "Sans" alias normally is equivalent to 
  * "Tahoma" but the resolution fails on some systems. */
-static const char *
+const char *
 gp_cairo_default_font(void)
 {
 #ifdef WIN32

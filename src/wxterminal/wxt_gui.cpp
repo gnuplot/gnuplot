@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.cpp,v 1.79 2010/03/18 04:52:53 sfeam Exp $
+ * $Id: wxt_gui.cpp,v 1.80 2011/03/11 22:20:59 sfeam Exp $
  */
 
 /* GNUPLOT - wxt_gui.cpp */
@@ -1908,7 +1908,7 @@ int wxt_set_font (const char *font)
 
 	if ( strlen(fontname) == 0 ) {
 		if ( strlen(wxt_set_fontname) == 0 )
-			strncpy(fontname, "Sans", sizeof(fontname));
+			strncpy(fontname, gp_cairo_default_font(), sizeof(fontname));
 		else
 			strncpy(fontname, wxt_set_fontname, sizeof(fontname));
 	}

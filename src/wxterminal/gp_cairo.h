@@ -1,5 +1,5 @@
 /*
- * $Id: gp_cairo.h,v 1.15 2009/03/26 00:49:18 sfeam Exp $
+ * $Id: gp_cairo.h,v 1.16 2011/03/11 22:20:59 sfeam Exp $
  */
 
 /* GNUPLOT - gp_cairo.h */
@@ -229,6 +229,9 @@ void gp_cairo_set_termvar(plot_struct *plot, unsigned int *v_char,
 
 /* translate plot->encoding int to char* suitable for glib */
 const char* gp_cairo_get_encoding(plot_struct *plot);
+
+/* determine default font to use */
+const char * gp_cairo_default_font(void);
 
 #ifdef __cplusplus
 }
