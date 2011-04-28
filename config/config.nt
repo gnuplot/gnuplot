@@ -568,6 +568,8 @@
 # define WIN_IPC 1
 #endif
 
+#define HAVE_GDIPLUS
+
 #define GP_INLINE __inline
 #define GP_EXCEPTION_NAME _exception
 #define GP_MATHERR _matherr

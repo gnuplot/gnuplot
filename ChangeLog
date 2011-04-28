@@ -1,8 +1,26 @@
 2011-04-28  Bastian Maerkisch  <bmaerkisch@web.de>
 
-	* src/win/gp_cairo.c (gp_cairo_default_font): New function to determine
-	default font. Default is "Sans" on all Systems but Windows where this
-	alias does not work in all cases.
+	Support for (optional) antialiasing in windows terminal via GDI+.
+
+	* config/config.mgw, config/config.nt: Compilers have support for
+	GDI+: define HAVE_GDIPLUS. Note: OpenWatcom might not support GDI+
+	* config/mingw/Makefile: Include new files wgdiplus.h|cpp in build,
+	add library gdiplus.
+	* src/win/wgdiplus.cpp src/win/wgdiplus.h: New files. C interface
+	to Windows GDI+ library. Currently supports polylines and circles.
+	* src/win/wgnuplib.h src/win/wgraph.c src/win/winmain.c
+	src/win/wresourc.h: Implement antialiasing for lines and and most point
+	shapes. Add option to LPGW, wgnuplot.ini and popup menu to toggle
+	antialiasing on and off. Default to oversampling off now that we have
+	proper antialiasing. Wrap all GDI+ code in #ifdef HAVE_GDIPLUS.
+	
+	* src/win/wgraph.c (drawgraph) [W_fillstyle, FS_PATTERN]: Fix cycling
+	of pattern styles.
+
+	* src/wxterminal/gp_cairo.c|h (gp_cairo_default_font)
+	src/wxterminal/wxt_gui.c: New function to determine	default font.
+	Default is "Sans" on all systems but Windows where this	alias might
+	not work work in all cases.
 
 2011-04-27  <wtf3@users.sourceforge.net>
 

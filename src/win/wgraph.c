@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.111 2011/04/18 08:00:32 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.112 2011/04/27 10:18:28 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - win/wgraph.c */
@@ -69,8 +69,11 @@ static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.111 2011/04/18 08:00:32 m
 # include "mouse.h"
 # include "command.h"
 #endif
-# include "color.h"
-# include "getcolor.h"
+#include "color.h"
+#include "getcolor.h"
+#ifdef HAVE_GDIPLUS
+#include "wgdiplus.h"
+#endif
 
 #ifdef USE_MOUSE
 /* Petr Mikulik, February 2001
@@ -431,6 +434,10 @@ GraphInit(LPGW lpgw)
 		M_DOUBLEBUFFER, "&Double buffer");
 	AppendMenu(lpgw->hPopMenu, MF_STRING | (lpgw->oversample ? MF_CHECKED : MF_UNCHECKED),
 		M_OVERSAMPLE, "O&versampling");
+#ifdef HAVE_GDIPLUS
+	AppendMenu(lpgw->hPopMenu, MF_STRING | (lpgw->antialiasing ? MF_CHECKED : MF_UNCHECKED),
+		M_ANTIALIASING, "&Antialiasing");
+#endif
 	AppendMenu(lpgw->hPopMenu, MF_STRING, M_BACKGROUND, "&Background...");
 	AppendMenu(lpgw->hPopMenu, MF_STRING, M_CHOOSE_FONT, "Choose &Font...");
 	AppendMenu(lpgw->hPopMenu, MF_STRING, M_LINESTYLE, "&Line Styles...");
@@ -735,7 +742,8 @@ MakeFonts(LPGW lpgw, LPRECT lprect, HDC hdc)
 	lpgw->lf.lfOutPrecision = OUT_OUTLINE_PRECIS;
 	lpgw->lf.lfClipPrecision = CLIP_DEFAULT_PRECIS;
 	/* ClearType quality is only supported on XP or later */
-	lpgw->lf.lfQuality = IsWindowsXPorLater() ? CLEARTYPE_QUALITY : PROOF_QUALITY;
+	lpgw->lf.lfQuality = 
+		IsWindowsXPorLater() && lpgw->antialiasing ? CLEARTYPE_QUALITY : PROOF_QUALITY;
 
 	if (lpgw->hfonth == 0) {
 		lpgw->hfonth = CreateFontIndirect((LOGFONT *)&(lpgw->lf));
@@ -746,7 +754,7 @@ MakeFonts(LPGW lpgw, LPRECT lprect, HDC hdc)
 		DeleteObject(lpgw->hfontv);
 	lpgw->lf.lfEscapement = 900;
 	lpgw->lf.lfOrientation = 900;
-	lpgw->hfontv = CreateFontIndirect((LOGFONT *)&(lpgw->lf));
+	lpgw->hfontv = CreateFontIndirect(&(lpgw->lf));
 
 	/* save text size */
 	hfontold = SelectObject(hdc, lpgw->hfonth);
@@ -791,18 +799,16 @@ DestroyFonts(LPGW lpgw)
 static void
 SetFont(LPGW lpgw, HDC hdc)
 {
-    if (lpgw->rotate && lpgw->angle) {
+	SelectObject(hdc, lpgw->hfonth);
+	if (lpgw->rotate && lpgw->angle) {
 		if (lpgw->hfontv)
 			DeleteObject(lpgw->hfontv);
 		lpgw->lf.lfEscapement = lpgw->lf.lfOrientation  = lpgw->angle * 10;
-		lpgw->hfontv = CreateFontIndirect((LOGFONT *)&(lpgw->lf));
+		lpgw->hfontv = CreateFontIndirect(&(lpgw->lf));
 		if (lpgw->hfontv)
 			SelectObject(hdc, lpgw->hfontv);
-		} else {
-		if (lpgw->hfonth)
-			SelectObject(hdc, lpgw->hfonth);
-    }
-    return;
+	}
+	return;
 }
 
 
@@ -1342,8 +1348,15 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 		/* finish last polygon */
 		if ((lastop == W_vect) && (curptr->op != W_vect)) {
 			if (polyi >= 2) {
+#ifdef HAVE_GDIPLUS
+				if (!lpgw->antialiasing)
+					Polyline(hdc, ppt, polyi);
+				else
+					gdiplusPolyline(hdc, ppt, polyi, &cur_penstruct);
+#else
 				Polyline(hdc, ppt, polyi);
-				/* move internal state to last point */
+#endif
+				/* move internal GDI state to last point */
 				MoveTo(hdc, ppt[polyi-1].x, ppt[polyi-1].y);
 			} else if (polyi == 1) {
 				/* degenerate case e.g. when using 'linecolor variable' */
@@ -1465,8 +1478,7 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 			case FS_PATTERN:
 				/* style == 2 --> use fill pattern according to
 						 * fillpattern. Pattern number is enumerated */
-				pattern = fillstyle >> 4;
-				pattern = MINMAX(0, pattern, pattern_num - 1);
+				pattern = GPMAX(fillstyle >> 4, 0) % pattern_num;
 				SelectObject(hdc, pattern_brush[pattern]);
 				break;
 			case FS_DEFAULT:
@@ -1870,8 +1882,18 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 			break;
 		case W_circle: /* do open circle */
 			SelectObject(hdc, lpgw->hsolid);
-			Arc(hdc, xdash-htic, ydash-vtic, xdash+htic+1, ydash+vtic+1,
-				xdash, ydash+vtic+1, xdash, ydash+vtic+1);
+#ifdef HAVE_GDIPLUS
+			if (lpgw->antialiasing) {
+				POINT p;
+				p.x = xdash;
+				p.y = ydash;
+				gdiplusCircleEx(hdc, &p, htic, PS_SOLID, line_width, last_color);
+			} else
+#endif
+			{
+				Arc(hdc, xdash-htic, ydash-vtic, xdash+htic+1, ydash+vtic+1,
+					xdash, ydash+vtic+1, xdash, ydash+vtic+1);
+			}
 			dot(hdc, xdash, ydash);
 			SelectObject(hdc, lpgw->hapen);
 			break;
@@ -1880,6 +1902,14 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 			Ellipse(hdc, xdash-htic, ydash-vtic,
 				xdash+htic+1, ydash+vtic+1);
 			SelectObject(hdc, lpgw->hapen);
+#ifdef HAVE_GDIPLUS
+			if (lpgw->antialiasing) {
+				POINT p;
+				p.x = xdash;
+				p.y = ydash;
+				gdiplusCircleEx(hdc, &p, htic, PS_SOLID, line_width, last_color);
+			}
+#endif
 			break;
 		default:	/* potentially closed figure */
 			{
@@ -1898,7 +1928,6 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 				  -0.58779, -0.80902, -0.95106, 0.30902} /* pentagon */
 			};
 
-			SelectObject(hdc, lpgw->hsolid);
 			switch (curptr->op) {
 			case W_box:
 				shape = 0;
@@ -1944,17 +1973,42 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 				p[i].x = xdash + htic*pointshapes[shape][i*2] + 0.5;
 				p[i].y = ydash + vtic*pointshapes[shape][i*2+1] + 0.5;
 			}
-			if ( filled )
+			if (filled) {
 				/* Filled polygon */
-				Polygon(hdc, p, i);
-			else {
+#ifdef HAVE_GDIPLUS
+				if (lpgw->antialiasing) {
+					/* filled polygon without border */
+					SelectObject(hdc, lpgw->hnull);
+					Polygon(hdc, p, i);
+					SelectObject(hdc, lpgw->hapen);
+					/* antialiased border */
+					p[i].x = p[0].x;
+					p[i].y = p[0].y;
+					gdiplusPolylineEx(hdc, p, i+1, PS_SOLID, line_width, last_color);
+				} else
+#endif
+				{
+					SelectObject(hdc, lpgw->hsolid);
+					Polygon(hdc, p, i);
+					SelectObject(hdc, lpgw->hapen);
+				}
+			} else {
 				/* Outline polygon */
 				p[i].x = p[0].x;
 				p[i].y = p[0].y;
+#ifdef HAVE_GDIPLUS
+				if (!lpgw->antialiasing) {
+					SelectObject(hdc, lpgw->hsolid);
+					Polyline(hdc, p, i+1);
+					SelectObject(hdc, lpgw->hapen);
+				} else {
+					gdiplusPolylineEx(hdc, p, i+1, PS_SOLID, line_width, last_color);
+				}
+#else
 				Polyline(hdc, p, i+1);
+#endif
 				dot(hdc, xdash, ydash);
 			}
-			SelectObject(hdc, lpgw->hapen);
 			} /* default case */
 		} /* switch(opcode) */
 		lastop = curptr->op;
@@ -2240,6 +2294,8 @@ WriteGraphIni(LPGW lpgw)
 	WritePrivateProfileString(section, "GraphDoublebuffer", profile, file);
 	wsprintf(profile, "%d", lpgw->oversample);
 	WritePrivateProfileString(section, "GraphOversampling", profile, file);
+	wsprintf(profile, "%d", lpgw->antialiasing);
+	WritePrivateProfileString(section, "GraphAntialising", profile, file);
 	wsprintf(profile, "%d %d %d",GetRValue(lpgw->background),
 			GetGValue(lpgw->background), GetBValue(lpgw->background));
 	WritePrivateProfileString(section, "GraphBackground", profile, file);
@@ -2331,7 +2387,12 @@ ReadGraphIni(LPGW lpgw)
 	if (bOKINI)
 		GetPrivateProfileString(section, "GraphOversampling", "", profile, 80, file);
 	if ( (p = GetInt(profile, (LPINT)&lpgw->oversample)) == NULL)
-		lpgw->oversample = TRUE;
+		lpgw->oversample = FALSE;
+
+	if (bOKINI)
+	  GetPrivateProfileString(section, "GraphAntialiasing", "", profile, 80, file);
+		if ( (p = GetInt(profile, (LPINT)&lpgw->antialiasing)) == NULL)
+			lpgw->antialiasing = TRUE;
 
 	lpgw->background = RGB(255,255,255);
 	if (bOKINI)
@@ -2812,6 +2873,7 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 				case M_COLOR:
 				case M_DOUBLEBUFFER:
 				case M_OVERSAMPLE:
+				case M_ANTIALIASING:
 				case M_CHOOSE_FONT:
 				case M_COPY_CLIP:
 				case M_SAVE_AS_EMF:
@@ -3019,6 +3081,10 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 					lpgw->doublebuffer = !lpgw->doublebuffer;
 					SendMessage(hwnd,WM_COMMAND,M_REBUILDTOOLS,0L);
 					return(0);
+				case M_ANTIALIASING:
+					lpgw->antialiasing = !lpgw->antialiasing;
+					SendMessage(hwnd,WM_COMMAND,M_REBUILDTOOLS,0L);
+					return(0);
 				case M_CHOOSE_FONT:
 					SelFont(lpgw);
 					return 0;
@@ -3057,6 +3123,12 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 						CheckMenuItem(lpgw->hPopMenu, M_OVERSAMPLE, MF_BYCOMMAND | MF_CHECKED);
 					else
 						CheckMenuItem(lpgw->hPopMenu, M_OVERSAMPLE, MF_BYCOMMAND | MF_UNCHECKED);
+#ifdef HAVE_GDIPLUS
+					if (lpgw->antialiasing)
+						CheckMenuItem(lpgw->hPopMenu, M_ANTIALIASING, MF_BYCOMMAND | MF_CHECKED);
+					else
+						CheckMenuItem(lpgw->hPopMenu, M_ANTIALIASING, MF_BYCOMMAND | MF_UNCHECKED);
+#endif
 					if (lpgw->graphtotop)
 						CheckMenuItem(lpgw->hPopMenu, M_GRAPH_TO_TOP, MF_BYCOMMAND | MF_CHECKED);
 					else

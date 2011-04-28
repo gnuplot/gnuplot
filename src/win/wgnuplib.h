@@ -1,5 +1,5 @@
 /*
- * $Id: wgnuplib.h,v 1.42 2011/04/10 16:47:47 markisch Exp $
+ * $Id: wgnuplib.h,v 1.43 2011/04/27 10:18:28 markisch Exp $
  */
 
 /* GNUPLOT - win/wgnuplib.h */
@@ -312,6 +312,7 @@ typedef struct tagGW {
 	BOOL	dashed;		/* dashed lines? */
 	BOOL	doublebuffer;	/* double buffering? */
 	BOOL	oversample;	/* oversampling? */
+	BOOL	antialiasing;
 
 	int		htic;		/* horizontal size of point symbol (xmax units) */
 	int 	vtic;		/* vertical size of point symbol (ymax units)*/

@@ -1,5 +1,5 @@
 # Hello, emacs: this is a -*- Makefile -*-
-# $Id: Makefile,v 1.8 2011/04/17 10:05:11 markisch Exp $
+# $Id: Makefile,v 1.9 2011/04/17 22:36:34 markisch Exp $
 #
 # GNUPLOT Makefile for MinGW32 on Win95/98/NT/2k/..
 # This assumes usual installation of the MinGW32 toolkit, the free
@@ -375,14 +375,14 @@ include $(S)/makefile.all
 OBJS = $(COREOBJS) version.$(O) gpexecute.$(O) $(WX_OBJS) $(CAIRO_OBJS)
 
 WINOBJS = winmain.$(O) wgnuplib.$(O) wgraph.$(O) wprinter.$(O) wtext.$(O) \
-	  wpause.$(O) wmenu.$(O) screenbuf.$(O)
+	  wpause.$(O) wmenu.$(O) screenbuf.$(O) wgdiplus.$(O)
 
 WINDOWS = makefile.nt README.win $(W)/wcommon.h \
 	$(W)/wgnuplib.c $(W)/wgnuplib.h $(W)/wgnuplib.rc \
 	$(W)/wgnuplot.hpj $(W)/wgnuplot.mnu $(W)/wgraph.c \
 	$(W)/winmain.c $(W)/wmenu.c $(W)/wpause.c $(W)/wprinter.c \
 	$(W)/wresourc.h $(W)/wtext.c $(W)/wtext.h $(W)/geticon.c \
-	$(W)/screenbuf.c $(W)/screenbuf.h \
+	$(W)/screenbuf.c $(W)/screenbuf.h $(W)/wgdiplus.cpp $(W)/wgdiplus.h \
 	$(D)doc2rtf.c $(T)win.trm $(W)/grpicon.ico $(W)/texticon.ico
 
 ifdef HTML_HELP
@@ -396,7 +396,7 @@ endif
 .c.$(O):
 	$(CC) -c $(CFLAGS) $<
 
-LDLIBS = -lkernel32 -lgdi32 -lwinspool -lcomdlg32 -lcomctl32 -ladvapi32 -lshell32 -lmsimg32
+LDLIBS = -lkernel32 -lgdi32 -lwinspool -lcomdlg32 -lcomctl32 -ladvapi32 -lshell32 -lmsimg32 -lgdiplus
 
 ifdef HTML_HELP
   LDLIBS += -lhtmlhelp
@@ -424,7 +424,7 @@ term.$(O): term.c term.h plot.h setshow.h bitmap.h $(CORETERM)
 
 version.$(O): version.c
 
-WINDEPS = $(W)/wgnuplib.h $(W)/wcommon.h $(W)/wresourc.h $(W)/screenbuf.h
+WINDEPS = $(W)/wgnuplib.h $(W)/wcommon.h $(W)/wresourc.h $(W)/screenbuf.h $(W)/wgdiplus.h
 
 winmain.$(O): $(W)/winmain.c $(W)/wgnuplib.h $(W)/wtext.h plot.h
 	$(CC) -c $(CFLAGS) -DHELPFILE=\"$(HELPFILE)\" $<
@@ -449,6 +449,9 @@ wprinter.$(O): $(W)/wprinter.c $(WINDEPS)
 
 wgraph.$(O): $(W)/wgraph.c $(WINDEPS)
 	$(CC) -c $(CFLAGS) $<
+
+wgdiplus.$(O): $(W)/wgdiplus.cpp $(WINDEPS)
+	$(CXX) -c $(CXXFLAGS) $(W)/wgdiplus.cpp
 
 wgnuplot.mnu: $(W)/wgnuplot.mnu
 	$(CP) $^ $@

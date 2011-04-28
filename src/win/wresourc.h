@@ -1,5 +1,5 @@
 /*
- * $Id: wresourc.h,v 1.12 2011/03/18 09:41:45 markisch Exp $
+ * $Id: wresourc.h,v 1.13 2011/03/29 18:58:25 markisch Exp $
  */
 
 /* GNUPLOT - win/wresourc.h */
@@ -81,6 +81,7 @@
 #define M_SAVE_AS_EMF  NUMMENU+14
 #define M_DOUBLEBUFFER NUMMENU+15
 #define M_OVERSAMPLE   NUMMENU+16
+#define M_ANTIALIASING NUMMENU+17
 
 /* wprinter.c */
 #define PSIZE_SBOX 100
