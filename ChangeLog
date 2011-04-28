@@ -1,3 +1,9 @@
+2011-04-28  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/win/gp_cairo.c (gp_cairo_default_font): New function to determine
+	default font. Default is "Sans" on all Systems but Windows where this
+	alias does not work in all cases.
+
 2011-04-27  <wtf3@users.sourceforge.net>
 
 	* src/graphics.c:  The autotitle option for column-stacked histograms

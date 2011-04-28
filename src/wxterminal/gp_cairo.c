@@ -1,5 +1,5 @@
 /*
- * $Id: gp_cairo.c,v 1.53 2011/01/19 03:15:00 sfeam Exp $
+ * $Id: gp_cairo.c,v 1.54 2011/03/11 22:20:59 sfeam Exp $
  */
 
 /* GNUPLOT - gp_cairo.c */
@@ -121,6 +121,9 @@ static int avg_vchar = 150;
 /* set a cairo pattern or solid fill depending on parameters */
 static void gp_cairo_fill(plot_struct *plot, int fillstyle, int fillpar);
 static void gp_cairo_fill_pattern(plot_struct *plot, int fillstyle, int fillpar);
+
+/* determine default font to use */
+static const char *gp_cairo_default_font(void);
 
 /* array of colors
  * FIXME could be shared with all gnuplot terminals */
@@ -760,7 +763,7 @@ void gp_cairo_draw_text(plot_struct *plot, int x1, int y1, const char* string)
 	if (!strcmp(plot->fontname,"Symbol")) {
 		FPRINTF((stderr,"Parsing a Symbol string\n"));
 		string_utf8 = gp_cairo_convert_symbol_to_unicode(plot, string);
-		strncpy(plot->fontname, "Sans", sizeof(plot->fontname));
+		strncpy(plot->fontname, gp_cairo_default_font(), sizeof(plot->fontname));
 		symbol_font_parsed = TRUE;
 	} else
 #endif /*MAP_SYMBOL*/
@@ -1204,7 +1207,7 @@ void gp_cairo_enhanced_flush(plot_struct *plot)
 				sizeof(gp_cairo_enhanced_font));
 		} else {
 			strncpy(gp_cairo_enhanced_font,
-				"Sans", sizeof(gp_cairo_enhanced_font));
+				gp_cairo_default_font(), sizeof(gp_cairo_enhanced_font));
 		}
 		symbol_font_parsed = TRUE;
 	} else
@@ -1750,6 +1753,19 @@ const char* gp_cairo_enhanced_get_fontname(plot_struct *plot)
 		return plot->fontname;
 	else
 		return gp_cairo_enhanced_font;
+}
+
+/* BM: New function to determine the default font.
+ * On Windows, the "Sans" alias normally is equivalent to 
+ * "Tahoma" but the resolution fails on some systems. */
+static const char *
+gp_cairo_default_font(void)
+{
+#ifdef WIN32
+	return "Tahoma";
+#else
+	return "Sans";
+#endif
 }
 
 /*----------------------------------------------------------------------------
