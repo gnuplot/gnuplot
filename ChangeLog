@@ -1,3 +1,9 @@
+2011-04-29  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/mouse.c (apply_zoom):  Prevent double-free of custom font for tic
+	labels.
+	Bug #3294915
+
 2011-04-28  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	Support for (optional) antialiasing in windows terminal via GDI+.
