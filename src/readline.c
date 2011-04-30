@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: readline.c,v 1.53 2011/04/26 17:54:28 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: readline.c,v 1.54 2011/04/26 21:08:11 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - readline.c */
@@ -303,7 +303,7 @@ static size_t max_pos = 0;	/* maximum character position */
 static void fix_line __PROTO((void));
 static void redraw_line __PROTO((const char *prompt));
 static void clear_line __PROTO((const char *prompt));
-static void clear_eoline __PROTO((void));
+static void clear_eoline __PROTO((const char *prompt));
 static void delete_previous_word __PROTO((void));
 static void copy_line __PROTO((char *line));
 static void set_termio __PROTO((void));
@@ -625,7 +625,7 @@ readline(const char *prompt)
 		}
 		break;
 	    case 013:		/* ^K */
-		clear_eoline();
+		clear_eoline(prompt);
 		max_pos = cur_pos;
 		break;
 	    case 020:		/* ^P */
@@ -781,14 +781,23 @@ clear_line(const char *prompt)
 
 /* clear to end of line and the screen end of line */
 static void
-clear_eoline()
+clear_eoline(const char *prompt)
 {
-    size_t i = max_pos;
+    size_t save_pos = cur_pos;
 
-    while (cur_pos < max_pos)
-	delete_forward();
-    while (i > cur_pos)
-	cur_line[i--] = '\0';
+    while (cur_pos < max_pos) {
+	user_putc(SPACE);
+	if (isdoublewidth(cur_line[cur_pos]))
+	    user_putc(SPACE);
+	cur_pos += char_seqlen();
+    }
+    cur_pos = save_pos;
+    while (max_pos > cur_pos)
+	cur_line[--max_pos] = '\0';
+
+    putc('\r', stderr);
+    fputs(prompt, stderr);
+    user_puts(cur_line);
 }
 
 /* delete the full or partial word immediately before cursor position */
