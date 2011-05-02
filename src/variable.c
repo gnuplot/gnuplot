@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: variable.c,v 1.39 2010/02/18 00:18:28 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: variable.c,v 1.40 2010/03/14 18:01:46 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - variable.c */
@@ -563,6 +563,7 @@ locale_handler(int action, char *newlocale)
 	free(current_locale);
 #ifdef HAVE_LOCALE_H
 	setlocale(LC_TIME, "");
+	setlocale(LC_CTYPE, "");
 	current_locale = gp_strdup(setlocale(LC_TIME,NULL));
 #else
 	current_locale = gp_strdup(INITIAL_LOCALE);

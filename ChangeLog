@@ -1,3 +1,10 @@
+2011-05-02  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/variable.c (locale_handler): If built-in readline character input
+	is to recognize UTF-8 characters via wcwidth(), it is necessary to 
+	initialize the CTYPE locale on entry. "set encoding utf" is not
+	sufficient.
+
 2011-05-02  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/readline.c (tab_completion, fn_completion, readline) NEWS:
