@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: readline.c,v 1.54 2011/04/26 21:08:11 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: readline.c,v 1.55 2011/04/30 17:26:30 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - readline.c */
@@ -58,15 +58,9 @@ static char *RCSid() { return RCSid("$Id: readline.c,v 1.54 2011/04/26 21:08:11 
 #include "plot.h"
 #include "util.h"
 #include "term_api.h"
-
-/* EAM FIXME
- * This test is intended to determine if the current character, of which
- * we have only seen the first byte so far, will require twice the width
- * of an ascii character.  The test catches glyphs above unicode 0x3000, 
- * which is roughly the set of CJK characters.
- * It should be replaced with a more accurate test.
- */
-#define isdoublewidth(c) ((unsigned char)(c) >= 0xe3)
+#ifdef HAVE_WCHAR_H
+#include <wchar.h>
+#endif
 
 #if defined(HAVE_LIBREADLINE) || defined(HAVE_LIBEDITLINE)
 #if defined(HAVE_LIBEDITLINE)
@@ -292,8 +286,9 @@ static char os2_getch __PROTO((void));
 #define MAXBUF	1024
 #define BACKSPACE 0x08   /* ^H */
 #define SPACE	' '
+#define NEWLINE	'\n'
 
-# define NEWLINE	'\n'
+#define MAX_COMPLETIONS 50
 
 static char *cur_line;		/* current contents of the line */
 static size_t line_len = 0;
@@ -359,6 +354,43 @@ user_puts(char *str)
     return rv;
 }
 
+
+/* EAM FIXME
+ * This test is intended to determine if the current character, of which
+ * we have only seen the first byte so far, will require twice the width
+ * of an ascii character.  The test catches glyphs above unicode 0x3000, 
+ * which is roughly the set of CJK characters.
+ * It should be replaced with a more accurate test.
+ */
+static int
+mbwidth(char *c) 
+{
+    switch (encoding) {
+
+    case S_ENC_UTF8: {
+#if defined(HAVE_WCHAR_H) && defined(HAVE_WCWIDTH)
+	wchar_t wc;
+	if (mbtowc(&wc, c, MB_CUR_MAX) < 0)
+	    return 1;
+	else 
+	    return wcwidth(wc);
+#else
+	return ((unsigned char)(*c) >= 0xe3 ? 2 : 1);
+#endif
+    }
+    default:
+        return 1;
+    }
+}
+
+
+int
+isdoublewidth(size_t pos)
+{
+    return mbwidth(cur_line + pos) > 1;
+}
+
+
 /*
  * Determine length of multi-byte sequence starting at current position
  */
@@ -403,7 +435,7 @@ backspace()
 	if ((cur_line[cur_pos] & 0xc0) == 0xc0
 	||  isprint(cur_line[cur_pos]))
 	    user_putc(BACKSPACE);
-	if (isdoublewidth(cur_line[cur_pos]))
+	if (isdoublewidth(cur_pos))
 	    user_putc(BACKSPACE);
 	return seqlen;
 
@@ -487,6 +519,189 @@ extend_cur_line()
     line_len += MAXBUF;
     FPRINTF((stderr, "\nextending readline length to %d chars\n", line_len));
 }
+
+
+#if defined(HAVE_DIRENT_H) || defined(WIN32)
+char * fn_completion(size_t anchor_pos, int direction)
+{
+    static char * completions[MAX_COMPLETIONS];
+    static int n_completions = 0;
+    static int completion_idx = 0;
+
+    if (direction == 0) {
+	/* new completion */
+	DIR * dir;
+	char * start, * path;
+	char * t, * search;
+	char * name = NULL;
+	size_t nlen;
+
+	if (n_completions != 0) {
+	    /* new completion, cleanup first */
+	    int i;
+	    for (i = 0; i < n_completions; i++)
+		free(completions[i]);
+	    memset(completions, 0, sizeof(completions));
+	    n_completions = 0;
+	    completion_idx = 0;
+	}
+	
+	/* extract path to complete */
+	start = cur_line + anchor_pos;
+	if (anchor_pos > 0) {
+	    /* first, look for a quote to start the string */
+	    for ( ; start > cur_line; start--) {
+	        if ((*start == '"') || (*start == '\'')) {
+		    start++;
+		    break;
+		}
+	    }
+	    /* if not found, search for a space instead */
+	    if (start == cur_line) {
+		for (start = cur_line + anchor_pos ; start > cur_line; start--) {
+		    if ((*start == ' ') || (*start == '!')) {
+			start++;
+			break;
+		    }
+		}
+	    }
+
+	    path = strndup(start, cur_line - start + anchor_pos);
+	    gp_expand_tilde(&path);
+	} else {
+	    path = gp_strdup("");
+	}
+
+	/* seperate directory and (partial) file directory name */
+	t = strrchr(path, DIRSEP1);
+#if DIRSEP2 != NUL
+	if (t == NULL) t = strrchr(path, DIRSEP2);
+#endif
+	if (t == NULL) {
+	    /* name... */
+	    search = gp_strdup(".");
+	    name = strdup(path);
+	} else if (t == path) {
+	    /* root dir: /name... */
+	    search = strndup(path, 1);
+	    nlen = cur_pos - (t - path) - 1;
+	    name = strndup(t + 1, nlen);
+	} else {
+	    /* normal case: dir/dir/name... */
+	    search = strndup(path, t - path);
+	    nlen = cur_pos - (t - path) - 1;
+	    name = strndup(t + 1, nlen);
+	}
+	nlen = strlen(name);
+	free(path);
+
+	n_completions = 0;
+	if ((dir = opendir(search))) {
+	    struct dirent * entry;
+	    while ((entry = readdir(dir)) != NULL) {
+		/* ignore files and directories starting with a dot */
+		if (entry->d_name[0] == '.') continue; 
+
+		/* skip entries which don't match */
+		if (nlen > 0)
+		    if (strncmp(entry->d_name, name, nlen) != 0) continue;
+
+		completions[n_completions] = gp_strdup(entry->d_name + nlen);
+		n_completions++;
+
+		/* limit number of completions */
+		if (n_completions == MAX_COMPLETIONS) break;
+	    }
+	    closedir(dir);
+	    free(search);
+	    if (name) free(name);
+            if (n_completions > 0)
+	        return completions[0];
+            else 
+                return NULL;
+	}
+	free(search);
+	if (name) free(name);
+    } else {
+	/* cycle trough previous results */
+	if (n_completions > 0) {
+	    if (direction > 0)
+		completion_idx = (completion_idx + 1) % n_completions;
+	    else
+		completion_idx = (completion_idx + n_completions - 1) % n_completions;
+	    return completions[completion_idx];
+	} else
+	    return NULL;
+    }
+    return NULL;
+}
+
+
+static void
+tab_completion(TBOOLEAN forward)
+{
+    size_t i;
+    char * completion;
+    size_t completion_len;
+    static size_t last_tab_pos = -1;
+    static size_t last_completion_len = 0;
+    int direction;
+
+    /* detect tab cycling */
+    if ((last_tab_pos + last_completion_len) != cur_pos) {
+	last_completion_len = 0;
+	last_tab_pos = cur_pos;
+	direction = 0; /* new completion */
+    } else {
+	direction = (forward ? 1 : -1);
+    }
+
+    /* find completion */
+    completion = fn_completion(last_tab_pos, direction);
+    if (!completion) return;
+
+    /* make room for new completion */
+    completion_len = strlen(completion);
+    if (completion_len > last_completion_len)
+	while (max_pos + completion_len - last_completion_len + 1 > line_len)
+	    extend_cur_line();
+
+    /* erase from last_tab_pos to eol */
+    while (cur_pos > last_tab_pos)
+	backspace();
+    while (cur_pos < max_pos) {
+	user_putc(SPACE);
+	if (isdoublewidth(cur_pos))
+	    user_putc(SPACE);
+	cur_pos += char_seqlen();
+    }
+
+    /* rewind to last_tab_pos */
+    while (cur_pos > last_tab_pos)
+	backspace();
+
+    /* insert completion string */
+    if (max_pos > (last_tab_pos - last_completion_len))
+	memmove(cur_line + last_tab_pos + completion_len, 
+		cur_line + last_tab_pos + last_completion_len, 
+		max_pos  - last_tab_pos - last_completion_len);
+    memcpy(cur_line + last_tab_pos, completion, completion_len);
+    max_pos += completion_len - last_completion_len;
+    cur_line[max_pos] = NUL;
+
+    /* draw new completion */
+    for (i = 0; i < completion_len; i++)
+	user_putc(cur_line[last_tab_pos+i]);
+    cur_pos += completion_len;
+    fix_line();
+
+    /* remember this completion */
+    last_tab_pos  = cur_pos - completion_len;
+    last_completion_len = completion_len;
+}
+
+#endif /* HAVE_DIRENT_H || WIN32 */
+
 
 char *
 readline(const char *prompt)
@@ -624,6 +839,11 @@ readline(const char *prompt)
 		    step_forward();
 		}
 		break;
+#if defined(HAVE_DIRENT_H) || defined(WIN32)
+	    case 011:		/* ^I / TAB */
+		tab_completion(TRUE); /* next tab completion */
+		break;
+#endif
 	    case 013:		/* ^K */
 		clear_eoline(prompt);
 		max_pos = cur_pos;
@@ -767,7 +987,7 @@ clear_line(const char *prompt)
 
     while (cur_pos < max_pos) {
 	user_putc(SPACE);
-	if (isdoublewidth(cur_line[cur_pos]))
+	if (isdoublewidth(cur_pos))
 	    user_putc(SPACE);
 	cur_pos += char_seqlen();
     }
@@ -816,14 +1036,27 @@ delete_previous_word()
 	backspace();
     }
     if (cur_pos != save_pos) {
+	size_t new_cur_pos = cur_pos;
 	size_t m = max_pos - save_pos;
+
+	/* erase to eol */
+	while (cur_pos < max_pos) {
+	    user_putc(SPACE);
+	    if (isdoublewidth(cur_pos))
+		user_putc(SPACE);
+	    cur_pos += char_seqlen();
+	}
+	while (cur_pos > new_cur_pos)
+	    backspace();
+
 	/* overwrite previous word with trailing characters */
 	memmove(cur_line + cur_pos, cur_line + save_pos, m);
-	/* overwrite characters at end of string with spaces */
-	memset(cur_line + cur_pos + m, SPACE, save_pos - cur_pos);
+	/* overwrite characters at end of string with NULs */
+	memset(cur_line + cur_pos + m, NUL, save_pos - cur_pos);
+
 	/* update display and line length */
-	fix_line();
 	max_pos = cur_pos + m;
+	fix_line();
     }
 }
 
