@@ -1,3 +1,22 @@
+2011-05-02  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/readline.c (tab_completion, fn_completion, readline) NEWS:
+	Cycling	variant of filename tab-completion for builtin readline.
+	
+	* src/stdfn.c|h (strnlen, strndup) configure.in config/config.nt
+	config/config.mgw config/config.oww: Support functions used by
+	tab-completion code.
+	
+	* src/stdfn.c|h (opendir, closedir, rewinddir): Add Kevlin Henney's
+	POSIX directory browsing functions and types for Win32.
+
+	* src/readline.c (mbwidth, isdoublewidth) configure.in: Determine
+	on screen width of utf8 encoded characters with wcwidth() if
+	provided by the system.
+	
+	* src/readline.c (delete_previous_word): Overprint with exact
+	number of spaces, add NUL at eol.
+
 2011-04-30  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/readline.c (clear_eoline): More efficient clear line algorithm.
