@@ -1,5 +1,5 @@
 /*
- * $Id: stdfn.h,v 1.36 2011/01/03 14:30:31 juhaszp Exp $
+ * $Id: stdfn.h,v 1.37 2011/04/16 11:15:55 markisch Exp $
  */
 
 /* GNUPLOT - stdfn.h */
@@ -44,10 +44,10 @@
 #ifndef STDFN_H
 #define STDFN_H
 
+#include "syscfg.h"
+
 #include <ctype.h>
 #include <stdio.h>
-
-#include "syscfg.h"
 
 #ifdef HAVE_STRING_H
 # include <string.h>
@@ -324,6 +324,14 @@ int gp_strnicmp __PROTO((const char *, const char *, size_t));
 # endif
 #endif
 
+#ifndef HAVE_STRNDUP
+char *strndup __PROTO((const char * str, size_t n));
+#endif
+
+#ifndef HAVE_STRNLEN
+size_t strnlen __PROTO((const char *str, size_t n));
+#endif
+
 #ifndef GP_GETCWD
 # if defined(HAVE_GETCWD)
 #   if defined(__EMX__)
@@ -369,6 +377,45 @@ int gp_strnicmp __PROTO((const char *, const char *, size_t));
 #else
 # define GP_ATEXIT(x) /* you lose */
 #endif
+
+#if !defined(HAVE_DIRENT_H) && defined(WIN32) && (!defined(__WATCOMC__))
+/*
+
+    Declaration of POSIX directory browsing functions and types for Win32.
+
+    Author:  Kevlin Henney (kevlin@acm.org, kevlin@curbralan.com)
+    History: Created March 1997. Updated June 2003.
+*/
+/*
+
+    Copyright Kevlin Henney, 1997, 2003. All rights reserved.
+
+    Permission to use, copy, modify, and distribute this software and its
+    documentation for any purpose is hereby granted without fee, provided
+    that this copyright and permissions notice appear in all copies and
+    derivatives.
+    
+    This software is supplied "as is" without express or implied warranty.
+
+    But that said, if there are any problems please get in touch.
+
+*/
+typedef struct DIR DIR;
+
+struct dirent
+{
+    char *d_name;
+};
+
+DIR           *opendir __PROTO((const char *));
+int           closedir __PROTO((DIR *));
+struct dirent *readdir __PROTO((DIR *));
+void          rewinddir __PROTO((DIR *));
+#elif defined(HAVE_DIRENT_H)
+# include <sys/types.h>
+# include <dirent.h>
+#endif /* !HAVE_DIRENT_H && WIN32 */
+
 
 /* Misc. defines */
 

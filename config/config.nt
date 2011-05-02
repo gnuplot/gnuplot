@@ -308,8 +308,14 @@
 /* Define to 1 if you have the `strncasecmp' function. */
 /* #undef HAVE_STRNCASECMP */
 
+/* Define to 1 if you have the `strndup' function. */
+/* #undef HAVE_STRNDUP */
+
 /* Define to 1 if you have the `strnicmp' function. */
 #define HAVE_STRNICMP 1
+
+/* Define to 1 if you have the `strnlen' function. */
+#define HAVE_STRNLEN 1
 
 /* Define to 1 if you have the `strrchr' function. */
 #define HAVE_STRRCHR 1
