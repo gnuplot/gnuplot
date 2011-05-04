@@ -4,6 +4,13 @@
 	determination of default font name and size. Fixes bug addressed
 	by change of 2010-02-22, but without the need for do_string_replot()
 
+	* src/win/wgraph.c (drawgraph): New variable fill_color to track
+	color of fills. Use cached color brush for transparent solid fills
+	instead of creating a new one.
+
+	* src/win/wgraph.c (drawgraph) src/win/wgdiplus.c|h: Add support for
+	antialiased solid filled (transparent) polygons.
+
 2011-05-04  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* config/mingw/Makefile: Build support for lua tikz related TeX files.

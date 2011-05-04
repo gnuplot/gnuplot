@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.113 2011/04/28 13:44:04 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.114 2011/05/05 19:01:04 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - win/wgraph.c */
@@ -1662,11 +1662,25 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 		case W_filled_polygon_draw:	{
 			/* end of point series --> draw polygon now */
 			if (!transparent) {
-				/* fill area without border */
-				SelectObject(hdc, lpgw->hnull);
-				Polygon(hdc, ppt, polyi);
-				SelectObject(hdc, lpgw->hapen); /* restore previous pen */
+#ifdef HAVE_GDIPLUS
+				if (lpgw->antialiasing && ((fillstyle & 0x0f) == FS_SOLID)) {
+					/* solid, antialiased fill */
+					gdiplusSolidFilledPolygonEx(hdc, ppt, polyi, fill_color, 1.0);
+				} else
+#endif
+				{
+					/* fill area without border */
+					SelectObject(hdc, lpgw->hnull);
+					Polygon(hdc, ppt, polyi);
+					SelectObject(hdc, lpgw->hapen); /* restore previous pen */
+				}
 			} else {
+#ifdef HAVE_GDIPLUS
+				if (lpgw->antialiasing && (fillstyle & 0x0f) == FS_TRANSPARENT_SOLID) {
+					gdiplusSolidFilledPolygonEx(hdc, ppt, polyi, fill_color, alpha);
+				} else
+#endif
+				{
 				/* BM: To support transparent fill on Windows we draw the
 				   polygon into a memory bitmap using a memory device context.
 
@@ -1973,14 +1987,8 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 				/* Filled polygon */
 #ifdef HAVE_GDIPLUS
 				if (lpgw->antialiasing) {
-					/* filled polygon without border */
-					SelectObject(hdc, lpgw->hnull);
-					Polygon(hdc, p, i);
-					SelectObject(hdc, lpgw->hapen);
-					/* antialiased border */
-					p[i].x = p[0].x;
-					p[i].y = p[0].y;
-					gdiplusPolylineEx(hdc, p, i+1, PS_SOLID, line_width, last_color);
+					/* filled polygon with border */
+					gdiplusSolidFilledPolygonEx(hdc, p, i, last_color, 1.0);
 				} else
 #endif
 				{

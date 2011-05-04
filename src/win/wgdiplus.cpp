@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: wgdiplus.cpp,v 1.1 2011/04/28 13:44:04 markisch Exp $
  */
 
 /*
@@ -93,6 +93,28 @@ void gdiplusPolylineEx(HDC hdc, POINT *ppt, int polyi, UINT style, float width, 
 	}
 	graphics.DrawLines(pen, points, polyi);
 	delete(pen);
+	delete(points);
+}
+
+
+void gdiplusSolidFilledPolygonEx(HDC hdc, POINT *ppt, int polyi, COLORREF color, double alpha)
+{
+	gdiplusInit();
+	Graphics graphics(hdc);
+	graphics.SetSmoothingMode(SmoothingModeAntiAlias);
+
+	ARGB argb = Color::MakeARGB(
+		BYTE(255 * alpha),
+		GetRValue(color), GetGValue(color), GetBValue(color));
+	Color gdipColor(argb);
+	SolidBrush brush(gdipColor);
+	Point * points = new Point[polyi];
+	for (int i = 0; i < polyi; i++) {
+		points[i].X = ppt[i].x;
+		points[i].Y = ppt[i].y;
+	}
+	graphics.FillPolygon(&brush, points, polyi);
+	delete(points);
 }
 
 
@@ -106,3 +128,4 @@ void gdiplusCircleEx(HDC hdc, POINT * p, int radius, UINT style, float width, CO
 	graphics.DrawEllipse(pen, p->x - radius, p->y - radius, 2*radius, 2*radius);
 	delete(pen);
 }
+

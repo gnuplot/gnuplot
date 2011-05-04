@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: wgdiplus.h,v 1.1 2011/04/28 13:44:04 markisch Exp $
  */
 
 /*
@@ -37,6 +37,8 @@ extern void gdiplusCleanup(void);
 
 extern void gdiplusPolyline(HDC hdc, POINT *ppt, int polyi, const PLOGPEN logpen);
 extern void gdiplusPolylineEx(HDC hdc, POINT *ppt, int polyi, UINT style, float width, COLORREF color);
+
+extern void gdiplusSolidFilledPolygonEx(HDC hdc, POINT *ppt, int polyi, COLORREF color, double alpha);
 
 extern void gdiplusCircleEx(HDC hdc, POINT *p, int radius, UINT style, float width, COLORREF color);
 
