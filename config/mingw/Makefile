@@ -1,5 +1,5 @@
 # Hello, emacs: this is a -*- Makefile -*-
-# $Id: Makefile,v 1.9 2011/04/17 22:36:34 markisch Exp $
+# $Id: Makefile,v 1.10 2011/04/28 13:44:04 markisch Exp $
 #
 # GNUPLOT Makefile for MinGW32 on Win95/98/NT/2k/..
 # This assumes usual installation of the MinGW32 toolkit, the free
@@ -98,7 +98,7 @@ MOUSE=1
 #CAIROLIBS=1
 
 # Uncomment the following line to select the lua/tikz terminal
-#LUA=1
+#LUA=lua5.1
 
 # Below you can adapt paths according to your software setup:
 
@@ -129,7 +129,7 @@ DESTDIR = /local/opt/gnuplot-4.5
 # Do you want some special optimization?
 # -mpentium means optimise for Pentium processor
 # -mpentiumpro means optimize for Pentium II and Pro procesors
-#CFLAGS =
+#CFLAGS +=
 
 ifdef HTML_HELP
 
@@ -345,8 +345,9 @@ endif
 
 ifdef LUA
 	CFLAGS += -DHAVE_LUA
-	TERMLIBS += -llua
+	TERMLIBS += -l$(LUA)
 	TERMFLAGS += -DGNUPLOT_LUA_DIR=\"$(GNUPLOT_LUA_DIR)\"
+	LUATARGETS += gnuplot-lua-tikz.sty
 endif
 
 ifdef GNU_RC
@@ -364,7 +365,7 @@ else
   RES2COFF = res2coff -i wgnuplot.res -o wgplt_res.$(O)
 endif
 
-default: $(TARGET) $(HELPFILE) $(MENUFILE) $(M)bf_test.exe $(PGNUPLOT)
+default: $(TARGET) $(HELPFILE) $(MENUFILE) $(M)bf_test.exe $(PGNUPLOT) $(LUATARGETS)
 
 all:	default gnuplot.ps gnuplot.pdf
 
@@ -422,7 +423,10 @@ show.$(O): show.c plot.h setshow.h
 term.$(O): term.c term.h plot.h setshow.h bitmap.h $(CORETERM)
 	$(CC) -c $(CFLAGS) $(TERMFLAGS) $<
 
-version.$(O): version.c
+version.$(O): $(S)/version.c
+
+$(S)/version.c: $(TOP)/VERSION $(TOP)/PATCHLEVEL $(TOP)/ChangeLog $(S)/Makefile.maint
+	$(MAKE) -C $(S) -f Makefile.maint version.c
 
 WINDEPS = $(W)/wgnuplib.h $(W)/wcommon.h $(W)/wresourc.h $(W)/screenbuf.h $(W)/wgdiplus.h
 
@@ -515,6 +519,13 @@ config.h: $(TOP)/config/config.mgw
 	cp -p $< $@
 
 
+# generate LUA TeX support files
+ifdef LUA
+gnuplot-lua-tikz.sty: $(T)/lua/gnuplot-tikz.lua
+	$(LUA) $(T)/lua/gnuplot-tikz.lua style
+endif
+
+
 # Create documentation in various formats
 #
 ALL_TERMINALS_DOC=1
@@ -583,24 +594,38 @@ veryclean: clean
 	$(RM) wgnuplot.exe wgnuplot_pipes.exe gnuplot.exe pgnuplot.exe
 	$(RM) $(HELPFILE) wgnuplot.chw wgnuplot.gid wgnuplot.mnu
 	$(RM) $(M)binary[123] $(M)fit.log $(M)soundfit.par
+	-$(RM) gnuplot-lua-tikz.sty gnuplot-lua-tikz.tex
+	-$(RM) gnuplot-lua-tikz-common.tex t-gnuplot-lua-tikz.tex
 
 # now move the whole stuff to its destination
 install: default
 	mkdir -p $(DESTDIR)
-	cp gnuplot.exe $(DESTDIR)/gnuplot.exe
-	cp wgnuplot.exe $(DESTDIR)/wgnuplot.exe
-	cp wgnuplot_pipes.exe $(DESTDIR)/wgnuplot_pipes.exe
-	cp pgnuplot.exe $(DESTDIR)/pgnuplot.exe
-	cp $(W)/wgnuplot.mnu $(DESTDIR)/wgnuplot.mnu
-ifdef HTML_HELP
-	cp $(D)windows/wgnuplot.chm $(DESTDIR)/wgnuplot.chm
-else
-	cp wgnuplot.hlp $(DESTDIR)/wgnuplot.hlp
-endif
+# binaries go to /bin
+	mkdir -p $(DESTDIR)/bin
+	cp -p gnuplot.exe $(DESTDIR)/bin/
+	cp -p wgnuplot.exe $(DESTDIR)/bin/
+	-cp -p wgnuplot_pipes.exe $(DESTDIR)/bin/
+	cp -p pgnuplot.exe $(DESTDIR)/bin/
+	cp -p $(W)/wgnuplot.mnu $(DESTDIR)/bin/
+	cp -p $(HELPFILE) $(DESTDIR)/bin/
+# terminal support files
 	mkdir -p $(DESTDIR)/$(GNUPLOT_PS_DIR)
-	cp ../term/PostScript/*.ps $(DESTDIR)/$(GNUPLOT_PS_DIR)
+	cp -p $(TOP)/term/PostScript/*.ps $(DESTDIR)/$(GNUPLOT_PS_DIR)/
 	mkdir -p $(DESTDIR)/$(GNUPLOT_JS_DIR)
-	cp ../term/js/* $(DESTDIR)/$(GNUPLOT_JS_DIR)
+	cp -p $(TOP)/term/js/*.* $(DESTDIR)/$(GNUPLOT_JS_DIR)/
+	cp -p $(TOP)/term/js/README $(DESTDIR)/$(GNUPLOT_JS_DIR)/
+	mkdir -p $(DESTDIR)/share/LaTeX
+	cp -p $(TOP)/share/LaTeX/README $(DESTDIR)/share/LaTeX/
+	cp -p $(TOP)/share/LaTeX/gnuplot.cfg $(DESTDIR)/share/LaTeX/
+ifdef LUA
 	mkdir -p $(DESTDIR)/$(GNUPLOT_LUA_DIR)
-	cp ../term/lua/* $(DESTDIR)/$(GNUPLOT_LUA_DIR)
-
+	(cd $(TOP)/term/lua/; cp -p README NEWS TODO gnuplot-tikz.lua $(DESTDIR)/$(GNUPLOT_LUA_DIR)/)
+	cp -p *.tex *.sty $(DESTDIR)/share/LaTeX/
+endif
+# README etc
+	(cd $(TOP); cp -p BUGS Copyright README NEWS ChangeLog $(DESTDIR)/)
+# demo and contrib
+	mkdir -p $(DESTDIR)/demo
+	-cp -p $(TOP)/demo/* $(DESTDIR)/demo/
+	mkdir -p $(DESTDIR)/contrib/pm3d/
+	-cp -p $(TOP)/pm3d/contrib/* $(DESTDIR)/contrib/pm3d/

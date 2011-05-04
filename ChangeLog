@@ -1,3 +1,10 @@
+2011-05-04  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* config/mingw/Makefile: Build support for lua tikz related TeX files.
+	Use Makefile.maint to update version.c. Update install target to match
+	directory layout of distribution and include share/lua/, share/LaTeX/, 
+	contrib/, demo/, README, NEWS, Copyright and ChangeLog.
+
 2011-05-02  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/variable.c (locale_handler): If built-in readline character input
@@ -8,19 +15,19 @@
 2011-05-02  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/readline.c (tab_completion, fn_completion, readline) NEWS:
-	Cycling	variant of filename tab-completion for builtin readline.
-	
+	Cycling variant of filename tab-completion for builtin readline.
+
 	* src/stdfn.c|h (strnlen, strndup) configure.in config/config.nt
 	config/config.mgw config/config.oww: Support functions used by
 	tab-completion code.
-	
+
 	* src/stdfn.c|h (opendir, closedir, rewinddir): Add Kevlin Henney's
 	POSIX directory browsing functions and types for Win32.
 
 	* src/readline.c (mbwidth, isdoublewidth) configure.in: Determine
 	on screen width of utf8 encoded characters with wcwidth() if
 	provided by the system.
-	
+
 	* src/readline.c (delete_previous_word): Overprint with exact
 	number of spaces, add NUL at eol.
 
@@ -49,13 +56,13 @@
 	shapes. Add option to LPGW, wgnuplot.ini and popup menu to toggle
 	antialiasing on and off. Default to oversampling off now that we have
 	proper antialiasing. Wrap all GDI+ code in #ifdef HAVE_GDIPLUS.
-	
+
 	* src/win/wgraph.c (drawgraph) [W_fillstyle, FS_PATTERN]: Fix cycling
 	of pattern styles.
 
 	* src/wxterminal/gp_cairo.c|h (gp_cairo_default_font)
-	src/wxterminal/wxt_gui.c: New function to determine	default font.
-	Default is "Sans" on all systems but Windows where this	alias might
+	src/wxterminal/wxt_gui.c: New function to determine default font.
+	Default is "Sans" on all systems but Windows where this alias might
 	not work work in all cases.
 
 2011-04-27  <wtf3@users.sourceforge.net>
@@ -76,11 +83,11 @@
 	terminal. Fixes several bugs and implements new options.
 
 	* term/win.trm (WIN_id, WIN_opts, WIN_options): Add options "solid",
-	"dashed", "background", "fontscale"	and "linewidth". Call new function
+	"dashed", "background", "fontscale" and "linewidth". Call new function
 	GraphInitStruct to initialize graphwin. Inlcude font in term_options.
 	* term/win.trm (WIN_point, WIN_filled_polygon): Handle dashed lines
 	in drawgraph, not here. (WIN_filled_polygon): Use generalized
-	W_fillstyle	call, shared with WIN_boxfill. (WIN_boxfill): Pass second
+	W_fillstyle call, shared with WIN_boxfill. (WIN_boxfill): Pass second
 	corner as parameter, not width and height. Fixes spurious rounding
 	errors during translation to graph coordinates. (help text): Document
 	new options.
