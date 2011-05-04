@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: wpause.c,v 1.18 2011/03/13 19:55:29 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: wpause.c,v 1.19 2011/03/20 18:47:47 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - win/wpause.c */
@@ -151,7 +151,7 @@ PauseBox(LPPW lppw)
 		lppw->Origin.y = (rect.bottom + rect.top) / 2;
 
 	hdc = GetDC(NULL);
-	SelectObject(hdc, GetStockObject(SYSTEM_FIXED_FONT));
+	SelectObject(hdc, GetStockObject(SYSTEM_FONT));
 	GetTextMetrics(hdc, &tm);
 	width  = max(24,4+_fstrlen(lppw->Message)) * tm.tmAveCharWidth;
 	width = min(width, rect.right-rect.left);
@@ -159,13 +159,7 @@ PauseBox(LPPW lppw)
 	ReleaseDC(NULL,hdc);
 
 	lppw->hWndPause = CreateWindowEx(
-        WS_EX_DLGMODALFRAME | WS_EX_TOPMOST
-#ifdef WS_EX_APPWINDOW
-        /* HBB 20001217: put the pause window into the taskbar, and make
-         * float on top of everything. This is cleaner than adding a window
-         * menu to it, as the 3.5 code did it: */
-        | WS_EX_APPWINDOW
-#endif
+        WS_EX_DLGMODALFRAME | WS_EX_TOPMOST | WS_EX_APPWINDOW
         , szPauseClass, current_pause_title,
 /* HBB 981202: WS_POPUPWINDOW would have WS_SYSMENU in it, but we don't
  * want, nor need, a System menu in our Pause windows. Actually, it was
@@ -246,7 +240,7 @@ WndPauseProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		case WM_PAINT:
 			{
 			hdc = BeginPaint(hwnd, &ps);
-			SelectObject(hdc, GetStockObject(SYSTEM_FIXED_FONT));
+			SelectObject(hdc, GetStockObject(SYSTEM_FONT));
 			SetTextAlign(hdc, TA_CENTER);
 			GetClientRect(hwnd, &rect);
 			SetBkMode(hdc,TRANSPARENT);
@@ -265,7 +259,7 @@ WndPauseProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			SetWindowLong(hwnd, 0, (LONG)lppw);
 			lppw->hWndPause = hwnd;
 			hdc = GetDC(hwnd);
-			SelectObject(hdc, GetStockObject(SYSTEM_FIXED_FONT));
+			SelectObject(hdc, GetStockObject(SYSTEM_FONT));
 			GetTextMetrics(hdc, &tm);
 			cxChar = tm.tmAveCharWidth;
 			cyChar = tm.tmHeight + tm.tmExternalLeading;

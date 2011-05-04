@@ -11,6 +11,9 @@
 	* src/win/wgraph.c (drawgraph) src/win/wgdiplus.c|h: Add support for
 	antialiased solid filled (transparent) polygons.
 
+	* src/win/wpause.c (WndPauseProc): Use default dialog font instead of
+	fixed width font for pause dialog.
+
 2011-05-04  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* config/mingw/Makefile: Build support for lua tikz related TeX files.
