@@ -1,5 +1,11 @@
 2011-05-04  Bastian Maerkisch  <bmaerkisch@web.de>
 
+	* term/win.trm (WIN_set_font) src/win/wgraph.c (drawgraph): Defer
+	determination of default font name and size. Fixes bug addressed
+	by change of 2010-02-22, but without the need for do_string_replot()
+
+2011-05-04  Bastian Maerkisch  <bmaerkisch@web.de>
+
 	* config/mingw/Makefile: Build support for lua tikz related TeX files.
 	Use Makefile.maint to update version.c. Update install target to match
 	directory layout of distribution and include share/lua/, share/LaTeX/, 

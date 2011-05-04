@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.112 2011/04/27 10:18:28 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.113 2011/04/28 13:44:04 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - win/wgraph.c */
@@ -854,8 +854,6 @@ SelFont(LPGW lpgw)
 		strcpy(lpgw->deffontname,lpgw->fontname);
 		lpgw->deffontsize = lpgw->fontsize;
 		SendMessage(lpgw->hWndGraph,WM_COMMAND,M_REBUILDTOOLS,0L);
-		/* DBT 2010-02-22 replot to force immediate font change, volatile data OK */
-		do_string_replot("");
 	}
 }
 
@@ -1279,6 +1277,7 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 	BOOL transparent = FALSE;	/* transparent fill? */
 	double alpha = 0.;			/* alpha for transarency */
 	int pattern = 0;			/* patter number */
+	COLORREF fill_color = 0;	/* color to use for fills */
 
 	/* images */
 	int seq = 0;				/* sequence counter for W_image ops */
@@ -1422,6 +1421,7 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 
 			/* remember this color */
 			last_color = cur_penstruct.lopnColor;
+			fill_color = last_color;
 			break;
 		}
 
@@ -1469,6 +1469,7 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 					    255 - density * (255 - GetGValue(last_color)),
 					    255 - density * (255 - GetBValue(last_color)));
 				draw_new_brush(lpgw, hdc, color);
+				fill_color = color;
 				break;
 			}
 			case FS_TRANSPARENT_PATTERN:
@@ -1482,12 +1483,13 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 				SelectObject(hdc, pattern_brush[pattern]);
 				break;
 			case FS_DEFAULT:
-				/* Leave the current brush in place */
+				/* Leave the current brush and color in place */
 				break;
 			case FS_EMPTY:
 			default:
 				/* fill with background color */
 				SelectObject(hdc, lpgw->hbrush);
+				fill_color = lpgw->background;
 				break;
 			}
 			break;
@@ -1509,7 +1511,7 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 				HDC memdc;
 				HBITMAP membmp, oldbmp;
 				BLENDFUNCTION ftn;
-				HBRUSH brush = NULL, old_brush;
+				HBRUSH old_brush;
 
 				/* create memory device context for bitmap */
 				memdc = CreateCompatibleDC(hdc);
@@ -1519,15 +1521,11 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 				oldbmp = (HBITMAP)SelectObject(memdc, membmp);
 
 				/* prepare memory context */
-				SetTextColor(memdc, last_color);
+				SetTextColor(memdc, fill_color);
 				if ((fillstyle & 0x0f) == FS_TRANSPARENT_PATTERN)
-					SelectObject(memdc, pattern_brush[pattern]);
-				else {
-					/* we don't know if we should use a colorbrush or a pm3d brush,
-					so we create our own... */
-					brush = CreateSolidBrush(last_color);
-					old_brush = SelectObject(memdc, brush);
-				}
+					old_brush = SelectObject(memdc, pattern_brush[pattern]);
+				else
+					old_brush = SelectObject(memdc, lpgw->hcolorbrush);
 
 				/* draw into memory bitmap */
 				PatBlt(memdc, 0, 0, width, height, PATCOPY);
@@ -1546,10 +1544,7 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 				}
 
 				/* clean up */
-				if (brush) {
-					SelectObject(memdc, old_brush);
-					DeleteObject(brush);
-				}
+				SelectObject(memdc, old_brush);
 				SelectObject(memdc, oldbmp);
 				DeleteObject(membmp);
 				DeleteDC(memdc);
@@ -1583,17 +1578,20 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 			break;
 
 		case W_font: {
-			char *font;
-
-			font = LocalLock(curptr->htext);
-			if (font) {
-				GraphChangeFont(lpgw, font, curptr->x, hdc, *rect);
-				SetFont(lpgw, hdc);
-				/* recalculate shifting of rotated text */
-				hshift = sin(M_PI/180. * lpgw->angle) * MulDiv(lpgw->vchar, rr-rl, lpgw->xmax) / 2;
-				vshift = cos(M_PI/180. * lpgw->angle) * MulDiv(lpgw->vchar, rb-rt, lpgw->ymax) / 2;
-			}
+			int size = curptr->x;
+			char * font = LocalLock(curptr->htext);
+			/* GraphChangeFont already handles font==NULL and size==0,
+			   so the checks below are a bit paranoid...
+			*/
+			GraphChangeFont(lpgw,
+				font != NULL ? font : lpgw->deffontname,
+				size > 0 ? size : lpgw->deffontsize, 
+				hdc, *rect);
 			LocalUnlock(curptr->htext);
+			SetFont(lpgw, hdc);
+			/* recalculate shifting of rotated text */
+			hshift = sin(M_PI/180. * lpgw->angle) * MulDiv(lpgw->vchar, rr-rl, lpgw->xmax) / 2;
+			vshift = cos(M_PI/180. * lpgw->angle) * MulDiv(lpgw->vchar, rb-rt, lpgw->ymax) / 2;
 			break;
 		}
 
@@ -1644,6 +1642,7 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 			SetTextColor(hdc, color);
 			/* remember this color */
 			last_color = color;
+			fill_color = color;
 			break;
 		}
 
@@ -1691,7 +1690,7 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 				   this will fail for last_color = white
 				*/
 				UINT32 transparentColor = 0x00ffffff; /* white */
-				HBRUSH brush = NULL;
+				HBRUSH old_brush;
 
 				/* find minimum rectangle enclosing our polygon. */
 				minx = maxx = ppt[0].x;
@@ -1731,16 +1730,12 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 					pvBits[i] = transparentColor;
 
 				/* prepare the memory context */
-				SetTextColor(memdc, last_color);
+				SetTextColor(memdc, fill_color);
 				SelectObject(memdc, lpgw->hapen);
 				if ((fillstyle & 0x0f) == FS_TRANSPARENT_PATTERN)
-					SelectObject(memdc, pattern_brush[pattern]);
-				else {
-					/* we don't know if we should use a colorbrush or a pm3d brush,
-					   so we create our own... */
-					brush = CreateSolidBrush(last_color);
-					SelectObject(memdc, brush);
-				}
+					old_brush = SelectObject(memdc, pattern_brush[pattern]);
+				else
+					old_brush = SelectObject(memdc, lpgw->hcolorbrush);
 
 				/* finally, draw polygon */
 				Polygon(memdc, points, polyi);
@@ -1768,10 +1763,11 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 
 				/* clean up */
 				LocalFreePtr(points);
-				if (brush) DeleteObject(brush);
+				SelectObject(memdc, old_brush);
 				SelectObject(memdc, oldbmp);
 				DeleteObject(membmp);
 				DeleteDC(memdc);
+			}
 			}
 			polyi = 0;
 			}

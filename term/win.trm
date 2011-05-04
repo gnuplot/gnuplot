@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: win.trm,v 1.95 2011/04/10 17:32:12 markisch Exp $
+ * $Id: win.trm,v 1.96 2011/04/27 10:18:28 markisch Exp $
  */
 
 /* GNUPLOT - win.trm */
@@ -703,34 +703,33 @@ WIN_boxfill(
 TERM_PUBLIC int
 WIN_set_font(const char *font)
 {
-	char fontname[MAXFONTNAME];
-	int  fontsize;
-
+	/* Note: defer the determination of default font name and default
+	   font size until drawgraph() is executed. */
 	if ((font == NULL) || (font[0] == '\0')) {
-	    strcpy(fontname, graphwin.deffontname);
-	    fontsize = graphwin.deffontsize;
+		/* select default font */
+		GraphOp(&graphwin, W_font, 0, 0, NULL);
 	} else {
-	    char *size;
+		int  fontsize;
+		char * size;
 
-	    size = strrchr(font, ',');
-	    if (size == NULL) {
+		size = strrchr(font, ',');
+		if (size == NULL) {
 			/* only font name given */
-			strcpy(fontname, font);
-			fontsize = graphwin.deffontsize;
-	    } else if (size == font) {
+			GraphOp(&graphwin, W_font, 0, 0, font);
+		} else if (size == font) {
 			/* only font size given */
-			strcpy(fontname, graphwin.deffontname);
-			sscanf(size+1, "%i", &fontsize);
-	    } else {
+			sscanf(size + 1, "%i", &fontsize);
+			GraphOp(&graphwin, W_font, fontsize, 0, NULL);
+		} else {
 			/* full font information supplied */
-			strncpy(fontname, font, size-font);
-			fontname[size-font] = '\0';
-			sscanf(size+1, "%i", &fontsize);
-	    }
+			char fontname[MAXFONTNAME];
+			strncpy(fontname, font, size - font);
+			fontname[size - font] = '\0';
+			sscanf(size + 1, "%i", &fontsize);
+			GraphOp(&graphwin, W_font, fontsize, 0, fontname);
+		}
 	}
-
-	GraphOp(&graphwin, W_font, fontsize, 0, fontname);
-    return TRUE;
+	return TRUE;
 }
 
 
