@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.241 2011/03/29 01:54:40 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.242 2011/04/19 20:22:25 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -1908,7 +1908,7 @@ eval_plots()
 		    /* or a function name.  Yes, the design could have been better. */
 		    if (almost_equals(c_token,"col$umnheader")
 		    && !(equals(c_token,"columnhead") && equals(c_token+1,"(")) ) {
-			df_set_key_title_columnhead(this_plot->plot_type);
+			df_set_key_title_columnhead(this_plot);
 		    } else {
 			evaluate_inside_using = TRUE;
 			if (!(this_plot->title = try_to_get_string()))

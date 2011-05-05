@@ -1,3 +1,9 @@
+2011-05-05  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/datafile.h src/datafile.c src/plot2d.c src/plot3d.c:
+	Change prototype of df_set_key_title_columnhead() to match that of
+	df_set_key_title().
+
 2011-05-05  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* term/win.trm (WIN_set_font) src/win/wgraph.c (drawgraph): Defer

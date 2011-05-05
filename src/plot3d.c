@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.183 2010/10/27 04:07:08 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.184 2010/11/06 22:02:37 juhaszp Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -1453,14 +1453,14 @@ eval_3dplots()
 		    c_token++;
 
 		    if (almost_equals(c_token,"col$umnheader")) {
-			df_set_key_title_columnhead(this_plot->plot_type);
+			df_set_key_title_columnhead((struct curve_points *)this_plot);
 		    } else 
 
 #ifdef BACKWARDS_COMPATIBLE
 		    /* Annoying backwards-compatibility hack - deprecate! */
 		    if (isanumber(c_token)) {
 			c_token--;
-			df_set_key_title_columnhead(this_plot->plot_type);
+			df_set_key_title_columnhead((struct curve_points *)this_plot);
 		    } else
 #endif
 

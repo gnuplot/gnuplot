@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.195 2011/04/19 20:22:24 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.196 2011/05/05 04:13:29 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -2384,7 +2384,7 @@ df_set_key_title(struct curve_points *plot)
  * Called from eval_plots(), eval_3dplots() while parsing the plot title option
  */
 void
-df_set_key_title_columnhead(enum PLOT_TYPE plot_type)
+df_set_key_title_columnhead(struct curve_points *plot)
 {
     c_token++;
     if (equals(c_token,"(")) {
@@ -2396,7 +2396,7 @@ df_set_key_title_columnhead(enum PLOT_TYPE plot_type)
     } else {
 	if (df_no_use_specs == 1)
 	    column_for_key_title = use_spec[0].column;
-	else if (plot_type == DATA3D)
+	else if (plot->plot_type == DATA3D)
 	    column_for_key_title = use_spec[2].column;
 	else
 	    column_for_key_title = use_spec[1].column;
