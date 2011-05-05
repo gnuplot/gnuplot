@@ -17,6 +17,9 @@
 	* src/readline.c (readline): Tab is a printable character in some
 	locales, ie. isprint(TAB)>0.
 
+	* src/win/wgraph.c (MakeFonts): Reduce size of tics and point symbols
+	by 20%.
+
 2011-05-04  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* config/mingw/Makefile: Build support for lua tikz related TeX files.
