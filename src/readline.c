@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: readline.c,v 1.55 2011/04/30 17:26:30 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: readline.c,v 1.56 2011/05/02 18:44:32 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - readline.c */
@@ -736,9 +736,9 @@ readline(const char *prompt)
 	/* Accumulate ascii (7bit) printable characters
 	 * and all leading 8bit characters.
 	 */
-
-	if (isprint(cur_char)
-	    || ((cur_char & 0x80) != 0 && cur_char != EOF)
+	if ((isprint(cur_char)
+	      || (((cur_char & 0x80) != 0) && (cur_char != EOF)))
+	    && (cur_char != 0x09) /* TAB is a printable character in some locales */
 	    ) {
 	    size_t i;
 

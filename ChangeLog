@@ -1,4 +1,4 @@
-2011-05-04  Bastian Maerkisch  <bmaerkisch@web.de>
+2011-05-05  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* term/win.trm (WIN_set_font) src/win/wgraph.c (drawgraph): Defer
 	determination of default font name and size. Fixes bug addressed
@@ -13,6 +13,9 @@
 
 	* src/win/wpause.c (WndPauseProc): Use default dialog font instead of
 	fixed width font for pause dialog.
+
+	* src/readline.c (readline): Tab is a printable character in some
+	locales, ie. isprint(TAB)>0.
 
 2011-05-04  Bastian Maerkisch  <bmaerkisch@web.de>
 
