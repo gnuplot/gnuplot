@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.116 2011/05/05 21:58:24 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.117 2011/05/05 22:23:56 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - win/wgraph.c */
@@ -764,8 +764,8 @@ MakeFonts(LPGW lpgw, LPRECT lprect, HDC hdc)
 
 	/* CMW: Base tick size on character size */
 	lpgw->htic = MulDiv(lpgw->hchar, 2, 5);
-	lpgw->vtic = MulDiv(lpgw->hchar, 
-		2 * GetDeviceCaps(hdc, LOGPIXELSY), 5 * GetDeviceCaps(hdc, LOGPIXELSX));
+	cy = MulDiv(cx/10, 2*GetDeviceCaps(hdc, LOGPIXELSY), 5*GetDeviceCaps(hdc, LOGPIXELSX));
+	lpgw->vtic = MulDiv(cy, lpgw->ymax, lprect->bottom - lprect->top);
 	/* find out if we can rotate text 90deg */
 	SelectObject(hdc, lpgw->hfontv);
 	result = GetDeviceCaps(hdc, TEXTCAPS);
