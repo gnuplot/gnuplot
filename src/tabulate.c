@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: tabulate.c,v 1.10 2009/12/25 00:30:33 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: tabulate.c,v 1.11 2009/12/28 23:57:54 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - tabulate.c */
@@ -147,7 +147,7 @@ print_table(struct curve_points *current_plot, int plot_num)
 	    break;
 	default:
 	    if (interactive)
-	        fprintf(stderr, "Tabular output of %s plot style not fully implemented\n",
+		fprintf(stderr, "Tabular output of %s plot style not fully implemented\n",
 		    current_plot->plot_style == HISTOGRAMS ? "histograms" :
 		    current_plot->plot_style == IMAGE ? "image" :
 		    current_plot->plot_style == RGBIMAGE ? "rgbimage" :

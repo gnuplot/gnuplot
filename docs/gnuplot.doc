@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.664 2011/04/19 20:22:24 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.665 2011/04/23 00:02:09 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -257,15 +257,6 @@ C
  canvas.  This is consistent with the way multiplot mode has always worked,
  however it is a change in the way the png driver worked for single plots in
  version 4.0.
-
-3 New plot elements
-=circles
-=ellipse
-=polygon
- The `set object` command can now be used to define fixed circles, ellipses, and
- polygons as well as rectangles. There are two corresponding new plot styles:
- `plot with circles` and `plot with ellipses`.  
- See `circle`, `ellipse` and `polygon`.
 
 3 New or revised terminal drivers
  Two new drivers based on the cairo and pango libraries are included,
@@ -7848,7 +7839,7 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/population.gif" alt="[popu
     cp1250      - codepage for MS Windows, Central and Eastern Europe
     cp1251      - codepage for 8-bit Russian, Serbian, Bulgarian, Macedonian
     cp1254      - codepage for MS Windows, Turkish (superset of Latin5)
-    sjis        - shift-JIS Japanese encoding (postscript and svg only)
+    sjis        - shift-JIS Japanese encoding
     utf8        - variable-length (multibyte) representation of Unicode
                   entry point for each character
 

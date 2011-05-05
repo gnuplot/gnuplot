@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: util.c,v 1.92 2010/09/28 17:14:38 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: util.c,v 1.93 2011/03/20 17:51:25 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - util.c */
@@ -280,7 +280,7 @@ quote_str(char *str, int t_num, int max)
     if (gp_input_line[token[t_num].start_index] == '"')
 	parse_esc(str);
     else
-        parse_sq(str);
+	parse_sq(str);
 }
 
 
@@ -343,7 +343,7 @@ m_quote_capture(char **str, int start, int end)
     if (gp_input_line[token[start].start_index] == '"')
 	parse_esc(*str);
     else
-        parse_sq(*str);
+	parse_sq(*str);
 
 }
 
@@ -546,11 +546,9 @@ gprintf(
 {
     char temp[MAX_LINE_LEN + 1];
     char *t;
-    TBOOLEAN seen_mantissa = FALSE; /* memorize if mantissa has been
-                                       output, already */
+    TBOOLEAN seen_mantissa = FALSE; /* remember if mantissa was already output */
     double stored_power_base = 0;   /* base for the last mantissa output*/
-    int stored_power = 0;	/* power that matches the mantissa
-                                   output earlier */
+    int stored_power = 0;	/* power matching the mantissa output earlier */
     TBOOLEAN got_hash = FALSE;				   
 
     set_numeric_locale();
@@ -992,7 +990,7 @@ int_error(int t_num, const char str[], va_dcl)
     /* reprint line if screen has been written to */
 
     if (t_num == DATAFILE) {
-        df_showdata();
+	df_showdata();
     } else if (t_num != NO_CARET) { /* put caret under error */
 	if (!screen_ok)
 	    PRINT_MESSAGE_TO_STDERR;
@@ -1053,7 +1051,7 @@ int_warn(int t_num, const char str[], va_dcl)
     /* reprint line if screen has been written to */
 
     if (t_num == DATAFILE) {
-        df_showdata();
+	df_showdata();
     } else if (t_num != NO_CARET) { /* put caret under error */
 	if (!screen_ok)
 	    PRINT_MESSAGE_TO_STDERR;
@@ -1184,9 +1182,9 @@ parse_sq(char *instr)
      */
 
     while (*s != NUL) {
-        if (*s == '\'' && *(s+1) == '\'')
-            s++;
-        *t++ = *s++;
+	if (*s == '\'' && *(s+1) == '\'')
+	    s++;
+	*t++ = *s++;
     }
     *t = NUL;
 }

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.194 2011/03/20 17:27:57 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.195 2011/04/19 20:22:24 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -87,13 +87,15 @@ static char *RCSid() { return RCSid("$Id: datafile.c,v 1.194 2011/03/20 17:27:57
  *      reads a line, does all the 'index' and 'using' manipulation
  *      deposits values into vector[]
  *      returns
- *          number of columns parsed  [0=not blank line, but no valid data],
- *          DF_EOF for EOF
+ *          number of columns parsed  [0 = not a blank line, but no valid data],
+ *          DF_EOF - end of file
  *          DF_UNDEFINED - undefined result during eval of extended using spec
  *          DF_MISSING - requested column matched that of 'set missing <foo>'
- *          DF_FIRST_BLANK for first consecutive blank line
- *          DF_SECOND_BLANK for second consecutive blank line
- *            will return FIRST before SECOND
+ *          DF_FIRST_BLANK - first consecutive blank line
+ *          DF_SECOND_BLANK - second consecutive blank line
+ *          DF_FOUND_KEY_TITLE  - only relevant to first line of data
+ *          DF_KEY_TITLE_MISSING  and only for 'set key autotitle columnhead'
+ *          DF_STRINGDATA - not currently used by anyone
  *
  * if a using spec was given, lines not fulfilling spec are ignored.
  * we will always return exactly the number of items specified
@@ -638,16 +640,6 @@ df_tokenise(char *s)
     for (i = 0; i<MAXDATACOLS; i++)
 	df_tokens[i] = NULL;
 
-#if (0)	/* Mar 2009 */
-    /* This code was broken by moving the check for 'title columnheader' elsewhere.*/
-    /* Auto-titling of histograms is a bit tricky because the x coord did not come */
-    /* from an explicit input column. This means our previous guess of what column */
-    /* to take the title from was probably wrong.                                  */
-    if (key_title_auto_col && df_current_plot
-    &&  (df_current_plot->plot_style == HISTOGRAMS))
-	column_for_key_title = use_spec[0].column;
-#endif
-
 #define NOTSEP (*s != df_separator)
 
     df_no_cols = 0;
@@ -659,8 +651,9 @@ df_tokenise(char *s)
 	    df_column = gp_realloc(df_column,
 				new_max * sizeof(df_column_struct),
 				"datafile column");
-	    while (df_max_cols < new_max)
-		df_column[df_max_cols++].datum = 0;
+	    for (; df_max_cols < new_max; df_max_cols++) {
+		df_column[df_max_cols].datum = 0;
+	    }
 	}
 
 	/* have always skipped spaces at this point */
@@ -1398,7 +1391,7 @@ plot_option_using(int max_using)
 		use_spec[df_no_use_specs++].column = at_highest_column_used;
 
 	    /* FIXME EAM - It would be nice to handle these like any other */
-	    /* internal function via perm_at() but there are problems.     */
+	    /* internal function via perm_at() but it doesn't work.        */
 	    } else if (almost_equals(c_token, "xtic$labels")) {
 		plot_ticlabel_using(CT_XTICLABEL);
 	    } else if (almost_equals(c_token, "x2tic$labels")) {
@@ -1420,7 +1413,7 @@ plot_option_using(int max_using)
 		    int_error(c_token, "Column must be >= -2");
 		use_spec[df_no_use_specs++].column = col;
 
-		/* Supposed only happens for binary files, but don't bet on it */
+		/* Supposedly only happens for binary files, but don't bet on it */
 		if (col > no_cols)
 		    no_cols = col;
 	    }
@@ -2393,7 +2386,6 @@ df_set_key_title(struct curve_points *plot)
 void
 df_set_key_title_columnhead(enum PLOT_TYPE plot_type)
 {
-    FPRINTF((stderr,"df_set_key_title_columnhead: column_for_key_title was %d, ",column_for_key_title));
     c_token++;
     if (equals(c_token,"(")) {
 	c_token++;
@@ -2409,7 +2401,7 @@ df_set_key_title_columnhead(enum PLOT_TYPE plot_type)
 	else
 	    column_for_key_title = use_spec[1].column;
     }
-    FPRINTF((stderr," setting to %d\n",column_for_key_title));
+    FPRINTF((stderr,"df_set_key_title_columnhead: column_for_key_title set to %d\n",column_for_key_title));
 }
 
 static char *
