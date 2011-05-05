@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.115 2011/05/05 19:07:19 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.116 2011/05/05 21:58:24 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - win/wgraph.c */
@@ -1278,6 +1278,7 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 	double alpha = 0.;			/* alpha for transarency */
 	int pattern = 0;			/* patter number */
 	COLORREF fill_color = 0;	/* color to use for fills */
+	HBRUSH solid_brush = 0;		/* current solid fill brush */
 
 	/* images */
 	int seq = 0;				/* sequence counter for W_image ops */
@@ -1412,9 +1413,10 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 
 			/* select new brush */
 			if (cur_pen < WGNUMPENS)
-				SelectObject(hdc, lpgw->colorbrush[cur_pen]);
+				solid_brush = lpgw->colorbrush[cur_pen];
 			else
-				SelectObject(hdc, lpgw->hbrush);
+				solid_brush = lpgw->hbrush;
+			SelectObject(hdc, solid_brush);
 
 			/* set text color, also used for pattern fill */
 			SetTextColor(hdc, cur_penstruct.lopnColor);
@@ -1469,6 +1471,7 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 					    255 - density * (255 - GetGValue(last_color)),
 					    255 - density * (255 - GetBValue(last_color)));
 				draw_new_brush(lpgw, hdc, color);
+				solid_brush = lpgw->hcolorbrush;
 				fill_color = color;
 				break;
 			}
@@ -1490,6 +1493,7 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 				/* fill with background color */
 				SelectObject(hdc, lpgw->hbrush);
 				fill_color = lpgw->background;
+				solid_brush = lpgw->hbrush;
 				break;
 			}
 			break;
@@ -1525,7 +1529,7 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 				if ((fillstyle & 0x0f) == FS_TRANSPARENT_PATTERN)
 					old_brush = SelectObject(memdc, pattern_brush[pattern]);
 				else
-					old_brush = SelectObject(memdc, lpgw->hcolorbrush);
+					old_brush = SelectObject(memdc, solid_brush);
 
 				/* draw into memory bitmap */
 				PatBlt(memdc, 0, 0, width, height, PATCOPY);
@@ -1633,6 +1637,7 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 
 			/* solid fill brush */
 			draw_new_brush(lpgw, hdc, color);
+			solid_brush = lpgw->hcolorbrush;
 
 			/* create new pen, too */
 			cur_penstruct.lopnColor = color;
@@ -1749,7 +1754,7 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 				if ((fillstyle & 0x0f) == FS_TRANSPARENT_PATTERN)
 					old_brush = SelectObject(memdc, pattern_brush[pattern]);
 				else
-					old_brush = SelectObject(memdc, lpgw->hcolorbrush);
+					old_brush = SelectObject(memdc, solid_brush);
 
 				/* finally, draw polygon */
 				Polygon(memdc, points, polyi);
