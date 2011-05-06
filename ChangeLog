@@ -1,3 +1,9 @@
+2011-05-06  Shigeharu Takeno  <shige@iee.niit.ac.jp>
+
+	* src/graph3d.c: Make "notitle" suppress contour line key entries in 
+	addition to the surface key entry.  This makes it possible to draw any
+	combination of surface, contours, and key entries.
+
 2011-05-06  Benjamin Lindner  <lindnerb@users.sourceforge.net>
 
 	* docs/plotstyles.gnu docs/gnuplot.doc: Add an illustration of the

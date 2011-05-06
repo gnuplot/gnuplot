@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.246 2011/04/06 06:00:18 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.247 2011/04/16 04:55:26 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -1233,7 +1233,7 @@ do_3dplot(
 
 		while (cntrs) {
 		    if (label_contours && cntrs->isNewLevel) {
-			if (key->visible) {
+			if (key->visible && !this_plot->title_is_suppressed) {
 			    (*t->linetype)(LT_BLACK);
 			    key_text(xl, yl, cntrs->label);
 			}
@@ -1253,7 +1253,7 @@ do_3dplot(
 			    term_apply_lp_properties(&thiscontour_lp_properties);
 			}
 
-			if (key->visible) {
+			if (key->visible && !this_plot->title_is_suppressed) {
 
 			    switch (this_plot->plot_style) {
 			    case IMPULSES:
