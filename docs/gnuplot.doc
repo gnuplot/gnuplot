@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.665 2011/04/23 00:02:09 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.666 2011/05/05 04:14:07 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -3459,7 +3459,20 @@ Ffigure_histcols
  If the fillstyle is set to `pattern`, then the pattern used for filling will
  be incremented automatically.
 
- The `at <x-coord>` option only applies to column-stacked histograms.
+Ffigure_newhist
+ The `at <x-coord>` option sets the x coordinate position of the following 
+ histogram to <x-coord>. For example
+
+        set style histogram cluster
+        set style data histogram
+        set style fill solid 1.0 border -1
+        set xtic 1 offset character 0,0.3
+        plot newhistogram "Set A", \
+             'file.dat' u 1 t 1, '' u 2 t 2, \
+             newhistogram "Set B" at 8, \
+             'file.dat' u 2 t 2, '' u 2 t 2
+
+ will position the second histogram to start at x=8.
 3 automated iteration over multiple columns
 ?automated
 ?histograms automated

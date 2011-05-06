@@ -187,6 +187,17 @@ set style histogram rows
 set title "Rowstacked" offset 0,-1
 plot demo . 'histopt.dat' using 1 fs solid 0.5, '' using 2 fs empty
 #
+set output 'figure_newhist' . ext
+set style histogram cluster
+set style data histogram
+unset title
+set key auto column noinvert
+set xtics 1 offset character 0,0.3
+plot newhistogram "Set A", \
+    '../demo/histopt.dat' u 1 t col, '' u 2 t col fs empty, \
+    newhistogram "Set B" at 8, \
+    '../demo/histopt.dat' u 1 t col, '' u 2 t col fs empty
+#
 set output out . 'figure_histcols' . ext
 set style histogram columns
 set title "Columnstacked" offset 0,-1

@@ -1,3 +1,8 @@
+2011-05-06  Benjamin Lindner  <lindnerb@users.sourceforge.net>
+
+	* docs/plotstyles.gnu docs/gnuplot.doc: Add an illustration of the
+	'newhistogram' command.
+
 2011-05-06  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* INSTALL: Update the description of readline options and mention
