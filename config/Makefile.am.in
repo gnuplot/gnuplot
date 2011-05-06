@@ -12,7 +12,7 @@ Makefile.am: Makefile.am.in
 	sed -n '1,/^##m4-files-begin/p' Makefile.am.in > $@t
 	echo EXTRA_DIST = README MacOSX Makefile.am.in buildvms.com	\
 	  config.* djconfig.sh make_vms.com makefile.* watcom/Makefile	\
-	  watcom/config.h cygwin/Makefile mingw/Makefile \
+	  watcom/config.h cygwin/Makefile mingw/Makefile msvc/Makefile \
 	  | fmt \
           | (tr '\012' @; echo) \
 	  | sed 's/@$$/%/;s/@/ \\@/g' \

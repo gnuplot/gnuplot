@@ -1,3 +1,14 @@
+2011-05-06  Shigeharu Takeno  <shige@iee.niit.ac.jp>
+
+	* config/makefile.nt: Add missing support for GDI+. Bug #3298244
+
+2011-05-06  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* config/msvc/Makefile: New file for Microsoft Visual C++. Builds
+	out of tree. Intended to eventually replace config/makefile.nt.
+
+	config/Makefile.am.in (Makefile.am): Add new Makefile.
+
 2011-05-05  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/datafile.h src/datafile.c src/plot2d.c src/plot3d.c:
