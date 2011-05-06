@@ -1,5 +1,5 @@
 #
-# $Id: makefile.nt,v 1.28 2011/03/11 20:46:03 markisch Exp $
+# $Id: makefile.nt,v 1.29 2011/03/13 12:15:56 markisch Exp $
 #
 # GNUPLOT Makefile Microsoft Visual C++ 2005 or newer
 
@@ -82,7 +82,8 @@ TERMFLAGS = /I..\\term /DGNUPLOT_PS_DIR=\"$(GNUPLOT_PS_DIR)\" /DGNUPLOT_JS_DIR=\
 # linker flags, append paths for external libs later
 LDFLAGS = /nologo /MACHINE:$(MACHINE)
 COMMONLIBS = kernel32.lib user32.lib gdi32.lib winspool.lib \
-             comdlg32.lib comctl32.lib advapi32.lib shell32.lib msimg32.lib
+             comdlg32.lib comctl32.lib advapi32.lib shell32.lib \
+             msimg32.lib gdiplus.lib
 CONSOLELIBS = ole32.lib oleaut32.lib comctl32.lib
 
 !IF "$(GDLIB)" == "1"
@@ -133,7 +134,7 @@ default: wgnuplot.exe $(HELPFILE) wgnuplot.mnu $(M)bf_test.exe pgnuplot.exe gnup
 OBJS = $(COREOBJS) version.obj
 
 WINOBJS = winmain.obj wgnuplib.obj wgraph.obj wprinter.obj wtext.obj \
-	screenbuf.obj wpause.obj wmenu.obj gpexecute.obj
+	screenbuf.obj wpause.obj wmenu.obj gpexecute.obj wgdiplus.obj
 
 ALL_CONSOLE_OBJS = $(OBJS:.obj=.cobj) $(WINOBJS:.obj=.cobj)
 
@@ -263,6 +264,12 @@ wgraph.obj: win\wgraph.c $(WINDEPS)
 
 wgraph.cobj: win\wgraph.c $(WINDEPS)
 	$(CC) /c $(CFLAGS) $(CONSOLE_CFLAGS) win\wgraph.c /Fo$@
+
+wgdiplus.obj: win\wgdiplus.cpp $(WINDEPS) win\wgdiplus.h
+	$(CC) /c $(CFLAGS) win\wgdiplus.cpp /Fo$@
+
+wgdiplus.cobj: win\wgdiplus.cpp $(WINDEPS) win\wgdiplus.h
+	$(CC) /c $(CFLAGS) $(CONSOLE_CFLAGS) win\wgdiplus.cpp /Fo$@
 
 wgnuplot.mnu: win\wgnuplot.mnu
 	copy win\wgnuplot.mnu wgnuplot.mnu
