@@ -32,7 +32,10 @@ For the impatient
 selects the set of terminal drivers to be compiled in.  
 
    The recommended way to configure both of these is the GNU-style
-"./configure" script described below, and also in INSTALL.gnu.
+"./configure" script described below and described further in INSTALL.gnu.
+This script is provided as part of the distributed source package, but if you
+are using sources downloaded directly from a CVS repository you may need to
+regenerate it using the preliminary script "./prepare".
 
    A complete overview of configure options is below in the Basic
 Installation section. On platforms which do not support GNU
@@ -169,14 +172,9 @@ $ ./configure --help
   --disable-x11-mbfonts   disable multi-byte font support for x11
   --disable-binary-x11-polygon  disable binary_x11_polygon
   --disable-x11-external  disable drawing to windows belonging to external apps
-  --enable-thin-splines   enable thin plate splines
   --disable-volatile-data disable zooming of volatile data
   --disable-raise-console spacebar in plot window does not raise console
-  --disable-objects       disable rectangles and other objects
   --disable-macros        disable command line macros
-  --enable-mgr            enable MGR terminal
-  --enable-rgip           enable Redwood Graphics Interface Protocol
-  --disable-h3d-quadtree  disable quadtree optimization in hidden3d code
   --enable-h3d-gridbox    enable gridbox optimization in hidden3d code
   --disable-wxwidgets     wxWidgets terminal (default enabled)
   --enable-backwards-compatibility       enable deprecated syntax
@@ -185,6 +183,9 @@ $ ./configure --help
 			restrictive that the gnuplot license.  This option
 			disables inclusion of this code and any terminals that
 			depend on it (mostly HP deskjet era dot matrix printers).
+  --with-readline={gnu|bsd|builtin}
+			Override the automatic choice of terminal input modes.
+			See below for more detail.
 
 Options marked with (*) are enabled by default, ie. these features or
 packages are used if configure detects them even if the corresponding
@@ -385,11 +386,17 @@ non-default location that is not searched by the preprocessor or linker.
 
   --with-readline
 
-   Use gnuplot's builtin readline function. This is enabled by default.
+   Use whatever readline support is detected automatically, either an
+   external library or gnuplot's built-in version. This is the default.
+
+  --with-readline=builtin
+
+   Use gnuplot's own builtin readline routines even if a GNU or BSD readline
+   library is detected.
 
   --without-readline
 
-   (same as --with-readline=no) Do not use gnuplot's builtin readline function.
+   (same as --with-readline=no) Do not use any readline processing.
 
   --with-readline=gnu
 

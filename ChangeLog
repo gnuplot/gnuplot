@@ -1,3 +1,8 @@
+2011-05-06  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* INSTALL: Update the description of readline options and mention
+	the ./prepare script.
+
 2011-05-06  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* config/makefile.nt: Add missing support for GDI+. Bug #3298244
