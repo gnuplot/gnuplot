@@ -23,6 +23,7 @@ New features, changes and fixes since gnuplot version 4.4
 * NEW windows terminal supports encodings
 * NEW mouse tracking for SVG terminal
 * NEW tab-completion for builtin readline
+* NEW windows terminal can save graph as EMF file
 * FIX length estimation of UTF-8 strings
 * FIX accurate placement of color boundaries in the colorbar
 * FIX Built-in readline handles UTF-8 encoding
@@ -35,6 +36,10 @@ New features, changes and fixes since gnuplot version 4.4
 * CHANGE javascript support for HTML5 canvas does not use global variables
 * CHANGE Built-in readline DEL recognized as forward-delete (system-dependent)
 * CHANGE Built-in readline ^W deletes previous full or partial word
+* CHANGE wgnuplot text window supports wrapping of long lines
+* CHANGE new Windows help file format (chm)
+* CHANGE copy graph to clipboard as enhanced metafile in windows terminal
+* CHANGE improved windows terminal driver
 
 
 New features, changes and fixes in gnuplot version 4.4.0
