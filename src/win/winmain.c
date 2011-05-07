@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: winmain.c,v 1.45 2011/04/27 17:17:17 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: winmain.c,v 1.46 2011/04/28 13:44:04 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - win/winmain.c */
@@ -101,10 +101,12 @@ static char *RCSid() { return RCSid("$Id: winmain.c,v 1.45 2011/04/27 17:17:17 m
   /* used if vsnprintf(NULL,0,...) returns zero (MingW 3.4) */
 
 /* globals */
+#ifndef WGP_CONSOLE
 TW textwin;
+MW menuwin;
+#endif
 GW graphwin;
 PW pausewin;
-MW menuwin;
 LPSTR szModuleName;
 LPSTR szPackageDir;
 LPSTR winhelpname;
@@ -174,13 +176,14 @@ WinExit(void)
                 GraphClose(&graphwin);
 #ifndef WGP_CONSOLE
         TextMessage();  /* process messages */
-#endif
 #ifndef WITH_HTML_HELP
         WinHelp(textwin.hWndText,(LPSTR)winhelpname,HELP_QUIT,(DWORD)NULL);
 #endif
-#ifndef WGP_CONSOLE
         TextMessage();  /* process messages */
 #else
+#ifndef WITH_HTML_HELP
+        WinHelp(GetDesktopWindow(), (LPSTR)winhelpname, HELP_QUIT, (DWORD)NULL);
+#endif
 #ifdef CONSOLE_SWITCH_CP
         /* restore console codepages */
         if (cp_changed) {
@@ -324,7 +327,6 @@ int main(int argc, char **argv)
 # define _argv argv
 # define _argc argc
         HINSTANCE hInstance = GetModuleHandle(NULL), hPrevInstance = NULL;
-        int nCmdShow = 0;
 #else
 #if defined(__MSC__) || defined(__WATCOMC__)
 #  define _argv __argv
@@ -366,21 +368,34 @@ int main(int argc, char **argv)
         _fstrcpy(szMenuName,szModuleName);
         _fstrcat(szMenuName,MENUNAME);
 
+#ifndef WGP_CONSOLE
         textwin.hInstance = hInstance;
         textwin.hPrevInstance = hPrevInstance;
         textwin.nCmdShow = nCmdShow;
         textwin.Title = "gnuplot";
+#endif
 
-        get_user_env(); /* this hasn't been called yet */
-        textwin.IniFile = gp_strdup("~\\wgnuplot.ini");
-        gp_expand_tilde(&(textwin.IniFile));
+		/* locate ini file */
+		{
+			char * inifile;
+			get_user_env(); /* this hasn't been called yet */
+			inifile = gp_strdup("~\\wgnuplot.ini");
+			gp_expand_tilde(&inifile);
 
-        /* if tilde expansion fails use current directory as
-           default - that was the previous default behaviour */
-        if (textwin.IniFile[0] == '~') {
-            free(textwin.IniFile);
-            textwin.IniFile = "wgnuplot.ini";
-        }
+			/* if tilde expansion fails use current directory as
+			   default - that was the previous default behaviour */
+			if (inifile[0] == '~') {
+				free(inifile);
+				inifile = "wgnuplot.ini";
+			}
+			
+#ifndef WGP_CONSOLE
+			textwin.IniFile = inifile;
+#endif
+			graphwin.IniFile = inifile;
+		}
+		
+#ifndef WGP_CONSOLE
         textwin.IniSection = "WGNUPLOT";
         textwin.DragPre = "load '";
         textwin.DragPost = "'\n";
@@ -404,6 +419,7 @@ int main(int argc, char **argv)
         CheckMemory(textwin.AboutText);
 
         menuwin.szMenuName = szMenuName;
+#endif
 
         pausewin.hInstance = hInstance;
         pausewin.hPrevInstance = hPrevInstance;
@@ -412,9 +428,12 @@ int main(int argc, char **argv)
         graphwin.hInstance = hInstance;
         graphwin.hPrevInstance = hPrevInstance;
         graphwin.Title = strdup(WINGRAPHTITLE);
+#ifdef WGP_CONSOLE
+        graphwin.lptw = NULL;
+#else
         graphwin.lptw = &textwin;
-        graphwin.IniFile = textwin.IniFile;
-        graphwin.IniSection = textwin.IniSection;
+#endif
+        graphwin.IniSection = "WGNUPLOT";
         graphwin.color=TRUE;
         graphwin.fontsize = WINFONTSIZE;
 
@@ -465,7 +484,6 @@ int main(int argc, char **argv)
         }
 #endif
 #endif
-
 
         atexit(WinExit);
 

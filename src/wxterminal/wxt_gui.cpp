@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.cpp,v 1.80 2011/03/11 22:20:59 sfeam Exp $
+ * $Id: wxt_gui.cpp,v 1.81 2011/04/28 13:40:58 markisch Exp $
  */
 
 /* GNUPLOT - wxt_gui.cpp */
@@ -1195,7 +1195,7 @@ void wxtPanel::RaiseConsoleWindow()
 	}
 #endif /* USE_GTK */
 
-#ifdef _Windows
+#if defined(_Windows) && !defined(WGP_CONSOLE)
 	/* Make sure the text window is visible: */
 	ShowWindow(textwin.hWndParent, SW_SHOW);
 	/* and activate it (--> Keyboard focus goes there */
@@ -3243,7 +3243,9 @@ void wxt_atexit()
 	if (!interactive) {
 		interactive = TRUE;
 		/* be sure to show the text window */
+#ifndef WGP_CONSOLE
 		ShowWindow(textwin.hWndParent, textwin.nCmdShow);
+#endif
 		while (!com_line());
 	}
 #else /*_Windows*/

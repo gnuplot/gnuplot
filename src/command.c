@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.209 2011/04/16 11:15:55 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.210 2011/04/27 17:17:17 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -2136,12 +2136,19 @@ do_system(const char *cmd)
 void
 help_command()
 {
+    HWND parent;
+
     c_token++;
+#ifdef WGP_CONSOLE
+    parent = GetDesktopWindow();
+#else
+    parent = textwin.hWndParent;
+#endif
 #ifdef WITH_HTML_HELP
     /* open help file if necessary */
-    help_window = HtmlHelp(textwin.hWndParent, winhelpname, HH_GET_WIN_HANDLE, (DWORD_PTR)NULL);
+    help_window = HtmlHelp(parent, winhelpname, HH_GET_WIN_HANDLE, (DWORD_PTR)NULL);
     if (help_window == NULL) {
-        help_window = HtmlHelp(textwin.hWndParent, winhelpname, HH_DISPLAY_TOPIC, (DWORD_PTR)NULL);
+        help_window = HtmlHelp(parent, winhelpname, HH_DISPLAY_TOPIC, (DWORD_PTR)NULL);
         if (help_window == NULL) {
             fprintf(stderr, "Error: Could not open help file \"%s\"\n", winhelpname);
             return;
@@ -2149,7 +2156,7 @@ help_command()
     }
     if (END_OF_COMMAND) {
         /* show table of contents */
-        HtmlHelp(textwin.hWndParent, winhelpname, HH_DISPLAY_TOC, (DWORD_PTR)NULL);
+        HtmlHelp(parent, winhelpname, HH_DISPLAY_TOC, (DWORD_PTR)NULL);
     } else {
         /* lookup topic in index */
         HH_AKLINK link;
@@ -2166,18 +2173,18 @@ help_command()
         link.pszMsgTitle =  NULL; 
         link.pszWindow =    NULL;
         link.fIndexOnFail = TRUE;
-        HtmlHelp(textwin.hWndParent, winhelpname, HH_KEYWORD_LOOKUP, (DWORD_PTR)&link);
+        HtmlHelp(parent, winhelpname, HH_KEYWORD_LOOKUP, (DWORD_PTR)&link);
     }
 #else
     if (END_OF_COMMAND)
-	WinHelp(textwin.hWndParent, (LPSTR) winhelpname, HELP_INDEX, (DWORD) NULL);
+	WinHelp(parent, (LPSTR) winhelpname, HELP_INDEX, (DWORD) NULL);
     else {
 	char buf[128];
 	int start = c_token;
 	while (!(END_OF_COMMAND))
 	    c_token++;
 	capture(buf, start, c_token - 1, 128);
-	WinHelp(textwin.hWndParent, (LPSTR) winhelpname, HELP_PARTIALKEY, (DWORD) buf);
+	WinHelp(parent, (LPSTR) winhelpname, HELP_PARTIALKEY, (DWORD) buf);
     }
 #endif
 }

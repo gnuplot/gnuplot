@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.117 2011/05/05 22:23:56 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.118 2011/05/05 22:39:10 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - win/wgraph.c */
@@ -454,10 +454,12 @@ GraphInit(LPGW lpgw)
 	AppendMenu(sysmenu, MF_POPUP, (UINT)lpgw->hPopMenu, "&Options");
 	AppendMenu(sysmenu, MF_STRING, M_ABOUT, "&About");
 
+#ifndef WGP_CONSOLE
 	if (!IsWindowVisible(lpgw->lptw->hWndParent)) {
 		AppendMenu(sysmenu, MF_SEPARATOR, 0, NULL);
 		AppendMenu(sysmenu, MF_STRING, M_COMMANDLINE, "C&ommand Line");
 	}
+#endif
 
 	ShowWindow(lpgw->hWndGraph, SW_SHOWNORMAL);
 }
@@ -2893,16 +2895,19 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 				case M_REBUILDTOOLS:
 					SendMessage(hwnd, WM_COMMAND, wParam, lParam);
 					break;
+#ifndef WGP_CONSOLE
 				case M_ABOUT:
 					if (lpgw->lptw)
 						AboutBox(hwnd,lpgw->lptw->AboutText);
 					return 0;
+#endif
 				case M_COMMANDLINE:
 					sysmenu = GetSystemMenu(lpgw->hWndGraph,0);
 					i = GetMenuItemCount (sysmenu);
 					DeleteMenu (sysmenu, --i, MF_BYPOSITION);
 					DeleteMenu (sysmenu, --i, MF_BYPOSITION);
-					ShowWindow (lpgw->lptw->hWndParent, SW_SHOW);
+					if (lpgw->lptw)
+						ShowWindow (lpgw->lptw->hWndParent, SW_SHOW);
 					break;
 			}
 			break;
@@ -2910,7 +2915,7 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			/* All 'normal' keys (letters, digits and the likes) end up
 			 * here... */
 #ifndef DISABLE_SPACE_RAISES_CONSOLE
-			if (wParam == VK_SPACE) {
+			if ((wParam == VK_SPACE) && (lpgw->lptw != NULL)){
 				/* HBB 20001023: implement the '<space> in graph returns to
 				 * text window' --- feature already present in OS/2 and X11 */
 				/* Make sure the text window is visible: */
@@ -3116,8 +3121,10 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 					return 0;
 				case M_WRITEINI:
 					WriteGraphIni(lpgw);
+#ifndef WGP_CONSOLE
 					if (lpgw->lptw)
 						WriteTextIni(lpgw->lptw);
+#endif
 					return 0;
 				case M_REBUILDTOOLS:
 					if (lpgw->color)
@@ -3273,10 +3280,12 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 				lpgw->Size.y = rect.bottom-rect.top;
 			}
 			break;
+#ifndef WGP_CONSOLE
 		case WM_DROPFILES:
 			if (lpgw->lptw)
 				DragFunc(lpgw->lptw, (HDROP)wParam);
 			break;
+#endif
 		case WM_DESTROY:
 			DestroyPens(lpgw);
 			DestroyFonts(lpgw);

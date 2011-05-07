@@ -1,5 +1,13 @@
 2011-05-07  Bastian Maerkisch  <bmaerkisch@web.de>
 
+	* src/command.c (help_command) src/win/wgraph.c (WndGraphProc)
+	src/win/winmain.c (WinExit, WinMain) src/wxtterminal/wxt_gui.cpp
+	(wxtPanel::RaiseConsoleWindow, wxt_atexit): For console gnuplot on
+	Windows, remove dependency on struct textwin, which represents the
+	non-existant text window. Fixes e.g. overwriting of text window
+	settings in wgnuplot.ini. Console gnuplot no longer depends on wtext.c
+	and screenbuf.c.
+
 	* src/standard.c (fn_asin, fn_asinh): Fix calculation for complex
 	arguments. Make sure that asin(sin(z))==z. Bug #2879772.
 	
