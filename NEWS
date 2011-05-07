@@ -26,6 +26,7 @@ New features, changes and fixes since gnuplot version 4.4
 * FIX length estimation of UTF-8 strings
 * FIX accurate placement of color boundaries in the colorbar
 * FIX Built-in readline handles UTF-8 encoding
+* FIX asin(sin(z)) == z for complex z
 * CHANGE 3D zoom using middle mouse button is now a logarithmic response
 * CHANGE 3D impulses are now always drawn from z=0
 * CHANGE remove vestigial code supporting Amiga, Apollo, and 16-bit MSDOS/WIN

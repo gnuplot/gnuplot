@@ -1,3 +1,13 @@
+2011-05-07  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/standard.c (fn_asin, fn_asinh): Fix calculation for complex
+	arguments. Make sure that asin(sin(z))==z. Bug #2879772.
+	
+	* config/README: Update to current status.
+
+	* config/config.mgw config/config.oww: Sync with config.h created
+	by autoconf tools.
+
 2011-05-06  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* src/graph3d.c: Make "notitle" suppress contour line key entries in 

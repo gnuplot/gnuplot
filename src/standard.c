@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: standard.c,v 1.28 2008/03/30 03:27:55 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: standard.c,v 1.29 2008/05/31 20:03:40 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - standard.c */
@@ -367,21 +367,23 @@ f_asin(union argument *arg)
 {
     struct value a;
     double alpha, beta, x, y;
+    int ysign;
 
     (void) arg;			/* avoid -Wunused warning */
     (void) pop(&a);
     x = real(&a);
     y = imag(&a);
+    ysign = (y >= 0) ? 1 : -1;
     if (y == 0.0 && fabs(x) <= 1.0) {
 	push(Gcomplex(&a, asin(x) / ang2rad, 0.0));
     } else if (x == 0.0) {
-	push(Gcomplex(&a, 0.0, -log(-y + sqrt(y * y + 1)) / ang2rad));
+	push(Gcomplex(&a, 0.0, ysign * log(-y + sqrt(y * y + 1)) / ang2rad));
     } else {
 	beta = sqrt((x + 1) * (x + 1) + y * y) / 2 - sqrt((x - 1) * (x - 1) + y * y) / 2;
 	if (beta > 1)
 	    beta = 1;		/* Avoid rounding error problems */
 	alpha = sqrt((x + 1) * (x + 1) + y * y) / 2 + sqrt((x - 1) * (x - 1) + y * y) / 2;
-	push(Gcomplex(&a, asin(beta) / ang2rad, -log(alpha + sqrt(alpha * alpha - 1)) / ang2rad));
+	push(Gcomplex(&a, asin(beta) / ang2rad, ysign * log(alpha + sqrt(alpha * alpha - 1)) / ang2rad));
     }
 }
 
@@ -528,22 +530,24 @@ f_asinh(union argument *arg)
 {
     struct value a;		/* asinh(z) = -I*asin(I*z) */
     double alpha, beta, x, y;
+    int ysign;
 
     (void) arg;			/* avoid -Wunused warning */
     (void) pop(&a);
     x = -imag(&a);
     y = real(&a);
+    ysign = (y >= 0) ? 1 : -1;
     if (y == 0.0 && fabs(x) <= 1.0) {
 	push(Gcomplex(&a, 0.0, -asin(x) / ang2rad));
     } else if (y == 0.0) {
 	push(Gcomplex(&a, 0.0, 0.0));
 	undefined = TRUE;
     } else if (x == 0.0) {
-	push(Gcomplex(&a, log(y + sqrt(y * y + 1)) / ang2rad, 0.0));
+	push(Gcomplex(&a, ysign * log(y + sqrt(y * y + 1)) / ang2rad, 0.0));
     } else {
 	beta = sqrt((x + 1) * (x + 1) + y * y) / 2 - sqrt((x - 1) * (x - 1) + y * y) / 2;
 	alpha = sqrt((x + 1) * (x + 1) + y * y) / 2 + sqrt((x - 1) * (x - 1) + y * y) / 2;
-	push(Gcomplex(&a, log(alpha + sqrt(alpha * alpha - 1)) / ang2rad, -asin(beta) / ang2rad));
+	push(Gcomplex(&a, ysign * log(alpha + sqrt(alpha * alpha - 1)) / ang2rad, -asin(beta) / ang2rad));
     }
 }
 
