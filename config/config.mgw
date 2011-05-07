@@ -1,21 +1,24 @@
 /* config.h for makefile.mgw
  * 
  * Prepared according to config.h from ./configure and by means of
- * config_strip.sh as of gnuplot 4.3 in February 2008.
+ * config_strip.sh as of gnuplot 4.5 in Mai 2011.
  */
 
 
 /* Define to allow use of deprecated syntax and terminal behaviour. */
-#define BACKWARDS_COMPATIBLE 1
-
-/* Define if you want to support files in binary format. */
-#define BINARY_DATA_FILE 1
+/* #undef BACKWARDS_COMPATIBLE */
 
 /* Define if you want to use the CGI terminal under SCO. */
 /* #undef CGI */
 
 /* Define if you want online help and subtopic tables sorted by column. */
 /* #undef COLUMN_HELP */
+
+/* Define to treat spacebar like any other keystroke. */
+/* #undef DISABLE_SPACE_RAISES_CONSOLE */
+
+/* Contact address for modified and binary distributed gnuplot versions */
+/* #undef DIST_CONTACT */
 
 /* Define if you want to use libgrx20 with MSDOS/djgpp. */
 /* #undef DJSVGA */
@@ -37,7 +40,7 @@
 
 /* Define if libgd supports animated gifs. */
 /* #undef GIF_ANIMATION */
-/* Don't change it here -- this define is set in config/makefile.mgw. */
+/* Don't change it here -- this define is set in config/mingw/Makefile. */
 
 /* Define if you want to use the GNU version of the Unix plot library. */
 /* #undef GNUGRAPH */
@@ -45,7 +48,7 @@
 /* Define if you want to use a gnuplot history file. */
 #define GNUPLOT_HISTORY 1
 
-/* Define to allow command line macros. EXPERIMENTAL */
+/* Define to allow command line macros. */
 #define GP_MACROS 1
 
 /* Define if you want to use a newer version of libgrx under MSDOS/djgpp. */
@@ -65,6 +68,7 @@
 
 /* Define if you want the cairo-based terminals. */
 /* #undef HAVE_CAIROPDF */
+/* Don't change it here -- this define is set in config/mingw/Makefile. */
 
 /* Define to 1 if you have the declaration of `signgam', and to 0 if you
    don't. */
@@ -75,6 +79,9 @@
 
 /* Define to 1 if you have the `doprnt' function. */
 /* #undef HAVE_DOPRNT */
+
+/* Define to 1 if you have the <editline/readline.h> header file. */
+/* #undef HAVE_EDITLINE_READLINE_H */
 
 /* Define to 1 if you have the `erf' function. */
 #if __GNUC__ >= 3
@@ -100,23 +107,23 @@
 
 /* Define if libgd supports gif. */
 /* #undef HAVE_GD_GIF */
-/* Don't change it here -- this define is set in config/makefile.mgw. */
+/* Don't change it here -- this define is set in config/mingw/Makefile. */
 
 /* Define to 1 if you have the <gd.h> header file. */
 /* #undef HAVE_GD_H */
-/* Don't change it here -- this define is set in config/makefile.mgw. */
+/* Don't change it here -- this define is set in config/mingw/Makefile. */
 
 /* Define if libgd supports jpeg. */
 /* #undef HAVE_GD_JPEG */
-/* Don't change it here -- this define is set in config/makefile.mgw. */
+/* Don't change it here -- this define is set in config/mingw/Makefile. */
 
 /* Define if libgd supports png. */
 /* #undef HAVE_GD_PNG */
-/* Don't change it here -- this define is set in config/makefile.mgw. */
+/* Don't change it here -- this define is set in config/mingw/Makefile. */
 
 /* Define if libgd supports TrueType fonts through libfreetype. */
 /* #undef HAVE_GD_TTF */
-/* Don't change it here -- this define is set in config/makefile.mgw. */
+/* Don't change it here -- this define is set in config/mingw/Makefile. */
 
 /* Define to 1 if you have the `getcwd' function. */
 #define HAVE_GETCWD 1
@@ -133,6 +140,9 @@
 /* Define to use gtk+ functions to handle cairo */
 /* #undef HAVE_GTK28 */
 
+/* define if you have libiconv and iconv.h */
+/* #undef HAVE_ICONV */
+
 /* Define to 1 if you have the `index' function. */
 /* #undef HAVE_INDEX */
 
@@ -141,17 +151,12 @@
 #  define HAVE_INTTYPES_H 1
 #endif
 
-/* Define to 1 if you have the `isnan' function. */
-#if __GNUC__ >= 3
-#  define HAVE_ISNAN 1
-#endif
-
 /* Define if you use have kpsexpand (TeX). */
 /* #undef HAVE_KPSEXPAND */
 
 /* Define to 1 if you have the `lgamma' function. */
 #if __GNUC__ >= 3
-/* #  define HAVE_LGAMMA 1 */
+/* #define HAVE_LGAMMA 1 */
 /* Comment: lgamma() is available in MingW 3.4.4, but without signgam required by f_gamma() */
 #endif
 
@@ -161,33 +166,43 @@
 /* Define to 1 if you have the <libc.h> header file. */
 /* #undef HAVE_LIBC_H */
 
+/* Define if you are using the BSD editline library. */
+/* #undef HAVE_LIBEDITLINE */
+
 /* Define if you have gd library. */
 /* #undef HAVE_LIBGD */
-/* Don't change it here -- this define is set in config/makefile.mgw. */
+/* Don't change it here -- this define is set in config/mingw/Makefile. */
 
 /* Define to 1 if you have the `m' library (-lm). */
 /* #undef HAVE_LIBM */
 
 /* Define to 1 if you have the `pdf' library (-lpdf). */
 /* #undef HAVE_LIBPDF */
-/* Don't change it here -- this define is set in config/makefile.mgw. */
+/* Don't change it here -- this define is set in config/mingw/Makefile. */
 
 /* Define if your pdf library is too old to use PDF_begin_document. */
 /* #undef HAVE_LIBPDF_OPEN_FILE */
 
 /* Define if you are using the GNU readline library. */
 /* #undef HAVE_LIBREADLINE */
-/* Don't change it here -- this define is set in config/makefile.mgw. */
 
 /* Define if you have zlib. */
 /* #undef HAVE_LIBZ */
-/* Don't change it here -- this define is set in config/makefile.mgw. */
+/* Don't change it here -- this define is set in config/mingw/Makefile. */
 
 /* Define to 1 if you have the <limits.h> header file. */
 #define HAVE_LIMITS_H 1
 
 /* Define to 1 if you have the <locale.h> header file. */
 #define HAVE_LOCALE_H 1
+
+/* Define if you want the lua/TikZ terminal. */
+/* #undef HAVE_LUA */
+/* Don't change it here -- this define is set in config/mingw/Makefile. */
+
+/* Define to 1 if you have the <lua.h> header file. */
+/* #undef HAVE_LUA_H */
+/* Don't change it here -- this define is set in config/mingw/Makefile. */
 
 /* Define to 1 if you have the <malloc.h> header file. */
 #define HAVE_MALLOC_H 1
@@ -237,8 +252,8 @@
 /* Define to 1 if you have the <readline/readline.h> header file. */
 /* #undef HAVE_READLINE_READLINE_H */
 
-/* Define to 1 if you have the <readline/tilde.h> header file. */
-/* #undef HAVE_READLINE_TILDE_H */
+/* Define if your libreadline has rl_reset_after_signal */
+/* #undef HAVE_READLINE_RESET */
 
 /* Define to 1 if you have the `rindex' function. */
 /* #undef HAVE_RINDEX */
@@ -397,6 +412,12 @@
 /* Define to 1 if you have the <vgagl.h> header file. */
 /* #undef HAVE_VGAGL_H */
 
+/* Define to 1 if you have the <wchar.h> header file. */
+#define HAVE_WCHAR_H 1
+
+/* Define to 1 if you have the `wcwidth' function. */
+/* #undef HAVE_WCWIDTH */
+
 /* Define to 1 if `fork' works. */
 /* #undef HAVE_WORKING_FORK */
 
@@ -418,14 +439,29 @@
 /* Define if this is a Linux system with SuperVGA library. */
 /* #undef LINUXVGA */
 
+/* Define to 1 if malloc(0)==0 */
+/* #undef MALLOC_ZERO_RETURNS_ZERO */
+
 /* Define if you want to use the MGR Window system. */
 /* #undef MGR */
+
+/* Define if your libreadline has no rl_ding */
+/* #undef MISSING_RL_DING */
+
+/* Define if your libreadline has no rl_force_update_display */
+/* #undef MISSING_RL_FORCED_UPDATE_DISPLAY */
+
+/* Define if your libreadline has no rl_complete_with_tilde_expansion */
+/* #undef MISSING_RL_TILDE_EXPANSION */
 
 /* Define if this is an MSDOS system. */
 /* #undef MSDOS */
 
 /* Define if you do not want to read .gnuplot in the current directory. */
 /* #undef NOCWDRC */
+
+/* Define to disable terminals that depend on code in bitmap.c */
+/* #undef NO_BITMAP_SUPPORT */
 
 /* Name of package */
 /* #undef PACKAGE */
@@ -447,13 +483,16 @@
 
 /* Define if you do have the popen and pclose functions. */
 /* #undef PIPES */
-/* Don't change it here -- this define is set in config/makefile.mgw. */
+/* Don't change it here -- this define is set in config/mingw/Makefile. */
 
 /* Unix-type of Interprocess Communication is required for mouse support. */
 /* #undef PIPE_IPC */
 
 /* Define to 1 if the C compiler supports function prototypes. */
 #define PROTOTYPES 1
+
+/* Define if you want the Qt terminal. */
+/* #undef QTTERM */
 
 /* Define if you want to use the included readline function. */
 #define READLINE 1
@@ -496,7 +535,7 @@
 
 /* Define if you want to have mouse support in interactive terminals. */
 /* #undef USE_MOUSE */
-/* Don't change it here -- this define is set in config/makefile.mgw. */
+/* Don't change it here -- this define is set in config/mingw/Makefile. */
 
 /* Define to enable multi-byte font support for x11 */
 /* #undef USE_X11_MULTIBYTE */
@@ -512,12 +551,18 @@
 
 /* Define if you want the wxwidgets terminal. */
 /* #undef WXWIDGETS */
+/* Don't change it here -- this define is set in config/mingw/Makefile. */
 
 /* Define if you are using the X11 window system. */
 /* #undef X11 */
 
 /* Define to 1 if the X Window System is missing or not being used. */
 /* #undef X_DISPLAY_MISSING */
+
+/* Enable GNU extensions on systems that have them.  */
+#ifndef _GNU_SOURCE
+# define _GNU_SOURCE 1
+#endif
 
 /* Define like PROTOTYPES; this can be used by system headers. */
 /* #undef __PROTOTYPES */
@@ -530,10 +575,12 @@
 
 /* Define to `__inline__' or `__inline' if that's what the C compiler
    calls it, or to nothing if 'inline' is not supported under any name.  */
+#ifndef __cplusplus
 /* #undef inline */
+#endif
 
 /* Define to `int' if <sys/types.h> does not define. */
-/* #define pid_t int */
+/* #undef pid_t */
 
 /* Define to `unsigned' if <sys/types.h> does not define. */
 /* #undef size_t */
@@ -549,9 +596,6 @@
  */
 
 
-#ifndef __WIN32__
-# define __WIN32__
-#endif
 #ifndef WIN32
 # define WIN32
 #endif
@@ -562,8 +606,6 @@
 /* Both USE_MOUSE and WIN_IPC must be defined together in the Makefile. */
 
 #define GP_INLINE inline
-
-#define NEAR
 
 /* gnuplot.gih is not used by wgnuplot */
 #define NO_GIH 1
