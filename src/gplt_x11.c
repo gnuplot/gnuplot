@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.202 2010/10/07 18:29:42 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.203 2011/04/21 03:12:29 sfeam Exp $"); }
 #endif
 
 #define X11_POLYLINE 1
@@ -4124,12 +4124,13 @@ is_meta(KeySym mod)
  * value of gnuplotXID (because Konsole's in KDE <3.2 don't set WINDOWID contrary
  * to all other xterm's).
  * Currently implemented for:
- *	- KDE's Konsole.
+ *	- KDE3 Konsole.
  * Note: if the returned command is !NULL, then it must be free()'d by the caller.
  */
 static char*
 getMultiTabConsoleSwitchCommand(unsigned long *newGnuplotXID)
 {
+#if (0)	/* This code used the DCOP mechanism from KDE3, which went away in KDE4 */
 #ifdef HAVE_STRDUP	/* We assume that any machine missing strdup is too old for KDE */
     char *cmd = NULL; /* result */
     char *ptr = getenv("KONSOLE_DCOP_SESSION"); /* Try KDE's Konsole first. */
@@ -4206,6 +4207,7 @@ getMultiTabConsoleSwitchCommand(unsigned long *newGnuplotXID)
     /* ... if somebody bothers to implement it ... */
 
 #endif /* HAVE_STRDUP */
+#endif	/* if(0) DCOP no longer exists in KDE4 */
     /* we are not running in any known (implemented) multitab console */
     return NULL;
 }

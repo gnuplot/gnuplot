@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.cpp,v 1.81 2011/04/28 13:40:58 markisch Exp $
+ * $Id: wxt_gui.cpp,v 1.82 2011/05/07 16:18:01 markisch Exp $
  */
 
 /* GNUPLOT - wxt_gui.cpp */
@@ -1131,7 +1131,8 @@ void wxtPanel::RaiseConsoleWindow()
 	window_env = getenv("WINDOWID");
 	if (window_env)
 		sscanf(window_env, "%lu", &windowid);
-	
+
+#if (0)	/* DCOP was a KDE3 mechanism that no longer exists in KDE4 */
 	char *ptr = getenv("KONSOLE_DCOP_SESSION"); /* Try KDE's Konsole first. */
 	if (ptr) {
 		/* We are in KDE's Konsole, or in a terminal window detached from a Konsole.
@@ -1185,6 +1186,7 @@ void wxtPanel::RaiseConsoleWindow()
 		if (konsole_name) free(konsole_name);
 		if (cmd) free(cmd);
 	}
+#endif	/* if (0) DCOP doesn't exist in KDE4 */
 	/* now test for GNOME multitab console */
 	/* ... if somebody bothers to implement it ... */
 	/* we are not running in any known (implemented) multitab console */
