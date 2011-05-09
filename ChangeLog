@@ -14,13 +14,6 @@
 
 	* src/term_api.h src/term.c src/util.c src/util.h:  Remove dead code.
 
-2011-05-08  Ethan A Merritt  <merritt@u.washington.edu>
-
-	* src/gpltx11.c (getMultiTabConsoleSwitchCommand)
-	src/wxterminal/wxt_gui.cpp (wxtPanel::RaiseConsoleWindow):
-	Comment out support for KDE3 konsole commands via DCOP, which no longer
-	exists in KDE4.
-
 2011-05-07  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/command.c (help_command) src/win/wgraph.c (WndGraphProc)
