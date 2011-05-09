@@ -1,3 +1,8 @@
+2011-05-09  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/eepic.trm:  New terminal option {size XX,YY}
+	Bug #3170746
+
 2011-05-07  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/standard.c (fn_asin, fn_asinh): Fix calculation for complex
