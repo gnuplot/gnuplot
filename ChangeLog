@@ -3,6 +3,11 @@
 	* term/eepic.trm:  New terminal option {size XX,YY}
 	Bug #3170746
 
+	* src/graphics.c (boundary):  Add a sanity check to make sure that the
+	plot size is not so small that the boundary limits go negative.
+	Implemented as int_warn(), but maybe it should be int_error().
+	Bug #3154401
+
 2011-05-08  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/gpltx11.c (getMultiTabConsoleSwitchCommand)

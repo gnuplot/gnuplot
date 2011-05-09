@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.364 2011/04/16 04:55:26 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.365 2011/04/27 18:38:14 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -1240,6 +1240,12 @@ boundary(struct curve_points *plots, int count)
 
     /* Set default clipping to the plot boundary */
     clip_area = &plot_bounds;
+
+    /* Sanity check. FIXME:  Stricter test? Fatal error? */
+    if (plot_bounds.xright < plot_bounds.xleft
+    ||  plot_bounds.ytop   < plot_bounds.ybot)
+	int_warn(NO_CARET, "Terminal canvas area too small to hold plot."
+			"\n\t    Check plot boundary and font sizes.");
 
 }
 
