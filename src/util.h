@@ -1,5 +1,5 @@
 /*
- * $Id: util.h,v 1.32 2009/10/31 20:20:07 sfeam Exp $
+ * $Id: util.h,v 1.33 2010/11/12 19:18:02 sfeam Exp $
  */
 
 /* GNUPLOT - util.h */
@@ -64,9 +64,6 @@ extern const char *current_prompt; /* needed by is_error() and friends */
 /* Functions exported by util.c: */
 
 /* Command parsing helpers: */
-#if 0 /* UNUSED */
-int chr_in_str __PROTO((int, int));
-#endif
 int equals __PROTO((int, const char *));
 int almost_equals __PROTO((int, const char *));
 int isstring __PROTO((int));

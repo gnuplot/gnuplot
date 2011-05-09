@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.217 2011/04/03 16:46:08 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.218 2011/04/16 11:15:55 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -1509,14 +1509,6 @@ static struct termentry term_tbl[] =
 };
 
 #define TERMCOUNT (sizeof(term_tbl) / sizeof(term_tbl[0]))
-#if 0 /* UNUSED */
-/* mainly useful for external code */
-int
-term_count()
-{
-    return TERMCOUNT;
-}
-#endif
 
 void
 list_terms()

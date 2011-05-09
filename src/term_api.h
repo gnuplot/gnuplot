@@ -1,5 +1,5 @@
 /*
- * $Id: term_api.h,v 1.94 2011/04/06 06:00:18 sfeam Exp $
+ * $Id: term_api.h,v 1.95 2011/04/07 03:30:33 sfeam Exp $
  */
 
 /* GNUPLOT - term_api.h */
@@ -388,9 +388,6 @@ void term_check_multiplot_okay __PROTO((TBOOLEAN));
 
 void write_multiline __PROTO((unsigned int, unsigned int, char *, JUSTIFY, VERT_JUSTIFY, int, const char *));
 int estimate_strlen __PROTO((char *));
-#if 0 /* UNUSED */
-int term_count __PROTO((void));
-#endif /* UNUSED */
 void list_terms __PROTO((void));
 char* get_terminals_names __PROTO((void));
 struct termentry *set_term __PROTO((void));

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: util.c,v 1.93 2011/03/20 17:51:25 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: util.c,v 1.94 2011/05/05 04:13:29 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - util.c */
@@ -69,26 +69,6 @@ const char *current_prompt = NULL; /* to be set by read_line() */
 
 static void mant_exp __PROTO((double, double, TBOOLEAN, double *, int *, const char *));
 static void parse_sq __PROTO((char *));
-
-#if 0 /* UNUSED */
-/*
- * chr_in_str() compares the characters in the string of token number t_num
- * with c, and returns TRUE if a match was found.
- */
-int
-chr_in_str(int t_num, int c)
-{
-    int i;
-
-    if (!token[t_num].is_token)
-	return (FALSE);		/* must be a value--can't be equal */
-    for (i = 0; i < token[t_num].length; i++) {
-	if (input_line[token[t_num].start_index + i] == c)
-	    return (TRUE);
-    }
-    return FALSE;
-}
-#endif
 
 /*
  * equals() compares string value of token number t_num with str[], and
