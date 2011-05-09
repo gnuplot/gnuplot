@@ -1,6 +1,6 @@
 /* Hello, Emacs! This is -*-C-*- !*/
 /*
- * $Id: eepic.trm,v 1.29 2006/07/21 02:35:46 sfeam Exp $
+ * $Id: eepic.trm,v 1.30 2008/02/24 19:49:38 sfeam Exp $
  *
  */
 
@@ -102,19 +102,18 @@ TERM_PUBLIC int EEPIC_text_angle __PROTO((int ang));
 TERM_PUBLIC void EEPIC_reset __PROTO((void));
 TERM_PUBLIC void EEPIC_options __PROTO((void));
 
-#define EEPIC_PTS_PER_INCH 72.27
+#define EEPIC_PTS_PER_INCH 72.
 /* resolution of printer we expect to use */
 #define EEPIC_DOTS_PER_INCH 600
 /* dot size in pt */
 #define EEPIC_UNIT (EEPIC_PTS_PER_INCH/EEPIC_DOTS_PER_INCH)
 
 /* 5 inches wide by 3 inches high (default) */
-#define EEPIC_XMAX (EEPIC_PTS_PER_INCH/EEPIC_UNIT*5.0)
-#define EEPIC_YMAX (EEPIC_PTS_PER_INCH/EEPIC_UNIT*3.0)
-
+#define EEPIC_XMAX (5.0*EEPIC_PTS_PER_INCH/EEPIC_UNIT)
+#define EEPIC_YMAX (3.0*EEPIC_PTS_PER_INCH/EEPIC_UNIT)
 #define EEPIC_HTIC (5.0/EEPIC_UNIT)
 #define EEPIC_VTIC (5.0/EEPIC_UNIT)
-#define EEPIC_VCHAR (10.0/EEPIC_UNIT)
+#define EEPIC_VCHAR (10.0/EEPIC_UNIT)	/* 10 pt font */
 #define EEPIC_HCHAR (EEPIC_VCHAR/2.0)
 #endif /* TERM_PROTO */
 
@@ -127,7 +126,9 @@ static enum JUSTIFY eepic_justify = LEFT;
 static int eepic_angle = 0;
 static int eepic_color_on = FALSE;		/* use \color */
 static int eepic_true_rotate = FALSE;		/* use \rotatebox */
-static int fontsize_set = FALSE;
+static int eepic_fontsize_set = FALSE;
+static float eepic_xsize = 5.0;
+static float eepic_ysize = 3.0;
 
 /* for DOTS point style */
 #define EEPIC_TINY_DOT "\\rule{.1pt}{.1pt}"
@@ -253,7 +254,7 @@ EEPIC_graphics()
 	    (int) (t->ymax * ysize),
 	    (int) (t->xmax * xoffset),
 	    (int) (t->ymax * xoffset));
-    if (fontsize_set) {
+    if (eepic_fontsize_set) {
 	float x = t->v_char * EEPIC_UNIT + 0.5;
 
 	fprintf(gpoutfile, "\\fontsize{%d}{%g}\\selectfont\n",
@@ -473,18 +474,24 @@ EEPIC_options()
 {
     float fontsize = 0;
 
+    int eepic_explicit_units = INCH;
+    static TBOOLEAN size_set = FALSE;
     eepic_color_on =
     eepic_true_rotate = FALSE;
     eepic_lineset = 0;
     eepic_pointsize = 0;
 
     while (!END_OF_COMMAND) {
-	if (almost_equals(c_token, "de$fault")) {
-	    fontsize_set = FALSE;
+	if (almost_equals(c_token, "def$ault")) {
+	    eepic_fontsize_set = FALSE;
 	    eepic_color_on = FALSE;
 	    eepic_true_rotate = FALSE;
 	    eepic_lineset = 0;
 	    eepic_pointsize = 0;
+	    eepic_explicit_units = INCH;
+	    term->xmax = EEPIC_XMAX;
+	    term->ymax = EEPIC_YMAX;
+	    size_set = FALSE;
 	    c_token++;
 	} else if (almost_equals(c_token, "c$olor") ||
 		   almost_equals(c_token, "c$olour")) {
@@ -498,6 +505,12 @@ EEPIC_options()
 	    if (! eepic_color_on)
 		eepic_lineset = 1;	/* ignore when color is on */
 	    c_token++;
+	} else if (equals(c_token, "size")) {
+	    c_token++;
+	    eepic_explicit_units = parse_term_size(&eepic_xsize, &eepic_ysize, INCHES);
+	    term->xmax = eepic_xsize / EEPIC_UNIT;
+	    term->ymax = eepic_ysize / EEPIC_UNIT;
+	    size_set = TRUE;
 	} else if (almost_equals(c_token, "s$mall")) {
 	    eepic_pointsize = 1;
 	    c_token++;
@@ -512,7 +525,7 @@ EEPIC_options()
 	    if (fontsize < 1 || fontsize > 100)
 		int_error(c_token, "font size out of bounds [1..100]");
 	    else {
-		fontsize_set = TRUE;
+		eepic_fontsize_set = TRUE;
 		term->v_char = (unsigned int)(fontsize/EEPIC_UNIT);
 		term->h_char = (unsigned int)((fontsize/EEPIC_UNIT)/2);
 	    }
@@ -520,14 +533,22 @@ EEPIC_options()
 	    int_error(c_token, "unrecognized option");
     } /* while(command) */
 
-    sprintf(term_options, "default%s%s%s%s",
+    sprintf(term_options, "%s%s%s%s",
 	    eepic_color_on ? " color" : "",
 	    eepic_lineset == 1 ? " dashed" : "",
 	    eepic_true_rotate ? " rotate" : "",
 	    eepic_pointsize == 1 ? " small"
 	    : eepic_pointsize == 2 ? " tiny" : "" );
-    if (fontsize_set)
+    if (eepic_fontsize_set)
 	sprintf( term_options+strlen(term_options), " %d", (int) fontsize );
+    if (size_set) {
+	if (eepic_explicit_units == CM)
+	    sprintf(term_options+strlen(term_options)," size %.2fcm, %.2fcm ",
+		2.54*(float)term->xmax/(EEPIC_DOTS_PER_INCH), 2.54*(float)term->ymax/(EEPIC_DOTS_PER_INCH));
+	else
+	    sprintf(term_options+strlen(term_options)," size %.2fin, %.2fin ",
+		(float)term->xmax/(EEPIC_DOTS_PER_INCH), (float)term->ymax/(EEPIC_DOTS_PER_INCH));
+    }
 }
 
 #endif
@@ -574,7 +595,8 @@ START_HELP(eepic)
 " dvips and dvipdfm do support the \"tpic\" \\specials.",
 "",
 " Syntax:",
-"    set terminal eepic {color, dashed, rotate, small, tiny, default, <fontsize>}",
+"    set terminal eepic {default} {color|dashed} {rotate} {size XX,YY}",
+"                       {small|tiny|<fontsize>}",
 "",
 " Options:",
 " You can give options in any order you wish.",
@@ -583,8 +605,8 @@ START_HELP(eepic)
 " of your latex document.",
 " 'dashed' will allow dashed line types; without this option, only solid lines",
 " with varying thickness will be used.",
-" 'dashed' and 'color' are mutually exclusive; if 'color' is specified, then 'dashed'",
-" will be ignored.",
+" 'dashed' and 'color' are mutually exclusive; if 'color' is specified, then",
+" 'dashed' will be ignored.",
 " 'rotate' will enable true rotated text (by 90 degrees). Otherwise, rotated text",
 " will be typeset with letters stacked above each other. If you use this option",
 " you must include \\usepackage{graphicx} in the preamble.",
@@ -602,10 +624,10 @@ START_HELP(eepic)
 " Remember to escape the # character (or other chars meaningful to (La-)TeX)",
 " by \\\\ (2 backslashes).",
 " It seems that dashed lines become solid lines when the vertices of a plot",
-" are too close. (I do not know if that is a general problem with the tpic specials,",
-" or if it is caused by a bug in eepic.sty or dvips/dvipdfm.)",
-" The default size of an eepic plot is 5x3 inches, which can be scaled ",
-" by 'set size a,b'.",
+" are too close. (I do not know if that is a general problem with the tpic",
+" specials, or if it is caused by a bug in eepic.sty or dvips/dvipdfm.)",
+" The default size of an eepic plot is 5x3 inches. You can change this using ",
+" the `size` terminal option.",
 " Points, among other things, are drawn using the LaTeX commands \"\\Diamond\",",
 " \"\\Box\", etc.  These commands no longer belong to the LaTeX2e core; they are",
 " included in the latexsym package, which is part of the base distribution and",

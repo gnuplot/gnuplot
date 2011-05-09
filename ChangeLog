@@ -1,3 +1,8 @@
+2011-05-09  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/eepic.trm:  New terminal option {size XX,YY}
+	Bug #3170746
+
 2011-05-08  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/gpltx11.c (getMultiTabConsoleSwitchCommand)
