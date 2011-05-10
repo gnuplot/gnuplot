@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.247 2011/04/16 04:55:26 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.248 2011/05/06 23:56:21 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -2273,6 +2273,8 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid,
 	}
 
 	if (X_AXIS.label.text) {
+	    int angle = 0;
+
 	    /* label at xaxis_y + 1/4 of (xaxis_y-other_y) */
 #ifdef USE_GRID_LAYERS /* FIXME: still needed??? what for? */
 	    if ((surface_rot_x <= 90 && BACKGRID != whichgrid) ||
@@ -2308,8 +2310,19 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid,
 #define DEFAULT_Y_DISTANCE 0.5
 		y1 -= (unsigned int) ((1 + DEFAULT_Y_DISTANCE) * t->v_char);
 #undef DEFAULT_Y_DISTANCE
+		angle = X_AXIS.label.rotate;
 	    } else { /* usual 3d set view ... */
 		double step = (xaxis_y - other_end) / 4;
+		/* The only angle that makes sense is running parallel to the axis */
+		if (X_AXIS.label.tag == ROTATE_IN_3D_LABEL_TAG) {
+		    double angx0, angx1, angy0, angy1;
+		    map3d_xy_double(X_AXIS.min, xaxis_y, base_z, &angx0, &angy0);
+		    map3d_xy_double(X_AXIS.max, xaxis_y, base_z, &angx1, &angy1);
+		    angle = round( atan2(angy1-angy0, angx1-angx0) / DEG2RAD );
+		    step /= 2;
+		    if (step > 0)
+			angle += 180;
+		}
 
 		if (X_AXIS.ticmode & TICS_ON_AXIS) {
 		    map3d_xyz(mid_x, (X_AXIS.tic_in ? step : -step)/2., base_z, &v1);
@@ -2328,14 +2341,13 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid,
 	    y1 += tmpy;
 	    ignore_enhanced(X_AXIS.label.noenhanced);
 	    apply_pm3dcolor(&(X_AXIS.label.textcolor),t);
-	    if (X_AXIS.label.rotate != 0 && splot_map && (term->text_angle)(X_AXIS.label.rotate)) {
+	    if (angle != 0 && (term->text_angle)(angle)) {
 		write_multiline(x1, y1, X_AXIS.label.text, CENTRE, JUST_TOP,
-			    X_AXIS.label.rotate, X_AXIS.label.font);
+			    angle, X_AXIS.label.font);
 		(term->text_angle)(0);
 	    } else {
-		write_multiline(x1, y1, X_AXIS.label.text,
-			    CENTRE, JUST_TOP, 0,
-			    X_AXIS.label.font);
+		write_multiline(x1, y1, X_AXIS.label.text, CENTRE, JUST_TOP,
+			    0, X_AXIS.label.font);
 	    }
 	    reset_textcolor(&(X_AXIS.label.textcolor),t);
 	    ignore_enhanced(FALSE);
@@ -2376,7 +2388,7 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid,
 		unsigned int x1, y1;
 		int tmpx, tmpy;
 		int h_just, v_just;
-		int angle;
+		int angle = 0;
 
 		if (splot_map) { /* case 'set view map' */
 		    /* copied from ytick_callback(): baseline of tics labels */
@@ -2426,6 +2438,16 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid,
 		    angle = Y_AXIS.label.rotate;
 		} else { /* usual 3d set view ... */
 		    double step = (other_end - yaxis_x) / 4;
+		    /* The only angle that makes sense is running parallel to the axis */
+		    if (Y_AXIS.label.tag == ROTATE_IN_3D_LABEL_TAG) {
+			double angx0, angx1, angy0, angy1;
+			map3d_xy_double(yaxis_x, Y_AXIS.min, base_z, &angx0, &angy0);
+			map3d_xy_double(yaxis_x, Y_AXIS.max, base_z, &angx1, &angy1);
+			angle = round( atan2(angy1-angy0, angx1-angx0) / DEG2RAD );
+			step /= 2;
+			if (step > 0)
+			    angle += 180;
+		    }
 		    if (Y_AXIS.ticmode & TICS_ON_AXIS) {
 			map3d_xyz((X_AXIS.tic_in ? -step : step)/2., mid_y, base_z, &v1);
 		    } else {
@@ -2438,8 +2460,6 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid,
 		    TERMCOORD(&v1, x1, y1);
 		    h_just = CENTRE;
 		    v_just = JUST_TOP;
-		    /* No Y-label rotation in 3D plot mode */
-		    angle = 0;
 		}
 
 		map3d_position_r(&(Y_AXIS.label.offset), &tmpx, &tmpy, "graphbox");
@@ -2450,7 +2470,7 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid,
 		ignore_enhanced(Y_AXIS.label.noenhanced);
 		apply_pm3dcolor(&(Y_AXIS.label.textcolor),t);
 
-		if (angle != 0 && splot_map && (term->text_angle)(angle)) {
+		if (angle != 0 && (term->text_angle)(angle)) {
 		    write_multiline(x1, y1, Y_AXIS.label.text, h_just, v_just,
 				    angle, Y_AXIS.label.font);
 		    (term->text_angle)(0);

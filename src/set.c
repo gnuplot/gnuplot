@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.337 2011/01/26 07:06:15 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.338 2011/02/20 23:17:11 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -5466,22 +5466,28 @@ parse_label_options( struct text_label *this_label )
 	}
 
 	/* get rotation (added by RCC) */
-	if (! set_rot) {
-	    if (almost_equals(c_token, "rot$ate")) {
+	if (almost_equals(c_token, "rot$ate")) {
+	    c_token++;
+	    set_rot = TRUE;
+	    rotate = this_label->rotate;
+	    if (equals(c_token, "by")) {
+		c_token++;
+		rotate = int_expression();
+	    } else if (almost_equals(c_token,"para$llel")) {
+		if (this_label->tag >= 0)
+		    int_error(c_token,"invalid option");
+		c_token++;
+		this_label->tag = ROTATE_IN_3D_LABEL_TAG;
+	    } else
 		rotate = TEXT_VERTICAL;
-		c_token++;
-		set_rot = TRUE;
-		if (equals(c_token, "by")) {
-		    c_token++;
-		    rotate = int_expression();
-		}
-		continue;
-	    } else if (almost_equals(c_token, "norot$ate")) {
-		rotate = 0;
-		c_token++;
-		set_rot = TRUE;
-		continue;
-	    }
+	    continue;
+	} else if (almost_equals(c_token, "norot$ate")) {
+	    rotate = 0;
+	    c_token++;
+	    set_rot = TRUE;
+	    if (this_label->tag == ROTATE_IN_3D_LABEL_TAG)
+		this_label->tag = NONROTATABLE_LABEL_TAG;
+	    continue;
 	}
 
 	/* get font (added by DJL) */

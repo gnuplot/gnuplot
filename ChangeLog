@@ -6,6 +6,12 @@
 
 	* src/graphics.c (finish_filled_curve): Consolidate duplicated code.
 
+	* src/graph3d.c (draw_3d_graphbox) src/set.c (parse_label_options)
+	src/gadgets.h src/show.c src/save.c
+	docs/plotstyles.gnu docs/gnuplot.doc:
+	The X-axis and Y-axis labels in 3D plots can be aligned parallel to the
+	respective axis using the command `set [xy]label rotate parallel`.
+
 2011-05-10  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* term/gd.trm (PNG_options): Init font pointers before using them.

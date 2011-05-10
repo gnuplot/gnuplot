@@ -66,7 +66,9 @@ set boxwidth 0.8 relative
 plot demo . 'silver.dat' u 1:($2-10.):(3*rand(0)) with boxerrorbars title 'with boxerrorbars' fs empty
 #
 set output out . 'figure_impulses' . ext
+set bmargin at screen .2
 plot demo . 'silver.dat' u 1:($2-10.) with impulses title 'with impulses'
+set bmargin at screen .05
 #
 # Error bars and whisker plots
 # ============================
@@ -273,8 +275,8 @@ set bmargin screen 0.40
 unset key
 set samples 20, 20
 set isosamples 21, 21
-set xlabel "X axis" 
-set ylabel "Y axis" 
+set xlabel "X axis" rotate parallel offset 0,-1
+set ylabel "Y axis" rotate parallel offset 0,-1
 set zlabel "Z axis" 
 set zlabel  offset 2,0 rotate by -90
 unset xtics

@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.666 2011/05/05 04:14:07 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.667 2011/05/06 23:39:58 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -3576,9 +3576,9 @@ Ffigure_impulses
  point (2D) or from z=0 to the z value of each point (3D).  Note that the y or z
  values may be negative.  Data from additional columns can be used to control
  the color of each impulse.  To use this style effectively in 3D plots, it is
- useful to use thick lines (linewidth > 1).  This approximates a 3D bar chart.
+ useful to choose thick lines (linewidth > 1). This approximates a 3D bar chart.
 
-      1 column:   y        # implicit x coordinate from row number (2D)
+      1 column:   y
       2 columns:  x  y     # line from [x,0] to [x,y]  (2D)
       3 columns:  x  y  z  # line from [x,y,0] to [x,y,z] (3D)
 
@@ -11801,8 +11801,8 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/population.gif" alt="[popu
 
  Syntax:
        set xlabel {"<label>"} {offset <offset>} {font "<font>{,<size>}"}
-                  {{textcolor | tc} {lt <line_type> | default}} {{no}enhanced}
-                  {rotate by <degrees>}
+                  {textcolor <colorspec>} {{no}enhanced}
+                  {rotate by <degrees> | rotate parallel | norotate}
        show xlabel
 
  The same syntax applies to `x2label`, `ylabel`, `y2label`, `zlabel` and
@@ -11819,8 +11819,6 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/population.gif" alt="[popu
  <font> is used to specify the font in which the label is written; the units
  of the font <size> depend upon which terminal is used.
 
- `textcolor lt <n>` sets the text color to that of line type <n>.
-
  `noenhanced` requests that the label text not be processed by the enhanced text
  mode parser, even if enhanced text mode is currently active.
 
@@ -11828,36 +11826,22 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/population.gif" alt="[popu
 
  The default positions of the axis labels are as follows:
 
- xlabel:  The x-axis label is centered below the bottom axis.
+ xlabel:  The x-axis label is centered below the bottom of the plot.
 
- ylabel:  The position of the y-axis label depends on the terminal, and can be
- one of the following three positions:
-
- 1. Horizontal text flushed left at the top left of the plot.  Terminals that
- cannot rotate text will probably use this method.  If `set x2tics` is also
- in use, the ylabel may overwrite the left-most x2tic label.  This may be
- remedied by adjusting the ylabel position or the left margin.
-
- 2. Vertical text centered vertically at the left of the plot.  Terminals
- that can rotate text will probably use this method.
-
- 3. Horizontal text centered vertically at the left of the plot.  The EEPIC,
- LaTeX and TPIC drivers use this method.  The EEPIC driver will produce a
- stack of characters so as not to overwrite the plot. With other drivers
- (such as LaTeX and TPIC), the user probably has to insert line breaks
- using \\ to prevent the ylabel from overwriting the plot.
+ ylabel:  The y-axis label is centered to the left of the plot, defaulting to
+ either horizontal or vertical orientation depending on the terminal type.
 
  zlabel: The z-axis label is centered along the z axis and placed in the space
  above the grid level.
 
  cblabel: The color box axis label is centered along the box and placed below
- or right according to horizontal or vertical color box gradient.
+ or to the right according to horizontal or vertical color box gradient.
 
  y2label: The y2-axis label is placed to the right of the y2 axis.  The
  position is terminal-dependent in the same manner as is the y-axis label.
 
- x2label: The x2-axis label is placed above the top axis but below the plot
- title.  It is also possible to create an x2-axis label by using new-line
+ x2label: The x2-axis label is placed above the plot but below the title.
+ It is also possible to create an x2-axis label by using new-line
  characters to make a multi-line plot title, e.g.,
 
        set title "This is the title\n\nThis is the x2label"
@@ -11865,9 +11849,10 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/population.gif" alt="[popu
  Note that double quotes must be used.  The same font will be used for both
  lines, of course.
 
- The orientation (rotation angle) of the x, x2, y and y2 axis labels can be
- explicitly changed from the default setting, but this applies only to 2D plots
- and only on terminals that support text rotation.
+ The orientation (rotation angle) of the x, x2, y and y2 axis labels in 2D plots
+ can be changed by specifying `rotate by <degrees>`.  The orientation of the x 
+ and y axis labels in 3D plots defaults to horizontal but can be changed to run
+ parallel to the axis by specifying `rotate parallel`.
 
  If you are not satisfied with the default position of an axis label, use `set
  label` instead--that command gives you much more control over where text is

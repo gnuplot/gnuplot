@@ -92,8 +92,11 @@ typedef struct text_label {
 
 /* This is the default state for the axis, timestamp, and plot title labels
  * indicated by tag = -2 */
+#define NONROTATABLE_LABEL_TAG -2
+#define ROTATE_IN_3D_LABEL_TAG -3
 #define EMPTY_LABELSTRUCT \
-    {NULL, -2, {character, character, character, 0.0, 0.0, 0.0}, CENTRE, 0, 0, \
+    {NULL, NONROTATABLE_LABEL_TAG, \
+     {character, character, character, 0.0, 0.0, 0.0}, CENTRE, 0, 0, \
      NULL, NULL, {TC_LT, -2, 0.0}, DEFAULT_LP_STYLE_TYPE, \
      {character, character, character, 0.0, 0.0, 0.0}, FALSE }
 
