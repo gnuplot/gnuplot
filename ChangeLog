@@ -1,3 +1,9 @@
+2011-05-10  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/datafile.c (expand_df_column):  Provide a shared routine for 
+	dynamic allocation of space to hold input data lines. This replaces
+	three separate instances, only one of which did proper initialization.
+
 2011-05-10  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* term/gd.trm (PNG_options): Init font pointers before using them.

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.196 2011/05/05 04:13:29 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.197 2011/05/06 05:48:25 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -171,6 +171,7 @@ static void mod_def_usespec __PROTO((int specno, int jump));
 #endif
 static int check_missing __PROTO((char *s));
 
+static void expand_df_column __PROTO((int));
 static char *df_gets __PROTO((void));
 static int df_tokenise __PROTO((char *s));
 static float *df_read_matrix __PROTO((int *rows, int *columns));
@@ -646,15 +647,8 @@ df_tokenise(char *s)
 
     while (*s) {
 	/* check store - double max cols or add 20, whichever is greater */
-	if (df_max_cols <= df_no_cols) {
-	    int new_max = df_max_cols + (df_max_cols < 20 ? 20 : df_max_cols);
-	    df_column = gp_realloc(df_column,
-				new_max * sizeof(df_column_struct),
-				"datafile column");
-	    for (; df_max_cols < new_max; df_max_cols++) {
-		df_column[df_max_cols].datum = 0;
-	    }
-	}
+	if (df_max_cols <= df_no_cols)
+	    expand_df_column((df_max_cols < 20) ? df_max_cols+20 : 2*df_max_cols);
 
 	/* have always skipped spaces at this point */
 	df_column[df_no_cols].position = s;
@@ -1644,12 +1638,8 @@ df_readascii(double v[], int max)
 	    assert(MAXDATACOLS == 7);
 
 	    /* check we have room for at least 7 columns */
-	    if (df_max_cols < 7) {
-		df_max_cols = 7;
-		df_column = gp_realloc(df_column,
-				       df_max_cols * sizeof(df_column_struct),
-				       "datafile columns");
-	    }
+	    if (df_max_cols < 7)
+		expand_df_column(7);
 
 	    df_no_cols = sscanf(line, df_format,
 				&df_column[0].datum,
@@ -4152,12 +4142,8 @@ df_readbinary(double v[], int max)
 	return DF_EOF;
 
     /* Check if we have room for at least df_no_bin_cols columns */
-    if (df_max_cols < df_no_bin_cols) {
-	df_column = gp_realloc(df_column,
-			       df_no_bin_cols * sizeof(df_column_struct),
-			       "datafile columns");
-	df_max_cols = df_no_bin_cols;
-    }
+    if (df_max_cols < df_no_bin_cols)
+	expand_df_column(df_no_bin_cols);
 
     /* In binary mode, the number of user specs was increased by the
      * number of dimensions in the underlying uniformly sampled grid
@@ -4770,4 +4756,16 @@ df_generate_pseudodata()
     }
 
     return line;
+}
+
+/* Allocate space for more data columns as needed */
+void
+expand_df_column(int new_max)
+{
+    df_column = gp_realloc(df_column,
+			new_max * sizeof(df_column_struct),
+			"datafile column");
+    for (; df_max_cols < new_max; df_max_cols++) {
+	df_column[df_max_cols].datum = 0;
+    }
 }
