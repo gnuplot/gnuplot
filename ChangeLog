@@ -1,3 +1,7 @@
+2011-05-10  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* term/gd.trm (PNG_options): Init font pointers before using them.
+
 2011-05-09  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/eepic.trm:  New terminal option {size XX,YY}
