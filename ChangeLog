@@ -4,6 +4,8 @@
 	dynamic allocation of space to hold input data lines. This replaces
 	three separate instances, only one of which did proper initialization.
 
+	* src/graphics.c (finish_filled_curve): Consolidate duplicated code.
+
 2011-05-10  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* term/gd.trm (PNG_options): Init font pointers before using them.
