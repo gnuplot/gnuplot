@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: mouse.c,v 1.128 2010/11/18 23:59:59 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: mouse.c,v 1.129 2011/04/29 21:33:05 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - mouse.c */
@@ -765,8 +765,8 @@ incr_mousemode(const int amount)
     if (MOUSE_COORDINATES_ALT == mouse_mode && !(mouse_alt_string || polar))
 	mouse_mode += amount;	/* stepping over */
     if (mouse_mode > MOUSE_COORDINATES_ALT) {
-	mouse_mode = MOUSE_COORDINATES_REAL;
-    } else if (mouse_mode < MOUSE_COORDINATES_REAL) {
+	mouse_mode = MOUSE_COORDINATES_REAL1;
+    } else if (mouse_mode <= MOUSE_COORDINATES_REAL) {
 	mouse_mode = MOUSE_COORDINATES_ALT;
 	if (!(mouse_alt_string || polar))
 	    mouse_mode--;	/* stepping over */
@@ -1107,7 +1107,7 @@ static char *
 builtin_decrement_mousemode(struct gp_event_t *ge)
 {
     if (!ge) {
-	return "`builtin-decrement-mousemode`";
+	return "`builtin-previous-mouse-format`";
     }
     incr_mousemode(-1);
     return (char *) 0;
@@ -1117,7 +1117,7 @@ static char *
 builtin_increment_mousemode(struct gp_event_t *ge)
 {
     if (!ge) {
-	return "`builtin-increment-mousemode`";
+	return "`builtin-next-mouse-format`";
     }
     incr_mousemode(1);
     return (char *) 0;

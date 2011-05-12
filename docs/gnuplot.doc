@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.667 2011/05/06 23:39:58 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.668 2011/05/11 05:18:41 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -3928,18 +3928,21 @@ Ffigure_surface+contours
  The `splot` command can also calculate and draw contour lines corresponding
  to constant Z values. These contour lines may be drawn onto the surface
  itself, or projected onto the XY plane. See `set contour`.
-
-
-
-
-
-
+  
+  
+  
+  
+  
+  
+3 2D projection (set view map)
+?2D projection (set view map)
+?projection
 Ffigure_mapcontours
  An important special case of the `splot` command is to map the Z coordinate
  onto a 2D surface by projecting the plot along the Z axis.  See `set view map`.
  This plot mode can be used to generate contour plots and heat maps.
-
-
+  
+  
 1 Commands
 ?commands
  This section lists the commands acceptable to `gnuplot` in alphabetical
@@ -5759,18 +5762,20 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/population.gif" alt="[popu
 ?data-file using
 ?datafile using
 ?using
- The most common datafile modifier is `using`.
+ The most common datafile modifier is `using`.  It tells the program which
+ columns of data in the input file are to be plotted.
 
  Syntax:
-       plot 'file' using {<entry> {:<entry> {:<entry> ...}}} {'format'}
+       plot 'file' using <entry> {:<entry> {:<entry> ...}} {'format'}
 
- If a format is specified, each datafile record is read using the C library's
- 'scanf' function, with the specified format string.  Otherwise the record is
- read and broken into columns. By default the separation between columns is
- whitespace (spaces and/or tabs), but see `datafile separator`.
+ If a format is specified, it is used to read in each datafile record using the
+ C library 'scanf' function.  Otherwise the record is interpreted as consisting
+ of columns (fields) of data separated by whitespace (spaces and/or tabs),
+ but see `datafile separator`.
 
  Each <entry> may be a simple column number that selects the value from one
- field of the input fit, an expression enclosed in parentheses, or empty.
+ field of the input file, an expression enclosed in parentheses, or a special
+ function not enclosed in parentheses such as xticlabels(2).
 
  If the entry is an expression in parentheses, then the function column(N) may
  be used to indicate the value in column N. That is, column(1) refers to the
@@ -5786,7 +5791,7 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/population.gif" alt="[popu
  An empty <entry> will default to its order in the list of entries.
  For example, `using ::4` is interpreted as `using 1:2:4`.
 
- If the `using` list has but a single entry, that <entry> will be used for y
+ If the `using` list has only a single entry, that <entry> will be used for y
  and the data point number (pseudo-column $0) is used for x; for example,
  "`plot 'file' using 1`" is identical to "`plot 'file' using 0:1`".
  If the `using` list has two entries, these will be used for x and y.
@@ -9214,29 +9219,6 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/population.gif" alt="[popu
  and the ruler is also shown in polar coordinates (distance and angle in
  degrees or tangent (slope)). This corresponds to the default key binding '5'.
 
- The `format` option takes a fprintf like format string which determines how
- floating point numbers are printed to the drivers window and the clipboard.
- The default is "% #g".
-
- `clipboardformat` and `mouseformat` are used for formatting the text on
- Button1 and Button2 actions -- copying the coordinates to the clipboard and
- temporarily annotating the mouse position. This corresponds to the key
- bindings '1', '2', '3', '4' (see the driver's documentation). If the argument
- is a string this string is used as c format specifier and should contain two
- float specifiers, e.g. `set mouse mouseformat "mouse = %5.2g, %10.2f"`. Use
- `set mouse mouseformat ""` to turn this string off again.
-
- The following formats are available (format 6 may only be selected if the
- format string was specified already):
-
-  0   real coordinates in  brackets e.g. [1.23, 2.45]
-  1   real coordinates w/o brackets e.g.  1.23, 2.45
-  2   x == timefmt                       [(as set by `set timefmt`), 2.45]
-  3   x == date                          [31. 12. 1999, 2.45]
-  4   x == time                          [23:59, 2.45]
-  5   x == date / time                   [31. 12. 1999 23:59, 2.45]
-  6   alt. format, specified as string   ""
-
 =labels
  Choose the option `labels` to define persistent gnuplot labels using Button 2.
  The default is `nolabels`, which makes Button 2 draw only a temporary label at
@@ -9262,6 +9244,34 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/population.gif" alt="[popu
  can be defined using the `bind` command, see help for `bind`.  Note, that user
  defined `hotkeys` may override the default bindings.
  See also help for `bind` and `label`.
+4 mouseformat
+?set mouse format
+?set mouse mouseformat
+?mouse format
+?mouseformat
+ The `set mouse format` command specifies a format string for sprintf() which
+ determines how the mouse cursor [x,y] coordinates are printed to the plot
+ window and to the clipboard.  The default is "% #g".
+
+ `set mouse clipboardformat` and `set mouse mouseformat` are used for formatting
+ the text on Button1 and Button2 actions -- copying the coordinates to the
+ clipboard and temporarily annotating the mouse position.  An integer argument
+ selects one of the format options in the table below. A string argument is used
+ as a format for sprintf() in option 6 and should contain two float specifiers.
+ Example:
+      `set mouse mouseformat "mouse x,y = %5.2g, %10.3f"`.
+ Use `set mouse mouseformat ""` to turn this string off again.
+
+ The following formats are available:
+
+  0   default (same as 1)
+  1   axis coordinates                    1.23, 2.45
+  2   graph coordinates (from 0 to 1)    /0.00, 1.00/
+  3   x = timefmt     y = axis           [(as set by `set timefmt`), 2.45]
+  4   x = date        y = axis           [31. 12. 1999, 2.45]
+  5   x = time        y = axis           [23:59, 2.45]
+  6   x = date time   y = axis           [31. 12. 1999 23:59, 2.45]
+  7   format from `set mouse mouseformat`, e.g. "mouse x,y = 1.23,     2.450"
 4 scrolling
 ?set mouse scrolling
 ?mouse scrolling

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.338 2011/02/20 23:17:11 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.339 2011/05/11 05:18:41 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -2480,7 +2480,7 @@ set_mouse()
 	    } else {
 		int itmp = int_expression();
 		if (itmp >= MOUSE_COORDINATES_REAL
-		    && itmp <= MOUSE_COORDINATES_XDATETIME) {
+		    && itmp <= MOUSE_COORDINATES_ALT) {
 		    if (MOUSE_COORDINATES_ALT == itmp && !mouse_alt_string) {
 			fprintf(stderr,
 			    "please 'set mouse mouseformat <fmt>' first.\n");
@@ -2489,7 +2489,7 @@ set_mouse()
 		    }
 		} else {
 		    fprintf(stderr, "should be: %d <= mouseformat <= %d\n",
-			MOUSE_COORDINATES_REAL, MOUSE_COORDINATES_XDATETIME);
+			MOUSE_COORDINATES_REAL, MOUSE_COORDINATES_ALT);
 		}
 	    }
 	} else if (almost_equals(c_token, "noru$ler")) {

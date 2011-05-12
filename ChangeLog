@@ -1,3 +1,9 @@
+2011-05-12  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* docs/gnuplot.doc src/set.c src/mouse.c:  Update documentation for the
+	mouse format modes, which has been incorrect since approximately forever
+	(predates CVS repository).
+
 2011-05-10  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/datafile.c (expand_df_column):  Provide a shared routine for 
