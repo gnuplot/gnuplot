@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: win.trm,v 1.97 2011/05/05 19:01:04 markisch Exp $
+ * $Id: win.trm,v 1.98 2011/05/13 18:29:39 markisch Exp $
  */
 
 /* GNUPLOT - win.trm */
@@ -1006,7 +1006,8 @@ START_HELP(windows)
 "       GraphColor=1",
 "       GraphToTop=1",
 "       GraphDoublebuffer=1",
-"       GraphOversampling=1",
+"       GraphOversampling=0",
+"       GraphAntialiasing=1",
 "       GraphBackground=255 255 255",
 "       Border=0 0 0 0 0",
 "       Axis=192 192 192 2 2",
@@ -1017,6 +1018,8 @@ START_HELP(windows)
 "       Line5=0 0 128 0 4",
 "",
 "^ <h3>Text window options</h3> ",
+"",
+" These settings apply to the wgnuplot text-window only."
 "",
 " The `TextOrigin` and `TextSize` entries specify the location and size of the",
 " text window.",
