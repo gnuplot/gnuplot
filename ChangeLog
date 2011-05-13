@@ -1,3 +1,9 @@
+2011-05-13  Allin Cottrell  <cottrell@wfu.edu>
+
+	* src/wxterminal/gp_cairo.c (gp_cairo_convert): Make the WIN32 font 
+	work-around (2009-11-06) conditional on cairo < 2.10. Needs more 
+	testing.
+
 2011-05-13  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/win/wgraph.c (WndGraphProc): Cycle through mouse-modes by
