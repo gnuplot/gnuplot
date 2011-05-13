@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.248 2011/05/06 23:56:21 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.249 2011/05/11 05:18:41 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -2315,10 +2315,11 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid,
 		double step = (xaxis_y - other_end) / 4;
 		/* The only angle that makes sense is running parallel to the axis */
 		if (X_AXIS.label.tag == ROTATE_IN_3D_LABEL_TAG) {
-		    double angx0, angx1, angy0, angy1;
+		    double ang, angx0, angx1, angy0, angy1;
 		    map3d_xy_double(X_AXIS.min, xaxis_y, base_z, &angx0, &angy0);
 		    map3d_xy_double(X_AXIS.max, xaxis_y, base_z, &angx1, &angy1);
-		    angle = round( atan2(angy1-angy0, angx1-angx0) / DEG2RAD );
+		    ang = atan2(angy1-angy0, angx1-angx0) / DEG2RAD;
+		    angle = (ang > 0) ? floor(ang + 0.5) : floor(ang - 0.5);
 		    step /= 2;
 		    if (step > 0)
 			angle += 180;
@@ -2440,10 +2441,11 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid,
 		    double step = (other_end - yaxis_x) / 4;
 		    /* The only angle that makes sense is running parallel to the axis */
 		    if (Y_AXIS.label.tag == ROTATE_IN_3D_LABEL_TAG) {
-			double angx0, angx1, angy0, angy1;
+			double ang, angx0, angx1, angy0, angy1;
 			map3d_xy_double(yaxis_x, Y_AXIS.min, base_z, &angx0, &angy0);
 			map3d_xy_double(yaxis_x, Y_AXIS.max, base_z, &angx1, &angy1);
-			angle = round( atan2(angy1-angy0, angx1-angx0) / DEG2RAD );
+			ang = atan2(angy1-angy0, angx1-angx0) / DEG2RAD;
+			angle = (ang > 0) ? floor(ang + 0.5) : floor(ang - 0.5);
 			step /= 2;
 			if (step > 0)
 			    angle += 180;

@@ -1,3 +1,8 @@
+2011-05-13  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/graph3d.c (draw_3d_graphbox):  Avoid use of round() because
+	MSVC is still not C99-compliant.
+
 2011-05-13  Allin Cottrell  <cottrell@wfu.edu>
 
 	* src/wxterminal/gp_cairo.c (gp_cairo_convert): Make the WIN32 font 
