@@ -2,7 +2,9 @@
 #include <windows.h>
 #include "wgnuplib.rc"
 
+#ifndef NO_MANIFEST
 CREATEPROCESS_MANIFEST_RESOURCE_ID RT_MANIFEST "wgnuplot.exe.manifest"
+#endif
 
 #ifdef MSRC
 /* using Microsoft RC.EXE */
