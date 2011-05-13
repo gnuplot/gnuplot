@@ -1,3 +1,18 @@
+2011-05-13  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/win/wgraph.c (WndGraphProc): Cycle through mouse-modes by
+	clicking on status bar. Suggestion by plotter@piments.com
+
+	* src/plot.c (main): Print messages concerning codepages only in
+	interactive sessions.
+
+	* src/win/wgnuplot.rc: Give the MSVC compiler a chance to create the
+	manifest itself.
+
+	* src/win/wgraph.c (drawgraph): Fix image regression.
+
+	* term/win.trm: Help text for antialiasing.
+
 2011-05-12  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* docs/gnuplot.doc src/set.c src/mouse.c:  Update documentation for the

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.119 2011/05/07 16:18:01 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.120 2011/05/13 18:33:22 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - win/wgraph.c */
@@ -3163,8 +3163,16 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			}
 			return 0;
 		case WM_PARENTNOTIFY:
-			/* Message from status bar: anything but context menu
-			   is not handled */
+			/* Message from status bar (or another child window): */
+#ifdef USE_MOUSE
+			/* Cycle through mouse-mode on button 1 click */
+			if (LOWORD(wParam) == WM_LBUTTONDOWN) {
+				/* simulate keyboard event '1' */
+				Wnd_exec_event(lpgw, lParam, GE_keypress, (TCHAR)'1');
+				return 0;
+			}
+#endif
+			/* Context menu is handled below, everything els is not */
 			if (LOWORD(wParam) != WM_CONTEXTMENU)
 				return 1;
 			/* intentionally fall through */
