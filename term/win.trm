@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: win.trm,v 1.96 2011/04/27 10:18:28 markisch Exp $
+ * $Id: win.trm,v 1.97 2011/05/05 19:01:04 markisch Exp $
  */
 
 /* GNUPLOT - win.trm */
@@ -878,7 +878,10 @@ START_HELP(windows)
 "",
 " `Oversampling` doubles the size of the virtual canvas. It is scaled down",
 " again for drawing to the screen. This gives smoother graphics but requires",
-" more memory and computing time. It requires `double buffer`."
+" more memory and computing time. It requires `double buffer`.",
+"",
+" `Antialiasing` selects smoothing of lines and edges. Note that this slows",
+" down drawing.",
 "",
 " `Background...` sets the window background color.",
 "",
