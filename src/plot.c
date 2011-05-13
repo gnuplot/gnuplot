@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot.c,v 1.124 2011/03/25 10:35:47 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot.c,v 1.125 2011/04/25 16:59:02 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot.c */
@@ -493,7 +493,7 @@ main(int argc, char **argv)
 
 #ifdef WGP_CONSOLE
 #ifdef CONSOLE_SWITCH_CP
-    if (cp_changed) {
+    if (cp_changed && interactive) {
 	fprintf(stderr,
 	    "\ngnuplot changed the codepage of this console from %i to %i to\n" \
 	    "match the graph window. Some characters might only display correctly\n" \
@@ -501,7 +501,7 @@ main(int argc, char **argv)
 	    cp_input, GetConsoleCP());
     }
 #else
-    if (GetConsoleCP() != GetACP()) {
+    if ((GetConsoleCP() != GetACP()) && interactive) {
 	fprintf(stderr,
 	    "\nWarning: The codepage of the graph window (%i) and that of the\n" \
 	    "console (%i) differ. Use `set encoding` or `!chcp` if extended\n" \
