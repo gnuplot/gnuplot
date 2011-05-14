@@ -1,5 +1,5 @@
 /*
- * $Id: wgdiplus.cpp,v 1.1 2011/04/28 13:44:04 markisch Exp $
+ * $Id: wgdiplus.cpp,v 1.2 2011/05/05 19:07:19 markisch Exp $
  */
 
 /*
@@ -54,7 +54,16 @@ void gdiplusCleanup(void)
 };
 
 
-Pen * gdiplusCreatePen(UINT style, float width, COLORREF color)
+static Color gdiplusCreateColor(COLORREF color, double alpha)
+{
+	ARGB argb = Color::MakeARGB(
+		BYTE(255 * alpha),
+		GetRValue(color), GetGValue(color), GetBValue(color));
+	return Color(argb);
+}
+
+
+static Pen * gdiplusCreatePen(UINT style, float width, COLORREF color)
 {
 	// create GDI+ pen
 	Color gdipColor(0, 0, 0, 255);
@@ -66,6 +75,28 @@ Pen * gdiplusCreatePen(UINT style, float width, COLORREF color)
 	pen->SetLineCap(LineCapFlat, LineCapFlat, DashCapFlat);
 	
 	return pen;	
+}
+
+
+void gdiplusLine(HDC hdc, POINT x, POINT y, const PLOGPEN logpen)
+{
+	gdiplusLineEx(hdc, x, y, logpen->lopnStyle, (float)logpen->lopnWidth.x, logpen->lopnColor);
+}
+
+
+void gdiplusLineEx(HDC hdc, POINT x, POINT y, UINT style, float width, COLORREF color)
+{
+	gdiplusInit();
+	Graphics graphics(hdc);
+
+	// Dash patterns get scaled with line width, in contrast to GDI.
+	// Avoid smearing out caused by antialiasing for small line widths.
+	if ((style == PS_SOLID) || (width >= 2.))
+		graphics.SetSmoothingMode(SmoothingModeAntiAlias);
+
+	Pen * pen = gdiplusCreatePen(style, width, color);
+	graphics.DrawLine(pen, (INT)x.x, (INT)x.y, (INT)y.x, (INT)y.y);
+	delete(pen);
 }
 
 
@@ -101,20 +132,22 @@ void gdiplusSolidFilledPolygonEx(HDC hdc, POINT *ppt, int polyi, COLORREF color,
 {
 	gdiplusInit();
 	Graphics graphics(hdc);
-	graphics.SetSmoothingMode(SmoothingModeAntiAlias);
 
-	ARGB argb = Color::MakeARGB(
-		BYTE(255 * alpha),
-		GetRValue(color), GetGValue(color), GetBValue(color));
-	Color gdipColor(argb);
-	SolidBrush brush(gdipColor);
-	Point * points = new Point[polyi];
+	Color gdipColor = gdiplusCreateColor(color, alpha);
+	Point * points = new Point[polyi + 1];
 	for (int i = 0; i < polyi; i++) {
 		points[i].X = ppt[i].x;
 		points[i].Y = ppt[i].y;
 	}
+	points[polyi].X = ppt[0].x;
+	points[polyi].Y = ppt[0].y;
+	SolidBrush brush(gdipColor);
 	graphics.FillPolygon(&brush, points, polyi);
-	delete(points);
+
+	graphics.SetSmoothingMode(SmoothingModeAntiAlias);
+	Pen * pen = new Pen(gdipColor, 1);
+	graphics.DrawLines(pen, points, polyi + 1);
+	delete pen, points;
 }
 
 

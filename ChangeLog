@@ -1,3 +1,9 @@
+2011-05-14  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/win/wgdiplus.c|h src/win/wgraph.c: Extend support for
+	antialiasing of line segments and point symbols. Add missing
+	border to antialiased solid fill region.
+
 2011-05-13  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graph3d.c (draw_3d_graphbox):  Avoid use of round() because
@@ -5,8 +11,8 @@
 
 2011-05-13  Allin Cottrell  <cottrell@wfu.edu>
 
-	* src/wxterminal/gp_cairo.c (gp_cairo_convert): Make the WIN32 font 
-	work-around (2009-11-06) conditional on cairo < 2.10. Needs more 
+	* src/wxterminal/gp_cairo.c (gp_cairo_convert): Make the WIN32 font
+	work-around (2009-11-06) conditional on cairo < 2.10. Needs more
 	testing.
 
 2011-05-13  Bastian Maerkisch  <bmaerkisch@web.de>

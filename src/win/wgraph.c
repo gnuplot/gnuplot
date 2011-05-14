@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.120 2011/05/13 18:33:22 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.121 2011/05/13 18:37:44 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - win/wgraph.c */
@@ -885,6 +885,7 @@ UnicodeText(const char *str, enum set_encoding_id encoding)
         case S_ENC_KOI8_U:     codepage = 21866; break;
         case S_ENC_SJIS:       codepage =   932; break;
         case S_ENC_UTF8:       codepage = CP_UTF8; break;
+		default:               codepage = 0;   
     }
     if (codepage != 0) {
         int length;
@@ -1273,6 +1274,7 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 	int polyi = 0;				/* number of points in ppt */
 	POINT *ppt;					/* storage of polyline/polygon-points */
 	unsigned int lastop=-1;		/* used for plotting last point on a line */
+	POINT cpoint;				/* current GDI location */
 
 	/* filled polygons and boxes */
 	unsigned int fillstyle = 0;	/* current fill style */
@@ -1351,18 +1353,23 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 		if ((lastop == W_vect) && (curptr->op != W_vect)) {
 			if (polyi >= 2) {
 #ifdef HAVE_GDIPLUS
-				if (!lpgw->antialiasing)
-					Polyline(hdc, ppt, polyi);
-				else
+				if (lpgw->antialiasing)
 					gdiplusPolyline(hdc, ppt, polyi, &cur_penstruct);
-#else
-				Polyline(hdc, ppt, polyi);
+				else
 #endif
+					Polyline(hdc, ppt, polyi);
 				/* move internal GDI state to last point */
 				MoveTo(hdc, ppt[polyi-1].x, ppt[polyi-1].y);
+				cpoint = ppt[polyi-1];
 			} else if (polyi == 1) {
 				/* degenerate case e.g. when using 'linecolor variable' */
-				LineTo(hdc, ppt[0].x, ppt[0].y);
+#ifdef HAVE_GDIPLUS
+				if (lpgw->antialiasing)
+					gdiplusLine(hdc, cpoint, ppt[0], &cur_penstruct);
+				else
+#endif
+					LineTo(hdc, ppt[0].x, ppt[0].y);
+				cpoint = ppt[0];
 			}
 			polyi = 0;
 		}
@@ -1382,11 +1389,17 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 			ppt[polyi].y = ydash;
 			polyi++;
 			if (polyi >= polymax) {
-			Polyline(hdc, ppt, polyi);
-			MoveTo(hdc, xdash, ydash);
-			ppt[0].x = xdash;
-			ppt[0].y = ydash;
-			polyi = 1;
+#ifdef HAVE_GDIPLUS
+				if (lpgw->antialiasing)
+					gdiplusPolyline(hdc, ppt, polyi, &cur_penstruct);
+				else
+#endif
+					Polyline(hdc, ppt, polyi);
+				MoveTo(hdc, xdash, ydash);
+				ppt[0].x = xdash;
+				ppt[0].y = ydash;
+				polyi = 1;
+				cpoint = ppt[0];
 			}
 			break;
 
@@ -1556,7 +1569,7 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 				DeleteDC(memdc);
 			} else {
 				/* not transparent */
-				/* FIXME: this actually is transparent, but probably shouldn't */
+				/* FIXME: this actually is transparent, but probably shouldn't be */
 				PatBlt(hdc, p.x, p.y, width, height, PATCOPY);
 			/*
 				SelectObject(hdc, lpgw->hnull);
@@ -1870,32 +1883,55 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 			dot(hdc, xdash, ydash);
 			break;
 		case W_plus: /* do plus */
-			SelectObject(hdc, lpgw->hsolid);
-			MoveTo(hdc,xdash-htic,ydash);
-			LineTo(hdc,xdash+htic+1,ydash);
-			MoveTo(hdc,xdash,ydash-vtic);
-			LineTo(hdc,xdash,ydash+vtic+1);
-			SelectObject(hdc, lpgw->hapen);
-			break;
+		case W_star: /* do star: first plus, then cross */
+#ifdef HAVE_GDIPLUS
+			if (lpgw->antialiasing) {
+				POINT a, b;
+				a.x = xdash - htic;
+				a.y = ydash;
+				b.x = xdash + htic;
+				b.y = ydash;
+				gdiplusLineEx(hdc, a, b, PS_SOLID, line_width, last_color);
+				a.x = xdash;
+				a.y = ydash - vtic;
+				b.x = xdash;
+				b.y = ydash + vtic;
+				gdiplusLineEx(hdc, a, b, PS_SOLID, line_width, last_color);
+			} else
+#endif
+			{
+				SelectObject(hdc, lpgw->hsolid);
+				MoveTo(hdc, xdash - htic, ydash);
+				LineTo(hdc, xdash + htic + 1, ydash);
+				MoveTo(hdc, xdash, ydash - vtic);
+				LineTo(hdc, xdash, ydash + vtic + 1);
+				SelectObject(hdc, lpgw->hapen);
+			}
+			if (curptr->op == W_plus) break;
 		case W_cross: /* do X */
-			SelectObject(hdc, lpgw->hsolid);
-			MoveTo(hdc,xdash-htic,ydash-vtic);
-			LineTo(hdc,xdash+htic+1,ydash+vtic+1);
-			MoveTo(hdc,xdash-htic,ydash+vtic);
-			LineTo(hdc,xdash+htic+1,ydash-vtic-1);
-			SelectObject(hdc, lpgw->hapen);
-			break;
-		case W_star: /* do star */
-			SelectObject(hdc, lpgw->hsolid);
-			MoveTo(hdc,xdash-htic,ydash);
-			LineTo(hdc,xdash+htic+1,ydash);
-			MoveTo(hdc,xdash,ydash-vtic);
-			LineTo(hdc,xdash,ydash+vtic+1);
-			MoveTo(hdc,xdash-htic,ydash-vtic);
-			LineTo(hdc,xdash+htic+1,ydash+vtic+1);
-			MoveTo(hdc,xdash-htic,ydash+vtic);
-			LineTo(hdc,xdash+htic+1,ydash-vtic-1);
-			SelectObject(hdc, lpgw->hapen);
+#ifdef HAVE_GDIPLUS
+			if (lpgw->antialiasing) {
+				POINT a, b;
+				a.x = xdash - htic;
+				a.y = ydash - vtic;
+				b.x = xdash + htic;
+				b.y = ydash + vtic;
+				gdiplusLineEx(hdc, a, b, PS_SOLID, line_width, last_color);
+				a.x = xdash - htic;
+				a.y = ydash + vtic;
+				b.x = xdash + htic;
+				b.y = ydash - vtic;
+				gdiplusLineEx(hdc, a, b, PS_SOLID, line_width, last_color);
+			} else
+#endif
+			{
+				SelectObject(hdc, lpgw->hsolid);
+				MoveTo(hdc, xdash - htic, ydash - vtic);
+				LineTo(hdc, xdash + htic + 1, ydash + vtic + 1);
+				MoveTo(hdc, xdash - htic, ydash + vtic);
+				LineTo(hdc, xdash + htic + 1, ydash - vtic - 1);
+				SelectObject(hdc, lpgw->hapen);
+			}
 			break;
 		case W_circle: /* do open circle */
 			SelectObject(hdc, lpgw->hsolid);
@@ -1907,10 +1943,8 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 				gdiplusCircleEx(hdc, &p, htic, PS_SOLID, line_width, last_color);
 			} else
 #endif
-			{
 				Arc(hdc, xdash-htic, ydash-vtic, xdash+htic+1, ydash+vtic+1,
 					xdash, ydash+vtic+1, xdash, ydash+vtic+1);
-			}
 			dot(hdc, xdash, ydash);
 			SelectObject(hdc, lpgw->hapen);
 			break;
@@ -1934,8 +1968,10 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 			int i;
 			int shape = 0;
 			int filled = 0;
-			static float pointshapes[5][10] = {
+			int index = 0;
+			static float pointshapes[6][10] = {
 				{-1, -1, +1, -1, +1, +1, -1, +1, 0, 0}, /* box */
+				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, /* dummy, circle */
 				{ 0, +1, -1,  0,  0, -1, +1,  0, 0, 0}, /* diamond */
 				{ 0, -4./3, -4./3, 2./3,
 				  4./3,  2./3, 0, 0}, /* triangle */
@@ -1945,57 +1981,28 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 				  -0.58779, -0.80902, -0.95106, 0.30902} /* pentagon */
 			};
 
-			switch (curptr->op) {
-			case W_box:
-				shape = 0;
-				break;
-			case W_diamond:
-				shape = 1;
-				break;
-			case W_itriangle:
-				shape = 2;
-				break;
-			case W_triangle:
-				shape = 3;
-				break;
-			case W_pentagon:
-				shape = 4;
-				break;
-			case W_fbox:
-				shape = 0;
-				filled = 1;
-				break;
-			case W_fdiamond:
-				shape = 1;
-				filled = 1;
-				break;
-			case W_fitriangle:
-				shape = 2;
-				filled = 1;
-				break;
-			case W_ftriangle:
-				shape = 3;
-				filled = 1;
-				break;
-			case W_fpentagon:
-				shape = 4;
-				filled = 1;
-				break;
+			/* BM: calculate index, instead of an ugly long switch statement;
+			   Depends on definition of commands in wgnuplib.h.
+			*/
+			index = (curptr->op - W_box);
+			if ((index > 0) && (index <= W_fpentagon - W_box)) {
+				shape = index / 2;
+				filled = (index % 2) > 0;
 			}
 
 			for (i = 0; i < 5; ++i) {
 				if (pointshapes[shape][i * 2 + 1] == 0
-				&& pointshapes[shape][i * 2] == 0)
+				 && pointshapes[shape][i * 2] == 0)
 					break;
-				p[i].x = xdash + htic*pointshapes[shape][i*2] + 0.5;
-				p[i].y = ydash + vtic*pointshapes[shape][i*2+1] + 0.5;
+				p[i].x = xdash + htic * pointshapes[shape][i * 2] + 0.5;
+				p[i].y = ydash + vtic * pointshapes[shape][i * 2 + 1] + 0.5;
 			}
 			if (filled) {
 				/* Filled polygon */
 #ifdef HAVE_GDIPLUS
 				if (lpgw->antialiasing) {
 					/* filled polygon with border */
-					gdiplusSolidFilledPolygonEx(hdc, p, i, last_color, 1.0);
+					gdiplusSolidFilledPolygonEx(hdc, p, i, last_color, 1.);
 				} else
 #endif
 				{
@@ -2008,16 +2015,15 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 				p[i].x = p[0].x;
 				p[i].y = p[0].y;
 #ifdef HAVE_GDIPLUS
-				if (!lpgw->antialiasing) {
-					SelectObject(hdc, lpgw->hsolid);
-					Polyline(hdc, p, i+1);
-					SelectObject(hdc, lpgw->hapen);
-				} else {
-					gdiplusPolylineEx(hdc, p, i+1, PS_SOLID, line_width, last_color);
-				}
-#else
-				Polyline(hdc, p, i+1);
+				if (lpgw->antialiasing) {
+					gdiplusPolylineEx(hdc, p, i + 1, PS_SOLID, line_width, last_color);
+				} else
 #endif
+				{
+					SelectObject(hdc, lpgw->hsolid);
+					Polyline(hdc, p, i + 1);
+					SelectObject(hdc, lpgw->hapen);
+				}
 				dot(hdc, xdash, ydash);
 			}
 			} /* default case */
@@ -2040,8 +2046,14 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 			curptr = (struct GWOP *)blkptr->gwop;
 		}
     }
-    if (polyi >= 2)
-		Polyline(hdc, ppt, polyi);
+    if (polyi >= 2) {
+#ifdef HAVE_GDIPLUS
+		if (lpgw->antialiasing)
+			gdiplusPolyline(hdc, ppt, polyi, &cur_penstruct);
+		else
+#endif
+			Polyline(hdc, ppt, polyi);
+	}
     LocalFreePtr(ppt);
 }
 

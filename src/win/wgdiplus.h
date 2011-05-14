@@ -1,5 +1,5 @@
 /*
- * $Id: wgdiplus.h,v 1.1 2011/04/28 13:44:04 markisch Exp $
+ * $Id: wgdiplus.h,v 1.2 2011/05/05 19:07:19 markisch Exp $
  */
 
 /*
@@ -34,6 +34,9 @@ extern "C" {
 
 extern void gdiplusInit(void);
 extern void gdiplusCleanup(void);
+
+extern void gdiplusLine(HDC hdc, POINT x, POINT y, const PLOGPEN logpen);
+extern void gdiplusLineEx(HDC hdc, POINT x, POINT y, UINT style, float width, COLORREF color);
 
 extern void gdiplusPolyline(HDC hdc, POINT *ppt, int polyi, const PLOGPEN logpen);
 extern void gdiplusPolylineEx(HDC hdc, POINT *ppt, int polyi, UINT style, float width, COLORREF color);
