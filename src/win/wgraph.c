@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.121 2011/05/13 18:37:44 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.122 2011/05/14 09:54:22 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - win/wgraph.c */
@@ -2816,7 +2816,7 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			case WM_RBUTTONDOWN:
 				/* FIXME HBB 20010207: this collides with the right-click
 				 * context menu !!! */
-				Wnd_exec_event(lpgw, lParam, GE_buttonpress,  3);
+				Wnd_exec_event(lpgw, lParam, GE_buttonpress, 3);
 				return 0L;
 
 			case WM_MBUTTONDOWN:
@@ -2961,8 +2961,7 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			/* Ignore Key-Up events other than those of modifier keys */
 			break;
 		case WM_KEYDOWN:
-			{
-			if (GetKeyState(VK_CONTROL) < 0) {
+			if ((GetKeyState(VK_CONTROL) < 0)  && (wParam != VK_CONTROL)) {
 				switch(wParam) {
 				case 'C':
 					/* Ctrl-C: Copy to Clipboard */
@@ -2973,18 +2972,16 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 					SendMessage(hwnd,WM_COMMAND,M_SAVE_AS_EMF,0L);
 					break;
 				} /* switch(wparam) */
-			} /* if(Ctrl) */
-			else {
+			} else {
 				/* First, look for a change in modifier status */
 				unsigned int modifier_mask = 0;
 				modifier_mask = ((GetKeyState(VK_SHIFT) < 0) ? Mod_Shift : 0 )
 					| ((GetKeyState(VK_CONTROL) < 0) ? Mod_Ctrl : 0)
 					| ((GetKeyState(VK_MENU) < 0) ? Mod_Alt : 0);
 				if (modifier_mask != last_modifier_mask) {
-					Wnd_exec_event ( lpgw, lParam, GE_modifier, modifier_mask);
+					Wnd_exec_event(lpgw, lParam, GE_modifier, modifier_mask);
 					last_modifier_mask = modifier_mask;
 				}
-			}
 			}
 			switch (wParam) {
 			case VK_BACK:
