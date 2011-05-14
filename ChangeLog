@@ -1,5 +1,7 @@
 2011-05-14  Bastian Maerkisch  <bmaerkisch@web.de>
 
+	* src/win/wgraph.c (drawgraph) [W_image]: Clip images as requested.
+
 	* src/win/wgraph.c (WndGraphProc) [WM_KEYDOWN]: Handle VK_CONTROL key
 	events again. Fixes ctrl-mousedrag rotation of splots.
 

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.123 2011/05/14 10:15:54 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.124 2011/05/14 15:43:42 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - win/wgraph.c */
@@ -1832,6 +1832,7 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 				image = LocalLock(curptr->htext);
 				if (image) {
 					BITMAPINFO bmi;
+					HRGN hrgn;
 
 					ZeroMemory(&bmi, sizeof(BITMAPINFO));
 					bmi.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
@@ -1840,6 +1841,12 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 					bmi.bmiHeader.biPlanes = 1;
 					bmi.bmiHeader.biCompression = BI_RGB;
 
+					/* create clip region */
+					hrgn = CreateRectRgn(
+						GPMIN(corners[2].x, corners[3].x), GPMIN(corners[2].y, corners[3].y),
+						GPMAX(corners[2].x, corners[3].x) + 1, GPMAX(corners[2].y, corners[3].y) + 1);
+					SelectClipRgn(hdc, hrgn);
+					
 					if (color_mode != IC_RGBA) {
 						bmi.bmiHeader.biBitCount = 24;
 
@@ -1874,6 +1881,7 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 						DeleteObject(membmp);
 						DeleteDC(memdc);
 					}
+					SelectClipRgn(hdc, NULL);
 				}
 				LocalUnlock(curptr->htext);
 			}
