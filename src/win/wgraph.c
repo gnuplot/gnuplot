@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.122 2011/05/14 09:54:22 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.123 2011/05/14 10:15:54 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - win/wgraph.c */
@@ -1721,10 +1721,11 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 				BLENDFUNCTION ftn;
 				UINT32 uAlpha = (UCHAR)(0xff * alpha);
 				/* FIXME: we always use white as inidicator for transparency
-				   this will fail for last_color = white
+				   this will fail for fill_color = white
 				*/
 				UINT32 transparentColor = 0x00ffffff; /* white */
 				HBRUSH old_brush;
+				HPEN old_pen;
 
 				/* find minimum rectangle enclosing our polygon. */
 				minx = maxx = ppt[0].x;
@@ -1765,7 +1766,7 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 
 				/* prepare the memory context */
 				SetTextColor(memdc, fill_color);
-				SelectObject(memdc, lpgw->hapen);
+				old_pen = SelectObject(memdc, lpgw->hnull);
 				if ((fillstyle & 0x0f) == FS_TRANSPARENT_PATTERN)
 					old_brush = SelectObject(memdc, pattern_brush[pattern]);
 				else
@@ -1797,6 +1798,7 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 
 				/* clean up */
 				LocalFreePtr(points);
+				SelectObject(memdc, old_pen);
 				SelectObject(memdc, old_brush);
 				SelectObject(memdc, oldbmp);
 				DeleteObject(membmp);
