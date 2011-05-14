@@ -1,5 +1,5 @@
 /*
- * $Id: wgdiplus.cpp,v 1.2 2011/05/05 19:07:19 markisch Exp $
+ * $Id: wgdiplus.cpp,v 1.3 2011/05/14 09:54:22 markisch Exp $
  */
 
 /*
@@ -132,22 +132,17 @@ void gdiplusSolidFilledPolygonEx(HDC hdc, POINT *ppt, int polyi, COLORREF color,
 {
 	gdiplusInit();
 	Graphics graphics(hdc);
+	graphics.SetSmoothingMode(SmoothingModeAntiAlias);
 
 	Color gdipColor = gdiplusCreateColor(color, alpha);
-	Point * points = new Point[polyi + 1];
+	Point * points = new Point[polyi];
 	for (int i = 0; i < polyi; i++) {
 		points[i].X = ppt[i].x;
 		points[i].Y = ppt[i].y;
 	}
-	points[polyi].X = ppt[0].x;
-	points[polyi].Y = ppt[0].y;
 	SolidBrush brush(gdipColor);
 	graphics.FillPolygon(&brush, points, polyi);
-
-	graphics.SetSmoothingMode(SmoothingModeAntiAlias);
-	Pen * pen = new Pen(gdipColor, 1);
-	graphics.DrawLines(pen, points, polyi + 1);
-	delete pen, points;
+	delete points;
 }
 
 
