@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.366 2011/05/09 21:45:14 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.367 2011/05/10 19:59:37 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -59,10 +59,10 @@ static char *RCSid() { return RCSid("$Id: graphics.c,v 1.366 2011/05/09 21:45:14
 
 /* 'set offset' --- artificial buffer zone between coordinate axes and
  * the area actually covered by the data */
-t_position loff = {first_axes, 0.0};
-t_position roff = {first_axes, 0.0};
-t_position toff = {first_axes, 0.0};
-t_position boff = {first_axes, 0.0};
+t_position loff = {first_axes, first_axes, first_axes, 0.0, 0.0, 0.0};
+t_position roff = {first_axes, first_axes, first_axes, 0.0, 0.0, 0.0};
+t_position toff = {first_axes, first_axes, first_axes, 0.0, 0.0, 0.0};
+t_position boff = {first_axes, first_axes, first_axes, 0.0, 0.0, 0.0};
 
 /* set bars */
 double bar_size = 1.0;

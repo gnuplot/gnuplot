@@ -295,7 +295,7 @@ typedef struct {
 
 extern legend_key keyT;
 
-# define DEFAULT_KEYBOX_LP { 0, LT_NODRAW, 0, 1.0, 1.0, 0 }
+#define DEFAULT_KEYBOX_LP {0, LT_NODRAW, 0, 0, 1.0, PTSZ_DEFAULT, FALSE, DEFAULT_COLORSPEC}
 
 #define DEFAULT_KEY_POSITION { graph, graph, graph, 0.9, 0.9, 0. }
 
@@ -310,7 +310,8 @@ extern legend_key keyT;
 		FALSE, FALSE, FALSE, TRUE, \
 		DEFAULT_KEYBOX_LP, \
 		"", \
-		NULL, {TC_LT, LT_BLACK, 0.0} }
+		NULL, {TC_LT, LT_BLACK, 0.0}, \
+		{0,0,0,0}, 0, 0 }
 
 
 /*

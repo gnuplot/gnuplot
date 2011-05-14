@@ -56,7 +56,8 @@ legend_key keyT = DEFAULT_KEY_PROPS;
 color_box_struct color_box; /* initialized in init_color() */
 color_box_struct default_color_box = {SMCOLOR_BOX_DEFAULT, 'v', 1, LT_BLACK, LAYER_FRONT, 0,
 					{screen, screen, screen, 0.90, 0.2, 0.0},
-					{screen, screen, screen, 0.05, 0.6, 0.0}};
+					{screen, screen, screen, 0.05, 0.6, 0.0},
+					{0,0,0,0} };
 
 /* The graph box, in terminal coordinates, as calculated by boundary()
  * or boundary3d(): */

@@ -1,5 +1,5 @@
 /*
- * $Id: axis.h,v 1.62 2010/11/18 23:59:59 sfeam Exp $
+ * $Id: axis.h,v 1.63 2011/01/16 19:15:20 sfeam Exp $
  *
  */
 
@@ -246,8 +246,8 @@ typedef struct axis {
     lp_style_type zeroaxis;	/* drawing style for zeroaxis, if any */
 } AXIS;
 
-#define DEFAULT_AXIS_TICDEF {TIC_COMPUTED, NULL, {TC_DEFAULT, 0, 0}, {NULL, {0,0}, FALSE},  { character, character, character, 0., 0., 0. }, FALSE }
-# define DEFAULT_AXIS_ZEROAXIS {0, -3, 0, 1.0, 1.0, 0}
+#define DEFAULT_AXIS_TICDEF {TIC_COMPUTED, NULL, {TC_DEFAULT, 0, 0.0}, {NULL, {0.,0.,0.}, FALSE},  { character, character, character, 0., 0., 0. }, FALSE }
+#define DEFAULT_AXIS_ZEROAXIS {0, LT_NODRAW, 0, 0, 1.0, PTSZ_DEFAULT, FALSE, DEFAULT_COLORSPEC}
 
 #define DEFAULT_AXIS_STRUCT {						    \
 	AUTOSCALE_BOTH, AUTOSCALE_BOTH, /* auto, set_auto */		    \
@@ -257,15 +257,17 @@ typedef struct axis {
 	-10.0, 10.0,							    \
 	  0.0,  0.0,		/* and another min/max for the data */	    \
 	CONSTRAINT_NONE, CONSTRAINT_NONE,  /* min and max constraints */    \
-	0, 0, 0, 0,             /* lower and upper bound for min and max */ \
-	0, 0, 0, 0,		/* terminal dependents */		    \
+	0., 0., 0., 0.,         /* lower and upper bound for min and max */ \
+	0, 0,   		/* terminal lower and upper coords */	    \
+	0.,        		/* terminal scale */			    \
+	0,        		/* zero axis position */		    \
 	FALSE, 0.0, 0.0,	/* log, base, log(base) */		    \
-	0, 1,			/* is_timedata, format_numeric */	    \
+	FALSE, TRUE,		/* is_timedata, format_numeric */	    \
 	DEF_FORMAT, TIMEFMT,	/* output format, timefmt */		    \
 	NO_TICS,		/* tic output positions (border, mirror) */ \
 	DEFAULT_AXIS_TICDEF,	/* tic series definition */		    \
 	0, FALSE, FALSE, 	/* tic_rotate, grid{major,minor} */	    \
-	MINI_DEFAULT, 10,	/* minitics, mtic_freq */		    \
+	MINI_DEFAULT, 10.,	/* minitics, mtic_freq */		    \
         1.0, 0.5, TRUE,		/* ticscale, miniticscale, tic_in */	    \
 	EMPTY_LABELSTRUCT,	/* axis label */			    \
 	DEFAULT_AXIS_ZEROAXIS	/* zeroaxis line style */		    \

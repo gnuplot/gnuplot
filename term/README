@@ -90,10 +90,10 @@ struct TERMENTRY {
 
 One consequence of (1) is that we would like drivers to be backwards
 compatible - drivers in the correct form below should work in future
-versions of gnuplot without change. C compilers guarantee to fill
-uninitialised members of a structure to zero, so gnuplot can detect old
-drivers, in which fields have not been initialised, and can point
-new interface entry pointers to dummy functions.
+versions of gnuplot without change. ISO C guarantees to fill uninitialised
+members of a static structure to zero, so gnuplot can detect old drivers,
+in which fields have not been initialised, and can point new interface entry
+pointers to dummy functions.
 
 We can add fields to the terminal structure, but only at the end of the list.
 If you design a terminal that can't work without a new interface being defined,
@@ -491,6 +491,12 @@ bitmap in memory, drawing lines and writing text. A simple driver
 need provide only a text() entry point, which converts and outputs
 the stored bitmap in the format required by the device.
 
+As of version 4.5, inclusion of bitmap.c and the terminal drivers
+that depend on it is controlled by ./configure --with-bitmap-terminals.
+This may be desirable because the license for bitmap.c is more
+restrictive than the gnuplot license itself, and because the terminals
+it supports are mostly obsolete.
+
 Internally, the bitmap is built of one or more planes of 1
 bit per pixel. In fact, I think the library would be easier to
 use if it offered one or more planes of pixels with 1,2,4 or 8
@@ -546,17 +552,6 @@ the initialisation that presently has to be done by the driver graphics()
 entry point.  Also, one day I would like to have parsing, including
 terminal driver options, table-driven, but I'm getting ahead of myself
 here.
-
-
-At present, bitmap.c is linked into gnuplot unconditionally. Perhaps
-it should be put into a library, so that it is linked in only if
-any of the user-selected drivers require bitmap support.
-
-There may be scope to do similar things with some of the other
-stuff that is shared by several drivers. Rather than requiring,
-for example, that LATEX driver is required if EMTEX is to be used,
-the shared routines could be extracted to a library and linked
-if any of the drivers which use them are used.  Just a thought...
 
 ------------------------------------
 

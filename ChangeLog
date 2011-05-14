@@ -1,3 +1,8 @@
+2011-05-14  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/axis.h src/gadgets.c src/gadgets.h src/graphics.c src/hidden3d.c
+	src/internal.c: Fix incomplete and incorrect initializers found by gcc.
+
 2011-05-14  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/win/wgraph.c (drawgraph) [W_image]: Clip images as requested.
