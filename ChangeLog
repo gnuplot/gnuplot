@@ -1,5 +1,9 @@
 2011-05-14  Bastian Maerkisch  <bmaerkisch@web.de>
 
+	* src/mouse.c (event_keypress): MinGW's toupper() masks out high bits
+	required for special keys. Only call for 8bit characters. Fixes
+	shift-mousedrag for wxt and windows terminals.
+
 	* src/win/wgdiplus.c|h src/win/wgraph.c: Extend support for
 	antialiasing of line segments and point symbols. Add missing
 	border to antialiased solid fill region.

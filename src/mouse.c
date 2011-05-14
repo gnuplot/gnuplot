@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: mouse.c,v 1.129 2011/04/29 21:33:05 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: mouse.c,v 1.130 2011/05/12 20:42:28 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - mouse.c */
@@ -1303,7 +1303,7 @@ event_keypress(struct gp_event_t *ge, TBOOLEAN current)
 	bind_install_default_bindings();
     }
 
-    if (modifier_mask & Mod_Shift) {
+    if ((modifier_mask & Mod_Shift) && ((c & 0xff) == 0)) {
 	c = toupper(c);
     }
 
