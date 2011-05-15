@@ -1,3 +1,9 @@
+2011-05-15  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/win/wgraph.c (drawgraph): [W_boxfill] Fix inversion of
+	transparency. [W_filled_polygon_draw]: Fix transparency in case of
+	aliased solid white polygons.
+
 2011-05-14  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/axis.h src/axis.c src/gadgets.c src/gadgets.h src/graphics.c

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.124 2011/05/14 15:43:42 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.125 2011/05/14 15:48:24 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - win/wgraph.c */
@@ -1555,7 +1555,7 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 						   memdc, 0, 0, width, height, 0x00ffffff);
 				} else {
 					ftn.AlphaFormat = 0; /* no alpha channel in bitmap */
-					ftn.SourceConstantAlpha = (UCHAR)((1. - alpha) * 0xff); /* global alpha */
+					ftn.SourceConstantAlpha = (UCHAR)(alpha * 0xff); /* global alpha */
 					ftn.BlendOp = AC_SRC_OVER;
 					ftn.BlendFlags = 0;
 					AlphaBlend(hdc, p.x, p.y, width, height,
@@ -1720,10 +1720,8 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 				POINT * points;
 				BLENDFUNCTION ftn;
 				UINT32 uAlpha = (UCHAR)(0xff * alpha);
-				/* FIXME: we always use white as inidicator for transparency
-				   this will fail for fill_color = white
-				*/
-				UINT32 transparentColor = 0x00ffffff; /* white */
+				/* make sure the indicator for transparency is different fill_color */
+				UINT32 transparentColor = fill_color ^ 0x00ffffff;
 				HBRUSH old_brush;
 				HPEN old_pen;
 
