@@ -1,5 +1,9 @@
 2011-05-15  Bastian Maerkisch  <bmaerkisch@web.de>
 
+	* src/win/wgraph.c (GetMousePosViewport): Window size is zero for
+	minized windows on Vista. Fixes crash when closing plot window in
+	minimized state e.g. via taskbar.
+
 	* src/win/wgraph.c (drawgraph): [W_boxfill] Fix inversion of
 	transparency. [W_filled_polygon_draw]: Fix transparency in case of
 	aliased solid white polygons.

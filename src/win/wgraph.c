@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.125 2011/05/14 15:48:24 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.126 2011/05/15 09:21:04 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - win/wgraph.c */
@@ -3521,7 +3521,7 @@ Graph_set_clipboard (LPGW lpgw, LPCSTR s)
 /* This routine gets the mouse/pointer position in the current window and
  * recalculates it to the viewport coordinates. */
 static void
-GetMousePosViewport (LPGW lpgw, int *mx, int *my)
+GetMousePosViewport(LPGW lpgw, int *mx, int *my)
 {
 	POINT pt;
 	RECT rc;
@@ -3531,14 +3531,16 @@ GetMousePosViewport (LPGW lpgw, int *mx, int *my)
 	/* HBB: has to be done this way. The simpler method by taking apart LPARM
 	 * only works for mouse, but not for keypress events. */
 	GetCursorPos(&pt);
-	ScreenToClient(lpgw->hWndGraph,&pt);
-	*mx = pt.x;
-	*my = pt.y;
+	ScreenToClient(lpgw->hWndGraph, &pt);
 
 	/* px=px(mx); mouse=>gnuplot driver coordinates */
 	/* FIXME: classically, this would use MulDiv() call, and no floating point */
-	*mx = (int)((*mx - rc.left) * lpgw->xmax / (rc.right - rc.left) + 0.5);
-	*my = (int)((rc.bottom - *my) * lpgw->ymax / (rc.bottom -rc.top) + 0.5);
+	/* BM: protect against zero window size - Vista does that when minimizing windows */
+	*mx = *my = 0;
+	if ((rc.right - rc.left) != 0)
+		*mx = (int)((pt.x - rc.left) * lpgw->xmax / (rc.right - rc.left) + 0.5);
+	if ((rc.bottom -rc.top) != 0)
+		*my = (int)((rc.bottom - pt.y) * lpgw->ymax / (rc.bottom -rc.top) + 0.5);
 }
 
 /* HBB 20010218: Newly separated function: Draw text string in XOR mode.
