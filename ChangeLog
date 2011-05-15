@@ -1,5 +1,8 @@
 2011-05-15  Bastian Maerkisch  <bmaerkisch@web.de>
 
+	* src/wxterminal/gp_cairo.c (gp_cairo_draw_fillbox): Width of filled
+	box was off by one unit.
+
 	* src/win/wgraph.c (GetMousePosViewport): Window size is zero for
 	minized windows on Vista. Fixes crash when closing plot window in
 	minimized state e.g. via taskbar.

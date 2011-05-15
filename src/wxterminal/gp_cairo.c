@@ -1,5 +1,5 @@
 /*
- * $Id: gp_cairo.c,v 1.56 2011/04/28 13:40:58 markisch Exp $
+ * $Id: gp_cairo.c,v 1.57 2011/05/13 19:25:24 markisch Exp $
  */
 
 /* GNUPLOT - gp_cairo.c */
@@ -1040,10 +1040,10 @@ void gp_cairo_draw_fillbox(plot_struct *plot, int x, int y, int width, int heigh
 	gp_cairo_fill( plot, fillstyle, fillpar);
 
 	cairo_move_to(plot->cr, x, y);
-	cairo_rel_line_to(plot->cr,0, -height);
-	cairo_rel_line_to(plot->cr, width-1, 0);
+	cairo_rel_line_to(plot->cr, 0, -height);
+	cairo_rel_line_to(plot->cr, width, 0);
 	cairo_rel_line_to(plot->cr, 0, height);
-	cairo_rel_line_to(plot->cr, -width+1, 0);
+	cairo_rel_line_to(plot->cr, -width, 0);
 	cairo_close_path(plot->cr);
 	cairo_fill(plot->cr);
 }
