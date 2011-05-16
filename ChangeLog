@@ -1,3 +1,7 @@
+2011-05-16  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/specfun.c (humlik):  Initialization would fail whenever y = -1.
+
 2011-05-15  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/wxterminal/gp_cairo.c (gp_cairo_draw_fillbox): Width of filled

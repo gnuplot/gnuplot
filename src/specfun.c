@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: specfun.c,v 1.43 2010/12/29 18:03:09 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: specfun.c,v 1.44 2010/12/30 07:23:41 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - specfun.c */
@@ -712,10 +712,11 @@ static double humlik(double x, double y)
 
     const double rrtpi = 0.56418958; /* 1/SQRT(pi) */
 
+    static double old_y = -1.23456789;	/* Is this worth it? */
+
     double a0, d0, d2, e0, e2, e4, h0, h2, h4, h6,
                  p0, p2, p4, p6, p8, z0, z2, z4, z6, z8;
     double mf[6], pf[6], mq[6], pq[6], xm[6], ym[6], xp[6], yp[6];
-    double old_y = -1.;
     bool rg1, rg2, rg3;
     double xlim0, xlim1, xlim2, xlim3, xlim4;
     double yq, yrrtpi;
