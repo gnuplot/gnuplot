@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.142 2011/01/07 18:24:25 juhaszp Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.143 2011/01/16 19:15:20 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -154,7 +154,7 @@ unset_command()
 
     c_token++;
 
-    check_for_iteration();
+    check_for_iteration(&set_iterator);
 
     found_token = lookup_table(&set_tbl[0],c_token);
 
@@ -538,7 +538,7 @@ unset_command()
 	break;
     }
 
-    if (next_iteration()) {
+    if (next_iteration(&set_iterator)) {
 	c_token = save_token;
 	goto ITERATE;
     }

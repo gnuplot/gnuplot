@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.339 2011/05/11 05:18:41 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.340 2011/05/12 20:42:28 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -242,7 +242,7 @@ set_command()
 #endif /* BACKWARDS_COMPATIBLE */
 
 	int save_token;
-	check_for_iteration();
+	check_for_iteration(&set_iterator);
 	save_token = c_token;
 	ITERATE:
 
@@ -652,7 +652,7 @@ set_command()
 	    break;
 	}
 
-    	if (next_iteration()) {
+    	if (next_iteration(&set_iterator)) {
 	    c_token = save_token;
 	    goto ITERATE;
 	}
@@ -1112,7 +1112,7 @@ set_cntrparam()
     } else if (almost_equals(c_token, "le$vels")) {
 	c_token++;
 
-	if (!iteration) {
+	if (!set_iterator.iteration) {
 	    free_dynarray(&dyn_contour_levels_list);
 	    init_dynarray(&dyn_contour_levels_list, sizeof(double), 5, 10);
 	}
@@ -5120,7 +5120,7 @@ load_tic_user(AXIS_INDEX axis)
     double ticposition;
 
     /* Free any old tic labels */
-    if (!axis_array[axis].ticdef.def.mix && !iteration) {
+    if (!axis_array[axis].ticdef.def.mix && !set_iterator.iteration) {
 	free_marklist(axis_array[axis].ticdef.def.user);
 	axis_array[axis].ticdef.def.user = NULL;
     }

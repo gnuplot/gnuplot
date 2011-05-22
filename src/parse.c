@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: parse.c,v 1.58 2010/09/28 17:14:38 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: parse.c,v 1.59 2011/03/20 17:51:25 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - parse.c */
@@ -54,13 +54,10 @@ TBOOLEAN scanning_range_in_progress = FALSE;
 /* This is used by plot_option_using() */
 int at_highest_column_used = -1;
 
-/* These are used by the iterate-over-plot code */
-static struct udvt_entry *iteration_udv = NULL;
-static int iteration_start = 0, iteration_end = 0;
-static int iteration_increment = 1;
-static int iteration_current = 0;
-static char *iteration_string = NULL;
-int iteration = 0;
+/* Iteration structures used for bookkeeping */
+/* Iteration can be nested so long as different iterators are used */
+t_iterator plot_iterator = {0};
+t_iterator set_iterator = {0};
 
 /* Internal prototypes: */
 
@@ -894,15 +891,15 @@ is_builtin_function(int t_num)
  *    {s}plot  for [<var> = <start> : <end> { : <increment>}] ...
  */
 void
-check_for_iteration()
+check_for_iteration(t_iterator *iter)
 {
     char *errormsg = "Expecting iterator \tfor [<var> = <start> : <end>]\n\t\t\tor\tfor [<var> in \"string of words\"]";
 
-    iteration_udv = NULL;
-    free(iteration_string);
-    iteration_string = NULL;
-    iteration_increment = 1;
-    iteration = 0;
+    iter->iteration_udv = NULL;
+    free(iter->iteration_string);
+    iter->iteration_string = NULL;
+    iter->iteration_increment = 1;
+    iter->iteration = 0;
 
     if (!equals(c_token, "for"))
 	return;
@@ -910,44 +907,44 @@ check_for_iteration()
     c_token++;
     if (!equals(c_token++, "[") || !isletter(c_token))
 	int_error(c_token-1, errormsg);
-    iteration_udv = add_udv(c_token++);
+    iter->iteration_udv = add_udv(c_token++);
 
     if (equals(c_token, "=")) {
 	c_token++;
-	iteration_start = int_expression();
+	iter->iteration_start = int_expression();
 	if (!equals(c_token++, ":"))
 	    int_error(c_token-1, errormsg);
-	iteration_end = int_expression();
+	iter->iteration_end = int_expression();
 	if (equals(c_token,":")) {
 	    c_token++;
-	    iteration_increment = int_expression();
+	    iter->iteration_increment = int_expression();
 	}
 	if (!equals(c_token++, "]"))
 	    int_error(c_token-1, errormsg);
-	if (iteration_udv->udv_undef == FALSE)
-	    gpfree_string(&iteration_udv->udv_value);
-	Ginteger(&(iteration_udv->udv_value), iteration_start);
-	iteration_udv->udv_undef = FALSE;
+	if (iter->iteration_udv->udv_undef == FALSE)
+	    gpfree_string(&(iter->iteration_udv->udv_value));
+	Ginteger(&(iter->iteration_udv->udv_value), iter->iteration_start);
+	iter->iteration_udv->udv_undef = FALSE;
     }
 
     else if (equals(c_token++, "in")) {
-	iteration_string = try_to_get_string();
-	if (!iteration_string)
+	iter->iteration_string = try_to_get_string();
+	if (!iter->iteration_string)
 	    int_error(c_token-1, errormsg);
 	if (!equals(c_token++, "]"))
 	    int_error(c_token-1, errormsg);
-	iteration_start = 1;
-	iteration_end = gp_words(iteration_string);
-	if (iteration_udv->udv_undef == FALSE)
-	    gpfree_string(&iteration_udv->udv_value);
-	Gstring(&(iteration_udv->udv_value), gp_word(iteration_string, 1));
-	iteration_udv->udv_undef = FALSE;
+	iter->iteration_start = 1;
+	iter->iteration_end = gp_words(iter->iteration_string);
+	if (iter->iteration_udv->udv_undef == FALSE)
+	    gpfree_string(&(iter->iteration_udv->udv_value));
+	Gstring(&(iter->iteration_udv->udv_value), gp_word(iter->iteration_string, 1));
+	iter->iteration_udv->udv_undef = FALSE;
     }
 
     else /* Neither [i=B:E] or [s in "foo"] */
  	int_error(c_token-1, errormsg);
 
-    iteration_current = iteration_start;
+    iter->iteration_current = iter->iteration_start;
 
 }
 
@@ -955,28 +952,29 @@ check_for_iteration()
  * Return TRUE if there is one, FALSE if we're done
  */
 TBOOLEAN
-next_iteration()
+next_iteration(t_iterator *iter)
 {
-    if (!iteration_udv) {
-	iteration = 0;
+    if (!iter->iteration_udv) {
+	iter->iteration = 0;
 	return FALSE;
     }
-    iteration++;
-    iteration_current += iteration_increment;
-    if (iteration_string) {
-	free(iteration_udv->udv_value.v.string_val);
-	iteration_udv->udv_value.v.string_val = gp_word(iteration_string,iteration_current);
+    iter->iteration++;
+    iter->iteration_current += iter->iteration_increment;
+    if (iter->iteration_string) {
+	free(iter->iteration_udv->udv_value.v.string_val);
+	iter->iteration_udv->udv_value.v.string_val
+	    = gp_word(iter->iteration_string, iter->iteration_current);
     } else
-	iteration_udv->udv_value.v.int_val = iteration_current;
-    return iteration_increment && /* no infinite loops! */
-      ((iteration_end - iteration_current)*iteration_increment >= 0);
+	iter->iteration_udv->udv_value.v.int_val = iter->iteration_current;
+    return iter->iteration_increment && /* no infinite loops! */
+      ((iter->iteration_end - iter->iteration_current)*iter->iteration_increment >= 0);
 }
 
 TBOOLEAN
-empty_iteration()
+empty_iteration(t_iterator *iter)
 {
-    if (iteration_udv
-        && ((iteration_end - iteration_start)*iteration_increment < 0))
+    if (iter->iteration_udv
+        && ((iter->iteration_end - iter->iteration_start)*iter->iteration_increment < 0))
         return TRUE;
     else
         return FALSE;

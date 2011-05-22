@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.668 2011/05/11 05:18:41 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.669 2011/05/12 20:42:28 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -1402,7 +1402,7 @@ C marker below is used to signal this to doc2html:
 #words("string") & string & returns the number of words in "string" \\
 %words("string")@string@returns the number of words in "string"
  `words("string")` returns the number of words in string. For example,
- `words(" a b c d")` returns the 4.
+ `words(" a b c d")` returns 4.
 @end table
 
 ^<!-- INCLUDE_NEXT_TABLE -->

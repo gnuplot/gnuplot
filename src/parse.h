@@ -1,5 +1,5 @@
 /*
- * $Id: parse.h,v 1.19 2008/09/09 06:05:05 sfeam Exp $
+ * $Id: parse.h,v 1.20 2010/09/28 17:14:38 sfeam Exp $
  */
 
 /* GNUPLOT - parse.h */
@@ -71,14 +71,24 @@ struct udvt_entry * add_udv __PROTO((int t_num));
 struct udft_entry * add_udf __PROTO((int t_num));
 void cleanup_udvlist __PROTO((void));
 
-/* These are used by the iterate-over-plot code */
-void check_for_iteration __PROTO((void));
-TBOOLEAN next_iteration  __PROTO((void));
-TBOOLEAN empty_iteration  __PROTO((void));
+/* Code that uses the iteration routines here must provide */
+/* a blank iteration structure to use for bookkeeping.     */
+typedef struct iterator {
+	struct udvt_entry *iteration_udv;
+	int iteration_start;
+	int iteration_end;
+	int iteration_increment;
+	int iteration_current;
+	char *iteration_string;
+	int iteration;
+} t_iterator;
 
-/* Some commands, e.g. set xtics, need to know if this is the first time
- * or a subsequent time through the iteration.  Export a counter.
- */
-extern int iteration;
+extern t_iterator plot_iterator;	/* Used for plot and splot */
+extern t_iterator set_iterator;		/* Used by set/unset commands */
+
+/* These are used by the iteration code */
+void check_for_iteration __PROTO((t_iterator *));
+TBOOLEAN next_iteration  __PROTO((t_iterator *));
+TBOOLEAN empty_iteration  __PROTO((t_iterator *));
 
 #endif /* PARSE_H */
