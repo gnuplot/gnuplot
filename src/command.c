@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.210 2011/04/27 17:17:17 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.211 2011/05/07 16:18:01 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -272,11 +272,7 @@ static char *input_line_SharedMem = NULL;
 	    return (1);
     } else {
 
-#ifndef USE_MOUSE
-	if (read_line(PROMPT))
-	    return (1);
-#else
-# ifdef OS2_IPC
+#if defined(OS2_IPC) && defined(USE_MOUSE)
 	ULONG u;
         if (thread_rl_Running == 0) {
 	    int res = _beginthread(thread_read_line,NULL,32768,NULL);
@@ -304,21 +300,17 @@ static char *input_line_SharedMem = NULL;
 		input_line_SharedMem[0] = 0; /* discard the whole command line */
 		return (0);
 	    }
-#  if 0
-	    fprintf(stderr,"shared mem received: |%s|\n",input_line_SharedMem);
-	    if (*input_line_SharedMem && input_line_SharedMem[strlen(input_line_SharedMem)-1] != '\n') fprintf(stderr,"\n");
-#  endif
 	    strcpy(gp_input_line, input_line_SharedMem);
 	    input_line_SharedMem[0] = 0;
 	    thread_rl_RetCode = 0;
 	}
 	if (thread_rl_RetCode)
 	    return (1);
-# else /* OS2_IPC */
+
+#else	/* The normal case */
 	if (read_line(PROMPT))
 	    return (1);
-# endif /* OS2_IPC */
-#endif /* USE_MOUSE */
+#endif	/* defined(OS2_IPC) && defined(USE_MOUSE) */
     }
 
     /* So we can flag any new output: if false at time of error,
@@ -339,13 +331,19 @@ static char *input_line_SharedMem = NULL;
 int
 do_line()
 {
-    /* Line continuation has already been handled
-     * by read_line() */
+    /* Line continuation has already been handled by read_line() */
     char *inlptr = gp_input_line;
 
     /* Skip leading whitespace */
     while (isspace((unsigned char) *inlptr))
 	inlptr++;
+
+    /* Strip off trailing comment */
+    if (strchr(inlptr, '#')) {
+        num_tokens = scanner(&gp_input_line, &gp_input_line_len);
+	if (gp_input_line[token[num_tokens].start_index] == '#')
+	    gp_input_line[token[num_tokens].start_index] = NUL;
+    }
 
     if (inlptr != gp_input_line) {
 	/* If there was leading whitespace, copy the actual
@@ -355,7 +353,7 @@ do_line()
 	/* Terminate resulting string */
 	gp_input_line[strlen(inlptr)] = NUL;
     }
-    FPRINTF((stderr, "Input line: \"%s\"\n", gp_input_line));
+    FPRINTF((stderr, "  echo: \"%s\"\n", gp_input_line));
 
 #ifdef GP_MACROS
     /* Expand any string variables in the current input line.
