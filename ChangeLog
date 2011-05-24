@@ -1,3 +1,8 @@
+2011-05-24  Harald Koenig  <h_koenig@users.sourceforge.net>
+
+	* src/Makefile.maint: Use dd rather than head to update last-modified
+	date since not all platforms support "head -c".
+
 2011-05-24  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* docs/titlepag.tex:  Add Peter Juhasz, Bastian Maerkisch, and

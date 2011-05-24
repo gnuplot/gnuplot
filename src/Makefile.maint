@@ -15,7 +15,7 @@ file_version := $(shell sed -n 's/.*gnuplot_version.*"\(.*\)".*/\1/p' ./version.
 patchlevel := $(shell cat ../PATCHLEVEL)
 file_pl := $(shell sed -n 's/.*gnuplot_patchlevel.*"\(.*\)".*/\1/p' ./version.c|tr -d ' ')
 
-last_change := $(shell head -c 11 ../ChangeLog)
+last_change := $(shell dd if=../ChangeLog bs=11 count=1 2> /dev/null)
 
 date := $(shell date)
 
