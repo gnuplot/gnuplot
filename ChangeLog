@@ -1,3 +1,8 @@
+2011-05-24  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* docs/titlepag.tex:  Add Peter Juhasz and Bastian Maerkisch to
+	the list of contributers. UTF-8.
+
 2011-05-22  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* parse.c (check_iteration next_iteration empty_iteration) parse.h

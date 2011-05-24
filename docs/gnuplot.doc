@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.669 2011/05/12 20:42:28 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.670 2011/05/22 06:18:45 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -2390,7 +2390,7 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/userdefined.gif" alt="[use
 
     "Close"
 
- See also help for `mouse` and `if`.
+ See also help for `mouse`.
 4 bind space
 ?commands bind space
 ?bind space
@@ -4666,8 +4666,7 @@ Ffigure_mapcontours
        v=v+1; if (v%2) print "2" ; else if (v%3) print "3"; else print "fred"
  (repeat the last line repeatedly!)
 
- See `reread` for an example of how `if` and `reread` can be used together to
- perform a loop.
+ See `reread` for an example of using if and reread together to perform a loop.
 2 iteration
 ?iteration
  The `plot`, `splot`, `set` and `unset` commands may optionally contain an
@@ -6504,7 +6503,7 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/population.gif" alt="[popu
  point before further commands are read from it.  This essentially implements
  an endless loop of the commands from the beginning of the command file to
  the `reread` command.  (But this is not necessarily a disaster---`reread` can
- be very useful when used in conjunction with `if`.  See `if` for details.)
+ be very useful when used in conjunction with `if`.)
  The `reread` command has no effect if input from standard input.
 
  Examples:
