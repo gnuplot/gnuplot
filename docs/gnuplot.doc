@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.671 2011/05/24 05:29:28 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.673 2011/05/24 16:49:32 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -763,12 +763,10 @@ C
 ?functions
  The functions in `gnuplot` are the same as the corresponding functions in
  the Unix math library, except that all functions accept integer, real, and
- complex arguments, unless otherwise noted.
-
- For those functions that accept or return angles that may be given in either
- degrees or radians (sin(x), cos(x), tan(x), asin(x), acos(x), atan(x),
- atan2(x) and arg(z)), the unit may be selected by `set angles`, which
- defaults to radians.
+ complex arguments unless otherwise noted.
+ Functions that accept or return angles (e.g. sin(x), cos(x), arg(z))
+ treat angle values as radians, but this may be changed to degrees using the
+ command `set angles`.
 
 ^<table align="center" border="1" rules="groups" frame="hsides" cellpadding="3" width="90%">
 ^<colgroup>
