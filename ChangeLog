@@ -1,3 +1,9 @@
+2011-05-24  Christoph Bersch  <cbersch@users.sourceforge.net>
+
+	* term/post.trm term/pslatex.trm: New options `background` and
+	`nobackground` for terminals postscript, epslatex, pstex and pslatex.
+	Patch #3415158
+
 2011-09-29  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/color.c src/graph3d.c src/graphics.c:  User-specified axis tick

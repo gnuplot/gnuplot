@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: pslatex.trm,v 1.77 2010/10/06 05:44:57 sfeam Exp $
+ * $Id: pslatex.trm,v 1.78 2011/09/21 11:43:50 markisch Exp $
  */
 
 /* GNUPLOT - pslatex.trm */
@@ -699,6 +699,12 @@ EPSLATEX_common_init()
   \\setlength{\\unitlength}{%.4fbp}%%\n\
   \\begin{picture}(%.2f,%.2f)%%\n",
                 1.0 / (2*PS_SC), term->xmax * xsize, term->ymax * ysize);
+    }
+    if (ps_params->background.r >= 0) {
+	fprintf(gpoutfile, "\\definecolor{gpBackground}{rgb}{%.3f, %.3f, %.3f}%%\n",
+		ps_params->background.r, ps_params->background.g, ps_params->background.b);
+	fprintf(gpoutfile, "\\put(0,0){\\colorbox{gpBackground}{\\makebox(%.2f,%.2f)[]{}}}%%\n",
+		term->xmax * xsize, term->ymax * ysize);
     }
 
     if (fontfamily)

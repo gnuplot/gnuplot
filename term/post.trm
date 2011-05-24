@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: post.trm,v 1.260 2011/03/15 05:28:17 sfeam Exp $
+ * $Id: post.trm,v 1.261 2011/04/16 06:05:54 sfeam Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -190,13 +190,14 @@ typedef struct ps_params_t {
     TBOOLEAN oldstyle;
     TBOOLEAN epslatex_standalone;
     TBOOLEAN adobeglyphnames;         /* Choice of output names for UTF8 */
+    rgb_color background;
 } ps_params_t;
 
 #define POST_PARAMS_DEFAULT { \
     PSTERM_POSTSCRIPT, 50, 50, \
     PSTERM_LANDSCAPE, FALSE, FALSE, FALSE, FALSE, 1.0, 1.0, FALSE, \
     FALSE, FALSE, FALSE, NULL, "Helvetica", 14., 1., FALSE, FALSE, 2000, 0.003, \
-    FALSE, TRUE, FALSE \
+    FALSE, TRUE, FALSE, {-1.,-1.,-1.} \
 }
 
 static ps_params_t post_params = POST_PARAMS_DEFAULT;
@@ -206,7 +207,7 @@ static const ps_params_t post_params_default = POST_PARAMS_DEFAULT;
     PSTERM_EPSLATEX, 50, 50, \
     PSTERM_EPS, FALSE, FALSE, TRUE, FALSE, 1.0, 1.0, FALSE, \
     FALSE, FALSE, FALSE, NULL, "", 11., 1., TRUE, FALSE, 2000, 0.003, \
-    FALSE, FALSE, FALSE \
+    FALSE, FALSE, FALSE, {-1.,-1.,-1.} \
 }
 static ps_params_t epslatex_params = EPSLATEX_PARAMS_DEFAULT;
 static const ps_params_t epslatex_params_default = EPSLATEX_PARAMS_DEFAULT;
@@ -215,7 +216,7 @@ static const ps_params_t epslatex_params_default = EPSLATEX_PARAMS_DEFAULT;
     PSTERM_PSLATEX, 0, 0, \
     PSTERM_EPS, FALSE, FALSE, TRUE, FALSE, 1.0, 1.0, FALSE, \
     FALSE, FALSE, FALSE, NULL, "", 0., 1., FALSE, TRUE, 2000, 0.003, \
-    FALSE, FALSE, FALSE \
+    FALSE, FALSE, FALSE, {-1.,-1.,-1.} \
 }
 static ps_params_t pslatex_params = PSLATEX_PARAMS_DEFAULT;
 static const ps_params_t pslatex_params_default = PSLATEX_PARAMS_DEFAULT;
@@ -224,7 +225,7 @@ static const ps_params_t pslatex_params_default = PSLATEX_PARAMS_DEFAULT;
     PSTERM_PSTEX, 0, 0, \
     PSTERM_EPS, FALSE, FALSE, TRUE, FALSE, 1.0, 1.0, FALSE, \
     FALSE, FALSE, FALSE, NULL, "", 0., 1., FALSE, TRUE, 2000, 0.003, \
-    FALSE, FALSE, FALSE \
+    FALSE, FALSE, FALSE, {-1.,-1.,-1.} \
 }
 static ps_params_t pstex_params = PSTEX_PARAMS_DEFAULT;
 static const ps_params_t pstex_params_default = PSTEX_PARAMS_DEFAULT;
@@ -487,6 +488,7 @@ enum PS_id {
     PSLATEX_OLDSTYLE, PSLATEX_NEWSTYLE, EPSLATEX_HEADER, EPSLATEX_NOHEADER,
     PS_SIZE,
     PS_ADOBEGLYPHNAMES, PS_NOADOBEGLYPHNAMES,
+    PS_BACKGROUND, PS_NOBACKGROUND,
     PS_OTHER
 };
 
@@ -537,6 +539,8 @@ static struct gen_table PS_opts[] =
     { "new$style", PSLATEX_NEWSTYLE },
     { "adobe$glyphnames", PS_ADOBEGLYPHNAMES },
     { "noadobe$glyphnames", PS_NOADOBEGLYPHNAMES },
+    { "backg$round", PS_BACKGROUND },
+    { "nobackg$round", PS_NOBACKGROUND },
     { NULL, PS_OTHER }
 };
 
@@ -1020,6 +1024,17 @@ PS_options()
 	    ps_params->adobeglyphnames = FALSE;
 	    ++c_token;
 	    break;
+	case PS_BACKGROUND:
+	    c_token++;
+	    int ps_background = parse_color_name();
+	    ps_params->background.r = ((ps_background >> 16) & 0xff) / 255.0;
+	    ps_params->background.g = ((ps_background >> 8) & 0xff) / 255.0;
+	    ps_params->background.b = (ps_background & 0xff) / 255.0;
+	    break;
+	case PS_NOBACKGROUND:
+	    c_token++;
+	    ps_params->background.r = ps_params->background.g = ps_params->background.b = -1.0;
+	    break;
 	case PS_PALFUNCPARAM:
 	    if (set_palfunc)
 		int_error(c_token,
@@ -1175,6 +1190,16 @@ PS_options()
 	    ps_params->rounded ? "rounded" : "butt",
 	    ps_params->clipped ? "clip" : "noclip");
     strcat(term_options,tmp_term_options);
+
+    if (ps_params->background.r >= 0) {
+	sprintf(tmp_term_options, "   background \"#%02x%02x%02x\" \\\n", 
+		(int)(255 * ps_params->background.r), 
+		(int)(255 * ps_params->background.g), 
+		(int)(255 * ps_params->background.b));
+	strcat(term_options, tmp_term_options);
+    } else {
+	strcat(term_options, "   nobackground \\\n");
+    }
 
     sprintf(tmp_term_options,"   palfuncparam %d,%g \\\n   ",
 	    ps_params->palfunc_samples, ps_params->palfunc_deviation);
@@ -1520,6 +1545,7 @@ PS_common_init(
 /gnulinewidth %.3f def\n\
 /userlinewidth gnulinewidth def\n\
 /Gamma 1.0 def\n\
+/BackgroundColor {%.3f %.3f %.3f} def\n\
 %%\n\
 /vshift %d def\n\
 /dl1 {\n\
@@ -1615,6 +1641,9 @@ end\n\
 	    ps_params->rounded ? "true" : "false",
 	    ps_params->clipped ? "true" : "false",
 	    PS_LW*ps_params->linewidth_factor,	/* line width */
+	    ps_params->background.r, 
+	    ps_params->background.g, 
+	    ps_params->background.b, /* background color, used only if all components >= 0 */
 	    (int)(t->v_char)/(-3),	/* shift for vertical centring */
 	    PS_SC*1.0,	/* dash length */
 	    PS_SC*1.0,	/* dash length */
@@ -1825,6 +1854,21 @@ doclip\n\
     PS_taken = 0;
     PS_linetype_last = LT_UNDEFINED;
     PS_linewidth_last = PS_linewidth_current = LT_UNDEFINED;
+
+    if (ps_params->terminal != PSTERM_EPSLATEX) {
+	/* set the background only if all components are >= 0 */
+	fputs("BackgroundColor 0 lt 3 1 roll 0 lt exch 0 lt or or not {", gppsfile);
+	if (ps_params->psformat == PSTERM_EPS) {
+	    /* for eps files set the color only for the graphics area */
+	    fprintf(gppsfile, "BackgroundColor C 1.000 0 0 %.2f %.2f BoxColFill",
+		    term->xmax * xsize, term->ymax * ysize);
+	} else {
+	    /* otherwise set the page background color, the code is taken from the
+	       TeX \pagecolor command (color package). */
+	    fputs("gsave BackgroundColor C clippath fill grestore", gppsfile);
+	}
+	fputs("} if\n", gppsfile);
+    }
 }
 
 
@@ -3775,6 +3819,7 @@ START_HELP(00psglobal)
 #define PS_COMMON_OPTS1 \
 "                               {level1 | leveldefault}",\
 "                               {color | colour | monochrome}",\
+"                               {background <rgbcolor> | nobackground}",\
 "                               {solid | dashed}",\
 "                               {dashlength | dl <DL>}",\
 "                               {linewidth | lw <LW>}",\
