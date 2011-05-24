@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.670 2011/05/22 06:18:45 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.671 2011/05/24 05:29:28 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -9,33 +9,22 @@ C
 ^<p align="center">  Version 4.4 organized by Ethan A Merritt and others</p>
 ^<p align="center">Major contributors (alphabetic order):<br>
 ^<br>
-^  Hans-Bernhard Broeker<br>
-^  John Campbell<br>
-^  Robert Cunningham<br>
-^  David Denholm<br>
-^  Gershon Elber<br>
-^  Roger Fearick<br>
-^  Carsten Grammes<br>
-^  Lucas Hart<br>
-^  Lars Hecking<br>
-^  Thomas Koenig<br>
-^  David Kotz<br>
-^  Ed Kubaitis<br>
-^  Russell Lang<br>
-^  Timoth&eacute;e Lecomte<br>
-^  Alexander Lehmann<br>
-^  Alexander Mai<br>
-^  Ethan A Merritt<br>
-^  Petr Mikulik<br>
-^  Carsten Steger<br>
-^  Tom Tkacik<br>
-^  Jos Van der Woude<br>
-^  Alex Woo<br>
-^  James R. Van Zandt<br>
-^  Johannes Zellner<br>
+^  Hans-Bernhard Broeker, John Campbell,<br>
+^  Robert Cunningham,  David Denholm,<br>
+^  Gershon Elber, Roger Fearick,<br>
+^  Carsten Grammes, Lucas Hart,<br>
+^  Lars Hecking, Péter Juhász,<br>
+^  Thomas Koenig, David Kotz,<br>
+^  Ed Kubaitis, Russell Lang,<br>
+^  Timothée Lecomte, Alexander Lehmann,<br>
+^  Alexander Mai, Bastian Märkisch,<br>
+^  Ethan A Merritt, Petr Mikulík,<br>
+^  Carsten Steger, Shigeharu Takeno,<br>
+^  Tom Tkacik, Jos Van der Woude,<br>
+^  James R. Van Zandt, Alex Woo, Johannes Zellner<br>
 ^</p>
 ^<p align="center">  Copyright (C) 1986 - 1993, 1998 - 2004   Thomas Williams, Colin Kelley<br>
-^     Copyright (C) 2004 - 2010 various authors</p>
+^     Copyright (C) 2004 - 2011 various authors</p>
 ^<p align="center">   Mailing list for comments: <tt>gnuplot-info@lists.sourceforge.net</tt><br>
 ^      Mailing list for bug reports: <tt>gnuplot-bugs@lists.sourceforge.net</tt><br>
 ^      Web access (preferred): <tt>http://sourceforge.net/projects/gnuplot</tt></p>
@@ -881,7 +870,7 @@ C
 ^<tr>    <th>Function</th>    <th>Arguments</th>    <th>Returns</th></tr>
 ^</thead>
 ^<tbody>
-^<tr>    <td>column(x)</td>    <td>int</td>    <td> column <i>x</i> during datafile manipulation.</td></tr>
+^<tr>    <td>column(x)</td>    <td>int or string</td>    <td> column <i>x</i> during datafile manipulation.</td></tr>
 ^<tr>    <td>columnhead(x)</td>    <td>int</td>    <td> string containing first entry of column <i>x</i> in datafile.</td></tr>
 ^<tr>    <td>defined(X)</td>    <td>variable name</td>    <td> [DEPRECATED] returns 1 if X is defined, 0 otherwise.</td></tr>
 ^<tr>    <td>exists("X")</td>    <td>string</td>    <td> returns 1 if a variable named X is defined, 0 otherwise.</td></tr>
@@ -1417,8 +1406,8 @@ C marker below is used to signal this to doc2html:
 ?expressions functions column
 ?functions column
 ?column
-#column(x) & int & column $x$ during datafile manipulation. \\
-%column(x)@int@ column $x$ during datafile manipulation.
+#column(x) & int or string & column $x$ during datafile manipulation. \\
+%column(x)@int or string@ column $x$ during datafile manipulation.
  `column(x)` may be used only in expressions as part of `using` manipulations
  to fits or datafile plots.  It evaluates to the numerical value of the contents
  of column x. See `plot datafile using`.
@@ -5773,7 +5762,8 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/population.gif" alt="[popu
  but see `datafile separator`.
 
  Each <entry> may be a simple column number that selects the value from one
- field of the input file, an expression enclosed in parentheses, or a special
+ field of the input file, a string that matches a column label in the first 
+ line of a data set, an expression enclosed in parentheses, or a special
  function not enclosed in parentheses such as xticlabels(2).
 
  If the entry is an expression in parentheses, then the function column(N) may
@@ -5781,6 +5771,22 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/population.gif" alt="[popu
  first item read, column(2) to the second, and so on.  The special symbols
  $1, $2, ... are shorthand for column(1), column(2) ...  The function `valid(N)`
  tests whether the value in the Nth column is a valid number.
+=column
+=columnhead
+ If each column of data in the input file contains a label in the first row
+ rather than a data value, this label can be used to identify the column on
+ input and/or in the plot legend. The column() function can be used to select
+ an input column by label rather than by column number.  For example,
+ if the data file contains
+       Height    Weight    Age
+       val1      val1      val1
+       ...       ...       ...
+ then the following plot commands are all equivalent
+       plot 'datafile' using 3:1, '' using 3:2
+       plot 'datafile' using (column("Age")):(column(1)), \
+                    '' using (column("Age")):(column(2))
+       plot 'datafile' using "Age":"Height", '' using "Age":"Weight"
+ To use the column labels in the plot legend, use `set key autotitle columnhead`.
 
  In addition to the actual columns 1...N in the input data file, gnuplot
  presents data from several "pseudo-columns" that hold bookkeeping information.
@@ -5868,10 +5874,6 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/population.gif" alt="[popu
 
  However, if you want to leave text in your data files, it is safer to put the
  comment character (#) in the first column of the text lines.
-^ See also the web page
-^ <a href="http://www.gnuplot.info/demo/using.html">
- Feeble using demos.
-^ </a>
 5 pseudocolumns
 ?pseudocolumns
 ?commands plot datafile using pseudocolumns

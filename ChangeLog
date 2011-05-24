@@ -5,8 +5,8 @@
 
 2011-05-24  Ethan A Merritt  <merritt@u.washington.edu>
 
-	* docs/titlepag.tex:  Add Peter Juhasz, Bastian Maerkisch, and
-	Shige Takeno to the list of contributers. UTF-8.
+	* docs/titlepag.tex, docs/gnuplot.doc:  Add Peter Juhasz,
+	Bastian Maerkisch, and Shige Takeno to the list of contributers. UTF-8.
 
 2011-05-22  Ethan A Merritt  <merritt@u.washington.edu>
 
