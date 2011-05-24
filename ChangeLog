@@ -1,3 +1,9 @@
+2011-05-24  Christoph Bersch  <usenet@bersch.net>
+
+	* term/cairo.trm: PDF documents normally behave as if they had a 
+	transparent background.  Modify the pdfcairo terminal to do this by
+	default, but also to accept the keywords {no}transparent.
+
 2011-05-24  Harald Koenig  <h_koenig@users.sourceforge.net>
 
 	* src/Makefile.maint: Use dd rather than head to update last-modified
@@ -6,7 +12,7 @@
 2011-05-24  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* docs/titlepag.tex, docs/gnuplot.doc:  Add Peter Juhasz,
-	Bastian Maerkisch, and Shige Takeno to the list of contributers. UTF-8.
+	Bastian Maerkisch, and Shige Takeno to the list of contributors. UTF-8.
 
 2011-05-22  Ethan A Merritt  <merritt@u.washington.edu>
 

@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: cairo.trm,v 1.42 2011/02/12 21:53:24 sfeam Exp $
+ * $Id: cairo.trm,v 1.43 2011/03/11 22:20:59 sfeam Exp $
  */
 
 /* GNUPLOT - cairo.trm */
@@ -112,7 +112,7 @@ typedef struct cairo_params_t {
 } cairo_params_t;
 
 #define CAIROPDF_PARAMS_DEFAULT { \
-    CAIROTERM_PDF, INCHES, FALSE, FALSE, 1.0, {1.,1.,1.}, FALSE, FALSE, FALSE, FALSE, "", \
+    CAIROTERM_PDF, INCHES, FALSE, FALSE, 1.0, {1.,1.,1.}, FALSE, FALSE, TRUE, FALSE, "", \
     12, 0.5, 5*72., 3*72., 0.25, 1.0 \
 }
 static cairo_params_t cairopdf_params = CAIROPDF_PARAMS_DEFAULT;
@@ -299,13 +299,11 @@ TERM_PUBLIC void cairotrm_options()
 			break;
 		case CAIROTRM_TRANSPARENT:
 			c_token++;
-			if (!strcmp(term->name,"pngcairo"))
-			    cairo_params->transparent = TRUE;
+			cairo_params->transparent = TRUE;
 			break;
 		case CAIROTRM_NOTRANSPARENT:
 			c_token++;
-			if (!strcmp(term->name,"pngcairo"))
-			    cairo_params->transparent = FALSE;
+			cairo_params->transparent = FALSE;
 			break;
 		case CAIROTRM_CROP:
 			c_token++;
@@ -325,6 +323,7 @@ TERM_PUBLIC void cairotrm_options()
 			cairo_params->background.r = (double)((wxt_background >> 16) & 0xff) / 255.;
 			cairo_params->background.g = (double)((wxt_background >>  8) & 0xff) / 255.;
 			cairo_params->background.b = (double)( wxt_background        & 0xff) / 255.;
+			cairo_params->transparent = FALSE;
 			break;
 			}
 
