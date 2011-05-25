@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: doc2html.c,v 1.4 2011/03/07 11:27:27 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: doc2html.c,v 1.5 2011/03/20 14:13:13 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - doc2html.c */
@@ -146,7 +146,7 @@ header(FILE *a, char * title)
     fprintf(a, "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\">\n");
     fprintf(a, "<html>\n");
     fprintf(a, "<head>\n");
-    fprintf(a, "<meta http-equiv=\"Content-type\" content=\"text/html; charset=windows-1252\">\n");
+    fprintf(a, "<meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\">\n");
     fprintf(a, "<title>%s</title>\n", title);
     fprintf(a, "</head>\n");
     fprintf(a, "<body>\n");

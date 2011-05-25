@@ -1,3 +1,7 @@
+2011-05-25  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* docs/windows/doc2html.c: Encoding of gnuplot.doc is UTF-8.
+
 2011-05-24  Christoph Bersch  <usenet@bersch.net>
 
 	* term/cairo.trm: PDF documents normally behave as if they had a 
