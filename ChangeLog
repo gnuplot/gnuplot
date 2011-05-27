@@ -1,3 +1,16 @@
+2011-05-27  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/datafile.c (df_open df_determine_matrix_info):
+	Add a keyword '[s]plot ... nonuniform matrix'
+	This provides an ascii input option parallel to 'binary matrix'.
+	nonuniform matrix:  ascii;  y coords in row 1, x coords in column 1
+	binary matrix:	    binary; y coords in row 1, x coords in column 1
+	matrix:             ascii;  uniform grid of x/y coords
+	binary general:     binary; uniform grid of x/y coords
+
+	* docs/gnuplot.doc:  Reorganize the description of data file contents.
+	More reorganization is still wanting.
+
 2011-05-25  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* docs/windows/doc2html.c: Encoding of gnuplot.doc is UTF-8.

@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.673 2011/05/24 16:49:32 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.674 2011/05/24 18:01:36 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -4829,118 +4829,27 @@ Ffigure_mapcontours
  `x1y2` to those on the bottom and right; and `x2y1` to those on the top and
  left.  Ranges specified on the `plot` command apply only to the first set of
  axes (bottom left).
-3 data
-?commands plot datafile
-?plot datafile
-?data-file
-?datafile
-?data
-?file
-?volatile
-?plot datafile volatile
- Discrete data contained in a file can be displayed by specifying the name of
- the data file (enclosed in single or double quotes) on the `plot` command line.
-
- Syntax:
-       plot '<file_name>' {binary <binary list>}
-                          {matrix}
-                          {index <index list> | index "<name>"}
-                          {every <every list>}
-                          {thru <thru expression>}
-                          {using <using list>}
-                          {smooth <option>}
-                          {volatile} {noautoscale}
-
- The modifiers `binary`, `index`, `every`, `thru`, `using`, and `smooth` are
- discussed separately.  In brief, `binary` allows data entry from a binary
- file (default is ASCII), `index` selects which data sets in a multi-data-set
- file are to be plotted, `every` specifies which points within a single data
- set are to be plotted, `using` determines how the columns within a single
- record are to be interpreted (`thru` is a special case of `using`), and
- `smooth` allows for simple interpolation and approximation.  (`splot` has a
- similar syntax, but does not support the `smooth` and `thru` options.)
-
- The `volatile` keyword indicates that the contents of the data file may be
- different if the file is re-read.  This tells the program to use `refresh`
- rather than `replot` commands whenever possible.  See `refresh`.
-
- The `noautoscale` keyword means that the points making up this plot will be
- ignored when automatically determining axis range limits.
-
-
- ASCII DATA FILES:
-
- Data files should contain at least one data point per record (`using`
- can select one data point from the record). Records beginning with `#`
- (and also with `!` on VMS) will be treated as comments and ignored.
- Each data point represents an (x,y) pair. For `plot`s with error bars or
- error bars with lines (see `set style errorbars` or `set style errorlines`),
- each data point is (x,y,ydelta), (x,y,ylow,yhigh),
- (x,y,xdelta), (x,y,xlow,xhigh), or (x,y,xlow,xhigh,ylow,yhigh).
-
- In all cases, the numbers of each record of a data file must be separated
- by white space (one or more blanks or tabs) unless a format specifier is
- provided by the `using` option. This white space divides each record into
- columns. However, whitespace inside a pair of double quotes is ignored when
- counting columns, so the following datafile line has three columns:
-       1.0 "second column" 3.0
-
- Data may be written in exponential format with the exponent preceded by the
- letter e or E.  The fortran exponential specifiers d, D, q, and Q may also
- be used if the command `set datafile fortran` is in effect.
-
- Only one column (the y value) need be provided.  If x is omitted, `gnuplot`
- provides integer values starting at 0.
-
- In datafiles, blank records (records with no characters other than blanks and
- a newline and/or carriage return) are significant.
-
- Single blank records designate discontinuities in a `plot`; no line will join
- points separated by a blank records (if they are plotted with a line style).
-
- Two blank records in a row indicate a break between separate data sets.
- See `index`.
-
- If autoscaling has been enabled (`set autoscale`), the axes are automatically
- extended to include all datapoints, with a whole number of tic marks if tics
- are being drawn.  This has two consequences: i) For `splot`, the corner of
- the surface may not coincide with the corner of the base.  In this case, no
- vertical line is drawn.  ii) When plotting data with the same x range on a
- dual-axis graph, the x coordinates may not coincide if the x2tics are not
- being drawn.  This is because the x axis has been autoextended to a whole
- number of tics, but the x2 axis has not.  The following example illustrates
- the problem:
-
-       reset; plot '-', '-' axes x2y1
-       1 1
-       19 19
-       e
-       1 1
-       19 19
-       e
-
- To avoid this, you can use the `fixmin`/`fixmax` feature of the
- `set autoscale` command, which turns off the automatic extension of the
- axis range upto the next tic mark.
-
- Label coordinates and text can also be read from a data file (see `labels`).
-
-
+3 binary
+?binary
+?data binary
+?datafile binary
+?plot data binary
  BINARY DATA FILES:
 
- Gnuplot can read binary data files.  However, adequate information about
- details of the file format must be given on the command line or extracted
- from the file itself for a supported binary `filetype`.  In particular,
- there are two structures for binary files, a matrix binary format and a
- general binary format.
+ Some earlier versions of `gnuplot` automatically detected binary data files.
+ It is now necessary to provide the keyword `binary` after the filename.
+ Adequate details of the file format must be given on the command line or
+ extracted from the file itself for a supported binary `filetype`.
+ In particular, there are two structures for binary files,  binary matrix
+ format and binary general format.
 
- The matrix binary format contains a two dimensional array of 32 bit IEEE
+ The `binary matrix` format contains a two dimensional array of 32 bit IEEE
  float values with an additional column and row of coordinate values.  As
- with ASCII matrix, in the `using` list, repetition of the coordinate row
- constitutes column 1, repetition of the coordinate column constitutes
+ with ASCII matrix, in the `using` list, enumeration of the coordinate row
+ constitutes column 1, enumeration of the coordinate column constitutes
  column 2, and the array of values constitutes column 3.
 
- The general binary format contains an arbitrary number of columns for which
+ The `binary general` format contains an arbitrary number of columns for which
  information must be specified at the command line.  For example, `array`,
  `record`, `format` and `using` can indicate the size, format and dimension
  of data.  There are a variety of useful commands for skipping file headers
@@ -4957,37 +4866,29 @@ Ffigure_mapcontours
  The general rule is that common command-line specified parameters override
  file-extracted parameters which override default parameters.
 
- Matrix binary is the default binary format when no keywords specific to
- general binary are given, i.e., `array`, `record`, `format`, `filetype`.
+ `Binary matrix` is the default binary format when no keywords specific to
+ `binary general` are given, i.e., `array`, `record`, `format`, `filetype`.
 
  General binary data can be entered at the command line via the special file
  name '-'.  However, this is intended for use through a pipe where programs
  can exchange binary data, not for keyboards.  There is no "end of record"
  character for binary data.  Gnuplot continues reading from a pipe until it
  has read the number of points declared in the `array` qualifier.
-
- See `datafile binary` for more details.
-4 binary
-?commands plot datafile binary
-?plot datafile binary
-?splot datafile binary
-?plot binary
-?splot binary
-?data-file binary
-?datafile binary
-?binary
- The `binary` keyword allows a data file to be binary as opposed to ASCII.
- There are two formats for binary--matrix binary and general binary.  Matrix
- binary is a fixed format in which data appears in a 2D array with an extra
- row and column for coordinate values.  General binary is a flexible format
- for which details about the file must be given at the command line.
-
  See `binary matrix` or `binary general` for more details.
-4 binary general
-?commands plot datafile binary general
-?commands splot datafile binary general
+
+ The `index` keyword is not supported, since the file format allows only one
+ surface per file.  The `every` and `using` filters are supported.  `using`
+ operates as if the data were read in the above triplet form.
+^ <a href="http://www.gnuplot.info/demo/binary.html">
+ Binary File Splot Demo.
+^ </a>
+4 general
+?commands plot binary general
+?commands splot binary general
 ?plot binary general
 ?splot binary general
+?datafile binary general
+?data binary general
 ?binary general
  General binary data in which format information is not necessarily part of
  the file can be read by giving further details about the file format at the
@@ -5137,8 +5038,6 @@ Ffigure_mapcontours
  can be found at
 
    http://www.edfplus.info/specs
-
- See also `binary`.
 5 png
 ?binary filetype png
 ?binary filetype gif
@@ -5153,8 +5052,6 @@ Ffigure_mapcontours
  Or the file type will be recognized automatically from the extension if you
  have previously requested
        set datafile binary filetype=auto
-
- See also `binary`.
 4 keywords
 ?binary keywords
  The following keywords apply only when generating coordinates from binary 
@@ -5257,40 +5154,95 @@ Ffigure_mapcontours
  data of the file is inherently not three-dimensional, logical rules are used to
  place the data in three-space.  (E.g., usually setting the z-dimension value to
  zero and placing 2D data in the x-y plane.)
-5 binary examples
-?binary_examples
-?binary examples
-?binary general examples
-=skip
- Examples:
+3 data
+?commands plot datafile
+?plot datafile
+?data-file
+?datafile
+?data
+?file
+ Discrete data contained in a file can be displayed by specifying the name of
+ the data file (enclosed in single or double quotes) on the `plot` command line.
 
-       # Selects two float values (second one implicit) with a float value
-       # discarded between them for an indefinite length of 1D data.
-       plot '<file_name>' binary format="%float%*float" using 1:2 with lines
+ Syntax:
+       plot '<file_name>' {binary <binary list>}
+                          {{nonuniform} matrix}
+                          {index <index list> | index "<name>"}
+                          {every <every list>}
+                          {thru <thru expression>}
+                          {using <using list>}
+                          {smooth <option>}
+                          {volatile} {noautoscale}
 
-       # The data file header contains all details necessary for creating
-       # coordinates from an EDF file.
-       plot '<file_name>' binary filetype=edf with image
-       plot '<file_name>.edf' binary filetype=auto with image
+ The modifiers `binary`, `index`, `every`, `thru`, `using`, and `smooth` are
+ discussed separately.  In brief, `binary` allows data entry from a binary
+ file (default is ASCII), `index` selects which data sets in a multi-data-set
+ file are to be plotted, `every` specifies which points within a single data
+ set are to be plotted, `using` determines how the columns within a single
+ record are to be interpreted (`thru` is a special case of `using`), and
+ `smooth` allows for simple interpolation and approximation.  (`splot` has a
+ similar syntax, but does not support the `smooth` and `thru` options.)
 
-       # Selects three unsigned characters for components of a raw RGB image
-       # and flips the y-dimension so that typical image orientation (start
-       # at top left corner) translates to the Cartesian plane.  Pixel
-       # spacing is given and there are two images in the file.  One of them
-       # is translated via origin.
-       plot '<file_name>' binary array=(512,1024):(1024,512) format='%uchar' \
-            dx=2:1 dy=1:2 origin=(0,0):(1024,1024) flipy u 1:2:3 w rgbimage
+ The `noautoscale` keyword means that the points making up this plot will be
+ ignored when automatically determining axis range limits.
 
-       # Four separate records in which the coordinates are part of the
-       # data file.  The file was created with a endianess different from
-       # the system on which gnuplot is running.
-       splot '<file_name>' binary record=30:30:29:26 endian=swap u 1:2:3
+ ASCII DATA FILES:
 
-       # Same input file, but this time we skip the 1st and 3rd records
-       splot '<file_name>' binary record=30:26 skip=360:348 endian=swap u 1:2:3
+ Data files should contain at least one data point per record (`using`
+ can select one data point from the record). Records beginning with `#`
+ (and also with `!` on VMS) will be treated as comments and ignored.
+ Each data point represents an (x,y) pair. For `plot`s with error bars or
+ error bars with lines (see `set style errorbars` or `set style errorlines`),
+ each data point is (x,y,ydelta), (x,y,ylow,yhigh),
+ (x,y,xdelta), (x,y,xlow,xhigh), or (x,y,xlow,xhigh,ylow,yhigh).
 
+ In all cases, the numbers of each record of a data file must be separated
+ by white space (one or more blanks or tabs) unless a format specifier is
+ provided by the `using` option. This white space divides each record into
+ columns. However, whitespace inside a pair of double quotes is ignored when
+ counting columns, so the following datafile line has three columns:
+       1.0 "second column" 3.0
 
- See also `binary matrix`.
+ Data may be written in exponential format with the exponent preceded by the
+ letter e or E.  The fortran exponential specifiers d, D, q, and Q may also
+ be used if the command `set datafile fortran` is in effect.
+
+ Only one column (the y value) need be provided.  If x is omitted, `gnuplot`
+ provides integer values starting at 0.
+
+ In datafiles, blank records (records with no characters other than blanks and
+ a newline and/or carriage return) are significant.
+
+ Single blank records designate discontinuities in a `plot`; no line will join
+ points separated by a blank records (if they are plotted with a line style).
+
+ Two blank records in a row indicate a break between separate data sets.
+ See `index`.
+
+ If autoscaling has been enabled (`set autoscale`), the axes are automatically
+ extended to include all datapoints, with a whole number of tic marks if tics
+ are being drawn.  This has two consequences: i) For `splot`, the corner of
+ the surface may not coincide with the corner of the base.  In this case, no
+ vertical line is drawn.  ii) When plotting data with the same x range on a
+ dual-axis graph, the x coordinates may not coincide if the x2tics are not
+ being drawn.  This is because the x axis has been autoextended to a whole
+ number of tics, but the x2 axis has not.  The following example illustrates
+ the problem:
+
+       reset; plot '-', '-' axes x2y1
+       1 1
+       19 19
+       e
+       1 1
+       19 19
+       e
+
+ To avoid this, you can use the `fixmin`/`fixmax` feature of the
+ `set autoscale` command, which turns off the automatic extension of the
+ axis range upto the next tic mark.
+
+ Label coordinates and text can also be read from a data file (see `labels`).
+
 4 every
 ?commands plot datafile every
 ?plot datafile every
@@ -5367,6 +5319,36 @@ Ffigure_mapcontours
           1985   10
 
 C^ <img align=bottom src="http://www.gnuplot.info/doc/population.gif" alt="[population.gif]" width=640 height=480>
+=skip
+ Binary examples:
+
+       # Selects two float values (second one implicit) with a float value
+       # discarded between them for an indefinite length of 1D data.
+       plot '<file_name>' binary format="%float%*float" using 1:2 with lines
+
+       # The data file header contains all details necessary for creating
+       # coordinates from an EDF file.
+       plot '<file_name>' binary filetype=edf with image
+       plot '<file_name>.edf' binary filetype=auto with image
+
+       # Selects three unsigned characters for components of a raw RGB image
+       # and flips the y-dimension so that typical image orientation (start
+       # at top left corner) translates to the Cartesian plane.  Pixel
+       # spacing is given and there are two images in the file.  One of them
+       # is translated via origin.
+       plot '<file_name>' binary array=(512,1024):(1024,512) format='%uchar' \
+            dx=2:1 dy=1:2 origin=(0,0):(1024,1024) flipy u 1:2:3 w rgbimage
+
+       # Four separate records in which the coordinates are part of the
+       # data file.  The file was created with a endianess different from
+       # the system on which gnuplot is running.
+       splot '<file_name>' binary record=30:30:29:26 endian=swap u 1:2:3
+
+       # Same input file, but this time we skip the 1st and 3rd records
+       splot '<file_name>' binary record=30:26 skip=360:348 endian=swap u 1:2:3
+
+
+ See also `binary matrix`.
 4 index
 ?commands plot datafile index
 ?plot datafile index
@@ -5925,6 +5907,12 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/population.gif" alt="[popu
 ?using zticlabels
 ?plot using zticlabels
  See `plot using xticlabels`.
+4 volatile
+?datafile volatile
+?plot datafile volatile
+ The `volatile` keyword indicates that the contents of the data file may be
+ different if the file is re-read.  This tells the program to use `refresh`
+ rather than `replot` commands whenever possible.  See `refresh`.
 3 errorbars
 ?commands plot errorbars
 ?commands splot errorbars
@@ -7597,7 +7585,8 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/population.gif" alt="[popu
 ?set datafile binary
  The `set datafile binary` command is used to set the defaults when reading
  binary data files.  The syntax matches precisely that used for commands
- `plot` and `splot`.  See `binary` for details about <binary list>.
+ `plot` and `splot`.  See `binary matrix` and `binary general` for details
+ about the keywords that can be present in <binary list>.
 
  Syntax:
        set datafile binary <binary list>
@@ -12621,19 +12610,17 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/population.gif" alt="[popu
 3 data-file
 ?commands splot datafile
 ?splot datafile
-?splot data-file
- As for `plot`, discrete data contained in a file can be displayed by
- specifying the name of the data file, enclosed in quotes,  on the `splot`
- command line.
+ `Splot`, like `plot`, can display from a file.
 
  Syntax:
        splot '<file_name>' {binary <binary list>}
-                           {matrix}
+                           {{nonuniform} matrix}
                            {index <index list>}
                            {every <every list>}
                            {using <using list>}
 
  The special filenames `""` and `"-"` are permitted, as in `plot`.
+ See `special-filenames`.
 
  In brief, `binary` and `matrix` indicate that the data are in a special
  form, `index` selects which data sets in a multi-data-set file are to be
@@ -12666,9 +12653,9 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/population.gif" alt="[popu
 
  It is no longer necessary to specify `parametric` mode for three-column
  `splot`s.
-4 binary matrix
-?commands plot datafile binary matrix
-?commands splot datafile binary matrix
+4 matrix
+?commands plot datafile matrix
+?commands splot datafile matrix
 ?plot datafile matrix binary
 ?splot datafile matrix binary
 ?plot binary matrix
@@ -12677,24 +12664,42 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/population.gif" alt="[popu
 ?splot matrix binary
 ?matrix binary
 ?binary matrix
-?gpbin
- Gnuplot can read matrix binary files by use of the option `binary` appearing
- without keyword qualifications unique to general binary, i.e., `array`,
- `record`, `format`, or `filetype`.  Other general binary keywords for
- translation should also apply to matrix binary.  (See `binary general` for
- more details.)
+ Gnuplot can interpret matrix input in two different ways.
+ The first of these assumes a uniform grid of x and y coordinates, and assigns
+ each value in the input matrix to one element of this uniform grid.
+ This is the default for ascii data input, but not for binary input.
+ Example commands for plotting uniform matrix data:
+      splot 'file' matrix using 1:2:3          # ascii input
+      splot 'file' binary general using 1:2:3  # binary input
 
- In previous versions, `gnuplot` dynamically detected binary data files.  It
- is now necessary to specify the keyword `binary` directly after the filename.
+ In a uniform grid matrix the z-values are read in a row at a time, i. e.,
+     z11 z12 z13 z14 ...
+     z21 z22 z23 z24 ...
+     z31 z32 z33 z34 ...
+ and so forth.
 
- Single precision floats are stored in a binary file as follows:
+ For ascii input, a blank line or comment line ends the matrix, and starts a new
+ surface mesh.  You can select among the meshes inside a file by the `index`
+ option to the `splot` command, as usual. 
+
+ The second interpretation assumes a non-uniform grid with explicit x and y
+ coordinates. The first row of input data contains the y coordinates; 
+ the first column of input data contains the x coordinates.  For binary input
+ data, the first element of the first row must contain the number of data
+ columns. (This number is ignored for ascii input).  Both the coordinates and
+ the data values in a binary input are treated as single precision floats.
+ Example commands for plotting non-uniform matrix data:
+      splot 'file' nonuniform matrix using 1:2:3  # ascii input
+      splot 'file' binary matrix using 1:2:3      # binary input
+
+ Thus the data organization for non-uniform matrix input is
 
        <N+1>  <y0>   <y1>   <y2>  ...  <yN>
         <x0> <z0,0> <z0,1> <z0,2> ... <z0,N>
         <x1> <z1,0> <z1,1> <z1,2> ... <z1,N>
          :      :      :      :   ...    :
 
- which are converted into triplets:
+ which is then converted into triplets:
        <x0> <y0> <z0,0>
        <x0> <y1> <z0,1>
        <x0> <y2> <z0,2>
@@ -12716,15 +12721,26 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/population.gif" alt="[popu
  An example of using these routines is provided in the file `bf_test.c`, which
  generates binary files for the demo file `demo/binary.dem`.
 
- The `index` keyword is not supported, since the file format allows only one
- surface per file.  The `every` and `using` filters are supported.  `using`
- operates as if the data were read in the above triplet form.
+ Usage in `plot`:
+     plot `a.dat` matrix
+     plot `a.dat` matrix using 1:3
+     plot 'a.gpbin' {matrix} binary using 1:3
+ will plot rows of the matrix, while using 2:3 will plot matrix columns, and
+ using 1:2 the point coordinates (rather useless). Applying the `every` option
+ you can specify explicit rows and columns.
 
- See also `binary general` and
+ Example -- rescale axes of a matrix in an ascii file:
+     splot `a.dat` matrix using (1+$1):(1+$2*10):3
 
-^ <a href="http://www.gnuplot.info/demo/binary.html">
- Binary File Splot Demo.
-^ </a>
+ Example -- plot the 3rd row of a matrix in an ascii file:
+     plot 'a.dat' matrix using 1:3 every 1:999:1:2
+ (rows are enumerated from 0, thus 2 instead of 3).
+
+ Gnuplot can read matrix binary files by use of the option `binary` appearing
+ without keyword qualifications unique to general binary, i.e., `array`,
+ `record`, `format`, or `filetype`.  Other general binary keywords for
+ translation should also apply to matrix binary.  (See `binary general` for
+ more details.)
 4 example datafile
 ?commands splot datafile example
 ?splot datafile example
@@ -12767,74 +12783,6 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/splot.gif" alt="[splot.gif
  derived, connects sequentially corresponding points, the effect of an
  irregular grid on a surface plot is unpredictable and should be examined
  on a case-by-case basis.
-4 matrix_ascii
-?commands plot datafile matrix ascii
-?commands splot datafile matrix ascii
-?plot datafile matrix ascii
-?splot datafile matrix ascii
-?plot matrix ascii
-?splot matrix ascii
-?data-file matrix ascii
-?datafile matrix ascii
-?matrix ascii
- The `matrix` keyword (without a sequent `binary` keyword) in
-     {s}plot 'a.dat' matrix
- indicates that data are stored in an ascii numbers matrix format.
-
- The z-values are read in a row at a time, i. e.,
-     z11 z12 z13 z14 ...
-     z21 z22 z23 z24 ...
-     z31 z32 z33 z34 ...
- and so forth.
-
- In 3D, the x- and y-indices of the matrix surface plot correspond to column
- and row indices of the matrix, respectively, being enumerated from 0. You can
- rescale or transform the axes as usual for a data file with three columns
- by means of x=$1, y=$2, z=$3. For example
-     splot 'a.dat' matrix using (1+$1/100):(1+$2*10):3
-
- A blank line or comment line ends the matrix, and starts a new surface mesh.
- You can select among the meshes inside a file by the `index` option to the
- `splot` command, as usual.
-
- See `matrix` for examples of plotting rows and columns of the matrix in
- a 2D plot.
-4 matrix
-?commands plot datafile matrix
-?commands splot datafile matrix
-?plot datafile matrix
-?splot datafile matrix
-?plot matrix
-?splot matrix
-?data-file matrix
-?datafile matrix
-?matrix
- Datafile can be in an ascii or binary matrix format. The `matrix` flag
- indicates that the file is ascii, the `binary` or `matrix binary` stands for
- a binary format. For details, see `matrix ascii` and `matrix binary`.
-
- Basic usage in `splot`:
-     splot 'a.dat' matrix
-     splot 'a.gpbin' {matrix} binary
- Advanced usage in `splot`:
-     splot 'a.dat' matrix using 1:2:3
-     splot 'a.gpbin' {matrix} binary using 1:2:3
- allows to transform the axes coordinates and the z-data independently.
-
- Usage in `plot`:
-     plot `a.dat` matrix
-     plot `a.dat` matrix using 1:3
-     plot 'a.gpbin' {matrix} binary using 1:3
- will plot rows of the matrix, while using 2:3 will plot matrix columns, and
- using 1:2 the point coordinates (rather useless). Applying the `every` option
- you can specify explicit rows and columns.
-
- Example -- rescale axes of a matrix in an ascii file:
-     splot `a.dat` matrix using (1+$1):(1+$2*10):3
-
- Example -- plot the 3rd row of a matrix in an ascii file:
-     plot 'a.dat' matrix using 1:3 every 1:999:1:2
- (rows are enumerated from 0, thus 2 instead of 3).
 3 grid data
 ?commands splot grid_data
 ?splot grid_data
@@ -12868,9 +12816,9 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/splot.gif" alt="[splot.gif
         set samples 4,10; replot
         set samples 10,4; replot
 
-3 splot overview
-?commands splot overview
-?splot overview
+3 splot surfaces
+?commands splot surfaces
+?splot surfaces
  `splot` can display a surface as a collection of points, or by connecting
  those points.  As with `plot`, the points may be read from a data file or
  result from evaluation of a function at specified intervals, see
