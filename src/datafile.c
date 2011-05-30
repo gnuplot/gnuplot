@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.172.2.12 2010/09/18 02:53:15 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.172.2.13 2011/04/19 20:59:26 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -313,14 +313,21 @@ static char *df_key_title = NULL;     /* filled in from <col> in 1st row by df_t
 static struct curve_points *df_current_plot;	/* used to process histogram labels + key entries */
 
 
-/* Binary *read* variables used by df_readbinary().  The difference between matrix
- * binary and general binary is that matrix binary requires an extra first column
- * and extra first row giving the sample coordinates.  Furthermore, note that if
- * ASCII matrix data is converted to floats (i.e., binary) then it really falls in
- * the general binary class, not the matrix binary class.
+/* Binary *read* variables used by df_readbinary().
+ * There is a confusing difference between the ascii and binary "matrix" keywords.
+ * Ascii matrix data by default is interpreted as having an implicit uniform grid
+ * of x and y coords that are not actually present in the data file.
+ * The equivalent binary data format is called "binary general".
+ * In both of these cases the internal flag df_nonuniform_matrix is FALSE;
+ * Binary matrix data contains explicit y values in the first row, and explicit x
+ * values in the first column. This is signalled by "binary matrix".
+ * In this case the internal flag df_nonuniform_matrix is TRUE.
+ *
+ * EAM May 2011 - Add a keyword "nonuniform matrix" to indicate ascii matrix data
+ * in the same format as "binary matrix", i.e. with explicit x and y coordinates.
  */
 TBOOLEAN df_read_binary;
-TBOOLEAN df_matrix_binary;
+TBOOLEAN df_nonuniform_matrix;
 int df_plot_mode;
 
 static int df_readascii __PROTO((double [], int));
@@ -985,6 +992,7 @@ df_open(const char *cmd_filename, int max_using, struct curve_points *plot)
     df_binary_file = df_matrix_file = FALSE;
     df_datablock = NULL;
     df_num_bin_records = 0;
+    df_nonuniform_matrix = FALSE;
 
     df_eof = 0;
 
@@ -1049,6 +1057,16 @@ df_open(const char *cmd_filename, int max_using, struct curve_points *plot)
 		int_error(c_token, matrix_general_binary_conflict_msg);
 	    df_matrix_file = TRUE;
 	    set_matrix = TRUE;
+	    fast_columns = 0;
+	    continue;
+	}
+
+	/* May 2011 - "nonuniform matrix" indicates an ascii data file
+	 * with the same row/column layout as "binary matrix" */
+	if (almost_equals(c_token, "nonuni$form")) {
+	    c_token++;
+	    df_matrix_file = TRUE;
+	    df_nonuniform_matrix = TRUE;
 	    fast_columns = 0;
 	    continue;
 	}
@@ -2024,6 +2042,13 @@ df_determine_matrix_info(FILE *fin)
 	while (1) {
 	    if ((matrix = df_read_matrix(&nr, &nc)) != NULL) {
 		int index = df_num_bin_records;
+
+		/* Ascii matrix with explicit y in first row, x in first column */
+		if (df_nonuniform_matrix) {
+		    nc--;
+		    nr--;
+		}
+
 		/* *** Careful!  Could error out in next step.  "matrix" should
 		 * be static and test next time. ***
 		 */
@@ -2746,13 +2771,11 @@ adjust_binary_use_spec()
     unsigned int ps_index;
     int c_token_copy;
 
-    /* This may appear strange, but ASCII matrix is not the same
-     * format as gnuplot matrix binary.  So, although the ASCII
-     * *file* may be matrix, it's data structure is similar to
-     * an M x N general binary file, i.e., no extra row and column
-     * for sample coordinates.
+    /* The default binary matrix format is nonuniform, i.e. 
+     * it has an extra row and column for sample coordinates.
      */
-    df_matrix_binary = (df_matrix_file && df_binary_file);
+    if (df_matrix_file && df_binary_file)
+	df_nonuniform_matrix = TRUE;
 
     c_token_copy = c_token;
  
@@ -2842,10 +2865,6 @@ adjust_binary_use_spec()
 		int_error(NO_CARET, "Plot style does not conform to three column data in this graph mode");
 	}
 
-    }
-
-    /* Adjust for ASCII matrix format.  The first two "columns" come from indices. */
-    if (df_matrix_file && !df_binary_file) {
     }
 
     if (df_num_bin_records && df_bin_record[0].scan_generate_coord && !df_matrix_file) {
@@ -4420,7 +4439,7 @@ df_readbinary(double v[], int max)
 	} /* for(i) */
 
 	if (df_matrix_file) {
-	    if (df_matrix_binary) {
+	    if (df_nonuniform_matrix) {
 		/* Store just first column? */
 		if (!df_M_count && !saved_first_matrix_column) {
 		    first_matrix_column = df_column[i].datum;
@@ -4462,9 +4481,9 @@ df_readbinary(double v[], int max)
 		 * overwritten. */
 		for (j = df_no_bin_cols-1; j >= 0; j--) {
 		    if (j == 0)
-			df_column[j].datum = df_matrix_binary ? scanned_matrix_row[df_M_count] : df_M_count;
+			df_column[j].datum = df_nonuniform_matrix ? scanned_matrix_row[df_M_count] : df_M_count;
 		    else if (j == 1)
-			df_column[j].datum = df_matrix_binary ? first_matrix_column : df_N_count;
+			df_column[j].datum = df_nonuniform_matrix ? first_matrix_column : df_N_count;
 		    else
 			df_column[j].datum = df_column[i].datum;
 		    df_column[j].good = DF_GOOD;
