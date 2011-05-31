@@ -2,6 +2,20 @@
 
 	* term/emf.trm: Reset line and text colors at the start of each plot.
 
+	* config/config.cyg config/config.dj2 config/config.mgw config/config.nt
+	config/config.os2 config/config.oww config/makefile.dj2 
+	config/makefile.emx config/makefile.unx config/makefile.vms
+	docs/doc2texi.el docs/Makefile.in docs/term-ja.diff
+	src/makefile.all src/makefile.awc src/show.c src/term.c src/term.h
+	configure.in configure.vms INSTALL PORTING NEWS
+	term/gnugraph.trm term/unixplot.trm:
+
+	Remove obsolete terminal drivers gnugraph and unixplot. The underlying
+	gnu plotutils library is itself more than 10 years out of date (last
+	release July 2000) and the terminal drivers haven't been upgraded for
+	longer than that. In any event, current gnuplot has better native terminal
+	drivers for the devices supported by unixplot/gnugraph.
+
 2011-05-27  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/datafile.c (df_open df_determine_matrix_info):

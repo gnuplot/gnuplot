@@ -42,9 +42,6 @@
 /* #undef GIF_ANIMATION */
 /* Don't change it here -- this define is set in config/watcom/Makefile. */
 
-/* Define if you want to use the GNU version of the Unix plot library. */
-/* #undef GNUGRAPH */
-
 /* Define if you want to use a gnuplot history file. */
 #define GNUPLOT_HISTORY 1
 
@@ -507,9 +504,6 @@
 
 /* Define if the 3dkit libray is present. */
 /* #undef THREEDKIT */
-
-/* Define if you want to use the standard Unix plot library. */
-/* #undef UNIXPLOT */
 
 /* Define if you want to use the experimental ggi driver. */
 /* #undef USE_GGI_DRIVER */

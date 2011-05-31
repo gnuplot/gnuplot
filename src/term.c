@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.218 2011/04/16 11:15:55 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.219 2011/05/09 22:55:26 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -219,8 +219,6 @@ static void do_pointsize __PROTO((double size));
 static void line_and_point __PROTO((unsigned int x, unsigned int y, int number));
 static void do_arrow __PROTO((unsigned int sx, unsigned int sy, unsigned int ex, unsigned int ey, int head));
 
-static void UP_redirect __PROTO((int called));
-
 static int null_text_angle __PROTO((int ang));
 static int null_justify_text __PROTO((enum JUSTIFY just));
 static int null_scale __PROTO((double x, double y));
@@ -336,13 +334,6 @@ void fflush_binary();
 # include <io.h>        /* for setmode() */
 #endif
 
-/* This is needed because the unixplot library only writes to stdout,
- * but GNU plotutils libplot.a doesn't */
-#if defined(UNIXPLOT) && !defined(GNUGRAPH)
-static FILE save_stdout;
-#endif
-static int unixplot = 0;
-
 #define NICE_LINE               0
 #define POINT_TYPES             6
 
@@ -419,7 +410,6 @@ term_set_output(char *dest)
 	gppsfile = NULL;
     }
     if (dest == NULL) {         /* stdout */
-	UP_redirect(4);
 	term_close_output();
     } else {
 
@@ -476,7 +466,6 @@ term_set_output(char *dest)
 	gpoutfile = f;
 	outstr = dest;
 	opened_binary = (term && (term->flags & TERM_BINARY));
-	UP_redirect(1);
     }
 }
 
@@ -1662,12 +1651,6 @@ change_term(const char *origname, int length)
     if (term->tscale <= 0)
 	term->tscale = 1.0;
 
-    /* Special handling for unixplot term type */
-    if (!strncmp("unixplot", term->name, 8)) {
-	UP_redirect(2);         /* Redirect actual stdout for unixplots */
-    } else if (unixplot) {
-	UP_redirect(3);         /* Put stdout back together again. */
-    }
     if (interactive)
 	fprintf(stderr, "Terminal type set to '%s'\n", term->name);
 
@@ -1837,55 +1820,6 @@ init_terminal()
     change_term("unknown", 7);
 }
 
-
-/*
- * Unixplot can't really write to gpoutfile--it wants to write to stdout.
- * This is normally ok, but the original design of gnuplot gives us
- * little choice.  Originally users of unixplot had to anticipate
- * their needs and redirect all I/O to a file...  Not very gnuplot-like.
- *
- * caller:  1 - called from SET OUTPUT "FOO.OUT"
- * 2 - called from SET TERM UNIXPLOT
- * 3 - called from SET TERM other
- * 4 - called from SET OUTPUT
- */
-static void
-UP_redirect(int caller)
-{
-#if defined(UNIXPLOT) && !defined(GNUGRAPH)
-    switch (caller) {
-    case 1:
-	/* Don't save, just replace stdout w/gpoutfile (save was already done). */
-	if (unixplot)
-	    *(stdout) = *(gpoutfile);   /* Copy FILE structure */
-	break;
-    case 2:
-	if (!unixplot) {
-	    fflush(stdout);
-	    save_stdout = *(stdout);
-	    *(stdout) = *(gpoutfile);   /* Copy FILE structure */
-	    unixplot = 1;
-	}
-	break;
-    case 3:
-	/* New terminal in use--put stdout back to original. */
-	/* closepl(); */ /* This is called by the term. */
-	fflush(stdout);
-	*(stdout) = save_stdout;        /* Copy FILE structure */
-	unixplot = 0;
-	break;
-    case 4:
-	/*  User really wants to go to normal output... */
-	if (unixplot) {
-	    fflush(stdout);
-	    *(stdout) = save_stdout;    /* Copy FILE structure */
-	}
-	break;
-    } /* switch() */
-#else /* !UNIXPLOT || GNUGRAPH */
-    (void) caller;              /* avoid -Wunused warning */
-#endif /* !UNIXPLOT || GNUGRAPH */
-}
 
 /* test terminal by drawing border and text */
 /* called from command test */

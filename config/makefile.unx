@@ -1,5 +1,5 @@
 #
-# $Id: makefile.unx,v 1.13 2010/03/14 18:52:42 sfeam Exp $
+# $Id: makefile.unx,v 1.14 2011/04/17 10:05:11 markisch Exp $
 #
 #
 ############################################################
@@ -163,9 +163,6 @@ CFLAGS = $(COPTS) $(OPTIONS)
 # -DSUN         Sun Microsystems Workstation
 # -DLINUXVGA	Linux PC with SuperVGA library
 # -DUNIXPC      unixpc (ATT 3b1 or ATT 7300)
-# -DUNIXPLOT    unixplot
-# -DGNUGRAPH    use GNU graphics version of UNIX plot library
-#               This can only be used in combination with -DUNIXPLOT
 # -DX11         X11 Window System (This is $(PLOTXFLAG))
 TERMFLAGS = -I. -Iterm $(PLOTXFLAG)
 
@@ -174,7 +171,6 @@ TERMFLAGS = -I. -Iterm $(PLOTXFLAG)
 #  You shouldn't need to adjust this; again, it is handled by the
 # machine-dependent definitions below.
 #
-#  -lplot if you have -DUNIXPLOT in TERMFLAGS
 #  -lsuntool -lsunwindow -lpixrect  if you have -DSUN in TERMFLAGS
 #  -lccgi if -DCGI in TERMFLAGS
 #  -lvga if -DLINUXVGA in TERMFLAGS
@@ -281,7 +277,7 @@ CGI_FLAGS = \
            CFLAGS="$(COPTS) $(OPTIONS) -Dunix" \
            LIBS="-lccgi $(LIBS)" X11FLAGS=" " X11INCLUDES=" " \
            X11LIBS=" " PLOTXFLAG=" " GNUPLOT_X11=" " X11INSTALL=x11_noinstall \
-           TERMFLAGS="-I. -Iterm -DUNIXPLOT -DCGI"
+           TERMFLAGS="-I. -Iterm -DCGI"
 
 3B1_FLAGS = \
            CFLAGS="$(COPTS) $(OPTIONS) -DHAVE_GETCWD" \
@@ -296,28 +292,28 @@ CGI_FLAGS = \
            X11FLAGS=" " X11INCLUDES=" " \
            X11LIBS=" " \
            PLOTXFLAG=" " GNUPLOT_X11=" " X11INSTALL=x11_noinstall \
-           TERMFLAGS="-I. -Iterm -DUNIXPLOT" LIBS="$(LIBS) -lplot"
+           TERMFLAGS="-I. -Iterm" LIBS="$(LIBS) -lplot"
 
 386IX_FLAGS = \
            CFLAGS="$(COPTS) $(OPTIONS) -DHAVE_GETCWD -DTCSETSW -DTCGETS" \
            LIBS="$(LIBS) -lcposix" X11FLAGS=" " X11INCLUDES=" " \
            X11LIBS=" " PLOTXFLAG=" " GNUPLOT_X11=" " \
            X11INSTALL=x11_noinstall \
-           TERMFLAGS="-I. -Iterm -DUNIXPLOT"
+           TERMFLAGS="-I. -Iterm"
 
 386IX_X11_FLAGS = \
            CFLAGS="$(COPTS) $(OPTIONS) -DHAVE_GETCWD -DTCSETSW -DTCGETS" \
            LIBS="$(LIBS) -lcposix" X11FLAGS="$(X11FLAGS)" X11INCLUDES="$(X11INCLUDES)" \
            X11LIBS="$(X11LIBS)" PLOTXFLAG="$(PLOTXFLAG)" GNUPLOT_X11="$(GNUPLOT_X11)" \
            X11INSTALL= "$(X11INSTALL)" \
-           TERMFLAGS="-I. -Iterm -DUNIXPLOT -DX11"
+           TERMFLAGS="-I. -Iterm -DX11"
 
 ISC22_X11_FLAGS = \
            CFLAGS="$(COPTS) $(OPTIONS) -DHAVE_GETCWD -DISC22" \
            LIBS="$(LIBS) -lplot -lcposix" X11FLAGS="$(X11FLAGS)" X11INCLUDES="$(X11INCLUDES)" \
            X11LIBS="$(X11LIBS) -linet -lpt -lcposix" PLOTXFLAG="$(PLOTXFLAG)" GNUPLOT_X11="$(GNUPLOT_X11)" \
            X11INSTALL= "$(X11INSTALL)" \
-           TERMFLAGS="-I. -Iterm -DUNIXPLOT -DX11"
+           TERMFLAGS="-I. -Iterm -DX11"
 
 AIX_FLAGS = \
            CFLAGS="$(COPTS) $(OPTIONS) -DERF -DGAMMA=gamma -DXPG3_LOCALE -Dunix" \
@@ -439,12 +435,12 @@ CSOURCE5 = term/ai.trm term/aed.trm \
 	term/hppj.trm
 CSOURCE6 = term/impcodes.h term/imagen.trm term/next.trm term/object.h \
 	term/kyo.trm term/latex.trm term/mif.trm \
-	term/pbm.trm term/pslatex.trm term/gpic.trm term/gnugraph.trm
+	term/pbm.trm term/pslatex.trm term/gpic.trm
 CSOURCE7 = term/post.trm term/pstricks.trm term/qms.trm term/regis.trm \
 	term/rgip.trm term/sun.trm\
 	term/t410x.trm term/tek.trm term/texdraw.trm \
 	term/tgif.trm term/tpic.trm \
-	term/unixpc.trm term/unixplot.trm \
+	term/unixpc.trm \
 	term/v384.trm term/vws.trm term/x11.trm term/xlib.trm term/linux.trm
 CSOURCE8 = contour.c specfun.c gplt_x11.c interpol.c
 CONFIGURE = configure configure.in Makefile.in docs/Makefile.in\

@@ -181,7 +181,7 @@ diff -rc docs/tex2ja.awk.ORG docs/tex2ja.awk
 *** 0 ****
 --- 1,54 ----
 + #
-+ # $Id: tex2ja.awk,v 1.5 2008-06-22 20:22:11+09 shige Exp $
++ # $Id: term-ja.diff,v 1.28 2011/04/24 03:46:04 sfeam Exp $
 + # doc2tex の出力の後処理スクリプト
 + # tex2ja.awk
 + # 06/20 2008
@@ -2460,59 +2460,6 @@ diff -rc term/ggi.trm.ORG term/ggi.trm
 + "    set term ggi V1024x768"
 + #endif /* JAPANESE_DOC */
   END_HELP(ggi)
-  #endif
-diff -rc term/gnugraph.trm.ORG term/gnugraph.trm
-*** term/gnugraph.trm	2006-07-22.ORG 17:39:08.000000000 +0900
---- term/gnugraph.trm	2011-04-18 12:09:18.000000000 +0900
-***************
-*** 422,427 ****
---- 422,428 ----
-  #define TERM_HELP_GNUGRAPH
-  #ifdef TERM_HELP
-  START_HELP(gnugraph)
-+ #ifndef JAPANESE_DOC
-  "1 Gnugraph(GNU plotutils)",
-  "?commands set terminal gnugraph",
-  "?set terminal gnugraph",
-***************
-*** 452,456 ****
---- 453,489 ----
-  "",
-  " There is a non-GNU version of the `gnugraph` driver which cannot be compiled",
-  " unless this version is left out."
-+ #else /* JAPANESE_DOC */
-+ "1 Gnugraph(GNU plotutils)",
-+ "?commands set terminal gnugraph",
-+ "?set terminal gnugraph",
-+ "?set term gnugraph",
-+ "?terminal gnugraph",
-+ "?term gnugraph",
-+ "?gnugraph",
-+ " `gnugraph` ドライバは、デバイスに依存しない GNU の plot グラフィック言",
-+ " 語の出力を生成します。それを \"plot2ps\" で PostScript 形式の出力にした",
-+ " 大きさのデフォルトは 5 インチ x 3 インチです。これは `set size` で約",
-+ " 8.25 x 8.25 まで増加させることが可能です。",
-+ "",
-+ " 書式:",
-+ "       set terminal gnugraph {\"<fontname>\"} {<fontsize>}",
-+ "                             {type <pt>} {size \"<size>\"}",
-+ "",
-+ " デフォルトは 10 ポイントの \"Courier\" です。",
-+ "",
-+ " `type` には以下のオプションが追加できます: `X`, `pnm`, `gif`, `ai`,",
-+ " `ps`, `cgm`, `fig`, `pcl5`, `hpgl`, `tek`, `meta` (default)。",
-+ " `size` オプション (default では a4) は、そのまま直接 plotutils に渡さ",
-+ " れますので、ユーザは正しい値を設定する義務を負います。詳細は plotutils",
-+ " のドキュメントを参照してください。",
-+ "",
-+ " 例:",
-+ "       set terminal gnugraph type hpgl size \"a4\"",
-+ "       set terminal gnugraph size \"a4,xoffset=-5mm,yoffset=2.0cm\" type pnm",
-+ "",
-+ " 非 GNU 版の `gnugraph` ドライバもありますが、それは GNU 版のを取り除か",
-+ " ないとコンパイルはされません。"
-+ #endif /* JAPANESE_DOC */
-  END_HELP(gnugraph)
   #endif
 diff -rc term/gpic.trm.ORG term/gpic.trm
 *** term/gpic.trm	2006-07-22.ORG 17:39:08.000000000 +0900
@@ -5642,42 +5589,6 @@ diff -rc term/unixpc.trm.ORG term/unixpc.trm
 + #endif /* JAPANESE_DOC */
   END_HELP(unixpc)
   #endif /* TERM_HELP */
-diff -rc term/unixplot.trm.ORG term/unixplot.trm
-*** term/unixplot.trm	2006-07-22.ORG 17:39:08.000000000 +0900
---- term/unixplot.trm	2011-04-18 12:09:18.000000000 +0900
-***************
-*** 176,181 ****
---- 176,182 ----
-  #ifdef TERM_HELP
-  #ifndef TERM_HELP_GNUGRAPH
-  START_HELP(unixplot)
-+ #ifndef JAPANESE_DOC
-  "1 unixplot",
-  "?commands set terminal unixplot",
-  "?set terminal unixplot",
-***************
-*** 188,193 ****
---- 189,208 ----
-  "",
-  " This terminal cannot be compiled if the GNU version of plot is to be used;",
-  " in that case, use the `gnugraph` terminal instead."
-+ #else /* JAPANESE_DOC */
-+ "1 unixplot",
-+ "?commands set terminal unixplot",
-+ "?set terminal unixplot",
-+ "?set term unixplot",
-+ "?terminal unixplot",
-+ "?term unixplot",
-+ "?unixplot",
-+ " `unixplot` ドライバは Unix の \"plot\" グラフィック言語の出力を生成しま",
-+ " す。オプションはありません。",
-+ "",
-+ " このドライバは、GNU 版の plot を使っている環境ではコンパイルされません。",
-+ " その場合は代わりに `gnugraph` ドライバ (terminal) を利用してください。"
-+ #endif /* JAPANESE_DOC */
-  END_HELP(unixplot)
-  #endif
-  #endif
 diff -rc term/v384.trm.ORG term/v384.trm
 *** term/v384.trm	2006-07-22.ORG 17:39:08.000000000 +0900
 --- term/v384.trm	2011-04-18 12:09:18.000000000 +0900

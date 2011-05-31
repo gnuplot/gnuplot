@@ -1,5 +1,5 @@
 # Hello, emacs: this is a -*- Makefile -*-
-# $Id: makefile.dj2,v 1.17 2010/03/14 18:01:46 sfeam Exp $
+# $Id: makefile.dj2,v 1.18 2010/03/14 18:52:42 sfeam Exp $
 #
 # GNUPLOT Makefile for DJGPP version 2 on DOS
 #
@@ -10,7 +10,7 @@
 #
 # AUTHORS : several ... including Edzer Pebesma <pebesma@metoor.frw.uva.nl>
 #           last mod. by Hans-Bernhard Broeker <broeker@physik.rwth-aachen.de>
-# DATE of last mod: $Date: 2010/03/14 18:01:46 $
+# DATE of last mod: $Date: 2010/03/14 18:52:42 $
 #
 # 
 # removed atari reference and added binary demo bf_test
@@ -92,7 +92,7 @@ CSOURCE6 = $(T)impcodes.h $(T)imagen.trm $(T)next.trm $(T)object.h \
 	$(T)pbm.trm $(T)pc.trm 
 CSOURCE7 = $(T)post.trm $(T)qms.trm $(T)regis.trm $(T)sun.trm \
 	$(T)t410x.trm $(T)tek.trm $(T)texdraw.trm $(T)unixpc.trm \
-	$(T)unixplot.trm $(T)v384.trm $(T)vws.trm $(T)x11.trm $(T)xlib.trm
+	$(T)v384.trm $(T)vws.trm $(T)x11.trm $(T)xlib.trm
 #OBJ1 =  bitmap.o command.o contour.o eval.o graphics.o graph3d.o hidden3d.o util3d.o
 #OBJ2 =  help.o internal.o misc.o parse.o plot.o plot2d.o plot3d.o readline.o
 #OBJ3 =  scanner.o set.o show.o specfun.o standard.o stdfn.o term.o time.o util.o

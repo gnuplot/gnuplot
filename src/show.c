@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.249 2010/12/05 00:01:02 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.250 2011/05/11 05:18:41 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -972,18 +972,6 @@ show_version(FILE *fp)
 #endif
 		"";
 
-	    const char *unixplot =
-#ifdef UNIXPLOT
-		"+UNIXPLOT  "
-#endif
-		"";
-
-	    const char *gnugraph =
-#ifdef GNUGRAPH
-		"+GNUGRAPH  "
-#endif
-		"";
-
 	    const char *hiddenline =
 #ifdef HIDDEN3D_QUADTREE
 		"+HIDDEN3D_QUADTREE  "
@@ -1014,10 +1002,10 @@ show_version(FILE *fp)
 	    sprintf(compile_options, "\
 %s%s\n%s%s\n\
 %s%s\n\
-%s%s%s%s%s%s\n%s\n",
+%s%s%s%s\n%s\n",
 		    rdline, gnu_rdline, compatibility, binary_files,
 		    libgd, linuxvga,
-		    nocwdrc, x11, use_mouse, unixplot, gnugraph, hiddenline,
+		    nocwdrc, x11, use_mouse, hiddenline,
 		    plotoptions);
 	}
 

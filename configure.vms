@@ -316,9 +316,6 @@ $ LINUXVGA = 0
 $ HAVE_LIBREADLINE = 0
 $ GNUPLOT_HISTORY = 0
 $ ! READLINE = 0    ! READLINE is defined above
-$ UNIXPLOT = 0
-$ GNUGRAPH = 0
-$ GNU_PLOTUTILS = 0
 $ HAVE_LIBGD = 0
 $ HAVE_LIBPNG = 0
 $ CGI = 0
@@ -375,7 +372,7 @@ $ ! List of terminal files; all are in [.term] and have an extension of .trm.
 $ !
 $ CORETERM = "aed cgi dumb dxf dxy eepic epson fig hp26 hp2648 hpgl hpljii " -
            + "imagen kyo latex pbm pc post qms regis sun t410x tek " -
-           + "unixpc unixplot v384 x11"
+           + "unixpc v384 x11"
 $ OTHERTERM = "[-.term]impcodes.h [-.term]object.h gplt_x11.c"
 $ !
 $ ! Define CFLAGS.

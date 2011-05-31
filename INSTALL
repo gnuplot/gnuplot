@@ -420,13 +420,6 @@ non-default location that is not searched by the preprocessor or linker.
 
     Dto. for the pdf library. This option is on by default.
 
-  --with-plot[=DIR]
-
-    If used without the DIR argument, this option selects the standard
-    UNIX plot library, if available. If used with the DIR argument,
-    configure looks for the plot library from GNU plotutils version 2.2
-    or better. The option is off by default.
-
 
 Platform compiler problems
 ==========================

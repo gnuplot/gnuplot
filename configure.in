@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot on Unix.
 dnl
-dnl $Id: configure.in,v 1.281 2011/04/26 17:54:28 sfeam Exp $
+dnl $Id: configure.in,v 1.282 2011/05/02 18:37:01 markisch Exp $
 dnl
 dnl this is actually major.minor ...
 dnl note that for a non-beta release, we need to
@@ -505,38 +505,6 @@ please add path to history.h to CPPFLAGS in Makefile]))
   LIBS="$_libs"
 fi
 dnl end readline
-
-dnl If no DIR argument given, use the Unix plot library
-dnl Else use either GNU libplot from plotutils,
-dnl or ancient GNU graphics libplot
-AC_ARG_WITH(plot,dnl
-[  --with-plot[=DIR]       use the Unix plot library],
-  [if test "$withval" != no; then
-     dnl Unix plot library
-     AC_CHECK_LIB(plot,openpl,
-       [AC_DEFINE(UNIXPLOT,1,
-                  [ Define if you want to use the standard Unix plot library. ])
-        TERMLIBS="-lplot $TERMLIBS"],
-       [
-	 dnl GNU plotutils 2.2 or better
-	 if test -d $withval/include; then
-	   CPPFLAGS="$CPPFLAGS -I$withval/include"
-	 fi
-	 if test -d $withval/lib; then
-	   LDFLAGS="$LDFLAGS -L$withval/lib"
-	 fi
-	 TERMXLIBS="$X_LIBS -lXaw -lXmu -lXt -lXext -lX11"
-	 AC_CHECK_LIB(plot,pl_textangle,
-	   [TERMLIBS="-lplot $TERMLIBS"
-	    AC_DEFINE(GNUGRAPH,1,
-	              [ Define if you want to use the GNU version of the Unix plot library. ])],
-	   [AC_MSG_WARN([GNU plotutils v2.2 or newer required -- disabling gnugraph terminal])
-	    TERMXLIBS=
-	    with_plot=no],
-	   [$TERMXLIBS])
-	])
-   fi])
-dnl end libplot
 
 dnl check presence of z library
 dnl TODO: path to zlib includes; -lz -lm specified multiple times
@@ -1329,19 +1297,6 @@ if test "$ac_cv_header_pdflib_h" = yes; then
   fi
 else
   AC_MSG_RESULT([  pdf terminal: no (requires libpdf)])
-fi
-
-if test x"$with_plot" != x; then
-  if test "$with_plot" = yes; then
-    AC_MSG_RESULT([  plot library terminal: yes (unixplot - UNIX version)])
-  elif test "$with_plot" != no; then
-    AC_MSG_RESULT([  plot library terminal: yes (gnugraph - GNU version)])
-  else
-    AC_MSG_RESULT([  plot library terminal: no (requires GNU plotutils or UNIX plot)])
-  fi
-else
-    AC_MSG_RESULT([  plot library terminal: no (use --with-plot to enable, requires GNU plotutils])
-    AC_MSG_RESULT([                             or UNIX plot)])
 fi
 
 if test "$with_linux_vga" = yes; then

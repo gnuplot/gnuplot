@@ -1,5 +1,5 @@
 %
-% $Id: tutorial.tex,v 1.9 2010/09/17 20:58:12 sfeam Exp $
+% $Id: tutorial.tex,v 1.10 2010/09/19 19:54:31 sfeam Exp $
 %
 % Tutorial for gnuplot plotting program, for LaTeX users
 % David Kotz
@@ -94,17 +94,7 @@ Gnuplot is by nature an interactive program. Users making plots for
 \LaTeX\ will generally not use gnuplot interactively.  Whenever hard
 copy is desired from gnuplot, the program need not be run on a
 graphics terminal. In this case the output is directed to a file or
-pipe, then sent to the appropriate output device. For example, output
-from the terminal type {\tt unixplot} may be sent to a program
-interpreting the Unix plotting standard. The terminal types {\tt
-imagen} and {\tt postscript} may be used for output to printers
-understanding those languages. (A shell script ({\tt lasergnu}) is
-supplied with the distribution that will accept a gnuplot command or
-input file and send the output to an Imagen or Postscript laser
-printer. This script may have been adapted to your site.) The terminal
-type {\tt fig} outputs FIG code that can be read by the Fig graphics
-program and translated into forms usable in both \TeX\ and
-\LaTeX\ documents.
+pipe, then sent to the appropriate output device.
 
 We now ignore the interactive nature of gnuplot and provide the input
 to gnuplot from a file, \ie,
