@@ -3,6 +3,7 @@ New features, changes and fixes in gnuplot version 4.4.4
 
 * NEW boxxyerrors plot style now allows variable color
 * NEW splot with pm3d now allows variable rgb color
+* NEW "nonuniform matrix" indicates ascii data with explicit x, y
 * CHANGE columnhead(N) is a string-valued function, not a keyword
 * CHANGE Demarcate plots in svg output using <g id="Plot_#"><title>...
 * FIX incorrect space allowed for outside left key box
@@ -25,7 +26,6 @@ New features, changes and fixes in gnuplot version 4.4.3
 * FIX prevent out-of-range boxes from creating degenerate ghosts on the border
 * FIX missing alpha channel flag for pdfcairo terminal
 * FIX font initialization in windows terminal
-
 
 New features, changes and fixes in gnuplot version 4.4.2
 ========================================================
