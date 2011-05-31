@@ -1,5 +1,5 @@
 /* Hey Emacs this is -*- C -*-
- * $Id: emf.trm,v 1.59.2.7 2010/12/14 04:57:25 sfeam Exp $
+ * $Id: emf.trm,v 1.59.2.8 2011/02/10 21:16:41 sfeam Exp $
  */
 
 /* GNUPLOT - emf.trm */
@@ -787,6 +787,8 @@ EMF_graphics()
     EMF_CreateBrush(EMF_HANDLE_BRUSH, 1, 0, 0);		/* transparent brush for polygons */
     EMF_SelectObject(EMF_HANDLE_BRUSH);
     EMF_set_font(NULL);		/* init default font */
+
+    emf_color = emf_textcolor = LT_UNDEFINED;
 }
 
 TERM_PUBLIC int 
