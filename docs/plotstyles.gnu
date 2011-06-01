@@ -149,7 +149,7 @@ plot demo . 'silver.dat' using (1):2:(.25) ps 0.3, \
 set output out . 'figure_dots' . ext
 reset
 set parametric
-set samples 1000
+set samples 500
 set isosamples 2,2 # Smallest possible
 set view map
 set lmargin screen 0.05
