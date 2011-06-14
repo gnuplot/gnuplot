@@ -1,3 +1,9 @@
+2011-06-14  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/graphics.c (plot_histeps): Allow data points with y=0 even if log
+	scaling is active.
+	Bug #3316112
+
 2011-05-31  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/emf.trm: Reset line and text colors at the start of each plot.

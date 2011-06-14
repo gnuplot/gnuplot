@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.367 2011/05/10 19:59:37 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.368 2011/05/14 19:53:36 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -3049,9 +3049,9 @@ plot_histeps(struct curve_points *plot)
     /* play it safe: invalidate the static pointer after usage */
     histeps_current_plot = NULL;
 
-    /* HBB 20010625: log y axis must treat 0.0 as -infinity. Define
-     * the correct y position for the histogram's baseline once. It'll
-     * be used twice (once for each endpoint of the histogram). */
+    /* HBB 20010625: log y axis must treat 0.0 as -infinity.
+     * Define the correct y position for the histogram's baseline.
+     */
     if (Y_AXIS.log)
 	y_null = GPMIN(Y_AXIS.min, Y_AXIS.max);
     else
@@ -3068,6 +3068,8 @@ plot_histeps(struct curve_points *plot)
 
     for (i = 0; i < goodcount - 1; i++) {	/* loop over all points except last  */
 	yn = plot->points[gl[i]].y;
+	if ((Y_AXIS.log) && yn <=0)
+	    yn = y_null;
 	xn = (plot->points[gl[i]].x + plot->points[gl[i + 1]].x) / 2.0;
 	histeps_vertical(&xl, &yl, x, y, yn);
 	histeps_horizontal(&xl, &yl, x, xn, yn);
