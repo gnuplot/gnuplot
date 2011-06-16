@@ -1,3 +1,9 @@
+2011-06-16  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/pm3d.c (z2cb): If cb is log-scale, then limit result to positive
+	values.
+	Bug #3316616
+
 2011-05-31  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/emf.trm: Reset line and text colors at the start of each plot.
