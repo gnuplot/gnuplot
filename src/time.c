@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: time.c,v 1.20.2.1 2009/06/12 05:02:14 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: time.c,v 1.20.2.2 2010/03/21 04:07:13 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - time.c */
@@ -277,44 +277,18 @@ gstrptime(char *s, char *fmt, struct tm *tm)
 	    s = read_int(s, 2, &tm->tm_sec);
 	    break;
 
-	/* read EPOCH data
-	 * EPOCH is the std. unixtimeformat seconds since 01.01.1970 UTC
-	 * actualy i would need a read_long (or what time_t is else)
-	 *  aktualy this is not my idea       i got if from
-	 * AlunDa Penguin Jones (21.11.97)
-	 * but changed %t to %s because of strftime
-	 * and fixed the localtime() into gmtime()
-	 * maybe we should use ggmtime() ? but who choose double ????
-	 * Walter Harms <WHarms@bfs.de> 26 Mar 2000
-	 */
 
 	case 's':
-#if 0 /* HBB 20040213: comment this out, but keep it around for now */
-	    {
-		/* time_t when; */
-		int when;
-		struct tm *tmwhen;
-		s = read_int(s, 10, &when);
-		tmwhen = gmtime((time_t*)&when);
-		tmwhen->tm_year += 1900;
-		*tm = *tmwhen;
-		break;
-	    }
-#else
-	    /* HBB 20040213: New version of this.  64-bit proof and
-	     * more in line with the rest of this module than the
-	     * original one. */
+	    /* read EPOCH data
+	     * EPOCH is the std. unix timeformat seconds since 01.01.1970 UTC
+	     */
 	    {
 		double when;
-		/* offset from UNIX epoch (1970) to gnuplot epoch */
-		static const long epoch_offset
-		    = (long)((ZERO_YEAR - 1970) * 365.25) * DAY_SEC;
-
-		when = strtod (s, &s) - epoch_offset;
+		when = strtod (s, &s) - SEC_OFFS_SYS;
 		ggmtime(tm, when);
 		break;
 	    }
-#endif
+
 	default:
 	    int_warn(DATAFILE, "Bad time format in string");
 	}
