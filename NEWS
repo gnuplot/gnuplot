@@ -9,6 +9,7 @@ New features, changes and fixes in gnuplot version 4.4.4
 * FIX incorrect space allowed for outside left key box
 * FIX buffer overflow from enhanced text timefmt tic labels
 * FIX correction for offset in epochs when reading in time format "%s"
+* FIX discontinuity in defined palette limited by maxcolors
 
 
 
