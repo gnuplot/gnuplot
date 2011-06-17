@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.676 2011/06/18 16:51:22 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.677 2011/06/19 22:10:36 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -4709,6 +4709,10 @@ Ffigure_mapcontours
        plot for [basename in "A B C"] basename.".dat" using 1:2 with lines
        set for [i = 1:10] style line i lc rgb "blue"
        unset for [tag = 100:200] label tag
+
+ Nested iteration is supported:
+
+       set for [i=1:9] for [j=1:9] label i*10+j sprintf("%d",i*10+j) at i,j
 
  See additional documentation for `plot iteration`, `do`.
 

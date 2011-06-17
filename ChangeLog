@@ -4,6 +4,10 @@
 	unsuccessful 'set term'
 	Bug #3347683
 
+	* src/parse.c src/parse.h docs/gnuplot.doc: Add nested iteration in plot
+	and other commands: constructs like 'plot for [i=1:5] for [j=1:5] foo'
+	are now valid
+
 2011-07-11  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c (plot_steps): Don't pass negative heights to t->fillbox

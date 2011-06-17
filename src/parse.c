@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: parse.c,v 1.59 2011/03/20 17:51:25 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: parse.c,v 1.60 2011/05/22 06:18:45 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - parse.c */
@@ -56,8 +56,8 @@ int at_highest_column_used = -1;
 
 /* Iteration structures used for bookkeeping */
 /* Iteration can be nested so long as different iterators are used */
-t_iterator plot_iterator = {0};
-t_iterator set_iterator = {0};
+t_iterator plot_iterator = NEW_ITERATOR;
+t_iterator set_iterator = NEW_ITERATOR;
 
 /* Internal prototypes: */
 
@@ -894,58 +894,89 @@ void
 check_for_iteration(t_iterator *iter)
 {
     char *errormsg = "Expecting iterator \tfor [<var> = <start> : <end>]\n\t\t\tor\tfor [<var> in \"string of words\"]";
+    int nesting_depth = 0;
+    t_iterator *this_iter;
 
+    /* Cleanup: Keeping the first node of the linked list, filling it with defaults,
+     * but freeing the rest of the list */
     iter->iteration_udv = NULL;
     free(iter->iteration_string);
     iter->iteration_string = NULL;
     iter->iteration_increment = 1;
     iter->iteration = 0;
+    iter->done = FALSE; /* ? */
+    iter->really_done = FALSE;
+    while (iter->prev && (iter != iter->prev)) {
+	this_iter = iter->prev;
+	iter->prev = this_iter->prev;
+	free(this_iter->iteration_string);
+	free(this_iter);
+    }
+    iter->prev = iter;
+    iter->next = NULL;
 
-    if (!equals(c_token, "for"))
-	return;
+    this_iter = iter;
 
+    /* Now checking for iteration parameters */
+    /* Nested "for" statements are supported, each one corresponds to a node of the linked list */
+    while (equals(c_token, "for")) {
+	if (nesting_depth) {
+	    this_iter->next = gp_alloc(sizeof(t_iterator), "iteration linked list");
+	    this_iter->next->prev = this_iter; /* setting up doubly linked list */
+	    this_iter = this_iter->next; /* stepping onto the newly created node... */
+	    this_iter->iteration_udv = NULL; /* and initializing it */
+	    this_iter->iteration_string = NULL;
+	    this_iter->iteration_increment = 1;
+	    this_iter->iteration = 0;
+	    this_iter->done = FALSE;
+	    this_iter->next = NULL;
+	}
+	    
+
+	iter->prev = this_iter; /* a shortcut: making the list circular */
+	nesting_depth++;
     c_token++;
     if (!equals(c_token++, "[") || !isletter(c_token))
 	int_error(c_token-1, errormsg);
-    iter->iteration_udv = add_udv(c_token++);
+	this_iter->iteration_udv = add_udv(c_token++);
 
     if (equals(c_token, "=")) {
 	c_token++;
-	iter->iteration_start = int_expression();
+	    this_iter->iteration_start = int_expression();
 	if (!equals(c_token++, ":"))
 	    int_error(c_token-1, errormsg);
-	iter->iteration_end = int_expression();
+	    this_iter->iteration_end = int_expression();
 	if (equals(c_token,":")) {
 	    c_token++;
-	    iter->iteration_increment = int_expression();
+		this_iter->iteration_increment = int_expression();
 	}
 	if (!equals(c_token++, "]"))
 	    int_error(c_token-1, errormsg);
-	if (iter->iteration_udv->udv_undef == FALSE)
-	    gpfree_string(&(iter->iteration_udv->udv_value));
-	Ginteger(&(iter->iteration_udv->udv_value), iter->iteration_start);
-	iter->iteration_udv->udv_undef = FALSE;
+	    if (this_iter->iteration_udv->udv_undef == FALSE)
+		gpfree_string(&(this_iter->iteration_udv->udv_value));
+	    Ginteger(&(this_iter->iteration_udv->udv_value), this_iter->iteration_start);
+	    this_iter->iteration_udv->udv_undef = FALSE;
     }
 
     else if (equals(c_token++, "in")) {
-	iter->iteration_string = try_to_get_string();
-	if (!iter->iteration_string)
+	    this_iter->iteration_string = try_to_get_string();
+	    if (!this_iter->iteration_string)
 	    int_error(c_token-1, errormsg);
 	if (!equals(c_token++, "]"))
 	    int_error(c_token-1, errormsg);
-	iter->iteration_start = 1;
-	iter->iteration_end = gp_words(iter->iteration_string);
-	if (iter->iteration_udv->udv_undef == FALSE)
-	    gpfree_string(&(iter->iteration_udv->udv_value));
-	Gstring(&(iter->iteration_udv->udv_value), gp_word(iter->iteration_string, 1));
-	iter->iteration_udv->udv_undef = FALSE;
+	    this_iter->iteration_start = 1;
+	    this_iter->iteration_end = gp_words(this_iter->iteration_string);
+	    if (this_iter->iteration_udv->udv_undef == FALSE)
+		gpfree_string(&(this_iter->iteration_udv->udv_value));
+	    Gstring(&(this_iter->iteration_udv->udv_value), gp_word(this_iter->iteration_string, 1));
+	    this_iter->iteration_udv->udv_undef = FALSE;
     }
 
     else /* Neither [i=B:E] or [s in "foo"] */
  	int_error(c_token-1, errormsg);
 
-    iter->iteration_current = iter->iteration_start;
-
+	this_iter->iteration_current = this_iter->iteration_start;
+    }
 }
 
 /* Set up next iteration.
@@ -954,28 +985,75 @@ check_for_iteration(t_iterator *iter)
 TBOOLEAN
 next_iteration(t_iterator *iter)
 {
-    if (!iter->iteration_udv) {
-	iter->iteration = 0;
+    t_iterator *this_iter;
+    TBOOLEAN condition = FALSE;
+    
+    /* Support for nested iteration:
+     * we start with the innermost loop. */
+    this_iter = iter->prev; /* linked to the last element of the list */
+    
+    if (!this_iter)
+	return FALSE;
+    
+    while (!iter->really_done && this_iter != iter && this_iter->done) {
+	this_iter->iteration_current = this_iter->iteration_start;
+	this_iter->done = FALSE;
+	if (this_iter->iteration_string) {
+	    free(this_iter->iteration_udv->udv_value.v.string_val);
+	    this_iter->iteration_udv->udv_value.v.string_val
+	         = gp_word(this_iter->iteration_string, this_iter->iteration_current);
+    } else
+	    this_iter->iteration_udv->udv_value.v.int_val = this_iter->iteration_current;	
+	
+	this_iter = this_iter->prev;
+    }
+   
+    if (!this_iter->iteration_udv) {
+	this_iter->iteration = 0;
 	return FALSE;
     }
     iter->iteration++;
-    iter->iteration_current += iter->iteration_increment;
-    if (iter->iteration_string) {
-	free(iter->iteration_udv->udv_value.v.string_val);
-	iter->iteration_udv->udv_value.v.string_val
-	    = gp_word(iter->iteration_string, iter->iteration_current);
+    /* don't increment if we're at the last iteration */
+    if (!iter->really_done)
+	this_iter->iteration_current += this_iter->iteration_increment;
+    if (this_iter->iteration_string) {
+	free(this_iter->iteration_udv->udv_value.v.string_val);
+	this_iter->iteration_udv->udv_value.v.string_val
+	    = gp_word(this_iter->iteration_string, this_iter->iteration_current);
     } else
-	iter->iteration_udv->udv_value.v.int_val = iter->iteration_current;
-    return iter->iteration_increment && /* no infinite loops! */
-      ((iter->iteration_end - iter->iteration_current)*iter->iteration_increment >= 0);
+	this_iter->iteration_udv->udv_value.v.int_val = this_iter->iteration_current;
+    
+    this_iter->done = !(this_iter->iteration_increment && /* no infinite loops! */
+      ((this_iter->iteration_end - this_iter->iteration_current - this_iter->iteration_increment)
+       *this_iter->iteration_increment >= 0));
+    
+    /* We return false only if we're, erm, really done */
+    this_iter = iter;
+    while (this_iter) {
+	condition = condition || (!this_iter->done);
+	this_iter = this_iter->next;
+    }
+    if (!condition) {
+	if (!iter->really_done) {
+	    iter->really_done = TRUE;
+	    condition = TRUE;
+	} else 
+	    condition = FALSE;
+    }
+    return condition;
 }
 
 TBOOLEAN
 empty_iteration(t_iterator *iter)
 {
-    if (iter->iteration_udv
-        && ((iter->iteration_end - iter->iteration_start)*iter->iteration_increment < 0))
-        return TRUE;
-    else
-        return FALSE;
+    t_iterator *this_iter;
+    TBOOLEAN condition = TRUE;
+
+    this_iter = iter;
+    while (this_iter) {
+	condition = condition && (this_iter->iteration_udv
+	    && ((this_iter->iteration_end - this_iter->iteration_start)*this_iter->iteration_increment < 0));
+	this_iter = this_iter->next;
+    }
+    return condition;
 }
