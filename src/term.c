@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.220 2011/06/01 03:44:36 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.221 2011/07/04 05:58:36 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -1580,8 +1580,10 @@ set_term()
 	}
     }
 
-    if (!t)
+    if (!t) {
+	change_term("unknown", 7);
 	int_error(c_token-1, "unknown or ambiguous terminal type; type just 'set terminal' for a list");
+    }
 
     /* otherwise the type was changed */
     return (t);
