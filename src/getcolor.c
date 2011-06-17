@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: getcolor.c,v 1.26 2010/10/01 23:32:13 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: getcolor.c,v 1.27 2010/10/06 00:19:50 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - getcolor.c */
@@ -408,7 +408,7 @@ quantize_gray( double gray )
 	else for (j=0; j<sm_palette.gradient_num; j++) {
 	    if ((gray >= sm_palette.gradient[j].pos)
 	    &&  (gray <  sm_palette.gradient[j+1].pos)) {
-		if ((degray <= sm_palette.gradient[j].pos)
+		if ((degray < sm_palette.gradient[j].pos)
 		||  (degray > sm_palette.gradient[j+1].pos))
 		    degray = (sm_palette.gradient[j].pos
 			    + sm_palette.gradient[j+1].pos) / 2.;
