@@ -1,3 +1,9 @@
+2011-06-17  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/getcolor.c (quantize_gray)): Remove a possible discontinuity at
+	the boundary of defined palettes with a small number of segments.
+	Bug #3317746
+
 2011-06-17  Peter Juhasz  <juhaszp@users.sourceforge.net>
 
 	* src/time.c (gstrptime):  The correction for the difference in epochs
