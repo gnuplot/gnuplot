@@ -1,5 +1,5 @@
 /*
- * $Id: axis.h,v 1.63 2011/01/16 19:15:20 sfeam Exp $
+ * $Id: axis.h,v 1.64 2011/05/14 19:53:36 sfeam Exp $
  *
  */
 
@@ -243,6 +243,7 @@ typedef struct axis {
 
 /* other miscellaneous fields */
     text_label label;		/* label string and position offsets */
+    TBOOLEAN manual_justify;	/* override automatic justification */
     lp_style_type zeroaxis;	/* drawing style for zeroaxis, if any */
 } AXIS;
 
@@ -270,6 +271,7 @@ typedef struct axis {
 	MINI_DEFAULT, 10.,	/* minitics, mtic_freq */		    \
         1.0, 0.5, TRUE,		/* ticscale, miniticscale, tic_in */	    \
 	EMPTY_LABELSTRUCT,	/* axis label */			    \
+	FALSE,			/* override automatic justification */	    \
 	DEFAULT_AXIS_ZEROAXIS	/* zeroaxis line style */		    \
 }
 

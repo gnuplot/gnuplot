@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.250 2011/05/11 05:18:41 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.251 2011/06/01 03:44:36 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -3176,7 +3176,25 @@ show_ticdef(AXIS_INDEX axis)
 
     if (axis_array[axis].ticdef.rangelimited)
 	fprintf(stderr, "\n\t  tics are limited to data range");
-    fprintf(stderr, "\n\t  labels are format \"%s\"", ticfmt);
+    fputs("\n\t  labels are ", stderr);
+    if (axis_array[axis].manual_justify) {
+    	switch (axis_array[axis].label.pos) {
+    	case LEFT:{
+		fputs("left justified, ", stderr);
+		break;
+	    }
+    	case RIGHT:{
+		fputs("right justified, ", stderr);
+		break;
+	    }
+    	case CENTRE:{
+		fputs("center justified, ", stderr);
+		break;
+	    }
+    	}
+    } else 
+        fputs("justified automatically, ", stderr);    
+    fprintf(stderr, "format \"%s\"", ticfmt);
     if (axis_array[axis].tic_rotate) {
 	fprintf(stderr," rotated");
 	fprintf(stderr," by %d",axis_array[axis].tic_rotate);

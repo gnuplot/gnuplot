@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.91 2011/03/17 23:08:45 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.92 2011/05/14 20:03:39 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -1330,6 +1330,11 @@ axis_output_tics(
 		: (axis_is_second ? JUST_BOT : JUST_TOP);
 	    rotate_tics = 0;
 	}
+
+	if (axis_array[axis].manual_justify)
+	    tic_hjust = axis_array[axis].label.pos;
+	else
+	    axis_array[axis].label.pos = tic_hjust;
 
 	if (axis_array[axis].ticmode & TICS_MIRROR)
 	    tic_mirror = mirror_position;

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.370 2011/06/21 18:53:31 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.371 2011/07/12 03:59:13 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -1005,7 +1005,12 @@ boundary(struct curve_points *plots, int count)
      */
 
     if (axis_array[SECOND_X_AXIS].ticmode & TICS_ON_BORDER && vertical_x2tics) {
+	/* Assuming left justified tic labels. Correction below if they aren't */
 	double projection = sin((double)axis_array[SECOND_X_AXIS].tic_rotate*DEG2RAD);
+	if (axis_array[SECOND_X_AXIS].label.pos == RIGHT)
+	    projection *= -1;
+	else if (axis_array[SECOND_X_AXIS].label.pos == CENTRE)
+	    projection = 0.5*fabs(projection);
 	widest_tic_strlen = 0;		/* reset the global variable ... */
 	gen_tics(SECOND_X_AXIS, /* 0, */ widest_tic_callback);
 	if (tmargin.x < 0) /* Undo original estimate */
@@ -1026,6 +1031,10 @@ boundary(struct curve_points *plots, int count)
 	    projection = 1.0;
 	else
 	    projection = -sin((double)axis_array[FIRST_X_AXIS].tic_rotate*DEG2RAD);
+	if (axis_array[FIRST_X_AXIS].label.pos == RIGHT)
+	    projection *= -1;
+	else if (axis_array[FIRST_X_AXIS].label.pos == CENTRE)
+	    projection = 0.5*fabs(projection);	
 	widest_tic_strlen = 0;		/* reset the global variable ... */
 	gen_tics(FIRST_X_AXIS, /* 0, */ widest_tic_callback);
 
@@ -1344,6 +1353,8 @@ place_grid()
 	    tic_hjust = CENTRE;
 	else if ((*t->text_angle)(rotate_tics))
 	    tic_hjust = (rotate_tics == TEXT_VERTICAL) ? RIGHT : LEFT;
+	if (R_AXIS.manual_justify)
+	    tic_hjust = R_AXIS.label.pos;
 	gen_tics(POLAR_AXIS, xtick2d_callback);
 	(*t->text_angle) (0);
     }

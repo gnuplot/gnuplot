@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.677 2011/06/19 22:10:36 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.678 2011/07/12 19:19:28 juhaszp Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -11324,6 +11324,7 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/population.gif" alt="[popu
        set tics {axis | border} {{no}mirror}
                 {in | out} {scale {default | <major> {,<minor>}}}
                 {{no}rotate {by <ang>}} {offset <offset> | nooffset}
+                {left | right | center | autojustify}
                 { format "formatstring" } { font "name{,<size>}" }
                 { textcolor <colorspec> }
        set tics {front | back}
@@ -11367,6 +11368,11 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/population.gif" alt="[popu
  coordinate system. <offset> is the offset of the tics texts from their
  default positions, while the default coordinate system is `character`.
  See `coordinates` for details. `nooffset` switches off the offset.
+
+ By default, tic labels are justified automatically depending on the axis and
+ rotation angle to produce aesthetically pleasing results. If this is not
+ desired, justification can be overridden with an explicit `left`, `right` or
+ `center` keyword. `autojustify` restores the default behavior.
 
  `set tics` with no options restores to place tics inwards. Every other
  options are retained.
@@ -12039,6 +12045,7 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/population.gif" alt="[popu
        set xtics {axis | border} {{no}mirror}
                  {in | out} {scale {default | <major> {,<minor>}}}
                  {{no}rotate {by <ang>}} {offset <offset> | nooffset}
+                 {left | right | center | autojustify}
                  {add}
                  {  autofreq
                   | <incr>
@@ -12088,6 +12095,11 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/population.gif" alt="[popu
 
  Move xtics more closely to the plot.
        set xtics offset 0,graph 0.05
+
+ By default, tic labels are justified automatically depending on the axis and
+ rotation angle to produce aesthetically pleasing results. If this is not
+ desired, justification can be overridden with an explicit `left`, `right` or
+ `center` keyword. `autojustify` restores the default behavior.
 
  `set xtics` with no options restores the default border or axis if xtics are
  being displayed;  otherwise it has no effect.  Any previously specified tic

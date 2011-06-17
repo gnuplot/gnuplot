@@ -8,6 +8,10 @@
 	and other commands: constructs like 'plot for [i=1:5] for [j=1:5] foo'
 	are now valid
 
+	* src/axis.c src/axis.h src/color.c src/graph3d.c src/graphics.c
+	src/save.c src/set.c src/show.c src/unset.c docs/gnuplot.doc:
+	Allow explicit justification for tic labels, e.g. set xtics right
+
 2011-07-11  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c (plot_steps): Don't pass negative heights to t->fillbox

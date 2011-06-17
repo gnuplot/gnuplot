@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: color.c,v 1.94 2010/10/12 21:11:25 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: color.c,v 1.95 2011/04/05 20:29:38 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - color.c */
@@ -481,6 +481,7 @@ cbtick_callback(
 
     /* draw label */
     if (text) {
+	int just;
 	/* get offset */
 	int offsetx, offsety;
 	map3d_position_r(&(axis_array[axis].ticdef.offset),
@@ -497,16 +498,22 @@ cbtick_callback(
 		    hrotate = axis_array[axis].tic_rotate;
 	    if (len > 0) y3 -= len; /* add outer tics len */
 	    if (y3<0) y3 = 0;
+	    just = hrotate ? LEFT : CENTRE;
+	    if (axis_array[axis].manual_justify)
+		just = axis_array[axis].label.pos;
 	    write_multiline(x2+offsetx, y3+offsety, text,
-			    (hrotate ? LEFT : CENTRE), CENTRE, hrotate,
+			    just, CENTRE, hrotate,
 			    axis_array[axis].ticdef.font);
 	    if (hrotate)
 		(*term->text_angle)(0);
 	} else {
 	    unsigned int x3 = color_box.bounds.xright + (term->h_char);
 	    if (len > 0) x3 += len; /* add outer tics len */
+	    just = LEFT;
+	    if (axis_array[axis].manual_justify)
+		just = axis_array[axis].label.pos;	    
 	    write_multiline(x3+offsetx, y2+offsety, text,
-			    LEFT, CENTRE, 0.0,
+			    just, CENTRE, 0.0,
 			    axis_array[axis].ticdef.font);
 	}
 	term_apply_lp_properties(&border_lp);	/* border linetype */

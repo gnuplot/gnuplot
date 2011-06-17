@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.341 2011/05/22 06:18:45 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.342 2011/06/18 16:51:22 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -4264,6 +4264,22 @@ set_tics()
 	    for (i = 0; i < AXIS_ARRAY_SIZE; ++i)
 		axis_array[i].tic_rotate = 0;
 	    ++c_token;
+	} else if (almost_equals(c_token, "l$eft")) {
+	    axis_array[i].label.pos = LEFT;
+	    axis_array[i].manual_justify = TRUE;
+	    c_token++;
+	} else if (almost_equals(c_token, "c$entre")
+		|| almost_equals(c_token, "c$enter")) {
+	    axis_array[i].label.pos = CENTRE;
+	    axis_array[i].manual_justify = TRUE;
+	    c_token++;
+	} else if (almost_equals(c_token, "ri$ght")) {
+	    axis_array[i].label.pos = RIGHT;
+	    axis_array[i].manual_justify = TRUE;
+	    c_token++;
+	} else if (almost_equals(c_token, "autoj$ustify")) {
+	    axis_array[i].manual_justify = FALSE;
+	    c_token++;
 	} else if (almost_equals(c_token, "off$set")) {
 	    struct position lpos;
 	    ++c_token;
@@ -4780,6 +4796,22 @@ set_tic_prop(AXIS_INDEX axis)
 		    { character, character, character, 0., 0., 0.};
 		++c_token;
 		axis_array[axis].ticdef.offset = tics_nooffset;
+	    } else if (almost_equals(c_token, "l$eft")) {
+		axis_array[axis].label.pos = LEFT;
+		axis_array[axis].manual_justify = TRUE;
+		c_token++;
+	    } else if (almost_equals(c_token, "c$entre")
+		       || almost_equals(c_token, "c$enter")) {
+		axis_array[axis].label.pos = CENTRE;
+		axis_array[axis].manual_justify = TRUE;
+		c_token++;
+	    } else if (almost_equals(c_token, "ri$ght")) {
+		axis_array[axis].label.pos = RIGHT;
+		axis_array[axis].manual_justify = TRUE;
+		c_token++;
+	    } else if (almost_equals(c_token, "autoj$ustify")) {
+		axis_array[axis].manual_justify = FALSE;
+		c_token++;
 	    } else if (almost_equals(c_token,"range$limited")) {
 		axis_array[axis].ticdef.rangelimited = TRUE;
 		++c_token;
