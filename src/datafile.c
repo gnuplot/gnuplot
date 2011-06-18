@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.198 2011/05/10 18:28:43 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.199 2011/05/28 04:58:42 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -165,10 +165,6 @@ static char *RCSid() { return RCSid("$Id: datafile.c,v 1.198 2011/05/10 18:28:43
 #define is_comment(c) ((c) && (strchr(df_commentschars, (c)) != NULL))
 
 /*{{{  static fns */
-#if 0                           /* not used */
-static int get_time_cols __PROTO((char *fmt));
-static void mod_def_usespec __PROTO((int specno, int jump));
-#endif
 static int check_missing __PROTO((char *s));
 
 static void expand_df_column __PROTO((int));
@@ -2246,47 +2242,6 @@ f_timecolumn(union argument *arg)
 
 /*}}} */
 
-#if 0                           /* not used */
-/*{{{  static int get_time_cols(fmt) */
-/* count columns in timefmt */
-static int
-get_time_cols(char *fmt)
-{
-    int cnt, i;
-    char *p;
-
-    p = fmt;
-    cnt = 0;
-    while (isspace((unsigned char) *p))
-	p++;
-    if (!strlen(p))
-	int_error(NO_CARET, "Empty time-data format");
-    cnt++;
-    for (i = 0; i < strlen(p) - 1; i++) {
-	if (isspace((unsigned char) p[i])
-	    && !isspace((unsigned char) p[i + 1]))
-	    cnt++;
-    }
-    return (cnt);
-}
-/*}}} */
-
-/*{{{  static void mod_def_usespec(specno,jump) */
-/* modify default use_spec, applies for no user spec and time datacolumns */
-static void
-mod_def_usespec(
-    int specno,                 /* which spec in ?:?:? */
-    int jump)                   /* no of columns in timefmt (time data) */
-{
-    int i;
-
-    for (i = specno + 1; i < MAXDATACOLS; ++i)
-	use_spec[i].column += jump;     /* add no of columns in time to the rest */
-    df_no_use_specs = 0;
-}
-
-/*}}} */
-#endif /* not used */
 
 /*{{{  static int check_missing(s) */
 static int

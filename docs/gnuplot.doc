@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.674 2011/05/24 18:01:36 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.675 2011/05/28 04:58:42 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -12575,8 +12575,7 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/population.gif" alt="[popu
  `splot` provides only a single x, y, and z axis; there is no equivalent to the
  x2 and y2 secondary axes provided by `plot`.
 
- See `plot` for features common to the `plot` command; only differences are
- discussed in detail here.
+ See the `plot` command for many options available in both 2D and 3D plots.
 
  Syntax:
        splot {<ranges>}
@@ -12681,7 +12680,7 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/population.gif" alt="[popu
  For ascii input, a blank line or comment line ends the matrix, and starts a new
  surface mesh.  You can select among the meshes inside a file by the `index`
  option to the `splot` command, as usual. 
-
+=nonuniform
  The second interpretation assumes a non-uniform grid with explicit x and y
  coordinates. The first row of input data contains the y coordinates; 
  the first column of input data contains the x coordinates.  For binary input

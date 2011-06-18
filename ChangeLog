@@ -1,3 +1,9 @@
+2011-06-18  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/datafile.c src/gplt_x11.c src/plot2d.c src/set.c src/util.c:
+	Remove dead code sections. Most of these have been commented out for
+	many years.
+
 2011-06-17  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/getcolor.c (quantize_gray)): Remove a possible discontinuity at

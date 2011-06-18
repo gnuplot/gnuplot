@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.340 2011/05/12 20:42:28 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.341 2011/05/22 06:18:45 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -3377,14 +3377,9 @@ set_pm3d()
 	if (PM3D_SCANS_AUTOMATIC == pm3d.direction
 	    && PM3D_FLUSH_BEGIN != pm3d.flush) {
 	    pm3d.direction = PM3D_SCANS_FORWARD;
-#if 0
-	    /* be silent, don't print this warning */
-	    /* Rather FIXME that this combination is supported? Shouldn't be
-	       so big problem, I guess, just it is not implemented. */
-	    fprintf(stderr, "pm3d: `scansautomatic' and `flush %s' are incompatible\n",
-		PM3D_FLUSH_END == pm3d.flush ? "end": "center");
-	    fputs("   => setting `scansforward'\n", stderr);
-#endif
+	    /* FIXME: Why isn't this combination supported? */
+	    FPRINTF((stderr, "pm3d: `scansautomatic' and `flush %s' are incompatible\n",
+		PM3D_FLUSH_END == pm3d.flush ? "end": "center"));
 	}
     }
 }

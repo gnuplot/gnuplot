@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: util.c,v 1.94 2011/05/05 04:13:29 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: util.c,v 1.95 2011/05/09 22:55:26 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - util.c */
@@ -1078,12 +1078,6 @@ graph_error(const char *fmt, va_dcl)
 
 #ifdef VA_START
     VA_START(args, fmt);
-#if 0
-    /* HBB 20001120: this seems not to work at all. Probably because a
-     * va_list argument, is, after all, something else than a varargs
-     * list (i.e. a '...') */
-    int_error(NO_CARET, fmt, args);
-#else
     /* HBB 20001120: instead, copy the core code from int_error() to
      * here: */
     PRINT_SPACES_UNDER_PROMPT;
@@ -1098,7 +1092,6 @@ graph_error(const char *fmt, va_dcl)
     fputs("\n\n", stderr);
 
     bail_to_command_line();
-#endif /* 1/0 */
     va_end(args);
 #else
     int_error(NO_CARET, fmt, a1, a2, a3, a4, a5, a6, a7, a8);
