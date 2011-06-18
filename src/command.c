@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.212 2011/05/22 06:27:54 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.213 2011/06/18 23:17:37 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -241,7 +241,7 @@ extend_token_table()
 void thread_read_line()
 {
    thread_rl_Running = 1;
-   thread_rl_RetCode = ( read_line(PROMPT), 0 );
+   thread_rl_RetCode = ( read_line(PROMPT, 0) );
    thread_rl_Running = 0;
    DosPostEventSem(semInputReady);
 }
