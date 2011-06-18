@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.211 2011/05/07 16:18:01 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.212 2011/05/22 06:27:54 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -147,13 +147,12 @@ static void command __PROTO((void));
 static int changedir __PROTO((char *path));
 static char* fgets_ipc __PROTO((char* dest, int len));
 static char* gp_get_string __PROTO((char *, size_t, const char *));
-static int read_line __PROTO((const char *prompt));
+static int read_line __PROTO((const char *prompt, int start));
 static void do_system __PROTO((const char *));
 static void test_palette_subcommand __PROTO((void));
 static void test_time_subcommand __PROTO((void));
 
 #ifdef GP_MACROS
-static int string_expand __PROTO((void));
 TBOOLEAN expand_macros = FALSE;
 #endif
 
@@ -242,7 +241,7 @@ extend_token_table()
 void thread_read_line()
 {
    thread_rl_Running = 1;
-   thread_rl_RetCode = ( read_line(PROMPT) );
+   thread_rl_RetCode = ( read_line(PROMPT), 0 );
    thread_rl_Running = 0;
    DosPostEventSem(semInputReady);
 }
@@ -268,7 +267,7 @@ static char *input_line_SharedMem = NULL;
 	/* calls int_error() if it is not happy */
 	term_check_multiplot_okay(interactive);
 
-	if (read_line("multiplot> "))
+	if (read_line("multiplot> ", 0))
 	    return (1);
     } else {
 
@@ -308,7 +307,7 @@ static char *input_line_SharedMem = NULL;
 	    return (1);
 
 #else	/* The normal case */
-	if (read_line(PROMPT))
+	if (read_line(PROMPT, 0))
 	    return (1);
 #endif	/* defined(OS2_IPC) && defined(USE_MOUSE) */
     }
@@ -332,9 +331,19 @@ int
 do_line()
 {
     /* Line continuation has already been handled by read_line() */
-    char *inlptr = gp_input_line;
+    char *inlptr;
+
+#ifdef GP_MACROS
+    /* Expand any string variables in the current input line.
+     * Allow up to 3 levels of recursion */
+    if (expand_macros)
+    if (string_expand_macros() && string_expand_macros() 
+    &&  string_expand_macros() && string_expand_macros())
+	int_error(NO_CARET, "Too many levels of nested macros");
+#endif
 
     /* Skip leading whitespace */
+    inlptr = gp_input_line;
     while (isspace((unsigned char) *inlptr))
 	inlptr++;
 
@@ -354,14 +363,6 @@ do_line()
 	gp_input_line[strlen(inlptr)] = NUL;
     }
     FPRINTF((stderr, "  echo: \"%s\"\n", gp_input_line));
-
-#ifdef GP_MACROS
-    /* Expand any string variables in the current input line.
-     * Allow up to 4 levels of recursion */
-    if (expand_macros)
-    if (string_expand() && string_expand() && string_expand() && string_expand() && string_expand())
-	int_error(NO_CARET, "Too many levels of nested macros");
-#endif
 
     /* also used in load_file */
     if (is_system(gp_input_line[0])) {
@@ -2026,9 +2027,9 @@ done(int status)
    length (yet) */
 
 static int
-read_line(const char *prompt)
+read_line(const char *prompt, int start)
 {
-    int more, start = 0;
+    int more;
     char expand_prompt[40];
 
     current_prompt = prompt;	/* HBB NEW 20040727 */
@@ -2342,7 +2343,7 @@ help_command()
 			strcat (prompt, ": ");
 		    } else
 			strcpy(prompt, "Help topic: ");
-		    read_line(prompt);
+		    read_line(prompt, 0);
 		    num_tokens = scanner(&gp_input_line, &gp_input_line_len);
 		    c_token = 0;
 		    more_help = !(END_OF_COMMAND);
@@ -2647,9 +2648,8 @@ gp_get_string(char * buffer, size_t len, const char * prompt)
 
 /* Non-VMS version */
 static int
-read_line(const char *prompt)
+read_line(const char *prompt, int start)
 {
-    int start = 0;
     TBOOLEAN more = FALSE;
     int last = 0;
 
@@ -2768,8 +2768,8 @@ call_kill_pending_Pause_dialog()
 
 #define COPY_CHAR gp_input_line[o++] = *c; \
                   after_backslash = FALSE;
-static int
-string_expand()
+int
+string_expand_macros()
 {
     TBOOLEAN in_squote = FALSE;
     TBOOLEAN in_dquote = FALSE;

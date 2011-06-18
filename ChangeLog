@@ -4,6 +4,14 @@
 	Remove dead code sections. Most of these have been commented out for
 	many years.
 
+	* src/command.c (do_line):  Macro expansion must be done before calling
+	scanner() to identify specific tokens.
+
+	* src/command.c src/command.h: Export string_expand_macros().
+
+	* src/command.c (read_line): Prepare for block-structure work by adding
+	a parameter to allow extending, rather than replacing, the input line.
+
 2011-06-17  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/getcolor.c (quantize_gray)): Remove a possible discontinuity at
