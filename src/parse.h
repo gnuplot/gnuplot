@@ -1,5 +1,5 @@
 /*
- * $Id: parse.h,v 1.20 2010/09/28 17:14:38 sfeam Exp $
+ * $Id: parse.h,v 1.21 2011/05/22 06:18:45 sfeam Exp $
  */
 
 /* GNUPLOT - parse.h */
@@ -75,13 +75,14 @@ void cleanup_udvlist __PROTO((void));
 /* a blank iteration structure to use for bookkeeping.     */
 typedef struct iterator {
 	struct udvt_entry *iteration_udv;
+	char *iteration_string;
 	int iteration_start;
 	int iteration_end;
 	int iteration_increment;
 	int iteration_current;
-	char *iteration_string;
 	int iteration;
 } t_iterator;
+#define NEW_ITERATOR {NULL, NULL, 0, 0, 0, 0, 0}
 
 extern t_iterator plot_iterator;	/* Used for plot and splot */
 extern t_iterator set_iterator;		/* Used by set/unset commands */

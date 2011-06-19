@@ -1,3 +1,15 @@
+2011-06-19  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/command.c src/command.h src/misc.c src/misc.h src/parse.h
+	src/scanner.c src/scanner.h src/tables.c src/util.c docs/gnuplot.doc:
+
+	Extend the line input processing to include blocks of commands enclosed
+	by curly braces, possibly spanning multiple lines.  This syntax is used
+	by new commands:
+	    if (<cond>) { ... } else { ... }
+	    do for [...] { ... }
+	    while (<cond>) { ... }
+
 2011-06-18  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/datafile.c src/gplt_x11.c src/plot2d.c src/set.c src/util.c:
@@ -51,8 +63,8 @@
 	Remove obsolete terminal drivers gnugraph and unixplot. The underlying
 	gnu plotutils library is itself more than 10 years out of date (last
 	release July 2000) and the terminal drivers haven't been upgraded for
-	longer than that. In any event, current gnuplot has better native terminal
-	drivers for the devices supported by unixplot/gnugraph.
+	longer than that. In any event, current gnuplot has better native
+	terminal drivers for the devices supported by unixplot/gnugraph.
 
 2011-05-27  Ethan A Merritt  <merritt@u.washington.edu>
 

@@ -1,5 +1,5 @@
 /*
- * $Id: command.h,v 1.52 2010/07/30 19:11:40 sfeam Exp $
+ * $Id: command.h,v 1.53 2011/06/18 23:17:37 sfeam Exp $
  */
 
 /* GNUPLOT - command.h */
@@ -45,8 +45,9 @@ extern size_t gp_input_line_len;
 
 extern int inline_num;
 
-extern int if_depth;
-extern TBOOLEAN if_condition;
+extern int if_depth;			/* old if/else syntax only */
+extern TBOOLEAN if_open_for_else;	/* new if/else syntax only */
+extern TBOOLEAN if_condition;		/* used by both old and new syntax */
 
 typedef struct lexical_unit {	/* produced by scanner */
     TBOOLEAN is_token;		/* true if token, false if a value */
@@ -161,10 +162,14 @@ void eval_command __PROTO((void));
 void exit_command __PROTO((void));
 void help_command __PROTO((void));
 void history_command __PROTO((void));
+void do_command __PROTO((void));
 void if_command __PROTO((void));
 void else_command __PROTO((void));
 void invalid_command __PROTO((void));
 void load_command __PROTO((void));
+void begin_clause __PROTO((void));
+void clause_reset_after_error __PROTO((void));
+void end_clause __PROTO((void));
 void null_command __PROTO((void));
 void pause_command __PROTO((void));
 void plot_command __PROTO((void));
@@ -181,6 +186,7 @@ void test_command __PROTO((void));
 void update_command __PROTO((void));
 void do_shell __PROTO((void));
 void undefine_command __PROTO((void));
+void while_command __PROTO((void));
 
 /* Prototypes for functions exported by command.c */
 void extend_input_line __PROTO((void));

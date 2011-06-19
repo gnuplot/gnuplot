@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: scanner.c,v 1.28 2010/01/30 05:07:25 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: scanner.c,v 1.29 2010/03/14 18:01:46 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - scanner.c */
@@ -39,6 +39,8 @@ static char *RCSid() { return RCSid("$Id: scanner.c,v 1.28 2010/01/30 05:07:25 s
 #include "alloc.h"
 #include "command.h"
 #include "util.h"
+
+int curly_brace_count;
 
 static int get_num __PROTO((char str[]));
 static void substitute __PROTO((char **strp, size_t *str_lenp, int current));
@@ -109,6 +111,8 @@ scanner(char **expressionp, size_t *expressionlenp)
     int quote;
     char brace;
 
+    curly_brace_count = 0;
+
     for (current = t_num = 0; expression[current] != NUL; current++) {
 	if (t_num + 1 >= token_table_size) {
 	    /* leave space for dummy end token */
@@ -144,24 +148,35 @@ scanner(char **expressionp, size_t *expressionlenp)
 	    } /* do nothing if the . is a token by itself */
 
 	} else if (expression[current] == LBRACE) {
+	    int partial;
 	    token[t_num].is_token = FALSE;
 	    token[t_num].l_val.type = CMPLX;
 #ifdef __PUREC__
 	    {
 		char l[80];
-		if ((sscanf(&expression[++current], "%lf,%lf%[ }]s",
+		partial = sscanf(&expression[++current], "%lf,%lf%[ }]s",
 			    &token[t_num].l_val.v.cmplx_val.real,
 			    &token[t_num].l_val.v.cmplx_val.imag,
-			    &l) != 3) || (!strchr(l, RBRACE)))
-		    int_error(t_num, "invalid complex constant");
+			    &l);
+		brace = l[0];
 	    }
 #else
-	    if ((sscanf(&expression[++current], "%lf , %lf %c",
+	    partial = sscanf(&expression[++current], "%lf , %lf %c",
 			&token[t_num].l_val.v.cmplx_val.real,
 			&token[t_num].l_val.v.cmplx_val.imag,
-			&brace) != 3) || (brace != RBRACE))
-		int_error(t_num, "invalid complex constant");
+			&brace);
 #endif
+
+	    if (partial <= 0) {
+		curly_brace_count++;
+		token[t_num++].is_token = TRUE;
+		current--;
+		continue;
+	    }
+
+	    if (partial != 3 || brace != RBRACE)
+		int_error(t_num, "invalid complex constant");
+
 	    token[t_num].length += 2;
 	    while (expression[++current] != RBRACE) {
 		token[t_num].length++;
@@ -216,6 +231,9 @@ scanner(char **expressionp, size_t *expressionlenp)
 	    case '?':
 	    case ',':
 	    case '$':		/* div */
+		break;
+	    case '}':		/* complex constants will not end up here */
+		curly_brace_count--;
 		break;
 	    case '&':
 	    case '|':

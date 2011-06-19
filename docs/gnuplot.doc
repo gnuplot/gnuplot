@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.675 2011/05/28 04:58:42 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.676 2011/06/18 16:51:22 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -4025,6 +4025,25 @@ Ffigure_mapcontours
 
  Please see `set multiplot`, `set size`, and `set origin` for details of these
  commands.
+2 Do
+?commands do
+?do
+ Syntax:
+       do for <iteration-spec> {
+            <commands>
+            <commands>
+       }
+ Execute a sequence of commands multiple times.  The commands must be enclosed
+ in curly brackets, and the opening "{" must be on the same line as the `do`
+ keyword.  For examples of iteration specifiers, see `iteration`.
+ Example:
+       set multiplot layout 2,2
+       do for [name in "A B C D"] {
+           filename = name . ".dat"
+           set title sprintf("Condition %s",name)
+           plot filename title name
+       }
+       unset multiplot
 2 evaluate
 ?commands evaluate
 ?evaluate
@@ -4627,16 +4646,34 @@ Ffigure_mapcontours
 2 if
 ?commands if
 ?if
- The `if` command allows commands to be executed conditionally.
-
- Syntax:
+ New syntax:
+       if (<condition>) { <commands>;
+              <commands>
+              <commands>
+       } else {
+              <commands>
+       }
+ Old syntax:
        if (<condition>) <command-line> [; else if (<condition>) ...; else ...]
 
- <condition> will be evaluated.  If it is true (non-zero), then the command(s)
- of the <command-line> will be executed.  If <condition> is false (zero), then
- the entire <command-line> is ignored until the next occurrence of `else`.
- Note that use of `;` to allow multiple commands on the same line will
- _not_ end the conditionalized commands.
+ This version of gnuplot supports block-structured if/else statements. If the
+ keyword `if` or `else` is immediately followed by an opening "{", then 
+ conditional execution applies to all statements, possibly on multiple input
+ lines, until a matching "}" terminates the block.  If commands may be nested.
+
+ The old single-line if/else syntax is still supported, but should not be
+ mixed with the new block-structured syntax.  See `if-old`.
+3 if-old
+?if if-old
+?if-old
+ Through gnuplot version 4.4, the scope of the if/else commands was limited to
+ a single input line. This has been replaced by allowing a multi-line clause to
+ be enclosed in curly brackets, but the old syntax is still honored.  If no
+ opening "{" follows the `if` keyword, then the command(s) in <command-line>
+ will be executed if <condition> is true (non-zero) or skipped if <condition> is
+ false (zero). Either case will consume commands on the input line until the
+ end of the line or an occurrence of `else`.  Note that use of `;` to allow
+ multiple commands on the same line will _not_ end the conditionalized commands.
 
  Examples:
        pi=3
@@ -4659,8 +4696,9 @@ Ffigure_mapcontours
  The `plot`, `splot`, `set` and `unset` commands may optionally contain an
  iteration clause.  This has the effect of executing the basic command 
  multiple times, each time re-evaluating any expressions that make use of the
- iteration control variable.  Two forms of iteration clause are currently
- supported:
+ iteration control variable.  Iteration of arbitrary command sequences can be
+ requested using the `do` command.
+ Two forms of iteration clause are currently supported:
 
        for [intvar = start:end{:increment}]
        for [stringvar in "A B C D"]
@@ -4672,7 +4710,7 @@ Ffigure_mapcontours
        set for [i = 1:10] style line i lc rgb "blue"
        unset for [tag = 100:200] label tag
 
- See additional documentation for `plot iteration`.
+ See additional documentation for `plot iteration`, `do`.
 
 2 load
 ?commands load
@@ -12927,6 +12965,15 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/splot.gif" alt="[splot.gif
  on VMS systems, since they use file-versioning.]
 
  Please see `fit` for more information.
+2 While
+?while
+?commands while
+ Syntax:
+       while (<expr>) {
+           <commands>
+       }
+ Execute a block of commands repeatedly so long as <expr> evaluates to 
+ a non-zero value.
 1 Terminal types
 ^ <h2> Terminal Types </h2>
 2 complete list of terminals

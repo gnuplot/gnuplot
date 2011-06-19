@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.132 2011/04/13 23:59:12 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.133 2011/04/25 16:59:02 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -45,6 +45,7 @@ static char *RCSid() { return RCSid("$Id: misc.c,v 1.132 2011/04/13 23:59:12 sfe
 #include "util.h"
 #include "variable.h"
 #include "axis.h"
+#include "scanner.h"		/* so that scanner() can count curly braces */
 
 #if defined(HAVE_DIRENT_H)
 # include <sys/types.h>
@@ -268,8 +269,39 @@ load_file(FILE *fp, char *name, TBOOLEAN can_do_args)
 			/* line continuation */
 			start = len;
 			left = gp_input_line_len - start;
-		    } else
+		    } else {
+			/* EAM May 2011 - handle multi-line bracketed clauses {...}.
+			 * Introduces a requirement for scanner.c and scanner.h
+			 * This code is redundant with part of do_line(),
+			 * but do_line() assumes continuation lines come from stdin.
+			 */
+#ifdef GP_MACROS
+			/* macros in a clause are problematic, as they are */
+			/* only expanded once even if the clause is replayed */
+			string_expand_macros();
+#endif
+			/* Strip off trailing comment and count curly braces */
+			num_tokens = scanner(&gp_input_line, &gp_input_line_len);
+			if (gp_input_line[token[num_tokens].start_index] == '#') {
+			    gp_input_line[token[num_tokens].start_index] = NUL;
+			    start = token[num_tokens].start_index;
+			    left = gp_input_line_len - start;
+			}
+			/* Read additional lines if necessary to complete a
+			 * bracketed clause {...}
+			 */
+			if (curly_brace_count < 0)
+			    int_error(NO_CARET, "Unexpected }");
+			if (curly_brace_count > 0) {
+			    strcat(gp_input_line,";");
+			    start = strlen(gp_input_line);
+			    left = gp_input_line_len - start;
+			    continue;
+			}
+			
 			more = FALSE;
+		    }
+
 		}
 	    }
 
@@ -320,6 +352,7 @@ lf_pop()
 	inline_num = lf->inline_num;
 	if_depth = lf->if_depth;
 	if_condition = lf->if_condition;
+	if_open_for_else = lf->if_open_for_else;
 
 	/* Restore saved input state and free the copy */
 	if (lf->tokens) {
@@ -373,6 +406,7 @@ lf_push(FILE *fp, char *name, char *cmdline)
     if (lf->depth > 1024)
 	int_error(NO_CARET, "Deep load/eval recursion detected");
     lf->if_depth = if_depth;
+    lf->if_open_for_else = if_open_for_else;
     lf->if_condition = if_condition;
     lf->c_token = c_token;
     lf->num_tokens = num_tokens;

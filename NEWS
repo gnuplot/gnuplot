@@ -1,6 +1,10 @@
 New features, changes and fixes since gnuplot version 4.4
 =========================================================
 
+* NEW syntax supporting multi-line blocks of code delimited by curly braces
+    if (<cond>) { ... } else { ... }
+    do for [...] { ... }
+    while (<cond>) { ... }
 * NEW time formats can handle fractional seconds (microsecond precision)
 * NEW time() function returns current time
 * NEW hidden3d supports "with impulses"

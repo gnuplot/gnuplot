@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.213 2011/06/18 23:17:37 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.214 2011/06/18 23:19:42 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -61,6 +61,12 @@ static char *RCSid() { return RCSid("$Id: command.c,v 1.213 2011/06/18 23:17:37 
  * gnupmdrv posts an event semaphore. Thus mousing works even when gnuplot
  * is used as a plotting device (commands passed via pipe).
  *
+ * May 2011 Ethan A Merritt
+ * Introduce block structure defined by { ... }, which may span multiple lines.
+ * In order to have the entire block available at one time we now count
+ * +/- curly brackets during input and keep extending the current input line
+ * until the net count is zero.  This is done in do_line() for interactive
+ * input, and load_file() for non-interactive input.
  */
 
 #include "command.h"
@@ -151,6 +157,7 @@ static int read_line __PROTO((const char *prompt, int start));
 static void do_system __PROTO((const char *));
 static void test_palette_subcommand __PROTO((void));
 static void test_time_subcommand __PROTO((void));
+static int find_clause __PROTO((int *, int *));
 
 #ifdef GP_MACROS
 TBOOLEAN expand_macros = FALSE;
@@ -187,6 +194,9 @@ int num_tokens, c_token;
 
 int if_depth = 0;
 TBOOLEAN if_condition = FALSE;
+TBOOLEAN if_open_for_else = FALSE;
+
+static int clause_depth = 0;
 
 static int command_exit_status = 0;
 
@@ -348,6 +358,7 @@ do_line()
 	inlptr++;
 
     /* Strip off trailing comment */
+    FPRINTF((stderr,"doline( \"%s\" )\n", gp_input_line));
     if (strchr(inlptr, '#')) {
         num_tokens = scanner(&gp_input_line, &gp_input_line_len);
 	if (gp_input_line[token[num_tokens].start_index] == '#')
@@ -364,17 +375,35 @@ do_line()
     }
     FPRINTF((stderr, "  echo: \"%s\"\n", gp_input_line));
 
-    /* also used in load_file */
+    /* EAM May 2011 - This will not work in a bracketed clause. Should it? */
     if (is_system(gp_input_line[0])) {
 	do_system(gp_input_line + 1);
-	if (interactive)	/* 3.5 did it unconditionally */
-	    (void) fputs("!\n", stderr);	/* why do we need this ? */
 	return (0);
     }
 
-    if_depth = 0;
+#if 0
+    /* EAM May 2011 */
+    /* Resetting here prevents handling "else" on a separate line */
     if_condition = TRUE;
+#endif
+    if_depth = 0;
     num_tokens = scanner(&gp_input_line, &gp_input_line_len);
+
+    /* 
+     * Expand line if necessary to contain a complete bracketed clause {...}
+     * Insert a ';' after current line and append the next input line.
+     * NB: This may leave an "else" condition on the next line.
+     */
+    if (curly_brace_count < 0)
+	int_error(NO_CARET,"Unexpected }");
+    while (curly_brace_count > 0) {
+	strcat(gp_input_line,";");
+	read_line("more> ", strlen(gp_input_line));
+	num_tokens = scanner(&gp_input_line, &gp_input_line_len);
+	if (gp_input_line[token[num_tokens].start_index] == '#')
+	    gp_input_line[token[num_tokens].start_index] = NUL;
+    }
+
     c_token = 0;
     while (c_token < num_tokens) {
 	command();
@@ -383,9 +412,13 @@ do_line()
 	    return 1;
 	}
 	if (c_token < num_tokens) {	/* something after command */
-	    if (equals(c_token, ";"))
+	    if (equals(c_token, ";")) {
 		c_token++;
-	    else
+	    } else if (equals(c_token, "{")) {
+		begin_clause();
+	    } else if (equals(c_token, "}")) {
+		end_clause();
+	    } else
 		int_error(c_token, "';' expected");
 	}
     }
@@ -966,11 +999,61 @@ if_command()
 {
     double exprval;
 
-    if_depth++;
-
     if (!equals(++c_token, "("))	/* no expression */
 	int_error(c_token, "expecting (expression)");
     exprval = real_expression();
+
+    /*
+     * EAM May 2011
+     * New if {...} else {...} syntax can span multiple lines.
+     * Isolate the active clause and execute it recursively.
+     */
+    if (equals(c_token,"{")) {
+	/* Identify start and end position of the clause substring */
+	char *clause = NULL;
+	int if_start, if_end, else_start=0, else_end=0;
+	int clause_start, clause_end;
+
+	c_token = find_clause(&if_start, &if_end);
+
+	if (equals(c_token,"else")) {
+	    if (!equals(++c_token,"{"))
+		int_error(c_token,"expected {else-clause}");
+	    c_token = find_clause(&else_start, &else_end);
+	}
+
+	if (exprval != 0) {
+	    clause_start = if_start;
+	    clause_end = if_end;
+	    if_condition = TRUE;
+	} else {
+	    clause_start = else_start;
+	    clause_end = else_end;
+	    if_condition = FALSE;
+	}
+	if_open_for_else = (else_start) ? FALSE : TRUE;
+
+	clause_depth++;
+	if (if_condition || else_start != 0) {
+	    /* Make a clean copy without the opening and closing braces */
+	    clause = gp_alloc(clause_end - clause_start, "clause");
+	    memcpy(clause, &gp_input_line[clause_start+1], clause_end - clause_start);
+	    clause[clause_end - clause_start - 1] = '\0';
+	    FPRINTF((stderr,"%s CLAUSE: \"{%s}\"\n",
+		    (exprval != 0.0) ? "IF" : "ELSE", clause));
+	    do_string_and_free(clause);
+	}
+
+	c_token--; 	/* Let the parser see the closing curly brace */
+	return;
+    }
+
+    /*
+     * EAM May 2011
+     * Old if/else syntax (no curly braces) affects the rest of the current line.
+     * Deprecate?
+     */
+    if_depth++;
     if (exprval != 0.0) {
 	/* fake the condition of a ';' between commands */
 	int eolpos = token[num_tokens - 1].start_index + token[num_tokens - 1].length;
@@ -1003,6 +1086,37 @@ if_command()
 void
 else_command()
 {
+   /*
+    * EAM May 2011
+    * New if/else syntax permits else clause to appear on a new line
+    */
+    if (equals(c_token+1,"{")) {
+	int i, depth;
+	int clause_start, clause_end;
+	char *clause;
+
+	if (if_open_for_else)
+	    if_open_for_else = FALSE;
+	else
+	    int_error(c_token,"Invalid {else-clause}");
+
+	c_token = find_clause(&clause_start, &clause_end);
+
+	clause_depth++;
+	c_token--;	 /* Let the parser see the closing curly brace */
+	if (!if_condition) {
+	    clause = gp_alloc(clause_end - clause_start, "clause");
+	    memcpy(clause, &gp_input_line[clause_start+1], clause_end - clause_start);
+	    clause[clause_end - clause_start - 1] = '\0';
+	    do_string_and_free(clause);
+	}
+	return;
+    }
+
+
+   /* EAM May 2011
+    * The rest is only relevant to the old if/else syntax (no curly braces)
+    */
     if (if_depth <= 0) {
 	int_error(c_token, "else without if");
 	return;
@@ -1020,6 +1134,67 @@ else_command()
     }
 }
 
+/* process commands of the form 'do for [i=1:N] ...' */
+void
+do_command()
+{
+    t_iterator do_iterator = NEW_ITERATOR;
+    int do_start, do_end;
+    char *clause;
+
+    c_token++;
+    check_for_iteration(&do_iterator);
+
+    if (!equals(c_token,"{"))
+	int_error(c_token,"expecting {do-clause}");
+    c_token = find_clause(&do_start, &do_end);
+
+    clause_depth++;
+    c_token--;	 /* Let the parser see the closing curly brace */
+
+    clause = gp_alloc(do_end - do_start, "clause");
+    memcpy(clause, &gp_input_line[do_start+1], do_end - do_start);
+    clause[do_end - do_start - 1] = '\0';
+
+    do {
+	do_string(clause);
+    } while (next_iteration(&do_iterator));
+
+    free(clause);
+    free(do_iterator.iteration_string);
+}
+
+/* process commands of the form 'while (foo) {...}' */
+void
+while_command()
+{
+    int do_start, do_end;
+    char *clause;
+    int save_token, end_token;
+    double exprval;
+
+    c_token++;
+    save_token = c_token;
+    exprval = real_expression();
+
+    if (!equals(c_token,"{"))
+	int_error(c_token,"expecting {while-clause}");
+    end_token = find_clause(&do_start, &do_end);
+
+    clause = gp_alloc(do_end - do_start, "clause");
+    memcpy(clause, &gp_input_line[do_start+1], do_end - do_start);
+    clause[do_end - do_start - 1] = '\0';
+    clause_depth++;
+
+    while (exprval != 0) {
+	do_string(clause);
+	c_token = save_token;
+	exprval = real_expression();
+    };
+
+    free(clause);
+    c_token = end_token;
+}
 
 /* process the 'load' command */
 void
@@ -1045,6 +1220,66 @@ void
 null_command()
 {
     return;
+}
+
+/* Clauses enclosed by curly brackets:
+ * do for [i = 1:N] { a; b; c; }
+ * if (<test>) {
+ *    line1;
+ *    line2;
+ * } else {
+ *    ...
+ * }
+ */
+
+/* Find the start and end character positions within gp_input_line
+ * bounding a clause delimited by {...}.
+ * Assumes that c_token indexes the opening left curly brace.
+ */
+int
+find_clause(int *clause_start, int *clause_end)
+{
+    int i, depth;
+
+    *clause_start = token[c_token].start_index;
+    for (i=++c_token, depth=1; i<num_tokens; i++) {
+	if (equals(i,"{"))
+	    depth++;
+	else if (equals(i,"}"))
+	    depth--;
+	if (depth == 0)
+	    break;
+    }
+    *clause_end = token[i].start_index;
+
+    return (i+1);
+}
+
+void
+begin_clause()
+{
+    clause_depth++;
+    c_token++;
+    return;
+}
+
+void
+end_clause()
+{
+    if (clause_depth == 0)
+	int_error(c_token, "unexpected }");
+    else
+	clause_depth--;
+    c_token++;
+    return;
+}
+
+void
+clause_reset_after_error()
+{
+    if (clause_depth)
+	FPRINTF((stderr,"CLAUSE RESET after error at depth %d\n",clause_depth));
+    clause_depth = 0;
 }
 
 

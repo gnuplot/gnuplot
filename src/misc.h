@@ -1,5 +1,5 @@
 /*
- * $Id: misc.h,v 1.34 2011/02/10 21:27:43 sfeam Exp $
+ * $Id: misc.h,v 1.35 2011/02/20 23:17:11 sfeam Exp $
  */
 
 /* GNUPLOT - misc.h */
@@ -94,8 +94,9 @@ typedef struct lf_state_struct {
     TBOOLEAN do_load_arg_substitution;	/* likewise ... */
     int inline_num;		/* inline_num on entry */
     int depth;			/* recursion depth */
-    int if_depth;
-    TBOOLEAN if_condition;
+    int if_depth;		/* used by _old_ if/else syntax */
+    TBOOLEAN if_open_for_else;	/* used by _new_ if/else syntax */
+    TBOOLEAN if_condition;	/* used by both old and new if/else syntax */
     char *input_line;		/* Input line text to restore */
     struct lexical_unit *tokens;/* Input line tokens to restore */
     int num_tokens;		/* How big is the above ? */
