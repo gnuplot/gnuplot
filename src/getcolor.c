@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: getcolor.c,v 1.27 2010/10/06 00:19:50 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: getcolor.c,v 1.28 2011/06/17 19:10:42 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - getcolor.c */
@@ -111,73 +111,7 @@ palettes_differ(t_sm_palette *p1, t_sm_palette *p2)
     return 0;  /* no real difference found */
 }
 
-
-/* Store double value from [0,1] in 2 characters. Resolution is 6.1e-5.
- * No '\n' are generated. */
-static char *dbl_to_str(double val, char *dest)
-{
-    unsigned int ival = (unsigned int) (((1 << 14) - 1) * val);
-
-    dest[0] = (ival >> 7) + 33;
-    dest[1] = (ival & 127) + 33;
-    return dest;
-}
-
-/* Reverse of dbl_to_str(): map 2 characters to double in [0,1] */
-static double
-str_to_dbl(char *s)
-{
-    unsigned int ival =
-	(((unsigned int) (s[0] - 33) & 127) << 7)
-	| (unsigned int) ((s[1] - 33) & 127);
-    double val = ((double) ival) / ((1 << 14) - 1);
-
-    return val;
-}
-
-
-/* Save rgb_color to 6 characters which are no '\n'. */
-static char
-*color_to_str(rgb_color col, char *buf)
-{
-    dbl_to_str(col.r, buf + 0);
-    dbl_to_str(col.g, buf + 2);
-    dbl_to_str(col.b, buf + 4);
-    buf[6] = 0;
-    return buf;
-}
-
-/* Restore rgb_color from 6 characters  */
-static void
-str_to_color(char *buf, rgb_color *col)
-{
-    col->r = str_to_dbl(buf + 0);
-    col->g = str_to_dbl(buf + 2);
-    col->b = str_to_dbl(buf + 4);
-}
-
-
-/* Store a gradient entry in 8 characters which do not contain '\n' */
-char *
-gradient_entry_to_str(gradient_struct *gs)
-{
-    static char buf[20];
-    dbl_to_str(gs->pos, buf);
-    color_to_str(gs->col, buf + 2);
-    return buf;
-}
-
-/* Gestore gradient entry from string */
-void
-str_to_gradient_entry(char *s, gradient_struct *gs)
-{
-    gs->pos = str_to_dbl(s);
-    str_to_color(s + 2, & (gs->col));
-}
-
-
 #define CONSTRAIN(x) ((x) < 0 ? 0 : ((x) > 1 ? 1 : (x)))
-
 
 /*  This one takes the gradient defined in sm_palette.gradient and
  *  returns an interpolated color for the given gray value.  It

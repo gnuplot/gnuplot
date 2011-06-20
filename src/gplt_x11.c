@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.205 2011/05/10 17:03:17 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.206 2011/06/18 16:51:22 sfeam Exp $"); }
 #endif
 
 #define X11_POLYLINE 1
@@ -1282,6 +1282,7 @@ scan_palette_from_buf(void)
 	}
 	break;
     case SMPAL_COLOR_MODE_GRADIENT: {
+	static char frac[8] = {0,0,0,0,0,0,0,0};
 	int i=0;
 	read_input_line();
 	if (1 != sscanf( buf, "%d", &(tpal.gradient_num) )) {
@@ -1293,12 +1294,20 @@ scan_palette_from_buf(void)
 	  malloc( tpal.gradient_num * sizeof(gradient_struct) );
 	assert(tpal.gradient);
 	for( i=0; i<tpal.gradient_num; i++ ) {
-	    /*  this %50 *must* match the amount of gradient structs
-		written to the pipe by x11.trm!  */
-	    if (i%50 == 0) {
+	    char *b = &(buf[12*(i%50)]);
+	    unsigned int rgb_component;
+	    /*  this %50 *must* match the corresponding line in x11.trm!  */
+	    if (i%50 == 0)
 	        read_input_line();
-	    }
-	    str_to_gradient_entry( &(buf[8*(i%50)]), &(tpal.gradient[i]) );
+	    /* Read gradient entry as 0.1234RRGGBB */
+	    memcpy(frac, b, 6);
+	    tpal.gradient[i].pos = atof(frac);
+	    sscanf(b+6,"%2x",&rgb_component);
+	    tpal.gradient[i].col.r = (double)(rgb_component) / 255.;
+	    sscanf(b+8,"%2x",&rgb_component);
+	    tpal.gradient[i].col.g = (double)(rgb_component) / 255.;
+	    sscanf(b+10,"%2x",&rgb_component);
+	    tpal.gradient[i].col.b = (double)(rgb_component) / 255.;
 	}
 	break;
       }

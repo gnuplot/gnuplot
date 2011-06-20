@@ -1,3 +1,13 @@
+2011-06-20  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/getcolor.c term/x11.trm src/gplt_x11.c:
+	Remove a set of routines in getcolor.c used only by the x11 terminal
+	to pass a color gradient description through the pipe to gnuplot_x11.
+	They packed four doubles (value; RGB color) into 8 bytes, losing
+	precision and failing to round.  Now we instead use 12 ascii characters
+	"0.1234RRGGBB".
+	Bug #3322975
+
 2011-06-19  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/command.c src/command.h src/misc.c src/misc.h src/parse.h

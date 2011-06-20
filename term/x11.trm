@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: x11.trm,v 1.190 2011/03/11 22:21:00 sfeam Exp $
+ * $Id: x11.trm,v 1.191 2011/04/13 23:59:12 sfeam Exp $
  *
  */
 
@@ -1556,7 +1556,11 @@ transmit_gradient(gradient_struct *gradient, int cnt)
 	    fputs("\n", X11_ipc);
 	    fflush(X11_ipc);
 	}
-	fprintf(X11_ipc, "%s", gradient_entry_to_str(&(gradient[i])));
+	/* Send gradient entry as 0.1234RRGGBB */
+	fprintf(X11_ipc, "%6.4f", gradient[i].pos);
+	fprintf(X11_ipc, "%02x", (unsigned int)(255.*gradient[i].col.r + 0.5));
+	fprintf(X11_ipc, "%02x", (unsigned int)(255.*gradient[i].col.g + 0.5));
+	fprintf(X11_ipc, "%02x", (unsigned int)(255.*gradient[i].col.b + 0.5));
     }
     fputs("\n", X11_ipc);
 }
