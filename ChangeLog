@@ -1,3 +1,8 @@
+2011-06-21  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/graphics (plot_histeps): Fix range-checking of log-scaled y.
+	Bug #3323828
+
 2011-06-20  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/getcolor.c term/x11.trm src/gplt_x11.c:
