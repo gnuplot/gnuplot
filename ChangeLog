@@ -1,3 +1,10 @@
+2011-06-28  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/svg.trm:  Pattern-fill definitions must initialize both
+	fill and stroke style; otherwise the most recent setting may bleed
+	through.
+	Bug #3334216
+
 2011-06-28  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* docs/gnuplot-ja.doc docs/term-ja.diff:  sync to docs version 1.677
