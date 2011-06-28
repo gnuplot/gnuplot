@@ -1,3 +1,10 @@
+2011-06-28  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/svg.trm:  Pattern-fill definitions must initialize both
+	fill and stroke style; otherwise the most recent setting may bleed
+	through.
+	Bug #3334216
+
 2011-06-17  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/getcolor.c (quantize_gray)): Remove a possible discontinuity at

@@ -10,7 +10,7 @@ New features, changes and fixes in gnuplot version 4.4.4
 * FIX buffer overflow from enhanced text timefmt tic labels
 * FIX correction for offset in epochs when reading in time format "%s"
 * FIX discontinuity in defined palette limited by maxcolors
-
+* FIX initialization of svg pattern-fill definitions
 
 
 New features, changes and fixes in gnuplot version 4.4.3

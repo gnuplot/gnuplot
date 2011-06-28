@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: svg.trm,v 1.101.2.4 2010/10/07 05:31:42 sfeam Exp $
+ * $Id: svg.trm,v 1.101.2.5 2011/03/21 18:52:39 sfeam Exp $
  */
 
 /*------------------------------------------------------------------------------------------------------------------------------------
@@ -387,15 +387,17 @@ SVG_DefineFillPattern(int fillpat)
 		    break;
 	}
 	if (*path) {
+	    char *figure = "fill:none;";
+	    if (!strcmp(style,"fill")) figure = "stroke:none;";
 	    if (SVG_color_mode == TC_RGB)
-		fprintf(gpoutfile,"\t\t\t<path style='fill:none; %s:rgb(%d,%d,%d)' d='%s'/>\n",
-			style, SVG_red, SVG_green, SVG_blue, path);
+		fprintf(gpoutfile,"\t\t\t<path style='%s %s:rgb(%d,%d,%d)' d='%s'/>\n",
+			figure, style, SVG_red, SVG_green, SVG_blue, path);
 	    else if (SVG_color_mode == TC_LT)
-		fprintf(gpoutfile, "\t\t\t<path style = '%s:%s' d= '%s'/>\n",
-			style, SVG_linecolor, path);
+		fprintf(gpoutfile, "\t\t\t<path style = '%s %s:%s' d= '%s'/>\n",
+			figure, style, SVG_linecolor, path);
 	    else
-		fprintf(gpoutfile, "\t\t\t<path style = '%s:currentColor' d='%s'/>\n",
-			style, path);
+		fprintf(gpoutfile, "\t\t\t<path style = '%s %s:currentColor' d='%s'/>\n",
+			figure, style, path);
 	}
 	fputs("\t\t</pattern>\n" "\t</defs>\n", gpoutfile);
     }
