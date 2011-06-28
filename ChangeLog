@@ -1,3 +1,7 @@
+2011-06-28  Shigeharu Takeno  <shige@iee.niit.ac.jp>
+
+	* docs/gnuplot-ja.doc docs/term-ja.diff:  sync to docs version 1.677
+
 2011-06-21  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graphics (plot_histeps): Fix range-checking of log-scaled y.
