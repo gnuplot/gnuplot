@@ -1,8 +1,13 @@
+2011-06-30  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/hidden3d.c (draw_edge):  Do not apply the default top/bottom
+	colors to line segments belonging to the plot border.
+	Bug #3344103
+
 2011-06-28  Ethan A Merritt  <merritt@u.washington.edu>
 
-	* term/svg.trm:  Pattern-fill definitions must initialize both
-	fill and stroke style; otherwise the most recent setting may bleed
-	through.
+	* term/svg.trm:  Pattern-fill definitions must initialize both fill and
+	stroke style; otherwise the most recent setting may bleed through.
 	Bug #3334216
 
 2011-06-28  Shigeharu Takeno  <shige@iee.niit.ac.jp>

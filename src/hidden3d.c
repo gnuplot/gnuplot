@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.77 2010/09/28 22:40:17 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.78 2011/05/14 19:53:36 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - hidden3d.c */
@@ -1618,7 +1618,6 @@ draw_vertex(p_vertex v)
 	    return;
 	}
 
-	/* EAM DEBUG - Check for extra point properties */
 	if (tc->type == TC_LINESTYLE && tc->lt == LT_COLORFROMCOLUMN) {
 	    struct lp_style_type style = *(v->lp_style);
 	    load_linetype(&style, (int)v->real_z);
@@ -1672,6 +1671,17 @@ draw_edge(p_edge e, p_vertex v1, p_vertex v2)
 	lptemp.pm3d_color.lt = varcolor;
     } else
 
+#if (0)
+    /* EAM FIXME: There is currently no way to catch explicit 'lc rgb' in the plot command */
+    if (color.type == TC_RGB && SOME_TEST_THAT_DOESNT_EXIST) {
+	recolor = TRUE;
+    } else
+#endif
+
+    if (color.type == TC_RGB && e->lp == &border_lp) {
+	lptemp.pm3d_color.lt = varcolor;
+    } else
+
     /* This handles 'lc variable' */
     if (lptemp.l_type == LT_COLORFROMCOLUMN) {
 	recolor = TRUE;
@@ -1689,6 +1699,11 @@ draw_edge(p_edge e, p_vertex v1, p_vertex v2)
 	recolor = TRUE;
 	load_linetype(&lptemp, e->style + 1);
     }
+
+    /* The remaining case is hiddenBacksideLinetypeOffset == 0  */
+    /* in which case we assume the correct color is already set */
+    else
+	;
 
     if (recolor) {
 	color = lptemp.pm3d_color;
