@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.219 2011/05/09 22:55:26 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.220 2011/06/01 03:44:36 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -892,16 +892,13 @@ term_apply_lp_properties(struct lp_style_type *lp)
      */
     (*term->linewidth) (lp->l_width);
 
-    /* FIXME: This shouldn't happen, because the higher level code */
-    /* should have made some decision about color before this. But */
-    /* better to draw in black than to draw in some random color.  */
-    if (lt <= LT_COLORFROMCOLUMN) {
-	(*term->linetype) (LT_BLACK);
-	return;
-    }
-
     /* Apply "linetype", which can include both color and dot/dash */
-    (*term->linetype) (lt);
+    if (lt <= LT_COLORFROMCOLUMN)
+	/* The color will be picked up in a moment, but we first need */
+	/* to set a reasonable line type.                             */
+	(*term->linetype) (LT_BLACK);
+    else
+	(*term->linetype) (lt);
     /* Possibly override the linetype color with a fancier colorspec */
     if (lp->use_palette)
 	apply_pm3dcolor(&lp->pm3d_color, term);

@@ -1,3 +1,9 @@
+2011-07-03  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/term.c (term_apply_lp_properties):  Handle the case where 
+	LT_COLORFROMCOLUMN is passed through as a linetype along with a color.
+	Bug #3350570
+
 2011-06-30  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/hidden3d.c (draw_edge):  Do not apply the default top/bottom
