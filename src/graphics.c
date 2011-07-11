@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.369 2011/06/14 23:18:39 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.370 2011/06/21 18:53:31 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -2850,7 +2850,10 @@ plot_steps(struct curve_points *plot)
 
 		if (prev == INRANGE) {
 		    if (style) {
-			(*t->fillbox)(style, xprev,y0,(x-xprev),yprev-y0);
+			if (yprev-y0 < 0)
+			    (*t->fillbox)(style, xprev,yprev,(x-xprev),y0-yprev);
+			else
+			    (*t->fillbox)(style, xprev,y0,(x-xprev),yprev-y0);
 		    } else {
 			(*t->vector) (x, yprev);
 			(*t->vector) (x, y);
@@ -2862,7 +2865,10 @@ plot_steps(struct curve_points *plot)
 			xprev = map_x(ex);
 			yprev = map_y(ey);
 			if (style) {
-			    (*t->fillbox)(style, xprev,y0,(x-xprev),yprev-y0);
+			    if (yprev-y0 < 0)
+				(*t->fillbox)(style, xprev,yprev,(x-xprev),y0-yprev);
+			    else
+				(*t->fillbox)(style, xprev,y0,(x-xprev),yprev-y0);
 			} else {
 			    (*t->move) (xprev,yprev);
 			    (*t->vector) (x, yprev);

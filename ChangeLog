@@ -1,3 +1,8 @@
+2011-07-11  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/graphics.c (plot_steps): Don't pass negative heights to t->fillbox
+	Bug #3358185
+
 2011-07-03  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/term.c (term_apply_lp_properties):  Handle the case where 
