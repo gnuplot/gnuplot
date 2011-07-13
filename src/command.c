@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.181.2.8 2010/09/27 02:08:58 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.181.2.9 2010/11/12 19:34:39 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -1784,6 +1784,8 @@ test_command()
 {
     int what;
     c_token++;
+    if (!term)
+	int_error(NO_CARET, "use 'set term' to set terminal type first");
     if (END_OF_COMMAND) {
 	test_term();
 	return;

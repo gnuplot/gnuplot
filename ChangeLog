@@ -1,3 +1,9 @@
+2011-07-13  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/command.c (test_command): Do not allow the 'test' command if there
+	is no current terminal.
+	Bug #3347683
+
 2011-06-28  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/svg.trm:  Pattern-fill definitions must initialize both
