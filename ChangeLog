@@ -1,4 +1,4 @@
-2011-06-17  Peter Juhasz  <juhaszp@users.sourceforge.net>
+2011-07-12  Peter Juhasz  <juhaszp@users.sourceforge.net>
 
 	* src/command.c src/term.c: Fix crash of 'test' after an 
 	unsuccessful 'set term'
