@@ -1,3 +1,9 @@
+2011-07-14  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/graphics.c (plot_boxes):  Correct positioning of bars in clustered
+	histograms when some values are missing.
+	Bug #3360882
+
 2011-07-12  Peter Juhasz  <juhaszp@users.sourceforge.net>
 
 	* src/command.c src/term.c: Fix crash of 'test' after an 
