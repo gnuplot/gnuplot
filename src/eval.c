@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: eval.c,v 1.90 2011/03/13 19:55:29 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: eval.c,v 1.91 2011/04/19 20:22:25 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - eval.c */
@@ -111,7 +111,7 @@ const struct ft_entry GPFAR ft[] =
     {"power",  f_power},
     {"factorial",  f_factorial},
     {"bool",  f_bool},
-    {"dollars",  f_dollars},	/* for using extension */
+    {"dollars",  f_dollars},	/* for usespec */
     {"concatenate",  f_concatenate},	/* for string variables only */
     {"eqs",  f_eqs},			/* for string variables only */
     {"nes",  f_nes},			/* for string variables only */
@@ -121,6 +121,15 @@ const struct ft_entry GPFAR ft[] =
     {"jumpz",  f_jumpz},
     {"jumpnz",  f_jumpnz},
     {"jtern",  f_jtern},
+
+/* Placeholder for FS_START */
+    {"", NULL},
+
+/* legal in using spec only */
+    {"column",  f_column},
+    {"columnhead",  f_columnhead},
+    {"valid",  f_valid},
+    {"timecolumn",  f_timecolumn},
 
 /* standard functions: */
     {"real",  f_real},
@@ -174,11 +183,6 @@ const struct ft_entry GPFAR ft[] =
     {"lambertw",  f_lambertw}, /* HBB, from G.Kuhnle 20001107 */
     {"airy",  f_airy},         /* janert, 20090905 */
     {"expint",  f_expint},     /* Jim Van Zandt, 20101010 */
-
-    {"columnhead",  f_columnhead},	/* for using */
-    {"column",  f_column},	/* for using */
-    {"valid",  f_valid},	/* for using */
-    {"timecolumn",  f_timecolumn},	/* for using */
 
     {"tm_sec",  f_tmsec},	/* for timeseries */
     {"tm_min",  f_tmmin},	/* for timeseries */

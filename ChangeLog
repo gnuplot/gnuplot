@@ -4,6 +4,16 @@
 	histograms when some values are missing.
 	Bug #3360882
 
+	* src/datafile.c (df_open plot_option_using df_readascii f_column)
+	src/datafile.h src/parse.c (create_call_column_at extend_at) src/parse.h
+	src/eval.c src/eval.h src/plot2d.c src/plot3d.c docs/gnuplot.doc:
+
+	Implement column selection based on matching a leading substring of the
+	column header.
+	    plot 'foo' using (column("A")):(column("B"))
+	    plot 'foo' using "A":"B"
+	    plot for [value in "Weight Height"] 'foo' using "Age":value
+
 2011-07-12  Peter Juhasz  <juhaszp@users.sourceforge.net>
 
 	* src/command.c src/term.c: Fix crash of 'test' after an 

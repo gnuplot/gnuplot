@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.199 2011/05/28 04:58:42 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.200 2011/06/18 16:51:22 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -96,6 +96,7 @@ static char *RCSid() { return RCSid("$Id: datafile.c,v 1.199 2011/05/28 04:58:42
  *          DF_FOUND_KEY_TITLE  - only relevant to first line of data
  *          DF_KEY_TITLE_MISSING  and only for 'set key autotitle columnhead'
  *          DF_STRINGDATA - not currently used by anyone
+ *          DF_COLUMN_HEADERS - first row used as headers rather than data
  *
  * if a using spec was given, lines not fulfilling spec are ignored.
  * we will always return exactly the number of items specified
@@ -293,7 +294,8 @@ typedef struct df_column_struct {
     enum {
 	DF_BAD, DF_GOOD
     } good;
-    char *position;
+    char *position;	/* points to start of this field in current line */
+    char *header;	/* points to copy of the header for this column */
 } df_column_struct;
 
 static df_column_struct *df_column = NULL;      /* we'll allocate space as needed */
@@ -303,10 +305,15 @@ static int fast_columns;        /* corey@cac optimization */
 
 char *df_tokens[MAXDATACOLS];           /* filled in by df_tokenise */
 static char *df_stringexpression[MAXDATACOLS] = {NULL,NULL,NULL,NULL,NULL,NULL,NULL};
+static struct curve_points *df_current_plot;	/* used to process histogram labels + key entries */
+
+/* These control the handling of fields in the first row of a data file.
+ * See also parse_1st_row_as_headers.
+ */
 #define NO_COLUMN_HEADER (-99)  /* some value that can never be a real column */
 static int column_for_key_title = NO_COLUMN_HEADER;
-static char *df_key_title = NULL;     /* filled in from <col> in 1st row by df_tokenise */
-static struct curve_points *df_current_plot;	/* used to process histogram labels + key entries */
+static TBOOLEAN df_already_got_headers = FALSE;
+static char *df_key_title = NULL;     /* filled in from column header if requested */
 
 
 /* Binary *read* variables used by df_readbinary().
@@ -666,11 +673,6 @@ df_tokenise(char *s)
 		    df_column[df_no_cols].good = DF_GOOD;
 	    }
 	}
-	/* Particularly if it is supposed to be a key title */
-	if (df_no_cols == column_for_key_title-1) {
-	    free(df_key_title);
-	    df_key_title = gp_strdup(s);
-	}
 
 	/* CSV files must accept numbers inside quotes also,
 	 * so we step past the quote */
@@ -979,6 +981,8 @@ df_open(const char *cmd_filename, int max_using, struct curve_points *plot)
     /* Perhaps it should be a parameter to df_readline? */
     df_current_plot = plot;
     column_for_key_title = NO_COLUMN_HEADER;
+    parse_1st_row_as_headers = FALSE;
+    df_already_got_headers = FALSE;
     /*}}} */
 
     assert(max_using <= MAXDATACOLS);
@@ -1367,13 +1371,25 @@ static void
 plot_option_using(int max_using)
 {
     int no_cols = 0;  /* For general binary only. */
+    char *column_label;
 
     /* The filetype function may have set the using specs, so reset
      * them before processing tokens. */
     if (df_binary_file)
 	initialize_use_spec();
 
-    if (!END_OF_COMMAND && !isstring(++c_token)) {
+    /* Try to distinguish between 'using "A":"B"' and 'using "%lf %lf" */
+    if (!END_OF_COMMAND && isstring(++c_token)) {
+	int save_token = c_token;
+	df_format = try_to_get_string();
+	if (valid_format(df_format))
+	    return;
+	free(df_format);
+	df_format = NULL;
+	c_token = save_token;
+    }
+
+    if (!END_OF_COMMAND) {
 	do {                    /* must be at least one */
 	    if (df_no_use_specs >= max_using)
 		int_error(c_token, "Too many columns in using specification");
@@ -1413,6 +1429,13 @@ plot_option_using(int max_using)
 		plot_ticlabel_using(CT_CBTICLABEL);
 	    } else if (almost_equals(c_token, "key")) {
 		plot_ticlabel_using(CT_KEYLABEL);
+
+	    } else if ((column_label = try_to_get_string())) {
+		/* ...using "A"... Dummy up a call to column(column_label) */
+		use_spec[df_no_use_specs].at = create_call_column_at(column_label);
+		use_spec[df_no_use_specs++].column = NO_COLUMN_HEADER;
+		fast_columns = 0;
+
 	    } else {
 		int col = int_expression();
 		
@@ -1435,17 +1458,6 @@ plot_option_using(int max_using)
 	df_extend_binary_columns(no_cols);
     }
 
-    if (!END_OF_COMMAND && isstring(c_token)) {
-
-	if (df_binary_file)
-	    int_error(NO_CARET, "Expecting \"binary format='...'\" or \"binary filetype=...\"");
-
-	df_format = try_to_get_string();
-	if (!valid_format(df_format))
-	    int_error(c_token,
-		      "Please use between 1 and 7 conversions, of type double (%%lf)");
-
-    } /* if (!EOC) */
 }
 
 
@@ -1675,23 +1687,35 @@ df_readascii(double v[], int max)
 	} else
 	    df_tokenise(s);
 
-	/* If we are supposed to read plot or key titles from the
-	 * first line of the data then do that and nothing else.  */
-	if (column_for_key_title != NO_COLUMN_HEADER) {
-	    char *temp_string = df_key_title;
-	    df_datum--;
-	    if (!df_key_title) {
-		FPRINTF((stderr,
-			 "df_readline: missing column head for key title\n"));
-		return(DF_KEY_TITLE_MISSING);
+	/* Always save the contents of the first row in case it is needed for
+	 * later access via column("header").  However, unless we know for certain that
+	 * it contains headers only, e.g. via parse_1st_row_as_headers or 
+	 * (column_for_key_title > 0), also treat it as a data row.
+	 */
+	if (df_datum == 0 && !df_already_got_headers) {
+	    int i,j;
+	    for (j=0; j<df_no_cols; j++) {
+		free(df_column[j].header);
+		df_column[j].header = df_parse_string_field(df_column[j].position);
+		FPRINTF((stderr,"Col %d: \"%s\"\n",j,df_column[j].header));
 	    }
-	    df_key_title = df_parse_string_field(df_key_title);
-	    free(temp_string);
-	    FPRINTF((stderr,
-		     "df_readline: Found key title in col %d %s\n",
-		     column_for_key_title, df_key_title));
-	    column_for_key_title = NO_COLUMN_HEADER;
-	    return(DF_FOUND_KEY_TITLE);
+	    df_already_got_headers = TRUE;
+	    if (column_for_key_title > 0) {
+		df_key_title = gp_strdup(df_column[column_for_key_title-1].header);
+		if (!df_key_title) {
+		    FPRINTF((stderr,
+			 "df_readline: missing column head for key title\n"));
+		    return(DF_KEY_TITLE_MISSING);
+		}
+		df_datum--;
+		column_for_key_title = NO_COLUMN_HEADER;
+		parse_1st_row_as_headers = FALSE;
+		return DF_FOUND_KEY_TITLE;
+	    } else if (parse_1st_row_as_headers) {
+		df_datum--;
+		parse_1st_row_as_headers = FALSE;
+		return DF_COLUMN_HEADERS;
+	    }
 	}
 
 	/*{{{  copy column[] to v[] via use[] */
@@ -2089,11 +2113,33 @@ f_column(union argument *arg)
 
     (void) arg;                 /* avoid -Wunused warning */
     (void) pop(&a);
-    column = (int) real(&a);
 
     if (!evaluate_inside_using)
 	int_error(c_token-1, "column() called from invalid context");
-    
+
+    if (a.type == STRING) {
+	int j;
+	char *name = a.v.string_val;
+	column = DF_COLUMN_HEADERS;
+	for (j=0; j<df_no_cols; j++) {
+	    if (df_column[j].header) {
+		int offset = (*df_column[j].header == '"') ? 1 : 0;
+		if (0 == strncmp(name, df_column[j].header + offset, 
+				strlen(name))) {
+		    column = j+1;
+		    if (!df_key_title) /* EAM DEBUG - on the off chance we want it */
+			df_key_title = gp_strdup(df_column[j].header);
+		    break;
+		}
+	    }
+	}
+	if (column == DF_COLUMN_HEADERS)
+	    int_error(NO_CARET,"could not find column with header \"%s\"\n",
+			a.v.string_val);
+	gpfree_string(&a);
+    } else
+	column = (int) real(&a);
+
     if (column == -2)
 	push(Ginteger(&a, df_current_index));
     else if (column == -1)
@@ -2268,6 +2314,9 @@ valid_format(const char *format)
 {
     int formats_found = 0;
 
+    if (!format)
+	return FALSE;
+
     for (;;) {
 	if (!(format = strchr(format, '%')))    /* look for format spec  */
 	    return (formats_found > 0 && formats_found <= 7);
@@ -2314,6 +2363,9 @@ expect_string(const char column)
 void
 df_set_key_title(struct curve_points *plot)
 {
+    if (!df_key_title)
+	return;
+
     if (plot->plot_style == HISTOGRAMS
     &&  histogram_opts.type == HT_STACKED_IN_TOWERS) {
 	/* In this case it makes no sense to treat key titles in the usual */
@@ -2370,7 +2422,9 @@ df_set_key_title_columnhead(struct curve_points *plot)
 	else
 	    column_for_key_title = use_spec[1].column;
     }
-    FPRINTF((stderr,"df_set_key_title_columnhead: column_for_key_title set to %d\n",column_for_key_title));
+    /* This results from  plot 'foo' using (column("name")) title columnhead */
+    if (column_for_key_title == NO_COLUMN_HEADER)
+	plot->title = gp_strdup("@COLUMNHEAD@");
 }
 
 static char *
@@ -4737,5 +4791,6 @@ expand_df_column(int new_max)
 			"datafile column");
     for (; df_max_cols < new_max; df_max_cols++) {
 	df_column[df_max_cols].datum = 0;
+	df_column[df_max_cols].header = NULL;
     }
 }

@@ -1,5 +1,5 @@
 /*
- * $Id: eval.h,v 1.34 2010/03/14 18:52:44 sfeam Exp $
+ * $Id: eval.h,v 1.35 2011/04/16 11:15:55 markisch Exp $
  */
 
 /* GNUPLOT - eval.h */
@@ -56,11 +56,14 @@ enum operators {
     CALL, CALLN, LNOT, BNOT, UMINUS,
     LOR, LAND, BOR, XOR, BAND, EQ, NE, GT, LT, GE, LE, PLUS, MINUS, MULT,
     DIV, MOD, POWER, FACTORIAL, BOOLE,
-    DOLLARS, /* for using extension - div */
+    DOLLARS, 
     CONCATENATE, EQS, NES, RANGE,
     ASSIGN,
     /* only jump operators go between jump and sf_start, for is_jump() */
-    JUMP, JUMPZ, JUMPNZ, JTERN, SF_START
+    JUMP, JUMPZ, JUMPNZ, JTERN, SF_START,
+
+    /* functions specific to using spec */
+    COLUMN
 };
 #define is_jump(operator) \
     ((operator) >=(int)JUMP && (operator) <(int)SF_START)

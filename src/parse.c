@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: parse.c,v 1.60 2011/05/22 06:18:45 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: parse.c,v 1.61 2011/07/12 19:19:28 juhaszp Exp $"); }
 #endif
 
 /* GNUPLOT - parse.c */
@@ -53,6 +53,9 @@ TBOOLEAN scanning_range_in_progress = FALSE;
 
 /* This is used by plot_option_using() */
 int at_highest_column_used = -1;
+
+/* This is checked by df_readascii() */
+TBOOLEAN parse_1st_row_as_headers = FALSE;
 
 /* Iteration structures used for bookkeeping */
 /* Iteration can be nested so long as different iterators are used */
@@ -246,6 +249,26 @@ perm_at()
     at = NULL;			/* invalidate at pointer */
     return (at_ptr);
 }
+
+/* Create an action table that describes a call to column("string"). */
+/* This is used by plot_option_using() to handle 'plot ... using "string"' */
+struct at_type *
+create_call_column_at(char *string)
+{
+    struct at_type *at = gp_alloc(sizeof(int) + 2*sizeof(struct at_entry),"");
+
+    at->a_count = 2;
+    at->actions[0].index = PUSHC;
+    at->actions[0].arg.j_arg = 3;	/* FIXME - magic number! */
+    at->actions[0].arg.v_arg.type = STRING;
+    at->actions[0].arg.v_arg.v.string_val = string;
+    at->actions[1].index = COLUMN;
+    at->actions[1].arg.j_arg = 0;
+
+    return (at);
+}
+
+
 
 static void
 extend_at()
@@ -455,10 +478,29 @@ parse_primary_expression()
 		/* with a variable number of arguments.         */
 		if (!strcmp(ft[whichfunc].f_name,"sprintf"))
 		    add_action(PUSHC)->v_arg = num_params;
-		/* And "words(s)" is implemented as "word(s,-1)" */
+
+		/* "words(s)" is implemented as "word(s,-1)" */
 		if (!strcmp(ft[whichfunc].f_name,"words")) {
 		    num_params.v.int_val = -1;
 		    add_action(PUSHC)->v_arg = num_params;
+		}
+
+		/* column("string") means we expect the first row of */
+		/* a data file to contain headers rather than data.  */
+		if (!strcmp(ft[whichfunc].f_name,"column")) {
+		    extern TBOOLEAN df_1st_row_contains_headers;
+		    struct at_entry *previous = &(at->actions[at->a_count-1]);
+		    if (previous->index == PUSHC
+		    &&  previous->arg.v_arg.type == STRING)
+			parse_1st_row_as_headers = TRUE;
+		}
+		/* This allows plot ... using (column(N)) title columnhead */
+		if (!strcmp(ft[whichfunc].f_name,"column")) {
+		    struct at_entry *previous = &(at->actions[at->a_count-1]);
+		    if (previous->index == PUSHC
+		    &&  previous->arg.v_arg.type == INTGR)
+			if (at_highest_column_used < previous->arg.v_arg.v.int_val)
+			    at_highest_column_used = previous->arg.v_arg.v.int_val;
 		}
 
 		(void) add_action(whichfunc);

@@ -1,5 +1,5 @@
 /*
- * $Id: datafile.h,v 1.32 2011/04/19 20:22:25 sfeam Exp $
+ * $Id: datafile.h,v 1.33 2011/05/06 05:48:25 sfeam Exp $
  */
 
 /* GNUPLOT - datafile.h */
@@ -53,6 +53,7 @@
 #define DF_FOUND_KEY_TITLE   (-6)
 #define DF_KEY_TITLE_MISSING (-7)
 #define DF_STRINGDATA	(-8)
+#define DF_COLUMN_HEADERS (-9)
 
 
 #ifndef MAXINT			/* should there be one already defined ? */

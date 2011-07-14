@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.244 2011/05/22 06:18:45 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.245 2011/06/18 16:51:22 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -656,6 +656,9 @@ get_data(struct curve_points *current_plot)
 	    fprintf(stderr,"get_data: key title not found in requested column\n");
 	    continue;
 
+	case DF_COLUMN_HEADERS:
+	    continue;
+
 	case 0:         /* not blank line, but df_readline couldn't parse it */
 	    {
 		df_close();
@@ -1027,6 +1030,9 @@ images:
 
     current_plot->p_count = i;
     cp_extend(current_plot, i); /* shrink to fit */
+
+    /* Last chance to substitute input values for placeholders in plot title */
+    df_set_key_title(current_plot);
 
     df_close();
 

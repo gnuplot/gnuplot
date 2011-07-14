@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.185 2011/05/06 05:48:25 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.186 2011/05/22 06:18:45 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -823,6 +823,10 @@ get_3ddata(struct surface_points *this_plot)
 		fprintf(stderr,
 			"get_data: key title not found in requested column\n"
 		    );
+		continue;
+	    }
+
+	    else if (j == DF_COLUMN_HEADERS) {
 		continue;
 	    }
 

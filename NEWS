@@ -1,6 +1,7 @@
 New features, changes and fixes since gnuplot version 4.4
 =========================================================
 
+* NEW syntax allowing column selection by matching a string in the first line
 * NEW syntax supporting multi-line blocks of code delimited by curly braces
     if (<cond>) { ... } else { ... }
     do for [...] { ... }

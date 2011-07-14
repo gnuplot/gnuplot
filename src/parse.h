@@ -1,5 +1,5 @@
 /*
- * $Id: parse.h,v 1.22 2011/06/19 22:10:37 sfeam Exp $
+ * $Id: parse.h,v 1.23 2011/07/12 19:19:28 juhaszp Exp $
  */
 
 /* GNUPLOT - parse.h */
@@ -55,8 +55,11 @@ extern char set_dummy_var[MAX_NUM_VAR][MAX_ID_LEN+1];
  * containing an explicit range (--> 'plot [phi=0..pi]') */
 extern char c_dummy_var[MAX_NUM_VAR][MAX_ID_LEN+1];
 
-/* This is used by the using_spec parsing code in plot_option_using() */
+/* This is used by plot_option_using() */
 extern int at_highest_column_used;
+
+/* This is checked by df_readascii() */
+extern TBOOLEAN parse_1st_row_as_headers;
 
 /* Prototypes of exported functions in parse.c */
 
@@ -67,6 +70,7 @@ struct value * const_express __PROTO((struct value *valptr));
 char* string_or_express __PROTO((struct at_type **atptr));
 struct at_type * temp_at __PROTO((void));
 struct at_type * perm_at __PROTO((void));
+struct at_type * create_call_column_at __PROTO((char *));
 struct udvt_entry * add_udv __PROTO((int t_num));
 struct udft_entry * add_udf __PROTO((int t_num));
 void cleanup_udvlist __PROTO((void));
