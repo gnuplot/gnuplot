@@ -1,3 +1,9 @@
+2011-07-14  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/graphics.c (plot_boxes):  Correct positioning of bars in clustered
+	histograms when some values are missing.
+	Bug #3360882
+
 2011-07-13  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/command.c (test_command): Do not allow the 'test' command if there

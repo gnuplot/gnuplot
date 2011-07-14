@@ -11,6 +11,7 @@ New features, changes and fixes in gnuplot version 4.4.4
 * FIX correction for offset in epochs when reading in time format "%s"
 * FIX discontinuity in defined palette limited by maxcolors
 * FIX initialization of svg pattern-fill definitions
+* FIX positioning of histogram bars when some data entries are missing
 
 
 New features, changes and fixes in gnuplot version 4.4.3
