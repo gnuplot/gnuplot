@@ -37,9 +37,9 @@
 
 
 
-  $Date: 2011/02/25 03:40:20 $
+  $Date: 2011/04/14 00:46:11 $
   $Author: sfeam $
-  $Rev: 98 $
+  $Rev: 100 $
 
 ]]--
 
@@ -80,8 +80,8 @@ pgf.DEFAULT_FONT_V_CHAR = 308
 
 pgf.STYLE_FILE_BASENAME = "gnuplot-lua-tikz"  -- \usepackage{gnuplot-lua-tikz}
 
-pgf.REVISION = string.sub("$Rev: 98 $",7,-3)
-pgf.REVISION_DATE = string.gsub("$Date: 2011/02/25 03:40:20 $",
+pgf.REVISION = string.sub("$Rev: 100 $",7,-3)
+pgf.REVISION_DATE = string.gsub("$Date: 2011/04/14 00:46:11 $",
                                 "$Date: ([0-9]+).([0-9]+).([0-9]+) .*","%1/%2/%3")
 
 pgf.styles = {}
@@ -182,8 +182,8 @@ pgf.styles.plotmarks = {
   [8] = {"gp mark 7", "mark=*"},
   [9] = {"gp mark 8", "mark=triangle"},
  [10] = {"gp mark 9", "mark=triangle*"},
- [11] = {"gp mark 10", "mark=triangle,mark options={rotate=180}"},
- [12] = {"gp mark 11", "mark=triangle*,mark options={rotate=180}"},
+ [11] = {"gp mark 10", "mark=triangle,every mark/.append style={rotate=180}"},
+ [12] = {"gp mark 11", "mark=triangle*,every mark/.append style={rotate=180}"},
  [13] = {"gp mark 12", "mark=diamond"},
  [14] = {"gp mark 13", "mark=diamond*"},
  [15] = {"gp mark 14", "mark=otimes"},
@@ -776,7 +776,7 @@ f:write([[
 %
 
 % short for a filled path
-\def\gpfill#1{\path[fill,#1]}
+\def\gpfill#1{\path[line width=0.1\gpbaselw,draw,fill,#1]}
 
 % short for changing the line width
 \def\gpsetlinewidth#1{\pgfsetlinewidth{#1\gpbaselw}}
@@ -802,7 +802,7 @@ f:write([[
   \ifgpscalepoints\else shift only\fi%
 }}
 \def\gppoint#1#2{%
-  \path[solid] plot[only marks,gp point,#1,mark options={gp shift only}] coordinates {#2};%
+  \path[solid] plot[only marks,gp point,mark options={gp shift only},#1] coordinates {#2};%
 }
 
 
@@ -946,7 +946,7 @@ f:write([[
     f:write("\\tikzset{"..pgf.styles.linetypes_axes[i][1].."/.style="..pgf.styles.linetypes_axes[i][2].."}\n")
   end
   f:write("\n% linestyle \"addon\" settings for overwriting a default linestyle within the\n")
-  f:write("% TeX document via eg. \\tikzset{gp lt plot 1 add}=[fill=black,draw=none] etc.\n")
+  f:write("% TeX document via eg. \\tikzset{gp lt plot 1 add/.style={fill=black,draw=none}} etc.\n")
   for i = 1, #pgf.styles.linetypes_axes do
     f:write("\\tikzset{"..pgf.styles.linetypes_axes[i][1].." add/.style={}}\n")
   end
@@ -1009,6 +1009,7 @@ pgf.print_help = function(fwrite)
       {nogppoints | gppoints}
       {picenvironment | nopicenvironment}
       {noclip | clip}
+      {notightboundingbox | tightboundingbox}
       {background "<colorpec>"}
       {size <x>{unit},<y>{unit}}
       {scale <x>,<y>}
@@ -1056,7 +1057,10 @@ pgf.print_help = function(fwrite)
  'clip' crops the plot at the defined canvas size. Default is
  'noclip' by which only a minimum bounding box of the canvas size
  is set. Neither a fixed bounding box nor a crop box is set if the
- 'plotsize' option is used.
+ 'plotsize' or 'tightboundingbox' option is used.
+
+ If 'tightboundingbox' is set the 'clip' option is ignored and the
+ final bounding box is the natural bounding box calculated by tikz.
 
  'background' sets the background color to the value specified in
  the <colorpec> argument. <colorspec> must be a valid color name or
@@ -1168,15 +1172,11 @@ end
 ]]--===============================================================================================
 
 
-gfx.in_path = false
-
+-- path coordinates
 gfx.path = {}
 gfx.posx = nil
 gfx.posy = nil
 
-
--- gfx.DEFAULT_LINE_TYPE = -2
--- gfx.linetype_idx = gfx.DEFAULT_LINE_TYPE -- current linetype intended for the plot
 gfx.linetype_idx = nil       -- current linetype intended for the plot
 gfx.linetype_idx_set = nil   -- current linetype set in the plot
 gfx.linewidth = nil
@@ -1191,7 +1191,6 @@ gfx.scaley = 1
 -- corner...
 gfx.origin_xoffset = 0
 gfx.origin_yoffset = 0
-
 
 
 -- color set in the document
@@ -1250,6 +1249,8 @@ gfx.opt = {
   bgcolor = nil,
   -- crop to the given canvas size
   clip = false,
+  -- if true, the natural bounding box will be used and 'clip' is ignored
+  tightboundingbox = false,
   -- fontscale
   fontscale = nil
 }
@@ -1422,7 +1423,7 @@ gfx.adjust_plotbox = function()
       -- plotsize as the canvas size
       gp.term_out("WARNING: PGF/TikZ Terminal: `plotsize' option used, but I could not determin the plot area!\n")
     end
-  else
+  elseif not gfx.opt.tightboundingbox then
     if gfx.opt.clip then
       gp.write("\\clip")
     else
@@ -1449,24 +1450,24 @@ gfx.check_variables = function()
 end
 
 
--- do we have to start a new path?
+-- check if the current path should be drawn
 gfx.check_in_path = function()
-  -- boundingbox data is available with the first
-  -- drawing command
+  -- also check the bounding box here
+  -- bounding box data is available with the first drawing command
   if (not gfx.have_plotbox) and gfx.in_picture then
     gfx.adjust_plotbox()
     gfx.have_plotbox = true
   end
   
-  if gfx.in_path == true then
+  -- ignore zero length paths
     if #gfx.path > 1 then
-      -- don't draw zero length paths
+    -- check all line properties and draw current path
+    gfx.check_color()
+    gfx.check_linetype()
+    gfx.check_linewidth()
       pgf.draw_path(gfx.path)
-    end
-    gfx.in_path = false
-    gfx.path = {}
-    gfx.posx = nil
-    gfx.posy = nil
+    -- remember last coordinates
+    gfx.start_path(gfx.path[#gfx.path][1], gfx.path[#gfx.path][2])
   end
 end
 
@@ -1521,13 +1522,8 @@ end
 
 
 gfx.start_path = function(x, y)
-  gfx.check_color()
-  gfx.check_linetype()
-  gfx.check_linewidth()
-
   --  init path with first coords
   gfx.path = {{x,y}}  
-  gfx.in_path = true
   gfx.posx = x
   gfx.posy = y
 end
@@ -1918,6 +1914,10 @@ term.options = function(opt_str, initial, t_count)
     elseif almost_equals(o_next, "noclip") then
       gfx.opt.clip = false
       term.flags = term_default_flags
+    elseif almost_equals(o_next, "tight$bounding") then
+      gfx.opt.tightboundingbox = true
+    elseif almost_equals(o_next, "notight$bounding") then
+      gfx.opt.tightboundingbox = false
     else
       gp.int_warn(t_count, string.format("unknown option `%s'.", o_next))
     end
@@ -1986,6 +1986,7 @@ term.options = function(opt_str, initial, t_count)
   tf(gfx.opt.direct_image, 'bitmap', 'nobitmap')
   tf(gfx.opt.cmykimage, 'cmykimage', 'rgbimage')
   tf(gfx.opt.clip, 'clip', 'noclip')
+  tf(gfx.opt.tightboundingbox, 'tightboundingbox', 'notightboundingbox')
   if term.external_images ~= nil then
     tf(term.external_images, 'externalimages', 'noexternalimages')
   end
@@ -2028,7 +2029,7 @@ end
 
 
 term.vector = function(x, y)
-  if not gfx.in_path then
+  if #gfx.path == 0 then
     gfx.start_path(gfx.posx, gfx.posy)
   elseif not gfx.check_coord(x, y) then
     -- checked for zero path length and add the path coords to gfx.path
@@ -2038,8 +2039,9 @@ term.vector = function(x, y)
 end
 
 term.move = function(x, y)
-  -- if we move to our last position we will just continue the path there
+  -- only "move" if we change our latest position
   if not gfx.check_coord(x, y) then
+    -- finish old path and start a new one
     gfx.check_in_path()
     gfx.start_path(x, y)
   end
@@ -2139,16 +2141,16 @@ end
 
 term.linewidth = function(width)
   if gfx.linewidth ~= width then
-    gfx.linewidth = width
     gfx.check_in_path()
+    gfx.linewidth = width
   end
   return 1
 end
 
 term.pointsize = function(size)
   if gfx.pointsize ~= size then
-    gfx.pointsize = size
     gfx.check_in_path()
+    gfx.pointsize = size
   end
   return 1
 end
