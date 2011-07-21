@@ -1,11 +1,14 @@
 2011-07-20  Peter Hedwig <peter@affenbande.org>
 
 	* term/lua/gnuplot-tikz.lua:  Point types 10 and 11 were upside down.
-	  Bug #3368877
+	Bug #3368877
+
 	* fill paths now have a pensize > 0 to have slight overlap of tiles to
-	  avoid rendering artifacts
+	avoid rendering artifacts
+
 	* path building was broken and showed interrupted lines on certain plots
-	  e.g. plot '+' u 1:($1**2):($1**2) with lines pal lw 3 title '$x^2$'
+	e.g. plot '+' u 1:($1**2):($1**2) with lines palette lw 3 title '$x^2$'
+
 	* a new terminal option (tightboundingbox|notightboundingbox) is added
 
 2011-07-20  Ethan A Merritt  <merritt@u.washington.edu>
