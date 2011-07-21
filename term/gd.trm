@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: gd.trm,v 1.158 2011/04/13 23:59:12 sfeam Exp $
+ * $Id: gd.trm,v 1.159 2011/05/10 06:51:23 markisch Exp $
  * based on gif.trm,v 1.26.2.1 2000/05/01 00:17:20 joze
  */
 
@@ -986,13 +986,15 @@ PNG_options()
 		    png_state.default_ttfsize = i;
 		else
 		    int_warn(c_token,"illegal font size");
-		++c_token;
+		c_token++;
 	        break;
 	    }
 #endif
 
 	    if (sscanf(string, "x%lx", &color) == 1)
 		int_error(c_token, "obsolete color option");
+	    else
+		int_error(c_token, "unrecognized terminal option");
 	    break;
 	}
     }
