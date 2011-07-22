@@ -1,5 +1,5 @@
 /*
- * $Id: parse.h,v 1.23 2011/07/12 19:19:28 juhaszp Exp $
+ * $Id: parse.h,v 1.24 2011/07/14 21:29:41 sfeam Exp $
  */
 
 /* GNUPLOT - parse.h */
@@ -89,15 +89,16 @@ typedef struct iterator {
 	int iteration;
 	TBOOLEAN done;
 	TBOOLEAN really_done;
+	TBOOLEAN empty_iteration;
 } t_iterator;
-#define NEW_ITERATOR {NULL, NULL, NULL, NULL, 0, 0, 0, 0, 0, FALSE, FALSE}
 
-extern t_iterator plot_iterator;	/* Used for plot and splot */
-extern t_iterator set_iterator;		/* Used by set/unset commands */
+extern t_iterator * plot_iterator;	/* Used for plot and splot */
+extern t_iterator * set_iterator;		/* Used by set/unset commands */
 
 /* These are used by the iteration code */
-void check_for_iteration __PROTO((t_iterator *));
+t_iterator * check_for_iteration __PROTO((void));
 TBOOLEAN next_iteration  __PROTO((t_iterator *));
 TBOOLEAN empty_iteration  __PROTO((t_iterator *));
+t_iterator * cleanup_iteration __PROTO((t_iterator *));
 
 #endif /* PARSE_H */

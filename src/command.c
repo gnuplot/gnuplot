@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.215 2011/06/19 22:10:36 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.216 2011/07/12 18:38:52 juhaszp Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -1138,12 +1138,12 @@ else_command()
 void
 do_command()
 {
-    t_iterator do_iterator = NEW_ITERATOR;
+    t_iterator *do_iterator;
     int do_start, do_end;
     char *clause;
 
     c_token++;
-    check_for_iteration(&do_iterator);
+    do_iterator = check_for_iteration();
 
     if (!equals(c_token,"{"))
 	int_error(c_token,"expecting {do-clause}");
@@ -1158,10 +1158,10 @@ do_command()
 
     do {
 	do_string(clause);
-    } while (next_iteration(&do_iterator));
+    } while (next_iteration(do_iterator));
 
     free(clause);
-    free(do_iterator.iteration_string);
+    do_iterator = cleanup_iteration(do_iterator);
 }
 
 /* process commands of the form 'while (foo) {...}' */

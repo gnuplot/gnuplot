@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.245 2011/06/18 16:51:22 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.246 2011/07/14 21:29:41 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -1602,7 +1602,7 @@ eval_plots()
      * as filling in every thing except the function data. That is done after
      * the xrange is defined.
      */
-    check_for_iteration(&plot_iterator);
+    plot_iterator = check_for_iteration();
     while (TRUE) {
 	if (END_OF_COMMAND)
 	    int_error(c_token, "function to plot expected");
@@ -2371,16 +2371,17 @@ eval_plots()
 	}
 
 	/* Iterate-over-plot mechanism */
-	if (empty_iteration(&plot_iterator) && this_plot) {
+	if (empty_iteration(plot_iterator) && this_plot) {
 	    this_plot->plot_type = NODATA;
-	} else if (next_iteration(&plot_iterator)) {
+	} else if (next_iteration(plot_iterator)) {
 	    c_token = start_token;
 	    continue;
 	}
 
+	plot_iterator = cleanup_iteration(plot_iterator);
 	if (equals(c_token, ",")) {
 	    c_token++;
-	    check_for_iteration(&plot_iterator);
+	    plot_iterator = check_for_iteration();
 	} else
 	    break;
     }
@@ -2463,7 +2464,7 @@ eval_plots()
 	this_plot = first_plot;
 	c_token = begin_token;  /* start over */
 
-	check_for_iteration(&plot_iterator);
+	plot_iterator = check_for_iteration();
 
 	/* Read through functions */
 	while (TRUE) {
@@ -2647,15 +2648,16 @@ eval_plots()
 	    }
 
 	    /* Iterate-over-plot mechanism */
-	    if (!in_parametric && next_iteration(&plot_iterator)) {
+	    if (!in_parametric && next_iteration(plot_iterator)) {
 		c_token = start_token;
 		continue;
 	    }
 
+	    plot_iterator = cleanup_iteration(plot_iterator);
 	    if (equals(c_token, ",")) {
 		c_token++;
 		if (!in_parametric)
-		    check_for_iteration(&plot_iterator);
+		    plot_iterator = check_for_iteration();
 	    } else
 		break;
 	}

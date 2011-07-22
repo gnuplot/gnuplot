@@ -1,3 +1,9 @@
+2011-07-22  Peter Juhasz  <juhaszp@users.sourceforge.net>
+
+	* src/parse.c src/parse.h plot2d.c plot3d.c set.c unset.c command.c:
+	Revise iteration-over-plot mechanism to handle edge cases of nested
+	iteration correctly.
+
 2011-07-20  Peter Hedwig <peter@affenbande.org>
 
 	* term/lua/gnuplot-tikz.lua:  Point types 10 and 11 were upside down.

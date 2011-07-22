@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.186 2011/05/22 06:18:45 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.187 2011/07/14 21:29:41 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -1280,7 +1280,7 @@ eval_3dplots()
      * well as filling in every thing except the function data. That is done
      * after the x/yrange is defined.
      */
-    check_for_iteration(&plot_iterator);
+    plot_iterator = check_for_iteration();
 
     while (TRUE) {
 	if (END_OF_COMMAND)
@@ -1359,7 +1359,7 @@ eval_3dplots()
 		/* for capture to key */
 		this_plot->token = end_token = c_token - 1;
 		/* FIXME: Is this really needed? */
-		this_plot->iteration = plot_iterator.iteration;
+		this_plot->iteration = plot_iterator ? plot_iterator->iteration : 0;
 
 		/* this_plot->token is temporary, for errors in get_3ddata() */
 
@@ -1761,7 +1761,7 @@ eval_3dplots()
 		    df_return = get_3ddata(this_plot);
 		    /* for second pass */
 		    this_plot->token = c_token;
-		    this_plot->iteration = plot_iterator.iteration;
+		    this_plot->iteration = plot_iterator ? plot_iterator->iteration : 0;
 
 		    if (this_plot->num_iso_read == 0)
 			this_plot->plot_type = NODATA;
@@ -1793,7 +1793,7 @@ eval_3dplots()
 		    }
 
 		    this_plot->plot_type = DATA3D;
-		    this_plot->iteration = plot_iterator.iteration;
+		    this_plot->iteration = plot_iterator ? plot_iterator->iteration : 0;
 		    this_plot->plot_style = first_dataset->plot_style;
 		    this_plot->lp_properties = first_dataset->lp_properties;
 		    if (this_plot->plot_style == LABELPOINTS) {
@@ -1809,10 +1809,10 @@ eval_3dplots()
 	    } else {		/* not a data file */
 		tp_3d_ptr = &(this_plot->next_sp);
 		this_plot->token = c_token;	/* store for second pass */
-		this_plot->iteration = plot_iterator.iteration;
+		this_plot->iteration = plot_iterator ? plot_iterator->iteration : 0;
 	    }
 
-	    if (empty_iteration(&plot_iterator))
+	    if (empty_iteration(plot_iterator))
 		this_plot->plot_type = NODATA;
 
 	}			/* !is_definition() : end of scope of this_plot */
@@ -1826,14 +1826,15 @@ eval_3dplots()
 	}
 
 	/* Iterate-over-plot mechanisms */
-	if (next_iteration(&plot_iterator)) {
+	if (next_iteration(plot_iterator)) {
 	    c_token = start_token;
 	    continue;
 	}
 
+	plot_iterator = cleanup_iteration(plot_iterator);
 	if (equals(c_token, ",")) {
 	    c_token++;
-	    check_for_iteration(&plot_iterator);
+	    plot_iterator = check_for_iteration();
 	} else
 	    break;
 
@@ -1910,7 +1911,7 @@ eval_3dplots()
 	/* start over */
 	this_plot = first_3dplot;
 	c_token = begin_token;
-	check_for_iteration(&plot_iterator);
+	plot_iterator = check_for_iteration();
 
 	/* why do attributes of this_plot matter ? */
 	/* FIXME HBB 20000501: I think they don't, actually. I'm
@@ -2003,15 +2004,18 @@ eval_3dplots()
 	    }			/* !is_definition */
 
 	    /* Iterate-over-plot mechanism */
-	    if (crnt_param == 0 && next_iteration(&plot_iterator)) {
+	    if (crnt_param == 0 && next_iteration(plot_iterator)) {
 		c_token = start_token;
 		continue;
 	    }
 
+	    if (crnt_param == 0)
+		plot_iterator = cleanup_iteration(plot_iterator);
+
 	    if (equals(c_token, ",")) {
 		c_token++;
 		if (crnt_param == 0)
-		    check_for_iteration(&plot_iterator);
+		    plot_iterator = check_for_iteration();
 	    } else
 		break;
 
