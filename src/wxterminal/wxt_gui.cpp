@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.cpp,v 1.83 2011/05/08 20:33:46 sfeam Exp $
+ * $Id: wxt_gui.cpp,v 1.84 2011/05/10 17:03:17 sfeam Exp $
  */
 
 /* GNUPLOT - wxt_gui.cpp */
@@ -116,6 +116,10 @@
 #include "bitmaps/png/config_png.h"
 #include "bitmaps/png/help_png.h"
 
+#ifdef __WXMAC__
+#include <ApplicationServices/ApplicationServices.h>
+#endif
+
 /* ---------------------------------------------------------------------------
  * event tables and other macros for wxWidgets
  * --------------------------------------------------------------------------*/
@@ -147,6 +151,7 @@ BEGIN_EVENT_TABLE( wxtFrame, wxFrame )
 END_EVENT_TABLE()
 
 BEGIN_EVENT_TABLE( wxtPanel, wxPanel )
+	EVT_LEAVE_WINDOW( wxtPanel::OnMouseLeave )
 	EVT_PAINT( wxtPanel::OnPaint )
 	EVT_ERASE_BACKGROUND( wxtPanel::OnEraseBackground )
 	EVT_SIZE( wxtPanel::OnSize )
@@ -212,6 +217,12 @@ IMPLEMENT_APP_NO_MAIN(wxtApp)
 
 bool wxtApp::OnInit()
 {
+#ifdef __WXMAC__
+	ProcessSerialNumber PSN;
+	GetCurrentProcess(&PSN);
+	TransformProcessType(&PSN, kProcessTransformToForegroundApplication);
+#endif
+
 	/* Usually wxWidgets apps create their main window here.
 	 * However, in the context of multiple plot windows, the same code is written in wxt_init().
 	 * So, to avoid duplication of the code, we do only what is strictly necessary.*/
@@ -311,7 +322,8 @@ void wxtApp::OnCreateWindow( wxCommandEvent& event )
 	wxt_window_t *window = (wxt_window_t*) event.GetClientData();
 
 	FPRINTF((stderr,"wxtApp::OnCreateWindow\n"));
-	window->frame = new wxtFrame( window->title, window->id, 50, 50, 640, 480 );
+	window->frame = new wxtFrame( window->title, window->id );
+	window->frame->Centre();
 	window->frame->Show(true);
 	FPRINTF((stderr,"new plot window opened\n"));
 	/* make the panel able to receive keyboard input */
@@ -343,9 +355,8 @@ void wxtApp::SendEvent( wxEvent &event)
  * ----------------------------------------------------------------------------*/
 
 /* frame constructor*/
-wxtFrame::wxtFrame( const wxString& title, wxWindowID id, int xpos, int ypos, int width, int height )
-	: wxFrame((wxFrame *)NULL, id, title, wxPoint(xpos,ypos),
-			wxSize(width,height), wxDEFAULT_FRAME_STYLE|wxWANTS_CHARS)
+wxtFrame::wxtFrame( const wxString& title, wxWindowID id )
+	: wxFrame((wxFrame *)NULL, id, title, wxDefaultPosition, wxDefaultSize, wxDEFAULT_FRAME_STYLE|wxWANTS_CHARS)
 {
 	FPRINTF((stderr,"wxtFrame constructor\n"));
 
@@ -793,6 +804,14 @@ void wxtPanel::DrawToDC(wxDC &dc, wxRegion &region)
 /* avoid flickering under win32 */
 void wxtPanel::OnEraseBackground( wxEraseEvent &WXUNUSED(event) )
 {
+}
+
+/* avoid leaving cross cursor when leaving window on Mac */
+void wxtPanel::OnMouseLeave( wxMouseEvent &WXUNUSED(event) )
+{
+#ifdef __WXMAC__
+	::wxSetCursor(wxNullCursor);
+#endif
 }
 
 /* when the window is resized */
@@ -3041,7 +3060,7 @@ bool wxt_exec_event(int type, int mx, int my, int par1, int par2, wxWindowID id)
 	event.par2 = par2;
 	event.winid = id;
 
-#ifdef _Windows
+#ifdef WXT_MONOTHREADED
 	wxt_process_one_event(&event);
 	return true;
 #else
@@ -3150,8 +3169,25 @@ int wxt_waitforinput()
 		return '\0';
 	}
 	else
-#endif /* _Windows */
-		return getch();
+#else /* !_Windows */
+	/* Generic hybrid GUI & console message loop */
+	static int yield = 0;
+	if(yield) return '\0';
+	while(wxTheApp) {
+		yield = 1;
+		wxTheApp->Yield();
+		yield = 0;
+
+		struct timeval tv;
+		fd_set read_fd;
+		tv.tv_sec = 0;
+		tv.tv_usec = 10000;
+		FD_ZERO(&read_fd);
+		FD_SET(0, &read_fd);
+		if(select(1, &read_fd, NULL, NULL, &tv) != -1 && FD_ISSET(0, &read_fd)) break;
+	}
+#endif
+	return getchar();
 }
 #endif /* WXT_MONOTHREADED || WXT_MULTITHREADED */
 

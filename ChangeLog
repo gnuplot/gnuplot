@@ -1,3 +1,11 @@
+2011-07-23  Adam Strzelecki <ono@users.sourceforge.net>
+
+	* src/wxterminal/wxt_gui.cpp src/wxterminal/wxt_gui.h m4/apple.m4:
+	OSX support for wxt terminal.  For OSX, switch to using single-threaded
+	hybrid GUI & console event loop at wxt_waitforinput().
+	Add -framework ApplicationServices to the apple-specific
+	configuration flags.
+
 2011-07-23  Mojca Miklavec <mojca.miklavec.lists@gmail.com>
 
 	* m4/apple.m4:  Replace -laquaterm with -Wl,-framework -Wl,AquaTerm
