@@ -14,7 +14,7 @@ AC_EGREP_CPP(yes,
 ], 
    [ AC_MSG_RESULT(yes)
      AC_CHECK_LIB(aquaterm, aqtInit, 
-     [ LIBS="-laquaterm $LIBS -framework Foundation"
+     [ LIBS="-Wl,-framework -Wl,AquaTerm $LIBS -framework Foundation"
        CFLAGS="$CFLAGS -ObjC"
        AC_DEFINE(HAVE_LIBAQUATERM,1,
                  [Define to 1 if you're using the aquaterm library on Mac OS X])

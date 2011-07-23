@@ -1,3 +1,9 @@
+2011-07-23  Mojca Miklavec <mojca.miklavec.lists@gmail.com>
+
+	* m4/apple.m4:  Replace -laquaterm with -Wl,-framework -Wl,AquaTerm
+	which is supposed to make the Macports version of aquaterm install
+	properly.
+
 2011-07-22  Peter Juhasz  <juhaszp@users.sourceforge.net>
 
 	* src/parse.c src/parse.h plot2d.c plot3d.c set.c unset.c command.c:
