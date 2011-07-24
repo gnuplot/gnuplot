@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.cpp,v 1.84 2011/05/10 17:03:17 sfeam Exp $
+ * $Id: wxt_gui.cpp,v 1.85 2011/07/24 03:35:02 sfeam Exp $
  */
 
 /* GNUPLOT - wxt_gui.cpp */
@@ -3060,7 +3060,7 @@ bool wxt_exec_event(int type, int mx, int my, int par1, int par2, wxWindowID id)
 	event.par2 = par2;
 	event.winid = id;
 
-#ifdef WXT_MONOTHREADED
+#if defined(WXT_MONOTHREADED) || defined(_Windows)
 	wxt_process_one_event(&event);
 	return true;
 #else
@@ -3169,6 +3169,8 @@ int wxt_waitforinput()
 		return '\0';
 	}
 	else
+		return getch();
+
 #else /* !_Windows */
 	/* Generic hybrid GUI & console message loop */
 	static int yield = 0;
@@ -3186,8 +3188,8 @@ int wxt_waitforinput()
 		FD_SET(0, &read_fd);
 		if(select(1, &read_fd, NULL, NULL, &tv) != -1 && FD_ISSET(0, &read_fd)) break;
 	}
-#endif
 	return getchar();
+#endif
 }
 #endif /* WXT_MONOTHREADED || WXT_MULTITHREADED */
 

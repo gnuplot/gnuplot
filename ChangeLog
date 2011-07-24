@@ -1,3 +1,9 @@
+2011-07-24  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/wxterminal/wxt_gui.cpp: Fix MSWin breakage from yesterday's patch
+	due to conditional code block damage.  (Preliminary)
+	Bug #3376861
+
 2011-07-23  Adam Strzelecki <ono@users.sourceforge.net>
 
 	* src/wxterminal/wxt_gui.cpp src/wxterminal/wxt_gui.h m4/apple.m4:
