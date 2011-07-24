@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.78 2011/05/14 19:53:36 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.79 2011/07/01 04:34:33 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - hidden3d.c */
@@ -1037,8 +1037,8 @@ build_networks(struct surface_points *plots, int pcount)
     long int *north_edges;	/* stores edges of polyline above */
     long int *these_edges;	/* same, being built for use by next turn */
     struct iso_curve *icrvs;
-    int above = LT_NODRAW;	/* line type for edges of front side*/
-    int below = LT_NODRAW;	/* line type for edges of back side*/
+    int above = LT_NODRAW;	/* linetype for edges of front side*/
+    int below = LT_NODRAW;	/* linetype for edges of back side*/
     struct lp_style_type *lp;	/* pointer to line and point properties */
 
     /* Count out the initial sizes needed for the polygon and vertex
@@ -1147,9 +1147,10 @@ build_networks(struct surface_points *plots, int pcount)
     for (this_plot = plots, surface = 0;
 	 surface < pcount;
 	 this_plot = this_plot->next_sp, surface++) {
-	lp_style_type *lp_style = NULL;
 	TBOOLEAN color_from_column = this_plot->pm3d_color_from_column;
 	long int crvlen;
+
+	lp = &(this_plot->lp_properties);
 
 	/* Quietly skip empty plots */
 	if (this_plot->plot_type == NODATA)
@@ -1161,14 +1162,15 @@ build_networks(struct surface_points *plots, int pcount)
 	if (this_plot->opt_out_of_hidden3d)
 	    continue;
 
-	lp = &(this_plot->lp_properties);
-	above = this_plot->lp_properties.l_type;
-	below = this_plot->lp_properties.l_type + hiddenBacksideLinetypeOffset;
+	/* We can't use the linetype passed to us, because it has been through */
+	/* load_linetype(), which replaced the nominal linetype with the one   */
+	/* assigned by "set linetype ..."                                      */
+	above = this_plot->hidden3d_top_linetype;
+	below = above + hiddenBacksideLinetypeOffset;
 
 	/* calculate the point symbol type: */
 	/* Assumes that upstream functions have made sure this is
 	 * initialized sensibly --- thou hast been warned */
-	lp_style = &(this_plot->lp_properties);
 
 	if (this_plot->plot_style == VECTOR) {
 	    lp->p_type = PT_ARROWHEAD;
@@ -1212,7 +1214,7 @@ build_networks(struct surface_points *plots, int pcount)
 		} else for (i = 0; i < icrvs->p_count; i++) {
 		    long int thisvertex, basevertex;
 
-		    thisvertex = store_vertex(points + i, lp_style,
+		    thisvertex = store_vertex(points + i, lp,
 					      color_from_column);
 
 		    if (this_plot->plot_style == VECTOR) {
@@ -1243,7 +1245,7 @@ build_networks(struct surface_points *plots, int pcount)
 			    coordval remember_z = points[i].z;
 
 			    points[i].z = axis_array[FIRST_Z_AXIS].min;
-			    basevertex = store_vertex(points + i, lp_style,
+			    basevertex = store_vertex(points + i, lp,
 						      color_from_column);
 			    points[i].z = remember_z;
 			}
@@ -1257,7 +1259,7 @@ build_networks(struct surface_points *plots, int pcount)
 			    coordval remember_z = points[i].z;
 
 			    points[i].z = 0.0;
-			    basevertex = store_vertex(points + i, lp_style,
+			    basevertex = store_vertex(points + i, lp,
 						      color_from_column);
 			    points[i].z = remember_z;
 			}
@@ -1299,7 +1301,7 @@ build_networks(struct surface_points *plots, int pcount)
 		long int e1, e2, e3;
 		long int pnum;
 
-		thisvertex = store_vertex(points + i, lp_style,
+		thisvertex = store_vertex(points + i, lp,
 					  color_from_column);
 
 		/* Preset the pointers to the polygons and edges
@@ -1441,7 +1443,7 @@ build_networks(struct surface_points *plots, int pcount)
 
 			points[i].z = (this_plot->plot_style == IMPULSES)
 					? 0.0 : axis_array[FIRST_Z_AXIS].min;
-			basevertex = store_vertex(points + i, lp_style,
+			basevertex = store_vertex(points + i, lp,
 						  color_from_column);
 			points[i].z = remember_z;
 		    }
@@ -1650,7 +1652,7 @@ draw_vertex(p_vertex v)
 static void
 draw_edge(p_edge e, p_vertex v1, p_vertex v2)
 {
-    /* It used to be that p_edge contained style as a integer linetype.
+    /* It used to be that e contained style as a integer linetype.
      * This destroyed any style attributes set in the splot command.
      * We really just want to extract a colorspec.
      */
@@ -1698,6 +1700,7 @@ draw_edge(p_edge e, p_vertex v1, p_vertex v2)
     &&  (e->lp->pm3d_color.type != TC_Z)) {
 	recolor = TRUE;
 	load_linetype(&lptemp, e->style + 1);
+	color = lptemp.pm3d_color;
     }
 
     /* The remaining case is hiddenBacksideLinetypeOffset == 0  */
@@ -1711,8 +1714,10 @@ draw_edge(p_edge e, p_vertex v1, p_vertex v2)
 	lptemp.pm3d_color = color;
 	if (arrow)
 	    lptemp.p_type = e->style;
+#if 0 /* No longer correct; handled by load_linetype() above */
 	else
 	    lptemp.l_type = e->style;
+#endif
     }
 
     draw3d_line_unconditional(v1, v2, &lptemp, color);
@@ -2223,9 +2228,6 @@ plot3d_hidden(struct surface_points *plots, int pcount)
 	    efirst = elist[efirst].next;
 	}
     }
-
-    /* Free memory */
-    /* FIXME: anything to free? */
 }
 
 void

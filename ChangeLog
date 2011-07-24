@@ -4,6 +4,17 @@
 	due to conditional code block damage.  (Preliminary)
 	Bug #3376861
 
+	* src/datafile.c (df_readbinary): Allow "using ... xticlabels()" for
+	binary files as well as ascii files.  Only string-valued functions
+	are valid in this case, as no string can be read from the binary 
+	datafield itself.
+
+	* src/graph3d.h src/hidden3d.c src/misc.c src/misc.h src/plot3d.c:
+	Re-work assignment of color and line type to top/bottom hidden3d
+	surfaces.  Keep the user-requested linetype in a new field of the
+	splot structure, since otherwise linetype definitions would overwrite
+	it. 
+
 2011-07-23  Adam Strzelecki <ono@users.sourceforge.net>
 
 	* src/wxterminal/wxt_gui.cpp src/wxterminal/wxt_gui.h m4/apple.m4:

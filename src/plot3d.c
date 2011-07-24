@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.187 2011/07/14 21:29:41 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.188 2011/07/22 14:37:57 juhaszp Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -1429,6 +1429,7 @@ eval_3dplots()
 	    this_plot->lp_properties.p_type = point_num;
 
 	    /* user may prefer explicit line styles */
+	    this_plot->hidden3d_top_linetype = line_num;
 	    if (prefer_line_styles)
 		lp_use_properties(&this_plot->lp_properties, line_num+1);
 	    else
@@ -1597,6 +1598,7 @@ eval_3dplots()
 		} else {
 		    int stored_token = c_token;
 		    struct lp_style_type lp = DEFAULT_LP_STYLE_TYPE;
+		    int new_lt = 0;
 
 		    lp.l_type = line_num;
 		    lp.p_type = point_num;
@@ -1607,8 +1609,9 @@ eval_3dplots()
 		    else
 			load_linetype(&lp, line_num+1);
 
- 		    lp_parse(&lp, TRUE,
+ 		    new_lt = lp_parse(&lp, TRUE,
 			     this_plot->plot_style & PLOT_STYLE_HAS_POINT);
+
 		    checked_once = TRUE;
 		    if (stored_token != c_token) {
 			if (set_lpstyle) {
@@ -1617,6 +1620,8 @@ eval_3dplots()
 			} else {
 			    this_plot->lp_properties = lp;
 			    set_lpstyle = TRUE;
+			    if (new_lt)
+				this_plot->hidden3d_top_linetype = new_lt - 1;
 			    continue;
 			}
 		    }
@@ -1658,6 +1663,7 @@ eval_3dplots()
 		    arrow_parse(&this_plot->arrow_properties, TRUE);
 		    this_plot->lp_properties = this_plot->arrow_properties.lp_properties;
 		} else {
+		    int new_lt = 0;
 		    this_plot->lp_properties.l_type = line_num;
 		    this_plot->lp_properties.l_width = 1.0;
 		    this_plot->lp_properties.p_type = point_num;
@@ -1670,8 +1676,12 @@ eval_3dplots()
 		    else
 			load_linetype(&this_plot->lp_properties, line_num+1);
 
-		    lp_parse(&this_plot->lp_properties, TRUE,
+		    new_lt = lp_parse(&this_plot->lp_properties, TRUE,
 			 this_plot->plot_style & PLOT_STYLE_HAS_POINT);
+		    if (new_lt)
+			this_plot->hidden3d_top_linetype = new_lt - 1;
+		    else
+			this_plot->hidden3d_top_linetype = line_num;
 		}
 
 #ifdef BACKWARDS_COMPATIBLE

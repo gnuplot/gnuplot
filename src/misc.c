@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.133 2011/04/25 16:59:02 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.134 2011/06/19 22:10:37 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -793,11 +793,12 @@ need_fill_border(struct fill_style_type *fillstyle)
  * the current context [ie not when doing a  set linestyle command]
  * allow_point is whether we accept a point command
  */
-void
+int
 lp_parse(struct lp_style_type *lp, TBOOLEAN allow_ls, TBOOLEAN allow_point)
 {
     /* keep track of which options were set during this call */
     int set_lt = 0, set_pal = 0, set_lw = 0, set_pt = 0, set_ps = 0, set_pi = 0;
+    int new_lt = 0;
 
     /* EAM Mar 2010 - We don't want properties from a user-defined default
      * linetype to override properties explicitly set here.  So fill in a
@@ -836,13 +837,13 @@ lp_parse(struct lp_style_type *lp, TBOOLEAN allow_ls, TBOOLEAN allow_point)
 		    c_token++;
 		} else {
 		    /* These replace the base style */
-		    int lt = int_expression();
-		    lp->l_type = lt - 1;
+		    new_lt = int_expression();
+		    lp->l_type = new_lt - 1;
 		    /* user may prefer explicit line styles */
 		    if (prefer_line_styles && allow_ls)
-			lp_use_properties(lp, lt);
+			lp_use_properties(lp, new_lt);
 		    else
-			load_linetype(lp, lt);
+			load_linetype(lp, new_lt);
 		}
 	    } /* linetype, lt */
 
@@ -978,6 +979,8 @@ lp_parse(struct lp_style_type *lp, TBOOLEAN allow_ls, TBOOLEAN allow_point)
 	    lp->p_interval = newlp.p_interval;
 	if (newlp.l_type == LT_COLORFROMCOLUMN)
 	    lp->l_type = LT_COLORFROMCOLUMN;
+
+    return new_lt;
 }
 
 /* <fillstyle> = {empty | solid {<density>} | pattern {<n>}} {noborder | border {<lt>}} */
