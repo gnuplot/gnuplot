@@ -211,25 +211,40 @@ Ubuntu:
 Mac OSX
 -------
 
-As I understand the situation, Apple ships OSX with a "fake" libreadline shared
-library. The file /usr/lib/libreadline.dylib is really a symlink to a
-compatibility layer over the BSD libedit library.  But the compatibility isn't
-complete, and in particular it is missing many of the routines used for readline
-support by gnuplot. As of version 4.4.1, the ./configure script should be able
-to cope with this. But you will still be left without some of the functionality
-of the "real" libreadline.  For one thing, libedit doesn't handle UTF input.
-You have a couple of options:
+Readline issues:
 
-1) Delete the fake libreadline libraries from OSX and install
-the real gnu libreadline as a system library.
+  As I understand the situation, Apple ships OSX with a "fake" libreadline
+  shared library. The file /usr/lib/libreadline.dylib is really a symlink to a
+  compatibility layer over the BSD libedit library.  But the compatibility isn't
+  complete, and in particular it is missing many of the routines used for readline
+  support by gnuplot. As of version 4.4.1, the ./configure script should be able
+  to cope with this. But you will still be left without some of the functionality
+  of the "real" libreadline.  For one thing, libedit doesn't handle UTF input.
+  You have a couple of options:
+  
+  1) Delete the fake libreadline libraries from OSX and install
+  the real gnu libreadline as a system library.
+  
+  2) Install the real gnu libreadline into your personal account and
+  tell gnuplot to use it:
+  ./configure --with-readline=/my/private/readline/installdir
+  This may require some playing around with additional -L and -I
+  definitions in CFLAGS, and is probably harder than replacing the
+  system copy of the library.
 
-2) Install the real gnu libreadline into your personal account and
-tell gnuplot to use it:
-./configure --with-readline=/my/private/readline/installdir
-This may require some playing around with additional -L and -I
-definitions in CFLAGS, and is probably harder than replacing the
-system copy of the library.
+wxt terminal:
 
+  Cairo & pango need to be installed first on Mac, 
+  I recommend using MacPorts building universal (i386 libraries):
+  sudo port install cairo +no_x11 +quartz +universal
+  sudo port install pango +no_x11 +quartz +universal
+
+  Next gnuplot may be compiled with shipped with Mac OS X 10.6 SL wxWidgets using:
+  ./configure CPPFLAGS='-arch i386' LDFLAGS='-arch i386'
+
+  NOTE: 10.6 SL by default generates x86_64 code, but wxWidgets stable is using
+  Carbon API on Mac which is 32-bit only, that makes compiling gnuplot,
+  cairo and pango to i386 necessary.
 
 
 VMS
