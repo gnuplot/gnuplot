@@ -5,6 +5,8 @@
 	are valid in this case, as no string can be read from the binary 
 	datafield itself.
 
+	* term/svg.trm: Remove size limit on svg plot dimensionts.
+
 2011-07-14  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c (plot_boxes):  Correct positioning of bars in clustered

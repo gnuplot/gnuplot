@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: svg.trm,v 1.101.2.5 2011/03/21 18:52:39 sfeam Exp $
+ * $Id: svg.trm,v 1.101.2.6 2011/06/29 03:53:44 sfeam Exp $
  */
 
 /*------------------------------------------------------------------------------------------------------------------------------------
@@ -440,7 +440,7 @@ SVG_options ()
 	    if (END_OF_COMMAND)
 		int_error(c_token,"expecting x size");
 	    value = real_expression();
-	    if (value < 2 || value > 8192)
+	    if (value < 2)
 		int_error(c_token,"x size out of range");
 	    SVG_xSize = value * SVG_SCALE;
 
@@ -449,7 +449,7 @@ SVG_options ()
 	    if (END_OF_COMMAND)
 		int_error(c_token,"expecting y size");
 	    value = real_expression();
-	    if (value < 2 || value > 8192)
+	    if (value < 2)
 		int_error(c_token,"y size out of range");
 	    SVG_ySize = value * SVG_SCALE;
 	    continue;
