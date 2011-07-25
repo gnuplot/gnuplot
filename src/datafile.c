@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.172.2.13 2011/04/19 20:59:26 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.172.2.14 2011/05/30 23:53:29 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -4673,6 +4673,49 @@ df_readbinary(double v[], int max)
 
 	if (!line_okay)
 	    continue;
+
+	for (i=df_no_use_specs; i<df_no_use_specs+df_no_tic_specs; i++) {
+	    if (use_spec[i].expected_type >= CT_XTICLABEL
+	    &&  use_spec[i].at != NULL) {
+		struct value a;
+		int axis, axcol;
+		evaluate_inside_using = TRUE;
+		evaluate_at(use_spec[i].at, &a);
+		evaluate_inside_using = FALSE;
+		switch (use_spec[i].expected_type) {
+		    default:
+		    case CT_XTICLABEL:
+			axis = FIRST_X_AXIS;
+			axcol = 0;
+			break;
+		    case CT_X2TICLABEL:
+			axis = SECOND_X_AXIS;
+			axcol = 0;
+			break;
+		    case CT_YTICLABEL:
+			axis = FIRST_Y_AXIS;
+			axcol = 1;
+			break;
+		    case CT_Y2TICLABEL:
+			axis = SECOND_Y_AXIS;
+			axcol = 1;
+			break;
+		    case CT_ZTICLABEL:
+			axis = FIRST_Z_AXIS;
+			axcol = 2;
+			break;
+		    case CT_CBTICLABEL:
+			/* EAM FIXME - Which column to set for cbtic? */
+			axis = COLOR_AXIS;
+			axcol = 2;
+			break;
+		}
+		if (a.type == STRING) {
+		    add_tic_user(axis, a.v.string_val, v[axcol], -1);
+		    gpfree_string(&a);
+		}
+	    }
+	}
 
 	/* output == df_no_use_specs if using was specified -
 	 * actually, smaller of df_no_use_specs and max */

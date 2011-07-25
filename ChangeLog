@@ -1,3 +1,10 @@
+2011-07-25  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/datafile.c (df_readbinary): Allow "using ... xticlabels()" for
+	binary files as well as ascii files.  Only string-valued functions
+	are valid in this case, as no string can be read from the binary 
+	datafield itself.
+
 2011-07-14  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c (plot_boxes):  Correct positioning of bars in clustered
