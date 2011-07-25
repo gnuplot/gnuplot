@@ -1,3 +1,7 @@
+2011-07-25  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/svg.trm: Remove size limit on svg plot dimensionts.
+
 2011-07-24  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/wxterminal/wxt_gui.cpp: Fix MSWin breakage from yesterday's patch
