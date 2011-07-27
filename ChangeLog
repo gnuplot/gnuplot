@@ -1,11 +1,17 @@
+2011-07-27  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/svg.trm:  Handle multiple overprint characters, albeit not
+	the way people probably expect.
+	Bug #3371782
+
 2011-07-25  Ethan A Merritt  <merritt@u.washington.edu>
 
-	* term/svg.trm: Remove size limit on svg plot dimensionts.
+	* term/svg.trm: Remove size limit on svg plot dimensions.
 
 2011-07-24  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/wxterminal/wxt_gui.cpp: Fix MSWin breakage from yesterday's patch
-	due to conditional code block damage.  (Preliminary)
+	due to conditional code block damage.
 	Bug #3376861
 
 	* src/datafile.c (df_readbinary): Allow "using ... xticlabels()" for

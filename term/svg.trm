@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: svg.trm,v 1.119 2011/06/29 03:52:18 sfeam Exp $
+ * $Id: svg.trm,v 1.120 2011/07/25 23:21:29 sfeam Exp $
  */
 
 /*------------------------------------------------------------------------------------------------------------------------------------
@@ -1538,8 +1538,12 @@ ENHsvg_OPEN(
      */
     switch (overprint) {
     case 2:
+	/* FIXME: If there are multiple overprint characters, 
+         *        they all get piled on top of one another.
+	 */
+	ENHsvg_FLUSH();
 	fprintf(gpoutfile, "<tspan dx=\"-%.1fem\" dy=\"%.1fpt\">", 
-		0.25 * ENHsvg_charcount, ENHsvg_base-base);
+		0.5 * ENHsvg_charcount, ENHsvg_base-base);
 	ENHsvg_base = base;
 	ENHsvg_x_offset = 0.0;
 	enhanced_cur_text = enhanced_text;
