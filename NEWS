@@ -48,6 +48,7 @@ New features, changes and fixes since gnuplot version 4.4
 * CHANGE new Windows help file format (chm)
 * CHANGE copy graph to clipboard as enhanced metafile in windows terminal
 * CHANGE improved windows terminal driver
+* CHANGE hidden3d top/bottom surface colors taken from linetype, not line style
 
 
 New features, changes and fixes in gnuplot version 4.4.0

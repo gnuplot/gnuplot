@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.679 2011/07/12 19:30:34 juhaszp Exp $
+C RCS $Id: gnuplot.doc,v 1.680 2011/07/14 21:29:41 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -2230,7 +2230,7 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/userdefined.gif" alt="[use
 ?textcolor variable
 ?tc variable
  `lc variable` tells the program to use the value read from one column of the
- input data as a linestyle index, and use the color belonging to that linestyle.
+ input data as a linetype index, and use the color belonging to that linetype.
  This requires a corresponding additional column in the `using` specifier.
  Text colors can be set similarly using `tc variable`.
 
@@ -3645,7 +3645,7 @@ Ffigure_linespoints
  required if 3D plots.  See `style lines`.  Additional input columns may be used
  to provide information such as variable point size or line color.
 
- The `pointinterval` (short form `pi`) property of the line style can be used to
+ The `pointinterval` (short form `pi`) property of the linetype can be used to
  control whether or not every point in the plot is given a symbol.  For example,
  'with lp pi 3' will draw line segments through every data point, but will only
  place a symbol on every 3rd point.  A negative value for `pointinterval` will
@@ -8460,12 +8460,12 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/population.gif" alt="[popu
  will keep their previous values, so you can turn on/off hidden line removal
  via `set {no}hidden3d`, without modifying the set of options you chose.
 
- The first option, `offset`, influences the linestyle used for lines on the
- 'back' side.  Normally, they are drawn in a linestyle one index number higher
+ The first option, `offset`, influences the linetype used for lines on the
+ 'back' side.  Normally, they are drawn in a linetype one index number higher
  than the one used for the front, to make the two sides of the surface
- distinguishable.  You can specify a different line style offset to add
+ distinguishable.  You can specify a different linetype offset to add
  instead of the default 1, by `offset <offset>`.  Option `nooffset` stands for
- `offset 0`, making the two sides of the surface use the same linestyle.
+ `offset 0`, making the two sides of the surface use the same linetype.
 
  Next comes the option `trianglepattern <bitpattern>`.  <bitpattern> must be
  a number between 0 and 7, interpreted as a bit pattern.  Each bit determines
