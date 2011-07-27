@@ -1,3 +1,8 @@
+2011-07-27  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/graphics.c (plot_impulses): Skip UNDEFINED points.
+	Bug #3382469
+
 2011-07-28  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	*src/win/wgraph.c (GraphEnhancedOpen, GraphEnhancedFlush): Fix sign

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.372 2011/07/12 19:30:34 juhaszp Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.373 2011/07/14 20:24:16 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -2158,6 +2158,9 @@ plot_impulses(struct curve_points *plot, int yaxis_x, int xaxis_y)
     struct termentry *t = term;
 
     for (i = 0; i < plot->p_count; i++) {
+
+        if (plot->points[i].type == UNDEFINED)
+	    continue;
 
 	if (!polar && !inrange(plot->points[i].x, X_AXIS.min, X_AXIS.max))
 	    continue;
