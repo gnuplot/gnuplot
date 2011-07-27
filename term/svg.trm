@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: svg.trm,v 1.101.2.6 2011/06/29 03:53:44 sfeam Exp $
+ * $Id: svg.trm,v 1.101.2.7 2011/07/25 23:23:19 sfeam Exp $
  */
 
 /*------------------------------------------------------------------------------------------------------------------------------------
@@ -1238,6 +1238,7 @@ ENHsvg_OPEN(
      */
     switch (overprint) {
     case 2:
+	ENHsvg_FLUSH();
 #ifdef CODDLE_NONCOMPLIANT_VIEWERS
 	fprintf(gpoutfile, "<tspan dx=\"-%.1fpt\" dy=\"%.1fpt\">", 
 		0.3 * ENHsvg_charcount * 1.1*SVG_fontSizeCur, ENHsvg_base-base);
