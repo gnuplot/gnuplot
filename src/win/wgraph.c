@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.126 2011/05/15 09:21:04 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.127 2011/05/15 09:31:23 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - win/wgraph.c */
@@ -959,7 +959,7 @@ void WDPROC
 GraphEnhancedOpen(char *fontname, double fontsize, double base,
     BOOL widthflag, BOOL showflag, int overprint)
 {
-	static const int win_scale = -1; /* scaling of base offset */
+	const int win_scale = 1; /* scaling of base offset */
 	char *fontstring;
 
 	/* There are two special cases:
@@ -1021,7 +1021,7 @@ GraphEnhancedFlush(void)
 	/* print the string fragment, perhaps invisibly */
 	/* NB: base expresses offset from current y pos */
 	x = enhstate.x - enhstate.base * sin(angle);
-	y = enhstate.y + enhstate.base * cos(angle);
+	y = enhstate.y - enhstate.base * cos(angle);
 
 	/* calculate length of string first */
 	len = GraphGetTextLength(enhstate.lpgw, enhstate.hdc, enhanced_text);

@@ -1,3 +1,8 @@
+2011-07-28  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	*src/win/wgraph.c (GraphEnhancedOpen, GraphEnhancedFlush): Fix sign
+	error in placement of rotated enhanced text with sub-/superscripts.
+
 2011-07-27  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/svg.trm:  Handle multiple overprint characters, albeit not
