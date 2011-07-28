@@ -1,3 +1,9 @@
+2011-07-28  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/win/wgraph.c (WndGraphProc): Console gnuplot should leave
+	wgnuplot's text window settings alone.
+	Bug #3307884
+
 2011-07-27  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/svg.trm:  Handle multiple overprint characters, albeit not

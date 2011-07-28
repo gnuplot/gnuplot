@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.67.2.16 2011/01/22 16:44:50 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.67.2.17 2011/02/11 03:47:37 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - win/wgraph.c */
@@ -2494,9 +2494,11 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 					return 0;
 				case M_WRITEINI:
 					WriteGraphIni(lpgw);
+#ifndef WGP_CONSOLE
 					if (lpgw->lptw)
 						WriteTextIni(lpgw->lptw);
-					return 0;
+#endif
+						return 0;
 				case M_REBUILDTOOLS:
 					lpgw->resized = TRUE;
 					if (lpgw->color)
