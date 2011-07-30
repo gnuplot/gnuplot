@@ -1,3 +1,8 @@
+2011-07-30  Stefan Reiser <stefanreiser@users.sourceforge.net>
+
+	* src/win/wgraph.c (WriteGraphIni): Fix spelling of "Antialiasing"
+	field. Bug #3382732
+
 2011-07-27  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c (plot_impulses): Skip UNDEFINED points.
