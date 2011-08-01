@@ -1,4 +1,13 @@
-2011-07-30  Stefan Reiser <stefanreiser@users.sourceforge.net>
+2011-08-01  Micha Wiedenmann  <mw-u2@gmx.de>
+
+	* src/eval.h src/eval.c (get_udv_by_name free_at) src/show.c (disp_at) 
+	src/internal.h src/internal.c (f_sum) src/parse.c (parse_sum_expression)
+	docs/gnuplot.doc demo/bivariat.dem:
+
+	New expression type for summation:
+	    sum [<var> = <beg> : <end>] <something>
+
+2011-07-30  Stefan Reiser  <stefanreiser@users.sourceforge.net>
 
 	* src/win/wgraph.c (WriteGraphIni): Fix spelling of "Antialiasing"
 	field. Bug #3382732

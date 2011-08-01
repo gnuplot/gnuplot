@@ -1,5 +1,5 @@
 /*
- * $Id: eval.h,v 1.35 2011/04/16 11:15:55 markisch Exp $
+ * $Id: eval.h,v 1.36 2011/07/14 21:29:41 sfeam Exp $
  */
 
 /* GNUPLOT - eval.h */
@@ -53,7 +53,7 @@
 enum operators {
     /* keep this in line with table in eval.c */
     PUSH, PUSHC, PUSHD1, PUSHD2, PUSHD, POP,
-    CALL, CALLN, LNOT, BNOT, UMINUS,
+    CALL, CALLN, SUM, LNOT, BNOT, UMINUS,
     LOR, LAND, BOR, XOR, BAND, EQ, NE, GT, LT, GE, LE, PLUS, MINUS, MULT,
     DIV, MOD, POWER, FACTORIAL, BOOLE,
     DOLLARS, 
@@ -160,6 +160,7 @@ void execute_at __PROTO((struct at_type *at_ptr));
 void evaluate_at __PROTO((struct at_type *at_ptr, struct value *val_ptr));
 void free_at __PROTO((struct at_type *at_ptr));
 struct udvt_entry * add_udv_by_name __PROTO((char *key));
+struct udvt_entry * get_udv_by_name __PROTO((char *key));
 
 /* update GPVAL_ variables available to user */
 void update_gpval_variables __PROTO((int from_plot_command));

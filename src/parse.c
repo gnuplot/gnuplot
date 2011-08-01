@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: parse.c,v 1.62 2011/07/14 21:29:41 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: parse.c,v 1.63 2011/07/22 14:37:57 juhaszp Exp $"); }
 #endif
 
 /* GNUPLOT - parse.c */
@@ -89,6 +89,7 @@ static void parse_relational_expression __PROTO((void));
 static void parse_additive_expression __PROTO((void));
 static void parse_multiplicative_expression __PROTO((void));
 static void parse_unary_expression __PROTO((void));
+static void parse_sum_expression __PROTO((void));
 static int  parse_assignment_expression __PROTO((void));
 static int is_builtin_function __PROTO((int t_num));
 
@@ -190,7 +191,8 @@ string_or_express(struct at_type **atptr)
     has_dummies = FALSE;
     for (i = 0; i < at->a_count; i++) {
 	enum operators op_index = at->actions[i].index;
-	if ( op_index == PUSHD1 || op_index == PUSHD2 || op_index == PUSHD ) {
+	if ( op_index == PUSHD1 || op_index == PUSHD2 || op_index == PUSHD
+                || op_index == SUM ) {
 	    has_dummies = TRUE;
 	    break;
 	}
@@ -527,7 +529,9 @@ parse_primary_expression()
 		c_token++;
 		add_action(call_type)->udf_arg = add_udf(tok);
 	    }
-	    /* dummy_func==NULL is a flag to say no dummy variables active */
+	} else if (equals(c_token, "sum") && equals(c_token+1, "[")) {
+            parse_sum_expression();
+	/* dummy_func==NULL is a flag to say no dummy variables active */
 	} else if (dummy_func) {
 	    if (equals(c_token, c_dummy_var[0])) {
 		c_token++;
@@ -871,6 +875,95 @@ parse_unary_expression()
     } else
 	parse_primary_expression();
 }
+
+
+/* create action code for 'sum' expressions */
+static void
+parse_sum_expression()
+{
+    /* sum [<var>=<range>] <expr>
+     * - Pass a udf to f_sum (with action code (for <expr>) that is not added
+     *   to the global action table).
+     * - f_sum uses a newly created udv (<var>) to pass the current value of
+     *   <var> to <expr> (resp. its ac).
+     * - The original idea was to treat <expr> as function f(<var>), but there
+     *   was the following problem: Consider 'g(x) = sum [k=1:4] f(k)'. There
+     *   are two dummy variables 'x' and 'k' from different functions 'g' and
+     *   'f' which would require changing the parsing of dummy variables.
+     */
+
+    char *errormsg = "Expecting 'sum [<var> = <start>:<end>] <expression>'\n";
+    char *varname = NULL;
+    union argument *arg;
+    struct udft_entry *udf;
+
+    struct at_type * save_at;
+    int save_at_size;
+    int i;
+    
+    /* Caller already checked for string "sum [" so skip both tokens */
+    c_token += 2;
+
+    /* <var> */
+    if (!isletter(c_token))
+        int_error(c_token, errormsg);
+    /* create a user defined variable and pass it to f_sum via PUSHC, since the
+     * argument of f_sum is already used by the udf */
+    m_capture(&varname, c_token, c_token);
+    add_udv(c_token);
+    arg = add_action(PUSHC);
+    Gstring(&(arg->v_arg), varname);
+    c_token++;
+
+    if (!equals(c_token, "="))
+        int_error(c_token, errormsg);
+    c_token++;
+
+    /* <start> */
+    parse_expression();
+
+    if (!equals(c_token, ":"))
+        int_error(c_token, errormsg);
+    c_token++;
+
+    /* <end> */
+    parse_expression();
+
+    if (!equals(c_token, "]"))
+        int_error(c_token, errormsg);
+    c_token++;
+
+    /* parse <expr> and convert it to a new action table. */
+    /* modeled on code from temp_at(). */
+    /* 1. save environment to restart parsing */
+    save_at = at;
+    save_at_size = at_size;
+
+    at = (struct at_type *) gp_alloc(sizeof(struct at_type), "action table");
+    at->a_count = 0;
+    memset(at, 0, sizeof(*at));
+    at_size = MAX_AT_LEN;
+
+    parse_expression();
+
+    /* 2. save action table in a user defined function */
+    udf = (struct udft_entry *) gp_alloc(sizeof(struct udft_entry), "sum");
+    udf->next_udf = (struct udft_entry *) NULL;
+    udf->udf_name = NULL; /* TODO maybe add a name and definition */ 
+    udf->at = at;
+    udf->definition = NULL;
+    udf->dummy_num = 0;
+    for (i = 0; i < MAX_NUM_VAR; i++)
+        (void) Ginteger(&(udf->dummy_values[i]), 0);
+
+    /* 3. restore environment */
+    at = save_at;
+    at_size = save_at_size;
+
+    /* pass the udf to f_sum using the argument */
+    add_action(SUM)->udf_arg = udf;
+}
+
 
 /* find or add value and return pointer */
 struct udvt_entry *

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.251 2011/06/01 03:44:36 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.252 2011/07/12 19:30:34 juhaszp Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -716,6 +716,7 @@ disp_at(struct at_type *curr_at, int level)
 		(void) putc('\n', stderr);
 	    break;
 	case CALLN:
+	case SUM:
 	    fprintf(stderr, " %s", arg->udf_arg->udf_name);
 	    if (level < 6) {
 		if (arg->udf_arg->at) {

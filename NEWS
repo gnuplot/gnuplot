@@ -6,6 +6,7 @@ New features, changes and fixes since gnuplot version 4.4
     if (<cond>) { ... } else { ... }
     do for [...] { ... }
     while (<cond>) { ... }
+* NEW summation expression:   sum [<var> = <beg> : <end>] <something>
 * NEW nested iteration e.g. "plot for [i=1:5] for [j=1:5]"
 * NEW explicit justification for tic labels, e.g. "set xtics right"
 * NEW time formats can handle fractional seconds (microsecond precision)

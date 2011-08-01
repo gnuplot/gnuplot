@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: internal.c,v 1.62 2011/02/17 19:59:01 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: internal.c,v 1.63 2011/05/14 19:53:36 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - internal.c */
@@ -202,6 +202,54 @@ f_calln(union argument *x)
 	gpfree_string(&udf->dummy_values[i]);
 	udf->dummy_values[i] = save_dummy[i];
     }
+}
+
+
+void
+f_sum(union argument *arg)
+{
+    struct value beg, end, varname; /* [<var> = <start>:<end>] */
+    udft_entry *udf;                /* function to evaluate */
+    udvt_entry *udv;                /* iteration variable */
+    struct value ret;               /* result */
+    struct value z;
+    int i;
+
+    (void) pop(&end);
+    (void) pop(&beg);
+    (void) pop(&varname);
+
+    if (beg.type != INTGR || end.type != INTGR)
+        int_error(NO_CARET, "range specifiers of sum must have integer values");
+    if (varname.type != STRING)
+        int_error(NO_CARET, "internal error: f_sum expects argument (varname) of type string.");
+
+    udv = get_udv_by_name(varname.v.string_val);
+    if (!udv)
+        int_error(NO_CARET, "internal error: f_sum could not access iteration variable.");
+    udv->udv_undef = false;
+
+    udf = arg->udf_arg;
+    if (!udf)
+        int_error(NO_CARET, "internal error: f_sum could not access summation coefficient function");
+
+    Gcomplex(&ret, 0, 0);
+    for (i=beg.v.int_val; i<=end.v.int_val; ++i) {
+        double x, y;
+
+        /* calculate f_i = f() with user defined variable i */
+        Ginteger(&udv->udv_value, i);
+        execute_at(udf->at);
+
+        pop(&z);
+        x = real(&ret) + real(&z);
+        y = imag(&ret) + imag(&z);
+        Gcomplex(&ret, x, y);
+    }
+
+    gpfree_string(&varname);
+
+    push(Gcomplex(&z, real(&ret), imag(&ret)));
 }
 
 

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: eval.c,v 1.91 2011/04/19 20:22:25 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: eval.c,v 1.92 2011/07/14 21:29:41 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - eval.c */
@@ -89,6 +89,7 @@ const struct ft_entry GPFAR ft[] =
     {"pop",  f_pop},
     {"call",  f_call},
     {"calln",  f_calln},
+    {"sum", f_sum}, 
     {"lnot",  f_lnot},
     {"bnot",  f_bnot},
     {"uminus",  f_uminus},
@@ -641,6 +642,11 @@ free_at(struct at_type *at_ptr)
 	/* if union a->arg is used as a->arg.v_arg free potential string */
 	if ( a->index == PUSHC || a->index == DOLLARS )
 	    gpfree_string(&(a->arg.v_arg));
+	/* a summation contains its own action table wrapped in a private udf */
+	if (a->index == SUM) {
+	    free_at(a->arg.udf_arg->at);
+	    free(a->arg.udf_arg);
+	}
     }
     free(at_ptr);
 }
@@ -670,6 +676,20 @@ add_udv_by_name(char *key)
     return (*udv_ptr);
 }
 
+struct udvt_entry *
+get_udv_by_name(char *key)
+{
+    struct udvt_entry *udv = first_udv;
+
+    while (udv) {
+        if (!strcmp(key, udv->udv_name))
+            return udv;
+
+        udv = udv->next_udv;
+    }
+
+    return NULL;
+}
 
 static void update_plot_bounds __PROTO((void));
 static void fill_gpval_axis __PROTO((AXIS_INDEX axis));

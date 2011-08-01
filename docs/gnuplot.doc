@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.680 2011/07/14 21:29:41 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.681 2011/07/27 20:22:58 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -1886,7 +1886,26 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/ternary.gif" alt="[ternary
        plot 'file' using 1:( $4<0 ? 1/0 : ($2+$3)/2 )
 
  For an explanation of the `using` syntax, please see `plot datafile using`.
-
+3 Summation
+?expressions operators summation
+?operators summation
+?summation
+ A summation expression has the form
+       sum [<var> = <start> : <end>] <expression>
+ <var> is treated as an integer variable that takes on successive integral
+ values from <start> to <end>.  For each of these, the current value of
+ <expression> is evaluated and added to a running total whose final value
+ becomes the value of the summation expression.
+ Examples:
+       print sum [i=1:10] i
+           55.
+       # Equivalent to plot 'data' using 1:($2+$3+$4+$5+$6+...)
+       plot 'data' using 1 : (sum [col=2:MAXCOL] column(col))
+ It is not necessary that <expression> contain the variable <var>.
+ Although <start> and <end> can be specified as variables or expressions,
+ their value cannot be changed dynamically as a side-effect of carrying
+ out the summation. If <end> is less than <start> then the value of the
+ summation is zero.
 3 Gnuplot-defined variables
 ?gnuplot-defined variables
  Gnuplot maintains a number of read-only variables that reflect the current

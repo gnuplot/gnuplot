@@ -1,5 +1,5 @@
 #
-# $Id: bivariat.dem,v 1.6 2005/07/29 07:54:32 mikulik Exp $
+# $Id: bivariat.dem,v 1.8 2006/07/06 21:52:19 sfeam Exp $
 #
 # This demo is very slow and requires unusually large stack size.
 # Do not attempt to run this demo under MSDOS.
@@ -113,6 +113,28 @@ set key default
 set title "Greatest Common Divisor (for integers only)"
 
 plot gcd(x, 60) with impulses
+pause -1 "Hit return to continue"
+
+#
+# This definition computes the sum of the first 10, 100, 1000 fourier
+# coefficients of a (particular) square wave.
+
+set title "Finite summation of 10, 100, 1000 fourier coefficients"
+
+set samples 500
+set xrange [-10:10]
+set yrange [-0.4:1.2]
+set key bottom right
+
+fourier(k, x) = sin(3./2*k)/k * 2./3*cos(k*x)
+sum10(x)   = 1./2 + sum [k=1:10]   fourier(k, x)
+sum100(x)  = 1./2 + sum [k=1:100]  fourier(k, x)
+sum1000(x) = 1./2 + sum [k=1:1000] fourier(k, x)
+
+plot \
+    sum10(x)   title "1./2 + sum [k=1:10]   sin(3./2*k)/k * 2./3*cos(k*x)", \
+    sum100(x)  title "1./2 + sum [k=1:100]  sin(3./2*k)/k * 2./3*cos(k*x)", \
+    sum1000(x) title "1./2 + sum [k=1:1000] sin(3./2*k)/k * 2./3*cos(k*x)"
 pause -1 "Hit return to continue"
 
 reset
