@@ -2,8 +2,10 @@
 
 	* docs/plotstyles.gnu docs/gnuplot.doc term/be.trm term/canvas.trm
 	term/cgm.trm term/ai.trm term/aquaterm.trm term/cgi.trm:
-
 	Documentation updates
+
+	* src/wxterminal/wxt_gui.cpp (OnCreateWindow):  It is not acceptable
+	to force every new plot window to occlude the center of the screen.
 
 2011-08-01  Micha Wiedenmann  <mw-u2@gmx.de>
 
