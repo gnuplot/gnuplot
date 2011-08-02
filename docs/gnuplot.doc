@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.682 2011/08/01 05:14:23 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.683 2011/08/02 20:40:30 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -4746,6 +4746,7 @@ Ffigure_mapcontours
  See `reread` for an example of using if and reread together to perform a loop.
 2 iteration
 ?iteration
+?iterate
  The `plot`, `splot`, `set` and `unset` commands may optionally contain an
  iteration clause.  This has the effect of executing the basic command 
  multiple times, each time re-evaluating any expressions that make use of the
@@ -9221,8 +9222,11 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/population.gif" alt="[popu
 ?set margin
 ?show margin
 ?margin
- The computed margins can be overridden by the `set margin` commands.  `show
- margin` shows the current settings.
+ The `margin` is the distance between the plot border and the outer edge of the
+ canvas. The size of the margin is chosen automatically, but can be overridden
+ by the `set margin` commands.  `show margin` shows the current settings.
+ To alter the distance between the inside of the plot border and the data in the
+ plot itself, see `set offsets`.
 
  Syntax:
        set bmargin {{at screen} <margin>}
