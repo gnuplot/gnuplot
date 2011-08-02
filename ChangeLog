@@ -1,3 +1,11 @@
+2011-08-02  Adam Strzelecki <ono@users.sourceforge.net>
+
+	* src/wxterminal/wxt_gui.cpp src/wxterminal/wxt_gui.h m4/apple.m4:
+	OSX support for wxt terminal.  For OSX, switch to using single-threaded
+	hybrid GUI & console event loop at wxt_waitforinput().
+	Add -framework ApplicationServices to the apple-specific
+	configuration flags.
+
 2011-07-28  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/win/wgraph.c (WndGraphProc): Console gnuplot should leave

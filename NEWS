@@ -7,6 +7,7 @@ New features, changes and fixes in gnuplot version 4.4.4
 * CHANGE columnhead(N) is a string-valued function, not a keyword
 * CHANGE Demarcate plots in svg output using <g id="Plot_#"><title>...
 * CHANGE xticlabels() works for binary data files as well as ascii
+* FIX wxt terminal should now work on at least some flavors of OSX
 * FIX incorrect space allowed for outside left key box
 * FIX buffer overflow from enhanced text timefmt tic labels
 * FIX correction for offset in epochs when reading in time format "%s"

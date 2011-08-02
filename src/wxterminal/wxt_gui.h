@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.h,v 1.32 2009/03/26 00:49:18 sfeam Exp $
+ * $Id: wxt_gui.h,v 1.32.2.1 2011/01/18 21:46:15 sfeam Exp $
  */
 
 /* GNUPLOT - wxt_gui.h */
@@ -148,9 +148,9 @@ extern "C" {
 
 /* depending on the platform, and mostly because of the Windows terminal which
  * already has its event loop, we may or may not be multithreaded */
-#if defined(__WXGTK__) || defined(__WXMAC__)
+#if defined(__WXGTK__)
 # define WXT_MULTITHREADED
-#elif defined(__WXMSW__)
+#elif defined(__WXMSW__) || defined(__WXMAC__)
 # define WXT_MONOTHREADED
 #else
 # error "wxt does not know if this platform has to be mono- or multi-threaded"
@@ -310,6 +310,7 @@ public :
 	/* event handlers (these functions should _not_ be virtual)*/
 	void OnPaint( wxPaintEvent &event );
 	void OnEraseBackground( wxEraseEvent &event );
+	void OnMouseLeave( wxMouseEvent &event );
 	void OnSize( wxSizeEvent& event );
 	void OnMotion( wxMouseEvent& event );
 	void OnLeftDown( wxMouseEvent& event );
@@ -442,7 +443,7 @@ class wxtFrame : public wxFrame
 {
 public:
 	/* constructor*/
-	wxtFrame( const wxString& title, wxWindowID id, int xpos, int ypos, int width, int height );
+	wxtFrame( const wxString& title, wxWindowID id );
 
 	/* event handlers (these functions should _not_ be virtual)*/
 	void OnClose( wxCloseEvent& event );
