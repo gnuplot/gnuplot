@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: be.trm,v 1.17 2006/07/07 03:51:21 sfeam Exp $
+ * $Id: be.trm,v 1.18 2006/07/21 02:35:45 sfeam Exp $
  *
  */
 
@@ -398,10 +398,11 @@ START_HELP(be)
 "?term be",
 "?be",
 "?BE",
-" `gnuplot` provides the `be` terminal type for use with X servers.  This",
-" terminal type is set automatically at startup if the `DISPLAY` environment",
-" variable is set, if the `TERM` environment variable is set to `xterm`, or",
-" if the `-display` command line option is used.",
+" The `be` terminal type is present if gnuplot is built for the `beos`",
+" operating system. for use with X servers.  It is selected at program",
+" startup if the `DISPLAY` environment variable is set, if the `TERM`",
+" environment variable is set to `xterm`, or if the `-display` command",
+" line option is used.",
 "",
 " Syntax:",
 "           set terminal be {reset} {<n>}",

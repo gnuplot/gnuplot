@@ -388,6 +388,26 @@ GPFUN_butterfly = "butterfly(x)=exp(cos(x))-2*cos(4*x)+sin(x/12)**5"
 plot 3.+sin(t)*cos(5*t) with filledcurve above r=2.5 notitle, \
      3.+sin(t)*cos(5*t) with line
 
+reset
+#
+# New syntax features
+#
+set output out . 'figure_newsyntax' . ext
+
+unset xtics
+unset ytics
+unset border
+set yrange [-0.3:1.3]
+set multiplot layout 2,2
+fourier(k, x) = sin(3./2*k)/k * 2./3*cos(k*x)
+do for [power = 0:3] {
+    TERMS = 10**power
+    set xlabel sprintf("%g term Fourier series",TERMS)
+    plot 0.5 + sum [k=1:TERMS] fourier(k,x) notitle 
+}
+unset multiplot
+
+
 # close last file
 unset outp
 

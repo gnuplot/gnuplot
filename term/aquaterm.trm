@@ -1,5 +1,5 @@
 /* -*- objc -*-
- * $Id: aquaterm.trm,v 1.41 2009/07/03 05:33:00 sfeam Exp $
+ * $Id: aquaterm.trm,v 1.42 2009/07/04 20:14:36 broeker Exp $
  *
  */
 
@@ -922,14 +922,13 @@ START_HELP(aqua)
 " <wintitle> is the name shown in the title bar (default \"Figure <n>\"),",
 " <x> <y> is the size of the plot (default is 846x594 pt = 11.75x8.25 in).",
 "",
-" Use <fontname> to specify the font to use (default is \"Times-Roman\"),",
-" and <fontsize> to specify the font size (default is 14.0 pt). The old syntax",
-" {fname \"<fontname>\"} {fsize <fontsize>} is still supported.",
+" Use <fontname> to specify the font (default is \"Times-Roman\"),",
+" and <fontsize> to specify the font size (default is 14.0 pt).",
 "",
 " The aqua terminal supports enhanced text mode (see `enhanced`), except for",
 " overprint. Font support is limited to the fonts available on the system.",
 " Character encoding can be selected by `set encoding` and currently supports",
-" iso_latin_1, iso_latin_2, cp1250, and default which equals UTF8.",
+" iso_latin_1, iso_latin_2, cp1250, and UTF8 (default).",
 "",
 " Lines can be drawn either solid or dashed, (default is solid) and the dash",
 " spacing can be modified by <dashlength> which is a multiplier > 0.",

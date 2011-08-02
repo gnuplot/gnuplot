@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.681 2011/07/27 20:22:58 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.682 2011/08/01 05:14:23 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -94,8 +94,8 @@ C
  (with mouse and hotkey input), direct output to pen plotters or modern
  printers, and output to many file formats (eps, emf, fig, jpeg, LaTeX, pdf, png,
  postscript, ...). Gnuplot is easily extensible to include new output modes.
- Recent additions include interactive terminals based on aquaterm (OSX),
- wxWidgets (multiple platforms), and Qt.  Mouseable plots embedded in web pages
+ Recent additions include interactive terminals based on wxWidgets (usable
+ on multiple platforms), and Qt.  Mouseable plots embedded in web pages
  can be generated using the svg or HTML5 canvas terminal drivers.
 
  The command language of `gnuplot` is case sensitive, i.e. commands and
@@ -195,63 +195,63 @@ C
  The list of those interested in development version of gnuplot is:
            gnuplot-beta@lists.sourceforge.net
 
- When posting a question, please include full details of the version of
- `gnuplot`, the machine, and operating system you are using.  A _small_ script
+ When posting a question, please include full details of the gnuplot version,
+ the terminal type, and the operating system you are using.  A _small_ script
  demonstrating the problem may be useful.  Function plots are preferable to
- datafile plots.  If email-ing to gnuplot-info, please state whether or not
- you are subscribed to the list, so that users who use news will know to email
- a reply to you.  There is a form for such postings on the website.
+ datafile plots.
 
-2 New features introduced in version 4.5
+2 New features
 ?new-features
- Gnuplot version 4.5 offers many new features introduced since the preceding
- official version 4.4. This section lists major additions and gives a partial
- list of changes and minor new features. For a more exhaustive list, see the
- NEWS file.
+ This section lists major additions since version 4.4.
+ For a more exhaustive list, see the NEWS file.
 
-3 Canvas size
-?canvas size
-?canvas
-?set term size
+3 New syntax
+Ffigure_newsyntax
+ This version of gnuplot introduces command iteration and block-structured
+ if/else/while/do constructs.  See `if`, `while`, and `do`.
+ Simple iteration is possible inside `plot` or `set` commands.
+ See `iteration`.  General iteration spanning multiple
+ commands is possible using a block construct as shown below.
+ For a related new feature, see the `summation` expression type.
+ Here is an example using several of these new syntax features:
+       set multiplot layout 2,2
+       fourier(k, x) = sin(3./2*k)/k * 2./3*cos(k*x)
+       do for [power = 0:3] {
+           TERMS = 10**power
+           set title sprintf("%g term Fourier series",TERMS)
+           plot 0.5 + sum [k=1:TERMS] fourier(k,x) notitle 
+       }
+       unset multiplot
+ 
+ It is now possible to select a column of data from a data file by
+ matching a label in the first row of the file. See `columnhead`.
+ For example
+       plot for [crop in "Oats Peas Beans"] 'data' using "Year":crop
 
- In earlier versions of gnuplot, some terminal types used the values from
- `set size` to control also the size of the output canvas; others did not.
- The use of 'set size' for this purpose was deprecated in version 4.2.
- In version 4.4 almost all terminals now behave as follows:
+3 User preferences for linetypes
+ You can now customize properties (color, linewidth, point type) of the
+ default sequence of linetypes used in plotting. See `set linetype`.
 
- `set term <terminal_type> size <XX>, <YY>` controls the size of the output
- file, or "canvas". Please see individual terminal documentation for allowed
- values of the size parameters.  By default, the plot will fill this canvas.
+3 New plot styles
+ See documentation for plot styles `boxplot`, `circles`, `ellipses`, and
+ `fillsteps`.
 
- `set size <XX>, <YY>` scales the plot itself relative to the size of the
- canvas.  Scale values less than 1 will cause the plot to not fill the entire
- canvas.  Scale values larger than 1 will cause only a portion of the plot to
- fit on the canvas.  Please be aware that setting scale values larger than 1
- may cause problems on some terminal types.
-
- The major exception to this convention is the PostScript driver, which
- by default continues to act as it has in earlier versions. Be warned that
- the next version of gnuplot may change the default behaviour of the
- PostScript driver as well.
-
- Example:
-
-       set size 0.5, 0.5
-       set term png size 600, 400
-       set output "figure.png"
-       plot "data" with lines
-
- These commands will produce an output file "figure.png" that is 600 pixels
- wide and 400 pixels tall. The plot will fill the lower left quarter of this
- canvas.  This is consistent with the way multiplot mode has always worked,
- however it is a change in the way the png driver worked for single plots in
- version 4.0.
+3 Revised polar axes
+ Polar plot mode has been reworked to support additional plot styles.
+ The polar axes can now be drawn and labeled independent of the x and y
+ axes. See `set polar` and `set rrange`.
 
 3 New or revised terminal drivers
- Two new drivers based on the cairo and pango libraries are included,
- `pngcairo` and `pdfcairo`.  These are alternatives to the older libgd-based
- png driver and the older PDFLib-based pdf driver.  The figures in the pdf
- version of this manual were prepared using the pdfcairo terminal driver.
+ The `qt` driver implements an interactive terminal on top of the Qt
+ graphics layer.  It can function either as a window in a full-featured
+ desktop enviroment or as a full-screen application on a Qt-based 
+ embedded device.  The `qt` terminal is new and may still have some
+ rough edges.
+
+ Two terminal types support web-based interactive display. The HTML5 `canvas`
+ terminal was introduced in version 4.4. The `svg` terminal has been extensively
+ revised to include support for mousing and better incorporation of svg plots
+ from gnuplot into larger svg/xml documents.
 
  The `canvas` terminal driver produces javascript output that draws onto the
  HTML canvas element of a web page.  It can produce either a complete web page
@@ -352,6 +352,41 @@ C
  To set user-defined variables a and s prior to executing commands from a file:
        gnuplot -e "a=2; s='file.png'" input.gpl
 
+2 Canvas size
+?canvas size
+?canvas
+?set term size
+
+ In earlier versions of gnuplot, some terminal types used the values from
+ `set size` to control also the size of the output canvas; others did not.
+ The use of 'set size' for this purpose was deprecated in version 4.2.
+ Since version 4.4 almost all terminals now behave as follows:
+
+ `set term <terminal_type> size <XX>, <YY>` controls the size of the output
+ file, or "canvas". Please see individual terminal documentation for allowed
+ values of the size parameters.  By default, the plot will fill this canvas.
+
+ `set size <XX>, <YY>` scales the plot itself relative to the size of the
+ canvas.  Scale values less than 1 will cause the plot to not fill the entire
+ canvas.  Scale values larger than 1 will cause only a portion of the plot to
+ fit on the canvas.  Please be aware that setting scale values larger than 1
+ may cause problems on some terminal types.
+
+ The major exception to this convention is the PostScript driver, which
+ by default continues to act as it has in earlier versions. Be warned that
+ the next version of gnuplot may change the default behaviour of the
+ PostScript driver as well.
+
+ Example:
+
+       set size 0.5, 0.5
+       set term png size 600, 400
+       set output "figure.png"
+       plot "data" with lines
+
+ These commands will produce an output file "figure.png" that is 600 pixels
+ wide and 400 pixels tall. The plot will fill the lower left quarter of this
+ canvas.  This is consistent with the way multiplot mode has always worked.
 
 2 Command-line-editing
 ?line-editing
@@ -1894,8 +1929,8 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/ternary.gif" alt="[ternary
        sum [<var> = <start> : <end>] <expression>
  <var> is treated as an integer variable that takes on successive integral
  values from <start> to <end>.  For each of these, the current value of
- <expression> is evaluated and added to a running total whose final value
- becomes the value of the summation expression.
+ <expression> is added to a running total whose final value becomes the value
+ of the summation expression.
  Examples:
        print sum [i=1:10] i
            55.
@@ -4382,16 +4417,15 @@ Ffigure_mapcontours
  generally over-optimistic and should not be used for determining confidence
  levels, but are useful for qualitative purposes.
 
- The final solution also produces a correlation matrix, which gives an
- indication of the correlation of parameters in the region of the solution;
- if one parameter is changed, increasing chisquare, does changing another
- compensate?  The main diagonal elements, autocorrelation, are all 1; if
- all parameters were independent, all other elements would be nearly 0.  Two
- variables which completely compensate each other would have an off-diagonal
- element of unit magnitude, with a sign depending on whether the relation is
- proportional or inversely proportional.  The smaller the magnitudes of the
- off-diagonal elements, the closer the estimates of the standard deviation
- of each parameter would be to the asymptotic standard error.
+ The final solution also produces a correlation matrix indicating correlation of
+ parameters in the region of the solution; The main diagonal elements,
+ autocorrelation, are always 1; if all parameters were independent, the
+ off-diagonal elements would be nearly 0.  Two variables which completely
+ compensate each other would have an off-diagonal element of unit magnitude,
+ with a sign depending on whether the relation is proportional or inversely
+ proportional.  The smaller the magnitudes of the off-diagonal elements, the
+ closer the estimates of the standard deviation of each parameter would be to
+ the asymptotic standard error.
 4 practical guidelines
 ?commands fit error practical_guidelines
 ?fit error practical_guidelines
@@ -5300,7 +5334,7 @@ Ffigure_mapcontours
 
  To avoid this, you can use the `fixmin`/`fixmax` feature of the
  `set autoscale` command, which turns off the automatic extension of the
- axis range upto the next tic mark.
+ axis range up to the next tic mark.
 
  Label coordinates and text can also be read from a data file (see `labels`).
 
@@ -5984,9 +6018,9 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/population.gif" alt="[popu
 4 volatile
 ?datafile volatile
 ?plot datafile volatile
- The `volatile` keyword indicates that the contents of the data file may be
- different if the file is re-read.  This tells the program to use `refresh`
- rather than `replot` commands whenever possible.  See `refresh`.
+ The `volatile` keyword indicates that the data previously read from the input
+ stream or file may not be available for re-reading.  This tells the program to
+ use `refresh` rather than `replot` commands whenever possible.  See `refresh`.
 3 errorbars
 ?commands plot errorbars
 ?commands splot errorbars
@@ -6464,7 +6498,7 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/population.gif" alt="[popu
 
  Note that if you wish to store the current directory into a string variable
  or use it in string expressions, then you can use variable GPVAL_PWD, see
- `show variables all`. This overcomes shell call by means of "`pwd`". 
+ `show variables all`.
 2 quit
 ?commands quit
 ?quit
@@ -7761,8 +7795,8 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/population.gif" alt="[popu
  is equally spaced in x (rows) and in y (columns); the z values are computed
  as weighted averages or spline interpolations of the scattered points' z 
  values. In other words, a regularly spaced grid is created and the a smooth
- approximation to the raw data is evaluated for all grid points. Only this
- approximation is plotted, but not the raw data.
+ approximation to the raw data is evaluated for all grid points. This
+ approximation is plotted in place of the raw data.
 
  The number of columns defaults to the number of rows, which defaults to 10.
 
@@ -7772,7 +7806,7 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/population.gif" alt="[popu
  the more effect it has on that grid point.
 
  The `splines` algorithm calculates an interpolation based on "thin plate
- splines". It does not take additional paramaters.
+ splines". It does not take additional parameters.
 
  The `qnorm` algorithm calculates a weighted average of the input data at
  each grid point. Each data point is weighted inversely by its distance from
@@ -7825,7 +7859,7 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/population.gif" alt="[popu
  A slightly different syntax is also supported for reasons of backwards
  compatibility. If no interpolation algorithm has been explicitly selected,
  the `qnorm` algorithm is assumed. Up to three comma-separated, optional
- paramaters can be specified, which are interpreted as the the number of
+ parameters can be specified, which are interpreted as the the number of
  rows, the number of columns, and the norm value, respectively.
 
  The `dgrid3d` option is a simple scheme which replaces scattered data
@@ -7993,13 +8027,12 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/population.gif" alt="[popu
  off, then. You can find out which is the default fontpath by using
  `show fontpath`.
 
- However, `show fontpath` prints the contents of user defined fontpath and
- system fontpath separately.  Also, the `save` and `save set` commands save
- only the user specified parts of `fontpath`, for portability reasons.
+ `show fontpath` prints the contents of the user-defined fontpath and the
+ system fontpath separately.  However, the `save` and `save set` commands
+ save only the user-specified parts of `fontpath`.
 
- Many other terminal drivers access TrueType fonts via the gd library.
- For these drivers the font search path is controlled by the environmental
- variable GDFONTPATH.
+ For terminal drivers that access fonts by filename via the gd library, the
+ font search path is controlled by the environmental variable GDFONTPATH.
 3 format
 ?commands set format
 ?commands show format
@@ -10694,10 +10727,6 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/population.gif" alt="[popu
  To make the graph twice as high as wide use:
        set size ratio 2
 
- See also
-^ <a href="http://www.gnuplot.info/demo/airfoil.html">
- airfoil demo.
-^ </a>
 3 style
 ?set style
 ?show style
@@ -12049,7 +12078,7 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/population.gif" alt="[popu
  To autoscale xmin but keeping xmin positive:
        set xrange [0<*:]
 
- To autoscale x but keep minumum range of 10 to 50 (actual might be larger):
+ To autoscale x but keep minimum range of 10 to 50 (actual might be larger):
        set xrange [*<10:50<*]
 
  Autoscaling but limit maximum xrange to -1000 to 1000, i.e. autoscaling
@@ -12258,7 +12287,7 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/population.gif" alt="[popu
  total y range, and only the axis tics in this region are generated.
  I.e., the plot will be scaled to the full range on y, but there will be a gap
  between 0 and 2 on the left border and another gap between 4 and 10. This
- style is sometimes refered to as a `range-frame` graph.
+ style is sometimes referred to as a `range-frame` graph.
        set border 3
        set yrange [0:10]
        set ytics nomirror rangelimited
@@ -13087,6 +13116,10 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/splot.gif" alt="[splot.gif
 
  The 'nohidden3d' option that is supposed to exempt individual plots from the
  global property 'set hidden3d' does not work for parametric curves.
+
+ The program does not track the true aspect ratio of the x11 terminal window.
+ In order for commands such as "set size ratio" to work, the x11 window must
+ itself have equal height and width.
 
 2 External libraries
 ?bugs external_libraries

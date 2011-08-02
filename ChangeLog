@@ -1,3 +1,10 @@
+2011-08-02  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* docs/plotstyles.gnu docs/gnuplot.doc term/be.trm term/canvas.trm
+	term/cgm.trm term/ai.trm term/aquaterm.trm term/cgi.trm:
+
+	Documentation updates
+
 2011-08-01  Micha Wiedenmann  <mw-u2@gmx.de>
 
 	* src/eval.h src/eval.c (get_udv_by_name free_at) src/show.c (disp_at) 

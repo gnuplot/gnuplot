@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: ai.trm,v 1.20 2006/07/21 02:35:45 sfeam Exp $
+ * $Id: ai.trm,v 1.21 2006/07/29 22:35:43 tlecomte Exp $
  *
  */
 
@@ -536,28 +536,12 @@ START_HELP(aifm)
 "?term aifm",
 "?aifm",
 "",
-" NOTE: this terminal driver is outdated. Since Adobe Illustrator understands",
-" PostScript level 1 directly, you should use `set terminal post level1`",
-" instead.",
-"",
-" Several options may be set in `aifm`---the Adobe Illustrator 3.0+ driver.",
+" `NOTE: Outdated terminal`, originally written for Adobe Illustrator 3.0+.",
+" Since Adobe Illustrator understands PostScript level 1 commands directly,",
+" you should use `set terminal post level1` instead.",
 "",
 " Syntax:",
-"       set terminal aifm {<color>} {\"<fontname>\"} {<fontsize>}",
-"",
-" <color> is either `color` or `monochrome`; \"<fontname>\" is the name of a",
-" valid PostScript font; <fontsize> is the size of the font in PostScript",
-" points, before scaling by the `set size` command.  Selecting `default` sets",
-" all options to their default values: `monochrome`, \"Times-Roman\", and 14pt.",
-"",
-" Since AI does not really support multiple pages, multiple graphs will be",
-" drawn directly on top of one another.  However, each graph will be grouped",
-" individually, making it easy to separate them inside AI (just pick them up",
-" and move them).",
-"",
-" Examples:",
-"       set term aifm",
-"       set term aifm 22",
-"       set size 0.7,1.4; set term aifm color \"Times-Roman\" 14"
+"       set terminal aifm {color|monochrome} {\"<fontname>\"} {<fontsize>}",
+""
 END_HELP(ai)
 #endif /* TERM_HELP */
