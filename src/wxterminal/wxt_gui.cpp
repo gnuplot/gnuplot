@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.cpp,v 1.72.2.6 2011/01/18 21:46:15 sfeam Exp $
+ * $Id: wxt_gui.cpp,v 1.72.2.7 2011/08/02 23:26:01 sfeam Exp $
  */
 
 /* GNUPLOT - wxt_gui.cpp */
@@ -323,7 +323,6 @@ void wxtApp::OnCreateWindow( wxCommandEvent& event )
 
 	FPRINTF((stderr,"wxtApp::OnCreateWindow\n"));
 	window->frame = new wxtFrame( window->title, window->id );
-	window->frame->Centre();
 	window->frame->Show(true);
 	FPRINTF((stderr,"new plot window opened\n"));
 	/* make the panel able to receive keyboard input */
