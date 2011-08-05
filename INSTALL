@@ -233,6 +233,19 @@ This may require some playing around with additional -L and -I
 definitions in CFLAGS, and is probably harder than replacing the
 system copy of the library.
 
+wxt terminal:
+
+  Cairo & pango need to be installed first on Mac, 
+  I recommend using MacPorts building universal (i386 libraries):
+  sudo port install cairo +no_x11 +quartz +universal
+  sudo port install pango +no_x11 +quartz +universal
+
+  Next gnuplot may be compiled with shipped with Mac OS X 10.6 SL wxWidgets using:
+  ./configure CPPFLAGS='-arch i386' LDFLAGS='-arch i386'
+
+  NOTE: 10.6 SL by default generates x86_64 code, but wxWidgets stable is using
+  Carbon API on Mac which is 32-bit only, that makes compiling gnuplot,
+  cairo and pango to i386 necessary.
 
 
 VMS
