@@ -302,7 +302,6 @@ Major contributors (alphabetic order):
 	"pstricks"
 	"qms"
 	"regis"
-	"rgip"
 	"sun"
 	"svg"
 	"t410x"

@@ -1,5 +1,5 @@
 /*
- * $Id: term.h,v 1.50 2011/04/16 11:15:55 markisch Exp $
+ * $Id: term.h,v 1.51 2011/06/01 03:44:36 sfeam Exp $
  */
 
 /* GNUPLOT - term.h */
@@ -192,13 +192,6 @@
 #ifdef MGR
 # include "mgr.trm"
 #endif
-
-/* Redwood Graphics Interface Protocol UNIPLEX */
-/* Metafile, requires POSIX */
-#ifdef RGIP
-# include "rgip.trm"
-#endif
-
 
 /* SCO CGI drivers */
 #ifdef SCO

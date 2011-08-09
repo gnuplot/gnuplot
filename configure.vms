@@ -324,7 +324,6 @@ $ NOCWDRC = 0
 $ THIN_PLATE_SPLINES_GRID = 0
 $ COLUMN_HELP = 0
 $ MGR = 0
-$ RGIP = 0
 $ ! USE_MOUSE = 0   ! USE_MOUSE is defined above         
 $ !
 $ OPEN/READ IN CONFIG.HIN

@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot on Unix.
 dnl
-dnl $Id: configure.in,v 1.282 2011/05/02 18:37:01 markisch Exp $
+dnl $Id: configure.in,v 1.283 2011/06/01 03:44:35 sfeam Exp $
 dnl
 dnl this is actually major.minor ...
 dnl note that for a non-beta release, we need to
@@ -908,14 +908,6 @@ AC_ARG_ENABLE(mgr,dnl
        [-lpixrect])
    fi])
 
-dnl Redwood Graphics Interface Protocol
-AC_ARG_ENABLE(rgip,dnl
-[  --enable-rgip           enable Redwood Graphics Interface Protocol],
-  [if test "$enableval" = yes; then
-     AC_DEFINE(RGIP,1,
-               [ Define if you want to use the Redwood Graphics Interface Protocol. ])
-   fi])
-
 dnl hidden3d compile-time options...
 dnl NOTE: have to check that they're not both turned on --- the code
 dnl doesn't allow that choice.
@@ -1328,12 +1320,6 @@ if test "$enable_mgr" = yes; then
   AC_MSG_RESULT([  mgr terminal: yes])
 else
   AC_MSG_RESULT([  mgr terminal: no (use --enable-mgr to enable, requires libpixrect)])
-fi
-
-if test "$enable_rgip" = yes ; then
-  AC_MSG_RESULT([  rgip/uniplex terminal: yes])
-else
-  AC_MSG_RESULT([  rgip/uniplex terminal: no (use --enable-rgip to enable)])
 fi
 
 if test "$is_msdos" = yes; then

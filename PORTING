@@ -1,3 +1,8 @@
+*******************************************************************************
+*** NB: This file is horribly out of date.
+***     View everything in it as historical perspective;
+***	the broad outline may be useful but the details are not current
+*******************************************************************************
 
  The following information is mainly geared towards people who want
 to port gnuplot to new platforms not covered by the installation
@@ -103,12 +108,8 @@ of devices that may be selected/deselected by editing term.h.
 
    AED         AED 512 and AED 767
    AIFM        Adobe Illustrator Format
-   AMIGA       Amiga custom screen
-   APOLLO      Apollo Graphics Primitive Resource (resizable window)
-   ATARI       AES, VDI, MultoTOS
    ATT6300     PC with AT&T 6300 graphics
    BITGRAPH    BBN BitGraph
-   CGI         SCO CGI, hcgi
    COREL       COREL! Draw Format
    CORONA      PC with Corona graphics 325
    DEBUG       Voluminous output for debugging to terminal
@@ -127,7 +128,6 @@ of devices that may be selected/deselected by editing term.h.
    FIG         Fig graphics language (requires object.h from TransFig)
    GIF         Gif output, requires special library
    GPIC        Gpic for groff
-   GPR         Apollo Graphics Primitive Resource (fixed-size window)
    HERCULES    IBM PC/Clone with Hercules graphics board
    HP2648      HP2648, HP2647
    HP26        HP2623A and maybe others
@@ -143,7 +143,6 @@ of devices that may be selected/deselected by editing term.h.
    MF          Metafont Format
    MGR         MGR window manager
    MIF         FrameMaker MIF 3.00 Format
-   MTOS        Atari MiNT/MULTITOS/Magic Terminal
    NEC         NEC CP6 pinwriter printer
    NEXT        NeXTStep Window System (only grey scale)
    OS2PM       OS/2 Presentation Manager
@@ -151,14 +150,11 @@ of devices that may be selected/deselected by editing term.h.
    PCL         HP PCL5 (actually  HPGL/2)
    PNG         Portable Network Graphics, requires separate library
    POSTSCRIPT  PostScript
-   PRESCRIBE   Kyocera Laser printer
    PSLATEX     Postscript graphics, LaTeX labels and titles
    PSTRICKS    PSTRICKS 0.91 format
    QMS         QMS/QUIC laserprinter (Talaris 1200 and others)
    REGIS       ReGis graphics (vt125, vt220, vt240, Gigis...)
-   RGIP        Redwood Graphics Interface Protocol
    SELANAR     Selanar
-   STARC       Star Color Printer
    SUN         Sun Microsystems Workstation
    T410X       Tektronix 4106, 4107, 4109 and 420x terminals
    TABLE       Text output
@@ -184,11 +180,6 @@ incomplete.
 
 define        note
 ------        --------
-AMIGA_AC_5    defined for Manx Aztec C 5.2a on the Amiga.
-AMIGA_SC_6_1  defined for SAS/C 6.1 or later versions on the Amiga.
-__amigaos__   defined by gcc on AmigaOS.
-AMIGA         defined for all Amiga compilers.
-apollo        defined by Apollo's C compilers.
 _CRAY         defined by CRAY's C compiler.
 __DECC        defined by DEC C compiler under VMS (?)
 __TURBOC__    defined automatically by  Borland C++ 3.x.

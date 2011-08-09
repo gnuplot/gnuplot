@@ -443,9 +443,6 @@
 /* Define as the return type of signal handlers (`int' or `void'). */
 /* #undef RETSIGTYPE */
 
-/* Define if you want to use the Redwood Graphics Interface Protocol. */
-/* #undef RGIP */
-
 /* Define to the type of arg 1 for `select'. */
 #define SELECT_TYPE_ARG1 int
 

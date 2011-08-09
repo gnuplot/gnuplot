@@ -78,7 +78,7 @@ EXTRA_gnuplot_SOURCES = corplot.c os9.c strftime.c vms.c
 EXTRA_DIST = GNUmakefile Makefile.maint NeXT OpenStep README \
 corgraph.asm genopt.com gnuplot.opt gnuplot.prj header.mac \
 hrcgraph.asm intergra.x11 lasergnu lineproc.mac linkopt.vms linkopt.ztc \
-makefile.all makefile.awc os2 pcgraph.asm rgipgnu win x11.opt \
+makefile.all makefile.awc os2 pcgraph.asm win x11.opt \
 $(EXTRA_gnuplot_SOURCES)
 
 if BUILD_WXWIDGETS

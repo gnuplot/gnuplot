@@ -1,6 +1,6 @@
 % Quick Reference Card for gnuplot 2004
 %
-% $Id: gpcard.tex,v 1.6 2007/10/16 21:19:45 sfeam Exp $
+% $Id: gpcard.tex,v 1.7 2008/03/30 03:27:53 sfeam Exp $
 %
 % Format stolen shamelessly from the GNU Emacs reference card
 %**start of header
@@ -310,11 +310,8 @@ Graphics Terminals:
 \key{Mac OS X}                                  {set term aqua}
 \key{AED 512 Terminal}                          {set term aed512}
 \key{AED 767 Terminal}                          {set term aed767}
-\key{Amiga}                                     {set term amiga}
-\key{Apollo graphics primitive, rescalable}     {set term apollo}
 \key{BBN Bitgraph Terminal}                     {set term bitgraph}
 \key{SCO CGI Driver}                            {set term cgi}
-\key{Apollo graphics primitive, fixed window}   {set term gpr}
 \key{MS-DOS Kermit Tek4010 term - color}        {set term kc_tek40xx}
 \key{MS-DOS Kermit Tek4010 term - mono}         {set term km_tek40xx}
 \key{NeXTstep window system}                    {set term next}
@@ -390,7 +387,6 @@ Metafiles
 \key{Frame Maker MIF 3.0}
                 {set term mif [pentype curvetype help]}
 \key{Portable bitmap}                                   {set term pbm [fontsize color]}
-\key{Uniplex Redwood Graphics Interface Protocol}{set term rgip}
 \key{TGIF language}                             {set term tgif}
 
 HP Devices
@@ -935,7 +931,7 @@ be used. This overrides any terminal type sensed by gnuplot on start
 up, but is itself overridden by the .gnuplot (or equivalent) start-up
 file (see {\bf start-up}), and of course by later explicit changes.
 
-On Unix, OS/2, AmigaOS, and MS-DOS, GNUHELP may be defined to be the pathname
+On Unix, OS/2, and MS-DOS, GNUHELP may be defined to be the pathname
 of the HELP file (gnuplot.gih).
 
 On VMS, the symbol GNUPLOT\$HELP should be defined as the name of
@@ -943,7 +939,7 @@ the help library for gnuplot.
 
 On Unix, HOME is used as the name of a directory to search for
 a .gnuplot file if none is found in the current directory.
-On OS/2, AmigaOS and MS-DOS, GNUPLOT is used to search for gnuplot.ini file.
+On OS/2 and MS-DOS, GNUPLOT is used to search for gnuplot.ini file.
 On VMS, SYS\$LOGIN: is used. See 'help start-up'.
 
 GNUPLOT\_LIB may be used to define additional search directories for
@@ -955,11 +951,8 @@ GDFONTPATH is the directory where png terminal searches TrueType fonts,
 i.e.~files like arial.ttf.
 GNUPLOT\_FONTPATH is that for the postscript terminal.
 
-On Unix and AmigaOS, SHELL is used for the {\bf shell} command. On MS-DOS,
+On Unix, SHELL is used for the {\bf shell} command. On MS-DOS,
 COMSPEC is used for the {\bf shell} command.
-
-On AmigaOS, GNUFONT is used for the screen font.  For example:
-``setenv GNUFONT sapphire/14''.
 
 On MS-DOS, if the BGI interface is used, the variable {\bf BGI} is used to point
 to the full path to the BGI drivers directory. Furthermore SVGA is used to

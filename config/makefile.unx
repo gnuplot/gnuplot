@@ -1,5 +1,5 @@
 #
-# $Id: makefile.unx,v 1.14 2011/04/17 10:05:11 markisch Exp $
+# $Id: makefile.unx,v 1.15 2011/06/01 03:44:36 sfeam Exp $
 #
 #
 ############################################################
@@ -437,7 +437,7 @@ CSOURCE6 = term/impcodes.h term/imagen.trm term/next.trm term/object.h \
 	term/kyo.trm term/latex.trm term/mif.trm \
 	term/pbm.trm term/pslatex.trm term/gpic.trm
 CSOURCE7 = term/post.trm term/pstricks.trm term/qms.trm term/regis.trm \
-	term/rgip.trm term/sun.trm\
+	term/sun.trm\
 	term/t410x.trm term/tek.trm term/texdraw.trm \
 	term/tgif.trm term/tpic.trm \
 	term/unixpc.trm \
