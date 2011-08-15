@@ -1,3 +1,18 @@
+2011-08-15  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/command.c (pause_command) src/win/wgnuplib.h (GW) src/win/wgraph.c
+	src/win/winmain.h src/win/winmain.c term/win.trm: Support multiple
+	graph windows. All state variables of graph windows were contained
+	in a single struct already. Replace all references to this struct
+	(graphwin) by pointers and dynamically allocate new instances when
+	required. Do not pass on mouse and key events from inactive windows.
+	Note: Since a single number passed to `set term win` is now interpreted
+	as window identifier, the old and fontsize options are no longer
+	supported and the `font` keyword is now required. This is consistent
+	with other terminals (e.g. x11 and wxt).
+
+	* src/win/wgnuplib.h src/win/wgraph.c: Make GraphChangeFont static. 
+
 2011-08-15  Reinier Heeres  <rheeres@users.sourceforge.net>
 
 	* src/win/pgnuplot.c: Detect termination of wgnuplot. Slightly enhanced

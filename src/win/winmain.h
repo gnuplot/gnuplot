@@ -1,5 +1,5 @@
 /*
- * $Id: winmain.h,v 1.7 2008/10/10 22:23:20 mikulik Exp $
+ * $Id: winmain.h,v 1.8 2011/04/27 17:17:17 markisch Exp $
  */
 
 /* GNUPLOT - win/winmain.h */
@@ -49,7 +49,8 @@
 #include "wgnuplib.h"
 
 extern TW textwin;
-extern GW graphwin;
+extern LPGW graphwin;
+extern LPGW listgraphs;
 extern PW pausewin;
 extern MW menuwin;
 

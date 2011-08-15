@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: winmain.c,v 1.46 2011/04/28 13:44:04 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: winmain.c,v 1.47 2011/05/07 16:18:01 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - win/winmain.c */
@@ -83,7 +83,7 @@ static char *RCSid() { return RCSid("$Id: winmain.c,v 1.46 2011/04/28 13:44:04 m
 #include "plot.h"
 #include "setshow.h"
 #include "version.h"
-#include "wgnuplib.h"
+#include "winmain.h"
 #include "wtext.h"
 #include "wcommon.h"
 #ifdef HAVE_GDIPLUS
@@ -105,7 +105,8 @@ static char *RCSid() { return RCSid("$Id: winmain.c,v 1.46 2011/04/28 13:44:04 m
 TW textwin;
 MW menuwin;
 #endif
-GW graphwin;
+LPGW graphwin; /* current graph window */
+LPGW listgraphs; /* list of graph windows */
 PW pausewin;
 LPSTR szModuleName;
 LPSTR szPackageDir;
@@ -164,39 +165,46 @@ kill_pending_Pause_dialog ()
 void
 WinExit(void)
 {
-        /* Last chance, call before anything else to avoid a crash. */
-        WinCloseHelp();
+	LPGW lpgw;
 
-        term_reset();
+    /* Last chance, call before anything else to avoid a crash. */
+    WinCloseHelp();
+
+    term_reset();
 
 #ifndef __MINGW32__ /* HBB 980809: FIXME: doesn't exist for MinGW32. So...? */
-        fcloseall();
+    fcloseall();
 #endif
-        if (graphwin.hWndGraph && IsWindow(graphwin.hWndGraph))
-                GraphClose(&graphwin);
+
+	/* Close all of graph windows */
+	for (lpgw = listgraphs; lpgw != NULL; lpgw = lpgw->next) {
+		if (GraphHasWindow(lpgw))
+			GraphClose(lpgw);
+	}
+
 #ifndef WGP_CONSOLE
-        TextMessage();  /* process messages */
+    TextMessage();  /* process messages */
 #ifndef WITH_HTML_HELP
-        WinHelp(textwin.hWndText,(LPSTR)winhelpname,HELP_QUIT,(DWORD)NULL);
+    WinHelp(textwin.hWndText,(LPSTR)winhelpname,HELP_QUIT,(DWORD)NULL);
 #endif
-        TextMessage();  /* process messages */
+    TextMessage();  /* process messages */
 #else
 #ifndef WITH_HTML_HELP
-        WinHelp(GetDesktopWindow(), (LPSTR)winhelpname, HELP_QUIT, (DWORD)NULL);
+    WinHelp(GetDesktopWindow(), (LPSTR)winhelpname, HELP_QUIT, (DWORD)NULL);
 #endif
 #ifdef CONSOLE_SWITCH_CP
-        /* restore console codepages */
-        if (cp_changed) {
-            SetConsoleCP(cp_input);
-            SetConsoleOutputCP(cp_output);
-            /* file APIs are per process */
-        }
+    /* restore console codepages */
+    if (cp_changed) {
+		SetConsoleCP(cp_input);
+		SetConsoleOutputCP(cp_output);
+		/* file APIs are per process */
+    }
 #endif
 #endif
 #ifdef HAVE_GDIPLUS
-        gdiplusCleanup();
+    gdiplusCleanup();
 #endif
-        return;
+    return;
 }
 
 /* call back function from Text Window WM_CLOSE */
@@ -211,7 +219,7 @@ ShutDown()
 
 
 /* This function can be used to retrieve version information from
- * Window's Shell and common control libraries such (Comctl32.dll,
+ * Window's Shell and common control libraries (Comctl32.dll,
  * Shell32.dll, and Shlwapi.dll) The code was copied from the MSDN
  * article "Shell and Common Controls Versions" */
 DWORD
@@ -375,6 +383,10 @@ int main(int argc, char **argv)
         textwin.Title = "gnuplot";
 #endif
 
+		/* create structure of first graph window */
+		graphwin = calloc(1, sizeof(GW));
+		listgraphs = graphwin;
+
 		/* locate ini file */
 		{
 			char * inifile;
@@ -392,7 +404,7 @@ int main(int argc, char **argv)
 #ifndef WGP_CONSOLE
 			textwin.IniFile = inifile;
 #endif
-			graphwin.IniFile = inifile;
+			graphwin->IniFile = inifile;
 		}
 		
 #ifndef WGP_CONSOLE
@@ -425,19 +437,15 @@ int main(int argc, char **argv)
         pausewin.hPrevInstance = hPrevInstance;
         pausewin.Title = "gnuplot pause";
 
-        graphwin.hInstance = hInstance;
-        graphwin.hPrevInstance = hPrevInstance;
-        graphwin.Title = strdup(WINGRAPHTITLE);
+        graphwin->hInstance = hInstance;
+        graphwin->hPrevInstance = hPrevInstance;
 #ifdef WGP_CONSOLE
-        graphwin.lptw = NULL;
+        graphwin->lptw = NULL;
 #else
-        graphwin.lptw = &textwin;
+        graphwin->lptw = &textwin;
 #endif
-        graphwin.IniSection = "WGNUPLOT";
-        graphwin.color=TRUE;
-        graphwin.fontsize = WINFONTSIZE;
 
-	/* init common controls */
+		/* init common controls */
 	{
 	    INITCOMMONCONTROLSEX initCtrls;
 	    initCtrls.dwSize = sizeof(INITCOMMONCONTROLSEX);
@@ -488,7 +496,7 @@ int main(int argc, char **argv)
         atexit(WinExit);
 
         if (!isatty(fileno(stdin)))
-                setmode(fileno(stdin), O_BINARY);
+            setmode(fileno(stdin), O_BINARY);
 
         gnu_main(_argc, _argv, environ);
 
@@ -846,25 +854,25 @@ void
 close_printer(FILE *outfile)
 {
     fclose(outfile);
-    DumpPrinter(graphwin.hWndGraph, graphwin.Title, win_prntmp);
+    DumpPrinter(graphwin->hWndGraph, graphwin->Title, win_prntmp);
 }
 
 void
 screen_dump()
 {
-    GraphPrint(&graphwin);
+    GraphPrint(graphwin);
 }
 
 void
 win_raise_terminal_window()
 {
-    ShowWindow(graphwin.hWndGraph, SW_SHOWNORMAL);
-    BringWindowToTop(graphwin.hWndGraph);
+    ShowWindow(graphwin->hWndGraph, SW_SHOWNORMAL);
+    BringWindowToTop(graphwin->hWndGraph);
 }
 
 void
 win_lower_terminal_window()
 {
-    SetWindowPos(graphwin.hWndGraph, HWND_BOTTOM, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE | SWP_NOACTIVATE);
+    SetWindowPos(graphwin->hWndGraph, HWND_BOTTOM, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE | SWP_NOACTIVATE);
 }
 
