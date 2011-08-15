@@ -1,5 +1,5 @@
 /*
- * $Id: wgnuplib.h,v 1.43 2011/04/27 10:18:28 markisch Exp $
+ * $Id: wgnuplib.h,v 1.44 2011/04/28 13:44:04 markisch Exp $
  */
 
 /* GNUPLOT - win/wgnuplib.h */
@@ -366,14 +366,13 @@ void WDPROC GraphOp(LPGW lpgw, UINT op, UINT x, UINT y, LPCSTR str);
 void WDPROC GraphOpSize(LPGW lpgw, UINT op, UINT x, UINT y, LPCSTR str, DWORD size);
 void WDPROC GraphPrint(LPGW lpgw);
 void WDPROC GraphRedraw(LPGW lpgw);
-void WDPROC GraphChangeFont(LPGW lpgw, LPCSTR font, int fontsize, HDC hdc, RECT rect);
 void WDPROC win_close_terminal_window(LPGW lpgw);
 
 #ifdef USE_MOUSE
-void WDPROC Graph_set_cursor (LPGW lpgw, int c, int x, int y );
-void WDPROC Graph_set_ruler (LPGW lpgw, int x, int y );
+void WDPROC Graph_set_cursor(LPGW lpgw, int c, int x, int y);
+void WDPROC Graph_set_ruler(LPGW lpgw, int x, int y);
 void WDPROC Graph_put_tmptext(LPGW lpgw, int i, LPCSTR str);
-void WDPROC Graph_set_clipboard (LPGW lpgw, LPCSTR s);
+void WDPROC Graph_set_clipboard(LPGW lpgw, LPCSTR s);
 #endif
 
 /* BM: callback functions for enhanced text */

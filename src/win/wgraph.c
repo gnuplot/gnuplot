@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.128 2011/07/28 16:27:43 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.129 2011/07/30 04:39:13 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - win/wgraph.c */
@@ -234,6 +234,7 @@ static void ReadGraphIni(LPGW lpgw);
 static COLORREF	GetColor(HWND hwnd, COLORREF ref);
 static void	UpdateColorSample(HWND hdlg);
 static BOOL	LineStyle(LPGW lpgw);
+static void GraphChangeFont(LPGW lpgw, LPCSTR font, int fontsize, HDC hdc, RECT rect);
 
 
 /* ================================== */
@@ -3189,7 +3190,7 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 				return 0;
 			}
 #endif
-			/* Context menu is handled below, everything els is not */
+			/* Context menu is handled below, everything else is not */
 			if (LOWORD(wParam) != WM_CONTEXTMENU)
 				return 1;
 			/* intentionally fall through */
@@ -3330,7 +3331,7 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 }
 
 
-void WDPROC
+void
 GraphChangeFont(LPGW lpgw, LPCSTR font, int fontsize, HDC hdc, RECT rect)
 {
     int newfontsize;
