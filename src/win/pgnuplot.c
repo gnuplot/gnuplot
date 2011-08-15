@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: pgnuplot.c,v 1.15 2006/04/08 14:22:48 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: pgnuplot.c,v 1.16 2008/10/10 21:24:30 mikulik Exp $"); }
 #endif
 
 /*
@@ -215,6 +215,15 @@ FindUnquotedSpace(char *pc)
     return pc;
 }
 
+BOOL
+ProcessAlive(HANDLE hProcess)
+{
+    DWORD code = 0;
+    if (GetExitCodeProcess(hProcess, &code))
+	return (code == STILL_ACTIVE);
+    return FALSE;
+}
+
 int
 main (int argc, char *argv[])
 {
@@ -329,27 +338,32 @@ main (int argc, char *argv[])
     /* CRS: get the HWND of the parent window and text windows */
     EnumThreadWindows(piProcInfo.dwThreadId, cbGetTextWindow, 0);
 
-    /* CRS: free the process and thread handles */
-    CloseHandle(piProcInfo.hProcess);
-    CloseHandle(piProcInfo.hThread);
-
     if (! hwndParent || ! hwndText) {
 	/* Still no gnuplot window? Problem! */
 	fprintf(stderr, "Can't find the gnuplot window");
+	/* CRS: free the process and thread handles */
+	CloseHandle(piProcInfo.hProcess);
+	CloseHandle(piProcInfo.hThread);
 	exit(EXIT_FAILURE);
     }
 
     /* wait for commands on stdin, and pass them on to the wgnuplot text
      * window */
     while (fgets(psBuffer, BUFFER_SIZE, stdin) != NULL) {
+	/* RWH: Check if wgnuplot is still alive */
+	if (!ProcessAlive(piProcInfo.hProcess))
+	    break;
 	PostString(hwndText, psBuffer);
     }
 
     /* exit gracefully, unless -persist is requested */
-    if (!bPersist) {
-	/* CRS: Add a test to see if gnuplot is still running? */
+    if (!bPersist && ProcessAlive(piProcInfo.hProcess)) {
 	PostString(hwndText, "\nexit\n");
     }
+
+    /* CRS: free the process and thread handles */
+    CloseHandle(piProcInfo.hProcess);
+    CloseHandle(piProcInfo.hThread);
 
     return EXIT_SUCCESS;
 }
