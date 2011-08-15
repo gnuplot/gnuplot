@@ -1,5 +1,8 @@
 2011-08-15  Bastian Maerkisch  <bmaerkisch@web.de>
 
+	* src/win/wgraph.c (WndGraphProc): Restore text window on space key:
+	also show terminal window if it is currently minimized.
+
 	* src/command.c (pause_command) src/win/wgnuplib.h (GW) src/win/wgraph.c
 	src/win/winmain.h src/win/winmain.c term/win.trm: Support multiple
 	graph windows. All state variables of graph windows were contained
