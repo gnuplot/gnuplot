@@ -1,5 +1,5 @@
 #
-# $Id: simple.dem,v 1.3 1999/10/17 19:17:00 lhecking Exp $
+# $Id: simple.dem,v 1.4 2006/06/30 02:17:22 sfeam Exp $
 #
 # Requires data files "[123].dat" from this directory,
 # so change current working directory to this directory before running.
@@ -40,8 +40,10 @@ pause -1 "Hit return to continue"
 
 plot [-19:19] '1.dat'with impulses ,'2.dat' ,'3.dat' with lines
 pause -1 "Hit return to continue"
-f(x) = x/100
-plot [-19:19] '1.dat'with impulses ,'2.dat' thru f(x) ,'3.dat' with lines
-pause -1 "Hit return to continue"
+#
+# Deprecated syntax - better to show an example with using (f(column(1))
+#f(x) = x/100
+#plot [-19:19] '1.dat'with impulses ,'2.dat' thru f(x) ,'3.dat' with lines
+#pause -1 "Hit return to continue"
 reset
 
