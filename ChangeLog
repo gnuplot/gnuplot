@@ -1,3 +1,12 @@
+2011-08-19  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/commands.c src/misc.c docs/gnuplot.doc:
+	The old-style if/else syntax cannot be mixed with the new syntax using
+	{ and } to enclose blocks of commands, possibly spanning several lines.
+	Add stronger warnings to the documentation and issue an error message
+	if an old-style if statement is encountered inside a bracketed clause.
+	Bug #3393631
+
 2011-08-15  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/win/wgraph.c (WndGraphProc): Restore text window on space key:

@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.683 2011/08/02 20:40:30 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.684 2011/08/05 17:36:31 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -4089,7 +4089,8 @@ Ffigure_mapcontours
        }
  Execute a sequence of commands multiple times.  The commands must be enclosed
  in curly brackets, and the opening "{" must be on the same line as the `do`
- keyword.  For examples of iteration specifiers, see `iteration`.
+ keyword.  This command cannot be used with old-style (un-bracketed) if/else
+ statements.  See `if`.  For examples of iteration specifiers, see `iteration`.
  Example:
        set multiplot layout 2,2
        do for [name in "A B C D"] {
@@ -4714,15 +4715,17 @@ Ffigure_mapcontours
  conditional execution applies to all statements, possibly on multiple input
  lines, until a matching "}" terminates the block.  If commands may be nested.
 
- The old single-line if/else syntax is still supported, but should not be
+ The old single-line if/else syntax is still supported, but can not be
  mixed with the new block-structured syntax.  See `if-old`.
 3 if-old
 ?if if-old
 ?if-old
  Through gnuplot version 4.4, the scope of the if/else commands was limited to
  a single input line. This has been replaced by allowing a multi-line clause to
- be enclosed in curly brackets, but the old syntax is still honored.  If no
- opening "{" follows the `if` keyword, then the command(s) in <command-line>
+ be enclosed in curly brackets. The old syntax is still honored by itself but
+ cannot be used inside a bracketed clause.
+
+ If no opening "{" follows the `if` keyword, the command(s) in <command-line>
  will be executed if <condition> is true (non-zero) or skipped if <condition> is
  false (zero). Either case will consume commands on the input line until the
  end of the line or an occurrence of `else`.  Note that use of `;` to allow
@@ -13054,7 +13057,8 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/splot.gif" alt="[splot.gif
            <commands>
        }
  Execute a block of commands repeatedly so long as <expr> evaluates to 
- a non-zero value.
+ a non-zero value.  This command cannot be mixed with old-style (un-bracketed)
+ if/else statements.  See `if`.
 1 Terminal types
 ^ <h2> Terminal Types </h2>
 2 complete list of terminals
