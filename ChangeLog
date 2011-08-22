@@ -1,3 +1,7 @@
+2011-08-22  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/graph3d.c:  Honor 'set key maxrows N' in 3D plot key.
+
 2011-08-02  Adam Strzelecki <ono@users.sourceforge.net>
 
 	* src/wxterminal/wxt_gui.cpp src/wxterminal/wxt_gui.h m4/apple.m4:
