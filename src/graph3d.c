@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.250 2011/05/13 20:52:24 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.251 2011/07/12 19:30:34 juhaszp Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -328,6 +328,12 @@ boundary3d(struct surface_points *plots, int count)
 
     key_rows = ptitl_cnt;
     key_cols = 1;
+    if (key_rows > key->maxrows && key->maxrows > 0) {
+	key_rows = key->maxrows;
+	key_cols = (ptitl_cnt - 1)/key_rows + 1;
+    }
+
+
     if (key->visible)
     if ((key->region == GPKEY_AUTO_EXTERIOR_MARGIN || key->region == GPKEY_AUTO_EXTERIOR_LRTBC)
 	&& key->margin == GPKEY_BMARGIN) {
@@ -339,6 +345,9 @@ boundary3d(struct surface_points *plots, int count)
 	    if (key_cols == 0)
 		key_cols = 1;
 	    key_rows = (int) ((ptitl_cnt - 1)/ key_cols) + 1;
+	    /* Limit the number of rows if requested by user */
+	    if (key_rows > key->maxrows && key->maxrows > 0)
+		key_rows = key->maxrows;
 	    /* now calculate actual no cols depending on no rows */
 	    key_cols = (int) ((ptitl_cnt - 1)/ key_rows) + 1;
 	    key_col_wth = (int) (plot_bounds.xright - plot_bounds.xleft) / key_cols;
@@ -380,6 +389,8 @@ boundary3d(struct surface_points *plots, int count)
 	    && key->margin == GPKEY_RMARGIN)) {
 	/* calculate max no rows, limited by plot_bounds.ytop-plot_bounds.ybot */
 	i = (int) (plot_bounds.ytop - plot_bounds.ybot) / t->v_char - 1 - ktitle_lines;
+	if (i > key->maxrows && key->maxrows > 0)
+	    i = key->maxrows;
 	/* HBB 20030321: div by 0 fix like above */
 	if (i == 0)
 	    i = 1;
@@ -848,6 +859,8 @@ do_3dplot(
 		key_cols = (int) (plot_bounds.xright - plot_bounds.xleft) / key_col_wth;
 		if (key_cols < 1) key_cols = 1;
 		key_rows = (int) (ptitl_cnt + key_cols - 1) / key_cols;
+		if (key_rows > key->maxrows && key->maxrows > 0)
+		    key_rows = key->maxrows;
 		/* now calculate actual no cols depending on no rows */
 		key_cols = (int) (ptitl_cnt + key_rows - 1) / key_rows;
 		key_col_wth = (int) (plot_bounds.xright - plot_bounds.xleft) / key_cols;

@@ -1,3 +1,8 @@
+2011-08-22  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/graph3d.c:  Honor 'set key maxrows N' in 3D plot key.
+	Bug #3396501
+
 2011-08-19  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/commands.c src/misc.c docs/gnuplot.doc:
