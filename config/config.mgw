@@ -1,5 +1,5 @@
-/* config.h for makefile.mgw
- * 
+/* config.h for mingw/Makefile
+ *
  * Prepared according to config.h from ./configure and by means of
  * config_strip.sh as of gnuplot 4.5 in Mai 2011.
  */
@@ -139,6 +139,7 @@
 
 /* define if you have libiconv and iconv.h */
 /* #undef HAVE_ICONV */
+/* Don't change it here -- this define is set in config/mingw/Makefile. */
 
 /* Define to 1 if you have the `index' function. */
 /* #undef HAVE_INDEX */

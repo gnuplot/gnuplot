@@ -21,6 +21,8 @@
 	UTF-8 encoding to UTF-16 and store using wide characters.
 	Bug #3021779
 
+	* config/config.mgw config/mingw/Makefile: add support for libiconv
+
 2011-08-22  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graph3d.c:  Honor 'set key maxrows N' in 3D plot key.

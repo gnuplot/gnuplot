@@ -1,5 +1,5 @@
 # Hello, emacs: this is a -*- Makefile -*-
-# $Id: Makefile,v 1.10 2011/04/28 13:44:04 markisch Exp $
+# $Id: Makefile,v 1.11 2011/05/04 17:22:53 markisch Exp $
 #
 # GNUPLOT Makefile for MinGW32 on Win95/98/NT/2k/..
 # This assumes usual installation of the MinGW32 toolkit, the free
@@ -99,6 +99,9 @@ MOUSE=1
 
 # Uncomment the following line to select the lua/tikz terminal
 #LUA=lua5.1
+
+# Uncomment if you have libiconv
+ICONV=1
 
 # Below you can adapt paths according to your software setup:
 
@@ -348,6 +351,11 @@ ifdef LUA
 	TERMLIBS += -l$(LUA)
 	TERMFLAGS += -DGNUPLOT_LUA_DIR=\"$(GNUPLOT_LUA_DIR)\"
 	LUATARGETS += gnuplot-lua-tikz.sty
+endif
+
+ifdef ICONV
+	CFLAGS += -DHAVE_ICONV
+	TERMLIBS += -liconv
 endif
 
 ifdef GNU_RC
