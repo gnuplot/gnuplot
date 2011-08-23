@@ -41,24 +41,7 @@ Pstricks:
 	Can somebody comment on this?
 
 Windows:
-  -- update its docs from docs/old/README.win, then delete this file
-  -- windows driver does not report font size to windows.trm, thus
-     character widht and height are quite useless numbers
   -- update wgnuplot menus
-  -- repair the linetype bug in wgraph.c --- crash for
-		set style fill solid border
-		plot [-2.5:4.5] 100/(1.0+x*x) with boxes lt -1
-	or
-		set style fill solid noborder
-		plot [-2.5:4.5] 100/(1.0+x*x) with boxes lt -1
-	or
-		set style fill empty
-		plot [-2.5:4.5] 100/(1.0+x*x) with boxes lt -1
-  -- windows "Pause -1": it works very strange if you press <enter> while 
-	having the mouse cursor out of the graph window. Mainly users running
-	demos complain about this. This bug is associated to BUG 561418 
-	"(MS Windows) 100% CPU Usage during pause", and to HBB 20001217's note
-	about WaitMessage(); in wpause.c.
 
 TERMINALS, GENERAL COMMENTS:
 ============================
