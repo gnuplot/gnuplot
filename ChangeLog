@@ -25,7 +25,7 @@
 	History indices are reversed compared to GNU readline. Fixes history ?.
 	Patch #3186010
 
-	* term/em.trm (EMF_put_text): Use iconv (if available) to convert
+	* term/emf.trm (EMF_put_text): Use iconv (if available) to convert
 	UTF-8 encoding to UTF-16 and store using wide characters.
 	Bug #3021779
 
