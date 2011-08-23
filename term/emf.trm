@@ -1,5 +1,5 @@
 /* Hey Emacs this is -*- C -*-
- * $Id: emf.trm,v 1.71 2011/03/11 22:20:59 sfeam Exp $
+ * $Id: emf.trm,v 1.72 2011/05/31 19:59:28 sfeam Exp $
  */
 
 /* GNUPLOT - emf.trm */
@@ -330,6 +330,9 @@ typedef  enum {
 #ifdef TERM_BODY
 
 #include <ctype.h>		/* for isspace() */
+#ifdef HAVE_ICONV
+#include <iconv.h>
+#endif
 
 static unsigned int emf_posx;
 static unsigned int emf_posy;
@@ -1194,8 +1197,34 @@ EMF_solid_vector(unsigned int ux, unsigned int uy)
 TERM_PUBLIC void 
 EMF_put_text(unsigned int x, unsigned int y, const char str[])
 {
-    int i, slen = strlen(str);
-    int alen = slen;
+    int i, slen, alen, nchars;
+#ifdef HAVE_ICONV
+    char * wstr;
+    if (encoding == S_ENC_UTF8) {
+	iconv_t cd;
+	size_t wsize, wlen, mblen;
+	const char * str_start = str;
+	char * wstr_start;
+
+	nchars = strlen(str);
+	mblen = nchars;
+	wlen = wsize = 2 * mblen + 2;
+	wstr = gp_alloc(wlen, "iconv string");
+	wstr_start = wstr;
+
+	if ((cd = iconv_open("UTF-16LE", "UTF-8")) == (iconv_t)-1) 
+	    int_warn(NO_CARET, "iconv_open failed");
+	else {
+	    if (iconv(cd, &str_start, &mblen, &wstr_start, &wlen) == (size_t)-1)
+		int_warn(NO_CARET, "iconv failed");
+	    iconv_close(cd);
+	    slen = wsize - wlen;
+	    nchars = slen / 2;
+	}
+    } else
+#endif
+	nchars = slen = strlen(str);
+    alen = slen;
 
     EMF_flush_polyline();
     if (emf_textcolor != emf_color) {
@@ -1207,7 +1236,14 @@ EMF_put_text(unsigned int x, unsigned int y, const char str[])
     /* SB 20040506: also changed function from unicode to ansi version */
     if (alen % 4)
 	alen += 4 - (slen % 4); /* Structure must be long aligned! */
-    EMF_write_emr(83, 76 + alen + slen*4);/* ExtTextOutA, ANSI char version! */
+#ifdef HAVE_ICONV
+    if (encoding == S_ENC_UTF8) {
+	EMF_write_emr(84, 76 + alen + nchars * 4);	/* ExtTextOutW, UTF16-LE version */
+    } else 
+#endif
+    {
+	EMF_write_emr(83, 76 + alen + nchars * 4);	/* ExtTextOutA, ANSI char version! */
+    }
     EMF_write_rectl(0, 0, 0, 0); /* bounding, never used */
     EMF_write_long(1);		/* GM_Compatible mode for advanced scaling */
     EMF_write_float(EMF_PX2HM);	/* x scale */
@@ -1218,16 +1254,23 @@ EMF_put_text(unsigned int x, unsigned int y, const char str[])
 	x + (long) ((EMF_VCHAR / 2) * sin(emf_vert_text * EMF_10THDEG2RAD)),
 	term->ymax - y + (long) (EMF_VCHAR / 2
 				 * cos(emf_vert_text * EMF_10THDEG2RAD)));
-    EMF_write_long(slen);       /* true number of characters */
+    EMF_write_long(nchars);	/* true number of characters */
     EMF_write_long(76);		/* offset to text */
     EMF_write_long(0);		/* options, none */
     EMF_write_rectl(0, 0, 0, 0); /* rectangle clipping not used */
     EMF_write_long(0);		/* offset to intercharacter spacing array */
 				/* can't be used since we don't know anything */
 				/* about the font properties being used */
-    for (i = 0; i < alen; i++) 
-	EMF_write_byte(i<slen?str[i]:0);	/* writing text */
-    for (i = 0; i < slen; i++)
+
+#ifdef HAVE_ICONV
+    if (encoding == S_ENC_UTF8)
+	for (i = 0; i < alen; i++) 
+	    EMF_write_byte(i < slen ? wstr[i] : 0);	/* writing text */
+    else
+#endif
+	for (i = 0; i < alen; i++) 
+	    EMF_write_byte(i < slen ? str[i] : 0);	/* writing text */
+    for (i = 0; i < nchars; i++)
 	/* writing intercharacter spacing array (but we don't use it) */
 	EMF_write_long(300); 
     /* SB 20040506: end of modification */

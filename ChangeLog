@@ -1,3 +1,9 @@
+2011-08-23  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* term/em.trm (EMF_put_text): Use iconv (if available) to convert
+	UTF-8 encoding to UTF-16 and store using wide characters.
+	Bug #3021779
+
 2011-08-22  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graph3d.c:  Honor 'set key maxrows N' in 3D plot key.
