@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.202 2011/07/21 04:53:23 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.203 2011/07/25 06:51:29 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -2172,10 +2172,32 @@ f_stringcolumn(union argument *arg)
 
     (void) arg;                 /* avoid -Wunused warning */
     (void) pop(&a);
-    column = (int) real(&a);
 
     if (!evaluate_inside_using || df_matrix)
 	int_error(c_token-1, "stringcolumn() called from invalid context");
+
+    if (a.type == STRING) {
+	int j;
+	char *name = a.v.string_val;
+	column = DF_COLUMN_HEADERS;
+	for (j=0; j<df_no_cols; j++) {
+	    if (df_column[j].header) {
+		int offset = (*df_column[j].header == '"') ? 1 : 0;
+		if (0 == strncmp(name, df_column[j].header + offset, 
+				strlen(name))) {
+		    column = j+1;
+		    if (!df_key_title) /* EAM DEBUG - on the off chance we want it */
+			df_key_title = gp_strdup(df_column[j].header);
+		    break;
+		}
+	    }
+	}
+	if (column == DF_COLUMN_HEADERS)
+	    int_error(NO_CARET,"could not find column with header \"%s\"\n",
+			a.v.string_val);
+	gpfree_string(&a);
+    } else
+	column = (int) real(&a);
 
     if (column == -2) {
 	char temp_string[32];

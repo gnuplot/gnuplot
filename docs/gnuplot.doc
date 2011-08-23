@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.684 2011/08/05 17:36:31 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.685 2011/08/19 18:42:08 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -1477,8 +1477,8 @@ C marker below is used to signal this to doc2html:
 ?expressions functions strcol
 ?functions strcol
 ?strcol
-#stringcolumn(x) & int & content of column $x$ as a string. \\
-%stringcolumn(x)@int@ content column $x$ as a string.
+#stringcolumn(x) & int or string & content of column $x$ as a string. \\
+%stringcolumn(x)@int or string@ content column $x$ as a string.
  `stringcolumn(x)` may be used only in expressions as part of `using` manipulations
  to fits or datafile plots.  It returns the content of column x as a string variable.
  See `plot datafile using`.
@@ -3657,6 +3657,11 @@ Ffigure_labels
  column specifiers are required, corresponding to X Y Z and text.
 
    splot 'datafile' using 1:2:3:4 with labels
+
+ If you want to select input columns by name, you have the `stringcolumn` 
+ (or `strcol`) function to specify the column that contains the labels:
+
+   plot 'datafile' using "X":"Y":(strcol("label")) with labels
 
  See also `datastrings`, `set style data`.
 2 lines
@@ -5865,7 +5870,12 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/population.gif" alt="[popu
        plot 'datafile' using (column("Age")):(column(1)), \
                     '' using (column("Age")):(column(2))
        plot 'datafile' using "Age":"Height", '' using "Age":"Weight"
- To use the column labels in the plot legend, use `set key autotitle columnhead`.
+
+ The `labels` style needs a slightly different syntax:
+      plot 'datafile' using "Age":"Height":(strcol("Weight")) with labels
+
+ To use the column labels in the plot legend, use 
+ `set key autotitle columnhead`.
 
  In addition to the actual columns 1...N in the input data file, gnuplot
  presents data from several "pseudo-columns" that hold bookkeeping information.

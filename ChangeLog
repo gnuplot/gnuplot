@@ -1,3 +1,12 @@
+2011-08-23  Peter Juhasz  <juhaszp@users.sourceforge.net>
+
+	* src/datafile.c (f_stringcolumn) docs/gnuplot.doc:
+	Implement 'stringcolumn("string")' in using specs to allow named columns
+	for the "labels" style too. The more natural 
+	    plot 'data' using "A":"B":"labels" with labels
+	still doesn't work: document this fact. 
+	
+
 2011-08-23  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/command.c (rlgets): Removing duplicate entries trashes command
