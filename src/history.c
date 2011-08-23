@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: history.c,v 1.26 2010/08/06 01:21:05 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: history.c,v 1.27 2011/02/21 07:55:48 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - history.c */
@@ -456,15 +456,33 @@ history_find_all(char *cmd)
     /* Output matching history entries in chronological order (not backwards
      * so we have to start at the beginning of the history list.
      */
-    history_set_pos(0);
+#if defined(HAVE_LIBREADLINE)
+    found = history_set_pos(0);
+    if (found == -1) {
+        fprintf(stderr, "ERROR (history_find_all): could not rewind history\n");
+        return 0;
+    }
+#else /* HAVE_LIBEDITLINE */
+    /* libedit's history_set_pos() does not work properly,
+       so we manually go to oldest entry */
+    while (next_history());
+#endif
     do {
         found = history_search_prefix(cmd, 1); /* Anchored backward search for prefix */
         if (found == 0) {
             number++;
+#if defined(HAVE_LIBREADLINE)
             printf("%5i  %s\n", where_history() + history_base, current_history()->line);
             /* go one step back or you find always the same entry. */
             if (!history_set_pos(where_history() + 1))
                 break; /* finished if stepping didn't work */
+#else /* HAVE_LIBEDITLINE */
+            /* libedit's history indices are reversed wrt GNU readline */
+            printf("%5i  %s\n", history_length - where_history() + history_base, current_history()->line);
+            /* go one step back or you find always the same entry. */
+            if (!previous_history())
+                break; /* finished if stepping didn't work */
+#endif
         } /* (found == 0) */
     } while (found > -1);
 

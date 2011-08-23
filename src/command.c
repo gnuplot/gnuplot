@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.218 2011/08/15 18:16:49 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.219 2011/08/19 18:42:08 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -2658,7 +2658,7 @@ rlgets(char *s, size_t n, const char *prompt)
 	leftover = 0;
 	/* If it's not an EOF */
 	if (line && *line) {
-#if defined(HAVE_LIBREADLINE) || defined(HAVE_LIBEDITLINE)
+#  if defined(HAVE_LIBREADLINE)
 	    int found;
 	    /* Initialize readline history functions */
 	    using_history();
@@ -2668,8 +2668,7 @@ rlgets(char *s, size_t n, const char *prompt)
 	     * the check on strcmp below. */
 	    found = history_search(line, -1);
 	    if (found != -1 && !strcmp(current_history()->line,line)) {
-	    /* this line is already in the history, remove the earlier entry */
-#if defined(HAVE_LIBREADLINE)
+		/* this line is already in the history, remove the earlier entry */
 		HIST_ENTRY *removed = remove_history(where_history());
 		/* according to history docs we are supposed to free the stuff */
 		if (removed) {
@@ -2677,13 +2676,14 @@ rlgets(char *s, size_t n, const char *prompt)
 		    free(removed->data);
 		    free(removed);
 		}
-#else
-		remove_history(where_history());
-#endif /* !HAVE_LIBREADLINE */
 	    }
 	    add_history(line);
-#  else /* !HAVE_LIBREADLINE && !HAVE_LIBEDITLINE */
-	    add_history(line);
+#  elif defined(HAVE_LIBEDITLINE)
+	    /* deleting history entries does not work, so suppress adjacent 
+	    duplicates only */
+	    while (previous_history());
+	    if (strcmp(current_history()->line, line) != 0)
+		add_history(line);
 #  endif
 	}
     }
@@ -2697,7 +2697,7 @@ rlgets(char *s, size_t n, const char *prompt)
     }
     return NULL;
 }
-# endif				/* READLINE || HAVE_LIBREADLINE */
+# endif				/* READLINE || HAVE_LIBREADLINE || HAVE_LIBEDITLINE */
 
 
 # if defined(MSDOS) || defined(_Windows)
@@ -2825,7 +2825,7 @@ cgets_emu(char *str, int len)
 #   define GET_STRING(s,l) fgets(s, l, stdin)
 
 #  endif			/* !plain DOS */
-# endif				/* !READLINE && !HAVE_LIBREADLINE) */
+# endif				/* !READLINE && !HAVE_LIBREADLINE && !HAVE_LIBEDITLINE */
 
 /* this function is called for non-interactive operation. Its usage is
  * like fgets(), but additionally it checks for ipc events from the
@@ -2877,12 +2877,12 @@ gp_get_string(char * buffer, size_t len, const char * prompt)
 	return rlgets(buffer, len, prompt);
     else
 	return fgets_ipc(buffer, len);
-# else /* !(READLINE || HAVE_LIBREADLINE) */
+# else
     if (interactive)
 	PUT_STRING(prompt);
 
     return GET_STRING(buffer, len);
-# endif /* !(READLINE || HAVE_LIBREADLINE) */
+# endif
 }
 
 /* Non-VMS version */

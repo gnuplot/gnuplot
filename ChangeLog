@@ -1,5 +1,13 @@
 2011-08-23  Bastian Maerkisch  <bmaerkisch@web.de>
 
+	* src/command.c (rlgets): Removing duplicate entries trashes command
+	line history when using editline. Just suppress adding the same command
+	to history repeatedly.
+	* src/history.c (history_find_all): editline's version of
+	history_set_pos() does not work, so traverse history list manually.
+	History indices are reversed compared to GNU readline. Fixes history ?.
+	Patch #3186010
+
 	* term/em.trm (EMF_put_text): Use iconv (if available) to convert
 	UTF-8 encoding to UTF-16 and store using wide characters.
 	Bug #3021779
