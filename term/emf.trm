@@ -1,5 +1,5 @@
 /* Hey Emacs this is -*- C -*-
- * $Id: emf.trm,v 1.72 2011/05/31 19:59:28 sfeam Exp $
+ * $Id: emf.trm,v 1.73 2011/08/23 10:50:35 markisch Exp $
  */
 
 /* GNUPLOT - emf.trm */
@@ -1263,10 +1263,11 @@ EMF_put_text(unsigned int x, unsigned int y, const char str[])
 				/* about the font properties being used */
 
 #ifdef HAVE_ICONV
-    if (encoding == S_ENC_UTF8)
+    if (encoding == S_ENC_UTF8) {
 	for (i = 0; i < alen; i++) 
 	    EMF_write_byte(i < slen ? wstr[i] : 0);	/* writing text */
-    else
+	free(wstr);
+    } else
 #endif
 	for (i = 0; i < alen; i++) 
 	    EMF_write_byte(i < slen ? str[i] : 0);	/* writing text */
