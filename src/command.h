@@ -1,5 +1,5 @@
 /*
- * $Id: command.h,v 1.53 2011/06/18 23:17:37 sfeam Exp $
+ * $Id: command.h,v 1.54 2011/06/19 22:10:37 sfeam Exp $
  */
 
 /* GNUPLOT - command.h */
@@ -133,8 +133,10 @@ extern void x11_lower_terminal_window __PROTO((int));
 extern void x11_lower_terminal_group __PROTO((void));
 #endif
 #ifdef _Windows
-extern void win_raise_terminal_window();
-extern void win_lower_terminal_window();
+extern void win_raise_terminal_window __PROTO((int));
+extern void win_raise_terminal_group __PROTO((void));
+extern void win_lower_terminal_window __PROTO((int));
+extern void win_lower_terminal_group __PROTO((void));
 #endif
 #ifdef WXWIDGETS
 extern void wxt_raise_terminal_window __PROTO((int));

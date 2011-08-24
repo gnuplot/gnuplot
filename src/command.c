@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.220 2011/08/23 11:06:50 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.221 2011/08/24 16:54:34 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -649,7 +649,7 @@ raise_lower_command(int lower)
 	    x11_lower_terminal_group();
 #endif
 #ifdef _Windows
-	    win_lower_terminal_window();
+	    win_lower_terminal_group();
 #endif
 #ifdef WXWIDGETS
 	    wxt_lower_terminal_group();
@@ -662,7 +662,7 @@ raise_lower_command(int lower)
 	    x11_raise_terminal_group();
 #endif
 #ifdef _Windows
-	    win_raise_terminal_window();
+	    win_raise_terminal_group();
 #endif
 #ifdef WXWIDGETS
 	    wxt_raise_terminal_group();
@@ -686,7 +686,7 @@ raise_lower_command(int lower)
 		x11_lower_terminal_window(number);
 #endif
 #ifdef _Windows
-		win_lower_terminal_window();
+		win_lower_terminal_window(number);
 #endif
 #ifdef WXWIDGETS
 		wxt_lower_terminal_window(number);
@@ -699,7 +699,7 @@ raise_lower_command(int lower)
 		x11_raise_terminal_window(number);
 #endif
 #ifdef _Windows
-		win_raise_terminal_window();
+		win_raise_terminal_window(number);
 #endif
 #ifdef WXWIDGETS
 		wxt_raise_terminal_window(number);
@@ -709,7 +709,10 @@ raise_lower_command(int lower)
 	    return;
 	}
     }
-    int_error(c_token, "usage: raise {x11_plot_n}");
+    if (lower)
+	int_error(c_token, "usage: lower {plot_id}");
+    else
+	int_error(c_token, "usage: raise {plot_id}");
 }
 
 void

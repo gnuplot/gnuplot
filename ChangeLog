@@ -1,3 +1,11 @@
+2011-08-24  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/command.c src/command.h src/win/winmain.c: "raise/lower <id>"
+	command for windows terminal.
+
+	* src/command.c (rlgets): Restore code for builtin readline which was
+	deleted by accident.
+
 2011-08-23  Peter Juhasz  <juhaszp@users.sourceforge.net>
 
 	* src/datafile.c (f_stringcolumn) docs/gnuplot.doc:

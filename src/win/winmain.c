@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: winmain.c,v 1.47 2011/05/07 16:18:01 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: winmain.c,v 1.48 2011/08/15 18:16:49 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - win/winmain.c */
@@ -863,16 +863,47 @@ screen_dump()
     GraphPrint(graphwin);
 }
 
+
 void
-win_raise_terminal_window()
+win_raise_terminal_window(int id)
 {
-    ShowWindow(graphwin->hWndGraph, SW_SHOWNORMAL);
-    BringWindowToTop(graphwin->hWndGraph);
+	LPGW lpgw = listgraphs;
+	while ((lpgw != NULL) && (lpgw->Id != id))
+		lpgw = lpgw->next;
+	if (lpgw != NULL) {
+		ShowWindow(lpgw->hWndGraph, SW_SHOWNORMAL);
+		BringWindowToTop(lpgw->hWndGraph);
+	}
 }
 
 void
-win_lower_terminal_window()
+win_raise_terminal_group(void)
 {
-    SetWindowPos(graphwin->hWndGraph, HWND_BOTTOM, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE | SWP_NOACTIVATE);
+	LPGW lpgw = listgraphs;
+	while (lpgw != NULL) {
+		ShowWindow(lpgw->hWndGraph, SW_SHOWNORMAL);
+		BringWindowToTop(lpgw->hWndGraph);
+		lpgw = lpgw->next;
+	}
+}
+
+void
+win_lower_terminal_window(int id)
+{
+	LPGW lpgw = listgraphs;
+	while ((lpgw != NULL) && (lpgw->Id != id))
+		lpgw = lpgw->next;
+	if (lpgw != NULL)
+	    SetWindowPos(lpgw->hWndGraph, HWND_BOTTOM, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE | SWP_NOACTIVATE);
+}
+
+void
+win_lower_terminal_group(void)
+{
+	LPGW lpgw = listgraphs;
+	while (lpgw != NULL) {
+	    SetWindowPos(lpgw->hWndGraph, HWND_BOTTOM, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE | SWP_NOACTIVATE);
+		lpgw = lpgw->next;
+	}
 }
 
