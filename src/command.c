@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.219 2011/08/19 18:42:08 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.220 2011/08/23 11:06:50 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -2684,6 +2684,8 @@ rlgets(char *s, size_t n, const char *prompt)
 	    while (previous_history());
 	    if (strcmp(current_history()->line, line) != 0)
 		add_history(line);
+#  else /* builtin readline */
+	    add_history(line);
 #  endif
 	}
     }
