@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: cairo.trm,v 1.43 2011/03/11 22:20:59 sfeam Exp $
+ * $Id: cairo.trm,v 1.44 2011/05/25 05:06:45 sfeam Exp $
  */
 
 /* GNUPLOT - cairo.trm */
@@ -38,6 +38,7 @@
  * Modifications:
  *	Peter Danenberg, Ethan Merritt	- handle png output as well as pdf
  *	Peter Danenberg - crop for PNGs
+ *	René Haber - added epscairo part and avoid useless calls to gp_cairo_vector (reduces file size)
  */
 
 #ifdef TERM_REGISTER
@@ -75,6 +76,7 @@ TERM_PUBLIC void cairotrm_filled_polygon __PROTO ((int n, gpiPoint * corners));
 #ifdef TERM_BODY
 
 #include "cairo-pdf.h"
+#include "cairo-ps.h"
 #include "wxterminal/gp_cairo.h"
 #include "wxterminal/gp_cairo_helpers.h"
 #include "glib.h"		/* For guint32 */
@@ -86,7 +88,7 @@ static int cairostream_error[1];
 
 /* Terminal type of postscript dialect */
 enum CAIRO_TERMINALTYPE {
-    CAIROTERM_PDF, CAIROTERM_PNG
+    CAIROTERM_EPS, CAIROTERM_PDF, CAIROTERM_PNG
 };
 
 /* One struct that takes all terminal parameters
@@ -110,6 +112,13 @@ typedef struct cairo_params_t {
     float base_linewidth;
     float lw;
 } cairo_params_t;
+
+#define CAIROEPS_PARAMS_DEFAULT { \
+    CAIROTERM_EPS, INCHES, FALSE, FALSE, 1.0, {1.,1.,1.}, FALSE, FALSE, TRUE, FALSE, "", \
+    12, 0.5, 5*72., 3*72., 0.25, 1.0 \
+}
+static cairo_params_t cairoeps_params = CAIROEPS_PARAMS_DEFAULT;
+static const cairo_params_t cairoeps_params_default = CAIROEPS_PARAMS_DEFAULT;
 
 #define CAIROPDF_PARAMS_DEFAULT { \
     CAIROTERM_PDF, INCHES, FALSE, FALSE, 1.0, {1.,1.,1.}, FALSE, FALSE, TRUE, FALSE, "", \
@@ -177,6 +186,9 @@ static struct gen_table cairotrm_opts[] = {
     {NULL, CAIROTRM_OTHER}
 };
 
+static int CT_pen_x;
+static int CT_pen_y;
+
 /* "Called when terminal type is selected. This procedure should parse options on the command line.
 * A list of the currently selected options should be stored in term_options[],
 * in a form suitable for use with the set term command.
@@ -195,6 +207,9 @@ TERM_PUBLIC void cairotrm_options()
 	if (strcmp(term->name, "pngcairo") == 0) {
 	    cairo_params = &cairopng_params;
 	    cairo_params_default = &cairopng_params_default;
+	} else if (strcmp(term->name, "epscairo") == 0) {
+	    cairo_params = &cairoeps_params;
+	    cairo_params_default = &cairoeps_params_default;
 	} else {
 	    cairo_params = &cairopdf_params;
 	    cairo_params_default = &cairopdf_params_default;
@@ -421,7 +436,7 @@ void cairotrm_init()
 	FPRINTF((stderr,"Init\n"));
 
 	/* do a sanity check for once */
-	if (strcmp(term->name,"pdfcairo") && strcmp(term->name,"pngcairo"))
+	if (strcmp(term->name,"epscairo") && strcmp(term->name,"pdfcairo") && strcmp(term->name,"pngcairo"))
 		int_error(c_token,"Unrecognized cairo terminal");
 
 	/* initialisations */
@@ -430,11 +445,35 @@ void cairotrm_init()
 	plot.device_ymax = (double) cairo_params->height;
 	plot.dashlength = cairo_params->dash_length;
 
+	CT_pen_x = 0;
+	CT_pen_y = 0;
+
 	/* is supposed to be done in cairotrm_reset */
 	if ( plot.cr )
 		cairo_destroy(plot.cr);
 
-	if (!strcmp(term->name,"pdfcairo")) {
+	if (!strcmp(term->name,"epscairo")) {
+		/* Output can either be a file or stdout */
+		if (!outstr) {
+		    surface = cairo_ps_surface_create_for_stream(
+			(cairo_write_func_t)cairostream_write, cairostream_error,
+				plot.device_xmax /*double width_in_points*/,
+				plot.device_ymax /*double height_in_points*/);
+		} else {
+		    surface = cairo_ps_surface_create(outstr,
+				plot.device_xmax /*double width_in_points*/,
+				plot.device_ymax /*double height_in_points*/);
+		}
+		cairo_ps_surface_set_eps(surface, TRUE);
+		/* it is up to the pdf viewer to do the hinting */
+		plot.hinting = 0;
+		/* disable OPERATOR_SATURATE, not implemented in cairo pdf backend,
+		 * results in bitmap fallback. However, polygons are drawn with seams
+		 * between each other. */
+		plot.polygons_saturate = FALSE;
+		/* Empirical correction to make pdf output look more like wxt and png */
+		plot.dashlength /= 2;
+	} else if (!strcmp(term->name,"pdfcairo")) {
 		/* Output can either be a file or stdout */
 		if (!outstr) {
 		    surface = cairo_pdf_surface_create_for_stream(
@@ -647,7 +686,12 @@ void cairotrm_move(unsigned int x, unsigned int y)
 
 void cairotrm_vector(unsigned int x, unsigned int y)
 {
+	int dx = x-CT_pen_x;
+	int dy = y-CT_pen_y;
+	if (dx == 0 && dy == 0) return;
 	gp_cairo_vector(&plot, x, term->ymax - y);
+	CT_pen_x = x;
+	CT_pen_y = y;
 }
 
 void cairotrm_put_text(unsigned int x, unsigned int y, const char * string)
@@ -917,6 +961,30 @@ void cairotrm_image(unsigned int M, unsigned int N, coordval * image, gpiPoint *
 #endif /* TERM_BODY */
 
 #ifdef TERM_TABLE
+TERM_TABLE_START (epscairo_driver)
+    "epscairo", "eps terminal based on cairo",
+    /* the following values are overriden by cairotrm_graphics */
+    1 /* xmax */ , 1 /* ymax */ , 1 /* vchar */ , 1 /* hchar */ ,
+    1 /* vtic */ , 1 /* htic */ ,
+    cairotrm_options, cairotrm_init, cairotrm_reset, cairotrm_text, null_scale, cairotrm_graphics,
+    cairotrm_move, cairotrm_vector, cairotrm_linetype, cairotrm_put_text,
+    cairotrm_text_angle, cairotrm_justify_text,
+    cairotrm_point, do_arrow, cairotrm_set_font,
+    cairotrm_pointsize,
+    TERM_CAN_MULTIPLOT|TERM_BINARY|TERM_CAN_DASH|TERM_ALPHA_CHANNEL|TERM_LINEWIDTH|TERM_FONTSCALE,
+    0 /* suspend */, 0 /* resume */, cairotrm_fillbox, cairotrm_linewidth
+#ifdef USE_MOUSE
+    , 0, 0, 0, 0, 0
+#endif
+    , cairotrm_make_palette, 0 /* cairotrm_previous_palette */, cairotrm_set_color, cairotrm_filled_polygon
+    , cairotrm_image
+    , cairotrm_enhanced_open, cairotrm_enhanced_flush, cairotrm_enhanced_writec
+    , 0, 0, 1.0
+TERM_TABLE_END (epscairo_driver)
+
+#undef LAST_TERM
+#define LAST_TERM epscairo_driver
+
 TERM_TABLE_START (pdfcairo_driver)
     "pdfcairo", "pdf terminal based on cairo",
     /* the following values are overriden by cairotrm_graphics */
@@ -968,6 +1036,24 @@ TERM_TABLE_END (pngcairo_driver)
 
 #endif /* TERM_TABLE */
 #endif /* TERM_PROTO_ONLY */
+
+#ifdef TERM_HELP
+START_HELP(epscairo)
+"1 epscairo",
+"?set terminal epscairo",
+"?terminal epscairo",
+"?set term epscairo",
+"?term epscairo",
+"?epscairo",
+" The `epscairo` terminal device generates output in eps. The actual",
+" drawing is done via cairo, a 2D graphics library, and pango, a library for",
+" laying out and rendering text.",
+"",
+" Please read the help for the pdfcairo temrinal."
+""
+END_HELP(epscairo)
+#endif /* TERM_HELP */
+
 
 #ifdef TERM_HELP
 START_HELP(pdfcairo)

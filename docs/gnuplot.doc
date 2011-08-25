@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.685 2011/08/19 18:42:08 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.686 2011/08/23 15:08:32 juhaszp Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -2040,7 +2040,7 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/userdefined.gif" alt="[use
  another. Brief documentation of font mechanisms that apply to more than one
  terminal type is given here. For information on font use by other individual
  terminals, see the documentation for that terminal.
-3 cairo (pdfcairo, pngcairo, wxt terminals)
+3 cairo (pdfcairo, pngcairo, epscairo, wxt terminals)
 ?fonts cairo
 =fonts
 =pdf

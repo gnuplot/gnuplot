@@ -1,3 +1,8 @@
+2011-08-25  René Haber  <renehaber@users.sourceforge.net>
+
+	* term/cairo.trm: New terminal epscairo using the shared cairo/pango
+	code to produce and export an eps surface.
+
 2011-08-24  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/command.c src/command.h src/win/winmain.c: "raise/lower <id>"
