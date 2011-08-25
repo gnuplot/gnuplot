@@ -3,6 +3,8 @@
 	* term/cairo.trm: New terminal epscairo using the shared cairo/pango
 	code to produce and export an eps surface.
 
+	* term/term.c: Allow "set term eps" as short for "set term epscairo".
+
 2011-08-24  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/command.c src/command.h src/win/winmain.c: "raise/lower <id>"
