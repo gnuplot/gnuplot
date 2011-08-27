@@ -16,7 +16,7 @@
 	terminal sort of like xterm+graphics in the era of Sun3 (i.e. early-mid
 	1990s). Source for the mgr server has apparently disappeared from the
 	net.  Gnuplot's mgr.trm supported only text and vector commands, so
-	even if an operation installation of mgr could be found, features 
+	even if an operational installation of mgr could be found, features 
 	added to gnuplot since about version 3.7 would be irrelevant. Let it go.
 
 2011-08-27  Peter Juhasz  <juhaszp@users.sourceforge.net>
