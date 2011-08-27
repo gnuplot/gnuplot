@@ -1,3 +1,11 @@
+2011-08-27  Peter Juhasz  <juhaszp@users.sourceforge.net>
+
+	* src/datafile.c (expect_string) src/eval.c src/eval.h docs/gnuplot.doc:
+	Add patch #3397007 to complete the support for named columns with the 
+	"labels" style. The following now works: 
+	    plot 'data' using "A":"B":"labels" with labels
+	Update the documentation. 
+
 2011-08-25  René Haber  <renehaber@users.sourceforge.net>
 
 	* term/cairo.trm: New terminal epscairo using the shared cairo/pango
@@ -20,7 +28,6 @@
 	for the "labels" style too. The more natural 
 	    plot 'data' using "A":"B":"labels" with labels
 	still doesn't work: document this fact. 
-	
 
 2011-08-23  Bastian Maerkisch  <bmaerkisch@web.de>
 

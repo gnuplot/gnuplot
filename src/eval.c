@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: eval.c,v 1.92 2011/07/14 21:29:41 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: eval.c,v 1.93 2011/08/01 05:14:23 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - eval.c */
@@ -128,6 +128,8 @@ const struct ft_entry GPFAR ft[] =
 
 /* legal in using spec only */
     {"column",  f_column},
+    {"stringcolumn",  f_stringcolumn},	/* for using specs */
+    {"strcol",  f_stringcolumn},	/* shorthand form */
     {"columnhead",  f_columnhead},
     {"valid",  f_valid},
     {"timecolumn",  f_timecolumn},
@@ -194,8 +196,6 @@ const struct ft_entry GPFAR ft[] =
     {"tm_wday",  f_tmwday},	/* for timeseries */
     {"tm_yday",  f_tmyday},	/* for timeseries */
 
-    {"stringcolumn",  f_stringcolumn},	/* for using specs */
-    {"strcol",  f_stringcolumn},	/* shorthand form */
     {"sprintf",  f_sprintf},	/* for string variables only */
     {"gprintf",  f_gprintf},	/* for string variables only */
     {"strlen",  f_strlen},	/* for string variables only */

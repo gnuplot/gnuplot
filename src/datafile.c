@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.203 2011/07/25 06:51:29 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.204 2011/08/23 15:08:32 juhaszp Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -2375,6 +2375,16 @@ int
 expect_string(const char column)
 {
     use_spec[column-1].expected_type = CT_STRING;
+    /* Nasty hack to make 'plot "file" using "A":"B":"C" with labels' work.
+     * The case of named columns is handled by create_call_column_at(),
+     * which fakes an action table as if '(column("string"))' was written 
+     * in the using spec instead of simply "string". In this specific case, however,
+     * we need the values as strings - so we change the action table to call 
+     * f_stringcolumn() instead of f_column. */
+    if (use_spec[column-1].at 
+    && (use_spec[column-1].at->a_count == 2)
+    && (use_spec[column-1].at->actions[1].index == COLUMN))
+        use_spec[column-1].at->actions[1].index = STRINGCOLUMN;
     return(use_spec[column-1].column);
 }
 
