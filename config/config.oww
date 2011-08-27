@@ -420,9 +420,6 @@
 /* Define to 1 if malloc(0)==0 */
 /* #undef MALLOC_ZERO_RETURNS_ZERO */
 
-/* Define if you want to use the MGR Window system. */
-/* #undef MGR */
-
 /* Define if your libreadline has no rl_ding */
 /* #undef MISSING_RL_DING */
 

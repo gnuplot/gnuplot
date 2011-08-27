@@ -1,5 +1,5 @@
 /*
- * $Id: term.h,v 1.51 2011/06/01 03:44:36 sfeam Exp $
+ * $Id: term.h,v 1.52 2011/08/09 17:34:29 sfeam Exp $
  */
 
 /* GNUPLOT - term.h */
@@ -187,11 +187,6 @@
 #  include "vgagl.trm"
 # endif
 #endif /* LINUXVGA */
-
-/* MGR Window system */
-#ifdef MGR
-# include "mgr.trm"
-#endif
 
 /* SCO CGI drivers */
 #ifdef SCO

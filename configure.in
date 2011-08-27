@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot on Unix.
 dnl
-dnl $Id: configure.in,v 1.284 2011/08/09 17:34:29 sfeam Exp $
+dnl $Id: configure.in,v 1.285 2011/08/25 18:34:38 sfeam Exp $
 dnl
 dnl this is actually major.minor ...
 dnl note that for a non-beta release, we need to
@@ -291,6 +291,7 @@ AC_FUNC_SELECT_ARGTYPES
 dnl On SVR3.
 dnl FIXME AC_DEFINE(CRIPPLED_SELECT)
 
+dnl Deprecated
 dnl Install the lasergnu printer script
 LASERGNU=lasergnu-noinstall
 AC_ARG_WITH(lasergnu,dnl
@@ -897,17 +898,6 @@ AC_ARG_ENABLE(macros,dnl
                [ Define to allow command line macros. ])
   fi
 
-dnl MGR Window system
-AC_ARG_ENABLE(mgr,dnl
-[  --enable-mgr            enable MGR terminal],
-  [if test "$enableval" = yes; then
-     AC_CHECK_LIB(mgr,m_getinfo,
-       [AC_DEFINE(MGR,1,[ Define if you want to use the MGR Window system. ])
-        TERMLIBS="-lmgr -lpixrect $TERMLIBS"],
-       enable_mgr=no,
-       [-lpixrect])
-   fi])
-
 dnl hidden3d compile-time options...
 dnl NOTE: have to check that they're not both turned on --- the code
 dnl doesn't allow that choice.
@@ -1316,12 +1306,6 @@ else
   AC_MSG_RESULT([  ggi terminal: no (use --with-ggi to enable, requires libggi)])
 fi
 
-if test "$enable_mgr" = yes; then
-  AC_MSG_RESULT([  mgr terminal: yes])
-else
-  AC_MSG_RESULT([  mgr terminal: no (use --enable-mgr to enable, requires libpixrect)])
-fi
-
 if test "$is_msdos" = yes; then
   AC_MSG_RESULT([  svga terminal (MSDOS/djgpp): yes])
 else
@@ -1375,11 +1359,6 @@ AC_MSG_RESULT([  Additional terminals are availaible in platform-specific makefi
 AC_MSG_RESULT([   cgi (makefile.unx), pm (makefile.os2),])
 AC_MSG_RESULT([   sun (makefile.unx), unixpc (makefile.unx), windows (various Windows])
 AC_MSG_RESULT([   makefiles)])
-
-AC_MSG_RESULT([  Additional terminals are built automatically if possible at compile-time:])
-AC_MSG_RESULT([   vesa (MSDOS), emxvga (MSDOS, OS/2), ega/vga/svga/ssvga/hercules (Windows with])
-AC_MSG_RESULT([   Zortec compiler), macintosh])
-
 
 AC_MSG_RESULT([])
 AC_MSG_RESULT([gnuplot will be compiled with the following features:])
@@ -1496,9 +1475,7 @@ AC_MSG_RESULT([gnuplot will install the following additional materials:])
 AC_MSG_RESULT([])
 
 if test "$with_lasergnu" = yes; then
-  AC_MSG_RESULT([  lasergnu printer script: yes])
-else
-  AC_MSG_RESULT([  lasergnu printer script: no (use --with-lasergnu to enable)])
+  AC_MSG_RESULT([  lasergnu printer script: yes (Deprecated)])
 fi
 
 if test "$with_lisp_files" != no; then

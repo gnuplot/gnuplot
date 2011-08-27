@@ -402,9 +402,6 @@
 /* Define if this is a Linux system with SuperVGA library. */
 /* #undef LINUXVGA */
 
-/* Define if you want to use the MGR Window system. */
-/* #undef MGR */
-
 /* Define if this is an MSDOS system. */
 #define MSDOS 1
 

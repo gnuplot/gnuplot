@@ -1,3 +1,15 @@
+2011-08-27  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* PORTING src/makefile.all src/makefile.awc src/term.h configure.vms
+	config/config.cyg config/config.dj2 config/config.mgw config/config.nt
+	config/config.os2 config/config.oww config/makefile.unx configure.in:
+	Remove obsolete mgr terminal driver.  The mgr window system offered a
+	terminal sort of like xterm+graphics in the era of Sun3 (i.e. early-mid
+	1990s). Source for the mgr server has apparently disappeared from the
+	net.  Gnuplot's mgr.trm supported only text and vector commands, so
+	even if an operation installation of mgr could be found, features 
+	added to gnuplot since about version 3.7 would be irrelevant. Let it go.
+
 2011-08-27  Peter Juhasz  <juhaszp@users.sourceforge.net>
 
 	* src/datafile.c (expect_string) src/eval.c src/eval.h docs/gnuplot.doc:

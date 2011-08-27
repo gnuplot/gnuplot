@@ -141,7 +141,6 @@ of devices that may be selected/deselected by editing term.h.
    LATEX       LaTeX picture environment
    LINUXVGA    Linux PC with (s)vgalib
    MF          Metafont Format
-   MGR         MGR window manager
    MIF         FrameMaker MIF 3.00 Format
    NEC         NEC CP6 pinwriter printer
    NEXT        NeXTStep Window System (only grey scale)
