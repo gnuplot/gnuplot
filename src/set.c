@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.343 2011/07/12 19:30:34 juhaszp Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.344 2011/07/22 14:37:57 juhaszp Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -4252,7 +4252,9 @@ set_tics()
 		}
 	    }
 	} else if (almost_equals(c_token, "ro$tate")) {
-	    axis_array[i].tic_rotate = TEXT_VERTICAL;
+	    for (i = 0; i < AXIS_ARRAY_SIZE; ++i) {
+	        axis_array[i].tic_rotate = TEXT_VERTICAL;
+	    }
 	    ++c_token;
 	    if (equals(c_token, "by")) {
 		int langle;
@@ -4266,20 +4268,27 @@ set_tics()
 		axis_array[i].tic_rotate = 0;
 	    ++c_token;
 	} else if (almost_equals(c_token, "l$eft")) {
-	    axis_array[i].label.pos = LEFT;
-	    axis_array[i].manual_justify = TRUE;
+	    for (i = 0; i < AXIS_ARRAY_SIZE; ++i) {
+		axis_array[i].label.pos = LEFT;
+		axis_array[i].manual_justify = TRUE;
+	    }
 	    c_token++;
 	} else if (almost_equals(c_token, "c$entre")
 		|| almost_equals(c_token, "c$enter")) {
-	    axis_array[i].label.pos = CENTRE;
-	    axis_array[i].manual_justify = TRUE;
+	    for (i = 0; i < AXIS_ARRAY_SIZE; ++i) {
+		axis_array[i].label.pos = CENTRE;
+		axis_array[i].manual_justify = TRUE;
+	    }
 	    c_token++;
 	} else if (almost_equals(c_token, "ri$ght")) {
-	    axis_array[i].label.pos = RIGHT;
-	    axis_array[i].manual_justify = TRUE;
+	    for (i = 0; i < AXIS_ARRAY_SIZE; ++i) {
+		axis_array[i].label.pos = RIGHT;
+		axis_array[i].manual_justify = TRUE;
+	    }
 	    c_token++;
 	} else if (almost_equals(c_token, "autoj$ustify")) {
-	    axis_array[i].manual_justify = FALSE;
+	    for (i = 0; i < AXIS_ARRAY_SIZE; ++i)
+		axis_array[i].manual_justify = FALSE;
 	    c_token++;
 	} else if (almost_equals(c_token, "off$set")) {
 	    struct position lpos;

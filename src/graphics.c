@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.373 2011/07/14 20:24:16 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.374 2011/07/29 22:54:26 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -1028,7 +1028,7 @@ boundary(struct curve_points *plots, int count)
 	if (axis_array[FIRST_X_AXIS].tic_rotate == 90)
 	    projection = 1.0;
 	else if (axis_array[FIRST_X_AXIS].tic_rotate == TEXT_VERTICAL)
-	    projection = 1.0;
+	    projection = -1.0;
 	else
 	    projection = -sin((double)axis_array[FIRST_X_AXIS].tic_rotate*DEG2RAD);
 	if (axis_array[FIRST_X_AXIS].label.pos == RIGHT)

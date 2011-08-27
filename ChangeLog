@@ -5,6 +5,19 @@
 	"labels" style. The following now works: 
 	    plot 'data' using "A":"B":"labels" with labels
 	Update the documentation. 
+	
+	* src/datafile.c (f_timecolumn) src/plot2d.c:
+	Track the current using spec to ensure that the timecolumn function
+	gets the right timeformat. (fixes part of bug #3163386)
+
+	* demo/timedat.dem: Remove the relative date demo because it was 
+	misleading and incorrect.
+
+	* src/set.c (set_tics): For some options set_tics() 
+	didn't act on all axes.
+	
+	* src/graphics.c (boundary): Fix (?) boundary calculation for 
+	"set xtics rotate".
 
 2011-08-25  René Haber  <renehaber@users.sourceforge.net>
 

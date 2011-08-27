@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.204 2011/08/23 15:08:32 juhaszp Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.205 2011/08/27 11:18:01 juhaszp Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -284,6 +284,7 @@ struct use_spec_s use_spec[MAXDATACOLS];
 static char *df_format = NULL;
 static char *df_binary_format = NULL;
 TBOOLEAN evaluate_inside_using = FALSE;
+int current_using_spec;
 
 /* rather than three arrays which all grow dynamically, make one
  * dynamic array of this structure
@@ -1731,6 +1732,7 @@ df_readascii(double v[], int max)
 		/* if there was no using spec, column is output+1 and
 		 * at=NULL */
 		int column = use_spec[output].column;
+		current_using_spec = output;
 
 		/* Handle cases where column holds a meta-data string */
 		/* Axis labels, plot titles, etc.                     */
@@ -2268,6 +2270,12 @@ f_valid(union argument *arg)
  * least.  First, the datafile column number.  Second either a timefmt
  * string (variable), or an axis index.  For now, we have to try to
  * guess the right axis index */
+/* JP 20110823: Each using spec has an axis (thus the correct timefmt)
+ * associated with it, in df_axis[]. Furthermore, this function can 
+ * only be called while evaluating an using spec, we just didn't know
+ * which one it was called from - hence the need for guessing.
+ * This information is now stored in the new global variable 
+ * current_using_spec. */
 void
 f_timecolumn(union argument *arg)
 {
@@ -2285,6 +2293,7 @@ f_timecolumn(union argument *arg)
     if (!evaluate_inside_using)
 	int_error(c_token-1, "timecolumn() called from invalid context");
 
+#if 0
     /* try to match datafile column with spec field number */
     whichaxis = FIRST_X_AXIS;
     for (spec = 0; spec<limit; spec++)
@@ -2296,6 +2305,8 @@ f_timecolumn(union argument *arg)
 	    whichaxis = df_axis[spec];
 	    break;
 	}
+#endif
+    whichaxis = df_axis[current_using_spec];
 
     if (column < 1
 	|| column > df_no_cols
