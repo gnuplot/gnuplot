@@ -1,3 +1,7 @@
+2011-08-28  Shigeharu Takeno  <shige@iee.niit.ac.jp>
+
+	* docs/gnuplot-ja.doc docs/term-ja.diff:  sync to docs version 1.688
+
 2011-08-28  Peter Juhasz  <juhaszp@users.sourceforge.net>
 
 	* src/plot2d.c (get_data): Revert yesterday's change to this file 

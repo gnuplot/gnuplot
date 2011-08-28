@@ -1,5 +1,5 @@
-C RCS $Id: gnuplot-ja.doc,v 1.382 2011-06-20 11:38:51+09 shige Exp $
-C corresponding original gnuplot.doc revision: 1.677
+C RCS $Id: gnuplot-ja.doc,v 1.389 2011-08-28 14:16:54+09 shige Exp $
+C corresponding original gnuplot.doc revision: 1.688
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -146,10 +146,10 @@ C 行が長いのは、できればなんとかしたい
  式 (マウスやホットキー入力も可能)、ペンプロッタや現在のプリンタへの直
  接出力、または多くのファイル形式への出力 (eps, emf, fig, jpeg, LaTeX,
  pdf, png, postscript, ...)。gnuplot は、容易に新しい出力形式を追加する
- よう拡張することができます。最近追加された対話型出力形式には、aquaterm
- (OSX) や wxWidgets (マルチプラットホーム), Qt を元にしたものがあります。
- svg や HTML5 canvas 出力形式を利用すれば、グラフを Web ページ内にマウ
- ス利用可能な形で埋め込んだ出力を生成することもできます。
+ よう拡張することができます。最近追加された対話型出力形式には、
+ wxWidgets (複数のプラットホームで利用可能), Qt を元にしたものがありま
+ す。svg や HTML5 canvas 出力形式を利用すれば、グラフを Web ページ内に
+ マウス利用可能な形で埋め込んだ出力を生成することもできます。
 
  `gnuplot` のコマンド言語は大文字小文字を区別します。すなわち、小文字で
  書かれたコマンドや関数名は、それらを大文字で書いたものとは同じではあり
@@ -258,68 +258,63 @@ C 行が長いのは、できればなんとかしたい
  開発版に関するメーリングリスト:
            gnuplot-beta@lists.sourceforge.net
 
- 何か質問を投稿するときは、あなたが使用している `gnuplot` のバージョン、
- 実行マシン、オペレーティングシステム、といった全ての情報を含むようにし
- てください。その問題を引き起こす _小さい_ スクリプトがあればなお良いで
- す。その場合、データファイルのプロットよりも関数のプロットの方がより良
- いです。もし、gnuplot-info へメールをするなら、そのメーリングリストの
- 購読をしているかどうかを述べてください。そうすれば、ニュースを見たユー
- ザはあなたへの返事をメールで出せば良いことが分かるでしょうから。そのよ
- うな記事のポストの form が Web サイトにあります。
+ 何か質問を投稿するときは、あなたが使用している gnuplot のバージョン、
+ 出力形式、オペレーティングシステム、といった全ての情報を含むようにして
+ ください。その問題を引き起こす「小さい」スクリプトがあればなお良いです。
+ その場合、データファイルのプロットよりも関数のプロットの方がより良いで
+ す。
 
-2 バージョン 4.5 で導入された新しい機能 (New features)
+2 新しい機能 (New features)
 ?new-features
- gnuplot version 4.5 は、直前の公式バージョン 4.4 以降に追加されたたく
- さんの機能を提供します。この節では、主な追加機能の一覧と、変更や細かい
- 新機能の一部を紹介します。より網羅的な一覧は、ファイル NEWS を参照して
- ください。
+ この節では、バージョン 4.4 以降に追加された主なものを紹介します。より
+ 網羅的な一覧は、ファイル NEWS を参照してください。
 
-3 キャンバスサイズ (Canvas size)
-?canvas size
-?canvas
-?set term size
+3 新しい構文 (New syntax)
+Ffigure_newsyntax
+ この版の gnuplot には、繰り返し (iteration) コマンドやブロック構造を扱
+ える if/else/while/do が導入されています。以下参照: `if`, `while`,
+ `do`。単純な繰り返しは、コマンド `plot`, `set` で利用できます。以下参
+ 照: `iteration`。複数のコマンドを包含する一般的な繰り返しは、以下で紹
+ 介するブロック構造を利用することで行えます。新しい機能に関連して、数式
+ 型の以下も参照: `summation`。以下は、これらの新しい構文機能をいくつか
+ 利用した例です:
+       set multiplot layout 2,2
+       fourier(k, x) = sin(3./2*k)/k * 2./3*cos(k*x)
+       do for [power = 0:3] {
+           TERMS = 10**power
+           set title sprintf("%g term Fourier series",TERMS)
+           plot 0.5 + sum [k=1:TERMS] fourier(k,x) notitle
+       }
+       unset multiplot
 
- gnuplot の以前の版では、`set size` の値を、出力する描画領域 (キャンバ
- ス) のサイズを制御するのにも使っていた出力形式もありましたが、すべての
- 出力形式がそうだったわけではありませんでした。この目的のために
- `set size` を使用することは version 4.2 で非推奨となり、version 4.4 で
- は、ほとんどの出力形式が以下のルールに従うようになりました:
+ 現在は、データファイルからのデータ列を、ファイルの 1 行目に書かれたラ
+ ベル名で選択することもできます。以下参照: `columnhead`。例:
+       plot for [crop in "Oats Peas Beans"] 'data' using "Year":crop
 
- `set term <terminal_type> size <XX>, <YY>` は、出力ファイルのサイズ、
- または "キャンバス" のサイズを制御します。サイズパラメータの有効な値に
- ついては、個々の出力形式のヘルプを参照してください。デフォルトでは、グ
- ラフはそのキャンバス全体に描画されます。
+3 線種のユーザ選択性 (User preferences for linetypes)
+ 現在では、ユーザが描画に使用される線種の属性 (色、線幅、点の種類) のデ
+ フォルトの並びをカスタマイズできます。以下参照: `set linetype`。
 
- `set size <XX>, <YY>` は、描画自体をキャンバスのサイズに対して相対的に
- 伸縮させます。1 より小さい伸縮値を指定すると、グラフはキャンバス全体を
- 埋めず、1 より大きい伸縮値を指定すると、グラフの一部分のみがキャンバス
- 全体に合うように描画されます。1 より大きい伸縮値を指定すると、ある出力
- 形式では問題が起こるかもしれないことに注意してください。
+3 新しい描画スタイル (New plot styles)
+ 描画スタイルの節の以下参照: `boxplot`, `circles`, `ellipses`,
+ `fillsteps`。
 
- このルールに沿わない主な例外は PostScript ドライバで、デフォルトでは以
- 前の版のと同じ振舞いをします。gnuplot の次の版では、PostScript ドライ
- バも同様にデフォルトの振舞いを変更することになるでしょう。
-
- 例:
-
-       set size 0.5, 0.5
-       set term png size 600, 400
-       set output "figure.png"
-       plot "data" with lines
-
- このコマンドは、幅 600 ピクセル、高さ 400 ピクセルの出力ファイル
- "figure.png" を生成します。グラフはキャンバスの中の左下に置かれます。
- これは、multiplot モードが常に行ってきた方法とは矛盾していませんが、し
- かし単一のグラフに対する version 4.0 の png ドライバの挙動とは異ってい
- ます。
+3 極座標軸の改良 (Revised polar axes)
+ 極座標描画モードは、より多くの描画スタイルをサポートするように改良され
+ ました。極座標軸は、今では x, y 軸とは独立に描画、ラベル付けできます。
+ 以下参照: `set polar`, `set rrange`。
 
 3 新しい/修正された出力形式
- cairo, pango ライブラリによる 2 つの新しいドライバ `pngcairo`,
- `pdfcairo` が含まれています。これらは、古い libgd ベースの png ドライ
- バ、古い PDFLib ベースの pdf ドライバの代替品です。このマニュアルの
- pdf 版の図は、pdfcairo 出力ドライバで作成されたものです (訳注: PDF 版
- マニュアルにこの図を入れるのには pdflatex が必要なため、日本語 PDF 版
- マニュアルには今のところこの図は含まれていないでしょう)。
+ ドライバ `qt` は、Qt グラフィック階層の最上位に位置する対話型出力形式
+ の実装です。それは、フル装備のデスクトップ環境内の一つのウィンドウとし
+ て、あるいは Qt ベースの埋め込みデバイス上のフルスクリーンアプリケーシ
+ ョンとして機能します。`qt` 出力形式は新しく、まだある種の粗さがありま
+ す。
+
+ Web ベースの対話型表示をサポートする出力形式が 2 つあります。HTML5 の
+ `canvas` 出力形式は version 4.4 で導入されました。`svg` 出力形式は、マ
+ ウス操作に関して、および gnuplot からの svg 出力をより大きな svg/xml
+ 文書によりよく埋め込めるように、大きく改良されています。
 
  出力ドライバ `canvas` は、ウェブページの canvas 要素 HTML 中に描画する
  javascript 出力を生成します。これは、一つの描画だけを含む完全なウェブ
@@ -421,6 +416,42 @@ C 行が長いのは、できればなんとかしたい
  ファイルのコマンドを実行する前に、ユーザ定義変数 a と s をセットする:
        gnuplot -e "a=2; s='file.png'" input.gpl
 
+2 キャンバスサイズ (Canvas size)
+?canvas size
+?canvas
+?set term size
+
+ gnuplot の以前の版では、`set size` の値を、出力する描画領域 (キャンバ
+ ス) のサイズを制御するのにも使っていた出力形式もありましたが、すべての
+ 出力形式がそうだったわけではありませんでした。この目的のために
+ `set size` を使用することは version 4.2 で非推奨となり、version 4.4 以
+ 降は、ほとんどの出力形式が以下のルールに従うようになりました:
+
+ `set term <terminal_type> size <XX>, <YY>` は、出力ファイルのサイズ、
+ または "キャンバス" のサイズを制御します。サイズパラメータの有効な値に
+ ついては、個々の出力形式のヘルプを参照してください。デフォルトでは、グ
+ ラフはそのキャンバス全体に描画されます。
+
+ `set size <XX>, <YY>` は、描画自体をキャンバスのサイズに対して相対的に
+ 伸縮させます。1 より小さい伸縮値を指定すると、グラフはキャンバス全体を
+ 埋めず、1 より大きい伸縮値を指定すると、グラフの一部分のみがキャンバス
+ 全体に合うように描画されます。1 より大きい伸縮値を指定すると、ある出力
+ 形式では問題が起こるかもしれないことに注意してください。
+
+ このルールに沿わない主な例外は PostScript ドライバで、デフォルトでは以
+ 前の版のと同じ振舞いをします。gnuplot の次の版では、PostScript ドライ
+ バも同様にデフォルトの振舞いを変更することになるでしょう。
+
+ 例:
+
+       set size 0.5, 0.5
+       set term png size 600, 400
+       set output "figure.png"
+       plot "data" with lines
+
+ このコマンドは、幅 600 ピクセル、高さ 400 ピクセルの出力ファイル
+ "figure.png" を生成します。グラフはキャンバスの中の左下に置かれます。
+ これは、multiplot モードが常に行ってきた方法と矛盾しません。
 
 2 コマンドライン編集 (Command-line-editing)
 ?line-editing
@@ -942,7 +973,7 @@ C 行が長いのは、できればなんとかしたい
 ^<tr>    <th>関数</th>    <th>引数</th>    <th>戻り値</th></tr>
 ^</thead>
 ^<tbody>
-^<tr>    <td>column(x)</td>    <td>整数</td>    <td> データファイル処理中の <i>x</i> 列目</td></tr>
+^<tr>    <td>column(x)</td>    <td>整数か文字列</td>    <td> 入力データ中の <i>x</i> 列目の内容</td></tr>
 ^<tr>    <td>columnhead(x)</td>    <td>整数</td>    <td> データファイルの最初の <i>x</i> 列目中の文字列</td></tr>
 ^<tr>    <td>defined(X)</td>    <td>変数名</td>    <td> [非推奨] X が定義されていれば 1, そうでなければ 0</td></tr>
 ^<tr>    <td>exists("X")</td>    <td>文字列</td>    <td> 変数名 X が定義されていれば 1, そうでなければ 0</td></tr>
@@ -1462,6 +1493,8 @@ C マーカを doc2html へのこのシグナルとして使用します。
 ?column
 #column(x) & 整数 & データファイル処理中の $x$ 列目 \\
 %column(x)@整数@ データファイル処理中の $x$ 列目
+#column(x) & 整数か文字列 & データファイル処理中の $x$ 列目 \\
+%column(x)@整数か文字列@ データファイル処理中の $x$ 列目
  `column(x)` は fit あるいはデータファイルプロットでの `using` の処理中
  の数式の一部としてのみ使われます。これは $x$ 列目の内容を数値として評
  価します。以下参照: `plot datafile using`。
@@ -1498,8 +1531,8 @@ C マーカを doc2html へのこのシグナルとして使用します。
 ?expressions functions strcol
 ?functions strcol
 ?strcol
-#stringcolumn(x) & 整数 & 文字列としての $x$ 列目の内容 \\
-%stringcolumn(x)@整数@ 文字列としての $x$ 列目の内容
+#stringcolumn(x) & 整数か文字列 & 文字列としての $x$ 列目の内容 \\
+%stringcolumn(x)@整数か文字列@ 文字列としての $x$ 列目の内容
  `stringcolumn(x)` は fit あるいはデータファイルプロットでの `using` の
  操作の数式の一部としてのみ使われます。これは $x$ 列目の内容を文字列変
  数として返します。以下参照: `plot datafile using`。
@@ -1933,7 +1966,24 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/ternary.gif" alt="[ternary
        plot 'file' using 1:( $4<0 ? 1/0 : ($2+$3)/2 )
 
  `using` の書式の説明に関しては、以下参照: `plot datafile using`。
-
+3 和 (Summation)
+?expressions operators summation
+?operators summation
+?summation
+ 和の式は、以下の形式で表します:
+       sum [<var> = <start> : <end>] <expression>
+ ここで <var> は、<start> から <end> までの整数値を順に取る整数変数とし
+ て扱われます。その各値に対して、式 <expression> の値が合計値に追加され、
+ 最終的な合計値がこの和の式の値となります。
+ 例:
+       print sum [i=1:10] i
+           55.
+       # 以下は plot 'data' using 1:($2+$3+$4+$5+$6+...) と同等
+       plot 'data' using 1 : (sum [col=2:MAXCOL] column(col))
+ <expression> は、必ずしも変数 <var> を含む必要はありません。<start> と
+ <end> は変数値や数式で指定もできますが、それらの値は動的に変更すること
+ はできません。そうでないと副作用が起こり得ます。<end> が <start> より
+ 小さい場合は、和の値は 0 となります。
 3 定義済み変数 (Gnuplot-defined variables)
 ?gnuplot-defined variables
  gnuplot は、プログラムの現在の内部状態と直前の描画を反映するような読み
@@ -2036,7 +2086,7 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/userdefined.gif" alt="[use
  では、複数の出力形式に適用されるフォント機構について説明します。ここに
  上げたもの以外の出力形式でのフォントの使用に関しては、その出力形式のド
  キュメントを参照してください。
-3 cairo (pdfcairo, pngcairo, wxt 出力形式)
+3 cairo (pdfcairo, pngcairo, epscairo, wxt 出力形式)
 ?fonts cairo
 =fonts
 =pdf
@@ -2294,10 +2344,10 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/userdefined.gif" alt="[use
 ?lc variable
 ?textcolor variable
 ?tc variable
- `lc variable` は、入力データの一つの列から読んだ値をラインスタイルの番
- 号として使い、そのラインスタイルに属する色を使うようプログラムに指示し
- ます。よってこれは、`using` 指定子へ対応する列の指定の追加を必要としま
- す。文字の色も同様に、`tc variable` で指定できます。
+ `lc variable` は、入力データの一つの列から読んだ値を線種 (linetype) の
+ 番号として使い、その線種に属する色を使うようプログラムに指示します。よ
+ ってこれは、`using` 指定子へ対応する列の指定の追加を必要とします。文字
+ の色も同様に、`tc variable` で指定できます。
 
  例:
        # データの 3 列目を、個々の点に色を割り当てるのに使用
@@ -3725,8 +3775,8 @@ Ffigure_linespoints
  余分な入力列は、点のサイズや線の色の変更などの情報が提供されたものとし
  て使用されます。
 
- ラインスタイルの属性である `pointinterval` (省略形 `pi`) で、グラフの
- すべての点を与えた記号にするかどうかを制御できます。例えば、
+ 線種 (linetype) の属性である `pointinterval` (省略形 `pi`) で、グラフ
+ のすべての点を与えた記号にするかどうかを制御できます。例えば、
  `with lp pi 3` は、すべてのデータ点間に線分を引きますが、点の記号は 3
  つおきにしか書きません。`pointinterval` を負の値にした場合は、記号の下
  の線分の部分を消します。消す部分のサイズは `set pointintervalbox` で制
@@ -4129,9 +4179,10 @@ Ffigure_mapcontours
             <commands>
        }
  これは、コマンド列を複数回実行します。コマンドは中カッコ {} で囲み、か
- つ開始カッコ "{" は、キーワード `do` と同じ行に置く必要があります。繰
- り返し指定 <iteration-spec> の例については、以下参照: `iteration`。
- 例:
+ つ開始カッコ "{" は、キーワード `do` と同じ行に置く必要があります。こ
+ のコマンドは、古い形式 (かっこなし) の if/else 構文と一緒に使うことは
+ できません。繰り返し指定 <iteration-spec> の例については、以下参照:
+ `iteration`。例:
        set multiplot layout 2,2
        do for [name in "A B C D"] {
            filename = name . ".dat"
@@ -4442,14 +4493,12 @@ Ffigure_mapcontours
  般に楽観過ぎ、信頼レベルの決定には使うべきではありませんが、定性的な指
  標としては役に立つでしょう。
 
- 最終的な解は相関行列も生成します。それは解の範囲におけるパラメータの相
- 関の表示を与えてくれます:もし一つのパラメータが変更されると、χ自乗の
- 増加が、他の補正の変更を行なう ? 主対角成分、すなわち自己相関はすべて
- 1 で、もし全てのパラメータが独立ならば他の成分はすべて 0 に近い値にな
- ります。完全に他を補いあう 2 つ変数は、大きさが 1 で、関係が正の相関か
- 負の相関かによって正か負になる符号を持つ非対角成分を持ちます。非対角要
- 素の大きさが小さいほど、各パラメータの標準偏差の評価は、漸近標準誤差に
- 近くなります。
+ 最終的な解は、解の範囲におけるパラメータの相関を示す相関行列も生成しま
+ す: その主対角要素、すなわち自己相関は常に 1 で、全てのパラメータが独
+ 立ならば非対角要素はすべて 0 に近い値になります。完全に他を補いあう 2
+ つの変数は、大きさが 1 で、関係が正の相関か負の相関かによって正か負に
+ なる符号を持つ非対角要素を持ちます。非対角要素の大きさが小さいほど、各
+ パラメータの標準偏差の評価は、漸近標準誤差に近くなります。
 4 実用的なガイドライン (practical guidelines)
 ?commands fit error practical_guidelines
 ?fit error practical_guidelines
@@ -4743,18 +4792,21 @@ Ffigure_mapcontours
  用されます。if コマンドは入れ子にすることもできます。
 
  古い形式の 1 行の if/else 文もまだサポートされていますが、新しいブロッ
- ク形式の書式とは混ぜない方がいいでしょう。以下参照: `if-old`。
+ ク形式の書式とは混ぜてはいけません。以下参照: `if-old`。
 3 if-old
 ?if if-old
 ?if-old
  gnuplot バージョン 4.4 までは、if/else コマンドの通用範囲は 1 行内に留
  まっていました。現在は中カッコ { } で囲むことで複数行にすることが可能
- になっていますが、古い書式も残されています。キーワード `if` が "{" を
- ともなわない場合は、<条件> が真 (ゼロでない) ならば <コマンド行> のコ
- マンド (複数も可) が実行され、偽 (ゼロ) ならばスキップされます。いずれ
- の場合も入力行の最後になるか、`else` が現れるところまでそれが行われま
- す。`;` を使うと同じ行に複数のコマンド置くことが可能ですが、条件付きの
- コマンド (`if` の構文自体) はそこでは終らないことに注意してください。
+ になっています。その古い形式も残されていますが、それは中カッコのブロッ
+ ク内で使うことはできません。
+
+ キーワード `if` が "{" をともなわない場合は、<条件> が真 (ゼロでない)
+ ならば <コマンド行> のコマンド (複数も可) が実行され、偽 (ゼロ) ならば
+ スキップされます。いずれの場合も入力行の最後になるか、`else` が現れる
+ ところまでそれが行われます。`;` を使うと同じ行に複数のコマンド置くこと
+ が可能ですが、条件付きのコマンド (`if` の構文自体) はそこでは終らない
+ ことに注意してください。
 
  例:
        pi=3
@@ -4774,6 +4826,7 @@ Ffigure_mapcontours
  if と reread を使ってループを構成する例は、以下参照: `reread`。
 2 繰り返し (iteration)
 ?iteration
+?iterate
  `plot`, `splot`, `set`, `unset` コマンドでは、繰り返し節を使うこともで
  きます。これは、基本的なコマンドを複数回実行する効果を持ち、そのおのお
  のの実行では繰り返し制御変数によって数式は再評価されます。`do` コマン
@@ -4789,6 +4842,10 @@ Ffigure_mapcontours
        plot for [basename in "A B C"] basename.".dat" using 1:2 with lines
        set for [i = 1:10] style line i lc rgb "blue"
        unset for [tag = 100:200] label tag
+
+ 繰り返しの入れ子もサポートしています:
+
+       set for [i=1:9] for [j=1:9] label i*10+j sprintf("%d",i*10+j) at i,j
 
  さらなる説明については、以下参照: `plot iteration`, `do`。
 
@@ -5375,8 +5432,8 @@ Ffigure_mapcontours
        e
 
  これを避けるには、`set autoscale` コマンドの `fixmin`/`fixmax` オプシ
- ョンを使うことができます。これは、軸の範囲を自動的に拡張して、次の目盛
- りの刻みに合うようにする機能を無効にします。
+ ョンを使うことができます。これは、次の目盛りの刻みに合うように軸の範囲
+ を自動的に拡張する機能を無効にします。
 
  ラベルの座標と文字列もデータファイルから読み込むことができます (以下参
  照: `labels`)。
@@ -5889,15 +5946,33 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/population.gif" alt="[popu
  ースやタブ) で区切られたデータの列 (フィールド) からなるとみなしますが
  以下も参照: `datafile separator`。
 
-  各 <entry> は、入力ファイルの一つのフィールドを選択するための単なる列
- の番号か、またはカッコで囲まれた数式、または xticlabels(2) のようにカ
- ッコで囲まない特別な関数、のいずれかです。
+ 各 <entry> は、入力ファイルの一つのフィールドを選択するための単なる列
+ の番号か、一つのデータ集合の最初の行の列のラベルに一致する文字列、カッ
+ コで囲まれた数式、xticlabels(2) のようにカッコで囲まない特別な関数、の
+ いずれかです。
 
  そのエントリがカッコで囲まれた数式の場合、N 列目の値を指定するのに関数
  column(N) を使用できます。つまり、column(1) は読み込まれた最初の項目を
  参照し、column(2) は次の項目、といった具合です。column(1), column(2),
  ... の略記として、特別な記号 $1, $2, ... を使用できます。関数
  `valid(N)` で、N 番目の列が有効な数字であるかどうかテストできます。
+=column
+=columnhead
+ 入力ファイルの最初の行の各列に、データの値ではなくラベルを持っている場
+ 合、このラベルを入力列の特定や plot タイトルに使用できます。関数
+ column() は、列番号以外にラベルで入力列を選択できます。例えば、データ
+ ファイルが以下のような場合:
+       Height    Weight    Age
+       val1      val1      val1
+       ...       ...       ...
+ 以下の plot コマンドは同じ意味になります:
+       plot 'datafile' using 3:1, '' using 3:2
+       plot 'datafile' using (column("Age")):(column(1)), \
+                    '' using (column("Age")):(column(2))
+       plot 'datafile' using "Age":"Height", '' using "Age":"Weight"
+
+ 列のラベルを plot タイトルに使うには、`set key autotitle columnhead`
+ としてください。
 
  入力データファイルの 1...N という実際の列に加えて、gnuplot は管理情報
  を持ついくつかの "疑似列" を提供します。例えば、$0 または column(0) は、
@@ -5988,10 +6063,6 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/population.gif" alt="[popu
  をも plot することが可能になります。しかし、どうしてもデータファイルに
  文字列を残しておきたいならば、そのテキスト行の第一列にコメント文字 (#)
  を置く方がより安全でしょう。
-^ 以下の Web ページ参照
-^ <a href="http://www.gnuplot.info/demo/using.html">
- 弱々しい using のデモ
-^ </a>
 5 疑似列 (pseudocolumns)
 ?pseudocolumns
 ?commands plot datafile using pseudocolumns
@@ -6060,10 +6131,10 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/population.gif" alt="[popu
 4 volatile
 ?datafile volatile
 ?plot datafile volatile
- キーワード `volatile` は、データファイルの内容が、再読み込み時には変化
- しうることを意味します。これは、可能な限りプログラムに、`replot` コマ
- ンドの代わりに `refresh` コマンドを使わせようとします。以下参照:
- `refresh`。
+ キーワード `volatile` は、入力ストリームかファイルから以前に読み込んだ
+ データが、再読み込み時には有効ではないことを意味します。これは、可能な
+ 限りプログラムに、`replot` コマンドの代わりに `refresh` コマンドを使わ
+ せようとします。以下参照: `refresh`。
 3 errorbars
 ?commands plot errorbars
 ?commands splot errorbars
@@ -6551,8 +6622,7 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/population.gif" alt="[popu
 
  カレントディレクトリを文字列変数に保存したり、文字式の中で使いたい場合
  は、変数 GPVAL_PWD を使うことができることに注意してください。以下参照:
- `show variables all`。これは、"`pwd`" によるシェル呼び出しよりも優れて
- います。
+ `show variables all`。
 2 quit
 ?commands quit
 ?quit
@@ -7870,8 +7940,8 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/population.gif" alt="[popu
  と列を持つように生成されます。格子は x 方向 (行) と y 方向 (列) に等間
  隔です。z の値は散在するデータの z の値の重み付きの平均、またはスプラ
  イン補間として計算されます。言い変えれば、規則的な間隔の格子が生成され、
- 全ての格子点で元のデータの滑かな近似値が評価されます。元のデータではな
- く、この近似値のみが描画されます。
+ 全ての格子点で元のデータの滑かな近似値が評価されます。元のデータの代わ
+ りにこの近似値が描画されます。
 
  デフォルトの列の数は行の数に等しく、そのデフォルトの値は 10 です。
 
@@ -8093,13 +8163,12 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/population.gif" alt="[popu
  すればディレクトリのチェックは OFF になります。デフォルトのフォントパ
  スが何であるかは、`show fontpath` で見ることができます。
 
- しかし、`show fontpath` は、ユーザ定義の fontpath と環境変数によるシス
- テム fontpath を別々に表示しますし、`save`, `save set` コマンドは、可
- 搬性の目的のためにユーザ定義の `fontpath` のみを保存します。
+ `show fontpath` は、ユーザ定義の fontpath とシステムの fontpath を別々
+ に表示しますが、`save`, `save set` コマンドは、ユーザ定義の `fontpath`
+ のみを保存します。
 
- gd ライブラリを通じて TrueType フォントにアクセスできる出力ドライバも
- たくさんあります。これらのドライバに対するフォントの検索パスは、環境変
- 数 GDFONTPATH で制御されます。
+ gd ライブラリを通じてファイル名でフォントにアクセスする出力ドライバに
+ 関しては、フォント検索パスは環境変数 GDFONTPATH で制御されます。
 3 format
 ?commands set format
 ?commands show format
@@ -9287,8 +9356,11 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/population.gif" alt="[popu
 ?set margin
 ?show margin
 ?margin
- 自動的に計算される周囲の余白 (margin) はコマンド `set margin` で変更で
- きます。`show margin` は現在の設定を表示します。
+ `margin` (周囲の余白) とは、描画領域の境界からキャンバスの一番外側まで
+ の間隔のことです。この余白の大きさは自動的にとられますが、コマンド
+ `set margin` で変更することもできます。`show margin` は現在の設定を表
+ 示します。描画領域の境界から内側の描画要素までの間隔を変更したい場合は
+ 以下参照: `set offsets`。
 
  書式:
        set bmargin {{at screen} <margin>}
@@ -9900,7 +9972,7 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/population.gif" alt="[popu
 ?show parametric
 ?parametric
 ?noparametric
- `set paramaetric` コマンドは `plot` および `splot` の意味を通常の関数描
+ `set parametric` コマンドは `plot` および `splot` の意味を通常の関数描
  画から媒介変数表示 (parametric) 関数描画に変更します。`unset parametric`
  を使えば元の描画モードに戻ります。
 
@@ -10822,10 +10894,6 @@ C 下記の以下参照: オプション `positive`, `negative`)。
  グラフの高さを横幅の 2 倍にします:
        set size ratio 2
 
- 以下も参照
-^ <a href="http://www.gnuplot.info/demo/airfoil.html">
- 翼のデモ。
-^ </a>
 3 style
 ?set style
 ?show style
@@ -11486,6 +11554,7 @@ C 下記の以下参照: オプション `positive`, `negative`)。
        set tics {axis | border} {{no}mirror}
                 {in | out} {scale {default | <major> {,<minor>}}}
                 {{no}rotate {by <ang>}} {offset <offset> | nooffset}
+                {left | right | center | autojustify}
                 { format "formatstring" } { font "name{,<size>}" }
                 { textcolor <colorspec> }
        set tics {front | back}
@@ -11531,6 +11600,11 @@ C 下記の以下参照: オプション `positive`, `negative`)。
  をつけることもできます。<offset> は、目盛りの見出し文字列のデフォルト
  の位置からのずらし位置で、そのデフォルトの単位系は `character` です。
  詳細は、以下参照: `coordinates`。`nooffset` は offset を OFF にします。
+
+ デフォルトでは見出しラベルは、美しい結果を生むように、軸と回転角に依存
+ した位置に自動的に位置合わせされます。それが気にいらなければ、明示的に
+ `left`, `right`, `center` のキーワードにより位置合わせを変更できます。
+ `autojustify` でデフォルトの挙動に復帰します。
 
  オプションなしの `set tics` は、目盛りの刻みを内側にしますが、その他の
  全てのオプションは直前の値を保持します。
@@ -12207,6 +12281,7 @@ C 下記の以下参照: オプション `positive`, `negative`)。
        set xtics {axis | border} {{no}mirror}
                  {in | out} {scale {default | <major> {,<minor>}}}
                  {{no}rotate {by <ang>}} {offset <offset> | nooffset}
+                 {left | right | center | autojustify}
                  {add}
                  {  autofreq
                   | <incr>
@@ -12259,6 +12334,11 @@ C 下記の以下参照: オプション `positive`, `negative`)。
 
  xtics をより描画に近づける:
        set xtics offset 0,graph 0.05
+
+ デフォルトでは見出しラベルは、美しい結果を生むように、軸と回転角に依存
+ した位置に自動的に位置合わせされます。それが気にいらなければ、明示的に
+ `left`, `right`, `center` のキーワードにより位置合わせを変更できます。
+ `autojustify` でデフォルトの挙動に復帰します。
 
  オプションなしで `set xtics` を実行すると、目盛りが表示される状態であ
  れば、それはデフォルトの境界、または軸を復元し、そうでなければ何もしま
@@ -13170,7 +13250,8 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/splot.gif" alt="[splot.gif
            <commands>
        }
  これは、コマンドのブロックを、<expr> が 0 でない値と評価される間、繰り
- 返し実行します。
+ 返し実行します。このコマンドは、古い形式 (かっこなし) の if/else 構文
+ と一緒に使うことはできません。以下参照: `if`。
 1 出力形式 (Terminal)
 ^ <h2> Terminal Types </h2>
 2 出力形式の一覧
@@ -13242,6 +13323,10 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/splot.gif" alt="[splot.gif
  `nohidden3d` は、全体的な設定である `set hidden3d` を、個々の描画に対
  して免除するためのオプションですが、これは媒介変数の曲線 (parametric)
  に対しては機能しません。
+
+ プログラムは、x11 出力ウィンドウのアスペクト比の正しさを追求しません。
+ それは、"set size ratio" のようなコマンドが正常に機能するためには、x11
+ ウィンドウ自体が等しい高さと幅を持たなければならないからです。
 
 2 外部ライブラリ (External libraries)
 ?bugs external_libraries
