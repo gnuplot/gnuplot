@@ -1,3 +1,8 @@
+2011-08-28  Peter Juhasz  <juhaszp@users.sourceforge.net>
+
+	* src/plot2d.c (get_data): Revert yesterday's change to this file 
+	because it broke stringvar.dem.
+
 2011-08-27  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* PORTING src/makefile.all src/makefile.awc src/term.h configure.vms

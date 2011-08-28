@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.247 2011/07/22 14:37:57 juhaszp Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.248 2011/08/27 17:53:47 juhaszp Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -475,7 +475,6 @@ get_data(struct curve_points *current_plot)
 	min_cols = 3;
 	max_cols = 4;
 	expect_string( 3 );
-	df_axis[2] = df_axis[0]; /* needed so time/date parsing works */
 	break;
 
     case IMAGE:
