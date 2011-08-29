@@ -1,5 +1,5 @@
 /*
- * $Id: stdfn.h,v 1.37 2011/04/16 11:15:55 markisch Exp $
+ * $Id: stdfn.h,v 1.38 2011/05/02 18:37:00 markisch Exp $
  */
 
 /* GNUPLOT - stdfn.h */
@@ -424,7 +424,11 @@ void          rewinddir __PROTO((DIR *));
 
 /* Definitions for debugging */
 /* #define NDEBUG */
-#include <assert.h>
+/* #include <assert.h> */
+#ifndef assert
+#define assert(X) if (!(X)) int_error(-1,"Assertion failed: %s", #X )
+#endif
+
 
 #ifdef DEBUG
 # define DEBUG_WHERE do { fprintf(stderr,"%s:%d ",__FILE__,__LINE__); } while (0)

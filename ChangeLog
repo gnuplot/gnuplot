@@ -1,3 +1,8 @@
+2011-08-29  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/gplt_x11.c src/stdfn.h:  Make "assert" statements trigger
+	int_error() rather than abort(), so that debugging is easier.
+
 2011-08-28  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* docs/gnuplot-ja.doc docs/term-ja.diff:  sync to docs version 1.688
