@@ -1,3 +1,8 @@
+2011-08-29  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/winmain.c (_WIN32_IE): MinGW64 headers require IE >= 501.
+	Bug #3398189
+
 2011-08-29  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/gplt_x11.c src/stdfn.h:  Make "assert" statements trigger
