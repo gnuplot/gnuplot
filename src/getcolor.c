@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: getcolor.c,v 1.28 2011/06/17 19:10:42 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: getcolor.c,v 1.29 2011/06/21 01:10:43 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - getcolor.c */
@@ -477,7 +477,6 @@ approximate_palette(t_sm_palette *palette, int samples,
     gradient = (gradient_struct*)
 	malloc(gradient_size * sizeof(gradient_struct));
     colors = (rgb_color*) malloc(colors_size * sizeof(rgb_color));
-    assert(gradient && colors);
 
     /* start (gray=0.0) is needed */
     cnt = 0;
