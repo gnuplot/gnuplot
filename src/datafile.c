@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.205 2011/08/27 11:18:01 juhaszp Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.206 2011/08/27 17:53:46 juhaszp Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -283,8 +283,8 @@ static int df_pseudospan = 0;
 struct use_spec_s use_spec[MAXDATACOLS];
 static char *df_format = NULL;
 static char *df_binary_format = NULL;
+static int current_using_spec;
 TBOOLEAN evaluate_inside_using = FALSE;
-int current_using_spec;
 
 /* rather than three arrays which all grow dynamically, make one
  * dynamic array of this structure
