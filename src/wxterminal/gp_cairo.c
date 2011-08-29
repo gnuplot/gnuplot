@@ -1,5 +1,5 @@
 /*
- * $Id: gp_cairo.c,v 1.57 2011/05/13 19:25:24 markisch Exp $
+ * $Id: gp_cairo.c,v 1.58 2011/05/15 09:43:22 markisch Exp $
  */
 
 /* GNUPLOT - gp_cairo.c */
@@ -1251,7 +1251,6 @@ void gp_cairo_enhanced_flush(plot_struct *plot)
 		 * the saved attributes list, get extents */
 		underprinted_layout = gp_cairo_create_layout (plot->cr);
 		pango_layout_set_text (underprinted_layout, gp_cairo_underprinted_utf8, -1);
-		// EAM DEBUG
 		if (!gp_cairo_enhanced_underprinted_AttrList)
 			fprintf(stderr,"uninitialized gp_cairo_enhanced_underprinted_AttrList!\n");
 		else

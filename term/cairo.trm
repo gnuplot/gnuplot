@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: cairo.trm,v 1.44 2011/05/25 05:06:45 sfeam Exp $
+ * $Id: cairo.trm,v 1.45 2011/08/25 20:55:13 sfeam Exp $
  */
 
 /* GNUPLOT - cairo.trm */
@@ -359,10 +359,12 @@ TERM_PUBLIC void cairotrm_options()
 			int_error(c_token-1, "Duplicated or contradicting arguments in cairo terminal options.");
 	}
 
+#if 0
 	/* Copy terminal-dependent values to the generic equivalent */
-	//cairo_params->width = cairo_params_default->width;
-	//cairo_params->height = cairo_params_default->height;
-	//cairo_params->base_linewidth = cairo_params_default->base_linewidth;
+	cairo_params->width = cairo_params_default->width;
+	cairo_params->height = cairo_params_default->height;
+	cairo_params->base_linewidth = cairo_params_default->base_linewidth;
+#endif
 
 	/* Save options back into options string in normalized format */
 	if (cairo_params->transparent)
