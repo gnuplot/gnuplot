@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot on Unix.
 dnl
-dnl $Id: configure.in,v 1.248.2.25 2011/08/23 17:12:46 sfeam Exp $
+dnl $Id: configure.in,v 1.248.2.26 2011/08/31 17:55:52 sfeam Exp $
 dnl
 dnl AC_INIT must match the release number
 AC_INIT(gnuplot, 4.4.4)
@@ -71,10 +71,14 @@ if test "$with_latex" = yes; then
     [texdir is not given and there is no kpsexpand, please tell where to install])
   dnl texdir has priority
   if test "$TEXDIR" = "no"; then
-    #in the case prefix = NONE us ac_default_prefix
-    TEXDIR="${prefix}"
-    test "x$TEXDIR" = xNONE && TEXDIR=$ac_default_prefix
-    TEXDIR=`$KPSEXPAND $TEXDIR/usr/'$TEXMFLOCAL'/tex/latex/gnuplot |sed "s%^.*share/%$TEXDIR/share/%"`
+    TEXDIR=`$KPSEXPAND '$TEXMFLOCAL'`
+    if test "x$TEXDIR" = "x"; then
+      TEXDIR="${ac_default_prefix}"/texmf
+    fi
+    TEXDIR=${TEXDIR}/tex/latex/gnuplot
+    if test "x$prefix" != "xNONE"; then
+      TEXDIR=${prefix}/${TEXDIR}
+    fi
   fi
 fi
 dnl X Window System files.

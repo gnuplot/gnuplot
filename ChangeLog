@@ -2,6 +2,9 @@
 
 	Bump patchlevel and date in preparation for release 4.4.4
 
+	configure.in:  Rewrite installation path rules for TeX files.
+	Bug #3401370
+
 2011-08-23  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* configure.in term/emf.trm (EMF_put_text): Use iconv (if available) to
