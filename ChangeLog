@@ -2,6 +2,9 @@
 
 	* m4/apple.m4:  Revert change of 2011-07-23 (aquaterm LIBS)
 
+	* configure.in: Rewrite the installation path rules for TeX files.
+	Bug #3401370
+
 2011-08-29  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/winmain.c (_WIN32_IE): MinGW64 headers require IE >= 501.
