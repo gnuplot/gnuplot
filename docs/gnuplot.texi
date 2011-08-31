@@ -794,6 +794,13 @@ the remainder of columns 2 and 4 to draw the required line:
 
 @end example
 
+Another example:
+
+@example
+  plot for [i=2:6] 'datafile' using i title "Results for ".columnhead(i)
+
+@end example
+
 See @ref{labels}, `using xticlabels`, @ref{title}, @ref{using}.
 
 @node Enhanced_text_mode, Environment, Datastrings, gnuplot
@@ -1078,6 +1085,7 @@ defaults to radians.
 * word::                        
 * words::                       
 * column::                      
+* columnhead::                  
 * defined::                     
 * exists::                      
 * stringcolumn::                
@@ -1093,6 +1101,7 @@ defaults to radians.
 * valid::                       
 * elliptic_integrals::          
 * Random_number_generator::     
+* value::                       
 @end menu
 
 @node abs, acos, Functions, Functions
@@ -1761,7 +1770,7 @@ This can be used to import external functions into gnuplot scripts using
 
 
 
-@node column, defined, words, Functions
+@node column, columnhead, words, Functions
 @subsubsection column
 
 @c ?expressions functions column
@@ -1774,7 +1783,20 @@ This can be used to import external functions into gnuplot scripts using
 to fits or datafile plots.  It evaluates to the numerical value of the contents
 of column x. See @ref{using}.
 
-@node defined, exists, column, Functions
+@node columnhead, defined, column, Functions
+@subsubsection columnhead
+
+@c ?expressions functions columnhead
+@c ?functions columnhead
+@cindex columnhead
+@findex columnhead
+
+
+`columnhead(x)` may only be used in expressions as part of @ref{using} manipulations
+to fits or datafile plots.  It evaluates to a string containing the contents of
+column x in the first line of data. See @ref{using}.
+
+@node defined, exists, columnhead, Functions
 @subsubsection defined
 
 @c ?expressions functions defined
@@ -1958,6 +1980,7 @@ to fits or datafile plots.  See @ref{using}.
 
 
 
+
 @node elliptic_integrals, Random_number_generator, valid, Functions
 @subsubsection elliptic integrals
 
@@ -1982,7 +2005,7 @@ third kind, i.e. the definite integral between 0 and pi/2 of the function
 than 1, while `k` must lie between -1 and 1 (exclusive).  Note that by
 definition EllipticPi(0,k) == EllipticK(k) for all possible values of `k`.
 
-@node Random_number_generator,  , elliptic_integrals, Functions
+@node Random_number_generator, value, elliptic_integrals, Functions
 @subsubsection Random number generator
 
 @c ?expressions random
@@ -1999,6 +2022,24 @@ pseudo-random numbers.  The current behavior is as follows:
  `rand(@{x,y@})` for x>0 sets seed1 to x and seed2 to y.
 
 @end example
+
+
+@node value,  , Random_number_generator, Functions
+@subsubsection value
+
+@c ?expressions functions value
+@c ?functions value
+@cindex value
+@findex value
+
+
+B = value("A") is effectively the same as B = A, where A is the name of a 
+user-defined variable.  This is useful when the name of the variable is itself
+held in a string variable. See @ref{variables}.  It also allows you to
+read the name of a variable from a data file.  If the argument is a numerical
+expression, value() returns the value of that expression.  If the argument is a
+string that does not correspond to a currently defined variable,
+value() returns NaN.
 
 
 @node Operators, Gnuplot-defined_variables, Functions, Expressions
@@ -2289,7 +2330,8 @@ Example:
 
 @end example
 
-See @ref{functions}, @ref{functions}, @ref{variables}, @ref{macros}.
+See @ref{functions}, @ref{functions}, @ref{variables}, @ref{macros},
+@ref{value}.
 
 @node Fonts, Glossary, Expressions, gnuplot
 @section Fonts
@@ -2521,7 +2563,7 @@ Examples:
 
 For many terminal types it is also possible to assign user-defined colors
 using explicit rgb (red, green, blue) values, named colors, or color values
-that refer to the current PM3D palette.
+that refer to the current pm3d palette.
 
 Examples:
 
@@ -4135,11 +4177,11 @@ the center of the parallelipiped.  That is, an M x N set of data will form an
 image with M x N pixels.  This is different from the pm3d plotting style, where
 an M x N set of data will form a surface of (M-1) x (N-1) elements.  The scan
 directions for a binary image data grid can be further controlled by additional
-keywords. See `binary general keywords flipx`, `center`, and `rotate`.
+keywords. See `binary keywords flipx`, `keywords center`, and `keywords rotate`.
 
 Image data can be scaled to fill a particular rectangle within a 2D plot 
 coordinate system by specifying the x and y extent of each pixel.
-See `binary general keywords dx` and `dy`. To generate the figure at the right,
+See `binary keywords dx` and `dy`. To generate the figure at the right,
 the same input image was placed multiple times, each with a specified dx, dy,
 and origin. The input PNG image of a building is 50x128 pixels.  The tall
 building was drawn by mapping this using `dx=0.5 dy=1.5`.  The short building
@@ -4330,7 +4372,8 @@ The `pointinterval` (short form `pi`) property of the line style can be used to
 control whether or not every point in the plot is given a symbol.  For example,
 'with lp pi 3' will draw line segments through every data point, but will only
 place a symbol on every 3rd point.  A negative value for `pointinterval` will
-erase the portion of line segment that passes underneath the symbol.
+erase the portion of line segment that passes underneath the symbol. The size
+of the erased portion is controlled by @ref{pointintervalbox}.
 
 @ref{linespoints} may be abbreviated `lp`.
 
@@ -4597,6 +4640,12 @@ See also
 
 @c ?3D (surface) plots
 @c ?plotting styles 3d (surface) plots
+@cindex 3D
+
+@cindex surface
+@opindex surface
+
+
 Surface plots are generated using the `splot` command rather than the `plot`
 command. The style `with lines` draws a surface made from a grid of lines.
 Solid surfaces can be drawn using the style @ref{pm3d}.
@@ -5975,7 +6024,7 @@ BINARY DATA FILES:
 
 Gnuplot can read binary data files.  However, adequate information about
 details of the file format must be given on the command line or extracted
-from the file itself for a supported binary `filetype`.  In particular,
+from the file itself for a supported binary @ref{filetype}.  In particular,
 there are two structures for binary files, a matrix binary format and a
 general binary format.
 
@@ -5986,8 +6035,8 @@ constitutes column 1, repetition of the coordinate column constitutes
 column 2, and the array of values constitutes column 3.
 
 The general binary format contains an arbitrary number of columns for which
-information must be specified at the command line.  For example, `array`,
-`record`, `format` and @ref{using} can indicate the size, format and dimension
+information must be specified at the command line.  For example, @ref{array},
+@ref{record}, `format` and @ref{using} can indicate the size, format and dimension
 of data.  There are a variety of useful commands for skipping file headers
 and changing endianess.  There are a set of commands for positioning and
 translating data since often coordinates are not part of the file when
@@ -6003,19 +6052,26 @@ The general rule is that common command-line specified parameters override
 file-extracted parameters which override default parameters.
 
 Matrix binary is the default binary format when no keywords specific to
-general binary are given, i.e., `array`, `record`, `format`, `filetype`.
+general binary are given, i.e., @ref{array}, @ref{record}, `format`, @ref{filetype}.
 
 General binary data can be entered at the command line via the special file
 name '-'.  However, this is intended for use through a pipe where programs
 can exchange binary data, not for keyboards.  There is no "end of record"
 character for binary data.  Gnuplot continues reading from a pipe until it
-has read the number of points declared in the `array` qualifier.
+has read the number of points declared in the @ref{array} qualifier.
 
 See `datafile binary` for more details.
 
 @menu
 * binary::                      
 * binary_general::              
+* array::                       
+* record::                      
+* skip::                        
+* format::                      
+* endian::                      
+* filetype::                    
+* keywords::                    
 * every::                       
 * example_datafile::            
 * index::                       
@@ -6045,7 +6101,7 @@ for which details about the file must be given at the command line.
 
 See `binary matrix` or `binary general` for more details.
 
-@node binary_general, every, binary, data
+@node binary_general, array, binary, data
 @subsubsection binary general
 
 @c ?commands plot datafile binary general
@@ -6067,8 +6123,8 @@ Syntax:
 @end example
 
 General binary format is activated by keywords in <binary list> pertaining
-to information about file structure, i.e., `array`, `record`, `format` or
-`filetype`.  Otherwise, matrix binary format is assumed.  (See `binary matrix`
+to information about file structure, i.e., @ref{array}, @ref{record}, `format` or
+@ref{filetype}.  Otherwise, matrix binary format is assumed.  (See `binary matrix`
 for more details.)
 
 There are some standard file types that may be read for which details about
@@ -6077,7 +6133,7 @@ binary` at the command line for a list.)  Otherwise, details must be
 specified at the command line or set in the defaults.  Keywords are described
 below.
 
-The keyword `filetype` in <binary list> controls the routine used to
+The keyword @ref{filetype} in <binary list> controls the routine used to
 read the file, i.e., the format of the data.  For a list of the supported
 file types, type `show datafile binary filetypes`.  If no file type is
 given, the rule is that traditional gnuplot binary is assumed for `splot`
@@ -6109,11 +6165,10 @@ that the special characters for @ref{using} representing point/line/index
 generally should not be used for binary data.  There are keywords in
 <binary list> that control this.
 
-
-@noindent --- ARRAY ---
+@node array, record, binary_general, data
+@subsubsection array
 
 @c ?binary array
-@c ?binary general array
 Describes the sampling array dimensions associated with the binary file.
 The coordinates will be generated by gnuplot.  A number must be specified
 for each dimension of the array.  For example, `array=(10,20)` means the
@@ -6132,21 +6187,19 @@ the file.
 
 @end example
 
-
-@noindent --- RECORD ---
+@node record, skip, array, data
+@subsubsection record
 
 @c ?binary record
-@c ?binary general record
-This keyword serves the same function as `array`, having the same syntax.
-However, `record` causes gnuplot to not generate coordinate information.
+This keyword serves the same function as @ref{array}, having the same syntax.
+However, @ref{record} causes gnuplot to not generate coordinate information.
 This is for the case where such information may be included in one of the
 columns of the binary data file.
 
-
-@noindent --- SKIP ---
+@node skip, format, record, data
+@subsubsection skip
 
 @c ?binary skip
-@c ?binary general skip
 This keyword allows you to skip sections of a binary file. For instance, if the
 file contains a 1024 byte header before the start of the data region you would
 probably want to use
@@ -6162,10 +6215,10 @@ the second and third records
 
 @end example
 
+@node format, endian, skip, data
+@subsubsection format
 
-@noindent --- FORMAT ---
-
-@c ?binary general format
+@c ?binary format
 The default binary format is a float.  For more flexibility, the format can
 include details about variable sizes.  For example, `format="%uchar%int%float"`
 associates an unsigned character with the first using column, an int with the
@@ -6181,10 +6234,10 @@ to discard two ints before reading three floats.  To list variable sizes, type
 dependent along with their sizes in bytes for the particular compilation.
 There is also a group of names which attempt to be machine independent.
 
+@node endian, filetype, format, data
+@subsubsection endian
 
-@noindent --- ENDIAN ---
-
-@c ?binary general endian
+@c ?binary endian
 Often the endianess of binary data in the file does not agree with the
 endianess used by the platform on which gnuplot is running.  Several words can
 direct gnuplot how to arrange bytes.  For example `endian=little` means treat
@@ -6202,10 +6255,10 @@ are
 
 Gnuplot can support "middle" ("pdp") endian if it is compiled with that option.
 
+@node filetype, keywords, endian, data
+@subsubsection filetype
 
-@noindent --- FILETYPE ---
-
-@c ?binary general filetype
+@c ?binary filetype
 For some standard binary file formats gnuplot can extract all the necessary
 information from the file in question.  As an example, "format=edf" will read
 ESRF Header File format files.  For a list of the currently supported file
@@ -6221,7 +6274,7 @@ for details.)
 
 @noindent --- AVS ---
 
-@c ?binary general filetype avs
+@c ?binary filetype avs
 @c ?filetype avs
 @cindex avs
 
@@ -6233,7 +6286,7 @@ of pixels, each with four bytes of information alpha/red/green/blue.
 
 @noindent --- EDF ---
 
-@c ?binary general filetype edf
+@c ?binary filetype edf
 @c ?filetype edf
 @cindex edf
 
@@ -6255,8 +6308,12 @@ See also `binary`.
 
 @noindent --- PNG ---
 
-@c ?binary general filetype png
+@c ?binary filetype png
+@c ?binary filetype gif
+@c ?binary filetype jpeg
 @c ?filetype png
+@c ?filetype gif
+@c ?filetype jpeg
 If gnuplot was configured to use the libgd library for png/gif/jpeg output, 
 then it can also be used to read these same image types as binary files.
 You can use an explicit command
@@ -6273,18 +6330,18 @@ have previously requested
 
 See also `binary`.
 
+@node keywords, every, filetype, data
+@subsubsection keywords
 
-@noindent --- KEYWORDS ---
-
-@c ?binary general keywords
-@c ?filetype keywords
-The following keywords apply only when generating coordinates.  That is, when
-the keyword `array` is used.
+@c ?binary keywords
+The following keywords apply only when generating coordinates from binary 
+data files.  That is, the control mapping the individual elements of a binary
+array, matrix, or image to specific x/y/z positions.
 
 
 @noindent --- SCAN ---
 
-@c ?binary general keywords scan
+@c ?binary keywords scan
 A great deal of confusion can arise concerning the relationship between how
 gnuplot scans a binary file and the dimensions seen on the plot.  To lessen
 the confusion, conceptually think of gnuplot _always_ scanning the binary file
@@ -6308,14 +6365,14 @@ analogous to the x, y and z of Cartesian coordinates.
 
 @noindent --- TRANSPOSE ---
 
-@c ?binary general keywords transpose
+@c ?binary keywords transpose
 Shorthand notation for `scan=yx` or `scan=yxz`.
 
 
 @noindent --- DX, DY, DZ ---
 
-@c ?binary general keywords dx
-@c ?binary general keywords dy
+@c ?binary keywords dx
+@c ?binary keywords dy
 @cindex dx
 
 @cindex dy
@@ -6335,7 +6392,7 @@ they may also be used with matrix binary files.
 
 @noindent --- FLIPX, FLIPY, FLIPZ ---
 
-@c ?binary general keywords flipx
+@c ?binary keywords flipx
 Sometimes the scanning directions in a binary datafile are not consistent with
 that assumed by gnuplot.  These keywords can flip the scanning direction along
 dimensions x, y, z.
@@ -6343,7 +6400,7 @@ dimensions x, y, z.
 
 @noindent --- ORIGIN  ---
 
-@c ?binary general keywords origin
+@c ?binary keywords origin
 When gnuplot generates coordinates based upon transposition and flip, it
 attempts to always position the lower left point in the array at the origin,
 i.e., the data lies in the first quadrant of a Cartesian system after transpose
@@ -6359,9 +6416,8 @@ is for plotting in three dimensions.
 
 @noindent --- CENTER ---
 
-@c ?binary general keywords center
-@cindex center
-
+@c ?binary keywords center
+@c ?keywords center
 Similar to @ref{origin}, this keyword will position the array such that its center
 lies at the point given by the tuple.  For example, `center=(0,0)`.  Center
 does not apply when the size of the array is `Inf`.
@@ -6369,9 +6425,8 @@ does not apply when the size of the array is `Inf`.
 
 @noindent --- ROTATE ---
 
-@c ?binary general keywords rotate
-@cindex rotate
-
+@c ?binary keywords rotate
+@c ?keywords rotate
 The transpose and flip commands provide some flexibility in generating and
 orienting coordinates.  However, for full degrees of freedom, it is possible to
 apply a rotational vector described by a rotational angle in two dimensions.
@@ -6390,7 +6445,7 @@ point before translation.  Otherwise, the rotation is done about the array
 
 @noindent --- PERPENDICULAR ---
 
-@c ?binary general keywords perpendicular
+@c ?binary keywords perpendicular
 For `splot`, the concept of a rotational vector is implemented by a triple
 representing the vector to be oriented normal to the two-dimensional x-y plane.
 Naturally, the default is (0,0,1).  Thus specifying both rotate and
@@ -6460,7 +6515,7 @@ Examples:
 
 See also `binary matrix`.
 
-@node every, example_datafile, binary_general, data
+@node every, example_datafile, keywords, data
 @subsubsection every
 
 @c ?commands plot datafile every
@@ -7129,7 +7184,7 @@ the first element on a line is a time with an embedded space, the y value
 should be specified as column three.
 
 It should be noted that `plot 'file'`, `plot 'file' using 1:2`, and `plot
-'file' using ($1):($2)` can be subtly different: 1) if @ref{file} has some lines
+'file' using ($1):($2)` can be subtly different: 1) if `file` has some lines
 with one column and some with two, the first will invent x values when they
 are missing, the second will quietly ignore the lines with one column, and
 the third will store an undefined value for lines with one point (so that in
@@ -7601,9 +7656,8 @@ the string iterator form of the command rather than an integer iterator.
 @c ?splot title
 @cindex columnheader
 
-A line title for each function and data set appears in the key, accompanied
-by a sample of the line and/or symbol used to represent it.  It can be
-changed by using the @ref{title} option.
+By default each plot is listed in the key by the corresponding function or file
+name. You can give an explicit plot title instead using the @ref{title} option.
 
 Syntax:
 @example
@@ -7612,17 +7666,13 @@ Syntax:
 
 @end example
 
-where <text> must either be a quoted string or a string variable.
-The quotes will not be shown in the key.  A special character may be given as
-a backslash followed by its octal value ("\345").  The tab character "\t" is
-understood.  Note that backslash processing occurs only for strings enclosed
-in double quotes---use single quotes to prevent such processing.  The newline
-character "\n" is not processed in key entries in either type of string.
+where <text> is a quoted string or an expression that evaluates to a string.
+The quotes will not be shown in the key.
 
 There is also an option that will interpret the first entry in a column of
 input data (i.e. the column header) as a text field, and use it as the key
-title.  See `datastrings`.  This can be made the default by speicifying
-`set key autotitle columnhead`.
+title.  See `datastrings`.  This can be made the default by specifying
+@ref{columnhead}.
 
 The line title and sample can be omitted from the key by using the keyword
 `notitle`.  A null title (`title ''`) is equivalent to `notitle`.  If only
@@ -8264,6 +8314,7 @@ See @ref{iteration}.
 * plot_::                       
 * pm3d::                        
 * palette::                     
+* pointintervalbox::            
 * pointsize::                   
 * polar::                       
 * print_::                      
@@ -9889,6 +9940,7 @@ Valid values are
    cp850       - codepage for OS/2, Western Europe
    cp852       - codepage for OS/2, Central and Eastern Europe
    cp1250      - codepage for MS Windows, Central and Eastern Europe
+   cp1251      - codepage for 8-bit Russian, Serbian, Bulgarian, Macedonian
    cp1254      - codepage for MS Windows, Turkish (superset of Latin5)
    utf8        - variable-length (multibyte) representation of Unicode
                  entry point for each character
@@ -10568,6 +10620,8 @@ Syntax:
               @{@{no@}box @{ @{linestyle | ls <line_style>@}
                          | @{linetype | lt <line_type>@}
                            @{linewidth | lw <line_width>@}@}@}
+              @{maxcols @{<max no. of columns> | auto@}@}
+              @{maxrows @{<max no. of rows> | auto@}@}
       unset key
       show key
 
@@ -10581,8 +10635,9 @@ in the graph. The key may be turned off by requesting `set key off` or
 Elements within the key are stacked according to `vertical` or `horizontal`.
 In the case of `vertical`, the key occupies as few columns as possible.  That
 is, elements are aligned in a column until running out of vertical space at
-which point a new column is started.  In the case of `horizontal`, the key
-occupies as few rows as possible.
+which point a new column is started.  The vertical space may be limited using
+'maxrows'.  In the case of `horizontal`, the key occupies as few rows as
+possible.  The horizontal space may be limited using 'maxcols'.
 
 By default the key is placed in the upper right inside corner of the graph.
 The keywords `left`, `right`, `top`, `bottom`, `center`, `inside`, `outside`,
@@ -12104,7 +12159,7 @@ terminals include
 @end example
 
 Let us first describe how a map/surface is drawn.  The input data come from an
-evaluated function or from an @ref{file}.  Each surface consists of a
+evaluated function or from an `splot data file`.  Each surface consists of a
 sequence of separate scans (isolines).  The pm3d algorithm fills the region
 between two neighbouring points in one scan with another two points in the
 next scan by a gray (or color) according to z-values (or according to an
@@ -12221,10 +12276,18 @@ contributing to the color of any quadrangle.  For example, applying the pm3d
 algorithm to the 4x4 grid of data points in script `demo/pm3d.dem` (please have
 a look) produces only (4-1)x(4-1)=9 colored rectangles.
 
-Another drawing algorithm, which would draw quadrangles around a given node
-by taking corners from averaged (x,y)-coordinates of its surrounding 4 nodes
-while using node's color, could be implemented in the future. This is already
-done for drawing images (2D grids) via `image` and @ref{rgbimage} styles.
+`4 columns of data (x,y,z,color)`:
+If a fourth column of data is provided, it is normally interpreted as a 
+separate palette-mapped gray value. The coloring of individual quadrangles
+works as above, except that the color value is distinct from the z value.
+As a separate coloring option, the fourth data column may provide instead
+an RGB color. See `rgbcolor variable`. In this case the plotting command
+must be
+
+@example
+      splot ... using 1:2:3:4 with pm3d lc rgb variable
+
+@end example
 
 Notice that ranges of z-values and color-values for surfaces are adjustable
 independently by @ref{zrange}, @ref{cbrange}, as well as `set log` for z or
@@ -12351,7 +12414,7 @@ The @ref{depthorder} option orders the solid quadrangles; the @ref{hidden3d} opt
 similarly orders the bounding lines (if drawn).  Note that the global option
 @ref{hidden3d} does not affect pm3d surfaces.
 
-@node palette, pointsize, pm3d, set-show
+@node palette, pointintervalbox, pm3d, set-show
 @subsection palette
 
 @c ?commands set palette
@@ -12427,7 +12490,7 @@ as the gray for gray maps. The color map requires a transformation gray -->
 Basically two different types of mappings can be used:  Analytic formulae to
 convert gray to color, or discrete mapping tables which are interpolated.
 @ref{rgbformulae} and @ref{functions} use analytic formulae whereas
-@ref{defined} and @ref{file} use interpolated tables.  @ref{rgbformulae} reduces the size of postscript output to a minimum.
+@ref{defined} and `palette file` use interpolated tables.  @ref{rgbformulae} reduces the size of postscript output to a minimum.
 
 The command `show palette fit2rgbformulae` finds the best matching @ref{rgbformulae} for the current @ref{palette}. Naturally, it makes sense
 to use it for non-rgbformulae palettes. This command can be found useful
@@ -12438,7 +12501,7 @@ as gnuplot, like zimg (
 ).
 
 `set palette gray` switches to a gray only palette. @ref{rgbformulae},
-@ref{defined}, @ref{file} and @ref{functions} switch
+@ref{defined}, `set palette file` and @ref{functions} switch
 to a color mapping. `set palette color` is an easy way to switch back from the
 gray palette to the last color mapping.
 
@@ -12670,7 +12733,7 @@ A gamma-corrected black and white palette
 @c ?commands set palette file
 @c ?set palette file
 @c ?palette file
-@ref{file} is basically a `set palette defined (<gradient>)` where
+`set palette file` is basically a `set palette defined (<gradient>)` where
 <gradient> is read from a datafile.  Either 4 columns (gray,R,G,B) or
 just three columns (R,G,B) have to be selected via the @ref{using} data file
 modifier.  In the three column case, the line number will be used as gray.
@@ -12795,7 +12858,22 @@ by the enclosed awk script `pm3dConvertToImage.awk`.  Usage:
 You may manually change the postscript output from gray to color and vice
 versa and change the definition of <maxcolors>.
 
-@node pointsize, polar, palette, set-show
+@node pointintervalbox, pointsize, palette, set-show
+@subsection pointintervalbox
+
+@c ?commands set pointintervalbox
+@c ?set pointintervalbox
+@cindex pointintervalbox
+@opindex pointintervalbox
+
+
+The `pointinterval` property of line types is used in plot style @ref{linespoints}.
+A negative value of pointinterval, e.g. -N, means that point symbols are drawn
+only for every Nth point, and that a box (actually circle) behind each point
+symbol is blanked out by filling with the background color.  The command
+@ref{pointintervalbox} controls the radius of this blanked out region.
+
+@node pointsize, polar, pointintervalbox, set-show
 @subsection pointsize
 
 @c ?commands set pointsize
@@ -13240,7 +13318,7 @@ Syntax:
       set style fill @{empty
                       | @{transparent@} solid @{<density>@}
                       | @{transparent@} pattern @{<n>@}@}
-                     @{border @{<colorspec>@} | noborder@}
+                     @{border @{lt@} @{lc <colorspec>@} | noborder@}
 
 @end example
 
@@ -15581,8 +15659,8 @@ It is no longer necessary to specify `parametric` mode for three-column
 @cindex gpbin
 
 Gnuplot can read matrix binary files by use of the option `binary` appearing
-without keyword qualifications unique to general binary, i.e., `array`,
-`record`, `format`, or `filetype`.  Other general binary keywords for
+without keyword qualifications unique to general binary, i.e., @ref{array},
+@ref{record}, `format`, or @ref{filetype}.  Other general binary keywords for
 translation should also apply to matrix binary.  (See `binary general` for
 more details.)
 
@@ -17085,7 +17163,8 @@ dvips and dvipdfm do support the "tpic" \\specials.
 
 Syntax:
 @example
-   set terminal eepic @{color, dashed, rotate, small, tiny, default, <fontsize>@}
+   set terminal eepic @{default@} @{color|dashed@} @{rotate@} @{size XX,YY@}
+                      @{small|tiny|<fontsize>@}
 
 @end example
 
@@ -17096,8 +17175,8 @@ colored. Using this option, you must include \\usepackage@{color@} in the preamb
 of your latex document.
 'dashed' will allow dashed line types; without this option, only solid lines
 with varying thickness will be used.
-'dashed' and 'color' are mutually exclusive; if 'color' is specified, then 'dashed'
-will be ignored.
+'dashed' and 'color' are mutually exclusive; if 'color' is specified, then
+'dashed' will be ignored.
 'rotate' will enable true rotated text (by 90 degrees). Otherwise, rotated text
 will be typeset with letters stacked above each other. If you use this option
 you must include \\usepackage@{graphicx@} in the preamble.
@@ -17115,10 +17194,10 @@ Notes:
 Remember to escape the # character (or other chars meaningful to (La-)TeX)
 by \\\\ (2 backslashes).
 It seems that dashed lines become solid lines when the vertices of a plot
-are too close. (I do not know if that is a general problem with the tpic specials,
-or if it is caused by a bug in eepic.sty or dvips/dvipdfm.)
-The default size of an eepic plot is 5x3 inches, which can be scaled 
-by 'set size a,b'.
+are too close. (I do not know if that is a general problem with the tpic
+specials, or if it is caused by a bug in eepic.sty or dvips/dvipdfm.)
+The default size of an eepic plot is 5x3 inches. You can change this using 
+the @ref{size} terminal option.
 Points, among other things, are drawn using the LaTeX commands "\\Diamond",
 "\\Box", etc.  These commands no longer belong to the LaTeX2e core; they are
 included in the latexsym package, which is part of the base distribution and
@@ -17187,6 +17266,7 @@ Syntax:
 @example
       set terminal emf @{color | monochrome@} @{solid | dashed@}
                        @{enhanced @{noproportional@}@}
+                       @{rounded | butt@}
                        @{linewidth <LW>@} @{dashlength <DL>@} @{size XX,YY@}
                        @{"<fontname>"@} @{<fontsize>@}    #old syntax
                        @{font "<fontname>,<fontsize>"@} #new syntax
@@ -19749,7 +19829,7 @@ color.
 The (mutually exclusive) options `interpolate` and `uniform` control
 if color interpolation is done while drawing triangles (on by default).
 
-A @ref{file} can be specified with the `dump "file"` option.
+A `screen dump file` can be specified with the `dump "file"` option.
 If this option is present, (i.e the dump file name is not empty) pressing
 the key KP_Delete will write the file.  This action cannot and cannot be
 rebound. The file is written in raw ppm (P6) format. Note that this option
