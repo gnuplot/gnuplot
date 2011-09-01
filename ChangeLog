@@ -4,6 +4,8 @@
 	TeX files.
 	Bug #3401370
 
+	* configure.in: Remove some obsolete status messages.
+
 2011-09-01  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* term/emf.trm (EMF_put_text):  Use iconv to handle Shift_JIS encoding.

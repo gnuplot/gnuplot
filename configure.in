@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot on Unix.
 dnl
-dnl $Id: configure.in,v 1.288 2011/09/01 19:12:00 sfeam Exp $
+dnl $Id: configure.in,v 1.289 2011/09/01 23:23:42 sfeam Exp $
 dnl
 dnl this is actually major.minor ...
 dnl note that for a non-beta release, we need to
@@ -873,7 +873,7 @@ AC_ARG_ENABLE(volatile-data,dnl
   test -z "$enable_volatile_data" && enable_volatile_data=yes)
   if test "$enable_volatile_data" = yes; then
       AC_DEFINE(VOLATILE_REFRESH,1,
-               [ Define to allow zooming or refresh of volatile data. EXPERIMENTAL ])
+               [ Define to allow zooming or refresh of volatile data. ])
   fi
 
 dnl disable the "space raises console" behaviour
@@ -1213,7 +1213,7 @@ AC_MSG_RESULT([    tek40xx, tek410x, texdraw, tgif, tkcanvas, tpic, vttek])
 AC_MSG_RESULT([])
 
 if test "$with_bitmap_terminals" == yes; then
-  AC_MSG_RESULT([  dot-matrix terminals: yes (disable using --without-bitmap-terminals])
+  AC_MSG_RESULT([  dot-matrix terminals: yes ( --without-bitmap-terminals to disable)])
 else
   AC_MSG_RESULT([  dot-matrix terminals: no])
 fi
@@ -1236,14 +1236,9 @@ if test "$no_x" != yes; then
     AC_MSG_RESULT([    (disable plotting to windows opened by external apps) ])
   fi
 
-  if test "$enable_binary_x11_polygon" = yes; then
-    AC_MSG_RESULT([    (with binary polygon protocol )])
-  else
-    AC_MSG_RESULT([    (without binary polygon protocol )])
-  fi
   AC_MSG_RESULT([    (with application defaults, in $X11_APPDEFAULTS_DIR)])
 else
-    AC_MSG_RESULT([  X Window System terminal: no (requires X libraries)])
+  AC_MSG_RESULT([  X Window System terminal: no (requires X libraries)])
 fi
 
 if test "$ac_cv_lib_gd_gdImageJpeg" = yes; then
@@ -1377,7 +1372,7 @@ else
 fi
 
 if test "$enable_volatile_data" = yes; then
-  AC_MSG_RESULT([  Zooming or refresh of volatile data: yes (EXPERIMENTAL)])
+  AC_MSG_RESULT([  Zooming or refresh of volatile data: yes ])
 else
   AC_MSG_RESULT([  Zooming or refresh of volatile data: no])
 fi
