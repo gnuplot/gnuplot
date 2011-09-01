@@ -1,3 +1,9 @@
+2011-09-01  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* configure.in: Yet another rewrite of the installation path rules for
+	TeX files.
+	Bug #3401370
+
 2011-09-01  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* term/emf.trm (EMF_put_text):  Use iconv to handle Shift_JIS encoding.
