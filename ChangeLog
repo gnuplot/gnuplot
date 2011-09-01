@@ -1,3 +1,7 @@
+2011-09-01  Shigeharu Takeno  <shige@iee.niit.ac.jp>
+
+	* term/emf.trm (EMF_put_text):  Use iconv to handle Shift_JIS encoding.
+
 2011-08-31  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* m4/apple.m4:  Revert change of 2011-07-23 (aquaterm LIBS)

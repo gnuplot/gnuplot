@@ -1,5 +1,5 @@
 /* Hey Emacs this is -*- C -*-
- * $Id: emf.trm,v 1.74 2011/08/23 16:43:45 markisch Exp $
+ * $Id: emf.trm,v 1.75 2011/08/23 18:57:04 markisch Exp $
  */
 
 /* GNUPLOT - emf.trm */
@@ -1200,19 +1200,22 @@ EMF_put_text(unsigned int x, unsigned int y, const char str[])
     int i, slen, alen, nchars;
 #ifdef HAVE_ICONV
     char * wstr;
-    if (encoding == S_ENC_UTF8) {
+    if (encoding == S_ENC_UTF8 || encoding == S_ENC_SJIS) {
 	iconv_t cd;
 	size_t wsize, wlen, mblen;
 	const char * str_start = str;
 	char * wstr_start;
+	char * FromEnc;
 
 	nchars = strlen(str);
 	mblen = nchars;
 	wlen = wsize = 2 * mblen + 2;
 	wstr = gp_alloc(wlen, "iconv string");
 	wstr_start = wstr;
+	if (encoding == S_ENC_UTF8) FromEnc = "UTF-8";
+	else FromEnc = "Shift_JIS";
 
-	if ((cd = iconv_open("UTF-16LE", "UTF-8")) == (iconv_t)-1) 
+	if ((cd = iconv_open("UTF-16LE", FromEnc)) == (iconv_t)-1) 
 	    int_warn(NO_CARET, "iconv_open failed");
 	else {
 	    if (iconv(cd, (void *)&str_start, &mblen, &wstr_start, &wlen) == (size_t)-1)
@@ -1237,7 +1240,7 @@ EMF_put_text(unsigned int x, unsigned int y, const char str[])
     if (alen % 4)
 	alen += 4 - (slen % 4); /* Structure must be long aligned! */
 #ifdef HAVE_ICONV
-    if (encoding == S_ENC_UTF8) {
+    if (encoding == S_ENC_UTF8 || encoding == S_ENC_SJIS) {
 	EMF_write_emr(84, 76 + alen + nchars * 4);	/* ExtTextOutW, UTF16-LE version */
     } else 
 #endif
@@ -1263,7 +1266,7 @@ EMF_put_text(unsigned int x, unsigned int y, const char str[])
 				/* about the font properties being used */
 
 #ifdef HAVE_ICONV
-    if (encoding == S_ENC_UTF8) {
+    if (encoding == S_ENC_UTF8 || encoding == S_ENC_SJIS) {
 	for (i = 0; i < alen; i++) 
 	    EMF_write_byte(i < slen ? wstr[i] : 0);	/* writing text */
 	free(wstr);
