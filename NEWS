@@ -16,7 +16,7 @@ New features, changes and fixes in gnuplot version 4.4.4
 * FIX discontinuity in defined palette limited by maxcolors
 * FIX initialization of svg pattern-fill definitions
 * FIX positioning of histogram bars when some data entries are missing
-* FIX emf terminal can handle UTF-8 and Shift_JIS encoding
+* FIX emf terminal can handle UTF-8 encoding
 
 
 New features, changes and fixes in gnuplot version 4.4.3
