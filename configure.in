@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot on Unix.
 dnl
-dnl $Id: configure.in,v 1.287 2011/08/31 23:32:52 sfeam Exp $
+dnl $Id: configure.in,v 1.288 2011/09/01 19:12:00 sfeam Exp $
 dnl
 dnl this is actually major.minor ...
 dnl note that for a non-beta release, we need to
@@ -80,7 +80,7 @@ test x"$EMACS" = xt && EMACS=
 AC_CHECK_PROGS(EMACS, emacs xemacs, no)
 
 dnl Allow manual specification of tex
-AC_ARG_WITH(latex,[--without-latex         disable latex support, (default enable)],[],[with_latex="yes"])
+AC_ARG_WITH(latex,[  --without-latex         disable latex support, (default enable)],[],[with_latex="yes"])
 if test "$with_latex" = yes; then
   AC_CHECK_PROGS(PLAINTEX, tex, no)
   AC_CHECK_PROGS(LATEX, latex latex2e, no)
@@ -96,7 +96,7 @@ AC_CHECK_PROGS(DVIPS, dvips, no)
 AC_CHECK_PROGS(TROFF, troff, no)
 
 AC_ARG_WITH(texdir,dnl
-  [  --with-texdir=DIR       where to install latex style files
+  [--with-texdir=DIR       where to install latex style files
                           (default by kpsexpand in subdir PACKAGE)],
   TEXDIR="$withval",
   TEXDIR="no")
@@ -117,12 +117,13 @@ if test "$with_latex" = yes; then
     [texdir is not given and there is no kpsexpand, please tell where to install])
   dnl texdir has priority
   if test "$TEXDIR" = "no"; then
-    TEXDIR=`$KPSEXPAND '$TEXMFLOCAL'`
-    if test "x$TEXDIR" = "x" -o "$TEXDIR" = "\$TEXMFLOCAL"; then
-      TEXDIR=${ac_default_prefix}/share/texmf
-    fi
     if test "x$prefix" != "xNONE"; then
       TEXDIR=${prefix}/share/texmf
+    else
+      TEXDIR=`$KPSEXPAND '$TEXMFLOCAL'`
+      if test "x$TEXDIR" = "x" -o "$TEXDIR" = "\$TEXMFLOCAL"; then
+        TEXDIR=${ac_default_prefix}/share/texmf
+      fi
     fi
     TEXDIR=${TEXDIR}/tex/latex/gnuplot
   fi
@@ -374,7 +375,7 @@ AC_ARG_WITH(xmi,dnl
 
 dnl Use builtin readline or GNU readline or NetBSD editline
 AC_ARG_WITH(readline,dnl
-[ --with-readline=builtin  use the built-in readline
+[  --with-readline=builtin  use the built-in readline
   --with-readline=gnu      use the GNU readline library (default if present)
   --with-readline=bsd      use the NetBSD editline library (NB: does not handle UTF-8!)
   --with-readline=DIR      specify the location of GNU readline
