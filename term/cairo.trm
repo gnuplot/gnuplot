@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: cairo.trm,v 1.45 2011/08/25 20:55:13 sfeam Exp $
+ * $Id: cairo.trm,v 1.46 2011/08/29 18:40:59 sfeam Exp $
  */
 
 /* GNUPLOT - cairo.trm */
@@ -76,7 +76,9 @@ TERM_PUBLIC void cairotrm_filled_polygon __PROTO ((int n, gpiPoint * corners));
 #ifdef TERM_BODY
 
 #include "cairo-pdf.h"
+#ifdef HAVE_CAIROEPS
 #include "cairo-ps.h"
+#endif
 #include "wxterminal/gp_cairo.h"
 #include "wxterminal/gp_cairo_helpers.h"
 #include "glib.h"		/* For guint32 */
@@ -454,28 +456,7 @@ void cairotrm_init()
 	if ( plot.cr )
 		cairo_destroy(plot.cr);
 
-	if (!strcmp(term->name,"epscairo")) {
-		/* Output can either be a file or stdout */
-		if (!outstr) {
-		    surface = cairo_ps_surface_create_for_stream(
-			(cairo_write_func_t)cairostream_write, cairostream_error,
-				plot.device_xmax /*double width_in_points*/,
-				plot.device_ymax /*double height_in_points*/);
-		} else {
-		    surface = cairo_ps_surface_create(outstr,
-				plot.device_xmax /*double width_in_points*/,
-				plot.device_ymax /*double height_in_points*/);
-		}
-		cairo_ps_surface_set_eps(surface, TRUE);
-		/* it is up to the pdf viewer to do the hinting */
-		plot.hinting = 0;
-		/* disable OPERATOR_SATURATE, not implemented in cairo pdf backend,
-		 * results in bitmap fallback. However, polygons are drawn with seams
-		 * between each other. */
-		plot.polygons_saturate = FALSE;
-		/* Empirical correction to make pdf output look more like wxt and png */
-		plot.dashlength /= 2;
-	} else if (!strcmp(term->name,"pdfcairo")) {
+	if (!strcmp(term->name,"pdfcairo")) {
 		/* Output can either be a file or stdout */
 		if (!outstr) {
 		    surface = cairo_pdf_surface_create_for_stream(
@@ -505,6 +486,30 @@ void cairotrm_init()
 		 * of OPERATOR_SATURATE */
 		plot.polygons_saturate = TRUE;
 	}
+#ifdef HAVE_CAIROEPS
+	else if (!strcmp(term->name,"epscairo")) {
+		/* Output can either be a file or stdout */
+		if (!outstr) {
+		    surface = cairo_ps_surface_create_for_stream(
+			(cairo_write_func_t)cairostream_write, cairostream_error,
+				plot.device_xmax /*double width_in_points*/,
+				plot.device_ymax /*double height_in_points*/);
+		} else {
+		    surface = cairo_ps_surface_create(outstr,
+				plot.device_xmax /*double width_in_points*/,
+				plot.device_ymax /*double height_in_points*/);
+		}
+		cairo_ps_surface_set_eps(surface, TRUE);
+		/* it is up to the pdf viewer to do the hinting */
+		plot.hinting = 0;
+		/* disable OPERATOR_SATURATE, not implemented in cairo pdf backend,
+		 * results in bitmap fallback. However, polygons are drawn with seams
+		 * between each other. */
+		plot.polygons_saturate = FALSE;
+		/* Empirical correction to make pdf output look more like wxt and png */
+		plot.dashlength /= 2;
+	}
+#endif /* HAVE_CAIROEPS */
 
 	plot.cr = cairo_create(surface);
 	cairo_surface_destroy( surface );
@@ -963,6 +968,7 @@ void cairotrm_image(unsigned int M, unsigned int N, coordval * image, gpiPoint *
 #endif /* TERM_BODY */
 
 #ifdef TERM_TABLE
+#ifdef HAVE_CAIROEPS
 TERM_TABLE_START (epscairo_driver)
     "epscairo", "eps terminal based on cairo",
     /* the following values are overriden by cairotrm_graphics */
@@ -986,6 +992,7 @@ TERM_TABLE_END (epscairo_driver)
 
 #undef LAST_TERM
 #define LAST_TERM epscairo_driver
+#endif /* HAVE_CAIROEPS */
 
 TERM_TABLE_START (pdfcairo_driver)
     "pdfcairo", "pdf terminal based on cairo",
@@ -1047,11 +1054,10 @@ START_HELP(epscairo)
 "?set term epscairo",
 "?term epscairo",
 "?epscairo",
-" The `epscairo` terminal device generates output in eps. The actual",
-" drawing is done via cairo, a 2D graphics library, and pango, a library for",
-" laying out and rendering text.",
+" The `epscairo` terminal device generates encapsulated PostScript (*.eps) using",
+" the cairo and pango support libraries.  cairo verion >= 1.6 is required.",
 "",
-" Please read the help for the pdfcairo temrinal."
+" Please read the help for the pdfcairo terminal."
 ""
 END_HELP(epscairo)
 #endif /* TERM_HELP */
