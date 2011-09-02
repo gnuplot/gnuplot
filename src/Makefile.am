@@ -76,8 +76,8 @@ SUBDIRS = $(d_beos) wxterminal qtterminal
 EXTRA_gnuplot_SOURCES = corplot.c os9.c strftime.c vms.c
 
 EXTRA_DIST = GNUmakefile Makefile.maint NeXT OpenStep README \
-corgraph.asm genopt.com gnuplot.opt gnuplot.prj header.mac \
-hrcgraph.asm intergra.x11 lasergnu lineproc.mac linkopt.vms linkopt.ztc \
+corgraph.asm genopt.com gnuplot.opt header.mac \
+hrcgraph.asm intergra.x11 lasergnu lineproc.mac linkopt.vms \
 makefile.all makefile.awc os2 pcgraph.asm win x11.opt \
 $(EXTRA_gnuplot_SOURCES)
 

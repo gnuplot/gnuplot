@@ -1,3 +1,11 @@
+2011-09-02  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* docs/makefile.ami docs/old/README.ami docs/old/README.win 
+	src/gnuplot.prj src/linkopt.ztc: Removed.
+
+	* config/makefile.unx docs/Makefile.in src/Makefile.am: Remove
+	references to obsolete files.
+
 2011-09-01  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* configure.in: Yet another rewrite of the installation path rules for
