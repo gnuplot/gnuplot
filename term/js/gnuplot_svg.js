@@ -1,12 +1,12 @@
 /*
- * $Id: gnuplot_svg.js,v 1.4 2011/04/09 04:22:00 sfeam Exp $
+ * $Id: gnuplot_svg.js,v 1.5 2011/04/09 20:56:43 sfeam Exp $
  */
 // Javascript routines for interaction with SVG documents produced by 
 // gnuplot's SVG terminal driver.
 
 var gnuplot_svg = { };
 
-gnuplot_svg.version = "08 April 2011";
+gnuplot_svg.version = "03 September 2011";
 
 gnuplot_svg.SVGDoc = null;
 gnuplot_svg.SVGRoot = null;
@@ -15,6 +15,7 @@ gnuplot_svg.Init = function(e)
 {
    gnuplot_svg.SVGDoc = e.target.ownerDocument;
    gnuplot_svg.SVGRoot = gnuplot_svg.SVGDoc.documentElement;
+   gnuplot_svg.axisdate = new Date();
 }
 
 gnuplot_svg.toggleVisibility = function(evt, targetId)
@@ -62,6 +63,28 @@ gnuplot_svg.updateCoordBox = function(t, evt) {
 	polar = gnuplot_svg.convert_to_polar(plotcoord.x,plotcoord.y);
 	label_x = "ang= " + polar.ang.toPrecision(4);
 	label_y = "R= " + polar.r.toPrecision(4);
+    } else if (gnuplot_svg.plot_timeaxis_x == "Date") {
+	gnuplot_svg.axisdate.setTime(1000. * (plotcoord.x + 946684800));
+	year = gnuplot.axisdate.getUTCFullYear();
+	month = gnuplot.axisdate.getUTCMonth();
+	date = gnuplot.axisdate.getUTCDate();
+	label_x = (" " + date).slice (-2) + "/"
+		+ ("0" + (month+1)).slice (-2) + "/"
+		+ year;
+	label_y = plotcoord.y.toFixed(2);
+    } else if (gnuplot_svg.plot_timeaxis_x == "Time") {
+	gnuplot_svg.axisdate.setTime(1000. * (plotcoord.x + 946684800));
+	hour = gnuplot_svg.axisdate.getUTCHours();
+	minute = gnuplot_svg.axisdate.getUTCMinutes();
+	second = gnuplot_svg.axisdate.getUTCSeconds();
+	label_x = ("0" + hour).slice (-2) + ":" 
+		+ ("0" + minute).slice (-2) + ":"
+		+ ("0" + second).slice (-2);
+	label_y = plotcoord.y.toFixed(2);
+    } else if (gnuplot_svg.plot_timeaxis_x == "DateTime") {
+	gnuplot_svg.axisdate.setTime(1000. * (plotcoord.x + 946684800));
+	label_x = gnuplot_svg.axisdate.toUTCString();
+	label_y = plotcoord.y.toFixed(2);
     } else {
 	label_x = plotcoord.x.toFixed(2);
 	label_y = plotcoord.y.toFixed(2);

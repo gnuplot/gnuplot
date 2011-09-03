@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: svg.trm,v 1.120 2011/07/25 23:21:29 sfeam Exp $
+ * $Id: svg.trm,v 1.121 2011/07/28 06:12:06 sfeam Exp $
  */
 
 /*------------------------------------------------------------------------------------------------------------------------------------
@@ -1021,6 +1021,24 @@ SVG_text ()
 	if (polar)
 	    fprintf(gpoutfile, "gnuplot_svg.plot_logaxis_r = %d;\n",
 		axis_array[POLAR_AXIS].log ? 1: 0);
+
+	/*
+	 * Note: mouse_alt_string is set by 'set mouse mouseformat "foo"'
+	 * The only strings currently recognized by gnuplot_svg.js are
+	 * "Time", "Date", and "DateTime" but the user could modify
+	 * gnuplot_svg.js to recognize additional formats.
+	 * FIXME: This all needs to be documented somewhere!
+	 */
+	if (axis_array[FIRST_X_AXIS].is_timedata) {
+	    fprintf(gpoutfile, "gnuplot_svg.plot_timeaxis_x = \"%s\";\n",
+		(mouse_alt_string) ? mouse_alt_string
+		: (mouse_mode == 4) ? "Date"
+		: (mouse_mode == 5) ? "Time"
+		: "DateTime"
+		);
+		
+	} else
+	    fprintf(gpoutfile, "gnuplot_svg.plot_timeaxis_x = \"\";\n");
 
 	fprintf(gpoutfile,"]]>\n</script>\n");
     } /* End of section writing out variables for mousing */

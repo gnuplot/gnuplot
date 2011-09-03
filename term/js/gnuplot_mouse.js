@@ -1,7 +1,7 @@
 /*
- * $Id: gnuplot_mouse.js,v 1.14 2011/04/03 19:31:15 sfeam Exp $
+ * $Id: gnuplot_mouse.js,v 1.15 2011/04/04 21:40:46 sfeam Exp $
  */
-    gnuplot.mouse_version = "03 April 2011";
+    gnuplot.mouse_version = "03 September 2011";
 
 // Mousing code for use with gnuplot's 'canvas' terminal driver.
 // The functions defined here assume that the javascript plot produced by
@@ -53,6 +53,7 @@
     gnuplot.zoom_in_progress = false;
 
     gnuplot.full_canvas_image = null;
+    gnuplot.axisdate = new Date();
 
 gnuplot.init = function ()
 {
@@ -160,6 +161,9 @@ gnuplot.mouse_update = function(e)
     polar = gnuplot.convert_to_polar(x,y);
     label_x = "ang= " + polar.ang.toPrecision(4);
     label_y = "R= " + polar.r.toPrecision(4);
+  } else if (typeof(gnuplot.plot_timeaxis_x) == "string" && gnuplot.plot_timeaxis_x != "") {
+    label_x = gnuplot.timefmt(x);
+    label_y = y.toPrecision(4);
   } else {
     label_x = x.toPrecision(4);
     label_y = y.toPrecision(4);
@@ -187,6 +191,31 @@ gnuplot.mouse_update = function(e)
     if (w<0) {x0 = x0 + w; w = -w;}
     if (h<0) {y0 = y0 + h; h = -h;}
     ctx.strokeRect(x0,y0,w,h);
+  }
+}
+
+gnuplot.timefmt = function (x)
+{
+  gnuplot.axisdate.setTime(1000. * (x + 946684800));
+
+  if (gnuplot.plot_timeaxis_x == "DateTime") {
+    return gnuplot.axisdate.toUTCString();
+  } 
+  if (gnuplot.plot_timeaxis_x == "Date") {
+    year = gnuplot.axisdate.getUTCFullYear();
+    month = gnuplot.axisdate.getUTCMonth();
+    date = gnuplot.axisdate.getUTCDate();
+    return (" " + date).slice (-2) + "/"
+         + ("0" + (month+1)).slice (-2) + "/"
+	 + year;
+  } 
+  if (gnuplot.plot_timeaxis_x == "Time") {
+    hour = gnuplot.axisdate.getUTCHours();
+    minute = gnuplot.axisdate.getUTCMinutes();
+    second = gnuplot.axisdate.getUTCSeconds();
+    return ("0" + hour).slice (-2) + ":"
+         + ("0" + minute).slice (-2) + ":"
+         + ("0" + second).slice (-2);
   }
 }
 
@@ -220,7 +249,10 @@ gnuplot.saveclick = function (event)
   if (button == "LEFT") {
     ctx.strokeStyle="black";
     ctx.strokeRect(gnuplot.mousex, gnuplot.mousey, 1, 1);
-    click = " " + x.toPrecision(4) + ", " + y.toPrecision(4);
+    if (typeof(gnuplot.plot_timeaxis_x) == "string" && gnuplot.plot_timeaxis_x != "") 
+      click = " " + gnuplot.timefmt(x) + ", " + y.toPrecision(4);
+    else
+      click = " " + x.toPrecision(4) + ", " + y.toPrecision(4);
     ctx.drawText("sans", 9, gnuplot.mousex, gnuplot.mousey, click);
   }
 

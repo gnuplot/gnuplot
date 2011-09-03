@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: canvas.trm,v 1.50 2011/04/13 23:59:12 sfeam Exp $
+ * $Id: canvas.trm,v 1.51 2011/08/02 20:40:31 sfeam Exp $
  *
  */
 
@@ -608,6 +608,22 @@ CANVAS_text()
 
 	fprintf(gpoutfile, "gnuplot.plot_axis_width = gnuplot.plot_axis_xmax - gnuplot.plot_axis_xmin;\n");
 	fprintf(gpoutfile, "gnuplot.plot_axis_height = gnuplot.plot_axis_ymax - gnuplot.plot_axis_ymin;\n");
+
+	/* 
+	 * Note: mouse_alt_string is set by 'set mouse mouseformat "foo"'
+	 * The only strings currently recognized by gnuplot_mouse.js are
+	 * "Time" and "Date", but the user could modify gnuplot_mouse.js to
+	 * recognize additional formats.
+	 */
+	if (axis_array[FIRST_X_AXIS].is_timedata) {
+	    fprintf(gpoutfile, "gnuplot.plot_timeaxis_x = \"%s\";\n",
+		(mouse_mode == MOUSE_COORDINATES_ALT && mouse_alt_string) ? mouse_alt_string
+		: (mouse_mode == 4) ? "Date"
+		: (mouse_mode == 5) ? "Time"
+		: "DateTime"
+		);
+	} else
+	    fprintf(gpoutfile, "gnuplot.plot_timeaxis_x = \"\";\n");
 
     } /* End of section writing out variables for mousing */
 

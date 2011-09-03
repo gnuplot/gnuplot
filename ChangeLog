@@ -1,3 +1,11 @@
+2011-09-03  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/svg.trm term/canvas.trm term/js/gnuplot_mouse.js
+	term/js/gnuplot_svg.js:  Add support for time coordinates to the mousing
+	code used by svg and canvas terminals.  In this initial implementation,
+	only the primary X axis is checked, and there is no provision for a
+	user-supplied format.
+
 2011-09-02  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* configure.in term/cairo.trm:  Check for the presence of cairo-ps.h
