@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.222 2011/07/12 18:38:52 juhaszp Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.223 2011/08/25 21:06:07 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -312,7 +312,7 @@ void fflush_binary();
 #endif /* !VMS */
 
 #if defined(MSDOS) || defined(WIN32)
-# if defined(__DJGPP__) || defined (__TURBOC__)
+# if defined(__DJGPP__)
 #  include <io.h>
 # endif
 # include <fcntl.h>
@@ -1682,7 +1682,7 @@ void
 init_terminal()
 {
     char *term_name = DEFAULTTERM;
-#if (defined(__TURBOC__) && defined(MSDOS) && !defined(_Windows)) || defined(NEXT) || defined(SUN) || defined(X11)
+#if (defined(MSDOS) && !defined(_Windows)) || defined(NEXT) || defined(SUN) || defined(X11)
     char *env_term = NULL;      /* from TERM environment var */
 #endif
 #ifdef X11

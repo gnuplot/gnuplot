@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: stdfn.c,v 1.22 2010/10/10 17:38:23 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: stdfn.c,v 1.23 2011/05/02 18:37:00 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - stdfn.c */
@@ -160,137 +160,6 @@ strstr(const char *cs, const char *ct)
 #endif /* HAVE_STRSTR */
 
 
-#ifdef __PUREC__
-/*
- * a substitute for PureC's buggy sscanf.
- * this uses the normal sscanf and fixes the following bugs:
- * - whitespace in format matches whitespace in string, but doesn't
- *   require any. ( "%f , %f" scans "1,2" correctly )
- * - the ignore value feature works (*). this created an address error
- *   in PureC.
- */
-
-#include <stdarg.h>
-
-int
-purec_sscanf(const char *string, const char *format,...)
-{
-    va_list args;
-    int cnt = 0;
-    char onefmt[256];
-    char buffer[256];
-    const char *f = format;
-    const char *s = string;
-    char *f2;
-    char ch;
-    int ignore;
-    void *p;
-    int *ip;
-    int pos;
-
-    va_start(args, format);
-    while (*f && *s) {
-	ch = *f++;
-	if (ch != '%') {
-	    if (isspace((unsigned char) ch)) {
-		/* match any number of whitespace */
-		while (isspace((unsigned char) *s))
-		    s++;
-	    } else {
-		/* match exactly the character ch */
-		if (*s != ch)
-		    goto finish;
-		s++;
-	    }
-	} else {
-	    /* we have got a '%' */
-	    ch = *f++;
-	    if (ch == '%') {
-		/* match exactly % */
-		if (*s != ch)
-		    goto finish;
-		s++;
-	    } else {
-		f2 = onefmt;
-		*f2++ = '%';
-		*f2++ = ch;
-		ignore = 0;
-		if (ch == '*') {
-		    ignore = 1;
-		    ch = f2[-1] = *f++;
-		}
-		while (isdigit((unsigned char) ch)) {
-		    ch = *f2++ = *f++;
-		}
-		if (ch == 'l' || ch == 'L' || ch == 'h') {
-		    ch = *f2++ = *f++;
-		}
-		switch (ch) {
-		case '[':
-		    while (ch && ch != ']') {
-			ch = *f2++ = *f++;
-		    }
-		    if (!ch)
-			goto error;
-		    break;
-		case 'e':
-		case 'f':
-		case 'g':
-		case 'd':
-		case 'o':
-		case 'i':
-		case 'u':
-		case 'x':
-		case 'c':
-		case 's':
-		case 'p':
-		case 'n':	/* special case handled below */
-		    break;
-		default:
-		    goto error;
-		}
-		if (ch != 'n') {
-		    strcpy(f2, "%n");
-		    if (ignore) {
-			p = buffer;
-		    } else {
-			p = va_arg(args, void *);
-		    }
-		    switch (sscanf(s, onefmt, p, &pos)) {
-		    case EOF:
-			goto error;
-		    case 0:
-			goto finish;
-		    }
-		    if (!ignore)
-			cnt++;
-		    s += pos;
-		} else {
-		    if (!ignore) {
-			ip = va_arg(args, int *);
-			*ip = (int) (s - string);
-		    }
-		}
-	    }
-	}
-    }
-
-    if (!*f)
-	goto finish;
-
-  error:
-    cnt = EOF;
-  finish:
-    va_end(args);
-    return cnt;
-}
-
-/* use the substitute now. I know this is dirty trick, but it works. */
-#define sscanf purec_sscanf
-
-#endif /* __PUREC__ */
-
-
 /*
  * POSIX functions
  */
@@ -305,20 +174,18 @@ purec_sscanf(const char *string, const char *format,...)
 unsigned int
 sleep(unsigned int delay)
 {
-#if defined(MSDOS) || defined(_Windows)
-# if !(defined(__TURBOC__) || defined(__EMX__) || defined(DJGPP)) || defined(_Windows)	/* Turbo C already has sleep() */
+#if defined(MSDOS)
+# if !((defined(__EMX__) || defined(DJGPP))
     /* kludge to provide sleep() for msc 5.1 */
     unsigned long time_is_up;
 
     time_is_up = time(NULL) + (unsigned long) delay;
     while (time(NULL) < time_is_up)
 	/* wait */ ;
-# endif /* !__TURBOC__ ... */
-#endif /* MSDOS ... */
-
-#ifdef WIN32
+# endif
+#elif defined(WIN32)
     Sleep((DWORD) delay * 1000);
-#endif
+#endif /* MSDOS ... */
 
     return 0;
 }

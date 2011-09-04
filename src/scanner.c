@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: scanner.c,v 1.29 2010/03/14 18:01:46 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: scanner.c,v 1.30 2011/06/19 22:10:37 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - scanner.c */
@@ -151,21 +151,10 @@ scanner(char **expressionp, size_t *expressionlenp)
 	    int partial;
 	    token[t_num].is_token = FALSE;
 	    token[t_num].l_val.type = CMPLX;
-#ifdef __PUREC__
-	    {
-		char l[80];
-		partial = sscanf(&expression[++current], "%lf,%lf%[ }]s",
-			    &token[t_num].l_val.v.cmplx_val.real,
-			    &token[t_num].l_val.v.cmplx_val.imag,
-			    &l);
-		brace = l[0];
-	    }
-#else
 	    partial = sscanf(&expression[++current], "%lf , %lf %c",
 			&token[t_num].l_val.v.cmplx_val.real,
 			&token[t_num].l_val.v.cmplx_val.imag,
 			&brace);
-#endif
 
 	    if (partial <= 0) {
 		curly_brace_count++;

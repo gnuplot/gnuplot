@@ -1,5 +1,5 @@
 /*
- * $Id: command.h,v 1.54 2011/06/19 22:10:37 sfeam Exp $
+ * $Id: command.h,v 1.55 2011/08/24 17:25:10 markisch Exp $
  */
 
 /* GNUPLOT - command.h */
@@ -96,11 +96,6 @@ extern struct udft_entry *dummy_func;
 # ifdef DJGPP
 extern char HelpFile[];         /* patch for do_help  - AP */
 # endif                         /* DJGPP */
-# ifdef __TURBOC__
-#  ifndef _Windows
-extern char HelpFile[];         /* patch for do_help  - DJL */
-#  endif                        /* _Windows */
-# endif                         /* TURBOC */
 #endif /* MSDOS */
 
 #ifdef _Windows

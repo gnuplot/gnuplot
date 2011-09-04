@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.221 2011/08/24 16:54:34 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.222 2011/08/24 17:25:10 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -99,10 +99,6 @@ static char *RCSid() { return RCSid("$Id: command.c,v 1.221 2011/08/24 16:54:34 
 #endif
 
 #define PROMPT "gnuplot> "
-
-#if defined(MSDOS) && defined(__TURBOC__) && !defined(_Windows)
-unsigned _stklen = 16394;        /* increase stack size */
-#endif /* MSDOS && TURBOC */
 
 #ifdef OS2_IPC
 #  define INCL_DOSMEMMGR
@@ -1096,7 +1092,6 @@ else_command()
     * New if/else syntax permits else clause to appear on a new line
     */
     if (equals(c_token+1,"{")) {
-	int i, depth;
 	int clause_start, clause_end;
 	char *clause;
 
@@ -2085,10 +2080,7 @@ changedir(char *path)
 	(void) _chdrive(driveno + 1);
 # endif
 
-
-/* HBB: recent versions of DJGPP also have setdisk():,
- * so I del'ed the special code */
-# if ((defined(MSDOS) || defined(_Windows)) && defined(__TURBOC__)) || defined(DJGPP)
+# ifdef DJGPP
 	(void) setdisk(driveno);
 # endif
 	path += 2;		/* move past drive letter */
@@ -2482,9 +2474,9 @@ help_command()
 	/* if can't find environment variable then just use HELPFILE */
 
 /* patch by David J. Liu for getting GNUHELP from home directory */
-#  if (defined(__TURBOC__) && defined(MSDOS)) || defined(__DJGPP__)
+#  ifdef __DJGPP__
 	help_ptr = HelpFile;
-#  else			/* __TURBOC__ */
+#  else
 	help_ptr = HELPFILE;
 #  endif
 #ifdef OS2
@@ -2773,33 +2765,6 @@ do_shell()
 #define PUT_STRING(s) cputs(s)
 #define GET_STRING(s,l) ((interactive) ? cgets_emu(s,l) : fgets(s,l,stdin))
 
-#   ifdef __TURBOC__
-/* cgets implemented using dos functions */
-/* Maurice Castro 22/5/91 */
-static char *doscgets __PROTO((char *));
-
-static char *
-doscgets(char *s)
-{
-    long datseg;
-
-    /* protect and preserve segments - call dos to do the dirty work */
-    datseg = _DS;
-
-    _DX = FP_OFF(s);
-    _DS = FP_SEG(s);
-    _AH = 0x0A;
-    geninterrupt(33);
-    _DS = datseg;
-
-    /* check for a carriage return and then clobber it with a null */
-    if (s[s[1] + 2] == '\r')
-	s[s[1] + 2] = 0;
-
-    /* return the input string */
-    return (&(s[2]));
-}
-#   endif			/* __TURBOC__ */
 
 /* emulate a fgets like input function with DOS cgets */
 char *
@@ -2810,11 +2775,7 @@ cgets_emu(char *str, int len)
 
     if (buffer[leftover] == NUL) {
 	buffer[0] = 126;
-#   ifdef __TURBOC__
-	doscgets(buffer);
-#   else
 	cgets(buffer);
-#   endif
 	fputc('\n', stderr);
 	if (buffer[2] == 26)
 	    return NULL;

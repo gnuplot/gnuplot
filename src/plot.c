@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot.c,v 1.126 2011/05/13 18:30:57 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot.c,v 1.127 2011/05/22 19:08:13 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot.c */
@@ -150,7 +150,7 @@ extern int X11_args __PROTO((int, char **)); /* FIXME: defined in term/x11.trm *
 #endif
 
 /* patch to get home dir, see command.c */
-#if defined (__TURBOC__) && (defined (MSDOS)) || defined(DJGPP)
+#ifdef DJGPP
 # include <dir.h>               /* MAXPATH */
 char HelpFile[MAXPATH];
 #endif /*   - DJL */
@@ -306,12 +306,6 @@ main(int argc, char **argv)
 #endif
 
 /* get helpfile from home directory */
-# ifndef _Windows
-#  if defined (__TURBOC__) && defined (MSDOS)
-    strcpy(HelpFile, argv[0]);
-    strcpy(strrchr(HelpFile, DIRSEP1), "\\gnuplot.gih");
-#  endif			/*   - DJL */
-# endif				/* !_Windows */
 #ifdef __DJGPP__
     {
 	char *s;
@@ -672,10 +666,6 @@ main(int argc, char **argv)
 void
 interrupt_setup()
 {
-#ifdef __PUREC__
-    setmatherr(purec_matherr);
-#endif
-
 #if defined(WGP_CONSOLE)
     /* FIXME. CTRC+C crashes console mode gnuplot for windows.
        Failure of longjmp() is not easy to fix so that the signal

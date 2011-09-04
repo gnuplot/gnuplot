@@ -1,5 +1,5 @@
 /*
- * $Id: syscfg.h,v 1.45 2011/03/13 19:55:29 markisch Exp $
+ * $Id: syscfg.h,v 1.46 2011/04/16 11:15:55 markisch Exp $
  */
 
 /* GNUPLOT - syscfg.h */
@@ -200,24 +200,9 @@
 #  include <process.h>
 # endif                         /* !DJGPP */
 
-# if defined(__TURBOC__)
-#  include <dos.h>		/* for sleep() prototype */
-#  ifndef _Windows
-#   define HAVE_SLEEP 1
-#   include <conio.h>
-#   include <dir.h>            /* setdisk() */
-#  endif                       /* _Windows */
-#  ifdef WIN32
-#   define HAVE_SLEEP 1
-#  endif
-
-# else                         /* must be MSC */
-#  if !defined(__EMX__) && !defined(DJGPP)
-#   ifdef __MSC__
-#    include <direct.h>        /* for _chdrive() */
-#   endif                      /* __MSC__ */
-#  endif                       /* !__EMX__ && !DJGPP */
-# endif                        /* !ZTC */
+# ifdef __MSC__
+#  include <direct.h>        /* for _chdrive() */
+# endif                      /* __MSC__ */
 
 #endif /* MSDOS */
 
@@ -255,14 +240,9 @@
 /* HBB 20000416: stuff moved from plot.h to here. It's system-dependent,
  * so it belongs here, IMHO */
 
-/* To access curves larger than 64k, MSDOS needs to use huge pointers */
-#if (defined(__TURBOC__) && defined(MSDOS))
-# define GPHUGE huge
-# define GPFAR far
-#else /* not TurboC */
-# define GPHUGE /* nothing */
-# define GPFAR /* nothing */
-#endif /* not TurboC */
+/* BM 20110904: remnant of huge memory model support */
+#define GPHUGE /* nothing */
+#define GPFAR /* nothing */
 
 typedef double coordval;
 
