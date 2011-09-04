@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: readline.c,v 1.56 2011/05/02 18:44:32 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: readline.c,v 1.57 2011/05/05 21:24:10 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - readline.c */
@@ -311,7 +311,10 @@ static void step_forward __PROTO((void));
 static void delete_forward __PROTO((void));
 static void delete_backward __PROTO((void));
 static int char_seqlen __PROTO((void));
-
+#if defined(HAVE_DIRENT_H) || defined(WIN32)
+static char *fn_completion(size_t anchor_pos, int direction);
+static void tab_completion(TBOOLEAN forward);
+#endif
 
 /* user_putc and user_puts should be used in the place of
  * fputc(ch,stderr) and fputs(str,stderr) for all output
@@ -384,7 +387,7 @@ mbwidth(char *c)
 }
 
 
-int
+static int
 isdoublewidth(size_t pos)
 {
     return mbwidth(cur_line + pos) > 1;
@@ -522,7 +525,8 @@ extend_cur_line()
 
 
 #if defined(HAVE_DIRENT_H) || defined(WIN32)
-char * fn_completion(size_t anchor_pos, int direction)
+static char *
+fn_completion(size_t anchor_pos, int direction)
 {
     static char * completions[MAX_COMPLETIONS];
     static int n_completions = 0;

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: winmain.c,v 1.49 2011/08/24 17:25:10 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: winmain.c,v 1.50 2011/08/29 19:45:44 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - win/winmain.c */
@@ -73,9 +73,6 @@ static char *RCSid() { return RCSid("$Id: winmain.c,v 1.49 2011/08/24 17:25:10 m
 #ifdef __MSC__
 # include <malloc.h>
 #endif
-#ifdef __TURBOC__ /* HBB 981201: MinGW32 doesn't have this */
-# include <alloc.h>
-#endif
 #ifdef __WATCOMC__
 # define mktemp _mktemp
 #endif
@@ -83,6 +80,7 @@ static char *RCSid() { return RCSid("$Id: winmain.c,v 1.49 2011/08/24 17:25:10 m
 #include "plot.h"
 #include "setshow.h"
 #include "version.h"
+#include "command.h"
 #include "winmain.h"
 #include "wtext.h"
 #include "wcommon.h"
@@ -133,9 +131,10 @@ char *authors[]={
 void WinExit(void);
 int gnu_main(int argc, char *argv[], char *env[]);
 static void WinCloseHelp(void);
+int CALLBACK ShutDown();
 
 
-void
+static void
 CheckMemory(LPSTR str)
 {
         if (str == (LPSTR)NULL) {
@@ -258,7 +257,7 @@ GetDllVersion(LPCTSTR lpszDllName)
 }
 
 
-BOOL IsWindowsXPorLater(void) 
+BOOL IsWindowsXPorLater(void)
 {
     OSVERSIONINFO versionInfo;
 
@@ -311,7 +310,7 @@ WinCloseHelp(void)
 {
 #ifdef WITH_HTML_HELP
 	/* Due to a known bug in the HTML help system we have to
-	 * call this as soon as possible before the end of the program. 
+	 * call this as soon as possible before the end of the program.
 	 * See e.g. http://helpware.net/FAR/far_faq.htm#HH_CLOSE_ALL
 	 */
 	if (IsWindow(help_window))
@@ -400,13 +399,13 @@ int main(int argc, char **argv)
 				free(inifile);
 				inifile = "wgnuplot.ini";
 			}
-			
+
 #ifndef WGP_CONSOLE
 			textwin.IniFile = inifile;
 #endif
 			graphwin->IniFile = inifile;
 		}
-		
+
 #ifndef WGP_CONSOLE
         textwin.IniSection = "WGNUPLOT";
         textwin.DragPre = "load '";
@@ -424,7 +423,7 @@ int main(int argc, char **argv)
 	    "last modified %s\n" \
 	    "%s\n%s, %s and many others\n" \
 	    "gnuplot home:     http://www.gnuplot.info\n",
-            gnuplot_version, gnuplot_patchlevel, 
+            gnuplot_version, gnuplot_patchlevel,
 	    gnuplot_date,
 	    gnuplot_copyright, authors[1], authors[0]);
         textwin.AboutText = (LPSTR)realloc(textwin.AboutText, _fstrlen(textwin.AboutText)+1);
@@ -452,7 +451,7 @@ int main(int argc, char **argv)
 	    initCtrls.dwICC = ICC_WIN95_CLASSES;
 	    InitCommonControlsEx(&initCtrls);
 	}
-	
+
 #ifndef WGP_CONSOLE
         if (TextInit(&textwin))
                 exit(1);
@@ -479,7 +478,7 @@ int main(int argc, char **argv)
 #ifdef CONSOLE_SWITCH_CP
         /* Change codepage of console to match that of the graph window.
            WinExit() will revert this.
-           Attention: display of characters does not work correctly with 
+           Attention: display of characters does not work correctly with
            "Terminal" font! Users will have to use "Lucida Console" or similar.
         */
         cp_input = GetConsoleCP();

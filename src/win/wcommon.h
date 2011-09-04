@@ -1,5 +1,5 @@
 /*
- * $Id: wcommon.h,v 1.12 2011/03/25 10:35:48 markisch Exp $
+ * $Id: wcommon.h,v 1.13 2011/03/28 10:09:41 markisch Exp $
  */
 
 /* GNUPLOT - wcommon.h */
@@ -50,6 +50,8 @@
 extern DWORD GetDllVersion(LPCTSTR lpszDllName);
 extern BOOL IsWindowsXPorLater(void);
 extern char *appdata_directory(void);
+extern FILE *open_printer();
+extern void close_printer(FILE *outfile);
 extern BOOL cp_changed;
 extern UINT cp_input;
 extern UINT cp_output;

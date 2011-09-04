@@ -1,7 +1,13 @@
 2011-09-04  Bastian Maerkisch  <bmaerkisch@web.de>
 
+	* src/readline.c (fn_completion, tab_completion, isdoublewidth)
+	src/win/screenbuf.h (sb_calc_length) src/win/wcommon.h (open_printer,
+	close_printer) src/win/wgraph.c (UnicodeText) src/win/winmain.c
+	(ShutDown, CheckMemory) src/win/wmenu.c: Add missing prototypes, 
+	make local functions static.
+
 	* src/alloc.c src/alloc.h src/ansicheck.h src/command.c src/command.h
-	src/plot.c src/scanner.c src/stdfn.c src/syscfg.h src/term.c src/term.h:
+	src/plot.c src/scanner.c src/stdfn.c src/syscfg.h src/term.c:
 	Remove conditional code for Atari Pure C and Borland C compilers.
 
 	* src/axis.c src/command.c src/datafile.c src/getcolor.c src/misc.c

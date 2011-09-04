@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: wmenu.c,v 1.19 2011/03/29 15:29:16 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: wmenu.c,v 1.20 2011/03/29 18:57:23 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - win/wmenu.c */
@@ -47,6 +47,7 @@ static char *RCSid() { return RCSid("$Id: wmenu.c,v 1.19 2011/03/29 15:29:16 mar
 
 #define STRICT
 #define COBJMACROS
+/* required for COMCTRL32 5.81 or later */
 #define _WIN32_IE 0x0501
 #include <windows.h>
 #include <windowsx.h>
@@ -103,6 +104,23 @@ BYTE keyeq[] = {
 	17, 18, 19, 20, 21, 22, 23, 24,
 	25, 26, 28, 29, 30, 31,
 	0};
+
+
+#define GBUFSIZE 512
+typedef struct tagGFILE {
+	HFILE	hfile;
+	char 	getbuf[GBUFSIZE];
+	int	getnext;
+	int	getleft;
+} GFILE;
+
+
+static GFILE * Gfopen(LPSTR lpszFileName, int fnOpenMode);
+static void Gfclose(GFILE * gfile);
+static int Gfgets(LPSTR lp, int size, GFILE *gfile);
+static int GetLine(char * buffer, int len, GFILE *gfile);
+static void LeftJustify(char *d, char *s);
+static void TranslateMacro(char *string);
 
 
 #ifdef SHELL_DIR_DIALOG
@@ -607,15 +625,8 @@ char *szFilter;
 }
 
 
-#define GBUFSIZE 512
-typedef struct tagGFILE {
-	HFILE	hfile;
-	char 	getbuf[GBUFSIZE];
-	int	getnext;
-	int	getleft;
-} GFILE;
-
-GFILE * Gfopen(LPSTR lpszFileName, int fnOpenMode)
+static GFILE *
+Gfopen(LPSTR lpszFileName, int fnOpenMode)
 {
 GFILE *gfile;
 
@@ -633,7 +644,9 @@ GFILE *gfile;
 	return gfile;
 }
 
-void Gfclose(GFILE * gfile)
+
+static void
+Gfclose(GFILE * gfile)
 {
 
 	_lclose(gfile->hfile);
@@ -641,8 +654,9 @@ void Gfclose(GFILE * gfile)
 	return;
 }
 
+
 /* returns number of characters read */
-int
+static int
 Gfgets(LPSTR lp, int size, GFILE *gfile)
 {
 int i;
@@ -671,7 +685,8 @@ int ch;
 
 /* Get a line from the menu file */
 /* Return number of lines read from file including comment lines */
-int GetLine(char * buffer, int len, GFILE *gfile)
+static int
+GetLine(char * buffer, int len, GFILE *gfile)
 {
 BOOL  status;
 int nLine = 0;
@@ -693,7 +708,8 @@ int nLine = 0;
 }
 
 /* Left justify string */
-void LeftJustify(char *d, char *s)
+static void
+LeftJustify(char *d, char *s)
 {
 	while ( *s && (*s==' ' || *s=='\t') )
 		s++;	/* skip over space */
@@ -703,7 +719,8 @@ void LeftJustify(char *d, char *s)
 }
 
 /* Translate string to tokenized macro */
-void TranslateMacro(char *string)
+static void
+TranslateMacro(char *string)
 {
 int i, len;
 LPSTR ptr;
@@ -826,8 +843,8 @@ int ButtonIcon[BUTTONMAX];
 			goto errorcleanup;
 		}
 		ButtonText[lpmw->nButton] = (char *)macroptr;
-		ButtonIcon[lpmw->nButton] = I_IMAGENONE;
-		if ((icon = strchr(macroptr, ';'))) {
+		ButtonIcon[lpmw->nButton] = I_IMAGENONE; /* comctl 5.81, Win 2000 */
+		if ((icon = strchr((char *)macroptr, ';'))) {
 			*icon = NUL;
 			ButtonIcon[lpmw->nButton] = atoi(++icon);
 		}

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.131 2011/08/15 18:16:49 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.132 2011/08/15 20:00:44 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - win/wgraph.c */
@@ -220,6 +220,7 @@ static void	MakeFonts(LPGW lpgw, LPRECT lprect, HDC hdc);
 static void	DestroyFonts(LPGW lpgw);
 static void	SetFont(LPGW lpgw, HDC hdc);
 static void	SelFont(LPGW lpgw);
+static LPWSTR UnicodeText(const char *str, enum set_encoding_id encoding);
 static void	dot(HDC hdc, int xdash, int ydash);
 static unsigned int WDPROC GraphGetTextLength(LPGW lpgw, HDC hdc, LPCSTR text);
 static void draw_enhanced_text(LPGW lpgw, HDC hdc, LPRECT rect, int x, int y, char * str);
@@ -890,7 +891,7 @@ SelFont(LPGW lpgw)
 }
 
 
-LPWSTR
+static LPWSTR
 UnicodeText(const char *str, enum set_encoding_id encoding)
 {
     UINT codepage = 0;
@@ -915,7 +916,7 @@ UnicodeText(const char *str, enum set_encoding_id encoding)
         case S_ENC_KOI8_U:     codepage = 21866; break;
         case S_ENC_SJIS:       codepage =   932; break;
         case S_ENC_UTF8:       codepage = CP_UTF8; break;
-		default:               codepage = 0;   
+		default:               codepage = 0;
     }
     if (codepage != 0) {
         int length;

@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: screenbuf.h,v 1.1 2011/03/07 21:41:36 markisch Exp $
  */
 
 /* GNUPLOT - screenbuf.h */
@@ -68,6 +68,7 @@ LPLB sb_get(LPSB sb, uint index);
 LPLB sb_get_last(LPSB sb);
 int  sb_append(LPSB sb, LPLB lb);
 uint sb_length(LPSB sb);
+uint sb_calc_length(LPSB sb);
 uint sb_lines(LPSB sb, LPLB lb);
 uint sb_max_line_length(LPSB sb);
 void sb_find_new_pos(LPSB sb, uint x, uint y, uint new_wrap_at, uint * new_x, uint * new_y);
