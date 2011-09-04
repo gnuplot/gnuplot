@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.92 2011/05/14 20:03:39 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.93 2011/07/12 19:30:34 juhaszp Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -1572,8 +1572,6 @@ void load_one_range(AXIS_INDEX axis, double *a, t_autoscale *autoscale, t_autosc
 t_autoscale
 load_range(AXIS_INDEX axis, double *a, double *b, t_autoscale autoscale)
 {
-    double lb, ub;
-
     if (equals(c_token, "]")) {
 	axis_array[axis].min_constraint = CONSTRAINT_NONE;
 	axis_array[axis].max_constraint = CONSTRAINT_NONE;

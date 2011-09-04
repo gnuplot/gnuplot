@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.206 2011/08/27 17:53:46 juhaszp Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.207 2011/08/29 04:06:33 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -4142,9 +4142,9 @@ df_swap_bytes_by_endianess(char *data, int read_order, int read_size)
 static int
 df_skip_bytes(int nbytes)
 {
+#if defined(PIPES)
     char cval;
 
-#if defined(PIPES)
     if (df_pipe_open || plotted_data_from_stdin) {
 	while (nbytes--) {
 	    if (1 == fread(&cval, 1, 1, data_fp))

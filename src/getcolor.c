@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: getcolor.c,v 1.29 2011/06/21 01:10:43 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: getcolor.c,v 1.30 2011/08/30 04:11:04 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - getcolor.c */
@@ -34,11 +34,7 @@ static char *RCSid() { return RCSid("$Id: getcolor.c,v 1.29 2011/06/21 01:10:43 
 static int calculate_color_from_formulae __PROTO((double, rgb_color *));
 #endif
 
-static char *dbl_to_str __PROTO((double val, char *dest));
-static double str_to_dbl __PROTO((char *s));
 static void color_components_from_gray __PROTO((double gray, rgb_color *color));
-static char *color_to_str __PROTO((rgb_color col, char *buf));
-static void str_to_color __PROTO((char *buf, rgb_color *col));
 static int interpolate_color_from_gray __PROTO((double, rgb_color *));
 static double get_max_dev __PROTO((rgb_color *colors, int j, double limit));
 static int is_extremum __PROTO((rgb_color left,rgb_color mid,rgb_color right));
