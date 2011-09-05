@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.223 2011/08/25 21:06:07 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.224 2011/09/04 11:08:33 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -96,6 +96,11 @@ static char *RCSid() { return RCSid("$Id: term.c,v 1.223 2011/08/25 21:06:07 sfe
 
 #ifdef USE_MOUSE
 #include "mouse.h"
+#else
+/* Some terminals (svg canvas) can provide mousing information */
+/* even if the interactive gnuplot session itself cannot.      */
+long mouse_mode = 0;
+char* mouse_alt_string = NULL;
 #endif
 
 #ifdef _Windows
