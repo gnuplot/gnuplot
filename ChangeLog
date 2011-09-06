@@ -1,10 +1,14 @@
+2011-09-06  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* configure.in: cairo_ps_surface_set_eps is only supported by cairo
+	version 1.6.0 or later.
+
 2011-09-05  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/term.c term/canvas.trm: Allow canvas and svg terminals to provide
 	mousing even if gnuplot itself is built without USE_MOUSE.
 
 	* src/gplt_x11.c src/Makefile.am:  gnuplot_x11 --version
-
 
 2011-09-04  Bastian Maerkisch  <bmaerkisch@web.de>
 
