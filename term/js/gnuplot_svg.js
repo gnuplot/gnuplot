@@ -1,12 +1,12 @@
 /*
- * $Id: gnuplot_svg.js,v 1.5 2011/04/09 20:56:43 sfeam Exp $
+ * $Id: gnuplot_svg.js,v 1.6 2011/09/04 02:05:25 sfeam Exp $
  */
 // Javascript routines for interaction with SVG documents produced by 
 // gnuplot's SVG terminal driver.
 
 var gnuplot_svg = { };
 
-gnuplot_svg.version = "03 September 2011";
+gnuplot_svg.version = "05 September 2011";
 
 gnuplot_svg.SVGDoc = null;
 gnuplot_svg.SVGRoot = null;
@@ -65,9 +65,9 @@ gnuplot_svg.updateCoordBox = function(t, evt) {
 	label_y = "R= " + polar.r.toPrecision(4);
     } else if (gnuplot_svg.plot_timeaxis_x == "Date") {
 	gnuplot_svg.axisdate.setTime(1000. * (plotcoord.x + 946684800));
-	year = gnuplot.axisdate.getUTCFullYear();
-	month = gnuplot.axisdate.getUTCMonth();
-	date = gnuplot.axisdate.getUTCDate();
+	year = gnuplot_svg.axisdate.getUTCFullYear();
+	month = gnuplot_svg.axisdate.getUTCMonth();
+	date = gnuplot_svg.axisdate.getUTCDate();
 	label_x = (" " + date).slice (-2) + "/"
 		+ ("0" + (month+1)).slice (-2) + "/"
 		+ year;
