@@ -57,7 +57,7 @@ pkglibexec_PROGRAMS =
 
 if BUILD_GNUPLOT_X11
 pkglibexec_PROGRAMS += gnuplot_x11
-gnuplot_x11_SOURCES = gplt_x11.c gplt_x11.h gpexecute.c gpexecute.h mousecmn.h
+gnuplot_x11_SOURCES = gplt_x11.c gplt_x11.h gpexecute.c gpexecute.h mousecmn.h version.c version.h
 XLIBS = @LIBRARIES_FOR_X@
 gnuplot_x11_LDADD = getcolor_x11.o $(XLIBS)
 endif
