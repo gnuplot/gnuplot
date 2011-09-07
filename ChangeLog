@@ -7,6 +7,9 @@
 	Break out the guts of undefine_command into a utility routine that can
 	be called internally.
 
+	* src/hidden3d.c (build_networks): Valgrind found a test against an
+	uninitialized field.
+
 2011-09-06  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* configure.in: cairo_ps_surface_set_eps is only supported by cairo

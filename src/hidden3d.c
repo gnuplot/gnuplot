@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.79 2011/07/01 04:34:33 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.80 2011/07/25 06:51:29 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - hidden3d.c */
@@ -1199,6 +1199,7 @@ build_networks(struct surface_points *plots, int pcount)
 		    struct coordinate labelpoint;
 
 		    lp->pointflag = 1; /* Labels can use the code for hidden points */
+		    labelpoint.type = INRANGE;
 		    for (label = this_plot->labels->next; label != NULL; label = label->next) {
 			labelpoint.x = label->place.x;
 			labelpoint.y = label->place.y;
