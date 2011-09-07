@@ -1,6 +1,6 @@
 2011-09-07  Ethan A Merritt  <merritt@u.washington.edu>
 
-	* src/parse.c (parse_sum_expression): Simply construction of summation
+	* src/parse.c (parse_sum_expression): Simplify construction of summation
 	action table.
 
 2011-09-06  Ethan A Merritt  <merritt@u.washington.edu>
