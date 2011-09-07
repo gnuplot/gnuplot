@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.222 2011/08/24 17:25:10 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.223 2011/09/04 11:08:33 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -96,6 +96,7 @@ static char *RCSid() { return RCSid("$Id: command.c,v 1.222 2011/08/24 17:25:10 
 
 #ifdef USE_MOUSE
 # include "mouse.h"
+int paused_for_mouse = 0;
 #endif
 
 #define PROMPT "gnuplot> "
@@ -176,10 +177,6 @@ int plot_token;			/* start of 'plot' command */
 /* flag to disable `replot` when some data are sent through stdin;
  * used by mouse/hotkey capable terminals */
 TBOOLEAN replot_disabled = FALSE;
-
-#ifdef USE_MOUSE
-int paused_for_mouse = 0;
-#endif
 
 /* output file for the print command */
 FILE *print_out = NULL;
@@ -1437,13 +1434,10 @@ pause_command()
 	    /* term->waitforinput() will return,
 	     * if CR was hit */
 	    term->waitforinput();
-	} else {
+	} else
 #endif /* USE_MOUSE */
 	(void) fgets(buf, sizeof(buf), stdin);
-	/* Hold until CR hit. */
-#ifdef USE_MOUSE
-	}
-#endif /* USE_MOUSE */
+
 #endif /* !(_Windows || OS2 || _Macintosh) */
     }
     if (sleep_time > 0)
