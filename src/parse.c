@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: parse.c,v 1.63 2011/07/22 14:37:57 juhaszp Exp $"); }
+static char *RCSid() { return RCSid("$Id: parse.c,v 1.64 2011/08/01 05:14:23 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - parse.c */
@@ -938,19 +938,13 @@ parse_sum_expression()
     /* 1. save environment to restart parsing */
     save_at = at;
     save_at_size = at_size;
-
-    at = (struct at_type *) gp_alloc(sizeof(struct at_type), "action table");
-    at->a_count = 0;
-    memset(at, 0, sizeof(*at));
-    at_size = MAX_AT_LEN;
-
-    parse_expression();
+    at = NULL;
 
     /* 2. save action table in a user defined function */
     udf = (struct udft_entry *) gp_alloc(sizeof(struct udft_entry), "sum");
     udf->next_udf = (struct udft_entry *) NULL;
     udf->udf_name = NULL; /* TODO maybe add a name and definition */ 
-    udf->at = at;
+    udf->at = perm_at();
     udf->definition = NULL;
     udf->dummy_num = 0;
     for (i = 0; i < MAX_NUM_VAR; i++)
