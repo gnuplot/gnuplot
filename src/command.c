@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.223 2011/09/04 11:08:33 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.224 2011/09/07 18:44:56 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -566,8 +566,7 @@ void
 undefine_command()
 {
     char key[MAX_ID_LEN+1];
-    struct udvt_entry **udv_ptr = &first_udv;
-    TBOOLEAN isWildcard;
+    TBOOLEAN wildcard;
 
     c_token++;               /* consume the command name */
 
@@ -577,34 +576,14 @@ undefine_command()
 
 	/* Peek ahead - must do this, because a '*' is returned as a 
 	   separate token, not as part of the 'key' */
-	isWildcard = equals(c_token+1,"*");
-	if (isWildcard)
+	wildcard = equals(c_token+1,"*");
+	if (wildcard)
 	    c_token++;
 
         /* ignore internal variables */
-	if (strncmp(key, "GPVAL_", 6) && strncmp(key, "MOUSE_", 6)) {
-	    udv_ptr = &first_udv;
+	if (strncmp(key, "GPVAL_", 6) && strncmp(key, "MOUSE_", 6))
+	    del_udv_by_name( key, wildcard );
 
-	    /* iterate over variables */
-	    while (*udv_ptr) {
- 	        /* exact match */
-		if (!isWildcard && !strcmp(key, (*udv_ptr)->udv_name)) {
-		    (*udv_ptr)->udv_undef = TRUE;
-		    gpfree_string(&((*udv_ptr)->udv_value));
-		    break;
-		}
-
-		/* wildcard match: prefix matches */
-		if ( isWildcard &&
-		     !strncmp(key, (*udv_ptr)->udv_name, strlen(key)) ) {
-		    (*udv_ptr)->udv_undef = TRUE;
-		    gpfree_string(&((*udv_ptr)->udv_value));
-		    /* no break - keep looking! */
-		}
-
-		udv_ptr = &((*udv_ptr)->next_udv); /* move on */
-	    }
-	}
 	c_token++;
     }
 }

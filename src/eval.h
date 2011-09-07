@@ -1,5 +1,5 @@
 /*
- * $Id: eval.h,v 1.37 2011/08/01 05:14:23 sfeam Exp $
+ * $Id: eval.h,v 1.38 2011/08/27 11:18:01 juhaszp Exp $
  */
 
 /* GNUPLOT - eval.h */
@@ -161,6 +161,7 @@ void evaluate_at __PROTO((struct at_type *at_ptr, struct value *val_ptr));
 void free_at __PROTO((struct at_type *at_ptr));
 struct udvt_entry * add_udv_by_name __PROTO((char *key));
 struct udvt_entry * get_udv_by_name __PROTO((char *key));
+void del_udv_by_name __PROTO(( char *key, TBOOLEAN isWildcard ));
 
 /* update GPVAL_ variables available to user */
 void update_gpval_variables __PROTO((int from_plot_command));

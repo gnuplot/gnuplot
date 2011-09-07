@@ -2,6 +2,10 @@
 
 	* src/parse.c (parse_sum_expression): Simplify construction of summation
 	action table.
+	
+	* src/command.c (undefine_command) src/eval.c (del_udv_by_name):
+	Break out the guts of undefine_command into a utility routine that can
+	be called internally.
 
 2011-09-06  Ethan A Merritt  <merritt@u.washington.edu>
 
