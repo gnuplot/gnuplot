@@ -1,3 +1,9 @@
+2011-09-08  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/graphics.c (plot_image_or_update_axes):  "with image" from a
+	function may not make sense, but at least it should not seqfault.
+	Bug #3406642
+
 2011-09-01  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* configure.in: Yet another rewrite of the installation path rules for

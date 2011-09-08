@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.302.2.28 2011/04/27 18:44:47 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.302.2.29 2011/07/14 20:26:42 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -5803,7 +5803,8 @@ plot_image_or_update_axes(void *plot, TBOOLEAN update_axes)
     t_imagecolor pixel_planes;
     TBOOLEAN project_points = FALSE;		/* True if 3D plot */
 
-    if (((struct surface_points *)plot)->plot_type == DATA3D)
+    if ((((struct surface_points *)plot)->plot_type == DATA3D)
+    ||  (((struct surface_points *)plot)->plot_type == FUNC3D))
 	project_points = TRUE;
 
     if (project_points) {
