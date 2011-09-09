@@ -1,3 +1,9 @@
+2011-09-09  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* docs/doc2tex.c docs/titlepag.tex:  Tweak format of TeX documentation
+	(no section numbers in table of contents, text width appropriate for
+	paper size).
+
 2011-09-09  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	src/win/wgnuplib.h src/win/wgraph.c src/win/wresourc.h term/win.trm:

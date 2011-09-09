@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: doc2tex.c,v 1.21 2006/08/13 17:23:23 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: doc2tex.c,v 1.22 2007/10/24 00:47:51 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - doc2tex.c */
@@ -347,13 +347,13 @@ section(char *line, FILE *b)
 	(void) fprintf(b, "\\part{");
 	break;
     case 2:
-	(void) fprintf(b, "\\section{");
+	(void) fprintf(b, "\\section*{");
 	break;
     case 3:
-	(void) fprintf(b, "\\subsection{");
+	(void) fprintf(b, "\\subsection*{");
 	break;
     case 4:
-	(void) fprintf(b, "\\subsubsection{");
+	(void) fprintf(b, "\\subsubsection*{");
 	break;
     case 5:
 	(void) fprintf(b, "\\paragraph{");
@@ -369,6 +369,28 @@ section(char *line, FILE *b)
 	string[0] = toupper(string[0]);
     puttex(string, b);
     (void) fprintf(b, "}\n");
+
+    switch (sh_i) {
+    case 2:
+	(void) fprintf(b, "\\addcontentsline{toc}{section}{");
+	puttex(string, b);
+	(void) fprintf(b, "}\n");
+	break;
+    case 3:
+	(void) fprintf(b, "\\addcontentsline{toc}{subsection}{");
+	puttex(string, b);
+	(void) fprintf(b, "}\n");
+	break;
+    case 4:
+	(void) fprintf(b, "\\addcontentsline{toc}{subsubsection}{");
+	puttex(string, b);
+	(void) fprintf(b, "}\n");
+	break;
+    default:
+        break;
+
+    }
+
 }
 
 /* put text in string str to file while buffering special TeX characters */
