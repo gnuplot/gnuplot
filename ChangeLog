@@ -1,3 +1,11 @@
+2011-09-09  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	src/win/wgnuplib.h src/win/wgraph.c src/win/wresourc.h term/win.trm:
+	Add a toolbar to the graph window. Currently, it offers icons for Copy,
+	Print, Save and Options. Additionaly, plot elements can be temporarily
+	hidden, ie. without a `replot`. This is much like what can be done
+	using canvas and svg terminals and is implemented using term->layer.
+
 2011-09-08  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c (plot_image_or_update_axes):  "with image" from a

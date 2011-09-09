@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: win.trm,v 1.99 2011/05/13 18:53:05 markisch Exp $
+ * $Id: win.trm,v 1.100 2011/08/15 18:16:49 markisch Exp $
  */
 
 /* GNUPLOT - win.trm */
@@ -99,7 +99,7 @@ TERM_PUBLIC void WIN_enhanced_open __PROTO((char * fontname, double fontsize,
 			int overprint));
 TERM_PUBLIC void WIN_enhanced_flush __PROTO((void));
 TERM_PUBLIC void WIN_image __PROTO((unsigned int, unsigned int, coordval *, gpiPoint *, t_imagecolor));
-
+TERM_PUBLIC void WIN_layer __PROTO((t_termlayer syncpoint));
 
 /* Initialization values - guess now, scale later */
 #define WIN_XMAX (24000)
@@ -805,6 +805,13 @@ WIN_enhanced_flush()
 	GraphEnhancedFlush();
 }
 
+
+TERM_PUBLIC void 
+WIN_layer (t_termlayer syncpoint)
+{
+	GraphOp(graphwin, W_layer, syncpoint, 0, NULL);
+}
+
 #endif /* TERM_BODY */
 
 #ifdef TERM_TABLE
@@ -830,7 +837,8 @@ TERM_TABLE_START(win_driver)
     WIN_make_palette, 0 /* previous_palette */,
     WIN_set_color, WIN_filled_polygon,
     WIN_image,
-    WIN_enhanced_open, WIN_enhanced_flush, do_enh_writec
+    WIN_enhanced_open, WIN_enhanced_flush, do_enh_writec,
+    WIN_layer
 TERM_TABLE_END(win_driver)
 
 #undef LAST_TERM

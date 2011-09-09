@@ -1,5 +1,5 @@
 /*
- * $Id: wgnuplib.h,v 1.45 2011/08/15 17:37:29 markisch Exp $
+ * $Id: wgnuplib.h,v 1.46 2011/08/15 18:16:49 markisch Exp $
  */
 
 /* GNUPLOT - win/wgnuplib.h */
@@ -228,6 +228,9 @@ void WDPROC AboutBox(HWND hwnd, LPSTR str);
  * by the 'Line styles...' dialog, and save to/from wgnuplot.ini). */
 #define WGNUMPENS 15
 
+/* maximum number of plots which can be enabled/disabled via toolbar */
+#define MAXPLOTSHIDE 10
+
 /* maximum number of different colors per palette, used to be hardcoded (256) */
 #define WIN_PAL_COLORS 4096
 
@@ -283,7 +286,9 @@ struct GWOPBLK {			/* kept in local memory */
 #define W_fillstyle 42
 #define W_font 43
 #define W_enhanced_text 44
-#define W_image 50
+#define W_image 45
+#define W_layer 46
+
 
 typedef struct tagGW {
 	GP_LPPRINT	lpr;		/* must be first */
@@ -301,6 +306,8 @@ typedef struct tagGW {
 	HWND	hWndGraph;	/* window handle */
 	HWND	hStatusbar;	/* window handle of status bar */
 	int		StatusHeight;	/* height of status line area */
+	HWND	hToolbar;
+	int		ToolbarHeight;
 	HMENU	hPopMenu;	/* popup menu */
 
 	struct GWOPBLK *gwopblk_head;
@@ -315,6 +322,11 @@ typedef struct tagGW {
 	BOOL	doublebuffer;	/* double buffering? */
 	BOOL	oversample;	/* oversampling? */
 	BOOL	antialiasing;
+
+	BOOL	hideplot[MAXPLOTSHIDE];
+	BOOL	hidegrid;
+	unsigned int numplots;
+	BOOL	hasgrid;
 
 	int		htic;		/* horizontal size of point symbol (xmax units) */
 	int 	vtic;		/* vertical size of point symbol (ymax units)*/

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.132 2011/08/15 20:00:44 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.133 2011/09/04 12:01:37 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - win/wgraph.c */
@@ -51,6 +51,8 @@ static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.132 2011/08/15 20:00:44 m
 #endif
 /* BM: for AlphaBlend/TransparentBlt */
 #define WINVER 0x0410
+/* BM: for Toolbars */
+#define _WIN32_IE 0x0501
 #include <windows.h>
 #include <windowsx.h>
 #include <commdlg.h>
@@ -110,6 +112,7 @@ static void	Wnd_refresh_ruler_lineto(LPGW lpgw, LPARAM lParam);
 static void	GetMousePosViewport(LPGW lpgw, int *mx, int *my);
 static void	Draw_XOR_Text(LPGW lpgw, const char *text, size_t length, int x, int y);
 static void	UpdateStatusLine(LPGW lpgw, const char text[]);
+static void	UpdateToolbar(LPGW lpgw);
 static void	DrawRuler(LPGW lpgw);
 static void	DrawRulerLineTo(LPGW lpgw);
 static void	DrawZoomBox(LPGW lpgw);
@@ -441,6 +444,89 @@ GraphInit(LPGW lpgw)
 	    lpgw->StatusHeight = rect.bottom - rect.top;
 	}
 
+	/* create a toolbar */
+	lpgw->hToolbar = CreateWindowEx(0, TOOLBARCLASSNAME, NULL,
+		WS_CHILD | TBSTYLE_LIST | TBSTYLE_TOOLTIPS, // TBSTYLE_WRAPABLE
+		0, 0, 0, 0,
+		lpgw->hWndGraph, (HMENU)ID_TOOLBAR, lpgw->hInstance, lpgw);
+
+	if (lpgw->hToolbar != NULL) {
+		RECT rect;
+		int i;
+		TBBUTTON button;
+		BOOL ret;
+		char buttontext[10]; 
+		unsigned num = 0;
+
+		SendMessage(lpgw->hToolbar, TB_SETBITMAPSIZE, (WPARAM)0, (LPARAM)((16<<16) + 16));
+		/* load standard toolbar icons: standard, history & view */
+		SendMessage(lpgw->hToolbar, TB_LOADIMAGES, (WPARAM)IDB_STD_SMALL_COLOR, (LPARAM)HINST_COMMCTRL);
+		SendMessage(lpgw->hToolbar, TB_LOADIMAGES, (WPARAM)IDB_HIST_SMALL_COLOR, (LPARAM)HINST_COMMCTRL);
+		SendMessage(lpgw->hToolbar, TB_LOADIMAGES, (WPARAM)IDB_VIEW_SMALL_COLOR, (LPARAM)HINST_COMMCTRL);
+
+		/* create buttons */
+		SendMessage(lpgw->hToolbar, TB_BUTTONSTRUCTSIZE, (WPARAM)sizeof(TBBUTTON), 0);
+
+		ZeroMemory(&button, sizeof(button));
+		button.fsState = TBSTATE_ENABLED;
+		button.fsStyle = BTNS_AUTOSIZE | BTNS_SHOWTEXT | BTNS_NOPREFIX;
+		button.iString = 0;
+
+		/* copy */
+		button.iBitmap = STD_COPY;
+		button.idCommand = M_COPY_CLIP;
+		ret = SendMessage(lpgw->hToolbar, TB_INSERTBUTTON, (WPARAM)num++, (LPARAM)&button);
+
+		/* print */
+		button.iBitmap = STD_PRINT;
+		button.idCommand = M_PRINT;
+		ret = SendMessage(lpgw->hToolbar, TB_INSERTBUTTON, (WPARAM)num++, (LPARAM)&button);
+
+		/* save as EMF */
+		button.iBitmap = STD_FILESAVE;
+		button.idCommand = M_SAVE_AS_EMF;
+		ret = SendMessage(lpgw->hToolbar, TB_INSERTBUTTON, (WPARAM)num++, (LPARAM)&button);
+
+		/* options */
+		button.iBitmap = STD_PROPERTIES;
+		button.idCommand = 0; /* unused */
+		button.iString = (INT_PTR) "Options";
+		button.fsStyle = BTNS_AUTOSIZE | BTNS_SHOWTEXT | BTNS_NOPREFIX | BTNS_WHOLEDROPDOWN;
+		ret = SendMessage(lpgw->hToolbar, TB_INSERTBUTTON, (WPARAM)num++, (LPARAM)&button);
+
+		/* TODO: Add the following buttons:
+			replot/refresh, toggle grid(?), previous/next zoom, autoscale, help
+		*/
+
+		button.fsStyle = BTNS_AUTOSIZE | BTNS_NOPREFIX | BTNS_SEP;
+		ret = SendMessage(lpgw->hToolbar, TB_INSERTBUTTON, (WPARAM)num++, (LPARAM)&button);
+
+		/* hide grid */
+		button.iBitmap = STD_CUT;
+		button.idCommand = M_HIDEGRID;
+		button.fsStyle = BTNS_AUTOSIZE | BTNS_SHOWTEXT | BTNS_NOPREFIX | BTNS_CHECK;
+		button.iString = (INT_PTR) "Grid";
+		ret = SendMessage(lpgw->hToolbar, TB_INSERTBUTTON, (WPARAM)num++, (LPARAM)&button);
+
+		/* hide graphs */
+		for (i = 0; i < MAXPLOTSHIDE; i++) {
+			button.iBitmap = STD_CUT;
+			button.idCommand = M_HIDEPLOT + i;
+			sprintf(buttontext, "%i", i + 1);
+			button.iString = (UINT_PTR) buttontext;
+			button.dwData = i;
+			ret = SendMessage(lpgw->hToolbar, TB_INSERTBUTTON, (WPARAM)num++, (LPARAM)&button);
+		}
+
+		/* auto-resize and show */
+		SendMessage(lpgw->hToolbar, TB_AUTOSIZE, (WPARAM)0, (LPARAM)0);
+		ShowWindow(lpgw->hToolbar, TRUE);
+
+		/* make room */
+		GetClientRect(lpgw->hToolbar, &rect);
+		lpgw->ToolbarHeight = rect.bottom - rect.top + 1;
+	}
+
 	lpgw->hPopMenu = CreatePopupMenu();
 	/* actions */
 	AppendMenu(lpgw->hPopMenu, MF_STRING, M_COPY_CLIP, "&Copy to Clipboard (Ctrl+C)");
@@ -714,6 +800,7 @@ GetPlotRect(LPGW lpgw, LPRECT rect)
 {
 	GetClientRect(lpgw->hWndGraph, rect);
 	rect->bottom -= lpgw->StatusHeight; /* leave some room for the status line */
+	rect->top += lpgw->ToolbarHeight + 1;
 	if (rect->bottom < rect->top) rect->bottom = rect->top;
 }
 
@@ -1292,6 +1379,12 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 	struct GWOP *curptr;
 	struct GWOPBLK *blkptr;
 
+	/* layers */
+	unsigned plotno = 0;
+	BOOL gridline = FALSE;
+	BOOL skipplot = FALSE;
+	BOOL keysample = FALSE;
+
 	/* colors */
 	BOOL isColor;				/* use colors? */
 	COLORREF last_color = 0;	/* currently selected color */
@@ -1361,6 +1454,10 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
     hshift = 0;
     vshift = MulDiv(lpgw->vchar, rb - rt, lpgw->ymax)/2;
 
+	/* init layer variables */
+	lpgw->numplots = 0;
+	lpgw->hasgrid = FALSE;
+
 	SelectObject(hdc, lpgw->hapen); /* background brush */
 	SelectObject(hdc, lpgw->colorbrush[2]); /* first user pen */
 
@@ -1405,8 +1502,55 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 			polyi = 0;
 		}
 
+		/* handle layer commands first */
+		if (curptr->op == W_layer) {
+			t_termlayer layer = curptr->x;
+			switch (layer) {
+				case TERM_LAYER_BEFORE_PLOT:
+					plotno++; 
+					lpgw->numplots = plotno;
+					if (plotno <= MAXPLOTSHIDE)
+						skipplot = lpgw->hideplot[plotno - 1];
+					break;
+				case TERM_LAYER_AFTER_PLOT:
+					skipplot = FALSE;
+					break;
+#if 0
+				case TERM_LAYER_BACKTEXT:
+				case TERM_LAYER_FRONTTEXT:
+					break;
+#endif
+				case TERM_LAYER_BEGIN_GRID:
+					gridline = TRUE;
+					lpgw->hasgrid = TRUE;
+					break;
+				case TERM_LAYER_END_GRID:
+					gridline = FALSE;
+					break;
+				case TERM_LAYER_BEGIN_KEYSAMPLE:
+					keysample = TRUE;
+					break;
+				case TERM_LAYER_END_KEYSAMPLE:
+					keysample = FALSE;
+					break;
+				case TERM_LAYER_RESET:
+				case TERM_LAYER_RESET_PLOTNO:
+					//plotno = 0;
+					break;
+				default:
+					break;
+			};
+		} 
+		
+		/* hide this layer? */
+		if (!(skipplot || (gridline && lpgw->hidegrid)) ||
+			(keysample || (curptr->op == W_line_type) || (curptr->op == W_setcolor)) ) {
+
 		switch (curptr->op) {
 		case 0:	/* have run past last in this block */
+			break;
+
+		case W_layer: /* already handled above */
 			break;
 
 		case W_move:
@@ -2067,6 +2211,8 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 			}
 			} /* default case */
 		} /* switch(opcode) */
+		} /* hide layer? */
+
 		lastop = curptr->op;
 		ngwop++;
 		curptr++;
@@ -3173,6 +3319,12 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 				case M_PRINT:
 					CopyPrint(lpgw);
 					return 0;
+				case M_HIDEGRID:
+					lpgw->hidegrid = SendMessage(lpgw->hToolbar, TB_ISBUTTONCHECKED, LOWORD(wParam), (LPARAM)0);
+					GetClientRect(hwnd, &rect);
+					InvalidateRect(hwnd, (LPRECT) &rect, 1);
+					UpdateWindow(hwnd);
+					return 0;
 				case M_WRITEINI:
 					WriteGraphIni(lpgw);
 #ifndef WGP_CONSOLE
@@ -3215,14 +3367,27 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 					UpdateWindow(hwnd);
 					return 0;
 			}
+			/* handle toolbar events  */
+			if ((LOWORD(wParam) >= M_HIDEPLOT) && (LOWORD(wParam) < (M_HIDEPLOT + MAXPLOTSHIDE))) {
+				unsigned button = LOWORD(wParam) - (M_HIDEPLOT);
+				lpgw->hideplot[button] = SendMessage(lpgw->hToolbar, TB_ISBUTTONCHECKED, LOWORD(wParam), (LPARAM)0);
+				GetClientRect(hwnd, &rect);
+				InvalidateRect(hwnd, (LPRECT) &rect, 1);
+				UpdateWindow(hwnd);
+				return 0;
+			}
 			return 0;
 		case WM_PARENTNOTIFY:
 			/* Message from status bar (or another child window): */
 #ifdef USE_MOUSE
 			/* Cycle through mouse-mode on button 1 click */
 			if (LOWORD(wParam) == WM_LBUTTONDOWN) {
-				/* simulate keyboard event '1' */
-				Wnd_exec_event(lpgw, lParam, GE_keypress, (TCHAR)'1');
+				int y = HIWORD(lParam);
+				RECT rect;
+				GetClientRect(hwnd, &rect);
+				if (y > rect.bottom - lpgw->StatusHeight)
+					/* simulate keyboard event '1' */
+					Wnd_exec_event(lpgw, lParam, GE_keypress, (TCHAR)'1');
 				return 0;
 			}
 #endif
@@ -3245,6 +3410,47 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 				pt.x, pt.y, 0, hwnd, NULL);
 			return 0;
 		}
+		case WM_NOTIFY:
+			switch (((LPNMHDR)lParam)->code) {
+				case TBN_DROPDOWN: {
+					RECT rc;
+					TPMPARAMS tpm;
+					LPNMTOOLBAR lpnmTB = (LPNMTOOLBAR)lParam;
+					SendMessage(lpnmTB->hdr.hwndFrom, TB_GETRECT, (WPARAM)lpnmTB->iItem, (LPARAM)&rc);
+					MapWindowPoints(lpnmTB->hdr.hwndFrom, HWND_DESKTOP, (LPPOINT)&rc, 2);
+					tpm.cbSize    = sizeof(TPMPARAMS);
+					tpm.rcExclude = rc;
+					TrackPopupMenuEx(lpgw->hPopMenu, TPM_LEFTALIGN | TPM_LEFTBUTTON | TPM_VERTICAL, 
+						rc.left, rc.bottom, lpgw->hWndGraph, &tpm);
+					return TBDDRET_DEFAULT;
+				}
+				case TTN_GETDISPINFO: {
+					LPTOOLTIPTEXT lpttt = (LPTOOLTIPTEXT)lParam;
+					UINT_PTR idButton = lpttt->hdr.idFrom;
+					lpttt->hinst = 0;
+					switch (idButton) {
+						case M_COPY_CLIP:
+							strcpy(lpttt->szText, "Copy graph to clipboard");
+							break;
+						case M_PRINT:
+							strcpy(lpttt->szText, "Print graph");
+							break;
+						case M_SAVE_AS_EMF:
+							strcpy(lpttt->szText, "Save graph as EMF");
+							break;
+						case M_HIDEGRID:
+							strcpy(lpttt->szText, "Do not draw grid lines");
+							break;
+					}
+					if ((idButton >= M_HIDEPLOT) && (idButton < (M_HIDEPLOT + MAXPLOTSHIDE))) {
+						unsigned index = (unsigned)idButton - (M_HIDEPLOT) + 1;
+						sprintf(lpttt->szText, "Hide graph #%i", index);
+					}
+					lpttt->uFlags |= TTF_DI_SETITEM;
+					return TRUE;
+				}
+			}
+			return FALSE;
 		case WM_CREATE:
 			lpgw = ((CREATESTRUCT *)lParam)->lpCreateParams;
 			SetWindowLong(hwnd, 0, (LONG)lpgw);
@@ -3303,10 +3509,10 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			    /* draw into memdc, then copy to hdc */
 			    drawgraph(lpgw, memdc, &memrect);
 			    if (sampling == 1)
-			        BitBlt(hdc, 0, 0, width, height, memdc, 0, 0, SRCCOPY);
+			        BitBlt(hdc, rect.left, rect.top, width, height, memdc, 0, 0, SRCCOPY);
 			    else {
 			        int stretch = SetStretchBltMode(hdc, HALFTONE);
-			        StretchBlt(hdc, 0, 0, width, height,
+			        StretchBlt(hdc, rect.left, rect.top, width, height,
 			                   memdc,0, 0, memrect.right, memrect.bottom,
 			                   SRCCOPY);
 			        SetStretchBltMode(hdc, stretch);
@@ -3329,11 +3535,20 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			DrawRulerLineTo(lpgw);
 			DrawZoomBox(lpgw);
 #endif
+			/* Update in case the number of graphs has changed */
+			UpdateToolbar(lpgw);
+
 			return 0;
 	}
 		case WM_SIZE:
-			/* update font sizes if graph resized */
 			SendMessage(lpgw->hStatusbar, WM_SIZE, wParam, lParam);
+			if (lpgw->hToolbar) {
+				RECT rect;
+				SendMessage(lpgw->hToolbar, WM_SIZE, wParam, lParam);
+				/* make room */
+				GetClientRect(lpgw->hToolbar, &rect);
+				lpgw->ToolbarHeight = rect.bottom - rect.top + 1;
+			}
 			if ((wParam == SIZE_MAXIMIZED) || (wParam == SIZE_RESTORED)) {
 				RECT rect;
 				SendMessage(hwnd,WM_SYSCOMMAND,M_REBUILDTOOLS,0L);
@@ -3628,8 +3843,6 @@ Draw_XOR_Text(LPGW lpgw, const char *text, size_t length, int x, int y)
 
 /* ================================== */
 
-/* Status line routines. */
-
 /*
  * Update the status line by the text; erase the previous text
  */
@@ -3638,6 +3851,32 @@ UpdateStatusLine(LPGW lpgw, const char text[])
 {
     SendMessage(lpgw->hStatusbar, WM_SETTEXT, (WPARAM)0, (LPARAM)text);
 }
+
+
+/*
+ * Update the toolbar to reflect the current the number of active plots
+ */
+static void
+UpdateToolbar(LPGW lpgw)
+{
+	unsigned i;
+
+	SendMessage(lpgw->hToolbar, TB_HIDEBUTTON, M_HIDEGRID, (LPARAM)!lpgw->hasgrid);
+	if (!lpgw->hasgrid) {
+		lpgw->hidegrid = FALSE;
+		SendMessage(lpgw->hToolbar, TB_CHECKBUTTON, M_HIDEGRID, (LPARAM)FALSE);
+	}
+	for (i = 0; i < MAXPLOTSHIDE; i++) {
+		if (i < lpgw->numplots) {
+			SendMessage(lpgw->hToolbar, TB_HIDEBUTTON, M_HIDEPLOT + i, (LPARAM)FALSE);
+		} else {
+			lpgw->hideplot[i] = FALSE;
+			SendMessage(lpgw->hToolbar, TB_HIDEBUTTON, M_HIDEPLOT + i, (LPARAM)TRUE);
+			SendMessage(lpgw->hToolbar, TB_CHECKBUTTON, M_HIDEPLOT + i, (LPARAM)FALSE);
+		}
+	}
+}
+
 
 /* Draw the ruler.
  */
