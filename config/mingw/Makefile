@@ -1,13 +1,14 @@
 # Hello, emacs: this is a -*- Makefile -*-
-# $Id: Makefile,v 1.11 2011/05/04 17:22:53 markisch Exp $
+# $Id: Makefile,v 1.12 2011/08/23 19:00:54 markisch Exp $
 #
-# GNUPLOT Makefile for MinGW32 on Win95/98/NT/2k/..
+# GNUPLOT Makefile for MinGW/MSYS on Windows
 # This assumes usual installation of the MinGW32 toolkit, the free
 # GNU gcc. See www.mingw.org for more details.
 
 # To compile gnuplot for Windows:
-#
-# - compile the package: go to directory 'gnuplot/config/mingw' and issue the command
+# - Change the configuration section in 'config/mingw/Makfile' to
+#   match your setup.
+# - On the MSYS prompt, change directory to 'config/mingw' and issue the commands
 #	 make
 #	 make install
 #
@@ -18,25 +19,6 @@
 #
 # ************** Begin of Configuration section ************************
 #
-
-# Choose target to compile:
-# 1. wgnuplot.exe: The usual Windows GUI for input commands.
-# 2. wgnuplot_pipes.exe: The usual Windows GUI with support of pipes, so
-#    that e.g.  plot '<awk -f preprocess.awk my.dat')  or  x=system('ls -1')
-#    can work. Drawback: wgnuplot_pipes.exe keeps attached to a console (DOS)
-#    window it was launched from, or it opens a new one.
-# 3. gnuplot.exe: Console mode instead of GUI for the text input.
-#
-# Comment for programs using gnuplot as their plotting engine:
-# Both wgnuplot*.exe compile also pgnuplot.exe. This small helper program was
-# used when gnuplot.exe was not available on Windows. Nowadays, pgnuplot.exe
-# is deprecated -- please use gnuplot.exe instead.
-
-ifndef TARGET
-TARGET=wgnuplot.exe
-#TARGET=wgnuplot_pipes.exe
-#TARGET=gnuplot.exe
-endif
 
 # Comment out the definition lines to disable the according features:
 
@@ -168,6 +150,10 @@ endif
 # GNU sort
 GNUSORT = /bin/sort
 
+# Directory that might contain extra files to be shipped with the installer.
+# This should include dependencies like DLLs, but also fontconfig configuration files.
+EXTRADIST = /d/Software/gnuplot-misc/gp-dist
+
 #
 # *************** End of Configuration section *************************
 #
@@ -177,6 +163,19 @@ GNUSORT = /bin/sort
 # **********************************************************************
 #
 
+# Choose target to compile:
+# 1. wgnuplot.exe: The usual Windows GUI for input commands.
+# 2. wgnuplot_pipes.exe: The usual Windows GUI with support of pipes, so
+#    that e.g.  plot '<awk -f preprocess.awk my.dat')  or  x=system('ls -1')
+#    can work. Drawback: wgnuplot_pipes.exe keeps attached to a console (DOS)
+#    window it was launched from, or it opens a new one.
+# 3. gnuplot.exe: Console mode instead of GUI for the text input.
+#
+# Comment for programs using gnuplot as their plotting engine:
+# Both wgnuplot*.exe compile also pgnuplot.exe. This small helper program was
+# used when gnuplot.exe was not available on Windows. Nowadays, pgnuplot.exe
+# is deprecated -- please use gnuplot.exe instead.
+
 # PIPES: define if you would prefer support of pipes undef Windows (e.g.
 # plot '<awk -f preprocess.awk my.dat'). Drawback: wgnuplot_pipes.exe keeps
 # attached to a console=DOS window it was launched from, or it opens a new one.
@@ -185,19 +184,28 @@ GNUSORT = /bin/sort
 # CONSOLE: define if you would prefer the console (non-GUI) version of the
 # text command window.
 
+ifndef TARGET
+TARGET=wgnuplot.exe
+#TARGET=wgnuplot_pipes.exe
+#TARGET=gnuplot.exe
+endif
+
 # Set PGNUPLOT, PIPES and CONSOLE according to the target
 ifeq ($(TARGET),wgnuplot.exe)
 	PGNUPLOT=pgnuplot.exe
 	MENUFILE=wgnuplot.mnu
+	O=o
 endif
 ifeq ($(TARGET),wgnuplot_pipes.exe)
 	PGNUPLOT=pgnuplot.exe
 	MENUFILE=wgnuplot.mnu
 	PIPES=1
+	O=po
 endif
 ifeq ($(TARGET),gnuplot.exe)
 	PIPES=1
 	CONSOLE=1
+	O=co
 endif
 
 
@@ -224,14 +232,15 @@ ifdef PIPES
 endif
 
 ifdef CONSOLE
-  OPTS += -DWGP_CONSOLE
+  OPTS += -DWGP_CONSOLE -DCONSOLE_SWITCH_CP
   LDFLAGS2 = -mconsole
 endif
 
 TOP = ../..
 
 # macros for makefile.all
-O=o
+#O has been defined above already
+#O=o
 S=$(TOP)/src
 W=$(S)/win
 T=$(TOP)/term/
@@ -373,9 +382,23 @@ else
   RES2COFF = res2coff -i wgnuplot.res -o wgplt_res.$(O)
 endif
 
-default: $(TARGET) $(HELPFILE) $(MENUFILE) $(M)bf_test.exe $(PGNUPLOT) $(LUATARGETS)
+default: $(TARGET) $(MENUFILE) support
 
-all:	default gnuplot.ps gnuplot.pdf
+console:
+	$(MAKE) TARGET=gnuplot.exe gnuplot.exe
+
+windows: $(MENUFILE)
+	$(MAKE) TARGET=wgnuplot.exe wgnuplot.exe
+
+pipes:
+	$(MAKE) TARGET=wgnuplot_pipes.exe wgnuplot_pipes.exe
+
+docs:
+	$(MAKE) TARGET=gnuplot.exe gnuplot.pdf
+
+support: $(HELPFILE) $(M)bf_test.exe $(PGNUPLOT) $(LUATARGETS)
+
+all:	console windows pipes support docs
 
 
 # include the 'core makefile template'
@@ -403,7 +426,7 @@ endif
 # default rules
 .SUFFIXES: .exe .$(O) .c
 .c.$(O):
-	$(CC) -c $(CFLAGS) $<
+	$(CC) -c $(CFLAGS) -o $@ $<
 
 LDLIBS = -lkernel32 -lgdi32 -lwinspool -lcomdlg32 -lcomctl32 -ladvapi32 -lshell32 -lmsimg32 -lgdiplus
 
@@ -426,10 +449,10 @@ wgplt_res.$(O) :  $(W)/wgnuplot.rc $(W)/wgnuplib.rc $(W)/wresourc.h texticon.ico
 	$(RES2COFF)
 
 show.$(O): show.c plot.h setshow.h
-	$(CC) -c $(CFLAGS) -DHELPFILE=\"$(HELPFILE)\" -DBINDIR=\"$(bindir)\" -DGNUPLOT_PS_DIR=\"$(GNUPLOT_PS_DIR)\" $<
+	$(CC) -c $(CFLAGS) -DHELPFILE=\"$(HELPFILE)\" -DBINDIR=\"$(bindir)\" -DGNUPLOT_PS_DIR=\"$(GNUPLOT_PS_DIR)\" -o $@ $<
 
 term.$(O): term.c term.h plot.h setshow.h bitmap.h $(CORETERM)
-	$(CC) -c $(CFLAGS) $(TERMFLAGS) $<
+	$(CC) -c $(CFLAGS) $(TERMFLAGS) -o $@ $<
 
 version.$(O): $(S)/version.c
 
@@ -439,43 +462,43 @@ $(S)/version.c: $(TOP)/VERSION $(TOP)/PATCHLEVEL $(TOP)/ChangeLog $(S)/Makefile.
 WINDEPS = $(W)/wgnuplib.h $(W)/wcommon.h $(W)/wresourc.h $(W)/screenbuf.h $(W)/wgdiplus.h
 
 winmain.$(O): $(W)/winmain.c $(W)/wgnuplib.h $(W)/wtext.h plot.h
-	$(CC) -c $(CFLAGS) -DHELPFILE=\"$(HELPFILE)\" $<
+	$(CC) -c $(CFLAGS) -o $@ -DHELPFILE=\"$(HELPFILE)\" $<
 
 wgnuplib.$(O): $(W)/wgnuplib.c $(WINDEPS)
-	$(CC) -c $(CFLAGS) $<
+	$(CC) -c $(CFLAGS) -o $@ $<
 
 wmenu.$(O): $(W)/wmenu.c $(WINDEPS)
-	$(CC) -c $(CFLAGS) $<
+	$(CC) -c $(CFLAGS) -o $@ $<
 
 wtext.$(O): $(W)/wtext.c $(WINDEPS)
-	$(CC) -c $(CFLAGS) $<
+	$(CC) -c $(CFLAGS) -o $@ $<
 
 screenbuf.$(O): $(W)/screenbuf.c $(WINDEPS)
-	$(CC) -c $(CFLAGS) $<
+	$(CC) -c $(CFLAGS) -o $@ $<
 
 wpause.$(O): $(W)/wpause.c $(S)/wxterminal/wxt_term.h $(WINDEPS)
-	$(CC) -c $(CFLAGS) $<
+	$(CC) -c $(CFLAGS) -o $@ $<
 
 wprinter.$(O): $(W)/wprinter.c $(WINDEPS)
-	$(CC) -c $(CFLAGS) $<
+	$(CC) -c $(CFLAGS) -o $@ $<
 
 wgraph.$(O): $(W)/wgraph.c $(WINDEPS)
-	$(CC) -c $(CFLAGS) $<
+	$(CC) -c $(CFLAGS) -o $@ $<
 
 wgdiplus.$(O): $(W)/wgdiplus.cpp $(WINDEPS)
-	$(CXX) -c $(CXXFLAGS) $(W)/wgdiplus.cpp
+	$(CXX) -c $(CXXFLAGS) -o $@ $<
 
 wgnuplot.mnu: $(W)/wgnuplot.mnu
 	$(CP) $^ $@
 
 wxt_gui.$(O): $(S)/wxterminal/wxt_gui.cpp $(S)/wxterminal/wxt_gui.h
-	$(CXX) -c $(CFLAGS) $(CXXFLAGS) $(CAIRO_CFLAGS) $<
+	$(CXX) -c $(CFLAGS) $(CXXFLAGS) $(CAIRO_CFLAGS) -o $@ $<
 
 gp_cairo.$(O): $(S)/wxterminal/gp_cairo.c $(S)/wxterminal/gp_cairo.h
-	$(CC) -c $(CFLAGS) $(CXXFLAGS) $(PANGOCAIRO_CFLAGS) $<
+	$(CC) -c $(CFLAGS) $(CXXFLAGS) $(PANGOCAIRO_CFLAGS) -o $@ $<
 
 gp_cairo_helpers.$(O): $(S)/wxterminal/gp_cairo_helpers.c $(S)/wxterminal/gp_cairo_helpers.h
-	$(CC) -c $(CFLAGS) $<
+	$(CC) -c $(CFLAGS) -o $@ $<
 
 # extract icons from wgnuplot.rc
 texticon.ico: grpicon.ico
@@ -571,48 +594,65 @@ endif
 gnuplot.tex: $(D)gnuplot.doc doc2tex.exe
 	doc2tex $(D)gnuplot.doc gnuplot.tex
 
+gnuplot-figures.tex: $(D)gnuplot.doc doc2tex.exe
+	GNUPLOT_LIB=$(M) $(TARGET) $(D)plotstyles.gnu
+	doc2tex -figures $(D)gnuplot.doc gnuplot-figures.tex
+
 # Call LaTeX three times to get the toc right.
-gnuplot.dvi: gnuplot.tex $(D)titlepag.tex
-	cp gnuplot.tex $(D)gp_tex2.tex
-	cp $(TOP)/VERSION $(D)
-	cd $(D) && latex gp_tex2.tex && latex gp_tex2.tex && latex gp_tex2.tex
-	mv $(D)gp_tex2.dvi gnuplot.dvi
-	rm -f $(D)gp_tex2.*
+gnuplot.dvi: gnuplot.tex $(TOP)/VERSION $(D)toc_entr.sty $(D)titlepag.tex
+	cp gnuplot.tex gp_tex2.tex
+	cp $(TOP)/VERSION .
+	cp -p $(D)toc_entr.sty .
+	cp -p $(D)titlepag.tex .
+	echo "" > pdffigures.tex
+	latex gp_tex2.tex && latex gp_tex2.tex && latex gp_tex2.tex
+	mv gp_tex2.dvi gnuplot.dvi
+	rm -f gp_tex2.*
 gnuplot.ps: gnuplot.dvi
 	dvips -o gnuplot.ps gnuplot.dvi
-gnuplot.pdf: gnuplot.tex $(D)titlepag.tex
-	cp gnuplot.tex $(D)gp_tex2.tex
-	cp $(TOP)/VERSION $(D)
-	cd $(D) && pdflatex gp_tex2.tex && pdflatex gp_tex2.tex && pdflatex gp_tex2.tex
-	mv $(D)gp_tex2.pdf gnuplot.pdf
-	rm -f $(D)gp_tex2.*
+
+gnuplot.pdf: gnuplot-figures.tex $(TOP)/VERSION $(D)toc_entr.sty $(D)titlepag.tex
+	cp gnuplot-figures.tex gp_tex2.tex
+	cp $(TOP)/VERSION .
+	cp -p $(D)toc_entr.sty .
+	cp -p $(D)titlepag.tex .
+	echo "\usepackage{graphicx}" > pdffigures.tex
+	echo "\usepackage{picins}" >> pdffigures.tex
+	pdflatex gp_tex2.tex && pdflatex gp_tex2.tex && pdflatex gp_tex2.tex
+	mv gp_tex2.pdf gnuplot.pdf
+	rm -f gp_tex2.*
 
 
 # clean up temporary files
 clean:
-	$(RM) config.h *.$(O) wgnuplot.map wgnuplot.res $(W)/gnuplot.rtf
+	$(RM) config.h wgnuplot.map wgnuplot.res $(W)/gnuplot.rtf
+	$(RM) *.$(O) *.po *.o *.co
 	$(RM) doc2*.exe $(W)/wgnuplib.res wgnuplib.map wgnuplot.lib
 	$(RM) $(M)bf_test.exe *.ico geticon.exe allterm.h allterm.c
-	$(RM) gnuplot.tex gnuplot.dvi gnuplot.ps gnuplot.pdf
+	$(RM) gnuplot.tex gnuplot.dvi 
+	$(RM) gnuplot-figures.tex pdffigures.tex pdffigures.aux figure_*.pdf
+	$(RM) titlepag.tex toc_entr.sty VERSION
 	$(RM) $(D)windows/wgnuplot.log $(D)windows/wgnuplot.hhc
 	$(RM) $(D)windows/*.png $(D)windows/wgnuplot.html
+	$(RM) -rf ./dist/
 
 realclean: veryclean
 veryclean: clean
 	$(RM) wgnuplot.exe wgnuplot_pipes.exe gnuplot.exe pgnuplot.exe
 	$(RM) $(HELPFILE) wgnuplot.chw wgnuplot.gid wgnuplot.mnu
+	$(RM) gnuplot.ps gnuplot.pdf
 	$(RM) $(M)binary[123] $(M)fit.log $(M)soundfit.par
-	-$(RM) gnuplot-lua-tikz.sty gnuplot-lua-tikz.tex
-	-$(RM) gnuplot-lua-tikz-common.tex t-gnuplot-lua-tikz.tex
+	$(RM) gnuplot-lua-tikz.sty gnuplot-lua-tikz.tex
+	$(RM) gnuplot-lua-tikz-common.tex t-gnuplot-lua-tikz.tex
 
 # now move the whole stuff to its destination
-install: default
+install:
 	mkdir -p $(DESTDIR)
 # binaries go to /bin
 	mkdir -p $(DESTDIR)/bin
 	cp -p gnuplot.exe $(DESTDIR)/bin/
 	cp -p wgnuplot.exe $(DESTDIR)/bin/
-	-cp -p wgnuplot_pipes.exe $(DESTDIR)/bin/
+	cp -p wgnuplot_pipes.exe $(DESTDIR)/bin/
 	cp -p pgnuplot.exe $(DESTDIR)/bin/
 	cp -p $(W)/wgnuplot.mnu $(DESTDIR)/bin/
 	cp -p $(HELPFILE) $(DESTDIR)/bin/
@@ -627,13 +667,28 @@ install: default
 	cp -p $(TOP)/share/LaTeX/gnuplot.cfg $(DESTDIR)/share/LaTeX/
 ifdef LUA
 	mkdir -p $(DESTDIR)/$(GNUPLOT_LUA_DIR)
-	(cd $(TOP)/term/lua/; cp -p README NEWS TODO gnuplot-tikz.lua $(DESTDIR)/$(GNUPLOT_LUA_DIR)/)
-	cp -p *.tex *.sty $(DESTDIR)/share/LaTeX/
+	cp -p $(TOP)/term/lua/README $(DESTDIR)/$(GNUPLOT_LUA_DIR)/
+	cp -p $(TOP)/term/lua/NEWS $(DESTDIR)/$(GNUPLOT_LUA_DIR)/
+	cp -p $(TOP)/term/lua/TODO $(DESTDIR)/$(GNUPLOT_LUA_DIR)/
+	cp -p $(TOP)/term/lua/gnuplot-tikz.lua $(DESTDIR)/$(GNUPLOT_LUA_DIR)/
+	cp -p gnuplot-lua-tikz.sty gnuplot-lua-tikz.tex $(DESTDIR)/share/LaTeX/
+	cp -p gnuplot-lua-tikz-common.tex t-gnuplot-lua-tikz.tex $(DESTDIR)/share/LaTeX/
 endif
 # README etc
-	(cd $(TOP); cp -p BUGS Copyright README NEWS ChangeLog $(DESTDIR)/)
+	cp -p $(TOP)/Copyright $(DESTDIR)/
+	cp -p $(TOP)/README $(DESTDIR)/
+	cp -p $(TOP)/NEWS $(DESTDIR)/
+	cp -p $(TOP)/ChangeLog $(DESTDIR)/
+	cp -p $(TOP)/BUGS $(DESTDIR)/
 # demo and contrib
 	mkdir -p $(DESTDIR)/demo
-	-cp -p $(TOP)/demo/* $(DESTDIR)/demo/
+	-cp -p $(M)* $(DESTDIR)/demo/
 	mkdir -p $(DESTDIR)/contrib/pm3d/
 	-cp -p $(TOP)/pm3d/contrib/* $(DESTDIR)/contrib/pm3d/
+# docs
+	mkdir -p $(DESTDIR)/docs
+	cp -p gnuplot.pdf $(DESTDIR)/docs/
+# runtime libraries, configuration files etc.
+ifdef EXTRADIST
+	cp -pR $(EXTRADIST)/* $(DESTDIR)/
+endif
