@@ -1,6 +1,6 @@
 /*
- *  $Id: lua.trm,v 1.15 2011/03/04 03:29:27 sfeam Exp $
- *  $Date: 2011/03/04 03:29:27 $
+ *  $Id: lua.trm,v 1.16 2011/04/03 16:46:08 sfeam Exp $
+ *  $Date: 2011/04/03 16:46:08 $
  *  $Rev: 99 $
  */
 
@@ -1212,7 +1212,7 @@ LUA_image (unsigned m, unsigned n, coordval *image, gpiPoint *corner, t_imagecol
 
 #ifdef LUA_EXTERNAL_IMAGES
     /* "externalize" if transparent images are used or on user request */
-    if ((color_mode == IC_RGBA) || image_extern) {
+    if (outstr && ((color_mode == IC_RGBA) || image_extern)) {
       char *idx;
       /* cairo based png images with alpha channel */
       if ((idx = strrchr(outstr, '.')) == NULL)
