@@ -37,7 +37,7 @@
 
 
 
-  $Date: 2011/04/14 00:46:11 $
+  $Date: 2011/07/21 05:05:08 $
   $Author: sfeam $
   $Rev: 100 $
 
@@ -81,7 +81,7 @@ pgf.DEFAULT_FONT_V_CHAR = 308
 pgf.STYLE_FILE_BASENAME = "gnuplot-lua-tikz"  -- \usepackage{gnuplot-lua-tikz}
 
 pgf.REVISION = string.sub("$Rev: 100 $",7,-3)
-pgf.REVISION_DATE = string.gsub("$Date: 2011/04/14 00:46:11 $",
+pgf.REVISION_DATE = string.gsub("$Date: 2011/07/21 05:05:08 $",
                                 "$Date: ([0-9]+).([0-9]+).([0-9]+) .*","%1/%2/%3")
 
 pgf.styles = {}
@@ -789,9 +789,9 @@ f:write([[
 
 % wrapper for color settings
 \def\gpcolor#1{\tikzset{global #1}}
-\tikzset{rgb color/.code={\pgfutil@definecolor{.}{rgb}{#1}\color{.}}}
-\tikzset{global rgb color/.code={\pgfutil@definecolor{.}{rgb}{#1}\color{.}}}
-\tikzset{global color/.code={\color{#1}}}
+\tikzset{rgb color/.code={\pgfutil@definecolor{.}{rgb}{#1}\tikzset{color=.}}}
+\tikzset{global rgb color/.code={\pgfutil@definecolor{.}{rgb}{#1}\pgfutil@color{.}}}
+\tikzset{global color/.code={\pgfutil@color{#1}}}
 
 % prevent plot mark distortions due to changes in the PGF transformation matrix
 % use `\gpscalepointstrue' and `\gpscalepointsfalse' for enabling and disabling
@@ -873,8 +873,8 @@ f:write([[
 %
 \tikzset{gnuplot/.style={%
   >=stealth',%
-  cap=round,%
-  join=round,%
+  line cap=round,%
+  line join=round,%
 }}
 
 \tikzset{gp node left/.style={anchor=mid west,yshift=-.12ex}}
