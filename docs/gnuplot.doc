@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.687 2011/08/25 20:55:13 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.688 2011/08/27 11:18:01 juhaszp Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -6640,7 +6640,7 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/population.gif" alt="[popu
  that the various options take.
 
  The following are _not_ affected by `reset`.
-      `set term` `set output` `set loadpath` `set fontpath`
+      `set term` `set output` `set loadpath` `set fontpath` `set linetype`
       `set encoding` `set decimalsign` `set locale` `set psdir`
 
 =error state
