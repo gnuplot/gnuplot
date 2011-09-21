@@ -1,5 +1,7 @@
 2011-09-21  Bastian Maerkisch  <bmaerkisch@web.de>
 
+	* demo/borders.dem: Use loop instead of `reread`.
+
 	* demo/image2.dem: Explicitely `reverse` axes.
 
 	* src/win/wgraph.c (drawhraph) [W_filled_polygon_draw]: Transparent

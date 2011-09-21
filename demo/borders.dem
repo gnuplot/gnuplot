@@ -1,25 +1,19 @@
 #
-# $Id: borders.dem,v 1.8 2006/12/10 04:05:58 sfeam Exp $
+# $Id: borders.dem,v 1.9 2007/01/10 02:34:50 sfeam Exp $
 #
 unset grid
 set xrange [0:10]
 set yrange [0:10]
 set format ""
 #
-if (!exists("bb")) bb = -1
-#
-bb=(bb+1)%16
-if (bb==0) set multiplot
-if (bb==0) set label 2 "Demonstration of different border settings\nand also of a reread loop" at 25.5,14 center
-set size 1.0/4,0.9/4
-set origin (bb%4)*1.0/4,0.9-(floor(bb/4)+1)*0.9/4
-set border bb
-show border
-set label 1 "Border = %.0f",bb  at 5,5 center
-plot x+50 notitle
-if (bb==0) unset label 2
-#
-if (bb!=15) reread; else unset multiplot
+set multiplot layout 4, 4 title "Demonstration of different border settings"
+do for [bb = 0:15] {
+    set border bb
+    show border
+    set label 1 "Border = %.0f",bb  at 5,5 center
+    plot 1/0 notitle
+}
+unset multiplot
 
 pause -1 "Hit return to continue"
 
