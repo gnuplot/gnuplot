@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: stdfn.c,v 1.23 2011/05/02 18:37:00 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: stdfn.c,v 1.24 2011/09/04 11:08:33 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - stdfn.c */
@@ -359,6 +359,29 @@ not_a_number(void)
 #else
 	return atof("NaN");
 #endif
+}
+
+
+/* Version of basename, which does take two possible
+   separators into account and does not modify its
+   argument.
+*/
+char * gp_basename(char *path)
+{
+    char * basename = strrchr(path, DIRSEP1);
+    if (basename) {
+        basename++;
+        return basename;
+    }
+#if DIRSEP2 != NUL
+    basename = strrchr(path, DIRSEP2);
+    if (basename) {
+        basename++;
+        return basename;
+    }
+#endif
+    /* no path separator found */
+    return path;
 }
 
 

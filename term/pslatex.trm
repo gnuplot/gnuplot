@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: pslatex.trm,v 1.76 2010/09/15 23:46:20 sfeam Exp $
+ * $Id: pslatex.trm,v 1.77 2010/10/06 05:44:57 sfeam Exp $
  */
 
 /* GNUPLOT - pslatex.trm */
@@ -281,26 +281,12 @@ PSTEX_common_init()
          * of the bounding box, but without the X_OFF and Y_OFF */
         int urx = (int) (xsize * term->xmax / (2*PS_SC) + 0.5);
         int ury = (int) (ysize * term->ymax / (2*PS_SC) + 0.5);
-        /* moved this code here from beginning of the function
-         * pslatex_auxname is only != NULL with the `auxfile' option */
-        char *psfile_basename = strrchr(pslatex_auxname, DIRSEP1);
 
-        /* If pslatex_auxname is not a simple file name, but a path,
+        /* pslatex_auxname is only != NULL with the `auxfile' option.
+         * If pslatex_auxname is not a simple file name, but a path,
          * we need to strip the path off the auxiliary file name,
          * because tex file and ps aux file end up in the same directory! */
-        if (psfile_basename)
-            psfile_basename++;
-        else {
-#if DIRSEP2 != NUL
-	    psfile_basename = strrchr(pslatex_auxname, DIRSEP2);
-	    if (psfile_basename)
-		psfile_basename++;
-	    else
-		psfile_basename = pslatex_auxname;
-#else
-	    psfile_basename = pslatex_auxname;
-#endif
-	}
+        char *psfile_basename = gp_basename(pslatex_auxname);
 
         /* generate special which xdvi and dvips can handle */
         fprintf(gpoutfile,

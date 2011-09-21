@@ -1,3 +1,10 @@
+2011-09-21  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/stdfn.c|h (gp_basename) term/pslatex.trm (PSTEX_common_init):
+	Move code from pslatex.trm to new function gp_basename which takes
+	two different directory separators into account and does not change
+	its argument.
+
 2011-09-16  Peter Hedwig <peter@affenbande.org>
 
 	* term/lua/gnuplot-tikz.lua:  Modify the commands used for rgb color 
