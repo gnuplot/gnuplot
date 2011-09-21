@@ -1,5 +1,9 @@
 2011-09-21  Bastian Maerkisch  <bmaerkisch@web.de>
 
+	* src/win/wgnuplib.h src/win/wgraph.c (WndGraphProc) term/win.trm
+	(WIN_options, WIN_update_options): Update term options on changes via
+	graph window/menu. Track font face and size as read from ini-file.
+
 	* src/stdfn.c|h (gp_basename) term/pslatex.trm (PSTEX_common_init):
 	Move code from pslatex.trm to new function gp_basename which takes
 	two different directory separators into account and does not change

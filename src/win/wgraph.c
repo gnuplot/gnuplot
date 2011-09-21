@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.133 2011/09/04 12:01:37 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.134 2011/09/09 18:29:37 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - win/wgraph.c */
@@ -971,7 +971,7 @@ SelFont(LPGW lpgw)
 		if (cf.nFontType & ITALIC_FONTTYPE)
 			lstrcat(lpgw->fontname," Italic");
 		/* set current font as default font */
-		strcpy(lpgw->deffontname,lpgw->fontname);
+		strcpy(lpgw->deffontname, lpgw->fontname);
 		lpgw->deffontsize = lpgw->fontsize;
 		SendMessage(lpgw->hWndGraph,WM_COMMAND,M_REBUILDTOOLS,0L);
 	}
@@ -2494,6 +2494,8 @@ WriteGraphIni(LPGW lpgw)
 	WritePrivateProfileString(section, "GraphSize", profile, file);
 	wsprintf(profile, "%s,%d", lpgw->deffontname, lpgw->deffontsize);
 	WritePrivateProfileString(section, "GraphFont", profile, file);
+	strcpy(WIN_inifontname, lpgw->deffontname);
+	WIN_inifontsize = lpgw->deffontsize;
 	wsprintf(profile, "%d", lpgw->color);
 	WritePrivateProfileString(section, "GraphColor", profile, file);
 	wsprintf(profile, "%d", lpgw->graphtotop);
@@ -2575,6 +2577,8 @@ ReadGraphIni(LPGW lpgw)
 		/* set current font as default font */
 		_fstrcpy(lpgw->deffontname, lpgw->fontname);
 		lpgw->deffontsize = lpgw->fontsize;
+		strcpy(WIN_inifontname, lpgw->deffontname);
+		WIN_inifontsize = lpgw->deffontsize;
 	}
 
 	if (bOKINI)
@@ -3286,6 +3290,7 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 					lpgw->color = !lpgw->color;
 					lpgw->dashed = !lpgw->color;
 					SendMessage(hwnd,WM_COMMAND,M_REBUILDTOOLS,0L);
+					WIN_update_options();
 					return(0);
 				case M_OVERSAMPLE:
 					lpgw->oversample = !lpgw->oversample;
@@ -3301,6 +3306,7 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 					return(0);
 				case M_CHOOSE_FONT:
 					SelFont(lpgw);
+					WIN_update_options();
 					return 0;
 				case M_COPY_CLIP:
 					CopyClip(lpgw);
@@ -3315,6 +3321,7 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 				case M_BACKGROUND:
 					lpgw->background = GetColor(hwnd, lpgw->background);
 					SendMessage(hwnd,WM_COMMAND,M_REBUILDTOOLS,0L);
+					WIN_update_options();
 					return 0;
 				case M_PRINT:
 					CopyPrint(lpgw);
@@ -3331,6 +3338,7 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 					if (lpgw->lptw)
 						WriteTextIni(lpgw->lptw);
 #endif
+					WIN_update_options();
 					return 0;
 				case M_REBUILDTOOLS:
 					if (lpgw->color)

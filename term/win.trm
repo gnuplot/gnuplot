@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: win.trm,v 1.100 2011/08/15 18:16:49 markisch Exp $
+ * $Id: win.trm,v 1.101 2011/09/09 18:29:37 markisch Exp $
  */
 
 /* GNUPLOT - win.trm */
@@ -151,7 +151,8 @@ static struct gen_table WIN_opts[] =
 
 static int WIN_last_linetype = LT_NODRAW; /* HBB 20000813: linetype caching */
 termentry * WIN_term = NULL;
-
+char WIN_inifontname[MAXFONTNAME] = WINFONT;
+int WIN_inifontsize = WINFONTSIZE;
 
 TERM_PUBLIC void
 WIN_options()
@@ -375,37 +376,7 @@ WIN_options()
 	/* font initialization */
 	WIN_set_font(NULL);
 
-
-	/* update term_options */
-	sprintf(term_options, "%i %s %s %s",
-		graphwin->Id,
-		graphwin->color ? "color" : "monochrome",
-		graphwin->dashed ? "dashed" : "solid",
-		term->flags & TERM_ENHANCED_TEXT ? "enhanced" : "noenhanced");
-
-	if (set_font || set_fontsize) {
-		char * fontstring = (char*) gp_alloc(strlen(graphwin->fontname) + 25, "win font");
-		if (!set_fontsize)
-			sprintf(fontstring, " font \"%s\"", graphwin->fontname);
-		else
-			sprintf(fontstring, " font \"%s, %d\"",
-				set_font ? graphwin->fontname : "", graphwin->fontsize);
-		strcat (term_options, fontstring);
-		free(fontstring);
-	}
-
-	if (graphwin->background != RGB(255,255,255))
-		sprintf(&(term_options[strlen(term_options)]),
-			" background \"#%0x%0x%0x\"", GetRValue(graphwin->background),
-			GetGValue(graphwin->background),	GetBValue(graphwin->background));
-
-	if (graphwin->fontscale != 1)
-		sprintf(&(term_options[strlen(term_options)]),
-			" fontscale %.1f", graphwin->fontscale);
-
-	if (graphwin->linewidth != 1)
-		sprintf(&(term_options[strlen(term_options)]),
-			" linewidth %.1f", graphwin->linewidth);
+	WIN_update_options();
 
 	if (set_close) {
 		win_close_terminal_window(graphwin);
@@ -416,6 +387,46 @@ WIN_options()
 	if (GraphHasWindow(graphwin) && IsIconic(graphwin->hWndGraph))
 		ShowWindow(graphwin->hWndGraph, SW_SHOWNORMAL);
 	GraphRedraw(graphwin);
+}
+
+
+void
+WIN_update_options()
+{
+	TBOOLEAN set_font = FALSE, set_fontsize = FALSE;
+
+	/* update term_options */
+	sprintf(term_options, "%i %s %s %s",
+		graphwin->Id,
+		graphwin->color ? "color" : "monochrome",
+		graphwin->dashed ? "dashed" : "solid",
+		term->flags & TERM_ENHANCED_TEXT ? "enhanced" : "noenhanced");
+
+	set_fontsize = (graphwin->deffontsize != WIN_inifontsize);
+	set_font = (strcmp(graphwin->deffontname, WIN_inifontname) != 0);
+	if (set_font || set_fontsize) {
+		char * fontstring = (char*) gp_alloc(strlen(graphwin->fontname) + 25, "win font");
+		if (!set_fontsize)
+			sprintf(fontstring, " font \"%s\"", graphwin->deffontname);
+		else
+			sprintf(fontstring, " font \"%s, %d\"",
+				set_font ? graphwin->deffontname : "", graphwin->deffontsize);
+		strcat (term_options, fontstring);
+		free(fontstring);
+	}
+
+	if (graphwin->background != RGB(255, 255, 255))
+		sprintf(&(term_options[strlen(term_options)]),
+			" background \"#%0x%0x%0x\"", GetRValue(graphwin->background),
+			GetGValue(graphwin->background), GetBValue(graphwin->background));
+
+	if (graphwin->fontscale != 1)
+		sprintf(&(term_options[strlen(term_options)]),
+			" fontscale %.1f", graphwin->fontscale);
+
+	if (graphwin->linewidth != 1)
+		sprintf(&(term_options[strlen(term_options)]),
+			" linewidth %.1f", graphwin->linewidth);
 }
 
 

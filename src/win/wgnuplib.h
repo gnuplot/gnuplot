@@ -1,5 +1,5 @@
 /*
- * $Id: wgnuplib.h,v 1.46 2011/08/15 18:16:49 markisch Exp $
+ * $Id: wgnuplib.h,v 1.47 2011/09/09 18:29:37 markisch Exp $
  */
 
 /* GNUPLOT - win/wgnuplib.h */
@@ -333,8 +333,8 @@ typedef struct tagGW {
 	int		hchar;		/* horizontal size of character (xmax units) */
 	int		vchar;		/* vertical size of character (ymax units)*/
 
-	char	fontname[MAXFONTNAME];	/* font name */
-	int		fontsize;	/* font size in pts */
+	char	fontname[MAXFONTNAME];	/* current font name */
+	int		fontsize;	/* current font size in pts */
 	char	deffontname[MAXFONTNAME]; /* default font name */
 	int		deffontsize;	/* default font size */
 	int		angle;		/* text angle */
@@ -371,6 +371,9 @@ typedef GW *  LPGW;
 #define WINGRAPHTITLE "gnuplot graph"
 
 extern termentry * WIN_term;
+extern char WIN_inifontname[MAXFONTNAME];
+extern int WIN_inifontsize;
+
 void WDPROC GraphInitStruct(LPGW lpgw);
 void WDPROC GraphInit(LPGW lpgw);
 void WDPROC GraphClose(LPGW lpgw);
@@ -396,6 +399,8 @@ void WDPROC Graph_set_clipboard(LPGW lpgw, LPCSTR s);
 void WDPROC GraphEnhancedOpen(char *fontname, double fontsize, double base,
     BOOL widthflag, BOOL showflag, int overprint);
 void WDPROC GraphEnhancedFlush(void);
+
+void WIN_update_options __PROTO((void));
 
 
 /* ================================== */
