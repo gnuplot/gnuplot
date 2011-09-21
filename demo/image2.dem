@@ -516,38 +516,42 @@ set multiplot
 set size 0.5,0.48
 unset key
 set origin 0.0,0.47
-set xrange [127.5:-0.5]
+set xrange [-0.5:127.5] noreverse
+set x2range [-0.5:127.5] noreverse
+set yrange [-0.5:127.5] noreverse
+set y2range [-0.5:127.5] noreverse
 set xtics out mirror
 unset ytics
-set y2range [-0.5:127.5]
+set xrange [] reverse
+set x2range [] reverse
 set y2tics out mirror
 set title '"Eccentric coordinate systems"' offset 0,-0.5
 set label 1 "Images reverse according to axis orientation" at -30,162 center
 plot 'blutux.rgb' binary array=(128,128) flip=y format='%uchar' using 1:2:3 with rgbimage
 unset label 1
 set origin 0.5,0.47
-set xrange [-0.5:127.5]
+set xrange [] noreverse
+set x2range [] noreverse
 unset y2tics
-set yrange [-0.5:127.5]
 set ytics out mirror
 set title '"Cartesian plane!"'
 replot
 set origin 0.0,0.04
 unset xtics
-set xrange [127.5:-0.5]
-set x2range [127.5:-0.5]
+set xrange [] reverse
+set x2range [] reverse
 set x2tics out mirror
 unset ytics
-set yrange [127.5:-0.5]
-set y2range [127.5:-0.5]
+set yrange [] reverse
+set y2range [] reverse
 set y2tics out mirror
 unset title
 set title ' ' offset 0,-0.5
 set label 1 '"Nato, ergo sum."' at 64,140 center rotate by 180
 replot
 set origin 0.5,0.04
-set xrange [-0.5:127.5]
-set x2range [-0.5:127.5]
+set xrange [] noreverse
+set x2range [] noreverse
 unset y2tics
 set ytics out mirror
 set title ' ' offset 0,-0.5
