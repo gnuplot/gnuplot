@@ -1,5 +1,9 @@
 2011-09-21  Bastian Maerkisch  <bmaerkisch@web.de>
 
+	* src/win/wgraph.c (drawhraph) [W_filled_polygon_draw]: Transparent
+	pattern fill actually fills with white background since 2011-05-15.
+	Fixed.
+
 	* src/win/wgnuplib.h src/win/wgraph.c (WndGraphProc) term/win.trm
 	(WIN_options, WIN_update_options): Update term options on changes via
 	graph window/menu. Track font face and size as read from ini-file.

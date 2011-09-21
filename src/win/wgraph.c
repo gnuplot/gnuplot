@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.134 2011/09/09 18:29:37 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.135 2011/09/21 11:48:10 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - win/wgraph.c */
@@ -1897,6 +1897,7 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 				UINT32 uAlpha = (UCHAR)(0xff * alpha);
 				/* make sure the indicator for transparency is different fill_color */
 				UINT32 transparentColor = fill_color ^ 0x00ffffff;
+				COLORREF bkColor = RGB((transparentColor >> 16) & 0xff, (transparentColor >> 8) & 0xff, transparentColor & 0xff);
 				HBRUSH old_brush;
 				HPEN old_pen;
 
@@ -1939,6 +1940,7 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 
 				/* prepare the memory context */
 				SetTextColor(memdc, fill_color);
+				SetBkColor(memdc, bkColor);
 				old_pen = SelectObject(memdc, lpgw->hnull);
 				if ((fillstyle & 0x0f) == FS_TRANSPARENT_PATTERN)
 					old_brush = SelectObject(memdc, pattern_brush[pattern]);
