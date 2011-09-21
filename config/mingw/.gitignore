@@ -1,0 +1,13 @@
+VERSION
+*.h
+*.co
+*.po
+*.exe
+*.mnu
+*.ico
+*.chw
+*.chm
+*.tex
+*.sty
+*.aux
+*.pdf
