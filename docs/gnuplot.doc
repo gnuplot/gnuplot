@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.688 2011/08/27 11:18:01 juhaszp Exp $
+C RCS $Id: gnuplot.doc,v 1.689 2011/09/17 23:05:36 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -3475,7 +3475,7 @@ Ffigure_histcols
 ?plotting style histograms newhistogram
  Syntax:
 
-      newhistogram {"<title>"} {<linetype>} {<fillstyle>} {at <x-coord>}
+      newhistogram {"<title>"} {lt <linetype>} {fs <fillstyle>} {at <x-coord>}
 
  More than one set of histograms can appear in a single plot. In this case you
  can force a gap between them, and a separate label for each set, by using the

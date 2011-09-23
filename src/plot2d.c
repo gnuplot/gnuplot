@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.248 2011/08/27 17:53:47 juhaszp Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.249 2011/08/28 08:19:16 juhaszp Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -1624,6 +1624,7 @@ eval_plots()
 		newhist_start = histogram_rightmost + 2;
 
 	    lp.l_type = line_num;
+	    newhist_color = lp.l_type;
 	    fs.fillpattern = LT_UNDEFINED;
 
 	    do {
@@ -1640,12 +1641,14 @@ eval_plots()
 		    histogram_title = try_to_get_string();
 
 		/* Allow explicit starting color or pattern for this histogram */
-		lp_parse(&lp, FALSE, FALSE);
+		if (equals(c_token,"lt") || almost_equals(c_token,"linet$ype")) {
+		    c_token++;
+		    newhist_color = int_expression();
+		}
 		parse_fillstyle(&fs, FS_SOLID, 100, fs.fillpattern, default_fillstyle.border_color);
 
 		} while (c_token != previous_token);
 
-	    newhist_color = lp.l_type;
 	    newhist_pattern = fs.fillpattern;
 	} else
 
@@ -2215,8 +2218,8 @@ eval_plots()
 		/* Normally each histogram gets a new set of colors, but in */
 		/* 'newhistogram' you can force a starting color instead.   */
 		if (!set_lpstyle && this_plot->histogram->startcolor != LT_UNDEFINED)
-		    this_plot->lp_properties.l_type = this_plot->histogram_sequence
-						    + this_plot->histogram->startcolor;
+		    load_linetype(&this_plot->lp_properties, 
+			this_plot->histogram_sequence + this_plot->histogram->startcolor);
 		if (this_plot->histogram->startpattern != LT_UNDEFINED)
 		    this_plot->fill_properties.fillpattern = this_plot->histogram_sequence
 						    + this_plot->histogram->startpattern;

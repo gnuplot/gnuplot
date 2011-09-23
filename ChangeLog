@@ -1,3 +1,8 @@
+2011-09-23  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* docs/gnuplot.doc src/plot2d.c:  Defer interpretation of newhistogram
+	linetype until the histogram itself is drawn.
+
 2011-09-21  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* demo/borders.dem: Use loop instead of `reread`.
@@ -54,7 +59,7 @@
 2011-09-08  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c (plot_image_or_update_axes):  "with image" from a
-	function may not make sense, but at least it should not seqfault.
+	function may not make sense, but at least it should not segfault.
 	Bug #3406642
 
 2011-09-07  Ethan A Merritt  <merritt@u.washington.edu>
