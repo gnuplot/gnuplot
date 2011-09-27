@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: metapost.trm,v 1.43 2008/05/31 15:05:29 sfeam Exp $
+ * $Id: metapost.trm,v 1.44 2009/12/31 05:37:22 sfeam Exp $
  */
 
 /* GNUPLOT - metapost.trm */
@@ -349,7 +349,7 @@ MP_options()
 
     if (MP_psnfss == MP_PSNFSS_NONE) { /* using the normal font scheme */
       sprintf(term_options,
-	    "%s %s %stex%s%s mag %.3f font \"%s\" %.2f %sprologues(%d)",
+	    "%s %s %stex%s%s mag %.3f font \"%s,%.2f\" %sprologues(%d)",
 	    MP_color ? "color" : "monochrome",
 	    MP_solid ? "solid" : "dashed",
 	    (MP_tex == MP_NO_TEX) ? "no" : (MP_tex == MP_LATEX) ? "la" : "",
@@ -1016,7 +1016,7 @@ START_HELP(mp)
 "                {prologues <value>}",
 "                {a4paper}",
 "                {amstex}",
-"                {\"<fontname>\"} {<fontsize>}",
+"                {\"<fontname> {,<fontsize>}\"} ",
 "",
 " The option `color` causes lines to be drawn in color (on a printer or display",
 " that supports it), `monochrome` (or nothing) selects black lines.  The option",

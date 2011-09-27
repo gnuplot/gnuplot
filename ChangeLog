@@ -1,9 +1,9 @@
 2011-09-27  Ethan A Merritt  <merritt@u.washington.edu>
 
-	* term/emf.trm term/fig.trm term/tgif.trm:  Prefer the new syntax
-	set term ... font "<name>,<size>"   in the documentation. This does not
-	change the terminal input, only the docs and the options string echoed
-	back by "show term".
+	* term/emf.trm term/fig.trm term/metapost.trm term/tgif.trm:
+	Prefer the new syntax set term ... font "<name>,<size>"   in the
+	documentation. This does not change the terminal input, only the docs
+	and the options string echoed back by "show term".
 
 	* term/canvas.trm:  Implement set term canvas ... font "<name>,<size>".
 	Currently the name is ignored.  
