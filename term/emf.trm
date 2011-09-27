@@ -1,5 +1,5 @@
 /* Hey Emacs this is -*- C -*-
- * $Id: emf.trm,v 1.75 2011/08/23 18:57:04 markisch Exp $
+ * $Id: emf.trm,v 1.76 2011/09/01 03:45:32 sfeam Exp $
  */
 
 /* GNUPLOT - emf.trm */
@@ -748,7 +748,7 @@ EMF_options()
     
     emf_colors = emf_monochrome ? 1 : EMF_COLORS;
 
-    sprintf(term_options, "%s %s %s \"%s\" %g",
+    sprintf(term_options, "%s %s %s font \"%s,%g\"",
 	    emf_monochrome ? "monochrome" : "color",
 	    emf_dashed ? "dashed" : "solid",
 	    emf_pentype ? "butt" : "rounded",
@@ -1785,8 +1785,7 @@ START_HELP(emf)
 "                        {rounded | butt}",
 "                        {linewidth <LW>} {dashlength <DL>}",
 "                        {size XX,YY} {background <rgb_color>}",
-"                        {\"<fontname>\"} {<fontsize>}    #old syntax",
-"                        {font \"<fontname>,<fontsize>\"} #new syntax",
+"                        {font \"<fontname>{,<fontsize>}\"}",
 "                        {fontscale <scale>}",
 "",
 " In `monochrome` mode successive line types cycle through dash patterns.",
@@ -1809,7 +1808,7 @@ START_HELP(emf)
 " Selecting `default` sets all options to their default values.",
 "",
 " Examples:",
-"       set terminal emf 'Times Roman Italic' 12",
+"       set terminal emf 'Times Roman Italic, 12'",
 "       set terminal emf color solid    # no pesky dashes!"
 END_HELP(emf)
 #endif /* TERM_HELP */

@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*- */
-/* $Id: tgif.trm,v 1.48 2009/09/13 17:49:16 sfeam Exp $ */
+/* $Id: tgif.trm,v 1.49 2010/03/24 18:22:37 sfeam Exp $ */
 
 /* GNUPLOT - tgif.trm */
 
@@ -433,7 +433,7 @@ TGIF_options()
     strcat(term_options, TgifUseColor ? " color" : " monochrome");
     sprintf(&(term_options[strlen(term_options)]), " linewidth %f", 
 	    dActThick_default);
-    sprintf(&(term_options[strlen(term_options)]), " %s \"%s\" %u",
+    sprintf(&(term_options[strlen(term_options)]), " %s font \"%s,%u\"",
 	    TgifSolid ? "solid" : "dashed",
 	    sActFont, uActFontSize);
 }
@@ -1733,14 +1733,14 @@ START_HELP(tgif)
 "                         {monochrome | color}",
 "                         {{linewidth | lw} <LW>}",
 "                         {solid | dashed}",
-"                         {font \"<fontname>\"} {<fontsize>}",
+"                         {font \"<fontname>{,<fontsize>}\"}",
 "",
 " where <[x,y]> specifies the number of graphs in the x and y directions on the",
 " page, `color` enables color, `linewidth` scales all linewidths by <LW>,",
 " \"<fontname>\" is the name of a valid PostScript font, and <fontsize>",
 " specifies the size of the PostScript font.",
 " `defaults` sets all options to their defaults: `portrait`, `[1,1]`, `color`,",
-" `linwidth 1.0`, `dashed`, `\"Helvetica\"`, and `18`.",
+" `linwidth 1.0`, `dashed`, `\"Helvetica,18\"`.",
 "",
 " The `solid` option is usually prefered if lines are colored, as they often",
 " are in the editor.  Hardcopy will be black-and-white, so `dashed` should be",
@@ -1773,7 +1773,7 @@ START_HELP(tgif)
 "",
 " Examples of single plots (or standard multiplot):",
 "       set terminal tgif                  # defaults",
-"       set terminal tgif \"Times-Roman\" 24",
+"       set terminal tgif \"Times-Roman,24\"",
 "       set terminal tgif landscape",
 "       set terminal tgif landscape solid",
 "",

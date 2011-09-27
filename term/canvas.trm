@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: canvas.trm,v 1.52 2011/09/04 02:05:24 sfeam Exp $
+ * $Id: canvas.trm,v 1.53 2011/09/06 03:17:42 sfeam Exp $
  *
  */
 
@@ -102,6 +102,7 @@ static double canvas_dashlength_factor = 1.0;
 static double CANVAS_ps = 1;	/* pointsize multiplier */
 static double canvas_font_size = 10;
 static double canvas_fontscale = 1.0;
+static char * canvas_font_name = NULL;
 static char *canvas_justify = "";
 static int canvas_text_angle = 0;
 static int canvas_in_a_path = FALSE;
@@ -136,7 +137,8 @@ static struct {
 } canvas_state;
 
 enum CANVAS_case {
-    CANVAS_SIZE, CANVAS_FSIZE, CANVAS_NAME, CANVAS_STANDALONE, CANVAS_TITLE,
+    CANVAS_SIZE, CANVAS_FONT, CANVAS_FSIZE, 
+    CANVAS_NAME, CANVAS_STANDALONE, CANVAS_TITLE,
     CANVAS_LINEWIDTH, CANVAS_MOUSING, CANVAS_JSDIR, CANVAS_ENH, CANVAS_NOENH,
     CANVAS_FONTSCALE, CANVAS_SOLID, CANVAS_DASHED, CANVAS_DASHLENGTH,
     CANVAS_ROUNDED, CANVAS_BUTT, CANVAS_BACKGROUND, CANVAS_OTHER
@@ -144,6 +146,7 @@ enum CANVAS_case {
 
 static struct gen_table CANVAS_opts[] =
 {
+    { "font", CANVAS_FONT },
     { "fsize", CANVAS_FSIZE },
     { "name", CANVAS_NAME },
     { "size", CANVAS_SIZE },
@@ -194,6 +197,7 @@ TERM_PUBLIC void
 CANVAS_options()
 {
     int canvas_background = 0;
+    int sep;
 
     /* (c_token == 2) only in the case of 'set termoption'	*/
     /* which is after we have already initialized everything.	*/
@@ -254,6 +258,27 @@ CANVAS_options()
 
 	case CANVAS_STANDALONE:
 	    CANVAS_standalone = TRUE;
+	    break;
+
+	case CANVAS_FONT:
+	/* FIXME: The HTML5 canvas element did not originally provide any	*/
+	/* support for text output, let alone fonts.There are now text routines	*/
+	/* in the HTML5 draft spec, but they are not yet widely supported.	*/
+	/* So for now we will accept a font request, but ignore it.		*/
+	/* Eventually the text calls will look something like			*/
+	/*	ctx.font = "12pt Times";					*/
+	/*	ctx.textAlign = "center";					*/
+	/*	ctx.fillText( "Oh goody, text support.", x, y );		*/
+	/*									*/
+	    free(canvas_font_name);
+	    if (!(canvas_font_name = try_to_get_string()))
+		int_error(c_token,"font: expecting string");
+	    sep = strcspn(canvas_font_name,",");
+	    if (canvas_font_name[sep] == ',') {
+		sscanf(&(canvas_font_name[sep+1]), "%lf", &canvas_font_size);
+		if (canvas_font_size <= 0)
+		    canvas_font_size = 10;
+	    }
 	    break;
 
 	case CANVAS_FSIZE:
@@ -1407,7 +1432,7 @@ START_HELP(canvas)
 " HTML5 canvas element.",
 " Syntax:",
 "       set terminal canvas {size <xsize>, <ysize>} {background <rgb_color>}",
-"                           {fsize <fontsize>}",
+"                           {font {<fontname>}{,<fontsize>}} | {fsize <fontsize>}",
 "                           {{no}enhanced} {linewidth <lw>}",
 "                           {rounded | butt}",
 "                           {solid | dashed {dashlength <dl>}}",
@@ -1417,10 +1442,14 @@ START_HELP(canvas)
 "",
 " where <xsize> and <ysize> set the size of the plot area in pixels.",
 " The default size in standalone mode is 600 by 400 pixels.",
-" The default font size is 10.  NB: Only one font is available, the ascii",
-" portion of Hershey simplex Roman provided in the file canvastext.js.",
-" You can replace this with the file canvasmath.js, which contains also",
-" UTF-8 encoded Hershey simplex Greek and math symbols.",
+" The default font size is 10.",
+"",
+" NB: Only one font is available, the ascii portion of Hershey simplex Roman",
+" provided in the file canvastext.js. You can replace this with the file",
+" canvasmath.js, which contains also UTF-8 encoded Hershey simplex Greek and",
+" math symbols. For consistency with other terminals, it is also possible to",
+" use `font \"name,size\"`. Currently the font `name` is ignored, but browser",
+" support for named fonts is likely to arrive eventually.",
 "",
 " The default `standalone` mode creates an html page containing javascript",
 " code that renders the plot using the HTML 5 canvas element.  The html page",
