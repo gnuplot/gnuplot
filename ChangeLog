@@ -8,6 +8,8 @@
 	coordinates are UNDEFINED.
 	Bug #3415454
 
+	* term/js/gnuplot_mouse.css:  Opera is picky about missing units.
+
 2011-09-27  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/emf.trm term/fig.trm term/metapost.trm term/tgif.trm:
