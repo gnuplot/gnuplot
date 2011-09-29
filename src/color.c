@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: color.c,v 1.95 2011/04/05 20:29:38 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: color.c,v 1.96 2011/07/12 19:30:34 juhaszp Exp $"); }
 #endif
 
 /* GNUPLOT - color.c */
@@ -482,8 +482,21 @@ cbtick_callback(
     /* draw label */
     if (text) {
 	int just;
-	/* get offset */
 	int offsetx, offsety;
+
+	/* Skip label if we've already written a user-specified one here */
+#	define MINIMUM_SEPARATION 0.001
+	while (userlabels) {
+	    if (fabs((place - userlabels->position) / (CB_AXIS.max - CB_AXIS.min))
+		<= MINIMUM_SEPARATION) {
+		text = NULL;
+		break;
+	    }
+	    userlabels = userlabels->next;
+	}
+#	undef MINIMUM_SEPARATION
+
+	/* get offset */
 	map3d_position_r(&(axis_array[axis].ticdef.offset),
 			 &offsetx, &offsety, "cbtics");
 	/* User-specified different color for the tics text */

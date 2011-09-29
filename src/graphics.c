@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.375 2011/08/27 17:53:46 juhaszp Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.376 2011/09/09 17:28:30 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -2155,7 +2155,6 @@ plot_impulses(struct curve_points *plot, int yaxis_x, int xaxis_y)
 {
     int i;
     int x, y;
-    struct termentry *t = term;
 
     for (i = 0; i < plot->p_count; i++) {
 
@@ -5100,7 +5099,7 @@ xtick2d_callback(
 
     (void) axis;		/* avoid "unused parameter" warning */
 
-    /* Skip label if we've already written a user-specified one */
+    /* Skip label if we've already written a user-specified one here */
 #   define MINIMUM_SEPARATION 2
     while (userlabels) {
 	int here = map_x(AXIS_LOG_VALUE(axis,userlabels->position));
@@ -5110,6 +5109,7 @@ xtick2d_callback(
 	}
 	userlabels = userlabels->next;
     }
+#   undef MINIMUM_SEPARATION
 
     if (grid.l_type > LT_NODRAW) {
 	(t->layer)(TERM_LAYER_BEGIN_GRID);
@@ -5202,15 +5202,17 @@ ytick2d_callback(
 
     (void) axis;	/* avoid "unused parameter" warning */
 
-    /* Skip label if we've already written a user-specified one */
+    /* Skip label if we've already written a user-specified one here */
+#   define MINIMUM_SEPARATION 2
     while (userlabels) {
 	int here = map_y(AXIS_LOG_VALUE(axis,userlabels->position));
-	if (abs(here-y) <= 1) {	/* FIXME: min separation could be configurable */
+	if (abs(here-y) <= MINIMUM_SEPARATION) {
 	    text = NULL;
 	    break;
 	}
 	userlabels = userlabels->next;
     }
+#   undef MINIMUM_SEPARATION
 
     if (grid.l_type > LT_NODRAW) {
 	(t->layer)(TERM_LAYER_BEGIN_GRID);
