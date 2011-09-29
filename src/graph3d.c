@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.222.2.10 2010/12/13 06:45:08 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.222.2.11 2011/08/22 21:46:19 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -2663,9 +2663,21 @@ xtick_callback(
 	int just;
 	unsigned int x2, y2;
 	int angle;
+	int offsetx, offsety;
+
+	/* Skip label if we've already written a user-specified one here */
+#	define MINIMUM_SEPARATION 0.001
+	while (userlabels) {
+	    if (fabs((place - userlabels->position) / (X_AXIS.max - X_AXIS.min))
+		<= MINIMUM_SEPARATION) {
+		text = NULL;
+		break;
+	    }
+	    userlabels = userlabels->next;
+	}
+#	undef MINIMUM_SEPARATION
 
 	/* get offset */
-	int offsetx, offsety;
 	map3d_position_r(&(axis_array[axis].ticdef.offset),
 		       &offsetx, &offsety, "xtics");
 	if (tic_unitx * xscaler < -0.9)
@@ -2745,9 +2757,21 @@ ytick_callback(
 	int just;
 	unsigned int x2, y2;
 	int angle;
+	int offsetx, offsety;
+
+	/* Skip label if we've already written a user-specified one here */
+#	define MINIMUM_SEPARATION 0.001
+	while (userlabels) {
+	    if (fabs((place - userlabels->position) / (Y_AXIS.max - Y_AXIS.min))
+		<= MINIMUM_SEPARATION) {
+		text = NULL;
+		break;
+	    }
+	    userlabels = userlabels->next;
+	}
+#	undef MINIMUM_SEPARATION
 
 	/* get offset */
-	int offsetx, offsety;
 	map3d_position_r(&(axis_array[axis].ticdef.offset),
 		       &offsetx, &offsety, "ytics");
 
@@ -2824,8 +2848,21 @@ ztick_callback(
 
     if (text) {
 	unsigned int x1, y1;
-	/* get offset */
 	int offsetx, offsety;
+
+	/* Skip label if we've already written a user-specified one here */
+#	define MINIMUM_SEPARATION 0.001
+	while (userlabels) {
+	    if (fabs((place - userlabels->position) / (Z_AXIS.max - Z_AXIS.min))
+		<= MINIMUM_SEPARATION) {
+		text = NULL;
+		break;
+	    }
+	    userlabels = userlabels->next;
+	}
+#	undef MINIMUM_SEPARATION
+
+	/* get offset */
 	map3d_position_r(&(axis_array[axis].ticdef.offset),
 		       &offsetx, &offsety, "ztics");
 

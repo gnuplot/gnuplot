@@ -17,6 +17,7 @@ New features, changes and fixes in gnuplot version 4.4.4
 * FIX initialization of svg pattern-fill definitions
 * FIX positioning of histogram bars when some data entries are missing
 * FIX emf terminal can handle UTF-8 encoding
+* FIX User-specified axis tick labels override auto labels in 3D just as in 2D
 
 
 New features, changes and fixes in gnuplot version 4.4.3

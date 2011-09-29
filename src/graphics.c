@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.302.2.29 2011/07/14 20:26:42 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.302.2.30 2011/09/09 17:30:34 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -4867,7 +4867,7 @@ xtick2d_callback(
 
     (void) axis;		/* avoid "unused parameter" warning */
 
-    /* Skip label if we've already written a user-specified one */
+    /* Skip label if we've already written a user-specified one here */
 #   define MINIMUM_SEPARATION 2
     while (userlabels) {
 	int here = map_x(AXIS_LOG_VALUE(axis,userlabels->position));
@@ -4877,6 +4877,7 @@ xtick2d_callback(
 	}
 	userlabels = userlabels->next;
     }
+#   undef MINIMUM_SEPARATION
 
     if (grid.l_type > LT_NODRAW) {
 	if (t->layer)
@@ -4974,15 +4975,17 @@ ytick2d_callback(
 
     (void) axis;	/* avoid "unused parameter" warning */
 
-    /* Skip label if we've already written a user-specified one */
+    /* Skip label if we've already written a user-specified one here */
+#   define MINIMUM_SEPARATION 2
     while (userlabels) {
 	int here = map_y(AXIS_LOG_VALUE(axis,userlabels->position));
-	if (abs(here-y) <= 1) {	/* FIXME: min separation could be configurable */
+	if (abs(here-y) <= MINIMUM_SEPARATION) {
 	    text = NULL;
 	    break;
 	}
 	userlabels = userlabels->next;
     }
+#   undef MINIMUM_SEPARATION
 
     if (grid.l_type > LT_NODRAW) {
 	if (t->layer)
