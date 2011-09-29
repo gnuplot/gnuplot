@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: parse.c,v 1.64 2011/08/01 05:14:23 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: parse.c,v 1.65 2011/09/07 18:42:37 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - parse.c */
@@ -490,7 +490,6 @@ parse_primary_expression()
 		/* column("string") means we expect the first row of */
 		/* a data file to contain headers rather than data.  */
 		if (!strcmp(ft[whichfunc].f_name,"column")) {
-		    extern TBOOLEAN df_1st_row_contains_headers;
 		    struct at_entry *previous = &(at->actions[at->a_count-1]);
 		    if (previous->index == PUSHC
 		    &&  previous->arg.v_arg.type == STRING)

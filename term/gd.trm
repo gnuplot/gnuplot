@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: gd.trm,v 1.159 2011/05/10 06:51:23 markisch Exp $
+ * $Id: gd.trm,v 1.160 2011/07/21 04:54:09 sfeam Exp $
  * based on gif.trm,v 1.26.2.1 2000/05/01 00:17:20 joze
  */
 
@@ -2291,7 +2291,6 @@ gd_iconv(char **string)
     size_t len1 = strlen(*string)+1;
     size_t len2;
     iconv_t cd;
-    size_t stat;
     char *stmp;
 
     /* We will return this to the caller and free it next time */
