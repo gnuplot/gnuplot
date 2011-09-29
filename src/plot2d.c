@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.193.2.20 2011/03/29 01:52:29 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.193.2.21 2011/04/19 20:59:26 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -850,7 +850,8 @@ get_data(struct curve_points *current_plot)
 		store2d_point(current_plot, i, v[0], v[1], v[0], v[0], v[1],
 			      v[1], -1.0);
 		/* Allocate and fill in a text_label structure to match it */
-		store_label(current_plot->labels,
+		if (current_plot->points[i].type != UNDEFINED)
+		    store_label(current_plot->labels,
 			    &(current_plot->points[i]), i, df_tokens[2], v[3]);
 		i++;
 		break;
