@@ -1,3 +1,7 @@
+2011-10-01  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* config/mingw/Makefile: Include epscairo terminal.
+
 2011-05-24  Christoph Bersch  <cbersch@users.sourceforge.net>
 
 	* term/post.trm term/pslatex.trm: New options `background` and

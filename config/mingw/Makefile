@@ -1,5 +1,5 @@
 # Hello, emacs: this is a -*- Makefile -*-
-# $Id: Makefile,v 1.12 2011/08/23 19:00:54 markisch Exp $
+# $Id: Makefile,v 1.13 2011/09/12 18:44:06 markisch Exp $
 #
 # GNUPLOT Makefile for MinGW/MSYS on Windows
 # This assumes usual installation of the MinGW32 toolkit, the free
@@ -345,6 +345,7 @@ endif
 
 ifdef CAIROTERMS
 	CFLAGS += -DHAVE_CAIROPDF
+	TERMFLAGS += -DHAVE_CAIROEPS
 endif
 
 ifdef WXT
