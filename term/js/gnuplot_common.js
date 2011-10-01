@@ -1,11 +1,11 @@
 /*
- * $Id: gnuplot_common.js,v 1.7 2011/04/03 19:31:15 sfeam Exp $
+ * $Id: gnuplot_common.js,v 1.8 2011/04/11 22:44:10 sfeam Exp $
  */
 // Shared routines for gnuplot's HTML5 canvas terminal driver.
 
 var gnuplot = { };
 
-gnuplot.common_version = "03 April 2011";
+gnuplot.common_version = "30 September 2011";
 
 gnuplot.L = function (x,y) {
   if (gnuplot.zoomed) {
@@ -73,7 +73,7 @@ gnuplot.bp = function (x,y) // begin polygon
 gnuplot.cfp = function () // close and fill polygon
     { ctx.closePath(); ctx.fill(); }
 gnuplot.cfsp = function () // close and fill polygon with stroke color
-    { ctx.closePath(); ctx.fillStyle = ctx.strokeStyle; ctx.fill(); }
+    { ctx.closePath(); ctx.fillStyle = ctx.strokeStyle; ctx.stroke(); ctx.fill(); }
 gnuplot.Dot = function (x,y) {
     xx = x; yy = y;
     if (gnuplot.zoomed) {zoom = gnuplot.zoomXY(xx,yy); xx = zoom.x; yy = zoom.y; if (zoom.clip) return;}
