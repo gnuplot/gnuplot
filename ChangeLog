@@ -1,8 +1,14 @@
 2011-10-01  Bastian Maerkisch  <bmaerkisch@web.de>
 
+	* term/cairo.trm: Depending on the version, Cairo defaults to cropping
+	eps files to the minimal bounding box. This patch adds support for the
+	{no}crop option to the epscairo terminal. Cropping is prevented by
+	putting two points in background color in opposite corners, or by
+	directly setting the bounding box for Cairo newer than 1.11.0.
+
 	* config/mingw/Makefile: Include epscairo terminal.
 
-2011-05-24  Christoph Bersch  <cbersch@users.sourceforge.net>
+2011-10-01  Christoph Bersch  <cbersch@users.sourceforge.net>
 
 	* term/post.trm term/pslatex.trm: New options `background` and
 	`nobackground` for terminals postscript, epslatex, pstex and pslatex.

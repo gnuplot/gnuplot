@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: cairo.trm,v 1.47 2011/09/02 17:43:47 sfeam Exp $
+ * $Id: cairo.trm,v 1.48 2011/09/03 16:42:20 sfeam Exp $
  */
 
 /* GNUPLOT - cairo.trm */
@@ -324,12 +324,14 @@ TERM_PUBLIC void cairotrm_options()
 			break;
 		case CAIROTRM_CROP:
 			c_token++;
-			if (!strcmp(term->name,"pngcairo"))
+			if ((cairo_params->terminal == CAIROTERM_PNG) || 
+			    (cairo_params->terminal == CAIROTERM_EPS))
 			    cairo_params->crop = TRUE;
 			break;
 		case CAIROTRM_NOCROP:
 			c_token++;
-			if (!strcmp(term->name,"pngcairo"))
+			if ((cairo_params->terminal == CAIROTERM_PNG) || 
+			    (cairo_params->terminal == CAIROTERM_EPS))
 			    cairo_params->crop = FALSE;
 			break;
 		case CAIROTRM_BACKGROUND:
@@ -500,6 +502,19 @@ void cairotrm_init()
 				plot.device_ymax /*double height_in_points*/);
 		}
 		cairo_ps_surface_set_eps(surface, TRUE);
+#if CAIRO_VERSION >= CAIRO_VERSION_ENCODE(1,11,1)
+		if (!cairo_params->crop) {
+			/* Normally, cairo clips the bounding box of eps files, but
+			   newer versions of Cairo let us enforce the bounding box. See
+			   http://old.nabble.com/EPS-target%3A-force-boundingbox-td29050435.html */
+			char bb[100];
+ 			sprintf(bb, "%%%%BoundingBox: 0 0 %i %i", plot.device_xmax, plot.device_ymax);
+			cairo_ps_surface_dsc_comment(surface, bb);
+			cairo_ps_surface_dsc_begin_page_setup(surface);
+			sprintf(bb, "%%%%PageBoundingBox: 0 0 %i %i", plot.device_xmax, plot.device_ymax);
+			cairo_ps_surface_dsc_comment(surface, bb);
+		}
+#endif
 		/* it is up to the pdf viewer to do the hinting */
 		plot.hinting = 0;
 		/* disable OPERATOR_SATURATE, not implemented in cairo pdf backend,
@@ -532,7 +547,6 @@ void cairotrm_graphics()
 	else
 		gp_cairo_solid_background(&plot);
 
-
 	/* update the window scale factor first, cairo needs it */
 	plot.xscale = 1.0;
 	plot.yscale = 1.0;
@@ -561,6 +575,20 @@ void cairotrm_graphics()
 
 	term->v_tic = (unsigned int) (term->v_char/2.5);
 	term->h_tic = (unsigned int) (term->v_char/2.5);
+
+#if CAIRO_VERSION < CAIRO_VERSION_ENCODE(1,11,1)
+	/* Put "invisible" points in two corners to enforce bounding box. */
+	if ((cairo_params->terminal == CAIROTERM_EPS) && !cairo_params->crop) {
+		cairo_set_line_width(plot.cr, 1);
+		cairo_set_source_rgb(plot.cr, cairo_params->background.r,
+				cairo_params->background.g, cairo_params->background.b);
+		cairo_move_to(plot.cr, 0, 0);
+		cairo_line_to(plot.cr, 1, 0);
+		cairo_move_to(plot.cr, plot.xmax - 1, plot.ymax);
+		cairo_line_to(plot.cr, plot.xmax, plot.ymax);
+		cairo_stroke(plot.cr);
+	}
+#endif
 
 	FPRINTF((stderr,"Graphics xmax %d ymax %d v_char %d h_char %d\n",
 		term->xmax, term->ymax, term->v_char, term->h_char));
@@ -1057,7 +1085,7 @@ START_HELP(epscairo)
 " The `epscairo` terminal device generates encapsulated PostScript (*.eps) using",
 " the cairo and pango support libraries.  cairo verion >= 1.6 is required.",
 "",
-" Please read the help for the pdfcairo terminal."
+" Please read the help for the `pdfcairo` terminal."
 ""
 END_HELP(epscairo)
 #endif /* TERM_HELP */
