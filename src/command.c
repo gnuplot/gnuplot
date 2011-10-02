@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.224 2011/09/07 18:44:56 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.225 2011/09/08 05:19:07 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -90,6 +90,7 @@ static char *RCSid() { return RCSid("$Id: command.c,v 1.224 2011/09/07 18:44:56 
 #include "save.h"
 #include "scanner.h"
 #include "setshow.h"
+#include "stats.h"
 #include "tables.h"
 #include "term_api.h"
 #include "util.h"
@@ -1781,6 +1782,16 @@ splot_command()
     SET_CURSOR_ARROW;
 }
 
+/* process the 'stats' command */
+void
+stats_command()
+{
+#ifdef USE_STATS
+    statsrequest();
+#else
+    int_error(NO_CARET,"This copy of gnuplot was not configured with support for the stats command");
+#endif
+}
 
 /* process the 'system' command */
 void

@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot on Unix.
 dnl
-dnl $Id: configure.in,v 1.292 2011/09/06 18:25:13 markisch Exp $
+dnl $Id: configure.in,v 1.293 2011/09/09 17:28:29 sfeam Exp $
 dnl
 dnl this is actually major.minor ...
 dnl note that for a non-beta release, we need to
@@ -1103,10 +1103,18 @@ AC_ARG_ENABLE(backwards-compatibility,dnl
                [ Define to allow use of deprecated syntax and terminal behaviour. ])
   fi])
 
+dnl Enable subsystem to generate statistical summary of file contents
+AC_ARG_ENABLE(stats,dnl
+[  --enable-stats           Include command to generate statistical summary of data],
+  [if test "$enableval" = yes; then
+    AC_DEFINE(USE_STATS,1,
+               [ Define to add support for generating a statistical summary of data])
+   fi])
+
 dnl Qt terminal
 
 AC_ARG_ENABLE(qt,dnl
-[  --enable-qt      Qt terminal (default disabled)],
+[  --enable-qt             Qt terminal (default disabled)],
   [if test "$enableval" = yes; then
      enable_qt=yes;
    fi])
@@ -1471,6 +1479,12 @@ if test "$enable_backwards_compatibility" = yes; then
   AC_MSG_RESULT([  Deprecated syntax and terminal options : yes])
 else
   AC_MSG_RESULT([  Deprecated syntax and terminal options : no (use --enable-backwards-compatibility to enable)])
+fi
+
+if test "$enable_stats" = yes; then
+  AC_MSG_RESULT([  Generate statistical summary of data : yes])
+else
+  AC_MSG_RESULT([  Generate statistical summary of data : no (use --enable-stats to enable)])
 fi
 
 

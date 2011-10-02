@@ -1,3 +1,20 @@
+2011-10-02  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* configure.in src/Makefile.am src/command.c src/command.h src/show.c
+	src/stats.c src/stats.h src/tables.c docs/gnuplot.doc:
+	
+	New command to generate a statistical summary of the data in a file.
+	    stats "datafile" [using col1[:col2]] [nooutput] [name "PREFIX"]
+	Data is read from the input file under the control of the same options
+	used for 'plot' commands (e.g. xrange, yrange, using, index, every).
+	The min/max/mean/stddev/quartiles of data from one or two data columns
+	are printed to the terminal and stored in named variables.  These
+	variables can be used to modify subsequent plot commands.
+	This code was developed primarily by Philipp Janert and Zoltán Vörös.
+ 
+	* demo/html/Makefile demo/html/Makefile.svg demo/html/Makefile.canvas
+	demo/stats.dem demo/all.dem:  New demo to exercise stats code.
+
 2011-10-01  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* term/cairo.trm: Depending on the version, Cairo defaults to cropping

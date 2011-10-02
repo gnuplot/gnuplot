@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.689 2011/09/17 23:05:36 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.690 2011/09/23 16:34:28 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -287,6 +287,14 @@ Ffigure_newsyntax
  Example: print the current time to msec precision
       print strftime("%H:%M:%.3S %d-%b-%Y",time(0.0))
       18:15:04.253 16-Apr-2011
+3 Statistical summary of data
+ The new `stats` command reads data from a file using the same syntax as
+ the `plot` or `splot` commands. Rather than drawing a graph, it prints
+ out a statistical summary of the data contained in the column[s] requested.
+ The resulting statistics  min, max, mean, standard deviation, correlation,
+ etc. are also stored in named variables that can be used to compose or modify
+ subsequent plotting commands.  See `stats`.  This command is only available
+ if gnuplot is built with the configuration option --enable-stats.
 
 2 Backwards compatibility
 ?backwards compatibility
@@ -12962,6 +12970,83 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/splot.gif" alt="[splot.gif
  base.  The base projections of the contour lines may be written to a
  file, and then read with `plot`, to take advantage of `plot`'s additional
  formatting capabilities.
+2 stats (Statistical Summary)
+?commands stats
+?stats
+?statistics
+ Syntax:
+      stats 'filename' [using N[:M]] [name 'prefix'] [[no]output]]
+ This command prepares a statistical summary of the data in one or two columns
+ of a file. The using specifier is interpreted in the same way as for plot
+ commands. See `plot` for details on the `index`, `every`, and `using`
+ directives. Data points are filtered against both xrange and yrange before
+ analysis. See `set xrange`. The summary is printed to the screen by default.
+ Output can be redirected to a file by prior use of the command `set print`,
+ or suppressed altogether using the `nooutput` option.  
+ 
+ In addition to printed output, the program stores the individual statistics
+ into three sets of variables.
+ The first set of variables reports how the data is laid out in the file:
+      STATS_records           # total number of in-range data records
+      STATS_outofrange        # number of records filtered out by range limits
+      STATS_invalid           # number of invalid/incomplete/missing records
+      STATS_blank             # number of blank lines in the file
+      STATS_blocks            # number of indexable data blocks in the file
+
+ The second set reports properties of the in-range data from a single column.
+ If the corresponding axis is autoscaled (x-axis for the 1st column, y-axis 
+ for the optional second column) then no range limits are applied. If two
+ columns are being analysed in a single `stats` command, the the suffix "_x"
+ or "_y" is appended to each variable name.  I.e. STATS_min_x is the minimum
+ value found in the first column, while STATS_min_y is the minimum value found
+ in the second column.
+      STATS_min               # minimum value of in-range data points
+      STATS_max               # maximum value of in-range data points
+      STATS_index_min         # index i for which data[i] == STATS_min
+      STATS_index_max         # index i for which data[i] == STATS_max
+      STATS_lo_quartile       # value of the lower (1st) quartile boundary
+      STATS_median            # median value
+      STATS_up_quartile       # value of the upper (3rd) quartile boundary
+      STATS_mean              # mean value of in-range data points
+      STATS_stddev            # standard deviation of the in-range data points
+      STATS_sum               # sum
+      STATS_sumsq             # sum of squares
+
+ The third set of variables is only relevant to analysis of two data columns.
+      STATS_correlation       # correlation coefficient between x and y values
+      STATS_slope             # B corresponding to a linear fit y = Ax + B
+      STATS_intercept         # A corresponding to a linear fit y = Ax + B
+      STATS_sumxy             # sum of x*y
+      STATS_pos_min_y         # x coordinate of a point with minimum y value
+      STATS_pos_max_y         # x coordinate of a point with maximum y value
+ 
+ It may be convenient to track the statistics from more than one file at the
+ same time. The `name` option causes the default prefix "STATS" to be replaced
+ by a user-specified string.  For example, the mean value of column 2 data from
+ two different files could be compared by
+      stats "file1.dat" using 2 name "A"
+      stats "file2.dat" using 2 name "B"
+      if (A_mean < B_mean) {...}
+
+ The index reported in STATS_index_xxx corresponds to the value of pseudo-column
+ 0 ($0) in plot commands.  I.e. the first point has index 0, the last point
+ has index N-1.
+
+ Data values are sorted to find the median and quartile boundaries.
+ If the total number of points N is odd, then the median value is taken as the
+ value of data point (N+1)/2. If N is even, then the median is reported as the
+ mean value of points N/2 and (N+2)/2. Equivalent treatment is used for the
+ quartile boundaries.
+
+ For an example of using the `stats` command to help annotate a subsequent plot,
+ see
+^ <a href="http://www.gnuplot.info/demo/stats.html">
+ stats.dem.
+^ </a>
+
+ The current implementation does not allow analysis if either the X or Y axis is
+ set to log-scaling.  This restriction may be removed in a later version.
+
 2 system
 ?commands system
 ?system
