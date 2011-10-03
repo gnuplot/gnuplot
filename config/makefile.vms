@@ -1,5 +1,5 @@
 #
-# $Id: makefile.vms,v 1.12 2007/10/16 21:19:44 sfeam Exp $
+# $Id: makefile.vms,v 1.13 2011/06/01 03:44:36 sfeam Exp $
 #
 # GNUPLOT Makefile for VMS
 #
@@ -64,7 +64,7 @@ TERMFLAGS = /include=[-.term]
 ############## okay, that's enough fiddling ###############
 
 OBJS1 = alloc.$(O),binary.$(O),bitmap.$(O),command.$(O),contour.$(O),datafile.$(O),dynarray.$(O),eval.$(O),
-OBJS2 = fit.$(O),graphics.$(O),graph3d.$(O),help.$(O),hidden3d.$(O),internal.$(O),interpol.$(O),
+OBJS2 = fit.$(O),graphics.$(O),graph3d.$(O),help.$(O),hidden3d.$(O),internal.$(O),interpol.$(O), stats.$(O),
 OBJS3 = matrix.$(O),misc.$(O),parse.$(O),plot.$(O),plot2d.$(O),plot3d.$(O),scanner.$(O),set.$(O),history.$(O),
 OBJS4 = show.$(O),specfun.$(O),standard.$(O),stdfn.$(O),term.$(O),time.$(O),util.$(O),util3d.$(O),version.$(O),vms.$(O),variable.$(O),save.$(O),tables.$(O),unset.$(O)
 OBJS = $(OBJS1)$(OBJS2)$(OBJS3)$(OBJS4)$(EXTRAOBJ)
@@ -72,7 +72,7 @@ OBJS = $(OBJS1)$(OBJS2)$(OBJS3)$(OBJS4)$(EXTRAOBJ)
 CSOURCE1 = command.c set.c show.c variable.c
 CSOURCE2 = help.c graphics.c graph3d.c internal.c
 CSOURCE3 = misc.c eval.c parse.c plot.c plot2d.c plot3d.c scanner.c standard.c stdfn.c
-CSOURCE4 = bitmap.c term.c time.c util.c version.c interpol.c fit.c matrix.c
+CSOURCE4 = bitmap.c term.c time.c util.c version.c interpol.c fit.c matrix.c stats.c
 CSOURCE5 = [-.term]aed.trm [-.term]cgi.trm [-.term]dumb.trm [-.term]dxf.trm [-.term]dxy.trm \
 	[-.term]eepic.trm [-.term]epson.trm [-.term]fig.trm [-.term]hp26.trm \
 	[-.term]hp2648.trm [-.term]hpgl.trm [-.term]hpljii.trm

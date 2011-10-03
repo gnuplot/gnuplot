@@ -1,5 +1,5 @@
 #
-# $Id: makefile.unx,v 1.17 2011/08/27 21:05:41 sfeam Exp $
+# $Id: makefile.unx,v 1.18 2011/09/02 16:26:10 markisch Exp $
 #
 #
 ############################################################
@@ -184,7 +184,7 @@ OBJS = bitmap.o command.o contour.o eval.o graphics.o graph3d.o help.o \
        internal.o misc.o parse.o plot.o plot2d.o plot3d.o readline.o \
        scanner.o set.o show.o specfun.o standard.o stdfn.o term.o time.o \
        util.o binary.o interpol.o fit.o matrix.o datafile.o alloc.o \
-       util3d.o hidden3d.o variable.o
+       util3d.o hidden3d.o variable.o stats.o
 
 NEXTOBJS = epsviewe.o
 ############################################################
@@ -415,7 +415,7 @@ DIRS = term demo docs docs/latextut
 CSOURCE1 = bf_test.c binary.c command.c set.c show.c
 CSOURCE2 = help.c graphics.c graph3d.c internal.c
 CSOURCE3 = misc.c eval.c parse.c plot.c plot2d.o plot3d.o readline.c scanner.c standard.c stdfn.c
-CSOURCE4 = bitmap.c term.c time.c util.c version.c fit.c matrix.c variable.c tabulate.c
+CSOURCE4 = bitmap.c term.c time.c util.c version.c fit.c matrix.c variable.c tabulate.c stats.c
 CSOURCE5 = term/ai.trm term/aed.trm \
 	term/cgi.trm term/corel.trm \
 	term/djsvga.trm term/dumb.trm \
