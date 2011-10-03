@@ -1,3 +1,8 @@
+2011-10-03  Rich Seymour  <richseymour@users.sourceforge.net>
+
+	* term/svg.trm: Look for strings " Bold" and/or " Italic" in font name
+	and set the corresponding properties if found.  Patchset #3058920.
+
 2011-10-03  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* term/post.trm (PS_options): Properly contain new variable in a

@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: svg.trm,v 1.121 2011/07/28 06:12:06 sfeam Exp $
+ * $Id: svg.trm,v 1.122 2011/09/04 02:05:24 sfeam Exp $
  */
 
 /*------------------------------------------------------------------------------------------------------------------------------------
@@ -49,6 +49,14 @@
  *
  * Contributed by <forgery69@users.sf.net>
  *   Javascript code to toggle plots on/off
+ */
+
+/*
+ * Code for gnuplot version 4.5
+ *   Bold -> font-weight:bold
+ *   Italic -> font-style:italic
+ *   Trying to match well with PNG output.
+ * Rich Seymour <rseymour@usc.edu>
  */
 
 #include "driver.h"
@@ -137,9 +145,13 @@ static enum JUSTIFY SVG_TextJust = LEFT; /* current text justification*/
 
 /* default text font family: */
 static char *SVG_fontNameDef = NULL;
+static char *SVG_fontStyleDef = NULL; /* default font style */
+static char *SVG_fontWeightDef = NULL; /* default font weight */
 static double SVG_fontSizeDef = 12;	/* default text size*/
 /* current text font family: */
 static char *SVG_fontNameCur = NULL;
+static char *SVG_fontStyleCur = NULL; /* current font style */
+static char *SVG_fontWeightCur = NULL; /* current font weight */
 static double SVG_fontSizeCur = 12;	/* current text size*/
 static TBOOLEAN SVG_groupIsOpen = FALSE; /* open group flag*/
 static TBOOLEAN SVG_pathIsOpen = FALSE; /* open path flag*/
@@ -539,9 +551,30 @@ SVG_options ()
 	    comma = strrchr(s,',');
 	    if (comma && (1 == sscanf(comma + 1, "%lf", &SVG_fontSizeDef)))
 		*comma = '\0';
+
 	    if (*s) {
+		char *bold, *italic;
+
+		if (!((bold = strstr(s," bold"))))
+		    bold = strstr(s," Bold");
+
+		if (!((italic = strstr(s," italic"))))
+		    italic = strstr(s," Italic");
+
 		free(SVG_fontNameDef);
 		SVG_fontNameDef = s;
+		if (italic) {
+		    SVG_fontStyleDef = "italic";
+		    SVG_fontNameDef[strlen(s) - strlen(italic)] = NUL;
+		} else  {
+		    SVG_fontStyleDef = "normal";
+		}
+		if (bold) {
+		    SVG_fontWeightDef="bold";
+		    SVG_fontNameDef[strlen(s) - strlen(bold)] = NUL;
+		} else {
+		    SVG_fontWeightDef = "normal";
+		}
 	    } else
 		free(s);
 	    continue;
@@ -1259,8 +1292,8 @@ SVG_put_text (unsigned int x, unsigned int y, const char *str)
 	fprintf (gpoutfile, "%s", SVG_pens[SVG_Pen_RealID (SVG_LineType)].color);
 
     fprintf (gpoutfile,
-	     "; font-family:%s; font-size:%.2fpt; text-anchor:%s\">\n",
-	     SVG_fontNameCur, SVG_fontSizeCur, alignment);
+	     "; font-family:%s; font-size:%.2fpt; font-weight:%s; font-style:%s; text-anchor:%s\">\n",
+	     SVG_fontNameCur, SVG_fontSizeCur, SVG_fontWeightCur, SVG_fontStyleCur, alignment);
 
 /* output text (unless the enhanced_text processing is in action) */
 
@@ -1305,13 +1338,38 @@ SVG_set_font (const char *font)
 	free(SVG_fontNameCur);
 	SVG_fontNameCur = gp_strdup(SVG_fontNameDef);
 	SVG_fontSizeCur = SVG_fontSizeDef;
+	SVG_fontStyleCur = SVG_fontStyleDef;
+	SVG_fontWeightCur = SVG_fontWeightDef;
     } else {
-	int sep = strcspn(font,",");
+	char *bold, *italic; 
+	int sep;
+
+	if (!((bold = strstr(font," bold"))))
+	    bold = strstr(font," Bold");
+
+	if (!((italic = strstr(font," italic"))))
+	    italic = strstr(font," Italic");
+
+	sep = strcspn(font,",");
 	if (sep > 0) {
 	    free(SVG_fontNameCur);
 	    SVG_fontNameCur = gp_strdup(font);
+	    if (italic) {
+		SVG_fontStyleCur="italic";
+		SVG_fontNameCur[strlen(font) - strlen(italic)] = NUL;
+	    } else {
+		SVG_fontStyleCur="normal";
+	    }
+
+	    if (bold) {
+        	SVG_fontWeightCur="bold";
+		SVG_fontNameCur[strlen(font) - strlen(bold)] = NUL;
+            } else {
+		SVG_fontWeightCur="normal";
+	    }
 	    SVG_fontNameCur[sep] = NUL;
 	}
+
 	if (font[sep] == ',')
 	    sscanf(font + sep + 1, "%lf", &SVG_fontSizeCur);
     }
@@ -1596,6 +1654,10 @@ ENHsvg_OPEN(
 	    SVG_fontSizeCur = fontsize;
 	    fprintf(gpoutfile, " font-size=\"%.1fpt\"", SVG_fontSizeCur);
 	}
+	if (strcmp(SVG_fontWeightCur,"normal"))
+	    fprintf(gpoutfile, " font-weight=\"%s\" ", SVG_fontWeightCur);
+	if (strcmp(SVG_fontStyleCur,"normal"))
+	    fprintf(gpoutfile, " font-style=\"%s\" ", SVG_fontStyleCur);
 	if (ENHsvg_x_offset != 0) {
 	    fprintf(gpoutfile, " dx=\"%.2fem\"", ENHsvg_x_offset);
 	    ENHsvg_x_offset = 0.0;
