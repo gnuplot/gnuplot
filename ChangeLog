@@ -1,3 +1,9 @@
+2011-10-03  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/Makefile.maint: New target makefile.awc.
+
+	* src/makefile.all src/makefile.awc: Regenerated to include stats.c.
+
 2011-10-02  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* configure.in src/Makefile.am src/command.c src/command.h src/show.c
