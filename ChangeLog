@@ -1,3 +1,8 @@
+2011-10-03  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* term/win.trm (WIN_options): When searching the list of graph windows
+	the correct test is for window Id.
+
 2011-10-03  Rich Seymour  <richseymour@users.sourceforge.net>
 
 	* term/svg.trm: Look for strings " Bold" and/or " Italic" in font name
