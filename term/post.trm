@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: post.trm,v 1.261 2011/04/16 06:05:54 sfeam Exp $
+ * $Id: post.trm,v 1.262 2011/10/01 06:35:55 markisch Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -1024,13 +1024,15 @@ PS_options()
 	    ps_params->adobeglyphnames = FALSE;
 	    ++c_token;
 	    break;
-	case PS_BACKGROUND:
+	case PS_BACKGROUND: {
+	    int ps_background;
 	    c_token++;
-	    int ps_background = parse_color_name();
+	    ps_background = parse_color_name();
 	    ps_params->background.r = ((ps_background >> 16) & 0xff) / 255.0;
 	    ps_params->background.g = ((ps_background >> 8) & 0xff) / 255.0;
 	    ps_params->background.b = (ps_background & 0xff) / 255.0;
 	    break;
+	}
 	case PS_NOBACKGROUND:
 	    c_token++;
 	    ps_params->background.r = ps_params->background.g = ps_params->background.b = -1.0;

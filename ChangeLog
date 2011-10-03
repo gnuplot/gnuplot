@@ -1,5 +1,8 @@
 2011-10-03  Bastian Maerkisch  <bmaerkisch@web.de>
 
+	* term/post.trm (PS_options): Properly contain new variable in a
+	block. Bug #3417716
+
 	* src/Makefile.maint: New target makefile.awc.
 
 	* src/makefile.all src/makefile.awc: Regenerated to include stats.c.
