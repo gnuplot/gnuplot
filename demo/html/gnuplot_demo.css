@@ -41,6 +41,10 @@
  	border: 0;
 	}
 
+ TD     {
+ 	vertical-align: top;
+	}
+
  TD.TD0 { 
  	font-weight: bold; font-size: 67%; 
 	color:#006600; 

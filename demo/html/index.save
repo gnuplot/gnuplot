@@ -46,6 +46,7 @@ Interactive demo scripts are not included on this page.
     <li><a href="prob.html">probability (more)</a></li>
     <li><a href="random.html">random numbers</a></li>
     <li><a href="bivariat.html">recursion, etc...</a></li>
+    <li><a href="stats.html">data statistics</a></li>
     </ul>
 
     <h4>Animation</h4>
@@ -56,7 +57,7 @@ Interactive demo scripts are not included on this page.
 </td>
 
 <td rowspan=2>
-    <h4>Surfaces and<br>3D plotting</h4>
+    <h4>3D plots and surfaces</h4>
     <ul>
     <li><a href="surface1.html">surfaces 1</a></li>
     <li><a href="surface2.html">surfaces 2</a></li>
