@@ -32,6 +32,9 @@ makefile.all: Makefile.maint
 	 | tr @% '\012\012' >>$@t
 	@if cmp -s $@ $@t; then rm -f $@t; else mv $@t $@; fi
 
+makefile.awc: makefile.all
+	sed -e 's/\\/\&/g' makefile.all > $@
+
 version.c: ../VERSION ../PATCHLEVEL ../ChangeLog
 	@echo Making $@
 	@if [ "$(version)" != "$(file_version)" -o \
