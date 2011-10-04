@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: svg.trm,v 1.122 2011/09/04 02:05:24 sfeam Exp $
+ * $Id: svg.trm,v 1.123 2011/10/04 04:20:22 sfeam Exp $
  */
 
 /*------------------------------------------------------------------------------------------------------------------------------------
@@ -1654,9 +1654,9 @@ ENHsvg_OPEN(
 	    SVG_fontSizeCur = fontsize;
 	    fprintf(gpoutfile, " font-size=\"%.1fpt\"", SVG_fontSizeCur);
 	}
-	if (strcmp(SVG_fontWeightCur,"normal"))
+	if (SVG_fontWeightCur && strcmp(SVG_fontWeightCur,"normal"))
 	    fprintf(gpoutfile, " font-weight=\"%s\" ", SVG_fontWeightCur);
-	if (strcmp(SVG_fontStyleCur,"normal"))
+	if (SVG_fontStyleCur && strcmp(SVG_fontStyleCur,"normal"))
 	    fprintf(gpoutfile, " font-style=\"%s\" ", SVG_fontStyleCur);
 	if (ENHsvg_x_offset != 0) {
 	    fprintf(gpoutfile, " dx=\"%.2fem\"", ENHsvg_x_offset);
