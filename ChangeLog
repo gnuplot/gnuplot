@@ -1,3 +1,8 @@
+2011-10-06  Shigeharu Takeno  <shige@iee.niit.ac.jp>
+
+	* src/internal.c (f_sprintf): Always null-terminal a string written by
+	the non-ANSI compliant MSVC++ routine _snprintf().
+
 2011-10-03  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* term/win.trm (WIN_options): When searching the list of graph windows
