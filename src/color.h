@@ -1,5 +1,5 @@
 /*
- * $Id: color.h,v 1.33 2010/06/28 19:07:52 sfeam Exp $
+ * $Id: color.h,v 1.34 2010/09/09 04:08:19 sfeam Exp $
  */
 
 /* GNUPLOT - color.h */
@@ -79,8 +79,9 @@ typedef enum {
     SMPAL_COLOR_MODE_GRAY = 'g',      /* grayscale only */
     SMPAL_COLOR_MODE_RGB = 'r',       /* one of several fixed transforms */
     SMPAL_COLOR_MODE_FUNCTIONS = 'f', /* user defined transforms */
-    SMPAL_COLOR_MODE_GRADIENT = 'd'   /* interpolated table:
+    SMPAL_COLOR_MODE_GRADIENT = 'd',  /* interpolated table:
 				       * explicitly defined or read from file */
+    SMPAL_COLOR_MODE_CUBEHELIX = 'c'
 } palette_color_mode;
 
 
@@ -189,8 +190,14 @@ typedef struct {
   struct udft_entry Bfunc;  /* G for RGB, S for HSV, M for CMY, ... */
   struct udft_entry Cfunc;  /* B for RGB, V for HSV, Y for CMY, ... */
 
-  /* gamma for gray scale palettes only */
+  /* gamma for gray scale and cubehelix palettes only */
   double gamma;
+
+  /* control parameters for the cubehelix palette scheme */
+  double cubehelix_start;	/* offset (radians) from colorwheel 0 */
+  double cubehelix_cycles;	/* number of times round the colorwheel */
+  double cubehelix_saturation;	/* color saturation */
+
 } t_sm_palette;
 
 

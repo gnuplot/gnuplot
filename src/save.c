@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.193 2011/05/11 05:18:41 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.194 2011/07/12 19:30:34 juhaszp Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -906,6 +906,11 @@ set origin %g,%g\n",
       case SMPAL_COLOR_MODE_FUNCTIONS:
 	fprintf( fp, "functions %s, %s, %s\n", sm_palette.Afunc.definition,
 		 sm_palette.Bfunc.definition, sm_palette.Cfunc.definition );
+	break;
+      case SMPAL_COLOR_MODE_CUBEHELIX:
+	fprintf( fp, "cubehelix start %.2g cycles %.2g saturation %.2g\n",
+		sm_palette.cubehelix_start, sm_palette.cubehelix_cycles,
+		sm_palette.cubehelix_saturation);
 	break;
       default:
 	fprintf( stderr, "%s:%d ooops: Unknown color mode '%c'.\n",

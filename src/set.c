@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.344 2011/07/22 14:37:57 juhaszp Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.345 2011/08/27 17:53:47 juhaszp Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -3082,6 +3082,34 @@ set_palette()
 		pm3d_last_set_palette_mode = SMPAL_COLOR_MODE_RGB;
 		continue;
 	    } /* rgbformulae */
+	    /* rgb color mapping based on the "cubehelix" scheme proposed by */
+	    /* D A Green (2011)  http://arxiv.org/abs/1108.5083		     */
+	    case S_PALETTE_CUBEHELIX: { /* cubehelix */
+		TBOOLEAN done = FALSE;
+		sm_palette.colorMode = SMPAL_COLOR_MODE_CUBEHELIX;
+		sm_palette.cubehelix_start = 0.5;
+		sm_palette.cubehelix_cycles = -1.5;
+		sm_palette.cubehelix_saturation = 1.0;
+		c_token++;
+		do {
+		    if (equals(c_token,"start")) {
+			c_token++;
+			sm_palette.cubehelix_start = real_expression();
+		    }
+		    else if (almost_equals(c_token,"cyc$les")) {
+			c_token++;
+			sm_palette.cubehelix_cycles = real_expression();
+		    }
+		    else if (almost_equals(c_token, "sat$uration")) {
+			c_token++;
+			sm_palette.cubehelix_saturation = real_expression();
+		    }
+		    else
+			done = TRUE;
+		} while (!done);
+		--c_token;
+		continue;
+	    } /* cubehelix */
 	    case S_PALETTE_DEFINED: { /* "def$ine" */
 		CHECK_TRANSFORM;
 		++c_token;

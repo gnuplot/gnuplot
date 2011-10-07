@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: getcolor.c,v 1.30 2011/08/30 04:11:04 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: getcolor.c,v 1.31 2011/09/04 11:06:19 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - getcolor.c */
@@ -100,6 +100,9 @@ palettes_differ(t_sm_palette *p1, t_sm_palette *p2)
 	    if (p1->gradient[i].col.b != p2->gradient[i].col.b)
 		return 1;
 	}
+	break;
+    case SMPAL_COLOR_MODE_CUBEHELIX:
+	return 1;
 	break;
     } /* case GRADIENT */
     } /* switch() */
@@ -249,6 +252,21 @@ color_components_from_gray(double gray, rgb_color *color)
 	calculate_color_from_formulae(gray, color);
 	break;
 #endif /* !GPLT_X11_MODE */
+    case SMPAL_COLOR_MODE_CUBEHELIX: {
+	double phi, a;
+	phi = 2. * M_PI * (sm_palette.cubehelix_start/3.
+			+  gray * sm_palette.cubehelix_cycles);
+	if (sm_palette.gamma != 1.0)
+	    gray = pow(gray, 1./sm_palette.gamma);
+	a = sm_palette.cubehelix_saturation * gray * (1.-gray) / 2.;
+	color->r = gray + a * (-0.14861 * cos(phi) + 1.78277 * sin(phi));
+	color->g = gray + a * (-0.29227 * cos(phi) - 0.90649 * sin(phi));
+	color->b = gray + a * ( 1.97294 * cos(phi));
+	if (color->r > 1.0) color->r = 1.0; if (color->r < 0.0) color->r = 0.0;
+	if (color->g > 1.0) color->g = 1.0; if (color->g < 0.0) color->g = 0.0;
+	if (color->b > 1.0) color->b = 1.0; if (color->b < 0.0) color->b = 0.0;
+	}	
+	break;
     default:
 	fprintf(stderr, "%s:%d ooops: Unknown colorMode '%c'.\n",
 		__FILE__, __LINE__, (char)(sm_palette.colorMode));
@@ -673,8 +691,8 @@ GetColorValueFromFormula(int formula, double x)
 	break;
 	/*
 	   IMPORTANT: if any new formula is added here, then:
-	   (1) its postscript counterpart must be added into term/post.trm,
-	   search for "ps_math_color_formulae[]"
+	   (1) its postscript counterpart must be added to the array
+	   ps_math_color_formulae[] below.
 	   (2) number of colours must be incremented in color.c: variable
 	   sm_palette, first item---search for "t_sm_palette sm_palette = "
 	 */

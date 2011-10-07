@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: post.trm,v 1.262 2011/10/01 06:35:55 markisch Exp $
+ * $Id: post.trm,v 1.263 2011/10/03 14:08:37 markisch Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -2847,6 +2847,7 @@ PS_make_header(t_sm_palette *palette)
     case SMPAL_COLOR_MODE_RGB:
 	make_palette_formulae();
 	break;
+    case SMPAL_COLOR_MODE_CUBEHELIX:
     case SMPAL_COLOR_MODE_FUNCTIONS: {
 	int cnt=0;
 	gradient_struct *gradient;

@@ -33,6 +33,7 @@ New features, changes and fixes since gnuplot version 4.4
 * NEW mouse tracking for SVG terminal
 * NEW tab-completion for builtin readline
 * NEW windows terminal can save graph as EMF file
+* NEW cubehelix scheme for color palettes
 * FIX length estimation of UTF-8 strings
 * FIX accurate placement of color boundaries in the colorbar
 * FIX Built-in readline handles UTF-8 encoding

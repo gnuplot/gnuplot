@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.208 2011/08/29 17:27:00 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.209 2011/09/06 03:17:00 sfeam Exp $"); }
 #endif
 
 #define X11_POLYLINE 1
@@ -1263,6 +1263,8 @@ scan_palette_from_buf(void)
 
     /* function palettes are transmitted as approximated gradients: */
     if (tpal.colorMode == SMPAL_COLOR_MODE_FUNCTIONS)
+      tpal.colorMode = SMPAL_COLOR_MODE_GRADIENT;
+    if (tpal.colorMode == SMPAL_COLOR_MODE_CUBEHELIX)
       tpal.colorMode = SMPAL_COLOR_MODE_GRADIENT;
 
     switch( tpal.colorMode ) {

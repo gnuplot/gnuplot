@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.691 2011/10/03 00:17:21 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.692 2011/10/04 15:20:49 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -10175,6 +10175,7 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/population.gif" alt="[popu
                     | file '<filename>' {datafile-modifiers}
                     | functions <R>,<G>,<B>
                   }
+                  { cubehelix {start <val>} {cycles <val>} {saturation <val>} }
                   { model { RGB | HSV | CMY | YIQ | XYZ } }
                   { positive | negative }
                   { nops_allcF | ps_allcF }
@@ -10235,8 +10236,8 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/population.gif" alt="[popu
  gray palette to the last color mapping.
 
  Automatic gamma correction via `set palette gamma <gamma>` can be done for
- gray maps only (`set palette gray`).  Linear mapping to gray is for gamma
- equals 1, see `test palette`.  Gamma is ignored for color mappings.
+ gray maps (`set palette gray`) and for the `cubehelix` color palette schemes.
+ Gamma = 1 produces a linear ramp of intensity. See `test palette`.
 
  Many terminals support only discrete number of colors (e.g. 256 colors in gif).
  After the default gnuplot linetype colors are allocated, the rest of the
@@ -10399,6 +10400,23 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/population.gif" alt="[popu
        color(gray) = gray**(1./gamma)
        set palette model RGB functions color(gray), color(gray), color(gray)
 
+4 cubehelix
+?commands set palette cubehelix
+?set palette cubehelix
+?cubehelix
+ The "cubehelix" option defines a family of palettes in which color (hue) varies
+ along the standard color wheel while at the same time the net intensity 
+ increases monotonically as the gray value goes from 0 to 1.
+       D A Green (2011) http://arxiv.org/abs/1108.5083
+ `start` defines the starting point along the color wheel in radians.
+ `cycles` defines how many color wheel cycles span the palette range.
+ Larger values of `saturation` produce more saturated color; saturation > 1
+ may lead to clipping of the individual RGB components and to intensity
+ becoming non-monotonic. The palette is also affected by `set palette gamma`.
+ The default values are
+       set palette cubehelix start 0.5 cycles -1.5 saturation 1
+       set palette gamma 1.5
+
 4 file
 ?commands set palette file
 ?set palette file
@@ -10444,10 +10462,9 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/population.gif" alt="[popu
  <gamma>`.  <gamma> defaults to 1.5 which is quite suitable for most
  terminals.
 
- For color mappings no automatic gamma correction is done by gnuplot.  However,
- you may easily implement gamma correction.  Here is an example for a gray
- scale image by use of explicit functions for the red, green and blue component
- with slightly different values of gamma
+ The gamma correction is applied to the cubehelix color palette family, but not
+ to other palette coloring schemes. However, you may easily implement gamma
+ correction for explicit color functions.
 
  Example:
        set palette model RGB
@@ -13070,12 +13087,11 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/splot.gif" alt="[splot.gif
  useful things appropriate for and supported by the `terminal` you are just
  using.
 
- `test palette` draws graphically profiles R(z),G(z),B(z), where 0<=z<=1, as
- calculated by the current color `palette`. In other words, it is a beautiful
- plot you would have to construct from the result of `show palette palette 256 float`.
- The optional parameter, a permutation of letters rgb, determines the sequence of
- r,g,b profiles drawn one after the other --- try this yourself for `set palette
- gray`. The default sequence is rgb.
+ `test palette` plots profiles of R(z),G(z),B(z), where 0<=z<=1. These are the
+ RGB components of the current color `palette`. It also plots the apparent net
+ intensity as calculated using NTSC coefficients to map RGB onto a grayscale.
+ The optional parameter, a permutation of letters rgb, determines the sequence in
+ which the r,g,b profiles are drawn.
 2 undefine
 ?commands undefine
 ?undefine

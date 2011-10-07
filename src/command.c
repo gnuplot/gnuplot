@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.225 2011/09/08 05:19:07 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.226 2011/10/03 00:17:22 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -1818,7 +1818,7 @@ test_palette_subcommand()
 
     double gray, z[test_palette_colors];
     rgb_color rgb1[test_palette_colors];
-    int i;
+    int i, k;
     static const char pre1[] = "\
 reset;set multi;\
 uns border;uns key;set tic in;uns xtics;uns ytics;\
@@ -1903,9 +1903,10 @@ title 'R,G,B profiles of the current color palette';";
 	    break;
 	} /* switch(order[i]) */
     } /* for (i) */
+    fputs(", '-' w l title 'NTSC' lt -1", f);
     fputs("\n", f);
     for (i = 0; i < 3; i++) {
-	int k, c = order[i];
+	int c = order[i];
 
 	for (k = 0; k < test_palette_colors; k++) {
 	    double rgb = (c=='r')
@@ -1916,6 +1917,13 @@ title 'R,G,B profiles of the current color palette';";
 	}
 	fputs("e\n", f);
     }
+    for (k = 0; k < test_palette_colors; k++) {
+	double ntsc = 0.299 * rgb1[k].r
+		    + 0.587 * rgb1[k].g
+		    + 0.114 * rgb1[k].b;
+	fprintf(f, "%0.4f\t%0.4f\n", z[k], ntsc);
+    }
+    fputs("e\n", f);
     fputs(post, f);
 
     /* save current gnuplot 'set' status because of the tricky sets 

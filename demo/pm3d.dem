@@ -1,5 +1,5 @@
 #
-# $Id: pm3d.dem,v 1.19 2007/01/19 18:03:34 mikulik Exp $
+# $Id: pm3d.dem,v 1.20 2007/03/04 06:06:39 sfeam Exp $
 #
 # demo for pm3d splotting
 #
@@ -91,10 +91,6 @@ set samples 50; set isosamples 50
 replot
 pause -1 "Hit return to continue"
 
-set title "Show underlying rgbformulae contributing to palette"
-test palette
-pause -1 "Hit return to continue"
-
 set title "colour, rgbformulae 3,11,6 ... green-red-violet"
 set palette rgbformulae 3,11,6
 replot
@@ -108,6 +104,14 @@ pause -1 "Hit return to continue"
 set title "colour, rgbformulae 30,31,32 ... color printable on gray (black-blue-violet-yellow-white)"
 set palette rgbformulae 30,31,32
 replot
+pause -1 "Hit return to continue"
+
+set title "cubehelix color scheme with monotonic intensity\nD A Green (2011) http://arxiv.org/abs/1108.5083" offset 0,1
+set palette cubehelix
+replot
+pause -1 "Hit return to continue"
+
+test palette
 pause -1 "Hit return to continue"
 
 set title "rgbformulae 31,-11,32: negative formula number=inverted color"

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.254 2011/09/07 18:44:56 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.255 2011/10/03 00:17:22 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -2283,7 +2283,7 @@ show_palette()
 	    fputs( "\tcolor mapping by defined gradient\n", stderr );
 	    break;
 	  case SMPAL_COLOR_MODE_FUNCTIONS:
-	    fputs("\tcolor maping is done by user defined functions\n",stderr);
+	    fputs("\tcolor mapping is done by user defined functions\n",stderr);
 	    if (sm_palette.Afunc.at && sm_palette.Afunc.definition)
 	        fprintf( stderr, "\t  A-formula: %s\n",
 			 sm_palette.Afunc.definition);
@@ -2293,6 +2293,11 @@ show_palette()
 	    if (sm_palette.Cfunc.at && sm_palette.Cfunc.definition)
 	        fprintf( stderr, "\t  C-formula: %s\n",
 			 sm_palette.Cfunc.definition);
+	    break;
+	  case SMPAL_COLOR_MODE_CUBEHELIX:
+	    fprintf(stderr, "\tCubehelix color palette: start %g cycles %g saturation %g\n",
+			sm_palette.cubehelix_start, sm_palette.cubehelix_cycles,
+			sm_palette.cubehelix_saturation);
 	    break;
 	  default:
 	    fprintf( stderr, "%s:%d oops: Unknown color mode '%c'.\n",
@@ -2380,7 +2385,7 @@ show_colorbox()
 	    fputs("at DEFAULT position\n", stderr);
 	    break;
 	case SMCOLOR_BOX_USER:
-	    fputs("at USER position: ", stderr);
+	    fputs("at USER origin: ", stderr);
 	    show_position(&color_box.origin);
 	    fputs("\n\t          size: ", stderr);
 	    show_position(&color_box.size);

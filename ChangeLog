@@ -1,3 +1,15 @@
+2011-10-07  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/color.h src/command.c src/getcolor.c src/gplt_x11.c src/save.c
+	src/set.c src/show.c src/tables.c src/tables.h term/post.trm
+	term/x11.trm demo/pm3d.dem docs/gnuplot.doc:
+
+	New palette option "cubehelix". The is a family of palettes with the
+	general property of combining N cycles of a color-wheel with a monotonic
+	increase in overall intensity. This feature was suggested by Ingo Thies.
+	See: D A Green (2011) "A colour scheme for the display of astronomical
+	intensity images" http://arxiv.org/abs/1108.5083
+
 2011-10-06  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* src/internal.c (f_sprintf): Always null-terminal a string written by
