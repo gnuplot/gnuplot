@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: internal.c,v 1.64 2011/08/01 05:14:23 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: internal.c,v 1.65 2011/10/07 15:24:36 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - internal.c */
@@ -1213,6 +1213,7 @@ f_sprintf(union argument *arg)
     int prev_pos;
     int i, remaining;
     int nargs = 0;
+    int save_errno;
     enum DATA_TYPES spec_type;
 
     /* Retrieve number of parameters from top of stack */
@@ -1281,6 +1282,7 @@ f_sprintf(union argument *arg)
 
 #ifdef HAVE_SNPRINTF
 	/* Use the format to print next arg */
+	save_errno = errno;
 	switch(spec_type) {
 	case INTGR:
 	    snprintf(outpos,bufsize-(outpos-buffer),
@@ -1297,9 +1299,9 @@ f_sprintf(union argument *arg)
 	default:
 	    int_error(NO_CARET,"internal error: invalid spec_type");
 	}
-#if VCPP
-       buffer[bufsize-1] = '\0';	/* shige : VC++ is not ANSI-compliant */
-       if (errno == ERANGE) errno = 0;	/* shige : This also is non-ANSI      */
+#if _MSC_VER
+       buffer[bufsize-1] = '\0';	/* VC++ is not ANSI-compliant */
+       if (errno == ERANGE) errno = save_errno;
 #endif 
 
 #else

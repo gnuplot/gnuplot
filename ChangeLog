@@ -1,3 +1,7 @@
+2011-10-09  Shigeharu Takeno  <shige@iee.niit.ac.jp>
+
+	* src/internal.c (f_sprintf): More complete MSVC++ snprintf() patch.
+
 2011-10-09  Adam Strzelecki  <ono@users.sourceforge.net>
 
 	* src/wxterminal/wxt_gui.h src/wxterminal/wxt_gui.cpp:
