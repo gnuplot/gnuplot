@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.cpp,v 1.86 2011/07/25 05:49:29 sfeam Exp $
+ * $Id: wxt_gui.cpp,v 1.87 2011/08/03 05:33:37 sfeam Exp $
  */
 
 /* GNUPLOT - wxt_gui.cpp */
@@ -279,7 +279,12 @@ bool wxtApp::OnInit()
 void wxtApp::LoadPngIcon(const unsigned char *embedded_png, int length, int icon_number)
 {
 	wxMemoryInputStream pngstream(embedded_png, length);
+#ifdef __WXOSX_COCOA__
+	/* 16x16 bitmaps on wxCocoa cause blurry toolbar images, resize them to 24x24 */
+	toolBarBitmaps[icon_number] = new wxBitmap(wxImage(pngstream, wxBITMAP_TYPE_PNG).Resize(wxSize(24, 24), wxPoint(4, 4)));
+#else
 	toolBarBitmaps[icon_number] = new wxBitmap(wxImage(pngstream, wxBITMAP_TYPE_PNG));
+#endif
 }
 
 /* load a cursor */
@@ -381,7 +386,12 @@ wxtFrame::wxtFrame( const wxString& title, wxWindowID id )
 	toolbar->AddTool(Toolbar_CopyToClipboard, wxT("Copy"),
 				*(toolBarBitmaps[0]), wxT("Copy the plot to clipboard"));
 #ifdef USE_MOUSE
+#ifdef __WXOSX_COCOA__
+	/* wx 2.9 Cocoa bug & crash workaround for Lion, which does not have toolbar separators anymore */
+	toolbar->AddStretchableSpace();
+#else
 	toolbar->AddSeparator();
+#endif
 	toolbar->AddTool(Toolbar_Replot, wxT("Replot"),
 				*(toolBarBitmaps[1]), wxT("Replot"));
 	toolbar->AddTool(Toolbar_ToggleGrid, wxT("Toggle grid"),
@@ -393,7 +403,12 @@ wxtFrame::wxtFrame( const wxString& title, wxWindowID id )
 	toolbar->AddTool(Toolbar_Autoscale, wxT("Autoscale"),
 				*(toolBarBitmaps[5]), wxT("Apply autoscale"));
 #endif /*USE_MOUSE*/
+#ifdef __WXOSX_COCOA__
+	/* wx 2.9 Cocoa bug & crash workaround for Lion, which does not have toolbar separators anymore */
+	toolbar->AddStretchableSpace();
+#else
 	toolbar->AddSeparator();
+#endif
 	toolbar->AddTool(Toolbar_Config, wxT("Terminal configuration"),
 				*(toolBarBitmaps[6]), wxT("Open configuration dialog"));
 	toolbar->AddTool(Toolbar_Help, wxT("Help"),
@@ -547,6 +562,10 @@ void wxtFrame::OnSize( wxSizeEvent& event )
 	 * So we must check for the panel to be properly initialized before.*/
 	if (panel)
 		panel->SetSize( this->GetClientSize() );
+#ifdef __WXOSX_COCOA__
+	/* wx 2.9 Cocoa bug workaround, that does not adjust layout for status bar on resize */
+	PositionStatusBar();
+#endif
 }
 
 /* wrapper for AddPendingEvent or ProcessEvent */
@@ -750,7 +769,10 @@ void wxtPanel::DrawToDC(wxDC &dc, wxRegion &region)
 		tmp_pen = wxPen(wxT("black"), 1, wxSOLID);
 		tmp_pen.SetCap( wxCAP_ROUND );
 		dc.SetPen( tmp_pen );
+#ifndef __WXOSX_COCOA__
+		/* wx 2.9 Cocoa bug workaround, which has no logical functions support */
 		dc.SetLogicalFunction( wxINVERT );
+#endif
 		dc.DrawLine( zoom_x1, zoom_y1, mouse_x, zoom_y1 );
 		dc.DrawLine( mouse_x, zoom_y1, mouse_x, mouse_y );
 		dc.DrawLine( mouse_x, mouse_y, zoom_x1, mouse_y );
@@ -784,7 +806,10 @@ void wxtPanel::DrawToDC(wxDC &dc, wxRegion &region)
 		tmp_pen = wxPen(wxT("black"), 1, wxSOLID);
 		tmp_pen.SetCap(wxCAP_BUTT);
 		dc.SetPen( tmp_pen );
+#ifndef __WXOSX_COCOA__
+		/* wx 2.9 Cocoa bug workaround, which has no logical functions support */
 		dc.SetLogicalFunction( wxINVERT );
+#endif
 		dc.CrossHair( (int)wxt_ruler_x, (int)wxt_ruler_y );
 		dc.SetLogicalFunction( wxCOPY );
 	}
@@ -793,7 +818,10 @@ void wxtPanel::DrawToDC(wxDC &dc, wxRegion &region)
 		tmp_pen = wxPen(wxT("black"), 1, wxSOLID);
 		tmp_pen.SetCap(wxCAP_BUTT);
 		dc.SetPen( tmp_pen );
+#ifndef __WXOSX_COCOA__
+		/* wx 2.9 Cocoa bug workaround, which has no logical functions support */
 		dc.SetLogicalFunction( wxINVERT );
+#endif
 		dc.DrawLine((int)wxt_ruler_x, (int)wxt_ruler_y, mouse_x, mouse_y);
 		dc.SetLogicalFunction( wxCOPY );
 	}

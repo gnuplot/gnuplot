@@ -1,3 +1,14 @@
+2011-10-09  Adam Strzelecki  <ono@users.sourceforge.net>
+
+	* src/wxterminal/wxt_gui.h src/wxterminal/wxt_gui.cpp:
+	Work around a number of issues compiling and running wxt with wx 2.9
+	using 64-bit Cocoa on OSX Lion. All changes are #ifdef __WXOSX_COCOA__.
+	These may not be necessary once Cocoa reaches a stable release. 
+	(1) use wxToolbar AddStretchableSpace rather than AddSeparator 
+	(2) wx Cocoa does not support logical operators such as wxDC inverse
+	(3) wx Cocoa toolbar icons are blurry unless they are 24x24
+	(4) wx Cocoa does not define _Bool even though it says it does
+
 2011-10-07  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/color.h src/command.c src/getcolor.c src/gplt_x11.c src/save.c
