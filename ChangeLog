@@ -1,3 +1,9 @@
+2011-10-10  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/hidden3d.c: Bump default QUADTREE_GRANULARITY from 10 to 30.
+	At 10, 24% of the CPU time for all.dem is spent in hidden line removal.
+	At 30 this decreases to 12%, for roughly a 10% speed increase overall.
+
 2011-10-10  Peter Juhasz  <juhaszp@users.sourceforge.net>
 
 	* src/datafile.c src/datafile.h src/gadgets.h src/graphics.c

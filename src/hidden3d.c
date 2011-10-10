@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.80 2011/07/25 06:51:29 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.81 2011/09/08 05:44:03 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - hidden3d.c */
@@ -253,11 +253,14 @@ typedef struct qtreelist {
 } qtreelist;
 typedef qtreelist GPHUGE *p_qtreelist;
 
-/* the number of cells in x and y direction: */
+/* The quadtree algorithm sorts the objects into lists indexed by x/y.     */
+/* The number of cells in x and y direction has a huge effect on run time. */
+/* If the granularity is 10, 24% of the CPU time for all.dem is spent in   */
+/* the routine in_front().  If granularity is bumped to 40 this goes down  */
+/* to 12%.  The tradeoff is increased size of the quadtree array.	   */
 # ifndef QUADTREE_GRANULARITY
-#  define QUADTREE_GRANULARITY 10
+#  define QUADTREE_GRANULARITY 30
 # endif
-/* indices of the heads of all the cells' chains: */
 static long quadtree[QUADTREE_GRANULARITY][QUADTREE_GRANULARITY];
 
 /* and a routine to calculate the cells' position in that array: */
