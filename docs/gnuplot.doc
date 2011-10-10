@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.692 2011/10/04 15:20:49 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.693 2011/10/08 00:07:40 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -2984,6 +2984,22 @@ Ffigure_boxplot
      # Same plot but suppress outliers and force the width of the boxplot to 0.3
      set style boxplot nooutliers
      plot 'data' using (1.0):5:(0.3)
+
+ By default only one boxplot is produced that represents all y values from the
+ second column of the using specification. However, an additional (fourth) 
+ colunm can be added to the specification. If present, the values of that
+ column will be interpreted as the discrete levels of a factor variable.
+ As many boxplots will be drawn as there are levels in the factor variable.
+ The separation between these boxplots is 1.0 by default, but it can be changed
+ by `set style boxplot separation`. By default, the value of the factor variable
+ is shown as a tic label below (or above) each boxplot.
+
+ Example
+
+     # Suppose that column 2 of 'data' contains either "control" or "treatment"
+     # The following example produces two boxplots, one for each level of the
+     # factor
+     plot 'data' using (1.0):5:(0):2
 
  The default width of the box can be set via `set boxwidth <width>` or may be
  specified as an optional 3rd column in the `using` clause of the plot command.
@@ -10887,6 +10903,9 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/population.gif" alt="[popu
        set style boxplot {range <r> | fraction <f>}
                          {{no}outliers} {pointtype <p>}
                          {candlesticks | financebars}
+                         {separation <x>}
+                         {labels off | auto | x | x2}
+                         {sorted | unsorted}
 
  The box in the boxplot always spans the range of values from the first
  quartile to the third quartile of the data points.  The limit of the whiskers
@@ -10912,6 +10931,30 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/population.gif" alt="[popu
 
  By default boxplots are drawn in a style similar to candlesticks, but you have
  the option of using instead a style similar to finance bars.
+ 
+ If the using specification for a boxplot contains a fourth column, the values
+ in that column will be interpreted as the discrete leveles of a factor 
+ variable.  In this case more than one boxplots may be drawn, as many as the
+ number of levels of the factor variable.  These boxplots will be drawn next to
+ each other, the distance between them is 1.0 by default (in x-axis units).
+ This distance can be changed by the option `separation`.
+ 
+ The `labels` option governs how and where these boxplots (each representing a
+ part of the dataset) are labeled.  By default the value of the factor is put 
+ as a tick label on the horizontal axis -- x or x2, depending on which one is
+ used for the plot itself.  This setting corresponds to option `labels auto`.
+ The labels can be forced to use either of the x or x2 axes -- options
+ `labels x` and `labels x2`, respectively --, or they can be turned off
+ altogether with the option `labels off`.
+ 
+ By default the boxplots corresponding to different levels of the factor
+ variable are not sorted; they will be drawn in the same order the levels are
+ encountered in the data file. This behavior corresponds to the `unsorted`
+ option. If the `sorted` option is active, the levels are first sorted
+ alphabetically, and the boxplots are drawn in the sorted order.
+
+ The `separation`, `labels`, `sorted` and `unsorted` option only have an effect
+ if a fourth column is given the plot specification.
 
  See `boxplot`, `candlesticks`, `financebars`.
 

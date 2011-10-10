@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.376 2011/09/09 17:28:30 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.377 2011/09/29 18:48:57 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -130,6 +130,7 @@ static void plot_vectors __PROTO((struct curve_points * plot));
 static void plot_f_bars __PROTO((struct curve_points * plot));
 static void plot_c_bars __PROTO((struct curve_points * plot));
 static void plot_boxplot __PROTO((struct curve_points * plot));
+static int filter_boxplot_factor __PROTO((struct curve_points *plot, int level));
 
 static void place_labels __PROTO((struct text_label * listhead, int layer, TBOOLEAN clip));
 static void place_arrows __PROTO((int layer));
@@ -4322,141 +4323,189 @@ filter_boxplot(struct curve_points *plot)
     return N;
 }
 
+static int
+filter_boxplot_factor(struct curve_points *plot, int level)
+{
+    int i, real_level;
+    int N = plot->p_count;
+
+    /* Do we have to show the boxplots in alphabetical order of factors? */
+    if (boxplot_opts.sort_factors && plot->boxplot_factor_order)
+	real_level = plot->boxplot_factor_order[level];
+    else
+	real_level = level;
+
+    /* If the factor doesn't match, 
+     * change the point to undefined and force it to the end of the list */
+    for (i=0; i<N; i++) {
+	plot->points[i].y = plot->points[i].yhigh;
+	plot->points[i].type = INRANGE;
+	if (plot->points[i].ylow != real_level) {
+	    plot->points[i].type = UNDEFINED;
+	    plot->points[i].y = VERYLARGE;
+	    FPRINTF((stderr, "filter_boxplot_factor: rejecting point: level %d, factor %g, i %d\n", level, plot->points[i].ylow, i));
+	}
+    }
+
+    /* Sort the points to find median and quartiles */
+    qsort(plot->points, N, sizeof(struct coordinate), compare_ypoints);
+
+    /* Remove any undefined points */
+    while (plot->points[N-1].type == UNDEFINED)
+	N--;
+    plot->p_count = N;
+
+    return N;
+}
+
 static void
 plot_boxplot(struct curve_points *plot)
 {
     int N;
+    int saved_p_count;
     struct coordinate *save_points = plot->points;
     struct coordinate candle;
     double median, quartile1, quartile3;
     double whisker_top, whisker_bot;
+    int level;
+    int levels = plot->boxplot_factors;
+    if (levels == 0)
+	levels = 1;
+    saved_p_count = plot->p_count;
 
-    /* Sort the points and get rid of any that are undefined */
-    /* EAM Feb 2011:  Move this to boxplot_range_fiddling()  */
-    /* N = filter_boxplot(plot);                             */
-    N = plot->p_count;
+    for (level=0; level<levels; level++) {
+	/* Sort the points and get rid of any that are undefined */
+	/* EAM Feb 2011:  Move this to boxplot_range_fiddling()  */
+	/* N = filter_boxplot(plot);                             */
+	/* but we need filtering to make factored boxplots work:        */
+	if (levels > 1) {
+	    plot->p_count = saved_p_count;
+	    N = filter_boxplot_factor(plot, level);
+	}
+	else
+	    N = plot->p_count;
 
-    /* Not enough points left to make a boxplot */
-    if (N < 4) {
-	candle.x = plot->points->x;
-	candle.yhigh = -VERYLARGE;
-	candle.ylow = VERYLARGE;
-	goto outliers;
-    }
+	/* Not enough points left to make a boxplot */
+	if (N < 4) {
+	    candle.x = plot->points->x + boxplot_opts.separation * level;
+	    candle.yhigh = -VERYLARGE;
+	    candle.ylow = VERYLARGE;
+	    goto outliers;
+	}
 
-    if ((N & 0x1) == 0)
-	median = 0.5 * (plot->points[N/2 - 1].y + plot->points[N/2].y);
-    else
-	median = plot->points[(N-1)/2].y;
-    if ((N & 0x3) == 0)
-	quartile1 = 0.5 * (plot->points[N/4 - 1].y + plot->points[N/4].y);
-    else
-	quartile1 = plot->points[(N+3)/4 - 1].y;
-    if ((N & 0x3) == 0)
-	quartile3 = 0.5 * (plot->points[N - N/4].y + plot->points[N - N/4 - 1].y);
-    else
-	quartile3 = plot->points[N - (N+3)/4].y;
+	if ((N & 0x1) == 0)
+	    median = 0.5 * (plot->points[N/2 - 1].y + plot->points[N/2].y);
+	else
+	    median = plot->points[(N-1)/2].y;
+	if ((N & 0x3) == 0)
+	    quartile1 = 0.5 * (plot->points[N/4 - 1].y + plot->points[N/4].y);
+	else
+	    quartile1 = plot->points[(N+3)/4 - 1].y;
+	if ((N & 0x3) == 0)
+	    quartile3 = 0.5 * (plot->points[N - N/4].y + plot->points[N - N/4 - 1].y);
+	else
+	    quartile3 = plot->points[N - (N+3)/4].y;
 
-    FPRINTF((stderr,"Boxplot: quartile boundaries for %d points: %g %g %g\n",
-		N, quartile1, median, quartile3));
+	    FPRINTF((stderr,"Boxplot: quartile boundaries for %d points: %g %g %g\n",
+			N, quartile1, median, quartile3));
 
-    /* Set the whisker limits based on the user-defined style */
-    if (boxplot_opts.limit_type == 0) {
-	/* Fraction of interquartile range */
-	double whisker_len = boxplot_opts.limit_value * (quartile3 - quartile1);
-	int i;
-	whisker_bot = quartile1 - whisker_len;
-	for (i=0; i<N; i++)
-	    if (plot->points[i].y >= whisker_bot) {
-		whisker_bot = plot->points[i].y;
-		break;
-	    }
-	whisker_top = quartile3 + whisker_len;
-	for (i=N-1; i>= 0; i--)
-	    if (plot->points[i].y <= whisker_top) {
-		whisker_top = plot->points[i].y;
-		break;
-	    }
+	/* Set the whisker limits based on the user-defined style */
+	if (boxplot_opts.limit_type == 0) {
+	    /* Fraction of interquartile range */
+	    double whisker_len = boxplot_opts.limit_value * (quartile3 - quartile1);
+	    int i;
+	    whisker_bot = quartile1 - whisker_len;
+	    for (i=0; i<N; i++)
+		if (plot->points[i].y >= whisker_bot) {
+		    whisker_bot = plot->points[i].y;
+		    break;
+		}
+	    whisker_top = quartile3 + whisker_len;
+	    for (i=N-1; i>= 0; i--)
+		if (plot->points[i].y <= whisker_top) {
+		    whisker_top = plot->points[i].y;
+		    break;
+		}
 
-    } else {
-	/* Set limits to include some fraction of the total number of points. */
-	/* The limits are symmetric about the median, but are truncated to    */
-	/* lie on a point in the data set.                                    */
-	int top = N-1;
-	int bot = 0;
-	while ((double)(top-bot+1)/(double)(N) >= boxplot_opts.limit_value) {
-	    whisker_top = plot->points[top].y;
-	    whisker_bot = plot->points[bot].y;
-	    if (whisker_top - median >= median - whisker_bot) {
-		top--;
-		while ((top > 0) && (plot->points[top].y == plot->points[top-1].y))
+	} else {
+	    /* Set limits to include some fraction of the total number of points. */
+	    /* The limits are symmetric about the median, but are truncated to    */
+	    /* lie on a point in the data set.                                    */
+	    int top = N-1;
+	    int bot = 0;
+	    while ((double)(top-bot+1)/(double)(N) >= boxplot_opts.limit_value) {
+		whisker_top = plot->points[top].y;
+		whisker_bot = plot->points[bot].y;
+		if (whisker_top - median >= median - whisker_bot) {
 		    top--;
-	    }
-	    if (whisker_top - median <= median - whisker_bot) {
-		bot++;
-		while ((bot < top) && (plot->points[bot].y == plot->points[bot+1].y))
+		    while ((top > 0) && (plot->points[top].y == plot->points[top-1].y))
+			top--;
+		}
+		if (whisker_top - median <= median - whisker_bot) {
 		    bot++;
+		    while ((bot < top) && (plot->points[bot].y == plot->points[bot+1].y))
+			bot++;
+		}
 	    }
 	}
-    }
 
-    /* Dummy up a single-point candlesticks plot using these limiting values */
-    candle.type = INRANGE;
-    if (plot->plot_type == FUNC)
-	candle.x = (plot->points[0].x + plot->points[N-1].x) / 2.;
-    else
-	candle.x = plot->points->x;
-    candle.y = quartile1;
-    candle.z = quartile3;
-    candle.ylow  = whisker_bot;
-    candle.yhigh = whisker_top;
-    candle.xlow  = plot->points->xlow;
-    candle.xhigh = median;	/* Crazy order of candlestick parameters! */
-    plot->points = &candle;
-    plot->p_count = 1;
+	/* Dummy up a single-point candlesticks plot using these limiting values */
+	candle.type = INRANGE;
+	if (plot->plot_type == FUNC)
+	    candle.x = (plot->points[0].x + plot->points[N-1].x) / 2.;
+	else
+	    candle.x = plot->points->x + boxplot_opts.separation * level;
+	candle.y = quartile1;
+	candle.z = quartile3;
+	candle.ylow  = whisker_bot;
+	candle.yhigh = whisker_top;
+	candle.xlow  = plot->points->xlow + boxplot_opts.separation * level;
+	candle.xhigh = median;	/* Crazy order of candlestick parameters! */
+	plot->points = &candle;
+	plot->p_count = 1;
 
-    if (boxplot_opts.plotstyle == FINANCEBARS)
-	plot_f_bars( plot );
-    else
-	plot_c_bars( plot );
+	if (boxplot_opts.plotstyle == FINANCEBARS)
+	    plot_f_bars( plot );
+	else
+	    plot_c_bars( plot );
 
-    plot->points = save_points;
-    plot->p_count = N;
+	plot->points = save_points;
+	plot->p_count = N;
 
-    /* Now draw individual points for the outliers */
-    outliers:
-    if (boxplot_opts.outliers) {
-	int i,j,x,y;
-	p_width = plot->lp_properties.p_size * term->h_tic;
+	/* Now draw individual points for the outliers */
+	outliers:
+	if (boxplot_opts.outliers) {
+	    int i,j,x,y;
+	    p_width = plot->lp_properties.p_size * term->h_tic;
 
-	for (i = 0; i < plot->p_count; i++) {
+	    for (i = 0; i < plot->p_count; i++) {
 
-	    if (plot->points[i].y >= candle.ylow
-	    &&  plot->points[i].y <= candle.yhigh)
-		continue;
+		if (plot->points[i].y >= candle.ylow
+		&&  plot->points[i].y <= candle.yhigh)
+		    continue;
 
-	    if (plot->points[i].type != INRANGE)
-		continue;
+		if (plot->points[i].type != INRANGE)
+		    continue;
 
-	    x = map_x(candle.x);
-	    y = map_y(plot->points[i].y);
-	    /* do clipping if necessary */
+		x = map_x(candle.x);
+		y = map_y(plot->points[i].y);
+		/* do clipping if necessary */
 		if (clip_points &&
-		      (x < plot_bounds.xleft + p_width
+		    (x < plot_bounds.xleft + p_width
 		    || y < plot_bounds.ybot + p_height
 		    || x > plot_bounds.xright - p_width
 		    || y > plot_bounds.ytop - p_height)) {
 			continue;
 		}
 
-	    /* Separate any duplicate outliers */
-	    for (j=1; (i >= j) && (plot->points[i].y == plot->points[i-j].y); j++)
-		x += p_width * ((j & 1) == 0 ? -j : j);;
+		/* Separate any duplicate outliers */
+		for (j=1; (i >= j) && (plot->points[i].y == plot->points[i-j].y); j++)
+		    x += p_width * ((j & 1) == 0 ? -j : j);;
 
-	    (term->point) (x, y, plot->lp_properties.p_type);
+		(term->point) (x, y, plot->lp_properties.p_type);
+	    }
 	}
     }
-
 }
 
 

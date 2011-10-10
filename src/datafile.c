@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.208 2011/09/04 11:06:19 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.209 2011/09/29 18:39:01 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -179,7 +179,7 @@ static void plot_option_thru __PROTO((void));
 static void plot_option_using __PROTO((int));
 static TBOOLEAN valid_format __PROTO((const char *));
 static void plot_ticlabel_using __PROTO((int));
-static char * df_parse_string_field __PROTO((char *));
+/*static char * df_parse_string_field __PROTO((char *));*/
 static void add_key_entry __PROTO((char *temp_string, int df_datum));
 static char * df_generate_pseudodata __PROTO((void));
 static int df_skip_bytes __PROTO((int nbytes));
@@ -2473,7 +2473,7 @@ df_set_key_title_columnhead(struct curve_points *plot)
 	plot->title = gp_strdup("@COLUMNHEAD@");
 }
 
-static char *
+char *
 df_parse_string_field(char *field)
 {
     char *temp_string;

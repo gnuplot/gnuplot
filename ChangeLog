@@ -1,3 +1,19 @@
+2011-10-10  Peter Juhasz  <juhaszp@users.sourceforge.net>
+
+	* src/datafile.c src/datafile.h src/gadgets.h src/graphics.c
+	src/graphics.h src/plot2d.c src/save.c src/set.c src/show.c
+	demo/boxplot.dem docs/gnuplot.doc:
+
+	Add new mode for the "with boxplot" plot style.
+	If there is a 4th column in the using spec, the values in it it will
+	be interpreted as the discrete levels of a factor variable. As many
+	boxplots will be drawn as there are different values in the factor
+	column, each boxplot representing part of the dataset. These boxplots
+	are optionally labeled and sorted. New options "separation", "label",
+	and "sorted"/"unsorted" to "set style boxplot" govern the behavior of
+	this new mode. The demo "boxplot.dem" is extended to showcase the new
+	capability. 
+
 2011-10-09  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* src/internal.c (f_sprintf): More complete MSVC++ snprintf() patch.

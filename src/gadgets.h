@@ -237,15 +237,25 @@ typedef enum histogram_type {
 } t_histogram_type;
 #define DEFAULT_HISTOGRAM_STYLE { HT_NONE, 2, 1, 0.0, 0.0, LT_UNDEFINED, LT_UNDEFINED, 0, NULL, EMPTY_LABELSTRUCT }
 
+typedef enum en_boxplot_factor_labels {
+	BOXPLOT_FACTOR_LABELS_OFF,
+	BOXPLOT_FACTOR_LABELS_AUTO,
+	BOXPLOT_FACTOR_LABELS_X,
+	BOXPLOT_FACTOR_LABELS_X2
+} t_boxplot_factor_labels;
+
 typedef struct boxplot_style {
     int limit_type;	/* 0 = multiple of interquartile 1 = fraction of points */
     double limit_value;
     TBOOLEAN outliers;
     int pointtype;
     int plotstyle;	/* CANDLESTICKS or FINANCEBARS */
+    double separation;	/* of boxplots if there are more than one factors */
+    t_boxplot_factor_labels labels;	/* Which axis to put the tic labels if there are factors */
+    TBOOLEAN sort_factors;	/* Sort factors in alphabetical order? */
 } boxplot_style;
 extern boxplot_style boxplot_opts;
-#define DEFAULT_BOXPLOT_STYLE { 0, 1.5, TRUE, 6, CANDLESTICKS }
+#define DEFAULT_BOXPLOT_STYLE { 0, 1.5, TRUE, 6, CANDLESTICKS, 1.0, BOXPLOT_FACTOR_LABELS_AUTO, FALSE }
 
 /***********************************************************/
 /* Variables defined by gadgets.c needed by other modules. */

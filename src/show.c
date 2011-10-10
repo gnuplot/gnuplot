@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.255 2011/10/03 00:17:22 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.256 2011/10/08 00:07:41 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -1217,6 +1217,17 @@ show_boxplot()
 		boxplot_opts.pointtype+1);
     else
 	fprintf(stderr,"\toutliers will not be drawn\n");
+    fprintf(stderr,"\tseparation between boxplots is %g\n",
+		boxplot_opts.separation);
+    fprintf(stderr,"\tfactor labels %s\n",
+		(boxplot_opts.labels == BOXPLOT_FACTOR_LABELS_X)    ? "will be put on the x axis"  :
+		(boxplot_opts.labels == BOXPLOT_FACTOR_LABELS_X2)   ? "will be put on the x2 axis" :
+		(boxplot_opts.labels == BOXPLOT_FACTOR_LABELS_AUTO) ? "are automatic" :
+		"are off");
+    fprintf(stderr,"\tfactor labels will %s\n",
+		boxplot_opts.sort_factors ? 
+		"be sorted alphabetically" : 
+		"appear in the order they were found");
 }
 
 

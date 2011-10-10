@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.345 2011/08/27 17:53:47 juhaszp Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.346 2011/10/08 00:07:41 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -1019,6 +1019,38 @@ set_boxplot()
 	else if (almost_equals(c_token,"finance$bars")) {
 	    c_token++;
 	    boxplot_opts.plotstyle = FINANCEBARS;
+	}
+	else if (almost_equals(c_token,"sep$aration")) {
+	    c_token++;
+	    boxplot_opts.separation = real_expression();
+	    if (boxplot_opts.separation < 0)
+		int_error(c_token-1,"separation must be > 0");
+	}
+	else if (almost_equals(c_token,"lab$els")) {
+	    c_token++;
+	    if (equals(c_token, "off")) {
+		boxplot_opts.labels = BOXPLOT_FACTOR_LABELS_OFF;
+	    }
+	    else if (equals(c_token, "x")) {
+		boxplot_opts.labels = BOXPLOT_FACTOR_LABELS_X;
+	    }
+	    else if (equals(c_token, "x2")) {
+		boxplot_opts.labels = BOXPLOT_FACTOR_LABELS_X2;
+	    }
+	    else if (equals(c_token, "auto")) {
+		boxplot_opts.labels = BOXPLOT_FACTOR_LABELS_AUTO;
+	    }
+	    else
+		int_error(c_token-1,"expecting 'x', 'x2', 'auto' or 'off'");
+	    c_token++;
+	}
+	else if (almost_equals(c_token, "so$rted")) {
+	    boxplot_opts.sort_factors = TRUE;
+	    c_token++;
+	}
+	else if (almost_equals(c_token, "un$sorted")) {
+	    boxplot_opts.sort_factors = FALSE;
+	    c_token++;
 	}
 	else
 	    int_error(c_token,"unrecognized option");

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.250 2011/09/23 16:34:29 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.251 2011/09/30 04:00:02 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -72,6 +72,10 @@ static void parametric_fixup __PROTO((struct curve_points * start_plot, int *plo
 static void box_range_fiddling __PROTO((struct curve_points *plot));
 static void boxplot_range_fiddling __PROTO((struct curve_points *plot));
 static void histogram_range_fiddling __PROTO((struct curve_points *plot));
+static int check_or_add_boxplot_factor __PROTO((struct curve_points *plot, char* string, double x));
+static void add_tics_boxplot_factors __PROTO((struct curve_points *plot));
+static void sort_boxplot_factors __PROTO((struct curve_points *plot));
+static int compare_boxplot_factors __PROTO((SORTFUNC_ARGS arg1, SORTFUNC_ARGS arg2));
 
 /* internal and external variables */
 
@@ -173,6 +177,8 @@ cp_free(struct curve_points *cp)
 	if (cp->labels)
 	    free_labels(cp->labels);
 	cp->labels = NULL;
+	free(cp->boxplot_factor_order);
+	cp->boxplot_factor_order = NULL;
 
 	free(cp);
 	cp = next;
@@ -393,7 +399,8 @@ get_data(struct curve_points *current_plot)
 
     case BOXPLOT:
 	min_cols = 2;		/* fixed x, lots of y data points */
-	max_cols = 3;		/* and an optional width */
+	max_cols = 4;		/* optional width, optional factor */
+	expect_string( 4 );
 	break;
 
     case CANDLESTICKS:
@@ -906,6 +913,15 @@ get_data(struct curve_points *current_plot)
 				  v[1] - v[2], v[1] + v[2], 0.0);
 		break;
 
+	    case BOXPLOT:	/* x, y, width, factor */
+		/* Load the coords just as we would have for 3-argument boxplot, 
+		 * index of factor in ylow , yhigh is the same as y */
+		store2d_point(current_plot, i++, v[0], v[1], v[0]-v[2]/2., v[0]+v[2]/2.,
+		    		  check_or_add_boxplot_factor(current_plot, df_tokens[3], v[0]),
+		    		  v[1], v[2]);
+		break;
+
+
 	    case VECTOR:
 		/* x,y,dx,dy */
 		store2d_point(current_plot, i++, v[0], v[1], v[0], v[0] + v[2],
@@ -1191,7 +1207,7 @@ store2d_point(
 	break;
     case BOXES:			/* auto-scale to xlow xhigh */
     case BOXPLOT:
-	cp->ylow = y;
+	cp->ylow = ylow;
 	cp->yhigh = yhigh;	
 	STORE_WITH_LOG_AND_UPDATE_RANGE(cp->xlow, xlow, dummy_type, current_plot->x_axis, 
 					current_plot->noautoscale, NOOP, cp->xlow = -VERYLARGE);
@@ -1273,6 +1289,132 @@ store2d_point(
 
 }                               /* store2d_point */
 
+/* Check if <string> is already among the known factors, if not, add it to the list */
+static int
+check_or_add_boxplot_factor(struct curve_points *plot, char* string, double x)
+{
+    int levels = plot->boxplot_factors;
+    int len;
+    char * trimmed_string;
+    /* We abuse the labels structure to store the factors in their string forms */
+    struct text_label *label = plot->labels;
+
+    /* This can happen if the user specifies a non-existent column:
+     * fall back to single-boxplot mode */
+    if (!string)
+	return 0;
+
+    /* Remove the trailing garbage, quotes etc. from the string */ 
+    trimmed_string = df_parse_string_field(string); /* valgrind says this leaks memory :( */
+    len = strlen(trimmed_string);
+    while (label) {
+	/* check if string is the same as the i-th factor */
+	if (label->text && len == strlen(label->text)) {
+	    
+	    if (0 == strncmp(trimmed_string, label->text, len)) {
+		FPRINTF((stderr, "check_or_add_boxplot_factor: found %s, level %d\n", trimmed_string, label->tag));
+		return label->tag; /* found it, we return its index */
+		}
+	}
+	label = label->next;
+    }
+
+    /* not found, so we add it now */
+    plot->boxplot_factors = levels + 1;
+    store_label(plot->labels, &(plot->points[0]), levels, trimmed_string, 0.0);
+    free(trimmed_string);
+
+    return levels;
+}
+
+/* Add tic labels to the boxplots, 
+ * showing which level of the factor variable they represent */ 
+static void
+add_tics_boxplot_factors(struct curve_points *plot)
+{
+    AXIS_INDEX boxplot_labels_axis;
+    text_label *this_label;
+    int i = 0;
+
+    boxplot_labels_axis = 
+	boxplot_opts.labels == BOXPLOT_FACTOR_LABELS_X  ? FIRST_X_AXIS  :
+	boxplot_opts.labels == BOXPLOT_FACTOR_LABELS_X2 ? SECOND_X_AXIS : 
+	x_axis;
+    this_label = plot->labels->next;
+    if (!this_label)
+	return;
+    while (this_label) {
+	add_tic_user(
+	    boxplot_labels_axis,
+	    this_label->text,
+	    plot->points->x + i * boxplot_opts.separation,
+	    -1);
+	i++;
+	this_label = this_label->next;
+    }
+}
+
+/* Comparison function for alphabetical sorting of boxplot string factors below */
+static int
+compare_boxplot_factors(SORTFUNC_ARGS arg1, SORTFUNC_ARGS arg2)
+{
+    struct text_label * const *p1 = arg1;
+    struct text_label * const *p2 = arg2;
+
+    return strncmp((*p1)->text, (*p2)->text, 64);
+}
+
+/* Sort boxplot factors */
+/* This is tricky. The discrete levels of the factor variable were assigned integers 
+ * in the order they were found in the file, and these numbers were written into the
+ * plot->points structure. To change the order in which they will be plotted, 
+ * we have to sort the factor strings (which are stored in plot->labels), then 
+ * fill plot->boxplot_factor_order with the order we've found. This is essentially 
+ * a permutation of the sequence 0:N-1 where N is the number of levels the factor 
+ * variable has (plot->boxplot_factors). */
+static void
+sort_boxplot_factors(struct curve_points *plot)
+{
+    /* temporary array that holds the pointers for the nodes of the labels list */
+    text_label **temp_labels, *this_label;
+    /* array that will hold the permutation of the levels */
+    int *permutation;
+    int i;
+    
+    if (plot->boxplot_factors < 2 || !plot->labels || !plot->labels->next)
+	return;
+    
+    temp_labels =  gp_alloc(plot->boxplot_factors * sizeof(temp_labels), "boxplot labels array");
+    permutation = gp_alloc(plot->boxplot_factors * sizeof(int), "boxplot permutations array");
+
+    /* fill pointer array by walking the linked list */
+    /* the list should have exactly plot->boxplot_factors nodes,
+     * plus the listhead which we leave alone. */
+    this_label = plot->labels->next;
+    for (i=0; i<plot->boxplot_factors; i++) {
+	temp_labels[i] = this_label;
+	this_label = this_label->next;
+    }
+    /* sort pointer array */
+    qsort(temp_labels, plot->boxplot_factors, sizeof(text_label *), compare_boxplot_factors);
+    
+    /* read out the tags from the text_labels from the - now sorted - pointer array, 
+     * and write them into the permutation array in order */
+    for (i=0; i<plot->boxplot_factors; i++) {
+	permutation[i] = temp_labels[i]->tag;
+    }
+
+    /* and also re-link the list in sorted order for the tics */
+    this_label = plot->labels->next = temp_labels[0];
+    for (i=0; i<plot->boxplot_factors-1; i++) {
+	this_label->next = temp_labels[i+1];
+	this_label = this_label->next;
+    }
+    this_label->next = NULL;
+    
+    free(temp_labels);
+    plot->boxplot_factor_order = permutation;
+}
 
 /* Autoscaling of box plots cuts off half of the box on each end. */
 /* Add a half-boxwidth to the range in this case.  EAM Aug 2007   */
@@ -1300,7 +1442,7 @@ box_range_fiddling(struct curve_points *plot)
     }
 }
 
-/* Autoscaling of boxplots with no explicit width cuts off the outer edges of the box */ 
+/* Autoscaling of boxplots with no explicit width cuts off the outer edges of the box */
 static void
 boxplot_range_fiddling(struct curve_points *plot)
 {
@@ -1315,6 +1457,8 @@ boxplot_range_fiddling(struct curve_points *plot)
     extra_width = plot->points[0].xhigh - plot->points[0].xlow;
     if (extra_width == 0)
 	extra_width = (boxwidth > 0 && boxwidth_is_absolute) ? boxwidth : 0.5;
+    if (extra_width < 0)
+	extra_width = -extra_width;
 
     if (axis_array[plot->x_axis].autoscale & AUTOSCALE_MIN) {
 	if (axis_array[plot->x_axis].min >= plot->points[0].x)
@@ -1327,6 +1471,9 @@ boxplot_range_fiddling(struct curve_points *plot)
 	    axis_array[plot->x_axis].max += 1.5 * extra_width;
 	else if (axis_array[plot->x_axis].max <= plot->points[N-1].x + extra_width)
 	    axis_array[plot->x_axis].max += 1 * extra_width;
+	if (plot->boxplot_factors > 1) {
+	    axis_array[plot->x_axis].max += (plot->boxplot_factors - 1) * boxplot_opts.separation;
+	}
     }
 }
 
@@ -2193,6 +2340,13 @@ eval_plots()
 		 
 	    }
 
+	    /* Initialize the label list in case the BOXPLOT style needs it to store factors */
+	    if (this_plot->plot_style == BOXPLOT) {
+		if (this_plot->labels == NULL)
+		    this_plot->labels = new_text_label(-1);
+		/* We only use the list to store strings, so this is all we need here. */
+	    }
+
 	    /* Initialize histogram data structure */
 	    if (this_plot->plot_style == HISTOGRAMS) {
 		if (axis_array[x_axis].log)
@@ -2303,6 +2457,14 @@ eval_plots()
 			CB_AXIS.min = 0;
 		    if (CB_AXIS.autoscale & AUTOSCALE_MAX)
 			CB_AXIS.max = 255;
+		}
+
+		/* if needed, sort boxplot factors and assign tic labels to them */
+		if (this_plot->plot_style == BOXPLOT && this_plot->boxplot_factors > 0) {
+		     if (boxplot_opts.sort_factors)
+			sort_boxplot_factors(this_plot);
+		     if (boxplot_opts.labels != BOXPLOT_FACTOR_LABELS_OFF)
+			add_tics_boxplot_factors(this_plot);
 		}
 
 		/* sort */
