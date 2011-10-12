@@ -1,3 +1,8 @@
+2011-10-12  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/stdfn.c (not_a_number):  Possible fix for failure of NaN tests
+	when build using mingw.
+
 2011-09-29  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/color.c src/graph3d.c src/graphics.c:  User-specified axis tick

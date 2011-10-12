@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: stdfn.c,v 1.17.4.2 2010/10/02 16:32:40 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: stdfn.c,v 1.17.4.3 2010/10/10 17:37:52 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - stdfn.c */
@@ -467,7 +467,7 @@ gp_strtod(const char *str, char **endptr)
 double
 not_a_number(void)
 {
-#if defined(__MSC__) || defined(DJGPP) || defined(__DJGPP__) || defined(__MINGW__)
+#if defined(__MSC__) || defined(DJGPP) || defined(__DJGPP__) || defined(__MINGW32__)
 	unsigned long lnan[2]={0xffffffff, 0x7fffffff};
     return *( double* )lnan;
 #else
