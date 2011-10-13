@@ -1,3 +1,9 @@
+2011-10-13  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/wxterminal/gp_cairo.c: Decrease linewidth used by pdfcairo
+	terminal for pattern fill.  This works around what seems to be a pdf
+	bug in libcairo versions through at least 1.10.
+
 2011-10-12  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/stdfn.c (not_a_number):  Possible fix for failure of NaN tests

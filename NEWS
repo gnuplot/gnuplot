@@ -20,6 +20,7 @@ New features, changes and fixes in gnuplot version 4.4.4
 * FIX User-specified axis tick labels override auto labels in 3D just as in 2D
 * FIX `plot with labels` failed to skip labels with UNDEFINED coords
 * FIX NaN (not a number) implementation for Windows build
+* FIX work-around for poor scaling in pdfcairo pattern fill
 
 
 New features, changes and fixes in gnuplot version 4.4.3

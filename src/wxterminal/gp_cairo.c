@@ -1,5 +1,5 @@
 /*
- * $Id: gp_cairo.c,v 1.48.2.3 2010/04/05 05:38:00 sfeam Exp $
+ * $Id: gp_cairo.c,v 1.48.2.4 2010/08/26 18:18:27 sfeam Exp $
  */
 
 /* GNUPLOT - gp_cairo.c */
@@ -1596,7 +1596,10 @@ void gp_cairo_fill_pattern(plot_struct *plot, int fillstyle, int fillpar)
 	    cairo_set_source_rgb( pattern_cr, 1.0, 1.0, 1.0);
 
 	cairo_paint(pattern_cr);
-	cairo_set_line_width(pattern_cr, PATTERN_SIZE/50.);
+	if (!strcmp(term->name,"pdfcairo")) /* Work-around for poor scaling in cairo <= 1.10 */
+	    cairo_set_line_width(pattern_cr, PATTERN_SIZE/150.);
+	else
+	    cairo_set_line_width(pattern_cr, PATTERN_SIZE/50.);
 	cairo_set_line_cap  (pattern_cr, CAIRO_LINE_CAP_BUTT);
 	cairo_set_source_rgb(pattern_cr, plot->color.r, plot->color.g, plot->color.b);
 
