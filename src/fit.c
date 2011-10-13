@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: fit.c,v 1.74 2010/12/06 22:28:27 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: fit.c,v 1.75 2011/03/13 19:55:29 markisch Exp $"); }
 #endif
 
 /*  NOTICE: Change of Copyright Status
@@ -286,8 +286,9 @@ error_ex()
     memcpy(fitbuf, "         ", 9);	/* start after GNUPLOT> */
     sp = strchr(fitbuf, NUL);
     while (*--sp == '\n');
-    strcpy(sp + 1, "\n\n");	/* terminate with exactly 2 newlines */
+    strcpy(sp + 1, "\n");
     fputs(fitbuf, STANDARD);
+    strcpy(sp + 2, "\n");	/* terminate with exactly 2 newlines */
     if (log_f) {
 	fprintf(log_f, "BREAK: %s", fitbuf);
 	(void) fclose(log_f);
@@ -300,7 +301,8 @@ error_ex()
     /* restore original SIGINT function */
     interrupt_setup();
 
-    bail_to_command_line();
+    /* exit via int_error() so that it can clean up state variables */
+    int_error(NO_CARET,"error during fit");
 }
 
 /* HBB 990829: removed the debug print routines */

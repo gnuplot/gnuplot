@@ -8,6 +8,9 @@
 	terminal for pattern fill.  This works around what seems to be a pdf
 	bug in libcairo versions through at least 1.10.
 
+	* src/fit.c (error_ex): Exit via int_error() so that it can walk
+	through the list of XXX_reset_after_error() routines.
+
 2011-10-10  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/hidden3d.c: Bump default QUADTREE_GRANULARITY from 10 to 30.
