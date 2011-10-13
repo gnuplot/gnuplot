@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.693 2011/10/08 00:07:40 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.694 2011/10/10 21:17:04 juhaszp Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -803,8 +803,7 @@ Ffigure_newsyntax
  omit either beg or end from the function call.
 3 Functions
 ?expressions functions
-?functions
- The functions in `gnuplot` are the same as the corresponding functions in
+ The math functions in `gnuplot` are the same as the corresponding functions in
  the Unix math library, except that all functions accept integer, real, and
  complex arguments unless otherwise noted.
  Functions that accept or return angles (e.g. sin(x), cos(x), arg(z))
@@ -936,15 +935,15 @@ C For the HTML help we want both, table and sections, so the magic
 C marker below is used to signal this to doc2html:
 ^<!-- INCLUDE_NEXT_TABLE -->
 @start table
-#\begin{tabular}{|ccl|} \hline
+#\begin{longtable}{|ccl|} \hline
 #\multicolumn{3}{|c|}{Math library functions} \\ \hline \hline
 #Function & Arguments & Returns \\ \hline
+#\endhead \hline \endfoot
 %c c l .
 %Function@Arguments@Returns
 %_
 4 abs
 ?expressions functions abs
-?functions abs
 ?abs
 #abs(x) & any  &  absolute value of $x$, $|x|$; same type \\
 #abs(x) & complex &  length of $x$, $\sqrt{{\mbox{real}(x)^{2} +
@@ -958,7 +957,6 @@ C marker below is used to signal this to doc2html:
  plane [i.e.,  sqrt(real(x)**2 + imag(x)**2) ].
 4 acos
 ?expressions functions acos
-?functions acos
 ?acos
 #acos(x) & any  & $\cos^{-1} x$ (inverse cosine) \\
 %acos(x)@any@$cos sup -1 x$ (inverse cosine)
@@ -967,7 +965,6 @@ C marker below is used to signal this to doc2html:
  `set angles`.
 4 acosh
 ?expressions functions acosh
-?functions acosh
 ?acosh
 #acosh(x) & any  & $\cosh^{-1} x$ (inverse hyperbolic cosine) in radians \\
 %acosh(x)@any@$cosh sup -1 x$ (inverse hyperbolic cosine) in radians
@@ -975,7 +972,6 @@ C marker below is used to signal this to doc2html:
  in radians.
 4 airy
 ?expressions functions airy
-?functions airy
 ?airy
 #airy(x) & any  & Airy function Ai(x) \\
 %airy(x)@any@Airy function Ai(x)
@@ -985,7 +981,6 @@ C marker below is used to signal this to doc2html:
  is ignored.
 4 arg
 ?expressions functions arg
-?functions arg
 ?arg
 #arg(x) & complex & the phase of $x$ \\
 %arg(x)@complex@the phase of $x$
@@ -993,7 +988,6 @@ C marker below is used to signal this to doc2html:
  degrees, as selected by `set angles`.
 4 asin
 ?expressions functions asin
-?functions asin
 ?asin
 #asin(x) & any  & $\sin^{-1} x$ (inverse sin) \\
 %asin(x)@any@$sin sup -1 x$ (inverse sin)
@@ -1002,7 +996,6 @@ C marker below is used to signal this to doc2html:
  angles`.
 4 asinh
 ?expressions functions asinh
-?functions asinh
 ?asinh
 #asinh(x) & any  & $\sinh^{-1} x$ (inverse hyperbolic sin) in radians \\
 %asinh(x)@any@$sinh sup -1 x$ (inverse hyperbolic sin) in radians
@@ -1010,7 +1003,6 @@ C marker below is used to signal this to doc2html:
  radians.
 4 atan
 ?expressions functions atan
-?functions atan
 ?atan
 #atan(x) & any  & $\tan^{-1} x$ (inverse tangent) \\
 %atan(x)@any@$tan sup -1 x$ (inverse tangent)
@@ -1019,7 +1011,6 @@ C marker below is used to signal this to doc2html:
  `set angles`.
 4 atan2
 ?expressions functions atan2
-?functions atan2
 ?atan2
 #atan2(y,x) & int or real & $\tan^{-1} (y/x)$ (inverse tangent) \\
 %atan2(y,x)@int or real@$tan sup -1 (y/x)$ (inverse tangent)
@@ -1028,7 +1019,6 @@ C marker below is used to signal this to doc2html:
  radians or degrees, as selected by `set angles`, in the correct quadrant.
 4 atanh
 ?expressions functions atanh
-?functions atanh
 ?atanh
 #atanh(x) & any  & $\tanh^{-1} x$ (inverse hyperbolic tangent) in radians \\
 %atanh(x)@any@$tanh sup -1 x$ (inverse hyperbolic tangent) in radians
@@ -1048,7 +1038,6 @@ C marker below is used to signal this to doc2html:
  See `elliptic integrals`.
 4 besj0
 ?expressions functions besj0
-?functions besj0
 ?besj0
 #besj0(x) & int or real &  $j_{0}$ Bessel function of $x$, in radians \\
 %besj0(x)@int or real@$j sub 0$ Bessel function of $x$, in radians
@@ -1056,7 +1045,6 @@ C marker below is used to signal this to doc2html:
  `besj0` expects its argument to be in radians.
 4 besj1
 ?expressions functions besj1
-?functions besj1
 ?besj1
 #besj1(x) & int or real & $j_{1}$ Bessel function of $x$, in radians \\
 %besj1(x)@int or real@$j sub 1$ Bessel function of $x$, in radians
@@ -1064,7 +1052,6 @@ C marker below is used to signal this to doc2html:
  `besj1` expects its argument to be in radians.
 4 besy0
 ?expressions functions besy0
-?functions besy0
 ?besy0
 #besy0(x) & int or real & $y_{0}$ Bessel function of $x$, in radians \\
 %besy0(x)@int or real@$y sub 0$ Bessel function of $x$, in radians
@@ -1072,7 +1059,6 @@ C marker below is used to signal this to doc2html:
  `besy0` expects its argument to be in radians.
 4 besy1
 ?expressions functions besy1
-?functions besy1
 ?besy1
 #besy1(x) & int or real & $y_{1}$ Bessel function of $x$, in radians \\
 %besy1(x)@int or real@$y sub 1$ Bessel function of $x$, in radians
@@ -1080,7 +1066,6 @@ C marker below is used to signal this to doc2html:
  `besy1` expects its argument to be in radians.
 4 ceil
 ?expressions functions ceil
-?functions ceil
 ?ceil
 #ceil(x) & any & $\lceil x \rceil$, smallest integer not less than $x$
 #(real part) \\
@@ -1090,7 +1075,6 @@ C marker below is used to signal this to doc2html:
  than the real part of its argument.
 4 cos
 ?expressions functions cos
-?functions cos
 ?cos
 #cos(x) & any & $\cos x$, cosine of $x$ \\
 %cos(x)@radians@$cos~x$, cosine of $x$
@@ -1098,7 +1082,6 @@ C marker below is used to signal this to doc2html:
  argument in radians or degrees, as selected by `set angles`.
 4 cosh
 ?expressions functions cosh
-?functions cosh
 ?cosh
 #cosh(x) & any & $\cosh x$, hyperbolic cosine of $x$ in radians \\
 %cosh(x)@any@$cosh~x$, hyperbolic cosine of $x$ in radians
@@ -1106,7 +1089,6 @@ C marker below is used to signal this to doc2html:
  expects its argument to be in radians.
 4 erf
 ?expressions functions erf
-?functions erf
 ?erf
 #erf(x) & any & $\mbox{erf}(\mbox{real}(x))$,  error function of real($x$) \\
 %erf(x)@any@$erf ( roman real (x))$, error function of real ($x$)
@@ -1115,7 +1097,6 @@ C marker below is used to signal this to doc2html:
  ignored.  See `erfc`, `inverf`, and `norm`.
 4 erfc
 ?expressions functions erfc
-?functions erfc
 ?erfc
 #erfc(x) & any & $\mbox{erfc}(\mbox{real}(x))$,  1.0 - error function of real($x$) \\
 %erfc(x)@any@$erfc ( roman real (x))$, 1.0 - error function of real ($x$)
@@ -1124,7 +1105,6 @@ C marker below is used to signal this to doc2html:
  ignored.  See `erf`, `inverf`, and `norm`.
 4 exp
 ?expressions functions exp
-?functions exp
 ?exp
 #exp(x) & any & $e^{x}$,  exponential function of $x$ \\
 %exp(x)@any@$e sup x$, exponential function of $x$
@@ -1134,7 +1114,6 @@ C marker below is used to signal this to doc2html:
  like safe(x) = x<-100 ? 0 : exp(x) might prove useful in these cases.
 4 expint
 ?expressions functions expint
-?functions expint
 ?expint
 #expint(n,x) & int $n\ge0$, real $x\ge0$ & $E_n(x)=\int_1^\infty t^{-n} e^{-xt}\,dt$,  exponential integral of $x$ \\
 %expint(n,x)@any@$E sub n (x)$, exponential integral function of $x$
@@ -1143,7 +1122,6 @@ C marker below is used to signal this to doc2html:
  n must be a nonnegative integer, x>=0, and either x>0 or n>1.
 4 floor
 ?expressions functions floor
-?functions floor
 ?floor
 #floor(x) & any & $\lfloor x \rfloor$,  largest integer not greater
 #than $x$ (real part) \\
@@ -1153,7 +1131,6 @@ C marker below is used to signal this to doc2html:
  greater than the real part of its argument.
 4 gamma
 ?expressions functions gamma
-?functions gamma
 ?gamma
 #gamma(x) & any & $\mbox{gamma}(\mbox{real}(x))$,  gamma function of real($x$) \\
 %gamma(x)@any@$GAMMA ( roman real (x))$, gamma function of real ($x$)
@@ -1162,7 +1139,6 @@ C marker below is used to signal this to doc2html:
  value, the imaginary component is ignored.
 4 ibeta
 ?expressions functions ibeta
-?functions ibeta
 ?ibeta
 #ibeta(p,q,x) & any & $\mbox{ibeta}(\mbox{real}(p,q,x))$,  ibeta function of real($p$,$q$,$x$) \\
 %ibeta(p,q,x)@any@$ibeta ( roman real (p,q,x))$, ibeta function of real ($p$,$q$,$x$)
@@ -1173,7 +1149,6 @@ C marker below is used to signal this to doc2html:
  The approximation is only accurate in the region x < (p-1)/(p+q-2). 
 4 inverf
 ?expressions functions inverf
-?functions inverf
 ?inverf
 #inverf(x) & any &  inverse error function of real($x$)  \\
 %inverf(x)@any@inverse error function real($x$)
@@ -1181,7 +1156,6 @@ C marker below is used to signal this to doc2html:
  of its argument.   See `erf` and `invnorm`.
 4 igamma
 ?expressions functions igamma
-?functions igamma
 ?igamma
 #igamma(a,x) & any & $\mbox{igamma}(\mbox{real}(a,x))$,  igamma function of real($a$,$x$) \\
 %igamma(a,x)@any@$igamma ( roman real (a,x))$, igamma function of real ($a$,$x$)
@@ -1192,7 +1166,6 @@ C marker below is used to signal this to doc2html:
  are complex, the imaginary components are ignored.
 4 imag
 ?expressions functions imag
-?functions imag
 ?imag
 #imag(x) & complex &  imaginary part of $x$ as a real number \\
 %imag(x)@complex@imaginary part of $x$ as a real number
@@ -1200,7 +1173,6 @@ C marker below is used to signal this to doc2html:
  number.
 4 invnorm
 ?expressions functions invnorm
-?functions invnorm
 ?invnorm
 #invnorm(x) & any &  inverse normal distribution function of real($x$)  \\
 %invnorm(x)@any@inverse normal distribution function real($x$)
@@ -1208,7 +1180,6 @@ C marker below is used to signal this to doc2html:
  distribution function of the real part of its argument.  See `norm`.
 4 int
 ?expressions functions int
-?functions int
 ?int
 #int(x) & real &  integer part of $x$, truncated toward zero \\
 %int(x)@real@integer part of $x$, truncated toward zero
@@ -1216,7 +1187,6 @@ C marker below is used to signal this to doc2html:
  toward zero.
 4 lambertw
 ?expressions functions lambertw
-?functions lambertw
 ?lambertw
 #lambertw(x) & real & Lambert W function \\
 %lambertw(x)@real@Lambert W function
@@ -1225,7 +1195,6 @@ C marker below is used to signal this to doc2html:
  z must be a real number with z >= -exp(-1).
 4 lgamma
 ?expressions functions lgamma
-?functions lgamma
 ?lgamma
 #lgamma(x) & any & $\mbox{lgamma}(\mbox{real}(x))$,  lgamma function of real($x$) \\
 %lgamma(x)@any@$lgamma ( roman real (x))$, lgamma function of real ($x$)
@@ -1234,7 +1203,6 @@ C marker below is used to signal this to doc2html:
  imaginary component is ignored.
 4 log
 ?expressions functions log
-?functions log
 ?log
 #log(x) & any & $\log_{e} x$,  natural logarithm (base $e$) of $x$ \\
 %log(x)@any@$ln~x$, natural logarithm (base $e$) of $x$
@@ -1242,14 +1210,12 @@ C marker below is used to signal this to doc2html:
  argument.  See `log10`.
 4 log10
 ?expressions functions log10
-?functions log10
 ?log10
 #log10(x) & any & $\log_{10} x$,  logarithm (base $10$) of $x$ \\
 %log10(x)@any@${log sub 10}~x$, logarithm (base $10$) of $x$
  The `log10(x)` function returns the logarithm (base 10) of its argument.
 4 norm
 ?expressions functions norm
-?functions norm
 ?norm
 #norm(x) & any & normal distribution (Gaussian) function of real($x$) \\
 %norm(x)@any@$norm(x)$, normal distribution function of real($x$)
@@ -1257,7 +1223,6 @@ C marker below is used to signal this to doc2html:
  function of the real part of its argument.   See `invnorm`, `erf` and `erfc`.
 4 rand
 ?expressions functions rand
-?functions rand
 ?rand
 #rand(x) & int & pseudo random number in the interval [0:1] \\
 %rand(x)@int@pseudo random number in the interval [0:1]
@@ -1265,14 +1230,12 @@ C marker below is used to signal this to doc2html:
  See `random` for more details.
 4 real
 ?expressions functions real
-?functions real
 ?real
 #real(x) & any &  real part of $x$ \\
 %real(x)@any@real part of $x$
  The `real(x)` function returns the real part of its argument.
 4 sgn
 ?expressions functions sgn
-?functions sgn
 ?sgn
 #sgn(x) & any & 1 if $x>0$, -1 if $x<0$, 0 if $x=0$. imag($x$) ignored \\
 %sgn(x)@any@1 if $x > 0$, -1 if $x < 0$, 0 if $x = 0$. $roman imag (x)$ ignored
@@ -1281,7 +1244,6 @@ C marker below is used to signal this to doc2html:
  complex value, the imaginary component is ignored.
 4 sin
 ?expressions functions sin
-?functions sin
 ?sin
 #sin(x) & any & $\sin x$, sine of $x$ \\
 %sin(x)@any@$sin~x$, sine of $x$
@@ -1289,7 +1251,6 @@ C marker below is used to signal this to doc2html:
  argument to be in radians or degrees, as selected by `set angles`.
 4 sinh
 ?expressions functions sinh
-?functions sinh
 ?sinh
 #sinh(x) & any & $\sinh x$, hyperbolic sine of $x$ in radians \\
 %sinh(x)@any@$sinh~x$, hyperbolic sine of $x$ in radians
@@ -1297,14 +1258,12 @@ C marker below is used to signal this to doc2html:
  expects its argument to be in radians.
 4 sqrt
 ?expressions functions sqrt
-?functions sqrt
 ?sqrt
 #sqrt(x) & any & $\sqrt{x}$,  square root of $x$ \\
 %sqrt(x)@any@$sqrt x $, square root of $x$
  The `sqrt(x)` function returns the square root of its argument.
 4 tan
 ?expressions functions tan
-?functions tan
 ?tan
 #tan(x) & any & $\tan x$,  tangent of $x$ \\
 %tan(x)@any@$tan~x$, tangent of $x$
@@ -1312,7 +1271,6 @@ C marker below is used to signal this to doc2html:
  its argument to be in radians or degrees, as selected by `set angles`.
 4 tanh
 ?expressions functions tanh
-?functions tanh
 ?tanh
 #tanh(x) & any & $\tanh x$, hyperbolic tangent of $x$ in radians\\
 %tanh(x)@any@$tanh~x$, hyperbolic tangent of $x$ in radians
@@ -1320,13 +1278,15 @@ C marker below is used to signal this to doc2html:
  expects its argument to be in radians.
 4 voigt
 ?expressions functions voigt
-?functions voigt
 ?voigt
 #voigt(x,y) & real & Voigt/Faddeeva function $\frac{y}{\pi} \int{\frac{exp(t^2)}{(x-t)^2+y^2}}dt$ \\
 %voigt(x,y)@real@convolution of Gaussian and Lorentzian
  The function `voigt(x,y)` returns an approximation to the Voigt/Faddeeva
  function used in spectral analysis. The approximation is accurate to 
  one part in 10^4.
+#\hline \end{longtable}
+#%% begin dummy tabular because the @end processing wants to end one
+#\begin{tabular}{|ccl|}
 @end table
 
 ^<!-- INCLUDE_NEXT_TABLE -->
@@ -1339,7 +1299,6 @@ C marker below is used to signal this to doc2html:
 %_
 4 gprintf
 ?expressions functions gprintf
-?functions gprintf
 #gprintf("format",x,...) & any & string result from applying gnuplot's format parser \\
 %gprintf("format",x,...)@any@string result from applying gnuplot's format parser
  `gprintf("format",x)` applies gnuplot's own format specifiers to the single
@@ -1348,7 +1307,6 @@ C marker below is used to signal this to doc2html:
  See `format specifiers`.
 4 sprintf
 ?expressions functions sprintf
-?functions sprintf
 ?sprintf
 #sprintf("format",x,...) & multiple & string result from C-language sprintf \\
 %sprintf("format",x,...)@multiple@string result from C-language sprintf
@@ -1359,14 +1317,12 @@ C marker below is used to signal this to doc2html:
  documentation or the unix sprintf man page.
 4 strlen
 ?expressions functions strlen
-?functions strlen
 ?strlen
 #strlen("string") & string & int length of string \\
 %strlen("string")@string@int length of string
  `strlen("string")` returns the number of characters in the string.
 4 strstrt
 ?expressions functions strstrt
-?functions strstrt
 ?strstrt
 #strstrt("string","key") & strings & int index of first character of substring "key" \\
 %strstrt("string","key")@strings@int index of first character of substring "key"
@@ -1376,7 +1332,6 @@ C marker below is used to signal this to doc2html:
  index rather than a string pointer. strstrt("hayneedlestack","needle") = 4.
 4 substr
 ?expressions functions substr
-?functions substr
 ?substr
 =substring
 #substr("string",beg,end) & multiple & string "string"[beg:end] \\
@@ -1387,7 +1342,6 @@ C marker below is used to signal this to doc2html:
  omitting beg or end.
 4 strftime
 ?expressions functions strftime
-?functions strftime
 ?strftime
 #strftime("timeformat",t) & any & string result from applying gnuplot's time parser \\
 %strftime("timeformat",t)@any@string result from applying gnuplot's time parser
@@ -1396,7 +1350,6 @@ C marker below is used to signal this to doc2html:
  See `time_specifiers` and `strptime`.
 4 strptime
 ?expressions functions strptime
-?functions strptime
 ?strptime
 #strptime("timeformat",s) & string & seconds since year 2000 as given in string s \\
 %strptime("timeformat",s)@string@seconds since year 2000 as given in string s
@@ -1405,7 +1358,6 @@ C marker below is used to signal this to doc2html:
  See `time_specifiers` and `strftime`.
 4 system
 ?expressions functions system
-?functions system
 =system
 #system("command") & string & string containing output stream of shell command \\
 %system("command")@string@string containing output stream of shell command
@@ -1417,7 +1369,6 @@ C marker below is used to signal this to doc2html:
  'f(x) = real(system(sprintf("somecommand %f", x)))'.
 4 word
 ?expressions functions word
-?functions word
 ?word
 =word
 #word("string",n) & string, int & returns the nth word in "string" \\
@@ -1426,7 +1377,6 @@ C marker below is used to signal this to doc2html:
  `word("one two three",2)` returns the string "two".
 4 words
 ?expressions functions words
-?functions words
 ?words
 =words
 #words("string") & string & returns the number of words in "string" \\
@@ -1445,7 +1395,6 @@ C marker below is used to signal this to doc2html:
 %_
 4 column
 ?expressions functions column
-?functions column
 ?column
 #column(x) & int or string & column $x$ during datafile manipulation. \\
 %column(x)@int or string@ column $x$ during datafile manipulation.
@@ -1454,7 +1403,6 @@ C marker below is used to signal this to doc2html:
  of column x. See `plot datafile using`.
 4 columnhead
 ?expressions functions columnhead
-?functions columnhead
 ?columnhead
 #columnhead(x) & int & string containing first entry of column $x$ in datafile. \\
 %columnhead(x)@int@ string containing first entry of column $x$ in datafile.
@@ -1463,7 +1411,6 @@ C marker below is used to signal this to doc2html:
  column x in the first line of data. See `plot datafile using`.
 4 defined
 ?expressions functions defined
-?functions defined
 ?defined
 #defined(X) & variable name & [DEPRECATED] returns 1 if X is defined, 0 otherwise. \\
 %defined(X)@variable name@ [DEPRECATED] returns 1 if X is defined, 0 otherwise.
@@ -1471,7 +1418,6 @@ C marker below is used to signal this to doc2html:
  it returns 0.
 4 exists
 ?expressions functions exists
-?functions exists
 ?exists
 #exists("X") & string & returns 1 if a variable named X is defined, 0 otherwise. \\
 %exists("X")@string@ returns 1 if a variable named X is defined, 0 otherwise.
@@ -1480,10 +1426,8 @@ C marker below is used to signal this to doc2html:
  Otherwise the function returns 0.
 4 stringcolumn
 ?expressions functions stringcolumn
-?functions stringcolumn
 ?stringcolumn
 ?expressions functions strcol
-?functions strcol
 ?strcol
 #stringcolumn(x) & int or string & content of column $x$ as a string. \\
 %stringcolumn(x)@int or string@ content column $x$ as a string.
@@ -1492,7 +1436,6 @@ C marker below is used to signal this to doc2html:
  See `plot datafile using`.
 4 timecolumn
 ?expressions functions timecolumn
-?functions timecolumn
 ?timecolumn
 #timecolumn(x) & int & timecolumn $x$ during datafile manipulation. \\
 %timecolumn(x)@int@ timecolumn $x$ during datafile manipulation.
@@ -1509,7 +1452,6 @@ C marker below is used to signal this to doc2html:
  is used.  Otherwise, `timecolumn` chooses the x axis `timefmt` per default.
 4 tm_hour
 ?expressions tm_hour
-?functions tm_hour
 ?tm_hour
 #tm\_hour(x) & int & the hour \\
 %tm_hour(x)@int@the hour
@@ -1517,7 +1459,6 @@ C marker below is used to signal this to doc2html:
  1 Jan 2000.  It returns the hour (an integer in the range 0--23) as a real.
 4 tm_mday
 ?expressions tm_mday
-?functions tm_mday
 ?tm_mday
 #tm\_mday(x) & int & the day of the month \\
 %tm_mday(x)@int@the day of the month
@@ -1526,7 +1467,6 @@ C marker below is used to signal this to doc2html:
  as a real.
 4 tm_min
 ?expressions tm_min
-?functions tm_min
 ?tm_min
 #tm\_min(x) & int & the minute \\
 %tm_min(x)@int@the minute
@@ -1534,7 +1474,6 @@ C marker below is used to signal this to doc2html:
  1 Jan 2000.  It returns the minute (an integer in the range 0--59) as a real.
 4 tm_mon
 ?expressions tm_mon
-?functions tm_mon
 ?tm_mon
 #tm\_mon(x) & int & the month \\
 %tm_mon(x)@int@the month
@@ -1542,7 +1481,6 @@ C marker below is used to signal this to doc2html:
  1 Jan 2000.  It returns the month (an integer in the range 0--11) as a real.
 4 tm_sec
 ?expressions tm_sec
-?functions tm_sec
 ?tm_sec
 #tm\_sec(x) & int & the second \\
 %tm_sec(x)@int@the second
@@ -1550,7 +1488,6 @@ C marker below is used to signal this to doc2html:
  1 Jan 2000.  It returns the second (an integer in the range 0--59) as a real.
 4 tm_wday
 ?expressions tm_wday
-?functions tm_wday
 ?tm_wday
 #tm\_wday(x) & int & the day of the week \\
 %tm_wday(x)@int@the day of the week
@@ -1559,7 +1496,6 @@ C marker below is used to signal this to doc2html:
  a real.
 4 tm_yday
 ?expressions tm_yday
-?functions tm_yday
 ?tm_yday
 #tm\_yday(x) & int & the day of the year \\
 %tm_yday(x)@int@the day of the year
@@ -1568,7 +1504,6 @@ C marker below is used to signal this to doc2html:
  as a real.
 4 tm_year
 ?expressions tm_year
-?functions tm_year
 ?tm_year
 #tm\_year(x) & int & the year \\
 %tm_year(x)@int@the year
@@ -1576,7 +1511,6 @@ C marker below is used to signal this to doc2html:
  1 Jan 2000.  It returns the year (an integer) as a real.
 4 time
 ?expressions time
-?functions time
 ?time
 #time(x) & any & the current system time \\
 %time(x)@any@the current system time
@@ -1590,7 +1524,6 @@ C marker below is used to signal this to doc2html:
  and it is passed to `strftime` to provide a formatted time string.
 4 valid
 ?expressions functions valid
-?functions valid
 ?valid
 #valid(x) & int & test validity of $\mbox{column}(x)$ during datafile manip.\\
 %valid(x)@int@ test validity of column($x$) during datafile manip.
@@ -1603,7 +1536,6 @@ C marker below is used to signal this to doc2html:
 
 4 elliptic integrals
 ?expressions functions elliptic integrals
-?functions elliptic integrals
 ?elliptic integrals
 =elliptic integrals
  The `EllipticK(k)` function returns the complete elliptic integral of the first
@@ -1621,7 +1553,6 @@ C marker below is used to signal this to doc2html:
  definition EllipticPi(0,k) == EllipticK(k) for all possible values of `k`.
 4 Random number generator
 ?expressions random
-?functions random
 ?random
 =rand
  The function `rand()` produces a sequence of pseudo-random numbers between
@@ -1639,7 +1570,6 @@ C marker below is used to signal this to doc2html:
                    seed2 to y.
 4 value
 ?expressions functions value
-?functions value
 ?value
  B = value("A") is effectively the same as B = A, where A is the name of a 
  user-defined variable.  This is useful when the name of the variable is itself
@@ -2509,10 +2439,9 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/userdefined.gif" alt="[use
  options controlling the z axis have no effect on 2D graphs.
 
  `splot` can plot surfaces and contours in addition to points and/or lines.
- In addition to `splot`, see `set isosamples` for information about defining
- the grid for a 3D function;  `splot datafile` for information about the
- requisite file structure for 3D data values; and `set contour` and
- `set cntrparam` for information about contours.
+ See `set isosamples` for information about defining the grid for a 3D function.
+ See `splot datafile` for information about the requisite file structure for 3D
+ data values, `set contour` and `set cntrparam` for information about contours.
 
  In `splot`, control over the scales and labels of the axes are the same as
  with `plot`, except that commands and options controlling the x2 and y2 axes
@@ -3473,6 +3402,7 @@ Ffigure_histrows
  This will produce a plot in which each vertical bar corresponds to one row of
  data.  Each vertical bar contains a stack of two segments, corresponding in
  height to the values found in columns 2 and 4 of the datafile.
+       
 
  Finally, the commands
 
@@ -4909,12 +4839,11 @@ Ffigure_mapcontours
 ?commands plot
 ?plot
  `plot` is the primary command for drawing plots with `gnuplot`.  It creates
- plots of functions and data in many, many ways.  `plot` is used to draw 2-d
+ plots of functions and data in many, many ways.  `plot` is used to draw 2D
  functions and data; `splot` draws 2D projections of 3D surfaces and data.
- `plot` and `splot` contain many common features; see `splot` for differences.
+ `plot` and `splot` offer many features in common; see `splot` for differences.
  Note specifically that although the `binary <binary list>` variation does
- work for both `plot` and `splot`, there are small differences between these
- modes.
+ work for both `plot` and `splot`, there are small differences between them.
 
  Syntax:
        plot {<ranges>}
@@ -4925,11 +4854,9 @@ Ffigure_mapcontours
 
  where either a <function> or the name of a data file enclosed in quotes is
  supplied.  A function is a mathematical expression or a pair of mathematical
- expressions in parametric mode.  The expressions may be defined completely or
- in part earlier in the stream of `gnuplot` commands (see `user-defined`).
-
- It is also possible to define functions and parameters on the `plot` command
- itself.  This is done merely by isolating them from other items with commas.
+ expressions in parametric mode.  Functions may be builtin, user-defined, or
+ provided in the plot command itself.  Multiple datafiles and/or functions may
+ be plotted in a single command, separated by commas.  See `data`, `functions`.
 
  Examples:
        plot sin(x)
@@ -5552,9 +5479,9 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/population.gif" alt="[popu
  plotted curve lies within the borders of the graph.
 
  If `autoscale` is not in effect, and the smooth option is either `acspline`
- or `cspline`, the sampling of the generated curve is
- done across the intersection of the x range covered by the input data and
- the fixed abscissa range as defined by `set xrange`.
+ or `cspline`, the sampling of the generated curve is done across the
+ intersection of the x range covered by the input data and the fixed abscissa
+ range as defined by `set xrange`.
 
  If too few points are available to allow the selected option to be applied,
  an error message is produced.  The minimum number is one for `unique` and
@@ -6148,6 +6075,21 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/population.gif" alt="[popu
  If autoscaling is on, the ranges will be adjusted to include the error bars.
 
  See `plot using`, `plot with`, and `set style` for more information.
+3 functions
+?commands plot functions
+?plot functions
+?functions
+ Built-in or user-defined functions can be displayed by the `plot` and `splot`
+ commands in addition to, or instead of, data read from a file. The requested
+ function is evaluated by sampling at regular intervals spanning the independent
+ axis range[s]. See `set samples` and `set isosamples`.
+ Example:
+       approx(ang) = ang - ang**3 / (3*2)
+       plot sin(x) title "sin(x)", approx(x) title "approximation"
+
+ To set a default plot style for functions, see `set style function`.
+ For information on built-in functions, see `expressions functions`.
+ For information on defining your own functions, see `user-defined`.
 3 parametric
 ?commands plot parametric
 ?commands splot parametric
@@ -11094,17 +11036,12 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/population.gif" alt="[popu
 ?commands show style function
 ?set style function
 ?show style function
-?function style
  The `set style function` command changes the default plotting style for
- function plots.
+ function plots (e.g. lines, points, filledcurves).  See `plotting styles`.
 
  Syntax:
        set style function <plotting-style>
        show style function
-
- See `plotting styles` for the choices.  If no choice is given, the choices are
- listed.  `show style function` shows the current default function plotting
- style.
 4 set style increment
 ?commands set style increment
 ?commands show style increment

@@ -1,3 +1,9 @@
+2011-10-13  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* docs/gnuplot.doc docs/titlepag.tex:  Revise the sections that 
+	describe function plots to mention `set samples`.  Allow the table of
+	builtin functions to split across pagebreaks in the TeX documentation.
+
 2011-10-10  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/hidden3d.c: Bump default QUADTREE_GRANULARITY from 10 to 30.
