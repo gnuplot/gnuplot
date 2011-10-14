@@ -10,6 +10,9 @@
 	processed by if_command() or else_command().  The latter was not
 	correctly updating c_token.
 
+	* src/misc.c (lf_load):  Tie maximum depth of load commands to
+	STACK_DEPTH.
+
 2011-10-13  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* docs/gnuplot.doc docs/titlepag.tex:  Revise the sections that 

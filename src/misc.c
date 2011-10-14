@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.136 2011/08/19 18:42:08 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.137 2011/09/04 11:06:19 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -403,8 +403,8 @@ lf_push(FILE *fp, char *name, char *cmdline)
 	call_args[argindex] = NULL;	/* initially no args */
     }
     lf->depth = lf_head ? lf_head->depth+1 : 0;	/* recursion depth */
-    if (lf->depth > 1024)
-	int_error(NO_CARET, "Deep load/eval recursion detected");
+    if (lf->depth > STACK_DEPTH)
+	int_error(NO_CARET, "load/eval nested too deeply");
     lf->if_depth = if_depth;
     lf->if_open_for_else = if_open_for_else;
     lf->if_condition = if_condition;
@@ -417,16 +417,6 @@ lf_push(FILE *fp, char *name, char *cmdline)
 
     lf->prev = lf_head;		/* link to stack */
     lf_head = lf;
-
-    /* Check for recursion (Is this too strict?) */
-    if (cmdline) {
-	while ((lf = lf->prev) != NULL) {
-	    if (lf->cmdline && !strcmp(cmdline, lf->cmdline))
-		int_error(NO_CARET,
-			  "probably infinite load/eval recursion at \"%s\"",
-			  cmdline);
-	}
-    }
 }
 
 /* used for reread  vsnyder@math.jpl.nasa.gov */
