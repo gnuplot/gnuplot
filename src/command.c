@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.226 2011/10/03 00:17:22 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.227 2011/10/08 00:07:41 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -1077,10 +1077,11 @@ else_command()
 	else
 	    int_error(c_token,"Invalid {else-clause}");
 
+	c_token++;	/* Advance to the opening curly brace */
 	c_token = find_clause(&clause_start, &clause_end);
+	c_token--;	/* Let the parser eventually see the closing curly brace */
 
 	clause_depth++;
-	c_token--;	 /* Let the parser see the closing curly brace */
 	if (!if_condition) {
 	    clause = gp_alloc(clause_end - clause_start, "clause");
 	    memcpy(clause, &gp_input_line[clause_start+1], clause_end - clause_start);

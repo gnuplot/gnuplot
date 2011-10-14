@@ -1,3 +1,15 @@
+2011-10-14  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/specfun.c (humlik):
+	Re-order code to avoid accessing an unitialized variable.
+
+	* term/emf.trm (EMF_put_text):
+	Re-order code to avoid accessing an unitialized variable.
+
+	* src/command.c (else_command):  An else clause might either be
+	processed by if_command() or else_command().  The latter was not
+	correctly updating c_token.
+
 2011-10-13  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* docs/gnuplot.doc docs/titlepag.tex:  Revise the sections that 

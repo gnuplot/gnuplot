@@ -1,5 +1,5 @@
 /* Hey Emacs this is -*- C -*-
- * $Id: emf.trm,v 1.76 2011/09/01 03:45:32 sfeam Exp $
+ * $Id: emf.trm,v 1.77 2011/09/27 23:18:02 sfeam Exp $
  */
 
 /* GNUPLOT - emf.trm */
@@ -1197,7 +1197,10 @@ EMF_solid_vector(unsigned int ux, unsigned int uy)
 TERM_PUBLIC void 
 EMF_put_text(unsigned int x, unsigned int y, const char str[])
 {
-    int i, slen, alen, nchars;
+    int i, alen;
+    int slen = strlen(str);
+    int nchars = slen;
+
 #ifdef HAVE_ICONV
     char * wstr;
     if (encoding == S_ENC_UTF8 || encoding == S_ENC_SJIS) {
@@ -1224,9 +1227,8 @@ EMF_put_text(unsigned int x, unsigned int y, const char str[])
 	    slen = wsize - wlen;
 	    nchars = slen / 2;
 	}
-    } else
+    }
 #endif
-	nchars = slen = strlen(str);
     alen = slen;
 
     EMF_flush_polyline();

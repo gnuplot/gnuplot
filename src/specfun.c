@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: specfun.c,v 1.44 2010/12/30 07:23:41 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: specfun.c,v 1.46 2011/05/16 18:43:41 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - specfun.c */
@@ -724,20 +724,21 @@ static double humlik(double x, double y)
     yq = y * y;
     yrrtpi = y * rrtpi;
     rg1 = true, rg2 = true, rg3 = true;
-    if (y < 70.55) {
-        xlim0 = sqrt(y * (40. - y * 3.6) + 15100.);
-        xlim1 = (y >= 8.425 ?  0. : sqrt(164. - y * (y * 1.8 + 4.3)));
-        xlim2 = 6.8 - y;
-        xlim3 = y * 2.4;
-        xlim4 = y * 18.1 + 1.65;
-        if (y <= 1e-6)
-            xlim2 = xlim1 = xlim0;
-    }
-
     abx = fabs(x);
     xq = abx * abx;
 
-    if (abx >= xlim0 || y >= 70.55)     /* Region 0 algorithm */
+    if (y >= 70.55)
+        return yrrtpi / (xq + yq);
+
+    xlim0 = sqrt(y * (40. - y * 3.6) + 15100.);
+    xlim1 = (y >= 8.425 ?  0. : sqrt(164. - y * (y * 1.8 + 4.3)));
+    xlim2 = 6.8 - y;
+    xlim3 = y * 2.4;
+    xlim4 = y * 18.1 + 1.65;
+    if (y <= 1e-6)
+	xlim2 = xlim1 = xlim0;
+
+    if (abx >= xlim0)                   /* Region 0 algorithm */
         return yrrtpi / (xq + yq);
 
     else if (abx >= xlim1) {            /* Humlicek W4 Region 1 */
