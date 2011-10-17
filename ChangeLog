@@ -1,3 +1,7 @@
+2011-10-17  Christoph Bersch  <cbersch@users.sourceforge.net>
+
+	* docs/doc2texi.el:  Handle presence of three nodes with the same key.
+
 2011-10-14  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/specfun.c (humlik):

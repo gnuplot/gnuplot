@@ -608,6 +608,9 @@ appropriate sectioning and @node commands."
 	  ;; this will fail to work if a third pops up in the future!
 	  (if (member* node d2t-node-list :test 'string=)
 	      (setq node (concat node "_")))
+	  ;; this is a fast hack to account for a third equal node name
+	  (if (member* node d2t-node-list :test 'string=)
+	      (setq node (concat node "_")))
 	  (setq d2t-node-list (append d2t-node-list (list node)))
 	  (beginning-of-line)
 	  (delete-region (point-marker) eol)
