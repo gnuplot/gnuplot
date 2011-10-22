@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: svg.trm,v 1.124 2011/10/04 20:07:42 sfeam Exp $
+ * $Id: svg.trm,v 1.125 2011/10/04 20:27:01 sfeam Exp $
  */
 
 /*------------------------------------------------------------------------------------------------------------------------------------
@@ -506,7 +506,7 @@ SVG_options ()
 		    int_error(c_token,"expecting a plot name");
 	    if (SVG_name[strspn(SVG_name,
 		"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_1234567890")])
-		    int_error(c_token-1,"illegal javascript variable name");
+		    int_error(c_token-1,"name must contain only alphanumerics or _");
 	    continue;
 	}
 
@@ -831,6 +831,8 @@ SVG_init ()
 #endif
     fprintf (gpoutfile, ">\n\n");
 
+    /* TODO: It would be nice to print the actual plot title here */
+    fprintf (gpoutfile, "<title>%s</title>\n", SVG_name ? SVG_name : "Gnuplot");
     fprintf (gpoutfile,
 	     "<desc>Produced by GNUPLOT %s patchlevel %s </desc>\n\n",
 	     gnuplot_version, gnuplot_patchlevel);

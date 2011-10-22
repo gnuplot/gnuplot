@@ -1,3 +1,8 @@
+2011-10-22  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/svg.trm:  Friendlier error message, add a <title> tag at the
+	top of the output svg document.
+
 2011-10-17  Christoph Bersch  <cbersch@users.sourceforge.net>
 
 	* docs/doc2texi.el:  Handle presence of three nodes with the same key.
