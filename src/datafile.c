@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.209 2011/09/29 18:39:01 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.210 2011/10/10 21:17:04 juhaszp Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -1824,7 +1824,7 @@ df_readascii(double v[], int max)
 			return DF_UNDEFINED;    /* store undefined point in plot */
 
 		    if ((df_axis[output] != NO_AXIS)
-			   && axis_array[df_axis[output]].is_timedata)
+			   && axis_array[df_axis[output]].datatype == DT_TIMEDATE)
 			timefield = TRUE;
 
 		    if (timefield && (a.type != STRING)
@@ -1877,7 +1877,7 @@ df_readascii(double v[], int max)
 		} else if (column <= 0) /* really < -2, but */
 		    int_error(NO_CARET, "internal error: column <= 0 in datafile.c");
 		else if ((df_axis[output] != NO_AXIS)
-			 && (axis_array[df_axis[output]].is_timedata)) {
+			 && (axis_array[df_axis[output]].datatype == DT_TIMEDATE)) {
 		    struct tm tm;
 		    double usec = 0.0;
 		    if (column > df_no_cols ||
@@ -4668,7 +4668,7 @@ df_readbinary(double v[], int max)
 		} else if (column == 0) {
 		    v[output] = df_datum;
 		} else if (column <= 0) {
-		    int_error(NO_CARET, "internal error: unkown column type");
+		    int_error(NO_CARET, "internal error: unknown column type");
 
 		/* July 2010 - We used to have special code to handle time data. */
 		/* But time data in a binary file is just one more binary value, */

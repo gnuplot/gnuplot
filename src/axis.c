@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.93 2011/07/12 19:30:34 juhaszp Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.94 2011/09/04 11:06:19 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -456,7 +456,7 @@ copy_or_invent_formatstring(AXIS_INDEX axis)
 
     /* HBB 20010803: moved this here ... was done whenever this was called,
      * anyway */
-    if (! axis_array[axis].is_timedata
+    if ( axis_array[axis].datatype != DT_TIMEDATE
 	|| !axis_array[axis].format_is_numeric) {
 	/* The simple case: formatstring is usable, so use it! */
 	strcpy(ticfmt[axis], axis_array[axis].formatstring);
@@ -606,7 +606,7 @@ make_tics(AXIS_INDEX axis, int guide)
     if (axis_array[axis].log && tic < 1.0)
 	  tic = 1.0;
 
-    if (axis_array[axis].is_timedata)
+    if (axis_array[axis].datatype == DT_TIMEDATE)
 	return quantize_time_tics(axis, tic, xr, guide);
     else
 	return tic;
@@ -733,7 +733,7 @@ round_outward(
 			   ? ceil(input / tic)
 			   : floor(input / tic));
 
-    if (axis_array[axis].is_timedata) {
+    if (axis_array[axis].datatype == DT_TIMEDATE) {
 	double ontime = time_tic_just(timelevel[axis], result);
 
 	/* FIXME: how certain is it that we don't want to *always*
@@ -808,7 +808,7 @@ setup_tics(AXIS_INDEX axis, int max)
      * leading to strange misbehaviours of minor tics on time axes.
      * We used to call quantize_time_tics, but that also caused strangeness.
      */
-    if (this->is_timedata && ticdef->type == TIC_SERIES) {
+    if (this->datatype == DT_TIMEDATE && ticdef->type == TIC_SERIES) {
 	if      (tic >= 365*24*60*60.) timelevel[axis] = TIMELEVEL_YEARS;
 	else if (tic >=  28*24*60*60.) timelevel[axis] = TIMELEVEL_MONTHS;
 	else if (tic >=   7*24*60*60.) timelevel[axis] = TIMELEVEL_WEEKS;
@@ -895,7 +895,7 @@ gen_tics(AXIS_INDEX axis, tic_callback callback)
 
 	    if (mark->level < 0) /* label read from data file */
 		strncpy(label, mark->label, sizeof(label));
-	    else if (axis_array[axis].is_timedata)
+	    else if (axis_array[axis].datatype == DT_TIMEDATE)
 		gstrftime(label, MAX_ID_LEN-1, mark->label ? mark->label : ticfmt[axis], mark->position);
 	    else
 		gprintf(label, sizeof(label), mark->label ? mark->label : ticfmt[axis], log10_base, mark->position);
@@ -1051,7 +1051,7 @@ gen_tics(AXIS_INDEX axis, tic_callback callback)
 		    }
 		    /* }}} */
 		}
-	    } else if (axis_array[axis].is_timedata) {
+	    } else if (axis_array[axis].datatype == DT_TIMEDATE) {
 		ministart = ministep =
 		    make_auto_time_minitics(timelevel[axis], step);
 		miniend = step * 0.9;
@@ -1118,7 +1118,7 @@ gen_tics(AXIS_INDEX axis, tic_callback callback)
 		/* Defer translation until after limit check */
 		internal = tic;
 	    } else if (!axis_array[axis].log) {
-		internal = (axis_array[axis].is_timedata)
+		internal = (axis_array[axis].datatype == DT_TIMEDATE)
 		    ? time_tic_just(timelevel[axis], tic)
 		    : tic;
 		user = CheckZero(internal, step);
@@ -1151,7 +1151,7 @@ gen_tics(AXIS_INDEX axis, tic_callback callback)
 		    }
 		default:{	/* comp or series */
 			char label[MAX_ID_LEN]; /* Leave room for enhanced text markup */
-			if (axis_array[axis].is_timedata) {
+			if (axis_array[axis].datatype == DT_TIMEDATE) {
 			    /* If they are doing polar time plot, good luck to them */
 			    gstrftime(label, MAX_ID_LEN-1, ticfmt[axis], (double) user);
 			} else if (polar) {
@@ -1194,7 +1194,7 @@ gen_tics(AXIS_INDEX axis, tic_callback callback)
 		/* {{{  process minitics */
 		double mplace, mtic;
 		for (mplace = ministart; mplace < miniend; mplace += ministep) {
-		    if (axis_array[axis].is_timedata)
+		    if (axis_array[axis].datatype == DT_TIMEDATE)
 			mtic = time_tic_just(timelevel[axis] - 1,
 					     internal + mplace);
 		    else

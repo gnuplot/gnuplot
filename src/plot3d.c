@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.188 2011/07/22 14:37:57 juhaszp Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.189 2011/07/25 06:51:29 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -1364,10 +1364,10 @@ eval_3dplots()
 		/* this_plot->token is temporary, for errors in get_3ddata() */
 
 		if (specs < 3) {
-		    if (axis_array[FIRST_X_AXIS].is_timedata) {
+		    if (axis_array[FIRST_X_AXIS].datatype == DT_TIMEDATE) {
 			int_error(c_token, "Need full using spec for x time data");
 		    }
-		    if (axis_array[FIRST_Y_AXIS].is_timedata) {
+		    if (axis_array[FIRST_Y_AXIS].datatype == DT_TIMEDATE) {
 			int_error(c_token, "Need full using spec for y time data");
 		    }
 		}

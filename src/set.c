@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.346 2011/10/08 00:07:41 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.347 2011/10/10 21:17:04 juhaszp Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -544,19 +544,14 @@ set_command()
 	    break;
 	case S_XDATA:
 	    set_timedata(FIRST_X_AXIS);
-	    /* HBB 20000506: the old cod this this, too, although it
-	     * serves no useful purpose, AFAICS */
-	    /* HBB 20010201: Changed implementation to fix bug
-	     * (c_token advanced too far) */
-	    axis_array[T_AXIS].is_timedata
-	      = axis_array[U_AXIS].is_timedata
-	      = axis_array[FIRST_X_AXIS].is_timedata;
+	    axis_array[T_AXIS].datatype
+	      = axis_array[U_AXIS].datatype
+	      = axis_array[FIRST_X_AXIS].datatype;
 	    break;
 	case S_YDATA:
 	    set_timedata(FIRST_Y_AXIS);
-	    /* dito */
-	    axis_array[V_AXIS].is_timedata
-	      = axis_array[FIRST_X_AXIS].is_timedata;
+	    axis_array[V_AXIS].datatype
+	      = axis_array[FIRST_X_AXIS].datatype;
 	    break;
 	case S_ZDATA:
 	    set_timedata(FIRST_Z_AXIS);
@@ -4664,12 +4659,11 @@ static void
 set_timedata(AXIS_INDEX axis)
 {
     c_token++;
-    if(END_OF_COMMAND) {
-	axis_array[axis].is_timedata = FALSE;
-    } else {
-	if ((axis_array[axis].is_timedata = almost_equals(c_token,"t$ime")))
-	    c_token++;
-}
+    axis_array[axis].datatype = DT_NORMAL;
+    if (almost_equals(c_token,"t$ime")) {
+	axis_array[axis].datatype = DT_TIMEDATE;
+	c_token++;
+    }
 }
 
 
@@ -5233,7 +5227,7 @@ load_tic_user(AXIS_INDEX axis)
 	/* has a string with it? */
 	save_token = c_token;
 	ticlabel = try_to_get_string();
-	if (ticlabel && axis_array[axis].is_timedata
+	if (ticlabel && axis_array[axis].datatype == DT_TIMEDATE
 	    && (equals(c_token,",") || equals(c_token,")"))) {
 	    c_token = save_token;
 	    free(ticlabel);

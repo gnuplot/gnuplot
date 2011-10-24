@@ -1,3 +1,15 @@
+2011-10-24  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/axis.c src/axis.h src/datafile.c src/fit.c src/mouse.c
+	src/plot2d.c src/plot3d.c src/save.c src/set.c src/setshow.h src/show.c
+	src/stats.c src/tabulate.c src/unset.c term/canvas.trm term/svg.trm:
+
+	Change the axis structure field from TBOOLEAN axis.is_timedata to an
+	enum {DT_NORMAL, DT_TIMEDATE} field axis.datatype.  This is preparation
+	for adding code to implement a new mode DT_DMS (degrees, minutes,
+	seconds) that tracks x and/or y as geographic coordinates.
+	There is no change to the behavior of the current code.
+
 2011-10-22  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/svg.trm:  Friendlier error message, add a <title> tag at the

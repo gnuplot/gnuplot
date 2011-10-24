@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.251 2011/09/30 04:00:02 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.252 2011/10/10 21:17:04 juhaszp Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -2402,11 +2402,11 @@ eval_plots()
 		    if (X_AXIS.autoscale & AUTOSCALE_MAX)
 			X_AXIS.max = -VERYLARGE;
 		}
-		if (X_AXIS.is_timedata) {
+		if (X_AXIS.datatype == DT_TIMEDATE) {
 		    if (specs < 2)
 			int_error(c_token, "Need full using spec for x time data");
 		}
-		if (Y_AXIS.is_timedata) {
+		if (Y_AXIS.datatype == DT_TIMEDATE) {
 		    if (specs < 1)
 			int_error(c_token, "Need using spec for y time data");
 		}

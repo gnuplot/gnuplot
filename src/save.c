@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.195 2011/10/08 00:07:41 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.196 2011/10/10 21:17:04 juhaszp Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -182,6 +182,7 @@ save_set_all(FILE *fp)
     struct linestyle_def *this_linestyle;
     struct arrowstyle_def *this_arrowstyle;
     legend_key *key = &keyT;
+    int axis;
 
     /* opinions are split as to whether we save term and outfile
      * as a compromise, we output them as comments !
@@ -213,29 +214,16 @@ set bar %f %s\n",
     } else
 	fputs("unset border\n", fp);
 
-    fprintf(fp, "\
-set xdata%s\n\
-set ydata%s\n\
-set zdata%s\n\
-set x2data%s\n\
-set y2data%s\n",
-	    axis_array[FIRST_X_AXIS].is_timedata ? " time" : "",
-	    axis_array[FIRST_Y_AXIS].is_timedata ? " time" : "",
-	    axis_array[FIRST_Z_AXIS].is_timedata ? " time" : "",
-	    axis_array[SECOND_X_AXIS].is_timedata ? " time" : "",
-	    axis_array[SECOND_Y_AXIS].is_timedata ? " time" : "");
-
-#define SAVE_TIMEFMT(axis)						\
-    if (strlen(axis_array[axis].timefmt)) 				\
-	fprintf(fp, "set timefmt %s \"%s\"\n", axis_defaults[axis].name,\
+    for (axis = FIRST_AXES; axis < LAST_REAL_AXIS; axis++) {
+	if (axis == SECOND_Z_AXIS) continue;
+	if (strlen(axis_array[axis].timefmt))
+	    fprintf(fp, "set timefmt %s \"%s\"\n", axis_defaults[axis].name,
 		conv_text(axis_array[axis].timefmt));
-    SAVE_TIMEFMT(FIRST_X_AXIS);
-    SAVE_TIMEFMT(FIRST_Y_AXIS);
-    SAVE_TIMEFMT(FIRST_Z_AXIS);
-    SAVE_TIMEFMT(SECOND_X_AXIS);
-    SAVE_TIMEFMT(SECOND_Y_AXIS);
-    SAVE_TIMEFMT(COLOR_AXIS);
-#undef SAVE_TIMEFMT
+	if (axis == COLOR_AXIS) continue;
+	fprintf(fp, "set %sdata %s\n", axis_defaults[axis].name,
+		axis_array[axis].datatype == DT_TIMEDATE ? "time" :
+		"");
+    }
 
     if (boxwidth < 0.0)
 	fputs("set boxwidth\n", fp);

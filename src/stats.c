@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: stats.c,v 1.26 2009/11/15 18:34:44 v923z Exp $"); }
+static char *RCSid() { return RCSid("$Id: stats.c,v 1.1 2011/10/03 00:17:22 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - stats.c */
@@ -710,16 +710,16 @@ statsrequest(void)
 
 	/* For all these below: we could save the state, switch off, then restore */
 	if ( axis_array[FIRST_X_AXIS].log || axis_array[FIRST_Y_AXIS].log )
-	    int_error( NO_CARET, "Stats command not available with logscale");
+	    int_error( NO_CARET, "Stats command not available with logscale active");
 
-	if ( axis_array[FIRST_X_AXIS].is_timedata || axis_array[FIRST_Y_AXIS].is_timedata )
-	    int_error( NO_CARET, "Stats command not available with timedata mode");
+	if ( axis_array[FIRST_X_AXIS].datatype == DT_TIMEDATE || axis_array[FIRST_Y_AXIS].datatype == DT_TIMEDATE )
+	    int_error( NO_CARET, "Stats command not available in timedata mode");
 
 	if ( polar )
-	    int_error( NO_CARET, "Stats command not availble in polar mode" );
+	    int_error( NO_CARET, "Stats command not available in polar mode" );
 
 	if ( parametric )
-	    int_error( NO_CARET, "Stats command not availble in parametric mode" );
+	    int_error( NO_CARET, "Stats command not available in parametric mode" );
 
 	/* The way readline and friends work is as follows:
 	 - df_open will return the number of columns requested in the using spec

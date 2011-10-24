@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: svg.trm,v 1.125 2011/10/04 20:27:01 sfeam Exp $
+ * $Id: svg.trm,v 1.126 2011/10/22 16:18:42 sfeam Exp $
  */
 
 /*------------------------------------------------------------------------------------------------------------------------------------
@@ -1064,7 +1064,7 @@ SVG_text ()
 	 * gnuplot_svg.js to recognize additional formats.
 	 * FIXME: This all needs to be documented somewhere!
 	 */
-	if (axis_array[FIRST_X_AXIS].is_timedata) {
+	if (axis_array[FIRST_X_AXIS].datatype == DT_TIMEDATE) {
 	    fprintf(gpoutfile, "gnuplot_svg.plot_timeaxis_x = \"%s\";\n",
 		(mouse_alt_string) ? mouse_alt_string
 		: (mouse_mode == 4) ? "Date"

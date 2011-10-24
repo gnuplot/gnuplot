@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.256 2011/10/08 00:07:41 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.257 2011/10/10 21:17:04 juhaszp Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -2785,7 +2785,7 @@ static void
 show_range(AXIS_INDEX axis)
 {
     SHOW_ALL_NL;
-    if (axis_array[axis].is_timedata)
+    if (axis_array[axis].datatype == DT_TIMEDATE)
 	fprintf(stderr, "\tset %sdata time\n", axis_defaults[axis].name);
     fprintf(stderr,"\t");
     save_range(stderr, axis);
@@ -2845,7 +2845,8 @@ show_data_is_timedate(AXIS_INDEX axis)
 {
     SHOW_ALL_NL;
     fprintf(stderr, "\t%s is set to %s\n", axis_defaults[axis].name,
-	    axis_array[axis].is_timedata ? "time" : "numerical");
+	    axis_array[axis].datatype == DT_TIMEDATE ? "time" :
+	    "numerical");
 }
 
 
@@ -2865,7 +2866,7 @@ show_timefmt()
     } else {
         /* show all currently active time axes' formats: */
 	for (axis = 0; axis<AXIS_ARRAY_SIZE; axis++)
-	    if (axis_array[axis].is_timedata)
+	    if (axis_array[axis].datatype == DT_TIMEDATE)
 		fprintf(stderr,
 			"\tread format for time on %s axis is \"%s\"\n",
 			axis_defaults[axis].name,
@@ -3247,7 +3248,7 @@ show_ticdef(AXIS_INDEX axis)
 		SHOW_NUM_OR_TIME(axis_array[axis].ticdef.def.series.start, axis);
 	    }
 	    fprintf(stderr, " by %g%s", axis_array[axis].ticdef.def.series.incr,
-		    axis_array[axis].is_timedata ? " secs" : "");
+		    axis_array[axis].datatype == DT_TIMEDATE ? " secs" : "");
 	    if (axis_array[axis].ticdef.def.series.end != VERYLARGE) {
 		fputs(" until ", stderr);
 		SHOW_NUM_OR_TIME(axis_array[axis].ticdef.def.series.end, axis);

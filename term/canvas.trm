@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: canvas.trm,v 1.53 2011/09/06 03:17:42 sfeam Exp $
+ * $Id: canvas.trm,v 1.54 2011/09/27 23:18:02 sfeam Exp $
  *
  */
 
@@ -640,7 +640,7 @@ CANVAS_text()
 	 * "Time" and "Date", but the user could modify gnuplot_mouse.js to
 	 * recognize additional formats.
 	 */
-	if (axis_array[FIRST_X_AXIS].is_timedata) {
+	if (axis_array[FIRST_X_AXIS].datatype == DT_TIMEDATE) {
 	    fprintf(gpoutfile, "gnuplot.plot_timeaxis_x = \"%s\";\n",
 		(mouse_alt_string) ? mouse_alt_string
 		: (mouse_mode == 4) ? "Date"

@@ -1,5 +1,5 @@
 /*
- * $Id: axis.h,v 1.64 2011/05/14 19:53:36 sfeam Exp $
+ * $Id: axis.h,v 1.65 2011/07/12 19:30:34 juhaszp Exp $
  *
  */
 
@@ -82,6 +82,12 @@ typedef enum en_ticseries_type {
     TIC_MONTH,   		/* print out month names ((mo-1)%12)+1 */
     TIC_DAY      		/* print out day of week */
 } t_ticseries_type;
+
+typedef enum {
+    DT_NORMAL=0,		/* default; treat values as pure numeric */
+    DT_TIMEDATE,		/* old datatype */
+    DT_DMS			/* degrees minutes seconds */
+} td_type;
 
 /* Defines one ticmark for TIC_USER style.
  * If label==NULL, the value is printed with the usual format string.
@@ -223,7 +229,7 @@ typedef struct axis {
     double log_base;		/* ln(base), for easier computations */
 
 /* time/date axis control */
-    TBOOLEAN is_timedata;	/* is this a time/date axis? */
+    td_type datatype;		/* DT_NORMAL | DT_TIMEDATE | DT_DMS */
     TBOOLEAN format_is_numeric;	/* format string looks like numeric??? */
     char timefmt[MAX_ID_LEN+1];	/* format string for input */
     char formatstring[MAX_ID_LEN+1];
@@ -263,7 +269,7 @@ typedef struct axis {
 	0.,        		/* terminal scale */			    \
 	0,        		/* zero axis position */		    \
 	FALSE, 0.0, 0.0,	/* log, base, log(base) */		    \
-	FALSE, TRUE,		/* is_timedata, format_numeric */	    \
+	DT_NORMAL, TRUE,	/* datatype, format_numeric */	            \
 	DEF_FORMAT, TIMEFMT,	/* output format, timefmt */		    \
 	NO_TICS,		/* tic output positions (border, mirror) */ \
 	DEFAULT_AXIS_TICDEF,	/* tic series definition */		    \
@@ -540,11 +546,11 @@ do {									     \
 /* parse a position of the form
  *    [coords] x, [coords] y {,[coords] z}
  * where coords is one of first,second.graph,screen,character
- * if first or second, we need to take axis_is_timedata into account
+ * if first or second, we need to take axis.datatype into account
  */
 #define GET_NUMBER_OR_TIME(store,axes,axis)				\
 do {									\
-    if (((axes) >= 0) && (axis_array[(axes)+(axis)].is_timedata)	\
+    if (((axes) >= 0) && (axis_array[(axes)+(axis)].datatype == DT_TIMEDATE)	\
 	&& isstringvalue(c_token)) {					\
 	struct tm tm;							\
 	double usec;							\

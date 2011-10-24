@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: fit.c,v 1.75 2011/03/13 19:55:29 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: fit.c,v 1.76 2011/10/13 22:12:27 sfeam Exp $"); }
 #endif
 
 /*  NOTICE: Change of Copyright Status
@@ -1191,7 +1191,7 @@ log_axis_restriction(FILE *log_f, AXIS_INDEX axis, char *name)
     fprintf(log_f, "\t%s range restricted to [", name);
     if (this_axis->autoscale & AUTOSCALE_MIN) {
 	putc('*', log_f);
-    } else if (this_axis->is_timedata) {
+    } else if (this_axis->datatype == DT_TIMEDATE) {
 	putc('"', log_f);
 	gstrftime(s, 80, this_axis->timefmt, this_axis->min);
 	fputs(s, log_f);
@@ -1203,7 +1203,7 @@ log_axis_restriction(FILE *log_f, AXIS_INDEX axis, char *name)
     fputs(" : ", log_f);
     if (this_axis->autoscale & AUTOSCALE_MAX) {
 	putc('*', log_f);
-    } else if (this_axis->is_timedata) {
+    } else if (this_axis->datatype == DT_TIMEDATE) {
 	putc('"', log_f);
 	gstrftime(s, 80, this_axis->timefmt, this_axis->max);
 	fputs(s, log_f);
@@ -1329,11 +1329,11 @@ fit_command()
      * We need to check if one of the columns is time data, like
      * in plot2d and plot3d */
 
-    if (X_AXIS.is_timedata) {
+    if (X_AXIS.datatype == DT_TIMEDATE) {
 	if (columns < 2)
 	    int_error(c_token, "Need full using spec for x time data");
     }
-    if (Y_AXIS.is_timedata) {
+    if (Y_AXIS.datatype == DT_TIMEDATE) {
 	if (columns < 1)
 	    int_error(c_token, "Need using spec for y time data");
     }
