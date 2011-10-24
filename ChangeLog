@@ -1,5 +1,12 @@
 2011-10-24  Ethan A Merritt  <merritt@u.washington.edu>
 
+	* src/color.c (make_palette):  Fix segfault caused by initializing a 
+	terminal with an "infinite" color palette (colors == 0) when previous 
+	terminal had merely a large color palette (e.g. WIN_PAL_COLORS 4096).
+	Bug #3429772
+
+2011-10-24  Ethan A Merritt  <merritt@u.washington.edu>
+
 	* src/axis.c src/axis.h src/datafile.c src/fit.c src/mouse.c
 	src/plot2d.c src/plot3d.c src/save.c src/set.c src/setshow.h src/show.c
 	src/stats.c src/tabulate.c src/unset.c term/canvas.trm term/svg.trm:

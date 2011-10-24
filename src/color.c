@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: color.c,v 1.96 2011/07/12 19:30:34 juhaszp Exp $"); }
+static char *RCSid() { return RCSid("$Id: color.c,v 1.97 2011/09/29 18:48:57 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - color.c */
@@ -107,6 +107,7 @@ make_palette()
 
     /* ask for suitable number of colours in the palette */
     i = term->make_palette(NULL);
+    sm_palette.colors = i;
     if (i == 0) {
 	/* terminal with its own mapping (PostScript, for instance)
 	   It will not change palette passed below, but non-NULL has to be
@@ -122,7 +123,6 @@ make_palette()
     }
 
     /* set the number of colours to be used (allocated) */
-    sm_palette.colors = i;
     if (sm_palette.use_maxcolors > 0) {
 	if (sm_palette.colorMode == SMPAL_COLOR_MODE_GRADIENT)
 	    sm_palette.colors = i;	/* EAM Sep 2010 - could this be a constant? */
