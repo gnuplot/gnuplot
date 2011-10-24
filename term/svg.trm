@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: svg.trm,v 1.101.2.7 2011/07/25 23:23:19 sfeam Exp $
+ * $Id: svg.trm,v 1.101.2.8 2011/07/28 06:18:06 sfeam Exp $
  */
 
 /*------------------------------------------------------------------------------------------------------------------------------------
@@ -709,6 +709,7 @@ SVG_init ()
 #endif
     fprintf (gpoutfile, ">\n\n");
 
+    fprintf (gpoutfile,"<title>gnuplot</title>\n");
     fprintf (gpoutfile,
 	     "<desc>Produced by GNUPLOT %s patchlevel %s </desc>\n\n",
 	     gnuplot_version, gnuplot_patchlevel);

@@ -1,3 +1,7 @@
+2011-10-24  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/svg.trm:  Write <title>gnuplot</title> at top of output.
+
 2011-10-13  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/wxterminal/gp_cairo.c: Decrease linewidth used by pdfcairo
