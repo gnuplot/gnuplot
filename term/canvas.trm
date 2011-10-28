@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: canvas.trm,v 1.54 2011/09/27 23:18:02 sfeam Exp $
+ * $Id: canvas.trm,v 1.55 2011/10/25 05:10:58 sfeam Exp $
  *
  */
 
@@ -549,7 +549,7 @@ CANVAS_graphics()
 	);
 
     fprintf(gpoutfile,
-	"ctx.lineCap = \"%s\"; ctx.lineJoin = \"%s\"\n",
+	"ctx.lineCap = \"%s\"; ctx.lineJoin = \"%s\";\n",
 	canvas_rounded ? "round" : "butt",
 	canvas_rounded ? "round" : "miter"
     );
