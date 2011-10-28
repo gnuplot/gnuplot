@@ -1,3 +1,10 @@
+2011-10-28  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/color.c (make_palette):  Fix segfault caused by initializing a 
+	terminal with an "infinite" color palette (colors == 0) when previous 
+	terminal had merely a large color palette (e.g. WIN_PAL_COLORS 4096).
+	Bug #3429772
+
 2011-10-24  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/svg.trm:  Write <title>gnuplot</title> at top of output.

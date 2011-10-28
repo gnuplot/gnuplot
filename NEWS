@@ -21,6 +21,7 @@ New features, changes and fixes in gnuplot version 4.4.4
 * FIX `plot with labels` failed to skip labels with UNDEFINED coords
 * FIX NaN (not a number) implementation for Windows build
 * FIX work-around for poor scaling in pdfcairo pattern fill
+* FIX segfault if mismatch between palette sizes of successive terminals
 
 
 New features, changes and fixes in gnuplot version 4.4.3
