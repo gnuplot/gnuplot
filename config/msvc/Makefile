@@ -1,5 +1,5 @@
 #
-# $Id: makefile.nt,v 1.29 2011/03/13 12:15:56 markisch Exp $
+# $Id: Makefile,v 1.1 2011/05/06 12:19:18 markisch Exp $
 #
 # GNUPLOT Makefile Microsoft Visual C++ 2005 or newer
 
@@ -77,7 +77,7 @@ LD = link
 # /MD means include multi-thread support (DLL)
 CBASEFLAGS = /EHsc /GR /MD /O2 /nologo
 CFLAGS = $(CBASEFLAGS) /I. /I$(TOP) /I$(S) /D_Windows /DWIN32 /DHAVE_CONFIG_H /D__MSC__ /DHELPFILE=\"$(HELPFILE)\" $(OPTIONS)
-CONSOLE_CFLAGS = /DWGP_CONSOLE
+CONSOLE_CFLAGS = /DWGP_CONSOLE /DPIPES
 OPTIONS = /DUSE_MOUSE
 OPTIONS = $(OPTIONS) /DGNUPLOT_HISTORY
 
