@@ -1,9 +1,14 @@
+2011-10-30  Shigeharu Takeno  <shige@iee.niit.ac.jp>
+
+	* config/config.nt config/makefile.nt: Windows console apps support
+	pipes.
+
 2011-10-30  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* config/config.cyg config/config.mgw config/config.nt
 	config/config.oww: Enable stats command.
 
-2011-10-24  Ethan A Merritt  <merritt@u.washington.edu>
+2011-10-28  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/color.c (make_palette):  Fix segfault caused by initializing a 
 	terminal with an "infinite" color palette (colors == 0) when previous 

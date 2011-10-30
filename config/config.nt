@@ -572,6 +572,10 @@
 #define GP_MATHERR _matherr
 #define snprintf _snprintf
 /*#define vsnprintf _vsnprintf*/
+#ifdef PIPES
+# define popen _popen
+# define pclose _pclose
+#endif
 #define isnan _isnan
 
 /* gnuplot.gih is not used by wgnuplot */
