@@ -462,6 +462,9 @@
 /* #undef USE_MOUSE */
 /* Don't change it here -- this define is set in config/makefile.cyg. */
 
+/* Define to add support for generating a statistical summary of data */
+#define USE_STATS 1
+
 /* Define to enable multi-byte font support for x11 */
 /* #undef USE_X11_MULTIBYTE */
 

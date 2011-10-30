@@ -1,3 +1,8 @@
+2011-10-30  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* config/config.cyg config/config.mgw config/config.nt
+	config/config.oww: Enable stats command.
+
 2011-10-24  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/color.c (make_palette):  Fix segfault caused by initializing a 
