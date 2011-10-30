@@ -291,38 +291,31 @@ the compiler you want to use (default DECC).
 MS-Windows
 ----------
 
-You'll need a help compiler from Microsoft to build the on-line help
-for gnuplot.  Some versions of that, including the one coming with
-version 4.0 of MSVC++ and with Borland C++ Builder 1.0, appear unable
-to compile gnuplot.rtf.  The freely available "Help Workshop" download
-from Microsoft is known to work, so in case of down you should get and
-use that.
+In order to build the help file you require the "Microsoft HTML Help 1.4
+SDK", which is freely downloadable here:
+http://go.microsoft.com/fwlink/?LinkId=154968
 
 General install instructions:
- Change into the "src" subdirectory.
- Build the program using one of the ways shown below this note.
- Put wgnuplot.exe, wgnuplot.hlp and wgnuplot.mnu all in a single
+ Build the program using one of the ways shown below this note. 
+ Some of the Makefiles include an "install" target (e.g. config/mingw/Makefile).
+ Alternatively, put wgnuplot.exe, wgnuplot.chm and wgnuplot.mnu all in a single
   directory somewhere.  You may want to add that directory to your PATH.
  There's no installer for gnuplot, so if you want a desktop link,
   program manager group or an association of *.plt or *.gpl files to
   wgnuplot, you'll have to do all that yourself.
 
-Using Visual C++ and compiling for Windows (32-bit, i.e. 9x and NT family)
-      nmake -f ..\config\makefile.nt
- or
-      copy ..\config\makefile.nt makefile
-      nmake
+We currently support and test building with the following compilers and
+Makefiles:
 
-Using the MinGW32 port of gcc:  Instructions are given in config/makefile.mgw
+    MinGW/MSYS: config/mingw/Makefile
+    Microsoft Visual C++: config/msvc/Makefile
+    OpenWatcom: config/watcom/Makefile
+    Cygwin: config/cygwin/Makefile
+	
+Further building instructions are given in correspondig Makefiles.
+Note that Makefiles contain a configuration section which you have to
+adopt to your actual setup!
 
-Using the Cygwin port of gcc:  Instructions are given in config/makefile.cyg
-
-Using Borland C++ 32 bit compilers, like the freely downloadable BCC55:
-      copy ..\config\makefile.win makefile.win
-  Look through makefile.win to see if you need to make any changes.
-  You'll probably have to change TC and some others.
-      make -fmakefile.win WIN32=1
-      
 [NOTE: gnuplot can no longer be built for 16-bit Windows versions.]
 
 

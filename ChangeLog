@@ -1,3 +1,9 @@
+2011-10-30  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* INSTALL: Update Windows section.
+
+	* config/makefile.mgw: Superseded by config/mingw/Makefile. Removed.
+
 2011-10-30  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* config/config.nt config/makefile.nt: Windows console apps support
