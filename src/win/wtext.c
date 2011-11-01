@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: wtext.c,v 1.34 2011/04/12 20:44:04 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: wtext.c,v 1.35 2011/04/13 06:46:48 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - win/wtext.c */
@@ -59,6 +59,7 @@ static char *RCSid() { return RCSid("$Id: wtext.c,v 1.34 2011/04/12 20:44:04 mar
 
 /* needed for mouse scroll wheel support */
 #define _WIN32_WINNT 0x0400
+#define _WIN32_IE 0x0501
 #include <windows.h>
 #include <windowsx.h>
 #include <commdlg.h>
@@ -1059,6 +1060,23 @@ WndParentProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 	    SetFocus(lptw->hWndText);
 	SendMessage(lptw->hWndText, message, wParam, lParam); /* pass on menu commands */
 	return(0);
+    case WM_NOTIFY:
+	switch (((LPNMHDR)lParam)->code) {
+		case TBN_DROPDOWN: {
+			RECT rc;
+			TPMPARAMS tpm;
+			LPNMTOOLBAR lpnmTB = (LPNMTOOLBAR)lParam;
+			SendMessage(lpnmTB->hdr.hwndFrom, TB_GETRECT, (WPARAM)lpnmTB->iItem, (LPARAM)&rc);
+			MapWindowPoints(lpnmTB->hdr.hwndFrom, HWND_DESKTOP, (LPPOINT)&rc, 2);
+			tpm.cbSize    = sizeof(TPMPARAMS);
+			tpm.rcExclude = rc;
+			TrackPopupMenuEx(lptw->hPopMenu, TPM_LEFTALIGN | TPM_LEFTBUTTON | TPM_VERTICAL,
+				rc.left, rc.bottom, lptw->hWndText, &tpm);
+			return TBDDRET_DEFAULT;
+		}
+		default:
+			return FALSE;
+    }
     case WM_ERASEBKGND:
 	return 1;
     case WM_DROPFILES:
@@ -1420,17 +1438,17 @@ WndTextProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 	break;
 	case WM_CONTEXTMENU:
 	{
-	POINT pt;
+		POINT pt;
 		pt.x = GET_X_LPARAM(lParam);
 		pt.y = GET_Y_LPARAM(lParam);
 		if (pt.x == -1) { /* keyboard activation */
 			pt.x = pt.y = 0;
 			ClientToScreen(hwnd, &pt);
 		}
-	TrackPopupMenu(lptw->hPopMenu, TPM_LEFTALIGN,
-		       pt.x, pt.y, 0, hwnd, NULL);
+		TrackPopupMenu(lptw->hPopMenu, TPM_LEFTALIGN,
+			pt.x, pt.y, 0, hwnd, NULL);
 		return 0;
-    }
+	}
     case WM_LBUTTONDOWN:
     { /* start marking text */
 	POINT pt;

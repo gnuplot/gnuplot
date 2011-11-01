@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: wmenu.c,v 1.20 2011/03/29 18:57:23 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: wmenu.c,v 1.21 2011/09/04 12:01:37 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - win/wmenu.c */
@@ -120,6 +120,7 @@ static void Gfclose(GFILE * gfile);
 static int Gfgets(LPSTR lp, int size, GFILE *gfile);
 static int GetLine(char * buffer, int len, GFILE *gfile);
 static void LeftJustify(char *d, char *s);
+static BYTE MacroCommand(LPTW lptw, UINT m);
 static void TranslateMacro(char *string);
 
 
@@ -336,6 +337,19 @@ UINT_PTR CALLBACK OFNHookProc(HWND hdlg, UINT uiMsg, WPARAM wParam, LPARAM lPara
 }
 
 #endif /* !SHELL_DIR_DIALOG */
+
+
+BYTE
+MacroCommand(LPTW lptw, UINT m)
+{
+	BYTE *s = lptw->lpmw->macro[m];
+	while (s && *s) {
+		if ((*s >= CMDMIN) && (*s <= CMDMAX))
+			return *s;
+		s++;
+	}
+	return 0;
+}
 
 
 /* Send a macro to the text window */
@@ -953,6 +967,8 @@ int ButtonIcon[BUTTONMAX];
 		button.idCommand = lpmw->hButtonID[i];
 		button.fsState = TBSTATE_ENABLED;
 		button.fsStyle = BTNS_AUTOSIZE | BTNS_SHOWTEXT | BTNS_NOPREFIX;
+		if (MacroCommand(lptw, lpmw->hButtonID[i]) == OPTIONS)
+			button.fsStyle |= BTNS_WHOLEDROPDOWN;
 		button.iString = (UINT_PTR)ButtonText[i];
 		ret = SendMessage(lpmw->hToolbar, TB_INSERTBUTTON, (WPARAM)i+1, (LPARAM)&button);
 	}
