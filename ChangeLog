@@ -1,3 +1,7 @@
+2011-11-01  Ethan A Merritt  <merritt@u.washington.edu>
+	* src/util.c src/util.h src/set.c (set_encoding):  Provide an internal
+	char sequence degree_sign[] appropriate for the current encoding.
+
 2011-11-01  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/win/wmenu.c src/win/wtext.c: Use proper dropdown menu for 

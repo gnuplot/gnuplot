@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.257 2011/10/10 21:17:04 juhaszp Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.258 2011/10/25 05:10:58 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -2510,6 +2510,8 @@ show_decimalsign()
         fprintf(stderr, "\tdecimalsign for output is %s \n", decimalsign);
     else
         fprintf(stderr, "\tdecimalsign for output has default value (normally '.')\n");
+
+    FPRINTF((stderr, "\tdegree sign for output is %s \n", degree_sign));
 }
 
 

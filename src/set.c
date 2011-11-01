@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.347 2011/10/10 21:17:04 juhaszp Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.348 2011/10/25 05:10:58 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -1410,6 +1410,19 @@ set_encoding()
 	    int_error(c_token, "unrecognized encoding specification; see 'help encoding'.");
 	encoding = temp;
 	c_token++;
+    }
+    /* Set degree sign to match encoding */
+    memset(degree_sign, 0, sizeof(degree_sign));
+    switch (encoding) {
+    case S_ENC_UTF8:	degree_sign[0] = '\302'; degree_sign[1] = '\260'; break;
+    case S_ENC_KOI8_R:
+    case S_ENC_KOI8_U:	degree_sign[0] = '\234'; break;
+    case S_ENC_CP437:
+    case S_ENC_CP850:
+    case S_ENC_CP852:	degree_sign[0] = '\370'; break;
+    case S_ENC_SJIS:	break;  /* should be 0x818B */
+    case S_ENC_CP950:	break;  /* should be 0xA258 */
+    default:		degree_sign[0] = '\260'; break;
     }
 }
 
