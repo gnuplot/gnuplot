@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.348 2011/10/25 05:10:58 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.349 2011/11/01 18:52:49 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -81,6 +81,7 @@ static void set_cntrparam __PROTO((void));
 static void set_contour __PROTO((void));
 static void set_dgrid3d __PROTO((void));
 static void set_decimalsign __PROTO((void));
+static void set_degreesign __PROTO((char *));
 static void set_dummy __PROTO((void));
 static void set_encoding __PROTO((void));
 static void set_fit __PROTO((void));
@@ -1390,13 +1391,14 @@ set_dummy()
 static void
 set_encoding()
 {
+    char *l = NULL;
     c_token++;
 
     if (END_OF_COMMAND) {
 	encoding = S_ENC_DEFAULT;
 #ifdef HAVE_LOCALE_H
     } else if (equals(c_token,"locale")) {
-	char *l = setlocale(LC_CTYPE,"");
+	l = setlocale(LC_CTYPE,"");
 	if (l && (strstr(l,"utf") || strstr(l,"UTF")))
 	    encoding = S_ENC_UTF8;
 	if (l && (strstr(l,"sjis") || strstr(l,"SJIS") || strstr(l,"932")))
@@ -1411,7 +1413,41 @@ set_encoding()
 	encoding = temp;
 	c_token++;
     }
+
     /* Set degree sign to match encoding */
+    set_degreesign(l);
+}
+
+static void
+set_degreesign(char *locale)
+{
+#ifdef HAVE_ICONV
+#include <iconv.h>
+    char degree_latin1[2] = {'\260', '\0'};
+    size_t lengthin = 2;
+    size_t lengthout = 8;
+    char *in = degree_latin1;
+    char *out = degree_sign;
+    iconv_t cd;
+
+    if (locale) { 
+	/* This should work even if gnuplot doesn't understand the encoding */
+	char *encoding = strchr(locale, '.');
+	if (encoding) {
+	    encoding++; /* Step past the dot in, e.g., ja_JP.EUC-JP */
+	    if ((cd = iconv_open(encoding, "ISO-8859-1")) == (iconv_t)(-1))
+		int_warn(NO_CARET, "iconv_open failed for %s",encoding);
+	    else {
+		if (iconv(cd, &in, &lengthin, &out, &lengthout) < 0)
+		    int_warn(NO_CARET, "iconv failed to convert degree sign");
+		iconv_close(cd);
+	    }
+	}
+	return;
+    }
+#endif    
+
+    /* These are the internally-known encodings */
     memset(degree_sign, 0, sizeof(degree_sign));
     switch (encoding) {
     case S_ENC_UTF8:	degree_sign[0] = '\302'; degree_sign[1] = '\260'; break;

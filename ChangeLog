@@ -1,6 +1,12 @@
-2011-11-01  Ethan A Merritt  <merritt@u.washington.edu>
-	* src/util.c src/util.h src/set.c (set_encoding):  Provide an internal
-	char sequence degree_sign[] appropriate for the current encoding.
+2011-11-02  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/util.c src/util.h src/set.c (set_encoding set_degreesign):
+	Provide an internal char sequence degree_sign[] appropriate for the
+	current encoding.  Use iconv(), if available, to translate it into the
+	environment's locale after `set encoding locale`.
+
+	* src/show.c (show_decimalsign):  Show the degree sign also, mostly
+	so that people can report problems with the encoding code above.
 
 2011-11-01  Bastian Maerkisch  <bmaerkisch@web.de>
 
