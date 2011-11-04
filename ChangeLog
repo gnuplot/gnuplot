@@ -1,3 +1,10 @@
+2011-11-04  Ethan A Merritt  <merritt@u.washington.edu>
+
+	term/wxt.trm src/wxterminal/wxt_term.h src/wxterminal/wxt_gui.cpp:
+	Add a term->layer() entry point for the wxt terminal.
+
+	* src/mouse.c src/term_api.h: TERM_LAYER_BEFORE_ZOOM
+
 2011-11-02  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/util.c src/util.h src/set.c (set_encoding set_degreesign):

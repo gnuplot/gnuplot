@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.cpp,v 1.87 2011/08/03 05:33:37 sfeam Exp $
+ * $Id: wxt_gui.cpp,v 1.88 2011/10/09 22:18:11 sfeam Exp $
  */
 
 /* GNUPLOT - wxt_gui.cpp */
@@ -2186,6 +2186,11 @@ void wxt_image(unsigned int M, unsigned int N, coordval * image, gpiPoint * corn
 	temp_command.image = gp_cairo_helper_coordval_to_chars(image, M, N, color_mode);
 
 	wxt_command_push(temp_command);
+}
+
+/* This is meta-information about the plot state */
+void wxt_layer(t_termlayer layer)
+{
 }
 
 #ifdef USE_MOUSE
