@@ -1,5 +1,5 @@
 /*
- * $Id: wxt.trm,v 1.27 2011/03/11 22:20:59 sfeam Exp $
+ * $Id: wxt.trm,v 1.28 2011/11/04 22:14:15 sfeam Exp $
  */
 
 /* GNUPLOT - wxt.trm */
@@ -66,6 +66,7 @@ rgb_color wxt_rgb_background = {1.,1.,1.};
 int wxt_persist = UNSET;
 int wxt_raise = UNSET;
 int wxt_ctrl = UNSET;
+int wxt_toggle = UNSET;
 int wxt_rounded = no;
 /* default text font family: */
 char wxt_set_fontname[MAX_ID_LEN + 1] = "";

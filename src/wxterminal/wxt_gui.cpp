@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.cpp,v 1.88 2011/10/09 22:18:11 sfeam Exp $
+ * $Id: wxt_gui.cpp,v 1.89 2011/11/04 22:14:15 sfeam Exp $
  */
 
 /* GNUPLOT - wxt_gui.cpp */
@@ -115,6 +115,25 @@
 #include "bitmaps/png/autoscale_png.h"
 #include "bitmaps/png/config_png.h"
 #include "bitmaps/png/help_png.h"
+
+/* Interactive toggle control variables
+ */
+static int wxt_cur_plotno = 0;
+static TBOOLEAN wxt_in_key_sample = FALSE;
+static TBOOLEAN wxt_zoom_command = FALSE;
+static unsigned long wxt_hide_plot = 0;	/* Used as a bit array */
+#ifdef USE_MOUSE
+typedef struct {
+	unsigned int left;
+	unsigned int right;
+	unsigned int ytop;
+	unsigned int ybot;
+} wxtBoundingBox;
+wxtBoundingBox *wxt_key_boxes = NULL;
+int wxt_max_key_boxes = 0;
+#else
+#define wxt_update_key_box(x,y)
+#endif
 
 #ifdef __WXMAC__
 #include <ApplicationServices/ApplicationServices.h>
@@ -902,6 +921,8 @@ void wxtPanel::OnLeftDown( wxMouseEvent& event )
 	y = (int) gnuplot_y( &plot, event.GetY() );
 
 	UpdateModifiers(event);
+	if (wxt_toggle)
+		wxt_check_for_toggle(x, y);
 
 	wxt_exec_event(GE_buttonpress, x, y, 1, 0, this->GetId());
 }
@@ -1155,6 +1176,67 @@ void wxtPanel::OnKeyDownChar( wxKeyEvent &event )
 	 *	GP_Linefeed, GP_Clear, GP_Sys_Req, GP_Begin
 	 */
 }
+
+/* --------------------------------------------------------
+ * Bookkeeping for clickable hot spots
+ * --------------------------------------------------------*/
+
+/* Initialize boxes starting from i */
+static void wxt_initialize_key_boxes(int i)
+{
+	for (; i<wxt_max_key_boxes; i++) {
+		wxt_key_boxes[i].left = wxt_key_boxes[i].ybot = INT_MAX;
+		wxt_key_boxes[i].right = wxt_key_boxes[i].ytop = 0;
+	}
+}
+
+/* Update the box enclosing the key sample for the current plot
+ * so that later we can detect mouse clicks in that area
+ */
+static void wxt_update_key_box( unsigned int x, unsigned int y )
+{
+	if (wxt_cur_plotno >= wxt_max_key_boxes) {
+		wxt_max_key_boxes += 10;
+		wxt_key_boxes = (wxtBoundingBox *)realloc(wxt_key_boxes, 
+				wxt_max_key_boxes * sizeof(wxtBoundingBox));
+		wxt_initialize_key_boxes(wxt_cur_plotno);
+	}
+	wxtBoundingBox *bb = &(wxt_key_boxes[wxt_cur_plotno]);
+	y = term->ymax - y;
+	if (x < bb->left)  bb->left = x;
+	if (x > bb->right) bb->right = x;
+	if (y < bb->ybot)  bb->ybot = y;
+	if (y > bb->ytop)  bb->ytop = y;
+}
+
+/* Called from wxtPanel::OnLeftDown
+ * If the mouse click was on top of a key sample then toggle the
+ * corresponding plot on/off
+ */
+static void wxt_check_for_toggle(unsigned int x, unsigned int y)
+{
+	int i;
+	for (i=1; i<=wxt_cur_plotno && i<wxt_max_key_boxes; i++) {
+		if (wxt_key_boxes[i].left == INT_MAX)
+			continue;
+		if (x < wxt_key_boxes[i].left)
+			continue;
+		if (x > wxt_key_boxes[i].right)
+			continue;
+		if (y < wxt_key_boxes[i].ybot)
+			continue;
+		if (y > wxt_key_boxes[i].ytop)
+			continue;
+		if ((wxt_hide_plot & 1L<<i) == 0)
+			wxt_hide_plot |= 1L<<i;
+		else
+			wxt_hide_plot &= ~(1L<<i);
+		wxt_current_panel->wxt_cairo_refresh();
+
+	}
+}
+
+
 #endif /*USE_MOUSE*/
 
 #ifndef DISABLE_SPACE_RAISES_CONSOLE
@@ -1303,6 +1385,7 @@ void wxtConfigDialog::OnButton( wxCommandEvent& event )
 		wxt_raise = raise_setting?yes:no;
 		wxt_persist = persist_setting?yes:no;
 		wxt_ctrl = ctrl_setting?yes:no;
+		wxt_toggle = toggle_setting?yes:no;
 
 		switch (rendering_setting) {
 		case 0 :
@@ -1331,6 +1414,8 @@ void wxtConfigDialog::OnButton( wxCommandEvent& event )
 			wxLogError(wxT("Cannot write persist"));
 		if (!pConfig->Write(wxT("ctrl"), ctrl_setting))
 			wxLogError(wxT("Cannot write ctrl"));
+		if (!pConfig->Write(wxT("toggle"), toggle_setting))
+			wxLogError(wxT("Cannot write toggle"));
 		if (!pConfig->Write(wxT("rendering"), rendering_setting))
 			wxLogError(wxT("Cannot write rendering_setting"));
 		if (!pConfig->Write(wxT("hinting"), hinting_setting))
@@ -1361,6 +1446,7 @@ wxtConfigDialog::wxtConfigDialog(wxWindow* parent)
 	pConfig->Read(wxT("raise"),&raise_setting);
 	pConfig->Read(wxT("persist"),&persist_setting);
 	pConfig->Read(wxT("ctrl"),&ctrl_setting);
+	pConfig->Read(wxT("toggle"),&toggle_setting);
 	pConfig->Read(wxT("rendering"),&rendering_setting);
 	pConfig->Read(wxT("hinting"),&hinting_setting);
 
@@ -1373,6 +1459,10 @@ wxtConfigDialog::wxtConfigDialog(wxWindow* parent)
 	wxCheckBox *check3 = new wxCheckBox (this, wxID_ANY,
 		wxT("Replace 'q' by <ctrl>+'q' and <space> by <ctrl>+<space> (ctrl)"),
 		wxDefaultPosition, wxDefaultSize, 0, wxGenericValidator(&ctrl_setting));
+
+	wxCheckBox *check4 = new wxCheckBox (this, wxID_ANY,
+		wxT("Toggle plots on/off when key sample is clicked"),
+		wxDefaultPosition, wxDefaultSize, 0, wxGenericValidator(&toggle_setting));
 
 	wxString choices[3];
 	choices[0] = wxT("No antialiasing");
@@ -1418,6 +1508,7 @@ wxtConfigDialog::wxtConfigDialog(wxWindow* parent)
 	vsizer->Add(check1,wxSizerFlags().Align(0).Expand().Border(wxALL));
 	vsizer->Add(check2,wxSizerFlags().Align(0).Expand().Border(wxALL));
 	vsizer->Add(check3,wxSizerFlags().Align(0).Expand().Border(wxALL));
+	vsizer->Add(check4,wxSizerFlags().Align(0).Expand().Border(wxALL));
 	vsizer->Add(box_sizer2,wxSizerFlags().Align(0).Expand().Border(wxALL));
 	/*vsizer->Add(CreateButtonSizer(wxOK|wxCANCEL),wxSizerFlags().Align(0).Expand().Border(wxALL));*/
 	vsizer->Add(hsizer,wxSizerFlags().Align(0).Expand().Border(wxALL));
@@ -1558,6 +1649,7 @@ void wxt_init()
 	bool raise_setting;
 	bool persist_setting;
 	bool ctrl_setting;
+	bool toggle_setting;
 	int rendering_setting;
 	int hinting_setting;
 
@@ -1581,6 +1673,13 @@ void wxt_init()
 	}
 	if (wxt_ctrl==UNSET)
 		wxt_ctrl = ctrl_setting?yes:no;
+
+	if (!pConfig->Read(wxT("toggle"), &toggle_setting)) {
+		pConfig->Write(wxT("toggle"), true);
+		toggle_setting = true;
+	}
+	if (wxt_toggle==UNSET)
+		wxt_toggle = toggle_setting?yes:no;
 
 	if (!pConfig->Read(wxT("rendering"), &rendering_setting)) {
 		pConfig->Write(wxT("rendering"), 2);
@@ -1686,6 +1785,12 @@ void wxt_graphics()
 
 	/* clear the command list, and free the allocated memory */
 	wxt_current_panel->ClearCommandlist();
+
+	/* Don't reset the hide_plot flags if this refresh is a zoom/unzoom */
+	if (wxt_zoom_command)
+		wxt_zoom_command = FALSE;
+	else
+		wxt_hide_plot = 0;
 
 	wxt_sigint_check();
 	wxt_sigint_restore();
@@ -2188,9 +2293,22 @@ void wxt_image(unsigned int M, unsigned int N, coordval * image, gpiPoint * corn
 	wxt_command_push(temp_command);
 }
 
-/* This is meta-information about the plot state */
+/* This is meta-information about the plot state
+ */
 void wxt_layer(t_termlayer layer)
 {
+	/* I do not understand why this particular layering command */
+	/* must be processed asynchronously, but if it is buffered  */
+	/* instead then it never reaches the command interpreter.   */
+	if (layer == TERM_LAYER_BEFORE_ZOOM) {
+		wxt_zoom_command = TRUE;
+		return;
+	}
+
+	gp_command temp_command;
+	temp_command.command = command_layer;
+	temp_command.integer_value = layer;
+	wxt_command_push(temp_command);
 }
 
 #ifdef USE_MOUSE
@@ -2364,6 +2482,13 @@ void wxtPanel::wxt_cairo_refresh()
 	/* Clear background. */
 	gp_cairo_solid_background(&plot);
 
+	/* Initialize toggle in keybox mechanism */
+	wxt_cur_plotno = 0;
+	wxt_in_key_sample = FALSE;
+#ifdef USE_MOUSE
+	wxt_initialize_key_boxes(0);
+#endif
+
 	command_list_t::iterator wxt_iter; /*declare the iterator*/
 	for(wxt_iter = command_list.begin(); wxt_iter != command_list.end(); ++wxt_iter) {
 		if (wxt_status == STATUS_INTERRUPT_ON_NEXT_CHECK) {
@@ -2375,7 +2500,16 @@ void wxtPanel::wxt_cairo_refresh()
 			Draw();
 			return;
 		}
+
+		/* Skip the plot commands, but not the key sample commands,
+		 * if the plot was toggled off by a mouse click in the GUI
+		 */
+		if (((wxt_hide_plot & (1L << wxt_cur_plotno)) != 0)
+		&&  wxt_iter->command != command_layer && !wxt_in_key_sample)
+			continue;
+
 		wxt_cairo_exec_command( *wxt_iter );
+
 	}
 
 	/* don't forget to stroke the last path if vector was the last command */
@@ -2466,12 +2600,24 @@ void wxtPanel::wxt_cairo_refresh()
 
 	/* draw the pixmap to the screen */
 	Draw();
+
+#if (0)	/* Just for DEBUG */
 	FPRINTF((stderr,"commands done, number of commands %d\n", command_list.size()));
+	int ibox;
+	for (ibox=1; ibox<=wxt_max_key_boxes; ibox++) {
+		if (ibox > wxt_cur_plotno) break;
+		fprintf(stderr,"box %d %8.8u %8.8u %8.8u %8.8u\n", ibox,
+		wxt_key_boxes[ibox].left,  wxt_key_boxes[ibox].ybot,
+		wxt_key_boxes[ibox].right, wxt_key_boxes[ibox].ytop);
+	}
+#endif
 }
 
 
 void wxtPanel::wxt_cairo_exec_command(gp_command command)
 {
+	static JUSTIFY text_justification_mode = LEFT;
+
 	switch ( command.command ) {
 	case command_color :
 		gp_cairo_set_color(&plot,command.color);
@@ -2480,9 +2626,15 @@ void wxtPanel::wxt_cairo_exec_command(gp_command command)
 		gp_cairo_draw_polygon(&plot, command.integer_value, command.corners);
 		return;
 	case command_move :
+		if (wxt_in_key_sample)
+			wxt_update_key_box(command.x1, command.y1);
 		gp_cairo_move(&plot, command.x1, command.y1);
 		return;
 	case command_vector :
+		if (wxt_in_key_sample) {
+			wxt_update_key_box(command.x1, command.y1+term->v_tic);
+			wxt_update_key_box(command.x1, command.y1-term->v_tic);
+		}
 		gp_cairo_vector(&plot, command.x1, command.y1);
 		return;
 	case command_linestyle :
@@ -2495,12 +2647,23 @@ void wxtPanel::wxt_cairo_exec_command(gp_command command)
 		gp_cairo_set_pointsize(&plot, command.double_value);
 		return;
 	case command_point :
+		if (wxt_in_key_sample) {
+			wxt_update_key_box(command.x1 - term->h_tic, command.y1 - term->v_tic);
+			wxt_update_key_box(command.x1 + term->h_tic, command.y1 + term->v_tic);
+		}
 		gp_cairo_draw_point(&plot, command.x1, command.y1, command.integer_value);
 		return;
 	case command_justify :
 		gp_cairo_set_justify(&plot,command.mode);
+		text_justification_mode = command.mode;
 		return;
 	case command_put_text :
+		if (wxt_in_key_sample) {
+			int slen = strlen(command.string) * term->h_char * 0.75;
+			if (text_justification_mode == RIGHT) slen = -slen;
+			wxt_update_key_box(command.x1, command.y1);
+			wxt_update_key_box(command.x1 + slen, command.y1 - term->v_tic);
+		}
 		gp_cairo_draw_text(&plot, command.x1, command.y1, command.string);
 		return;
 	case command_enhanced_init :
@@ -2529,6 +2692,10 @@ void wxtPanel::wxt_cairo_exec_command(gp_command command)
 		gp_cairo_set_textangle(&plot, command.double_value);
 		return;
 	case command_fillbox :
+		if (wxt_in_key_sample) {
+			wxt_update_key_box(command.x1, command.y1);
+			wxt_update_key_box(command.x1+command.x2, command.y1-command.y2);
+		}
 		gp_cairo_draw_fillbox(&plot, command.x1, command.y1,
 					command.x2, command.y2,
 					command.integer_value);
@@ -2540,6 +2707,28 @@ void wxtPanel::wxt_cairo_exec_command(gp_command command)
 				command.x3, command.y3,
 				command.x4, command.y4,
 				command.integer_value, command.integer_value2);
+		return;
+	case command_layer :
+		switch (command.integer_value)
+		{
+		case TERM_LAYER_RESET:
+		case TERM_LAYER_RESET_PLOTNO:
+				wxt_cur_plotno = 0;
+				break;
+		case TERM_LAYER_BEFORE_PLOT:
+				wxt_cur_plotno++;
+				break;
+		case TERM_LAYER_AFTER_PLOT:
+				break;
+		case TERM_LAYER_BEGIN_KEYSAMPLE:
+				wxt_in_key_sample = TRUE;
+				break;
+		case TERM_LAYER_END_KEYSAMPLE:
+				wxt_in_key_sample = FALSE;
+				break;
+		default:
+				break;
+		}
 		return;
 	}
 }
@@ -2820,6 +3009,7 @@ void wxt_update_size(int number)
 	wxt_sigint_check();
 	wxt_sigint_restore();
 }
+
 
 /* --------------------------------------------------------
  * Cairo stuff

@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_term.h,v 1.14 2011/03/11 22:20:59 sfeam Exp $
+ * $Id: wxt_term.h,v 1.15 2011/11/04 22:14:15 sfeam Exp $
  */
 
 /* GNUPLOT - wxt_term.h */
@@ -110,6 +110,7 @@ extern rgb_color wxt_rgb_background;
 extern int wxt_persist;
 extern int wxt_raise;
 extern int wxt_ctrl;
+extern int wxt_toggle;
 extern char wxt_set_fontname[MAX_ID_LEN + 1];
 extern int wxt_set_fontsize;
 extern double wxt_set_fontscale;

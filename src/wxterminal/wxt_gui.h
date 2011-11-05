@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.h,v 1.34 2011/07/24 03:35:02 sfeam Exp $
+ * $Id: wxt_gui.h,v 1.35 2011/10/09 22:18:11 sfeam Exp $
  */
 
 /* GNUPLOT - wxt_gui.h */
@@ -276,7 +276,8 @@ typedef enum wxt_gp_command_t {
 	command_text_angle,
 	command_fillbox,
 	command_filled_polygon,
-	command_image
+	command_image,
+	command_layer
 } wxt_gp_command_t;
 
 /* base structure for storing gnuplot commands */
@@ -433,6 +434,7 @@ class wxtConfigDialog : public wxDialog
 	bool raise_setting;
 	bool persist_setting;
 	bool ctrl_setting;
+	bool toggle_setting;
 	/* rendering_setting :
 	 * 0 = no antialiasing, no oversampling
 	 * 1 = antialiasing, no oversampling
@@ -574,6 +576,7 @@ static void wxt_command_push(gp_command command);
  * returns true if the event has really been processed - it will
  * not if the window is not the current one. */
 static bool wxt_exec_event(int type, int mx, int my, int par1, int par2, wxWindowID id);
+static void wxt_check_for_toggle(unsigned int x, unsigned int y);
 
 /* process one event, returns true if it ends the pause */
 static bool wxt_process_one_event(struct gp_event_t *);
