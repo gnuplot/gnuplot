@@ -2,7 +2,6 @@
 
 # List of core object files except version.$(O)
 COREOBJS = alloc.$(O) axis.$(O) binary.$(O) bitmap.$(O) breaders.$(O) \
-bgd-helpers.$(O) \
 color.$(O) command.$(O) contour.$(O) datafile.$(O) dynarray.$(O) eval.$(O) \
 fit.$(O) gadgets.$(O) getcolor.$(O) graph3d.$(O) graphics.$(O) help.$(O) \
 hidden3d.$(O) history.$(O) internal.$(O) interpol.$(O) matrix.$(O) \
