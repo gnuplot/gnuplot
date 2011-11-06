@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.694 2011/10/10 21:17:04 juhaszp Exp $
+C RCS $Id: gnuplot.doc,v 1.695 2011/10/13 17:36:09 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -269,6 +269,14 @@ Ffigure_newsyntax
  `Set term tikz` is shorthand for `set term lua tikz`.  As decribed above, it
  uses the generic lua terminal and an external lua script to produce a latex
  document.
+
+ The `context` terminal driver creates output to be further processed by
+ the ConTeXt TeX macro package. To process its output, you additionally require
+ the gnuplot module for ConTeXt available at
+^ <a href=\"http://ctan.org/pkg/context-gnuplot\">
+      http://ctan.org/pkg/context-gnuplot
+^ </a>
+ .
 
 3 New smoothing algorithms
 =kdensity

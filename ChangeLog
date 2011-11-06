@@ -1,3 +1,12 @@
+2011-11-06  Mojca Miklavec <mojca.miklavec.lists@gmail.com>
+
+	Add a context terminal, which creates output suitable for ConTeXt.
+
+	* configure.in docs/doc2texi.el docs/gnuplot.doc docs/Makefile.in
+	src/makefile.all src/makefile.awc src/term.h term/context.trm:
+	New terminal driver context.
+	Patches #1654807 and #1503836. Feature Request #2815867.
+
 2011-11-05  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/wxterminal/wxt_gui.cpp src/wxterminal/wxt_gui.h

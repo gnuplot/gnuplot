@@ -1,5 +1,5 @@
 /*
- * $Id: term.h,v 1.52 2011/08/09 17:34:29 sfeam Exp $
+ * $Id: term.h,v 1.53 2011/08/27 21:05:42 sfeam Exp $
  */
 
 /* GNUPLOT - term.h */
@@ -401,6 +401,9 @@
 
 /* METAPOST */
 #include "metapost.trm"
+
+/* ConTeXt */
+#include "context.trm"
 
 #ifdef USE_GGI_DRIVER
 # include "ggi.trm"

@@ -254,6 +254,7 @@ Major contributors (alphabetic order):
 	"canvas"
 	"cgi"
 	"cgm"
+	"context"
 	"corel"
 	"debug"
 	"djsvga"
