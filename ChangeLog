@@ -5,6 +5,14 @@
 	* term/context.trm: Avoid use of round() because MSVC is still not
 	C99-compliant.
 
+	New terminal driver cairolatex, which uses the cairo EPS or PDF
+	backend for graphics output and LaTeX text created by functions
+	shared with the epslatex and pslatex terminals.
+
+	* term/cairo.term term/post.h term/post.trm term/pslatex.trm: New
+	terminal driver cairolatex.
+	Patch #3413095
+
 2011-11-06  Mojca Miklavec <mojca.miklavec.lists@gmail.com>
 
 	Add a context terminal, which creates output suitable for ConTeXt.

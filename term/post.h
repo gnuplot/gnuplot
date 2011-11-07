@@ -1,5 +1,5 @@
 /*
- * $Id: post.h,v 1.10 2005/07/18 18:24:00 sfeam Exp $
+ * $Id: post.h,v 1.11 2010/03/18 04:52:53 sfeam Exp $
  */
 
 /* GNUPLOT - post.h */
@@ -45,7 +45,7 @@
 TERM_PUBLIC void PSTEX_common_init __PROTO((void));
 TERM_PUBLIC void PSTEX_reopen_output __PROTO((void));
 TERM_PUBLIC void EPSLATEX_common_init __PROTO((void));
-TERM_PUBLIC void EPSLATEX_reopen_output __PROTO((void));
+TERM_PUBLIC void EPSLATEX_reopen_output __PROTO((char *));
 #endif
 
 #define PS_POINT_TYPES 8

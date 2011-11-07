@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: pslatex.trm,v 1.78 2011/09/21 11:43:50 markisch Exp $
+ * $Id: pslatex.trm,v 1.79 2011/10/01 06:35:55 markisch Exp $
  */
 
 /* GNUPLOT - pslatex.trm */
@@ -94,7 +94,7 @@ TERM_PUBLIC void PSTEX_text __PROTO((void));
 
 /* Functions for epslatex */
 /* All these routines begin with EPSLATEX_ */
-TERM_PUBLIC void EPSLATEX_reopen_output __PROTO((void));
+TERM_PUBLIC void EPSLATEX_reopen_output __PROTO((char *));
 TERM_PUBLIC void EPSLATEX_common_init __PROTO((void));
 TERM_PUBLIC void EPSLATEX_put_text __PROTO((unsigned int x, unsigned int y, const char *str));
 TERM_PUBLIC void EPSLATEX_linetype __PROTO((int linetype));
@@ -126,13 +126,15 @@ static t_colorspec tex_previous_colorspec = {-1, 0, 0.0};  /* Initialize to inva
 static char tex_current_color[64];
 static TBOOLEAN tex_color_synced = FALSE;
 
-#define EPSLATEX_sync_color \
-    do { \
-	if (!tex_color_synced) { \
-	    fputs(tex_current_color,gpoutfile); \
-	    tex_color_synced = TRUE; \
-	} \
-    } while (0)
+/* support for cairolatex */
+#ifdef HAVE_CAIROPDF
+#define ISCAIROTERMINAL ((strcmp(term->name, "cairolatex") == 0))
+TERM_PUBLIC void cairotrm_linetype __PROTO ((int linetype));
+TERM_PUBLIC void cairotrm_set_color __PROTO ((t_colorspec *colorspec));
+#else
+#define ISCAIROTERMINAL (FALSE)
+#endif
+
 
 /* Common functions for epslatex and ps(la)tex */
 
@@ -141,7 +143,8 @@ PSLATEX_reset()
 {
     switch (ps_params->terminal) {
     case PSTERM_EPSLATEX:
-        PS_reset();
+        if (!ISCAIROTERMINAL)
+            PS_reset();
         if (gpoutfile) {
 	    fprintf(gpoutfile, "\
     \\gplbacktext\n\
@@ -720,7 +723,10 @@ TERM_PUBLIC void
 EPSLATEX_put_text(unsigned int x, unsigned int y, const char *str)
 {
     if (gpoutfile) {
-	EPSLATEX_sync_color;
+	if (!tex_color_synced) {
+	    fputs(tex_current_color, gpoutfile);
+	    tex_color_synced = TRUE;
+	}
 	fprintf(gpoutfile, "      \\put(%d,%d){", x, y);
         if (ps_ang)
             fprintf(gpoutfile,"\\rotatebox{%d}{", ps_ang);
@@ -750,7 +756,7 @@ EPSLATEX_put_text(unsigned int x, unsigned int y, const char *str)
  * and it must not be outstr itself !
  */
 void
-EPSLATEX_reopen_output()
+EPSLATEX_reopen_output(char * ext)
 {
     char *psoutstr = NULL;
 
@@ -782,11 +788,14 @@ EPSLATEX_reopen_output()
             if (!gpoutfile)
                 int_error(NO_CARET, "--- reopen failed");
         } else {
+            char suffix[PATH_MAX];
             if (ps_params->epslatex_standalone)
-                strncpy( &psoutstr[outstrlen-4], "-inc.eps", 9);
+                sprintf(suffix, "-inc.%s", ext);
             else
-                strncpy( &psoutstr[outstrlen-4], ".eps", 4);
-            gppsfile = fopen(psoutstr,"w");
+                sprintf(suffix, ".%s", ext);
+            strncpy(&psoutstr[outstrlen - 4], suffix, strlen(suffix) + 1);
+            /* BM: Need binary output for PDF files. Does this have negative side effects for EPS? */
+            gppsfile = fopen(psoutstr, "wb");
         }
         if (!gppsfile)
             int_error(NO_CARET, "open of postscipt output file %s failed",
@@ -815,10 +824,17 @@ EPSLATEX_set_color(t_colorspec *colorspec)
 	memcpy(&tex_previous_colorspec, colorspec, sizeof(t_colorspec));
 
     /* Fancy footwork to deal with mono/grayscale plots */
-    if (colorspec->type == TC_LT && !ps_params->color)
-	PS_linetype(colorspec->lt);
-    else
-	PS_set_color(colorspec);
+#ifdef HAVE_CAIROPDF
+    if (ISCAIROTERMINAL) {
+        cairotrm_set_color(colorspec);
+    } else 
+#endif
+    {
+        if (colorspec->type == TC_LT && !ps_params->color)
+            PS_linetype(colorspec->lt);
+        else
+            PS_set_color(colorspec);
+    }
 
     /* Many [most? all?] of the set_color commands only affect the *.eps     */
     /* output stream.  So rather than printing them all to the *.tex stream, */
@@ -870,7 +886,12 @@ EPSLATEX_linetype(int linetype)
 {
     t_colorspec tempcol = {TC_LT, 0, 0.0};
     tempcol.lt = linetype;
-    PS_linetype(linetype);
+#ifdef HAVE_CAIROPDF
+    if (ISCAIROTERMINAL)
+        cairotrm_linetype(linetype);
+    else
+#endif
+        PS_linetype(linetype);
 
     /* This leads to redundant *.eps output */
     EPSLATEX_set_color(&tempcol);

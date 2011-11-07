@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: post.trm,v 1.263 2011/10/03 14:08:37 markisch Exp $
+ * $Id: post.trm,v 1.264 2011/10/08 00:07:41 sfeam Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -1803,7 +1803,7 @@ PS_init()
 	PSTEX_reopen_output();
 	break;
     case PSTERM_EPSLATEX:
-	EPSLATEX_reopen_output();
+	EPSLATEX_reopen_output("eps");
 #endif
 	break;
     }
