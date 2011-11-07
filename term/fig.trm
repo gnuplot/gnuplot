@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: fig.trm,v 1.67 2009/03/26 00:49:20 sfeam Exp $
+ * $Id: fig.trm,v 1.68 2011/09/27 23:18:02 sfeam Exp $
  */
 
 /* GNUPLOT - fig.trm */
@@ -1326,10 +1326,10 @@ START_HELP(fig)
 " `solid` inhibits automatic usage of `dash`ed lines when solid linestyles are",
 " used up, which otherwise occurs.",
 "",
-" `fontsize` sets the size of the text font to <fsize> points.  `textnormal`",
-" resets the text flags and selects postscript fonts, `textspecial` sets the",
-" text flags for LaTeX specials, `texthidden` sets the hidden flag and",
-" `textrigid` the rigid flag. ",
+" `font` sets the text font face to <fontname> and its size to <fontsize>",
+" points. `textnormal` resets the text flags and selects postscript fonts,",
+" `textspecial` sets the text flags for LaTeX specials, `texthidden` sets the",
+" hidden flag and `textrigid` the rigid flag.",
 "",
 " `depth` sets the default depth layer for all lines and text.  The default",
 " depth is 10 to leave room for adding material with \"xfig\" on top of the",
