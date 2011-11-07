@@ -1,6 +1,6 @@
 /*
- *  $Id: lua.trm,v 1.5.2.4 2010/10/09 21:02:37 sfeam Exp $
- *  $Date: 2010/10/09 21:02:37 $
+ *  $Id: lua.trm,v 1.5.2.5 2011/02/10 21:20:21 sfeam Exp $
+ *  $Date: 2011/02/10 21:20:21 $
  *  $Rev: 90 $
  */
 
@@ -443,8 +443,6 @@ LUA_get_term_vars(void) {
 
 static void
 LUA_set_term_vars() {
-  extern const char lua_ident[];
-
   /* set term.version */
   lua_pushstring(L, gnuplot_version);
   lua_setfield(L, luaterm, "gp_version");
@@ -455,7 +453,7 @@ LUA_set_term_vars() {
   lua_pushstring(L, LUA_TERM_REVISON);
   lua_setfield(L, luaterm, "lua_term_revision");
   /* set term.lua_ident */
-  lua_pushstring(L, lua_ident);
+  lua_pushstring(L, LUA_RELEASE);
   lua_setfield(L, luaterm, "lua_ident");
   lua_pushboolean(L, 1);
   lua_setfield(L, luaterm, "IS_GNUPLOT_43");

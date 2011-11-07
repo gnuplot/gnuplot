@@ -37,7 +37,7 @@
 
 
 
-  $Date: 2010/03/21 03:50:23 $
+  $Date: 2011/02/10 21:20:21 $
   $Author: sfeam $
   $Rev: 96 $
 
@@ -75,7 +75,7 @@ pgf.DEFAULT_FONT_SIZE = 10
 pgf.LATEX_STYLE_FILE = "gnuplot-lua-tikz"  -- \usepackage{gnuplot-lua-tikz}
 
 pgf.REVISION = string.sub("$Rev: 96a $",7,-3)
-pgf.REVISION_DATE = string.gsub("$Date: 2010/03/21 03:50:23 $",
+pgf.REVISION_DATE = string.gsub("$Date: 2011/02/10 21:20:21 $",
                                 "$Date: ([0-9]+).([0-9]+).([0-9]+) .*","%1/%2/%3")
 
 pgf.styles = {}
@@ -251,7 +251,6 @@ pgf.write_graph_begin = function (font, noenv)
   gp.write(string.format("\\begin{tikzpicture}[gnuplot%s]\n",global_opt))
   gp.write(string.format("%%%% generated with GNUPLOT %sp%s (%s; terminal rev. %s, script rev. %s)\n%%%% %s\n",
       term.gp_version, term.gp_patchlevel,
-      string.match(term.lua_ident, "Lua [0-9\.]+"),
       string.sub(term.lua_term_revision,7,-3),
       pgf.REVISION,os.date()))
   if font ~= "" then

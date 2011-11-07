@@ -1,3 +1,13 @@
+2011-11-07  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* term/lua.trm term/lua/gnuplot-lua.tikz: lua_ident is not available
+	in LUA 5.1.
+
+	* term/gd.trm: Backport windows compilation changes from 4.5.
+
+	* config/makefile.mgw: Fix errors related to shell scripts. Backport
+	from 4.5.
+
 2011-10-28  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/color.c (make_palette):  Fix segfault caused by initializing a 
