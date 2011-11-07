@@ -1,3 +1,8 @@
+2011-11-07  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* term/context.trm: Avoid use of round() because MSVC is still not
+	C99-compliant.
+
 2011-11-06  Mojca Miklavec <mojca.miklavec.lists@gmail.com>
 
 	Add a context terminal, which creates output suitable for ConTeXt.

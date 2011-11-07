@@ -1,5 +1,5 @@
 /*
- * $Id:$
+ * $Id: context.trm,v 1.1 2011/11/06 09:31:00 markisch Exp $
  */
 
 /* GNUPLOT - context.trm */
@@ -1321,18 +1321,18 @@ static void
 CONTEXT_adjust_dimensions()
 {
 	/* sets vertical dimension of characters based on current fontsize in pt */
-	term->v_char = (unsigned int)round((double)CONTEXT_DPI *
-		CONTEXT_fontsize / 72.27 * CONTEXT_params.scale_text);
+	term->v_char = (unsigned int)((double)CONTEXT_DPI *
+		CONTEXT_fontsize / 72.27 * CONTEXT_params.scale_text + 0.5);
 	/* based on proportions of LM digits at 12pt */
-	term->h_char = (unsigned int)round(CONTEXT_LM_H_TO_V_RATIO * term->v_char);
+	term->h_char = (unsigned int)(CONTEXT_LM_H_TO_V_RATIO * term->v_char + 0.5);
 
 	/* we might want to fix CONTEXT_DPI in case that the figure becomes too big */
 	if (CONTEXT_params.unit == INCHES) {
-		term->xmax = (unsigned int)round((double)CONTEXT_DPI  * CONTEXT_params.xsize);
-		term->ymax = (unsigned int)round((double)CONTEXT_DPI  * CONTEXT_params.ysize);
+		term->xmax = (unsigned int)((double)CONTEXT_DPI  * CONTEXT_params.xsize + 0.5);
+		term->ymax = (unsigned int)((double)CONTEXT_DPI  * CONTEXT_params.ysize + 0.5);
 	} else {
-		term->xmax = (unsigned int)round((double)CONTEXT_DPCM * CONTEXT_params.xsize);
-		term->ymax = (unsigned int)round((double)CONTEXT_DPCM * CONTEXT_params.ysize);
+		term->xmax = (unsigned int)((double)CONTEXT_DPCM * CONTEXT_params.xsize + 0.5);
+		term->ymax = (unsigned int)((double)CONTEXT_DPCM * CONTEXT_params.ysize + 0.5);
 	}
 }
 
