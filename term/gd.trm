@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: gd.trm,v 1.136.2.9 2009/12/01 06:23:06 sfeam Exp $
+ * $Id: gd.trm,v 1.136.2.10 2010/02/24 20:33:57 sfeam Exp $
  * based on gif.trm,v 1.26.2.1 2000/05/01 00:17:20 joze
  */
 
@@ -199,11 +199,12 @@ BGD_EXPORT_DATA_PROT gdFontPtr gdFontMediumBold;	/* 7x13 */
 BGD_EXPORT_DATA_PROT gdFontPtr gdFontGiant;  /* 9x15 */
 BGD_EXPORT_DATA_PROT gdFontPtr gdFontTiny;  /* 5x8 */
 #else
-static gdFontPtr gdFontSmall;	/* 6x12 */
-static gdFontPtr gdFontLarge;	/* 8x16 */
-static gdFontPtr gdFontMediumBold;	/* 7x13 */
-static gdFontPtr gdFontGiant;  /* 9x15 */
-static gdFontPtr gdFontTiny;  /* 5x8 */
+static gdFontPtr gp_gdFonts[5];
+#define gdFontSmall gp_gdFonts[0]
+#define gdFontLarge gp_gdFonts[1]
+#define gdFontMediumBold gp_gdFonts[2]
+#define gdFontGiant gp_gdFonts[3]
+#define gdFontTiny gp_gdFonts[4]
 #endif
 
 #define GREG_XMAX 640
@@ -631,6 +632,13 @@ PNG_options()
     if (!PNG_initialized) {
 	PNG_initialized = TRUE;
 	term_options[0] = '\0';
+#ifdef GD_NEED_LOCAL_FONT_POINTERS
+	gdFontSmall = gdFontGetSmall();
+	gdFontLarge = gdFontGetLarge();
+	gdFontMediumBold = gdFontGetMediumBold();
+	gdFontGiant = gdFontGetGiant();
+	gdFontTiny = gdFontGetTiny();
+#endif
 	term->h_char = PNG_HCHAR; /* Default to medium font */
 	png_state.default_font = gdfont;
 	png_state.n_colors = 0;
@@ -644,13 +652,7 @@ PNG_options()
 	PNG_linewidth_factor = 1.0;
 	PNG_dashlength_factor = 1.0;
 	png_state.capbutt = FALSE; /* to preserve previous default behavior */
-#ifdef GD_NEED_LOCAL_FONT_POINTERS
-	gdFontSmall = gdFontGetSmall();
-	gdFontLarge = gdFontGetLarge();
-	gdFontMediumBold = gdFontGetMediumBold();
-	gdFontGiant = gdFontGetGiant();
-	gdFontTiny = gdFontGetTiny();
-#endif
+
     } else {
 	/* FIXME EAM - these should never happen! */
 	if (!png_state.default_font) {
