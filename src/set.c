@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.349 2011/11/01 18:52:49 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.350 2011/11/02 21:20:14 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -64,6 +64,9 @@ static char *RCSid() { return RCSid("$Id: set.c,v 1.349 2011/11/01 18:52:49 sfea
 #include "pm3d.h"
 #include "getcolor.h"
 #include <ctype.h>
+#ifdef HAVE_ICONV
+#include <iconv.h>
+#endif
 
 static palette_color_mode pm3d_last_set_palette_mode = SMPAL_COLOR_MODE_NONE;
 
@@ -1422,7 +1425,6 @@ static void
 set_degreesign(char *locale)
 {
 #ifdef HAVE_ICONV
-#include <iconv.h>
     char degree_latin1[2] = {'\260', '\0'};
     size_t lengthin = 2;
     size_t lengthout = 8;
