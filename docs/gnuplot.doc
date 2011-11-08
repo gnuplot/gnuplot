@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.696 2011/11/06 09:31:00 markisch Exp $
+C RCS $Id: gnuplot.doc,v 1.697 2011/11/08 05:25:50 markisch Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -280,12 +280,12 @@ Ffigure_newsyntax
 
  The `cairolatex` terminal uses the cairo backend of the `pdfcairo` or 
  `epscairo` terminal to produce graphs for inclusion in LaTeX documents. It
- creates png or eps graphics but transfers texts to LaTeXin same way as the
- `epslatex` terminal.
+ creates png or eps graphics but transfers texts to LaTeX in the same way as
+ the `epslatex` terminal.
  
  The `windows` terminal driver has been largely revised. It now suports
  transparency, antialiasing and buffered output, multiple graph windows and
- copying to clipboard and saving of graphs to emf files. It has many more
+ copying to clipboard and saving of graphs as emf files. It has many more
  options and a revised user interface. Additionaly, the code of the text
  console has been largely rewritten to support wrapping of long lines and
  gnuplot now uses the HTML based help system.

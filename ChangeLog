@@ -1,3 +1,8 @@
+2011-11-08  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* doc/gnuplot.doc [New features]: Document new cairolatex and
+	revised windows terminal.
+
 2010-11-08  Tatsuro Matsuoka  <tmacchant3@yahoo.co.jp>
 
 	* src/set.c (set_degreesign): Move include of iconv.h to top level.
