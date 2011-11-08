@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.cpp,v 1.89 2011/11/04 22:14:15 sfeam Exp $
+ * $Id: wxt_gui.cpp,v 1.90 2011/11/06 04:06:10 sfeam Exp $
  */
 
 /* GNUPLOT - wxt_gui.cpp */
@@ -2623,6 +2623,12 @@ void wxtPanel::wxt_cairo_exec_command(gp_command command)
 		gp_cairo_set_color(&plot,command.color);
 		return;
 	case command_filled_polygon :
+		if (wxt_in_key_sample) {
+			int x1 = command.corners[0].x;
+			int y1 = command.corners[0].y;
+			wxt_update_key_box(command.x1 - term->h_tic, command.y1 - term->v_tic);
+			wxt_update_key_box(command.x1 + term->h_tic, command.y1 + term->v_tic);
+		}
 		gp_cairo_draw_polygon(&plot, command.integer_value, command.corners);
 		return;
 	case command_move :

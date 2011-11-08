@@ -3,6 +3,8 @@
 	* configure.in src/set.c: Use nl_langinfo(CODESET) to find the encoding.
 	This hopefully works around non-standard encoding names used by Solaris.
 
+	* src/wxterminal/wxt_gui.cpp: Toggle for "plot ... with circles"
+
 2011-11-08  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* doc/gnuplot.doc [New features]: Document new cairolatex and
