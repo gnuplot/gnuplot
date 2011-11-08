@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.350 2011/11/02 21:20:14 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.351 2011/11/08 05:25:51 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -66,6 +66,9 @@ static char *RCSid() { return RCSid("$Id: set.c,v 1.350 2011/11/02 21:20:14 sfea
 #include <ctype.h>
 #ifdef HAVE_ICONV
 #include <iconv.h>
+#endif
+#ifdef HAVE_LANGINFO_H
+#include <langinfo.h>
 #endif
 
 static palette_color_mode pm3d_last_set_palette_mode = SMPAL_COLOR_MODE_NONE;
@@ -1425,19 +1428,23 @@ static void
 set_degreesign(char *locale)
 {
 #ifdef HAVE_ICONV
-    char degree_latin1[2] = {'\260', '\0'};
-    size_t lengthin = 2;
+    char degree_utf8[3] = {'\302', '\260', '\0'};
+    size_t lengthin = 3;
     size_t lengthout = 8;
-    char *in = degree_latin1;
+    char *in = degree_utf8;
     char *out = degree_sign;
     iconv_t cd;
 
     if (locale) { 
 	/* This should work even if gnuplot doesn't understand the encoding */
+#ifdef HAVE_LANGINFO_H
+	char *encoding = nl_langinfo(CODESET);
+#else
 	char *encoding = strchr(locale, '.');
+	if (encoding) encoding++; /* Step past the dot in, e.g., ja_JP.EUC-JP */
+#endif
 	if (encoding) {
-	    encoding++; /* Step past the dot in, e.g., ja_JP.EUC-JP */
-	    if ((cd = iconv_open(encoding, "ISO-8859-1")) == (iconv_t)(-1))
+	    if ((cd = iconv_open(encoding, "UTF-8")) == (iconv_t)(-1))
 		int_warn(NO_CARET, "iconv_open failed for %s",encoding);
 	    else {
 		if (iconv(cd, &in, &lengthin, &out, &lengthout) < 0)
