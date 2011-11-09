@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.697 2011/11/08 05:25:50 markisch Exp $
+C RCS $Id: gnuplot.doc,v 1.698 2011/11/08 08:21:37 markisch Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -259,24 +259,28 @@ Ffigure_newsyntax
  externally generated HTML document that perhaps contains multiple plots.
  The embedded plots support browser-side mousing, including zoom/unzoom.
 
- The `lua` terminal driver creates an data intended to be further processed
+ The `lua` terminal driver creates data intended to be further processed
  by a script in the lua programming language.  At this point only one such
  lua script, gnuplot-tikz.lua, is available.  It produces a TeX document
  suitable for use with the latex TikZ package.  Other lua scripts could be
  written to process the gnuplot output for use with other TeX packages,
  or with other non-TeX tools.
 
- `Set term tikz` is shorthand for `set term lua tikz`.  As decribed above, it
+ `set term tikz` is shorthand for `set term lua tikz`.  As decribed above, it
  uses the generic lua terminal and an external lua script to produce a latex
  document.
 
  The `context` terminal driver creates output to be further processed by
  the ConTeXt TeX macro package. To process its output, you additionally require
  the gnuplot module for ConTeXt available at
-^ <a href=\"http://ctan.org/pkg/context-gnuplot\">
-      http://ctan.org/pkg/context-gnuplot
+^ <a href="http://ctan.org/pkg/context-gnuplot">
+           http://ctan.org/pkg/context-gnuplot
 ^ </a>
- .
+
+ The `epscairo` terminal uses the cairo and pango libraries to create
+ encapsulated postscript (eps) ouput. It is an alternative to the `postscript`
+ terminal driver for those who would like to have their eps files look equal
+ to e.g. screen output by the `wxt` terminal.
 
  The `cairolatex` terminal uses the cairo backend of the `pdfcairo` or 
  `epscairo` terminal to produce graphs for inclusion in LaTeX documents. It

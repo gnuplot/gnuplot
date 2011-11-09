@@ -1,5 +1,7 @@
 2011-11-09  Bastian Maerkisch  <bmaerkisch@web.de>
 
+	* doc/gnuplot.doc: New terminal driver epscairo.
+
 	* term/gd.trm: Don't use gd font pointer variables for builtin fonts.
 
 2011-11-08  Ethan A Merritt  <merritt@u.washington.edu>
