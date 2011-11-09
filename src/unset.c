@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.146 2011/07/22 14:37:57 juhaszp Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.147 2011/10/25 05:10:58 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -439,16 +439,9 @@ unset_command()
 	break;
     case S_XDATA:
 	unset_timedata(FIRST_X_AXIS);
-	/* FIXME HBB 20000506: does unsetting these axes make *any*
-	 * sense?  After all, their content is never displayed, so
-	 * what would they need a corrected format for? */
-	unset_timedata(T_AXIS);
-	unset_timedata(U_AXIS);
 	break;
     case S_YDATA:
 	unset_timedata(FIRST_Y_AXIS);
-	/* FIXME: see above */
-	unset_timedata(V_AXIS);
 	break;
     case S_ZDATA:
 	unset_timedata(FIRST_Z_AXIS);
@@ -543,7 +536,6 @@ unset_command()
 	goto ITERATE;
     }
 
-    /* FIXME - Should this be inside the iteration loop? */
     update_gpval_variables(0);
     
     set_iterator = cleanup_iteration(set_iterator);

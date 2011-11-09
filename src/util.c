@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: util.c,v 1.97 2011/06/19 22:10:37 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: util.c,v 1.98 2011/11/01 18:52:49 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - util.c */
@@ -1106,23 +1106,9 @@ graph_error(const char *fmt, va_dcl)
 /*}}} */
 
 
-/* Lower-case the given string (DFK) */
-/* Done in place. */
-void
-lower_case(char *s)
-{
-    char *p = s;
-
-    while (*p) {
-	if (isupper((unsigned char)*p))
-	    *p = tolower((unsigned char)*p);
-	p++;
-    }
-}
-
 /* Squash spaces in the given string (DFK) */
 /* That is, reduce all multiple white-space chars to single spaces */
-/* Done in place. */
+/* Done in place. Currently used only by help_command() */
 void
 squash_spaces(char *s)
 {

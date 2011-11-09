@@ -141,8 +141,6 @@ const struct lp_style_type background_lp = {0, LT_BACKGROUND, 0, 0, 1.0, 0.0, FA
 /* set clip */
 TBOOLEAN clip_lines1 = TRUE;
 TBOOLEAN clip_lines2 = FALSE;
-/* FIXME HBB 20000521: clip_points is only used by 2D plots. This may
- * well constitute a yet unknown bug... */
 TBOOLEAN clip_points = FALSE;
 
 /* set samples */

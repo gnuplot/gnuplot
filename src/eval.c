@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: eval.c,v 1.94 2011/08/27 11:18:01 juhaszp Exp $"); }
+static char *RCSid() { return RCSid("$Id: eval.c,v 1.95 2011/09/08 05:19:07 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - eval.c */
@@ -856,8 +856,8 @@ update_gpval_variables(int context)
     /* These are set after every "set" command, which is kind of silly */
     /* because they only change after 'set term' 'set output' ...      */
     if (context == 0 || context == 2 || context == 3) {
-	/* FIXME! This prevents a segfault if term==NULL, which can */
-	/* happen if set_terminal() exits via int_error().          */
+	/* This prevents a segfault if term==NULL, which can */
+	/* happen if set_terminal() exits via int_error().   */
 	if (!term)
 	    fill_gpval_string("GPVAL_TERM", "unknown");
 	else

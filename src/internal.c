@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: internal.c,v 1.65 2011/10/07 15:24:36 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: internal.c,v 1.66 2011/10/10 06:13:02 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - internal.c */
@@ -1378,7 +1378,7 @@ f_gprintf(union argument *arg)
     struct value fmt, val, result;
     char *buffer;
     int length;
-    double base;
+    double base = 10.;
  
     /* Retrieve parameters from top of stack */
     pop(&val);
@@ -1395,9 +1395,6 @@ f_gprintf(union argument *arg)
     /* Make sure parameters are of the correct type */
     if (fmt.type != STRING)
 	int_error(NO_CARET,"First parameter to gprintf must be a format string");
-
-    /* EAM FIXME - I have no idea where we would learn another base is wanted */
-    base = 10.;
 
     /* Make sure we have at least as much space in the output as the format itself */
     length = 80 + strlen(fmt.v.string_val);

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.94 2011/09/04 11:06:19 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.95 2011/10/25 05:10:58 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -334,10 +334,7 @@ axis_checked_extend_empty_range(AXIS_INDEX axis, const char *mesg)
 	} else {
 	    /* user has explicitly set the range (to something empty)
                ==> we're in trouble */
-	    /* FIXME HBB 20000416: is c_token always set properly,
-	     * when this is called? We might be better off using
-	     * NO_CARET..., here */
-	    int_error(c_token, "Can't plot with an empty %s range!",
+	    int_error(NO_CARET, "Can't plot with an empty %s range!",
 		      axis_defaults[axis].name);
 	}
     }

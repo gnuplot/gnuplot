@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.377 2011/09/29 18:48:57 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.378 2011/10/10 21:17:04 juhaszp Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -1978,8 +1978,6 @@ do_plot(struct curve_points *plots, int pcount)
 	    case FILLEDCURVES:
 		if (this_plot->filledcurves_options.closeto == FILLEDCURVES_BETWEEN) {
 		    plot_betweencurves(this_plot);
-		    /* FIXME: maybe call plot_lines() here twice, once for the lower */
-		    /* curve and once for the upper, conditional on need_fill_border */
 		} else if (this_plot->filledcurves_options.closeto == FILLEDCURVES_ATR) {
 		    plot_betweencurves(this_plot);
 		} else {
@@ -6735,7 +6733,6 @@ plot_image_or_update_axes(void *plot, TBOOLEAN update_axes)
 
 		    if (N_corners > 0) {
 			if (pixel_planes == IC_PALETTE) {
-			    /* FIXME: Why do we have to check both??? */
 			    if ((points[i_image].type == UNDEFINED)
 			    ||  isnan(points[i_image].CRD_COLOR))
 				goto skip_pixel;

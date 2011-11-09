@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: post.trm,v 1.264 2011/10/08 00:07:41 sfeam Exp $
+ * $Id: post.trm,v 1.265 2011/11/07 18:40:48 markisch Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -1303,6 +1303,7 @@ PS_load_fontfile(struct ps_fontfile_def *current_ps_fontfile, TBOOLEAN doload)
 	char ext[4];
 	char cmd[256];
 	char *fontname = NULL;
+	int i;
 #if defined(PIPES)
 	char *envcmd = NULL;
 	TBOOLEAN ispipe = FALSE;
@@ -1327,7 +1328,8 @@ PS_load_fontfile(struct ps_fontfile_def *current_ps_fontfile, TBOOLEAN doload)
 		strcpy(ext, current_ps_fontfile->fontfile_name);
 
 	    /* make extension lowercase for comparison */
-	    lower_case(ext);
+	    for (i=0; i<3; i++)
+		ext[i] = tolower(ext[i]);
 
 	    if (!current_ps_fontfile->fontfile_fullname)
 		int_error(NO_CARET, "Font file '%s' not found",
