@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: gd.trm,v 1.160 2011/07/21 04:54:09 sfeam Exp $
+ * $Id: gd.trm,v 1.161 2011/09/29 18:39:02 sfeam Exp $
  * based on gif.trm,v 1.26.2.1 2000/05/01 00:17:20 joze
  */
 
@@ -138,7 +138,14 @@ TERM_PUBLIC void ENHGD_OPEN __PROTO((char * fontname, double fontsize,
 TERM_PUBLIC void ENHGD_FLUSH __PROTO((void));
 
 
-#include "gd.h"
+#include <gd.h>
+/* Include files for bitmap fonts */
+#include <gdfontt.h>
+#include <gdfonts.h>
+#include <gdfontl.h>
+#include <gdfontmb.h>
+#include <gdfontg.h>
+#include "bgd.h"
 
 /* Before version 2.0.36, the libgd function gdFTUseFontConfig() didn't */
 /* do what we need.  Test for earlier versions and ignore it.           */
@@ -149,27 +156,6 @@ TERM_PUBLIC void ENHGD_FLUSH __PROTO((void));
 #endif
 #ifndef gdUseFontConfig
 #define gdUseFontConfig(x) 0
-#endif
-
-#if defined(WIN32) && !defined(NONDLL)
-  /* static font pointers are recommended when using bgd.dll */
-# ifndef GD_NEED_LOCAL_FONT_POINTERS
-#  define GD_NEED_LOCAL_FONT_POINTERS
-# endif
-#endif
-
-#ifdef GD_NEED_LOCAL_FONT_POINTERS
-# include "gdfonts.h"
-# include "gdfontl.h"
-# include "gdfontmb.h"
-# include "gdfontt.h"
-# include "gdfontg.h"
-#endif
-
-/* This is required for the shared library version of libgd on Windows.
-   Newer versions of libgd (>=2.0.24 ?) already define it. */
-#ifndef BGD_EXPORT_DATA_PROT 
-# define BGD_EXPORT_DATA_PROT extern
 #endif
 
 /* These intermediate functions are necessary on Windows since 
@@ -191,21 +177,6 @@ static void PNG_Triangle(unsigned int x, unsigned int y, int direction,
 static void PNG_Diamond(unsigned int x, unsigned int y,
 	void (*draw_func)(gdImagePtr, gdPointPtr, int, int));
 static void PNG_init_brush __PROTO((int));
-
-#ifndef GD_NEED_LOCAL_FONT_POINTERS
-BGD_EXPORT_DATA_PROT gdFontPtr gdFontSmall;	/* 6x12 */
-BGD_EXPORT_DATA_PROT gdFontPtr gdFontLarge;	/* 8x16 */
-BGD_EXPORT_DATA_PROT gdFontPtr gdFontMediumBold;	/* 7x13 */
-BGD_EXPORT_DATA_PROT gdFontPtr gdFontGiant;  /* 9x15 */
-BGD_EXPORT_DATA_PROT gdFontPtr gdFontTiny;  /* 5x8 */
-#else
-static gdFontPtr gp_gdFonts[5];
-#define gdFontSmall gp_gdFonts[0]
-#define gdFontLarge gp_gdFonts[1]
-#define gdFontMediumBold gp_gdFonts[2]
-#define gdFontGiant gp_gdFonts[3]
-#define gdFontTiny gp_gdFonts[4]
-#endif
 
 #define GREG_XMAX 640
 #define GREG_YMAX 480
@@ -647,13 +618,6 @@ PNG_options()
     if (!PNG_initialized) {
 	PNG_initialized = TRUE;
 	term_options[0] = '\0';
-#ifdef GD_NEED_LOCAL_FONT_POINTERS
-	gdFontSmall = gdFontGetSmall();
-	gdFontLarge = gdFontGetLarge();
-	gdFontMediumBold = gdFontGetMediumBold();
-	gdFontGiant = gdFontGetGiant();
-	gdFontTiny = gdFontGetTiny();
-#endif
 	term->h_char = PNG_HCHAR; /* Default to medium font */
 	png_state.default_font = gdfont;
 	png_state.n_colors = 0;
@@ -751,35 +715,35 @@ PNG_options()
 #endif
 
 	case PNG_TINY:
-	    png_state.default_font=gdFontTiny;
+	    png_state.default_font = gdFontGetTiny();
 	    term->v_char = png_state.default_font->h;
 	    term->h_char = png_state.default_font->w;
 	    ++c_token;
 	    UNSET_TTF_FONT;
 	    break;
 	case PNG_SMALL:
-	    png_state.default_font = gdFontSmall;
+	    png_state.default_font = gdFontGetSmall();
 	    term->v_char = png_state.default_font->h;
 	    term->h_char = png_state.default_font->w;
 	    ++c_token;
 	    UNSET_TTF_FONT;
 	    break;
 	case PNG_MEDIUM:
-	    png_state.default_font = gdFontMediumBold;
+	    png_state.default_font = gdFontGetMediumBold();
 	    term->v_char = png_state.default_font->h;
 	    term->h_char = png_state.default_font->w;
 	    ++c_token;
 	    UNSET_TTF_FONT;
 	    break;
 	case PNG_LARGE:
-	    png_state.default_font = gdFontLarge;
+	    png_state.default_font = gdFontGetLarge();
 	    term->v_char = png_state.default_font->h;
 	    term->h_char = png_state.default_font->w;
 	    ++c_token;
 	    UNSET_TTF_FONT;
 	    break;
 	case PNG_GIANT:
-	    png_state.default_font=gdFontGiant;
+	    png_state.default_font = gdFontGetGiant();
 	    term->v_char = png_state.default_font->h;
 	    term->h_char = png_state.default_font->w;
 	    ++c_token;
@@ -1098,7 +1062,7 @@ PNG_options()
 
     if (png_state.ttffont) {
 	sprintf(term_options + strlen(term_options),
-		"font %s %d ", png_state.ttffont, png_state.ttfsize);
+		"font \"%s,%d\" ", png_state.ttffont, png_state.ttfsize);
 	sprintf(term_options + strlen(term_options),
 		"fontscale %.1f ", png_state.fontscale);
     } else switch (term->h_char) {
@@ -1866,15 +1830,15 @@ PNG_set_font(const char *fontname)
     sscanf (&(fontname[sep+1]),"%d",&size);
 
     if (!strcmp(name,"small"))
-	font = gdFontSmall;
+	font = gdFontGetSmall();
     else if (!strcmp(name,"medium"))
-	font = gdFontMediumBold;
+	font = gdFontGetMediumBold();
     else if (!strcmp(name,"large"))
-	font = gdFontLarge;
+	font = gdFontGetLarge();
     else if (!strcmp(name,"giant"))
-	font = gdFontGiant;
+	font = gdFontGetGiant();
     else if (!strcmp(name,"tiny"))
-	font = gdFontTiny;
+	font = gdFontGetTiny();
     else if (*name) {
 	/* New ttf font */
 	free(png_state.ttffont);
@@ -2484,7 +2448,7 @@ TERM_PUBLIC void JPEG_text __PROTO((void));
 
 #ifdef TERM_BODY
 
-#include "gd.h"
+#include <gd.h>
 /*
  * All functions except the final write to file
  * are actually performed by the PNG driver code
@@ -2613,7 +2577,7 @@ TERM_PUBLIC void GIF_text __PROTO((void));
 
 #ifdef TERM_BODY
 
-#include "gd.h"
+#include <gd.h>
 /*
  * All functions except the final write to file
  * are actually performed by the PNG driver code

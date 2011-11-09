@@ -1,3 +1,7 @@
+2011-11-09  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* term/gd.trm: Don't use gd font pointer variables for builtin fonts.
+
 2011-11-08  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* configure.in src/set.c: Use nl_langinfo(CODESET) to find the encoding.
