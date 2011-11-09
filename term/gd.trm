@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: gd.trm,v 1.161 2011/09/29 18:39:02 sfeam Exp $
+ * $Id: gd.trm,v 1.162 2011/11/09 17:04:36 markisch Exp $
  * based on gif.trm,v 1.26.2.1 2000/05/01 00:17:20 joze
  */
 
@@ -145,7 +145,6 @@ TERM_PUBLIC void ENHGD_FLUSH __PROTO((void));
 #include <gdfontl.h>
 #include <gdfontmb.h>
 #include <gdfontg.h>
-#include "bgd.h"
 
 /* Before version 2.0.36, the libgd function gdFTUseFontConfig() didn't */
 /* do what we need.  Test for earlier versions and ignore it.           */
