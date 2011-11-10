@@ -1,5 +1,5 @@
-C RCS $Id: gnuplot-ja.doc,v 1.389 2011-08-28 14:16:54+09 shige Exp $
-C corresponding original gnuplot.doc revision: 1.688
+C RCS $Id: gnuplot-ja.doc,v 1.398 2011-11-10 09:15:30+09 shige Exp $
+C corresponding original gnuplot.doc revision: 1.699
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -334,6 +334,31 @@ Ffigure_newsyntax
  これは lua 出力形式と外部の lua スクリプトを使用して latex 文書を生成
  します。
 
+ 出力ドライバ `context` は、ConTeXt TeX マクロパッケージでさらに処理さ
+ れる出力を生成します。その出力の処理には、以下の ConTeXt 用の gnuplot
+ モジュールが必要です:
+^ <a href="http://ctan.org/pkg/context-gnuplot">
+           http://ctan.org/pkg/context-gnuplot
+^ </a>
+
+ 出力形式 `epscairo` は、cairo と pango ライブラリを使用して EPS 出力
+ (Encapsulated PostScript) を生成します。これは、出力ドライバ
+ `postscript` とは別の EPS 出力方法となりますが、例えば出力形式
+ `wxt` の画面出力と同じ見た目の EPS ファイルが欲しいという人向きです。
+
+ 出力形式 `cairolatex` は、出力形式 `pdfcairo` や `epscairo` の cairo
+ による後処理を使用して LaTeX 文書に取り込むためのグラフを生成します。
+ これは、PDF か EPS グラフを生成しますが、テキスト文字列は、出力形式
+ `epslatex` と同じ方法で LaTeX に転送します。
+
+ 出力ドライバ `windows` は、大きく改良されています。現在は、透明化、ア
+ ンチエイリアス、バッファリング出力、複数のグラフウィンドウ、グラフのク
+ リップボードへのコピーやグラフの EMF ファイルへの保存をサポートしてい
+ ます。オプションも増えていて、ユーザーインターフェースも改良されていま
+ す。さらに、長い行の折りたたみをサポートするようにテキストコンソールの
+ プログラムも大幅に書き換えられていますし、現在の gnuplot は HTML ベー
+ スのヘルプシステムを使用します。
+
 3 新しい平滑化アルゴリズム
 =kdensity
 =cumulative
@@ -351,6 +376,15 @@ Ffigure_newsyntax
  例: 現在の時刻をミリ秒精度で表示
       print strftime("%H:%M:%.3S %d-%b-%Y",time(0.0))
       18:15:04.253 16-Apr-2011
+3 データの簡単な統計情報
+ 新しいコマンド `stats` は、`plot` や `splot` と同じ書式でファイルから
+ データを読み込みますが、グラフを描画するのではなく、これは、column で
+ 指定されたデータ列の簡単な統計情報を出力します。出力するのは、最小値
+ (min)、最大値 (max)、標準偏差 (standard deviation)、相関 (correlation)
+ 等で、そしてそれらの値をそれ以降の描画コマンドの構成、修正に利用できる
+ ように名前のついた変数に保存します。以下参照: `stats`。このコマンドは
+ gnuplot のコンパイル時に --enable-stats で configure された場合のみ有
+ 効です。
 
 2 後方互換性 (Backwards compatibility)
 ?backwards compatibility
@@ -591,7 +625,7 @@ Ffigure_newsyntax
  与える座標が絶対的な位置ではなくて相対的な値である場合もあります (例え
  ば `set arrow` ... `rto` の 2 番目の数値)。そのほとんどが、与えられた
  数値を最初の位置に対する差として使います。与えられた座標が対数軸内にあ
- る場合は、その相対的な値は積因子として解釈されます。例えば
+ る場合は、その相対的な値は倍率として解釈されます。例えば
 
        set logscale x
        set arrow 100,5 rto 10,2
@@ -866,12 +900,11 @@ Ffigure_newsyntax
  beg, end は省略することはできません。
 3 関数 (Functions)
 ?expressions functions
-?functions
- `gnuplot` の関数は、Unix 数学ライブラリの関数とほぼ同じですが、特に注
- 意がなければ全ての関数が整数、実数、複素数の引数を取ることができます。
- 角を引数や戻り値とする関数 (例えば sin(x), cos(x), arg(z)) は、その値
- をラジアンとして扱いますが、これはコマンド `set angles` によって度に変
- 更できます。
+ `gnuplot` の数学関数は、Unix 数学ライブラリの関数とほぼ同じですが、特
+ に注意がなければ全ての関数が整数、実数、複素数の引数を取ることができま
+ す。角を引数や戻り値とする関数 (例えば sin(x), cos(x), arg(z)) は、そ
+ の値をラジアンとして扱いますが、これはコマンド `set angles` によって度
+ に変更できます。
 
 ^<table align="center" border="1" rules="groups" frame="hsides" cellpadding="3" width="90%">
 ^<colgroup>
@@ -998,15 +1031,15 @@ C HTML ヘルプに関しては表とセクションの両方が必要なので、以下のマジック
 C マーカを doc2html へのこのシグナルとして使用します。
 ^<!-- INCLUDE_NEXT_TABLE -->
 @start table
-#\begin{tabular}{|ccl|} \hline
+#\begin{longtable}{|ccl|} \hline
 #\multicolumn{3}{|c|}{数学ライブラリ関数} \\ \hline \hline
 #関数 & 引数 & 戻り値 \\ \hline
+#\endhead \hline \endfoot
 %c c l .
 %関数@引数@戻り値
 %_
 4 abs
 ?expressions functions abs
-?functions abs
 ?abs
 #abs(x) & 任意  &  $x$ の絶対値, $|x|$; 同じ型\\
 #abs(x) & 複素数 &  $x$ の長さ, $\sqrt{{\mbox{real}(x)^{2} +
@@ -1019,7 +1052,6 @@ C マーカを doc2html へのこのシグナルとして使用します。
  います [すなわち sqrt(real(x)**2 + imag(x)**2) ]。
 4 acos
 ?expressions functions acos
-?functions acos
 ?acos
 #acos(x) & 任意 & $\cos^{-1} x$ (アークコサイン) \\
 %acos(x)@任意@$cos sup -1 x$ (アークコサイン)
@@ -1027,7 +1059,6 @@ C マーカを doc2html へのこのシグナルとして使用します。
  す値がラジアン単位かまたは度であるかは `set angles` で選択されます。
 4 acosh
 ?expressions functions acosh
-?functions acosh
 ?acosh
 #acosh(x) & 任意 & ラジアンでの $\cosh^{-1} x$ (逆双曲余弦)\\
 %acosh(x)@任意@$ラジアンでの cosh sup -1 x$ (逆双曲余弦)
@@ -1035,7 +1066,6 @@ C マーカを doc2html へのこのシグナルとして使用します。
  で返します。
 4 airy
 ?expressions functions airy
-?functions airy
 ?airy
 #airy(x) & 任意  & エアリー関数 Ai(x) \\
 %airy(x)@任意@エアリー関数 Ai(x)
@@ -1044,7 +1074,6 @@ C マーカを doc2html へのこのシグナルとして使用します。
  複素数の場合、その虚数部分は無視されます。
 4 arg
 ?expressions functions arg
-?functions arg
 ?arg
 #arg(x) & 複素数 & $x$ の偏角 \\
 %arg(x)@複素数@$x$ の偏角
@@ -1052,7 +1081,6 @@ C マーカを doc2html へのこのシグナルとして使用します。
  ン、または度で返します。
 4 asin
 ?expressions functions asin
-?functions asin
 ?asin
 #asin(x) & 任意  & $\sin^{-1} x$ (アークサイン) \\
 %asin(x)@任意@$sin sup -1 x$ (アークサイン)
@@ -1060,7 +1088,6 @@ C マーカを doc2html へのこのシグナルとして使用します。
  値は `set angles` の設定によってラジアン単位かまたは度になります。
 4 asinh
 ?expressions functions asinh
-?functions asinh
 ?asinh
 #asinh(x) & 任意  & ラジアンでの $\sinh^{-1} x$ (逆双曲正弦)\\
 %asinh(x)@任意@$ラジアンでの sinh sup -1 x$ (逆双曲正弦)
@@ -1068,7 +1095,6 @@ C マーカを doc2html へのこのシグナルとして使用します。
  返します。
 4 atan
 ?expressions functions atan
-?functions atan
 ?atan
 #atan(x) & 任意  & $\tan^{-1} x$ (アークタンジェント) \\
 %atan(x)@任意@$tan sup -1 x$ (アークタンジェント)
@@ -1077,7 +1103,6 @@ C マーカを doc2html へのこのシグナルとして使用します。
  なります。
 4 atan2
 ?expressions functions atan2
-?functions atan2
 ?atan2
 #atan2(y,x) & 整数または実数 & $\tan^{-1} (y/x)$ (アークタンジェント) \\
 %atan2(y,x)@整数または実数@$tan sup -1 (y/x)$ (アークタンジェント)
@@ -1086,7 +1111,6 @@ C マーカを doc2html へのこのシグナルとして使用します。
  なる、適切な四分円における値を返します。
 4 atanh
 ?expressions functions atanh
-?functions atanh
 ?atanh
 #atanh(x) & 任意  & ラジアンでの $\tanh^{-1} x$ (逆双曲正接)\\
 %atanh(x)@任意@ラジアンでの $tanh sup -1 x$ (逆双曲正接)
@@ -1106,7 +1130,6 @@ C マーカを doc2html へのこのシグナルとして使用します。
  以下参照: `elliptic integrals`。
 4 besj0
 ?expressions functions besj0
-?functions besj0
 ?besj0
 #besj0(x) & 整数または実数 & $j_{0}$ ベッセル関数 (0 次ベッセル関数)\\
 %besj0(x)@整数または実数@$j sub 0$ ベッセル関数 (0 次ベッセル関数)
@@ -1114,7 +1137,6 @@ C マーカを doc2html へのこのシグナルとして使用します。
  次ベッセル関数) の値を返します。`besj0` には引数はラジアンで与えます。
 4 besj1
 ?expressions functions besj1
-?functions besj1
 ?besj1
 #besj1(x) & 整数または実数 & $j_{1}$ ベッセル関数 (1 次ベッセル関数)\\
 %besj1(x)@整数または実数@$j sub 1$ ベッセル関数 (1 次ベッセル関数)
@@ -1122,7 +1144,6 @@ C マーカを doc2html へのこのシグナルとして使用します。
  次ベッセル関数) の値を返します。`besj1` には引数はラジアンで与えます。
 4 besy0
 ?expressions functions besy0
-?functions besy0
 ?besy0
 #besy0(x) & 整数または実数 & $y_{0}$ ベッセル関数 (0 次ノイマン関数)\\
 %besy0(x)@整数または実数@$y sub 0$ ベッセル関数 (0 次ノイマン関数)
@@ -1130,7 +1151,6 @@ C マーカを doc2html へのこのシグナルとして使用します。
  次ノイマン関数) の値を返します。`besy0` には引数はラジアンで与えます。
 4 besy1
 ?expressions functions besy1
-?functions besy1
 ?besy1
 #besy1(x) & 整数または実数 & $y_{1}$ ベッセル関数 (1 次ノイマン関数)\\
 %besy1(x)@整数または実数@$y sub 1$ ベッセル関数 (1 次ノイマン関数)
@@ -1138,7 +1158,6 @@ C マーカを doc2html へのこのシグナルとして使用します。
  次ノイマン関数) の値を返します。`besy1` には引数はラジアンで与えます。
 4 ceil
 ?expressions functions ceil
-?functions ceil
 ?ceil
 #ceil(x) & 任意 & $\lceil x \rceil$, $x$ (の実部) 以上の最小の整数\\
 %ceil(x)@任意@$left ceiling x right ceiling$, $x$ (の実部) 以上の最小の整数
@@ -1146,7 +1165,6 @@ C マーカを doc2html へのこのシグナルとして使用します。
  `ceil` はその引数の実部以上の最小の整数を返します。
 4 cos
 ?expressions functions cos
-?functions cos
 ?cos
 #cos(x) & 任意 & $x$ のコサイン $\cos x$\\
 %cos(x)@ラジアン@$x$ のコサイン $cos~x$
@@ -1154,7 +1172,6 @@ C マーカを doc2html へのこのシグナルとして使用します。
  `set angles` の選択にしたがって、ラジアンまたは度の引数を受け付けます。
 4 cosh
 ?expressions functions cosh
-?functions cosh
 ?cosh
 #cosh(x) & 任意 & $\cosh x$, $x$ のハイパボリックコサイン \\
 %cosh(x)@任意@$cosh~x$, $x$ のハイパボリックコサイン
@@ -1162,7 +1179,6 @@ C マーカを doc2html へのこのシグナルとして使用します。
  引数はラジアンで与えます。
 4 erf
 ?expressions functions erf
-?functions erf
 ?erf
 #erf(x) & 任意 & $\mbox{erf}(\mbox{real}(x))$,  $x$ の 実部の誤差関数\\
 %erf(x)@任意@$erf ( roman real (x))$, $x$ の実部の誤差関数
@@ -1170,7 +1186,6 @@ C マーカを doc2html へのこのシグナルとして使用します。
  は虚部は無視されます。以下参照: `erfc`, `inverf`, `norm`。
 4 erfc
 ?expressions functions erfc
-?functions erfc
 ?erfc
 #erfc(x) & 任意 & $\mbox{erfc}(\mbox{real}(x))$,  1.0 - ($x$ の実部の誤差関数) \\
 %erfc(x)@任意@$erfc ( roman real (x))$, 1.0 - ($x$ の実部の誤差関数)
@@ -1179,7 +1194,6 @@ C マーカを doc2html へのこのシグナルとして使用します。
  `inverf`, `norm`。
 4 exp
 ?expressions functions exp
-?functions exp
 ?exp
 #exp(x) & 任意 & $e^{x}$, $x$ の指数関数\\
 %exp(x)@任意@$e sup x$, $x$ の指数関数
@@ -1189,7 +1203,6 @@ C マーカを doc2html へのこのシグナルとして使用します。
  義関数が役に立つでしょう。
 4 expint
 ?expressions functions expint
-?functions expint
 ?expint
 #expint(n,x) & 整数 $n\ge0$, 実数 $x\ge0$ & $E_n(x)=\int_1^\infty t^{-n} e^{-xt}\,dt$, $x$ の指数積分 \\
 %expint(n,x)@any@$E sub n (x)$, $x$ の指数積分
@@ -1198,7 +1211,6 @@ C マーカを doc2html へのこのシグナルとして使用します。
  x は 0 以上の実数で、x>0 か n>1 のいずれかでなければなりません。
 4 floor
 ?expressions functions floor
-?functions floor
 ?floor
 #floor(x) & 任意 & $\lfloor x \rfloor$, $x$ (の実部) 以下の最大の整数\\
 %floor(x)@任意@$left floor x right floor$, $x$ (の実部) 以下の最大の整数
@@ -1206,7 +1218,6 @@ C マーカを doc2html へのこのシグナルとして使用します。
  ては `floor` はその引数の実部以下の最大の整数を返します。
 4 gamma
 ?expressions functions gamma
-?functions gamma
 ?gamma
 #gamma(x) & 任意 & $\mbox{gamma}(\mbox{real}(x))$, $x$ の実部のガンマ関数\\
 %gamma(x)@任意@$GAMMA ( roman real (x))$, $x$ の実部のガンマ関数
@@ -1214,7 +1225,6 @@ C マーカを doc2html へのこのシグナルとして使用します。
  ては gamma(n+1) = n! です。引数が複素数の場合、虚数部分は無視されます。
 4 ibeta
 ?expressions functions ibeta
-?functions ibeta
 ?ibeta
 #ibeta(p,q,x) & 任意 & $\mbox{ibeta}(\mbox{real}(p,q,x))$, $p$,$q$,$x$ の実部の不完全ベータ関数 \\
 %ibeta(p,q,x)@任意@$ibeta ( roman real (p,q,x))$, $p$,$q$,$x$ の実部の不完全ベータ関数
@@ -1224,7 +1234,6 @@ C マーカを doc2html へのこのシグナルとして使用します。
  近似は x < (p-1)/(p+q-2) の範囲でしか正確ではありません。
 4 inverf
 ?expressions functions inverf
-?functions inverf
 ?inverf
 #inverf(x) & 任意 & $x$ の実部の逆誤差関数 \\
 %inverf(x)@任意@$x$ の実部の逆誤差関数
@@ -1232,7 +1241,6 @@ C マーカを doc2html へのこのシグナルとして使用します。
  `erf`, `invnorm`。
 4 igamma
 ?expressions functions igamma
-?functions igamma
 ?igamma
 #igamma(a,x) & 任意 & $\mbox{igamma}(\mbox{real}(a,x))$, $a$,$x$ の実部の不完全ガンマ関数 \\
 %igamma(a,x)@任意@$igamma ( roman real (a,x))$, $a$,$x$ の実部の不完全ガンマ関数
@@ -1242,14 +1250,12 @@ C マーカを doc2html へのこのシグナルとして使用します。
  1 です。引数が複素数の場合は虚部は無視されます。
 4 imag
 ?expressions functions imag
-?functions imag
 ?imag
 #imag(x) & 複素数 & $x$ の虚数部分 (実数) \\
 %imag(x)@複素数@$x$ の虚数部分 (実数)
  関数 `imag(x)` は引数の虚数部分を実数として返します。
 4 invnorm
 ?expressions functions invnorm
-?functions invnorm
 ?invnorm
 #invnorm(x) & 任意 & $x$ の実部の逆正規分布関数 \\
 %invnorm(x)@任意@$x$ の実部の逆正規分布関数
@@ -1257,14 +1263,12 @@ C マーカを doc2html へのこのシグナルとして使用します。
  布関数の逆関数の値を返します。以下参照: `norm`。
 4 int
 ?expressions functions int
-?functions int
 ?int
 #int(x) & 実数 &  $x$ の整数部分 (0 に向かって丸め) \\
 %int(x)@実数@$x$ の整数部分 (0 に向かって丸め)
  関数 `int(x)` は、引数の整数部分 (0 に向かって丸めた) を返します。
 4 lambertw
 ?expressions functions lambertw
-?functions lambertw
 ?lambertw
 #lambertw(x) & 実数 & Lambert W 関数 \\
 %lambertw(x)@実数@Lambert W 関数
@@ -1273,7 +1277,6 @@ C マーカを doc2html へのこのシグナルとして使用します。
  ければいけません。
 4 lgamma
 ?expressions functions lgamma
-?functions lgamma
 ?lgamma
 #lgamma(x) & 任意 & $\mbox{lgamma}(\mbox{real}(x))$, $x$ の実部のガンマ対数関数\\
 %lgamma(x)@任意@$lgamma ( roman real (x))$, $x$ の実部のガンマ対数関数
@@ -1281,7 +1284,6 @@ C マーカを doc2html へのこのシグナルとして使用します。
  引数が複素数の場合、虚部は無視されます。
 4 log
 ?expressions functions log
-?functions log
 ?log
 #log(x) & 任意 & $\log_{e} x$,  $x$ の自然対数 (底 $e$) \\
 %log(x)@任意@$ln~x$, $x$ の自然対数 (底 $e$)
@@ -1289,14 +1291,12 @@ C マーカを doc2html へのこのシグナルとして使用します。
  `log10`。
 4 log10
 ?expressions functions log10
-?functions log10
 ?log10
 #log10(x) & 任意 & $\log_{10} x$, $x$ の対数 (底 $10$) \\
 %log10(x)@任意@${log sub 10}~x$, $x$ の対数 (底 $10$)
  関数 `log10(x)` は引数の対数 (底 10) を返します。
 4 norm
 ?expressions functions norm
-?functions norm
 ?norm
 #norm(x) & 任意 & $x$ の実部の正規分布 (ガウス分布) 関数 \\
 %norm(x)@任意@$norm(x)$, $x$ の実部の正規分布 (ガウス分布) 関数
@@ -1304,21 +1304,18 @@ C マーカを doc2html へのこのシグナルとして使用します。
  布関数の値を返します。以下参照: `invnorm`, `erf`, `erfc`。
 4 rand
 ?expressions functions rand
-?functions rand
 ?rand
 #rand(x) & 整数 & 区間 [0:1] 内の疑似乱数生成器 \\
 %rand(x)@整数@区間 [0:1] 内の疑似乱数生成器
  `rand(0)`  区間 [0:1] 内の疑似乱数を返す。詳しくは以下参照: `random`。
 4 real
 ?expressions functions real
-?functions real
 ?real
 #real(x) & 任意 &  $x$ の実部 \\
 %real(x)@任意@$x$ の実部
  関数 `real(x)` は引数の実部を返します。
 4 sgn
 ?expressions functions sgn
-?functions sgn
 ?sgn
 #sgn(x) & 任意 & $x>0$ なら 1, $x<0$ なら -1, $x=0$ なら 0. $x$ の虚部は無視 \\
 %sgn(x)@任意@$x>0$ なら 1, $x<0$ なら -1, $x=0$ なら 0. $x$ の虚部は無視
@@ -1326,7 +1323,6 @@ C マーカを doc2html へのこのシグナルとして使用します。
  引数が複素数の場合虚部は無視されます。
 4 sin
 ?expressions functions sin
-?functions sin
 ?sin
 #sin(x) & 任意 & $\sin x$, $x$ のサイン\\
 %sin(x)@任意@$sin~x$, $x$ のサイン
@@ -1334,7 +1330,6 @@ C マーカを doc2html へのこのシグナルとして使用します。
  `set angles` の選択にしたがって、ラジアンまたは度の引数を受け付けます。
 4 sinh
 ?expressions functions sinh
-?functions sinh
 ?sinh
 #sinh(x) & 任意 & $\sinh x$, $x$ のハイパボリックサイン \\
 %sinh(x)@任意@$sinh~x$, $x$ のハイパボリックサイン
@@ -1342,14 +1337,12 @@ C マーカを doc2html へのこのシグナルとして使用します。
  引数はラジアンで与えます。
 4 sqrt
 ?expressions functions sqrt
-?functions sqrt
 ?sqrt
 #sqrt(x) & 任意 & $\sqrt{x}$,  $x$ の平方根\\
 %sqrt(x)@任意@$sqrt x $, $x$ の平方根
  関数 `sqrt(x)` は引数の平方根の値を返します。
 4 tan
 ?expressions functions tan
-?functions tan
 ?tan
 #tan(x) & 任意 & $\tan x$,  $x$ のタンジェント \\
 %tan(x)@任意@$tan~x$, $x$ のタンジェント
@@ -1357,7 +1350,6 @@ C マーカを doc2html へのこのシグナルとして使用します。
  `set angles` の選択にしたがって、ラジアンまたは度の引数を受け付けます。
 4 tanh
 ?expressions functions tanh
-?functions tanh
 ?tanh
 #tanh(x) & 任意 & $\tanh x$, $x$ のハイパボリックタンジェント\\
 %tanh(x)@任意@$tanh~x$, $x$ のハイパボリックタンジェント
@@ -1365,12 +1357,14 @@ C マーカを doc2html へのこのシグナルとして使用します。
  `tanh` の引数はラジアンで与えます。
 4 voigt
 ?expressions functions voigt
-?functions voigt
 ?voigt
 #voigt(x,y) & 実数 & Voigt/Faddeeva 関数 $\frac{y}{\pi} \int{\frac{exp(t^2)}{(x-t)^2+y^2}}dt$ \\
 %voigt(x,y)@実数@ガウス関数とローレンツ関数の畳みこみ
  関数 `voigt(x,y)` は、スペクトル解析で使用される Voigt/Faddeeva 関数の
  近似を返します。その誤差は 1/10^4 以内です。
+#\hline \end{longtable}
+#%% begin dummy tabular because the @end processing wants to end one
+#\begin{tabular}{|ccl|}
 @end table
 
 ^<!-- INCLUDE_NEXT_TABLE -->
@@ -1383,7 +1377,6 @@ C マーカを doc2html へのこのシグナルとして使用します。
 %_
 4 gprintf
 ?expressions functions gprintf
-?functions gprintf
 #gprintf("format",x,...) & 任意 & gnuplot の書式解析器を適用した結果の文字列 \\
 %gprintf("format",x,...)@任意@gnuplot の書式解析器を適用した結果の文字列 \\
  `gprintf("format",x)` は、gnuplot 独自の書式指定子に一つの変数 x を適
@@ -1392,7 +1385,6 @@ C マーカを doc2html へのこのシグナルとして使用します。
  以下参照: `format specifiers`。
 4 sprintf
 ?expressions functions sprintf
-?functions sprintf
 ?sprintf
 #sprintf("format",x,...) & 複数個 & C 言語の sprintf の返す文字列 \\
 %sprintf("format",x,...)@複数個@C 言語の sprintf の返す文字列 \\
@@ -1403,14 +1395,12 @@ C マーカを doc2html へのこのシグナルとして使用します。
  の本か、unix の sprintf の man ページを参照してください。
 4 strlen
 ?expressions functions strlen
-?functions strlen
 ?strlen
 #strlen("string") & 文字列 & 文字列の長さ (整数) \\
 %strlen("string")@文字列@文字列の長さ (整数)
  `strlen("string")` は文字列の中の文字数を返します。
 4 strstrt
 ?expressions functions strstrt
-?functions strstrt
 ?strstrt
 #strstrt("string","key") & 文字列 & 部分文字列 "key" が現れる先頭位置\\
 %strstrt("string","key")@文字列@部分文字列 "key" が現れる先頭位置
@@ -1421,7 +1411,6 @@ C マーカを doc2html へのこのシグナルとして使用します。
  strstrt("hayneedlestack","needle") = 4 となります。
 4 substr
 ?expressions functions substr
-?functions substr
 ?substr
 =substring
 #substr("string",beg,end) & 複数個 & 文字列 "string"[beg:end] \\
@@ -1431,7 +1420,6 @@ C マーカを doc2html へのこのシグナルとして使用します。
  じですが、こちらはオプション beg, end を省略できません。
 4 strftime
 ?expressions functions strftime
-?functions strftime
 ?strftime
 #strftime("timeformat",t) & 任意 & gnuplot による時刻解析結果の文字列 \\
 %strftime("timeformat",t)@任意@gnuplot による時刻解析結果の文字列
@@ -1440,7 +1428,6 @@ C マーカを doc2html へのこのシグナルとして使用します。
  以下参照: `time_specifiers`, `strptime`。
 4 strptime
 ?expressions functions strptime
-?functions strptime
 ?strptime
 #strptime("timeformat",s) & 文字列 & 文字列 s を変換した 2000 年からの秒数 \\
 %strptime("timeformat",s)@文字列@文字列 s を変換した 2000 年からの秒数
@@ -1449,7 +1436,6 @@ C マーカを doc2html へのこのシグナルとして使用します。
  以下参照: `time_specifiers`, `strftime`。
 4 system
 ?expressions functions system
-?functions system
 =system
 #system("command") & 文字列 & シェルコマンドの出力を持つ文字列\\
 %system("command")@文字列@シェルコマンドの出力を持つ文字列
@@ -1461,7 +1447,6 @@ C マーカを doc2html へのこのシグナルとして使用します。
  て、外部関数の出力を gnuplot スクリプト内に取り込むのに利用できます。
 4 word
 ?expressions functions word
-?functions word
 ?word
 =word
 #word("string",n) & 文字列, 整数 & 文字列 "string" の n 番目の単語 \\
@@ -1470,7 +1455,6 @@ C マーカを doc2html へのこのシグナルとして使用します。
  えば `word("one two three",2)` は文字列 "two" を返します。
 4 words
 ?expressions functions words
-?functions words
 ?words
 =words
 #words("string") & 文字列 & 文字列 "string" 中の単語数 \\
@@ -1489,7 +1473,6 @@ C マーカを doc2html へのこのシグナルとして使用します。
 %_
 4 column
 ?expressions functions column
-?functions column
 ?column
 #column(x) & 整数 & データファイル処理中の $x$ 列目 \\
 %column(x)@整数@ データファイル処理中の $x$ 列目
@@ -1500,7 +1483,6 @@ C マーカを doc2html へのこのシグナルとして使用します。
  価します。以下参照: `plot datafile using`。
 4 columnhead
 ?expressions functions columnhead
-?functions columnhead
 ?columnhead
 #columnhead(x) & 整数 & データファイルの最初の $x$ 列目中の文字列 \\
 %columnhead(x)@整数@ データファイルの最初の $x$ 列目中の文字列
@@ -1510,7 +1492,6 @@ C マーカを doc2html へのこのシグナルとして使用します。
  `plot datafile using`。
 4 defined
 ?expressions functions defined
-?functions defined
 ?defined
 #defined(X) & 変数名 & [非推奨] X が定義されていれば 1, そうでなければ 0\\
 %defined(X)@変数名@ [非推奨] X が定義されていれば 1, そうでなければ 0
@@ -1518,7 +1499,6 @@ C マーカを doc2html へのこのシグナルとして使用します。
  返します。
 4 exists
 ?expressions functions exists
-?functions exists
 ?exists
 #exists("X") & 文字列 & 変数名 X が定義されていれば 1, そうでなければ 0\\
 %exists("X")@文字列@ 変数名 X が定義されていれば 1, そうでなければ 0
@@ -1526,10 +1506,8 @@ C マーカを doc2html へのこのシグナルとして使用します。
  されている変数名を持っていれば 1 を、そうでなければ 0 を返します。
 4 stringcolumn
 ?expressions functions stringcolumn
-?functions stringcolumn
 ?stringcolumn
 ?expressions functions strcol
-?functions strcol
 ?strcol
 #stringcolumn(x) & 整数か文字列 & 文字列としての $x$ 列目の内容 \\
 %stringcolumn(x)@整数か文字列@ 文字列としての $x$ 列目の内容
@@ -1538,7 +1516,6 @@ C マーカを doc2html へのこのシグナルとして使用します。
  数として返します。以下参照: `plot datafile using`。
 4 timecolumn
 ?expressions functions timecolumn
-?functions timecolumn
 ?timecolumn
 #timecolumn(x) & 整数 & データファイル処理中の $x$ 列目の日時データ \\
 %timecolumn(x)@整数@ データファイル処理中の $x$ 列目の日時データ
@@ -1555,7 +1532,6 @@ C マーカを doc2html へのこのシグナルとして使用します。
  ます。
 4 tm_hour
 ?expressions tm_hour
-?functions tm_hour
 ?tm_hour
 #tm\_hour(x) & 整数 & 時\\
 %tm_hour(x)@整数@時
@@ -1563,7 +1539,6 @@ C マーカを doc2html へのこのシグナルとして使用します。
  時刻の何時 (0--23 の範囲の整数) であるかを、実数として返します。
 4 tm_mday
 ?expressions tm_mday
-?functions tm_mday
 ?tm_mday
 #tm\_mday(x) & 整数 & 日 \\
 %tm_mday(x)@整数@日
@@ -1571,7 +1546,6 @@ C マーカを doc2html へのこのシグナルとして使用します。
  その月の何日 (1--31 の範囲の整数) であるかを、実数として返します。
 4 tm_min
 ?expressions tm_min
-?functions tm_min
 ?tm_min
 #tm\_min(x) & 整数 & 分 \\
 %tm_min(x)@整数@分
@@ -1579,7 +1553,6 @@ C マーカを doc2html へのこのシグナルとして使用します。
  時刻の何分 (0--59 の範囲の整数) であるかを、実数として返します。
 4 tm_mon
 ?expressions tm_mon
-?functions tm_mon
 ?tm_mon
 #tm\_mon(x) & 整数 & 月 \\
 %tm_mon(x)@整数@月
@@ -1587,7 +1560,6 @@ C マーカを doc2html へのこのシグナルとして使用します。
  何月 (0--11 の範囲の整数) であるかを、実数として返します。
 4 tm_sec
 ?expressions tm_sec
-?functions tm_sec
 ?tm_sec
 #tm\_sec(x) & 整数 & 秒 \\
 %tm_sec(x)@整数@秒
@@ -1595,7 +1567,6 @@ C マーカを doc2html へのこのシグナルとして使用します。
  時刻の何秒 (0--59 の範囲の整数) であるかを、実数として返します。
 4 tm_wday
 ?expressions tm_wday
-?functions tm_wday
 ?tm_wday
 #tm\_wday(x) & 整数 & その週の何日目 \\
 %tm_wday(x)@整数@その週の何日目
@@ -1603,7 +1574,6 @@ C マーカを doc2html へのこのシグナルとして使用します。
  その週の何日目 (0--6 の範囲の整数) であるかを、実数として返します。
 4 tm_yday
 ?expressions tm_yday
-?functions tm_yday
 ?tm_yday
 #tm\_yday(x) & 整数 & その年の何日目 \\
 %tm_yday(x)@整数@その年の何日目
@@ -1611,7 +1581,6 @@ C マーカを doc2html へのこのシグナルとして使用します。
  その年の何日目 (1--366 の範囲の整数) であるかを、実数として返します。
 4 tm_year
 ?expressions tm_year
-?functions tm_year
 ?tm_year
 #tm\_year(x) & 整数 & 西暦 \\
 %tm_year(x)@整数@西暦
@@ -1619,7 +1588,6 @@ C マーカを doc2html へのこのシグナルとして使用します。
  西暦何年 (整数) であるかを、実数として返します。
 4 time
 ?expressions time
-?functions time
 ?time
 #time(x) & 任意 & 現在のシステム時刻 \\
 %time(x)@任意@現在のシステム時刻
@@ -1632,7 +1600,6 @@ C マーカを doc2html へのこのシグナルとして使用します。
  字列を提供するようそれを `strftime` に渡します。
 4 valid
 ?expressions functions valid
-?functions valid
 ?valid
 #valid(x) & 整数 & データ中の $\mbox{column}(x)$ の正当性\\
 %valid(x)@整数@ データ中の column($x$) の正当性
@@ -1645,7 +1612,6 @@ C マーカを doc2html へのこのシグナルとして使用します。
 
 4 種々の楕円積分 (elliptic integrals)
 ?expressions functions elliptic integrals
-?functions elliptic integrals
 ?elliptic integrals
 =elliptic integrals
  関数 `EllipticK(k)` は、第 1 種完全楕円積分、すなわち、関数
@@ -1663,7 +1629,6 @@ C マーカを doc2html へのこのシグナルとして使用します。
  に対し EllipticPi(0,k) == EllipticK(k) であることに注意してください。
 4 乱数の生成 (random)
 ?expressions random
-?functions random
 ?random
 =rand
  関数 `rand()` は 0 と 1 の間の疑似乱数列を生成します。これは以下からの
@@ -1679,7 +1644,6 @@ C マーカを doc2html へのこのシグナルとして使用します。
                    に設定する
 4 value
 ?expressions functions value
-?functions value
 ?value
  A がユーザー定義変数の名前であれば、B = value("A") は事実上 B = A と全
  く同じです。これは、変数の名前自身が文字列変数に収められている場合に有
@@ -2569,11 +2533,10 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/userdefined.gif" alt="[use
  たは複数の軸の名前をオプションとしてとります。z 軸を制御するオプション
  やコマンドは 2 次元グラフには効力を持ちません。
 
- `splot` は、曲面の描画と、点や線を加えて等高線を書くことも出来ます。3
- 次元の関数の格子定義に関する情報については、以下参照: `splot`,
- `set isosamples`。3 次元データのファイルに必要な形態に関しては、以下も
- 参照: `splot datafile`。等高線に関する情報については、以下も参照:
- `set contour`, `set cntrparam`。
+ `splot` は、点や線に加えて曲面や等高線を書くことができます。3 次元の関
+ 数の格子定義に関する情報については、以下参照: `set isosamples`。3 次元
+ データのファイルに必要な形態については、以下参照: `splot datafile`。等
+ 高線に関する情報については、以下参照: `set contour`, `set cntrparam`。
 
  `splot` での縮尺や見出し付けの制御は、x2 軸と y2 軸を制御するコマンド
  やオプションは効果がなく、z 軸を制御するものにはもちろん効果がある、と
@@ -3048,6 +3011,20 @@ Ffigure_boxplot
      set style boxplot nooutliers
      plot 'data' using (1.0):5:(0.3)
 
+ デフォルトでは、using 指定による 2 列目の y のすべての値に対する
+ boxplot を 1 つだけ生成します。しかし、追加の (4 つ目の) 列を指定する
+ と、その列の値をある因子変数の離散的なレベル値であると見なし、その離散
+ 値のレベルの値の数だけの boxplot を描画します。それらの boxplot の間隔
+ はデフォルトでは 1.0 ですが、これは `set style boxplot separation` で
+ 変更できます。デフォルトでは、因子変数の値は、各 boxplot の下 (または
+ 上) の目盛のラベルに表示します。
+
+ 例
+
+     # 'data' の 2 列目は "control" か "treatment" のいずれかの文字列で
+     # 以下の例は、その因子毎の 2 つの boxplot を生成する
+     plot 'data' using (1.0):5:(0):2
+
  その箱のデフォルトの幅は `set boxwidth <width>` で設定できますが、plot
  コマンドの `using` による 3 番目のオプション列でも指定できます。1 番目
  と 3 番目の列 (x 座標と幅) は通常データ列ではなく定数として与えます。
@@ -3521,6 +3498,7 @@ Ffigure_histrows
  す。各棒は、2 つの部分の積み上げの形であり、それぞれの部分の高さが、デ
  ータファイルの 2 列目と 4 列目の値に対応します。
 
+
  最後に以下のコマンド
 
        set style histogram columnstacked
@@ -3546,7 +3524,7 @@ Ffigure_histcols
 ?plotting style histograms newhistogram
  書式:
 
-      newhistogram {"<title>"} {<linetype>} {<fillstyle>} {at <x-coord>}
+      newhistogram {"<title>"} {lt <linetype>} {fs <fillstyle>} {at <x-coord>}
 
  一回の描画に 2 つ以上のヒストグラムの組を作ることもできます。この場合
  コマンド `newhistogram` を使うことで、それらを強制的に分離し、またそれ
@@ -4966,7 +4944,7 @@ Ffigure_mapcontours
  `plot` は `gnuplot` で図を描くための基本的なコマンドです。 それは関数
  やデータを実に多くの方法で表示します。`plot` は 2 次元の関数やデータを
  描くのに使われ、`splot` は 3 次元の曲面やデータの 2 次元投影を描きます。
- `plot` と `splot` は多くの共通の特徴点を持ちますが、その違いについては
+ `plot` と `splot` は多くの共通の機能を提供しますが、その違いについては
  以下参照: `splot`。特に注意しておきますが、`binary <binary list>` オプ
  ションは `plot`, `splot` の両方で動作しますが、両者には小さな違いがあ
  ります。
@@ -4979,13 +4957,11 @@ Ffigure_mapcontours
             {, {definitions{,}} <function> ...}
 
  関数 <function>、または引用符で囲まれたデータファイル名 (<datafile>)
- のどちらか一方を与えます。関数は一本の数式、または parametric mode に
- おいては 2 つの数式の組です。数式は完全に定義してもいいですし、前の方
- の `gnuplot` のコマンド列で部分的に定義してもいいです (以下参照:
- `user-defined`)。
-
- 関数とパラメータは `plot` コマンド自身の上で定義をすることも可能です。
- これは単に他の項目とコンマで分離して記述することでなされます。
+ のどちらか一方を与えます。関数は通常は 1 本の数式ですが、媒介変数モー
+ ド (parametric) においては 2 つの数式の組です。関数は、組み込み関数、
+ ユーザ定義関数、あるいはその plot コマンドの上で与えるもののいずれかを
+ 使用できます。コンマで区切ることで、複数のデータや関数を 1 つのコマン
+ ドで描画できます。以下参照: `data`, `functions`。
 
  例:
        plot sin(x)
@@ -6236,7 +6212,24 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/population.gif" alt="[popu
  されます。
 
  更なる情報については、以下参照: `plot using`, `plot with`, `set style`。
-3 parametric
+3 関数描画 (functions)
+?commands plot functions
+?plot functions
+?functions
+ コマンド `plot`, `splot` では、ファイルから読み込んだデータの描画だけ
+ でなく、組み込み関数やユーザ定義関数を描画することもできます。関数の値
+ は、独立な軸の通常の範囲に渡ってデータサンプルを取ることで評価します。
+ 以下参照: `set samples`, `set isosamples`。
+
+ 例:
+       approx(ang) = ang - ang**3 / (3*2)
+       plot sin(x) title "sin(x)", approx(x) title "approximation"
+
+ 関数のデフォルトの描画スタイルを設定する方法については、以下参照:
+ `set style function`。組み込み関数の情報については、以下参照:
+ `expressions functions`。自前で関数を定義する方法については、以下参照:
+ `user-defined`。
+3 媒介変数モード描画 (parametric)
 ?commands plot parametric
 ?commands splot parametric
 ?plot parametric
@@ -6765,7 +6758,7 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/population.gif" alt="[popu
  参照してください。
 
  以下のものは、`reset` の影響を受けません。
-      `set term` `set output` `set loadpath` `set fontpath`
+      `set term` `set output` `set loadpath` `set fontpath` `set linetype`
       `set encoding` `set decimalsign` `set locale` `set psdir`
 
 =error state
@@ -6935,9 +6928,9 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/population.gif" alt="[popu
  "to" の代わりに "rto" で指定されている場合、始点からの相対的な位置に描
  かれます。この場合、線形軸 (非対数軸)、および `graph`, `screen` 座標に
  対しては、始点と終点の距離が与えられた相対的な値に対応します。一方、対
- 数軸に対しては、与えられた相対的な値は、始点から終点への積因子 (比) に
- 対応します。よって、対数軸の場合、相対的な値として 0 や負の値を与える
- ことは許されません。
+ 数軸に対しては、与えられた相対的な値は、始点から終点への倍数に対応しま
+ す。よって、対数軸の場合、相対的な値として 0 や負の値を与えることは許
+ されません。
 
  `nohead` を指定することで、矢先のない矢、すなわち線分を書くこともでき
  ます。これは描画の上に線分を描く別な方法を与えます。デフォルトでは 1
@@ -7006,7 +6999,7 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/population.gif" alt="[popu
        set arrow from 100,-5 rto 10,10
  これは 100,-5 から 1000,5 までの矢を描きます。線形軸 (y) に対しては相
  対的な座標 10 が "差 10" を意味するのに対し、対数軸 (x) に対しては相対
- 的な座標 10 は "積因子 10" として働きます。
+ 的な座標 10 は "倍数 10" として働きます。
 
  2 番の矢印を消すには:
        unset arrow 2
@@ -7526,7 +7519,7 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/population.gif" alt="[popu
  増えて行き限界の個数に達するまで書かれます。<end> はその等高線の数を決
  定するのに使われますが、これは後の `set cntrparam levels <n>` によって
  常に変更されます。z 軸が対数軸の場合、`set ztics` の場合と同様に、
- <increment> は積因子として解釈されます。
+ <increment> は倍数として解釈されます。
 
  コマンド `set cntrparam` が引数なしに呼ばれた場合は、次のデフォルトの
  値が使われます: linear, 5 points, order 4, 5 auto levels
@@ -10313,6 +10306,7 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/population.gif" alt="[popu
                     | file '<filename>' {datafile-modifiers}
                     | functions <R>,<G>,<B>
                   }
+                  { cubehelix {start <val>} {cycles <val>} {saturation <val>} }
                   { model { RGB | HSV | CMY | YIQ | XYZ } }
                   { positive | negative }
                   { nops_allcF | ps_allcF }
@@ -10376,9 +10370,9 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/population.gif" alt="[popu
  のカラーパレットへ、`set palette color` で簡単に復帰できます。
 
  `set palette gamma <gamma>` による自動的なガンマ補正は、灰色のパレット
- (`set palette gray`) のみに行われます。灰色階調への線形写像は gamma=1
- に相当します (以下参照: `test palette`)。カラーパレットに対してはガン
- マ値は無視されます。
+ (`set palette gray`) と、`cubehelix` カラーパレット形式に行われます。
+ gamma = 1 の場合は、線形の光度写像を生成します。以下参照:
+ `test palette`。
 
  出力形式の多くは、有限個の色数しかサポートしていません (例えば gif で
  は 256 個)。デフォルトの gnuplot の線種色を割り当てた後の残りの有効な
@@ -10543,6 +10537,23 @@ C 下記の以下参照: オプション `positive`, `negative`)。
        color(gray) = gray**(1./gamma)
        set palette model RGB functions color(gray), color(gray), color(gray)
 
+4 cubehelix
+?commands set palette cubehelix
+?set palette cubehelix
+?cubehelix
+ オプション "cubehelix" はあるパレット族を定義しますが、これは、灰色階
+ 調値が 0 から 1 に増加するのに伴ない、正味の光度が単調に増加するのと同
+ 時に、色相 (hue) が標準色相環に従って変化します。
+       D A Green (2011) http://arxiv.org/abs/1108.5083
+ `start` は、色相環に沿った開始点をラジアン単位で決定します。
+ `cycles` は、パレットの範囲を渡って色相環を何回回るかを決定します。
+ `saturation` (彩度) が大きいと、よりあざやかな色になります。1 より大き
+ い彩度は、個々の RGB 成分をクリッピングすることになり、光度は単調では
+ なくなってしまいます。`set palette gamma` もパレットに影響を与えます。
+ デフォルト値は以下の通りです。
+       set palette cubehelix start 0.5 cycles -1.5 saturation 1
+       set palette gamma 1.5
+
 4 file
 ?commands set palette file
 ?set palette file
@@ -10591,10 +10602,9 @@ C 下記の以下参照: オプション `positive`, `negative`)。
  きます。<gamma> のデフォルトは 1.5 で、これは多くの出力形式に適切な値
  です。
 
- カラーの配色に対しては gnuplot では自動的なガンマ補正は行いません。し
- かしガンマ補正は簡単に実装できます。ここに例として、ガンマの値の少し異
- なる赤、緑、青の成分に、明示的な関数を与えた灰色階調画像の例を紹介しま
- す。
+ ガンマ補正は、cubehelix カラーパレット形式には適用されますが、他の色形
+ 式には適用されません。しかし、明示的な色関数にガンマ補正を実装するのは
+ 難しくありません。
 
  例:
        set palette model RGB
@@ -11020,6 +11030,9 @@ C 下記の以下参照: オプション `positive`, `negative`)。
        set style boxplot {range <r> | fraction <f>}
                          {{no}outliers} {pointtype <p>}
                          {candlesticks | financebars}
+                         {separation <x>}
+                         {labels off | auto | x | x2}
+                         {sorted | unsorted}
 
  boxplot の箱は、常にデータ点の第一四分位から第三四分位の値の範囲にかか
  っています。箱から延長される箱ひげの限界は、2 つの異なる方法で制御でき
@@ -11044,6 +11057,28 @@ C 下記の以下参照: オプション `positive`, `negative`)。
 
  デフォルトでは boxplot は candlesticks と似たスタイルで描画しますが、
  financebars と似たスタイルで描画するためのオプションもあります。
+
+ boxplot の using 指定が 4 列目を持つ場合、その列の値はある因子変数の離
+ 散的なレベル値であると見なします。この場合、その因子変数のレベルの数と
+ 同じだけの複数の boxplot が描かれます。それらの boxplot の隣り合うもの
+ 同士の距離はデフォルトでは 1.0 (x 軸の単位で) ですが、この間隔はオプシ
+ ョン `separation` で変更できます。
+
+ オプション `labels` は、これらの boxplot (それぞれデータ集合のある部分
+ に対応する) のどこに、どのようにラベルをつけるかを決定します。デフォル
+ トでは因子の値を水平軸 (x か x2 のいずれか plot で使われている方) の目
+ 盛ラベルに出力します。これはオプションの `labels auto` に対応します。
+ オプション `labels x`, `labels x2` によって、強制的に x 軸、x2 軸にそ
+ れぞれ出力させることもできますし、`labels off` でオフにすることもでき
+ ます。
+
+ デフォルトでは、因子変数の異なるレベルに対応する boxplot は整列化はせ
+ ず、データファイルにそのレベルが現れる順番に描画します。この挙動はオプ
+ ションの `unsorted` に対応しますが、オプション `sorted` を使用すると、
+ まずレベルを辞書順にソートし、その順に boxplot を描画します。
+
+ オプション `separation`, `labels`, `sorted`, `unsorted` は、plot に 4
+ 列目の指定を与えた場合のみ効力を持ちます。
 
  以下参照: `boxplot`, `candlesticks`, `financebars`。
 
@@ -11185,17 +11220,13 @@ C 下記の以下参照: オプション `positive`, `negative`)。
 ?commands show style function
 ?set style function
 ?show style function
-?function style
  コマンド `set style function` は関数描画に対するデフォルトの描画スタイ
- ルを変更します。
+ ル (lines, points, filledcurves など) を変更します。以下参照:
+ `plotting styles`。
 
  書式:
        set style function <plotting-style>
        show style function
-
- 選択項目については、以下参照: `plotting styles`。項目を指定しなかった
- 場合、その一覧が表示されます。`show style function` は現在のデフォルト
- の関数描画スタイルを表示します。
 4 set style increment
 ?commands set style increment
 ?commands show style increment
@@ -12353,7 +12384,7 @@ C 下記の以下参照: オプション `positive`, `negative`)。
  とみなされます。<incr> は負の値も可能です。<start> と <end> の両方が指
  定されていない場合、<start> は -∞、<end> は +∞とみなされ、目盛りは
  <incr> の整数倍の位置に表示されます。軸が対数軸の場合、目盛りの間隔
- (増分) は、積因子として使用されます。
+ (増分) は、倍数として使用されます。
 
  負の <start> や <incr> を、数値の後ろに指定すると (例えば
  `rotate by <angle>` とか `offset <offset>` の後ろ)、gnuplot の構文解析
@@ -13149,6 +13180,82 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/splot.gif" alt="[splot.gif
  等高線は曲面の上に表示することもできますし、底面に射影することもできま
  す。底面への射影は、ファイルに書き出すこともでき、そしてそれを `plot`
  で再び読み込んで `plot` のより強い整形能力を生かすこともできます。
+2 stats (簡単な統計情報)
+?commands stats
+?stats
+?statistics
+ 書式:
+      stats 'filename' [using N[:M]] [name 'prefix'] [[no]output]]
+ このコマンドは、ファイルの 1 列、または 2 列のデータの簡単な統計情報を
+ 提供します。using 指定子は、plot コマンドと同じ形で解釈されますが、
+ `index`, `every`, `using` 指定に関する詳細については以下参照: `plot`。
+ データ点は、その解析の前に xrange, yrange に従ってフィルタにかけられま
+ す。以下参照: `set xrange`。その情報はデフォルトではスクリーンに出力さ
+ れますが、コマンド `set print` を先に使うことで出力をファイルにリダイ
+ レクトしたり、オプション `nooutput` を使うことで出力しないようにするこ
+ ともできます。
+
+ 画面出力に加え、gnuplot は個々の統計情報を 3 つの変数グループに保存し
+ ます。
+ 1 番目の変数グループは、どんなデータが並んでいるかを示します:
+      STATS_records           # 範囲内のデータ行の総数
+      STATS_outofrange        # 範囲外として除かれた行数
+      STATS_invalid           # 無効/不完全/欠損データ行の総数
+      STATS_blank             # 空行の総数
+      STATS_blocks            # ファイル内の index データブロック数
+
+ 2 番目の変数グループは、1 つの列の、範囲内のデータの性質を示します。対
+ 応する軸 (1 つ目の列には x 軸、追加の 2 つ目の列には y 軸) が自動縮尺
+ の場合は、範囲に制限はありません。2 つの列を 1 回の `stats` コマンドで
+ 解析する場合は、各変数名には "_x", "_y" という接尾辞が追加されます。例
+ えば STATS_mix_x は、1 つ目の列のデータの最小値で、STATS_min_y は 2 つ
+ 目の列のデータの最小値を意味します。
+      STATS_min               # 範囲内のデータ点の最小値
+      STATS_max               # 範囲内のデータ点の最大値
+      STATS_index_min         # data[i] == STATS_min となる添字 i
+      STATS_index_max         # data[i] == STATS_max となる添字 i
+      STATS_lo_quartile       # 第一 (下の) 四分位境界値
+      STATS_median            # メジアン値 (第二四分位境界値)
+      STATS_up_quartile       # 第三 (上の) 四分位境界値
+      STATS_mean              # 範囲内のデータ点の平均値
+      STATS_stddev            # 範囲内のデータ点の標準偏差
+      STATS_sum               # 和
+      STATS_sumsq             # 平方和
+
+ 3 番目の変数グループは、2 つの列のデータの解析専用です。
+      STATS_correlation       # x と y の相関係数
+      STATS_slope             # 回帰直線 y = Ax + B の係数 A
+      STATS_intercept         # 回帰直線 y = Ax + B の係数 B
+      STATS_sumxy             # 積和 (x*y の和)
+      STATS_pos_min_y         # y の最小値を与える x 座標
+      STATS_pos_max_y         # y の最大値を与える x 座標
+
+ 同時に 2 つ以上のファイルからの統計情報を使うことができれば便利でしょ
+ うから、変数のデフォルトの接頭辞である "STATS" をオプション `name` で
+ ユーザが指定する文字列に置き換えることができるようになっています。例え
+ ば、異なる 2 つのファイルのそれぞれの 2 列目のデータの平均値は以下のよ
+ うにして比較できます:
+      stats "file1.dat" using 2 name "A"
+      stats "file2.dat" using 2 name "B"
+      if (A_mean < B_mean) {...}
+
+ STATS_index_xxx で示される添字の値は、plot コマンドの第 0 疑似列 ($0)
+ の値に対応し、最初の点は添字は 0、最後の点の添字は N-1 となります。
+
+ メジアンと四分位境界値を探す際はデータの値をソートし、点の総数 N が奇
+ 数の場合は、その (N+1)/2 番目の値をメジアン値とし、N が偶数の場合は、
+ N/2 番目と (N+2)/2 番目の値の平均値をメジアン値とします。四分位境界値
+ も同様に処理します。
+
+ その後の描画に注釈をつけるためにコマンド `stats` を利用した例について
+ は、以下を参照してください。
+^ <a href="http://www.gnuplot.info/demo/stats.html">
+ stats.dem。
+^ </a>
+
+ 現在の実装では、X 軸と Y 軸の一方が対数軸の場合は解析できません。この
+ 制限は今後のバージョンでは解消されるでしょう。
+
 2 system
 ?commands system
 ?system
@@ -13174,12 +13281,11 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/splot.gif" alt="[splot.gif
  使える線の種類、点の種類、または有用なそして利用可能なその他の描画を生
  成します。
 
- `test palette` は、現在のカラーパレット (`palette`) で計算した R(z),
- G(z),B(z) (0<=z<=1) の状態を画像で描画します。それは実際には、本来はあ
- なたが `show palette palette 256 float` の結果から作るべき綺麗な描画で
- す。追加のパラメータは、r,g,b の文字の組合せで、それにより描画する順番
- が決定されます。`set palette gray` で色々試してみてください。デフォル
- トの順番は rgb です。
+ `test palette` は、R(z),G(z),B(z) (0<=z<=1) の状態を描画します。これら
+ は現在のカラーパレット (`palette`) の RGB 成分を示します。また、RGB を
+ 灰色階調に写像する NTSC 係数を用いて計算された視光度も描画します。追加
+ のパラメータは、r,g,b の文字の組合せで、それにより描画する順番が決定さ
+ れます。
 2 undefine
 ?commands undefine
 ?undefine
