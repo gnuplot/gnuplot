@@ -1,5 +1,5 @@
 /*
- * $Id: context.trm,v 1.1 2011/11/06 09:31:00 markisch Exp $
+ * $Id: context.trm,v 1.2 2011/11/07 18:30:10 markisch Exp $
  */
 
 /* GNUPLOT - context.trm */
@@ -1980,7 +1980,7 @@ START_HELP(context)
 " or to read the manual of the gnuplot module for ConTeXt.",
 "",
 " The `context` terminal supports the following options:",
-" ",
+"",
 " Syntax:",
 "      set term context {default}",
 "                       {defaultsize | size <scale> |",
@@ -2002,13 +2002,13 @@ START_HELP(context)
 " In non-standalone (`input`) graphic only parameters `size` to select graphic",
 " size, `fontscale` to scale all the labels for a factor <fontscale>",
 " and font size, make sense, the rest is silently",
-" ignored and should be configured in the .tex file which inputs the graphic."
+" ignored and should be configured in the .tex file which inputs the graphic.",
 " It's highly recommended to set the proper fontsize if document font differs from",
 " 12pt, so that gnuplot will know how much space to reserve for labels.",
 "",
 " `default` resets all the options to their default values.",
 "",
-" `defaultsize` sets the plot size to 5in,3in.\n",
+" `defaultsize` sets the plot size to 5in,3in.",
 " `size` <scale> sets the plot size to <scale> times <default value>.",
 " If two arguments are given (separated with ','), the first one sets",
 " the horizontal size and the second one the vertical size.",
@@ -2016,7 +2016,7 @@ START_HELP(context)
 " value), with inches ('in') or centimeters ('cm').",
 "",
 " `input` (default) creates a graphic that can be included into another ConTeXt",
-" document.\n",
+" document.",
 " `standalone` adds some lines, so that the document might be compiled as-is.",
 " You might also want to add `header` in that case.",
 "",
@@ -2038,11 +2038,11 @@ START_HELP(context)
 " (Some general support for this should be added to Gnuplot, so that the same options",
 " could be set for each line (style) separately).",
 "",
-" `dashed` (default) uses different dash patterns for different line types,"
+" `dashed` (default) uses different dash patterns for different line types,",
 " `solid` draws all plots with solid lines.",
 "",
 " `dashlength` or `dl` scales the length of the dashed-line segments by <dl>.",
-" `linewidth` or `lw` scales all linewidths by <lw>."
+" `linewidth` or `lw` scales all linewidths by <lw>.",
 " (lw 1 stands for 0.5bp, which is the default line width when drawing with Metapost.)",
 " `fontscale` scales text labels for factor <fontscale> relative to default document font.",
 "",
@@ -2054,26 +2054,27 @@ START_HELP(context)
 "",
 " `inlineimages` writes binary images to a string and only works in ConTeXt MKIV.",
 " `externalimages` writes PNG files to disk and also works with ConTeXt MKII.",
-" Gnuplot needs to have support for PNG images built in for this to work."
+" Gnuplot needs to have support for PNG images built in for this to work.",
 "",
 " With `font` you can set font name and size in standalone graphics.",
 " In non-standalone (`input`) mode only the font size is important",
 " to reserve enough space for text labels.",
-" The command"
+" The command",
 "      set term context font \"myfont,ss,10\"",
 " will result in",
 "      \\setupbodyfont[myfont,ss,10pt]",
 " If you additionaly set `fontscale` to 0.8 for example,",
 " then the resulting font will be 8pt big and",
 "      set label ... font \"myfont,12\"",
-" will come out as 9.6pt.\n",
+" will come out as 9.6pt.",
+"",
 " It is your own responsibility to provide proper typescripts (and header),",
-" otherwise switching the font will have no effect.\n",
+" otherwise switching the font will have no effect.",
 " For a standard font in ConTeXt MKII (pdfTeX) you could use:",
 "      set terminal context standalone header '\\usetypescript[iwona][ec]' \\",
 "          font \"iwona,ss,11\"",
 " Please take a look into ConTeXt documentation, wiki or mailing list (archives)",
-" for any up-to-date information about font usage."
+" for any up-to-date information about font usage.",
 "",
 " Examples:",
 "      set terminal context size 10cm, 5cm     # 10cm, 5cm",

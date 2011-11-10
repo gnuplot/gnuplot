@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: win.trm,v 1.102 2011/09/21 11:48:10 markisch Exp $
+ * $Id: win.trm,v 1.103 2011/10/05 14:06:11 markisch Exp $
  */
 
 /* GNUPLOT - win.trm */
@@ -921,7 +921,7 @@ START_HELP(windows)
 " gnuplot's interactive command line is accessible after the -persist option.",
 "",
 " The plot window remains open when the gnuplot terminal is changed with a",
-" `set term` command. The plot window can be closed with `set term windows close`",
+" `set term` command. The plot window can be closed with `set term windows close`.",
 "",
 " `gnuplot` supports different methods to create printed output on Windows,",
 " see `windows printing`. The windows terminal supports data exchange with ",

@@ -1,3 +1,8 @@
+2011-11-10  Shigeharu Takeno  <shige@iee.niit.ac.jp>
+
+	* docs/gnuplot.doc term/be.trm term/cairo.trm term/context.trm
+	term/win.trm: Fix typos.
+
 2011-11-09  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/axis.c src/command.c src/eval.c src/gadgets.c src/graphics.c
