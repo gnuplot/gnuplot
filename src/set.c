@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.351 2011/11/08 05:25:51 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.352 2011/11/08 20:07:10 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -1438,14 +1438,16 @@ set_degreesign(char *locale)
     if (locale) { 
 	/* This should work even if gnuplot doesn't understand the encoding */
 #ifdef HAVE_LANGINFO_H
-	char *encoding = nl_langinfo(CODESET);
+	char *cencoding = nl_langinfo(CODESET);
 #else
-	char *encoding = strchr(locale, '.');
-	if (encoding) encoding++; /* Step past the dot in, e.g., ja_JP.EUC-JP */
+	char *cencoding = strchr(locale, '.');
+	if (cencoding) cencoding++; /* Step past the dot in, e.g., ja_JP.EUC-JP */
 #endif
-	if (encoding) {
-	    if ((cd = iconv_open(encoding, "UTF-8")) == (iconv_t)(-1))
-		int_warn(NO_CARET, "iconv_open failed for %s",encoding);
+	if (cencoding) {
+	    if (strcmp(cencoding,"UTF-8") == 0)
+		strcpy(degree_sign,degree_utf8);
+	    else if ((cd = iconv_open(cencoding, "UTF-8")) == (iconv_t)(-1))
+		int_warn(NO_CARET, "iconv_open failed for %s",cencoding);
 	    else {
 		if (iconv(cd, &in, &lengthin, &out, &lengthout) < 0)
 		    int_warn(NO_CARET, "iconv failed to convert degree sign");
