@@ -1,5 +1,5 @@
 /*
- * $Id: wgraph.c,v 1.136 2011/09/21 11:54:15 markisch Exp $
+ * $Id: wgraph.c,v 1.137 2011/11/12 11:05:52 markisch Exp $
  */
 
 /* GNUPLOT - win/wgraph.c */
@@ -3089,7 +3089,7 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 				Wnd_exec_event(lpgw, lParam,  GE_motion, wParam);
 				return 0L; /* end of WM_MOUSEMOVE */
 
-			case WM_LBUTTONDOWN:
+			case WM_LBUTTONDOWN: {
 				int i;
 				int x = GET_X_LPARAM(lParam);
 				int y = GET_Y_LPARAM(lParam) - lpgw->ToolbarHeight;
