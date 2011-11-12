@@ -1,5 +1,12 @@
 2011-11-12  Bastian Maerkisch  <bmaerkisch@web.de>
 
+	* src/set.c (set_degreesign): Windows implementation using a Windows
+	API call since iconv() does not understand locales as returned by
+	setlocale().
+
+	* src/command.c (help_command): HTML help window need to occlude
+	the text window.
+
 	* term/win.trm (WIN_filled_polygon): Use boxfill for filled polygons
 	which are actually rectangles.
 

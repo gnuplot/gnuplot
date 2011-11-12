@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.352 2011/11/08 20:07:10 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.353 2011/11/12 03:45:39 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -1427,7 +1427,7 @@ set_encoding()
 static void
 set_degreesign(char *locale)
 {
-#ifdef HAVE_ICONV
+#if defined(HAVE_ICONV) && !(defined WIN32)
     char degree_utf8[3] = {'\302', '\260', '\0'};
     size_t lengthin = 3;
     size_t lengthout = 8;
@@ -1435,7 +1435,7 @@ set_degreesign(char *locale)
     char *out = degree_sign;
     iconv_t cd;
 
-    if (locale) { 
+    if (locale) {
 	/* This should work even if gnuplot doesn't understand the encoding */
 #ifdef HAVE_LANGINFO_H
 	char *cencoding = nl_langinfo(CODESET);
@@ -1456,7 +1456,23 @@ set_degreesign(char *locale)
 	}
 	return;
     }
-#endif    
+#elif defined(WIN32)
+    if (locale) {
+	char *encoding = strchr(locale, '.');
+	if (encoding) {
+	    unsigned cp;
+	    encoding++; /* Step past the dot in, e.g., German_Germany.1252 */
+	    /* iconv does not understand encodings returned by setlocale() */
+	    if (sscanf(encoding, "%i", &cp)) {
+		wchar_t wdegreesign = 176; /* "\u00B0" */
+		int n = WideCharToMultiByte(cp, WC_COMPOSITECHECK, &wdegreesign, 1,
+			degree_sign, sizeof(degree_sign) - 1, NULL, NULL);
+		degree_sign[n] = NUL;
+	    }
+	}
+	return;
+    }
+#endif
 
     /* These are the internally-known encodings */
     memset(degree_sign, 0, sizeof(degree_sign));
