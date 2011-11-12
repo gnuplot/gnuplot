@@ -1,5 +1,8 @@
 2011-11-12  Bastian Maerkisch  <bmaerkisch@web.de>
 
+	* term/win.trm (WIN_filled_polygon): Use boxfill for filled polygons
+	which are actually rectangles.
+
 	* src/win/wgnuplib.h src/win/wgraph.c: 	Add support in windows terminal
 	for toggling individual plots on/off by clicking on the corresponding
 	key sample in addition to toggling via toolbar buttons.
