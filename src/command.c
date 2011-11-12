@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.228 2011/10/15 00:03:33 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.229 2011/11/10 05:15:58 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -2365,11 +2365,7 @@ help_command()
     HWND parent;
 
     c_token++;
-#ifdef WGP_CONSOLE
     parent = GetDesktopWindow();
-#else
-    parent = textwin.hWndParent;
-#endif
 #ifdef WITH_HTML_HELP
     /* open help file if necessary */
     help_window = HtmlHelp(parent, winhelpname, HH_GET_WIN_HANDLE, (DWORD_PTR)NULL);
