@@ -1,4 +1,4 @@
-# $Id: README.win-ja,v 1.3 2006-03-25 19:54:33+09 shige Exp $
+# $Id: README.win-ja,v 1.6 2011-02-25 11:39:16+09 shige Exp $
 # a Japanized kit of wgnuplot
 # Shigeharu TAKENO <shige@iee.niit.ac.jp>
 #
@@ -14,11 +14,14 @@ Shigeharu TAKENO <shige@iee.niit.ac.jp>
 
 [a] wgnuplot-ja.mnu: wgnuplot のメニューメッセージの日本語訳
 [b] wgnuplot-ja.hlp: wgnuplot 用の日本語オンラインマニュアル
-[c] README.win-ja:   このファイル (MS-Windows ユーザへの説明書)
+  (.hlp 形式)
+[c] wgnuplot-ja.chm: wgnuplot 用の日本語オンラインマニュアル 
+  (HTML help 形式)
+[d] README.win-ja:   このファイル (MS-Windows ユーザへの説明書)
 
-なお、[b] はバイナリファイルで、[a],[c] は日本語テキストファイル
-ですが、漢字コードは Shift_JIS になっています。必要ならば適当に変
-換してご利用ください。
+なお、[b],[c] はバイナリファイルで、[a],[d] は日本語テキストファ
+イルですが、漢字コードは Shift_JIS になっています。必要ならば適当
+に変換してご利用ください。
 
 他のファイル (主に Unix ユーザへの説明書) に関しては、README.ja 
 をご覧ください。
@@ -51,11 +54,14 @@ MS-Windows 用の gnuplot は、必要ならば gnuplot の公式ホームページ
 からたどって取得してください。
 
 なお、gnuplot の MS-Windows 用バイナリは、ほかにも角藤さん作成の
-ものや尾田さん作成のものなどがあります。
+ものや松岡さん作成のもの、あるいは山賀さん作成のもの (gnuplot+) 
+などがあります。
 
- http://www.fsci.fuk.kindai.ac.jp/~kakuto/win32-ptex/web2c75.html
+ http://w32tex.org/index-ja.html
+ ftp://ftp.ring.gr.jp/pub/text/TeX/ptex-win32/w32/
+ http://www.tatsuromatsuoka.com/gnuplot/Eng/winbin/
  http://www.yama-ga.com/gnuplot/
-
+ 
 この日本語化キットは、単にメニューファイルとヘルプファイルを日本
 語のものに置き換えるだけですので、もちろんそれらの版でも使用でき
 ます。書かれていることと実体の機能のずれを気にしなければ、gnuplot
@@ -65,23 +71,34 @@ MS-Windows 用の gnuplot は、必要ならば gnuplot の公式ホームページ
 ナリや英語版のヘルプファイルやメニューファイルが含まれていると思
 います。
 
-できれば、オリジナルのヘルプファイル (wgnuplot.hlp) とメニューフ
-ァイル (wgnuplot.mnu) を名前を変えて保存しておくといいでしょう。
+できれば、オリジナルのヘルプファイル (wgnuplot.hlp, または 
+wgnuplot.chm) とメニューファイル (wgnuplot.mnu) を名前を変えて保
+存しておくといいでしょう。
 
 > cd bin
 > copy wgnuplot.mnu wgnuplot-en.mnu
 > copy wgnuplot.hlp wgnuplot-en.hlp
 
+または
+
+> copy wgnuplot.chm wgnuplot-en.chm
+
 
 [2] 日本語化キットのコピー
 
-wgnuplot-ja.mnu と wgnuplot-ja.hlp を元々の wgnuplot.mnu, 
-wgnuplot.hlp の代わりにコピーします。
+wgnuplot-ja.mnu と wgnuplot-ja.hlp または wgnuplot-ja.chm を元々
+の wgnuplot.mnu, wgnuplot.hlp または wgnuplot.chm の代わりにコピ
+ーします。
 
 なお、環境変数を利用して日本語のヘルプファイルと英語のヘルプファ
 イルを共存させて切替えることも可能です。それに関してはヘルプファ
 イルを参照してください。
 
+ヘルプファイルは、wgnuplot は wgnuplot.hlp か wgnuplot.chm のどち
+らか一方のみを使用しますが、どちらを使用するかはコンパイル時に決
+定されています。多分、[1] の段階でどちらか一方のみが付属している
+と思いますが、それが使用されるヘルプファイルです。心配ならば両方
+をコピーして構いません。
 
 [3] wgnuplot のフォントの設定
 
@@ -197,8 +214,12 @@ wgnuplot.ini」を行なうのですが、このまま普通にマウス右クリックす
   http://t16web.lanl.gov/Kawano/gnuplot/
 ・松田＠東京電機大 さんの gnuplot Tips 集
   http://ayapin.film.s.dendai.ac.jp/~matuda/Gnuplot/Tips/tips.html
+・松岡さんの gnuplot メモ
+  http://www.tatsuromatsuoka.com/gnuplot/Jpn/gnuplot_memo.html
 ・gnuplot マニュアル等からの検索サービス
   http://takeno.iee.niit.ac.jp/~foo/gp-jman/gp-jman.html#search
+・gnuplot マニュアルの日本語化に関する QandA
+  http://takeno.iee.niit.ac.jp/~foo/gp-jman/gp-jman.html#QandA
 
 [2] Shift_JIS 特有の問題
 
@@ -226,23 +247,30 @@ http://ayapin.film.s.dendai.ac.jp/cgi-bin/trees.cgi
 
 この日本語化キットは、単に起動画面のメニューとヘルプファイルを日
 本語化するだけで、後はオリジナルの gnuplot の機能に任せているだけ
-なので、例えば gnuplot がサポートする多くの出力 terminal ではあい
-かわらず日本語は使えませんし、gnuplot+ のようにその点を改良するも
-のではありません。
+なので、gnuplot の terminal で日本語を使えるようにするものではあ
+りませんし、gnuplot+ のようにその点を改良するものではありません。
 
-なお、現在 PostScript terminal では、gnuplot+ パッチを当てなくて
-も日本語フォントを指定することで日本語が使えます。
+なお、現在いくつかの terminal ではオリジナルの gnuplot で日本語も
+使えるようになっていて、windows terminal でももちろん日本語が使え
+ますし、PostScript terminal でも、gnuplot+ パッチを当てなくても日
+本語フォントを指定すれば日本語が使えます。
 
  http://ayapin.film.s.dendai.ac.jp/~matuda/Gnuplot/Feature38i/kanji.html
 
-にも Unix 環境での例が書かれていますが、MS-Windows でも
+に Unix 環境での例が書かれていますが、MS-Windows でも
 
  set title 'これは十勝です' font "Ryumin-Light-83pv-RKSJ-H,32"
  set terminal postscript eps
  set output "kanji.eps"
  plot sin(x) w l
 
-のような指定を行なえばいいようです。
+のような指定を行なえばいいようです。なお、set term post enh のよ
+うに enhanced モードを使う場合は、上は Shift_JIS 環境では文字化け
+しますので、CVS 版 gnuplot では
+
+ set encoding sjis
+
+としてみてください。
 
 [4] 日本語の含まれているパス
 
@@ -276,7 +304,7 @@ WWW page: http://takeno.iee.niit.ac.jp/~foo/gp-jman/
  gnuplot 3.7.2 まで: 山賀正人 (gnuplot+)
  gnuplot 4.0 以降: 竹野茂治 
 
-[b] wgnuplot-ja.hlp:
+[b] wgnuplot-ja.hlp, wgnuplot-ja.chm:
  gnuplot 3.2 用: 田丸博晴
  gnuplot 3.5 用: 升谷保博
  gnuplot 3.7 用: 井上直大、鈴木義利、船橋崇将、渡邉伸征、
@@ -382,10 +410,10 @@ wgnuplot に関するいくつかの情報は、松田＠東京電機大 さんの運営し
  http://ayapin.film.s.dendai.ac.jp/cgi-bin/trees.cgi)
 
 Gnuplot Q&A 掲示版上で、wgnuplot のマウス機能の ON/OFF に関する情
-報や、多くの wgnuplot に関する情報を松岡さんから頂きました。どう
-もありがとうございました。
-(cf. 松岡＠名古屋大 さんの gnuplot のページ
- http://www.nuce.nagoya-u.ac.jp/e8/Matsuoka/gnuplot_memo.html)
+報や多くの wgnuplot に関する情報、助言を松岡さんから頂きました。
+どうもありがとうございました。
+(cf. 松岡さんの gnuplot のページ
+ http://www.tatsuromatsuoka.com/gnuplot/Jpn/gnuplot_memo.html)
 
 
 6. 目次

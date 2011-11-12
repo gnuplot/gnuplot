@@ -1,3 +1,8 @@
+2011-11-12  Shigeharu Takeno  <shige@iee.niit.ac.jp>
+
+	* src/win/README.win-ja src/win/wgnuplot-ja.mnu: Update and sync
+	with wgnuplot.mnu
+
 2011-11-12  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/set.c (set_degreesign): Windows implementation using a Windows

@@ -4,7 +4,7 @@
 ; Modified for 4.0, John Bollinger, 31 Dec 2002
 ; translated by Masahito Yamaga (ma@yama-ga.com) (for 3.7.2)
 ; translated by Shigeharu TAKENO 03/25 2006 (for 4.1)
-; $Id: wgp410-sj.mnu,v 1.1 2006-03-25 20:45:00+09 shige Exp $
+; $Id: wgp410-sj.mnu,v 1.4 2011-03-30 14:57:09+09 shige Exp $
 
 [Menu]
 ファイル(&F)
@@ -25,7 +25,7 @@
 	プリンタへ(&P)
 		set output "PRN"{ENTER}
 	ウィンドウ表示(&W)
-		 set output{ENTER}set terminal win{ENTER} 
+		set output{ENTER}set terminal win{ENTER} 
 	現在の出力先
 		show output{ENTER}
 	出力デバイスの設定(&T) ...
@@ -717,32 +717,39 @@
 		help [INPUT]Help Topic?{ENTER}
 	ウィンドウズ(&W)
 		help windows{ENTER}
+	--
+	gnuplot に関して(&A)
+		[ABOUT]
 [EndMenu]
 
-; now some buttons
-; DON'T put a shortcut key (&) on any of these because
-; it doesn't work with Windows 3.1 and it HANGS Windows 3.0.
+; ボタンをいくつか
+;   タイトル文字列内のセミコロンの次の数字はアイコンのインデックス。
+;   MSDN の以下参照: "Toolbar Standard Button Image Index Values"
+;   http://msdn.microsoft.com/en-us/library/bb760433%28v=vs.85%29.aspx
 [Button]
-	再表示
+	再表示;4
 		replot{ENTER}
 [Button]
-	開く
+	開く;7
 		load '[OPEN]load[EOS]*.plt[EOS]'{ENTER}
 [Button]
-	保存
+	保存;8
 		save '[SAVE]save[EOS]*.plt[EOS]'{ENTER}
 [Button]
-	移動
+	移動;31
 		cd '[DIRECTORY]New directory?[EOS]'{ENTER}
-;[Button]
-;	プリント
-;		set terminal [INPUT]Terminal type?{ENTER}set output "PRN"{ENTER}replot{ENTER}set terminal win{ENTER}set output{ENTER}
 [Button]
-	ダンプ
+	印刷;14
+		set terminal [INPUT]Terminal type?{ENTER}set output "PRN"{ENTER}replot{ENTER}set terminal win{ENTER}set output{ENTER}
+[Button]
+	ダンプ;14
 		screendump{ENTER}
 [Button]
-	前
+	前;15
 		{^P}
 [Button]
-	次
+	次;16
 		{^N}
+[Button]
+	オプション;10
+		[OPTIONS]
