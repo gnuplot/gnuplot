@@ -1,3 +1,7 @@
+2011-11-12  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* TAG AND RELEASE VERSION 4.4.4
+
 2011-11-07  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* term/lua.trm term/lua/gnuplot-lua.tikz: lua_ident is not available

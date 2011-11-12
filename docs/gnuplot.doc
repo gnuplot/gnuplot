@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.568.2.41 2011/03/26 02:39:24 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.568.2.42 2011/04/19 20:59:26 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -4375,7 +4375,7 @@ Ffigure_mapcontours
 
  Syntax:
        plot '<file_name>' {binary <binary list>}
-                          {matrix}
+                          {{nonuniform} matrix}
                           {index <index list> | index "<name>"}
                           {every <every list>}
                           {thru <thru expression>}
@@ -11714,7 +11714,7 @@ Ffigure_mapcontours
 
  Syntax:
        splot '<file_name>' {binary <binary list>}
-                           {matrix}
+                           {{nonuniform} matrix}
                            {index <index list>}
                            {every <every list>}
                            {using <using list>}
