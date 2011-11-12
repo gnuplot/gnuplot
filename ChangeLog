@@ -1,3 +1,9 @@
+2011-11-12  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/win/wgnuplib.h src/win/wgraph.c: 	Add support in windows terminal
+	for toggling individual plots on/off by clicking on the corresponding
+	key sample in addition to toggling via toolbar buttons.
+
 2011-11-11  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/set.c (set_degreesign):  More attempts to work around oddities in

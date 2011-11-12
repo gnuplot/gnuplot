@@ -1,5 +1,5 @@
 /*
- * $Id: wgnuplib.h,v 1.47 2011/09/09 18:29:37 markisch Exp $
+ * $Id: wgnuplib.h,v 1.48 2011/09/21 11:48:10 markisch Exp $
  */
 
 /* GNUPLOT - win/wgnuplib.h */
@@ -327,6 +327,8 @@ typedef struct tagGW {
 	BOOL	hidegrid;
 	unsigned int numplots;
 	BOOL	hasgrid;
+	LPRECT	keyboxes;
+	unsigned int maxkeyboxes;
 
 	int		htic;		/* horizontal size of point symbol (xmax units) */
 	int 	vtic;		/* vertical size of point symbol (ymax units)*/
@@ -366,8 +368,6 @@ typedef GW *  LPGW;
 
 #define WINFONTSIZE 10
 #define WINFONT "Arial"
-
-#define MAXTITLELEN 120
 #define WINGRAPHTITLE "gnuplot graph"
 
 extern termentry * WIN_term;

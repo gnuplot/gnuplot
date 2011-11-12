@@ -1,6 +1,6 @@
-#ifndef lint
-static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.135 2011/09/21 11:48:10 markisch Exp $"); }
-#endif
+/*
+ * $Id: wgraph.c,v 1.136 2011/09/21 11:54:15 markisch Exp $
+ */
 
 /* GNUPLOT - win/wgraph.c */
 /*[
@@ -202,6 +202,7 @@ static struct {
 	int x, y;            /* current text position */
 	char fontname[MAXFONTNAME]; /* current font name */
 	double fontsize;     /* current font size */
+	int totalwidth;      /* total width of printed text */
 } enhstate;
 
 
@@ -218,7 +219,7 @@ static void	StorePen(LPGW lpgw, int i, COLORREF ref, int colorstyle, int monosty
 static void	MakePens(LPGW lpgw, HDC hdc);
 static void	DestroyPens(LPGW lpgw);
 static void	Wnd_GetTextSize(HDC hdc, LPCSTR str, size_t len, int *cx, int *cy);
-static void GetPlotRect(LPGW lpgw, LPRECT rect);
+static void	GetPlotRect(LPGW lpgw, LPRECT rect);
 static void	MakeFonts(LPGW lpgw, LPRECT lprect, HDC hdc);
 static void	DestroyFonts(LPGW lpgw);
 static void	SetFont(LPGW lpgw, HDC hdc);
@@ -226,15 +227,15 @@ static void	SelFont(LPGW lpgw);
 static LPWSTR UnicodeText(const char *str, enum set_encoding_id encoding);
 static void	dot(HDC hdc, int xdash, int ydash);
 static unsigned int WDPROC GraphGetTextLength(LPGW lpgw, HDC hdc, LPCSTR text);
-static void draw_enhanced_text(LPGW lpgw, HDC hdc, LPRECT rect, int x, int y, char * str);
-static void draw_text_justify(HDC hdc, int justify);
-static void draw_put_text(LPGW lpgw, HDC hdc, int x, int y, char * str);
+static int	draw_enhanced_text(LPGW lpgw, HDC hdc, LPRECT rect, int x, int y, char * str);
+static void	draw_text_justify(HDC hdc, int justify);
+static void	draw_put_text(LPGW lpgw, HDC hdc, int x, int y, char * str);
 static void	drawgraph(LPGW lpgw, HDC hdc, LPRECT rect);
 static void	CopyClip(LPGW lpgw);
 static void	SaveAsEMF(LPGW lpgw);
 static void	CopyPrint(LPGW lpgw);
 static void	WriteGraphIni(LPGW lpgw);
-static void ReadGraphIni(LPGW lpgw);
+static void	ReadGraphIni(LPGW lpgw);
 static COLORREF	GetColor(HWND hwnd, COLORREF ref);
 static void	UpdateColorSample(HWND hdlg);
 static BOOL	LineStyle(LPGW lpgw);
@@ -390,6 +391,8 @@ GraphInitStruct(LPGW lpgw)
 		lpgw->dashed = FALSE;
 		lpgw->IniSection = "WGNUPLOT";
 		lpgw->fontsize = WINFONTSIZE;
+		lpgw->maxkeyboxes = 0;
+		lpgw->keyboxes = 0;
 		ReadGraphIni(lpgw);
 	}
 }
@@ -455,7 +458,7 @@ GraphInit(LPGW lpgw)
 		int i;
 		TBBUTTON button;
 		BOOL ret;
-		char buttontext[10]; 
+		char buttontext[10];
 		unsigned num = 0;
 
 		SendMessage(lpgw->hToolbar, TB_SETBITMAPSIZE, (WPARAM)0, (LPARAM)((16<<16) + 16));
@@ -862,7 +865,7 @@ MakeFonts(LPGW lpgw, LPRECT lprect, HDC hdc)
 	lpgw->lf.lfOutPrecision = OUT_OUTLINE_PRECIS;
 	lpgw->lf.lfClipPrecision = CLIP_DEFAULT_PRECIS;
 	/* ClearType quality is only supported on XP or later */
-	lpgw->lf.lfQuality = 
+	lpgw->lf.lfQuality =
 		IsWindowsXPorLater() && lpgw->antialiasing ? CLEARTYPE_QUALITY : PROOF_QUALITY;
 
 	if (lpgw->hfonth == 0) {
@@ -1146,6 +1149,9 @@ GraphEnhancedFlush(void)
 	width = cos(angle) * len;
 	height = -sin(angle) * len;
 
+	if (enhstate.widthflag && !enhstate.sizeonly && !enhstate.overprint)
+		enhstate.totalwidth += width;
+
 	/* display string */
 	if (enhstate.show && !enhstate.sizeonly)
 		draw_put_text(enhstate.lpgw, enhstate.hdc, x, y, enhanced_text);
@@ -1188,7 +1194,7 @@ GraphEnhancedFlush(void)
 }
 
 
-static void
+static int
 draw_enhanced_text(LPGW lpgw, HDC hdc, LPRECT rect, int x, int y, char * str)
 {
 	char * original_string = str;
@@ -1207,6 +1213,7 @@ draw_enhanced_text(LPGW lpgw, HDC hdc, LPRECT rect, int x, int y, char * str)
 	/* Store the start position */
 	enhstate.x = x;
 	enhstate.y = y;
+	enhstate.totalwidth = 0;
 
 	/* Save font information */
 	strcpy(save_fontname, lpgw->fontname);
@@ -1282,6 +1289,8 @@ draw_enhanced_text(LPGW lpgw, HDC hdc, LPRECT rect, int x, int y, char * str)
 
 	/* restore text alignment */
 	draw_text_justify(hdc, enhstate.lpgw->justify);
+
+	return enhstate.totalwidth;
 }
 
 
@@ -1368,6 +1377,29 @@ draw_new_brush(LPGW lpgw, HDC hdc, COLORREF color)
 	lpgw->hcolorbrush = new_brush;
 }
 
+static void
+draw_update_keybox(LPGW lpgw, unsigned plotno, unsigned x, unsigned y)
+{
+	LPRECT bb;
+	if (plotno == 0) return;
+	if (plotno > lpgw->maxkeyboxes) {
+		int i;
+		lpgw->maxkeyboxes += 10;
+		lpgw->keyboxes = (LPRECT) realloc(lpgw->keyboxes,
+				lpgw->maxkeyboxes * sizeof(RECT));
+		for (i = plotno - 1; i < lpgw->maxkeyboxes; i++) {
+			lpgw->keyboxes[i].left = INT_MAX;
+			lpgw->keyboxes[i].right = 0;
+			lpgw->keyboxes[i].bottom = INT_MAX;
+			lpgw->keyboxes[i].top = 0;
+		}
+	}
+	bb = lpgw->keyboxes + plotno - 1;
+	if (x < bb->left)   bb->left = x;
+	if (x > bb->right)  bb->right = x;
+	if (y < bb->bottom) bb->bottom = y;
+	if (y > bb->top)    bb->top = y;
+}
 
 /* This one is really the heart of this module: it executes the stored set of
  * commands, whenever it changed or a redraw is necessary */
@@ -1419,6 +1451,9 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 	int htic, vtic;				/* tic sizes */
 	int hshift, vshift;			/* correction of text position */
 
+	/* indices */
+	int i, k;
+
     if (lpgw->locked) return;
 
     /* HBB 20010218: the GDI status query functions don't work on Metafile
@@ -1457,6 +1492,12 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 	/* init layer variables */
 	lpgw->numplots = 0;
 	lpgw->hasgrid = FALSE;
+	for (i = 0; i < lpgw->maxkeyboxes; i++) {
+		lpgw->keyboxes[i].left = INT_MAX;
+		lpgw->keyboxes[i].right = 0;
+		lpgw->keyboxes[i].bottom = INT_MAX;
+		lpgw->keyboxes[i].top = 0;
+	}
 
 	SelectObject(hdc, lpgw->hapen); /* background brush */
 	SelectObject(hdc, lpgw->colorbrush[2]); /* first user pen */
@@ -1507,7 +1548,7 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 			t_termlayer layer = curptr->x;
 			switch (layer) {
 				case TERM_LAYER_BEFORE_PLOT:
-					plotno++; 
+					plotno++;
 					lpgw->numplots = plotno;
 					if (plotno <= MAXPLOTSHIDE)
 						skipplot = lpgw->hideplot[plotno - 1];
@@ -1540,8 +1581,8 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 				default:
 					break;
 			};
-		} 
-		
+		}
+
 		/* hide this layer? */
 		if (!(skipplot || (gridline && lpgw->hidegrid)) ||
 			(keysample || (curptr->op == W_line_type) || (curptr->op == W_setcolor)) ) {
@@ -1557,6 +1598,8 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 			ppt[0].x = xdash;
 			ppt[0].y = ydash;
 			polyi = 1;
+			if (keysample)
+				draw_update_keybox(lpgw, plotno, xdash, ydash);
 			break;
 
 		case W_vect:
@@ -1576,6 +1619,8 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 				polyi = 1;
 				cpoint = ppt[0];
 			}
+			if (keysample)
+				draw_update_keybox(lpgw, plotno, xdash, ydash);
 			break;
 
 		case W_line_type: {
@@ -1622,9 +1667,14 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 			str = LocalLock(curptr->htext);
 			if (str) {
 				/* shift correctly for rotated text */
-				xdash += hshift;
-				ydash += vshift;
-				draw_put_text(lpgw, hdc, xdash, ydash, str);
+				draw_put_text(lpgw, hdc, xdash + hshift, ydash + vshift, str);
+				if (keysample) {
+					int slen = GraphGetTextLength(lpgw, hdc, str);
+					int vsize = MulDiv(lpgw->vchar, rb-rt, 2 * lpgw->ymax);
+					if (lpgw->justify == RIGHT) slen *= -1;
+					draw_update_keybox(lpgw, plotno, xdash, ydash - vsize);
+					draw_update_keybox(lpgw, plotno, xdash + slen, ydash + vsize);
+				}
 			}
 			LocalUnlock(curptr->htext);
 			break;
@@ -1633,8 +1683,15 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 		case W_enhanced_text: {
 			char * str;
 			str = LocalLock(curptr->htext);
-			if (str)
-				draw_enhanced_text(lpgw, hdc, rect, xdash, ydash, str);
+			if (str) {
+				int slen = draw_enhanced_text(lpgw, hdc, rect, xdash, ydash, str);
+				if (keysample) {
+					int vsize = MulDiv(lpgw->vchar, rb-rt, 2 * lpgw->ymax);
+					if (lpgw->justify == RIGHT) slen *= -1;
+					draw_update_keybox(lpgw, plotno, xdash, ydash - vsize);
+					draw_update_keybox(lpgw, plotno, xdash + slen, ydash + vsize);
+				}
+			}
 			LocalUnlock(curptr->htext);
 			break;
 		}
@@ -1753,6 +1810,8 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 			*/
 			}
 			polyi = 0;
+			if (keysample)
+				draw_update_keybox(lpgw, plotno, xdash + 1, ydash);
 			break;
 		}
 
@@ -1779,7 +1838,7 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 			*/
 			GraphChangeFont(lpgw,
 				font != NULL ? font : lpgw->deffontname,
-				size > 0 ? size : lpgw->deffontsize, 
+				size > 0 ? size : lpgw->deffontsize,
 				hdc, *rect);
 			LocalUnlock(curptr->htext);
 			SetFont(lpgw, hdc);
@@ -2021,7 +2080,7 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 						GPMIN(corners[2].x, corners[3].x), GPMIN(corners[2].y, corners[3].y),
 						GPMAX(corners[2].x, corners[3].x) + 1, GPMAX(corners[2].y, corners[3].y) + 1);
 					SelectClipRgn(hdc, hrgn);
-					
+
 					if (color_mode != IC_RGBA) {
 						bmi.bmiHeader.biBitCount = 24;
 
@@ -2066,6 +2125,10 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 
 		case W_dot:
 			dot(hdc, xdash, ydash);
+			if (keysample) {
+				draw_update_keybox(lpgw, plotno, xdash + htic, ydash + vtic);
+				draw_update_keybox(lpgw, plotno, xdash - htic, ydash - vtic);
+			}
 			break;
 		case W_plus: /* do plus */
 		case W_star: /* do star: first plus, then cross */
@@ -2092,6 +2155,10 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 				LineTo(hdc, xdash, ydash + vtic + 1);
 				SelectObject(hdc, lpgw->hapen);
 			}
+			if (keysample) {
+				draw_update_keybox(lpgw, plotno, xdash + htic, ydash + vtic);
+				draw_update_keybox(lpgw, plotno, xdash - htic, ydash - vtic);
+			}
 			if (curptr->op == W_plus) break;
 		case W_cross: /* do X */
 #ifdef HAVE_GDIPLUS
@@ -2117,6 +2184,10 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 				LineTo(hdc, xdash + htic + 1, ydash - vtic - 1);
 				SelectObject(hdc, lpgw->hapen);
 			}
+			if (keysample) {
+				draw_update_keybox(lpgw, plotno, xdash + htic, ydash + vtic);
+				draw_update_keybox(lpgw, plotno, xdash - htic, ydash - vtic);
+			}
 			break;
 		case W_circle: /* do open circle */
 			SelectObject(hdc, lpgw->hsolid);
@@ -2132,6 +2203,10 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 					xdash, ydash+vtic+1, xdash, ydash+vtic+1);
 			dot(hdc, xdash, ydash);
 			SelectObject(hdc, lpgw->hapen);
+			if (keysample) {
+				draw_update_keybox(lpgw, plotno, xdash + htic, ydash + vtic);
+				draw_update_keybox(lpgw, plotno, xdash - htic, ydash - vtic);
+			}
 			break;
 		case W_fcircle: /* do filled circle */
 			SelectObject(hdc, lpgw->hsolid);
@@ -2146,6 +2221,10 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 				gdiplusCircleEx(hdc, &p, htic, PS_SOLID, line_width, last_color);
 			}
 #endif
+			if (keysample) {
+				draw_update_keybox(lpgw, plotno, xdash + htic, ydash + vtic);
+				draw_update_keybox(lpgw, plotno, xdash - htic, ydash - vtic);
+			}
 			break;
 		default:	/* potentially closed figure */
 			{
@@ -2210,6 +2289,10 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 					SelectObject(hdc, lpgw->hapen);
 				}
 				dot(hdc, xdash, ydash);
+			}
+			if (keysample) {
+				draw_update_keybox(lpgw, plotno, xdash + htic, ydash + vtic);
+				draw_update_keybox(lpgw, plotno, xdash - htic, ydash - vtic);
 			}
 			} /* default case */
 		} /* switch(opcode) */
@@ -3007,9 +3090,26 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 				return 0L; /* end of WM_MOUSEMOVE */
 
 			case WM_LBUTTONDOWN:
+				int i;
+				int x = GET_X_LPARAM(lParam);
+				int y = GET_Y_LPARAM(lParam) - lpgw->ToolbarHeight;
+				for (i = 0; (i < lpgw->numplots) && (i < lpgw->maxkeyboxes) && (i < MAXPLOTSHIDE); i++) {
+					if ((lpgw->keyboxes[i].left != INT_MAX) &&
+						(x >= lpgw->keyboxes[i].left) &&
+						(x <= lpgw->keyboxes[i].right) &&
+						(y <= lpgw->keyboxes[i].top) &&
+						(y >= lpgw->keyboxes[i].bottom)) {
+						lpgw->hideplot[i] = ! lpgw->hideplot[i];
+						SendMessage(lpgw->hToolbar, TB_CHECKBUTTON, M_HIDEPLOT + i, (LPARAM)lpgw->hideplot[i]);
+						GetClientRect(hwnd, &rect);
+						InvalidateRect(hwnd, (LPRECT) &rect, 1);
+						UpdateWindow(hwnd);
+						return 0L;
+					}
+				}
 				Wnd_exec_event(lpgw, lParam, GE_buttonpress, 1);
 				return 0L;
-
+			}
 			case WM_RBUTTONDOWN:
 				/* FIXME HBB 20010207: this collides with the right-click
 				 * context menu !!! */
@@ -3430,7 +3530,7 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 					MapWindowPoints(lpnmTB->hdr.hwndFrom, HWND_DESKTOP, (LPPOINT)&rc, 2);
 					tpm.cbSize    = sizeof(TPMPARAMS);
 					tpm.rcExclude = rc;
-					TrackPopupMenuEx(lpgw->hPopMenu, TPM_LEFTALIGN | TPM_LEFTBUTTON | TPM_VERTICAL, 
+					TrackPopupMenuEx(lpgw->hPopMenu, TPM_LEFTALIGN | TPM_LEFTBUTTON | TPM_VERTICAL,
 						rc.left, rc.bottom, lpgw->hWndGraph, &tpm);
 					return TBDDRET_DEFAULT;
 				}
