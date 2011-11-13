@@ -1,3 +1,11 @@
+2011-11-13  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/win/wgraph.c src/win/wresourc.h src/win/wgnuplib.h: Add a
+	separate switch to toggle antialiasing of polygons.
+
+	* src/win/wgraph.c (Draw_XOR_Text): Implement a 10 year old FIXME:
+	Use proper raster operation instead of double inversion.
+
 2011-11-12  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* src/win/README.win-ja src/win/wgnuplot-ja.mnu: Update and sync
@@ -15,7 +23,7 @@
 	* term/win.trm (WIN_filled_polygon): Use boxfill for filled polygons
 	which are actually rectangles.
 
-	* src/win/wgnuplib.h src/win/wgraph.c: 	Add support in windows terminal
+	* src/win/wgnuplib.h src/win/wgraph.c: Add support in windows terminal
 	for toggling individual plots on/off by clicking on the corresponding
 	key sample in addition to toggling via toolbar buttons.
 

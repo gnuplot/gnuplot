@@ -1,5 +1,5 @@
 /*
- * $Id: wgraph.c,v 1.138 2011/11/12 11:41:45 markisch Exp $
+ * $Id: wgraph.c,v 1.139 2011/11/14 17:47:34 markisch Exp $
  */
 
 /* GNUPLOT - win/wgraph.c */
@@ -548,6 +548,8 @@ GraphInit(LPGW lpgw)
 #ifdef HAVE_GDIPLUS
 	AppendMenu(lpgw->hPopMenu, MF_STRING | (lpgw->antialiasing ? MF_CHECKED : MF_UNCHECKED),
 		M_ANTIALIASING, "&Antialiasing");
+	AppendMenu(lpgw->hPopMenu, MF_STRING | (lpgw->polyaa ? MF_CHECKED : MF_UNCHECKED),
+		M_POLYAA, "Antialiasing of &Polygons");
 #endif
 	AppendMenu(lpgw->hPopMenu, MF_STRING, M_BACKGROUND, "&Background...");
 	AppendMenu(lpgw->hPopMenu, MF_STRING, M_CHOOSE_FONT, "Choose &Font...");
@@ -1917,7 +1919,7 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 			/* end of point series --> draw polygon now */
 			if (!transparent) {
 #ifdef HAVE_GDIPLUS
-				if (lpgw->antialiasing && ((fillstyle & 0x0f) == FS_SOLID)) {
+				if (lpgw->antialiasing && lpgw->polyaa && ((fillstyle & 0x0f) == FS_SOLID)) {
 					/* solid, antialiased fill */
 					gdiplusSolidFilledPolygonEx(hdc, ppt, polyi, fill_color, 1.0);
 				} else
@@ -1930,7 +1932,7 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 				}
 			} else {
 #ifdef HAVE_GDIPLUS
-				if (lpgw->antialiasing && (fillstyle & 0x0f) == FS_TRANSPARENT_SOLID) {
+				if (lpgw->antialiasing && lpgw->polyaa && (fillstyle & 0x0f) == FS_TRANSPARENT_SOLID) {
 					gdiplusSolidFilledPolygonEx(hdc, ppt, polyi, fill_color, alpha);
 				} else
 #endif
@@ -2591,6 +2593,8 @@ WriteGraphIni(LPGW lpgw)
 	WritePrivateProfileString(section, "GraphOversampling", profile, file);
 	wsprintf(profile, "%d", lpgw->antialiasing);
 	WritePrivateProfileString(section, "GraphAntialiasing", profile, file);
+	wsprintf(profile, "%d", lpgw->polyaa);
+	WritePrivateProfileString(section, "GraphPolygonAA", profile, file);
 	wsprintf(profile, "%d %d %d",GetRValue(lpgw->background),
 			GetGValue(lpgw->background), GetBValue(lpgw->background));
 	WritePrivateProfileString(section, "GraphBackground", profile, file);
@@ -2687,9 +2691,14 @@ ReadGraphIni(LPGW lpgw)
 		lpgw->oversample = FALSE;
 
 	if (bOKINI)
-	  GetPrivateProfileString(section, "GraphAntialiasing", "", profile, 80, file);
-		if ( (p = GetInt(profile, (LPINT)&lpgw->antialiasing)) == NULL)
-			lpgw->antialiasing = TRUE;
+		GetPrivateProfileString(section, "GraphAntialiasing", "", profile, 80, file);
+	if ( (p = GetInt(profile, (LPINT)&lpgw->antialiasing)) == NULL)
+		lpgw->antialiasing = TRUE;
+
+	if (bOKINI)
+		GetPrivateProfileString(section, "GraphPolygonAA", "", profile, 80, file);
+	if ((p = GetInt(profile, (LPINT)&lpgw->polyaa)) == NULL)
+		lpgw->polyaa = FALSE;
 
 	lpgw->background = RGB(255,255,255);
 	if (bOKINI)
@@ -3194,6 +3203,7 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 				case M_DOUBLEBUFFER:
 				case M_OVERSAMPLE:
 				case M_ANTIALIASING:
+				case M_POLYAA:
 				case M_CHOOSE_FONT:
 				case M_COPY_CLIP:
 				case M_SAVE_AS_EMF:
@@ -3396,16 +3406,20 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 					return(0);
 				case M_OVERSAMPLE:
 					lpgw->oversample = !lpgw->oversample;
-					SendMessage(hwnd,WM_COMMAND,M_REBUILDTOOLS,0L);
-					return(0);
+					SendMessage(hwnd, WM_COMMAND, M_REBUILDTOOLS, 0L);
+					return 0;
 				case M_DOUBLEBUFFER:
 					lpgw->doublebuffer = !lpgw->doublebuffer;
-					SendMessage(hwnd,WM_COMMAND,M_REBUILDTOOLS,0L);
-					return(0);
+					SendMessage(hwnd, WM_COMMAND, M_REBUILDTOOLS, 0L);
+					return 0;
 				case M_ANTIALIASING:
 					lpgw->antialiasing = !lpgw->antialiasing;
-					SendMessage(hwnd,WM_COMMAND,M_REBUILDTOOLS,0L);
-					return(0);
+					SendMessage(hwnd, WM_COMMAND, M_REBUILDTOOLS, 0L);
+					return 0;
+				case M_POLYAA:
+					lpgw->polyaa = !lpgw->polyaa;
+					SendMessage(hwnd, WM_COMMAND, M_REBUILDTOOLS, 0L);
+					return 0;
 				case M_CHOOSE_FONT:
 					SelFont(lpgw);
 					WIN_update_options();
@@ -3460,6 +3474,10 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 						CheckMenuItem(lpgw->hPopMenu, M_ANTIALIASING, MF_BYCOMMAND | MF_CHECKED);
 					else
 						CheckMenuItem(lpgw->hPopMenu, M_ANTIALIASING, MF_BYCOMMAND | MF_UNCHECKED);
+					if (lpgw->polyaa)
+						CheckMenuItem(lpgw->hPopMenu, M_POLYAA, MF_BYCOMMAND | MF_CHECKED);
+					else
+						CheckMenuItem(lpgw->hPopMenu, M_POLYAA, MF_BYCOMMAND | MF_UNCHECKED);
 #endif
 					if (lpgw->graphtotop)
 						CheckMenuItem(lpgw->hPopMenu, M_GRAPH_TO_TOP, MF_BYCOMMAND | MF_CHECKED);
