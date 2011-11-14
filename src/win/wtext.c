@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: wtext.c,v 1.35 2011/04/13 06:46:48 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: wtext.c,v 1.36 2011/11/01 10:23:47 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - win/wtext.c */
@@ -2077,17 +2077,21 @@ ReadTextIni(LPTW lptw)
 
 	_fstrcpy(lptw->fontname, profile);
         if (!(*lptw->fontname)) {
-            /* select a default type face depending on the OS version */
-            OSVERSIONINFO versionInfo;
-            ZeroMemory(&versionInfo, sizeof(OSVERSIONINFO));
-            versionInfo.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
-            GetVersionEx(&versionInfo);
-            if (versionInfo.dwMajorVersion >= 6) /* Vista or later */
-                strcpy(lptw->fontname, "Consolas");
-            else if ((versionInfo.dwMajorVersion == 5) && (versionInfo.dwMinorVersion >= 1)) /* Windows XP */
-                strcpy(lptw->fontname, "Lucida Console");
-            else /* Windows 2000 or earlier */
-                strcpy(lptw->fontname, "Courier New");
+			if (GetACP() == 932) /* Japanese Shift-JIS */
+				strcpy(lptw->fontname, "MS Gothic");
+			else {
+				/* select a default type face depending on the OS version */
+				OSVERSIONINFO versionInfo;
+				ZeroMemory(&versionInfo, sizeof(OSVERSIONINFO));
+				versionInfo.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
+				GetVersionEx(&versionInfo);
+				if (versionInfo.dwMajorVersion >= 6) /* Vista or later */
+					strcpy(lptw->fontname, "Consolas");
+				else if ((versionInfo.dwMajorVersion == 5) && (versionInfo.dwMinorVersion >= 1)) /* Windows XP */
+					strcpy(lptw->fontname, "Lucida Console");
+				else /* Windows 2000 or earlier */
+					strcpy(lptw->fontname, "Courier New");
+			}
         }
     }
 

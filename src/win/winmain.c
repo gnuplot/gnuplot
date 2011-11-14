@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: winmain.c,v 1.50 2011/08/29 19:45:44 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: winmain.c,v 1.51 2011/09/04 12:01:37 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - win/winmain.c */
@@ -77,6 +77,7 @@ static char *RCSid() { return RCSid("$Id: winmain.c,v 1.50 2011/08/29 19:45:44 m
 # define mktemp _mktemp
 #endif
 #include <io.h>
+#include <sys/stat.h>
 #include "plot.h"
 #include "setshow.h"
 #include "version.h"
@@ -114,10 +115,6 @@ LPSTR szMenuName;
 BOOL cp_changed = FALSE;
 UINT cp_input;  /* save previous codepage settings */
 UINT cp_output;
-#endif
-#define MENUNAME "wgnuplot.mnu"
-#ifndef HELPFILE /* HBB 981203: makefile.win predefines this... */
-#define HELPFILE "wgnuplot.hlp"
 #endif
 #ifdef WITH_HTML_HELP
 HWND help_window = NULL;
@@ -175,7 +172,7 @@ WinExit(void)
     fcloseall();
 #endif
 
-	/* Close all of graph windows */
+	/* Close all graph windows */
 	for (lpgw = listgraphs; lpgw != NULL; lpgw = lpgw->next) {
 		if (GraphHasWindow(lpgw))
 			GraphClose(lpgw);
@@ -320,6 +317,94 @@ WinCloseHelp(void)
 }
 
 
+static char * 
+GetLanguageCode()
+{
+	static char lang[6] = "";
+
+	if (lang[0] == NUL) {
+		GetLocaleInfo(LOCALE_USER_DEFAULT, LOCALE_SABBREVLANGNAME, lang, sizeof(lang));
+		//strcpy(lang, "JPN"); //TEST
+		/* language definition files for Japanese already use "ja" as abbreviation */
+		if (strcmp(lang, "JPN") == 0)
+			lang[1] = 'A';
+		/* prefer lower case */
+		lang[0] = tolower(lang[0]);
+		lang[1] = tolower(lang[1]);
+		/* only use two character sequence */
+		lang[2] = NUL;
+	}
+
+	return lang;
+}
+
+
+static BOOL
+FileExists(const char * filename)
+{
+	struct stat buffer;
+	return stat(filename, &buffer) == 0;
+}
+
+
+static char *
+LocalisedFile(const char * name, const char * ext, const char * defaultname)
+{
+	char * lang = GetLanguageCode();
+	char * filename = (LPSTR) malloc(strlen(szModuleName) + strlen(name) + strlen(lang) + strlen(ext) + 1);
+	if (filename) {
+		strcpy(filename, szModuleName);
+		strcat(filename, name);
+		strcat(filename, lang);
+		strcat(filename, ext);
+		if (!FileExists(filename)) {
+			strcpy(filename, szModuleName);
+			strcat(filename, defaultname);
+		}
+	}
+	return filename;
+}
+
+
+static void
+ReadMainIni(LPSTR file, LPSTR section)
+{
+    char profile[81] = "";
+#ifdef WITH_HTML_HELP
+	const char hlpext[] = ".chm";
+#else
+	const char hlpext[] = ".hlp";
+#endif
+	const char name[] = "wgnuplot-";
+
+	/* help file name */
+	GetPrivateProfileString(section, "HelpFile", "", profile, 80, file);
+	if (profile[0] != NUL) {
+		winhelpname = (LPSTR) malloc(strlen(szModuleName) + strlen(profile) + 1);
+		if (winhelpname) {
+			strcpy(winhelpname, szModuleName);
+			strcat(winhelpname, profile);
+		}
+	} else {
+		/* default name is "wgnuplot-LL.chm" */
+		winhelpname = LocalisedFile(name, hlpext, HELPFILE);
+	}
+
+	/* menu file name */
+	GetPrivateProfileString(section, "MenuFile", "", profile, 80, file);
+	if (profile[0] != NUL) {
+		szMenuName = (LPSTR) malloc(strlen(szModuleName) + strlen(profile) + 1);
+		if (szMenuName) {
+			strcpy(szMenuName, szModuleName);
+			strcat(szMenuName, profile);
+		}
+	} else {
+		/* default name is "wgnuplot-LL.mnu" */
+		szMenuName = LocalisedFile(name, ".mnu", "wgnuplot.mnu");
+	}
+}
+
+
 #ifndef WGP_CONSOLE
 int PASCAL WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
                 LPSTR lpszCmdLine, int nCmdShow)
@@ -365,16 +450,6 @@ int main(int argc, char **argv)
         else
                 szPackageDir = szModuleName;
 
-        winhelpname = (LPSTR)malloc(_fstrlen(szModuleName)+_fstrlen(HELPFILE)+1);
-        CheckMemory(winhelpname);
-        _fstrcpy(winhelpname,szModuleName);
-        _fstrcat(winhelpname,HELPFILE);
-
-        szMenuName = (LPSTR)malloc(_fstrlen(szModuleName)+_fstrlen(MENUNAME)+1);
-        CheckMemory(szMenuName);
-        _fstrcpy(szMenuName,szModuleName);
-        _fstrcat(szMenuName,MENUNAME);
-
 #ifndef WGP_CONSOLE
         textwin.hInstance = hInstance;
         textwin.hPrevInstance = hPrevInstance;
@@ -404,6 +479,8 @@ int main(int argc, char **argv)
 			textwin.IniFile = inifile;
 #endif
 			graphwin->IniFile = inifile;
+
+			ReadMainIni(inifile, "WGNUPLOT");
 		}
 
 #ifndef WGP_CONSOLE

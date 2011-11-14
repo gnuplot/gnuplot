@@ -5,6 +5,16 @@
 
 2011-11-14  Bastian Maerkisch  <bmaerkisch@web.de>
 
+	* src/win/wgnuplib.h src/win/wgraph.c src/win/winmain.c
+	src/win/wtext.c: Localisation support for menu and help files.
+	Files are loaded according to current language settings from
+	files named "wgnuplot-LL.mnu" and "wgnuplot-LL.chm", where LL is
+	the abbreviation of the current language. Fall back to
+	"wgnuplot.mnu" and "wgnuplot.chm" if localised files don't exist.
+	Defaults may be overwritten by new entries "MenuFile" and
+	"HelpFile" in wgnuplot.ini.
+	Choose appropriate default fonts in Japanese environments.
+
 	src/show.c (show_version) src/win/winmain.h: List correct names
 	of menu and help files on Windows.
 

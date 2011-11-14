@@ -1,5 +1,5 @@
 /*
- * $Id: wgnuplib.h,v 1.49 2011/11/12 11:05:52 markisch Exp $
+ * $Id: wgnuplib.h,v 1.50 2011/11/14 17:55:47 markisch Exp $
  */
 
 /* GNUPLOT - win/wgnuplib.h */
@@ -368,7 +368,10 @@ typedef struct tagGW {
 typedef GW *  LPGW;
 
 #define WINFONTSIZE 10
-#define WINFONT "Arial"
+#define WINFONT "Tahoma"
+#ifndef WINJPFONT
+#define WINJPFONT "MS PGothic"
+#endif
 #define WINGRAPHTITLE "gnuplot graph"
 
 extern termentry * WIN_term;

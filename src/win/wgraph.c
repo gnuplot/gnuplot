@@ -1,5 +1,5 @@
 /*
- * $Id: wgraph.c,v 1.139 2011/11/14 17:47:34 markisch Exp $
+ * $Id: wgraph.c,v 1.140 2011/11/14 17:55:47 markisch Exp $
  */
 
 /* GNUPLOT - win/wgraph.c */
@@ -235,11 +235,12 @@ static void	CopyClip(LPGW lpgw);
 static void	SaveAsEMF(LPGW lpgw);
 static void	CopyPrint(LPGW lpgw);
 static void	WriteGraphIni(LPGW lpgw);
+static char *	GraphDefaultFont(void);
 static void	ReadGraphIni(LPGW lpgw);
 static COLORREF	GetColor(HWND hwnd, COLORREF ref);
 static void	UpdateColorSample(HWND hdlg);
 static BOOL	LineStyle(LPGW lpgw);
-static void GraphChangeFont(LPGW lpgw, LPCSTR font, int fontsize, HDC hdc, RECT rect);
+static void	GraphChangeFont(LPGW lpgw, LPCSTR font, int fontsize, HDC hdc, RECT rect);
 
 
 /* ================================== */
@@ -2619,6 +2620,15 @@ WriteGraphIni(LPGW lpgw)
 }
 
 
+static char * GraphDefaultFont(void)
+{
+	if (GetACP() == 932) /* Japanese Shift-JIS */
+		return WINJPFONT;
+	else
+		return WINFONT;
+};
+
+
 static void
 ReadGraphIni(LPGW lpgw)
 {
@@ -2662,7 +2672,7 @@ ReadGraphIni(LPGW lpgw)
 		if (lpgw->fontsize == 0)
 			lpgw->fontsize = WINFONTSIZE;
 		if (!(*lpgw->fontname))
-		    _fstrcpy(lpgw->fontname,WINFONT);
+			_fstrcpy(lpgw->fontname, GraphDefaultFont());
 		/* set current font as default font */
 		_fstrcpy(lpgw->deffontname, lpgw->fontname);
 		lpgw->deffontsize = lpgw->fontsize;
