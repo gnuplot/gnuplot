@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.259 2011/11/01 18:52:49 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.260 2011/11/02 21:20:14 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -69,6 +69,9 @@ static char *RCSid() { return RCSid("$Id: show.c,v 1.259 2011/11/01 18:52:49 sfe
 #include "pm3d.h"
 #include "getcolor.h"
 #include <ctype.h>
+#ifdef WIN32
+#include "win/winmain.h"
+#endif
 
 /******** Local functions ********/
 
@@ -1083,8 +1086,12 @@ show_version(FILE *fp)
 	c_token++;
 	fprintf(stderr, "Compile options:\n%s\n", compile_options);
 
+#ifndef WIN32
 	if ((helpfile = getenv("GNUHELP")) == NULL)
 	    helpfile = HELPFILE;
+#else
+	helpfile = winhelpname;
+#endif
 
 #ifdef X11
 	{
@@ -1104,6 +1111,9 @@ show_version(FILE *fp)
 
 	fprintf(stderr, "HELPFILE           = \"%s\"\n", helpfile);
 
+#if defined(WIN32) && !defined(WGP_CONSOLE)
+	fprintf(stderr, "MENUNAME           = \"%s\"\n", szMenuName);
+#endif
     }
 }
 

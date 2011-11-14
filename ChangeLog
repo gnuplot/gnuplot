@@ -5,6 +5,9 @@
 
 2011-11-14  Bastian Maerkisch  <bmaerkisch@web.de>
 
+	src/show.c (show_version) src/win/winmain.h: List correct names
+	of menu and help files on Windows.
+
 	src/win.trm (WIN_set_color): Immediately translate palette color
 	values to RGB instead of passing them on. This makes it possible
 	to use more than one palettes in multiplots and in different
