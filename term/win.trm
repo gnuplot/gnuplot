@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: win.trm,v 1.104 2011/11/10 07:30:53 markisch Exp $
+ * $Id: win.trm,v 1.105 2011/11/12 11:10:23 markisch Exp $
  */
 
 /* GNUPLOT - win.trm */
@@ -181,8 +181,8 @@ WIN_options()
 		case WIN_DEFAULT:
 			color = TRUE;
 			dashed = FALSE;
-			strcpy(fontname, WINFONT);
-			fontsize = WINFONTSIZE;
+			strcpy(fontname, WIN_inifontname);
+			fontsize = WIN_inifontsize;
 			fontscale = linewidth = 1;
 			set_color = set_dashed = TRUE;
 			set_font = set_fontsize = TRUE;
@@ -632,7 +632,7 @@ WIN_image(unsigned int M, unsigned int N, coordval *image,
     */
     if ((color_mode == IC_PALETTE) || (color_mode == IC_RGB)) {
 		pad_bytes = (4 - (3 * M) % 4) % 4; /* scan lines start on ULONG boundaries */
-		image_size = (M + pad_bytes ) * N * 3;
+		image_size = (3 * M + pad_bytes) * N;
     } else if (color_mode == IC_RGBA) {
 		pad_bytes = 0;
 		image_size = M * N * 4;
@@ -724,18 +724,25 @@ WIN_make_palette(t_sm_palette *palette)
 TERM_PUBLIC void
 WIN_set_color(t_colorspec *colorspec)
 {
-    switch (colorspec->type ) {
-	case TC_FRAC:
-	    GraphOp(graphwin, W_setcolor, (int)(WIN_PAL_COLORS*colorspec->value), 0, NULL);
-	    break;
-	case TC_RGB:
-	    GraphOp(graphwin, W_setcolor, (colorspec->lt) & 0xffff, 0xff00 | ((colorspec->lt >> 16) & 0x00ff), NULL);
-	    break;
-	case TC_LT:
-	    GraphOp(graphwin, W_setcolor, colorspec->lt, TC_LT << 8, NULL);
-	    break;
-    }
-    WIN_last_linetype = LT_NODRAW;
+	switch (colorspec->type ) {
+		case TC_FRAC: {
+			/* Immediately translate palette index to RGB colour */
+			rgb255_color rgb255;
+			rgb255maxcolors_from_gray(colorspec->value, &rgb255);
+			GraphOp(graphwin, W_setcolor, (rgb255.g << 8) | rgb255.b, 0xff00 | (rgb255.r), NULL);
+			/* 
+			GraphOp(graphwin, W_setcolor, (int)(WIN_PAL_COLORS*colorspec->value), 0, NULL);
+			*/
+			break;
+		}
+		case TC_RGB:
+			GraphOp(graphwin, W_setcolor, (colorspec->lt) & 0xffff, 0xff00 | ((colorspec->lt >> 16) & 0x00ff), NULL);
+			break;
+		case TC_LT:
+			GraphOp(graphwin, W_setcolor, colorspec->lt, TC_LT << 8, NULL);
+			break;
+	}
+	WIN_last_linetype = LT_NODRAW;
 }
 
 

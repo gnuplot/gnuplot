@@ -5,6 +5,11 @@
 
 2011-11-14  Bastian Maerkisch  <bmaerkisch@web.de>
 
+	src/win.trm (WIN_set_color): Immediately translate palette color
+	values to RGB instead of passing them on. This makes it possible
+	to use more than one palettes in multiplots and in different
+	graph windows. Test e.g. with pm3dcolors.dem
+
 	* src/win/wgraph.c src/win/wresourc.h src/win/wgnuplib.h: Add a
 	separate switch to toggle antialiasing of polygons.
 
