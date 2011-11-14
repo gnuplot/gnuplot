@@ -1,5 +1,5 @@
 /*
- * $Id: wgraph.c,v 1.137 2011/11/12 11:05:52 markisch Exp $
+ * $Id: wgraph.c,v 1.138 2011/11/12 11:41:45 markisch Exp $
  */
 
 /* GNUPLOT - win/wgraph.c */
@@ -3930,19 +3930,13 @@ Draw_XOR_Text(LPGW lpgw, const char *text, size_t length, int x, int y)
 	tempDC = CreateCompatibleDC(hdc);
 	DeleteObject(SelectObject(tempDC, bitmap));
 
-	/* Print inverted text, so the second inversion done by SRCINVERT ends
-	 * up printing the right way round... */
-	/* FIXME HBB 20010218: find out the real ROP3 code for operation
-	 * "target = target XOR (NOT source)" and use that, instead. It's the
-	 * one with MSByte = 0x99, but without VC++ or MSDN, I can't seem to
-	 * find out what the full code is. */
-	SetTextColor(tempDC, GetBkColor(hdc));
-	SetBkColor(tempDC, GetTextColor(hdc));
 	TextOut(tempDC, 0, 0, text, length);
 
-	/* Copy printed string to the screen window by XORing, so the
-	 * repetition of this same operation will delete it again */
-	BitBlt(hdc, x, y - cy, cx, cy, tempDC, 0, 0, SRCINVERT);
+	/* Copy printed string to the screen window using
+	   "target = target XOR (NOT source)" ROP, see "Ternary Raster Operations"
+	   http://msdn.microsoft.com/en-us/library/dd145130%28VS.85%29.aspx
+	*/
+	BitBlt(hdc, x, y - cy, cx, cy, tempDC, 0, 0, 0x00990066);
 
 	/* Clean up behind ourselves */
 	DeleteDC(tempDC);
