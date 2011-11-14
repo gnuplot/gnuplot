@@ -1,4 +1,9 @@
-2011-11-13  Bastian Maerkisch  <bmaerkisch@web.de>
+2011-11-14  Peter Juhasz  <juhaszp@users.sourceforge.net>
+
+	* src/plot2d.c (store2d_point): Fix for 4-column mode of
+	BOXPLOT style which did not handle log scale correctly.
+
+2011-11-14  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/win/wgraph.c src/win/wresourc.h src/win/wgnuplib.h: Add a
 	separate switch to toggle antialiasing of polygons.

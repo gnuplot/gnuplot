@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.252 2011/10/10 21:17:04 juhaszp Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.253 2011/10/25 05:10:58 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -1206,9 +1206,17 @@ store2d_point(
 	cp->yhigh = yhigh;
 	break;
     case BOXES:			/* auto-scale to xlow xhigh */
-    case BOXPLOT:
 	cp->ylow = ylow;
 	cp->yhigh = yhigh;	
+	STORE_WITH_LOG_AND_UPDATE_RANGE(cp->xlow, xlow, dummy_type, current_plot->x_axis, 
+					current_plot->noautoscale, NOOP, cp->xlow = -VERYLARGE);
+	STORE_WITH_LOG_AND_UPDATE_RANGE(cp->xhigh, xhigh, dummy_type, current_plot->x_axis,
+					current_plot->noautoscale, NOOP, cp->xhigh = -VERYLARGE);
+	break;
+    case BOXPLOT:			/* auto-scale to xlow xhigh, yhigh = y needed for factors */
+	cp->ylow = ylow;
+	STORE_WITH_LOG_AND_UPDATE_RANGE(cp->yhigh, yhigh, dummy_type, current_plot->y_axis,
+					current_plot->noautoscale, NOOP, cp->yhigh = -VERYLARGE);
 	STORE_WITH_LOG_AND_UPDATE_RANGE(cp->xlow, xlow, dummy_type, current_plot->x_axis, 
 					current_plot->noautoscale, NOOP, cp->xlow = -VERYLARGE);
 	STORE_WITH_LOG_AND_UPDATE_RANGE(cp->xhigh, xhigh, dummy_type, current_plot->x_axis,
