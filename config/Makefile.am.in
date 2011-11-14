@@ -18,6 +18,6 @@ Makefile.am: Makefile.am.in
 	  | sed 's/@$$/%/;s/@/ \\@/g' \
           | tr @% '\012 ' >> $@t
 	sed -n '/^##m4-files-end/,$$p' $< >> $@t
-	chmod a-w $@t
+	chmod og-w $@t
 	mv $@t $@
 

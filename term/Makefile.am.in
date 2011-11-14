@@ -36,11 +36,11 @@ Makefile.am: Makefile.am.in
 	echo     build_lua = >> $@t
 	echo endif >> $@t
 	sed -n '/^##trm-files-end/,$$p' $< >> $@t
-	chmod a-w $@t
+	chmod og-w $@t
 	mv $@t $@
 
 all: lua/gnuplot-tikz.help
 
 $(srcdir)/lua/gnuplot-tikz.help: $(srcdir)/lua/gnuplot-tikz.lua
-	test -z "$(build_lua)" || lua $< termhelp > $@
+	test -z "$(build_lua)" || (chmod u+w $@ && lua $< termhelp > $@)
 

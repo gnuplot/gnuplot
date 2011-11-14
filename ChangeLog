@@ -1,3 +1,12 @@
+2011-11-14  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* config/Makefile.am.in demo/Makefile.am.in m4/Makefile.am.in
+	tutorial/Makefile.am.in term/Makefile.am.in:
+
+	Make sure that the generated files Makefile.am and gnuplot-tikz.help
+	do not end up non-writable by the owner, which caused build cleanup
+	problems while packaging.  Bug #3419881
+
 2011-11-14  Peter Juhasz  <juhaszp@users.sourceforge.net>
 
 	* src/plot2d.c (store2d_point): Fix for 4-column mode of
