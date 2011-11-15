@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: win.trm,v 1.105 2011/11/12 11:10:23 markisch Exp $
+ * $Id: win.trm,v 1.106 2011/11/14 20:47:46 markisch Exp $
  */
 
 /* GNUPLOT - win.trm */
@@ -361,14 +361,14 @@ WIN_options()
 		graphwin->Origin.x = win_x;
 		graphwin->Origin.y = win_y;
 		/* TODO: apply now */
-	}	
+	}
 	if (set_title) {
 		free (graphwin->Title);
 		graphwin->Title = (title) ?  title : strdup(WINGRAPHTITLE);
 		GraphChangeTitle(graphwin);
 		/* TODO: apply now */
 	}
-	if (set_fontsize) 
+	if (set_fontsize)
 		graphwin->deffontsize = graphwin->fontsize = fontsize;
 	if (set_font) {
 		strcpy(graphwin->fontname, fontname);
@@ -469,6 +469,9 @@ WIN_graphics()
     term->h_tic = graphwin->htic;
     term->v_tic = graphwin->vtic;
     WIN_last_linetype = LT_NODRAW;		/* HBB 20000813: linetype caching */
+
+	/* Save current text encoding */
+	GraphOp(graphwin, W_text_encoding, encoding, 0, NULL);
 }
 
 
@@ -730,7 +733,7 @@ WIN_set_color(t_colorspec *colorspec)
 			rgb255_color rgb255;
 			rgb255maxcolors_from_gray(colorspec->value, &rgb255);
 			GraphOp(graphwin, W_setcolor, (rgb255.g << 8) | rgb255.b, 0xff00 | (rgb255.r), NULL);
-			/* 
+			/*
 			GraphOp(graphwin, W_setcolor, (int)(WIN_PAL_COLORS*colorspec->value), 0, NULL);
 			*/
 			break;
@@ -755,7 +758,7 @@ WIN_filled_polygon(int points, gpiPoint *corners)
 		  (corners[2].x == corners[1].x) && (corners[2].y == corners[3].y)) ||
 		 ((corners[0].x == corners[1].x) && (corners[0].y == corners[3].y) &&
 		  (corners[2].x == corners[3].x) && (corners[2].y == corners[1].y)))) {
-		/* The polygon describes a rectangle. Thus we use boxfill, which 
+		/* The polygon describes a rectangle. Thus we use boxfill, which
 		   is more efficient. */
 		GraphOp(graphwin, W_move, corners[0].x, corners[0].y, NULL);
 		GraphOp(graphwin, W_boxfill, corners[2].x, corners[2].y, NULL);
@@ -837,7 +840,7 @@ WIN_enhanced_flush()
 }
 
 
-TERM_PUBLIC void 
+TERM_PUBLIC void
 WIN_layer (t_termlayer syncpoint)
 {
 	GraphOp(graphwin, W_layer, syncpoint, 0, NULL);
@@ -916,7 +919,7 @@ START_HELP(windows)
 " `<fontspec>` is in the format \"<fontface>,<fontsize>\", where \"<fontface>\"",
 " is the name of a valid Windows font, and <fontsize> is the size of the font",
 " in points and both components are optional.",
-" Note that in previous versions of gnuplot the `font` statement could be left", 
+" Note that in previous versions of gnuplot the `font` statement could be left",
 " out and <fontsize> could be given as a number without double quotes. This is",
 " no longer supported.",
 " `linewidth` and `fontscale` can be used to scale the width of lines and",

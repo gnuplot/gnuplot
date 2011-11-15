@@ -1,5 +1,5 @@
 /*
- * $Id: wgnuplib.h,v 1.50 2011/11/14 17:55:47 markisch Exp $
+ * $Id: wgnuplib.h,v 1.51 2011/11/14 21:03:38 markisch Exp $
  */
 
 /* GNUPLOT - win/wgnuplib.h */
@@ -288,7 +288,7 @@ struct GWOPBLK {			/* kept in local memory */
 #define W_enhanced_text 44
 #define W_image 45
 #define W_layer 46
-
+#define W_text_encoding 47
 
 typedef struct tagGW {
 	GP_LPPRINT	lpr;		/* must be first */
@@ -349,6 +349,7 @@ typedef struct tagGW {
 	double	org_pointsize;	/* Original Pointsize */
 	int		encoding_error; /* last unknown encoding */
 	double	fontscale;	/* scale factor for font sizes */
+	enum set_encoding_id encoding;	/* text encoding */
 
 	HPEN	hapen;		/* stored current pen */
 	HPEN	hsolid;		/* solid sibling of current pen */

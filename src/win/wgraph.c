@@ -1,5 +1,5 @@
 /*
- * $Id: wgraph.c,v 1.140 2011/11/14 17:55:47 markisch Exp $
+ * $Id: wgraph.c,v 1.141 2011/11/14 21:03:38 markisch Exp $
  */
 
 /* GNUPLOT - win/wgraph.c */
@@ -224,7 +224,7 @@ static void	MakeFonts(LPGW lpgw, LPRECT lprect, HDC hdc);
 static void	DestroyFonts(LPGW lpgw);
 static void	SetFont(LPGW lpgw, HDC hdc);
 static void	SelFont(LPGW lpgw);
-static LPWSTR UnicodeText(const char *str, enum set_encoding_id encoding);
+static LPWSTR	UnicodeText(const char *str, enum set_encoding_id encoding);
 static void	dot(HDC hdc, int xdash, int ydash);
 static unsigned int WDPROC GraphGetTextLength(LPGW lpgw, HDC hdc, LPCSTR text);
 static int	draw_enhanced_text(LPGW lpgw, HDC hdc, LPRECT rect, int x, int y, char * str);
@@ -1068,7 +1068,7 @@ GraphGetTextLength(LPGW lpgw, HDC hdc, LPCSTR text)
     SIZE size;
     LPWSTR textw;
 
-    textw = UnicodeText(text, encoding);
+    textw = UnicodeText(text, lpgw->encoding);
     if (textw) {
         GetTextExtentPoint32W(hdc, textw, wcslen(textw), &size);
         free(textw);
@@ -1321,18 +1321,18 @@ draw_put_text(LPGW lpgw, HDC hdc, int x, int y, char * str)
 	SetBkMode(hdc, TRANSPARENT);
 
 	/* support text encoding */
-	if ((encoding == S_ENC_DEFAULT) || (encoding == S_ENC_INVALID)) {
+	if ((lpgw->encoding == S_ENC_DEFAULT) || (lpgw->encoding == S_ENC_INVALID)) {
 		TextOut(hdc, x, y, str, lstrlen(str));
 	} else {
-		LPWSTR textw = UnicodeText(str, encoding);
+		LPWSTR textw = UnicodeText(str, lpgw->encoding);
 		if (textw) {
 			TextOutW(hdc, x, y, textw, wcslen(textw));
 			free(textw);
 		} else {
 			/* print this only once */
-			if (encoding != lpgw->encoding_error) {
-				fprintf(stderr, "windows terminal: encoding %s not supported\n", encoding_names[encoding]);
-				lpgw->encoding_error = encoding;
+			if (lpgw->encoding != lpgw->encoding_error) {
+				fprintf(stderr, "windows terminal: encoding %s not supported\n", encoding_names[lpgw->encoding]);
+				lpgw->encoding_error = lpgw->encoding;
 			}
 			/* fall back to standard encoding */
 			TextOut(hdc, x, y, str, strlen(str));
@@ -1664,6 +1664,10 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 			fill_color = last_color;
 			break;
 		}
+
+		case W_text_encoding:
+			lpgw->encoding = curptr->x;
+			break;
 
 		case W_put_text: {
 			char * str;
