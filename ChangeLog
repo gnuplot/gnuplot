@@ -1,3 +1,8 @@
+2011-11-15  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/win/wgnuplib.h src/win/wgraph.c term/win.trm: Store current
+	text encoding in list of drawing ops.
+
 2011-11-15  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/axis.h src/axis.c (parse_range, parse_named_range)
