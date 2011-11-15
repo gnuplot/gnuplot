@@ -14,6 +14,6 @@ Makefile.am: Makefile.am.in
 	  djconfig.sh make_vms.com term_pc.h makefile.* | fmt | \
 	  (tr '\012' @; echo) |sed 's/@$$/%/;s/@/ \\@/g' |tr @% '\012 ' >> $@t
 	sed -n '/^##m4-files-end/,$$p' $< >> $@t
-	chmod a-w $@t
+	chmod og-w $@t
 	mv $@t $@
 

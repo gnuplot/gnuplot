@@ -76,6 +76,6 @@ Makefile.am: Makefile.am.in
 	echo PLT_FILES = *.plt | fmt | (tr '\012' @; echo ) \
 	  |sed 's/@$$/%/;s/@/ \\@/g;' | tr @% '\012 ' >> $@t
 	sed -n '/^##plt-files-end/,$$p' $< >> $@t
-	chmod a-w $@t
+	chmod og-w $@t
 	mv $@t $@
 

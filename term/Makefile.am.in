@@ -31,6 +31,6 @@ Makefile.am: Makefile.am.in
 	  | (tr '\012' @; echo) |sed 's/@$$/%/;s/@/ \\@/g' \
 	  | tr @% '\012 ' >> $@t
 	sed -n '/^##trm-files-end/,$$p' Makefile.am.in >> $@t
-	chmod a-w $@t
+	chmod og-w $@t
 	mv $@t $@
 
