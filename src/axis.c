@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.95 2011/10/25 05:10:58 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.96 2011/11/10 05:15:58 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -1661,6 +1661,33 @@ set_writeback_max(AXIS_INDEX axis)
     axis_array[axis].writeback_max = val;
 }
 
+void
+save_writeback_all_axes()
+{
+    AXIS_INDEX axis;
+
+    for (axis = 0; axis < AXIS_ARRAY_SIZE; axis++)
+	if (axis_array[axis].range_flags & RANGE_WRITEBACK) {
+	    set_writeback_min(axis);
+	    set_writeback_max(axis);
+	}
+}
+
+void
+check_axis_reversed( AXIS_INDEX axis )
+{
+    AXIS *this = axis_array + axis;
+    if (((this->autoscale & AUTOSCALE_BOTH) == AUTOSCALE_NONE)
+    &&  (this->max < this->min)) {
+	double temp = this->min;
+	this->min = this->max;
+	this->max = temp;
+	this->range_is_reverted = 1;
+    } else {
+	this->range_is_reverted = (this->range_flags & RANGE_REVERSE);
+    }
+}
+
 TBOOLEAN
 some_grid_selected()
 {
@@ -1843,3 +1870,52 @@ add_tic_user(AXIS_INDEX axis, char *label, double position, int level)
     axis_array[axis].ticdef.def.user = listhead.next;
 }
 
+/*
+ * EAM Oct 2011
+ * These routines used to be macros PARSE_RANGE, PARSE_NAMED_RANGE
+ * Since they take only normal parameters, it saves code/space to make
+ * them subroutines instead.
+ */
+
+/* get optional [min:max] */
+void
+parse_range(AXIS_INDEX axis)
+{
+    if (equals(c_token, "[")) {
+	c_token++;
+	axis_array[axis].autoscale =
+	    load_range(axis, &axis_array[axis].min, &axis_array[axis].max,
+		       axis_array[axis].autoscale);
+	if (!equals(c_token, "]"))
+	    int_error(c_token, "']' expected");
+	c_token++;
+    }
+}
+
+/* like parse_range, but for named ranges as in 'plot [phi=3.5:7] sin(phi)' */
+int
+parse_named_range(AXIS_INDEX axis, int dummy)
+{
+    int dummy_token = dummy;
+
+    if (equals(c_token, "[")) {
+	c_token++;
+	if (isletter(c_token)) {
+	    if (equals(c_token + 1, "=")) {
+		dummy_token = c_token;
+		c_token += 2;
+	    }
+		/* oops; probably an expression with a variable: act
+		 * as if no variable name had been seen, by
+		 * fallthrough */
+	}
+	axis_array[axis].autoscale = load_range(axis, &axis_array[axis].min,
+				      &axis_array[axis].max,
+				      axis_array[axis].autoscale);
+	if (!equals(c_token, "]"))
+	    int_error(c_token, "']' expected");
+	c_token++;
+    }				/* first '[' */
+
+    return dummy_token;
+}

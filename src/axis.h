@@ -1,5 +1,5 @@
 /*
- * $Id: axis.h,v 1.65 2011/07/12 19:30:34 juhaszp Exp $
+ * $Id: axis.h,v 1.66 2011/10/25 05:10:58 sfeam Exp $
  *
  */
 
@@ -465,20 +465,6 @@ do {									\
 } while (0)
 
 #endif
-/* handle reversed ranges */
-#define CHECK_REVERSE(axis) do {					\
-    AXIS *this = axis_array + axis;					\
-									\
-    if (((this->autoscale & AUTOSCALE_BOTH) == AUTOSCALE_NONE)		\
-	&& (this->max < this->min)) {					\
-	double temp = this->min;					\
-									\
-	this->min = this->max;						\
-	this->max = temp;						\
-	this->range_is_reverted = 1;					\
-    } else								\
-	this->range_is_reverted = (this->range_flags & RANGE_REVERSE);	\
-} while(0)
 
 /* HBB NEW 20050316: macros to always access the actual minimum, even
  * if 'set view map' or something else flipped things around behind
@@ -491,57 +477,6 @@ do {									\
     (axis_array[axis].range_flags & RANGE_REVERSE	\
      ? axis_array[axis].min : axis_array[axis].max)
 
-/* HBB 20000725: new macro, built upon ULIG's SAVE_WRITEBACK(axis),
- * but easier to use. Code like this occured twice, in plot2d and
- * plot3d: */
-#define SAVE_WRITEBACK_ALL_AXES					\
-do {								\
-    AXIS_INDEX axis;						\
-								\
-    for (axis = 0; axis < AXIS_ARRAY_SIZE; axis++)		\
-	if(axis_array[axis].range_flags & RANGE_WRITEBACK) {	\
-	    set_writeback_min(axis);				\
-	    set_writeback_max(axis);				\
-	}							\
-} while(0)
-
-/* get optional [min:max] */
-#define PARSE_RANGE(axis)						   \
-do {									   \
-    if (equals(c_token, "[")) {						   \
-	c_token++;							   \
-	axis_array[axis].autoscale =					   \
-	    load_range(axis, &axis_array[axis].min, &axis_array[axis].max, \
-		       axis_array[axis].autoscale);			   \
-	if (!equals(c_token, "]"))					   \
-	    int_error(c_token, "']' expected");				   \
-	c_token++;							   \
-    }									   \
-} while (0)
-
-/* HBB 20000430: new macro, like PARSE_RANGE, but for named ranges as
- * in 'plot [phi=3.5:7] sin(phi)' */
-#define PARSE_NAMED_RANGE(axis, dummy_token)				     \
-do {									     \
-    if (equals(c_token, "[")) {						     \
-	c_token++;							     \
-	if (isletter(c_token)) {					     \
-	    if (equals(c_token + 1, "=")) {				     \
-		dummy_token = c_token;					     \
-		c_token += 2;						     \
-	    }								     \
-		/* oops; probably an expression with a variable: act	     \
-		 * as if no variable name had been seen, by		     \
-		 * fallthrough */					     \
-	}								     \
-	axis_array[axis].autoscale = load_range(axis, &axis_array[axis].min, \
-				      &axis_array[axis].max,		     \
-				      axis_array[axis].autoscale);	     \
-	if (!equals(c_token, "]"))					     \
-	    int_error(c_token, "']' expected");				     \
-	c_token++;							     \
-    }				/* first '[' */				     \
-} while (0)
 
 /* parse a position of the form
  *    [coords] x, [coords] y {,[coords] z}
@@ -716,6 +651,11 @@ double get_writeback_min __PROTO((AXIS_INDEX));
 double get_writeback_max __PROTO((AXIS_INDEX));
 void set_writeback_min __PROTO((AXIS_INDEX));
 void set_writeback_max __PROTO((AXIS_INDEX));
+
+void save_writeback_all_axes __PROTO((void));
+void parse_range __PROTO((AXIS_INDEX axis));
+int  parse_named_range __PROTO((AXIS_INDEX axis, int token));
+void check_axis_reversed __PROTO((AXIS_INDEX axis));
 
 /* set widest_tic_label: length of the longest tics label */
 void widest_tic_callback __PROTO((AXIS_INDEX, double place, char *text, 

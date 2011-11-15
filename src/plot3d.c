@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.189 2011/07/25 06:51:29 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.190 2011/10/25 05:10:58 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -255,25 +255,25 @@ plot3drequest()
     u_axis = (parametric ? U_AXIS : FIRST_X_AXIS);
     v_axis = (parametric ? V_AXIS : FIRST_Y_AXIS);
 
-    PARSE_NAMED_RANGE(u_axis, dummy_token0);
+    dummy_token0 = parse_named_range(u_axis, dummy_token0);
     if (splot_map == TRUE && !parametric) /* v_axis==FIRST_Y_AXIS */
 	splot_map_deactivate();
-    PARSE_NAMED_RANGE(v_axis, dummy_token1);
+    dummy_token1 = parse_named_range(v_axis, dummy_token1);
     if (splot_map == TRUE && !parametric) /* v_axis==FIRST_Y_AXIS */
 	splot_map_activate();
 
     if (parametric) {
-	PARSE_RANGE(FIRST_X_AXIS);
+	parse_range(FIRST_X_AXIS);
 	if (splot_map == TRUE)
 	    splot_map_deactivate();
-	PARSE_RANGE(FIRST_Y_AXIS);
+	parse_range(FIRST_Y_AXIS);
 	if (splot_map == TRUE)
 	    splot_map_activate();
     }				/* parametric */
-    PARSE_RANGE(FIRST_Z_AXIS);
-    CHECK_REVERSE(FIRST_X_AXIS);
-    CHECK_REVERSE(FIRST_Y_AXIS);
-    CHECK_REVERSE(FIRST_Z_AXIS);
+    parse_range(FIRST_Z_AXIS);
+    check_axis_reversed(FIRST_X_AXIS);
+    check_axis_reversed(FIRST_Y_AXIS);
+    check_axis_reversed(FIRST_Z_AXIS);
 
     /* Clear out any tick labels read from data files in previous plot */
     for (u_axis=0; u_axis<AXIS_ARRAY_SIZE; u_axis++) {
@@ -2148,7 +2148,7 @@ eval_3dplots()
 	 * to tic marks, not only the min/max data values)
 	 * --> save them now for writeback if requested
 	 */
-	SAVE_WRITEBACK_ALL_AXES;
+	save_writeback_all_axes();
 	/* update GPVAL_ variables available to user */
 	update_gpval_variables(1);
 

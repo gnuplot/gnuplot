@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.147 2011/10/25 05:10:58 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.148 2011/11/10 05:15:58 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -1618,8 +1618,7 @@ reset_command()
 {
     AXIS_INDEX axis;
     TBOOLEAN save_interactive = interactive;
-    static const TBOOLEAN set_for_axis[AXIS_ARRAY_SIZE]
-	= AXIS_ARRAY_INITIALIZER(TRUE);
+    static TBOOLEAN set_for_axis[AXIS_ARRAY_SIZE] = AXIS_ARRAY_INITIALIZER(TRUE);
 
     c_token++;
 

@@ -1,3 +1,10 @@
+2011-11-15  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/axis.h src/axis.c (parse_range, parse_named_range)
+	src/axis.c (save_writeback_all_axes check_axis_reversed)
+	src/fit.c src/plot2d.c src/plot3d.c src/stats.c src/unset.c:
+	Replace axis-related macros with equivalent subroutines.
+
 2011-11-14  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* config/Makefile.am.in demo/Makefile.am.in m4/Makefile.am.in

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.253 2011/10/25 05:10:58 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.254 2011/11/14 18:09:39 juhaszp Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -219,20 +219,20 @@ plotrequest()
 
     t_axis = (parametric || polar) ? T_AXIS : FIRST_X_AXIS;
 
-    PARSE_NAMED_RANGE(t_axis, dummy_token);
+    dummy_token = parse_named_range(t_axis, dummy_token);
     if (parametric || polar)    /* set optional x ranges */
-	PARSE_RANGE(FIRST_X_AXIS);
+	parse_range(FIRST_X_AXIS);
 
     /* possible reversal of x range *does* matter, even in parametric
      * or polar mode */
-    CHECK_REVERSE(FIRST_X_AXIS);
+    check_axis_reversed(FIRST_X_AXIS);
 
-    PARSE_RANGE(FIRST_Y_AXIS);
-    CHECK_REVERSE(FIRST_Y_AXIS);
-    PARSE_RANGE(SECOND_X_AXIS);
-    CHECK_REVERSE(SECOND_X_AXIS);
-    PARSE_RANGE(SECOND_Y_AXIS);
-    CHECK_REVERSE(SECOND_Y_AXIS);
+    parse_range(FIRST_Y_AXIS);
+    check_axis_reversed(FIRST_Y_AXIS);
+    parse_range(SECOND_X_AXIS);
+    check_axis_reversed(SECOND_X_AXIS);
+    parse_range(SECOND_Y_AXIS);
+    check_axis_reversed(SECOND_Y_AXIS);
 
     /* Clear out any tick labels read from data files in previous plot */
     for (t_axis=0; t_axis<AXIS_ARRAY_SIZE; t_axis++) {
@@ -2942,7 +2942,7 @@ eval_plots()
 	 * to tic marks, not only the min/max data values)
 	 *  --> save them now for writeback if requested
 	 */
-	SAVE_WRITEBACK_ALL_AXES;
+	save_writeback_all_axes();
 
 #ifdef VOLATILE_REFRESH
 	/* Mark these plots as safe for quick refresh */
