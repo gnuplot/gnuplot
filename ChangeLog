@@ -1,3 +1,9 @@
+2011-11-18  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/win/wgraph.c (CopyPrint): Use Print Setup dialog since the Page
+	Setup dialog does not offer a possibility to change printer. Do not
+	use antialiasing on printers.
+
 2011-11-15  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/win/wgnuplib.h src/win/wgraph.c term/win.trm: Store current

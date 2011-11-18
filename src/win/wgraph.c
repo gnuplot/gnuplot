@@ -1,5 +1,5 @@
 /*
- * $Id: wgraph.c,v 1.141 2011/11/14 21:03:38 markisch Exp $
+ * $Id: wgraph.c,v 1.142 2011/11/15 22:47:19 markisch Exp $
  */
 
 /* GNUPLOT - win/wgraph.c */
@@ -2480,43 +2480,49 @@ CopyPrint(LPGW lpgw)
 	DOCINFO docInfo;
 
 	HDC printer;
-	PAGESETUPDLG pg;
-	DEVNAMES* pDevNames;
-	DEVMODE* pDevMode;
+	PRINTDLG pd;
+	static DEVNAMES * pDevNames = NULL;
+	static DEVMODE * pDevMode = NULL;
 	LPCTSTR szDriver, szDevice, szOutput;
-	HWND hwnd;
+	HWND hwnd = lpgw->hWndGraph;
 	RECT rect;
 	GP_PRINT pr;
 
-	hwnd = lpgw->hWndGraph;
-
+	/* Print Setup Dialog */
 
 	/* See http://support.microsoft.com/kb/240082 */
+	_fmemset (&pd, 0, sizeof pd);
+	pd.lStructSize = sizeof pd;
+	pd.hwndOwner = hwnd;
+	pd.Flags = PD_PRINTSETUP;
+	pd.hDevNames = pDevNames;
+	pd.hDevMode = pDevMode;
 
-	_fmemset (&pg, 0, sizeof pg);
-	pg.lStructSize = sizeof pg;
-	pg.hwndOwner = hwnd;
-
-	if (!PageSetupDlg (&pg))
+	if (!PrintDlg(&pd))
 		return;
 
-	pDevNames = (DEVNAMES*) GlobalLock (pg.hDevNames);
-	pDevMode = (DEVMODE*) GlobalLock (pg.hDevMode);
+	pDevNames = (DEVNAMES *) GlobalLock(pd.hDevNames);
+	pDevMode = (DEVMODE *) GlobalLock(pd.hDevMode);
 
 	szDriver = (LPCTSTR)pDevNames + pDevNames->wDriverOffset;
 	szDevice = (LPCTSTR)pDevNames + pDevNames->wDeviceOffset;
 	szOutput = (LPCTSTR)pDevNames + pDevNames->wOutputOffset;
 
-	printer = CreateDC (szDriver, szDevice, szOutput, pDevMode);
+	printer = CreateDC(szDriver, szDevice, szOutput, pDevMode);
 
-	GlobalUnlock (pg.hDevMode);
-	GlobalUnlock (pg.hDevNames);
+	GlobalUnlock(pd.hDevMode);
+	GlobalUnlock(pd.hDevNames);
 
-	GlobalFree (pg.hDevMode);
-	GlobalFree (pg.hDevNames);
+	/* We no longer free these structures, but preserve them for the next time
+	GlobalFree(pd.hDevMode);
+	GlobalFree(pd.hDevNames);
+	*/
 
-	if (NULL == printer)
+	if (printer == NULL)
 		return;	/* abort */
+
+
+	/* Print Size Dialog */
 
 	if (!PrintSize(printer, hwnd, &rect)) {
 		DeleteDC(printer);
@@ -2527,36 +2533,41 @@ CopyPrint(LPGW lpgw)
 	SetWindowLong(hwnd, 4, (LONG)((GP_LPPRINT)&pr));
 	PrintRegister((GP_LPPRINT)&pr);
 
-	EnableWindow(hwnd,FALSE);
+	EnableWindow(hwnd, FALSE);
 	pr.bUserAbort = FALSE;
-	pr.hDlgPrint = CreateDialogParam(hdllInstance,"CancelDlgBox",hwnd,PrintDlgProc,(LPARAM)lpgw->Title);
-	SetAbortProc(printer,PrintAbortProc);
+	pr.hDlgPrint = CreateDialogParam(hdllInstance, "CancelDlgBox",
+									hwnd, PrintDlgProc, (LPARAM)lpgw->Title);
+	SetAbortProc(printer, PrintAbortProc);
 
 	memset(&docInfo, 0, sizeof(DOCINFO));
 	docInfo.cbSize = sizeof(DOCINFO);
 	docInfo.lpszDocName = lpgw->Title;
 
 	if (StartDoc(printer, &docInfo) > 0) {
+		bool aa = lpgw->antialiasing;
+		lpgw->sampling = 1;
+		lpgw->antialiasing = FALSE;
 		SetMapMode(printer, MM_TEXT);
-		SetBkMode(printer,OPAQUE);
+		SetBkMode(printer, OPAQUE);
 		StartPage(printer);
 		DestroyFonts(lpgw);
-		MakeFonts(lpgw, (RECT *)&rect, printer);
+		MakeFonts(lpgw, &rect, printer);
 		DestroyPens(lpgw);	/* rebuild pens */
 		MakePens(lpgw, printer);
-		drawgraph(lpgw, printer, (void *) &rect);
+		drawgraph(lpgw, printer, &rect);
 		if (EndPage(printer) > 0)
 			EndDoc(printer);
+		lpgw->antialiasing = aa;
 	}
 	if (!pr.bUserAbort) {
-		EnableWindow(hwnd,TRUE);
+		EnableWindow(hwnd, TRUE);
 		DestroyWindow(pr.hDlgPrint);
 	}
 	DeleteDC(printer);
 	SetWindowLong(hwnd, 4, (LONG)(0L));
 	PrintUnregister((GP_LPPRINT)&pr);
 	/* make certain that the screen pen set is restored */
-	SendMessage(lpgw->hWndGraph,WM_COMMAND,M_REBUILDTOOLS,0L);
+	SendMessage(lpgw->hWndGraph, WM_COMMAND, M_REBUILDTOOLS, 0L);
 	return;
 }
 
