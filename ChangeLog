@@ -1,3 +1,15 @@
+2011-11-18  Daniel Leidert  <dleidert@users.sourceforge.net>
+
+	* demo/html/webify.pl demo/html/webify_svg.pl demo/html/webify_canvas.pl
+	Use perl5 native routine ctime() rather than perl4 external module.
+
+	* src/datafile.c term/epson.trm term/post.trm:
+	Typos.
+
+	* configure.in: Check for lua5.1.pc if lua.pc is not found.
+
+	* man/gnuplot.1: Add some needed character escapes.
+
 2011-11-18  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/win/wgdiplus.cpp src/win/wgdiplus.h src/win/wgnuplib.h
