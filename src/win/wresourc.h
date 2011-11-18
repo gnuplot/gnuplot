@@ -1,5 +1,5 @@
 /*
- * $Id: wresourc.h,v 1.15 2011/09/09 18:29:37 markisch Exp $
+ * $Id: wresourc.h,v 1.16 2011/11/14 17:55:47 markisch Exp $
  */
 
 /* GNUPLOT - win/wresourc.h */
@@ -83,8 +83,9 @@
 #define M_OVERSAMPLE   NUMMENU+16
 #define M_ANTIALIASING NUMMENU+17
 #define M_POLYAA       NUMMENU+18
-#define M_HIDEGRID     NUMMENU+19
-#define M_HIDEPLOT     NUMMENU+20
+#define M_PATTERNAA    NUMMENU+19
+#define M_HIDEGRID     NUMMENU+20
+#define M_HIDEPLOT     NUMMENU+21
 /* Warning: need MAXPLOTSHIDE slots */
 
 /* wprinter.c */

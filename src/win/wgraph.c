@@ -1,5 +1,5 @@
 /*
- * $Id: wgraph.c,v 1.142 2011/11/15 22:47:19 markisch Exp $
+ * $Id: wgraph.c,v 1.143 2011/11/18 07:41:08 markisch Exp $
  */
 
 /* GNUPLOT - win/wgraph.c */
@@ -550,7 +550,9 @@ GraphInit(LPGW lpgw)
 	AppendMenu(lpgw->hPopMenu, MF_STRING | (lpgw->antialiasing ? MF_CHECKED : MF_UNCHECKED),
 		M_ANTIALIASING, "&Antialiasing");
 	AppendMenu(lpgw->hPopMenu, MF_STRING | (lpgw->polyaa ? MF_CHECKED : MF_UNCHECKED),
-		M_POLYAA, "Antialiasing of &Polygons");
+		M_POLYAA, "Antialiasing of Pol&ygons");
+	AppendMenu(lpgw->hPopMenu, MF_STRING | (lpgw->patternaa ? MF_CHECKED : MF_UNCHECKED),
+		M_PATTERNAA, "Antialiasing of Patt&erns");
 #endif
 	AppendMenu(lpgw->hPopMenu, MF_STRING, M_BACKGROUND, "&Background...");
 	AppendMenu(lpgw->hPopMenu, MF_STRING, M_CHOOSE_FONT, "Choose &Font...");
@@ -1765,6 +1767,21 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 			p.x = ppt[0].x;
 			p.y = ydash;
 
+#ifdef HAVE_GDIPLUS
+			if (lpgw->antialiasing && lpgw->patternaa &&
+			    (((fillstyle & 0x0f) == FS_PATTERN) ||
+			     ((fillstyle & 0x0f) == FS_TRANSPARENT_PATTERN))) {
+				ppt[1].x = ppt[0].x;
+				ppt[1].y = ydash;
+				ppt[2].x = xdash;
+				ppt[2].y = ydash;
+				ppt[3].x = xdash;
+				ppt[3].y = ppt[0].y;
+				ppt[4].x = ppt[0].x;
+				ppt[4].y = ppt[0].y;
+				gdiplusPatternFilledPolygonEx(hdc, ppt, 5, fill_color, 1., lpgw->background, transparent, pattern);
+			} else
+#endif
 			if (transparent) {
 				HDC memdc;
 				HBITMAP membmp, oldbmp;
@@ -1927,6 +1944,8 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 				if (lpgw->antialiasing && lpgw->polyaa && ((fillstyle & 0x0f) == FS_SOLID)) {
 					/* solid, antialiased fill */
 					gdiplusSolidFilledPolygonEx(hdc, ppt, polyi, fill_color, 1.0);
+				} else if (lpgw->antialiasing && lpgw->patternaa && ((fillstyle & 0x0f) == FS_PATTERN)) {
+					gdiplusPatternFilledPolygonEx(hdc, ppt, polyi, fill_color, 1., lpgw->background, transparent, pattern);
 				} else
 #endif
 				{
@@ -1939,6 +1958,8 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 #ifdef HAVE_GDIPLUS
 				if (lpgw->antialiasing && lpgw->polyaa && (fillstyle & 0x0f) == FS_TRANSPARENT_SOLID) {
 					gdiplusSolidFilledPolygonEx(hdc, ppt, polyi, fill_color, alpha);
+				} else if (lpgw->antialiasing && lpgw->patternaa && ((fillstyle & 0x0f) == FS_TRANSPARENT_PATTERN)) {
+					gdiplusPatternFilledPolygonEx(hdc, ppt, polyi, fill_color, 1., lpgw->background, transparent, pattern);
 				} else
 #endif
 				{
@@ -2611,6 +2632,8 @@ WriteGraphIni(LPGW lpgw)
 	WritePrivateProfileString(section, "GraphAntialiasing", profile, file);
 	wsprintf(profile, "%d", lpgw->polyaa);
 	WritePrivateProfileString(section, "GraphPolygonAA", profile, file);
+	wsprintf(profile, "%d", lpgw->patternaa);
+	WritePrivateProfileString(section, "GraphPatternAA", profile, file);
 	wsprintf(profile, "%d %d %d",GetRValue(lpgw->background),
 			GetGValue(lpgw->background), GetBValue(lpgw->background));
 	WritePrivateProfileString(section, "GraphBackground", profile, file);
@@ -2724,6 +2747,11 @@ ReadGraphIni(LPGW lpgw)
 		GetPrivateProfileString(section, "GraphPolygonAA", "", profile, 80, file);
 	if ((p = GetInt(profile, (LPINT)&lpgw->polyaa)) == NULL)
 		lpgw->polyaa = FALSE;
+
+	if (bOKINI)
+		GetPrivateProfileString(section, "GraphPatternAA", "", profile, 80, file);
+	if ((p = GetInt(profile, (LPINT)&lpgw->patternaa)) == NULL)
+		lpgw->patternaa = TRUE;
 
 	lpgw->background = RGB(255,255,255);
 	if (bOKINI)
@@ -3229,6 +3257,7 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 				case M_OVERSAMPLE:
 				case M_ANTIALIASING:
 				case M_POLYAA:
+				case M_PATTERNAA:
 				case M_CHOOSE_FONT:
 				case M_COPY_CLIP:
 				case M_SAVE_AS_EMF:
@@ -3445,6 +3474,10 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 					lpgw->polyaa = !lpgw->polyaa;
 					SendMessage(hwnd, WM_COMMAND, M_REBUILDTOOLS, 0L);
 					return 0;
+				case M_PATTERNAA:
+					lpgw->patternaa = !lpgw->patternaa;
+					SendMessage(hwnd, WM_COMMAND, M_REBUILDTOOLS, 0L);
+					return 0;
 				case M_CHOOSE_FONT:
 					SelFont(lpgw);
 					WIN_update_options();
@@ -3503,6 +3536,10 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 						CheckMenuItem(lpgw->hPopMenu, M_POLYAA, MF_BYCOMMAND | MF_CHECKED);
 					else
 						CheckMenuItem(lpgw->hPopMenu, M_POLYAA, MF_BYCOMMAND | MF_UNCHECKED);
+					if (lpgw->patternaa)
+						CheckMenuItem(lpgw->hPopMenu, M_PATTERNAA, MF_BYCOMMAND | MF_CHECKED);
+					else
+						CheckMenuItem(lpgw->hPopMenu, M_PATTERNAA, MF_BYCOMMAND | MF_UNCHECKED);
 #endif
 					if (lpgw->graphtotop)
 						CheckMenuItem(lpgw->hPopMenu, M_GRAPH_TO_TOP, MF_BYCOMMAND | MF_CHECKED);

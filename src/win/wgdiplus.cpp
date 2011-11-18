@@ -1,5 +1,5 @@
 /*
- * $Id: wgdiplus.cpp,v 1.3 2011/05/14 09:54:22 markisch Exp $
+ * $Id: wgdiplus.cpp,v 1.4 2011/05/14 15:40:37 markisch Exp $
  */
 
 /*
@@ -73,8 +73,8 @@ static Pen * gdiplusCreatePen(UINT style, float width, COLORREF color)
 		// cast is save since GDI and GDI+ use same numbers
 		pen->SetDashStyle(static_cast<DashStyle>(style));
 	pen->SetLineCap(LineCapFlat, LineCapFlat, DashCapFlat);
-	
-	return pen;	
+
+	return pen;
 }
 
 
@@ -143,6 +143,41 @@ void gdiplusSolidFilledPolygonEx(HDC hdc, POINT *ppt, int polyi, COLORREF color,
 	SolidBrush brush(gdipColor);
 	graphics.FillPolygon(&brush, points, polyi);
 	delete points;
+}
+
+
+void gdiplusPatternFilledPolygonEx(HDC hdc, POINT *ppt, int polyi, COLORREF color, double alpha, COLORREF backcolor, BOOL transparent, int style)
+{
+	gdiplusInit();
+	Graphics graphics(hdc);
+	graphics.SetSmoothingMode(SmoothingModeAntiAlias);
+
+	Color gdipColor = gdiplusCreateColor(color, alpha);
+	Color gdipBackColor = gdiplusCreateColor(backcolor, transparent ? 0 : 1.);
+	Brush * brush;
+	style %= 8;
+	const HatchStyle styles[] = { HatchStyleTotal, HatchStyleDiagonalCross,
+		HatchStyleZigZag, HatchStyleTotal,
+		HatchStyleForwardDiagonal, HatchStyleBackwardDiagonal,
+		HatchStyleLightDownwardDiagonal, HatchStyleDarkUpwardDiagonal };
+	switch (style) {
+		case 0:
+			brush = new SolidBrush(gdipBackColor);
+			break;
+		case 3:
+			brush = new SolidBrush(gdipColor);
+			break;
+		default:
+			brush = new HatchBrush(styles[style], gdipColor, gdipBackColor);
+	}
+	Point * points = new Point[polyi];
+	for (int i = 0; i < polyi; i++) {
+		points[i].X = ppt[i].x;
+		points[i].Y = ppt[i].y;
+	}
+	graphics.FillPolygon(brush, points, polyi);
+	delete(points);
+	delete(brush);
 }
 
 
