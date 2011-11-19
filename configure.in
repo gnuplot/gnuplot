@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot on Unix.
 dnl
-dnl $Id: configure.in,v 1.295 2011/11/06 09:30:59 markisch Exp $
+dnl $Id: configure.in,v 1.296 2011/11/08 20:07:10 sfeam Exp $
 dnl
 dnl this is actually major.minor ...
 dnl note that for a non-beta release, we need to
@@ -680,7 +680,7 @@ AC_ARG_WITH(lua,dnl
   [test -z "${with_lua}" && with_lua=yes])
 
 if test "${with_lua}" = yes ; then
-  PKG_CHECK_MODULES(LUA, [lua], LUAFOUND=yes, [LUAFOUND=no])
+  PKG_CHECK_MODULES(LUA, [lua], LUAFOUND=yes, [PKG_CHECK_MODULES(LUA, [lua5.1], LUAFOUND=yes, [LUAFOUND=no])])
   if test $pkg_failed != no; then
     AC_MSG_WARN([Could not find support for lua using pkg-config.])
     with_lua=no
