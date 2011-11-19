@@ -33,9 +33,8 @@
 #
 use Env qw(DEMOTERM GNUPLOT_LIB);
 
+use Time::localtime;
 use HTML::Entities;
-
-require "ctime.pl";
 
 # Use the in-tree copy of gnuplot if there is one
 	my $gnuplot = ( -x "../../src/gnuplot" ) ? "../../src/gnuplot" : "gnuplot" ;
@@ -43,7 +42,7 @@ require "ctime.pl";
 	if ((!defined $ENV{GNUPLOT_LIB}) || $GNUPLOT_LIB eq "") {
 	    $GNUPLOT_LIB = "..";
 	}
-	my $date = &ctime(time);
+	my $date = ctime();
 	my $plot = 1;
 
 # input and output files
