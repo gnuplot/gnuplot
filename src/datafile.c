@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.210 2011/10/10 21:17:04 juhaszp Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.211 2011/10/25 05:10:58 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -3963,7 +3963,7 @@ df_show_binary(FILE *fp)
     else
 	fprintf(fp, "none");
 
-    fprintf(fp, "\n\t  File Endianess: %s",
+    fprintf(fp, "\n\t  File Endianness: %s",
 	    df_endian[df_bin_file_endianess_default]);
 
     fprintf(fp, "\n\t  Default binary format: %s",

@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: post.trm,v 1.265 2011/11/07 18:40:48 markisch Exp $
+ * $Id: post.trm,v 1.266 2011/11/10 05:15:59 sfeam Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -2779,7 +2779,7 @@ write_color_space(t_sm_palette *palette)
 	fputs("(XYZ)", gppsfile);
 	break;
     default:
-	fprintf(stderr,"%s:%d ooops: Unkown color model '%c'. Will be RGB\n",
+	fprintf(stderr,"%s:%d ooops: Unknown color model '%c'. Will be RGB\n",
 		__FILE__, __LINE__, (char)(palette->cmodel));
 	fputs("(RGB)", gppsfile);
 	break;

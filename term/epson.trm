@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: epson.trm,v 1.24 2008/05/31 19:49:45 sfeam Exp $
+ * $Id: epson.trm,v 1.25 2008/05/31 20:23:44 sfeam Exp $
  *
  */
 
@@ -1012,7 +1012,7 @@ TERM_TABLE_END(epsonlx_driver)
 
 #ifdef NEC
     TERM_TABLE_START(nec_driver)
-    "nec_cp6", "NEC printer CP6, Epson LQ-800 [monocrome color draft]",
+    "nec_cp6", "NEC printer CP6, Epson LQ-800 [monochrome color draft]",
     NECXMAX, NECYMAX, NECVCHAR, NECHCHAR,
     NECVTIC, NECHTIC, NEC_options, NEC_init, EPSON_reset,
     NEC_text, null_scale, NEC_graphics, b_move, b_vector,
