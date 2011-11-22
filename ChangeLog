@@ -1,3 +1,9 @@
+2011-11-22  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/contour.c (contour): Format contour labels using gprintf rather
+	than sprintf so that LC_NUMERIC and "set decimal" are honored.
+	Bugfix.
+
 2011-11-22  Peter <plotter@piments.com>
 
 	* term/svg.trm: "standalone" option includes gnuplot_svg.js mousing
