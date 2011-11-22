@@ -4,6 +4,9 @@
 	than sprintf so that LC_NUMERIC and "set decimal" are honored.
 	Bugfix.
 
+	* term/js/gnuplot_svg.js: Try to correct for coordinate offset due to
+	scrollbars.  The fix is unfortunately browser specific.
+
 2011-11-22  Peter <plotter@piments.com>
 
 	* term/svg.trm: "standalone" option includes gnuplot_svg.js mousing

@@ -1,12 +1,12 @@
 /*
- * $Id: gnuplot_svg.js,v 1.6 2011/09/04 02:05:25 sfeam Exp $
+ * $Id: gnuplot_svg.js,v 1.7 2011/09/06 02:17:08 sfeam Exp $
  */
 // Javascript routines for interaction with SVG documents produced by 
 // gnuplot's SVG terminal driver.
 
 var gnuplot_svg = { };
 
-gnuplot_svg.version = "05 September 2011";
+gnuplot_svg.version = "22 November 2011";
 
 gnuplot_svg.SVGDoc = null;
 gnuplot_svg.SVGRoot = null;
@@ -51,9 +51,13 @@ gnuplot_svg.updateCoordBox = function(t, evt) {
      */
     var m = document.documentElement.getScreenCTM();
     var p = document.documentElement.createSVGPoint(); 
-    p.x = evt.clientX;
-    p.y = evt.clientY; 
+    p.x = evt.clientX; p.y = evt.clientY; 
     p = p.matrixTransform(m.inverse()); 
+
+    // Allow for scrollbar position (Firefox, others?)
+    if (typeof evt.pageX != 'undefined') {
+        p.x = evt.pageX; p.y = evt.pageY; 
+    }
     t.setAttribute("x", p.x);
     t.setAttribute("y", p.y);
    
