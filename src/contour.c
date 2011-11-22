@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: contour.c,v 1.27 2005/08/07 09:43:28 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: contour.c,v 1.28 2008/03/30 18:08:07 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - contour.c */
@@ -253,7 +253,9 @@ contour(int num_isolines, struct iso_curve *iso_lines)
 	gen_contours(p_edges, z, x_min, x_max, y_min, y_max);
 	if (contour_list != save_contour_list) {
 	    contour_list->isNewLevel = 1;
-	    sprintf(contour_list->label, contour_format, AXIS_DE_LOG_VALUE(FIRST_Z_AXIS,z));
+	    /* Nov-2011 Use gprintf rather than sprintf so that LC_NUMERIC is used */
+	    gprintf(contour_list->label, sizeof(contour_list->label), 
+		    contour_format, 1.0, AXIS_DE_LOG_VALUE(FIRST_Z_AXIS,z));
 	    contour_list->z = z;
 	}
     }
