@@ -1,5 +1,10 @@
-New features, changes and fixes since gnuplot version 4.4
+New features, changes and fixes since gnuplot version 4.6
 =========================================================
+
+
+
+New features, changes and fixes in gnuplot version 4.6
+======================================================
 
 * NEW individual plots can be toggled on/off by clicking on the key sample
       (wxt, svg, canvas, win)

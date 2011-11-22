@@ -1,5 +1,5 @@
 /*
- * $Id: eval.h,v 1.38 2011/08/27 11:18:01 juhaszp Exp $
+ * $Id: eval.h,v 1.39 2011/09/08 05:19:07 sfeam Exp $
  */
 
 /* GNUPLOT - eval.h */
@@ -49,7 +49,7 @@
 
 /* Type definitions */
 
-/* HBB 20010725: Moved here, from parse.h */
+/* These are used by add_action() to index the subroutine list ft[] in eval.c */
 enum operators {
     /* keep this in line with table in eval.c */
     PUSH, PUSHC, PUSHD1, PUSHD2, PUSHD, POP,

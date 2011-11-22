@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: eval.c,v 1.95 2011/09/08 05:19:07 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: eval.c,v 1.96 2011/11/10 05:15:58 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - eval.c */
@@ -72,12 +72,7 @@ static int s_p = -1;		/* stack pointer */
 static int jump_offset;		/* to be modified by 'jump' operators */
 
 /* The table of built-in functions */
-/* HBB 20010725: I've removed all the casts to type (FUNC_PTR) ---
- * According to ANSI/ISO C Standards it causes undefined behaviour if
- * you cast a function pointer to any other type, including a function
- * pointer with a different set of arguments, and then call the
- * function.  Instead, I made all these functions adhere to the common
- * type, directly */
+/* These must strictly parallel enum operators in eval.h */
 const struct ft_entry GPFAR ft[] =
 {
     /* internal functions: */
