@@ -538,7 +538,7 @@ NULL
 
 static const char *prologue_prologue_ps[] = {
 "%\n",
-"% Gnuplot Prolog Version 4.4 (August 2010)\n",
+"% Gnuplot Prolog Version 4.6 (November 2011)\n",
 "%\n",
 "%/SuppressPDFMark true def\n",
 "%\n",

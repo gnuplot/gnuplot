@@ -217,7 +217,7 @@ Readline issues:
   shared library. The file /usr/lib/libreadline.dylib is really a symlink to a
   compatibility layer over the BSD libedit library.  But the compatibility isn't
   complete, and in particular it is missing many of the routines used for readline
-  support by gnuplot. As of version 4.4.1, the ./configure script should be able
+  support by gnuplot. As of version 4.4, the ./configure script should be able
   to cope with this. But you will still be left without some of the functionality
   of the "real" libreadline.  For one thing, libedit doesn't handle UTF input.
   You have a couple of options:
