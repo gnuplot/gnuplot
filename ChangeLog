@@ -1,3 +1,9 @@
+2011-11-22  Peter <plotter@piments.com>
+
+	* term/svg.trm: "standalone" option includes gnuplot_svg.js mousing
+	support directly in the output *.svg file rather than linking to it
+	as an external resource.
+
 2011-11-18  Daniel Leidert  <dleidert@users.sourceforge.net>
 
 	* demo/html/webify.pl demo/html/webify_svg.pl demo/html/webify_canvas.pl

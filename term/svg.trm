@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: svg.trm,v 1.126 2011/10/22 16:18:42 sfeam Exp $
+ * $Id: svg.trm,v 1.127 2011/10/25 05:10:58 sfeam Exp $
  */
 
 /*------------------------------------------------------------------------------------------------------------------------------------
@@ -47,7 +47,7 @@
  *   Bitmap image support by creating and linking to external png files
  *   Mouse-tracking with coordinate readout.
  *
- * Contributed by <forgery69@users.sf.net>
+ * Contributed by <plotter@piments.com>
  *   Javascript code to toggle plots on/off
  */
 
@@ -120,6 +120,7 @@ static char *SVG_linecolor = NULL;
 static char *SVG_name = NULL;
 static char *SVG_scriptdir = NULL;
 static TBOOLEAN SVG_mouseable = FALSE;
+static TBOOLEAN SVG_standalone = FALSE;
 
 static TBOOLEAN SVG_groupFilledIsOpen = FALSE; /* open pm3d group flag*/
 
@@ -499,6 +500,12 @@ SVG_options ()
 	    continue;
 	}
 
+	if (almost_equals(c_token, "stand$alone")) {
+	    c_token++;
+	    SVG_standalone = TRUE;
+	    continue;
+	}
+
 	if (equals(c_token, "name")) {
 	    c_token++;
 	    SVG_name = try_to_get_string();
@@ -665,6 +672,11 @@ SVG_options ()
 	    "mousing ");
     }
 
+    if (SVG_standalone) {
+	sprintf(term_options + strlen(term_options),
+	    "standalone ");
+    }
+
     if (SVG_name) {
 	sprintf(term_options + strlen(term_options),
 	    "name \"%s\" ", SVG_name);
@@ -706,6 +718,7 @@ SVG_local_reset()
 	free(SVG_embedded_font);
     SVG_embedded_font = NULL;
     SVG_mouseable = FALSE;
+    SVG_standalone = FALSE;
     free(SVG_name);
     SVG_name = NULL;
     free(SVG_scriptdir);
@@ -883,9 +896,35 @@ SVG_init ()
 #endif
 
     if (SVG_mouseable) {
-	/* This is sufficient to support toggling plots on/off */
-	fprintf(gpoutfile,"<script type=\"text/javascript\" xlink:href=\"%sgnuplot_svg.js\"/>\n",
-	    SVG_scriptdir);
+	/* Inclusion of gnuplot_svg.js is sufficient to support toggling plots on/off */
+	if (!SVG_standalone) {
+ 	    fprintf(gpoutfile,
+		"<script type=\"text/javascript\" xlink:href=\"%sgnuplot_svg.js\"/>\n",
+		SVG_scriptdir);
+	} else {
+	    /* "standalone" option includes the mousing code in the file itself */
+	    char *fullname = NULL;
+	    char *name ="gnuplot_svg.js";
+	    char buf[256];
+	    FILE *svg_js_fd;
+
+	    fullname = gp_alloc(strlen(SVG_scriptdir) + strlen(name) + 4,"javascript name");
+	    strcpy(fullname, SVG_scriptdir);
+	    PATH_CONCAT(fullname, name);
+
+	    svg_js_fd=fopen(fullname, "r");
+	    if (!svg_js_fd)
+		int_warn(NO_CARET, "Failed to insert javascript file %s\n", fullname);
+ 	    else {
+		fprintf(gpoutfile,
+		    "<script language=\"javaScript\" TYPE=\"text/javascript\" > <![CDATA[\n");
+		while (fgets(buf, sizeof(buf), svg_js_fd))
+		    fputs(buf, gpoutfile);
+		fprintf(gpoutfile,"]]>\n</script>\n");
+		fclose(svg_js_fd);
+	    }
+	    free(fullname);
+	}
     }
 
     if (SVG_mouseable) {   /* FIXME: Should only do this for 2D plots */
