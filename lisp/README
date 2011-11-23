@@ -1,7 +1,7 @@
 
 This directory contains files for running Gnuplot from within emacs.
-This package was assembled by Bruce Ravel <ravel@phys.washington.edu>.
-See http://feff.phys.washington.edu/~ravel/gnuplot/ for the latest.
+This package was assembled by Bruce Ravel <bravel@bnl.gov>.
+See http://http://xafs.org/BruceRavel/GnuplotMode
 
 
 			       Contents
