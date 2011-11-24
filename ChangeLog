@@ -1,3 +1,10 @@
+2011-11-24  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/term_api.h src/misc.c src/hidden3d.c:  New flag LT_SINGLECOLOR
+	passed through to hidden3d to indicate that the user gave an explicit
+	surface color in the splot command.
+	Bugfix.
+
 2011-11-22  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* Branchpoint for 4.6

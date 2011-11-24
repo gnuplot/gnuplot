@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.137 2011/09/04 11:06:19 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.138 2011/10/15 04:01:21 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -958,6 +958,7 @@ lp_parse(struct lp_style_type *lp, TBOOLEAN allow_ls, TBOOLEAN allow_point)
 	if (set_pal) {
 	    lp->pm3d_color = newlp.pm3d_color;
 	    lp->use_palette = newlp.use_palette;
+	    new_lt = LT_SINGLECOLOR;
 	}
 	if (set_lw)
 	    lp->l_width = newlp.l_width;

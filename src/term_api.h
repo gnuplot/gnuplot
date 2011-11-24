@@ -1,5 +1,5 @@
 /*
- * $Id: term_api.h,v 1.96 2011/05/09 22:55:26 sfeam Exp $
+ * $Id: term_api.h,v 1.97 2011/11/04 22:13:40 sfeam Exp $
  */
 
 /* GNUPLOT - term_api.h */
@@ -57,6 +57,7 @@
 #define LT_UNDEFINED  (-5)
 #define LT_COLORFROMCOLUMN  (-6)	/* Used by hidden3d code */
 #define LT_DEFAULT    (-7)
+#define LT_SINGLECOLOR  (-8)		/* Used by hidden3d code */
 
 /* Constant value passed to (term->text_angle)(ang) to generate vertical
  * text corresponding to old keyword "rotate", which produced the equivalent
