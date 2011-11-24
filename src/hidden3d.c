@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.81 2011/09/08 05:44:03 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.82 2011/10/10 23:01:13 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - hidden3d.c */
@@ -1171,6 +1171,11 @@ build_networks(struct surface_points *plots, int pcount)
 	above = this_plot->hidden3d_top_linetype;
 	below = above + hiddenBacksideLinetypeOffset;
 
+	/* This is a special flag indicating that the user specified an	*/
+	/* explicit surface color in the splot command.			*/
+	if (above == LT_SINGLECOLOR-1)
+	    above = below = LT_SINGLECOLOR;
+
 	/* calculate the point symbol type: */
 	/* Assumes that upstream functions have made sure this is
 	 * initialized sensibly --- thou hast been warned */
@@ -1677,12 +1682,10 @@ draw_edge(p_edge e, p_vertex v1, p_vertex v2)
 	lptemp.pm3d_color.lt = varcolor;
     } else
 
-#if (0)
-    /* EAM FIXME: There is currently no way to catch explicit 'lc rgb' in the plot command */
-    if (color.type == TC_RGB && SOME_TEST_THAT_DOESNT_EXIST) {
+    /* This handles explicit 'lc rgb' in the plot command */
+    if (color.type == TC_RGB && e->style == LT_SINGLECOLOR) {
 	recolor = TRUE;
     } else
-#endif
 
     if (color.type == TC_RGB && e->lp == &border_lp) {
 	lptemp.pm3d_color.lt = varcolor;
