@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.260 2011/11/02 21:20:14 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.261 2011/11/14 20:50:10 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -2799,6 +2799,8 @@ show_range(AXIS_INDEX axis)
     SHOW_ALL_NL;
     if (axis_array[axis].datatype == DT_TIMEDATE)
 	fprintf(stderr, "\tset %sdata time\n", axis_defaults[axis].name);
+    else if (axis_array[axis].datatype == DT_DMS)
+	fprintf(stderr, "\tset %sdata geographic\n", axis_defaults[axis].name);
     fprintf(stderr,"\t");
     save_range(stderr, axis);
 }
@@ -2858,6 +2860,7 @@ show_data_is_timedate(AXIS_INDEX axis)
     SHOW_ALL_NL;
     fprintf(stderr, "\t%s is set to %s\n", axis_defaults[axis].name,
 	    axis_array[axis].datatype == DT_TIMEDATE ? "time" :
+	    axis_array[axis].datatype == DT_DMS ? "geographic" :
 	    "numerical");
 }
 

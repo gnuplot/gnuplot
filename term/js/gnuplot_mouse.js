@@ -1,7 +1,7 @@
 /*
- * $Id: gnuplot_mouse.js,v 1.15 2011/04/04 21:40:46 sfeam Exp $
+ * $Id: gnuplot_mouse.js,v 1.16 2011/09/04 02:05:25 sfeam Exp $
  */
-    gnuplot.mouse_version = "03 September 2011";
+    gnuplot.mouse_version = "24 November 2011";
 
 // Mousing code for use with gnuplot's 'canvas' terminal driver.
 // The functions defined here assume that the javascript plot produced by
@@ -161,12 +161,15 @@ gnuplot.mouse_update = function(e)
     polar = gnuplot.convert_to_polar(x,y);
     label_x = "ang= " + polar.ang.toPrecision(4);
     label_y = "R= " + polar.r.toPrecision(4);
-  } else if (typeof(gnuplot.plot_timeaxis_x) == "string" && gnuplot.plot_timeaxis_x != "") {
-    label_x = gnuplot.timefmt(x);
-    label_y = y.toPrecision(4);
   } else {
-    label_x = x.toPrecision(4);
-    label_y = y.toPrecision(4);
+    if (typeof(gnuplot.plot_timeaxis_x) == "string" && gnuplot.plot_timeaxis_x != "")
+      label_x = gnuplot.datafmt(x);
+    else
+      label_x = x.toPrecision(4);
+    if (typeof(gnuplot.plot_timeaxis_y) == "string" && gnuplot.plot_timeaxis_y != "")
+      label_y = gnuplot.datafmt(y);
+    else
+      label_y = y.toPrecision(4);
   }
 
   if (document.getElementById(gnuplot.active_plot_name + "_x"))
@@ -194,8 +197,12 @@ gnuplot.mouse_update = function(e)
   }
 }
 
-gnuplot.timefmt = function (x)
+gnuplot.datafmt = function (x)
 {
+  if (gnuplot.plot_timeaxis_x == "DMS") {
+    return gnuplot.convert_to_DMS(x);
+  }
+
   gnuplot.axisdate.setTime(1000. * (x + 946684800));
 
   if (gnuplot.plot_timeaxis_x == "DateTime") {
@@ -217,6 +224,20 @@ gnuplot.timefmt = function (x)
          + ("0" + minute).slice (-2) + ":"
          + ("0" + second).slice (-2);
   }
+}
+
+gnuplot.convert_to_DMS = function (x)
+{
+    var dms = {d:0, m:0, s:0};
+    deg = Math.abs(x);
+    dms.d = Math.floor(deg);
+    dms.m = Math.floor((deg - dms.d) * 60.);
+    dms.s = Math.floor((deg - dms.d) * 3600. - dms.m * 60.);
+    fmt = ((x<0)?"-":" ")
+        + dms.d.toFixed(0) + "°"
+	+ dms.m.toFixed(0) + "\""
+	+ dms.s.toFixed(0) + "'";
+    return fmt;
 }
 
 gnuplot.convert_to_polar = function (x,y)
@@ -249,10 +270,15 @@ gnuplot.saveclick = function (event)
   if (button == "LEFT") {
     ctx.strokeStyle="black";
     ctx.strokeRect(gnuplot.mousex, gnuplot.mousey, 1, 1);
-    if (typeof(gnuplot.plot_timeaxis_x) == "string" && gnuplot.plot_timeaxis_x != "") 
-      click = " " + gnuplot.timefmt(x) + ", " + y.toPrecision(4);
+    if (typeof(gnuplot.plot_timeaxis_x) == "string" && gnuplot.plot_timeaxis_x != "")
+      label_x = gnuplot.datafmt(x);
     else
-      click = " " + x.toPrecision(4) + ", " + y.toPrecision(4);
+      label_x = x.toPrecision(4);
+    if (typeof(gnuplot.plot_timeaxis_y) == "string" && gnuplot.plot_timeaxis_y != "")
+      label_y = gnuplot.datafmt(y);
+    else
+      label_y = y.toPrecision(4);
+    click = " " + label_x + ", " + label_y;
     ctx.drawText("sans", 9, gnuplot.mousex, gnuplot.mousey, click);
   }
 

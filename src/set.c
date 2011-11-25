@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.354 2011/11/12 11:19:00 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.355 2011/11/26 00:04:31 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -4736,6 +4736,9 @@ set_timedata(AXIS_INDEX axis)
     axis_array[axis].datatype = DT_NORMAL;
     if (almost_equals(c_token,"t$ime")) {
 	axis_array[axis].datatype = DT_TIMEDATE;
+	c_token++;
+    } else if (almost_equals(c_token,"geo$graphic")) {
+	axis_array[axis].datatype = DT_DMS;
 	c_token++;
     }
 }

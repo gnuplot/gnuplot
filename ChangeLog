@@ -3,6 +3,16 @@
 	* src/setshow.h src/unset.c src/axis.c src/graph3d.c src/plot3d.c
 	src/set.c src/term.c: Deal with more FIXMEs.
 
+	* src/axis.c src/axis.h src/mouse.c src/save.c src/set.c src/show.c
+	term/canvas.trm term/js/gnuplot_mouse.js term/js/gnuplot_svg.js
+	term/svg.trm demo/world.dem docs/gnuplot.doc:
+
+	New coordinate mode for geographic (DMS) data axes. 
+	`set xdata geographic` indicates that the x coordinate is to be
+	interpreted as a geographic coordinate measured in degrees.
+	Use `set format x` to establish how the coordinate appears as an axis
+	tick label. Similarly for the y axis.
+
 2011-11-24  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/term_api.h src/misc.c src/hidden3d.c:  New flag LT_SINGLECOLOR

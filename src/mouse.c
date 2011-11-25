@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: mouse.c,v 1.132 2011/10/25 05:10:58 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: mouse.c,v 1.133 2011/11/04 22:13:40 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - mouse.c */
@@ -396,7 +396,22 @@ zoombox_format()
 static char *
 GetAnnotateString(char *s, double x, double y, int mode, char *fmt)
 {
-    if (mode == MOUSE_COORDINATES_XDATE || mode == MOUSE_COORDINATES_XTIME || mode == MOUSE_COORDINATES_XDATETIME || mode == MOUSE_COORDINATES_TIMEFMT) {	/* time is on the x axis */
+    if (axis_array[FIRST_X_AXIS].datatype == DT_DMS
+    ||  axis_array[FIRST_Y_AXIS].datatype == DT_DMS) {
+	static char dms_format[16];
+	sprintf(dms_format, "%%D%s%%.2m'", degree_sign);
+	if (axis_array[FIRST_X_AXIS].datatype == DT_DMS)
+	    gstrdms(s, fmt ? fmt : dms_format, x);
+	else
+	    sprintf(s, mouse_setting.fmt, x);
+	strcat(s,", ");
+	s += strlen(s);
+	if (axis_array[FIRST_Y_AXIS].datatype == DT_DMS)
+	    gstrdms(s, fmt ? fmt : dms_format, y);
+	else
+	    sprintf(s, mouse_setting.fmt, y);
+	s += strlen(s);
+    } else if (mode == MOUSE_COORDINATES_XDATE || mode == MOUSE_COORDINATES_XTIME || mode == MOUSE_COORDINATES_XDATETIME || mode == MOUSE_COORDINATES_TIMEFMT) {	/* time is on the x axis */
 	char buf[0xff];
 	char format[0xff] = "[%s, ";
 	strcat(format, mouse_setting.fmt);
@@ -1781,8 +1796,8 @@ event_buttonrelease(struct gp_event_t *ge)
 	}
 	if (b == 2) {
 
-	    /* draw temporary annotation or label. For 3d plots this takes
-	     * only place, if the user didn't drag (scale) the plot */
+	    /* draw temporary annotation or label. For 3d plots this is
+	     * only done if the user didn't drag (scale) the plot */
 
 	    if (!is_3d_plot || !motion) {
 

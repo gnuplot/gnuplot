@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.97 2011/11/15 20:23:43 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.98 2011/11/26 00:04:31 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -894,6 +894,8 @@ gen_tics(AXIS_INDEX axis, tic_callback callback)
 		strncpy(label, mark->label, sizeof(label));
 	    else if (axis_array[axis].datatype == DT_TIMEDATE)
 		gstrftime(label, MAX_ID_LEN-1, mark->label ? mark->label : ticfmt[axis], mark->position);
+	    else if (axis_array[axis].datatype == DT_DMS)
+		gstrdms(label, mark->label ? mark->label : ticfmt[axis], mark->position);
 	    else
 		gprintf(label, sizeof(label), mark->label ? mark->label : ticfmt[axis], log10_base, mark->position);
 
@@ -1151,6 +1153,8 @@ gen_tics(AXIS_INDEX axis, tic_callback callback)
 			if (axis_array[axis].datatype == DT_TIMEDATE) {
 			    /* If they are doing polar time plot, good luck to them */
 			    gstrftime(label, MAX_ID_LEN-1, ticfmt[axis], (double) user);
+			} else if (axis_array[axis].datatype == DT_DMS) {
+			    gstrdms(label, ticfmt[axis], (double)user);
 			} else if (polar) {
 			    double min = (R_AXIS.autoscale & AUTOSCALE_MIN) ? 0 : R_AXIS.min;
 			    double r = fabs(user) + min;
@@ -1868,6 +1872,111 @@ add_tic_user(AXIS_INDEX axis, char *label, double position, int level)
 
     /* Make sure the listhead is kept */
     axis_array[axis].ticdef.def.user = listhead.next;
+}
+
+/*
+ * Degrees/minutes/seconds geographic coordinate format
+ * ------------------------------------------------------------
+ *  %D 			= integer degrees, truncate toward zero
+ *  %<width.precision>d	= floating point degrees
+ *  %M 			= integer minutes, truncate toward zero
+ *  %<width.precision>m	= floating point minutes
+ *  %S 			= integer seconds, truncate toward zero
+ *  %<width.precision>s	= floating point seconds
+ *  %E                  = E/W instead of +/-
+ *  %N                  = N/S instead of +/-
+ */
+void
+gstrdms (char *label, char *format, double value)
+{
+double Degrees, Minutes, Seconds;
+double degrees, minutes, seconds;
+int dtype = 0, mtype = 0, stype = 0;
+TBOOLEAN EWflag = FALSE;
+TBOOLEAN NSflag = FALSE;
+char compass = ' ';
+char *c, *cfmt;
+
+    /* Limit the range to +/- 180 degrees */
+    if (value > 180.)
+	value -= 360.;
+    if (value < -180.)
+	value += 360.;
+
+    degrees = fabs(value);
+    Degrees = floor(degrees);
+    minutes = (degrees - (double)Degrees) * 60.;
+    Minutes = floor(minutes);
+    seconds = (degrees - (double)Degrees) * 3600. -  (double)Minutes*60.;
+    Seconds = floor(seconds);
+
+    for (c = cfmt = gp_strdup(format); *c; ) {
+	if (*c++ == '%') {
+	    while (*c && !strchr("DdMmSsEN%",*c))
+		c++;
+	    switch (*c) {
+	    case 'D':	*c = 'g'; dtype = 1; degrees = Degrees; break;
+	    case 'd':	*c = 'f'; dtype = 2; break;
+	    case 'M':	*c = 'g'; mtype = 1; minutes = Minutes; break;
+	    case 'm':	*c = 'f'; mtype = 2; break;
+	    case 'S':	*c = 'g'; stype = 1; seconds = Seconds; break;
+	    case 's':	*c = 'f'; stype = 2; break;
+	    case 'E':	*c = 'c'; EWflag = TRUE; break;
+	    case 'N':	*c = 'c'; NSflag = TRUE; break;
+	    case '%':	int_error(NO_CARET,"unrecognized format: \"%s\"",format);
+	    }
+	}
+    }
+
+    /* By convention the minus sign goes only in front of the degrees */
+    /* Watch out for round-off errors! */
+    if (value < 0 && !EWflag && !NSflag) {
+	if (dtype > 0)  degrees = -fabs(degrees); 
+	else if (mtype > 0)  minutes = -fabs(minutes); 
+	else if (stype > 0)  seconds = -fabs(seconds); 
+    }
+    if (EWflag)
+	compass = (value == 0) ? ' ' : (value < 0) ? 'W' : 'E';
+    if (NSflag)
+	compass = (value == 0) ? ' ' : (value < 0) ? 'S' : 'N';
+
+    /* This is tricky because we have to deal with the possibility that
+     * the user may not have specified all the possible format components
+     */
+    if (dtype == 0) {	/* No degrees */
+	if (mtype == 0) {
+	    if (stype == 0) /* Must be some non-DMS format */
+		snprintf(label, MAX_ID_LEN, cfmt, value);
+	    else
+		snprintf(label, MAX_ID_LEN, cfmt,
+		    seconds, compass);
+	} else {
+	    if (stype == 0)
+		snprintf(label, MAX_ID_LEN, cfmt, 
+		    minutes, compass);
+	    else
+		snprintf(label, MAX_ID_LEN, cfmt, 
+		    minutes, seconds, compass);
+	}
+    } else {	/* Some form of degrees in first field */
+	if (mtype == 0) {
+	    if (stype == 0)
+		snprintf(label, MAX_ID_LEN, cfmt,
+		    degrees, compass);
+	    else
+		snprintf(label, MAX_ID_LEN, cfmt,
+		    degrees, seconds, compass);
+	} else {
+	    if (stype == 0)
+		snprintf(label, MAX_ID_LEN, cfmt, 
+		    degrees, minutes, compass);
+	    else
+		snprintf(label, MAX_ID_LEN, cfmt, 
+		    degrees, minutes, seconds, compass);
+	}
+    }
+
+    free(cfmt);
 }
 
 /*

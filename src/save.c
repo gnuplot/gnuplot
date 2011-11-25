@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.196 2011/10/10 21:17:04 juhaszp Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.197 2011/10/25 05:10:58 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -222,6 +222,7 @@ set bar %f %s\n",
 	if (axis == COLOR_AXIS) continue;
 	fprintf(fp, "set %sdata %s\n", axis_defaults[axis].name,
 		axis_array[axis].datatype == DT_TIMEDATE ? "time" :
+		axis_array[axis].datatype == DT_DMS ? "geographic" :
 		"");
     }
 

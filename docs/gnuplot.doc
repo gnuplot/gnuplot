@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.700 2011/11/10 07:30:52 markisch Exp $
+C RCS $Id: gnuplot.doc,v 1.701 2011/11/19 04:46:49 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -11876,31 +11876,61 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/population.gif" alt="[popu
 ?set xdata
 ?show xdata
 ?xdata
- This command sets the datatype on the x axis to time/date.  A similar command
- does the same thing for each of the other axes.
+ This command controls interpretation of data on the x axis.
+ An analogous command acts on each of the other axes.
 
  Syntax:
-       set xdata {time}
+       set xdata {time | geographic}
        show xdata
 
  The same syntax applies to `ydata`, `zdata`, `x2data`, `y2data` and `cbdata`.
 
- The `time` option signals that the datatype is indeed time/date.  If the
- option is not specified, the datatype reverts to normal.
+ The `time` option signals that data represents a time/date in seconds.
+ The current version of gnuplot stores time to a millisecond precision.
 
- See `set timefmt` to tell gnuplot how to read date or time data.  The
- time/date is converted to seconds from start of the century.  There is
+ The `geographic` option signals that data represents a geographical coordinate
+ measured in degrees/minutes/seconds.
+
+ If no option is specified, the data interpretation reverts to normal.
+4 time
+?commands set xdata time
+?set xdata time
+ `set xdata time` indicates that the x coordinate is to be interpreted as a
+ date or time to millisecond precision.
+
+ See `set timefmt` to tell gnuplot how to read date or time data from a file.
+ The time/date is converted to seconds from start of the century.  There is
  currently only one timefmt, which implies that all the time/date columns must
  conform to this format.  Specification of ranges should be supplied as quoted
  strings according to this format to avoid interpretation of the time/date as
  an expression.
 
- The function 'strftime' (type "man strftime" on unix to look it up) is used
- to print tic-mark labels.  `gnuplot` tries to figure out a reasonable format
- for this  unless the `set format x "string"` has supplied something that does
- not look like a decimal format (more than one '%' or neither %f nor %g).
-
+ By default the function 'strftime' (type "man strftime" on unix to look it up)
+ is used to label axis tickmarks.  `gnuplot` tries to figure out a reasonable
+ format for this.  You can customize the label format using `set format x`.
+ See `time_specifiers` for a special set of time format specifiers.
  See also `time/date` for more information.
+4 geographic
+?commands set xdata geographic
+?set xdata geographic
+?geographic
+ `set xdata geographic` indicates that the x coordinate is to be interpreted as
+ a geographic coordinate measured in degrees.  Use `set format x` to establish
+ how the coordinate appears as an axis tick label.  The format specifiers for
+ geographic data are as follows:
+        %D                   = integer degrees
+        %<width.precision>d  = floating point degrees
+        %M                   = integer minutes
+        %<width.precision>m  = floating point minutes
+        %S                   = integer seconds
+        %<width.precision>s  = floating point seconds
+        %E                   = label with E/W instead of +/-
+        %N                   = label with N/S instead of +/-
+ For example, the command `set format x "%Ddeg %5.2mmin %E"` will cause 
+ x coordinate -1.51 to be labeled as `" 1deg 30.60min W"`.
+
+ If no special format is provided, the coordinate will be reported as a decimal
+ number of degrees.
 3 xdtics
 ?commands set xdtics
 ?commands unset xdtics

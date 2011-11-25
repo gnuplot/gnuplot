@@ -1,5 +1,5 @@
 /*
- * $Id: axis.h,v 1.66 2011/10/25 05:10:58 sfeam Exp $
+ * $Id: axis.h,v 1.67 2011/11/15 20:23:43 sfeam Exp $
  *
  */
 
@@ -663,6 +663,8 @@ void widest_tic_callback __PROTO((AXIS_INDEX, double place, char *text,
 
 void get_position __PROTO((struct position *pos));
 void get_position_default __PROTO((struct position *pos, enum position_type default_type));
+
+void gstrdms __PROTO((char *label, char *format, double value));
 
 /* ------------ autoscaling of the color axis */
 #define NEED_PALETTE(plot) \

@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: canvas.trm,v 1.55 2011/10/25 05:10:58 sfeam Exp $
+ * $Id: canvas.trm,v 1.56 2011/10/28 23:37:06 sfeam Exp $
  *
  */
 
@@ -647,8 +647,16 @@ CANVAS_text()
 		: (mouse_mode == 5) ? "Time"
 		: "DateTime"
 		);
+	} else if (axis_array[FIRST_X_AXIS].datatype == DT_DMS) {
+	    fprintf(gpoutfile, "gnuplot.plot_timeaxis_x = \"%s\";\n",
+		(mouse_alt_string) ? mouse_alt_string : "DMS");
 	} else
 	    fprintf(gpoutfile, "gnuplot.plot_timeaxis_x = \"\";\n");
+	if (axis_array[FIRST_Y_AXIS].datatype == DT_DMS) {
+	    fprintf(gpoutfile, "gnuplot.plot_timeaxis_y = \"%s\";\n",
+		(mouse_alt_string) ? mouse_alt_string : "DMS");
+	} else
+	    fprintf(gpoutfile, "gnuplot.plot_timeaxis_y = \"\";\n");
 
     } /* End of section writing out variables for mousing */
 

@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: svg.trm,v 1.127 2011/10/25 05:10:58 sfeam Exp $
+ * $Id: svg.trm,v 1.128 2011/11/22 19:54:17 sfeam Exp $
  */
 
 /*------------------------------------------------------------------------------------------------------------------------------------
@@ -1110,9 +1110,15 @@ SVG_text ()
 		: (mouse_mode == 5) ? "Time"
 		: "DateTime"
 		);
-		
+	} else if (axis_array[FIRST_X_AXIS].datatype == DT_DMS) {
+	    fprintf(gpoutfile, "gnuplot_svg.plot_timeaxis_x = \"DMS\";\n");
 	} else
 	    fprintf(gpoutfile, "gnuplot_svg.plot_timeaxis_x = \"\";\n");
+
+	if (axis_array[FIRST_Y_AXIS].datatype == DT_DMS)
+	    fprintf(gpoutfile, "gnuplot_svg.plot_timeaxis_y = \"DMS\";\n");
+	else
+	    fprintf(gpoutfile, "gnuplot_svg.plot_timeaxis_y = \"\";\n");
 
 	fprintf(gpoutfile,"]]>\n</script>\n");
     } /* End of section writing out variables for mousing */
