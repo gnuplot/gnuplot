@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.353 2011/11/12 03:45:39 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.354 2011/11/12 11:19:00 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -91,7 +91,6 @@ static void set_degreesign __PROTO((char *));
 static void set_dummy __PROTO((void));
 static void set_encoding __PROTO((void));
 static void set_fit __PROTO((void));
-static void set_format __PROTO((void));
 static void set_grid __PROTO((void));
 static void set_hidden3d __PROTO((void));
 #ifdef GNUPLOT_HISTORY
@@ -661,7 +660,6 @@ set_command()
 
     }
 
-    /* FIXME - Should this be inside the iteration loop? */
     update_gpval_variables(0);
 
     set_iterator = cleanup_iteration(set_iterator);
@@ -1526,7 +1524,7 @@ set_fit()
 
 
 /* process 'set format' command */
-static void
+void
 set_format()
 {
     TBOOLEAN set_for_axis[AXIS_ARRAY_SIZE] = AXIS_ARRAY_INITIALIZER(FALSE);

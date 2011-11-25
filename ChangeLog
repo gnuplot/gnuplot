@@ -1,3 +1,8 @@
+2011-11-25  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/setshow.h src/unset.c src/axis.c src/graph3d.c src/plot3d.c
+	src/set.c src/term.c: Deal with more FIXMEs.
+
 2011-11-24  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/term_api.h src/misc.c src/hidden3d.c:  New flag LT_SINGLECOLOR

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.190 2011/10/25 05:10:58 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.191 2011/11/15 20:23:43 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -654,7 +654,7 @@ grid_nongrid_data(struct surface_points *this_plot)
 	    points->y = y;
 
 	    /* Honor requested x and y limits */
-	    /* FIXME: This code section was not in 4.2.  It imperfectly    */
+	    /* Historical note: This code was not in 4.0 or 4.2. It imperfectly */
 	    /* restores the clipping behaviour of version 3.7 and earlier. */
 	    if ((x < axis_array[x_axis].min && !(axis_array[x_axis].autoscale & AUTOSCALE_MIN))
 	    ||  (x > axis_array[x_axis].max && !(axis_array[x_axis].autoscale & AUTOSCALE_MAX))
@@ -944,8 +944,8 @@ get_3ddata(struct surface_points *this_plot)
 			"Wrong number of columns in input data - line %d",
 			df_line_number);
 
-	    /* FIXME: Work-around for hidden3d, which otherwise would use */
-	    /* the color of the vector midpoint rather than the endpoint. */
+	    /* Work-around for hidden3d, which otherwise would use the */
+	    /* color of the vector midpoint rather than the endpoint. */
 	    if (this_plot->plot_style == IMPULSES) {
 		if (this_plot->lp_properties.pm3d_color.type == TC_Z) {
 		    color = z;

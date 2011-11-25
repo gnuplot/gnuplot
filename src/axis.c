@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.96 2011/11/10 05:15:58 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.97 2011/11/15 20:23:43 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -549,7 +549,7 @@ quantize_normal_tics(double arg, int guide)
     /* with guide=20, we expect 2 <= posns <= 20 */
     double tics;
 
-    /* FIXME HBB 20020220: Looking at these, I would normally expect
+    /* HBB 20020220: Looking at these, I would normally expect
      * to see posns*tics to be always about the same size. But we
      * rather suddenly drop from 2.0 to 1.0 at tic step 0.5. Why? */
     /* JRV 20021117: fixed this by changing next to last threshold

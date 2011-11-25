@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.148 2011/11/10 05:15:58 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.149 2011/11/15 20:23:43 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -75,7 +75,6 @@ static void unset_dummy __PROTO((void));
 static void unset_encoding __PROTO((void));
 static void unset_decimalsign __PROTO((void));
 static void unset_fit __PROTO((void));
-static void unset_format __PROTO((void));
 static void unset_grid __PROTO((void));
 static void unset_hidden3d __PROTO((void));
 static void unset_histogram __PROTO((void));
@@ -212,7 +211,8 @@ unset_command()
 	unset_fit();
 	break;
     case S_FORMAT:
-	unset_format();
+	c_token--;
+	set_format();
 	break;
     case S_GRID:
 	unset_grid();
@@ -788,40 +788,6 @@ unset_fit()
     fitlogfile = NULL;
     fit_errorvariables = FALSE;
 }
-
-
-/* process 'unset format' command */
-/* FIXME: compare and merge with set.c::set_format */
-static void
-unset_format()
-{
-    TBOOLEAN set_for_axis[AXIS_ARRAY_SIZE] = AXIS_ARRAY_INITIALIZER(FALSE);
-    int axis;
-
-    if ((axis = lookup_table(axisname_tbl, c_token)) >= 0) {
-	set_for_axis[axis] = TRUE;
-    } else if (equals(c_token,"xy") || equals(c_token,"yx")) {
-	set_for_axis[FIRST_X_AXIS]
-	    = set_for_axis[FIRST_Y_AXIS]
-	    = TRUE;
-	c_token++;
-    } else if (isstring(c_token) || END_OF_COMMAND) {
-	/* Assume he wants all */
-	for (axis = 0; axis < AXIS_ARRAY_SIZE; axis++)
-	    set_for_axis[axis] = TRUE;
-    }
-
-    if (END_OF_COMMAND) {
-	SET_DEFFORMAT(FIRST_X_AXIS , set_for_axis);
-	SET_DEFFORMAT(FIRST_Y_AXIS , set_for_axis);
-	SET_DEFFORMAT(FIRST_Z_AXIS , set_for_axis);
-	SET_DEFFORMAT(SECOND_X_AXIS, set_for_axis);
-	SET_DEFFORMAT(SECOND_Y_AXIS, set_for_axis);
-	SET_DEFFORMAT(COLOR_AXIS   , set_for_axis);
-	SET_DEFFORMAT(POLAR_AXIS   , set_for_axis);
-    }
-}
-
 
 /* process 'unset grid' command */
 static void

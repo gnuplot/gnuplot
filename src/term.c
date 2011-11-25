@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.224 2011/09/04 11:08:33 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.225 2011/09/06 03:17:42 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -1175,8 +1175,8 @@ do_arrow(
     t_arrow_head head = (t_arrow_head)((headstyle < 0) ? -headstyle : headstyle);
 	/* negative headstyle means draw heads only, no shaft */
 
-    /* FIXME: The plan is to migrate calling routines to call via            */
-    /* draw_clip_arrow() in which case we would not need to clip again here. */
+    /* The arrow shaft was clipped already in do_clip_arrow() but we still */
+    /* need to clip the head here. */
     clip_save = clip_area;
     if (term->flags & TERM_CAN_CLIP)
 	clip_area = NULL;
