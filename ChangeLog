@@ -1,3 +1,10 @@
+2011-11-26  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/cairo.trm: Revert the change of 2011-08-25 that tried to skip 
+	empty vectors. The concept was sound but the implementation was not
+	correct, leading to mysteriously missing lines.
+	Bugfix.
+
 2011-11-26  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* config/mingw/Makefile: Support building of the Japanese help file
