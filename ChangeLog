@@ -1,3 +1,13 @@
+2011-11-26  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* config/config.nt config/config.mgw: Sync with config.h created by
+	autoconf.
+
+	* src/msvc/Makefile: More complete install target. Add new variables
+	to hold paths to external libraries.
+
+	src/mingw/Makefile: Include index in gnuplot.pdf.
+
 2011-11-26  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/cairo.trm: Revert the change of 2011-08-25 that tried to skip 
