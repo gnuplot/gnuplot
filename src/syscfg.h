@@ -1,5 +1,5 @@
 /*
- * $Id: syscfg.h,v 1.46 2011/04/16 11:15:55 markisch Exp $
+ * $Id: syscfg.h,v 1.47 2011/09/04 11:08:33 markisch Exp $
  */
 
 /* GNUPLOT - syscfg.h */
@@ -103,17 +103,18 @@
 # ifndef _Windows
 #  define _Windows
 # endif
-#  define OS "MS-Windows 32 bit"
+# define OS "MS-Windows 32 bit"
 /* introduced by Pedro Mendes, prm@aber.ac.uk */
 #  define far
 /* Fix for broken compiler headers
  * See stdfn.h
  */
-#  define S_IFIFO  _S_IFIFO
+# define S_IFIFO  _S_IFIFO
 # define HOME    "GNUPLOT"
 # define PLOTRC  "gnuplot.ini"
 # define SHELL   "\\command.com"
 # define DIRSEP1 '\\'
+# define DIRSEP2 '/'
 # define PATHSEP ';'
 # define GNUPLOT_HISTORY_FILE "~\\gnuplot_history"
 #endif /* _WINDOWS */
