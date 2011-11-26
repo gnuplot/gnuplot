@@ -1,5 +1,5 @@
 # Hello, emacs: this is a -*- Makefile -*-
-# $Id: Makefile,v 1.14 2011/10/01 20:55:36 markisch Exp $
+# $Id: Makefile,v 1.15 2011/11/26 13:59:23 markisch Exp $
 #
 # GNUPLOT Makefile for MinGW/MSYS on Windows
 # This assumes usual installation of the MinGW32 toolkit, the free
@@ -555,7 +555,7 @@ $(JASRC): $(D)gnuplot-ja.doc $(D)term-ja.diff $(CORETERM)
 	-mkdir $(JA)demo
 	cp -r $(TOP)/term/* $(JA)term/
 	cp -r $(TOP)/docs/* $(JA)docs/
-	cp $(TOP)/demo/*.dat $(JA)demo/
+	cp $(M)*.dat $(M)*.png $(M)*.rgb $(JA)demo/
 	# Apply patch for Japanese docs
 	-rm $(JAD)tex2ja.awk $(JAD)sjisenc.c
 	(cd $(JA) ; patch -p0 -i docs/term-ja.diff)
