@@ -1,5 +1,5 @@
 # Hello, emacs: this is a -*- Makefile -*-
-# $Id: Makefile,v 1.13 2011/09/12 18:44:06 markisch Exp $
+# $Id: Makefile,v 1.14 2011/10/01 20:55:36 markisch Exp $
 #
 # GNUPLOT Makefile for MinGW/MSYS on Windows
 # This assumes usual installation of the MinGW32 toolkit, the free
@@ -9,7 +9,7 @@
 # - Change the configuration section in 'config/mingw/Makfile' to
 #   match your setup.
 # - On the MSYS prompt, change directory to 'config/mingw' and issue the commands
-#	 make
+#	 make all
 #	 make install
 #
 # This makefile was tested with MSYS, MingW32 and Microsoft Help
@@ -21,6 +21,9 @@
 #
 
 # Comment out the definition lines to disable the according features:
+
+# Define this only if doing a release build
+#RELEASE=1
 
 # Use more modern HTML help instead of no longer supported Windows help system
 # Please update the HHWPATH below if necessary.
@@ -90,6 +93,7 @@ ICONV=1
 # Where to place the helpfile:
 ifdef HTML_HELP
   HELPFILE = wgnuplot.chm
+  HELPFILEJA = wgnuplot-ja.chm
 else
   HELPFILE = wgnuplot.hlp
 endif
@@ -105,7 +109,8 @@ GNUPLOT_JS_DIR = share/js
 GNUPLOT_LUA_DIR = share/lua
 
 # Destination directory, used in 'make install':
-DESTDIR = /local/opt/gnuplot-4.5
+#DESTDIR = /local/opt/gnuplot-4.5
+DESTDIR = "$(PROGRAMFILES)/gnuplot"
 
 # give here the path to MinGW compiler unless it is already in PATH
 #GCCPATH = g:/mingw32/bin/
@@ -152,7 +157,7 @@ GNUSORT = /bin/sort
 
 # Directory that might contain extra files to be shipped with the installer.
 # This should include dependencies like DLLs, but also fontconfig configuration files.
-EXTRADIST = /d/Software/gnuplot-misc/gp-dist
+#EXTRADIST = /d/Software/gnuplot-misc/gp-dist
 
 #
 # *************** End of Configuration section *************************
@@ -256,6 +261,10 @@ TERMFLAGS += -I$(TOP)/term
 TERMLIBS =
 
 CFLAGS += -I. -I$(S) -D_Windows -DHAVE_CONFIG_H $(OPTS)
+
+ifdef RELEASE
+  CFLAGS += -DRELEASE_VERSION
+endif
 
 ifdef MOUSE
   CFLAGS += -DUSE_MOUSE=1 -DWIN_IPC
@@ -397,9 +406,11 @@ pipes:
 docs:
 	$(MAKE) TARGET=gnuplot.exe gnuplot.pdf
 
-support: $(HELPFILE) $(M)bf_test.exe $(PGNUPLOT) $(LUATARGETS)
+support: $(HELPFILE) $(M)bf_test.exe $(PGNUPLOT) $(LUATARGETS) $(HELPFILEJA)
 
-all:	console windows pipes support docs
+ja: $(HELPFILEJA)
+
+all: $(S)/version.c console windows pipes support docs
 
 
 # include the 'core makefile template'
@@ -457,8 +468,10 @@ term.$(O): term.c term.h plot.h setshow.h bitmap.h $(CORETERM)
 
 version.$(O): $(S)/version.c
 
+ifndef RELEASE
 $(S)/version.c: $(TOP)/VERSION $(TOP)/PATCHLEVEL $(TOP)/ChangeLog $(S)/Makefile.maint
 	$(MAKE) -C $(S) -f Makefile.maint version.c
+endif
 
 WINDEPS = $(W)/wgnuplib.h $(W)/wcommon.h $(W)/wresourc.h $(W)/screenbuf.h $(W)/wgdiplus.h
 
@@ -513,7 +526,7 @@ geticon.exe: $(W)/geticon.c
 ifdef HTML_HELP
 # convert gnuplot.doc to windows/wgnuplot.html
 $(BUILDHELPFILE): doc2html.exe $(D)gnuplot.doc $(D)windows/wgnuplot.hhp $(D)windows/wgnuplot.hhk \
-                  $(D)windows/wgnuplot.stp $(D)plotstyles.gnu
+                  $(D)windows/wgnuplot.stp $(D)plotstyles.gnu $(CORETERM)
 	./doc2html $(D)gnuplot.doc $(D)windows/
 	-$(TARGET) -e "winhelp=1; cd '$(D)'" plotstyles.gnu
 	-$(HHC) $(D)windows/wgnuplot.hhp
@@ -527,8 +540,50 @@ $(HELPFILE): doc2rtf.exe $(D)gnuplot.doc win/wgnuplot.hpj
 	$(HCW) -c -e win/wgnuplot.hpj
 endif
 
+# Working directory for patched Japanese sources 
+JA = ja/
+JAD = $(JA)docs/
+JADW = $(JAD)windows/
+# Random file which receives patches by term-ja.diff to get dependicies right
+JASRC = $(JA)term/cairo.trm
+
+$(JASRC): $(D)gnuplot-ja.doc $(D)term-ja.diff $(CORETERM)
+	# Create a local copy of relevant sources
+	-mkdir $(JA)
+	-mkdir $(JA)term
+	-mkdir $(JAD)
+	-mkdir $(JA)demo
+	cp -r $(TOP)/term/* $(JA)term/
+	cp -r $(TOP)/docs/* $(JA)docs/
+	cp $(TOP)/demo/*.dat $(JA)demo/
+	# Apply patch for Japanese docs
+	-rm $(JAD)tex2ja.awk $(JAD)sjisenc.c
+	(cd $(JA) ; patch -p0 -i docs/term-ja.diff)
+
+wgnuplot-ja.chm: $(JASRC) doc2html-ja.exe \
+                  $(D)windows/wgnuplot.hhp $(D)windows/wgnuplot.hhk \
+                  $(D)windows/wgnuplot.stp $(D)plotstyles.gnu
+	# Create Japanese html source in EUC-JP encoding
+	./doc2html-ja $(JAD)gnuplot-ja.doc $(JADW)
+	# Change character encoding from EUC-JP to SHIFT-JIS
+	-iconv -c -s -f EUC-JP -t SHIFT-JIS $(JADW)wgnuplot.html > $(JADW)wgnuplot-ja.html
+	-iconv -c -s -f EUC-JP -t SHIFT-JIS $(JADW)wgnuplot.hhc > $(JADW)wgnuplot-ja.hhc
+	cp $(JADW)wgnuplot-ja.html $(JADW)wgnuplot.html
+	cp $(JADW)wgnuplot-ja.hhc $(JADW)wgnuplot.hhc
+	# Adjust Encoding and Language information
+	sed -i -e "s/charset=utf-8/charset=shift-jis/" $(JADW)wgnuplot.html
+	sed -i -e "s/charset=utf-8/charset=shift-jis/" $(JADW)wgnuplot.hhc
+	sed -i -e "s/Language=0x409 Englisch (USA)/Language=0x411 Japanisch (Japan)/" $(JADW)/wgnuplot.hhp
+	# Build help file
+	-$(TARGET) -e "winhelp=1; cd '$(JAD)'" plotstyles.gnu
+	-$(HHC) $(JADW)wgnuplot.hhp
+	cp $(JADW)wgnuplot.chm $(HELPFILEJA)
+
 doc2html.exe: $(D)windows/doc2html.c $(D)termdoc.c $(D)xref.c version.$(O)
 	$(LD) $(LDFLAGS) -o $@ -DWINDOWS_NO_GUI $(CFLAGS) -I. -I$(D:/=) -I$(T:/=) $^
+
+doc2html-ja.exe: $(JASRC) $(D)windows/doc2html.c $(D)termdoc.c $(D)xref.c version.$(O)
+	$(LD) $(LDFLAGS) -o $@ -DWINDOWS_NO_GUI -DJAPANESE_DOC $(CFLAGS) -I. -I$(JAD) -I$(JA)/term $(D)windows/doc2html.c $(D)termdoc.c $(D)xref.c version.$(O)
 
 doc2rtf.exe: $(D)doc2rtf.c $(D)termdoc.c $(D)xref.c
 	$(LD) $(LDFLAGS) -o $@ -DWINDOWS_NO_GUI $(CFLAGS) -I$(S) -I$(D) -I$(T) $^
@@ -537,7 +592,6 @@ doc2rtf.exe: $(D)doc2rtf.c $(D)termdoc.c $(D)xref.c
 $(M)bf_test.exe : bf_test.c dbinary.$(O) alloc.$(O)
 	$(LD) $(LDFLAGS) $(CFLAGS) -U_Windows -o $@ $^
 	(cd $(M) ; ./bf_test.exe )
-#	cd ..
 
 # _Windows causes wtext.h to define fread() etc
 dbinary.$(O): binary.c
@@ -636,11 +690,12 @@ clean:
 	$(RM) $(D)windows/wgnuplot.log $(D)windows/wgnuplot.hhc
 	$(RM) $(D)windows/*.png $(D)windows/wgnuplot.html
 	$(RM) -rf ./dist/
+	$(RM) -rf $(JA)
 
 realclean: veryclean
 veryclean: clean
 	$(RM) wgnuplot.exe wgnuplot_pipes.exe gnuplot.exe pgnuplot.exe
-	$(RM) $(HELPFILE) wgnuplot.chw wgnuplot.gid wgnuplot.mnu
+	$(RM) $(HELPFILE) $(HELPFILEJA) wgnuplot.chw wgnuplot.gid wgnuplot.mnu
 	$(RM) gnuplot.ps gnuplot.pdf
 	$(RM) $(M)binary[123] $(M)fit.log $(M)soundfit.par
 	$(RM) gnuplot-lua-tikz.sty gnuplot-lua-tikz.tex
@@ -656,7 +711,11 @@ install:
 	cp -p wgnuplot_pipes.exe $(DESTDIR)/bin/
 	cp -p pgnuplot.exe $(DESTDIR)/bin/
 	cp -p $(W)/wgnuplot.mnu $(DESTDIR)/bin/
+	cp -p $(W)/wgnuplot-ja.mnu $(DESTDIR)/bin/
 	cp -p $(HELPFILE) $(DESTDIR)/bin/
+ifdef HELPFILEJA
+	cp -p $(HELPFILEJA) $(DESTDIR)/bin/
+endif
 # terminal support files
 	mkdir -p $(DESTDIR)/$(GNUPLOT_PS_DIR)
 	cp -p $(TOP)/term/PostScript/*.ps $(DESTDIR)/$(GNUPLOT_PS_DIR)/
@@ -681,6 +740,8 @@ endif
 	cp -p $(TOP)/NEWS $(DESTDIR)/
 	cp -p $(TOP)/ChangeLog $(DESTDIR)/
 	cp -p $(TOP)/BUGS $(DESTDIR)/
+#	cp -p $(TOP)/win/README.Windows $(DESTDIR)/
+	cp -p $(TOP)/src/win/README.win-ja $(DESTDIR)/
 # demo and contrib
 	mkdir -p $(DESTDIR)/demo
 	-cp -p $(M)* $(DESTDIR)/demo/

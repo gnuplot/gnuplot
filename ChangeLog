@@ -1,3 +1,21 @@
+2011-11-26  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* config/mingw/Makefile: Support building of the Japanese help file
+	wgnuplot-ja.chm.
+
+	* src/win/wpause.c: Remove local definition of TBOOLEAN.
+
+	* docs/plotstyles.gnu: Prefer pngcairo over png terminal. Use font
+	"Times New Roman" on Windows.
+
+	* src/syscfg.h: All tested platforms (XP, Vista, 7) support '/' as
+	directory separator.
+
+	* src/eval.c (update_gpval_variables): New variable GPVAL_ENCODING.
+
+	* term/gd.trm (gd_iconv): Silence const mismatch compiler warning
+	in call to iconv by casting second argument to (void *).
+
 2011-11-25  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/setshow.h src/unset.c src/axis.c src/graph3d.c src/plot3d.c
