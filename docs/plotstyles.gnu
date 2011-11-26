@@ -4,12 +4,27 @@
 #
 #
 
+if (strstrt(GPVAL_TERMINALS, " windows ") == 0) {
+   fontspec = "Times,12"
+} else {
+   fontspec = "Times New Roman,12"
+}
+
 if (!exists("winhelp")) winhelp = 0
-if (winhelp==0) set term pdfcairo mono font "Times,12" size 3.5,2.0 dashlength 0.2
-if (winhelp==1) set term png font "Times,12" size 448,225 dashlength 0.2
+if (winhelp == 0) {
+    set term pdfcairo mono font fontspec size 3.5,2.0 dashlength 0.2
+    out = "./"
+} else {
+#   prefer pngcairo over gd based png
+    if (strstrt(GPVAL_TERMINALS, " pngcairo ") > 0) {
+        set term pngcairo font fontspec size 448,225 dashlength 0.2
+    } else {
+        set term png font fontspec size 448,225 dashlength 0.2
+    }
+    out = "./windows/"
+}
+
 demo = "../demo/"
-if (winhelp==0) out = "./"
-if (winhelp==1) out = "./windows/"
 
 if (GPVAL_TERM eq "pngcairo" || GPVAL_TERM eq "png") ext=".png"
 if (GPVAL_TERM eq "pdfcairo" || GPVAL_TERM eq "pdf") ext=".pdf"
@@ -196,9 +211,9 @@ unset title
 set key auto column noinvert
 set xtics 1 offset character 0,0.3
 plot newhistogram "Set A", \
-    '../demo/histopt.dat' u 1 t col, '' u 2 t col fs empty, \
+    demo . 'histopt.dat' u 1 t col, '' u 2 t col fs empty, \
     newhistogram "Set B" at 8, \
-    '../demo/histopt.dat' u 1 t col, '' u 2 t col fs empty
+    demo . 'histopt.dat' u 1 t col, '' u 2 t col fs empty
 #
 set output out . 'figure_histcols' . ext
 set style histogram columns
