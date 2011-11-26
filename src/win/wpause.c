@@ -1,6 +1,6 @@
-#ifndef lint
-static char *RCSid() { return RCSid("$Id: wpause.c,v 1.19 2011/03/20 18:47:47 markisch Exp $"); }
-#endif
+/*
+ * $Id: wpause.c,v 1.20 2011/05/05 19:10:06 markisch Exp $
+ */
 
 /* GNUPLOT - win/wpause.c */
 /*[
@@ -62,12 +62,7 @@ LRESULT CALLBACK PauseButtonProc(HWND, UINT, WPARAM, LPARAM);
 
 /* We need to hide "OK" and "Cancel" buttons on the pause dialog during
  * "pause mouse".
- * The following hack works for Mingw, and should probably for others too; if
- * you don't like it, then copy the whole definition of TBOOLEAN from syscfg.h.
  */
-#ifndef TBOOLEAN
-#define TBOOLEAN unsigned char
-#endif
 extern int paused_for_mouse;
 
 
