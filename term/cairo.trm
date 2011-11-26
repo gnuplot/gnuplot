@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: cairo.trm,v 1.50 2011/11/07 18:40:48 markisch Exp $
+ * $Id: cairo.trm,v 1.52 2011/11/27 05:26:23 sfeam Exp $
  */
 
 /* GNUPLOT - cairo.trm */
@@ -38,7 +38,7 @@
  * Modifications:
  *	Peter Danenberg, Ethan Merritt	- handle png output as well as pdf
  *	Peter Danenberg - crop for PNGs
- *	René Haber - added epscairo part and avoid useless calls to gp_cairo_vector (reduces file size)
+ *	René Haber - added epscairo terminal
  *	Bastian Maerkisch - cairolatex terminal
  */
 
@@ -228,9 +228,6 @@ static struct gen_table cairotrm_opts[] = {
     {"pdf", CAIROLATEX_PDF},
     {NULL, CAIROTRM_OTHER}
 };
-
-static int CT_pen_x;
-static int CT_pen_y;
 
 /* "Called when terminal type is selected. This procedure should parse options on the command line.
 * A list of the currently selected options should be stored in term_options[],
@@ -637,9 +634,6 @@ void cairotrm_init()
 	plot.device_ymax = (double) cairo_params->height;
 	plot.dashlength = cairo_params->dash_length;
 
-	CT_pen_x = 0;
-	CT_pen_y = 0;
-
 	/* is supposed to be done in cairotrm_reset */
 	if ( plot.cr )
 		cairo_destroy(plot.cr);
@@ -961,12 +955,7 @@ void cairotrm_move(unsigned int x, unsigned int y)
 
 void cairotrm_vector(unsigned int x, unsigned int y)
 {
-	int dx = x-CT_pen_x;
-	int dy = y-CT_pen_y;
-	if (dx == 0 && dy == 0) return;
 	gp_cairo_vector(&plot, x, term->ymax - y);
-	CT_pen_x = x;
-	CT_pen_y = y;
 }
 
 void cairotrm_put_text(unsigned int x, unsigned int y, const char * string)
