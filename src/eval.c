@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: eval.c,v 1.96 2011/11/10 05:15:58 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: eval.c,v 1.97 2011/11/24 05:08:35 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - eval.c */
@@ -48,6 +48,7 @@ static char *RCSid() { return RCSid("$Id: eval.c,v 1.96 2011/11/10 05:15:58 sfea
 #include "standard.h"
 #include "util.h"
 #include "version.h"
+#include "term_api.h"
 
 #include <signal.h>
 #include <setjmp.h>
@@ -84,7 +85,7 @@ const struct ft_entry GPFAR ft[] =
     {"pop",  f_pop},
     {"call",  f_call},
     {"calln",  f_calln},
-    {"sum", f_sum}, 
+    {"sum", f_sum},
     {"lnot",  f_lnot},
     {"bnot",  f_bnot},
     {"uminus",  f_uminus},
@@ -714,7 +715,7 @@ static void update_plot_bounds __PROTO((void));
 static void fill_gpval_axis __PROTO((AXIS_INDEX axis));
 static void set_gpval_axis_sth_double __PROTO((const char *prefix, AXIS_INDEX axis, const char *suffix, double value, int is_int));
 
-static void 
+static void
 set_gpval_axis_sth_double(const char *prefix, AXIS_INDEX axis, const char *suffix, double value, int is_int)
 {
     struct udvt_entry *v;
@@ -761,7 +762,7 @@ fill_gpval_string(char *var, const char *stringvalue)
     if (v->udv_undef == FALSE && !strcmp(v->udv_value.v.string_val, stringvalue))
 	return;
     if (v->udv_undef)
-	v->udv_undef = FALSE; 
+	v->udv_undef = FALSE;
     else
 	gpfree_string(&v->udv_value);
     Gstring(&v->udv_value, gp_strdup(stringvalue));
@@ -773,7 +774,7 @@ fill_gpval_integer(char *var, int value)
     struct udvt_entry *v = add_udv_by_name(var);
     if (!v)
 	return;
-    v->udv_undef = FALSE; 
+    v->udv_undef = FALSE;
     Ginteger(&v->udv_value, value);
 }
 
@@ -783,7 +784,7 @@ fill_gpval_float(char *var, double value)
     struct udvt_entry *v = add_udv_by_name(var);
     if (!v)
 	return;
-    v->udv_undef = FALSE; 
+    v->udv_undef = FALSE;
     Gcomplex(&v->udv_value, value, 0);
 }
 
@@ -793,7 +794,7 @@ fill_gpval_complex(char *var, double areal, double aimag)
     struct udvt_entry *v = add_udv_by_name(var);
     if (!v)
 	return;
-    v->udv_undef = FALSE; 
+    v->udv_undef = FALSE;
     Gcomplex(&v->udv_value, areal, aimag);
 }
 
@@ -847,7 +848,7 @@ update_gpval_variables(int context)
 	fill_gpval_float("GPVAL_VIEW_ZSCALE", surface_zscale);
 	return;
     }
-    
+
     /* These are set after every "set" command, which is kind of silly */
     /* because they only change after 'set term' 'set output' ...      */
     if (context == 0 || context == 2 || context == 3) {
@@ -857,9 +858,10 @@ update_gpval_variables(int context)
 	    fill_gpval_string("GPVAL_TERM", "unknown");
 	else
 	    fill_gpval_string("GPVAL_TERM", (char *)(term->name));
-	
+
 	fill_gpval_string("GPVAL_TERMOPTIONS", term_options);
 	fill_gpval_string("GPVAL_OUTPUT", (outstr) ? outstr : "");
+	fill_gpval_string("GPVAL_ENCODING", encoding_names[encoding]);
     }
 
     /* If we are called from int_error() then set the error state */
@@ -871,7 +873,7 @@ update_gpval_variables(int context)
 	struct udvt_entry *v = add_udv_by_name("GPVAL_VERSION");
 	char *tmp;
 	if (v && v->udv_undef == TRUE) {
-	    v->udv_undef = FALSE; 
+	    v->udv_undef = FALSE;
 	    Gcomplex(&v->udv_value, atof(gnuplot_version), 0);
 	}
 	v = add_udv_by_name("GPVAL_PATCHLEVEL");
@@ -889,6 +891,8 @@ update_gpval_variables(int context)
 	tmp = get_terminals_names();
 	fill_gpval_string("GPVAL_TERMINALS", tmp);
 	free(tmp);
+
+	fill_gpval_string("GPVAL_ENCODING", encoding_names[encoding]);
 
 	/* Permanent copy of user-clobberable variables pi and NaN */
 	fill_gpval_float("GPVAL_pi", M_PI);
@@ -925,7 +929,7 @@ gp_words(char *string)
 	push(Ginteger(&a,-1));
 	f_words((union argument *)NULL);
 	pop(&a);
-	
+
     return a.v.int_val;
 }
 
@@ -939,7 +943,7 @@ gp_word(char *string, int i)
 	push(Ginteger(&a,i));
 	f_words((union argument *)NULL);
 	pop(&a);
-	
+
     return a.v.string_val;
 }
 
