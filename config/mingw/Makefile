@@ -1,5 +1,5 @@
 # Hello, emacs: this is a -*- Makefile -*-
-# $Id: Makefile,v 1.15 2011/11/26 13:59:23 markisch Exp $
+# $Id: Makefile,v 1.16 2011/11/26 14:24:26 markisch Exp $
 #
 # GNUPLOT Makefile for MinGW/MSYS on Windows
 # This assumes usual installation of the MinGW32 toolkit, the free
@@ -301,7 +301,7 @@ ifdef PNG
 endif
 
 ifdef NEWGD
-  CFLAGS += -DHAVE_GD_GIF -DGIF_ANIMATION -DHAVE_GD_PNG
+  CFLAGS += -DHAVE_LIBGD -DHAVE_GD_H -DHAVE_GD_GIF -DGIF_ANIMATION -DHAVE_GD_PNG
 ifdef JPEG
   CFLAGS += -DHAVE_GD_JPEG
   ifndef BGD
@@ -653,13 +653,13 @@ gnuplot-figures.tex: $(D)gnuplot.doc doc2tex.exe
 	GNUPLOT_LIB=$(M) $(TARGET) $(D)plotstyles.gnu
 	doc2tex -figures $(D)gnuplot.doc gnuplot-figures.tex
 
-# Call LaTeX three times to get the toc right.
 gnuplot.dvi: gnuplot.tex $(TOP)/VERSION $(D)toc_entr.sty $(D)titlepag.tex
 	cp gnuplot.tex gp_tex2.tex
 	cp $(TOP)/VERSION .
 	cp -p $(D)toc_entr.sty .
 	cp -p $(D)titlepag.tex .
 	echo "" > pdffigures.tex
+	# Call LaTeX three times to get the toc right.
 	latex gp_tex2.tex && latex gp_tex2.tex && latex gp_tex2.tex
 	mv gp_tex2.dvi gnuplot.dvi
 	rm -f gp_tex2.*
@@ -668,12 +668,15 @@ gnuplot.ps: gnuplot.dvi
 
 gnuplot.pdf: gnuplot-figures.tex $(TOP)/VERSION $(D)toc_entr.sty $(D)titlepag.tex
 	cp gnuplot-figures.tex gp_tex2.tex
-	cp $(TOP)/VERSION .
-	cp -p $(D)toc_entr.sty .
-	cp -p $(D)titlepag.tex .
 	echo "\usepackage{graphicx}" > pdffigures.tex
 	echo "\usepackage{picins}" >> pdffigures.tex
-	pdflatex gp_tex2.tex && pdflatex gp_tex2.tex && pdflatex gp_tex2.tex
+	# Call LaTeX three times to get the toc right.
+	TEXINPUTS=.:$(TOP):$(D):${TEXINPUTS}: pdflatex gp_tex2.tex
+	TEXINPUTS=.:$(TOP):$(D):${TEXINPUTS}: pdflatex gp_tex2.tex
+	TEXINPUTS=.:$(TOP):$(D):${TEXINPUTS}: pdflatex gp_tex2.tex
+	# now include index
+	makeindex gp_tex2
+	TEXINPUTS=.:$(TOP):$(D):${TEXINPUTS}: pdflatex gp_tex2.tex
 	mv gp_tex2.pdf gnuplot.pdf
 	rm -f gp_tex2.*
 
