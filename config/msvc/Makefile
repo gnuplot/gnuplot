@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.1 2011/05/06 12:19:18 markisch Exp $
+# $Id: Makefile,v 1.2 2011/10/30 18:31:01 markisch Exp $
 #
 # GNUPLOT Makefile Microsoft Visual C++ 2005 or newer
 
@@ -54,6 +54,14 @@ LUA = 0
 # for HTML help (.chm) this should be 1, for (.hlp) it should be 0
 HTML_HELP = 1
 
+# Location of additional libraries
+GDDIR = gdwin32
+LUADIR = lua
+PDFDIR = pdflib
+
+# installation directory
+DESTDIR = "$(PROGRAMFILES)\gnuplot"
+
 TOP = ..\\..
 
 # directory for PostScript prolog and associated files
@@ -77,7 +85,7 @@ LD = link
 # /MD means include multi-thread support (DLL)
 CBASEFLAGS = /EHsc /GR /MD /O2 /nologo
 CFLAGS = $(CBASEFLAGS) /I. /I$(TOP) /I$(S) /D_Windows /DWIN32 /DHAVE_CONFIG_H /D__MSC__ /DHELPFILE=\"$(HELPFILE)\" $(OPTIONS)
-CONSOLE_CFLAGS = /DWGP_CONSOLE /DPIPES
+CONSOLE_CFLAGS = /DWGP_CONSOLE /DCONSOLE_SWITCH_CP /DPIPES
 OPTIONS = /DUSE_MOUSE
 OPTIONS = $(OPTIONS) /DGNUPLOT_HISTORY
 
@@ -94,15 +102,15 @@ COMMONLIBS = kernel32.lib user32.lib gdi32.lib winspool.lib \
 CONSOLELIBS = ole32.lib oleaut32.lib comctl32.lib
 
 !IF "$(GDLIB)" == "1"
-OPTIONS = $(OPTIONS) /DHAVE_LIBGD /DHAVE_GD_GIF /DGIF_ANIMATION /DHAVE_GD_PNG /DHAVE_GD_JPEG /DHAVE_GD_TTF
-OPTIONS = $(OPTIONS) /Igdwin32\include
-LDFLAGS = $(LDFLAGS) /libpath:gdwin32\lib
+OPTIONS = $(OPTIONS) /DHAVE_LIBGD /DHAVE_GD_H /DHAVE_GD_GIF /DGIF_ANIMATION /DHAVE_GD_PNG /DHAVE_GD_JPEG /DHAVE_GD_TTF
+OPTIONS = $(OPTIONS) /I$(GDDIR)\include
+LDFLAGS = $(LDFLAGS) /libpath:$(GDDIR)\lib
 !ENDIF
 
 !IF "$(PDFLIB)" == "1"
 OPTIONS = $(OPTIONS) /DHAVE_LIBPDF
-LDFLAGS = $(LDFLAGS) /libpath:pdflib\pdflib
-TERMFLAGS = $(TERMFLAGS) /Ipdflib\pdflib
+LDFLAGS = $(LDFLAGS) /libpath:$(PDFDIR)\pdflib
+TERMFLAGS = $(TERMFLAGS) /I$(PDFDIR)\pdflib
 !ENDIF
 
 !IF "$(WXT)" == "1"
@@ -113,8 +121,8 @@ WXTLIBS = glib-2.0.lib gobject-2.0.lib gmodule-2.0.lib \
 
 !IF "$(LUA)" == "1"
 OPTIONS = $(OPTIONS) /DHAVE_LUA
-OPTIONS = $(OPTIONS) /Ilua
-LDFLAGS = $(LDFLAGS) /libpath:lua
+OPTIONS = $(OPTIONS) /I$(LUADIR)/include
+LDFLAGS = $(LDFLAGS) /libpath:$(LUADIR)
 TERMFLAGS = $(TERMFLAGS) /DGNUPLOT_LUA_DIR=\"$(GNUPLOT_LUA_DIR)\"
 LUALIBS = lua51.lib
 !ENDIF
@@ -186,13 +194,19 @@ config.h: $(TOP)\config\config.nt
 wgnuplot.exe: $(OBJS) $(WINOBJS) wgnuplot.res linkopt-w.msw texticon.ico grpicon.ico
 	$(LD) /subsystem:windows $(LDFLAGS) /map:wgnuplot.map /out:$@ @linkopt-w.msw
 !IF "$(GDLIB)" == "1"
-	copy gdwin32\bin\bgd.dll .
+	copy $(GDDIR)\bin\*.dll .
+!ENDIF
+!IF "$(LUA)" == "1"
+	copy $(LUADIR)\*.dll .
 !ENDIF
 
 gnuplot.exe: $(ALL_CONSOLE_OBJS) wgnuplot.res linkopt-c.msw texticon.ico grpicon.ico
 	$(LD) /subsystem:console $(LDFLAGS) /map:wgnuplot.map /out:$@ @linkopt-c.msw
 !IF "$(GDLIB)" == "1"
-	copy gdwin32\bin\bgd.dll .
+	copy $(GDDIR)\bin\*.dll .
+!ENDIF
+!IF "$(LUA)" == "1"
+	copy $(LUADIR)\*.dll .
 !ENDIF
 
 pgnuplot.exe: $(W)pgnuplot.c
@@ -335,21 +349,32 @@ veryclean: clean
 	if exist $(M)soundfit.par del $(M)soundfit.par
 	if exist config.h del config.h
 
-install: default
+install:
 	if not exist $(DESTDIR) mkdir $(DESTDIR)
 	if not exist $(DESTDIR)\bin mkdir $(DESTDIR)\bin
 	copy /Y wgnuplot.exe $(DESTDIR)\bin
-	copy /Y win\wgnuplot.mnu $(DESTDIR)\bin
-	if exist wgnuplot.chm copy /Y wgnuplot.chm $(DESTDIR)\bin
-	if exist wgnuplot.hlp copy /Y wgnuplot.hlp $(DESTDIR)\bin
 	copy /Y pgnuplot.exe $(DESTDIR)\bin
 	copy /Y gnuplot.exe $(DESTDIR)\bin
+	copy /Y *gnuplot.exe.manifest $(DESTDIR)\bin
+	copy /Y $(W)wgnuplot.mnu $(DESTDIR)\bin
+	copy /Y $(W)wgnuplot-ja.mnu $(DESTDIR)\bin
+	if exist wgnuplot.chm copy /Y wgnuplot.chm $(DESTDIR)\bin
+	if exist wgnuplot-ja.chm copy /Y wgnuplot-ja.chm $(DESTDIR)\bin
+	if exist wgnuplot.hlp copy /Y wgnuplot.hlp $(DESTDIR)\bin
+	copy /Y *.dll $(DESTDIR)\bin
 	if not exist $(DESTDIR)\$(GNUPLOT_PS_DIR) mkdir $(DESTDIR)\$(GNUPLOT_PS_DIR)
-	xcopy /Y ..\term\PostScript\*.ps $(DESTDIR)\$(GNUPLOT_PS_DIR)
+	xcopy /Y $(T)PostScript\*.ps $(DESTDIR)\$(GNUPLOT_PS_DIR)
 	if not exist $(DESTDIR)\$(GNUPLOT_JS_DIR) mkdir $(DESTDIR)\$(GNUPLOT_JS_DIR)
-	xcopy /Y ..\term\js\*.* $(DESTDIR)\$(GNUPLOT_JS_DIR)
+	xcopy /Y $(T)js\*.* $(DESTDIR)\$(GNUPLOT_JS_DIR)
 	if not exist $(DESTDIR)\$(GNUPLOT_LUA_DIR) mkdir $(DESTDIR)\$(GNUPLOT_LUA_DIR)
-	xcopy /Y ..\term\lua\*.* $(DESTDIR)\$(GNUPLOT_LUA_DIR)
-	for %f in (BUGS README Copyright NEWS ChangeLog) do copy ..\%f $(DESTDIR)\%f
-	if not exist $(DESTDIR)\share\gnuplot\demo mkdir $(DESTDIR)\share\gnuplot\demo
-	xcopy /Y ..\demo $(DESTDIR)\share\gnuplot\demo
+	xcopy /Y $(T)lua\*.* $(DESTDIR)\$(GNUPLOT_LUA_DIR)
+	if not exist $(DESTDIR)\share\LaTeX mkdir $(DESTDIR)\share\LaTeX
+	copy /Y $(TOP)\share\LaTeX\README $(DESTDIR)\share\LaTeX
+	copy /Y $(TOP)\share\LaTeX\gnuplot.cfg $(DESTDIR)\share\LaTeX
+	for %f in (BUGS README Copyright NEWS ChangeLog) do copy $(TOP)\%f $(DESTDIR)\%f
+	if exist $(TOP)\win\README.Windows copy /Y $(TOP)\win\README.Windows $(DESTDIR)
+	copy /Y $(TOP)\src\win\README.win-ja $(DESTDIR)
+	if not exist $(DESTDIR)\demo mkdir $(DESTDIR)\demo
+	xcopy /Y $(TOP)\demo $(DESTDIR)\demo
+	if not exist $(DESTDIR)\contrib\pm3d mkdir $(DESTDIR)\contrib\pm3d
+	xcopy /Y $(TOP)\pm3d\contrib\*.* $(DESTDIR)\contrib\pm3d
