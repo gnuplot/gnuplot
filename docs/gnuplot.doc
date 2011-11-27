@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.701 2011/11/19 04:46:49 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.702 2011/11/26 00:31:14 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -222,7 +222,7 @@ Ffigure_newsyntax
            plot 0.5 + sum [k=1:TERMS] fourier(k,x) notitle 
        }
        unset multiplot
- 
+
  It is now possible to select a column of data from a data file by
  matching a label in the first row of the file. See `columnhead`.
  For example
