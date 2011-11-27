@@ -653,6 +653,8 @@
 
 	* term/term.c: Allow "set term eps" as short for "set term epscairo".
 
+	* term/cairo.trm: Test for and skip empty vectors.
+
 2011-08-24  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/command.c src/command.h src/win/winmain.c: "raise/lower <id>"
