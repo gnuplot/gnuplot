@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: fit.c,v 1.77 2011/10/25 05:10:58 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: fit.c,v 1.78 2011/11/15 20:23:43 sfeam Exp $"); }
 #endif
 
 /*  NOTICE: Change of Copyright Status
@@ -62,6 +62,7 @@ static char *RCSid() { return RCSid("$Id: fit.c,v 1.77 2011/10/25 05:10:58 sfeam
 #include "plot.h"
 #include "misc.h"
 #include "util.h"
+#include "scanner.h"  /* For legal_identifier() */
 #include "variable.h" /* For locale handling */
 
 /* Just temporary */
@@ -194,7 +195,6 @@ static void show_fit __PROTO((int i, double chisq, double last_chisq, double *a,
 			      double lambda, FILE * device));
 static void log_axis_restriction __PROTO((FILE *log_f, AXIS_INDEX axis, char *name));
 static TBOOLEAN is_empty __PROTO((char *s));
-static TBOOLEAN is_variable __PROTO((char *s));
 static double getdvar __PROTO((const char *varname));
 static int getivar __PROTO((const char *varname));
 static void setvar __PROTO((char *varname, struct value data));
@@ -878,20 +878,6 @@ get_next_word(char **s, char *subst)
 
 
 /*****************************************************************
-    check for variable identifiers
-*****************************************************************/
-static TBOOLEAN
-is_variable(char *s)
-{
-    while (*s != '\0') {
-	if (!isalnum((unsigned char) *s) && *s != '_')
-	    return FALSE;
-	s++;
-    }
-    return TRUE;
-}
-
-/*****************************************************************
     first time settings
 *****************************************************************/
 void
@@ -1074,7 +1060,7 @@ update(char *pfile, char *npfile)
 	    strcpy(tail, "\n");
 
 	tmp = get_next_word(&s, &c);
-	if (!is_variable(tmp) || strlen(tmp) > MAX_ID_LEN) {
+	if (!legal_identifier(tmp) || strlen(tmp) > MAX_ID_LEN) {
 	    (void) fclose(nf);
 	    (void) fclose(of);
 	    Eex2("syntax error in parameter file %s", fnam);
@@ -1620,7 +1606,7 @@ fit_command()
 	    if (is_empty(s))
 		continue;
 	    tmp = get_next_word(&s, &c);
-	    if (!is_variable(tmp) || strlen(tmp) > MAX_ID_LEN) {
+	    if (!legal_identifier(tmp) || strlen(tmp) > MAX_ID_LEN) {
 		(void) fclose(f);
 		Eex("syntax error in parameter file");
 	    }

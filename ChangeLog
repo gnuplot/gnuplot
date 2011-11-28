@@ -1,6 +1,6 @@
 2011-11-28  Ethan A Merritt  <merritt@u.washington.edu>
 
-	* src/scanner.c (legal_identifier) src/scanner.h src/stats.c:
+	* src/scanner.c (legal_identifier) src/scanner.h src/stats.c fit.c:
 	Make sure that the variable name produced by the "stats ... prefix"
 	command is a legal identifier.
 	Bug #3441395
