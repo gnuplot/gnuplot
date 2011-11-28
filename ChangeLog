@@ -5,6 +5,8 @@
 	command is a legal identifier.
 	Bug #3441395
 
+	* src/set.c (set_palette): Add missing check for conflicting options.
+
 2011-11-26  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/cairo.trm: Revert the change of 2011-08-25 that tried to skip 

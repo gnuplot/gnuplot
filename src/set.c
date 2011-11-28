@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.353 2011/11/12 03:45:39 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.354 2011/11/12 11:19:00 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -3126,11 +3126,10 @@ check_palette_grayscale()
     formula = i;										       \
 } while(0)
 
-#define CHECK_TRANSFORM  do {							  \
-    if (transform_defined)							  \
-	int_error(c_token,							  \
-		  "Use either `rgbformulae`, `defined`, `file` or `formulae`." ); \
-    transform_defined = 1;							  \
+#define CHECK_TRANSFORM  do {				\
+    if (transform_defined)				\
+	int_error(c_token, "conflicting options" );	\
+    transform_defined = 1;				\
 }  while(0)
 
 /* Process 'set palette' command */
@@ -3189,6 +3188,7 @@ set_palette()
 	    /* D A Green (2011)  http://arxiv.org/abs/1108.5083		     */
 	    case S_PALETTE_CUBEHELIX: { /* cubehelix */
 		TBOOLEAN done = FALSE;
+		CHECK_TRANSFORM;
 		sm_palette.colorMode = SMPAL_COLOR_MODE_CUBEHELIX;
 		sm_palette.cubehelix_start = 0.5;
 		sm_palette.cubehelix_cycles = -1.5;
