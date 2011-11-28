@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: scanner.c,v 1.30 2011/06/19 22:10:37 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: scanner.c,v 1.31 2011/09/04 11:08:33 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - scanner.c */
@@ -67,6 +67,17 @@ static void substitute __PROTO((char **strp, size_t *str_lenp, int current));
 				APPEND_TOKEN
 
 static int t_num;		/* number of token I'm working on */
+
+TBOOLEAN
+legal_identifier(char *p)
+{
+    if (!p || !(*p) || isdigit(*p))
+	return FALSE;
+    while (*p)
+	if (!isident(*p++))
+	    return FALSE;
+    return TRUE;
+}
 
 /*
  * scanner() breaks expression[] into lexical units, storing them in token[].

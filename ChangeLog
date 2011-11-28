@@ -1,3 +1,10 @@
+2011-11-28  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/scanner.c (legal_identifier) src/scanner.h src/stats.c:
+	Make sure that the variable name produced by the "stats ... prefix"
+	command is a legal identifier.
+	Bug #3441395
+
 2011-11-26  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* config/config.nt config/config.mgw: Sync with config.h created by

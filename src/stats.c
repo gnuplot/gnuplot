@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: stats.c,v 1.2 2011/10/25 05:10:58 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: stats.c,v 1.3 2011/11/15 20:23:43 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - stats.c */
@@ -41,6 +41,7 @@ static char *RCSid() { return RCSid("$Id: stats.c,v 1.2 2011/10/25 05:10:58 sfea
 #include "datafile.h"
 #include "gadgets.h"  /* For polar and parametric flags */
 #include "matrix.h"   /* For vector allocation */
+#include "scanner.h"  /* To check for legal prefixes */
 #include "variable.h" /* For locale handling */
 
 #include "stats.h"
@@ -846,8 +847,8 @@ statsrequest(void)
 	    c_token++;
 	    free ( prefix );
 	    prefix = try_to_get_string();
-	    if ( !strcmp ( "GPVAL_", prefix ) )
-		int_error( c_token, "GPVAL_ is forbidden as a prefix" );
+	    if (!legal_identifier(prefix) || !strcmp ("GPVAL_", prefix))
+		int_error( --c_token, "illegal prefix" );
 
 	}  else {
 	    int_error( c_token, "Expecting [no]output or prefix");
