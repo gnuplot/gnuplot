@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.702 2011/11/26 00:31:14 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.703 2011/11/27 22:21:35 markisch Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -2119,12 +2119,12 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/userdefined.gif" alt="[use
  The word "title" occurs with multiple meanings in `gnuplot`.  In this
  document, it will always be preceded by the adjective "plot", "line", or
  "key" to differentiate among them.
- A 2D graph may have up to four labelled `axes`.  The names of the four axes
+ A 2D graph may have up to four labeled `axes`.  The names of the four axes
  are "x" for the axis along the bottom border of the plot, "y" for the axis
  along the left border, "x2" for the top border, and "y2" for the right border.
  See `axes`.
 
- A 3D graph may have up to three labelled `axes` -- "x", "y" and "z".  It is
+ A 3D graph may have up to three labeled `axes` -- "x", "y" and "z".  It is
  not possible to say where on the graph any particular axis will fall because
  you can change the direction from which the graph is seen with `set view`.
 
@@ -6899,6 +6899,7 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/population.gif" alt="[popu
 
  Syntax:
        set autoscale {<axes>{|min|max|fixmin|fixmax|fix} | fix | keepfix}
+       set autoscale noextend
        unset autoscale {<axes>}
        show autoscale
 
@@ -6912,6 +6913,8 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/population.gif" alt="[popu
  axes using equidistant tics; `set autoscale fix` sets this for all axes.
  Command `set autoscale keepfix` autoscales all axes while keeping the fix
  settings.
+
+ `set autoscale noextend` is a synonym for `set autoscale fix`.
 
  When autoscaling, the axis range is automatically computed and the dependent
  axis (y for a `plot` and z for `splot`) is scaled to include the range of the
@@ -10687,6 +10690,7 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/population.gif" alt="[popu
 ?set size square
 ?set size ratio
 ?ratio
+?square
  Syntax:
        set size {{no}square | ratio <r> | noratio} {<xscale>,<yscale>}
        show size
@@ -10722,8 +10726,9 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/population.gif" alt="[popu
  the terminal selected.  The graph area will be the largest rectangle of
  aspect ratio <r> that will fit into the specified portion of the output
  (leaving adequate margins, of course).
+=square
 
- `square` is a synonym for `ratio 1`.
+ `set size square` is a synonym for `set size ratio 1`.
 
  Both `noratio` and `nosquare` return the graph to the default aspect ratio
  of the terminal, but do not return <xscale> or <yscale> to their default
@@ -11411,10 +11416,10 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/population.gif" alt="[popu
 ?unset tics
 ?show tics
 ?tics
- Control of the major (labelled) tics on all axes at once is possible with the
+ Control of the major (labeled) tics on all axes at once is possible with the
  `set tics` command.
 
- Fine control of the major (labelled) tics on all axes at once is possible
+ Fine control of the major (labeled) tics on all axes at once is possible
  with the `set tics` command.  The tics may be turned off with the `unset tics`
  command, and may be turned on (the default state) with `set tics`.  Similar
  commands (by preceding 'tics' by the axis name) control the major tics on a
@@ -11431,8 +11436,9 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/population.gif" alt="[popu
        unset tics
        show tics
 
- The options in the first set above can be applied individually to
- any or all axes, i.e., x, y, z, x2, y2, and cb.
+ The options can be applied to a single axis (x, y, z, x2, y2, cb), e.g.
+       set xtics rotate by -90
+       unset cbtics
 
  Set tics `front` or `back` applies to all axes at once, but only for 2D plots
  (not splot).  It controls whether the tics are placed behind or in front of
@@ -11445,7 +11451,7 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/population.gif" alt="[popu
  `set border`).  The relevant margin settings will usually be sized badly by
  the automatic layout algorithm in this case.
 
- `mirror` tells `gnuplot` to put unlabelled tics at the same positions on the
+ `mirror` tells `gnuplot` to put unlabeled tics at the same positions on the
  opposite border.  `nomirror` does what you think it does.
 
  `in` and `out` change the tic marks to be drawn inwards or outwards.
@@ -11477,7 +11483,7 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/population.gif" alt="[popu
  `set tics` with no options restores to place tics inwards. Every other
  options are retained.
 
- See also `set xtics` for more control of major (labelled) tic marks and
+ See also `set xtics` for more control of major (labeled) tic marks and
  `set mxtics` for control of minor tic marks.  These commands provide control
  at a axis by axis basis.
 3 ticslevel
@@ -11857,7 +11863,7 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/population.gif" alt="[popu
 ?show x2tics
 ?x2tics
 ?nox2tics
- The `set x2tics` command controls major (labelled) tics on the x2 (top) axis.
+ The `set x2tics` command controls major (labeled) tics on the x2 (top) axis.
  Please see `set xtics` for details.
 3 x2zeroaxis
 ?commands set x2zeroaxis
@@ -12167,7 +12173,7 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/population.gif" alt="[popu
 ?show xtics
 ?xtics
 ?noxtics
- Fine control of the major (labelled) tics on the x axis is possible with the
+ Fine control of the major (labeled) tics on the x axis is possible with the
  `set xtics` command.  The tics may be turned off with the `unset xtics`
  command, and may be turned on (the default state) with `set xtics`.  Similar
  commands control the major tics on the y, z, x2 and y2 axes.
@@ -12196,7 +12202,7 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/population.gif" alt="[popu
  tic labels to outside the border.  The relevant margin settings will usually
  be sized badly by the automatic layout algorithm in this case.
 
- `mirror` tells `gnuplot` to put unlabelled tics at the same positions on the
+ `mirror` tells `gnuplot` to put unlabeled tics at the same positions on the
  opposite border.  `nomirror` does what you think it does.
 
  `in` and `out` change the tic marks to be drawn inwards or outwards.
@@ -12296,8 +12302,8 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/population.gif" alt="[popu
        set ytics ("bottom" 0, "" 10, "top" 20)
        set ytics ("bottom" 0, "" 10 1, "top" 20)
 
- In the second example, all tics are labelled.  In the third, only the end
- tics are labelled.  In the fourth, the unlabeled tic is a minor tic.
+ In the second example, all tics are labeled.  In the third, only the end
+ tics are labeled.  In the fourth, the unlabeled tic is a minor tic.
 
  Normally if explicit tics are given, they are used instead of auto-generated
  tics. Conversely if you specify `set xtics auto` or the like it will erase
@@ -12317,7 +12323,7 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/population.gif" alt="[popu
  Format (or omission) of the tic labels is controlled by `set format`, unless
  the explicit text of a label is included in the `set xtics ("<label>")` form.
 
- Minor (unlabelled) tics can be added automatically by the `set mxtics`
+ Minor (unlabeled) tics can be added automatically by the `set mxtics`
  command, or at explicit positions by the `set xtics ("" <pos> 1, ...)` form.
 4 xtics time_data
 ?set xtics time_axis tics
@@ -12342,7 +12348,7 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/population.gif" alt="[popu
        set xrange ["01/12":"06/12"]
        set xtics ("01/12", "" "03/12", "05/12")
  Both of these will produce tics "Dec 1", "Dec 3", and "Dec 5", but in the
- second example the tic at "Dec 3" will be unlabelled.
+ second example the tic at "Dec 3" will be unlabeled.
 4 xtics rangelimited
 ?set xtics rangelimited
 ?xtics rangelimited
@@ -12459,7 +12465,7 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/population.gif" alt="[popu
 ?show y2tics
 ?y2tics
 ?noy2tics
- The `set y2tics` command controls major (labelled) tics on the y2 (right-hand)
+ The `set y2tics` command controls major (labeled) tics on the y2 (right-hand)
  axis.  Please see `set xtics` for details.
 3 y2zeroaxis
 ?commands set y2zeroaxis
@@ -12526,7 +12532,7 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/population.gif" alt="[popu
 ?show ytics
 ?ytics
 ?noytics
- The `set ytics` command controls major (labelled) tics on the y axis.
+ The `set ytics` command controls major (labeled) tics on the y axis.
  Please see `set xtics` for details.
 3 yzeroaxis
 ?commands set yzeroaxis
@@ -12681,7 +12687,7 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/population.gif" alt="[popu
 ?show ztics
 ?ztics
 ?noztics
- The `set ztics` command controls major (labelled) tics on the z axis.
+ The `set ztics` command controls major (labeled) tics on the z axis.
  Please see `set xtics` for details.
 3 cblabel
 ?commands set cblabel
@@ -12726,7 +12732,7 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/population.gif" alt="[popu
 ?show cbtics
 ?cbtics
 ?nocbtics
- The `set cbtics` command controls major (labelled) tics on the color box axis.
+ The `set cbtics` command controls major (labeled) tics on the color box axis.
  Please see `set xtics` for details.
 2 shell
 ?commands shell

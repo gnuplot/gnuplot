@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.253 2011/09/29 18:48:57 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.254 2011/11/26 00:04:31 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -240,7 +240,7 @@ find_maxl_keys3d(struct surface_points *plots, int count, int *kcnt)
     for (surf = 0; surf < count; this_plot = this_plot->next_sp, surf++) {
 
 	/* we draw a main entry if there is one, and we are
-	 * drawing either surface, or unlabelled contours
+	 * drawing either surface, or unlabeled contours
 	 */
 	if (this_plot->title && *this_plot->title && !this_plot->title_is_suppressed) {
 	    ++cnt;
@@ -1193,7 +1193,7 @@ do_3dplot(
 		if (key->visible && this_plot->title && this_plot->title[0]
 		    && !this_plot->title_is_suppressed
 		    && !draw_surface && !label_contours) {
-		    /* unlabelled contours but no surface : put key entry in now */
+		    /* unlabeled contours but no surface : put key entry in now */
 		    /* EAM - force key text to black, then restore */
 		    (*t->linetype)(LT_BLACK);
 		    key_text(xl, yl, this_plot->title);

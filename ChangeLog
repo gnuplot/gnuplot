@@ -5,6 +5,10 @@
 	command is a legal identifier.
 	Bug #3441395
 
+	* src/set.c (set_autoscale_axis): Remove unjustifiably large macros.
+
+	* docs/gnuplot.doc src/graph3d.c: Spelling, additional index keywords.
+
 2011-11-26  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* config/config.nt config/config.mgw: Sync with config.h created by
