@@ -1,3 +1,12 @@
+2011-11-29  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/qtterminal/QtGnuplotItems.cpp src/qtterminal/QtGnuplotItems.h
+	src/qtterminal/QtGnuplotScene.cpp:
+	- Pointsize is a double, not an integer (fractional sizes were being
+	truncated to zero).
+	- When a polygon is flushed, the final vertex must be kept as the
+	current position. Bug #3370540.
+
 2011-11-29  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* docs/Makefile.in:  Remove duplicate entry for qt in CORETERMS.

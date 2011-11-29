@@ -50,7 +50,7 @@
 class QtGnuplotPoint : public QGraphicsItem
 {
 public:
-	QtGnuplotPoint(int style, int size, QColor color, QGraphicsItem * parent = 0);
+	QtGnuplotPoint(int style, double size, QColor color, QGraphicsItem * parent = 0);
 
 public:
 	virtual QRectF boundingRect() const;

@@ -112,7 +112,7 @@ void QtGnuplotEnhancedFragment::paint(QPainter* painter, const QStyleOptionGraph
 /////////////////////////////
 // QtGnuplotPoint
 
-QtGnuplotPoint::QtGnuplotPoint(int style, int size, QColor color, QGraphicsItem * parent)
+QtGnuplotPoint::QtGnuplotPoint(int style, double size, QColor color, QGraphicsItem * parent)
 	: QGraphicsItem(parent)
 {
 	m_color = color;

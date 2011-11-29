@@ -122,7 +122,11 @@ void QtGnuplotScene::flushCurrentPolygon()
 void QtGnuplotScene::processEvent(QtGnuplotEventType type, QDataStream& in)
 {
 	if ((type != GEMove) && (type != GEVector) && !m_currentPolygon.empty())
+	{
+		QPointF point = m_currentPolygon.last();
 		flushCurrentPolygon();
+		m_currentPolygon << point;	// EAM DEBUG
+	}
 
 	if (type == GEClear)
 		resetItems();
@@ -200,8 +204,8 @@ void QtGnuplotScene::processEvent(QtGnuplotEventType type, QDataStream& in)
 	else if (type == GEPoint)
 	{
 		QPointF point; in >> point;
-		int size    ; in >> size;
-		QtGnuplotPoint* pointItem = new QtGnuplotPoint(size, m_currentPointSize, m_currentPen.color());
+		int style    ; in >> style;
+		QtGnuplotPoint* pointItem = new QtGnuplotPoint(style, m_currentPointSize, m_currentPen.color());
 		pointItem->setPos(clipPoint(point));
 		pointItem->setZValue(m_currentZ++);
 		addItem(pointItem);
