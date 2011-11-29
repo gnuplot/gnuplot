@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.355 2011/11/26 00:04:31 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.356 2011/11/26 00:31:15 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -811,13 +811,61 @@ assign_arrow_tag()
     return (last + 1);
 }
 
+/* helper routine for 'set autoscale' on a single axis */
+static TBOOLEAN
+set_autoscale_axis(AXIS_INDEX axis)
+{
+    char keyword[16];
+    AXIS *this = axis_array + axis;
+    char *name = (char *) &(axis_defaults[axis].name[0]);
+
+    if (equals(c_token, name)) {
+	this->set_autoscale = AUTOSCALE_BOTH;
+	this->min_constraint = CONSTRAINT_NONE;
+	this->max_constraint = CONSTRAINT_NONE;
+	++c_token;
+	return TRUE;
+    }
+    sprintf(keyword, "%smi$n", name);
+    if (almost_equals(c_token, keyword)) {
+	this->set_autoscale |= AUTOSCALE_MIN;
+	this->min_constraint = CONSTRAINT_NONE;
+	++c_token;
+	return TRUE;
+    }
+    sprintf(keyword, "%sma$x", name);
+    if (almost_equals(c_token, keyword)) {
+	this->set_autoscale |= AUTOSCALE_MAX;
+	this->max_constraint = CONSTRAINT_NONE;
+	++c_token;
+	return TRUE;
+    }
+    sprintf(keyword, "%sfix", name);
+    if (equals(c_token, keyword)) {
+	this->set_autoscale |= AUTOSCALE_FIXMIN | AUTOSCALE_FIXMAX;
+	++c_token;
+	return TRUE;
+    }
+    sprintf(keyword, "%sfixmi$n", name);
+    if (almost_equals(c_token, keyword)) {
+	this->set_autoscale |= AUTOSCALE_FIXMIN;
+	++c_token;
+	return TRUE;
+    }
+    sprintf(keyword, "%sfixma$x", name);
+    if (almost_equals(c_token, keyword)) {
+	this->set_autoscale |= AUTOSCALE_FIXMAX;
+	++c_token;
+	return TRUE;
+    }
+
+    return FALSE;
+}
 
 /* process 'set autoscale' command */
 static void
 set_autoscale()
 {
-    char min_string[20], max_string[20];
-
     c_token++;
     if (END_OF_COMMAND) {
 	int axis;
@@ -833,7 +881,7 @@ set_autoscale()
 	    axis_array[FIRST_Y_AXIS].max_constraint = CONSTRAINT_NONE;
 	c_token++;
 	return;
-    } else if (equals(c_token, "fix")) {
+    } else if (equals(c_token, "fix") || almost_equals(c_token, "noext$end")) {
 	int a = 0;
 	while (a < AXIS_ARRAY_SIZE) {
 	    axis_array[a].set_autoscale |= AUTOSCALE_FIXMIN | AUTOSCALE_FIXMAX;
@@ -849,63 +897,19 @@ set_autoscale()
 	return;
     }
 
-    /* save on replication with a macro */
-#define PROCESS_AUTO_LETTER(axis)					\
-    do {								\
-	AXIS *this = axis_array + axis;					\
-									\
-	if (equals(c_token, axis_defaults[axis].name)) {		\
-	    this->set_autoscale = AUTOSCALE_BOTH;			\
-	    this->min_constraint = CONSTRAINT_NONE;			\
-	    this->max_constraint = CONSTRAINT_NONE;			\
-	    ++c_token;							\
-	    return;							\
-	}								\
-	sprintf(min_string, "%smi$n", axis_defaults[axis].name);	\
-	if (almost_equals(c_token, min_string)) {			\
-	    this->set_autoscale |= AUTOSCALE_MIN;			\
-	    this->min_constraint = CONSTRAINT_NONE;			\
-	    ++c_token;							\
-	    return;							\
-	}								\
-	sprintf(max_string, "%sma$x", axis_defaults[axis].name);	\
-	if (almost_equals(c_token, max_string)) {			\
-	    this->set_autoscale |= AUTOSCALE_MAX;			\
-	    this->max_constraint = CONSTRAINT_NONE;			\
-	    ++c_token;							\
-	    return;							\
-	}								\
-	sprintf(min_string, "%sfix", axis_defaults[axis].name);		\
-	if (equals(c_token, min_string)) {				\
-	    this->set_autoscale |= AUTOSCALE_FIXMIN | AUTOSCALE_FIXMAX;	\
-	    ++c_token;							\
-	    return;							\
-	}								\
-	sprintf(min_string, "%sfixmi$n", axis_defaults[axis].name);	\
-	if (almost_equals(c_token, min_string)) {			\
-	    this->set_autoscale |= AUTOSCALE_FIXMIN;			\
-	    ++c_token;							\
-	    return;							\
-	}								\
-	sprintf(max_string, "%sfixma$x", axis_defaults[axis].name);	\
-	if (almost_equals(c_token, max_string)) {			\
-	    this->set_autoscale |= AUTOSCALE_FIXMAX;			\
-	    ++c_token;							\
-	    return;							\
-	}								\
-    } while(0)
+    if (set_autoscale_axis(FIRST_X_AXIS)) return;
+    if (set_autoscale_axis(FIRST_Y_AXIS)) return;
+    if (set_autoscale_axis(FIRST_Z_AXIS)) return;
+    if (set_autoscale_axis(SECOND_X_AXIS)) return;
+    if (set_autoscale_axis(SECOND_Y_AXIS)) return;
+    if (set_autoscale_axis(COLOR_AXIS)) return;
+    if (set_autoscale_axis(POLAR_AXIS)) return;
+    /* FIXME: Do these commands make any sense? */
+    if (set_autoscale_axis(T_AXIS)) return;
+    if (set_autoscale_axis(U_AXIS)) return;
+    if (set_autoscale_axis(V_AXIS)) return;
 
-    PROCESS_AUTO_LETTER(POLAR_AXIS);
-    PROCESS_AUTO_LETTER(T_AXIS);
-    PROCESS_AUTO_LETTER(U_AXIS);
-    PROCESS_AUTO_LETTER(V_AXIS);
-    PROCESS_AUTO_LETTER(FIRST_X_AXIS);
-    PROCESS_AUTO_LETTER(FIRST_Y_AXIS);
-    PROCESS_AUTO_LETTER(FIRST_Z_AXIS);
-    PROCESS_AUTO_LETTER(SECOND_X_AXIS);
-    PROCESS_AUTO_LETTER(SECOND_Y_AXIS);
-    PROCESS_AUTO_LETTER(COLOR_AXIS);
-    /* came here only if nothing found: */
+    /* come here only if nothing found: */
 	int_error(c_token, "Invalid range");
 }
 
@@ -3114,29 +3118,20 @@ check_palette_grayscale()
     sm_palette.gradient[sm_palette.gradient_num-1].pos = 1.0;
 }
 
-
-#define SCAN_RGBFORMULA(formula) do {								       \
-    c_token++;											       \
-    i = int_expression();										       \
-    if (abs(i) >= sm_palette.colorFormulae)							       \
-	int_error(c_token,									       \
-		  "color formula out of range (use `show palette rgbformulae' to display the range)"); \
-    formula = i;										       \
-} while(0)
-
-#define CHECK_TRANSFORM  do {							  \
-    if (transform_defined)							  \
-	int_error(c_token,							  \
-		  "Use either `rgbformulae`, `defined`, `file` or `formulae`." ); \
-    transform_defined = 1;							  \
+#define CHECK_TRANSFORM  do {				  \
+    if (transform_defined)				  \
+	int_error(c_token, "inconsistent palette options" ); \
+    transform_defined = 1;				  \
 }  while(0)
 
 /* Process 'set palette' command */
 static void
 set_palette()
 {
-    int transform_defined, named_color;
-    transform_defined = named_color = 0;
+    int transform_defined = 0;
+    int named_color = 0;
+    char *formerr = "color formula out of range (use `show palette rgbformulae' to display the range)";
+
     c_token++;
 
     if (END_OF_COMMAND) /* reset to default settings */
@@ -3165,19 +3160,34 @@ set_palette()
 		if (pm3d_last_set_palette_mode != SMPAL_COLOR_MODE_NONE) {
 		    sm_palette.colorMode = pm3d_last_set_palette_mode;
 		} else {
-		sm_palette.colorMode = SMPAL_COLOR_MODE_RGB;
+		    sm_palette.colorMode = SMPAL_COLOR_MODE_RGB;
 		}
 		continue;
 	    /* rgb color mapping formulae: rgb$formulae r,g,b (3 integers) */
 	    case S_PALETTE_RGBFORMULAE: { /* "rgb$formulae" */
 		int i;
+		char * formerr = "color formula out of range (use `show palette rgbformulae' to display the range)";
 
 		CHECK_TRANSFORM;
-		SCAN_RGBFORMULA( sm_palette.formulaR );
-		if (!equals(c_token,",")) { c_token--; continue; }
-		SCAN_RGBFORMULA( sm_palette.formulaG );
-		if (!equals(c_token,",")) { c_token--; continue; }
-		SCAN_RGBFORMULA( sm_palette.formulaB );
+		c_token++;
+		i = int_expression();
+		if (abs(i) >= sm_palette.colorFormulae)
+		    int_error(c_token, formerr);
+		sm_palette.formulaR = i;
+		if (!equals(c_token--,","))
+		    continue;
+		c_token += 2;
+		i = int_expression();
+		if (abs(i) >= sm_palette.colorFormulae)
+		    int_error(c_token, formerr);
+		sm_palette.formulaG = i;
+		if (!equals(c_token--,","))
+		    continue;
+		c_token += 2;
+		i = int_expression();
+		if (abs(i) >= sm_palette.colorFormulae)
+		    int_error(c_token, formerr);
+		sm_palette.formulaB = i;
 		c_token--;
 		sm_palette.colorMode = SMPAL_COLOR_MODE_RGB;
 		pm3d_last_set_palette_mode = SMPAL_COLOR_MODE_RGB;
@@ -3187,6 +3197,7 @@ set_palette()
 	    /* D A Green (2011)  http://arxiv.org/abs/1108.5083		     */
 	    case S_PALETTE_CUBEHELIX: { /* cubehelix */
 		TBOOLEAN done = FALSE;
+		CHECK_TRANSFORM;
 		sm_palette.colorMode = SMPAL_COLOR_MODE_CUBEHELIX;
 		sm_palette.cubehelix_start = 0.5;
 		sm_palette.cubehelix_cycles = -1.5;
@@ -3279,7 +3290,6 @@ set_palette()
 }
 
 #undef CHECK_TRANSFORM
-#undef SCAN_RGBFORMULA
 
 /* process 'set colorbox' command */
 static void
