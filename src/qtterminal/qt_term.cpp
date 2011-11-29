@@ -238,6 +238,20 @@ void qt_init()
 	else if (pid == 0) // Child: start the GUI
 	{
 		signal(SIGINT, SIG_IGN); // Do not listen to SIGINT signals anymore
+
+#ifndef HAVE_QT_47
+		/* 
+		 * FIXME: EAM Nov 2011
+		 * It is better to use environmental variable
+		 * QT_GRAPHICSSYSTEM but this requires qt >= 4.7
+		 * "raster" is ~5x faster than "native" (default).
+		 * Unfortunately "opengl" isn't recognized on my test systems :-(
+		 */
+		// This makes a huge difference to the speed of polygon rendering.
+		// Alternatives are "native", "raster", "opengl"
+		QApplication::setGraphicsSystem("raster");
+#endif
+
 		QtGnuplotApplication application(argc, (char**)( NULL));
 
 		// Load translations for the qt library

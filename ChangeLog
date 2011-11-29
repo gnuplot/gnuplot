@@ -1,11 +1,15 @@
 2011-11-29  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/qtterminal/QtGnuplotItems.cpp src/qtterminal/QtGnuplotItems.h
-	src/qtterminal/QtGnuplotScene.cpp:
+	src/qtterminal/QtGnuplotScene.cpp src/qtterminal/qt_term.cpp
+	configure.in:
 	- Pointsize is a double, not an integer (fractional sizes were being
-	truncated to zero).
+	  truncated to zero).
 	- When a polygon is flushed, the final vertex must be kept as the
-	current position. Bug #3370540.
+	  current position. Bug #3370540.
+	- The default rendering ("native") is pathetically slow for polygons.
+	  If the Qt version is >= 4.7 this can be changed using environmental
+	  variable QT_GRAPHICSSYSTEM.  Otherwise we force it to "raster".
 
 2011-11-29  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
