@@ -2,7 +2,7 @@
 
 	* src/qtterminal/QtGnuplotItems.cpp src/qtterminal/QtGnuplotItems.h
 	src/qtterminal/QtGnuplotScene.cpp src/qtterminal/qt_term.cpp
-	configure.in:
+	term/qt.trm configure.in:
 	- Pointsize is a double, not an integer (fractional sizes were being
 	  truncated to zero).
 	- When a polygon is flushed, the final vertex must be kept as the
