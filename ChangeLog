@@ -1,3 +1,7 @@
+2011-11-29  Shigeharu Takeno  <shige@iee.niit.ac.jp>
+
+	* docs/Makefile.in:  Remove duplicate entry for qt in CORETERMS.
+
 2011-11-28  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/scanner.c (legal_identifier) src/scanner.h src/stats.c:
