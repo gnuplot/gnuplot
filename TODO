@@ -9,33 +9,16 @@ COMMANDS:
 DOCUMENTATION:
 ==============
 
-Recently I've moved importants things from README.os2 into gnuplot.doc and
-INSTALL; those other README.{win, xli, nex} should be
-dispersed similarly. Who can do it?
-
--- docs/old/README.3d
--- docs/old/README.fit
-  These should be be edited and pasted into gnuplot.doc and then removed.
-
+ -- Improve the documentation on fonts
+ -- More figures in the manual
+ -- We no longer have a working build path for HTML documentation.
+    Is there a suitable replacement?
 
 TERMINALS:
 ==========
 
-Emx:
-  -- update its docs from docs/old/README.emx, then delete this file
-
-(g)pic:
-  -- update its docs from docs/old/README.pic, then delete this file
-
-Metafont:
-  -- update its docs from docs/old/README.mf, then delete this file
-
-NeXTstep:
-  -- update its docs from docs/old/README.nex, then delete this file
-
-Pstricks:
-  -- Patch 559611 color + variable pointsize in pstricks
-	Can somebody comment on this?
+ -- Configuration/installation on OSX remains problematic, specifically
+    including the OSX-specific aquaterm
 
 Windows:
   -- update wgnuplot menus
@@ -72,6 +55,7 @@ INSTALLATION --- LINUX:
 
 -- add .spec file and a 'make' target to create RPM file?
    [HBB: no.]
+-- the installation paths for TeX-related files are a mess
 
 
 INSTALLATION --- VMS:
@@ -140,14 +124,12 @@ HBB:
 
 [Optional:] See if 16-bit compilations can be made to work again.
 
-Ethan's List (2010):
+Ethan's List (2011):
 
+- the qt terminal should support OpenGL as a back-end rendering path
 - separate out the handling of junk, NaN, Inf, and missing data entries
-- you should be able to set a default style for arrows and labels
 - isosurfaces (3D contour of 4D data)
 - fix emf text handling to match other terminals (vertical centering, enhanced)
-- javascript mousing support integrated with svg output
-  (low priority now that the canvas terminal supports mousing).
 - allow the user to assign arbitrary coordinate transforms to the axes
 - more demos and more comprehensible descriptions in the user manual
 - revise the coordinate system used by x11 so that the terminal coordinates
