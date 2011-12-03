@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.197 2011/10/25 05:10:58 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.198 2011/11/26 00:31:15 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -61,6 +61,8 @@ static void save_position __PROTO((FILE *, struct position *, TBOOLEAN offset));
 static void save_zeroaxis __PROTO((FILE *,AXIS_INDEX));
 static void save_set_all __PROTO((FILE *));
 
+static const char *coord_msg[] = { "first ", "second ", "graph ", "screen ",
+				 "character "};
 /*
  *  functions corresponding to the arguments of the GNUPLOT `save` command
  */
@@ -476,8 +478,18 @@ set bar %f %s\n",
 	 this_arrow = this_arrow->next) {
 	fprintf(fp, "set arrow %d from ", this_arrow->tag);
 	save_position(fp, &this_arrow->start, FALSE);
-	fputs(this_arrow->relative ? " rto " : " to ", fp);
-	save_position(fp, &this_arrow->end, FALSE);
+	if (this_arrow->type == arrow_end_absolute) {
+	    fputs(" to ", fp);
+	    save_position(fp, &this_arrow->end, FALSE);
+	} else if (this_arrow->type == arrow_end_absolute) {
+	    fputs(" rto ", fp);
+	    save_position(fp, &this_arrow->end, FALSE);
+	} else { /* type arrow_end_oriented */
+	    struct position *e = &this_arrow->end;
+	    fputs(" length ", fp);
+	    fprintf(fp, "%s%g", e->scalex == first_axes ? "" : coord_msg[e->scalex], e->x);
+	    fprintf(fp, " angle %g", this_arrow->angle);
+	}
 	fprintf(fp, " %s %s %s",
 		arrow_head_names[this_arrow->arrow_properties.head],
 		(this_arrow->arrow_properties.layer==0) ? "back" : "front",
@@ -1066,8 +1078,6 @@ save_tics(FILE *fp, AXIS_INDEX axis)
 
 }
 
-static const char *coord_msg[] = { "first ", "second ", "graph ", "screen ",
-				 "character "};
 static void
 save_position(FILE *fp, struct position *pos, TBOOLEAN offset)
 {

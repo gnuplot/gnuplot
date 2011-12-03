@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.356 2011/11/26 00:31:15 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.357 2011/11/29 00:17:59 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -710,8 +710,9 @@ set_arrow()
 
     /* get tag */
     if (almost_equals(c_token, "back$head") || equals(c_token, "front")
-	    || equals(c_token, "from") || equals(c_token, "size")
+	    || equals(c_token, "from") || equals(c_token, "at")
 	    || equals(c_token, "to") || equals(c_token, "rto")
+	    || equals(c_token, "size")
 	    || equals(c_token, "filled") || equals(c_token, "empty")
 	    || equals(c_token, "as") || equals(c_token, "arrowstyle")
 	    || almost_equals(c_token, "head$s") || equals(c_token, "nohead")) {
@@ -743,6 +744,7 @@ set_arrow()
 
 	this_arrow->start = default_position;
 	this_arrow->end = default_position;
+	this_arrow->angle = 0.0;
 
 	default_arrow_style(&(new_arrow->arrow_properties));
     }
@@ -750,7 +752,7 @@ set_arrow()
     while (!END_OF_COMMAND) {
 
 	/* get start position */
-	if (equals(c_token, "from")) {
+	if (equals(c_token, "from") || equals(c_token,"at")) {
 	    if (set_start) { duplication = TRUE; break; }
 	    c_token++;
 	    if (END_OF_COMMAND)
@@ -764,13 +766,32 @@ set_arrow()
 	/* get end or relative end position */
 	if (equals(c_token, "to") || equals(c_token,"rto")) {
 	    if (set_end) { duplication = TRUE; break; }
-	    this_arrow->relative = (equals(c_token,"rto")) ? TRUE : FALSE;
+	    if (equals(c_token,"rto"))
+		this_arrow->type = arrow_end_relative;
+	    else
+		this_arrow->type = arrow_end_absolute;
 	    c_token++;
 	    if (END_OF_COMMAND)
 		int_error(c_token, "end coordinates expected");
 	    /* get coordinates */
 	    get_position(&this_arrow->end);
 	    set_end = TRUE;
+	    continue;
+	}
+
+	/* get end position specified as length + orientation angle */
+	if (almost_equals(c_token, "len$gth")) {
+	    if (set_end) { duplication = TRUE; break; }
+	    this_arrow->type = arrow_end_oriented;
+	    c_token++;
+	    /* FIXME: we really only want one coordinate (length), not 3 */
+	    get_position(&this_arrow->end);
+	    set_end = TRUE;
+	    continue;
+	}
+	if (almost_equals(c_token,"ang$le")) {
+	    c_token++;
+	    this_arrow->angle = real_expression();
 	    continue;
 	}
 

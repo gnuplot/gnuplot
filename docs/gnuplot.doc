@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.703 2011/11/27 22:21:35 markisch Exp $
+C RCS $Id: gnuplot.doc,v 1.704 2011/11/29 00:19:13 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -6765,15 +6765,16 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/population.gif" alt="[popu
  Arbitrary arrows can be placed on a plot using the `set arrow` command.
 
  Syntax:
-       set arrow {<tag>} {from <position>} {to|rto <position>}
-                 { {arrowstyle | as <arrow_style>}
-                   | { {nohead | head | backhead | heads}
-                       {size <length>,<angle>{,<backangle>}}
+       set arrow {<tag>} from <position> to <position>
+       set arrow {<tag>} from <position> rto <position>
+       set arrow {<tag>} from <position> length <coord> angle <ang>
+       set arrow <tag> arrowstyle | as <arrow_style>
+       set arrow <tag> {nohead | head | backhead | heads}
+                       {size <headlength>,<headangle>{,<backangle>}}
                        {filled | empty | nofilled}
                        {front | back}
-                       { {linestyle | ls <line_style>}
-                         | {linetype | lt <line_type>}
-                           {linewidth | lw <line_width} } } }
+                       {linestyle <line_style>}
+                       {linetype <line_type>} {linewidth <line_width}
 
        unset arrow {<tag>}
        show arrow {<tag>}
@@ -6784,64 +6785,34 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/population.gif" alt="[popu
  arrow, use the `set arrow` command with the appropriate tag and specify the
  parts of the arrow to be changed.
 
+ The position of the first end point of the arrow is always specified by "from".
+ The other end point can be specified using any of three different mechanisms.
  The <position>s are specified by either x,y or x,y,z, and may be preceded by
  `first`, `second`, `graph`, `screen`, or `character` to select the coordinate
- system.  Unspecified coordinates default to 0.  The end points can be
- specified in one of five coordinate systems---`first` or `second` axes,
- `graph`, `screen`, or `character`.  See `coordinates` for details.  A
- coordinate system specifier does not carry over from the "from" position to
- the "to" position.  Arrows outside the screen boundaries are permitted but
- may cause device errors.  If the end point is specified by "rto" instead of
- "to" it is drawn relatively to the start point.  For linear axes, `graph`
- and `screen` coordinates, the distance between the start and the end point
- corresponds to the given relative coordinate.  For logarithmic axes, the
- relative given coordinate corresponds to the factor of the coordinate
+ system.  Unspecified coordinates default to 0. See `coordinates` for details.
+ A coordinate system specifier does not carry over from the first endpoint
+ description the second.
+
+ 1) "to <position>" specifies the absolute coordinates of the other end..
+ 
+ 2) "rto <position>" specifies an offset to the "from" position.  For linear
+ axes, `graph` and `screen` coordinates, the distance between the start and the
+ end point corresponds to the given relative coordinate.  For logarithmic axes,
+ the relative given coordinate corresponds to the factor of the coordinate
  between start and end point.  Thus, a negative relative value or zero are
  not allowed for logarithmic axes.
 
- Specifying `nohead` produces an arrow drawn without a head---a line segment.
- This gives you yet another way to draw a line segment on the plot.  By
- default, an arrow has a head at its end. Specifying `backhead` draws an arrow
- head at the start point of the arrow while `heads` draws arrow heads on both
- ends of the line.  Not all terminal types support double-ended arrows.
+ 3) "length <coordinate> angle <angle>" specifies the orientation of the arrow
+ in the plane of the graph.  Again any of the coordinate systems can
+ be used to specify the length.  The angle is always in degrees.
 
- Head size can be controlled by `size <length>,<angle>` or
- `size <length>,<angle>,<backangle>`, where `<length>` defines length of each
- branch of the arrow head and `<angle>` the angle (in degrees) they make with
- the arrow.  `<Length>` is in x-axis units; this can be changed by `first`,
- `second`, `graph`, `screen`, or `character` before the <length>;  see
- `coordinates` for details.  `<Backangle>` only takes effect when `filled`
- or `empty` is also used.  Then, `<backangle>` is the angle (in degrees) the
- back branches make with the arrow (in the same direction as `<angle>`).
- The `fig` terminal has a restricted backangle function. It supports three
- different angles. There are two thresholds: Below 70 degrees, the arrow head
- gets an indented back angle. Above 110 degrees, the arrow head has an acute
- back angle. Between these thresholds, the back line is straight.
-
- Specifying `filled` produces filled arrow heads (if heads are used).
- Filling is supported on filled-polygon capable terminals, see help of `pm3d`
- for their list, otherwise the arrow heads are closed but not filled.
- The same result (closed but not filled arrow head) is reached by specifying
- `empty`.  Further, filling and outline is obviously not supported on
- terminals drawing arrows by their own specific routines, like `metafont`,
- `metapost`, `latex` or `tgif`.
-
- The line style may be selected from a user-defined list of line styles
- (see `set style line`) or may be defined here by providing values for
- <line_type> (an index from the default list of styles) and/or <line_width>
- (which is a  multiplier for the default width).
-
- Note, however, that if a user-defined line style has been selected, its
- properties (type and width) cannot be altered merely by issuing another
- `set arrow` command with the appropriate index and `lt` or `lw`.
-
- If `front` is given, the arrow is written on top of the graphed data. If
- `back` is given (the default), the arrow is written underneath the graphed
- data.  Using `front` will prevent an arrow from being obscured by dense data.
+ Other characteristics of the arrow can either be specified as a pre-defined
+ arrow style or by providing them in `set arrow` command.  For a detailed
+ explanation of arrow characteristics, see `arrowstyle`.
 
  Examples:
 
- To set an arrow pointing from the origin to (1,2) with user-defined style 5,
+ To set an arrow pointing from the origin to (1,2) with user-defined linestyle 5,
  use:
        set arrow to 1,2 ls 5
 

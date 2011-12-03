@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.378 2011/10/10 21:17:04 juhaszp Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.379 2011/11/10 05:15:58 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -1272,13 +1272,19 @@ get_arrow(
     map_position_double(&arrow->start, &sx_d, &sy_d, "arrow");
     *sx = (int)(sx_d);
     *sy = (int)(sy_d);
-    if (arrow->relative) {
+    if (arrow->type == arrow_end_relative) {
 	/* different coordinate systems:
 	 * add the values in the drivers coordinate system.
 	 * For log scale: relative coordinate is factor */
 	map_position_r(&arrow->end, &ex_d, &ey_d, "arrow");
 	*ex = (int)(ex_d + sx_d);
 	*ey = (int)(ey_d + sy_d);
+    } else if (arrow->type == arrow_end_oriented) {
+	double aspect = (double)term->v_tic / (double)term->h_tic;
+	double radius, junk;
+	map_position_r(&arrow->end, &radius, &junk, "arrow");
+	*ex = *sx + cos(DEG2RAD * arrow->angle) * radius;
+	*ey = *sy + sin(DEG2RAD * arrow->angle) * radius * aspect;
     } else {
 	map_position_double(&arrow->end, &ex_d, &ey_d, "arrow");
 	*ex = (int)(ex_d);

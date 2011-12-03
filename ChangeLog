@@ -1,3 +1,11 @@
+2011-12-03  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/gadgets.h src/set.c src/show.c src/graph3d.c src/graphics.c
+	src/save.c docs/gnuplot.doc: Add an arrow specification syntax variant
+	    "set arrow <tag> from <position> length <val> angle <angle>"
+	that makes it easy to describe arrows of constant length, independent of
+	terminal or graph aspect ratios and 3D view angle.
+
 2011-12-01  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graph3d.c (draw_3d_graphbox): Rather than treating the position

@@ -101,12 +101,19 @@ typedef struct text_label {
      {character, character, character, 0.0, 0.0, 0.0}, FALSE }
 
 /* Datastructure for implementing 'set arrow' */
+typedef enum arrow_type {
+    arrow_end_absolute,
+    arrow_end_relative,
+    arrow_end_oriented
+    } arrow_type;
+
 typedef struct arrow_def {
     struct arrow_def *next;	/* pointer to next arrow in linked list */
     int tag;			/* identifies the arrow */
+    arrow_type type;		/* how to interpret t_position end */
     t_position start;
     t_position end;
-    TBOOLEAN relative;		/* second coordinate is relative to first */
+    double angle;		/* angle in degrees if type arrow_end_oriented */
     struct arrow_style_type arrow_properties;
 } arrow_def;
 

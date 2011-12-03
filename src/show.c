@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.261 2011/11/14 20:50:10 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.262 2011/11/26 00:31:15 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -1775,8 +1775,17 @@ show_arrow(int tag)
 	    save_linetype(stderr, &(this_arrow->arrow_properties.lp_properties), FALSE);
 	    fprintf(stderr, "\n\t  from ");
 	    show_position(&this_arrow->start);
-	    fputs(this_arrow->relative ? " rto " : " to ", stderr);
-	    show_position(&this_arrow->end);
+	    if (this_arrow->type == arrow_end_absolute) {
+		fputs(" to ", stderr);
+		show_position(&this_arrow->end);
+	    } else if (this_arrow->type == arrow_end_relative) {
+		fputs(" rto ", stderr);
+		show_position(&this_arrow->end);
+	    } else { /* arrow_end_oriented */
+		fputs(" length ", stderr);
+		show_position(&this_arrow->end);
+		fprintf(stderr," angle %g deg",this_arrow->angle);
+	    }
 	    if (this_arrow->arrow_properties.head_length > 0) {
 		static char *msg[] =
 		{"(first x axis) ", "(second x axis) ", "(graph units) ", "(screen units) "};
