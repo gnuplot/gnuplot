@@ -1,3 +1,9 @@
+2011-12-05  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/win/winmain.c: Automatic language detection can be overridden
+	by new setting "Language=XX" in wgnuplot.ini. Suggestion by Shigeharu
+	Takeno.
+
 2011-12-03  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/gadgets.h src/set.c src/show.c src/graph3d.c src/graphics.c

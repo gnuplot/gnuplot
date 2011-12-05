@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: winmain.c,v 1.51 2011/09/04 12:01:37 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: winmain.c,v 1.52 2011/11/14 21:03:38 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - win/winmain.c */
@@ -111,6 +111,7 @@ LPSTR szModuleName;
 LPSTR szPackageDir;
 LPSTR winhelpname;
 LPSTR szMenuName;
+static LPSTR szLanguageCode = NULL;
 #if defined(WGP_CONSOLE) && defined(CONSOLE_SWITCH_CP)
 BOOL cp_changed = FALSE;
 UINT cp_input;  /* save previous codepage settings */
@@ -350,8 +351,16 @@ FileExists(const char * filename)
 static char *
 LocalisedFile(const char * name, const char * ext, const char * defaultname)
 {
-	char * lang = GetLanguageCode();
-	char * filename = (LPSTR) malloc(strlen(szModuleName) + strlen(name) + strlen(lang) + strlen(ext) + 1);
+	char * lang;
+	char * filename;
+
+	/* Allow user to override language detection. */
+	if (szLanguageCode)
+		lang = szLanguageCode;
+	else
+		lang = GetLanguageCode();
+
+	filename = (LPSTR) malloc(strlen(szModuleName) + strlen(name) + strlen(lang) + strlen(ext) + 1);
 	if (filename) {
 		strcpy(filename, szModuleName);
 		strcat(filename, name);
@@ -376,6 +385,13 @@ ReadMainIni(LPSTR file, LPSTR section)
 	const char hlpext[] = ".hlp";
 #endif
 	const char name[] = "wgnuplot-";
+
+	/* Language code override */
+	GetPrivateProfileString(section, "Language", "", profile, 80, file);
+	if (profile[0] != NUL)
+		szLanguageCode = strdup(profile);
+	else
+		szLanguageCode = NULL;
 
 	/* help file name */
 	GetPrivateProfileString(section, "HelpFile", "", profile, 80, file);
