@@ -1,3 +1,9 @@
+2011-12-06  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* term/lua/gnuplot-tikz.lua:
+	Missing parameter breaks lua terminal in release 4.4.4
+	Bug #3441899
+
 2011-11-22  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/contour.c (contour): Format contour labels using gprintf rather
