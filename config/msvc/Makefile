@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.2 2011/10/30 18:31:01 markisch Exp $
+# $Id: Makefile,v 1.3 2011/11/27 22:18:36 markisch Exp $
 #
 # GNUPLOT Makefile Microsoft Visual C++ 2005 or newer
 
@@ -85,6 +85,7 @@ LD = link
 # /MD means include multi-thread support (DLL)
 CBASEFLAGS = /EHsc /GR /MD /O2 /nologo
 CFLAGS = $(CBASEFLAGS) /I. /I$(TOP) /I$(S) /D_Windows /DWIN32 /DHAVE_CONFIG_H /D__MSC__ /DHELPFILE=\"$(HELPFILE)\" $(OPTIONS)
+WIN_CFLAGS = /DUSE_FAKEPIPES
 CONSOLE_CFLAGS = /DWGP_CONSOLE /DCONSOLE_SWITCH_CP /DPIPES
 OPTIONS = /DUSE_MOUSE
 OPTIONS = $(OPTIONS) /DGNUPLOT_HISTORY
@@ -165,19 +166,19 @@ ALL_CONSOLE_OBJS = $(OBJS:.obj=.cobj) $(WINOBJS:.obj=.cobj)
 
 # default rules
 {$(S)}.c.obj:
-	$(CC) /c $(CFLAGS) $(S)\\$*.c
+	$(CC) /c $(CFLAGS) $(WIN_CFLAGS) $(S)\\$*.c
 
 {$(S)}.c.cobj:
 	$(CC) /c $(CFLAGS) $(CONSOLE_CFLAGS) $(S)\\$*.c /Fo$@
 
 {$(W)}.c.obj:
-	$(CC) /c $(CFLAGS) $(W)$*.c /Fo$@
+	$(CC) /c $(CFLAGS) $(WIN_CFLAGS) $(W)$*.c /Fo$@
 
 {$(W)}.c.cobj:
 	$(CC) /c $(CFLAGS) $(CONSOLE_CFLAGS) $(W)$*.c /Fo$@
 
 {$(W)}.cpp.obj:
-	$(CC) /c $(CFLAGS) $(W)$*.cpp /Fo$@
+	$(CC) /c $(CFLAGS) $(WIN_CFLAGS) $(W)$*.cpp /Fo$@
 
 {$(W)}.cpp.cobj:
 	$(CC) /c $(CFLAGS) $(CONSOLE_CFLAGS) $(W)$*.cpp /Fo$@
@@ -257,13 +258,13 @@ linkopt-c.msw: Makefile
 # rules
 
 term.obj: $(S)\term.c $(S)\term.h $(S)\plot.h $(S)\setshow.h $(S)\bitmap.h $(CORETERM)
-	$(CC) /c $(CFLAGS) $(TERMFLAGS) $(S)\$(*B).c /Fo$@
+	$(CC) /c $(CFLAGS) $(WIN_CFLAGS) $(TERMFLAGS) $(S)\$(*B).c /Fo$@
 
 term.cobj: $(S)\term.c $(S)\term.h $(S)\plot.h $(S)\setshow.h $(S)\bitmap.h $(CORETERM)
 	$(CC) /c $(CFLAGS) $(CONSOLE_CFLAGS) $(TERMFLAGS) $(S)\$(*B).c /Fo$@
 
 winmain.obj: $(W)winmain.c $(W)wgnuplib.h $(W)wtext.h $(S)\plot.h
-	$(CC) /c $(CFLAGS) $(W)$(*B).c /Fo$@
+	$(CC) /c $(CFLAGS) $(WIN_CFLAGS) $(W)$(*B).c /Fo$@
 
 winmain.cobj: $(W)winmain.c $(W)wgnuplib.h $(W)wtext.h $(S)\plot.h
 	$(CC) /c $(CFLAGS) $(CONSOLE_CFLAGS) $(W)winmain.c /Fo$@

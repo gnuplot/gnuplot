@@ -606,5 +606,14 @@
 
 #define GP_INLINE inline
 
+/* Emulated pipe support for wgnuplot */
+#ifdef USE_FAKEPIPES
+# ifndef PIPES
+#  define PIPES
+# endif
+# define popen fake_popen
+# define pclose fake_pclose
+#endif
+
 /* gnuplot.gih is not used by wgnuplot */
 #define NO_GIH 1

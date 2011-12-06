@@ -1,3 +1,10 @@
+2011-12-06  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/win/winmain.c src/win/wtext.h config/config.mgw config/config.nt
+	config/mingw/Makefile config/msvc/Makefile: Emulation of popen/pclose
+	for wgnuplot via temporary files. Briefly opens a console window for
+	every pipe and read and write pipes are supported.
+
 2011-12-05  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/win/winmain.c: Automatic language detection can be overridden

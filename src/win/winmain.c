@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: winmain.c,v 1.52 2011/11/14 21:03:38 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: winmain.c,v 1.53 2011/12/05 19:25:10 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - win/winmain.c */
@@ -828,6 +828,107 @@ MyFRead(void *ptr, size_t size, size_t n, FILE *file)
     }
     return fread(ptr, size, n, file);
 }
+
+
+#ifdef USE_FAKEPIPES
+
+static char pipe_type = NUL;
+static char * pipe_filename = NULL;
+static char * pipe_command = NULL;
+
+FILE *
+fake_popen(const char * command, const char * type)
+{
+	FILE * f = NULL;
+	char tmppath[MAX_PATH];
+	char tmpfile[MAX_PATH];
+	DWORD ret;
+
+	if (type == NULL) return NULL;
+
+	pipe_type = NUL;
+	if (pipe_filename != NULL)
+		free(pipe_filename);
+
+	/* Random temp file name in %TEMP% */
+	ret = GetTempPath(sizeof(tmppath), tmppath);
+	if ((ret == 0) || (ret > sizeof(tmppath)))
+		return NULL;
+	ret = GetTempFileName(tmppath, "gpp", 0, tmpfile);
+	if (ret == 0)
+		return NULL;
+	pipe_filename = strdup(tmpfile);
+
+	if (*type == 'r') {
+		char * cmd;
+		int rc;
+		pipe_type = *type;
+		/* Execute command with redirection of stdout to temporary file. */
+		cmd = (char *) malloc(strlen(command) + strlen(pipe_filename) + 5);
+		sprintf(cmd, "%s > %s", command, pipe_filename);
+		rc = system(cmd);
+		free(cmd);
+		/* Now open temporary file. */
+		/* system() returns 1 if the command could not be executed. */
+		if (rc != 1)
+			f = fopen(pipe_filename, "r");
+		else {
+			remove(pipe_filename);
+			free(pipe_filename);
+			pipe_filename = NULL;
+			errno = EINVAL;
+		}
+	} else if (*type == 'w') {
+		pipe_type = *type;
+		/* Write output to temporary file and handle the rest in fake_pclose. */
+		if (type[1] == 'b')
+			int_error(NO_CARET, "Could not execute pipe '%s'. Writing to binary pipes is not supported.", command);
+		else
+			f = fopen(pipe_filename, "w");
+		pipe_command = strdup(command);
+	}
+
+	return f;
+}
+
+
+int fake_pclose(FILE *stream)
+{
+	int rc = 0;
+	if (!stream) return ECHILD;
+
+	/* Close temporary file */
+	fclose(stream);
+
+	/* Finally, execute command with redirected stdin. */
+	if (pipe_type == 'w') {
+		char * cmd;
+		cmd = (char *) malloc(strlen(pipe_command) + strlen(pipe_filename) + 10);
+		/* FIXME: this won't work for binary data. We need a proper `cat` replacement. */
+		sprintf(cmd, "type %s | %s", pipe_filename, pipe_command);
+		rc = system(cmd);
+		free(cmd);
+	}
+
+	/* Delete temp file again. */
+	if (pipe_filename) {
+		remove(pipe_filename);
+		errno = 0;
+		free(pipe_filename);
+		pipe_filename = NULL;
+	}
+
+	if (pipe_command) {
+		/* system() returns 255 if the command could not be executed. 
+		   The real popen would have returned an error already. */
+		if (rc == 255)
+			int_error(NO_CARET, "Could not execute pipe '%s'.", pipe_command);
+		free(pipe_command);
+	}
+
+	return rc;
+}
+#endif
 
 #else /* WGP_CONSOLE */
 

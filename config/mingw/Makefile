@@ -1,5 +1,5 @@
 # Hello, emacs: this is a -*- Makefile -*-
-# $Id: Makefile,v 1.16 2011/11/26 14:24:26 markisch Exp $
+# $Id: Makefile,v 1.17 2011/11/27 22:17:38 markisch Exp $
 #
 # GNUPLOT Makefile for MinGW/MSYS on Windows
 # This assumes usual installation of the MinGW32 toolkit, the free
@@ -200,9 +200,9 @@ ifeq ($(TARGET),wgnuplot.exe)
 	PGNUPLOT=pgnuplot.exe
 	MENUFILE=wgnuplot.mnu
 	O=o
+	CFLAGSEXTRA=-DUSE_FAKEPIPES
 endif
 ifeq ($(TARGET),wgnuplot_pipes.exe)
-	PGNUPLOT=pgnuplot.exe
 	MENUFILE=wgnuplot.mnu
 	PIPES=1
 	O=po
@@ -438,7 +438,7 @@ endif
 # default rules
 .SUFFIXES: .exe .$(O) .c
 .c.$(O):
-	$(CC) -c $(CFLAGS) -o $@ $<
+	$(CC) -c $(CFLAGS) $(CFLAGSEXTRA) -o $@ $<
 
 LDLIBS = -lkernel32 -lgdi32 -lwinspool -lcomdlg32 -lcomctl32 -ladvapi32 -lshell32 -lmsimg32 -lgdiplus
 
@@ -461,10 +461,10 @@ wgplt_res.$(O) :  $(W)/wgnuplot.rc $(W)/wgnuplib.rc $(W)/wresourc.h texticon.ico
 	$(RES2COFF)
 
 show.$(O): show.c plot.h setshow.h
-	$(CC) -c $(CFLAGS) -DHELPFILE=\"$(HELPFILE)\" -DBINDIR=\"$(bindir)\" -DGNUPLOT_PS_DIR=\"$(GNUPLOT_PS_DIR)\" -o $@ $<
+	$(CC) -c $(CFLAGS) $(CFLAGSEXTRA) -DHELPFILE=\"$(HELPFILE)\" -DBINDIR=\"$(bindir)\" -DGNUPLOT_PS_DIR=\"$(GNUPLOT_PS_DIR)\" -o $@ $<
 
 term.$(O): term.c term.h plot.h setshow.h bitmap.h $(CORETERM)
-	$(CC) -c $(CFLAGS) $(TERMFLAGS) -o $@ $<
+	$(CC) -c $(CFLAGS)  $(CFLAGSEXTRA) $(TERMFLAGS) -o $@ $<
 
 version.$(O): $(S)/version.c
 
@@ -476,43 +476,43 @@ endif
 WINDEPS = $(W)/wgnuplib.h $(W)/wcommon.h $(W)/wresourc.h $(W)/screenbuf.h $(W)/wgdiplus.h
 
 winmain.$(O): $(W)/winmain.c $(W)/wgnuplib.h $(W)/wtext.h plot.h
-	$(CC) -c $(CFLAGS) -o $@ -DHELPFILE=\"$(HELPFILE)\" $<
+	$(CC) -c $(CFLAGS) $(CFLAGSEXTRA) -o $@ -DHELPFILE=\"$(HELPFILE)\" $<
 
 wgnuplib.$(O): $(W)/wgnuplib.c $(WINDEPS)
-	$(CC) -c $(CFLAGS) -o $@ $<
+	$(CC) -c $(CFLAGS) $(CFLAGSEXTRA) -o $@ $<
 
 wmenu.$(O): $(W)/wmenu.c $(WINDEPS)
-	$(CC) -c $(CFLAGS) -o $@ $<
+	$(CC) -c $(CFLAGS) $(CFLAGSEXTRA) -o $@ $<
 
 wtext.$(O): $(W)/wtext.c $(WINDEPS)
-	$(CC) -c $(CFLAGS) -o $@ $<
+	$(CC) -c $(CFLAGS) $(CFLAGSEXTRA) -o $@ $<
 
 screenbuf.$(O): $(W)/screenbuf.c $(WINDEPS)
-	$(CC) -c $(CFLAGS) -o $@ $<
+	$(CC) -c $(CFLAGS) $(CFLAGSEXTRA) -o $@ $<
 
 wpause.$(O): $(W)/wpause.c $(S)/wxterminal/wxt_term.h $(WINDEPS)
-	$(CC) -c $(CFLAGS) -o $@ $<
+	$(CC) -c $(CFLAGS) $(CFLAGSEXTRA) -o $@ $<
 
 wprinter.$(O): $(W)/wprinter.c $(WINDEPS)
-	$(CC) -c $(CFLAGS) -o $@ $<
+	$(CC) -c $(CFLAGS) $(CFLAGSEXTRA) -o $@ $<
 
 wgraph.$(O): $(W)/wgraph.c $(WINDEPS)
-	$(CC) -c $(CFLAGS) -o $@ $<
+	$(CC) -c $(CFLAGS) $(CFLAGSEXTRA) -o $@ $<
 
 wgdiplus.$(O): $(W)/wgdiplus.cpp $(WINDEPS)
-	$(CXX) -c $(CXXFLAGS) -o $@ $<
+	$(CXX) -c $(CXXFLAGS) $(CFLAGSEXTRA) -o $@ $<
 
 wgnuplot.mnu: $(W)/wgnuplot.mnu
 	$(CP) $^ $@
 
 wxt_gui.$(O): $(S)/wxterminal/wxt_gui.cpp $(S)/wxterminal/wxt_gui.h
-	$(CXX) -c $(CFLAGS) $(CXXFLAGS) $(CAIRO_CFLAGS) -o $@ $<
+	$(CXX) -c $(CFLAGS) $(CFLAGSEXTRA) $(CXXFLAGS) $(CAIRO_CFLAGS) -o $@ $<
 
 gp_cairo.$(O): $(S)/wxterminal/gp_cairo.c $(S)/wxterminal/gp_cairo.h
-	$(CC) -c $(CFLAGS) $(CXXFLAGS) $(PANGOCAIRO_CFLAGS) -o $@ $<
+	$(CC) -c $(CFLAGS) $(CFLAGSEXTRA) $(CXXFLAGS) $(PANGOCAIRO_CFLAGS) -o $@ $<
 
 gp_cairo_helpers.$(O): $(S)/wxterminal/gp_cairo_helpers.c $(S)/wxterminal/gp_cairo_helpers.h
-	$(CC) -c $(CFLAGS) -o $@ $<
+	$(CC) -c $(CFLAGS) $(CFLAGSEXTRA) -o $@ $<
 
 # extract icons from wgnuplot.rc
 texticon.ico: grpicon.ico
