@@ -1,5 +1,5 @@
 /*
- * $Id: gp_cairo.c,v 1.48.2.4 2010/08/26 18:18:27 sfeam Exp $
+ * $Id: gp_cairo.c,v 1.48.2.5 2011/10/13 20:01:09 sfeam Exp $
  */
 
 /* GNUPLOT - gp_cairo.c */
@@ -692,8 +692,10 @@ gchar * gp_cairo_convert(plot_struct *plot, const char* string)
  * the cairo/win32 backend for font rendering.  It has the effect of
  * testing for libfreetype support, and using that instead if possible.
  * Suggested by cairo developer Behdad Esfahbod. 
+ * Allin Cottrell suggests that this is no longer necessary for newer
+ * versions of cairo.
  */
-#ifdef WIN32
+#if defined(WIN32) && (CAIRO_VERSION_MAJOR < 2) && (CAIRO_VERSION_MINOR < 10)
 PangoLayout *
 gp_cairo_create_layout (cairo_t *cr)
 {
