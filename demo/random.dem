@@ -1,5 +1,5 @@
 #
-# $Id: random.dem,v 1.12 2006/07/12 17:21:14 tlecomte Exp $
+# $Id: random.dem,v 1.13 2006/10/23 05:43:53 sfeam Exp $
 #
 # random.dem
 #
@@ -45,19 +45,17 @@ print "vector and a contour plot illustrating the correlation, which in"
 print "this case is zero, i.e. a circle.  (Easier to view in map mode.)"
 print ""
 nsamp = 50
+# Generate N random data points.
+set print "random.tmp"
+do for [i=1:nsamp] {
+    print sprintf("%8.5g %8.5g", invnorm(rand(0)), invnorm(rand(0)))
+}
+unset print
+#
 unset xlabel
 unset ylabel
 unset zlabel
 set parametric
-# A somewhat inelegant way of generating N random data points.  A future
-# non-pressing plot-command feature addition may address this issue.
-set samples nsamp
-set format "%8.5g"
-set table "random.tmp"
-plot invnorm(rand(0)),invnorm(rand(0))
-unset table
-unset format
-#
 tstring(n) = sprintf("%d random samples from a 2D Gaussian PDF with\nunit variance, zero mean and no dependence", n)
 set title tstring(nsamp)
 unset key
@@ -78,6 +76,7 @@ splot u,v,( 1/(2*pi) * exp(-0.5 * (u**2 + v**2)) ) with line lc rgb "black", \
    "random.tmp" using 1:2:(-0.2) with points pointtype 7 lc rgb "black"
 pause -1 "Hit return to continue"
 unset contour
+unset parametric
 
 load "stat.inc"
 
@@ -96,17 +95,13 @@ binwidth = 20
 xlow = -3.0
 xhigh = 3.0
 scale = (binwidth/(xhigh-xlow))
-# A somewhat inelegant way of generating N random data points.  A future
-# non-pressing plot-command feature addition may address this issue.
-set parametric
-set samples nsamp
-set format "%8.5g"
-set table "random.tmp"
-plot invnorm(rand(0)),(1.0*scale/nsamp)
-unset table
-unset format
+# Generate N random data points.
+set print "random.tmp"
+do for [i=1:nsamp] {
+    print sprintf("%8.5g %8.5g", invnorm(rand(0)), (1.0*scale/nsamp))
+}
+unset print
 #
-unset parametric
 set samples 200
 tstring(n) = sprintf("Histogram of %d random samples from a univariate\nGaussian PDF with unit variance and zero mean", n)
 set title tstring(nsamp)
@@ -129,17 +124,13 @@ print "each point is from the origin.  That distribution is known to fit"
 print "the Maxwell probability law, as shown."
 print ""
 reset
-# A somewhat inelegant way of generating N random data points.  A future
-# non-pressing plot-command feature addition may address this issue.
 nsamp = 3000
-set parametric
-set samples nsamp
-set isosamples 2,2 # Smallest possible
-set format "%8.5g"
-set table "random.tmp"
-splot invnorm(rand(0)),invnorm(rand(0)),invnorm(rand(0))
-unset table
-unset format
+# Generate N random data points.
+set print "random.tmp"
+do for [i=1:nsamp] {
+    print sprintf("%8.5g %8.5g %8.5g", invnorm(rand(0)), invnorm(rand(0)), invnorm(rand(0)))
+}
+unset print
 #
 oneplot = 1
 #
@@ -148,6 +139,7 @@ if (oneplot) set multiplot layout 1,2
 unset key
 rlow = -4.0
 rhigh = 4.0
+set parametric
 set xrange [rlow:rhigh]; set yrange [rlow:rhigh]; set zrange [rlow:rhigh]
 set xtics axis nomirror; set ytics axis nomirror; set ztics axis nomirror;
 set border 0

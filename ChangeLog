@@ -1,3 +1,7 @@
+2011-12-07  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* demo/random.dem: Use loops to create random number data sets.
+
 2011-12-06  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/win/winmain.c src/win/wtext.h config/config.mgw config/config.nt
