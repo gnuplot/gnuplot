@@ -1,3 +1,21 @@
+2011-12-07  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* config/makefile.mgw: Sync with 4.5: support bgd.dll, iconv, lua/tikz,
+	gnuplot.pdf with figures and index and a improved 'install' target
+
+	* src/command.c (test_palette): tmpfile() always fails on a modern
+	Windows. Open a file in the user's temp directory instead. Bugfix.
+
+	* src/win/wtext.c: Use "Lucida Console" as default font since 
+	"Terminal" has a very limited character set.
+
+2011-12-07 Allin Cottrell <cottrell@wfu.edu>
+
+	* src/wxterminal/gp_cairo.c (gp_cairo_convert): Make the WIN32 font
+	work-around (2009-11-06) conditional on cairo < 2.10.
+	BM: Fixes "dead window" reports due to fontconfig cache updates. Was
+	applied to 4.5 on 2011-05-13.
+
 2011-12-06  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* term/lua/gnuplot-tikz.lua:

@@ -1,5 +1,5 @@
 # Hello, emacs: this is a -*- Makefile -*-
-# $Id: makefile.mgw,v 1.50.2.8 2010/03/07 00:27:46 sfeam Exp $
+# $Id: makefile.mgw,v 1.50.2.9 2011/11/07 18:07:37 markisch Exp $
 #
 # GNUPLOT Makefile for MinGW32 on Win95/98/NT/2k/..
 # This assumes usual installation of the MinGW32 toolkit, the free
@@ -51,11 +51,12 @@ TARGET=wgnuplot.exe
 # In some cases, libfreetype can depend on additional libraries such as
 # fontconfig or iconv; then, uncomment GDAUTOCONFIGLIBS so that all of the
 # libraries needed for linking will be taken by running 'gdlib-config'.
-#
+# Uncomment BGD if you want to use the binary DLL version of libgd.
 NEWGD=1
 JPEG=1
 FREETYPE=1
 #GDAUTOCONFIGLIBS=1
+#BGD=1
 
 # PDF device driver
 # Requires PNG and Z libraries based on particular PDF library used, and
@@ -83,7 +84,6 @@ MOUSE=1
 # terminals
 #CAIROTERMS=1
 #CAIROLIBS=1
-#
 
 # WXWIDGETS interactive terminal
 # Requires wxWidgets, Cairo, Pango, and their respective dependencies.
@@ -95,6 +95,9 @@ MOUSE=1
 
 # Uncomment the following line to select the lua/tikz terminal
 #LUA=1
+
+# Uncomment if you have libiconv
+ICONV=1
 
 # Below you can adapt paths according to your software setup:
 
@@ -112,7 +115,7 @@ GNUPLOT_JS_DIR = share/js
 GNUPLOT_LUA_DIR = share/lua
 
 # Destination directory, used in 'make install':
-DESTDIR = /c/Progra~1/Gnuplot4.4
+DESTDIR = "$(PROGRAMFILES)/gnuplot"
 
 # give here the path to MinGW compiler unless it is already in PATH
 #GCCPATH = g:/mingw32/bin/
@@ -144,6 +147,10 @@ endif
 # GNU sort
 GNUSORT = /bin/sort
 
+# Directory that might contain extra files to be shipped with the installer.
+# This should include dependencies like DLLs, but also fontconfig configuration files.
+#EXTRADIST = /d/Software/gnuplot-misc/gp-dist44
+
 #
 # *************** End of Configuration section *************************
 #
@@ -166,7 +173,6 @@ ifeq ($(TARGET),wgnuplot.exe)
 	PGNUPLOT=pgnuplot.exe
 endif
 ifeq ($(TARGET),wgnuplot_pipes.exe)
-	PGNUPLOT=pgnuplot.exe
 	PIPES=1
 endif
 ifeq ($(TARGET),gnuplot.exe)
@@ -184,7 +190,7 @@ RM = rm -f
 CP = cp -p
 
 ifdef DEBUG
-  CFLAGS += -g
+  CFLAGS += -g -Wall
   LDFLAGS += -g
 else
   CFLAGS += -O2
@@ -221,13 +227,19 @@ endif
 
 ifdef GD
   CFLAGS += -DHAVE_LIBGD
-  TERMLIBS += -lgd
+  ifndef BGD
+    TERMLIBS += -lgd
+  else
+    TERMLIBS += -lbgd
+  endif
 endif
 
 ifdef PNG
   CFLAGS += -DHAVE_LIBPNG
-  ifndef GDAUTOCONFIGLIBS
-    TERMLIBS += -lpng -lz
+  ifndef BGD
+    ifndef GDAUTOCONFIGLIBS
+      TERMLIBS += -lpng -lz
+    endif
   endif
 endif
 
@@ -235,14 +247,18 @@ ifdef NEWGD
   CFLAGS += -DHAVE_GD_GIF -DGIF_ANIMATION -DHAVE_GD_PNG
 ifdef JPEG
   CFLAGS += -DHAVE_GD_JPEG
-  ifndef GDAUTOCONFIGLIBS
-    TERMLIBS += -ljpeg
+  ifndef BGD
+    ifndef GDAUTOCONFIGLIBS
+      TERMLIBS += -ljpeg
+    endif
   endif
 endif
 ifdef FREETYPE
   CFLAGS += -DHAVE_GD_TTF
-  ifndef GDAUTOCONFIGLIBS
-    TERMLIBS += -lfreetype
+  ifndef BGD
+    ifndef GDAUTOCONFIGLIBS
+      TERMLIBS += -lfreetype
+    endif
   endif
 endif
 ifdef GDAUTOCONFIGLIBS
@@ -294,6 +310,12 @@ ifdef LUA
 	CFLAGS += -DHAVE_LUA
 	TERMLIBS += -llua5.1
 	TERMFLAGS += -DGNUPLOT_LUA_DIR=\"$(GNUPLOT_LUA_DIR)\"
+	LUATARGETS += gnuplot-lua-tikz.sty
+endif
+
+ifdef ICONV
+	CFLAGS += -DHAVE_ICONV
+	TERMLIBS += -liconv
 endif
 
 ifdef GNU_RC
@@ -326,9 +348,9 @@ L=docs/latex/			# HBB FIXME 20060430: what's this for?
 M=../demo/
 
 
-default: $(TARGET) $(HELPFILE) wgnuplot.mnu $(M)bf_test.exe $(PGNUPLOT)
+default: $(TARGET) $(HELPFILE) wgnuplot.mnu $(M)bf_test.exe $(PGNUPLOT) $(LUATARGETS)
 
-all:	default gnuplot.ps gnuplot.pdf
+all:	default gnuplot.pdf
 
 
 # include the 'core makefile template'
@@ -362,7 +384,7 @@ config.h: ../config/config.mgw
 
 $(OBJS) $(WINOBJS) dbinary.$(O): config.h
 
-$(TARGET): $(OBJS) $(WINOBJS) win/wgnuplot.def wgplt_res.o texticon.ico grpicon.ico
+$(TARGET): $(OBJS) $(WINOBJS) wgplt_res.o texticon.ico grpicon.ico
 	$(LDX) $(LDFLAGS) $(LDFLAGS2) -o $@ $(OBJS) $(WINOBJS) wgplt_res.o $(LDLIBS)\
 	$(TERMLIBS) $(WX_LIBS) $(PANGOCAIRO_LIBS)
 
@@ -445,6 +467,12 @@ $(M)bf_test.exe : bf_test.c dbinary.$(O) alloc.$(O)
 dbinary.$(O): binary.c
 	$(CC) -c $(CFLAGS) -U_Windows -o $@ $<
 
+# generate LUA TeX support files
+ifdef LUA
+gnuplot-lua-tikz.sty: $(T)/lua/gnuplot-tikz.lua
+	lua5.1 $(T)/lua/gnuplot-tikz.lua style
+endif
+
 
 # Create documentation in various formats
 #
@@ -471,7 +499,7 @@ allterm.h: $(CORETERM)
 	  sed '/^ *$$/d;/^#/d' > allterm.h
 	@rm -f allterm.c
 endif
-doc2tex.exe: $(D)doc2tex.c $(D)termdoc.c allterm.h
+doc2tex.exe: $(D)doc2tex.c $(D)termdoc.c allterm.h $(CORETERM)
 	$(LD) $(LDFLAGS) -o $@ -DWINDOWS_NO_GUI -DALL_TERM_DOC $(CFLAGS) \
 	  -I. -I$(D:/=) -I$(T:/=) $(D)doc2tex.c $(D)termdoc.c
 else
@@ -492,12 +520,32 @@ gnuplot.dvi: gnuplot.tex $(D)titlepag.tex
 	rm -f $(D)gp_tex2.*
 gnuplot.ps: gnuplot.dvi
 	dvips -o gnuplot.ps gnuplot.dvi
-gnuplot.pdf: gnuplot.tex $(D)titlepag.tex
+gnuplot-nofigures.pdf: gnuplot.tex $(D)titlepag.tex
 	cp gnuplot.tex $(D)gp_tex2.tex
 	cp $(D)../VERSION $(D)
 	cd $(D) && pdflatex gp_tex2.tex && pdflatex gp_tex2.tex && pdflatex gp_tex2.tex
+	# now include index
+	cd $(D) && makeindex gp_tex2 && pdflatex gp_tex2.tex
 	mv $(D)gp_tex2.pdf gnuplot.pdf
 	rm -f $(D)gp_tex2.*
+
+gnuplot-figures.tex: $(D)gnuplot.doc doc2tex.exe
+	GNUPLOT_LIB=$(M) $(TARGET) $(D)plotstyles.gnu
+	doc2tex -figures $(D)gnuplot.doc gnuplot-figures.tex
+
+gnuplot.pdf: gnuplot-figures.tex $(TOP)/VERSION $(D)toc_entr.sty $(D)titlepag.tex
+	cp gnuplot-figures.tex gp_tex2.tex
+	echo "\usepackage{graphicx}" > pdffigures.tex
+	echo "\usepackage{picins}" >> pdffigures.tex
+	# Call LaTeX three times to get the toc right.
+	TEXINPUTS=.:$(TOP):$(D):${TEXINPUTS}: pdflatex gp_tex2.tex
+	TEXINPUTS=.:$(TOP):$(D):${TEXINPUTS}: pdflatex gp_tex2.tex
+	TEXINPUTS=.:$(TOP):$(D):${TEXINPUTS}: pdflatex gp_tex2.tex
+	# now include index
+	makeindex gp_tex2
+	TEXINPUTS=.:$(TOP):$(D):${TEXINPUTS}: pdflatex gp_tex2.tex
+	mv gp_tex2.pdf gnuplot.pdf
+	rm -f gp_tex2.* pdffigures.tex
 
 
 # clean up temporary files
@@ -511,22 +559,58 @@ clean:
 realclean: veryclean
 veryclean: clean
 	$(RM) wgnuplot.exe wgnuplot_pipes.exe gnuplot.exe pgnuplot.exe
-	$(RM) wgnuplot.hlp wgnuplot.gid
+	$(RM) wgnuplot.hlp wgnuplot.gid wgnuplot.mnu
+	$(RM) gnuplot.ps gnuplot.pdf
 	$(RM) $(M)binary[123] $(M)fit.log $(M)soundfit.par
+	$(RM) gnuplot-lua-tikz.sty gnuplot-lua-tikz.tex
+	$(RM) gnuplot-lua-tikz-common.tex t-gnuplot-lua-tikz.tex
 
 # now move the whole stuff to its destination
 install: default
 	mkdir -p $(DESTDIR)
-	cp gnuplot.exe $(DESTDIR)/gnuplot.exe
-	cp wgnuplot.exe $(DESTDIR)/wgnuplot.exe
-	cp wgnuplot_pipes.exe $(DESTDIR)/wgnuplot_pipes.exe
-	cp pgnuplot.exe $(DESTDIR)/pgnuplot.exe
-	cp win/wgnuplot.mnu $(DESTDIR)/wgnuplot.mnu
-	cp wgnuplot.hlp $(DESTDIR)/wgnuplot.hlp
-	mkdir -p $(DESTDIR)/$(GNUPLOT_PS_DIR)
-	cp ../term/PostScript/*.ps $(DESTDIR)/$(GNUPLOT_PS_DIR)
-	mkdir -p $(DESTDIR)/$(GNUPLOT_JS_DIR)
-	cp ../term/js/* $(DESTDIR)/$(GNUPLOT_JS_DIR)
-	mkdir -p $(DESTDIR)/$(GNUPLOT_LUA_DIR)
-	cp ../term/lua/* $(DESTDIR)/$(GNUPLOT_LUA_DIR)
+# binaries go to /binary
+	mkdir -p $(DESTDIR)/binary
+	cp -p gnuplot.exe $(DESTDIR)/binary/
+	cp -p wgnuplot.exe $(DESTDIR)/binary/
+	cp -p wgnuplot_pipes.exe $(DESTDIR)/binary/
+	cp -p pgnuplot.exe $(DESTDIR)/binary/
+	cp -p win/wgnuplot.mnu $(DESTDIR)/binary/
+	cp -p wgnuplot.hlp $(DESTDIR)/binary/wgnuplot.hlp
+# terminal support files
+	mkdir -p $(DESTDIR)/binary/share
+	mkdir -p $(DESTDIR)/binary/etc
+	mkdir -p $(DESTDIR)/binary/$(GNUPLOT_PS_DIR)
+	cp -p $(TOP)/term/PostScript/*.ps $(DESTDIR)/binary/$(GNUPLOT_PS_DIR)
+	mkdir -p $(DESTDIR)/binary/$(GNUPLOT_JS_DIR)
+	cp -p $(TOP)/term/js/*.* $(DESTDIR)/binary/$(GNUPLOT_JS_DIR)
+	cp -p $(TOP)/term/js/README $(DESTDIR)/binary/$(GNUPLOT_JS_DIR)/
+	mkdir -p $(DESTDIR)/binary/share/LaTeX
+	cp -p $(TOP)/share/LaTeX/README $(DESTDIR)/binary/share/LaTeX/
+	cp -p $(TOP)/share/LaTeX/gnuplot.cfg $(DESTDIR)/binary/share/LaTeX/
+ifdef LUA
+	mkdir -p $(DESTDIR)/binary/$(GNUPLOT_LUA_DIR)
+	cp -p $(TOP)/term/lua/README $(DESTDIR)/binary/$(GNUPLOT_LUA_DIR)/
+	cp -p $(TOP)/term/lua/NEWS $(DESTDIR)/binary/$(GNUPLOT_LUA_DIR)/
+	cp -p $(TOP)/term/lua/TODO $(DESTDIR)/binary/$(GNUPLOT_LUA_DIR)/
+	cp -p $(TOP)/term/lua/gnuplot-tikz.lua $(DESTDIR)/binary/$(GNUPLOT_LUA_DIR)/
+	cp -p gnuplot-lua-tikz.sty $(DESTDIR)/binary/share/LaTeX/
+endif
+# README etc
+	cp -p $(TOP)/Copyright $(DESTDIR)/
+	cp -p $(TOP)/README $(DESTDIR)/
+	cp -p $(TOP)/NEWS $(DESTDIR)/
+	cp -p $(TOP)/ChangeLog $(DESTDIR)/
+	cp -p $(TOP)/BUGS $(DESTDIR)/
+# demo and contrib
+	mkdir -p $(DESTDIR)/demo
+	-cp -p $(M)* $(DESTDIR)/demo/
+	mkdir -p $(DESTDIR)/contrib/pm3d/
+	-cp -p $(TOP)/pm3d/contrib/* $(DESTDIR)/contrib/pm3d/
+# docs
+	mkdir -p $(DESTDIR)/docs
+	cp -p gnuplot.pdf $(DESTDIR)/docs/
+# runtime libraries, configuration files etc.
+ifdef EXTRADIST
+	cp -pR $(EXTRADIST)/* $(DESTDIR)/
+endif
 
