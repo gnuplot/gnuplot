@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: doc2rnh.c,v 1.16 2005/06/03 05:11:55 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: doc2rnh.c,v 1.17 2007/10/24 00:47:51 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - doc2rnh.c */
@@ -176,12 +176,6 @@ process_line(char *line, FILE *b)
     case '%':{			/* troff table entry */
 	    break;		/* ignore */
 	}
-#if 0
-/* 'C' is taken care of by termdoc.c */
-    case 'C':{			/*  new Comment designator */
-	    break;		/* ignore */
-	}
-#endif
     case '\n':			/* empty text line */
     case ' ':{			/* normal text line */
 

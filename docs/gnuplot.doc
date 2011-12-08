@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.701 2011/11/19 04:46:49 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.701.2.1 2011/11/23 05:26:43 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -164,6 +164,7 @@ C
 2 Seeking-assistance
 ?help-desk
 ?seeking-assistance
+?FAQ
  The canonical gnuplot web page can be found at
 ^ <a href="http://www.gnuplot.info">
            http://www.gnuplot.info
@@ -1870,7 +1871,6 @@ C ... and restart the table:
  and undefined elsewhere:
        f(x) = 0<=x && x<1 ? sin(x) : 1<=x && x<2 ? 1/x : 1/0
        plot f(x)
-C^ <img align=bottom src="http://www.gnuplot.info/doc/ternary.gif" alt="[ternary.gif]" width=640 height=480>
  Note that `gnuplot` quietly ignores undefined values, so the final branch of
  the function (1/0) will produce no plottable points.  Note also that f(x)
  will be plotted as a continuous function across the discontinuity if a line
@@ -1962,7 +1962,6 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/ternary.gif" alt="[ternary
        file = "mydata.inp"
        file(n) = sprintf("run_%d.dat",n)
 
-C^ <img align=bottom src="http://www.gnuplot.info/doc/userdefined.gif" alt="[userdefined.gif]" width=640 height=480>
  The final two examples illustrate a user-defined string variable and a
  user-defined string function.
 
@@ -2302,14 +2301,13 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/userdefined.gif" alt="[use
 
 2 mouse input
 ?mouse input
- The `x11`, `pm`, `windows`, `ggi`, and `wxt` terminals allow interaction with
- the current plot using the mouse. They also support the definition of hotkeys
- to activate pre-defined functions by hitting a single key while the mouse
- focus is in the active plot window.  It is even possible to combine mouse
- input with `batch` command scripts, by invoking the command `pause mouse`
- and then using the mouse variables returned by mouse clicking as parameters
- for subsequent scripted actions. See `bind` and `mouse variables`.
- See also the command `set mouse`.
+ Many terminals allow interaction with the current plot using the mouse. Some
+ also support the definition of hotkeys to activate pre-defined functions by
+ hitting a single key while the mouse focus is in the active plot window.
+ It is even possible to combine mouse input with `batch` command scripts, by
+ invoking the command `pause mouse` and then using the mouse variables returned
+ by mouse clicking as parameters for subsequent scripted actions.
+ See `bind` and `mouse variables`.  See also the command `set mouse`.
 3 bind
 ?commands bind
 ?hotkey
@@ -5381,7 +5379,8 @@ Ffigure_mapcontours
  curve:
 
        pop(x) = 103*exp((1965-x)/10)
-       plot [1960:1990] 'population.dat', pop(x)
+       set xrange [1960:1990]
+       plot 'population.dat', pop(x)
 
  The file "population.dat" might contain:
 
@@ -5392,7 +5391,6 @@ Ffigure_mapcontours
           1980   24
           1985   10
 
-C^ <img align=bottom src="http://www.gnuplot.info/doc/population.gif" alt="[population.gif]" width=640 height=480>
 =skip
  Binary examples:
 
@@ -6149,6 +6147,9 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/population.gif" alt="[popu
 ?splot ranges
 ?ranges
  The optional ranges specify the region of the graph that will be displayed.
+ Note that if you specify the range as part of a plot command rather than using
+ a separate `set range` statement, you will not be able to pan or zoom the plot
+ interactively, and will not be able to change the range later and then `replot`.
 
  Syntax:
        [{<dummy-var>=}{{<min>}:{<max>}}]
@@ -6249,7 +6250,7 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/population.gif" alt="[popu
 
  Example:
        set key left
-       plot [0:1] for [n=1:4] x**n sprintf("%d",n)
+       plot for [n=1:4] x**n sprintf("%d",n)
 
  This example plots a family of functions.
 
@@ -8479,7 +8480,7 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/population.gif" alt="[popu
  on the surface (`set contour surface`) don't work.
 
  Labels and arrows are always visible and are unaffected.  The key box is never
- hidden by the surface. As of gnuplot version 4.5, hidden3d also affects 3D
+ hidden by the surface. As of gnuplot version 4.6, hidden3d also affects 3D
  plotting styles `points`, `labels`, `vectors`, and `impulses` even if no
  surface is present in the graph.  Individual plots within the graph may be
  explicitly excluded from this processing by appending the extra option 
@@ -9029,7 +9030,7 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/population.gif" alt="[popu
  line (the previous default meaning of lt 1).  This includes uses such as the
  definition of a temporary linestyle derived from the base linetype 1.
 
- `Note`: This command is new to gnuplot version 4.5.  It supersedes a rather
+ `Note`: This command is new to gnuplot version 4.6.  It supersedes a rather
  cryptic command in version 4.2 "set style increment user".
  The older command is now deprecated.
 
@@ -10503,7 +10504,8 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/population.gif" alt="[popu
  A negative value of pointinterval, e.g. -N, means that point symbols are drawn
  only for every Nth point, and that a box (actually circle) behind each point
  symbol is blanked out by filling with the background color.  The command
- `set pointintervalbox` controls the radius of this blanked out region.
+ `set pointintervalbox` controls the radius of this blanked-out region.
+ It is a multiplier for the default radius, which is equal to the point size.
 3 pointsize
 ?commands set pointsize
 ?commands show pointsize
@@ -12925,7 +12927,6 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/population.gif" alt="[popu
  Note that "datafile.dat" defines a 4 by 3 grid ( 4 rows of 3 points each ).
  Rows (datablocks) are separated by blank records.
 
-C^ <img align=bottom src="http://www.gnuplot.info/doc/splot.gif" alt="[splot.gif]" width=640 height=480>
  Note also that the x value is held constant within each dataline.  If you
  instead keep y constant, and plot with hidden-line removal enabled, you will
  find that the surface is drawn 'inside-out'.
@@ -13183,24 +13184,6 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/splot.gif" alt="[splot.gif
  terminals available on a particular gnuplot installation, type 'set terminal'
  with no modifiers.
 <3 -- all terminal stuff is pulled from the .trm files
-1 Graphical User Interfaces
-?graphical user interfaces
-?gui's
- Several graphical user interfaces have been written for `gnuplot` and one for
- win32 is included in this distribution.
-
- Bruce Ravel (ravel@phys.washington.edu) has written a gnuplot-mode for
- GNU emacs and XEmacs based on  the earlier gnuplot.el file by Gershon Elber.
- While the gnuplot CVS repository has its own copy the most recent
- version of this package is available from
-^ <a href="http://feff.phys.washington.edu/~ravel/software/gnuplot-mode/">
-           http://feff.phys.washington.edu/~ravel/software/gnuplot-mode/
-^ </a>
- For Python, Tk/Tcl, and other front-ends, check the links on
-^ <a href="http://gnuplot.sourceforge.net/links.html">
-          http://gnuplot.sourceforge.net/links.html
-^ </a>
-
 1 Bugs
 ?bugs
  Please e-mail bug reports to the gnuplot-bugs mailing list or
@@ -13224,19 +13207,22 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/splot.gif" alt="[splot.gif
 
  The gamma, bessel, and erf functions do not work for complex arguments.
 
- Only one color palette at a time is active for any given x11 plot window.
- This means that multiplots whose constituent plots use different palettes
- will not display correctly in x11.
-
- Coordinates specified as "time" wrap at 24 hours. This is in particular
- a limitation in using time format to handle geographic coordinates.
+ Coordinates specified as "time" wrap at 24 hours.
 
  The 'nohidden3d' option that is supposed to exempt individual plots from the
  global property 'set hidden3d' does not work for parametric curves.
 
- The program does not track the true aspect ratio of the x11 terminal window.
- In order for commands such as "set size ratio" to work, the x11 window must
- itself have equal height and width.
+ X11 terminal: It is difficult to select UTF-8 fonts.  The program does not
+ track the true aspect ratio of the x11 terminal window.  In order for commands
+ such as "set size ratio" to work, the x11 window must itself have equal height
+ and width.  Only one color palette at a time is active for any given x11 plot
+ window.  This means that multiplots whose constituent plots use different
+ palettes will not display correctly in x11.
+
+ Qt terminal: This terminal is still in the EXPERIMENTAL category.  It does not
+ yet support all the features of the other interactive terminals.  If the local
+ qt environment does not support "opengl" as a rendering mode then display of
+ polygons and surfaces can be very slow.
 
 2 External libraries
 ?bugs external_libraries
