@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.705 2011/12/04 05:36:28 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.706 2011/12/08 20:53:03 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -6402,7 +6402,7 @@ Ffigure_mapcontours
  color is chosen from a smooth palette which was set previously with the
  command `set palette`. The color value corresponds to the z-value of the
  point coordinates or to the color coordinate if specified by the 4th parameter
- in `using`. Both 2d and 3d plots (`plot` and `splot` commands) can use palette
+ in `using`. Both 2D and 3D plots (`plot` and `splot` commands) can use palette
  colors as specified by either their fractional value or the corresponding value
  mapped to the colorbox range.  A palette color value can also be read from an
  explicitly specified input column in the `using` specifier.
@@ -8405,7 +8405,7 @@ Ffigure_mapcontours
  If `front` is given, the grid is drawn on top of the graphed data. If
  `back` is given, the grid is drawn underneath the graphed data. Using
  `front` will prevent the grid from being obscured by dense data. The
- default setup, `layerdefault`, is equivalent to `back` for 2d plots.
+ default setup, `layerdefault`, is equivalent to `back` for 2D plots.
  In 3D plots the default is to split up the grid and the graph box into
  two layers: one behind, the other in front of the plotted data and
  functions. Since `hidden3d` mode does its own sorting, it ignores
@@ -9230,13 +9230,18 @@ Ffigure_mapcontours
 ?mousing
 ?mouse
 ?nomouse
- The command `set mouse` enables mouse actions. Currently the pm, x11, ggi,
- windows and wxt terminals are mouse enhanced. There are two mouse modes. The
- 2d-graph mode works for 2d graphs and for maps (i.e. splots with `set view`
- having z-rotation 0, 90, 180, 270 or 360 degrees, including `set view map`)
- and it allows tracing the position over graph, zooming, annotating graph etc.
+ The command `set mouse` enables mouse actions for the current interactive
+ terminal.  It is usually enabled by default in interactive mode, but disabled
+ by default if commands are being read from a file.
+ 
+ There are two mouse modes. The 2D mode works for `plot` commands and for `splot`
+ maps (i.e. `set view` with z-rotation 0, 90, 180, 270 or 360 degrees, including
+ `set view map`).  In this mode the mouse position is tracked and you can pan or
+ zoom using the mouse buttons or arrow keys.  Some terminals support toggling
+ individual plots on/off by clicking on the corresponding key title or on a
+ separate widget.
 
- For 3d graphs `splot`, the view and scaling of the graph can be changed with
+ For 3D graphs `splot`, the view and scaling of the graph can be changed with
  mouse buttons 1 and 2, respectively. A vertical motion of Button 2 with the
  shift key held down changes the `xyplane`.  If additionally to these
  buttons the modifier <ctrl> is held down, the coordinate axes are displayed
@@ -9258,13 +9263,6 @@ Ffigure_mapcontours
                  {{no}zoomjump} {{no}verbose}
        unset mouse
 
- The doubleclick resolution is given in milliseconds and used for Button 1,
- which copies the current mouse position to the `clipboard`.  The default value
- is 300 ms.  Setting the value to 0 ms triggers the copy on a single click.
-
- The option `zoomcoordinates` determines if the coordinates of the zoom box are
- drawn at the edges while zooming. This is on by default.
-
  The options `noruler` and `ruler` switch the ruler off and on, the latter
  optionally setting the origin at the given coordinates. While the ruler is on,
  the distance in user units from the ruler origin to the mouse is displayed
@@ -9285,11 +9283,6 @@ Ffigure_mapcontours
  Button 2 on the label's point. The threshold for how close you must be to the
  label is also determined by the `pointsize`.
 
- If the option `zoomjump` is on, the mouse pointer will be automatically
- offset a small distance after starting a zoom region with button 3. This can
- be useful to avoid a tiny (or even empty) zoom region. `zoomjump` is off by
- default.
-
  If the option `verbose` is turned on the communication commands are shown
  during execution. This option can also be toggled by hitting `6` in the
  driver's window. `verbose` is off by default.
@@ -9299,6 +9292,12 @@ Ffigure_mapcontours
  can be defined using the `bind` command, see help for `bind`.  Note, that user
  defined `hotkeys` may override the default bindings.
  See also help for `bind` and `label`.
+4 doubleclick
+?set mouse doubleclick
+?mouse doubleclick
+ The doubleclick resolution is given in milliseconds and used for Button 1,
+ which copies the current mouse position to the `clipboard`.  The default value
+ is 300 ms.  Setting the value to 0 ms triggers the copy on a single click.
 4 mouseformat
 ?set mouse format
 ?set mouse mouseformat
@@ -9333,7 +9332,7 @@ Ffigure_mapcontours
 ?mouse wheel
 ?scrolling
 ?mousewheel
- X and Y axis scaling in both 2d and 3d graphs can be adjusted using the
+ X and Y axis scaling in both 2D and 3D graphs can be adjusted using the
  mouse wheel.  <wheel-up> scrolls up (increases both YMIN and YMAX by ten
  percent of the Y range, and increases both Y2MIN and Y2MAX likewise), and
  <wheel down> scrolls down.  <shift-wheel-up> scrolls left (decreases both
@@ -9350,6 +9349,23 @@ Ffigure_mapcontours
  terminal option, then only the current plot window supports the entire
  range of mouse commands and hotkeys.  The other windows will, however,
  continue to display mouse coordinates at the lower left.
+4 zoom
+?mouse zoom
+=zoom
+ Zooming is usually accomplished by holding down the left mouse button and 
+ dragging the mouse to delineate a zoom region.  Some platforms may require
+ using a different mouse button.  The original plot can be restored by tying
+ `unzoom` at the command line or the 'u' hotkey in the plot window.  The hotkeys
+ 'p' and 'n' step back and forth through a history of zoom operations.
+
+ The option `zoomcoordinates` determines if the coordinates of the zoom box are
+ drawn at the edges while zooming. This is on by default.
+
+ If the option `zoomjump` is on, the mouse pointer will be automatically
+ offset a small distance after starting a zoom region with button 3. This can
+ be useful to avoid a tiny (or even empty) zoom region. `zoomjump` is off by
+ default.
+
 3 multiplot
 ?commands set multiplot
 ?commands unset multiplot
