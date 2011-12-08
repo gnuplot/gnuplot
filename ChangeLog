@@ -1,3 +1,8 @@
+2011-12-08  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* docs/gnuplot.doc docs/Makefile.in term/context.trm docs/doc2rnh.c:
+	Miscellaneous documentation updates, remove dead URLs.
+
 2011-12-07  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* demo/random.dem: Use loops to create random number data sets.

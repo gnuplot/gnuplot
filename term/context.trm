@@ -1,5 +1,5 @@
 /*
- * $Id: context.trm,v 1.2 2011/11/07 18:30:10 markisch Exp $
+ * $Id: context.trm,v 1.3 2011/11/10 07:30:53 markisch Exp $
  */
 
 /* GNUPLOT - context.trm */
@@ -1983,21 +1983,18 @@ START_HELP(context)
 "",
 " Syntax:",
 "      set term context {default}",
-"                       {defaultsize | size <scale> |",
-"                        size <xsize>{in|cm}, <ysize>{in|cm}}",
-"                       {input | standalone}",
-"                       {timestamp | notimestamp}",
-"                       {noheader | header \"<header>\"}",
-"                       {color | colour | monochrome}",
-"                       {rounded | mitered | beveled}",
-"                       {round | butt | squared}",
-"                       {dashed | solid}",
-"                       {dashlength | dl <dl>}",
-"                       {linewidth | lw <lw>}",
-"                       {fontscale <fontscale>}",
-"                       {mppoints | texpoints}",
-"                       {inlineimages | externalimages}",
-"                       {defaultfont | font \"{<fontname>}{,<fontsize>}\"}",
+"              {defaultsize | size <scale> | size <xsize>{in|cm}, <ysize>{in|cm}}",
+"              {input | standalone}",
+"              {timestamp | notimestamp}",
+"              {noheader | header \"<header>\"}",
+"              {color | colour | monochrome}",
+"              {rounded | mitered | beveled} {round | butt | squared}",
+"              {dashed | solid} {dashlength | dl <dl>}",
+"              {linewidth | lw <lw>}",
+"              {fontscale <fontscale>}",
+"              {mppoints | texpoints}",
+"              {inlineimages | externalimages}",
+"              {defaultfont | font \"{<fontname>}{,<fontsize>}\"}",
 "",
 " In non-standalone (`input`) graphic only parameters `size` to select graphic",
 " size, `fontscale` to scale all the labels for a factor <fontscale>",
