@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.701.2.2 2011/12/08 21:01:52 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.701.2.3 2011/12/08 22:06:05 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -9378,12 +9378,12 @@ Ffigure_mapcontours
  continue to display mouse coordinates at the lower left.
 4 zoom
 ?mouse zoom
-=zoom
+?zoom
  Zooming is usually accomplished by holding down the left mouse button and 
  dragging the mouse to delineate a zoom region.  Some platforms may require
- using a different mouse button.  The original plot can be restored by tying
- `unzoom` at the command line or the 'u' hotkey in the plot window.  The hotkeys
- 'p' and 'n' step back and forth through a history of zoom operations.
+ using a different mouse button.  The original plot can be restored by typing
+ the 'u' hotkey in the plot window.  The hotkeys 'p' and 'n' step back and
+ forth through a history of zoom operations.
 
  The option `zoomcoordinates` determines if the coordinates of the zoom box are
  drawn at the edges while zooming. This is on by default.
