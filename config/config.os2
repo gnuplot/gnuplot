@@ -403,8 +403,9 @@
 /* Define if this is an MSDOS system. */
 /* #undef MSDOS */
 
-/* Define if you do not want to read .gnuplot in the current directory. */
-/* #undef NOCWDRC */
+/* Define if you want to read .gnuplot from current directory
+   (SECURITY RISK!). */
+/* #undef USE_CWDRC */
 
 /* Name of package */
 /* #undef PACKAGE */

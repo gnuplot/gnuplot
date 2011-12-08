@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.262 2011/11/26 00:31:15 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.263 2011/12/04 05:36:28 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -950,12 +950,12 @@ show_version(FILE *fp)
 		"";
 
 	    const char *nocwdrc =
-#ifdef NOCWDRC
+#ifdef USE_CWDRC
 		"+"
 #else
 		"-"
 #endif
-		"NOCWDRC  ";
+		"USE_CWDRC  ";
 
 	    const char *x11 =
 #ifdef X11
