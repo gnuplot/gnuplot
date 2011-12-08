@@ -1,5 +1,5 @@
 #
-# $Id: makefile.unx,v 1.18 2011/09/02 16:26:10 markisch Exp $
+# $Id: makefile.unx,v 1.19 2011/10/03 16:20:32 sfeam Exp $
 #
 #
 ############################################################
@@ -66,11 +66,11 @@ INSTALL=install
 #   If you want to use the more complex gnu version of readline, you can
 #   define HAVE_LIBREADLINE instead of READLINE and add the appropriate library
 #   file(s) to LIBS below.
-# NOCWDRC:
-#   If NOCWDRC is defined, then any .gnuplot in the current directory
-#   is not read on startup. This is a security consideration
-#   especially for root users ( we recommend you define -DNOCWDRC ).
-OPTIONS = -DREADLINE -DNOCWDRC
+# USE_CWDRC:
+#   If USE_CWDRC is defined, then any .gnuplot in the current directory
+#   is read on startup. This is a security consideration
+#   especially for root users ( we recommend you do not define this ).
+OPTIONS = -DREADLINE
 
 #>>> Optionally install the lasergnu script.
 # Lasergnu is a handy shell script for creating a plot from the

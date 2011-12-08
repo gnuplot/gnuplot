@@ -3,6 +3,18 @@
 	* docs/gnuplot.doc docs/Makefile.in term/context.trm docs/doc2rnh.c:
 	Miscellaneous documentation updates, remove dead URLs.
 
+	* configure.in docs/gnuplot.doc src/plot.c src/show.c
+	config/config.cyg config/config.dj2 config/config.mgw config/config.nt
+	config/config.os2 config/config.oww config/makefile.unx:
+
+	Despite what it says in the documentation, and despite what the
+	configure script prints out, auto-configuration never defined the
+	NOCWDRC flag to disable reading an initialization file .gnuplot
+	from the current directory.  This is a security risk.  Furthermore,
+	having to define something special to get the secure state is bad
+	design.  Fix the configuration script and default to not initializing
+	from the current directory.  Put a warning in various config files.
+
 2011-11-29  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* docs/Makefile.in:  Remove duplicate entry for qt in CORETERMS.
