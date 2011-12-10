@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.225 2011/09/06 03:17:42 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.226 2011/11/26 00:04:31 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -274,6 +274,7 @@ static const struct gen_table set_multiplot_tbl[] =
 
 # define MP_LAYOUT_DEFAULT {          \
     FALSE,	/* auto_layout */         \
+    0,		/* current_panel */       \
     0, 0,	/* num_rows, num_cols */  \
     FALSE,	/* row_major */           \
     TRUE,	/* downwards */           \
@@ -286,6 +287,7 @@ static const struct gen_table set_multiplot_tbl[] =
 
 static struct {
     TBOOLEAN auto_layout;  /* automatic layout if true */
+    int current_panel;     /* initialized to 0, incremented after each plot */
     int num_rows;          /* number of rows in layout */
     int num_cols;          /* number of columns in layout */
     TBOOLEAN row_major;    /* row major mode if true, column major else */
@@ -591,6 +593,7 @@ term_end_plot()
 	(*term->text) ();
 	term_graphics = FALSE;
     } else {
+	mp_layout.current_panel++;
 	if (mp_layout.auto_layout) {
 	    if (mp_layout.row_major) {
 		mp_layout.act_row++;
@@ -642,6 +645,7 @@ term_start_multiplot()
     term_start_plot();
 
     mp_layout.auto_layout = FALSE;
+    mp_layout.current_panel = 0;
 
     /* Parse options (new in version 4.1 */
     while (!END_OF_COMMAND) {

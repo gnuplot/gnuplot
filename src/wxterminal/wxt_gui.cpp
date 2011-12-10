@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.cpp,v 1.90 2011/11/06 04:06:10 sfeam Exp $
+ * $Id: wxt_gui.cpp,v 1.91 2011/11/08 21:21:00 sfeam Exp $
  */
 
 /* GNUPLOT - wxt_gui.cpp */
@@ -120,8 +120,9 @@
  */
 static int wxt_cur_plotno = 0;
 static TBOOLEAN wxt_in_key_sample = FALSE;
+static TBOOLEAN wxt_in_plot = FALSE;
 static TBOOLEAN wxt_zoom_command = FALSE;
-static unsigned long wxt_hide_plot = 0;	/* Used as a bit array */
+static unsigned long long wxt_hide_plot = 0;	/* Used as a bit array */
 #ifdef USE_MOUSE
 typedef struct {
 	unsigned int left;
@@ -1227,10 +1228,10 @@ static void wxt_check_for_toggle(unsigned int x, unsigned int y)
 			continue;
 		if (y > wxt_key_boxes[i].ytop)
 			continue;
-		if ((wxt_hide_plot & 1L<<i) == 0)
-			wxt_hide_plot |= 1L<<i;
+		if ((wxt_hide_plot & 1LL<<i) == 0)
+			wxt_hide_plot |= 1LL<<i;
 		else
-			wxt_hide_plot &= ~(1L<<i);
+			wxt_hide_plot &= ~(1LL<<i);
 		wxt_current_panel->wxt_cairo_refresh();
 
 	}
@@ -2297,12 +2298,19 @@ void wxt_image(unsigned int M, unsigned int N, coordval * image, gpiPoint * corn
  */
 void wxt_layer(t_termlayer layer)
 {
-	/* I do not understand why this particular layering command */
-	/* must be processed asynchronously, but if it is buffered  */
-	/* instead then it never reaches the command interpreter.   */
+	/* There are two classes of meta-information.  The first class	*/
+	/* is tied to the current state of the user interface or the	*/
+	/* main gnuplot thread.  Any action on these must be done here,	*/
+	/* immediately.  The second class relates to the sequence of	*/
+	/* operations in the plot itself.  These are buffered for later	*/
+	/* execution in sequential order.				*/
 	if (layer == TERM_LAYER_BEFORE_ZOOM) {
 		wxt_zoom_command = TRUE;
 		return;
+	}
+	if (layer == TERM_LAYER_RESET || layer == TERM_LAYER_RESET_PLOTNO) {
+		if (multiplot)
+			return;
 	}
 
 	gp_command temp_command;
@@ -2504,7 +2512,8 @@ void wxtPanel::wxt_cairo_refresh()
 		/* Skip the plot commands, but not the key sample commands,
 		 * if the plot was toggled off by a mouse click in the GUI
 		 */
-		if (((wxt_hide_plot & (1L << wxt_cur_plotno)) != 0)
+		if (wxt_in_plot)
+		if (((wxt_hide_plot & (1LL << wxt_cur_plotno)) != 0)
 		&&  wxt_iter->command != command_layer && !wxt_in_key_sample)
 			continue;
 
@@ -2723,8 +2732,10 @@ void wxtPanel::wxt_cairo_exec_command(gp_command command)
 				break;
 		case TERM_LAYER_BEFORE_PLOT:
 				wxt_cur_plotno++;
+				wxt_in_plot = TRUE;
 				break;
 		case TERM_LAYER_AFTER_PLOT:
+				wxt_in_plot = FALSE;
 				break;
 		case TERM_LAYER_BEGIN_KEYSAMPLE:
 				wxt_in_key_sample = TRUE;

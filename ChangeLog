@@ -1,3 +1,9 @@
+2011-12-10  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/term.c src/wxterminal/wxt_gui.cpp term/svg.trm:
+	Allow toggling individual plots on/off inside a multiplot page.
+	Bugfix.
+
 2011-12-08  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* docs/gnuplot.doc docs/Makefile.in term/context.trm docs/doc2rnh.c:
