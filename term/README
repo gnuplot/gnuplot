@@ -1,8 +1,6 @@
 DOCUMENTATION FOR GNUPLOT TERMINAL DRIVER WRITERS
 By Russell Lang 1/90
-
 Updated for new file layout by drd 4/95
-
 Paragraphs about inclusion of TERM_HELP added by rcc 1/96
 
 No change to the interface between gnuplot and the terminal drivers,
@@ -13,11 +11,6 @@ but we would like to make the terminal drivers standalone
    contributed drivers
 2) To make it easy for users to add contributed drivers, by adding
    a single #include line to term.h
-3) To allow individual compilation on DOS, to save the overlay
-   manager from having to load _all_ drivers together.
-
-CORRECTION - scale() interface is no longer supported, since it
-is incompatible with multiplot.
 
 Whole of terminal driver should be contained in one <driver>.trm file,
 with a fairly strict layout as detailed below - this allows the
@@ -193,10 +186,8 @@ _scale(xs,ys) Called just before _graphics(). This takes the x and y
 scaling factors as information. If the terminal would like to do its
 own scaling, it returns TRUE. Otherwise, it can ignore the information
 and return FALSE: do_plot will do the scaling for you. null_scale is
-provided to do just this, so most drivers can ignore this function
-entirely. The Latex driver is currently the only one providing its own
-scaling. PLEASE DO NOT USE THIS INTERFACE - IT IS NOT COMPATIBLE WITH
-MULTIPLOT.
+provided to do just this, so most drivers can ignore this function.
+PLEASE DO NOT USE THIS INTERFACE - IT IS NOT COMPATIBLE WITH MULTIPLOT.
 
 _graphics()  Called just before a plot is going to be displayed.  This
 procedure should set the device into graphics mode.  Devices which can't
@@ -296,9 +287,12 @@ An _arrow() function called do_arrow() is provided in term.c which will
 draw arrows using the _move() and _vector() functions.  
 Drivers should use do_arrow unless it causes problems.
 
-_set_font() is called to set the font of labels, etc. [new 3.7 feature]
+_set_font() is called to set the font of labels, etc.
   - fonts are selected as strings "name,size".
   - _set_font("") restores the terminal's default font.
+The core code does not currently use this entry point, but many 
+terminal drivers use it internally to process font requests either
+in "set term" or enhanced text strings.
 
 _pointsize() is used to set the pointsize for subsequent points
 
@@ -309,6 +303,7 @@ _flags stores various flags describing driver capabilities.
   - TERM_BINARY - output file must be opened in binary mode
   - TERM_ENHANCED_TEXT - terminal is currently in enhanced text mode
   - TERM_NO_OUTPUTFILE - terminal does not use gpoutfile
+  See other flags defined in term_api.h
 
 _suspend() - Called before gnuplot issues a prompt in multiplot mode.
    Called only in interactive mode, and only for drivers that have set the
@@ -353,9 +348,7 @@ _set_cursor(int c, int x, int y) - Set cursor style and corner of
 _set_clipboard(const char s[]) - Write a string to the clipboard.
 
 
-The following four functions were conditioned on #ifdef PM3D; this necessity
-was removed in August 2005. For further documentation about pm3d routines,
-see also pm3d/old-docs/README-pm3d.
+The following four functions support PM3D and RGB colors.
 
 _make_palette(t_sm_palette *palette) - If argument is NULL, return
    number of colors available.  If the number of colors is not limited
@@ -431,7 +424,9 @@ _image(unsigned M, unsigned N, coordval *image, gpiPoint *corner, t_imagecolor c
 
 _layer(t_termlayer syncpoint)
    Driver-specific synchronization or other layering commands.
-   As of this point (Jan 2009) used only by fig lua post pslatex and svg.
+   For example, the BEGIN_KEY_SAMPLE/END_KEY_SAMPLE sync points allow
+   a driver to respond differently to mouse-clicks on the key sample
+   than to mouse clicks elsewhere.
    See term_api.h for defined synchronization points. Any driver that 
    implements term->layer() must silently ignore unrecognized syncpoints.
 
