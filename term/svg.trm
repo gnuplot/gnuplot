@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: svg.trm,v 1.129 2011/11/26 00:31:15 sfeam Exp $
+ * $Id: svg.trm,v 1.130 2011/12/10 07:05:33 sfeam Exp $
  */
 
 /*------------------------------------------------------------------------------------------------------------------------------------
@@ -1040,7 +1040,6 @@ SVG_text ()
 
     if (SVG_mouseable) {
 	struct udvt_entry *udv;
-	char *name = (SVG_name) ? SVG_name : "gnuplot";
 
 	fprintf(gpoutfile, "\n<script type=\"text/javascript\"><![CDATA[\n");
 	fprintf(gpoutfile, "// plot boundaries and axis scaling information for mousing \n");
