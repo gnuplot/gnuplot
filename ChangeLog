@@ -1,3 +1,33 @@
+2011-12-11  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* config/config.nt config/config.mgw: Sync with config.h created by
+	autoconf.
+
+	* src/msvc/Makefile: More complete install target. Add new variables
+	to hold paths to external libraries.
+
+	* src/mingw/Makefile: Include index in gnuplot.pdf. Support building
+	of the Japanese help file wgnuplot-ja.chm.
+
+	* src/eval.c (update_gpval_variables): New variable GPVAL_ENCODING.
+
+	* term/gd.trm (gd_iconv): Silence const mismatch compiler warning
+	in call to iconv by casting second argument to (void *).
+
+	* src/syscfg.h: All tested platforms (XP, Vista, 7) support '/' as
+	directory separator.
+
+	* src/win/winmain.c: Automatic language detection can be overridden
+	by new setting "Language=XX" in wgnuplot.ini. Suggestion by Shigeharu
+	Takeno.
+
+	* src/win/wpause.c: Remove local definition of TBOOLEAN.
+
+	* docs/plotstyles.gnu: Prefer pngcairo over png terminal. Use font
+	"Times New Roman" on Windows.
+
+	* demo/random.dem: Use loops to create random number data sets.
+
 2011-12-08  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* docs/gnuplot.doc docs/Makefile.in term/context.trm docs/doc2rnh.c:

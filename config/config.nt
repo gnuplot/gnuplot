@@ -1,7 +1,7 @@
-/* config.h for makefile.nt
+/* config.h for msvc/Makefile
  *
  * Prepared according to config.h from ./configure and by means of
- * config_strip.sh as of gnuplot 4.5 in March 2011.
+ * config_strip.sh as of gnuplot 4.5 in November 2011.
  */
 
 
@@ -40,7 +40,7 @@
 
 /* Define if libgd supports animated gifs. */
 /* #undef GIF_ANIMATION */
-/* Don't change it here -- this define is set in config/makefile.nt. */
+/* Don't change it here -- this define is set in config/msvc/Makefile. */
 
 /* Define if you want to use a gnuplot history file. */
 #define GNUPLOT_HISTORY 1
@@ -63,8 +63,13 @@
 /* Define to 1 if you have the `bzero' function. */
 /* #undef HAVE_BZERO */
 
+/* libcairo support for eps (cairo >= 1.6) */
+/* #undef HAVE_CAIROEPS */
+/* Don't change it here -- this define is set in config/msvc/Makefile. */
+
 /* Define if you want the cairo-based terminals. */
 /* #undef HAVE_CAIROPDF */
+/* Don't change it here -- this define is set in config/msvc/Makefile. */
 
 /* Define to 1 if you have the declaration of `signgam', and to 0 if you
    don't. */
@@ -99,23 +104,23 @@
 
 /* Define if libgd supports gif. */
 /* #undef HAVE_GD_GIF */
-/* Don't change it here -- this define is set in config/makefile.nt. */
+/* Don't change it here -- this define is set in config/msvc/Makefile. */
 
 /* Define to 1 if you have the <gd.h> header file. */
 /* #undef HAVE_GD_H */
-/* Don't change it here -- this define is set in config/makefile.nt. */
+/* Don't change it here -- this define is set in config/msvc/Makefile. */
 
 /* Define if libgd supports jpeg. */
 /* #undef HAVE_GD_JPEG */
-/* Don't change it here -- this define is set in config/makefile.nt. */
+/* Don't change it here -- this define is set in config/msvc/Makefile. */
 
 /* Define if libgd supports png. */
 /* #undef HAVE_GD_PNG */
-/* Don't change it here -- this define is set in config/makefile.nt. */
+/* Don't change it here -- this define is set in config/msvc/Makefile. */
 
 /* Define if libgd supports TrueType fonts through libfreetype. */
 /* #undef HAVE_GD_TTF */
-/* Don't change it here -- this define is set in config/makefile.nt. */
+/* Don't change it here -- this define is set in config/msvc/Makefile. */
 
 /* Define to 1 if you have the `getcwd' function. */
 #define HAVE_GETCWD 1
@@ -132,17 +137,21 @@
 /* Define to use gtk+ functions to handle cairo */
 /* #undef HAVE_GTK28 */
 
+/* define if you have libiconv and iconv.h */
+/* #undef HAVE_ICONV */
+/* Don't change it here -- this define is set in config/msvc/Makefile. */
+
 /* Define to 1 if you have the `index' function. */
 /* #undef HAVE_INDEX */
 
 /* Define to 1 if you have the <inttypes.h> header file. */
 /* #undef HAVE_INTTYPES_H */
 
-/* Define to 1 if you have the `isnan' function. */
-#define HAVE_ISNAN 1
-
 /* Define if you use have kpsexpand (TeX). */
 /* #undef HAVE_KPSEXPAND */
+
+/* Define to 1 if you have the <langinfo.h> header file. */
+/* #undef HAVE_LANGINFO_H */
 
 /* Define to 1 if you have the `lgamma' function. */
 /* #undef HAVE_LGAMMA */
@@ -158,14 +167,14 @@
 
 /* Define if you have gd library. */
 /* #undef HAVE_LIBGD */
-/* Don't change it here -- this define is set in config/makefile.nt. */
+/* Don't change it here -- this define is set in config/msvc/Makefile. */
 
 /* Define to 1 if you have the `m' library (-lm). */
 /* #undef HAVE_LIBM */
 
 /* Define to 1 if you have the `pdf' library (-lpdf). */
 /* #undef HAVE_LIBPDF */
-/* Don't change it here -- this define is set in config/makefile.nt. */
+/* Don't change it here -- this define is set in config/msvc/Makefile. */
 
 /* Define if your pdf library is too old to use PDF_begin_document. */
 /* #undef HAVE_LIBPDF_OPEN_FILE */
@@ -175,7 +184,7 @@
 
 /* Define if you have zlib. */
 /* #undef HAVE_LIBZ */
-/* Don't change it here -- this define is set in config/makefile.nt. */
+/* Don't change it here -- this define is set in config/msvc/Makefile. */
 
 /* Define to 1 if you have the <limits.h> header file. */
 #define HAVE_LIMITS_H 1
@@ -185,9 +194,11 @@
 
 /* Define if you want the lua/TikZ terminal. */
 /* #undef HAVE_LUA */
+/* Don't change it here -- this define is set in config/msvc/Makefile. */
 
 /* Define to 1 if you have the <lua.h> header file. */
 /* #undef HAVE_LUA_H */
+/* Don't change it here -- this define is set in config/msvc/Makefile. */
 
 /* Define to 1 if you have the <malloc.h> header file. */
 #define HAVE_MALLOC_H 1
@@ -248,7 +259,7 @@
 
 /* Define to 1 if you have the `setvbuf' function. */
 /* #define HAVE_SETVBUF	1 */
-  /* it is defined, but setvbuf(stdout) does not work for the MS Windows GUI redirected stdout */
+  /* it is defined, but setvbuf(stdout) does not work for Windows GUI redirected stdout */
 
 /* Define to 1 if you have the <sgtty.h> header file. */
 /* #undef HAVE_SGTTY_H */
@@ -392,6 +403,12 @@
 /* Define to 1 if you have the <vgagl.h> header file. */
 /* #undef HAVE_VGAGL_H */
 
+/* Define to 1 if you have the <wchar.h> header file. */
+#define HAVE_WCHAR_H 1
+
+/* Define to 1 if you have the `wcwidth' function. */
+/* #undef HAVE_WCWIDTH */
+
 /* Define to 1 if `fork' works. */
 /* #undef HAVE_WORKING_FORK */
 
@@ -405,7 +422,7 @@
 /* #undef HIDDEN3D_GRIDBOX */
 
 /* Define to enable quadtree optimization in hidden3d code. */
-/* #undef HIDDEN3D_QUADTREE */
+#define HIDDEN3D_QUADTREE 1
 
 /* Define to enable handling point size in hidden3d code. */
 #define HIDDEN3D_VAR_PTSIZE 1
@@ -455,6 +472,7 @@
 
 /* Define if you do have the popen and pclose functions. */
 /* #undef PIPES */
+/* Don't change it here -- this define is set in config/msvc/Makefile. */
 
 /* Unix-type of Interprocess Communication is required for mouse support. */
 /* #undef PIPE_IPC */
@@ -500,7 +518,7 @@
 
 /* Define if you want to have mouse support in interactive terminals. */
 /* #undef USE_MOUSE */
-/* Don't change it here -- this define is set in config/makefile.nt. */
+/* Don't change it here -- this define is set in config/msvc/Makefile. */
 
 /* Define to add support for generating a statistical summary of data */
 #define USE_STATS 1
@@ -519,6 +537,7 @@
 
 /* Define if you want the wxwidgets terminal. */
 /* #undef WXWIDGETS */
+/* Don't change it here -- this define is set in config/msvc/Makefile. */
 
 /* Define if you are using the X11 window system. */
 /* #undef X11 */
@@ -573,16 +592,18 @@
 #define GP_MATHERR _matherr
 #define snprintf _snprintf
 /*#define vsnprintf _vsnprintf*/
+#define isnan _isnan
+#define ftruncate _chsize
+
 #ifdef PIPES
 # define popen _popen
 # define pclose _pclose
 #endif
-#define isnan _isnan
 
 /* gnuplot.gih is not used by wgnuplot */
 #define NO_GIH 1
 
 /* The Microsoft visual C++ compiler spews about 1000 warnings during */
 /* compilation of gnuplot. The following lines disable most of them.  */
-#pragma warning(disable: 4018 4056 4244 4305 4761 4756 4996)
+#pragma warning(disable: 4018 4056 4113 4244 4305 4761 4756 4996)
 #define _CRT_SECURE_NO_WARNINGS
