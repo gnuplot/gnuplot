@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: eval.c,v 1.95 2011/09/08 05:19:07 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: eval.c,v 1.96 2011/11/10 05:15:58 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - eval.c */
@@ -852,7 +852,7 @@ update_gpval_variables(int context)
 	fill_gpval_float("GPVAL_VIEW_ZSCALE", surface_zscale);
 	return;
     }
-    
+
     /* These are set after every "set" command, which is kind of silly */
     /* because they only change after 'set term' 'set output' ...      */
     if (context == 0 || context == 2 || context == 3) {
@@ -862,9 +862,10 @@ update_gpval_variables(int context)
 	    fill_gpval_string("GPVAL_TERM", "unknown");
 	else
 	    fill_gpval_string("GPVAL_TERM", (char *)(term->name));
-	
+
 	fill_gpval_string("GPVAL_TERMOPTIONS", term_options);
 	fill_gpval_string("GPVAL_OUTPUT", (outstr) ? outstr : "");
+	fill_gpval_string("GPVAL_ENCODING", encoding_names[encoding]);
     }
 
     /* If we are called from int_error() then set the error state */
@@ -876,7 +877,7 @@ update_gpval_variables(int context)
 	struct udvt_entry *v = add_udv_by_name("GPVAL_VERSION");
 	char *tmp;
 	if (v && v->udv_undef == TRUE) {
-	    v->udv_undef = FALSE; 
+	    v->udv_undef = FALSE;
 	    Gcomplex(&v->udv_value, atof(gnuplot_version), 0);
 	}
 	v = add_udv_by_name("GPVAL_PATCHLEVEL");
@@ -894,6 +895,8 @@ update_gpval_variables(int context)
 	tmp = get_terminals_names();
 	fill_gpval_string("GPVAL_TERMINALS", tmp);
 	free(tmp);
+
+	fill_gpval_string("GPVAL_ENCODING", encoding_names[encoding]);
 
 	/* Permanent copy of user-clobberable variables pi and NaN */
 	fill_gpval_float("GPVAL_pi", M_PI);
@@ -930,7 +933,7 @@ gp_words(char *string)
 	push(Ginteger(&a,-1));
 	f_words((union argument *)NULL);
 	pop(&a);
-	
+
     return a.v.int_val;
 }
 
