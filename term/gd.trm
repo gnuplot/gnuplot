@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: gd.trm,v 1.162 2011/11/09 17:04:36 markisch Exp $
+ * $Id: gd.trm,v 1.163 2011/11/09 17:09:49 markisch Exp $
  * based on gif.trm,v 1.26.2.1 2000/05/01 00:17:20 joze
  */
 
@@ -637,10 +637,10 @@ PNG_options()
 	    const char fonts[] = "\\fonts";
 	    char *windir = getenv("windir");
 	    if (windir) {
-		char *gdfontpath = (char *) 
+		char *gdfontpath = (char *)
 		    gp_alloc(strlen(windir) + strlen(fonts) + 1, "GDFONTPATH");
 		if (gdfontpath) {
-		   strcpy(gdfontpath, windir); 
+		   strcpy(gdfontpath, windir);
 		   strcat(gdfontpath, fonts);
 		   SetEnvironmentVariable("GDFONTPATH", gdfontpath);
 		   free(gdfontpath);
@@ -2266,10 +2266,10 @@ gd_iconv(char **string)
 	len2 = len1;
 	iconv_string = gp_alloc(len2, "iconv string");
 	stmp = iconv_string;
-	if ((cd = iconv_open("Shift_JIS", "UTF-8")) == (iconv_t)-1) 
+	if ((cd = iconv_open("Shift_JIS", "UTF-8")) == (iconv_t)-1)
 	  int_warn(NO_CARET, "iconv_open failed");
 	else {
-	    if (iconv(cd, string, &len1, &stmp, &len2) == (size_t)-1)
+	    if (iconv(cd, (void *)string, &len1, &stmp, &len2) == (size_t)-1)
 		int_warn(NO_CARET, "iconv failed");
 	    else
 		*string = iconv_string;
@@ -2284,7 +2284,7 @@ gd_iconv(char **string)
 	if ((cd = iconv_open("UTF-8", "Shift_JIS")) == (iconv_t)-1)
 	  int_warn(NO_CARET, "iconv_open failed");
 	else {
-	    if (iconv(cd, (char **)(string), &len1, &stmp, &len2) == (size_t)-1)
+	    if (iconv(cd, (void *)string, &len1, &stmp, &len2) == (size_t)-1)
 		int_warn(NO_CARET, "iconv failed");
 	    else
 		*string = iconv_string;
@@ -2295,11 +2295,11 @@ gd_iconv(char **string)
 #else /* ! HAVE_ICONV */
 #ifdef JIS_GDLIB
     if (encoding == S_ENC_UTF8)
-	int_warn(NO_CARET, 
+	int_warn(NO_CARET,
 		 "This gdlib supports Shift_JIS encoding, but not UTF-8.");
 #else /* ! JIS_GDLIB */
     if (encoding == S_ENC_SJIS) /* Shift_JIS -> UTF-8 */
-	int_warn(NO_CARET, 
+	int_warn(NO_CARET,
 		 "This gdlib supports UTF-8 encoding, but not Shift_JIS.");
 #endif  /* JIS_GDLIB */
 #endif /* HAVE_ICONV */
