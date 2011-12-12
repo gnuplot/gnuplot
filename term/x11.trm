@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: x11.trm,v 1.192 2011/06/21 01:10:43 sfeam Exp $
+ * $Id: x11.trm,v 1.193 2011/10/08 00:07:41 sfeam Exp $
  *
  */
 
@@ -617,7 +617,11 @@ X11_options()
     /* Leave the current window unchanged when closing an old window */
     if (X11_ipc) {
 	if (set_close) {
-	    fprintf(X11_ipc, (set_number ? "C%d\n" : "C\n"), new_term_number);
+	    if (set_number) {
+		fprintf(X11_ipc, "C%d\n", new_term_number);
+	    } else {
+		fputs("C\n", X11_ipc);
+	    }
 	    fflush(X11_ipc);
 	} else if (set_number) {
 #ifdef EXTERNAL_X11_WINDOW
