@@ -59,6 +59,8 @@ TERM_TABLE_START (qt_driver)
     , qt_make_palette, 0 /* qt_previous_palette */, qt_set_color, qt_filled_polygon
     , qt_image
     , qt_enhanced_open, qt_enhanced_flush, qt_enhanced_writec
+    , qt_layer
+    , NULL /* qt_path */
 TERM_TABLE_END (qt_driver)
 
 #undef LAST_TERM

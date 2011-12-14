@@ -1,3 +1,15 @@
+2011-12-14  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/qtterminal/QtGnuplotScene.cpp src/qtterminal/QtGnuplotSettings.ui
+	src/qtterminal/QtGnuplotWidget.cpp src/qtterminal/QtGnuplotWidget.h:
+	Support rounded linejoins/caps in qt terminal.
+
+	* src/qtterminal/qt_term.cpp src/qtterminal/qt_term.h term/qt.trm:
+	Add term->layer() entry point for qt terminal.
+
+	* src/qtterminal/qt_term.cpp:
+	Support for dashed lines in qt terminal.
+
 2011-12-10  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/term.c src/wxterminal/wxt_gui.cpp term/svg.trm:

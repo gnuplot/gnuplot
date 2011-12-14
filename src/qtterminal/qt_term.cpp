@@ -915,3 +915,12 @@ void qt_options()
 	/// @bug change Utf8 to local encoding
 	strncpy(term_options, termOptions.toUtf8().data(), MAX_LINE_LEN);
 }
+
+void qt_layer( t_termlayer syncpoint )
+{
+    /* We must ignore all syncpoints that we don't recognize */
+    switch (syncpoint) {
+    	default:
+		break;
+    }
+}
