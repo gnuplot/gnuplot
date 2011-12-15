@@ -76,6 +76,7 @@ bool qt_optionEnhanced = false;
 bool qt_optionPersist  = false;
 bool qt_optionRaise    = true;
 bool qt_optionCtrl     = false;
+bool qt_optionDash     = false;
 int  qt_optionWidth    = 640;
 int  qt_optionHeight   = 480;
 int  qt_optionFontSize = 9;
@@ -465,7 +466,16 @@ void qt_linetype(int lt)
 		lt = LT_NODRAW; // background color
 
 	if (lt == -1)
-		qt_out << GEPenStyle << Qt::DashLine;
+		qt_out << GEPenStyle << Qt::DotLine;
+	else if (qt_optionDash && lt > 0) {	// DEBUG EAM 11dec2011
+		Qt::PenStyle style;
+		style =
+			(lt%4 == 1) ? Qt::DashLine :
+			(lt%4 == 2) ? Qt::DashDotLine :
+			(lt%4 == 3) ? Qt::DashDotDotLine :
+			              Qt::SolidLine ;
+		qt_out << GEPenStyle << style;
+		}
 	else
 		qt_out << GEPenStyle << Qt::SolidLine;
 
@@ -725,6 +735,8 @@ enum QT_id {
 	QT_NOCTRL,
 	QT_TITLE,
 	QT_CLOSE,
+	QT_DASH,
+	QT_SOLID,
 	QT_OTHER
 };
 
@@ -742,6 +754,8 @@ static struct gen_table qt_opts[] = {
 	{"noct$rlq",    QT_NOCTRL},
 	{"ti$tle",      QT_TITLE},
 	{"cl$ose",      QT_CLOSE},
+	{"dash$ed",	QT_DASH},
+	{"solid",	QT_SOLID},
 	{NULL,          QT_OTHER}
 };
 
@@ -761,6 +775,7 @@ void qt_options()
 	bool set_title = false, set_close = false;
 	bool set_capjoin = false, set_size = false;
 	bool set_widget = false;
+	bool set_dash = false;
 
 #define SETCHECKDUP(x) { c_token++; if (x) duplication = true; x = true; }
 
@@ -847,6 +862,14 @@ void qt_options()
 		case QT_CLOSE:
 			SETCHECKDUP(set_close);
 			break;
+		case QT_DASH:
+			SETCHECKDUP(set_dash);
+			qt_optionDash = true;
+			break;
+		case QT_SOLID:
+			SETCHECKDUP(set_dash);
+			qt_optionDash = false;
+			break;
 		case QT_OTHER:
 		default:
 			qt_optionWindowId = int_expression();
@@ -881,6 +904,7 @@ void qt_options()
 
 	if (set_enhanced) termOptions +=  qt_optionEnhanced ? " enhanced" : " noenhanced";
 	if (set_font)     termOptions += " font \"" + fontSettings + '"';
+	if (set_dash)     termOptions += qt_optionDash ? " dashed" : " solid";
 	if (set_widget)   termOptions += " widget \"" + qt_optionWidget + '"';
 	if (set_persist)  termOptions += qt_optionPersist ? " persist" : " nopersist";
 	if (set_raise)    termOptions += qt_optionRaise ? " raise" : " noraise";
