@@ -63,6 +63,7 @@ public:
 	bool isActive() const;
 	void setStatusText(const QString& status);
 	QSize plotAreaSize() const;
+	bool m_rounded;
 
 signals:
 	void statusTextChanged(const QString& status);

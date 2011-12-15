@@ -109,8 +109,10 @@ QRectF& QtGnuplotScene::clipRect(QRectF& rect) const
 // to make drawing faster
 void QtGnuplotScene::flushCurrentPolygon()
 {
-	if (m_currentPolygon.size() < 2)
+	if (m_currentPolygon.size() < 2) {
+		m_currentPolygon.clear();
 		return;
+	}
 
 	clipPolygon(m_currentPolygon);
 	QPainterPath path;
@@ -159,6 +161,13 @@ void QtGnuplotScene::processEvent(QtGnuplotEventType type, QDataStream& in)
 	{
 		int style; in >> style;
 		m_currentPen.setStyle(Qt::PenStyle(style));
+		if (m_widget->m_rounded) {
+			m_currentPen.setJoinStyle(Qt::RoundJoin);
+			m_currentPen.setCapStyle(Qt::RoundCap);
+		} else {
+			m_currentPen.setJoinStyle(Qt::MiterJoin);
+			m_currentPen.setCapStyle(Qt::FlatCap);
+		}
 	}
 	else if (type == GEPointSize)
 		in >> m_currentPointSize;
