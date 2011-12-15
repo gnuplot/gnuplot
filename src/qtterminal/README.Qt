@@ -26,5 +26,7 @@ Known issues
 
 - export to EPS
 - image clipping not implemented
-- Multiplots are reported to be slow
-- wxt/Qt incompatible
+- mouse coordinate readout is not handling UTF-8 correctly
+- no support for toggling graphs on/off
+- "opengl" not accepted as a rendering mode (at least under linux)
+- wxt/Qt terminals must not be active within the same gnuplot session
