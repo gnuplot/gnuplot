@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.708 2011/12/08 22:37:55 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.709 2011/12/09 06:58:06 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -9232,7 +9232,7 @@ Ffigure_mapcontours
  The command `set mouse` enables mouse actions for the current interactive
  terminal.  It is usually enabled by default in interactive mode, but disabled
  by default if commands are being read from a file.
- 
+
  There are two mouse modes. The 2D mode works for `plot` commands and for `splot`
  maps (i.e. `set view` with z-rotation 0, 90, 180, 270 or 360 degrees, including
  `set view map`).  In this mode the mouse position is tracked and you can pan or
