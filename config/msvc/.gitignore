@@ -1,0 +1,13 @@
+config.h
+*.chm
+*.cobj
+*.dll
+*.exe
+*.ico
+*.manifest
+*.map
+*.mnu
+*.msw
+*.obj
+*.pobj
+*.res
