@@ -1,3 +1,8 @@
+2011-12-21  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/plot2d.c:  The default sequence of histogram colors was one off
+	from the default sequence of line colors.  Bugfix.
+
 2011-12-11  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* config/config.nt config/config.mgw: Sync with config.h created by
