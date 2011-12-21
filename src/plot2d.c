@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.254 2011/11/14 18:09:39 juhaszp Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.255 2011/11/15 20:23:43 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -1719,7 +1719,7 @@ eval_plots()
 
     double newhist_start = 0.0;
     int histogram_sequence = -1;
-    int newhist_color = 0;
+    int newhist_color = 1;
     int newhist_pattern = LT_UNDEFINED;
     histogram_rightmost = 0.0;
     free_histlist(&histogram_opts);
@@ -1780,7 +1780,7 @@ eval_plots()
 		newhist_start = histogram_rightmost + 2;
 
 	    lp.l_type = line_num;
-	    newhist_color = lp.l_type;
+	    newhist_color = lp.l_type + 1;
 	    fs.fillpattern = LT_UNDEFINED;
 
 	    do {

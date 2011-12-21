@@ -1,3 +1,8 @@
+2011-12-21  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/plot2d.c:  The default sequence of histogram colors was one off
+	from the default sequence of line colors.  Bugfix.
+
 2011-12-14  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/qtterminal/QtGnuplotScene.cpp src/qtterminal/QtGnuplotSettings.ui
