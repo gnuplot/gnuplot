@@ -1,5 +1,5 @@
 # Hello, emacs: this is a -*- Makefile -*-
-# $Id: Makefile,v 1.17 2011/11/27 22:17:38 markisch Exp $
+# $Id: Makefile,v 1.18 2011/12/06 20:31:50 markisch Exp $
 #
 # GNUPLOT Makefile for MinGW/MSYS on Windows
 # This assumes usual installation of the MinGW32 toolkit, the free
@@ -108,6 +108,9 @@ GNUPLOT_JS_DIR = share/js
 # Similarly for scripts used by the lua terminal
 GNUPLOT_LUA_DIR = share/lua
 
+# Install will put TeX files here:
+GNUPLOT_TEX_DIR = share/texmf/tex
+
 # Destination directory, used in 'make install':
 #DESTDIR = /local/opt/gnuplot-4.5
 DESTDIR = "$(PROGRAMFILES)/gnuplot"
@@ -154,6 +157,10 @@ endif
 
 # GNU sort
 GNUSORT = /bin/sort
+
+# Inno Setup Compiler
+# get it from: http://www.jrsoftware.org/isdl.php
+ISCC = "$(PROGRAMFILES)/Inno Setup 5/iscc"
 
 # Directory that might contain extra files to be shipped with the installer.
 # This should include dependencies like DLLs, but also fontconfig configuration files.
@@ -464,7 +471,7 @@ show.$(O): show.c plot.h setshow.h
 	$(CC) -c $(CFLAGS) $(CFLAGSEXTRA) -DHELPFILE=\"$(HELPFILE)\" -DBINDIR=\"$(bindir)\" -DGNUPLOT_PS_DIR=\"$(GNUPLOT_PS_DIR)\" -o $@ $<
 
 term.$(O): term.c term.h plot.h setshow.h bitmap.h $(CORETERM)
-	$(CC) -c $(CFLAGS)  $(CFLAGSEXTRA) $(TERMFLAGS) -o $@ $<
+	$(CC) -c $(CFLAGS) $(CFLAGSEXTRA) $(TERMFLAGS) -o $@ $<
 
 version.$(O): $(S)/version.c
 
@@ -544,7 +551,7 @@ endif
 JA = ja/
 JAD = $(JA)docs/
 JADW = $(JAD)windows/
-# Random file which receives patches by term-ja.diff to get dependicies right
+# Random file which receives patches by term-ja.diff to get dependencies right
 JASRC = $(JA)term/cairo.trm
 
 $(JASRC): $(D)gnuplot-ja.doc $(D)term-ja.diff $(CORETERM)
@@ -637,7 +644,7 @@ allterm.h: $(CORETERM)
 	  sed '/^ *$$/d;/^#/d' > allterm.h
 	@rm -f allterm.c
 endif
-doc2tex.exe: $(D)doc2tex.c $(D)termdoc.c allterm.h
+doc2tex.exe: $(D)doc2tex.c $(D)termdoc.c allterm.h $(CORETERM)
 	$(LD) $(LDFLAGS) -o $@ -DWINDOWS_NO_GUI -DALL_TERM_DOC $(CFLAGS) \
 	  -I. -I$(D) -I$(T) $(D)doc2tex.c $(D)termdoc.c
 else
@@ -722,29 +729,36 @@ endif
 # terminal support files
 	mkdir -p $(DESTDIR)/$(GNUPLOT_PS_DIR)
 	cp -p $(TOP)/term/PostScript/*.ps $(DESTDIR)/$(GNUPLOT_PS_DIR)/
+	cp -p $(TOP)/term/PostScript/*.txt $(DESTDIR)/$(GNUPLOT_PS_DIR)/
 	mkdir -p $(DESTDIR)/$(GNUPLOT_JS_DIR)
 	cp -p $(TOP)/term/js/*.* $(DESTDIR)/$(GNUPLOT_JS_DIR)/
 	cp -p $(TOP)/term/js/README $(DESTDIR)/$(GNUPLOT_JS_DIR)/
-	mkdir -p $(DESTDIR)/share/LaTeX
-	cp -p $(TOP)/share/LaTeX/README $(DESTDIR)/share/LaTeX/
-	cp -p $(TOP)/share/LaTeX/gnuplot.cfg $(DESTDIR)/share/LaTeX/
+	mkdir -p $(DESTDIR)/$(GNUPLOT_TEX_DIR)/generic/gnuplot
+	mkdir -p $(DESTDIR)/$(GNUPLOT_TEX_DIR)/plain/gnuplot
+	mkdir -p $(DESTDIR)/$(GNUPLOT_TEX_DIR)/latex/gnuplot
+	mkdir -p $(DESTDIR)/$(GNUPLOT_TEX_DIR)/context/gnuplot
+	cp -p $(TOP)/share/LaTeX/README $(DESTDIR)/$(GNUPLOT_TEX_DIR)/latex/gnuplot/
+	cp -p $(TOP)/share/LaTeX/gnuplot.cfg $(DESTDIR)/$(GNUPLOT_TEX_DIR)/latex/gnuplot/
 ifdef LUA
 	mkdir -p $(DESTDIR)/$(GNUPLOT_LUA_DIR)
 	cp -p $(TOP)/term/lua/README $(DESTDIR)/$(GNUPLOT_LUA_DIR)/
 	cp -p $(TOP)/term/lua/NEWS $(DESTDIR)/$(GNUPLOT_LUA_DIR)/
 	cp -p $(TOP)/term/lua/TODO $(DESTDIR)/$(GNUPLOT_LUA_DIR)/
 	cp -p $(TOP)/term/lua/gnuplot-tikz.lua $(DESTDIR)/$(GNUPLOT_LUA_DIR)/
-	cp -p gnuplot-lua-tikz.sty gnuplot-lua-tikz.tex $(DESTDIR)/share/LaTeX/
-	cp -p gnuplot-lua-tikz-common.tex t-gnuplot-lua-tikz.tex $(DESTDIR)/share/LaTeX/
+	cp -p gnuplot-lua-tikz.sty $(DESTDIR)/$(GNUPLOT_TEX_DIR)/latex/gnuplot/
+	cp -p gnuplot-lua-tikz.tex $(DESTDIR)/$(GNUPLOT_TEX_DIR)/plain/gnuplot/
+	cp -p t-gnuplot-lua-tikz.tex $(DESTDIR)/$(GNUPLOT_TEX_DIR)/context/gnuplot/
+	cp -p gnuplot-lua-tikz-common.tex $(DESTDIR)/$(GNUPLOT_TEX_DIR)/generic/gnuplot/
 endif
 # README etc
 	cp -p $(TOP)/Copyright $(DESTDIR)/
+	cp -p $(TOP)/win/Copyright-ja.txt $(DESTDIR)/
 	cp -p $(TOP)/README $(DESTDIR)/
 	cp -p $(TOP)/NEWS $(DESTDIR)/
 	cp -p $(TOP)/ChangeLog $(DESTDIR)/
 	cp -p $(TOP)/BUGS $(DESTDIR)/
-#	cp -p $(TOP)/win/README.Windows $(DESTDIR)/
-	cp -p $(TOP)/src/win/README.win-ja $(DESTDIR)/
+	cp -p $(TOP)/win/README-Windows.txt $(DESTDIR)/
+	cp -p $(TOP)/win/README-Windows-ja.txt $(DESTDIR)/
 # demo and contrib
 	mkdir -p $(DESTDIR)/demo
 	-cp -p $(M)* $(DESTDIR)/demo/
@@ -757,3 +771,10 @@ endif
 ifdef EXTRADIST
 	cp -pR $(EXTRADIST)/* $(DESTDIR)/
 endif
+
+installer:
+	$(MAKE) DESTDIR=./dist install
+	cp -p grpicon.ico ./dist/bin/
+	cp -p $(TOP)/win/*.iss ./dist
+	(cd ./dist; $(ISCC) gnuplot.iss)
+	mv ./dist/gp*-setup.exe .

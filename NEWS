@@ -49,6 +49,7 @@ New features, changes and fixes in gnuplot version 4.6
 * NEW windows terminal can save graph as EMF file
 * NEW cubehelix scheme for color palettes
 * NEW localisation support for Windows help and menu file
+* NEW Windows installer
 * FIX length estimation of UTF-8 strings
 * FIX accurate placement of color boundaries in the colorbar
 * FIX Built-in readline handles UTF-8 encoding
