@@ -157,6 +157,10 @@ void QtGnuplotScene::processEvent(QtGnuplotEventType type, QDataStream& in)
 		QColor color; in >> color;
 		m_currentPen.setColor(color);
 	}
+	else if (type == GEBackgroundColor)
+	{
+		m_currentPen.setColor(m_widget->m_backgroundColor);
+	}
 	else if (type == GEPenStyle)
 	{
 		int style; in >> style;

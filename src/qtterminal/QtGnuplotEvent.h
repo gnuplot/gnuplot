@@ -63,7 +63,7 @@ GEStatusText, GETitle, GESetCtrl,
 // Events for QtGnuplotWidget
 GESetWidgetSize, GECursor,
 // Events for QtGnuplotScene
-GEPenColor, GEBrushStyle, GEPenStyle, GEPointSize, GELineWidth,
+GEPenColor, GEBackgroundColor, GEBrushStyle, GEPenStyle, GEPointSize, GELineWidth,
 GEFillBox, GEPutText, GEFilledPolygon, GETextAngle, GETextAlignment, GEPoint, GEClear,
 GEZoomStart, GEZoomStop, GERuler, GECopyClipboard, GEMove, GEVector, GELineTo,
 GESetFont, GEEnhancedFlush, GEEnhancedFinish, GEImage, GESetSceneSize, GERaise,

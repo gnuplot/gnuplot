@@ -1,3 +1,8 @@
+2011-12-23  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* QtGnuplotEvent.h QtGnuplotScene.cpp QtGnuplotWidget.h qt_term.cpp:
+	Support LT_BACKGROUND in qt terminal.
+
 2011-12-23  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	Installer for Windows. Japanese translation by Shigeharu Takeno.
