@@ -63,6 +63,7 @@ public:
 	bool isActive() const;
 	void setStatusText(const QString& status);
 	QSize plotAreaSize() const;
+	// these can be set from the tool widget or from the command line
 	bool m_rounded;
 	QColor m_backgroundColor;
 
