@@ -3,6 +3,9 @@
 	* QtGnuplotEvent.h QtGnuplotScene.cpp QtGnuplotWidget.h qt_term.cpp:
 	Support LT_BACKGROUND in qt terminal.
 
+	* src/wxterminal/wxt_gui.cpp:
+	Revised mechanism for toggling plots on/off.
+
 2011-12-23  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	Installer for Windows. Japanese translation by Shigeharu Takeno.

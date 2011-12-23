@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.cpp,v 1.91 2011/11/08 21:21:00 sfeam Exp $
+ * $Id: wxt_gui.cpp,v 1.92 2011/12/10 07:05:33 sfeam Exp $
  */
 
 /* GNUPLOT - wxt_gui.cpp */
@@ -122,13 +122,13 @@ static int wxt_cur_plotno = 0;
 static TBOOLEAN wxt_in_key_sample = FALSE;
 static TBOOLEAN wxt_in_plot = FALSE;
 static TBOOLEAN wxt_zoom_command = FALSE;
-static unsigned long long wxt_hide_plot = 0;	/* Used as a bit array */
 #ifdef USE_MOUSE
 typedef struct {
 	unsigned int left;
 	unsigned int right;
 	unsigned int ytop;
 	unsigned int ybot;
+	TBOOLEAN hidden;
 } wxtBoundingBox;
 wxtBoundingBox *wxt_key_boxes = NULL;
 int wxt_max_key_boxes = 0;
@@ -1190,6 +1190,12 @@ static void wxt_initialize_key_boxes(int i)
 		wxt_key_boxes[i].right = wxt_key_boxes[i].ytop = 0;
 	}
 }
+static void wxt_initialize_hidden(int i)
+{
+	for (; i<wxt_max_key_boxes; i++)
+		wxt_key_boxes[i].hidden = FALSE;
+}
+
 
 /* Update the box enclosing the key sample for the current plot
  * so that later we can detect mouse clicks in that area
@@ -1201,6 +1207,7 @@ static void wxt_update_key_box( unsigned int x, unsigned int y )
 		wxt_key_boxes = (wxtBoundingBox *)realloc(wxt_key_boxes, 
 				wxt_max_key_boxes * sizeof(wxtBoundingBox));
 		wxt_initialize_key_boxes(wxt_cur_plotno);
+		wxt_initialize_hidden(wxt_cur_plotno);
 	}
 	wxtBoundingBox *bb = &(wxt_key_boxes[wxt_cur_plotno]);
 	y = term->ymax - y;
@@ -1228,10 +1235,7 @@ static void wxt_check_for_toggle(unsigned int x, unsigned int y)
 			continue;
 		if (y > wxt_key_boxes[i].ytop)
 			continue;
-		if ((wxt_hide_plot & 1LL<<i) == 0)
-			wxt_hide_plot |= 1LL<<i;
-		else
-			wxt_hide_plot &= ~(1LL<<i);
+		wxt_key_boxes[i].hidden = !wxt_key_boxes[i].hidden;
 		wxt_current_panel->wxt_cairo_refresh();
 
 	}
@@ -1791,7 +1795,7 @@ void wxt_graphics()
 	if (wxt_zoom_command)
 		wxt_zoom_command = FALSE;
 	else
-		wxt_hide_plot = 0;
+		wxt_initialize_hidden(0);
 
 	wxt_sigint_check();
 	wxt_sigint_restore();
@@ -2512,9 +2516,10 @@ void wxtPanel::wxt_cairo_refresh()
 		/* Skip the plot commands, but not the key sample commands,
 		 * if the plot was toggled off by a mouse click in the GUI
 		 */
-		if (wxt_in_plot)
-		if (((wxt_hide_plot & (1LL << wxt_cur_plotno)) != 0)
-		&&  wxt_iter->command != command_layer && !wxt_in_key_sample)
+		if (wxt_in_plot && !wxt_in_key_sample
+		&&  wxt_iter->command != command_layer
+		&&  wxt_cur_plotno < wxt_max_key_boxes
+		&&  wxt_key_boxes[wxt_cur_plotno].hidden)
 			continue;
 
 		wxt_cairo_exec_command( *wxt_iter );
@@ -2615,6 +2620,7 @@ void wxtPanel::wxt_cairo_refresh()
 	int ibox;
 	for (ibox=1; ibox<=wxt_max_key_boxes; ibox++) {
 		if (ibox > wxt_cur_plotno) break;
+		fprintf(stderr, wxt_key_boxes[ibox].hidden ? "hidden " : "visible ");
 		fprintf(stderr,"box %d %8.8u %8.8u %8.8u %8.8u\n", ibox,
 		wxt_key_boxes[ibox].left,  wxt_key_boxes[ibox].ybot,
 		wxt_key_boxes[ibox].right, wxt_key_boxes[ibox].ytop);
