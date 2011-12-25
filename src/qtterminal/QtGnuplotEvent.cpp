@@ -111,6 +111,10 @@ void QtGnuplotEventHandler::readEvent()
 			if ((type < 1000) || (type > GEDone))
 			{
 				qDebug() << "############### WRONG readEvent " << type << m_socket->bytesAvailable();
+				// FIXME EAM - At this point the program cannot recover
+				// and if we return it will eventually become a zombie.
+				// Probably better to just exit explicitly right now.
+				exit(0);
 				return;
 			}
 			receiver->processEvent(QtGnuplotEventType(type), in);

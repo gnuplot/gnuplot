@@ -474,9 +474,18 @@ void QtGnuplotScene::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
 	else if (event->button()== Qt::MidButton)   button = 2;
 	else if (event->button()== Qt::RightButton) button = 3;
 
+	// EAM FIXME - If the press/release events get out of order or if we see
+	// a very fast double-click then the following call causes the program
+	// to error out during event processing.  Also note that I can't find
+	// where that the timers are initialized on entry - maybe a problem there?
+	// Finally, why do we need or want a timer at all?
+	int time = m_watches[button].elapsed();
+	// fprintf(stderr,"elapsed = %d\n",time);
+	if (time > 300) // purely empical work-around
 	if (m_eventHandler->postTermEvent(GE_buttonrelease, int(event->scenePos().x()),
-	    int(event->scenePos().y()), button, m_watches[button].elapsed(), 0)) /// @todo m_id
+	    int(event->scenePos().y()), button, time, 0))
 		m_watches[button].start();
+
 	QGraphicsScene::mouseReleaseEvent(event);
 }
 

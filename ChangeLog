@@ -1,3 +1,12 @@
+2011-12-25  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/qtterminal/QtGnuplotEvent.cpp src/qtterminal/QtGnuplotScene.cpp:
+	If two button release events occur in quick succession then the program
+	messes up the event handling and winds up in a non-recoverable state.
+	Apply an empirical fix to ignore events in a 300 msec window.
+	Also rather than ending up a zombie, exit explicitly on a sync error.
+	Bugfix
+
 2011-12-21  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/plot2d.c:  The default sequence of histogram colors was one off
