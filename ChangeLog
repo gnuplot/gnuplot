@@ -13,6 +13,8 @@
 
 	* src/plot.c src/show.c: More compact splash page.
 
+	* configure.in: Default to --enable-stats --without-bitmap-terminals
+
 2011-12-25  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/qtterminal/QtGnuplotEvent.cpp src/qtterminal/QtGnuplotScene.cpp:

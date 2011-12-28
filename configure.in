@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot on Unix.
 dnl
-dnl $Id: configure.in,v 1.298 2011/11/30 00:53:06 sfeam Exp $
+dnl $Id: configure.in,v 1.299 2011/12/09 06:58:06 sfeam Exp $
 dnl
 dnl this is actually major.minor ...
 dnl note that for a non-beta release, we need to
@@ -1054,12 +1054,10 @@ dnl  Allow to disable terminals requiring bitmap support.
 dnl  NB: The copyright notice in bitmap.c is more restrictive
 dnl  than the overall gnuplot copyright.
 AC_ARG_WITH(bitmap_terminals,dnl
-[  --without-bitmap-terminals      dot-matrix printers and pbm],,
-  [test -z "${with_bitmap_terminals}" && with_bitmap_terminals=yes])
-if test "${with_bitmap_terminals}" != yes; then
+[  --with-bitmap-terminals         dot-matrix printers and pbm])
+AS_IF([test "x${with_bitmap_terminals}" = "xyes"],,
   AC_DEFINE(NO_BITMAP_SUPPORT,1,
-          [ Define to disable terminals that depend on code in bitmap.c ])
-fi
+          [ Define to disable terminals that depend on code in bitmap.c ]))
 AM_CONDITIONAL(BUILD_BITMAP, test "${with_bitmap_terminals}" = yes)
 
 
@@ -1105,11 +1103,14 @@ AC_ARG_ENABLE(backwards-compatibility,dnl
 
 dnl Enable subsystem to generate statistical summary of file contents
 AC_ARG_ENABLE(stats,dnl
-[  --enable-stats           Include command to generate statistical summary of data],
-  [if test "$enableval" = yes; then
+[  --enable-stats          Include command to generate statistical summary of data],
+  [if test "$enableval" != no; then
     AC_DEFINE(USE_STATS,1,
                [ Define to add support for generating a statistical summary of data])
-   fi])
+   fi],
+    AC_DEFINE(USE_STATS,1,
+               [ Define to add support for generating a statistical summary of data])
+   )
 
 dnl Qt terminal
 
@@ -1484,7 +1485,7 @@ else
   AC_MSG_RESULT([  Deprecated syntax and terminal options : no (use --enable-backwards-compatibility to enable)])
 fi
 
-if test "$enable_stats" = yes; then
+if test "$enable_stats" != no; then
   AC_MSG_RESULT([  Generate statistical summary of data : yes])
 else
   AC_MSG_RESULT([  Generate statistical summary of data : no (use --enable-stats to enable)])
