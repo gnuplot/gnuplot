@@ -1,5 +1,5 @@
 #
-# $Id: makefile.unx,v 1.19 2011/10/03 16:20:32 sfeam Exp $
+# $Id: makefile.unx,v 1.20 2011/12/09 06:58:06 sfeam Exp $
 #
 #
 ############################################################
@@ -455,7 +455,7 @@ DEMOS = demo/1.dat demo/2.dat demo/3.dat demo/contours.dem \
 ETC = Copyright 0README README.gnu makefile.unx makefile.vms \
 	linkopt.amg makefile.amg linkopt.vms buildvms.com \
 	lasergnu makefile.r makefile.nt makefile.g 0FAQ 0BUGS\
-	term/README History gnuplot.el intergra.x11 0INSTALL README.3p1\
+	term/README History gnuplot.el 0INSTALL README.3p1\
 	README.3p2 README.3p3 README.3p4 README.pro README.nex README.x11 \
 	README.3d README.mf README.win README.iso README.3p5 README.pic \
 	README.xli $(CONFIGURE)

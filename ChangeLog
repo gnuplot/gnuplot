@@ -24,6 +24,8 @@
 
 	* configure.in: Default to --enable-stats --without-bitmap-terminals
 
+	* Remove obsolete interface shim intergraph.x11
+
 2011-12-25  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/qtterminal/QtGnuplotEvent.cpp src/qtterminal/QtGnuplotScene.cpp:
