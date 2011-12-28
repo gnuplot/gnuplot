@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.212 2011/11/19 04:24:17 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.212.2.1 2011/12/28 19:30:43 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -1695,7 +1695,7 @@ df_readascii(double v[], int max)
 	 * (column_for_key_title > 0), also treat it as a data row.
 	 */
 	if (df_datum == 0 && !df_already_got_headers) {
-	    int i,j;
+	    int j;
 	    for (j=0; j<df_no_cols; j++) {
 		free(df_column[j].header);
 		df_column[j].header = df_parse_string_field(df_column[j].position);
