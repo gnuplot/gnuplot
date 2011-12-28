@@ -25,6 +25,9 @@ GNUPLOT_JS_DIR=$(pkgdatadir)/$(VERSION_MAJOR)/js
 # Default Postscript prologues location
 GNUPLOT_PS_DIR=$(pkgdatadir)/$(VERSION_MAJOR)/PostScript
 
+# System-wide initialization file
+GNUPLOT_SHARE_DIR=$(pkgdatadir)/$(VERSION_MAJOR)
+
 # There is probably no need to edit anything below this line
 
 bin_PROGRAMS = gnuplot
@@ -34,7 +37,7 @@ binonly: $(bin_PROGRAMS)
 transform = @program_transform_name@
 GNUPLOT_X11 = `echo gnuplot_x11 | sed '$(transform)'`$(EXEEXT)
 
-AM_CPPFLAGS = -I../term -I$(top_srcdir)/term -DBINDIR=\"$(bindir)\" -DX11_DRIVER_DIR=\"$(X11_DRIVER_DIR)\" -DGNUPLOT_PS_DIR=\"$(GNUPLOT_PS_DIR)\" -DGNUPLOT_JS_DIR=\"$(GNUPLOT_JS_DIR)\" -DGNUPLOT_LUA_DIR=\"$(GNUPLOT_LUA_DIR)\"  -DCONTACT=\"$(EMAIL)\" -DHELPFILE=\"$(HELPFILE)\" -DGNUPLOT_X11=\"$(GNUPLOT_X11)\" -DXAPPLRESDIR=\"$(XAPPLRESDIR)\"
+AM_CPPFLAGS = -I../term -I$(top_srcdir)/term -DBINDIR=\"$(bindir)\" -DX11_DRIVER_DIR=\"$(X11_DRIVER_DIR)\" -DGNUPLOT_SHARE_DIR=\"$(GNUPLOT_SHARE_DIR)\" -DGNUPLOT_PS_DIR=\"$(GNUPLOT_PS_DIR)\" -DGNUPLOT_JS_DIR=\"$(GNUPLOT_JS_DIR)\" -DGNUPLOT_LUA_DIR=\"$(GNUPLOT_LUA_DIR)\"  -DCONTACT=\"$(EMAIL)\" -DHELPFILE=\"$(HELPFILE)\" -DGNUPLOT_X11=\"$(GNUPLOT_X11)\" -DXAPPLRESDIR=\"$(XAPPLRESDIR)\"
 
 gnuplot_SOURCES = alloc.c alloc.h ansichek.h axis.c axis.h binary.c \
 breaders.c breaders.h bitmap.h color.c color.h command.c \

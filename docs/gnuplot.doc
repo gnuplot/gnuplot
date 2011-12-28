@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.709 2011/12/09 06:58:06 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.710 2011/12/18 12:44:12 markisch Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -228,9 +228,11 @@ Ffigure_newsyntax
  For example
        plot for [crop in "Oats Peas Beans"] 'data' using "Year":crop
 
-3 User preferences for linetypes
+3 Local customization of linetypes
  You can now customize properties (color, linewidth, point type) of the
  default sequence of linetypes used in plotting. See `set linetype`.
+ This is normally done in an initialization file, either the system-wide
+ file `gnuplotrc` or a private file `~/.gnuplot`. See `initialization`.
 
 3 New plot styles
  See documentation for plot styles `boxplot`, `circles`, `ellipses`, and
@@ -2467,22 +2469,20 @@ C ... and restart the table:
  In `splot`, control over the scales and labels of the axes are the same as
  with `plot`, except that commands and options controlling the x2 and y2 axes
  have no effect whereas of course those controlling the z axis do take effect.
-2 Start-up
+2 Start-up (initialization)
 ?startup
 ?start
 ?start-up
 ?.gnuplot
- When `gnuplot` is run, it looks for an initialization file to load.
- This file is called `.gnuplot` on Unix-like systems, and `GNUPLOT.INI`
- on other systems.  Normally the program will look for it in the HOME directory.
- (Windows and OS/2 will look in the directory named in the environment variable
- `GNUPLOT`; Windows will use `USERPROFILE` if GNUPLOT is not defined).
+ When gnuplot is run, it first looks for a system-wide initialization file named
+ `gnuplotrc`.  The location of this file is determined when the program is built
+ and is reported by `show loadpath`.  The program then looks in the user's HOME
+ directory for a file called `.gnuplot` on Unix-like systems or `GNUPLOT.INI` on
+ other systems.  (Windows and OS/2 will look for it in the directory named in
+ the environment variable `GNUPLOT`; Windows will use `USERPROFILE` if GNUPLOT
+ is not defined).
  Note: The program can be configured to look first in the current directory,
  but this is not recommended because it is bad security practice.
-
- If the initialization file is found, `gnuplot` executes the commands in it.
- These may be any legal `gnuplot` commands, but typically they are limited to
- setting the terminal and defining frequently-used functions or variables.
 2 String constants and string variables
 ?strings
 ?string variables
@@ -9066,14 +9066,12 @@ Ffigure_mapcontours
  path names separated by a platform-specific path separator, eg. colon
  (':') on Unix, semicolon (';') on DOS/Windows/OS/2 platforms.
  The `show loadpath`, `save` and `save set` commands replace the
- platform-specific separator with a space character (' ') for maximum
- portability.
+ platform-specific separator with a space character (' ').
 
- If the environment variable GNUPLOT_LIB is set, its contents are
- appended to `loadpath`.  However, `show loadpath` prints the contents
- of user defined loadpath and system loadpath separately.  Also, the
- `save` and `save set` commands save only the user specified parts of
- `loadpath`, for portability reasons.
+ If the environment variable GNUPLOT_LIB is set, its contents are appended to
+ `loadpath`.  However, `show loadpath` prints the contents of `set loadpath`
+ and GNUPLOT_LIB separately.  Also, the `save` and `save set` commands ignore
+ the contents of GNUPLOT_LIB.
 3 locale
 ?commands set locale
 ?set locale
