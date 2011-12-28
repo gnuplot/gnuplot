@@ -12,7 +12,9 @@
 	Do not allow execution of system(), shell, or popen() commands in the
 	initialization files.
 
-	* src/plot.c: More compact splash page.
+	* src/plot.c show/plot.c: More compact splash page.
+
+	* configure.in: Default to --enable-stats --without-bitmap-terminals
 
 2011-12-25  Ethan A Merritt  <merritt@u.washington.edu>
 
