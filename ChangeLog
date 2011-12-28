@@ -16,6 +16,8 @@
 
 	* configure.in: Default to --enable-stats --without-bitmap-terminals
 
+	* configure.in PATCHLEVEL: Report as version 4.6.rc1
+
 2011-12-25  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/qtterminal/QtGnuplotEvent.cpp src/qtterminal/QtGnuplotScene.cpp:
