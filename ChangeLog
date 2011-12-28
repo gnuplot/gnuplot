@@ -1,3 +1,17 @@
+2011-12-28  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* docs/gnuplot.doc share/Makefile.am share/colors_default.gp
+	share/colors_mono.gp share/colors_podo.gp share/gnuplotrc
+	src/Makefile.am:
+	Provide template initialization files, including examples of customizing
+	the linetype color sequence.  These are installed in $GNUPLOT_SHARE_DIR
+	(usually /usr/local/share/gnuplot/4.6).
+
+	* src/command.c src/datafile.c src/help.c src/history.c src/misc.c
+	src/plot.c src/plot.h src/term.c src/variable.c:
+	Do not allow execution of system(), shell, or popen() commands in the
+	initialization files.
+
 2011-12-25  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/qtterminal/QtGnuplotEvent.cpp src/qtterminal/QtGnuplotScene.cpp:

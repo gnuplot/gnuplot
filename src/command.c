@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.229 2011/11/10 05:15:58 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.230 2011/11/12 11:12:35 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -1485,6 +1485,7 @@ print_set_output(char *name, TBOOLEAN append_p)
 
 #ifdef PIPES
     if (name[0]=='|') {
+	restrict_popen();
 	print_out = popen(name + 1, "w");
 	if (!print_out)
 	    perror(name);
@@ -1702,9 +1703,10 @@ save_command()
     if (!save_file)
 	    int_error(c_token, "expecting filename");
 #ifdef PIPES
-    if (save_file[0]=='|')
+    if (save_file[0]=='|') {
+	restrict_popen();
 	fp = popen(save_file+1,"w");
-    else
+    } else
 #endif
     {
     gp_expand_tilde(&save_file);
@@ -2604,6 +2606,7 @@ do_system(const char *cmd)
 # if defined(_Windows) && defined(USE_OWN_WINSYSTEM_FUNCTION)
     if (!cmd)
 	return;
+    restrict_popen();
     winsystem(cmd);
 # else /* _Windows) */
 /* (am, 19980929)
@@ -2614,6 +2617,7 @@ do_system(const char *cmd)
  */
     if (!cmd)
 	return;
+    restrict_popen();
     system(cmd);
 # endif /* !(_Windows) */
 }
@@ -3078,8 +3082,9 @@ do_system_func(const char *cmd, char **output)
     if ((f = fopen("PLOT$MAILBOX", "r")) == NULL)
 	os_error(NO_CARET, "mailbox open failed");
 # else	/* everyone else */
-	    if ((f = popen(cmd, "r")) == NULL)
-		os_error(NO_CARET, "popen failed");
+    restrict_popen();
+    if ((f = popen(cmd, "r")) == NULL)
+	os_error(NO_CARET, "popen failed");
 # endif	/* everyone else */
 
     /* get output */

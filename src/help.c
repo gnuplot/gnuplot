@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: help.c,v 1.25 2010/03/14 06:43:17 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: help.c,v 1.26 2010/07/30 18:28:38 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - help.c */
@@ -44,6 +44,7 @@ void OutLine(const char *M){fputs(M,stderr);}
 #else
 
 #include "alloc.h"
+#include "plot.h"
 #include "util.h"
 
 /*
@@ -657,9 +658,11 @@ StartOutput()
 #if defined(PIPES)
     char *pager_name = getenv("PAGER");
 
-    if (pager_name != NULL && *pager_name != NUL)
+    if (pager_name != NULL && *pager_name != NUL) {
+	restrict_popen();
 	if ((outfile = popen(pager_name, "w")) != (FILE *) NULL)
 	    return;		/* success */
+    }
     outfile = stderr;
     /* fall through to built-in pager */
 #endif
