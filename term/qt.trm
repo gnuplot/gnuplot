@@ -1,5 +1,5 @@
 /* GNUPLOT - qt.trm 
- * $Id: qt.trm,v 1.5 2011/12/18 06:28:42 sfeam Exp $
+ * $Id: qt.trm,v 1.6 2011/12/18 06:29:46 sfeam Exp $
  */
 
 /*[
@@ -54,7 +54,7 @@ TERM_TABLE_START (qt_driver)
     qt_point, do_arrow, qt_set_font,
     qt_pointsize,
     TERM_CAN_MULTIPLOT|TERM_NO_OUTPUTFILE|TERM_ALPHA_CHANNEL|TERM_CAN_DASH,
-    qt_text /* suspend */, 0 /* resume */, qt_fillbox, qt_linewidth
+    0 /* suspend */, 0 /* resume */, qt_fillbox, qt_linewidth
 #ifdef USE_MOUSE
     , qt_waitforinput, qt_put_tmptext, qt_set_ruler, qt_set_cursor, qt_set_clipboard
 #endif

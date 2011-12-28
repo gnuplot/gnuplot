@@ -1,5 +1,14 @@
 2011-12-28  Ethan A Merritt  <merritt@u.washington.edu>
 
+	* src/qtterminal/QtGnuplotEvent.h src/qtterminal/QtGnuplotItems.cpp
+ 	src/qtterminal/QtGnuplotItems.h src/qtterminal/QtGnuplotScene.cpp
+ 	src/qtterminal/QtGnuplotScene.h src/qtterminal/qt_term.cpp term/qt.trm:
+
+	Organize Qt display list items into groups, one group per plot.
+	Track display area of keybox entries so that mouse clicks there can
+	toggle the visibility of the corresponding plot group.
+	NB: Doesn't work if the key box is set to opaque.
+
 	* docs/gnuplot.doc share/Makefile.am share/colors_default.gp
 	share/colors_mono.gp share/colors_podo.gp share/gnuplotrc
 	src/Makefile.am:

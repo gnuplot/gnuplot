@@ -67,7 +67,11 @@ GEPenColor, GEBackgroundColor, GEBrushStyle, GEPenStyle, GEPointSize, GELineWidt
 GEFillBox, GEPutText, GEFilledPolygon, GETextAngle, GETextAlignment, GEPoint, GEClear,
 GEZoomStart, GEZoomStop, GERuler, GECopyClipboard, GEMove, GEVector, GELineTo,
 GESetFont, GEEnhancedFlush, GEEnhancedFinish, GEImage, GESetSceneSize, GERaise,
-GEWrapCursor, GEScale, GEActivate, GEDesactivate, GEDone
+GEWrapCursor, GEScale, GEActivate, GEDesactivate, GELayer, GEPlotNumber, GEDone
+};
+
+enum QtGnuplotLayer {
+QTLAYER_BEGIN_KEYSAMPLE, QTLAYER_END_KEYSAMPLE, QTLAYER_BEFORE_ZOOM
 };
 
 class QLocalServer;

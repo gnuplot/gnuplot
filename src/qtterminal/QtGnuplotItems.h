@@ -95,4 +95,14 @@ private:
 	double m_overprintPos;
 };
 
+
+class QtGnuplotKeybox : public QRectF {
+public:
+	QtGnuplotKeybox(  const QRectF rect );
+	void setHidden( const bool state );
+	bool ishidden();
+private:
+	bool hidden;
+};
+
 #endif // QTGNUPLOTITEMS_H

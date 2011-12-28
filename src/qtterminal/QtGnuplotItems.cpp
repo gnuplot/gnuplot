@@ -175,3 +175,22 @@ void QtGnuplotPoint::paint(QPainter* painter, const QStyleOptionGraphicsItem* op
 		painter->drawPolygon(p, 4);
 	}
 }
+
+/*
+ * EAM - support for toggling plots by clicking on a key sample
+ */
+
+QtGnuplotKeybox::QtGnuplotKeybox( QRectF rect ) : QRectF( rect )
+{
+	hidden = false;
+}
+
+bool QtGnuplotKeybox::ishidden()
+{
+	return hidden;
+}
+
+void QtGnuplotKeybox::setHidden( const bool state )
+{
+	hidden = state;
+}

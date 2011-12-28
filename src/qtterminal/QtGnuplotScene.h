@@ -45,8 +45,10 @@
 #define QTGNUPLOTSCENE_H
 
 #include "QtGnuplotEvent.h"
+#include "QtGnuplotItems.h"
 
 #include <QGraphicsScene>
+#include <QGraphicsItemGroup>
 #include <QTime>
 
 class QtGnuplotEnhanced;
@@ -78,9 +80,12 @@ private:
 	QPointF&   clipPoint(QPointF& point) const;
 	QRectF&    clipRect(QRectF& point) const;
 	double sceneToGraph(int axis, double coord) const;
+	void update_key_box(const QRectF rect);
 
 private:
 	QtGnuplotWidget* m_widget;
+
+	QList <QGraphicsItemGroup*> m_plot_group;
 
 	// State variables
 	Qt::Alignment m_textAlignment;
@@ -94,6 +99,10 @@ private:
 	double  m_textAngle;
 	double  m_currentZ;
 	QTime   m_watches[4];
+	int     m_currentPlotNumber;
+	bool    m_inKeySample;
+	bool    m_preserve_visibility;
+	QList<QGraphicsItem*> m_currentGroup;
 
 	// User events data
 	QPointF m_lastMousePos;
@@ -102,11 +111,12 @@ private:
 	// Special items
 	QGraphicsLineItem* m_horizontalRuler;
 	QGraphicsLineItem* m_verticalRuler;
-	QGraphicsLineItem* m_lineTo;    // Line from ruller to cursor
+	QGraphicsLineItem* m_lineTo;    // Line from ruler to cursor
 	QGraphicsRectItem* m_zoomRect;
 	QGraphicsTextItem* m_zoomStartText;
 	QGraphicsTextItem* m_zoomStopText;
 	QtGnuplotEnhanced* m_enhanced;  // Current enhanced text block
+	QList<QtGnuplotKeybox> m_key_boxes;
 
 	// Axis scales
 	bool   m_axisValid[4];

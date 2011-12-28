@@ -467,7 +467,7 @@ void qt_linetype(int lt)
 
 	if (lt == -1)
 		qt_out << GEPenStyle << Qt::DotLine;
-	else if (qt_optionDash && lt > 0) {	// DEBUG EAM 11dec2011
+	else if (qt_optionDash && lt > 0) {
 		Qt::PenStyle style;
 		style =
 			(lt%4 == 1) ? Qt::DashLine :
@@ -922,8 +922,24 @@ void qt_options()
 
 void qt_layer( t_termlayer syncpoint )
 {
+    static int current_plotno = 0;
+
     /* We must ignore all syncpoints that we don't recognize */
     switch (syncpoint) {
+	case TERM_LAYER_BEFORE_PLOT:
+		current_plotno++;
+		qt_out << GEPlotNumber << current_plotno; break;
+	case TERM_LAYER_AFTER_PLOT:
+		qt_out << GEPlotNumber << 0; break;
+	case TERM_LAYER_RESET:
+	case TERM_LAYER_RESET_PLOTNO:
+		if (!multiplot) current_plotno = 0; break;
+	case TERM_LAYER_BEGIN_KEYSAMPLE:
+		qt_out << GELayer << QTLAYER_BEGIN_KEYSAMPLE; break;
+	case TERM_LAYER_END_KEYSAMPLE:
+		qt_out << GELayer << QTLAYER_END_KEYSAMPLE; break;
+	case TERM_LAYER_BEFORE_ZOOM:
+		qt_out << GELayer << QTLAYER_BEFORE_ZOOM; break;
     	default:
 		break;
     }
