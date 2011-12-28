@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: variable.c,v 1.41 2011/05/02 19:25:01 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: variable.c,v 1.42 2011/09/04 11:06:19 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - variable.c */
@@ -42,6 +42,7 @@ static char *RCSid() { return RCSid("$Id: variable.c,v 1.41 2011/05/02 19:25:01 
 
 #include "alloc.h"
 #include "command.h"
+#include "plot.h"
 #include "util.h"
 #include "term_api.h"
 
@@ -146,11 +147,14 @@ loadpath_handler(int action, char *path)
 	    PRINT_PATHLIST(loadpath, envptr);
 	    if (envptr) {
 		/* env part */
-		fputs("\tsystem loadpath is ", stderr);
+		fputs("\tloadpath from GNUPLOT_LIB is ", stderr);
 		PRINT_PATHLIST(envptr, last);
 	    }
 	} else
 	    fputs("\tloadpath is empty\n", stderr);
+#ifdef GNUPLOT_SHARE_DIR
+	fprintf(stderr,"\tgnuplotrc is read from %s\n",GNUPLOT_SHARE_DIR);
+#endif
 #ifdef X11
 	if ((appdir = getenv("XAPPLRESDIR"))) {
 	    fprintf(stderr,"\tenvironmental path for X11 application defaults: \"%s\"\n",
@@ -389,6 +393,7 @@ fontpath_handler(int action, char *path)
 			    FILE *fcmd;
 			    envend = strchr(cmdbeg+2,'`');
 			    envend[0] = '\0';
+			    restrict_popen();
 			    fcmd = popen(cmdbeg+2,"r");
 			    if (fcmd) {
 				fgets(envval,255,fcmd);

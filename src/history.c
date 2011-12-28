@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: history.c,v 1.27 2011/02/21 07:55:48 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: history.c,v 1.28 2011/08/23 11:06:50 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - history.c */
@@ -39,6 +39,7 @@ static char *RCSid() { return RCSid("$Id: history.c,v 1.27 2011/02/21 07:55:48 m
 #include "gp_hist.h"
 
 #include "alloc.h"
+#include "plot.h"
 #include "util.h"
 
 
@@ -183,6 +184,7 @@ write_history_n(const int n, const char *filename, const char *mode)
     if (filename != NULL && filename[0]) {
 #ifdef PIPES
 	if (filename[0]=='|') {
+	    restrict_popen();
 	    out = popen(filename+1, "w");
 	    is_pipe = 1;
 	} else
@@ -359,6 +361,7 @@ write_history_list(const int num, const char *const filename, const char *mode)
         /* good filename given and not quiet */
 #ifdef PIPES
         if (filename[0]=='|') {
+	    restrict_popen();
             out = popen(filename+1, "w");
             is_pipe = 1;
         } else {

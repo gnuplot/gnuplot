@@ -1,5 +1,5 @@
 /*
- * $Id: plot.h,v 1.45 2008/03/30 03:27:54 sfeam Exp $
+ * $Id: plot.h,v 1.46 2009/10/31 20:20:07 sfeam Exp $
  */
 
 /* GNUPLOT - plot.h */
@@ -78,6 +78,10 @@ void take_privilege __PROTO((void));
 
 #ifdef OS2
 int ExecuteMacro __PROTO((char *, int));
+#endif
+
+#ifdef PIPES
+void restrict_popen __PROTO((void));
 #endif
 
 #endif /* GNUPLOT_PLOT_H */

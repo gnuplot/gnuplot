@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.212 2011/11/19 04:24:17 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.213 2011/12/10 19:57:47 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -1136,6 +1136,7 @@ df_open(const char *cmd_filename, int max_using, struct curve_points *plot)
     /*{{{  open file */
 #if defined(PIPES)
     if (*df_filename == '<') {
+	restrict_popen();
 	if ((data_fp = popen(df_filename + 1, "r")) == (FILE *) NULL)
 	    os_error(name_token, "cannot create pipe for data");
 	else

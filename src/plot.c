@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot.c,v 1.128 2011/09/04 11:08:33 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot.c,v 1.129 2011/12/09 06:58:06 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot.c */
@@ -145,6 +145,8 @@ static const char *user_homedir = NULL;
 /* user shell */
 const char *user_shell = NULL;
 
+static TBOOLEAN successful_initialization = FALSE;
+
 #ifdef X11
 extern int X11_args __PROTO((int, char **)); /* FIXME: defined in term/x11.trm */
 #endif
@@ -164,7 +166,7 @@ static JMP_BUF far command_line_env;
 static JMP_BUF command_line_env;
 #endif
 
-static void load_rcfile __PROTO((void));
+static void load_rcfile __PROTO((int where));
 static RETSIGTYPE inter __PROTO((int anint));
 static void init_memory __PROTO((void));
 
@@ -528,7 +530,8 @@ main(int argc, char **argv)
 	 * initialized arrays any more, this is now necessary... */
 	reset_command();
 	init_color();  /*  Initialization of color  */
-	load_rcfile();
+	load_rcfile(0);
+	load_rcfile(1);
 	init_fit();		/* Initialization of fitting module */
 
 	if (interactive && term != 0) {		/* not unknown */
@@ -565,6 +568,11 @@ main(int argc, char **argv)
 	}			/* if (interactive && term != 0) */
     } else {
 	/* come back here from int_error() */
+	if (!successful_initialization) {
+	    /* Only print the warning once */
+	    successful_initialization = TRUE;
+	    fprintf(stderr,"WARNING: Error during initialization\n\n");
+	}
 	if (interactive == FALSE)
 	    exit_status = EXIT_FAILURE;
 #ifdef HAVE_READLINE_RESET
@@ -598,6 +606,9 @@ main(int argc, char **argv)
 	    exit(EXIT_FAILURE);	/* exit on non-interactive error */
 	}
     }
+
+    /* After this we allow pipes and system commands */
+    successful_initialization = TRUE;
 
     if (argc > 1) {
 #ifdef _Windows
@@ -683,12 +694,22 @@ interrupt_setup()
 }
 
 
-/* Look for a gnuplot init file in current or home directory */
+/* where = 0: look for gnuplotrc in system shared directory */
+/* where = 1: look for a gnuplot init file in current or home directory */
 static void
-load_rcfile()
+load_rcfile(int where)
 {
     FILE *plotrc = NULL;
     char *rcfile = NULL;
+
+    if (where == 0) {
+#ifdef GNUPLOT_SHARE_DIR
+	rcfile = (char *) gp_alloc(strlen(GNUPLOT_SHARE_DIR) + 1 + strlen("gnuplotrc") + 1, "rcfile");
+	strcpy(rcfile, GNUPLOT_SHARE_DIR);
+	PATH_CONCAT(rcfile, "gnuplotrc");
+	plotrc = fopen(rcfile, "r");
+#endif
+    } else
 
 #ifdef USE_CWDRC
     /* Allow check for a .gnuplot init file in the current directory */
@@ -697,7 +718,7 @@ load_rcfile()
     plotrc = fopen(PLOTRC, "r");
 #endif /* !USE_CWDRC */
 
-    if (plotrc == NULL) {
+    if (where == 1 && plotrc == NULL) {
 	if (user_homedir) {
 	    /* len of homedir + directory separator + len of file name + \0 */
 	    rcfile = (char *) gp_alloc((user_homedir ? strlen(user_homedir) : 0) + 1 + strlen(PLOTRC) + 1, "rcfile");
@@ -965,3 +986,11 @@ wrapper_for_write_history()
 # endif /* HAVE_LIBREADLINE || HAVE_LIBEDITLINE */
 #endif /* GNUPLOT_HISTORY */
 
+#ifdef PIPES
+void
+restrict_popen()
+{
+    if (!successful_initialization)
+	int_error(NO_CARET,"Pipes and shell commands not permitted during intialization");
+}
+#endif
