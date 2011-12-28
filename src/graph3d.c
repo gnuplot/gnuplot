@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.257 2011/12/04 05:36:28 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.258 2011/12/29 06:29:30 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -2270,10 +2270,8 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid,
     /* Draw ticlabels and axis labels. x axis, first:*/
     if (X_AXIS.ticmode || X_AXIS.label.text) {
 	vertex v0, v1;
-	double other_end =
-	    Y_AXIS.min + Y_AXIS.max - xaxis_y;
-	double mid_x =
-	    (X_AXIS.max + X_AXIS.min) / 2;
+	double other_end = Y_AXIS.min + Y_AXIS.max - xaxis_y;
+	double mid_x     = (X_AXIS.max + X_AXIS.min) / 2;
 
 	map3d_xyz(mid_x, xaxis_y, base_z, &v0);
 	map3d_xyz(mid_x, other_end, base_z, &v1);
@@ -2570,7 +2568,6 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid,
 	vertex v1;
 	int h_just = CENTRE;
 	int v_just = JUST_TOP;
-	double other_end = X_AXIS.min + X_AXIS.max - zaxis_x;
 	double mid_z = (Z_AXIS.max + Z_AXIS.min) / 2.;
 
 	if (Z_AXIS.ticmode & TICS_ON_AXIS) {
@@ -2581,8 +2578,9 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid,
 	} else {
 	    /* December 2011 - This caused the separation between the axis and the
 	     * label to vary as the view angle changes (Bug #2879916).   Why???
-	     * It seems better to use a constant default separation.
+	     * double other_end = X_AXIS.min + X_AXIS.max - zaxis_x;
 	     * map3d_xyz(zaxis_x - (other_end - zaxis_x) / 4., zaxis_y, mid_z, &v1);
+	     * It seems better to use a constant default separation.
 	     */
 	    map3d_xyz(zaxis_x, zaxis_y, mid_z, &v1);
 	    TERMCOORD(&v1, x, y);
@@ -2626,8 +2624,7 @@ xtick_callback(
 {
     vertex v1, v2;
     double scale = (text ? axis_array[axis].ticscale : axis_array[axis].miniticscale) * (axis_array[axis].tic_in ? 1 : -1);
-    double other_end =
-	Y_AXIS.min + Y_AXIS.max - xaxis_y;
+    double other_end = Y_AXIS.min + Y_AXIS.max - xaxis_y;
     struct termentry *t = term;
 
     (void) axis;		/* avoid -Wunused warning */
@@ -2722,8 +2719,7 @@ ytick_callback(
 {
     vertex v1, v2;
     double scale = (text ? axis_array[axis].ticscale : axis_array[axis].miniticscale) * (axis_array[axis].tic_in ? 1 : -1);
-    double other_end =
-	X_AXIS.min + X_AXIS.max - yaxis_x;
+    double other_end = X_AXIS.min + X_AXIS.max - yaxis_x;
     struct termentry *t = term;
 
     (void) axis;		/* avoid -Wunused warning */

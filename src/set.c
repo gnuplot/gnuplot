@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.357 2011/11/29 00:17:59 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.358 2011/12/04 05:36:28 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -3151,7 +3151,6 @@ set_palette()
 {
     int transform_defined = 0;
     int named_color = 0;
-    char *formerr = "color formula out of range (use `show palette rgbformulae' to display the range)";
 
     c_token++;
 

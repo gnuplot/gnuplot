@@ -31,7 +31,6 @@
 	(1) never used and (2) shadowed a global parameter that _was_ used.
 	Bug #3426247
 
-
 2011-12-25  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/qtterminal/QtGnuplotEvent.cpp src/qtterminal/QtGnuplotScene.cpp:
