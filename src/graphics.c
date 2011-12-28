@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.378 2011/10/10 21:17:04 juhaszp Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.379 2011/11/10 05:15:58 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -1447,7 +1447,7 @@ place_labels(struct text_label *listhead, int layer, TBOOLEAN clip)
 
 #ifdef EAM_OBJECTS
 void
-place_objects(struct object *listhead, int layer, int dimensions, BoundingBox *clip_area)
+place_objects(struct object *listhead, int layer, int dimensions)
 {
     t_object *this_object;
     double x1, y1;
@@ -1480,6 +1480,7 @@ place_objects(struct object *listhead, int layer, int dimensions, BoundingBox *c
 	{
 	    t_circle *e = &this_object->o.circle;
 	    double radius, junk;
+	    BoundingBox *clip_save = clip_area;
 
 	    if (dimensions == 2 || e->center.scalex == screen) {
 		map_position_double(&e->center, &x1, &y1, "rect");
@@ -1494,12 +1495,16 @@ place_objects(struct object *listhead, int layer, int dimensions, BoundingBox *c
 
 	    term_apply_lp_properties(&lpstyle);
 
+	    if (e->center.scalex == screen && e->center.scaley == screen)
+	    	clip_area = &canvas;
+
 	    do_arc((int)x1, (int)y1, radius, e->arc_begin, e->arc_end, style);
 
 	    /* Retrace the border if the style requests it */
 	    if (need_fill_border(fillstyle))
 		do_arc((int)x1, (int)y1, radius, e->arc_begin, e->arc_end, 0);
 
+	    clip_area = clip_save;
 	    break;
 	}
 
@@ -1620,7 +1625,7 @@ do_plot(struct curve_points *plots, int pcount)
 	make_palette();
 
     /* Give a chance for rectangles to be behind everything else */
-    place_objects( first_object, -1, 2, NULL );
+    place_objects( first_object, -1, 2);
 
     screen_ok = FALSE;
 
@@ -1800,7 +1805,7 @@ do_plot(struct curve_points *plots, int pcount)
 	    draw_color_smooth_box(MODE_PLOT);
 
     /* And rectangles */
-    place_objects( first_object, 0, 2, clip_area );
+    place_objects( first_object, 0, 2);
 
     /* PLACE LABELS */
     place_labels( first_label, 0, FALSE );
@@ -2106,7 +2111,7 @@ do_plot(struct curve_points *plots, int pcount)
 	    draw_color_smooth_box(MODE_PLOT);
 
     /* And rectangles */
-    place_objects( first_object, 1, 2, clip_area );
+    place_objects( first_object, 1, 2);
 
     /* PLACE LABELS */
     place_labels( first_label, 1, FALSE );
@@ -5672,7 +5677,7 @@ place_raxis()
 
 #ifdef EAM_OBJECTS
     if (!(R_AXIS.autoscale & AUTOSCALE_MIN) && R_AXIS.set_min != 0)
-	place_objects( &raxis_circle, 1, 2, clip_area );
+	place_objects( &raxis_circle, 1, 2);
 #endif
 
 }

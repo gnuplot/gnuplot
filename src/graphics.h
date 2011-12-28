@@ -1,5 +1,5 @@
 /*
- * $Id: graphics.h,v 1.51 2011/02/10 21:29:51 sfeam Exp $
+ * $Id: graphics.h,v 1.52 2011/10/10 21:17:04 juhaszp Exp $
  */
 
 /* GNUPLOT - graphics.h */
@@ -105,11 +105,11 @@ void free_histlist __PROTO((struct histogram_style *hist));
 void plot_image_or_update_axes __PROTO((void *plot, TBOOLEAN update_axes));
 
 #ifdef EAM_OBJECTS
-void place_objects __PROTO((struct object *listhead, int layer, int dimensions, BoundingBox *clip_area));
+void place_objects __PROTO((struct object *listhead, int layer, int dimensions));
 void do_ellipse __PROTO((int dimensions, t_ellipse *e, int style, TBOOLEAN do_own_mapping ));
 void do_polygon __PROTO((int dimensions, t_polygon *p, int style ));
 #else
-#define place_objects(listhead,layer,dimensions,clip_area) /* void() */
+#define place_objects(listhead,layer,dimensions) /* void() */
 #endif
 
 int filter_boxplot __PROTO((struct curve_points *));
