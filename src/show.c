@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.261 2011/11/14 20:50:10 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.261.2.1 2011/12/09 07:05:35 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -1041,9 +1041,8 @@ show_version(FILE *fp)
     strcpy(fmt, "\
 %s\n\
 %s\t%s\n\
-%s\tVersion %s patchlevel %s\n\
-%s\tlast modified %s\n\
-%s\tSystem: %s %s\n\
+%s\tVersion %s patchlevel %s    last modified %s\n\
+%s\tBuild System: %s %s\n\
 %s\n\
 %s\t%s\n\
 %s\tThomas Williams, Colin Kelley and many others\n\
@@ -1054,16 +1053,14 @@ show_version(FILE *fp)
     strcat(fmt, "%s\tmailing list:     %s\n");
 #endif
     strcat(fmt, "\
-%s\tfaq, bugs, etc:   type \"help seeking-assistance\"\n\
-%s\timmediate help:   type \"help\"\n\
-%s\tplot window:      hit 'h'\n\
+%s\tfaq, bugs, etc:   type \"help FAQ\"\n\
+%s\timmediate help:   type \"help\"  (plot window: hit 'h')\n\
 ");
 
     fprintf(fp, fmt,
 	    p,			/* empty line */
 	    p, PROGRAM,
-	    p, gnuplot_version, gnuplot_patchlevel,
-	    p, gnuplot_date,
+	    p, gnuplot_version, gnuplot_patchlevel, gnuplot_date,
 	    p, os_name, os_rel,
 	    p,			/* empty line */
 	    p, gnuplot_copyright,
@@ -1074,8 +1071,7 @@ show_version(FILE *fp)
 	    p, help_email,	/* mailing list */
 #endif
 	    p,			/* type "help" */
-	    p,			/* type "help seeking-assistance" */
-	    p			/* hit 'h' */
+	    p 			/* type "help seeking-assistance" */
 	    );
 
 

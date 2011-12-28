@@ -12,6 +12,8 @@
 	Do not allow execution of system(), shell, or popen() commands in the
 	initialization files.
 
+	* src/plot.c: More compact splash page.
+
 2011-12-25  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/qtterminal/QtGnuplotEvent.cpp src/qtterminal/QtGnuplotScene.cpp:
