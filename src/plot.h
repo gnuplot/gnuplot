@@ -1,5 +1,5 @@
 /*
- * $Id: plot.h,v 1.47 2011/12/28 19:37:37 sfeam Exp $
+ * $Id: plot.h,v 1.48 2011/12/28 20:10:18 sfeam Exp $
  */
 
 /* GNUPLOT - plot.h */
@@ -81,5 +81,11 @@ int ExecuteMacro __PROTO((char *, int));
 #endif
 
 void restrict_popen __PROTO((void));
+
+#ifdef GNUPLOT_HISTORY
+void cancel_history __PROTO((void));
+#else
+#define cancel_history()  {}
+#endif
 
 #endif /* GNUPLOT_PLOT_H */
