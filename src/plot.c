@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot.c,v 1.128.2.3 2011/12/28 19:59:39 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot.c,v 1.128.2.4 2011/12/28 20:09:49 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot.c */
@@ -123,11 +123,10 @@ extern smg$create_key_table();
 #  define GNUPLOT_HISTORY_FILE "~/.gnuplot_history"
 # endif
 /*
- * The next variable is a pointer to the value returned from 'tilde_expand()'.
- * This function expands '~' to the user's home directory, or $HOME, with
- * UN*X, MSDOS.
+ * expanded_history_filename points to the value from 'tilde_expand()',
+ * which expands '~' to the user's home directory, or $HOME.
  * Depending on your OS you have to make sure that the "$HOME" environment
- * variable exitsts.  You are responsible for valid values.
+ * variable exists.  You are responsible for valid values.
  */
 static char *expanded_history_filename;
 
@@ -940,13 +939,23 @@ RexxInterface(PRXSTRING rxCmd, PUSHORT pusErr, PRXSTRING rxRc)
 #endif /* OS2 */
 
 #ifdef GNUPLOT_HISTORY
+
+/* cancel_history() can be called by terminals that fork a helper process
+ * to make sure that the helper doesn't trash the history file on exit.
+ */
+void
+cancel_history()
+{
+    expanded_history_filename = NULL;
+}
+
 # if defined(HAVE_LIBREADLINE) || defined(HAVE_LIBEDITLINE)
 
 static void
 wrapper_for_write_history()
 {
-#if 1
-    /* Alternative code, saves one disk access */
+    if (!expanded_history_filename)
+	return;
     if (history_is_stifled())
 	unstifle_history();
     if (gnuplot_history_size >= 0)
@@ -957,15 +966,6 @@ wrapper_for_write_history()
 	fprintf (stderr, "Warning:  Could not write history file!!!\n");
 
     unstifle_history();
-#else
-    /* if writing was successful, truncate history
-     *  to gnuplot_history_size lines
-     */
-    if (write_history(expanded_history_filename)) {
-	if (gnuplot_history_size >= 0)
-	    history_truncate_file(expanded_history_filename, gnuplot_history_size);
-    }
-#endif
 }
 
 # else /* HAVE_LIBREADLINE || HAVE_LIBEDITLINE */
@@ -976,6 +976,8 @@ wrapper_for_write_history()
 {
     /* What we really want to do is truncate(expanded_history_filename),
        but this is only available on BSD compatible systems */
+    if (!expanded_history_filename)
+	return;
     remove(expanded_history_filename);
     if (gnuplot_history_size < 0)
     	write_history(expanded_history_filename);

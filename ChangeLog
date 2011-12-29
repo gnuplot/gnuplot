@@ -1,3 +1,11 @@
+2011-12-29  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/plot.c src/plot.h src/qtterminal/qt_term.cpp:
+	Provide a function cancel_history() that can be called by terminal
+	helper processes after forking so that the history file isn't 
+	trashed on exit.
+	Bug #2950711
+
 2011-12-28  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* docs/gnuplot.doc share/Makefile.am share/colors_default.gp

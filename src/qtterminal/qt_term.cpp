@@ -240,6 +240,9 @@ void qt_init()
 		signal(SIGINT, SIG_IGN); // Do not listen to SIGINT signals anymore
 		QtGnuplotApplication application(argc, (char**)( NULL));
 
+		// Make sure the forked copy doesn't trash the history file 
+		cancel_history();
+
 		// Load translations for the qt library
 		QTranslator qtTranslator;
 		qtTranslator.load("qt_" + QLocale::system().name(), QLibraryInfo::location(QLibraryInfo::TranslationsPath));
