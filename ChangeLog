@@ -6,6 +6,8 @@
 	trashed on exit.
 	Bug #2950711
 
+	* docs/gnuplot.doc:  Minor updates to match 4.6 configuration.
+
 2011-12-28  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* docs/gnuplot.doc share/Makefile.am share/colors_default.gp
