@@ -1,3 +1,10 @@
+2011-12-31  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/qtterminal/QtGnuplotApplication.cpp (processEvent):
+	In "persis" mode, if all Qt plot windows were already closed when
+	the main program exited then the daughter process would become a zombie.
+	Bugfix.
+
 2011-12-29  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/plot.c src/plot.h src/qtterminal/qt_term.cpp:

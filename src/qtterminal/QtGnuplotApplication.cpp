@@ -94,7 +94,12 @@ void QtGnuplotApplication::processEvent(QtGnuplotEventType type, QDataStream& in
 	else if (type == GEExit)
 		quit();
 	else if (type == GEPersist)
+	{
 		setQuitOnLastWindowClosed(true);
+		// But if the plot window was already closed, this is our last chance to exit
+		if (m_windows.isEmpty())
+			quit();
+	}
 	else if (m_currentWindow) // Dispatch gnuplot events to widgets
 		m_currentWindow->processEvent(type, in);
 	else
