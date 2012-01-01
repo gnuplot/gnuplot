@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.711 2011/12/28 19:37:15 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.712 2011/12/28 20:01:33 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -142,7 +142,7 @@ C
  where file1, file2, etc. are input file as in the `load` command.
  On X11-based systems, you can use
        gnuplot {X11OPTIONS} {OPTIONS} file1 file2 ...
- see your X11 documentation or rather `x11` in this document.
+ see your X11 documentation and `x11` in this document.
 
  Options interpreted by gnuplot may come anywhere on the line.  Files are
  executed in the order specified, as are commands supplied by the -e option,
@@ -156,9 +156,8 @@ C
        gnuplot --help
  See `command line options` for more details.
 
- Hit 'h' for help about `hotkeys` and `mousing` features in interactive screen
- terminals (`pm`, `windows`, `wxt`, `x11`).
-
+ In sessions with an interactive plot window you can hit 'h' anywhere on the
+ plot for help about `hotkeys` and `mousing` features.
  Section `seeking-assistance` will help you to find further information, help
  and FAQ.
 2 Seeking-assistance
@@ -194,7 +193,7 @@ C
  Please check previous bug reports if the bug you want to report has not been
  already fixed in a newer version of gnuplot.
 
- The list of those interested in development version of gnuplot is:
+ A mailing list for those interested in development version of gnuplot is:
            gnuplot-beta@lists.sourceforge.net
 
  When posting a question, please include full details of the gnuplot version,
@@ -245,6 +244,31 @@ Ffigure_newsyntax
  The polar axes can now be drawn and labeled independent of the x and y
  axes. See `set polar` and `set rrange`.
 
+3 New smoothing algorithms
+=kdensity
+=cumulative
+ New smoothing algorithms have been added for both 2- and 3-dimensional plots.
+ `smooth kdensity` and `smooth cumulative` can be used with `plot` to draw 
+ smooth histograms and cumulative distribution functions.  Several new smoothing
+ kernels have been added to `dgrid3d` for use with `splot`.
+ See `smooth` `dgrid3d`.
+
+3 New time/date handling
+=time
+ Gnuplot now tracks time to millisecond precision. Time formats have been
+ modified to match this. The new built-in function time() returns the current
+ time of day according to the system clock.
+ Example: print the current time to msec precision
+      print strftime("%H:%M:%.3S %d-%b-%Y",time(0.0))
+      18:15:04.253 16-Apr-2011
+3 Statistical summary of data
+ The new `stats` command reads data from a file using the same syntax as
+ the `plot` or `splot` commands. Rather than drawing a graph, it prints
+ out a statistical summary of the data contained in the column[s] requested.
+ The resulting statistics  min, max, mean, standard deviation, correlation,
+ etc. are also stored in named variables that can be used to compose or modify
+ subsequent plotting commands.  See `stats`.
+
 3 New or revised terminal drivers
  The `qt` driver implements an interactive terminal on top of the Qt
  graphics layer.  It can function either as a window in a full-featured
@@ -291,13 +315,13 @@ Ffigure_newsyntax
  creates pdf or eps graphics but transfers texts to LaTeX in the same way as
  the `epslatex` terminal.
  
- The `windows` terminal driver has been largely revised. It now suports
- transparency, antialiasing and buffered output, multiple graph windows and
- copying to clipboard and saving of graphs as emf files. It has many more
- options and a revised user interface. Additionaly, the code of the text
- console has been largely rewritten to support wrapping of long lines and
- gnuplot now uses the HTML based help system.
+ The `windows` terminal driver has been revised to suport transparency,
+ antialiasing, buffered output, multiple graph windows and copying to clipboard
+ and saving of graphs as emf files. It has many new options and a revised user
+ interface. Additionaly, the code of the text console has been largely rewritten
+ to support wrapping of long lines. Help is now provided via HTML.
 
+2 Backwards compatibility
 3 New smoothing algorithms
 =kdensity
 =cumulative
@@ -321,19 +345,17 @@ Ffigure_newsyntax
  out a statistical summary of the data contained in the column[s] requested.
  The resulting statistics  min, max, mean, standard deviation, correlation,
  etc. are also stored in named variables that can be used to compose or modify
- subsequent plotting commands.  See `stats`.  This command is only available
- if gnuplot is built with the configuration option --enable-stats.
+ subsequent plotting commands.  See `stats`.
 
-2 Backwards compatibility
 ?backwards compatibility
 ?compatibility
  Gnuplot version 4.0 deprecated certain syntax used in earlier versions, but
  continued to recognize it.  This is now under the control of a configuration
- option, and can be disabled as follows:
+ option, and can be enabled as follows:
 
-       ./configure --disable-backwards-compatibility
+       ./configure --enable-backwards-compatibility
 
- Notice: Deprecated syntax items may be disabled permanently in some future
+ Notice: Deprecated syntax items may be removed entirely in some future
  version of gnuplot.
 
  One major difference is the introduction of keywords to disambiguate complex
@@ -805,8 +827,8 @@ Ffigure_newsyntax
  determine if your system chooses -2 or -3 as the answer.
 
  The integer expression "1/0" may be used to generate an "undefined" flag,
- which causes a point to ignored; the `ternary` operator gives an example.
- Or you can use the pre-defined variable NaN to achieve the same result.
+ which causes a point to ignored.  Or you can use the pre-defined variable NaN
+ to achieve the same result.  See `using` for an example.
 =NaN
 
  The real and imaginary parts of complex expressions are always real, whatever
@@ -2439,7 +2461,7 @@ C ... and restart the table:
 2 Plotting
 ?plotting
  There are three `gnuplot` commands which actually create a plot: `plot`,
- `splot` and `replot`.  `plot` generates 2D plots, `splot` generates 3-d
+ `splot` and `replot`.  `plot` generates 2D plots, `splot` generates 3D
  plots (actually 2D projections, of course), and `replot` appends its
  arguments to the previous `plot` or `splot` and executes the modified
  command.
@@ -2475,6 +2497,7 @@ C ... and restart the table:
 ?startup
 ?start
 ?start-up
+?initialization
 ?.gnuplot
  When gnuplot is run, it first looks for a system-wide initialization file named
  `gnuplotrc`.  The location of this file is determined when the program is built
@@ -2648,16 +2671,10 @@ C ... and restart the table:
 ?syntax
 ?specify
 ?punctuation
- Version 4 of gnuplot is much less sensitive than earlier versions to the
- order of keywords and suboptions. However, if you get error messages from
- specifying options that you think should work, please try rearranging them
- into the exact order listed by the documentation.
-
  Options and any accompanying parameters are separated by spaces whereas lists
  and coordinates are separated by commas.  Ranges are separated by colons and
  enclosed in brackets [], text and file names are enclosed in quotes, and a
- few miscellaneous things are enclosed in parentheses.  Braces {} are used for
- a few special purposes.
+ few miscellaneous things are enclosed in parentheses.
 
  Commas are used to separate coordinates on the `set` commands `arrow`,
  `key`, and `label`; the list of variables being fitted (the list after the
@@ -2686,11 +2703,9 @@ C ... and restart the table:
 
  Semicolons are used to separate commands given on a single command line.
 
- Braces are used in text to be specially processed by some terminals, like
- `postscript`.  They are also used to denote complex numbers: {3,2} = 3 + 2i.
-
- At present you should not embed \n inside {} when using the PostScript
- terminal in `enhanced text` mode.
+ Curly braces are used in the syntax for enhanced text mode and to delimit
+ blocks in if/then/else statements.  They are also used to denote complex
+ numbers: {3,2} = 3 + 2i.
 
  The EEPIC, Imagen, Uniplex, LaTeX, and TPIC drivers allow a newline to be
  specified by \\ in a single-quoted string or \\\\ in a double-quoted string.
@@ -7547,8 +7562,8 @@ Ffigure_mapcontours
  The `set datafile nofpe_trap` command tells gnuplot not to re-initialize a
  floating point exception handler before every expression evaluation used while
  reading data from an input file.  This can significantly speed data input from
- large files at the risk of program termination if a floating-point exception is
- generated.
+ very large files at the risk of program termination if a floating-point
+ exception is generated.
 4 set datafile missing
 ?set datafile missing
 ?show datafile missing
@@ -8553,7 +8568,7 @@ Ffigure_mapcontours
 ?historysize
 ?nohistorysize
  Note: the command `set historysize` is only available when
- gnuplot has been configured with the GNU readline.
+ gnuplot has been configured to use the GNU readline library.
 
  Syntax:
        set historysize <int>
@@ -12104,9 +12119,9 @@ Ffigure_mapcontours
  [-5:5] range of x/2 is ignored.  Executing `show yrange` after each command
  in the above example should help you understand what is going on.
 
- In 2-d, `xrange` and `yrange` determine the extent of the axes, `trange`
+ In 2D, `xrange` and `yrange` determine the extent of the axes, `trange`
  determines the range of the parametric variable in parametric mode or the
- range of the angle in polar mode.  Similarly in parametric 3-d, `xrange`,
+ range of the angle in polar mode.  Similarly in parametric 3D, `xrange`,
  `yrange`, and `zrange` govern the axes and `urange` and `vrange` govern the
  parametric variables.
 
