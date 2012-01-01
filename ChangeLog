@@ -1,8 +1,11 @@
-2011-12-31  Ethan A Merritt  <merritt@u.washington.edu>
+2012-01-01  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/qtterminal/QtGnuplotApplication.cpp (processEvent):
-	In "persis" mode, if all Qt plot windows were already closed when
-	the main program exited then the daughter process would become a zombie.
+	* src/wxterminal/wxt_gui.cpp (wxt_atexit):
+	In "persist" mode, if all qt plot windows were already closed when the
+	main program exited then the daughter process would become a zombie.
+	Even worse for wxt; if _any_ plot windows had been closed then the 
+	persisting daughter process would become a zombie.
 	Bugfix.
 
 2011-12-29  Ethan A Merritt  <merritt@u.washington.edu>

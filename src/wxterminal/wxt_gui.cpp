@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.cpp,v 1.92 2011/12/10 07:05:33 sfeam Exp $
+ * $Id: wxt_gui.cpp,v 1.93 2011/12/24 18:51:04 sfeam Exp $
  */
 
 /* GNUPLOT - wxt_gui.cpp */
@@ -3468,6 +3468,7 @@ bool wxt_window_opened()
 void wxt_atexit()
 {
 	int i;
+	int openwindows = 0;
 	int persist_setting;
 #ifdef _Windows
 	MSG msg;
@@ -3539,13 +3540,35 @@ void wxt_atexit()
 	wxt_handling_persist = true;
 
 	/* if fork() is available, use it so that the initial gnuplot process
-	 * exits (Maxima expects that since that's the way the x11 terminal
-	 * does it) and the child process continues in the background. */
-	/* FIXME: int_error() should be changed here, it causes crashes (for example,
-	 * zoom until an error occurs and then hit a key) */
+	 * exits and the child process continues in the background.
+	 */
+	/* NB: 
+	 * If there are no plot windows open, then once the parent process
+	 * exits the child can receive no input and will become a zombie.
+	 * So destroy any closed window first, and only fork if some remain open.
+	 */
+	/* declare the iterator */
+	std::vector<wxt_window_t>::iterator wxt_iter;
+
+	for(wxt_iter = wxt_window_list.begin(), i=0;
+			wxt_iter != wxt_window_list.end(); wxt_iter++, i++)
+	{
+		TBOOLEAN state = wxt_iter->frame->IsShown();
+		FPRINTF((stderr,"\tChecking window %d : %s shown\n", i, state?"":"not "));
+		if (state)
+			openwindows++;
+		else
+			wxt_iter->frame->Destroy();
+	}
+
 # ifdef HAVE_WORKING_FORK
 	/* fork */
-	pid_t pid = fork();
+	pid_t pid;
+	
+	if (openwindows > 0)
+		pid = fork();
+	else
+		pid = -1;
 
 	/* the parent just exits, the child keeps going */
 	if (!pid) {
