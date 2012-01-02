@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.712 2011/12/28 20:01:33 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.713 2012/01/01 01:38:03 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -9642,6 +9642,9 @@ Ffigure_mapcontours
 
      # Return fill and color to the default style but leave vertices unchanged
      set object 2 rect default
+
+ Rectangle corners specified in screen coordinates may extend beyond the edge of
+ the current graph. Otherwise the rectangle is clipped to fit in the graph.
 
 4 ellipse
 ?ellipse

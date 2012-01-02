@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot on Unix.
 dnl
-dnl $Id: configure.in,v 1.299 2011/12/09 06:58:06 sfeam Exp $
+dnl $Id: configure.in,v 1.300 2011/12/28 20:41:13 sfeam Exp $
 dnl
 dnl this is actually major.minor ...
 dnl note that for a non-beta release, we need to
@@ -108,7 +108,7 @@ AC_ARG_WITH(kpsexpand,dnl
   [if test "$withval" = yes; then
     test "$KPSEXPAND" != "no" || AC_MSG_ERROR(dnl
       [You tell me to use kpsexpand, but there is no kpsexpand])
-    AC_DEFINE(HAVE_KPSEXPAND,1,[ Define if you use have kpsexpand (TeX). ])
+    AC_DEFINE(HAVE_KPSEXPAND,1,[ Define if you want to use kpsexpand (TeX). ])
   fi])
 
 dnl we only care about texdir if latex is enabled
@@ -1482,7 +1482,7 @@ fi
 if test "$enable_backwards_compatibility" = yes; then
   AC_MSG_RESULT([  Deprecated syntax and terminal options : yes])
 else
-  AC_MSG_RESULT([  Deprecated syntax and terminal options : no (use --enable-backwards-compatibility to enable)])
+  AC_MSG_RESULT([  Deprecated syntax and terminal options : no (use --enable-backwards-compatibility)])
 fi
 
 if test "$enable_stats" != no; then
