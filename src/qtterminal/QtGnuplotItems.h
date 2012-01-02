@@ -50,7 +50,7 @@
 class QtGnuplotPoint : public QGraphicsItem
 {
 public:
-	QtGnuplotPoint(int style, int size, QColor color, QGraphicsItem * parent = 0);
+	QtGnuplotPoint(int style, double size, QColor color, QGraphicsItem * parent = 0);
 
 public:
 	virtual QRectF boundingRect() const;
@@ -93,6 +93,16 @@ private:
 	QPointF m_currentPos, m_savedPos;
 	bool m_overprintMark;
 	double m_overprintPos;
+};
+
+
+class QtGnuplotKeybox : public QRectF {
+public:
+	QtGnuplotKeybox(  const QRectF rect );
+	void setHidden( const bool state );
+	bool ishidden();
+private:
+	bool hidden;
 };
 
 #endif // QTGNUPLOTITEMS_H

@@ -1,3 +1,13 @@
+2012-01-02  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* configure.in term/qt.trm
+	In src/qtterminal: QtGnuplotEvent.cpp QtGnuplotEvent.h
+	QtGnuplotItems.cpp QtGnuplotItems.h QtGnuplotScene.cpp
+	QtGnuplotScene.h QtGnuplotSettings.ui QtGnuplotWidget.cpp
+	QtGnuplotWidget.h qt_term.cpp qt_term.h README.Qt:
+	Update qt terminal to support pointsize, dashed lines, round linejoins,
+	term->layer(), LT_BACKGROUND, mouse toggling, faster rendering.
+
 2012-01-01  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/qtterminal/QtGnuplotApplication.cpp (processEvent):

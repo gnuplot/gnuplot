@@ -76,6 +76,7 @@ bool qt_optionEnhanced = false;
 bool qt_optionPersist  = false;
 bool qt_optionRaise    = true;
 bool qt_optionCtrl     = false;
+bool qt_optionDash     = false;
 int  qt_optionWidth    = 640;
 int  qt_optionHeight   = 480;
 int  qt_optionFontSize = 9;
@@ -238,6 +239,20 @@ void qt_init()
 	else if (pid == 0) // Child: start the GUI
 	{
 		signal(SIGINT, SIG_IGN); // Do not listen to SIGINT signals anymore
+
+#ifndef HAVE_QT_47
+		/* 
+		 * FIXME: EAM Nov 2011
+		 * It is better to use environmental variable
+		 * QT_GRAPHICSSYSTEM but this requires qt >= 4.7
+		 * "raster" is ~5x faster than "native" (default).
+		 * Unfortunately "opengl" isn't recognized on my test systems :-(
+		 */
+		// This makes a huge difference to the speed of polygon rendering.
+		// Alternatives are "native", "raster", "opengl"
+		QApplication::setGraphicsSystem("raster");
+#endif
+
 		QtGnuplotApplication application(argc, (char**)( NULL));
 
 		// Make sure the forked copy doesn't trash the history file 
@@ -454,11 +469,24 @@ void qt_linetype(int lt)
 		lt = LT_NODRAW; // background color
 
 	if (lt == -1)
-		qt_out << GEPenStyle << Qt::DashLine;
+		qt_out << GEPenStyle << Qt::DotLine;
+	else if (qt_optionDash && lt > 0) {
+		Qt::PenStyle style;
+		style =
+			(lt%4 == 1) ? Qt::DashLine :
+			(lt%4 == 2) ? Qt::DashDotLine :
+			(lt%4 == 3) ? Qt::DashDotDotLine :
+			              Qt::SolidLine ;
+		qt_out << GEPenStyle << style;
+		}
 	else
 		qt_out << GEPenStyle << Qt::SolidLine;
 
-	qt_out << GEPenColor << qt_colorList[lt % 9 + 3];
+	if ((lt-1) == LT_BACKGROUND) {
+		/* FIXME: Add parameter to this API to set the background color from the gnuplot end */
+		qt_out << GEBackgroundColor;
+	} else
+		qt_out << GEPenColor << qt_colorList[lt % 9 + 3];
 }
 
 int qt_set_font (const char* font)
@@ -714,6 +742,8 @@ enum QT_id {
 	QT_NOCTRL,
 	QT_TITLE,
 	QT_CLOSE,
+	QT_DASH,
+	QT_SOLID,
 	QT_OTHER
 };
 
@@ -731,6 +761,8 @@ static struct gen_table qt_opts[] = {
 	{"noct$rlq",    QT_NOCTRL},
 	{"ti$tle",      QT_TITLE},
 	{"cl$ose",      QT_CLOSE},
+	{"dash$ed",	QT_DASH},
+	{"solid",	QT_SOLID},
 	{NULL,          QT_OTHER}
 };
 
@@ -750,6 +782,7 @@ void qt_options()
 	bool set_title = false, set_close = false;
 	bool set_capjoin = false, set_size = false;
 	bool set_widget = false;
+	bool set_dash = false;
 
 #define SETCHECKDUP(x) { c_token++; if (x) duplication = true; x = true; }
 
@@ -836,6 +869,14 @@ void qt_options()
 		case QT_CLOSE:
 			SETCHECKDUP(set_close);
 			break;
+		case QT_DASH:
+			SETCHECKDUP(set_dash);
+			qt_optionDash = true;
+			break;
+		case QT_SOLID:
+			SETCHECKDUP(set_dash);
+			qt_optionDash = false;
+			break;
 		case QT_OTHER:
 		default:
 			qt_optionWindowId = int_expression();
@@ -870,6 +911,7 @@ void qt_options()
 
 	if (set_enhanced) termOptions +=  qt_optionEnhanced ? " enhanced" : " noenhanced";
 	if (set_font)     termOptions += " font \"" + fontSettings + '"';
+	if (set_dash)     termOptions += qt_optionDash ? " dashed" : " solid";
 	if (set_widget)   termOptions += " widget \"" + qt_optionWidget + '"';
 	if (set_persist)  termOptions += qt_optionPersist ? " persist" : " nopersist";
 	if (set_raise)    termOptions += qt_optionRaise ? " raise" : " noraise";
@@ -879,4 +921,29 @@ void qt_options()
 
 	/// @bug change Utf8 to local encoding
 	strncpy(term_options, termOptions.toUtf8().data(), MAX_LINE_LEN);
+}
+
+void qt_layer( t_termlayer syncpoint )
+{
+    static int current_plotno = 0;
+
+    /* We must ignore all syncpoints that we don't recognize */
+    switch (syncpoint) {
+	case TERM_LAYER_BEFORE_PLOT:
+		current_plotno++;
+		qt_out << GEPlotNumber << current_plotno; break;
+	case TERM_LAYER_AFTER_PLOT:
+		qt_out << GEPlotNumber << 0; break;
+	case TERM_LAYER_RESET:
+	case TERM_LAYER_RESET_PLOTNO:
+		if (!multiplot) current_plotno = 0; break;
+	case TERM_LAYER_BEGIN_KEYSAMPLE:
+		qt_out << GELayer << QTLAYER_BEGIN_KEYSAMPLE; break;
+	case TERM_LAYER_END_KEYSAMPLE:
+		qt_out << GELayer << QTLAYER_END_KEYSAMPLE; break;
+	case TERM_LAYER_BEFORE_ZOOM:
+		qt_out << GELayer << QTLAYER_BEFORE_ZOOM; break;
+    	default:
+		break;
+    }
 }

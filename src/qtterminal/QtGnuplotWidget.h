@@ -63,6 +63,9 @@ public:
 	bool isActive() const;
 	void setStatusText(const QString& status);
 	QSize plotAreaSize() const;
+	// these can be set from the tool widget or from the command line
+	bool m_rounded;
+	QColor m_backgroundColor;
 
 signals:
 	void statusTextChanged(const QString& status);
@@ -102,7 +105,6 @@ private:
 
 	// Settings
 	Ui_settingsDialog* m_ui;
-	QColor m_backgroundColor;
 	QColor m_chosenBackgroundColor;
 	bool m_antialias;
 	bool m_replotOnResize;

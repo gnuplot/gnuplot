@@ -112,7 +112,7 @@ void QtGnuplotEnhancedFragment::paint(QPainter* painter, const QStyleOptionGraph
 /////////////////////////////
 // QtGnuplotPoint
 
-QtGnuplotPoint::QtGnuplotPoint(int style, int size, QColor color, QGraphicsItem * parent)
+QtGnuplotPoint::QtGnuplotPoint(int style, double size, QColor color, QGraphicsItem * parent)
 	: QGraphicsItem(parent)
 {
 	m_color = color;
@@ -174,4 +174,23 @@ void QtGnuplotPoint::paint(QPainter* painter, const QStyleOptionGraphicsItem* op
 		                       QPointF(-m_size, 0.)};
 		painter->drawPolygon(p, 4);
 	}
+}
+
+/*
+ * EAM - support for toggling plots by clicking on a key sample
+ */
+
+QtGnuplotKeybox::QtGnuplotKeybox( QRectF rect ) : QRectF( rect )
+{
+	hidden = false;
+}
+
+bool QtGnuplotKeybox::ishidden()
+{
+	return hidden;
+}
+
+void QtGnuplotKeybox::setHidden( const bool state )
+{
+	hidden = state;
 }

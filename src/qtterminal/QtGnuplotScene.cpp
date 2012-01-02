@@ -60,6 +60,11 @@ QtGnuplotScene::QtGnuplotScene(QtGnuplotEventHandler* eventHandler, QObject* par
 	m_currentZ = 1.;
 	m_currentPointSize = 1.;
 	m_enhanced = 0;
+	m_currentPlotNumber = 0;
+	m_inKeySample = false;
+	m_preserve_visibility = false;
+
+	m_currentGroup.clear();
 
 	resetItems();
 }
@@ -109,23 +114,50 @@ QRectF& QtGnuplotScene::clipRect(QRectF& rect) const
 // to make drawing faster
 void QtGnuplotScene::flushCurrentPolygon()
 {
-	if (m_currentPolygon.size() < 2)
+	if (m_currentPolygon.size() < 2) {
+		m_currentPolygon.clear();
 		return;
+	}
 
 	clipPolygon(m_currentPolygon);
 	QPainterPath path;
 	path.addPolygon(m_currentPolygon);
-	addPath(path, m_currentPen, Qt::NoBrush)->setZValue(m_currentZ++);
+	QGraphicsPathItem *pathItem;
+	pathItem = addPath(path, m_currentPen, Qt::NoBrush);
+	pathItem->setZValue(m_currentZ++);
 	m_currentPolygon.clear();
+	if (!m_inKeySample)
+		m_currentGroup.append(pathItem);
+}
+
+void QtGnuplotScene::update_key_box(const QRectF rect)
+{
+	if (m_currentPlotNumber > m_key_boxes.count()) {
+		m_key_boxes.insert(m_currentPlotNumber, QtGnuplotKeybox(rect));
+	} else if (m_key_boxes[m_currentPlotNumber-1].isEmpty()) {
+		// Retain the visible/hidden flag when re-initializing the Keybox
+		bool tmp = m_key_boxes[m_currentPlotNumber-1].ishidden();
+		m_key_boxes[m_currentPlotNumber-1] = QtGnuplotKeybox(rect);
+		m_key_boxes[m_currentPlotNumber-1].setHidden(tmp);
+	} else {
+		m_key_boxes[m_currentPlotNumber-1] |= rect;
+	}
 }
 
 void QtGnuplotScene::processEvent(QtGnuplotEventType type, QDataStream& in)
 {
 	if ((type != GEMove) && (type != GEVector) && !m_currentPolygon.empty())
+	{
+		QPointF point = m_currentPolygon.last();
 		flushCurrentPolygon();
+		m_currentPolygon << point;
+	}
 
 	if (type == GEClear)
+	{
 		resetItems();
+		m_preserve_visibility = false;
+	}
 	else if (type == GELineWidth)
 	{
 		double width; in >> width;
@@ -145,16 +177,29 @@ void QtGnuplotScene::processEvent(QtGnuplotEventType type, QDataStream& in)
 	{
 		QPointF point; in >> point;
 		m_currentPolygon << point;
+		if (m_inKeySample)
+			update_key_box( QRectF(point, QSize(0,1)) );
 	}
 	else if (type == GEPenColor)
 	{
 		QColor color; in >> color;
 		m_currentPen.setColor(color);
 	}
+	else if (type == GEBackgroundColor)
+	{
+		m_currentPen.setColor(m_widget->m_backgroundColor);
+	}
 	else if (type == GEPenStyle)
 	{
 		int style; in >> style;
 		m_currentPen.setStyle(Qt::PenStyle(style));
+		if (m_widget->m_rounded) {
+			m_currentPen.setJoinStyle(Qt::RoundJoin);
+			m_currentPen.setCapStyle(Qt::RoundCap);
+		} else {
+			m_currentPen.setJoinStyle(Qt::MiterJoin);
+			m_currentPen.setCapStyle(Qt::FlatCap);
+		}
 	}
 	else if (type == GEPointSize)
 		in >> m_currentPointSize;
@@ -169,7 +214,13 @@ void QtGnuplotScene::processEvent(QtGnuplotEventType type, QDataStream& in)
 	else if (type == GEFillBox)
 	{
 		QRect rect; in >> rect;
-		addRect(rect, Qt::NoPen, m_currentBrush)->setZValue(m_currentZ++);
+		QGraphicsRectItem *rectItem;
+		rectItem = addRect(rect, Qt::NoPen, m_currentBrush);
+		rectItem->setZValue(m_currentZ++);
+		if (m_inKeySample)
+			update_key_box(rect);
+		else
+			m_currentGroup.append(rectItem);
 	}
 	else if (type == GEFilledPolygon)
 	{
@@ -178,7 +229,11 @@ void QtGnuplotScene::processEvent(QtGnuplotEventType type, QDataStream& in)
 		if (m_currentBrush.style() == Qt::SolidPattern)
 			pen = m_currentBrush.color();
 		clipPolygon(polygon, false);
-		addPolygon(polygon, pen, m_currentBrush)->setZValue(m_currentZ++);
+		QGraphicsPolygonItem *path;
+		path = addPolygon(polygon, pen, m_currentBrush);
+		path->setZValue(m_currentZ++);
+		if (!m_inKeySample)
+			m_currentGroup.append(path);
 	}
 	else if (type == GEBrushStyle)
 	{
@@ -200,11 +255,15 @@ void QtGnuplotScene::processEvent(QtGnuplotEventType type, QDataStream& in)
 	else if (type == GEPoint)
 	{
 		QPointF point; in >> point;
-		int size    ; in >> size;
-		QtGnuplotPoint* pointItem = new QtGnuplotPoint(size, m_currentPointSize, m_currentPen.color());
+		int style    ; in >> style;
+		QtGnuplotPoint* pointItem = new QtGnuplotPoint(style, m_currentPointSize, m_currentPen.color());
 		pointItem->setPos(clipPoint(point));
 		pointItem->setZValue(m_currentZ++);
 		addItem(pointItem);
+		if (m_inKeySample)
+			update_key_box( QRectF(point, QSize(2,2)) );
+		else
+			m_currentGroup.append(pointItem);
 	}
 	else if (type == GEPutText)
 	{
@@ -213,6 +272,18 @@ void QtGnuplotScene::processEvent(QtGnuplotEventType type, QDataStream& in)
 		QGraphicsTextItem* textItem = addText(text, m_font);
 		textItem->setDefaultTextColor(m_currentPen.color());
 		positionText(textItem, point);
+		if (m_inKeySample) {
+			QRectF rect = textItem->boundingRect();
+			qreal fullheight = rect.height();
+			if (m_textAlignment == Qt::AlignRight)
+				rect.moveBottomRight(point);
+			else
+				rect.moveBottomLeft(point);
+			rect.adjust(0, fullheight/1.8, 0, fullheight/4);
+			update_key_box(rect);
+		} else {
+			m_currentGroup.append(textItem);
+		}
 	}
 	else if (type == GEEnhancedFlush)
 	{
@@ -299,8 +370,40 @@ void QtGnuplotScene::processEvent(QtGnuplotEventType type, QDataStream& in)
 		for (int i = 0; i < 4; i++)
 			in >> m_axisValid[i] >> m_axisMin[i] >> m_axisLower[i] >> m_axisScale[i] >> m_axisLog[i];
 	}
+	else if (type == GEPlotNumber) 
+	{
+		int newPlotNumber;  in >> newPlotNumber;
+		if (newPlotNumber == 0 && m_currentPlotNumber > 0) {
+			// End of previous plot, create group holding the accumulated elements
+			QGraphicsItemGroup *newgroup;
+			newgroup = createItemGroup(m_currentGroup);
+			newgroup->setZValue(m_currentZ++);
+			// Copy the visible/hidden status from the previous plot/replot
+			if (0 < m_currentPlotNumber  && m_currentPlotNumber < m_key_boxes.count())
+				newgroup->setVisible( !(m_key_boxes[m_currentPlotNumber-1].ishidden()) );
+			// Store it in an ordered list so we can toggle it by index
+			if (m_currentPlotNumber >= m_plot_group.count())
+				m_plot_group.insert(m_currentPlotNumber, newgroup);
+			else
+				m_plot_group.replace(m_currentPlotNumber-1, newgroup);
+		} 
+		else
+		{
+			// Initialize list of elements for next group
+			m_currentGroup.clear();
+		}
+		m_currentPlotNumber = newPlotNumber;
+	}
+	else if (type == GELayer)
+	{
+		int layer; in >> layer;
+		if (layer == QTLAYER_BEGIN_KEYSAMPLE) m_inKeySample = true;
+		if (layer == QTLAYER_END_KEYSAMPLE) m_inKeySample = false;
+		if (layer == QTLAYER_BEFORE_ZOOM) m_preserve_visibility = true;
+	}
 	else if (type == GEDone)
-		m_eventHandler->postTermEvent(GE_plotdone, 0, 0, 0, 0, 0); /// @todo m_id;//qDebug() << "Done !" << items().size();
+		m_eventHandler->postTermEvent(GE_plotdone, 0, 0, 0, 0, 0);
+		/// @todo m_id;//qDebug() << "Done !" << items().size();
 	else
 		swallowEvent(type, in);
 }
@@ -323,6 +426,14 @@ void QtGnuplotScene::resetItems()
 	m_horizontalRuler->setVisible(false);
 	m_verticalRuler->setVisible(false);
 	m_lineTo->setVisible(false);
+
+	int i = m_key_boxes.count();
+	while (i-- > 0) {
+		m_key_boxes[i].setSize( QSizeF(0,0) );
+		if (!m_preserve_visibility)
+			m_key_boxes[i].setHidden(false);
+	}
+	m_plot_group.clear();	// Memory leak?  Destroy groups first?
 }
 
 namespace QtGnuplot {
@@ -480,11 +591,25 @@ void QtGnuplotScene::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
 	// where the timers are initialized on entry - maybe a problem there?
 	// Finally, why do we need or want a timer at all?
 	int time = m_watches[button].elapsed();
-	// fprintf(stderr,"elapsed = %d\n",time);
 	if (time > 300) // purely empical work-around
 	if (m_eventHandler->postTermEvent(GE_buttonrelease, int(event->scenePos().x()),
 	    int(event->scenePos().y()), button, time, 0))
 		m_watches[button].start();
+
+	/* Check for click in one of the keysample boxes */
+	int i = m_key_boxes.count();
+	while (i-- > 0) {
+		if (m_key_boxes[i].contains(m_lastMousePos)) {
+			if (m_plot_group[i]->isVisible()) {
+				m_plot_group[i]->setVisible(false);
+				m_key_boxes[i].setHidden(true);
+			} else {
+				m_plot_group[i]->setVisible(true);
+				m_key_boxes[i].setHidden(false);
+			}
+			break;
+		}
+	}
 
 	QGraphicsScene::mouseReleaseEvent(event);
 }

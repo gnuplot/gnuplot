@@ -258,6 +258,7 @@ void QtGnuplotWidget::loadSettings()
 {
 	QSettings settings("gnuplot", "qtterminal");
 	m_antialias = settings.value("view/antialias", true).toBool();
+	m_rounded = settings.value("view/rounded", true).toBool();
 	m_backgroundColor = settings.value("view/backgroundColor", Qt::white).value<QColor>();
 	m_replotOnResize = settings.value("view/replotOnResize", true).toBool();
 	applySettings();
@@ -273,6 +274,7 @@ void QtGnuplotWidget::saveSettings()
 {
 	QSettings settings("gnuplot", "qtterminal");
 	settings.setValue("view/antialias", m_antialias);
+	settings.setValue("view/rounded", m_rounded);
 	settings.setValue("view/backgroundColor", m_backgroundColor);
 	settings.setValue("view/replotOnResize", m_replotOnResize);
 }
@@ -285,6 +287,7 @@ void QtGnuplotWidget::showSettingsDialog()
 	m_ui = new Ui_settingsDialog();
 	m_ui->setupUi(settingsDialog);
 	m_ui->antialiasCheckBox->setCheckState(m_antialias ? Qt::Checked : Qt::Unchecked);
+	m_ui->roundedCheckBox->setCheckState(m_rounded ? Qt::Checked : Qt::Unchecked);
 	m_ui->replotOnResizeCheckBox->setCheckState(m_replotOnResize ? Qt::Checked : Qt::Unchecked);
 	QPixmap samplePixmap(m_ui->sampleColorLabel->size());
 	samplePixmap.fill(m_backgroundColor);
@@ -297,6 +300,7 @@ void QtGnuplotWidget::showSettingsDialog()
 	{
 		m_backgroundColor = m_chosenBackgroundColor;
 		m_antialias = (m_ui->antialiasCheckBox->checkState() == Qt::Checked);
+		m_rounded = (m_ui->roundedCheckBox->checkState() == Qt::Checked);
 		m_replotOnResize = (m_ui->replotOnResizeCheckBox->checkState() == Qt::Checked);
 		applySettings();
 		saveSettings();
