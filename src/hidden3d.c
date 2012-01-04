@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.82 2011/10/10 23:01:13 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.83 2011/11/24 22:59:10 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - hidden3d.c */
@@ -1212,6 +1212,11 @@ build_networks(struct surface_points *plots, int pcount)
 			labelpoint.x = label->place.x;
 			labelpoint.y = label->place.y;
 			labelpoint.z = label->place.z;
+			if (label->textcolor.type == TC_Z)
+			    labelpoint.CRD_COLOR = label->textcolor.value;
+			else
+			    labelpoint.CRD_COLOR = label->textcolor.lt;
+			
 			thisvertex = store_vertex(&labelpoint, 
 				&(this_plot->lp_properties), color_from_column);
 			if (thisvertex < 0)
