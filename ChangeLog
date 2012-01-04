@@ -1,3 +1,8 @@
+2012-01-04  Colin Macdonald  <macdonald@maths.ox.ac.uk>
+
+	* src/gplt_x11.c: Set WM_CLASS to "Gnuplot" for the benefit of various
+	window managers.
+
 2012-01-04  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/hidden3d.c: Fix an uninitialized colorspec found by valgrind.
