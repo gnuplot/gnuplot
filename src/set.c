@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.359 2011/12/29 18:35:56 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.360 2012/01/05 22:28:45 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -2203,6 +2203,7 @@ set_label()
 	    this_label->text = text;
 	}
 
+#ifdef BACKWARDS_COMPATIBLE
 	/* HBB 20001021: new functionality. If next token is a ','
 	 * treat it as a numeric expression whose value is to be
 	 * sprintf()ed into the label string (which contains an
@@ -2211,6 +2212,7 @@ set_label()
 	 * handling, but left in for backward compatibility */
 	if (!END_OF_COMMAND && equals(c_token, ","))
 	    this_label->text = fill_numbers_into_string(this_label->text);
+#endif
     }
 
     /* Now parse the label format and style options */
@@ -5515,7 +5517,7 @@ static void set_nolinestyle()
 }
 #endif
 
-
+#ifdef BACKWARDS_COMPATIBLE
 /* HBB 20001021: new function: make label texts decoratable with numbers */
 static char *
 fill_numbers_into_string(char *pattern)
@@ -5578,6 +5580,7 @@ fill_numbers_into_string(char *pattern)
     free(pattern);
     return output;
 }
+#endif
 
 /*
  * new_text_label() allocates and initializes a text_label structure.
