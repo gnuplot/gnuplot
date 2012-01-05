@@ -1,3 +1,8 @@
+2012-01-05  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* configure.in src/Makefile.am: Tweak autodetection of Qt utilities to
+	handle differences in the Qt 4.6 and 4.7 pkg-config files.
+
 2012-01-04  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/hidden3d.c: Fix an uninitialized colorspec found by valgrind.

@@ -104,7 +104,7 @@ moc_%.cpp : qtterminal/%.h
 
 # Call the Qt resource compiler
 qrc_%.cpp: qtterminal/%.qrc
-	rcc -name QtGnuplotResource -o $@ $<
+	$(RCC) -name QtGnuplotResource -o $@ $<
 
 # Call the Qt ui compiler
 ui_%.h: qtterminal/%.ui
