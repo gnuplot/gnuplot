@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot on Unix.
 dnl
-dnl $Id: configure.in,v 1.300 2011/12/28 20:41:13 sfeam Exp $
+dnl $Id: configure.in,v 1.301 2012/01/03 04:00:00 sfeam Exp $
 dnl
 dnl this is actually major.minor ...
 dnl note that for a non-beta release, we need to
@@ -1147,17 +1147,35 @@ if test "${enable_qt_ok}" = yes ; then
 
   CPPFLAGS="$CPPFLAGS $QT_CFLAGS"
   CXXFLAGS="$CXXFLAGS $QT_CXXFLAGS"
+  QT4LOC=`$PKG_CONFIG --variable=exec_prefix QtCore`
   MOC=`$PKG_CONFIG --variable=moc_location QtCore`
   UIC=`$PKG_CONFIG --variable=uic_location QtCore`
+  RCC=`$PKG_CONFIG --variable=rcc_location QtCore`
+  if test x"$RCC" = x ; then
+    if test x"$QT4LOC" != x ; then
+        RCC=$QT4LOC/bin/rcc
+    else
+        RCC=rcc
+    fi
+  fi
+  LRELEASE=`$PKG_CONFIG --variable=lrelease_location QtCore`
+  if test x"$LRELEASE" = x ; then
+    if test x"$QT4LOC" != x ; then
+        LRELEASE=$QT4LOC/bin/lrelease
+    else
+        LRELEASE=lrelease
+    fi
+  fi
+  AC_SUBST(RCC)
   AC_SUBST(MOC)
   AC_SUBST(UIC)
   AC_SUBST(QT_LIBS)
+  AC_SUBST(LRELEASE)
   AC_DEFINE(QTTERM,1, [ Define if you want the Qt terminal. ])
 fi
 AM_CONDITIONAL(BUILD_QT, test "${enable_qt_ok}" = yes)
 
 dnl translation tools
-AC_CHECK_PROGS(LRELEASE, lrelease-qt4 lrelease, no)
 AM_CONDITIONAL(HAVE_LRELEASE, test "${LRELEASE}" != no)
 
 AC_ARG_VAR(DIST_CONTACT,[Contact address for modified and binary distributed gnuplot versions])
