@@ -3,7 +3,7 @@
 	* configure.in src/Makefile.am: Tweak autodetection of Qt utilities to
 	handle differences in the Qt 4.6 and 4.7 pkg-config files.
 
-	* src/set.c: Call gp_expand_tilde() in 'set loadpath'
+	* src/set.c: Call gp_expand_tilde() in 'set loadpath' and 'set fontpath'.
 
 2012-01-04  Colin Macdonald  <macdonald@maths.ox.ac.uk>
 

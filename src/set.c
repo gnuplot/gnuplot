@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.360 2012/01/05 22:28:45 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.361 2012/01/05 22:47:02 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -2290,11 +2290,10 @@ set_fontpath()
     if (END_OF_COMMAND) {
 	clear_fontpath();
     } else while (!END_OF_COMMAND) {
-	if (isstring(c_token)) {
-	    int len;
-	    char *ss = gp_alloc(token_len(c_token), "tmp storage");
-	    len = (collect? strlen(collect) : 0);
-	    quote_str(ss,c_token,token_len(c_token));
+	char *ss;
+	if ((ss = try_to_get_string())) {
+	    int len = (collect? strlen(collect) : 0);
+	    gp_expand_tilde(&ss);
 	    collect = gp_realloc(collect, len+1+strlen(ss)+1, "tmp fontpath");
 	    if (len != 0) {
 		strcpy(collect+len+1,ss);
@@ -2303,7 +2302,6 @@ set_fontpath()
 	    else
 		strcpy(collect,ss);
 	    free(ss);
-	    ++c_token;
 	} else {
 	    int_error(c_token, "expected string");
 	}
