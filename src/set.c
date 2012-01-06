@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.361 2012/01/05 22:47:02 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.362 2012/01/05 22:54:37 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -166,7 +166,6 @@ static void set_arrowstyle __PROTO((void));
 static int assign_arrowstyle_tag __PROTO((void));
 static int looks_like_numeric __PROTO((char *));
 static int set_tic_prop __PROTO((AXIS_INDEX));
-static char *fill_numbers_into_string __PROTO((char *pattern));
 
 static void check_palette_grayscale __PROTO((void));
 static int set_palette_defined __PROTO((void));
@@ -180,6 +179,7 @@ static struct position default_position
 
 #ifdef BACKWARDS_COMPATIBLE
 static void set_nolinestyle __PROTO((void));
+static char *fill_numbers_into_string __PROTO((char *pattern));
 #endif
 
 /******** The 'set' command ********/
