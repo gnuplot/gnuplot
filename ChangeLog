@@ -6,6 +6,11 @@
 	* configure.in: Report status of aquaterm configuration correctly
 	(Lutz Maibaum).
 
+2012-01-07  Jérôme Lodewyck <lodewyck@users.sourceforge.net>
+
+	* src/qtterminal/QtGnuplotScene.cpp: Normalize the zoom rectangle to avoid
+	redrawing artifacts
+
 2012-01-07  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/misc.c (lf_pop): If the current input stream from "load file" is
