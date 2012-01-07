@@ -346,7 +346,7 @@ void QtGnuplotScene::processEvent(QtGnuplotEventType type, QDataStream& in)
 			m_zoomStopText->setVisible(true);
 			m_zoomStopText->setPlainText(text); /// @todo font
 			m_zoomStopText->setPos(m_lastMousePos);
-			m_zoomRect->setRect(QRectF(m_zoomBoxCorner + QPointF(0.5, 0.5), m_lastMousePos + QPointF(0.5, 0.5)));
+			m_zoomRect->setRect(QRectF(m_zoomBoxCorner + QPointF(0.5, 0.5), m_lastMousePos + QPointF(0.5, 0.5)).normalized());
 		}
 	}
 	else if (type == GELineTo)
