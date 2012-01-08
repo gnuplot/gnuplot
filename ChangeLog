@@ -3,6 +3,9 @@
 	* src/plot.c:  Allow shell commands from ~/.gnuplot but not from shared
 	initialization files.
 
+	* configure.in: Report status of aquaterm configuration correctly
+	(Lutz Maibaum).
+
 2012-01-07  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/misc.c (lf_pop): If the current input stream from "load file" is
