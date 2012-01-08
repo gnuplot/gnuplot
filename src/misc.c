@@ -338,8 +338,10 @@ lf_pop()
     if (lf->fp == NULL || lf->fp == stdin)
 	/* Do not close stdin in the case that "-" is named as a load file */
 	;
+#if defined(PIPES)
     else if (lf->name[0] == '<')
 	pclose(lf->fp);
+#endif
     else
 	fclose(lf->fp);
 
