@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: scanner.c,v 1.32 2011/11/28 19:49:53 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: scanner.c,v 1.33 2011/11/29 01:43:43 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - scanner.c */
@@ -48,7 +48,6 @@ static void substitute __PROTO((char **strp, size_t *str_lenp, int current));
 #ifdef VMS
 #include <descrip.h>
 #define MAILBOX "PLOT$MAILBOX"
-#define pclose(f) fclose(f)
 #ifdef __DECC
 #include <lib$routines.h>	/* avoid some IMPLICITFNC warnings */
 #include <starlet.h>
