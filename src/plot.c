@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot.c,v 1.128.2.4 2011/12/28 20:09:49 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot.c,v 1.128.2.5 2011/12/29 22:58:36 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot.c */
@@ -528,10 +528,15 @@ main(int argc, char **argv)
 	 * would set them to. Since the axis variables aren't in
 	 * initialized arrays any more, this is now necessary... */
 	reset_command();
-	init_color();  /*  Initialization of color  */
-	load_rcfile(0);
-	load_rcfile(1);
+	init_color();		/* Initialization of color  */
+	load_rcfile(0);		/* System-wide gnuplotrc if configured */
+	load_rcfile(1);		/* ./.gnuplot if configured */
 	init_fit();		/* Initialization of fitting module */
+
+	/* After this point we allow pipes and system commands */
+	successful_initialization = TRUE;
+
+	load_rcfile(2);		/* ~/.gnuplot */
 
 	if (interactive && term != 0) {		/* not unknown */
 #ifdef GNUPLOT_HISTORY
@@ -605,9 +610,6 @@ main(int argc, char **argv)
 	    exit(EXIT_FAILURE);	/* exit on non-interactive error */
 	}
     }
-
-    /* After this we allow pipes and system commands */
-    successful_initialization = TRUE;
 
     if (argc > 1) {
 #ifdef _Windows
@@ -693,8 +695,12 @@ interrupt_setup()
 }
 
 
-/* where = 0: look for gnuplotrc in system shared directory */
-/* where = 1: look for a gnuplot init file in current or home directory */
+/*
+ * Read commands from an initialization file.
+ * where = 0: look for gnuplotrc in system shared directory
+ * where = 1: look for .gnuplot in current directory
+ * where = 2: look for .gnuplot in home directory
+ */
 static void
 load_rcfile(int where)
 {
@@ -708,24 +714,24 @@ load_rcfile(int where)
 	PATH_CONCAT(rcfile, "gnuplotrc");
 	plotrc = fopen(rcfile, "r");
 #endif
-    } else
 
+    } else if (where == 1) {
 #ifdef USE_CWDRC
     /* Allow check for a .gnuplot init file in the current directory */
     /* This is a security risk, as someone might leave a malicious   */
     /* init file in a shared directory.                              */
-    plotrc = fopen(PLOTRC, "r");
+	plotrc = fopen(PLOTRC, "r");
 #endif /* !USE_CWDRC */
 
-    if (where == 1 && plotrc == NULL) {
-	if (user_homedir) {
-	    /* len of homedir + directory separator + len of file name + \0 */
-	    rcfile = (char *) gp_alloc((user_homedir ? strlen(user_homedir) : 0) + 1 + strlen(PLOTRC) + 1, "rcfile");
-	    strcpy(rcfile, user_homedir);
-	    PATH_CONCAT(rcfile, PLOTRC);
-	    plotrc = fopen(rcfile, "r");
-	}
+    } else if (where == 2 && user_homedir) {
+	/* length of homedir + directory separator + length of file name + \0 */
+	int len = (user_homedir ? strlen(user_homedir) : 0) + 1 + strlen(PLOTRC) + 1;
+	rcfile = gp_alloc(len, "rcfile");
+	strcpy(rcfile, user_homedir);
+	PATH_CONCAT(rcfile, PLOTRC);
+	plotrc = fopen(rcfile, "r");
     }
+
     if (plotrc) {
 	char *rc = gp_strdup(rcfile ? rcfile : PLOTRC);
 	load_file(plotrc, rc, FALSE);
