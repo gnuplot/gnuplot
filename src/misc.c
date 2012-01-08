@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.138.2.1 2011/11/24 22:59:46 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.138.2.2 2011/12/28 19:30:43 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -329,51 +329,51 @@ TBOOLEAN
 lf_pop()
 {
     LFS *lf;
+    int argindex;
 
     if (lf_head == NULL)
 	return (FALSE);
-    else {
-	int argindex;
-	lf = lf_head;
-	if (lf->fp != (FILE *) NULL && lf->fp != stdin) {
-	    /* DBT 10-6-98  do not close stdin in the case
-	     * that "-" is named as a load file
-	     */
-	    (void) fclose(lf->fp);
-	}
-	for (argindex = 0; argindex < 10; argindex++) {
-	    if (call_args[argindex]) {
-		free(call_args[argindex]);
-	    }
-	    call_args[argindex] = lf->call_args[argindex];
-	}
-	do_load_arg_substitution = lf->do_load_arg_substitution;
-	interactive = lf->interactive;
-	inline_num = lf->inline_num;
-	if_depth = lf->if_depth;
-	if_condition = lf->if_condition;
-	if_open_for_else = lf->if_open_for_else;
 
-	/* Restore saved input state and free the copy */
-	if (lf->tokens) {
-	    num_tokens = lf->num_tokens;
-	    c_token = lf->c_token;
-	    assert(token_table_size >= lf->num_tokens+1);
-	    memcpy(token, lf->tokens,
-		   (lf->num_tokens+1) * sizeof(struct lexical_unit));
-	    free(lf->tokens);
-	}
-	if (lf->input_line) {
-	    strcpy(gp_input_line, lf->input_line);
-	    free(lf->input_line);
-	}
-	free(lf->name);
-	free(lf->cmdline);
-	
-	lf_head = lf->prev;
-	free(lf);
-	return (TRUE);
+    lf = lf_head;
+    if (lf->fp == NULL || lf->fp == stdin)
+	/* Do not close stdin in the case that "-" is named as a load file */
+	;
+    else if (lf->name[0] == '<')
+	pclose(lf->fp);
+    else
+	fclose(lf->fp);
+
+    for (argindex = 0; argindex < 10; argindex++) {
+	if (call_args[argindex])
+	    free(call_args[argindex]);
+	call_args[argindex] = lf->call_args[argindex];
     }
+    do_load_arg_substitution = lf->do_load_arg_substitution;
+    interactive = lf->interactive;
+    inline_num = lf->inline_num;
+    if_depth = lf->if_depth;
+    if_condition = lf->if_condition;
+    if_open_for_else = lf->if_open_for_else;
+
+    /* Restore saved input state and free the copy */
+    if (lf->tokens) {
+	num_tokens = lf->num_tokens;
+	c_token = lf->c_token;
+	assert(token_table_size >= lf->num_tokens+1);
+	memcpy(token, lf->tokens,
+	       (lf->num_tokens+1) * sizeof(struct lexical_unit));
+	free(lf->tokens);
+    }
+    if (lf->input_line) {
+	strcpy(gp_input_line, lf->input_line);
+	free(lf->input_line);
+    }
+    free(lf->name);
+    free(lf->cmdline);
+    
+    lf_head = lf->prev;
+    free(lf);
+    return (TRUE);
 }
 
 /* push onto load_file state stack
