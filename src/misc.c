@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.138.2.3 2012/01/08 00:39:42 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.138.2.4 2012/01/08 05:48:41 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -339,7 +339,7 @@ lf_pop()
 	/* Do not close stdin in the case that "-" is named as a load file */
 	;
 #if defined(PIPES)
-    else if (lf->name[0] == '<')
+    else if (lf->name != NULL && lf->name[0] == '<')
 	pclose(lf->fp);
 #endif
     else
