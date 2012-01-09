@@ -1,5 +1,5 @@
 /*
- * $Id: axis.h,v 1.67 2011/11/15 20:23:43 sfeam Exp $
+ * $Id: axis.h,v 1.68 2011/11/26 00:31:15 sfeam Exp $
  *
  */
 
@@ -610,7 +610,7 @@ do {									  \
 /* Now trying ((void)0) */
 #define NOOP ((void)0)
 
-/* HBB 20000506: new macro to automatically build intializer lists
+/* HBB 20000506: new macro to automatically build initializer lists
  * for arrays of AXIS_ARRAY_SIZE equal elements */
 #define AXIS_ARRAY_INITIALIZER(value) {			\
     value, value, value, value, value,			\

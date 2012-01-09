@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot.c,v 1.133 2011/12/29 22:55:17 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot.c,v 1.134 2012/01/08 19:32:34 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot.c */
@@ -998,5 +998,5 @@ void
 restrict_popen()
 {
     if (!successful_initialization)
-	int_error(NO_CARET,"Pipes and shell commands not permitted during intialization");
+	int_error(NO_CARET,"Pipes and shell commands not permitted during initialization");
 }
