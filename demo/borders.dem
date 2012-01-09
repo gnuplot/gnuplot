@@ -1,5 +1,5 @@
 #
-# $Id: borders.dem,v 1.9 2007/01/10 02:34:50 sfeam Exp $
+# $Id: borders.dem,v 1.10 2011/09/21 18:00:58 markisch Exp $
 #
 unset grid
 set xrange [0:10]
@@ -10,7 +10,7 @@ set multiplot layout 4, 4 title "Demonstration of different border settings"
 do for [bb = 0:15] {
     set border bb
     show border
-    set label 1 "Border = %.0f",bb  at 5,5 center
+    set label 1 sprintf("Border = %.0f",bb)  at 5,5 center
     plot 1/0 notitle
 }
 unset multiplot
