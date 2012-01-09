@@ -1,3 +1,8 @@
+2012-01-09  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* docs/Makefile.in src/term.h src/makefile.awc term/mac.trm:
+	Remove vestigial terminal wrapper (contents are long gone).
+
 2012-01-08  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/plot.c:  Allow shell commands from ~/.gnuplot but not from shared
