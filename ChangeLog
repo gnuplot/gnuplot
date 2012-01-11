@@ -5,7 +5,8 @@
 	assumed that a 3D curve is always traversed in ascending order of the
 	constituent points.  But plot3d_lines_pm3d scans in both directions,
 	leading to incorrect clipping and possible array over-run when the
-	utility routines were called.
+	utility routines were called.  Furthermore, the arrays holding the
+	scan direction info were never initialized.
 	Bug #3471163
 
 2012-01-08  Ethan A Merritt  <merritt@u.washington.edu>
