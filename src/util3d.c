@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: util3d.c,v 1.43 2011/01/21 04:49:31 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: util3d.c,v 1.44 2011/01/23 23:02:08 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - util3d.c */
@@ -174,19 +174,19 @@ mat_mult(
 void
 edge3d_intersect(
     struct coordinate GPHUGE *points,	/* the points array */
-    int i,				/* line segment from point i-1 to point i */
+    int i0, int i1,
     double *ex, double *ey, double *ez)	/* the point where it crosses an edge */
 {
     int count;
-    double ix = points[i - 1].x;
-    double iy = points[i - 1].y;
-    double iz = points[i - 1].z;
-    double ox = points[i].x;
-    double oy = points[i].y;
-    double oz = points[i].z;
+    double ix = points[i0].x;
+    double iy = points[i0].y;
+    double iz = points[i0].z;
+    double ox = points[i1].x;
+    double oy = points[i1].y;
+    double oz = points[i1].z;
     double x, y, z;		/* possible intersection point */
 
-    if (points[i].type == INRANGE) {
+    if (points[i0].type == INRANGE) {
 	/* swap points around so that ix/ix/iz are INRANGE and ox/oy/oz are OUTRANGE */
 	x = ix;
 	ix = ox;
@@ -431,17 +431,17 @@ edge3d_intersect(
 TBOOLEAN			/* any intersection? */
 two_edge3d_intersect(
     struct coordinate GPHUGE *points,	/* the points array */
-    int i,				/* line segment from point i-1 to point i */
+    int i0, int i1,
     double *lx, double *ly, double *lz)	/* lx[2], ly[2], lz[2]: points where it crosses edges */
 {
     int count;
     /* global axis_array[FIRST_{X,Y,Z}_AXIS].{min,max} */
-    double ix = points[i - 1].x;
-    double iy = points[i - 1].y;
-    double iz = points[i - 1].z;
-    double ox = points[i].x;
-    double oy = points[i].y;
-    double oz = points[i].z;
+    double ix = points[i0].x;
+    double iy = points[i0].y;
+    double iz = points[i0].z;
+    double ox = points[i1].x;
+    double oy = points[i1].y;
+    double oz = points[i1].z;
     double t[6];
     double swap;
     double x, y, z;		/* possible intersection point */

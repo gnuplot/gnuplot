@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.258 2011/12/29 06:29:30 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.259 2011/12/29 18:35:55 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -1586,7 +1586,7 @@ plot3d_lines(struct surface_points *plot)
 				 * Calculate intersection point and draw
 				 * vector from there
 				 */
-				edge3d_intersect(points, i, &clip_x, &clip_y, &clip_z);
+				edge3d_intersect(points, i-1, i, &clip_x, &clip_y, &clip_z);
 
 				map3d_xy(clip_x, clip_y, clip_z, &xx0, &yy0);
 
@@ -1609,7 +1609,7 @@ plot3d_lines(struct surface_points *plot)
 			     * vector to it
 			     */
 
-			    edge3d_intersect(points, i, &clip_x, &clip_y, &clip_z);
+			    edge3d_intersect(points, i-1, i, &clip_x, &clip_y, &clip_z);
 
 			    map3d_xy(clip_x, clip_y, clip_z, &xx0, &yy0);
 
@@ -1622,7 +1622,7 @@ plot3d_lines(struct surface_points *plot)
 			     * Calculate the two 3D intersection points
 			     * if present
 			     */
-			    if (two_edge3d_intersect(points, i, lx, ly, lz)) {
+			    if (two_edge3d_intersect(points, i-1, i, lx, ly, lz)) {
 
 				map3d_xy(lx[0], ly[0], lz[0], &x, &y);
 
@@ -1738,7 +1738,7 @@ plot3d_lines_pm3d(struct surface_points *plot)
 				     * Calculate intersection point and draw
 				     * vector from there
 				     */
-				    edge3d_intersect(points, i, &clip_x, &clip_y, &clip_z);
+				    edge3d_intersect(points, i-step, i, &clip_x, &clip_y, &clip_z);
 
 				    map3d_xy(clip_x, clip_y, clip_z, &xx0, &yy0);
 
@@ -1765,7 +1765,7 @@ plot3d_lines_pm3d(struct surface_points *plot)
 				 * vector to it
 				 */
 
-				edge3d_intersect(points, i, &clip_x, &clip_y, &clip_z);
+				edge3d_intersect(points, i-step, i, &clip_x, &clip_y, &clip_z);
 
 				map3d_xy(clip_x, clip_y, clip_z, &xx0, &yy0);
 
@@ -1783,7 +1783,7 @@ plot3d_lines_pm3d(struct surface_points *plot)
 				 * Calculate the two 3D intersection points
 				 * if present
 				 */
-				if (two_edge3d_intersect(points, i, lx, ly, lz)) {
+				if (two_edge3d_intersect(points, i-step, i, lx, ly, lz)) {
 
 				    map3d_xy(lx[0], ly[0], lz[0], &x, &y);
 

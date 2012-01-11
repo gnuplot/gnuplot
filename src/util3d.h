@@ -1,5 +1,5 @@
 /*
- * $Id: util3d.h,v 1.17 2010/09/27 19:15:58 sfeam Exp $
+ * $Id: util3d.h,v 1.18 2010/09/27 19:27:10 sfeam Exp $
  */
 
 /* GNUPLOT - util3d.h */
@@ -75,8 +75,8 @@ typedef vertex GPHUGE * p_vertex;
 
 /* Prototypes of functions exported by "util3d.c" */
 
-void edge3d_intersect __PROTO((struct coordinate GPHUGE *, int, double *, double *, double *));
-TBOOLEAN two_edge3d_intersect __PROTO((struct coordinate GPHUGE *, int, double *, double *, double *));
+void edge3d_intersect __PROTO((struct coordinate GPHUGE *, int, int, double *, double *, double *));
+TBOOLEAN two_edge3d_intersect __PROTO((struct coordinate GPHUGE *, int, int, double *, double *, double *));
 void mat_scale __PROTO((double sx, double sy, double sz, double mat[4][4]));
 void mat_rot_x __PROTO((double teta, double mat[4][4]));
 void mat_rot_z __PROTO((double teta, double mat[4][4]));
