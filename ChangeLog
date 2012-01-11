@@ -1,3 +1,13 @@
+2012-01-11  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/util3d.h src/util3d.c (edge3d_intersect two_edge3d_intersect) 
+	src/graph3d.c (plot3d_lines_pm3d):  The utility routines in util3d
+	assumed that a 3D curve is always traversed in ascending order of the
+	constituent points.  But plot3d_lines_pm3d scans in both directions,
+	leading to incorrect clipping and possible array over-run when the
+	utility routines were called.
+	Bug #3471163
+
 2012-01-08  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/plot.c:  Allow shell commands from ~/.gnuplot but not from shared
