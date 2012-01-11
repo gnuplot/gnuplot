@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.259 2011/12/29 18:35:55 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.260 2012/01/11 23:40:42 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -1659,8 +1659,8 @@ static void
 plot3d_lines_pm3d(struct surface_points *plot)
 {
     struct iso_curve** icrvs_pair[2];
-    int invert[2];
-    int n[2];
+    int invert[2] = {0,0};
+    int n[2] = {0,0};
 
     int i, set, scan;
     int x, y, xx0, yy0;	/* point in terminal coordinates */
@@ -1690,8 +1690,8 @@ plot3d_lines_pm3d(struct surface_points *plot)
     /* split the bunch of scans in two sets in
      * which the scans are already depth ordered */
     pm3d_rearrange_scan_array(plot,
-	icrvs_pair, n, invert,
-	icrvs_pair + 1, n + 1, invert + 1);
+	icrvs_pair, &n[0], &invert[0],
+	icrvs_pair + 1, &n[1], &invert[1]);
 
     for (set = 0; set < 2; set++) {
 
