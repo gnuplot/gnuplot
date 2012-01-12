@@ -1,5 +1,5 @@
 ﻿;
-; $Id$
+; $Id: gnuplot.iss,v 1.1 2011/12/23 13:19:11 markisch Exp $
 ;
 ; GNUPLOT - gnuplot.iss
 ;
@@ -241,7 +241,8 @@ ja.defaultterm=gnuplot のデフォルト出力形式 (terminal) の選択:
 ja.termpreserve=GNUTERM 環境変数を変更しない
 ja.other=Other tasks:
 ja.setassociations=ファイルの関連づけを行う:
-ja.path=Add application directory to PATH environment variable
+; ja.path=Add application directory to PATH environment variable
+ja.path=実行ファイルのディレクトリを PATH 環境変数に追加する
 ; actions
 ja.view=%1 を表示する
 ; registry

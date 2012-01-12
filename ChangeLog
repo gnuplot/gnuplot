@@ -1,3 +1,7 @@
+2012-01-12  Shigeharu Takeno  <shige@iee.niit.ac.jp>
+
+	* win/gnuplot.iss: Japanese translation
+
 2012-01-11  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/util3d.h src/util3d.c (edge3d_intersect two_edge3d_intersect) 
