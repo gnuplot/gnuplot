@@ -1,5 +1,5 @@
 # Hello, emacs: this is a -*- Makefile -*-
-# $Id: Makefile,v 1.14.2.4 2012/01/14 14:00:42 markisch Exp $
+# $Id: Makefile,v 1.14.2.5 2012/01/14 15:00:28 markisch Exp $
 #
 # GNUPLOT Makefile for MinGW/MSYS on Windows
 # This assumes usual installation of the MinGW32 toolkit, the free
@@ -43,11 +43,11 @@ HTML_HELP=1
 # fontconfig or iconv; then, uncomment GDAUTOCONFIGLIBS so that all of the
 # libraries needed for linking will be taken by running 'gdlib-config'.
 # Uncomment BGD if you want to use the binary DLL version of libgd.
-NEWGD=1
-JPEG=1
-FREETYPE=1
+#NEWGD=1
+#JPEG=1
+#FREETYPE=1
 #GDAUTOCONFIGLIBS=1
-BGD=1
+#BGD=1
 
 # PDF device driver
 # Requires PNG and Z libraries based on particular PDF library used, and
@@ -73,17 +73,17 @@ MOUSE=1
 # Cairo/Pango terminals
 # Uncomment the following lines to select the pngcairo and pdfcairo
 # terminals
-CAIROTERMS=1
-CAIROLIBS=1
+#CAIROTERMS=1
+#CAIROLIBS=1
 
 # WXWIDGETS interactive terminal
 # Requires wxWidgets, Cairo, Pango, and their respective dependencies.
 # Uncomment the following lines to compile it.
-WXT=1
-CAIROLIBS=1
+#WXT=1
+#CAIROLIBS=1
 
 # Uncomment the following line to select the lua/tikz terminal
-LUA=lua5.1
+#LUA=lua5.1
 
 # Uncomment if you have libiconv
 ICONV=1
@@ -116,8 +116,7 @@ GNUPLOT_SHARE_DIR = share
 
 # Destination directory, used in 'make install':
 #DESTDIR = /local/opt/gnuplot-4.5
-#DESTDIR = "$(PROGRAMFILES)/gnuplot"
-DESTDIR = "$(USERPROFILE)/Desktop/gnuplot"
+DESTDIR = "$(PROGRAMFILES)/gnuplot"
 
 # give here the path to MinGW compiler unless it is already in PATH
 #GCCPATH = g:/mingw32/bin/
