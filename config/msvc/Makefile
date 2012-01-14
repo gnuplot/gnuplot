@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.4 2011/12/06 20:31:50 markisch Exp $
+# $Id: Makefile,v 1.5 2012/01/14 07:55:14 markisch Exp $
 #
 # GNUPLOT Makefile Microsoft Visual C++ 2005 or newer
 
@@ -41,7 +41,7 @@
 
 # Compilation options, disable by setting to zero
 # Is libgd available? (required by terminal png/jpeg/gif)?
-GDLIB = 1
+GDLIB = 0
 # Is pdflib available? (required by terminal pdf)
 PDFLIB = 0
 # Build wxt terminal? (required GTK, wxWidgets, cairo and pango libraries)
@@ -49,7 +49,7 @@ PDFLIB = 0
 #     http://wiki.wxwidgets.org/Visual_Studio_2008_%289.0%29
 WXT = 0
 # Build the lua/tikz terminal?
-LUA = 1
+LUA = 0
 # Choose help format:
 # for HTML help (.chm) this should be 1, for (.hlp) it should be 0
 HTML_HELP = 1
