@@ -10,5 +10,10 @@ VERSION
 *.tex
 *.sty
 *.aux
+*.dvi
+*.log
+*.toc
+*.eps
+*.ps
 *.pdf
 ja
