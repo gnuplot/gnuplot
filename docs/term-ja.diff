@@ -181,7 +181,7 @@ diff -rc docs/tex2ja.awk.ORG docs/tex2ja.awk
 *** 0 ****
 --- 1,54 ----
 + #
-+ # $Id: tex2ja.awk,v 1.5 2008-06-22 20:22:11+09 shige Exp $
++ # $Id: term-ja.diff,v 1.32 2011/11/10 22:01:19 markisch Exp $
 + # doc2tex の出力の後処理スクリプト
 + # tex2ja.awk
 + # 06/20 2008
@@ -3685,61 +3685,6 @@ diff -rc term/lua.trm.ORG term/lua.trm
 + " を使用してください。"
 + #endif
   END_HELP(tikz)
-  #endif /* TERM_HELP */
-diff -rc term/mac.trm.ORG term/mac.trm
-*** term/mac.trm	2008-12-27.ORG 16:15:27.000000000 +0900
---- term/mac.trm	2011-11-10 08:57:27.000000000 +0900
-***************
-*** 137,142 ****
---- 137,143 ----
-  
-  #ifdef TERM_HELP
-  START_HELP(mac)
-+ #ifndef JAPANESE_DOC
-  "1 macintosh",
-  "?set terminal macintosh",
-  "?set term macintosh",
-***************
-*** 167,171 ****
---- 168,206 ----
-  " to multiwin, generate some graphs, and then switch to singlewin again, the",
-  " orginal 'singlewin' window will be resused if it is still open. Otherwise",
-  " a new 'singlewin' window will be created. The 'singlewin' window is not numbered."
-+ #else /* JAPANESE_DOC */
-+ "1 macintosh",
-+ "?set terminal macintosh",
-+ "?set term macintosh",
-+ "?terminal macintosh",
-+ "?term macintosh",
-+ "?macintosh",
-+ " 書式:",
-+ "      set terminal macintosh {singlewin | multiwin} {vertical | novertical}",
-+ "                             {size <width>, <height> | default}",
-+ "",
-+ " 'singlewin' は単一ウィンドウへの制限であり、アニメーション用に有用です。",
-+ " 'multiwin' は複数のウィンドウが使えるようになります。",
-+ " 'vertical' は gx オプションの元でのみ有効です。このオプションでは回転",
-+ " した文字列を垂直方向に書きます。novertical はこのオプションを無効にし",
-+ " ます。",
-+ " size <width>, <height> は preferences dialog で設定されたグラフサイズ",
-+ " を書き換え、'set term mac size default' か 'set term mac default' が指",
-+ " 定されるまでその値は保持されます。",
-+ "",
-+ " 'set term mac size default' はウィンドウサイズの設定を preferences",
-+ " dialog で設定したものにします。",
-+ "",
-+ " 'set term mac default' は全てのオプションをデフォルトの値に設定します。",
-+ " デフォルト値は nogx, multiwin, novertical です。",
-+ "",
-+ " multiwin オプションの元でグラフを作成し、その後 singlewin にスイッチし",
-+ " た場合、次の plot コマンドでは更に一つウィンドウが作られ、この新しいウ",
-+ " ィンドウでは singlewin が有効な間使用されます。そして multiwin に戻り、",
-+ " いくつかのグラフを生成し、また再び singlewin にスイッチすると、もし元",
-+ " の 'singlewin' ウィンドウがまだ開いていればそれが使われ、そうでなけれ",
-+ " ば新しい 'singlewin' ウィンドウが作られます。'singlewin' ウィンドウは",
-+ " 番号付けはされません。"
-+ #endif /* JAPANESE_DOC */
-  END_HELP(mac)
   #endif /* TERM_HELP */
 diff -rc term/metafont.trm.ORG term/metafont.trm
 *** term/metafont.trm	2006-07-22.ORG 17:39:08.000000000 +0900
