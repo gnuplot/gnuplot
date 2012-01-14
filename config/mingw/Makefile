@@ -1,5 +1,5 @@
 # Hello, emacs: this is a -*- Makefile -*-
-# $Id: Makefile,v 1.14.2.3 2012/01/14 08:18:00 markisch Exp $
+# $Id: Makefile,v 1.14.2.4 2012/01/14 14:00:42 markisch Exp $
 #
 # GNUPLOT Makefile for MinGW/MSYS on Windows
 # This assumes usual installation of the MinGW32 toolkit, the free
@@ -736,9 +736,10 @@ clean:
 	$(RM) *.$(O) *.po *.o *.co
 	$(RM) doc2*.exe $(W)/wgnuplib.res wgnuplib.map wgnuplot.lib
 	$(RM) $(M)bf_test.exe *.ico geticon.exe allterm.h allterm.c
-	$(RM) gnuplot.tex gnuplot.dvi 
-	$(RM) gnuplot-figures.tex pdffigures.tex pdffigures.aux figure_*.pdf
+	$(RM) *.aux *.log *.dvi *.toc
+	$(RM) gnuplot.tex gnuplot-figures.tex pdffigures.tex figure_*.pdf
 	$(RM) titlepag.tex toc_entr.sty VERSION
+	$(RM) eg?.tex eg?.eps linepoin.tex test.tex test_tikz.tex
 	$(RM) $(D)windows/wgnuplot.log $(D)windows/wgnuplot.hhc
 	$(RM) $(D)windows/*.png $(D)windows/wgnuplot.html
 	$(RM) -rf ./dist/
@@ -749,6 +750,9 @@ veryclean: clean
 	$(RM) wgnuplot.exe wgnuplot_pipes.exe gnuplot.exe pgnuplot.exe
 	$(RM) $(HELPFILE) $(HELPFILEJA) wgnuplot.chw wgnuplot.gid wgnuplot.mnu
 	$(RM) gnuplot.ps gnuplot.pdf
+	$(RM) gpcard.pdf tutorial.pdf
+	$(RM) ps_fontfile_doc.pdf ps_fontfile_doc.ps ps_guide.pdf
+	$(RM) ps_symbols.ps ps_symbols.pdf
 	$(RM) $(M)binary[123] $(M)fit.log $(M)soundfit.par
 	$(RM) gnuplot-lua-tikz.sty gnuplot-lua-tikz.tex
 	$(RM) gnuplot-lua-tikz-common.tex t-gnuplot-lua-tikz.tex
