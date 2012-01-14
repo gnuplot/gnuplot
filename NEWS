@@ -12,7 +12,7 @@ New features, changes and fixes in gnuplot version 4.6
 ======================================================
 
 * NEW individual plots can be toggled on/off by clicking on the key sample
-      (wxt, svg, canvas, win)
+    (wxt, svg, canvas, qt, win)
 * NEW syntax allowing column selection by matching a string in the first line
 * NEW syntax supporting multi-line blocks of code delimited by curly braces
     if (<cond>) { ... } else { ... }
@@ -50,6 +50,7 @@ New features, changes and fixes in gnuplot version 4.6
 * NEW cubehelix scheme for color palettes
 * NEW localisation support for Windows help and menu file
 * NEW Windows installer
+* NEW shared initialization file $GNUPLOT_SHARE_DIR/gnuplotrc
 * FIX length estimation of UTF-8 strings
 * FIX accurate placement of color boundaries in the colorbar
 * FIX Built-in readline handles UTF-8 encoding
