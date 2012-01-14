@@ -1,5 +1,5 @@
 ﻿;
-; $Id: gnuplot.iss,v 1.2.2.3 2012/01/14 14:00:42 markisch Exp $
+; $Id: gnuplot.iss,v 1.2.2.4 2012/01/14 14:51:36 markisch Exp $
 ;
 ; GNUPLOT - gnuplot.iss
 ;
@@ -39,8 +39,8 @@
 
 #define MyAppName "gnuplot"
 #define MyAppVersionShort "4.6"
-#define MyAppVersion "4.6 rc 1"
-#define MyAppNumVersion "4.6rc1"
+#define MyAppVersion "4.6rc1"
+#define MyAppNumVersion "4.6.0"
 #define MyAppPublisher "gnuplot development team"
 #define MyAppURL "http://www.gnuplot.info/"
 #define MyAppExeName "wgnuplot.exe"
