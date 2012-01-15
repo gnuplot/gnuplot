@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: mouse.c,v 1.133 2011/11/04 22:13:40 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: mouse.c,v 1.134 2011/11/26 00:31:15 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - mouse.c */
@@ -1458,12 +1458,12 @@ event_buttonpress(struct gp_event_t *ge)
     MousePosToGraphPosReal(mouse_x, mouse_y, &real_x, &real_y, &real_x2, &real_y2);
 
 
-    if (4 == b &&			/* wheel up */
+    if ((b == 4 || b == 6) && /* 4 - wheel up, 6 - wheel left */
 	(!replot_disabled || refresh_ok)	/* Use refresh if available */
 	&& !(paused_for_mouse & PAUSE_BUTTON3)) {
       double xmin, ymin, x2min, y2min;
       double xmax, ymax, x2max, y2max;
-      if (modifier_mask & Mod_Ctrl) {
+      if ((b == 4) && (modifier_mask & Mod_Ctrl)) {
 	if (modifier_mask & Mod_Shift) {
 	  /* zoom in (X axis only) */
 	  double w1=23./25.;
@@ -1503,7 +1503,7 @@ event_buttonpress(struct gp_event_t *ge)
 	}
       } else {
 #if DO_ZOOM_AND_APPLY_ZOOM_FIXED_TO_HANDLE_Z_AXIS
-	if (modifier_mask & Mod_Alt) {
+	if ((b == 4) && (modifier_mask & Mod_Alt)) {
 	  /* scroll in +Z direction */
 	  xmin = rescale(FIRST_X_AXIS, 1., 0.);
 	  ymin = rescale(FIRST_Y_AXIS, 1., 0.);
@@ -1522,7 +1522,7 @@ event_buttonpress(struct gp_event_t *ge)
 	  }
 	} else 
 #endif
-	  if (modifier_mask & Mod_Shift) {
+	  if (((b == 4) && (modifier_mask & Mod_Shift)) || (b == 6)) {
 	  /* scroll left */
           xmin = rescale(FIRST_X_AXIS, 1.1, -.1);
 	  ymin = rescale(FIRST_Y_AXIS, 1., 0.);
@@ -1554,12 +1554,12 @@ event_buttonpress(struct gp_event_t *ge)
 	  }
 	}
       }
-    } else if (5 == b &&			/* wheel down */
+    } else if (((b == 5) || (b == 7)) && /* 5 - wheel down, 7 - wheel right */
 	       (!replot_disabled || refresh_ok)	/* Use refresh if available */
 	       && !(paused_for_mouse & PAUSE_BUTTON3)) {
       double xmin, ymin, x2min, y2min;
       double xmax, ymax, x2max, y2max;
-      if (modifier_mask & Mod_Ctrl) {
+      if ((b == 5) && (modifier_mask & Mod_Ctrl)) {
 	if (modifier_mask & Mod_Shift) {
 	  /* zoom out (X axis only) */
 	  double w1= 23./21.;
@@ -1596,7 +1596,7 @@ event_buttonpress(struct gp_event_t *ge)
 	  }
 	}
       } else {
-	if (modifier_mask & Mod_Shift) {
+	if (((b == 5) && (modifier_mask & Mod_Shift)) || (b == 7)) {
 	  /* scroll right */
 	  xmin = rescale(FIRST_X_AXIS, .9, .1);
 	  ymin = rescale(FIRST_Y_AXIS, 1., 0.);
