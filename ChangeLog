@@ -1,3 +1,11 @@
+2012-01-15  Mojca Miklavec <mojca.miklavec.lists@gmail.com>
+
+	* src/mouse.c (event_buttonpress): Treat mouse buttons 6/7 as
+	left/right scroll events (e.g. from fingers on a touchpad).
+
+	* src/qtterminal/QtGnuplotScene.cpp (mouseReleaseEvent):  Pass
+	horizontal scroll events through to gnuplot core as mouse events 6/7.
+
 2011-01-15 Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* config/config.mgw: Sync with configure.

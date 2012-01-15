@@ -614,10 +614,19 @@ void QtGnuplotScene::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
 	QGraphicsScene::mouseReleaseEvent(event);
 }
 
+/* http://developer.qt.nokia.com/doc/qt-4.8/qgraphicsscenewheelevent.html */
 void QtGnuplotScene::wheelEvent(QGraphicsSceneWheelEvent* event)
 {
 	updateModifiers();
-	m_eventHandler->postTermEvent(GE_buttonpress, 0, 0, event->delta() > 0 ? 4 : 5, 0, 0); /// @todo m_id
+	if (event->orientation() == Qt::Horizontal) {
+		// 6 = scroll left, 7 = scroll right
+		m_eventHandler->postTermEvent(GE_buttonpress, 0, 0, 
+			event->delta() > 0 ? 6 : 7, 0, 0);
+	} else { /* if (event->orientation() == Qt::Vertical) */
+		// 4 = scroll up, 5 = scroll down
+		m_eventHandler->postTermEvent(GE_buttonpress, 0, 0, 
+			event->delta() > 0 ? 4 : 5, 0, 0);
+	} 
 }
 
 void QtGnuplotScene::keyPressEvent(QKeyEvent* event)
