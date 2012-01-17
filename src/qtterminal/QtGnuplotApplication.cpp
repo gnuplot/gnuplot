@@ -51,14 +51,16 @@ QtGnuplotApplication::QtGnuplotApplication(int& argc, char** argv)
 	: QApplication(argc, argv)
 {
 	setQuitOnLastWindowClosed(false);
+	setWindowIcon(QIcon(":/images/gnuplot"));
 	m_currentWindow = NULL;
 	m_lastId = 0;
 	m_eventHandler = new QtGnuplotEventHandler(this, "qtgnuplot" + QString::number(applicationPid()));
+	connect(m_eventHandler, SIGNAL(connected()), this, SLOT(exitPersistMode()));
+	connect(m_eventHandler, SIGNAL(disconnected()), this, SLOT(enterPersistMode()));
 }
 
 QtGnuplotApplication::~QtGnuplotApplication()
 {
-	qDebug() << "Quit application" << applicationPid();
 }
 
 void QtGnuplotApplication::windowDestroyed(QObject* object)
@@ -67,6 +69,19 @@ void QtGnuplotApplication::windowDestroyed(QObject* object)
 	int id = m_windows.key((QtGnuplotWindow*)(object));
 	if (m_windows.take(id) == m_currentWindow)
 		m_currentWindow = 0;
+}
+
+void QtGnuplotApplication::enterPersistMode()
+{
+	setQuitOnLastWindowClosed(true);
+	// But if the plot window was already closed, this is our last chance to exit
+	if (m_windows.isEmpty())
+		quit();
+}
+
+void QtGnuplotApplication::exitPersistMode()
+{
+	setQuitOnLastWindowClosed(false);
 }
 
 void QtGnuplotApplication::processEvent(QtGnuplotEventType type, QDataStream& in)
@@ -94,12 +109,7 @@ void QtGnuplotApplication::processEvent(QtGnuplotEventType type, QDataStream& in
 	else if (type == GEExit)
 		quit();
 	else if (type == GEPersist)
-	{
-		setQuitOnLastWindowClosed(true);
-		// But if the plot window was already closed, this is our last chance to exit
-		if (m_windows.isEmpty())
-			quit();
-	}
+		enterPersistMode();
 	else if (m_currentWindow) // Dispatch gnuplot events to widgets
 		m_currentWindow->processEvent(type, in);
 	else

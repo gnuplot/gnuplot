@@ -116,9 +116,14 @@ public:
 	bool postTermEvent(int type, int mx, int my, int par1, int par2, int winid);
 	QString serverName();
 
+signals:
+	void connected();
+	void disconnected();
+
 private slots:
 	void newConnection();
 	void readEvent();
+	void connectionClosed();
 
 private:
 	void init(const QString& inSocket);

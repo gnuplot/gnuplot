@@ -1,7 +1,7 @@
-/* GNUPLOT - QtGnuplotApplication.h */
+/* GNUPLOT - gnuplot_qt.cpp */
 
 /*[
- * Copyright 2009   Jérôme Lodewyck
+ * Copyright 2011   Jérôme Lodewyck
  *
  * Permission to use, copy, and distribute this software and its
  * documentation for any purpose with or without fee is hereby granted,
@@ -41,36 +41,41 @@
  * under either the GPL or the gnuplot license.
 ]*/
 
-#ifndef QTGNUPLOTAPPLICATION_H
-#define QTGNUPLOTAPPLICATION_H
+#include "QtGnuplotApplication.h"
+#include <QtCore>
+#include <signal.h>
 
-#include "QtGnuplotEvent.h"
-
-#include <QApplication>
-#include <QMap>
-
-class QtGnuplotWindow;
-
-class QtGnuplotApplication : public QApplication, public QtGnuplotEventReceiver
+int main(int argc, char* argv[])
 {
-Q_OBJECT
+	signal(SIGINT, SIG_IGN); // Do not listen to SIGINT signals anymore
 
-public:
-	QtGnuplotApplication(int& argc, char** argv);
-	~QtGnuplotApplication();
+#if QT_VERSION < 0x040700
+	/* 
+	* FIXME: EAM Nov 2011
+	* It is better to use environmental variable
+	* QT_GRAPHICSSYSTEM but this requires qt >= 4.7
+	* "raster" is ~5x faster than "native" (default).
+	* Unfortunately "opengl" isn't recognized on my test systems :-(
+	*/
+	// This makes a huge difference to the speed of polygon rendering.
+	// Alternatives are "native", "raster", "opengl"
+	QApplication::setGraphicsSystem("raster");
+#endif
 
-public slots:
-	void windowDestroyed(QObject* object = 0);
-	void enterPersistMode();
-	void exitPersistMode();
+	QtGnuplotApplication application(argc, argv);
 
-public:
-	void processEvent(QtGnuplotEventType type, QDataStream& in);
+	// Load translations for the qt library
+	QTranslator qtTranslator;
+	qtTranslator.load("qt_" + QLocale::system().name(), QLibraryInfo::location(QLibraryInfo::TranslationsPath));
+	application.installTranslator(&qtTranslator);
 
-private:
-	QMap<int, QtGnuplotWindow*> m_windows;
-	QtGnuplotWindow* m_currentWindow;
-	int m_lastId;
-};
+	// Load translations for the qt terminal
+	QTranslator translator;
+	translator.load("qtgnuplot_" + QLocale::system().name(), QTGNUPLOT_DATA_DIR);
+	application.installTranslator(&translator);
 
-#endif // QTGNUPLOTAPPLICATION_H
+	// Start
+	application.exec();
+
+	return 0;
+}

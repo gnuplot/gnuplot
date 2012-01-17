@@ -1,3 +1,13 @@
+2012-01-17  Jérôme Lodewyck <lodewyck@users.sourceforge.net>
+
+	* configure.in src/Makefile.am src/qtterminal/Makefile.am
+	src/qtterminal/QtGnuplotApplication.cpp
+	src/qtterminal/QtGnuplotApplication.h src/qtterminal/QtGnuplotEvent.cpp
+	src/qtterminal/QtGnuplotEvent.h src/qtterminal/gnuplot_qt.cpp
+	src/qtterminal/qt_term.cpp term/qt.trm: The Qt terminal application is
+	executed in a separate executable called gnuplot_qt, started by exec.
+	This makes the Qt terminal compatible with OS X.
+
 2012-01-17  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/eval.c (update_plot_bounds):  Store the canvas size used by

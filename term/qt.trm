@@ -1,5 +1,5 @@
 /* GNUPLOT - qt.trm 
- * $Id: qt.trm,v 1.6 2011/12/18 06:29:46 sfeam Exp $
+ * $Id: qt.trm,v 1.7 2011/12/28 22:20:29 sfeam Exp $
  */
 
 /*[
@@ -156,6 +156,11 @@ START_HELP(qt)
 " explicitely close all the plot windows.",
 " Finally, by default the key <space> raises the gnuplot console window, and",
 " 'q' closes the plot window. The keyword \"ctrl\" allows you to replace those",
-" bindings by <ctrl>+<space> and <ctrl>+'q', respectively."
+" bindings by <ctrl>+<space> and <ctrl>+'q', respectively.",
+"",
+" The gnuplot outboard driver, gnuplot_qt, is searched in a default place",
+" chosen when the program is compiled.  You can override that by defining",
+" the environment variable GNUPLOT_DRIVER_DIR to point to a different",
+" location."
 END_HELP(qt)
 #endif /* TERM_HELP */
