@@ -1930,6 +1930,7 @@ C ... and restart the table:
  summation is zero.
 3 Gnuplot-defined variables
 ?gnuplot-defined variables
+?GPVAL
  Gnuplot maintains a number of read-only variables that reflect the current
  internal state of the program and the most recent plot. These variables begin
  with the prefix "GPVAL_".
@@ -1939,12 +1940,10 @@ C ... and restart the table:
  last plot, not those currently `set`.
 
  Example:  To calculate the fractional screen coordinates of the point [X,Y]
-      XRANGE = GPVAL_TERM_XMAX - GPVAL_TERM_XMIN
-      YRANGE = GPVAL_TERM_YMAX - GPVAL_TERM_YMIN
-      GRAPH_X = (X - GPVAL_TERM_XMIN) / XRANGE
-      GRAPH_Y = (Y - GPVAL_TERM_YMIN) / YRANGE
-      SCREEN_X = GPVAL_TERM_XMIN + GRAPH_X / XRANGE
-      SCREEN_Y = GPVAL_TERM_YMIN + GRAPH_Y / YRANGE
+      GRAPH_X = (X - GPVAL_X_MIN) / (GPVAL_X_MAX - GPVAL_X_MIN)
+      GRAPH_Y = (Y - GPVAL_Y_MIN) / (GPVAL_Y_MAX - GPVAL_Y_MIN)
+      SCREEN_X = GPVAL_TERM_XMIN + GRAPH_X * (GPVAL_TERM_XMAX - GPVAL_TERM_XMIN) 
+      SCREEN_Y = GPVAL_TERM_YMIN + GRAPH_Y * (GPVAL_TERM_YMAX - GPVAL_TERM_YMIN)
       FRAC_X = SCREEN_X / GPVAL_TERM_XSIZE
       FRAC_Y = SCREEN_Y / GPVAL_TERM_YSIZE
 
