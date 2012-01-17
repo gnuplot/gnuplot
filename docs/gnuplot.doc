@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.701.2.8 2011/12/30 05:15:23 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.701.2.9 2012/01/17 19:34:56 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -1915,12 +1915,10 @@ C ... and restart the table:
  last plot, not those currently `set`.
 
  Example:  To calculate the fractional screen coordinates of the point [X,Y]
-      XRANGE = GPVAL_TERM_XMAX - GPVAL_TERM_XMIN
-      YRANGE = GPVAL_TERM_YMAX - GPVAL_TERM_YMIN
-      GRAPH_X = (X - GPVAL_TERM_XMIN) / XRANGE
-      GRAPH_Y = (Y - GPVAL_TERM_YMIN) / YRANGE
-      SCREEN_X = GPVAL_TERM_XMIN + GRAPH_X / XRANGE
-      SCREEN_Y = GPVAL_TERM_YMIN + GRAPH_Y / YRANGE
+      GRAPH_X = (X - GPVAL_X_MIN) / (GPVAL_X_MAX - GPVAL_X_MIN)
+      GRAPH_Y = (Y - GPVAL_Y_MIN) / (GPVAL_Y_MAX - GPVAL_Y_MIN)
+      SCREEN_X = GPVAL_TERM_XMIN + GRAPH_X * (GPVAL_TERM_XMAX - GPVAL_TERM_XMIN)
+      SCREEN_Y = GPVAL_TERM_YMIN + GRAPH_Y * (GPVAL_TERM_YMAX - GPVAL_TERM_YMIN)
       FRAC_X = SCREEN_X / GPVAL_TERM_XSIZE
       FRAC_Y = SCREEN_Y / GPVAL_TERM_YSIZE
 
