@@ -16,6 +16,9 @@ XAPPLRESDIR=@X11_APPDEFAULTS_DIR@
 # Default X11 driver location
 X11_DRIVER_DIR=$(pkglibexecdir)
 
+# Default Qt driver location
+QT_DRIVER_DIR=$(pkglibexecdir)
+
 # Default lua driver location
 GNUPLOT_LUA_DIR=$(pkgdatadir)/$(VERSION_MAJOR)/lua
 
@@ -37,7 +40,7 @@ binonly: $(bin_PROGRAMS)
 transform = @program_transform_name@
 GNUPLOT_X11 = `echo gnuplot_x11 | sed '$(transform)'`$(EXEEXT)
 
-AM_CPPFLAGS = -I../term -I$(top_srcdir)/term -DBINDIR=\"$(bindir)\" -DX11_DRIVER_DIR=\"$(X11_DRIVER_DIR)\" -DGNUPLOT_SHARE_DIR=\"$(GNUPLOT_SHARE_DIR)\" -DGNUPLOT_PS_DIR=\"$(GNUPLOT_PS_DIR)\" -DGNUPLOT_JS_DIR=\"$(GNUPLOT_JS_DIR)\" -DGNUPLOT_LUA_DIR=\"$(GNUPLOT_LUA_DIR)\"  -DCONTACT=\"$(EMAIL)\" -DHELPFILE=\"$(HELPFILE)\" -DGNUPLOT_X11=\"$(GNUPLOT_X11)\" -DXAPPLRESDIR=\"$(XAPPLRESDIR)\"
+AM_CPPFLAGS = -I../term -I$(top_srcdir)/term -DBINDIR=\"$(bindir)\" -DX11_DRIVER_DIR=\"$(X11_DRIVER_DIR)\" -DQT_DRIVER_DIR=\"$(QT_DRIVER_DIR)\" -DGNUPLOT_SHARE_DIR=\"$(GNUPLOT_SHARE_DIR)\" -DGNUPLOT_PS_DIR=\"$(GNUPLOT_PS_DIR)\" -DGNUPLOT_JS_DIR=\"$(GNUPLOT_JS_DIR)\" -DGNUPLOT_LUA_DIR=\"$(GNUPLOT_LUA_DIR)\"  -DCONTACT=\"$(EMAIL)\" -DHELPFILE=\"$(HELPFILE)\" -DGNUPLOT_X11=\"$(GNUPLOT_X11)\" -DXAPPLRESDIR=\"$(XAPPLRESDIR)\"
 
 gnuplot_SOURCES = alloc.c alloc.h ansichek.h axis.c axis.h binary.c \
 breaders.c breaders.h bitmap.h color.c color.h command.c \
@@ -137,16 +140,22 @@ clean-demo:
 clean-local: clean-qt-extra clean-demo
 
 # Qt terminal sources
-nodist_gnuplot_SOURCES = moc_QtGnuplotWindow.cpp moc_QtGnuplotApplication.cpp \
-                         moc_QtGnuplotWidget.cpp moc_QtGnuplotScene.cpp \
-                         moc_QtGnuplotEvent.cpp qrc_QtGnuplotResource.cpp
 
-$(gnuplot_OBJECTS) : ui_QtGnuplotSettings.h
+gnuplot_SOURCES += qtterminal/qt_term.cpp
 
-gnuplot_SOURCES += qtterminal/qt_term.cpp qtterminal/QtGnuplotWindow.cpp \
+pkglibexec_PROGRAMS += gnuplot_qt
+
+$(gnuplot_qt_OBJECTS) : ui_QtGnuplotSettings.h
+
+nodist_gnuplot_qt_SOURCES = moc_QtGnuplotWindow.cpp moc_QtGnuplotApplication.cpp \
+                            moc_QtGnuplotWidget.cpp moc_QtGnuplotScene.cpp \
+                            moc_QtGnuplotEvent.cpp qrc_QtGnuplotResource.cpp
+
+gnuplot_qt_SOURCES = qtterminal/gnuplot_qt.cpp qtterminal/QtGnuplotWindow.cpp \
 qtterminal/QtGnuplotApplication.cpp qtterminal/QtGnuplotWidget.cpp \
 qtterminal/QtGnuplotScene.cpp qtterminal/QtGnuplotItems.cpp \
 qtterminal/QtGnuplotEvent.cpp
+gnuplot_qt_LDADD = $(QT_LIBS)
 
 # embed example (uncomment to build it)
 

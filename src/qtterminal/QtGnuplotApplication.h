@@ -61,6 +61,8 @@ public:
 
 public slots:
 	void windowDestroyed(QObject* object = 0);
+	void enterPersistMode();
+	void exitPersistMode();
 
 public:
 	void processEvent(QtGnuplotEventType type, QDataStream& in);

@@ -45,6 +45,10 @@
 #include <QtGui>
 #include <QtNetwork>
 
+#ifdef Q_WS_MAC
+	#include <Cocoa/Cocoa.h>
+#endif
+
 extern "C" {
 	#include "plot.h"      // for interactive
 	#include "term_api.h"  // for stdfn.h, JUSTIFY, encoding, *term definition, color.h
@@ -59,7 +63,6 @@ extern "C" {
 }
 
 #include "qt_term.h"
-#include "QtGnuplotApplication.h"
 #include "QtGnuplotEvent.h"
 #include "qt_conversion.cpp"
 
@@ -91,6 +94,7 @@ static const double qt_oversamplingF = double(qt_oversampling);
  *-------------------------------------------------------*/
 
 bool qt_initialized = false;
+bool qt_gnuplot_qtStarted = false;
 bool qt_setSize = true;
 int  qt_setWidth = qt_optionWidth;
 int  qt_setHeight = qt_optionHeight;
@@ -113,6 +117,33 @@ QPointF qt_termCoordF(unsigned int x, unsigned int y)
 QPoint qt_termCoord(unsigned int x, unsigned int y)
 {
 	return QPoint(qRound(double(x)/qt_oversamplingF), qRound(double(term->ymax - y)/qt_oversamplingF));
+}
+
+// Start the GUI application
+void execGnuplotQt()
+{
+	// Fork the GUI and exec the gnuplot_qt program in the child process
+	pid_t pid = fork();
+	if (pid < 0)
+		fprintf(stderr, "Forking error\n");
+	else if (pid == 0) // Child: start the GUI
+	{
+		// Make sure the forked copy doesn't trash the history file 
+		cancel_history();
+
+		// Start the gnuplot_qt program
+		QString filename = getenv("GNUPLOT_DRIVER_DIR");
+		if (filename.isEmpty())
+			filename = QT_DRIVER_DIR;
+		filename += "/gnuplot_qt";
+
+		execlp(filename.toAscii().data(), "gnuplot_qt", (char*)NULL);
+		fprintf(stderr, "Expected Qt driver: %s\n", filename.toAscii().data());
+		perror("Exec failed");
+		exit(EXIT_FAILURE);
+	}
+	qt_localServerName = "qtgnuplot" + QString::number(pid);
+	qt_gnuplot_qtStarted = true;
 }
 
 /*-------------------------------------------------------
@@ -148,33 +179,70 @@ void qt_flushOutBuffer()
 	qt_outBuffer.clear();
 }
 
+// Helper function called by qt_connectToServer()
+void qt_connectToServer(const QString& server, bool retry = true)
+{
+	bool connectToWidget = (server != qt_localServerName);
+
+	// The QLocalSocket::waitForConnected does not respect the time out argument when the
+	// gnuplot_qt application is not yet started. To wait for it, we need to implement the timeout ourselves
+	QDateTime timeout = QDateTime::currentDateTime().addMSecs(1000);
+	do
+	{
+		qt_socket.connectToServer(server);
+		qt_socket.waitForConnected(200);
+		// TODO: yield CPU ?
+	}
+	while((qt_socket.state() != QLocalSocket::ConnectedState) && (QDateTime::currentDateTime() < timeout));
+
+	// Still not connected...
+	if ((qt_socket.state() != QLocalSocket::ConnectedState) && retry)
+	{
+		// The widget could not be reached: start a gnuplot_qt program which will create a QtGnuplotApplication
+		if (connectToWidget)
+		{
+			qDebug() << "Could not connect to widget" << qt_optionWidget << ". Staring a QtGnuplotApplication";
+			qt_optionWidget = QString();
+			qt_connectToServer(qt_localServerName);
+		}
+		// The gnuplot_qt program could not be reached: try to start a new one
+		else
+		{
+			qDebug() << "Could not connect gnuplot_qt" << qt_optionWidget << ". Staring a new one";
+			execGnuplotQt();
+			qt_connectToServer(qt_localServerName, false);
+		}
+	}
+}
+
+// Called before a plot to connect to the terminal window, if needed
 void qt_connectToServer()
 {
 	if (!qt_initialized)
 		return;
 
 	// Determine to which server we should connect
-	QString server = qt_localServerName;
-	if (!qt_optionWidget.isEmpty())
-		server = qt_optionWidget;
+	bool connectToWidget = !qt_optionWidget.isEmpty();
+	QString server = connectToWidget ? qt_optionWidget : qt_localServerName;
 
-	// Check if we are already connected
-	if (qt_socket.serverName() == server)
-		return;
-
-	// Disconnect
 	if (qt_socket.state() == QLocalSocket::ConnectedState)
 	{
+		// Check if we are already connected to the correct server
+		if (qt_socket.serverName() == server)
+			return;
+
+		// Otherwise disconnect
 		qt_socket.disconnectFromServer();
 		while (qt_socket.state() == QLocalSocket::ConnectedState)
 			qt_socket.waitForDisconnected(1000);
 	}
 
-	// Connect to server, or local server if not available.
-	qt_socket.connectToServer(server);
-	if (!qt_socket.waitForConnected(3000))
-		while (qt_socket.state() != QLocalSocket::ConnectedState)
-			qt_socket.connectToServer(qt_localServerName);
+	// Start the gnuplot_qt helper program if not already started
+	if (!connectToWidget && !qt_gnuplot_qtStarted)
+		execGnuplotQt();
+
+	// Connect to the server, or local server if not available.
+	qt_connectToServer(server);
 }
 
 /*-------------------------------------------------------
@@ -226,67 +294,35 @@ bool qt_processTermEvent(gp_event_t* event)
 // Called before first plot after a set term command.
 void qt_init()
 {
-	// Start the QtGnuplotApplication if not already started
 	if (qt_initialized)
 		return;
 
-	// Fork the GUI if necessary
+	// If we are not connecting to an existing QtGnuplotWidget, start a QtGnuplotApplication
+	if (qt_optionWidget.isEmpty())
+		execGnuplotQt();
+
+	// Create a QApplication without event loop for QObject's that need it, namely font handling
+	// A better strategy would be to transfer the font handling to the QtGnuplotWidget, but it would require
+	// some synchronization between the widget and the gnuplot process.
 	int argc = 0;
-	pid_t pid = 0;
-	pid = fork();
-	if (pid < 0)
-		fprintf(stderr, "Forking error\n");
-	else if (pid == 0) // Child: start the GUI
-	{
-		signal(SIGINT, SIG_IGN); // Do not listen to SIGINT signals anymore
-
-#ifndef HAVE_QT_47
-		/* 
-		 * FIXME: EAM Nov 2011
-		 * It is better to use environmental variable
-		 * QT_GRAPHICSSYSTEM but this requires qt >= 4.7
-		 * "raster" is ~5x faster than "native" (default).
-		 * Unfortunately "opengl" isn't recognized on my test systems :-(
-		 */
-		// This makes a huge difference to the speed of polygon rendering.
-		// Alternatives are "native", "raster", "opengl"
-		QApplication::setGraphicsSystem("raster");
-#endif
-
-		QtGnuplotApplication application(argc, (char**)( NULL));
-
-		// Make sure the forked copy doesn't trash the history file 
-		cancel_history();
-
-		// Load translations for the qt library
-		QTranslator qtTranslator;
-		qtTranslator.load("qt_" + QLocale::system().name(), QLibraryInfo::location(QLibraryInfo::TranslationsPath));
-		application.installTranslator(&qtTranslator);
-
-		// Load translations for the qt terminal
-		QTranslator translator;
-		translator.load("qtgnuplot_" + QLocale::system().name(), QTGNUPLOT_DATA_DIR);
-		application.installTranslator(&translator);
-
-		// Start
-		application.exec();
-		exit(0);
-	}
-
-	// Parent: create a QApplication without event loop for QObject's that need it
 	QApplication* application = new QApplication(argc, (char**)( NULL));
 
-	// Init state variables
-	qt_localServerName = "qtgnuplot" + QString::number(pid);
-	qt_out.setVersion(QDataStream::Qt_4_4);
-	qt_initialized = true;
-	GP_ATEXIT(qt_atexit);
+#ifdef Q_WS_MAC
+	// Don't display this application in the MAC OS X dock
+	ProcessSerialNumber psn;
+	if (GetCurrentProcess(&psn) == noErr)
+		TransformProcessType(&psn, kProcessTransformToBackgroundApplication);
+#endif
 
 	// The creation of a QApplication mangled our locale settings
 #ifdef HAVE_LOCALE_H
 	setlocale(LC_NUMERIC, "C");
 	setlocale(LC_TIME, current_locale);
 #endif
+
+	qt_out.setVersion(QDataStream::Qt_4_4);
+	qt_initialized = true;
+	GP_ATEXIT(qt_atexit);
 }
 
 // Called just before a plot is going to be displayed.
@@ -670,7 +706,9 @@ int qt_waitforinput(void)
 		// Wait for input
 		if (select(socket_fd+1, &read_fds, NULL, NULL, NULL) < 0)
 		{
-			fprintf(stderr, "Qt terminal communication error: select() error\n");
+			// Display the error message except when Ctrl + C is pressed
+			if (errno != 4)
+				fprintf(stderr, "Qt terminal communication error: select() error %i %s\n", errno, strerror(errno));
 			break;
 		}
 

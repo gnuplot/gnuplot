@@ -74,6 +74,13 @@ void QtGnuplotEventHandler::newConnection()
 {
 	m_socket = m_server->nextPendingConnection();
 	connect(m_socket, SIGNAL(readyRead()), this, SLOT(readEvent()));
+	connect(m_socket, SIGNAL(disconnected()), this, SLOT(connectionClosed()));
+	emit(connected());
+}
+
+void QtGnuplotEventHandler::connectionClosed()
+{
+	emit(disconnected());
 }
 
 void QtGnuplotEventHandler::readEvent()
