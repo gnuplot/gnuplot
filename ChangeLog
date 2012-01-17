@@ -1,3 +1,9 @@
+2012-01-17  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/eval.c (update_plot_bounds):  Store the canvas size used by
+	the previous plot in user accessible variables GPVAL_TERM_XSIZE,
+	GPVAL_TERM_YSIZE.
+
 2012-01-15  Mojca Miklavec <mojca.miklavec.lists@gmail.com>
 
 	* src/mouse.c (event_buttonpress): Treat mouse buttons 6/7 as
