@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.211 2011/12/28 22:20:18 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.212 2012/01/04 18:22:23 sfeam Exp $"); }
 #endif
 
 #define X11_POLYLINE 1
@@ -648,6 +648,9 @@ static XPoint *polyline = NULL;
 static int polyline_space = 0;
 static int polyline_size = 0;
 #endif
+
+static void gpXStoreName __PROTO((Display *, Window, char *));
+
 
 /*
  * Main program
@@ -1390,10 +1393,10 @@ record()
 		    if (msg = (char *) malloc(orig_len + strlen(added_text) + 1)) {
 			strcpy(msg, plot->titlestring);
 			strcat(msg, added_text);
-			XStoreName(dpy, plot->window, msg);
+			gpXStoreName(dpy, plot->window, msg);
 			free(msg);
 		    } else
-			XStoreName(dpy, plot->window, added_text + 1);
+			gpXStoreName(dpy, plot->window, added_text + 1);
 		}
 #else
 		if (!button_pressed) {
@@ -1511,7 +1514,7 @@ record()
 		    } else
 			cp = "<lost name>";
 		    if (current_plot->window)
-			XStoreName(dpy, current_plot->window, cp);
+			gpXStoreName(dpy, current_plot->window, cp);
 		}
 		return 1;
 	    }
@@ -3262,7 +3265,7 @@ display(plot_struct *plot)
 	/* restore default window title */
 	char *cp = plot->titlestring;
 	if (!cp) cp = "";
-	XStoreName(dpy, plot->window, cp);
+	gpXStoreName(dpy, plot->window, cp);
     }
 #else
     if (!button_pressed) {
@@ -3556,7 +3559,7 @@ PaletteMake(t_sm_palette * tpal)
 		    else
 			msg[0] = '\0';
 		    strcat(msg, added_text);
-		    XStoreName(dpy, current_plot->window, msg);
+		    gpXStoreName(dpy, current_plot->window, msg);
 		    free(msg);
 		}
 	    }
@@ -3675,7 +3678,7 @@ PaletteMake(t_sm_palette * tpal)
 	/* Restore window title (current_plot and current_plot->window are
 	 * valid, otherwise would not have been able to get save_title.
 	 */
-	XStoreName(dpy, current_plot->window, save_title);
+	gpXStoreName(dpy, current_plot->window, save_title);
 	XFree(save_title);
     }
 #endif
@@ -5432,6 +5435,13 @@ int gpXGetFontascent(XFontStruct *cfont)
 #endif
 }
 
+static void
+gpXStoreName (Display *dpy, Window w, char *name)
+{
+    XStoreName(dpy, w, name);
+    XSetIconName(dpy, w, name);
+}
+
 #ifdef USE_X11_MULTIBYTE
 int fontset_transsep(char *nfname, char *ofname, int n)
 {
@@ -5951,11 +5961,11 @@ pr_window(plot_struct *plot)
 	    if (orig_len && (plot->plot_number > 0))
 		plot->titlestring[orig_len++] = ' ';
 	    strcpy(plot->titlestring + orig_len, numstr + strlen(ICON_TEXT));
-	    XStoreName(dpy, plot->window, plot->titlestring);
+	    gpXStoreName(dpy, plot->window, plot->titlestring);
 	} else
-	    XStoreName(dpy, plot->window, title);
+	    gpXStoreName(dpy, plot->window, title);
     } else {
-	XStoreName(dpy, plot->window, plot->titlestring);
+	gpXStoreName(dpy, plot->window, plot->titlestring);
     }
     }
 #undef ICON_TEXT

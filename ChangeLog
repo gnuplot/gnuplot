@@ -1,3 +1,8 @@
+2012-01-19  Khanh-Dang  <kdntl@users.sourceforge.net>
+
+	* gplt_x11.c (gpXStoreName):  Provide a name string for both
+	WM_NAME and WM_ICON_NAME.
+
 2012-01-17  Jérôme Lodewyck <lodewyck@users.sourceforge.net>
 
 	* configure.in src/Makefile.am src/qtterminal/Makefile.am
