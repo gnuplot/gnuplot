@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.cpp,v 1.93 2011/12/24 18:51:04 sfeam Exp $
+ * $Id: wxt_gui.cpp,v 1.94 2012/01/02 00:08:06 sfeam Exp $
  */
 
 /* GNUPLOT - wxt_gui.cpp */
@@ -1596,6 +1596,8 @@ void wxt_init()
 #endif /* WXT_MULTITHREADED */
 
  		FPRINTF((stderr,"First Init2\n"));
+
+		term_interlock = (void *)wxt_init;
 
 		/* register call for "persist" effect and cleanup */
 		GP_ATEXIT(wxt_atexit);

@@ -4,6 +4,11 @@
 	src/stats.c:  When reporting bad data in an input file, give the file
 	name in addition to the current line number.
 
+	* term/wxt.trm src/term_api.h src/term.c src/qtterminal/qt_term.cpp
+	src/wxterminal/wxt_gui.cpp:  Switching the terminal from qt to wxt or
+	vice versa causes the program to lock up or segfault.  Introduce a flag
+	terminal_interlock to prevent such a switch.
+
 2012-01-19  Khanh-Dang  <kdntl@users.sourceforge.net>
 
 	* gplt_x11.c (gpXStoreName):  Provide a name string for both
