@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.255 2011/11/15 20:23:43 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.256 2011/12/22 05:41:58 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -669,8 +669,8 @@ get_data(struct curve_points *current_plot)
 	case 0:         /* not blank line, but df_readline couldn't parse it */
 	    {
 		df_close();
-		int_error(current_plot->token,
-			  "Bad data on line %d", df_line_number);
+		int_error(current_plot->token, "Bad data on line %d of file %s",
+			  df_line_number, df_filename ? df_filename : ""); 
 	    }
 
 	case 1:

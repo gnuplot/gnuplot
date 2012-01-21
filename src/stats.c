@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: stats.c,v 1.3 2011/11/15 20:23:43 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: stats.c,v 1.4 2011/11/28 19:49:53 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - stats.c */
@@ -775,8 +775,8 @@ statsrequest(void)
 	      continue;
 	      
 	    case 0:
-	      int_error( NO_CARET,
-			 "bad data on line %d of datafile", df_line_number);
+	      int_error( NO_CARET, "bad data on line %d of file %s",
+	  		df_line_number, df_filename ? df_filename : "" );
 	      break;
 
 	    case 1: /* Read single column successfully  */

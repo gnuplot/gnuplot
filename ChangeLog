@@ -1,3 +1,9 @@
+2012-01-21  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/datafile.h src/datafile.c src/plot2d.c src/breaders.c src/plot3d.c
+	src/stats.c:  When reporting bad data in an input file, give the file
+	name in addition to the current line number.
+
 2012-01-19  Khanh-Dang  <kdntl@users.sourceforge.net>
 
 	* gplt_x11.c (gpXStoreName):  Provide a name string for both
