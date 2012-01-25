@@ -1,5 +1,5 @@
-C RCS $Id: gnuplot-ja.doc,v 1.398 2011-11-10 09:15:30+09 shige Exp $
-C corresponding original gnuplot.doc revision: 1.699
+C RCS $Id: gnuplot-ja.doc,v 1.1 2012-01-22 14:27:35+09 shige Exp $
+C corresponding original gnuplot.doc revision: 1.701.2.10
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -11,7 +11,7 @@ C 下の contributers の表のアクセント文字は、現在のオリジナルでは UTF-8
 C で書かれているが、それを HTML 名前参照形式に変更している。
 ^<h2 align="center"> An Interactive Plotting Program </h2>
 ^<p align="center">  Thomas Williams & Colin Kelley</p>
-^<p align="center">  Version 4.4 organized by Ethan A Merritt and others</p>
+^<p align="center">  Version 4.6 organized by Ethan A Merritt and others</p>
 ^<p align="center">Major contributors (alphabetic order):<br>
 ^<br>
 ^  Hans-Bernhard Broeker, John Campbell,<br>
@@ -200,7 +200,7 @@ C 行が長いのは、できればなんとかしたい
  イル (スクリプトファイル) です。
  X11 ベースのシステムでは、以下の書式が使えます。
        gnuplot {X11OPTIONS} {OPTIONS} file1 file2 ...
- 詳細は、X11 のドキュメントか、あるいは以下参照: `x11`。
+ 詳細は、X11 のドキュメント、および以下参照: `x11`。
 
  gnuplot に与えるオプションは、コマンド行のどこに置いても構いません。フ
  ァイルは指定した順に実行され、同様に -e オプションで任意のコマンドを与
@@ -215,15 +215,15 @@ C 行が長いのは、できればなんとかしたい
        gnuplot --help
  詳細は以下参照: `command line options`。
 
- 対話型スクリーン出力形式 (`pm`, `windows`, `wxt`, `x11`) では、'h' を
- 打つとホットキー (`hotkeys`) とマウス機能 (`mousing`) に関するヘルプが
- 表示されます。
-
+ 対話型描画ウィンドウでの作業中は、'h' を打つとホットキー (`hotkeys`)
+ とマウス機能 (`mousing`) に関するヘルプを見ることができます。
  `seeking-assistance` のセクションは、さらなる情報やヘルプ、FAQ を探す
  手掛りを与えてくれるでしょう。
 2 探し出す手助け (Seeking-assistance)
 ?help-desk
 ?seeking-assistance
+?faq
+?FAQ
  公式の gnuplot Web ページは以下にあります。
 ^ <a href="http://www.gnuplot.info">
            http://www.gnuplot.info
@@ -291,9 +291,11 @@ Ffigure_newsyntax
  ベル名で選択することもできます。以下参照: `columnhead`。例:
        plot for [crop in "Oats Peas Beans"] 'data' using "Year":crop
 
-3 線種のユーザ選択性 (User preferences for linetypes)
+3 線種のカスタマイズ (Local customization of linetypes)
  現在では、ユーザが描画に使用される線種の属性 (色、線幅、点の種類) のデ
- フォルトの並びをカスタマイズできます。以下参照: `set linetype`。
+ フォルトの並びをカスタマイズできます。以下参照: `set linetype`。これは
+ 通常、システム用の初期化ファイル `gnuplotrc` か個人的な初期化ファイル
+ `~/.gnuplot` のいずれかで行います。以下参照: `initialization`。
 
 3 新しい描画スタイル (New plot styles)
  描画スタイルの節の以下参照: `boxplot`, `circles`, `ellipses`,
@@ -303,6 +305,31 @@ Ffigure_newsyntax
  極座標描画モードは、より多くの描画スタイルをサポートするように改良され
  ました。極座標軸は、今では x, y 軸とは独立に描画、ラベル付けできます。
  以下参照: `set polar`, `set rrange`。
+
+3 新しい平滑化アルゴリズム
+=kdensity
+=cumulative
+ 2 次元、3 次元描画の両方に、新しい平滑化アルゴリズムが追加されていて、
+ 滑らかなヒストグラムや累積分布関数の `plot` による描画に、それぞれ
+ `smooth kdensity` や `smooth cumulative` が使えます。`dgrid3d` には、
+ `splot` 用に新しい平滑化重み付け関数 (kernel) がいくつか追加されていま
+ す。以下参照: `smooth`, `dgrid3d`。
+
+3 新しい日時 (time/date) の取扱い
+=time
+ 現在の gnuplot は、時刻をミリ秒精度で追跡し、時刻のフォーマットもそれ
+ に伴って変更されています。新しい組み込み関数 time() は、システム時計に
+ 従った時刻を返します。
+ 例: 現在の時刻をミリ秒精度で表示
+      print strftime("%H:%M:%.3S %d-%b-%Y",time(0.0))
+      18:15:04.253 16-Apr-2011
+3 データの簡単な統計情報
+ 新しいコマンド `stats` は、`plot` や `splot` と同じ書式でファイルから
+ データを読み込みますが、グラフを描画するのではなく、これは、column で
+ 指定されたデータ列の簡単な統計情報を出力します。出力するのは、最小値
+ (min)、最大値 (max)、標準偏差 (standard deviation)、相関 (correlation)
+ 等で、そしてそれらの値をそれ以降の描画コマンドの構成、修正に利用できる
+ ように名前のついた変数に保存します。以下参照: `stats`。
 
 3 新しい/修正された出力形式
  ドライバ `qt` は、Qt グラフィック階層の最上位に位置する対話型出力形式
@@ -351,52 +378,25 @@ Ffigure_newsyntax
  これは、PDF か EPS グラフを生成しますが、テキスト文字列は、出力形式
  `epslatex` と同じ方法で LaTeX に転送します。
 
- 出力ドライバ `windows` は、大きく改良されています。現在は、透明化、ア
- ンチエイリアス、バッファリング出力、複数のグラフウィンドウ、グラフのク
- リップボードへのコピーやグラフの EMF ファイルへの保存をサポートしてい
- ます。オプションも増えていて、ユーザーインターフェースも改良されていま
- す。さらに、長い行の折りたたみをサポートするようにテキストコンソールの
- プログラムも大幅に書き換えられていますし、現在の gnuplot は HTML ベー
- スのヘルプシステムを使用します。
-
-3 新しい平滑化アルゴリズム
-=kdensity
-=cumulative
- 2 次元、3 次元描画の両方に、新しい平滑化アルゴリズムが追加されていて、
- 滑らかなヒストグラムや累積分布関数の `plot` による描画に、それぞれ
- `smooth kdensity` や `smooth cumulative` が使えます。`dgrid3d` には、
- `splot` 用に新しい平滑化重み付け関数 (kernel) がいくつか追加されていま
- す。以下参照: `smooth`, `dgrid3d`。
-
-3 新しい日時 (time/date) の取扱い
-=time
- 現在の gnuplot は、時刻をミリ秒精度で追跡し、時刻のフォーマットもそれ
- に伴って変更されています。新しい組み込み関数 time() は、システム時計に
- 従った時刻を返します。
- 例: 現在の時刻をミリ秒精度で表示
-      print strftime("%H:%M:%.3S %d-%b-%Y",time(0.0))
-      18:15:04.253 16-Apr-2011
-3 データの簡単な統計情報
- 新しいコマンド `stats` は、`plot` や `splot` と同じ書式でファイルから
- データを読み込みますが、グラフを描画するのではなく、これは、column で
- 指定されたデータ列の簡単な統計情報を出力します。出力するのは、最小値
- (min)、最大値 (max)、標準偏差 (standard deviation)、相関 (correlation)
- 等で、そしてそれらの値をそれ以降の描画コマンドの構成、修正に利用できる
- ように名前のついた変数に保存します。以下参照: `stats`。このコマンドは
- gnuplot のコンパイル時に --enable-stats で configure された場合のみ有
- 効です。
+ 出力ドライバ `windows` は、透明化、アンチエイリアス、バッファリング出
+ 力、複数のグラフウィンドウ、グラフのクリップボードへのコピーやグラフの
+ EMF ファイルへの保存をサポートするよう改良されています。新しいオプショ
+ ンもたくさんあり、ユーザーインターフェースも改良されています。さらに、
+ 長い行の折りたたみをサポートするようにテキストコンソールのプログラムも
+ 大幅に書き換えられています。ヘルプは、現在は HTML 形式のものを用意して
+ います。
 
 2 後方互換性 (Backwards compatibility)
 ?backwards compatibility
 ?compatibility
  以前の版で使われていたいくつかの書式は gnuplot 4.0 で非推奨となりまし
  たが、それは今でも認識はされ続けています。これは現在コンパイル時に制御
- され、以下のようにして無効にできます:
+ され、以下のようにして有効にできます:
 
-       ./configure --disable-backwards-compatibility
+       ./configure --enable-backwards-compatibility
 
- 注意: 非推奨の書式は、未来の gnuplot のある版からは、完全に無効になっ
- てしまうかもしれません。
+ 注意: 非推奨の書式は、未来の gnuplot のある版で、完全に削除されてしま
+ うかもしれません。
 
  一つの主な違いは、複雑なコマンド (特に文字列変数を含むコマンド) のあい
  まいさを避けるようなキーワードの導入です。特に注意すべき点は、オフセッ
@@ -875,8 +875,8 @@ Ffigure_newsyntax
  ムが -2 と -3 のどちらを答えとするかを確認してください。
 
  数式 "1/0" は "未定義値 (undefined)" フラグを生成し、それによりその点
- は無視されます。`ternary` 演算子 (三項演算子) の項にその例があります。
- または、あらかじめ定義されている値 NaN を使っても同じことになります。
+ を無視します。あるいは、あらかじめ定義されている値 NaN を使っても同じ
+ ことになります。例については、以下参照: `using`。
 =NaN
 
  複素数表現の実数部分、虚数部分は、どんな形で入力されても常に実数です:
@@ -1916,7 +1916,6 @@ C ... and restart the table:
  x では定義されない関数を描画:
        f(x) = 0<=x && x<1 ? sin(x) : 1<=x && x<2 ? 1/x : 1/0
        plot f(x)
-C^ <img align=bottom src="http://www.gnuplot.info/doc/ternary.gif" alt="[ternary.gif]" width=640 height=480>
  `gnuplot` は未定義値に対しては何も表示せずにただ無視するので、最後の場
  合の関数 (1/0) は点を何も出力しないことに注意してください。また、この
  関数描画の描画スタイルが lines (線描画) の場合、不連続点 (x=1) の所も
@@ -1950,6 +1949,7 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/ternary.gif" alt="[ternary
  小さい場合は、和の値は 0 となります。
 3 定義済み変数 (Gnuplot-defined variables)
 ?gnuplot-defined variables
+?GPVAL
  gnuplot は、プログラムの現在の内部状態と直前の描画を反映するような読み
  出し専用の変数をいくつか持っています。これらの変数の名前は、例えば
  GPVAL_TERM, GPVAL_X_MIN, GPVAL_X_MAX, GPVAL_Y_MIN のように "GPVAL_" で
@@ -1957,6 +1957,14 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/ternary.gif" alt="[ternary
  と入力してください。ただし、軸のパラメータに関連する値 (範囲、対数軸で
  あるか等) は、現在 `set` したものではなく、最後に描画されたものが使用
  されます。
+
+ 例: 点 [X,Y] のスクリーン比での座標を計算する方法
+      GRAPH_X = (X - GPVAL_X_MIN) / (GPVAL_X_MAX - GPVAL_X_MIN)
+      GRAPH_Y = (Y - GPVAL_Y_MIN) / (GPVAL_Y_MAX - GPVAL_Y_MIN)
+      SCREEN_X = GPVAL_TERM_XMIN + GRAPH_X * (GPVAL_TERM_XMAX - GPVAL_TERM_XMIN)
+      SCREEN_Y = GPVAL_TERM_YMIN + GRAPH_Y * (GPVAL_TERM_YMAX - GPVAL_TERM_YMIN)
+      FRAC_X = SCREEN_X / GPVAL_TERM_XSIZE
+      FRAC_Y = SCREEN_Y / GPVAL_TERM_YSIZE
 
 =errors
 =error state
@@ -2009,7 +2017,6 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/ternary.gif" alt="[ternary
        file = "mydata.inp"
        file(n) = sprintf("run_%d.dat",n)
 
-C^ <img align=bottom src="http://www.gnuplot.info/doc/userdefined.gif" alt="[userdefined.gif]" width=640 height=480>
  最後の 2 行の例は、ユーザ定義文字列変数と、ユーザ定義文字列関数を意味
  しています。
 
@@ -2366,14 +2373,14 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/userdefined.gif" alt="[use
 
 2 マウス入力 (mouse input)
 ?mouse input
- 出力形式 `x11`, `pm`, `windows`, `ggi`, `wxt` では、現在の描画にマウス
- を使って作用をすることが可能になっています。これらはホットキーの定義も
- サポートしていて、マウスカーソルが有効な描画ウィンドウにあるときに、あ
- るキーを押すことであらかじめ定義した関数を実行させることができます。マ
- ウス入力を `batch` コマンドスクリプトと組み合わせることも可能で、例え
- ば `pause mouse` として、その後にマウスクリックによってパラメータとし
- て返って来るマウス変数をその後のスクリプト動作に反映させることができま
- す。以下参照: `bind`, `mouse variables`。また以下も参照: `set mouse`。
+ 多くの出力形式で、現在の描画にマウスを使って作用をすることが可能になっ
+ ています。そのうちいくつかはホットキーの定義もサポートしていて、マウス
+ カーソルが有効な描画ウィンドウにあるときに、あるキーを押すことであらか
+ じめ定義した関数を実行させることができます。マウス入力を `batch` コマ
+ ンドスクリプトと組み合わせることも可能で、例えば `pause mouse` として、
+ その後にマウスクリックによってパラメータとして返って来るマウス変数をそ
+ の後のスクリプト動作に反映させることができます。以下参照: `bind`,
+ `mouse variables`。また以下も参照: `set mouse`。
 3 bind
 ?commands bind
 ?hotkey
@@ -2541,24 +2548,22 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/userdefined.gif" alt="[use
  `splot` での縮尺や見出し付けの制御は、x2 軸と y2 軸を制御するコマンド
  やオプションは効果がなく、z 軸を制御するものにはもちろん効果がある、と
  いうことを除けば `plot` と全く同じです。
-2 起動 (Startup)
+2 初期化 (Startup (initialization))
 ?startup
 ?start
 ?start-up
+?initialization
 ?.gnuplot
- `gnuplot` が起動されるとき、初期設定ファイルを読み込もうとします。この
- ファイルは Unix 系のシステムでは、`.gnuplot` であり、その他の処理系で
- は `GNUPLOT.INI` となっています。このファイルがカレントディレクトリに
- 無い場合、`gnuplot` はホームディレクトリを検索します (MS-DOS, Windows,
- OS/2 では、環境変数 `GNUPLOT` にホームディレクトリに対応するディレクト
- リを指定します; Windows NT では、GNUPLOT が定義されていなければ
- `USERPROFILE` が使われます)。注意: インストールの時に NOCWDRC を定義し
- た場合には、`gnuplot` はカレントディレクトリからは読みません。
-
- 初期設定ファイルが見つかると、`gnuplot` はこのファイルに書かれているコ
- マンドを実行します。ここには任意の正しい `gnuplot` コマンドを書くこと
- が可能ですが、一般的には、出力装置の指定や、よく使う関数や変数の定義を
- 設定する程度に抑えておきます。
+ 起動時に、gnuplot はまずシステム用の初期設定ファイル `gnuplotrc` を探
+ します。そのファイルの置き場所は gnuplot のインストール時に決定され、
+ `show loadpath` で知ることができます。次にユーザのホームディレクトリ内
+ に個人用の設定ファイルを探します。そのファイルは Unix 系のシステムでは
+ `.gnuplot` であり、その他の処理系では `GNUPLOT.INI` となっています。
+ (Windows と OS/2 では、環境変数 `GNUPLOT` に設定されている名前のディレ
+ クトリ内にそれを探します; Windows では、変数 GNUPLOT が定義されていな
+ ければ `USEPROFILE` を使用します)。注意: インストール時に `gnuplot` が
+ 最初にカレントディレクトリを探すように設定できますが、セキュリティ上危
+ 険なのでそれは推奨しません。
 2 文字列定数と文字列変数 (Strings)
 ?strings
 ?string variables
@@ -2719,16 +2724,10 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/userdefined.gif" alt="[use
 ?syntax
 ?specify
 ?punctuation
- gnuplot Version 4 では、以前の範囲比べてキーワードやオプションに関する
- 順序はだいぶ許容的になりました。しかし、もしあなたが正しく動くべきだと
- 思うオプション指定がエラーメッセージを出したなら、正確にドキュメントに
- 書かれている通りの順序で指定して試してみてください。
-
  リストや座標がコンマ (,) 区切りであるのに対し、オプションやそれに伴う
  パラメータはスペース ( ) 区切りです。範囲はコロン (:) で区切ってかぎか
  っこ ([]) でくくりますし、文字列やファイル名は引用符でくくり、他にいく
- つかカッコ (()) でくくるものがあります。中カッコ ({}) は特別な目的で使
- われます。
+ つかカッコ (()) でくくるものがあります。
 
  コンマは以下の区切りで使用されます。`set` コマンドの `arrow`, `key`,
  `label` の座標; 当てはめ (fit) られる変数のリスト (コマンド `fit` のキ
@@ -2757,12 +2756,9 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/userdefined.gif" alt="[use
  セミコロン (;) は、一行のコマンド行内で与えられる複数のコマンドを区切
  るのに使われます。
 
- 中カッコは、`postscript` のようないくつかの出力形式で特別に処理される
- 文字列内で使用されます。または複素数を記述するのにも使われます: {3,2}
- = 3 + 2i となります。
-
- PostScript 出力形式で `enhanced text` モード (拡張文字列処理モード) を
- 使う場合、現在は、{} の内部に \n を入れてはいけません。
+ 中カッコ ({}) は、拡張文字列処理モード (enhanced text mode) の記述や、
+ if/then/else 文のブロックの区切りとして使われますし、または複素数を記
+ 述するのにも使われます: {3,2} = 3 + 2i となります。
 
  EEPIC, Imagen, Uniplex, LaTeX, TPIC の各出力形式では、単一引用符内の
  \\ または二重引用符内の \\\\ で改行を示すことが可能です。
@@ -4755,7 +4751,7 @@ Ffigure_mapcontours
 ?commands if
 ?if
  新しい書式:
-       if (<condition>) { <commands>;
+       if (<condition>) { <command>; <command>
               <commands>
               <commands>
        } else {
@@ -5329,7 +5325,7 @@ Ffigure_mapcontours
  データファイル名 (<datafile>) を単一引用符または二重引用符で囲んで指定
  することによって表示できます。
 
- 書式：
+ 書式:
        plot '<file_name>' {binary <binary list>}
                           {{nonuniform} matrix}
                           {index <index list> | index "<name>"}
@@ -5428,7 +5424,7 @@ Ffigure_mapcontours
  し、ここでの「ブロック」は「データ・ブロック」(以下参照: `glossary`)
  と同じものを意味することとします。
 
- 書式：
+ 書式:
           plot 'file' every {<ポイント増分>}
                             {:{<ブロック増分>}
                               {:{<開始ポイント>}
@@ -5482,7 +5478,8 @@ Ffigure_mapcontours
  です。
 
        pop(x) = 103*exp((1965-x)/10)
-       plot [1960:1990] 'population.dat', pop(x)
+       set xrange [1960:1990]
+       plot 'population.dat', pop(x)
 
  ファイル "population.dat" は次のようなファイルです。
 
@@ -5493,7 +5490,6 @@ Ffigure_mapcontours
           1980   24
           1985   10
 
-C^ <img align=bottom src="http://www.gnuplot.info/doc/population.gif" alt="[population.gif]" width=640 height=480>
 =skip
  binary の例:
 
@@ -6264,6 +6260,10 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/population.gif" alt="[popu
 ?splot ranges
 ?ranges
  オプションの範囲 (range) は、表示されるグラフの領域範囲を指定します。
+ plot コマンドとは別に `set range` 文で範囲指定するのではなく plot コマ
+ ンド上のその一部として範囲指定する場合、そのグラフを対話的に拡大したり
+ 視点移動したりはできなくなるでしょうし、後で範囲を変更して `replot` す
+ ることができなくなるでしょう。
 
  書式:
        [{<dummy-var>=}{{<min>}:{<max>}}]
@@ -6366,7 +6366,7 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/population.gif" alt="[popu
 
  例:
        set key left
-       plot [0:1] for [n=1:4] x**n sprintf("%d",n)
+       plot for [n=1:4] x**n sprintf("%d",n)
 
  この例は、関数の組を描画します。
 
@@ -6911,10 +6911,10 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/population.gif" alt="[popu
        unset arrow {<tag>}
        show arrow {<tag>}
 
- タグ <tag> は各矢印を識別する整数です。タグを指定しない場合は、その
- 時点で未使用の最も小さい数が自動的に割り当てられます。タグを使うこと
- で、特定の矢印を変更したり、削除したりできます。既に存在する矢印の属性を
- 変更する場合は、タグを明示した set arrow コマンドで変更箇所を指定して
+ タグ <tag> は各矢印を識別する整数です。タグを指定しない場合は、その時
+ 点で未使用の最も小さい数が自動的に割り当てられます。タグを使うことで、
+ 特定の矢印を変更したり、削除したりできます。既に存在する矢印の属性を変
+ 更する場合は、タグを明示した `set arrow` コマンドで変更箇所を指定して
  ください。
 
  <position> は  x,y あるいは x,y,z で指定します。そしてその前に座標系を
@@ -6946,11 +6946,11 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/population.gif" alt="[popu
  きます。詳細は、以下参照: `coordinates`。`<backangle>` は、`filled` か
  または `empty` がともに使われた場合のみ効力を持ち、その場合、
  `<backangle>` は矢先の後ろの部分の矢軸との切り角 (`<angle>` と同じ方向;
- 単位は度) になります。
- 出力形式 `fig` は、制限された切り角関数を持っていて、それは 3 つの異な
- る形をサポートしていて、それは 2 つの閾値で決定します: 70 度未満の場合、
- 矢先はへこんだ切り角を持ち、110 度を超える場合、後ろの部分に尖った角を
- 持ち、その間の角では、矢先の後ろは直線になります。
+ 単位は度) になります。出力形式 `fig` は、制限された切り角関数を持って
+ いて、それは 3 つの異なる形をサポートしていて、それは 2 つの閾値で決定
+ します: 70 度未満の場合、矢先はへこんだ切り角を持ち、110 度を超える場
+ 合、後ろの部分に尖った角を持ち、その間の角では、矢先の後ろは直線になり
+ ます。
 
  `filled` を指定すると、塗りつぶされた矢先を作ります (`heads` が使われ
  ている場合)。塗りつぶしは、多角形の塗りつぶしが行えるような出力形式で
@@ -6976,7 +6976,7 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/population.gif" alt="[popu
 
  例:
 
- 原点から (1,2) への矢印をユーザ定義済のラインスタイル 5 で描くには:
+ 原点から (1,2) への矢印をユーザ定義済のスタイル 5 で描くには:
        set arrow to 1,2 ls 5
 
  描画領域の左下角から (-5,5,3) へタグ番号 3 の矢印を描くには:
@@ -7712,9 +7712,9 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/population.gif" alt="[popu
 =floating point exceptions
  コマンド `set datafile nofpe_trap` は、入力ファイルからデータの読み込
  みの際に、すべての数式の評価の前に浮動小数点例外ハンドラの再初期化をし
- ないように gnuplot に命令します。これにより、大きなファイルからのデー
- タの入力がかなり速くなりますが、浮動小数点例外が起きた場合にプログラム
- が異常終了してしまう危険はあります。
+ ないように gnuplot に命令します。これにより、とても大きなファイルから
+ のデータの入力がかなり速くなりますが、浮動小数点例外が起きた場合にプロ
+ グラムが異常終了してしまう危険はあります。
 4 set datafile missing
 ?set datafile missing
 ?show datafile missing
@@ -8611,7 +8611,7 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/population.gif" alt="[popu
  表示 (`set contour surface`) は機能しません。
 
  見出しと矢印は常に表示され、影響を受けません。グラフの説明 (key) も曲
- 面に隠されることはありません。gnuplot バージョン 4.5 では、グラフ上に
+ 面に隠されることはありません。gnuplot バージョン 4.6 では、グラフ上に
  曲面が一つもない状態でも、hidden3d は `points`, `labels`, `vectors`,
  `impulses` の 3 次元の描画スタイルに影響を与えます。グラフ内の各々の描
  画をこの処理から明示的に除外したいときは、`with` 指定に特別のオプショ
@@ -9161,7 +9161,7 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/population.gif" alt="[popu
  ォルト) か太い青線になります。この性質は、lt 1 に基づいて作られた一時
  的なラインスタイルの定義のようなものも含んでいます。
 
- `注意`: このコマンドは gnuplot バージョン 4.5 で新たに導入されたもので、
+ `注意`: このコマンドは gnuplot バージョン 4.6 で新たに導入されたもので、
  バージョン 4.2 のあいまいなコマンド "set style increment user" に置き
  換わるものです。古いコマンドは現在は非推奨です。
 
@@ -9225,13 +9225,13 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/population.gif" alt="[popu
  パス名は単一のディレクトリ名、または複数のパス名のリストとして入力しま
  す。複数のパスからなるパスリストは OS 固有のパス区切り、例えば Unix で
  はコロン (':'), MS-DOS, Windows, OS/2 ではセミコロン (';') 等で区切り
- ます。`show loadpath`, `save`, `save set` コマンドは、可搬性のために
- OS 固有のパス区切りをスペース (' ') で置き換えます。
+ ます。`show loadpath`, `save`, `save set` コマンドは、OS 固有のパス区
+ 切りをスペース (' ') で置き換えます。
 
  環境変数 GNUPLOT_LIB が設定されている場合、その内容は `loadpath` に追
- 加されますが、`show loadpath` は、ユーザ定義の loadpath と環境変数によ
- るシステム loadpath を別々に表示しますし、`save`, `save set` コマンド
- は、可搬性の目的のためにユーザ定義の `loadpath` のみを保存します。
+ 加されますが、`show loadpath` は、`set loadpath` と GNUPLOT_LIB の値を
+ 別々に表示しますし、`save`, `save set` コマンドは、GNUPLOT_LIB の値の
+ 方は無視します。
 3 locale
 ?commands set locale
 ?set locale
@@ -9388,12 +9388,18 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/population.gif" alt="[popu
 ?mousing
 ?mouse
 ?nomouse
- コマンド `set mouse` はマウス機能を有効にします。現在、pm, x11, ggi,
- windows, wxt の各出力ドライバがマウス拡張されています。2 種類のマウス
- モードがあります。2 次元グラフモードは、2 次元グラフ、または地図型表示
- (すなわち、z の回転角が 0, 90, 180, 270, 360 度の `set view` での
- splot、および `set view map`) で動作し、グラフ上の位置の追跡、拡大表示、
- グラフの注釈づけ等を可能にします。
+ コマンド `set mouse` は、現在の対話型出力形式に対してマウス機能を有効
+ にします。対話型モードでは通常デフォルトでこれは有効になっていますが、
+ コマンドがファイルから読み込まれる場合はデフォルトでは無効になっていま
+ す。
+
+ マウスモードは 2 種類用意されています。2 次元モードは、`plot` コマンド
+ と `splot` の 2 次元射影 (すなわち、z の回転角が 0, 90, 180, 270, 360
+ 度の `set view`、および `set view map`) で動作します。このモードでは、
+ マウス位置が追跡され、マウスボタンや矢印キーを使って拡大したり視点移動
+ したりできます。グラフに対応する key タイトルや別なウィジェットアイコ
+ ンなどをクリックすることで、個々のグラフの描画をオン/オフに切り替える
+ ことをサポートする出力形式もあります。
 
  `splot` による 3 次元グラフに対しては、グラフの視方向 (view) と縮尺の
  変更が、それぞれマウスボタン 1 と 2 (によるドラッグ) で行えます。ボタ
@@ -9419,14 +9425,6 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/population.gif" alt="[popu
                  {{no}zoomjump} {{no}verbose}
        unset mouse
 
- ダブルクリックの解像度はミリ秒 (ms) 単位で与えます。これは、ボタン 1
- 用のもので、現在のマウス位置をクリップボード (`clipboard`) にコピーす
- るのに使います。デフォルトの値は 300 ms です。これを 0 ms に設定すると
- シングルクリックでそのコピーを行うようになります。
-
- オプション `zoomcoordinates` は、拡大 (zoom) の時に、ズームの枠の端に
- その座標を書くかどうかを決定し、デフォルトでは ON になっています。
-
  オプション `noruler` と `ruler` は、定規 (ruler) 機能を off, on にしま
  す。`ruler` には座標を与えて原点を設定することもできます。`ruler` が
  on の間、ruler の原点からマウスまでのユーザ単位での距離が連続的に表示
@@ -9449,11 +9447,6 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/population.gif" alt="[popu
  できます。実際のラベルの位置にどれ位近くでクリックしなければいけないか
  の閾値も `pointsize` で決定されます。
 
- オプション `zoomjump` が ON の場合、ボタン 3 によるズーム領域の選択を
- 開始すると、マウスポインタは自動的に少しだけずれた位置に移動します。
- これは、ごく小さい (または空でさえある) ズーム領域を選択してしまうこと
- を避けるのに便利でしょう。デフォルトでは `zoomjump` は OFF です。
-
  オプション `verbose` が ON の場合、実行時の報告コマンドが表示されます。
  このオプションはドライバウィンドウ上で `6` を打つことで ON/OFF がスイ
  ッチできます。デフォルトでは `verbose` は OFF になっています。
@@ -9463,6 +9456,13 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/population.gif" alt="[popu
  `hotkeys` (以下参照: `bind`) も表示されます。ユーザ定義の `hotkeys` は
  デフォルトのキー割当を無効にします。
  以下も参照: `bind`, `label`。
+4 doubleclick
+?set mouse doubleclick
+?mouse doubleclick
+ ダブルクリックの解像度はミリ秒 (ms) 単位で与えます。これは、ボタン 1
+ 用のもので、現在のマウス位置をクリップボード (`clipboard`) にコピーす
+ るのに使います。デフォルトの値は 300 ms です。これを 0 ms に設定すると
+ シングルクリックでそのコピーを行うようになります。
 4 mouseformat
 ?set mouse format
 ?set mouse mouseformat
@@ -9515,6 +9515,23 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/population.gif" alt="[popu
  ウィンドウが開いている場合、マウスコマンドとホットキーの機能をちゃんと
  使えるのは現在の描画ウィンドウのみです。しかし、他のウィンドウも左下に
  マウスの座標を表示位はしてくれるでしょう。
+4 zoom
+?mouse zoom
+?zoom
+ 拡大 (zoom) は、通常は左マウスボタンを押すことで行われ、拡大範囲の線引
+ きはマウスのドラッグで行いますが、これとは異なるマウスボタンを要求する
+ 実行環境もあるかもしれません。元のグラフは、グラフウィンドウ上でホット
+ キー 'u' をタイプすることで復元できます。ホットキー 'p' と 'n' は、拡
+ 大操作の履歴を後方と前方にたどります。
+
+ オプション `zoomcoordinates` は、拡大の際に、拡大の枠の端にその座標を
+ 書くかどうかを決定し、デフォルトでは ON になっています。
+
+ オプション `zoomjump` が ON の場合、ボタン 3 による拡大範囲の選択を開
+ 始すると、マウスポインタは自動的に少しだけずれた位置に移動します。これ
+ は、ごく小さい (または空でさえある) 拡大範囲を選択してしまうことを避け
+ るのに便利でしょう。デフォルトでは `zoomjump` は OFF です。
+
 3 multiplot
 ?commands set multiplot
 ?commands unset multiplot
@@ -10371,7 +10388,7 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/population.gif" alt="[popu
 
  `set palette gamma <gamma>` による自動的なガンマ補正は、灰色のパレット
  (`set palette gray`) と、`cubehelix` カラーパレット形式に行われます。
- gamma = 1 の場合は、線形の光度写像を生成します。以下参照:
+ gamma = 1 の場合は、線形の光度勾配を生成します。以下参照:
  `test palette`。
 
  出力形式の多くは、有限個の色数しかサポートしていません (例えば gif で
@@ -10658,10 +10675,10 @@ C 下記の以下参照: オプション `positive`, `negative`)。
 ?set pointintervalbox
 ?pointintervalbox
  線種の属性 `pointinterval` は描画スタイル `linespoints` で使われます。
- pointinterval を負の値、例えば -N とすると、点の記号は N 番目毎に書かれ、
- そして各点の記号の後ろの箱 (実際には円) の部分は背景色で塗りつぶして消
- されます。コマンド `set pointintervalbox` は、この消す領域の大きさ (半
- 径) を制御します。
+ pointinterval を負の値、例えば -N とすると、点の記号は N 番目毎に書き、
+ そして各点の記号の後ろの箱 (実際には円) の部分を背景色で塗りつぶして消
+ します。コマンド `set pointintervalbox` はその消す領域の大きさ (半径)
+ を制御します。これはデフォルトの半径 (= pointsize) に対する倍率です。
 3 pointsize
 ?commands set pointsize
 ?commands show pointsize
@@ -10842,6 +10859,7 @@ C 下記の以下参照: オプション `positive`, `negative`)。
 ?aspect ratio
 ?set size square
 ?set size ratio
+?ratio
  書式:
        set size {{no}square | ratio <r> | noratio} {<xscale>,<yscale>}
        show size
@@ -10853,7 +10871,7 @@ C 下記の以下参照: オプション `positive`, `negative`)。
        gnuplot の以前の版では、`set size` の値を、出力する描画領域
        (キャンバス) のサイズを制御するのにも使っていた出力形式もありま
        したが、すべての出力形式がそうだったわけではありませんでした。
-       version 4.4 では、ほとんどの出力形式が以下のルールに従うようにな
+       version 4.6 では、ほとんどの出力形式が以下のルールに従うようにな
        りました:
 
  `set term <terminal_type> size <XX>, <YY>` は、出力ファイルのサイズ、
@@ -11581,7 +11599,7 @@ C 下記の以下参照: オプション `positive`, `negative`)。
  態の) 目盛りがつきます。各単一軸の大目盛りの制御を行なう同様のコマンド
  があります (`tics` の前に軸名をつけたもの)。
 
- 書式
+ 書式:
        set tics {axis | border} {{no}mirror}
                 {in | out} {scale {default | <major> {,<minor>}}}
                 {{no}rotate {by <ang>}} {offset <offset> | nooffset}
@@ -11592,8 +11610,8 @@ C 下記の以下参照: オプション `positive`, `negative`)。
        unset tics
        show tics
 
- 上の最初のオプションの形式は、別々に任意の、またはすべての軸 x, y, z,
- x2, y2, cb に適用できます。
+ 上の最初の書式のところに書いたオプションは、個々の軸にも、またはすべて
+ の軸 (x, y, z, x2, y2, cb) にも適用できます。
 
  tics の `front` または `back` の設定は、2D 描画 (splot は不可) にのみ
  すべての軸に 1 度適用されます。これは、目盛と描画要素が重なった場合に
@@ -11947,6 +11965,7 @@ C 下記の以下参照: オプション `positive`, `negative`)。
 ?set view equal
 ?view equal_axes
 ?view equal
+?equal_axes
  コマンド `set view equal xy` は x 軸と y 軸の単位の長さが強制的に等し
  くなるように縮尺を合わせ、グラフがページに丁度合うようにその縮尺を選択
  します。コマンド `set view equal xyz` は、さらに z 軸も x と y 軸に合
@@ -13108,7 +13127,6 @@ C 下記の以下参照: オプション `positive`, `negative`)。
  4 つの行) を定義することに注意して下さい。行 (データブロック) は 1 行の
  空行で区切られます。
 
-C^ <img align=bottom src="http://www.gnuplot.info/doc/splot.gif" alt="[splot.gif]" width=640 height=480>
  x の値はそれぞれのデータブロックの中で定数になっていることに注意して下
  さい。もし y を定数の値とし、隠線処理が有効な状態で描画すると、その曲面は
  裏返しで書かれることになります。
@@ -13377,25 +13395,6 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/splot.gif" alt="[splot.gif
  い出力形式のものも含まれているかもしれませんし、逆にその一覧内の出力形
  式でマニュアルがないものもあるかもしれません。)
 <3 -- 全ての出力ドライバの項目は、.trm ファイルから引っ張って来られます。
-1 グラフィカルユーザインターフェース (Graphical User Interfaces)
-?graphical user interfaces
-?gui's
- `gnuplot` のために色々なグラフィカルユーザインターフェースが書かれてき
- ました。その win32 用の物はこの配布版に含まれています。
-
- Bruce Ravel (ravel@phys.washington.edu) は、Gershon Elber による
- gnuplot.el を元に、GNU emacs, XEmacs 用の gnuplot-mode を書きました。
- gnuplot の CVS リポジトリにはそのコピーが含まれていますが、このパッケ
- ージの最新版は以下にもあります。
-^ <a href="http://feff.phys.washington.edu/~ravel/software/gnuplot-mode/">
-           http://feff.phys.washington.edu/~ravel/software/gnuplot-mode/
-^ </a>
- Python, Tk/Tcl, および他のフロントエンドに関しては、以下のページのリン
- クをチェックしてみてください。
-^ <a href="http://gnuplot.sourceforge.net/links.html">
-          http://gnuplot.sourceforge.net/links.html
-^ </a>
-
 1 バグ (Bugs)
 ?bugs
  バグリポートは e-mail で gnuplot-bugs メーリングリストへ送るか、または
@@ -13419,20 +13418,24 @@ C^ <img align=bottom src="http://www.gnuplot.info/doc/splot.gif" alt="[splot.gif
 
  ガンマ関数とベッセル関数、erf 関数は複素数引数に対しては動作しません。
 
- すべての x11 描画ウィンドウに対して、一度に 1 つのカラーパレットのみが
- 有効です。これは、異なるパレットを使用する描画を含んだ multiplot では
- x11 上では正しく表示されない、ということを意味します。
-
- "時刻" として指定された座標は 24 時で折り返します。これは、特に地理上
- の座標に基づく時刻を使っている場合には制限になります。
+ "時刻" として指定された座標は 24 時で折り返します。
 
  `nohidden3d` は、全体的な設定である `set hidden3d` を、個々の描画に対
  して免除するためのオプションですが、これは媒介変数の曲線 (parametric)
  に対しては機能しません。
 
- プログラムは、x11 出力ウィンドウのアスペクト比の正しさを追求しません。
- それは、"set size ratio" のようなコマンドが正常に機能するためには、x11
- ウィンドウ自体が等しい高さと幅を持たなければならないからです。
+ X11 出力形式: UTF-8 フォントの選択が困難です。プログラムは、x11 出力ウ
+ ィンドウのアスペクト比の正しさを追求しません。それは、"set size ratio"
+ のようなコマンドが正常に機能するためには、x11 ウィンドウ自体が等しい高
+ さと幅を持たなければならないからです。 すべての x11 描画ウィンドウに対
+ して、一度に 1 つのカラーパレットのみが有効です。これは、異なるパレッ
+ トを使用する描画を含んだ multiplot では x11 上では正しく表示されない、
+ ということを意味します。
+
+ Qt 出力形式: この出力形式はいまだ「試験的」な範疇のものです。これは、
+ 他の対話型出力形式が持つ多くの機能をまだサポートしていません。コンパイ
+ ル時に使用される qt 環境がレンダリングモードとして "opengl" をサポート
+ していなければ多角形と曲面表示はかなり遲くなる可能性があります。
 
 2 外部ライブラリ (External libraries)
 ?bugs external_libraries
