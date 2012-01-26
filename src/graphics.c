@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.381 2011/12/29 06:29:30 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.382 2012/01/03 04:00:00 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -6845,8 +6845,9 @@ do_key_layout(legend_key *key, TBOOLEAN key_pass, int *xinkey, int *yinkey)
 	draw_clip_line(key->bounds.xright, key->bounds.ybot, key->bounds.xleft, key->bounds.ybot);
 	closepath();
 	/* draw a horizontal line between key title and first entry */
-	draw_clip_line( key->bounds.xleft, key->bounds.ytop - (ktitl_lines) * t->v_char,
-			key->bounds.xright, key->bounds.ytop - (ktitl_lines) * t->v_char);
+	if (*key->title)
+	    draw_clip_line( key->bounds.xleft, key->bounds.ytop - (ktitl_lines) * t->v_char,
+			    key->bounds.xright, key->bounds.ytop - (ktitl_lines) * t->v_char);
 	clip_area = clip_save;
     }
 
