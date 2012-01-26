@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.701.2.9 2012/01/17 19:34:56 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.701.2.10 2012/01/17 22:14:24 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -911,7 +911,7 @@ Ffigure_newsyntax
 ^<tbody>
 ^<tr>    <td>gprintf("format",x,...)</td>    <td>any</td>    <td>string result from applying gnuplot's format parser</td></tr>
 ^<tr>    <td>sprintf("format",x,...)</td>    <td>multiple</td>    <td>string result from C-language sprintf</td></tr>
-^<tr>    <td>strlen("string")</td>    <td>string</td>    <td>int length of string</td></tr>
+^<tr>    <td>strlen("string")</td>    <td>string</td>    <td>int length of string in bytes</td></tr>
 ^<tr>    <td>strstrt("string","key")</td>    <td>strings</td>    <td>int index of first character of substring "key"</td></tr>
 ^<tr>    <td>substr("string",beg,end)</td>    <td>multiple</td>    <td>string "string"[beg:end]</td></tr>
 ^<tr>    <td>strftime("timeformat",t)</td>    <td>any</td>    <td>string result from applying gnuplot's time parser</td></tr>
@@ -1343,9 +1343,11 @@ C marker below is used to signal this to doc2html:
 4 strlen
 ?expressions functions strlen
 ?strlen
-#strlen("string") & string & int length of string \\
-%strlen("string")@string@int length of string
- `strlen("string")` returns the number of characters in the string.
+#strlen("string") & string & int length of string in bytes\\
+%strlen("string")@string@int length of string in bytes
+ `strlen("string")` returns the length of the string in bytes.  If the current 
+ encoding supports multibyte characters, this may be larger than the number of
+ characters in the string.
 4 strstrt
 ?expressions functions strstrt
 ?strstrt
