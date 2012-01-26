@@ -1,3 +1,9 @@
+2012-01-26  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/graphics.c:  If there is no key title, there is no need to draw a
+	line between the title and the key samples.
+	Bug #3478984
+
 2012-01-25  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* docs/gnuplot-ja.doc docs/term-ja.diff:
