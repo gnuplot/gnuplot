@@ -4,6 +4,9 @@
 	line between the title and the key samples.
 	Bug #3478984
 
+	* docs/gnuplot.doc:  Clarify that strlen returns string length in bytes,
+	not characters.
+
 2012-01-21  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/datafile.h src/datafile.c src/plot2d.c src/breaders.c src/plot3d.c
