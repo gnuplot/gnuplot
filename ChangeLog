@@ -1,3 +1,8 @@
+2012-01-29  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/cairo.trm:  Make the font scale handling more like pdf and eps.
+	Bugs #3478745 #3480006
+
 2012-01-26  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c:  If there is no key title, there is no need to draw a

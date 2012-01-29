@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: cairo.trm,v 1.51 2011/11/10 07:30:53 markisch Exp $
+ * $Id: cairo.trm,v 1.52 2011/11/27 05:26:23 sfeam Exp $
  */
 
 /* GNUPLOT - cairo.trm */
@@ -127,12 +127,12 @@ static const cairo_params_t cairoeps_params_default = CAIROEPS_PARAMS_DEFAULT;
 #ifdef HAVE_CAIROEPS
 #define CAIROLATEX_PARAMS_DEFAULT { \
     CAIROTERM_LATEX, INCHES, FALSE, FALSE, 1.0, {1.,1.,1.}, FALSE, FALSE, TRUE, FALSE, "", \
-    11, 1., 5*72., 3*72., 0.25, 1.0, FALSE \
+    11, 0.6, 5*72., 3*72., 0.25, 1.0, FALSE \
 }
 #else
 #define CAIROLATEX_PARAMS_DEFAULT { \
     CAIROTERM_LATEX, INCHES, FALSE, FALSE, 1.0, {1.,1.,1.}, FALSE, FALSE, TRUE, FALSE, "", \
-    11, 1., 5*72., 3*72., 0.25, 1.0, TRUE \
+    11, 0.6, 5*72., 3*72., 0.25, 1.0, TRUE \
 }
 #endif
 static cairo_params_t cairolatex_params = CAIROLATEX_PARAMS_DEFAULT;
@@ -1261,7 +1261,7 @@ TERM_TABLE_START(cairolatex_driver)
     cairotrm_move, cairotrm_vector,
     EPSLATEX_linetype, EPSLATEX_put_text, 
     PS_text_angle, PS_justify_text,
-    cairotrm_point, do_arrow, PS_set_font,
+    cairotrm_point, do_arrow, cairotrm_set_font,
     cairotrm_pointsize,
     TERM_CAN_MULTIPLOT|TERM_BINARY|TERM_CAN_DASH|TERM_ALPHA_CHANNEL|TERM_LINEWIDTH|TERM_FONTSCALE|TERM_IS_LATEX,
     0 /* suspend */, 0 /* resume */, cairotrm_fillbox, cairotrm_linewidth,
