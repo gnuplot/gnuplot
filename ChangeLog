@@ -1,3 +1,9 @@
+2012-01-30  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/term.c term/linux.trm:  Provide a 5x9 raster font for linux.trm
+	and svga.trm so that they are not dependent on --with-bitmap-terminals.
+	Bug #3481336
+
 2012-01-29  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/cairo.trm:  Make the font scale handling more like pdf and eps.
