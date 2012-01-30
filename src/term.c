@@ -78,6 +78,9 @@ static char *RCSid() { return RCSid("$Id: term.c,v 1.228 2011/12/28 19:37:37 sfe
 
 #include "alloc.h"
 #include "axis.h"
+#ifndef NO_BITMAP_SUPPORT
+#include "bitmap.h"
+#endif
 #include "command.h"
 #include "driver.h"
 #include "graphics.h"
@@ -89,10 +92,6 @@ static char *RCSid() { return RCSid("$Id: term.c,v 1.228 2011/12/28 19:37:37 sfe
 #include "util.h"
 #include "version.h"
 #include "misc.h"
-
-#ifndef NO_BITMAP_SUPPORT
-#include "bitmap.h"
-#endif
 
 #ifdef USE_MOUSE
 #include "mouse.h"
@@ -138,7 +137,7 @@ TBOOLEAN term_initialised;
 
 /* The qt and wxt terminals cannot be used in the same session. */
 /* Whichever one is used first to plot, this locks out the other. */
-void *term_interlock = NULL;
+void *term_interlock = 0;
 
 /* true if in multiplot mode */
 TBOOLEAN multiplot = FALSE;
