@@ -1,7 +1,9 @@
 2012-02-06  Thanate Dhirasakdanon  <dthanate@users.sourceforge.net>
 
-	* term/luz.trm: Compatibility wrapper functions to support both lua 5.2
+	* term/lua.trm: Compatibility wrapper functions to support both lua 5.2
 	and earlier versions.
+
+	* term/lua/gnuplot-tikz.lua: "tightboundingbox" option didn't match docs.
 
 2012-02-06  Ethan A Merritt  <merritt@u.washington.edu>
 
