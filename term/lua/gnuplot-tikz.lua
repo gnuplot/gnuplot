@@ -37,7 +37,7 @@
 
 
 
-  $Date: 2011/07/21 05:05:08 $
+  $Date: 2011/09/16 18:45:08 $
   $Author: sfeam $
   $Rev: 100 $
 
@@ -81,7 +81,7 @@ pgf.DEFAULT_FONT_V_CHAR = 308
 pgf.STYLE_FILE_BASENAME = "gnuplot-lua-tikz"  -- \usepackage{gnuplot-lua-tikz}
 
 pgf.REVISION = string.sub("$Rev: 100 $",7,-3)
-pgf.REVISION_DATE = string.gsub("$Date: 2011/07/21 05:05:08 $",
+pgf.REVISION_DATE = string.gsub("$Date: 2011/09/16 18:45:08 $",
                                 "$Date: ([0-9]+).([0-9]+).([0-9]+) .*","%1/%2/%3")
 
 pgf.styles = {}
@@ -515,7 +515,7 @@ end
 
 pgf.write_boundingbox = function(t, num)
   gp.write("%% coordinates of the plot area\n")
-  gp.write("\\\gpdefrectangularnode{gp plot "..num.."}{"
+  gp.write("\\gpdefrectangularnode{gp plot "..num.."}{"
     ..string.format("\\pgfpoint{%.3fcm}{%.3fcm}", pgf.transform_xcoord(t.xleft), pgf.transform_ycoord(t.ybot)).."}{"
     ..string.format("\\pgfpoint{%.3fcm}{%.3fcm}", pgf.transform_xcoord(t.xright), pgf.transform_ycoord(t.ytop)).."}\n")
 end
