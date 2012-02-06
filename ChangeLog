@@ -1,3 +1,8 @@
+2012-02-06  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/plot2d.c: Remove error test that could not be reached in the DATA
+	case and is incorrect in the FUNC case.
+
 2012-01-30  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/term.c term/linux.trm:  Provide a 5x9 raster font for linux.trm

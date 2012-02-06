@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.255 2011/11/15 20:23:43 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.255.2.1 2011/12/22 05:44:44 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -2282,14 +2282,6 @@ eval_plots()
 		default:
 				int_error(NO_CARET, 
 				    "This plot style is not available in polar mode");
-	    }
-
-	    if (df_matrix) {
-		if (!(this_plot->plot_style == IMAGE || this_plot->plot_style == RGBIMAGE
-		      || this_plot->plot_style == RGBA_IMAGE || this_plot->plot_style == LINES
-		      || this_plot->plot_style == POINTSTYLE))
-		int_error(NO_CARET, "this 2D plot style cannot handle matrix data");
-
 	    }
 
 	    /* If we got this far without initializing the fill style, do it now */
