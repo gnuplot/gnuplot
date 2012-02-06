@@ -1,6 +1,6 @@
 /*
- *  $Id: lua.trm,v 1.17 2011/09/14 00:31:00 sfeam Exp $
- *  $Date: 2011/09/14 00:31:00 $
+ *  $Id: lua.trm,v 1.18 2011/12/12 00:25:31 broeker Exp $
+ *  $Date: 2011/12/12 00:25:31 $
  *  $Rev: 99 $
  */
 
@@ -116,6 +116,41 @@ static char *LUA_script = NULL;
 
 static int lua_term_status, lua_term_result;
 static int tb, luaterm, image_cnt, image_extern;
+
+#if LUA_VERSION_NUM > 501
+/* 
+ * two helper functions to ease transitioning to lua 5.2
+ */
+
+/*
+ * same as lua_getfield(L, LUA_GLOBALINDEXS, f) in lua 5.1
+ */
+static void LUA_getfield_global(lua_State *L, const char *f)
+{
+  lua_rawgeti(L, LUA_REGISTRYINDEX, LUA_RIDX_GLOBALS);
+  lua_getfield(L, -1, f);
+  lua_replace(L, -2);
+}
+/*
+ * approximately the same as luaL_register(L, libname, l) in lua 5.1
+ */
+static void LUA_register(lua_State *L, const char *libname, const luaL_Reg *l)
+{
+  if (!libname)
+    luaL_setfuncs(L, l, 0);
+  else {
+    LUA_getfield_global(L, "package");
+    lua_getfield(L, -1, "loaded");
+    lua_newtable(L);
+    luaL_setfuncs(L, l, 0);
+    lua_pushvalue(L, -1);
+    lua_setglobal(L, libname);
+    lua_setfield(L, -2, libname);
+    lua_pop(L, 2);
+    lua_getglobal(L, libname);
+  }
+}
+#endif /* LUA_VERSION_NUM > 501 */
 
 /*
  * static buffer, because we cannot free memory after
@@ -422,8 +457,11 @@ LUA_GP_parse_color_name(lua_State *L)
   return (1);
 }
 
-
+#if LUA_VERSION_NUM > 500
+static const luaL_Reg gp_methods[] = {
+#else
 static const luaL_reg gp_methods[] = {
+#endif
   {"write", LUA_GP_write},
   {"int_error", LUA_GP_int_error},
   {"int_warn", LUA_GP_int_warn},
@@ -440,7 +478,11 @@ static const luaL_reg gp_methods[] = {
 static void
 LUA_register_gp_fnc ()
 {
+#if LUA_VERSION_NUM > 501
+  LUA_register(L, LUA_GP_FNC, gp_methods);
+#else
   luaL_register(L, LUA_GP_FNC, gp_methods);
+#endif
 }
 
 
@@ -586,7 +628,11 @@ LUA_init_lua(void)
     */
   if (L)
     lua_close(L);
+#if LUA_VERSION_NUM > 500
+  L = luaL_newstate();
+#else
   L = lua_open();
+#endif
 
   luaL_openlibs(L); /* Load Lua libraries */
   luaopen_debug(L);
@@ -633,14 +679,22 @@ LUA_init_lua(void)
   sf = lua_gettop(L);
 
   /*  lua_settop(L, 0);*/ /* clear stack */
+#if LUA_VERSION_NUM > 501
+  LUA_getfield_global(L, "debug");
+#else
   lua_getfield(L, LUA_GLOBALSINDEX, "debug");
+#endif
   lua_getfield(L, -1, "traceback");
   lua_remove(L, -2); /* rm debug */
   tb = lua_gettop(L); /* store "traceback" */
   /* create table `term' */
   lua_newtable(L);
   lua_setglobal(L, "term");
+#if LUA_VERSION_NUM > 501
+  LUA_getfield_global(L, "term");
+#else
   lua_getfield(L, LUA_GLOBALSINDEX, "term");
+#endif
   luaterm = lua_gettop(L); /* store `term' */
 
   /* register gp functions */
