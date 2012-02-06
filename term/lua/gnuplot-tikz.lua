@@ -37,7 +37,7 @@
 
 
 
-  $Date: 2011/09/16 18:45:08 $
+  $Date: 2012/02/07 05:08:16 $
   $Author: sfeam $
   $Rev: 100 $
 
@@ -81,7 +81,7 @@ pgf.DEFAULT_FONT_V_CHAR = 308
 pgf.STYLE_FILE_BASENAME = "gnuplot-lua-tikz"  -- \usepackage{gnuplot-lua-tikz}
 
 pgf.REVISION = string.sub("$Rev: 100 $",7,-3)
-pgf.REVISION_DATE = string.gsub("$Date: 2011/09/16 18:45:08 $",
+pgf.REVISION_DATE = string.gsub("$Date: 2012/02/07 05:08:16 $",
                                 "$Date: ([0-9]+).([0-9]+).([0-9]+) .*","%1/%2/%3")
 
 pgf.styles = {}
@@ -1914,9 +1914,9 @@ term.options = function(opt_str, initial, t_count)
     elseif almost_equals(o_next, "noclip") then
       gfx.opt.clip = false
       term.flags = term_default_flags
-    elseif almost_equals(o_next, "tight$bounding") then
+    elseif almost_equals(o_next, "tight$boundingbox") then
       gfx.opt.tightboundingbox = true
-    elseif almost_equals(o_next, "notight$bounding") then
+    elseif almost_equals(o_next, "notight$boundingbox") then
       gfx.opt.tightboundingbox = false
     else
       gp.int_warn(t_count, string.format("unknown option `%s'.", o_next))
