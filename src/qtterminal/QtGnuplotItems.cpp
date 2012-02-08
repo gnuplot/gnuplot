@@ -180,17 +180,17 @@ void QtGnuplotPoint::paint(QPainter* painter, const QStyleOptionGraphicsItem* op
  * EAM - support for toggling plots by clicking on a key sample
  */
 
-QtGnuplotKeybox::QtGnuplotKeybox( QRectF rect ) : QRectF( rect )
+QtGnuplotKeybox::QtGnuplotKeybox(const QRectF& rect) : QRectF(rect)
 {
-	hidden = false;
+	m_hidden = false;
 }
 
-bool QtGnuplotKeybox::ishidden()
+bool QtGnuplotKeybox::ishidden() const
 {
-	return hidden;
+	return m_hidden;
 }
 
-void QtGnuplotKeybox::setHidden( const bool state )
+void QtGnuplotKeybox::setHidden(bool state)
 {
-	hidden = state;
+	m_hidden = state;
 }

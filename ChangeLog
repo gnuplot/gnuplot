@@ -1,3 +1,8 @@
+2012-02-08  Jérôme Lodewyck  <lodewyck@users.sourceforge.net>
+
+	* src/qtterminal/QtGnuplotItems.h src/qtterminal/QtGnuplotItems.cpp: Fixed
+	the const-ness of QtGnuplotKeybox members.
+
 2012-02-06  Thanate Dhirasakdanon  <dthanate@users.sourceforge.net>
 
 	* term/lua.trm: Compatibility wrapper functions to support both lua 5.2
