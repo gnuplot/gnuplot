@@ -96,13 +96,15 @@ private:
 };
 
 
-class QtGnuplotKeybox : public QRectF {
+class QtGnuplotKeybox : public QRectF
+{
 public:
-	QtGnuplotKeybox(  const QRectF rect );
-	void setHidden( const bool state );
-	bool ishidden();
+	QtGnuplotKeybox(const QRectF& rect);
+	void setHidden(bool state);
+	bool ishidden() const;
+
 private:
-	bool hidden;
+	bool m_hidden;
 };
 
 #endif // QTGNUPLOTITEMS_H
