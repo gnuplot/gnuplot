@@ -1,3 +1,10 @@
+2012-02-09  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/wxt.trm src/term_api.h src/term.c src/qtterminal/qt_term.cpp
+	src/wxterminal/wxt_gui.cpp: Switching the terminal from qt to wxt or
+	vice versa causes the program to lock up or segfault.  Introduce a flag
+	terminal_interlock to prevent such a switch.
+
 2012-02-08  Jérôme Lodewyck  <lodewyck@users.sourceforge.net>
 
 	* src/qtterminal/QtGnuplotItems.h src/qtterminal/QtGnuplotItems.cpp: Fixed

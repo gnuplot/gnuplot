@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.225.2.1 2011/12/28 19:30:43 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.225.2.2 2012/01/30 19:34:25 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -134,6 +134,10 @@ char *PS_psdir = NULL;
 
 /* true if terminal has been initialized */
 TBOOLEAN term_initialised;
+
+/* The qt and wxt terminals cannot be used in the same session. */
+/* Whichever one is used first to plot, this locks out the other. */
+void *term_interlock = NULL;
 
 /* true if in multiplot mode */
 TBOOLEAN multiplot = FALSE;

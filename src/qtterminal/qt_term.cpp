@@ -51,7 +51,7 @@
 
 extern "C" {
 	#include "plot.h"      // for interactive
-	#include "term_api.h"  // for stdfn.h, JUSTIFY, encoding, *term definition, color.h
+	#include "term_api.h"  // for stdfn.h, JUSTIFY, encoding, *term definition, color.h term_interlock
 	#include "mouse.h"     // for do_event declaration
 	#include "getcolor.h"  // for rgb functions
 	#include "command.h"   // for paused_for_mouse, PAUSE_BUTTON1 and friends
@@ -322,6 +322,7 @@ void qt_init()
 
 	qt_out.setVersion(QDataStream::Qt_4_4);
 	qt_initialized = true;
+	term_interlock = (void *)qt_init;
 	GP_ATEXIT(qt_atexit);
 }
 
@@ -821,6 +822,11 @@ void qt_options()
 	bool set_capjoin = false, set_size = false;
 	bool set_widget = false;
 	bool set_dash = false;
+
+	if (term_interlock != NULL && term_interlock != (void *)qt_init) {
+		term = NULL;
+		int_error(NO_CARET, "The qt terminal cannot be used in a wxt session");
+	}
 
 #define SETCHECKDUP(x) { c_token++; if (x) duplication = true; x = true; }
 
