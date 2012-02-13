@@ -15,7 +15,7 @@ set multiplot title "Demo of placing multiple plots (2D and 3D)\nwith explicit a
 set lmargin at screen 0.20
 set rmargin at screen 0.85
 set bmargin at screen 0.25
-set tmargin at screen 0.90
+set tmargin at screen 0.85
 
 set pm3d
 set palette rgbformulae 7, 5, 15
@@ -30,7 +30,7 @@ set zrange [ -0.250 : 1.000 ]
 unset xtics
 unset ytics
 
-set key above
+unset key
 
 splot sin(sqrt(x**2+y**2))/sqrt(x**2+y**2)
 

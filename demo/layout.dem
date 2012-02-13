@@ -4,10 +4,13 @@
 #
 #
 set multiplot layout 3, 1 title "Multiplot layout 3, 1"
+set tmargin 2
 set title "Plot 1"
+unset key
 plot sin(x)/x
 #
 set title "Plot 2"
+unset key
 plot 'silver.dat' using 1:2 ti 'silver.dat'
 #
 set style histogram columns
@@ -33,9 +36,11 @@ set xtics rotate
 set bmargin 5
 #
 set title "Plot 1"
+unset key
 plot sin(x)/x
 #
 set title "Plot 2"
+unset key
 plot 'silver.dat' using 1:2 ti 'silver.dat'
 #
 set title "Plot 3"
@@ -62,9 +67,11 @@ set xtics rotate
 set bmargin 5
 #
 set title "Plot 1"
+unset key
 plot sin(x)/x
 #
 set title "Plot 2"
+unset key
 plot 'silver.dat' using 1:2 ti 'silver.dat'
 #
 set title "Plot 3"
@@ -99,7 +106,7 @@ unset ytics
 
 set multiplot layout 4,1 title "Auto-layout of stacked plots\n"
 
-set key autotitle column nobox samplen 1
+set key autotitle column nobox samplen 1 noenhanced
 unset title
 set style data boxes
 set yrange [0 : 800000]
@@ -107,7 +114,7 @@ set yrange [0 : 800000]
 plot 'immigration.dat' using 3 lt 1
 plot 'immigration.dat' using 8 lt 3
 set xtics nomirror
-set tics scale 0
+set tics scale 0 font ",8"
 set xlabel "Immigration to U.S. by Decade"
 plot 'immigration.dat' using 21:xtic(1) lt 4
 
