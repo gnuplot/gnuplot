@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.257 2012/01/22 01:32:47 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.258 2012/02/06 23:54:32 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -1806,6 +1806,8 @@ eval_plots()
 		} while (c_token != previous_token);
 
 	    newhist_pattern = fs.fillpattern;
+	    if (!equals(c_token,","))
+		int_error(c_token,"syntax error");
 	} else
 
 	if (is_definition(c_token)) {
@@ -2656,6 +2658,12 @@ eval_plots()
 		plot_num++;
 
 		dummy_func = &plot_func;
+	
+		if (almost_equals(c_token, "newhist$ogram")) {
+		    /* Make sure this isn't interpreted as a function */
+		    name_str = "";
+		} else
+
 		/* WARNING: do NOT free name_str */
 		/* FIXME: should this be saved in "this_plot"? */
 		name_str = string_or_express(&at_ptr);
