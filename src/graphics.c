@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.379.2.1 2011/12/29 06:36:05 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.379.2.2 2012/01/26 18:08:13 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -211,6 +211,7 @@ static int
 find_maxl_keys(struct curve_points *plots, int count, int *kcnt)
 {
     int mlen, len, curve, cnt;
+    int previous_plot_style = 0;
     struct curve_points *this_plot;
 
     mlen = cnt = 0;
@@ -229,6 +230,7 @@ find_maxl_keys(struct curve_points *plots, int count, int *kcnt)
 
 	/* Check for new histogram here and save space for divider */
 	if (this_plot->plot_style == HISTOGRAMS
+	&&  previous_plot_style == HISTOGRAMS
 	&&  this_plot->histogram_sequence == 0 && cnt > 1)
 	    cnt++;
 	/* Check for column-stacked histogram with key entries */
@@ -241,6 +243,7 @@ find_maxl_keys(struct curve_points *plots, int count, int *kcnt)
 		    mlen = len;
 	    }
 	}
+	previous_plot_style = this_plot->plot_style;
     }
 
     if (kcnt != NULL)
@@ -1596,6 +1599,7 @@ do_plot(struct curve_points *plots, int pcount)
     int key_count = 0;
     TBOOLEAN key_pass = FALSE;
     legend_key *key = &keyT;
+    int previous_plot_style;
 
     x_axis = FIRST_X_AXIS;
     y_axis = FIRST_Y_AXIS;
@@ -1826,6 +1830,7 @@ do_plot(struct curve_points *plots, int pcount)
 
     /* DRAW CURVES */
     this_plot = plots;
+    previous_plot_style = 0;
     for (curve = 0; curve < pcount; this_plot = this_plot->next, curve++) {
 
 	TBOOLEAN localkey = lkey;	/* a local copy */
@@ -1847,6 +1852,7 @@ do_plot(struct curve_points *plots, int pcount)
 
 	/* Skip a line in the key between histogram clusters */
 	if (this_plot->plot_style == HISTOGRAMS
+	&&  previous_plot_style == HISTOGRAMS
 	&&  this_plot->histogram_sequence == 0 && yl != yl_ref) {
 	    if (++key_count >= key_rows) {
 		yl = yl_ref;
@@ -2085,6 +2091,7 @@ do_plot(struct curve_points *plots, int pcount)
 
 	/* Sync point for end of this curve (used by svg, post, ...) */
 	(term->layer)(TERM_LAYER_AFTER_PLOT);
+	previous_plot_style = this_plot->plot_style;
 
     }
 
