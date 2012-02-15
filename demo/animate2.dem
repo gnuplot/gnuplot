@@ -1,5 +1,5 @@
 #
-# $Id: animate2.dem,v 1.6 2006/1/3 05:35:54 sfeam Exp $
+# $Id: animate2.dem,v 1.1 2006/01/07 23:21:02 sfeam Exp $
 #
 # demo for creating GIF animation and illustrating saving images to
 # file one pixel to one pixel
@@ -15,7 +15,7 @@
 
 # Caller must set terminal type.
 # Example of intended use:
-# set term gif animate transparent opt delay 10 size 200,200 x000000
+# set term gif animate transparent opt delay 10 size 200,200 background rgb 'black'
 
 unset title
 unset key

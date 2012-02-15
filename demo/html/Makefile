@@ -54,7 +54,7 @@ dashcolor.html: $(GNUPLOT_LIB)/dashcolor.dem ./webify.pl
 	export DEMOTERM="pngcairo dash"; ./webify.pl dashcolor
 
 animate2.html: $(GNUPLOT_LIB)/animate2.dem ./webify.pl
-	export DEMOTERM="gif animate transparent opt delay 10 size 200,200 x000000"; ./webify.pl animate2
+	export DEMOTERM="gif animate transparent noopt delay 10 size 200,200 background rgb 'black'"; ./webify.pl animate2
 	mv animate2.html temp.html
 	cat temp.html | sed -e 's/1.png/1.gif/g' > animate2.html
 	mv animate2.1.png animate2.1.gif
