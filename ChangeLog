@@ -1,3 +1,10 @@
+2012-02-17  W. Trevor King  <wking@tremily.us>
+
+	* configure.in src/datafile.c (df_open) docs/gnuplot.doc:
+	New special file syntax  "<&N"  plots data read from an arbitrary file
+	descriptor.  This allows setting up multiple input pipes to gnuplot
+	when it is invoked from a shell.
+
 2013-02-17  Craig DeForest  <deforest@boulder.swri.edu>
 
 	* src/datafile.c (df_readbinary):  Add special case code to read in a
