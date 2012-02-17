@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.212.2.14 2012/12/14 18:06:33 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.212.2.15 2013/02/17 18:36:01 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -238,6 +238,9 @@ static size_t max_line_len = 0;
 static FILE *data_fp = NULL;
 #if defined(PIPES)
 static TBOOLEAN df_pipe_open = FALSE;
+#endif
+#if defined(HAVE_FDOPEN)
+static int data_fd = -2;	/* only used for file redirection */
 #endif
 static TBOOLEAN mixed_data_fp = FALSE; /* inline data */
 char *df_filename = NULL;      /* name of data file */
@@ -1136,6 +1139,21 @@ df_open(const char *cmd_filename, int max_using, struct curve_points *plot)
     /*}}} */
 
     /*{{{  open file */
+#if defined(HAVE_FDOPEN)
+    if (*df_filename == '<' && strlen(df_filename) > 1 && df_filename[1] == '&') {
+	char *substr;
+	/* read from an already open file descriptor */
+	data_fd = strtol(df_filename + 2, &substr, 10);
+	if (*substr != '\0' || data_fd < 0 || substr == df_filename+2)
+	    int_error(name_token, "invalid file descriptor integer");
+	else if (data_fd == fileno(stdin)
+	     ||  data_fd == fileno(stdout)
+	     ||  data_fd == fileno(stderr))
+	    int_error(name_token, "cannot plot from stdin/stdout/stderr");
+	else if ((data_fp = fdopen(data_fd, "r")) == (FILE *) NULL)
+	    int_error(name_token, "cannot open file descriptor for reading data");
+    } else
+#endif /* HAVE_FDOPEN */
 #if defined(PIPES)
     if (*df_filename == '<') {
 	restrict_popen();
@@ -1145,7 +1163,8 @@ df_open(const char *cmd_filename, int max_using, struct curve_points *plot)
 	    df_pipe_open = TRUE;
     } else
 #endif /* PIPES */
-	/* I don't want to call strcmp(). Does it make a difference? */
+
+    /* Special filenames '-' '+' '++' '$DATABLOCK' */
     if (*df_filename == '-' && strlen(df_filename) == 1) {
 	plotted_data_from_stdin = TRUE;
 	volatile_data = TRUE;
@@ -1159,6 +1178,7 @@ df_open(const char *cmd_filename, int max_using, struct curve_points *plot)
 	else if (df_filename[1] == '+' && strlen(df_filename) == 2)
 	    df_pseudodata = 2;
     } else {
+
 	/* filename cannot be static array! */
 	gp_expand_tilde(&df_filename);
 #ifdef HAVE_SYS_STAT_H
@@ -1243,6 +1263,16 @@ df_close()
     }
 
     if (!mixed_data_fp) {
+#if defined(HAVE_FDOPEN)
+	if (data_fd == fileno(data_fp)) {
+	    /* This will allow replotting if this stream is backed by a file,
+	     * and hopefully is harmless if it connects to a pipe.
+	     * Leave it open in either case.
+	     */
+	    rewind(data_fp);
+	    fprintf(stderr,"Rewinding fd %d\n", data_fd);
+	} else
+#endif
 #if defined(PIPES)
 	if (df_pipe_open) {
 	    (void) pclose(data_fp);
