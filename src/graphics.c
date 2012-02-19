@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.383 2012/01/26 18:05:24 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.384 2012/02/14 23:48:58 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -4589,67 +4589,70 @@ edge_intersect(
 	/* assume inrange(iy, Y_AXIS.min, Y_AXIS.max) */
 	*ey = iy;		/* == oy */
 
-	if (inrange(X_AXIS.max, ix, ox)) {
+	if (inrange(X_AXIS.max, ix, ox) && X_AXIS.max != ix) {
 	    *ex = X_AXIS.max;
 	    return RIGHT_EDGE;
 	}
-	*ex = X_AXIS.min;
-	if (!inrange(X_AXIS.min, ix, ox))
-	    int_warn(NO_CARET,"error in edge_intersect");
-	return LEFT_EDGE;
+	if (inrange(X_AXIS.min, ix, ox) && X_AXIS.min != ix) {
+	    *ex = X_AXIS.min;
+	    return LEFT_EDGE;
+	}
 
     } else if (ix == ox) {
 	/* vertical line */
 	/* assume inrange(ix, X_AXIS.min, X_AXIS.max) */
 	*ex = ix;		/* == ox */
 
-	if (inrange(Y_AXIS.max, iy, oy)) {
+	if (inrange(Y_AXIS.max, iy, oy) && Y_AXIS.max != iy) {
 	    *ey = Y_AXIS.max;
 	    return TOP_EDGE;
 	}
-	*ey = Y_AXIS.min;
-	if (!inrange(Y_AXIS.min, iy, oy))
-	    int_warn(NO_CARET,"error in edge_intersect");
-	return BOTTOM_EDGE;
-    }
-    /* slanted line of some kind */
-
-    /* does it intersect Y_AXIS.min edge */
-    if (inrange(Y_AXIS.min, iy, oy) && Y_AXIS.min != iy && Y_AXIS.min != oy) {
-	x = ix + (Y_AXIS.min - iy) * ((ox - ix) / (oy - iy));
-	if (inrange(x, X_AXIS.min, X_AXIS.max)) {
-	    *ex = x;
+	if (inrange(Y_AXIS.min, iy, oy) && Y_AXIS.min != iy) {
 	    *ey = Y_AXIS.min;
-	    return BOTTOM_EDGE;		/* yes */
+	    return BOTTOM_EDGE;
+	}
+
+    } else {
+	/* slanted line of some kind */
+
+	/* does it intersect Y_AXIS.min edge */
+	if (inrange(Y_AXIS.min, iy, oy) && Y_AXIS.min != iy && Y_AXIS.min != oy) {
+	    x = ix + (Y_AXIS.min - iy) * ((ox - ix) / (oy - iy));
+	    if (inrange(x, X_AXIS.min, X_AXIS.max)) {
+		*ex = x;
+		*ey = Y_AXIS.min;
+		return BOTTOM_EDGE;		/* yes */
+	    }
+	}
+	/* does it intersect Y_AXIS.max edge */
+	if (inrange(Y_AXIS.max, iy, oy) && Y_AXIS.max != iy && Y_AXIS.max != oy) {
+	    x = ix + (Y_AXIS.max - iy) * ((ox - ix) / (oy - iy));
+	    if (inrange(x, X_AXIS.min, X_AXIS.max)) {
+		*ex = x;
+		*ey = Y_AXIS.max;
+		return TOP_EDGE;		/* yes */
+	    }
+	}
+	/* does it intersect X_AXIS.min edge */
+	if (inrange(X_AXIS.min, ix, ox) && X_AXIS.min != ix && X_AXIS.min != ox) {
+	    y = iy + (X_AXIS.min - ix) * ((oy - iy) / (ox - ix));
+	    if (inrange(y, Y_AXIS.min, Y_AXIS.max)) {
+		*ex = X_AXIS.min;
+		*ey = y;
+		return LEFT_EDGE;
+	    }
+	}
+	/* does it intersect X_AXIS.max edge */
+	if (inrange(X_AXIS.max, ix, ox) && X_AXIS.max != ix && X_AXIS.max != ox) {
+	    y = iy + (X_AXIS.max - ix) * ((oy - iy) / (ox - ix));
+	    if (inrange(y, Y_AXIS.min, Y_AXIS.max)) {
+		*ex = X_AXIS.max;
+		*ey = y;
+		return RIGHT_EDGE;
+	    }
 	}
     }
-    /* does it intersect Y_AXIS.max edge */
-    if (inrange(Y_AXIS.max, iy, oy) && Y_AXIS.max != iy && Y_AXIS.max != oy) {
-	x = ix + (Y_AXIS.max - iy) * ((ox - ix) / (oy - iy));
-	if (inrange(x, X_AXIS.min, X_AXIS.max)) {
-	    *ex = x;
-	    *ey = Y_AXIS.max;
-	    return TOP_EDGE;		/* yes */
-	}
-    }
-    /* does it intersect X_AXIS.min edge */
-    if (inrange(X_AXIS.min, ix, ox) && X_AXIS.min != ix && X_AXIS.min != ox) {
-	y = iy + (X_AXIS.min - ix) * ((oy - iy) / (ox - ix));
-	if (inrange(y, Y_AXIS.min, Y_AXIS.max)) {
-	    *ex = X_AXIS.min;
-	    *ey = y;
-	    return LEFT_EDGE;
-	}
-    }
-    /* does it intersect X_AXIS.max edge */
-    if (inrange(X_AXIS.max, ix, ox) && X_AXIS.max != ix && X_AXIS.max != ox) {
-	y = iy + (X_AXIS.max - ix) * ((oy - iy) / (ox - ix));
-	if (inrange(y, Y_AXIS.min, Y_AXIS.max)) {
-	    *ex = X_AXIS.max;
-	    *ey = y;
-	    return RIGHT_EDGE;
-	}
-    }
+
     /* If we reach here, the inrange point is on the edge, and
      * the line segment from the outrange point does not cross any
      * other edges to get there. In this case, we return the inrange
