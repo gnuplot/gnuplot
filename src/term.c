@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.225.2.2 2012/01/30 19:34:25 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.225.2.3 2012/02/10 06:52:21 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -1351,6 +1351,8 @@ do_arc(
     /* FIXME: INC=2 causes problems for gnuplot_x11 */
 #   define INC 3.
     segments = (arc_end - arc_start) / INC;
+    if (segments < 1)
+	segments = 1;
 
     /* Calculate the vertices */
     aspect = (double)term->v_tic / (double)term->h_tic;

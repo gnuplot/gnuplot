@@ -1,3 +1,8 @@
+2012-02-21  contributed anonymously
+
+	* src/term.c (do_arc): Arcs smaller than 3 degrees were being
+	reduced to a single line.  Bug #3490227.
+
 2012-02-14  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/plot2d.c src/graphics.c:  The histogram code was not designed to 
