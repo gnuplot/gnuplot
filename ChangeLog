@@ -3,6 +3,13 @@
 	* src/term.c (do_arc): Arcs smaller than 3 degrees were being
 	reduced to a single line.  Bug #3490227.
 
+2012-02-21  David Leverton  <dleverton@users.sourceforge.net>
+	
+	* src/graphics.c (edge_intersect):  Fix a bug that failed to draw a
+	pure horizontal or vertical from out of range that crossed the entire
+	range of a plot to terminate on the boundary.
+	Bug #3488666
+
 2012-02-14  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/plot2d.c src/graphics.c:  The histogram code was not designed to 
