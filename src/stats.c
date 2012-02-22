@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: stats.c,v 1.4 2011/11/28 19:49:53 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: stats.c,v 1.5 2012/01/22 01:32:47 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - stats.c */
@@ -47,7 +47,6 @@ static char *RCSid() { return RCSid("$Id: stats.c,v 1.4 2011/11/28 19:49:53 sfea
 #include "stats.h"
 
 #define INITIAL_DATA_SIZE (4096)   /* initial size of data arrays */
-#define UNDEF (-1)                 /* needed to parse command line */
 
 static int comparator __PROTO(( const void *a, const void *b ));
 static struct file_stats analyze_file __PROTO(( long n, int outofrange, int invalid, int blank, int dblblank ));
@@ -622,7 +621,7 @@ statsrequest(void)
     static char *prefix = NULL;       /* prefix for user-defined vars names */
 
     /* Vars that control output */
-    int do_output;     /* Generate formatted output */ 
+    TBOOLEAN do_output = TRUE;     /* Generate formatted output */ 
     
     c_token++;
 
@@ -642,8 +641,6 @@ statsrequest(void)
     nr = 0;               /* Matrix dimensions */
     nc = 0;
     max_n = INITIAL_DATA_SIZE;
-    
-    do_output = UNDEF;
     
     free(data_x);
     free(data_y);
@@ -827,20 +824,13 @@ statsrequest(void)
 
     /* Parse the remainder of the command line: 0 to 2 tokens possible */
     while( !(END_OF_COMMAND) ) {
-	if ( do_output != UNDEF ) {
-	    int_error( c_token, "';' expected" );
-
-	} else if ( almost_equals( c_token, "out$put" ) ) {
-	    if ( do_output == UNDEF )
-		do_output = 1;
-	    else
-		int_error( c_token, "Only one output allowed" );
+	if ( almost_equals( c_token, "out$put" ) ) {
+		do_output = TRUE;
+		c_token++;
 
 	} else if ( almost_equals( c_token, "noout$put" ) ) {
-	    if ( do_output == UNDEF )
-		do_output = 0;
-	    else
-		int_error( c_token, "Only one [no]output allowed" );
+		do_output = FALSE;
+		c_token++;
 
 	} else if ( almost_equals(c_token, "pre$fix") 
 	       ||   equals(c_token, "name")) {
@@ -854,11 +844,9 @@ statsrequest(void)
 	    int_error( c_token, "Expecting [no]output or prefix");
 	}
 
-	c_token++;
     }
 
     /* Set defaults if not explicitly set by user */
-    do_output = ( do_output == UNDEF ? 1 : do_output ); /* YES by default */
     if (!prefix)
 	prefix = gp_strdup("STATS_");
     i = strlen(prefix);

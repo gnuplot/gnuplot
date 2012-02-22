@@ -1,3 +1,8 @@
+2012-02-22  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/stats.c: Remove order-dependence of keywords.
+	Bug #3491215
+
 2012-02-21  contributed anonymously
 
 	* src/term.c (do_arc): Arcs smaller than 3 degrees were being
