@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.716 2012/01/17 20:58:13 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.717 2012/01/26 22:52:39 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -234,6 +234,9 @@ Ffigure_newsyntax
  default sequence of linetypes used in plotting. See `set linetype`.
  This is normally done in an initialization file, either the system-wide
  file `gnuplotrc` or a private file `~/.gnuplot`. See `initialization`.
+
+ Most terminals now allow you to set an explicit background color for the plot.
+ The special linetype `bgnd` can be used to draw in this color. See `bgnd`.
 
 3 New plot styles
  See documentation for plot styles `boxplot`, `circles`, `ellipses`, and
@@ -2179,6 +2182,8 @@ C ... and restart the table:
  The pre-defined colors and dot/dash patterns are not guaranteed to be
  consistent for all terminal types, but all terminals use the special linetype
  -1 to mean a solid line in the primary foreground color (normally black).
+ Most terminals also recognize the special linetype "bgnd" to mean a solid line
+ in the background color.
 
  You can redefine the default linetype properties either interactively or via an
  initialization file.  This allows you to customize the colors and other
@@ -2275,6 +2280,19 @@ C ... and restart the table:
  cbrange mapping of the palette. This allows smoothly-varying color along a
  3d line or surface. It also allows coloring 2D plots by palette values read
  from an extra column of data (not all 2D plot styles allow an extra column).
+4 background color
+?background
+?bgnd
+ Most terminals now allow you to set an explicit background color for the plot.
+ The special linetype `bgnd` will draw in this color, and `bgnd` is also 
+ recognized as a color.
+ Examples:
+      # This will erase a section of the canvas by writing over it in the
+      # background color
+      set term wxt background rgb "gray75"
+      set object 1 rectangle from x0,y0 to x1,y1 fillstyle solid fillcolor bgnd
+      # This will draw an "invisible" line along the x axis
+      plot 0 lt bgnd
 4 linecolor variable
 ?linecolor variable
 ?lc variable
