@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.138.2.4 2012/01/08 05:48:41 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.138.2.5 2012/01/08 23:13:06 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -246,6 +246,11 @@ load_file(FILE *fp, char *name, TBOOLEAN can_do_args)
 		    stop = TRUE;	/* EOF in file */
 		    gp_input_line[start] = '\0';
 		    more = FALSE;
+		    if (curly_brace_count > 0)
+			/* reaching this point means that the entire file was gobbled up 
+			 * by this routine without finding the closing } for at least one block.
+			 * Likely user error, so we die with an error message. */
+			int_error(NO_CARET, "Syntax error: missing block terminator }");
 		} else {
 		    inline_num++;
 		    len = strlen(gp_input_line) - 1;

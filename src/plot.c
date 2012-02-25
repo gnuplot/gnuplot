@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot.c,v 1.128.2.7 2012/01/09 19:51:24 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot.c,v 1.128.2.8 2012/01/14 08:01:15 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - plot.c */
@@ -135,7 +135,7 @@ static void wrapper_for_write_history __PROTO((void));
 #endif				/* GNUPLOT_HISTORY */
 
 TBOOLEAN interactive = TRUE;	/* FALSE if stdin not a terminal */
-static TBOOLEAN noinputfiles = TRUE; /* FALSE if there are script files */
+TBOOLEAN noinputfiles = TRUE; /* FALSE if there are script files */
 TBOOLEAN persist_cl = FALSE; /* TRUE if -persist is parsed in the command line */
 
 /* user home directory */
