@@ -1,5 +1,5 @@
 %
-% $Id: tutorial.tex,v 1.10 2010/09/19 19:54:31 sfeam Exp $
+% $Id: tutorial.tex,v 1.11 2011/06/01 03:44:36 sfeam Exp $
 %
 % Tutorial for gnuplot plotting program, for LaTeX users
 % David Kotz
@@ -8,6 +8,7 @@
 % Slightly updated by the gnuplot team in 2004, for gnuplot 4.0.
 % Updated for gnuplot 4.2 to include epslatex example by Ethan A Merritt
 % Updated for gnuplot 4.4 to replace 'set size' with 'set term latex size'
+% Updated for gnuplot 4.6 to mention the newer TeX-based terminals
 %
 % NOTE: If LaTeX runs out of memory processing plots,
 % add ``with lines 4'' to each curve in eg*.plt and rerun make.
@@ -33,11 +34,12 @@ Principal author of this tutorial for gnuplot 3.0, July 3, 1991 \\[1.0cm]
 {\bf current gnuplot team} \\[0.4cm]
 Updates of this tutorial for gnuplot 4.0, March 2004 \\
 Update of this tutorial for gnuplot 4.2, August 2006 \\
-Update of this tutorial for gnuplot 4.4, September 2010
+Update of this tutorial for gnuplot 4.4, September 2010 \\
+Update of this tutorial for gnuplot 4.6, February 2012
 
 \vskip2cm
 
-% All plots in this document were made with the version of gnuplot.
+% All plots in this document were made with the current version of gnuplot.
 
 \end{center}
 
@@ -50,7 +52,7 @@ Update of this tutorial for gnuplot 4.4, September 2010
 
 
 \pagestyle{myheadings}
-\markright{Gnuplot \LaTeX\ Tutorial Version 4.4}
+\markright{Gnuplot \LaTeX\ Tutorial Version 4.6}
 
 \currentspace % defined in header.tex
 
@@ -83,10 +85,9 @@ the EEPIC macro package for \LaTeX. EEPIC allows for much more
 efficient line-drawing, runs through \LaTeX\ faster, and uses less
 memory.  See Section~\ref{s:eepic} for more information.
 
-There is a small package of auxiliary files (makefiles and scripts)
-that I find useful for making \LaTeX\ plots with gnuplot. This is
-available for \verb+ftp+ as \verb+pub/gnuplot-latex.shar+ from
-\verb+cs.duke.edu+.
+Other gnuplot terminal types have been added that take advantage of
+newer \TeX\ and \LaTeX\ packages and variants, including {\tt emtex}, 
+{\tt metafont}, {\tt epslatex}, {\tt tikz}, and {\tt context}.
 
 \section{Using gnuplot for \LaTeX: a Tutorial}
 
@@ -420,7 +421,7 @@ To use EEPIC, set gnuplot's terminal type to {\tt eepic} instead of
 Include the file {\tt plot.tex} in your document as before, along with
 the document style options {\tt [epic,eepic]}.
 
-\section{What is new for \TeX{} and \LaTeX{} terminals in gnuplot 4.0}
+\section{Other \TeX-based terminal types in gnuplot}
 
 In addition to the \texttt{latex} terminal, the following \LaTeX-friendly
 terminals are available. The gnuplot documentation contains more information
@@ -440,22 +441,23 @@ postscript parts for text and lines, respectively, included by
 
 \item \texttt{mf} and \texttt{mp}: Produces metafont and metapost outputs.
 
-\end{itemize}
-
-
-\section{What is new for \TeX{} and \LaTeX{} terminals in gnuplot 4.4}
-
-\begin{itemize}
-
-\item \texttt{pslatex and epslatex}:  Rewritten version.  See the example below. 
+\item \texttt{pslatex and epslatex}:  New versions of these terminals were
+introduced in gnuplot 4.4.  See the example below. 
 
 \item \texttt{tikz}:  Much improved graphics compaired to earlier \LaTeX terminals.  
 Use of the terminal requires a lua interpreter that is called by gnuplot. 
 The resulting .tex file can be processed using pdflatex.
 
+\item \texttt{context}:  Produces output for the {Con{\TeX}t} environment.
+
 \end{itemize}
 
-\section{Sample of epslatex terminal driver}
+The {\tt tikz} and {\tt context} terminals support newer gnuplot features
+such as transparency and embedded images.  The {\em standalone} terminal
+option allows you to create a *.tex document that can be processed by itself
+without being embedded in a wrapping document.
+
+\section{Example of using the epslatex terminal driver}
 \label{epslatex}
 
 The epslatex terminal driver allows you to mix the best features of \TeX\
@@ -502,9 +504,9 @@ generated with the following commands:
 
 \section{Contact for help}
 
-For general gnuplot questions, the gnuplot mailing list
-\url{info-gnuplot@lists.sourceforge.net} is where you can send your e-mail, or
-you can use gnuplot newsgroup \url{comp.graphics.apps.gnuplot}. Addional sources
-of information are available on gnuplot homepage \url{www.gnuplot.info}.
+For general gnuplot questions, you can post to the gnuplot newsgroup 
+\url{comp.graphics.apps.gnuplot}.
+Additional sources of information are listed on the gnuplot homepage
+\url{http://www.gnuplot.info}.
 
 \end{document}

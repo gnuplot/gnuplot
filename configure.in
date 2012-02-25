@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot on Unix.
 dnl
-dnl $Id: configure.in,v 1.297.2.8 2012/01/08 23:46:29 sfeam Exp $
+dnl $Id: configure.in,v 1.297.2.9 2012/01/19 07:03:27 sfeam Exp $
 dnl
 dnl this is actually major.minor ...
 dnl note that for a non-beta release, we need to
@@ -758,13 +758,12 @@ AC_ARG_WITH(row-help,dnl
    fi])
 
 dnl Whether we want to create the LaTeX tutorial
-TUTORIAL=tutorial
+TUTORIAL=notutorial
 AC_ARG_WITH(tutorial,dnl
-[  --without-tutorial      do not build LaTeX tutorial])
+[  --with-tutorial      process the LaTeX tutorial when building])
 dnl only if latex/2e is found
-if test "$with_latex" = no -o "$with_tutorial" = no ; then
-  TUTORIAL=notutorial
-  with_tutorial=no
+if test "$with_latex" != no -a "$with_tutorial" = yes ; then
+  TUTORIAL=tutorial
 fi
 
 dnl use mouse for interactive terminals
