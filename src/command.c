@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.230 2011/11/12 11:12:35 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.231 2011/12/28 19:37:37 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -391,11 +391,31 @@ do_line()
     if (curly_brace_count < 0)
 	int_error(NO_CARET,"Unexpected }");
     while (curly_brace_count > 0) {
-	strcat(gp_input_line,";");
-	read_line("more> ", strlen(gp_input_line));
-	num_tokens = scanner(&gp_input_line, &gp_input_line_len);
-	if (gp_input_line[token[num_tokens].start_index] == '#')
-	    gp_input_line[token[num_tokens].start_index] = NUL;
+	if (interactive || noinputfiles) {
+	    /* If we are really in interactive mode and there are unterminated blocks,
+	     * then we want to display a "more>" prompt to get the rest of the block.
+	     * However, there are two more cases that must be dealt here:
+	     * One is when commands are piped to gnuplot - on the command line,
+	     * the other is when commands are piped to gnuplot which is opened 
+	     * as a slave process. The test for noinputfiles is for the latter case.
+	     * If we didn't have that test here, unterminated blocks sent via a pipe
+	     * would trigger the error message in the else branch below. */
+	    int retval;
+	    strcat(gp_input_line,";");
+	    retval = read_line("more> ", strlen(gp_input_line));
+	    if (retval)
+	 	int_error(NO_CARET, "Syntax error: missing block terminator }");
+	    num_tokens = scanner(&gp_input_line, &gp_input_line_len);
+	    if (gp_input_line[token[num_tokens].start_index] == '#')
+		gp_input_line[token[num_tokens].start_index] = NUL;
+	}
+	else {
+	    /* Non-interactive mode here means that we got a string from -e.
+	     * Having curly_brace_count > 0 means that there are at least one 
+	     * unterminated blocks in the string.
+	     * Likely user error, so we die with an error message. */
+	    int_error(NO_CARET, "Syntax error: missing block terminator }");
+	}
     }
 
     c_token = 0;
@@ -2863,7 +2883,7 @@ read_line(const char *prompt, int start)
 		(void) putc('\n', stderr);
 	    gp_input_line[start] = NUL;
 	    inline_num++;
-	    if (start > 0)	/* don't quit yet - process what we have */
+	    if (start > 0 && curly_brace_count == 0)	/* don't quit yet - process what we have */
 		more = FALSE;
 	    else
 		return (1);	/* exit gnuplot */

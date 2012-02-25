@@ -1,3 +1,11 @@
+2012-02-25  Peter Juhasz  <juhaszp@users.sourceforge.net>
+
+	* src/command.c src/misc.c src/plot.c src/plot.h:
+	Unterminated blocks (i.e. missing }) in batch mode caused the program to
+	erroneously wait for further input or - when commands were streamed
+	through a pipe - crash. Fix: display an appropriate error message instead.
+	Bug #3491904
+
 2012-02-22  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/stats.c: Remove order-dependence of keywords.
