@@ -1,3 +1,8 @@
+2012-02-25  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* configure.in tutorial/tutorial.tex:  Update latex tutorial for version
+	4.6 but do not install it by default.
+
 2012-02-25  Peter Juhasz  <juhaszp@users.sourceforge.net>
 
 	* src/command.c src/misc.c src/plot.c src/plot.h:
