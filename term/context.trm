@@ -1,5 +1,5 @@
 /*
- * $Id: context.trm,v 1.3 2011/11/10 07:30:53 markisch Exp $
+ * $Id: context.trm,v 1.3.2.1 2011/12/08 21:01:52 sfeam Exp $
  */
 
 /* GNUPLOT - context.trm */
@@ -1969,6 +1969,8 @@ START_HELP(context)
 "?commands set terminal context",
 "?set terminal context",
 "?terminal context",
+"?set term context",
+"?term context",
 "?context",
 " ConTeXt is a macro package for TeX, highly integrated with Metapost",
 " (for drawing figures) and intended for creation of high-quality PDF documents.",
