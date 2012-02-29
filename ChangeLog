@@ -1,3 +1,9 @@
+2011-02-29 Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* win/gnuplot.iss: Prepare for 4.6 release.
+
+	* config/mingw/Makefile: New target 'zip' for zip file distribution.
+
 2012-02-25  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* configure.in tutorial/tutorial.tex:  Update latex tutorial for version
