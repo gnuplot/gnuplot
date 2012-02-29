@@ -1,3 +1,8 @@
+2012-02-29  Mojca Miklavec <mojca.miklavec.lists@gmail.com>
+
+	* src/wxterminal/wxt_gui.cpp (OnMouseWheel): wxWidgets 2.9 supports 
+	horizontal mouse scrolling.
+
 2012-02-25  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* configure.in tutorial/tutorial.tex:  Update latex tutorial for version
