@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.701.2.11 2012/01/26 22:53:11 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.701.2.12 2012/02/23 06:52:49 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -3056,11 +3056,11 @@ Ffigure_candlesticks
  If you set the fillstyle to solid or pattern, then this will be used for
  all boxes independent of open and close values.
  See also `set bars` and `financebars`.  See also the
-^ <a href="http://gnuplot.sourceforge.net/demo/candlesticks.html">
+^ <a href="http://www.gnuplot.info/demo/candlesticks.html">
  candlestick
 ^ </a>
  and
-^ <a href="http://gnuplot.sourceforge.net/demo/finance.html">
+^ <a href="http://www.gnuplot.info/demo/finance.html">
  finance 
 ^ </a>
  demos.
@@ -5383,7 +5383,7 @@ Ffigure_mapcontours
  Non-parametric splot demos
 ^ </a>
  , and
-^ <a href="http://gnuplot.sourceforge.net/demo/surface2.html">
+^ <a href="http://www.gnuplot.info/demo/surface2.html">
  Parametric splot demos
 ^ </a>
  .
@@ -6067,7 +6067,7 @@ Ffigure_mapcontours
  If autoscaling is on, the ranges will be adjusted to include the error bars.
 
  See also
-^ <a href="http://gnuplot.sourceforge.net/demo/mgr.html">
+^ <a href="http://www.gnuplot.info/demo/mgr.html">
  errorbar demos.
 ^ </a>
 
@@ -6899,7 +6899,7 @@ Ffigure_mapcontours
  To show all arrows (in tag order), use:
        show arrow
 
-^ <a href="http://gnuplot.sourceforge.net/demo/arrowstyle.html">
+^ <a href="http://www.gnuplot.info/demo/arrowstyle.html">
  arrows demos.
 ^ </a>
 
@@ -9501,7 +9501,7 @@ Ffigure_mapcontours
  size of 0.9/3.
 
  See also
-^ <a href="http://gnuplot.sourceforge.net/demo/multiplt.html">
+^ <a href="http://www.gnuplot.info/demo/multiplt.html">
  multiplot demo (multiplt.dem)
 ^ </a>
 3 mx2tics
