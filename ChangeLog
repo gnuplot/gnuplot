@@ -1,3 +1,7 @@
+2012-03-01  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* PATCHLEVEL configure.in README.1ST INSTALL:  Update for 4.6.0
+
 2011-02-29 Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* win/gnuplot.iss: Prepare for 4.6 release.
