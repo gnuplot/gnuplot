@@ -17,8 +17,7 @@ DOCUMENTATION:
 TERMINALS:
 ==========
 
- -- Configuration/installation on OSX remains problematic, specifically
-    including the OSX-specific aquaterm
+ -- Configuration/installation on OSX remains problematic
 
 Windows:
   -- update wgnuplot menus
@@ -124,10 +123,9 @@ HBB:
 
 [Optional:] See if 16-bit compilations can be made to work again.
 
-Ethan's List (2011):
+Ethan's List (2012):
 
 - the qt terminal should support OpenGL as a back-end rendering path
-- separate out the handling of junk, NaN, Inf, and missing data entries
 - isosurfaces (3D contour of 4D data)
 - fix emf text handling to match other terminals (vertical centering, enhanced)
 - allow the user to assign arbitrary coordinate transforms to the axes
@@ -135,4 +133,12 @@ Ethan's List (2011):
 - revise the coordinate system used by x11 so that the terminal coordinates
   are proportional to the actual on-screen coordinates. 
   This will fix 'set size ratio'.
+- support mousing in multiplot output, at least for selected terminals
 
+- Changes for 5.0 (syntax or behavior is not 100% backward compatible)
+  + separate out the handling of junk, NaN, Inf, and missing data entries
+  + revise the keywords for matrix handling so that the binary and ascii
+    versions are consistent
+  + establish interpretation of input columns only once, at start of input.
+    Get rid of the ancient "every line may be interpreted differently"
+    behavior. See "help missing".
