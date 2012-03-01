@@ -8,9 +8,6 @@
    If your source is from the CVS repository rather from a release package,
    the order of commands is  ./prepare; ./configure; make
  
- - Under DOS, if you are using bash and DJGPP,
-   you can just run config/djconfig.sh
-
  - Other platforms, copy the relevant makefile from config/
    to src, cd to src and make. See config/README for what each
    of those files is for.  Note: some of those files haven't been
@@ -20,7 +17,7 @@
  IMPORTANT NOTE ON PDF SUPPORT
  ===========================================
 
- PDF support in gnuplot is provided by an external library.
+ Direct PDF support in gnuplot is provided by an external library.
  Two options are currently possible.  It is possible to have both
  PDF terminal drivers in the same gnuplot executable.
  
@@ -38,21 +35,3 @@
  is freely redistrutable, but programs linked to that are strictly for
  non-commercial usage only.  *You* are liable for whatever violations
  of this licence occur in a gnuplot binary built by you.
-
-
- IMPORTANT NOTE ON GIF, PNG and JPEG SUPPORT
- ===========================================
-
- The gd library from http://libgd.org/ is used to generate GIF, PNG and JPEG
- output. We strongly recommend using version 2.0.29 or newer.
-
- Historical notes:
-     Old versions of the Boutell gd library (versions 1.2 to 1.4) produced
- only GIF output. This means you cannot obtain a PNG or a JPEG output from
- gnuplot 4.2 with these versions. (Note that gnuplot's old minimalistic but
- standalone PNG driver driver has now been removed).
-     Versions of the the Boutell gd library between 1.6 and 2.0.27 did not
- support GIF output because of patent concerns. This means that with these
- versions, you cannot generate a GIF output directly from gnuplot.
- Version 2.0.29 added support for GIF animation.
-
