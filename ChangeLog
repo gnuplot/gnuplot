@@ -1,7 +1,15 @@
 2012-03-02  Ethan A Merritt  <merritt@u.washington.edu>
 
-	* README README.1ST INSTALL TODO FAQ.pdf:  Update text for version 4.6
 	* docs/gnuplot.doc:  Point to www.gnuplot.info as the URL for all demos.
+	
+	* configure.in src/plot.c src/version.c src/show.c config/mingw/Makefile:
+	Mark this explicitly as a DEVELOPMENT_VERSION at configuration time
+	rather than hiding or providing a RELEASE_VERSION definition in
+	individual source files.
+
+2012-03-01  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* README README.1ST INSTALL TODO FAQ.pdf:  Update text for version 4.6
 
 2012-02-29  Mojca Miklavec <mojca.miklavec.lists@gmail.com>
 
