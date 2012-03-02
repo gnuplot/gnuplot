@@ -1,8 +1,8 @@
 #
-# $Id: makefile.os2,v 1.52 2009/10/31 23:33:12 mikulik Exp $
+# $Id: makefile.os2,v 1.53 2009/12/02 04:59:57 sfeam Exp $
 #
 # GNUPLOT Makefile for use on OS/2 2.x (and above)
-# using emx 0.9 (and above) and GNUMake
+# using emx 0.9 (and above) and GNU make
 #
 # To compile gnuplot, run the following command in directory gnuplot\src:
 #	make -f ..\config\makefile.os2
@@ -314,7 +314,7 @@ ifdef MOUSE
 X11FLAGS += -DUSE_MOUSE
 endif
 
-gnuplot_x11.exe: gplt_x11.o gpexecute.o getcolor_x11.o
+gnuplot_x11.exe: gplt_x11.o gpexecute.o getcolor_x11.o version.o
 	$(CC) $(LDFLAGS) $(X11FLAGS) $(EMXSPECIFIC) -o $@ -DGPLT_X11_MODE $^ $(X11LIBS)
 
 gplt_x11.o: gplt_x11.c mouse.h gpexecute.h config.h

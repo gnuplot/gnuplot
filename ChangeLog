@@ -1,3 +1,7 @@
+2012-03-02  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* config/makefile.os2: version.o is required for gnuplot_x11.exe.
+
 2012-03-02  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* PATCHLEVEL configure.in README.1ST INSTALL FAQ:
