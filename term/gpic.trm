@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: gpic.trm,v 1.17 2006/07/07 03:51:22 sfeam Exp $
+ * $Id: gpic.trm,v 1.18 2006/07/21 02:35:46 sfeam Exp $
  */
 
 /* GNUPLOT - gpic.trm */
@@ -346,14 +346,9 @@ START_HELP(gpic)
 " This will produce an 8-inch-wide figure with four graphs in two rows on top",
 " of each other.",
 "",
-" One can also achieve the same thing by the command",
+" One can also achieve the same thing by specifying x and y in the command",
 "",
 "       set terminal gpic x y",
-"",
-" for example, using",
-"",
-"       .PS 6.0",
-"       copy \"trig.pic\"",
-"       .PE"
+""
 END_HELP(gpic)
 #endif /* TERM_HELP */
