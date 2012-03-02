@@ -1,6 +1,7 @@
-2012-03-01  Ethan A Merritt  <merritt@u.washington.edu>
+2012-03-02  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* README README.1ST INSTALL TODO FAQ.pdf:  Update text for version 4.6
+	* docs/gnuplot.doc:  Point to www.gnuplot.info as the URL for all demos.
 
 2012-02-29  Mojca Miklavec <mojca.miklavec.lists@gmail.com>
 
