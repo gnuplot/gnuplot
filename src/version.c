@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: version.c,v 1.100.2.1 2011/11/23 05:26:43 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: version.c,v 1.100.2.2 2012/03/02 01:39:49 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - version.c */
@@ -48,26 +48,8 @@ const char faq_location[] = FAQ_LOCATION;
 
 char *compile_options = (void *)0;	/* Will be loaded at runtime */
 
-/* #define RELEASE_VERSION 1 */
-
-/* mustn't forget to activate this before the release ... */
-#ifdef RELEASE_VERSION
-# ifndef HELPMAIL
-#  define HELPMAIL "gnuplot-info@lists.sourceforge.net";
-# endif
-# ifndef CONTACT
-#  define CONTACT "gnuplot-bugs@lists.sourceforge.ent";
-# endif
-
-const char bug_email[] = CONTACT;
-const char help_email[] = HELPMAIL;
-
-#else
-
 const char bug_email[] = "gnuplot-beta@lists.sourceforge.net";
 const char help_email[] = "gnuplot-beta@lists.sourceforge.net";
-
-#endif
 
 char os_name[32];
 char os_rel[32];

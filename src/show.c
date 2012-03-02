@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.261.2.1 2011/12/09 07:05:35 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.261.2.2 2011/12/28 19:59:39 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -1049,7 +1049,7 @@ show_version(FILE *fp)
 %s\n\
 %s\tgnuplot home:     http://www.gnuplot.info\n\
 ");
-#ifndef RELEASE_VERSION
+#ifdef DEVELOPMENT_VERSION
     strcat(fmt, "%s\tmailing list:     %s\n");
 #endif
     strcat(fmt, "\
@@ -1067,7 +1067,7 @@ show_version(FILE *fp)
 	    p,			/* authors */
 	    p,			/* empty line */
 	    p,			/* website */
-#ifndef RELEASE_VERSION
+#ifdef DEVELOPMENT_VERSION
 	    p, help_email,	/* mailing list */
 #endif
 	    p,			/* type "help" */
