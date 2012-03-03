@@ -1,3 +1,8 @@
+2012-03-03  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* docs/doc2ipf.c (process_line): Don't use assert() because it calls
+	int_error().
+
 2012-03-02  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* config/makefile.os2: version.o is required for gnuplot_x11.exe.
