@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.cpp,v 1.91.2.1 2012/01/02 00:09:31 sfeam Exp $
+ * $Id: wxt_gui.cpp,v 1.91.2.2 2012/02/10 06:52:22 sfeam Exp $
  */
 
 /* GNUPLOT - wxt_gui.cpp */
@@ -120,14 +120,15 @@
  */
 static int wxt_cur_plotno = 0;
 static TBOOLEAN wxt_in_key_sample = FALSE;
+static TBOOLEAN wxt_in_plot = FALSE;
 static TBOOLEAN wxt_zoom_command = FALSE;
-static unsigned long wxt_hide_plot = 0;	/* Used as a bit array */
 #ifdef USE_MOUSE
 typedef struct {
 	unsigned int left;
 	unsigned int right;
 	unsigned int ytop;
 	unsigned int ybot;
+	TBOOLEAN hidden;
 } wxtBoundingBox;
 wxtBoundingBox *wxt_key_boxes = NULL;
 int wxt_max_key_boxes = 0;
@@ -1189,6 +1190,12 @@ static void wxt_initialize_key_boxes(int i)
 		wxt_key_boxes[i].right = wxt_key_boxes[i].ytop = 0;
 	}
 }
+static void wxt_initialize_hidden(int i)
+{
+	for (; i<wxt_max_key_boxes; i++)
+		wxt_key_boxes[i].hidden = FALSE;
+}
+
 
 /* Update the box enclosing the key sample for the current plot
  * so that later we can detect mouse clicks in that area
@@ -1200,6 +1207,7 @@ static void wxt_update_key_box( unsigned int x, unsigned int y )
 		wxt_key_boxes = (wxtBoundingBox *)realloc(wxt_key_boxes, 
 				wxt_max_key_boxes * sizeof(wxtBoundingBox));
 		wxt_initialize_key_boxes(wxt_cur_plotno);
+		wxt_initialize_hidden(wxt_cur_plotno);
 	}
 	wxtBoundingBox *bb = &(wxt_key_boxes[wxt_cur_plotno]);
 	y = term->ymax - y;
@@ -1227,10 +1235,7 @@ static void wxt_check_for_toggle(unsigned int x, unsigned int y)
 			continue;
 		if (y > wxt_key_boxes[i].ytop)
 			continue;
-		if ((wxt_hide_plot & 1L<<i) == 0)
-			wxt_hide_plot |= 1L<<i;
-		else
-			wxt_hide_plot &= ~(1L<<i);
+		wxt_key_boxes[i].hidden = !wxt_key_boxes[i].hidden;
 		wxt_current_panel->wxt_cairo_refresh();
 
 	}
@@ -1792,7 +1797,7 @@ void wxt_graphics()
 	if (wxt_zoom_command)
 		wxt_zoom_command = FALSE;
 	else
-		wxt_hide_plot = 0;
+		wxt_initialize_hidden(0);
 
 	wxt_sigint_check();
 	wxt_sigint_restore();
@@ -2299,12 +2304,19 @@ void wxt_image(unsigned int M, unsigned int N, coordval * image, gpiPoint * corn
  */
 void wxt_layer(t_termlayer layer)
 {
-	/* I do not understand why this particular layering command */
-	/* must be processed asynchronously, but if it is buffered  */
-	/* instead then it never reaches the command interpreter.   */
+	/* There are two classes of meta-information.  The first class	*/
+	/* is tied to the current state of the user interface or the	*/
+	/* main gnuplot thread.  Any action on these must be done here,	*/
+	/* immediately.  The second class relates to the sequence of	*/
+	/* operations in the plot itself.  These are buffered for later	*/
+	/* execution in sequential order.				*/
 	if (layer == TERM_LAYER_BEFORE_ZOOM) {
 		wxt_zoom_command = TRUE;
 		return;
+	}
+	if (layer == TERM_LAYER_RESET || layer == TERM_LAYER_RESET_PLOTNO) {
+		if (multiplot)
+			return;
 	}
 
 	gp_command temp_command;
@@ -2506,8 +2518,10 @@ void wxtPanel::wxt_cairo_refresh()
 		/* Skip the plot commands, but not the key sample commands,
 		 * if the plot was toggled off by a mouse click in the GUI
 		 */
-		if (((wxt_hide_plot & (1L << wxt_cur_plotno)) != 0)
-		&&  wxt_iter->command != command_layer && !wxt_in_key_sample)
+		if (wxt_in_plot && !wxt_in_key_sample
+		&&  wxt_iter->command != command_layer
+		&&  wxt_cur_plotno < wxt_max_key_boxes
+		&&  wxt_key_boxes[wxt_cur_plotno].hidden)
 			continue;
 
 		wxt_cairo_exec_command( *wxt_iter );
@@ -2608,6 +2622,7 @@ void wxtPanel::wxt_cairo_refresh()
 	int ibox;
 	for (ibox=1; ibox<=wxt_max_key_boxes; ibox++) {
 		if (ibox > wxt_cur_plotno) break;
+		fprintf(stderr, wxt_key_boxes[ibox].hidden ? "hidden " : "visible ");
 		fprintf(stderr,"box %d %8.8u %8.8u %8.8u %8.8u\n", ibox,
 		wxt_key_boxes[ibox].left,  wxt_key_boxes[ibox].ybot,
 		wxt_key_boxes[ibox].right, wxt_key_boxes[ibox].ytop);
@@ -2725,8 +2740,10 @@ void wxtPanel::wxt_cairo_exec_command(gp_command command)
 				break;
 		case TERM_LAYER_BEFORE_PLOT:
 				wxt_cur_plotno++;
+				wxt_in_plot = TRUE;
 				break;
 		case TERM_LAYER_AFTER_PLOT:
+				wxt_in_plot = FALSE;
 				break;
 		case TERM_LAYER_BEGIN_KEYSAMPLE:
 				wxt_in_key_sample = TRUE;

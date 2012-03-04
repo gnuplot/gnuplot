@@ -1,3 +1,9 @@
+2012-03-04  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/wxterminal/wxt_gui.cpp: Backport CVS fixes for toggling plots
+	on/off in multiplots and to limit the toggle effect to the contents
+	of the current plot.
+
 2012-03-03  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* docs/doc2ipf.c (process_line): Don't use assert() because it calls
