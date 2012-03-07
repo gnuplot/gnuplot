@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.701.2.12 2012/02/23 06:52:49 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.701.2.13 2012/03/02 17:56:02 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -13252,10 +13252,8 @@ Ffigure_mapcontours
  window.  This means that multiplots whose constituent plots use different
  palettes will not display correctly in x11.
 
- Qt terminal: This terminal is still in the EXPERIMENTAL category.  It does not
- yet support all the features of the other interactive terminals.  If the local
- qt environment does not support "opengl" as a rendering mode then display of
- polygons and surfaces can be very slow.
+ Qt terminal: If the local qt environment does not support "opengl" as a
+ rendering mode then display of polygons and surfaces can be very slow.
 
 2 External libraries
 ?bugs external_libraries
