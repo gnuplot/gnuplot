@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot on Unix.
 dnl
-dnl $Id: configure.in,v 1.306 2012/02/26 01:10:14 sfeam Exp $
+dnl $Id: configure.in,v 1.307 2012/03/02 19:52:13 sfeam Exp $
 dnl
 dnl this is actually major.minor ...
 dnl note that for a non-beta release, we need to disable DEVELOPMENT_RELEASE
@@ -1392,7 +1392,7 @@ else
 fi
 
 if test "$enable_qt_ok" = yes; then
-  AC_MSG_RESULT([  Qt terminal: yes (EXPERIMENTAL)])
+  AC_MSG_RESULT([  Qt terminal: yes ])
 else
   AC_MSG_RESULT([  Qt terminal: no (requires C++, Qt >= 4.5)])
 fi
