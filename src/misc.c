@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.138.2.5 2012/01/08 23:13:06 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.138.2.6 2012/02/25 12:02:07 juhaszp Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -283,7 +283,8 @@ load_file(FILE *fp, char *name, TBOOLEAN can_do_args)
 #ifdef GP_MACROS
 			/* macros in a clause are problematic, as they are */
 			/* only expanded once even if the clause is replayed */
-			string_expand_macros();
+			if (expand_macros)
+			    string_expand_macros();
 #endif
 			/* Strip off trailing comment and count curly braces */
 			num_tokens = scanner(&gp_input_line, &gp_input_line_len);
