@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.720 2012/03/07 21:04:45 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.721 2012/03/09 18:26:39 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -12113,10 +12113,10 @@ Ffigure_mapcontours
  The same syntax applies to `yrange`, `zrange`, `x2range`, `y2range`, `cbrange`,
  `rrange`, `trange`, `urange` and `vrange`.
 
- The `reverse` option reverses the direction of the axis, e.g., `set xrange
- [0:1] reverse` will produce an axis with 1 on the left and 0 on the right.
- This is identical to the axis produced by `set xrange [1:0]`, of course.
- `reverse` is intended primarily for use with `autoscale`.
+ The `reverse` option reverses the direction of an autoscaled axis. For example,
+ if the data values range from 10 to 100, it will autoscale to the equivalent of
+ set xrange [100:10].  The `reverse` flag has no effect if the axis is not
+ autoscaled. NB: This is a change introduced in version 4.7.
 
  Autoscaling:  If <min> (the same applies for correspondingly to <max>) is
  an asterisk "*" autoscaling is turned on.  The range in which autoscaling

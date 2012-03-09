@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: mouse.c,v 1.134 2011/11/26 00:31:15 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: mouse.c,v 1.135 2012/01/16 01:42:42 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - mouse.c */
@@ -342,9 +342,14 @@ MousePosToGraphPosReal(int xx, int yy, double *x, double *y, double *x2, double 
 		+ ((double) xx) / axis3d_y_dx * (axis_array[FIRST_Y_AXIS].max -
 						 axis_array[FIRST_Y_AXIS].min);
 	} else if (axis3d_y_dy != 0) {
-	    *y = axis_array[FIRST_Y_AXIS].min
-		+ ((double) yy) / axis3d_y_dy * (axis_array[FIRST_Y_AXIS].max -
-						 axis_array[FIRST_Y_AXIS].min);
+	    if (splot_map) 
+		*y = axis_array[FIRST_Y_AXIS].max
+		    + ((double) yy) / axis3d_y_dy * (axis_array[FIRST_Y_AXIS].min -
+						     axis_array[FIRST_Y_AXIS].max);
+	    else
+		*y = axis_array[FIRST_Y_AXIS].min
+		    + ((double) yy) / axis3d_y_dy * (axis_array[FIRST_Y_AXIS].max -
+						     axis_array[FIRST_Y_AXIS].min);
 	} else {
 	    /* both diffs are zero (y axis points into the screen */
 	    *y = VERYLARGE;
@@ -610,26 +615,16 @@ apply_zoom(struct t_zoom *z)
 {
     char s[1024];		/* HBB 20011005: made larger */
     int is_splot_map = (is_3d_plot && (splot_map == TRUE));
-    int flip = 0;
 
     if (zoom_now != NULL) {	/* remember the current zoom */
 	zoom_now->xmin = axis_array[FIRST_X_AXIS].set_min;
 	zoom_now->xmax = axis_array[FIRST_X_AXIS].set_max;
 	zoom_now->x2min = axis_array[SECOND_X_AXIS].set_min;
 	zoom_now->x2max = axis_array[SECOND_X_AXIS].set_max;
-	zoom_now->was_splot_map = is_splot_map;
-	if (!is_splot_map) { /* 2D plot */
-	    zoom_now->ymin = axis_array[FIRST_Y_AXIS].set_min;
-	    zoom_now->ymax = axis_array[FIRST_Y_AXIS].set_max;
-	    zoom_now->y2min = axis_array[SECOND_Y_AXIS].set_min;
-	    zoom_now->y2max = axis_array[SECOND_Y_AXIS].set_max;
-	} else { /* the opposite, i.e. case 'set view map' */
-	    zoom_now->ymin = axis_array[FIRST_Y_AXIS].set_max;
-	    zoom_now->ymax = axis_array[FIRST_Y_AXIS].set_min;
-	    zoom_now->y2min = axis_array[SECOND_Y_AXIS].set_max;
-	    zoom_now->y2max = axis_array[SECOND_Y_AXIS].set_min;
-	}
-
+	zoom_now->ymin = axis_array[FIRST_Y_AXIS].set_min;
+	zoom_now->ymax = axis_array[FIRST_Y_AXIS].set_max;
+	zoom_now->y2min = axis_array[SECOND_Y_AXIS].set_min;
+	zoom_now->y2max = axis_array[SECOND_Y_AXIS].set_max;
     }
 
     /* EAM DEBUG - The autoscale save/restore was too complicated, and
@@ -658,11 +653,9 @@ apply_zoom(struct t_zoom *z)
     /* Now we're committed. Notify the terminal the the next replot is a zoom */
     (*term->layer)(TERM_LAYER_BEFORE_ZOOM);
 
-    flip = (is_splot_map && zoom_now->was_splot_map);
     sprintf(s, "set xr[%.12g:%.12g]; set yr[%.12g:%.12g]",
 	       zoom_now->xmin, zoom_now->xmax, 
-	       (flip) ? zoom_now->ymax : zoom_now->ymin,
-	       (flip) ? zoom_now->ymin : zoom_now->ymax);
+	       zoom_now->ymin, zoom_now->ymax);
 
     if (!is_3d_plot) {
 	sprintf(s + strlen(s), "; set x2r[% #g:% #g]; set y2r[% #g:% #g]",
@@ -734,7 +727,6 @@ do_zoom(double xmin, double ymin, double x2min, double y2min, double xmax, doubl
     z->ymax = ymax;
     z->x2max = x2max;
     z->y2max = y2max;
-    z->was_splot_map = (is_3d_plot && (splot_map == TRUE)); /* see is_splot_map in apply_zoom() */ 
     apply_zoom(z);
 }
 

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.98 2011/11/26 00:04:31 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.99 2011/11/26 00:31:15 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -197,7 +197,9 @@ axis_unlog_interval(AXIS_INDEX axis, double *min, double *max, TBOOLEAN checkran
 void
 axis_revert_and_unlog_range(AXIS_INDEX axis)
 {
-  if (axis_array[axis].range_is_reverted) {
+  if ((axis_array[axis].range_is_reverted)
+  &&  (axis_array[axis].autoscale != 0) 
+  &&  (axis_array[axis].max > axis_array[axis].min) ) {
     double temp = axis_array[axis].min;
     axis_array[axis].min = axis_array[axis].max;
     axis_array[axis].max = temp;
@@ -1593,17 +1595,6 @@ load_range(AXIS_INDEX axis, double *a, double *b, t_autoscale autoscale)
 	load_one_range(axis, b, &autoscale, AUTOSCALE_MAX );
     }
 
-    /* HBB 20030127: If range input backwards, automatically turn on
-       the "reverse" option, too. */
-    if ((autoscale & AUTOSCALE_BOTH) == AUTOSCALE_NONE) {
-      if (*b < *a) {
-	double temp = *a;
-
-	*a = *b; *b = temp;
-	axis_array[axis].range_flags |= RANGE_REVERSE;
-      }
-    }
-
     return (autoscale);
 }
 
@@ -1682,13 +1673,9 @@ check_axis_reversed( AXIS_INDEX axis )
 {
     AXIS *this = axis_array + axis;
     if (((this->autoscale & AUTOSCALE_BOTH) == AUTOSCALE_NONE)
-    &&  (this->max < this->min)) {
-	double temp = this->min;
-	this->min = this->max;
-	this->max = temp;
-	this->range_is_reverted = 1;
-    } else {
-	this->range_is_reverted = (this->range_flags & RANGE_REVERSE);
+    &&  (this->set_max < this->set_min)) {
+	this->min = this->set_min;
+	this->max = this->set_max;
     }
 }
 

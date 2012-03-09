@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.192 2011/11/26 00:04:31 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.193 2012/01/22 01:32:47 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -232,10 +232,6 @@ plot3drequest()
 
     is_3d_plot = TRUE;
 
-    /* change view to become map if requested by 'set view map' */
-    if (splot_map == TRUE)
-	splot_map_activate();
-
     if (parametric && strcmp(set_dummy_var[0], "t") == 0) {
 	strcpy(set_dummy_var[0], "u");
 	strcpy(set_dummy_var[1], "v");
@@ -256,19 +252,11 @@ plot3drequest()
     v_axis = (parametric ? V_AXIS : FIRST_Y_AXIS);
 
     dummy_token0 = parse_named_range(u_axis, dummy_token0);
-    if (splot_map == TRUE && !parametric) /* v_axis==FIRST_Y_AXIS */
-	splot_map_deactivate();
     dummy_token1 = parse_named_range(v_axis, dummy_token1);
-    if (splot_map == TRUE && !parametric) /* v_axis==FIRST_Y_AXIS */
-	splot_map_activate();
 
     if (parametric) {
 	parse_range(FIRST_X_AXIS);
-	if (splot_map == TRUE)
-	    splot_map_deactivate();
 	parse_range(FIRST_Y_AXIS);
-	if (splot_map == TRUE)
-	    splot_map_activate();
     }				/* parametric */
     parse_range(FIRST_Z_AXIS);
     check_axis_reversed(FIRST_X_AXIS);
@@ -2145,7 +2133,19 @@ eval_3dplots()
     if (table_mode)
 	print_3dtable(plot_num);
     else {
+	/* EAM Jan 2012 - Move the "set view map" adjustments to view angles
+	 * and inversion of the Y axis to here, just before plotting, so that
+	 * the code elsewhere doesn't have to keep un-applying and re-applying
+	 * it whenever a command touches the axis ranges. Revert it immediately
+	 * after plotting.
+	 */
+	if (splot_map)
+	    splot_map_activate();
+
 	do_3dplot(first_3dplot, plot_num, 0);
+
+	if (splot_map)
+	    splot_map_deactivate();
 
 	/* after do_3dplot(), axis_array[] and max_array[].min
 	 * contain the plotting range actually used (rounded

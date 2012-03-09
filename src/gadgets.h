@@ -449,7 +449,7 @@ extern TBOOLEAN is_3d_plot;
    either the plot is a 2D plot, or it is a suitably oriented 3D plot (e.g. map).
 */
 #define ALMOST2D      \
-    ( !is_3d_plot ||  \
+    ( !is_3d_plot || splot_map || \
       ( fabs(fmod(surface_rot_z,90.0))<0.1  \
         && fabs(fmod(surface_rot_x,180.0))<0.1 ) )
 

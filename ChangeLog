@@ -4,7 +4,19 @@
 	Preparatory cleanup for re-working of axis reverse and range check
 	processing.  This change reduces the size of code produced by macro 
 	STORE_WITH_LOG_AND_UPDATE_RANGE (called >50 times)
-	but does not change the runtime behavior of the program.  
+	but does not change the runtime behavior of the program.
+
+	* src/axis.c src/axis.h src/command.c src/gadgets.h src/mouse.c 
+	src/mouse.h src/plot2d.c src/plot3d.c src/save.c src/set.c src/unset.c
+	docs/gnuplot.doc:
+	Change the handling of "set [xyz]range reverse".
+	Get rid of flag RANGE_REVERSE.  Axis range endpoints are now always
+	stored as-is (i.e. XAXIS.min is not guaranteed to be numerically less
+	than XAXIS.max).  The user command "set [xyz]range ... reverse" now
+	only affects auto-scaling. This is a change in behavior, although it
+	matches what the documentation has always given as the intended use.
+	Fixes various bugs and unexpected behavior; e.g.
+	"set xr [1:0]; set xr [0:1];" left the axis range reversed.
 
 2012-03-09  BUMP DEVELOPMENT VERSION NUMBER TO 4.7
 

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.149 2011/11/15 20:23:43 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.150 2011/11/26 00:04:31 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -1491,7 +1491,6 @@ unset_timestamp()
 static void
 unset_view()
 {
-    splot_map_deactivate();
     splot_map = FALSE;
     aspect_ratio_3D = 0;
     surface_rot_z = 30.0;
@@ -1643,7 +1642,7 @@ reset_command()
     unset_keytitle();
 
     unset_timefmt();
-    unset_view(); /* has to be called in advance to reset reversed yrange if splot_map_active */
+    unset_view();
 
     for (axis=0; axis<AXIS_ARRAY_SIZE; axis++) {
 	SET_DEFFORMAT(axis, set_for_axis);

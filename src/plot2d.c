@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.258 2012/02/06 23:54:32 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.259 2012/02/14 23:48:59 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -202,6 +202,7 @@ plotrequest()
     is_3d_plot = FALSE;
 
     /* Deactivate if 'set view map' is still running after the previous 'splot': */
+    /* EAM Jan 2012 - this should no longer be necessary, but it doesn't hurt. */
     splot_map_deactivate();
 
     if (parametric && strcmp(set_dummy_var[0], "u") == 0)
@@ -223,16 +224,9 @@ plotrequest()
     if (parametric || polar)    /* set optional x ranges */
 	parse_range(FIRST_X_AXIS);
 
-    /* possible reversal of x range *does* matter, even in parametric
-     * or polar mode */
-    check_axis_reversed(FIRST_X_AXIS);
-
     parse_range(FIRST_Y_AXIS);
-    check_axis_reversed(FIRST_Y_AXIS);
     parse_range(SECOND_X_AXIS);
-    check_axis_reversed(SECOND_X_AXIS);
     parse_range(SECOND_Y_AXIS);
-    check_axis_reversed(SECOND_Y_AXIS);
 
     /* Clear out any tick labels read from data files in previous plot */
     for (t_axis=0; t_axis<AXIS_ARRAY_SIZE; t_axis++) {

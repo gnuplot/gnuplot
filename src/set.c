@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.362 2012/01/05 22:54:37 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.363 2012/01/06 00:16:15 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -4690,10 +4690,8 @@ set_view()
 	    return;
     };
 
-    if (splot_map == TRUE) {
-	splot_map_deactivate();
+    if (splot_map == TRUE)
 	splot_map = FALSE; /* default is no map */
-    }
 
     if (almost_equals(c_token,"equal$_axes")) {
 	c_token++;
@@ -4777,10 +4775,7 @@ set_range(AXIS_INDEX axis)
 {
     c_token++;
 
-    if (splot_map)
-	splot_map_deactivate();
-
-    if(almost_equals(c_token,"re$store")) { /* ULIG */
+    if (almost_equals(c_token,"re$store")) { /* ULIG */
 	c_token++;
 	axis_array[axis].set_min = get_writeback_min(axis);
 	axis_array[axis].set_max = get_writeback_max(axis);
@@ -4798,10 +4793,10 @@ set_range(AXIS_INDEX axis)
 	c_token++;
 	if (almost_equals(c_token, "rev$erse")) {
 	    ++c_token;
-	    axis_array[axis].range_flags |= RANGE_REVERSE;
+	    axis_array[axis].range_is_reverted = TRUE;
 	} else if (almost_equals(c_token, "norev$erse")) {
 	    ++c_token;
-	    axis_array[axis].range_flags &= ~RANGE_REVERSE;
+	    axis_array[axis].range_is_reverted = FALSE;
 	}
 	if (almost_equals(c_token, "wr$iteback")) {
 	    ++c_token;
@@ -4811,8 +4806,6 @@ set_range(AXIS_INDEX axis)
 	    axis_array[axis].range_flags &= ~RANGE_WRITEBACK;
 	}
     }
-    if (splot_map)
-	splot_map_activate();
 }
 
 static void

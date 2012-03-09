@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.198 2011/11/26 00:31:15 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.199 2011/12/04 05:36:28 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -795,15 +795,8 @@ set origin %g,%g\n",
 
     SAVE_AXISLABEL(FIRST_Y_AXIS);
     SAVE_AXISLABEL(SECOND_Y_AXIS);
-    if (splot_map == FALSE) {
-	save_range(fp, FIRST_Y_AXIS);
-	save_range(fp, SECOND_Y_AXIS);
-    } else { /* 'set view map' uses flipped y-axes */
-	splot_map_deactivate();
-	save_range(fp, FIRST_Y_AXIS);
-	save_range(fp, SECOND_Y_AXIS);
-	splot_map_activate();
-    }
+    save_range(fp, FIRST_Y_AXIS);
+    save_range(fp, SECOND_Y_AXIS);
 
     SAVE_AXISLABEL(FIRST_Z_AXIS);
     save_range(fp, FIRST_Z_AXIS);
@@ -1127,7 +1120,7 @@ save_range(FILE *fp, AXIS_INDEX axis)
     }
 
     fprintf(fp, " ] %sreverse %swriteback",
-	    axis_array[axis].range_flags & RANGE_REVERSE ? "" : "no",
+	    axis_array[axis].range_is_reverted ? "" : "no",
 	    axis_array[axis].range_flags & RANGE_WRITEBACK ? "" : "no");
 
     if (axis_array[axis].set_autoscale && fp == stderr) {

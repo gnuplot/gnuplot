@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.231 2011/12/28 19:37:37 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.232 2012/02/25 11:41:19 juhaszp Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -1629,25 +1629,6 @@ refresh_request()
     else if (refresh_ok == 3)
 	refresh_3dbounds(first_3dplot, refresh_nplots);
 
-/* FIXME EAM
- * The existing mechanism defined in axis.h does not work here for some reason.
- * The following defined check works empirically.  Most of the time.  Maybe.
- */
-#undef CHECK_REVERSE
-#define CHECK_REVERSE(axis) do {		\
-    AXIS *ax = axis_array + axis;		\
-    if ((ax->range_flags & RANGE_REVERSE)) {	\
-	double temp = ax->max;			\
-	ax->max = ax->min; ax->min = temp;	\
-    } } while (0)
-
-
-    CHECK_REVERSE(FIRST_X_AXIS);
-    CHECK_REVERSE(FIRST_Y_AXIS);
-    CHECK_REVERSE(SECOND_X_AXIS);
-    CHECK_REVERSE(SECOND_Y_AXIS);
-#undef CHECK_REVERSE
-
     if (refresh_ok == 2)
 	do_plot(first_plot, refresh_nplots);
     else if (refresh_ok == 3)
@@ -2196,6 +2177,7 @@ static float splot_map_surface_scale;
 void
 splot_map_activate()
 {
+    double temp;
     if (splot_map_active)
 	return;
     splot_map_active = 1;
@@ -2207,19 +2189,20 @@ splot_map_activate()
     surface_rot_x = 180;
     surface_rot_z = 0;
     surface_scale = 1.3;
-    axis_array[FIRST_Y_AXIS].range_flags  ^= RANGE_REVERSE;
-    axis_array[SECOND_Y_AXIS].range_flags ^= RANGE_REVERSE;
-	/* note: ^ is xor */
+    /* The Y axis runs backwards from a normal 2D plot */
+    temp = axis_array[FIRST_Y_AXIS].min;
+    axis_array[FIRST_Y_AXIS].min = axis_array[FIRST_Y_AXIS].max;
+    axis_array[FIRST_Y_AXIS].max = temp;
 }
 
 
-/* This routine is called when the current 'set view map' is no more needed,
- * i.e., when calling "plot" --- the reversed y-axis et al must still be
- * available for mousing.
+/* This routine is called at the end of 3D plot evaluation to undo the 
+ * changes needed for 'set view map'.
  */
 void
 splot_map_deactivate()
 {
+    double temp;
     if (!splot_map_active)
 	return;
     splot_map_active = 0;
@@ -2227,9 +2210,10 @@ splot_map_deactivate()
     surface_rot_x = splot_map_surface_rot_x;
     surface_rot_z = splot_map_surface_rot_z;
     surface_scale = splot_map_surface_scale;
-    axis_array[FIRST_Y_AXIS].range_flags  ^= RANGE_REVERSE;
-    axis_array[SECOND_Y_AXIS].range_flags ^= RANGE_REVERSE;
-	/* note: ^ is xor */
+    /* The Y axis runs backwards from a normal 2D plot */
+    temp = axis_array[FIRST_Y_AXIS].min;
+    axis_array[FIRST_Y_AXIS].min = axis_array[FIRST_Y_AXIS].max;
+    axis_array[FIRST_Y_AXIS].max = temp;
 }
 
 

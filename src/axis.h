@@ -1,5 +1,5 @@
 /*
- * $Id: axis.h,v 1.69 2012/01/09 19:50:29 sfeam Exp $
+ * $Id: axis.h,v 1.70 2012/03/09 20:08:44 sfeam Exp $
  *
  */
 
@@ -538,7 +538,8 @@ do {									  \
 	break;  /* don't set y range if x is outrange, for example */	  \
     if ( curval < axis->data_min )					  \
 	axis->data_min = curval;					  \
-    if ( curval < axis->min ) {						  \
+    if ( curval < axis->min						  \
+    &&  (curval <= axis->max || axis->max == -VERYLARGE)) {		  \
 	if (axis->autoscale & AUTOSCALE_MIN)	{			  \
 	    if (axis->min_constraint & CONSTRAINT_LOWER) {		  \
 		if (axis->min_lb <= curval) {				  \
@@ -560,7 +561,8 @@ do {									  \
     }									  \
     if ( curval > axis->data_max )					  \
 	axis->data_max = curval;					  \
-    if ( curval > axis->max ) {						  \
+    if ( curval > axis->max						  \
+    &&  (curval >= axis->min || axis->min == VERYLARGE)) {		  \
 	if (axis->autoscale & AUTOSCALE_MAX)	{			  \
 	    if (axis->max_constraint & CONSTRAINT_UPPER) {		  \
 		if (axis->max_ub >= curval) {				  \
