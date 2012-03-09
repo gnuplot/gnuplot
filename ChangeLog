@@ -1,3 +1,8 @@
+2012-03-09  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/graphics.c: Odd corner-case of histograms + "set style incr user".
+	Bug #3499425
+
 2012-03-03  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* docs/doc2ipf.c (process_line): Don't use assert() because it calls

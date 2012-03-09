@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.384 2012/02/14 23:48:58 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.385 2012/02/20 00:43:04 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -1848,13 +1848,15 @@ do_plot(struct curve_points *plots, int pcount)
 	x_axis = this_plot->x_axis;
 	y_axis = this_plot->y_axis;
 
-	term_apply_lp_properties(&(this_plot->lp_properties));
+	/* Crazy corner case handling Bug #3499425 */
+	if (this_plot->plot_style == HISTOGRAMS)
+	    if ((!key_pass && key->front) &&  (prefer_line_styles)) {
+		struct lp_style_type ls;
+		lp_use_properties(&ls, this_plot->lp_properties.l_type+1);
+		this_plot->lp_properties.pm3d_color = ls.pm3d_color;
+	    }
 
-	/* Why only for histograms? */
-	if (this_plot->plot_style == HISTOGRAMS) {
-	    if (prefer_line_styles)
-		lp_use_properties(&this_plot->lp_properties, this_plot->lp_properties.l_type+1);
-	}
+	term_apply_lp_properties(&(this_plot->lp_properties));
 
 	/* Skip a line in the key between histogram clusters */
 	if (this_plot->plot_style == HISTOGRAMS
