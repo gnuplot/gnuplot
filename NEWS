@@ -5,7 +5,7 @@ New features, changes and fixes since gnuplot version 4.6
 * NEW set arrow <tag> from <start> length <len> angle <ang>
 * CHANGE Pipe (popen/pclose) emulation within wgnuplot
 * CHANGE Draw the z-axis label at a fixed distance to the left of the z-axis
-* FIX various improvements to the qt terminal
+* CHANGE 'set [xyz]axis ... reverse' affects only auto-scaling
 
 
 New features, changes and fixes in gnuplot version 4.6
