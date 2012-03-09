@@ -1,5 +1,5 @@
 ###
-### Gnuplot version 4.5 intialization file
+### Gnuplot version 4.7 intialization file
 ### This file is loaded by gnuplot at the start of each run.
 ### It is provided as a template, with all commands commented out.
 ### Uncomment and customize lines for local use.
@@ -30,7 +30,7 @@
 ### Initialize the default loadpath for shared gnuplot scripts and data.
 ### Please confirm that this path is correct before uncommented the line below.
 ###
-# set loadpath /usr/local/share/gnuplot/4.5/
+# set loadpath /usr/local/share/gnuplot/4.7/
 
 ###
 ### Some commonly used functions that are not built in

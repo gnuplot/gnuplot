@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.719 2012/03/02 17:54:26 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.720 2012/03/07 21:04:45 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -8498,7 +8498,7 @@ Ffigure_mapcontours
  on the surface (`set contour surface`) don't work.
 
  Labels and arrows are always visible and are unaffected.  The key box is never
- hidden by the surface. As of gnuplot version 4.5, hidden3d also affects 3D
+ hidden by the surface. As of gnuplot version 4.6, hidden3d also affects 3D
  plotting styles `points`, `labels`, `vectors`, and `impulses` even if no
  surface is present in the graph.  Individual plots within the graph may be
  explicitly excluded from this processing by appending the extra option 
@@ -9048,7 +9048,7 @@ Ffigure_mapcontours
  line (the previous default meaning of lt 1).  This includes uses such as the
  definition of a temporary linestyle derived from the base linetype 1.
 
- `Note`: This command is new to gnuplot version 4.5.  It supersedes a rather
+ `Note`: This command is new to gnuplot version 4.6.  It supersedes a rather
  cryptic command in version 4.2 "set style increment user".
  The older command is now deprecated.
 

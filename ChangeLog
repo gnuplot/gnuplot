@@ -1,3 +1,5 @@
+2012-03-09  BUMP DEVELOPMENT VERSION NUMBER TO 4.7
+
 2012-03-09  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c: Odd corner-case of histograms + "set style incr user".
