@@ -1,3 +1,11 @@
+2012-03-09  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/axis.h src/graphics3d.c src/util3d.c:
+	Preparatory cleanup for re-working of axis reverse and range check
+	processing.  This change reduces the size of code produced by macro 
+	STORE_WITH_LOG_AND_UPDATE_RANGE (called >50 times)
+	but does not change the runtime behavior of the program.  
+
 2012-03-09  BUMP DEVELOPMENT VERSION NUMBER TO 4.7
 
 2012-03-09  Ethan A Merritt  <merritt@u.washington.edu>

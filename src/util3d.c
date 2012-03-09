@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: util3d.c,v 1.44 2011/01/23 23:02:08 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: util3d.c,v 1.45 2012/01/11 23:40:42 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - util3d.c */
@@ -52,8 +52,9 @@ static char *RCSid() { return RCSid("$Id: util3d.c,v 1.44 2011/01/23 23:02:08 sf
 #include "pm3d.h"
 #include "term_api.h"
 
-/* HBB 990826: all that stuff referenced from other modules is now
- * exported in graph3d.h, instead of being listed here */
+/* EAM DEBUG - moved these here from axis.h */
+#define AXIS_ACTUAL_MIN(axis) GPMIN(axis_array[axis].max, axis_array[axis].min)
+#define AXIS_ACTUAL_MAX(axis) GPMAX(axis_array[axis].max, axis_array[axis].min)
 
 /* Prototypes for local functions */
 static void mat_unit __PROTO((transform_matrix mat));

@@ -1,5 +1,5 @@
 /*
- * $Id: axis.h,v 1.68 2011/11/26 00:31:15 sfeam Exp $
+ * $Id: axis.h,v 1.69 2012/01/09 19:50:29 sfeam Exp $
  *
  */
 
@@ -466,18 +466,6 @@ do {									\
 
 #endif
 
-/* HBB NEW 20050316: macros to always access the actual minimum, even
- * if 'set view map' or something else flipped things around behind
- * our back */
-#define AXIS_ACTUAL_MIN(axis)				\
-    (axis_array[axis].range_flags & RANGE_REVERSE	\
-     ? axis_array[axis].max : axis_array[axis].min)
-
-#define AXIS_ACTUAL_MAX(axis)				\
-    (axis_array[axis].range_flags & RANGE_REVERSE	\
-     ? axis_array[axis].min : axis_array[axis].max)
-
-
 /* parse a position of the form
  *    [coords] x, [coords] y {,[coords] z}
  * where coords is one of first,second.graph,screen,character
@@ -517,52 +505,52 @@ do {							\
  */
 
 #define STORE_WITH_LOG_AND_UPDATE_RANGE(STORE, VALUE, TYPE, AXIS,	  \
-			        NOAUTOSCALE, OUT_ACTION, UNDEF_ACTION)	  \
+				NOAUTOSCALE, OUT_ACTION, UNDEF_ACTION)	  \
 do {									  \
-    if (AXIS == NO_AXIS)                                                  \
-	break;                                                            \
+    struct axis *axis = &axis_array[AXIS];				  \
+    double curval = VALUE;						  \
+    if (AXIS == NO_AXIS)						  \
+	break;								  \
     /* HBB 20040304: new check to avoid storing infinities and NaNs */	  \
-    if (! (VALUE > -VERYLARGE && VALUE < VERYLARGE)) {			  \
+    if (! (curval > -VERYLARGE && curval < VERYLARGE)) {		  \
 	TYPE = UNDEFINED;						  \
 	UNDEF_ACTION;							  \
 	break;								  \
     }									  \
-    if (axis_array[AXIS].log) {						  \
-	if (VALUE<0.0) {						  \
+    if (axis->log) {							  \
+	if (curval < 0.0) {						  \
 	    TYPE = UNDEFINED;						  \
 	    UNDEF_ACTION;						  \
 	    break;							  \
-	} else if (VALUE == 0.0) {					  \
+	} else if (curval == 0.0) {					  \
 	    STORE = -VERYLARGE;						  \
 	    TYPE = OUTRANGE;						  \
 	    OUT_ACTION;							  \
 	    break;							  \
 	} else {							  \
-	    STORE = AXIS_DO_LOG(AXIS,VALUE);				  \
+	    STORE = log(curval) / axis->log_base; /* AXIS_DO_LOG() */	  \
 	}								  \
     } else								  \
-	STORE = VALUE;							  \
+	STORE = curval;							  \
     if (NOAUTOSCALE)							  \
 	break;  /* this plot is not being used for autoscaling */	  \
     if (TYPE != INRANGE)						  \
 	break;  /* don't set y range if x is outrange, for example */	  \
-    if ((int)AXIS < 0)							  \
-	break;	/* HBB 20000507: don't check range if not a coordinate */ \
-    if ( VALUE<axis_array[AXIS].data_min )				  \
-	axis_array[AXIS].data_min = VALUE;				  \
-    if ( VALUE<axis_array[AXIS].min ) {					  \
-	if (axis_array[AXIS].autoscale & AUTOSCALE_MIN)	{		  \
-            if (axis_array[AXIS].min_constraint & CONSTRAINT_LOWER) {     \
-                if (axis_array[AXIS].min_lb <= VALUE) {                   \
-                    axis_array[AXIS].min = VALUE;                         \
-                } else {                                                  \
-                    axis_array[AXIS].min = axis_array[AXIS].min_lb;       \
-                    TYPE = OUTRANGE;                                       \
-                    OUT_ACTION;                                           \
-                    break;                                                \
-                }                                                         \
-            } else {                                                      \
-	        axis_array[AXIS].min = VALUE;				  \
+    if ( curval < axis->data_min )					  \
+	axis->data_min = curval;					  \
+    if ( curval < axis->min ) {						  \
+	if (axis->autoscale & AUTOSCALE_MIN)	{			  \
+	    if (axis->min_constraint & CONSTRAINT_LOWER) {		  \
+		if (axis->min_lb <= curval) {				  \
+		    axis->min = curval;					  \
+		} else {						  \
+		    axis->min = axis->min_lb;				  \
+		    TYPE = OUTRANGE;					  \
+		    OUT_ACTION;						  \
+		    break;						  \
+		}							  \
+	    } else {							  \
+		axis->min = curval;					  \
 	    }								  \
 	} else {							  \
 	    TYPE = OUTRANGE;						  \
@@ -570,28 +558,29 @@ do {									  \
 	    break;							  \
 	}								  \
     }									  \
-    if ( VALUE>axis_array[AXIS].data_max )				  \
-	axis_array[AXIS].data_max = VALUE;				  \
-    if ( VALUE>axis_array[AXIS].max ) {					  \
-	if (axis_array[AXIS].autoscale & AUTOSCALE_MAX)	{		  \
-	    if (axis_array[AXIS].max_constraint & CONSTRAINT_UPPER) {     \
-                if (axis_array[AXIS].max_ub >= VALUE) {                   \
-                    axis_array[AXIS].max = VALUE;                         \
-                } else {                                                  \
-                    axis_array[AXIS].max = axis_array[AXIS].max_ub;       \
-                    TYPE =OUTRANGE;                                       \
-                    OUT_ACTION;                                           \
-                    break;                                                \
-                }                                                         \
-            } else {                                                      \
-	        axis_array[AXIS].max = VALUE;                             \
-            }                                                     	  \
+    if ( curval > axis->data_max )					  \
+	axis->data_max = curval;					  \
+    if ( curval > axis->max ) {						  \
+	if (axis->autoscale & AUTOSCALE_MAX)	{			  \
+	    if (axis->max_constraint & CONSTRAINT_UPPER) {		  \
+		if (axis->max_ub >= curval) {				  \
+		    axis->max = curval;					  \
+		} else {						  \
+		    axis->max = axis->max_ub;				  \
+		    TYPE =OUTRANGE;					  \
+		    OUT_ACTION;						  \
+		    break;						  \
+		}							  \
+	    } else {							  \
+		axis->max = curval;					  \
+	    }								  \
 	} else {							  \
 	    TYPE = OUTRANGE;						  \
 	    OUT_ACTION;							  \
 	}								  \
     }									  \
 } while(0)
+
 
 /* Implementation of the above for the color axis. It should not change
  * the type of the point (out-of-range color is plotted with the color
@@ -600,7 +589,7 @@ do {									  \
 #define COLOR_STORE_WITH_LOG_AND_UPDATE_RANGE(STORE, VALUE, TYPE, AXIS,	  \
 			       NOAUTOSCALE, OUT_ACTION, UNDEF_ACTION)	  \
 {									  \
-    coord_type c_type_tmp = TYPE;						  \
+    coord_type c_type_tmp = TYPE;					  \
     STORE_WITH_LOG_AND_UPDATE_RANGE(STORE, VALUE, c_type_tmp, AXIS,	  \
 			       NOAUTOSCALE, OUT_ACTION, UNDEF_ACTION);	  \
 }

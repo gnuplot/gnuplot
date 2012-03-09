@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.260 2012/01/11 23:40:42 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.261 2012/01/12 00:11:23 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -635,7 +635,7 @@ do_3dplot(
 
     /* If we are to draw the bottom grid make sure zmin is updated properly. */
     if (X_AXIS.ticmode || Y_AXIS.ticmode || some_grid_selected()) {
-	if (Z_AXIS.range_flags & RANGE_REVERSE) {
+	if (Z_AXIS.min > Z_AXIS.max) {
 	    floor_z = GPMAX(Z_AXIS.min, base_z);
 	    ceiling_z = GPMIN(Z_AXIS.max, base_z);
 	} else {
