@@ -1,10 +1,10 @@
 ﻿;
-; $Id: gnuplot.iss,v 1.2 2012/01/12 17:25:26 sfeam Exp $
+; $Id: gnuplot.iss,v 1.3 2012/01/14 13:47:04 markisch Exp $
 ;
 ; GNUPLOT - gnuplot.iss
 ;
 ;[
-; Copyright 2011   Bastian Märkisch
+; Copyright 2011,2012   Bastian Märkisch
 ;
 ; Permission to use, copy, and distribute this software and its
 ; documentation for any purpose with or without fee is hereby granted,
@@ -38,13 +38,13 @@
 ;
 
 #define MyAppName "gnuplot"
-#define MyAppVersionShort "4.5"
-#define MyAppVersion "4.5 patchlevel 0"
-#define MyAppNumVersion "4.5.0"
+#define MyAppVersionShort "4.7"
+#define MyAppVersion "4.7 patchlevel 0"
+#define MyAppNumVersion "4.7.0"
 #define MyAppPublisher "gnuplot development team"
 #define MyAppURL "http://www.gnuplot.info/"
 #define MyAppExeName "wgnuplot.exe"
-#define MyInstallerName "gp450win32-setup"
+#define MyInstallerName "gp470-win32-setup"
 
 [Setup]
 ; NOTE: The value of AppId uniquely identifies this application.
@@ -114,12 +114,12 @@ Source: "bin\wgnuplot.exe"; DestDir: "{app}\bin\"; Flags: ignoreversion; Compone
 Source: bin\wgnuplot_pipes.exe; DestDir: {app}\bin\; Flags: ignoreversion skipifsourcedoesntexist; Components: core;
 Source: "bin\gnuplot.exe"; DestDir: "{app}\bin\"; Flags: ignoreversion; Components: core
 ; core support files
-Source: "bin\*.dll"; DestDir: "{app}\bin\"; Flags: ignoreversion; Components: core
+Source: "bin\*.dll"; DestDir: "{app}\bin\"; Flags: skipifsourcedoesntexist ignoreversion; Components: core
 Source: "bin\wgnuplot.mnu"; DestDir: {app}\bin\; Components: core
 Source: "bin\wgnuplot.chm"; DestDir: {app}\bin\; Components: core
 Source: bin\pgnuplot.exe; DestDir: {app}\bin\; Flags: skipifsourcedoesntexist; Components: core;
 Source: "share\*"; DestDir: {app}\share\; Flags: recursesubdirs; Components: core
-Source: "etc\*"; DestDir: {app}\etc\; Flags: recursesubdirs;  Components: core
+Source: "etc\*"; DestDir: {app}\etc\; Flags: skipifsourcedoesntexist recursesubdirs;  Components: core
 ; demo files / contrib
 Source: "contrib\*"; DestDir: {app}\contrib\; Flags: recursesubdirs; Components: demo
 Source: "demo\*"; DestDir: {app}\demo\; Flags: recursesubdirs; Components: demo

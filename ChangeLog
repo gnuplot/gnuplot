@@ -1,3 +1,7 @@
+2012-03-12 Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* win/gnuplot.iss: Bump version number of installer to 4.7.
+
 2012-03-09  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/axis.h src/graphics3d.c src/util3d.c:
