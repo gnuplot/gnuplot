@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.385 2012/02/20 00:43:04 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.386 2012/03/09 18:18:52 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -387,12 +387,7 @@ boundary(struct curve_points *plots, int count)
     /* tic labels */
     if (axis_array[SECOND_X_AXIS].ticmode & TICS_ON_BORDER) {
 	/* ought to consider tics on axes if axis near border */
-	if (vertical_x2tics) {
-	    /* guess at tic length, since we don't know it yet
-	       --- we'll fix it after the tic labels have been created */
-	    x2tic_textheight = (int) (5 * t->h_char);
-	} else
-	    x2tic_textheight = (int) (x2ticlin * t->v_char);
+	x2tic_textheight = (int) (x2ticlin * t->v_char);
     } else
 	x2tic_textheight = 0;
 
@@ -502,12 +497,7 @@ boundary(struct curve_points *plots, int count)
     }
     if ((axis_array[FIRST_X_AXIS].ticmode & TICS_ON_BORDER)
     ||  shift_labels_to_border) {
-	/* ought to consider tics on axes if axis near border */
-	if (vertical_xtics) {
-	    /* guess at tic length, since we don't know it yet */
-	    xtic_textheight = (int) (t->h_char * 5);
-	} else
-	    xtic_textheight = (int) (t->v_char * (xticlin + 1));
+	xtic_textheight = (int) (t->v_char * (xticlin + 1));
     } else
 	xtic_textheight =  0;
 
@@ -1019,18 +1009,16 @@ boundary(struct curve_points *plots, int count)
 	gen_tics(SECOND_X_AXIS, /* 0, */ widest_tic_callback);
 	if (tmargin.x < 0) /* Undo original estimate */
 	    plot_bounds.ytop += x2tic_textheight;
-	/* Now compute a new one and use that instead: */
+	/* Adjust spacing for rotation */
 	if (projection > 0.0)
-	    x2tic_textheight = (int) (t->h_char * (widest_tic_strlen)) * projection;
-	else
-	    x2tic_textheight = t->v_char;
+	    x2tic_textheight += (int) (t->h_char * (widest_tic_strlen)) * projection;
 	if (tmargin.x < 0)
 	    plot_bounds.ytop -= x2tic_textheight;
     }
     if (axis_array[FIRST_X_AXIS].ticmode & TICS_ON_BORDER && vertical_xtics) {
 	double projection;
 	if (axis_array[FIRST_X_AXIS].tic_rotate == 90)
-	    projection = 1.0;
+	    projection = -1.0;
 	else if (axis_array[FIRST_X_AXIS].tic_rotate == TEXT_VERTICAL)
 	    projection = -1.0;
 	else

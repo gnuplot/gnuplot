@@ -1,3 +1,9 @@
+2012-03-13  Michael Reeves  <mgreeves@users.sourceforge.net> 
+
+	* src/graphics.c: Improved calculation of the margin space needed to
+	hold rotated x and x2 tic labels.
+	Bug #3482491
+
 2012-03-12 Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* win/gnuplot.iss: Bump version number of installer to 4.7.
