@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.199 2011/12/04 05:36:28 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.200 2012/03/09 20:23:31 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -1410,6 +1410,7 @@ save_object(FILE *fp, int tag)
 	    fprintf(fp, " size ");
 	    fprintf(fp, "%s%g", e->scalex == first_axes ? "" : coord_msg[e->scalex], e->x);
 	    fprintf(fp, " arc [%g:%g] ", this_circle->arc_begin, this_circle->arc_end);
+	    fprintf(fp, this_circle->wedge ? "wedge " : "nowedge"); 
 	}
 
 	else if ((this_object->object_type == OBJ_ELLIPSE)

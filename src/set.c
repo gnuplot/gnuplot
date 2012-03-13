@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.363 2012/01/06 00:16:15 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.364 2012/03/09 20:23:31 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -3826,6 +3826,14 @@ set_obj(int tag, int obj_type)
 			}
 		    }
 		    int_error(--c_token, "Expecting arc [<begin>:<end>]");
+		} else if (equals(c_token, "wedge")) {
+		    c_token++;
+		    this_circle->wedge = TRUE;
+		    continue;
+		} else if (equals(c_token, "nowedge")) {
+		    c_token++;
+		    this_circle->wedge = FALSE;
+		    continue;
 		}
 		break;
 
@@ -4121,8 +4129,18 @@ set_style()
 	break;
     case SHOW_STYLE_CIRCLE:
 	c_token++;
-	if (almost_equals(c_token++,"r$adius")) {
-	    get_position(&default_circle.o.circle.extent);
+	while (!END_OF_COMMAND) {
+	    if (almost_equals(c_token,"r$adius")) {
+		c_token++;
+		get_position(&default_circle.o.circle.extent);
+	    } else if (almost_equals(c_token, "wedge$s")) {
+		c_token++;
+		default_circle.o.circle.wedge = TRUE;
+	    } else if (almost_equals(c_token, "nowedge$s")) {
+		c_token++;
+		default_circle.o.circle.wedge = FALSE;
+	    } else
+		int_error(c_token, "unrecognized style option" );
 	}
 	break;
     case SHOW_STYLE_ELLIPSE:

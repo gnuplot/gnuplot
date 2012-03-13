@@ -1,3 +1,9 @@
+2012-03-13  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/gadgets.h src/graphics.c src/save.c src/set.c src/show.c
+	src/term.c src/term_api.h docs/gnuplot.doc:
+	New option "set style circle {no}wedges"
+
 2012-03-13  Michael Reeves  <mgreeves@users.sourceforge.net> 
 
 	* src/graphics.c: Improved calculation of the margin space needed to

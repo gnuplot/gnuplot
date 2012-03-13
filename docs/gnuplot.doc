@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.721 2012/03/09 18:26:39 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.722 2012/03/09 20:23:30 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -3116,11 +3116,12 @@ Ffigure_circles
  (x or x2).  The scale on y and the aspect ratio of the plot are both ignored.
  If only two columns are present, the radius is taken from `set style circle`.
  In this case the radius may be given in graph or screen coordinates.
+
  By default a full circle will be drawn.  It is possible to plot arc segments
  instead of full circles by specifying a start and end angle in the 4th and 5th
  columns.  An optional 4th or 6th column can specify per-circle color.
  The start and end angles of the circle segments must be specified in degrees.
-
+ See `set style circle` and `set style fill`.
 
  Examples:
 
@@ -11256,11 +11257,13 @@ Ffigure_mapcontours
 ?show style circle
 
  Syntax:
-       set style circle {radius {graph|screen} <R>}
+       set style circle {radius {graph|screen} <R>} {{no}wedge
 
  This command sets the default radius used in plot style "with circles".  It
  applies to data plots with only 2 columns of data (x,y) and to function plots.
- The default is "set style circle radius graph 0.02".
+ The default is "set style circle radius graph 0.02".  `Nowedge` disables
+ drawing of the two radii that connect the ends of an arc to the center.
+ The default is `wedge`.  This parameter has no effect on full circles.
 
 4 set style rectangle
 ?commands set style rectangle

@@ -1,5 +1,5 @@
 /*
- * $Id: term_api.h,v 1.98 2011/11/24 22:59:11 sfeam Exp $
+ * $Id: term_api.h,v 1.99 2012/01/22 03:59:16 sfeam Exp $
  */
 
 /* GNUPLOT - term_api.h */
@@ -421,7 +421,8 @@ int style_from_fill __PROTO((struct fill_style_type *));
 #ifdef EAM_OBJECTS
 /* Terminal-independent routine to draw a circle or arc */
 void do_arc __PROTO(( unsigned int cx, unsigned int cy, double radius,
-                      double arc_start, double arc_end, int style));
+                      double arc_start, double arc_end, 
+		      int style, TBOOLEAN wedge));
 #endif
 
 #ifdef LINUXVGA

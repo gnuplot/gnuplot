@@ -135,6 +135,7 @@ typedef struct circle {
     t_position extent;		/* radius */
     double arc_begin;
     double arc_end;
+    TBOOLEAN wedge;		/* TRUE = connect arc ends to center */
 } t_circle;
 
 #define ELLIPSEAXES_XY (0)
@@ -502,7 +503,7 @@ extern struct object default_circle;
 #define DEFAULT_CIRCLE_STYLE { NULL, -1, 0, OBJ_CIRCLE,       \
 	{FS_SOLID, 100, 0, BLACK_COLORSPEC},   			\
 	{0, LT_BACKGROUND, 0, 0, 1.0, 0.0, FALSE, BACKGROUND_COLORSPEC},			\
-	{.circle = {1, {0,0,0,0.,0.,0.}, {graph,0,0,0.02,0.,0.}, 0., 360. }} }
+	{.circle = {1, {0,0,0,0.,0.,0.}, {graph,0,0,0.02,0.,0.}, 0., 360., TRUE }} }
 
 extern struct object default_ellipse;
 #define DEFAULT_ELLIPSE_STYLE { NULL, -1, 0, OBJ_ELLIPSE,       \

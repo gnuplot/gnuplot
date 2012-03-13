@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.265 2011/12/28 20:01:33 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.266 2012/03/02 19:52:14 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -1572,6 +1572,7 @@ show_style_circle()
     SHOW_ALL_NL;
     fprintf(stderr, "\tCircle style has default radius ");
     show_position(&default_circle.o.circle.extent);
+    fprintf(stderr, " [%s]", default_circle.o.circle.wedge ? "wedge" : "nowedge");
     fputs("\n", stderr);
 }
 

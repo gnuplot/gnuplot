@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.386 2012/03/09 18:18:52 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.387 2012/03/13 17:07:58 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -1495,11 +1495,11 @@ place_objects(struct object *listhead, int layer, int dimensions)
 	    if (e->center.scalex == screen && e->center.scaley == screen)
 	    	clip_area = &canvas;
 
-	    do_arc((int)x1, (int)y1, radius, e->arc_begin, e->arc_end, style);
+	    do_arc((int)x1, (int)y1, radius, e->arc_begin, e->arc_end, style, FALSE);
 
 	    /* Retrace the border if the style requests it */
 	    if (need_fill_border(fillstyle))
-		do_arc((int)x1, (int)y1, radius, e->arc_begin, e->arc_end, 0);
+		do_arc((int)x1, (int)y1, radius, e->arc_begin, e->arc_end, 0, e->wedge);
 
 	    clip_area = clip_save;
 	    break;
@@ -3771,10 +3771,10 @@ plot_circles(struct curve_points *plot)
 	    /* rgb variable  -  color read from data column */
 	    if (!check_for_variable_color(plot, &plot->varcolor[i]) && withborder)
 		term_apply_lp_properties(&plot->lp_properties);
-	    do_arc(x,y, radius, arc_begin, arc_end, style);
+	    do_arc(x,y, radius, arc_begin, arc_end, style, FALSE);
 	    if (withborder) {
 		need_fill_border(&plot->fill_properties);
-		do_arc(x,y, radius, arc_begin, arc_end, 0);
+		do_arc(x,y, radius, arc_begin, arc_end, 0, default_circle.o.circle.wedge);
 	    }
 	}
     }
@@ -5752,7 +5752,7 @@ do_key_sample(
 
 #ifdef EAM_OBJECTS
 	if (this_plot->plot_style == CIRCLES && w > 0) {
-	    do_arc(xl + key_point_offset, yl, key_entry_height/4, 0., 360., style);
+	    do_arc(xl + key_point_offset, yl, key_entry_height/4, 0., 360., style, FALSE);
 	} else if (this_plot->plot_style == ELLIPSES && w > 0) {
 	    t_ellipse *key_ellipse = (t_ellipse *) gp_alloc(sizeof(t_ellipse), 
 	        "cute little ellipse for the key sample");
