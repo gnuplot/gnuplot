@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: svg.trm,v 1.128 2011/11/22 19:54:17 sfeam Exp $
+ * $Id: svg.trm,v 1.128.2.1 2011/12/28 21:30:11 sfeam Exp $
  */
 
 /*------------------------------------------------------------------------------------------------------------------------------------
@@ -1839,6 +1839,7 @@ SVG_load_fontfile(char *fontfile)
 
 #if defined(PIPES)
 	if ( *fontfile == '<' ) {
+	    restrict_popen();
 	    ispipe = TRUE;
 	    ffont = popen(fontfile + 1, "r" );
 	    if ( !ffont )

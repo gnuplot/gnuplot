@@ -1,3 +1,8 @@
+2012-03-16  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/post.trm term/svg.trm:  
+	Do not allow execution of popen() commands during initialization.
+
 2012-03-08  RELEASE 4.6.0
 
 2012-03-04  Ethan A Merritt  <merritt@u.washington.edu>

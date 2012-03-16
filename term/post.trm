@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: post.trm,v 1.266 2011/11/10 05:15:59 sfeam Exp $
+ * $Id: post.trm,v 1.267 2011/11/19 04:24:17 sfeam Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -1340,6 +1340,7 @@ PS_load_fontfile(struct ps_fontfile_def *current_ps_fontfile, TBOOLEAN doload)
 	if (strlen(ext) == 0) {
 #if defined(PIPES)
 	    /* Pipe is given */
+	    restrict_popen();
 	    ispipe = TRUE;
 	    strcpy(cmd,current_ps_fontfile->fontfile_name + 1);
 	    ffont = popen(cmd, "r");
@@ -1351,6 +1352,7 @@ PS_load_fontfile(struct ps_fontfile_def *current_ps_fontfile, TBOOLEAN doload)
 	else if (!strcmp(ext,"ttf") || !strcmp(ext,"otf")) {
 	    /* TrueType */
 #if defined(PIPES)
+	    restrict_popen();
 	    ispipe = TRUE;
 	    envcmd = getenv("GNUPLOT_TTFTOPFA");
 	    if (envcmd != NULL)
@@ -1373,6 +1375,7 @@ PS_load_fontfile(struct ps_fontfile_def *current_ps_fontfile, TBOOLEAN doload)
 	} else if (strcmp(ext,"pfb") == 0) {
 	    /* PFB */
 #if defined(PIPES)
+	    restrict_popen();
 	    ispipe = TRUE;
 	    envcmd = getenv("GNUPLOT_PFBTOPFA");
 	    if (envcmd != NULL)
