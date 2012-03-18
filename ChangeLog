@@ -3,6 +3,8 @@
 	* src/axis.c (gen_tics): Be even more paranoid about precision error in
 	axis range or tic steps.
 
+	* src/set.c: Sanity checking on requested number of minitic intervals.
+
 2012-03-18  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/gplt_x11.c (exec_cmd): Don't feed unknown strings directly

@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.722 2012/03/09 20:23:30 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.723 2012/03/13 18:56:01 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -9155,6 +9155,8 @@ Ffigure_mapcontours
  `r` in any order.  <base> is the base of the log scaling (default is base 10).
  If no axes are specified, the command affects all axes except `r`.
  The command `unset logscale` turns off log scaling for all axes.
+ Note that the ticmarks generated for logscaled axes are not uniformly spaced.
+ See `set xtics`.
 
  Examples:
 

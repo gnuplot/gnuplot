@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.364 2012/03/09 20:23:31 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.365 2012/03/13 18:56:01 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -5098,8 +5098,14 @@ set_tic_prop(AXIS_INDEX axis)
 	    axis_array[axis].minitics = MINI_DEFAULT;
 	    ++c_token;
 	} else {
-	    axis_array[axis].mtic_freq = floor(real_expression());
-	    axis_array[axis].minitics = MINI_USER;
+	    int freq = int_expression();
+	    if (freq > 0 && freq < 101) {
+		axis_array[axis].mtic_freq = freq;
+		axis_array[axis].minitics = MINI_USER;
+	    } else {
+		axis_array[axis].minitics = MINI_DEFAULT;
+		int_warn(c_token-1,"Expecting number of intervals");
+	    }
 	}
     }
     if (almost_equals(c_token, nocmd)) {	/* NOMINI */
