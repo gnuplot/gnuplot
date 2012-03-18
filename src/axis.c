@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.99 2011/11/26 00:31:15 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.100 2012/03/09 20:23:31 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -938,6 +938,7 @@ gen_tics(AXIS_INDEX axis, tic_callback callback)
 	double internal;	/* in internal co-ords */
 	double user;		/* in user co-ords */
 	double start, step, end;
+	int    nsteps;
 	double lmin = axis_array[axis].min, lmax = axis_array[axis].max;
 	double internal_min, internal_max;	/* to allow for rounding errors */
 	double ministart = 0, ministep = 1, miniend = 1;	/* internal or user - depends on step */
@@ -1095,24 +1096,25 @@ gen_tics(AXIS_INDEX axis, tic_callback callback)
 	    return;
 	}
 
-	/* This protects against infinite loops if the separation between   */
-	/* two ticks is less than the precision of the control variables.   */
-	/* The for(...) loop here must be identical to the true loop below. */
-	/* Furthermore, compiler optimization can muck up this test, so we  */
-	/* tell the compiler that the control variables are volatile.       */
-	if (1) /* (some-test-for-range-and-or-step-size) */ {
-	    vol_previous_tic = start-step;
-	    for (vol_this_tic = start; vol_this_tic <= end; vol_this_tic += step) {
-		if (fabs(vol_this_tic - vol_previous_tic) < (step/4.)) {
-		    step = end - start;
-		    int_warn(NO_CARET, "tick interval too small for machine precision");
-		    break;
-		}
-		vol_previous_tic = vol_this_tic;
+	/* This protects against infinite loops if the separation between 	*/
+	/* two ticks is less than the precision of the control variables. 	*/
+	/* The for(...) loop here must exactly describe the true loop below. 	*/
+	/* Furthermore, compiler optimization can muck up this test, so we	*/
+	/* tell the compiler that the control variables are volatile.     	*/
+	nsteps = 0;
+	vol_previous_tic = start-step;
+	for (vol_this_tic = start; vol_this_tic <= end; vol_this_tic += step) {
+	    if (fabs(vol_this_tic - vol_previous_tic) < (step/4.)) {
+		step = end - start;
+		nsteps = 2;
+		int_warn(NO_CARET, "tick interval too small for machine precision");
+		break;
 	    }
+	    vol_previous_tic = vol_this_tic;
+	    nsteps++;
 	}
 
-	for (tic = start; tic <= end; tic += step) {
+	for (tic = start; nsteps > 0; tic += step, nsteps--) {
 
 	    /* {{{  calc internal and user co-ords */
 	    if (axis == POLAR_AXIS) {

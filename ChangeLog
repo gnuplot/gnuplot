@@ -1,3 +1,8 @@
+2012-03-18  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/axis.c (gen_tics): Be even more paranoid about precision error in
+	axis range or tic steps.
+
 2012-03-18  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/gplt_x11.c (exec_cmd): Don't feed unknown strings directly
