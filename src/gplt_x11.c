@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.212 2012/01/04 18:22:23 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.213 2012/01/19 22:28:35 sfeam Exp $"); }
 #endif
 
 #define X11_POLYLINE 1
@@ -2900,22 +2900,22 @@ exec_cmd(plot_struct *plot, char *command)
 
 		    case PseudoColor:
 			fprintf(stderr, ERROR_NOTICE("PseudoColor"));
-			fprintf(stderr, display_error_text_after);
+			fprintf(stderr, "%s", display_error_text_after);
 			break;
 
 		    case GrayScale:
 			fprintf(stderr, ERROR_NOTICE("GrayScale"));
-			fprintf(stderr, display_error_text_after);
+			fprintf(stderr, "%s", display_error_text_after);
 			break;
 
 		    case StaticColor:
 			fprintf(stderr, ERROR_NOTICE("StaticColor"));
-			fprintf(stderr, display_error_text_after);
+			fprintf(stderr, "%s", display_error_text_after);
 			break;
 
 		    case StaticGray:
 			fprintf(stderr, ERROR_NOTICE("StaticGray"));
-			fprintf(stderr, display_error_text_after);
+			fprintf(stderr, "%s", display_error_text_after);
 			break;
 
 		    case DirectColor:

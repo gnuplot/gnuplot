@@ -1,6 +1,23 @@
+2012-03-18  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/gplt_x11.c (exec_cmd): Don't feed unknown strings directly
+	to *printf.
+
+	* src/plot3d.c (eval_3dplots): Don't mix up enums JUSTIFY and
+	VERT_JUSTIFY.
+
+	* src/plot2d.c (eval_plots): Don't mix up enums JUSTIFY and
+	VERT_JUSTIFY.
+
+	* src/graphics.c (do_plot): Don't mix up enums JUSTIFY and
+	VERT_JUSTIFY.
+
+	* src/color.c (cbtick_callback): Don't mix up enums JUSTIFY and
+	VERT_JUSTIFY.
+
 2012-03-16  Ethan A Merritt  <merritt@u.washington.edu>
 
-	* term/post.trm term/svg.trm:  
+	* term/post.trm term/svg.trm:
 	Do not allow execution of popen() commands during initialization.
 
 2012-03-13  Ethan A Merritt  <merritt@u.washington.edu>
@@ -9,7 +26,7 @@
 	src/term.c src/term_api.h docs/gnuplot.doc:
 	New option "set style circle {no}wedges"
 
-2012-03-13  Michael Reeves  <mgreeves@users.sourceforge.net> 
+2012-03-13  Michael Reeves  <mgreeves@users.sourceforge.net>
 
 	* src/graphics.c: Improved calculation of the margin space needed to
 	hold rotated x and x2 tic labels.
