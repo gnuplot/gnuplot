@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.150 2011/11/26 00:04:31 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.151 2012/03/09 20:23:31 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -1656,6 +1656,7 @@ reset_command()
 	    = axis_defaults[axis].min;
 	axis_array[axis].writeback_max = axis_array[axis].set_max
 	    = axis_defaults[axis].max;
+	axis_array[axis].range_is_reverted = FALSE;
 
 	axis_array[axis].min_constraint = CONSTRAINT_NONE;
 	axis_array[axis].max_constraint = CONSTRAINT_NONE;

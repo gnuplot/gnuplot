@@ -5,6 +5,8 @@
 	* term/canvas.trm:  Push the correction for over-sampling of Pt
 	coordinates down one level so it matches the other graphics item types.
 
+	* src/unset.c:  "reset" must clear range_is_reverted flag for all axes.
+
 2012-03-18  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/axis.c (gen_tics): Be even more paranoid about precision error in
