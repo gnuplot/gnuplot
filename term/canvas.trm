@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: canvas.trm,v 1.56 2011/10/28 23:37:06 sfeam Exp $
+ * $Id: canvas.trm,v 1.57 2011/11/26 00:31:15 sfeam Exp $
  *
  */
 
@@ -462,9 +462,10 @@ CANVAS_graphics()
 	    );
 	fprintf(gpoutfile,
 		"<!--[if IE]><script type=\"text/javascript\" src=\"excanvas.js\"></script><![endif]-->\n"
-		"<script src=\"%scanvastext.js\"></script>\n"
+		"<script src=\"%s%s.js\"></script>\n"
 		"<script src=\"%sgnuplot_common.js\"></script>\n"
 		, CANVAS_scriptdir
+		, (encoding == S_ENC_UTF8) ? "canvasmath" : "canvastext"
 		, CANVAS_scriptdir);
 	if (canvas_dashed)
 	    fprintf(gpoutfile,
@@ -532,8 +533,8 @@ CANVAS_graphics()
 	"function DL  (x,y) {gnuplot.dashstep(x,y);};\n"
 	"function M   (x,y) {if (gnuplot.pattern.length > 0) DS(x,y); else gnuplot.M(x,y);};\n"
 	"function L   (x,y) {if (gnuplot.pattern.length > 0) DL(x,y); else gnuplot.L(x,y);};\n"
-	"function Dot (x,y) {gnuplot.Dot(x,y);};\n"
-	"function Pt  (N,x,y,w) {gnuplot.Pt(N,x,y,w);};\n"
+	"function Dot (x,y) {gnuplot.Dot(x/10.,y/10.);};\n"
+	"function Pt  (N,x,y,w) {gnuplot.Pt(N,x/10.,y/10.,w/10.);};\n"
 	"function R   (x,y,w,h) {gnuplot.R(x,y,w,h);};\n"
 	"function T   (x,y,fontsize,justify,string) {gnuplot.T(x,y,fontsize,justify,string);};\n"
 	"function TR  (x,y,angle,fontsize,justify,string) {gnuplot.TR(x,y,angle,fontsize,justify,string);};\n"
@@ -909,7 +910,7 @@ CANVAS_justify_text(enum JUSTIFY mode)
 TERM_PUBLIC void
 CANVAS_point(unsigned int x, unsigned int y, int number)
 {
-    double width  = CANVAS_ps * 0.6 * CANVASHTIC / CANVAS_OVERSAMPLE;
+    double width  = CANVAS_ps * 0.6 * CANVASHTIC;
     int pt = number % 9;
 
     /* Skip size 0 points;  the alternative would be to draw a Dot instead */
@@ -920,8 +921,8 @@ CANVAS_point(unsigned int x, unsigned int y, int number)
 
     switch (pt) {
     default:
-	fprintf(gpoutfile, "Dot(%.1f,%.1f);\n",
-		x/CANVAS_OVERSAMPLE, (canvas_ymax-y)/CANVAS_OVERSAMPLE);
+	fprintf(gpoutfile, "Dot(%d,%d);\n",
+		x, (canvas_ymax-y));
 	break;
     case 4:
     case 6:
@@ -937,8 +938,8 @@ CANVAS_point(unsigned int x, unsigned int y, int number)
     case 3:
     case 5:
     case 7:
-	fprintf(gpoutfile, "Pt(%d,%.1f,%.1f,%.1f);\n", pt,
-		x/CANVAS_OVERSAMPLE, (canvas_ymax-y)/CANVAS_OVERSAMPLE, width);
+	fprintf(gpoutfile, "Pt(%d,%d,%d,%.1f);\n", pt,
+		x, (canvas_ymax-y), width);
 	break;
     }
 }
