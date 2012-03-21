@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.260 2012/03/09 20:23:31 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.261 2012/03/18 17:30:43 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -472,7 +472,7 @@ get_data(struct curve_points *current_plot)
 
     case LABELPOINTS:
 	/* 3 column data: X Y Label */
-	/* 4th column allows rgb variable */
+	/* 4th column allows rgb variable or pointsize variable */
 	min_cols = 3;
 	max_cols = 4;
 	expect_string( 3 );
@@ -922,9 +922,23 @@ get_data(struct curve_points *current_plot)
 			      v[1], v[1] + v[3], 0.);
 		break;
 
+	    case LABELPOINTS:
+		/* Load the coords just as we would have for a point plot */
+		store2d_point(current_plot, i, v[0], v[1],
+				v[0], v[0], v[1], v[1], v[3]);
+		/* Allocate and fill in a text_label structure to match it */
+		if (current_plot->points[i].type != UNDEFINED) {
+		    struct text_label *tl;
+		    tl = store_label(current_plot->labels, &(current_plot->points[i]), 
+			    i, df_tokens[2], 
+			    current_plot->varcolor ? current_plot->varcolor[i] : 0.0);
+		    tl->lp_properties.p_size = v[3];
+		}
+		i++;
+		break;
+
 	    case POINTSTYLE:
 	    case LINESPOINTS:
-	    case LABELPOINTS:
 		/* These are here only to catch the case where no using spec */
 		/* is given and there are more than 3 columns in the data file */
 		store2d_point(current_plot, i++, v[0], v[1], 
@@ -1584,7 +1598,7 @@ histogram_range_fiddling(struct curve_points *plot)
 
 /* store_label() is called by get_data for each point */
 /* This routine is exported so it can be shared by plot3d */
-void
+struct text_label *
 store_label(
     struct text_label *listhead,
     struct coordinate *cp,
@@ -1677,6 +1691,8 @@ store_label(
     parse_esc(tl->text);
 
     FPRINTF((stderr,"LABELPOINT %f %f \"%s\" \n", tl->place.x, tl->place.y, tl->text));
+
+    return tl;
 }
 
 /* HBB 20010610: mnemonic names for the bits stored in 'uses_axis' */

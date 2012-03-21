@@ -1,5 +1,5 @@
 /*
- * $Id: plot2d.h,v 1.13 2007/08/31 20:03:44 sfeam Exp $
+ * $Id: plot2d.h,v 1.14 2008/03/13 19:53:35 sfeam Exp $
  */
 
 /* GNUPLOT - plot2d.h */
@@ -57,7 +57,7 @@ void cp_extend __PROTO((struct curve_points *cp, int num));
 
 #include "gp_types.h"
 #include "gadgets.h"
-void store_label __PROTO((struct text_label *, struct coordinate *, int i,
-                          char * string, double colorval));
+struct text_label *store_label __PROTO((struct text_label *, struct coordinate *,
+					int i, char * string, double colorval));
 
 #endif /* GNUPLOT_PLOT2D_H */
