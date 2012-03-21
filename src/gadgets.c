@@ -521,6 +521,7 @@ write_label(unsigned int x, unsigned int y, struct text_label *this_label)
 	apply_pm3dcolor(&(this_label->textcolor),term);
 	ignore_enhanced(this_label->noenhanced);
 
+	/* The text itself */
 	get_offsets(this_label, term, &htic, &vtic);
 	if (this_label->rotate && (*term->text_angle) (this_label->rotate)) {
 	    write_multiline(x + htic, y + vtic, this_label->text,
@@ -531,6 +532,8 @@ write_label(unsigned int x, unsigned int y, struct text_label *this_label)
 	    write_multiline(x + htic, y + vtic, this_label->text,
 			    this_label->pos, justify, 0, this_label->font);
 	}
+
+	/* The associated point, if any */
 	/* write_multiline() clips text to on_page; do the same for any point */
 	if (this_label->lp_properties.pointflag && on_page(x,y)) {
 	    term_apply_lp_properties(&this_label->lp_properties);
