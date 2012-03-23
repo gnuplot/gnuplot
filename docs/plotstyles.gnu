@@ -268,7 +268,7 @@ unset cbtics
 unset xtics
 set xrange  [-0.5:4.5]
 set x2range [-0.5:4.5]
-set yrange  [-0.5:3.5] reverse
+set yrange  [3.5:-0.5]
 set x2tics 0,1
 set ytics  0,1
 set palette rgbformula -3,-3,-3
