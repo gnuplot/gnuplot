@@ -1,5 +1,5 @@
 /*
- * $Id: canvasmath.js,v 1.5 2009/03/05 07:01:21 sfeam Exp $
+ * $Id: canvasmath.js,v 1.6 2009/03/24 19:03:38 sfeam Exp $
  */
 // The canvastext.js code was released to the public domain by Jim Studt, 2007.
 // He may keep some sort of up to date copy at http://www.federated.com/~jim/canvastext/
@@ -315,6 +315,7 @@ CanvasTextFunctions.draw = function(ctx,font,size,x,y,str)
     var len = str.length;
     var mag = size / 25.0;
     var composite = 0;
+    var xorig = x;
 
     ctx.save();
     ctx.lineCap = "round";
@@ -323,6 +324,15 @@ CanvasTextFunctions.draw = function(ctx,font,size,x,y,str)
     for ( i = 0; i < len; i++) {
 	var index = str.charAt(i);
 
+	// EAM tab and newline
+	if (index == '	') {
+	    tabstop = 48 * mag;
+	    x = tabstop * Math.ceil(x/tabstop);
+	    continue;
+	} else if (index < ' ') {
+	    x = xorig; y += size;
+	    continue;
+	}
 	// EAM deal with non-ascii characaters
 	if (index > '~')
 	    index = str.charCodeAt(i);
