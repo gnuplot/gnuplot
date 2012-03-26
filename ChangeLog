@@ -1,3 +1,9 @@
+2012-03-26  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/term.c (enhanced_recursion): Revised handling of backslash
+	character in enhanced text processing.
+	Bug #3496517
+
 2012-03-16  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/post.trm term/svg.trm:  

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.225.2.3 2012/02/10 06:52:21 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.225.2.4 2012/02/21 23:50:14 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -2570,15 +2570,11 @@ enhanced_recursion(
 	    /*}}}*/
 
 	case '\\'  :
-	    if (p[1]=='\\' || p[1]=='(' || p[1]==')') {
-		(term->enhanced_open)(fontname, fontsize, base, widthflag, showflag, overprint);
-		(term->enhanced_writec)('\\');
-
-	    /*{{{  The enhanced mode always uses \xyz as an octal character representation
+	    /*{{{  Enhanced mode always uses \xyz as an octal character representation
 		   but each terminal type must give us the actual output format wanted.
 		   pdf.trm wants the raw character code, which is why we use strtol();
 		   most other terminal types want some variant of "\\%o". */
-	    } else if (p[1] >= '0' && p[1] <= '7') {
+	    if (p[1] >= '0' && p[1] <= '7') {
 		char *e, escape[16], octal[4] = {'\0','\0','\0','\0'};
 
 		(term->enhanced_open)(fontname, fontsize, base, widthflag, showflag, overprint);
@@ -2593,8 +2589,14 @@ enhanced_recursion(
 		    (term->enhanced_writec)(*e);
 		}
 		break;
+	    /* This was the original (prior to version 4) enhanced text code specific */
+	    /* to the reserved characters of PostScript.  Some of it was mis-applied  */
+	    /* to other terminal types until fixed in Mar 2012.                       */
 	    } else if (term->flags & TERM_IS_POSTSCRIPT) {
-		if (strchr("^_@&~{}",p[1]) == NULL) {
+		if (p[1]=='\\' || p[1]=='(' || p[1]==')') {
+		    (term->enhanced_open)(fontname, fontsize, base, widthflag, showflag, overprint);
+		    (term->enhanced_writec)('\\');
+		} else if (strchr("^_@&~{}",p[1]) == NULL) {
 		    (term->enhanced_open)(fontname, fontsize, base, widthflag, showflag, overprint);
 		    (term->enhanced_writec)('\\');
 		    (term->enhanced_writec)('\\');
