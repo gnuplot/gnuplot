@@ -1,3 +1,9 @@
+2012-03-26  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/term.c (enhanced_recursion): Revised handling of backslash
+	character in enhanced text processing.
+	Bug #3496517
+
 2012-03-24  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/js/canvasmath.js:  Handle tab and newline.
