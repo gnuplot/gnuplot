@@ -1,5 +1,5 @@
 /*
- * $Id: gp_cairo.c,v 1.59 2011/08/29 18:40:59 sfeam Exp $
+ * $Id: gp_cairo.c,v 1.60 2011/10/13 19:56:55 sfeam Exp $
  */
 
 /* GNUPLOT - gp_cairo.c */
@@ -335,37 +335,36 @@ void gp_cairo_set_textangle(plot_struct *plot, double angle)
 	plot->text_angle =angle;
 }
 
-/* By default, Cairo uses an antialiasing algorithm which
- * will let a seam between polygons which
- * share common edges.
+/* By default, Cairo uses an antialiasing algorithm which may
+ * leave a seam between polygons which share a common edge.
  * Several solutions allow to workaround this behaviour :
  * - don't antialias the polygons
- * Problem : aliased lines are ugly
+ *   Problem : aliased lines are ugly
  * - stroke on each edge
- * Problem : stroking is a very time-consuming operation
+ *   Problem : stroking is a very time-consuming operation
  * - draw without antialiasing to a separate context of a bigger size
- * Problem : not really in the spirit of the rest of the drawing.
- * - dilatate the polygon so that they overlap slightly
- * It is really more time-consuming that it may seem. It implies dealing
- * with each corner, find on which direction to move it (making
- * the difference between the inside and the outside of the polygon).
+ *   Problem : not really in the spirit of the rest of the drawing.
+ * - enlarge the polygons so that they overlap slightly
+ *   Problem : It is really more time-consuming that it may seem.
+ *   It implies inspecting each corner to find which direction to move it
+ *   (making the difference between the inside and the outside of the polygon).
  * - using CAIRO_OPERATOR_SATURATE
- * Problem : for each set of polygons, we have to draw front-to-back
- * on a separate context and then copy back to this one.
- * Time-consuming but probably less than stroking all the edges.
+ *   Problem : for each set of polygons, we have to draw front-to-back
+ *   on a separate context and then copy back to this one.
+ *   Time-consuming but probably less than stroking all the edges.
  *
  * The last solution is implemented if plot->polygons_saturate is set to TRUE
- * Otherwise the default (antialiasing but seams) is used.
+ * Otherwise the default (antialiasing but may have seams) is used.
  */
 
 void gp_cairo_draw_polygon(plot_struct *plot, int n, gpiPoint *corners)
 {
+	/* begin by stroking any open path */
+	gp_cairo_stroke(plot);
+	
 	if (plot->polygons_saturate) {
 		int i;
 		path_item *path;
-	
-		/* begin by stroking any open path */
-		gp_cairo_stroke(plot);
 	
 		path = (path_item*) gp_alloc(sizeof(path_item), "gp_cairo : polygon path");
 	
@@ -910,9 +909,11 @@ void gp_cairo_draw_point(plot_struct *plot, int x1, int y1, int style)
 	cairo_set_line_width(plot->cr, plot->linewidth*plot->oversampling_scale);
 	cairo_set_source_rgb(plot->cr, plot->color.r, plot->color.g, plot->color.b);
 
-	/* always draw a dot. Nothing more is needed for style=-1 */
-	cairo_arc (plot->cr, x, y, 0.5*plot->oversampling_scale, 0, 2*M_PI);
-	cairo_fill (plot->cr);
+	/* Dot	FIXME: because this is drawn as a filled circle, it's quite slow */
+	if (style < 0) {
+		cairo_arc (plot->cr, x, y, 0.5*plot->oversampling_scale, 0, 2*M_PI);
+		cairo_fill (plot->cr);
+	}
 
 	switch (style%13) {
 	case 0: /* plus */
