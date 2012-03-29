@@ -1,3 +1,10 @@
+2012-03-29  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/wxterminal/gp_cairo.c (gp_cairo_draw_polygon): Always stroke
+	previous path before starting a new polygon.  Also, dots are slow.
+	Only draw them if specifically requested.
+	Bug #3512955
+
 2012-03-26  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/term.c (enhanced_recursion): Revised handling of backslash
