@@ -1,5 +1,5 @@
 /*
- * $Id: term_api.h,v 1.97.2.1 2011/11/24 22:59:46 sfeam Exp $
+ * $Id: term_api.h,v 1.97.2.2 2012/02/10 06:52:22 sfeam Exp $
  */
 
 /* GNUPLOT - term_api.h */
@@ -136,7 +136,9 @@ typedef enum termlayer {
 	TERM_LAYER_BEGIN_KEYSAMPLE,
 	TERM_LAYER_END_KEYSAMPLE,
 	TERM_LAYER_RESET_PLOTNO,
-	TERM_LAYER_BEFORE_ZOOM
+	TERM_LAYER_BEFORE_ZOOM,
+	TERM_LAYER_BEGIN_PM3D_MAP,
+	TERM_LAYER_END_PM3D_MAP
 } t_termlayer;
 
 typedef struct fill_style_type {
@@ -339,17 +341,14 @@ extern int linetype_recycle_count;
 extern char *outstr;
 extern FILE *gpoutfile;
 
-/* Output file where the PostScript output goes to.
+/* Output file where postscript terminal output goes to.
    In particular:
 	gppsfile == gpoutfile
 		for 'set term': postscript, pstex
 	gppsfile == PSLATEX_auxfile
-		for 'set term': pslatex
+		for 'set term': pslatex, cairolatex
 	gppsfile == 0
 		for all other terminals
-   It is non-zero for for the family of postscript terminals, thus making
-   this a unique check for postscript output (pm3d has some code optimized
-   for PS, for instance).
 */
 extern FILE *gppsfile;
 extern char *PS_psdir;

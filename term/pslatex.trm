@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: pslatex.trm,v 1.79 2011/10/01 06:35:55 markisch Exp $
+ * $Id: pslatex.trm,v 1.80 2011/11/07 18:40:48 markisch Exp $
  */
 
 /* GNUPLOT - pslatex.trm */
@@ -932,6 +932,16 @@ EPSLATEX_layer(t_termlayer syncpoint)
 	if (epslatex_text_layer == 1 || epslatex_text_layer == 2)
 	    fputs("    }%\n", gpoutfile);
 	epslatex_text_layer = 0;
+	break;
+
+    case TERM_LAYER_BEGIN_PM3D_MAP:
+	if (gppsfile && (gppsfile != gpoutfile))
+	    fprintf(gppsfile, "%%pm3d_map_begin\n");
+	break;
+    
+    case TERM_LAYER_END_PM3D_MAP:
+	if (gppsfile && (gppsfile != gpoutfile))
+	    fprintf(gppsfile, "%%pm3d_map_end\n");
 	break;
 
     default:

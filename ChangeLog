@@ -1,3 +1,12 @@
+2012-03-31  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/pm3d.c term/post.trm term/pslatex.trm src/term_api.h src/color.c:
+	The core code should not write terminal-specific output.  Instead define
+	TERM_LAYER_BEGIN_PM3D_MAP and TERM_LAYER_END_PM3D_MAP and use the 
+	term->layer() mechanism.  This prevents garbage from being written out
+	to the cairolatex terminals in pm3d mode.
+	Bug #3513291
+
 2012-03-29  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/wxterminal/gp_cairo.c (gp_cairo_draw_polygon): Always stroke

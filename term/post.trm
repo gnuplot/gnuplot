@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: post.trm,v 1.267 2011/11/19 04:24:17 sfeam Exp $
+ * $Id: post.trm,v 1.267.2.1 2012/03/16 16:49:35 sfeam Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -3769,6 +3769,14 @@ PS_layer(t_termlayer syncpoint)
 	
 	case TERM_LAYER_AFTER_PLOT:
 		fprintf(gppsfile, "%% End plot #%d\n", plotno);
+		break;
+	
+	case TERM_LAYER_BEGIN_PM3D_MAP:
+		fprintf(gppsfile, "%%pm3d_map_begin\n");
+		break;
+	
+	case TERM_LAYER_END_PM3D_MAP:
+		fprintf(gppsfile, "%%pm3d_map_end\n");
 		break;
 	
 	case TERM_LAYER_RESET:
