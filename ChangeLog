@@ -1,3 +1,8 @@
+2012-04-01  Hannes Nagel  <hannes.nagel@itp.uni-leipzig.de>
+
+	* term/lua.term: Do not create external png images if they are not 
+	going to be used in the tex document.
+
 2012-03-31  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/pm3d.c term/post.trm term/pslatex.trm src/term_api.h src/color.c:

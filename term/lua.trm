@@ -1,6 +1,6 @@
 /*
- *  $Id: lua.trm,v 1.17 2011/09/14 00:31:00 sfeam Exp $
- *  $Date: 2011/09/14 00:31:00 $
+ *  $Id: lua.trm,v 1.17.2.1 2012/02/07 05:09:19 sfeam Exp $
+ *  $Date: 2012/02/07 05:09:19 $
  *  $Rev: 99 $
  */
 
@@ -528,7 +528,7 @@ LUA_get_term_vars(void) {
   lua_pop(L, 1);
 
   lua_getfield(L, luaterm, "external_images");
-  image_extern = lua_toboolean(L ,1);
+  image_extern = lua_toboolean(L ,-1);
   lua_pop(L, 1);
 }
 
