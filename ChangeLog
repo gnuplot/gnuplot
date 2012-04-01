@@ -1,3 +1,8 @@
+2012-04-01  Hannes Nagel  <hannes.nagel@itp.uni-leipzig.de>
+
+	* term/lua.term: Do not create external png images if they are not 
+	going to be used in the tex document.
+
 2012-04-01  Jérôme Lodewyck  <lodewyck@users.sourceforge.net>
 
 	* src/qtterminal/QtGnuplotWidget.h src/qtterminal/QtGnuplotWidget.cpp:
