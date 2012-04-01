@@ -1,3 +1,9 @@
+2012-04-01  Jérôme Lodewyck  <lodewyck@users.sourceforge.net>
+
+	* src/qtterminal/QtGnuplotWidget.h src/qtterminal/QtGnuplotWidget.cpp:
+	Fixes fom Mojca Miklavec: correct page size in the PDF export and always
+	turn on text antialiasing
+
 2012-03-31  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/pm3d.c term/post.trm term/pslatex.trm src/term_api.h src/color.c:

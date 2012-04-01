@@ -47,6 +47,7 @@
 #include "QtGnuplotEvent.h"
 
 #include <QWidget>
+#include <QPainter>
 
 class QtGnuplotScene;
 class QGraphicsView;
@@ -93,6 +94,7 @@ private:
 	void loadSettings();
 	void applySettings();
 	void saveSettings();
+	QPainter::RenderHints renderHints() const;
 
 private:
 	int m_id;

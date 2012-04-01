@@ -169,6 +169,15 @@ void QtGnuplotWidget::resizeEvent(QResizeEvent* event)
 	QWidget::resizeEvent(event);
 }
 
+QPainter::RenderHints QtGnuplotWidget::renderHints() const
+{
+	QPainter::RenderHints hint = QPainter::TextAntialiasing;
+	if (m_antialias)
+		hint |= QPainter::Antialiasing;
+
+	return hint;
+}
+
 /////////////////////////////////////////////////
 // Slots
 
@@ -178,7 +187,7 @@ QPixmap QtGnuplotWidget::createPixmap()
 	pixmap.fill();
 	QPainter painter(&pixmap);
 	painter.translate(0.5, 0.5);
-	painter.setRenderHint(m_antialias ? QPainter::Antialiasing : QPainter::TextAntialiasing);
+	painter.setRenderHints(renderHints());
 	m_scene->render(&painter);
 	painter.end();
 	return pixmap;
@@ -195,7 +204,7 @@ void QtGnuplotWidget::print()
 	if (QPrintDialog(&printer).exec() == QDialog::Accepted)
 	{
 		QPainter painter(&printer);
-		painter.setRenderHint(m_antialias ? QPainter::Antialiasing : QPainter::TextAntialiasing);
+		painter.setRenderHints(renderHints());
 		m_scene->render(&painter);
 	}
 }
@@ -211,8 +220,10 @@ void QtGnuplotWidget::exportToPdf()
 	QPrinter printer;
 	printer.setOutputFormat(QPrinter::PdfFormat);
 	printer.setOutputFileName(fileName);
+	printer.setPaperSize(QSizeF(m_scene->width(), m_scene->height()), QPrinter::Point);
+	printer.setPageMargins(0, 0, 0, 0, QPrinter::Point);
 	QPainter painter(&printer);
-	painter.setRenderHint(m_antialias ? QPainter::Antialiasing : QPainter::TextAntialiasing);
+	painter.setRenderHints(renderHints());
 	m_scene->render(&painter);
 }
 
@@ -266,7 +277,7 @@ void QtGnuplotWidget::loadSettings()
 
 void QtGnuplotWidget::applySettings()
 {
-	m_view->setRenderHints(m_antialias ? QPainter::Antialiasing : QPainter::TextAntialiasing);
+	m_view->setRenderHints(renderHints());
 	m_view->setBackgroundBrush(m_backgroundColor);
 }
 
