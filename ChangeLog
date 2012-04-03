@@ -1,3 +1,10 @@
+2012-04-03  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/axis.c (copy_or_invent_formatstring):  Expansion to many decimal
+	places of precision is not necessary if the axis range spans 0, because
+	in that case exponential notation can be used instead.
+	Bug #3514604
+
 2012-04-01  Hannes Nagel  <hannes.nagel@itp.uni-leipzig.de>
 
 	* term/lua.term: Do not create external png images if they are not 
