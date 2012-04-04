@@ -1,10 +1,11 @@
 #! /bin/sh --
-# $Id: prepare,v 1.10 2004/01/07 14:46:22 lhecking Exp $
+# $Id: prepare,v 1.11 2006/08/28 16:33:02 lhecking Exp $
 # Small shell script to prepare the gnuplot sources when
 # checked out from CVS.
 
 # Note that autoconf 2.52 or newer is required; automake versions older than
 # 1.7 might not work
+# April 2012 - The AC_HEADER_STDBOOL macro is unreliable in autoconf versions < 2.68
 
 # allow importing from the environment (mainly for FreeBSD; use
 # "AUTOCONF=autoconf259 ... ./prepare")
