@@ -7,6 +7,9 @@
 	Try to report the name of the datafile in which an error was found.
 	Handles plot, splot, and stats but not fit.
 
+	* src/wxterminal/wxt_gui.cpp: Support horizontal mouse scroll
+	(needs wxt 2.9.0).
+
 2012-04-08  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/misc.c (iso_alloc iso_extend):  Initialize each 3D coordinate
