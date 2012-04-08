@@ -4,6 +4,15 @@
 	structure on allocation.  Fixes problems found by valgrind and easily
 	seen by running imageNaN.dem.
 
+	* src/datafile.c src/graphics.c demo/imageNaN.dem demo/all.dem:
+	Revised treatment of NaN in the input data stream.
+	1) Mark NaN points as DF_UNDEFINED on input. This is a CHANGE. Ascii NaN
+	was either reported as DF_BAD or ignored altogether depended on context;
+	binary NaN was not handled at all, leading to possible segfaults.
+	2) Treat NaN in non-coordinate data columns in the same way as NaN in a
+	coordinate.
+	Bug #3513138 and various problems visible by running imageNaN.dem
+
 2012-04-03  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/axis.c (copy_or_invent_formatstring):  Expansion to many decimal

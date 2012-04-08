@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.388 2012/03/13 18:56:01 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.389 2012/03/18 17:30:43 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -6743,8 +6743,13 @@ plot_image_or_update_axes(void *plot, TBOOLEAN update_axes)
 		    if (N_corners > 0) {
 			if (pixel_planes == IC_PALETTE) {
 			    if ((points[i_image].type == UNDEFINED)
-			    ||  isnan(points[i_image].CRD_COLOR))
-				goto skip_pixel;
+			    ||  (isnan(points[i_image].CRD_COLOR))) {
+				/* EAM April 2012 Distinguish +/-Inf from NaN */
+			    	FPRINTF((stderr,"undefined pixel value %g\n",
+					points[i_image].CRD_COLOR));
+				if (isnan(points[i_image].CRD_COLOR))
+					goto skip_pixel;
+			    }
 			    set_color( cb2gray(points[i_image].CRD_COLOR) );
 			} else {
 			    int r = cb2gray(points[i_image].CRD_R) * 255. + 0.5;

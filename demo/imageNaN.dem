@@ -1,6 +1,9 @@
 #
 # Explore the effect of image data pixels that are
 # missing/NaN/Inf/garbage/...
+# Test 2D and 3D versions of the generic and
+# terminal-optimized image code.
+# The four tests should all come out the same.
 #
 
 set title "Treatment of missing/undefined/NaN/Inf data"
@@ -37,6 +40,20 @@ pause -1 "Hit return to continue"
 set title "Same thing in failsafe mode (2D)"
 
 plot '-' matrix with image failsafe
+0    5 4 3 1 0
+?    2 2 0 0 1
+Junk 1 2 3 4 5
+NaN  0 0 3 1 0
+Inf  3 2 0 2 3
+-Inf 0 1 2 4 3
+e
+e
+
+pause -1 "Hit return to continue"
+
+set title "Same thing in 3D mode"
+
+splot '-' matrix with image
 0    5 4 3 1 0
 ?    2 2 0 0 1
 Junk 1 2 3 4 5

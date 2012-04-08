@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.214 2011/12/28 19:37:37 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.215 2012/01/22 01:32:47 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -781,8 +781,11 @@ df_tokenise(char *s)
 
 	    df_column[df_no_cols].good = count == 1 ? DF_GOOD : DF_BAD;
 
-	    if (isnan(df_column[df_no_cols].datum))
-		df_column[df_no_cols].good = DF_BAD;
+	    if (isnan(df_column[df_no_cols].datum)) {
+		/* EAM April 2012 */
+		df_column[df_no_cols].good = DF_UNDEFINED;
+		FPRINTF((stderr,"NaN in column %d\n", df_no_cols));
+	    }
 	}
 
 	++df_no_cols;
@@ -1914,7 +1917,11 @@ df_readascii(double v[], int max)
 		    else if ((column <= df_no_cols)
 			     && (df_column[column - 1].good == DF_MISSING))
 			return DF_MISSING;
-		    else {
+		    else if ((column <= df_no_cols)
+			     && (df_column[column - 1].good == DF_UNDEFINED)) {
+			/* EAM April 2012 - return or continue?? */
+			return DF_UNDEFINED;
+		    } else {
 			/* line bad only if user explicitly asked
 			 * for this column */
 			if (df_no_use_specs)
@@ -4693,6 +4700,14 @@ df_readbinary(double v[], int max)
 			line_okay = 0;
 		    break;  /* return or ignore depending on line_okay */
 		}
+
+		if (isnan(v[output])) {
+			/* EAM April 2012 - return, continue, or ignore??? */
+			FPRINTF((stderr,"NaN input value"));
+			if (!df_matrix_file)
+				return DF_UNDEFINED;
+		}
+
 	    }
 
 	    /* Linear translation. */

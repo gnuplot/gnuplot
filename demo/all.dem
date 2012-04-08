@@ -1,5 +1,5 @@
 #
-# $Id: all.dem,v 1.43 2010/09/28 17:14:38 sfeam Exp $
+# $Id: all.dem,v 1.44 2011/10/03 00:17:21 sfeam Exp $
 #
 # Executes ALL demos in this directory, in functionality order.
 #
@@ -220,6 +220,7 @@ print "**********************    Image formats    *********************"
 load "image.dem"
 load "image2.dem"
 load "rgbalpha.dem"
+load "imageNaN.dem"
 reset
 
 print "********************** file stringvar.dem *********************"
