@@ -1,7 +1,7 @@
 New features, changes and fixes since gnuplot version 4.6
 =========================================================
 
-* NEW geographic (DMS) data axes
+* NEW geographic (Degrees Minutes Seconds) data axes
 * NEW set arrow <tag> from <start> length <len> angle <ang>
 * CHANGE Pipe (popen/pclose) emulation within wgnuplot
 * CHANGE Draw the z-axis label at a fixed distance to the left of the z-axis
