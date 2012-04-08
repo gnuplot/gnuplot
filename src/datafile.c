@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.212.2.1 2011/12/28 19:30:43 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.212.2.2 2011/12/28 21:30:11 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -240,7 +240,7 @@ static FILE *data_fp = NULL;
 static TBOOLEAN df_pipe_open = FALSE;
 #endif
 static TBOOLEAN mixed_data_fp = FALSE; /* inline data */
-char *df_filename;      /* name of data file */
+char *df_filename = NULL;      /* name of data file */
 static int df_eof = 0;
 
 static int df_no_tic_specs;     /* ticlabel columns not counted in df_no_use_specs */

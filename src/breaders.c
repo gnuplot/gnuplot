@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: breaders.c,v 1.9 2009/11/02 20:22:10 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: breaders.c,v 1.10 2009/12/09 01:03:26 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - breaders.c */
@@ -54,7 +54,6 @@ static char *RCSid() { return RCSid("$Id: breaders.c,v 1.9 2009/11/02 20:22:10 s
  */
 
 /* Inside datafile.c, but kept hidden. */
-extern char *df_filename;	/* name of data file */
 extern int df_no_bin_cols;	/* cols to read */
 extern df_endianess_type df_bin_file_endianess;
 extern TBOOLEAN df_matrix_file, df_binary_file;

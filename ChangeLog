@@ -2,6 +2,11 @@
 
 	* src/term.c src/svg.trm:  Backport fix for toggling multiplots.
 
+	* src/breaders.c src/datafile.c src/datafile.h src/plot2d.c
+	src/plot3d.c src/stats.c:
+	Try to report the name of the datafile in which an error was found.
+	Handles plot, splot, and stats but not fit.
+
 2012-04-08  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/misc.c (iso_alloc iso_extend):  Initialize each 3D coordinate
