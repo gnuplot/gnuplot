@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: svg.trm,v 1.128.2.1 2011/12/28 21:30:11 sfeam Exp $
+ * $Id: svg.trm,v 1.128.2.2 2012/03/16 16:49:35 sfeam Exp $
  */
 
 /*------------------------------------------------------------------------------------------------------------------------------------
@@ -1545,6 +1545,7 @@ TERM_PUBLIC void
 SVG_layer(t_termlayer syncpoint)
 {
     char *name = NULL;
+    char panel[2] = {'\0','\0'};
 
     /* We must ignore all syncpoints that we don't recognize */
     switch (syncpoint) {
@@ -1557,8 +1558,11 @@ SVG_layer(t_termlayer syncpoint)
 		SVG_GroupClose();
 		++SVG_plotno;
 		name = (SVG_name) ? SVG_name : "gnuplot";
-		fprintf(gpoutfile, "\t<g id=\"%s_plot_%d\" ", name,SVG_plotno);
-		fprintf(gpoutfile, "><title>%s_plot_%d</title>\n", name,SVG_plotno);
+		if (multiplot && SVG_plotno < 26)
+		    panel[0] = 'a' + mp_layout.current_panel;
+
+		fprintf(gpoutfile, "\t<g id=\"%s_plot_%d%s\" ", name,SVG_plotno,panel);
+		fprintf(gpoutfile, "><title>%s_plot_%d%s</title>\n", name,SVG_plotno,panel);
 		SVG_LineType = LT_UNDEFINED; /* Force a new group on next stroke */
 		break;
 
@@ -1583,10 +1587,13 @@ SVG_layer(t_termlayer syncpoint)
 		    SVG_PathClose();
 		    SVG_GroupFilledClose();
 		    name = (SVG_name) ? SVG_name : "gnuplot";
+		    if (multiplot && SVG_plotno < 26)
+			panel[0] = 'a' + mp_layout.current_panel;
+
 		    fprintf(gpoutfile, "\t<g visibility=\"visible\" ");
 		    fprintf(gpoutfile,
-			"onclick=\"gnuplot_svg.toggleVisibility(evt,'%s_plot_%d')\"",
-			name,SVG_plotno);
+			"onclick=\"gnuplot_svg.toggleVisibility(evt,'%s_plot_%d%s')\"",
+			name,SVG_plotno,panel);
 		    fprintf(gpoutfile, ">\n");
 		}
 		break;
