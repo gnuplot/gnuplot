@@ -1,5 +1,7 @@
 2012-04-08  Ethan A Merritt  <merritt@u.washington.edu>
 
+	Backport various minor additions from 4.7
+
 	* src/term.c src/svg.trm:  Backport fix for toggling multiplots.
 
 	* src/breaders.c src/datafile.c src/datafile.h src/plot2d.c
@@ -9,6 +11,9 @@
 
 	* src/wxterminal/wxt_gui.cpp: Support horizontal mouse scroll
 	(needs wxt 2.9.0).
+
+	* src/gplt_x11.c: (Colin Macdonald) Set WM_CLASS to "Gnuplot" for the
+	benefit of various window managers.
 
 2012-04-08  Ethan A Merritt  <merritt@u.washington.edu>
 
