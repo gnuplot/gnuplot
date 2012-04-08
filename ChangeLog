@@ -1,3 +1,9 @@
+2012-04-08  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/misc.c (iso_alloc iso_extend):  Initialize each 3D coordinate
+	structure on allocation.  Fixes problems found by valgrind and easily
+	seen by running imageNaN.dem.
+
 2012-04-03  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/axis.c (copy_or_invent_formatstring):  Expansion to many decimal
