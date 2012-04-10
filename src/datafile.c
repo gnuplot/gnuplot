@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.212.2.2 2011/12/28 21:30:11 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.212.2.3 2012/04/09 04:25:37 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -4692,6 +4692,10 @@ df_readbinary(double v[], int max)
 		    if (df_no_use_specs)
 			line_okay = 0;
 		    break;  /* return or ignore depending on line_okay */
+		}
+		if (isnan(v[output])) {
+		    if (!df_matrix)
+			return DF_UNDEFINED;
 		}
 	    }
 

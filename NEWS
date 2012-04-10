@@ -1,6 +1,7 @@
 New features, changes and fixes since gnuplot version 4.6.0
 ===========================================================
 
+* FIX check for NaN values in binary input
 * FIX backslash handling in enhanced text strings
 * FIX cairo terminals sometimes lost the line segment before a polygon
 * FIX interactive toggle of multiplots in svg
