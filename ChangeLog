@@ -1,3 +1,8 @@
+2012-04-12  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* configure.in term/gd.trm:  We no longer claim to support libgd 
+	versions older thatn 2.0
+
 2012-04-10  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/datafile.c (df_readbinary):  NaN treatment tested the wrong flag

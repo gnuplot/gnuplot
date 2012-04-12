@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: gd.trm,v 1.163 2011/11/09 17:09:49 markisch Exp $
+ * $Id: gd.trm,v 1.164 2011/11/26 13:35:57 markisch Exp $
  * based on gif.trm,v 1.26.2.1 2000/05/01 00:17:20 joze
  */
 
@@ -39,7 +39,7 @@
  * This file is included by ../term.c.
  *
  * This terminal driver supports PNG and JPEG output using
- *  GD library 1.8, 2.0
+ *  GD library version 2
  *
  * To Use:
  *
@@ -94,10 +94,8 @@
  * Ethan Merritt, May 2001: modified gd/gif driver to produce png instead;
  *                          added support for line width and TrueType fonts
  * Shige Takeno, Mar 2011: deal with libgd built to use SJIS rather than UTF-8
+ * Ethan Merritt, Apr 2012: Don't claim to support versions 1.x of libgd
  */
-
-/* Approximate "fillstyle solid FRAC " for indexed palettes */
-#define PASTEL_PALETTE
 
 #define GD_DEFINED_COLORS	96	/* Must not exceed size of pm3d_color_names_tbl[] */
 
@@ -383,7 +381,7 @@ image_do_crop ()
 	}
 	x = x2 - x1 + 1; /* width */
 	y = y2 - y1 + 1; /* height */
-#if (GD2_VERS >= 2)
+
 	if (png_state.TrueColor)
 	    im_crop = gdImageCreateTrueColor(x,y);
 	else
@@ -393,9 +391,6 @@ image_do_crop ()
 	    return;
 	}
 	bg = gdImageColorAllocateAlpha(im_crop,255,255,255,127);
-#else
-	im_crop = gdImageCreate(x,y);
-#endif
 
 	gdImagePaletteCopy(im_crop, png_state.image);
 	if (png_state.flags & PNG_USE_TRANSPARENT) {
@@ -1223,15 +1218,6 @@ from ColorAllocate
 */
 static int png_smooth_color[gdMaxColors];
 
-#ifdef PASTEL_PALETTE
-/*
- * This is only needed in order to maintain png_state_rgb for fillstyle variants,
- * and only for palette-based coloring. It doesn't seem worth the space or effort.
- * EAM November 2004
- */
-static int png_smooth_rgb[gdMaxColors];
-#endif
-
   /* TODO: how to recover from a multiplot with two colour pm3d maps?
      They must use the same palette! Or palette size must be
      restricted to certain number of colours---a new user's option
@@ -1263,11 +1249,6 @@ TERM_PUBLIC int PNG_make_palette (t_sm_palette *palette)
 	    (int)( palette->color[i].r * 255 + 0.5 ), /* r,g,b values for png */
 	    (int)( palette->color[i].g * 255 + 0.5 ), /* terminal are [0;255] */
 	    (int)( palette->color[i].b * 255 + 0.5 ) );
-#ifdef PASTEL_PALETTE
-	png_smooth_rgb[i] = (((int)(palette->color[i].r * 255.) & 0xff) << 16)
-	                  + (((int)(palette->color[i].g * 255.) & 0xff) << 8)
-			  +  ((int)(palette->color[i].b * 255.) & 0xff);
-#endif
 	if (png_smooth_color[i] < 0) { /* this should never happen! take away? */
 	    FPRINTF((stderr,"png_smooth_color[i]<0 cannot happen"));
 	    exit(1);
@@ -1313,9 +1294,6 @@ void PNG_set_color (t_colorspec *colorspec)
 	    png_color = sm_palette.colors - 1;
 	/* map [0;1] to interval [0;png_smooth_colors-1] */
 	png_state.color = png_smooth_color[ png_color ];
-#ifdef PASTEL_PALETTE
-	png_state.rgb = png_smooth_rgb[ png_color ];
-#endif
     }
 }
 
@@ -1433,7 +1411,6 @@ PNG_graphics()
     if (png_state.n_colors < GD_DEFINED_COLORS)
 	png_state.n_colors = GD_DEFINED_COLORS;
 
-#if (GD2_VERS >= 2)
     /* TrueColor images default to a black background; load white instead.	*/
     /* If PNG_USE_TRANSPARENT, store the background alpha in the output file	*/
     /* but apply alpha for the rest of the image internally. Otherwise you	*/
@@ -1454,8 +1431,8 @@ PNG_graphics()
 	}
 	gdImageFill(png_state.image, 1, 1, rgb);
 	gdImageAlphaBlending(png_state.image, 1);
+
     } else
-#endif
 	png_state.image = gdImageCreate(PNG_XMAX, PNG_YMAX);
     if (!png_state.image)
 	int_error(NO_CARET,"libgd: failed to create output image structure");
@@ -1555,7 +1532,7 @@ PNG_vector(unsigned int x, unsigned int y)
     /* All other (not dashed) vectors */
     } else {
 	if (png_state.linewidth == 1) {
-#if (GD2_VERS >= 2) && defined(gdAntiAliased) 
+#if defined(gdAntiAliased) 
 	    gdImageSetThickness(png_state.image,1);
 	    gdImageSetAntiAliased(png_state.image, png_state.color);
 	    gdImageLine(png_state.image, png_state.x, Y(png_state.y),
@@ -1564,13 +1541,13 @@ PNG_vector(unsigned int x, unsigned int y)
 	    gdImageLine(png_state.image, png_state.x, Y(png_state.y),
 			x, Y(y), png_state.color);
 #endif
-#if (GD2_VERS >= 2)
+
 	} else if (png_state.capbutt){
 
 	    gdImageSetThickness(png_state.image,png_state.linewidth);
 	    gdImageLine(png_state.image, png_state.x, Y(png_state.y),
 			x, Y(y), png_state.color);
-#endif
+
 	} else {
 	    /* EAM - Implement linewidth by using a brush */
 	    PNG_init_brush(lw);
@@ -1781,15 +1758,8 @@ PNG_point(unsigned int x, unsigned int y, int number)
 		   0, 360, png_state.color);
 	break;
     case 6: /* circle (disk)         filled */
-#if (GD2_VERS >= 2)
 	gdImageFilledArc(png_state.image, x, y, 2 * PNG_ps, 2 * PNG_ps,
 		   0, 360, png_state.color, gdArc);
-#else
-	gdImageArc(png_state.image, x, y, 2 * PNG_ps, 2 * PNG_ps,
-		   0, 360, png_state.color);
-	gdImageFillToBorder(png_state.image, x, y,
-			    png_state.color, png_state.color);
-#endif
 	break;
     case 7: /* triangle */
 	PNG_Triangle(x, y, 1, gp_gdImagePolygon);
@@ -2135,21 +2105,17 @@ PNG_image (unsigned int M, unsigned int N, coordval * image, gpiPoint * corner, 
     int pixel;
     gdImagePtr im;
 
-#if (GD2_VERS >= 2)
     if (png_state.TrueColor) {
 	im = gdImageCreateTrueColor(M, N);
 	if (!im)
 	    int_error(NO_CARET,"libgd: failed to create image structure");
-    } else
-#endif
-    {
+    } else {
 	im = gdImageCreate(M, N);
 	if (!im)
 	    int_error(NO_CARET,"libgd: failed to create image structure");
 	gdImagePaletteCopy(im, png_state.image);
     }
 
-#if (GD2_VERS >= 2)
     /* Set clipping bound for area into which we will copy */
     xclip1 = GPMIN(corner[2].x, corner[3].x);
     xclip2 = GPMAX(corner[2].x, corner[3].x);
@@ -2157,7 +2123,6 @@ PNG_image (unsigned int M, unsigned int N, coordval * image, gpiPoint * corner, 
     yclip2 = GPMAX(Y(corner[2].y), Y(corner[3].y));
     gdImageGetClip(png_state.image, &x1, &y1, &x2, &y2);
     gdImageSetClip(png_state.image, xclip1, yclip1, xclip2, yclip2);
-#endif
 
     /* Initialize image area with current contents of plot. */
     mout = abs( (int)corner[1].x - (int)corner[0].x );
@@ -2234,10 +2199,8 @@ PNG_image (unsigned int M, unsigned int N, coordval * image, gpiPoint * corner, 
 		);
     gdImageDestroy(im);
 
-#if (GD2_VERS >= 2)
     /* Restore previous clipping, if any */
     gdImageSetClip(png_state.image, x1, y1, x2, y2);
-#endif
 
 }
 
