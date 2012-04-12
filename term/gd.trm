@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: gd.trm,v 1.164 2011/11/26 13:35:57 markisch Exp $
+ * $Id: gd.trm,v 1.165 2012/04/13 00:10:16 sfeam Exp $
  * based on gif.trm,v 1.26.2.1 2000/05/01 00:17:20 joze
  */
 
@@ -1263,38 +1263,50 @@ void PNG_set_color (t_colorspec *colorspec)
 {
     double gray = colorspec->value;
 
-    if (colorspec->type == TC_LT) {
-	int savetype = png_state.linetype;
+    switch (colorspec->type) {
+
+    case TC_LT:
 	PNG_linetype(colorspec->lt);
-	/* Harmless now; will be needed if we ever support dot/dash */
-	png_state.linetype = savetype;
-    }
+	break;
 
-    if (colorspec->type == TC_RGB) {
+    case TC_RGB:
 	png_state.rgb = colorspec->lt;
-	png_state.color = gdImageColorResolve(png_state.image,
-	    (colorspec->lt >> 16) & 0xff,
-	    (colorspec->lt >> 8) & 0xff, 
-	    colorspec->lt & 0xff);
+	if (png_state.TrueColor)
+	    png_state.color = gdImageColorExactAlpha(png_state.image, 
+		(colorspec->lt >> 16) & 0xff,
+		(colorspec->lt >> 8) & 0xff, 
+		 colorspec->lt & 0xff,
+		(colorspec->lt >> 25) & 0x7f);
+	else
+	    png_state.color = gdImageColorResolve(png_state.image,
+		(colorspec->lt >> 16) & 0xff,
+		(colorspec->lt >> 8) & 0xff, 
+		colorspec->lt & 0xff);
+	break;
+
+    case TC_FRAC:
+	if (png_state.TrueColor) {
+	    rgb255_color color;
+	    rgb255maxcolors_from_gray(gray, &color);
+	    png_state.color = gdImageColorResolve(png_state.image,
+		(int)color.r, (int)color.g, (int)color.b);
+	    png_state.rgb = (color.r << 16) + (color.g << 8) +color.b;
+	    return;
+	} else {
+	    int png_color = (gray <= 0) ? 0 : (int)(gray * sm_palette.colors);
+	    if (png_color >= sm_palette.colors)
+		png_color = sm_palette.colors - 1;
+	    /* map [0;1] to interval [0;png_smooth_colors-1] */
+	    png_state.color = png_smooth_color[ png_color ];
+	}
+	break;
+
+    default:
+	break;
     }
 
-    if (colorspec->type != TC_FRAC)
-	return;
-
-    if (png_state.TrueColor) {
-	rgb255_color color;
-	rgb255maxcolors_from_gray(gray, &color);
-	png_state.color = gdImageColorResolve(png_state.image,
-	    (int)color.r, (int)color.g, (int)color.b);
-	png_state.rgb = (color.r << 16) + (color.g << 8) +color.b;
-	return;
-    } else {
-	int png_color = (gray <= 0) ? 0 : (int)(gray * sm_palette.colors);
-	if (png_color >= sm_palette.colors)
-	    png_color = sm_palette.colors - 1;
-	/* map [0;1] to interval [0;png_smooth_colors-1] */
-	png_state.color = png_smooth_color[ png_color ];
-    }
+    /* This is correct, but currently the resulting gdAntiAliased is not used */
+    gdImageSetAntiAliased(png_state.image, png_state.color);
 }
 
 TERM_PUBLIC

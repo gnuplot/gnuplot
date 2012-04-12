@@ -451,9 +451,9 @@ void QtGnuplotScene::setBrushStyle(int style)
 
 	QColor color = m_currentPen.color();
 
-	if ((fillstyle == FS_TRANSPARENT_SOLID) || ((fillstyle == FS_SOLID) && (fillpar == 100)))
+	if (fillstyle == FS_TRANSPARENT_SOLID)
 		color.setAlphaF(double(fillpar)/100.);
-	else if (fillstyle == FS_SOLID)
+	else if (fillstyle == FS_SOLID && (fillpar < 100))
 	{
 		double fact  = double(100 - fillpar)/100.;
 		double factc = 1. - fact;

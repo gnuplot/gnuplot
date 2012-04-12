@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.cpp,v 1.95 2012/01/22 03:59:16 sfeam Exp $
+ * $Id: wxt_gui.cpp,v 1.96 2012/02/29 19:29:26 sfeam Exp $
  */
 
 /* GNUPLOT - wxt_gui.cpp */
@@ -2036,6 +2036,7 @@ void wxt_linetype(int lt)
 
 	temp_command.command = command_color;
 	temp_command.color = gp_cairo_linetype2color( lt );
+	temp_command.double_value = 0.0; // alpha
 	wxt_command_push(temp_command);
 }
 
@@ -2209,6 +2210,7 @@ void wxt_set_color(t_colorspec *colorspec)
 
 	rgb_color rgb1;
 	gp_command temp_command;
+	double alpha = 0.0;
 
 	if (colorspec->type == TC_LT) {
 		rgb1 = gp_cairo_linetype2color(colorspec->lt);
@@ -2218,10 +2220,12 @@ void wxt_set_color(t_colorspec *colorspec)
 		rgb1.r = (double) ((colorspec->lt >> 16) & 0xff)/255;
 		rgb1.g = (double) ((colorspec->lt >> 8) & 0xff)/255;
 		rgb1.b = (double) ((colorspec->lt) & 0xff)/255;
+		alpha = (double) ((colorspec->lt >> 24) & 0xff)/255;
 	} else return;
 
 	temp_command.command = command_color;
 	temp_command.color = rgb1;
+	temp_command.double_value = alpha;
 
 	wxt_command_push(temp_command);
 }
@@ -2642,7 +2646,7 @@ void wxtPanel::wxt_cairo_exec_command(gp_command command)
 
 	switch ( command.command ) {
 	case command_color :
-		gp_cairo_set_color(&plot,command.color);
+		gp_cairo_set_color(&plot,command.color,command.double_value);
 		return;
 	case command_filled_polygon :
 		if (wxt_in_key_sample) {

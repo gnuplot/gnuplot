@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: canvas.trm,v 1.57 2011/11/26 00:31:15 sfeam Exp $
+ * $Id: canvas.trm,v 1.58 2012/03/21 00:23:46 sfeam Exp $
  *
  */
 
@@ -130,6 +130,7 @@ static canvas_imagefile *imagelist = NULL;
 
 static struct {
     int  previous_linewidth;
+    double alpha;		/* alpha channel */
     char color[18];		/* rgb(rrr,ggg,bbb) */
     char previous_color[18];	/* rgb(rrr,ggg,bbb) */
     char previous_fill[24];	/* rgba(rrr,ggg,bbb,aaaa) */
@@ -1005,6 +1006,7 @@ TERM_PUBLIC void
 CANVAS_set_color(t_colorspec *colorspec)
 {
     rgb255_color rgb255;
+    canvas_state.alpha = 0.0;
 
     if (colorspec->type == TC_LT) {
 	CANVAS_linetype(colorspec->lt);
@@ -1013,6 +1015,7 @@ CANVAS_set_color(t_colorspec *colorspec)
 	rgb255.r = (colorspec->lt >> 16) & 0xff;
 	rgb255.g = (colorspec->lt >> 8) & 0xff;
 	rgb255.b = colorspec->lt & 0xff;
+	canvas_state.alpha = (double)((colorspec->lt >> 24) & 0xff)/255.;
     } else if (colorspec->type == TC_FRAC) {
 	rgb255maxcolors_from_gray(colorspec->value, &rgb255);
     } else
@@ -1023,7 +1026,11 @@ CANVAS_set_color(t_colorspec *colorspec)
 
     sprintf(canvas_state.color,"rgb(%03d,%03d,%03d)", rgb255.r, rgb255.g, rgb255.b);
     if (strcmp(canvas_state.color, canvas_state.previous_color)) {
-	fprintf(gpoutfile, "ctx.strokeStyle = \"%s\";\n", canvas_state.color);
+	if (canvas_state.alpha > 0)
+	    fprintf(gpoutfile, "ctx.strokeStyle = \"rgba(%11.11s,%4.2f)\";\n",
+			&canvas_state.color[4], 1.0 - canvas_state.alpha);
+	else
+	    fprintf(gpoutfile, "ctx.strokeStyle = \"%s\";\n", canvas_state.color);
 	strcpy(canvas_state.previous_color, canvas_state.color);
     }
     canvas_line_type = LT_UNDEFINED;
@@ -1061,7 +1068,10 @@ CANVAS_fillstyle(int style)
 			case 4: density = 0.50; break;
 		}	/* fall through */
 	case FS_SOLID:
-		if (density == 1) {
+		if (canvas_state.alpha > 0) {
+		    sprintf(fillcolor,"rgba(%11.11s,%4.2f)%c",
+			&canvas_state.color[4], 1.0 - canvas_state.alpha, '\0');
+		} else if (density == 1) {
 		    strcpy(fillcolor,canvas_state.color);
 		} else {
 		    int r = atoi(&canvas_state.color[4]);

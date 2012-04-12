@@ -10,6 +10,16 @@
 	In order to read and store a 32-bit AlphaRGB value it must be treated
 	as (unsigned int) rather than (int).
 
+	* term/cairo.trm term/canvas.trm term/gd.trm term/svg.trm 
+	src/qtterminal/QtGnuplotScene.cpp src/qtterminal/qt_term.cpp
+	src/wxterminal/gp_cairo.c src/wxterminal/gp_cairo.h
+	src/wxterminal/wxt_gui.cpp demo/rgba_lines.dem:
+	Carry along all 32 bits of an input RGB value, so that the high bits
+	can hold an alpha channel.  In order for existing RGB colors to stay
+	opaque, this means that alpha=0 is opaque and alpha=255 is transparent.
+	>>> Note: this convention is the inverse of the current treatment
+	>>>       of the alpha channel in "with rgbimage".
+
 2012-04-10  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/datafile.c (df_readbinary):  NaN treatment tested the wrong flag

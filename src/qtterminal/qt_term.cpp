@@ -605,8 +605,13 @@ void qt_set_color(t_colorspec* colorspec)
 		color.setRgbF(rgb.r, rgb.g, rgb.b);
 		qt_out << GEPenColor << color;
 	}
-	else if (colorspec->type == TC_RGB)
-		qt_out << GEPenColor << QColor(QRgb(colorspec->lt));
+	else if (colorspec->type == TC_RGB) {
+		QColor color = QRgb(colorspec->lt);
+		int alpha = (colorspec->lt >> 24) & 0xff;
+		if (alpha > 0)
+			color.setAlpha(255-alpha);
+		qt_out << GEPenColor << color;
+	}
 }
 
 void qt_filled_polygon(int n, gpiPoint *corners)

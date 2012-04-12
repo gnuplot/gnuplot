@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: svg.trm,v 1.131 2011/12/10 19:57:47 sfeam Exp $
+ * $Id: svg.trm,v 1.132 2012/03/16 16:48:37 sfeam Exp $
  */
 
 /*------------------------------------------------------------------------------------------------------------------------------------
@@ -115,6 +115,7 @@ static t_sm_palette SVG_palette;
 static unsigned char SVG_red = 0;
 static unsigned char SVG_green = 0;
 static unsigned char SVG_blue = 0;
+static double SVG_alpha = 0.0;
 static unsigned char SVG_color_mode = TC_DEFAULT;
 static char *SVG_linecolor = NULL;
 static char *SVG_name = NULL;
@@ -284,6 +285,10 @@ SVG_PathOpen ()
 	if (SVG_dashed && SVG_LineType % SVG_dashtypes > 0)
 	    fprintf(gpoutfile, "stroke-dasharray='%s' ",
 	 	    SVG_dashpattern[SVG_LineType % SVG_dashtypes]);
+
+	/* RGBA */
+	if (SVG_alpha != 0.0)
+	    fprintf(gpoutfile, "opacity='%4.2f' ", 1.0 - SVG_alpha);
 
 	/* Mark grid lines so that we can toggle them on/off */
 	if (SVG_gridline)
@@ -1457,6 +1462,7 @@ TERM_PUBLIC void
 SVG_set_color(t_colorspec *colorspec)
 {
     rgb255_color rgb255;
+    SVG_alpha = 0.0;
 
     if (colorspec->type == TC_LT) {
 	SVG_linecolor = SVG_pens[SVG_Pen_RealID (colorspec->lt)].color;
@@ -1468,6 +1474,7 @@ SVG_set_color(t_colorspec *colorspec)
 	rgb255.r = colorspec->lt >> 16 & 0xff;
 	rgb255.g = colorspec->lt >> 8 & 0xff;
 	rgb255.b = colorspec->lt & 0xff;
+	SVG_alpha = (double)(colorspec->lt >> 24 & 0xff) / 255.;
     } else
 	return;
 
@@ -1523,7 +1530,9 @@ SVG_filled_polygon(int points, gpiPoint* corners)
 	case FS_SOLID: /* solid fill */
 	case FS_TRANSPARENT_SOLID:
 	    SVG_StyleFillColor();
-	    if (fillpar >= 0 && fillpar < 100)
+	    if (SVG_alpha != 0.0)
+		fprintf(gpoutfile, " fill-opacity='%4.2f' ", 1.0 - SVG_alpha);
+	    else if (fillpar >= 0 && fillpar < 100)
 		fprintf(gpoutfile, " fill-opacity = '%f'", fillpar * 0.01);
 	    break;
 	case FS_PATTERN: /* pattern fill */

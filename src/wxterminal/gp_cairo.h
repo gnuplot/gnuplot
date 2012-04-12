@@ -1,5 +1,5 @@
 /*
- * $Id: gp_cairo.h,v 1.16 2011/03/11 22:20:59 sfeam Exp $
+ * $Id: gp_cairo.h,v 1.17 2011/04/28 13:40:58 markisch Exp $
  */
 
 /* GNUPLOT - gp_cairo.h */
@@ -87,11 +87,18 @@ extern "C" {
 /* oversampling scale */
 #define GP_CAIRO_SCALE 20
 
+typedef struct rgba_color {
+	double r;
+	double g;
+	double b;
+	double alpha;
+} rgba_color;
+
 /* linked list in reverse order used to draw polygons more efficiently */
 typedef struct path_item {
 	gpiPoint *corners;
 	int n;
-	rgb_color color;
+	rgba_color color;
 	struct path_item *previous;
 } path_item;
 
@@ -127,7 +134,7 @@ typedef struct plot_struct {
 	double pointsize;
 	double dashlength;
 	double text_angle;
-	rgb_color color;
+	rgba_color color;
 	rgb_color background;
 
 	/* "polyline" */
@@ -209,7 +216,7 @@ void gp_cairo_draw_fillbox(plot_struct *plot, int x, int y, int width, int heigh
 void gp_cairo_draw_polygon(plot_struct *plot, int n, gpiPoint *corners);
 void gp_cairo_end_polygon(plot_struct *plot);
 void gp_cairo_draw_image(plot_struct *plot, unsigned int * image, int x1, int y1, int x2, int y2, int x3, int y3, int x4, int y4, int M, int N);
-void gp_cairo_set_color(plot_struct *plot, rgb_color color);
+void gp_cairo_set_color(plot_struct *plot, rgb_color color, double alpha);
 void gp_cairo_set_linestyle(plot_struct *plot, int linestyle);
 void gp_cairo_set_linetype(plot_struct *plot, int linetype);
 void gp_cairo_set_pointsize(plot_struct *plot, double pointsize);
