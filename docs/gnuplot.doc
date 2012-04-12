@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.724 2012/03/19 03:07:55 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.725 2012/04/05 22:44:50 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -203,143 +203,24 @@ C
 
 2 New features
 ?new-features
- This section lists major additions since version 4.4.
+ This section lists major additions since version 4.6.
  For a more exhaustive list, see the NEWS file.
-
-3 New syntax
-Ffigure_newsyntax
- This version of gnuplot introduces command iteration and block-structured
- if/else/while/do constructs.  See `if`, `while`, and `do`.
- Simple iteration is possible inside `plot` or `set` commands.
- See `iteration`.  General iteration spanning multiple
- commands is possible using a block construct as shown below.
- For a related new feature, see the `summation` expression type.
- Here is an example using several of these new syntax features:
-       set multiplot layout 2,2
-       fourier(k, x) = sin(3./2*k)/k * 2./3*cos(k*x)
-       do for [power = 0:3] {
-           TERMS = 10**power
-           set title sprintf("%g term Fourier series",TERMS)
-           plot 0.5 + sum [k=1:TERMS] fourier(k,x) notitle 
-       }
-       unset multiplot
-
- It is now possible to select a column of data from a data file by
- matching a label in the first row of the file. See `columnhead`.
- For example
-       plot for [crop in "Oats Peas Beans"] 'data' using "Year":crop
-
-3 Local customization of linetypes
- You can now customize properties (color, linewidth, point type) of the
- default sequence of linetypes used in plotting. See `set linetype`.
- This is normally done in an initialization file, either the system-wide
- file `gnuplotrc` or a private file `~/.gnuplot`. See `initialization`.
-
- Most terminals now allow you to set an explicit background color for the plot.
- The special linetype `bgnd` can be used to draw in this color. See `bgnd`.
-
-3 New plot styles
- See documentation for plot styles `boxplot`, `circles`, `ellipses`, and
- `fillsteps`.
-
-3 Revised polar axes
- Polar plot mode has been reworked to support additional plot styles.
- The polar axes can now be drawn and labeled independent of the x and y
- axes. See `set polar` and `set rrange`.
-
-3 New smoothing algorithms
-=kdensity
-=cumulative
- New smoothing algorithms have been added for both 2- and 3-dimensional plots.
- `smooth kdensity` and `smooth cumulative` can be used with `plot` to draw 
- smooth histograms and cumulative distribution functions.  Several new smoothing
- kernels have been added to `dgrid3d` for use with `splot`.
- See `smooth` `dgrid3d`.
-
-3 New time/date handling
-=time
- Gnuplot now tracks time to millisecond precision. Time formats have been
- modified to match this. The new built-in function time() returns the current
- time of day according to the system clock.
- Example: print the current time to msec precision
-      print strftime("%H:%M:%.3S %d-%b-%Y",time(0.0))
-      18:15:04.253 16-Apr-2011
-3 Statistical summary of data
- The new `stats` command reads data from a file using the same syntax as
- the `plot` or `splot` commands. Rather than drawing a graph, it prints
- out a statistical summary of the data contained in the column[s] requested.
- The resulting statistics  min, max, mean, standard deviation, correlation,
- etc. are also stored in named variables that can be used to compose or modify
- subsequent plotting commands.  See `stats`.
-
-3 New or revised terminal drivers
- The `qt` driver implements an interactive terminal on top of the Qt
- graphics layer.  It can function either as a window in a full-featured
- desktop enviroment or as a full-screen application on a Qt-based 
- embedded device.  The `qt` terminal is new and may still have some
- rough edges.
-
- Two terminal types support web-based interactive display. The HTML5 `canvas`
- terminal was introduced in version 4.4. The `svg` terminal has been extensively
- revised to include support for mousing and better incorporation of svg plots
- from gnuplot into larger svg/xml documents.
-
- The `canvas` terminal driver produces javascript output that draws onto the
- HTML canvas element of a web page.  It can produce either a complete web page
- containing a single plot, or a script that can be embedded as part of an
- externally generated HTML document that perhaps contains multiple plots.
- The embedded plots support browser-side mousing, including zoom/unzoom.
-
- The `lua` terminal driver creates data intended to be further processed
- by a script in the lua programming language.  At this point only one such
- lua script, gnuplot-tikz.lua, is available.  It produces a TeX document
- suitable for use with the latex TikZ package.  Other lua scripts could be
- written to process the gnuplot output for use with other TeX packages,
- or with other non-TeX tools.
-
- `set term tikz` is shorthand for `set term lua tikz`.  As decribed above, it
- uses the generic lua terminal and an external lua script to produce a latex
- document.
-
- The `context` terminal driver creates output to be further processed by
- the ConTeXt TeX macro package. To process its output, you additionally require
- the gnuplot module for ConTeXt available at
-^ <a href="http://ctan.org/pkg/context-gnuplot">
-           http://ctan.org/pkg/context-gnuplot
-^ </a>
-
- The `epscairo` terminal uses the cairo and pango libraries to create
- encapsulated postscript (eps) ouput. It is an alternative to the `postscript`
- terminal driver for those who would like to have their eps files look equal
- to e.g. screen output by the `wxt` terminal.
-
- The `cairolatex` terminal uses the cairo backend of the `pdfcairo` or 
- `epscairo` terminal to produce graphs for inclusion in LaTeX documents. It
- creates pdf or eps graphics but transfers texts to LaTeX in the same way as
- the `epslatex` terminal.
- 
- The `windows` terminal driver has been revised to suport transparency,
- antialiasing, buffered output, multiple graph windows and copying to clipboard
- and saving of graphs as emf files. It has many new options and a revised user
- interface. Additionaly, the code of the text console has been largely rewritten
- to support wrapping of long lines. Help is now provided via HTML.
+3 NOTHING HERE YET
 
 2 Backwards compatibility
 ?backwards compatibility
 ?compatibility
- Gnuplot version 4.0 deprecated certain syntax used in earlier versions, but
+ Gnuplot version 4 deprecated certain syntax used in earlier versions, but
  continued to recognize it.  This is now under the control of a configuration
  option, and can be enabled as follows:
 
        ./configure --enable-backwards-compatibility
 
- Notice: Deprecated syntax items may be removed entirely in some future
- version of gnuplot.
+ Notice: Deprecated syntax items may be removed entirely in version 5. 
 
  One major difference is the introduction of keywords to disambiguate complex
  commands, particularly commands containing string variables. A notable issue
  was the use of bare numbers to specify offsets, line and point types.
- Illustrative examples:
 
  Deprecated:
        set title "Old" 0,-1
@@ -399,8 +280,7 @@ Ffigure_newsyntax
  Since version 4.4 almost all terminals now behave as follows:
 
  `set term <terminal_type> size <XX>, <YY>` controls the size of the output
- file, or "canvas". Please see individual terminal documentation for allowed
- values of the size parameters.  By default, the plot will fill this canvas.
+ file, or "canvas". By default, the plot will fill this canvas.
 
  `set size <XX>, <YY>` scales the plot itself relative to the size of the
  canvas.  Scale values less than 1 will cause the plot to not fill the entire
@@ -546,7 +426,7 @@ Ffigure_newsyntax
  `character`.
 
  `first` places the x, y, or z coordinate in the system defined by the left
- and bottom axes; `second` places it in the system defined by the second axes
+ and bottom axes; `second` places it in the system defined by the x2,y2 axes
  (top and right); `graph` specifies the area within the axes---0,0 is bottom
  left and 1,1 is top right (for splot, 0,0,0 is bottom left of plotting area;
  use negative z to get to the base---see `set xyplane`); `screen`
@@ -562,8 +442,8 @@ Ffigure_newsyntax
  In some cases, the given coordinate is not an absolute position but a
  relative value (e.g., the second position in `set arrow` ... `rto`).  In
  most cases, the given value serves as difference to the first position.
- If the given coordinate resides in a logarithmic axis the value is
- interpreted as factor. For example,
+ If the given coordinate belongs to a log-scaled axis, a relative value is
+ interpreted as multiplier. For example,
 
        set logscale x
        set arrow 100,5 rto 10,2
@@ -580,7 +460,7 @@ Ffigure_newsyntax
  Data files may contain string data consisting of either an arbitrary string
  of printable characters containing no whitespace or an arbitrary string of
  characters, possibly including whitespace, delimited by double quotes.
- The following sample line from a datafile is interpreted to contain four
+ The following line from a datafile is interpreted to contain four
  columns, with a text field in column 3:
 
    1.000 2.000 "Third column is all of this text" 4.00
@@ -2147,6 +2027,26 @@ C ... and restart the table:
  a single record.  A "datablock" is a set of points from consecutive records,
  delimited by blank records.  A line, when referred to in the context of a
  data file, is a subset of a datablock.
+2 iteration
+?iteration
+?iterate
+Ffigure_newsyntax
+ Version 4.6 of gnuplot introduced command iteration and block-structured
+ if/else/while/do constructs.  See `if`, `while`, and `do`.
+ Simple iteration is possible inside `plot` or `set` commands.
+ See `plot for`.  General iteration spanning multiple
+ commands is possible using a block construct as shown below.
+ For a related new feature, see the `summation` expression type.
+ Here is an example using several of these new syntax features:
+       set multiplot layout 2,2
+       fourier(k, x) = sin(3./2*k)/k * 2./3*cos(k*x)
+       do for [power = 0:3] {
+           TERMS = 10**power
+           set title sprintf("%g term Fourier series",TERMS)
+           plot 0.5 + sum [k=1:TERMS] fourier(k,x) notitle 
+       }
+       unset multiplot
+
 2 linetypes, colors, and styles
 ?linetypes
 ?colors
@@ -2813,6 +2713,12 @@ C ... and restart the table:
 
  which will produce xtic labels that look like "03/21".
 
+ Gnuplot tracks time to millisecond precision. Time formats have been
+ modified to match this.
+ Example: print the current time to msec precision
+      print strftime("%H:%M:%.3S %d-%b-%Y",time(0.0))
+      18:15:04.253 16-Apr-2011
+
  See `time_specifiers`.
 1 plotting styles
 ?plotting styles
@@ -3408,7 +3314,7 @@ Ffigure_histclust
  and error estimates in columns 3, 5, 7, ...  This example plots the values
  in columns 2 and 4 as a histogram of clustered boxes (the default style).
  Because we use iteration in the plot command, any number of data columns can
- be handled in a single command. See `iteration`.
+ be handled in a single command. See `plot for`.
 
        set boxwidth 0.9 relative
        set style data histograms
@@ -3516,7 +3422,7 @@ Ffigure_newhist
 ?styles histograms automated
 ?plotting styles histograms automated
  If you want to create a histogram from many columns of data in a single file,
- it is very convenient to use the plot iteration feature.  See `iteration`.
+ it is very convenient to use the plot iteration feature.  See `plot for`.
  For example, to create stacked histograms of the data in columns 3 through 8
 
        set style histogram columnstacked
@@ -4741,13 +4647,10 @@ Ffigure_mapcontours
        v=0
        v=v+1; if (v%2) print "2" ; else if (v%3) print "3"; else print "fred"
  (repeat the last line repeatedly!)
-
- See `reread` for an example of using if and reread together to perform a loop.
-2 iteration
-?iteration
-?iterate
+2 for
+?for
  The `plot`, `splot`, `set` and `unset` commands may optionally contain an
- iteration clause.  This has the effect of executing the basic command 
+ iteration for clause.  This has the effect of executing the basic command 
  multiple times, each time re-evaluating any expressions that make use of the
  iteration control variable.  Iteration of arbitrary command sequences can be
  requested using the `do` command.
@@ -4767,7 +4670,7 @@ Ffigure_mapcontours
 
        set for [i=1:9] for [j=1:9] label i*10+j sprintf("%d",i*10+j) at i,j
 
- See additional documentation for `plot iteration`, `do`.
+ See additional documentation for `iteration`, `do`.
 
 2 load
 ?commands load
@@ -6233,11 +6136,12 @@ Ffigure_mapcontours
        set timefmt "%d/%m/%y %H:%M"
        plot ["1/6/93 12:00":"5/6/93 12:00"] 'timedata.dat'
 
-3 iteration
-?commands plot iteration
-?commands splot iteration
-?plot iteration
-?splot iteration
+3 for loops in plot command
+?commands plot for
+?commands splot for
+?plot for
+?splot for
+?for loops
 =iteration
  If many similar files or functions are to be plotted together, it may be
  convenient to do so by iterating over a shared plot command.
@@ -6587,8 +6491,8 @@ Ffigure_mapcontours
  over again.  In most cases you can use the `refresh` command instead, which
  will redraw the plot using the data previously read in.
 
- Note that `replot` does not work in `multiplot` mode, since it reproduces
- only the last plot rather than the entire screen.
+ Note that in multiplot mode, `replot` can only reproduce the most recent
+ component plot, not the full set.
 
  See also `command-line-editing` for ways to edit the last `plot` (`splot`)
  command.
@@ -6727,7 +6631,7 @@ Ffigure_mapcontours
  when the variable was initially defined.
 =iteration
  The `set` and `unset` commands may optionally contain an iteration clause.
- See `iteration`.
+ See `plot for`.
 
 3 angles
 ?commands set angles
@@ -7069,10 +6973,10 @@ Ffigure_mapcontours
  and bottom front corners is the "front vertical".  (This nomenclature is
  defined solely to allow the reader to figure out the table that follows.)
 
- The borders are encoded in a 12-bit integer: the bottom four bits control the
+ The borders are encoded in a 12-bit integer: the four low bits control the
  border for `plot` and the sides of the base for `splot`; the next four bits
- control the verticals in `splot`; the top four bits control the edges on top
- of the `splot`.  In detail, `<integer>` should be the sum of the appropriate
+ control the verticals in `splot`; the four high bits control the edges on top
+ of an `splot`.  The border settings is thus the sum of the appropriate
  entries from the following table:
 
 @start table - first is interactive cleartext form
@@ -7146,10 +7050,8 @@ Ffigure_mapcontours
 ^</tbody>
 ^</table>
 
- Various bits or combinations of bits may be added together in the command.
-
- The default is 31, which is all four sides for `plot`, and base and z axis
- for `splot`.
+ The default setting is 31, which is all four sides for `plot`, and base and 
+ z axis for `splot`.
 
  In 2D plots the border is normally drawn on top of all plots elements
  (`front`). If you want the border to be drawn behind the plot elements,
@@ -7578,19 +7480,16 @@ Ffigure_mapcontours
  string is used in a data file to denote missing data.  Exactly how this missing
  value will be treated depends on the `using` specifier of the `plot` or `splot`
  command.
-
  Syntax:
        set datafile missing {"<string>"}
        show datafile missing
        unset datafile
-
  Example:
        # Ignore entries containing IEEE NaN ("Not a Number") code
        set datafile missing "NaN"
-
  Example:
        set style data linespoints
-       plot '-'
+       plot '-' title "(a)"
           1 10
           2 20
           3 ?
@@ -7598,21 +7497,21 @@ Ffigure_mapcontours
           5 50
           e
        set datafile missing "?"
-       plot '-'
+       plot '-' title "(b)"
           1 10
           2 20
           3 ?
           4 40
           5 50
           e
-       plot '-' using 1:2
+       plot '-' using 1:2 title "(c)"
           1 10
           2 20
           3 ?
           4 40
           5 50
           e
-       plot '-' using 1:($2)
+       plot '-' using 1:($2) title "(d)"
           1 10
           2 20
           3 ?
@@ -13174,7 +13073,7 @@ Ffigure_mapcontours
 =iteration
  Options set using the `set` command may be returned to their default state by
  the corresponding `unset` command.  The `unset` command may contain an optional
- iteration clause. See `iteration`.
+ iteration clause. See `plot for`.
 
  Examples:
        set xtics mirror rotate by -45 0,10,100

@@ -1,7 +1,10 @@
 2012-04-12  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* configure.in term/gd.trm:  We no longer claim to support libgd 
-	versions older thatn 2.0
+	versions older than 2.0
+
+	* docs/gnuplot.doc:  Clear out the New Features section, which should
+	now cover stuff added since 4.6
 
 2012-04-10  Ethan A Merritt  <merritt@u.washington.edu>
 
