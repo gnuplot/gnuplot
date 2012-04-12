@@ -6,6 +6,10 @@
 	* docs/gnuplot.doc:  Clear out the New Features section, which should
 	now cover stuff added since 4.6
 
+	* src/color.c (set_rgbcolor) src/color.h src/graph3d.c src/hidden3d.c:
+	In order to read and store a 32-bit AlphaRGB value it must be treated
+	as (unsigned int) rather than (int).
+
 2012-04-10  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/datafile.c (df_readbinary):  NaN treatment tested the wrong flag
