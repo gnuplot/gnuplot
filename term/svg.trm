@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: svg.trm,v 1.132 2012/03/16 16:48:37 sfeam Exp $
+ * $Id: svg.trm,v 1.133 2012/04/14 03:59:31 sfeam Exp $
  */
 
 /*------------------------------------------------------------------------------------------------------------------------------------
@@ -1245,10 +1245,12 @@ TERM_PUBLIC void
 SVG_point (unsigned int x, unsigned int y, int number)
 {
     char color_spec[0x40];
-    if (SVG_color_mode == TC_RGB)
+    if (SVG_color_mode == TC_RGB) {
    	sprintf(color_spec, " color='rgb(%3d, %3d, %3d)'",
 		SVG_red, SVG_green, SVG_blue);
-    else if (SVG_color_mode == TC_LT)
+	if (SVG_alpha != 0.0)
+		sprintf(&color_spec[27], " opacity='%4.2f'", 1.0 - SVG_alpha);
+    } else if (SVG_color_mode == TC_LT)
 	sprintf(color_spec, " color='%s'", SVG_linecolor);
     else
 	*color_spec = '\0';
