@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.262 2012/03/09 20:08:44 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.263 2012/04/13 19:30:38 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -523,8 +523,7 @@ place_labels3d(struct text_label *listhead, int layer)
     struct text_label *this_label;
     int x, y;
 
-    if (term->pointsize)
-	(*term->pointsize)(pointsize);
+    term->pointsize(pointsize);
 
     for (this_label = listhead;
 	 this_label != NULL;
@@ -3225,10 +3224,6 @@ key_sample_point_pm3d(
     gray_from = cb2gray(cbmin);
     gray_to = cb2gray(cbmax);
     gray_step = (gray_to - gray_from)/steps;
-#if 0
-    fprintf(stderr,"POINT_pm3D: cbmin=%g  cbmax=%g\n",cbmin, cbmax);
-    fprintf(stderr,"steps=%i gray_from=%g gray_to=%g gray_step=%g\n",steps,gray_from,gray_to,gray_step);
-#endif
     /* Clip to canvas */
     if (term->flags & TERM_CAN_CLIP)
 	clip_area = NULL;

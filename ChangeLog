@@ -5,6 +5,10 @@
 	the final partial line did in fact contain the required }.
 	Bug #3518476
 
+	* src/command.c src/datafile.c src/graph3d.c src/graphics.c
+	src/hidden3d.c src/mouse.c src/util3d.c:
+	Remove dead code.
+
 2012-04-12  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* configure.in term/gd.trm:  We no longer claim to support libgd 

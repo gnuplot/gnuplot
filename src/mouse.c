@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: mouse.c,v 1.135 2012/01/16 01:42:42 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: mouse.c,v 1.136 2012/03/09 20:23:31 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - mouse.c */
@@ -1062,12 +1062,6 @@ builtin_toggle_mouse(struct gp_event_t *ge)
 	if (display_ipc_commands()) {
 	    fprintf(stderr, "turning mouse off.\n");
 	}
-# if 0
-	if (ruler.on) {
-	    ruler.on = FALSE;
-	    (*term->set_ruler) (-1, -1);
-	}
-# endif
     }
 # ifdef OS2
     PM_update_menu_items();
@@ -1878,12 +1872,6 @@ event_motion(struct gp_event_t *ge)
 	    relx = fabs(mouse_x - start_x) / term->h_tic;
 	    rely = fabs(mouse_y - start_y) / term->v_tic;
 
-# if 0
-	    /* threshold: motion should be at least 3 pixels.
-	     * We've to experiment with this. */
-	    if (relx < 3 && rely < 3)
-		return;
-# endif
 	    if (modifier_mask & Mod_Shift) {
 		xyplane.z += (1 + fabs(xyplane.z))
 		    * (mouse_y - start_y) * 2.0 / term->ymax;

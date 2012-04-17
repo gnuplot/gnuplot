@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: util3d.c,v 1.45 2012/01/11 23:40:42 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: util3d.c,v 1.46 2012/03/09 20:08:44 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - util3d.c */
@@ -73,17 +73,6 @@ mat_unit(transform_matrix mat)
 		mat[i][j] = 0.0;
 }
 
-#if 0 /* HBB 990829: unused --> commented out */
-void
-mat_trans(double tx, double ty, double tz, transform_matrix mat)
-{
-    mat_unit(mat);		/* Make it unit matrix. */
-    mat[3][0] = tx;
-    mat[3][1] = ty;
-    mat[3][2] = tz;
-}
-#endif /* commented out */
-
 void
 mat_scale(double sx, double sy, double sz, transform_matrix mat)
 {
@@ -108,24 +97,6 @@ mat_rot_x(double teta, transform_matrix mat)
     mat[2][1] = sin_teta;
     mat[2][2] = cos_teta;
 }
-
-#if 0 /* HBB 990829: unused --> commented out */
-void
-mat_rot_y(double teta, transform_matrix mat)
-{
-    double cos_teta, sin_teta;
-
-    teta *= DEG2RAD;
-    cos_teta = cos(teta);
-    sin_teta = sin(teta);
-
-    mat_unit(mat);		/* Make it unit matrix. */
-    mat[0][0] = cos_teta;
-    mat[0][2] = -sin_teta;
-    mat[2][0] = sin_teta;
-    mat[2][2] = cos_teta;
-}
-#endif /* commented out */
 
 void
 mat_rot_z(double teta, transform_matrix mat)

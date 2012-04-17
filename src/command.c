@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.232 2012/02/25 11:41:19 juhaszp Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.233 2012/03/09 20:23:31 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -375,11 +375,6 @@ do_line()
 	return (0);
     }
 
-#if 0
-    /* EAM May 2011 */
-    /* Resetting here prevents handling "else" on a separate line */
-    if_condition = TRUE;
-#endif
     if_depth = 0;
     num_tokens = scanner(&gp_input_line, &gp_input_line_len);
 

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.389 2012/03/18 17:30:43 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.390 2012/04/08 17:45:40 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -1408,8 +1408,7 @@ place_labels(struct text_label *listhead, int layer, TBOOLEAN clip)
     struct text_label *this_label;
     int x, y;
 
-    if (term->pointsize)
-	(*term->pointsize)(pointsize);
+    term->pointsize(pointsize);
 
     for (this_label = listhead; this_label != NULL; this_label = this_label->next) {
 

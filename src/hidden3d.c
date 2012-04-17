@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.84 2012/01/04 05:16:49 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.85 2012/04/13 19:30:38 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - hidden3d.c */
@@ -1726,10 +1726,6 @@ draw_edge(p_edge e, p_vertex v1, p_vertex v2)
 	lptemp.pm3d_color = color;
 	if (arrow)
 	    lptemp.p_type = e->style;
-#if 0 /* No longer correct; handled by load_linetype() above */
-	else
-	    lptemp.l_type = e->style;
-#endif
     }
 
     draw3d_line_unconditional(v1, v2, &lptemp, color);

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.216 2012/04/08 17:45:40 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.217 2012/04/10 16:49:44 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -2292,10 +2292,6 @@ f_timecolumn(union argument *arg)
     AXIS_INDEX whichaxis;
     struct tm tm;
     double usec = 0.0;
-#if 0
-    int spec;
-    int limit = (df_no_use_specs ? df_no_use_specs : MAXDATACOLS);
-#endif
 
     (void) arg;                 /* avoid -Wunused warning */
     (void) pop(&a);
@@ -2304,19 +2300,6 @@ f_timecolumn(union argument *arg)
     if (!evaluate_inside_using)
 	int_error(c_token-1, "timecolumn() called from invalid context");
 
-#if 0
-    /* try to match datafile column with spec field number */
-    whichaxis = FIRST_X_AXIS;
-    for (spec = 0; spec<limit; spec++)
-	if(use_spec[spec].column == column) {
-	    /* Found a 'using' specifier whose (default) column number
-	     * is the same as the column being referred to here.  So
-	     * assume this spec's output axis is the one that we want
-	     * to use the timefmt of. */
-	    whichaxis = df_axis[spec];
-	    break;
-	}
-#endif
     whichaxis = df_axis[current_using_spec];
 
     if (column < 1
