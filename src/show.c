@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.266 2012/03/02 19:52:14 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.267 2012/03/13 18:56:01 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -393,21 +393,9 @@ show_command()
     case S_VIEW:
 	show_view();
 	break;
-#ifdef BACKWARDS_COMPATIBLE
-    case S_DATA:
-	/* HBB 20010525: re-implement old 'show data style' command */
-	/* FIXME: 'show function style' is gone completely */
-	if (almost_equals(c_token, "st$yle")) {
-	    show_styles("Data", data_style);
-	    c_token++;
-	} else
-	    error_message = "keyword 'style' expected after 'show data'";
-	break;
-#else
     case S_DATA:
 	error_message = "keyword 'data' deprecated, use 'show style data'";
 	break;
-#endif
     case S_STYLE:
 	show_style();
 	break;
@@ -595,38 +583,6 @@ show_command()
     case S_Y2MTICS:
 	show_tics(FALSE, FALSE, FALSE, FALSE, TRUE, FALSE);
 	break;
-
-#ifdef BACKWARDS_COMPATIBLE
-	/* HBB 20010522: avoid triggering the 'default' parse error
-	 * message for these commands --- they don't really exist, and
-	 * shouldn't cause that message to appear */
-    case S_NOMX2TICS:
-    case S_NOMXTICS:
-    case S_NOMY2TICS:
-    case S_NOMYTICS:
-    case S_NOMZTICS:
-    case S_NOCBTICS:
-    case S_NOMCBTICS:
-    case S_NOCBDTICS:
-    case S_NOCBMTICS:
-    case S_NOX2DTICS:
-    case S_NOX2MTICS:
-    case S_NOX2TICS:
-    case S_NOXDTICS:
-    case S_NOXMTICS:
-    case S_NOXTICS:
-    case S_NOY2DTICS:
-    case S_NOY2MTICS:
-    case S_NOY2TICS:
-    case S_NOYDTICS:
-    case S_NOYMTICS:
-    case S_NOYTICS:
-    case S_NOZDTICS:
-    case S_NOZMTICS:
-    case S_NOZTICS:
-	error_message = "'show' does not accept the 'no...' type of 'set' options";
-	break;
-#endif /* BACKWARDS_COMPATIBLE */
 
     case S_MULTIPLOT:
 	fprintf(stderr,"multiplot mode is %s\n", multiplot ? "on" : "off");

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.365 2012/03/13 18:56:01 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.366 2012/03/19 03:07:55 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -177,63 +177,13 @@ static void parse_histogramstyle __PROTO((histogram_style *hs,
 static struct position default_position
 	= {first_axes, first_axes, first_axes, 0., 0., 0.};
 
-#ifdef BACKWARDS_COMPATIBLE
-static void set_nolinestyle __PROTO((void));
-static char *fill_numbers_into_string __PROTO((char *pattern));
-#endif
-
 /******** The 'set' command ********/
 void
 set_command()
 {
     c_token++;
 
-#ifdef BACKWARDS_COMPATIBLE
-
-    /* retain backwards compatibility to the old syntax for now
-     * Oh, such ugliness ...
-     */
-
-    if (almost_equals(c_token,"da$ta")) {
-	if (interactive)
-	    int_warn(c_token, "deprecated syntax, use \"set style data\"");
-	if (!almost_equals(++c_token,"s$tyle"))
-	    int_error(c_token,"expecting keyword 'style'");
-	else
-	    data_style = get_style();
-    } else if (almost_equals(c_token,"fu$nction")) {
-	if (interactive)
-	    int_warn(c_token, "deprecated syntax, use \"set style function\"");
-	if (!almost_equals(++c_token,"s$tyle"))
-	    int_error(c_token,"expecting keyword 'style'");
-	else {
-	    enum PLOT_STYLE temp_style = get_style();
-
-	    if (temp_style & PLOT_STYLE_HAS_ERRORBAR)
-		int_error(c_token, "style not usable for function plots, left unchanged");
-	    else if (temp_style == HISTOGRAMS)
-		int_error(c_token, "style not usable for function plots, left unchanged");
-	    else
-		func_style = temp_style;
-	}
-    } else if (almost_equals(c_token,"noli$nestyle") || equals(c_token, "nols" )) {
-	c_token++;
-	set_nolinestyle();
-    } else if (gp_input_line[token[c_token].start_index] == 'n' &&
-	       gp_input_line[token[c_token].start_index+1] == 'o') {
-	if (interactive)
-	    int_warn(c_token, "deprecated syntax, use \"unset\"");
-	token[c_token].start_index += 2;
-	token[c_token].length -= 2;
-	c_token--;
-	unset_command();
-    } else if (almost_equals(c_token,"miss$ing")) {
-	if (interactive)
-	    int_warn(c_token, "deprecated syntax, use \"set datafile missing\"");
-	set_missing();
-    } else {
-
-#else	/* Milder form of backwards compatibility */
+    /* Mild form of backwards compatibility */
 	/* Allow "set no{foo}" rather than "unset foo" */ 
     if (gp_input_line[token[c_token].start_index] == 'n' &&
 	       gp_input_line[token[c_token].start_index+1] == 'o') {
@@ -244,8 +194,6 @@ set_command()
 	c_token--;
 	unset_command();
     } else {
-
-#endif /* BACKWARDS_COMPATIBLE */
 
 	int save_token;
 	set_iterator = check_for_iteration();
@@ -1795,15 +1743,6 @@ set_key()
     c_token++;
     key->visible = TRUE;
 
-#ifdef BACKWARDS_COMPATIBLE
-    if (END_OF_COMMAND) {
-	free(key->font);
-	reset_key();
-	if (interactive)
-	    int_warn(c_token, "deprecated syntax, use \"set key default\"");
-    }
-#endif
-
     while (!END_OF_COMMAND) {
 	switch(lookup_table(&set_key_tbl[0],c_token)) {
 	case S_KEY_ON:
@@ -1891,12 +1830,6 @@ set_key()
 	    reg_set = TRUE;
 	    break;
 	case S_KEY_OUTSIDE:
-#ifdef BACKWARDS_COMPATIBLE
-	    if (!hpos_set)
-		key->hpos = RIGHT;
-	    if (!sdir_set)
-		key->stack_dir = GPKEY_VERTICAL;
-#endif
 	    if (reg_set)
 		int_warn(c_token, reg_warn);
 	    key->region = GPKEY_AUTO_EXTERIOR_LRTBC;
@@ -2070,10 +2003,6 @@ set_key()
 
 	case S_KEY_MANUAL:
 	    c_token++;
-#ifdef BACKWARDS_COMPATIBLE
-	case S_KEY_INVALID:
-	default:
-#endif
 	    if (reg_set)
 		int_warn(c_token, reg_warn);
 	    get_position(&key->user_pos);
@@ -2081,12 +2010,11 @@ set_key()
 	    reg_set = TRUE;
 	    c_token--;  /* will be incremented again soon */
 	    break;
-#ifndef BACKWARDS_COMPATIBLE
+
 	case S_KEY_INVALID:
 	default:
 	    int_error(c_token, "unknown key option");
 	    break;
-#endif
 	}
 	c_token++;
     }
@@ -2203,16 +2131,6 @@ set_label()
 	    this_label->text = text;
 	}
 
-#ifdef BACKWARDS_COMPATIBLE
-	/* HBB 20001021: new functionality. If next token is a ','
-	 * treat it as a numeric expression whose value is to be
-	 * sprintf()ed into the label string (which contains an
-	 * appropriate %f format string) */
-	/* EAM Oct 2004 - this is superseded by general string variable
-	 * handling, but left in for backward compatibility */
-	if (!END_OF_COMMAND && equals(c_token, ","))
-	    this_label->text = fill_numbers_into_string(this_label->text);
-#endif
     }
 
     /* Now parse the label format and style options */
@@ -4244,16 +4162,6 @@ set_terminal()
 	return;
     }
 
-#ifdef BACKWARDS_COMPATIBLE
-    if (equals(c_token,"table")) {
-	set_table();
-	if (interactive)
-	    int_warn(NO_CARET,"The command 'set term table' is deprecated.\n\t Please use 'set table \"outfile\"' instead.\n");
-	return;
-    } else
-	table_mode = FALSE;
-#endif
-
     /* `set term push' */
     if (equals(c_token,"push")) {
 	push_terminal(interactive);
@@ -4670,18 +4578,7 @@ set_timestamp()
 	    continue;
 	}
 
-#ifdef BACKWARDS_COMPATIBLE
-	/* The "font" keyword is new (v4.1), for backward compatibility we don't enforce it */
-	if (!END_OF_COMMAND && ((new = try_to_get_string()))) {
-	    free(timelabel.font);
-	    timelabel.font = new;
-	    continue;
-	}
-	/* The "offset" keyword is new (v4.1); for backward compatibility we don't enforce it */
-	get_position_default(&(timelabel.offset),character);
-#else
 	int_error(c_token,"unrecognized option");
-#endif
 
     }
 
@@ -4857,9 +4754,7 @@ set_allzeroaxis()
 {
     set_zeroaxis(FIRST_X_AXIS);
     axis_array[FIRST_Y_AXIS].zeroaxis = axis_array[FIRST_X_AXIS].zeroaxis;
-#ifndef BACKWARDS_COMPATIBLE
     axis_array[FIRST_Z_AXIS].zeroaxis = axis_array[FIRST_X_AXIS].zeroaxis;
-#endif
 }
 
 /*********** Support functions for set_command ***********/
@@ -5138,12 +5033,6 @@ set_xyzlabel(text_label *label)
 	    free(label->text);
 	    label->text = text;
 	}
-#ifdef BACKWARDS_COMPATIBLE
-	if (isanumber(c_token) || equals(c_token, "-")) {
-	    /* Parse offset with missing keyword "set xlabel 'foo' 1,2 "*/
-	    get_position_default(&(label->offset),character);
-	}
-#endif
     }
 
     parse_label_options(label);
@@ -5500,102 +5389,6 @@ looks_like_numeric(char *format)
 
     return (*format == 'f' || *format == 'g' || *format == 'e');
 }
-
-#ifdef BACKWARDS_COMPATIBLE
-/*
- * Backwards compatibility ...
- */
-static void set_nolinestyle()
-{
-    struct linestyle_def *this, *prev;
-    int tag;
-
-    if (END_OF_COMMAND) {
-	/* delete all linestyles */
-	while (first_linestyle != NULL)
-	    delete_linestyle(&first_linestyle, NULL, first_linestyle);
-    } else {
-	/* get tag */
-	tag = int_expression();
-	if (!END_OF_COMMAND)
-	    int_error(c_token, "extraneous arguments to set nolinestyle");
-	for (this = first_linestyle, prev = NULL;
-	     this != NULL;
-	     prev = this, this = this->next) {
-	    if (this->tag == tag) {
-		delete_linestyle(&first_linestyle, prev, this);
-		return;         /* exit, our job is done */
-	    }
-	}
-	int_error(c_token, "linestyle not found");
-    }
-}
-#endif
-
-#ifdef BACKWARDS_COMPATIBLE
-/* HBB 20001021: new function: make label texts decoratable with numbers */
-static char *
-fill_numbers_into_string(char *pattern)
-{
-    size_t pattern_length = strlen(pattern) + 1;
-    size_t newlen = pattern_length;
-    char *output = gp_alloc(newlen, "fill_numbers output buffer");
-    size_t output_end = 0;
-
-    do {			/* loop over string/value pairs */
-	double value;
-
-	if (isstring(++c_token)) {
-	    free(output);
-	    free(pattern);
-	    int_error(c_token, "constant expression expected");
-	}
-
-	/* assume it's a numeric expression, concatenate it to output
-	 * string: parse value, enlarge output buffer, and gprintf()
-	 * it. */
-	value = real_expression();
-	newlen += pattern_length + 30;
-	output = gp_realloc(output, newlen, "fill_numbers next number");
-	gprintf(output + output_end, newlen - output_end,
-		pattern, 1.0, value);
-	output_end += strlen(output + output_end);
-
-	/* allow a string to follow, after another comma: */
-	if (END_OF_COMMAND || !equals(c_token, ",")) {
-	    /* no comma followed the number --> we're done. Jump out
-	     * directly, as falling out of the while loop means
-	     * something slightly different. */
-	    free(pattern);
-	    return output;
-	}
-	c_token++;
-
-	if (!END_OF_COMMAND && isstring(c_token)) {
-	    size_t length = token_len(c_token);
-
-	    if (length >= pattern_length)
-		pattern = gp_realloc(pattern, pattern_length = length,
-				     "fill_numbers resize pattern");
-	    quote_str(pattern, c_token, length);
-	    c_token++;
-	} else {
-	    free(pattern);
-	    free(output);
-	    int_error(c_token, "string expected");
-	} /* if (string after comma) */
-    } while (!END_OF_COMMAND && equals(c_token, ","));
-
-    /* came out here --> the last element was a string, not a number.
-     * that means that there is a string in pattern which was not yet
-     * copied to 'output' */
-    output = gp_realloc(output, newlen += pattern_length,
-			"fill_numbers closing");
-    strcpy(output + output_end, pattern);
-    free(pattern);
-    return output;
-}
-#endif
 
 /*
  * new_text_label() allocates and initializes a text_label structure.

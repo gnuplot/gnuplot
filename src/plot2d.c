@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.261 2012/03/18 17:30:43 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.262 2012/03/21 00:22:25 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -2254,16 +2254,6 @@ eval_plots()
 
 		lp_parse(&this_plot->lp_properties, TRUE,
 			 this_plot->plot_style & PLOT_STYLE_HAS_POINT);
-
-#ifdef BACKWARDS_COMPATIBLE
-		/* allow old-style syntax - ignore case lt 3 4 for example */
-		if (!END_OF_COMMAND && isanumber(c_token)) {
-		    this_plot->lp_properties.l_type =
-			this_plot->lp_properties.p_type = int_expression() - 1;
-		    if (isanumber(c_token))
-			this_plot->lp_properties.p_type = int_expression() - 1;
-		}
-#endif /* BACKWARDS_COMPATIBLE */
 
 	    }
 

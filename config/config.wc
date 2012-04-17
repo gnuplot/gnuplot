@@ -67,6 +67,3 @@
 #define HAVE_VFPRINTF           1
 
 
-/* Define to enable parsing of deprecated syntax */
-#define BACKWARDS_COMPATIBLE 1
-

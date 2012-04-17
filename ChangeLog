@@ -9,6 +9,13 @@
 	src/hidden3d.c src/mouse.c src/util3d.c:
 	Remove dead code.
 
+	* config/config.nt config/config.os2 config/config.oww config/config.mgw
+	config/config.cyg config/config.dj2 config/config.wc src/parse.c
+	src/plot2d.c src/plot3d.c src/show.c src/eval.c src/set.c:
+	Remove the --enable-backwards-compatibility configuration option.
+	The deprecation warning has been in the documentation since version 4.0
+	and it wasn't working in recent versions anyhow.
+
 2012-04-12  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* configure.in term/gd.trm:  We no longer claim to support libgd 

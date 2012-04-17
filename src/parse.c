@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: parse.c,v 1.65 2011/09/07 18:42:37 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: parse.c,v 1.66 2011/09/29 18:39:01 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - parse.c */
@@ -451,18 +451,6 @@ parse_primary_expression()
 	    num_params.type = INTGR;
 
 	    if (whichfunc) {
-#ifdef BACKWARDS_COMPATIBLE
-		/* Deprecated syntax:   if (defined(foo)) ...  */
-		/* New syntax:          if (exists("foo")) ... */
-		if (strcmp(ft[whichfunc].f_name,"defined")==0) {
-		    struct udvt_entry *udv = add_udv(c_token+2);
-		    union argument *foo = add_action(PUSHC);
-		    foo->v_arg.type = INTGR;
-		    foo->v_arg.v.int_val = udv->udv_undef ? 0 : 1;
-		    c_token += 4;  /* skip past "defined ( <foo> ) " */
-		    return;
-		}
-#endif
 		c_token += 2;	/* skip fnc name and '(' */
 		parse_expression(); /* parse fnc argument */
 		num_params.v.int_val = 1;

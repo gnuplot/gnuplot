@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: eval.c,v 1.98 2011/11/26 13:37:30 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: eval.c,v 1.99 2012/01/17 19:16:53 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - eval.c */
@@ -169,9 +169,6 @@ const struct ft_entry GPFAR ft[] =
     {"rand",  f_rand},
     {"floor",  f_floor},
     {"ceil",  f_ceil},
-#ifdef BACKWARDS_COMPATIBLE
-    {"defined",  f_exists},       /* deprecated syntax defined(foo) */
-#endif
 
     {"norm",  f_normal},	/* XXX-JG */
     {"inverf",  f_inverse_erf},	/* XXX-JG */

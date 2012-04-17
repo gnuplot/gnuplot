@@ -5,9 +5,6 @@
  */
 
 
-/* Define to allow use of deprecated syntax and terminal behaviour. */
-#define BACKWARDS_COMPATIBLE 1
-
 /* Define if you want to support files in binary format. */
 #define BINARY_DATA_FILE 1
 

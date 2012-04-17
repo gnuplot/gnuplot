@@ -5,9 +5,6 @@
  */
 
 
-/* Define to allow use of deprecated syntax and terminal behaviour. */
-/* #undef BACKWARDS_COMPATIBLE */
-
 /* Define if you want to use the CGI terminal under SCO. */
 /* #undef CGI */
 

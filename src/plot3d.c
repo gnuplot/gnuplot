@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.194 2012/03/09 20:23:31 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.195 2012/03/18 17:30:43 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -1452,17 +1452,9 @@ eval_3dplots()
 
 		    if (almost_equals(c_token,"col$umnheader")) {
 			df_set_key_title_columnhead((struct curve_points *)this_plot);
-		    } else 
+		    }
 
-#ifdef BACKWARDS_COMPATIBLE
-		    /* Annoying backwards-compatibility hack - deprecate! */
-		    if (isanumber(c_token)) {
-			c_token--;
-			df_set_key_title_columnhead((struct curve_points *)this_plot);
-		    } else
-#endif
-
-		    if (!(this_plot->title = try_to_get_string()))
+		    else if (!(this_plot->title = try_to_get_string()))
 			int_error(c_token, "expecting \"title\" for plot");
 		    set_title = TRUE;
 		    continue;
@@ -1675,18 +1667,6 @@ eval_3dplots()
 		    else
 			this_plot->hidden3d_top_linetype = line_num;
 		}
-
-#ifdef BACKWARDS_COMPATIBLE
-		/* allow old-style syntax - ignore case lt 3 4 for example */
-		if (!END_OF_COMMAND && isanumber(c_token)) {
-		    this_plot->lp_properties.l_type =
-			this_plot->lp_properties.p_type = int_expression() - 1;
-
-		    if (isanumber(c_token))
-			this_plot->lp_properties.p_type = int_expression() - 1;
-		}
-#endif
-
 	    }
 
 	    /* Some low-level routines expect to find the pointflag attribute */

@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot on Unix.
 dnl
-dnl $Id: configure.in,v 1.309 2012/03/09 18:26:39 sfeam Exp $
+dnl $Id: configure.in,v 1.310 2012/04/13 00:10:16 sfeam Exp $
 dnl
 dnl this is actually major.minor ...
 dnl note that for a non-beta release, we need to disable DEVELOPMENT_RELEASE
@@ -1089,14 +1089,6 @@ fi
 
 AM_CONDITIONAL(BUILD_GPCAIRO, test "${build_gpcairo}" = yes)
 
-dnl Enable parsing of deprecated syntax
-AC_ARG_ENABLE(backwards-compatibility,dnl
-[  --enable-backwards-compatibility       enable deprecated syntax ],
-  [if test "$enableval" = yes; then
-    AC_DEFINE(BACKWARDS_COMPATIBLE,1,
-               [ Define to allow use of deprecated syntax and terminal behaviour. ])
-  fi])
-
 dnl Enable subsystem to generate statistical summary of file contents
 AC_ARG_ENABLE(stats,dnl
 [  --enable-stats          Include command to generate statistical summary of data],
@@ -1341,20 +1333,14 @@ fi
 
 if test "$is_msdos" = yes; then
   AC_MSG_RESULT([  svga terminal (MSDOS/djgpp): yes])
-else
-  AC_MSG_RESULT([  svga terminal (MSDOS/djgpp): no])
 fi
 
 if test "$build_src_beos_subdir" = yes; then
   AC_MSG_RESULT([  be terminal (BeOS): yes])
-else
-  AC_MSG_RESULT([  be terminal (BeOS): no])
 fi
 
 if test "$is_next" = yes; then
   AC_MSG_RESULT([  next terminal: yes])
-else
-  AC_MSG_RESULT([  next terminal: no])
 fi
 
 if test "$ac_cv_lib_aquaterm_aqtInit" = yes; then
@@ -1389,9 +1375,8 @@ fi
 
 AC_MSG_RESULT([])
 AC_MSG_RESULT([  Additional terminals are availaible in platform-specific makefiles:])
-AC_MSG_RESULT([   cgi (makefile.unx), pm (makefile.os2),])
-AC_MSG_RESULT([   sun (makefile.unx), unixpc (makefile.unx), windows (various Windows])
-AC_MSG_RESULT([   makefiles)])
+AC_MSG_RESULT([   cgi (makefile.unx), pm (makefile.os2), be (BeOS), svga (MSDOS/djgpp)])
+AC_MSG_RESULT([   sun (makefile.unx), unixpc (makefile.unx), windows (several options)])
 
 AC_MSG_RESULT([])
 AC_MSG_RESULT([gnuplot will be compiled with the following features:])
@@ -1494,12 +1479,6 @@ else
   else
     AC_MSG_RESULT([  Hidden3d optimization: quadtree])
   fi
-fi
-
-if test "$enable_backwards_compatibility" = yes; then
-  AC_MSG_RESULT([  Deprecated syntax and terminal options : yes])
-else
-  AC_MSG_RESULT([  Deprecated syntax and terminal options : no (use --enable-backwards-compatibility)])
 fi
 
 if test "$enable_stats" != no; then
