@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.725 2012/04/05 22:44:50 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.726 2012/04/13 02:32:27 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -207,20 +207,13 @@ C
  For a more exhaustive list, see the NEWS file.
 3 NOTHING HERE YET
 
-2 Backwards compatibility
+2 Deprecated syntax
+?deprecated syntax
 ?backwards compatibility
 ?compatibility
- Gnuplot version 4 deprecated certain syntax used in earlier versions, but
- continued to recognize it.  This is now under the control of a configuration
- option, and can be enabled as follows:
-
-       ./configure --enable-backwards-compatibility
-
- Notice: Deprecated syntax items may be removed entirely in version 5. 
-
- One major difference is the introduction of keywords to disambiguate complex
- commands, particularly commands containing string variables. A notable issue
- was the use of bare numbers to specify offsets, line and point types.
+ Gnuplot version 4 deprecated certain syntax used in earlier versions but
+ provided a configuration option that allowed backward compatability.
+ Support for the old syntax has now been removed.
 
  Deprecated:
        set title "Old" 0,-1
@@ -2289,7 +2282,6 @@ Ffigure_newsyntax
      bind "ctrl-alt-a" ""   # removes binding for ctrl-alt-a
                               (note that builtins cannot be removed)
      reset bind             # installs default (builtin) bindings
-     bind!                  # deprecated form of "reset bind"
 
  - bind a key to toggle something:
    v=0
@@ -4950,9 +4942,7 @@ Ffigure_mapcontours
  For example, `array=25:35` indicates there are two one-dimensional records in
  the file.
        Note:  Gnuplot version 4.2 used the syntax array=128x128 rather than
-              array=(128,128). The older syntax is now deprecated, but may
-              still work if your copy of gnuplot was built to support
-              backwards compatibility.
+              array=(128,128). The older syntax is now deprecated.
 4 record
 ?binary record
  This keyword serves the same function as `array`, having the same syntax.
