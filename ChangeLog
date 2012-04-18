@@ -1,3 +1,8 @@
+2012-04-18  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/svg.trm: The svg code refers to CANVAS_OVERSAMPLE when it should
+	refer to SVG_SCALE.  Fortunately they both equal 10.
+
 2012-04-17  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/misc.c (load_file):  If the input file did not end in a newline,
