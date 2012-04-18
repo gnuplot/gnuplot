@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: svg.trm,v 1.133 2012/04/14 03:59:31 sfeam Exp $
+ * $Id: svg.trm,v 1.134 2012/04/17 20:30:18 sfeam Exp $
  */
 
 /*------------------------------------------------------------------------------------------------------------------------------------
@@ -1048,14 +1048,14 @@ SVG_text ()
 
 	fprintf(gpoutfile, "\n<script type=\"text/javascript\"><![CDATA[\n");
 	fprintf(gpoutfile, "// plot boundaries and axis scaling information for mousing \n");
-	fprintf(gpoutfile, "gnuplot_svg.plot_term_xmax = %d;\n", (int)(term->xmax / CANVAS_OVERSAMPLE));
-	fprintf(gpoutfile, "gnuplot_svg.plot_term_ymax = %d;\n", (int)(term->ymax / CANVAS_OVERSAMPLE));
-	fprintf(gpoutfile, "gnuplot_svg.plot_xmin = %.1f;\n", (double)plot_bounds.xleft / CANVAS_OVERSAMPLE);
-	fprintf(gpoutfile, "gnuplot_svg.plot_xmax = %.1f;\n", (double)plot_bounds.xright / CANVAS_OVERSAMPLE);
-	fprintf(gpoutfile, "gnuplot_svg.plot_ybot = %.1f;\n", (double)(term->ymax-plot_bounds.ybot) / CANVAS_OVERSAMPLE);
-	fprintf(gpoutfile, "gnuplot_svg.plot_ytop = %.1f;\n", (double)(term->ymax-plot_bounds.ytop) / CANVAS_OVERSAMPLE);
-	fprintf(gpoutfile, "gnuplot_svg.plot_width = %.1f;\n", (double)(plot_bounds.xright - plot_bounds.xleft) / CANVAS_OVERSAMPLE);
-	fprintf(gpoutfile, "gnuplot_svg.plot_height = %.1f;\n", (double)(plot_bounds.ytop - plot_bounds.ybot) / CANVAS_OVERSAMPLE);
+	fprintf(gpoutfile, "gnuplot_svg.plot_term_xmax = %d;\n", (int)(term->xmax / SVG_SCALE));
+	fprintf(gpoutfile, "gnuplot_svg.plot_term_ymax = %d;\n", (int)(term->ymax / SVG_SCALE));
+	fprintf(gpoutfile, "gnuplot_svg.plot_xmin = %.1f;\n", (double)plot_bounds.xleft / SVG_SCALE);
+	fprintf(gpoutfile, "gnuplot_svg.plot_xmax = %.1f;\n", (double)plot_bounds.xright / SVG_SCALE);
+	fprintf(gpoutfile, "gnuplot_svg.plot_ybot = %.1f;\n", (double)(term->ymax-plot_bounds.ybot) / SVG_SCALE);
+	fprintf(gpoutfile, "gnuplot_svg.plot_ytop = %.1f;\n", (double)(term->ymax-plot_bounds.ytop) / SVG_SCALE);
+	fprintf(gpoutfile, "gnuplot_svg.plot_width = %.1f;\n", (double)(plot_bounds.xright - plot_bounds.xleft) / SVG_SCALE);
+	fprintf(gpoutfile, "gnuplot_svg.plot_height = %.1f;\n", (double)(plot_bounds.ytop - plot_bounds.ybot) / SVG_SCALE);
 
 	/* Get true axis ranges as used in the plot */
 	update_gpval_variables(1);
