@@ -1,10 +1,11 @@
 /*
- * $Id: canvasmath.js,v 1.6 2009/03/24 19:03:38 sfeam Exp $
+ * $Id: canvasmath.js,v 1.7 2012/03/24 21:34:11 sfeam Exp $
  */
 // The canvastext.js code was released to the public domain by Jim Studt, 2007.
 // He may keep some sort of up to date copy at http://www.federated.com/~jim/canvastext/
 // Mar 2009 Ethan A Merritt (EAM) Modify code to work in non-ascii environments.
 //	    Add Latin-1, Hershey simplex Greek, and math symbols with unicode indexing.
+// Apr 2012 Ethan A Merritt  Composite widths, tab, newline
 //
 var CanvasTextFunctions = { };
 
@@ -304,7 +305,15 @@ CanvasTextFunctions.measure = function( font, size, str)
 	    index = str.charCodeAt(i);
 
 	var c = CanvasTextFunctions.letter(index);
-	if (c) total += c.width * size / 25.0;
+	if (!c) break;
+	total += c.width * size / 25.0;
+	if (c.width == 0) {
+	    for ( j = 0; j < c.points.length; j++) {
+		var a = c.points[j];
+		if (a[0] == -99)
+		    total += CanvasTextFunctions.letter(a[1]).width * size / 25.0;
+	    }
+	}
     }
     return total;
 }
