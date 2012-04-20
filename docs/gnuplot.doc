@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.727 2012/04/18 01:19:48 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.728 2012/04/20 19:24:54 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -10388,8 +10388,8 @@ Ffigure_mapcontours
  `pm3dCompress.awk`.  If the data lies on a rectangular grid, even greater
  compression may be possible using the script `pm3dConvertToImage.awk`.
  Usage:
-     awk -f pm3dCompress.awk <thefile.ps >smallerfile.ps
-     awk -f pm3dConvertToImage.awk <thefile.ps >smallerfile.ps
+     awk -f pm3dCompress.awk thefile.ps >smallerfile.ps
+     awk -f pm3dConvertToImage.awk thefile.ps >smallerfile.ps
 
 3 pointintervalbox
 ?commands set pointintervalbox
