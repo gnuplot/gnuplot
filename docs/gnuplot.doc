@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.726 2012/04/13 02:32:27 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.727 2012/04/18 01:19:48 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -10382,22 +10382,15 @@ Ffigure_mapcontours
  postscript file in order to have different palettes for different surfaces
  in one graph.  Well, you can achieve this functionality by `multiplot` with
  fixed `origin` and `size`.
-
- If pm3d map has been plotted from gridded or almost regular data with an
- output to a postscript file, then it is possible to reduce the size of this
- postscript file up to at about 50% by the enclosed awk script
- `pm3dCompress.awk`.  This you may find  interesting if you intend to keep the
- file for including it into your publication or before downloading a very large
- file into a slow printer. Usage:
-     awk -f pm3dCompress.awk thefile.ps >smallerfile.ps
-
- If pm3d map has been plotted from rectangular gridded data with an output
- to a postscript file, then it is possible to reduce the file size even more
- by the enclosed awk script `pm3dConvertToImage.awk`.  Usage:
+ 
+ If you are writing a pm3d surface to a postscript file, it may be possible to
+ reduce the file size by up to 50% by the enclosed awk script
+ `pm3dCompress.awk`.  If the data lies on a rectangular grid, even greater
+ compression may be possible using the script `pm3dConvertToImage.awk`.
+ Usage:
+     awk -f pm3dCompress.awk <thefile.ps >smallerfile.ps
      awk -f pm3dConvertToImage.awk <thefile.ps >smallerfile.ps
 
- You may manually change the postscript output from gray to color and vice
- versa and change the definition of <maxcolors>.
 3 pointintervalbox
 ?commands set pointintervalbox
 ?set pointintervalbox
