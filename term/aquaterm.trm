@@ -1,5 +1,5 @@
 /* -*- objc -*-
- * $Id: aquaterm.trm,v 1.42 2009/07/04 20:14:36 broeker Exp $
+ * $Id: aquaterm.trm,v 1.43 2011/08/02 20:40:31 sfeam Exp $
  *
  */
 
@@ -559,11 +559,15 @@ AQUA_resume()
 TERM_PUBLIC void
 AQUA_boxfill(int style, unsigned int x1, unsigned int y1, unsigned int width, unsigned int height)
 {
-  float r,g,b;
+  float r,g,b,a;
 
   LOG(@"\nstyle=%d\nstyle & 0xf = %d\nfillpar=%d\n", style, style & 0xf, style >> 4);
+
   /* Save current color */
-  [adapter getColorRed:&r green:&g blue:&b];
+  if (AQUA_hasAlphaSupport)
+    [adapter getColorRed:&r green:&g blue:&b alpha:&a];
+  else
+    [adapter getColorRed:&r green:&g blue:&b];
 
   /* fillpar:
    * - solid   : 0 - 100
@@ -588,7 +592,7 @@ AQUA_boxfill(int style, unsigned int x1, unsigned int y1, unsigned int width, un
     } else
       /* fall through */
   case FS_SOLID: /* solid fill */
-    {
+    if (fillpar < 100) {
       float density = (100 - fillpar)*0.01;
       [adapter setColorRed:r*(1-density) + density
 	             green:g*(1-density) + density
@@ -607,8 +611,12 @@ AQUA_boxfill(int style, unsigned int x1, unsigned int y1, unsigned int width, un
   NSRect scaledRect = NSMakeRect(x1/AQUA_RESOLUTION, y1/AQUA_RESOLUTION, width/AQUA_RESOLUTION, height/AQUA_RESOLUTION);
   [adapter eraseRect:scaledRect];
   [adapter addFilledRect:scaledRect];
+  
   /* Restore color */
-  [adapter setColorRed:r green:g blue:b];
+  if (AQUA_hasAlphaSupport)
+    [adapter setColorRed:r green:g blue:b alpha:a];
+  else
+    [adapter setColorRed:r green:g blue:b];
 }
 
 TERM_PUBLIC void
@@ -638,6 +646,7 @@ TERM_PUBLIC void
 AQUA_set_color(t_colorspec *colorspec)
 {
   rgb_color color;
+  double alpha;
   
   switch (colorspec->type) {
   case TC_FRAC:
@@ -645,10 +654,16 @@ AQUA_set_color(t_colorspec *colorspec)
     [adapter setColorRed:color.r green:color.g blue:color.b];
     break;
   case TC_RGB:
-    color.r = (double)((colorspec->lt >> 16 ) & 255) / 255.;
+    color.r = (double)((colorspec->lt >> 16) & 255) / 255.;
     color.g = (double)((colorspec->lt >> 8 ) & 255) / 255.;
     color.b = (double)(colorspec->lt & 255) / 255.;
-    [adapter setColorRed:color.r green:color.g blue:color.b];
+    alpha   = (double)((colorspec->lt >> 24) & 255) / 255.;
+    if (AQUA_hasAlphaSupport && (alpha > 0)) {
+      alpha = 1.0 - alpha;
+      [adapter setColorRed:color.r green:color.g blue:color.b alpha:alpha];
+    } else {
+      [adapter setColorRed:color.r green:color.g blue:color.b];
+    }
     break;
   case TC_LT:
     [adapter takeColorFromColormapEntry:((colorspec->lt)%CYCLIC_COLORS)+SPECIAL_COLORS];
@@ -664,9 +679,13 @@ AQUA_filled_polygon(int pc, gpiPoint *corners)
 {
   int i;
   int fillpar = corners->style >> 4;
-  float r,g,b;
+  float r,g,b,a;
 
-  [adapter getColorRed:&r green:&g blue:&b];
+  /* Save current color */
+  if (AQUA_hasAlphaSupport)
+    [adapter getColorRed:&r green:&g blue:&b alpha:&a];
+  else
+    [adapter getColorRed:&r green:&g blue:&b];
  
   /* This switch is a clone of the one in AQUA_boxfill() */
   switch (corners->style & 0xf) {
@@ -685,7 +704,7 @@ AQUA_filled_polygon(int pc, gpiPoint *corners)
     } else
       /* fall through */
   case FS_SOLID: /* solid fill */
-    {
+    if (fillpar < 100) {
       float density = (100 - fillpar)*0.01;
       [adapter setColorRed:r*(1-density) + density
 	             green:g*(1-density) + density
