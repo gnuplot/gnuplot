@@ -1,3 +1,8 @@
+2012-04-20  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/canvas.trm: backport recent changes (UTF-8 character set,
+	precision of point coordinates).
+
 2012-04-18  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/svg.trm: The svg code refers to CANVAS_OVERSAMPLE when it should
