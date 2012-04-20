@@ -1,3 +1,8 @@
+2012-04-20  Michael Reeves  <mgreeves@users.sourceforge.net>
+
+	* src/graphics.c: Improved calculation of the margin space needed to
+	hold rotated x and x2 tic labels.  backported fix for Bug #3482491
+
 2012-04-20  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/canvas.trm: backport recent changes (UTF-8 character set,
