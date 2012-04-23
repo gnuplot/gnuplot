@@ -1,3 +1,8 @@
+2012-04-23  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* configure.in m4/apple.m4:  Add a configuration option for aquaterm.
+	The default is --without-aquaterm, select using --with-aquaterm.
+
 2012-04-20  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/aquaterm.trm: rgba colors
