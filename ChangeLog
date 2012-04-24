@@ -1,3 +1,8 @@
+2012-04-24  Mojca Miklavec <mojca.miklavec.lists@gmail.com>
+
+	* term/aquaterm.trm:  Clip images to bounding box. Reset line type
+	at the start of each plot.
+
 2012-04-20  Michael Reeves  <mgreeves@users.sourceforge.net>
 
 	* src/graphics.c: Improved calculation of the margin space needed to
