@@ -1,3 +1,8 @@
+2012-04-24  Mojca Miklavec <mojca.miklavec.lists@gmail.com>
+
+	* term/aquaterm.trm:  Clip images to bounding box. Reset line type
+	at the start of each plot.
+
 2012-04-23  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* configure.in m4/apple.m4:  Add a configuration option for aquaterm.
