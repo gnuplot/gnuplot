@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: svg.trm,v 1.128.2.3 2012/04/09 04:20:52 sfeam Exp $
+ * $Id: svg.trm,v 1.128.2.4 2012/04/19 00:37:15 sfeam Exp $
  */
 
 /*------------------------------------------------------------------------------------------------------------------------------------
@@ -1964,7 +1964,8 @@ START_HELP(svg)
 "       set terminal svg {size <x>,<y> {|fixed|dynamic}}",
 "                        {{no}enhanced}",
 "                        {fname \"<font>\"} {fsize <fontsize>}",
-"                        {mouse} {jsdir <dirname>} {name <plotname>}",
+"                        {mouse} {standalone | jsdir <dirname>}",
+"                        {name <plotname>}",
 "                        {font \"<fontname>{,<fontsize>}\"}",
 "                        {fontfile <filename>}",
 "                        {rounded|butt} {solid|dashed} {linewidth <lw>}",
@@ -1986,13 +1987,15 @@ START_HELP(svg)
 " strings. The enhanced text mode syntax is shared with other gnuplot",
 " terminal types. See `enhanced` for more details.",
 "",
-" The `mouse` option tells gnuplot to include a link to a javascript",
-" module that supports toggling individual plots on/off by clicking",
-" on the corresponding key entry. By default this script is taken from",
-" a local directory, usually /usr/local/share/gnuplot/<version>/js.",
+" The `mouse` option tells gnuplot to add support for mouse tracking and for",
+" toggling individual plots on/off by clicking on the corresponding key entry.",
+" By default this is done by including a link that points to a script in a",
+" local directory, usually /usr/local/share/gnuplot/<version>/js.",
 " You can change this by using the `jsdir` option to specify either a",
 " different local directory or a general URL. The latter is usually",
 " appropriate if you are embedding the svg into a web page.",
+" Alternatively, the `standalone` option embeds the mousing code in the",
+" svg document itself rather than linking to an external resource.",
 "",
 " SVG allows you to embed fonts directly into an SVG document, or to",
 " provide a hypertext link to the desired font. The `fontfile` option",
