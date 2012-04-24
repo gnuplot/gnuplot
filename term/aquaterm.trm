@@ -1,5 +1,5 @@
 /* -*- objc -*-
- * $Id: aquaterm.trm,v 1.43 2011/08/02 20:40:31 sfeam Exp $
+ * $Id: aquaterm.trm,v 1.44 2012/04/21 05:06:56 sfeam Exp $
  *
  */
 
@@ -126,7 +126,7 @@ static char AQUA_title[MAX_LINE_LEN + 1] = "Figure 0"; /* Plot title (in windowb
 static unsigned int AQUA_xSize = AQUA_XMAX; /* plot horizontal size */
 static unsigned int AQUA_ySize = AQUA_YMAX; /* plot vertical size*/
 
-static int AQUA_LineType = -3; /* current line type*/
+static int AQUA_LineType = LT_UNDEFINED; /* current line type*/
 static float AQUA_LineWidth = 1.0; /* current line width*/
 static float AQUA_TextAngle = 0.0; /* current text orientation*/
 static enum JUSTIFY AQUA_TextJust = LEFT; /* current text justification*/
@@ -425,6 +425,8 @@ AQUA_graphics()
       [NSAutoreleasePool topAutoreleasePoolCount]);
 #endif
   [adapter eraseRect:NSMakeRect(0.0, 0.0, AQUA_xSize/AQUA_RESOLUTION, AQUA_ySize/AQUA_RESOLUTION)];
+
+  AQUA_LineType = LT_UNDEFINED;
 }
 
 TERM_PUBLIC void
