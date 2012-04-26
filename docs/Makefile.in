@@ -54,6 +54,7 @@ bindir = @bindir@
 datadir = @datadir@
 datarootdir = @datarootdir@
 infodir = @infodir@
+lispdir = @lispdir@
 srcdir = @srcdir@
 top_builddir = ..
 top_srcdir = @top_srcdir@
@@ -150,7 +151,7 @@ gnuplot.ms doc2rnh gnuplot.rnh doc2rtf gnuplot.rtf gnuplot.nroff	\
 checkdoc gnuplot.txt gnuplot.tmp VERSION gnuplot.4tc gnuplot.4ct	\
 gnuplot.idv gnuplot.xref gnuplot.lg figure*.pdf pdffigures.*		\
 wxhelp/*.html wxhelp/wgnuplot.htc windows/wgnuplot.htk gnuplot.pdf	\
-gnuplot.htb
+gnuplot.htb gnuplot-eldoc.el gnuplot-eldoc.elc
 
 DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(EXTRA_DIST)
 
@@ -387,14 +388,18 @@ gnuplot.info: $(srcdir)/gnuplot.texi
 	$(MAKEINFO) -I$(srcdir) $(srcdir)/gnuplot.texi --no-split --output=$@
 
 # Thanks to Bruce Ravel for doc2texi.el!
-$(srcdir)/gnuplot.texi: $(srcdir)/doc2texi.el $(srcdir)/gnuplot.doc
-	@echo "Creating texinfo"
+$(srcdir)/gnuplot.texi $(srcdir)/gnuplot-eldoc.el $(srcdir)/gnuplot-eldoc.elc: $(srcdir)/doc2texi.el $(srcdir)/gnuplot.doc
+	@echo "Creating texinfo and eldoc strings file"
 	@if test "$(EMACS)" != no; then \
 	   cd $(srcdir) ;  \
 	   $(EMACS) -batch -l doc2texi.el -f d2t-doc-to-texi ; \
+	   echo "Compiling gnuplot-eldoc.el" ; \
+	   $(EMACS) -batch --eval='(byte-compile-file "gnuplot-eldoc.el")' ; \
 	else \
 	   echo "No emacs found - cannot create texinfo file" ; \
 	fi
+
+
 
 # this is how to make OS/2 ipfc documentation
 ipf: gnuplot.ipf
@@ -451,9 +456,11 @@ install-pdf:
 	    $(INSTALL_DATA) gnuplot.pdf $(DESTDIR)$(GIHDIR)/gnuplot.pdf; \
 	fi
 
-install-info: gnuplot.info
-	$(top_srcdir)/mkinstalldirs $(DESTDIR)$(infodir)
+install-info: gnuplot.info gnuplot-eldoc.el gnuplot-eldoc.elc
+	$(top_srcdir)/mkinstalldirs $(DESTDIR)$(infodir) $(DESTDIR)$(lispdir)
 	$(INSTALL_DATA) gnuplot.info $(DESTDIR)$(infodir)/gnuplot.info
+	$(INSTALL_DATA) gnuplot-eldoc.el $(DESTDIR)$(lispdir)/gnuplot-eldoc.el
+	$(INSTALL_DATA) gnuplot-eldoc.elc $(DESTDIR)$(lispdir)/gnuplot-eldoc.elc
 	@if (install-info --version && \
 	     install-info --version | fgrep -i -v debian) >/dev/null 2>&1; then \
 	  echo "install-info --info-dir=$(DESTDIR)$(infodir) $(DESTDIR)$(infodir)/gnuplot.info";\
@@ -494,6 +501,7 @@ uninstall-info:
 	     rm -f $$relfile $$relfile-[0-9] $$relfile-[0-9][0-9] $$relfile_i[0-9] $$relfile_i[0-9][0-9]; \
 	   else :; fi); \
 	done
+	rm -rf $(DESTDIR)$(lispdir)/gnuplot-eldoc.el $(DESTDIR)$(lispdir)/gnuplot-eldoc.elc
 
 # for VMS only
 install-vms: gnuplot.hlp
