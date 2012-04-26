@@ -3,6 +3,8 @@
 	* term/svg.trm:  Write out coordinates to the precision implied by
 	SVG_SCALE.
 
+	* src/set.c: Fix incorrect test for error return from iconv().
+
 2012-04-24  Mojca Miklavec <mojca.miklavec.lists@gmail.com>
 
 	* term/aquaterm.trm:  Clip images to bounding box. Reset line type
