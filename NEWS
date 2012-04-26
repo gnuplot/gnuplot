@@ -1,6 +1,7 @@
 New features, changes and fixes since gnuplot version 4.6.0
 ===========================================================
 
+* NEW syntax hints inside Emacs gnuplot-mode
 * CHANGE canvas terminal loads appropriate font file for UTF-8 encoding
 * FIX margin space required for rotated axis tic labels
 * FIX check for NaN values in binary input

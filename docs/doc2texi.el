@@ -89,6 +89,8 @@
 ;;  0.1  Mar 23 1999 <BR> Initial version
 ;;  0.2  May 28 1999 <BR>
 ;;  0.3  Jun  2 1999 <BR> Added terminal information, fixed uref problem.
+;;  0.4  Feb 23 2012 <jjo> Added generation of gnuplot-eldoc strings file
+;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Acknowledgements:
 ;;
@@ -322,6 +324,46 @@ Major contributors (alphabetic order):
 	"x11"
 	"xlib"))
 
+(defvar d2t-gnuplot-license
+  ";;;; This file is generated automatically from the Gnuplot
+;;;; documentation by `doc2texi.el', part of the Gnuplot distribution.
+;;;; It is not intended to be edited manually.  See docs/gnuplot.doc
+;;;; in the gnuplot source tree (available from
+;;;; gnuplot.sourcefourge.net) for the original.
+
+;; This file is covered by the Gnuplot licensing terms:
+
+;; Copyright 1986 - 1993, 1998, 2004   Thomas Williams, Colin Kelley
+;;
+;; Permission to use, copy, and distribute this software and its
+;; documentation for any purpose with or without fee is hereby granted,
+;; provided that the above copyright notice appear in all copies and
+;; that both that copyright notice and this permission notice appear
+;; in supporting documentation.
+;;
+;; Permission to modify the software is granted, but not the right to
+;; distribute the complete modified source code.  Modifications are to
+;; be distributed as patches to the released version.  Permission to
+;; distribute binaries produced by compiling modified sources is granted,
+;; provided you
+;;   1. distribute the corresponding source modifications from the
+;;    released version in the form of a patch file along with the binaries,
+;;   2. add special version identification to distinguish your version
+;;    in addition to the base release version number,
+;;   3. provide your name and address as the primary contact for the
+;;    support of your modified version, and
+;;   4. retain our contact information in regard to use of the base
+;;    software.
+;; Permission to distribute the released version of the source code along
+;; with corresponding source modifications in the form of a patch file is
+;; granted with same provisions 2 through 4 for binary distributions.
+;;
+;; This software is provided \"as is\" without express or implied warranty
+;; to the extent permitted by applicable law."
+
+  "Gnuplot license for insertion into automatically generated gnuplot-eldoc.el file.")
+
+
 (defun d2t-doc-to-texi-verbosely ()
   "Run `d2t-doc-to-texi' noisily"
   (interactive)
@@ -357,6 +399,7 @@ particular conversion chore."
   (d2t-braces-atsigns)   ;; this must be the first conversion function
   (d2t-comments)         ;; delete comments
   (d2t-sectioning)       ;; chapters, sections, etc
+  (d2t-get-eldoc-strings)
   (d2t-indexing)         ;; index markup
   (d2t-tables)           ;; fix up tables
   (d2t-handle-html)      ;; fix up html markup
@@ -402,50 +445,41 @@ particular conversion chore."
   (goto-char (point-min)))
 
 
+(defvar d2t-additional-terminals
+  '(("linux" "linux")
+    ("canvas" "canvas")
+    ("lua" "lua" "tikz")
+    ("mac" "mac" "openstep")
+    ("beos" "be")
+    ("dos" "emxvga" "djsvga" "fg" "pc")
+    ("windows" "win")
+    ("next" "next")
+    ("os2" "pm" "emxvga")
+    ("sco" "cgi")
+    ("sun" "sun")
+    ("vms" "vws"))
+
+  "Additional terminals to add to the converted gnuplot.info file.
+
+The CARs of the items are strings to match against
+`system-configuration', and the CDRs are the elements to add to
+the end of `d2t-get-terminals'.")
+
 (defun d2t-get-terminals ()
   "Insert all appropriate terminal help."
   (let ((case-fold-search t))
-    (if (string-match "linux" system-configuration)
-	(setq d2t-terminal-list (append d2t-terminal-list
-					'("linux"))))
-    (if (string-match "canvas" system-configuration)
-	(setq d2t-terminal-list (append d2t-terminal-list
-					'("canvas"))))
-    (if (string-match "lua" system-configuration)
-	(setq d2t-terminal-list (append d2t-terminal-list
-					'("lua" "tikz"))))
-    (if (string-match "mac" system-configuration)
-	(setq d2t-terminal-list (append d2t-terminal-list
-					'("mac" "openstep"))))
-    (if (string-match "beos" system-configuration)
-	(setq d2t-terminal-list (append d2t-terminal-list
-					'("be"))))
-    (if (string-match "dos" system-configuration)
-	(setq d2t-terminal-list (append d2t-terminal-list
-					'("emxvga" "djsvga" "fg" "pc"))))
-    (if (string-match "windows" (format "%s" system-type))
-	(setq d2t-terminal-list (append d2t-terminal-list
-					'("win"))))
-    (if (string-match "next" system-configuration)
-	(setq d2t-terminal-list (append d2t-terminal-list
-					'("next"))))
-    (if (string-match "os2" system-configuration)
-	(setq d2t-terminal-list (append d2t-terminal-list
-					'("pm" "emxvga"))))
-    (if (string-match "sco" system-configuration)
-	(setq d2t-terminal-list (append d2t-terminal-list
-					'("cgi"))))
-    (if (string-match "sun" system-configuration)
-	(setq d2t-terminal-list (append d2t-terminal-list
-					'("sun"))))
-    (if (string-match "vms" system-configuration)
-	(setq d2t-terminal-list (append d2t-terminal-list
-					'("vws"))))
+    (dolist (rec d2t-additional-terminals)
+      (let ((system (car rec))
+	    (terms (cdr rec)))
+	(when (string-match system system-configuration)
+	  (dolist (term terms)
+	    (add-to-list 'd2t-terminal-list term)))))
+
     (unless (member* system-configuration '("pc" "windows")
 		     :test 'string-match)
-      (setq d2t-terminal-list
-	    (append d2t-terminal-list
-		    '("x11" "tgif" "gpic" "regis" "t410x" "tex" "xlib")))) )
+      (dolist (term '("x11" "tgif" "gpic" "regis" "t410x" "tex" "xlib"))
+	(add-to-list 'd2t-terminal-list term)))
+
   (setq d2t-terminal-list (sort d2t-terminal-list 'string<))
   (let ((list d2t-terminal-list) file node marker)
     (save-excursion
@@ -453,52 +487,51 @@ particular conversion chore."
 	(beginning-of-line)
 	(insert "@c ")
 	(forward-line 1)
-	(while list
-	  (and d2t-verbose (message "    %s ..." (car list)))
-	  (setq file (concat d2t-terminal-directory (car list) ".trm"))
-	  (when (file-exists-p file)
-	    (set-buffer d2t-terminal-buffer-name)
-	    (erase-buffer)
-	    (insert-file-contents file)
-	    ;; find the terminal help
-	    (when (search-forward "START_HELP" (point-max) "to_end")
-	      (forward-line 1)
-	      (delete-region (point-min) (point-marker))
-	      (search-forward "END_HELP" (point-max) "to_end")
-	      (beginning-of-line)
-	      (delete-region (point-marker) (point-max))
-	      ;; tidy up the terminal help content
-	      (goto-char (point-min))
-	      (while (re-search-forward "\",[ \t]*$" nil t)
-		(replace-match "" nil nil))
-	      (goto-char (point-min))
-	      (while (re-search-forward "^\"" nil t)
-		(replace-match "" nil nil))
-	      (goto-char (point-min))
-	      (while (re-search-forward "\\\\\"" nil t)
-		(replace-match "\"" nil nil))
-	      (goto-char (point-min))
-	      (while (re-search-forward "^1[ \t]+\\(.+\\)$" nil t)
-		(setq node   (match-string 1)
-		      marker (point-marker))
-		(replace-match (concat "4  " node) nil nil))
-	      (goto-char (point-min))
-	      (while (re-search-forward "^2" nil t)
-		(replace-match "5 " nil nil))
-	      (goto-char (point-min))
-	      ;; set up terminals index
-	      (while (re-search-forward "^\?\\([^ ]+\\)$" nil t)
-		(let ((word (match-string 1)))
-		  (unless (string-match "_\\|command-line-options" word)
-		    (setq d2t-terminals-alist
-			  (append d2t-terminals-alist
-				  (list (cons word (point-marker))))))))
-	      ;; and cram it into the doc buffer
-	      (set-buffer d2t-work-buffer-name)
-	      (insert-buffer-substring d2t-terminal-buffer-name)
-	      ))
-	  (setq list (cdr list))
-	  )))))
+	(dolist (elem list)
+          (and d2t-verbose (message "    %s ..." elem))
+          (setq file (concat d2t-terminal-directory elem ".trm"))
+          (when (file-exists-p file)
+            (with-current-buffer d2t-terminal-buffer-name
+              (erase-buffer)
+              (insert-file-contents file)
+              ;; find the terminal help
+              (when (search-forward "START_HELP" (point-max) "to_end")
+                (forward-line 1)
+                (delete-region (point-min) (point-marker))
+                (search-forward "END_HELP" (point-max) "to_end")
+                (beginning-of-line)
+                (delete-region (point-marker) (point-max))
+                ;; tidy up the terminal help content
+                (goto-char (point-min))
+                (while (re-search-forward "\",[ \t]*$" nil t)
+                  (replace-match "" nil nil))
+                (goto-char (point-min))
+                (while (re-search-forward "^\"" nil t)
+                  (replace-match "" nil nil))
+                (goto-char (point-min))
+                (while (re-search-forward "\\\\\"" nil t)
+                  (replace-match "\"" nil nil))
+                (goto-char (point-min))
+                (while (re-search-forward "^1[ \t]+\\(.+\\)$" nil t)
+                  (setq node   (match-string 1)
+                        marker (point-marker))
+                  (replace-match (concat "4  " node) nil nil))
+                (goto-char (point-min))
+                (while (re-search-forward "^2" nil t)
+                  (replace-match "5 " nil nil))
+                (goto-char (point-min))
+                ;; set up terminals index
+                (while (re-search-forward "^\?\\([^ ]+\\)$" nil t)
+                  (let ((word (match-string 1)))
+                    (unless (string-match "_\\|command-line-options" word)
+                      (setq d2t-terminals-alist
+                            (append d2t-terminals-alist
+                                    (list (cons word (point-marker))))))))
+                
+                ;; and cram it into the doc buffer
+                (with-current-buffer d2t-work-buffer-name
+                  (insert-buffer-substring d2t-terminal-buffer-name)))))))))))
+	  
 
 ;;; functions for obtaining lists of nodes in the document
 
@@ -605,13 +638,9 @@ appropriate sectioning and @node commands."
 	       (word (match-string 2))
 	       (node (substitute ?_ ?  word :test 'char-equal))
 	       (eol  (save-excursion (end-of-line) (point-marker))))
-	  ;; some node names appear twice.  make the second one unique.
-	  ;; this will fail to work if a third pops up in the future!
-	  (if (member* node d2t-node-list :test 'string=)
-	      (setq node (concat node "_")))
-	  ;; this is a fast hack to account for a third equal node name
-	  (if (member* node d2t-node-list :test 'string=)
-	      (setq node (concat node "_")))
+	  ;; some node names appear twice.  make them unique.
+	  (while (member* node d2t-node-list :test 'string=)
+	    (setq node (concat node "_")))
 	  (setq d2t-node-list (append d2t-node-list (list node)))
 	  (beginning-of-line)
 	  (delete-region (point-marker) eol)
@@ -626,6 +655,67 @@ appropriate sectioning and @node commands."
 		 (insert "@subsubsection " word "\n"))
 		(t
 		 (insert "\n\n@noindent --- " (upcase word) " ---\n")) ) )))))
+
+(defun d2t-get-eldoc-strings ()
+  "Find all syntax descriptions in the doc for ElDoc alist.
+
+Dumps the resulting data into gnuplot-eldoc.el"
+  (and d2t-verbose (message "  Doing d2t-get-eldoc-strings ..."))
+  (save-excursion
+    (goto-char (point-min))
+    (let ((alist '()))
+      (while (re-search-forward "^\\s-Syntax:" nil t)
+	;; Find the section name
+	(let ((section
+	       (save-excursion
+		 (re-search-backward "@node *\\([^ ].*\\)$")
+		 (match-string 1))))
+
+	  ;; Skip blank lines
+	  (forward-line)
+	  (while (looking-at "^\\s-*$") (forward-line))
+
+	  ;; Grab everything at this level of indentation
+	  (let* ((lines '())
+		 (indent
+		  (save-excursion
+		    (skip-syntax-forward "-")))
+		 (indent-regexp
+		  (buffer-substring (point) (+ (point) indent))))
+	    (while (looking-at indent-regexp)
+	      (let ((line
+		     (replace-regexp-in-string
+		      "@\\([@{}]\\)" "\\1"
+		      (buffer-substring (+ (point-at-bol) indent) (point-at-eol)))))
+		(push line lines))
+	      (forward-line))
+
+	    ;; Add to alist
+	    (if (= (length lines) 1)
+		(push `(,section ,(car lines)) alist)
+	      (setq lines (nreverse lines))
+	      (push `(,section ,(concat (car lines) " [more ...]")
+			       ,(mapconcat 'identity lines "\n")) alist)))))
+      ;; Save in "gnuplot-eldoc.el"
+      (with-temp-file "gnuplot-eldoc.el"
+	(let ((print-level nil)
+	      (print-length nil))
+	  (insert
+	   (format ";;;; Automatically generated by doc2texi.el on %s\n\n"
+		   (format-time-string "%a, %d %B %Y")))
+	  (insert d2t-gnuplot-license)
+	  (insert
+	   (format
+            "\n\n%S\n%S"
+            '(eval-when-compile (defvar gnuplot-eldoc-hash nil))       
+            `(setq gnuplot-eldoc-hash
+                   (let ((tbl (make-hash-table :test 'equal))
+                         (alist ',alist))
+                     (while alist
+                       (puthash (caar alist) (cdar alist) tbl)
+                       (setq alist (cdr alist)))
+                     tbl)))))))))
+
 
 (defun d2t-indexing ()
   "Find all lines starting with a question mark.
@@ -800,19 +890,16 @@ This must be run after `d2t-first-column'."
 			   d2t-level-3-alist
 			   d2t-level-4-alist)))
     (save-excursion
-      (while (not (eobp))
-	(re-search-forward "\\(`\\([^`]+\\)`\\)" (point-max) "to_end")
-	(unless (eobp)
-	  (let* ((b (match-beginning 1))
-		 (e (match-end 1))
-		 (list (split-string (match-string 2)))
-		 (last (car (reverse list)))
-		 (text (concat "@ref{" last "}")))
-	    ;;(message "%s %s" (match-string 1) last)
-	    (when (and (equal t (try-completion last big-alist))
-		       (not (string= last "gnuplot")))
-	      (delete-region b e)
-	      (insert text))))
-	))))
+      (while (re-search-forward "\\(`\\([^`]+\\)`\\)" nil t)
+	(let* ((b (match-beginning 1))
+	       (e (match-end 1))
+	       (list (save-match-data (split-string (match-string 2))))
+	       (last (car (reverse list)))
+	       (text (concat "@ref{" last "}")))
+	  ;; (message "%s %s" (match-string 1) last)
+	  (when (and (equal t (try-completion last big-alist))
+		     (not (string= last "gnuplot")))
+	    (delete-region b e)
+	    (insert text)))))))
 
 ;;; doc2texi.el ends here

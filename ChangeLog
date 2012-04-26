@@ -1,3 +1,14 @@
+2012-04-26  Jon Oddie  <joddie@users.sourceforge.net>
+
+	* docs/doc2texi.c: Two bug fixes
+	Cleaner code to determine which term files to read in d2t-get-terminals.
+	Fix code for uniquifying duplicate node names.
+
+	* configure.in docs/Makefile.in docs/doc2texi.c:
+	Create an Emacs Lisp file of documentation strings extracted from the
+	syntax descriptions in gnuplot.doc. Gnuplot-mode can then optionally
+	display these strings as automatic one-line documentation while editing,
+
 2012-04-24  Mojca Miklavec <mojca.miklavec.lists@gmail.com>
 
 	* term/aquaterm.trm:  Clip images to bounding box. Reset line type
