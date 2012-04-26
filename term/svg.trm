@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: svg.trm,v 1.135 2012/04/19 00:34:59 sfeam Exp $
+ * $Id: svg.trm,v 1.136 2012/04/24 21:04:39 sfeam Exp $
  */
 
 /*------------------------------------------------------------------------------------------------------------------------------------
@@ -99,7 +99,8 @@ TERM_PUBLIC void SVG_path __PROTO((int p));
 TERM_PUBLIC void SVG_image __PROTO((unsigned m, unsigned n, coordval *image, gpiPoint *corner, t_imagecolor color_mode));
 #endif
 
-#define SVG_SCALE	10.
+#define SVG_SCALE	10.	/* Coordinates accuracy is 1/SVG_SCALE pixel */
+#define PREC		1	/* Decimal places needed for SVG_SCALEd values */
 #define Y(y) ((float)((int)term->ymax - (int)y) / SVG_SCALE)
 #define X(x) ((float)(x) / SVG_SCALE)
 
@@ -455,7 +456,7 @@ SVG_MoveForced(unsigned int x, unsigned int y)
 
     SVG_PathOpen ();
 
-    fprintf (gpoutfile, "M%.1f,%.1f ", X(x), Y(y));
+    fprintf (gpoutfile, "M%.*f,%.*f ", PREC, X(x), PREC, Y(y));
     SVG_path_count++;
 
     SVG_PathLimit ();
@@ -1228,7 +1229,7 @@ SVG_vector (unsigned int x, unsigned int y)
 	    SVG_MoveForced(SVG_xLast, SVG_yLast);
 	}
 
-	fprintf (gpoutfile, "L%.1f,%.1f ", X(x), Y(y));
+	fprintf (gpoutfile, "L%.*f,%.*f ", PREC, X(x), PREC, Y(y));
 	SVG_path_count++;
 
 	SVG_PathLimit ();
@@ -1259,13 +1260,13 @@ SVG_point (unsigned int x, unsigned int y, int number)
 
     if (number < 0) {		/* do dot */
 	fprintf (gpoutfile, "\
-\t<use xlink:href='#gpDot' x='%.1f' y='%.1f'%s/>\n",
-		 X(x), Y(y), color_spec);
+\t<use xlink:href='#gpDot' x='%.*f' y='%.*f'%s/>\n",
+		 PREC, X(x), PREC, Y(y), color_spec);
     } else {			/* draw a point symbol */
 	fprintf (gpoutfile, "\
-\t<use xlink:href='#gpPt%u' transform='translate(%.1f,%.1f) scale(%.2f)'%s/>\
+\t<use xlink:href='#gpPt%u' transform='translate(%.*f,%.*f) scale(%.2f)'%s/>\
 \n",
-		 number % 13, X(x), Y(y),
+		 number % 13, PREC, X(x), PREC, Y(y),
 		 term_pointsize * term->h_tic / (2 * SVG_SCALE),
 		 color_spec);
     }
@@ -1332,7 +1333,7 @@ SVG_put_text (unsigned int x, unsigned int y, const char *str)
 
 /* define text position and attributes */
 
-    fprintf (gpoutfile, "\t<g transform=\"translate(%.1f,%.1f)", X(h), Y(v));
+    fprintf (gpoutfile, "\t<g transform=\"translate(%.*f,%.*f)", PREC, X(h), PREC, Y(v));
     if (SVG_TextAngle)
 	fprintf (gpoutfile, " rotate(%i)", -SVG_TextAngle);
     fprintf (gpoutfile, "\" style=\"stroke:none; fill:");
@@ -1549,8 +1550,8 @@ SVG_filled_polygon(int points, gpiPoint* corners)
 
     fputs(" points = '", gpoutfile);
     for (i = 0; i < points; i++)
-	fprintf(gpoutfile, "%.1f,%.1f%s",
-		X(corners[i].x), Y(corners[i].y),
+	fprintf(gpoutfile, "%.*f,%.*f%s",
+		PREC, X(corners[i].x), PREC, Y(corners[i].y),
 		i % 16 == 15 ? "\n" : " ");
     fputs("'/>\n", gpoutfile);
 }
@@ -1647,9 +1648,9 @@ SVG_image (unsigned m, unsigned n, coordval *image, gpiPoint *corner, t_imagecol
     write_png_image (m, n, image, color_mode, image_file);
 
     /* Map it onto the terminals coordinate system. */
-    fprintf(gpoutfile, "<image x='%.1f' y='%.1f' width='%.1f' height='%.1f' preserveAspectRatio='none' ",
-	X(corner[0].x), Y(corner[0].y), 
-	X(corner[1].x) - X(corner[0].x), Y(corner[1].y) - Y(corner[0].y));
+    fprintf(gpoutfile, "<image x='%.*f' y='%.*f' width='%.*f' height='%.*f' preserveAspectRatio='none' ",
+	PREC, X(corner[0].x), PREC, Y(corner[0].y), 
+	PREC, X(corner[1].x) - X(corner[0].x), PREC, Y(corner[1].y) - Y(corner[0].y));
 
     fprintf(gpoutfile, "xlink:href='%s_image_%02d.png'/>;\n",
 	base_name, SVG_imageno);
@@ -1929,6 +1930,7 @@ SVG_path(int p)
 
 #undef Y
 #undef X
+#undef PREC
 
 #endif /* TERM_BODY */
 

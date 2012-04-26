@@ -1,3 +1,8 @@
+2012-04-26  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/svg.trm:  Write out coordinates to the precision implied by
+	SVG_SCALE.
+
 2012-04-24  Mojca Miklavec <mojca.miklavec.lists@gmail.com>
 
 	* term/aquaterm.trm:  Clip images to bounding box. Reset line type
