@@ -1,3 +1,8 @@
+2012-04-27  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/svg.trm:  Prevent illegal characters from being generated as 
+	subplot ids if there are more than 30 subplots in a multiplot.
+
 2012-04-26  Jon Oddie  <joddie@users.sourceforge.net>
 
 	* docs/doc2texi.c: Two bug fixes
