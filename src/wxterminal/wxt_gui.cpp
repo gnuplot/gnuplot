@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.cpp,v 1.96 2012/02/29 19:29:26 sfeam Exp $
+ * $Id: wxt_gui.cpp,v 1.97 2012/04/14 03:59:31 sfeam Exp $
  */
 
 /* GNUPLOT - wxt_gui.cpp */
@@ -2160,7 +2160,7 @@ void wxt_linewidth(double lw)
 	gp_command temp_command;
 
 	temp_command.command = command_linewidth;
-	temp_command.double_value = lw;
+	temp_command.double_value = lw * wxt_lw;
 
 	wxt_command_push(temp_command);
 }

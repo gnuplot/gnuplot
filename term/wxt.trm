@@ -1,5 +1,5 @@
 /*
- * $Id: wxt.trm,v 1.29 2011/11/06 04:06:10 sfeam Exp $
+ * $Id: wxt.trm,v 1.30 2012/01/22 03:59:16 sfeam Exp $
  */
 
 /* GNUPLOT - wxt.trm */
@@ -61,6 +61,7 @@ int wxt_window_number = 0;
 TBOOLEAN wxt_enhanced_enabled = FALSE;
 TBOOLEAN wxt_dashed = FALSE;
 double wxt_dashlength = 1.0;
+double wxt_lw = 1.0;
 int wxt_background = 0xffffff;
 rgb_color wxt_rgb_background = {1.,1.,1.};
 int wxt_persist = UNSET;
@@ -103,6 +104,7 @@ enum WXT_id {
     WXT_SOLID,
     WXT_DASHED,
     WXT_DASHLENGTH,
+    WXT_LINEWIDTH,
     WXT_BACKGROUND,
     WXT_OTHER
 };
@@ -127,6 +129,8 @@ static struct gen_table wxt_opts[] = {
     {"dash$ed", WXT_DASHED},
     {"dashl$ength", WXT_DASHLENGTH},
     {"dl", WXT_DASHLENGTH},
+    {"line$width", WXT_LINEWIDTH},
+    {"lw", WXT_LINEWIDTH},
     {"backg$round", WXT_BACKGROUND},
     {NULL, WXT_OTHER}
 };
@@ -288,6 +292,12 @@ TERM_PUBLIC void wxt_options()
 			c_token++;
 			wxt_dashed = FALSE;
 			break;
+		case WXT_LINEWIDTH:
+			c_token++;
+			wxt_lw = real_expression();
+			if (wxt_lw <= 0)
+			    wxt_lw = 1.0;
+			break;
 		case WXT_BACKGROUND:
 			{
 			c_token++;
@@ -327,6 +337,12 @@ TERM_PUBLIC void wxt_options()
 	if (wxt_dashlength != 1.0) {
 		char tmp_term_options[MAX_LINE_LEN+1] = "";
 		snprintf(tmp_term_options,sizeof(tmp_term_options), " dashlength %g", wxt_dashlength);
+		strncat(term_options, tmp_term_options, sizeof(term_options)-strlen(term_options));
+	}
+
+	if (wxt_lw != 1.0) {
+		char tmp_term_options[MAX_LINE_LEN+1] = "";
+		snprintf(tmp_term_options,sizeof(tmp_term_options), " lw %g", wxt_lw);
 		strncat(term_options, tmp_term_options, sizeof(term_options)-strlen(term_options));
 	}
 
@@ -464,6 +480,7 @@ START_HELP(wxt)
 "                      {{no}enhanced}",
 "                      {font <font>} {fontscale <scale>}",
 "                      {title \"title\"}",
+"                      {linewidth <lw>}",
 "                      {dashed|solid} {dashlength <dl>}",
 "                      {{no}persist}",
 "                      {{no}raise}",
