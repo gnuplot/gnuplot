@@ -1,3 +1,9 @@
+2012-04-30  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/term.c (do_arc):  A bug in the new wedge/nowedge option left a
+	gap in the perimeter of some circles.
+	Bug #3522503
+
 2012-04-27  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/svg.trm:  Prevent illegal characters from being generated as 

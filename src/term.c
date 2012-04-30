@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.233 2012/03/13 18:56:02 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.234 2012/03/26 19:45:40 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -1337,9 +1337,10 @@ do_arc(
     double arc_start, double arc_end, /* Limits of arc in degress */
     int style, TBOOLEAN wedge)
 {
-    gpiPoint vertex[250];  /* changed this - JP */
+    gpiPoint vertex[250];
     int i, segments;
     double aspect;
+    TBOOLEAN complete_circle;
 
     /* Protect against out-of-range values */
     while (arc_start < 0)
@@ -1374,8 +1375,9 @@ do_arc(
 	vertex[segments].y = cy;
 	vertex[++segments].x = vertex[0].x;
 	vertex[segments].y = vertex[0].y;
+	complete_circle = FALSE;
     } else
-	wedge = FALSE;
+	complete_circle = TRUE;
 
     if (style) {
 	/* Fill in the center */
@@ -1383,7 +1385,7 @@ do_arc(
 	    term->filled_polygon(segments+1, vertex);
     } else {
 	/* Draw the arc */
-	if (!wedge)
+	if (!wedge && !complete_circle)
 	    segments -= 2;
 	for (i=0; i<segments; i++)
 	    draw_clip_line( vertex[i].x, vertex[i].y,
