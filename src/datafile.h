@@ -1,5 +1,5 @@
 /*
- * $Id: datafile.h,v 1.35 2011/10/10 21:17:04 juhaszp Exp $
+ * $Id: datafile.h,v 1.36 2012/01/22 01:32:47 sfeam Exp $
  */
 
 /* GNUPLOT - datafile.h */
@@ -45,15 +45,19 @@
 
 /* returns from DF_READLINE in datafile.c */
 /* +ve is number of columns read */
-#define DF_EOF          (-1)
-#define DF_UNDEFINED    (-2)
-#define DF_FIRST_BLANK  (-3)
-#define DF_SECOND_BLANK (-4)
-#define DF_MISSING      (-5)
-#define DF_FOUND_KEY_TITLE   (-6)
-#define DF_KEY_TITLE_MISSING (-7)
-#define DF_STRINGDATA	(-8)
-#define DF_COLUMN_HEADERS (-9)
+enum DF_STATUS {
+    DF_BAD = 0,
+    DF_GOOD = 1,
+    DF_EOF = -1,
+    DF_UNDEFINED = -2,
+    DF_FIRST_BLANK = -3,
+    DF_SECOND_BLANK = -4,
+    DF_MISSING = -5,
+    DF_FOUND_KEY_TITLE = -6,
+    DF_KEY_TITLE_MISSING = -7,
+    DF_STRINGDATA = -8,
+    DF_COLUMN_HEADERS = -9
+};
 
 
 #ifndef MAXINT			/* should there be one already defined ? */

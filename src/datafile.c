@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.217 2012/04/10 16:49:44 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.218 2012/04/17 22:42:52 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -292,9 +292,7 @@ TBOOLEAN evaluate_inside_using = FALSE;
 
 typedef struct df_column_struct {
     double datum;
-    enum {
-	DF_BAD, DF_GOOD
-    } good;
+    enum DF_STATUS good;
     char *position;	/* points to start of this field in current line */
     char *header;	/* points to copy of the header for this column */
 } df_column_struct;
