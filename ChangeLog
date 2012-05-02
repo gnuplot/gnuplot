@@ -1,3 +1,19 @@
+2012-05-02  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/datafile.c (df_readascii):  CHANGE long-standing program action to
+	check every input data line individually for number of data columns.
+	Instead, whatever number of columns are found in the first record, that
+	same number is expected for the rest of the input file.
+	This is not ideal, because plot 'foo' with points will now fail if 'foo'
+	has 4 or more entries on the first line but only 3 on subsequent lines.
+	On the other hand, it fixes the unexpected behavior that
+	    3 NaN
+	in record 5, for example, would be treated as (5,3) DEFINED
+	rather than as (3,NaN) UNDEFINED.
+
+	* docs/gnuplot.doc docs/figure_missing.pdf:  Documentation and example
+	for above change.
+
 2012-04-30  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/term.c (do_arc):  A bug in the new wedge/nowedge option left a

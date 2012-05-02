@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.729 2012/04/20 19:36:02 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.730 2012/04/23 19:25:15 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -203,9 +203,14 @@ C
 
 2 New features
 ?new-features
- This section lists major additions since version 4.6.
+ This section lists major additions and changes since version 4.6.
  For a more exhaustive list, see the NEWS file.
-3 NOTHING HERE YET
+
+ * New coordinate system (Degrees, Minutes, Seconds). See `set xdata geographic`.
+
+ * New support for 32-bit Alpha channel + RGB colors #AARRGGBB.  See `colorspec`.
+
+ * Changed handling of NaN or other unexpected input data.  See `missing`.
 
 2 Deprecated syntax
 ?deprecated syntax
@@ -2107,8 +2112,6 @@ Ffigure_newsyntax
 ?tc
 ?textcolor
  Many commands allow you to specify a linetype with an explicit color.
- Terminal-independent color choice is only possible for terminals that support
- RGB color or pm3d palettes.
 
  Syntax:
 
@@ -2119,6 +2122,7 @@ Ffigure_newsyntax
 
        rgbcolor "colorname"
        rgbcolor "#RRGGBB"
+       rgbcolor "#AARRGGBB"
        rgbcolor variable       # color is read from input file
        palette frac <val>      # <val> runs from 0 to 1
        palette cb <value>      # <val> lies within cbrange
@@ -2135,6 +2139,13 @@ Ffigure_newsyntax
  from 0 - 255.  For example, magenta = full-scale red + full-scale blue would
  be represented by #FF00FF, which is the hexadecimal representation of
  (255 << 16) + (0 << 8) + (255).
+
+ "#AARRGGBB" represents an RGB color with an alpha channel (transparency) 
+ value in the high bits. An alpha value of 0 represents a fully opaque color;
+ i.e., "#00RRGGBB" is the same as "#RRGGBB".  An alpha value of 255 (FF)
+ represents full transparency. `Note`: This convention for the alpha channel
+ is backwards from that used by the "with rgbalpha" image plot mode in earlier
+ versions of gnuplot.
 
  The color palette is a linear gradient of colors that smoothly maps a
  single numerical value onto a particular color.  Two such mappings are always
@@ -7469,17 +7480,22 @@ Ffigure_mapcontours
 ?show datafile missing
 ?set missing
 ?missing
- The `set datafile missing` command allows you to tell `gnuplot` what character
- string is used in a data file to denote missing data.  Exactly how this missing
- value will be treated depends on the `using` specifier of the `plot` or `splot`
- command.
+ The `set datafile missing` command tells `gnuplot` there is a special string
+ used in input data files to denote a missing data entry.  There is no default
+ character for `missing`, but in many cases any non-parsible string of
+ characters found where a numerical value is expected will cause the line to be
+ treated as missing data. There is a distinction between missing data and 
+ invalid data (e.g. "NaN", 1/0.).  Invalid data causes a gap in the line drawn
+ through the points; missing data does not.
+
  Syntax:
-       set datafile missing {"<string>"}
+       set datafile missing "<string>"
        show datafile missing
        unset datafile
- Example:
-       # Ignore entries containing IEEE NaN ("Not a Number") code
-       set datafile missing "NaN"
+
+ `Note`: The treatment of certain cases has changed in this version of gnuplot.
+ The example below shows the difference.
+Ffigure_missing
  Example:
        set style data linespoints
        plot '-' title "(a)"
@@ -7500,32 +7516,28 @@ Ffigure_mapcontours
        plot '-' using 1:2 title "(c)"
           1 10
           2 20
-          3 ?
+          3 NaN
           4 40
           5 50
           e
        plot '-' using 1:($2) title "(d)"
           1 10
           2 20
-          3 ?
+          3 NaN
           4 40
           5 50
           e
 
- The first `plot` will recognize only the first datum in the "3 ?" line.  It
- will use the single-datum-on-a-line convention that the line number is "x"
- and the datum is "y", so the point will be plotted (in this case erroneously)
- at (2,3).
+ Plot (a) differs because the third line contains only one valid number.
+ Old gnuplot versions switched to a single-datum-on-a-line convention that the
+ line number is "x" and the datum is "y", erroneously placing the point at(2,3).
 
- The second and third `plot` commands will correctly ignore the middle line.
- The plotted line will connect the points at (2,20) and (4,40).
+ Both the old and new gnuplot versions handle the same data correctly if the
+ '?' character is designated as a marker for missing data (b).
 
- The fourth `plot` will also correctly ignore the middle line, but the plotted
- line will not connect the points at (2,20) and (4,40).
-
- There is no default character for `missing`, but in many cases any
- non-parsible string of characters found where a numerical value is expected
- will be treated as missing data.
+ Old gnuplot versions handled NaN differently depending of the form of the
+ `using` clause, as shown in plots (c) and (d).  Gnuplot now handles NaN the
+ same whether the input column was specified as N or ($N).
 
 4 set datafile separator
 ?set datafile separator
@@ -7550,23 +7562,21 @@ Ffigure_mapcontours
 4 set datafile commentschars
 ?set datafile commentschars
 ?commentschars
- The `set datafile commentschars` command allows you to tell `gnuplot` what
- characters are used in a data file to denote comments.  Gnuplot will ignore
- rest of the line behind the specified characters if either of them is the
- first non-blank character on the line.
+ The `set datafile commentschars` tells `gnuplot` what characters are used in a
+ data file to begin comment lines. If the first non-blank character on a line is
+ one of the specified characters then the rest of the input line is ignored.
+ Default value of the string is "#!" on VMS and "#" otherwise.
 
  Syntax:
        set datafile commentschars {"<string>"}
        show datafile commentschars
        unset commentschars
 
- Default value of the string is "#!" on VMS and "#" otherwise.
-
  Then, the following line in a data file is completely ignored
      # 1 2 3 4
  but the following
      1 # 3 4
- produces rather unexpected plot unless
+ produces a rather unexpected plot unless
      set datafile missing '#'
  is specified as well.
 

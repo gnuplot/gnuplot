@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.218 2012/04/17 22:42:52 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.219 2012/05/02 04:21:58 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -1953,6 +1953,14 @@ df_readascii(double v[], int max)
 	assert(df_no_use_specs == 0
 	       || output == df_no_use_specs
 	       || output == max);
+
+	/*
+	 * EAM Apr 2012 - If there is no using spec, then whatever we found on
+	 * the first line becomes the expectation for the rest of the input file.
+	 * THIS IS A CHANGE!
+	 */
+	 if (df_no_use_specs == 0)
+		df_no_use_specs = output;
 
 	return output;
 
