@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: svg.trm,v 1.137 2012/04/26 17:24:29 sfeam Exp $
+ * $Id: svg.trm,v 1.138 2012/04/27 22:12:55 sfeam Exp $
  */
 
 /*------------------------------------------------------------------------------------------------------------------------------------
@@ -177,7 +177,7 @@ static int SVG_fontAvWidth = 0;	/* estimated current font char average width*/
 static short SVG_Pen_RealID __PROTO ((int));
 static void SVG_PathOpen __PROTO ((void));
 static void SVG_PathClose __PROTO ((void));
-static void SVG_PathLimit __PROTO ((void));
+static void SVG_AddSpaceOrNewline __PROTO ((void));
 static void SVG_GroupOpen __PROTO ((void));
 static void SVG_GroupClose __PROTO ((void));
 static void SVG_SetFont __PROTO ((const char *name, double size));
@@ -285,7 +285,7 @@ SVG_PathOpen ()
 	/* Dash patterns */
 	if (SVG_dashed && SVG_LineType % SVG_dashtypes > 0)
 	    fprintf(gpoutfile, "stroke-dasharray='%s' ",
-	 	    SVG_dashpattern[SVG_LineType % SVG_dashtypes]);
+		    SVG_dashpattern[SVG_LineType % SVG_dashtypes]);
 
 	/* RGBA */
 	if (SVG_alpha != 0.0)
@@ -317,13 +317,15 @@ SVG_PathClose ()
 }
 
 /*------------------------------------------------------------------------------------------------------------------------------------
-	SVG_PathLimit
+	SVG_AddSpaceOrNewline
 ------------------------------------------------------------------------------------------------------------------------------------*/
 static void
-SVG_PathLimit ()
+SVG_AddSpaceOrNewline ()
 {
     if (SVG_path_count % 8 == 0)	/* avoid excessive line length*/
 	fputs ("\n\t\t", gpoutfile);
+    else
+      fputs (" ", gpoutfile);
 }
 
 /*------------------------------------------------------------------------------------------------------------------------------------
@@ -456,10 +458,10 @@ SVG_MoveForced(unsigned int x, unsigned int y)
 
     SVG_PathOpen ();
 
-    fprintf (gpoutfile, "M%.*f,%.*f ", PREC, X(x), PREC, Y(y));
+    fprintf (gpoutfile, "M%.*f,%.*f", PREC, X(x), PREC, Y(y));
     SVG_path_count++;
 
-    SVG_PathLimit ();
+    SVG_AddSpaceOrNewline ();
 
     SVG_xLast = x;
     SVG_yLast = y;
@@ -827,15 +829,15 @@ SVG_init ()
 
     fprintf (gpoutfile,
 	     "<?xml version=\"1.0\" %s standalone=\"no\"?>\n"
-	     "<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 1.1//EN\" \n"
+	     "<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 1.1//EN\"\n"
 	     " \"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd\">\n"
 	     "<svg ", svg_encoding);
 
     if (SVG_mouseable)
-	fprintf (gpoutfile, "onload=\"if (typeof(gnuplot_svg)!='undefined') gnuplot_svg.Init(evt)\" ");
+	fprintf (gpoutfile, " onload=\"if (typeof(gnuplot_svg)!='undefined') gnuplot_svg.Init(evt)\" ");
 
     if (SVG_fixed_size)
-	fprintf (gpoutfile, "\n width=\"%u\" height=\"%u\" ",
+	fprintf (gpoutfile, "\n width=\"%u\" height=\"%u\"",
 		 (unsigned int) (term->xmax / SVG_SCALE),
 		 (unsigned int) (term->ymax / SVG_SCALE));
 
@@ -1229,10 +1231,10 @@ SVG_vector (unsigned int x, unsigned int y)
 	    SVG_MoveForced(SVG_xLast, SVG_yLast);
 	}
 
-	fprintf (gpoutfile, "L%.*f,%.*f ", PREC, X(x), PREC, Y(y));
+	fprintf (gpoutfile, "L%.*f,%.*f", PREC, X(x), PREC, Y(y));
 	SVG_path_count++;
 
-	SVG_PathLimit ();
+	SVG_AddSpaceOrNewline ();
 
 	SVG_xLast = x;
 	SVG_yLast = y;
