@@ -1,7 +1,7 @@
 /*
- * $Id: gnuplot_mouse.js,v 1.16 2011/09/04 02:05:25 sfeam Exp $
+ * $Id: gnuplot_mouse.js,v 1.17 2011/11/26 00:31:15 sfeam Exp $
  */
-    gnuplot.mouse_version = "24 November 2011";
+    gnuplot.mouse_version = "3 May 2012";
 
 // Mousing code for use with gnuplot's 'canvas' terminal driver.
 // The functions defined here assume that the javascript plot produced by
@@ -156,9 +156,10 @@ gnuplot.mouse_update = function(e)
 	if (document.getElementById(gnuplot.active_plot_name + "_y2"))
 	    document.getElementById(gnuplot.active_plot_name + "_y2").innerHTML = y2.toPrecision(4);
     }
-
+  
+  var label_x, label_y;
   if (gnuplot.polar_mode) {
-    polar = gnuplot.convert_to_polar(x,y);
+    var polar = gnuplot.convert_to_polar(x,y);
     label_x = "ang= " + polar.ang.toPrecision(4);
     label_y = "R= " + polar.r.toPrecision(4);
   } else {
@@ -209,17 +210,17 @@ gnuplot.datafmt = function (x)
     return gnuplot.axisdate.toUTCString();
   } 
   if (gnuplot.plot_timeaxis_x == "Date") {
-    year = gnuplot.axisdate.getUTCFullYear();
-    month = gnuplot.axisdate.getUTCMonth();
-    date = gnuplot.axisdate.getUTCDate();
+    var year = gnuplot.axisdate.getUTCFullYear();
+    var month = gnuplot.axisdate.getUTCMonth();
+    var date = gnuplot.axisdate.getUTCDate();
     return (" " + date).slice (-2) + "/"
          + ("0" + (month+1)).slice (-2) + "/"
 	 + year;
   } 
   if (gnuplot.plot_timeaxis_x == "Time") {
-    hour = gnuplot.axisdate.getUTCHours();
-    minute = gnuplot.axisdate.getUTCMinutes();
-    second = gnuplot.axisdate.getUTCSeconds();
+    var hour = gnuplot.axisdate.getUTCHours();
+    var minute = gnuplot.axisdate.getUTCMinutes();
+    var second = gnuplot.axisdate.getUTCSeconds();
     return ("0" + hour).slice (-2) + ":"
          + ("0" + minute).slice (-2) + ":"
          + ("0" + second).slice (-2);
@@ -229,7 +230,7 @@ gnuplot.datafmt = function (x)
 gnuplot.convert_to_DMS = function (x)
 {
     var dms = {d:0, m:0, s:0};
-    deg = Math.abs(x);
+    var deg = Math.abs(x);
     dms.d = Math.floor(deg);
     dms.m = Math.floor((deg - dms.d) * 60.);
     dms.s = Math.floor((deg - dms.d) * 3600. - dms.m * 60.);
@@ -242,7 +243,7 @@ gnuplot.convert_to_DMS = function (x)
 
 gnuplot.convert_to_polar = function (x,y)
 {
-    polar = new Object;
+    var polar = new Object;
     var phi, r;
     phi = Math.atan2(y,x);
     if (gnuplot.plot_logaxis_r) 
@@ -257,6 +258,7 @@ gnuplot.convert_to_polar = function (x,y)
 gnuplot.saveclick = function (event)
 {
   gnuplot.mouse_update(event);
+  var button, label_x, label_y;
   
   // Limit tracking to the interior of the plot
   if (gnuplot.plotx < 0 || gnuplot.ploty < 0) return;
@@ -303,7 +305,9 @@ gnuplot.zoom_in = function (event)
     return false;
 
   gnuplot.mouse_update(event);
-  
+ 
+  var button;
+
   if (event.which == null) 	/* IE case */
     button= (event.button < 2) ? "LEFT" : ((event.button == 4) ? "MIDDLE" : "RIGHT");
   else				/* All others */
@@ -382,7 +386,7 @@ gnuplot.unzoom = function (e)
 
 gnuplot.zoomXY = function(x,y)
 {
-  zoom = new Object;
+  var zoom = new Object;
   var xreal, yreal;
 
   zoom.x = x; zoom.y = y; zoom.clip = false;

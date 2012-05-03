@@ -1,22 +1,22 @@
 /*
- * $Id: gnuplot_common.js,v 1.8 2011/04/11 22:44:10 sfeam Exp $
+ * $Id: gnuplot_common.js,v 1.9 2011/10/01 04:10:48 sfeam Exp $
  */
 // Shared routines for gnuplot's HTML5 canvas terminal driver.
 
 var gnuplot = { };
 
-gnuplot.common_version = "30 September 2011";
+gnuplot.common_version = "3 May 2012";
 
 gnuplot.L = function (x,y) {
   if (gnuplot.zoomed) {
-    zoom = gnuplot.zoomXY(x/10.0,y/10.0);
+    var zoom = gnuplot.zoomXY(x/10.0,y/10.0);
     ctx.lineTo(zoom.x,zoom.y);
   } else
     ctx.lineTo(x/10.0,y/10.0);
 }
 gnuplot.M = function (x,y) {
   if (gnuplot.zoomed) {
-    zoom = gnuplot.zoomXY(x/10.0,y/10.0);
+    var zoom = gnuplot.zoomXY(x/10.0,y/10.0);
     ctx.moveTo(zoom.x,zoom.y);
   } else
     ctx.moveTo(x/10.0,y/10.0);
@@ -24,7 +24,7 @@ gnuplot.M = function (x,y) {
 gnuplot.R = function (x,y,w,h) {
   if (gnuplot.zoomed) {
     var dx, dy, dw, dh;
-    zoom = gnuplot.zoomXY(x/10.0,y/10.0);
+    var zoom = gnuplot.zoomXY(x/10.0,y/10.0);
     if (zoom.x >= gnuplot.plot_xmax) return;
     if (zoom.y >= gnuplot.plot_ybot) return;
     dx = zoom.x; dy = zoom.y;
@@ -37,9 +37,9 @@ gnuplot.R = function (x,y,w,h) {
     ctx.fillRect(x/10.0, y/10.0, w/10.0, h/10.0);
 }
 gnuplot.T = function (x,y,fontsize,justify,string) {
-  xx = x/10.0; yy = y/10.0;
+  var xx = x/10.0; var yy = y/10.0;
   if (gnuplot.zoomed) {
-    zoom = gnuplot.zoomXY(xx,yy);
+    var zoom = gnuplot.zoomXY(xx,yy);
     if (zoom.clip) return;
     xx = zoom.x; yy = zoom.y;
     if (gnuplot.plot_xmin < xx && xx < gnuplot.plot_xmax && gnuplot.plot_ybot > yy && yy > gnuplot.plot_ytop)
@@ -51,9 +51,9 @@ gnuplot.T = function (x,y,fontsize,justify,string) {
   else if (justify=="Center") ctx.drawTextCenter("sans", fontsize, xx, yy, string);
 }
 gnuplot.TR = function (x,y,angle,fontsize,justify,string) {
-  xx = x/10.0; yy = y/10.0;
+  var xx = x/10.0; var yy = y/10.0;
   if (gnuplot.zoomed) {
-    zoom = gnuplot.zoomXY(xx,yy);
+    var zoom = gnuplot.zoomXY(xx,yy);
     if (zoom.clip) return;
     xx = zoom.x; yy = zoom.y;
     if (gnuplot.plot_xmin < xx && xx < gnuplot.plot_xmax && gnuplot.plot_ybot > yy && yy > gnuplot.plot_ytop)
@@ -75,13 +75,13 @@ gnuplot.cfp = function () // close and fill polygon
 gnuplot.cfsp = function () // close and fill polygon with stroke color
     { ctx.closePath(); ctx.fillStyle = ctx.strokeStyle; ctx.stroke(); ctx.fill(); }
 gnuplot.Dot = function (x,y) {
-    xx = x; yy = y;
+    var xx = x; var yy = y;
     if (gnuplot.zoomed) {zoom = gnuplot.zoomXY(xx,yy); xx = zoom.x; yy = zoom.y; if (zoom.clip) return;}
     ctx.strokeRect(xx,yy,0.5,0.5);
 }
 gnuplot.Pt = function (N,x,y,w) {
-    xx = x; yy = y;
-    if (gnuplot.zoomed) {zoom = gnuplot.zoomXY(xx,yy); xx = zoom.x; yy = zoom.y; if (zoom.clip) return;}
+    var xx = x; var yy = y;
+    if (gnuplot.zoomed) {var zoom = gnuplot.zoomXY(xx,yy); xx = zoom.x; yy = zoom.y; if (zoom.clip) return;}
     if (w==0) return;
     switch (N)
     {
@@ -92,7 +92,7 @@ gnuplot.Pt = function (N,x,y,w) {
 	ctx.stroke();
 	break;
     case 1:
-	ww = w * 3/4;
+	var ww = w * 3/4;
 	ctx.beginPath();
 	ctx.moveTo(xx-ww,yy-ww); ctx.lineTo(xx+ww,yy+ww);
 	ctx.moveTo(xx+ww,yy-ww); ctx.lineTo(xx-ww,yy+ww);
@@ -135,7 +135,7 @@ gnuplot.ZI = function (image, m, n, x1, y1, x2, y2) {
   if (gnuplot.zoomed) {
     var sx, sy, sw, sh, dx, dy, dw, dh;
 
-    zoom = gnuplot.zoomXY(x1/10.0,y1/10.0);
+    var zoom = gnuplot.zoomXY(x1/10.0,y1/10.0);
     if (zoom.x >= gnuplot.plot_xmax) return;
     if (zoom.y >= gnuplot.plot_ybot) return;
     x1raw = zoom.xraw; y1raw = zoom.yraw;
@@ -144,7 +144,7 @@ gnuplot.ZI = function (image, m, n, x1, y1, x2, y2) {
     zoom = gnuplot.zoomXY((x2)/10.,(y2)/10.);
     if (zoom.xraw <= gnuplot.plot_xmin) return;
     if (zoom.yraw <= gnuplot.plot_ytop) return;
-    x2raw = zoom.xraw; y2raw = zoom.yraw;
+    var x2raw = zoom.xraw; var y2raw = zoom.yraw;
     dw = zoom.x - dx;  dh = zoom.y - dy;
 
     // FIXME: This is sometimes flaky. Needs integer truncation?

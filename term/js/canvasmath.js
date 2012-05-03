@@ -1,5 +1,5 @@
 /*
- * $Id: canvasmath.js,v 1.7 2012/03/24 21:34:11 sfeam Exp $
+ * $Id: canvasmath.js,v 1.8 2012/04/18 16:51:51 sfeam Exp $
  */
 // The canvastext.js code was released to the public domain by Jim Studt, 2007.
 // He may keep some sort of up to date copy at http://www.federated.com/~jim/canvastext/
@@ -330,12 +330,12 @@ CanvasTextFunctions.draw = function(ctx,font,size,x,y,str)
     ctx.lineCap = "round";
     ctx.lineWidth = 2.0 * mag;
 
-    for ( i = 0; i < len; i++) {
+    for (var i = 0; i < len; i++) {
 	var index = str.charAt(i);
 
 	// EAM tab and newline
 	if (index == '	') {
-	    tabstop = 48 * mag;
+	    var tabstop = 48 * mag;
 	    x = tabstop * Math.ceil(x/tabstop);
 	    continue;
 	} else if (index < ' ') {
@@ -359,7 +359,7 @@ CanvasTextFunctions.draw = function(ctx,font,size,x,y,str)
 
 	var penUp = 1;
 	var needStroke = 0;
-	for ( j = 0; j < c.points.length; j++) {
+	for (var j = 0; j < c.points.length; j++) {
 	    var a = c.points[j];
 	    if ( a[0] == -1 && a[1] == -1) {
 		penUp = 1;

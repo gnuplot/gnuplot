@@ -1,3 +1,9 @@
+2012-05-03  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/js/canvasmath.js term/js/gnuplot_common.js term/js/gnuplot_svg.js
+	term/js/gnuplot_dashedlines.js term/js/gnuplot_mouse.js:
+	Reduce the scope of local variables.
+
 2012-05-02  Arun Persaud  <arun@nubati.net>
 
 	* term/svg.trm:  Remove trailing whitespace from output svg files.
