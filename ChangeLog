@@ -17,6 +17,8 @@
 	 The individual config.* files and the source code itself can be cleaned
 	 up later to remove the need for this definition.
 
+	* src/ansi2knr.1 src/ansi2knr.c src/ansichek.h: Remove these.
+
 2012-05-03  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/js/canvasmath.js term/js/gnuplot_common.js term/js/gnuplot_svg.js
