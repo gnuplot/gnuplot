@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.367 2012/04/18 00:13:46 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.368 2012/04/26 18:16:04 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -197,6 +197,12 @@ set_command()
 
 	int save_token;
 	set_iterator = check_for_iteration();
+	if (empty_iteration(set_iterator)) {
+	    /* Skip iteration [i=start:end] where start > end */
+	    while (!END_OF_COMMAND) c_token++;
+	    cleanup_iteration(set_iterator);
+	    return;
+	}
 	save_token = c_token;
 	ITERATE:
 

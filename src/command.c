@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.233 2012/03/09 20:23:31 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.234 2012/04/17 22:42:52 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -1145,9 +1145,12 @@ do_command()
     clause_depth++;
     c_token--;	 /* Let the parser see the closing curly brace */
 
-    clause = gp_alloc(do_end - do_start, "clause");
+    clause = gp_alloc(do_end - do_start + 2, "clause");
     memcpy(clause, &gp_input_line[do_start+1], do_end - do_start);
     clause[do_end - do_start - 1] = '\0';
+
+    if (empty_iteration(do_iterator))
+	strcpy(clause, ";");
 
     do {
 	do_string(clause);
