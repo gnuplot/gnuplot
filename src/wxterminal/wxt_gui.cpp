@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.cpp,v 1.91.2.8 2012/10/14 02:31:34 sfeam Exp $
+ * $Id: wxt_gui.cpp,v 1.91.2.9 2013/02/20 05:27:33 sfeam Exp $
  */
 
 /* GNUPLOT - wxt_gui.cpp */
@@ -1339,11 +1339,19 @@ void wxtPanel::RaiseConsoleWindow()
 	}
 #endif /* USE_GTK */
 
-#if defined(_Windows) && !defined(WGP_CONSOLE)
-	/* Make sure the text window is visible: */
-	ShowWindow(textwin.hWndParent, SW_SHOW);
-	/* and activate it (--> Keyboard focus goes there */
-	BringWindowToTop(textwin.hWndParent);
+#ifdef _Windows
+	HWND console = NULL;
+#ifdef WGP_CONSOLE
+	console = GetConsoleWindow();
+#else
+	console = textwin.hWndParent;
+#endif
+	if (console != NULL) {
+		/* Make sure the text window is visible: */
+		ShowWindow(console, SW_SHOW);
+		/* and activate it --> Keyboard focus goes there */
+		BringWindowToTop(console);
+	}
 #endif /* _Windows */
 
 #ifdef OS2
@@ -1723,7 +1731,7 @@ void wxt_init()
 	wxt_current_plot->hinting = hinting_setting;
 
 #ifdef HAVE_LOCALE_H
-	/* when wxGTK was initialised above, GTK+ also set the locale of the 
+	/* when wxGTK was initialised above, GTK+ also set the locale of the
 	 * program itself;  we must revert it */
 	if (wxt_status == STATUS_UNINITIALIZED) {
 		extern char *current_locale;
@@ -1830,7 +1838,7 @@ void wxt_text()
 	/* Save a snapshot of the axis state so that we can continue
 	 * to update mouse cursor coordinates even though the plot is not active */
 	wxt_current_window->axis_mask = wxt_axis_mask;
-	memcpy( wxt_current_window->axis_state, 
+	memcpy( wxt_current_window->axis_state,
 	 	wxt_axis_state, sizeof(wxt_axis_state) );
 #endif
 
@@ -1984,7 +1992,7 @@ void wxt_put_text(unsigned int x, unsigned int y, const char * string)
 		* we get stuck in an infinite loop) and try again. */
 
 		while (*(string = enhanced_recursion((char*)string, TRUE, wxt_current_plot->fontname,
-				wxt_current_plot->fontsize * wxt_set_fontscale, 
+				wxt_current_plot->fontsize * wxt_set_fontscale,
 				0.0, TRUE, TRUE, 0))) {
 			wxt_enhanced_flush();
 
@@ -2852,7 +2860,7 @@ void wxt_raise_terminal_group()
 	for(wxt_iter = wxt_window_list.begin(); wxt_iter != wxt_window_list.end(); wxt_iter++) {
 		FPRINTF((stderr,"wxt : raise window %d\n",wxt_iter->id));
 		wxt_iter->frame->Show(true);
-		/* FIXME Why does wxt_iter doesn't work directly ? */
+		/* FIXME Why does wxt_iter not work directly? */
 		wxt_raise_window(&(*wxt_iter),true);
 	}
 	wxt_MutexGuiLeave();
@@ -2930,7 +2938,7 @@ void wxt_close_terminal_window(int number)
 }
 
 
-/* The following two routines allow us to update the cursor position 
+/* The following two routines allow us to update the cursor position
  * in the specified window even if the window is not active
  */
 
@@ -2940,7 +2948,7 @@ static double mouse_to_axis(int mouse_coord, wxt_axis_state_t *axis)
 
 	if (axis->term_scale == 0.0)
 	    return 0;
-	axis_coord = axis->min 
+	axis_coord = axis->min
 	           + ((double)mouse_coord - axis->term_lower) / axis->term_scale;
 	if (axis->logbase > 0)
 		axis_coord = exp(axis_coord * axis->logbase);
@@ -2956,7 +2964,7 @@ static void wxt_update_mousecoords_in_window(int number, int mx, int my)
 		return;
 
 	if ((window = wxt_findwindowbyid(number))) {
-		
+
 		/* TODO: rescale mx and my using stored per-plot scale info */
 		char mouse_format[66];
 		char *m = mouse_format;
@@ -3481,9 +3489,6 @@ void wxt_atexit()
 	int i;
 	int openwindows = 0;
 	int persist_setting;
-#ifdef _Windows
-	MSG msg;
-#endif /*_Windows*/
 
 	if (wxt_status == STATUS_UNINITIALIZED)
 		return;
@@ -3553,7 +3558,7 @@ void wxt_atexit()
 	/* if fork() is available, use it so that the initial gnuplot process
 	 * exits and the child process continues in the background.
 	 */
-	/* NB: 
+	/* NB:
 	 * If there are no plot windows open, then once the parent process
 	 * exits the child can receive no input and will become a zombie.
 	 * So destroy any closed window first, and only fork if some remain open.
@@ -3683,7 +3688,7 @@ void wxt_sigint_handler(int WXUNUSED(sig))
 {
 	FPRINTF((stderr,"custom interrupt handler called\n"));
 	signal(SIGINT, wxt_sigint_handler);
-	/* routines must check regularly for wxt_status, 
+	/* routines must check regularly for wxt_status,
 	 * and abort cleanly on STATUS_INTERRUPT_ON_NEXT_CHECK */
 	wxt_status = STATUS_INTERRUPT_ON_NEXT_CHECK;
 	if (wxt_current_plot)

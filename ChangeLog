@@ -1,5 +1,10 @@
 2012-05-04  Bastian Maerkisch  <bmaerkisch@web.de>
 
+	* src/win/wgraph.c (WndGraphProc), src/wxterminal/wxt_gui.cpp
+	(wxtPanel::RaiseConsoleWindow), src/wxterminal/wxt_gui.h: 
+	Implement space-raises-console for console mode gnuplot.
+	Backport from 4.7.
+
 	* config/mingw/Makefile:  Extend use of VPATH which makes some explicit
 	rules superfluous. Automatically create dependency .d files during
 	build. Include current date in filenames of zip-file and installer for
