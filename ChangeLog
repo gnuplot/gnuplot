@@ -1,3 +1,8 @@
+2012-05-04  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/set.c(set_command) src/command.c(do_command):  Test for empty
+	iteration loop in "set for ..." and "do for ..." commands.
+
 2012-04-27  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/svg.trm:  Prevent illegal characters from being generated as 

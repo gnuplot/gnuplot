@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: parse.c,v 1.65 2011/09/07 18:42:37 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: parse.c,v 1.66 2011/09/29 18:39:01 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - parse.c */
@@ -1199,10 +1199,8 @@ empty_iteration(t_iterator *iter)
 {
     if (!iter)
 	return FALSE;
-
-    /* FIXME: shouldn't we warn or error out instead? */
-
-    return iter->empty_iteration;
+    else
+	return iter->empty_iteration;
 }
 
 t_iterator *
