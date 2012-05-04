@@ -1,3 +1,22 @@
+2012-05-04  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* CodeStyle config/Makefile.am.in configure.in demo/Makefile.am.in
+	 lisp/Makefile.am m4/Makefile.am.in Makefile.am man/Makefile.am
+	 share/LaTeX/Makefile.am share/Makefile.am src/Makefile.am
+	 src/qtterminal/Makefile.am src/version.c src/wxterminal/Makefile.am
+	 term/Makefile.am.in tutorial/Makefile.am.in:
+
+	 Automake 1.12 removes support for the AM_C_PROTOTYPES macro and for
+	 conversion of ANSI C code to K&R C code.  Gnuplot's CodeStyle file has
+	 warned since version 3.7 that gnuplot would drop support for ansi2knr
+	 "very soon".  Now 12+ years later the other shoe has dropped.
+	 
+	 This set of changes removes reference to AM_C_PROTOTYPES and ansi2knr
+	 in the autoconf files, replacing it with an unconditional
+	 AC_DEFINE(PROTOTYPES,1) so that the existing source code stays happy.
+	 The individual config.* files and the source code itself can be cleaned
+	 up later to remove the need for this definition.
+
 2012-05-03  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/js/canvasmath.js term/js/gnuplot_common.js term/js/gnuplot_svg.js

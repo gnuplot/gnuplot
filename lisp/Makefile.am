@@ -1,5 +1,5 @@
 ## Process this file with automake to produce Makefile.in -*-Makefile-*-
-AUTOMAKE_OPTIONS = foreign 1.2h
+AUTOMAKE_OPTIONS = foreign
 
 ELS = gnuplot-gui.el gnuplot.el info-look.20.2.el info-look.20.3.el
 ELCS = gnuplot.elc gnuplot-gui.elc @INFO_LOOK_ELC@

@@ -1,4 +1,4 @@
-$Id: CodeStyle,v 1.8 1999/06/14 19:17:37 lhecking Exp $
+$Id: CodeStyle,v 1.9 2001/02/01 17:56:04 broeker Exp $
 
 The following things have be observed when writing new code for gnuplot:
 (this file is currently under construction)  Some of the following is
@@ -133,6 +133,10 @@ code on non-ansi compilers.
  since existing code seems to work with k&r, we're sticking
  with it for the time being.
 ]
+
+April 2012:  Many years later, version 1.12 of the automake toolchain
+itself has abandoned support for non-ansification using ansi2knr.
+So the above section is of only historical interest.
 
 
 
