@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot.c,v 1.148 2013/02/21 20:18:16 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot.c,v 1.128.2.15 2013/02/21 20:23:23 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot.c */
@@ -641,6 +641,9 @@ main(int argc, char **argv)
 	    ) {
 		FPRINTF((stderr,"'persist' command line option recognized\n"));
 	    } else if (strcmp(*argv, "-") == 0) {
+#if defined(_Windows) && !defined(WGP_CONSOLE)
+		TextShow(&textwin);
+#endif
 		interactive = TRUE;
 		while (!com_line());
 		interactive = FALSE;
@@ -667,13 +670,18 @@ main(int argc, char **argv)
 	    }
     }
 
-    /* take commands from stdin */
-    if (noinputfiles) {
-	/* FIXME: setting interactive true breaks Gnuplot.pm
-	 * but was used in the Windows code prior to Feb 2013.
-	 */
-	/* interactive = TRUE; */
+#ifdef _Windows
+    /* On Windows 'persist' is handled by keeping the main input loop running. */
+    if (persist_cl) {
+	interactive = TRUE;
 	while (!com_line());
+	interactive = FALSE;
+    } else
+#endif
+    {
+	/* take commands from stdin */
+	if (noinputfiles)
+	    while (!com_line());
     }
 
 #if (defined(HAVE_LIBREADLINE) || defined(HAVE_LIBEDITLINE)) && defined(GNUPLOT_HISTORY)

@@ -1,15 +1,42 @@
 2012-05-04  Bastian Maerkisch  <bmaerkisch@web.de>
 
+	Backports from 4.7 relevant for the Windows platform:
+
+	* src/win/wgraph.c src/win/winmain.c|h (WinMessageLoop) src/win/wtext.c:
+	Move Windows message handling from TextMessage() to new WinMessageLoop()
+	and make it accessible in Windows console mode.
+
+	* src/win/wtext.h (getchar): Make sure that getchar is defined.
+
+	* src/win/wcommon.h src/win/wtext.c (TextShow) src/win/winmain.h
+	src/win/winmain.c (WinWindowOpened, WinPersistTextClose)
+	src/win/wgraph.c (WndGraphProc) src/wxterminal/wx_term.h
+	src/wxterminal/wxt_gui.h src/wxterminal/wxt_gui.cpp (~wxtFrame, 
+	wxtFrame::onClose, wxt_window_opened, wxt_atexit) src/plot.c (main)
+	Revise handling of persist mode on Windows: Exit wgnuplot only after the
+	last plot window (wxt or win) has been closed. The text window is only
+	shown if "-" is given on the command line. No zombie wgnuplot process
+	when closing a persistent wxt terminal window. Console gnuplot behaviour
+	stays unchanged.
+	Bug #3538762
+
+	* src/plot.c (gnu_main) src/win/winmain.c (main): The Windows version
+	used to handle the persist command line option in winmain.c. Moving
+	it to plot.c ensures that the same options are supported on all
+	platforms. See Bug #3538762
+
+	* src/plot.c (main): Restore a code snippet for the Windows platform
+	which got removed by accident on Feb 3rd. Fixes -persist mode on
+	Windows.
+
 	* src/win/wgraph.c (WndGraphProc), src/wxterminal/wxt_gui.cpp
 	(wxtPanel::RaiseConsoleWindow), src/wxterminal/wxt_gui.h: 
 	Implement space-raises-console for console mode gnuplot.
-	Backport from 4.7.
 
 	* config/mingw/Makefile:  Extend use of VPATH which makes some explicit
 	rules superfluous. Automatically create dependency .d files during
 	build. Include current date in filenames of zip-file and installer for
 	non-release builds. Remove long-unused WINDOWS variable.
-	Backport from 4.7.
 
 	* win/gnuplot.iss win/README-Windows.txt win/README-Windows-ja.txt:
 	Release 4.6.2

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: winmain.c,v 1.52 2011/11/14 21:03:38 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: winmain.c,v 1.52.2.1 2011/12/11 11:39:29 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - win/winmain.c */
@@ -88,6 +88,10 @@ static char *RCSid() { return RCSid("$Id: winmain.c,v 1.52 2011/11/14 21:03:38 m
 #ifdef HAVE_GDIPLUS
 #include "wgdiplus.h"
 #endif
+#ifdef WXWIDGETS
+#include "wxterminal/wxt_term.h"
+#endif
+
 
 /* workaround for old header files */
 #ifndef CSIDL_APPDATA
@@ -127,7 +131,6 @@ char *authors[]={
                 };
 
 void WinExit(void);
-int gnu_main(int argc, char *argv[], char *env[]);
 static void WinCloseHelp(void);
 int CALLBACK ShutDown();
 
@@ -318,7 +321,7 @@ WinCloseHelp(void)
 }
 
 
-static char * 
+static char *
 GetLanguageCode()
 {
 	static char lang[6] = "";
@@ -428,15 +431,15 @@ int PASCAL WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 int main(int argc, char **argv)
 #endif
 {
-        /*WNDCLASS wndclass;*/
         LPSTR tail;
+	int i;
 
 #ifdef WGP_CONSOLE
 # define _argv argv
 # define _argc argc
         HINSTANCE hInstance = GetModuleHandle(NULL), hPrevInstance = NULL;
 #else
-#if defined(__MSC__) || defined(__WATCOMC__)
+#if defined(__MSC__) || defined(__WATCOMC__) || defined(__MINGW32__)
 #  define _argv __argv
 #  define _argc __argc
 #endif
@@ -550,17 +553,24 @@ int main(int argc, char **argv)
                 exit(1);
         textwin.hIcon = LoadIcon(hInstance, "TEXTICON");
         SetClassLong(textwin.hWndParent, GCL_HICON, (DWORD)textwin.hIcon);
-        if (_argc>1) {
-                int i,noend=FALSE;
-                for (i=0; i<_argc; ++i)
-                        if (!stricmp(_argv[i],"-noend") || !stricmp(_argv[i],"/noend")
-                            || !stricmp(_argv[i],"-persist"))
-                                noend = TRUE;
-                if (noend)
-                        ShowWindow(textwin.hWndParent, textwin.nCmdShow);
-        }
-        else
-                ShowWindow(textwin.hWndParent, textwin.nCmdShow);
+	/* Note: we want to know whether this is an interactive session so that we can
+	 * decide whether or not to write status information to stderr.  The old test
+	 * for this was to see if (argc > 1) but the addition of optional command line
+	 * switches broke this.  What we really wanted to know was whether any of the
+	 * command line arguments are file names or an explicit in-line "-e command".
+	 * (This is a copy of a code snippet from plot.c)
+	 */
+	for (i = 1; i < _argc; i++) {
+		if (!stricmp(_argv[i], "/noend"))
+			continue;
+		if ((_argv[i][0] != '-') || (_argv[i][1] == 'e')) {
+			interactive = FALSE;
+			break;
+		}
+	}
+	if (interactive || persist_cl) {
+		ShowWindow(textwin.hWndParent, textwin.nCmdShow);
+	}
         if (IsIconic(textwin.hWndParent)) { /* update icon */
                 RECT rect;
                 GetClientRect(textwin.hWndParent, (LPRECT) &rect);
@@ -590,7 +600,7 @@ int main(int argc, char **argv)
         if (!isatty(fileno(stdin)))
             setmode(fileno(stdin), O_BINARY);
 
-        gnu_main(_argc, _argv, environ);
+        gnu_main(_argc, _argv);
 
         /* First chance to close help system for console gnuplot,
         second for wgnuplot */
@@ -986,7 +996,7 @@ win_lower_terminal_window(int id)
 	while ((lpgw != NULL) && (lpgw->Id != id))
 		lpgw = lpgw->next;
 	if (lpgw != NULL)
-	    SetWindowPos(lpgw->hWndGraph, HWND_BOTTOM, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE | SWP_NOACTIVATE);
+		SetWindowPos(lpgw->hWndGraph, HWND_BOTTOM, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE | SWP_NOACTIVATE);
 }
 
 void
@@ -994,8 +1004,53 @@ win_lower_terminal_group(void)
 {
 	LPGW lpgw = listgraphs;
 	while (lpgw != NULL) {
-	    SetWindowPos(lpgw->hWndGraph, HWND_BOTTOM, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE | SWP_NOACTIVATE);
+		SetWindowPos(lpgw->hWndGraph, HWND_BOTTOM, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE | SWP_NOACTIVATE);
 		lpgw = lpgw->next;
 	}
 }
 
+
+/* return the number of graph windows (win terminal)*/
+TBOOLEAN
+WinWindowOpened(void)
+{
+	LPGW lpgw;
+
+	lpgw = listgraphs;
+	while (lpgw != NULL) {
+		if (GraphHasWindow(lpgw))
+			return TRUE;
+		lpgw = lpgw->next;
+	}
+	return FALSE;
+}
+
+
+#ifndef WGP_CONSOLE
+void
+WinPersistTextClose(void)
+{
+	TBOOLEAN window_opened = WinWindowOpened();
+#ifdef WXWIDGETS
+	window_opened |= wxt_window_opened();
+#endif
+	if (!window_opened &&
+		(textwin.hWndParent != NULL) && !IsWindowVisible(textwin.hWndParent))
+		PostMessage(textwin.hWndParent, WM_CLOSE, 0, 0);
+}
+#endif
+
+
+void
+WinMessageLoop(void)
+{
+	MSG msg;
+
+	while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
+		/* HBB 19990505: Petzold says we should check this: */
+		if (msg.message == WM_QUIT)
+			return;
+		TranslateMessage(&msg);
+		DispatchMessage(&msg);
+	}
+}

@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.cpp,v 1.91.2.9 2013/02/20 05:27:33 sfeam Exp $
+ * $Id: wxt_gui.cpp,v 1.91.2.10 2013/04/05 16:24:36 markisch Exp $
  */
 
 /* GNUPLOT - wxt_gui.cpp */
@@ -569,6 +569,11 @@ void wxtFrame::OnClose( wxCloseEvent& event )
 		}
 		this->Destroy();
 	}
+
+#if defined(_Windows) && !defined(WGP_CONSOLE)
+	/* Close text window if this was the last plot window. */
+	WinPersistTextClose();
+#endif
 }
 
 /* when the window is resized,
@@ -3465,20 +3470,21 @@ int wxt_waitforinput()
 
 /* returns true if at least one plot window is opened.
  * Used to handle 'persist' */
-bool wxt_window_opened()
+TBOOLEAN wxt_window_opened(void)
 {
 	std::vector<wxt_window_t>::iterator wxt_iter; /*declare the iterator*/
 
 	wxt_MutexGuiEnter();
-	for(wxt_iter = wxt_window_list.begin(); wxt_iter != wxt_window_list.end(); wxt_iter++) {
-		if ( wxt_iter->frame->IsShown() ) {
+	for (wxt_iter = wxt_window_list.begin(); wxt_iter != wxt_window_list.end(); wxt_iter++) {
+		if (wxt_iter->frame->IsShown()) {
 			wxt_MutexGuiLeave();
-			return true;
+			return TRUE;
 		}
 	}
 	wxt_MutexGuiLeave();
-	return false;
+	return FALSE;
 }
+
 
 /* Called when gnuplot exits.
  * Handle the 'persist' setting, ie will continue
@@ -3542,12 +3548,8 @@ void wxt_atexit()
 	FPRINTF((stderr,"wxt_atexit: handling \"persist\" setting\n"));
 
 #ifdef _Windows
-	if (!interactive) {
+	if (!persist_cl) {
 		interactive = TRUE;
-		/* be sure to show the text window */
-#ifndef WGP_CONSOLE
-		ShowWindow(textwin.hWndParent, textwin.nCmdShow);
-#endif
 		while (!com_line());
 	}
 #else /*_Windows*/

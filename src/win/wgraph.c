@@ -1,5 +1,5 @@
 /*
- * $Id: wgraph.c,v 1.144.2.3 2012/07/25 05:23:49 markisch Exp $
+ * $Id: wgraph.c,v 1.144.2.4 2013/04/05 16:24:36 markisch Exp $
  */
 
 /* GNUPLOT - win/wgraph.c */
@@ -46,8 +46,8 @@
 
 #define STRICT
 #ifdef USE_MOUSE
-/* shige: for mouse wheel */
-#define _WIN32_WINNT 0x0400
+/* shige: for mouse wheel, BM: GetConsoleWindow */
+#define _WIN32_WINNT 0x0500
 #endif
 /* BM: for AlphaBlend/TransparentBlt */
 #define WINVER 0x0501
@@ -593,9 +593,7 @@ GraphClose(LPGW lpgw)
 	/* close window */
 	if (lpgw->hWndGraph)
 		DestroyWindow(lpgw->hWndGraph);
-#ifndef WGP_CONSOLE
-	TextMessage();
-#endif
+	WinMessageLoop();
 	lpgw->hWndGraph = NULL;
 
 	lpgw->locked = TRUE;
@@ -3838,9 +3836,10 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			DestroyCursors(lpgw);
 #endif
 			DragAcceptFiles(hwnd, FALSE);
-			if (lpgw->lptw && !IsWindowVisible(lpgw->lptw->hWndParent)) {
-				PostMessage (lpgw->lptw->hWndParent, WM_CLOSE, 0, 0);
-			}
+			lpgw->hWndGraph = NULL;
+#ifndef WGP_CONSOLE
+			WinPersistTextClose();
+#endif
 			return 0;
 		case WM_CLOSE:
 			GraphClose(lpgw);

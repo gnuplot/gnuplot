@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.h,v 1.36 2011/11/06 04:06:10 sfeam Exp $
+ * $Id: wxt_gui.h,v 1.36.2.1 2013/04/05 16:24:36 markisch Exp $
  */
 
 /* GNUPLOT - wxt_gui.h */
@@ -590,10 +590,6 @@ int wxt_event_fd = -1;
 int wxt_sendevent_fd = -1;
 # endif /* WXT_MULTITHREADED */
 #endif /*USE_MOUSE*/
-
-/* returns true if at least one plot window is opened.
- * Used to handle 'persist' */
-static bool wxt_window_opened();
 
 /* helpers to handle the issues of the default Raise() and Lower() methods */
 static void wxt_raise_window(wxt_window_t* window, bool force);

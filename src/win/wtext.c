@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: wtext.c,v 1.36 2011/11/01 10:23:47 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: wtext.c,v 1.37 2011/11/14 21:03:38 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - win/wtext.c */
@@ -66,6 +66,7 @@ static char *RCSid() { return RCSid("$Id: wtext.c,v 1.36 2011/11/01 10:23:47 mar
 #include <commctrl.h>
 
 #include "wgnuplib.h"
+#include "winmain.h"
 #include "wresourc.h"
 #include "wcommon.h"
 #include "stdfn.h"
@@ -83,6 +84,7 @@ static char *RCSid() { return RCSid("$Id: wtext.c,v 1.36 2011/11/01 10:23:47 mar
 /* limits */
 static POINT ScreenMinSize = {16,4};
 
+BOOL CALLBACK AboutDlgProc(HWND hDlg, UINT wMsg, WPARAM wParam, LPARAM lParam);
 static LRESULT CALLBACK WndParentProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);
 static LRESULT CALLBACK WndTextProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);
 
@@ -135,15 +137,7 @@ static const COLORREF TextColorTable[16] = {
 void WDPROC
 TextMessage()
 {
-    MSG msg;
-    while (PeekMessage(&msg, 0, 0, 0, PM_REMOVE)) {
-#if 1 /* HBB 19990505: Petzold says we should check this: */
-        if (msg.message == WM_QUIT)
-            return;
-#endif
-        TranslateMessage(&msg);
-        DispatchMessage(&msg);
-    }
+	WinMessageLoop();
 }
 
 
@@ -255,8 +249,8 @@ TextInit(LPTW lptw)
 
     lptw->hStatusbar = CreateWindowEx(0, STATUSCLASSNAME, (LPSTR)NULL,
 				  WS_CHILD | SBARS_SIZEGRIP,
-				  0, 0, 0, 0, 
-				  lptw->hWndParent, (HMENU)ID_TEXTSTATUS, 
+				  0, 0, 0, 0,
+				  lptw->hWndParent, (HMENU)ID_TEXTSTATUS,
 				  lptw->hInstance, lptw);
     if (lptw->hStatusbar) {
 	RECT rect;
@@ -332,6 +326,17 @@ TextClose(LPTW lptw)
 }
 
 
+/* Bring the text window to front */
+void
+TextShow(LPTW lptw)
+{
+	ShowWindow(textwin.hWndParent, textwin.nCmdShow);
+	ShowWindow(lptw->hWndText, SW_SHOWNORMAL);
+	BringWindowToTop(lptw->hWndText);
+	SetFocus(lptw->hWndText);
+}
+
+
 /* Bring Cursor into text window */
 static void
 TextToCursor(LPTW lptw)
@@ -342,7 +347,7 @@ TextToCursor(LPTW lptw)
     int cyCursor;
 
     if (lptw->bWrap)
-	cyCursor = (lptw->CursorPos.y + (lptw->CursorPos.x / lptw->ScreenBuffer.wrap_at)) * lptw->CharSize.y; 
+	cyCursor = (lptw->CursorPos.y + (lptw->CursorPos.x / lptw->ScreenBuffer.wrap_at)) * lptw->CharSize.y;
     else
 	cyCursor = lptw->CursorPos.y * lptw->CharSize.y;
     if ((cyCursor + lptw->CharSize.y > lptw->ScrollPos.y + lptw->ClientSize.y)
@@ -378,7 +383,7 @@ NewLine(LPTW lptw)
     int ycorr;
     int last_lines;
 
-    /* append an empty line buffer, 
+    /* append an empty line buffer,
        dismiss previous lines if necessary */
     lplb = sb_get_last(&(lptw->ScreenBuffer));
     lb_init(&lb);
@@ -486,10 +491,10 @@ UpdateText(LPTW lptw, int count)
 	uint x = lptw->CursorPos.x;
 	uint y = lptw->CursorPos.y;
 
-	/* Always draw complete lines to avoid character overlap 
+	/* Always draw complete lines to avoid character overlap
 	   when using Cleartype. */
-	yofs = lptw->CursorPos.x / width; /* first line to draw */
-	n    = (lptw->CursorPos.x + count - 1) / width + 1 - yofs; /* number of lines */
+	yofs = x / width; /* first line to draw */
+	n    = (x + count - 1) / width + 1 - yofs; /* number of lines */
 	for (; n > 0; y++, n--) {
 	    ypos = (y + yofs) * lptw->CharSize.y - lptw->ScrollPos.y;
 	    DoLine(lptw, hdc, 0, ypos, 0, y + yofs, width);
@@ -539,7 +544,7 @@ TextPutCh(LPTW lptw, BYTE ch)
 	    break;
 	default: {
 	    char c = (char)ch;
-	    
+
 	    sb_last_insert_str(&(lptw->ScreenBuffer), lptw->CursorPos.x, &c, 1);
 	    /* TODO: add attribute support */
 	    UpdateText(lptw, 1);
@@ -569,8 +574,8 @@ TextPutStr(LPTW lptw, LPSTR str)
 		sb_last_insert_str(&(lptw->ScreenBuffer), idx, str - n, n);
 		sb_last_insert_str(&(lptw->ScreenBuffer), idx + n, "        ", tab);
 		/* TODO: add attribute support (lptw->Attr) */
-		idx += n + tab; 
-		count += n + tab; 
+		idx += n + tab;
+		count += n + tab;
 		n = 0;
 	    } else
 		n++;
@@ -718,7 +723,7 @@ DoLine(LPTW lptw, HDC hdc, int xpos, int ypos, int x, int y, int count)
 	outp = lb_substr(lb, x + idx, count - num - idx);
 	TextOut(hdc, xpos, ypos, outp, count - num - idx);
 	free(outp);
-	
+
 	xpos += lptw->CharSize.x * (count - num - idx);
 	idx = count-num;
     }
@@ -1218,13 +1223,13 @@ WndTextProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 	    uint new_x, new_y;
 
 	    /* keep upper left corner in place */
-	    sb_find_new_pos(&(lptw->ScreenBuffer), 
-		lptw->ScrollPos.x / lptw->CharSize.x, lptw->ScrollPos.y / lptw->CharSize.y, 
+	    sb_find_new_pos(&(lptw->ScreenBuffer),
+		lptw->ScrollPos.x / lptw->CharSize.x, lptw->ScrollPos.y / lptw->CharSize.y,
 		new_wrap, & new_x, & new_y);
 	    lptw->ScrollPos.x = lptw->CharSize.x * new_x + lptw->ScrollPos.x % lptw->CharSize.x;
 	    lptw->ScrollPos.y = lptw->CharSize.y * new_y + lptw->ScrollPos.y % lptw->CharSize.y;
 	} else {
-	    int xold, yold; 
+	    int xold, yold;
 	    int deltax, deltay;
 	    uint xnew, ynew;
 
@@ -1238,7 +1243,7 @@ WndTextProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 	    deltay = GPMAX(lptw->ScrollPos.y + lptw->ClientSize.y - (yold - 1) * lptw->CharSize.y, 0);
 	    deltax = xold * lptw->CharSize.x - lptw->ScrollPos.x;
 
-	    sb_find_new_pos(&(lptw->ScreenBuffer), 
+	    sb_find_new_pos(&(lptw->ScreenBuffer),
 		xold, yold, new_wrap, &xnew, &ynew);
 
 	    lptw->ScrollPos.x = GPMAX((xnew * lptw->CharSize.x) - deltax, 0);
@@ -1261,12 +1266,12 @@ WndTextProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 	    if ((lptw->MarkBegin.x != lptw->MarkEnd.x) ||
 		(lptw->MarkBegin.y != lptw->MarkEnd.y) ) {
 		uint new_x, new_y;
-		
-		sb_find_new_pos(&(lptw->ScreenBuffer), lptw->MarkBegin.x, lptw->MarkBegin.y, 
+
+		sb_find_new_pos(&(lptw->ScreenBuffer), lptw->MarkBegin.x, lptw->MarkBegin.y,
 		    lptw->ScreenSize.x - 1, & new_x, & new_y);
 		lptw->MarkBegin.x = new_x;
 		lptw->MarkBegin.y = new_y;
-		sb_find_new_pos(&(lptw->ScreenBuffer), lptw->MarkEnd.x, lptw->MarkEnd.y, 
+		sb_find_new_pos(&(lptw->ScreenBuffer), lptw->MarkEnd.x, lptw->MarkEnd.y,
 		    lptw->ScreenSize.x - 1, & new_x, & new_y);
 		lptw->MarkEnd.x = new_x;
 		lptw->MarkEnd.y = new_y;
@@ -1666,12 +1671,12 @@ WndTextProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		if ((lptw->MarkBegin.x != lptw->MarkEnd.x) ||
 		    (lptw->MarkBegin.y != lptw->MarkEnd.y) ) {
 		    uint new_x, new_y;
-		    
-		    sb_find_new_pos(&(lptw->ScreenBuffer), lptw->MarkBegin.x, lptw->MarkBegin.y, 
+
+		    sb_find_new_pos(&(lptw->ScreenBuffer), lptw->MarkBegin.x, lptw->MarkBegin.y,
 			new_wrap, & new_x, & new_y);
 		    lptw->MarkBegin.x = new_x;
 		    lptw->MarkBegin.y = new_y;
-		    sb_find_new_pos(&(lptw->ScreenBuffer), lptw->MarkEnd.x, lptw->MarkEnd.y, 
+		    sb_find_new_pos(&(lptw->ScreenBuffer), lptw->MarkEnd.x, lptw->MarkEnd.y,
 			new_wrap, & new_x, & new_y);
 		    lptw->MarkEnd.x = new_x;
 		    lptw->MarkEnd.y = new_y;
@@ -1686,13 +1691,13 @@ WndTextProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		    uint new_x, new_y;
 
 		    /* keep upper left corner in place */
-		    sb_find_new_pos(&(lptw->ScreenBuffer), 
-			lptw->ScrollPos.x / lptw->CharSize.x, lptw->ScrollPos.y / lptw->CharSize.y, 
+		    sb_find_new_pos(&(lptw->ScreenBuffer),
+			lptw->ScrollPos.x / lptw->CharSize.x, lptw->ScrollPos.y / lptw->CharSize.y,
 			new_wrap, & new_x, & new_y);
 		    lptw->ScrollPos.x = lptw->CharSize.x * new_x;
 		    lptw->ScrollPos.y = lptw->CharSize.y * new_y;
 		} else {
-		    int xold, yold; 
+		    int xold, yold;
 		    int deltax, deltay;
 		    uint xnew, ynew;
 
@@ -1706,7 +1711,7 @@ WndTextProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		    deltay = GPMAX(lptw->ScrollPos.y + lptw->ClientSize.y - (yold - 1) * lptw->CharSize.y, 0);
 		    deltax = xold * lptw->CharSize.x - lptw->ScrollPos.x;
 
-		    sb_find_new_pos(&(lptw->ScreenBuffer), 
+		    sb_find_new_pos(&(lptw->ScreenBuffer),
 			xold, yold, new_wrap, &xnew, &ynew);
 
 		    lptw->ScrollPos.x = GPMAX((xnew * lptw->CharSize.x) - deltax, 0);
@@ -2028,7 +2033,7 @@ WriteTextIni(LPTW lptw)
 
 /* Helper function to avoid signedness conflict --- windows delivers an INT, we want an uint */
 static LPSTR
-GetUInt(LPSTR str, uint *pval) 
+GetUInt(LPSTR str, uint *pval)
 {
     INT val_fromGetInt;
 
