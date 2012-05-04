@@ -1,5 +1,5 @@
 # Hello, emacs: this is a -*- Makefile -*-
-# $Id: Makefile,v 1.14.2.9 2012/06/13 11:01:51 markisch Exp $
+# $Id: Makefile,v 1.14.2.10 2012/09/16 18:36:47 markisch Exp $
 #
 # GNUPLOT Makefile for MinGW/MSYS on Windows
 # This assumes usual installation of the MinGW32 toolkit, the free
@@ -23,7 +23,7 @@
 # Comment out the definition lines to disable the according features:
 
 # Define this only if doing a release build
-#RELEASE=1
+RELEASE=1
 
 # Use more modern HTML help instead of no longer supported Windows help system
 # Please update the HHWPATH below if necessary.
@@ -261,7 +261,7 @@ T=$(TOP)/term/
 D=$(TOP)/docs/
 M=$(TOP)/demo/
 
-VPATH = $(S)
+VPATH = $(S):$(W):$(S)/wxterminal
 
 TERMFLAGS = -DGNUPLOT_PS_DIR=\"$(GNUPLOT_PS_DIR)\" -DGNUPLOT_JS_DIR=\"$(GNUPLOT_JS_DIR)\"
 TERMFLAGS += -I$(TOP)/term
@@ -270,6 +270,10 @@ TERMLIBS =
 
 CFLAGS += -I. -I$(S) -D_Windows -DHAVE_CONFIG_H $(OPTS)
 CFLAGS += -DGNUPLOT_SHARE_DIR=\"$(GNUPLOT_SHARE_DIR)\"
+
+ifndef RELEASE
+  CFLAGS += -DDEVELOPMENT_VERSION
+endif
 
 ifdef MOUSE
   CFLAGS += -DUSE_MOUSE=1 -DWIN_IPC
@@ -427,24 +431,10 @@ OBJS = $(COREOBJS) version.$(O) gpexecute.$(O) $(WX_OBJS) $(CAIRO_OBJS)
 WINOBJS = winmain.$(O) wgnuplib.$(O) wgraph.$(O) wprinter.$(O) wtext.$(O) \
 	  wpause.$(O) wmenu.$(O) screenbuf.$(O) wgdiplus.$(O)
 
-WINDOWS = makefile.nt README.win $(W)/wcommon.h \
-	$(W)/wgnuplib.c $(W)/wgnuplib.h $(W)/wgnuplib.rc \
-	$(W)/wgnuplot.hpj $(W)/wgnuplot.mnu $(W)/wgraph.c \
-	$(W)/winmain.c $(W)/wmenu.c $(W)/wpause.c $(W)/wprinter.c \
-	$(W)/wresourc.h $(W)/wtext.c $(W)/wtext.h $(W)/geticon.c \
-	$(W)/screenbuf.c $(W)/screenbuf.h $(W)/wgdiplus.cpp $(W)/wgdiplus.h \
-	$(D)doc2rtf.c $(T)win.trm $(W)/grpicon.ico $(W)/texticon.ico
-
-ifdef HTML_HELP
-WINDOWS +=	$(D)windows/doc2html.c
-else
-WINDOWS +=	$(D)doc2rtf.c
-endif
-
 # default rules
 .SUFFIXES: .exe .$(O) .c
 .c.$(O):
-	$(CC) -c $(CFLAGS) -o $@ $<
+	$(CC) -c $(CFLAGS) $(CFLAGSEXTRA) -MMD -MT '$*.$$(O)' -MF $*.d -o $@ $<
 
 LDLIBS = -lkernel32 -lgdi32 -lwinspool -lcomdlg32 -lcomctl32 -ladvapi32 -lshell32 -lmsimg32 -lgdiplus
 
@@ -460,17 +450,23 @@ $(TARGET): $(OBJS) $(WINOBJS) wgplt_res.$(O) texticon.ico grpicon.ico
 $(PGNUPLOT): $(W)/pgnuplot.c version.$(O)
 	$(CC) -O2 -DHAVE_STDBOOL_H -s -o $@ $^ -I$(W) -I$(S) -luser32
 
-# rules
+# pull in dependency info for existing object files
+ifndef NODEPS
+-include $(OBJS:.$(O)=.d)
+-include $(WINOBJS:.$(O)=.d)
+endif
 
-wgplt_res.$(O) :  $(W)/wgnuplot.rc $(W)/wgnuplib.rc $(W)/wresourc.h texticon.ico grpicon.ico
+# explicit rules
+
+wgplt_res.$(O): $(W)/wgnuplot.rc $(W)/wgnuplib.rc $(W)/wresourc.h texticon.ico grpicon.ico
 	$(RC) $(RCFLAGS) $< $(RCOUT)
 	$(RES2COFF)
 
 show.$(O): show.c plot.h setshow.h
-	$(CC) -c $(CFLAGS) -DHELPFILE=\"$(HELPFILE)\" -DBINDIR=\"$(bindir)\" -DGNUPLOT_PS_DIR=\"$(GNUPLOT_PS_DIR)\" -o $@ $<
+	$(CC) -c $(CFLAGS) -DHELPFILE=\"$(HELPFILE)\" -DBINDIR=\"$(bindir)\" -DGNUPLOT_PS_DIR=\"$(GNUPLOT_PS_DIR)\" -MMD -MT '$*.$$(O)' -MF $*.d -o $@ $<
 
 term.$(O): term.c term.h plot.h setshow.h bitmap.h $(CORETERM)
-	$(CC) -c $(CFLAGS) $(TERMFLAGS) -o $@ $<
+	$(CC) -c $(CFLAGS) $(TERMFLAGS) -MMD -MT '$*.$$(O)' -MF $*.d -o $@ $<
 
 version.$(O): $(S)/version.c
 
@@ -482,43 +478,20 @@ endif
 WINDEPS = $(W)/wgnuplib.h $(W)/wcommon.h $(W)/wresourc.h $(W)/screenbuf.h $(W)/wgdiplus.h
 
 winmain.$(O): $(W)/winmain.c $(W)/wgnuplib.h $(W)/wtext.h plot.h
-	$(CC) -c $(CFLAGS) -o $@ -DHELPFILE=\"$(HELPFILE)\" $<
+	$(CC) -c $(CFLAGS) -MMD -MT '$*.$$(O)' -MF $*.d -o $@ -DHELPFILE=\"$(HELPFILE)\" $<
 
-wgnuplib.$(O): $(W)/wgnuplib.c $(WINDEPS)
-	$(CC) -c $(CFLAGS) -o $@ $<
-
-wmenu.$(O): $(W)/wmenu.c $(WINDEPS)
-	$(CC) -c $(CFLAGS) -o $@ $<
-
-wtext.$(O): $(W)/wtext.c $(WINDEPS)
-	$(CC) -c $(CFLAGS) -o $@ $<
-
-screenbuf.$(O): $(W)/screenbuf.c $(WINDEPS)
-	$(CC) -c $(CFLAGS) -o $@ $<
-
-wpause.$(O): $(W)/wpause.c $(S)/wxterminal/wxt_term.h $(WINDEPS)
-	$(CC) -c $(CFLAGS) -o $@ $<
-
-wprinter.$(O): $(W)/wprinter.c $(WINDEPS)
-	$(CC) -c $(CFLAGS) -o $@ $<
-
-wgraph.$(O): $(W)/wgraph.c $(WINDEPS)
-	$(CC) -c $(CFLAGS) -o $@ $<
 
 wgdiplus.$(O): $(W)/wgdiplus.cpp $(WINDEPS)
-	$(CXX) -c $(CXXFLAGS) -o $@ $<
+	$(CXX) -c $(CXXFLAGS) -MMD -MT '$*.$$(O)' -MF $*.d -o $@ $<
 
 wgnuplot.mnu: $(W)/wgnuplot.mnu
 	$(CP) $^ $@
 
 wxt_gui.$(O): $(S)/wxterminal/wxt_gui.cpp $(S)/wxterminal/wxt_gui.h
-	$(CXX) -c $(CFLAGS) $(CXXFLAGS) $(CAIRO_CFLAGS) -o $@ $<
+	$(CXX) -c $(CFLAGS) $(CXXFLAGS) $(CAIRO_CFLAGS) -MMD -MT '$*.$$(O)' -MF $*.d -o $@ $<
 
 gp_cairo.$(O): $(S)/wxterminal/gp_cairo.c $(S)/wxterminal/gp_cairo.h
-	$(CC) -c $(CFLAGS) $(CXXFLAGS) $(PANGOCAIRO_CFLAGS) -o $@ $<
-
-gp_cairo_helpers.$(O): $(S)/wxterminal/gp_cairo_helpers.c $(S)/wxterminal/gp_cairo_helpers.h
-	$(CC) -c $(CFLAGS) -o $@ $<
+	$(CC) -c $(CFLAGS) $(CXXFLAGS) $(PANGOCAIRO_CFLAGS) -MMD -MT '$*.$$(O)' -MF $*.d -o $@ $<
 
 # extract icons from wgnuplot.rc
 texticon.ico: grpicon.ico
@@ -728,7 +701,7 @@ ps_guide.pdf: $(D)psdoc/ps_guide.ps
 # clean up temporary files
 clean:
 	$(RM) config.h wgnuplot.map wgnuplot.res $(W)/gnuplot.rtf
-	$(RM) *.$(O) *.po *.o *.co
+	$(RM) *.$(O) *.po *.o *.co *.d
 	$(RM) doc2*.exe $(W)/wgnuplib.res wgnuplib.map wgnuplot.lib
 	$(RM) $(M)bf_test.exe *.ico geticon.exe allterm.h allterm.c
 	$(RM) *.aux *.log *.dvi *.toc
@@ -737,8 +710,8 @@ clean:
 	$(RM) eg?.tex eg?.eps linepoin.tex test.tex test_tikz.tex
 	$(RM) $(D)windows/wgnuplot.log $(D)windows/wgnuplot.hhc
 	$(RM) $(D)windows/*.png $(D)windows/wgnuplot.html
-	$(RM) -rf ./dist/ ./gnuplot/
-	$(RM) -rf $(JA)
+	-$(RM) -rf ./dist/ ./gnuplot/
+	-$(RM) -rf $(JA)
 
 realclean: veryclean
 veryclean: clean
@@ -832,8 +805,16 @@ installer:
 	cp -p grpicon.ico ./dist/bin/
 	cp -p $(TOP)/win/*.iss ./dist
 	(cd ./dist; $(ISCC) gnuplot.iss)
-	mv ./dist/gp*-setup.exe .
+ifdef RELEASE
+	mv ./dist/gp*-setup.exe gp462-win32-setup.exe
+else
+	mv ./dist/gp*-setup.exe gp462-`date +%Y%m%d`-win32-mingw.exe
+endif
 
 zip:
 	$(MAKE) DESTDIR=./gnuplot install
-	zip -mro9 gp461-win32.zip gnuplot
+ifdef RELEASE
+	zip -mro9 gp462-win32-mingw.zip gnuplot
+else
+	zip -mro9 gp462-`date +%Y%m%d`-win32-mingw.zip gnuplot
+endif

@@ -1,3 +1,14 @@
+2012-05-04  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* config/mingw/Makefile:  Extend use of VPATH which makes some explicit
+	rules superfluous. Automatically create dependency .d files during
+	build. Include current date in filenames of zip-file and installer for
+	non-release builds. Remove long-unused WINDOWS variable.
+	Backport from 4.7.
+
+	* win/gnuplot.iss win/README-Windows.txt win/README-Windows-ja.txt:
+	Release 4.6.2
+
 2013-03-29  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/qtterminal/QtGnuplotScene.cpp (processEvent):  Fix off-by-one
