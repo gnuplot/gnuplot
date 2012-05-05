@@ -3,6 +3,14 @@
 	* src/term.c term/estimate.trm:  Rename utf8_strlen to utf8_strwidth
 	to avoid name collision.
 
+	* src/internal.c (f_strlen f_range) src/util.c (strlen_utf8 gp_strlen)
+	(utf8_strchrn gp_strchrn) src/util.h:  Fix gnuplot's user-visible
+	string handling routines strlen() and substr() so that they handle
+	multibyte UTF-8 characters correctly.  I.e. strlen() returns the number
+	of characters, not the number of bytes.  Other multi-byte encodings are
+	not handled, however.
+	Bug #3480075
+
 2012-05-04  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/set.c(set_command) src/command.c(do_command):  Test for empty

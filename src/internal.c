@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: internal.c,v 1.66 2011/10/10 06:13:02 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: internal.c,v 1.67 2011/11/10 05:15:58 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - internal.c */
@@ -1095,7 +1095,7 @@ f_strlen(union argument *arg)
     if (a.type != STRING)
 	int_error(NO_CARET, "internal error : strlen of non-STRING argument");
 
-    (void) Ginteger(&result, (int)strlen(a.v.string_val));
+    (void) Ginteger(&result, (int)gp_strlen(a.v.string_val));
     gpfree_string(&a);
     push(&result);
 }
@@ -1120,6 +1120,11 @@ f_strstrt(union argument *arg)
     push(&result);
 }
 
+/*
+ * f_range() handles both explicit calls to substr(string, beg, end)
+ * and the short form string[beg:end].  The calls to gp_strlen() and
+ * gp_strchrn() allow it to handle utf8 strings.
+ */
 void
 f_range(union argument *arg)
 {
@@ -1139,15 +1144,19 @@ f_range(union argument *arg)
 
     FPRINTF((stderr,"f_range( \"%s\", %d, %d)\n", full.v.string_val, beg.v.int_val, end.v.int_val));
 
-    if (end.v.int_val > strlen(full.v.string_val))
-	end.v.int_val = strlen(full.v.string_val);
+    if (end.v.int_val > gp_strlen(full.v.string_val))
+	end.v.int_val = gp_strlen(full.v.string_val);
     if (beg.v.int_val < 1)
 	beg.v.int_val = 1;
-    if (beg.v.int_val > end.v.int_val)
-	beg.v.int_val = strlen(full.v.string_val)+1;
 
-    full.v.string_val[end.v.int_val] = '\0';
-    push(Gstring(&substr, &full.v.string_val[beg.v.int_val-1]));
+    if (beg.v.int_val > end.v.int_val) {
+	push(Gstring(&substr, ""));
+    } else {
+	char *begp = gp_strchrn(full.v.string_val,beg.v.int_val-1);
+	char *endp = gp_strchrn(full.v.string_val,end.v.int_val);
+	*endp = '\0';
+	push(Gstring(&substr, begp));
+    }
     gpfree_string(&full);
 }
 

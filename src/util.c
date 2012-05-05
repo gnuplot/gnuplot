@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: util.c,v 1.98 2011/11/01 18:52:49 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: util.c,v 1.99 2011/11/10 05:15:58 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - util.c */
@@ -1327,4 +1327,56 @@ utf8toulong (unsigned long * wch, const char ** str)
 
   *wch = INVALID_UTF8;
   return FALSE;
+}
+
+/*
+ * Returns number of (possibly multi-byte) characters in a UTF-8 string
+ */
+size_t
+strlen_utf8(const char *s)
+{
+    int i = 0, j = 0;
+    while (s[i]) {
+	if ((s[i] & 0xc0) != 0x80) j++;
+	i++;
+    }
+    return j;
+}
+
+size_t
+gp_strlen(const char *s)
+{
+    if (encoding == S_ENC_UTF8)
+	return strlen_utf8(s);
+    else
+	return strlen(s);
+}
+
+/*
+ * Returns a pointer to the Nth character of s
+ * or a pointer to the trailing \0 if N is too large
+ */
+char *
+utf8_strchrn(const char *s, int N)
+{
+    int i = 0, j = 0;
+
+    if (N <= 0)
+	return (char *)s;
+    while (s[i]) {
+	if ((s[i] & 0xc0) != 0x80) {
+	    if (j++ == N) return (char *)&s[i];
+	}
+	i++;
+    }
+    return (char *)&s[i];
+}
+
+char *
+gp_strchrn(const char *s, int N)
+{
+    if (encoding == S_ENC_UTF8)
+	return utf8_strchrn(s,N);
+    else
+	return (char *)&s[N];
 }
