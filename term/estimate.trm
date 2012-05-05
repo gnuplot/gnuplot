@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: estimate.trm,v 1.9 2010/05/21 04:53:38 sfeam Exp $
+ * $Id: estimate.trm,v 1.10 2010/07/28 20:43:59 sfeam Exp $
  *
  */
 
@@ -45,7 +45,7 @@ static TBOOLEAN ENHest_widthflag = TRUE;
 static double ENHest_base;
 
 /* Internal routines for UTF-8 support */
-static size_t strlen_utf8 __PROTO((const char *s));
+static size_t strwidth_utf8 __PROTO((const char *s));
 
 TERM_PUBLIC void
 ENHest_OPEN(
@@ -128,7 +128,7 @@ ENHest_put_text(unsigned int x, unsigned int y, const char *str)
     /* If no enhanced text processing is needed, strlen() is sufficient */
     if (ignore_enhanced_text || !strpbrk(str, "{}^_@&~\n")) {
 	if (encoding == S_ENC_UTF8)
-	    term->xmax = strlen_utf8(str);
+	    term->xmax = strwidth_utf8(str);
 	else
 	    term->xmax = strlen(str);
 	term->ymax = 10;
@@ -185,7 +185,7 @@ ENHest_writec(int c)
  * As with the ENHest_writec() routine, it approximates the width of characters
  * above unicode 0x3000 as being twice that of western alphabetic characters.
  */
-size_t strlen_utf8(const char *s) {
+size_t strwidth_utf8(const char *s) {
     int i = 0, j = 0;
     while (s[i]) {
        if ((s[i] & 0xc0) != 0x80) {
