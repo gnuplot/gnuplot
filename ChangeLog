@@ -1,3 +1,8 @@
+2012-05-05  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/term.c term/estimate.trm:  Rename utf8_strlen to utf8_strwidth
+	to avoid name collision.
+
 2012-05-04  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* CodeStyle config/Makefile.am.in configure.in demo/Makefile.am.in
