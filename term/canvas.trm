@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: canvas.trm,v 1.56 2011/10/28 23:37:06 sfeam Exp $
+ * $Id: canvas.trm,v 1.56.2.1 2012/04/20 16:50:59 sfeam Exp $
  *
  */
 
@@ -1232,7 +1232,7 @@ ENHCANVAS_OPEN(
  * we can go to the trouble of actually counting character widths.
  * As it happens, the averages width of ascii characters is 20.
  */
-static int utf8strlen(char *s)
+static int canvas_strwidth(char *s)
 {
     int width = 0;
     char *end = s + strlen(s);
@@ -1275,7 +1275,7 @@ ENHCANVAS_FLUSH()
 	save_fontsize = canvas_font_size;
 	x = canvas_x;
 	y = canvas_y;
-	w = utf8strlen(enhanced_text) * CANVAS_OVERSAMPLE * ENHCANVAS_fontsize/25.;
+	w = canvas_strwidth(enhanced_text) * CANVAS_OVERSAMPLE * ENHCANVAS_fontsize/25.;
 
 	canvas_font_size = ENHCANVAS_fontsize;
 	x += sin((double)canvas_text_angle * M_PI_2/90.) * ENHCANVAS_base;
