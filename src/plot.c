@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot.c,v 1.137 2012/02/25 11:41:19 juhaszp Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot.c,v 1.138 2012/03/02 19:52:14 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot.c */
@@ -333,7 +333,11 @@ main(int argc, char **argv)
      * instead of readline) */
     rl_readline_name = "Gnuplot";
     rl_terminal_name = getenv("TERM");
+#if defined(HAVE_LIBREADLINE)
     using_history();
+#else
+    history_init();
+#endif
 #endif
 #if defined(HAVE_LIBREADLINE) && !defined(MISSING_RL_TILDE_EXPANSION)
     rl_complete_with_tilde_expansion = 1;
