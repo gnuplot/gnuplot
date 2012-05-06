@@ -201,14 +201,14 @@ void qt_connectToServer(const QString& server, bool retry = true)
 		// The widget could not be reached: start a gnuplot_qt program which will create a QtGnuplotApplication
 		if (connectToWidget)
 		{
-			qDebug() << "Could not connect to widget" << qt_optionWidget << ". Staring a QtGnuplotApplication";
+			qDebug() << "Could not connect to widget" << qt_optionWidget << ". Starting a QtGnuplotApplication";
 			qt_optionWidget = QString();
 			qt_connectToServer(qt_localServerName);
 		}
 		// The gnuplot_qt program could not be reached: try to start a new one
 		else
 		{
-			qDebug() << "Could not connect gnuplot_qt" << qt_optionWidget << ". Staring a new one";
+			qDebug() << "Could not connect gnuplot_qt" << qt_optionWidget << ". Starting a new one";
 			execGnuplotQt();
 			qt_connectToServer(qt_localServerName, false);
 		}
