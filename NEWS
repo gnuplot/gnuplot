@@ -12,6 +12,7 @@ New features, changes and fixes since gnuplot version 4.6.0
 * FIX failure to balance {} if an input file did not end with a newline
 * FIX strlen() and substring operators correctly handle UTF-8
 * FIX initialization of history when configured --with-readline=bsd
+* FIX set term cairolatex pdf mono
 
 
 New features, changes and fixes in gnuplot version 4.6

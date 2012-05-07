@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: pslatex.trm,v 1.80 2011/11/07 18:40:48 markisch Exp $
+ * $Id: pslatex.trm,v 1.80.2.1 2012/03/31 05:54:39 sfeam Exp $
  */
 
 /* GNUPLOT - pslatex.trm */
@@ -129,7 +129,6 @@ static TBOOLEAN tex_color_synced = FALSE;
 /* support for cairolatex */
 #ifdef HAVE_CAIROPDF
 #define ISCAIROTERMINAL ((strcmp(term->name, "cairolatex") == 0))
-TERM_PUBLIC void cairotrm_linetype __PROTO ((int linetype));
 TERM_PUBLIC void cairotrm_set_color __PROTO ((t_colorspec *colorspec));
 #else
 #define ISCAIROTERMINAL (FALSE)
@@ -886,12 +885,7 @@ EPSLATEX_linetype(int linetype)
 {
     t_colorspec tempcol = {TC_LT, 0, 0.0};
     tempcol.lt = linetype;
-#ifdef HAVE_CAIROPDF
-    if (ISCAIROTERMINAL)
-        cairotrm_linetype(linetype);
-    else
-#endif
-        PS_linetype(linetype);
+    PS_linetype(linetype);
 
     /* This leads to redundant *.eps output */
     EPSLATEX_set_color(&tempcol);

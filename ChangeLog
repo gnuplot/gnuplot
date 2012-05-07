@@ -1,3 +1,8 @@
+2012-05-07  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/cairo.trm term/pslatex.trm: Fix 'set term cairolatex pdf mono'
+	Bug-Debian: http://bugs.debian.org/668339
+
 2012-05-06  Anton Gladky <gladky.anton@gmail.com>
 
 	* src/command.c: Fix segfault in initial check of history when using
