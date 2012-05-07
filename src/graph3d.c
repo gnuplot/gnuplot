@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.263 2012/04/13 19:30:38 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.264 2012/04/17 22:42:52 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -3147,8 +3147,11 @@ key_sample_line_pm3d(struct surface_points *plot, int xl, int yl)
     /* If plot uses a constant color, set it here and then let simpler routine take over */
     if ((colortype == TC_RGB && plot->lp_properties.pm3d_color.value >= 0.0)
     || (colortype == TC_LT)
-    || (colortype == TC_LINESTYLE && plot->lp_properties.l_type != LT_COLORFROMCOLUMN)) {
-	apply_pm3dcolor(&(plot->lp_properties.pm3d_color), term);
+    || (colortype == TC_LINESTYLE)) {
+	lp_style_type lptmp = plot->lp_properties;
+	if (plot->lp_properties.l_type == LT_COLORFROMCOLUMN)
+		lp_use_properties(&lptmp, (int)(plot->iso_crvs->points[0].CRD_COLOR));
+	apply_pm3dcolor(&lptmp.pm3d_color, term);
 	key_sample_line(xl,yl);
 	return;
     }
@@ -3209,8 +3212,11 @@ key_sample_point_pm3d(
     /* If plot uses a constant color, set it here and then let simpler routine take over */
     if ((colortype == TC_RGB && plot->lp_properties.pm3d_color.value >= 0.0)
     || (colortype == TC_LT)
-    || (colortype == TC_LINESTYLE && plot->lp_properties.l_type != LT_COLORFROMCOLUMN)) {
-	apply_pm3dcolor(&(plot->lp_properties.pm3d_color), term);
+    || (colortype == TC_LINESTYLE)) {
+	lp_style_type lptmp = plot->lp_properties;
+	if (plot->lp_properties.l_type == LT_COLORFROMCOLUMN)
+		lp_use_properties(&lptmp, (int)(plot->iso_crvs->points[0].CRD_COLOR));
+	apply_pm3dcolor(&lptmp.pm3d_color, term);
 	key_sample_point(xl,yl,pointtype);
 	return;
     }

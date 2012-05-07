@@ -3,6 +3,10 @@
 	* term/cairo.trm term/pslatex.trm: Fix 'set term cairolatex pdf mono'
 	Bug-Debian: http://bugs.debian.org/668339
 
+	* src/graph3d.c (key_sample_line_pm3d key_sample_point_pm3d):
+	If the color scheme is "lc variable", take the color of key sample from
+	the first point in the data set.
+
 2012-05-06  Anton Gladky <gladky.anton@gmail.com>
 
 	* src/command.c: Fix segfault in initial check of history when using
