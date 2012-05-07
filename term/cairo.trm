@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: cairo.trm,v 1.53 2012/01/30 01:34:20 sfeam Exp $
+ * $Id: cairo.trm,v 1.54 2012/04/14 03:59:31 sfeam Exp $
  */
 
 /* GNUPLOT - cairo.trm */
@@ -1261,7 +1261,7 @@ TERM_TABLE_START(cairolatex_driver)
     1 /* vtic */ , 1 /* htic */ ,
     cairotrm_options, cairotrm_init, cairotrm_reset, cairotrm_text, null_scale, cairotrm_graphics,
     cairotrm_move, cairotrm_vector,
-    EPSLATEX_linetype, EPSLATEX_put_text, 
+    cairotrm_linetype, EPSLATEX_put_text, 
     PS_text_angle, PS_justify_text,
     cairotrm_point, do_arrow, cairotrm_set_font,
     cairotrm_pointsize,
