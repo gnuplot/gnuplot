@@ -1,5 +1,5 @@
 ## Process this file with automake to produce Makefile.in -*-Makefile-*-
-AUTOMAKE_OPTIONS = foreign 1.2h
+AUTOMAKE_OPTIONS = foreign
 
 EXTRA_DIST = README Makefile.am.in driver.h impcodes.h \
 object.h post.h $(CORETERM) PostScript lua js write_png_image.c

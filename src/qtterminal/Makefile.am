@@ -1,5 +1,5 @@
 ## Process this file with automake to produce Makefile.in -*-Makefile-*-
-AUTOMAKE_OPTIONS = foreign 1.2h
+AUTOMAKE_OPTIONS = foreign
 
 # here are listed all the qtterminal files that go to the distribution
 EXTRA_DIST = qt_term.h qt_conversion.cpp QtGnuplot.pro QtGnuplotWindow.h \

@@ -1,5 +1,5 @@
 ## Process this file with automake to produce Makefile.in -*-Makefile-*-
-AUTOMAKE_OPTIONS = foreign 1.2h
+AUTOMAKE_OPTIONS = foreign
 
 CLEANFILES = binary1 binary2 binary3 defaults.ini equipo2.tmp field2xy.tmp \
 fit.log soundfit.par temp.set fontfile.ps fontfile_latex.ps epslatex-inc.eps \

@@ -4,6 +4,7 @@ New features, changes and fixes since gnuplot version 4.6.0
 * NEW syntax hints inside Emacs gnuplot-mode
 * CHANGE canvas terminal loads appropriate font file for UTF-8 encoding
 * CHANGE skip execution of empty iteration loops in set and do commands
+* CHANGE build scripts modified to accommodate automake 1.12
 * FIX margin space required for rotated axis tic labels
 * FIX check for NaN values in binary input
 * FIX backslash handling in enhanced text strings

@@ -1,5 +1,5 @@
 ## Process this file with automake to produce Makefile.in -*-Makefile-*-
-AUTOMAKE_OPTIONS = foreign 1.2h
+AUTOMAKE_OPTIONS = foreign
                                                                                 
 EXTRA_DIST = Gnuplot.app-defaults gnuplotrc \
              colors_podo.gp colors_default.gp colors_mono.gp
