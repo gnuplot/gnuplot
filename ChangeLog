@@ -1,3 +1,10 @@
+2012-05-09  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/datafile.c (plot_option_array): Skip call to clear_binary_records.
+	This reduces the order-dependence of binary plot options, but may intro-
+	duce some persistence of options across plot commands.
+	Bug #3408082
+
 2012-05-07  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/cairo.trm term/pslatex.trm: Fix 'set term cairolatex pdf mono'

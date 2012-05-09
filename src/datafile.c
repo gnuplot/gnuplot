@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.219 2012/05/02 04:21:58 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.220 2012/05/02 05:01:48 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -3459,7 +3459,12 @@ plot_option_array(void)
     if (!equals(c_token, "="))
 	int_error(c_token, equal_symbol_msg);
 
+#if (0)
+    /* Removing this call reduces the order-dependence of binary options.	*/
+    /* However, it may also introduce some option persistance across plots.	*/
+    /* See Bug #3408082 */
     clear_binary_records(DF_CURRENT_RECORDS);
+#endif
 
     do {
 	c_token++;

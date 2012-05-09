@@ -12,6 +12,7 @@ New features, changes and fixes since gnuplot version 4.6
 * CHANGE The number of valid columns in the first line of a data line
          is used to decide the interpretation of all lines in the file.
 * CHANGE Automake 1.12 imposes an absolute requirement for C prototypes
+* CHANGE binary plot options are less order-dependent, but may be persistent
 
 
 New features, changes and fixes in gnuplot version 4.6
