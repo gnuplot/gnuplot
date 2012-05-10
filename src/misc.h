@@ -1,5 +1,5 @@
 /*
- * $Id: misc.h,v 1.36 2011/06/19 22:10:37 sfeam Exp $
+ * $Id: misc.h,v 1.37 2011/07/25 06:51:29 sfeam Exp $
  */
 
 /* GNUPLOT - misc.h */
@@ -102,6 +102,7 @@ typedef struct lf_state_struct {
     int num_tokens;		/* How big is the above ? */
     int c_token;		/* Which one were we on ? */
     struct lf_state_struct *prev;			/* defines a stack */
+    int call_argc;		/* This saves the _caller's_ argc */
     char *call_args[10];	/* args when file is 'call'ed instead of 'load'ed */
 }  LFS;
 extern LFS *lf_head;

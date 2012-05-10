@@ -1,3 +1,10 @@
+2012-05-10  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/misc.c (lf_push lf_pop) src/misc.h:  The lf_push/lf_pop mechanism
+	for restoring context after a "call" statement was saving the individual
+	call args $0 $1 etc, but failing to save the number of active args.
+	Bug #3525155
+
 2012-05-09  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/datafile.c (plot_option_array): Skip call to clear_binary_records.

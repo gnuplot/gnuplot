@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.146 2012/04/08 17:33:41 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.147 2012/04/17 21:07:48 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -354,6 +354,7 @@ lf_pop()
 	    free(call_args[argindex]);
 	call_args[argindex] = lf->call_args[argindex];
     }
+    call_argc = lf->call_argc;
     do_load_arg_substitution = lf->do_load_arg_substitution;
     interactive = lf->interactive;
     inline_num = lf->inline_num;
@@ -404,6 +405,7 @@ lf_push(FILE *fp, char *name, char *cmdline)
     lf->interactive = interactive;	/* save current state */
     lf->inline_num = inline_num;	/* save current line number */
     lf->do_load_arg_substitution = do_load_arg_substitution;
+    lf->call_argc = call_argc;
     for (argindex = 0; argindex < 10; argindex++) {
 	lf->call_args[argindex] = call_args[argindex];
 	call_args[argindex] = NULL;	/* initially no args */
