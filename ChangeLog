@@ -1,3 +1,10 @@
+2012-05-11  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/wxterminal/wxt_gui.cpp (wxt_cairo_refresh):  Execution of the
+	command list must be protected by command_list_mutex or it will blow
+	if the command list is cleared/replaced during execution.
+	Bug #3371205
+
 2012-05-10  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/misc.c (lf_push lf_pop) src/misc.h:  The lf_push/lf_pop mechanism
