@@ -1,3 +1,12 @@
+New features, changes and fixes in gnuplot version 4.4.5
+========================================================
+
+* FIX mutex protecting execution of wxt command list
+* FIX Missing parameter broke lua terminal in release 4.4.4
+* FIX Honor LC_NUMERIC and "set decimal" in contour labels
+* FIX "test palette" on Windows
+
+
 New features, changes and fixes in gnuplot version 4.4.4
 ========================================================
 

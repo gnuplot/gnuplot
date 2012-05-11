@@ -1,3 +1,10 @@
+2012-05-11  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/wxterminal/wxt_gui.cpp (wxt_cairo_refresh):  Execution of the
+	command list must be protected by command_list_mutex or it will blow
+	if the command list is cleared/replaced during execution.
+	Bug #3371205
+
 2011-12-07  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* config/makefile.mgw: Sync with 4.5: support bgd.dll, iconv, lua/tikz,
