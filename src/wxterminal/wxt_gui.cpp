@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.cpp,v 1.91.2.3 2012/03/04 19:14:37 sfeam Exp $
+ * $Id: wxt_gui.cpp,v 1.91.2.4 2012/04/09 04:32:40 sfeam Exp $
  */
 
 /* GNUPLOT - wxt_gui.cpp */
@@ -2508,6 +2508,7 @@ void wxtPanel::wxt_cairo_refresh()
 	wxt_initialize_key_boxes(0);
 #endif
 
+	command_list_mutex.Lock();
 	command_list_t::iterator wxt_iter; /*declare the iterator*/
 	for(wxt_iter = command_list.begin(); wxt_iter != command_list.end(); ++wxt_iter) {
 		if (wxt_status == STATUS_INTERRUPT_ON_NEXT_CHECK) {
@@ -2532,6 +2533,7 @@ void wxtPanel::wxt_cairo_refresh()
 		wxt_cairo_exec_command( *wxt_iter );
 
 	}
+	command_list_mutex.Unlock();
 
 	/* don't forget to stroke the last path if vector was the last command */
 	gp_cairo_stroke(&plot);
