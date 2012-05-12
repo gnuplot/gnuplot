@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.390 2012/04/08 17:45:40 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.391 2012/04/17 22:42:53 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -2854,8 +2854,12 @@ plot_steps(struct curve_points *plot)
     /* EAM April 2011:  Default to lines only, but allow filled boxes */
     if ((plot->plot_style & PLOT_STYLE_HAS_FILL) && t->fillbox) {
 	style = style_from_fill(&plot->fill_properties);
-	ey = 0;
-	cliptorange(ey, Y_AXIS.min, Y_AXIS.max);
+	if (Y_AXIS.log) {
+	    ey = Y_AXIS.min;
+	} else {
+	    ey = 0;
+	    cliptorange(ey, Y_AXIS.min, Y_AXIS.max);
+	}
 	y0 = map_y(ey);
     }
 
