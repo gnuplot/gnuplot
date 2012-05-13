@@ -16,6 +16,7 @@ New features, changes and fixes since gnuplot version 4.6.0
 * FIX set term cairolatex pdf mono
 * FIX preserve number of active call arguments across a nested call command
 * FIX wxt terminal mutex protecting execution of the command list
+* FIX apply clipping to the interior fill of circles and ellipses
 
 
 New features, changes and fixes in gnuplot version 4.6

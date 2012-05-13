@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.379.2.5 2012/04/20 17:20:53 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.379.2.6 2012/05/12 22:20:57 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -6031,6 +6031,8 @@ do_ellipse( int dimensions, t_ellipse *e, int style, TBOOLEAN do_own_mapping )
 	        vertex[i].y = cy + yoff * aspect;
 	    else
 	        vertex[i].y = cy + yoff;
+	
+	    clip_line((int *)&cx, (int *)&cy, &vertex[i].x, &vertex[i].y);
     }
 
     if (style) {

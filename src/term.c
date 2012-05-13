@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.225.2.6 2012/04/09 04:20:52 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.225.2.7 2012/05/06 00:32:17 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -1340,6 +1340,8 @@ do_arc(
     gpiPoint vertex[250];  /* changed this - JP */
     int i, segments;
     double aspect;
+    int xcen = cx;
+    int ycen = cy;
 
     /* Protect against out-of-range values */
     while (arc_start < 0)
@@ -1364,10 +1366,13 @@ do_arc(
     for (i=0; i<segments; i++) {
 	vertex[i].x = cx + cos(DEG2RAD * (arc_start + i*INC)) * radius;
 	vertex[i].y = cy + sin(DEG2RAD * (arc_start + i*INC)) * radius * aspect;
+	clip_line(&xcen, &ycen, &vertex[i].x, &vertex[i].y);
     }
 #   undef INC
     vertex[segments].x = cx + cos(DEG2RAD * arc_end) * radius;
     vertex[segments].y = cy + sin(DEG2RAD * arc_end) * radius * aspect;
+    clip_line(&xcen, &ycen, &vertex[segments].x, &vertex[segments].y);
+
     if (fabs(arc_end - arc_start) > .1 
     &&  fabs(arc_end - arc_start) < 359.9) {
 	vertex[++segments].x = cx;
