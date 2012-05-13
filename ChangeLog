@@ -1,3 +1,9 @@
+2012-05-13  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/term.c (do_arc) src/graphics.c (do_ellipse):  Clip the filled
+	interior of circles and ellipses.
+	Bug #3522515
+
 2012-05-11  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/wxterminal/wxt_gui.cpp (wxt_cairo_refresh):  Execution of the
