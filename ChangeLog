@@ -4,6 +4,10 @@
 	interior of circles and ellipses.
 	Bug #3522515
 
+	* docs/gnuplot.doc src/graphics.c (do_rectangle):  Establish a clipping
+	behavior for rectangles - clip to fit in the graph unless one or both
+	corners are given in screen coordinates.
+
 2012-05-11  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/wxterminal/wxt_gui.cpp (wxt_cairo_refresh):  Execution of the

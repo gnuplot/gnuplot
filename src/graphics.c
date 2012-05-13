@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.379.2.6 2012/05/12 22:20:57 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.379.2.7 2012/05/14 03:04:23 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -5838,7 +5838,7 @@ do_rectangle( int dimensions, t_object *this_object, int style )
     struct fill_style_type *fillstyle;
     t_rectangle *this_rect = &this_object->o.rectangle;
 
-	if (this_rect->type == 1) {
+	if (this_rect->type == 1) {	/* specified as center + size */
 	    double width, height;
 
 	    if (dimensions == 2 || this_rect->center.scalex == screen) {
@@ -5879,11 +5879,9 @@ do_rectangle( int dimensions, t_object *this_object, int style )
 
 	    if (x1 > x2) {double t=x1; x1=x2; x2=t;}
 	    if (y1 > y2) {double t=y1; y1=y2; y2=t;}
-	    if (this_rect->bl.scalex == first_axes
-	    ||  this_rect->bl.scalex == second_axes)
+	    if (this_rect->bl.scalex != screen && this_rect->tr.scalex != screen)
 		clip_x = TRUE;
-	    if (this_rect->bl.scaley == first_axes
-	    ||  this_rect->bl.scaley == second_axes)
+	    if (this_rect->bl.scaley != screen && this_rect->tr.scaley != screen)
 		clip_y = TRUE;
 	}
 
