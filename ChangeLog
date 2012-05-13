@@ -1,9 +1,12 @@
 2012-05-11  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/wxterminal/wxt_gui.cpp (wxt_cairo_refresh):  Execution of the
-	command list must be protected by command_list_mutex or it will blow
+	command list must be protected by command_list_mutex or it will blow up
 	if the command list is cleared/replaced during execution.
 	Bug #3371205
+
+	* src/graphics.c: allow log-scaled y axis when plotting with fillsteps
+	Bug #3324785
 
 2012-05-10  Ethan A Merritt  <merritt@u.washington.edu>
 
