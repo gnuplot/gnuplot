@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.392 2012/05/12 22:20:16 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.393 2012/05/14 03:02:37 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -5955,6 +5955,7 @@ do_ellipse( int dimensions, t_ellipse *e, int style, TBOOLEAN do_own_mapping )
     double xoff, yoff;
     double junkfoo;
     int junkw, junkh;
+    int xcent, ycent;
     double cosO = cos(DEG2RAD * e->orientation);
     double sinO = sin(DEG2RAD * e->orientation);
     double A = e->extent.x / 2.0;	/* Major axis radius */
@@ -6036,8 +6037,9 @@ do_ellipse( int dimensions, t_ellipse *e, int style, TBOOLEAN do_own_mapping )
 	        vertex[i].y = cy + yoff * aspect;
 	    else
 	        vertex[i].y = cy + yoff;
-	
-	    clip_line((int *)&cx, (int *)&cy, &vertex[i].x, &vertex[i].y);
+
+	    xcent = cx;  ycent = cy;
+	    clip_line(&xcent, &ycent, &vertex[i].x, &vertex[i].y);
     }
 
     if (style) {
