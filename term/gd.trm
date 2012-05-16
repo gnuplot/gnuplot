@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: gd.trm,v 1.163 2011/11/09 17:09:49 markisch Exp $
+ * $Id: gd.trm,v 1.163.2.1 2011/12/11 11:43:30 markisch Exp $
  * based on gif.trm,v 1.26.2.1 2000/05/01 00:17:20 joze
  */
 
@@ -2401,17 +2401,12 @@ START_HELP(png)
 " Blank space at the edges of the finished plot may be trimmed using the `crop`",
 " option, resulting in a smaller final image size. Default is `nocrop`.",
 "",
-" The background color must be given in the form 'xrrggbb', where x is the",
-" literal character 'x' and 'rrggbb' are the red, green and blue components",
-" in hexadecimal.  For example, 'x00ff00' is green.  The specification of",
-" additional colors other than the background is deprecated.",
-"",
 "2 examples",
 "?set term png examples",
-"       set terminal png medium size 640,480 xffffff",
+"       set terminal png medium size 640,480 background '#ffffff'",
 "",
 " Use the medium size built-in non-scaleable, non-rotatable font.",
-" Use white (xffffff) for the non-transparent background.",
+" Use white (24-bit RGB in hexadecimal) for the non-transparent background.",
 "",
 "       set terminal png font arial 14 size 800,600",
 "",
@@ -2545,11 +2540,6 @@ START_HELP(jpeg)
 " Please see additional information under `canvas` and `set size`.",
 " Blank space at the edges of the finished plot may be trimmed using the `crop`",
 " option, resulting in a smaller final image size. Default is `nocrop`.",
-"",
-" The background color must be given in the form 'xrrggbb', where x is the",
-" literal character 'x' and 'rrggbb' are the red, green and blue components",
-" in hexadecimal.  For example, 'x00ff00' is green.  The specification of",
-" additional colors other than the background is deprecated.",
 ""
 END_HELP(jpeg)
 #endif /* TERM_HELP */
@@ -2729,17 +2719,12 @@ START_HELP(gif)
 " Blank space at the edges of the finished plot may be trimmed using the `crop`",
 " option, resulting in a smaller final image size. Default is `nocrop`.",
 "",
-" The background color must be given in the form 'xrrggbb', where x is the",
-" literal character 'x' and 'rrggbb' are the red, green and blue components",
-" in hexadecimal.  For example, 'x00ff00' is green.  The specification of",
-" additional colors other than the background is deprecated.",
-"",
 "2 examples",
 "?set term gif examples",
-"       set terminal gif medium size 640,480 xffffff",
+"       set terminal gif medium size 640,480 background '#ffffff'",
 "",
 " Use the medium size built-in non-scaleable, non-rotatable font.",
-" Use white (xffffff) for the non-transparent background.",
+" Use white (24 bit RGB in hexadecimal) for the non-transparent background.",
 "",
 "       set terminal gif font arial 14 enhanced",
 "",
@@ -2747,7 +2732,7 @@ START_HELP(gif)
 " size to 14pt.  Please see `fonts` for details of how the font search",
 " is done.  Because this is a scalable font, we can use enhanced text mode.",
 "",
-"       set term gif animate transparent opt delay 10 size 200,200 x000000",
+"       set term gif animate transparent opt delay 10 size 200,200",
 "       load \"animate2.dem\"",
 "",
 " Open the gif terminal for creation of an animated gif file.  The individual",
