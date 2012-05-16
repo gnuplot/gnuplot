@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.730 2012/04/23 19:25:15 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.731 2012/05/02 05:01:48 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -6722,7 +6722,7 @@ Ffigure_mapcontours
  A coordinate system specifier does not carry over from the first endpoint
  description the second.
 
- 1) "to <position>" specifies the absolute coordinates of the other end..
+ 1) "to <position>" specifies the absolute coordinates of the other end.
  
  2) "rto <position>" specifies an offset to the "from" position.  For linear
  axes, `graph` and `screen` coordinates, the distance between the start and the
@@ -11129,7 +11129,7 @@ Ffigure_missing
 ?show style circle
 
  Syntax:
-       set style circle {radius {graph|screen} <R>} {{no}wedge
+       set style circle {radius {graph|screen} <R>} {{no}wedge}
 
  This command sets the default radius used in plot style "with circles".  It
  applies to data plots with only 2 columns of data (x,y) and to function plots.
