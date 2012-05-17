@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.393 2012/05/14 03:02:37 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.394 2012/05/14 18:23:49 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -5949,7 +5949,7 @@ void
 do_ellipse( int dimensions, t_ellipse *e, int style, TBOOLEAN do_own_mapping )
 {
     gpiPoint vertex[120];
-    int i;
+    int i, in;
     double angle;
     double cx, cy;
     double xoff, yoff;
@@ -5978,11 +5978,10 @@ do_ellipse( int dimensions, t_ellipse *e, int style, TBOOLEAN do_own_mapping )
 	}
 	else if (dimensions == 2)
 	    map_position_double(&e->center, &cx, &cy, "ellipse");
-    else
+	else
 	    map3d_position_double(&e->center, &cx, &cy, "ellipse");
 
     /* Calculate the vertices */
-    vertex[0].style = style;
     for (i=0, angle = 0.0; i<=segments; i++, angle += ang_inc) {
         /* Given that the (co)sines of same sequence of angles 
          * are calculated every time - shouldn't they be precomputed
@@ -6037,15 +6036,28 @@ do_ellipse( int dimensions, t_ellipse *e, int style, TBOOLEAN do_own_mapping )
 	        vertex[i].y = cy + yoff * aspect;
 	    else
 	        vertex[i].y = cy + yoff;
-
-	    xcent = cx;  ycent = cy;
-	    clip_line(&xcent, &ycent, &vertex[i].x, &vertex[i].y);
     }
 
     if (style) {
 	/* Fill in the center */
+	gpiPoint fillarea[120];
+	for (i=0, in=0; i<segments; i++) {
+	    xcent = cx; ycent = cy;
+	    fillarea[in] = vertex[i];
+	    if (clip_line(&xcent, &ycent, &fillarea[in].x, &fillarea[in].y))
+		in++;
+	}
+	if (clip_point(cx,cy))
+	    for (i=segments-1; i>=0; i--) {
+		fillarea[in+1] = vertex[i];
+		fillarea[in].x = cx; fillarea[in].y = cy;
+		if (clip_line(&fillarea[in+1].x, &fillarea[in+1].y, &fillarea[in].x, &fillarea[in].y))
+		    in++;
+	    }
+
+	fillarea[0].style = style;
 	if (term->filled_polygon)
-	    term->filled_polygon(segments, vertex);
+	    term->filled_polygon(in, fillarea);
     } else {
 	/* Draw the arc */
 	for (i=0; i<segments; i++)

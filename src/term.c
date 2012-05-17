@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.237 2012/05/14 03:02:37 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.238 2012/05/14 17:13:39 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -1341,7 +1341,6 @@ do_arc(
     int i, segments;
     double aspect;
     TBOOLEAN complete_circle;
-    int in, xcen, ycen;
 
     /* Protect against out-of-range values */
     while (arc_start < 0)
@@ -1362,40 +1361,50 @@ do_arc(
 
     /* Calculate the vertices */
     aspect = (double)term->v_tic / (double)term->h_tic;
-    vertex[0].style = style;
-    for (i=0, in=0; i<segments; i++) {
-	vertex[in].x = cx + cos(DEG2RAD * (arc_start + i*INC)) * radius;
-	vertex[in].y = cy + sin(DEG2RAD * (arc_start + i*INC)) * radius * aspect;
-	xcen = cx; ycen = cy;
-	if (clip_line(&xcen, &ycen, &vertex[in].x, &vertex[in].y))
-	    in++;
+    for (i=0; i<segments; i++) {
+	vertex[i].x = cx + cos(DEG2RAD * (arc_start + i*INC)) * radius;
+	vertex[i].y = cy + sin(DEG2RAD * (arc_start + i*INC)) * radius * aspect;
     }
 #   undef INC
-    vertex[in].x = cx + cos(DEG2RAD * arc_end) * radius;
-    vertex[in].y = cy + sin(DEG2RAD * arc_end) * radius * aspect;
-    if (!clip_line(&xcen, &ycen, &vertex[in].x, &vertex[in].y))
-	in--;
-	
+    vertex[segments].x = cx + cos(DEG2RAD * arc_end) * radius;
+    vertex[segments].y = cy + sin(DEG2RAD * arc_end) * radius * aspect;
 
     if (fabs(arc_end - arc_start) > .1 
     &&  fabs(arc_end - arc_start) < 359.9) {
-	vertex[++in].x = cx;
-	vertex[in].y = cy;
-	vertex[++in].x = vertex[0].x;
-	vertex[in].y = vertex[0].y;
+	vertex[++segments].x = cx;
+	vertex[segments].y = cy;
+	vertex[++segments].x = vertex[0].x;
+	vertex[segments].y = vertex[0].y;
 	complete_circle = FALSE;
     } else
 	complete_circle = TRUE;
 
-    if (style) {
-	/* Fill in the center */
+    if (style) { /* Fill in the center */
+	/* EAM DEBUG - Do proper clipping */
+	gpiPoint fillarea[250];
+	int xcent, ycent, in;
+	for (i=0, in=0; i<segments; i++) {
+	    xcent = cx; ycent = cy;
+	    fillarea[in] = vertex[i];
+	    if (clip_line(&xcent, &ycent, &fillarea[in].x, &fillarea[in].y))
+		in++;
+	}
+	if (clip_point(cx,cy))
+	    for (i=segments-1; i>=0; i--) {
+		fillarea[in+1] = vertex[i];
+		fillarea[in].x = cx; fillarea[in].y = cy;
+		if (0 > clip_line(&fillarea[in+1].x, &fillarea[in+1].y, 
+				  &fillarea[in].x, &fillarea[in].y))
+		    in++;
+	    }
+	fillarea[0].style = style;
 	if (term->filled_polygon)
-	    term->filled_polygon(in+1, vertex);
-    } else {
-	/* Draw the arc */
+	    term->filled_polygon(in, fillarea);
+
+    } else { /* Draw the arc */
 	if (!wedge && !complete_circle)
-	    in -= 2;
-	for (i=0; i<in; i++)
+	    segments -= 2;
+	for (i=0; i<segments; i++)
 	    draw_clip_line( vertex[i].x, vertex[i].y,
 		vertex[i+1].x, vertex[i+1].y );
     }

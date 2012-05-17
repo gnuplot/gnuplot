@@ -1,9 +1,16 @@
+2012-05-17  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/term.c (do_arc) src/graphics.c (do_ellipse):  Revisit clipping the
+	filled interior of circles and ellipses.  Now it handles objects whose
+	center is outside the plot but specified in plot coordinates.
+	Bug #3522515
+
 2012-05-17  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* docs/faq-ja.tex docs/gnuplot-ja.doc docs/term-ja.diff
 	man/gnuplot-ja.1:  Sync with English documentation.
 
-	2012-05-13  Ethan A Merritt  <merritt@u.washington.edu>
+2012-05-13  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/term.c (do_arc) src/graphics.c (do_ellipse):  Clip the filled
 	interior of circles and ellipses.
