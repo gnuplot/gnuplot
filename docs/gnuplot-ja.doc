@@ -1,5 +1,5 @@
-C RCS $Id: gnuplot-ja.doc,v 1.1 2012-01-22 14:27:35+09 shige Exp $
-C corresponding original gnuplot.doc revision: 1.701.2.10
+C RCS $Id: gnuplot-ja.doc,v 1.2 2012-03-09 20:06:07+09 shige Exp $
+C corresponding original gnuplot.doc revision: 1.701.2.14
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -296,6 +296,10 @@ Ffigure_newsyntax
  フォルトの並びをカスタマイズできます。以下参照: `set linetype`。これは
  通常、システム用の初期化ファイル `gnuplotrc` か個人的な初期化ファイル
  `~/.gnuplot` のいずれかで行います。以下参照: `initialization`。
+
+ 現在は多くの出力形式でグラフの背景色を明示的に設定できます。その色で描
+ 画するのに、特別な線種 (linetype) `bgnd` が利用できます。以下参照:
+ `bgnd`。
 
 3 新しい描画スタイル (New plot styles)
  描画スタイルの節の以下参照: `boxplot`, `circles`, `ellipses`,
@@ -982,7 +986,7 @@ Ffigure_newsyntax
 ^<tbody>
 ^<tr>    <td>gprintf("format",x,...)</td>    <td>任意</td>    <td>gnuplot の書式解析器を適用した結果の文字列</td></tr>
 ^<tr>    <td>sprintf("format",x,...)</td>    <td>複数個</td>    <td>C 言語の sprintf の返す文字列</td></tr>
-^<tr>    <td>strlen("string")</td>    <td>文字列</td>    <td>文字列の長さ (整数)</td></tr>
+^<tr>    <td>strlen("string")</td>    <td>文字列</td>    <td>バイト単位での文字列の長さ (整数)</td></tr>
 ^<tr>    <td>strstrt("string","key")</td>    <td>文字列</td>    <td>部分文字列 "key" が現れる先頭位置</td></tr>
 ^<tr>    <td>substr("string",beg,end)</td>    <td>複数個</td>    <td>文字列 "string"[beg:end]</td></tr>
 ^<tr>    <td>strftime("timeformat",t)</td>    <td>任意</td>    <td>gnuplot による時刻解析結果の文字列</td></tr>
@@ -1396,9 +1400,11 @@ C マーカを doc2html へのこのシグナルとして使用します。
 4 strlen
 ?expressions functions strlen
 ?strlen
-#strlen("string") & 文字列 & 文字列の長さ (整数) \\
-%strlen("string")@文字列@文字列の長さ (整数)
- `strlen("string")` は文字列の中の文字数を返します。
+#strlen("string") & 文字列 & バイト単位での文字列の長さ (整数) \\
+%strlen("string")@文字列@バイト単位での文字列の長さ (整数)
+ `strlen("string")` は、バイト単位での文字列の長さを返します。現在のエ
+ ンドーディングが多バイト文字をサポートしていれば、その値は文字列中の文
+ 字数よりも大きくなるでしょう。
 4 strstrt
 ?expressions functions strstrt
 ?strstrt
@@ -2212,7 +2218,8 @@ C ... and restart the table:
  定した (`set terminal`) 後で `test` コマンドを発行することで確認できま
  す。定義されている色、点線/破線のパターンはすべての出力形式で同じもの
  であるという保証は何もありませんが、線種 -1 は特別に全ての出力形式で、
- 最も普通の表示色 (通常は黒) の実線を意味しています。
+ 最も普通の表示色 (通常は黒) の実線を意味しています。また、多くの出力形
+ 式で、背景色での実線を意味する特別な線種 "bgnd" も認識します。
 
  デフォルトの線種 (linetype) の属性は、対話的か初期化ファイルのいずれか
  によって再定義可能です。これは、すべての gnuplot 描画コマンドで使用さ
@@ -2310,6 +2317,18 @@ C ... and restart the table:
  に沿って色を滑らかに変化させることができます。これは、2 次元描画で、パ
  レット値を追加の列データから読み込ませて色付けするのにも使えます (すべ
  ての 2 次元描画スタイルがこの追加列を認識するわけではありません)。
+4 background color
+?background
+?bgnd
+ 現在は多くの出力形式でグラフの背景色を明示的に設定できます。特別な線種
+ (linetype) `bgnd` はその色で描画しますが、その `bgnd` は色としても認識
+ されます。
+ 例:
+      # 以下はキャンバスの一部分を背景色で上書きすることで消去します。
+      set term wxt background rgb "gray75"
+      set object 1 rectangle from x0,y0 to x1,y1 fillstyle solid fillcolor bgnd
+      # 以下は x 軸に沿った「見えない」線を描きます。
+      plot 0 lt bgnd
 4 linecolor variable
 ?linecolor variable
 ?lc variable
@@ -3106,11 +3125,11 @@ Ffigure_candlesticks
  fillstyle に塗り潰し、またはパターンをセットしている場合は、開始値、終
  値に関係なく、すべての箱にそれが使われます。以下参照: `set bars`,
  `financebars`。また、以下も参照してください。
-^ <a href="http://gnuplot.sourceforge.net/demo/candlesticks.html">
+^ <a href="http://www.gnuplot.info/demo/candlesticks.html">
  candlestick
 ^ </a>
  と
-^ <a href="http://gnuplot.sourceforge.net/demo/finance.html">
+^ <a href="http://www.gnuplot.info/demo/finance.html">
  finance
 ^ </a>
  のデモ。
@@ -5463,7 +5482,7 @@ Ffigure_mapcontours
  非パラメータモードでの splot デモ
 ^ </a>
  ,
-^ <a href="http://gnuplot.sourceforge.net/demo/surface2.html">
+^ <a href="http://www.gnuplot.info/demo/surface2.html">
  パラメータモードでの splot デモ
 ^ </a>
  。
@@ -6157,7 +6176,7 @@ Ffigure_mapcontours
  されます。
 
  以下も参照
-^ <a href="http://gnuplot.sourceforge.net/demo/mgr.html">
+^ <a href="http://www.gnuplot.info/demo/mgr.html">
  エラーバーのデモ
 ^ </a>
 
@@ -7010,7 +7029,7 @@ Ffigure_mapcontours
  全ての矢印の情報を (タグの順に) 見るには:
        show arrow
 
-^ <a href="http://gnuplot.sourceforge.net/demo/arrowstyle.html">
+^ <a href="http://www.gnuplot.info/demo/arrowstyle.html">
  矢印のデモ
 ^ </a>
 
@@ -9625,7 +9644,7 @@ Ffigure_mapcontours
  きます。各描画は水平サイズが 1.1/2、垂直サイズが 0.9/3 となります。
 
  以下も参照
-^ <a href="http://gnuplot.sourceforge.net/demo/multiplt.html">
+^ <a href="http://www.gnuplot.info/demo/multiplt.html">
  multiplot のデモ (multiplt.dem)
 ^ </a>
 3 mx2tics
@@ -13432,10 +13451,9 @@ C 下記の以下参照: オプション `positive`, `negative`)。
  トを使用する描画を含んだ multiplot では x11 上では正しく表示されない、
  ということを意味します。
 
- Qt 出力形式: この出力形式はいまだ「試験的」な範疇のものです。これは、
- 他の対話型出力形式が持つ多くの機能をまだサポートしていません。コンパイ
- ル時に使用される qt 環境がレンダリングモードとして "opengl" をサポート
- していなければ多角形と曲面表示はかなり遲くなる可能性があります。
+ Qt 出力形式: コンパイル時に使用される qt 環境がレンダリングモードとし
+ て "opengl" をサポートしていなければ多角形と曲面表示はかなり遲くなる可
+ 能性があります。
 
 2 外部ライブラリ (External libraries)
 ?bugs external_libraries

@@ -1,3 +1,8 @@
+2012-05-17  Shigeharu Takeno  <shige@iee.niit.ac.jp>
+
+	* docs/faq-ja.tex docs/gnuplot-ja.doc man/gnuplot-ja.1:
+	Sync with English FAQ rev. 1.48 and documentation rev. 1.701.2.14.
+
 2012-05-13  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/term.c (do_arc) src/graphics.c (do_ellipse):  Clip the filled

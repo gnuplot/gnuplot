@@ -1,5 +1,5 @@
 .\" dummy line
-.\" $Id: gnuplot-ja.1,v 1.3 2009-03-09 20:21:36+09 shige Exp $
+.\" $Id: gnuplot-ja.1,v 1.5 2011-11-21 19:16:14+09 shige Exp $
 .\" 日本語訳: Shigeharu TAKENO <shige@iee.niit.ac.jp>
 .\"
 .\" .TH GNUPLOT 1 " 7 October 2008"
@@ -18,7 +18,7 @@ gnuplot \- 対話型グラフ描画プログラム
 .SH 機能説明
 .\" .B Gnuplot
 .\" is a command-driven interactive function plotting program.
-.B Gnuplot
+.B gnuplot
 は、コマンド入力方式の対話的な関数描画プログラムです。
 .PP
 .\" If file names are given on the command line,
@@ -89,16 +89,16 @@ load と save。
 .\" .SH OPTIONS
 .SH オプション
 .PP
-.\" \fB\-p, --persist\fP lets plot windows survive after main gnuplot program exits.
-\fB\-p, --persist\fP は、
+.\" \fB\-p, \-\-persist\fP lets plot windows survive after main gnuplot program exits.
+\fB\-p, \-\-persist\fP は、
 gnuplot プログラムが終了した後も描画ウィンドウを残します。
 .PP
 .\" \fB\-e "command list"\fP executes the requested commands before loading the next input file.
 \fB\-e "command list"\fP は、
 次の入力ファイルを読み込む前に指定したコマンドを実行します。
 .PP
-.\" \fB\-h, --help\fP print summary of usage
-\fB\-h, --help\fP は、使用法の要約を表示します。
+.\" \fB\-h, \-\-help\fP print summary of usage
+\fB\-h, \-\-help\fP は、使用法の要約を表示します。
 .PP
 .\" \fB\-V\fP show current version
 \fB\-V\fP は、現在のバージョンを表示します。
@@ -341,9 +341,9 @@ gnuplot は多くのシェル環境変数を認識します。必須のものはありません。
 .TP
 .B GNUTERM
 .\" The name of the terminal type to be used.  This overrides any terminal
-.\" type sensed by gnuplot on start-up, but is itself overridden by the
-.\" .gnuplot (or equivalent) start-up file (see \fBFILES\fP and "help
-.\" start-up") and, of course, by later explicit changes.
+.\" type sensed by gnuplot on start-up, but is itself overridden by the .gnuplot
+.\" (or equivalent) start-up file (see \fBFILES\fP and "help start-up") and,
+.\" of course, by later explicit changes.
 使用される出力形式 (terminal) の名前。
 これは gnuplot が起動時に見つけた出力形式に優先して使用されますが、.gnuplot 
 (またはそれに相当する) スタートアップファイル (「ファイル」のセクション、
