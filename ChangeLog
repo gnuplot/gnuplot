@@ -1,3 +1,10 @@
+2012-05-18  Peter Juhasz  <juhaszp@users.sourceforge.net>
+
+	* src/datafile.c (f_column f_stringcolumn):
+	f_stringcolumn now issues a warning if a named column was not found 
+	in the header, just as f_column does. Additionally, if there is a
+	partial match, print the name in the warning between double quotes.
+
 2013-05-17  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/wxterminal/gp_cairo.c (gp_cairo_enhanced_flush):  Empirical fix

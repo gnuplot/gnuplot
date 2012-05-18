@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.252 2013/05/09 03:22:15 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.253 2013/05/09 05:35:10 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -2251,7 +2251,7 @@ f_column(union argument *arg)
 		if (df_column[j].header) {
 		    int offset = (*df_column[j].header == '"') ? 1 : 0;
 		    if (!strncmp(name, df_column[j].header + offset,strlen(name)))
-			int_warn(NO_CARET, "partial match against column %d header %s",
+			int_warn(NO_CARET, "partial match against column %d header \"%s\"",
 				j+1, df_column[j].header);
 		}
 	    }
@@ -2313,8 +2313,20 @@ f_stringcolumn(union argument *arg)
 		}
 	    }
 	}
-	if (column == DF_COLUMN_HEADERS)
-	    FPRINTF(("could not find column with header \"%s\"\n", a.v.string_val));
+	/* This warning should only trigger once per problematic input file */
+	if (column == DF_COLUMN_HEADERS && (*name)
+	&&  df_warn_on_missing_columnheader) {
+	    df_warn_on_missing_columnheader = FALSE;
+	    int_warn(NO_CARET,"no column with header \"%s\"", a.v.string_val);
+	    for (j=0; j<df_no_cols; j++) {
+		if (df_column[j].header) {
+		    int offset = (*df_column[j].header == '"') ? 1 : 0;
+		    if (!strncmp(name, df_column[j].header + offset,strlen(name)))
+			int_warn(NO_CARET, "partial match against column %d header \"%s\"",
+				j+1, df_column[j].header);
+		}
+	    }
+	}
 	gpfree_string(&a);
     } else
 	column = (int) real(&a);
