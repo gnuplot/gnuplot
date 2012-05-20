@@ -1,5 +1,11 @@
 2012-05-20 Bastian Maerkisch  <bmaerkisch@web.de>
 
+	* term/win.trm (WIN_options, WIN_set_color) src/win/wgraph.c
+	(drawgraph): Change the behaviour of the "mono" terminal option of
+	the windows terminal. Colors are converted from RGB to grayscale in
+	drawgraph(). That way, a grayscale copy of colour plots can obtained
+	more easily.
+
 	* src/win/wgnuplib.h src/win/wgraph.c: Retain the temporary bitmap used
 	for drawing to speed up redraws. Reduces the number of calls to drawgraph()
 	to a minimum.

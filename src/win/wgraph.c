@@ -1,5 +1,5 @@
 /*
- * $Id: wgraph.c,v 1.144 2011/11/18 07:48:28 markisch Exp $
+ * $Id: wgraph.c,v 1.145 2012/05/20 08:14:58 markisch Exp $
  */
 
 /* GNUPLOT - win/wgraph.c */
@@ -733,9 +733,9 @@ MakePens(LPGW lpgw, HDC hdc)
 		pen = lpgw->monopen[1];
 		pen.lopnWidth.x *= lpgw->linewidth * lpgw->sampling;
 		lpgw->hapen = CreatePenIndirect(&pen); 	/* axis */
-		lpgw->hbrush = CreateSolidBrush(RGB(255,255,255));
+		lpgw->hbrush = CreateSolidBrush(lpgw->background);
 		for (i = 0; i < WGNUMPENS + 2; i++)
-			lpgw->colorbrush[i] = CreateSolidBrush(RGB(0,0,0));
+			lpgw->colorbrush[i] = CreateSolidBrush(lpgw->monopen[i].lopnColor);
 	} else {
 		pen = lpgw->colorpen[1];
 		pen.lopnWidth.x *= lpgw->linewidth * lpgw->sampling;
@@ -1469,10 +1469,10 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
      * handles, so can't know whether the screen is actually showing
      * color or not, if drawgraph() is being called from CopyClip().
      * Solve by defaulting isColor to 1 if hdc is a metafile. */
-    isColor = (((GetDeviceCaps(hdc, PLANES) * GetDeviceCaps(hdc,BITSPIXEL))	> 2)
+    isColor = (((GetDeviceCaps(hdc, PLANES) * GetDeviceCaps(hdc, BITSPIXEL)) > 2)
 	       || (GetDeviceCaps(hdc, TECHNOLOGY) == DT_METAFILE));
 
-    if (lpgw->color && isColor) {
+    if (isColor) {
 		SetBkColor(hdc, lpgw->background);
 		FillRect(hdc, rect, lpgw->hbrush);
     } else {
@@ -1895,21 +1895,30 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 		case W_setcolor: {
 			COLORREF color;
 
-			/* distinguish gray values and RGB colors */
-			if (curptr->y == 0) {			/* TC_FRAC */
-				rgb255_color rgb255;
-				rgb255maxcolors_from_gray(curptr->x / (double)WIN_PAL_COLORS, &rgb255);
-				color = RGB(rgb255.r, rgb255.g, rgb255.b);
-			}
-			else if (curptr->y == (TC_LT << 8)) {	/* TC_LT */
+			if (curptr->htext != NULL) {	/* TC_LT */
 				int pen = (int)curptr->x % WGNUMPENS;
-				if (pen <= LT_NODRAW)
+				if (pen <= LT_NODRAW) {
 					color = lpgw->background;
-				else
-					color = lpgw->colorpen[pen + 2].lopnColor;
-			}
-			else {					/* TC_RGB */
-				color = RGB(curptr->y & 0xff, (curptr->x >> 8) & 0xff, curptr->x & 0xff);
+				} else {
+					if (lpgw->color)
+						color = lpgw->colorpen[pen + 2].lopnColor;
+					else
+						color = lpgw->monopen[pen + 2].lopnColor;
+				}
+			} else {						/* TC_RGB */
+				rgb255_color rgb255;
+				rgb255.r = (curptr->y & 0xff);
+				rgb255.g = (curptr->x >> 8);
+				rgb255.b = (curptr->x & 0xff);
+
+				if (lpgw->color || ((rgb255.r == rgb255.g) && (rgb255.r == rgb255.b))) {
+					/* Use colors or this is already gray scale */
+					color = RGB(rgb255.r, rgb255.g, rgb255.b);
+				} else {
+					/* convert to gray */
+					int luma = (int)(rgb255.r * 0.3 + rgb255.g * 0.59 + rgb255.b * 0.11);
+					color = RGB(luma, luma, luma);
+				}
 			}
 
 			/* solid fill brush */
@@ -2114,13 +2123,36 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 					SelectClipRgn(hdc, hrgn);
 
 					if (color_mode != IC_RGBA) {
+						char * dibimage;
 						bmi.bmiHeader.biBitCount = 24;
+
+						if (!lpgw->color) {
+							/* create a copy of the color image */
+							int pad_bytes = (4 - (3 * width) % 4) % 4; /* scan lines start on ULONG boundaries */
+							int image_size = (width * 3 + pad_bytes) * height;
+							int x, y;
+							dibimage = (char *) malloc(image_size);
+							memcpy(dibimage, image, image_size);
+							for (y = 0; y < height; y ++) {
+								for (x = 0; x < width; x ++) {
+									BYTE * p = (BYTE *) dibimage + y * (3 * width + pad_bytes) + x * 3;
+									/* convert to gray */
+									int luma = (int) (p[2] * 0.3 + p[1] * 0.59 + p[0] * 0.11);
+									p[0] = p[1] = p[2] = luma;
+								}
+							}
+
+						} else {
+							dibimage = image;
+						}
 
 						rc = StretchDIBits(hdc,
 							GPMIN(corners[0].x, corners[1].x) , GPMIN(corners[0].y, corners[1].y),
 							abs(corners[1].x - corners[0].x), abs(corners[1].y - corners[0].y),
 							0, 0, width, height,
-							image, &bmi, DIB_RGB_COLORS, SRCCOPY);
+							dibimage, &bmi, DIB_RGB_COLORS, SRCCOPY);
+
+						if (!lpgw->color) free(dibimage);
 					} else {
 						HDC memdc;
 						HBITMAP membmp, oldbmp;
@@ -2133,6 +2165,19 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 						oldbmp = (HBITMAP)SelectObject(memdc, membmp);
 
 						memcpy(pvBits, image, width * height * 4);
+
+						/* convert to grayscale? */
+						if (!lpgw->color) {
+							int x, y;
+							for (y = 0; y < height; y ++) {
+								for (x = 0; x < width; x ++) {
+									UINT32 * p = pvBits + y * width + x;
+									/* convert to gray */
+									int luma = (int)(GetRValue(*p) * 0.3 + GetGValue(*p) * 0.59 + GetBValue(*p) * 0.11);
+									*p = (*p & 0xff000000) | RGB(luma, luma, luma);
+								}
+							}
+						}
 
 						ftn.BlendOp = AC_SRC_OVER;
 						ftn.BlendFlags = 0;

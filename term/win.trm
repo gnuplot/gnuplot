@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: win.trm,v 1.106 2011/11/14 20:47:46 markisch Exp $
+ * $Id: win.trm,v 1.107 2011/11/15 22:47:19 markisch Exp $
  */
 
 /* GNUPLOT - win.trm */
@@ -338,10 +338,8 @@ WIN_options()
 	GraphInitStruct(graphwin);
 	if (set_color) {
 		graphwin->color = color;
-		if (color)
-			term->flags &= ~TERM_MONOCHROME;
-		else
-			term->flags |= TERM_MONOCHROME;
+		/* Note: We no longer set TERM_MONOCHROME here, since colors
+		and grayscale conversion are fully handled by drawgraph() */
 		if (!set_dashed)
 			graphwin->dashed = !color;
 	}
@@ -739,10 +737,11 @@ WIN_set_color(t_colorspec *colorspec)
 			break;
 		}
 		case TC_RGB:
-			GraphOp(graphwin, W_setcolor, (colorspec->lt) & 0xffff, 0xff00 | ((colorspec->lt >> 16) & 0x00ff), NULL);
+			/* highest byte of colorspec->lt contains alpha */
+			GraphOp(graphwin, W_setcolor, (colorspec->lt) & 0xffff, (colorspec->lt >> 16) & 0xffff, NULL);
 			break;
 		case TC_LT:
-			GraphOp(graphwin, W_setcolor, colorspec->lt, TC_LT << 8, NULL);
+			GraphOp(graphwin, W_setcolor, colorspec->lt, 0, (void *) &WIN_set_color);
 			break;
 	}
 	WIN_last_linetype = LT_NODRAW;
