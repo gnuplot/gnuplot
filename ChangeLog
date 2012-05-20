@@ -1,3 +1,9 @@
+2012-05-20  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/win/wcommon.h src/win/wgnuplib.h src/win/wgraph.c: Remove limit
+	on number of plots which can be toggled on/off via key entries.
+	Maximum number of toolbar buttons still restricted to MAXPLOTSHIDE.
+	Bug #3516417
 2012-05-17  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* docs/faq-ja.tex docs/gnuplot-ja.doc man/gnuplot-ja.1:
