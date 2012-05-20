@@ -1,5 +1,5 @@
 /*
- * $Id: wgnuplib.h,v 1.53 2011/11/18 07:48:28 markisch Exp $
+ * $Id: wgnuplib.h,v 1.54 2012/05/20 08:14:58 markisch Exp $
  */
 
 /* GNUPLOT - win/wgnuplib.h */
@@ -231,9 +231,6 @@ void WDPROC AboutBox(HWND hwnd, LPSTR str);
  * by the 'Line styles...' dialog, and save to/from wgnuplot.ini). */
 #define WGNUMPENS 15
 
-/* maximum number of plots which can be enabled/disabled via toolbar */
-#define MAXPLOTSHIDE 10
-
 /* maximum number of different colors per palette, used to be hardcoded (256) */
 #define WIN_PAL_COLORS 4096
 
@@ -330,7 +327,8 @@ typedef struct tagGW {
 	BOOL	polyaa;		/* anti-aliasing for polygons ? */
 	BOOL	patternaa;	/* anti-aliasing for polygons ? */
 
-	BOOL	hideplot[MAXPLOTSHIDE];
+	BOOL	*hideplot;
+	unsigned int maxhideplots;
 	BOOL	hidegrid;
 	unsigned int numplots;
 	BOOL	hasgrid;

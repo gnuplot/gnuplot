@@ -1,5 +1,5 @@
 /*
- * $Id: wgraph.c,v 1.145 2012/05/20 08:14:58 markisch Exp $
+ * $Id: wgraph.c,v 1.146 2012/05/20 10:42:07 markisch Exp $
  */
 
 /* GNUPLOT - win/wgraph.c */
@@ -396,6 +396,8 @@ GraphInitStruct(LPGW lpgw)
 		lpgw->maxkeyboxes = 0;
 		lpgw->keyboxes = 0;
 		lpgw->buffervalid = FALSE;
+		lpgw->maxhideplots = MAXPLOTSHIDE;
+		lpgw->hideplot = (BOOL *) calloc(MAXPLOTSHIDE, sizeof(BOOL));
 		ReadGraphIni(lpgw);
 	}
 }
@@ -1559,7 +1561,14 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 				case TERM_LAYER_BEFORE_PLOT:
 					plotno++;
 					lpgw->numplots = plotno;
-					if (plotno <= MAXPLOTSHIDE)
+					if (plotno >= lpgw->maxhideplots) {
+						int idx;
+						lpgw->maxhideplots += 10;
+						lpgw->hideplot = (BOOL *) realloc(lpgw->hideplot, lpgw->maxhideplots * sizeof(BOOL));
+						for (idx = plotno; idx < lpgw->maxhideplots; idx++)
+							lpgw->hideplot[idx] = FALSE;
+					}
+					if (plotno <= lpgw->maxhideplots)
 						skipplot = lpgw->hideplot[plotno - 1];
 					break;
 				case TERM_LAYER_AFTER_PLOT:
@@ -3204,14 +3213,16 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 				int i;
 				int x = GET_X_LPARAM(lParam);
 				int y = GET_Y_LPARAM(lParam) - lpgw->ToolbarHeight;
-				for (i = 0; (i < lpgw->numplots) && (i < lpgw->maxkeyboxes) && (i < MAXPLOTSHIDE); i++) {
+				for (i = 0; (i < lpgw->numplots) && (i < lpgw->maxkeyboxes) && (i < lpgw->maxhideplots); i++) {
 					if ((lpgw->keyboxes[i].left != INT_MAX) &&
 						(x >= lpgw->keyboxes[i].left) &&
 						(x <= lpgw->keyboxes[i].right) &&
 						(y <= lpgw->keyboxes[i].top) &&
 						(y >= lpgw->keyboxes[i].bottom)) {
 						lpgw->hideplot[i] = ! lpgw->hideplot[i];
-						SendMessage(lpgw->hToolbar, TB_CHECKBUTTON, M_HIDEPLOT + i, (LPARAM)lpgw->hideplot[i]);
+						if (i < MAXPLOTSHIDE)
+							SendMessage(lpgw->hToolbar, TB_CHECKBUTTON, M_HIDEPLOT + i, (LPARAM)lpgw->hideplot[i]);
+						lpgw->buffervalid = FALSE;
 						GetClientRect(hwnd, &rect);
 						InvalidateRect(hwnd, (LPRECT) &rect, 1);
 						UpdateWindow(hwnd);
@@ -3551,6 +3562,7 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 					return 0;
 				case M_HIDEGRID:
 					lpgw->hidegrid = SendMessage(lpgw->hToolbar, TB_ISBUTTONCHECKED, LOWORD(wParam), (LPARAM)0);
+					lpgw->buffervalid = FALSE;
 					GetClientRect(hwnd, &rect);
 					InvalidateRect(hwnd, (LPRECT) &rect, 1);
 					UpdateWindow(hwnd);
@@ -3610,7 +3622,8 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			/* handle toolbar events  */
 			if ((LOWORD(wParam) >= M_HIDEPLOT) && (LOWORD(wParam) < (M_HIDEPLOT + MAXPLOTSHIDE))) {
 				unsigned button = LOWORD(wParam) - (M_HIDEPLOT);
-				lpgw->hideplot[button] = SendMessage(lpgw->hToolbar, TB_ISBUTTONCHECKED, LOWORD(wParam), (LPARAM)0);
+				if (button < lpgw->maxhideplots)
+					lpgw->hideplot[button] = SendMessage(lpgw->hToolbar, TB_ISBUTTONCHECKED, LOWORD(wParam), (LPARAM)0);
 				lpgw->buffervalid = FALSE;
 				GetClientRect(hwnd, &rect);
 				InvalidateRect(hwnd, (LPRECT) &rect, 1);
@@ -4135,13 +4148,17 @@ UpdateToolbar(LPGW lpgw)
 		lpgw->hidegrid = FALSE;
 		SendMessage(lpgw->hToolbar, TB_CHECKBUTTON, M_HIDEGRID, (LPARAM)FALSE);
 	}
-	for (i = 0; i < MAXPLOTSHIDE; i++) {
+	for (i = 0; i < GPMAX(MAXPLOTSHIDE, lpgw->maxhideplots); i++) {
 		if (i < lpgw->numplots) {
-			SendMessage(lpgw->hToolbar, TB_HIDEBUTTON, M_HIDEPLOT + i, (LPARAM)FALSE);
+			if (i < MAXPLOTSHIDE)
+				SendMessage(lpgw->hToolbar, TB_HIDEBUTTON, M_HIDEPLOT + i, (LPARAM)FALSE);
 		} else {
-			lpgw->hideplot[i] = FALSE;
-			SendMessage(lpgw->hToolbar, TB_HIDEBUTTON, M_HIDEPLOT + i, (LPARAM)TRUE);
-			SendMessage(lpgw->hToolbar, TB_CHECKBUTTON, M_HIDEPLOT + i, (LPARAM)FALSE);
+			if (i < lpgw->maxhideplots)
+				lpgw->hideplot[i] = FALSE;
+			if (i < MAXPLOTSHIDE) {
+				SendMessage(lpgw->hToolbar, TB_HIDEBUTTON, M_HIDEPLOT + i, (LPARAM)TRUE);
+				SendMessage(lpgw->hToolbar, TB_CHECKBUTTON, M_HIDEPLOT + i, (LPARAM)FALSE);
+			}
 		}
 	}
 }

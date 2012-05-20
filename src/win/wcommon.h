@@ -1,5 +1,5 @@
 /*
- * $Id: wcommon.h,v 1.13 2011/03/28 10:09:41 markisch Exp $
+ * $Id: wcommon.h,v 1.14 2011/09/04 12:01:37 markisch Exp $
  */
 
 /* GNUPLOT - wcommon.h */
@@ -44,6 +44,9 @@
 #ifndef CLEARTYPE_QUALITY
 #define CLEARTYPE_QUALITY       5
 #endif
+
+/* maximum number of plots which can be enabled/disabled via toolbar */
+#define MAXPLOTSHIDE 10
 
 /* winmain.c */
 # define PACKVERSION(major,minor) MAKELONG(minor,major)
