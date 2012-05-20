@@ -1,3 +1,12 @@
+2012-05-20  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* configure.in docs/Makefile.am: Updated a patch from Christoph Junghans
+	to use autoconf to manage the documentation subdirectory.  The primary
+	reason is to allow --without-lisp-files to control whether or not the
+	build process tries to access emacs-specific directories and files that
+	may not be present.
+	Bugs #2950671 #3528377
+
 2012-05-20  Alexander Täschner  <taschna@users.sourceforge.net>
 
 	* src/fit.c|h (regress) src/save.c (save_set_all) src/set.c (set_fit)

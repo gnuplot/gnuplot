@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot on Unix.
 dnl
-dnl $Id: configure.in,v 1.315 2012/05/04 21:11:56 sfeam Exp $
+dnl $Id: configure.in,v 1.316 2012/05/05 02:29:46 sfeam Exp $
 dnl
 dnl this is actually major.minor ...
 dnl note that for a non-beta release, we need to disable DEVELOPMENT_RELEASE
@@ -71,6 +71,7 @@ else
   CFLAGS=${CFLAGS-"-g -O2"}
   CXXFLAGS=${CXXFLAGS-"-g -O2"}
 fi
+AM_PROG_CC_C_O
 AC_SUBST(CC_FOR_BUILD)
 
 
@@ -1190,6 +1191,7 @@ else
   LISPDIR=
 fi
 AC_SUBST(LISPDIR)
+AM_CONDITIONAL(BUILD_LISP, test "${with_lisp_files}" != no)
 
 dnl Substitute variables
 AC_SUBST(PACKAGE)
