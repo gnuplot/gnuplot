@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.151 2012/03/09 20:23:31 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.152 2012/03/23 04:29:28 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -537,7 +537,7 @@ unset_command()
     }
 
     update_gpval_variables(0);
-    
+
     set_iterator = cleanup_iteration(set_iterator);
 }
 
@@ -787,6 +787,8 @@ unset_fit()
 	free(fitlogfile);
     fitlogfile = NULL;
     fit_errorvariables = FALSE;
+    fit_errorscaling = TRUE;
+    fit_quiet = FALSE;
 }
 
 /* process 'unset grid' command */
@@ -927,7 +929,7 @@ unset_linestyle(struct linestyle_def **head)
 {
     int tag = int_expression();
     struct linestyle_def *this, *prev;
-    for (this = *head, prev = NULL; this != NULL; 
+    for (this = *head, prev = NULL; this != NULL;
 	 prev = this, this = this->next) {
 	if (this->tag == tag) {
 	    delete_linestyle(head, prev, this);
@@ -1130,7 +1132,7 @@ unset_tics(AXIS_INDEX axis)
 	istart = axis;
 	iend = axis + 1;
     }
-	
+
     for (i = istart; i < iend; ++i) {
 	axis_array[i].ticmode = NO_TICS;
 
@@ -1548,7 +1550,7 @@ unset_all_zeroaxes()
 static void
 unset_axislabel_or_title(text_label *label)
 {
-    struct position default_offset = { character, character, character, 
+    struct position default_offset = { character, character, character,
 				       0., 0., 0. };
     if (label) {
 	free(label->text);
@@ -1660,7 +1662,7 @@ reset_command()
 
 	axis_array[axis].min_constraint = CONSTRAINT_NONE;
 	axis_array[axis].max_constraint = CONSTRAINT_NONE;
-	
+
 	/* 'tics' default is on for some, off for the other axes: */
 	unset_tics(axis);
 	axis_array[axis].ticmode = axis_defaults[axis].ticmode;

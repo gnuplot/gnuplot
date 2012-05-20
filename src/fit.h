@@ -1,5 +1,5 @@
 /*
- * $Id: fit.h,v 1.13 2010/05/02 20:56:09 sfeam Exp $
+ * $Id: fit.h,v 1.14 2010/10/10 04:44:34 sfeam Exp $
  */
 
 /* GNUPLOT - fit.h */
@@ -63,6 +63,7 @@ extern char fitbuf[];
 extern char *fitlogfile;
 extern TBOOLEAN fit_errorvariables;
 extern TBOOLEAN fit_quiet;
+extern TBOOLEAN fit_errorscaling;
 
 /* Prototypes of functions exported by fit.c */
 

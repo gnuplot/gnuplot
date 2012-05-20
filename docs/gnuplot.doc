@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.731 2012/05/02 05:01:48 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.732 2012/05/16 04:46:59 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -7857,7 +7857,10 @@ Ffigure_missing
  The `fit` setting defines where the `fit` command writes its output.
 
  Syntax:
-       set fit {logfile {"<filename>"}} {{no}errorvariables} {{no}quiet}
+       set fit {logfile {"<filename>"}}
+               {{no}errorvariables}
+               {{no}errorscaling}
+               {{no}quiet}
        unset fit
        show fit
 
@@ -7882,6 +7885,13 @@ Ffigure_missing
         print "error of a is:", a_err
         set label 'a=%6.2f', a, '+/- %6.2f', a_err
         plot 'datafile' using 1:2, f(x)
+
+ If the `errorscaling` option is specified, which is the default, the
+ calculated parameter errors are scaled with the reduced chi square. This is equivalent to providing data errors equal to the calculated standard
+ deviation of the fit (FIT_STDFIT) resulting in a reduced chi square of one.
+ With the `noerrorscaling` option the estimated errors are the unscaled
+ standard deviations of the fit parameters.
+ If no weights are specified for the data, parameter errors are always scaled.
 
  By default the information written to the log file is also echoed to
  the terminal session. `set fit quiet` turns off the echo.

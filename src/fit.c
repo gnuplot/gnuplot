@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: fit.c,v 1.78 2011/11/15 20:23:43 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: fit.c,v 1.79 2011/11/29 01:07:52 sfeam Exp $"); }
 #endif
 
 /*  NOTICE: Change of Copyright Status
@@ -129,6 +129,7 @@ char fitbuf[256];
 char *fitlogfile = NULL;
 TBOOLEAN fit_errorvariables = FALSE;
 TBOOLEAN fit_quiet = FALSE;
+TBOOLEAN fit_errorscaling = TRUE;
 
 /* private variables: */
 
@@ -715,9 +716,9 @@ regress(double a[])
 	for (k = 0; k < num_params; k++)
 	    Dblf3("%-15.15s = %-15g\n", par_name[k], a[k]);
     } else {
-	int ndf          = num_data - num_params; 
+	int ndf          = num_data - num_params;
 	double stdfit    = sqrt(chisq/ndf);
-	
+
 	Dblf2("degrees of freedom    (FIT_NDF)                        : %d\n", ndf);
 	Dblf2("rms of residuals      (FIT_STDFIT) = sqrt(WSSR/ndf)    : %g\n", stdfit);
 	Dblf2("variance of residuals (reduced chisquare) = WSSR/ndf   : %g\n\n", chisq/ndf);
@@ -759,12 +760,17 @@ regress(double a[])
 		covar[i][j] /= dpar[i] * dpar[j];
 	}
 
-	/* scale parameter errors based on chisq */
-	chisq = sqrt(chisq / (num_data - num_params));
-	for (i = 0; i < num_params; i++)
-	    dpar[i] *= chisq;
+	if ((fit_errorscaling) || (columns < 3)) {
+	    /* scale parameter errors based on chisq */
+	    chisq = sqrt(chisq / (num_data - num_params));
+	    for (i = 0; i < num_params; i++)
+		dpar[i] *= chisq;
 
-	Dblf("Final set of parameters            Asymptotic Standard Error\n");
+	    Dblf("Final set of parameters            Asymptotic Standard Error\n");
+	} else {
+	    Dblf("Final set of parameters            Standard Deviation\n");
+	}
+
 	Dblf("=======================            ==========================\n\n");
 
 	for (i = 0; i < num_params; i++) {
@@ -1346,13 +1352,13 @@ fit_command()
     else if (num_ranges == num_indep+1 && num_indep < 5) {
       /* last range spec is for the Z axis */
       int i = var_order[num_ranges-1]; /* index for the last range spec */
-      
+
       Z_AXIS.autoscale = axis_array[i].autoscale;
       if (!(axis_array[i].autoscale & AUTOSCALE_MIN))
 	Z_AXIS.min = axis_array[i].min;
       if (!(axis_array[i].autoscale & AUTOSCALE_MAX))
 	Z_AXIS.max = axis_array[i].max;
-      
+
       /* restore former values */
       axis_array[i] = saved_axis;
       dummy_token[num_ranges-1] = dummy_token[6];
@@ -1499,7 +1505,7 @@ fit_command()
 	/* check Z value too */
 	{
 	  AXIS *this = axis_array + FIRST_Z_AXIS;
-	  
+
 	  if (!(this->autoscale & AUTOSCALE_MIN) && (v[i] < this->min)) {
 	    skipped[FIRST_Z_AXIS]++;
 	    goto out_of_range;
