@@ -8,6 +8,8 @@
 
 2012-05-20  Bastian Maerkisch  <bmaerkisch@web.de>
 
+	* demo/image2.dem: Meaning of "set [xyz]range reverse" changed.
+
 	* term/win.trm (WIN_options, WIN_set_color) src/win/wgraph.c
 	(drawgraph): Change the behaviour of the "mono" terminal option of
 	the windows terminal. Colors are converted from RGB to grayscale in
