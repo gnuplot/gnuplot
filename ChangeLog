@@ -1,3 +1,9 @@
+2012-05-20 Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/win/wgnuplib.h src/win/wgraph.c: Retain the temporary bitmap used
+	for drawing to speed up redraws. Reduces the number of calls to drawgraph()
+	to a minimum.
+
 2012-05-17  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/term.c (do_arc) src/graphics.c (do_ellipse):  Revisit clipping the

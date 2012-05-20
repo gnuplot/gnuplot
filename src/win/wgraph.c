@@ -1,5 +1,5 @@
 /*
- * $Id: wgraph.c,v 1.143 2011/11/18 07:41:08 markisch Exp $
+ * $Id: wgraph.c,v 1.144 2011/11/18 07:48:28 markisch Exp $
  */
 
 /* GNUPLOT - win/wgraph.c */
@@ -357,6 +357,7 @@ GraphOpSize(LPGW lpgw, UINT op, UINT x, UINT y, LPCSTR str, DWORD size)
 	}
 	this->used++;
 	lpgw->nGWOP++;
+	lpgw->buffervalid = FALSE;
 	return;
 }
 
@@ -394,6 +395,7 @@ GraphInitStruct(LPGW lpgw)
 		lpgw->fontsize = WINFONTSIZE;
 		lpgw->maxkeyboxes = 0;
 		lpgw->keyboxes = 0;
+		lpgw->buffervalid = FALSE;
 		ReadGraphIni(lpgw);
 	}
 }
@@ -605,6 +607,7 @@ void WDPROC
 GraphStart(LPGW lpgw, double pointsize)
 {
 	lpgw->locked = TRUE;
+	lpgw->buffervalid = FALSE;
 	DestroyBlocks(lpgw);
 	lpgw->org_pointsize = pointsize;
 	if ( !lpgw->hWndGraph || !IsWindow(lpgw->hWndGraph) )
@@ -669,6 +672,7 @@ GraphPrint(LPGW lpgw)
 void WDPROC
 GraphRedraw(LPGW lpgw)
 {
+	lpgw->buffervalid = FALSE;
 	if (GraphHasWindow(lpgw))
 		SendMessage(lpgw->hWndGraph, WM_COMMAND, M_REBUILDTOOLS, 0L);
 }
@@ -1755,8 +1759,8 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 			break;
 
 		case W_boxfill: {  /* ULIG */
-			/* NOTE: the x and y passed with this call are the width and
-			 * height of the box, actually. The left corner was stored into
+			/* NOTE: the x and y passed with this call are the coordinates of the
+			 * lower right corner of the box. The upper left corner was stored into
 			 * ppt[0] by a preceding W_move, and the style was set
 			 * by a W_fillstyle call. */
 			POINT p;
@@ -3545,6 +3549,7 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 						CheckMenuItem(lpgw->hPopMenu, M_GRAPH_TO_TOP, MF_BYCOMMAND | MF_CHECKED);
 					else
 						CheckMenuItem(lpgw->hPopMenu, M_GRAPH_TO_TOP, MF_BYCOMMAND | MF_UNCHECKED);
+					lpgw->buffervalid = FALSE;
 					DestroyPens(lpgw);
 					DestroyFonts(lpgw);
 					hdc = GetDC(hwnd);
@@ -3561,6 +3566,7 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			if ((LOWORD(wParam) >= M_HIDEPLOT) && (LOWORD(wParam) < (M_HIDEPLOT + MAXPLOTSHIDE))) {
 				unsigned button = LOWORD(wParam) - (M_HIDEPLOT);
 				lpgw->hideplot[button] = SendMessage(lpgw->hToolbar, TB_ISBUTTONCHECKED, LOWORD(wParam), (LPARAM)0);
+				lpgw->buffervalid = FALSE;
 				GetClientRect(hwnd, &rect);
 				InvalidateRect(hwnd, (LPRECT) &rect, 1);
 				UpdateWindow(hwnd);
@@ -3659,11 +3665,13 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		case WM_ERASEBKGND:
 			return(1); /* we erase the background ourselves */
 		case WM_PAINT: {
-			HDC memdc;
+			HDC memdc = NULL;
 			HBITMAP membmp, oldbmp;
 			LONG width, height;
+			LONG wwidth, wheight;
 			int sampling;
 			RECT memrect;
+			RECT wrect;
 
 			hdc = BeginPaint(hwnd, &ps);
 			SetMapMode(hdc, MM_TEXT);
@@ -3672,32 +3680,51 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			SetViewportExtEx(hdc, rect.right, rect.bottom, NULL);
 			/* double buffering */
 			if (lpgw->doublebuffer) {
-			    /* choose oversampling */
-			    if (lpgw->oversample)
-			        sampling = 2; /* anything bigger than that makes the computer crawl ... */
-			    else
-			        sampling = 1;
+				/* choose oversampling */
+				if (lpgw->oversample)
+					sampling = 2; /* anything bigger than that makes the computer crawl ... */
+				else
+					sampling = 1;
 
-			    /* create memory device context for double buffering */
-			    width = rect.right - rect.left;
-			    height = rect.bottom - rect.top;
-			    memdc = CreateCompatibleDC(hdc);
-			    memrect.left = 0;
-			    memrect.right = width * sampling + sampling/2;
-			    memrect.top = 0;
-			    memrect.bottom = height * sampling + sampling/2;
-			    membmp = CreateCompatibleBitmap(hdc, memrect.right, memrect.bottom);
-			    oldbmp = (HBITMAP)SelectObject(memdc, membmp);
+				/* Has window resized? */
+				GetWindowRect(hwnd, &wrect);
+				wwidth =  wrect.right - wrect.left;
+				wheight = wrect.bottom - wrect.top;
+				if ((lpgw->Size.x != wwidth) || (lpgw->Size.y != wheight))
+					lpgw->buffervalid = FALSE;
 
-			    /* TODO: we really should cache the results ... */
-			    if (sampling > 1) {
-			        lpgw->sampling = sampling;
-			        DestroyFonts(lpgw);
-			        MakeFonts(lpgw, &memrect, memdc);
-			    }
+				/* create memory device context for double buffering */
+				width = rect.right - rect.left;
+				height = rect.bottom - rect.top;
+				memdc = CreateCompatibleDC(hdc);
+				memrect.left = 0;
+				memrect.right = width * sampling + sampling/2;
+				memrect.top = 0;
+				memrect.bottom = height * sampling + sampling/2;
 
-			    /* draw into memdc, then copy to hdc */
-			    drawgraph(lpgw, memdc, &memrect);
+				if (!lpgw->buffervalid || (lpgw->hBitmap == NULL)) {
+					if (lpgw->hBitmap != NULL)
+						DeleteObject(lpgw->hBitmap);
+					lpgw->hBitmap = CreateCompatibleBitmap(hdc, memrect.right, memrect.bottom);
+					membmp = lpgw->hBitmap;
+					oldbmp = (HBITMAP)SelectObject(memdc, membmp);
+					lpgw->buffervalid = TRUE;
+					/* Update window size */
+					lpgw->Size.x = wwidth;
+					lpgw->Size.y = wheight;
+
+					/* TODO: we really should cache the results ... */
+					if (sampling > 1) {
+						lpgw->sampling = sampling;
+						DestroyFonts(lpgw);
+						MakeFonts(lpgw, &memrect, memdc);
+					}
+
+					/* draw into memdc, then copy to hdc */
+					drawgraph(lpgw, memdc, &memrect);
+				} else {
+					oldbmp = (HBITMAP) SelectObject(memdc, lpgw->hBitmap);
+				}
 			    if (sampling == 1)
 			        BitBlt(hdc, rect.left, rect.top, width, height, memdc, 0, 0, SRCCOPY);
 			    else {
@@ -3709,10 +3736,11 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			    }
 			    lpgw->sampling = 1;
 
-			    /* select the old bitmap back into the device context */
-			    SelectObject(memdc, oldbmp);
-			    DeleteObject(membmp);
-			    DeleteDC(memdc);
+				/* select the old bitmap back into the device context */
+				if (memdc != NULL) {
+					SelectObject(memdc, oldbmp);
+					DeleteDC(memdc);
+				}
 			} else {
 			    drawgraph(lpgw, hdc, &rect);
 			}
@@ -3741,10 +3769,19 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			}
 			if ((wParam == SIZE_MAXIMIZED) || (wParam == SIZE_RESTORED)) {
 				RECT rect;
-				SendMessage(hwnd,WM_SYSCOMMAND,M_REBUILDTOOLS,0L);
-				GetWindowRect(hwnd,&rect);
-				lpgw->Size.x = rect.right-rect.left;
-				lpgw->Size.y = rect.bottom-rect.top;
+				unsigned width, height;
+				GetWindowRect(hwnd, &rect);
+				width = rect.right - rect.left;
+				height = rect.bottom - rect.top;
+				/* Ignore minimize / de-minize */
+				if ((lpgw->Size.x != width) || (lpgw->Size.y != height)) {
+					lpgw->Size.x = width;
+					lpgw->Size.y = height;
+					lpgw->buffervalid = FALSE;
+					GetClientRect(hwnd, &rect);
+					InvalidateRect(hwnd, (LPRECT) &rect, 1);
+					UpdateWindow(hwnd);
+				}
 			}
 			break;
 #ifndef WGP_CONSOLE
@@ -3754,6 +3791,9 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			break;
 #endif
 		case WM_DESTROY:
+			lpgw->buffervalid = FALSE;
+			DeleteObject(lpgw->hBitmap);
+			lpgw->hBitmap = NULL;
 			DestroyPens(lpgw);
 			DestroyFonts(lpgw);
 #ifdef USE_MOUSE

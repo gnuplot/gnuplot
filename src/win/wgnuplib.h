@@ -1,5 +1,5 @@
 /*
- * $Id: wgnuplib.h,v 1.52 2011/11/15 22:47:19 markisch Exp $
+ * $Id: wgnuplib.h,v 1.53 2011/11/18 07:48:28 markisch Exp $
  */
 
 /* GNUPLOT - win/wgnuplib.h */
@@ -39,6 +39,9 @@
  *
  *   Russell Lang
  */
+
+#ifndef WGNUPLIB_H
+#define WGNUPLIB_H
 
 #include <windows.h>
 #include "screenbuf.h"
@@ -309,6 +312,8 @@ typedef struct tagGW {
 	HWND	hToolbar;
 	int		ToolbarHeight;
 	HMENU	hPopMenu;	/* popup menu */
+	HBITMAP	hBitmap;	/* bitmap of current graph */
+	BOOL	buffervalid;	/* indicates of hBitmap is valid */
 
 	struct GWOPBLK *gwopblk_head;
 	struct GWOPBLK *gwopblk_tail;
@@ -410,3 +415,5 @@ void WIN_update_options __PROTO((void));
 
 
 /* ================================== */
+#endif
+
