@@ -2,7 +2,8 @@
 
 	* src/fit.c|h (regress) src/save.c (save_set_all) src/set.c (set_fit)
 	src/show.c (show_fit) src/unset.c (unset_fit) docs/gnuplot.doc: 
-	New option "set fit [no]errorscaling" which allows to toggle scaling of parameter errors. The default remains to scale errors.
+	New option "set fit [no]errorscaling" which allows to toggle scaling
+	of parameter errors. The default remains to scale errors.
 	Patch #3375473, Feature Request #2956524.
 
 2012-05-20  Bastian Maerkisch  <bmaerkisch@web.de>
@@ -10,12 +11,12 @@
 	* term/win.trm (WIN_options, WIN_set_color) src/win/wgraph.c
 	(drawgraph): Change the behaviour of the "mono" terminal option of
 	the windows terminal. Colors are converted from RGB to grayscale in
-	drawgraph(). That way, a grayscale copy of colour plots can obtained
-	more easily.
+	drawgraph(). That way, a grayscale copy of colour plots can be
+	obtained more easily.
 
 	* src/win/wgnuplib.h src/win/wgraph.c: Retain the temporary bitmap used
-	for drawing to speed up redraws. Reduces the number of calls to drawgraph()
-	to a minimum.
+	for drawing to speed up redraws. Reduces the number of calls to
+	drawgraph() to a minimum.
 
 2012-05-17  Ethan A Merritt  <merritt@u.washington.edu>
 
