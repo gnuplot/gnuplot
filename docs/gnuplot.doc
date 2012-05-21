@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.701.2.15 2012/03/30 04:22:46 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.701.2.16 2012/05/14 04:40:12 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -6015,10 +6015,14 @@ Ffigure_mapcontours
  See `plot using xticlabels`.
 4 volatile
 ?datafile volatile
+?data volatile
 ?plot datafile volatile
- The `volatile` keyword indicates that the data previously read from the input
- stream or file may not be available for re-reading.  This tells the program to
- use `refresh` rather than `replot` commands whenever possible.  See `refresh`.
+?plot volatile
+?volatile
+ The `volatile` keyword in a plot command indicates that the data previously
+ read from the input stream or file may not be available for re-reading.
+ This tells the program to use `refresh` rather than `replot` commands whenever
+ possible.  See `refresh`.
 3 errorbars
 ?commands plot errorbars
 ?commands splot errorbars
@@ -13231,6 +13235,9 @@ Ffigure_mapcontours
  See `seeking-assistance`.
 
 2 known limitations
+ It is not possible to use in-line data (e.g. plot '-' ...) inside the curly
+ brackets of a `do` or `while` loop.
+
 =gamma
 =bessel
 =timefmt
