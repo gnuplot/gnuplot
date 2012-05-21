@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_term.h,v 1.16 2011/11/06 04:06:10 sfeam Exp $
+ * $Id: wxt_term.h,v 1.17 2012/05/02 04:24:09 sfeam Exp $
  */
 
 /* GNUPLOT - wxt_term.h */
@@ -91,6 +91,7 @@ void wxt_enhanced_writec(int c);
 void wxt_enhanced_open(char* fontname, double fontsize, double base, TBOOLEAN widthflag, TBOOLEAN showflag, int overprint);
 
 void wxt_layer(t_termlayer layer);
+void wxt_hypertext(int type, const char *text);
 
 void wxt_raise_terminal_window __PROTO((int));
 void wxt_raise_terminal_group __PROTO((void));

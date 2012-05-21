@@ -1,6 +1,7 @@
 New features, changes and fixes since gnuplot version 4.6
 =========================================================
 
+* NEW hypertext labels can be displayed on mouse-over
 * NEW geographic (Degrees Minutes Seconds) data axes
 * NEW set arrow <tag> from <start> length <len> angle <ang>
 * NEW the high bits of RGB colors are treated as an alpha channel

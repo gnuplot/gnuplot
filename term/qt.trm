@@ -1,5 +1,5 @@
 /* GNUPLOT - qt.trm 
- * $Id: qt.trm,v 1.7 2011/12/28 22:20:29 sfeam Exp $
+ * $Id: qt.trm,v 1.8 2012/01/17 20:53:53 lodewyck Exp $
  */
 
 /*[
@@ -63,6 +63,8 @@ TERM_TABLE_START (qt_driver)
     , qt_enhanced_open, qt_enhanced_flush, qt_enhanced_writec
     , qt_layer
     , NULL /* qt_path */
+    , 0.0 /* Scale (unused) */
+    , qt_hypertext
 TERM_TABLE_END (qt_driver)
 
 #undef LAST_TERM

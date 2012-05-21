@@ -67,7 +67,8 @@ GEPenColor, GEBackgroundColor, GEBrushStyle, GEPenStyle, GEPointSize, GELineWidt
 GEFillBox, GEPutText, GEFilledPolygon, GETextAngle, GETextAlignment, GEPoint, GEClear,
 GEZoomStart, GEZoomStop, GERuler, GECopyClipboard, GEMove, GEVector, GELineTo,
 GESetFont, GEEnhancedFlush, GEEnhancedFinish, GEImage, GESetSceneSize, GERaise,
-GEWrapCursor, GEScale, GEActivate, GEDesactivate, GELayer, GEPlotNumber, GEDone
+GEWrapCursor, GEScale, GEActivate, GEDesactivate, GELayer, GEPlotNumber, GEHypertext,
+GEDone
 };
 
 enum QtGnuplotLayer {

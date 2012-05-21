@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: svg.trm,v 1.138 2012/04/27 22:12:55 sfeam Exp $
+ * $Id: svg.trm,v 1.139 2012/05/02 19:14:47 sfeam Exp $
  */
 
 /*------------------------------------------------------------------------------------------------------------------------------------
@@ -46,6 +46,7 @@
  *   Background option
  *   Bitmap image support by creating and linking to external png files
  *   Mouse-tracking with coordinate readout.
+ *   Version 4.7 (April 2012) hypertext support
  *
  * Contributed by <plotter@piments.com>
  *   Javascript code to toggle plots on/off
@@ -94,6 +95,7 @@ TERM_PUBLIC void ENHsvg_put_text __PROTO((unsigned int, unsigned int, const char
 TERM_PUBLIC void ENHsvg_writec __PROTO((int));
 
 TERM_PUBLIC void SVG_path __PROTO((int p));
+TERM_PUBLIC void SVG_hypertext __PROTO((int, const char *));
 
 #ifdef WRITE_PNG_IMAGE
 TERM_PUBLIC void SVG_image __PROTO((unsigned m, unsigned n, coordval *image, gpiPoint *corner, t_imagecolor color_mode));
@@ -204,6 +206,9 @@ static TBOOLEAN SVG_dashed = FALSE;
 static char *SVG_dashpattern[SVG_dashtypes] = {
     "", " 5,8", " 1,4", " 8,4,2,4", " 9,4,1,4,1,4"
     };
+
+/* Support for embedded hypertext */
+static char *SVG_hypertext_text = NULL;
 
 /*------------------------------------------------------------------------------------------------------------------------------------
 	SVG_Pen_RealID
@@ -1141,6 +1146,16 @@ SVG_text ()
 	fprintf(gpoutfile,"  visibility=\"hidden\"> </text>\n");
     }
 
+    /* And a box and a text element to hold mouseover hypertext */
+    if (SVG_mouseable) {
+	fprintf(gpoutfile,"\n  <rect id=\"hypertextbox\" class=\"hypertextbox\" pointer-events=\"none\"\n");
+	fprintf(gpoutfile,"  fill=\"white\" stroke=\"black\" opacity=\"0.8\"\n");
+	fprintf(gpoutfile,"  height=\"16\" visibility=\"hidden\" />\n");
+	fprintf(gpoutfile,"\n  <text id=\"hypertext\" class=\"hypertext\" pointer-events=\"none\"\n");
+	fprintf(gpoutfile,"  font-size=\"12\" font-family=\"Arial\"\n");
+	fprintf(gpoutfile,"  visibility=\"hidden\"> </text>\n");
+    }
+
     /* If there were any grid lines in this plot, add a button to toggle them */
     if (SVG_mouseable && SVG_hasgrid) {
 	fprintf(gpoutfile,"\n  <image x='10' y='%d' width='16' height='16' xlink:href='grid.png'\n",
@@ -1260,20 +1275,34 @@ SVG_point (unsigned int x, unsigned int y, int number)
 
     SVG_PathClose ();
 
+    if (SVG_hypertext_text) {
+	fprintf(gpoutfile,"\
+\t<g onmousemove=\"gnuplot_svg.showHypertext(evt,'%s')\" \
+onmouseout=\"gnuplot_svg.hideHypertext()\"><title> </title>\n",
+		SVG_hypertext_text);
+    }
+
     if (number < 0) {		/* do dot */
 	fprintf (gpoutfile, "\
 \t<use xlink:href='#gpDot' x='%.*f' y='%.*f'%s/>\n",
 		 PREC, X(x), PREC, Y(y), color_spec);
     } else {			/* draw a point symbol */
 	fprintf (gpoutfile, "\
-\t<use xlink:href='#gpPt%u' transform='translate(%.*f,%.*f) scale(%.2f)'%s/>\
-\n",
+\t<use xlink:href='#gpPt%u' transform='translate(%.*f,%.*f) scale(%.2f)'%s/>",
 		 number % 13, PREC, X(x), PREC, Y(y),
 		 term_pointsize * term->h_tic / (2 * SVG_SCALE),
 		 color_spec);
     }
     SVG_xLast = x;
     SVG_yLast = y;
+
+    if (SVG_hypertext_text) {
+	fprintf(gpoutfile,"</g>\n");
+	free(SVG_hypertext_text);
+	SVG_hypertext_text = NULL;
+    } else {
+	fprintf(gpoutfile,"\n");
+    }
 }
 
 /*------------------------------------------------------------------------------------------------------------------------------------
@@ -1840,6 +1869,10 @@ ENHsvg_writec(int c)
 		*enhanced_cur_text++ = 'p';
 		*enhanced_cur_text++ = ';';
 		break;
+    case '\n':
+		*enhanced_cur_text++ = '\\';
+		*enhanced_cur_text++ = 'n';
+		break;
     case '\376':
 		/* This is an illegal UTF-8 byte; we use it to escape the reserved '&' */
 		if (encoding == S_ENC_DEFAULT) {
@@ -1929,6 +1962,26 @@ SVG_path(int p)
     }
 }
 
+TERM_PUBLIC void
+SVG_hypertext( int type, const char *text )
+{
+    if (type != TERM_HYPERTEXT_TOOLTIP)
+	return;
+
+    free(SVG_hypertext_text);
+    if (text) {
+	char *buffer = gp_alloc(5*strlen(text),"escape");
+	enhanced_cur_text = buffer;
+	do { ENHsvg_writec(*text); }
+	    while (*text++);
+	SVG_hypertext_text = gp_strdup(buffer);
+	enhanced_cur_text = NULL;
+	free(buffer);
+    } else {
+	SVG_hypertext_text = NULL;
+    }
+}
+
 
 #undef Y
 #undef X
@@ -1962,6 +2015,7 @@ TERM_TABLE_START (svg_driver)
    , SVG_layer	/* layer */
    , SVG_path 	/* path */
    , SVG_SCALE	/* pixel oversampling scale */
+   , SVG_hypertext	/* hypertext support */
 TERM_TABLE_END (svg_driver)
 
 #undef LAST_TERM

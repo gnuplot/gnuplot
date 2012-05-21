@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.369 2012/05/05 04:21:41 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.370 2012/05/20 14:18:54 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -176,6 +176,9 @@ static void parse_histogramstyle __PROTO((histogram_style *hs,
 
 static struct position default_position
 	= {first_axes, first_axes, first_axes, 0., 0., 0.};
+
+static lp_style_type default_hypertext_point_style
+	= {1, LT_BLACK, 4, 0, 1.0, PTSZ_DEFAULT, TRUE, {TC_RGB, 0x000000, 0.0}};
 
 /******** The 'set' command ********/
 void
@@ -5427,6 +5430,7 @@ new_text_label(int tag)
     new->lp_properties.p_type = 1;
     new->offset = default_offset;
     new->noenhanced = FALSE;
+    new->hypertext = FALSE;
 
     return(new);
 }
@@ -5445,9 +5449,10 @@ parse_label_options( struct text_label *this_label )
     int rotate = 0;
     TBOOLEAN set_position = FALSE, set_just = FALSE,
 	set_rot = FALSE, set_font = FALSE, set_offset = FALSE,
-	set_layer = FALSE, set_textcolor = FALSE;
+	set_layer = FALSE, set_textcolor = FALSE, set_hypertext = FALSE;
     int layer = 0;
     TBOOLEAN axis_label = (this_label->tag == -2);
+    TBOOLEAN hypertext = FALSE;
     struct position offset = { character, character, character, 0., 0., 0. };
     t_colorspec textcolor = {TC_DEFAULT,0,0.0};
     struct lp_style_type loc_lp = DEFAULT_LP_STYLE_TYPE;
@@ -5519,6 +5524,18 @@ parse_label_options( struct text_label *this_label )
 		int_error(c_token, "'fontname,fontsize' expected");
 	}
 
+	/* Flag this as hypertext rather than a normal label */
+	if (!set_hypertext && almost_equals(c_token,"hyper$text")) {
+	    c_token++;
+	    hypertext = TRUE;
+	    set_hypertext = TRUE;
+	    loc_lp = default_hypertext_point_style;
+	} else if (!set_hypertext && almost_equals(c_token,"nohyper$text")) {
+	    c_token++;
+	    hypertext = FALSE;
+	    set_hypertext = TRUE;
+	}
+
 	/* get front/back (added by JDP) */
 	if (! set_layer && !axis_label) {
 	    if (equals(c_token, "back")) {
@@ -5534,7 +5551,7 @@ parse_label_options( struct text_label *this_label )
 	    }
 	}
 
-	if (loc_lp.pointflag == -2 && !axis_label) {
+	if (!axis_label && (loc_lp.pointflag == -2 || set_hypertext)) {
 	    if (almost_equals(c_token, "po$int")) {
 		int stored_token = ++c_token;
 		struct lp_style_type tmp_lp;
@@ -5607,6 +5624,8 @@ parse_label_options( struct text_label *this_label )
 	    this_label->lp_properties = loc_lp;
 	if (set_offset)
 	    this_label->offset = offset;
+	if (set_hypertext)
+	    this_label->hypertext = hypertext;
 
     /* Make sure the z coord and the z-coloring agree */
     if (this_label->textcolor.type == TC_Z)

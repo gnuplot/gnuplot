@@ -1,7 +1,7 @@
 /*
- * $Id: gnuplot_mouse.js,v 1.17 2011/11/26 00:31:15 sfeam Exp $
+ * $Id: gnuplot_mouse.js,v 1.18 2012/05/03 20:35:22 sfeam Exp $
  */
-    gnuplot.mouse_version = "3 May 2012";
+    gnuplot.mouse_version = "21 May 2012";
 
 // Mousing code for use with gnuplot's 'canvas' terminal driver.
 // The functions defined here assume that the javascript plot produced by
@@ -195,6 +195,52 @@ gnuplot.mouse_update = function(e)
     if (w<0) {x0 = x0 + w; w = -w;}
     if (h<0) {y0 = y0 + h; h = -h;}
     ctx.strokeRect(x0,y0,w,h);
+  }
+
+  // See if we are over a hypertext anchor point
+  if (typeof(gnuplot.hypertext_list != "unknown") && gnuplot.hypertext_list.length > 0) {
+    gnuplot.check_hypertext();
+  }
+}
+
+gnuplot.check_hypertext = function()
+{
+  var nitems = gnuplot.hypertext_list.length;
+  for (var i=0; i<nitems; i++) {
+    var linkx = gnuplot.hypertext_list[i].x / 10.;
+    var linky = gnuplot.hypertext_list[i].y / 10.;
+    if (gnuplot.zoomed) {
+      var zoom = gnuplot.zoomXY(linkx,linky);
+      linkx = zoom.x; linky = zoom.y;
+    }
+    var delx = Math.abs(gnuplot.mousex - linkx);
+    var dely = Math.abs(gnuplot.mousey - linky);
+    var w = gnuplot.hypertext_list[i].w / 20.;
+    if (delx < w && dely < w) {
+	if (i == gnuplot.on_hypertext)
+	    break;
+	gnuplot.on_hypertext = i;
+	var text = gnuplot.hypertext_list[i].text;
+	var lines = text.split('\v');
+	var len = 0;
+	if (lines.length <= 1) {
+	    len = ctx.measureText("sans", 10, text);
+	} else {
+	    for (var l=0; l<lines.length; l++) {
+		var ll = ctx.measureText("sans", 10, lines[l]);
+		if (len < ll) len = ll;
+	    }
+	}
+	ctx.fillStyle = "rgba(238,238,238,0.8)"
+	ctx.fillRect(linkx+10, linky+4, len+8, 14*lines.length);
+	ctx.drawText("sans", 10, linkx+14, linky+14, text);
+	break;
+    }
+  } 
+  if (i == nitems && gnuplot.on_hypertext >= 0) {
+    gnuplot.on_hypertext = -1;
+    ctx.clearRect(0,0,gnuplot.plot_term_xmax,gnuplot.plot_term_ymax);
+    gnuplot_canvas();
   }
 }
 

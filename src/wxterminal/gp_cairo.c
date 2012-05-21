@@ -1,5 +1,5 @@
 /*
- * $Id: gp_cairo.c,v 1.61 2012/03/30 04:20:17 sfeam Exp $
+ * $Id: gp_cairo.c,v 1.62 2012/04/14 03:59:31 sfeam Exp $
  */
 
 /* GNUPLOT - gp_cairo.c */
@@ -738,7 +738,8 @@ gp_cairo_create_layout (cairo_t *cr)
 }
 #endif
 
-void gp_cairo_draw_text(plot_struct *plot, int x1, int y1, const char* string)
+void gp_cairo_draw_text(plot_struct *plot, int x1, int y1, const char* string,
+		    int *width, int *height)
 {
 	double x,y;
 	double arg = plot->text_angle * M_PI/180;
@@ -796,6 +797,10 @@ void gp_cairo_draw_text(plot_struct *plot, int x1, int y1, const char* string)
 	pango_font_description_free (desc);
 	
 	pango_layout_get_extents(layout, &ink_rect, &logical_rect);
+	if (width)
+		*width = logical_rect.width / PANGO_SCALE;
+	if (height)
+		*height = logical_rect.height / PANGO_SCALE;
 
 	/* EAM Mar 2009 - Adjusting the vertical position for every character fragment */
 	/* leads to uneven baselines.  Better to adjust to the "average" character height */

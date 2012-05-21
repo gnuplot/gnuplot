@@ -1,5 +1,5 @@
 /*
- * $Id: term_api.h,v 1.100 2012/03/13 18:56:02 sfeam Exp $
+ * $Id: term_api.h,v 1.101 2012/03/31 05:54:12 sfeam Exp $
  */
 
 /* GNUPLOT - term_api.h */
@@ -141,6 +141,9 @@ typedef enum termlayer {
 	TERM_LAYER_END_PM3D_MAP
 } t_termlayer;
 
+/* Options used by the terminal entry point term->hypertext(). */
+#define TERM_HYPERTEXT_TOOLTIP 0
+
 typedef struct fill_style_type {
     int fillstyle;
     int filldensity;
@@ -271,6 +274,9 @@ typedef struct TERMENTRY {
  * pixel coordinates.  Used to provide data for external mousing code.
  */
     double tscale;
+
+/* Pass hypertext for inclusion in the output plot */
+    void (*hypertext) __PROTO((int type, const char *text));
 
 } TERMENTRY;
 

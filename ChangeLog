@@ -1,3 +1,38 @@
+2012-05-21  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/term_api.h:
+	Core support for hypertext in interactive terminals.  Terminal entry
+	    term->hypertext(int TYPE, const char TEXT)
+	associates a hypertext string with some subsequent graphics object.
+	The effect of this association depends on TYPE.  Initially only type
+	HYPERTEXT_TOOLTIP is implemented.  This causes the text string to be
+	displayed in a tooltip-like popup when the mouse hovers over the
+	associated graphics element.
+
+	* src/gadgets.c src/gadgets.h src/set.c src/show.c:
+	New keyword "hypertext" associated with individual labels, including
+	plot style "with labels".  The label text is displayed only when the
+	mouse hovers over the associated anchor point.
+
+	* term/README docs/gnuplot.doc demo/hypertext.dem:
+	Documentation and demo
+
+	* term/canvas.trm term/js/gnuplot_mouse.js:
+	Support for canvas terminal.
+
+	* src/qtterminal/QtGnuplotEvent.h src/qtterminal/QtGnuplotScene.cpp
+	src/qtterminal/QtGnuplotScene.h src/qtterminal/qt_term.cpp 
+	src/qtterminal/qt_term.h term/qt.trm:
+	Support for qt terminal.
+
+	* term/svg.trm term/js/gnuplot_svg.js:
+	Support for svg terminal.
+
+	* src/wxterminal/gp_cairo.c src/wxterminal/gp_cairo.h
+	src/wxterminal/wxt_gui.cpp src/wxterminal/wxt_gui.h
+	src/wxterminal/wxt_term.h term/cairo.trm term/wxt.trm:
+	Support for wxt terminal.
+
 2012-05-20  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* configure.in docs/Makefile.am: Updated a patch from Christoph Junghans

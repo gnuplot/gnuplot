@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: canvas.trm,v 1.59 2012/04/14 03:59:31 sfeam Exp $
+ * $Id: canvas.trm,v 1.60 2012/05/05 16:54:36 sfeam Exp $
  *
  */
 
@@ -39,6 +39,8 @@
  *	Optional explicit background
  *	Wrap each plot in a test for gnuplot.hide_plot_N
  *	Handle image data by storing it in a parallel PNG file
+ *   Ethan A Merritt, Mar 2012
+ *	Hypertext
  *
  * send your comments or suggestions to (gnuplot-info@lists.sourceforge.net).
  *
@@ -72,6 +74,7 @@ TERM_PUBLIC void CANVAS_set_color __PROTO((t_colorspec *colorspec));
 TERM_PUBLIC int CANVAS_make_palette __PROTO((t_sm_palette *palette));
 TERM_PUBLIC void CANVAS_layer __PROTO((t_termlayer));
 TERM_PUBLIC void CANVAS_path __PROTO((int));
+TERM_PUBLIC void CANVAS_hypertext __PROTO((int, const char *));
 
 TERM_PUBLIC void ENHCANVAS_OPEN __PROTO((char *, double, double, TBOOLEAN, TBOOLEAN, int));
 TERM_PUBLIC void ENHCANVAS_FLUSH __PROTO((void));
@@ -115,6 +118,7 @@ static char CANVAS_background[18] = {'\0'};
 static char *CANVAS_name = NULL;
 static char *CANVAS_scriptdir = NULL;
 static char *CANVAS_title = NULL;
+static char *CANVAS_hypertext_text = NULL;
 
 /*
  * Stuff for tracking images stored in separate files
@@ -544,6 +548,14 @@ CANVAS_graphics()
 	"function cfsp() {gnuplot.cfsp();};\n"
 	"\n"
     );
+    fprintf(gpoutfile,
+	"gnuplot.hypertext_list = [];\n"
+	"gnuplot.on_hypertext = -1;\n"
+	"function Hypertext(x,y,w,text) {\n"
+	"    newtext = {x:x, y:y, w:w, text:text};\n"
+	"    gnuplot.hypertext_list.push(newtext);\n"
+	"}\n"
+    );
     if (canvas_dashed)
 	fprintf(gpoutfile,
 	    "gnuplot.dashlength = %d;\n",
@@ -943,6 +955,17 @@ CANVAS_point(unsigned int x, unsigned int y, int number)
 		x, (canvas_ymax-y), width);
 	break;
     }
+
+    /* Hypertext support */
+    if (CANVAS_hypertext_text) {
+	/* EAM DEBUG: embedded \n produce illegal javascript output */
+	while (strchr(CANVAS_hypertext_text,'\n'))
+		*strchr(CANVAS_hypertext_text,'\n') = '\v';
+	fprintf(gpoutfile, "Hypertext(%d,%d,%.1f,\"%s\");\n",
+		x, (canvas_ymax-y), width, CANVAS_hypertext_text);
+	free(CANVAS_hypertext_text);
+	CANVAS_hypertext_text = NULL;
+    }
 }
 
 TERM_PUBLIC void
@@ -1200,6 +1223,19 @@ CANVAS_path(int p)
     }
 }
 
+TERM_PUBLIC void
+CANVAS_hypertext(int type, const char *hypertext)
+{
+    if (type != TERM_HYPERTEXT_TOOLTIP)
+	return;
+
+    free(CANVAS_hypertext_text);
+    if (hypertext)
+	CANVAS_hypertext_text = gp_strdup(hypertext);
+    else
+	CANVAS_hypertext_text = NULL;
+}
+
 /* Enhanced text mode support starts here */
 
 static double ENHCANVAS_base = 0.0;
@@ -1431,6 +1467,8 @@ TERM_TABLE_START(canvas_driver)
     , ENHCANVAS_OPEN, ENHCANVAS_FLUSH, do_enh_writec
     , CANVAS_layer
     , CANVAS_path		/* path */
+    , 1.0			/* Should this be CANVAS_OVERSAMPLE? */
+    , CANVAS_hypertext
 TERM_TABLE_END(canvas_driver)
 
 #undef LAST_TERM

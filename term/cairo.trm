@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: cairo.trm,v 1.54 2012/04/14 03:59:31 sfeam Exp $
+ * $Id: cairo.trm,v 1.55 2012/05/08 04:18:56 sfeam Exp $
  */
 
 /* GNUPLOT - cairo.trm */
@@ -966,13 +966,13 @@ void cairotrm_put_text(unsigned int x, unsigned int y, const char * string)
 	/* if ignore_enhanced_text is set, draw with the normal routine.
 	 * This is meant to avoid enhanced syntax when the enhanced mode is on */
 	if (ignore_enhanced_text || !cairo_params->enhanced) {
-		gp_cairo_draw_text(&plot, x, term->ymax - y, string);
+		gp_cairo_draw_text(&plot, x, term->ymax - y, string, NULL, NULL);
 		return;
 	}
 
 	/* If there are no mark-up characters we can use the normal routine */
 	if (!strpbrk(string, "{}^_@&~")) {
-		gp_cairo_draw_text(&plot, x, term->ymax - y, string);
+		gp_cairo_draw_text(&plot, x, term->ymax - y, string, NULL, NULL);
 		return;
 	}
 

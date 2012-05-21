@@ -85,6 +85,7 @@ void qt_enhanced_open(char* fontname, double fontsize, double base, TBOOLEAN wid
 void qt_enhanced_flush();
 void qt_enhanced_writec(int c);
 void qt_layer(t_termlayer layer);
+void qt_hypertext(int type, const char *text);
 
 #ifdef __cplusplus
 }

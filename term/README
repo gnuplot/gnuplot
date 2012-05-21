@@ -79,6 +79,8 @@ struct TERMENTRY {
     void (*layer) __PROTO((t_termlayer syncpoint));
 /* Path control for end-joins of closed polygons on PostScript-like devices */
     void (*path) __PROTO((int p));
+/* Hypertext support */
+    void (*hypertext) __PROTO((int type, const char *text));
 };
 
 One consequence of (1) is that we would like drivers to be backwards
@@ -439,7 +441,13 @@ _path(int p)
    term->path(0) triggers a "newpath"
    term->path(1) triggers a "closepath"
    These calls are optional, and only required by a few drivers.
-   
+
+_hypertext(int type, const char *text)
+   Associates a text string with a subsequent graphics object.
+   The effect of this association is controlled by type.
+   Currently the only type supported is a tooltips-like text popup
+   triggered by mousing over the object. Possible future extensions
+   include treating the text as a URL activated by mouse click.
 
 The following should illustrate the order in which calls to these
 routines are made:

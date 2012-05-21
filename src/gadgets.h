@@ -88,6 +88,7 @@ typedef struct text_label {
     struct lp_style_type lp_properties;
     struct position offset;
     TBOOLEAN noenhanced;
+    TBOOLEAN hypertext;
 } text_label;
 
 /* This is the default state for the axis, timestamp, and plot title labels
@@ -98,7 +99,8 @@ typedef struct text_label {
     {NULL, NONROTATABLE_LABEL_TAG, \
      {character, character, character, 0.0, 0.0, 0.0}, CENTRE, 0, 0, \
      NULL, NULL, {TC_LT, -2, 0.0}, DEFAULT_LP_STYLE_TYPE, \
-     {character, character, character, 0.0, 0.0, 0.0}, FALSE }
+     {character, character, character, 0.0, 0.0, 0.0}, FALSE, \
+     FALSE}
 
 /* Datastructure for implementing 'set arrow' */
 typedef enum arrow_type {

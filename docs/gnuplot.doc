@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.733 2012/05/20 14:18:54 markisch Exp $
+C RCS $Id: gnuplot.doc,v 1.734 2012/05/21 18:20:23 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -3560,6 +3560,13 @@ Ffigure_labels
  name, the command would be much simpler:
 
    plot 'cities.dat' using 5:4:1 with labels font "Times,8"
+
+ If the labels are marked as `hypertext` then the text only appears if the
+ mouse is hovering over the corresponding anchor point.  See `hypertext`.
+ In this case you must enable the label's `point` attribute so that there is
+ a point to act as the hypertext anchor:
+
+   plot 'cities.dat' using 5:4:1 with labels hypertext point pt 7
 
  The `labels` style can also be used in 3D plots. In this case four input
  column specifiers are required, corresponding to X Y Z and text.
@@ -8793,6 +8800,7 @@ Ffigure_missing
                  {textcolor <colorspec>}
                  {point <pointstyle> | nopoint}
                  {offset <offset>}
+                 {hypertext}
        unset label {<tag>}
        show label
 
@@ -8917,6 +8925,20 @@ Ffigure_missing
  To set a label whose color matches the z value (in this case 5.5) of some
  point on a 3D splot colored using pm3d:
        set label 'text' at 0,0,5.5 tc palette z
+4 hypertext
+?hypertext
+?label hypertext
+?set label hypertext
+ Some terminals (currently svg, canvas, and wxt) allow you to attach hypertext
+ to specific points on the graph or elsewhere on the canvas. When the mouse
+ hovers over the anchor point, a pop-up box containing the text is displayed.
+ Terminals that do not support hypertext will display nothing. You must enable
+ the `point` attribute of the label in order for the hypertext to be anchored.
+ Examples:
+       set label at 0,0 "Plot origin" hypertext point pt 1
+       plot 'data' using 1:2:0 with labels hypertext point pt 7 \
+            title 'mouse over point to see its order in data set'
+
 3 linetype
 ?commands set linetype
 ?commands unset linetype

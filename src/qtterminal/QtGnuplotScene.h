@@ -97,6 +97,7 @@ private:
 	QPointF m_zoomBoxCorner;
 	double  m_currentPointSize;
 	double  m_textAngle;
+	QPoint  m_textOffset;
 	double  m_currentZ;
 	QTime   m_watches[4];
 	int     m_currentPlotNumber;
@@ -117,6 +118,8 @@ private:
 	QGraphicsTextItem* m_zoomStopText;
 	QtGnuplotEnhanced* m_enhanced;  // Current enhanced text block
 	QList<QtGnuplotKeybox> m_key_boxes;
+	QString m_currentHypertext;
+	QList<QGraphicsItem*> m_hypertextList;
 
 	// Axis scales
 	bool   m_axisValid[4];

@@ -1,5 +1,5 @@
 /*
- * $Id: wxt.trm,v 1.30 2012/01/22 03:59:16 sfeam Exp $
+ * $Id: wxt.trm,v 1.31 2012/05/02 04:24:09 sfeam Exp $
  */
 
 /* GNUPLOT - wxt.trm */
@@ -453,6 +453,9 @@ TERM_TABLE_START (wxt_driver)
     , wxt_image
     , wxt_enhanced_open, wxt_enhanced_flush, wxt_enhanced_writec
     , wxt_layer
+    , NULL /* no term->path */
+    , 0.0 /* Scale (unused) */
+    , wxt_hypertext
 TERM_TABLE_END (wxt_driver)
 
 #undef LAST_TERM

@@ -522,15 +522,27 @@ write_label(unsigned int x, unsigned int y, struct text_label *this_label)
 	ignore_enhanced(this_label->noenhanced);
 
 	/* The text itself */
-	get_offsets(this_label, term, &htic, &vtic);
-	if (this_label->rotate && (*term->text_angle) (this_label->rotate)) {
-	    write_multiline(x + htic, y + vtic, this_label->text,
-			    this_label->pos, justify, this_label->rotate,
-			    this_label->font);
-	    (*term->text_angle) (0);
+	if (this_label->hypertext) {
+	    /* Treat text as hypertext */
+	    char *font = this_label->font;
+	    if (font && term->set_font)
+		term->set_font(font);
+	    if (term->hypertext)
+	        term->hypertext(TERM_HYPERTEXT_TOOLTIP, this_label->text);
+	    if (font && term->set_font)
+		term->set_font("");
 	} else {
-	    write_multiline(x + htic, y + vtic, this_label->text,
-			    this_label->pos, justify, 0, this_label->font);
+	    /* A normal label (always print text) */
+	    get_offsets(this_label, term, &htic, &vtic);
+	    if (this_label->rotate && (*term->text_angle) (this_label->rotate)) {
+		write_multiline(x + htic, y + vtic, this_label->text,
+				this_label->pos, justify, this_label->rotate,
+				this_label->font);
+		(*term->text_angle) (0);
+	    } else {
+		write_multiline(x + htic, y + vtic, this_label->text,
+				this_label->pos, justify, 0, this_label->font);
+	    }
 	}
 
 	/* The associated point, if any */

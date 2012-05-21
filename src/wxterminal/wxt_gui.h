@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.h,v 1.35 2011/10/09 22:18:11 sfeam Exp $
+ * $Id: wxt_gui.h,v 1.36 2011/11/06 04:06:10 sfeam Exp $
  */
 
 /* GNUPLOT - wxt_gui.h */
@@ -277,7 +277,8 @@ typedef enum wxt_gp_command_t {
 	command_fillbox,
 	command_filled_polygon,
 	command_image,
-	command_layer
+	command_layer,
+	command_hypertext
 } wxt_gp_command_t;
 
 /* base structure for storing gnuplot commands */
@@ -372,6 +373,7 @@ public :
 	/* functions used to process the command list */
 	void wxt_cairo_refresh();
 	void wxt_cairo_exec_command(gp_command command);
+	void wxt_cairo_draw_hypertext();
 
 	/* the plot structure, defined in gp_cairo.h */
 	plot_struct plot;
@@ -577,6 +579,7 @@ static void wxt_command_push(gp_command command);
  * not if the window is not the current one. */
 static bool wxt_exec_event(int type, int mx, int my, int par1, int par2, wxWindowID id);
 static void wxt_check_for_toggle(unsigned int x, unsigned int y);
+static void wxt_check_for_anchors(unsigned int x, unsigned int y);
 
 /* process one event, returns true if it ends the pause */
 static bool wxt_process_one_event(struct gp_event_t *);
