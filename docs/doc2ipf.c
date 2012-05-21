@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: doc2ipf.c,v 1.21 2008/02/25 02:20:35 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: doc2ipf.c,v 1.22 2012/03/03 16:21:24 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - doc2ipf.c */
@@ -495,7 +495,9 @@ process_line(char *line, FILE *b)
     case '^':
 	break;			/* ignore */
     default:{
+#ifdef IPF_MENU_SECTIONS
 	    TBOOLEAN leaf;
+#endif
 	    
 	    if (isdigit((int)line[0])) {	/* start of section */
 		if (intable) {
@@ -511,13 +513,6 @@ process_line(char *line, FILE *b)
 		    }
 		}
 
-#if 0
-		/* disabled by BM: this doesn't do anything? */
-		if (startpage)	/* use new level 0 item */
-		    refs(0, bo, NULL, NULL, NULL);
-		else
-		    refs(last_line, bo, NULL, NULL, NULL);
-#endif		
 		if (debug) {
 		   fprintf(stderr, "%d: %s\n", line_count, &line2[1]);
 		}
