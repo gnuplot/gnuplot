@@ -1,6 +1,6 @@
 <!DOCTYPE HTML>
 <html>
-<head><title>Gnuplot Version 4.5 SVG terminal demos</title>
+<head><title>Gnuplot Version 4.7 SVG terminal demos</title>
 <link type="text/css" href="gnuplot_demo.css" rel="stylesheet">
 <meta charset="UTF-8">
 </head>
@@ -8,15 +8,15 @@
 <body>
 
 <h2 align=center>
-    Gnuplot Version 4.5 SVG terminal demos<br>
+    Gnuplot Version 4.7 SVG terminal demos<br>
     See also the demo output for the 
-       <a href="../demo_cvs/">PNG</a> and
-       <a href="../demo_canvas/">canvas</a> terminals.
+       <a href="../demo_4.7/">PNG</a> and
+       <a href="../demo_canvas_4.7/">canvas</a> terminals.
 </h2>
 
 <p>
 Here are samples of SVG output from demos included with the gnuplot
-distribution. They were generated using the <i>April 2011</i>
+distribution. They were generated using the <i>May 2012</i>
 CVS version of gnuplot.
 Note that individual plots can be toggled on/off by clicking on
 the corresponding key entry.  Clicking in the plot area should turn
@@ -119,6 +119,7 @@ The mousing code is new. You may see some browser-dependent glitches.
     <li><a href="datastrings.html">string data</a></li>
     <li><a href="stringvar.html">string variables</a></li>
     <li><a href="cities.html">variable font size</a></li>
+    <li><a href="hypertext.html">hypertext</a></li>
     </ul>
 
     <h4>Page Layout</h4>
@@ -132,9 +133,8 @@ The mousing code is new. You may see some browser-dependent glitches.
 
     <h4>Styles</h4>
     <ul>
-    <li><a href="dashcolor.html">line styles</a></li>
+    <li><a href="lines_arrows.html">line and arrow styles</a></li>
     <li><a href="fillstyle.html">fill styles</a></li>
-    <li><a href="arrowstyle.html">arrow styles</a></li>
     <li><a href="transparent.html">transparency</a></li>
     <li><a href="transparent_solids.html">transparent solids</a></li>
     </ul>
@@ -170,7 +170,7 @@ The mousing code is new. You may see some browser-dependent glitches.
 <tbody><tr valign="top">
 
     <td>
-    <i>This page created by Ethan Merritt<br>April 2011</i>
+    <i>This page created by Ethan Merritt<br>April 2012</i>
     </td>
 
     <td>
