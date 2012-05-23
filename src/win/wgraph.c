@@ -1,5 +1,5 @@
 /*
- * $Id: wgraph.c,v 1.147 2012/05/20 20:58:52 markisch Exp $
+ * $Id: wgraph.c,v 1.148 2012/05/23 17:18:34 markisch Exp $
  */
 
 /* GNUPLOT - win/wgraph.c */
@@ -50,7 +50,7 @@
 #define _WIN32_WINNT 0x0400
 #endif
 /* BM: for AlphaBlend/TransparentBlt */
-#define WINVER 0x0410
+#define WINVER 0x0501
 /* BM: for Toolbars */
 #define _WIN32_IE 0x0501
 #include <windows.h>
@@ -237,6 +237,9 @@ static void	CopyPrint(LPGW lpgw);
 static void	WriteGraphIni(LPGW lpgw);
 static char *	GraphDefaultFont(void);
 static void	ReadGraphIni(LPGW lpgw);
+static void	add_tooltip(LPGW lpgw, PRECT rect, LPWSTR text);
+static void	clear_tooltips(LPGW lpgw);
+static void track_tooltip(LPGW lpgw, int x, int y);
 static COLORREF	GetColor(HWND hwnd, COLORREF ref);
 static void	UpdateColorSample(HWND hdlg);
 static BOOL	LineStyle(LPGW lpgw);
@@ -996,13 +999,14 @@ SelFont(LPGW lpgw)
 static LPWSTR
 UnicodeText(const char *str, enum set_encoding_id encoding)
 {
-    UINT codepage = 0;
+    UINT codepage;
     LPWSTR textw = NULL;
 
     /* For a list of code page identifiers see
        http://msdn.microsoft.com/en-us/library/dd317756%28v=vs.85%29.aspx
     */
     switch (encoding) {
+        case S_ENC_DEFAULT:    codepage = CP_ACP; break;
         case S_ENC_ISO8859_1:  codepage = 28591; break;
         case S_ENC_ISO8859_2:  codepage = 28592; break;
         case S_ENC_ISO8859_9:  codepage = 28599; break;
@@ -1018,9 +1022,9 @@ UnicodeText(const char *str, enum set_encoding_id encoding)
         case S_ENC_KOI8_U:     codepage = 21866; break;
         case S_ENC_SJIS:       codepage =   932; break;
         case S_ENC_UTF8:       codepage = CP_UTF8; break;
-		default:               codepage = 0;
+        default:               codepage = 0xffffffff;
     }
-    if (codepage != 0) {
+    if (codepage != 0xffffffff) {
         int length;
 
         /* get length of converted string */
@@ -1423,11 +1427,14 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 	struct GWOP *curptr;
 	struct GWOPBLK *blkptr;
 
-	/* layers */
+	/* layers and hypertext */
 	unsigned plotno = 0;
 	BOOL gridline = FALSE;
 	BOOL skipplot = FALSE;
 	BOOL keysample = FALSE;
+	BOOL interactive;
+	LPWSTR hypertext = NULL;
+	int hypertype = 0;
 
 	/* colors */
 	BOOL isColor;				/* use colors? */
@@ -1468,6 +1475,12 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 	int i, k;
 
     if (lpgw->locked) return;
+
+	/* clear hypertexts only in display sessions */
+	interactive = (GetObjectType(hdc) == OBJ_MEMDC) ||
+		((GetObjectType(hdc) == OBJ_DC) && (GetDeviceCaps(hdc, TECHNOLOGY) == DT_RASDISPLAY));
+	if (interactive)
+		clear_tooltips(lpgw);
 
     /* HBB 20010218: the GDI status query functions don't work on Metafile
      * handles, so can't know whether the screen is actually showing
@@ -1607,6 +1620,20 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 		if (!(skipplot || (gridline && lpgw->hidegrid)) ||
 			(keysample || (curptr->op == W_line_type) || (curptr->op == W_setcolor)) ) {
 
+		/* special case hypertexts */
+		if ((hypertext != NULL) && (hypertype == TERM_HYPERTEXT_TOOLTIP)) {
+			/* point symbols */
+			if ((curptr->op >= W_dot) && (curptr->op <= W_dot + WIN_POINT_TYPES)) {
+				RECT rect;
+				rect.left = xdash - htic;
+				rect.right = xdash + htic;
+				rect.top = ydash - vtic;
+				rect.bottom = ydash + vtic;
+				add_tooltip(lpgw, &rect, hypertext);
+				hypertext = NULL;
+			}
+		}
+
 		switch (curptr->op) {
 		case 0:	/* have run past last in this block */
 			break;
@@ -1720,6 +1747,17 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 			LocalUnlock(curptr->htext);
 			break;
 		}
+
+		case W_hypertext:
+			if (interactive) {
+				/* Make a copy for future reference */
+				char * str = LocalLock(curptr->htext);
+				free(hypertext);
+				hypertext = UnicodeText(str, encoding);
+				hypertype = curptr->x;
+				LocalUnlock(curptr->htext);
+			}
+			break;
 
 		case W_fillstyle:
 			/* HBB 20010916: new entry, needed to squeeze the many
@@ -2879,6 +2917,96 @@ ReadGraphIni(LPGW lpgw)
 	}
 }
 
+/* ================================== */
+
+/* Hypertext support functions */
+
+static void
+add_tooltip(LPGW lpgw, PRECT rect, LPWSTR text)
+{
+	int idx = lpgw->numtooltips;
+
+	/* Extend buffer, if necessary */
+	if (lpgw->numtooltips >= lpgw->maxtooltips) {
+		lpgw->maxtooltips += 10;
+		lpgw->tooltips = (struct tooltips *) realloc(lpgw->tooltips, lpgw->maxtooltips * sizeof(struct tooltips));
+	}
+
+	rect->top += lpgw->ToolbarHeight;
+	rect->bottom += lpgw->ToolbarHeight;
+	lpgw->tooltips[idx].rect = *rect;
+	lpgw->tooltips[idx].text = text;
+	lpgw->numtooltips++;
+
+	if (!lpgw->hTooltip) {
+		TOOLINFO ti = { 0 };
+
+		/* Create new tooltip. */
+		HWND hwnd = CreateWindowEx(WS_EX_TOPMOST, TOOLTIPS_CLASS, NULL,
+									 WS_POPUP | TTS_NOPREFIX | TTS_ALWAYSTIP,
+									 CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
+									 lpgw->hWndGraph, NULL, lpgw->hInstance, NULL);
+		lpgw->hTooltip = hwnd;
+
+		/* Associate the tooltip with the rect area.*/
+		ti.cbSize   = sizeof(TOOLINFO);
+		ti.uFlags   = TTF_SUBCLASS;
+		ti.hwnd     = lpgw->hWndGraph;
+		ti.hinst    = lpgw->hInstance;
+		ti.uId      = 0;
+		ti.rect     = * rect;
+		ti.lpszText = (LPTSTR) text;
+		SendMessage(hwnd, TTM_ADDTOOLW, 0, (LPARAM) (LPTOOLINFO) &ti);
+		SendMessage(hwnd, TTM_SETDELAYTIME, TTDT_INITIAL, (LPARAM) 100);
+		SendMessage(hwnd, TTM_SETDELAYTIME, TTDT_RESHOW, (LPARAM) 100);
+		SetWindowPos(hwnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
+	}
+}
+
+
+static void
+clear_tooltips(LPGW lpgw)
+{
+	int i;
+	for (i = 0; i < lpgw->numtooltips; i++) {
+		free(lpgw->tooltips[i].text);
+	}
+	lpgw->numtooltips = 0;
+	lpgw->maxtooltips = 0;
+	free(lpgw->tooltips);
+	lpgw->tooltips = NULL;
+}
+
+
+static void
+track_tooltip(LPGW lpgw, int x, int y)
+{
+	static POINT p = {0, 0};
+	int i;
+
+	/* only update if mouse position changed */
+	if ((p.x == x) && (p.y == y))
+		return;
+	p.x = x; p.y = y;
+
+	for (i = 0; i < lpgw->numtooltips; i++) {
+		if (PtInRect(&(lpgw->tooltips[i].rect), p)) {
+			TOOLINFO ti = { 0 };
+			int width;
+
+			ti.cbSize   = sizeof(TOOLINFO);
+			ti.hwnd     = lpgw->hWndGraph;
+			ti.hinst    = lpgw->hInstance;
+			ti.rect     = lpgw->tooltips[i].rect;
+			ti.lpszText = (LPTSTR) lpgw->tooltips[i].text;
+			SendMessage(lpgw->hTooltip, TTM_NEWTOOLRECT, 0, (LPARAM) (LPTOOLINFO) &ti);
+			SendMessage(lpgw->hTooltip, TTM_UPDATETIPTEXTW, 0, (LPARAM) (LPTOOLINFO) &ti);
+			/* Multi-line tooltip. */
+			width = (wcschr(lpgw->tooltips[i].text, L'\n') == NULL) ? -1 : 200;
+			SendMessage(lpgw->hTooltip, TTM_SETMAXTIPWIDTH, 0, (LPARAM) (INT) width);
+		}
+	}
+}
 
 /* ================================== */
 
@@ -3228,6 +3356,8 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 				if (ruler.on && ruler_lineto.on) {
 					Wnd_refresh_ruler_lineto(lpgw, lParam);
 				}
+				/* track hypertexts */
+				track_tooltip(lpgw, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
 				/* track (show) mouse position -- send the event to gnuplot */
 				Wnd_exec_event(lpgw, lParam,  GE_motion, wParam);
 				return 0L; /* end of WM_MOUSEMOVE */
@@ -3747,7 +3877,7 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			return(1); /* we erase the background ourselves */
 		case WM_PAINT: {
 			HDC memdc = NULL;
-			HBITMAP membmp, oldbmp;
+			HBITMAP oldbmp;
 			LONG width, height;
 			LONG wwidth, wheight;
 			int sampling;
@@ -3878,6 +4008,9 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			lpgw->buffervalid = FALSE;
 			DeleteObject(lpgw->hBitmap);
 			lpgw->hBitmap = NULL;
+			clear_tooltips(lpgw);
+			DestroyWindow(lpgw->hTooltip);
+			lpgw->hTooltip = NULL;
 			DestroyPens(lpgw);
 			DestroyFonts(lpgw);
 #ifdef USE_MOUSE

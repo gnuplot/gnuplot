@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: win.trm,v 1.108 2012/05/20 10:42:08 markisch Exp $
+ * $Id: win.trm,v 1.109 2012/05/23 17:18:34 markisch Exp $
  */
 
 /* GNUPLOT - win.trm */
@@ -95,11 +95,11 @@ TERM_PUBLIC void WIN_filled_polygon __PROTO((int points, gpiPoint *corners));
 TERM_PUBLIC void WIN_boxfill __PROTO((int, unsigned int, unsigned int, unsigned int, unsigned int));
 TERM_PUBLIC int WIN_set_font __PROTO((const char *font));
 TERM_PUBLIC void WIN_enhanced_open __PROTO((char * fontname, double fontsize,
-	    		double base, TBOOLEAN widthflag, TBOOLEAN showflag,
-			int overprint));
+					double base, TBOOLEAN widthflag, TBOOLEAN showflag, int overprint));
 TERM_PUBLIC void WIN_enhanced_flush __PROTO((void));
 TERM_PUBLIC void WIN_image __PROTO((unsigned int, unsigned int, coordval *, gpiPoint *, t_imagecolor));
 TERM_PUBLIC void WIN_layer __PROTO((t_termlayer syncpoint));
+TERM_PUBLIC void WIN_hypertext __PROTO((int type, const char * text));
 
 /* Initialization values - guess now, scale later */
 #define WIN_XMAX (24000)
@@ -842,6 +842,13 @@ WIN_layer (t_termlayer syncpoint)
 	GraphOp(graphwin, W_layer, syncpoint, 0, NULL);
 }
 
+
+TERM_PUBLIC void
+WIN_hypertext(int type, const char * text)
+{
+	GraphOp(graphwin, W_hypertext, type, 0, text);
+}
+
 #endif /* TERM_BODY */
 
 #ifdef TERM_TABLE
@@ -868,7 +875,10 @@ TERM_TABLE_START(win_driver)
     WIN_set_color, WIN_filled_polygon,
     WIN_image,
     WIN_enhanced_open, WIN_enhanced_flush, do_enh_writec,
-    WIN_layer
+    WIN_layer,
+    0, /* no term->path */
+    0.0, /* Scale (unused) */
+    WIN_hypertext
 TERM_TABLE_END(win_driver)
 
 #undef LAST_TERM

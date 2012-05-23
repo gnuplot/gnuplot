@@ -1,5 +1,5 @@
 /*
- * $Id: wgnuplib.h,v 1.54 2012/05/20 08:14:58 markisch Exp $
+ * $Id: wgnuplib.h,v 1.55 2012/05/20 20:58:52 markisch Exp $
  */
 
 /* GNUPLOT - win/wgnuplib.h */
@@ -234,6 +234,13 @@ void WDPROC AboutBox(HWND hwnd, LPSTR str);
 /* maximum number of different colors per palette, used to be hardcoded (256) */
 #define WIN_PAL_COLORS 4096
 
+/* hypertext structure
+*/
+struct tooltips {
+	LPWSTR text;
+	RECT rect;
+};
+
 /* Information about one graphical operation to be stored by the
  * driver for the sake of redraws. Array of GWOP kept in global block */
 struct GWOP {
@@ -289,6 +296,7 @@ struct GWOPBLK {			/* kept in local memory */
 #define W_image 45
 #define W_layer 46
 #define W_text_encoding 47
+#define W_hypertext 48
 
 typedef struct tagGW {
 	GP_LPPRINT	lpr;		/* must be first */
@@ -334,6 +342,11 @@ typedef struct tagGW {
 	BOOL	hasgrid;
 	LPRECT	keyboxes;
 	unsigned int maxkeyboxes;
+
+	HWND	hTooltip;	/* tooltip windows for hypertext */
+	struct tooltips * tooltips;
+	unsigned int maxtooltips;
+	unsigned int numtooltips;
 
 	int		htic;		/* horizontal size of point symbol (xmax units) */
 	int 	vtic;		/* vertical size of point symbol (ymax units)*/
