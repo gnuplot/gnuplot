@@ -1,5 +1,5 @@
 /*
- * $Id: wgdiplus.h,v 1.3 2011/05/14 09:54:22 markisch Exp $
+ * $Id: wgdiplus.h,v 1.4 2011/11/18 07:48:28 markisch Exp $
  */
 
 /*
@@ -35,16 +35,16 @@ extern "C" {
 extern void gdiplusInit(void);
 extern void gdiplusCleanup(void);
 
-extern void gdiplusLine(HDC hdc, POINT x, POINT y, const PLOGPEN logpen);
-extern void gdiplusLineEx(HDC hdc, POINT x, POINT y, UINT style, float width, COLORREF color);
+extern void gdiplusLine(HDC hdc, POINT x, POINT y, const PLOGPEN logpen, double alpha);
+extern void gdiplusLineEx(HDC hdc, POINT x, POINT y, UINT style, float width, COLORREF color, double alpha);
 
-extern void gdiplusPolyline(HDC hdc, POINT *ppt, int polyi, const PLOGPEN logpen);
-extern void gdiplusPolylineEx(HDC hdc, POINT *ppt, int polyi, UINT style, float width, COLORREF color);
+extern void gdiplusPolyline(HDC hdc, POINT *ppt, int polyi, const PLOGPEN logpen, double alpha);
+extern void gdiplusPolylineEx(HDC hdc, POINT *ppt, int polyi, UINT style, float width, COLORREF color, double alpha);
 
-extern void gdiplusSolidFilledPolygonEx(HDC hdc, POINT *ppt, int polyi, COLORREF color, double alpha);
+extern void gdiplusSolidFilledPolygonEx(HDC hdc, POINT *ppt, int polyi, COLORREF color, double alpha, BOOL aa);
 extern void gdiplusPatternFilledPolygonEx(HDC hdc, POINT *ppt, int polyi, COLORREF color, double alpha, COLORREF backcolor, BOOL transparent, int style);
 
-extern void gdiplusCircleEx(HDC hdc, POINT *p, int radius, UINT style, float width, COLORREF color);
+extern void gdiplusCircleEx(HDC hdc, POINT *p, int radius, UINT style, float width, COLORREF color, double alpha);
 
 #ifdef __cplusplus
 }

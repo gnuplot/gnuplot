@@ -1,5 +1,5 @@
 /*
- * $Id: wgdiplus.cpp,v 1.4 2011/05/14 15:40:37 markisch Exp $
+ * $Id: wgdiplus.cpp,v 1.5 2011/11/18 07:48:28 markisch Exp $
  */
 
 /*
@@ -63,11 +63,10 @@ static Color gdiplusCreateColor(COLORREF color, double alpha)
 }
 
 
-static Pen * gdiplusCreatePen(UINT style, float width, COLORREF color)
+static Pen * gdiplusCreatePen(UINT style, float width, COLORREF color, double alpha)
 {
 	// create GDI+ pen
-	Color gdipColor(0, 0, 0, 255);
-	gdipColor.SetFromCOLORREF(color);
+	Color gdipColor = gdiplusCreateColor(color, alpha);
 	Pen * pen = new Pen(gdipColor, width > 1 ? width : 1);
 	if (style <= PS_DASHDOTDOT)
 		// cast is save since GDI and GDI+ use same numbers
@@ -78,13 +77,13 @@ static Pen * gdiplusCreatePen(UINT style, float width, COLORREF color)
 }
 
 
-void gdiplusLine(HDC hdc, POINT x, POINT y, const PLOGPEN logpen)
+void gdiplusLine(HDC hdc, POINT x, POINT y, const PLOGPEN logpen, double alpha)
 {
-	gdiplusLineEx(hdc, x, y, logpen->lopnStyle, (float)logpen->lopnWidth.x, logpen->lopnColor);
+	gdiplusLineEx(hdc, x, y, logpen->lopnStyle, (float)logpen->lopnWidth.x, logpen->lopnColor, 0);
 }
 
 
-void gdiplusLineEx(HDC hdc, POINT x, POINT y, UINT style, float width, COLORREF color)
+void gdiplusLineEx(HDC hdc, POINT x, POINT y, UINT style, float width, COLORREF color, double alpha)
 {
 	gdiplusInit();
 	Graphics graphics(hdc);
@@ -94,19 +93,19 @@ void gdiplusLineEx(HDC hdc, POINT x, POINT y, UINT style, float width, COLORREF 
 	if ((style == PS_SOLID) || (width >= 2.))
 		graphics.SetSmoothingMode(SmoothingModeAntiAlias);
 
-	Pen * pen = gdiplusCreatePen(style, width, color);
+	Pen * pen = gdiplusCreatePen(style, width, color, alpha);
 	graphics.DrawLine(pen, (INT)x.x, (INT)x.y, (INT)y.x, (INT)y.y);
 	delete(pen);
 }
 
 
-void gdiplusPolyline(HDC hdc, POINT *ppt, int polyi, const PLOGPEN logpen)
+void gdiplusPolyline(HDC hdc, POINT *ppt, int polyi, const PLOGPEN logpen, double alpha)
 {
-	gdiplusPolylineEx(hdc, ppt, polyi, logpen->lopnStyle, (float)logpen->lopnWidth.x, logpen->lopnColor);
+	gdiplusPolylineEx(hdc, ppt, polyi, logpen->lopnStyle, (float)logpen->lopnWidth.x, logpen->lopnColor, alpha);
 }
 
 
-void gdiplusPolylineEx(HDC hdc, POINT *ppt, int polyi, UINT style, float width, COLORREF color)
+void gdiplusPolylineEx(HDC hdc, POINT *ppt, int polyi, UINT style, float width, COLORREF color, double alpha)
 {
 	gdiplusInit();
 	Graphics graphics(hdc);
@@ -116,7 +115,7 @@ void gdiplusPolylineEx(HDC hdc, POINT *ppt, int polyi, UINT style, float width, 
 	if ((style == PS_SOLID) || (width >= 2.))
 		graphics.SetSmoothingMode(SmoothingModeAntiAlias);
 
-	Pen * pen = gdiplusCreatePen(style, width, color);
+	Pen * pen = gdiplusCreatePen(style, width, color, alpha);
 	Point * points = new Point[polyi];
 	for (int i = 0; i < polyi; i++) {
 		points[i].X = ppt[i].x;
@@ -128,11 +127,12 @@ void gdiplusPolylineEx(HDC hdc, POINT *ppt, int polyi, UINT style, float width, 
 }
 
 
-void gdiplusSolidFilledPolygonEx(HDC hdc, POINT *ppt, int polyi, COLORREF color, double alpha)
+void gdiplusSolidFilledPolygonEx(HDC hdc, POINT *ppt, int polyi, COLORREF color, double alpha, BOOL aa)
 {
 	gdiplusInit();
 	Graphics graphics(hdc);
-	graphics.SetSmoothingMode(SmoothingModeAntiAlias);
+	if (aa)
+		graphics.SetSmoothingMode(SmoothingModeAntiAlias);
 
 	Color gdipColor = gdiplusCreateColor(color, alpha);
 	Point * points = new Point[polyi];
@@ -181,13 +181,13 @@ void gdiplusPatternFilledPolygonEx(HDC hdc, POINT *ppt, int polyi, COLORREF colo
 }
 
 
-void gdiplusCircleEx(HDC hdc, POINT * p, int radius, UINT style, float width, COLORREF color)
+void gdiplusCircleEx(HDC hdc, POINT * p, int radius, UINT style, float width, COLORREF color, double alpha)
 {
 	gdiplusInit();
 	Graphics graphics(hdc);
 	graphics.SetSmoothingMode(SmoothingModeAntiAlias);
 
-	Pen * pen = gdiplusCreatePen(style, width, color);
+	Pen * pen = gdiplusCreatePen(style, width, color, alpha);
 	graphics.DrawEllipse(pen, p->x - radius, p->y - radius, 2*radius, 2*radius);
 	delete(pen);
 }

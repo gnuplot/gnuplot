@@ -1,5 +1,5 @@
 /*
- * $Id: wgraph.c,v 1.146 2012/05/20 10:42:07 markisch Exp $
+ * $Id: wgraph.c,v 1.147 2012/05/20 20:58:52 markisch Exp $
  */
 
 /* GNUPLOT - win/wgraph.c */
@@ -639,6 +639,7 @@ GraphEnd(LPGW lpgw)
 
 	GetClientRect(lpgw->hWndGraph, &rect);
 	InvalidateRect(lpgw->hWndGraph, (LPRECT) &rect, 1);
+	lpgw->buffervalid = FALSE;
 	lpgw->locked = FALSE;
 	UpdateWindow(lpgw->hWndGraph);
 #ifdef USE_MOUSE
@@ -1431,6 +1432,7 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 	/* colors */
 	BOOL isColor;				/* use colors? */
 	COLORREF last_color = 0;	/* currently selected color */
+	double alpha_c = 1.;		/* alpha for transparency */
 
 	/* lines */
 	double line_width = lpgw->sampling * lpgw->linewidth;	/* current line width */
@@ -1534,7 +1536,7 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 			if (polyi >= 2) {
 #ifdef HAVE_GDIPLUS
 				if (lpgw->antialiasing)
-					gdiplusPolyline(hdc, ppt, polyi, &cur_penstruct);
+					gdiplusPolyline(hdc, ppt, polyi, &cur_penstruct, alpha_c);
 				else
 #endif
 					Polyline(hdc, ppt, polyi);
@@ -1545,7 +1547,7 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 				/* degenerate case e.g. when using 'linecolor variable' */
 #ifdef HAVE_GDIPLUS
 				if (lpgw->antialiasing)
-					gdiplusLine(hdc, cpoint, ppt[0], &cur_penstruct);
+					gdiplusLine(hdc, cpoint, ppt[0], &cur_penstruct, alpha_c);
 				else
 #endif
 					LineTo(hdc, ppt[0].x, ppt[0].y);
@@ -1627,7 +1629,7 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 			if (polyi >= polymax) {
 #ifdef HAVE_GDIPLUS
 				if (lpgw->antialiasing)
-					gdiplusPolyline(hdc, ppt, polyi, &cur_penstruct);
+					gdiplusPolyline(hdc, ppt, polyi, &cur_penstruct, alpha_c);
 				else
 #endif
 					Polyline(hdc, ppt, polyi);
@@ -1677,6 +1679,7 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 			/* remember this color */
 			last_color = cur_penstruct.lopnColor;
 			fill_color = last_color;
+			alpha_c = 1.;
 			break;
 		}
 
@@ -1734,14 +1737,26 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 				/* we already have a brush with that color */
 				break;
 			case FS_SOLID: {
-				double density = MINMAX(0, (int)(fillstyle >> 4), 100) * 0.01;
-				COLORREF color =
-					RGB(255 - density * (255 - GetRValue(last_color)),
-					    255 - density * (255 - GetGValue(last_color)),
-					    255 - density * (255 - GetBValue(last_color)));
-				draw_new_brush(lpgw, hdc, color);
-				solid_brush = lpgw->hcolorbrush;
-				fill_color = color;
+				if (alpha_c < 1.) {
+					alpha = alpha_c;
+					fill_color = last_color;
+					draw_new_brush(lpgw, hdc, fill_color);
+					solid_brush = lpgw->hcolorbrush;
+				} else if ((int)(fillstyle >> 4) == 100) {
+					/* special case this common choice */
+					// FIXME: we should already have that!
+					fill_color = last_color;
+					draw_new_brush(lpgw, hdc, fill_color);
+					solid_brush = lpgw->hcolorbrush;
+				} else {
+					double density = MINMAX(0, (int)(fillstyle >> 4), 100) * 0.01;
+					COLORREF color =
+						RGB(255 - density * (255 - GetRValue(last_color)),
+							255 - density * (255 - GetGValue(last_color)),
+							255 - density * (255 - GetBValue(last_color)));
+					solid_brush = lpgw->hcolorbrush;
+					fill_color = color;
+				}
 				break;
 			}
 			case FS_TRANSPARENT_PATTERN:
@@ -1754,15 +1769,15 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 				pattern = GPMAX(fillstyle >> 4, 0) % pattern_num;
 				SelectObject(hdc, pattern_brush[pattern]);
 				break;
-			case FS_DEFAULT:
-				/* Leave the current brush and color in place */
-				break;
 			case FS_EMPTY:
-			default:
 				/* fill with background color */
 				SelectObject(hdc, lpgw->hbrush);
 				fill_color = lpgw->background;
 				solid_brush = lpgw->hbrush;
+				break;
+			case FS_DEFAULT:
+			default:
+				/* Leave the current brush and color in place */
 				break;
 			}
 			break;
@@ -1781,18 +1796,24 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 			p.y = ydash;
 
 #ifdef HAVE_GDIPLUS
+			ppt[1].x = ppt[0].x;
+			ppt[1].y = ydash;
+			ppt[2].x = xdash;
+			ppt[2].y = ydash;
+			ppt[3].x = xdash;
+			ppt[3].y = ppt[0].y;
+			ppt[4].x = ppt[0].x;
+			ppt[4].y = ppt[0].y;
+
 			if (lpgw->antialiasing && lpgw->patternaa &&
 			    (((fillstyle & 0x0f) == FS_PATTERN) ||
 			     ((fillstyle & 0x0f) == FS_TRANSPARENT_PATTERN))) {
-				ppt[1].x = ppt[0].x;
-				ppt[1].y = ydash;
-				ppt[2].x = xdash;
-				ppt[2].y = ydash;
-				ppt[3].x = xdash;
-				ppt[3].y = ppt[0].y;
-				ppt[4].x = ppt[0].x;
-				ppt[4].y = ppt[0].y;
 				gdiplusPatternFilledPolygonEx(hdc, ppt, 5, fill_color, 1., lpgw->background, transparent, pattern);
+			} else if (((fillstyle & 0x0f) == FS_SOLID) || ((fillstyle & 0x0f) == FS_TRANSPARENT_SOLID)) {
+				if (transparent)
+					gdiplusSolidFilledPolygonEx(hdc, ppt, 5, fill_color, 1, lpgw->antialiasing && lpgw->polyaa);
+				else
+					gdiplusSolidFilledPolygonEx(hdc, ppt, 5, fill_color, alpha_c, lpgw->antialiasing && lpgw->polyaa);
 			} else
 #endif
 			if (transparent) {
@@ -1914,11 +1935,13 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 					else
 						color = lpgw->monopen[pen + 2].lopnColor;
 				}
+				alpha_c = 1.;
 			} else {						/* TC_RGB */
 				rgb255_color rgb255;
 				rgb255.r = (curptr->y & 0xff);
 				rgb255.g = (curptr->x >> 8);
 				rgb255.b = (curptr->x & 0xff);
+				alpha_c = 1. - ((curptr->y >> 8) & 0xff) / 255.;
 
 				if (lpgw->color || ((rgb255.r == rgb255.g) && (rgb255.r == rgb255.b))) {
 					/* Use colors or this is already gray scale */
@@ -1963,9 +1986,9 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 			/* end of point series --> draw polygon now */
 			if (!transparent) {
 #ifdef HAVE_GDIPLUS
-				if (lpgw->antialiasing && lpgw->polyaa && ((fillstyle & 0x0f) == FS_SOLID)) {
+				if ((fillstyle & 0x0f) == FS_SOLID) {
 					/* solid, antialiased fill */
-					gdiplusSolidFilledPolygonEx(hdc, ppt, polyi, fill_color, 1.0);
+					gdiplusSolidFilledPolygonEx(hdc, ppt, polyi, fill_color, alpha_c, lpgw->antialiasing && lpgw->polyaa);
 				} else if (lpgw->antialiasing && lpgw->patternaa && ((fillstyle & 0x0f) == FS_PATTERN)) {
 					gdiplusPatternFilledPolygonEx(hdc, ppt, polyi, fill_color, 1., lpgw->background, transparent, pattern);
 				} else
@@ -1978,8 +2001,8 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 				}
 			} else {
 #ifdef HAVE_GDIPLUS
-				if (lpgw->antialiasing && lpgw->polyaa && (fillstyle & 0x0f) == FS_TRANSPARENT_SOLID) {
-					gdiplusSolidFilledPolygonEx(hdc, ppt, polyi, fill_color, alpha);
+				if (lpgw->antialiasing && (fillstyle & 0x0f) == FS_TRANSPARENT_SOLID) {
+					gdiplusSolidFilledPolygonEx(hdc, ppt, polyi, fill_color, alpha, lpgw->polyaa);
 				} else if (lpgw->antialiasing && lpgw->patternaa && ((fillstyle & 0x0f) == FS_TRANSPARENT_PATTERN)) {
 					gdiplusPatternFilledPolygonEx(hdc, ppt, polyi, fill_color, 1., lpgw->background, transparent, pattern);
 				} else
@@ -2225,12 +2248,12 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 				a.y = ydash;
 				b.x = xdash + htic;
 				b.y = ydash;
-				gdiplusLineEx(hdc, a, b, PS_SOLID, line_width, last_color);
+				gdiplusLineEx(hdc, a, b, PS_SOLID, line_width, last_color, alpha_c);
 				a.x = xdash;
 				a.y = ydash - vtic;
 				b.x = xdash;
 				b.y = ydash + vtic;
-				gdiplusLineEx(hdc, a, b, PS_SOLID, line_width, last_color);
+				gdiplusLineEx(hdc, a, b, PS_SOLID, line_width, last_color, alpha_c);
 			} else
 #endif
 			{
@@ -2254,12 +2277,12 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 				a.y = ydash - vtic;
 				b.x = xdash + htic;
 				b.y = ydash + vtic;
-				gdiplusLineEx(hdc, a, b, PS_SOLID, line_width, last_color);
+				gdiplusLineEx(hdc, a, b, PS_SOLID, line_width, last_color, alpha_c);
 				a.x = xdash - htic;
 				a.y = ydash + vtic;
 				b.x = xdash + htic;
 				b.y = ydash - vtic;
-				gdiplusLineEx(hdc, a, b, PS_SOLID, line_width, last_color);
+				gdiplusLineEx(hdc, a, b, PS_SOLID, line_width, last_color, alpha_c);
 			} else
 #endif
 			{
@@ -2282,7 +2305,7 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 				POINT p;
 				p.x = xdash;
 				p.y = ydash;
-				gdiplusCircleEx(hdc, &p, htic, PS_SOLID, line_width, last_color);
+				gdiplusCircleEx(hdc, &p, htic, PS_SOLID, line_width, last_color, alpha_c);
 			} else
 #endif
 				Arc(hdc, xdash-htic, ydash-vtic, xdash+htic+1, ydash+vtic+1,
@@ -2304,7 +2327,7 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 				POINT p;
 				p.x = xdash;
 				p.y = ydash;
-				gdiplusCircleEx(hdc, &p, htic, PS_SOLID, line_width, last_color);
+				gdiplusCircleEx(hdc, &p, htic, PS_SOLID, line_width, last_color, alpha_c);
 			}
 #endif
 			if (keysample) {
@@ -2352,7 +2375,7 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 #ifdef HAVE_GDIPLUS
 				if (lpgw->antialiasing) {
 					/* filled polygon with border */
-					gdiplusSolidFilledPolygonEx(hdc, p, i, last_color, 1.);
+					gdiplusSolidFilledPolygonEx(hdc, p, i, last_color, alpha_c, TRUE);
 				} else
 #endif
 				{
@@ -2366,7 +2389,7 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 				p[i].y = p[0].y;
 #ifdef HAVE_GDIPLUS
 				if (lpgw->antialiasing) {
-					gdiplusPolylineEx(hdc, p, i + 1, PS_SOLID, line_width, last_color);
+					gdiplusPolylineEx(hdc, p, i + 1, PS_SOLID, line_width, last_color, alpha_c);
 				} else
 #endif
 				{
@@ -2405,7 +2428,7 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
     if (polyi >= 2) {
 #ifdef HAVE_GDIPLUS
 		if (lpgw->antialiasing)
-			gdiplusPolyline(hdc, ppt, polyi, &cur_penstruct);
+			gdiplusPolyline(hdc, ppt, polyi, &cur_penstruct, alpha_c);
 		else
 #endif
 			Polyline(hdc, ppt, polyi);
@@ -3764,9 +3787,7 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 					if (lpgw->hBitmap != NULL)
 						DeleteObject(lpgw->hBitmap);
 					lpgw->hBitmap = CreateCompatibleBitmap(hdc, memrect.right, memrect.bottom);
-					membmp = lpgw->hBitmap;
-					oldbmp = (HBITMAP)SelectObject(memdc, membmp);
-					lpgw->buffervalid = TRUE;
+					oldbmp = (HBITMAP)SelectObject(memdc, lpgw->hBitmap);
 					/* Update window size */
 					lpgw->Size.x = wwidth;
 					lpgw->Size.y = wheight;
@@ -3780,19 +3801,24 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 					/* draw into memdc, then copy to hdc */
 					drawgraph(lpgw, memdc, &memrect);
+
+					/* drawing by gnuplot still in progress... */
+					lpgw->buffervalid = !lpgw->locked;
 				} else {
 					oldbmp = (HBITMAP) SelectObject(memdc, lpgw->hBitmap);
 				}
-			    if (sampling == 1)
-			        BitBlt(hdc, rect.left, rect.top, width, height, memdc, 0, 0, SRCCOPY);
-			    else {
-			        int stretch = SetStretchBltMode(hdc, HALFTONE);
-			        StretchBlt(hdc, rect.left, rect.top, width, height,
-			                   memdc,0, 0, memrect.right, memrect.bottom,
-			                   SRCCOPY);
-			        SetStretchBltMode(hdc, stretch);
-			    }
-			    lpgw->sampling = 1;
+				if (lpgw->buffervalid) {
+					if (sampling == 1)
+						BitBlt(hdc, rect.left, rect.top, width, height, memdc, 0, 0, SRCCOPY);
+					else {
+						int stretch = SetStretchBltMode(hdc, HALFTONE);
+						StretchBlt(hdc, rect.left, rect.top, width, height,
+								   memdc,0, 0, memrect.right, memrect.bottom,
+								   SRCCOPY);
+						SetStretchBltMode(hdc, stretch);
+					}
+				}
+				lpgw->sampling = 1;
 
 				/* select the old bitmap back into the device context */
 				if (memdc != NULL) {
