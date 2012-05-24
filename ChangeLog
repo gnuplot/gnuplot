@@ -1,10 +1,15 @@
+2012-05-24  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/win/wgraph.c: Recreate fonts after resizing the graph window.
+	Fixes side effects of changes on 2012-05-20.
+
 2012-05-23  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/win/wgraph.c src/win/wgnuplib.h term/win.trm: Support for 
 	hypertext labels for win terminal.
 
 	* src/win/wgdiplus.c|h src/wgraph.c term/win.trm: rgba colors.
-	Resticted to GDI+ and thus currently only available when using
+	Restricted to GDI+ and thus currently only available when using
 	antialiasing.
 
 2012-05-21  Ethan A Merritt  <merritt@u.washington.edu>

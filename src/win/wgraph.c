@@ -1,5 +1,5 @@
 /*
- * $Id: wgraph.c,v 1.148 2012/05/23 17:18:34 markisch Exp $
+ * $Id: wgraph.c,v 1.149 2012/05/23 17:27:34 markisch Exp $
  */
 
 /* GNUPLOT - win/wgraph.c */
@@ -239,7 +239,7 @@ static char *	GraphDefaultFont(void);
 static void	ReadGraphIni(LPGW lpgw);
 static void	add_tooltip(LPGW lpgw, PRECT rect, LPWSTR text);
 static void	clear_tooltips(LPGW lpgw);
-static void track_tooltip(LPGW lpgw, int x, int y);
+static void	track_tooltip(LPGW lpgw, int x, int y);
 static COLORREF	GetColor(HWND hwnd, COLORREF ref);
 static void	UpdateColorSample(HWND hdlg);
 static BOOL	LineStyle(LPGW lpgw);
@@ -3901,8 +3901,13 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 				GetWindowRect(hwnd, &wrect);
 				wwidth =  wrect.right - wrect.left;
 				wheight = wrect.bottom - wrect.top;
-				if ((lpgw->Size.x != wwidth) || (lpgw->Size.y != wheight))
+				if ((lpgw->Size.x != wwidth) || (lpgw->Size.y != wheight)) {
+					RECT rect;
+					DestroyFonts(lpgw);
+					GetPlotRect(lpgw, &rect);
+					MakeFonts(lpgw, (LPRECT)&rect, hdc);
 					lpgw->buffervalid = FALSE;
+				}
 
 				/* create memory device context for double buffering */
 				width = rect.right - rect.left;
@@ -3984,6 +3989,7 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			if ((wParam == SIZE_MAXIMIZED) || (wParam == SIZE_RESTORED)) {
 				RECT rect;
 				unsigned width, height;
+
 				GetWindowRect(hwnd, &rect);
 				width = rect.right - rect.left;
 				height = rect.bottom - rect.top;
@@ -3991,9 +3997,17 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 				if ((lpgw->Size.x != width) || (lpgw->Size.y != height)) {
 					lpgw->Size.x = width;
 					lpgw->Size.y = height;
+
+					/* remake fonts */
 					lpgw->buffervalid = FALSE;
+					DestroyFonts(lpgw);
+					GetPlotRect(lpgw, &rect);
+					hdc = GetDC(hwnd);
+					MakeFonts(lpgw, &rect, hdc);
+					ReleaseDC(hwnd, hdc);
+
 					GetClientRect(hwnd, &rect);
-					InvalidateRect(hwnd, (LPRECT) &rect, 1);
+					InvalidateRect(hwnd, &rect, 1);
 					UpdateWindow(hwnd);
 				}
 			}
