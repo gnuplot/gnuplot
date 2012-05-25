@@ -149,13 +149,10 @@ grops: gnuplot.ms titlepag.ms
 ### doc2xxx dependencies
 ms: gnuplot.ms
 
-gnuplot.ms: doc2ms gnuplot.doc
-	./doc2ms gnuplot.doc gnuplot.ms
+gnuplot.ms: doc2ms $(srcdir)/gnuplot.doc
+	./doc2ms $(srcdir)/gnuplot.doc gnuplot.ms
 
-doc2ms: doc2ms.o termdoc.o
-	$(LINK) doc2ms.o termdoc.o $(LIBS)
-
-doc2ms_SOURCES = doc2ms.c doc2ms.c termdoc.c allterm.h
+doc2ms_SOURCES = doc2ms.c termdoc.c allterm.h
 doc2ms_CPPFLAGS = -DALL_TERM_DOC $(AM_CPPFLAGS)
 	$(COMPILE) -DALL_TERM_DOC -c $(srcdir)/doc2ms.c
 
@@ -173,9 +170,9 @@ pdffigures.tex:	figures gnuplot.pdf
 	rm -f gnuplot.tex
 	echo "" > pdffigures.tex
 
-figures: doc2tex
+figures: doc2tex $(srcdir)/gnuplot.doc
 	GNUPLOT_LIB=$(top_srcdir)/demo ../src/gnuplot $(srcdir)/plotstyles.gnu
-	./doc2tex -figures gnuplot.doc gnuplot.tex
+	./doc2tex -figures $(srcdir)/gnuplot.doc gnuplot.tex
 	echo "\usepackage{graphicx}" > pdffigures.tex
 	echo "\usepackage{picins}" >> pdffigures.tex
 
@@ -197,8 +194,8 @@ gnuplot.pdf: gnuplot.tex
 ### LaTeX documentation
 tex: gnuplot.tex
 
-gnuplot.tex: doc2tex gnuplot.doc
-	./doc2tex gnuplot.doc gnuplot.tex
+gnuplot.tex: doc2tex $(srcdir)/gnuplot.doc
+	./doc2tex $(srcdir)/gnuplot.doc gnuplot.tex
 
 doc2tex_SOURCES = doc2tex.c termdoc.c allterm.h
 doc2tex_CPPFLAGS = -DALL_TERM_DOC $(AM_CPPFLAGS)
@@ -248,22 +245,22 @@ gpcard.ps: gpcard.dvi
 # this is how to make gnuplot.hlp
 hlp: gnuplot.hlp
 
-gnuplot.hlp: doc2hlp gnuplot.doc
-	./doc2hlp gnuplot.doc gnuplot.hlp
+gnuplot.hlp: doc2hlp $(srcdir)/gnuplot.doc
+	./doc2hlp $(srcdir)/gnuplot.doc gnuplot.hlp
 
 doc2hlp_SOURCES = doc2hlp.c termdoc.c
 
 ### gnuplot interactive help format
 gih: gnuplot.gih
 
-gnuplot.gih: doc2gih gnuplot.doc
-	./doc2gih gnuplot.doc gnuplot.gih
+gnuplot.gih: doc2gih $(srcdir)/gnuplot.doc
+	./doc2gih $(srcdir)/gnuplot.doc gnuplot.gih
 
 doc2gih_SOURCES = doc2gih.c termdoc.c
 
 # To include all terminals in the .gih file
-allgih: alldoc2gih gnuplot.doc allterm.h
-	./alldoc2gih gnuplot.doc gnuplot.gih
+allgih: alldoc2gih $(srcdir)/gnuplot.doc allterm.h
+	./alldoc2gih $(srcdir)/gnuplot.doc gnuplot.gih
 
 alldoc2gih_SOURCES = doc2gih.c termdoc.c allterm.h
 alldoc2gih_CPPFLAGS = -DALL_TERM_DOC $(AM_CPPFLAGS)
@@ -289,10 +286,13 @@ wxhelp/doc2html: wxhelp/doc2html.o termdoc.o xref.o ../src/version.o
 info: gnuplot.info
 
 # Thanks to Bruce Ravel for doc2texi.el!
-gnuplot.texi: doc2texi.el gnuplot.doc
+gnuplot.texi: $(srcdir)/doc2texi.el $(srcdir)/gnuplot.doc
 	@echo "Creating texinfo and eldoc strings file"
 	@if test "$(EMACS)" != no; then \
-	   $(EMACS) -batch -l doc2texi.el -f d2t-doc-to-texi ; \
+	   if test "$(srcdir)" != "$(builddir)" ; then \
+	     cp $(srcdir)/gnuplot.doc . ; \
+	   fi ; \
+	   $(EMACS) -batch -l $(srcdir)/doc2texi.el -f d2t-doc-to-texi ; \
 	   echo "Compiling gnuplot-eldoc.el" ; \
 	   $(EMACS) -batch --eval='(byte-compile-file "gnuplot-eldoc.el")' ; \
 	else \
@@ -319,30 +319,30 @@ install-info: gnuplot.info gnuplot-eldoc.el gnuplot-eldoc.elc
 # this is how to make OS/2 ipfc documentation
 ipf: gnuplot.ipf
 
-gnuplot.ipf: doc2ipf gnuplot.doc
-	./doc2ipf gnuplot.doc gnuplot.ipf
+gnuplot.ipf: doc2ipf $(srcdir)/gnuplot.doc
+	./doc2ipf $(srcdir)/gnuplot.doc gnuplot.ipf
 
 doc2ipf_SOURCES = doc2ipf.c termdoc.c xref.c
 
 ### Rich Text Format
 rtf: gnuplot.rtf
 
-gnuplot.rtf: doc2rtf gnuplot.doc
-	./doc2rtf gnuplot.doc gnuplot.rtf
+gnuplot.rtf: doc2rtf $(srcdir)/gnuplot.doc
+	./doc2rtf $(srcdir)/gnuplot.doc gnuplot.rtf
 
 doc2rtf_SOURCES = doc2rtf.c termdoc.c xref.c
 
 # this is how to make rnh documentation (VMS help format)
 rnh: gnuplot.rnh
 
-gnuplot.rnh: doc2rnh gnuplot.doc
-	./doc2rnh gnuplot.doc gnuplot.rnh
+gnuplot.rnh: doc2rnh $(srcdir)/gnuplot.doc
+	./doc2rnh $(srcdir)/gnuplot.doc gnuplot.rnh
 
 doc2rnh_SOURCES = doc2rnh.c termdoc.c
 
 # this is how to check the gnuplot.doc file
 check: all checkdoc
-	@checkdoc < gnuplot.doc; \
+	@checkdoc < $(srcdir)/gnuplot.doc; \
 	if test $$? -eq 0; then \
 	  echo "PASS: gnuplot.doc"; \
 	else \

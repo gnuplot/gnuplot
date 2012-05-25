@@ -1,3 +1,12 @@
+2012-05-25  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* docs/Makefile.am (gnuplot.ms, figures, gnuplot.tex)
+	(gnuplot.hlp, gnuplot.gih, allgih, gnuplot.texi, gnuplot.ipf)
+	(gnuplot.rtf, check): Re-enable out-of-source-tree builds.
+	(doc2ms_SOURCES): Remove duplicate source file.
+	(doc2ms): Remove rule that would conflict with automake generated
+	one.
+
 2012-05-24  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/win/wgraph.c: Recreate fonts after resizing the graph window.
@@ -5,7 +14,7 @@
 
 2012-05-23  Bastian Maerkisch  <bmaerkisch@web.de>
 
-	* src/win/wgraph.c src/win/wgnuplib.h term/win.trm: Support for 
+	* src/win/wgraph.c src/win/wgnuplib.h term/win.trm: Support for
 	hypertext labels for win terminal.
 
 	* src/win/wgdiplus.c|h src/wgraph.c term/win.trm: rgba colors.
@@ -14,62 +23,63 @@
 
 2012-05-21  Ethan A Merritt  <merritt@u.washington.edu>
 
-	* src/term_api.h:
-	Core support for hypertext in interactive terminals.  Terminal entry
-	    term->hypertext(int TYPE, const char TEXT)
-	associates a hypertext string with some subsequent graphics object.
-	The effect of this association depends on TYPE.  Initially only type
-	HYPERTEXT_TOOLTIP is implemented.  This causes the text string to be
-	displayed in a tooltip-like popup when the mouse hovers over the
-	associated graphics element.
+	* src/term_api.h: Core support for hypertext in interactive
+	terminals.  Terminal entry term->hypertext(int TYPE, const char
+	TEXT) associates a hypertext string with some subsequent graphics
+	object.  The effect of this association depends on TYPE.
+	Initially only type HYPERTEXT_TOOLTIP is implemented.  This causes
+	the text string to be displayed in a tooltip-like popup when the
+	mouse hovers over the associated graphics element.
 
-	* src/gadgets.c src/gadgets.h src/set.c src/show.c:
-	New keyword "hypertext" associated with individual labels, including
-	plot style "with labels".  The label text is displayed only when the
+	* src/gadgets.c src/gadgets.h src/set.c src/show.c: New keyword
+	"hypertext" associated with individual labels, including plot
+	style "with labels".  The label text is displayed only when the
 	mouse hovers over the associated anchor point.
 
-	* term/README docs/gnuplot.doc demo/hypertext.dem:
-	Documentation and demo
+	* term/README docs/gnuplot.doc demo/hypertext.dem: Documentation
+	and demo
 
-	* term/canvas.trm term/js/gnuplot_mouse.js:
-	Support for canvas terminal.
+	* term/canvas.trm term/js/gnuplot_mouse.js: Support for canvas
+	terminal.
 
-	* src/qtterminal/QtGnuplotEvent.h src/qtterminal/QtGnuplotScene.cpp
-	src/qtterminal/QtGnuplotScene.h src/qtterminal/qt_term.cpp 
-	src/qtterminal/qt_term.h term/qt.trm:
+	* src/qtterminal/QtGnuplotEvent.h
+	src/qtterminal/QtGnuplotScene.cpp src/qtterminal/QtGnuplotScene.h
+	src/qtterminal/qt_term.cpp src/qtterminal/qt_term.h term/qt.trm:
 	Support for qt terminal.
 
-	* term/svg.trm term/js/gnuplot_svg.js:
-	Support for svg terminal.
+	* term/svg.trm term/js/gnuplot_svg.js: Support for svg terminal.
 
 	* src/wxterminal/gp_cairo.c src/wxterminal/gp_cairo.h
 	src/wxterminal/wxt_gui.cpp src/wxterminal/wxt_gui.h
-	src/wxterminal/wxt_term.h term/cairo.trm term/wxt.trm:
-	Support for wxt terminal.
+	src/wxterminal/wxt_term.h term/cairo.trm term/wxt.trm: Support for
+	wxt terminal.
 
 2012-05-20  Ethan A Merritt  <merritt@u.washington.edu>
 
-	* configure.in docs/Makefile.am: Updated a patch from Christoph Junghans
-	to use autoconf to manage the documentation subdirectory.  The primary
-	reason is to allow --without-lisp-files to control whether or not the
-	build process tries to access emacs-specific directories and files that
-	may not be present.
-	Bugs #2950671 #3528377
+	* configure.in docs/Makefile.am: Updated a patch from Christoph
+	Junghans to use autoconf to manage the documentation subdirectory.
+	The primary reason is to allow --without-lisp-files to control
+	whether or not the build process tries to access emacs-specific
+	directories and files that may not be present.  Bugs #2950671
+	#3528377
 
 2012-05-20  Alexander Täschner  <taschna@users.sourceforge.net>
 
-	* src/fit.c|h (regress) src/save.c (save_set_all) src/set.c (set_fit)
-	src/show.c (show_fit) src/unset.c (unset_fit) docs/gnuplot.doc: 
-	New option "set fit [no]errorscaling" which allows to toggle scaling
-	of parameter errors. The default remains to scale errors.
-	Patch #3375473, Feature Request #2956524.
+	* src/fit.c|h (regress)
+	* src/save.c (save_set_all)
+	* src/set.c (set_fit)
+	* src/show.c (show_fit)
+	* src/unset.c (unset_fit)
+	* docs/gnuplot.doc: New option "set fit [no]errorscaling" which
+	allows to toggle scaling of parameter errors. The default remains
+	to scale errors.  Patch #3375473, Feature Request #2956524.
 
 2012-05-20  Bastian Maerkisch  <bmaerkisch@web.de>
 
-	* src/win/wcommon.h src/win/wgnuplib.h src/win/wgraph.c: Remove limit
-	on number of plots which can be toggled on/off via key entries.
-	Maximum number of toolbar buttons still restricted to MAXPLOTSHIDE.
-	Bug #3516417
+	* src/win/wcommon.h src/win/wgnuplib.h src/win/wgraph.c: Remove
+	limit on number of plots which can be toggled on/off via key
+	entries.  Maximum number of toolbar buttons still restricted to
+	MAXPLOTSHIDE.  Bug #3516417
 
 	* demo/image2.dem: Meaning of "set [xyz]range reverse" changed.
 
