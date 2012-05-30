@@ -8,6 +8,9 @@
 	value (used as a weight by smooth acsplines) of input data points.
 	Bug #3529621
 
+	* src/plot2d.c (get_data) docs/gnuplot.doc:  Default acsplines weighting
+	to unit weights if no separate column is provided.
+
 2012-05-25  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* docs/Makefile.am (gnuplot.ms, figures, gnuplot.tex)

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.262 2012/03/21 00:22:25 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.263 2012/04/18 00:13:46 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -742,15 +742,19 @@ get_data(struct curve_points *current_plot)
 
 #endif
 	    } else {
-		    if (current_plot->plot_style == CANDLESTICKS
-			|| current_plot->plot_style == FINANCEBARS) {
-			int_warn(storetoken, "This plot style does not work with 1 or 2 cols. Setting to points");
-			current_plot->plot_style = POINTSTYLE;
-		    }
-		    /* xlow and xhigh are same as x */
-		    /* auto width if boxes, else ignored */
-		    store2d_point(current_plot, i++, v[0], v[1], v[0], v[0], v[1],
-				  v[1], -1.0);
+		double w;
+		if (current_plot->plot_style == CANDLESTICKS
+		    || current_plot->plot_style == FINANCEBARS) {
+		    int_warn(storetoken, "This plot style does not work with 1 or 2 cols. Setting to points");
+		    current_plot->plot_style = POINTSTYLE;
+		}
+		if (current_plot->plot_smooth == SMOOTH_ACSPLINES)
+		    w = 1.0;	/* Unit weights */
+		else
+		    w = -1.0;	/* Auto-width boxes in some styles */
+		/* Set x/y high/low to exactly [x,y] */
+		store2d_point(current_plot, i++, v[0], v[1], 
+						 v[0], v[0], v[1], v[1], w);
 	    }
 	    break;
 

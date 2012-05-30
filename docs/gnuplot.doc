@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.734 2012/05/21 18:20:23 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.735 2012/05/21 23:15:17 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -5456,9 +5456,9 @@ Ffigure_mapcontours
  The `acsplines` option approximates the data with a "natural smoothing spline".
  After the data are made monotonic in x (see `smooth unique`), a curve is
  piecewise constructed from segments of cubic polynomials whose coefficients
- are found by the weighting the data points; the weights are taken from the
- third column in the data file.  That default can be modified by the third
- entry in the `using` list, e.g.,
+ are found by fitting to the individual data points weighted by the value,
+ if any, given in the third column of the using spec.  The default is equivalent
+ to
        plot 'data-file' using 1:2:(1.0) smooth acsplines
 
  Qualitatively, the absolute magnitude of the weights determines the number
