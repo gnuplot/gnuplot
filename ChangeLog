@@ -1,3 +1,9 @@
+2012-05-30  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/pslatex.trm: More helpful error message if output filename
+	is not acceptable.
+	Bug #3529832
+
 2012-05-25  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* docs/Makefile.am (gnuplot.ms, figures, gnuplot.tex)

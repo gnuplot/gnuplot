@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: pslatex.trm,v 1.81 2012/03/31 05:54:12 sfeam Exp $
+ * $Id: pslatex.trm,v 1.82 2012/05/08 04:18:56 sfeam Exp $
  */
 
 /* GNUPLOT - pslatex.trm */
@@ -763,8 +763,7 @@ EPSLATEX_reopen_output(char * ext)
         unsigned int outstrlen = strlen(outstr);
         if (strrchr(outstr, '.') != &outstr[outstrlen-4] ) {
             int_error(NO_CARET,
-                      "epslatex outputfile may not have dots inside %s",
-                      "their filenames before the extension .tex or .eps");
+                      "epslatex output file name must be of the form filename.xxx");
         }
 
         /* copy filename to postsript output */
