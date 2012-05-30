@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: interpol.c,v 1.38 2008/11/12 02:29:43 janert Exp $"); }
+static char *RCSid() { return RCSid("$Id: interpol.c,v 1.39 2010/04/21 07:34:35 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - interpol.c */
@@ -1183,8 +1183,7 @@ cp_implode(struct curve_points *cp)
     int first_point, num_points;
     int i, j, k;
     double x = 0., y = 0., sux = 0., slx = 0., suy = 0., sly = 0.;
-    /* int x_axis = cp->x_axis; */
-    /* int y_axis = cp->y_axis; */
+    double weight; /* used for acsplines */
     TBOOLEAN all_inrange = FALSE;
 
     x_axis = cp->x_axis;
@@ -1204,6 +1203,7 @@ cp_implode(struct curve_points *cp)
 		slx = cp->points[i].xlow;
 		suy = cp->points[i].yhigh;
 		sly = cp->points[i].ylow;
+		weight = cp->points[i].z;
 		all_inrange = (cp->points[i].type == INRANGE);
 		k = 1;
 	    } else if (cp->points[i].x == x) {
@@ -1212,6 +1212,7 @@ cp_implode(struct curve_points *cp)
 		slx += cp->points[i].xlow;
 		suy += cp->points[i].yhigh;
 		sly += cp->points[i].ylow;
+		weight += cp->points[i].z;
 		if (cp->points[i].type != INRANGE)
 		    all_inrange = FALSE;
 		k++;
@@ -1226,6 +1227,7 @@ cp_implode(struct curve_points *cp)
 		cp->points[j].xlow = slx / (double) k;
 		cp->points[j].yhigh = suy / (double) k;
 		cp->points[j].ylow = sly / (double) k;
+		cp->points[j].z = weight / (double) k;
 		/* HBB 20000405: I wanted to use STORE_AND_FIXUP_RANGE
 		 * here, but won't: it assumes we want to modify the
 		 * range, and that the range is given in 'input'
@@ -1278,6 +1280,7 @@ cp_implode(struct curve_points *cp)
 	    cp->points[j].xlow = slx / (double) k;
 	    cp->points[j].yhigh = suy / (double) k;
 	    cp->points[j].ylow = sly / (double) k;
+	    cp->points[j].z = weight / (double) k;
 	    cp->points[j].type = INRANGE;
 	    if (! all_inrange) {
 		    if (X_AXIS.log) {
