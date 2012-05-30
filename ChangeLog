@@ -4,6 +4,10 @@
 	is not acceptable.
 	Bug #3529832
 
+	* src/interpol.c (cp_implode): This routine was not preserving the z
+	value (used as a weight by smooth acsplines) of input data points.
+	Bug #3529621
+
 2012-05-20  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/win/wcommon.h src/win/wgnuplib.h src/win/wgraph.c: Remove limit
