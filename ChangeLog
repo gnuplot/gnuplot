@@ -1,3 +1,9 @@
+2012-06-01  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/plot2d.c (box_range_fiddling):
+	Autoscaling + auto-boxwidth + log scale on x = fail.
+	Bug #3529285
+
 2012-05-30  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/pslatex.trm: More helpful error message if output filename
