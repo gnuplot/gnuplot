@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: color.c,v 1.98 2011/10/28 21:01:16 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: color.c,v 1.98.2.1 2012/03/31 05:54:38 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - color.c */
@@ -188,6 +188,7 @@ set_color(double gray)
 	return;
     color.type = TC_FRAC;
     color.value = gray;
+    color.lt = 0;
     term->set_color(&color);
 }
 
@@ -199,6 +200,7 @@ set_rgbcolor(int rgblt)
 	return;
     color.type = TC_RGB;
     color.lt = rgblt;
+    color.value = 0;
     term->set_color(&color);
 }
 
