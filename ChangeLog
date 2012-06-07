@@ -1,3 +1,8 @@
+2012-06-07  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/tabulate.c:  Allow tabulation (set table) of pixel values for
+	IMAGE RGBIMAGE RGBA_IMAGE.
+
 2012-06-01  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/plot2d.c (box_range_fiddling):

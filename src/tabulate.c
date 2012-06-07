@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: tabulate.c,v 1.12 2011/05/05 04:13:29 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: tabulate.c,v 1.13 2011/10/25 05:10:58 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - tabulate.c */
@@ -145,12 +145,18 @@ print_table(struct curve_points *current_plot, int plot_num)
 	case FSTEPS:
 	case HISTEPS:
 	    break;
+	case IMAGE:
+	    fputs("  pixel", outfile);
+	    break;
+	case RGBIMAGE:
+	case RGBA_IMAGE:
+	    fputs("  red green blue alpha", outfile);
+	    break;
+
 	default:
 	    if (interactive)
 		fprintf(stderr, "Tabular output of %s plot style not fully implemented\n",
 		    current_plot->plot_style == HISTOGRAMS ? "histograms" :
-		    current_plot->plot_style == IMAGE ? "image" :
-		    current_plot->plot_style == RGBIMAGE ? "rgbimage" :
 		    "this");
 	    break;
 	}
@@ -197,6 +203,16 @@ print_table(struct curve_points *current_plot, int plot_num)
 		    case YERRORBARS:
 			OUTPUT_NUMBER(point->ylow, current_plot->y_axis);
 			OUTPUT_NUMBER(point->yhigh, current_plot->y_axis);
+			break;
+		    case IMAGE:
+			fprintf(outfile,"%g ",point->z);
+			break;
+		    case RGBIMAGE:
+		    case RGBA_IMAGE:
+			fprintf(outfile,"%4d ",(int)point->CRD_R);
+			fprintf(outfile,"%4d ",(int)point->CRD_G);
+			fprintf(outfile,"%4d ",(int)point->CRD_B);
+			fprintf(outfile,"%4d ",(int)point->CRD_A);
 			break;
 		    case FILLEDCURVES:
 			OUTPUT_NUMBER(point->yhigh, current_plot->y_axis);
@@ -265,7 +281,9 @@ print_3dtable(int pcount)
 	    free(title);
 	}
 
-	if (this_plot->plot_style == LABELPOINTS) {
+	switch (this_plot->plot_style) {
+	case LABELPOINTS:
+	    {
 	    struct text_label *this_label;
 	    for (this_label = this_plot->labels->next; this_label != NULL;
 		 this_label = this_label->next) {
@@ -276,6 +294,17 @@ print_3dtable(int pcount)
 		fprintf(outfile, " \"%s\"\n", label);
 		free(label);
 	    }
+	    }
+	    continue;
+	case LINES:
+	case POINTSTYLE:
+	case IMPULSES:
+	case DOTS:
+	case VECTOR:
+	case IMAGE:
+	    break;
+	default:
+	    fprintf(stderr, "Tabular output of this 3D plot style not implemented\n");
 	    continue;
 	}
 
@@ -308,6 +337,8 @@ print_3dtable(int pcount)
 			OUTPUT_NUMBER((tail->y - point->y), FIRST_Y_AXIS);
 			OUTPUT_NUMBER((tail->z - point->z), FIRST_Z_AXIS);
 			tail++;
+		    } else if (this_plot->plot_style == IMAGE) {
+			fprintf(outfile,"%g ",point->CRD_COLOR);
 		    }
 		    fprintf(outfile, "%c\n",
 			    point->type == INRANGE
