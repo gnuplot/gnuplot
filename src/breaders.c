@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: breaders.c,v 1.10 2009/12/09 01:03:26 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: breaders.c,v 1.10.2.1 2012/04/09 04:25:37 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - breaders.c */
@@ -57,7 +57,7 @@ static char *RCSid() { return RCSid("$Id: breaders.c,v 1.10 2009/12/09 01:03:26 
 extern int df_no_bin_cols;	/* cols to read */
 extern df_endianess_type df_bin_file_endianess;
 extern TBOOLEAN df_matrix_file, df_binary_file;
-extern void *df_datablock;
+extern void *df_pixeldata;
 
 /* Reader for the ESRF Header File format files (EDF / EHF).
  */
@@ -343,7 +343,7 @@ gd_filetype_function(int filetype)
     FPRINTF((stderr,"This is a %u X %u %s image\n",M,N,
 		im->trueColor ? "TrueColor" : "palette"));
 
-    df_datablock = im->trueColor ? (void *)im->tpixels : (void *)im->pixels;
+    df_pixeldata = im->trueColor ? (void *)im->tpixels : (void *)im->pixels;
     df_matrix_file = FALSE;
     df_binary_file = TRUE;
 
