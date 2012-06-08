@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.220 2012/05/02 05:01:48 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.221 2012/05/09 19:27:04 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -200,7 +200,7 @@ int df_datum;                   /* suggested x value if none given */
 AXIS_INDEX df_axis[MAXDATACOLS];
 TBOOLEAN df_matrix = FALSE;     /* indicates if data originated from a 2D or 3D format */
 
-void *df_datablock;		/* pixel data from an external library (e.g. libgd) */
+void *df_pixeldata;		/* pixel data from an external library (e.g. libgd) */
 
 /* jev -- the 'thru' function --- NULL means no dummy vars active */
 /* HBB 990829: moved this here, from command.c */
@@ -972,7 +972,7 @@ df_open(const char *cmd_filename, int max_using, struct curve_points *plot)
     lastpoint = lastline = MAXINT;
 
     df_binary_file = df_matrix_file = FALSE;
-    df_datablock = NULL;
+    df_pixeldata = NULL;
     df_num_bin_records = 0;
     df_matrix = FALSE;
     df_nonuniform_matrix = FALSE;
@@ -4417,7 +4417,7 @@ df_readbinary(double v[], int max)
 		break;
 
 	    /* Read in a "column", i.e., a binary value of various types. */
-	    if (df_datablock) {
+	    if (df_pixeldata) {
 		io_val.uc = df_libgd_get_pixel(df_M_count, df_N_count, i);
 	    } else
 
