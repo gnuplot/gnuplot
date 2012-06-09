@@ -1,5 +1,5 @@
 /*
- * $Id: eval.h,v 1.39 2011/09/08 05:19:07 sfeam Exp $
+ * $Id: eval.h,v 1.40 2011/11/24 05:08:36 sfeam Exp $
  */
 
 /* GNUPLOT - eval.h */
@@ -56,7 +56,7 @@ enum operators {
     CALL, CALLN, SUM, LNOT, BNOT, UMINUS,
     LOR, LAND, BOR, XOR, BAND, EQ, NE, GT, LT, GE, LE, PLUS, MINUS, MULT,
     DIV, MOD, POWER, FACTORIAL, BOOLE,
-    DOLLARS, 
+    DOLLARS,
     CONCATENATE, EQS, NES, RANGE,
     ASSIGN,
     /* only jump operators go between jump and sf_start, for is_jump() */
@@ -134,6 +134,7 @@ double gp_exp __PROTO((double x));
 
 /* HBB 20010726: Moved these here, from util.h. */
 double real __PROTO((struct value *));
+int real_int __PROTO((struct value *val));
 double imag __PROTO((struct value *));
 double magnitude __PROTO((struct value *));
 double angle __PROTO((struct value *));

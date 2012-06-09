@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: eval.c,v 1.99 2012/01/17 19:16:53 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: eval.c,v 1.100 2012/04/18 00:13:46 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - eval.c */
@@ -249,6 +249,25 @@ real(struct value *val)
     }
     /* NOTREACHED */
     return ((double) 0.0);
+}
+
+
+/* returns the real part of val, converted to int if necessary */
+int
+real_int(struct value *val)
+{
+    switch (val->type) {
+    case INTGR:
+	return val->v.int_val;
+    case CMPLX:
+	return (int) val->v.cmplx_val.real;
+    case STRING:
+	return atoi(val->v.string_val);
+    default:
+	int_error(NO_CARET, "unknown type in real_int()");
+    }
+    /* NOTREACHED */
+    return 0;
 }
 
 
@@ -685,7 +704,7 @@ get_udv_by_name(char *key)
 }
 
 void
-del_udv_by_name( char *key, TBOOLEAN wildcard )
+del_udv_by_name(char *key, TBOOLEAN wildcard)
 {
     struct udvt_entry *udv_ptr = first_udv;
 
