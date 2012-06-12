@@ -1,3 +1,8 @@
+2012-06-12  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/datafile.c (df_readascii):  Bugfix for label plots using column 0
+	to generate text. E.g. plot foo using 1:2:(sprintf("%d",$0)) with labels
+
 2012-06-09  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/fit.c (setvar):  Accept a double value instead of struct value.
