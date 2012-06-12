@@ -1,3 +1,8 @@
+2012-06-12  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/datafile.c (df_readascii):  Bugfix for label plots using column 0
+	to generate text. E.g. plot foo using 1:2:(sprintf("%d",$0)) with labels
+
 2012-06-07  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/tabulate.c:  Allow tabulation (set table) of pixel values for

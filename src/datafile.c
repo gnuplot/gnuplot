@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.212.2.4 2012/04/10 23:20:31 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.212.2.5 2012/06/08 17:32:55 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -1924,6 +1924,7 @@ df_readascii(double v[], int max)
 		}
 		/* Special case to make 'using 0' et al. to work with labels */
 		if (use_spec[output].expected_type == CT_STRING
+		    && (!(use_spec[output].at) || !df_tokens[output])
 		    && (column == -2 || column == -1 || column == 0)) {
 		    char *s = gp_alloc(32*sizeof(char), 
 			"temp string for label hack");
