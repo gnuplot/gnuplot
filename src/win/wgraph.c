@@ -1,5 +1,5 @@
 /*
- * $Id: wgraph.c,v 1.149 2012/05/23 17:27:34 markisch Exp $
+ * $Id: wgraph.c,v 1.150 2012/05/24 18:51:31 markisch Exp $
  */
 
 /* GNUPLOT - win/wgraph.c */
@@ -203,6 +203,7 @@ static struct {
 	char fontname[MAXFONTNAME]; /* current font name */
 	double fontsize;     /* current font size */
 	int totalwidth;      /* total width of printed text */
+	double res_scale;    /* scaling due to different resolution (printers) */
 } enhstate;
 
 
@@ -1140,7 +1141,9 @@ GraphEnhancedOpen(char *fontname, double fontsize, double base,
 			non-optimal results for most font and size selections.
 			OUTLINEFONTMETRICS could be used for better results here.
 		*/
-		enhstate.base = win_scale * base * enhstate.lpgw->sampling * enhstate.lpgw->fontscale;
+		enhstate.base = win_scale * base *
+						enhstate.lpgw->sampling * enhstate.lpgw->fontscale *
+						enhstate.res_scale;
 	}
 }
 
@@ -1443,7 +1446,8 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 
 	/* lines */
 	double line_width = lpgw->sampling * lpgw->linewidth;	/* current line width */
-	LOGPEN cur_penstruct;				/* current pen settings */
+	double lw_scale = 1.;
+	LOGPEN cur_penstruct;		/* current pen settings */
 
 	/* polylines and polygons */
 	int polymax = 200;			/* size of ppt */
@@ -1482,12 +1486,17 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 	if (interactive)
 		clear_tooltips(lpgw);
 
-    /* HBB 20010218: the GDI status query functions don't work on Metafile
-     * handles, so can't know whether the screen is actually showing
-     * color or not, if drawgraph() is being called from CopyClip().
-     * Solve by defaulting isColor to 1 if hdc is a metafile. */
-    isColor = (((GetDeviceCaps(hdc, PLANES) * GetDeviceCaps(hdc, BITSPIXEL)) > 2)
-	       || (GetDeviceCaps(hdc, TECHNOLOGY) == DT_METAFILE));
+	/* The GDI status query functions don't work on metafile, printer or
+	 * plotter handles, so can't know whether the screen is actually showing
+	 * color or not, if drawgraph() is being called from CopyClip().
+	 * Solve by defaulting isColor to TRUE in those cases.
+	 * Note that info on color capabilities of printers would be available
+	 * via DeviceCapabilities().
+	 */
+	isColor = (((GetDeviceCaps(hdc, PLANES) * GetDeviceCaps(hdc, BITSPIXEL)) > 2)
+	       || (GetDeviceCaps(hdc, TECHNOLOGY) == DT_METAFILE)
+	       || (GetDeviceCaps(hdc, TECHNOLOGY) == DT_PLOTTER)
+	       || (GetDeviceCaps(hdc, TECHNOLOGY) == DT_RASPRINTER));
 
     if (isColor) {
 		SetBkColor(hdc, lpgw->background);
@@ -1495,6 +1504,18 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
     } else {
 		FillRect(hdc, rect, (HBRUSH)GetStockObject(WHITE_BRUSH));
     }
+
+	/* Need to scale line widths for raster printers so they are the same
+	   as on screen */
+	if ((GetDeviceCaps(hdc, TECHNOLOGY) == DT_RASPRINTER)) {
+		HDC hdc_screen = GetDC(NULL);
+		lw_scale = (double) GetDeviceCaps(hdc, VERTRES) /
+		           (double) GetDeviceCaps(hdc_screen, VERTRES);
+		line_width *= lw_scale;
+		ReleaseDC(NULL, hdc_screen);
+	}
+	/* Also needed for enhanced text */
+	enhstate.res_scale = lw_scale;
 
     ppt = (POINT *)LocalAllocPtr(LHND, (polymax+1) * sizeof(POINT));
 
@@ -1957,7 +1978,7 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 			 * that linewidth is exactly 1 iff it's in default
 			 * state */
 			line_width = curptr->x == 100 ? 1 : (curptr->x / 100.0);
-			line_width *= lpgw->sampling * lpgw->linewidth;
+			line_width *= lpgw->sampling * lpgw->linewidth * lw_scale;
 			break;
 
 		case W_setcolor: {
