@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.201 2012/03/13 18:56:01 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.202 2012/05/20 14:18:54 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -608,13 +608,14 @@ set encoding %s\n\
     fprintf(fp, "\n\
 set samples %d, %d\n\
 set isosamples %d, %d\n\
-%sset surface\n\
-%sset contour",
+%sset surface %s",
 	    samples_1, samples_2,
 	    iso_samples_1, iso_samples_2,
 	    (draw_surface) ? "" : "un",
-	    (draw_contour) ? "" : "un");
+	    (implicit_surface) ? "" : "explicit");
 
+    fprintf(fp, "\n\
+%sset contour", (draw_contour) ? "" : "un");
     switch (draw_contour) {
     case CONTOUR_NONE:
 	fputc('\n', fp);
@@ -1323,6 +1324,9 @@ save_data_func_style(FILE *fp, const char *which, enum PLOT_STYLE style)
 	fputs("ellipses\n", fp);
 	break;
 #endif
+    case SURFACEGRID:
+	fputs("surfaces\n", fp);
+	break;
     default:
 	fputs("---error!---\n", fp);
     }

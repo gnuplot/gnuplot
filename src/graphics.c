@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.394 2012/05/14 18:23:49 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.395 2012/05/17 05:03:17 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -2008,7 +2008,8 @@ do_plot(struct curve_points *plots, int pcount)
 		break;
 
 	    case PM3DSURFACE:
-		int_warn(NO_CARET, "Can't use pm3d for 2d plots");
+	    case SURFACEGRID:
+		int_warn(NO_CARET, "Can't use pm3d or surface for 2d plots");
 		break;
 
 	    case LABELPOINTS:
@@ -2040,6 +2041,8 @@ do_plot(struct curve_points *plots, int pcount)
 		break;
 		
 #endif
+	    default:
+		int_error(NO_CARET, "unknown plot style");
 	    }
 	}
 

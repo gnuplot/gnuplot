@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.370 2012/05/20 14:18:54 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.371 2012/05/21 23:15:18 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -4134,6 +4134,14 @@ set_surface()
 {
     c_token++;
     draw_surface = TRUE;
+    implicit_surface = TRUE;
+    if (!END_OF_COMMAND) {
+	if (equals(c_token, "implicit"))
+	    ;
+	else if (equals(c_token, "explicit"))
+	    implicit_surface = FALSE;
+	c_token++;
+    }
 }
 
 

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.264 2012/04/17 22:42:52 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.265 2012/05/08 19:36:38 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -83,8 +83,10 @@ t_contour_placement draw_contour = CONTOUR_NONE;
 /* different linestyles are used for contours when set */
 TBOOLEAN label_contours = TRUE;
 
-/* Want to draw surfaces? FALSE mainly useful in contouring mode */
+/* Draw the surface at all? (FALSE if only contours are wanted) */
 TBOOLEAN draw_surface = TRUE;
+/* Always create a gridded surface when lines are read from a data file */
+TBOOLEAN implicit_surface = TRUE;
 
 /* Was hidden3d display selected by user? */
 TBOOLEAN hidden3d = FALSE;
@@ -1047,6 +1049,7 @@ do_3dplot(
 	    case FILLSTEPS:
 	    case FSTEPS:
 	    case HISTEPS:
+	    case SURFACEGRID:
 	    case LINES:
 		if (draw_surface && !this_plot->opt_out_of_surface) {
 		    if (lkey) {

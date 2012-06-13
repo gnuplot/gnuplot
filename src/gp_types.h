@@ -1,5 +1,5 @@
 /*
- * $Id: gp_types.h,v 1.49 2010/10/27 04:22:43 sfeam Exp $
+ * $Id: gp_types.h,v 1.50 2011/04/16 04:55:26 sfeam Exp $
  */
 
 /* GNUPLOT - gp_types.h */
@@ -107,6 +107,7 @@ typedef enum PLOT_STYLE {
     , CIRCLES      = 28*PLOT_STYLE_BITS + PLOT_STYLE_HAS_LINE + PLOT_STYLE_HAS_FILL
     , BOXPLOT      = 29*PLOT_STYLE_BITS + PLOT_STYLE_HAS_FILL + PLOT_STYLE_HAS_POINT
     , ELLIPSES     = 30*PLOT_STYLE_BITS + PLOT_STYLE_HAS_LINE + PLOT_STYLE_HAS_FILL
+    , SURFACEGRID  = 31*PLOT_STYLE_BITS + PLOT_STYLE_HAS_LINE,
 } PLOT_STYLE;
 
 typedef enum PLOT_SMOOTH {

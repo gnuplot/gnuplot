@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.735 2012/05/21 23:15:17 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.736 2012/05/31 21:26:04 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -6294,12 +6294,11 @@ Ffigure_mapcontours
       lines        dots       steps     errorbars     xerrorbar    xyerrorlines
       points       impulses   fsteps    errorlines    xerrorlines  yerrorbars
       linespoints  labels     histeps   financebars   xyerrorbars  yerrorlines
-                                        vectors
+      surface      vectors
  or
-       boxes            candlesticks   image      circles
-       boxerrorbars     filledcurves   rgbimage   ellipses
-       boxxyerrorbars   histograms     rgbalpha   pm3d
-       boxplot
+      boxes            boxplot        ellipses       image
+      boxerrorbars     candlesticks   filledcurves   rgbimage
+      boxxyerrorbars   circles        histograms     rgbalpha   pm3d
 
  The first group of styles have associated line, point, and text properties.
  The second group of styles also have fill properties.  See `fillstyle`.  Some
@@ -7428,7 +7427,7 @@ Ffigure_mapcontours
  See also `set cntrparam` for the parameters that affect the drawing of
  contours, and `set clabel` for control of labelling of the contours.
 
- The surface can be switched off (see `set surface`), giving a contour-only
+ The surface can be switched off (see `unset surface`), giving a contour-only
  graph.  Though it is possible to use `set size` to enlarge the plot to fill
  the screen, more control over the output format can be obtained by writing
  the contour information to a file, and rereading it as a 2D datafile plot:
@@ -11250,23 +11249,28 @@ Ffigure_missing
 ?show surface
 ?surface
 ?nosurface
- The command `set surface` controls the display of surfaces by `splot`.
+ The `set surface` command is only relevant for 3D plots (`splot`).
 
  Syntax:
-       set surface
+       set surface {implicit|explicit}
        unset surface
        show surface
 
- The surface is drawn with the style specified by `with`, or else the
- appropriate style, data or function.
-
  `unset surface` will cause `splot` to not draw points or lines corresponding
- to any of the function or data file points.  If you want to turn off the surface
- for an individual function or data file while leaving the others active, use
- the `nosurface` keyword in the `splot` command.  Contours may still be drawn on
- the surface, depending on the `set contour` option.  The combination
- `unset surface; set contour base` is useful for displaying contours on the grid
- base.  See also `set contour`. 
+ to any of the function or data file points.  This is mainly useful for drawing
+ only contour lines rather than the surface they were derived from.  Contours
+ may still be drawn on the surface, depending on the `set contour` option.
+ To turn off the surface for an individual function or data file while leaving
+ others active, use the `nosurface` keyword in the `splot` command.
+ The combination `unset surface; set contour base` is useful for displaying
+ contours on the grid base.  See also `set contour`. 
+
+ If an 3D data set is recognizable as a mesh (grid) then by default the program
+ implicitly treats the plot style `with lines` as requesting a gridded surface.
+ See `grid_data`.  The command `set surface explicit` suppresses this expansion,
+ plotting only the individual lines described by separate data blocks in the
+ input file.  A gridded surface can still be plotted by explicitly requesting
+ splot `with surface`.
 3 table
 ?commands set table
 ?set table

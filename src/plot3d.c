@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.195 2012/03/18 17:30:43 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.196 2012/04/18 00:13:46 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -1110,7 +1110,9 @@ get_3ddata(struct surface_points *this_plot)
 
     if (this_plot->num_iso_read <= 1)
 	this_plot->has_grid_topology = FALSE;
-    if (this_plot->has_grid_topology && !hidden3d) {
+
+    if (this_plot->has_grid_topology && !hidden3d 
+    &&   (implicit_surface || this_plot->plot_style == SURFACEGRID)) {
 	struct iso_curve *new_icrvs = NULL;
 	int num_new_iso = this_plot->iso_crvs->p_count;
 	int len_new_iso = this_plot->num_iso_read;

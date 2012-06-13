@@ -1,3 +1,21 @@
+2012-06-13  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/graph3d.c src/graph3d.h src/set.c src/show.c src/save.c
+	src/unset.c src/plot3d.c src/gp_types.h src/tables.c src/graphics.c
+	docs/gnuplot.doc:
+
+	New command keywords "set surface {implicit|explicit}".
+	Until now, splot has always added isolines to generate a gridded surface
+	if an input data file looks like it contains lines along one direction
+	of the grid.  This behavior corresponds to the "implicit" keyword and
+	remains the default.  "set source explicit" turns off the automatic
+	generation of isolines, allowing such a data file to be plotted purely
+	as unconnected lines rather than a generated grid.  You can still
+	generate a gridded surface in this case by saying
+	"plot ... with surface" rather than "plot ... with lines".
+
+	Addresses tracker item #1244775 (Theo Hopman)
+
 2012-06-13  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* config/config.mgw config/config.nt src/win/wtext.h:  Move preprocessor
