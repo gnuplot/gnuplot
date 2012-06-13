@@ -1,5 +1,5 @@
 # Hello, emacs: this is a -*- Makefile -*-
-# $Id: Makefile,v 1.14.2.7 2012/02/29 15:34:32 markisch Exp $
+# $Id: Makefile,v 1.14.2.8 2012/03/02 20:00:04 sfeam Exp $
 #
 # GNUPLOT Makefile for MinGW/MSYS on Windows
 # This assumes usual installation of the MinGW32 toolkit, the free
@@ -564,7 +564,7 @@ $(JASRC): $(D)gnuplot-ja.doc $(D)term-ja.diff $(CORETERM)
 	cp $(M)*.dat $(M)*.png $(M)*.rgb $(JA)demo/
 	# Apply patch for Japanese docs
 	-rm $(JAD)tex2ja.awk $(JAD)sjisenc.c
-	(cd $(JA) ; patch -p0 -i docs/term-ja.diff)
+	-(cd $(JA) ; patch -p0 -i docs/term-ja.diff)
 
 wgnuplot-ja.chm: $(JASRC) doc2html-ja.exe \
                   $(D)windows/wgnuplot.hhp $(D)windows/wgnuplot.hhk \
@@ -737,7 +737,7 @@ clean:
 	$(RM) eg?.tex eg?.eps linepoin.tex test.tex test_tikz.tex
 	$(RM) $(D)windows/wgnuplot.log $(D)windows/wgnuplot.hhc
 	$(RM) $(D)windows/*.png $(D)windows/wgnuplot.html
-	$(RM) -rf ./dist/
+	$(RM) -rf ./dist/ ./gnuplot/
 	$(RM) -rf $(JA)
 
 realclean: veryclean
@@ -767,6 +767,10 @@ install:
 ifdef HELPFILEJA
 	cp -p $(HELPFILEJA) $(DESTDIR)/bin/
 endif
+# configuration files
+	mkdir -p $(DESTDIR)/$(GNUPLOT_SHARE_DIR)
+	cp -p $(TOP)/share/gnuplotrc $(DESTDIR)/$(GNUPLOT_SHARE_DIR)
+	cp -p $(TOP)/share/*.gp $(DESTDIR)/$(GNUPLOT_SHARE_DIR)
 # terminal support files
 	mkdir -p $(DESTDIR)/$(GNUPLOT_PS_DIR)
 	cp -p $(TOP)/term/PostScript/*.ps $(DESTDIR)/$(GNUPLOT_PS_DIR)/

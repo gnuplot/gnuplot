@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.2.2.1 2011/12/11 11:44:57 markisch Exp $
+# $Id: Makefile,v 1.2.2.2 2012/01/14 08:01:15 markisch Exp $
 #
 # GNUPLOT Makefile Microsoft Visual C++ 2005 or newer
 
@@ -338,6 +338,7 @@ clean:
 	if exist doc2html.exe del doc2html.exe
 	if exist doc2rtf.exe del doc2rtf.exe
 	if exist geticon.exe del geticon.exe
+	if exist gnuplot rmdir /s /q gnuplot
 
 veryclean: clean
 	if exist wgnuplot.exe del wgnuplot.exe
@@ -372,6 +373,9 @@ install:
 	xcopy /Y $(T)js\*.* $(DESTDIR)\$(GNUPLOT_JS_DIR)
 	if not exist $(DESTDIR)\$(GNUPLOT_LUA_DIR) mkdir $(DESTDIR)\$(GNUPLOT_LUA_DIR)
 	xcopy /Y $(T)lua\*.* $(DESTDIR)\$(GNUPLOT_LUA_DIR)
+	if not exist $(DESTDIR)\$(GNUPLOT_SHARE_DIR) mkdir $(DESTDIR)\$(GNUPLOT_SHARE_DIR)
+	copy /Y $(TOP)\share\gnuplotrc $(DESTDIR)\$(GNUPLOT_SHARE_DIR)
+	copy /Y $(TOP)\share\*.gp $(DESTDIR)\$(GNUPLOT_SHARE_DIR)
 	if not exist $(DESTDIR)\share\LaTeX mkdir $(DESTDIR)\share\LaTeX
 	copy /Y $(TOP)\share\LaTeX\README $(DESTDIR)\share\LaTeX
 	copy /Y $(TOP)\share\LaTeX\gnuplot.cfg $(DESTDIR)\share\LaTeX
@@ -382,3 +386,7 @@ install:
 	xcopy /Y $(TOP)\demo $(DESTDIR)\demo
 	if not exist $(DESTDIR)\contrib\pm3d mkdir $(DESTDIR)\contrib\pm3d
 	xcopy /Y $(TOP)\pm3d\contrib\*.* $(DESTDIR)\contrib\pm3d
+
+zip:
+	$(MAKE) DESTDIR=.\gnuplot install
+	zip -mro9 gp460-msvc-win32.zip gnuplot
