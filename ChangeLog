@@ -1,3 +1,10 @@
+2012-06-13  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/win/wgraph.c (drawgraph): Do not try to detect color capabilities
+	of printers. When drawing to a printer, scale line widths to match the
+	widths on screen and fix placement of super- and subscripts.
+	Bug #3503318
+
 2012-06-12  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/datafile.c (df_readascii):  Bugfix for label plots using column 0
