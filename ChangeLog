@@ -1,5 +1,9 @@
 2012-06-13  Bastian Maerkisch  <bmaerkisch@web.de>
 
+	* config/config.mgw config/config.nt src/win/wtext.h:  Move preprocessor
+	defines for fake pipe support to wtext.h in order to avoid redefinition
+	warnings.
+
 	* config/mingw/Makefile config/msvc/Makefile:  Include
 	templates for initialization files in distribution.
 

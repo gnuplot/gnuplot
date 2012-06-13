@@ -1,5 +1,5 @@
 /*
- * $Id: wtext.h,v 1.10 2008/11/07 11:55:46 mikulik Exp $
+ * $Id: wtext.h,v 1.11 2011/12/06 20:31:50 markisch Exp $
  */
 
 /* GNUPLOT - win/wtext.h */
@@ -34,11 +34,14 @@
  * to the extent permitted by applicable law.
 ]*/
 
+#ifndef GNUPLOT_WTEXT_H
+#define GNUPLOT_WTEXT_H
+
 #include <stdio.h>
 #include <stdarg.h>
 
 /* redefine functions that can talk to tty devices, to use
- * implementation in winmain.c/wgnuplot.dll */
+ * implementation in winmain.c */
 
 #ifndef WGP_CONSOLE
 
@@ -86,6 +89,11 @@
 #define cscanf dontuse_cscanf
 #define ungetch dontuse_ungetch
 
+#ifdef USE_FAKEPIPES
+# define popen fake_popen
+# define pclose fake_pclose
+#endif
+
 /* now for the prototypes */
 
 int MyPutCh(int ch);
@@ -115,3 +123,5 @@ int fake_pclose(FILE *stream);
 int ConsoleGetch();
 
 #endif /* WGP_CONSOLE */
+
+#endif /* GNUPLOT_WTEXT_H */

@@ -613,8 +613,6 @@
 # ifndef PIPES
 #  define PIPES
 # endif
-# define popen fake_popen
-# define pclose fake_pclose
 #endif
 
 /* gnuplot.gih is not used by wgnuplot */

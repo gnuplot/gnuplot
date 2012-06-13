@@ -595,8 +595,6 @@
 /* Emulated pipe support for wgnuplot */
 #ifdef USE_FAKEPIPES
 # define PIPES
-# define popen fake_popen
-# define pclose fake_pclose
 #elif defined(PIPES)
 # define popen _popen
 # define pclose _pclose
