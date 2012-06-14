@@ -149,8 +149,8 @@ grops: gnuplot.ms titlepag.ms
 ### doc2xxx dependencies
 ms: gnuplot.ms
 
-gnuplot.ms: doc2ms $(srcdir)/gnuplot.doc
-	./doc2ms $(srcdir)/gnuplot.doc gnuplot.ms
+gnuplot.ms: doc2ms$(EXEEXT) $(srcdir)/gnuplot.doc
+	./doc2ms$(EXEEXT) $(srcdir)/gnuplot.doc gnuplot.ms
 
 doc2ms_SOURCES = doc2ms.c termdoc.c allterm.h
 doc2ms_CPPFLAGS = -DALL_TERM_DOC $(AM_CPPFLAGS)
@@ -170,9 +170,9 @@ pdffigures.tex:	figures gnuplot.pdf
 	rm -f gnuplot.tex
 	echo "" > pdffigures.tex
 
-figures: doc2tex $(srcdir)/gnuplot.doc
+figures: doc2tex$(EXEEXT) $(srcdir)/gnuplot.doc
 	GNUPLOT_LIB=$(top_srcdir)/demo ../src/gnuplot $(srcdir)/plotstyles.gnu
-	./doc2tex -figures $(srcdir)/gnuplot.doc gnuplot.tex
+	./doc2tex$(EXEEXT) -figures $(srcdir)/gnuplot.doc gnuplot.tex
 	echo "\usepackage{graphicx}" > pdffigures.tex
 	echo "\usepackage{picins}" >> pdffigures.tex
 
@@ -194,8 +194,8 @@ gnuplot.pdf: gnuplot.tex
 ### LaTeX documentation
 tex: gnuplot.tex
 
-gnuplot.tex: doc2tex $(srcdir)/gnuplot.doc
-	./doc2tex $(srcdir)/gnuplot.doc gnuplot.tex
+gnuplot.tex: doc2tex$(EXEEXT) $(srcdir)/gnuplot.doc
+	./doc2tex$(EXEEXT) $(srcdir)/gnuplot.doc gnuplot.tex
 
 doc2tex_SOURCES = doc2tex.c termdoc.c allterm.h
 doc2tex_CPPFLAGS = -DALL_TERM_DOC $(AM_CPPFLAGS)
@@ -245,22 +245,22 @@ gpcard.ps: gpcard.dvi
 # this is how to make gnuplot.hlp
 hlp: gnuplot.hlp
 
-gnuplot.hlp: doc2hlp $(srcdir)/gnuplot.doc
-	./doc2hlp $(srcdir)/gnuplot.doc gnuplot.hlp
+gnuplot.hlp: doc2hlp$(EXEEXT) $(srcdir)/gnuplot.doc
+	./doc2hlp$(EXEEXT) $(srcdir)/gnuplot.doc gnuplot.hlp
 
 doc2hlp_SOURCES = doc2hlp.c termdoc.c
 
 ### gnuplot interactive help format
 gih: gnuplot.gih
 
-gnuplot.gih: doc2gih $(srcdir)/gnuplot.doc
-	./doc2gih $(srcdir)/gnuplot.doc gnuplot.gih
+gnuplot.gih: doc2gih$(EXEEXT) $(srcdir)/gnuplot.doc
+	./doc2gih$(EXEEXT) $(srcdir)/gnuplot.doc gnuplot.gih
 
 doc2gih_SOURCES = doc2gih.c termdoc.c
 
 # To include all terminals in the .gih file
-allgih: alldoc2gih $(srcdir)/gnuplot.doc allterm.h
-	./alldoc2gih $(srcdir)/gnuplot.doc gnuplot.gih
+allgih: alldoc2gih$(EXEEXT) $(srcdir)/gnuplot.doc allterm.h
+	./alldoc2gih$(EXEEXT) $(srcdir)/gnuplot.doc gnuplot.gih
 
 alldoc2gih_SOURCES = doc2gih.c termdoc.c allterm.h
 alldoc2gih_CPPFLAGS = -DALL_TERM_DOC $(AM_CPPFLAGS)
@@ -272,8 +272,8 @@ gnuplot.htb: wxhelp/wgnuplot.html
 	GNUPLOT_LIB=$(srcdir)/../demo ../src/gnuplot -e "winhelp=1;" $(srcdir)/plotstyles.gnu
 	zip -j9 gnuplot.htb windows/wgnuplot.hhp wxhelp/wgnuplot.hhc wxhelp/wgnuplot.hhk wxhelp/*.html windows/*.png
 
-wxhelp/wgnuplot.html: wxhelp/doc2html $(srcdir)/gnuplot.doc 
-	./wxhelp/doc2html $(srcdir)/gnuplot.doc wxhelp/
+wxhelp/wgnuplot.html: wxhelp/doc2html$(EXEEXT) $(srcdir)/gnuplot.doc 
+	./wxhelp/doc2html$(EXEEXT) $(srcdir)/gnuplot.doc wxhelp/
 
 wxhelp/doc2html.o: $(srcdir)/windows/doc2html.c $(BUILT_SOURCES)
 	[ -d wxhelp ] || mkdir wxhelp
@@ -319,24 +319,24 @@ install-info: gnuplot.info gnuplot-eldoc.el gnuplot-eldoc.elc
 # this is how to make OS/2 ipfc documentation
 ipf: gnuplot.ipf
 
-gnuplot.ipf: doc2ipf $(srcdir)/gnuplot.doc
-	./doc2ipf $(srcdir)/gnuplot.doc gnuplot.ipf
+gnuplot.ipf: doc2ipf$(EXEEXT) $(srcdir)/gnuplot.doc
+	./doc2ipf$(EXEEXT) $(srcdir)/gnuplot.doc gnuplot.ipf
 
 doc2ipf_SOURCES = doc2ipf.c termdoc.c xref.c
 
 ### Rich Text Format
 rtf: gnuplot.rtf
 
-gnuplot.rtf: doc2rtf $(srcdir)/gnuplot.doc
-	./doc2rtf $(srcdir)/gnuplot.doc gnuplot.rtf
+gnuplot.rtf: doc2rtf$(EXEEXT) $(srcdir)/gnuplot.doc
+	./doc2rtf$(EXEEXT) $(srcdir)/gnuplot.doc gnuplot.rtf
 
 doc2rtf_SOURCES = doc2rtf.c termdoc.c xref.c
 
 # this is how to make rnh documentation (VMS help format)
 rnh: gnuplot.rnh
 
-gnuplot.rnh: doc2rnh $(srcdir)/gnuplot.doc
-	./doc2rnh $(srcdir)/gnuplot.doc gnuplot.rnh
+gnuplot.rnh: doc2rnh$(EXEEXT) $(srcdir)/gnuplot.doc
+	./doc2rnh$(EXEEXT) $(srcdir)/gnuplot.doc gnuplot.rnh
 
 doc2rnh_SOURCES = doc2rnh.c termdoc.c
 
@@ -355,34 +355,7 @@ checkdoc_SOURCES = checkdoc.c termdoc.c gnuplot.doc
 install-vms: gnuplot.hlp
 	$(INSTALL_DATA) gnuplot.hlp $(datadir)/gnuplot.hlp
 
-### Dependencies - do not edit!
-
-# all doc2somethings depend on termdoc and either ../term.h or
-# allterm.h, maybe this would be better as separate object file
-# (but then we have to change all the other makefiles). Plus then
-# we cannot make some doc2* filters use allterm.h and others use term.h
-
-checkdoc.o: checkdoc.c ../config.h $(top_srcdir)/src/syscfg.h \
-		$(top_srcdir)/src/stdfn.h doc2x.h allterm.h
-alldoc2gih.o: doc2gih.c ../config.h $(top_srcdir)/src/syscfg.h \
-		$(top_srcdir)/src/stdfn.h doc2x.h allterm.h
-doc2gih.o: doc2gih.c ../config.h $(top_srcdir)/src/syscfg.h \
-		$(top_srcdir)/src/stdfn.h doc2x.h $(TERM_H)
-doc2hlp.o: doc2hlp.c ../config.h $(top_srcdir)/src/syscfg.h \
-		$(top_srcdir)/src/stdfn.h doc2x.h $(TERM_H)
-doc2ipf.o: doc2ipf.c ../config.h $(top_srcdir)/src/syscfg.h \
-		$(top_srcdir)/src/stdfn.h doc2x.h $(TERM_H)
-doc2ms.o: doc2ms.c ../config.h $(top_srcdir)/src/syscfg.h \
-		$(top_srcdir)/src/stdfn.h doc2x.h allterm.h
-doc2rnh.o: doc2rnh.c ../config.h $(top_srcdir)/src/syscfg.h \
-		$(top_srcdir)/src/stdfn.h doc2x.h $(TERM_H)
-doc2rtf.o: doc2rtf.c ../config.h $(top_srcdir)/src/syscfg.h \
-		$(top_srcdir)/src/stdfn.h doc2x.h $(TERM_H)
-doc2tex.o: doc2tex.c ../config.h $(top_srcdir)/src/syscfg.h \
-		$(top_srcdir)/src/stdfn.h doc2x.h allterm.h
-termdoc.o: termdoc.c ../config.h $(top_srcdir)/src/syscfg.h \
-		$(top_srcdir)/src/stdfn.h doc2x.h
-xref.o: xref.c ../config.h $(top_srcdir)/src/syscfg.h \
-		$(top_srcdir)/src/stdfn.h doc2x.h xref.h
+# explicit dependencies were here --- pointless now, since auto-tools 
+# inlcude automatic dependencies
 
 #the end

@@ -1,3 +1,13 @@
+2012-06-14  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* docs/Makefile.in: Regenerated.
+
+	* docs/Makefile.am (gnuplot.ms, figures, gnuplot.tex)
+	(gnuplot.hlp, gnuplot.gih, allgih, wxhelp/wgnuplot.html)
+	(gnuplot.ipf, gnuplot.rtf, gnuplot.rnh): Targets running private
+	executables lacked mandatory $(EXEEXT).  Caused direct build of,
+	e.g. 'make pdf', to try and build the wrong program and fail.
+
 2012-06-13  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graph3d.c src/graph3d.h src/set.c src/show.c src/save.c
