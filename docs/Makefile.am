@@ -152,7 +152,8 @@ ms: gnuplot.ms
 gnuplot.ms: doc2ms$(EXEEXT) $(srcdir)/gnuplot.doc
 	./doc2ms$(EXEEXT) $(srcdir)/gnuplot.doc gnuplot.ms
 
-doc2ms_SOURCES = doc2ms.c termdoc.c allterm.h
+doc2ms_SOURCES = doc2ms.c termdoc.c
+doc2ms_DEPENDENCIES = allterm.h
 doc2ms_CPPFLAGS = -DALL_TERM_DOC $(AM_CPPFLAGS)
 	$(COMPILE) -DALL_TERM_DOC -c $(srcdir)/doc2ms.c
 
@@ -197,8 +198,9 @@ tex: gnuplot.tex
 gnuplot.tex: doc2tex$(EXEEXT) $(srcdir)/gnuplot.doc
 	./doc2tex$(EXEEXT) $(srcdir)/gnuplot.doc gnuplot.tex
 
-doc2tex_SOURCES = doc2tex.c termdoc.c allterm.h
+doc2tex_SOURCES = doc2tex.c termdoc.c
 doc2tex_CPPFLAGS = -DALL_TERM_DOC $(AM_CPPFLAGS)
+doc2tex_DEPENDENCIES = allterm.h
 
 # this is how to make DVI files
 dvi: gnuplot.dvi gpcard.dvi
@@ -259,11 +261,12 @@ gnuplot.gih: doc2gih$(EXEEXT) $(srcdir)/gnuplot.doc
 doc2gih_SOURCES = doc2gih.c termdoc.c
 
 # To include all terminals in the .gih file
-allgih: alldoc2gih$(EXEEXT) $(srcdir)/gnuplot.doc allterm.h
+allgih: alldoc2gih$(EXEEXT) $(srcdir)/gnuplot.doc
 	./alldoc2gih$(EXEEXT) $(srcdir)/gnuplot.doc gnuplot.gih
 
-alldoc2gih_SOURCES = doc2gih.c termdoc.c allterm.h
+alldoc2gih_SOURCES = doc2gih.c termdoc.c
 alldoc2gih_CPPFLAGS = -DALL_TERM_DOC $(AM_CPPFLAGS)
+alldoc2gih_DEPENDENCIES = allterm.h
 
 ### wxhelp format
 htb: gnuplot.htb
@@ -355,7 +358,10 @@ checkdoc_SOURCES = checkdoc.c termdoc.c gnuplot.doc
 install-vms: gnuplot.hlp
 	$(INSTALL_DATA) gnuplot.hlp $(datadir)/gnuplot.hlp
 
-# explicit dependencies were here --- pointless now, since auto-tools 
-# inlcude automatic dependencies
+# Explicit dependencies that autoconf does not find
+# -------------------------------------------------
+# There may be a better way to do this, but without something of
+# the sort the build fails.
+termdoc.$(OBJEXT): allterm.h
 
 #the end

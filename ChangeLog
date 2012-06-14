@@ -1,3 +1,10 @@
+2012-06-14  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* docs/Makefile.am: autoconf (2.68) does not automatically propagate
+	dependencies for allterm.h. Add generic dependencies as documented,
+	even though this still results in incorrect ordering. Fix it empirically
+	by adding an explicit lower-level dependency at the end of the file.
+
 2012-06-14  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* docs/Makefile.in: Regenerated.
