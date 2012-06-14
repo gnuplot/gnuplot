@@ -8,7 +8,7 @@
 	Until now, splot has always added isolines to generate a gridded surface
 	if an input data file looks like it contains lines along one direction
 	of the grid.  This behavior corresponds to the "implicit" keyword and
-	remains the default.  "set source explicit" turns off the automatic
+	remains the default.  "set surface explicit" turns off the automatic
 	generation of isolines, allowing such a data file to be plotted purely
 	as unconnected lines rather than a generated grid.  You can still
 	generate a gridded surface in this case by saying
