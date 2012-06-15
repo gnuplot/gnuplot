@@ -353,19 +353,21 @@ wxhelp/*.html wxhelp/wgnuplot.htc windows/wgnuplot.htk gnuplot.pdf	\
 gnuplot.htb gnuplot-eldoc.el gnuplot-eldoc.elc
 
 DISTFILES = $(DIST_COMMON) $(SOURCES) $(DOCHEADERS) $(EXTRA_DIST)
-doc2ms_SOURCES = doc2ms.c termdoc.c allterm.h
+BUILT_SOURCES = allterm.h
+doc2ms_SOURCES = doc2ms.c termdoc.c
 doc2ms_CPPFLAGS = -DALL_TERM_DOC $(AM_CPPFLAGS)
-doc2tex_SOURCES = doc2tex.c termdoc.c allterm.h
+doc2tex_SOURCES = doc2tex.c termdoc.c
 doc2tex_CPPFLAGS = -DALL_TERM_DOC $(AM_CPPFLAGS)
 doc2hlp_SOURCES = doc2hlp.c termdoc.c
 doc2gih_SOURCES = doc2gih.c termdoc.c
-alldoc2gih_SOURCES = doc2gih.c termdoc.c allterm.h
+alldoc2gih_SOURCES = doc2gih.c termdoc.c
 alldoc2gih_CPPFLAGS = -DALL_TERM_DOC $(AM_CPPFLAGS)
 doc2ipf_SOURCES = doc2ipf.c termdoc.c xref.c
 doc2rtf_SOURCES = doc2rtf.c termdoc.c xref.c
 doc2rnh_SOURCES = doc2rnh.c termdoc.c
 checkdoc_SOURCES = checkdoc.c termdoc.c gnuplot.doc
-all: all-am
+all: $(BUILT_SOURCES)
+	$(MAKE) $(AM_MAKEFLAGS) all-am
 
 .SUFFIXES:
 .SUFFIXES: .c .o .obj
@@ -650,13 +652,16 @@ distdir: $(DISTFILES)
 	  fi; \
 	done
 check-am: all-am
-check: check-am
+	$(MAKE) $(AM_MAKEFLAGS) check-local
+check: $(BUILT_SOURCES)
+	$(MAKE) $(AM_MAKEFLAGS) check-am
 all-am: Makefile $(PROGRAMS) $(DATA)
 installdirs:
 	for dir in "$(DESTDIR)$(gihdir)"; do \
 	  test -z "$$dir" || $(MKDIR_P) "$$dir"; \
 	done
-install: install-am
+install: $(BUILT_SOURCES)
+	$(MAKE) $(AM_MAKEFLAGS) install-am
 install-exec: install-exec-am
 install-data: install-data-am
 uninstall: uninstall-am
@@ -687,6 +692,7 @@ distclean-generic:
 maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
 	@echo "it deletes files that may require special tools to rebuild."
+	-test -z "$(BUILT_SOURCES)" || rm -f $(BUILT_SOURCES)
 clean: clean-am
 
 clean-am: clean-generic clean-noinstPROGRAMS mostlyclean-am
@@ -744,20 +750,20 @@ ps-am:
 
 uninstall-am: uninstall-gihDATA
 
-.MAKE: install-am install-strip
+.MAKE: all check check-am install install-am install-strip
 
-.PHONY: CTAGS GTAGS all all-am check check-am clean clean-generic \
-	clean-noinstPROGRAMS ctags distclean distclean-compile \
-	distclean-generic distclean-tags distdir dvi dvi-am html \
-	html-am info info-am install install-am install-data \
-	install-data-am install-dvi install-dvi-am install-exec \
-	install-exec-am install-gihDATA install-html install-html-am \
-	install-info install-info-am install-man install-pdf \
-	install-pdf-am install-ps install-ps-am install-strip \
-	installcheck installcheck-am installdirs maintainer-clean \
-	maintainer-clean-generic mostlyclean mostlyclean-compile \
-	mostlyclean-generic pdf pdf-am ps ps-am tags uninstall \
-	uninstall-am uninstall-gihDATA
+.PHONY: CTAGS GTAGS all all-am check check-am check-local clean \
+	clean-generic clean-noinstPROGRAMS ctags distclean \
+	distclean-compile distclean-generic distclean-tags distdir dvi \
+	dvi-am html html-am info info-am install install-am \
+	install-data install-data-am install-dvi install-dvi-am \
+	install-exec install-exec-am install-gihDATA install-html \
+	install-html-am install-info install-info-am install-man \
+	install-pdf install-pdf-am install-ps install-ps-am \
+	install-strip installcheck installcheck-am installdirs \
+	maintainer-clean maintainer-clean-generic mostlyclean \
+	mostlyclean-compile mostlyclean-generic pdf pdf-am ps ps-am \
+	tags uninstall uninstall-am uninstall-gihDATA
 
 
 allterm.h: $(CORETERM)
@@ -920,7 +926,7 @@ gnuplot.gih: doc2gih$(EXEEXT) $(srcdir)/gnuplot.doc
 	./doc2gih$(EXEEXT) $(srcdir)/gnuplot.doc gnuplot.gih
 
 # To include all terminals in the .gih file
-allgih: alldoc2gih$(EXEEXT) $(srcdir)/gnuplot.doc allterm.h
+allgih: alldoc2gih$(EXEEXT) $(srcdir)/gnuplot.doc
 	./alldoc2gih$(EXEEXT) $(srcdir)/gnuplot.doc gnuplot.gih
 
 ### wxhelp format
@@ -990,8 +996,8 @@ gnuplot.rnh: doc2rnh$(EXEEXT) $(srcdir)/gnuplot.doc
 	./doc2rnh$(EXEEXT) $(srcdir)/gnuplot.doc gnuplot.rnh
 
 # this is how to check the gnuplot.doc file
-check: all checkdoc
-	@checkdoc < $(srcdir)/gnuplot.doc; \
+check-local: checkdoc$(EXEEXT)
+	@./checkdoc$(EXEEXT) < $(srcdir)/gnuplot.doc; \
 	if test $$? -eq 0; then \
 	  echo "PASS: gnuplot.doc"; \
 	else \
@@ -1001,9 +1007,6 @@ check: all checkdoc
 # for VMS only
 install-vms: gnuplot.hlp
 	$(INSTALL_DATA) gnuplot.hlp $(datadir)/gnuplot.hlp
-
-# explicit dependencies were here --- pointless now, since auto-tools 
-# inlcude automatic dependencies
 
 #the end
 

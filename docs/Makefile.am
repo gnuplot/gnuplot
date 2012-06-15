@@ -88,6 +88,8 @@ gnuplot.htb gnuplot-eldoc.el gnuplot-eldoc.elc
 
 DISTFILES = $(DIST_COMMON) $(SOURCES) $(DOCHEADERS) $(EXTRA_DIST)
 
+BUILT_SOURCES = allterm.h
+
 allterm.h: $(CORETERM)
 	@echo "Building allterm.h"
 	@for e in `egrep "^[ 	]*START_HELP" $(CORETERM) |\
@@ -153,7 +155,6 @@ gnuplot.ms: doc2ms$(EXEEXT) $(srcdir)/gnuplot.doc
 	./doc2ms$(EXEEXT) $(srcdir)/gnuplot.doc gnuplot.ms
 
 doc2ms_SOURCES = doc2ms.c termdoc.c
-doc2ms_DEPENDENCIES = allterm.h
 doc2ms_CPPFLAGS = -DALL_TERM_DOC $(AM_CPPFLAGS)
 	$(COMPILE) -DALL_TERM_DOC -c $(srcdir)/doc2ms.c
 
@@ -200,7 +201,6 @@ gnuplot.tex: doc2tex$(EXEEXT) $(srcdir)/gnuplot.doc
 
 doc2tex_SOURCES = doc2tex.c termdoc.c
 doc2tex_CPPFLAGS = -DALL_TERM_DOC $(AM_CPPFLAGS)
-doc2tex_DEPENDENCIES = allterm.h
 
 # this is how to make DVI files
 dvi: gnuplot.dvi gpcard.dvi
@@ -266,7 +266,6 @@ allgih: alldoc2gih$(EXEEXT) $(srcdir)/gnuplot.doc
 
 alldoc2gih_SOURCES = doc2gih.c termdoc.c
 alldoc2gih_CPPFLAGS = -DALL_TERM_DOC $(AM_CPPFLAGS)
-alldoc2gih_DEPENDENCIES = allterm.h
 
 ### wxhelp format
 htb: gnuplot.htb
@@ -344,8 +343,8 @@ gnuplot.rnh: doc2rnh$(EXEEXT) $(srcdir)/gnuplot.doc
 doc2rnh_SOURCES = doc2rnh.c termdoc.c
 
 # this is how to check the gnuplot.doc file
-check: all checkdoc
-	@checkdoc < $(srcdir)/gnuplot.doc; \
+check-local: checkdoc$(EXEEXT)
+	@./checkdoc$(EXEEXT) < $(srcdir)/gnuplot.doc; \
 	if test $$? -eq 0; then \
 	  echo "PASS: gnuplot.doc"; \
 	else \
@@ -357,11 +356,5 @@ checkdoc_SOURCES = checkdoc.c termdoc.c gnuplot.doc
 # for VMS only
 install-vms: gnuplot.hlp
 	$(INSTALL_DATA) gnuplot.hlp $(datadir)/gnuplot.hlp
-
-# Explicit dependencies that autoconf does not find
-# -------------------------------------------------
-# There may be a better way to do this, but without something of
-# the sort the build fails.
-termdoc.$(OBJEXT): allterm.h
 
 #the end

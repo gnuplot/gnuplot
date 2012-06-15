@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.736 2012/05/31 21:26:04 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.737 2012/06/13 20:12:59 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -3353,7 +3353,7 @@ Ffigure_histrows
  This will produce a plot in which each vertical bar corresponds to one row of
  data.  Each vertical bar contains a stack of two segments, corresponding in
  height to the values found in columns 2 and 4 of the datafile.
-       
+
 
  Finally, the commands
 
@@ -3884,12 +3884,6 @@ Ffigure_surface+contours
  The `splot` command can also calculate and draw contour lines corresponding
  to constant Z values. These contour lines may be drawn onto the surface
  itself, or projected onto the XY plane. See `set contour`.
-  
-  
-  
-  
-  
-  
 3 2D projection (set view map)
 ?2D projection (set view map)
 ?projection
@@ -3897,8 +3891,7 @@ Ffigure_mapcontours
  An important special case of the `splot` command is to map the Z coordinate
  onto a 2D surface by projecting the plot along the Z axis.  See `set view map`.
  This plot mode can be used to generate contour plots and heat maps.
-  
-  
+
 1 Commands
 ?commands
  This section lists the commands acceptable to `gnuplot` in alphabetical
@@ -6733,7 +6726,7 @@ Ffigure_mapcontours
  description the second.
 
  1) "to <position>" specifies the absolute coordinates of the other end.
- 
+
  2) "rto <position>" specifies an offset to the "from" position.  For linear
  axes, `graph` and `screen` coordinates, the distance between the start and the
  end point corresponds to the given relative coordinate.  For logarithmic axes,
@@ -10430,7 +10423,7 @@ Ffigure_missing
  postscript file in order to have different palettes for different surfaces
  in one graph.  Well, you can achieve this functionality by `multiplot` with
  fixed `origin` and `size`.
- 
+
  If you are writing a pm3d surface to a postscript file, it may be possible to
  reduce the file size by up to 50% by the enclosed awk script
  `pm3dCompress.awk`.  If the data lies on a rectangular grid, even greater
@@ -10845,14 +10838,14 @@ Ffigure_missing
 
  By default boxplots are drawn in a style similar to candlesticks, but you have
  the option of using instead a style similar to finance bars.
- 
+
  If the using specification for a boxplot contains a fourth column, the values
  in that column will be interpreted as the discrete leveles of a factor 
  variable.  In this case more than one boxplots may be drawn, as many as the
  number of levels of the factor variable.  These boxplots will be drawn next to
  each other, the distance between them is 1.0 by default (in x-axis units).
  This distance can be changed by the option `separation`.
- 
+
  The `labels` option governs how and where these boxplots (each representing a
  part of the dataset) are labeled.  By default the value of the factor is put 
  as a tick label on the horizontal axis -- x or x2, depending on which one is
@@ -10860,7 +10853,7 @@ Ffigure_missing
  The labels can be forced to use either of the x or x2 axes -- options
  `labels x` and `labels x2`, respectively --, or they can be turned off
  altogether with the option `labels off`.
- 
+
  By default the boxplots corresponding to different levels of the factor
  variable are not sorted; they will be drawn in the same order the levels are
  encountered in the data file. This behavior corresponds to the `unsorted`
@@ -12990,7 +12983,7 @@ Ffigure_missing
  analysis. See `set xrange`. The summary is printed to the screen by default.
  Output can be redirected to a file by prior use of the command `set print`,
  or suppressed altogether using the `nooutput` option.  
- 
+
  In addition to printed output, the program stores the individual statistics
  into three sets of variables.
  The first set of variables reports how the data is laid out in the file:
@@ -13026,7 +13019,7 @@ Ffigure_missing
       STATS_sumxy             # sum of x*y
       STATS_pos_min_y         # x coordinate of a point with minimum y value
       STATS_pos_max_y         # x coordinate of a point with maximum y value
- 
+
  It may be convenient to track the statistics from more than one file at the
  same time. The `name` option causes the default prefix "STATS" to be replaced
  by a user-specified string.  For example, the mean value of column 2 data from

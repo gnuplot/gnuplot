@@ -1,9 +1,26 @@
+2012-06-15  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* docs/gnuplot.doc: Cleaned blank-only lines.
+
+	* docs/Makefile.in: Regenerated.
+
+	* docs/Makefile.am (BUILT_SOURCES): allterm.h belongs here.
+	(doc2ms_DEPENDENCIES, doc2tex_DEPENDENDIES)
+	(alldoc2gih_DEPENDENCIES): Removed allterm.h from these, since
+	that would only cause it to be built at link time, which is too
+	late.
+	(check-local): Renamed from check, which would collide with
+	automake's own definition.  Add missing $(EXEEXT) and ./
+	(termdoc.$(OBJEXT)): Removed explicit dependency, since it would
+	have made exactly the wrong builds depend on allterm.h.
+
 2012-06-14  Ethan A Merritt  <merritt@u.washington.edu>
 
-	* docs/Makefile.am: autoconf (2.68) does not automatically propagate
-	dependencies for allterm.h. Add generic dependencies as documented,
-	even though this still results in incorrect ordering. Fix it empirically
-	by adding an explicit lower-level dependency at the end of the file.
+	* docs/Makefile.am: autoconf (2.68) does not automatically
+	propagate dependencies for allterm.h. Add generic dependencies as
+	documented, even though this still results in incorrect
+	ordering. Fix it empirically by adding an explicit lower-level
+	dependency at the end of the file.
 
 2012-06-14  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
