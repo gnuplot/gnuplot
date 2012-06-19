@@ -1,3 +1,23 @@
+2012-06-19  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/datablock.c src/datablock.h:  New files
+	
+	* src/command.c src/datafile.c src/eval.c src/fit.c src/gp_types.h
+	src/Makefile.am src/misc.c src/parse.c src/scanner.c src/show.c
+	src/stats.c src/tables.c:  Add support for named data blocks.
+
+	* docs/gnuplot.doc demo/imageNaN.dem demo/heatmaps.dem:
+	Document and provide demos for named data blocks.
+
+	Example use of named data blocks:
+	$Mydata << EOD
+	1 2 3
+	4 5 6
+	EOD
+	stats $Mydata using 1:2
+	plot $Mydata using 1:2 with lines, $Mydata using 1:3 with impulse
+	set print 'save.data'; print $Mydata
+
 2012-06-15  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* docs/gnuplot.doc: Cleaned blank-only lines.

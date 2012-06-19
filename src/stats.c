@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: stats.c,v 1.5 2012/01/22 01:32:47 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: stats.c,v 1.6 2012/02/22 19:36:45 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - stats.c */
@@ -654,10 +654,12 @@ statsrequest(void)
 
     /* Get filename */
     free ( file_name );
-    file_name = try_to_get_string();
-
-    if ( !file_name )
-	int_error(c_token, "missing filename");
+    i = c_token;
+    file_name = string_or_express(NULL);
+    if (file_name )
+	file_name = gp_strdup(file_name);
+    else
+	int_error(i, "missing filename or datablock");
 
     /* ===========================================================
     v923z: insertion for treating matrices 

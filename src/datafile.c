@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.222 2012/06/08 17:33:41 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.223 2012/06/13 00:18:15 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -143,6 +143,7 @@ static char *RCSid() { return RCSid("$Id: datafile.c,v 1.222 2012/06/08 17:33:41
  */
 
 #include "datafile.h"
+#include "datablock.h"
 
 #include "alloc.h"
 #include "axis.h"
@@ -278,6 +279,10 @@ static int line_count = 0;      /* line counter */
 static int df_pseudodata = 0;
 static int df_pseudorecord = 0;
 static int df_pseudospan = 0;
+
+/* for datablocks */
+static TBOOLEAN df_datablock = FALSE;
+static char **df_datablock_line = NULL;
 
 /* parsing stuff */
 struct use_spec_s use_spec[MAXDATACOLS];
@@ -601,6 +606,9 @@ df_gets()
     /* Special pseudofiles '+' and '++' return coords of sample */
     if (df_pseudodata)
 	return df_generate_pseudodata();
+
+    if (df_datablock)
+	return *(df_datablock_line++);
 
     if (!fgets(line, max_line_len, data_fp))
 	return NULL;
@@ -1010,6 +1018,8 @@ df_open(const char *cmd_filename, int max_using, struct curve_points *plot)
 
 	/* look for binary / matrix */
 	if (almost_equals(c_token, "bin$ary")) {
+	    if (df_filename[0] == '$')
+		int_error(c_token, "data blocks cannot be binary");
 	    c_token++;
 	    if (df_binary_file) {
 		duplication=TRUE;
@@ -1126,6 +1136,8 @@ df_open(const char *cmd_filename, int max_using, struct curve_points *plot)
     df_pseudodata = 0;
     df_pseudorecord = 0;
     df_pseudospan = 0;
+    df_datablock = FALSE;
+    df_datablock_line = NULL;
 
     /* here so it's not done for every line in df_readline */
     if (max_line_len < DATA_LINE_BUFSIZ) {
@@ -1157,6 +1169,9 @@ df_open(const char *cmd_filename, int max_using, struct curve_points *plot)
 	    df_pseudodata = 1;
 	else if (df_filename[1] == '+' && strlen(df_filename) == 2)
 	    df_pseudodata = 2;
+    } else if (df_filename[0] == '$') {
+	df_datablock = TRUE;
+	df_datablock_line = get_datablock(df_filename);
     } else {
 	/* filename cannot be static array! */
 	gp_expand_tilde(&df_filename);
@@ -1218,7 +1233,7 @@ df_close()
     /* paranoid - mark $n and column(n) as invalid */
     df_no_cols = 0;
 
-    if (!data_fp)
+    if (!data_fp && !df_datablock)
 	return;
 
     if (ydata_func.at) {
@@ -1241,7 +1256,7 @@ df_close()
 	}
     }
 
-    if (!mixed_data_fp) {
+    if (!mixed_data_fp && !df_datablock) {
 #if defined(PIPES)
 	if (df_pipe_open) {
 	    (void) pclose(data_fp);
@@ -1496,7 +1511,7 @@ void plot_ticlabel_using(int axis)
 int
 df_readline(double v[], int max)
 {
-    if (!data_fp && !df_pseudodata)
+    if (!data_fp && !df_pseudodata && !df_datablock)
 	return DF_EOF;
 
     if (df_read_binary)
@@ -1521,8 +1536,6 @@ df_readascii(double v[], int max)
 {
     char *s;
 
-    assert(data_fp != NULL || df_pseudodata);
-    assert(max_line_len);       /* alloc-ed in df_open() */
     assert(max <= MAXDATACOLS);
 
     /* catch attempt to read past EOF on mixed-input */
@@ -4205,7 +4218,6 @@ df_readbinary(double v[], int max)
     static int first_matrix_row_col_count;
     TBOOLEAN saved_first_matrix_column = FALSE;
 
-    assert(data_fp != NULL);
     assert(max <= MAXDATACOLS);
     assert(df_max_bininfo_cols > df_no_bin_cols);
     assert(df_no_bin_cols);

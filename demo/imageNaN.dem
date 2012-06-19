@@ -20,62 +20,41 @@ set yrange [-0.5:5.5]
 
 set datafile missing "?"
 set ytics ("-Inf" 5, "Inf" 4, "NaN" 3, "Junk" 2, "?" 1, "0" 0)
-unset xtics
-set xlabel "First column contains various odd values" offset 0,1
+set xtics 0
 
-set view map
-plot '-' matrix with image 
+# Define the test data as a named data block
+$matrixdata << EOD
 0    5 4 3 1 0
 ?    2 2 0 0 1
 Junk 1 2 3 4 5
 NaN  0 0 3 1 0
 Inf  3 2 0 2 3
 -Inf 0 1 2 4 3
-e
-e
+EOD
+
+set xlabel "First column contains various odd values" offset 0,1
+
+set view map
+plot $matrixdata matrix with image 
 
 pause -1 "Hit return to continue"
 #
 #
 set title "Same thing in failsafe mode (2D)"
 
-plot '-' matrix with image failsafe
-0    5 4 3 1 0
-?    2 2 0 0 1
-Junk 1 2 3 4 5
-NaN  0 0 3 1 0
-Inf  3 2 0 2 3
--Inf 0 1 2 4 3
-e
-e
+plot $matrixdata matrix with image failsafe
 
 pause -1 "Hit return to continue"
 
 set title "Same thing in 3D mode"
 
-splot '-' matrix with image
-0    5 4 3 1 0
-?    2 2 0 0 1
-Junk 1 2 3 4 5
-NaN  0 0 3 1 0
-Inf  3 2 0 2 3
--Inf 0 1 2 4 3
-e
-e
+splot $matrixdata matrix with image
 
 pause -1 "Hit return to continue"
 
 set title "Same thing in failsafe mode (3D)"
 
-splot '-' matrix with image failsafe
-0    5 4 3 1 0
-?    2 2 0 0 1
-Junk 1 2 3 4 5
-NaN  0 0 3 1 0
-Inf  3 2 0 2 3
--Inf 0 1 2 4 3
-e
-e
+splot $matrixdata matrix with image failsafe
 
 pause -1 "Hit return to continue"
 

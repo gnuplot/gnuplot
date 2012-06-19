@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: fit.c,v 1.80 2012/05/20 14:18:54 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: fit.c,v 1.81 2012/06/09 21:47:16 markisch Exp $"); }
 #endif
 
 /*  NOTICE: Change of Copyright Status
@@ -1268,9 +1268,11 @@ fit_command()
     token2 = c_token;
 
     /* get filename */
-    file_name = try_to_get_string();
-    if (!file_name)
-	int_error(c_token, "missing filename");
+    file_name = string_or_express(NULL);
+    if (file_name )
+	file_name = gp_strdup(file_name);
+    else
+	int_error(token2, "missing filename or datablock");
 
     /* use datafile module to parse the datafile and qualifiers */
     df_set_plot_mode(MODE_QUERY);  /* Does nothing except for binary datafiles */

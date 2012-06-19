@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.147 2012/04/17 21:07:48 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.148 2012/05/10 21:46:16 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -170,8 +170,11 @@ expand_call_arg(int c)
 	    return "";
 	else
 	    return call_args[ind];
-    } else
-	int_error(NO_CARET, "Invalid substitution $%c", c);
+    } else {
+	/* pass through unrecognized syntax elements that begin with $, e.g. datablock names */
+	sprintf(numstr, "$%c", c);
+	return numstr;
+    }
     return NULL; /* Avoid compiler warning */
 }
 

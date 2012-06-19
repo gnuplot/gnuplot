@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: tables.c,v 1.110 2011/11/10 05:15:58 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: tables.c,v 1.111 2012/06/13 20:12:59 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - tables.c */
@@ -37,6 +37,7 @@ static char *RCSid() { return RCSid("$Id: tables.c,v 1.110 2011/11/10 05:15:58 s
 #include "tables.h"
 
 #include "command.h"
+#include "datablock.h"
 #include "fit.h"
 #include "setshow.h"
 #include "term_api.h"
@@ -95,6 +96,7 @@ const struct gen_ftable command_ftbl[] =
     { "{", begin_clause },
     { "}", end_clause },
     { ";", null_command },
+    { "$", datablock_command },
     /* last key must be NULL */
     { NULL, invalid_command }
 };

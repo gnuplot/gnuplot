@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.235 2012/05/05 04:21:41 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.236 2012/05/06 22:21:25 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -74,6 +74,7 @@ static char *RCSid() { return RCSid("$Id: command.c,v 1.235 2012/05/05 04:21:41 
 #include "axis.h"
 
 #include "alloc.h"
+#include "datablock.h"
 #include "eval.h"
 #include "fit.h"
 #include "binary.h"
@@ -1546,6 +1547,14 @@ print_command()
     screen_ok = FALSE;
     do {
 	++c_token;
+	if (equals(c_token,"$") && isletter(c_token+1)) {
+	    char **line = get_datablock(parse_datablock_name());
+	    while (line && *line) {
+		fputs(*line, print_out);
+		line++;
+	    }
+	    continue;
+	}
 	const_express(&a);
 	if (a.type == STRING) {
 	    fputs(a.v.string_val, print_out);

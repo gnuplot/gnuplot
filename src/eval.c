@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: eval.c,v 1.100 2012/04/18 00:13:46 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: eval.c,v 1.101 2012/06/09 21:44:17 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - eval.c */
@@ -43,6 +43,7 @@ static char *RCSid() { return RCSid("$Id: eval.c,v 1.100 2012/04/18 00:13:46 sfe
 #include "syscfg.h"
 #include "alloc.h"
 #include "datafile.h"
+#include "datablock.h"
 #include "internal.h"
 #include "specfun.h"
 #include "standard.h"
@@ -713,6 +714,7 @@ del_udv_by_name(char *key, TBOOLEAN wildcard)
 	if (!wildcard && !strcmp(key, udv_ptr->udv_name)) {
 	    udv_ptr->udv_undef = TRUE;
 	    gpfree_string(&(udv_ptr->udv_value));
+	    gpfree_datablock(&(udv_ptr->udv_value));
 	    break;
 	}
 
@@ -720,6 +722,7 @@ del_udv_by_name(char *key, TBOOLEAN wildcard)
 	if ( wildcard && !strncmp(key, udv_ptr->udv_name, strlen(key)) ) {
 	    udv_ptr->udv_undef = TRUE;
 	    gpfree_string(&(udv_ptr->udv_value));
+	    gpfree_datablock(&(udv_ptr->udv_value));
 	    /* no break - keep looking! */
 	}
 

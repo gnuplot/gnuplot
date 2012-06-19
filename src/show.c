@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.270 2012/05/21 23:15:18 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.271 2012/06/13 20:12:59 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -3302,6 +3302,16 @@ disp_value(FILE *fp, struct value *val, TBOOLEAN need_quotes)
 		fprintf(fp, "%s", val->v.string_val);
 	}
 	break;
+    case DATABLOCK:
+	{
+	char **dataline = val->v.data_array;
+	int nlines = 0;
+	if (dataline)
+	    while (*dataline++)
+		nlines++;
+	fprintf(fp, "<%d line data block>", nlines);
+	break;
+	}
     default:
 	int_error(NO_CARET, "unknown type in disp_value()");
     }
