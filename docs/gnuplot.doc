@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.737 2012/06/13 20:12:59 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.738 2012/06/15 12:45:27 broeker Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -466,7 +466,7 @@ C
  Text fields can be positioned within a 2-D or 3-D plot using the commands:
 
    plot 'datafile' using 1:2:4 with labels
-   splot 'datafile using 1:2:3:4 with labels
+   splot 'datafile' using 1:2:3:4 with labels
 
  A column of text data can also be used to label the ticmarks along one or more
  of the plot axes. The example below plots a line through a series of points
