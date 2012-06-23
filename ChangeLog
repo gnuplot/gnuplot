@@ -1,3 +1,9 @@
+2012-06-23  Jérôme lodewyck  <lodewyck@users.sourceforge.net>
+
+	* configure.in src/Makefile.am src/qtterminal/qt_term.cpp
+	src/qtterminal/qt_term_mac.m: Proper handling of the qt terminal dock
+	icons on Mac OS
+
 2012-06-19  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/datablock.c src/datablock.h:  New files
