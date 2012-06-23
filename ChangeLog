@@ -1,3 +1,13 @@
+2012-06-23  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* demo/approximate.dem demo/cities.dem demo/enhanced-utf8.dem
+	demo/epslatex.dem demo/fontfile.dem demo/fontfile_latex.dem
+	demo/hypertext.dem demo/transparent.dem demo/utf8.dem:
+	Restore original encoding.
+
+	* src/set.c (set_encoding): Allow string valued variables as
+	parameters.
+
 2012-06-23  Jérôme lodewyck  <lodewyck@users.sourceforge.net>
 
 	* configure.in src/Makefile.am src/qtterminal/qt_term.cpp

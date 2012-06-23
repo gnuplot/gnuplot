@@ -16,6 +16,7 @@ label3 = "x - {x^3}/3! + {x^5}/5! - {x^7}/7!"
 
 #
 set termoption enhanced
+save_encoding = GPVAL_ENCODING
 set encoding utf8
 #
 set title "Polynomial approximation of sin(x)"
@@ -33,4 +34,5 @@ plot '+' using 1:(sin($1)):(approx_1($1)) with filledcurve title label1 lt 3, \
 
 pause -1 "Hit return to continue"
 
+set encoding save_encoding
 reset

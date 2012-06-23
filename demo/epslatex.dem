@@ -1,5 +1,5 @@
 #
-# $Id: epslatex.dem,v 1.1 2005/02/09 11:43:06 mikulik Exp $
+# $Id: epslatex.dem,v 1.2 2005/08/08 09:13:02 mikulik Exp $
 #
 # This file demonstrates new features in gnuplot 4.1
 print "\n This file demonstrates how to use the epslatex terminal."
@@ -23,6 +23,7 @@ unset autoscale
 set xr [xmin:xmax]
 set yr [ymin:ymax]
 #
+save_encoding = GPVAL_ENCODING
 set encoding iso_8859_1
 set format x '$%g$'
 set format y '$%.1f$'
@@ -61,4 +62,5 @@ print " and have a look at epslatex.pdf."
 print " Do the same with epslatex-oldstyle.tex."
 #
 set terminal pop
+set encoding save_encoding
 reset

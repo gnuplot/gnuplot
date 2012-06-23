@@ -5,6 +5,8 @@
 #    Not all terminal types support transparency
 #    Assumes UTF-8 support for plot titles
 #
+save_encoding = GPVAL_ENCODING
+set encoding utf8
 set style fill solid 1.0 noborder
 set style function filledcurves y1=0
 set clip two
@@ -49,3 +51,5 @@ set title "Transparent pattern-filled curves"
 replot
 
 pause -1 "Hit return to continue"
+set encoding save_encoding
+reset
