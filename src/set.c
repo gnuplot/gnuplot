@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.371 2012/05/21 23:15:18 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.372 2012/06/13 20:12:59 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -1393,6 +1393,15 @@ set_encoding()
 #endif
     } else {
 	int temp = lookup_table(&set_encoding_tbl[0],c_token);
+
+	/* allow string variables as parameter */
+	if ((temp == S_ENC_INVALID) && isstringvalue(c_token)) {
+	    int i;
+	    char *senc = try_to_get_string();
+	    for (i = 0; encoding_names[i] != NULL; i++)
+		if (strcmp(encoding_names[i], senc) == 0)
+		    temp = i;
+	}
 
 	if (temp == S_ENC_INVALID)
 	    int_error(c_token, "unrecognized encoding specification; see 'help encoding'.");
