@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.739 2012/06/19 15:03:09 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.740 2012/06/19 18:11:05 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -4148,10 +4148,10 @@ Ffigure_mapcontours
  should be deleted or renamed as desired. By using the command
  `set fit logfile`, the name of the log file can be changed.
 
- If gnuplot was built with this option, and you activated it using `set fit
- errorvariables`, the error for each fitted parameter will be stored in
- a variable named like the parameter, but with "_err" appended.  Thus the
- errors can be used as input for further computations.
+ If activated by using `set fit errorvariables`, the error for each fitted
+ parameter will be stored in a variable named like the parameter, but with
+ "_err" appended.  Thus the errors can be used as input for further
+ computations.
 
  The fit may be interrupted by pressing Ctrl-C.
  After the current iteration completes, you have the option to
@@ -7921,7 +7921,8 @@ Ffigure_missing
         plot 'datafile' using 1:2, f(x)
 
  If the `errorscaling` option is specified, which is the default, the
- calculated parameter errors are scaled with the reduced chi square. This is equivalent to providing data errors equal to the calculated standard
+ calculated parameter errors are scaled with the reduced chi square.  This is
+ equivalent to providing data errors equal to the calculated standard
  deviation of the fit (FIT_STDFIT) resulting in a reduced chi square of one.
  With the `noerrorscaling` option the estimated errors are the unscaled
  standard deviations of the fit parameters.
