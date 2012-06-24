@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: win.trm,v 1.109 2012/05/23 17:18:34 markisch Exp $
+ * $Id: win.trm,v 1.110 2012/05/23 17:27:34 markisch Exp $
  */
 
 /* GNUPLOT - win.trm */
@@ -125,7 +125,8 @@ TERM_PUBLIC void WIN_hypertext __PROTO((int type, const char * text));
 enum WIN_id { WIN_DEFAULT, WIN_MONOCHROME, WIN_COLOR, WIN_GTITLE,
 	      WIN_ENHANCED, WIN_NOENHANCED, WIN_FONT, WIN_SIZE,
 	      WIN_POSITION, WIN_CLOSE, WIN_BACKGROUND, WIN_FONTSCALE,
-	      WIN_LINEWIDTH, WIN_SOLID, WIN_DASHED, WIN_OTHER };
+	      WIN_LINEWIDTH, WIN_SOLID, WIN_DASHED, WIN_ROUND, WIN_BUTT,
+	      WIN_OTHER };
 
 static struct gen_table WIN_opts[] =
 {
@@ -136,6 +137,8 @@ static struct gen_table WIN_opts[] =
     { "backg$round", WIN_BACKGROUND },
     { "solid", WIN_SOLID },
     { "dash$ed", WIN_DASHED },
+    { "round$ed", WIN_ROUND },
+    { "butt", WIN_BUTT },
     { "enh$anced", WIN_ENHANCED },
     { "noenh$anced", WIN_NOENHANCED },
     { "font", WIN_FONT },
@@ -164,7 +167,8 @@ WIN_options()
 	TBOOLEAN set_background = FALSE, set_fontscale = FALSE;
 	TBOOLEAN set_linewidth = FALSE, set_size = FALSE;
 	TBOOLEAN set_position = FALSE, set_number = FALSE;
-	TBOOLEAN color, dashed;
+	TBOOLEAN set_rounded = FALSE;
+	TBOOLEAN color, dashed, rounded;
 	COLORREF background;
 	double fontscale, linewidth;
 	int win_x = 0;
@@ -181,12 +185,14 @@ WIN_options()
 		case WIN_DEFAULT:
 			color = TRUE;
 			dashed = FALSE;
+			rounded = FALSE;
 			strcpy(fontname, WIN_inifontname);
 			fontsize = WIN_inifontsize;
 			fontscale = linewidth = 1;
 			set_color = set_dashed = TRUE;
 			set_font = set_fontsize = TRUE;
 			set_fontscale = set_linewidth = TRUE;
+			set_rounded = TRUE;
 			c_token++;
 			break;
 		case WIN_COLOR:
@@ -242,6 +248,16 @@ WIN_options()
 			c_token++;
 			dashed = TRUE;
 			set_dashed = TRUE;
+			break;
+		case WIN_BUTT:
+			c_token++;
+			rounded = FALSE;
+			set_rounded = TRUE;
+			break;
+		case WIN_ROUND:
+			c_token++;
+			rounded = TRUE;
+			set_rounded = TRUE;
 			break;
 		case WIN_SIZE: {
 			c_token++;
@@ -345,6 +361,8 @@ WIN_options()
 	}
 	if (set_dashed)
 		graphwin->dashed = dashed;
+	if (set_rounded)
+		graphwin->rounded = rounded;
 	if (set_background)
 		graphwin->background = background;
 	if (set_fontscale)
@@ -399,6 +417,7 @@ WIN_update_options()
 		graphwin->Id,
 		graphwin->color ? "color" : "monochrome",
 		graphwin->dashed ? "dashed" : "solid",
+		graphwin->rounded ? "rounded" : "butt",
 		term->flags & TERM_ENHANCED_TEXT ? "enhanced" : "noenhanced");
 
 	set_fontsize = (graphwin->deffontsize != WIN_inifontsize);
@@ -904,6 +923,7 @@ START_HELP(windows)
 "       set terminal windows {<n>}",
 "                            {color | monochrome}",
 "                            {solid | dashed}",
+"                            {rounded | butt}",
 "                            {enhanced | noenhanced}",
 "                            {font <fontspec>}",
 "                            {fontscale <scale>}",
@@ -920,6 +940,8 @@ START_HELP(windows)
 " `color` and `monochrome` select colored or mono output,",
 " `dashed` and `solid` select dashed or solid lines. Note that `color`",
 " defaults to `solid`, whereas `monochrome` defaults to `dashed`.",
+" `rounded` sets line caps and line joins to be rounded; `butt` is the",
+" default, butt caps and mitered joins.",
 " `enhanced` enables enhanced text mode features (subscripts,",
 " superscripts and mixed fonts, see `enhanced text` for more information).",
 " `<fontspec>` is in the format \"<fontface>,<fontsize>\", where \"<fontface>\"",

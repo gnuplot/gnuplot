@@ -1,3 +1,8 @@
+2012-06-24  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/win/wgraph.c (draw_new_pens) src/win/wgnuplib.h (struct GW)
+	term/win.trm (WIN_options): Terminal option "rounded|butt".
+
 2012-06-23  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* demo/approximate.dem demo/cities.dem demo/enhanced-utf8.dem

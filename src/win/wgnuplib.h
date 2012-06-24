@@ -1,5 +1,5 @@
 /*
- * $Id: wgnuplib.h,v 1.55 2012/05/20 20:58:52 markisch Exp $
+ * $Id: wgnuplib.h,v 1.56 2012/05/23 17:27:34 markisch Exp $
  */
 
 /* GNUPLOT - win/wgnuplib.h */
@@ -329,6 +329,7 @@ typedef struct tagGW {
 	BOOL	graphtotop;	/* bring graph window to top after every plot? */
 	BOOL	color;		/* color pens? */
 	BOOL	dashed;		/* dashed lines? */
+	BOOL	rounded;	/* rounded line caps and joins? */
 	BOOL	doublebuffer;	/* double buffering? */
 	BOOL	oversample;	/* oversampling? */
 	BOOL	antialiasing;

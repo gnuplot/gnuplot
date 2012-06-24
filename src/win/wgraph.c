@@ -1,5 +1,5 @@
 /*
- * $Id: wgraph.c,v 1.150 2012/05/24 18:51:31 markisch Exp $
+ * $Id: wgraph.c,v 1.151 2012/06/13 09:24:12 markisch Exp $
  */
 
 /* GNUPLOT - win/wgraph.c */
@@ -736,7 +736,7 @@ MakePens(LPGW lpgw, HDC hdc)
 	int i;
 	LOGPEN pen;
 
-	if ((GetDeviceCaps(hdc,NUMCOLORS) == 2) || !lpgw->color) {
+	if ((GetDeviceCaps(hdc, NUMCOLORS) == 2) || !lpgw->color) {
 		pen = lpgw->monopen[1];
 		pen.lopnWidth.x *= lpgw->linewidth * lpgw->sampling;
 		lpgw->hapen = CreatePenIndirect(&pen); 	/* axis */
@@ -1373,10 +1373,12 @@ draw_new_pens(LPGW lpgw, HDC hdc, LOGPEN cur_penstruct)
 		lb.lbStyle = BS_SOLID;
 		lb.lbColor = cur_penstruct.lopnColor;
 		lpgw->hapen = ExtCreatePen(
-			PS_GEOMETRIC | cur_penstruct.lopnStyle | PS_ENDCAP_FLAT | PS_JOIN_BEVEL,
+			PS_GEOMETRIC | cur_penstruct.lopnStyle |
+			(lpgw->rounded ? PS_ENDCAP_ROUND | PS_JOIN_ROUND : PS_ENDCAP_SQUARE | PS_JOIN_MITER),
 			cur_penstruct.lopnWidth.x, &lb, 0, 0);
 		lpgw->hsolid = ExtCreatePen(
-			PS_GEOMETRIC | PS_SOLID | PS_ENDCAP_FLAT | PS_JOIN_BEVEL,
+			PS_GEOMETRIC | PS_SOLID |
+			(lpgw->rounded ? PS_ENDCAP_ROUND | PS_JOIN_ROUND : PS_ENDCAP_SQUARE | PS_JOIN_MITER),
 			cur_penstruct.lopnWidth.x, &lb, 0, 0);
 	}
 
@@ -2041,7 +2043,7 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 			break;
 		}
 
-		case W_filled_polygon_draw:	{
+		case W_filled_polygon_draw: {
 			/* end of point series --> draw polygon now */
 			if (!transparent) {
 #ifdef HAVE_GDIPLUS
@@ -2154,7 +2156,7 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 					}
 				}
 
-				/* copy to device with alpa blending */
+				/* copy to device with alpha blending */
 				ftn.BlendOp = AC_SRC_OVER;
 				ftn.BlendFlags = 0;
 				ftn.AlphaFormat = AC_SRC_ALPHA; /* bitmap has an alpha channel */
