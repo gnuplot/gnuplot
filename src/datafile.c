@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.212.2.5 2012/06/08 17:32:55 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.212.2.6 2012/06/13 00:18:53 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -1436,6 +1436,7 @@ plot_option_using(int max_using)
 		/* ...using "A"... Dummy up a call to column(column_label) */
 		use_spec[df_no_use_specs].at = create_call_column_at(column_label);
 		use_spec[df_no_use_specs++].column = NO_COLUMN_HEADER;
+		parse_1st_row_as_headers = TRUE;
 		fast_columns = 0;
 
 	    } else {
