@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.264 2012/05/31 21:26:05 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.265 2012/06/02 04:43:51 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -1989,6 +1989,7 @@ eval_plots()
 			duplication=TRUE;
 			break;
 		    }
+		    set_title = TRUE;
 		    this_plot->title_no_enhanced = !key->enhanced;
 			/* title can be enhanced if not explicitly disabled */
 		    if (parametric) {
@@ -2004,13 +2005,24 @@ eval_plots()
 		    if (almost_equals(c_token,"col$umnheader")
 		    && !(equals(c_token,"columnhead") && equals(c_token+1,"(")) ) {
 			df_set_key_title_columnhead(this_plot);
+		    } else if (equals(c_token,"at")) {
+			set_title = FALSE;
 		    } else {
 			evaluate_inside_using = TRUE;
 			if (!(this_plot->title = try_to_get_string()))
 			    int_error(c_token, "expecting \"title\" for plot");
 			evaluate_inside_using = FALSE; 
 		    }
-		    set_title = TRUE;
+		    if (equals(c_token,"at")) {
+			c_token++;
+			if (equals(c_token,"end"))
+			    this_plot->title_position = 1;
+			else if (almost_equals(c_token,"beg$inning"))
+			    this_plot->title_position = -1;
+			else
+			    int_error(c_token, "expecting \"at beginning\" or \"at end\"");
+			c_token++;
+		    }
 		    continue;
 		}
 

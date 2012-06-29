@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.740 2012/06/19 18:11:05 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.741 2012/06/23 08:33:29 markisch Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -6249,6 +6249,7 @@ Ffigure_mapcontours
  Syntax:
        title <text> | notitle [<ignored text>]
        title columnheader | title columnheader(N)
+             {at {beginning|end}}
 
  where <text> is a quoted string or an expression that evaluates to a string.
  The quotes will not be shown in the key.
@@ -6271,6 +6272,11 @@ Ffigure_mapcontours
  The layout of the key itself (position, title justification, etc.) can be
  controlled by `set key`.  Please see `set key` for details.
 
+ If you want the title of a plotted line to be placed immediately before or
+ after that line in the graph itself, use `at {beginning|end}`.  This option
+ may be useful when plotting `with lines` but makes little sense for some
+ other plot styles.
+
  Examples:
 
  This plots y=x with the title 'x':
@@ -6283,8 +6289,12 @@ Ffigure_mapcontours
  This puts an untitled circular border around a polar graph:
        set polar; plot my_function(t), 1 notitle
 
- Plot multiple columns of data, each of which contains its own title in the file
-       plot for [i=1:4] 'data' using i title columnhead
+ Plot multiple columns of data, each of which contains its own title on the
+ first line of the file.  Place the titles after the corresponding lines rather
+ than in a separate key:
+       unset key
+       set offset 0, graph 0.1
+       plot for [i=1:4] 'data' using i with lines title columnhead at end 
 
 3 with
 ?commands plot with
@@ -8573,39 +8583,32 @@ Ffigure_missing
 ?key
 ?nokey
 ?legend
- The `set key` command enables a key (or legend) describing plots on a plot.
-
- The contents of the key, i.e., the names given to each plotted data set and
- function and samples of the lines and/or symbols used to represent them, are
- determined by the `title` and `with` options of the {`s`}`plot` command.
- Please see `plot title` and `plot with` for more information.
+ The `set key` command enables a key (or legend) containing a title and a
+ sample (line, point, box) for each plot in the graph. The key may be turned off
+ by requesting `set key off` or `unset key`.  Individual key entries may be
+ turned off by using the `notitle` keyword in the corresponding plot command.
+ The text of the titles is controlled by the `set key autotitle` option or by
+ the `title` keyword of individual `plot` and `splot` commands.
+ See `plot title` for more information.
 
  Syntax:
        set key {on|off} {default}
-               {{inside | outside} | {lmargin | rmargin | tmargin | bmargin}
-                 | {at <position>}}
-               {left | right | center} {top | bottom | center}
-               {vertical | horizontal} {Left | Right}
-               {{no}opaque}
-               {{no}reverse} {{no}invert}
-               {samplen <sample_length>} {spacing <vertical_spacing>}
-               {width <width_increment>}
-               {height <height_increment>}
-               {{no}autotitle {columnheader}}
-               {title "<text>"} {{no}enhanced}
-               {font "<face>,<size>"} {textcolor <colorspec>}
-               {{no}box { {linestyle | ls <line_style>}
-                          | {linetype | lt <line_type>}
-                            {linewidth | lw <line_width>}}}
-               {maxcols {<max no. of columns> | auto}}
-               {maxrows {<max no. of rows> | auto}}
+             {{inside | outside} | {lmargin | rmargin | tmargin | bmargin}
+               | {at <position>}}
+             {left | right | center} {top | bottom | center}
+             {vertical | horizontal} {Left | Right}
+             {{no}opaque}
+             {{no}reverse} {{no}invert}
+             {samplen <sample_length>} {spacing <vertical_spacing>}
+             {width <width_increment>} {height <height_increment>}
+             {{no}autotitle {columnheader}}
+             {title "<text>"} {{no}enhanced}
+             {font "<face>,<size>"} {textcolor <colorspec>}
+             {{no}box {linestyle <style> | linetype <type> | linewidth <width>}}
+             {maxcols {<max no. of columns> | auto}}
+             {maxrows {<max no. of rows> | auto}}
        unset key
        show key
-
- The key contains a title and a sample (line, point, box) for each plot
- in the graph. The key may be turned off by requesting `set key off` or
- `unset key`.  Individual key entries may be turned off by using the
- `notitle` keyword in the corresponding plot command.
 
  Elements within the key are stacked according to `vertical` or `horizontal`.
  In the case of `vertical`, the key occupies as few columns as possible.  That

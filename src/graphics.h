@@ -1,5 +1,5 @@
 /*
- * $Id: graphics.h,v 1.52 2011/10/10 21:17:04 juhaszp Exp $
+ * $Id: graphics.h,v 1.53 2011/12/29 06:29:31 sfeam Exp $
  */
 
 /* GNUPLOT - graphics.h */
@@ -51,6 +51,7 @@ typedef struct curve_points {
     enum PLOT_TYPE plot_type;	/* DATA2D? DATA3D? FUNC2D FUNC3D? NODATA? */
     enum PLOT_STYLE plot_style;	/* style set by "with" or by default */
     char *title;		/* plot title, a.k.a. key entry */
+    int title_position;		/* -1 for beginning; +1 for end */
     TBOOLEAN title_no_enhanced;	/* don't typeset title in enhanced mode */
     TBOOLEAN title_is_filename;	/* TRUE if title was auto-generated from filename */
     TBOOLEAN title_is_suppressed;/* TRUE if 'notitle' was specified */

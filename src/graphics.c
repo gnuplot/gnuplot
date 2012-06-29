@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.395 2012/05/17 05:03:17 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.396 2012/06/13 20:12:59 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -165,7 +165,8 @@ static int find_maxl_keys __PROTO((struct curve_points *plots, int count, int *k
 
 static void do_key_layout __PROTO((legend_key *key, TBOOLEAN key_pass, int *xl, int *yl));
 static void do_key_sample __PROTO((struct curve_points *this_plot, legend_key *key,
-				   char *title,  struct termentry *t, int xl, int yl));
+				   char *title,  int xl, int yl));
+static void attach_title_to_plot __PROTO((struct curve_points *this_plot, legend_key *key));
 
 static TBOOLEAN check_for_variable_color __PROTO((struct curve_points *plot, double *colorvalue));
 
@@ -1873,7 +1874,7 @@ do_plot(struct curve_points *plots, int pcount)
 			    lp_use_properties(&this_plot->lp_properties, key_entry->tag + 1);
 			else
 			    load_linetype(&this_plot->lp_properties, key_entry->tag + 1);
-			do_key_sample(this_plot, key, key_entry->text, t, xl, yl);
+			do_key_sample(this_plot, key, key_entry->text, xl, yl);
 		    }
 		    if (++key_count >= key_rows) {
 			yl = yl_ref;
@@ -1898,7 +1899,7 @@ do_plot(struct curve_points *plots, int pcount)
 		key_count++;
 		if (key->invert)
 		    yl = key->bounds.ybot + yl_ref + key_entry_height/2 - yl;
-		do_key_sample(this_plot, key, this_plot->title, t, xl, yl);
+		do_key_sample(this_plot, key, this_plot->title, xl, yl);
 	    }
 	    ignore_enhanced(FALSE);
 	}
@@ -2086,6 +2087,10 @@ do_plot(struct curve_points *plots, int pcount)
 	    } else
 		yl = yl - key_entry_height;
 	}
+
+	/* Option to label the end of the curve on the plot itself */
+	if (this_plot->title_position)
+	    attach_title_to_plot(this_plot, key);
 
 	/* Sync point for end of this curve (used by svg, post, ...) */
 	(term->layer)(TERM_LAYER_AFTER_PLOT);
@@ -5706,9 +5711,10 @@ do_key_sample(
     struct curve_points *this_plot,
     legend_key *key,
     char *title,
-    struct termentry *t,
     int xl, int yl)
 {
+    struct termentry *t = term;
+
     /* Clip key box against canvas */
     BoundingBox *clip_save = clip_area;
     if (term->flags & TERM_CAN_CLIP)
@@ -5833,6 +5839,33 @@ do_key_sample(
 
     /* Restore previous clipping area */
     clip_area = clip_save;
+}
+
+/* 
+ * Label the curve by placing its title at one end of the curve.
+ * This option is independent of the plot key, but uses the same
+ * color/font/text options controlled by "set key".
+ */
+static void
+attach_title_to_plot(struct curve_points *this_plot, legend_key *key)
+{
+    struct termentry *t = term;
+    int index = (this_plot->title_position > 0) ? this_plot->p_count-1 : 0;
+    int x = map_x(this_plot->points[index].x);
+    int y = map_y(this_plot->points[index].y);
+
+    if (key->textcolor.type == TC_VARIABLE)
+	/* Draw key text in same color as plot */
+	;
+    else if (key->textcolor.type != TC_DEFAULT)
+	/* Draw key text in same color as key title */
+	apply_pm3dcolor(&key->textcolor, t);
+    else
+	/* Draw key text in black */
+	(*t->linetype)(LT_BLACK);
+
+    write_multiline(x, y, this_plot->title, 
+    	(this_plot->title_position > 0) ? LEFT : RIGHT, JUST_TOP, 0, key->font);
 }
 
 #ifdef EAM_OBJECTS

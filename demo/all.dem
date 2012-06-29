@@ -1,5 +1,5 @@
 #
-# $Id: all.dem,v 1.44 2011/10/03 00:17:21 sfeam Exp $
+# $Id: all.dem,v 1.45 2012/04/08 17:45:40 sfeam Exp $
 #
 # Executes ALL demos in this directory, in functionality order.
 #
@@ -245,6 +245,10 @@ reset
 
 print "********************** file key.dem *********************"
 load "key.dem"
+reset
+
+print "********************** file nokey.dem *********************"
+load "nokey.dem"
 reset
 
 print "********************** file borders.dem *********************"

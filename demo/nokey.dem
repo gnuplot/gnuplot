@@ -1,0 +1,14 @@
+set title "Position plot titles at the end of the corresponding curve\nrather than in a separate key"
+set auto fix
+unset key
+set rmargin at screen 0.8
+set datafile sep '\t'
+set xtics nomirror scale 0
+set ytics nomirror
+set border 3 lw 2
+set style data lines
+plot for [N=6:10] 'immigration.dat' u 1:N lw 2 title columnhead at end
+
+pause -1 "Hit return to continue"
+
+reset

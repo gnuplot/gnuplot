@@ -1,5 +1,5 @@
 /*
- * $Id: graph3d.h,v 1.41 2011/07/25 06:51:29 sfeam Exp $
+ * $Id: graph3d.h,v 1.42 2012/06/13 20:12:59 sfeam Exp $
  */
 
 /* GNUPLOT - graph3d.h */
@@ -97,6 +97,7 @@ typedef struct surface_points {
     enum PLOT_TYPE plot_type;	/* DATA2D? DATA3D? FUNC2D FUNC3D? NODATA? */
     enum PLOT_STYLE plot_style;	/* style set by "with" or by default */
     char *title;		/* plot title, a.k.a. key entry */
+    int title_position;		/* -1 for beginning; +1 for end */
     TBOOLEAN title_no_enhanced;	/* don't typeset title in enhanced mode */
     TBOOLEAN title_is_filename;	/* not used in 3D */
     TBOOLEAN title_is_suppressed;/* TRUE if 'notitle' was specified */

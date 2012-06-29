@@ -1,3 +1,14 @@
+2012-06-29  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/graphics.h src/graph3d.h src/graphics.c src/plot2d.c:
+	New modifier for the `title` keyword in plot commands.
+	`title ... at {beginning|end}` writes the plot title on the graph
+	itself, immediately next to the corresponding plot. This is independent
+	of the normal key.
+
+	* docs/gnuplog.doc demo/nokey.dem demo/all.dem:
+	Document new option and provide a demo.
+
 2012-06-24  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/datafile.c:  plot ... using "a":"b" was not setting the 
