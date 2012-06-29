@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.255.2.4 2012/04/09 04:25:37 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.255.2.5 2012/06/02 04:43:38 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -2683,11 +2683,17 @@ eval_plots()
 			t_step = (t_max - t_min) / (samples_1 - 1);
 		    }
 		    for (i = 0; i < samples_1; i++) {
-			double temp;
+			double x, temp;
 			struct value a;
 			double t = t_min + i * t_step;
+
+			/* Zero is often a special point in a function domain.	*/
+			/* Make sure we don't miss it due to round-off error.	*/
+			if ((fabs(t) < 1.e-9) && (fabs(t_step) > 1.e-6))
+			    t = 0.0;
+
 			/* parametric/polar => NOT a log quantity */
-			double x = (!parametric && !polar)
+			x = (!parametric && !polar)
 			    ? AXIS_DE_LOG_VALUE(x_axis, t) : t;
 
 			(void) Gcomplex(&plot_func.dummy_values[0], x, 0.0);

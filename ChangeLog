@@ -1,3 +1,9 @@
+2012-06-29  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/plot2d.c (eval_plots):  Zero is often a special point in a
+	function domain.  Make sure we don't miss it due to round-off error.
+	Bug #3519079
+
 2012-06-24  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/datafile.c:  plot ... using "a":"b" was not setting the 
