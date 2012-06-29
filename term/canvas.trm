@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: canvas.trm,v 1.60 2012/05/05 16:54:36 sfeam Exp $
+ * $Id: canvas.trm,v 1.61 2012/05/21 23:15:18 sfeam Exp $
  *
  */
 
@@ -993,6 +993,13 @@ CANVAS_put_text(unsigned int x, unsigned int y, const char *str)
 	return;
 
     CANVAS_finish();
+
+    /* ctx.fillText uses fillStyle rather than strokeStyle */
+    if (strcmp(canvas_state.previous_fill, canvas_state.color)) {
+	fprintf(gpoutfile, "ctx.fillStyle = \"%s\";\n", canvas_state.color);
+	strcpy(canvas_state.previous_fill, canvas_state.color);
+    }
+
     if (0 != canvas_text_angle) {
 	fprintf(gpoutfile,
 		"TR(%d,%d,%d,%.1f,\"%s\",\"",
@@ -1363,6 +1370,12 @@ ENHCANVAS_put_text(unsigned int x, unsigned int y, const char *str)
     if (ignore_enhanced_text || !strpbrk(str, "{}^_@&~")) {
 	CANVAS_put_text(x, y, str);
 	return;
+    }
+
+    /* ctx.fillText uses fillStyle rather than strokeStyle */
+    if (strcmp(canvas_state.previous_fill, canvas_state.color)) {
+	fprintf(gpoutfile, "ctx.fillStyle = \"%s\";\n", canvas_state.color);
+	strcpy(canvas_state.previous_fill, canvas_state.color);
     }
 
     CANVAS_move(x,y);

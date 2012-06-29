@@ -1,5 +1,7 @@
 2012-06-29  Ethan A Merritt  <merritt@u.washington.edu>
 
+	* term/canvas.trm: ctx.fillText() uses fillStyle rather than strokeStyle
+
 	* src/graphics.h src/graph3d.h src/graphics.c src/plot2d.c:
 	New modifier for the `title` keyword in plot commands.
 	`title ... at {beginning|end}` writes the plot title on the graph
