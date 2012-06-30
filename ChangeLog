@@ -1,5 +1,14 @@
 2012-06-30  Bastian Maerkisch  <bmaerkisch@web.de>
 
+	* src/win/grpicon.ico:  Icon with more color depths and resolutions,
+	derived on Mojca Miklavec's SVG icon, see patch #3469808.
+
+	Store icons in CVS in binary format.
+	* src/win/grpicon.ico src/win/texticon.ico:  New files.
+	* config/cygwin/Makefile config/mingw/Makefile config/msvc/Makefile
+	config/watcom/Makefile src/win/wgnuplot.rc:  Binary icons.
+	* src/win/geticon.c:  Removed.
+
 	* config/makefile.nt:  Superseded by msvc/Makefile. Removed.
 
 	Eliminate some compiler warnings.
@@ -21,6 +30,8 @@
 	* src/wxt/gpcairo.c (gp_cairo_convert, gp_cairo_create_layout):  Match
 	prototypes.
 	* src/wxt/wxt_gui.cpp (wxt_cairo_draw_hypertext):  Fix memory leak.
+
+	* src/tables.c (num_predefined_colors):  Off by one.
 
 	* src/win/wgdiplus.cpp (gdiplusCreatePen):  Use square line ends and
 	miter line joins.
