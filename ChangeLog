@@ -1,5 +1,7 @@
 2012-06-30  Bastian Maerkisch  <bmaerkisch@web.de>
 
+	* config/makefile.nt:  Superseded by msvc/Makefile. Removed.
+
 	Eliminate some compiler warnings.
 	* src/axis.c (load_one_range):  Make static and add prototype.
 	* src/bitmap.c (b_boxfill):  Remove unused variable.
