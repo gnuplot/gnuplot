@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: tables.c,v 1.111 2012/06/13 20:12:59 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: tables.c,v 1.112 2012/06/19 18:11:06 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - tables.c */
@@ -625,7 +625,7 @@ struct gen_table default_color_names_tbl[] =
 struct gen_table *pm3d_color_names_tbl = default_color_names_tbl;
 struct gen_table *user_color_names_tbl = NULL;
 const int num_predefined_colors = sizeof(default_color_names_tbl)
-				/ sizeof(struct gen_table);
+				/ sizeof(struct gen_table) - 1;
 int num_userdefined_colors = 0;
 
 
