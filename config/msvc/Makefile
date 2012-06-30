@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.6 2012/01/14 13:34:25 markisch Exp $
+# $Id: Makefile,v 1.7 2012/06/13 10:58:56 markisch Exp $
 #
 # GNUPLOT Makefile Microsoft Visual C++ 2005 or newer
 
@@ -196,7 +196,7 @@ $(OBJS): config.h
 config.h: $(TOP)\config\config.nt
 	copy $(TOP)\config\config.nt config.h
 
-wgnuplot.exe: $(OBJS) $(WINOBJS) wgnuplot.res linkopt-w.msw texticon.ico grpicon.ico
+wgnuplot.exe: $(OBJS) $(WINOBJS) wgnuplot.res linkopt-w.msw
 	$(LD) /subsystem:windows $(LDFLAGS) /map:wgnuplot.map /out:$@ @linkopt-w.msw
 !IF "$(GDLIB)" == "1"
 	copy $(GDDIR)\bin\*.dll .
@@ -205,7 +205,7 @@ wgnuplot.exe: $(OBJS) $(WINOBJS) wgnuplot.res linkopt-w.msw texticon.ico grpicon
 	copy $(LUADIR)\*.dll .
 !ENDIF
 
-gnuplot.exe: $(ALL_CONSOLE_OBJS) wgnuplot.res linkopt-c.msw texticon.ico grpicon.ico
+gnuplot.exe: $(ALL_CONSOLE_OBJS) wgnuplot.res linkopt-c.msw
 	$(LD) /subsystem:console $(LDFLAGS) /map:wgnuplot.map /out:$@ @linkopt-c.msw
 !IF "$(GDLIB)" == "1"
 	copy $(GDDIR)\bin\*.dll .
@@ -278,17 +278,8 @@ winmain.cobj: $(W)winmain.c $(W)wgnuplib.h $(W)wtext.h $(S)\plot.h
 wgnuplot.mnu: $(W)wgnuplot.mnu
 	copy $(W)wgnuplot.mnu wgnuplot.mnu
 
-wgnuplot.res :  $(W)wgnuplot.rc $(W)wgnuplib.rc $(W)wresourc.h texticon.ico grpicon.ico
-	$(RC) /l 0x409 /fowgnuplot.res /I $(W) /d "NDEBUG" /d WIN32 /d MSRC /d NO_MANIFEST $(W)wgnuplot.rc
-
-# extract icons from wgnuplot.rc
-texticon.ico: grpicon.ico
-
-grpicon.ico: geticon.exe $(W)wgnuplot.rc
-	geticon $(W)wgnuplot.rc
-
-geticon.exe: $(W)geticon.c
-	$(CC) /DMSDOS /F 5000 /W1 $(W)geticon.c
+wgnuplot.res :  $(W)wgnuplot.rc $(W)wgnuplib.rc $(W)wresourc.h $(W)grpicon.ico $(W)texticon.ico
+	$(RC) /l 0x409 /fowgnuplot.res /I $(W) /d "NDEBUG" /d WIN32 /d NO_MANIFEST $(W)wgnuplot.rc
 
 
 # build windows help file
@@ -330,15 +321,15 @@ dbinary.obj: $(S)\\binary.c
 clean:
 	if exist *.obj del *.obj
 	if exist *.cobj del *.cobj
-	if exist *.ico del *.ico
+	if exist *.map del *.map
 	if exist wgnuplot.res del wgnuplot.res
 	if exist gnuplot.rtf del gnuplot.rtf
+	if exist wgnuplot.chw del wgnuplot.chw
 	if exist $(M)bf_test.exe del $(M)bf_test.exe
 	if exist linkopt-w.msw del linkopt-w.msw
 	if exist linkopt-c.msw del linkopt-c.msw
 	if exist doc2html.exe del doc2html.exe
 	if exist doc2rtf.exe del doc2rtf.exe
-	if exist geticon.exe del geticon.exe
 	if exist gnuplot rmdir /s /q gnuplot
 
 veryclean: clean
@@ -348,6 +339,7 @@ veryclean: clean
 	if exist wgnuplot.mnu del wgnuplot.mnu
 	if exist pgnuplot.exe del pgnuplot.exe
 	if exist gnuplot.exe del gnuplot.exe
+	if exist *.manifest del *.manifest
 	if exist $(M)binary1 del $(M)binary1
 	if exist $(M)binary2 del $(M)binary2
 	if exist $(M)binary3 del $(M)binary3

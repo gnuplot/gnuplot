@@ -1,5 +1,5 @@
 # Hello, emacs: this is a -*- Makefile -*-
-# $Id: Makefile,v 1.24 2012/03/12 06:28:53 markisch Exp $
+# $Id: Makefile,v 1.25 2012/06/13 10:58:56 markisch Exp $
 #
 # GNUPLOT Makefile for MinGW/MSYS on Windows
 # This assumes usual installation of the MinGW32 toolkit, the free
@@ -391,13 +391,13 @@ ifdef GNU_RC
   # RC = d:/cygnus/cygwin-b20/H-i586-cygwin32/bin/windres
   RC  = $(GCCPATH)windres
   RCFLAGS = --include-dir=$(W) \
-	--define __WIN32__ --define __WIN95__ --define MSRC \
+	--define __WIN32__ --define __WIN95__ \
 	--define __GNUWIN32__ --use-temp-file
   RCOUT = wgplt_res.$(O)
   RES2COFF = echo wgplt_res.$(O)
 else
   RC = $(MSSDK)/bin/rc
-  RCFLAGS = -v -i$(MSSDK)/include -i$(W) -dWIN32 -dMSRC
+  RCFLAGS = -v -i$(MSSDK)/include -i$(W) -dWIN32
   RCOUT = -fowgnuplot.res
   RES2COFF = res2coff -i wgnuplot.res -o wgplt_res.$(O)
 endif
@@ -436,7 +436,7 @@ WINDOWS = makefile.nt README.win $(W)/wcommon.h \
 	$(W)/wgnuplib.c $(W)/wgnuplib.h $(W)/wgnuplib.rc \
 	$(W)/wgnuplot.hpj $(W)/wgnuplot.mnu $(W)/wgraph.c \
 	$(W)/winmain.c $(W)/wmenu.c $(W)/wpause.c $(W)/wprinter.c \
-	$(W)/wresourc.h $(W)/wtext.c $(W)/wtext.h $(W)/geticon.c \
+	$(W)/wresourc.h $(W)/wtext.c $(W)/wtext.h \
 	$(W)/screenbuf.c $(W)/screenbuf.h $(W)/wgdiplus.cpp $(W)/wgdiplus.h \
 	$(D)doc2rtf.c $(T)win.trm $(W)/grpicon.ico $(W)/texticon.ico
 
@@ -458,7 +458,7 @@ ifdef HTML_HELP
   LDFLAGS2 += -L$(HHWPATH)lib
 endif
 
-$(TARGET): $(OBJS) $(WINOBJS) wgplt_res.$(O) texticon.ico grpicon.ico
+$(TARGET): $(OBJS) $(WINOBJS) wgplt_res.$(O)
 	$(LDX) $(LDFLAGS) $(LDFLAGS2) -o $@ $(OBJS) $(WINOBJS) wgplt_res.$(O) $(LDLIBS)\
 	$(TERMLIBS) $(WX_LIBS) $(PANGOCAIRO_LIBS)
 
@@ -467,7 +467,7 @@ $(PGNUPLOT): $(W)/pgnuplot.c version.$(O)
 
 # rules
 
-wgplt_res.$(O) :  $(W)/wgnuplot.rc $(W)/wgnuplib.rc $(W)/wresourc.h texticon.ico grpicon.ico
+wgplt_res.$(O) :  $(W)/wgnuplot.rc $(W)/wgnuplib.rc $(W)/wresourc.h $(W)/texticon.ico $(W)/grpicon.ico
 	$(RC) $(RCFLAGS) $< $(RCOUT)
 	$(RES2COFF)
 
@@ -524,15 +524,6 @@ gp_cairo.$(O): $(S)/wxterminal/gp_cairo.c $(S)/wxterminal/gp_cairo.h
 
 gp_cairo_helpers.$(O): $(S)/wxterminal/gp_cairo_helpers.c $(S)/wxterminal/gp_cairo_helpers.h
 	$(CC) -c $(CFLAGS) $(CFLAGSEXTRA) -o $@ $<
-
-# extract icons from wgnuplot.rc
-texticon.ico: grpicon.ico
-
-grpicon.ico: geticon.exe $(W)/wgnuplot.rc
-	./geticon $(W)/wgnuplot.rc
-
-geticon.exe: $(W)/geticon.c
-	$(LD) $(LDFLAGS) -o $@ $<
 
 ifdef HTML_HELP
 # convert gnuplot.doc to windows/wgnuplot.html
@@ -735,14 +726,14 @@ clean:
 	$(RM) config.h wgnuplot.map wgnuplot.res $(W)/gnuplot.rtf
 	$(RM) *.$(O) *.po *.o *.co
 	$(RM) doc2*.exe $(W)/wgnuplib.res wgnuplib.map wgnuplot.lib
-	$(RM) $(M)bf_test.exe *.ico geticon.exe allterm.h allterm.c
+	$(RM) $(M)bf_test.exe allterm.h allterm.c
 	$(RM) *.aux *.log *.dvi *.toc
 	$(RM) gnuplot.tex gnuplot-figures.tex pdffigures.tex figure_*.pdf
 	$(RM) titlepag.tex toc_entr.sty VERSION
 	$(RM) eg?.tex eg?.eps linepoin.tex test.tex test_tikz.tex
 	$(RM) $(D)windows/wgnuplot.log $(D)windows/wgnuplot.hhc
 	$(RM) $(D)windows/*.png $(D)windows/wgnuplot.html
-	$(RM) -rf ./dist/ ./gnuplot/
+	-$(RM) -rf ./dist/ ./gnuplot/
 	$(RM) -rf $(JA)
 
 realclean: veryclean
@@ -834,7 +825,7 @@ endif
 
 installer:
 	$(MAKE) DESTDIR=./dist install
-	cp -p grpicon.ico ./dist/bin/
+	cp -p $(W)/grpicon.ico ./dist/bin/
 	cp -p $(TOP)/win/*.iss ./dist
 	(cd ./dist; $(ISCC) gnuplot.iss)
 	mv ./dist/gp*-setup.exe .

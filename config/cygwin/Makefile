@@ -1,5 +1,5 @@
 # Hey, Emacs, this is a -*- Makefile -*- #
-# $Id: Makefile,v 1.3 2011/03/13 16:14:45 broeker Exp $
+# $Id: Makefile,v 1.4 2011/04/17 10:05:11 markisch Exp $
 #
 #
 # GNUPLOT Makefile for Cygwin on WinNT and Win95/98/2000
@@ -242,7 +242,7 @@ ifdef GNU_RC
   # RC = /bin/windres
   RC  = $(GCCPATH)windres
   RCFLAGS = --include-dir win \
-	--define __WIN32__ --define __WIN95__ --define MSRC \
+	--define __WIN32__ --define __WIN95__ \
 	--define __GNUWIN32__ --define WIN32
   RCOUT = wgplt_res.$(O)
   RES2COFF = echo wgplt_res.$(O)
@@ -272,9 +272,9 @@ WINDOWS = makefile.win makefile.nt README.win $(W)/wcommon.h \
 	$(W)/wgnuplib.c $(W)/wgnuplib.h $(W)/wgnuplib.rc \
 	$(W)/wgnuplot.hpj $(W)/wgnuplot.mnu $(W)/wgraph.c \
 	$(W)/winmain.c $(W)/wmenu.c $(W)/wpause.c $(W)/wprinter.c \
-	$(W)/wresourc.h $(W)/wtext.c $(W)/wtext.h $(W)/geticon.c \
+	$(W)/wresourc.h $(W)/wtext.c $(W)/wtext.h \
 	$(W)/screenbuf.c $(W)/screenbuf.h \
-	$(D)doc2rtf.c $(T)win.trm $(W)/grpicon.ico $(W)/texticon.ico	
+	$(D)doc2rtf.c $(T)win.trm $(W)/grpicon.ico $(W)/texticon.ico
 
 
 # default rules
@@ -284,7 +284,7 @@ WINDOWS = makefile.win makefile.nt README.win $(W)/wcommon.h \
 
 LDLIBS = -L/usr/local/lib -lkernel32 -lgdi32 -lmsimg32 -lcomctl32
 
-$(TARGET): $(OBJS) $(WINOBJS) wgplt_res.$(O) texticon.ico grpicon.ico
+$(TARGET): $(OBJS) $(WINOBJS) wgplt_res.$(O)
 	$(LD) $(LDFLAGS) $(LDFLAGS2) -mwindows -mno-cygwin -o $@ \
 		$(OBJS) $(WINOBJS) wgplt_res.$(O) $(LDLIBS) $(TERMLIBS)
 
@@ -295,7 +295,7 @@ $(PGNUPLOT): $(W)/pgnuplot.c version.$(O)
 
 # Rules:
 
-wgplt_res.$(O):  $(W)/wgnuplot.rc $(W)/wgnuplib.rc $(W)/wresourc.h texticon.ico grpicon.ico
+wgplt_res.$(O):  $(W)/wgnuplot.rc $(W)/wgnuplib.rc $(W)/wresourc.h $(W)/texticon.ico $(W)/grpicon.ico
 	$(RC) $(RCFLAGS) $(W)/wgnuplot.rc $(RCOUT) --include-dir=win
 	$(RES2COFF)
 
@@ -336,14 +336,6 @@ screenbuf.$(O): $(W)/screenbuf.c $(WINDEPS)
 wgnuplot.mnu: $(W)/wgnuplot.mnu
 	$(CP) $^ $@
 
-# extract icons from wgnuplot.rc
-texticon.ico: grpicon.ico
-
-grpicon.ico: geticon.exe $(W)/wgnuplot.rc
-	./geticon $(W)/wgnuplot.rc
-
-geticon.exe: $(W)/geticon.c
-	$(LD) $(LDFLAGS) -o $@ $(W)/geticon.c
 
 # convert gnuplot.doc to gnuplot.rtf
 $(HELPFILE): doc2rtf.exe $(D)gnuplot.doc $(W)/wgnuplot.hpj
@@ -428,7 +420,7 @@ gnuplot.pdf: gnuplot.tex $(D)titlepag.tex
 clean:
 	$(RM) config.h *.$(O) wgnuplot.map wgnuplot.res $(W)/gnuplot.rtf
 	$(RM) doc2rtf.exe $(W)/wgnuplib.res wgnuplib.map wgnuplot.lib
-	$(RM) $(M)bf_test.exe *.ico geticon.exe allterm.h allterm.c
+	$(RM) $(M)bf_test.exe allterm.h allterm.c
 	$(RM) gnuplot.tex gnuplot.dvi gnuplot.ps gnuplot.pdf
 
 realclean: veryclean
