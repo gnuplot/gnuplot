@@ -1,5 +1,5 @@
 /*
- * $Id: wgdiplus.cpp,v 1.5 2011/11/18 07:48:28 markisch Exp $
+ * $Id: wgdiplus.cpp,v 1.6 2012/05/23 17:18:34 markisch Exp $
  */
 
 /*
@@ -71,7 +71,8 @@ static Pen * gdiplusCreatePen(UINT style, float width, COLORREF color, double al
 	if (style <= PS_DASHDOTDOT)
 		// cast is save since GDI and GDI+ use same numbers
 		pen->SetDashStyle(static_cast<DashStyle>(style));
-	pen->SetLineCap(LineCapFlat, LineCapFlat, DashCapFlat);
+	pen->SetLineCap(LineCapSquare, LineCapSquare, DashCapFlat);
+	pen->SetLineJoin(LineJoinMiter);
 
 	return pen;
 }
