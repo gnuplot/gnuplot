@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot.c,v 1.138 2012/03/02 19:52:14 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot.c,v 1.139 2012/05/06 22:56:35 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot.c */
@@ -720,8 +720,8 @@ load_rcfile(int where)
 # if defined(_Windows)
 	/* retrieve path relative to gnuplot executable,
 	 * whose path is in szModuleName (winmain.c) */
-	rcfile = gp_alloc(strlen((char *)szPackageDir) + 1 +
-		strlen(GNUPLOT_SHARE_DIR) + 1 + strlen("gnuplotrc") + 1, "rcfile");
+	rcfile = gp_alloc(strlen((char *)szPackageDir) + 1
+	       + strlen(GNUPLOT_SHARE_DIR) + 1 + strlen("gnuplotrc") + 1, "rcfile");
 	strcpy(rcfile, (char *)szPackageDir);
 	PATH_CONCAT(rcfile, GNUPLOT_SHARE_DIR);
 # else
