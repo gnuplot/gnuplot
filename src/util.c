@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: util.c,v 1.99 2011/11/10 05:15:58 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: util.c,v 1.100 2012/05/06 02:58:54 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - util.c */
@@ -72,6 +72,8 @@ const char *current_prompt = NULL; /* to be set by read_line() */
 
 static void mant_exp __PROTO((double, double, TBOOLEAN, double *, int *, const char *));
 static void parse_sq __PROTO((char *));
+static TBOOLEAN utf8_getmore __PROTO((unsigned long * wch, const char **str, int nbytes));
+static char *utf8_strchrn __PROTO((const char *s, int N));
 
 /*
  * equals() compares string value of token number t_num with str[], and
@@ -532,7 +534,7 @@ gprintf(
     TBOOLEAN seen_mantissa = FALSE; /* remember if mantissa was already output */
     double stored_power_base = 0;   /* base for the last mantissa output*/
     int stored_power = 0;	/* power matching the mantissa output earlier */
-    TBOOLEAN got_hash = FALSE;				   
+    TBOOLEAN got_hash = FALSE;
 
     set_numeric_locale();
 
@@ -806,7 +808,7 @@ gprintf(
 	   int_error(NO_CARET, "Bad format character");
 	} /* switch */
 	/*}}} */
-	
+
 	if (got_hash && (format != strpbrk(format,"oeEfFgG"))) {
 	   reset_numeric_locale();
 	   int_error(NO_CARET, "Bad format character");
@@ -862,7 +864,7 @@ do {							\
 	    current_prompt ? current_prompt : "",	\
 	    gp_input_line);				\
 } while (0)
-    
+
 #define PRINT_SPACES_UNDER_PROMPT		\
 do {						\
     const char *p;				\
@@ -1236,7 +1238,7 @@ existdir (const char *name)
 }
 
 char *
-getusername ()
+getusername()
 {
     char *username = NULL;
 
@@ -1260,7 +1262,7 @@ TBOOLEAN contains8bit(const char *s)
 
 /* Read from second byte to end of UTF-8 sequence.
    used by utf8toulong() */
-TBOOLEAN
+static TBOOLEAN
 utf8_getmore (unsigned long * wch, const char **str, int nbytes)
 {
   int i;
@@ -1269,7 +1271,7 @@ utf8_getmore (unsigned long * wch, const char **str, int nbytes)
 
   for (i = 0; i < nbytes; i++) {
     c = (unsigned char) **str;
-  
+
     if ((c & 0xc0) != 0x80) {
       *wch = INVALID_UTF8;
       return FALSE;
@@ -1356,7 +1358,7 @@ gp_strlen(const char *s)
  * Returns a pointer to the Nth character of s
  * or a pointer to the trailing \0 if N is too large
  */
-char *
+static char *
 utf8_strchrn(const char *s, int N)
 {
     int i = 0, j = 0;

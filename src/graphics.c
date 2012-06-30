@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.396 2012/06/13 20:12:59 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.397 2012/06/29 16:30:37 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -129,6 +129,7 @@ static TBOOLEAN bound_intersect __PROTO((struct coordinate GPHUGE * points, int 
 static void plot_vectors __PROTO((struct curve_points * plot));
 static void plot_f_bars __PROTO((struct curve_points * plot));
 static void plot_c_bars __PROTO((struct curve_points * plot));
+static int compare_ypoints __PROTO((SORTFUNC_ARGS arg1, SORTFUNC_ARGS arg2));
 static void plot_boxplot __PROTO((struct curve_points * plot));
 static int filter_boxplot_factor __PROTO((struct curve_points *plot, int level));
 
@@ -137,17 +138,16 @@ static void place_arrows __PROTO((int layer));
 static void place_grid __PROTO((void));
 static void place_raxis __PROTO((void));
 
-static int edge_intersect __PROTO((struct coordinate GPHUGE * points, int i, double *ex, double *ey));
-static TBOOLEAN two_edge_intersect __PROTO((struct coordinate GPHUGE * points, int i, double *lx, double *ly));
-static TBOOLEAN two_edge_intersect_steps __PROTO((struct coordinate GPHUGE * points, int i, double *lx, double *ly));
-
 static void plot_steps __PROTO((struct curve_points * plot));	/* JG */
 static void plot_fsteps __PROTO((struct curve_points * plot));	/* HOE */
 static void plot_histeps __PROTO((struct curve_points * plot));	/* CAC */
 static void histeps_horizontal __PROTO((int *xl, int *yl, double x1, double x2, double y));	/* CAC */
 static void histeps_vertical __PROTO((int *xl, int *yl, double x, double y1, double y2));	/* CAC */
+
+static int edge_intersect __PROTO((struct coordinate GPHUGE * points, int i, double *ex, double *ey));
 static void edge_intersect_steps __PROTO((struct coordinate GPHUGE * points, int i, double *ex, double *ey));	/* JG */
 static void edge_intersect_fsteps __PROTO((struct coordinate GPHUGE * points, int i, double *ex, double *ey));	/* HOE */
+static TBOOLEAN two_edge_intersect __PROTO((struct coordinate GPHUGE * points, int i, double *lx, double *ly));
 static TBOOLEAN two_edge_intersect_steps __PROTO((struct coordinate GPHUGE * points, int i, double *lx, double *ly));	/* JG */
 static TBOOLEAN two_edge_intersect_fsteps __PROTO((struct coordinate GPHUGE * points, int i, double *lx, double *ly));
 
@@ -169,6 +169,8 @@ static void do_key_sample __PROTO((struct curve_points *this_plot, legend_key *k
 static void attach_title_to_plot __PROTO((struct curve_points *this_plot, legend_key *key));
 
 static TBOOLEAN check_for_variable_color __PROTO((struct curve_points *plot, double *colorvalue));
+
+static void hyperplane_between_points __PROTO((double *p1, double *p2, double *w, double *b));
 
 #ifdef EAM_OBJECTS
 static void plot_circles __PROTO((struct curve_points *plot));
@@ -734,7 +736,7 @@ boundary(struct curve_points *plots, int count)
 	       /  (axis_array[FIRST_X_AXIS].max - axis_array[FIRST_X_AXIS].min)))
 	    shift_labels_to_border = TRUE;
     }
-    
+
     if ((axis_array[FIRST_Y_AXIS].ticmode & TICS_ON_BORDER)
     ||  shift_labels_to_border) {
 	if (vertical_ytics)
@@ -785,7 +787,7 @@ boundary(struct curve_points *plots, int count)
     } else
 	timelabel_textwidth = 0;
 
-    if (lmargin.x < 0) {	
+    if (lmargin.x < 0) {
 	/* Auto-calculation */
 	double tmpx, tmpy;
 	int space_to_left = key_xleft;
@@ -857,8 +859,8 @@ boundary(struct curve_points *plots, int count)
 			   * cos(DEG2RAD * (double)(axis_array[FIRST_X_AXIS].tic_rotate))
 			   * term->h_char;
 
-		if (inrange(tic->position, 
-		    axis_array[FIRST_X_AXIS].set_min, 
+		if (inrange(tic->position,
+		    axis_array[FIRST_X_AXIS].set_min,
 		    axis_array[FIRST_X_AXIS].set_max)) {
 			xx = axis_log_value_checked(FIRST_X_AXIS, tic->position, "xtic");
 		        xx = AXIS_MAP(FIRST_X_AXIS, xx);
@@ -962,7 +964,7 @@ boundary(struct curve_points *plots, int count)
 	/* Set aspect ratio if valid and sensible */
 	/* EAM Mar 2008 - fixed borders take precedence over centering */
 	if (current_aspect_ratio >= 0.01 && current_aspect_ratio <= 100.0) {
-	    double current = ((double) (plot_bounds.ytop - plot_bounds.ybot)) 
+	    double current = ((double) (plot_bounds.ytop - plot_bounds.ybot))
 			   / (plot_bounds.xright - plot_bounds.xleft);
 	    double required = (current_aspect_ratio * t->v_tic) / t->h_tic;
 
@@ -1027,7 +1029,7 @@ boundary(struct curve_points *plots, int count)
 	if (axis_array[FIRST_X_AXIS].label.pos == RIGHT)
 	    projection *= -1;
 	else if (axis_array[FIRST_X_AXIS].label.pos == CENTRE)
-	    projection = 0.5*fabs(projection);	
+	    projection = 0.5*fabs(projection);
 	widest_tic_strlen = 0;		/* reset the global variable ... */
 	gen_tics(FIRST_X_AXIS, /* 0, */ widest_tic_callback);
 
@@ -1173,7 +1175,7 @@ boundary(struct curve_points *plots, int count)
 		/* align top first since tmargin may be manual */
 		key->bounds.ytop = plot_bounds.ytop;
 		key->bounds.ybot = key->bounds.ytop - key_h;
-	    } else if (key->vpos == CENTRE) {
+	    } else if (key->vpos == JUST_CENTRE) {
 		int key_box_half = key_h / 2;
 		key->bounds.ybot = (plot_bounds.ybot + plot_bounds.ytop) / 2 - key_box_half;
 		key->bounds.ytop = (plot_bounds.ybot + plot_bounds.ytop) / 2 + key_box_half;
@@ -1390,7 +1392,7 @@ place_arrows(int layer)
 	 this_arrow != NULL;
 	 this_arrow = this_arrow->next) {
 	int sx, sy, ex, ey;
-	
+
 	if (this_arrow->arrow_properties.layer != layer)
 	    continue;
 	get_arrow(this_arrow, &sx, &sy, &ex, &ey);
@@ -1453,7 +1455,7 @@ place_objects(struct object *listhead, int layer, int dimensions)
     for (this_object = listhead; this_object != NULL; this_object = this_object->next) {
 	struct lp_style_type lpstyle;
 	struct fill_style_type *fillstyle;
-    
+
 	if (this_object->layer != layer)
 	    continue;
 
@@ -1463,7 +1465,7 @@ place_objects(struct object *listhead, int layer, int dimensions)
 	    lpstyle = default_rectangle.lp_properties;
 	else
 	    lpstyle = this_object->lp_properties;
-	
+
 	if (this_object->fillstyle.fillstyle == FS_DEFAULT
 	    && this_object->object_type == OBJ_RECTANGLE)
 	    fillstyle = &default_rectangle.fillstyle;
@@ -1698,7 +1700,7 @@ do_plot(struct curve_points *plots, int pcount)
 	    y = (plot_bounds.ytop + plot_bounds.ybot) / 2 + tmpy;
 
 	    write_multiline(x, y, axis_array[SECOND_Y_AXIS].label.text,
-			    CENTRE, JUST_TOP, 
+			    CENTRE, JUST_TOP,
 			    axis_array[SECOND_Y_AXIS].label.rotate,
 			    axis_array[SECOND_Y_AXIS].label.font);
 	    (*t->text_angle) (0);
@@ -2036,11 +2038,11 @@ do_plot(struct curve_points *plots, int pcount)
 	    case CIRCLES:
 		plot_circles(this_plot);
 		break;
-		
+
 	    case ELLIPSES:
 		plot_ellipses(this_plot);
 		break;
-		
+
 #endif
 	    default:
 		int_error(NO_CARET, "unknown plot style");
@@ -2480,7 +2482,7 @@ plot_filledcurves(struct curve_points *plot)
 			else if (reentry_edge != exit_edge)
 			    /* Fill in dummy points at plot corners if the bounding curve */
 			    /* went around the corner while out of range */
-			    fill_missing_corners(corners, &points, 
+			    fill_missing_corners(corners, &points,
 				exit_edge, reentry_edge, out_updown, out_leftright);
 
 			/* vector(map_x(ex),map_y(ey)); */
@@ -2592,13 +2594,13 @@ plot_filledcurves(struct curve_points *plot)
 		break;
 	    }
 	case UNDEFINED:{
-		/* UNDEFINED flags a blank line in the input file. 
+		/* UNDEFINED flags a blank line in the input file.
 		 * Unfortunately, it can also mean that the point was undefined.
 		 * Is there a clean way to detect or handle the latter case?
 		 */
 		if (prev != UNDEFINED) {
 		    if (first_entry && first_entry != exit_edge)
-			fill_missing_corners(corners, &points, 
+			fill_missing_corners(corners, &points,
 				exit_edge, first_entry, out_updown, out_leftright);
 		    finish_filled_curve(points, corners, plot);
 		    points = 0;
@@ -2618,7 +2620,7 @@ plot_filledcurves(struct curve_points *plot)
 		out_updown, out_leftright);
 	}
     }
-    
+
     finish_filled_curve(points, corners, plot);
 }
 
@@ -2728,7 +2730,7 @@ plot_betweencurves(struct curve_points *plot)
 
 static void
 fill_between(
-double x1, double xu1, double yl1, double yu1, 
+double x1, double xu1, double yl1, double yu1,
 double x2, double xu2, double yl2, double yu2,
 struct curve_points *plot)
 {
@@ -2745,7 +2747,7 @@ struct curve_points *plot)
 	xmax = GPMAX(axis_array[axis].min, axis_array[axis].max);
 	if (!(inrange(x1, xmin, xmax)) && !(inrange(x2, xmin, xmax)))
 	    return;
-	
+
     /* Clip end segments. It would be nice to use edge_intersect() here, */
     /* but as currently written it cannot handle the second curve.       */
 	dx = x2 - x1;
@@ -2791,7 +2793,7 @@ struct curve_points *plot)
 
 	INTERPOLATE( yu1, yu2, ymin );
 	INTERPOLATE( yu1, yu2, ymax );
-	
+
 	corners[ic].x   = map_x(xu2);
 	corners[ic++].y = map_y(yu2);
 	corners[ic].x   = map_x(x2);
@@ -2833,11 +2835,11 @@ struct curve_points *plot)
 	    drl = (plx-ox)*(plx-ox) + (ply-oy)*(ply-oy);
 	    dru = (pux-ox)*(pux-ox) + (puy-oy)*(puy-oy);
 	    dx2 = dru - drl;
-	    
+
 	    box[ic].x = (dx1+dx2 < 0) ? 1 : 0;
 	} else
 	    box[ic].x = ((yu1-yl1) + (yu2-yl2) < 0) ? 1 : 0;
-	
+
 	finish_filled_curve(ic, box, plot);
 }
 
@@ -3303,14 +3305,14 @@ plot_bars(struct curve_points *plot)
 		) {
 		check_for_variable_color(plot, &plot->varcolor[i]);
 	    }
-	    
+
 	    /* Error bars should be drawn in the border color for filled boxes
 	     * but only if there *is* a border color. */
 	    if ((plot->plot_style == BOXERROR) && t->fillbox)
 		(void) need_fill_border(&plot->fill_properties);
 
 	    /* by here everything has been mapped */
-	    if (!polar) {		
+	    if (!polar) {
 		/* HBB 981130: use Igor's routine *only* for polar errorbars */
 		(*t->move) (xM, ylowM);
 		/* draw the main bar */
@@ -3428,10 +3430,10 @@ plot_bars(struct curve_points *plot)
 	    if (!high_inrange && !low_inrange && xlowM == xhighM)
 		/* both out of range on the same side */
 		continue;
-		
+
 	    /* Check for variable color - June 2010 */
 	    check_for_variable_color(plot, &plot->varcolor[i]);
-	    
+
 	    /* by here everything has been mapped */
 	    (*t->move) (xlowM, yM);
 	    (*t->vector) (xhighM, yM);	/* draw the main bar */
@@ -3778,7 +3780,7 @@ plot_circles(struct curve_points *plot)
 
 	    arc_begin = plot->points[i].ylow;
 	    arc_end = plot->points[i].xhigh;
-	    
+
 	    /* rgb variable  -  color read from data column */
 	    if (!check_for_variable_color(plot, &plot->varcolor[i]) && withborder)
 		term_apply_lp_properties(&plot->lp_properties);
@@ -3807,19 +3809,19 @@ plot_ellipses(struct curve_points *plot)
     if (fillstyle->border_color.type != TC_LT
     ||  fillstyle->border_color.lt != LT_NODRAW)
 	withborder = TRUE;
-	
+
     e->extent.scalex = (plot->x_axis == SECOND_X_AXIS) ? second_axes : first_axes;
     e->extent.scaley = (plot->y_axis == SECOND_Y_AXIS) ? second_axes : first_axes;
-    e->type = plot->ellipseaxes_units; 
-	
+    e->type = plot->ellipseaxes_units;
+
     for (i = 0; i < plot->p_count; i++) {
 	if (plot->points[i].type == INRANGE) {
 	    e->center.x = map_x(plot->points[i].x);
 	    e->center.y = map_y(plot->points[i].y);
-	   	    
+
 	    e->extent.x = plot->points[i].xlow; /* major axis */
 	    e->extent.y = plot->points[i].xhigh; /* minor axis */
-	    /* the mapping can be set by the 
+	    /* the mapping can be set by the
 	     * "set ellipseaxes" setting
 	     * both x units, mixed, both y units */
 	    /* clumsy solution */
@@ -3827,7 +3829,7 @@ plot_ellipses(struct curve_points *plot)
 	    case ELLIPSEAXES_XY:
 	        map_position_r(&e->extent, &tempx, &tempy, "ellipse");
 	        e->extent.x = tempx;
-	        e->extent.y = tempy;        
+	        e->extent.y = tempy;
 	        break;
 	    case ELLIPSEAXES_XX:
 	        map_position_r(&e->extent, &tempx, &tempy, "ellipse");
@@ -3846,15 +3848,15 @@ plot_ellipses(struct curve_points *plot)
 	        e->extent.y = tempfoo;
 	        break;
 	    }
-	    
+
 	    if (plot->points[i].z <= DEFAULT_RADIUS) {
 	        /*memcpy(&(e->extent), &default_ellipse.o.ellipse.extent, sizeof(t_position));*/
 	        /*e->extent.x = default_ellipse.o.ellipse.extent.x;
 	        e->extent.y = default_ellipse.o.ellipse.extent.y;*/
 	        map_position_r(&default_ellipse.o.ellipse.extent, &e->extent.x, &e->extent.y, "ellipse");
 	    }
-	    
-	    if (plot->points[i].z == DEFAULT_ELLIPSE) 
+
+	    if (plot->points[i].z == DEFAULT_ELLIPSE)
 	        e->orientation = default_ellipse.o.ellipse.orientation;
 	    else
 	        e->orientation = plot->points[i].ylow;
@@ -4045,7 +4047,7 @@ plot_f_bars(struct curve_points *plot)
 	if (!high_inrange && !low_inrange && ylowM == yhighM)
 	    /* both out of range on the same side */
 	    continue;
-	    
+
 	/* variable color read from extra data column. June 2010 */
 	check_for_variable_color(plot, &plot->varcolor[i]);
 
@@ -4071,7 +4073,7 @@ plot_f_bars(struct curve_points *plot)
 
 /* plot_c_bars:
  * Plot the curves in CANDLESTICKS style
- * EAM Apr 2008 - switch to using empty/fill rather than empty/striped 
+ * EAM Apr 2008 - switch to using empty/fill rather than empty/striped
  *		  to distinguish whether (open > close)
  * EAM Dec 2009	- allow an optional 6th column to specify width
  *		  This routine is also used for BOXPLOT, which
@@ -4219,7 +4221,7 @@ plot_c_bars(struct curve_points *plot)
 
 	/* variable color read from extra data column. June 2010 */
 	check_for_variable_color(plot, &plot->varcolor[i]);
-	
+
 	/* Boxes are always filled if an explicit non-empty fillstyle is set. */
 	/* If the fillstyle is FS_EMPTY, fill to indicate (open > close).     */
 	if (term->fillbox && !skip_box) {
@@ -4256,7 +4258,7 @@ plot_c_bars(struct curve_points *plot)
 	    }
 
 	/* Some users prefer bars at the end of the whiskers */
-	if (plot->plot_style == BOXPLOT 
+	if (plot->plot_style == BOXPLOT
 	||  plot->arrow_properties.head == BOTH_HEADS) {
 	    unsigned int d;
 	    if (plot->plot_style == BOXPLOT) {
@@ -4302,10 +4304,10 @@ plot_c_bars(struct curve_points *plot)
     }
 }
 
-/* 
+/*
  * Plot the curves in BOXPLOT style
  */
-int
+static int
 compare_ypoints(SORTFUNC_ARGS arg1, SORTFUNC_ARGS arg2)
 {
     struct coordinate const *p1 = arg1;
@@ -4352,7 +4354,7 @@ filter_boxplot_factor(struct curve_points *plot, int level)
     else
 	real_level = level;
 
-    /* If the factor doesn't match, 
+    /* If the factor doesn't match,
      * change the point to undefined and force it to the end of the list */
     for (i=0; i<N; i++) {
 	plot->points[i].y = plot->points[i].yhigh;
@@ -5766,7 +5768,7 @@ do_key_sample(
 	if (this_plot->plot_style == CIRCLES && w > 0) {
 	    do_arc(xl + key_point_offset, yl, key_entry_height/4, 0., 360., style, FALSE);
 	} else if (this_plot->plot_style == ELLIPSES && w > 0) {
-	    t_ellipse *key_ellipse = (t_ellipse *) gp_alloc(sizeof(t_ellipse), 
+	    t_ellipse *key_ellipse = (t_ellipse *) gp_alloc(sizeof(t_ellipse),
 	        "cute little ellipse for the key sample");
 	    key_ellipse->center.x = xl + key_point_offset;
 	    key_ellipse->center.y = yl;
@@ -5910,7 +5912,7 @@ do_rectangle( int dimensions, t_object *this_object, int style )
 		clip_y = TRUE;
 
 	} else {
-	    if ((dimensions == 2) 
+	    if ((dimensions == 2)
 	    ||  (this_rect->bl.scalex == screen && this_rect->tr.scalex == screen)) {
 		map_position_double(&this_rect->bl, &x1, &y1, "rect");
 		map_position_double(&this_rect->tr, &x2, &y2, "rect");
@@ -5958,7 +5960,7 @@ do_rectangle( int dimensions, t_object *this_object, int style )
 	    lpstyle = this_object->lp_properties;
 	if (lpstyle.l_width > 0)
 	    lpstyle.l_width = this_object->lp_properties.l_width;
-	
+
 	if (this_object->fillstyle.fillstyle == FS_DEFAULT)
 	    fillstyle = &default_rectangle.fillstyle;
 	else
@@ -6006,7 +6008,7 @@ do_ellipse( int dimensions, t_ellipse *e, int style, TBOOLEAN do_own_mapping )
     /* Find the center of the ellipse */
     /* If this ellipse is part of a plot - as opposed to an object -
      * then the caller plot_ellipses function already did the mapping for us.
-     * Else we do it here. The 'ellipses' plot style is 2D only, but objects 
+     * Else we do it here. The 'ellipses' plot style is 2D only, but objects
      * can apparently be placed on splot maps too, so we do 3D mapping if needed. */
 	if (!do_own_mapping) {
 	    cx = e->center.x;
@@ -6019,7 +6021,7 @@ do_ellipse( int dimensions, t_ellipse *e, int style, TBOOLEAN do_own_mapping )
 
     /* Calculate the vertices */
     for (i=0, angle = 0.0; i<=segments; i++, angle += ang_inc) {
-        /* Given that the (co)sines of same sequence of angles 
+        /* Given that the (co)sines of same sequence of angles
          * are calculated every time - shouldn't they be precomputed
          * and put into a table? */
 	    pos.x = A * cosO * cos(angle) - B * sinO * sin(angle);
@@ -6043,7 +6045,7 @@ do_ellipse( int dimensions, t_ellipse *e, int style, TBOOLEAN do_own_mapping )
 	        pos.y = pos.x;
 		    map_position_r(&pos, &junkfoo, &xoff, "ellipse");
 		    break;
-		}	        
+		}
 	    else {
 	    switch (e->type) {
 	    case ELLIPSEAXES_XY:
@@ -6065,10 +6067,10 @@ do_ellipse( int dimensions, t_ellipse *e, int style, TBOOLEAN do_own_mapping )
 		    map3d_position_r(&pos, &junkh, &junkw, "ellipse");
 		    xoff = junkw;
 		    break;
-		}	      
+		}
 	    }
 	    vertex[i].x = cx + xoff;
-	    if (!do_own_mapping) 
+	    if (!do_own_mapping)
 	        vertex[i].y = cy + yoff * aspect;
 	    else
 	        vertex[i].y = cy + yoff;
@@ -6121,7 +6123,7 @@ do_polygon( int dimensions, t_polygon *p, int style )
 	    map3d_position(&p->vertex[nv], &corners[nv].x, &corners[nv].y, "pvert");
 	else
 	    map_position(&p->vertex[nv], &corners[nv].x, &corners[nv].y, "pvert");
-	
+
 	/* Any vertex not given in plot coords will disable clipping */
 	if (p->vertex[nv].scalex == screen || p->vertex[nv].scaley == screen)
 	    noclip = TRUE;
@@ -6190,7 +6192,7 @@ check_for_variable_color(struct curve_points *plot, double *colorvalue)
     } else
 	return FALSE;
 }
-	    
+
 
 /* Similar to HBB's comment above, this routine is shared with
  * graph3d.c, so it shouldn't be in this module (graphics.c).
@@ -6204,7 +6206,7 @@ check_for_variable_color(struct curve_points *plot, double *colorvalue)
  * Compute the hyperplane representation of a line passing
  *  between two points.
  */
-void
+static void
 hyperplane_between_points(double *p1, double *p2, double *w, double *b)
 {
     w[0] = p1[1] - p2[1];
@@ -6266,12 +6268,12 @@ plot_image_or_update_axes(void *plot, TBOOLEAN update_axes)
 	int_warn(NO_CARET, "Image grid must be at least 4 points (2 x 2).\n\n");
 	return;
     }
-    
+
     if (project_points && (X_AXIS.log || Y_AXIS.log || Z_AXIS.log)) {
 	int_warn(NO_CARET, "Log scaling of 3D image plots is not supported");
 	return;
     }
-	
+
 
     /* Check if the pixel data forms a valid rectangular grid for potential image
      * matrix support.  A general grid orientation is considered.  If the grid
@@ -6384,7 +6386,7 @@ plot_image_or_update_axes(void *plot, TBOOLEAN update_axes)
 	    y -= (GRIDY((5-i)%4) - GRIDY(i)) / (2*(K-1));
 	    x -= (GRIDX((i+2)%4) - GRIDX(i)) / (2*(L-1));
 	    y -= (GRIDY((i+2)%4) - GRIDY(i)) / (2*(L-1));
-	    
+
 	    } else {
 	    x = points[grid_corner[i]].x;
 	    y = points[grid_corner[i]].y;

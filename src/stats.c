@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: stats.c,v 1.6 2012/02/22 19:36:45 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: stats.c,v 1.7 2012/06/19 18:11:06 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - stats.c */
@@ -65,7 +65,7 @@ static void two_column_output __PROTO(( struct sgl_column_stats x,
 					struct sgl_column_stats y,
 					struct two_column_stats xy, long n));
 
-static void create_and_set_var __PROTO(( double val, char *prefix, 
+static void create_and_set_var __PROTO(( double val, char *prefix,
 					 char *base, char *suffix ));
 
 static void sgl_column_variables __PROTO(( struct sgl_column_stats res,
@@ -73,14 +73,12 @@ static void sgl_column_variables __PROTO(( struct sgl_column_stats res,
 
 static TBOOLEAN validate_data __PROTO((double v, AXIS_INDEX ax));
 
-void statsrequest __PROTO((void));
-
 /* =================================================================
    Data Structures
    ================================================================= */
 
 /* Keeps info on a value and its index in the file */
-struct pair { 
+struct pair {
     double val;
     long index;
 };
@@ -107,14 +105,14 @@ struct sgl_column_stats {
 
     struct pair min;
     struct pair max;
-    
+
     double median;
     double lower_quartile;
     double upper_quartile;
-    
+
     double cog_x;   /* centre of gravity */
-    double cog_y; 
-    
+    double cog_y;
+
     /* info on data points out of bounds? */
 };
 
@@ -127,7 +125,7 @@ struct two_column_stats {
     double slope_err;
     double intercept_err;
 
-    double correlation; 
+    double correlation;
 
     double pos_min_y;	/* x coordinate of min y */
     double pos_max_y;	/* x coordinate of max y */
@@ -141,7 +139,7 @@ struct two_column_stats {
 /* FIXME: I am dubious that keeping the original index gains anything. */
 /* It makes no sense at all for quartiles,  and even the min/max are not  */
 /* guaranteed to be unique.                                               */
-static int 
+static int
 comparator( const void *a, const void *b )
 {
     struct pair *x = (struct pair *)a;
@@ -152,7 +150,7 @@ comparator( const void *a, const void *b )
     return 0;
 }
 
-static struct file_stats 
+static struct file_stats
 analyze_file( long n, int outofrange, int invalid, int blank, int dblblank )
 {
     struct file_stats res;
@@ -166,7 +164,7 @@ analyze_file( long n, int outofrange, int invalid, int blank, int dblblank )
     return res;
 }
 
-static struct sgl_column_stats 
+static struct sgl_column_stats
 analyze_sgl_column( double *data, long n, long nr )
 {
     struct sgl_column_stats res;
@@ -180,7 +178,7 @@ analyze_sgl_column( double *data, long n, long nr )
 
     struct pair *tmp = (struct pair *)gp_alloc( n*sizeof(struct pair),
 					      "analyze_sgl_column" );
-     
+
     if ( nr > 0 ) {
 	res.sx = nr;
 	res.sy = n / nr;
@@ -188,7 +186,7 @@ analyze_sgl_column( double *data, long n, long nr )
 	res.sx = 0;
 	res.sy = n;
     }
-  
+
     /* Mean and Std Dev and centre of gravity */
     for( i=0; i<n; i++ ) {
 	s  += data[i];
@@ -209,7 +207,7 @@ analyze_sgl_column( double *data, long n, long nr )
 	tmp[i].index = i;
     }
     qsort( tmp, n, sizeof(struct pair), comparator );
-  
+
     res.min = tmp[0];
     res.max = tmp[n-1];
 
@@ -243,7 +241,7 @@ analyze_sgl_column( double *data, long n, long nr )
     return res;
 }
 
-static struct two_column_stats 
+static struct two_column_stats
 analyze_two_columns( double *x, double *y,
 		     struct sgl_column_stats res_x,
 		     struct sgl_column_stats res_y,
@@ -253,7 +251,7 @@ analyze_two_columns( double *x, double *y,
 
     long i;
     double s = 0;
-  
+
     for( i=0; i<n; i++ ) {
 	s += x[i]*y[i];
     }
@@ -279,14 +277,14 @@ analyze_two_columns( double *x, double *y,
 /* Output */
 /* Note: print_out is a FILE ptr, set by the "set print" command */
 
-static void 
+static void
 ensure_output()
 {
     if (!print_out)
 	print_out = stderr;
 }
 
-static char* 
+static char*
 fmt( char *buf, double val )
 {
     if ( fabs(val) < 1e-14 )
@@ -298,7 +296,7 @@ fmt( char *buf, double val )
     return buf;
 }
 
-static void 
+static void
 file_output( struct file_stats s )
 {
     int width = 3;
@@ -329,14 +327,14 @@ file_output( struct file_stats s )
     fprintf( print_out, "  Data Blocks:  %*ld\n", width, s.blocks );
 }
 
-static void 
+static void
 sgl_column_output_nonformat( struct sgl_column_stats s, char *x )
 {
     fprintf( print_out, "%s%s\t%f\n", "mean",   x, s.mean );
     fprintf( print_out, "%s%s\t%f\n", "stddev", x, s.stddev );
     fprintf( print_out, "%s%s\t%f\n", "sum",   x, s.sum );
     fprintf( print_out, "%s%s\t%f\n", "sum_sq",  x, s.sum_sq );
-  
+
     fprintf( print_out, "%s%s\t%f\n", "min",     x, s.min.val );
     if ( s.sx == 0 ) {
 	fprintf( print_out, "%s%s\t%f\n", "lo_quartile", x, s.lower_quartile );
@@ -355,11 +353,11 @@ sgl_column_output_nonformat( struct sgl_column_stats s, char *x )
 	fprintf( print_out, "%s%s\t%f\n","cog_y",  x, s.cog_y );
     } else {
 	fprintf( print_out, "%s%s\t%ld\n","min_index",  x, s.min.index );
-	fprintf( print_out, "%s%s\t%ld\n","max_index",  x, s.max.index );  
+	fprintf( print_out, "%s%s\t%ld\n","max_index",  x, s.max.index );
     }
 }
 
-static void 
+static void
 sgl_column_output( struct sgl_column_stats s, long n )
 {
     int width = 1;
@@ -379,11 +377,11 @@ sgl_column_output( struct sgl_column_stats s, long n )
 
     /* Formatted to screen */
     fprintf( print_out, "\n" );
-  
+
     /* First, we check whether the data file was a matrix */
-     if ( s.sx > 0) 
+     if ( s.sx > 0)
 	 fprintf( print_out, "* MATRIX: [%d X %d] \n", s.sx, s.sy );
-     else 
+     else
 	 fprintf( print_out, "* COLUMN: \n" );
 
     fprintf( print_out, "  Mean:     %s\n", fmt( buf, s.mean ) );
@@ -394,9 +392,9 @@ sgl_column_output( struct sgl_column_stats s, long n )
 
     /* For matrices, the quartiles and the median do not make too much sense */
     if ( s.sx > 0 ) {
-	fprintf( print_out, "  Minimum:  %s [%*ld %ld ]\n", fmt(buf, s.min.val), width, 
+	fprintf( print_out, "  Minimum:  %s [%*ld %ld ]\n", fmt(buf, s.min.val), width,
 	     (s.min.index) / s.sx, (s.min.index) % s.sx);
-	fprintf( print_out, "  Maximum:  %s [%*ld %ld ]\n", fmt(buf, s.max.val), width, 
+	fprintf( print_out, "  Maximum:  %s [%*ld %ld ]\n", fmt(buf, s.max.val), width,
 	     (s.max.index) / s.sx, (s.max.index) % s.sx);
 	fprintf( print_out, "  COG:      %s %s\n", fmt(buf, s.cog_x), fmt(buf2, s.cog_y) );
     } else {
@@ -410,7 +408,7 @@ sgl_column_output( struct sgl_column_stats s, long n )
     }
 }
 
-static void 
+static void
 two_column_output( struct sgl_column_stats x,
 			struct sgl_column_stats y,
 			struct two_column_stats xy,
@@ -465,11 +463,11 @@ two_column_output( struct sgl_column_stats x,
     fprintf( print_out, "\n" );
 
     /* Simpler below - don't care about alignment */
-    if ( xy.intercept < 0.0 ) 
+    if ( xy.intercept < 0.0 )
 	fprintf( print_out, "  Linear Model: y = %.4g x - %.4g\n", xy.slope, -xy.intercept );
     else
 	fprintf( print_out, "  Linear Model: y = %.4g x + %.4g\n", xy.slope, xy.intercept );
-  
+
     fprintf( print_out, "  Correlation:  r = %.4g\n", xy.correlation );
     fprintf( print_out, "  Sum xy:       %.4g\n", xy.sum_xy );
     fprintf( print_out, "\n" );
@@ -479,7 +477,7 @@ two_column_output( struct sgl_column_stats x,
    Variable Handling
    ================================================================= */
 
-static void 
+static void
 create_and_set_var( double val, char *prefix, char *base, char *suffix )
 {
     int len;
@@ -508,7 +506,7 @@ create_and_set_var( double val, char *prefix, char *base, char *suffix )
     free( varname );
 }
 
-static void 
+static void
 file_variables( struct file_stats s, char *prefix )
 {
     /* Suffix does not make sense here! */
@@ -519,7 +517,7 @@ file_variables( struct file_stats s, char *prefix )
     create_and_set_var( s.outofrange, prefix, "outofrange", "" );
 }
 
-static void 
+static void
 sgl_column_variables( struct sgl_column_stats s, char *prefix, char *suffix )
 {
     create_and_set_var( s.mean,   prefix, "mean",   suffix );
@@ -530,7 +528,7 @@ sgl_column_variables( struct sgl_column_stats s, char *prefix, char *suffix )
 
     create_and_set_var( s.min.val, prefix, "min", suffix );
     create_and_set_var( s.max.val, prefix, "max", suffix );
-  
+
     /* If data set is matrix */
     if ( s.sx > 0 ) {
 	create_and_set_var( (s.min.index) / s.sx, prefix, "index_min_x", suffix );
@@ -546,7 +544,7 @@ sgl_column_variables( struct sgl_column_stats s, char *prefix, char *suffix )
     }
 }
 
-static void 
+static void
 two_column_variables( struct two_column_stats s, char *prefix)
 {
     /* Suffix does not make sense here! */
@@ -563,9 +561,9 @@ two_column_variables( struct two_column_stats s, char *prefix)
    Range Handling
    ================================================================= */
 
-/* We validate our data here: discard everything that is outside 
- * the specified range. However, we have to be a bit careful here, 
- * because if no range is specified, we keep everything 
+/* We validate our data here: discard everything that is outside
+ * the specified range. However, we have to be a bit careful here,
+ * because if no range is specified, we keep everything
  */
 static TBOOLEAN validate_data(double v, AXIS_INDEX ax)
 {
@@ -579,19 +577,19 @@ static TBOOLEAN validate_data(double v, AXIS_INDEX ax)
     &&  (v >= axis_array[ax].min))
 	return TRUE;
     if (((axis_array[ax].autoscale & AUTOSCALE_BOTH) == AUTOSCALE_NONE)
-	 && ((v <= axis_array[ax].max) && (v >= axis_array[ax].min))) 
+	 && ((v <= axis_array[ax].max) && (v >= axis_array[ax].min)))
 	return(TRUE);
 
     return(FALSE);
 }
-   
+
 /* =================================================================
    Parse Command Line and Process
    ================================================================= */
 
-void 
+void
 statsrequest(void)
-{ 
+{
     int i;
     int columns;
     int columnsread;
@@ -612,7 +610,7 @@ statsrequest(void)
     struct file_stats res_file;
     struct sgl_column_stats res_x, res_y;
     struct two_column_stats res_xy;
-    
+
     float *matrix;            /* matrix data. This must be float. */
     int nc, nr;               /* matrix dimensions. */
     int index;
@@ -621,8 +619,8 @@ statsrequest(void)
     static char *prefix = NULL;       /* prefix for user-defined vars names */
 
     /* Vars that control output */
-    TBOOLEAN do_output = TRUE;     /* Generate formatted output */ 
-    
+    TBOOLEAN do_output = TRUE;     /* Generate formatted output */
+
     c_token++;
 
     /* Parse ranges */
@@ -641,7 +639,7 @@ statsrequest(void)
     nr = 0;               /* Matrix dimensions */
     nc = 0;
     max_n = INITIAL_DATA_SIZE;
-    
+
     free(data_x);
     free(data_y);
     data_x = vec(max_n);       /* start with max. value */
@@ -662,29 +660,29 @@ statsrequest(void)
 	int_error(i, "missing filename or datablock");
 
     /* ===========================================================
-    v923z: insertion for treating matrices 
+    v923z: insertion for treating matrices
       EAM: only handles ascii matrix with uniform grid,
            and fails to apply any input data transforms
       =========================================================== */
     if ( almost_equals(c_token, "mat$rix") ) {
 	df_open(file_name, 3, NULL);
 	index = df_num_bin_records - 1;
-	
+
 	/* We take these values as set by df_determine_matrix_info
 	See line 1996 in datafile.c */
 	nc = df_bin_record[index].scan_dim[0];
 	nr = df_bin_record[index].scan_dim[1];
 	n = nc * nr;
-	
+
 	matrix = (float *)df_bin_record[index].memory_data;
-	
+
 	/* Fill up a vector, so that we can use the existing code. */
 	if ( !redim_vec(&data_x, n ) ) {
-	    int_error( NO_CARET, 
+	    int_error( NO_CARET,
 		   "Out of memory in stats: too many datapoints (%d)?", n );
 	}
 	for( i=0; i < n; i++ ) {
-	    data_y[i] = (double)matrix[i];  
+	    data_y[i] = (double)matrix[i];
 	}
 	/* We can close the file here, there is nothing else to do */
 	df_close();
@@ -695,18 +693,18 @@ statsrequest(void)
 	columns = df_open(file_name, 2, NULL); /* up to 2 using specs allowed */
 
 	if (columns < 0)
-	    int_error(NO_CARET, "Can't read data file"); 
+	    int_error(NO_CARET, "Can't read data file");
 
 	if (columns > 2 )
 	    int_error(c_token, "Need 0 to 2 using specs for stats command");
 
 	/* If the user has set an explicit locale for numeric input, apply it
 	   here so that it affects data fields read from the input file. */
-	/* v923z: where exactly should this be? here or before the matrix case? 
-	 * I think, we should move everything here to before trying to open the file. 
+	/* v923z: where exactly should this be? here or before the matrix case?
+	 * I think, we should move everything here to before trying to open the file.
 	 * There is no point in trying to read anything, if the axis is logarithmic, e.g.
 	 */
-	set_numeric_locale();   
+	set_numeric_locale();
 
 	/* For all these below: we could save the state, switch off, then restore */
 	if ( axis_array[FIRST_X_AXIS].log || axis_array[FIRST_Y_AXIS].log )
@@ -727,29 +725,29 @@ statsrequest(void)
 	 - readline always returns the same number of columns (for us: 1 or 2)
 	 - using 1:2 = return two columns, skipping lines w/ bad data
 	 - using 1   = return sgl column (supply zeros (0) for the second col)
-	 - no using  = return two columns (first two), fail on bad data 
+	 - no using  = return two columns (first two), fail on bad data
 
 	 We need to know how many columns to process. If columns==1 or ==2
 	 (that is, if there was a using spec), all is clear and we use the
-	 value of columns. 
+	 value of columns.
 	 But: if columns is 0, then we need to figure out the number of cols
 	 read from the return value of readline. If readline ever returns
 	 1, we take that; only if it always returns 2 do we assume two cols.
 	 */
-  
+
 	while( (i = df_readline(v, 2)) != DF_EOF ) {
 	    columnsread = ( i > columnsread ? i : columnsread );
 
 	    if ( n >= max_n ) {
 		max_n = (max_n * 3) / 2; /* increase max_n by factor of 1.5 */
-	  
+
 		/* Some of the reallocations went bad: */
 		if ( 0 || !redim_vec(&data_x, max_n) || !redim_vec(&data_y, max_n) ) {
 		    df_close();
-		    int_error( NO_CARET, 
+		    int_error( NO_CARET,
 		       "Out of memory in stats: too many datapoints (%d)?",
 		       max_n );
-		} 
+		}
 	    } /* if (need to extend storage space) */
 
 	    switch (i) {
@@ -763,16 +761,16 @@ statsrequest(void)
 		 return anything!) Status: 2009-11-02 */
 	      invalid += 1;
 	      continue;
-	      
-	    case DF_FIRST_BLANK: 
+
+	    case DF_FIRST_BLANK:
 	      blanks += 1;
 	      continue;
 
-	    case DF_SECOND_BLANK:      
+	    case DF_SECOND_BLANK:
 	      blanks += 1;
 	      doubleblanks += 1;
 	      continue;
-	      
+
 	    case 0:
 	      int_error( NO_CARET, "bad data on line %d of file %s",
 	  		df_line_number, df_filename ? df_filename : "" );
@@ -820,7 +818,7 @@ statsrequest(void)
     if ( n == 0 ) {
 	if ( out_of_range > 0 )
 	    int_error( NO_CARET, "All points out of range" );
-	else 
+	else
 	    int_error( NO_CARET, "No valid data points found in file" );
     }
 
@@ -834,7 +832,7 @@ statsrequest(void)
 		do_output = FALSE;
 		c_token++;
 
-	} else if ( almost_equals(c_token, "pre$fix") 
+	} else if ( almost_equals(c_token, "pre$fix")
 	       ||   equals(c_token, "name")) {
 	    c_token++;
 	    free ( prefix );
@@ -879,7 +877,7 @@ statsrequest(void)
     if ( columns == 1 ) {
 	sgl_column_variables( res_y, prefix, "" );
     }
-    
+
     if ( columns == 2 ) {
 	sgl_column_variables( res_x, prefix, "_x" );
 	sgl_column_variables( res_y, prefix, "_y" );
@@ -896,16 +894,16 @@ statsrequest(void)
     }
 
     /* Cleanup */
-      
+
     free(data_x);
     free(data_y);
 
     data_x = NULL;
     data_y = NULL;
-    
+
     free( file_name );
     file_name = NULL;
-    
+
     free( prefix );
     prefix = NULL;
 }

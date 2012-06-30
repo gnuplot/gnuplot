@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: bitmap.c,v 1.25 2008/05/22 21:17:47 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: bitmap.c,v 1.26 2008/11/15 19:38:54 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - bitmap.c */
@@ -1083,7 +1083,7 @@ void
 b_vector(unsigned int x, unsigned int y)
 {
     /* We can't clip properly, but we can refuse to draw out of bounds */
-    if (x < term->xmax && y < term->ymax 
+    if (x < term->xmax && y < term->ymax
     &&  b_currx < term->xmax && b_curry < term->ymax)
 	b_line(b_currx, b_curry, x, y);
     b_currx = x;
@@ -1130,7 +1130,7 @@ b_boxfill(
     unsigned int w, unsigned int h)
 {
     unsigned int ix, iy;
-    int pixcolor, actpix, pat, mask, idx, bitoffs, shiftcnt;
+    int pixcolor, actpix, pat, mask, idx, bitoffs;
     unsigned char *fillbitmap;
 
     switch( style & 0xf ) {
@@ -1170,7 +1170,6 @@ b_boxfill(
 	pat = fillbitmap[bitoffs % fill_bitmap_width];
 	bitoffs++;
 	mask = 1 << (fill_bitmap_width - 1);
-	shiftcnt = 0;
 	for(ix = x; ix < x+w; ix ++) { /* box width */
 	    /* actual pixel = 0 or color, according to pattern */
 	    actpix = (pat & mask) ? pixcolor : 0;

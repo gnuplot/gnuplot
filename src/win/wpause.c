@@ -1,5 +1,5 @@
 /*
- * $Id: wpause.c,v 1.20 2011/05/05 19:10:06 markisch Exp $
+ * $Id: wpause.c,v 1.21 2011/11/26 13:56:44 markisch Exp $
  */
 
 /* GNUPLOT - win/wpause.c */
@@ -55,8 +55,10 @@
 #include "wgnuplib.h"
 #include "wresourc.h"
 #include "wcommon.h"
+#include "winmain.h"
 
 /* Pause Window */
+static void CreatePauseClass(LPPW lppw);
 LRESULT CALLBACK WndPauseProc(HWND, UINT, WPARAM, LPARAM);
 LRESULT CALLBACK PauseButtonProc(HWND, UINT, WPARAM, LPARAM);
 
@@ -69,12 +71,12 @@ extern int paused_for_mouse;
 /* Non-blocking Sleep function, called by pause_command.
    This allows redrawing and (some) user interaction.
 */
-void 
+void
 win_sleep(DWORD dwMilliSeconds)
 {
     MSG msg;
     DWORD t0, t1, tstop, rc;
-    
+
     t0 = GetTickCount();
     tstop  = t0 + dwMilliSeconds;
     t1 = dwMilliSeconds; /* remaining time to wait */
@@ -105,7 +107,7 @@ win_sleep(DWORD dwMilliSeconds)
 
 /* Create Pause Class */
 /* called from PauseBox the first time a pause window is created */
-void
+static void
 CreatePauseClass(LPPW lppw)
 {
 	WNDCLASS wndclass;
@@ -169,7 +171,7 @@ PauseBox(LPPW lppw)
 
 	/* Don't show the pause "OK CANCEL" dialog for "pause mouse ..." -- well, show
 	   it only for "pause -1".
-	   Note: maybe to show in the window titlebar or somewhere else a message like 
+	   Note: maybe to show in the window titlebar or somewhere else a message like
 	   graphwin.Title = "gnuplot pausing (waiting for mouse click)";
 	*/
 	if (!paused_for_mouse) {
@@ -197,7 +199,7 @@ PauseBox(LPPW lppw)
 	return(lppw->bPauseCancel);
 }
 
-LRESULT CALLBACK 
+LRESULT CALLBACK
 WndPauseProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	HDC hdc;

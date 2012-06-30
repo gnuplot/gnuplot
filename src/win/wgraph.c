@@ -1,5 +1,5 @@
 /*
- * $Id: wgraph.c,v 1.151 2012/06/13 09:24:12 markisch Exp $
+ * $Id: wgraph.c,v 1.152 2012/06/24 00:39:20 markisch Exp $
  */
 
 /* GNUPLOT - win/wgraph.c */
@@ -1478,7 +1478,7 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 	int hshift, vshift;			/* correction of text position */
 
 	/* indices */
-	int i, k;
+	int i;
 
     if (lpgw->locked) return;
 

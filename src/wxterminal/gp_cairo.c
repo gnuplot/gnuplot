@@ -1,5 +1,5 @@
 /*
- * $Id: gp_cairo.c,v 1.62 2012/04/14 03:59:31 sfeam Exp $
+ * $Id: gp_cairo.c,v 1.63 2012/05/21 23:15:18 sfeam Exp $
  */
 
 /* GNUPLOT - gp_cairo.c */
@@ -133,7 +133,7 @@ static rgb_color gp_cairo_colorlist[12] = {
 {0,0,1}, /* blue */
 {1,0,1}, /* magenta */
 {0,1,1}, /* cyan */
-{1,1,0}, /* yellow */ 
+{1,1,0}, /* yellow */
 {0,0,0}, /* black */
 {1,0.3,0}, /* orange */
 {0.5,0.5,0.5} /* grey */
@@ -159,7 +159,7 @@ void gp_cairo_initialize_plot(plot_struct *plot)
 	plot->xscale = 1.0; plot->yscale = 1.0;
 	plot->device_xmax = 1; plot->device_ymax = 1;
 	plot->xmax = 1; plot->ymax = 1;
-	
+
 	plot->justify_mode = LEFT;
 	plot->linetype = 1;
 	plot->linewidth = 1.0;
@@ -364,20 +364,20 @@ void gp_cairo_draw_polygon(plot_struct *plot, int n, gpiPoint *corners)
 {
 	/* begin by stroking any open path */
 	gp_cairo_stroke(plot);
-	
+
 	if (plot->polygons_saturate) {
 		int i;
 		path_item *path;
-	
+
 		path = (path_item*) gp_alloc(sizeof(path_item), "gp_cairo : polygon path");
-	
+
 		path->n = n;
 		path->corners = (gpiPoint*) gp_alloc(n*sizeof(gpiPoint), "gp_cairo : polygon corners");
 		for(i=0;i<n;i++)
 			*(path->corners + i) = *corners++;
-	
+
 		path->color = plot->color;
-	
+
 		if (plot->polygon_path_last == NULL) {
 			FPRINTF((stderr,"creating a polygon path\n"));
 			path->previous = NULL;
@@ -553,7 +553,7 @@ void gp_cairo_stroke(plot_struct *plot)
 		&& lt >= 0 && (lt % 5 != 0)) {
 		int i;
 		for (i=0; i<8; i++)
-			dashes[i] = dashpattern[(lt-1) % 5][i] 
+			dashes[i] = dashpattern[(lt-1) % 5][i]
 				* plot->dashlength
 				* plot->oversampling_scale;
 		cairo_set_dash(plot->cr, dashes, 8 /*num_dashes*/, 0 /*offset*/);
@@ -605,7 +605,7 @@ void gp_cairo_vector(plot_struct *plot, int x, int y)
 			fprintf(stderr,"wxt terminal : hinting error, setting to default\n");
 			plot->hinting = 100;
 		}
-		
+
 		/* detect and handle vertical lines */
 		/* the second test is there to avoid artefacts when you choose
 		* a high sampling ('set samples 10000'), so that a smooth function
@@ -652,7 +652,7 @@ void gp_cairo_vector(plot_struct *plot, int x, int y)
 /* pango needs a string encoded in utf-8. We use g_convert from glib.
  * gp_cairo_get_encoding() gives the encoding set via 'set enconding'
  * memory allocated for the string has to be freed */
-gchar * gp_cairo_convert(plot_struct *plot, const char* string)
+static gchar * gp_cairo_convert(plot_struct *plot, const char* string)
 {
 	gsize bytes_read;
 	GError *error = NULL;
@@ -700,19 +700,19 @@ gchar * gp_cairo_convert(plot_struct *plot, const char* string)
  * The following #ifdef WIN32 section is all to work around a bug in
  * the cairo/win32 backend for font rendering.  It has the effect of
  * testing for libfreetype support, and using that instead if possible.
- * Suggested by cairo developer Behdad Esfahbod. 
+ * Suggested by cairo developer Behdad Esfahbod.
  * Allin Cottrell suggests that this not necessary anymore for newer
  * versions of cairo.
  */
 #if defined(WIN32) && (CAIRO_VERSION_MAJOR < 2) && (CAIRO_VERSION_MINOR < 10)
-PangoLayout *
-gp_cairo_create_layout (cairo_t *cr)
+static PangoLayout *
+gp_cairo_create_layout(cairo_t *cr)
 {
     static PangoFontMap *fontmap;
     PangoContext *context;
     PangoLayout *layout;
 
-    if (fontmap == NULL) {   
+    if (fontmap == NULL) {
         fontmap = pango_cairo_font_map_new_for_font_type(CAIRO_FONT_TYPE_FT);
         if (fontmap == NULL) {
 	    fontmap = pango_cairo_font_map_get_default();
@@ -731,8 +731,8 @@ gp_cairo_create_layout (cairo_t *cr)
     return layout;
 }
 #else
-PangoLayout *
-gp_cairo_create_layout (cairo_t *cr)
+static PangoLayout *
+gp_cairo_create_layout(cairo_t *cr)
 {
     return pango_cairo_create_layout(cr);
 }
@@ -777,7 +777,7 @@ void gp_cairo_draw_text(plot_struct *plot, int x1, int y1, const char* string,
 
 	/* Create a PangoLayout, set the font and text */
 	layout = gp_cairo_create_layout (plot->cr);
-	
+
 	pango_layout_set_text (layout, string_utf8, -1);
 	g_free(string_utf8);
 	desc = pango_font_description_new ();
@@ -789,13 +789,13 @@ void gp_cairo_draw_text(plot_struct *plot, int x1, int y1, const char* string,
 #endif /*MAP_SYMBOL*/
 	pango_font_description_set_size (desc, (int) (plot->fontsize*PANGO_SCALE*plot->oversampling_scale) );
 
-	pango_font_description_set_weight (desc, 
+	pango_font_description_set_weight (desc,
 		plot->fontweight ? PANGO_WEIGHT_BOLD : PANGO_WEIGHT_NORMAL);
-	pango_font_description_set_style (desc, 
+	pango_font_description_set_style (desc,
 		plot->fontstyle ? PANGO_STYLE_ITALIC : PANGO_STYLE_NORMAL);
 	pango_layout_set_font_description (layout, desc);
 	pango_font_description_free (desc);
-	
+
 	pango_layout_get_extents(layout, &ink_rect, &logical_rect);
 	if (width)
 		*width = logical_rect.width / PANGO_SCALE;
@@ -859,14 +859,14 @@ void gp_cairo_draw_text(plot_struct *plot, int x1, int y1, const char* string,
 	double lw = cairo_get_line_width (plot->cr);
 	pango_layout_get_extents (layout, &ink, &logical);
 
-	cairo_set_source_rgba (plot->cr, 1.0, 0.0, 0.0, 0.75);	
+	cairo_set_source_rgba (plot->cr, 1.0, 0.0, 0.0, 0.75);
 	cairo_rectangle (plot->cr,
 			(double)logical.x / PANGO_SCALE - lw / 2,
 			(double)logical.y / PANGO_SCALE - lw / 2,
 			(double)logical.width / PANGO_SCALE + lw,
 			(double)logical.height / PANGO_SCALE + lw);
 	cairo_stroke (plot->cr);
-	
+
 	cairo_set_source_rgba (plot->cr, 0.0, 1.0, 0.0, 0.75);
 	cairo_rectangle (plot->cr,
 			(double)ink.x / PANGO_SCALE - lw / 2,
@@ -1278,9 +1278,9 @@ void gp_cairo_enhanced_flush(plot_struct *plot)
 		current_desc = pango_font_description_new ();
 		pango_font_description_set_family (current_desc, gp_cairo_enhanced_get_fontname(plot));
 		pango_font_description_set_size(current_desc,(int) gp_cairo_enhanced_fontsize*PANGO_SCALE);
-		pango_font_description_set_weight (current_desc, 
+		pango_font_description_set_weight (current_desc,
 			plot->fontweight ? PANGO_WEIGHT_BOLD : PANGO_WEIGHT_NORMAL);
-		pango_font_description_set_style (current_desc, 
+		pango_font_description_set_style (current_desc,
 			plot->fontstyle ? PANGO_STYLE_ITALIC : PANGO_STYLE_NORMAL);
 
 		pango_layout_set_font_description (current_layout, current_desc);
@@ -1288,7 +1288,7 @@ void gp_cairo_enhanced_flush(plot_struct *plot)
 		pango_layout_get_extents(current_layout, &current_ink_rect, &current_logical_rect);
 		g_object_unref (current_layout);
 
-		/* calculate the distance to remove to center the overprinted text */ 
+		/* calculate the distance to remove to center the overprinted text */
 		underprinted_logical_rect.width = -(underprinted_logical_rect.width + current_logical_rect.width)/2;
 		overprinted_width = current_logical_rect.width;
 
@@ -1324,9 +1324,9 @@ void gp_cairo_enhanced_flush(plot_struct *plot)
 		hide_desc = pango_font_description_new ();
 		pango_font_description_set_family (hide_desc, gp_cairo_enhanced_get_fontname(plot));
 		pango_font_description_set_size(hide_desc,(int) gp_cairo_enhanced_fontsize*PANGO_SCALE);
-		pango_font_description_set_weight (hide_desc, 
+		pango_font_description_set_weight (hide_desc,
 			plot->fontweight ? PANGO_WEIGHT_BOLD : PANGO_WEIGHT_NORMAL);
-		pango_font_description_set_style (hide_desc, 
+		pango_font_description_set_style (hide_desc,
 			plot->fontstyle ? PANGO_STYLE_ITALIC : PANGO_STYLE_NORMAL);
 		pango_layout_set_font_description (hide_layout, hide_desc);
 		pango_font_description_free (hide_desc);
@@ -1348,16 +1348,16 @@ void gp_cairo_enhanced_flush(plot_struct *plot)
 	if (!gp_cairo_enhanced_widthflag) {
 		/* the idea is to use a blank character, drawn with the inverted width of the text*/
 		/* we first compute the size of the text */
-	
+
 		/* Create a PangoLayout, set the font and text */
 		zerowidth_layout = gp_cairo_create_layout (plot->cr);
 		pango_layout_set_text (zerowidth_layout, enhanced_text_utf8, -1);
 		zerowidth_desc = pango_font_description_new ();
 		pango_font_description_set_family (zerowidth_desc, gp_cairo_enhanced_get_fontname(plot));
 		pango_font_description_set_size(zerowidth_desc,(int) gp_cairo_enhanced_fontsize*PANGO_SCALE);
-		pango_font_description_set_weight (zerowidth_desc, 
+		pango_font_description_set_weight (zerowidth_desc,
 			plot->fontweight ? PANGO_WEIGHT_BOLD : PANGO_WEIGHT_NORMAL);
-		pango_font_description_set_style (zerowidth_desc, 
+		pango_font_description_set_style (zerowidth_desc,
 			plot->fontstyle ? PANGO_STYLE_ITALIC : PANGO_STYLE_NORMAL);
 		pango_layout_set_font_description (zerowidth_layout, zerowidth_desc);
 		pango_font_description_free (zerowidth_desc);
@@ -1467,7 +1467,7 @@ void gp_cairo_enhanced_init(plot_struct *plot, int len)
 	/* also draw any open polygon set */
 	gp_cairo_end_polygon(plot);
 
-	
+
 	gp_cairo_enhanced_string = (char*) malloc(len+1);
 	gp_cairo_enhanced_opened_string = FALSE;
 	gp_cairo_enhanced_overprint = FALSE;
@@ -1493,7 +1493,7 @@ void gp_cairo_enhanced_finish(plot_struct *plot, int x, int y)
 	pango_layout_get_extents(layout, &ink_rect, &logical_rect);
 	/* vert_just = ((double)ink_rect.height/2 +(double)ink_rect.y) / PANGO_SCALE; */
 	vert_just = avg_vchar/2;
-	
+
 	arg = plot->text_angle * M_PI/180;
 	enh_x = x - vert_just * sin(arg);
 	enh_y = y - vert_just * cos(arg);
@@ -1560,7 +1560,7 @@ void gp_cairo_fill(plot_struct *plot, int fillstyle, int fillpar)
 			blue  = plot->color.b;
 
 			fact = (double)(100 - fillpar) /100;
-			
+
 			if (fact >= 0 && fact <= 1) {
 				red   += (1 - red) * fact;
 				green += (1 - green) * fact;
@@ -1713,9 +1713,9 @@ void gp_cairo_set_termvar(plot_struct *plot, unsigned int *v_char,
 	desc = pango_font_description_new ();
 	pango_font_description_set_family (desc, plot->fontname);
 	pango_font_description_set_size(desc,(int) (plot->fontsize*PANGO_SCALE*plot->oversampling_scale));
-	pango_font_description_set_weight (desc, 
+	pango_font_description_set_weight (desc,
 		plot->fontweight ? PANGO_WEIGHT_BOLD : PANGO_WEIGHT_NORMAL);
-	pango_font_description_set_style (desc, 
+	pango_font_description_set_style (desc,
 		plot->fontstyle ? PANGO_STYLE_ITALIC : PANGO_STYLE_NORMAL);
 	pango_layout_set_font_description (layout, desc);
 	pango_font_description_free (desc);
@@ -1775,7 +1775,7 @@ const char* gp_cairo_enhanced_get_fontname(plot_struct *plot)
 }
 
 /* BM: New function to determine the default font.
- * On Windows, the "Sans" alias normally is equivalent to 
+ * On Windows, the "Sans" alias normally is equivalent to
  * "Tahoma" but the resolution fails on some systems. */
 const char *
 gp_cairo_default_font(void)
@@ -1982,7 +1982,7 @@ gchar* gp_cairo_convert_symbol_to_unicode(plot_struct *plot, const char* string)
 		SYMB_UNICODE(0x7C,0x007C); /* VERTICAL LINE */
 		SYMB_UNICODE(0x7D,0x007D); /* RIGHT CURLY BRACKET */
 		SYMB_UNICODE(0x7E,0x223C); /* TILDE OPERATOR */
-		
+
 		SYMB_UNICODE(0xA0,0x20AC); /* EURO SIGN */
 		SYMB_UNICODE(0xA1,0x03D2); /* GREEK UPSILON WITH HOOK SYMBOL */
 		SYMB_UNICODE(0xA2,0x2032); /* PRIME minute */
@@ -2075,7 +2075,7 @@ gchar* gp_cairo_convert_symbol_to_unicode(plot_struct *plot, const char* string)
 		SYMB_UNICODE(0xFC,0x23AB); /* RIGHT CURLY BRACKET UPPER HOOK */
 		SYMB_UNICODE(0xFD,0x23AC); /* RIGHT CURLY BRACKET MIDDLE PIECE */
 		SYMB_UNICODE(0xFE,0x23AD); /* RIGHT CURLY BRACKET LOWER HOOK */
-		
+
 		/* to be treated specifically : composed characters */
 		case 0xE2 : /* REGISTERED SIGN, alternate: sans serif */
 			g_unichar_to_utf8(0x00AE,iter_mod);

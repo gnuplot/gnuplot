@@ -1,6 +1,6 @@
-#ifndef lint
-static char *RCSid() { return RCSid("$Id: wmenu.c,v 1.21 2011/09/04 12:01:37 markisch Exp $"); }
-#endif
+/*
+ * $Id: $Id: wmenu.c,v 1.22 2011/11/01 10:23:47 markisch Exp $
+ */
 
 /* GNUPLOT - win/wmenu.c */
 /*[
@@ -126,6 +126,8 @@ static void TranslateMacro(char *string);
 
 #ifdef SHELL_DIR_DIALOG
 
+INT CALLBACK BrowseCallbackProc(HWND hwnd, UINT uMsg, LPARAM lp, LPARAM pData);
+
 /* This is missing in MingW 2.95 */
 #ifndef BIF_EDITBOX
 # define BIF_EDITBOX 0x0010
@@ -134,7 +136,8 @@ static void TranslateMacro(char *string);
 /* Note: this code has been bluntly copied from MSDN article KB179378
          "How To Browse for Folders from the Current Directory"
 */
-INT CALLBACK BrowseCallbackProc(HWND hwnd, UINT uMsg, LPARAM lp, LPARAM pData)
+INT CALLBACK
+BrowseCallbackProc(HWND hwnd, UINT uMsg, LPARAM lp, LPARAM pData)
 {
 	TCHAR szDir[MAX_PATH];
 
@@ -507,13 +510,12 @@ char *szFilter;
 
 						if( pidl != NULL ) {
 							LPMALLOC pMalloc;
-							HRESULT hr;
 							char szPath[MAX_PATH];
 							unsigned int len;
 
 							/* Convert the item ID list's binary
 							   representation into a file system path */
-							BOOL f = SHGetPathFromIDList(pidl, szPath);
+							SHGetPathFromIDList(pidl, szPath);
 
 							len = strlen( szPath );
 							flag = len > 0;
@@ -523,7 +525,7 @@ char *szFilter;
 
 							/* Allocate a pointer to an IMalloc interface
 							   Get the address of our task allocator's IMalloc interface */
-							hr = SHGetMalloc(&pMalloc) ;
+							SHGetMalloc(&pMalloc) ;
 
 							/* Free the item ID list allocated by SHGetSpecialFolderLocation */
 							IMalloc_Free( pMalloc, pidl );
@@ -815,7 +817,7 @@ int ButtonIcon[BUTTONMAX];
 		if (!(nInc = GetLine(buf,MAXSTR,menufile))) {
 			nLine += nInc;
 			wsprintf(buf,"Problem on line %d of %s\n",nLine,lpmw->szMenuName);
-            		MessageBox(lptw->hWndParent,(LPSTR) buf,lptw->Title, MB_ICONEXCLAMATION);
+			MessageBox(lptw->hWndParent,(LPSTR) buf,lptw->Title, MB_ICONEXCLAMATION);
 			goto errorcleanup;
 		}
 		LeftJustify(buf,buf);
@@ -961,7 +963,6 @@ int ButtonIcon[BUTTONMAX];
 	SendMessage(lpmw->hToolbar, TB_BUTTONSTRUCTSIZE, (WPARAM)sizeof(TBBUTTON), 0);
 	for (i = 0; i < lpmw->nButton; i++) {
 		TBBUTTON button;
-		BOOL ret;
 		ZeroMemory(&button, sizeof(button));
 		button.iBitmap = ButtonIcon[i];
 		button.idCommand = lpmw->hButtonID[i];
@@ -970,7 +971,7 @@ int ButtonIcon[BUTTONMAX];
 		if (MacroCommand(lptw, lpmw->hButtonID[i]) == OPTIONS)
 			button.fsStyle |= BTNS_WHOLEDROPDOWN;
 		button.iString = (UINT_PTR)ButtonText[i];
-		ret = SendMessage(lpmw->hToolbar, TB_INSERTBUTTON, (WPARAM)i+1, (LPARAM)&button);
+		SendMessage(lpmw->hToolbar, TB_INSERTBUTTON, (WPARAM)i + 1, (LPARAM)&button);
 	}
 
 	/* auto-resize and show */

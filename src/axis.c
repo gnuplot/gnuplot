@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.101 2012/03/18 22:39:13 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.102 2012/04/03 16:57:47 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -162,6 +162,7 @@ static double quantize_time_tics __PROTO((AXIS_INDEX, double, double, int));
 static double time_tic_just __PROTO((t_timelevel, double));
 static double round_outward __PROTO((AXIS_INDEX, TBOOLEAN, double));
 static TBOOLEAN axis_position_zeroaxis __PROTO((AXIS_INDEX));
+static void load_one_range __PROTO((AXIS_INDEX axis, double *a, t_autoscale *autoscale, t_autoscale which ));
 static double quantize_duodecimal_tics __PROTO((double, int));
 static void get_position_type __PROTO((enum position_type * type, int *axes));
 
@@ -198,7 +199,7 @@ void
 axis_revert_and_unlog_range(AXIS_INDEX axis)
 {
   if ((axis_array[axis].range_is_reverted)
-  &&  (axis_array[axis].autoscale != 0) 
+  &&  (axis_array[axis].autoscale != 0)
   &&  (axis_array[axis].max > axis_array[axis].min) ) {
     double temp = axis_array[axis].min;
     axis_array[axis].min = axis_array[axis].max;
@@ -839,7 +840,7 @@ setup_tics(AXIS_INDEX axis, int max)
 /* }}} */
 
 /* {{{  gen_tics */
-/* uses global arrays ticstep[], ticfmt[], axis_array[], 
+/* uses global arrays ticstep[], ticfmt[], axis_array[],
  * we use any of GRID_X/Y/X2/Y2 and  _MX/_MX2/etc - caller is expected
  * to clear the irrelevent fields from global grid bitmask
  * note this is also called from graph3d, so we need GRID_Z too
@@ -1189,7 +1190,6 @@ gen_tics(AXIS_INDEX axis, tic_callback callback)
 			    (*callback) (axis, -internal, label, lgrd, def->def.user);
 			    lgrd.l_type = save_gridline;
 			}
-	    		
 		    }
 		}
 		/* }}} */
@@ -1391,7 +1391,7 @@ axis_output_tics(
 }
 
 /* }}} */
-		 
+
 /* {{{ axis_set_graphical_range() */
 
 void
@@ -1449,10 +1449,11 @@ axis_draw_2d_zeroaxis(AXIS_INDEX axis, AXIS_INDEX crossaxis)
 }
 /* }}} */
 
-void load_one_range(AXIS_INDEX axis, double *a, t_autoscale *autoscale, t_autoscale which )
+static void
+load_one_range(AXIS_INDEX axis, double *a, t_autoscale *autoscale, t_autoscale which )
 {
     double number;
-    
+
     assert( which==AUTOSCALE_MIN || which==AUTOSCALE_MAX );
 
     if (equals(c_token, "*")) {
@@ -1501,7 +1502,7 @@ void load_one_range(AXIS_INDEX axis, double *a, t_autoscale *autoscale, t_autosc
             }
         } else if (equals(c_token, ">")) {
 	    int_error(c_token, "malformed range with constraint (use '<' only)");
-	} else { 
+	} else {
 	    /*  no autoscaling-with-lower-bound but simple fixed value only  */
 	    *autoscale &= ~which;
 	    if (which==AUTOSCALE_MIN) {
@@ -1514,7 +1515,7 @@ void load_one_range(AXIS_INDEX axis, double *a, t_autoscale *autoscale, t_autosc
 	    *a = number;
         }
     }
-    
+
     if (*autoscale & which) {
 	/*  check for upper bound only if autoscaling is on  */
 	if (END_OF_COMMAND)  int_error(c_token, "unfinished range");
@@ -1762,7 +1763,7 @@ get_position(struct position *pos)
     get_position_default(pos,first_axes);
 }
 
-/* get_position() - reads a position for label,arrow,key,... 
+/* get_position() - reads a position for label,arrow,key,...
  * with given default coordinate system
  */
 void
@@ -1920,9 +1921,9 @@ char *c, *cfmt;
     /* By convention the minus sign goes only in front of the degrees */
     /* Watch out for round-off errors! */
     if (value < 0 && !EWflag && !NSflag) {
-	if (dtype > 0)  degrees = -fabs(degrees); 
-	else if (mtype > 0)  minutes = -fabs(minutes); 
-	else if (stype > 0)  seconds = -fabs(seconds); 
+	if (dtype > 0)  degrees = -fabs(degrees);
+	else if (mtype > 0)  minutes = -fabs(minutes);
+	else if (stype > 0)  seconds = -fabs(seconds);
     }
     if (EWflag)
 	compass = (value == 0) ? ' ' : (value < 0) ? 'W' : 'E';
@@ -1941,10 +1942,10 @@ char *c, *cfmt;
 		    seconds, compass);
 	} else {
 	    if (stype == 0)
-		snprintf(label, MAX_ID_LEN, cfmt, 
+		snprintf(label, MAX_ID_LEN, cfmt,
 		    minutes, compass);
 	    else
-		snprintf(label, MAX_ID_LEN, cfmt, 
+		snprintf(label, MAX_ID_LEN, cfmt,
 		    minutes, seconds, compass);
 	}
     } else {	/* Some form of degrees in first field */
@@ -1957,10 +1958,10 @@ char *c, *cfmt;
 		    degrees, seconds, compass);
 	} else {
 	    if (stype == 0)
-		snprintf(label, MAX_ID_LEN, cfmt, 
+		snprintf(label, MAX_ID_LEN, cfmt,
 		    degrees, minutes, compass);
 	    else
-		snprintf(label, MAX_ID_LEN, cfmt, 
+		snprintf(label, MAX_ID_LEN, cfmt,
 		    degrees, minutes, seconds, compass);
 	}
     }

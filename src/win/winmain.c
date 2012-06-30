@@ -1,6 +1,6 @@
-#ifndef lint
-static char *RCSid() { return RCSid("$Id: winmain.c,v 1.53 2011/12/05 19:25:10 markisch Exp $"); }
-#endif
+/*
+ * $Id: winmain.c,v 1.54 2011/12/06 20:31:50 markisch Exp $
+ */
 
 /* GNUPLOT - win/winmain.c */
 /*[
@@ -127,7 +127,6 @@ char *authors[]={
                 };
 
 void WinExit(void);
-int gnu_main(int argc, char *argv[], char *env[]);
 static void WinCloseHelp(void);
 int CALLBACK ShutDown();
 
@@ -318,7 +317,7 @@ WinCloseHelp(void)
 }
 
 
-static char * 
+static char *
 GetLanguageCode()
 {
 	static char lang[6] = "";
@@ -590,7 +589,7 @@ int main(int argc, char **argv)
         if (!isatty(fileno(stdin)))
             setmode(fileno(stdin), O_BINARY);
 
-        gnu_main(_argc, _argv, environ);
+        gnu_main(_argc, _argv);
 
         /* First chance to close help system for console gnuplot,
         second for wgnuplot */
@@ -919,7 +918,7 @@ int fake_pclose(FILE *stream)
 	}
 
 	if (pipe_command) {
-		/* system() returns 255 if the command could not be executed. 
+		/* system() returns 255 if the command could not be executed.
 		   The real popen would have returned an error already. */
 		if (rc == 255)
 			int_error(NO_CARET, "Could not execute pipe '%s'.", pipe_command);

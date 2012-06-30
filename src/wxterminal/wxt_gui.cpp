@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.cpp,v 1.99 2012/05/12 04:16:48 sfeam Exp $
+ * $Id: wxt_gui.cpp,v 1.100 2012/05/21 23:15:18 sfeam Exp $
  */
 
 /* GNUPLOT - wxt_gui.cpp */
@@ -373,7 +373,7 @@ void wxtApp::OnCreateWindow( wxCommandEvent& event )
 	 * Note : the frame must be shown for this to succeed */
 	if (!window->frame->panel->plot.success)
 		window->frame->panel->wxt_cairo_create_context();
-	
+
 	/* tell the other thread we have finished */
 	wxMutexLocker lock(*(window->mutex));
 	window->condition->Broadcast();
@@ -765,7 +765,7 @@ void wxtPanel::DrawToDC(wxDC &dc, wxRegion &region)
 		vY = upd.GetY();
 		vW = upd.GetW();
 		vH = upd.GetH();
-	
+
 		FPRINTF((stderr,"OnPaint %d,%d,%d,%d\n",vX,vY,vW,vH));
 		/* Repaint this rectangle */
 		if (gdkpixmap)
@@ -888,7 +888,7 @@ void wxtPanel::OnSize( wxSizeEvent& event )
 	GetSize(&(plot.device_xmax),&(plot.device_ymax));
 
 	double new_xscale, new_yscale;
-	
+
 	new_xscale = ((double) plot.device_xmax)*plot.oversampling_scale/((double) plot.xmax);
 	new_yscale = ((double) plot.device_ymax)*plot.oversampling_scale/((double) plot.ymax);
 
@@ -1137,7 +1137,7 @@ void wxtPanel::OnKeyDownChar( wxKeyEvent &event )
 		WXK_GPKEYCODE(WXK_NUMPAD_F2,GP_KP_F2);
 		WXK_GPKEYCODE(WXK_NUMPAD_F3,GP_KP_F3);
 		WXK_GPKEYCODE(WXK_NUMPAD_F4,GP_KP_F4);
-		
+
 		WXK_GPKEYCODE(WXK_NUMPAD_INSERT,GP_KP_Insert);
 		WXK_GPKEYCODE(WXK_NUMPAD_END,GP_KP_End);
 		WXK_GPKEYCODE(WXK_NUMPAD_DOWN,GP_KP_Down);
@@ -1148,7 +1148,7 @@ void wxtPanel::OnKeyDownChar( wxKeyEvent &event )
 		WXK_GPKEYCODE(WXK_NUMPAD_HOME,GP_KP_Home);
 		WXK_GPKEYCODE(WXK_NUMPAD_UP,GP_KP_Up);
 		WXK_GPKEYCODE(WXK_NUMPAD_PAGEUP,GP_KP_Page_Up);
-		
+
 		WXK_GPKEYCODE(WXK_NUMPAD_DELETE,GP_KP_Delete);
 		WXK_GPKEYCODE(WXK_NUMPAD_EQUAL,GP_KP_Equal);
 		WXK_GPKEYCODE(WXK_NUMPAD_MULTIPLY,GP_KP_Multiply);
@@ -1231,7 +1231,7 @@ static void wxt_update_key_box( unsigned int x, unsigned int y )
 {
 	if (wxt_cur_plotno >= wxt_max_key_boxes) {
 		wxt_max_key_boxes += 10;
-		wxt_key_boxes = (wxtBoundingBox *)realloc(wxt_key_boxes, 
+		wxt_key_boxes = (wxtBoundingBox *)realloc(wxt_key_boxes,
 				wxt_max_key_boxes * sizeof(wxtBoundingBox));
 		wxt_initialize_key_boxes(wxt_cur_plotno);
 		wxt_initialize_hidden(wxt_cur_plotno);
@@ -1385,7 +1385,7 @@ void wxtPanel::RaiseConsoleWindow()
 	/* now test for GNOME multitab console */
 	/* ... if somebody bothers to implement it ... */
 	/* we are not running in any known (implemented) multitab console */
-	
+
 	if (windowid) {
 		gdk_window_raise(gdk_window_foreign_new(windowid));
 		gdk_window_focus(gdk_window_foreign_new(windowid), GDK_CURRENT_TIME);
@@ -1777,7 +1777,7 @@ void wxt_init()
 	wxt_current_plot->hinting = hinting_setting;
 
 #ifdef HAVE_LOCALE_H
-	/* when wxGTK was initialised above, GTK+ also set the locale of the 
+	/* when wxGTK was initialised above, GTK+ also set the locale of the
 	 * program itself;  we must revert it */
 	if (wxt_status == STATUS_UNINITIALIZED) {
 		extern char *current_locale;
@@ -1887,7 +1887,7 @@ void wxt_text()
 	/* Save a snapshot of the axis state so that we can continue
 	 * to update mouse cursor coordinates even though the plot is not active */
 	wxt_current_window->axis_mask = wxt_axis_mask;
-	memcpy( wxt_current_window->axis_state, 
+	memcpy( wxt_current_window->axis_state,
 	 	wxt_axis_state, sizeof(wxt_axis_state) );
 #endif
 
@@ -2041,7 +2041,7 @@ void wxt_put_text(unsigned int x, unsigned int y, const char * string)
 		* we get stuck in an infinite loop) and try again. */
 
 		while (*(string = enhanced_recursion((char*)string, TRUE, wxt_current_plot->fontname,
-				wxt_current_plot->fontsize * wxt_set_fontscale, 
+				wxt_current_plot->fontsize * wxt_set_fontscale,
 				0.0, TRUE, TRUE, 0))) {
 			wxt_enhanced_flush();
 
@@ -2166,7 +2166,7 @@ int wxt_set_font (const char *font)
 	/* the returned int is not used anywhere */
 	return 1;
 }
-	
+
 
 int wxt_justify_text(enum JUSTIFY mode)
 {
@@ -2786,7 +2786,7 @@ void wxtPanel::wxt_cairo_exec_command(gp_command command)
 			wxt_update_key_box(command.x1 + term->h_tic, command.y1 + term->v_tic);
 		}
 		gp_cairo_draw_point(&plot, command.x1, command.y1, command.integer_value);
-		/* 
+		/*
 		 * If we detect that we have just drawn a point with active hypertext,
 		 * save the position and the text to draw after everything else.
 		 */
@@ -2889,7 +2889,6 @@ void wxtPanel::wxt_cairo_draw_hypertext()
 {
 	/* FIXME: Properly, we should save and restore the plot properties, */
 	/* but since this box is the very last thing in the plot....        */
-	char *tmp = strdup(wxt_display_hypertext);
 	char *c;
 	rgb_color grey = {.9, .9, .9};
 	int width = 0;
@@ -2903,7 +2902,7 @@ void wxtPanel::wxt_cairo_draw_hypertext()
 
 	gp_cairo_set_color(&plot, grey, 0.3);
 	gp_cairo_draw_fillbox(&plot,
-		wxt_display_anchor.x + term->h_char, 
+		wxt_display_anchor.x + term->h_char,
 		wxt_display_anchor.y + height,
 		width, height, FS_OPAQUE);
 
@@ -3076,7 +3075,7 @@ void wxt_close_terminal_window(int number)
 }
 
 
-/* The following two routines allow us to update the cursor position 
+/* The following two routines allow us to update the cursor position
  * in the specified window even if the window is not active
  */
 
@@ -3086,7 +3085,7 @@ static double mouse_to_axis(int mouse_coord, wxt_axis_state_t *axis)
 
 	if (axis->term_scale == 0.0)
 	    return 0;
-	axis_coord = axis->min 
+	axis_coord = axis->min
 	           + ((double)mouse_coord - axis->term_lower) / axis->term_scale;
 	if (axis->logbase > 0)
 		axis_coord = exp(axis_coord * axis->logbase);
@@ -3102,7 +3101,7 @@ static void wxt_update_mousecoords_in_window(int number, int mx, int my)
 		return;
 
 	if ((window = wxt_findwindowbyid(number))) {
-		
+
 		/* TODO: rescale mx and my using stored per-plot scale info */
 		char mouse_format[66];
 		char *m = mouse_format;
@@ -3241,7 +3240,7 @@ int wxtPanel::wxt_cairo_create_platform_context()
 
 	/* free gdkpixmap */
 	wxt_cairo_free_platform_context();
-	
+
 	/* GetWindow is a wxGTK specific wxDC method that returns
 	 * the GdkWindow on which painting should be done */
 
@@ -3627,9 +3626,6 @@ void wxt_atexit()
 	int i;
 	int openwindows = 0;
 	int persist_setting;
-#ifdef _Windows
-	MSG msg;
-#endif /*_Windows*/
 
 	if (wxt_status == STATUS_UNINITIALIZED)
 		return;
@@ -3699,7 +3695,7 @@ void wxt_atexit()
 	/* if fork() is available, use it so that the initial gnuplot process
 	 * exits and the child process continues in the background.
 	 */
-	/* NB: 
+	/* NB:
 	 * If there are no plot windows open, then once the parent process
 	 * exits the child can receive no input and will become a zombie.
 	 * So destroy any closed window first, and only fork if some remain open.
@@ -3721,7 +3717,7 @@ void wxt_atexit()
 # ifdef HAVE_WORKING_FORK
 	/* fork */
 	pid_t pid;
-	
+
 	if (openwindows > 0)
 		pid = fork();
 	else
@@ -3824,7 +3820,7 @@ void wxt_sigint_handler(int WXUNUSED(sig))
 {
 	FPRINTF((stderr,"custom interrupt handler called\n"));
 	signal(SIGINT, wxt_sigint_handler);
-	/* routines must check regularly for wxt_status, 
+	/* routines must check regularly for wxt_status,
 	 * and abort cleanly on STATUS_INTERRUPT_ON_NEXT_CHECK */
 	wxt_status = STATUS_INTERRUPT_ON_NEXT_CHECK;
 	if (wxt_current_plot)

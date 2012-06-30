@@ -1,5 +1,5 @@
 /*
- * $Id: plot.h,v 1.49 2011/12/29 22:55:17 sfeam Exp $
+ * $Id: plot.h,v 1.50 2012/02/25 11:41:19 juhaszp Exp $
  */
 
 /* GNUPLOT - plot.h */
@@ -66,6 +66,10 @@ extern TBOOLEAN CallFromRexx;
 void bail_to_command_line __PROTO((void)) __attribute__((noreturn));
 #else
 void bail_to_command_line __PROTO((void));
+#endif
+
+#if defined(_Windows) || defined(_Macintosh)
+int gnu_main __PROTO((int argc, char **argv));
 #endif
 
 void interrupt_setup __PROTO((void));

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.85 2011/09/04 11:06:19 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.86 2012/03/31 05:54:12 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - pm3d.c */
@@ -425,7 +425,7 @@ void pm3d_depth_queue_flush(void)
 static void
 pm3d_plot(struct surface_points *this_plot, int at_which_z)
 {
-    int j, i, i1, ii, ii1, from, curve, scan, up_to, up_to_minus, invert = 0;
+    int j, i, i1, ii, ii1, from, scan, up_to, up_to_minus, invert = 0;
     int go_over_pts, max_pts;
     int are_ftriangles, ftriangles_low_pt = -999, ftriangles_high_pt = -999;
     struct iso_curve *scanA, *scanB;
@@ -443,7 +443,7 @@ pm3d_plot(struct surface_points *this_plot, int at_which_z)
 
     /* just a shortcut */
     TBOOLEAN color_from_column = this_plot->pm3d_color_from_column;
-    
+
     color_from_rgbvar = (this_plot->lp_properties.pm3d_color.type == TC_RGB
 			&&  this_plot->lp_properties.pm3d_color.value == -1);
 
@@ -474,7 +474,6 @@ pm3d_plot(struct surface_points *this_plot, int at_which_z)
     }
 
     scanA = this_plot->iso_crvs;
-    curve = 0;
 
     pm3d_rearrange_scan_array(this_plot, &scan_array, &scan_array_n, &invert, (struct iso_curve ***) 0, (int *) 0, (int *) 0);
 
@@ -804,9 +803,9 @@ pm3d_plot(struct surface_points *this_plot, int at_which_z)
 		 * defined by corners[3],corners[0] and corners[2],corners[1]. */
 		int j1;
 		for (i1 = 0; i1 <= interp_i; i1++) {
-		    bl_point[i1][0].x = 
+		    bl_point[i1][0].x =
 			((corners[3].x - corners[0].x) / interp_i) * i1 + corners[0].x;
-		    bl_point[i1][interp_j].x = 
+		    bl_point[i1][interp_j].x =
 			((corners[2].x - corners[1].x) / interp_i) * i1 + corners[1].x;
 		    bl_point[i1][0].y =
 			((corners[3].y - corners[0].y) / interp_i) * i1 + corners[0].y;
