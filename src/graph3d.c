@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.265 2012/05/08 19:36:38 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.266 2012/06/13 20:12:59 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -54,6 +54,7 @@ static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.265 2012/05/08 19:36:38 
 
 #include "alloc.h"
 #include "axis.h"
+#include "command.h"
 #include "gadgets.h"
 #include "hidden3d.h"
 #include "misc.h"
@@ -607,6 +608,8 @@ do_3dplot(
     TBOOLEAN pm3d_order_depth = 0;
 
     /* Initiate transformation matrix using the global view variables. */
+    if (splot_map)
+	splot_map_activate();
     mat_rot_z(surface_rot_z, trans_mat);
     mat_rot_x(surface_rot_x, mat);
     mat_mult(trans_mat, trans_mat, mat);
@@ -1442,6 +1445,8 @@ do_3dplot(
 	term_hidden_line_removal();
     }
 
+    if (splot_map)
+	splot_map_deactivate();
 }
 
 

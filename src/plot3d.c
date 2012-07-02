@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.196 2012/04/18 00:13:46 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.197 2012/06/13 20:12:59 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -2115,19 +2115,7 @@ eval_3dplots()
     if (table_mode)
 	print_3dtable(plot_num);
     else {
-	/* EAM Jan 2012 - Move the "set view map" adjustments to view angles
-	 * and inversion of the Y axis to here, just before plotting, so that
-	 * the code elsewhere doesn't have to keep un-applying and re-applying
-	 * it whenever a command touches the axis ranges. Revert it immediately
-	 * after plotting.
-	 */
-	if (splot_map)
-	    splot_map_activate();
-
 	do_3dplot(first_3dplot, plot_num, 0);
-
-	if (splot_map)
-	    splot_map_deactivate();
 
 	/* after do_3dplot(), axis_array[] and max_array[].min
 	 * contain the plotting range actually used (rounded

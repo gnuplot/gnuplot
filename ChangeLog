@@ -1,3 +1,10 @@
+2012-07-02  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/graph3d.c src/plot3d.c: do_3dplot() was called in three places,
+	but only one correctly wrapped it in splot_map_{de}active().
+	Move the activate/deactivate calls inside do_3dplot().
+	Bug #3539459
+
 2012-06-30  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/win/grpicon.ico:  Icon with more color depths and resolutions,
