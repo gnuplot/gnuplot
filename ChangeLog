@@ -5,6 +5,9 @@
 	Move the activate/deactivate calls inside do_3dplot().
 	Bug #3539459
 
+	* src/qtterminal/QtGnuplotScene.cpp: Set Z value of zoom box to a large
+	value so that it is not occluded by plot elements.
+
 2012-06-30  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/win/grpicon.ico:  Icon with more color depths and resolutions,
