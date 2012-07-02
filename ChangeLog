@@ -1,3 +1,10 @@
+2012-07-02  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/graph3d.c (draw_3d_graphbox): Rather than treating the position
+	of the z-axis label as a fixed 3D [x,y,z], always draw it at a fixed
+	distance to the left of the z axis.  This is a CHANGE in behavior.
+	Bug #2879916
+
 2012-06-29  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/plot2d.c (eval_plots):  Zero is often a special point in a

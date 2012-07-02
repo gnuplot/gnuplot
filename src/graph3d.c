@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.253.2.2 2012/01/11 23:42:23 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.253.2.3 2012/01/12 00:12:07 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -2563,9 +2563,7 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid,
 	vertex v1;
 	int h_just = CENTRE;
 	int v_just = JUST_TOP;
-	double other_end = X_AXIS.min + X_AXIS.max - zaxis_x;
 	double mid_z = (Z_AXIS.max + Z_AXIS.min) / 2.;
-	double step = (other_end - zaxis_x) / 4.;
 
 	if (Z_AXIS.ticmode & TICS_ON_AXIS) {
 	    map3d_xyz(0, 0, mid_z, &v1);
@@ -2573,8 +2571,15 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid,
 	    x -= 5 * t->h_char;
 	    h_just = RIGHT;
 	} else {
-	    map3d_xyz(zaxis_x - step, zaxis_y, mid_z, &v1);
+	    /* December 2011 - This caused the separation between the axis and the
+	     * label to vary as the view angle changes (Bug #2879916).   Why???
+	     * It seems better to use a constant default separation.
+	     * double other_end = X_AXIS.min + X_AXIS.max - zaxis_x;
+	     * map3d_xyz(zaxis_x - (other_end - zaxis_x) / 4., zaxis_y, mid_z, &v1);
+	     */
+	    map3d_xyz(zaxis_x, zaxis_y, mid_z, &v1);
 	    TERMCOORD(&v1, x, y);
+	    x -= 7 * t->h_char;
 	    h_just = CENTRE;
 	}
 
