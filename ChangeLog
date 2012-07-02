@@ -5,6 +5,9 @@
 	distance to the left of the z axis.  This is a CHANGE in behavior.
 	Bug #2879916
 
+	* src/qtterminal/QtGnuplotScene.cpp: Set Z value of zoom box to a
+	large value so that it is not occluded by plot elements.
+
 2012-06-29  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/plot2d.c (eval_plots):  Zero is often a special point in a
