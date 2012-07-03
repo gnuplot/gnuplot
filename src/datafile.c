@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.224 2012/06/19 18:11:06 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.225 2012/06/24 04:40:04 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -1656,19 +1656,20 @@ df_readascii(double v[], int max)
 	    continue;
 	/*}}} */
 
-	/*{{{  reject points by every */
-	/* accept only lines with (line_count%everyline) == 0 */
-
-	if (line_count < firstline || line_count > lastline ||
-	    (line_count - firstline) % everyline != 0)
-	    continue;
-
-	/* update point_count. ignore point if point_count%everypoint != 0 */
-
-	if (++point_count < firstpoint || point_count > lastpoint ||
-	    (point_count - firstpoint) % everypoint != 0)
-	    continue;
-	/*}}} */
+	/* Bookkeeping for the plot ... every N:M:etc option */
+	if ((parse_1st_row_as_headers || column_for_key_title > 0)
+	&&  !df_already_got_headers) {
+		FPRINTF((stderr,"skipping 'every' test in order to read column headers\n"));
+	} else {
+		/* Accept only lines with (line_count%everyline) == 0 */
+		if (line_count < firstline || line_count > lastline ||
+		    (line_count - firstline) % everyline != 0)
+		    continue;
+		/* update point_count. ignore point if point_count%everypoint != 0 */
+		if (++point_count < firstpoint || point_count > lastpoint ||
+		    (point_count - firstpoint) % everypoint != 0)
+		    continue;
+	}
 	/*}}} */
 
 	++df_datum;

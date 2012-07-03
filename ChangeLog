@@ -1,4 +1,4 @@
-2012-07-02  Ethan A Merritt  <merritt@u.washington.edu>
+2012-07-03  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graph3d.c src/plot3d.c: do_3dplot() was called in three places,
 	but only one correctly wrapped it in splot_map_{de}active().
@@ -7,6 +7,11 @@
 
 	* src/qtterminal/QtGnuplotScene.cpp: Set Z value of zoom box to a large
 	value so that it is not occluded by plot elements.
+
+	* src/datafile.c (df_readascii): If the first line in a data file 
+	contains column headers (strings to be used as titles), then that line
+	should be ignored when applying the "plot ... every N:M(:N1:M1)" filter.
+	Bug #3438848
 
 2012-06-30  Bastian Maerkisch  <bmaerkisch@web.de>
 
