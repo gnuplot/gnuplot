@@ -1,3 +1,10 @@
+2012-07-04  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/pm3d.c (z2cb):  After "set log cb", z2cb(x) was returning 0 for
+	x<=0 rather than -inf.  This causes it to be mistaken for the logged
+	value of x=1.  Now we return CB_AXIS.min instead.
+	Bug #3540048
+
 2012-07-03  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graph3d.c src/plot3d.c: do_3dplot() was called in three places,

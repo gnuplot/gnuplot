@@ -9,7 +9,6 @@ New features, changes and fixes since gnuplot version 4.6
 * NEW the high bits of RGB colors are treated as an alpha channel
 * NEW 'set surface explicit' disables automatic generation of a surface mesh 
 * CHANGE Pipe (popen/pclose) emulation within wgnuplot
-* CHANGE Draw the z-axis label at a fixed distance to the left of the z-axis
 * CHANGE 'set [xyz]axis ... reverse' affects only auto-scaling
 * CHANGE Revised handling of NaN in input data stream
 * CHANGE Remove the BACKWARDS_COMPATIBLE build option (deprecated since v4.0)

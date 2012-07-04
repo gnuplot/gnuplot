@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.86 2012/03/31 05:54:12 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.87 2012/06/30 06:41:33 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - pm3d.c */
@@ -161,7 +161,7 @@ z2cb(double z)
     if (Z_AXIS.log && !CB_AXIS.log) /* log z, linear cb */
 	return exp(z * Z_AXIS.log_base); /* unlog(z) */
     if (!Z_AXIS.log && CB_AXIS.log) /* linear z, log cb */
-	return (z<=0) ? 0.0 : (log(z) / CB_AXIS.log_base);
+	return (z<=0) ? CB_AXIS.min : (log(z) / CB_AXIS.log_base);
     /* both are log */
     if (Z_AXIS.base==CB_AXIS.base) /* can we compare double numbers like that? */
 	return z;
