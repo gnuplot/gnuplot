@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.237 2012/06/19 18:11:05 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.238 2012/06/30 20:50:48 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -3073,7 +3073,6 @@ do_system_func(const char *cmd, char **output)
 #if defined(VMS) || defined(PIPES)
     int c;
     FILE *f;
-    size_t cmd_len;
     int result_allocated, result_pos;
     char* result;
     int ierr = 0;
@@ -3083,12 +3082,10 @@ do_system_func(const char *cmd, char **output)
     static $DESCRIPTOR(lognamedsc, "PLOT$MAILBOX");
 # endif /* VMS */
 
-    cmd_len = strlen(cmd);
-
     /* open stream */
 # ifdef VMS
     pgmdsc.dsc$a_pointer = cmd;
-    pgmdsc.dsc$w_length = cmd_len;
+    pgmdsc.dsc$w_length = strlen(cmd);
     if (!((vaxc$errno = sys$crembx(0, &chan, 0, 0, 0, 0, &lognamedsc)) & 1))
 	os_error(NO_CARET, "sys$crembx failed");
 
