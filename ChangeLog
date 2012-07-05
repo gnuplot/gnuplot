@@ -1,3 +1,9 @@
+2012-07-05  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/qtterminal/QtGnuplotScene.cpp (wheelEvent)
+	src/wxterminal/wxt_gui.cpp (OnMouseWheel):
+	Pass current mouse position in the structure for mouse wheel events.
+
 2012-07-05  Thomas Orgis  <sobukus@users.sourceforge.net>
 
 	* src/qtterminal/QtGnuplotApplication.cpp src/wxterminal/wxt_gui.cpp:

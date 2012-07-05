@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.cpp,v 1.101 2012/06/30 06:41:33 markisch Exp $
+ * $Id: wxt_gui.cpp,v 1.102 2012/07/05 21:26:15 sfeam Exp $
  */
 
 /* GNUPLOT - wxt_gui.cpp */
@@ -1026,6 +1026,10 @@ void wxtPanel::OnRightUp( wxMouseEvent& event )
 void wxtPanel::OnMouseWheel( wxMouseEvent& event )
 {
     int mouse_button;
+    int x,y;
+
+	x = (int) gnuplot_x( &plot, event.GetX() );
+	y = (int) gnuplot_y( &plot, event.GetY() );
 
 	UpdateModifiers(event);
 	mouse_button = (event.GetWheelRotation() > 0 ? 4 : 5);
@@ -1034,7 +1038,7 @@ void wxtPanel::OnMouseWheel( wxMouseEvent& event )
 	if (event.GetWheelAxis() > 0)
 	    mouse_button += 2;
 #endif
-	wxt_exec_event(GE_buttonpress, 0, 0, mouse_button, 0, this->GetId());
+	wxt_exec_event(GE_buttonpress, x, y, mouse_button, 0, this->GetId());
 }
 
 /* the state of the modifiers is checked each time a key is pressed instead of

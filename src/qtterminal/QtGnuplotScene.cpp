@@ -564,7 +564,9 @@ void QtGnuplotScene::mousePressEvent(QGraphicsSceneMouseEvent* event)
 	else if (event->button()== Qt::MidButton)   button = 2;
 	else if (event->button()== Qt::RightButton) button = 3;
 
-	m_eventHandler->postTermEvent(GE_buttonpress, int(event->scenePos().x()), int(event->scenePos().y()), button, 0, 0); /// @todo m_id
+	m_eventHandler->postTermEvent(GE_buttonpress, 
+			int(event->scenePos().x()), int(event->scenePos().y()), 
+			button, 0, 0); /// @todo m_id
 	QGraphicsScene::mousePressEvent(event);
 }
 
@@ -661,11 +663,13 @@ void QtGnuplotScene::wheelEvent(QGraphicsSceneWheelEvent* event)
 	updateModifiers();
 	if (event->orientation() == Qt::Horizontal) {
 		// 6 = scroll left, 7 = scroll right
-		m_eventHandler->postTermEvent(GE_buttonpress, 0, 0, 
+		m_eventHandler->postTermEvent(GE_buttonpress,
+			int(event->scenePos().x()), int(event->scenePos().y()), 
 			event->delta() > 0 ? 6 : 7, 0, 0);
 	} else { /* if (event->orientation() == Qt::Vertical) */
 		// 4 = scroll up, 5 = scroll down
-		m_eventHandler->postTermEvent(GE_buttonpress, 0, 0, 
+		m_eventHandler->postTermEvent(GE_buttonpress,
+			int(event->scenePos().x()), int(event->scenePos().y()), 
 			event->delta() > 0 ? 4 : 5, 0, 0);
 	} 
 }
