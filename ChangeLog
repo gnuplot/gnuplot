@@ -1,3 +1,12 @@
+2012-07-05  Thomas Orgis  <sobukus@users.sourceforge.net>
+
+	* src/qtterminal/QtGnuplotApplication.cpp src/wxterminal/wxt_gui.cpp:
+	The wxt and qt terminals handle -persist by continuing execution of a
+	forked thread after the main thread has exited.  However, anyone waiting
+	on the main thread won't see it as finished unless the stdout and 
+	stderr streams inherited by the continuing process are closed.
+	Bug #3309277
+
 2012-07-04  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/pm3d.c (z2cb):  After "set log cb", z2cb(x) was returning 0 for
