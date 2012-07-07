@@ -1,4 +1,5 @@
 VERSION
+*.d
 *.h
 *.co
 *.po
@@ -16,4 +17,14 @@ VERSION
 *.eps
 *.ps
 *.pdf
+*.par
+*.log
+*.tmp
+*.zip
+dist
 ja
+share
+*.depend
+*.layout
+obj
+bin
