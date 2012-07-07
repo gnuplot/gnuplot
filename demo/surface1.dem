@@ -1,12 +1,31 @@
 #
-# $Id: surface1.dem,v 1.10 2003/10/28 05:35:54 sfeam Exp $
+# $Id: surface1.dem,v 1.11 2004/09/17 05:01:12 sfeam Exp $
 #
+set title "3D surface from a grid (matrix) of Z values"
+set xrange [-0.5:4.5]
+set yrange [-0.5:4.5]
+
+set grid
+set hidden3d
+$grid << EOD
+5 4 3 1 0
+2 2 0 0 1
+0 0 0 1 0
+0 0 0 2 3
+0 1 2 4 3
+EOD
+splot '$grid' matrix with lines notitle
+
+pause -1 "Hit return to continue"
+unset hidden3d
+undefine $*
+
 set samples 21
 set isosample 11
 set xlabel "X axis" offset -3,-2
 set ylabel "Y axis" offset 3,-2
 set zlabel "Z axis" offset -5
-set title "3D gnuplot demo"
+set title "3D surface from a function"
 set label 1 "This is the surface boundary" at -10,-5,150 center
 set arrow 1 from -10,-5,120 to -10,0,0 nohead
 set arrow 2 from -10,-5,120 to 10,0,0 nohead
