@@ -1,3 +1,10 @@
+2012-07-07  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* config/mingw/Makefile:  Extend use of VPATH which makes some explicit
+	rules superfluous. Automatically create dependency .d files during
+	build. Include current date in filenames of zip-file and installer for
+	non-release builds. Remove long-unused WINDOWS variable.
+
 2012-07-05  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/qtterminal/QtGnuplotScene.cpp (wheelEvent)
