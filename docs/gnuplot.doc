@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.741 2012/06/23 08:33:29 markisch Exp $
+C RCS $Id: gnuplot.doc,v 1.742 2012/06/29 16:30:37 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -5429,8 +5429,8 @@ Ffigure_mapcontours
  other types of persistent variables.  The end-of-data delimiter (EOD in the
  example) may be any sequence of alphanumeric characters.
 
- The storage associated with all named data blocks can be released using the
- command `undefine $*`.
+ The storage associated with named data blocks can be released using `undefine`
+ command. `undefine $*` frees all named data blocks at once.
 4 smooth
 ?commands plot datafile smooth
 ?plot datafile smooth

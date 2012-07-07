@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.238 2012/06/30 20:50:48 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.239 2012/07/05 22:08:12 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -596,6 +596,10 @@ undefine_command()
 	wildcard = equals(c_token+1,"*");
 	if (wildcard)
 	    c_token++;
+
+	/* The '$' starting a data block name is a separate token */
+	else if (*key == '$')
+	    copy_str(&key[1], ++c_token, MAX_ID_LEN-1);
 
         /* ignore internal variables */
 	if (strncmp(key, "GPVAL_", 6) && strncmp(key, "MOUSE_", 6))

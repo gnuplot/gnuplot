@@ -1,3 +1,7 @@
+2012-07-07  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/command.c (undefine_command): Allow "undefine $datablockname".
+
 2012-07-07  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* config/mingw/Makefile:  Extend use of VPATH which makes some explicit
