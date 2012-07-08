@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: util.c,v 1.100 2012/05/06 02:58:54 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: util.c,v 1.101 2012/06/30 06:41:33 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - util.c */
@@ -216,9 +216,16 @@ is_definition(int t_num)
 void
 copy_str(char *str, int t_num, int max)
 {
-    int i = 0;
-    int start = token[t_num].start_index;
-    int count = token[t_num].length;
+    int i, start, count;
+
+    if (t_num >= num_tokens) {
+	*str = NUL;
+	return;
+    }
+
+    i = 0;
+    start = token[t_num].start_index;
+    count = token[t_num].length;
 
     if (count >= max) {
 	count = max - 1;
