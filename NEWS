@@ -24,6 +24,7 @@ New features, changes and fixes since gnuplot version 4.6.0
 * FIX corruption of weights used for plotting with smooth acsplines
 * FIX skip columnheader line when applying "every" filter
 * FIX handle out-of-range pm3d values when cb axis is set to log scale
+* FIX top/bottom color distinction in hidden3d when not using palette/RGB colors
 
 
 
