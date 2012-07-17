@@ -1,3 +1,10 @@
+2012-07-17  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/hidden3d.c (draw_edge): Fix broken tracking of top/bottom color
+	distinction in hidden3d mode when the line colors are not specified in
+	palette or RGB mode.
+	Bugfix
+
 2012-07-07  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/command.c (undefine_command): Allow "undefine $datablockname".
