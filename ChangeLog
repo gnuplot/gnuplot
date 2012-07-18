@@ -1,5 +1,8 @@
 2012-07-18  Bastian Maerkisch  <bmaerkisch@web.de>
 
+	* term/win.trm (WIN_options): Specifying only the font size (ie. ",8")
+	would overwrite the font name with a bogus string. Bug fix.
+
 	* config/config.oww config/config.nt config/config.mgw
 	config/makefile.cyg config/makefile.unx config/cygwin/Makefile
 	config/mingw/Makefile config/msvc/Makefile config/watcom/Makefile

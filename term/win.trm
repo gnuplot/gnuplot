@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: win.trm,v 1.110 2012/05/23 17:27:34 markisch Exp $
+ * $Id: win.trm,v 1.111 2012/06/24 00:39:20 markisch Exp $
  */
 
 /* GNUPLOT - win.trm */
@@ -303,13 +303,13 @@ WIN_options()
 					int_error(c_token,
 						  "extraneous argument in set terminal %s",
 						  term->name);
-				set_font = TRUE;
 				comma = strrchr(s,',');
 				if (comma && (1 == sscanf(comma + 1, "%i", &fontsize))) {
 					set_fontsize = TRUE;
 					*comma = '\0';
 				}
 				if (*s) {
+					set_font = TRUE;
 					strncpy(fontname, s, MAXFONTNAME);
 					free(s);
 				}
