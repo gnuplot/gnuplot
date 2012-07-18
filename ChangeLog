@@ -1,3 +1,8 @@
+2012-07-18  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* term/win.trm (WIN_options): Specifying only the font size (ie. ",8")
+	would overwrite the font name with a bogus string. Bug fix.
+
 2012-07-17  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/hidden3d.c (draw_edge): Fix broken tracking of top/bottom color
