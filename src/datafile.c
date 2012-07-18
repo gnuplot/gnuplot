@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.212.2.7 2012/06/24 16:40:24 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.212.2.8 2012/07/03 19:33:22 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -1438,6 +1438,11 @@ plot_option_using(int max_using)
 		use_spec[df_no_use_specs++].column = NO_COLUMN_HEADER;
 		parse_1st_row_as_headers = TRUE;
 		fast_columns = 0;
+		/* FIXME - is it safe to always take the title from the 2nd use spec? */
+		if (df_no_use_specs == 2) {
+		    free(df_key_title);
+		    df_key_title = gp_strdup(column_label);
+		}
 
 	    } else {
 		int col = int_expression();

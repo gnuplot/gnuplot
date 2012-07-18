@@ -4,6 +4,16 @@
 	of the correct result for complex input x with imag(x) > 0.
 	Bug #3542862
 
+	* src/parse.c (set_up_columnheader_parsing):  Take the column header 
+	from the second using spec (normally the Y coordinate) to satisfy
+	set key autotitle columnhead;  plot 'data' using "X":"Y"
+	Bug #3542065
+
+	* src/datafile.c (plot_option_using):  Track the appropriate column
+	header when the column is specified via a non-string variable; e.g.
+	plot for [i=1:N] 'data' using 1:(column(i))
+	Bug #3542065
+
 2012-07-18  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* term/win.trm (WIN_options): Specifying only the font size (ie. ",8")
