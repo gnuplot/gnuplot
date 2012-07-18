@@ -1,3 +1,9 @@
+2012-07-18  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/standard.c (f_acos): acos(x) was returning the complex conjugate
+	of the correct result for complex input x with imag(x) > 0.
+	Bug #3542862
+
 2012-07-18  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* term/win.trm (WIN_options): Specifying only the font size (ie. ",8")
@@ -6,7 +12,7 @@
 2012-07-17  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/hidden3d.c (draw_edge): Fix broken tracking of top/bottom color
-	distinction in hidden3d mode when the line colors are not specified in
+	distinction in hidden3d plots when the line colors are not specified in
 	palette or RGB mode.
 	Bugfix
 
