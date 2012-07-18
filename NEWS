@@ -25,8 +25,9 @@ New features, changes and fixes since gnuplot version 4.6.0
 * FIX skip columnheader line when applying "every" filter
 * FIX handle out-of-range pm3d values when cb axis is set to log scale
 * FIX top/bottom color distinction in hidden3d when not using palette/RGB colors
-
-
+* FIX allow toggling on/off of more than 10 plots in windows terminal
+* FIX color printing from windows terminal
+* FIX set term win font ",<size>"
 
 New features, changes and fixes in gnuplot version 4.6
 ======================================================
