@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: standard.c,v 1.29 2008/05/31 20:03:40 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: standard.c,v 1.30 2011/05/07 15:00:37 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - standard.c */
@@ -392,11 +392,13 @@ f_acos(union argument *arg)
 {
     struct value a;
     double x, y;
+    double ysign;
 
     (void) arg;			/* avoid -Wunused warning */
     (void) pop(&a);
     x = real(&a);
     y = imag(&a);
+    ysign = (y < 0) ? -1: 1;
     if (y == 0.0 && fabs(x) <= 1.0) {
 	/* real result */
 	push(Gcomplex(&a, acos(x) / ang2rad, 0.0));
@@ -409,8 +411,8 @@ f_acos(union argument *arg)
 	    beta = 1;		/* Avoid rounding error problems */
 	else if (beta < -1)
 	    beta = -1;
-	push(Gcomplex(&a, (y > 0? -1: 1)*acos(beta) / ang2rad,
-	                  log(alpha + sqrt(alpha * alpha - 1)) / ang2rad));
+	push(Gcomplex(&a, acos(beta) / ang2rad,
+	                  -ysign * log(alpha + sqrt(alpha * alpha - 1)) / ang2rad));
     }
 }
 
