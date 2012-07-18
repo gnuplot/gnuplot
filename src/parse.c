@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: parse.c,v 1.69 2012/06/19 18:11:06 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: parse.c,v 1.70 2012/06/30 20:50:48 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - parse.c */
@@ -93,6 +93,8 @@ static void parse_unary_expression __PROTO((void));
 static void parse_sum_expression __PROTO((void));
 static int  parse_assignment_expression __PROTO((void));
 static int is_builtin_function __PROTO((int t_num));
+
+static void set_up_columnheader_parsing __PROTO((struct at_entry *previous ));
 
 /* Internal variables: */
 
@@ -409,7 +411,7 @@ parse_assignment_expression()
 
 
 /* add action table entries for primary expressions, i.e. either a
- * parenthesized expression, a variable names, a numeric constant, a
+ * parenthesized expression, a variable name, a numeric constant, a
  * function evaluation, a power operator or postfix '!' (factorial)
  * expression */
 static void
@@ -481,21 +483,9 @@ parse_primary_expression()
 		    add_action(PUSHC)->v_arg = num_params;
 		}
 
-		/* column("string") means we expect the first row of */
-		/* a data file to contain headers rather than data.  */
+		/* The column() function has side effects requiring special handling */
 		if (!strcmp(ft[whichfunc].f_name,"column")) {
-		    struct at_entry *previous = &(at->actions[at->a_count-1]);
-		    if (previous->index == PUSHC
-		    &&  previous->arg.v_arg.type == STRING)
-			parse_1st_row_as_headers = TRUE;
-		}
-		/* This allows plot ... using (column(N)) title columnhead */
-		if (!strcmp(ft[whichfunc].f_name,"column")) {
-		    struct at_entry *previous = &(at->actions[at->a_count-1]);
-		    if (previous->index == PUSHC
-		    &&  previous->arg.v_arg.type == INTGR)
-			if (at_highest_column_used < previous->arg.v_arg.v.int_val)
-			    at_highest_column_used = previous->arg.v_arg.v.int_val;
+		    set_up_columnheader_parsing( &(at->actions[at->a_count-1]) );
 		}
 
 		(void) add_action(whichfunc);
@@ -1207,4 +1197,41 @@ cleanup_iteration(t_iterator *iter)
 	iter = next;
     }
     return NULL;
+}
+
+/* The column() function requires special handling because
+ * - It has side effects if reference to a column entry
+ *   requires matching it to the column header string.
+ * - These side effects must be handled at the time the
+ *   expression is parsed rather than when it it evaluated.
+ */
+static void
+set_up_columnheader_parsing( struct at_entry *previous )
+{
+    /* column("string") means we expect the first row of */
+    /* a data file to contain headers rather than data.  */
+    if (previous->index == PUSHC &&  previous->arg.v_arg.type == STRING)
+	parse_1st_row_as_headers = TRUE;
+
+    /* This allows plot ... using (column(<const>)) title columnhead */
+    if (previous->index == PUSHC && previous->arg.v_arg.type == INTGR) {
+	if (at_highest_column_used < previous->arg.v_arg.v.int_val)
+	    at_highest_column_used = previous->arg.v_arg.v.int_val;
+    }
+    
+    /* This attempts to catch plot ... using (column(<variable>)) */
+    if (previous->index == PUSH) {
+	udvt_entry *u = previous->arg.udv_arg;
+	if (u->udv_value.type == INTGR) {
+	    if (at_highest_column_used < u->udv_value.v.int_val)
+		at_highest_column_used = u->udv_value.v.int_val;
+	}
+#if (0) /* Currently handled elsewhere, but could be done here instead */
+	if (u->udv_value.type == STRING) {
+	    parse_1st_row_as_headers = TRUE;
+	}
+#endif
+    }
+
+    /* NOTE: There is no way to handle ... using (column(<general expression>)) */
 }
