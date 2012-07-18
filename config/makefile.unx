@@ -1,5 +1,5 @@
 #
-# $Id: makefile.unx,v 1.20 2011/12/09 06:58:06 sfeam Exp $
+# $Id: makefile.unx,v 1.21 2011/12/29 04:30:43 sfeam Exp $
 #
 #
 ############################################################
@@ -467,10 +467,10 @@ PC = corgraph.asm corplot.c header.mac hrcgraph.asm lineproc.mac \
 	makefile.djg pcgraph.asm makefile.emx term/pc.trm 
 WINDOWS = makefile.win makefile.msw README.win win/wcommon.h \
 	win/wgnuplib.c win/wgnuplib.h win/wgnuplib.rc \
-	win/wgnuplot.hpj win/wgnuplot.mnu win/wgnuplot.rc \
+	win/wgnuplot.mnu win/wgnuplot.rc \
 	win/wgraph.c win/winmain.c win/wmenu.c win/wpause.c \
 	win/wprinter.c win/wresourc.h win/wtext.c win/wtext.h \
-	win/geticon.c docs/doc2rtf.c term/win.trm
+	win/geticon.c term/win.trm
 OS2 = makefile.os2 os2/makefile os2/dialogs.c os2/dialogs.h os2/gclient.c \
 	os2/gnuicon.uue os2/gnupmdrv.c os2/gnupmdrv.def os2/gnupmdrv.h \
 	os2/gnupmdrv.itl os2/gnupmdrv.rc os2/print.c docs/doc2ipf.c \
@@ -480,8 +480,7 @@ OS2 = makefile.os2 os2/makefile os2/dialogs.c os2/dialogs.h os2/gclient.c \
 DOCS1 = docs/makefile docs/README docs/checkdoc.c docs/doc2gih.c \
 	docs/doc2hlp.c docs/doc2hlp.vms docs/doc2ms.c docs/doc2tex.c \
 	docs/gnuplot.1 docs/lasergnu.1 docs/toc_entr.sty docs/doc2info.pl \
-	docs/titlepag.ms docs/titlepag.tex \
-	docs/doc2rtf.c
+	docs/titlepag.ms docs/titlepag.tex
 DOCS2 = docs/gnuplot.doc docs/gpcard.tex
 DOCS3 = docs/latextut/makefile docs/latextut/eg1.plt \
 	docs/latextut/eg2.plt docs/latextut/eg3.dat docs/latextut/eg3.plt \

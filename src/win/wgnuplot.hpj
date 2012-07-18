@@ -1,9 +1,0 @@
-[OPTIONS]
-COMPRESS=12 Hall Zeck
-LCID=0x409 0x0 0x0 ; Englisch (USA)
-TITLE=gnuplot
-HLP=wgnuplot.hlp
-[FILES]
-gnuplot.rtf
-[CONFIG]
-BrowseButtons()

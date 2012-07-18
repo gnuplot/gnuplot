@@ -602,6 +602,7 @@
 
 /* gnuplot.gih is not used by wgnuplot */
 #define NO_GIH 1
+#define HELPFILE "wgnuplot.chm"
 
 /* The Microsoft visual C++ compiler spews about 1000 warnings during */
 /* compilation of gnuplot. The following lines disable most of them.  */

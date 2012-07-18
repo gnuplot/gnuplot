@@ -1,3 +1,13 @@
+2012-07-18  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* config/config.oww config/config.nt config/config.mgw
+	config/makefile.cyg config/makefile.unx config/cygwin/Makefile
+	config/mingw/Makefile config/msvc/Makefile config/watcom/Makefile
+	src/command.c src/winmain.c:
+	Remove support for old style Windows help format.
+
+	* src/win/wgnuplot.hpj: Removed.
+
 2012-07-17  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/hidden3d.c (draw_edge): Fix broken tracking of top/bottom color

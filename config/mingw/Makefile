@@ -1,5 +1,5 @@
 # Hello, emacs: this is a -*- Makefile -*-
-# $Id: Makefile,v 1.26 2012/06/30 09:37:08 markisch Exp $
+# $Id: Makefile,v 1.27 2012/07/07 12:38:41 markisch Exp $
 #
 # GNUPLOT Makefile for MinGW/MSYS on Windows
 # This assumes usual installation of the MinGW32 toolkit, the free
@@ -12,8 +12,8 @@
 #	 make all
 #	 make install
 #
-# This makefile was tested with MSYS, MingW32 and Microsoft Help
-# Workshop 4.03 / Microsoft HTML Help 1.4 SDK.
+# This makefile was tested with 
+#   MSYS, MingW32 and Microsoft HTML Help 1.4 SDK.
 
 
 #
@@ -24,10 +24,6 @@
 
 # Define this only if doing a release build
 #RELEASE=1
-
-# Use more modern HTML help instead of no longer supported Windows help system
-# Please update the HHWPATH below if necessary.
-HTML_HELP=1
 
 # GIF, PNG, JPEG device drivers
 # Requires gd library. There are two possibilities how to configure these
@@ -90,14 +86,6 @@ ICONV=1
 
 # Below you can adapt paths according to your software setup:
 
-# Where to place the helpfile:
-ifdef HTML_HELP
-  HELPFILE = wgnuplot.chm
-  HELPFILEJA = wgnuplot-ja.chm
-else
-  HELPFILE = wgnuplot.hlp
-endif
-
 # Where to install the PostScript prologue files, relatively to the executable
 # wgnuplot.exe
 GNUPLOT_PS_DIR = share/PostScript
@@ -127,8 +115,6 @@ DESTDIR = "$(PROGRAMFILES)/gnuplot"
 # -mpentiumpro means optimize for Pentium II and Pro procesors
 #CFLAGS +=
 
-ifdef HTML_HELP
-
 # To compile the .chm file you need the Microsoft HTML Help 1.4 SDK
 # It can be obtained here:
 # http://go.microsoft.com/fwlink/?LinkId=154968
@@ -136,20 +122,6 @@ ifdef HTML_HELP
 # adjust the include and linrary paths.
 HHWPATH = "$(PROGRAMFILES)/HTML Help Workshop/"
 HHC = $(HHWPATH)hhc
-
-else
-
-# To compile the .hlp file you need hcw either out of Microsoft SDK or MS Help
-# Workshop. The latter can be obtained from either of
-# ftp://ftp.microsoft.com/softlib/mslfiles/hcwsetup.exe
-# http://www.microsoft.com/downloads/details.aspx?displaylang=en&FamilyID=34D35502-4DE9-4676-952C-34CC7F64F098
-# Put the path to hcw here unless it is already in PATH:
-HCWPATH = "$(PROGRAMFILES)/Help\ Workshop/"
-HCW = $(HCWPATH)hcw
-# Switches are for HCW 4.03:
-HCWFLAG =
-
-endif
 
 # Choose which windres/rc do you want to use (GNU windres or MS RC):
 GNU_RC = 1
@@ -280,12 +252,11 @@ ifdef MOUSE
   CFLAGS += -DUSE_MOUSE=1 -DWIN_IPC
 endif
 
-ifdef HTML_HELP
-  CFLAGS += -DWITH_HTML_HELP -I$(HHWPATH)include
-  BUILDHELPFILE = $(D)windows/$(HELPFILE)
-else
-  BUILDHELPFILE = $(HELPFILE)
-endif
+# Name of helpfiles:
+HELPFILE = wgnuplot.chm
+HELPFILEJA = wgnuplot-ja.chm
+CFLAGS += -I$(HHWPATH)include
+BUILDHELPFILE = $(D)windows/$(HELPFILE)
 
 ifdef NEWGD
   GD=1
@@ -429,8 +400,11 @@ include $(S)/makefile.all
 
 OBJS = $(COREOBJS) version.$(O) gpexecute.$(O) $(WX_OBJS) $(CAIRO_OBJS)
 
-WINOBJS = winmain.$(O) wgnuplib.$(O) wgraph.$(O) wprinter.$(O) wtext.$(O) \
-	  wpause.$(O) wmenu.$(O) screenbuf.$(O) wgdiplus.$(O)
+WINOBJS = winmain.$(O) wgnuplib.$(O) wgraph.$(O) wprinter.$(O) \
+	  wpause.$(O) wgdiplus.$(O)
+ifneq ($(TARGET),gnuplot.exe)
+WINOBJS += wtext.$(O) screenbuf.$(O) wmenu.$(O)
+endif
 
 # default rules
 .SUFFIXES: .exe .$(O) .c
@@ -438,11 +412,8 @@ WINOBJS = winmain.$(O) wgnuplib.$(O) wgraph.$(O) wprinter.$(O) wtext.$(O) \
 	$(CC) -c $(CFLAGS) $(CFLAGSEXTRA) -MMD -MT '$*.$$(O)' -MF $*.d -o $@ $<
 
 LDLIBS = -lkernel32 -lgdi32 -lwinspool -lcomdlg32 -lcomctl32 -ladvapi32 -lshell32 -lmsimg32 -lgdiplus
-
-ifdef HTML_HELP
-  LDLIBS += -lhtmlhelp
-  LDFLAGS2 += -L$(HHWPATH)lib
-endif
+LDLIBS += -lhtmlhelp
+LDFLAGS2 += -L$(HHWPATH)lib
 
 $(TARGET): $(OBJS) $(WINOBJS) wgplt_res.$(O)
 	$(LDX) $(LDFLAGS) $(LDFLAGS2) -o $@ $(OBJS) $(WINOBJS) wgplt_res.$(O) $(LDLIBS)\
@@ -464,7 +435,7 @@ wgplt_res.$(O): $(W)/wgnuplot.rc $(W)/wgnuplib.rc $(W)/wresourc.h $(W)/texticon.
 	$(RES2COFF)
 
 show.$(O): show.c plot.h setshow.h
-	$(CC) -c $(CFLAGS) $(CFLAGSEXTRA) -DHELPFILE=\"$(HELPFILE)\" -DBINDIR=\"$(bindir)\" -DGNUPLOT_PS_DIR=\"$(GNUPLOT_PS_DIR)\" -MMD -MT '$*.$$(O)' -MF $*.d -o $@ $<
+	$(CC) -c $(CFLAGS) $(CFLAGSEXTRA) -DBINDIR=\"$(bindir)\" -DGNUPLOT_PS_DIR=\"$(GNUPLOT_PS_DIR)\" -MMD -MT '$*.$$(O)' -MF $*.d -o $@ $<
 
 term.$(O): term.c term.h plot.h setshow.h bitmap.h $(CORETERM)
 	$(CC) -c $(CFLAGS) $(CFLAGSEXTRA) $(TERMFLAGS) -MMD -MT '$*.$$(O)' -MF $*.d -o $@ $<
@@ -479,7 +450,7 @@ endif
 WINDEPS = $(W)/wgnuplib.h $(W)/wcommon.h $(W)/wresourc.h $(W)/screenbuf.h $(W)/wgdiplus.h
 
 winmain.$(O): $(W)/winmain.c $(W)/wgnuplib.h $(W)/wtext.h plot.h
-	$(CC) -c $(CFLAGS) $(CFLAGSEXTRA) -MMD -MT '$*.$$(O)' -MF $*.d -o $@ -DHELPFILE=\"$(HELPFILE)\" $<
+	$(CC) -c $(CFLAGS) $(CFLAGSEXTRA) -MMD -MT '$*.$$(O)' -MF $*.d -o $@ $<
 
 wgdiplus.$(O): $(W)/wgdiplus.cpp $(WINDEPS)
 	$(CXX) -c $(CXXFLAGS) $(CFLAGSEXTRA) -MMD -MT '$*.$$(O)' -MF $*.d -o $@ $<
@@ -493,7 +464,6 @@ wxt_gui.$(O): $(S)/wxterminal/wxt_gui.cpp $(S)/wxterminal/wxt_gui.h
 gp_cairo.$(O): $(S)/wxterminal/gp_cairo.c $(S)/wxterminal/gp_cairo.h
 	$(CC) -c $(CFLAGS) $(CFLAGSEXTRA) $(CXXFLAGS) $(PANGOCAIRO_CFLAGS) -MMD -MT '$*.$$(O)' -MF $*.d -o $@ $<
 
-ifdef HTML_HELP
 # convert gnuplot.doc to windows/wgnuplot.html
 $(BUILDHELPFILE): doc2html.exe $(D)gnuplot.doc $(D)windows/wgnuplot.hhp $(D)windows/wgnuplot.hhk \
                   $(D)windows/wgnuplot.stp $(D)plotstyles.gnu $(CORETERM)
@@ -503,12 +473,6 @@ $(BUILDHELPFILE): doc2html.exe $(D)gnuplot.doc $(D)windows/wgnuplot.hhp $(D)wind
 
 $(HELPFILE): $(BUILDHELPFILE)
 	$(CP) $^ $@
-else
-# convert gnuplot.doc to gnuplot.rtf
-$(HELPFILE): doc2rtf.exe $(D)gnuplot.doc win/wgnuplot.hpj
-	./doc2rtf $(D)gnuplot.doc win/gnuplot.rtf
-	$(HCW) -c -e win/wgnuplot.hpj
-endif
 
 # Working directory for patched Japanese sources 
 JA = ja/
@@ -554,9 +518,6 @@ doc2html.exe: $(D)windows/doc2html.c $(D)termdoc.c $(D)xref.c version.$(O)
 
 doc2html-ja.exe: $(JASRC) $(D)windows/doc2html.c $(D)termdoc.c $(D)xref.c version.$(O)
 	$(LD) $(LDFLAGS) -o $@ -DWINDOWS_NO_GUI -DJAPANESE_DOC $(CFLAGS) -I. -I$(JAD) -I$(JA)/term $(D)windows/doc2html.c $(D)termdoc.c $(D)xref.c version.$(O)
-
-doc2rtf.exe: $(D)doc2rtf.c $(D)termdoc.c $(D)xref.c
-	$(LD) $(LDFLAGS) -o $@ -DWINDOWS_NO_GUI $(CFLAGS) -I$(S) -I$(D) -I$(T) $^
 
 #make binary demo files
 $(M)bf_test.exe : bf_test.c dbinary.$(O) alloc.$(O)
@@ -691,7 +652,7 @@ ps_guide.pdf: $(D)psdoc/ps_guide.ps
 
 # clean up temporary files
 clean:
-	$(RM) config.h wgnuplot.map wgnuplot.res $(W)/gnuplot.rtf
+	$(RM) config.h wgnuplot.map wgnuplot.res
 	$(RM) *.$(O) *.po *.o *.co *.d
 	$(RM) doc2*.exe $(W)/wgnuplib.res wgnuplib.map wgnuplot.lib
 	$(RM) $(M)bf_test.exe allterm.h allterm.c

@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.7 2012/06/13 10:58:56 markisch Exp $
+# $Id: Makefile,v 1.8 2012/06/30 09:37:08 markisch Exp $
 #
 # GNUPLOT Makefile Microsoft Visual C++ 2005 or newer
 
@@ -50,9 +50,6 @@ PDFLIB = 0
 WXT = 0
 # Build the lua/tikz terminal?
 LUA = 0
-# Choose help format:
-# for HTML help (.chm) this should be 1, for (.hlp) it should be 0
-HTML_HELP = 1
 
 # Location of additional libraries
 GDDIR = gdwin32
@@ -87,7 +84,7 @@ LD = link
 # /Zi means prepare for codeview
 # /MD means include multi-thread support (DLL)
 CBASEFLAGS = /EHsc /GR /MD /O2 /nologo
-CFLAGS = $(CBASEFLAGS) /I. /I$(TOP) /I$(S) /D_Windows /DWIN32 /DHAVE_CONFIG_H /D__MSC__ /DHELPFILE=\"$(HELPFILE)\" $(OPTIONS)
+CFLAGS = $(CBASEFLAGS) /I. /I$(TOP) /I$(S) /D_Windows /DWIN32 /DHAVE_CONFIG_H /D__MSC__ $(OPTIONS)
 CFLAGS = $(CFLAGS) /DGNUPLOT_SHARE_DIR=\"$(GNUPLOT_SHARE_DIR)\"
 WIN_CFLAGS = /DUSE_FAKEPIPES
 CONSOLE_CFLAGS = /DWGP_CONSOLE /DCONSOLE_SWITCH_CP /DPIPES
@@ -132,14 +129,8 @@ TERMFLAGS = $(TERMFLAGS) /DGNUPLOT_LUA_DIR=\"$(GNUPLOT_LUA_DIR)\"
 LUALIBS = lua51.lib
 !ENDIF
 
-!IF "$(HTML_HELP)" == "1"
 HELPFILE = wgnuplot.chm
-OPTIONS = $(OPTIONS) /DWITH_HTML_HELP
 HHWPATH=$(PROGRAMFILES)\HTML Help Workshop\\
-!ELSE
-HELPFILE = wgnuplot.hlp
-HCWPATH=$(PROGRAMFILES)\help workshop\\
-!ENDIF
 
 !IF "$(PROCESSOR_ARCHITECTURE)" == "ALPHA"
 MACHINE = $(PROCESSOR_ARCHITECTURE)
@@ -222,9 +213,7 @@ linkopt-w.msw: Makefile
 	echo $(WINOBJS) >> linkopt-w.msw
 	echo $(COMMONLIBS) >> linkopt-w.msw
 	echo wgnuplot.res >> linkopt-w.msw
-!IF "$(HTML_HELP)" == "1"
 	echo htmlhelp.lib >> linkopt-w.msw
-!ENDIF
 !IF "$(GDLIB)" == "1"
 	echo bgd.lib >> linkopt-w.msw
 !ENDIF
@@ -243,9 +232,7 @@ linkopt-c.msw: Makefile
 	echo $(COMMONLIBS) >> linkopt-c.msw
 	echo $(CONSOLELIBS) >> linkopt-c.msw
 	echo wgnuplot.res >> linkopt-c.msw
-!IF "$(HTML_HELP)" == "1"
 	echo htmlhelp.lib >> linkopt-c.msw
-!ENDIF
 !IF "$(GDLIB)" == "1"
 	echo bgd.lib >> linkopt-c.msw
 !ENDIF
@@ -283,7 +270,6 @@ wgnuplot.res :  $(W)wgnuplot.rc $(W)wgnuplib.rc $(W)wresourc.h $(W)grpicon.ico $
 
 
 # build windows help file
-!IF "$(HTML_HELP)" == "1"
 $(HELPFILE): doc2html.exe $(D)gnuplot.doc gnuplot.exe
 	doc2html $(D)gnuplot.doc $(D)windows\\
 	cd $(D)
@@ -291,19 +277,9 @@ $(HELPFILE): doc2html.exe $(D)gnuplot.doc gnuplot.exe
 	-"$(HHWPATH)hhc" windows\wgnuplot.hhp
 	cd ..\\config\\msvc
 	if exist $(D)windows\wgnuplot.chm copy $(D)windows\wgnuplot.chm .
-!ELSE
-# convert gnuplot.doc to gnuplot.rtf
-$(HELPFILE): doc2rtf.exe $(D)gnuplot.doc $(W)wgnuplot.hpj
-	doc2rtf $(D)gnuplot.doc $(W)gnuplot.rtf
-	"$(HCWPATH)hcw" /c /e $(W)wgnuplot.hpj
-	if exist $(W)wgnuplot.hlp copy $(W)wgnuplot.hlp .
-!ENDIF
 
 doc2html.exe: $(D)windows\doc2html.c $(D)termdoc.c $(D)xref.c version.obj
 	$(CC) $(CFLAGS) /F 5000 /W1 /I. /DWINDOWS_NO_GUI /I$(D) /I$(T) -Fedoc2html.exe $(D)windows\doc2html.c $(D)termdoc.c $(D)xref.c version.obj
-
-doc2rtf.exe: $(D)doc2rtf.c $(D)termdoc.c $(D)xref.c
-	$(CC) $(CFLAGS) /F 5000 /W1 /I. /DWINDOWS_NO_GUI /I$(D) /I$(T) -Fedoc2rtf.exe $(D)doc2rtf.c $(D)termdoc.c $(D)xref.c
 
 
 # make binary demo files
@@ -323,13 +299,11 @@ clean:
 	if exist *.cobj del *.cobj
 	if exist *.map del *.map
 	if exist wgnuplot.res del wgnuplot.res
-	if exist gnuplot.rtf del gnuplot.rtf
 	if exist wgnuplot.chw del wgnuplot.chw
 	if exist $(M)bf_test.exe del $(M)bf_test.exe
 	if exist linkopt-w.msw del linkopt-w.msw
 	if exist linkopt-c.msw del linkopt-c.msw
 	if exist doc2html.exe del doc2html.exe
-	if exist doc2rtf.exe del doc2rtf.exe
 	if exist gnuplot rmdir /s /q gnuplot
 
 veryclean: clean

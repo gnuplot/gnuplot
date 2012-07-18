@@ -1,5 +1,5 @@
 # Hey, Emacs, this is a -*- Makefile -*- #
-# $Id: Makefile,v 1.4 2011/04/17 10:05:11 markisch Exp $
+# $Id: Makefile,v 1.5 2012/06/30 09:37:08 markisch Exp $
 #
 #
 # GNUPLOT Makefile for Cygwin on WinNT and Win95/98/2000
@@ -270,11 +270,11 @@ WINOBJS = winmain.$(O) wgnuplib.$(O) wgraph.$(O) wprinter.$(O) wtext.$(O) \
 
 WINDOWS = makefile.win makefile.nt README.win $(W)/wcommon.h \
 	$(W)/wgnuplib.c $(W)/wgnuplib.h $(W)/wgnuplib.rc \
-	$(W)/wgnuplot.hpj $(W)/wgnuplot.mnu $(W)/wgraph.c \
+	$(W)/wgnuplot.mnu $(W)/wgraph.c \
 	$(W)/winmain.c $(W)/wmenu.c $(W)/wpause.c $(W)/wprinter.c \
 	$(W)/wresourc.h $(W)/wtext.c $(W)/wtext.h \
 	$(W)/screenbuf.c $(W)/screenbuf.h \
-	$(D)doc2rtf.c $(T)win.trm $(W)/grpicon.ico $(W)/texticon.ico
+	$(T)win.trm $(W)/grpicon.ico $(W)/texticon.ico
 
 
 # default rules
@@ -336,14 +336,6 @@ screenbuf.$(O): $(W)/screenbuf.c $(WINDEPS)
 wgnuplot.mnu: $(W)/wgnuplot.mnu
 	$(CP) $^ $@
 
-
-# convert gnuplot.doc to gnuplot.rtf
-$(HELPFILE): doc2rtf.exe $(D)gnuplot.doc $(W)/wgnuplot.hpj
-	./doc2rtf $(D)gnuplot.doc $(W)/gnuplot.rtf
-	$(HCW) /c /e $(W)/wgnuplot.hpj
-
-doc2rtf.exe: $(D)doc2rtf.c $(D)termdoc.c $(D)xref.c
-	$(LD) $(LDFLAGS) -o $@ -DWINDOWS_NO_GUI $(CFLAGS) -I$(S) -I$(D) -I$(T) $^
 
 #make binary demo files
 $(M)bf_test.exe : bf_test.c dbinary.$(O) alloc.$(O)
@@ -419,7 +411,7 @@ gnuplot.pdf: gnuplot.tex $(D)titlepag.tex
 # clean up temporary files
 clean:
 	$(RM) config.h *.$(O) wgnuplot.map wgnuplot.res $(W)/gnuplot.rtf
-	$(RM) doc2rtf.exe $(W)/wgnuplib.res wgnuplib.map wgnuplot.lib
+	$(RM) $(W)/wgnuplib.res wgnuplib.map wgnuplot.lib
 	$(RM) $(M)bf_test.exe allterm.h allterm.c
 	$(RM) gnuplot.tex gnuplot.dvi gnuplot.ps gnuplot.pdf
 

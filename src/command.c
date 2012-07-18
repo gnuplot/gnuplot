@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.239 2012/07/05 22:08:12 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.240 2012/07/08 04:18:42 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -135,9 +135,7 @@ static int winsystem __PROTO((const char *));
 #   include <dir.h>		/* setdisk() */
 #  endif
 # endif				/* !MSC */
-# ifdef WITH_HTML_HELP
-#   include <htmlhelp.h>
-# endif
+# include <htmlhelp.h>
 # include "win/winmain.h"
 #endif /* _Windows */
 
@@ -2383,7 +2381,7 @@ help_command()
 
     c_token++;
     parent = GetDesktopWindow();
-#ifdef WITH_HTML_HELP
+
     /* open help file if necessary */
     help_window = HtmlHelp(parent, winhelpname, HH_GET_WIN_HANDLE, (DWORD_PTR)NULL);
     if (help_window == NULL) {
@@ -2414,18 +2412,6 @@ help_command()
         link.fIndexOnFail = TRUE;
         HtmlHelp(parent, winhelpname, HH_KEYWORD_LOOKUP, (DWORD_PTR)&link);
     }
-#else
-    if (END_OF_COMMAND)
-	WinHelp(parent, (LPSTR) winhelpname, HELP_INDEX, (DWORD) NULL);
-    else {
-	char buf[128];
-	int start = c_token;
-	while (!(END_OF_COMMAND))
-	    c_token++;
-	capture(buf, start, c_token - 1, 128);
-	WinHelp(parent, (LPSTR) winhelpname, HELP_PARTIALKEY, (DWORD) buf);
-    }
-#endif
 }
 #else  /* !_Windows */
 void

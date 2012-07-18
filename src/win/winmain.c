@@ -1,5 +1,5 @@
 /*
- * $Id: winmain.c,v 1.54 2011/12/06 20:31:50 markisch Exp $
+ * $Id: winmain.c,v 1.55 2012/06/30 06:41:33 markisch Exp $
  */
 
 /* GNUPLOT - win/winmain.c */
@@ -60,9 +60,7 @@
 #include <commctrl.h>
 #include <shlobj.h>
 #include <shlwapi.h>
-#ifdef WITH_HTML_HELP
 #include <htmlhelp.h>
-#endif
 #include <dos.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -117,9 +115,7 @@ BOOL cp_changed = FALSE;
 UINT cp_input;  /* save previous codepage settings */
 UINT cp_output;
 #endif
-#ifdef WITH_HTML_HELP
 HWND help_window = NULL;
-#endif
 
 char *authors[]={
                  "Colin Kelley",
@@ -180,14 +176,7 @@ WinExit(void)
 
 #ifndef WGP_CONSOLE
     TextMessage();  /* process messages */
-#ifndef WITH_HTML_HELP
-    WinHelp(textwin.hWndText,(LPSTR)winhelpname,HELP_QUIT,(DWORD)NULL);
-#endif
-    TextMessage();  /* process messages */
 #else
-#ifndef WITH_HTML_HELP
-    WinHelp(GetDesktopWindow(), (LPSTR)winhelpname, HELP_QUIT, (DWORD)NULL);
-#endif
 #ifdef CONSOLE_SWITCH_CP
     /* restore console codepages */
     if (cp_changed) {
@@ -305,7 +294,6 @@ appdata_directory(void)
 static void
 WinCloseHelp(void)
 {
-#ifdef WITH_HTML_HELP
 	/* Due to a known bug in the HTML help system we have to
 	 * call this as soon as possible before the end of the program.
 	 * See e.g. http://helpware.net/FAR/far_faq.htm#HH_CLOSE_ALL
@@ -313,7 +301,6 @@ WinCloseHelp(void)
 	if (IsWindow(help_window))
 		SendMessage(help_window, WM_CLOSE, 0, 0);
 	Sleep(0);
-#endif
 }
 
 
@@ -378,11 +365,7 @@ static void
 ReadMainIni(LPSTR file, LPSTR section)
 {
     char profile[81] = "";
-#ifdef WITH_HTML_HELP
 	const char hlpext[] = ".chm";
-#else
-	const char hlpext[] = ".hlp";
-#endif
 	const char name[] = "wgnuplot-";
 
 	/* Language code override */

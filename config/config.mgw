@@ -617,3 +617,4 @@
 
 /* gnuplot.gih is not used by wgnuplot */
 #define NO_GIH 1
+#define HELPFILE "wgnuplot.chm"

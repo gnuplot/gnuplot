@@ -577,9 +577,4 @@
 
 /* gnuplot.gih is not used by wgnuplot */
 #define NO_GIH 1
-
-#ifdef WITH_HTML_HELP
-# define HELPFILE        "wgnuplot.chm"
-#else
-# define HELPFILE        "wgnuplot.hlp"
-#endif
+#define HELPFILE "wgnuplot.chm"
