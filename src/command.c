@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.240 2012/07/08 04:18:42 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.241 2012/07/18 16:42:51 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -3124,7 +3124,7 @@ do_system_func(const char *cmd, char **output)
 
 #else /* VMS || PIPES */
 
-    int_warn(NO_CARET, "system evaluation not supported by %s", OS);
+    int_warn(NO_CARET, "system() requires support for pipes");
     *output = gp_strdup("");
     return 0;
 
