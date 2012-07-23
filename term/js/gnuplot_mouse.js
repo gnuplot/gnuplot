@@ -1,7 +1,7 @@
 /*
- * $Id: gnuplot_mouse.js,v 1.18 2012/05/03 20:35:22 sfeam Exp $
+ * $Id: gnuplot_mouse.js,v 1.19 2012/05/21 23:15:18 sfeam Exp $
  */
-    gnuplot.mouse_version = "21 May 2012";
+    gnuplot.mouse_version = "23 July 2012";
 
 // Mousing code for use with gnuplot's 'canvas' terminal driver.
 // The functions defined here assume that the javascript plot produced by
@@ -145,14 +145,20 @@ gnuplot.mouse_update = function(e)
     if (gnuplot.plot_axis_x2min != "none") {
 	gnuplot.axis_x2min = (gnuplot.zoomed) ? gnuplot.zoom_axis_x2min : gnuplot.plot_axis_x2min;
 	gnuplot.axis_x2max = (gnuplot.zoomed) ? gnuplot.zoom_axis_x2max : gnuplot.plot_axis_x2max;
-	x2 =  gnuplot.axis_x2min + (gnuplot.plotx / (gnuplot.plot_xmax-gnuplot.plot_xmin)) * (gnuplot.axis_x2max - gnuplot.axis_x2min);
+	if (gnuplot.x2_mapping != undefined)
+	    x2 = gnuplot.x2_mapping(x);
+	else
+	    x2 =  gnuplot.axis_x2min + (gnuplot.plotx / (gnuplot.plot_xmax-gnuplot.plot_xmin)) * (gnuplot.axis_x2max - gnuplot.axis_x2min);
 	if (document.getElementById(gnuplot.active_plot_name + "_x2"))
 	    document.getElementById(gnuplot.active_plot_name + "_x2").innerHTML = x2.toPrecision(4);
     }
     if (gnuplot.plot_axis_y2min != "none") {
 	gnuplot.axis_y2min = (gnuplot.zoomed) ? gnuplot.zoom_axis_y2min : gnuplot.plot_axis_y2min;
 	gnuplot.axis_y2max = (gnuplot.zoomed) ? gnuplot.zoom_axis_y2max : gnuplot.plot_axis_y2max;
-	y2 = gnuplot.axis_y2min - (gnuplot.ploty / (gnuplot.plot_ytop-gnuplot.plot_ybot)) * (gnuplot.axis_y2max - gnuplot.axis_y2min);
+	if (gnuplot.y2_mapping != undefined)
+	    y2 = gnuplot.y2_mapping(y);
+	else
+	    y2 = gnuplot.axis_y2min - (gnuplot.ploty / (gnuplot.plot_ytop-gnuplot.plot_ybot)) * (gnuplot.axis_y2max - gnuplot.axis_y2min);
 	if (document.getElementById(gnuplot.active_plot_name + "_y2"))
 	    document.getElementById(gnuplot.active_plot_name + "_y2").innerHTML = y2.toPrecision(4);
     }
