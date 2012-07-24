@@ -29,8 +29,6 @@
 /* Define to allow placement of rectangles and other objects */
 /* Warning: Uses union initializers which VC++ does not like */
 /* undef EAM_OBJECTS */
-#define EAM_OBJECTS 1
-#define WITH_C89
 
 /* Define if color information should be passed for each vertex. */
 /* #undef EXTENDED_COLOR_SPECS */
