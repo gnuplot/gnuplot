@@ -1,5 +1,13 @@
 2012-07-24  Bastian Maerkisch  <bmaerkisch@web.de>
 
+	* src/win/wgraph.c (drawgraph):  Always use GDI calls only for
+	printing. Do not mix with GDI+. This fixes printing of (transparent)
+	filled polygons and boxes. Check if the printer driver can actually do
+	transparency (AlphaBlend).
+	See bug #3503318
+
+2012-07-24  Bastian Maerkisch  <bmaerkisch@web.de>
+
 	* src/standard.c (f_asin, f_asinh): The patch of March 2011 got the
 	overall sign wrong in the (x == 0.0) case.
 	Bug #3542862

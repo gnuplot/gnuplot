@@ -1,5 +1,5 @@
 /*
- * $Id: wgraph.c,v 1.152 2012/06/24 00:39:20 markisch Exp $
+ * $Id: wgraph.c,v 1.153 2012/06/30 06:41:33 markisch Exp $
  */
 
 /* GNUPLOT - win/wgraph.c */
@@ -1465,6 +1465,8 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 	int pattern = 0;			/* patter number */
 	COLORREF fill_color = 0;	/* color to use for fills */
 	HBRUSH solid_brush = 0;		/* current solid fill brush */
+	int shadedblendcaps = SB_CONST_ALPHA;	/* displays can always do AlphaBlend */
+	bool warn_no_transparent = FALSE;
 
 	/* images */
 	int seq = 0;				/* sequence counter for W_image ops */
@@ -1515,6 +1517,9 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 		           (double) GetDeviceCaps(hdc_screen, VERTRES);
 		line_width *= lw_scale;
 		ReleaseDC(NULL, hdc_screen);
+		/* Does the printer support AlphaBlend with transparency (const alpha)? */
+		shadedblendcaps = GetDeviceCaps(hdc, SHADEBLENDCAPS);
+		warn_no_transparent = ((shadedblendcaps & SB_CONST_ALPHA) == 0);
 	}
 	/* Also needed for enhanced text */
 	enhstate.res_scale = lw_scale;
@@ -1788,14 +1793,29 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 			 * of the fixed number of parameters in GraphOp() and
 			 * struct GWOP, respectively. */
 			fillstyle = curptr->x;
-
 			transparent = FALSE;
 			alpha = 0.;
 			switch (fillstyle & 0x0f) {
 			case FS_TRANSPARENT_SOLID:
 				alpha = (fillstyle >> 4) / 100.;
-				transparent = TRUE;
-				/* we already have a brush with that color */
+				if ((shadedblendcaps & SB_CONST_ALPHA) != 0) {
+					transparent = TRUE;
+					/* we already have a brush with that color */
+				} else {
+					/* Printer does not support AlphaBlend() */
+					COLORREF color =
+						RGB(255 - alpha * (255 - GetRValue(last_color)),
+							255 - alpha * (255 - GetGValue(last_color)),
+							255 - alpha * (255 - GetBValue(last_color)));
+					solid_brush = lpgw->hcolorbrush;
+					fill_color = color;
+					draw_new_brush(lpgw, hdc, fill_color);
+					fillstyle = (fillstyle & 0xfffffff0) | FS_SOLID;
+					if (warn_no_transparent) {
+						fprintf(stderr, "Warning: Transparency not supported on this device.\n");
+						warn_no_transparent = FALSE; /* Warn only once */
+					}
+				}
 				break;
 			case FS_SOLID: {
 				if (alpha_c < 1.) {
@@ -1821,8 +1841,17 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 				break;
 			}
 			case FS_TRANSPARENT_PATTERN:
-				transparent = TRUE;
-				alpha = 1.;
+				if ((shadedblendcaps & SB_CONST_ALPHA) != 0) {
+					transparent = TRUE;
+					alpha = 1.;
+				} else {
+					/* Printer does not support AlphaBlend() */
+					fillstyle = (fillstyle & 0xfffffff0) | FS_PATTERN;
+					if (warn_no_transparent) {
+						fprintf(stderr, "Warning: Transparency not supported on this device.\n");
+						warn_no_transparent = FALSE; /* Warn only once */
+					}
+				}
 				/* intentionally fall through */
 			case FS_PATTERN:
 				/* style == 2 --> use fill pattern according to
@@ -1870,7 +1899,7 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 			    (((fillstyle & 0x0f) == FS_PATTERN) ||
 			     ((fillstyle & 0x0f) == FS_TRANSPARENT_PATTERN))) {
 				gdiplusPatternFilledPolygonEx(hdc, ppt, 5, fill_color, 1., lpgw->background, transparent, pattern);
-			} else if (((fillstyle & 0x0f) == FS_SOLID) || ((fillstyle & 0x0f) == FS_TRANSPARENT_SOLID)) {
+			} else if (lpgw->antialiasing && (((fillstyle & 0x0f) == FS_SOLID) || ((fillstyle & 0x0f) == FS_TRANSPARENT_SOLID))) {
 				if (transparent)
 					gdiplusSolidFilledPolygonEx(hdc, ppt, 5, fill_color, 1, lpgw->antialiasing && lpgw->polyaa);
 				else
@@ -2047,7 +2076,7 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 			/* end of point series --> draw polygon now */
 			if (!transparent) {
 #ifdef HAVE_GDIPLUS
-				if ((fillstyle & 0x0f) == FS_SOLID) {
+				if (lpgw->antialiasing && ((fillstyle & 0x0f) == FS_SOLID)) {
 					/* solid, antialiased fill */
 					gdiplusSolidFilledPolygonEx(hdc, ppt, polyi, fill_color, alpha_c, lpgw->antialiasing && lpgw->polyaa);
 				} else if (lpgw->antialiasing && lpgw->patternaa && ((fillstyle & 0x0f) == FS_PATTERN)) {
@@ -2709,6 +2738,7 @@ CopyPrint(LPGW lpgw)
 	if (StartDoc(printer, &docInfo) > 0) {
 		bool aa = lpgw->antialiasing;
 		lpgw->sampling = 1;
+		/* Mixing GDI/GDI+ does not seem to work properly on printer devices. */
 		lpgw->antialiasing = FALSE;
 		SetMapMode(printer, MM_TEXT);
 		SetBkMode(printer, OPAQUE);
