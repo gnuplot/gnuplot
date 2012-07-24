@@ -1,3 +1,9 @@
+2012-07-24  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/standard.c (f_asin, f_asinh): The patch of March 2011 got the
+	overall sign wrong in the (x == 0.0) case.
+	Bug #3542862
+
 2012-07-18  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/standard.c (f_acos): acos(x) was returning the complex conjugate
