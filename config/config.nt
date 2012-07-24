@@ -1,7 +1,7 @@
 /* config.h for msvc/Makefile
  *
  * Prepared according to config.h from ./configure and by means of
- * config_strip.sh as of gnuplot 4.5 in November 2011.
+ * config_strip.sh as of gnuplot 4.7 in July 2012.
  */
 
 
@@ -10,6 +10,9 @@
 
 /* Define if you want online help and subtopic tables sorted by column. */
 /* #undef COLUMN_HELP */
+
+/* Provide contact info for gnuplot develoment */
+/* #undef DEVELOPMENT_VERSION */
 
 /* Define to treat spacebar like any other keystroke. */
 /* #undef DISABLE_SPACE_RAISES_CONSOLE */
@@ -24,7 +27,10 @@
 /* #undef DOS32 */
 
 /* Define to allow placement of rectangles and other objects */
+/* Warning: Uses union initializers which VC++ does not like */
 /* undef EAM_OBJECTS */
+#define EAM_OBJECTS 1
+#define WITH_C89
 
 /* Define if color information should be passed for each vertex. */
 /* #undef EXTENDED_COLOR_SPECS */
@@ -144,7 +150,7 @@
 /* Define to 1 if you have the <inttypes.h> header file. */
 /* #undef HAVE_INTTYPES_H */
 
-/* Define if you use have kpsexpand (TeX). */
+/* Define if you want to use kpsexpand (TeX). */
 /* #undef HAVE_KPSEXPAND */
 
 /* Define to 1 if you have the <langinfo.h> header file. */
@@ -245,8 +251,8 @@
 /* Define to 1 if you have the <readline/readline.h> header file. */
 /* #undef HAVE_READLINE_READLINE_H */
 
-/* Define to 1 if you have the <readline/tilde.h> header file. */
-/* #undef HAVE_READLINE_TILDE_H */
+/* Define if your libreadline has rl_reset_after_signal */
+/* #undef HAVE_READLINE_RESET */
 
 /* Define to 1 if you have the `rindex' function. */
 /* #undef HAVE_RINDEX */
@@ -255,7 +261,7 @@
 /* #undef HAVE_SELECT */
 
 /* Define to 1 if you have the `setvbuf' function. */
-/* #define HAVE_SETVBUF	1 */
+/* #define HAVE_SETVBUF 1 */
   /* it is defined, but setvbuf(stdout) does not work for Windows GUI redirected stdout */
 
 /* Define to 1 if you have the <sgtty.h> header file. */
@@ -329,7 +335,7 @@
 #define HAVE_STRSTR 1
 
 /* Define if math.h declares struct exception for matherr(). */
-#define HAVE_STRUCT_EXCEPTION_IN_MATH_H 1 
+#define HAVE_STRUCT_EXCEPTION_IN_MATH_H 1
 
 /* Define to 1 if you have the `sysinfo' function. */
 /* #undef HAVE_SYSINFO */
@@ -442,12 +448,11 @@
 /* Define if this is an MSDOS system. */
 /* #undef MSDOS */
 
-/* Define if you want to read .gnuplot from current directory
-   (SECURITY RISK!). */
-/* #undef USE_CWDRC */
-
 /* Define to disable terminals that depend on code in bitmap.c */
-/* #undef NO_BITMAP_SUPPORT */
+#define NO_BITMAP_SUPPORT 1
+
+/* Define to 1 if your C compiler doesn't accept -c and -o together. */
+/* #undef NO_MINUS_C_MINUS_O */
 
 /* Name of package */
 /* #undef PACKAGE */
@@ -474,7 +479,7 @@
 /* Unix-type of Interprocess Communication is required for mouse support. */
 /* #undef PIPE_IPC */
 
-/* Define to 1 if the C compiler supports function prototypes. */
+/* Automake 1.12 dropped support for building without prototypes */
 #define PROTOTYPES 1
 
 /* Define if you want the Qt terminal. */
@@ -510,6 +515,10 @@
 /* Define if the 3dkit libray is present. */
 /* #undef THREEDKIT */
 
+/* Define if you want to read .gnuplot from current directory (SECURITY
+   RISK!). */
+/* #undef USE_CWDRC */
+
 /* Define if you want to use the experimental ggi driver. */
 /* #undef USE_GGI_DRIVER */
 
@@ -529,7 +538,7 @@
 /* Define if the vgagl libray is present. */
 /* #undef VGAGL */
 
-/* Define to allow zooming or refresh of volatile data. EXPERIMENTAL */
+/* Define to allow zooming or refresh of volatile data. */
 #define VOLATILE_REFRESH 1
 
 /* Define if you want the wxwidgets terminal. */
@@ -542,14 +551,8 @@
 /* Define to 1 if the X Window System is missing or not being used. */
 /* #undef X_DISPLAY_MISSING */
 
-/* Define like PROTOTYPES; this can be used by system headers. */
-/* #undef __PROTOTYPES */
-
 /* Define to empty if `const' does not conform to ANSI C. */
 /* #undef const */
-
-/* libgd versions < 1.8.4 need gdImageStringTTF rather than gdImageStringFT */
-/* #undef gdImageStringFT */
 
 /* Define to `__inline__' or `__inline' if that's what the C compiler
    calls it, or to nothing if 'inline' is not supported under any name.  */
