@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: standard.c,v 1.30 2011/05/07 15:00:37 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: standard.c,v 1.31 2012/07/18 23:06:32 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - standard.c */
@@ -373,16 +373,16 @@ f_asin(union argument *arg)
     (void) pop(&a);
     x = real(&a);
     y = imag(&a);
-    ysign = (y >= 0) ? 1 : -1;
     if (y == 0.0 && fabs(x) <= 1.0) {
 	push(Gcomplex(&a, asin(x) / ang2rad, 0.0));
     } else if (x == 0.0) {
-	push(Gcomplex(&a, 0.0, ysign * log(-y + sqrt(y * y + 1)) / ang2rad));
+	push(Gcomplex(&a, 0.0, -log(-y + sqrt(y * y + 1)) / ang2rad));
     } else {
 	beta = sqrt((x + 1) * (x + 1) + y * y) / 2 - sqrt((x - 1) * (x - 1) + y * y) / 2;
 	if (beta > 1)
 	    beta = 1;		/* Avoid rounding error problems */
 	alpha = sqrt((x + 1) * (x + 1) + y * y) / 2 + sqrt((x - 1) * (x - 1) + y * y) / 2;
+	ysign = (y >= 0) ? 1 : -1;
 	push(Gcomplex(&a, asin(beta) / ang2rad, ysign * log(alpha + sqrt(alpha * alpha - 1)) / ang2rad));
     }
 }
@@ -398,7 +398,6 @@ f_acos(union argument *arg)
     (void) pop(&a);
     x = real(&a);
     y = imag(&a);
-    ysign = (y < 0) ? -1: 1;
     if (y == 0.0 && fabs(x) <= 1.0) {
 	/* real result */
 	push(Gcomplex(&a, acos(x) / ang2rad, 0.0));
@@ -411,6 +410,7 @@ f_acos(union argument *arg)
 	    beta = 1;		/* Avoid rounding error problems */
 	else if (beta < -1)
 	    beta = -1;
+	ysign = (y >= 0) ? 1 : -1;
 	push(Gcomplex(&a, acos(beta) / ang2rad,
 	                  -ysign * log(alpha + sqrt(alpha * alpha - 1)) / ang2rad));
     }
@@ -538,17 +538,17 @@ f_asinh(union argument *arg)
     (void) pop(&a);
     x = -imag(&a);
     y = real(&a);
-    ysign = (y >= 0) ? 1 : -1;
     if (y == 0.0 && fabs(x) <= 1.0) {
 	push(Gcomplex(&a, 0.0, -asin(x) / ang2rad));
     } else if (y == 0.0) {
 	push(Gcomplex(&a, 0.0, 0.0));
 	undefined = TRUE;
     } else if (x == 0.0) {
-	push(Gcomplex(&a, ysign * log(y + sqrt(y * y + 1)) / ang2rad, 0.0));
+	push(Gcomplex(&a, log(y + sqrt(y * y + 1)) / ang2rad, 0.0));
     } else {
 	beta = sqrt((x + 1) * (x + 1) + y * y) / 2 - sqrt((x - 1) * (x - 1) + y * y) / 2;
 	alpha = sqrt((x + 1) * (x + 1) + y * y) / 2 + sqrt((x - 1) * (x - 1) + y * y) / 2;
+	ysign = (y >= 0) ? 1 : -1;
 	push(Gcomplex(&a, ysign * log(alpha + sqrt(alpha * alpha - 1)) / ang2rad, -asin(beta) / ang2rad));
     }
 }
@@ -613,7 +613,7 @@ f_atanh(union argument *arg)
     }
 }
 
-void 
+void
 f_ellip_first(union argument *arg)
 {
     struct value a;
@@ -632,10 +632,10 @@ f_ellip_first(union argument *arg)
 	push(&a);
 	undefined=TRUE;
     }
- 
+
 }
 
-void 
+void
 f_ellip_second(union argument *arg)
 {
     struct value a;
@@ -648,7 +648,7 @@ f_ellip_second(union argument *arg)
 
     ak=real(&a);
     q=(1.0-ak)*(1.0+ak);
-    if (q > 0.0) {	
+    if (q > 0.0) {
 	e=carlson_elliptic_rf(0.0,q,1.0)-(ak*ak)*carlson_elliptic_rd(0.0,q,1.0)/3.0;
 	push(Gcomplex(&a,e,0.0));
 
@@ -660,11 +660,11 @@ f_ellip_second(union argument *arg)
 	e=1.0;
 	push(Gcomplex(&a,e,0.0));
     }
-    
- 
+
+
 }
 
-void 
+void
 f_ellip_third(union argument *arg)
 {
     struct value a1,a2;
@@ -685,7 +685,7 @@ f_ellip_third(union argument *arg)
 	undefined=TRUE;
 	push(&a1);
     }
- 
+
 }
 
 void
@@ -1160,7 +1160,7 @@ TIMEFUNC( f_tmyday, tm_yday)
 #define C3 0.375
 #define C4 (9.0/22.0)
 
-static double 
+static double
 carlson_elliptic_rc(double x,double y)
 {
     double alamb,ave,s,w,xt,yt,ans;
