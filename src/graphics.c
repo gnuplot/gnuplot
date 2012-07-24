@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.397 2012/06/29 16:30:37 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.398 2012/06/30 06:41:33 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -5852,9 +5852,19 @@ static void
 attach_title_to_plot(struct curve_points *this_plot, legend_key *key)
 {
     struct termentry *t = term;
-    int index = (this_plot->title_position > 0) ? this_plot->p_count-1 : 0;
-    int x = map_x(this_plot->points[index].x);
-    int y = map_y(this_plot->points[index].y);
+    int index, x, y;
+
+    if (this_plot->title_position > 0) {
+	for (index=this_plot->p_count-1; index > 0; index--)
+	    if (this_plot->points[index].type == INRANGE)
+		break;
+    } else {
+	for (index=0; index < this_plot->p_count-1; index++)
+	    if (this_plot->points[index].type == INRANGE)
+		break;
+    }
+    x = map_x(this_plot->points[index].x);
+    y = map_y(this_plot->points[index].y);
 
     if (key->textcolor.type == TC_VARIABLE)
 	/* Draw key text in same color as plot */

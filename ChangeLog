@@ -1,3 +1,8 @@
+2012-07-24  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/graphics.c (attach_title_to_plot): Limit "title at end" placement
+	to the INRANGE portion of a plot.
+
 2012-07-24  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/win/wgraph.c (drawgraph):  Always use GDI calls only for
