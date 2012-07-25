@@ -1,3 +1,10 @@
+2012-07-25  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/win/wgraph.c (drawgraph):  Check if the printer driver can
+	actually do transparency (AlphaBlend). Fixes printing of transparent
+	filled polygons and boxes.
+	See bug #3503318
+
 2012-07-24  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/standard.c (f_asin, f_asinh): The patch of March 2011 got the

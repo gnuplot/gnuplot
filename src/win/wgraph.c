@@ -1,5 +1,5 @@
 /*
- * $Id: wgraph.c,v 1.144.2.1 2012/05/20 21:26:31 markisch Exp $
+ * $Id: wgraph.c,v 1.144.2.2 2012/06/13 09:53:14 markisch Exp $
  */
 
 /* GNUPLOT - win/wgraph.c */
@@ -50,7 +50,7 @@
 #define _WIN32_WINNT 0x0400
 #endif
 /* BM: for AlphaBlend/TransparentBlt */
-#define WINVER 0x0410
+#define WINVER 0x0501
 /* BM: for Toolbars */
 #define _WIN32_IE 0x0501
 #include <windows.h>
@@ -728,7 +728,7 @@ MakePens(LPGW lpgw, HDC hdc)
 	int i;
 	LOGPEN pen;
 
-	if ((GetDeviceCaps(hdc,NUMCOLORS) == 2) || !lpgw->color) {
+	if ((GetDeviceCaps(hdc, NUMCOLORS) == 2) || !lpgw->color) {
 		pen = lpgw->monopen[1];
 		pen.lopnWidth.x *= lpgw->linewidth * lpgw->sampling;
 		lpgw->hapen = CreatePenIndirect(&pen); 	/* axis */
@@ -1450,6 +1450,8 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 	int pattern = 0;			/* patter number */
 	COLORREF fill_color = 0;	/* color to use for fills */
 	HBRUSH solid_brush = 0;		/* current solid fill brush */
+	int shadedblendcaps = SB_CONST_ALPHA;	/* displays can always do AlphaBlend */
+	bool warn_no_transparent = FALSE;
 
 	/* images */
 	int seq = 0;				/* sequence counter for W_image ops */
@@ -1494,6 +1496,9 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 		           (double) GetDeviceCaps(hdc_screen, VERTRES);
 		line_width *= lw_scale;
 		ReleaseDC(NULL, hdc_screen);
+		/* Does the printer support AlphaBlend with transparency (const alpha)? */
+		shadedblendcaps = GetDeviceCaps(hdc, SHADEBLENDCAPS);
+		warn_no_transparent = ((shadedblendcaps & SB_CONST_ALPHA) == 0);
 	}
 	/* Also needed for enhanced text */
 	enhstate.res_scale = lw_scale;
@@ -1747,8 +1752,24 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 			switch (fillstyle & 0x0f) {
 			case FS_TRANSPARENT_SOLID:
 				alpha = (fillstyle >> 4) / 100.;
-				transparent = TRUE;
-				/* we already have a brush with that color */
+				if ((shadedblendcaps & SB_CONST_ALPHA) != 0) {
+					transparent = TRUE;
+					/* we already have a brush with that color */
+				} else {
+					/* Printer does not support AlphaBlend() */
+					COLORREF color =
+						RGB(255 - alpha * (255 - GetRValue(last_color)),
+							255 - alpha * (255 - GetGValue(last_color)),
+							255 - alpha * (255 - GetBValue(last_color)));
+					solid_brush = lpgw->hcolorbrush;
+					fill_color = color;
+					draw_new_brush(lpgw, hdc, fill_color);
+					fillstyle = (fillstyle & 0xfffffff0) | FS_SOLID;
+					if (warn_no_transparent) {
+						fprintf(stderr, "Warning: Transparency not supported on this device.\n");
+						warn_no_transparent = FALSE; /* Warn only once */
+					}
+				}
 				break;
 			case FS_SOLID: {
 				double density = MINMAX(0, (int)(fillstyle >> 4), 100) * 0.01;
@@ -1762,8 +1783,17 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 				break;
 			}
 			case FS_TRANSPARENT_PATTERN:
-				transparent = TRUE;
-				alpha = 1.;
+				if ((shadedblendcaps & SB_CONST_ALPHA) != 0) {
+					transparent = TRUE;
+					alpha = 1.;
+				} else {
+					/* Printer does not support AlphaBlend() */
+					fillstyle = (fillstyle & 0xfffffff0) | FS_PATTERN;
+					if (warn_no_transparent) {
+						fprintf(stderr, "Warning: Transparency not supported on this device.\n");
+						warn_no_transparent = FALSE; /* Warn only once */
+					}
+				}
 				/* intentionally fall through */
 			case FS_PATTERN:
 				/* style == 2 --> use fill pattern according to
@@ -1967,7 +1997,7 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 			break;
 		}
 
-		case W_filled_polygon_draw:	{
+		case W_filled_polygon_draw: {
 			/* end of point series --> draw polygon now */
 			if (!transparent) {
 #ifdef HAVE_GDIPLUS
@@ -2080,7 +2110,7 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 					}
 				}
 
-				/* copy to device with alpa blending */
+				/* copy to device with alpha blending */
 				ftn.BlendOp = AC_SRC_OVER;
 				ftn.BlendFlags = 0;
 				ftn.AlphaFormat = AC_SRC_ALPHA; /* bitmap has an alpha channel */
@@ -2597,6 +2627,7 @@ CopyPrint(LPGW lpgw)
 	if (StartDoc(printer, &docInfo) > 0) {
 		bool aa = lpgw->antialiasing;
 		lpgw->sampling = 1;
+		/* Mixing GDI/GDI+ does not seem to work properly on printer devices. */
 		lpgw->antialiasing = FALSE;
 		SetMapMode(printer, MM_TEXT);
 		SetBkMode(printer, OPAQUE);
