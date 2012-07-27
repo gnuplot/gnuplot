@@ -1,3 +1,11 @@
+2012-07-27  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/axis.h (STORE_WITH_LOG_AND_UPDATE_RANGE):  Auto-generated data was
+	failing to plot the first and last points if the corresponding axis 
+	range was inverted. E.g. plot [10:-10] '+' using 1:(sinc($1)) with lines
+	The incorrect range check was introduced in the patch of 2012-03-09.
+	Bugfix.
+
 2012-07-24  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c (attach_title_to_plot): Limit "title at end" placement
