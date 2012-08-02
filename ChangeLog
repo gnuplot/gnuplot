@@ -1,3 +1,10 @@
+2012-08-02  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/canvas.trm term/svg.trm: Since we now support time to
+	millisecond precision, the bounds of a time/date axis need to be
+	written out using %.3f rather than %g.
+	# Bug #3548932
+
 2012-07-27  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/axis.h (STORE_WITH_LOG_AND_UPDATE_RANGE):  Auto-generated data was

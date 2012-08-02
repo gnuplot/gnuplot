@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: svg.trm,v 1.139 2012/05/02 19:14:47 sfeam Exp $
+ * $Id: svg.trm,v 1.140 2012/05/21 23:15:18 sfeam Exp $
  */
 
 /*------------------------------------------------------------------------------------------------------------------------------------
@@ -1077,8 +1077,10 @@ SVG_text ()
 		fprintf(gpoutfile, "gnuplot_svg.%s = %g;\n", \
 			js_NAME, udv->udv_value.v.cmplx_val.real); \
 	}
-	MOUSE_PARAM("GPVAL_X_MIN", "plot_axis_xmin");
-	MOUSE_PARAM("GPVAL_X_MAX", "plot_axis_xmax");
+	if (axis_array[FIRST_X_AXIS].datatype != DT_TIMEDATE) {
+	    MOUSE_PARAM("GPVAL_X_MIN", "plot_axis_xmin");
+	    MOUSE_PARAM("GPVAL_X_MAX", "plot_axis_xmax");
+	}
 	MOUSE_PARAM("GPVAL_Y_MIN", "plot_axis_ymin");
 	MOUSE_PARAM("GPVAL_Y_MAX", "plot_axis_ymax");
 
@@ -1116,6 +1118,10 @@ SVG_text ()
 	 * FIXME: This all needs to be documented somewhere!
 	 */
 	if (axis_array[FIRST_X_AXIS].datatype == DT_TIMEDATE) {
+	    fprintf(gpoutfile, "gnuplot_svg.plot_axis_xmin = %.3f;\n",
+		axis_array[FIRST_X_AXIS].min);
+	    fprintf(gpoutfile, "gnuplot_svg.plot_axis_xmax = %.3f;\n",
+		axis_array[FIRST_X_AXIS].max);
 	    fprintf(gpoutfile, "gnuplot_svg.plot_timeaxis_x = \"%s\";\n",
 		(mouse_alt_string) ? mouse_alt_string
 		: (mouse_mode == 4) ? "Date"
