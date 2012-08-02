@@ -32,6 +32,7 @@ New features, changes and fixes since gnuplot version 4.6.0
       incorrect return for asin(x) when imag(x) > 0 (bug in 4.4.4, 4.6.0)
       incorrect asinh(x) when real(x) < 0 && imag(x) == 0 (bug in 4.4.4, 4.6.0)
 * FIX keep sufficient precision in canvas and svg coords to report time in msec
+* FIX the input buffer was not always extended correctly inside a { clause }
 
 New features, changes and fixes in gnuplot version 4.6
 ======================================================
