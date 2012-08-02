@@ -10,6 +10,11 @@
 	input buffer if needed before doing this.
 	Bug #3549386
 
+	* term/gd.trm: Restore the deprecated syntax "set term png xRRGGBB" for
+	setting the PNG background color in 4.6.1, since the manual still lists
+	it.  But it will definitely go away in 4.7.
+	Bug #3551340
+
 2012-07-25  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/win/wgraph.c (drawgraph):  Check if the printer driver can

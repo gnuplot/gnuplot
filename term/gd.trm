@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: gd.trm,v 1.163.2.1 2011/12/11 11:43:30 markisch Exp $
+ * $Id: gd.trm,v 1.163.2.2 2012/05/16 04:42:54 sfeam Exp $
  * based on gif.trm,v 1.26.2.1 2000/05/01 00:17:20 joze
  */
 
@@ -954,9 +954,11 @@ PNG_options()
 	    }
 #endif
 
-	    if (sscanf(string, "x%lx", &color) == 1)
-		int_error(c_token, "obsolete color option");
-	    else
+	    if (sscanf(string, "x%lx", &color) == 1) {
+		int_warn(c_token++, "deprecated color option");
+		png_state.rgb_table[png_state.n_colors++] = color;
+		break;
+	    } else
 		int_error(c_token, "unrecognized terminal option");
 	    break;
 	}
