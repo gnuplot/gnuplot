@@ -3,7 +3,12 @@
 	* term/canvas.trm term/svg.trm: Since we now support time to
 	millisecond precision, the bounds of a time/date axis need to be
 	written out using %.3f rather than %g.
-	# Bug #3548932
+	Bug #3548932
+
+	* src/misc.c (load_file): The multiline bracketed clause handling adds
+	trailing newlines to the input.  It is essential to check and extend the
+	input buffer if needed before doing this.
+	Bug #3549386
 
 2012-07-27  Ethan A Merritt  <merritt@u.washington.edu>
 
