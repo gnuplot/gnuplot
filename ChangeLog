@@ -1,3 +1,9 @@
+2012-08-03  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/pslatex.trm (EPSLATEX_set_color):  Some cairolatex set_color
+	requests were being incorrectly ignored.
+	Bug #3553940
+
 2012-08-02  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/canvas.trm term/svg.trm: Since we now support time to
