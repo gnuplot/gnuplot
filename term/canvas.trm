@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: canvas.trm,v 1.56.2.1 2012/04/20 16:50:59 sfeam Exp $
+ * $Id: canvas.trm,v 1.56.2.2 2012/05/05 16:54:26 sfeam Exp $
  *
  */
 
@@ -603,8 +603,10 @@ CANVAS_text()
 	    else if (udv->udv_value.type == CMPLX) \
 		fprintf(gpoutfile, "%s = %g;\n", js_NAME, udv->udv_value.v.cmplx_val.real); \
 	}
-	MOUSE_PARAM("GPVAL_X_MIN", "gnuplot.plot_axis_xmin");
-	MOUSE_PARAM("GPVAL_X_MAX", "gnuplot.plot_axis_xmax");
+	if (axis_array[FIRST_X_AXIS].datatype != DT_TIMEDATE) {
+	    MOUSE_PARAM("GPVAL_X_MIN", "gnuplot.plot_axis_xmin");
+	    MOUSE_PARAM("GPVAL_X_MAX", "gnuplot.plot_axis_xmax");
+	}
 	MOUSE_PARAM("GPVAL_Y_MIN", "gnuplot.plot_axis_ymin");
 	MOUSE_PARAM("GPVAL_Y_MAX", "gnuplot.plot_axis_ymax");
 
@@ -642,6 +644,11 @@ CANVAS_text()
 	 * recognize additional formats.
 	 */
 	if (axis_array[FIRST_X_AXIS].datatype == DT_TIMEDATE) {
+	    /* May need to reconstruct time to millisecond precision */
+	    fprintf(gpoutfile, "gnuplot.plot_axis_xmin = %.3f;\n",
+		    axis_array[FIRST_X_AXIS].min);
+	    fprintf(gpoutfile, "gnuplot.plot_axis_xmax = %.3f;\n",
+		    axis_array[FIRST_X_AXIS].max);
 	    fprintf(gpoutfile, "gnuplot.plot_timeaxis_x = \"%s\";\n",
 		(mouse_alt_string) ? mouse_alt_string
 		: (mouse_mode == 4) ? "Date"
