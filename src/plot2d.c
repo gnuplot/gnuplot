@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.266 2012/06/29 16:30:37 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.267 2012/06/29 18:48:08 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -2798,7 +2798,7 @@ eval_plots()
 			    if ((this_plot->plot_style == BOXES)
 			    &&  (boxwidth >= 0 && boxwidth_is_absolute)) {
 				double xlow, xhigh;
-				int dmy_type = INRANGE;
+				coord_type dmy_type = INRANGE;
 				this_plot->points[i].z = 0;
 				if (axis_array[this_plot->x_axis].log) {
 				    double base = axis_array[this_plot->x_axis].base;
@@ -3047,7 +3047,7 @@ parametric_fixup(struct curve_points *start_plot, int *plot_num)
 		    x = r * cos(t);
 		    y = r * sin(t);
 		    if (boxwidth >= 0 && boxwidth_is_absolute) {
-			int dmy_type = INRANGE;
+			coord_type dmy_type = INRANGE;
 			STORE_WITH_LOG_AND_UPDATE_RANGE( yp->points[i].xlow, x - boxwidth/2, dmy_type, xp->x_axis,
 							 xp->noautoscale, NOOP, NOOP );
 			dmy_type = INRANGE;
@@ -3064,7 +3064,7 @@ parametric_fixup(struct curve_points *start_plot, int *plot_num)
 		    double y = yp->points[i].y;
 
 		    if (boxwidth >= 0 && boxwidth_is_absolute) {
-			int dmy_type = INRANGE;
+			coord_type dmy_type = INRANGE;
 			STORE_WITH_LOG_AND_UPDATE_RANGE( yp->points[i].xlow, x - boxwidth/2, dmy_type, yp->x_axis,
 							 xp->noautoscale, NOOP, NOOP );
 			dmy_type = INRANGE;

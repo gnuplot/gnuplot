@@ -4,6 +4,8 @@
 	requests were being incorrectly ignored.
 	Bug #3553940
 
+	* src/plot2d.c:  Use coord_type rather than int where appropriate.
+
 2012-08-02  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/canvas.trm term/svg.trm: Since we now support time to
