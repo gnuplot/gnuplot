@@ -1,5 +1,5 @@
 /*
- * $Id: axis.h,v 1.71 2012/03/09 20:23:31 sfeam Exp $
+ * $Id: axis.h,v 1.72 2012/07/27 20:12:22 sfeam Exp $
  *
  */
 
@@ -539,7 +539,7 @@ do {									  \
     if ( curval < axis->data_min )					  \
 	axis->data_min = curval;					  \
     if ( curval < axis->min						  \
-    &&  (curval < axis->max || axis->max == -VERYLARGE)) {		  \
+    &&  (curval <= axis->max || axis->max == -VERYLARGE)) {		  \
 	if (axis->autoscale & AUTOSCALE_MIN)	{			  \
 	    if (axis->min_constraint & CONSTRAINT_LOWER) {		  \
 		if (axis->min_lb <= curval) {				  \
@@ -553,7 +553,7 @@ do {									  \
 	    } else {							  \
 		axis->min = curval;					  \
 	    }								  \
-	} else {							  \
+	} else if (curval != axis->max) {				  \
 	    TYPE = OUTRANGE;						  \
 	    OUT_ACTION;							  \
 	    break;							  \
@@ -562,7 +562,7 @@ do {									  \
     if ( curval > axis->data_max )					  \
 	axis->data_max = curval;					  \
     if ( curval > axis->max						  \
-    &&  (curval > axis->min || axis->min == VERYLARGE)) {		  \
+    &&  (curval >= axis->min || axis->min == VERYLARGE)) {		  \
 	if (axis->autoscale & AUTOSCALE_MAX)	{			  \
 	    if (axis->max_constraint & CONSTRAINT_UPPER) {		  \
 		if (axis->max_ub >= curval) {				  \
@@ -576,7 +576,7 @@ do {									  \
 	    } else {							  \
 		axis->max = curval;					  \
 	    }								  \
-	} else {							  \
+	} else if (curval != axis->min) {				  \
 	    TYPE = OUTRANGE;						  \
 	    OUT_ACTION;							  \
 	}								  \

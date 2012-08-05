@@ -1,3 +1,8 @@
+2012-08-05  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/axis.h (STORE_WITH_LOG_AND_UPDATE_RANGE):  The fix of 
+	2012-07-27 was not quite right (e.g. it broke electron.dem).
+
 2012-08-03  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/pslatex.trm (EPSLATEX_set_color):  Some cairolatex set_color
