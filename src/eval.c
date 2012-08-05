@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: eval.c,v 1.101 2012/06/09 21:44:17 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: eval.c,v 1.102 2012/06/19 18:11:06 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - eval.c */
@@ -968,3 +968,25 @@ gp_word(char *string, int i)
     return a.v.string_val;
 }
 
+
+/* Evaluate the function linking secondary axis to primary axis */
+double
+eval_link_function(int axis, double raw_coord)
+{
+    udft_entry *link_udf = axis_array[axis].link_udf;
+    int dummy_var;
+    struct value a;
+
+    if (axis == FIRST_Y_AXIS || axis == SECOND_Y_AXIS)
+	dummy_var = 1;
+    else
+	dummy_var = 0;
+
+    Gcomplex(&link_udf->dummy_values[dummy_var], raw_coord, 0.0);
+    evaluate_at(link_udf->at, &a);
+
+    if (a.type != CMPLX)
+	a = udv_NaN->udv_value;
+
+    return a.v.cmplx_val.real;
+}

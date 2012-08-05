@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.202 2012/05/20 14:18:54 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.203 2012/06/13 20:12:59 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -1093,6 +1093,15 @@ save_position(FILE *fp, struct position *pos, TBOOLEAN offset)
 void
 save_range(FILE *fp, AXIS_INDEX axis)
 {
+    if (axis_array[axis].linked_to_primary) {
+	fprintf(fp, "set link %c2 ", axis_defaults[axis].name[0]);
+	if (axis_array[axis].link_udf->at)
+	    fprintf(fp, "via %s ", axis_array[axis].link_udf->definition);
+	if (axis_array[axis-SECOND_AXES].link_udf->at)
+	    fprintf(fp, "inverse %s ", axis_array[axis-SECOND_AXES].link_udf->definition);
+	fputs("\n\t", fp);
+    }
+
     fprintf(fp, "set %srange [ ", axis_defaults[axis].name);
     if (axis_array[axis].set_autoscale & AUTOSCALE_MIN) {
 	if (axis_array[axis].min_constraint & CONSTRAINT_LOWER ) {

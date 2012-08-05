@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.102 2012/04/03 16:57:47 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.103 2012/06/30 06:41:33 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -2017,4 +2017,70 @@ parse_named_range(AXIS_INDEX axis, int dummy)
     }				/* first '[' */
 
     return dummy_token;
+}
+/*
+ * When a secondary axis is linked to the corresponding primary axis,
+ * this routine copies the relevant range/scale data
+ */
+void
+clone_linked_axes(AXIS_INDEX axis2, AXIS_INDEX axis1)
+{
+    double testmin, testmax;
+
+    memcpy(&axis_array[axis2], &axis_array[axis1], AXIS_CLONE_SIZE);
+    if (axis_array[axis2].link_udf == NULL || axis_array[axis2].link_udf->at == NULL)
+	return;
+
+    /* Transform the min/max limits of linked secondary axis */
+	axis_array[axis2].set_min = eval_link_function(axis2, axis_array[axis1].set_min);
+	axis_array[axis2].set_max = eval_link_function(axis2, axis_array[axis1].set_max);
+	axis_array[axis2].min = eval_link_function(axis2, axis_array[axis1].min);
+	axis_array[axis2].max = eval_link_function(axis2, axis_array[axis1].max);
+
+	if (isnan(axis_array[axis2].min) || isnan(axis_array[axis2].set_min)
+	||  isnan(axis_array[axis2].max) || isnan(axis_array[axis2].set_max))
+	    int_warn(NO_CARET, "axis mapping function must return a real value");
+
+    /* Confirm that the inverse mapping actually works */
+	testmin = eval_link_function(axis1, axis_array[axis2].set_min);
+	testmax = eval_link_function(axis1, axis_array[axis2].set_max);
+	if (fabs(testmin - axis_array[axis1].set_min) / testmin > 1.e-6
+	||  fabs(testmax - axis_array[axis1].set_max) / testmax > 1.e-6) {
+	    int_warn(NO_CARET, "could not confirm linked axis inverse mapping function");
+	    fprintf(stderr,"\tmin: %g inv(via(min)): %g", axis_array[axis1].set_min, testmin);
+	    fprintf(stderr,"  max: %g inv(via(max)): %g\n", axis_array[axis1].set_max, testmax);
+	}
+}
+
+/*
+ * Check for linked-axis coordinate transformation given by command
+ *     set {x|y}2r link via <expr1> inverse <expr2>
+ * If we are plotting on the secondary axis in this case, apply the inverse
+ * transform to get back to the primary coordinate system before mapping.
+ */
+
+int map_x(double value)
+{
+    if ((x_axis == SECOND_X_AXIS) 
+    &&  axis_array[SECOND_X_AXIS].linked_to_primary
+    &&  axis_array[SECOND_X_AXIS].link_udf->at != NULL) {
+	if (axis_array[FIRST_X_AXIS].link_udf->at == NULL)
+	    int_error(NO_CARET, "No inverse mapping function available for x2 data");
+	value = eval_link_function(FIRST_X_AXIS, value);
+	return AXIS_MAP(FIRST_X_AXIS, value);
+    }
+    return AXIS_MAP(x_axis, value);
+}
+
+int map_y(double value)
+{
+    if ((y_axis == SECOND_Y_AXIS)
+    &&  axis_array[SECOND_Y_AXIS].linked_to_primary
+    &&  axis_array[SECOND_Y_AXIS].link_udf->at != NULL) {
+	if (axis_array[FIRST_Y_AXIS].link_udf->at == NULL)
+	    int_error(NO_CARET, "No inverse mapping function available for y2 data");
+	value = eval_link_function(FIRST_Y_AXIS, value);
+	return AXIS_MAP(FIRST_Y_AXIS, value);
+    }
+    return AXIS_MAP(y_axis, value);
 }

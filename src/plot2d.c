@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.267 2012/06/29 18:48:08 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.268 2012/08/04 17:22:35 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -1106,6 +1106,7 @@ store2d_point(
 	evaluate_at(ydata_func.at, &val);
 	yhigh = undefined ? 0 : real(&val);
     }
+
     dummy_type = cp->type = INRANGE;
 
     if (polar) {
@@ -2601,7 +2602,10 @@ eval_plots()
 	/* check that xmin -> xmax is not too small */
 	axis_checked_extend_empty_range(FIRST_X_AXIS, "x range is invalid");
 
-	if (uses_axis[SECOND_X_AXIS] & USES_AXIS_FOR_DATA) {
+	if (axis_array[SECOND_X_AXIS].linked_to_primary) {
+	    clone_linked_axes(SECOND_X_AXIS, FIRST_X_AXIS);
+	    /* FIXME: This obsoletes OUTRANGE/INRANGE for secondary axis data */
+	} else if (uses_axis[SECOND_X_AXIS] & USES_AXIS_FOR_DATA) {
 	    /* check that x2min -> x2max is not too small */
 	    axis_checked_extend_empty_range(SECOND_X_AXIS, "x2 range is invalid");
 	} else if (axis_array[SECOND_X_AXIS].autoscale) {

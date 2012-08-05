@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: parse.c,v 1.70 2012/06/30 20:50:48 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: parse.c,v 1.71 2012/07/18 23:29:05 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - parse.c */
@@ -857,6 +857,36 @@ parse_unary_expression()
 	parse_unary_expression();
     } else
 	parse_primary_expression();
+}
+
+
+/*
+ * Syntax: set link {x2|y2} {via <expression1> inverse <expression2>}
+ * Create action code tables for the functions linking primary and secondary axes.
+ * expression1 maps primary coordinates into the secondary coordinate space.
+ * expression2 maps secondary coordinates into the primary coordinate space.
+ */
+void
+parse_link_via( struct udft_entry *udf, char *domain )
+{
+    int start_token;
+    
+    /* Caller left us pointing at "via" or "inverse" */
+    c_token++;
+    start_token = c_token;
+    if (END_OF_COMMAND)
+	int_error(c_token,"Missing expression");
+
+    /* Save action table for the linkage mapping */
+    strcpy(c_dummy_var[0], "x");
+    strcpy(c_dummy_var[1], "y");
+    dummy_func = udf;
+    free_at(udf->at);
+    udf->at = perm_at();
+    dummy_func = NULL;
+
+    /* Save the mapping expression itself */
+    m_capture(&(udf->definition), start_token, c_token - 1);
 }
 
 

@@ -1,5 +1,5 @@
 /*
- * $Id: eval.h,v 1.40 2011/11/24 05:08:36 sfeam Exp $
+ * $Id: eval.h,v 1.41 2012/06/09 21:44:17 markisch Exp $
  */
 
 /* GNUPLOT - eval.h */
@@ -175,5 +175,8 @@ void fill_gpval_complex __PROTO((char *var, double areal, double aimag));
 /* C-callable versions of internal gnuplot functions word() and words() */
 char * gp_word __PROTO((char *string, int i));
 int gp_words __PROTO((char *string));
+
+/* Evaluate the function linking secondary axis to primary axis */
+double eval_link_function __PROTO((int, double));
 
 #endif /* GNUPLOT_EVAL_H */

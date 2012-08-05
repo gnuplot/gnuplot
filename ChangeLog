@@ -1,5 +1,29 @@
 2012-08-05  Ethan A Merritt  <merritt@u.washington.edu>
 
+	* src/axis.c src/axis.h src/command.c src/command.h src/eval.c
+	src/eval.h src/graphics.c src/mouse.c src/parse.c src/parse.h
+	src/plot2d.c src/save.c src/set.c src/show.c src/tables.c src/tables.h
+	src/unset.c term/canvas.trm:
+
+	New command and functionality
+	   set link [x2|y2] {via <expression1> inverse <expression2>}
+	   unset link [x2|y2]
+	This ties the range on the secondary axis to that of the primary axis.
+	<expression1> maps the primary axis coordinates onto the secondary axis.
+	<expression2> maps the secondary axis coordinates onto the primary axis.
+	The optional mapping can be nonlinear. If x2/y2 tics are auto-generated,
+	they will be labeled in the transformed coordinate system.
+	Mouse tracking readout will also report the transformed coordinates.
+
+	Note: Making the "linked_to_primary" option generic introduces compiler
+	warnings from the code handling the colorbar axis, which in reality can
+	never be linked.  These will be removed in a subsequent patchset.
+
+ 	* demo/TaBr.dem docs/gnuplot.doc:
+	Documentation and demo files for the new command.
+
+2012-08-05  Ethan A Merritt  <merritt@u.washington.edu>
+
 	* src/axis.h (STORE_WITH_LOG_AND_UPDATE_RANGE):  The fix of 
 	2012-07-27 was not quite right (e.g. it broke electron.dem).
 

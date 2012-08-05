@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: canvas.trm,v 1.62 2012/06/29 16:43:40 sfeam Exp $
+ * $Id: canvas.trm,v 1.63 2012/08/03 05:17:36 sfeam Exp $
  *
  */
 
@@ -632,11 +632,23 @@ CANVAS_text()
 	    MOUSE_PARAM("GPVAL_X2_MAX", "gnuplot.plot_axis_x2max");
 	} else
 	    fprintf(gpoutfile, "gnuplot.plot_axis_x2min = \"none\"\n");
+	if (axis_array[SECOND_X_AXIS].linked_to_primary 
+	&&  axis_array[FIRST_X_AXIS].link_udf->at) {
+	    fprintf(gpoutfile, "gnuplot.x2_mapping = function(x) { return x; };");
+	    fprintf(gpoutfile, "  // replace returned value with %s\n",
+			axis_array[FIRST_X_AXIS].link_udf->definition);
+	}
 	if ((axis_array[SECOND_Y_AXIS].ticmode & TICS_MASK) != NO_TICS) {
 	    MOUSE_PARAM("GPVAL_Y2_MIN", "gnuplot.plot_axis_y2min");
 	    MOUSE_PARAM("GPVAL_Y2_MAX", "gnuplot.plot_axis_y2max");
 	} else
 	    fprintf(gpoutfile, "gnuplot.plot_axis_y2min = \"none\"\n");
+	if (axis_array[SECOND_Y_AXIS].linked_to_primary 
+	&&  axis_array[FIRST_Y_AXIS].link_udf->at) {
+	    fprintf(gpoutfile, "gnuplot.y2_mapping = function(y) { return y; };");
+	    fprintf(gpoutfile, "  // replace returned value with %s\n",
+			axis_array[FIRST_Y_AXIS].link_udf->definition);
+	}
 #undef MOUSE_PARAM
 
 	fprintf(gpoutfile, "gnuplot.plot_logaxis_x = %d;\n",

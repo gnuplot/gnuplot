@@ -1,5 +1,5 @@
 /*
- * $Id: axis.h,v 1.72 2012/07/27 20:12:22 sfeam Exp $
+ * $Id: axis.h,v 1.73 2012/08/05 18:25:53 sfeam Exp $
  *
  */
 
@@ -188,10 +188,7 @@ typedef enum e_constraint {
     CONSTRAINT_UPPER = 1<<1,
     CONSTRAINT_BOTH  = (1<<0 | 1<<1)
 } t_constraint;
-    
 
-/* FIXME 20000725: collect some of those various TBOOLEAN fields into
- * a larger int (or -- shudder -- a bitfield?) */
 typedef struct axis {
 /* range of this axis */
     t_autoscale autoscale;	/* Which end(s) are autoscaled? */
@@ -227,6 +224,13 @@ typedef struct axis {
     TBOOLEAN log;		/* log axis stuff: flag "islog?" */
     double base;		/* logarithm base value */
     double log_base;		/* ln(base), for easier computations */
+
+/* linked axis information (used only by x2, y2)
+ * If linked_to_primary is TRUE, the primary axis info will be cloned into the
+ * secondary axis only up to this point in the structure.
+ */
+    TBOOLEAN linked_to_primary;
+    struct udft_entry *link_udf;
 
 /* time/date axis control */
     td_type datatype;		/* DT_NORMAL | DT_TIMEDATE | DT_DMS */
@@ -269,6 +273,7 @@ typedef struct axis {
 	0.,        		/* terminal scale */			    \
 	0,        		/* zero axis position */		    \
 	FALSE, 0.0, 0.0,	/* log, base, log(base) */		    \
+	FALSE, NULL,		/* linked_to_primary, link function */      \
 	DT_NORMAL, TRUE,	/* datatype, format_numeric */	            \
 	DEF_FORMAT, TIMEFMT,	/* output format, timefmt */		    \
 	NO_TICS,		/* tic output positions (border, mirror) */ \
@@ -281,6 +286,9 @@ typedef struct axis {
 	DEFAULT_AXIS_ZEROAXIS	/* zeroaxis line style */		    \
 }
 
+/* This much of the axis structure is cloned by the "set x2range link" command */
+#define AXIS_CLONE_SIZE ((size_t)&(axis_array->linked_to_primary) - (size_t)axis_array)
+
 /* Table of default behaviours --- a subset of the struct above. Only
  * those fields are present that differ from axis to axis. */
 typedef struct axis_defaults {
@@ -289,8 +297,6 @@ typedef struct axis_defaults {
     char name[4];		/* axis name, like in "x2" or "t" */
     int ticmode;		/* tics on border/axis? mirrored? */
 } AXIS_DEFAULTS;
-
-
 
 /* global variables in axis.c */
 
@@ -361,9 +367,6 @@ extern AXIS_INDEX x_axis, y_axis, z_axis;
   (((double)(pos)-axis_array[axis].term_lower)/axis_array[axis].term_scale \
    + axis_array[axis].min)
 
-/* these are the old names for these: */
-#define map_x(x) AXIS_MAP(x_axis, x)
-#define map_y(y) AXIS_MAP(y_axis, y)
 
 #define AXIS_SETSCALE(axis, out_low, out_high)			\
     axis_array[axis].term_scale = ((out_high) - (out_low))	\
@@ -536,6 +539,11 @@ do {									  \
 	break;  /* this plot is not being used for autoscaling */	  \
     if (TYPE != INRANGE)						  \
 	break;  /* don't set y range if x is outrange, for example */	  \
+    if (axis->linked_to_primary) {					  \
+	axis = &axis_array[AXIS - SECOND_AXES];				  \
+	if (axis->link_udf->at) 					  \
+	    curval = eval_link_function(AXIS - SECOND_AXES, curval);	  \
+    } 									  \
     if ( curval < axis->data_min )					  \
 	axis->data_min = curval;					  \
     if ( curval < axis->min						  \
@@ -656,6 +664,11 @@ void get_position __PROTO((struct position *pos));
 void get_position_default __PROTO((struct position *pos, enum position_type default_type));
 
 void gstrdms __PROTO((char *label, char *format, double value));
+
+void clone_linked_axes __PROTO((AXIS_INDEX axis2, AXIS_INDEX axis1));
+
+int map_x __PROTO((double value));
+int map_y __PROTO((double value));
 
 /* ------------ autoscaling of the color axis */
 #define NEED_PALETTE(plot) \

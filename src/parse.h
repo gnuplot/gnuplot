@@ -1,5 +1,5 @@
 /*
- * $Id: parse.h,v 1.24 2011/07/14 21:29:41 sfeam Exp $
+ * $Id: parse.h,v 1.25 2011/07/22 14:37:57 juhaszp Exp $
  */
 
 /* GNUPLOT - parse.h */
@@ -100,5 +100,7 @@ t_iterator * check_for_iteration __PROTO((void));
 TBOOLEAN next_iteration  __PROTO((t_iterator *));
 TBOOLEAN empty_iteration  __PROTO((t_iterator *));
 t_iterator * cleanup_iteration __PROTO((t_iterator *));
+
+void parse_link_via __PROTO((struct udft_entry *, char *));
 
 #endif /* PARSE_H */

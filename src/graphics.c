@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.398 2012/06/30 06:41:33 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.399 2012/07/25 05:08:34 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -1583,6 +1583,11 @@ adjust_offsets()
 	int_error(NO_CARET, "x_min should not equal x_max!");
     if (Y_AXIS.min == Y_AXIS.max)
 	int_error(NO_CARET, "y_min should not equal y_max!");
+
+    if (axis_array[SECOND_X_AXIS].linked_to_primary)
+	clone_linked_axes(SECOND_X_AXIS, FIRST_X_AXIS);
+    if (axis_array[SECOND_Y_AXIS].linked_to_primary)
+	clone_linked_axes(SECOND_Y_AXIS, FIRST_Y_AXIS);
 }
 
 void
@@ -5421,8 +5426,12 @@ map_position_double(
 	}
     case second_axes:
 	{
-	    double xx = axis_log_value_checked(SECOND_X_AXIS, pos->x, what);
-	    *x = AXIS_MAP(SECOND_X_AXIS, xx);
+	    if (axis_array[SECOND_X_AXIS].linked_to_primary)
+		*x = (double)map_x(pos->x);
+	    else {
+		double xx = axis_log_value_checked(SECOND_X_AXIS, pos->x, what);
+		*x = AXIS_MAP(SECOND_X_AXIS, xx);
+	    }
 	    break;
 	}
     case graph:
@@ -5452,8 +5461,12 @@ map_position_double(
 	}
     case second_axes:
 	{
-	    double yy = axis_log_value_checked(SECOND_Y_AXIS, pos->y, what);
-	    *y = AXIS_MAP(SECOND_Y_AXIS, yy);
+	    if (axis_array[SECOND_Y_AXIS].linked_to_primary)
+		*y = (double)map_x(pos->y);
+	    else {
+		double yy = axis_log_value_checked(SECOND_Y_AXIS, pos->y, what);
+		*y = AXIS_MAP(SECOND_Y_AXIS, yy);
+	    }
 	    break;
 	}
     case graph:

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.153 2012/05/20 14:18:54 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.154 2012/06/13 20:12:59 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -237,6 +237,10 @@ unset_command()
 	break;
     case S_LINETYPE:
 	unset_linetype();
+	break;
+    case S_LINK:
+	c_token--;
+	link_command();
 	break;
     case S_LOADPATH:
 	unset_loadpath();
@@ -1522,8 +1526,6 @@ unset_timedata(AXIS_INDEX axis)
 static void
 unset_range(AXIS_INDEX axis)
 {
-    /* FIXME HBB 20000506: do we want to reset the axis autoscale and
-     * min/max, too?  */
     axis_array[axis].range_flags = 0;
 }
 
@@ -1669,6 +1671,8 @@ reset_command()
 	unset_minitics(axis);
 	axis_array[axis].ticdef = default_axis_ticdef;
 	axis_array[axis].minitics = MINI_DEFAULT;
+
+	axis_array[axis].linked_to_primary = FALSE;
 
 	reset_logscale(axis);
     }

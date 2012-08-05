@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.241 2012/07/18 16:42:51 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.242 2012/07/20 16:53:48 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -1193,6 +1193,61 @@ while_command()
 
     free(clause);
     c_token = end_token;
+}
+
+/*
+ * set link [x2|y2] {via <expression1> {inverse <expression2>}}
+ * unset link [x2|y2]
+ */
+void
+link_command()
+{
+    AXIS_INDEX primary_axis, secondary_axis;
+    TBOOLEAN linked = TRUE;
+
+    if (equals(c_token - 1,"unset"))
+	linked = FALSE;
+
+    /* Flag the axes as being linked, and copy the range settings */
+    /* from the primary axis into the linked secondary axis       */
+    c_token++;
+    if (almost_equals(c_token,"x$2")) {
+	primary_axis = FIRST_X_AXIS;
+	secondary_axis = SECOND_X_AXIS;
+    } else if (almost_equals(c_token,"y$2")) {
+	primary_axis = FIRST_Y_AXIS;
+	secondary_axis = SECOND_Y_AXIS;
+    } else {
+	int_error(c_token,"expecting x2 or y2");
+    }
+    axis_array[secondary_axis].linked_to_primary = linked;
+    c_token++;
+
+    /* Initialize the action tables for the mapping function[s] */
+    if (!axis_array[primary_axis].link_udf) {
+	axis_array[primary_axis].link_udf = gp_alloc(sizeof(udft_entry),"link_at");
+	memset(axis_array[primary_axis].link_udf, 0, sizeof(udft_entry));
+    }
+    if (!axis_array[secondary_axis].link_udf) {
+	axis_array[secondary_axis].link_udf = gp_alloc(sizeof(udft_entry),"link_at");
+	memset(axis_array[secondary_axis].link_udf, 0, sizeof(udft_entry));
+    }
+
+    if (!equals(c_token,"via")) {
+	free_at(axis_array[secondary_axis].link_udf->at);
+	axis_array[secondary_axis].link_udf->at = NULL;
+	free_at(axis_array[primary_axis].link_udf->at);
+	axis_array[primary_axis].link_udf->at = NULL;
+    } else {
+	parse_link_via(axis_array[secondary_axis].link_udf,
+		    (secondary_axis==SECOND_X_AXIS) ? "x" : "y");
+	if (!almost_equals(c_token,"inv$erse"))
+	    int_error(c_token,"inverse mapping function required");
+	parse_link_via(axis_array[primary_axis].link_udf,
+		    (secondary_axis==SECOND_X_AXIS) ? "x" : "y");
+    }
+    /* Clone the range information */
+    clone_linked_axes(secondary_axis, primary_axis);
 }
 
 /* process the 'load' command */

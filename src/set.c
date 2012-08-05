@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.372 2012/06/13 20:12:59 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.373 2012/06/23 07:42:23 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -295,6 +295,9 @@ set_command()
 	    break;
 	case S_LABEL:
 	    set_label();
+	    break;
+	case S_LINK:
+	    link_command();
 	    break;
 	case S_LOADPATH:
 	    set_loadpath();
@@ -4722,7 +4725,14 @@ set_range(AXIS_INDEX axis)
 {
     c_token++;
 
-    if (almost_equals(c_token,"re$store")) { /* ULIG */
+    /* If this is a secondary axis linked to the primary, ignore the command */
+    if (axis_array[axis].linked_to_primary) {
+	while (!END_OF_COMMAND)
+	    c_token++;
+	return;
+    }
+
+    if (almost_equals(c_token,"re$store")) {
 	c_token++;
 	axis_array[axis].set_min = get_writeback_min(axis);
 	axis_array[axis].set_max = get_writeback_max(axis);
@@ -4753,6 +4763,12 @@ set_range(AXIS_INDEX axis)
 	    axis_array[axis].range_flags &= ~RANGE_WRITEBACK;
 	}
     }
+
+    /* If there is a secondary axis linked to this one, */
+    /* replicate the new range information to it.       */
+    if ((axis == FIRST_X_AXIS || axis == FIRST_Y_AXIS)
+    &&  (axis_array[axis + SECOND_AXES].linked_to_primary))
+	    clone_linked_axes(axis + SECOND_AXES, axis);
 }
 
 static void
@@ -5731,3 +5747,4 @@ rrange_to_xy()
 	Y_AXIS.set_min = X_AXIS.set_min = -X_AXIS.set_max;
     }
 }
+

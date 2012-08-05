@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: mouse.c,v 1.136 2012/03/09 20:23:31 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: mouse.c,v 1.137 2012/04/17 22:42:53 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - mouse.c */
@@ -371,6 +371,17 @@ MousePosToGraphPosReal(int xx, int yy, double *x, double *y, double *x2, double 
     if (!is_3d_plot) {
 	*x2 = AXIS_DE_LOG_VALUE(SECOND_X_AXIS, *x2);
 	*y2 = AXIS_DE_LOG_VALUE(SECOND_Y_AXIS, *y2);
+    }
+
+    /* If x2 is linked to x via a mapping function, apply it now */
+    /* Similarly for y/y2 */
+    if (!is_3d_plot) {
+	if (axis_array[SECOND_X_AXIS].linked_to_primary
+	&&  axis_array[SECOND_X_AXIS].link_udf->at)
+	    *x2 = eval_link_function(SECOND_X_AXIS, *x);
+	if (axis_array[SECOND_Y_AXIS].linked_to_primary
+	&&  axis_array[SECOND_Y_AXIS].link_udf->at)
+	    *y2 = eval_link_function(SECOND_Y_AXIS, *y);
     }
 }
 

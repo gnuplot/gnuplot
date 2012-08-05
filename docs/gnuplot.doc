@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.743 2012/07/08 04:18:42 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.744 2012/07/20 18:25:47 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -214,6 +214,12 @@ C
  * New support for 32-bit Alpha channel + RGB colors #AARRGGBB.  See `colorspec`.
 
  * Changed handling of NaN or other unexpected input data.  See `missing`.
+
+ * Secondary axes (x2, y2) may be locked to the primary axis via a mapping
+ function.  In the simplest case this guarantees that the primary and secondary
+ axis ranges are identical.  In the general case it allows defining a non-linear
+ axis scale, which previous has been possible only for log scaling.
+ See `set link`.
 
 2 Deprecated syntax
 ?deprecated syntax
@@ -4680,7 +4686,6 @@ Ffigure_mapcontours
        set for [i=1:9] for [j=1:9] label i*10+j sprintf("%d",i*10+j) at i,j
 
  See additional documentation for `iteration`, `do`.
-
 2 load
 ?commands load
 ?load
@@ -6888,9 +6893,10 @@ Ffigure_mapcontours
 
  When tics are displayed on second axes but no plot has been specified for
  those axes, x2range and y2range are inherited from xrange and yrange.  This
- is done _before_ xrange and yrange are autoextended to a whole number of
- tics, which can cause unexpected results.  You can use the `fixmin`
- or `fixmax` options to avoid this.
+ is done _before_ applying offsets or autoextending the ranges to a whole
+ number of tics, which can cause unexpected results.  To prevent this you can
+ explicitly link the secondary axis range to the primary axis range.
+ See `set link`.
 
  Examples:
 
@@ -9027,7 +9033,34 @@ Ffigure_missing
  this command.  `unset linetype cycle` disables this feature.  If the line
  properties of a higher numbered linetype are explicitly defined, this takes
  precedence over the recycled low-number linetype properties.
+3 link
+?commands set link
+?set link
+?link
+ Syntax:
+       set link {x2 | y2} {via <expression1> inverse <expression2>}
+       unset link
 
+ The `set link` command establishes a mapping between the x and x2 axes, or the
+ y and y2 axes.  <expression1> maps primary axis coordinates onto the secondary
+ axis.  <expresion2> maps secondary axis coordinates onto the primary axis.
+
+ Examples:
+       
+       set link x
+
+ This is the simplest form of the command. It forces the x2 axis to have
+ identically the same range, scale, and direction as the x axis.
+ Commands `set xrange`, `set auto x`, etc will affect both the x and x2 axes.
+ Commands `set x2range`, etc, will be ignored while the linkage is in effect.
+       
+       set link x2 via x**2 inverse sqrt(x)
+       plot "sqrt_data" using 1:2 axes x2y1, "linear_data" using 1:2 axes x1y1
+
+ This command establishes forward and reverse mapping between the x and x2 axes.
+ The forward mapping is used to generate x2 tic labels and x2 mouse coordinate
+ The reverse mapping is used to plot coordinates given in the x2 coordinate
+ system.  Note that the mapping as given is valid only for x non-negative.
 3 lmargin
 ?commands set lmargin
 ?set lmargin
@@ -11830,7 +11863,9 @@ Ffigure_missing
 ?show x2range
 ?x2range
  The `set x2range` command sets the horizontal range that will be displayed on
- the x2 (top) axis.  Please see `set xrange` for details.
+ the x2 (top) axis.  See `set xrange` for the full set of command options.
+ This command is ignored if the x2 axis range is explicitly linked to the
+ x axis.  See `set link`.
 3 x2tics
 ?commands set x2tics
 ?commands unset x2tics
@@ -12055,6 +12090,8 @@ Ffigure_missing
 
  The same syntax applies to `yrange`, `zrange`, `x2range`, `y2range`, `cbrange`,
  `rrange`, `trange`, `urange` and `vrange`.
+ 
+ See `set link` for options that link the ranges of x and x2, or y and y2.
 
  The `reverse` option reverses the direction of an autoscaled axis. For example,
  if the data values range from 10 to 100, it will autoscale to the equivalent of
@@ -12431,8 +12468,10 @@ Ffigure_missing
 ?set y2range
 ?show y2range
 ?y2range
- The `set y2range` command sets the vertical range that will be displayed on
- the y2 (right-hand) axis.  Please see `set xrange` for details.
+ The `set y2range` command sets the horizontal range that will be displayed on
+ the y2 (right) axis.  See `set xrange` for the full set of command options.
+ This command is ignored if the y2 axis range is explicitly linked to the
+ y axis.  See `set link`.
 3 y2tics
 ?commands set y2tics
 ?commands unset y2tics
