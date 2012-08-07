@@ -1,5 +1,5 @@
 /* -*- objc -*-
- * $Id: aquaterm.trm,v 1.45 2012/04/24 23:58:21 sfeam Exp $
+ * $Id: aquaterm.trm,v 1.46 2012/04/25 04:12:20 sfeam Exp $
  *
  */
 
@@ -356,7 +356,7 @@ AQUA_init()
   [adapter openPlotWithIndex:AQUA_plotRef];
 
   /* Check for support of version-dependent features */
-   AQUA_hasAlphaSupport = [AQTAdapter respondsToSelector:@selector(setColorRed:green:blue:alpha:)];
+   AQUA_hasAlphaSupport = [AQTAdapter instancesRespondToSelector:@selector(setColorRed:green:blue:alpha:)];
 
   /* set xmax, ymax*/
   term->xmax = AQUA_xSize;

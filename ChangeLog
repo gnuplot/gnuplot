@@ -1,3 +1,8 @@
+2012-08-07  Mojca Miklavec <mojca.miklavec.lists@gmail.com>
+
+	* term/aquaterm.trm:  Revised test for transparency support to match
+	the implementation in AquaTerm version 1.1.1
+
 2012-08-07  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/datafile.c src/datafile.h src/plot2d.c src/tabulate.c:
