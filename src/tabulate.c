@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: tabulate.c,v 1.13 2011/10/25 05:10:58 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: tabulate.c,v 1.14 2012/06/08 04:53:49 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - tabulate.c */
@@ -45,6 +45,7 @@ static char *RCSid() { return RCSid("$Id: tabulate.c,v 1.13 2011/10/25 05:10:58 
 
 #include "alloc.h"
 #include "axis.h"
+#include "datafile.h"
 #include "gp_time.h"
 #include "graphics.h"
 #include "graph3d.h"
@@ -181,6 +182,12 @@ print_table(struct curve_points *current_plot, int plot_num)
 
 	    for (i = 0, point = current_plot->points; i < current_plot->p_count;
 		i++, point++) {
+
+		/* Reproduce blank lines read from original input file, if any */
+		if (!memcmp(point, &blank_data_line, sizeof(struct coordinate))) {
+		    fprintf(outfile, "\n");
+		    continue;
+		}
 
 		/* FIXME HBB 20020405: had better use the real x/x2 axes of this plot */
 		OUTPUT_NUMBER(point->x, current_plot->x_axis);

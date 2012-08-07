@@ -1,3 +1,13 @@
+2012-08-07  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/datafile.c src/datafile.h src/plot2d.c src/tabulate.c:
+	Blank lines separating datasets in an input file were stored as an
+	UNDEFINED point but not otherwise marked. This patch introduces a
+	recognizable (struct coordinate)blank_data_line that is stored when
+	a blank line is encounted. This means that when writing the data back
+	out via "set table" the separation between data sets can be maintained.
+	Bug #3553151
+
 2012-08-05  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/axis.c src/axis.h src/command.c src/command.h src/eval.c

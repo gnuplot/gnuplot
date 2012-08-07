@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.226 2012/07/03 19:32:22 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.227 2012/07/18 23:29:05 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -440,6 +440,9 @@ df_binary_file_record_struct df_bin_record_reset = {
 
 int df_max_num_bin_records = 0, df_num_bin_records, df_bin_record_count;
 int df_max_num_bin_records_default = 0, df_num_bin_records_default;
+
+/* Used to mark the location of a blank line in the original data input file */
+struct coordinate blank_data_line = {UNDEFINED, -999, -999, -999, -999, -999, -999, -999};
 
 static void gpbin_filetype_function __PROTO((void));
 static void raw_filetype_function __PROTO((void));
