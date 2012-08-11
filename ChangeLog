@@ -1,3 +1,10 @@
+2012-08-11  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* docs/Makefile.in:  Remove dependency on emacs for "make install"
+	in the docs subdirectory.  If no emacs is available, skip installation
+	of the site-lisp files.
+	Bug #3528377
+
 2012-08-07  Mojca Miklavec <mojca.miklavec.lists@gmail.com>
 
 	* term/aquaterm.trm:  Revised test for transparency support to match

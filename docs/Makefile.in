@@ -457,11 +457,13 @@ install-pdf:
 	fi
 
 install-info: gnuplot.info gnuplot-eldoc.el gnuplot-eldoc.elc
-	$(top_srcdir)/mkinstalldirs $(DESTDIR)$(infodir) $(DESTDIR)$(lispdir)
-	$(INSTALL_DATA) gnuplot.info $(DESTDIR)$(infodir)/gnuplot.info
-	$(INSTALL_DATA) gnuplot-eldoc.el $(DESTDIR)$(lispdir)/gnuplot-eldoc.el
-	$(INSTALL_DATA) gnuplot-eldoc.elc $(DESTDIR)$(lispdir)/gnuplot-eldoc.elc
-	@if (install-info --version && \
+	@if test "$(EMACS)" != no; then \
+	    $(top_srcdir)/mkinstalldirs $(DESTDIR)$(infodir) $(DESTDIR)$(lispdir); \
+	    $(INSTALL_DATA) gnuplot.info $(DESTDIR)$(infodir)/gnuplot.info; \
+	    $(INSTALL_DATA) gnuplot-eldoc.el $(DESTDIR)$(lispdir)/gnuplot-eldoc.el; \
+	    $(INSTALL_DATA) gnuplot-eldoc.elc $(DESTDIR)$(lispdir)/gnuplot-eldoc.elc; \
+	else : ; fi
+	@if (test "$(EMACS)" != no && install-info --version && \
 	     install-info --version | fgrep -i -v debian) >/dev/null 2>&1; then \
 	  echo "install-info --info-dir=$(DESTDIR)$(infodir) $(DESTDIR)$(infodir)/gnuplot.info";\
 	  install-info --info-dir=$(DESTDIR)$(infodir) $(DESTDIR)$(infodir)/gnuplot.info || :;\
