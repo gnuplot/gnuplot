@@ -1,3 +1,9 @@
+2012-08-14  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* lisp/gnuplot.el: elisp is now getting serious about a syntax change
+	announced 10+ years ago.   s/(` (/`(/
+	While here, clean out some old cruft from the directory.
+
 2012-08-07  Mojca Miklavec <mojca.miklavec.lists@gmail.com>
 
 	* term/aquaterm.trm:  Revised test for transparency support to match
