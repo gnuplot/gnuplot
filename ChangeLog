@@ -1,3 +1,8 @@
+2012-08-22  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/graph3d.c:  Clip over-wide key box to left edge of plot.
+	Bug #3560531
+
 2012-08-11  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* docs/Makefile.in:  Remove dependency on emacs for "make install"
