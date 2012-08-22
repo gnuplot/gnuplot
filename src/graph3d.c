@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.266 2012/06/13 20:12:59 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.267 2012/07/03 03:02:35 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -952,16 +952,16 @@ do_3dplot(
 
 	term_apply_lp_properties(&key->box);
 	newpath();
-	(*t->move) (key->bounds.xleft, key->bounds.ybot);
-	(*t->vector) (key->bounds.xleft, key->bounds.ytop);
-	(*t->vector) (key->bounds.xright, key->bounds.ytop);
-	(*t->vector) (key->bounds.xright, key->bounds.ybot);
-	(*t->vector) (key->bounds.xleft, key->bounds.ybot);
+	clip_move(key->bounds.xleft, key->bounds.ybot);
+	clip_vector(key->bounds.xleft, key->bounds.ytop);
+	clip_vector(key->bounds.xright, key->bounds.ytop);
+	clip_vector(key->bounds.xright, key->bounds.ybot);
+	clip_vector(key->bounds.xleft, key->bounds.ybot);
 	closepath();
 
 	/* draw a horizontal line between key title and first entry  JFi */
-	(*t->move) (key->bounds.xleft, key->bounds.ytop - (ktitle_lines) * t->v_char);
-	(*t->vector) (key->bounds.xright, key->bounds.ytop - (ktitle_lines) * t->v_char);
+	clip_move(key->bounds.xleft, key->bounds.ytop - (ktitle_lines) * t->v_char);
+	clip_vector(key->bounds.xright, key->bounds.ytop - (ktitle_lines) * t->v_char);
     }
 
 
@@ -2060,33 +2060,34 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid,
     struct termentry *t = term;
     BoundingBox *clip_save = clip_area;
 
+    clip_area = &canvas;
     if (draw_border && splot_map) {
 	if (border_layer == current_layer) {
 	    term_apply_lp_properties(&border_lp);
 	    if ((draw_border & 15) == 15)
 		newpath();
 	    map3d_xy(zaxis_x, zaxis_y, base_z, &x, &y);
-	    term->move(x, y);
+	    clip_move(x, y);
 	    map3d_xy(back_x , back_y , base_z, &x, &y);
 	    if (draw_border & 2)
-		term->vector(x, y);
+		clip_vector(x, y);
 	    else
-		term->move(x, y);
+		clip_move(x, y);
 	    map3d_xy(right_x, right_y, base_z, &x, &y);
 	    if (draw_border & 8)
-		term->vector(x, y);
+		clip_vector(x, y);
 	    else
-		term->move(x, y);
+		clip_move(x, y);
 	    map3d_xy(front_x, front_y, base_z, &x, &y);
 	    if (draw_border & 4)
-		term->vector(x, y);
+		clip_vector(x, y);
 	    else
-		term->move(x, y);
+		clip_move(x, y);
 	    map3d_xy(zaxis_x, zaxis_y, base_z, &x, &y);
 	    if (draw_border & 1)
-		term->vector(x, y);
+		clip_vector(x, y);
 	    else
-		term->move(x, y);
+		clip_move(x, y);
 	    if ((draw_border & 15) == 15)
 		closepath();
 	}
@@ -2270,9 +2271,6 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid,
 	return;
     if (whichgrid == BORDERONLY)
 	return;
-
-    if (splot_map)
-	clip_area = NULL;
 
     /* Draw ticlabels and axis labels. x axis, first:*/
     if (X_AXIS.ticmode || X_AXIS.label.text) {
@@ -2613,8 +2611,7 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid,
 	ignore_enhanced(FALSE);
     }
 
-    if (splot_map)
-	clip_area = clip_save;
+    clip_area = clip_save;
 }
 
 /* HBB 20010118: all the *_callback() functions made non-static. This
@@ -3142,7 +3139,6 @@ get_surface_cbminmax(struct surface_points *plot, double *cbmin, double *cbmax)
 static void
 key_sample_line_pm3d(struct surface_points *plot, int xl, int yl)
 {
-    legend_key *key = &keyT;
     int steps = GPMIN(24, abs(key_sample_right - key_sample_left));
     /* don't multiply by key->swidth --- could be >> palette.maxcolors */
     int x_to = xl + key_sample_right;
@@ -3174,21 +3170,15 @@ key_sample_line_pm3d(struct surface_points *plot, int xl, int yl)
     gray_to = cb2gray(cbmax);
     gray_step = (gray_to - gray_from)/steps;
 
-    if (key->region != GPKEY_USER_PLACEMENT)
-	(*term->move) (x1, yl);
-    else
-	clip_move(x1, yl);
+    clip_move(x1, yl);
     x2 = x1;
     while (i <= steps) {
 	/* if (i>1) set_color( i==steps ? 1 : (i-0.5)/steps ); ... range [0:1] */
 	gray = (i==steps) ? gray_to : gray_from+i*gray_step;
 	set_color(gray);
-	(*term->move) (x2, yl);
+	clip_move(x2, yl);
 	x2 = (i==steps) ? x_to : x1 + (int)(i*step+0.5);
-	if (key->region != GPKEY_USER_PLACEMENT)
-	    (*term->vector) (x2, yl);
-	else
-	    clip_vector(x2, yl);
+	clip_vector(x2, yl);
 	i++;
     }
 }

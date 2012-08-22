@@ -1,3 +1,10 @@
+2012-08-22  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/graph3d.c: In the code for drawing the key box and key samples,
+	replace direct calls to term->move() and term->vector() with calls to
+	clip_move() and clip_vector().
+	Bug #3560531
+
 2012-08-14  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* lisp/gnuplot.el: elisp is now getting serious about a syntax change
