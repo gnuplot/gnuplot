@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.197 2012/06/13 20:12:59 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.198 2012/07/03 03:02:35 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -1277,8 +1277,13 @@ eval_3dplots()
     plot_iterator = check_for_iteration();
 
     while (TRUE) {
-	if (END_OF_COMMAND)
-	    int_error(c_token, "function to plot expected");
+
+	/* Forgive trailing comma on a multi-element plot command */
+	if (END_OF_COMMAND) {
+	    if (plot_num == 0)
+		int_error(c_token, "function to plot expected");
+	    break;
+	}
 
 	if (crnt_param == 0 && !was_definition)
 	    start_token = c_token;
@@ -1931,6 +1936,12 @@ eval_3dplots()
 		struct at_type *at_ptr;
 		char *name_str;
 		was_definition = FALSE;
+
+		/* Forgive trailing comma on a multi-element plot command */
+		if (END_OF_COMMAND || this_plot == NULL) {
+		    int_warn(c_token, "ignoring trailing comma in plot command");
+		    break;
+		}
 
 		dummy_func = &plot_func;
 		name_str = string_or_express(&at_ptr);

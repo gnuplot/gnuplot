@@ -5,6 +5,10 @@
 	clip_move() and clip_vector().
 	Bug #3560531
 
+	* src/plot2d.c src/plot3d.c:  Downgrade detection of a trailing comma
+	in a plot command to a warning rather than an error.  This allows more
+	convenient re-ordering of multi-line plot elements when replotting.
+
 2012-08-14  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* lisp/gnuplot.el: elisp is now getting serious about a syntax change
