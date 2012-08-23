@@ -1,3 +1,9 @@
+2012-08-23  Thomas Gaillard <tgaillard@users.sourceforge.net>
+
+	* src/interpol.c:  Mean and sigma of kernel density function were
+	incorrectly calculated.
+	Bug #3519563
+
 2012-08-22  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graph3d.c:  Clip over-wide key box to left edge of plot.
