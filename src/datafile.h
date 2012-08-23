@@ -1,5 +1,5 @@
 /*
- * $Id: datafile.h,v 1.37 2012/05/02 04:21:58 sfeam Exp $
+ * $Id: datafile.h,v 1.38 2012/08/08 03:46:26 sfeam Exp $
  */
 
 /* GNUPLOT - datafile.h */
@@ -59,14 +59,6 @@ enum DF_STATUS {
     DF_COLUMN_HEADERS = -9
 };
 
-
-#ifndef MAXINT			/* should there be one already defined ? */
-# ifdef INT_MAX			/* in limits.h ? */
-#  define MAXINT INT_MAX
-# else
-#  define MAXINT ((~0)>>1)
-# endif
-#endif
 
 /* Variables of datafile.c needed by other modules: */
 
