@@ -3,6 +3,17 @@
 	* src/datafile.c:  Remove incorrect fall-back definition for MAXINT.
 	Note:  ~0>>1  is _not_ guaranteed to shift a 0 into the high bit!
 
+	* src/term.c src/unset.c src/term_api.h:
+	Consistent with the documented generic meaning of "unset", the command
+	"unset terminal" now restores the default terminal present at program
+	entry.  I.e., it is equivalent to "set terminal GNUTERM".
+
+	* docs/gnuplot.doc:
+	- Add sections for "unset output" and "unset terminal".
+	- Remove index entries for "set style <plotstyle>" since there is no
+	  such command.
+	- Bessel functions Jn and Yn by convention use a capital letter. 
+
 2012-08-23  Thomas Gaillard <tgaillard@users.sourceforge.net>
 
 	* src/interpol.c:  Mean and sigma of kernel density function were

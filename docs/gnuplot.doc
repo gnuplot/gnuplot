@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.744 2012/07/20 18:25:47 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.745 2012/08/05 19:24:53 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -750,10 +750,10 @@ C
 ^<tr>    <td>EllipticK(k)</td>    <td>real k in (-1:1)</td>    <td><i>K(k)</i> complete elliptic integral of the first kind</td></tr>
 ^<tr>    <td>EllipticE(k)</td>    <td>real k in [-1:1]</td>    <td><i>E(k)</i> complete elliptic integral of the second kind</td></tr>
 ^<tr>    <td>EllipticPi(n,k)</td>    <td> real n&lt;1, real k in (-1:1)</td>    <td> &Pi;(<i>n,k</i>) complete elliptic integral of the third kind</td></tr>
-^<tr>    <td>besj0(x)</td>    <td>int or real</td>    <td><i>j</i><sub>0</sub> Bessel function of <i>x</i>, in radians</td></tr>
-^<tr>    <td>besj1(x)</td>    <td>int or real</td>    <td><i>j</i><sub>1</sub> Bessel function of <i>x</i>, in radians</td></tr>
-^<tr>    <td>besy0(x)</td>    <td>int or real</td>    <td><i>y</i><sub>0</sub> Bessel function of <i>x</i>, in radians</td></tr>
-^<tr>    <td>besy1(x)</td>    <td>int or real</td>    <td><i>y</i><sub>1</sub> Bessel function of <i>x</i>, in radians</td></tr>
+^<tr>    <td>besj0(x)</td>    <td>int or real</td>    <td><i>J</i><sub>0</sub> Bessel function of <i>x</i>, in radians</td></tr>
+^<tr>    <td>besj1(x)</td>    <td>int or real</td>    <td><i>J</i><sub>1</sub> Bessel function of <i>x</i>, in radians</td></tr>
+^<tr>    <td>besy0(x)</td>    <td>int or real</td>    <td><i>Y</i><sub>0</sub> Bessel function of <i>x</i>, in radians</td></tr>
+^<tr>    <td>besy1(x)</td>    <td>int or real</td>    <td><i>Y</i><sub>1</sub> Bessel function of <i>x</i>, in radians</td></tr>
 ^<tr>    <td>ceil(x)</td>    <td>any</td>    <td>&lceil;<i>x</i>&rceil;, smallest integer not less than <i>x</i> (real part)</td></tr>
 ^<tr>    <td>cos(x)</td>    <td>radians</td>    <td>cos <i>x</i>, cosine of <i>x</i></td></tr>
 ^<tr>    <td>cosh(x)</td>    <td>any</td>    <td>cosh <i>x</i>, hyperbolic cosine of <i>x</i> in radians</td></tr>
@@ -868,8 +868,11 @@ C marker below is used to signal this to doc2html:
  The `abs(x)` function returns the absolute value of its argument.  The
  returned value is of the same type as the argument.
 
+=norm
+=modulus
  For complex arguments, abs(x) is defined as the length of x in the complex
- plane [i.e.,  sqrt(real(x)**2 + imag(x)**2) ].
+ plane [i.e.,  sqrt(real(x)**2 + imag(x)**2) ]. This is also known as the norm
+ or complex modulus of x.
 4 acos
 ?expressions functions acos
 ?acos
@@ -954,30 +957,30 @@ C marker below is used to signal this to doc2html:
 4 besj0
 ?expressions functions besj0
 ?besj0
-#besj0(x) & int or real &  $j_{0}$ Bessel function of $x$, in radians \\
-%besj0(x)@int or real@$j sub 0$ Bessel function of $x$, in radians
- The `besj0(x)` function returns the j0th Bessel function of its argument.
+#besj0(x) & int or real &  $J_{0}$ Bessel function of $x$, in radians \\
+%besj0(x)@int or real@$J sub 0$ Bessel function of $x$, in radians
+ The `besj0(x)` function returns the J0th Bessel function of its argument.
  `besj0` expects its argument to be in radians.
 4 besj1
 ?expressions functions besj1
 ?besj1
-#besj1(x) & int or real & $j_{1}$ Bessel function of $x$, in radians \\
-%besj1(x)@int or real@$j sub 1$ Bessel function of $x$, in radians
- The `besj1(x)` function returns the j1st Bessel function of its argument.
+#besj1(x) & int or real & $J_{1}$ Bessel function of $x$, in radians \\
+%besj1(x)@int or real@$J sub 1$ Bessel function of $x$, in radians
+ The `besj1(x)` function returns the J1st Bessel function of its argument.
  `besj1` expects its argument to be in radians.
 4 besy0
 ?expressions functions besy0
 ?besy0
-#besy0(x) & int or real & $y_{0}$ Bessel function of $x$, in radians \\
-%besy0(x)@int or real@$y sub 0$ Bessel function of $x$, in radians
- The `besy0(x)` function returns the y0th Bessel function of its argument.
+#besy0(x) & int or real & $Y_{0}$ Bessel function of $x$, in radians \\
+%besy0(x)@int or real@$Y sub 0$ Bessel function of $x$, in radians
+ The `besy0(x)` function returns the Y0th Bessel function of its argument.
  `besy0` expects its argument to be in radians.
 4 besy1
 ?expressions functions besy1
 ?besy1
-#besy1(x) & int or real & $y_{1}$ Bessel function of $x$, in radians \\
-%besy1(x)@int or real@$y sub 1$ Bessel function of $x$, in radians
- The `besy1(x)` function returns the y1st Bessel function of its argument.
+#besy1(x) & int or real & $Y_{1}$ Bessel function of $x$, in radians \\
+%besy1(x)@int or real@$Y sub 1$ Bessel function of $x$, in radians
+ The `besy1(x)` function returns the Y1st Bessel function of its argument.
  `besy1` expects its argument to be in radians.
 4 ceil
 ?expressions functions ceil
@@ -2755,8 +2758,6 @@ Ffigure_newsyntax
  file are interpreted as plot data, see `using`.
 
 2 boxerrorbars
-?commands set style boxerrorbars
-?set style boxerrorbars
 ?plotting styles boxerrorbars
 ?style boxerrorbars
 ?boxerrorbars
@@ -2790,8 +2791,6 @@ Ffigure_boxerrorbars
  errorbar demo.
 ^ </a>
 2 boxes
-?commands set style boxes
-?set style boxes
 ?plotting styles boxes
 ?style boxes
 ?boxes
@@ -2903,8 +2902,6 @@ Ffigure_boxplot
  See `set style boxplot`, `bars`, `boxwidth`, `fillstyle`, `candlesticks`.
 
 2 boxxyerrorbars
-?commands set style boxxyerrorbars
-?set style boxxyerrorbars
 ?plotting styles boxxyerrorbars
 ?style boxxyerrorbars
 ?boxxyerrorbars
@@ -2930,8 +2927,6 @@ Ffigure_boxxyerrorbars
  See `set style fill` and `boxes` for details.  Alternatively a new fillstyle
  may be specified in the plot command.
 2 candlesticks
-?commands set style candlesticks
-?set style candlesticks
 ?plotting styles candlesticks
 ?style candlesticks
 ?candlesticks
@@ -2997,8 +2992,6 @@ Ffigure_candlesticks
 
  See `set boxwidth`, `set bars`, `set style fill`, and `boxplot`.
 2 circles
-?commands set style circles
-?set style circles
 ?plotting styles circles
 ?style circles
 ?circles
@@ -3095,8 +3088,6 @@ Ffigure_ellipses
 
  See also `set object ellipse`, `set style ellipse` and `fillstyle`.
 2 dots
-?commands set style dots
-?set style dots
 ?plotting styles dots
 ?style dots
 ?dots
@@ -3113,8 +3104,6 @@ Ffigure_dots
       3 columns:  x  y  z   # 3D only (splot)
 
 2 filledcurves
-?commands set style filledcurves
-?set style filledcurves
 ?plotting styles filledcurves
 ?style filledcurves
 ?filledcurves
@@ -3176,8 +3165,6 @@ Ffigure_filledcurves
  are moved to the graph boundary. Then the actually filled area in the case
  of option xy=<x>,<y> will depend on xrange and yrange.
 2 financebars
-?commands set style financebars
-?set style financebars
 ?plotting styles financebars
 ?style financebars
 ?financebars
@@ -3200,8 +3187,6 @@ Ffigure_financebars
  finance demo.
 ^ </a>
 2 fsteps
-?commands set style fsteps
-?set style fsteps
 ?plotting styles fsteps
 ?style fsteps
 ?fsteps
@@ -3218,15 +3203,11 @@ Ffigure_fsteps
  steps demo.
 ^ </a>
 2 fillsteps
-?commands set style fillsteps
-?set style fillsteps
 ?style fillsteps
 ?fillsteps
  The `fillsteps` style is exactly like `steps` except that the area between
  the curve and y=0 is filled in the current fill style.  See `steps`.
 2 histeps
-?commands set style histeps
-?set style histeps
 ?plotting styles histeps
 ?style histeps
 ?histeps
@@ -3249,8 +3230,6 @@ Ffigure_histeps
  `histeps` is only a plotting style; `gnuplot` does not have the ability to
  create bins and determine their population from some data set.
 2 histograms
-?commands set style histogram
-?set style histogram
 ?style histograms
 ?plotting styles histograms
 ?histograms
@@ -3440,8 +3419,6 @@ Ffigure_newhist
        set style histogram columnstacked
        plot for [i=3:8] "datafile" using i title columnhead
 2 image
-?commands set style image
-?set style image
 ?plotting styles image
 ?style image
 ?image
@@ -3509,8 +3486,6 @@ Ffigure_scaled_image
  Only a few terminal types can handle this correctly; other terminals will
  approximate this by treating alpha as being either 0 or 255.
 3 image failsafe
-?commands set style image failsafe
-?set style image failsafe
 ?plotting styles image failsafe
 ?style image failsafe
 ?image failsafe
@@ -3524,8 +3499,6 @@ Ffigure_scaled_image
  Example:
        plot 'data' with image failsafe
 2 impulses
-?commands set style impulses
-?set style impulses
 ?plotting styles impulses
 ?style impulses
 ?impulses
@@ -3541,8 +3514,6 @@ Ffigure_impulses
       3 columns:  x  y  z  # line from [x,y,0] to [x,y,z] (3D)
 
 2 labels
-?commands set style labels
-?set style labels
 ?plotting styles labels
 ?style labels
 ?labels
@@ -3584,8 +3555,6 @@ Ffigure_labels
 
  See also `datastrings`, `set style data`.
 2 lines
-?commands set style lines
-?set style lines
 ?plotting styles lines
 ?style lines
 ?lines
@@ -3605,11 +3574,7 @@ Ffigure_lines
 
  See also `linetype`, `linewidth`, and `linestyle`.
 2 linespoints
-?commands set style linespoints
-?commands set style lp
-?set style linespoints
 ?plotting styles linespoints
-?set style lp
 ?style linespoints
 ?style lp
 ?linespoints
@@ -3632,8 +3597,6 @@ Ffigure_linespoints
 
  `linespoints` may be abbreviated `lp`.
 2 points
-?commands set style points
-?set style points
 ?plotting styles points
 ?style points
 ?points
@@ -3654,8 +3617,6 @@ Ffigure_polar
  See `set polar`, `set rrange`, `set size square`.
 
 2 steps
-?commands set style steps
-?set style steps
 ?plotting styles steps
 ?style steps
 ?steps
@@ -3673,20 +3634,14 @@ Ffigure_steps
 ^ </a>
 
 2 rgbalpha
-?commands set style rgbalpha
-?set style rgbalpha
 ?plotting styles rgbalpha
 ?style rgbalpha
  See `image`.
 2 rgbimage
-?commands set style rgbimage
-?set style rgbimage
 ?plotting styles rgbimage
 ?style rgbimage
  See `image`.
 2 vectors
-?commands set style vectors
-?set style vectors
 ?plotting styles vectors
 ?style vectors
 ?vectors
@@ -3723,8 +3678,6 @@ Ffigure_steps
  `set clip one` and `set clip two` affect vectors drawn in 2D.
  Please see `set clip` and `arrowstyle`.
 2 xerrorbars
-?commands set style xerrorbars
-?set style xerrorbars
 ?plotting styles xerrorbars
 ?style xerrorbars
 ?xerrorbars
@@ -3743,8 +3696,6 @@ Ffigure_xerrorbars
  such as variable point color.
 
 2 xyerrorbars
-?commands set style xyerrorbars
-?set style xyerrorbars
 ?plotting styles xyerrorbars
 ?style xyerrorbars
 ?xyerrorbars
@@ -3770,12 +3721,8 @@ Ffigure_xyerrorbars
  (per-datapoint) color information. 
 
 2 yerrorbars
-?commands set style yerrorbars
-?commands set style errorbars
 ?plotting styles yerrorbars
 ?plotting styles errorbars
-?set style yerrorbars
-?set style errorbars
 ?style yerrorbars
 ?style errorbars
 ?yerrorbars
@@ -3798,8 +3745,6 @@ Ffigure_yerrorbars
  errorbar demo.
 ^ </a>
 2 xerrorlines
-?commands set style xerrorlines
-?set style xerrorlines
 ?plotting styles xerrorlines
 ?style xerrorlines
 ?xerrorlines
@@ -3819,8 +3764,6 @@ Ffigure_xerrorlines
  such as variable point color.
 
 2 xyerrorlines
-?commands set style xyerrorlines
-?set style xyerrorlines
 ?plotting styles xyerrorlines
 ?style xyerrorlines
 ?xyerrorlines
@@ -3847,12 +3790,8 @@ Ffigure_xyerrorlines
  (per-datapoint) color information. 
 
 2 yerrorlines
-?commands set style yerrorlines
-?commands set style errorlines
 ?plotting styles yerrorlines
 ?plotting styles errorlines
-?set style yerrorlines
-?set style errorlines
 ?style yerrorlines
 ?style errorlines
 ?yerrorlines
@@ -9812,20 +9751,16 @@ Ffigure_missing
  When both `set terminal` and `set output` are used together, it is safest to
  give `set terminal` first, because some terminals set a flag which is needed
  in some operating systems.  This would be the case, for example, if the
- operating system needs to know whether or not a file is to be formatted in
- order to open it properly.
+ operating system needs a separate open command for binary files.
 
- On machines with popen functions (Unix), output can be piped through a shell
- command if the first non-whitespace character of the filename is '|'.
+ On platforms that support pipes, it may be useful to pipe terminal output.
  For instance,
 
        set output "|lpr -Plaser filename"
-       set output "|lp -dlaser filename"
+       set term png; set output "|display png:-"
 
  On MSDOS machines, `set output "PRN"` will direct the output to the default
- printer.  On VMS, output can be sent directly to any spooled device.  It is
- also possible to send the output to DECnet transparent tasks, which allows
- some flexibility.
+ printer.  On VMS, output can be sent directly to any spooled device.
 3 parametric
 ?commands set parametric
 ?commands unset parametric
@@ -11403,6 +11338,7 @@ Ffigure_missing
  another terminal has been pushed explicitly.
 
  For more information, see the `complete list of terminals`.
+
 3 termoption
 ?commands set termoption
 ?set termoption
@@ -13186,7 +13122,20 @@ Ffigure_missing
 
        # Unset labels numbered between 100 and 200
        unset for [i=100:200] label i
-
+3 output
+?unset output
+ Because some terminal types allow multiple plots to be written into a single
+ output file, the output file is not automatically closed after plotting.
+ In order to print or otherwise use the file safely, it should first be closed
+ explicitly by using `unset output` or by using `set output` to close the 
+ previous file and then open a new one.
+3 terminal
+?unset terminal
+ The default terminal that is active at the time of program entry depends on the
+ system platform, gnuplot build options, and the environmental variable GNUTERM.
+ Whatever this default may be, gnuplot saves it in the internal variable GNUTERM.
+ The `unset terminal` command restores this initial state.  It is equivalent to
+ `set terminal GNUTERM`.
 2 update
 ?commands update
 ?update

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.238 2012/05/14 17:13:39 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.239 2012/05/17 05:03:17 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -219,7 +219,6 @@ static double term_pointsize=1;
 
 static void term_suspend __PROTO((void));
 static void term_close_output __PROTO((void));
-static struct termentry *change_term __PROTO((const char *name, int length));
 
 static void null_linewidth __PROTO((double));
 static void do_point __PROTO((unsigned int x, unsigned int y, int number));
@@ -1631,7 +1630,7 @@ set_term()
  * returns NULL for unknown or ambiguous, otherwise is terminal
  * driver pointer
  */
-static struct termentry *
+struct termentry *
 change_term(const char *origname, int length)
 {
     int i;
