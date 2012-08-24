@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.379.2.7 2012/05/14 03:04:23 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.379.2.8 2012/05/14 04:40:12 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -6795,10 +6795,19 @@ do_key_layout(legend_key *key, TBOOLEAN key_pass, int *xinkey, int *yinkey)
     /* In two-pass mode, we blank out the key area after the graph	*/
     /* is drawn and then redo the key in the blank area.		*/
     if (key_pass && t->fillbox) {
+	double extra_height = 0.0;
+	int adjusted_key_bot = key->bounds.ybot;
+	if (*key->title) {
+	    if ((t->flags & TERM_ENHANCED_TEXT) && strchr(key->title,'^'))
+		extra_height += 0.51;
+	    if ((t->flags & TERM_ENHANCED_TEXT) && strchr(key->title,'_'))
+		extra_height += 0.3;
+	    adjusted_key_bot -= extra_height * t->v_char;
+	}
 	(*t->set_color)(&background_fill);
-	(*t->fillbox)(FS_OPAQUE, key->bounds.xleft, key->bounds.ybot,
-				key->bounds.xright - key->bounds.xleft,
-				key->bounds.ytop - key->bounds.ybot);
+	(*t->fillbox)(FS_OPAQUE, key->bounds.xleft, adjusted_key_bot,
+		key->bounds.xright - key->bounds.xleft,
+		key->bounds.ytop - adjusted_key_bot);
     }
 
     if (*key->title) {
