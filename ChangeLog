@@ -1,3 +1,8 @@
+2012-08-24  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/datafile.c:  Remove incorrect fall-back definition for MAXINT.
+	Note:  ~0>>1  is _not_ guaranteed to shift a 0 into the high bit!
+
 2012-08-23  Thomas Gaillard <tgaillard@users.sourceforge.net>
 
 	* src/interpol.c:  Mean and sigma of kernel density function were

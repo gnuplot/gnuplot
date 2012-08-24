@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.103 2012/06/30 06:41:33 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.104 2012/08/05 19:24:53 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -1032,7 +1032,7 @@ gen_tics(AXIS_INDEX axis, tic_callback callback)
 		if (step > 1.5) {	/* beware rounding errors */
 		    /* {{{  10,100,1000 case */
 		    /* no more than five minitics */
-		    if (step < 65535) /* should be MAXINT */
+		    if (step < 65535) /* could be INT_MAX but 54K is already ridiculous */
 			ministart = ministep = (int)(0.2 * step);
 		    else
 			ministart = ministep = 0.2 * step;

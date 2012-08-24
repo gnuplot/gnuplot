@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.227 2012/07/18 23:29:05 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.228 2012/08/08 03:46:26 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -247,11 +247,7 @@ static int df_eof = 0;
 static int df_no_tic_specs;     /* ticlabel columns not counted in df_no_use_specs */
 
 #ifndef MAXINT                  /* should there be one already defined ? */
-# ifdef INT_MAX                 /* in limits.h ? */
-#  define MAXINT INT_MAX
-# else
-#  define MAXINT ((~0)>>1)
-# endif
+#  define MAXINT INT_MAX	/* from <limits.h> */
 #endif
 
 /* stuff for implementing index */
