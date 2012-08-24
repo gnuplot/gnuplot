@@ -8,6 +8,10 @@
 	"unset terminal" now restores the default terminal present at program
 	entry.  I.e., it is equivalent to "set terminal GNUTERM".
 
+	* src/graphics.c (do_key_layout): The height of opaque fill for the key
+	box must be adjusted to allow for superscripts/subscripts in the title.
+	Bug #3556892
+
 	* docs/gnuplot.doc:
 	- Add sections for "unset output" and "unset terminal".
 	- Remove index entries for "set style <plotstyle>" since there is no
