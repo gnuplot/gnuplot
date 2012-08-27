@@ -1,3 +1,7 @@
+2012-08-27  Mojca Miklavec <mojca.miklavec.lists@gmail.com>
+
+	* src/gp_types.h:  Remove superfluous comma from enum declaration.
+
 2012-08-27  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/contour.c:  Invoke CheckZero() when automatically choosing contour
