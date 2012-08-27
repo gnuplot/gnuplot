@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.270 2012/08/08 03:46:26 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.271 2012/08/23 00:26:14 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -2718,6 +2718,7 @@ eval_plots()
 
 			/* Zero is often a special point in a function domain.	*/
 			/* Make sure we don't miss it due to round-off error.	*/
+			/* NB: This is a stricter test than CheckZero(). 	*/
 			if ((fabs(t) < 1.e-9) && (fabs(t_step) > 1.e-6))
 			    t = 0.0;
 

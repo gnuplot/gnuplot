@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: contour.c,v 1.28 2008/03/30 18:08:07 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: contour.c,v 1.29 2011/11/22 20:41:15 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - contour.c */
@@ -239,6 +239,7 @@ contour(int num_isolines, struct iso_curve *iso_lines)
 	switch (contour_levels_kind) {
 	case LEVELS_AUTO:
 	    z += dz;
+	    z = CheckZero(z,dz);
 	    break;
 	case LEVELS_INCREMENTAL:
 	    z = AXIS_LOG_VALUE(FIRST_Z_AXIS, contour_levels_list[0]) +
