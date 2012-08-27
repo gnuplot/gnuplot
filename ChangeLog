@@ -3,6 +3,9 @@
 	* src/contour.c:  Invoke CheckZero() when automatically choosing contour
 	levels.  The need for this check can be seen in contour.dem plots 19-21.
 
+	* src/graph3d.c:  Rearrange code so that the plot key can be drawn in a
+	separate pass ("set key opaque").
+
 2012-08-24  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/datafile.c:  Remove incorrect fall-back definition for MAXINT.
