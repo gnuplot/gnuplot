@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.cpp,v 1.102 2012/07/05 21:26:15 sfeam Exp $
+ * $Id: wxt_gui.cpp,v 1.103 2012/07/05 23:10:25 sfeam Exp $
  */
 
 /* GNUPLOT - wxt_gui.cpp */
@@ -2798,7 +2798,7 @@ void wxtPanel::wxt_cairo_exec_command(gp_command command)
 			int xnow = gnuplot_x(&plot, mouse_x);
 			int ynow = term->ymax - gnuplot_y(&plot, mouse_y);
 			int size = 3 * plot.pointsize * plot.oversampling_scale;
-			if (abs(xnow-command.x1) < size && abs(ynow-command.y1) < size) {
+			if (abs(xnow - (int)command.x1) < size && abs(ynow - (int)command.y1) < size) {
 				wxt_display_hypertext = current_href;
 				wxt_display_anchor.x = command.x1;
 				wxt_display_anchor.y = command.y1;
