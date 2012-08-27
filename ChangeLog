@@ -1,3 +1,8 @@
+2012-08-27  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/contour.c:  Invoke CheckZero() when automatically choosing contour
+	levels.  The need for this check can be seen in contour.dem plots 19-21.
+
 2012-08-24  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c (do_key_layout): The height of opaque fill for the key
