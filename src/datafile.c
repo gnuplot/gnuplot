@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.228 2012/08/08 03:46:26 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.229 2012/08/24 21:08:14 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -445,7 +445,7 @@ static void raw_filetype_function __PROTO((void));
 static void avs_filetype_function __PROTO((void));
 
 static void (*binary_input_function)(void);	/* Will point to one of the above */
-static void auto_filetype_function(void){};	/* Just a placeholder for auto    */
+static void auto_filetype_function(void){}	/* Just a placeholder for auto    */
 
 struct gen_ftable df_bin_filetype_table[] = {
     {"avs", avs_filetype_function},

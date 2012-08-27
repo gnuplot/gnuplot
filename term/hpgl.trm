@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: hpgl.trm,v 1.22 2006/07/21 02:35:47 sfeam Exp $
+ * $Id: hpgl.trm,v 1.23 2009/03/02 23:55:26 sfeam Exp $
  */
 
 /* GNUPLOT - hpgl.trm */
@@ -2577,7 +2577,6 @@ HPGL2_neg_point(unsigned int x, unsigned int y, int number)
 	HPGL2_move(x, y);
 	HPGL2_vector(x, y);
 	break;
-	return;
     }
 }
 

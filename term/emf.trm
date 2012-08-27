@@ -1,5 +1,5 @@
 /* Hey Emacs this is -*- C -*-
- * $Id: emf.trm,v 1.77 2011/09/27 23:18:02 sfeam Exp $
+ * $Id: emf.trm,v 1.78 2011/10/15 00:03:33 sfeam Exp $
  */
 
 /* GNUPLOT - emf.trm */
@@ -334,14 +334,14 @@ typedef  enum {
 #include <iconv.h>
 #endif
 
-static unsigned int emf_posx;
-static unsigned int emf_posy;
-static unsigned int emf_record_count = 0;
-static unsigned int emf_linetype = 1;
-static unsigned int emf_dashtype = 0;
-static unsigned long emf_color = 0L;
+static int emf_posx;
+static int emf_posy;
+static int emf_record_count = 0;
+static int emf_linetype = 1;
+static int emf_dashtype = 0;
+static long emf_color = 0L;
+static long emf_textcolor = LT_UNDEFINED;
 static unsigned long emf_pentype = 0x2200;		/* cap=flat join=miter */
-static unsigned long emf_textcolor = LT_UNDEFINED;
 static unsigned int emf_colors = EMF_COLORS;
 static unsigned int emf_polyline[EMF_MAX_SEGMENTS];	/* stored polyline coordinates */
 static unsigned int emf_graphics = FALSE;
