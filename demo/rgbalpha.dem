@@ -32,3 +32,4 @@ plot 100.*(.4+sin(x/5.)/(x/5.)) lw 5 title 'solid line', \
                 with rgbalpha title "Lena with circular mask"
 
 pause -1 "Hit return to continue"
+reset
