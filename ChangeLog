@@ -10,11 +10,8 @@
 	* src/graph3d.c:  Rearrange code so that the plot key can be drawn in a
 	separate pass ("set key opaque").
 
-	* src/wxterminal/wxt_gui.cpp:  Explicit cast to (int) to suppress Sun 
-	error from Sun compiler.
-
-	* src/datafile.c term/emf.trm term/hpgl.trm:  More trivial compiler
-	warnings (Sun or clang).
+	* src/wxterminal/wxt_gui.cpp src/datafile.c term/emf.trm term/hpgl.trm:
+	Trivial code cleanup to avoid compiler warnings (Sun or clang).
 
 2012-08-24  Ethan A Merritt  <merritt@u.washington.edu>
 
