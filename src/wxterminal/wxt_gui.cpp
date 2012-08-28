@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.cpp,v 1.103 2012/07/05 23:10:25 sfeam Exp $
+ * $Id: wxt_gui.cpp,v 1.104 2012/08/28 01:11:51 sfeam Exp $
  */
 
 /* GNUPLOT - wxt_gui.cpp */
@@ -1650,7 +1650,6 @@ void wxt_init()
 
 # ifdef USE_MOUSE
 		int filedes[2];
-		char buf;
 
 	       if (pipe(filedes) == -1) {
 			fprintf(stderr, "Pipe error, mousing will not work\n");
@@ -2753,8 +2752,6 @@ void wxtPanel::wxt_cairo_exec_command(gp_command command)
 		return;
 	case command_filled_polygon :
 		if (wxt_in_key_sample) {
-			int x1 = command.corners[0].x;
-			int y1 = command.corners[0].y;
 			wxt_update_key_box(command.x1 - term->h_tic, command.y1 - term->v_tic);
 			wxt_update_key_box(command.x1 + term->h_tic, command.y1 + term->v_tic);
 		}
@@ -2811,6 +2808,7 @@ void wxtPanel::wxt_cairo_exec_command(gp_command command)
 		text_justification_mode = command.mode;
 		return;
 	case command_put_text :
+	case command_enhanced_put_text :
 		if (wxt_in_key_sample) {
 			int slen = strlen(command.string) * term->h_char * 0.75;
 			if (text_justification_mode == RIGHT) slen = -slen;
@@ -2893,7 +2891,6 @@ void wxtPanel::wxt_cairo_draw_hypertext()
 {
 	/* FIXME: Properly, we should save and restore the plot properties, */
 	/* but since this box is the very last thing in the plot....        */
-	char *c;
 	rgb_color grey = {.9, .9, .9};
 	int width = 0;
 	int height = 0;
