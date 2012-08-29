@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.cpp,v 1.104 2012/08/28 01:11:51 sfeam Exp $
+ * $Id: wxt_gui.cpp,v 1.105 2012/08/28 17:14:22 sfeam Exp $
  */
 
 /* GNUPLOT - wxt_gui.cpp */
@@ -3535,7 +3535,7 @@ int wxt_waitforinput()
 			/* terminal event coming */
 			struct gp_event_t wxt_event;
 			int n_bytes_read = read(wxt_event_fd, (void*) &wxt_event, sizeof(wxt_event));
-			if (n_bytes_read < sizeof(wxt_event)) {
+			if (n_bytes_read < (int)sizeof(wxt_event)) {
 				if (paused_for_mouse)
 					int_error(NO_CARET, "wxt communication error, not enough bytes read");
 				FPRINTF((stderr, "wxt communication error, not enough bytes read\n"));
