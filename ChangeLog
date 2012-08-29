@@ -1,3 +1,8 @@
+2012-08-29  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/axis.h (from Hans-Bernhard Broeker)
+	#define AXIS_CLONE_SIZE offsetof(AXIS, linked_to_primary)
+
 2012-08-27  Mojca Miklavec <mojca.miklavec.lists@gmail.com>
 
 	* src/gp_types.h:  Remove superfluous comma from enum declaration.

@@ -1,5 +1,5 @@
 /*
- * $Id: axis.h,v 1.73 2012/08/05 18:25:53 sfeam Exp $
+ * $Id: axis.h,v 1.74 2012/08/05 19:24:53 sfeam Exp $
  *
  */
 
@@ -36,6 +36,7 @@
 #ifndef GNUPLOT_AXIS_H
 #define GNUPLOT_AXIS_H
 
+#include <stddef.h>		/* for offsetof() */
 #include "gp_types.h"		/* for TBOOLEAN */
 
 #include "gadgets.h"
@@ -287,7 +288,7 @@ typedef struct axis {
 }
 
 /* This much of the axis structure is cloned by the "set x2range link" command */
-#define AXIS_CLONE_SIZE ((size_t)&(axis_array->linked_to_primary) - (size_t)axis_array)
+#define AXIS_CLONE_SIZE offsetof(AXIS, linked_to_primary)
 
 /* Table of default behaviours --- a subset of the struct above. Only
  * those fields are present that differ from axis to axis. */
