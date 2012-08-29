@@ -819,7 +819,7 @@ void qt_options()
 	bool set_persist = false, set_number = false;
 	bool set_raise = false, set_ctrl = false;
 	bool set_title = false, set_close = false;
-	bool set_capjoin = false, set_size = false;
+	bool set_size = false;
 	bool set_widget = false;
 	bool set_dash = false;
 

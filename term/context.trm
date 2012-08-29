@@ -1,5 +1,5 @@
 /*
- * $Id: context.trm,v 1.4 2011/12/08 20:53:03 sfeam Exp $
+ * $Id: context.trm,v 1.5 2012/02/26 00:54:09 sfeam Exp $
  */
 
 /* GNUPLOT - context.trm */
@@ -1591,7 +1591,6 @@ CONTEXT_write_palette(t_sm_palette *palette)
 		/* grayscale only */
 		case SMPAL_COLOR_MODE_GRAY:
 			fprintf(gpoutfile, "color_mode(gray)");
-			// XXX: I'm not sure if something has to be done here or not
 			break;
 		/* one of several fixed transformations */
 		case SMPAL_COLOR_MODE_RGB:
