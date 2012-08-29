@@ -10,7 +10,7 @@ New features, changes and fixes since gnuplot version 4.6
 * NEW 'set surface explicit' disables automatic generation of a surface mesh 
 * NEW 'set link [x2|y2]' ties secondary axis range to the primary axis
 * NEW 'set link x2 via f(x) inverse g(x)' introduces generic nonlinear axes
-* NEW 'set key opaque' work for 3D plots alos
+* NEW 'set key opaque' works for 3D plots also
 * CHANGE Pipe (popen/pclose) emulation within wgnuplot
 * CHANGE 'set [xyz]axis ... reverse' affects only auto-scaling
 * CHANGE Revised handling of NaN in input data stream
