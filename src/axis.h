@@ -1,5 +1,5 @@
 /*
- * $Id: axis.h,v 1.74 2012/08/05 19:24:53 sfeam Exp $
+ * $Id: axis.h,v 1.75 2012/08/29 16:09:29 sfeam Exp $
  *
  */
 
@@ -540,8 +540,10 @@ do {									  \
 	break;  /* this plot is not being used for autoscaling */	  \
     if (TYPE != INRANGE)						  \
 	break;  /* don't set y range if x is outrange, for example */	  \
-    if (axis->linked_to_primary) {					  \
-	axis = &axis_array[AXIS - SECOND_AXES];				  \
+    /* NB: we hope for compile-time evaluation of the strcmp */	 	  \
+    /*     which should optimize out the code altogether.    */		  \
+    if (strcmp(#AXIS,"COLOR_AXIS") && axis->linked_to_primary) {	  \
+	axis -= SECOND_AXES;						  \
 	if (axis->link_udf->at) 					  \
 	    curval = eval_link_function(AXIS - SECOND_AXES, curval);	  \
     } 									  \
