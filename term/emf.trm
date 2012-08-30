@@ -1,5 +1,5 @@
 /* Hey Emacs this is -*- C -*-
- * $Id: emf.trm,v 1.77 2011/09/27 23:18:02 sfeam Exp $
+ * $Id: emf.trm,v 1.80 2012/08/30 21:03:57 sfeam Exp $
  */
 
 /* GNUPLOT - emf.trm */
@@ -334,15 +334,14 @@ typedef  enum {
 #include <iconv.h>
 #endif
 
-static unsigned int emf_posx;
-static unsigned int emf_posy;
-static unsigned int emf_record_count = 0;
-static unsigned int emf_linetype = 1;
-static unsigned int emf_dashtype = 0;
-static unsigned long emf_color = 0L;
+static int emf_posx;
+static int emf_posy;
+static int emf_record_count = 0;
+static int emf_linetype = 1;
+static int emf_dashtype = 0;
+static long emf_color = 0L;
+static long emf_textcolor = LT_UNDEFINED;
 static unsigned long emf_pentype = 0x2200;		/* cap=flat join=miter */
-static unsigned long emf_textcolor = LT_UNDEFINED;
-static unsigned int emf_colors = EMF_COLORS;
 static unsigned int emf_polyline[EMF_MAX_SEGMENTS];	/* stored polyline coordinates */
 static unsigned int emf_graphics = FALSE;
 static unsigned int emf_dashed = TRUE;
@@ -746,8 +745,6 @@ EMF_options()
     }
     EMF_set_font(NULL);		/* set default font */
     
-    emf_colors = emf_monochrome ? 1 : EMF_COLORS;
-
     sprintf(term_options, "%s %s %s font \"%s,%g\"",
 	    emf_monochrome ? "monochrome" : "color",
 	    emf_dashed ? "dashed" : "solid",
@@ -844,7 +841,11 @@ EMF_set_font(const char *font)
     static float last_fontsize = -1;
     static char last_fontname[256] = {'\0'};
 
-    if (font && *font) {
+    /* FIXME: This condition is somehow triggered by enhanced_recursion */
+    if (font == emf_fontname)
+	;
+
+    else if (font && *font) {
 	float tempsize;
 	int sep = strcspn(font,",");
 	if (sep > 0)
@@ -1046,15 +1047,13 @@ EMF_fillbox(int style, unsigned int x1, unsigned int y1, unsigned int width, uns
 TERM_PUBLIC void 
 EMF_linewidth(double width)
 {
-	int current_dashtype = emf_dashtype;
-    
     width *= emf_linewidth_factor;
     if (width == emf_linewidth)
 	return;
     emf_linewidth = width;
 
-	emf_dashtype = LT_UNDEFINED;      /* Invalidate current dash type     */
-	EMF_dashtype(current_dashtype);    /* Force re-evaluation of dash type */
+    /* The linewidth is applied at the same time as the dash pattern */
+    EMF_dashtype(emf_dashtype);
 }
 
 /*
@@ -1081,7 +1080,7 @@ EMF_dashtype(int dashtype)
     EMF_flush_polyline();
 
     if (dashtype >= 0)
-	dashtype = (dashtype / emf_colors) % EMF_LINE_TYPES;
+	dashtype = dashtype % EMF_LINE_TYPES;
 
     if (dashtype == LT_AXIS)
 	dashtype = 2;
@@ -1093,7 +1092,8 @@ EMF_dashtype(int dashtype)
 	EMF_SelectObject(EMF_HANDLE_PEN);
 
 	term->vector = EMF_solid_vector;
-    } else {			/* Since win32 dashed lines works only with 1 pixel linewith we must emulate */
+    } else {
+	/* Since win32 dashed lines works only with 1 pixel linewith we must emulate */
 	EMF_SelectObject(EMF_STOCK_OBJECT_BLACK_PEN);
 	EMF_DeleteObject(EMF_HANDLE_PEN);
 	EMF_CreatePen(EMF_HANDLE_PEN, emf_pentype, emf_linewidth * EMF_PX2HM, emf_color);

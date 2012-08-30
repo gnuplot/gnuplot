@@ -1,3 +1,7 @@
+2012-08-30  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/emf.trm:  Fix dashed line support (broken for a looong time).
+
 2012-08-27  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/contour.c:  Invoke CheckZero() when automatically choosing contour

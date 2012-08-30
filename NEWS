@@ -35,6 +35,7 @@ New features, changes and fixes since gnuplot version 4.6.0
 * FIX the input buffer was not always extended correctly inside a { clause }
 * FIX some cairolatex set_color requests were being ignored
 * FIX calculated value of kernel density mean and sigma
+* FIX emf terminal dashed line support
 
 New features, changes and fixes in gnuplot version 4.6
 ======================================================
