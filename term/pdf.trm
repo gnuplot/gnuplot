@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: pdf.trm,v 1.87 2010/03/04 07:16:00 sfeam Exp $
+ * $Id: pdf.trm,v 1.88 2010/03/18 04:52:53 sfeam Exp $
  */
 
 /*------------------------------
@@ -1234,8 +1234,11 @@ PDF_put_text (unsigned int x, unsigned int y, const char *str)
 TERM_PUBLIC int
 PDF_set_font (const char *font)
 {
+    /* FIXME: This condition is somehow triggered by enhanced_recursion */
+    if (font == PDF_fontNameCur)
+	;
 
-    if (!font || !(*font)) {
+    else if (!font || !(*font)) {
 	strcpy (PDF_fontNameCur, PDF_fontNameDef);
 	PDF_fontSizeCur = PDF_fontSizeDef;
     } else {

@@ -1,5 +1,13 @@
 2012-08-30  Ethan A Merritt  <merritt@u.washington.edu>
 
+	* term/emf.trm (EMF_dashtype):  Fix incorrect mapping of requested
+	linetype to the dash pattern.  Only LT_AXIS was properly mapped.
+
+	* term/emf.trm (EMF_set_font):  (thanks to Shige Takeno) The intended
+	optimization to prevent redundant requests for the same font was not
+	implemented correctly.  This change fixes it so that a new font request
+	is ignored if it would reapply the current font.
+
 	* src/axis.h (STORE_WITH_LOG_AND_UPDATE_RANGE) src/plot2d.c:
 	Optimize out the check for linked axes when the primary axis is
 	COLOR_AXIS.  This avoids a compiler warning and also reduces the
