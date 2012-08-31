@@ -1,6 +1,13 @@
-2012-08-30  Ethan A Merritt  <merritt@u.washington.edu>
+2012-08-31  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/emf.trm:  Fix dashed line support (broken for a looong time).
+
+	* term/emf.trm (EMF_set_font): (thanks to Shige Takeno) The intended
+	optimization to prevent redundant requests for the same font was not
+	implemented correctly.  This change fixes it so that a new font request
+	is ignored if it would reapply the current font.
+
+	* src/unset.c: "unset object N" succeeds even if there is no object N
 
 2012-08-27  Ethan A Merritt  <merritt@u.washington.edu>
 

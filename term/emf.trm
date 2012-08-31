@@ -1,5 +1,5 @@
 /* Hey Emacs this is -*- C -*-
- * $Id: emf.trm,v 1.80 2012/08/30 21:03:57 sfeam Exp $
+ * $Id: emf.trm,v 1.81 2012/08/30 21:15:07 sfeam Exp $
  */
 
 /* GNUPLOT - emf.trm */
@@ -857,9 +857,12 @@ EMF_set_font(const char *font)
 	emf_fontsize = emf_defaultfontsize;
     }
 
-    /* Optimization only */
-    if (!strcmp(last_fontname,emf_fontname) && last_fontsize == emf_fontsize) {
+    /* Skip redundant requests for the same font */
+    if (!strcmp(last_fontname, emf_fontname) && last_fontsize == emf_fontsize) {
 	return TRUE;
+    } else {
+	safe_strncpy(last_fontname, emf_fontname, sizeof(last_fontname));
+	last_fontsize = emf_fontsize;
     }
 
     term->h_char = 0.6 * (emf_fontsize * EMF_PT2HM * emf_fontscale);
@@ -1229,6 +1232,8 @@ EMF_put_text(unsigned int x, unsigned int y, const char str[])
 	}
     }
 #endif
+    if (slen <=0) return;	/* shige: 08/30 2012 */
+
     alen = slen;
 
     EMF_flush_polyline();
