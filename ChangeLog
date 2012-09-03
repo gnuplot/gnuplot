@@ -1,3 +1,10 @@
+2012-09-03  Shigeharu Takeno  <shige@iee.niit.ac.jp>
+
+	* term/emf.trm:  Revise the object-handling code so that the current
+	brush or pen is deselected before being deleted and recreated.
+	Defer application of new dash+color line properties until needed for a
+	new line segment.
+
 2012-08-30  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/emf.trm (EMF_dashtype):  Fix incorrect mapping of requested
