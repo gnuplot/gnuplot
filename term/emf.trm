@@ -1,5 +1,5 @@
 /* Hey Emacs this is -*- C -*-
- * $Id: emf.trm,v 1.81 2012/08/30 21:15:07 sfeam Exp $
+ * $Id: emf.trm,v 1.78.2.2 2012/08/31 17:39:17 sfeam Exp $
  */
 
 /* GNUPLOT - emf.trm */
@@ -143,6 +143,7 @@ TERM_PUBLIC void EMF_previous_palette __PROTO((void));
 TERM_PUBLIC void EMF_set_color __PROTO((t_colorspec *colorspec));
 TERM_PUBLIC void EMF_filled_polygon __PROTO((int, gpiPoint *));
 TERM_PUBLIC void EMF_fillbox __PROTO((int, unsigned int, unsigned int, unsigned int, unsigned int));
+TERM_PUBLIC void EMF_flush_dashtype __PROTO((void));
 
 /* Enhanced text support */
 TERM_PUBLIC void ENHemf_put_text __PROTO((unsigned int x, unsigned int y, const char *str));
@@ -364,6 +365,7 @@ static int emf_tic, emf_tic707, emf_tic866, emf_tic500, emf_tic1241, emf_tic1077
 
 static TBOOLEAN emf_tweak = TRUE;	/* Empirical hack to adjust character widths */
 static double emf_fontscale = 1.0;
+static int emf_dashtype_count = 0;	/* count > 0 if EMF_dashtype needed before drawing */
 
 static void EMF_flush_polyline __PROTO((void));
 static void EMF_flush_polygon __PROTO((void));
@@ -515,6 +517,8 @@ EMF_flush_polygon()
     if (emf_coords == 0)
 	return;
 
+    EMF_flush_dashtype();
+
     EMF_MoveToEx(emf_polyline[i++], term->ymax - emf_polyline[i++]);
     while (i < emf_coords * 2)
 	EMF_LineTo(emf_polyline[i++], term->ymax - emf_polyline[i++]);
@@ -529,6 +533,8 @@ EMF_flush_polyline()
     if (emf_coords == 0)
 	return;
     
+    EMF_flush_dashtype();
+
     if (emf_coords <= 2) {
 	EMF_MoveToEx(emf_polyline[0], term->ymax - emf_polyline[1]);
 	EMF_LineTo(emf_polyline[2], term->ymax - emf_polyline[3]);
@@ -877,6 +883,13 @@ EMF_text()
     long pos;
     EMF_flush_polyline();
 
+    /* shige: 08/30 2012
+     * FIXME:
+     * The following command prevents export of a spurious rectangle
+     * (not the bounding box) on some Windows systems.  Why? How?
+     */
+    EMF_MoveToEx(emf_polyline[0], term->ymax - emf_polyline[1]);
+
     /* writing end of metafile */
     EMF_SelectObject(EMF_STOCK_OBJECT_DEFAULT_FONT);
     EMF_DeleteObject(EMF_HANDLE_FONT);
@@ -899,6 +912,8 @@ EMF_text()
 TERM_PUBLIC void 
 EMF_linetype(int linetype)
 {
+    EMF_flush_polyline();
+
     /* Note : separating linetype and color would have not been futile, but anyway... */
 
 #if (0)  /* Not safe because linetype/color/pen are intermixed */
@@ -962,6 +977,8 @@ EMF_set_color(t_colorspec *colorspec)
 {
     rgb255_color rgb255;
 
+    EMF_flush_polyline();
+
     if (colorspec->type == TC_LT) {
 	EMF_linecolor(colorspec->lt);
     } else if (colorspec->type == TC_FRAC) {
@@ -980,8 +997,8 @@ EMF_set_color(t_colorspec *colorspec)
     */
 
     /* Force reevaluation of dash type */
-    emf_dashtype = LT_UNDEFINED;
-    EMF_dashtype(emf_linetype);
+    emf_dashtype = emf_linetype;
+    emf_dashtype_count++;
 }
 
 TERM_PUBLIC void
@@ -1013,20 +1030,23 @@ EMF_filled_polygon(int points, gpiPoint *corners)
 		break;
     }
 
-    /* Sequence of operations cribbed from Windows example */
+    EMF_flush_dashtype();
+
+    /* MS documentation says not to delete an object while it is selected */
+	EMF_SelectObject(EMF_STOCK_OBJECT_BLACK_PEN);
+	EMF_SelectObject(EMF_STOCK_OBJECT_WHITE_BRUSH);
+
+	EMF_DeleteObject(EMF_HANDLE_BRUSH);
 	EMF_CreateBrush(EMF_HANDLE_BRUSH, 0, color, 0);
 	EMF_SelectObject(EMF_HANDLE_BRUSH);
 
-	/* EAM DEBUG - does this get rid of the border? */
+	EMF_DeleteObject(EMF_HANDLE_PEN);
 	EMF_CreatePen(EMF_HANDLE_PEN, emf_pentype, 0, color);
 	EMF_SelectObject(EMF_HANDLE_PEN);
 
 	EMF_CreatePolygon(points);
 	for (i=0; i<points; i++)
 	    EMF_write_pointl(corners[i].x, term->ymax - corners[i].y);
-
-	EMF_DeleteObject(EMF_HANDLE_PEN);
-	EMF_DeleteObject(EMF_HANDLE_BRUSH);
 
     /* Force re-evaluation of linetype next time we draw a line */
     emf_linetype = LT_UNDEFINED;
@@ -1050,13 +1070,24 @@ EMF_fillbox(int style, unsigned int x1, unsigned int y1, unsigned int width, uns
 TERM_PUBLIC void 
 EMF_linewidth(double width)
 {
+    EMF_flush_polyline();
+
     width *= emf_linewidth_factor;
     if (width == emf_linewidth)
 	return;
     emf_linewidth = width;
 
     /* The linewidth is applied at the same time as the dash pattern */
-    EMF_dashtype(emf_dashtype);
+    emf_dashtype_count++;
+}
+
+TERM_PUBLIC void
+EMF_flush_dashtype(void)
+{
+    if (emf_dashtype_count > 0) {
+       EMF_dashtype(emf_dashtype);
+       emf_dashtype_count = 0;	/* EMF_dashtype clears this also (shrug) */
+    }
 }
 
 /*
@@ -1079,8 +1110,6 @@ EMF_dashtype(int dashtype)
     };
 
     emf_dashtype = dashtype;
-
-    EMF_flush_polyline();
 
     if (dashtype >= 0)
 	dashtype = dashtype % EMF_LINE_TYPES;
@@ -1113,6 +1142,8 @@ EMF_dashtype(int dashtype)
 	emf_step = emf_step_sizes[1];
 	emf_step_index = 1;
     }
+
+    emf_dashtype_count = 0;
 }
 
 TERM_PUBLIC void 
@@ -1352,9 +1383,10 @@ EMF_point(unsigned int x, unsigned int y, int number)
     gpiPoint corners[12];
     corners->style = FS_OPAQUE;
 
-    EMF_flush_polyline();
+    EMF_flush_polyline();	/* Calls EMF_flush_dashtype */
     old_dashtype = emf_dashtype;
-    EMF_dashtype(0);
+    emf_dashtype = 0;
+    emf_dashtype_count++;
 
     /* A few special point types */
     if (69 <= number && number <= 73) {
@@ -1375,7 +1407,10 @@ EMF_point(unsigned int x, unsigned int y, int number)
 	case 72:  EMF_point(x,y,9); break;
 	case 73:  EMF_point(x,y,11); break;
 	}
-	EMF_dashtype(old_dashtype);
+
+	emf_dashtype = old_dashtype;
+	emf_dashtype_count++;
+
 	return;
     }
 
@@ -1421,20 +1456,23 @@ EMF_point(unsigned int x, unsigned int y, int number)
 	break;
     case 5:
 	y = term->ymax-y; /* EAM - WTF? */ 
+	EMF_SelectObject(EMF_STOCK_OBJECT_BLACK_PEN);
+	EMF_SelectObject(EMF_STOCK_OBJECT_WHITE_BRUSH);
+	EMF_DeleteObject(EMF_HANDLE_BRUSH);
 	EMF_CreateBrush(EMF_HANDLE_BRUSH, 1, 0, 0);	/* transparent brush */
 	EMF_SelectObject(EMF_HANDLE_BRUSH);
+	EMF_DeleteObject(EMF_HANDLE_PEN);
 	EMF_CreatePen(EMF_HANDLE_PEN, emf_pentype, 1, emf_color);
 	EMF_SelectObject(EMF_HANDLE_PEN);
 	EMF_Ellipse((long)(x-emf_tic),(long)(y-emf_tic),(long)(x+emf_tic),(long)(y+emf_tic));
-	EMF_DeleteObject(EMF_HANDLE_PEN);
-	EMF_DeleteObject(EMF_HANDLE_BRUSH);
 	break;
     case 6: /* filled circle */
 	y = term->ymax-y; /* EAM - WTF? */ 
+	EMF_SelectObject(EMF_STOCK_OBJECT_WHITE_BRUSH);
+	EMF_DeleteObject(EMF_HANDLE_BRUSH);
 	EMF_CreateBrush(EMF_HANDLE_BRUSH, 0, emf_color, 0);
 	EMF_SelectObject(EMF_HANDLE_BRUSH);
 	EMF_Ellipse((long)(x-emf_tic),(long)(y-emf_tic),(long)(x+emf_tic),(long)(y+emf_tic));
-	EMF_DeleteObject(EMF_HANDLE_BRUSH);
 	break;
     case 7:			/* draw triangle (point up) */
 	EMF_move(x, y + emf_tic1241);
@@ -1476,7 +1514,9 @@ EMF_point(unsigned int x, unsigned int y, int number)
 	break;
     }
 /* end_points: */
-    EMF_dashtype(old_dashtype);
+
+    emf_dashtype = old_dashtype; 
+    emf_dashtype_count++;
 }
 
 
