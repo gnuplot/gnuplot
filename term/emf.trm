@@ -48,6 +48,11 @@
  * - Revised order of object handling   Deselect/Delete/Create/Select
  * - Defer application of new dash+color style until needed for a new line segment
  *
+ * 4.6.1 04-Sep-2012 Ethan A Merritt
+ * - Fix dashed line option, but make solid lines the default
+ * - Seek to start of output file after plotting so that successive plots will
+ *   overwrite each other cleanly rather than producing a corrupt file.
+ *
  * 4.5   28-Nov-2010 Ethan A Merritt
  * - Use the EMR_ELLIPSE primitive to draw point types 6 and 7
  * - Switch to using linecap=flat and linejoin=miter by default,
@@ -349,7 +354,7 @@ static long emf_textcolor = LT_UNDEFINED;
 static unsigned long emf_pentype = 0x2200;		/* cap=flat join=miter */
 static unsigned int emf_polyline[EMF_MAX_SEGMENTS];	/* stored polyline coordinates */
 static unsigned int emf_graphics = FALSE;
-static unsigned int emf_dashed = TRUE;
+static unsigned int emf_dashed = FALSE;
 static unsigned int emf_monochrome = FALSE;
 static unsigned int emf_background = 0xffffff; /* defaults to white */
 static double emf_linewidth;	/* line width in plot units */
@@ -617,7 +622,7 @@ EMF_options()
     if (c_token != 2) {
 	term->xmax = EMF_XMAX;
 	term->ymax = EMF_YMAX;
-	emf_dashed = TRUE;
+	emf_dashed = FALSE;
 	emf_monochrome = FALSE;
 	emf_background = 0xffffff;
 	emf_tweak = TRUE;
@@ -628,7 +633,7 @@ EMF_options()
 	    strcpy(emf_defaultfontname, EMF_FONTNAME);
 	    emf_defaultfontsize = EMF_FONTSIZE;
 	    emf_monochrome = FALSE;
-	    emf_dashed = TRUE;
+	    emf_dashed = FALSE;
 	    term->flags &= ~TERM_MONOCHROME;
 	    c_token++;
 	    continue;
@@ -1859,11 +1864,11 @@ START_HELP(emf)
 " If you are using a monospaced font, or don't like the approximation, you",
 " can turn off this correction using the `noproportional` option.",
 "",
-" The default settings are `color dashed font \"Arial,12\" size 1024,768`",
+" The default settings are `color solid font \"Arial,12\" size 1024,768`",
 " Selecting `default` sets all options to their default values.",
 "",
 " Examples:",
 "       set terminal emf 'Times Roman Italic, 12'",
-"       set terminal emf color solid    # no pesky dashes!"
+"       set terminal emf dashed    # otherwise all lines are solid"
 END_HELP(emf)
 #endif /* TERM_HELP */
