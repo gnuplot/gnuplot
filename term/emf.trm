@@ -1,5 +1,5 @@
 /* Hey Emacs this is -*- C -*-
- * $Id: emf.trm,v 1.81 2012/08/30 21:15:07 sfeam Exp $
+ * $Id: emf.trm,v 1.82 2012/09/04 16:36:38 sfeam Exp $
  */
 
 /* GNUPLOT - emf.trm */
@@ -43,6 +43,10 @@
  * TODO
  *
  * HISTORY
+ *
+ * 4.6.1 04-Sep-2012 Shige Takeno
+ * - Revised order of object handling   Deselect/Delete/Create/Select
+ * - Defer application of new dash+color style until needed for a new line segment
  *
  * 4.5   28-Nov-2010 Ethan A Merritt
  * - Use the EMR_ELLIPSE primitive to draw point types 6 and 7
@@ -882,6 +886,7 @@ EMF_text()
 {
     long pos;
     EMF_flush_polyline();
+    emf_graphics = FALSE;
 
     /* shige: 08/30 2012
      * FIXME:
@@ -899,14 +904,17 @@ EMF_text()
     EMF_DeleteObject(EMF_HANDLE_BRUSH);
     EMF_EOF();
 
-    /* updating header */
+    /* update the header */
     pos = ftell(gpoutfile);
-    fseek(gpoutfile, 48, SEEK_SET);
+    fseek(gpoutfile, 48L, SEEK_SET);
     EMF_write_long(pos);
     EMF_write_long(emf_record_count);
-    /* HBB 20010228: have to make known that we're no longer in graphics
-     * status. */
-    emf_graphics = FALSE;
+
+    /* Reset to start of output file.  If the user mistakenly tries to	*/
+    /* plot again into the same file, it will overwrite the original	*/
+    /* rather than corrupting it.					*/
+    /* FIXME:  An alternative would be to open a new output file. 	*/
+    fseek(gpoutfile, 0L, SEEK_SET);
 }
 
 TERM_PUBLIC void 

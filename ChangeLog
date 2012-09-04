@@ -1,9 +1,15 @@
-2012-09-03  Shigeharu Takeno  <shige@iee.niit.ac.jp>
+2012-09-04  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* term/emf.trm:  Revise the object-handling code so that the current
 	brush or pen is deselected before being deleted and recreated.
 	Defer application of new dash+color line properties until needed for a
 	new line segment.
+
+2012-09-04  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/emf.trm: Seek to the beginning of the output file after plotting.
+	If a user mistakenly tries to place two plots in the same file, the 
+	second will cleanly overwrite the first rather than corrupting it.
 
 2012-08-30  Ethan A Merritt  <merritt@u.washington.edu>
 
