@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.255.2.5 2012/06/02 04:43:38 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.255.2.6 2012/06/29 18:49:36 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -643,10 +643,8 @@ get_data(struct curve_points *current_plot)
 	    ||  current_plot->plot_style == RGBA_IMAGE)
 		continue;
 
-	    /* break in data, make next point undefined */
-	    /* FIXME: We really should distinguish between a blank	*/
-	    /*        line and an undefined value on a non-blank line.	*/
-	    current_plot->points[i].type = UNDEFINED;
+	    /* make type of next point undefined, but recognizable */
+	    current_plot->points[i] = blank_data_line;
 	    i++;
 	    continue;
 

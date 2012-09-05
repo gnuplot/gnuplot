@@ -3,6 +3,7 @@ New features, changes and fixes since gnuplot version 4.6.0
 
 * NEW syntax hints inside Emacs gnuplot-mode
 * NEW support tabulation (set table) of pixel values from image plot styles
+* NEW support tabulation of variable color column
 * CHANGE canvas terminal loads appropriate font file for UTF-8 encoding
 * CHANGE skip execution of empty iteration loops in set and do commands
 * CHANGE build scripts modified to accommodate automake 1.12

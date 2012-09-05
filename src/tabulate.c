@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: tabulate.c,v 1.13 2011/10/25 05:10:58 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: tabulate.c,v 1.13.2.1 2012/06/08 04:56:24 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - tabulate.c */
@@ -45,6 +45,7 @@ static char *RCSid() { return RCSid("$Id: tabulate.c,v 1.13 2011/10/25 05:10:58 
 
 #include "alloc.h"
 #include "axis.h"
+#include "datafile.h"
 #include "gp_time.h"
 #include "graphics.h"
 #include "graph3d.h"
@@ -161,6 +162,9 @@ print_table(struct curve_points *current_plot, int plot_num)
 	    break;
 	}
 
+	if (current_plot->varcolor)
+	    fputs("  color", outfile);
+
 	fputs(" type\n", outfile);
 
 	if (current_plot->plot_style == LABELPOINTS) {
@@ -181,6 +185,12 @@ print_table(struct curve_points *current_plot, int plot_num)
 
 	    for (i = 0, point = current_plot->points; i < current_plot->p_count;
 		i++, point++) {
+
+		/* Reproduce blank lines read from original input file, if any */
+		if (!memcmp(point, &blank_data_line, sizeof(struct coordinate))) {
+		    fprintf(outfile, "\n");
+		    continue;
+		}
 
 		/* FIXME HBB 20020405: had better use the real x/x2 axes of this plot */
 		OUTPUT_NUMBER(point->x, current_plot->x_axis);
@@ -245,6 +255,19 @@ print_table(struct curve_points *current_plot, int plot_num)
 			/* ? */
 			break;
 		} /* switch(plot type) */
+
+		if (current_plot->varcolor) {
+		    double colorval = current_plot->varcolor[i];
+		    if ((current_plot->lp_properties.pm3d_color.value < 0.0)
+		    &&  (current_plot->lp_properties.pm3d_color.type == TC_RGB)) {
+			fprintf(outfile, "0x%6x", (unsigned int)(colorval));
+		    } else if (current_plot->lp_properties.pm3d_color.type == TC_Z) {
+			OUTPUT_NUMBER(colorval, COLOR_AXIS);
+		    } else if (current_plot->lp_properties.l_type == LT_COLORFROMCOLUMN) {
+			OUTPUT_NUMBER(colorval, COLOR_AXIS);
+		    }
+		}
+
 		fprintf(outfile, " %c\n",
 		    current_plot->points[i].type == INRANGE
 		    ? 'i' : current_plot->points[i].type == OUTRANGE
