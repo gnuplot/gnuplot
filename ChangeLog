@@ -1,3 +1,8 @@
+2012-09-05  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/tabulate.c:  Output a column for variable color if it is used 
+	in the plot command.
+
 2012-09-04  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* term/emf.trm:  Revise the object-handling code so that the current

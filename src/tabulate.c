@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: tabulate.c,v 1.14 2012/06/08 04:53:49 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: tabulate.c,v 1.15 2012/08/08 03:46:26 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - tabulate.c */
@@ -162,6 +162,9 @@ print_table(struct curve_points *current_plot, int plot_num)
 	    break;
 	}
 
+	if (current_plot->varcolor)
+	    fputs("  color", outfile);
+
 	fputs(" type\n", outfile);
 
 	if (current_plot->plot_style == LABELPOINTS) {
@@ -252,6 +255,19 @@ print_table(struct curve_points *current_plot, int plot_num)
 			/* ? */
 			break;
 		} /* switch(plot type) */
+
+		if (current_plot->varcolor) {
+		    double colorval = current_plot->varcolor[i];
+		    if ((current_plot->lp_properties.pm3d_color.value < 0.0)
+		    &&  (current_plot->lp_properties.pm3d_color.type == TC_RGB)) {
+			fprintf(outfile, "0x%6x", (unsigned int)(colorval));
+		    } else if (current_plot->lp_properties.pm3d_color.type == TC_Z) {
+			OUTPUT_NUMBER(colorval, COLOR_AXIS);
+		    } else if (current_plot->lp_properties.l_type == LT_COLORFROMCOLUMN) {
+			OUTPUT_NUMBER(colorval, COLOR_AXIS);
+		    }
+		}
+
 		fprintf(outfile, " %c\n",
 		    current_plot->points[i].type == INRANGE
 		    ? 'i' : current_plot->points[i].type == OUTRANGE
