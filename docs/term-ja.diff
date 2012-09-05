@@ -181,7 +181,7 @@ diff -rc docs/tex2ja.awk.ORG docs/tex2ja.awk
 *** 0 ****
 --- 1,54 ----
 + #
-+ # $Id: tex2ja.awk,v 1.5 2008-06-22 20:22:11+09 shige Exp $
++ # $Id: term-ja.diff,v 1.32.2.1 2012/01/26 00:07:10 sfeam Exp $
 + # doc2tex の出力の後処理スクリプト
 + # tex2ja.awk
 + # 06/20 2008
@@ -2073,7 +2073,7 @@ diff -rc term/emf.trm.ORG term/emf.trm
 --- 1813,1862 ----
   " Examples:",
   "       set terminal emf 'Times Roman Italic, 12'",
-  "       set terminal emf color solid    # no pesky dashes!"
+  "       set terminal emf dashed    # otherwise all lines are solid"
 + #else /* JAPANESE_DOC */
 + "1 emf",
 + "?commands set terminal emf",
