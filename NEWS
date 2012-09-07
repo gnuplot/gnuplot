@@ -4,6 +4,7 @@ New features, changes and fixes since gnuplot version 4.6.0
 * NEW syntax hints inside Emacs gnuplot-mode
 * NEW support tabulation (set table) of pixel values from image plot styles
 * NEW support tabulation of variable color column
+* CHANGE emf output modified for better compatibility with MS Office programs
 * CHANGE canvas terminal loads appropriate font file for UTF-8 encoding
 * CHANGE skip execution of empty iteration loops in set and do commands
 * CHANGE build scripts modified to accommodate automake 1.12
@@ -103,8 +104,8 @@ New features, changes and fixes in gnuplot version 4.6
 * CHANGE hidden3d top/bottom surface colors taken from linetype, not line style
 
 
-New features, changes and fixes in gnuplot version 4.4.0
-========================================================
+New features, changes and fixes in gnuplot version 4.4
+======================================================
 
 * NEW CANDLESTICKS accept an option 6th input column specifying width
 * NEW point property 'pointinterval'
