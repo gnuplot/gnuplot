@@ -56,7 +56,7 @@ QtGnuplotScene::QtGnuplotScene(QtGnuplotEventHandler* eventHandler, QObject* par
 	m_eventHandler = eventHandler;
 	m_lastModifierMask = 0;
 	m_textAngle = 0.;
-	m_textAlignment == Qt::AlignLeft;
+	m_textAlignment = Qt::AlignLeft;
 	m_currentZ = 1.;
 	m_currentPointSize = 1.;
 	m_enhanced = 0;

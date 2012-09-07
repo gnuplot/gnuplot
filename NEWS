@@ -39,6 +39,7 @@ New features, changes and fixes since gnuplot version 4.6.0
 * FIX some cairolatex set_color requests were being ignored
 * FIX calculated value of kernel density mean and sigma
 * FIX emf terminal dashed line support
+* FIX qt terminal build/installation procedure on OSX
 
 New features, changes and fixes in gnuplot version 4.6
 ======================================================

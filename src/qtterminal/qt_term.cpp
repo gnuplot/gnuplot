@@ -45,10 +45,6 @@
 #include <QtGui>
 #include <QtNetwork>
 
-#ifdef Q_WS_MAC
-	#include <Cocoa/Cocoa.h>
-#endif
-
 extern "C" {
 	#include "plot.h"      // for interactive
 	#include "term_api.h"  // for stdfn.h, JUSTIFY, encoding, *term definition, color.h term_interlock
@@ -60,6 +56,7 @@ extern "C" {
 	#include "parse.h"     // for real_expression
 	#include "axis.h"
 	#include <signal.h>
+	double removeDockIcon();
 }
 
 #include "qt_term.h"
@@ -309,9 +306,7 @@ void qt_init()
 
 #ifdef Q_WS_MAC
 	// Don't display this application in the MAC OS X dock
-	ProcessSerialNumber psn;
-	if (GetCurrentProcess(&psn) == noErr)
-		TransformProcessType(&psn, kProcessTransformToBackgroundApplication);
+	removeDockIcon();
 #endif
 
 	// The creation of a QApplication mangled our locale settings
@@ -819,7 +814,7 @@ void qt_options()
 	bool set_persist = false, set_number = false;
 	bool set_raise = false, set_ctrl = false;
 	bool set_title = false, set_close = false;
-	bool set_capjoin = false, set_size = false;
+	bool set_size = false;
 	bool set_widget = false;
 	bool set_dash = false;
 

@@ -1,3 +1,19 @@
+2012-09-07  Mojca Miklavec  <mojca.miklavec.lists@gmail.com>
+
+	* configure.in src/Makefile.am src/qtterminal/QtGnuplotWidget.cpp 
+	src/qtterminal/QtGnuplotWidget.h src/qtterminal/qt_term.cpp
+	src/qtterminal/qt_term_mac.m src/qtterminal/QtGnuplotScene.cpp:
+	Backport recent OSX-related Qt modifications from 4.7 to 4.6.1.
+
+2012-09-07  Thomas Orgis  <sobukus@users.sourceforge.net>
+
+	* src/qtterminal/QtGnuplotApplication.cpp src/wxterminal/wxt_gui.cpp:
+	The wxt and qt terminals handle -persist by continuing execution of a
+	forked thread after the main thread has exited.  However, anyone waiting
+	on the main thread won't see it as finished unless the stdout and
+	stderr streams inherited by the continuing process are closed.
+	Bug #3309277
+
 2012-09-06  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* Bump version to 4.6.1 in preparation for release

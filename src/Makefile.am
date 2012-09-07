@@ -142,6 +142,9 @@ clean-local: clean-qt-extra clean-demo
 # Qt terminal sources
 
 gnuplot_SOURCES += qtterminal/qt_term.cpp
+if BUILD_ON_APPLE 
+gnuplot_SOURCES += qtterminal/qt_term_mac.m 
+endif 
 
 pkglibexec_PROGRAMS += gnuplot_qt
 
