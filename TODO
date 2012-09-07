@@ -28,10 +28,6 @@ TERMINALS, GENERAL COMMENTS:
 -- verify that terminals don't reset options (I've checked a lot, but 
 should be tested again)
 
--- verify that color and pointtype sequence is unified, alias similar line and
-point type sequences for the main terminal drivers
-
-
 GNUPLOT TOOLS LIBRARY:
 ======================
 
@@ -55,12 +51,6 @@ INSTALLATION --- LINUX:
 -- add .spec file and a 'make' target to create RPM file?
    [HBB: no.]
 -- the installation paths for TeX-related files are a mess
-
-
-INSTALLATION --- VMS:
-=====================
-
--- bring configure.vms in sync with current configure.in
 
 
 [========================================================================]
@@ -93,7 +83,6 @@ longer term
 Lars' list
 
 - provide library of replacement functions instead of stdfn.c
-- fully switch to automake [docs left to do, won't do lisp]
 - completely rewrite the parser. Use yacc/bison if possible.
 - maybe rewrite the scanner in lex? The benefits are not so obvious,
   because the current scanner is extremely simple. This is probably
@@ -105,12 +94,9 @@ Lars' list
   floating-point equality?) and symbolic constants from standard header files.
   LOADS of errors throughout the code, especially in graphics.c
 - autogenerate term.h from config file in text format and/or configure?
-- general expansion of user defined and environment vars in labels?
 - write or organise a portable version of snprintf(3) with a copyright
   compatible with the gnuplot copyright (ie. no GPL) (Apache?)
 - add more maintainer checks (eg. file permissions)
-- better lisp/ files integration (Makefile target to import Bruce's
-  latest version). How to handle duplicates?
 - better documentation format; get rid of the doc2xxx utils
   [SGML. SGML. SGML]
 - tilde and variable expansion to be done by 
@@ -126,9 +112,9 @@ HBB:
 Ethan's List (2012):
 
 - the qt terminal should support OpenGL as a back-end rendering path
+- rewrite javascript support files for the canvas terminal to use
+  browser's font support.  Maintain more per-plot context, e.g. zoom state.
 - isosurfaces (3D contour of 4D data)
-- fix emf text handling to match other terminals (vertical centering, enhanced)
-- allow the user to assign arbitrary coordinate transforms to the axes
 - more demos and more comprehensible descriptions in the user manual
 - revise the coordinate system used by x11 so that the terminal coordinates
   are proportional to the actual on-screen coordinates. 
