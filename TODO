@@ -14,13 +14,15 @@ DOCUMENTATION:
  -- We no longer have a working build path for HTML documentation.
     Is there a suitable replacement?
 
-TERMINALS:
+PLATFORMS:
 ==========
 
  -- Configuration/installation on OSX remains problematic
 
-Windows:
-  -- update wgnuplot menus
+ -- autoconf handling of TBOOLEAN on Solaris also remains problematic.
+    The definition apparently needs to be different for C and C++.
+
+  -- update wgnuplot menus for Windows
 
 TERMINALS, GENERAL COMMENTS:
 ============================
