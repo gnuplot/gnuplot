@@ -1,5 +1,5 @@
 .\" dummy line
-.TH GNUPLOT 1 " 7 October 2008"
+.TH GNUPLOT 1 " 7 September 2012"
 .UC 4
 .SH NAME
 gnuplot \- an interactive plotting program
@@ -9,7 +9,7 @@ gnuplot \- an interactive plotting program
 .br
 .SH DESCRIPTION
 .B Gnuplot
-is a command-driven interactive function plotting program.
+is a command-driven interactive plotting program.
 .PP
 If file names are given on the command line,
 gnuplot
@@ -21,7 +21,7 @@ interactive commands.
 .PP
 Here are some of its features:
 .PP
-Plots any number of functions, built up of C operators, C library
+Plots any number of functions, built up of C operators, C math library
 functions, and some things C doesn't have like **, sgn(), etc.  
 .PP
 User-defined constants and functions.
@@ -30,27 +30,21 @@ All computations performed in the complex domain.  Just the real part is
 plotted by default, but functions like imag() and abs() and arg() are
 available to override this.
 .PP
-Also support for plotting data files, to compare actual data to
-theoretical curves.
+Many presentation styles for plotting user data from files, including
+surface-fitting, error bars, boxplots, histograms, heat maps, and simple
+manipulation of image data.  There is an on-line demo collection at
+.br
+.I http://gnuplot.info/demo
 .PP
 Nonlinear least-squares fitting.
 .PP
-2D plots with mouse-controlled zooming.
-.PP
-3D plots with mouse-controlled point of view.
-.PP
-User-defined X and Y ranges (optional auto-ranging), smart axes scaling,
-smart tic marks.
-.PP
-Labelling of X and Y axes.
+2D and 3D plots with mouse-controlled zooming, rotation, and hypertext.
 .PP
 Shell escapes and command line substitution.
 .PP
 Load and save capability.
 .PP
-Support for many output devices and file formats.
-.PP
-Output redirection.
+Support for a huge variety of output devices and file formats.
 .SH OPTIONS
 .PP
 \fB\-p, \-\-persist\fP lets plot windows survive after main gnuplot program exits.
@@ -64,188 +58,27 @@ Output redirection.
 .B Gnuplot
 provides the \fIx11\fP terminal type for use
 with X servers. This terminal type is set automatically at startup if
-the \fBDISPLAY\fR environment variable is set, if the \fBTERM\fR environment
-variable is set to \fBxterm\fR, or if the \fB\-display\fR command line
-option is used.
-For terminal type \fIx11\fR, \fIgnuplot\fP
+the \fBGNUTERM\fR environment variable is set to x11,
+or if the \fB\-display\fR command line option is used.
+For terminal type Ix11, \fIgnuplot\fP
 accepts the standard X Toolkit options and resources such as geometry, font,
-and background. See the X(1) man page for a description of
-the options.
-In addition to the X Toolkit options:
-.PP
-\fB\-clear\fP requests that the window be cleared momentarily before a
-new plot is displayed.
-.PP
-\fB\-gray\fP requests grayscale rendering on grayscale or color displays.
-(Grayscale displays receive monochrome rendering by default.)
-.PP
-\fB\-mono\fP forces monochrome rendering on color displays.
-.PP
-\fB-raise\fP raises the plot window after each plot.
-.PP
-\fB-noraise\fP does not raise the plot window after each plot.
-.PP
-\fB\-tvtwm\fP requests that geometry specifications
-for position of the window be made relative to the currently displayed
-portion of the virtual root.
-.PP
-These options may also be controlled with resources in your \fB.Xdefaults\fR
-file.
-For example: \fBgnuplot*gray: on\fP .
-.PP
-\fIGnuplot\fP provides a command line option (\fB\-pointsize \fIv\fR) and
-a resource (\fBgnuplot*pointsize: \fIv\fR) to control the size of points
-plotted with the "points" plotting style. The value \fIv\fR is a real
-number (greater than 0 and less than or equal to ten) used as a
-scaling factor for point sizes. For example, \fB\-pointsize 2\fR uses
-points twice the default size, and \fB\-pointsize 0.5\fR uses points
-half the normal size.
-.PP
-For monochrome displays, \fIgnuplot\fR does not honor foreground or
-background colors. The default is black-on-white. \fB\-rv\fP or
-\fBgnuplot*reverseVideo: on\fP requests white-on-black.
-.PP
-For color displays \fIgnuplot\fP honors
-the following resources (shown here with default values). The values
-may be color names in the X11 \fIrgb.txt\fP file on your system, hexadecimal
-RGB color specifications (see X11 documentation), or a color name
-followed by a comma and an \fIintensity\fR value from 0 to 1. For example,
-\fBblue,.5\fR means a half intensity blue.
-.sp
-.B  "gnuplot*background: white"
-.br
-.B  "gnuplot*textColor: black"
-.br
-.B  "gnuplot*borderColor: black"
-.br
-.B  "gnuplot*axisColor: black"
-.br
-.B  "gnuplot*line1Color: red"
-.br
-.B  "gnuplot*line2Color: green"
-.br
-.B  "gnuplot*line3Color: blue"
-.br
-.B  "gnuplot*line4Color: magenta"
-.br
-.B  "gnuplot*line5Color: cyan"
-.br
-.B  "gnuplot*line6Color: sienna"
-.br
-.B  "gnuplot*line7Color: orange"
-.br
-.B  "gnuplot*line8Color: coral"
-.br
-
-When \fB\-gray\fP is selected, \fIgnuplot\fP honors
-the following resources for grayscale or color displays (shown here with
-default values). Note that the default background is black.
-.sp
-.B  "gnuplot*background: black"
-.br
-.B  "gnuplot*textGray: white"
-.br
-.B  "gnuplot*borderGray: gray50"
-.br
-.B  "gnuplot*axisGray: gray50"
-.br
-.B  "gnuplot*line1Gray: gray100"
-.br
-.B  "gnuplot*line2Gray: gray60"
-.br
-.B  "gnuplot*line3Gray: gray80"
-.br
-.B  "gnuplot*line4Gray: gray40"
-.br
-.B  "gnuplot*line5Gray: gray90"
-.br
-.B  "gnuplot*line6Gray: gray50"
-.br
-.B  "gnuplot*line7Gray: gray70"
-.br
-.B  "gnuplot*line8Gray: gray30"
-.br
-
-\fIGnuplot\fP honors the following resources for setting the width in
-pixels of plot lines (shown here with default values.) 0 or 1 means
-a minimal width line of 1 pixel width. A value of 2 or 3 may
-improve the  appearance of some plots.
-.sp
-.br
-.B  "gnuplot*borderWidth: 2"
-.br
-.B  "gnuplot*axisWidth: 0"
-.br
-.B  "gnuplot*line1Width: 0"
-.br
-.B  "gnuplot*line2Width: 0"
-.br
-.B  "gnuplot*line3Width: 0"
-.br
-.B  "gnuplot*line4Width: 0"
-.br
-.B  "gnuplot*line5Width: 0"
-.br
-.B  "gnuplot*line6Width: 0"
-.br
-.B  "gnuplot*line7Width: 0"
-.br
-.B  "gnuplot*line8Width: 0"
-.br
-
-\fIGnuplot\fP honors the following resources for setting the dash style
-used for plotting lines.  0 means a solid line. A 2 digit number \fIjk\fR
-(\fIj\fP and \fIk\fP are >= 1  and <= 9) means a dashed line with a
-repeated pattern of \fIj\fR pixels on followed by \fIk\fR pixels off.
-For example, '16' is a "dotted" line with 1 pixel on followed by 6 pixels
-off.  More elaborate on/off patterns can be specified with a 4 digit value.
-For example, '4441' is 4 on, 4 off, 4 on, 1 off. The default values shown
-below are for monochrome displays or monochrome rendering on color or
-grayscale displays. For color displays, the defaults for all are 0
-(solid line) except for \fBaxisDashes\fR which defaults to a '16' dotted
-line.
-.sp
-.br
-.B  "gnuplot*borderDashes: 0"
-.br
-.B  "gnuplot*axisDashes: 16"
-.br
-.B  "gnuplot*line1Dashes: 0"
-.br
-.B  "gnuplot*line2Dashes: 42"
-.br
-.B  "gnuplot*line3Dashes: 13"
-.br
-.B  "gnuplot*line4Dashes: 44"
-.br
-.B  "gnuplot*line5Dashes: 15"
-.br
-.B  "gnuplot*line6Dashes: 4441"
-.br
-.B  "gnuplot*line7Dashes: 42"
-.br
-.B  "gnuplot*line8Dashes: 13"
-.br
-.PP
-The size or aspect ratio of a plot may be changed by resizing the
-.I gnuplot
-window.
+and background. See the X(1) man page for a description of common options.
+For additional X options specific to gnuplot, type \fIhelp x11\fP on the
+gnuplot command line.
 .SH ENVIRONMENT
 A number of shell environment variables are understood by
 gnuplot.  None of these are required.
 .TP
 .B GNUTERM
-The name of the terminal type to be used.  This overrides any terminal
-type sensed by gnuplot on start-up, but is itself overridden by the .gnuplot
-(or equivalent) start-up file (see \fBFILES\fP and "help start-up") and,
-of course, by later explicit changes.
+The name of the terminal type to be used by default.  This can be
+overridden by the gnuplotrc or .gnuplot start-up files and,
+of course, by later explicit "set terminal" commands.
 .TP
 .B GNUHELP 
 The pathname of the HELP file (gnuplot.gih).
 .TP
 .B HOME
-The name of a directory to search for a .gnuplot file if none is found
-in the current directory.
+The name of a directory to search for a .gnuplot file.
 .TP
 .B PAGER
 An output filter for help messages.
@@ -289,34 +122,27 @@ this variable to test the postscript terminal with custom prologue
 files. See "help postscript prologue".
 .SH FILES
 .TP
+.I gnuplotrc
+When gnuplot is run, it first looks for a system-wide initialization
+file named gnuplotrc.  The standard location of this file expected by
+the program is reported by the "show loadpath" command.
+.TP
 .I .gnuplot
-Gnuplot looks for this initialization file, first in the current
-directory, then in the HOME directory.  It may contain any legal
-gnuplot commands, but typically they are limited to setting the
-terminal and defining frequently-used functions or variables.
+After loading the system-wide initialization file, if any,
+Gnuplot looks for a private initialization file in the HOME directory.
+It may contain any legal gnuplot commands, but typically they are
+limited to setting the preferred terminal and line types
+and defining frequently-used functions or variables.
 .TP 
 .I fit.log
-The default name of the logfile maintained by fit.
+The default name of the logfile output by the "fit" command.
 .SH AUTHORS
-Thomas Williams, Pixar Corporation,
-.br
-(gnuplot-info@lists.sourceforge.net)
-.br
-and Colin Kelley.
-.PP
-Additions for labelling by Russell Lang, Monash University, Australia.
-.br
-(rjl@monu1.cc.monash.edu.au)
-.br
-Further additions by David Kotz, Dartmouth College, New Hampshire, USA
-(formerly of Duke University, North Carolina, USA).
-.br
-(David.Kotz@Dartmouth.edu)
+Original authors: Thomas Williams and Colin Kelley.
+Starting with gnuplot version 3.8, the project source is cooperatively
+maintained on SourceForge by a large number of contributors.
 .SH BUGS
-See the
-.I help bugs
-command in gnuplot.
+Please report bugs using the project bug tracker on SourceForge.
 .SH SEE ALSO
 See the printed manual or the on-line help for details on specific commands.
-.br
-X(1).
+Project web site at 
+/I http://gnuplot.info
