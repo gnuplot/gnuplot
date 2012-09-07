@@ -73,7 +73,7 @@ DOCHEADERS = doc2x.h xref.h
 
 EXTRA_DIST = doc2texi.el gnuplot.doc gnuplot.texi gpcard.tex	\
 makefile.dst titlepag.ipf titlepag.ms titlepag.tex	\
-toc_entr.sty old psdoc faq-ja.tex gnuplot-ja.doc README.ja	\
+toc_entr.sty psdoc faq-ja.tex gnuplot-ja.doc README.ja	\
 term-ja.diff plotstyles.gnu pdffigures.tex gnuplot.pdf windows
 
 CLEANFILES = allterm.h gnuplot.tex gnuplot.dvi gnuplot.aux gnuplot.log	\
