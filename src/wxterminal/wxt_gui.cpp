@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.cpp,v 1.91.2.5 2012/05/12 04:20:07 sfeam Exp $
+ * $Id: wxt_gui.cpp,v 1.91.2.6 2012/07/07 04:44:49 sfeam Exp $
  */
 
 /* GNUPLOT - wxt_gui.cpp */
@@ -3589,6 +3589,11 @@ void wxt_atexit()
 # endif /* HAVE_WORKING_FORK */
 
 		FPRINTF((stderr,"child process: restarting its event loop\n"));
+		/* Some programs executing gnuplot -persist may wait for all default
+		 * handles to be closed before they consider the sub-process finished.
+		 * Using freopen() ensures that debug fprintf()s won't crash. */
+		freopen("/dev/null","w",stdout);
+		freopen("/dev/null","w",stderr);
 
 		/* (re)start gui loop */
 		wxTheApp->OnRun();
