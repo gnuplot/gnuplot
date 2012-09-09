@@ -1,5 +1,6 @@
 #
-# Demo for non-linear linked axes, in this case x2 is proportional to 1/x.
+# Demo for non-linear linked axes. 
+# In this example x2 is proportional to 1/x.
 # X axis is X-ray energy in eV; x2 axis is wavelength in Angstroms.
 #
 # The scattering data are pulled from the web using the GET
@@ -9,6 +10,8 @@
 #
 # For more information on the plot itself see
 #	http://www.bmsc.washington.edu/scatter
+#
+# Ethan A Merritt - August 2012
 #
 set encoding utf8
 set key outside Left

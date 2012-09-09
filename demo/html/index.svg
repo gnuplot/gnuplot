@@ -80,6 +80,7 @@ The mousing code is new. You may see some browser-dependent glitches.
 
     <h4>Coordinate and<br> axis transforms</h4>
     <ul>
+    <li><a href="linkedaxes.html">linked axes</a></li>
     <li><a href="polar.html">polar coords</a></li>
     <li><a href="poldat.html">polar data</a></li>
     <li><a href="world.html">cylindrical/spherical</a></li>

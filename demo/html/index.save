@@ -71,6 +71,7 @@ Interactive demo scripts are not included on this page.
 
     <h4>Coordinate and<br> axis transforms</h4>
     <ul>
+    <li><a href="linkedaxes.html">linked axes</a></li>
     <li><a href="polar.html">polar coords</a></li>
     <li><a href="poldat.html">polar data</a></li>
     <li><a href="world.html">cylindrical/spherical</a></li>
@@ -118,7 +119,6 @@ Interactive demo scripts are not included on this page.
 
     <h4>Page Layout</h4>
     <ul>
-    <li><a href="key.html">plot key</a></li>
     <li><a href="layout.html">multiplot&nbsp;layout</a></li>
     <li><a href="multiplt.html">multiple plots</a></li>
     <li><a href="margins.html">aligned plots</a></li>
@@ -129,9 +129,8 @@ Interactive demo scripts are not included on this page.
 
     <h4>Styles</h4>
     <ul>
-    <li><a href="dashcolor.html">line styles</a></li>
+    <li><a href="lines_arrows.html">line and arrow styles</a></li>
     <li><a href="fillstyle.html">fill styles</a></li>
-    <li><a href="arrowstyle.html">arrow styles</a></li>
     <li><a href="transparent.html">transparency</a></li>
     <li><a href="transparent_solids.html">transparent solids</a></li>
     </ul>
