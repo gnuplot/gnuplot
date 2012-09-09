@@ -50,8 +50,8 @@ transparent_solids.html: $(GNUPLOT_LIB)/transparent_solids.dem ./webify.pl
 	export DEMOTERM="png enhanced truecolor font 'arial,9' size 512,384"; ./webify.pl transparent_solids
 
 # The png terminal does not support dashed lines, so let's use pngcairo
-lines_arrow.html: $(GNUPLOT_LIB)/lines_arrows.dem ./webify.pl
-	export DEMOTERM="pngcairo dash"; ./webify.pl lines_arrows
+lines_arrows.html: $(GNUPLOT_LIB)/lines_arrows.dem ./webify.pl
+	export DEMOTERM="pngcairo dash dl 2"; ./webify.pl lines_arrows
 
 animate2.html: $(GNUPLOT_LIB)/animate2.dem ./webify.pl
 	export DEMOTERM="gif animate transparent noopt delay 10 size 200,200 background rgb 'black'"; ./webify.pl animate2
