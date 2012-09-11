@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.400 2012/08/05 19:24:53 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.401 2012/08/25 05:21:32 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -3552,6 +3552,7 @@ plot_boxes(struct curve_points *plot, int xaxis_y)
 		if (plot->plot_style == HISTOGRAMS) {
 		    int ix = plot->points[i].x;
 		    int histogram_linetype = i;
+		    int stack = i;
 		    if (plot->histogram->startcolor > 0)
 			histogram_linetype += plot->histogram->startcolor;
 
@@ -3581,8 +3582,8 @@ plot_boxes(struct curve_points *plot, int xaxis_y)
 		    }
 
 		    switch (histogram_opts.type) {
-		    case HT_STACKED_IN_TOWERS:
-			ix = 0;
+		    case HT_STACKED_IN_TOWERS: /* columnstacked */
+			stack = 0;
 			/* Line type (color) must match row number */
 			if (prefer_line_styles) {
 			    struct lp_style_type ls;
@@ -3595,16 +3596,15 @@ plot_boxes(struct curve_points *plot, int xaxis_y)
 			}
 			plot->fill_properties.fillpattern = histogram_linetype;
 			/* Fall through */
-		    case HT_STACKED_IN_LAYERS:
-
+		    case HT_STACKED_IN_LAYERS: /* rowstacked */
 			if( plot->points[i].y >= 0 ){
-			    dyb = stackheight[ix].yhigh;
-			    dyt += stackheight[ix].yhigh;
-			    stackheight[ix].yhigh += plot->points[i].y;
+			    dyb = stackheight[stack].yhigh;
+			    dyt += stackheight[stack].yhigh;
+			    stackheight[stack].yhigh += plot->points[i].y;
 			} else {
-			    dyb = stackheight[ix].ylow;
-			    dyt += stackheight[ix].ylow;
-			    stackheight[ix].ylow += plot->points[i].y;
+			    dyb = stackheight[stack].ylow;
+			    dyt += stackheight[stack].ylow;
+			    stackheight[stack].ylow += plot->points[i].y;
 			}
 
 			if ((Y_AXIS.min < Y_AXIS.max && dyb < Y_AXIS.min)
