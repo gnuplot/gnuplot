@@ -1,3 +1,9 @@
+2012-09-11  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/graphics.c:  Index histogram stacks using the point's index rather
+	than its x coordinate. Fixes rowstacked histogram array overflow.
+	Bug #3566662
+
 2012-09-07  Mojca Miklavec  <mojca.miklavec.lists@gmail.com>
 
 	* configure.in src/Makefile.am src/qtterminal/QtGnuplotWidget.cpp 
