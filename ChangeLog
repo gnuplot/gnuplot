@@ -1,3 +1,8 @@
+2012-09-12  Shigeharu Takeno  <shige@iee.niit.ac.jp>
+
+	* docs/gnuplot-ja.doc docs/term-ja.diff man/gnuplot-ja.1:
+	Sync with English documentation (rev.1.746).
+
 2012-09-11  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c:  Index histogram stacks using the point's index rather
@@ -326,7 +331,7 @@
 2012-06-29  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* docs/gnuplot-ja.doc docs/term-ja.diff:
-	Sync with English documentation (rev.1741).
+	Sync with English documentation (rev.1.741).
 
 2012-06-29  Ethan A Merritt  <merritt@u.washington.edu>
 
