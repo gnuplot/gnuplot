@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.745 2012/08/05 19:24:53 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.746 2012/08/24 21:28:38 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -12404,7 +12404,7 @@ Ffigure_missing
 ?set y2range
 ?show y2range
 ?y2range
- The `set y2range` command sets the horizontal range that will be displayed on
+ The `set y2range` command sets the vertical range that will be displayed on
  the y2 (right) axis.  See `set xrange` for the full set of command options.
  This command is ignored if the y2 axis range is explicitly linked to the
  y axis.  See `set link`.
