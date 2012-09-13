@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.229 2012/08/24 21:08:14 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.230 2012/08/28 04:43:28 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -4851,8 +4851,7 @@ df_generate_pseudodata()
     /* Pseudofile '++' returns a (samples X isosamples) grid of x,y coordinates */
     /* This code copied from that in second pass through eval_3dplots */
     if (df_pseudodata == 2) {
-	static double u_min, u_max, u_step, v_min, v_max, v_step;
-	static double u_isostep, v_isostep;
+	static double u_min, u_max, u_step, v_min, v_max, v_isostep;
 	static int nusteps, nvsteps;
 	double u, v;
 	AXIS_INDEX u_axis = FIRST_X_AXIS;
@@ -4878,14 +4877,11 @@ df_generate_pseudodata()
 
 	    if (hidden3d) {
 		 u_step = (u_max - u_min) / (iso_samples_1 - 1);
-		 v_step = (v_max - v_min) / (iso_samples_2 - 1);
 		 nusteps = iso_samples_1;
 	    } else {
 		 u_step = (u_max - u_min) / (samples_1 - 1);
-		 v_step = (v_max - v_min) / (samples_2 - 1);
 		 nusteps = samples_1;
 	    }
-	    u_isostep = (u_max - u_min) / (iso_samples_1 - 1);
 	    v_isostep = (v_max - v_min) / (iso_samples_2 - 1);
 	    nvsteps = iso_samples_2;
 	}

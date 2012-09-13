@@ -10,6 +10,8 @@
 	min/max values when storing them for later mousing calculations by the
 	canvas, svg, and other terminals.
 
+	* src/datafile.c: Remove unused variables.
+
 	* demo/html:  Update online demo collection to include linked axes
 	and RGBA color applied to individual lines. 
 
