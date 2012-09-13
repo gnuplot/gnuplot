@@ -1,3 +1,10 @@
+2012-09-13  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/PostScript/prologue.ps term/post.trm:
+	Handle transparent fill patterns in PS_fillbox() in the same way
+	as is already done in PS_filled_polygon().
+	Bug #3567035
+
 2012-09-12  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* docs/gnuplot-ja.doc docs/term-ja.diff man/gnuplot-ja.1:

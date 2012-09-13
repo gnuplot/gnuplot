@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: post.trm,v 1.268 2012/03/16 16:48:37 sfeam Exp $
+ * $Id: post.trm,v 1.269 2012/03/31 05:54:12 sfeam Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -2312,8 +2312,9 @@ PS_fillbox(
 		filldens, x1,y1, width,height);
 	break;
 
-    case FS_PATTERN:
     case FS_TRANSPARENT_PATTERN:
+	fprintf(gppsfile,"\n /TransparentPatterns true def\n");
+    case FS_PATTERN:
 	/* style == 2 --> fill with pattern according to fillpattern */
 	/* the upper 3 nibbles of 'style' contain pattern number */
 	pattern = (style >> 4) % 8;
