@@ -90,6 +90,7 @@ Interactive demo scripts are not included on this page.
     <ul>
     <li><a href="rainbow.html">user-defined colors</a></li>
     <li><a href="rgb_variable.html">RGB coloring</a></li>
+    <li><a href="rgba_lines.html">RGB + Alpha</a></li>
     <li><a href="pm3dcolors.html">pm3d colors</a></li>
     <li><a href="pm3dgamma.html">pm3d gamma</a></li>
     </ul>

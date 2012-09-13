@@ -5,9 +5,13 @@
 	as is already done in PS_filled_polygon().
 	Bug #3567035
 
-	* src/eval.c (fill_gpval_axis): The RANGE_REVERSE flag no longer exists,
-	so do not report it to the user and do not swap axis min/max values when
-	storing them for later mousing calculations by canvas, svg, etc.
+	* src/eval.c (fill_gpval_axis) src/axis.h: The RANGE_REVERSE flag no
+	longer exists, so do not report it to the user and do not swap axis
+	min/max values when storing them for later mousing calculations by the
+	canvas, svg, and other terminals.
+
+	* demo/html:  Update online demo collection to include linked axes
+	and RGBA color applied to individual lines. 
 
 2012-09-12  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 

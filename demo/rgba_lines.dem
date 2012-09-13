@@ -30,3 +30,6 @@ set yrange [-1:1]
 set size square
 
 plot 0 notitle
+
+pause -1 "Hit return to continue"
+reset

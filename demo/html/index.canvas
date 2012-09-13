@@ -98,6 +98,7 @@ To view the results you need a browser that supports the HTML5 'canvas' element.
     <ul>
     <li><a href="rainbow.html">user-defined colors</a></li>
     <li><a href="rgb_variable.html">RGB coloring</a></li>
+    <li><a href="rgba_lines.html">RGB + Alpha</a></li>
     <li><a href="pm3dcolors.html">pm3d colors</a></li>
     </ul>
 </td>

@@ -98,6 +98,7 @@ The mousing code is new. You may see some browser-dependent glitches.
     <ul>
     <li><a href="rainbow.html">user-defined colors</a></li>
     <li><a href="rgb_variable.html">RGB coloring</a></li>
+    <li><a href="rgba_lines.html">RGB + Alpha</a></li>
     <li><a href="pm3dcolors.html">pm3d colors</a></li>
     </ul>
 </td>
