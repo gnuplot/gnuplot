@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: eval.c,v 1.96.2.1 2011/12/11 11:41:31 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: eval.c,v 1.96.2.2 2012/01/17 19:17:50 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - eval.c */
@@ -89,7 +89,7 @@ const struct ft_entry GPFAR ft[] =
     {"pop",  f_pop},
     {"call",  f_call},
     {"calln",  f_calln},
-    {"sum", f_sum}, 
+    {"sum", f_sum},
     {"lnot",  f_lnot},
     {"bnot",  f_bnot},
     {"uminus",  f_uminus},
@@ -719,7 +719,7 @@ static void update_plot_bounds __PROTO((void));
 static void fill_gpval_axis __PROTO((AXIS_INDEX axis));
 static void set_gpval_axis_sth_double __PROTO((const char *prefix, AXIS_INDEX axis, const char *suffix, double value, int is_int));
 
-static void 
+static void
 set_gpval_axis_sth_double(const char *prefix, AXIS_INDEX axis, const char *suffix, double value, int is_int)
 {
     struct udvt_entry *v;
@@ -739,19 +739,22 @@ static void
 fill_gpval_axis(AXIS_INDEX axis)
 {
     const char *prefix = "GPVAL";
-#define A axis_array[axis]
-    double a = AXIS_DE_LOG_VALUE(axis, A.min); /* FIXME GPVAL: This should be replaced by  a = A.real_min  and */
-    double b = AXIS_DE_LOG_VALUE(axis, A.max); /* FIXME GPVAL: b = A.real_max  when true (delogged) min/max range values are implemented in the axis structure */
-    set_gpval_axis_sth_double(prefix, axis, "MIN", ((a < b) ? a : b), 0);
-    set_gpval_axis_sth_double(prefix, axis, "MAX", ((a < b) ? b : a), 0);
-    set_gpval_axis_sth_double(prefix, axis, "REVERSE", (A.range_flags & RANGE_REVERSE), 1);
-    set_gpval_axis_sth_double(prefix, axis, "LOG", A.base, 0);
+    AXIS *ap = &axis_array[axis];
+    double a = AXIS_DE_LOG_VALUE(axis, ap->min);
+    double b = AXIS_DE_LOG_VALUE(axis, ap->max);
+    if ((ap->range_flags & RANGE_REVERSE) && (a > b)) {
+	double tmp = a;
+	a = b;
+	b = tmp;
+    }
+    set_gpval_axis_sth_double(prefix, axis, "MIN", a, 0);
+    set_gpval_axis_sth_double(prefix, axis, "MAX", b, 0);
+    set_gpval_axis_sth_double(prefix, axis, "LOG", ap->base, 0);
 
     if (axis < POLAR_AXIS) {
-	set_gpval_axis_sth_double("GPVAL_DATA", axis, "MIN", AXIS_DE_LOG_VALUE(axis, A.data_min), 0);
-	set_gpval_axis_sth_double("GPVAL_DATA", axis, "MAX", AXIS_DE_LOG_VALUE(axis, A.data_max), 0);
+	set_gpval_axis_sth_double("GPVAL_DATA", axis, "MIN", AXIS_DE_LOG_VALUE(axis, ap->data_min), 0);
+	set_gpval_axis_sth_double("GPVAL_DATA", axis, "MAX", AXIS_DE_LOG_VALUE(axis, ap->data_max), 0);
     }
-#undef A
 }
 
 /* Fill variable "var" visible by "show var" or "show var all" ("GPVAL_*")
@@ -766,7 +769,7 @@ fill_gpval_string(char *var, const char *stringvalue)
     if (v->udv_undef == FALSE && !strcmp(v->udv_value.v.string_val, stringvalue))
 	return;
     if (v->udv_undef)
-	v->udv_undef = FALSE; 
+	v->udv_undef = FALSE;
     else
 	gpfree_string(&v->udv_value);
     Gstring(&v->udv_value, gp_strdup(stringvalue));
@@ -778,7 +781,7 @@ fill_gpval_integer(char *var, int value)
     struct udvt_entry *v = add_udv_by_name(var);
     if (!v)
 	return;
-    v->udv_undef = FALSE; 
+    v->udv_undef = FALSE;
     Ginteger(&v->udv_value, value);
 }
 
@@ -788,7 +791,7 @@ fill_gpval_float(char *var, double value)
     struct udvt_entry *v = add_udv_by_name(var);
     if (!v)
 	return;
-    v->udv_undef = FALSE; 
+    v->udv_undef = FALSE;
     Gcomplex(&v->udv_value, value, 0);
 }
 
@@ -798,7 +801,7 @@ fill_gpval_complex(char *var, double areal, double aimag)
     struct udvt_entry *v = add_udv_by_name(var);
     if (!v)
 	return;
-    v->udv_undef = FALSE; 
+    v->udv_undef = FALSE;
     Gcomplex(&v->udv_value, areal, aimag);
 }
 

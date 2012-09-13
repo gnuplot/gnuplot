@@ -5,6 +5,10 @@
 	as is already done in PS_filled_polygon().
 	Bug #3567035
 
+	* src/eval.c (fill_gpval_axis):  Do not swap axis min/max values when
+	storing them for later mousing calculations by the canvas, svg, and
+	other terminals.  Fixes bug in the mouse readout from reversed axes.
+
 2012-09-11  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c:  Index histogram stacks using the point's index rather
