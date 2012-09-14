@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.87 2012/06/30 06:41:33 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.88 2012/07/05 00:28:37 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - pm3d.c */
@@ -364,7 +364,7 @@ void pm3d_depth_queue_flush(void)
 	quadrangle* qe;
 	gpdPoint* gpdPtr;
 #ifdef EXTENDED_COLOR_SPECS
-	gpdPoint* gpiPtr;
+	gpiPoint* gpiPtr;
 	double w = trans_mat[3][3];
 #endif
 	vertex out;
