@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.701.2.18 2012/06/19 15:02:47 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.701.2.19 2012/09/06 04:37:05 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -5096,6 +5096,7 @@ Ffigure_mapcontours
  Gnuplot can support "middle" ("pdp") endian if it is compiled with that option.
 4 filetype
 ?binary filetype
+?filetype
  For some standard binary file formats gnuplot can extract all the necessary
  information from the file in question.  As an example, "format=edf" will read
  ESRF Header File format files.  For a list of the currently supported file
