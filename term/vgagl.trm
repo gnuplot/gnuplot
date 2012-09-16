@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: vgagl.trm,v 1.19 2006/07/07 03:51:23 sfeam Exp $
+ * $Id: vgagl.trm,v 1.20 2006/07/21 02:35:48 sfeam Exp $
  */
 
 #if defined(USE_MOUSE)
@@ -784,7 +784,6 @@ VGAGL_graphics()
 	/* graphics is already on; clear previous plot */
 	gl_clearscreen(0);
     }
-    supply_extended_color_specs = 1;
     VGAGL_cursor_drawn = FALSE;
     VGAGL_savedstr[0] = '\0';
 #if 0
@@ -1533,7 +1532,7 @@ TERM_TABLE_START(vgagl_driver)
     VGAGL_linetype, VGAGL_put_text, VGAGL_text_angle,
     null_justify_text, do_point, do_arrow, set_font_null,
     0,				/* pointsize */
-    TERM_CAN_MULTIPLOT, VGAGL_suspend, VGAGL_resume
+    TERM_CAN_MULTIPLOT|TERM_EXTENDED_COLOR, VGAGL_suspend, VGAGL_resume
     , 0, 0 /* fillbox, linewidth */
 # ifdef USE_MOUSE
     , 0 /* VGAGL_waitforinput */, VGAGL_put_tmptext, VGAGL_set_ruler,

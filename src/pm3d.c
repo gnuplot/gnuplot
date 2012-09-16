@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.88 2012/07/05 00:28:37 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.89 2012/09/14 22:21:11 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - pm3d.c */
@@ -672,8 +672,9 @@ pm3d_plot(struct surface_points *this_plot, int at_which_z)
 
 	    if ((interp_i <= 1 && interp_j <= 1) || pm3d.direction == PM3D_DEPTH) {
 #ifdef EXTENDED_COLOR_SPECS
-	      if (!supply_extended_color_specs) {
+	      if ((term->flags & TERM_EXTENDED_COLOR) == 0)
 #endif
+	      {
 		/* Get the gray as the average of the corner z- or gray-positions
 		   (note: log scale is already included). The average is calculated here
 		   if there is no interpolation (including the "pm3d depthorder" option),
@@ -733,9 +734,7 @@ pm3d_plot(struct surface_points *this_plot, int at_which_z)
 		    else
 			set_color(gray);
 		}
-#ifdef EXTENDED_COLOR_SPECS
 	      }
-#endif
 	    }
 
 	    corners[0].x = pointsA[i].x;
@@ -763,7 +762,7 @@ pm3d_plot(struct surface_points *this_plot, int at_which_z)
 		}
 	    }
 #ifdef EXTENDED_COLOR_SPECS
-	    if (supply_extended_color_specs) {
+	    if ((term->flags & TERM_EXTENDED_COLOR)) {
 		if (color_from_column) {
 		    icorners[0].z = pointsA[i].CRD_COLOR;
 		    icorners[1].z = pointsB[ii].CRD_COLOR;

@@ -2,6 +2,11 @@
 
 	* src/set.c: set datafile separator {whitespace|tab|comma|"<char>"}
 
+	* src/pm3d.c src/set.c src/color.c term/vgagl.trm src/term_api.h:
+	The EXTENDED_COLOR_SPECS compile option is relevant only to one
+	terminal (vgagl).  Make the corresponding toggle a terminal-specific
+	flag rather than a global variable.  Clean up terminal flags.
+
 2012-09-13  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/PostScript/prologue.ps term/post.trm:

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: color.c,v 1.101 2012/04/13 19:30:38 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: color.c,v 1.102 2012/06/06 22:12:02 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - color.c */
@@ -47,11 +47,6 @@ static t_sm_palette prev_palette = {
 	-1, -1, -1, -1, -1, -1, -1, -1,
 	(rgb_color *) 0, -1
     };
-
-
-#ifdef EXTENDED_COLOR_SPECS
-int supply_extended_color_specs = 0;
-#endif
 
 /* Internal prototype declarations: */
 
@@ -204,7 +199,8 @@ set_rgbcolor(unsigned int rgbvalue)
     term->set_color(&color);
 }
 
-void ifilled_quadrangle(gpiPoint* icorners)
+void
+ifilled_quadrangle(gpiPoint* icorners)
 {
     if (default_fillstyle.fillstyle == FS_EMPTY)
 	icorners->style = FS_OPAQUE;
@@ -271,7 +267,7 @@ filled_polygon_3dcoords(int points, struct coordinate GPHUGE * coords)
 	icorners[i].y = y;
     }
 #ifdef EXTENDED_COLOR_SPECS
-    if (supply_extended_color_specs) {
+    if ((term->flags & TERM_EXTENDED_COLOR)) {
 	icorners[0].spec.gray = -1;	/* force solid color */
     }
 #endif
@@ -301,7 +297,7 @@ filled_polygon_3dcoords_zfixed(int points, struct coordinate GPHUGE * coords, do
 	icorners[i].y = y;
     }
 #ifdef EXTENDED_COLOR_SPECS
-    if (supply_extended_color_specs) {
+    if ((term->flags & TERM_EXTENDED_COLOR)) {
 	icorners[0].spec.gray = -1;	/* force solid color */
     }
 #endif
@@ -425,7 +421,7 @@ draw_inside_color_smooth_box_bitmap(FILE * out)
 	    corners[1].x = corners[2].x = GPMIN(xy_to,xy2+1);
 	}
 #ifdef EXTENDED_COLOR_SPECS
-	if (supply_extended_color_specs)
+	if ((term->flags & TERM_EXTENDED_COLOR))
 	    corners[0].spec.gray = -1;	/* force solid color */
 #endif
 	/* print the rectangle with the given colour */

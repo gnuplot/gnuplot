@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.374 2012/08/05 19:24:53 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.375 2012/09/17 03:00:18 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -4207,11 +4207,6 @@ set_terminal()
 	return;
     } /* set term push */
 
-#ifdef EXTENDED_COLOR_SPECS
-    /* each terminal is supposed to turn this on, probably
-     * somewhere when the graphics is initialized */
-    supply_extended_color_specs = 0;
-#endif
 #ifdef USE_MOUSE
     event_reset((void *)1);   /* cancel zoombox etc. */
 #endif

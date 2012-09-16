@@ -1,5 +1,5 @@
 /*
- * $Id: term_api.h,v 1.102 2012/05/21 23:15:18 sfeam Exp $
+ * $Id: term_api.h,v 1.103 2012/08/24 21:28:38 sfeam Exp $
  */
 
 /* GNUPLOT - term_api.h */
@@ -167,20 +167,21 @@ typedef struct t_image {
 
 /* Values for the flags field of TERMENTRY
  */
-#define TERM_CAN_MULTIPLOT    1  /* tested if stdout not redirected */
-#define TERM_CANNOT_MULTIPLOT 2  /* tested if stdout is redirected  */
-#define TERM_BINARY           4  /* open output file with "b"       */
-#define TERM_INIT_ON_REPLOT   8  /* call term->init() on replot     */
-#define TERM_IS_POSTSCRIPT   16  /* post, next, pslatex, etc        */
-#define TERM_ENHANCED_TEXT   32  /* enhanced text mode is enabled   */
-#define TERM_NO_OUTPUTFILE   64  /* terminal doesnt write to a file */
-#define TERM_CAN_CLIP       128  /* terminal does its own clipping  */
-#define TERM_CAN_DASH       256  /* terminal supports dashed lines  */
-#define TERM_ALPHA_CHANNEL  512  /* alpha channel transparency      */
-#define TERM_MONOCHROME    1024  /* term is running in mono mode    */
-#define TERM_LINEWIDTH     2048  /* support for set term linewidth  */
-#define TERM_FONTSCALE     4096  /* terminal supports fontscale     */
-#define TERM_IS_LATEX      8192  /* text uses TeX markup            */
+#define TERM_CAN_MULTIPLOT    (1<<0)	/* tested if stdout not redirected */
+#define TERM_CANNOT_MULTIPLOT (1<<1)	/* tested if stdout is redirected  */
+#define TERM_BINARY           (1<<2)	/* open output file with "b"       */
+#define TERM_INIT_ON_REPLOT   (1<<3)	/* call term->init() on replot     */
+#define TERM_IS_POSTSCRIPT    (1<<4)	/* post, next, pslatex, etc        */
+#define TERM_ENHANCED_TEXT    (1<<5)	/* enhanced text mode is enabled   */
+#define TERM_NO_OUTPUTFILE    (1<<6)	/* terminal doesnt write to a file */
+#define TERM_CAN_CLIP         (1<<7)	/* terminal does its own clipping  */
+#define TERM_CAN_DASH         (1<<8)	/* terminal supports dashed lines  */
+#define TERM_ALPHA_CHANNEL    (1<<9)	/* alpha channel transparency      */
+#define TERM_MONOCHROME      (1<<10)	/* term is running in mono mode    */
+#define TERM_LINEWIDTH       (1<<11)	/* support for set term linewidth  */
+#define TERM_FONTSCALE       (1<<12)	/* terminal supports fontscale     */
+#define TERM_IS_LATEX        (1<<13)	/* text uses TeX markup            */
+#define TERM_EXTENDED_COLOR  (1<<14)	/* uses EXTENDED_COLOR_SPECS       */
 
 /* The terminal interface structure --- heart of the terminal layer.
  *
