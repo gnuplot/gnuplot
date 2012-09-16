@@ -1,3 +1,7 @@
+2012-09-16  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/set.c: set datafile separator {whitespace|tab|comma|"<char>"}
+
 2012-09-13  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/PostScript/prologue.ps term/post.trm:

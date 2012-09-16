@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.747 2012/09/12 22:33:24 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.748 2012/09/14 20:54:04 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -7534,21 +7534,21 @@ Ffigure_missing
 ?show datafile separator
 ?datafile separator
 ?separator
- The command `set datafile separator "<char>"` tells `gnuplot` that data fields
- in subsequent input files are separated by <char> rather than by whitespace.
- The most common use is to read in csv (comma-separated value) files written
- by spreadsheet or database programs. By default data fields are separated by
- whitespace.
+ The command `set datafile separator` tells `gnuplot` that data fields in
+ subsequent input files are separated by a specific character rather than by
+ whitespace.  The most common use is to read in csv (comma-separated value)
+ files written by spreadsheet or database programs. By default data fields
+ are separated by whitespace.
 
  Syntax:
-       set datafile separator {"<char>" | whitespace}
+       set datafile separator {whitespace | tab | comma | "<char>"}
 
  Examples:
        # Input file contains tab-separated fields
        set datafile separator "\t"
 
        # Input file contains comma-separated values fields
-       set datafile separator ","
+       set datafile separator comma
 4 set datafile commentschars
 ?set datafile commentschars
 ?commentschars
