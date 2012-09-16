@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.2.2.2 2012/01/14 08:01:15 markisch Exp $
+# $Id: Makefile,v 1.2.2.3 2012/06/13 11:01:51 markisch Exp $
 #
 # GNUPLOT Makefile Microsoft Visual C++ 2005 or newer
 
@@ -41,7 +41,7 @@
 
 # Compilation options, disable by setting to zero
 # Is libgd available? (required by terminal png/jpeg/gif)?
-GDLIB = 0
+GDLIB = 1
 # Is pdflib available? (required by terminal pdf)
 PDFLIB = 0
 # Build wxt terminal? (required GTK, wxWidgets, cairo and pango libraries)
@@ -49,7 +49,7 @@ PDFLIB = 0
 #     http://wiki.wxwidgets.org/Visual_Studio_2008_%289.0%29
 WXT = 0
 # Build the lua/tikz terminal?
-LUA = 0
+LUA = 1
 # Choose help format:
 # for HTML help (.chm) this should be 1, for (.hlp) it should be 0
 HTML_HELP = 1
@@ -121,6 +121,7 @@ TERMFLAGS = $(TERMFLAGS) /I$(PDFDIR)\pdflib
 WXTLIBS = glib-2.0.lib gobject-2.0.lib gmodule-2.0.lib \
 	cairo.lib pango-1.0.lib pangocairo-1.0.lib \
 	wxmsw28.lib wxtiff.lib
+CFLAGS = $(CFLAGS) -DWXWIDGETS
 !ENDIF
 
 !IF "$(LUA)" == "1"
@@ -389,4 +390,4 @@ install:
 
 zip:
 	$(MAKE) DESTDIR=.\gnuplot install
-	zip -mro9 gp460-msvc-win32.zip gnuplot
+	zip -mro9 gp461-msvc-win32.zip gnuplot

@@ -1,5 +1,5 @@
 # Hello, emacs: this is a -*- Makefile -*-
-# $Id: Makefile,v 1.14.2.8 2012/03/02 20:00:04 sfeam Exp $
+# $Id: Makefile,v 1.14.2.9 2012/06/13 11:01:51 markisch Exp $
 #
 # GNUPLOT Makefile for MinGW/MSYS on Windows
 # This assumes usual installation of the MinGW32 toolkit, the free
@@ -836,4 +836,4 @@ installer:
 
 zip:
 	$(MAKE) DESTDIR=./gnuplot install
-	zip -mro9 gp460-win32.zip gnuplot
+	zip -mro9 gp461-win32.zip gnuplot
