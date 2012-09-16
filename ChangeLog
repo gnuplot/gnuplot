@@ -11,6 +11,8 @@
 	Allow zooming of plots that originally had an explicit range in the
 	plot command.
 
+	* src/set.c (set_label):  Simplify label parsing.
+
 2012-09-13  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/PostScript/prologue.ps term/post.trm:

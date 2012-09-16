@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.375 2012/09/17 03:00:18 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.376 2012/09/17 03:03:33 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -2087,43 +2087,23 @@ set_label()
     struct text_label *new_label = NULL;
     struct text_label *prev_label = NULL;
     struct value a;
-    int tag;
+    int save_token;
+    int tag = -1;
 
     c_token++;
+    if (END_OF_COMMAND)
+	return;
 
-    /* get tag */
-    if (!END_OF_COMMAND
-	/* FIXME - Are these tests really still needed? */
-	&& !isstringvalue(c_token)
-	&& !equals(c_token, "at")
-	&& !equals(c_token, "left")
-	&& !equals(c_token, "center")
-	&& !equals(c_token, "centre")
-	&& !equals(c_token, "right")
-	&& !equals(c_token, "front")
-	&& !equals(c_token, "back")
-	&& !almost_equals(c_token, "rot$ate")
-	&& !almost_equals(c_token, "norot$ate")
-	&& !equals(c_token, "lt")
-	&& !almost_equals(c_token, "linet$ype")
-	&& !equals(c_token, "pt")
-	&& !almost_equals(c_token, "pointt$ype")
-	&& !equals(c_token, "tc")
-	&& !almost_equals(c_token, "text$color")
-	&& !equals(c_token, "font")) {
-
-	/* must be an expression, but is it a tag or is it the label itself? */
-	int save_token = c_token;
-	const_express(&a);
-	if (a.type == STRING) {
-	    c_token = save_token;
-	    tag = assign_label_tag();
-	    gpfree_string(&a);
-	} else
-	    tag = (int) real(&a);
-
-    } else
-	tag = assign_label_tag();	/* default next tag */
+    /* The first item must be either a tag or the label text */
+    save_token = c_token;
+    const_express(&a);
+    if (a.type == STRING) {
+	c_token = save_token;
+	tag = assign_label_tag();
+	gpfree_string(&a);
+    } else {
+	tag = (int) real(&a);
+    }
 
     if (tag <= 0)
 	int_error(c_token, "tag must be > zero");
