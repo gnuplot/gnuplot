@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.272 2012/08/27 20:23:21 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.273 2012/08/30 16:12:30 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -217,6 +217,13 @@ plotrequest()
     AXIS_INIT2D(T_AXIS, 0);
     AXIS_INIT2D(POLAR_AXIS, 1);
     AXIS_INIT2D(COLOR_AXIS, 1);
+
+    /* If we are called from a mouse zoom operation we should ignore	*/
+    /* any range limitations because otherwise the zoom won't zoom.	*/
+    if (inside_zoom) {
+	while (equals(c_token,"["))
+	    parse_skip_range();
+    }
 
     t_axis = (parametric || polar) ? T_AXIS : FIRST_X_AXIS;
 

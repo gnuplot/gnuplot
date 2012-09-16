@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.104 2012/08/05 19:24:53 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.105 2012/08/24 21:08:14 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -147,6 +147,9 @@ TBOOLEAN raxis = TRUE;
 
 /* Length of the longest tics label, set by widest_tic_callback(): */
 int widest_tic_strlen;
+
+/* flag to indicate that in-line axis ranges should be ignored */
+TBOOLEAN inside_zoom;
 
 /* axes being used by the current plot */
 /* These are mainly convenience variables, replacing separate copies of
@@ -2018,6 +2021,17 @@ parse_named_range(AXIS_INDEX axis, int dummy)
 
     return dummy_token;
 }
+
+/* Called if an in-line range is encountered while inside a zoom command */
+void
+parse_skip_range()
+{
+    while (!equals(c_token++,"]"))
+	if (END_OF_COMMAND)
+	    break;
+    return;
+}
+
 /*
  * When a secondary axis is linked to the corresponding primary axis,
  * this routine copies the relevant range/scale data

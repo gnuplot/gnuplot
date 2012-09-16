@@ -7,6 +7,10 @@
 	terminal (vgagl).  Make the corresponding toggle a terminal-specific
 	flag rather than a global variable.  Clean up terminal flags.
 
+	* src/axis.c src/axis.h src/mouse.c src/plot2d.c src/util.c:
+	Allow zooming of plots that originally had an explicit range in the
+	plot command.
+
 2012-09-13  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/PostScript/prologue.ps term/post.trm:

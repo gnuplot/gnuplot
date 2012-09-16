@@ -1,5 +1,5 @@
 /*
- * $Id: axis.h,v 1.76 2012/08/30 16:12:30 sfeam Exp $
+ * $Id: axis.h,v 1.77 2012/09/13 20:14:16 sfeam Exp $
  *
  */
 
@@ -346,6 +346,9 @@ extern double polar_grid_angle; /* angle step in polar grid in radians */
 /* Length of the longest tics label, set by widest_tic_callback(): */
 extern int widest_tic_strlen;
 
+/* flag to indicate that in-line axis ranges should be ignored */
+extern TBOOLEAN inside_zoom;
+
 /* axes being used by the current plot */
 extern AXIS_INDEX x_axis, y_axis, z_axis;
 /* macros to reduce code clutter caused by the array notation, mainly
@@ -656,6 +659,7 @@ void set_writeback_max __PROTO((AXIS_INDEX));
 void save_writeback_all_axes __PROTO((void));
 void parse_range __PROTO((AXIS_INDEX axis));
 int  parse_named_range __PROTO((AXIS_INDEX axis, int token));
+void parse_skip_range __PROTO((void));
 void check_axis_reversed __PROTO((AXIS_INDEX axis));
 
 /* set widest_tic_label: length of the longest tics label */

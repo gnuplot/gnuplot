@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: mouse.c,v 1.137 2012/04/17 22:42:53 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: mouse.c,v 1.138 2012/08/05 19:24:53 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - mouse.c */
@@ -702,9 +702,12 @@ apply_zoom(struct t_zoom *z)
 	}
 #endif
 
+    } else {
+	inside_zoom = TRUE;
     }
 
     do_string_replot(s);
+    inside_zoom = FALSE;
 }
 
 
