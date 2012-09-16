@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.401 2012/08/25 05:21:32 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.402 2012/09/11 22:44:17 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -2422,35 +2422,30 @@ plot_filledcurves(struct curve_points *plot)
     }
 
     /* clip the "at" coordinate to the drawing area */
-#define MYNOMIN(x,ax) if (x<axis_array[ax].min) x=axis_array[ax].min;
-#define MYNOMAX(x,ax) if (x>axis_array[ax].max) x=axis_array[ax].max;
-    /* FIXME HBB 20030127: replace by cliptorange()!? */
     switch (plot->filledcurves_options.closeto) {
 	case FILLEDCURVES_ATX1:
-	    MYNOMIN(plot->filledcurves_options.at,FIRST_X_AXIS);
-	    MYNOMAX(plot->filledcurves_options.at,FIRST_X_AXIS);
+	    cliptorange(plot->filledcurves_options.at,
+			axis_array[FIRST_X_AXIS].min, axis_array[FIRST_X_AXIS].max);
 	    break;
 	case FILLEDCURVES_ATX2:
-	    MYNOMIN(plot->filledcurves_options.at,SECOND_X_AXIS);
-	    MYNOMAX(plot->filledcurves_options.at,SECOND_X_AXIS);
+	    cliptorange(plot->filledcurves_options.at,
+			axis_array[SECOND_X_AXIS].min, axis_array[SECOND_X_AXIS].max);
 	    break;
 	case FILLEDCURVES_ATY1:
-	    MYNOMIN(plot->filledcurves_options.at,FIRST_Y_AXIS);
-	    MYNOMAX(plot->filledcurves_options.at,FIRST_Y_AXIS);
+	    cliptorange(plot->filledcurves_options.at,
+			axis_array[FIRST_Y_AXIS].min, axis_array[FIRST_Y_AXIS].max);
 	    break;
 	case FILLEDCURVES_ATY2:
-	    MYNOMIN(plot->filledcurves_options.at,SECOND_Y_AXIS);
-	    MYNOMAX(plot->filledcurves_options.at,SECOND_Y_AXIS);
+	    cliptorange(plot->filledcurves_options.at,
+			axis_array[SECOND_Y_AXIS].min, axis_array[SECOND_Y_AXIS].max);
 	    break;
 	case FILLEDCURVES_ATXY:
-	    MYNOMIN(plot->filledcurves_options.at,FIRST_X_AXIS);
-	    MYNOMAX(plot->filledcurves_options.at,FIRST_X_AXIS);
-	    MYNOMIN(plot->filledcurves_options.aty,FIRST_Y_AXIS);
-	    MYNOMAX(plot->filledcurves_options.aty,FIRST_Y_AXIS);
+	    cliptorange(plot->filledcurves_options.at,
+			axis_array[FIRST_X_AXIS].min, axis_array[FIRST_X_AXIS].max);
+	    cliptorange(plot->filledcurves_options.aty,
+			axis_array[FIRST_Y_AXIS].min, axis_array[FIRST_Y_AXIS].max);
 	    break;
     }
-#undef MYNOMIN
-#undef MYNOMAX
 
     for (i = 0; i < plot->p_count; i++) {
 	if (points+2 >= corners_allocated) { /* there are 2 side points */

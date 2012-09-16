@@ -13,6 +13,9 @@
 
 	* src/set.c (set_label):  Simplify label parsing.
 
+	* src/graphics.c (plot_filledcurves):  Use cliptorange() instead of
+	simpler range check, since it handles reversed axes correctly.
+
 2012-09-13  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/PostScript/prologue.ps term/post.trm:
