@@ -1,7 +1,7 @@
-# $Id: README-Windows-ja.txt,v 1.1 2011/12/23 13:19:11 markisch Exp $
+# $Id: README-Windows-ja.txt,v 1.1.2.2 2012/01/14 08:16:17 markisch Exp $
 # README.Windows (installer 付属) の訳
 
-gnuplot バージョン 4.6 パッチレベル 0 -- Windows 用バイナリ配付
+gnuplot バージョン 4.6 パッチレベル 1 -- Windows 用バイナリ配付
 =======================================================================
 
 gnuplot は、コマンド入力方式の対話機能のグラフユーティリティで、Linux,
@@ -215,4 +215,4 @@ gnuplot version 4.6 では、メニューとヘルプファイルの地域対応をサポート
 
 --------------------------------------------------------------------------------
 
-The gnuplot team, November 2011
+The gnuplot team, September 2012
