@@ -342,16 +342,16 @@
     (if (fboundp 'defface)
         nil
       (defmacro defface (var values doc &rest args)
-        (` (progn
+        `(progn
              (defvar (, var) (quote (, var)))
              ;; To make colors for your faces you need to set your .Xdefaults
              ;; or set them up ahead of time in your .emacs file.
              (make-face (, var))
-             ))))
+             )))
     (if (fboundp 'defcustom)
         nil
       (defmacro defcustom (var value doc &rest args)
-        (` (defvar (, var) (, value) (, doc)))))))
+        `(defvar (, var) (, value) (, doc))))))
 
 ;; (eval-and-compile
 ;;   (condition-case ()
