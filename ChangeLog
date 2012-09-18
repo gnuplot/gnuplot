@@ -3,6 +3,13 @@
 	* lisp/gnuplot.el: elisp is now getting serious about a syntax change
 	announced 10+ years ago.   s/(` (/`(/
 
+	* lisp/configure.in lisp/Makefile.am:  The autoconfigure scripting for
+	the lisp directory is failing when $(EMACS) is redefined by the user.
+	But the failure is only relevant to testing/patching info-look.el for
+	very old versions of emacs.  Deal with it by simply assuming that
+	everyone has an emacs version newer than 20.3 and therefore no patching
+	is needed.
+
 	* src/graphics.c:  Incorrect default layout of rotated xtic labels.
 	Bug #3568817
 

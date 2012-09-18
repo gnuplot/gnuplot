@@ -41,62 +41,10 @@ AC_ARG_WITH(lisp-files,dnl
 if test ! -f ./gnuplot.el ; then
   # all except dot.el
   AC_MSG_RESULT([Compiling outside source directory - copying needed .el files])
-  cp ${srcdir}/gnuplot.el ${srcdir}/gnuplot-gui.el ${srcdir}/info-look.20.2.el \
-     ${srcdir}/info-look.20.3.el .
+  cp ${srcdir}/gnuplot.el ${srcdir}/gnuplot-gui.el .
   cp ${srcdir}/gpelcard.tex .
 fi
 
-INFO_LOOK_ELC=info-look.elc
-dnl
-dnl There are many possibilities for info-look:
-dnl
-dnl     EMACS version            use
-dnl  -----------------------------------------
-dnl   Emacs or XEmacs 19    info-look.20.2.el
-dnl   Emacs 20.2 or less    info-look.20.2.el
-dnl   Emacs 20.3            nothing
-dnl   XEmacs 20+            info-look.20.3.el
-dnl
-dnl want to use my modified version even if 20.2 is installed because a
-dnl bug is fixed
-dnl
-dnl the first 6 lines attempt to ascertain the version number of
-dnl $(EMACS), then multiply by 100 to convert it to an integer for the
-dnl sake of the integer comparisons in the following lines.  Is this a
-dnl hassle, or what?!
-dnl
-AC_MSG_CHECKING([for emacs version])
-if test "$EMACS" = no; then
-  emacs_version="none found"
-else
-  emacs_version=`$EMACS --version |sed 's/^GNU //' |awk '/Emacs [[12]]/{print $2}'`
-fi
-AC_MSG_RESULT([$emacs_version])
-vnum=`echo $emacs_version |awk -F\. '{print 100*$1+$2}'`
-
-AC_MSG_CHECKING([whether info-look.el is needed])
-if test "$EMACS" = emacs ; then
-  if test "$vnum" -ge 2030 ; then
-    info_look="not needed with emacs $emacs_version"
-    INFO_LOOK_ELC=
-  else
-    info_look="using info-look.20.2.el"
-    cp info-look.20.2.el info-look.el
-  fi
-elif test "$EMACS" = xemacs ; then
-  if test "$vnum" -ge 2000 ; then
-    info_look="using info-look.20.3.el"
-    cp info-look.20.3.el info-look.el
-  else
-    info_look="using info-look.20.2.el"
-    cp info-look.20.2.el info-look.el
-  fi
-else
-  info_look="using none"
-fi
-AC_MSG_RESULT([$info_look])
-
-AC_SUBST(INFO_LOOK_ELC)
 AC_SUBST(LISPFILES)
 AC_SUBST(INSTALL_LISP)
 
