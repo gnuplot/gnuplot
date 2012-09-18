@@ -3,6 +3,9 @@
 	* lisp/gnuplot.el: elisp is now getting serious about a syntax change
 	announced 10+ years ago.   s/(` (/`(/
 
+	* src/graphics.c:  Incorrect default layout of rotated xtic labels.
+	Bug #3568817
+
 2012-09-13  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/PostScript/prologue.ps term/post.trm:
