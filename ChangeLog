@@ -1,3 +1,8 @@
+2012-09-18  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/graphics.c:  Incorrect default layout of rotated xtic labels.
+	Bug #3568817
+
 2012-09-16  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/set.c: set datafile separator {whitespace|tab|comma|"<char>"}

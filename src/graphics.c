@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.402 2012/09/11 22:44:17 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.403 2012/09/17 06:02:53 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -1028,8 +1028,6 @@ boundary(struct curve_points *plots, int count)
 	    projection = -sin((double)axis_array[FIRST_X_AXIS].tic_rotate*DEG2RAD);
 	if (axis_array[FIRST_X_AXIS].label.pos == RIGHT)
 	    projection *= -1;
-	else if (axis_array[FIRST_X_AXIS].label.pos == CENTRE)
-	    projection = 0.5*fabs(projection);
 	widest_tic_strlen = 0;		/* reset the global variable ... */
 	gen_tics(FIRST_X_AXIS, /* 0, */ widest_tic_callback);
 
