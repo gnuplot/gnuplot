@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.253.2.4 2012/07/03 04:39:55 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.253.2.5 2012/08/22 20:48:15 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -848,9 +848,9 @@ do_3dplot(
 	key_size_right = t->h_char + key_sample_width;
     }
     key_point_offset = (key_sample_left + key_sample_right) / 2;
+    xl = key_size_left; /* FIXME: not correct, but otherwise some code paths fail to initialize it! */
 
-    if (key->visible)
-    if (key->region != GPKEY_USER_PLACEMENT) {
+    if (key->visible && (key->region != GPKEY_USER_PLACEMENT)) {
 	if (key->region != GPKEY_AUTO_INTERIOR_LRTBC && key->margin == GPKEY_BMARGIN) {
 	    /* HBB 19990608: why calculate these again? boundary3d has already
 	     * done it... */
