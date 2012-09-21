@@ -71,7 +71,7 @@ TERM_H = $(top_srcdir)/src/term.h
 
 DOCHEADERS = doc2x.h xref.h
 
-EXTRA_DIST = Makefile.in doc2texi.el gnuplot.doc gnuplot.texi gpcard.tex	\
+EXTRA_DIST = Makefile.in doc2texi.el gnuplot.doc gpcard.tex	\
 makefile.dst titlepag.ipf titlepag.ms titlepag.tex	\
 toc_entr.sty psdoc faq-ja.tex gnuplot-ja.doc README.ja	\
 term-ja.diff plotstyles.gnu pdffigures.tex gnuplot.pdf windows
@@ -84,7 +84,7 @@ gnuplot.ms doc2rnh gnuplot.rnh doc2rtf gnuplot.rtf gnuplot.nroff	\
 checkdoc gnuplot.txt gnuplot.tmp VERSION gnuplot.4tc gnuplot.4ct	\
 gnuplot.idv gnuplot.xref gnuplot.lg figure*.pdf pdffigures.*		\
 wxhelp/*.html wxhelp/wgnuplot.htc windows/wgnuplot.htk gnuplot.pdf	\
-gnuplot.htb gnuplot-eldoc.el gnuplot-eldoc.elc
+gnuplot.htb gnuplot.texi gnuplot-eldoc.el gnuplot-eldoc.elc
 
 DISTFILES = $(DIST_COMMON) $(SOURCES) $(DOCHEADERS) $(EXTRA_DIST)
 
@@ -295,9 +295,7 @@ info: gnuplot.info
 gnuplot.texi: $(srcdir)/doc2texi.el $(srcdir)/gnuplot.doc
 	@echo "Creating texinfo and eldoc strings file"
 	@if test "$(EMACS)" != no; then \
-	   if test "$(srcdir)" != "$(builddir)" ; then \
-	     cp $(srcdir)/gnuplot.doc . ; \
-	   fi ; \
+	   test "$(top_srcdir)" = "$(top_builddir)" || cp $(srcdir)/gnuplot.doc . ; \
 	   $(EMACS) -batch -l $(srcdir)/doc2texi.el -f d2t-doc-to-texi ; \
 	   echo "Compiling gnuplot-eldoc.el" ; \
 	   $(EMACS) -batch --eval='(byte-compile-file "gnuplot-eldoc.el")' ; \

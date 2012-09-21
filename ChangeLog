@@ -1,6 +1,7 @@
 2012-09-21  Ethan A Merritt  <merritt@u.washington.edu>
 
-	* docs/Makefile.am lisp/Makefile.am:  Fix breakage in "make distcheck".
+	* docs/Makefile.am lisp/Makefile.am lisp/configure.in:
+	Fix breakage in "make distcheck".
 
 2012-09-18  Ethan A Merritt  <merritt@u.washington.edu>
 
