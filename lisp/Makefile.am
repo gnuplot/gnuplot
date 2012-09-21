@@ -3,7 +3,7 @@ AUTOMAKE_OPTIONS = foreign
 
 ELS = gnuplot-gui.el gnuplot.el
 ELCS = gnuplot.elc gnuplot-gui.elc
-EXTRA_DIST = README.1st dot.el dotemacs gnuplot.el.old gpelcard.dvi gpelcard.pdf gpelcard.ps gpelcard.tex $(ELS)
+EXTRA_DIST = dot.el dotemacs gpelcard.dvi gpelcard.pdf gpelcard.ps gpelcard.tex $(ELS)
 
 CLEANFILES = $(ELCS) gpelcard.pdf gpelcard.ps gpelcard.dvi gpelcard.log gpelcard.aux
 DISTCLEANFILES = 

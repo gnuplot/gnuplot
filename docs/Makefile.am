@@ -71,7 +71,7 @@ TERM_H = $(top_srcdir)/src/term.h
 
 DOCHEADERS = doc2x.h xref.h
 
-EXTRA_DIST = doc2texi.el gnuplot.doc gnuplot.texi gpcard.tex	\
+EXTRA_DIST = Makefile.in doc2texi.el gnuplot.doc gnuplot.texi gpcard.tex	\
 makefile.dst titlepag.ipf titlepag.ms titlepag.tex	\
 toc_entr.sty psdoc faq-ja.tex gnuplot-ja.doc README.ja	\
 term-ja.diff plotstyles.gnu pdffigures.tex gnuplot.pdf windows
@@ -173,10 +173,14 @@ pdffigures.tex:	figures gnuplot.pdf
 	echo "" > pdffigures.tex
 
 figures: doc2tex$(EXEEXT) $(srcdir)/gnuplot.doc
-	GNUPLOT_LIB=$(top_srcdir)/demo ../src/gnuplot $(srcdir)/plotstyles.gnu
-	./doc2tex$(EXEEXT) -figures $(srcdir)/gnuplot.doc gnuplot.tex
-	echo "\usepackage{graphicx}" > pdffigures.tex
-	echo "\usepackage{picins}" >> pdffigures.tex
+	@if [ -a $(top_srcdir)/src/gnuplot ] ; then \
+	  GNUPLOT_LIB=$(top_srcdir)/demo ../src/gnuplot $(srcdir)/plotstyles.gnu ; \
+	  ./doc2tex$(EXEEXT) -figures $(srcdir)/gnuplot.doc gnuplot.tex ; \
+	  echo "\usepackage{graphicx}" > pdffigures.tex ; \
+	  echo "\usepackage{picins}" >> pdffigures.tex ; \
+	else \
+	  echo gnuplot executable not found - cannot regenerate manual figures ; \
+	fi
 
 pdf: gnuplot.pdf
 

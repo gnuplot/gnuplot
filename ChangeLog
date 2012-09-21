@@ -1,3 +1,7 @@
+2012-09-21  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* docs/Makefile.am:  Fix breakage in "make distcheck".
+
 2012-09-18  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c:  Incorrect default layout of rotated xtic labels.
