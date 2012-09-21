@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.376 2012/09/17 03:03:33 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.377 2012/09/17 03:07:00 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -2096,13 +2096,17 @@ set_label()
 
     /* The first item must be either a tag or the label text */
     save_token = c_token;
-    const_express(&a);
-    if (a.type == STRING) {
-	c_token = save_token;
+    if (isletter(c_token) && type_udv(c_token) == 0) {
 	tag = assign_label_tag();
-	gpfree_string(&a);
     } else {
-	tag = (int) real(&a);
+	const_express(&a);
+	if (a.type == STRING) {
+	    c_token = save_token;
+	    tag = assign_label_tag();
+	    gpfree_string(&a);
+	} else {
+	    tag = (int) real(&a);
+	}
     }
 
     if (tag <= 0)
