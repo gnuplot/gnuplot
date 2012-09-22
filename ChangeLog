@@ -1,3 +1,8 @@
+2012-09-22  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* lisp/configure.in docs/Makefile.in:
+	Backport emacs+info build configuration from 4.7
+
 2012-09-20  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graph3d.c: valgrind found a code path in which the key placement

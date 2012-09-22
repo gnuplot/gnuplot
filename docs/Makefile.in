@@ -258,11 +258,16 @@ pdffigures.tex:	figures gnuplot.pdf
 	rm -f gnuplot.tex
 	echo "" > pdffigures.tex
 
-figures: doc2tex
-	GNUPLOT_LIB=$(top_srcdir)/demo ../src/gnuplot $(srcdir)/plotstyles.gnu
-	./doc2tex -figures $(srcdir)/gnuplot.doc gnuplot.tex
-	echo "\usepackage{graphicx}" > pdffigures.tex
-	echo "\usepackage{picins}" >> pdffigures.tex
+figures: doc2tex$(EXEEXT) $(srcdir)/gnuplot.doc
+	@if [ -a $(top_srcdir)/src/gnuplot ] ; then \
+	  GNUPLOT_LIB=$(top_srcdir)/demo ../src/gnuplot $(srcdir)/plotstyles.gnu ; \
+	  ./doc2tex$(EXEEXT) -figures $(srcdir)/gnuplot.doc gnuplot.tex ; \
+	  echo "\usepackage{graphicx}" > pdffigures.tex ; \
+	  echo "\usepackage{picins}" >> pdffigures.tex ; \
+	else \
+	  echo gnuplot executable not found - cannot regenerate manual figures ; \
+	  touch gnuplot.pdf ; \
+	fi
 
 pdf: gnuplot.pdf
 
@@ -388,17 +393,17 @@ gnuplot.info: $(srcdir)/gnuplot.texi
 	$(MAKEINFO) -I$(srcdir) $(srcdir)/gnuplot.texi --no-split --output=$@
 
 # Thanks to Bruce Ravel for doc2texi.el!
-$(srcdir)/gnuplot.texi $(srcdir)/gnuplot-eldoc.el $(srcdir)/gnuplot-eldoc.elc: $(srcdir)/doc2texi.el $(srcdir)/gnuplot.doc
+gnuplot.texi $(srcdir)/gnuplot-eldoc.el $(srcdir)/gnuplot-eldoc.elc: $(srcdir)/doc2texi.el $(srcdir)/gnuplot.doc
 	@echo "Creating texinfo and eldoc strings file"
 	@if test "$(EMACS)" != no; then \
-	   cd $(srcdir) ;  \
-	   $(EMACS) -batch -l doc2texi.el -f d2t-doc-to-texi ; \
+	   @test "$(top_srcdir)" = "$(top_builddir)" || echo "COPYING GNUPLOT.DOC" ; \
+	   @test "$(top_srcdir)" = "$(top_builddir)" || cp $(srcdir)/gnuplot.doc . ; \
+	   $(EMACS) -batch -l $(srcdir)/doc2texi.el -f d2t-doc-to-texi ; \
 	   echo "Compiling gnuplot-eldoc.el" ; \
 	   $(EMACS) -batch --eval='(byte-compile-file "gnuplot-eldoc.el")' ; \
 	else \
 	   echo "No emacs found - cannot create texinfo file" ; \
 	fi
-
 
 
 # this is how to make OS/2 ipfc documentation
@@ -545,6 +550,7 @@ mostlyclean: clean
 
 distclean: clean
 	-rm -f Makefile
+	@test "$(top_srcdir)" = "$(top_builddir)" || rm -f ./gnuplot.doc
 
 realclean: distclean
 	-rm -f TAGS
