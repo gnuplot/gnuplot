@@ -1,4 +1,4 @@
-# Makefile.in for GNUPLOT documentation
+# Makefile.am for GNUPLOT documentation directory
 # based on Makefile.in as of 20-may-2012
 #
 # Note that the master file for generating documentation is gnuplot.doc.
