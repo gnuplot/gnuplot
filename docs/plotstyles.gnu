@@ -221,15 +221,15 @@ set title "Columnstacked" offset 0,-1
 set boxwidth 0.8 rel
 set xtics
 
-set style line 1 lt rgb "gray0"
-set style line 2 lt rgb "white"
-set style line 3 lt rgb "gray40"
-set style line 4 lt rgb "gray70"
-set style increment user
+set linetype 11 lc rgb "gray0"
+set linetype 12 lc rgb "white"
+set linetype 13 lc rgb "gray40"
+set linetype 14 lc rgb "gray70"
 set style fill solid 1.0 border -1
 
-plot demo . 'histopt.dat' using 1 ti col lt 1, '' using 2 ti col fs solid lt 1
-set style increment system
+plot newhistogram lt 11, \
+     'histopt.dat' using 1 title column, \
+     '' using 2 title column
 #
 # Circles
 #

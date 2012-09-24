@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.403 2012/09/17 06:02:53 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.404 2012/09/19 00:22:15 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -3584,7 +3584,7 @@ plot_boxes(struct curve_points *plot, int xaxis_y)
 			    apply_pm3dcolor(&ls.pm3d_color, term);
 			} else {
 			    struct lp_style_type ls;
-			    load_linetype(&ls, i+1);
+			    load_linetype(&ls, histogram_linetype);
 			    apply_pm3dcolor(&ls.pm3d_color, term);
 			}
 			plot->fill_properties.fillpattern = histogram_linetype;

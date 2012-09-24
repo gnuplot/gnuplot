@@ -5,6 +5,7 @@ set border 0
 unset xtics
 unset ytics
 unset ztics
+set view equal xyz
 
 splot 'GM1_sugar.pdb' using 6:7:8 with points lt 3 pt 7 ps 3 notitle, \
       'GM1_bonds.r3d' using 1:2:3:($5-$1):($6-$2):($7-$3) with vectors nohead lw 3 lt 1 \

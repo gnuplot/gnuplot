@@ -1,3 +1,12 @@
+2012-09-24  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* demo/molecule.dem demo/datastrings.dem:  Remove old labelplot demo
+	because it failed to show properly scaled xyz;  instead add equal xyz
+	to molecule demo.
+
+	* src/graphics.c docs/plotstyles.gnu:  Fix bug preventing explicit
+	assignment of color sequence in stacked histograms.
+
 2012-09-21  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* docs/Makefile.am lisp/Makefile.am lisp/configure.in:
