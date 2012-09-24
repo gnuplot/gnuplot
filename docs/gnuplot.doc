@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.748 2012/09/14 20:54:04 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.749 2012/09/17 03:00:18 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -501,7 +501,7 @@ C
 
    plot for [i=2:6] 'datafile' using i title "Results for ".columnhead(i)
 
- See `set style labels`, `using xticlabels`, `plot title`, `using`.
+ See `labels`, `using xticlabels`, `plot title`, `using`.
 2 Enhanced text mode
 ?enhanced text
 ?enhanced
@@ -5139,7 +5139,7 @@ Ffigure_mapcontours
  can select one data point from the record). Records beginning with `#`
  (and also with `!` on VMS) will be treated as comments and ignored.
  Each data point represents an (x,y) pair. For `plot`s with error bars or
- error bars with lines (see `set style errorbars` or `set style errorlines`),
+ error bars with lines (see `errorbars` or `errorlines`),
  each data point is (x,y,ydelta), (x,y,ylow,yhigh),
  (x,y,xdelta), (x,y,xlow,xhigh), or (x,y,xlow,xhigh,ylow,yhigh).
 
