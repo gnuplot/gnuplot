@@ -1,3 +1,8 @@
+2012-09-25  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/graphics.c: Fix bug preventing explicit assignment of color
+	sequence in stacked histograms.
+
 2012-09-22  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* lisp/configure.in docs/Makefile.in:
