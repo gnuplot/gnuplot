@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: mouse.c,v 1.138 2012/08/05 19:24:53 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: mouse.c,v 1.139 2012/09/17 03:05:43 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - mouse.c */
@@ -2015,6 +2015,7 @@ event_reset(struct gp_event_t *ge)
     }
 }
 
+
 void
 do_event(struct gp_event_t *ge)
 {
@@ -2074,12 +2075,46 @@ do_event(struct gp_event_t *ge)
 	event_reset(ge);
 	break;
     case GE_fontprops:
+#ifdef X11
+	/* Cached sizing values for the x11 terminal. Each time an X11 window is
+	   resized, these are updated with the new sizes. When a replot happens some
+	   time later, these saved values are used. The normal mechanism for doing this
+	   is sending a QG from inboard to outboard driver, then the outboard driver
+	   responds with the sizing info in a GE_fontprops event. The problem is that if
+	   we're in a "pause" command, this communication would use the channel in a
+	   re-entrant way, resulting in everything breaking.
+	*/
+	/* If mx < 0, we simply save the values for future use, and move on */
+	if (ge->mx < 0) {
+	    /* These are declared in ../term/x11.trm */
+	    extern int          h_char_saved, v_char_saved;
+	    extern unsigned int h_tic_saved,  v_tic_saved;
+	    extern double       ymax_saved;
+
+	    ge->mx *= -1;
+	    h_char_saved = ge->par1;
+	    v_char_saved = ge->par2;
+	    h_tic_saved	= (unsigned int) (v_char_saved/2.5);
+	    v_tic_saved	= (unsigned int) (v_char_saved/2.5);
+	    ymax_saved	= (double)term->xmax * (double)ge->my / (double)ge->mx;
+	    break;
+	}
+#endif
+
 	term->h_char = ge->par1;
 	term->v_char = ge->par2;
-	/* Update aspect ratio based on current window size */
-	term->v_tic = term->h_tic * (double)ge->mx / (double)ge->my;
-	/* EAM FIXME - We could also update term->xmax and term->ymax here, */
-	/*             but the existing code doesn't expect it to change.   */
+
+#ifdef X11
+	/* X11 terminal only: aspect ratio controlled by inboard terminal driver. */
+	if (!strcmp(term->name,"x11")) {
+	    term->h_tic = (unsigned int) (term->v_char/2.5);
+	    term->v_tic = (unsigned int) (term->v_char/2.5);
+	    term->ymax  = (double)term->xmax * (double)ge->my / (double)ge->mx;
+	} else 
+#endif
+	/* Other terminals update aspect ratio based on current window size */
+	    term->v_tic = term->h_tic * (double)ge->mx / (double)ge->my;
+
 	FPRINTF((stderr, "mouse do_event: window size %d X %d, font hchar %d vchar %d\n",
 		ge->mx, ge->my, ge->par1,ge->par2));
 	break;

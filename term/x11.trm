@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: x11.trm,v 1.193 2011/10/08 00:07:41 sfeam Exp $
+ * $Id: x11.trm,v 1.194 2011/12/12 00:28:47 broeker Exp $
  *
  */
 
@@ -170,6 +170,7 @@ static struct x11opt {
     { "-selectionTimeout", hasArg}, { "-title", hasArg},
     { "-xnllanguage", hasArg}, { "-xrm", hasArg},
     { "-raise", hasNoArg}, { "-noraise", hasNoArg},
+    { "-replotonresize", hasNoArg}, { "-noreplotonresize", hasNoArg},
     { "-solid", hasNoArg}, { "-dashed", hasNoArg}
 #ifdef USE_MOUSE
     , { "-nofeedback", hasNoArg}
@@ -213,6 +214,7 @@ static char *X11_full_command_path = NULL;
 /* must match the definition in src/gplt_x11.c: */
 static int persist = UNSET;
 static int do_raise = UNSET;
+static int replot_on_resize = UNSET;
 static int dashedlines = UNSET;
 static int ctrlq = UNSET;
 static int set_size = UNSET;
@@ -361,6 +363,8 @@ enum X11_id {
     X11_NOPERSIST,
     X11_RAISE,
     X11_NORAISE,
+    X11_REPLOTONRESIZE,
+    X11_NOREPLOTONRESIZE,
     X11_FONT,
     X11_TITLE,
     X11_ENHANCED,
@@ -386,6 +390,8 @@ static struct gen_table X11_opts[] = {
     {"noper$sist", X11_NOPERSIST},
     {"rai$se", X11_RAISE},
     {"norai$se", X11_NORAISE},
+    {"rep$lotonresize", X11_REPLOTONRESIZE},
+    {"norep$lotonresize", X11_NOREPLOTONRESIZE},
     {"font",   X11_FONT},
     {"fn$ame", X11_FONT},
     {"ti$tle", X11_TITLE},
@@ -418,6 +424,7 @@ X11_options()
     int background;
     TBOOLEAN duplication = FALSE;
     TBOOLEAN set_reset = FALSE, set_persist = FALSE, set_raise = FALSE, set_font = FALSE;
+    TBOOLEAN set_replotonresize = FALSE;
     TBOOLEAN set_ctrlq = FALSE;
     TBOOLEAN set_title = FALSE, set_number = FALSE, set_close = FALSE, set_solid = FALSE;
 #ifdef EXTERNAL_X11_WINDOW
@@ -426,6 +433,7 @@ X11_options()
 #endif
 
     do_raise = dashedlines = ctrlq = UNSET;
+    replot_on_resize = UNSET;
     set_size = set_position = UNSET;
     persist = persist_cl;	/* previously set from command line */
     strcpy(x11_userbkg,"#RRGGBB");
@@ -495,6 +503,18 @@ X11_options()
 	    c_token++;
 	    if (set_raise) duplication=TRUE;
 	    set_raise = TRUE;
+	    break;
+	case X11_REPLOTONRESIZE:
+	    replot_on_resize = yes;
+	    c_token++;
+	    if (set_replotonresize) duplication=TRUE;
+	    set_replotonresize = TRUE;
+	    break;
+	case X11_NOREPLOTONRESIZE:
+	    replot_on_resize = no;
+	    c_token++;
+	    if (set_replotonresize) duplication=TRUE;
+	    set_replotonresize = TRUE;
 	    break;
 	case X11_FONT:
 	    c_token++;
@@ -649,6 +669,9 @@ X11_options()
     if (UNSET != do_raise) {
 	strcat(term_options, (yes == do_raise ? " raise" : " noraise"));
     }
+    if (UNSET != replot_on_resize) {
+	strcat(term_options, (yes == replot_on_resize ? " replotonresize" : " noreplotonresize"));
+    }
     if (UNSET != persist) {
 	strcat(term_options, (yes == persist ? " persist" : " nopersist"));
     }
@@ -756,9 +779,11 @@ X11_update_opts()
     if (!X11_ipc)
 	return;
 
-    if (UNSET != do_raise || UNSET != persist || UNSET != dashedlines || UNSET != ctrlq) {
-	fprintf(X11_ipc, "X %d %d %d %d\n", 
-		do_raise, persist, dashedlines, ctrlq);
+    if (UNSET != do_raise || UNSET != persist || UNSET != dashedlines ||
+        UNSET != ctrlq || UNSET != replot_on_resize)
+    {
+	fprintf(X11_ipc, "X %d %d %d %d %d\n", 
+		do_raise, persist, dashedlines, ctrlq, replot_on_resize);
 	fflush(X11_ipc);
     }
 
@@ -865,7 +890,12 @@ AGAIN:
 		     * error occurs), so need to reset l first */
 		    l = 0;
 		    do_event(&ge);
-		    if (ge.type == GE_fontprops) {
+
+		    /* I react only to the first GE_fontprops event. Subsequent
+		       GE_fontprops events only save the sizing information for
+		       later. We also can't use the main pipe at that point. The
+		       'pause' command gets confused, for example. */
+		    if (ge.type == GE_fontprops && !default_font_size_known) {
 		    	if (repeat_count > 0) {
 		    	    FPRINTF((stderr,
 			        "X11_waitforinput: caught GE_fontprops after %d tries\n",
@@ -1291,6 +1321,14 @@ X11_reset()
     You lose.
 #endif /* !VMS */
 
+
+/* Cached sizing values for the x11 terminal.
+ * Updated/Maintained in mouse.c 
+ */
+int          h_char_saved, v_char_saved;
+unsigned int h_tic_saved, v_tic_saved;
+double       ymax_saved = -1.0;
+
 /* common stuff, using macros defined above */
 
 TERM_PUBLIC void
@@ -1342,6 +1380,12 @@ X11_graphics()
     /* to gnuplot_x11, then wait for it to return the resulting    */
     /* font size information (v_char and h_char). The feedback is  */
     /* caught by do_event() as an event of type GE_fontprops.      */
+
+    /* Dima Kogan Sep 2012: Above is true when generating the plot THE FIRST
+       TIME. After the first time, the pipe is busy, and not available to send
+       the sizing information. I now save the sizing information every time the
+       window sizes change (in the ..._saved variables). Thus I no longer need
+       to ask for this information NOW, and can just use it. */
     if (ipc_back_fd >= 0 && X11_MOUSE_FEEDBACK) {
 	if (!default_font_size_known) {
 	    IPC_LOCK = TRUE;
@@ -1350,6 +1394,23 @@ X11_graphics()
 	    X11_waitforinput();
 	    default_font_size_known = TRUE;
 	    IPC_LOCK = FALSE;
+	}
+	else
+	{
+	  /* replot. I send a Qg to tell the outboard driver to use the new
+             window sizes. I also use the stored window sizes to update myself
+             (inboard driver) */
+	  PRINT0("Qg\n");
+	  FFLUSH();
+
+	  if( ymax_saved > 0.0 ) /* use saved sizes, if they're valid */
+	  {
+	    term->h_char = h_char_saved;
+	    term->v_char = v_char_saved;
+	    term->h_tic  = h_tic_saved;
+	    term->v_tic  = v_tic_saved;
+	    term->ymax   = ymax_saved;
+	  }
 	}
     }
 #endif
@@ -2134,6 +2195,7 @@ START_HELP(x11)
 "                     {{no}enhanced} {font <fontspec>}",
 "                     {linewidth LW} {solid|dashed}",
 "                     {{no}persist} {{no}raise} {{no}ctrlq}",
+"                     {{no}replotonresize}",
 "                     {close}",
 "                     {size XX,YY} {position XX,YY}",
 "    set terminal x11 {reset}",
@@ -2190,6 +2252,14 @@ START_HELP(x11)
 " the behaviour of an already running driver can be modified.  If the window",
 " does not get raised, see discussion in `raise`.",
 "",
+" The option `replotonresize` (active by default) replots the data when the",
+" plot window is resized. Without this option, the even-aspect-ratio scaling",
+" may result in the plot filling only part of the window after resizing.",
+" With this option, gnuplot does a full replot on each resize event, resulting",
+" in better space utilization. This option is generally desirable, unless the",
+" potentially CPU-intensive replotting during resizing is a concern. Replots",
+" can be manually initiated with hotkey 'e' or the 'replot' command.",
+  "",
 " The option `title \"<title name>\"` will supply the title name of the window",
 " for the current plot window or plot window <n> if a number is given.",
 " Where (or if) this title is shown depends on your X window manager.",

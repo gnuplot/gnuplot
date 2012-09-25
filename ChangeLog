@@ -1,3 +1,11 @@
+2012-09-25  Dima Kogan  <gnuplot@dima.secretsauce.net>
+
+	* src/gplt_x11.c src/mouse.c (do_event) term/x11.trm:
+	Feed back the x11 window size from gnuplot_x11 to gnuplot so that
+	the coordinates can be rescaled to maintain the correct aspect ratio.
+	This allows correct functioning of command like 'set size square' and
+	'set view equal xyz' in an interactive x11 output window.
+
 2012-09-24  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* demo/molecule.dem demo/datastrings.dem:  Remove old labelplot demo

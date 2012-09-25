@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.213 2012/01/19 22:28:35 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.214 2012/03/18 17:30:43 broeker Exp $"); }
 #endif
 
 #define X11_POLYLINE 1
@@ -462,6 +462,7 @@ static void pr_pointsize __PROTO((void));
 static void pr_width __PROTO((void));
 static void pr_window __PROTO((plot_struct *));
 static void pr_raise __PROTO((void));
+static void pr_replotonresize __PROTO((void));
 static void pr_persist __PROTO((void));
 static void pr_feedback __PROTO((void));
 static void pr_ctrlq __PROTO((void));
@@ -557,6 +558,7 @@ static int do_raise = yes, persist = no;
 static TBOOLEAN fast_rotate = TRUE;
 static int feedback = yes;
 static int ctrlq = no;
+static int replot_on_resize = yes;
 static int dashedlines = no;
 #ifdef EXPORT_SELECTION
 static TBOOLEAN exportselection = TRUE;
@@ -577,6 +579,13 @@ static int button_pressed = 0;
 static int windows_open = 0;
 
 static int gX = 100, gY = 100;
+
+/* gW and gH are the sizes of the plot, when it was first made. If the window is
+   resized after the plot is made (and we're not replotting on resize), the
+   plot->width and plot->height track the window size, but gW and gH do NOT.
+   This allows the plot to be maximally scaled while preserving the aspect
+   ratio.
+*/
 static unsigned int gW = 640, gH = 450;
 static unsigned int gFlags = PSize;
 
@@ -596,15 +605,17 @@ static int vchar, hchar;
 /* Speficy negative values as indicator of uninitialized state */
 static double xscale = -1.;
 static double yscale = -1.;
+static int    ymax   = 4096;
+
 double pointsize = -1.;
 /* Avoid a crash upon using uninitialized variables from
    above and avoid unnecessary calls to display().
    Probably this is not the best fix ... */
 #define Call_display(plot) if (xscale<0.) display(plot);
 #define X(x) (int) ((x) * xscale)
-#define Y(y) (int) ((4095-(y)) * yscale)
+#define Y(y) (int) (( (  ymax -1)-(y)) * yscale)
 #define RevX(x) (((x)+0.5)/xscale)
-#define RevY(y) (4095-((y)+0.5)/yscale)
+#define RevY(y) (ymax-1 -((y)+0.5)/yscale)
 /* note: the 0.5 term in RevX(x) and RevY(y) compensates for the round-off in X(x) and Y(y) */
 
 static char buf[X11_COMMAND_BUFFER_LENGTH];
@@ -1566,7 +1577,9 @@ record()
 	    {
 		int tmp_do_raise = UNSET, tmp_persist = UNSET;
 		int tmp_dashed = UNSET, tmp_ctrlq = UNSET;
-		sscanf(buf, "X%d%d%d%d", &tmp_do_raise, &tmp_persist, &tmp_dashed, &tmp_ctrlq);
+		int tmp_replot_on_resize = UNSET;
+		sscanf(buf, "X%d%d%d%d%d",
+		       &tmp_do_raise, &tmp_persist, &tmp_dashed, &tmp_ctrlq, &tmp_replot_on_resize);
 		if (UNSET != tmp_do_raise)
 		    do_raise = tmp_do_raise;
 		if (UNSET != tmp_persist)
@@ -1575,6 +1588,8 @@ record()
 		    dashedlines = tmp_dashed;
 		if (UNSET != tmp_ctrlq)
 		    ctrlq = tmp_ctrlq;
+		if (UNSET != tmp_replot_on_resize)
+		    replot_on_resize = tmp_replot_on_resize;
 	    }
 	    return 1;
 
@@ -1748,22 +1763,36 @@ record()
 	case 'Q':
 	    /* Set default font immediately and return size info through pipe */
 	    if (buf[1] == 'G') {
+
+	      /* received QG. We're thus setting up the graphics for the first
+		 time. We grab the window sizes and send the back to inboard
+		 gnuplot via GE_fontprops. For subsequent replots, we receive Qg
+		 instead: see below */
 		int scaled_hchar, scaled_vchar;
 		char *c = &(buf[strlen(buf)-1]);
 		while (*c <= ' ') *c-- = '\0';
 		strncpy(default_font, &buf[2], strlen(&buf[2])+1);
 		pr_font(NULL);
 		if (plot) {
-		    /* EAM FIXME - this is all out of order; initialization doesnt */
-		    /*             happen until term->graphics() is called.        */
-		    xscale = (plot->width > 0) ? plot->width / 4096. : gW / 4096.;
-		    yscale = (plot->height > 0) ? plot->height / 4096. : gH / 4096.;
-		    scaled_hchar = (1.0/xscale) * hchar;
-		    scaled_vchar = (1.0/yscale) * vchar;
+		    double scale = (double)plot->width / 4096.0;
+		    scaled_hchar = (1.0/scale) * hchar;
+		    scaled_vchar = (1.0/scale) * vchar;
 		    FPRINTF((stderr, "gplt_x11: preset default font to %s hchar = %d vchar = %d \n",
 			     default_font, scaled_hchar, scaled_vchar));
 		    gp_exec_event(GE_fontprops, plot->width, plot->height,
 				  scaled_hchar, scaled_vchar, 0);
+		    ymax = 4096.0 * (double)plot->height / (double)plot->width;
+		}
+		return 1;
+	    }
+	    else if (buf[1] == 'g') {
+	      /* received Qg. Unlike QG, this is sent during replots, not plots.
+		 We simply take the current window size as the plot size */
+
+		if (plot) {
+		  ymax = 4096.0 * (double)plot->height / (double)plot->width;
+		  gW   = plot->width;
+		  gH   = plot->height;
 		}
 		return 1;
 	    }
@@ -3192,14 +3221,27 @@ display(plot_struct *plot)
 {
     int n;
 
+    /* set scaling factor between internal driver & window geometry */
+    unsigned int winW = plot->width;
+    unsigned int winH = GRAPH_HEIGHT(plot);
+
     FPRINTF((stderr, "Display %d ; %d commands\n", plot->plot_number, plot->ncommands));
 
     if (plot->ncommands == 0)
 	return;
 
-    /* set scaling factor between internal driver & window geometry */
-    xscale = plot->width / 4096.0;
-    yscale = GRAPH_HEIGHT(plot) / 4096.0;
+    /* make the plot as large as possible, while preserving the aspect ratio and
+       fitting into the window */
+    if( winW * gH > gW * winH )
+    {
+      /* window is too wide; height dominates */
+      yscale = xscale = (double)(winH * gW) / (double)(gH * 4096.0);
+    }
+    else
+    {
+      /* window is too tall; width dominates */
+      yscale = xscale = (double)winW / 4096.0;
+    }
 
     /* initial point sizes, until overridden with P7xxxxyyyy */
     plot->px = (int) (xscale * pointsize);
@@ -4279,6 +4321,24 @@ process_configure_notify_event(XEvent *event)
 #endif
 
 	    display(plot);
+
+#ifdef USE_MOUSE
+	    {
+	    /* the window was resized. Send the sizing information back to
+	       inboard gnuplot. I send -plot->width to indicate that this sizing
+	       information shouldn't be used yet, just saved for a future
+	       replot */
+	      double scale = (double)plot->width / 4096.0;
+	      int scaled_hchar = (1.0/scale) * hchar;
+	      int scaled_vchar = (1.0/scale) * vchar;
+
+	      gp_exec_event(GE_fontprops, -plot->width, plot->height,
+			    scaled_hchar, scaled_vchar, 0);
+
+	      if( replot_on_resize )
+		gp_exec_event(GE_keypress, 0, 0, 'e', 0, 0); // ask for replot
+	    }
+#endif
 	}
     }
 }
@@ -4811,6 +4871,8 @@ static XrmOptionDescRec options[] = {
     {"-xrm", NULL, XrmoptionResArg, (XPointer) NULL},
     {"-raise", "*raise", XrmoptionNoArg, (XPointer) "on"},
     {"-noraise", "*raise", XrmoptionNoArg, (XPointer) "off"},
+    {"-replotonresize", "*replotonresize", XrmoptionNoArg, (XPointer) "on"},
+    {"-noreplotonresize", "*replotonresize", XrmoptionNoArg, (XPointer) "off"},
     {"-feedback", "*feedback", XrmoptionNoArg, (XPointer) "on"},
     {"-nofeedback", "*feedback", XrmoptionNoArg, (XPointer) "off"},
     {"-ctrlq", "*ctrlq", XrmoptionNoArg, (XPointer) "on"},
@@ -5094,6 +5156,7 @@ gnuplot: X11 aborted.\n", ldisplay);
     pr_dashes();
     pr_pointsize();
     pr_raise();
+    pr_replotonresize();
     pr_persist();
     pr_feedback();
     pr_ctrlq();
@@ -5989,6 +6052,12 @@ pr_raise()
 	do_raise = (On(value.addr));
 }
 
+static void
+pr_replotonresize()
+{
+    if (pr_GetR(db, ".replotonresize"))
+	replot_on_resize = (On(value.addr));
+}
 
 static void
 pr_persist()
