@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.230 2012/08/28 04:43:28 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.231 2012/09/14 03:30:26 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -2160,8 +2160,7 @@ f_column(union argument *arg)
 	for (j=0; j<df_no_cols; j++) {
 	    if (df_column[j].header) {
 		int offset = (*df_column[j].header == '"') ? 1 : 0;
-		if (0 == strncmp(name, df_column[j].header + offset, 
-				strlen(name))) {
+		if (streq(name, df_column[j].header + offset)) {
 		    column = j+1;
 		    if (!df_key_title) /* EAM DEBUG - on the off chance we want it */
 			df_key_title = gp_strdup(df_column[j].header);
@@ -2219,8 +2218,7 @@ f_stringcolumn(union argument *arg)
 	for (j=0; j<df_no_cols; j++) {
 	    if (df_column[j].header) {
 		int offset = (*df_column[j].header == '"') ? 1 : 0;
-		if (0 == strncmp(name, df_column[j].header + offset, 
-				strlen(name))) {
+		if (streq(name, df_column[j].header + offset)) {
 		    column = j+1;
 		    if (!df_key_title) /* EAM DEBUG - on the off chance we want it */
 			df_key_title = gp_strdup(df_column[j].header);
