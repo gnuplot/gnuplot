@@ -1,5 +1,5 @@
 /*
- * $Id: util.h,v 1.36 2011/11/10 05:15:58 sfeam Exp $
+ * $Id: util.h,v 1.36.2.1 2012/05/06 05:02:58 sfeam Exp $
  */
 
 /* GNUPLOT - util.h */
@@ -126,5 +126,6 @@ TBOOLEAN utf8toulong __PROTO((unsigned long * wch, const char ** str));
 size_t strlen_utf8 __PROTO((const char *s));
 size_t gp_strlen __PROTO((const char *s));
 char * gp_strchrn __PROTO((const char *s, int N));
+TBOOLEAN streq __PROTO((const char *a, const char *b));
 
 #endif /* GNUPLOT_UTIL_H */

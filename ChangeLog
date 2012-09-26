@@ -1,7 +1,13 @@
-2012-09-25  Ethan A Merritt  <merritt@u.washington.edu>
+2012-09-26  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c: Fix bug preventing explicit assignment of color
 	sequence in stacked histograms.
+
+	* src/datafile.c src/util.c (streq) src/util.h:  New utility function
+	streq(char *a, char *b) returns TRUE if a and b are identical save for
+	leading and trailing whitespace.  Use this for matching requested string
+	labels in a using spec to the actual column header text in a data file.
+	Bug #3571243
 
 2012-09-22  Ethan A Merritt  <merritt@u.washington.edu>
 

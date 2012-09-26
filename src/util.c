@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: util.c,v 1.99 2011/11/10 05:15:58 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: util.c,v 1.99.2.1 2012/05/06 05:02:58 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - util.c */
@@ -1379,4 +1379,26 @@ gp_strchrn(const char *s, int N)
 	return utf8_strchrn(s,N);
     else
 	return (char *)&s[N];
+}
+
+/* TRUE if strings a and b are identical save for leading or trailing whitespace */
+TBOOLEAN
+streq(const char *a, const char *b)
+{
+    int enda, endb;
+
+    while (isspace(*a))
+	a++;
+    while (isspace(*b))
+	b++;
+
+    enda = strlen(a) - 1;
+    endb = strlen(b) - 1;
+
+    while (isspace(a[enda]))
+	enda--;
+    while (isspace(b[endb]))
+	endb--;
+
+    return (enda == endb) ? !strncmp(a,b,++enda) : FALSE;
 }
