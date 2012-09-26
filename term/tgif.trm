@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*- */
-/* $Id: tgif.trm,v 1.49 2010/03/24 18:22:37 sfeam Exp $ */
+/* $Id: tgif.trm,v 1.50 2011/09/27 23:18:02 sfeam Exp $ */
 
 /* GNUPLOT - tgif.trm */
 
@@ -46,7 +46,7 @@
 /* send your comments or suggestions to werner@mez.ruhr-uni-bochum.de      */
 /*                                                                         */
 /*                                                                         */
-/* MODIFIED May, 11st 1997 by NOVÁK Levente (novakl@tigris.klte.hu):       */
+/* MODIFIED May, 11st 1997 by NOVÃK Levente (novakl@tigris.klte.hu):       */
 /*                                                                         */
 /*          - Modified the default linewidth for borders from 3 to 2       */
 /*          - Modified the default size of markers' bounding box           */
@@ -60,7 +60,7 @@
 /* Modified  07 July 2000 by Ian MacPhedran                                */
 /*          - added PM3D support                                           */
 /*                                                                         */
-/* Modified  04 February 2002 by Levente Novák                             */
+/* Modified  04 February 2002 by Levente NovÃ¡k                             */
 /*          - break long "polygon()" directives into lines, as it made     */
 /*            Tgif fail polygons had >8 sides                              */
 /*            (e.g. when using "filledcurves")                             */
