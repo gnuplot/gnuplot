@@ -22,7 +22,7 @@ PLATFORMS:
  -- autoconf handling of TBOOLEAN on Solaris also remains problematic.
     The definition apparently needs to be different for C and C++.
 
-  -- update wgnuplot menus for Windows
+ -- update wgnuplot menus for Windows
 
 TERMINALS, GENERAL COMMENTS:
 ============================
@@ -118,15 +118,11 @@ Ethan's List (2012):
   browser's font support.  Maintain more per-plot context, e.g. zoom state.
 - isosurfaces (3D contour of 4D data)
 - more demos and more comprehensible descriptions in the user manual
-- revise the coordinate system used by x11 so that the terminal coordinates
-  are proportional to the actual on-screen coordinates. 
-  This will fix 'set size ratio'.
 - support mousing in multiplot output, at least for selected terminals
+- add additional tic levels, possibly to appear only when zoomed
 
 - Changes for 5.0 (syntax or behavior is not 100% backward compatible)
   + separate out the handling of junk, NaN, Inf, and missing data entries
   + revise the keywords for matrix handling so that the binary and ascii
     versions are consistent
-  + establish interpretation of input columns only once, at start of input.
-    Get rid of the ancient "every line may be interpreted differently"
-    behavior. See "help missing".
+  + apply in-line plot ranges only to the immediately following plot clause
