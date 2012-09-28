@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.216 2012/09/28 16:56:25 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.217 2012/09/28 21:40:43 sfeam Exp $"); }
 #endif
 
 #define X11_POLYLINE 1
@@ -2334,8 +2334,8 @@ exec_cmd(plot_struct *plot, char *command)
 	sscanf(buffer + 1, "%d %d %d", &point, &x, &y);
 	if (point == -2) {
 	    /* set point size */
-	    plot->px = (int) (x * xscale * pointsize);
-	    plot->py = (int) (y * yscale * pointsize);
+	    plot->px = (int) (x * pointsize * 3.0 / 4096.0);
+	    plot->py = (int) (y * pointsize * 3.0 / 4096.0);
 	} else if (point == -1) {
 	    /* dot */
 	    XDrawPoint(dpy, plot->pixmap, *current_gc, X(x), Y(y));

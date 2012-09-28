@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: x11.trm,v 1.195 2012/09/26 04:21:18 sfeam Exp $
+ * $Id: x11.trm,v 1.196 2012/09/28 21:40:43 sfeam Exp $
  *
  */
 
@@ -1496,7 +1496,7 @@ X11_pointsize(double ps)
     if (ps < 0)
 	ps = 1;
     PRINT2("P-2 %d %d\n",	/* size of point symbols */
-	   (int) (term->h_tic * ps * 0.5), (int) (term->v_tic * ps * 0.5));
+	   (int) (4096.0 * ps), (int) (4096.0 * ps));
 }
 
 TERM_PUBLIC void

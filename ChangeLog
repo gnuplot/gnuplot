@@ -8,6 +8,9 @@
 	The extra byte required for a 4-digit coordinate is compensated by 
 	fewer bytes needed for small integers like linetype.
 
+	* src/gplt_x11.c src/gplt_x11.h:  Adjust point size to accommodate
+	changes in window size.
+
 2012-09-26  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/datafile.c src/util.c (streq) src/util.h:  New utility function
