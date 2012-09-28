@@ -2,6 +2,12 @@
 
 	* src/gplt_x11.c src/gplt_x11.h:  Remove dead code.
 
+	* src/gplt_x11.c term/x11.trm:  Modify format statements used to send
+	commands from x11.trm to gnuplot_x11.  Before most integers were sent
+	using "%04d", now " %d".  This prevents overflow for coordinate > 9999.
+	The extra byte required for a 4-digit coordinate is compensated by 
+	fewer bytes needed for small integers like linetype.
+
 2012-09-26  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/datafile.c src/util.c (streq) src/util.h:  New utility function

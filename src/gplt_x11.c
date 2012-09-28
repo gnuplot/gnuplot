@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.215 2012/09/26 04:21:18 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.216 2012/09/28 16:56:25 sfeam Exp $"); }
 #endif
 
 #define X11_POLYLINE 1
@@ -1578,7 +1578,7 @@ record()
 		int tmp_do_raise = UNSET, tmp_persist = UNSET;
 		int tmp_dashed = UNSET, tmp_ctrlq = UNSET;
 		int tmp_replot_on_resize = UNSET;
-		sscanf(buf, "X%d%d%d%d%d",
+		sscanf(buf, "X%d %d %d %d %d",
 		       &tmp_do_raise, &tmp_persist, &tmp_dashed, &tmp_ctrlq, &tmp_replot_on_resize);
 		if (UNSET != tmp_do_raise)
 		    do_raise = tmp_do_raise;
@@ -1609,7 +1609,7 @@ record()
 	    {
 		/* `set cursor' */
 		int c, x, y;
-		sscanf(buf, "u%4d%4d%4d", &c, &x, &y);
+		sscanf(buf, "u%d %d %d", &c, &x, &y);
 		if (plot) {
 		    switch (c) {
 		    case -4:	/* switch off line between ruler and mouse cursor */
@@ -1669,18 +1669,32 @@ record()
 	    if (!pipe_died)
 #endif
 	    {
-		int where;
+		int where = -1;
 		char *second;
-		if (sscanf(buf, "t%4d", &where) != 1)
+		char* str;
+		int char_byte_offset;
+
+		/* sscanf manpage says %n may or may not count in the return
+		   value of sscanf. I thus don't do a strong check on the number
+		   of parsed elements, but also check for a valid number being
+		   parsed */
+		if (sscanf(buf, "t%d%n", &where, &char_byte_offset) < 1 ||
+		    where < 0 )
+		{
 		    return 1;
+		}
 		buf[strlen(buf) - 1] = 0;	/* remove trailing \n */
 		if (plot) {
+
+		    /* extra 1 for the space before the string start */
+		    str = &buf[ char_byte_offset + 1 ];
+
 		    switch (where) {
 		    case 0:
-			DisplayCoords(plot, buf + 5);
+			DisplayCoords(plot, str);
 			break;
 		    case 1:
-			second = strchr(buf + 5, '\r');
+			second = strchr(str, '\r');
 			if (second == NULL) {
 			    *(plot->zoombox_str1a) = '\0';
 			    *(plot->zoombox_str1b) = '\0';
@@ -1690,13 +1704,13 @@ record()
 			second++;
 			if (plot->zoombox_on)
 			    DrawBox(plot);
-			strcpy(plot->zoombox_str1a, buf + 5);
+			strcpy(plot->zoombox_str1a, str);
 			strcpy(plot->zoombox_str1b, second);
 			if (plot->zoombox_on)
 			    DrawBox(plot);
 			break;
 		    case 2:
-			second = strchr(buf + 5, '\r');
+			second = strchr(str, '\r');
 			if (second == NULL) {
 			    *(plot->zoombox_str2a) = '\0';
 			    *(plot->zoombox_str2b) = '\0';
@@ -1706,7 +1720,7 @@ record()
 			second++;
 			if (plot->zoombox_on)
 			    DrawBox(plot);
-			strcpy(plot->zoombox_str2a, buf + 5);
+			strcpy(plot->zoombox_str2a, str);
 			strcpy(plot->zoombox_str2b, second);
 			if (plot->zoombox_on)
 			    DrawBox(plot);
@@ -1724,7 +1738,7 @@ record()
 		if (plot) {
 		    int x, y;
 		    DrawRuler(plot);	/* erase previous ruler */
-		    sscanf(buf, "r%4d%4d", &x, &y);
+		    sscanf(buf, "r%d %d", &x, &y);
 		    if (x < 0) {
 			DrawLineToRuler(plot);
 			plot->ruler_on = FALSE;
@@ -2076,7 +2090,7 @@ exec_cmd(plot_struct *plot, char *command)
 #ifdef X11_POLYLINE
     /*   X11_vector(x, y) - draw vector  */
     if (*buffer == 'V') {
-	sscanf(buffer, "V%4d%4d", &x, &y);
+	sscanf(buffer, "V%d %d", &x, &y);
 	if (polyline_size == 0) {
 	    polyline[polyline_size].x = X(cx);
 	    polyline[polyline_size].y = Y(cy);
@@ -2107,7 +2121,7 @@ exec_cmd(plot_struct *plot, char *command)
 #else
     /*   X11_vector(x, y) - draw vector  */
     if (*buffer == 'V') {
-	sscanf(buffer, "V%4d%4d", &x, &y);
+	sscanf(buffer, "V%d %d", &x, &y);
 	XDrawLine(dpy, plot->pixmap, *current_gc, X(cx), Y(cy), X(x), Y(y));
 	cx = x;
 	cy = y;
@@ -2115,7 +2129,7 @@ exec_cmd(plot_struct *plot, char *command)
 #endif
     /*   X11_move(x, y) - move  */
     if (*buffer == 'M')
-	sscanf(buffer, "M%4d%4d", &cx, &cy);
+	sscanf(buffer, "M%d %d", &cx, &cy);
 
     /* change default font (QD) encoding (QE) or current font (QF)  */
     else if (*buffer == 'Q') {
@@ -2152,21 +2166,22 @@ exec_cmd(plot_struct *plot, char *command)
     else if (*buffer == 'T') {
 	/* Enhanced text mode added November 2003 - Ethan A Merritt */
 	int x_offset=0, y_offset=0, v_offset=0;
+	int char_byte_offset;
 
 	switch (buffer[1]) {
 
 	case 'j':	/* Set start for right-justified enhanced text */
-		    sscanf(buffer+2, "%4d%4d", &x_offset, &y_offset);
+		    sscanf(buffer+2, "%d %d", &x_offset, &y_offset);
 		    plot->xLast = x_offset - (plot->xLast - x_offset);
 		    plot->yLast = y_offset - (vchar/3) / yscale;
 		    return;
 	case 'k':	/* Set start for center-justified enhanced text */
-		    sscanf(buffer+2, "%4d%4d", &x_offset, &y_offset);
+		    sscanf(buffer+2, "%d %d", &x_offset, &y_offset);
 		    plot->xLast = x_offset - 0.5*(plot->xLast - x_offset);
 		    plot->yLast = y_offset - (vchar/3) / yscale;
 		    return;
 	case 'l':	/* Set start for left-justified enhanced text */
-		    sscanf(buffer+2, "%4d%4d", &x_offset, &y_offset);
+		    sscanf(buffer+2, "%d %d", &x_offset, &y_offset);
 		    plot->xLast = x_offset;
 		    plot->yLast = y_offset - (vchar/3) / yscale;
 		    return;
@@ -2174,7 +2189,7 @@ exec_cmd(plot_struct *plot, char *command)
 	case 'c':	/* Enhanced mode print with update to center */
 	case 'u':	/* Enhanced mode print with update */
 	case 's':	/* Enhanced mode update with no print */
-		    sscanf(buffer+2, "%4d%4d", &x_offset, &y_offset);
+          sscanf(buffer+2, "%d %d%n", &x_offset, &y_offset, &char_byte_offset);
 		    /* EAM FIXME - This code has only been tested for x_offset == 0 */
 		    if (plot->angle != 0) {
 			int xtmp=0, ytmp=0;
@@ -2187,7 +2202,9 @@ exec_cmd(plot_struct *plot, char *command)
 		    }
 		    x = plot->xLast + x_offset;
 		    y = plot->yLast + y_offset;
-		    str = buffer + 10;
+
+		    /* extra 1 for the space before the string start */
+		    str = buffer + char_byte_offset + 1;
 		    break;
 	case 'p':	/* Push (Save) position for later use */
 		    plot->xSave = plot->xLast;
@@ -2198,9 +2215,11 @@ exec_cmd(plot_struct *plot, char *command)
 		    plot->yLast = plot->ySave;
 		    return;
 	default:
-		    sscanf(buffer, "T%4d%4d", &x, &y);
+		    sscanf(buffer, "T%d %d%n", &x, &y, &char_byte_offset);
 		    v_offset = vchar/3;		/* Why is this??? */
-		    str = buffer + 9;
+
+		    /* extra 1 for the space before the string start */
+		    str = buffer + char_byte_offset + 1;
 		    break;
 	}
 
@@ -2255,7 +2274,7 @@ exec_cmd(plot_struct *plot, char *command)
     } else if (*buffer == 'F') {	/* fill box */
 	int style, xtmp, ytmp, w, h;
 
-	if (sscanf(buffer + 1, "%4d%4d%4d%4d%4d", &style, &xtmp, &ytmp, &w, &h) == 5) {
+	if (sscanf(buffer + 1, "%d %d %d %d %d", &style, &xtmp, &ytmp, &w, &h) == 5) {
 
 	    /* Load selected pattern or fill into a separate gc */
 	    if (!fill_gc)
@@ -2274,18 +2293,18 @@ exec_cmd(plot_struct *plot, char *command)
     }
     /*   X11_justify_text(mode) - set text justification mode  */
     else if (*buffer == 'J')
-	sscanf(buffer, "J%4d", (int *) &plot->jmode);
+	sscanf(buffer, "J%d", (int *) &plot->jmode);
 
     else if (*buffer == 'A')
 	sscanf(buffer + 1, "%lf", &plot->angle);
 
     /*  X11_linewidth(plot->lwidth) - set line width */
     else if (*buffer == 'W')
-	sscanf(buffer + 1, "%4d", &plot->user_width);
+	sscanf(buffer + 1, "%d", &plot->user_width);
 
     /*   X11_linetype(plot->type) - set line type  */
     else if (*buffer == 'L') {
-	sscanf(buffer, "L%4d", &plot->lt);
+	sscanf(buffer, "L%d", &plot->lt);
 	plot->lt = (plot->lt % 8) + 2;
 
 	if (plot->lt < 0) /* LT_NODRAW, LT_BACKGROUND, LT_UNDEFINED */
@@ -2460,7 +2479,7 @@ exec_cmd(plot_struct *plot, char *command)
     }
     else if (*buffer == X11_GR_SET_LINECOLOR) {
 	    int lt;
-	    sscanf(buffer + 1, "%4d", &lt);
+	    sscanf(buffer + 1, "%d", &lt);
 	    lt = (lt % 8) + 2;
 	    if (lt < 0) /* LT_NODRAW, LT_BACKGROUND, LT_UNDEFINED */
 		lt = -3;

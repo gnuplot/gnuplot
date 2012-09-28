@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: x11.trm,v 1.194 2011/12/12 00:28:47 broeker Exp $
+ * $Id: x11.trm,v 1.195 2012/09/26 04:21:18 sfeam Exp $
  *
  */
 
@@ -1481,13 +1481,13 @@ X11_text()
 TERM_PUBLIC void
 X11_move(unsigned int x, unsigned int y)
 {
-    PRINT2("M%04d%04d\n", x, y);
+    PRINT2("M%d %d\n", x, y);
 }
 
 TERM_PUBLIC void
 X11_vector(unsigned int x, unsigned int y)
 {
-    PRINT2("V%04d%04d\n", x, y);
+    PRINT2("V%d %d\n", x, y);
 }
 
 TERM_PUBLIC void
@@ -1502,13 +1502,13 @@ X11_pointsize(double ps)
 TERM_PUBLIC void
 X11_linewidth(double lw)
 {
-    PRINT1("W%04d\n", (int) (lw * X11_linewidth_multiplier + 0.5));
+    PRINT1("W%d\n", (int) (lw * X11_linewidth_multiplier + 0.5));
 }
 
 TERM_PUBLIC void
 X11_linetype(int lt)
 {
-    PRINT1("L%04d\n", lt);
+    PRINT1("L%d\n", lt);
 }
 
 TERM_PUBLIC void
@@ -1519,11 +1519,7 @@ X11_put_text(unsigned int x, unsigned int y, const char str[])
 	strcpy(X11_last_font_used,X11_next_font_used);
 	PRINT1("QF%s\n", X11_next_font_used);
     }
-
-    /* badly outrange labels can overflow into text field */
-    if (x < 10000 && y < 10000) {
-	PRINT3("T%04d%04d%s\n", x, y, str);
-    }
+    PRINT3("T%d %d %s\n", x, y, str);
 }
 
 TERM_PUBLIC int
@@ -1536,7 +1532,7 @@ X11_text_angle(int ang)
 TERM_PUBLIC int
 X11_justify_text(enum JUSTIFY mode)
 {
-    PRINT1("J%04d\n", mode);
+    PRINT1("J%d\n", mode);
     X11_last_justification = mode;
     return (TRUE);
 }
@@ -1565,7 +1561,7 @@ TERM_PUBLIC void
 X11_fillbox(int style, unsigned int x, unsigned int y, unsigned int w, unsigned int h)
 {
     if (X11_ipc) {
-	PRINT5("F%04d%04u%04u%04u%04u\n", style, x, y, w, h);
+	PRINT5("F%d %u %u %u %u\n", style, x, y, w, h);
     }
 }
 
@@ -1574,7 +1570,7 @@ TERM_PUBLIC void
 X11_put_tmptext(int i, const char str[])
 {
     if (X11_ipc) {
-	PRINT2("t%04d%s\n", i, str);
+	PRINT2("t%d %s\n", i, str);
 	FFLUSH();
     }
 }
@@ -1583,7 +1579,7 @@ TERM_PUBLIC void
 X11_set_ruler(int x, int y)
 {
     if (X11_ipc) {
-	PRINT2("r%04d%04d\n", x < 9999 ? x : 9999, y < 9999 ? y : 9999);
+	PRINT2("r%d %d\n", x, y);
 	FFLUSH();
     }
 }
@@ -1592,7 +1588,7 @@ TERM_PUBLIC void
 X11_set_cursor(int c, int x, int y)
 {
     if (X11_ipc) {
-	PRINT3("u%04d%04d%04d\n", c, x, y);
+	PRINT3("u%d %d %d\n", c, x, y);
 	FFLUSH();
     }
 }
@@ -1712,7 +1708,7 @@ X11_set_color(t_colorspec *colorspec)
 
     if (colorspec->type == TC_LT) {
 	fputc(X11_GR_SET_LINECOLOR, X11_ipc);
-	PRINT1("%4d\n", colorspec->lt);
+	PRINT1("%d\n", colorspec->lt);
 	FFLUSH();
 	return;
     }
@@ -1862,10 +1858,10 @@ ENHX11_OPEN(
 {
     /* If the overprint code requests a save or request, that's all we do */
     if (overprint == 3) {
-	PRINT2("Tp%04d%04d\n", 0, 0);
+	PRINT2("Tp%d %d\n", 0, 0);
 	return;
     } else if (overprint == 4) {
-	PRINT2("Tr%04d%04d\n", 0, 0);
+	PRINT2("Tr%d %d\n", 0, 0);
 	return;
     }
 
@@ -1898,13 +1894,13 @@ ENHX11_FLUSH()
 	*X11_last_font_used = '\01';
 
 	if (!ENHx11_show || ENHx11_sizeonly)
-	    PRINT3("Ts%04d%04d%s\n", 0, (int)ENHx11_base, enhanced_text);
+	    PRINT3("Ts%d %d %s\n", 0, (int)ENHx11_base, enhanced_text);
 	else if (ENHx11_overprint == 1)
-	    PRINT3("Tc%04d%04d%s\n", 0, (int)ENHx11_base, enhanced_text);
+	    PRINT3("Tc%d %d %s\n", 0, (int)ENHx11_base, enhanced_text);
 	else if (!ENHx11_widthflag && ENHx11_overprint != 0)
-	    PRINT3("To%04d%04d%s\n", 0, (int)ENHx11_base, enhanced_text);
+	    PRINT3("To%d %d %s\n", 0, (int)ENHx11_base, enhanced_text);
 	else
-	    PRINT3("Tu%04d%04d%s\n", 0, (int)ENHx11_base, enhanced_text);
+	    PRINT3("Tu%d %d %s\n", 0, (int)ENHx11_base, enhanced_text);
 
 	ENHx11_opened_string = FALSE;
     }
@@ -1940,12 +1936,12 @@ ENHX11_put_text(unsigned int x, unsigned int y, const char *str)
 
 
     /* Tell gnuplot_x11 to set the current position to (x,y) */
-	PRINT2("Tl%04d%04d\n", x, y);
+	PRINT2("Tl%d %d\n", x, y);
 
     /* Text justification requires two passes. During the first pass we */
     /* don't draw anything, we just measure the space it will take.     */
     if (X11_last_justification != LEFT) {
-	PRINT1("J%04d\n", LEFT);
+	PRINT1("J%d\n", LEFT);
 	ENHx11_sizeonly = TRUE;
     }
 PASS2:
@@ -1987,7 +1983,7 @@ PASS2:
 
     /* Restore text justification flag after 2nd pass */
     if (pass > 1) {
-	PRINT1("J%04d\n", X11_last_justification);
+	PRINT1("J%d\n", X11_last_justification);
 	return;
     }
 
@@ -1997,9 +1993,9 @@ PASS2:
 	ENHx11_sizeonly = FALSE;
 
 	if (X11_last_justification == RIGHT) {
-		PRINT2("Tj%04d%04d\n", x, y);
+		PRINT2("Tj%d %d\n", x, y);
 	} else if (X11_last_justification == CENTRE) {
-		PRINT2("Tk%04d%04d\n", x, y);
+		PRINT2("Tk%d %d\n", x, y);
 	}
 	str = original_string;
 	pass = 2;
