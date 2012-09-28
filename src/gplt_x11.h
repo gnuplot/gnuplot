@@ -56,7 +56,6 @@
 #define X11_GR_BINARY_COLOR     'c'
 #define X11_GR_SET_RGBCOLOR     'g'
 #define X11_GR_SET_LINECOLOR    'l'
-#define X11_GR_FILLED_POLYGON   'I'
 #define X11_GR_BINARY_POLYGON   'f'
 #define X11_GR_IMAGE		'i'
 

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.214 2012/03/18 17:30:43 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.215 2012/09/26 04:21:18 sfeam Exp $"); }
 #endif
 
 #define X11_POLYLINE 1
@@ -2533,78 +2533,6 @@ exec_cmd(plot_struct *plot, char *command)
 	    PaletteSetColor(plot, (double)gray);
 	    current_gc = &gc;
 	}
-    }
-
-    else if (*buffer == X11_GR_FILLED_POLYGON) {	/* filled polygon */
-	if (have_pm3d) {	/* ignore, if your X server is not supported */
-	    static XPoint *points = NULL;
-	    static int st_npoints = 0;
-	    static int saved_npoints = -1, saved_i = -1;	/* HBB 20010919 */
-	    int i, npoints, style;
-	    char *ptr = buffer + 1;
-
-	    sscanf(ptr, "%4d", &npoints);
-
-	    if (npoints > 0) {
-		ptr += 4;
-		sscanf(ptr, "%4d", &style);
-	    }
-
-	    /* HBB 20010919: Implement buffer overflow protection by
-	     * breaking up long lines */
-	    if (npoints == -1) {
-		/* This is a continuation line. */
-		if (saved_npoints < 100) {
-		    fprintf(stderr, "gnuplot_x11: filled_polygon() protocol error\n");
-		    EXIT(1);
-		}
-		/* Continue filling at end of previous list: */
-		i = saved_i;
-		npoints = saved_npoints;
-	    } else {
-		saved_npoints = npoints;
-		i = 0;
-	    }
-
-	    ptr += 4;
-	    if (npoints > st_npoints) {
-		XPoint *new_points = realloc(points, sizeof(XPoint) * npoints);
-		st_npoints = npoints;
-		if (!new_points) {
-		    perror("gnuplot_x11: exec_cmd()->points");
-		    EXIT(1);
-		}
-		points = new_points;
-	    }
-
-	    while (*ptr != 'x' && i < npoints) {	/* not end-of-line marker */
-		sscanf(ptr, "%4d%4d", &x, &y);
-		ptr += 8;
-		points[i].x = X(x);
-		points[i].y = Y(y);
-		i++;
-	    }
-
-	    if (i >= npoints) {
-		/* Load selected pattern or fill into a separate gc */
-		if (!fill_gc)
-		    fill_gc = XCreateGC(dpy, plot->window, 0, 0);
-		XCopyGC(dpy, *current_gc, ~0, fill_gc);
-
-		x11_setfill(&fill_gc, style);
-
-		XFillPolygon(dpy, plot->pixmap, fill_gc, points, npoints,
-			     Nonconvex, CoordModeOrigin);
-
-		/* Flag this continuation line as closed */
-		saved_npoints = saved_i = -1;
-	    } else {
-		/* Store how far we got: */
-		saved_i = i;
-	    }
-
-	}
-
     }
 
     else if (*buffer == X11_GR_BINARY_POLYGON) {	/* filled polygon */
