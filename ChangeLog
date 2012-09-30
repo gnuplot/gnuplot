@@ -1,3 +1,5 @@
+2012-09-30  Tag Release_4_6_1
+
 2012-09-26  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c: Fix bug preventing explicit assignment of color
