@@ -1,8 +1,7 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.217 2012/09/28 21:40:43 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.218 2012/09/28 22:24:43 sfeam Exp $"); }
 #endif
 
-#define X11_POLYLINE 1
 #define MOUSE_ALL_WINDOWS 1
 
 /* GNUPLOT - gplt_x11.c */
@@ -654,11 +653,9 @@ static const char stipple_pattern_bits[stipple_pattern_num][8] = {
 static Pixmap stipple_pattern[stipple_pattern_num];
 static int stipple_initialized = 0;
 
-#ifdef X11_POLYLINE
 static XPoint *polyline = NULL;
 static int polyline_space = 0;
 static int polyline_size = 0;
-#endif
 
 static void gpXStoreName __PROTO((Display *, Window, char *));
 
@@ -710,11 +707,9 @@ main(int argc, char *argv[])
     }
 # endif
 
-#ifdef X11_POLYLINE
     polyline_space = 100;
     polyline = calloc(polyline_space, sizeof(XPoint));
     if (!polyline) fprintf(stderr, "Panic: cannot allocate polyline\n");
-#endif
 
     mainloop();
 
@@ -2084,13 +2079,16 @@ exec_cmd(plot_struct *plot, char *command)
 {
     int x, y, sw, sl, sj;
     char *buffer, *str;
+    char *strx, *stry;
 
     buffer = command;
+    strx = buffer+1;
 
-#ifdef X11_POLYLINE
     /*   X11_vector(x, y) - draw vector  */
     if (*buffer == 'V') {
-	sscanf(buffer, "V%d %d", &x, &y);
+	x = strtol(strx, &stry, 0);
+	y = strtol(stry, NULL, 0);
+
 	if (polyline_size == 0) {
 	    polyline[polyline_size].x = X(cx);
 	    polyline[polyline_size].y = Y(cy);
@@ -2118,18 +2116,12 @@ exec_cmd(plot_struct *plot, char *command)
 			polyline, polyline_size+1, CoordModeOrigin);
 	polyline_size = 0;
     }
-#else
-    /*   X11_vector(x, y) - draw vector  */
-    if (*buffer == 'V') {
-	sscanf(buffer, "V%d %d", &x, &y);
-	XDrawLine(dpy, plot->pixmap, *current_gc, X(cx), Y(cy), X(x), Y(y));
-	cx = x;
-	cy = y;
-    } else
-#endif
+
     /*   X11_move(x, y) - move  */
-    if (*buffer == 'M')
-	sscanf(buffer, "M%d %d", &cx, &cy);
+    if (*buffer == 'M') {
+	cx = strtol(strx, &stry, 0);
+	cy = strtol(stry, NULL, 0);
+    }
 
     /* change default font (QD) encoding (QE) or current font (QF)  */
     else if (*buffer == 'Q') {
@@ -2331,7 +2323,9 @@ exec_cmd(plot_struct *plot, char *command)
     /*   X11_point(number) - draw a point */
     else if (*buffer == 'P') {
 	int point;
-	sscanf(buffer + 1, "%d %d %d", &point, &x, &y);
+	point = strtol(buffer+1, &strx, 0);
+	x = strtol(strx, &stry, 0);
+	y = strtol(stry, NULL, 0);
 	if (point == -2) {
 	    /* set point size */
 	    plot->px = (int) (x * pointsize * 3.0 / 4096.0);
@@ -2479,7 +2473,7 @@ exec_cmd(plot_struct *plot, char *command)
     }
     else if (*buffer == X11_GR_SET_LINECOLOR) {
 	    int lt;
-	    sscanf(buffer + 1, "%d", &lt);
+	    lt = strtol(strx, NULL, 0);
 	    lt = (lt % 8) + 2;
 	    if (lt < 0) /* LT_NODRAW, LT_BACKGROUND, LT_UNDEFINED */
 		lt = -3;

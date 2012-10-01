@@ -1,3 +1,9 @@
+2012-10-01  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/gplt_x11.c:  Replace parsing using sscanf( "%d %d" ) with
+	two calls to strtol().  This yields a 2-fold speedup in benchmarks
+	with large numbers of points and vectors.
+
 2012-09-28  Dima Kogan  <gnuplot@dima.secretsauce.net>
 
 	* src/gplt_x11.c src/gplt_x11.h:  Remove dead code.
