@@ -5,10 +5,24 @@ ELS = gnuplot-gui.el gnuplot.el
 ELCS = gnuplot.elc gnuplot-gui.elc
 EXTRA_DIST = dot.el dotemacs gpelcard.dvi gpelcard.pdf gpelcard.ps gpelcard.tex $(ELS)
 
+lispdir = @lispdir@
+
 CLEANFILES = $(ELCS) gpelcard.pdf gpelcard.ps gpelcard.dvi gpelcard.log gpelcard.aux
 DISTCLEANFILES = 
 
 BYTEC = $(EMACS) -batch -q -no-site-file -l $(srcdir)/dot.el -f batch-byte-compile
+
+gnuplot.elc: gnuplot.el
+	@if [ "$(srcdir)" != "$(top_builddir)" ] ; then \
+	  cp $(srcdir)/gnuplot.el . ; \
+	fi
+	$(BYTEC) gnuplot.el
+
+gnuplot-gui.elc: gnuplot-gui.el
+	@if [ "$(srcdir)" != "$(top_builddir)" ] ; then \
+	  cp $(srcdir)/gnuplot-gui.el . ; \
+	fi
+	$(BYTEC) gnuplot-gui.el
 
 .el.elc:
 	$(BYTEC) $<
@@ -24,7 +38,7 @@ BYTEC = $(EMACS) -batch -q -no-site-file -l $(srcdir)/dot.el -f batch-byte-compi
 
 all: @LISPFILES@
 
-elcs: $(ELCS)
+elcs: $(ELCS) $(ELS)
 
 noelcs:
 

@@ -1,3 +1,8 @@
+2012-10-04  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* configure.in prepare lisp/Makefile.am lisp/configure.in (removed):
+	Simplify build scripts for the lisp files (a.k.a. emacs gnuplot-mode).
+
 2012-10-01  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/gplt_x11.c:  Replace parsing using sscanf( "%d %d" ) with

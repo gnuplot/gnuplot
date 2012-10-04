@@ -1,5 +1,5 @@
 #! /bin/sh --
-# $Id: prepare,v 1.11 2006/08/28 16:33:02 lhecking Exp $
+# $Id: prepare,v 1.12 2012/04/04 20:33:42 sfeam Exp $
 # Small shell script to prepare the gnuplot sources when
 # checked out from CVS.
 
@@ -28,7 +28,6 @@ if ${ACLOCAL} -I m4 && ${AUTOHEADER} \
   && (cd m4 && make -f Makefile.am.in Makefile.am ) \
   && (cd term && make -f Makefile.am.in Makefile.am ) \
   && (cd tutorial && make -f Makefile.am.in Makefile.am ) \
-  && (cd lisp && ${ACLOCAL} && ${AUTOMAKE} && ${AUTOCONF} ) \
   && ${AUTOMAKE} -a -c \
   && sed 's/noinst_PROGRAMS = bf_test$(EXEEXT) @GNUPLOT_X11@/noinst_PROGRAMS = bf_test$(EXEEXT) @GNUPLOT_X11@$(EXEEXT)/' \
 	<src/Makefile.in >src/Makefile.in2 \

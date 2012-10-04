@@ -1,14 +1,14 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot on Unix.
 dnl
-dnl $Id: configure.in,v 1.317 2012/05/21 04:28:08 sfeam Exp $
+dnl $Id: configure.in,v 1.318 2012/06/23 07:15:28 lodewyck Exp $
 dnl
 dnl this is actually major.minor ...
 dnl note that for a non-beta release, we need to disable DEVELOPMENT_RELEASE
 dnl
 AC_INIT(gnuplot, 4.7)
 AC_CONFIG_SRCDIR(src/graphics.c)
-AC_PREREQ(2.58)
+AC_PREREQ(2.60)
 AC_CONFIG_HEADERS(config.h:config.hin)
 AC_DEFINE(DEVELOPMENT_VERSION,1,[Provide contact info for gnuplot develoment])
 AM_INIT_AUTOMAKE(1.7.9)
@@ -82,7 +82,6 @@ dnl X/Emacs for building lisp packages and creating .texi version of docs
 # If you have an Emacs named "t", then use the full path.
 test x"$EMACS" = xt && EMACS=
 AC_CHECK_PROGS(EMACS, emacs xemacs, no)
-AM_PATH_LISPDIR
 
 dnl Allow manual specification of tex
 AC_ARG_WITH(latex,[  --without-latex         disable latex support, (default enable)],[],[with_latex="yes"])
@@ -744,10 +743,28 @@ if test "$with_cwdrc" = yes; then
                [ Define if you want to read .gnuplot from current directory (SECURITY RISK!).])
 fi
 
-dnl Whether we want to build the lisp files
-dnl Does nothing here, is passed on to the lisp subdir
+
+dnl Conditional actions based on whether or not we want to build the lisp files
+dnl This replaces a separate configure.in file in the lisp subdirectory
+if test "$EMACS" = no; then
+  LISPFILES=noelcs
+  INSTALL_LISP=install-nolisp
+else
+  LISPFILES=elcs
+  INSTALL_LISP=install-lisp
+fi
 AC_ARG_WITH(lisp-files,dnl
-[  --without-lisp-files    do not build emacs lisp files])
+[  --without-lisp-files    do not build emacs lisp files],
+  [if test "$with_lisp_files" = no; then
+     LISPFILES=noelcs
+     INSTALL_LISP=install-nolisp
+   fi])
+AM_PATH_LISPDIR
+AC_SUBST(lispdir)
+AC_SUBST(LISPFILES)
+AC_SUBST(INSTALL_LISP)
+
+
 
 dnl Sort help/subtopic tables by row or column
 AC_ARG_WITH(row-help,dnl
@@ -1188,7 +1205,6 @@ fi
 
 dnl build lisp files
 if test "$with_lisp_files" != no; then
-  AC_CONFIG_SUBDIRS(lisp)
   LISPDIR=lisp
 else
   LISPDIR=
@@ -1214,6 +1230,7 @@ AC_OUTPUT([Makefile
            config/Makefile
            demo/Makefile
            docs/Makefile
+	   lisp/Makefile
            m4/Makefile
            man/Makefile
            share/Makefile
