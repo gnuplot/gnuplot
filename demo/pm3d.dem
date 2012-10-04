@@ -1,5 +1,5 @@
 #
-# $Id: pm3d.dem,v 1.20 2007/03/04 06:06:39 sfeam Exp $
+# $Id: pm3d.dem,v 1.21 2011/10/08 00:07:40 sfeam Exp $
 #
 # demo for pm3d splotting
 #
@@ -401,8 +401,12 @@ f(x,y)=2*x+y
 set key off
 unset xtics
 unset ytics
-set tics scale 2
-set colorbox horizontal user origin 0.1,0.025 size .8,0.02
+unset colorbox
+set tmargin 0
+set bmargin 0
+
+# set tics scale 2
+# set colorbox horizontal user origin 0.1,0.025 size .8,0.02
 
 # Needed by terminals limited on colors:
 #set palette maxcolors 26
@@ -411,44 +415,49 @@ set colorbox horizontal user origin 0.1,0.025 size .8,0.02
 #set pm3d corners2color median
 #set pm3d corners2color geomean
 
-set multiplot
+set multiplot title "set pm3d corners2color mode"
 # Let us do multiplot grid 3x3:
 dx = 1.0/3; dy = 1.0/3;
 set size dx,dy
 
 set origin 0*dx,0*dy
-set title "set pm3d corners2color c1"
+set title "c1"
 set pm3d corners2color c1
 splot f(x,y)
 
 set origin 2*dx,0*dy
-set title "set pm3d corners2color c2"
+set title "c2"
 set pm3d corners2color c2
 replot
 
 set origin 0*dx,2*dy
-set title "set pm3d corners2color c3"
+set title "c3"
 set pm3d corners2color c3
 replot
 
 set origin 2*dx,2*dy
-set title "set pm3d corners2color c4"
+set title "c4"
 set pm3d corners2color c4
 replot
 
-set origin 0*dx,1*dy
-set title "set pm3d corners2color mean"
+set origin 1*dx,2*dy
+set title "mean"
 set pm3d corners2color mean
 replot
 
 set origin 2*dx,1*dy
-set title "set pm3d corners2color geomean"
+set title "geomean"
 set pm3d corners2color geomean
 replot
 
 set origin 1*dx,0*dy
-set title "set pm3d corners2color median"
+set title "median"
 set pm3d corners2color median
+replot
+
+set origin 0*dx,1*dy
+set title "harmean"
+set pm3d corners2color harmean
 replot
 
 set origin 1*dx,1*dy

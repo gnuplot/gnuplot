@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.377 2012/09/17 03:07:00 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.378 2012/09/22 05:18:49 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -3444,6 +3444,8 @@ set_pm3d()
 		    pm3d.which_corner_color = PM3D_WHICHCORNER_MEAN;
 		else if (equals(c_token, "geomean"))
 		    pm3d.which_corner_color = PM3D_WHICHCORNER_GEOMEAN;
+		else if (equals(c_token, "harmean"))
+			pm3d.which_corner_color = PM3D_WHICHCORNER_HARMEAN;
 		else if (equals(c_token, "median"))
 		    pm3d.which_corner_color = PM3D_WHICHCORNER_MEDIAN;
 		else if (equals(c_token, "min"))
@@ -3459,7 +3461,7 @@ set_pm3d()
 		else if (equals(c_token, "c4"))
 		    pm3d.which_corner_color = PM3D_WHICHCORNER_C4;
 		else
-		    int_error(c_token,"expecting 'mean', 'geomean', 'median', 'min', 'max', 'c1', 'c2', 'c3' or 'c4'");
+		    int_error(c_token,"expecting 'mean', 'geomean', 'harmean', 'median', 'min', 'max', 'c1', 'c2', 'c3' or 'c4'");
 		continue;
 	    } /* switch over pm3d lookup table */
 	    int_error(c_token,"invalid pm3d option");

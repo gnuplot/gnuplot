@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.89 2012/09/14 22:21:11 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.90 2012/09/17 03:03:33 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - pm3d.c */
@@ -68,6 +68,7 @@ static quadrangle* quadrangles = (quadrangle*)0;
 /* Internal prototypes for this module */
 static TBOOLEAN plot_has_palette;
 static double geomean4 __PROTO((double, double, double, double));
+static double harmean4 __PROTO((double, double, double, double));
 static double median4 __PROTO((double, double, double, double));
 static void pm3d_plot __PROTO((struct surface_points *, int));
 static void pm3d_option_at_error __PROTO((void));
@@ -103,6 +104,15 @@ geomean4 (double x1, double x2, double x3, double x4)
     }
 #endif
     return (neg <= 2) ? x1 : -x1;
+}
+
+static double
+harmean4 (double x1, double x2, double x3, double x4)
+{
+    if (x1 <= 0 || x2 <= 0 || x3 <= 0 || x4 <= 0)
+	return 0;
+    else
+	return 4 / ((1/x1) + (1/x2) + (1/x3) + (1/x4));
 }
 
 
@@ -708,6 +718,7 @@ pm3d_plot(struct surface_points *this_plot, int at_which_z)
 			}
 			break;
 		    case PM3D_WHICHCORNER_GEOMEAN: avgC = geomean4(cb1, cb2, cb3, cb4); break;
+		    case PM3D_WHICHCORNER_HARMEAN: avgC = harmean4(cb1, cb2, cb3, cb4); break;
 		    case PM3D_WHICHCORNER_MEDIAN: avgC = median4(cb1, cb2, cb3, cb4); break;
 		    case PM3D_WHICHCORNER_MIN: avgC = minimum4(cb1, cb2, cb3, cb4); break;
 		    case PM3D_WHICHCORNER_MAX: avgC = maximum4(cb1, cb2, cb3, cb4); break;
@@ -882,6 +893,7 @@ pm3d_plot(struct surface_points *this_plot, int at_which_z)
 			switch (pm3d.which_corner_color) {
 			    case PM3D_WHICHCORNER_MEAN: avgC = (cb1 + cb2 + cb3 + cb4) * 0.25; break;
 			    case PM3D_WHICHCORNER_GEOMEAN: avgC = geomean4(cb1, cb2, cb3, cb4); break;
+			    case PM3D_WHICHCORNER_HARMEAN: avgC = harmean4(cb1, cb2, cb3, cb4); break;
 			    case PM3D_WHICHCORNER_MEDIAN: avgC = median4(cb1, cb2, cb3, cb4); break;
 			    case PM3D_WHICHCORNER_MIN: avgC = minimum4(cb1, cb2, cb3, cb4); break;
 			    case PM3D_WHICHCORNER_MAX: avgC = maximum4(cb1, cb2, cb3, cb4); break;

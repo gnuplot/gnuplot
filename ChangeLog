@@ -1,3 +1,9 @@
+2012-10-04  Clement Law  <themanifold@gmail.com>
+
+	* src/pm3d.c src/pm3d.h src/set.c src/save.c src/show.c
+	docs/gnuplot.doc demo/pm3d.dem:
+	New option 'set pm3d corners2color harmean' (harmonic mean).
+
 2012-10-04  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* configure.in prepare lisp/Makefile.am lisp/configure.in (removed):

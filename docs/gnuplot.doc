@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.749 2012/09/17 03:00:18 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.750 2012/09/24 23:18:31 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -9838,7 +9838,9 @@ Ffigure_missing
                   { flush { begin | center | end } }
                   { ftriangles | noftriangles }
                   { clip1in | clip4in }
-                  { corners2color { mean|geomean|median|min|max|c1|c2|c3|c4 } }
+                  { corners2color
+                    { mean|geomean|harmean|median|min|max|c1|c2|c3|c4 }
+                  }
                   { hidden3d {<linestyle>} | nohidden3d }
                   { implicit | explicit }
                   { map }
@@ -9988,6 +9990,7 @@ Ffigure_missing
 ?pm3d color_assignment
 =mean
 =geomean
+=harmean
 =median
 =min
 =max
@@ -10000,9 +10003,9 @@ Ffigure_missing
  when your terminal is running out of available colors.
 
  There is a single gray/color value associated to each drawn pm3d quadrangle
- (no smooth color change among vertices).  The value is calculated from
- z-coordinates from the surrounding corners according to `corners2color
- <option>`.  The options 'mean' (default), 'geomean' and 'median' produce
+ (it contains a solid color, not a gradient).  The value is calculated from
+ z-coordinates the four corners according to `corners2color <option>`.
+ The options 'mean' (default), 'geomean', 'harmean, and 'median' produce
  various kinds of surface color smoothing, while options 'min' and 'max' choose
  minimal or maximal value, respectively. This may not be desired for pixel
  images or for maps with sharp and intense peaks, in which case the options
