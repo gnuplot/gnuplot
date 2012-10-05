@@ -1840,16 +1840,22 @@ buffer.  Further customization is possible via
 	(make-variable-buffer-local 'font-lock-defaults)
 	(setq font-lock-defaults '(gnuplot-font-lock-keywords t t))
 	(if gnuplot-xemacs-p (turn-on-font-lock))))
-  ;;(if (featurep 'kw-compl)
-  ;;    (progn
-  ;;	(setq kw-compl-list gnuplot-keywords
-  ;;	      kw-compl-upper-case nil)
-  ;;	(define-key comint-mode-map "\M-\r" 'kw-compl-abbrev)))
-  (define-key comint-mode-map "\M-\C-p" 'gnuplot-plot-from-comint)
-  (define-key comint-mode-map "\M-\C-f" 'gnuplot-save-and-plot-from-comint)
-  (define-key comint-mode-map "\C-d"    'gnuplot-delchar-or-maybe-eof)
-  (define-key comint-mode-map "\M-\r"   'gnuplot-complete-keyword)
-  (define-key comint-mode-map "\M-\t"   'gnuplot-complete-keyword)
+
+  (let ((keymap (make-sparse-keymap)))
+    (set-keymap-parent keymap comint-mode-map)
+    (define-key keymap "\M-\C-p" 'gnuplot-plot-from-comint)
+    (define-key keymap "\M-\C-f" 'gnuplot-save-and-plot-from-comint)
+    (define-key keymap "\C-d"    'gnuplot-delchar-or-maybe-eof)
+    (define-key keymap "\M-\r"   'gnuplot-complete-keyword)
+    (define-key keymap "\M-\t"   'gnuplot-complete-keyword)
+    ;;(when (featurep 'kw-compl)
+    ;;	(setq kw-compl-list gnuplot-keywords
+    ;;	      kw-compl-upper-case nil)
+    ;;	(define-key keymap "\M-\r" 'kw-compl-abbrev))
+    (with-current-buffer gnuplot-buffer
+      (use-local-map keymap)))
+
+
   (run-hooks 'gnuplot-comint-setup-hook))
 
 (defun gnuplot-make-gnuplot-buffer ()

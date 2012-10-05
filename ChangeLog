@@ -1,3 +1,9 @@
+2012-10-05  Dima Kogan  <dima@secretsauce.net>
+
+	* lisp/gnuplot.el: With this patch, emacs mode no longer pollutes
+	global comint-mode-map. Instead it applies the key bindings only to
+	the gnuplot comint instance.
+
 2012-10-05  Vladimir  <lomov_vl@users.sourceforge.net>
 
 	* src/lisp/Makefile.am: Fix typo in yesterday's revision.
