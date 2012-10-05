@@ -15,7 +15,7 @@
 	two calls to strtol().  This yields a 2-fold speedup in benchmarks
 	with large numbers of points and vectors.
 
-2012-09-28  Dima Kogan  <gnuplot@dima.secretsauce.net>
+2012-09-28  Dima Kogan  <dima@secretsauce.net>
 
 	* src/gplt_x11.c src/gplt_x11.h:  Remove dead code.
 
@@ -36,12 +36,12 @@
 	labels in a using spec to the actual column header text in a data file.
 	Bug #3571243
 
-2012-09-25  Dima Kogan  <gnuplot@dima.secretsauce.net>
+2012-09-25  Dima Kogan  <dima@secretsauce.net>
 
 	* src/gplt_x11.c src/mouse.c (do_event) term/x11.trm:
 	Feed back the x11 window size from gnuplot_x11 to gnuplot so that
 	the coordinates can be rescaled to maintain the correct aspect ratio.
-	This allows correct functioning of command like 'set size square' and
+	This allows correct functioning of commands like 'set size square' and
 	'set view equal xyz' in an interactive x11 output window.
 
 2012-09-24  Ethan A Merritt  <merritt@u.washington.edu>
