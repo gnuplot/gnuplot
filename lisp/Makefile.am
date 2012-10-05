@@ -13,13 +13,13 @@ DISTCLEANFILES =
 BYTEC = $(EMACS) -batch -q -no-site-file -l $(srcdir)/dot.el -f batch-byte-compile
 
 gnuplot.elc: gnuplot.el
-	@if [ "$(srcdir)" != "$(top_builddir)" ] ; then \
+	@if [ "$(top_srcdir)" != "$(top_builddir)" ] ; then \
 	  cp $(srcdir)/gnuplot.el . ; \
 	fi
 	$(BYTEC) gnuplot.el
 
 gnuplot-gui.elc: gnuplot-gui.el
-	@if [ "$(srcdir)" != "$(top_builddir)" ] ; then \
+	@if [ "$(top_srcdir)" != "$(top_builddir)" ] ; then \
 	  cp $(srcdir)/gnuplot-gui.el . ; \
 	fi
 	$(BYTEC) gnuplot-gui.el

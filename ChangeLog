@@ -1,3 +1,7 @@
+2012-10-05  Vladimir  <lomov_vl@users.sourceforge.net>
+
+	* src/lisp/Makefile.am: Fix typo in yesterday's revision.
+
 2012-10-04  Clement Law  <themanifold@gmail.com>
 
 	* src/pm3d.c src/pm3d.h src/set.c src/save.c src/show.c
