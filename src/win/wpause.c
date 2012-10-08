@@ -1,5 +1,5 @@
 /*
- * $Id: wpause.c,v 1.21 2011/11/26 13:56:44 markisch Exp $
+ * $Id: wpause.c,v 1.22 2012/06/30 06:41:33 markisch Exp $
  */
 
 /* GNUPLOT - win/wpause.c */
@@ -57,15 +57,14 @@
 #include "wcommon.h"
 #include "winmain.h"
 
+/* for paused_for_mouse */
+#include "command.h"
+
+
 /* Pause Window */
 static void CreatePauseClass(LPPW lppw);
 LRESULT CALLBACK WndPauseProc(HWND, UINT, WPARAM, LPARAM);
 LRESULT CALLBACK PauseButtonProc(HWND, UINT, WPARAM, LPARAM);
-
-/* We need to hide "OK" and "Cancel" buttons on the pause dialog during
- * "pause mouse".
- */
-extern int paused_for_mouse;
 
 
 /* Non-blocking Sleep function, called by pause_command.
@@ -74,34 +73,34 @@ extern int paused_for_mouse;
 void
 win_sleep(DWORD dwMilliSeconds)
 {
-    MSG msg;
-    DWORD t0, t1, tstop, rc;
+	MSG msg;
+	DWORD t0, t1, tstop, rc;
 
-    t0 = GetTickCount();
-    tstop  = t0 + dwMilliSeconds;
-    t1 = dwMilliSeconds; /* remaining time to wait */
-    do {
-	rc = MsgWaitForMultipleObjects(0, NULL, 0, t1, QS_ALLINPUT);
-        if (rc != WAIT_TIMEOUT) {
-	    while (PeekMessage(&msg, 0, 0, 0, PM_REMOVE)) {
-		if (msg.message == WM_QUIT)
-		    return;
-		TranslateMessage(&msg);
-		DispatchMessage(&msg);
-	    }
+	t0 = GetTickCount();
+	tstop  = t0 + dwMilliSeconds;
+	t1 = dwMilliSeconds; /* remaining time to wait */
+	do {
+		rc = MsgWaitForMultipleObjects(0, NULL, FALSE, t1, QS_ALLINPUT);
+		if (rc != WAIT_TIMEOUT) {
+			while (PeekMessage(&msg, 0, 0, 0, PM_REMOVE)) {
+				if (msg.message == WM_QUIT)
+					return;
+				TranslateMessage(&msg);
+				DispatchMessage(&msg);
+			}
 
-	    /* calculate remaining time, detect overflow */
-	    t1 = GetTickCount();
-	    if (tstop > t0) {
-		if ((t1 >= tstop) || (t1 < t0))
-		    rc = WAIT_TIMEOUT;
-	    } else {
-		if ((t1 >= tstop) && (t1 < t0))
-		    rc = WAIT_TIMEOUT;
-	    }
-	    t1 = tstop - t1; /* remaining time to wait */
-	}
-    } while(rc != WAIT_TIMEOUT);
+			/* calculate remaining time, detect overflow */
+			t1 = GetTickCount();
+			if (tstop > t0) {
+				if ((t1 >= tstop) || (t1 < t0))
+					rc = WAIT_TIMEOUT;
+			} else {
+				if ((t1 >= tstop) && (t1 < t0))
+					rc = WAIT_TIMEOUT;
+			}
+			t1 = tstop - t1; /* remaining time to wait */
+		}
+	} while (rc != WAIT_TIMEOUT);
 }
 
 
@@ -119,11 +118,12 @@ CreatePauseClass(LPPW lppw)
 	wndclass.hInstance = lppw->hInstance;
 	wndclass.hIcon = NULL;
 	wndclass.hCursor = LoadCursor(NULL, IDC_ARROW);
-	wndclass.hbrBackground = (HBRUSH)(COLOR_BTNFACE+1);
+	wndclass.hbrBackground = (HBRUSH)(COLOR_BTNFACE + 1);
 	wndclass.lpszMenuName = NULL;
 	wndclass.lpszClassName = szPauseClass;
 	RegisterClass(&wndclass);
 }
+
 
 /* PauseBox */
 int WDPROC
@@ -136,6 +136,7 @@ PauseBox(LPPW lppw)
 	RECT rect;
 	char *current_pause_title = lppw->Title;
 	static char TITLE_PAUSE_MOUSE[] = "waiting for mouse click";
+
 	if (paused_for_mouse)
 	    current_pause_title = TITLE_PAUSE_MOUSE;
 
@@ -150,24 +151,20 @@ PauseBox(LPPW lppw)
 	hdc = GetDC(NULL);
 	SelectObject(hdc, GetStockObject(SYSTEM_FONT));
 	GetTextMetrics(hdc, &tm);
-	width  = max(24,4+_fstrlen(lppw->Message)) * tm.tmAveCharWidth;
+	width  = max(24, 4 + strlen(lppw->Message)) * tm.tmAveCharWidth;
 	width = min(width, rect.right-rect.left);
 	height = 28 * (tm.tmHeight + tm.tmExternalLeading) / 4;
 	ReleaseDC(NULL,hdc);
 
 	lppw->hWndPause = CreateWindowEx(
-        WS_EX_DLGMODALFRAME | WS_EX_TOPMOST | WS_EX_APPWINDOW
-        , szPauseClass, current_pause_title,
-/* HBB 981202: WS_POPUPWINDOW would have WS_SYSMENU in it, but we don't
- * want, nor need, a System menu in our Pause windows. Actually, it was
- * emptied manually, in the WM_CREATE handler below, in the original code.
- * This solution seems cleaner. */
+		WS_EX_DLGMODALFRAME | WS_EX_APPWINDOW,
+		szPauseClass, current_pause_title,
+		/* HBB 981202: WS_POPUPWINDOW would have WS_SYSMENU in it, but we don't
+		 * want, nor need, a System menu in our Pause windows. */
 		WS_POPUP | WS_BORDER | WS_CAPTION,
 		lppw->Origin.x - width/2, lppw->Origin.y - height/2,
 		width, height,
 		lppw->hWndParent, NULL, lppw->hInstance, lppw);
-
-	SendMessage(lppw->hCancel, BM_SETSTYLE, (WPARAM)BS_DEFPUSHBUTTON, (LPARAM)FALSE);
 
 	/* Don't show the pause "OK CANCEL" dialog for "pause mouse ..." -- well, show
 	   it only for "pause -1".
@@ -196,8 +193,9 @@ PauseBox(LPPW lppw)
 
 	DestroyWindow(lppw->hWndPause);
 
-	return(lppw->bPauseCancel);
+	return lppw->bPauseCancel;
 }
+
 
 LRESULT CALLBACK
 WndPauseProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
@@ -213,45 +211,39 @@ WndPauseProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 	switch(message) {
 		case WM_KEYDOWN:
-			if (wParam == VK_RETURN) {
-				if (lppw->bDefOK)
-					SendMessage(hwnd, WM_COMMAND, IDOK, 0L);
-				else
-					SendMessage(hwnd, WM_COMMAND, IDCANCEL, 0L);
-			}
-			return(0);
+			if (wParam == VK_RETURN)
+				SendMessage(hwnd, WM_COMMAND, lppw->bDefOK ? IDOK : IDCANCEL, 0L);
+			else if (wParam == VK_ESCAPE)
+				SendMessage(hwnd, WM_COMMAND, IDCANCEL, 0L);
+			return 0;
 		case WM_COMMAND:
-			switch(LOWORD(wParam)) {
-				case IDCANCEL:
-				case IDOK:
-				    if (!paused_for_mouse) { /* ignore OK and Cancel buttons during "pause mouse" */
+			if ((LOWORD(wParam) == IDCANCEL) || (LOWORD(wParam) == IDOK)) {
+				if (!paused_for_mouse) { /* ignore OK and Cancel buttons during "pause mouse" */
 					lppw->bPauseCancel = LOWORD(wParam);
 					lppw->bPause = FALSE;
-				    }
-				    break;
+				}
+				break;
 			}
-			return(0);
+			return 0;
 		case WM_SETFOCUS:
 			SetFocus(lppw->bDefOK ? lppw->hOK : lppw->hCancel);
-			return(0);
-		case WM_PAINT:
-			{
+			return 0;
+		case WM_PAINT: {
 			hdc = BeginPaint(hwnd, &ps);
 			SelectObject(hdc, GetStockObject(SYSTEM_FONT));
 			SetTextAlign(hdc, TA_CENTER);
 			GetClientRect(hwnd, &rect);
 			SetBkMode(hdc,TRANSPARENT);
-			TextOut(hdc,(rect.right+rect.left)/2, (rect.bottom+rect.top)/6,
-				lppw->Message,_fstrlen(lppw->Message));
+			TextOut(hdc, (rect.right + rect.left) / 2, (rect.bottom + rect.top) / 6,
+				lppw->Message, strlen(lppw->Message));
 			EndPaint(hwnd, &ps);
 			return 0;
-			}
-		case WM_CREATE:
-			{
-		    	int ws_opts = WS_CHILD | BS_DEFPUSHBUTTON;
+		}
+		case WM_CREATE: {
+			int ws_opts = WS_CHILD | WS_TABSTOP;
+
 			if (!paused_for_mouse) /* don't show buttons during pausing for mouse or key */
-			    ws_opts |= WS_VISIBLE;
-			/* HBB 981202 HMENU sysmenu = GetSystemMenu(hwnd, FALSE); */
+				ws_opts |= WS_VISIBLE;
 			lppw = ((CREATESTRUCT *)lParam)->lpCreateParams;
 			SetWindowLong(hwnd, 0, (LONG)lppw);
 			lppw->hWndPause = hwnd;
@@ -260,19 +252,19 @@ WndPauseProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			GetTextMetrics(hdc, &tm);
 			cxChar = tm.tmAveCharWidth;
 			cyChar = tm.tmHeight + tm.tmExternalLeading;
-			ReleaseDC(hwnd,hdc);
+			ReleaseDC(hwnd, hdc);
 			middle = ((LPCREATESTRUCT) lParam)->cx / 2;
 			lppw->hOK = CreateWindow((LPSTR)"button", (LPSTR)"OK",
-				ws_opts,
-					middle - 10*cxChar, 3*cyChar,
-					8*cxChar, 7*cyChar/4,
+					ws_opts | BS_DEFPUSHBUTTON,
+					middle - 10 * cxChar, 3 * cyChar,
+					8 * cxChar, 7 * cyChar / 4,
 					hwnd, (HMENU)IDOK,
 					((LPCREATESTRUCT) lParam)->hInstance, NULL);
 			lppw->bDefOK = TRUE;
 			lppw->hCancel = CreateWindow((LPSTR)"button", (LPSTR)"Cancel",
-				ws_opts,
-					middle + 2*cxChar, 3*cyChar,
-					8*cxChar, 7*cyChar/4,
+					ws_opts | BS_PUSHBUTTON,
+					middle + 2 * cxChar, 3 * cyChar,
+					8 * cxChar, 7 * cyChar / 4,
 					hwnd, (HMENU)IDCANCEL,
 					((LPCREATESTRUCT) lParam)->hInstance, NULL);
 			lppw->lpfnOK = (WNDPROC) GetWindowLong(lppw->hOK, GWL_WNDPROC);
@@ -280,25 +272,16 @@ WndPauseProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			lppw->lpfnCancel = (WNDPROC) GetWindowLong(lppw->hCancel, GWL_WNDPROC);
 			SetWindowLong(lppw->hCancel, GWL_WNDPROC, (LONG)PauseButtonProc);
 			if (GetParent(hwnd))
-				EnableWindow(GetParent(hwnd),FALSE);
-#if 0 /* HBB 981203 */
-			DeleteMenu(sysmenu,SC_RESTORE,MF_BYCOMMAND);
-			DeleteMenu(sysmenu,SC_SIZE,MF_BYCOMMAND);
-			DeleteMenu(sysmenu,SC_MINIMIZE,MF_BYCOMMAND);
-			DeleteMenu(sysmenu,SC_MAXIMIZE,MF_BYCOMMAND);
-			DeleteMenu(sysmenu,SC_TASKLIST,MF_BYCOMMAND);
-			DeleteMenu(sysmenu,0,MF_BYCOMMAND); /* a separator */
-			DeleteMenu(sysmenu,0,MF_BYCOMMAND); /* a separator */
-#endif
-			}
+				EnableWindow(GetParent(hwnd), FALSE);
 			return 0;
+		}
 		case WM_DESTROY:
 			GetWindowRect(hwnd, &rect);
-			lppw->Origin.x = (rect.right+rect.left)/2;
-			lppw->Origin.y = (rect.bottom+rect.top)/2;
+			lppw->Origin.x = (rect.right + rect.left) / 2;
+			lppw->Origin.y = (rect.bottom + rect.top) / 2;
 			lppw->bPause = FALSE;
 			if (GetParent(hwnd))
-				EnableWindow(GetParent(hwnd),TRUE);
+				EnableWindow(GetParent(hwnd), TRUE);
 			break;
 	}
 	return DefWindowProc(hwnd, message, wParam, lParam);
@@ -311,32 +294,31 @@ PauseButtonProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 	LPPW lppw;
 	LONG n = GetWindowLong(hwnd, GWL_ID);
 	lppw = (LPPW)GetWindowLong(GetParent(hwnd), 0);
-	switch(message) {
+	switch (message) {
 		case WM_KEYDOWN:
-			switch(wParam) {
-			  case VK_TAB:
-			  case VK_BACK:
-			  case VK_LEFT:
-			  case VK_RIGHT:
-			  case VK_UP:
-			  case VK_DOWN:
-				lppw->bDefOK = !(n == IDOK);
-				if (lppw->bDefOK) {
-					SendMessage(lppw->hOK,     BM_SETSTYLE, (WPARAM)BS_DEFPUSHBUTTON, (LPARAM)TRUE);
-					SendMessage(lppw->hCancel, BM_SETSTYLE, (WPARAM)BS_PUSHBUTTON, (LPARAM)TRUE);
-					SetFocus(lppw->hOK);
-				}
-				else {
-					SendMessage(lppw->hOK,     BM_SETSTYLE, (WPARAM)BS_PUSHBUTTON, (LPARAM)TRUE);
-					SendMessage(lppw->hCancel, BM_SETSTYLE, (WPARAM)BS_DEFPUSHBUTTON, (LPARAM)TRUE);
-					SetFocus(lppw->hCancel);
-				}
-				break;
-			  default:
-				SendMessage(GetParent(hwnd), message, wParam, lParam);
+			switch (wParam) {
+				case VK_TAB:
+				case VK_BACK:
+				case VK_LEFT:
+				case VK_RIGHT:
+				case VK_UP:
+				case VK_DOWN:
+					lppw->bDefOK = !(n == IDOK);
+					if (lppw->bDefOK) {
+						SendMessage(lppw->hOK,     BM_SETSTYLE, (WPARAM)BS_DEFPUSHBUTTON, (LPARAM)TRUE);
+						SendMessage(lppw->hCancel, BM_SETSTYLE, (WPARAM)BS_PUSHBUTTON, (LPARAM)TRUE);
+						SetFocus(lppw->hOK);
+					} else {
+						SendMessage(lppw->hOK,     BM_SETSTYLE, (WPARAM)BS_PUSHBUTTON, (LPARAM)TRUE);
+						SendMessage(lppw->hCancel, BM_SETSTYLE, (WPARAM)BS_DEFPUSHBUTTON, (LPARAM)TRUE);
+						SetFocus(lppw->hCancel);
+					}
+					break;
+				default:
+					SendMessage(GetParent(hwnd), message, wParam, lParam);
 			}
 			break;
 	}
 	return CallWindowProc(((n == IDOK) ? lppw->lpfnOK : lppw->lpfnCancel),
-		 hwnd, message, wParam, lParam);
+		hwnd, message, wParam, lParam);
 }
