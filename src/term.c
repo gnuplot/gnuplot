@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.239 2012/05/17 05:03:17 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.240 2012/08/24 21:28:38 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -1898,11 +1898,13 @@ test_term()
     /* border linetype */
     (*t->linewidth) (1.0);
     (*t->linetype) (LT_BLACK);
+    newpath();
     (*t->move) (0, 0);
     (*t->vector) (xmax_t - 1, 0);
     (*t->vector) (xmax_t - 1, ymax_t - 1);
     (*t->vector) (0, ymax_t - 1);
     (*t->vector) (0, 0);
+    closepath();
     (*t->linetype)(0);
 
     /* Echo back the current terminal type */
@@ -1929,11 +1931,13 @@ test_term()
     (*t->vector) (xmax_t - 1, ymax_t / 2);
     /* test width and height of characters */
     (*t->linetype) (3);
+    newpath();
     (*t->move) (xmax_t / 2 - t->h_char * 10, ymax_t / 2 + t->v_char / 2);
     (*t->vector) (xmax_t / 2 + t->h_char * 10, ymax_t / 2 + t->v_char / 2);
     (*t->vector) (xmax_t / 2 + t->h_char * 10, ymax_t / 2 - t->v_char / 2);
     (*t->vector) (xmax_t / 2 - t->h_char * 10, ymax_t / 2 - t->v_char / 2);
     (*t->vector) (xmax_t / 2 - t->h_char * 10, ymax_t / 2 + t->v_char / 2);
+    closepath();
     (*t->put_text) (xmax_t / 2 - t->h_char * 10, ymax_t / 2,
 		    "12345678901234567890");
     (*t->put_text) (xmax_t / 2 - t->h_char * 10, ymax_t / 2 + t->v_char * 1.4,
@@ -2088,11 +2092,13 @@ test_term()
 	int style = ((i<<4) + FS_PATTERN);
 	if (t->fillbox)
 	    (*t->fillbox) ( style, x, y, xl, yl );
+	newpath();
 	(*t->move)  (x,y);
 	(*t->vector)(x,y+yl);
 	(*t->vector)(x+xl,y+yl);
 	(*t->vector)(x+xl,y);
 	(*t->vector)(x,y);
+	closepath();
 	sprintf(label,"%2d",i);
 	(*t->put_text)(x+xl/2, y+yl+t->v_char*0.5, label);
 	x += xl * 1.5;

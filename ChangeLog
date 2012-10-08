@@ -3,6 +3,10 @@
 	* src/win/wgraph.c (WndGraphProc): Implement space-raises-console
 	for console mode gnuplot.
 
+	* src/win/wtext.h (getchar): Make sure that getchar is defined.
+
+	* src/term.c (test_term): Add newpath/closepath calls were applicable.
+
 2012-10-05  Dima Kogan  <dima@secretsauce.net>
 
 	* lisp/gnuplot.el: With this patch, emacs mode no longer pollutes
