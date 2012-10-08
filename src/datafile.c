@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.231 2012/09/14 03:30:26 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.232 2012/09/26 22:20:15 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -1936,7 +1936,8 @@ df_readascii(double v[], int max)
 			return DF_MISSING;
 		    else if ((column <= df_no_cols)
 			     && (df_column[column - 1].good == DF_UNDEFINED)) {
-			/* EAM April 2012 - return or continue?? */
+			/* EAM October 2012 - return or continue?? */
+			v[output] = df_column[column - 1].datum;
 			return DF_UNDEFINED;
 		    } else {
 			/* line bad only if user explicitly asked

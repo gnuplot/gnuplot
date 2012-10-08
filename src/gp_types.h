@@ -1,5 +1,5 @@
 /*
- * $Id: gp_types.h,v 1.52 2012/06/19 18:11:06 sfeam Exp $
+ * $Id: gp_types.h,v 1.53 2012/08/27 23:33:24 sfeam Exp $
  */
 
 /* GNUPLOT - gp_types.h */
@@ -154,7 +154,7 @@ typedef enum coord_type {
 /* These fields of 'struct coordinate' used for storing the color of 3D data
  * points (if requested by NEED_PALETTE(this_plot), for instance).
  */
-#define CRD_COLOR ylow
+#define CRD_COLOR yhigh
 #define CRD_R yhigh
 #define CRD_G xlow
 #define CRD_B xhigh

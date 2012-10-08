@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.90 2012/09/17 03:03:33 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.91 2012/10/04 20:19:08 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - pm3d.c */
@@ -81,36 +81,30 @@ static TBOOLEAN color_from_rgbvar = FALSE;
  */
 
 /* Geometrical mean = pow( prod(x_i > 0) x_i, 1/N )
- * Sign of the result: result is positive if 3 or 4 x_i are positive,
- * it is negative if 3 or all 4 x_i are negative. Helps to splot surface
- * with all color coordinates negative.
+ * In order to facilitate plotting surfaces with all color coords negative,
+ * All 4 corners positive - return positive geometric mean
+ * All 4 corners negative - return negative geometric mean
+ * otherwise return 0
+ * EAM Oct 2012: This is a CHANGE
  */
 static double
 geomean4 (double x1, double x2, double x3, double x4)
 {
-    /* honor signess, i.e. sign(geomean) = sign(prod(x_i)) */
     int neg = (x1 < 0) + (x2 < 0) + (x3 < 0) + (x4 < 0);
-    x1 *= x2 * x3 * x4;
-    if (x1 == 0) return 0;
-    /* pow(x, 0.25) is slightly faster than sqrt(sqrt(x)) */
-    x1 = sqrt(sqrt(fabs(x1)));
-#if 0
-    /* such a warning could be helpful, but under normal usage it is just an overhead */
-    if (neg > 1 && interactive && notwarned) {
-	    int notwarned = 1;  ... to be set on every new splot
-	    if (notwarned)
-		int_warn(NO_CARET, "corners2color geomean with negative data points");
-	    notwarned = 0;
-    }
-#endif
-    return (neg <= 2) ? x1 : -x1;
+    double product = x1 * x2 * x3 * x4;
+
+    if (product == 0) return 0;
+    if (neg == 1 || neg == 2 || neg == 3) return 0;
+
+    product = sqrt(sqrt(fabs(product)));
+    return (neg == 0) ? product : -product;
 }
 
 static double
 harmean4 (double x1, double x2, double x3, double x4)
 {
     if (x1 <= 0 || x2 <= 0 || x3 <= 0 || x4 <= 0)
-	return 0;
+	return not_a_number();
     else
 	return 4 / ((1/x1) + (1/x2) + (1/x3) + (1/x4));
 }
@@ -727,6 +721,10 @@ pm3d_plot(struct surface_points *this_plot, int at_which_z)
 		    case PM3D_WHICHCORNER_C3: avgC = cb3; break;
 		    case PM3D_WHICHCORNER_C4: avgC = cb4; break;
 		}
+
+		/* The value is out of range, but we didn't figure it out until now */
+		if (isnan(avgC))
+		    continue;
 
 		if (color_from_rgbvar) /* we were given an explicit color */
 			gray = avgC;

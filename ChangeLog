@@ -1,3 +1,16 @@
+2012-10-08  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/plot2d.c (get_data) src/datafile.c (df_readascii) src/gp_types.h:
+	Handle NaN pixels in image plots read in from non-matrix data.
+	Handle NaN pixels in pm3d surfaces created by singularities in 
+	harmonic mean.
+	
+	* src/pm3d.c (geomean4 harmean4 pm3d_plot): Revise geomean4():
+	All corners positive => return positive geometric mean.
+	All corners negative => return negative geometric mean.
+	Otherwise return zero (previously the function returned something
+	peculiar if 1 or 3 corners were negative).
+
 2012-10-08  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/win/wgraph.c (WndGraphProc): Implement space-raises-console
