@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot.c,v 1.139 2012/05/06 22:56:35 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot.c,v 1.140 2012/06/30 20:50:48 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot.c */
@@ -375,7 +375,11 @@ main(int argc, char **argv)
 #endif
 	    return 0;
 
-	} else if (!strncmp(argv[i], "-persist", 2) || !strcmp(argv[i], "--persist")) {
+	} else if (!strncmp(argv[i], "-persist", 2) || !strcmp(argv[i], "--persist")
+#ifdef _Windows
+		|| !stricmp(argv[i], "-noend") || !stricmp(argv[i], "/noend")
+#endif
+		) {
 	    persist_cl = TRUE;
 	}
     }
@@ -620,23 +624,17 @@ main(int argc, char **argv)
     }
 
     if (argc > 1) {
-#ifdef _Windows
-	TBOOLEAN noend = persist_cl;
-#endif
 
 	/* load filenames given as arguments */
 	while (--argc > 0) {
 	    ++argv;
 	    c_token = 0;
+	    if (!strncmp(*argv, "-persist", 2) || !strcmp(*argv, "--persist")
 #ifdef _Windows
-	    if (stricmp(*argv, "-noend") == 0 || stricmp(*argv, "/noend") == 0
-	       	|| stricmp(*argv, "-persist") == 0)
-		noend = TRUE;
-	    else
+		|| !stricmp(*argv, "-noend") || !stricmp(*argv, "/noend")
 #endif
-	    if (!strncmp(*argv, "-persist", 2) || !strcmp(*argv, "--persist")) {
+	    ) {
 		FPRINTF((stderr,"'persist' command line option recognized\n"));
-
 	    } else if (strcmp(*argv, "-") == 0) {
 		interactive = TRUE;
 		while (!com_line());
@@ -655,9 +653,10 @@ main(int argc, char **argv)
 	    }
 	}
 #ifdef _Windows
-	if (noend) {
+	if (persist_cl) {
 	    interactive = TRUE;
 	    while (!com_line());
+	    interactive = FALSE;
 	}
 #endif
     } else {

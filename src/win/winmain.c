@@ -1,5 +1,5 @@
 /*
- * $Id: winmain.c,v 1.55 2012/06/30 06:41:33 markisch Exp $
+ * $Id: winmain.c,v 1.56 2012/07/18 16:42:51 markisch Exp $
  */
 
 /* GNUPLOT - win/winmain.c */
@@ -410,7 +410,6 @@ int PASCAL WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 int main(int argc, char **argv)
 #endif
 {
-        /*WNDCLASS wndclass;*/
         LPSTR tail;
 
 #ifdef WGP_CONSOLE
@@ -532,17 +531,12 @@ int main(int argc, char **argv)
                 exit(1);
         textwin.hIcon = LoadIcon(hInstance, "TEXTICON");
         SetClassLong(textwin.hWndParent, GCL_HICON, (DWORD)textwin.hIcon);
-        if (_argc>1) {
-                int i,noend=FALSE;
-                for (i=0; i<_argc; ++i)
-                        if (!stricmp(_argv[i],"-noend") || !stricmp(_argv[i],"/noend")
-                            || !stricmp(_argv[i],"-persist"))
-                                noend = TRUE;
-                if (noend)
-                        ShowWindow(textwin.hWndParent, textwin.nCmdShow);
-        }
-        else
-                ShowWindow(textwin.hWndParent, textwin.nCmdShow);
+	if (_argc > 1) {
+		if (persist_cl)
+			ShowWindow(textwin.hWndParent, textwin.nCmdShow);
+	} else {
+		ShowWindow(textwin.hWndParent, textwin.nCmdShow);
+	}
         if (IsIconic(textwin.hWndParent)) { /* update icon */
                 RECT rect;
                 GetClientRect(textwin.hWndParent, (LPRECT) &rect);
