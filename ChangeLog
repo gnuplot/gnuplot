@@ -11,6 +11,9 @@
 	Do not force pause-messagebox to stay on top. (WndPauseProc): "Cancel"
 	button can be activated by escape key. Code cleanup.
 
+	* term/win.trm (WIN_filled_polygon): Filled polygon are always closed.
+	Ignore the last corner if it's the same as the first one.
+
 2012-10-05  Dima Kogan  <dima@secretsauce.net>
 
 	* lisp/gnuplot.el: With this patch, emacs mode no longer pollutes
