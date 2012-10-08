@@ -1,5 +1,5 @@
 /*
- * $Id: wgraph.c,v 1.153 2012/06/30 06:41:33 markisch Exp $
+ * $Id: wgraph.c,v 1.154 2012/07/25 05:06:28 markisch Exp $
  */
 
 /* GNUPLOT - win/wgraph.c */
@@ -3554,13 +3554,20 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			/* All 'normal' keys (letters, digits and the likes) end up
 			 * here... */
 #ifndef DISABLE_SPACE_RAISES_CONSOLE
-			if ((wParam == VK_SPACE) && (lpgw->lptw != NULL)){
+			if (wParam == VK_SPACE) {
+				HWND console = NULL;
+#ifndef WGP_CONSOLE
+				if (lpgw->lptw != NULL)
+					console = lpgw->lptw->hWndParent;
+#else
+				console = GetConsoleWindow();
+#endif
 				/* HBB 20001023: implement the '<space> in graph returns to
 				 * text window' --- feature already present in OS/2 and X11 */
-				/* Make sure the text window is visible: */
-				ShowWindow(lpgw->lptw->hWndParent, SW_RESTORE);
-				/* and activate it (--> Keyboard focus goes there */
-				BringWindowToTop(lpgw->lptw->hWndParent);
+				/* Make sure the text window or console is is visible: */
+				ShowWindow(console, SW_RESTORE);
+				/* Activate it --> keyboard focus goes there: */
+				BringWindowToTop(console);
 				return 0;
 			}
 #endif /* DISABLE_SPACE_RAISES_CONSOLE */
