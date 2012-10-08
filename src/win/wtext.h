@@ -1,5 +1,5 @@
 /*
- * $Id: wtext.h,v 1.12 2012/06/13 11:27:40 markisch Exp $
+ * $Id: wtext.h,v 1.13 2012/10/08 09:28:49 markisch Exp $
  */
 
 /* GNUPLOT - win/wtext.h */
@@ -52,11 +52,11 @@
 
 #define fgetc(file) MyFGetC(file)
 #undef  getchar
-#define getchar()	MyGetCh()
+#define getchar()   MyGetCh()
 #undef  getc
 #define getc(file)  MyFGetC(file)
 #define fgets(str,sz,file)  MyFGetS(str,sz,file)
-#define gets(str)  	    MyGetS(str)
+#define gets(str)   MyGetS(str)
 
 #define fputc(ch,file) MyFPutC(ch,file)
 #undef  putchar

@@ -1,5 +1,5 @@
 /*
- * $Id: winmain.c,v 1.56 2012/07/18 16:42:51 markisch Exp $
+ * $Id: winmain.c,v 1.57 2012/10/08 15:53:57 markisch Exp $
  */
 
 /* GNUPLOT - win/winmain.c */
@@ -86,6 +86,10 @@
 #ifdef HAVE_GDIPLUS
 #include "wgdiplus.h"
 #endif
+#ifdef WXWIDGETS
+#include "wxterminal/wxt_term.h"
+#endif
+
 
 /* workaround for old header files */
 #ifndef CSIDL_APPDATA
@@ -1063,7 +1067,7 @@ win_lower_terminal_window(int id)
 	while ((lpgw != NULL) && (lpgw->Id != id))
 		lpgw = lpgw->next;
 	if (lpgw != NULL)
-	    SetWindowPos(lpgw->hWndGraph, HWND_BOTTOM, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE | SWP_NOACTIVATE);
+		SetWindowPos(lpgw->hWndGraph, HWND_BOTTOM, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE | SWP_NOACTIVATE);
 }
 
 void
@@ -1071,8 +1075,38 @@ win_lower_terminal_group(void)
 {
 	LPGW lpgw = listgraphs;
 	while (lpgw != NULL) {
-	    SetWindowPos(lpgw->hWndGraph, HWND_BOTTOM, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE | SWP_NOACTIVATE);
+		SetWindowPos(lpgw->hWndGraph, HWND_BOTTOM, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE | SWP_NOACTIVATE);
 		lpgw = lpgw->next;
 	}
 }
 
+
+/* return the number of graph windows (win terminal)*/
+TBOOLEAN
+WinWindowOpened(void)
+{
+	LPGW lpgw;
+
+	lpgw = listgraphs;
+	while (lpgw != NULL) {
+		if (GraphHasWindow(lpgw))
+			return TRUE;
+		lpgw = lpgw->next;
+	}
+	return FALSE;
+}
+
+
+#ifndef WGP_CONSOLE
+void
+WinPersistTextClose(void)
+{
+	TBOOLEAN window_opened = WinWindowOpened();
+#ifdef WXWIDGETS
+	window_opened |= wxt_window_opened();
+#endif
+	if (!window_opened &&
+		(textwin.hWndParent != NULL) && !IsWindowVisible(textwin.hWndParent))
+		PostMessage(textwin.hWndParent, WM_CLOSE, 0, 0);
+}
+#endif

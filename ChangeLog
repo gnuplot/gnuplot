@@ -14,10 +14,22 @@
 	* term/win.trm (WIN_filled_polygon): Filled polygon are always closed.
 	Ignore the last corner if it's the same as the first one.
 
-	src/plot.c (gnu_main) src/win/winmain.c (main): The Windows version
+	* src/plot.c (gnu_main) src/win/winmain.c (main): The Windows version
 	used to handle the persist command line option in winmain.c. Moving
 	it to plot.c ensures that the same options are supported on all
 	platforms. See Bug #3538762
+
+	* src/win/wcommon.h src/win/wtext.c (TextShow) src/win/winmain.h
+	src/win/winmain.c (WinWindowOpened, WinPersistTextClose)
+	src/win/wgraph.c (WndGraphProc) src/wxterminal/wx_term.h
+	src/wxterminal/wxt_gui.h src/wxterminal/wxt_gui.cpp (~wxtFrame, 
+	wxtFrame::onClose, wxt_window_opened, wxt_atexit) src/plot.c (main)
+	Revise handling of persist mode on Windows: Exit wgnuplot only after the
+	last plot window (wxt or win) has been closed. The text window is only
+	shown if "-" is given on the command line. No zombie wgnuplot process
+	when closing a persistent wxt terminal window. Console gnuplot behaviour
+	stays unchanged.
+	Bug #3538762
 
 2012-10-05  Dima Kogan  <dima@secretsauce.net>
 

@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.cpp,v 1.105 2012/08/28 17:14:22 sfeam Exp $
+ * $Id: wxt_gui.cpp,v 1.106 2012/08/29 21:25:35 sfeam Exp $
  */
 
 /* GNUPLOT - wxt_gui.cpp */
@@ -464,6 +464,21 @@ wxtFrame::wxtFrame( const wxString& title, wxWindowID id )
 }
 
 
+wxtFrame::~wxtFrame()
+{
+	/* Automatically remove frame from window list. */
+	std::vector<wxt_window_t>::iterator wxt_iter;
+
+	for(wxt_iter = wxt_window_list.begin();
+		wxt_iter != wxt_window_list.end(); wxt_iter++) {
+		if (this == wxt_iter->frame) {
+			wxt_window_list.erase(wxt_iter);
+			break;
+		}
+	}
+}
+
+
 /* toolbar event : Copy to clipboard
  * We will copy the panel to a bitmap, using platform-independant wxWidgets functions */
 void wxtFrame::OnCopy( wxCommandEvent& WXUNUSED( event ) )
@@ -584,6 +599,11 @@ void wxtFrame::OnClose( wxCloseEvent& event )
 		}
 		this->Destroy();
 	}
+
+#if defined(_Windows) && !defined(WGP_CONSOLE)
+	/* Close text window if this was the last plot window. */
+	WinPersistTextClose();
+#endif
 }
 
 /* when the window is resized,
@@ -3603,20 +3623,21 @@ int wxt_waitforinput()
 
 /* returns true if at least one plot window is opened.
  * Used to handle 'persist' */
-bool wxt_window_opened()
+TBOOLEAN wxt_window_opened(void)
 {
 	std::vector<wxt_window_t>::iterator wxt_iter; /*declare the iterator*/
 
 	wxt_MutexGuiEnter();
-	for(wxt_iter = wxt_window_list.begin(); wxt_iter != wxt_window_list.end(); wxt_iter++) {
-		if ( wxt_iter->frame->IsShown() ) {
+	for (wxt_iter = wxt_window_list.begin(); wxt_iter != wxt_window_list.end(); wxt_iter++) {
+		if (wxt_iter->frame->IsShown()) {
 			wxt_MutexGuiLeave();
-			return true;
+			return TRUE;
 		}
 	}
 	wxt_MutexGuiLeave();
-	return false;
+	return FALSE;
 }
+
 
 /* Called when gnuplot exits.
  * Handle the 'persist' setting, ie will continue
@@ -3680,12 +3701,8 @@ void wxt_atexit()
 	FPRINTF((stderr,"wxt_atexit: handling \"persist\" setting\n"));
 
 #ifdef _Windows
-	if (!interactive) {
+	if (!persist_cl) {
 		interactive = TRUE;
-		/* be sure to show the text window */
-#ifndef WGP_CONSOLE
-		ShowWindow(textwin.hWndParent, textwin.nCmdShow);
-#endif
 		while (!com_line());
 	}
 #else /*_Windows*/

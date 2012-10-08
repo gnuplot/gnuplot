@@ -1,5 +1,5 @@
 /*
- * $Id: wgraph.c,v 1.154 2012/07/25 05:06:28 markisch Exp $
+ * $Id: wgraph.c,v 1.155 2012/10/08 09:24:59 markisch Exp $
  */
 
 /* GNUPLOT - win/wgraph.c */
@@ -46,8 +46,8 @@
 
 #define STRICT
 #ifdef USE_MOUSE
-/* shige: for mouse wheel */
-#define _WIN32_WINNT 0x0400
+/* shige: for mouse wheel, BM: GetConsoleWindow */
+#define _WIN32_WINNT 0x0500
 #endif
 /* BM: for AlphaBlend/TransparentBlt */
 #define WINVER 0x0501
@@ -4091,9 +4091,10 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			DestroyCursors(lpgw);
 #endif
 			DragAcceptFiles(hwnd, FALSE);
-			if (lpgw->lptw && !IsWindowVisible(lpgw->lptw->hWndParent)) {
-				PostMessage (lpgw->lptw->hWndParent, WM_CLOSE, 0, 0);
-			}
+			lpgw->hWndGraph = NULL;
+#ifndef WGP_CONSOLE
+			WinPersistTextClose();
+#endif
 			return 0;
 		case WM_CLOSE:
 			GraphClose(lpgw);

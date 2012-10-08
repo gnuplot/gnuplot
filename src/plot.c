@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot.c,v 1.140 2012/06/30 20:50:48 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot.c,v 1.141 2012/10/08 15:53:57 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - plot.c */
@@ -328,7 +328,7 @@ main(int argc, char **argv)
 
 #if defined(HAVE_LIBREADLINE) || defined(HAVE_LIBEDITLINE)
     /* T.Walter 1999-06-24: 'rl_readline_name' must be this fix name.
-     * It is used to parse a 'gnuplot' specific section in '~/.inputrc' 
+     * It is used to parse a 'gnuplot' specific section in '~/.inputrc'
      * or gnuplot specific commands in '.editrc' (when using editline
      * instead of readline) */
     rl_readline_name = "Gnuplot";
@@ -504,7 +504,7 @@ main(int argc, char **argv)
 	fprintf(stderr,
 	    "\ngnuplot changed the codepage of this console from %i to %i to\n" \
 	    "match the graph window. Some characters might only display correctly\n" \
-	    "if you change the font to a non-raster type.\n", 
+	    "if you change the font to a non-raster type.\n",
 	    cp_input, GetConsoleCP());
     }
 #else
@@ -512,7 +512,7 @@ main(int argc, char **argv)
 	fprintf(stderr,
 	    "\nWarning: The codepage of the graph window (%i) and that of the\n" \
 	    "console (%i) differ. Use `set encoding` or `!chcp` if extended\n" \
-	    "characters don't display correctly.\n", 
+	    "characters don't display correctly.\n",
 	    GetACP(), GetConsoleCP());
     }
 #endif
@@ -636,6 +636,9 @@ main(int argc, char **argv)
 	    ) {
 		FPRINTF((stderr,"'persist' command line option recognized\n"));
 	    } else if (strcmp(*argv, "-") == 0) {
+#if defined(_Windows) && !defined(WGP_CONSOLE)
+		TextShow(&textwin);
+#endif
 		interactive = TRUE;
 		while (!com_line());
 		interactive = FALSE;

@@ -1,5 +1,5 @@
 /*
- * $Id: wtext.c,v 1.37 2011/11/14 21:03:38 markisch Exp $
+ * $Id: wtext.c,v 1.38 2012/06/30 06:41:33 markisch Exp $
  */
 
 /* GNUPLOT - win/wtext.c */
@@ -66,6 +66,7 @@
 #include <commctrl.h>
 
 #include "wgnuplib.h"
+#include "winmain.h"
 #include "wresourc.h"
 #include "wcommon.h"
 #include "stdfn.h"
@@ -330,6 +331,17 @@ TextClose(LPTW lptw)
     if (lptw->lpmw)
 	CloseMacros(lptw);
     lptw->hWndParent = (HWND)NULL;
+}
+
+
+/* Bring the text window to front */
+void
+TextShow(LPTW lptw)
+{
+	ShowWindow(textwin.hWndParent, textwin.nCmdShow);
+	ShowWindow(lptw->hWndText, SW_SHOWNORMAL);
+	BringWindowToTop(lptw->hWndText);
+	SetFocus(lptw->hWndText);
 }
 
 
