@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: interpol.c,v 1.40 2012/05/30 22:15:19 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: interpol.c,v 1.41 2012/08/23 21:43:47 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - interpol.c */
@@ -296,28 +296,18 @@ eval_kdensity (
     /* This is the optimal bandwidth if the point distribution is Gaussian.
        (Applied Smoothing Techniques for Data Analysis
        by Adrian W, Bowman & Adelchi Azzalini (1997)) */
+    /* If the supplied bandwidth is zero of less, the default bandwidth is used. */
     default_bandwidth = pow( 4.0/(3.0*num_points), 1.0/5.0 )*sigma;
-
-    /* If the supplied bandwidth is zero of less, the default bandwidth
-       is used. If only two columns have been specified in the using
-       declaration, the value of the third column (z-value) is set to
-       the value of '-1' in plot2d.c::get_data(). Therefore, a negative
-       value of z indicates that the default bandwidth should be used.
-       (I would prefer that a different magic value would be used to
-       indicate a missing third column, so that we we could fail if 
-       the user supplies a negative bandwidth, but the -1 seems too
-       deeply ingrained.) */
+    if (cp->smooth_parameter <= 0) {
+	bandwidth = default_bandwidth;
+	cp->smooth_parameter = -default_bandwidth;
+    } else
+	bandwidth = cp->smooth_parameter;
 
     x = min + sr*(max-min); /* The current x-value */
 
     y = 0;
     for (i = 0; i <= n; i++) {
-      if ( this_points[i].z <= 0 ) {
-	bandwidth = default_bandwidth;
-      } else {
-	bandwidth = this_points[i].z;
-      }
-      
       tmp = ( x - this_points[i].x )/bandwidth;
       y += this_points[i].y * exp( - 0.5*tmp*tmp ) / bandwidth;
     }

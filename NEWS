@@ -12,6 +12,7 @@ New features, changes and fixes since gnuplot version 4.6
 * NEW 'set link x2 via f(x) inverse g(x)' introduces generic nonlinear axes
 * NEW 'set key opaque' works for 3D plots also
 * NEW x11 terminal is aware of current and requested plot aspect ratio
+* CHANGE Provide kdensity bandwidth via a keyword rather than a data column
 * CHANGE Pipe (popen/pclose) emulation within wgnuplot
 * CHANGE 'set [xyz]axis ... reverse' affects only auto-scaling
 * CHANGE Revised handling of NaN in input data stream

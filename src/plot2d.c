@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.274 2012/09/17 03:05:43 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.275 2012/10/09 03:51:19 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -1932,8 +1932,16 @@ eval_plots()
 			break;
 		    }
 		    found_token = lookup_table(plot_smooth_tbl, ++c_token);
+		    c_token++;
 
 		    switch(found_token) {
+		    case SMOOTH_KDENSITY:
+			this_plot->smooth_parameter = -1; /* Default */
+			if (almost_equals(c_token,"band$width")) {
+			    c_token++;
+			    this_plot->smooth_parameter = real_expression();
+			}
+			/* Fall through */
 		    case SMOOTH_ACSPLINES:
 		    case SMOOTH_BEZIER:
 		    case SMOOTH_CSPLINES:
@@ -1941,7 +1949,6 @@ eval_plots()
 		    case SMOOTH_UNIQUE:
 		    case SMOOTH_FREQUENCY:
 		    case SMOOTH_CUMULATIVE:
-		    case SMOOTH_KDENSITY:
 		    case SMOOTH_CUMULATIVE_NORMALISED:
 			this_plot->plot_smooth = found_token;
 			break;
@@ -1951,7 +1958,6 @@ eval_plots()
 			break;
 		    }
 		    this_plot->plot_style = LINES;
-		    c_token++;      /* skip format */
 		    set_smooth = TRUE;
 		    continue;
 		}
@@ -2531,8 +2537,13 @@ eval_plots()
 		case SMOOTH_ACSPLINES:
 		case SMOOTH_BEZIER:
 		case SMOOTH_SBEZIER:
+		    gen_interp(this_plot);
+		    break;
 		case SMOOTH_KDENSITY:
 		    gen_interp(this_plot);
+		    fill_gpval_float("GPVAL_KDENSITY_BANDWIDTH", 
+			fabs(this_plot->smooth_parameter));
+		    break;
 		case SMOOTH_NONE:
 		case SMOOTH_UNIQUE:
 		default:

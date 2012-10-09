@@ -1,3 +1,14 @@
+2012-10-09  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/graphics.h src/interpol.c src/plot2d.c docs/gnuplot.doc:
+	Make the bandwidth parameter of "smooth kdensity" a constant specified 
+	in the plot command rather than a per-data point variable.  The latter
+	has no obvious physical meaning and anyhow is problematic because it
+	overloads the meaning of the 3rd 'using' spec.  New syntax:
+	    plot foo smooth kdensity {bandwidth <val>}
+	If no value is given, or if the value in negative, use the calculated
+	optimum bandwidth.  Store the value used in GPVAL_KDENSITY_BANDWIDTH.
+
 2012-10-08  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/plot2d.c (get_data) src/datafile.c (df_readascii) src/gp_types.h:

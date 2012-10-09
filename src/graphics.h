@@ -1,5 +1,5 @@
 /*
- * $Id: graphics.h,v 1.53 2011/12/29 06:29:31 sfeam Exp $
+ * $Id: graphics.h,v 1.54 2012/06/29 16:30:37 sfeam Exp $
  */
 
 /* GNUPLOT - graphics.h */
@@ -68,6 +68,7 @@ typedef struct curve_points {
     struct histogram_style *histogram;	/* Only used if plot_style == HISTOGRAM */
     int histogram_sequence;	/* Ordering of this dataset within the histogram */
     enum PLOT_SMOOTH plot_smooth; /* which "smooth" method to be used? */
+    double smooth_parameter;	/* e.g. optional bandwidth for smooth kdensity */
     int boxplot_factors;	/* Only used if plot_style == BOXPLOT */
     int *boxplot_factor_order;	/* Only used if plot_style == BOXPLOT */
     int p_max;			/* how many points are allocated */

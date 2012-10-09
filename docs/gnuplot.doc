@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.750 2012/09/24 23:18:31 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.751 2012/10/04 20:19:07 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -5389,7 +5389,7 @@ Ffigure_mapcontours
  externally or by using `fit` with an appropriate model.
 
  Syntax:
-       smooth {unique | frequency | cumulative | cnormal | kdensity 
+       smooth {unique | frequency | cumulative | cnormal | kdensity {bandwidth}
                       | csplines | acsplines | bezier | sbezier}
 
  `unique`, `frequency`, `cumulative` and `cnormal` plot the data after
@@ -5559,12 +5559,13 @@ Ffigure_mapcontours
  A Gaussian is placed at the location of each point in the first column and
  the sum of all these Gaussians is plotted as a function. The value in the
  second column is taken as weight of the Gaussian. (To obtain a normalized
- histogram, this should be 1/number-of-points). The value of the third column,
- if supplied, is taken as the bandwidth for the kernels. If only two columns
- have been specified, or if the value of the third column is zero or less,
- gnuplot calculates the bandwidth which would be optimal if the input data was
- normally distributed. (This will usually be a very conservative, i.e. broad 
- bandwidth.)
+ histogram, this should be 1/number-of-points). By default gnuplot calculates
+ and uses the bandwidth which would be optimal for normally distributed input
+ data. (This will usually be a very conservative, i.e. broad bandwidth.)
+ Alternatively, you can provide an explicit bandwidth.
+      plot $DATA smooth kdensity bandwith <value> with boxes
+ The bandwidth used in the previous plot is stored in variable 
+ GPVAL_KDENSITY_BANDWIDTH.
 4 special-filenames
 ?commands plot datafile special-filenames
 ?plot datafile special-filenames
