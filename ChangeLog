@@ -1,3 +1,10 @@
+2012-10-09  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/term.c src/unset.c src/term_api.h:
+	Consistent with the documented generic meaning of "unset", the command
+	"unset terminal" now restores the default terminal present at program
+	entry.  I.e., it is equivalent to "set terminal GNUTERM".
+
 2012-09-30  Tag Release_4_6_1
 
 2012-09-26  Ethan A Merritt  <merritt@u.washington.edu>

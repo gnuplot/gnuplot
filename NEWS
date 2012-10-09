@@ -1,6 +1,9 @@
 New features, changes and fixes since gnuplot version 4.6.1
 ===========================================================
 
+* CHANGE "unset term" restores original default terminal (GNUTERM)
+
+
 New features, changes and fixes in gnuplot version 4.6.1
 ===========================================================
 

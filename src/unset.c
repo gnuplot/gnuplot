@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.149 2011/11/15 20:23:43 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.149.2.1 2012/08/31 17:34:26 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -286,7 +286,6 @@ unset_command()
 	break;
 #endif
     case S_MULTIPLOT:
-/*	unset_multiplot(); */
 	term_end_multiplot();
 	break;
     case S_OFFSETS:
@@ -1455,15 +1454,21 @@ unset_table()
 
 
 /* process 'unset terminal' comamnd */
+/* Aug 2012:  restore original terminal type */
 static void
 unset_terminal()
 {
-    /* This is a problematic case */
-/* FIXME */
-    if (multiplot)
-	int_error(c_token, "You can't change the terminal in multiplot mode");
+    struct udvt_entry *original_terminal = get_udv_by_name("GNUTERM");
 
-    list_terms();
+    if (multiplot)
+	term_end_multiplot();
+
+    term_reset();
+
+    if (original_terminal) {
+	char *termname = original_terminal->udv_value.v.string_val;
+	term = change_term(termname, strlen(termname));
+    }
     screen_ok = FALSE;
 }
 

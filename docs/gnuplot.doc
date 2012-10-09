@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.701.2.19 2012/09/06 04:37:05 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.701.2.20 2012/09/14 20:53:22 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -11431,6 +11431,7 @@ Ffigure_mapcontours
  another terminal has been pushed explicitly.
 
  For more information, see the `complete list of terminals`.
+
 3 termoption
 ?commands set termoption
 ?set termoption
@@ -13176,7 +13177,13 @@ Ffigure_mapcontours
 
        # Unset labels numbered between 100 and 200
        unset for [i=100:200] label i
-
+3 terminal
+?unset terminal
+ The default terminal that is active at the time of program entry depends on the
+ system platform, gnuplot build options, and the environmental variable GNUTERM.
+ Whatever this default may be, gnuplot saves it in the internal variable GNUTERM.
+ The `unset terminal` command restores this initial state.  It is equivalent to
+ `set terminal GNUTERM`.
 2 update
 ?commands update
 ?update
