@@ -1,4 +1,7 @@
-New features, changes and fixes since gnuplot version 4.6.0
+New features, changes and fixes since gnuplot version 4.6.1
+===========================================================
+
+New features, changes and fixes in gnuplot version 4.6.1
 ===========================================================
 
 * NEW syntax hints inside Emacs gnuplot-mode
