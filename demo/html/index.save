@@ -33,7 +33,6 @@ Interactive demo scripts are not included on this page.
     <li><a href="vector.html">vector fields</a></li>
     <li><a href="boxplot.html">boxplots</a></li>
     <li><a href="circles.html">circles</a></li>
-    <li><a href="cities.html">text</a></li>
     </ul>
 
     <h4>Math functions and<br> curve fitting</h4>
@@ -84,11 +83,12 @@ Interactive demo scripts are not included on this page.
     <li><a href="image.html">image data</a></li>
     <li><a href="image2.html">binary and image tricks</a></li>
     <li><a href="rgbalpha.html">RGB + alpha channel</a></li>
+    <li><a href="barchart_art.html">rescaled images</a></li>
     </ul>
 
     <h4>Colors</h4>
     <ul>
-    <li><a href="rainbow.html">user-defined colors</a></li>
+    <li><a href="varcolor.html">data-dependent coloring</a></li>
     <li><a href="rgb_variable.html">RGB coloring</a></li>
     <li><a href="rgba_lines.html">RGB + Alpha</a></li>
     <li><a href="pm3dcolors.html">pm3d colors</a></li>
@@ -114,6 +114,7 @@ Interactive demo scripts are not included on this page.
     <li><a href="textrotate.html">rotated text</a></li>
     <li><a href="enhancedtext.html">enhanced text</a></li>
     <li><a href="datastrings.html">string data</a></li>
+    <li><a href="cities.html">variable font size</a></li>
     <li><a href="stringvar.html">string variables</a></li>
     <li><font color=gray>hypertext (no png support)</font></li>
     </ul>

@@ -22,6 +22,7 @@ plot 'candlesticks.dat' using 1:(1):1 with points pt 11 lc variable, \
 pause -1 'Hit <cr> to continue'
 
 set title "variable color boxerror, xyerrorbars, impulses, vectors, and labels"
+unset colorbox
 plot 'candlesticks.dat' \
         using 1:5:2:6:(.2):1 with boxerror lc var fs solid 0.5 border -1 , \
      '' using 1:(1):1 with points pt 11 lc variable, \
@@ -33,6 +34,7 @@ plot 'candlesticks.dat' \
 pause -1 'Hit <cr> to continue'
 
 set title "variable color using 'lc palette z'"
+set colorbox
 plot 'candlesticks.dat' using 1:(1):1 with points pt 11 lc pal z, \
      '' using 1:2:(.1):1 with circles lc pal z, \
      '' using 1:3:2:6:5:1 with candlesticks lc pal z, \
