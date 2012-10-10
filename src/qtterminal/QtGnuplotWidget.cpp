@@ -256,7 +256,8 @@ void QtGnuplotWidget::exportToSvg()
 
 	QSvgGenerator svg;
 	svg.setFileName(fileName);
-	svg.setSize(QSize(m_scene->width(), m_scene->height()));
+	svg.setSize(QSize(m_view->width(), m_view->height()));
+	svg.setViewBox(QRect(0, 0, m_view->width(), m_view->height()));
 	QPainter painter(&svg);
 	m_scene->render(&painter);
 	painter.end();
