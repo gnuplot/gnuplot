@@ -1,3 +1,11 @@
+2012-10-10  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/qtterminal/QtGnuplotWidget.cpp (exportToSvg):
+	Restrict svg output size to scaled viewport.  This gets rid of the
+	oversize border around a plot exported from the qt terminal to svg.
+	Empirical fix, results not guaranteed!
+	Bug #3573897
+
 2012-10-09  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.h src/interpol.c src/plot2d.c docs/gnuplot.doc:
