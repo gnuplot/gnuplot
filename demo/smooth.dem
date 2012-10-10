@@ -1,6 +1,7 @@
 bin(x, s) = s*int(x/s)
 
 set zeroaxis
+set style data points
 
 # Uniform
 set title "Uniform Distribution"
