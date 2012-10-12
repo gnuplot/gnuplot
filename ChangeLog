@@ -1,4 +1,16 @@
-2012-10-13  Ethan A Merritt  <merritt@u.washington.edu>
+2012-10-12  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/svg.trm: Replace sizes given in points with sizes in user
+	coordinates (nominally pixels = "px").  In empirical tests this makes
+	the estimates generated for string width more accurate.  An alternative
+	might be to give sizes in points multiplied by some internal variable
+	that could be recalculated dynamically at display time.
+
+	* term/svg.trm: Replace bundled style attributes with individual 
+	specifications.  E.g.   
+	    <g style="fill:none; stroke:rgb(0,0,0); font-size:10pt">
+	becomes
+	    <g fill="none" stroke="rgb(0,0,0)" font-size="10">
 
 	* src/graph3d.c:  Suppress drawing of a degenerate keybox when
 	"set key box" but no plot titles.  Bugfix.

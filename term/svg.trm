@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: svg.trm,v 1.140 2012/05/21 23:15:18 sfeam Exp $
+ * $Id: svg.trm,v 1.141 2012/08/03 05:17:36 sfeam Exp $
  */
 
 /*------------------------------------------------------------------------------------------------------------------------------------
@@ -50,6 +50,9 @@
  *
  * Contributed by <plotter@piments.com>
  *   Javascript code to toggle plots on/off
+ *
+ * Revised font sizing Oct 2012
+ *   specify font-size without "pt" units.
  */
 
 /*
@@ -158,6 +161,7 @@ static char *SVG_fontNameCur = NULL;
 static char *SVG_fontStyleCur = NULL; /* current font style */
 static char *SVG_fontWeightCur = NULL; /* current font weight */
 static double SVG_fontSizeCur = 12;	/* current text size*/
+static double SVG_fontscale = 1.0;	/* multiplier for nominal font size */
 static TBOOLEAN SVG_groupIsOpen = FALSE; /* open group flag*/
 static TBOOLEAN SVG_pathIsOpen = FALSE; /* open path flag*/
 static unsigned int SVG_path_count = 0;	/* size of current path*/
@@ -234,7 +238,7 @@ SVG_GroupOpen ()
     SVG_GroupFilledClose();
     if (!SVG_groupIsOpen) {
 
-	fprintf (gpoutfile, "<g style=\"fill:none; color:%s; stroke:",
+	fprintf (gpoutfile, "<g fill=\"none\" color=\"%s\" stroke=\"",
 		 SVG_pens[SVG_Pen_RealID (SVG_LineType)].color);
 
 	if (SVG_color_mode == TC_RGB)
@@ -244,12 +248,13 @@ SVG_GroupOpen ()
 	else
 	    fprintf(gpoutfile, "currentColor");
 
-	fprintf (gpoutfile, "; stroke-width:%.2f; stroke-linecap:%s; stroke-linejoin:%s",
+	fprintf (gpoutfile, "\" ");
+	fprintf (gpoutfile, "stroke-width=\"%.2f\" stroke-linecap=\"%s\" stroke-linejoin=\"%s\"",
 		 SVG_pens[SVG_Pen_RealID (SVG_LineType)].width * SVG_linewidth_factor,
 		 SVG_rounded ? "round" : "butt",
 		 SVG_rounded ? "round" : "miter");
 
-	fprintf (gpoutfile, "\">\n");
+	fprintf (gpoutfile, ">\n");
 
 	SVG_groupIsOpen = TRUE;
     }
@@ -351,10 +356,10 @@ SVG_SetFont (const char *name, double size)
  * 'font-size' (!), we have to to define font properties in a less
  * than optimal way */
 
-    SVG_fontAscent = (int) (SVG_fontSizeCur * 1.00 * SVG_SCALE); /* estimated current font ascent*/
-    SVG_fontDescent = (int) (SVG_fontSizeCur * 0.25 * SVG_SCALE); /* estimated current font descent*/
-    SVG_fontLeading = (int) (SVG_fontSizeCur * 0.25 * SVG_SCALE); /* estimated current font leading*/
-    SVG_fontAvWidth = (int) (SVG_fontSizeCur * 0.70 * SVG_SCALE); /* estimated current font char average width*/
+    SVG_fontAscent = (int) (SVG_fontSizeCur * 1.00 * SVG_SCALE);
+    SVG_fontDescent = (int) (SVG_fontSizeCur * 0.25 * SVG_SCALE);
+    SVG_fontLeading = (int) (SVG_fontSizeCur * 0.25 * SVG_SCALE);
+    SVG_fontAvWidth = (int) (SVG_fontSizeCur * 0.70 * SVG_SCALE);
 }
 
 static void
@@ -362,7 +367,7 @@ SVG_GroupFilledOpen()
 {
     if (!SVG_groupFilledIsOpen) {
 	SVG_PathClose();
-	fputs("\t<g style = 'stroke:none; shape-rendering:crispEdges'>\n",
+	fputs("\t<g stroke='none' shape-rendering='crispEdges'>\n",
 	      gpoutfile);
 	SVG_groupFilledIsOpen = TRUE;
     }
@@ -1373,7 +1378,7 @@ SVG_put_text (unsigned int x, unsigned int y, const char *str)
     fprintf (gpoutfile, "\t<g transform=\"translate(%.*f,%.*f)", PREC, X(h), PREC, Y(v));
     if (SVG_TextAngle)
 	fprintf (gpoutfile, " rotate(%i)", -SVG_TextAngle);
-    fprintf (gpoutfile, "\" style=\"stroke:none; fill:");
+    fprintf (gpoutfile, "\" stroke=\"none\" fill=\"");
 
     if (SVG_color_mode == TC_RGB)
 	fprintf (gpoutfile, "rgb(%d,%d,%d)", SVG_red, SVG_green, SVG_blue);
@@ -1381,13 +1386,13 @@ SVG_put_text (unsigned int x, unsigned int y, const char *str)
 	fprintf (gpoutfile, "%s", SVG_linecolor);
     else
 	fprintf (gpoutfile, "%s", SVG_pens[SVG_Pen_RealID (SVG_LineType)].color);
-    fprintf (gpoutfile, "; font-family:%s; font-size:%.2fpt;",
-	     SVG_fontNameCur, SVG_fontSizeCur);
+    fprintf (gpoutfile, "\" font-family=\"%s\" font-size=\"%.2f\" ",
+	     SVG_fontNameCur, SVG_fontSizeCur * SVG_fontscale);
     if (SVG_fontWeightCur && strcmp(SVG_fontWeightCur,"normal"))
-	    fprintf(gpoutfile, " font-weight:%s;", SVG_fontWeightCur);
+	    fprintf(gpoutfile, " font-weight=\"%s\" ", SVG_fontWeightCur);
     if (SVG_fontStyleCur && strcmp(SVG_fontStyleCur,"normal"))
-	    fprintf(gpoutfile, " font-style:%s;", SVG_fontStyleCur);
-    fprintf(gpoutfile, " text-anchor:%s\">\n", alignment);
+	    fprintf(gpoutfile, " font-style=\"%s\" ", SVG_fontStyleCur);
+    fprintf(gpoutfile, " text-anchor=\"%s\">\n", alignment);
 
 /* output text (unless the enhanced_text processing is in action) */
 
@@ -1723,7 +1728,7 @@ ENHsvg_OPEN(
          *        they all get piled on top of one another.
 	 */
 	ENHsvg_FLUSH();
-	fprintf(gpoutfile, "<tspan dx=\"-%.1fem\" dy=\"%.1fpt\">", 
+	fprintf(gpoutfile, "<tspan dx=\"-%.1fem\" dy=\"%.1fpx\">", 
 		0.5 * ENHsvg_charcount, ENHsvg_base-base);
 	ENHsvg_base = base;
 	ENHsvg_x_offset = 0.0;
@@ -1753,11 +1758,11 @@ ENHsvg_OPEN(
 	if (strcmp(SVG_fontNameCur, fontname)) {
 	    free(SVG_fontNameCur);
 	    SVG_fontNameCur = gp_strdup(fontname);
-	    fprintf(gpoutfile, " style=\"font-family:%s\" ", SVG_fontNameCur);
+	    fprintf(gpoutfile, " font-family=\"%s\" ", SVG_fontNameCur);
 	}
 	if (SVG_fontSizeCur != fontsize) {
 	    SVG_fontSizeCur = fontsize;
-	    fprintf(gpoutfile, " font-size=\"%.1fpt\"", SVG_fontSizeCur);
+	    fprintf(gpoutfile, " font-size=\"%.1f\"", SVG_fontSizeCur * SVG_fontscale);
 	}
 	if (SVG_fontWeightCur && strcmp(SVG_fontWeightCur,"normal"))
 	    fprintf(gpoutfile, " font-weight=\"%s\" ", SVG_fontWeightCur);
@@ -1768,7 +1773,7 @@ ENHsvg_OPEN(
 	    ENHsvg_x_offset = 0.0;
 	}
 	if (ENHsvg_base != base) {
-	    fprintf(gpoutfile, " dy=\"%.2fpt\"", ENHsvg_base-base);
+	    fprintf(gpoutfile, " dy=\"%.2fpx\"", ENHsvg_base-base);
 	    ENHsvg_base = base;
 	}
 	if (!showflag) {
@@ -1841,8 +1846,8 @@ ENHsvg_put_text(unsigned int x, unsigned int y, const char *str)
     SVG_fontNameCur = fontname;
     fontname = NULL;
     if (SVG_fontSizeCur != fontsize || ENHsvg_base != 0) {
-	fprintf(gpoutfile, "<tspan font-size=\"%.1fpt\" dy=\"%.2fpt\"></tspan>",
-		fontsize, ENHsvg_base);
+	fprintf(gpoutfile, "<tspan font-size=\"%.1f\" dy=\"%.2f\"></tspan>",
+		fontsize * SVG_fontscale, ENHsvg_base);
 	SVG_fontSizeCur = fontsize;
 	ENHsvg_base = 0;
     }
