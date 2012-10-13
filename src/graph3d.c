@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.253.2.6 2012/09/20 19:56:45 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.253.2.7 2012/10/13 18:09:38 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -2593,7 +2593,9 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid,
 
 	ignore_enhanced(Z_AXIS.label.noenhanced);
 	apply_pm3dcolor(&(Z_AXIS.label.textcolor),t);
-	if (Z_AXIS.label.rotate != 0 && (term->text_angle)(Z_AXIS.label.rotate)) {
+	if (Z_AXIS.label.tag == ROTATE_IN_3D_LABEL_TAG)
+	    Z_AXIS.label.rotate = TEXT_VERTICAL;
+	if (Z_AXIS.label.rotate != 0 &&  (term->text_angle)(Z_AXIS.label.rotate)) {
 	    write_multiline(x, y, Z_AXIS.label.text,
 			    h_just, v_just, Z_AXIS.label.rotate, Z_AXIS.label.font);
 	    (term->text_angle)(0);

@@ -1,7 +1,10 @@
 2012-10-13  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graph3d.c:  Suppress drawing of a degenerate keybox when
-	"set key box" but no plot titles. Bugfix.
+	"set key box" but no plot titles.  Bugfix.
+
+	* src/graph3d.c src/show.c:  "set zlabel rotate parallel" should have
+	the same effect as "set zlabel rotate".  Bugfix.
 
 2012-10-10  Ethan A Merritt  <merritt@u.washington.edu>
 

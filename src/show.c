@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.261.2.2 2011/12/28 19:59:39 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.261.2.3 2012/03/02 20:00:04 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -2814,10 +2814,10 @@ show_xyzlabel(const char *name, const char *suffix, text_label *label)
     if (label->font)
 	fprintf(stderr, ", using font \"%s\"", conv_text(label->font));
 
-    if (label->rotate)
-	fprintf(stderr, ", rotated by %d degrees in 2D plots", label->rotate);
     if (label->tag == ROTATE_IN_3D_LABEL_TAG)
 	fprintf(stderr, ", parallel to axis in 3D plots");
+    else if (label->rotate)
+	fprintf(stderr, ", rotated by %d degrees in 2D plots", label->rotate);
 
     if (label->textcolor.type)
 	save_textcolor(stderr, &label->textcolor);
