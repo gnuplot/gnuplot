@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.156 2012/08/24 21:28:38 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.157 2012/09/02 21:48:58 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -1533,7 +1533,15 @@ unset_timedata(AXIS_INDEX axis)
 static void
 unset_range(AXIS_INDEX axis)
 {
+    axis_array[axis].set_autoscale = AUTOSCALE_BOTH;
+    axis_array[axis].writeback_min = axis_array[axis].set_min
+	= axis_defaults[axis].min;
+    axis_array[axis].writeback_max = axis_array[axis].set_max
+	= axis_defaults[axis].max;
+    axis_array[axis].min_constraint = CONSTRAINT_NONE;
+    axis_array[axis].max_constraint = CONSTRAINT_NONE;
     axis_array[axis].range_flags = 0;
+    axis_array[axis].range_is_reverted = FALSE;
 }
 
 /* process 'unset {x|y|x2|y2|z}zeroaxis' command */
@@ -1659,18 +1667,8 @@ reset_command()
 	SET_DEFFORMAT(axis, set_for_axis);
 	unset_timedata(axis);
 	unset_zeroaxis(axis);
-	unset_range(axis);
 	unset_axislabel(axis);
-
-	axis_array[axis].set_autoscale = AUTOSCALE_BOTH;
-	axis_array[axis].writeback_min = axis_array[axis].set_min
-	    = axis_defaults[axis].min;
-	axis_array[axis].writeback_max = axis_array[axis].set_max
-	    = axis_defaults[axis].max;
-	axis_array[axis].range_is_reverted = FALSE;
-
-	axis_array[axis].min_constraint = CONSTRAINT_NONE;
-	axis_array[axis].max_constraint = CONSTRAINT_NONE;
+	unset_range(axis);
 
 	/* 'tics' default is on for some, off for the other axes: */
 	unset_tics(axis);

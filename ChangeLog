@@ -6,6 +6,9 @@
 	* src/graph3d.c src/show.c:  "set zlabel rotate parallel" should have
 	the same effect as "set zlabel rotate".  Bugfix.
 
+	* src/unset.c: `unset xrange` has done nothing but clear range_reverse.
+	Make it also restore the default autoscaling and axis ranges.
+
 2012-10-10  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/qtterminal/QtGnuplotWidget.cpp (exportToSvg):
