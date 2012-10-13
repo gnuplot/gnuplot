@@ -1,5 +1,5 @@
 #
-# $Id: random.dem,v 1.13 2006/10/23 05:43:53 sfeam Exp $
+# $Id: random.dem,v 1.14 2011/12/07 22:26:07 markisch Exp $
 #
 # random.dem
 #
@@ -19,9 +19,9 @@ set xrange [0: 1]
 set yrange [0: 1]
 set zrange [0: 1]
 set title "Lattice test for random numbers"
-set xlabel "rand(n) ->"
-set ylabel "rand(n + 1) ->"
-set zlabel "rand(n + 2) ->"
+set xlabel "rand(n) ->"      rotate parallel
+set ylabel "rand(n + 1) ->"  rotate parallel offset 0,-1
+set zlabel "rand(n + 2) ->"  rotate parallel offset 0,-1
 set format x "%3.2f"
 set format y "%3.2f"
 set format z "%3.2f"
