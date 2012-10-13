@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.253.2.5 2012/08/22 20:48:15 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.253.2.6 2012/09/20 19:56:45 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -937,7 +937,8 @@ do_3dplot(
     }
 
     /* Key box */
-    if (key->visible && key->box.l_type > LT_NODRAW) {
+    if (key->visible && key->box.l_type > LT_NODRAW
+    &&  key->bounds.ytop != key->bounds.ybot) {
 	int tmp = (int)(0.5 * key->height_fix * t->v_char);
 	key->bounds.ybot -= 2*tmp;
 	yl -= tmp;
