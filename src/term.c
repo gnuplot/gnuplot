@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.240 2012/08/24 21:28:38 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.241 2012/10/08 09:32:07 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -647,30 +647,41 @@ term_start_multiplot()
 
     term_start_plot();
 
+    /* FIXME: more options should be reset/initialized each time */
     mp_layout.auto_layout = FALSE;
     mp_layout.current_panel = 0;
+    mp_layout.title.noenhanced = FALSE;
+    free(mp_layout.title.text);
+    mp_layout.title.text = NULL;
+    free(mp_layout.title.font);
+    mp_layout.title.font = NULL;
 
-    /* Parse options (new in version 4.1 */
+    /* Parse options */
     while (!END_OF_COMMAND) {
-	char *s;
 
 	if (almost_equals(c_token, "ti$tle")) {
 	    c_token++;
-	    if ((s = try_to_get_string())) {
-		free(mp_layout.title.text);
-		mp_layout.title.text = s;
- 	    }
+	    mp_layout.title.text = try_to_get_string();
  	    continue;
        }
 
        if (equals(c_token, "font")) {
 	    c_token++;
- 	    if ((s = try_to_get_string())) {
- 		free(mp_layout.title.font);
- 		mp_layout.title.font = s;
-	    }
+	    mp_layout.title.font = try_to_get_string();
 	    continue;
 	}
+
+        if (almost_equals(c_token,"enh$anced")) {
+            mp_layout.title.noenhanced = FALSE;
+            c_token++;
+            continue;
+        }
+
+        if (almost_equals(c_token,"noenh$anced")) {
+            mp_layout.title.noenhanced = TRUE;
+            c_token++;
+            continue;
+        }
 
 	if (almost_equals(c_token, "lay$out")) {
 	    if (mp_layout.auto_layout)
