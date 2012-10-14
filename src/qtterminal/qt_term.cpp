@@ -530,6 +530,9 @@ int qt_set_font (const char* font)
 			qt_currentFontName = list[0];
 		if (list.size() > 1)
 			qt_currentFontSize = list[1].toInt();
+	} else {
+		qt_currentFontSize = qt_optionFontSize;
+		qt_currentFontName = qt_optionFontName;
 	}
 
 	if (qt_currentFontName.isEmpty())

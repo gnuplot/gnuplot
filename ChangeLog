@@ -3,6 +3,12 @@
 	* src/term.c (term_start_multiplot) docs/gnuplot.doc:
 	Add enhanced/noenhanced option to "set multiplot title".
 
+2012-10-14  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/qtterminal/qt_term.cpp (qt_set_font):  term->set_font("")
+	must restore the default terminal font and size.
+	Bugfix.
+
 2012-10-13  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graph3d.c:  Suppress drawing of a degenerate keybox when
