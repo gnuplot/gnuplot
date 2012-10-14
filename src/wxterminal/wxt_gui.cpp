@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.cpp,v 1.91.2.6 2012/07/07 04:44:49 sfeam Exp $
+ * $Id: wxt_gui.cpp,v 1.91.2.7 2012/09/08 04:50:55 sfeam Exp $
  */
 
 /* GNUPLOT - wxt_gui.cpp */
@@ -358,7 +358,7 @@ void wxtApp::OnCreateWindow( wxCommandEvent& event )
 	 * Note : the frame must be shown for this to succeed */
 	if (!window->frame->panel->plot.success)
 		window->frame->panel->wxt_cairo_create_context();
-	
+
 	/* tell the other thread we have finished */
 	wxMutexLocker lock(*(window->mutex));
 	window->condition->Broadcast();
@@ -749,7 +749,7 @@ void wxtPanel::DrawToDC(wxDC &dc, wxRegion &region)
 		vY = upd.GetY();
 		vW = upd.GetW();
 		vH = upd.GetH();
-	
+
 		FPRINTF((stderr,"OnPaint %d,%d,%d,%d\n",vX,vY,vW,vH));
 		/* Repaint this rectangle */
 		if (gdkpixmap)
@@ -872,7 +872,7 @@ void wxtPanel::OnSize( wxSizeEvent& event )
 	GetSize(&(plot.device_xmax),&(plot.device_ymax));
 
 	double new_xscale, new_yscale;
-	
+
 	new_xscale = ((double) plot.device_xmax)*plot.oversampling_scale/((double) plot.xmax);
 	new_yscale = ((double) plot.device_ymax)*plot.oversampling_scale/((double) plot.ymax);
 
@@ -1119,7 +1119,7 @@ void wxtPanel::OnKeyDownChar( wxKeyEvent &event )
 		WXK_GPKEYCODE(WXK_NUMPAD_F2,GP_KP_F2);
 		WXK_GPKEYCODE(WXK_NUMPAD_F3,GP_KP_F3);
 		WXK_GPKEYCODE(WXK_NUMPAD_F4,GP_KP_F4);
-		
+
 		WXK_GPKEYCODE(WXK_NUMPAD_INSERT,GP_KP_Insert);
 		WXK_GPKEYCODE(WXK_NUMPAD_END,GP_KP_End);
 		WXK_GPKEYCODE(WXK_NUMPAD_DOWN,GP_KP_Down);
@@ -1130,7 +1130,7 @@ void wxtPanel::OnKeyDownChar( wxKeyEvent &event )
 		WXK_GPKEYCODE(WXK_NUMPAD_HOME,GP_KP_Home);
 		WXK_GPKEYCODE(WXK_NUMPAD_UP,GP_KP_Up);
 		WXK_GPKEYCODE(WXK_NUMPAD_PAGEUP,GP_KP_Page_Up);
-		
+
 		WXK_GPKEYCODE(WXK_NUMPAD_DELETE,GP_KP_Delete);
 		WXK_GPKEYCODE(WXK_NUMPAD_EQUAL,GP_KP_Equal);
 		WXK_GPKEYCODE(WXK_NUMPAD_MULTIPLY,GP_KP_Multiply);
@@ -1213,7 +1213,7 @@ static void wxt_update_key_box( unsigned int x, unsigned int y )
 {
 	if (wxt_cur_plotno >= wxt_max_key_boxes) {
 		wxt_max_key_boxes += 10;
-		wxt_key_boxes = (wxtBoundingBox *)realloc(wxt_key_boxes, 
+		wxt_key_boxes = (wxtBoundingBox *)realloc(wxt_key_boxes,
 				wxt_max_key_boxes * sizeof(wxtBoundingBox));
 		wxt_initialize_key_boxes(wxt_cur_plotno);
 		wxt_initialize_hidden(wxt_cur_plotno);
@@ -1332,7 +1332,7 @@ void wxtPanel::RaiseConsoleWindow()
 	/* now test for GNOME multitab console */
 	/* ... if somebody bothers to implement it ... */
 	/* we are not running in any known (implemented) multitab console */
-	
+
 	if (windowid) {
 		gdk_window_raise(gdk_window_foreign_new(windowid));
 		gdk_window_focus(gdk_window_foreign_new(windowid), GDK_CURRENT_TIME);
@@ -1593,7 +1593,6 @@ void wxt_init()
 
 # ifdef USE_MOUSE
 		int filedes[2];
-		char buf;
 
 	       if (pipe(filedes) == -1) {
 			fprintf(stderr, "Pipe error, mousing will not work\n");
@@ -2109,7 +2108,7 @@ int wxt_set_font (const char *font)
 	/* the returned int is not used anywhere */
 	return 1;
 }
-	
+
 
 int wxt_justify_text(enum JUSTIFY mode)
 {
@@ -2652,8 +2651,6 @@ void wxtPanel::wxt_cairo_exec_command(gp_command command)
 		return;
 	case command_filled_polygon :
 		if (wxt_in_key_sample) {
-			int x1 = command.corners[0].x;
-			int y1 = command.corners[0].y;
 			wxt_update_key_box(command.x1 - term->h_tic, command.y1 - term->v_tic);
 			wxt_update_key_box(command.x1 + term->h_tic, command.y1 + term->v_tic);
 		}
@@ -2692,6 +2689,7 @@ void wxtPanel::wxt_cairo_exec_command(gp_command command)
 		text_justification_mode = command.mode;
 		return;
 	case command_put_text :
+	case command_enhanced_put_text :
 		if (wxt_in_key_sample) {
 			int slen = strlen(command.string) * term->h_char * 0.75;
 			if (text_justification_mode == RIGHT) slen = -slen;
@@ -3097,7 +3095,7 @@ int wxtPanel::wxt_cairo_create_platform_context()
 
 	/* free gdkpixmap */
 	wxt_cairo_free_platform_context();
-	
+
 	/* GetWindow is a wxGTK specific wxDC method that returns
 	 * the GdkWindow on which painting should be done */
 
@@ -3391,7 +3389,7 @@ int wxt_waitforinput()
 			/* terminal event coming */
 			struct gp_event_t wxt_event;
 			int n_bytes_read = read(wxt_event_fd, (void*) &wxt_event, sizeof(wxt_event));
-			if (n_bytes_read < sizeof(wxt_event)) {
+			if (n_bytes_read < (int)sizeof(wxt_event)) {
 				if (paused_for_mouse)
 					int_error(NO_CARET, "wxt communication error, not enough bytes read");
 				FPRINTF((stderr, "wxt communication error, not enough bytes read\n"));
@@ -3577,7 +3575,7 @@ void wxt_atexit()
 # ifdef HAVE_WORKING_FORK
 	/* fork */
 	pid_t pid;
-	
+
 	if (openwindows > 0)
 		pid = fork();
 	else
