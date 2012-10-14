@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.218 2012/09/28 22:24:43 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.219 2012/10/02 04:48:54 sfeam Exp $"); }
 #endif
 
 #define MOUSE_ALL_WINDOWS 1
@@ -4261,7 +4261,11 @@ process_configure_notify_event(XEvent *event)
 	    }
 #endif
 
-	    display(plot);
+		/* Don't replot if we're replotting-on-window-resizes, since replotting
+		   happens elsewhere in those cases. If the inboard driver is dead, and
+		   the window is still around with -persist, replot also. */
+		if( !replot_on_resize || pipe_died )
+			display(plot);
 
 #ifdef USE_MOUSE
 	    {
@@ -6167,8 +6171,8 @@ static void
 mouse_to_coords(plot_struct *plot, XEvent *event,
 		double *x, double *y, double *x2, double *y2)
 {
-    int xx =         4096. * (event->xbutton.x + 0.5)/ plot->width;
-    int yy = 4095. - 4096. * (event->xbutton.y + 0.5)/ plot->gheight;
+    int xx = RevX( event->xbutton.x );
+    int yy = RevY( event->xbutton.y );
 
     FPRINTF((stderr, "gnuplot_x11 %d: mouse at %d %d\t", __LINE__, xx, yy));
 

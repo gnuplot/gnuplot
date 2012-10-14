@@ -1,3 +1,12 @@
+2012-10-14  Dima Kogan  <dima@secretsauce.net>
+
+	* src/gplt_x11.c: 
+	With -replotonresize the resize triggered two replots, the initial
+	outboard-only even-aspect-ratio one, and then the full replot.
+	This fix skips the first of these.
+	When the inboard driver is killed, the mouse-over coordinates were not
+	computed correctly.  Bugfix.
+
 2012-10-14  Ruediger Haertel  <haertel@users.sourceforge.net>
 
 	* src/term.c (term_start_multiplot) docs/gnuplot.doc:
