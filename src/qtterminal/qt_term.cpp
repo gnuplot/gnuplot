@@ -523,6 +523,9 @@ void qt_linetype(int lt)
 
 int qt_set_font (const char* font)
 {
+	int  qt_previousFontSize = qt_currentFontSize;
+	QString qt_previousFontName = qt_currentFontName;
+
 	if (font && (*font))
 	{
 		QStringList list = QString(font).split(',');
@@ -541,7 +544,18 @@ int qt_set_font (const char* font)
 	if (qt_currentFontSize <= 0)
 		qt_currentFontSize = qt_optionFontSize;
 
+	/* Optimize by leaving early if there is no change */
+	if (qt_currentFontSize == qt_previousFontSize
+	&&  qt_currentFontName == qt_currentFontName) {
+		return 1;
+	}
+
 	qt_out << GESetFont << qt_currentFontName << qt_currentFontSize;
+
+	/* Update the font size as seen by the core gnuplot code */
+	QFontMetrics metrics(QFont(qt_currentFontName, qt_currentFontSize));
+	term->v_char = qt_oversampling*metrics.ascent() + 1;
+	term->h_char = qt_oversampling*metrics.width("0123456789")/10;
 
 	return 1;
 }
@@ -940,6 +954,9 @@ void qt_options()
 	// Save options back into options string in normalized format
 	QString termOptions = QString::number(qt_optionWindowId);
 
+	/* Initialize user-visible font setting */
+	fontSettings = qt_optionFontName + "," + QString::number(qt_optionFontSize);
+
 	if (set_title)
 	{
 		termOptions += " title \"" + qt_optionTitle + '"';
@@ -957,7 +974,7 @@ void qt_options()
 	}
 
 	if (set_enhanced) termOptions +=  qt_optionEnhanced ? " enhanced" : " noenhanced";
-	if (set_font)     termOptions += " font \"" + fontSettings + '"';
+	                  termOptions += " font \"" + fontSettings + '"';
 	if (set_dash)     termOptions += qt_optionDash ? " dashed" : " solid";
 	if (set_widget)   termOptions += " widget \"" + qt_optionWidget + '"';
 	if (set_persist)  termOptions += qt_optionPersist ? " persist" : " nopersist";

@@ -9,6 +9,13 @@
 	must restore the default terminal font and size.
 	Bugfix.
 
+	* src/qtterminal/qt_term.cpp (qt_set_font qt_options):
+	Make the current terminal font visible to the user.
+	Update the font metrics whenever the font is changed.
+	Bugfix.
+
+	* demo/layout.dem: Modified to act as a test for the above bug fixes.
+
 2012-10-12  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/svg.trm: Replace sizes given in points with sizes in user
