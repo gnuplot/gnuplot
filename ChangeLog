@@ -9,6 +9,8 @@
 	must restore the default terminal font and size.
 	Bugfix.
 
+	* src/qtterminal/qt_term.cpp: Improved font metrics.
+
 2012-10-13  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graph3d.c:  Suppress drawing of a degenerate keybox when
