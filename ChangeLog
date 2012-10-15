@@ -4,6 +4,9 @@
 	notice a change in font size sent by set_term(",newsize")
 	Bugfix (old bug!)
 
+	* term/canvas.trm (set_font); Minimal set_font routine for canvas
+	terminal. All it does at this point is change or restore the font size.
+
 2012-10-14  Ruediger Haertel  <haertel@users.sourceforge.net>
 
 	* src/term.c (term_start_multiplot) docs/gnuplot.doc:

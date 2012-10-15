@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: canvas.trm,v 1.56.2.2 2012/05/05 16:54:26 sfeam Exp $
+ * $Id: canvas.trm,v 1.56.2.3 2012/08/03 05:15:11 sfeam Exp $
  *
  */
 
@@ -72,6 +72,7 @@ TERM_PUBLIC void CANVAS_set_color __PROTO((t_colorspec *colorspec));
 TERM_PUBLIC int CANVAS_make_palette __PROTO((t_sm_palette *palette));
 TERM_PUBLIC void CANVAS_layer __PROTO((t_termlayer));
 TERM_PUBLIC void CANVAS_path __PROTO((int));
+TERM_PUBLIC int CANVAS_set_font __PROTO((const char *));
 
 TERM_PUBLIC void ENHCANVAS_OPEN __PROTO((char *, double, double, TBOOLEAN, TBOOLEAN, int));
 TERM_PUBLIC void ENHCANVAS_FLUSH __PROTO((void));
@@ -197,7 +198,6 @@ TERM_PUBLIC void
 CANVAS_options()
 {
     int canvas_background = 0;
-    int sep;
 
     /* (c_token == 2) only in the case of 'set termoption'	*/
     /* which is after we have already initialized everything.	*/
@@ -261,24 +261,11 @@ CANVAS_options()
 	    break;
 
 	case CANVAS_FONT:
-	/* FIXME: The HTML5 canvas element did not originally provide any	*/
-	/* support for text output, let alone fonts.There are now text routines	*/
-	/* in the HTML5 draft spec, but they are not yet widely supported.	*/
-	/* So for now we will accept a font request, but ignore it.		*/
-	/* Eventually the text calls will look something like			*/
-	/*	ctx.font = "12pt Times";					*/
-	/*	ctx.textAlign = "center";					*/
-	/*	ctx.fillText( "Oh goody, text support.", x, y );		*/
-	/*									*/
+	/* FIXME: See note at CANVAS_set_font() */ 
 	    free(canvas_font_name);
 	    if (!(canvas_font_name = try_to_get_string()))
 		int_error(c_token,"font: expecting string");
-	    sep = strcspn(canvas_font_name,",");
-	    if (canvas_font_name[sep] == ',') {
-		sscanf(&(canvas_font_name[sep+1]), "%lf", &canvas_font_size);
-		if (canvas_font_size <= 0)
-		    canvas_font_size = 10;
-	    }
+	    CANVAS_set_font(canvas_font_name);
 	    break;
 
 	case CANVAS_FSIZE:
@@ -1189,6 +1176,39 @@ CANVAS_path(int p)
     }
 }
 
+/* FIXME: The HTML5 canvas element did not originally provide any	*/
+/* support for text output, let alone fonts.There are now text routines	*/
+/* in the HTML5 draft spec, but they are not yet widely supported.	*/
+/* So for now we will accept a font request, but ignore it except for	*/
+/* the size.								*/
+/* Eventually the text calls will look something like			*/
+/*	ctx.font = "12pt Times";					*/
+/*	ctx.textAlign = "center";					*/
+/*	ctx.fillText( "Oh goody, text support.", x, y );		*/
+/*									*/
+TERM_PUBLIC int
+CANVAS_set_font(const char *newfont)
+{
+    int sep;
+
+	if (!newfont || !(*newfont))
+	    canvas_font_size = 10;
+	else {
+	    sep = strcspn(newfont,",");
+	    if (newfont[sep] == ',') {
+		sscanf(&(newfont[sep+1]), "%lf", &canvas_font_size);
+		if (canvas_font_size <= 0)
+		    canvas_font_size = 10;
+	    }
+	}
+
+	term->v_char = canvas_font_size * canvas_fontscale * CANVAS_OVERSAMPLE;
+	term->h_char = canvas_font_size * canvas_fontscale * 0.8 * CANVAS_OVERSAMPLE;
+
+    return 1;
+}
+
+
 /* Enhanced text mode support starts here */
 
 static double ENHCANVAS_base = 0.0;
@@ -1403,7 +1423,7 @@ TERM_TABLE_START(canvas_driver)
     CANVAS_text, null_scale, CANVAS_graphics, CANVAS_move, CANVAS_vector,
     CANVAS_linetype, CANVAS_put_text, CANVAS_text_angle,
     CANVAS_justify_text, CANVAS_point, do_arrow, 
-    set_font_null,
+    CANVAS_set_font,
     CANVAS_pointsize,
     TERM_CAN_MULTIPLOT|TERM_ALPHA_CHANNEL|TERM_LINEWIDTH|TERM_CAN_DASH,
     NULL, NULL, CANVAS_fillbox, CANVAS_linewidth
