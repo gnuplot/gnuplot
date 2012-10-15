@@ -338,8 +338,8 @@ void qt_graphics()
 
 	// Set plot metrics
 	QFontMetrics metrics(QFont(qt_currentFontName, qt_currentFontSize));
-	term->v_char = qt_oversampling*metrics.ascent() + 1;
-	term->h_char = qt_oversampling*metrics.width("0123456789")/10;
+	term->v_char = qt_oversampling * (metrics.ascent() + metrics.descent());
+	term->h_char = qt_oversampling * metrics.width("0123456789")/10.;
 	term->v_tic = (unsigned int) (term->v_char/2.5);
 	term->h_tic = (unsigned int) (term->v_char/2.5);
 	if (qt_setSize)
@@ -554,8 +554,8 @@ int qt_set_font (const char* font)
 
 	/* Update the font size as seen by the core gnuplot code */
 	QFontMetrics metrics(QFont(qt_currentFontName, qt_currentFontSize));
-	term->v_char = qt_oversampling*metrics.ascent() + 1;
-	term->h_char = qt_oversampling*metrics.width("0123456789")/10;
+	term->v_char = qt_oversampling * (metrics.ascent() + metrics.descent());
+	term->h_char = qt_oversampling * metrics.width("0123456789")/10.;
 
 	return 1;
 }
