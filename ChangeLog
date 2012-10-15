@@ -7,6 +7,10 @@
 	* term/canvas.trm (set_font); Minimal set_font routine for canvas
 	terminal. All it does at this point is change or restore the font size.
 
+	* src/term.c (term_start_multiplot): The calculation of vertical space
+	required for a plot title depends on term->v_char, which in turn depends
+	on the font used for the title. Bugfix.
+
 2012-10-14  Ruediger Haertel  <haertel@users.sourceforge.net>
 
 	* src/term.c (term_start_multiplot) docs/gnuplot.doc:

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.225.2.10 2012/10/09 16:30:15 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.225.2.11 2012/10/14 18:51:55 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -793,10 +793,17 @@ term_start_multiplot()
 
 	/* Calculate fractional height of title compared to entire page */
 	/* If it would fill the whole page, forget it! */
-	for (y=2; *p; p++)
+	for (y=1; *p; p++)
 	    if (*p == '\n')
 		y++;
+
+	/* Oct 2012 - v_char depends on the font used */
+	if (mp_layout.title.font && *mp_layout.title.font && term->set_font)
+	    term->set_font(mp_layout.title.font);
 	mp_layout.title_height = (double)(y * term->v_char) / (double)term->ymax;
+	if (mp_layout.title.font && *mp_layout.title.font && term->set_font)
+	    term->set_font("");
+
 	if (mp_layout.title_height > 0.9)
 	    mp_layout.title_height = 0.05;
     } else {
