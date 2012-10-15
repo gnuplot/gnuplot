@@ -1,3 +1,9 @@
+2012-10-15  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/gd.trm (set_font): The libgd terminals were failing to 
+	notice a change in font size sent by set_term(",newsize")
+	Bugfix (old bug!)
+
 2012-10-14  Dima Kogan  <dima@secretsauce.net>
 
 	* src/gplt_x11.c: 
