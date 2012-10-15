@@ -1007,7 +1007,7 @@ PNG_options()
     }
 
     /* If no explicit TTF font size found, generate default */
-    if (png_state.default_ttfsize == 0)
+    if (!(png_state.default_ttfsize > 0))
 	png_state.default_ttfsize = 2 * term->h_char - 2;
     png_state.ttfsize = png_state.default_ttfsize;
 
@@ -1807,8 +1807,9 @@ PNG_set_font(const char *fontname)
     sep = strcspn(fontname,",");
     strncpy(name,fontname,sep);
     name[sep] = '\0';
-    size = png_state.default_ttfsize;
-    sscanf (&(fontname[sep+1]),"%d",&size);
+    if ((sscanf(&(fontname[sep+1]),"%d",&size) < 1)
+    || !(size > 0))
+	size = png_state.default_ttfsize;
 
     if (!strcmp(name,"small"))
 	font = gdFontGetSmall();
