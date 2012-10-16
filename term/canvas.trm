@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: canvas.trm,v 1.64 2012/08/05 19:24:53 sfeam Exp $
+ * $Id: canvas.trm,v 1.65 2012/10/15 23:13:11 sfeam Exp $
  *
  */
 
@@ -75,7 +75,7 @@ TERM_PUBLIC int CANVAS_make_palette __PROTO((t_sm_palette *palette));
 TERM_PUBLIC void CANVAS_layer __PROTO((t_termlayer));
 TERM_PUBLIC void CANVAS_path __PROTO((int));
 TERM_PUBLIC void CANVAS_hypertext __PROTO((int, const char *));
-TERM_PUBLIC void CANVAS_set_font __PROTO((const char *));
+TERM_PUBLIC int CANVAS_set_font __PROTO((const char *));
 
 TERM_PUBLIC void ENHCANVAS_OPEN __PROTO((char *, double, double, TBOOLEAN, TBOOLEAN, int));
 TERM_PUBLIC void ENHCANVAS_FLUSH __PROTO((void));
@@ -1259,7 +1259,7 @@ CANVAS_hypertext(int type, const char *hypertext)
 /*	ctx.textAlign = "center";					*/
 /*	ctx.fillText( "Oh goody, text support.", x, y );		*/
 /*									*/
-TERM_PUBLIC void
+TERM_PUBLIC int
 CANVAS_set_font(const char *newfont)
 {
     int sep;
@@ -1277,6 +1277,8 @@ CANVAS_set_font(const char *newfont)
 
 	term->v_char = canvas_font_size * canvas_fontscale * CANVAS_OVERSAMPLE;
 	term->h_char = canvas_font_size * canvas_fontscale * 0.8 * CANVAS_OVERSAMPLE;
+
+    return 1;
 }
 
 
