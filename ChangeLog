@@ -1,4 +1,8 @@
-2012-10-15  Ethan A Merritt  <merritt@u.washington.edu>
+2012-10-16  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/term.c (term_start_multiplot): The calculation of vertical space
+	required for a plot title depends on term->v_char, which in turn depends
+	on the font used for the title. Bugfix.
 
 	* term/gd.trm (set_font): The libgd terminals were failing to 
 	notice a change in font size sent by set_term(",newsize")
