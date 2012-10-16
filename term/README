@@ -16,6 +16,8 @@ Whole of terminal driver should be contained in one <driver>.trm file,
 with a fairly strict layout as detailed below - this allows the
 gnuplot maintainers to change the way the terminal drivers are
 compiled without having to change the drivers themselves.
+A few routines shared by multiple terminal drivers are given their
+own C file, for example .../term/write_png_image.c.
 
 term.h, and therefore each file.trm file, may be loaded more than once,
 with different sections selected by macros.
@@ -135,9 +137,10 @@ ymax is the maximum number of points in the y direction.
 The range of points used by gnuplot is 0 to ymax-1.
 
 v_char is the height of characters, in the same units as xmax and ymax.
-The border for labelling at the top and bottom of the plot is 
-calculated using v_char.  
 v_char is used as the vertical line spacing for characters.
+v_char and h_char should be updated by set_font() since they are 
+needed for the core routines to estimate how much space will be
+required for a text element.
 
 h_char is the width of characters, in the same units as xmax and ymax.
 The border for labelling at the left and right of the plot is 
@@ -212,14 +215,18 @@ position.
 _linetype(lt)  Called to set the line type before text is displayed or
 line(s) plotted.  This procedure should select a pen color or line
 style if the device has these capabilities.  
-lt is an integer from -3 to 0 or greater.  
-An lt of -3 is solid and drawn with xor (for temporary interactive annotations).
-An lt of -2 is used for the border of the plot.
-An lt of -1 is used for the X and Y axes.  
-lt 0 and upwards are used for plots 0 and upwards.
+Non-negative lt values correspond to a "real" linetype.
+Negative lt values correspond to special values as defined in term_api.h
+#define LT_AXIS       (-1)		/* Used to draw X and Y axes */
+#define LT_BLACK      (-2)
+#define LT_NODRAW     (-3)
+#define LT_BACKGROUND (-4)
+#define LT_UNDEFINED  (-5)
+#define LT_COLORFROMCOLUMN  (-6)	/* Used by hidden3d code */
+#define LT_DEFAULT    (-7)
+#define LT_SINGLECOLOR  (-8)		/* Used by hidden3d code */
 If _linetype() is called with lt greater than the available line types, 
 it should map it to one of the available line types.
-Most drivers provide 9 different linetypes (lt is 0 to 8).
 
 _put_text(x,y,str)  Called to display text at the (x,y) position, 
 while in graphics mode.   The text should be vertically (with respect 
@@ -292,9 +299,6 @@ Drivers should use do_arrow unless it causes problems.
 _set_font() is called to set the font of labels, etc.
   - fonts are selected as strings "name,size".
   - _set_font("") restores the terminal's default font.
-The core code does not currently use this entry point, but many 
-terminal drivers use it internally to process font requests either
-in "set term" or enhanced text strings.
 
 _pointsize() is used to set the pointsize for subsequent points
 
