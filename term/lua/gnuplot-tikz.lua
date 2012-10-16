@@ -37,7 +37,7 @@
 
 
 
-  $Date: 2012/02/07 05:08:16 $
+  $Date: 2012/02/07 17:55:06 $
   $Author: sfeam $
   $Rev: 100 $
 
@@ -81,7 +81,7 @@ pgf.DEFAULT_FONT_V_CHAR = 308
 pgf.STYLE_FILE_BASENAME = "gnuplot-lua-tikz"  -- \usepackage{gnuplot-lua-tikz}
 
 pgf.REVISION = string.sub("$Rev: 100 $",7,-3)
-pgf.REVISION_DATE = string.gsub("$Date: 2012/02/07 05:08:16 $",
+pgf.REVISION_DATE = string.gsub("$Date: 2012/02/07 17:55:06 $",
                                 "$Date: ([0-9]+).([0-9]+).([0-9]+) .*","%1/%2/%3")
 
 pgf.styles = {}
@@ -1208,6 +1208,7 @@ gfx.text_angle = 0
 gfx.opt = {
   latex_preamble = '',
   default_font = '',
+  default_fontsize = 10,
   lines_dashed = true,
   lines_colored = true,
   -- use gnuplot arrows or points instead of TikZ?
@@ -1368,6 +1369,10 @@ end
 
 gfx.parse_font_string = function (str)
   local size,rets,toks = nil, str, explode(',', str)
+  -- set_font("") must restore default font
+  if string.len(str) == 0 then
+    return gfx.opt.default_font, gfx.opt.default_fontsize
+  end
   -- if at least two tokens
   if #toks > 1 then
     -- add first element to font string
@@ -1387,6 +1392,7 @@ gfx.parse_font_string = function (str)
       rets = rets .. ',' .. v
     end
   else
+    -- assume bare font name with no size
     if #rets > 0 then 
       rets = "{" .. rets .. "}"
     end
@@ -1927,6 +1933,7 @@ term.options = function(opt_str, initial, t_count)
   -- FIXME: what happens on "set termoptions font ..." or subsequent terminal calls
   local term_h_char, term_v_char = term.h_char, term.v_char
   if fontsize ~= nil then
+    gfx.opt.default_fontsize = fontsize
     term_h_char = pgf.DEFAULT_FONT_H_CHAR * (fontsize/10) * (pgf.DEFAULT_RESOLUTION/1000)
     term_v_char = pgf.DEFAULT_FONT_V_CHAR * (fontsize/10) * (pgf.DEFAULT_RESOLUTION/1000)
     -- on change apply old text scaling
@@ -2156,7 +2163,12 @@ term.pointsize = function(size)
 end
 
 term.set_font = function(font)
-  gfx.text_font = gfx.parse_font_string(font)
+  local fontsize = nil
+  gfx.text_font, fontsize = gfx.parse_font_string(font)
+  if fontsize ~= nil then
+    term.h_char = pgf.DEFAULT_FONT_H_CHAR * (fontsize/10) * (pgf.DEFAULT_RESOLUTION/1000)
+    term.v_char = pgf.DEFAULT_FONT_V_CHAR * (fontsize/10) * (pgf.DEFAULT_RESOLUTION/1000)
+  end
   return 1
 end
 
