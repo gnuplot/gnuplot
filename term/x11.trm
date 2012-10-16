@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: x11.trm,v 1.196 2012/09/28 21:40:43 sfeam Exp $
+ * $Id: x11.trm,v 1.197 2012/09/28 22:24:43 sfeam Exp $
  *
  */
 
@@ -777,6 +777,9 @@ TERM_PUBLIC void
 X11_update_opts()
 {
     if (!X11_ipc)
+	return;
+
+    if (!strcmp("xlib",term->name))
 	return;
 
     if (UNSET != do_raise || UNSET != persist || UNSET != dashedlines ||
