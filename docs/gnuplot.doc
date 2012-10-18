@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.752 2012/10/09 22:06:41 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.753 2012/10/14 18:57:24 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -10061,17 +10061,22 @@ Ffigure_missing
 4 interpolate
 ?set pm3d interpolate
 ?pm3d interpolate
- The option `interpolate m,n` will interpolate grid points into a finer mesh,
- and color each quadrangle appropriately.  For data files, this will smoothen
- the color surface, and enhance spikes in a color surface. For functions,
- interpolation makes little sense, except to trade off precision for memory.
- It would usually make more sense to use `samples` and `isosamples` when
- working with functions. For positive m and n, each quadrangle or triangle
- is interpolated m-times and n-times in the respective direction.  For negative
- m and n, the interpolation frequency is chosen so that there will be at least
- |m| and |n| points drawn; you can consider this as a special gridding function.
- Zeros, i.e. `interpolate 0,0`, will automatically choose an optimal number of
+ The option `interpolate m,n` will interpolate between grid points to generate
+ a finer mesh.  For data files, this smooths the color surface and enhances the
+ contrast of spikes in the surface.  When working with functions, interpolation
+ makes little sense.  It would usually make more sense to increase `samples` and
+ `isosamples`.
+
+ For positive m and n, each quadrangle or triangle is interpolated m-times and
+ n-times in the respective direction.  For negative m and n, the interpolation
+ frequency is chosen so that there will be at least |m| and |n| points drawn;
+ you can consider this as a special gridding function.
+
+ Note: `interpolate 0,0`, will automatically choose an optimal number of
  interpolated surface points.
+
+ Note: Currently color interpolation is always linear, even if corners2color
+ is set to a nonlinear scheme such as the geometric mean.
 4 deprecated_options
 ?pm3d deprecated_options
  There used to be an option {transparent|solid} to this command.  Now
