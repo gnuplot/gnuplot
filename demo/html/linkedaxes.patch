@@ -11,7 +11,7 @@
  gnuplot.plot_logaxis_y = 0;
 --- linkedaxes.html.raw	2012-09-13 11:50:58.000000000 -0700
 +++ linkedaxes.html	2012-09-13 11:55:45.000000000 -0700
-@@ -39,8 +39,8 @@
+@@ -40,8 +40,8 @@
  <table class="mbright" tabindex=0>
  <tr>
  
@@ -22,7 +22,7 @@
  
    <td class="icon"></td>
    <td class="icon" onclick="gnuplot.toggle_grid();"><img src="grid.png" id="gnuplot_grid_icon" class="icon-image" alt="#" title="toggle grid"></td>
-@@ -51,7 +51,7 @@
+@@ -52,7 +52,7 @@
  
  </tr>
  <tr>
@@ -31,7 +31,7 @@
    <td class="blank">&nbsp;</td>
    <td class="icon">&nbsp;</td>
    <td class="icon" onclick='gnuplot.toggle_plot("linkedaxes_1_plot_1")'>&#9312;</td>
-@@ -60,7 +60,6 @@
+@@ -61,7 +61,6 @@
    <td class="icon" onclick='gnuplot.toggle_plot("linkedaxes_1_plot_4")'>&#9315;</td>
    <td class="icon" onclick='gnuplot.toggle_plot("linkedaxes_1_plot_5")'>&#9316;</td>
    <td class="icon" onclick='gnuplot.toggle_plot("linkedaxes_1_plot_6")'>&#9317;</td>
