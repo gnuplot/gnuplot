@@ -6,6 +6,10 @@
 	* src/command.c (do_string_and_free):  The "exit" command was not working
 	inside a bracketed clause.  Bug #3576439
 
+	* src/pm3d.c (pm3d_plot):  If pm3d option corners2color is 'mean' and
+	the coloring option is 'rgb variable', then the code that calculates the
+	mean must deal with alpha channel values as well as r/g/b components.
+
 2012-10-19  Dima Kogan  <dima@secretsauce.net>
 
 	* src/gplt_x11.c src/mouse.c term/x11.trm:

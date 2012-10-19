@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.91 2012/10/04 20:19:08 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.92 2012/10/09 03:51:19 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - pm3d.c */
@@ -700,13 +700,17 @@ pm3d_plot(struct surface_points *this_plot, int at_which_z)
 		    default:
 		    case PM3D_WHICHCORNER_MEAN:
 			if (color_from_rgbvar) {
-			    int r = (((int)cb1)&0xff0000)+(((int)cb2)&0xff0000)
-			    	  + (((int)cb3)&0xff0000)+(((int)cb4)&0xff0000);
-			    int g = (((int)cb1)&0xff00)+(((int)cb2)&0xff00)
-			    	  + (((int)cb3)&0xff00)+(((int)cb4)&0xff00);
-			    int b = (((int)cb1)&0xff)+(((int)cb2)&0xff)
-			    	  + (((int)cb3)&0xff)+(((int)cb4)&0xff);
+			    unsigned int r, g, b, a;
+			    unsigned int u1 = cb1;
+			    unsigned int u2 = cb2;
+			    unsigned int u3 = cb3;
+			    unsigned int u4 = cb4;
+			    r = (u1&0xff0000) + (u2&0xff0000) + (u3&0xff0000) + (u4&0xff0000);
+			    g = (u1&0xff00) + (u2&0xff00) + (u3&0xff00) + (u4&0xff00);
+			    b = (u1&0xff) + (u2&0xff) + (u3&0xff) + (u4&0xff);
 			    avgC = ((r>>2)&0xff0000) + ((g>>2)&0xff00) + ((b>>2)&0xff);
+			    a = ((u1>>24)&0xff) + ((u2>>24)&0xff) + ((u3>>24)&0xff) + ((u4>>24)&0xff);
+			    avgC += (a<<22)&0xff000000;
 			} else {
     			    avgC = (cb1 + cb2 + cb3 + cb4) * 0.25;
 			}
