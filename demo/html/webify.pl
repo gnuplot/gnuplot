@@ -48,9 +48,12 @@ use HTML::Entities;
 # input and output files
 	open(IN,  "<$GNUPLOT_LIB/$ARGV[0].dem") or die "can't open $GNUPLOT_LIB/$ARGV[0].dem";
 	open(OUT, ">$ARGV[0].html") or die "can't open $ARGV[0].html";
+	binmode IN, ":encoding(UTF-8)";
+	binmode OUT,":encoding(UTF-8)";
 
 # open pipe to gnuplot and set terminal type
 	open(GNUPLOT, "|$gnuplot") or die "can't find gnuplot";
+	binmode GNUPLOT,":encoding(UTF-8)";
 	if ((defined $ENV{DEMOTERM}) && $DEMOTERM ne "") {
 	    print GNUPLOT "set term $DEMOTERM\n";
 	} else {
@@ -65,6 +68,7 @@ use HTML::Entities;
 
 # Boiler plate header
 	print OUT "<html>\n<head>\n<title>gnuplot demo script: $ARGV[0].dem </title>\n";
+	print OUT "<meta charset=\"UTF-8\" />\n";
 	print OUT "<link rel=\"stylesheet\" href=\"gnuplot_demo.css\" type=\"text/css\">\n"
 		  if (-e "gnuplot_demo.css");
 	print OUT "</head>\n";
