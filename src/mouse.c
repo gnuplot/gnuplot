@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: mouse.c,v 1.139 2012/09/17 03:05:43 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: mouse.c,v 1.140 2012/09/26 04:21:18 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - mouse.c */
@@ -2094,6 +2094,8 @@ do_event(struct gp_event_t *ge)
 	    ge->mx *= -1;
 	    h_char_saved = ge->par1;
 	    v_char_saved = ge->par2;
+		/* factor of 2.5 must match default values of X11_VTIC and X11_HTIC
+		   in x11.trm */
 	    h_tic_saved	= (unsigned int) (v_char_saved/2.5);
 	    v_tic_saved	= (unsigned int) (v_char_saved/2.5);
 	    ymax_saved	= (double)term->xmax * (double)ge->my / (double)ge->mx;

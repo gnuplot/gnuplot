@@ -1,3 +1,8 @@
+2012-10-19  Dima Kogan  <dima@secretsauce.net>
+
+	* src/gplt_x11.c src/mouse.c term/x11.trm:
+	Initialize x11 terminal aspect ratio so that it works for xlib also.
+
 2012-10-16  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/lua.trm term/lua/gnuplot-tikz.lua:  The set_font() routine must

@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: x11.trm,v 1.197 2012/09/28 22:24:43 sfeam Exp $
+ * $Id: x11.trm,v 1.198 2012/10/16 19:12:00 sfeam Exp $
  *
  */
 
@@ -107,19 +107,24 @@ TERM_PUBLIC void ENHX11_OPEN __PROTO((char * fontname, double fontsize,
 				int overprint));
 TERM_PUBLIC void ENHX11_FLUSH __PROTO((void));
 
+/* These are the default terminal sizing parameters. These should match the
+   sizes in gplt_x11.c, and both specify 640,450 */
 # define X11_XMAX 4096
-# define X11_YMAX 4096
+# define X11_YMAX (4096*450/640)
 
 static int X11_SIZE_X = 640;
 static int X11_SIZE_Y = 450;
 static int X11_POSITION_X = 0;
 static int X11_POSITION_Y = 0;
 
-/* approximations for typical font/screen sizes */
+/* approximations for typical font/screen sizes. The are just the defaults that
+   get updated by the outboard driver. We make sure that the inboard and the
+   outboard defaults match up at the start. The *10/25 is the factor of 2.5 that
+   gets applied in the GE_fontprops handler in mouse.c */
 # define X11_VCHAR (X11_YMAX/25)
 # define X11_HCHAR (X11_XMAX/100)
-# define X11_VTIC (X11_YMAX/100)
-# define X11_HTIC (X11_XMAX/150)
+# define X11_VTIC (X11_VCHAR * 10 / 25)
+# define X11_HTIC (X11_VCHAR * 10 / 25)
 #endif	/* TERM_PROTO */
 
 
@@ -1389,33 +1394,33 @@ X11_graphics()
        the sizing information. I now save the sizing information every time the
        window sizes change (in the ..._saved variables). Thus I no longer need
        to ask for this information NOW, and can just use it. */
-    if (ipc_back_fd >= 0 && X11_MOUSE_FEEDBACK) {
 	if (!default_font_size_known) {
-	    IPC_LOCK = TRUE;
-	    PRINT1("QG%s\n",X11_default_font);
-	    FFLUSH();
-	    X11_waitforinput();
-	    default_font_size_known = TRUE;
-	    IPC_LOCK = FALSE;
+		IPC_LOCK = TRUE;
+		PRINT1("QG%s\n",X11_default_font);
+		FFLUSH();
+		if (ipc_back_fd >= 0 && X11_MOUSE_FEEDBACK)
+			X11_waitforinput();
+
+		default_font_size_known = TRUE;
+		IPC_LOCK = FALSE;
 	}
 	else
 	{
-	  /* replot. I send a Qg to tell the outboard driver to use the new
-             window sizes. I also use the stored window sizes to update myself
-             (inboard driver) */
-	  PRINT0("Qg\n");
-	  FFLUSH();
+		/* replot. I send a Qg to tell the outboard driver to use the new
+		   window sizes. I also use the stored window sizes to update myself
+		   (inboard driver) */
+		PRINT0("Qg\n");
+		FFLUSH();
 
-	  if( ymax_saved > 0.0 ) /* use saved sizes, if they're valid */
-	  {
-	    term->h_char = h_char_saved;
-	    term->v_char = v_char_saved;
-	    term->h_tic  = h_tic_saved;
-	    term->v_tic  = v_tic_saved;
-	    term->ymax   = ymax_saved;
-	  }
+		if( ymax_saved > 0.0 ) /* use saved sizes, if they're valid */
+		{
+			term->h_char = h_char_saved;
+			term->v_char = v_char_saved;
+			term->h_tic	 = h_tic_saved;
+			term->v_tic	 = v_tic_saved;
+			term->ymax	 = ymax_saved;
+		}
 	}
-    }
 #endif
     /* Force default font at start of plot */
     *X11_last_font_used = '\01';
