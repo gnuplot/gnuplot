@@ -1,3 +1,8 @@
+2012-10-19  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/command.c (do_string_and_free):  The "exit" command was not working
+	inside a bracketed clause.  Bug #3576439
+
 2012-10-15  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/gd.trm (set_font): The libgd terminals were failing to 
