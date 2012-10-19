@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.242 2012/07/20 16:53:48 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.243 2012/08/05 19:24:53 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -454,7 +454,7 @@ do_string_and_free(char *cmdline)
 	extend_input_line();
     strcpy(gp_input_line, cmdline);
     screen_ok = FALSE;
-    do_line();
+    command_exit_status = do_line();
 
     /* We don't know if screen_ok is appropriate so leave it FALSE. */
     lf_pop();

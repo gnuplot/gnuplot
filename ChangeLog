@@ -3,6 +3,9 @@
 	* demo/html/webify.pl demo/html/webify_svg.pl demo/html/webify_canvas.pl:
 	Add UTF-8 handling to web page generation.
 
+	* src/command.c (do_string_and_free):  The "exit" command was not working
+	inside a bracketed clause.  Bug #3576439
+
 2012-10-19  Dima Kogan  <dima@secretsauce.net>
 
 	* src/gplt_x11.c src/mouse.c term/x11.trm:
