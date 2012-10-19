@@ -1,3 +1,8 @@
+2012-10-19  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* demo/html/webify.pl demo/html/webify_svg.pl demo/html/webify_canvas.pl:
+	Add UTF-8 handling to web page generation.
+
 2012-10-19  Dima Kogan  <dima@secretsauce.net>
 
 	* src/gplt_x11.c src/mouse.c term/x11.trm:
