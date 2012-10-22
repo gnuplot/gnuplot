@@ -29,17 +29,21 @@ TERM_PUBLIC void Xlib_reset __PROTO((void));
 #ifndef TERM_PROTO_ONLY
 #ifdef TERM_BODY
 
+static FILE *X11_save_ipc = NULL;
+
 TERM_PUBLIC void
 Xlib_init()
 {
     /* x11.trm thinks it is writing to a private pipe, but here we */
     /* set it to use the channel opened by 'set output <file>'     */
+    X11_save_ipc = X11_ipc;
     X11_ipc = gpoutfile;
 
 #ifdef PIPE_IPC
     /* There is, of course, no mouse feedback */
     ipc_back_fd = IPC_BACK_UNUSABLE;
 #endif
+    term_initialised = TRUE;
 }
 
 TERM_PUBLIC void
@@ -50,13 +54,12 @@ Xlib_text()
 #ifdef PIPE_IPC
     ipc_back_fd = IPC_BACK_UNUSABLE;
 #endif
-    X11_ipc = NULL;
 }
 
 TERM_PUBLIC void
 Xlib_reset()
 {
-    X11_ipc = NULL;
+    X11_ipc = X11_save_ipc;
 }
 
 #endif
@@ -73,7 +76,7 @@ TERM_TABLE_START(xlib_driver)
     X11_text /* suspend can use same routine */ , 0 /* resume */ ,
     X11_fillbox, X11_linewidth
 #ifdef USE_MOUSE
-    , X11_waitforinput, X11_put_tmptext, X11_set_ruler, X11_set_cursor, X11_set_clipboard
+    , X11_waitforinput, NULL, NULL, NULL, NULL
 #endif
     , X11_make_palette, 0 /* X11_previous_palette */ ,
     X11_set_color, X11_filled_polygon
