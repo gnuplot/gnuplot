@@ -1,3 +1,8 @@
+2012-10-22  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/xlib.trm: Reset X11_ipc when xlib terminal exits; otherwise a
+	subsequent "set term x11" fails to send output to gnuplot_x11.
+
 2012-10-19  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/command.c (do_string_and_free):  The "exit" command was not working

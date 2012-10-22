@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: xlib.trm,v 1.22 2009/02/07 19:56:43 sfeam Exp $
+ * $Id: xlib.trm,v 1.23 2009/03/26 00:49:29 sfeam Exp $
  */
 
 /* GNUPLOT - xlib.trm */
@@ -50,7 +50,7 @@ Xlib_text()
 #ifdef PIPE_IPC
     ipc_back_fd = IPC_BACK_UNUSABLE;
 #endif
-
+    X11_ipc = NULL;
 }
 
 TERM_PUBLIC void
