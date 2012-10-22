@@ -3,6 +3,14 @@
 	* term/xlib.trm: Reset X11_ipc when xlib terminal exits; otherwise a
 	subsequent "set term x11" fails to send output to gnuplot_x11.
 
+	* term/x11.trm: Filter out redundant move/vector/set_color commands.
+	- Do not send a Move or Vector command to gnuplot_x11 if the previous
+	  move/vector went to the same coordinates.
+	- Do not send an rgbcolor command to gnuplot_x11 if it duplicates the
+	  previous rgbcolor command.
+	Filtering yields a 9% reduction in the number of bytes sent from
+	gnuplot to gnuplot_x11 during execution of all.dem.
+
 2012-10-19  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* demo/html/webify.pl demo/html/webify_svg.pl demo/html/webify_canvas.pl:
