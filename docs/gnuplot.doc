@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.753 2012/10/14 18:57:24 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.754 2012/10/18 23:11:42 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -2271,7 +2271,7 @@ Ffigure_newsyntax
  bindings, except that <space> and 'q' cannot normally be rebound. For an
  exception, see `bind space`.
 
- Mouse buttons cannot be rebound.
+ Only mouse button 1 can be bound, and only for 2D plots.
 
  You get the list of all hotkeys by typing `show bind` or `bind` or by typing
  the hotkey 'h' in the graph window.
@@ -2333,7 +2333,7 @@ Ffigure_newsyntax
 
  The following are window events rather than actual keys
 
-    "Close"
+    "Button1" "Close"
 
  See also help for `mouse`.
 4 bind space

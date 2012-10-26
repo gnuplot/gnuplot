@@ -1,3 +1,9 @@
+2012-10-26  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/mouse.c src/mouse.h src/mousecmn.h src/term_api.h:  
+	Allow the "bind" command to attach a user command to mouse button 1,
+	at least for 2D plots.
+
 2012-10-22  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/xlib.trm: Reset X11_ipc when xlib terminal exits; otherwise a

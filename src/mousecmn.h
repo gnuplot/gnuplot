@@ -1,5 +1,5 @@
 /*
- * $Id: mousecmn.h,v 1.15 2006/06/16 19:55:56 mikulik Exp $
+ * $Id: mousecmn.h,v 1.16 2007/05/18 06:15:31 sfeam Exp $
  */
 
 /* GNUPLOT - mousecnm.h */
@@ -157,6 +157,7 @@ enum { /* other special keys */
     GP_F11,
     GP_F12,
     GP_Cancel,
+    GP_Button1,
     GP_LAST_KEY
 };
 
