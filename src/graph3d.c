@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.270 2012/10/13 18:03:11 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.271 2012/10/13 18:29:16 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -490,6 +490,10 @@ boundary3d(struct surface_points *plots, int count)
 	clip_area = NULL;
     else
 	clip_area = &canvas;
+    
+    /* Needed for mousing by outboard terminal drivers */
+    AXIS_SETSCALE(FIRST_X_AXIS, plot_bounds.xleft, plot_bounds.xright);
+    AXIS_SETSCALE(FIRST_Y_AXIS, plot_bounds.ybot, plot_bounds.ytop);
 }
 
 static TBOOLEAN
