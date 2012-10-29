@@ -81,5 +81,45 @@ set title "Demo of hidden3d with points only (no surface)"
 set hidden3d
 replot
 pause -1 "Hit return to continue"
+reset
 #
+
+RGB(R,G,B) =  int(255.*R) * 2**16 + int(255.*G) * 2**8  + int(255.*B)
+
+set xr [0.01:1]
+set yr [0.01:1]
+set zr [0:1]
+set xtics ("R=1" 1)
+set ytics ("G=1" 1)
+set ztics ("0" 0, "B=1" 1)
+unset colorbox
+set isosamples 40,40
+set xyplane at 0.0
+set view 63,58,1.,1.4
+
+set title "RGB coloring of pm3d surface"
+unset key
+
+# Just some function that is well-defined in this range
+# (except at the origin)
+f(x,y) = 0.4 + sin(sqrt(100.*x**2+100.*y**2)) \
+       / (1.5*sqrt(100.*x**2+100.*y**2))
+
+splot '++' using 1:2:(f($1,$2)):(RGB($1,$2,f($1,$2))) \
+       with pm3d lc rgb variable
+
+pause -1 "Hit return to continue"
+
+set title "HSV coloring of pm3d surface\n(V=1)"
+unset xtics
+unset ytics
+set ztics ("0" 0)
+set xlabel "H"
+set ylabel "S"
+
+splot '++' using 1:2:(f($1,$2)):(hsv2rgb($1,$2,1.0)) \
+       with pm3d lc rgb variable
+
+pause -1 "Hit return to continue"
+
 reset

@@ -16,6 +16,20 @@
 	routine null_set_font() so that code does not have to test every
 	time whether the current terminal supports term->set_font() or not.
 
+	* src/color.c src/color.h src/eval.c src/getcolor.c src/getcolor.h
+	docs/gnuplot.doc:  
+	New user-visible function hsv2rgb(H,S,V) creates a 24-bit RGB value
+	from real H,S,V values in the range [0:1]. This allows use of hsv colors
+	in plots with coloring style "rgb variable".  The new function can be
+	used to implement the capability suggested by Shige Takeno:
+	  hsv(h,s,v) = sprintf("#%06x",hsv2rgb(h,s,v))
+	  plot FOO lc rgb hsv(H,S,V)
+
+	* demo/all.dem demo/complex_trig.dem demo/html/index.canvas
+	demo/html/index.save demo/html/index.svg demo/html/Makefile
+	demo/rgb_variable.dem:  Demos for HSV coloring, including a new demo
+	for complex-valued trig functions.
+
 2012-10-26  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/mouse.c src/mouse.h src/mousecmn.h src/term_api.h:  

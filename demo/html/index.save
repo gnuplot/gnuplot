@@ -40,6 +40,7 @@ Interactive demo scripts are not included on this page.
     <li><a href="approximate.html">approximation</a></li>
     <li><a href="spline.html">B-splines</a></li>
     <li><a href="airfoil.html">Bezier splines</a></li>
+    <li><a href="complex_trig.html">complex functions</a></li>
     <li><a href="fit.html">parameter fitting</a></li>
     <li><a href="prob2.html">probability</a></li>
     <li><a href="prob.html">probability (more)</a></li>
@@ -89,7 +90,7 @@ Interactive demo scripts are not included on this page.
     <h4>Colors</h4>
     <ul>
     <li><a href="varcolor.html">data-dependent coloring</a></li>
-    <li><a href="rgb_variable.html">RGB coloring</a></li>
+    <li><a href="rgb_variable.html">RGB and HSV coloring</a></li>
     <li><a href="rgba_lines.html">RGB + Alpha</a></li>
     <li><a href="pm3dcolors.html">pm3d colors</a></li>
     <li><a href="pm3dgamma.html">pm3d gamma</a></li>

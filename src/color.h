@@ -1,5 +1,5 @@
 /*
- * $Id: color.h,v 1.35 2011/10/08 00:07:41 sfeam Exp $
+ * $Id: color.h,v 1.36 2012/04/13 19:30:38 sfeam Exp $
  */
 
 /* GNUPLOT - color.h */
@@ -263,6 +263,10 @@ void filled_polygon_3dcoords_zfixed __PROTO((int points, struct coordinate GPHUG
 */
 void draw_color_smooth_box __PROTO((int plot_mode));
 
+/*
+ Support for user-callable routines
+*/
+void f_hsv2rgb __PROTO((union argument *));
 
 #endif /* COLOR_H */
 

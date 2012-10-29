@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: color.c,v 1.102 2012/06/06 22:12:02 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: color.c,v 1.103 2012/09/17 03:03:32 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - color.c */
@@ -727,3 +727,46 @@ draw_color_smooth_box(int plot_mode)
 
 }
 
+/*
+ * User-callable builtin color conversion 
+ */
+void
+f_hsv2rgb(union argument *arg)
+{
+    struct value h, s, v, result;
+    rgb_color color = {0., 0., 0.};
+
+    (void) arg;
+    (void) pop(&v);
+    (void) pop(&s);
+    (void) pop(&h);
+
+    if (h.type == INTGR)
+	color.r = h.v.int_val;
+    else if (h.type == CMPLX)
+	color.r = h.v.cmplx_val.real;
+    if (s.type == INTGR)
+	color.g = s.v.int_val;
+    else if (s.type == CMPLX)
+	color.g = s.v.cmplx_val.real;
+    if (v.type == INTGR)
+	color.b = v.v.int_val;
+    else if (v.type == CMPLX)
+	color.b = v.v.cmplx_val.real;
+
+    if (color.r < 0)
+	color.r = 0;
+    if (color.g < 0)
+	color.g = 0;
+    if (color.b < 0)
+	color.b = 0;
+    if (color.r > 1.)
+	color.r = 1.;
+    if (color.g > 1.)
+	color.g = 1.;
+    if (color.b > 1.)
+	color.b = 1.;
+
+    (void) Ginteger(&result, hsv2rgb(&color));
+    push(&result);
+}

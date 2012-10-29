@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.754 2012/10/18 23:11:42 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.755 2012/10/27 02:23:38 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -829,6 +829,7 @@ C
 ^<tr>    <td>columnhead(x)</td>    <td>int</td>    <td> string containing first entry of column <i>x</i> in datafile.</td></tr>
 ^<tr>    <td>defined(X)</td>    <td>variable name</td>    <td> [DEPRECATED] returns 1 if X is defined, 0 otherwise.</td></tr>
 ^<tr>    <td>exists("X")</td>    <td>string</td>    <td> returns 1 if a variable named X is defined, 0 otherwise.</td></tr>
+^<tr>    <td>hsv2rgb(h,s,v)</td>    <td>h,s,v in [0:1]</td>    <td> converts HSV color to 24bit RGB color.</td></tr>
 ^<tr>    <td>stringcolumn(x)</td>    <td>int</td>    <td> content column <i>x</i> as a string.</td></tr>
 ^<tr>    <td>timecolumn(x)</td>    <td>int</td>    <td> timecolumn <i>x</i> during datafile manipulation.</td></tr>
 ^<tr>    <td>tm_hour(x)</td>    <td>int</td>    <td>the hour</td></tr>
@@ -1344,6 +1345,12 @@ C marker below is used to signal this to doc2html:
  The argument to exists() is a string constant or a string variable;
  if the string contains the name of a defined variable, the function returns 1.
  Otherwise the function returns 0.
+4 hsv2rgb
+?expressions functions hsv2rgb 
+?hsv2rgb
+#hsv2rgb(h,s,v) & h,s,v $\in$ [0:1] & 24bit RGB color value. \\
+%hsv2rgb(h,s,v)@h,s,v $\in$ [0:1]@ 24bit RGB color value.
+ The HSV (Hue/Saturation/Value) triplet is converted to an equivalent RGB value.
 4 stringcolumn
 ?expressions functions stringcolumn
 ?stringcolumn

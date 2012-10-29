@@ -51,6 +51,7 @@ The mousing code is new. You may see some browser-dependent glitches.
     <li><a href="approximate.html">approximation</a></li>
     <li><a href="spline.html">B-splines</a></li>
     <li><a href="airfoil.html">Bezier splines</a></li>
+    <li><font color=gray>>complex functions</font></li>
     <li><a href="prob2.html">probability</a></li>
     <li><a href="prob.html">probability (more)</a></li>
     <li><a href="random.html">random numbers</a></li>
@@ -97,7 +98,7 @@ The mousing code is new. You may see some browser-dependent glitches.
     <h4>Colors</h4>
     <ul>
     <li><a href="varcolor.html">data-dependent coloring</a></li>
-    <li><a href="rgb_variable.html">RGB coloring</a></li>
+    <li><a href="rgb_variable.html">RGB and HSV coloring</a></li>
     <li><a href="rgba_lines.html">RGB + Alpha</a></li>
     <li><a href="pm3dcolors.html">pm3d colors</a></li>
     </ul>

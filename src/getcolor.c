@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: getcolor.c,v 1.31 2011/09/04 11:06:19 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: getcolor.c,v 1.32 2011/10/08 00:07:41 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - getcolor.c */
@@ -858,5 +858,17 @@ HSV_2_RGB(rgb_color *col)
 }
 #undef CONSTRAIN
 
+/*
+ * Support for user-callable rgb = hsv2rgb(h,s,v)
+ */
+unsigned int 
+hsv2rgb ( rgb_color *color )
+{
+    HSV_2_RGB(color);
+
+    return    ((unsigned int)(255.*color->r) << 16) 
+	    + ((unsigned int)(255.*color->g) << 8)
+	    + ((unsigned int)(255.*color->b));
+}
 
 /* eof getcolor.c */
