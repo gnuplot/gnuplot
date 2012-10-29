@@ -299,6 +299,8 @@ Drivers should use do_arrow unless it causes problems.
 _set_font() is called to set the font of labels, etc.
   - fonts are selected as strings "name,size".
   - _set_font("") restores the terminal's default font.
+  - FIXME >> Return value is never used! << 
+  - FIXME >> Should tolerate being passed a NULL font <<
 
 _pointsize() is used to set the pointsize for subsequent points
 

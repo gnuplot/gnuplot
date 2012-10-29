@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.243 2012/10/17 04:29:42 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.244 2012/10/30 04:11:13 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -228,6 +228,7 @@ static int null_text_angle __PROTO((int ang));
 static int null_justify_text __PROTO((enum JUSTIFY just));
 static int null_scale __PROTO((double x, double y));
 static void null_layer __PROTO((t_termlayer layer));
+static int null_set_font __PROTO((const char *font));
 static void options_null __PROTO((void));
 static void UNKNOWN_null __PROTO((void));
 static void MOVE_null __PROTO((unsigned int, unsigned int));
@@ -793,10 +794,10 @@ term_start_multiplot()
 		y++;
 
 	/* Oct 2012 - v_char depends on the font used */
-	if (mp_layout.title.font && *mp_layout.title.font && term->set_font)
+	if (mp_layout.title.font && *mp_layout.title.font)
 	    term->set_font(mp_layout.title.font);
 	mp_layout.title_height = (double)(y * term->v_char) / (double)term->ymax;
-	if (mp_layout.title.font && *mp_layout.title.font && term->set_font)
+	if (mp_layout.title.font && *mp_layout.title.font)
 	    term->set_font("");
 
 	if (mp_layout.title_height > 0.9)
@@ -988,7 +989,7 @@ write_multiline(
 	return;
 
     /* EAM 9-Feb-2003 - Set font before calculating sizes */
-    if (font && *font && t->set_font)
+    if (font && *font)
 	(*t->set_font) (font);
 
     if (vert != JUST_TOP) {
@@ -1040,7 +1041,7 @@ write_multiline(
 	text = p + 1;
     }                           /* unconditional branch back to the for(;;) - just a goto ! */
 
-    if (font && *font && t->set_font)
+    if (font && *font)
 	(*t->set_font) ("");
 
 }
@@ -1521,6 +1522,12 @@ null_linewidth(double s)
     (void) s;                   /* avoid -Wunused warning */
 }
 
+static int
+null_set_font(const char *font)
+{
+    (void) font;		/* avoid -Wunused warning */
+    return FALSE;		/* Never used!! */
+}
 
 /* setup the magic macros to compile in the right parts of the
  * terminal drivers included by term.h
@@ -1709,6 +1716,8 @@ change_term(const char *origname, int length)
 	term->layer = null_layer;
     if (term->tscale <= 0)
 	term->tscale = 1.0;
+    if (term->set_font == 0)
+	term->set_font = null_set_font;
 
     if (interactive)
 	fprintf(stderr, "Terminal type set to '%s'\n", term->name);
@@ -2780,8 +2789,7 @@ ignore_enhanced(TBOOLEAN flag)
     /* Force a return to the default font */
     if (flag && !ignore_enhanced_text) {
 	ignore_enhanced_text = TRUE;
-	if (term->set_font)
-	    term->set_font("");
+	term->set_font("");
     }
     ignore_enhanced_text = flag;
 }

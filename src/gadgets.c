@@ -525,11 +525,11 @@ write_label(unsigned int x, unsigned int y, struct text_label *this_label)
 	if (this_label->hypertext) {
 	    /* Treat text as hypertext */
 	    char *font = this_label->font;
-	    if (font && term->set_font)
+	    if (font)
 		term->set_font(font);
 	    if (term->hypertext)
 	        term->hypertext(TERM_HYPERTEXT_TOOLTIP, this_label->text);
-	    if (font && term->set_font)
+	    if (font)
 		term->set_font("");
 	} else {
 	    /* A normal label (always print text) */

@@ -1,7 +1,20 @@
-2012-10-28  Ethan A Merritt  <merritt@u.washington.edu>
+2012-10-29  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graph3d.c: Save axis scaling for 3D 'set view map' plots so
 	that outboard drivers can continue mousing in -persist mode.
+
+	* term/canvas.trm term/svg.trm: Sort out the up/down polarity of
+	mousing limits in 3D 'set view map' plots. Bug #3581514
+
+	* src/term.c src/term_api.h term/xlib.trm: Remove vestigial traces
+	of ipc_back_fd outside of its scope (term.c).
+
+	* term/debug.trm: Add entry points for filled_polygon, layer,
+	set_color, path, image.
+
+	* src/term.c src/gadgets.c src/set.c term/README:  Add a default
+	routine null_set_font() so that code does not have to test every
+	time whether the current terminal supports term->set_font() or not.
 
 2012-10-26  Ethan A Merritt  <merritt@u.washington.edu>
 
