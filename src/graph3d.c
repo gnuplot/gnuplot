@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.253.2.8 2012/10/13 18:30:47 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.253.2.9 2012/10/28 22:22:15 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -486,10 +486,6 @@ boundary3d(struct surface_points *plots, int count)
 	clip_area = NULL;
     else
 	clip_area = &canvas;
-    
-    /* Needed for mousing by outboard terminal drivers */
-    AXIS_SETSCALE(FIRST_X_AXIS, plot_bounds.xleft, plot_bounds.xright);
-    AXIS_SETSCALE(FIRST_Y_AXIS, plot_bounds.ybot, plot_bounds.ytop);
 }
 
 static TBOOLEAN
@@ -687,6 +683,19 @@ do_3dplot(
 	}
 	if (aspect_ratio_3D >= 3)
 	    zscale3d = xscale3d;
+    }
+
+    /* Needed for mousing by outboard terminal drivers */
+    if (splot_map) {
+	AXIS *X = &axis_array[FIRST_X_AXIS];
+	AXIS *Y = &axis_array[FIRST_Y_AXIS];
+	int xl, xr, yb, yt;
+	map3d_xy(X->min, Y->min, 0.0, &xl, &yb);
+	map3d_xy(X->max, Y->max, 0.0, &xr, &yt);
+	AXIS_SETSCALE(FIRST_X_AXIS, xl, xr);
+	AXIS_SETSCALE(FIRST_Y_AXIS, yb, yt);
+	X->term_lower = xl;
+	Y->term_lower = yb;
     }
 
     /* Initialize palette */
