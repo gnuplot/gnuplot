@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.253.2.9 2012/10/28 22:22:15 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.253.2.10 2012/10/29 00:15:02 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -694,8 +694,8 @@ do_3dplot(
 	map3d_xy(X->max, Y->max, 0.0, &xr, &yt);
 	AXIS_SETSCALE(FIRST_X_AXIS, xl, xr);
 	AXIS_SETSCALE(FIRST_Y_AXIS, yb, yt);
-	X->term_lower = xl;
-	Y->term_lower = yb;
+	axis_set_graphical_range(FIRST_X_AXIS, xl, xr);
+	axis_set_graphical_range(FIRST_Y_AXIS, yb, yt);
     }
 
     /* Initialize palette */
