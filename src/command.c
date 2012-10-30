@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.243 2012/08/05 19:24:53 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.244 2012/10/20 02:43:17 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -1446,7 +1446,7 @@ pause_command()
 	    if (paused_for_mouse && !GraphHasWindow(graphwin)) {
 		if (interactive) { /* cannot wait for Enter in a non-interactive session without the graph window */
 		    if (buf) fprintf(stderr,"%s\n", buf);
-		    fgets(buf, sizeof(buf), stdin); /* graphical window not yet initialized, wait for any key here */
+		    fgets(buf, strlen(buf), stdin); /* graphical window not yet initialized, wait for any key here */
 		}
 	    } else { /* pausing via graphical windows */
 		int tmp = paused_for_mouse;
@@ -1493,7 +1493,7 @@ pause_command()
 	    term->waitforinput();
 	} else
 #endif /* USE_MOUSE */
-	(void) fgets(buf, sizeof(buf), stdin);
+	(void) fgets(buf, strlen(buf), stdin);
 
 #endif /* !(_Windows || OS2 || _Macintosh) */
     }
