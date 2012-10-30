@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: xlib.trm,v 1.23 2009/03/26 00:49:29 sfeam Exp $
+ * $Id: xlib.trm,v 1.25 2012/10/22 22:45:44 sfeam Exp $
  */
 
 /* GNUPLOT - xlib.trm */
@@ -30,6 +30,9 @@ TERM_PUBLIC void Xlib_reset __PROTO((void));
 #ifdef TERM_BODY
 
 static FILE *X11_save_ipc = NULL;
+#ifndef PIPE_IPC
+    int ipc_back_fd = IPC_BACK_UNUSABLE;
+#endif
 
 TERM_PUBLIC void
 Xlib_init()
@@ -39,21 +42,17 @@ Xlib_init()
     X11_save_ipc = X11_ipc;
     X11_ipc = gpoutfile;
 
-#ifdef PIPE_IPC
     /* There is, of course, no mouse feedback */
     ipc_back_fd = IPC_BACK_UNUSABLE;
-#endif
     term_initialised = TRUE;
 }
 
 TERM_PUBLIC void
 Xlib_text()
 {
-    PRINT0("E\n");
-    FFLUSH();
-#ifdef PIPE_IPC
+    ipc_back_fd = 1;	/* Force scaling info to be appended */
+    X11_text();
     ipc_back_fd = IPC_BACK_UNUSABLE;
-#endif
 }
 
 TERM_PUBLIC void

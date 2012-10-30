@@ -1,5 +1,5 @@
 /*
- * $Id: term_api.h,v 1.104 2012/09/17 03:03:33 sfeam Exp $
+ * $Id: term_api.h,v 1.105 2012/10/27 02:23:39 sfeam Exp $
  */
 
 /* GNUPLOT - term_api.h */
@@ -307,21 +307,6 @@ enum set_encoding_id {
  * semaphores => the code in gpexecute.c is used, and nothing more from here.
  */
 
-#ifdef PIPE_IPC
-
-enum { IPC_BACK_UNUSABLE = -2, IPC_BACK_CLOSED = -1 };
-
-/*
- * Currently only used for PIPE_IPC, but in principle
- * every term could use this file descriptor to write back
- * commands to gnuplot.  Note, that terminals using this fd
- * should set it to a negative value when closing. (joze)
- */
-/* HBB 20020225: currently not used anywhere outside term.c --> make
- * it static */
-/* extern int ipc_back_fd; */
-
-# endif /* PIPE_IPC */
 
 /* options handling */
 enum { UNSET = -1, no = 0, yes = 1 };

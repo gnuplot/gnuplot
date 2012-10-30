@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.242 2012/10/14 18:57:24 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.243 2012/10/17 04:29:42 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -174,11 +174,9 @@ const struct gen_table set_encoding_tbl[] =
 const char *arrow_head_names[4] = 
     {"nohead", "head", "backhead", "heads"};
 
-/* HBB 20020225: moved here, from ipc.h, where it never should have
- * been. */
+enum { IPC_BACK_UNUSABLE = -2, IPC_BACK_CLOSED = -1 };
 #ifdef PIPE_IPC
-/* HBB 20020225: currently not used anywhere outside term.c --> make
- * it static */
+/* HBB 20020225: currently not used anywhere outside term.c */
 static SELECT_TYPE_ARG1 ipc_back_fd = IPC_BACK_CLOSED;
 #endif
 
