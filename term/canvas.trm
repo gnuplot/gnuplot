@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: canvas.trm,v 1.65 2012/10/15 23:13:11 sfeam Exp $
+ * $Id: canvas.trm,v 1.66 2012/10/16 18:22:23 sfeam Exp $
  *
  */
 
@@ -607,8 +607,14 @@ CANVAS_text()
 	    MOUSE_PARAM("GPVAL_X_MIN", "gnuplot.plot_axis_xmin");
 	    MOUSE_PARAM("GPVAL_X_MAX", "gnuplot.plot_axis_xmax");
 	}
-	MOUSE_PARAM("GPVAL_Y_MIN", "gnuplot.plot_axis_ymin");
-	MOUSE_PARAM("GPVAL_Y_MAX", "gnuplot.plot_axis_ymax");
+	/* FIXME: Should this inversion be done at a higher level? */
+	if (is_3d_plot && splot_map) { 
+	    MOUSE_PARAM("GPVAL_Y_MAX", "gnuplot.plot_axis_ymin");
+	    MOUSE_PARAM("GPVAL_Y_MIN", "gnuplot.plot_axis_ymax");
+	} else {
+	    MOUSE_PARAM("GPVAL_Y_MIN", "gnuplot.plot_axis_ymin");
+	    MOUSE_PARAM("GPVAL_Y_MAX", "gnuplot.plot_axis_ymax");
+	}
 
 	if (polar)
 	    fprintf(gpoutfile, "gnuplot.plot_axis_rmin = %g;\n",

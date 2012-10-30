@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: svg.trm,v 1.141 2012/08/03 05:17:36 sfeam Exp $
+ * $Id: svg.trm,v 1.142 2012/10/13 20:37:01 sfeam Exp $
  */
 
 /*------------------------------------------------------------------------------------------------------------------------------------
@@ -1086,8 +1086,14 @@ SVG_text ()
 	    MOUSE_PARAM("GPVAL_X_MIN", "plot_axis_xmin");
 	    MOUSE_PARAM("GPVAL_X_MAX", "plot_axis_xmax");
 	}
-	MOUSE_PARAM("GPVAL_Y_MIN", "plot_axis_ymin");
-	MOUSE_PARAM("GPVAL_Y_MAX", "plot_axis_ymax");
+	/* FIXME: Should this inversion be done at a higher level? */
+	if (is_3d_plot && splot_map) {
+	    MOUSE_PARAM("GPVAL_Y_MAX", "plot_axis_ymin");
+	    MOUSE_PARAM("GPVAL_Y_MIN", "plot_axis_ymax");
+	} else {
+	    MOUSE_PARAM("GPVAL_Y_MIN", "plot_axis_ymin");
+	    MOUSE_PARAM("GPVAL_Y_MAX", "plot_axis_ymax");
+	}
 
 	fprintf(gpoutfile, "gnuplot_svg.polar_mode = %s;\n",
 		polar ? "true" : "false");
