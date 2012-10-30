@@ -1,3 +1,9 @@
+2012-10-30  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/command.c: Fix a coding error, (sizeof((char *)buf) rather than
+	(strlen((char *)buf)), that can cause a buffer overrun on 64-bit
+	machines.  Found by valgrind.
+
 2012-10-28  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graph3d.c: Save axis scaling for 3D 'set view map' plots so
