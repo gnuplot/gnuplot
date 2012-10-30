@@ -4,6 +4,9 @@
 	(strlen((char *)buf)), that can cause a buffer overrun on 64-bit
 	machines.  Found by valgrind.
 
+	* src/gplt_x11.c: The new read format for text fragments passed from
+	x11.trm was missing a space.  Bugfix.
+
 2012-10-29  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graph3d.c: Save axis scaling for 3D 'set view map' plots so

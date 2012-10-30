@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.220 2012/10/15 04:41:34 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.221 2012/10/19 15:23:12 sfeam Exp $"); }
 #endif
 
 #define MOUSE_ALL_WINDOWS 1
@@ -2181,7 +2181,7 @@ exec_cmd(plot_struct *plot, char *command)
 	case 'c':	/* Enhanced mode print with update to center */
 	case 'u':	/* Enhanced mode print with update */
 	case 's':	/* Enhanced mode update with no print */
-          sscanf(buffer+2, "%d %d%n", &x_offset, &y_offset, &char_byte_offset);
+          sscanf(buffer+2, "%d %d %n", &x_offset, &y_offset, &char_byte_offset);
 		    /* EAM FIXME - This code has only been tested for x_offset == 0 */
 		    if (plot->angle != 0) {
 			int xtmp=0, ytmp=0;
@@ -2207,7 +2207,7 @@ exec_cmd(plot_struct *plot, char *command)
 		    plot->yLast = plot->ySave;
 		    return;
 	default:
-		    sscanf(buffer, "T%d %d%n", &x, &y, &char_byte_offset);
+		    sscanf(buffer, "T%d %d %n", &x, &y, &char_byte_offset);
 		    v_offset = vchar/3;		/* Why is this??? */
 
 		    /* extra 1 for the space before the string start */
