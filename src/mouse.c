@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: mouse.c,v 1.141 2012/10/19 15:23:13 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: mouse.c,v 1.142 2012/10/27 02:23:38 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - mouse.c */
@@ -1843,9 +1843,11 @@ event_buttonrelease(struct gp_event_t *ge)
 
     /* In 2D mouse button 1 is available for "bind" commands */
     if (!is_3d_plot && (b == 1)) {
+	int save = ge->par1;
 	ge->par1 = GP_Button1;
 	ge->par2 = 0;
 	event_keypress(ge, TRUE);
+	ge->par1 = save;	/* needed for "pause mouse" */
     }
 
 #ifdef _Windows

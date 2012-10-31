@@ -4,6 +4,9 @@
 	Error exit from inside try_to_get_string() left the internal flag for
 	string parsing in an incorrect state.  Provide a reset routine.
 
+	* src/mouse.c (event_buttonrelease): Save/restore event parameters
+	across the check for a user command bound to the mouse button.
+
 2012-10-30  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/command.c: Fix a coding error, (sizeof((char *)buf) rather than
