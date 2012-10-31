@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: parse.c,v 1.73 2012/08/24 21:08:14 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: parse.c,v 1.74 2012/10/31 20:16:11 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - parse.c */
@@ -129,6 +129,7 @@ void
 parse_reset_after_error()
 {
     string_result_only = FALSE;
+    parse_recursion_level = 0;
 }
 
 /* JW 20051126:
