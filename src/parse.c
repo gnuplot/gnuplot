@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: parse.c,v 1.66.2.1 2012/05/05 04:24:18 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: parse.c,v 1.66.2.2 2012/07/18 23:30:25 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - parse.c */
@@ -124,6 +124,12 @@ real_expression()
 }
 
 
+void
+parse_reset_after_error()
+{
+    string_result_only = FALSE;
+}
+
 /* JW 20051126:
  * Wrapper around const_express() called by try_to_get_string().
  * Disallows top level + and - operators.
@@ -176,12 +182,13 @@ string_or_express(struct at_type **atptr)
     free(str);
     str = NULL;
 
+    if (atptr)
+	*atptr = NULL;
+
     if (END_OF_COMMAND)
 	int_error(c_token, "expression expected");
 
     if (isstring(c_token)) {
-	if (atptr)
-	    *atptr = NULL;
 	str = try_to_get_string();
 	return str;
     }
@@ -247,8 +254,8 @@ perm_at()
     size_t len;
 
     (void) temp_at();
-    len = sizeof(struct at_type) +
-     (at->a_count - MAX_AT_LEN) * sizeof(struct at_entry);
+    len = sizeof(struct at_type)
+	+ (at->a_count - MAX_AT_LEN) * sizeof(struct at_entry);
     at_ptr = (struct at_type *) gp_realloc(at, len, "perm_at");
     at = NULL;			/* invalidate at pointer */
     return (at_ptr);
@@ -801,9 +808,9 @@ parse_additive_expression()
 	    (void) add_action(CONCATENATE);
 	/* If only string results are wanted
 	 * do not accept '-' or '+' at the top level. */
-	} else if (string_result_only && parse_recursion_level == 1)
+	} else if (string_result_only && parse_recursion_level == 1) {
 	    break;
-	else if (equals(c_token, "+")) {
+	} else if (equals(c_token, "+")) {
 	    c_token++;
 	    accept_multiplicative_expression();
 	    (void) add_action(PLUS);

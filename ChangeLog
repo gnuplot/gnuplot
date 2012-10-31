@@ -1,3 +1,12 @@
+2012-10-31  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/parse.c (parse_reset_after_error) src/parse.h src/util.c:
+	Error exit from inside try_to_get_string() left the internal flag for
+	string parsing in an incorrect state.  Provide a reset routine.
+	Example of original bug:	stats file"
+					print 1+2
+					       ^ ';' expected
+
 2012-10-30  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/command.c: Fix a coding error, (sizeof((char *)buf) rather than
