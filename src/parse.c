@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: parse.c,v 1.72 2012/08/05 19:24:53 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: parse.c,v 1.73 2012/08/24 21:08:14 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - parse.c */
@@ -124,6 +124,12 @@ real_expression()
    return result;
 }
 
+
+void
+parse_reset_after_error()
+{
+    string_result_only = FALSE;
+}
 
 /* JW 20051126:
  * Wrapper around const_express() called by try_to_get_string().
@@ -795,9 +801,9 @@ parse_additive_expression()
 	    (void) add_action(CONCATENATE);
 	/* If only string results are wanted
 	 * do not accept '-' or '+' at the top level. */
-	} else if (string_result_only && parse_recursion_level == 1)
+	} else if (string_result_only && parse_recursion_level == 1) {
 	    break;
-	else if (equals(c_token, "+")) {
+	} else if (equals(c_token, "+")) {
 	    c_token++;
 	    accept_multiplicative_expression();
 	    (void) add_action(PLUS);

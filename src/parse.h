@@ -1,5 +1,5 @@
 /*
- * $Id: parse.h,v 1.25 2011/07/22 14:37:57 juhaszp Exp $
+ * $Id: parse.h,v 1.26 2012/08/05 19:24:53 sfeam Exp $
  */
 
 /* GNUPLOT - parse.h */
@@ -65,6 +65,7 @@ extern TBOOLEAN parse_1st_row_as_headers;
 
 int int_expression __PROTO(());
 double real_expression __PROTO(());
+void parse_reset_after_error __PROTO(());
 struct value * const_string_express __PROTO((struct value *valptr));
 struct value * const_express __PROTO((struct value *valptr));
 char* string_or_express __PROTO((struct at_type **atptr));
