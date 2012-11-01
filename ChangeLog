@@ -1,11 +1,15 @@
+2012-11-01  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/gplt_x11.c: Yet another bug fix for the new text fragment format.
+
 2012-10-31  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/parse.c (parse_reset_after_error) src/parse.h src/util.c:
-	Error exit from inside try_to_get_string() left the internal flag for
+	Error exit from inside try_to_get_string() left the internal flags for
 	string parsing in an incorrect state.  Provide a reset routine.
 
 	* src/mouse.c (event_buttonrelease): Save/restore event parameters
-	across the check for a user command bound to the mouse button.
+	across the check for a user command bound to a mouse button.
 
 2012-10-30  Ethan A Merritt  <merritt@u.washington.edu>
 

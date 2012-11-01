@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.221 2012/10/19 15:23:12 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.222 2012/10/31 04:56:35 sfeam Exp $"); }
 #endif
 
 #define MOUSE_ALL_WINDOWS 1
@@ -2208,10 +2208,8 @@ exec_cmd(plot_struct *plot, char *command)
 		    return;
 	default:
 		    sscanf(buffer, "T%d %d %n", &x, &y, &char_byte_offset);
-		    v_offset = vchar/3;		/* Why is this??? */
-
-		    /* extra 1 for the space before the string start */
-		    str = buffer + char_byte_offset + 1;
+		    str = buffer + char_byte_offset;
+		    v_offset = vchar/3;		/* Why? */
 		    break;
 	}
 
