@@ -577,11 +577,18 @@ void QtGnuplotScene::mouseMoveEvent(QGraphicsSceneMouseEvent* event)
 	{
 		m_lineTo->hide();
 		QString status;
-		for (int i = 0; i < 4; i++)
-			if (m_axisValid[i])
-				status += (i % 2 ? QString("y") : QString("x")) + (i / 2 ? QString("2"): QString("")) + " = "
-				       + QString::number(sceneToGraph(0, i % 2 ? event->scenePos().y() : event->scenePos().x()));
-		//status << sceneToGraph(0, event->scenePos().x()) << sceneToGraph(1, event->scenePos().y());
+		if (m_axisValid[0])
+			status += QString("x = ")
+			+ QString::number(sceneToGraph(0,event->scenePos().x()));
+		if (m_axisValid[1])
+			status += QString(" y = ")
+			+ QString::number(sceneToGraph(1,event->scenePos().y()));
+		if (m_axisValid[2])
+			status += QString(" x2 = ")
+			+ QString::number(sceneToGraph(2,event->scenePos().x()));
+		if (m_axisValid[3])
+			status += QString(" y2 = ")
+			+ QString::number(sceneToGraph(3,event->scenePos().y()));
 		m_widget->setStatusText(status);
 		QGraphicsScene::mouseMoveEvent(event);
 		return;

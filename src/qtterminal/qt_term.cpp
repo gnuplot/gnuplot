@@ -773,7 +773,10 @@ int qt_waitforinput(void)
 void qt_atexit()
 {
 	if (qt_optionPersist || persist_cl)
+	{
+		qt_out << GEDesactivate;
 		qt_out << GEPersist;
+	}
 	else
 		qt_out << GEExit;
 	qt_flushOutBuffer();
