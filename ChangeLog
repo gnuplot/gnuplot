@@ -1,3 +1,9 @@
+2012-11-01  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/qtterminal/qt_term.cpp src/qtterminal/QtGnuplotScene.cpp
+	src/qtterminal/QtGnuplotWidget.cpp:  Fix mouse tracking and resize
+	events for persistent qt windows.
+
 2012-10-31  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/parse.c (parse_reset_after_error) src/parse.h src/util.c:
