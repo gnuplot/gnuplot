@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.379 2012/10/04 20:19:08 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.380 2012/10/30 04:20:21 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -3452,6 +3452,8 @@ set_pm3d()
 		    pm3d.which_corner_color = PM3D_WHICHCORNER_MIN;
 		else if (equals(c_token, "max"))
 		    pm3d.which_corner_color = PM3D_WHICHCORNER_MAX;
+		else if (equals(c_token, "rms"))
+			pm3d.which_corner_color = PM3D_WHICHCORNER_RMS;		
 		else if (equals(c_token, "c1"))
 		    pm3d.which_corner_color = PM3D_WHICHCORNER_C1;
 		else if (equals(c_token, "c2"))
@@ -4123,8 +4125,7 @@ set_style()
 	set_boxplot();
 	break;
     default:
-	int_error(c_token,
-		  "expecting 'data', 'function', 'line', 'fill', 'rectangle', 'circle', 'ellipse' or 'arrow'" );
+	int_error(c_token, "unrecognized option - see 'help set style'");
     }
 }
 

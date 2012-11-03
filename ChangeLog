@@ -1,3 +1,8 @@
+2012-11-03  Clement Law  <themanifold@gmail.com>
+
+	* src/pm3d.c src/pm3d.h src/save.c src/set.c src/show.c:
+	Add rms option for 'set pm3d corners2color'.
+
 2012-11-01  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/gplt_x11.c: Yet another bug fix for the new text fragment format.

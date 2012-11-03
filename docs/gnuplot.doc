@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.755 2012/10/27 02:23:38 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.756 2012/10/30 04:43:42 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -9848,7 +9848,7 @@ Ffigure_missing
                   { ftriangles | noftriangles }
                   { clip1in | clip4in }
                   { corners2color
-                    { mean|geomean|harmean|median|min|max|c1|c2|c3|c4 }
+                    { mean|geomean|harmean|rms|median|min|max|c1|c2|c3|c4 }
                   }
                   { hidden3d {<linestyle>} | nohidden3d }
                   { implicit | explicit }
@@ -9997,12 +9997,6 @@ Ffigure_missing
 
 4 color_assignment
 ?pm3d color_assignment
-=mean
-=geomean
-=harmean
-=median
-=min
-=max
  `3 columns of data (x,y,z)`:
 
  The coloring setup as well as the color box drawing are determined by
@@ -10014,20 +10008,6 @@ Ffigure_missing
  There is a single gray/color value associated to each drawn pm3d quadrangle
  (it contains a solid color, not a gradient).  The value is calculated from
  z-coordinates the four corners according to `corners2color <option>`.
- The options 'mean' (default), 'geomean', 'harmean, and 'median' produce
- various kinds of surface color smoothing, while options 'min' and 'max' choose
- minimal or maximal value, respectively. This may not be desired for pixel
- images or for maps with sharp and intense peaks, in which case the options
- 'c1', 'c2', 'c3' or 'c4' can be used instead to assign the quadrangle color
- based on the z-coordinate of only one corner.  Some experimentation may be
- needed to determine which corner corresponds to 'c1', as the orientation
- depends on the drawing direction.  Because the pm3d algorithm does not extend
- the colored surface outside the range of the input data points, the 'c<j>'
- coloring options will result in pixels along two edges of the grid not
- contributing to the color of any quadrangle.  For example, applying the pm3d
- algorithm to the 4x4 grid of data points in script `demo/pm3d.dem` (please have
- a look) produces only (4-1)x(4-1)=9 colored rectangles.
-
  `4 columns of data (x,y,z,color)`:
 
  If a fourth column of data is provided, it is normally interpreted as a 
@@ -10048,6 +10028,31 @@ Ffigure_missing
  independently by `set zrange`, `set cbrange`, as well as `set log` for z or
  cb.  Maps can be adjusted by the cb-axis only; see also `set view map` and
  `set colorbox`.
+4 corners2color
+?pm3d corners2color
+?corners2color
+=mean
+=geomean
+=harmean
+=median
+=min
+=max
+=rms
+ The color of each quadrangle in a pm3d surface is assigned based on the color
+ values of its four bounding vertices.
+ The options 'mean' (default), 'geomean', 'harmean, 'rms', and 'median' produce
+ various kinds of surface color smoothing, while options 'min' and 'max' choose
+ minimal or maximal value, respectively. This may not be desired for pixel
+ images or for maps with sharp and intense peaks, in which case the options
+ 'c1', 'c2', 'c3' or 'c4' can be used instead to assign the quadrangle color
+ based on the z-coordinate of only one corner.  Some experimentation may be
+ needed to determine which corner corresponds to 'c1', as the orientation
+ depends on the drawing direction.  Because the pm3d algorithm does not extend
+ the colored surface outside the range of the input data points, the 'c<j>'
+ coloring options will result in pixels along two edges of the grid not
+ contributing to the color of any quadrangle.  For example, applying the pm3d
+ algorithm to the 4x4 grid of data points in script `demo/pm3d.dem` (please have
+ a look) produces only (4-1)x(4-1)=9 colored rectangles.
 4 hidden3d
 ?set pm3d hidden3d
 ?pm3d hidden3d

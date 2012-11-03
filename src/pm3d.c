@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.92 2012/10/09 03:51:19 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.93 2012/10/20 02:47:14 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - pm3d.c */
@@ -70,6 +70,7 @@ static TBOOLEAN plot_has_palette;
 static double geomean4 __PROTO((double, double, double, double));
 static double harmean4 __PROTO((double, double, double, double));
 static double median4 __PROTO((double, double, double, double));
+static double rms4 __PROTO((double, double, double, double));
 static void pm3d_plot __PROTO((struct surface_points *, int));
 static void pm3d_option_at_error __PROTO((void));
 static void pm3d_rearrange_part __PROTO((struct iso_curve *, const int, struct iso_curve ***, int *));
@@ -148,6 +149,12 @@ maximum4 (double x1, double x2, double x3, double x4)
     return GPMAX(x1, x3);
 }
 
+/* The root mean square of the 4 numbers */
+static double
+rms4 (double x1, double x2, double x3, double x4)
+{
+	return 0.5*sqrt(x1*x1 + x2*x2 + x3*x3 + x4*x4);
+}
 
 /*
 * Now the routines which are really just those for pm3d.c
@@ -696,34 +703,44 @@ pm3d_plot(struct surface_points *this_plot, int at_which_z)
 		    cb3 = z2cb(pointsB[ii].z);
 		    cb4 = z2cb(pointsB[ii1].z);
 		}
-		switch (pm3d.which_corner_color) {
-		    default:
-		    case PM3D_WHICHCORNER_MEAN:
-			if (color_from_rgbvar) {
-			    unsigned int r, g, b, a;
-			    unsigned int u1 = cb1;
-			    unsigned int u2 = cb2;
-			    unsigned int u3 = cb3;
-			    unsigned int u4 = cb4;
+		/* Fancy averages of RGB color make no sense */
+		if (color_from_rgbvar) {
+		    unsigned int r, g, b, a;
+		    unsigned int u1 = cb1;
+		    unsigned int u2 = cb2;
+		    unsigned int u3 = cb3;
+		    unsigned int u4 = cb4;
+		    switch (pm3d.which_corner_color) {
+			default:
 			    r = (u1&0xff0000) + (u2&0xff0000) + (u3&0xff0000) + (u4&0xff0000);
 			    g = (u1&0xff00) + (u2&0xff00) + (u3&0xff00) + (u4&0xff00);
 			    b = (u1&0xff) + (u2&0xff) + (u3&0xff) + (u4&0xff);
 			    avgC = ((r>>2)&0xff0000) + ((g>>2)&0xff00) + ((b>>2)&0xff);
 			    a = ((u1>>24)&0xff) + ((u2>>24)&0xff) + ((u3>>24)&0xff) + ((u4>>24)&0xff);
 			    avgC += (a<<22)&0xff000000;
-			} else {
-    			    avgC = (cb1 + cb2 + cb3 + cb4) * 0.25;
-			}
-			break;
-		    case PM3D_WHICHCORNER_GEOMEAN: avgC = geomean4(cb1, cb2, cb3, cb4); break;
-		    case PM3D_WHICHCORNER_HARMEAN: avgC = harmean4(cb1, cb2, cb3, cb4); break;
-		    case PM3D_WHICHCORNER_MEDIAN: avgC = median4(cb1, cb2, cb3, cb4); break;
-		    case PM3D_WHICHCORNER_MIN: avgC = minimum4(cb1, cb2, cb3, cb4); break;
-		    case PM3D_WHICHCORNER_MAX: avgC = maximum4(cb1, cb2, cb3, cb4); break;
-		    case PM3D_WHICHCORNER_C1: avgC = cb1; break;
-		    case PM3D_WHICHCORNER_C2: avgC = cb2; break;
-		    case PM3D_WHICHCORNER_C3: avgC = cb3; break;
-		    case PM3D_WHICHCORNER_C4: avgC = cb4; break;
+			    break;
+			case PM3D_WHICHCORNER_C1: avgC = cb1; break;
+			case PM3D_WHICHCORNER_C2: avgC = cb2; break;
+			case PM3D_WHICHCORNER_C3: avgC = cb3; break;
+			case PM3D_WHICHCORNER_C4: avgC = cb4; break;
+		    }
+
+		/* But many different averages are possible for gray values */
+		} else  {
+		    switch (pm3d.which_corner_color) {
+			default:
+			case PM3D_WHICHCORNER_MEAN: avgC = (cb1 + cb2 + cb3 + cb4) * 0.25; break;
+			case PM3D_WHICHCORNER_GEOMEAN: avgC = geomean4(cb1, cb2, cb3, cb4); break;
+			case PM3D_WHICHCORNER_HARMEAN: avgC = harmean4(cb1, cb2, cb3, cb4); break;
+			case PM3D_WHICHCORNER_MEDIAN: avgC = median4(cb1, cb2, cb3, cb4); break;
+			case PM3D_WHICHCORNER_MIN: avgC = minimum4(cb1, cb2, cb3, cb4); break;
+			case PM3D_WHICHCORNER_MAX: avgC = maximum4(cb1, cb2, cb3, cb4); break;
+			case PM3D_WHICHCORNER_RMS: avgC = rms4(cb1, cb2, cb3, cb4); break;
+			case PM3D_WHICHCORNER_C1: avgC = cb1; break;
+			case PM3D_WHICHCORNER_C2: avgC = cb2; break;
+			case PM3D_WHICHCORNER_C3: avgC = cb3; break;
+			case PM3D_WHICHCORNER_C4: avgC = cb4; break;
+		    }
 		}
 
 		/* The value is out of range, but we didn't figure it out until now */
@@ -899,6 +916,7 @@ pm3d_plot(struct surface_points *this_plot, int at_which_z)
 			    case PM3D_WHICHCORNER_MEDIAN: avgC = median4(cb1, cb2, cb3, cb4); break;
 			    case PM3D_WHICHCORNER_MIN: avgC = minimum4(cb1, cb2, cb3, cb4); break;
 			    case PM3D_WHICHCORNER_MAX: avgC = maximum4(cb1, cb2, cb3, cb4); break;
+			    case PM3D_WHICHCORNER_RMS: avgC = rms4(cb1, cb2, cb3, cb4); break;
 			    case PM3D_WHICHCORNER_C1: avgC = cb1; break;
 			    case PM3D_WHICHCORNER_C2: avgC = cb2; break;
 			    case PM3D_WHICHCORNER_C3: avgC = cb3; break;

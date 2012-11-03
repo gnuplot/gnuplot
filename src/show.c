@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.274 2012/10/04 20:19:08 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.275 2012/10/13 18:29:16 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -2441,6 +2441,7 @@ show_pm3d()
 	case PM3D_WHICHCORNER_MEDIAN: fputs("median of 4 corners\n", stderr); break;
 	case PM3D_WHICHCORNER_MIN: fputs("minimum of 4 corners\n", stderr); break;
 	case PM3D_WHICHCORNER_MAX: fputs("maximum of 4 corners\n", stderr); break;
+	case PM3D_WHICHCORNER_RMS: fputs("root mean square of 4 corners\n", stderr); break;
 	default: fprintf(stderr, "corner %i\n", pm3d.which_corner_color - PM3D_WHICHCORNER_C1 + 1);
     }
 }
