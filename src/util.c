@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: util.c,v 1.104 2012/09/26 22:20:15 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: util.c,v 1.105 2012/10/31 20:16:11 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - util.c */
@@ -508,17 +508,6 @@ mant_exp(
 
 /*}}} */
 
-/*
- * Kludge alert!!
- * Workaround until we have a better solution ...
- * Note: this assumes that all calls to sprintf in gprintf have
- * exactly three args. Lars
- */
-#ifdef HAVE_SNPRINTF
-# define sprintf(str,fmt,arg) \
-    if (snprintf((str),count,(fmt),(arg)) > count) \
-      fprintf (stderr,"%s:%d: Warning: too many digits for format\n",__FILE__,__LINE__)
-#endif
 
 /*{{{  gprintf */
 /* extended s(n)printf */
@@ -528,27 +517,38 @@ mant_exp(
  * '1.0*10^1'.  This causes problems for people using the %T part,
  * only, with logscaled axes, in combination with the occasional
  * round-off error. */
+/* EAM Nov 2012:
+ * Unbelievably, the count parameter has been silently ignored or
+ * improperly applied ever since this routine was introduced back
+ * in version 3.7.  Now fixed to prevent buffer overflow.
+ */
 void
 gprintf(
-    char *dest,
+    char *outstring,
     size_t count,
     char *format,
     double log10_base,
     double x)
 {
     char temp[MAX_LINE_LEN + 1];
+    char tempdest[MAX_LINE_LEN + 1];
     char *t;
     TBOOLEAN seen_mantissa = FALSE; /* remember if mantissa was already output */
     double stored_power_base = 0;   /* base for the last mantissa output*/
     int stored_power = 0;	/* power matching the mantissa output earlier */
     TBOOLEAN got_hash = FALSE;
 
+    char *dest = &tempdest[0];
+    char *limit = &tempdest[MAX_LINE_LEN];
+#define remaining_space (size_t)(limit-dest)
+
     set_numeric_locale();
 
     for (;;) {
 	/*{{{  copy to dest until % */
 	while (*format != '%')
-	    if (!(*dest++ = *format++)) {
+	    if (!(*dest++ = *format++) || (remaining_space == 0)) {
+		safe_strncpy(outstring,tempdest,count);
 		reset_numeric_locale();
 		return;		/* end of format */
 	    }
@@ -589,11 +589,11 @@ gprintf(
 		t[1] = 'l';
 		t[2] = *format;
 		t[3] = '\0';
-		sprintf(dest, temp, (long long) x);
+		snprintf(dest, remaining_space, temp, (long long) x);
 	    } else {
 		t[0] = *format;
 		t[1] = '\0';
-		sprintf(dest, temp, (int) x);
+		snprintf(dest, remaining_space, temp, (int) x);
 	    }
 	    break;
 	    /*}}} */
@@ -606,7 +606,7 @@ gprintf(
 	case 'G':
 	    t[0] = *format;
 	    t[1] = 0;
-	    sprintf(dest, temp, x);
+	    snprintf(dest, remaining_space, temp, x);
 	    break;
 	    /*}}} */
 	    /*{{{  l --- mantissa to current log base */
@@ -620,7 +620,7 @@ gprintf(
 		mant_exp(stored_power_base, x, FALSE, &mantissa,
 				&stored_power, temp);
 		seen_mantissa = TRUE;
-		sprintf(dest, temp, mantissa);
+		snprintf(dest, remaining_space, temp, mantissa);
 		break;
 	    }
 	    /*}}} */
@@ -635,7 +635,7 @@ gprintf(
 		mant_exp(stored_power_base, x, FALSE, &mantissa,
 				&stored_power, temp);
 		seen_mantissa = TRUE;
-		sprintf(dest, temp, mantissa);
+		snprintf(dest, remaining_space, temp, mantissa);
 		break;
 	    }
 	    /*}}} */
@@ -650,7 +650,7 @@ gprintf(
 		mant_exp(stored_power_base, x, TRUE, &mantissa,
 				&stored_power, temp);
 		seen_mantissa = TRUE;
-		sprintf(dest, temp, mantissa);
+		snprintf(dest, remaining_space, temp, mantissa);
 		break;
 	    }
 	    /*}}} */
@@ -665,7 +665,7 @@ gprintf(
 		mant_exp(stored_power_base, x, FALSE, &mantissa,
 				&stored_power, temp);
 		seen_mantissa = TRUE;
-		sprintf(dest, temp, mantissa);
+		snprintf(dest, remaining_space, temp, mantissa);
 		break;
 	    }
 	    /*}}} */
@@ -684,7 +684,7 @@ gprintf(
 		else
 		    stored_power_base = log10_base;
 		    mant_exp(log10_base, x, FALSE, NULL, &power, "%.0f");
-		sprintf(dest, temp, power);
+		snprintf(dest, remaining_space, temp, power);
 		break;
 	    }
 	    /*}}} */
@@ -702,7 +702,7 @@ gprintf(
 			int_error(NO_CARET, "Format character mismatch: %%T is only valid with %%t");
 		else
 		    mant_exp(1.0, x, FALSE, NULL, &power, "%.0f");
-		sprintf(dest, temp, power);
+		snprintf(dest, remaining_space, temp, power);
 		break;
 	    }
 	    /*}}} */
@@ -720,7 +720,7 @@ gprintf(
 			int_error(NO_CARET, "Format character mismatch: %%S is only valid with %%s");
 		else
 		    mant_exp(1.0, x, TRUE, NULL, &power, "%.0f");
-		sprintf(dest, temp, power);
+		snprintf(dest, remaining_space, temp, power);
 		break;
 	    }
 	    /*}}} */
@@ -743,7 +743,7 @@ gprintf(
 		    /* -18 -> 0, 0 -> 6, +18 -> 12, ... */
 		    /* HBB 20010121: avoid division of -ve ints! */
 		    power = (power + 24) / 3;
-		    sprintf(dest, temp, "yzafpnum kMGTPEZY"[power]);
+		    snprintf(dest, remaining_space, temp, "yzafpnum kMGTPEZY"[power]);
 		} else {
 		    /* please extend the range ! */
 		    /* name  power   name  power
@@ -758,7 +758,7 @@ gprintf(
 		       milli   -3    kilo    3   */
 
 		    /* fall back to simple exponential */
-		    sprintf(dest, "e%+02d", power);
+		    snprintf(dest, remaining_space, "e%+02d", power);
 		}
 		break;
 	    }
@@ -790,12 +790,12 @@ gprintf(
 		       Gibi   3
 		       Mebi   2
 		       kibi   1   */
-		    sprintf(dest, temp, " kMGTPEZY"[power]);
+		    snprintf(dest, remaining_space, temp, " kMGTPEZY"[power]);
 		} else if (power > 8) {
 		    /* for the larger values, print x2^{10}Gi for example */
-		    sprintf(dest, "x2^{%d}Yi", power-8);
+		    snprintf(dest, remaining_space, "x2^{%d}Yi", power-8);
 		} else if (power < 0) {
-		    sprintf(dest, "x2^{%d}", power*10);
+		    snprintf(dest, remaining_space, "x2^{%d}", power*10);
 		}
 
 		break;
@@ -806,7 +806,7 @@ gprintf(
 	    {
 		t[0] = 'f';
 		t[1] = 0;
-		sprintf(dest, temp, x / M_PI);
+		snprintf(dest, remaining_space, temp, x / M_PI);
 		break;
 	    }
 	    /*}}} */
@@ -854,13 +854,13 @@ gprintf(
 	++format;
     } /* for ever */
 
+    /* Copy as much as fits */
+    safe_strncpy(outstring, tempdest, count);
+
     reset_numeric_locale();
 }
 
 /*}}} */
-#ifdef HAVE_SNPRINTF
-# undef sprintf
-#endif
 
 /* some macros for the error and warning functions below
  * may turn this into a utility function later
@@ -1005,11 +1005,7 @@ int_error(int t_num, const char str[], va_dcl)
     va_end(args);
 #else
     fprintf(stderr, str, a1, a2, a3, a4, a5, a6, a7, a8);
-#ifdef HAVE_SNPRINTF
     snprintf(error_message, sizeof(error_message), str, a1, a2, a3, a4, a5, a6, a7, a8);
-#else
-    sprintf(error_message, str, a1, a2, a3, a4, a5, a6, a7, a8);
-#endif
 #endif
 
     fputs("\n\n", stderr);
