@@ -1,3 +1,13 @@
+2012-11-05  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/util.c (gprintf): Ever since the gprintf routine was added
+	(sometime before version 3.7) the count parameter that should limit how
+	many characters are written on output has been silently ignored.
+	Obviously this can lead to buffer overflows, the simplest case being a
+	format consisting of a string constant with length > MAX_ID_LEN.
+	Revise gprintf() to use snprintf() and safe_strncpy() throughout.
+	Bug #3577439
+
 2012-11-01  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/qtterminal/qt_term.cpp src/qtterminal/QtGnuplotScene.cpp

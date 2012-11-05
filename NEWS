@@ -8,6 +8,7 @@ New features, changes and fixes since gnuplot version 4.6.1
 * FIX -persist mode continued mousing of 3D "set view map" plots
 * FIX reset parsing state after error in parsing string input
 * FIX qt terminal mouse tracking and resize events for persistent plots
+* FIX buffer overflow from very long tic label formats
 
 
 New features, changes and fixes in gnuplot version 4.6.1
