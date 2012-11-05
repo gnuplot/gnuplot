@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: util.c,v 1.105 2012/10/31 20:16:11 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: util.c,v 1.106 2012/11/05 03:53:45 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - util.c */
@@ -530,15 +530,15 @@ gprintf(
     double log10_base,
     double x)
 {
-    char temp[MAX_LINE_LEN + 1];
     char tempdest[MAX_LINE_LEN + 1];
+    char temp[MAX_LINE_LEN + 1];
     char *t;
     TBOOLEAN seen_mantissa = FALSE; /* remember if mantissa was already output */
     double stored_power_base = 0;   /* base for the last mantissa output*/
     int stored_power = 0;	/* power matching the mantissa output earlier */
     TBOOLEAN got_hash = FALSE;
 
-    char *dest = &tempdest[0];
+    char *dest  = &tempdest[0];
     char *limit = &tempdest[MAX_LINE_LEN];
 #define remaining_space (size_t)(limit-dest)
 
@@ -570,7 +570,7 @@ gprintf(
 	    format++;
 	    got_hash = TRUE;
 	}
-	/* dont put isdigit first since sideeffect in macro is bad */
+	/* dont put isdigit first since side effect in macro is bad */
 	while (*++format == '.' || isdigit((unsigned char) *format)
 	       || *format == '-' || *format == '+' || *format == ' '
 	       || *format == '\'')
@@ -821,32 +821,32 @@ gprintf(
 	   int_error(NO_CARET, "Bad format character");
 	}
 
-    /* change decimal `.' to the actual entry in decimalsign */
+    /* change decimal '.' to the actual entry in decimalsign */
 	if (decimalsign != NULL) {
-	    char *dotpos1 = dest, *dotpos2;
+	    char *dotpos1 = dest;
+	    char *dotpos2;
 	    size_t newlength = strlen(decimalsign);
-	    int dot;
 
 	    /* dot is the default decimalsign we will be replacing */
-	    dot = *get_decimal_locale();
+	    int dot = *get_decimal_locale();
 
 	    /* replace every dot by the contents of decimalsign */
 	    while ((dotpos2 = strchr(dotpos1,dot)) != NULL) {
-		size_t taillength = strlen(dotpos2);
-
-		dotpos1 = dotpos2 + newlength;
-		/* test if the new value for dest would be too long */
-		if (dotpos1 - dest + taillength > count)
-		    int_error(NO_CARET,
-			      "format too long due to long decimalsign string");
-		/* move tail end of string out of the way */
-		memmove(dotpos1, dotpos2 + 1, taillength);
-		/* insert decimalsign */
-		memcpy(dotpos2, decimalsign, newlength);
+		if (newlength == 1) {	/* The normal case */
+		    *dotpos2 = *decimalsign;
+		    dotpos1++;
+		} else {		/* Some multi-byte decimal marker */
+		    size_t taillength = strlen(dotpos2);
+		    dotpos1 = dotpos2 + newlength;
+		    if (dotpos1 + taillength > limit)
+			int_error(NO_CARET,
+				  "format too long due to decimalsign string");
+		    /* move tail end of string out of the way */
+		    memmove(dotpos1, dotpos2 + 1, taillength);
+		    /* insert decimalsign */
+		    memcpy(dotpos2, decimalsign, newlength);
+		}
 	    }
-	    /* clear temporary variables for safety */
-	    dotpos1=NULL;
-	    dotpos2=NULL;
 	}
 
 	/* this was at the end of every single case, before: */
