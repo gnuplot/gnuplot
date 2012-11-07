@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.380 2012/10/30 04:20:21 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.381 2012/11/04 00:18:04 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -1404,6 +1404,7 @@ set_encoding()
 	    for (i = 0; encoding_names[i] != NULL; i++)
 		if (strcmp(encoding_names[i], senc) == 0)
 		    temp = i;
+	    free(senc);
 	}
 
 	if (temp == S_ENC_INVALID)
