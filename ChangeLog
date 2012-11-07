@@ -5,6 +5,10 @@
 	No truncation is necessary.
 	Bug #3585182
 
+	* src/axis.c (setup_tics) src/plot2d.c (eval_plots):
+	Enable auto-scaling for data sets plotted using the secondary axis
+	of a linked axis pair.  E.g.   set link y; plot FOO axes x1y2
+
 2012-11-04  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/util.c (gprintf): Ever since the gprintf routine was added

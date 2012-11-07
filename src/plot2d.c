@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.275 2012/10/09 03:51:19 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.276 2012/10/09 22:06:41 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -2435,12 +2435,17 @@ eval_plots()
 		    this_plot->plot_type = NODATA;
 		    goto SKIPPED_EMPTY_FILE;
 		}
-		if (! (uses_axis[x_axis] & USES_AXIS_FOR_DATA)
-		    && X_AXIS.autoscale) {
-		    if (X_AXIS.autoscale & AUTOSCALE_MIN)
-			X_AXIS.min = VERYLARGE;
-		    if (X_AXIS.autoscale & AUTOSCALE_MAX)
-			X_AXIS.max = -VERYLARGE;
+		/* Reset flags to auto-scale X axis to contents of data set */
+		if (!(uses_axis[x_axis] & USES_AXIS_FOR_DATA) && X_AXIS.autoscale) {
+		    struct axis *scaling_axis;
+		    if (x_axis == SECOND_X_AXIS && !X_AXIS.linked_to_primary)
+		    	scaling_axis = &axis_array[SECOND_X_AXIS];
+		    else
+		    	scaling_axis = &axis_array[FIRST_X_AXIS];
+		    if (scaling_axis->autoscale & AUTOSCALE_MIN)
+			scaling_axis->min = VERYLARGE;
+		    if (scaling_axis->autoscale & AUTOSCALE_MAX)
+			scaling_axis->max = -VERYLARGE;
 		}
 		if (X_AXIS.datatype == DT_TIMEDATE) {
 		    if (specs < 2)
@@ -2931,6 +2936,8 @@ eval_plots()
 	    int_error(NO_CARET, "all points undefined!");
 	axis_revert_and_unlog_range(SECOND_X_AXIS);
     } else {
+	/* FIXME: If this triggers, doesn't it clobber linked axes? */
+	/*        Maybe we should just call clone_linked_axes()?    */
 	assert(uses_axis[FIRST_X_AXIS]);
 	if (axis_array[SECOND_X_AXIS].autoscale & AUTOSCALE_MIN)
 	    axis_array[SECOND_X_AXIS].min = axis_array[FIRST_X_AXIS].min;
@@ -2952,7 +2959,9 @@ eval_plots()
 	axis_checked_extend_empty_range(FIRST_Y_AXIS, "all points y value undefined!");
 	axis_revert_and_unlog_range(FIRST_Y_AXIS);
     }
-    if (uses_axis[SECOND_Y_AXIS]) {
+    if (uses_axis[SECOND_Y_AXIS] && axis_array[SECOND_Y_AXIS].linked_to_primary) {
+	clone_linked_axes(SECOND_Y_AXIS, FIRST_Y_AXIS);
+    } else if (uses_axis[SECOND_Y_AXIS]) {
 	axis_checked_extend_empty_range(SECOND_Y_AXIS, "all points y2 value undefined!");
 	axis_revert_and_unlog_range(SECOND_Y_AXIS);
     } else {

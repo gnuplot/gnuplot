@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.106 2012/09/17 03:05:43 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.107 2012/11/08 05:28:49 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -819,6 +819,14 @@ setup_tics(AXIS_INDEX axis, int max)
 	else if (tic >=        60*60.) timelevel[axis] = TIMELEVEL_HOURS;
 	else if (tic >=           60.) timelevel[axis] = TIMELEVEL_MINUTES;
 	else                           timelevel[axis] = TIMELEVEL_SECONDS;
+    }
+
+    /* Note: setup_tics is always called on the primary axis first, so we can
+     * clone that rather than trying to reproduce it for the secondary axis.
+     */
+    if (this->linked_to_primary) {
+	clone_linked_axes(axis, axis - SECOND_AXES);
+	autoextend_min = autoextend_max = FALSE;
     }
 
     if (autoextend_min) {
