@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.105 2012/08/24 21:08:14 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.106 2012/09/17 03:05:43 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -883,7 +883,8 @@ gen_tics(AXIS_INDEX axis, tic_callback callback)
 	}
 
 	for (mark = def->def.user; mark; mark = mark->next) {
-	    char label[MAX_ID_LEN];
+	    char label[MAX_ID_LEN];	/* Scratch space to construct a label */
+	    char *ticlabel;		/* Points either to ^^ or to some existing text */
 	    double internal;
 
 	    /* This condition is only possible if we are in polar mode */
@@ -896,18 +897,26 @@ gen_tics(AXIS_INDEX axis, tic_callback callback)
 	    if (!inrange(internal, internal_min, internal_max))
 		continue;
 
-	    if (mark->level < 0) /* label read from data file */
-		strncpy(label, mark->label, sizeof(label));
-	    else if (axis_array[axis].datatype == DT_TIMEDATE)
+	    if (mark->level < 0) {
+		/* label read from data file */
+		ticlabel = mark->label;
+	    } else if (mark->label && !strchr(mark->label, '%')) {
+		/* string constant that contains no format keys */
+		ticlabel = mark->label;
+	    } else if (axis_array[axis].datatype == DT_TIMEDATE) {
 		gstrftime(label, MAX_ID_LEN-1, mark->label ? mark->label : ticfmt[axis], mark->position);
-	    else if (axis_array[axis].datatype == DT_DMS)
+		ticlabel = label;
+	    } else if (axis_array[axis].datatype == DT_DMS) {
 		gstrdms(label, mark->label ? mark->label : ticfmt[axis], mark->position);
-	    else
+		ticlabel = label;
+	    } else {
 		gprintf(label, sizeof(label), mark->label ? mark->label : ticfmt[axis], log10_base, mark->position);
+		ticlabel = label;
+	    }
 
 	    /* use NULL instead of label for minitic */
 	    (*callback) (axis, internal,
-	    		(mark->level>0)?NULL:label,
+	    		(mark->level>0)?NULL:ticlabel,
 	    		(mark->level>0)?mgrd:lgrd, NULL);
 
 	    /* Polar axis tics are mirrored across the origin */
@@ -915,7 +924,7 @@ gen_tics(AXIS_INDEX axis, tic_callback callback)
 		int save_gridline = lgrd.l_type;
 		lgrd.l_type = LT_NODRAW;
 		(*callback) (axis, -internal,
-			(mark->level>0)?NULL:label,
+			(mark->level>0)?NULL:ticlabel,
 	    		(mark->level>0)?mgrd:lgrd, NULL);
 		lgrd.l_type = save_gridline;
 	    }
