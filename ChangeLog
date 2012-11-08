@@ -1,3 +1,10 @@
+2012-11-08  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/axis.c (gen_tics):  Axis tic labels provided by the user as string
+	constants were arbitrarily truncated to MAX_ID_LEN before printing.
+	No truncation is necessary.
+	Bug #3585182
+
 2012-11-05  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/util.c (gprintf): Ever since the gprintf routine was added
