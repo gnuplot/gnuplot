@@ -1,3 +1,9 @@
+2012-11-08  Dima Kogan  <dima@secretsauce.net>
+
+	* src/gplt_x11.c:  Revise placement of the %n format used to read from
+	the input stream. This avoids an ambiguity in the standard for treating
+	spaces immediately preceding %n.
+
 2012-11-07  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/axis.c (gen_tics):  Axis tic labels provided by the user as string
