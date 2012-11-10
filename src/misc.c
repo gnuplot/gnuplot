@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.138.2.10 2012/05/10 21:48:01 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.138.2.11 2012/08/03 05:24:21 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -1162,9 +1162,10 @@ long
 parse_color_name()
 {
     char *string;
-    long color = -1;
+    long color = -2;
 
-    if (almost_equals(c_token,"rgb$color"))
+    /* Terminal drivers call this after seeing a "background" option */
+    if (almost_equals(c_token,"rgb$color") && almost_equals(c_token-1,"back$ground"))
 	c_token++;
     if ((string = try_to_get_string())) {
 	color = lookup_table_nth(pm3d_color_names_tbl, string);
@@ -1173,10 +1174,11 @@ parse_color_name()
 	else
 	    sscanf(string,"#%lx",&color);
 	free(string);
+	if (color == -2)
+	    int_error(c_token, "unrecognized color name and not a string \"#AARRGGBB\"");
+    } else {
+	color = int_expression();
     }
-
-    if (color == -1)
-	int_error(c_token, "not recognized as a color name or a string of form \"#RRGGBB\"");
 
     return (unsigned int)(color);
 }

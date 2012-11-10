@@ -1,3 +1,10 @@
+2012-11-10  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/misc.c (parse_color_name):  If the expression term in
+	`linecolor rgb <expression>` is not interpretable as a color name or 
+	hexadecimal string "#AARRGGBB" then treat it as an integer representing
+	AARRGGBB.
+
 2012-11-08  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/axis.c (gen_tics):  Axis tic labels provided by the user as string
