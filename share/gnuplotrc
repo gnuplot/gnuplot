@@ -36,6 +36,8 @@
 ### Some commonly used functions that are not built in
 ###
 # sinc(x) = sin(x)/x
+# rgb(r,g,b) = sprintf("#%06x",256.*256.*255.*r+256.*255.*g+255.*b)
+# hsv(h,s,v) = sprintf("#%06x",hsv2rgb(h,s,v))
 
 ###
 ### Other preferences

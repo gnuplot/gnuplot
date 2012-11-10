@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.756 2012/10/30 04:43:42 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.757 2012/11/04 00:18:04 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -2139,10 +2139,11 @@ Ffigure_newsyntax
 
  where <colorspec> has one of the following forms:
 
-       rgbcolor "colorname"
-       rgbcolor "#RRGGBB"
-       rgbcolor "#AARRGGBB"
-       rgbcolor variable       # color is read from input file
+       rgbcolor "colorname"    # e.g. "blue"
+       rgbcolor "#RRGGBB"      # string containing hexadecimal value
+       rgbcolor "#AARRGGBB"    # string containing hexadecimal value
+       rgbcolor <integer val>  # integer value representing AARRGGBB
+       rgbcolor variable       # integer value is read from input file
        palette frac <val>      # <val> runs from 0 to 1
        palette cb <value>      # <val> lies within cbrange
        palette z

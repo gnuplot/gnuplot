@@ -1,3 +1,12 @@
+2012-11-10  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/misc.c (parse_color_name) share/gnuplotrc:  If the expression in
+	`linecolor rgb <expression>` is not interpretable as a color name or 
+	hexadecimal string "#RRGGBB" then treat it as an integer representing
+	AARRGGBB.  Provide examples in gnuplotrc of user-defined functions to
+	map RGB or HSV colors using the [0:1] range onto gnuplot's AARRGGBB
+	hexadecimal string notation.
+
 2012-11-08  Dima Kogan  <dima@secretsauce.net>
 
 	* src/gplt_x11.c:  Revise placement of the %n format used to read from
