@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: fit.c,v 1.81 2012/06/09 21:47:16 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: fit.c,v 1.82 2012/06/19 18:11:06 sfeam Exp $"); }
 #endif
 
 /*  NOTICE: Change of Copyright Status
@@ -1235,8 +1235,7 @@ fit_command()
       saved_axis = axis_array[i];
       dummy_token[6] = dummy_token[i];
 
-      dummy_token[num_ranges] = -1;
-      dummy_token[num_ranges] = parse_named_range(i, dummy_token[num_ranges]);
+      dummy_token[num_ranges] = parse_range(i);
       zrange_token = c_token;
       num_ranges++;
     }

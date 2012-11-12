@@ -1,5 +1,5 @@
 /*
- * $Id: axis.h,v 1.77 2012/09/13 20:14:16 sfeam Exp $
+ * $Id: axis.h,v 1.78 2012/09/17 03:05:43 sfeam Exp $
  *
  */
 
@@ -657,8 +657,7 @@ void set_writeback_min __PROTO((AXIS_INDEX));
 void set_writeback_max __PROTO((AXIS_INDEX));
 
 void save_writeback_all_axes __PROTO((void));
-void parse_range __PROTO((AXIS_INDEX axis));
-int  parse_named_range __PROTO((AXIS_INDEX axis, int token));
+int  parse_range __PROTO((AXIS_INDEX axis));
 void parse_skip_range __PROTO((void));
 void check_axis_reversed __PROTO((AXIS_INDEX axis));
 

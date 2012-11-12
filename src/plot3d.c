@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.198 2012/07/03 03:02:35 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.199 2012/08/23 00:26:15 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -180,7 +180,7 @@ sp_replace(
  *   surface points.
  */
 /* HBB 20000506: don't risk stack havoc by recursion, use iterative list
- * cleanup unstead */
+ * cleanup instead */
 void
 sp_free(struct surface_points *sp)
 {
@@ -215,9 +215,6 @@ sp_free(struct surface_points *sp)
 }
 
 
-
-/* support for dynamic size of input line */
-
 void
 plot3drequest()
 /*
@@ -251,13 +248,13 @@ plot3drequest()
     u_axis = (parametric ? U_AXIS : FIRST_X_AXIS);
     v_axis = (parametric ? V_AXIS : FIRST_Y_AXIS);
 
-    dummy_token0 = parse_named_range(u_axis, dummy_token0);
-    dummy_token1 = parse_named_range(v_axis, dummy_token1);
+    dummy_token0 = parse_range(u_axis);
+    dummy_token1 = parse_range(v_axis);
 
     if (parametric) {
 	parse_range(FIRST_X_AXIS);
 	parse_range(FIRST_Y_AXIS);
-    }				/* parametric */
+    }
     parse_range(FIRST_Z_AXIS);
     check_axis_reversed(FIRST_X_AXIS);
     check_axis_reversed(FIRST_Y_AXIS);

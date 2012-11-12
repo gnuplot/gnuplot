@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.107 2012/11/08 05:28:49 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.108 2012/11/08 05:36:06 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -1990,51 +1990,31 @@ char *c, *cfmt;
 }
 
 /*
- * EAM Oct 2011
- * These routines used to be macros PARSE_RANGE, PARSE_NAMED_RANGE
- * Since they take only normal parameters, it saves code/space to make
- * them subroutines instead.
+ * EAM Nov 2012
+ * This routine used to be macros PARSE_RANGE, PARSE_NAMED_RANGE
  */
 
-/* get optional [min:max] */
-void
+/* Accepts a range of the form [MIN:MAX] or [var=MIN:MAX] */
+/* In the second case it returns the token pointing to var */
+int
 parse_range(AXIS_INDEX axis)
 {
+    int dummy_token = -1;
+
     if (equals(c_token, "[")) {
 	c_token++;
+	/* If the range starts with "[var=" return the token of the named variable. */
+	if (isletter(c_token) && equals(c_token + 1, "=")) {
+		dummy_token = c_token;
+		c_token += 2;
+	}
 	axis_array[axis].autoscale =
-	    load_range(axis, &axis_array[axis].min, &axis_array[axis].max,
-		       axis_array[axis].autoscale);
+		load_range(axis, &axis_array[axis].min, &axis_array[axis].max,
+			   axis_array[axis].autoscale);
 	if (!equals(c_token, "]"))
 	    int_error(c_token, "']' expected");
 	c_token++;
     }
-}
-
-/* like parse_range, but for named ranges as in 'plot [phi=3.5:7] sin(phi)' */
-int
-parse_named_range(AXIS_INDEX axis, int dummy)
-{
-    int dummy_token = dummy;
-
-    if (equals(c_token, "[")) {
-	c_token++;
-	if (isletter(c_token)) {
-	    if (equals(c_token + 1, "=")) {
-		dummy_token = c_token;
-		c_token += 2;
-	    }
-		/* oops; probably an expression with a variable: act
-		 * as if no variable name had been seen, by
-		 * fallthrough */
-	}
-	axis_array[axis].autoscale = load_range(axis, &axis_array[axis].min,
-				      &axis_array[axis].max,
-				      axis_array[axis].autoscale);
-	if (!equals(c_token, "]"))
-	    int_error(c_token, "']' expected");
-	c_token++;
-    }				/* first '[' */
 
     return dummy_token;
 }

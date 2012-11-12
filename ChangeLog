@@ -1,3 +1,9 @@
+2012-11-12  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/axis.c src/axis.h src/fit.c src/plot2d.c src/plot3d.c:
+	Merge parse_range() and parse_named_range() into a single routine.
+	Clean up the code and the call sites.
+
 2012-11-10  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/misc.c (parse_color_name) share/gnuplotrc:  If the expression in
