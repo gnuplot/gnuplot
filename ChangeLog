@@ -9,6 +9,10 @@
 	that was lost in a code reorganization and missing in 4.6.0 and 4.6.1.
 	Bug #3586441
 
+	* src/command.c (pause_command):  Further cleanup of the code that 
+	waits for input after a "pause -1" command.  Eat up characters from
+	stdin one by one until a \n is encountered.  No need to store them.
+
 2012-11-10  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/misc.c (parse_color_name) share/gnuplotrc:  If the expression in

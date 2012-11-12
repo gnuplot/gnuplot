@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.244 2012/10/20 02:43:17 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.245 2012/10/30 19:12:27 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -1338,6 +1338,7 @@ clause_reset_after_error()
 
 
 /* process the 'pause' command */
+#define EAT_INPUT_WITH(slurp) do {int junk=0; do {junk=slurp;} while (junk != EOF && junk != '\n');} while (0)
 void
 pause_command()
 {
@@ -1446,7 +1447,7 @@ pause_command()
 	    if (paused_for_mouse && !GraphHasWindow(graphwin)) {
 		if (interactive) { /* cannot wait for Enter in a non-interactive session without the graph window */
 		    if (buf) fprintf(stderr,"%s\n", buf);
-		    fgets(buf, strlen(buf), stdin); /* graphical window not yet initialized, wait for any key here */
+		    EAT_INPUT_WITH(fgetc(stdin));
 		}
 	    } else { /* pausing via graphical windows */
 		int tmp = paused_for_mouse;
@@ -1479,7 +1480,7 @@ pause_command()
 	    } else if (rc == 2) {
 		fputs(buf, stderr);
 		text = 1;
-		(void) fgets(buf, strlen(buf), stdin);
+		EAT_INPUT_WITH(fgetc(stdin));
 	    }
 	}
 #elif defined(_Macintosh)
@@ -1488,12 +1489,11 @@ pause_command()
 #else /* !(_Windows || OS2 || _Macintosh) */
 #ifdef USE_MOUSE
 	if (term && term->waitforinput) {
-	    /* term->waitforinput() will return,
-	     * if CR was hit */
+	    /* It does _not_ work to do EAT_INPUT_WITH(term->waitforinput()) */
 	    term->waitforinput();
 	} else
 #endif /* USE_MOUSE */
-	(void) fgets(buf, strlen(buf), stdin);
+	    EAT_INPUT_WITH(fgetc(stdin));
 
 #endif /* !(_Windows || OS2 || _Macintosh) */
     }
