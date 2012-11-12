@@ -13,6 +13,8 @@
 	waits for input after a "pause -1" command.  Eat up characters from
 	stdin one by one until a \n is encountered.  No need to store them.
 
+	* src/plot2d.c (check_or_add_boxplot_factor):  Fix memory leak.
+
 2012-11-10  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/misc.c (parse_color_name) share/gnuplotrc:  If the expression in

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.277 2012/11/08 05:36:06 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.278 2012/11/12 03:48:30 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -1333,16 +1333,13 @@ check_or_add_boxplot_factor(struct curve_points *plot, char* string, double x)
 	return 0;
 
     /* Remove the trailing garbage, quotes etc. from the string */ 
-    trimmed_string = df_parse_string_field(string); /* valgrind says this leaks memory :( */
+    trimmed_string = df_parse_string_field(string);
     len = strlen(trimmed_string);
     while (label) {
 	/* check if string is the same as the i-th factor */
-	if (label->text && len == strlen(label->text)) {
-	    
-	    if (0 == strncmp(trimmed_string, label->text, len)) {
-		FPRINTF((stderr, "check_or_add_boxplot_factor: found %s, level %d\n", trimmed_string, label->tag));
+	if (label->text && !strncmp(trimmed_string, label->text, len)) {
+		free(trimmed_string);
 		return label->tag; /* found it, we return its index */
-		}
 	}
 	label = label->next;
     }
