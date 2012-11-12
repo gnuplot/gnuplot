@@ -1,3 +1,10 @@
+2012-11-12  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/datafile.c (plot_option_using):  The check for a format spec given
+	after the list of columns  (e.g.  plot FOO using 1:2 "%lf; %lf") was
+	lost in a code reorganization, so it was missing in 4.6.0 and 4.6.1.
+	Restore it.  Bug #3586441
+
 2012-11-10  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/misc.c (parse_color_name):  If the expression term in
