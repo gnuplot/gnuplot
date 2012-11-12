@@ -4,13 +4,18 @@
 	Merge parse_range() and parse_named_range() into a single routine.
 	Clean up the code and the call sites.
 
+	* src/datafile.c (plot_option_using):  Restore a check for a format 
+	spec given after the list of columns (e.g. plot XX using 1:2 "%lf; %lf")
+	that was lost in a code reorganization and missing in 4.6.0 and 4.6.1.
+	Bug #3586441
+
 2012-11-10  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/misc.c (parse_color_name) share/gnuplotrc:  If the expression in
 	`linecolor rgb <expression>` is not interpretable as a color name or 
 	hexadecimal string "#RRGGBB" then treat it as an integer representing
 	AARRGGBB.  Provide examples in gnuplotrc of user-defined functions to
-	map RGB or HSV colors using the [0:1] range onto gnuplot's AARRGGBB
+	map RGB or HSV colors using the [0:1] range onto gnuplot's "#AARRGGBB"
 	hexadecimal string notation.
 
 2012-11-08  Dima Kogan  <dima@secretsauce.net>

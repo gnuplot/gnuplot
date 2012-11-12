@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.232 2012/09/26 22:20:15 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.233 2012/10/09 03:51:19 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -1479,6 +1479,14 @@ plot_option_using(int max_using)
 	 * specified column or the default.
 	 */
 	df_extend_binary_columns(no_cols);
+    }
+
+    /* Allow a format specifier after the enumeration of columns. */
+    /* Note: This was left out by mistake in versions 4.6.0 + 4.6.1 */
+    if (!END_OF_COMMAND && isstring(c_token)) {
+	df_format = try_to_get_string();
+	if (!valid_format(df_format))
+	    int_error(c_token, "format must have 1-7 conversions of type double (%%lf)");
     }
 
 }
