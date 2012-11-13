@@ -1,5 +1,5 @@
 #
-# $Id: contours.dem,v 1.11 2006/05/13 00:42:41 sfeam Exp $
+# $Id: contours.dem,v 1.13 2006/06/25 17:24:32 sfeam Exp $
 #
 set samples 20
 set isosamples 21
@@ -54,31 +54,25 @@ set cntrparam levels 5
 set title "3D gnuplot demo - low resolution (6x6)"
 replot
 pause -1 "Hit return to continue (12)"
+set title "3D gnuplot demo - low resolution (6x6) using cubic splines"
+set cntrparam cubic
+replot
+pause -1 "Hit return to continue (13)"
 set cntrparam bspline
 set title "3D gnuplot demo - low resolution (6x6) using bspline approx."
 replot
-pause -1 "Hit return to continue (13)"
+pause -1 "Hit return to continue (14)"
 set cntrparam order 8
 set title "3D gnuplot demo - low resolution (6x6) raise bspline order."
 replot
-pause -1 "Hit return to continue (14)"
-set cntrparam linear
-set auto
-set title "3D gnuplot demo - low resolution (6x6) using linear contours."
-splot x*y
 pause -1 "Hit return to continue (15)"
-set cntrparam order 4
-set cntrparam bspline
-set title "3D gnuplot demo - low resolution (6x6) using bspline approx."
-replot
-pause -1 "Hit return to continue (16)"
 set samples 25
 set isosamples 26
 set title "3D gnuplot demo - contour of Sinc function"
 splot [-5:5.01] [-5:5.01] sin(sqrt(x**2+y**2)) / sqrt(x**2+y**2)
-pause -1 "Hit return to continue (17)"
+pause -1 "Hit return to continue (16)"
 splot [-12:12.01] [-12:12.01] sin(sqrt(x**2+y**2)) / sqrt(x**2+y**2)
-pause -1 "Hit return to continue (18)"
+pause -1 "Hit return to continue (17)"
 set cntrparam levels 10
 set auto
 set zrange [-1.0:1.0]
@@ -86,18 +80,18 @@ set style data lines
 set title "3D gnuplot demo - contour of data grid plotting"
 set parametric
 splot "glass.dat"
-pause -1 "Hit return to continue (19)"
+pause -1 "Hit return to continue (18)"
 set xrange [0:15]
 set yrange [0:15]
 set zrange [-1.2:1.2]
 unset parametric
 splot "glass.dat" using 1
-pause -1 "Hit return to continue (20)"
+pause -1 "Hit return to continue (19)"
 set view map
 unset surface
 set title "3D gnuplot demo - 2D contour projection of last plot"
 replot
-pause -1 "Hit return to continue (21)"
+pause -1 "Hit return to continue (20)"
 
 #From: shen@athena.cs.uga.edu (Mingzuo Shen)
 #Subject: Rosenbrock's function: some answers and thanks
@@ -133,7 +127,7 @@ set xlabel "x"
 set ylabel "y"
 set title "Rosenbrock Function"
 splot [0.9:1.1] [0.9:1.1] (1-x)**2 + 100*(y - x**2)**2
-pause -1 "Hit Return to Continue (22)"
+pause -1 "Hit Return to Continue (21)"
 
 set logscale z
 set hidden3d
@@ -143,14 +137,14 @@ set view 20,340	#HBB: ,1,2
 set xlabel "x"
 set ylabel "y"
 splot [-1.5:1.5] [-0.5:1.5] (1-x)**2 + 100*(y - x**2)**2
-pause -1 "Hit Return to Continue (23)"
+pause -1 "Hit Return to Continue (22)"
 set contour
 unset surface
 unset ztics
 unset zlabel
 set border 15
 replot
-pause -1 "Hit Return to Continue (24)"
+pause -1 "Hit Return to Continue (23)"
 #
 set title "All contours drawn in a single color"
 unset clabel

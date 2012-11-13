@@ -22,6 +22,9 @@ print "foo[*:*]      = ",foo[*:*]
 print "foo.foo[2:2]  = ",foo.foo[2:2]
 print "(foo.foo)[2:2]= ",(foo.foo)[2:2]
 print ""
+print "foo[1:1] eq 'A' && foo[2:2] ne 'X' = ", \
+      (foo[1:1] eq 'A' && foo[2:2] ne 'X') ? "true" : "false"
+
 unset print
 
 set label 1 system("cat stringvar.tmp") at graph 0.1, graph 0.9

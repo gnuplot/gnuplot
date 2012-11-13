@@ -1,5 +1,5 @@
 #
-# $Id: all.dem,v 1.46 2012/06/29 16:30:37 sfeam Exp $
+# $Id: all.dem,v 1.47 2012/10/30 04:43:42 sfeam Exp $
 #
 # Executes ALL demos in this directory, in functionality order.
 #
@@ -55,6 +55,10 @@ reset
 
 print "******************** file poldat.dem ********************"
 load "poldat.dem"
+reset
+
+print "******************** file boxplot.dem ********************"
+load "boxplot.dem"
 reset
 
 print "******************** file multiplt.dem ********************"
@@ -225,6 +229,7 @@ load "image.dem"
 load "image2.dem"
 load "rgbalpha.dem"
 load "imageNaN.dem"
+load "barchart_art.dem"
 reset
 
 print "********************** file stringvar.dem *********************"

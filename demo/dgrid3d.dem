@@ -7,6 +7,11 @@ set title "The Valley of the Gnu"
 splot "gnu-valley" u 1:2:3 w linesp
 pause -1 "Hit return to continue"
 
+# Splines
+set title "dgrid3d splines"
+set dgrid3d splines
+splot "gnu-valley" u 1:2:3 w lines
+pause -1 "Hit return to continue"
 
 # QNorm
 set title "dgrid3d 30,30 qnorm 1"
