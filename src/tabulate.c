@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: tabulate.c,v 1.13.2.1 2012/06/08 04:56:24 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: tabulate.c,v 1.13.2.2 2012/09/05 23:35:46 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - tabulate.c */
@@ -260,7 +260,7 @@ print_table(struct curve_points *current_plot, int plot_num)
 		    double colorval = current_plot->varcolor[i];
 		    if ((current_plot->lp_properties.pm3d_color.value < 0.0)
 		    &&  (current_plot->lp_properties.pm3d_color.type == TC_RGB)) {
-			fprintf(outfile, "0x%6x", (unsigned int)(colorval));
+			fprintf(outfile, "0x%06x", (unsigned int)(colorval));
 		    } else if (current_plot->lp_properties.pm3d_color.type == TC_Z) {
 			OUTPUT_NUMBER(colorval, COLOR_AXIS);
 		    } else if (current_plot->lp_properties.l_type == LT_COLORFROMCOLUMN) {
