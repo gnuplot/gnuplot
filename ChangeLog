@@ -1,3 +1,7 @@
+2012-11-14  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/tabulate.c:  Fix the hexadecimal format used to output RGB color
+
 2012-11-12  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/axis.c src/axis.h src/fit.c src/plot2d.c src/plot3d.c:
