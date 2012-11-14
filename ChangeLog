@@ -15,6 +15,9 @@
 
 	* src/plot2d.c (check_or_add_boxplot_factor):  Fix memory leak.
 
+	* demos (various): Tweak demos so that they exercise more options,
+	giving more coverage of the code when used as a set of unit tests.
+
 2012-11-10  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/misc.c (parse_color_name) share/gnuplotrc:  If the expression in
