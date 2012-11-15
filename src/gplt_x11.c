@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.210.2.2 2012/04/09 04:38:25 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.210.2.3 2012/05/07 16:53:08 sfeam Exp $"); }
 #endif
 
 #define X11_POLYLINE 1
@@ -2256,10 +2256,12 @@ exec_cmd(plot_struct *plot, char *command)
 	sscanf(buffer, "L%4d", &plot->lt);
 	plot->lt = (plot->lt % 8) + 2;
 
-	if (plot->lt < 0) /* LT_NODRAW, LT_BACKGROUND, LT_UNDEFINED */
+	/* Fixme: no mechanism to hold width or dashstyle for LT_BACKGROUND */
+	if (plot->lt < 0) { /* LT_NODRAW, LT_BACKGROUND, LT_UNDEFINED */
 	    plot->lt = -3;
+	    plot->lwidth = plot->user_width;
 
-	else { /* Fixme: no mechanism to hold width or dashstyle for LT_BACKGROUND */
+	} else { 
 	    /* default width is 0 {which X treats as 1} */
 	    plot->lwidth = widths[plot->lt] ? plot->user_width * widths[plot->lt] : plot->user_width;
 
