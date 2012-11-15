@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: svg.trm,v 1.142 2012/10/13 20:37:01 sfeam Exp $
+ * $Id: svg.trm,v 1.143 2012/10/30 04:08:11 sfeam Exp $
  */
 
 /*------------------------------------------------------------------------------------------------------------------------------------
@@ -296,6 +296,10 @@ SVG_PathOpen ()
 	if (SVG_dashed && SVG_LineType % SVG_dashtypes > 0)
 	    fprintf(gpoutfile, "stroke-dasharray='%s' ",
 		    SVG_dashpattern[SVG_LineType % SVG_dashtypes]);
+	/* Axis is dotted */
+	else if (SVG_LineType == -1)
+	    fprintf(gpoutfile, "stroke-dasharray='%s' ",
+		    SVG_dashpattern[2]);
 
 	/* RGBA */
 	if (SVG_alpha != 0.0)
