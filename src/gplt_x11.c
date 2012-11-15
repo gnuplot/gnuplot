@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.223 2012/11/01 20:19:36 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.224 2012/11/08 20:00:19 sfeam Exp $"); }
 #endif
 
 #define MOUSE_ALL_WINDOWS 1
@@ -2297,12 +2297,15 @@ exec_cmd(plot_struct *plot, char *command)
     /*   X11_linetype(plot->type) - set line type  */
     else if (*buffer == 'L') {
 	sscanf(buffer, "L%d", &plot->lt);
+
 	plot->lt = (plot->lt % 8) + 2;
 
-	if (plot->lt < 0) /* LT_NODRAW, LT_BACKGROUND, LT_UNDEFINED */
+	/* Fixme: no mechanism to hold width or dashstyle for LT_BACKGROUND */
+	if (plot->lt < 0) { /* LT_NODRAW, LT_BACKGROUND, LT_UNDEFINED */
 	    plot->lt = -3;
+	    plot->lwidth = plot->user_width;
 
-	else { /* Fixme: no mechanism to hold width or dashstyle for LT_BACKGROUND */
+	} else { 
 	    /* default width is 0 {which X treats as 1} */
 	    plot->lwidth = widths[plot->lt] ? plot->user_width * widths[plot->lt] : plot->user_width;
 
