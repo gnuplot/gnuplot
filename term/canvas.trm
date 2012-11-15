@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: canvas.trm,v 1.56.2.4 2012/10/15 23:39:34 sfeam Exp $
+ * $Id: canvas.trm,v 1.56.2.5 2012/11/15 05:11:41 sfeam Exp $
  *
  */
 
@@ -101,6 +101,7 @@ static int canvas_line_type = LT_UNDEFINED;
 static double canvas_linewidth = 1.0;
 static double canvas_dashlength_factor = 1.0;
 static double CANVAS_ps = 1;	/* pointsize multiplier */
+static double CANVAS_default_fsize = 10;
 static double canvas_font_size = 10;
 static double canvas_fontscale = 1.0;
 static char * canvas_font_name = NULL;
@@ -203,7 +204,7 @@ CANVAS_options()
     /* which is after we have already initialized everything.	*/
     if (c_token != 2) {
 	/* Re-initialize a few things */
-	canvas_font_size = 10;
+	canvas_font_size = CANVAS_default_fsize = 10;
 	canvas_fontscale = 1.0;
 	CANVAS_standalone = TRUE;
 	CANVAS_mouseable = FALSE;
@@ -269,9 +270,10 @@ CANVAS_options()
 	    break;
 
 	case CANVAS_FSIZE:
-	    canvas_font_size = real_expression();
-	    if (canvas_font_size <= 0)
-		canvas_font_size = 10;
+	    CANVAS_default_fsize = real_expression();
+	    if (CANVAS_default_fsize <= 0)
+		CANVAS_default_fsize = 10;
+	    canvas_font_size = CANVAS_default_fsize;
 	    break;
 
 	case CANVAS_MOUSING:
@@ -1194,13 +1196,13 @@ CANVAS_set_font(const char *newfont)
     int sep;
 
 	if (!newfont || !(*newfont))
-	    canvas_font_size = 10;
+	    canvas_font_size = CANVAS_default_fsize;
 	else {
 	    sep = strcspn(newfont,",");
 	    if (newfont[sep] == ',') {
 		sscanf(&(newfont[sep+1]), "%lf", &canvas_font_size);
 		if (canvas_font_size <= 0)
-		    canvas_font_size = 10;
+		    canvas_font_size = CANVAS_default_fsize;
 	    }
 	}
 

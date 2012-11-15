@@ -1,10 +1,12 @@
 /*
- * $Id: canvasmath.js,v 1.5 2009/03/05 07:01:21 sfeam Exp $
+ * $Id: canvasmath.js,v 1.9 2012/05/03 20:35:22 sfeam Exp $
  */
 // The canvastext.js code was released to the public domain by Jim Studt, 2007.
 // He may keep some sort of up to date copy at http://www.federated.com/~jim/canvastext/
 // Mar 2009 Ethan A Merritt (EAM) Modify code to work in non-ascii environments.
 //	    Add Latin-1, Hershey simplex Greek, and math symbols with unicode indexing.
+// Apr 2012 Ethan A Merritt  Composite widths, tab, newline
+// Nov 2012 Ethan A Merritt  Additional UTF8 mathematical operators
 //
 var CanvasTextFunctions = { };
 
@@ -244,9 +246,15 @@ CanvasTextFunctions.letters = {
 8745: { width: 24, points: [[4,2],[4,9],[5,13],[6,15],[8,17],[11,18],[13,18],[16,17],[18,15],[19,13],[20,9],[20,2]] },
 8746: { width: 24, points: [[4,18],[4,11],[5,7],[6,5],[8,3],[11,2],[13,2],[16,3],[18,5],[19,7],[20,11],[20,18]] },
 8747: { width: 24, points: [[21,25],[20,24],[21,23],[22,24],[22,25],[21,26],[19,26],[17,25],[15,23],[14,21],[13,18],[12,14],[10,2],[9,-2],[8,-4],[-1,-1],[16,24],[15,22],[14,18],[12,6],[11,2],[10,-1],[9,-3],[7,-5],[5,-6],[3,-6],[2,-5],[2,-4],[3,-3],[4,-4],[3,-5]] },
+8771: { width: 24, points: [[3,10],[3,11],[4,13],[6,14],[8,14],[10,13],[14,11],[16,10],[18,10],[20,11],[22,13],[22,14],[-1,-1],[3,6],[22,6]] },
+8776: { width: 24, points: [[3,10],[3,11],[4,13],[6,14],[8,14],[10,13],[14,11],[16,10],[18,10],[20,11],[22,13],[22,14],[-1,-1],[3,4],[3,5],[4,7],[6,8],[8,8],[10,7],[14,5],[16,4],[18,4],[20,5],[22,7],[22,8]] },
 8800: { width: 24, points: [[18,19],[6,1],[-1,-1],[3,12],[20,12],[-1,-1],[3,6],[20,6]] },
+8804: { width: 24, points: [[20,4],[4,11],[20,18],[-1,-1],[4,0],[20,0]] },
+8805: { width: 24, points: [[4,4],[20,11],[4,18],[-1,-1],[4,0],[20,0]] },
 8834: { width: 24, points: [[20,18],[13,18],[9,17],[7,16],[5,14],[4,11],[4,9],[5,6],[7,4],[9,3],[13,2],[20,2]] },
 8835: { width: 24, points: [[4,18],[11,18],[15,17],[17,16],[19,14],[20,11],[20,9],[19,6],[17,4],[15,3],[11,2],[4,2]] },
+8838: { width: 24, points: [[20,20],[13,20],[9,19],[7,18],[5,16],[4,13],[4,11],[5,8],[7,6],[9,5],[13,4],[20,4],[-1,-1],[4,0],[20,0]] },
+8839: { width: 24, points: [[4,20],[11,20],[15,19],[17,18],[19,16],[20,13],[20,11],[19,8],[17,6],[15,5],[11,4],[4,4],[-1,-1],[4,0],[20,0]] },
 8853: { width: 20, points: [[9,17],[6,16],[4,14],[3,11],[3,9],[4,6],[6,4],[9,3],[11,3],[14,4],[16,6],[17,9],[17,11],[16,14],[14,16],[11,17],[9,17],[-1,-1],[5,10],[15,10],[-1,-1],[10,5],[10,15]] },
 8855: { width: 20, points: [[9,17],[6,16],[4,14],[3,11],[3,9],[4,6],[6,4],[9,3],[11,3],[14,4],[16,6],[17,9],[17,11],[16,14],[14,16],[11,17],[9,17],[-1,-1],[6,6],[14,14],[-1,-1],[14,6],[6,14]] },
 8857: { width: 20, points: [[9,17],[6,16],[4,14],[3,11],[3,9],[4,6],[6,4],[9,3],[11,3],[14,4],[16,6],[17,9],[17,11],[16,14],[14,16],[11,17],[9,17],[-1,-1],[10,11],[9,10],[10,9],[11,10],[10,11]] },
@@ -258,6 +266,8 @@ CanvasTextFunctions.letters = {
 177: { width: 20, points: [[10,15],[10,5],[-1,-1],[4,10],[16,10],[-1,-1],[4,2],[16,2]] },
 181: { width: 0, points: [[-99,956]] },
 183: { width: 10, points: [[5,11],[4,10],[5,9],[6,10],[5,11]] },
+188: { width: 23, points: [[4,0],[16,20],[-1,-1],[2,18],[4,20],[4,10],[-1,-1],[21,3],[12,3],[17,12],[18,12],[18,-1]] },
+189: { width: 23, points: [[4,0],[16,20],[-1,-1],[2,18],[4,20],[4,10],[-1,-1],[14,8],[16,10],[18,10],[20,8],[20,6],[14,1],[14,0],[21,0]] },
 215: { width: 20, points: [[4,16],[16,4],[-1,-1],[4,4],[16,16]] },
 402: { width: 15, points: [[15,21],[14,20],[15,19],[16,20],[16,21],[15,22],[13,22],[11,21],[10,20],[9,18],[8,15],[5,1],[4,-3],[3,-5],[-1,-1],[13,22],[11,20],[10,18],[9,14],[7,5],[6,1],[5,-2],[4,-4],[3,-5],[1,-6],[-1,-6],[-2,-5],[-2,-4],[-1,-3],[0,-4],[-1,-5],[-1,-1],[4,15],[14,15]] },
 8242: { width: 8, points: [[5,24],[3,16],[-1,-1],[3,16],[6,24]] },
@@ -304,7 +314,15 @@ CanvasTextFunctions.measure = function( font, size, str)
 	    index = str.charCodeAt(i);
 
 	var c = CanvasTextFunctions.letter(index);
-	if (c) total += c.width * size / 25.0;
+	if (!c) break;
+	total += c.width * size / 25.0;
+	if (c.width == 0) {
+	    for ( j = 0; j < c.points.length; j++) {
+		var a = c.points[j];
+		if (a[0] == -99)
+		    total += CanvasTextFunctions.letter(a[1]).width * size / 25.0;
+	    }
+	}
     }
     return total;
 }
@@ -315,14 +333,24 @@ CanvasTextFunctions.draw = function(ctx,font,size,x,y,str)
     var len = str.length;
     var mag = size / 25.0;
     var composite = 0;
+    var xorig = x;
 
     ctx.save();
     ctx.lineCap = "round";
     ctx.lineWidth = 2.0 * mag;
 
-    for ( i = 0; i < len; i++) {
+    for (var i = 0; i < len; i++) {
 	var index = str.charAt(i);
 
+	// EAM tab and newline
+	if (index == '	') {
+	    var tabstop = 48 * mag;
+	    x = tabstop * Math.ceil(x/tabstop);
+	    continue;
+	} else if (index < ' ') {
+	    x = xorig; y += size;
+	    continue;
+	}
 	// EAM deal with non-ascii characaters
 	if (index > '~')
 	    index = str.charCodeAt(i);
@@ -340,7 +368,7 @@ CanvasTextFunctions.draw = function(ctx,font,size,x,y,str)
 
 	var penUp = 1;
 	var needStroke = 0;
-	for ( j = 0; j < c.points.length; j++) {
+	for (var j = 0; j < c.points.length; j++) {
 	    var a = c.points[j];
 	    if ( a[0] == -1 && a[1] == -1) {
 		penUp = 1;

@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.701.2.22 2012/10/14 18:51:55 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.701.2.23 2012/10/27 02:24:37 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -6168,10 +6168,9 @@ Ffigure_mapcontours
 ?plot ranges
 ?splot ranges
 ?ranges
- The optional ranges specify the region of the graph that will be displayed.
- Note that if you specify the range as part of a plot command rather than using
- a separate `set range` statement, you will not be able to pan or zoom the plot
- interactively, and will not be able to change the range later and then `replot`.
+ The optional axis ranges at the start of a plot command specify the region of
+ the graph that will be displayed.  These override any ranges established by a
+ previous `set range` statement.
 
  Syntax:
        [{<dummy-var>=}{{<min>}:{<max>}}]

@@ -1,6 +1,8 @@
-2012-11-14  Ethan A Merritt  <merritt@u.washington.edu>
+2012-11-15  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/tabulate.c:  Fix the hexadecimal format used to output RGB color
+
+	* term/canvas.trm term/js/canvasmath.js:  Backport updates from 4.7
 
 2012-11-12  Ethan A Merritt  <merritt@u.washington.edu>
 
