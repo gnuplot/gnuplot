@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: svg.trm,v 1.143 2012/10/30 04:08:11 sfeam Exp $
+ * $Id: svg.trm,v 1.144 2012/11/15 05:20:17 sfeam Exp $
  */
 
 /*------------------------------------------------------------------------------------------------------------------------------------
@@ -208,7 +208,7 @@ static TBOOLEAN ENHsvg_preserve_spaces = FALSE;
 #define SVG_dashtypes 5
 static TBOOLEAN SVG_dashed = FALSE;
 static char *SVG_dashpattern[SVG_dashtypes] = {
-    "", " 5,8", " 1,4", " 8,4,2,4", " 9,4,1,4,1,4"
+    "", " 5,8", " 2,4", " 8,4,2,4", " 9,4,1,4,1,4"
     };
 
 /* Support for embedded hypertext */

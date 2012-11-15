@@ -1,6 +1,12 @@
-2012-11-14  Ethan A Merritt  <merritt@u.washington.edu>
+2012-11-15  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/tabulate.c:  Fix the hexadecimal format used to output RGB color
+
+	* term/js/canvasmath.js:  Additional UTF-8 mathematical operators
+
+	* term/canvas.trm:  Retain the initial font size for later use.
+	Reset dashed line status before filled box or polygon (not sure why
+	this is necessary, but omitting it causes strange things to happen).
 
 2012-11-12  Ethan A Merritt  <merritt@u.washington.edu>
 
