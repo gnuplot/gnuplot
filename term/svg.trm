@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: svg.trm,v 1.128.2.6 2012/04/27 22:13:49 sfeam Exp $
+ * $Id: svg.trm,v 1.128.2.7 2012/08/03 05:15:11 sfeam Exp $
  */
 
 /*------------------------------------------------------------------------------------------------------------------------------------
@@ -284,6 +284,10 @@ SVG_PathOpen ()
 	if (SVG_dashed && SVG_LineType % SVG_dashtypes > 0)
 	    fprintf(gpoutfile, "stroke-dasharray='%s' ",
 	 	    SVG_dashpattern[SVG_LineType % SVG_dashtypes]);
+	/* Axis is dotted */
+	else if (SVG_LineType == -1)
+	    fprintf(gpoutfile, "stroke-dasharray='%s' ",
+		    SVG_dashpattern[2]);
 
 	/* Mark grid lines so that we can toggle them on/off */
 	if (SVG_gridline)
