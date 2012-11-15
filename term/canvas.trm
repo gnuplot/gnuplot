@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: canvas.trm,v 1.66 2012/10/16 18:22:23 sfeam Exp $
+ * $Id: canvas.trm,v 1.67 2012/10/30 04:08:12 sfeam Exp $
  *
  */
 
@@ -874,6 +874,8 @@ CANVAS_linetype(int linetype)
     if (canvas_dashed) {
 	if (0 < linetype && linetype < 5)
 	    fprintf(gpoutfile, "DT(gnuplot.dashpattern%1d);\n",linetype+1);
+	else if (linetype == -1)	/* Axis */
+	    fprintf(gpoutfile, "DT(gnuplot.dashpattern3);\n");
 	else
 	    fprintf(gpoutfile, "DT(gnuplot.solid);\n");
     }
