@@ -3,13 +3,15 @@ New features, changes and fixes since gnuplot version 4.6.1
 
 * NEW Allow the "bind" command to attach a user command to mouse button 1
 * CHANGE "unset term" restores original default terminal (GNUTERM)
-* FIX qt terminal font metrics
 * FIX gd terminal fontsize change requested by set_font(",newsize")
+* FIX qt terminal font metrics
+* FIX qt terminal mouse tracking and resize events for persistent plots
+* FIX x11 terminal sometimes failed to reset the line width
 * FIX -persist mode continued mousing of 3D "set view map" plots
 * FIX reset parsing state after error in parsing string input
-* FIX qt terminal mouse tracking and resize events for persistent plots
 * FIX buffer overflow from very long tic label formats
 * FIX broken handling of formatted input via 'using 1:2 "<format>"'
+* FIX exit current command file from inside bracketed clause
 
 
 New features, changes and fixes in gnuplot version 4.6.1
