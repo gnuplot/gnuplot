@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: canvas.trm,v 1.56.2.5 2012/11/15 05:11:41 sfeam Exp $
+ * $Id: canvas.trm,v 1.56.2.6 2012/11/15 20:30:03 sfeam Exp $
  *
  */
 
@@ -1078,6 +1078,13 @@ CANVAS_filled_polygon(int points, gpiPoint *corners)
 
     CANVAS_finish();
 
+    /* FIXME: I do not understand why this is necessary, but without it */
+    /*        a dashed line followed by a filled area fails to fill.    */
+    if (canvas_dashed) {
+	fprintf(gpoutfile, "DT(gnuplot.solid);\n");
+	canvas_line_type = LT_UNDEFINED;
+    }
+
     if (corners->style != FS_OPAQUE && corners->style != FS_DEFAULT) {
 	char *fillcolor = CANVAS_fillstyle(corners->style);
 	if (strcmp(canvas_state.previous_fill, fillcolor)) {
@@ -1108,6 +1115,13 @@ TERM_PUBLIC void
 CANVAS_fillbox(int style, unsigned int x1, unsigned int y1, unsigned int width, unsigned int height)
 {
     char *fillcolor = CANVAS_fillstyle(style);
+
+    /* FIXME: I do not understand why this is necessary, but without it */
+    /*        a dashed line followed by a filled area fails to fill.    */
+	if (canvas_dashed) {
+	    fprintf(gpoutfile, "DT(gnuplot.solid);\n");
+	    canvas_line_type = LT_UNDEFINED;
+	}
 
     /* Since filled-rectangle is a primitive operation for the canvas element */
     /* it's worth making this a special case rather than using filled_polygon */
