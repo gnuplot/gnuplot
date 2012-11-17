@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.157 2012/09/02 21:48:58 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.158 2012/10/13 18:50:59 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -1602,6 +1602,7 @@ reset_command()
 {
     AXIS_INDEX axis;
     TBOOLEAN save_interactive = interactive;
+    TBOOLEAN save_state;
     static TBOOLEAN set_for_axis[AXIS_ARRAY_SIZE] = AXIS_ARRAY_INITIALIZER(TRUE);
 
     c_token++;
@@ -1754,7 +1755,7 @@ reset_command()
     free(df_commentschars);
     df_commentschars = gp_strdup(DEFAULT_COMMENTS_CHARS);
 
-    unset_fit();
+    save_state = fit_quiet; unset_fit(); fit_quiet = save_state;
 
     update_gpval_variables(0); /* update GPVAL_ inner variables */
 

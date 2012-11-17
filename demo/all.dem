@@ -1,5 +1,5 @@
 #
-# $Id: all.dem,v 1.49 2012/11/17 18:07:03 sfeam Exp $
+# $Id: all.dem,v 1.50 2012/11/17 22:39:10 sfeam Exp $
 #
 # Executes ALL demos in this directory, in functionality order.
 #
@@ -42,6 +42,7 @@ load "mgr.dem"
 reset
 
 print "******************** file fit.dem ********************"
+set fit quiet
 load "fit.dem"
 reset
 
