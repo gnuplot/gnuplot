@@ -1,11 +1,12 @@
 #
-# $Id: simple.dem,v 1.4 2006/06/30 02:17:22 sfeam Exp $
+# $Id: simple.dem,v 1.5 2011/08/19 21:01:41 sfeam Exp $
 #
 # Requires data files "[123].dat" from this directory,
 # so change current working directory to this directory before running.
 # gnuplot> set term <term-type>
 # gnuplot> load 'simple.dem'
 #
+set title "Simple Plots" font ",20"
 set key left box
 set samples 50
 plot [-10:10] sin(x),atan(x),cos(atan(x))

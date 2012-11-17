@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.404 2012/09/19 00:22:15 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.405 2012/09/25 03:52:01 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -372,7 +372,12 @@ boundary(struct curve_points *plots, int count)
     if (titlelin) {
 	double tmpx, tmpy;
 	map_position_r(&(title.offset), &tmpx, &tmpy, "boundary");
-	title_textheight = (int) ((titlelin + 1) * (t->v_char) + tmpy);
+	if (title.font)
+	    t->set_font(title.font);
+	title_textheight = (int) ((titlelin) * (t->v_char) + tmpy);
+	if (title.font)
+	    t->set_font("");
+	title_textheight += (int)(t->v_char); /* Gap of one normal line height */
     } else
 	title_textheight = 0;
 
@@ -381,9 +386,13 @@ boundary(struct curve_points *plots, int count)
 	double tmpx, tmpy;
 	map_position_r(&(axis_array[SECOND_X_AXIS].label.offset),
 		       &tmpx, &tmpy, "boundary");
+	if (axis_array[SECOND_X_AXIS].label.font)
+	    t->set_font(axis_array[SECOND_X_AXIS].label.font);
 	x2label_textheight = (int) (x2lablin * t->v_char + tmpy);
 	if (!axis_array[SECOND_X_AXIS].ticmode)
 	    x2label_textheight += 0.5 * t->v_char;
+	if (axis_array[SECOND_X_AXIS].label.font)
+	    t->set_font("");
     } else
 	x2label_textheight = 0;
 
@@ -416,7 +425,11 @@ boundary(struct curve_points *plots, int count)
 	double tmpx, tmpy;
 	map_position_r(&(axis_array[FIRST_Y_AXIS].label.offset),
 		       &tmpx, &tmpy, "boundary");
+	if (axis_array[FIRST_Y_AXIS].label.font)
+	    t->set_font(axis_array[FIRST_Y_AXIS].label.font);
 	ylabel_textheight = (int) (ylablin * t->v_char + tmpy);
+	if (axis_array[FIRST_Y_AXIS].label.font)
+	    t->set_font("");
     } else
 	ylabel_textheight = 0;
 
@@ -425,7 +438,11 @@ boundary(struct curve_points *plots, int count)
 	double tmpx, tmpy;
 	map_position_r(&(axis_array[SECOND_Y_AXIS].label.offset),
 		       &tmpx, &tmpy, "boundary");
+	if (axis_array[SECOND_Y_AXIS].label.font)
+	    t->set_font(axis_array[FIRST_Y_AXIS].label.font);
 	y2label_textheight = (int) (y2lablin * t->v_char + tmpy);
+	if (axis_array[SECOND_Y_AXIS].label.font)
+	    t->set_font("");
     } else
 	y2label_textheight = 0;
 
