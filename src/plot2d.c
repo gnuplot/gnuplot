@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.278 2012/11/12 03:48:30 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.280 2012/11/14 02:08:43 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -225,11 +225,12 @@ plotrequest()
 	    parse_skip_range();
     }
 
-
-    if (parametric || polar)
+    if (parametric || polar) {
 	dummy_token = parse_range(T_AXIS);
-
-    parse_range(FIRST_X_AXIS);
+	parse_range(FIRST_X_AXIS);
+    } else {
+	dummy_token = parse_range(FIRST_X_AXIS);
+    }
     parse_range(FIRST_Y_AXIS);
     parse_range(SECOND_X_AXIS);
     parse_range(SECOND_Y_AXIS);
