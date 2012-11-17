@@ -1,5 +1,5 @@
 #
-# $Id: all.dem,v 1.48 2012/11/13 23:59:30 sfeam Exp $
+# $Id: all.dem,v 1.49 2012/11/17 18:07:03 sfeam Exp $
 #
 # Executes ALL demos in this directory, in functionality order.
 #
@@ -101,6 +101,10 @@ reset
 
 print "******************** file random.dem ********************"
 load "random.dem"
+reset
+
+print "******************** file rugplot.dem ********************"
+load "rugplot.dem"
 reset
 
 print "******************** file smooth.dem ********************"

@@ -44,6 +44,7 @@ The mousing code is new. You may see some browser-dependent glitches.
     <li><a href="vector.html">vector fields</a></li>
     <li><a href="circles.html">circles</a></li>
     <li><a href="boxplot.html">boxplot</a></li>
+    <li><a href="rugplot.html">rug plot</a></li>
     </ul>
 
     <h4>Math functions</h4>

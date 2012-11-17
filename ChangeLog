@@ -3,8 +3,9 @@
 	* src/plot2d.c (plotrequest):  Fix bug introduced by 2012-11-12 patch
 	(failure to recognize nonparametric named variables).
 
-	* demo/named_var.dem demo/all.dem:  Add a unit test for the use of a
-	nonparametric named variable. It would have caught the above bug!
+	* demo/named_var.dem demo/rugplot.dem demo/all.dem:  Add a unit test 
+	for the use of a nonparametric named variable. It would have caught
+	the above bug!  Also add a rugplot demo.
 
 2012-11-15  Ethan A Merritt  <merritt@u.washington.edu>
 

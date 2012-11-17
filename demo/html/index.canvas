@@ -44,6 +44,7 @@ To view the results you need a browser that supports the HTML5 'canvas' element.
     <li><a href="vector.html">vector fields</a></li>
     <li><a href="circles.html">circles</a></li>
     <li><a href="boxplot.html">boxplots</a></li>
+    <li><a href="rugplot.html">rug plot</a></li>
     </ul>
 
     <h4>Math functions</h4>
