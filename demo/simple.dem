@@ -9,6 +9,8 @@
 set title "Simple Plots" font ",20"
 set key left box
 set samples 50
+set style data points
+
 plot [-10:10] sin(x),atan(x),cos(atan(x))
 pause -1 "Hit return to continue"
 
@@ -41,10 +43,6 @@ pause -1 "Hit return to continue"
 
 plot [-19:19] '1.dat'with impulses ,'2.dat' ,'3.dat' with lines
 pause -1 "Hit return to continue"
-#
-# Deprecated syntax - better to show an example with using (f(column(1))
-#f(x) = x/100
-#plot [-19:19] '1.dat'with impulses ,'2.dat' thru f(x) ,'3.dat' with lines
-#pause -1 "Hit return to continue"
+
 reset
 
