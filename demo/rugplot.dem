@@ -4,7 +4,7 @@
 # on the corresponding axis.
 #
 unset key
-set set bmargin at screen .2; 
+set bmargin at screen .2; 
 set rmargin at screen .8; set lmargin at screen .2;
 set offset .08, .08, .08, .08
 set border lw 0.5
