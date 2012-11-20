@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: parse.c,v 1.74 2012/10/31 20:16:11 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: parse.c,v 1.75 2012/10/31 20:40:24 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - parse.c */
@@ -856,9 +856,20 @@ parse_unary_expression()
 	parse_unary_expression();
 	(void) add_action(BNOT);
     } else if (equals(c_token, "-")) {
+	struct at_entry *previous;
 	c_token++;
 	parse_unary_expression();
-	(void) add_action(UMINUS);
+	/* Collapse two operations PUSHC <pos-const> + UMINUS
+	 * into a single operation PUSHC <neg-const>
+	 */
+	previous = &(at->actions[at->a_count-1]);
+	if (previous->index == PUSHC &&  previous->arg.v_arg.type == INTGR) {
+	    previous->arg.v_arg.v.int_val = -previous->arg.v_arg.v.int_val;
+	} else if (previous->index == PUSHC &&  previous->arg.v_arg.type == CMPLX) {
+	    previous->arg.v_arg.v.cmplx_val.real = -previous->arg.v_arg.v.cmplx_val.real;
+	    previous->arg.v_arg.v.cmplx_val.imag = -previous->arg.v_arg.v.cmplx_val.imag;
+	} else
+	    (void) add_action(UMINUS);
     } else if (equals(c_token, "+")) {	/* unary + is no-op */
 	c_token++;
 	parse_unary_expression();
