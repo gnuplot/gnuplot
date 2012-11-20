@@ -1,12 +1,12 @@
 2012-11-20  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/datafile.c:  Truncate requested column number to maximum sane
-	value. This prevents a segfault on "plot $foo using 1 title column(999)"
+	value. This prevents segfault on "plot $foo using 1 title column(12345)"
 
 	* src/parse.c (parse_unary_expression):
 	Collapse two operations PUSHC <pos-const> + UMINUS
 	into a single operation PUSHC <neg-const>
-	This save both space and time when evaluating negative numbers, but the
+	This saves both space and time when evaluating negative numbers, but the
 	direct motivation is to make it easier to treat functions of a constant
 	value as a special case.
 

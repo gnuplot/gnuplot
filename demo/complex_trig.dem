@@ -87,7 +87,9 @@ pause -1
 # plane is colored as before.
 #
 
-set view 66, 336, 1, 1
+set view 66, 336, 1.2, 1.2
+set view equal xyz
+set colorbox user origin 0.85, 0.2
 unset ztics
 set zlabel "magnitude" rotate offset 3
 set xlabel "Real" rotate parallel offset 0,-2

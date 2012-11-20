@@ -112,5 +112,5 @@ splot '++' using 1:2:(Z($1,$2)):(color($1,$2)) with pm3d title "4 data columns x
 pause -1 "Hit return to continue"
 
 # Release datablocks used in this demo
-undefine $!
+undefine $map1 $map2
 reset

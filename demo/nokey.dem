@@ -7,7 +7,8 @@ set xtics nomirror scale 0
 set ytics nomirror
 set border 2 lw 2
 set style data lines
-plot for [N=6:10] 'immigration.dat' u 1:N lw 2 title columnhead at end
+plot for [place in "Germany Greece Denmark France"] 'immigration.dat' \
+         using 1:(column(place)) lw 2 title columnhead at end
 
 pause -1 "Hit return to continue"
 

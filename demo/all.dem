@@ -1,7 +1,8 @@
 #
-# $Id: all.dem,v 1.50 2012/11/17 22:39:10 sfeam Exp $
+# $Id: all.dem,v 1.51 2012/11/18 18:15:56 sfeam Exp $
 #
-# Executes ALL demos in this directory, in functionality order.
+# Executes all demos (OK, MOST demos) in this directory.
+# This serves as a series of unit tests for non-interactive capabilities.
 #
 
 print "******************** file simple.dem ********************"
@@ -218,6 +219,10 @@ reset
 
 print "********************** file datastrings.dem *********************"
 load "datastrings.dem"
+reset
+
+print "********************** file hypertext.dem *********************"
+load "hypertext.dem"
 reset
 
 print "********************** file stats.dem *********************"
