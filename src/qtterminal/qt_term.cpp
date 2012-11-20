@@ -100,6 +100,8 @@ QString qt_currentFontName;
 QString qt_localServerName;
 QTextCodec* qt_codec = QTextCodec::codecForLocale();
 
+QApplication* gnuplot_qt_application;
+
 /* ------------------------------------------------------
  * Helpers
  * ------------------------------------------------------*/
@@ -302,7 +304,7 @@ void qt_init()
 	// A better strategy would be to transfer the font handling to the QtGnuplotWidget, but it would require
 	// some synchronization between the widget and the gnuplot process.
 	int argc = 0;
-	QApplication* application = new QApplication(argc, (char**)( NULL));
+	gnuplot_qt_application = new QApplication(argc, (char**)( NULL));
 
 #ifdef Q_WS_MAC
 	// Don't display this application in the MAC OS X dock
