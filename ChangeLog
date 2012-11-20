@@ -1,3 +1,8 @@
+2012-11-20  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/datafile.c:  Truncate requested column number to maximum sane
+	value. This prevents a segfault on "plot $foo using 1 title column(999)"
+
 2012-11-15  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/tabulate.c:  Fix the hexadecimal format used to output RGB color

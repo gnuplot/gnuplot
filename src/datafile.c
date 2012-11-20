@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.212.2.11 2012/09/26 23:03:15 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.212.2.12 2012/11/12 23:22:00 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -1720,6 +1720,11 @@ df_readascii(double v[], int max)
 		FPRINTF((stderr,"Col %d: \"%s\"\n",j,df_column[j].header));
 	    }
 	    df_already_got_headers = TRUE;
+
+	    /* Restrict the column number to possible values */
+	    if (column_for_key_title > df_no_cols)
+		column_for_key_title = df_no_cols;
+
 	    if (column_for_key_title > 0) {
 		df_key_title = gp_strdup(df_column[column_for_key_title-1].header);
 		if (!df_key_title) {
