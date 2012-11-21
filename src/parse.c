@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: parse.c,v 1.75 2012/10/31 20:40:24 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: parse.c,v 1.76 2012/11/21 01:10:49 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - parse.c */
@@ -441,13 +441,16 @@ parse_primary_expression()
     } else if (equals(c_token, "$")) {
 	struct value a;
 
-	if (!isanumber(++c_token))
+	c_token++;
+	if (!isanumber(c_token)) {
 	    int_error(c_token, "Column number expected");
-	convert(&a, c_token++);
-	if (a.type != INTGR || a.v.int_val < 0)
-	    int_error(c_token, "Positive integer expected");
-	if (at_highest_column_used < a.v.int_val)
-	    at_highest_column_used = a.v.int_val;
+	} else {
+	    convert(&a, c_token++);
+	    if (a.type != INTGR || a.v.int_val < 0)
+		int_error(c_token, "Positive integer expected");
+	    if (at_highest_column_used < a.v.int_val)
+		at_highest_column_used = a.v.int_val;
+	}
 	add_action(DOLLARS)->v_arg = a;
     } else if (isanumber(c_token)) {
 	/* work around HP 9000S/300 HP-UX 9.10 cc limitation ... */

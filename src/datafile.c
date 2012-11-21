@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.234 2012/11/12 23:26:24 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.235 2012/11/20 05:21:33 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -703,6 +703,7 @@ df_tokenise(char *s)
 	    int dfncp1 = df_no_cols + 1;
 
 	    /* optimizations by Corey Satten, corey@cac.washington.edu */
+	    /* only scanf the field if it is mentioned in one of the using specs */
 	    if ((fast_columns == 0)
 		|| (df_no_use_specs == 0)
 		|| ((df_no_use_specs > 0)
@@ -714,8 +715,7 @@ df_tokenise(char *s)
 				|| (df_no_use_specs > 3
 				    && (use_spec[3].column == dfncp1
 				        || (df_no_use_specs > 4
-				            && (use_spec[4].column
-				                == dfncp1
+				            && (use_spec[4].column == dfncp1
 				                || df_no_use_specs > 5)
 				            )
 				        )
@@ -1461,9 +1461,10 @@ plot_option_using(int max_using)
 
 	    } else {
 		int col = int_expression();
-		
+
 		if (col < -2)
 		    int_error(c_token, "Column must be >= -2");
+
 		use_spec[df_no_use_specs++].column = col;
 
 		/* Supposedly only happens for binary files, but don't bet on it */
@@ -2139,17 +2140,16 @@ df_determine_matrix_info(FILE *fin)
 void
 f_dollars(union argument *x)
 {
-    int column = x->v_arg.v.int_val - 1;
-    /* we checked it was an integer >= 0 at compile time */
+    int column = x->v_arg.v.int_val;
     struct value a;
 
-    if (column == -1) {
+    if (column == 0) {
 	push(Gcomplex(&a, (double) df_datum, 0.0));     /* $0 */
-    } else if (column >= df_no_cols || df_column[column].good != DF_GOOD) {
+    } else if (column > df_no_cols || df_column[column-1].good != DF_GOOD) {
 	undefined = TRUE;
 	push(&(x->v_arg));      /* this okay ? */
     } else
-	push(Gcomplex(&a, df_column[column].datum, 0.0));
+	push(Gcomplex(&a, df_column[column-1].datum, 0.0));
 }
 
 /*}}} */
