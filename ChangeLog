@@ -1,3 +1,11 @@
+2012-11-23  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/datafile.c src/parse.c:  Internal implementation of a pseudocolumn
+	(-3) that means "last column in input file".  I.e. if the input file has
+	19 columns then column(-3) is treated as column(19). It might be nice to
+	wrap this so that the user interface is something like column(LAST), but
+	that remains to be done.
+
 2012-11-20  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/datafile.c:  Truncate requested column number to maximum sane

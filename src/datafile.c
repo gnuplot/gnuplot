@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.235 2012/11/20 05:21:33 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.236 2012/11/21 18:39:50 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -1462,7 +1462,9 @@ plot_option_using(int max_using)
 	    } else {
 		int col = int_expression();
 
-		if (col < -2)
+		if (col == -3)	/* pseudocolumn -3 means "last column" */	
+		    fast_columns = 0;
+		else if (col < -2)
 		    int_error(c_token, "Column must be >= -2");
 
 		use_spec[df_no_use_specs++].column = col;
@@ -1735,6 +1737,8 @@ df_readascii(double v[], int max)
 	    /* Restrict the column number to possible values */
 	    if (column_for_key_title > df_no_cols)
 		column_for_key_title = df_no_cols;
+	    if (column_for_key_title == -3)	/* last column in file */ 
+		column_for_key_title = df_no_cols;
 
 	    if (column_for_key_title > 0) {
 		df_key_title = gp_strdup(df_column[column_for_key_title-1].header);
@@ -1768,6 +1772,9 @@ df_readascii(double v[], int max)
 		 * at=NULL */
 		int column = use_spec[output].column;
 		current_using_spec = output;
+
+		if (column == -3) /* pseudocolumn -3 means "last column" */
+		    column = use_spec[output].column = df_no_cols;
 
 		/* Handle cases where column holds a meta-data string */
 		/* Axis labels, plot titles, etc.                     */
@@ -2143,6 +2150,9 @@ f_dollars(union argument *x)
     int column = x->v_arg.v.int_val;
     struct value a;
 
+    if (column == -3)	/* pseudocolumn -3 means "last column" */
+	column = df_no_cols;
+
     if (column == 0) {
 	push(Gcomplex(&a, (double) df_datum, 0.0));     /* $0 */
     } else if (column > df_no_cols || df_column[column-1].good != DF_GOOD) {
@@ -2195,6 +2205,8 @@ f_column(union argument *arg)
 	push(Ginteger(&a, line_count));
     else if (column == 0)       /* $0 = df_datum */
 	push(Gcomplex(&a, (double) df_datum, 0.0));
+    else if (column == -3)	/* pseudocolumn -3 means "last column" */
+	push(Gcomplex(&a, df_column[df_no_cols - 1].datum, 0.0));
     else if (column < 1
 	     || column > df_no_cols
 	     || df_column[column - 1].good != DF_GOOD
@@ -2246,6 +2258,9 @@ f_stringcolumn(union argument *arg)
 	gpfree_string(&a);
     } else
 	column = (int) real(&a);
+
+    if (column == -3)	/* pseudocolumn -3 means "last column" */
+	column = df_no_cols;
 
     if (column == -2) {
 	char temp_string[32];

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: parse.c,v 1.76 2012/11/21 01:10:49 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: parse.c,v 1.77 2012/11/21 18:39:50 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - parse.c */
@@ -442,7 +442,11 @@ parse_primary_expression()
 	struct value a;
 
 	c_token++;
-	if (!isanumber(c_token)) {
+	if (equals(c_token,"N")) {	/* $N == pseudocolumn -3 means "last column" */
+	    c_token++;
+	    Ginteger(&a, -3);
+	    at_highest_column_used = -3;
+	} else if (!isanumber(c_token)) {
 	    int_error(c_token, "Column number expected");
 	} else {
 	    convert(&a, c_token++);
