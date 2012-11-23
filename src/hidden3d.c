@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.86 2012/04/17 22:42:53 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.87 2012/07/17 19:06:43 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - hidden3d.c */
@@ -1104,6 +1104,7 @@ build_networks(struct surface_points *plots, int pcount)
 	case FSTEPS:
 	case HISTEPS:
 	case LINES:
+	case SURFACEGRID:
 	    nv += nverts;
 	    ne += nverts - ncrvs;
 	    if (this_plot->has_grid_topology) {
@@ -1246,6 +1247,7 @@ build_networks(struct surface_points *plots, int pcount)
 		    case FSTEPS:
 		    case HISTEPS:
 		    case LINES:
+		    case SURFACEGRID:
 			if (previousvertex >= 0)
 			    store_edge(thisvertex, edir_west, 0, lp, above);
 			break;
@@ -1331,6 +1333,7 @@ build_networks(struct surface_points *plots, int pcount)
 		case FSTEPS:
 		case HISTEPS:
 		case LINES:
+		case SURFACEGRID:
 		    if (i > 0) {
 			/* not first point, so we might want to set up
 			 * the edge(s) to the left of this vertex */

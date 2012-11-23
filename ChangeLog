@@ -6,6 +6,8 @@
 	wrap this so that the user interface is something like column(LAST), but
 	that remains to be done.
 
+	* src/hidden3d.c:  Handle exlicit surface in hidden3d mode.
+
 2012-11-20  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/datafile.c:  Truncate requested column number to maximum sane
