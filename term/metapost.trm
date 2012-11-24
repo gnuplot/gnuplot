@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: metapost.trm,v 1.44 2009/12/31 05:37:22 sfeam Exp $
+ * $Id: metapost.trm,v 1.45 2011/09/27 23:49:32 sfeam Exp $
  */
 
 /* GNUPLOT - metapost.trm */
@@ -216,7 +216,7 @@ MP_options()
 
     /* Annoying hack to handle the case of 'set termoption' after */
     /* we have already initialized the terminal.                  */
-    if (c_token != 2) {
+    if (!almost_equals(c_token-1, "termopt$ion")) {
 	MP_color = FALSE;
 	MP_solid = FALSE;
 	MP_tex = MP_TEX;

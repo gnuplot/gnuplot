@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: gd.trm,v 1.167 2012/05/16 04:43:20 sfeam Exp $
+ * $Id: gd.trm,v 1.169 2012/10/15 21:05:42 sfeam Exp $
  * based on gif.trm,v 1.26.2.1 2000/05/01 00:17:20 joze
  */
 
@@ -653,7 +653,7 @@ PNG_options()
 
     /* Annoying hack to handle the case of 'set termoption' after */
     /* we are already in animation mode.                          */
-    if (c_token == 2)
+    if (almost_equals(c_token-1, "termopt$ion"))
 	FPRINTF((stderr,"gif: Maintaining animation state\n"));
     else {
 	/* Otherwise reset animation parameters */

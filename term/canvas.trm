@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: canvas.trm,v 1.69 2012/11/16 03:47:30 sfeam Exp $
+ * $Id: canvas.trm,v 1.70 2012/11/16 03:49:20 sfeam Exp $
  *
  */
 
@@ -205,9 +205,7 @@ CANVAS_options()
 {
     int canvas_background = 0;
 
-    /* (c_token == 2) only in the case of 'set termoption'	*/
-    /* which is after we have already initialized everything.	*/
-    if (c_token != 2) {
+    if (!almost_equals(c_token-1, "termopt$ion")) {
 	/* Re-initialize a few things */
 	canvas_font_size = CANVAS_default_fsize = 10;
 	canvas_fontscale = 1.0;

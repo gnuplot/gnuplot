@@ -9,6 +9,10 @@
 
 	* term/svg.trm:  Support for dashlength
 
+	* src/set.c src/tables.c:  Allow "set termoption dashlength <foo>"
+	* term/{canvas cgm emf gd metapost pdf post}.trm:
+	Recognize 'set termoption' even when not the first command on a line.
+
 2012-11-23  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/datafile.c src/parse.c:  Internal implementation of a pseudocolumn

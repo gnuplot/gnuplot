@@ -1,5 +1,5 @@
 /* Hey Emacs this is -*- C -*-
- * $Id: cgm.trm,v 1.96 2011/03/11 22:20:59 sfeam Exp $
+ * $Id: cgm.trm,v 1.97 2011/08/02 20:40:31 sfeam Exp $
  */
 
 /* GNUPLOT - cgm.trm */
@@ -347,7 +347,7 @@ CGM_options()
 
     /* Annoying hack to handle the case of 'set termoption' after */
     /* we have already initialized the terminal.                  */
-    if (c_token != 2)
+    if (!almost_equals(c_token-1, "termopt$ion"))
 	CGM_local_reset();
 
     while (!END_OF_COMMAND) {

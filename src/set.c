@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.381 2012/11/04 00:18:04 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.382 2012/11/09 00:49:06 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -4228,8 +4228,7 @@ set_terminal()
  * Only reasonably common terminal options are supported.
  *
  * If necessary, the code in term->options() can detect that it was called
- * from here because in this case (c_token == 2), whereas when called from
- * 'set term foo ...' it will see (c_token == 3).
+ * from here because in this case almost_equals(c_token-1, "termopt$ion"); 
  */
 
 static void
@@ -4253,6 +4252,7 @@ set_termoptions()
 	num_tokens = GPMIN(num_tokens,c_token+2);
 	ok_to_call_terminal = TRUE;
     } else if (equals(c_token,"fontscale")) {
+	num_tokens = GPMIN(num_tokens,c_token+2);
 	if (term->flags & TERM_FONTSCALE)
 	    ok_to_call_terminal = TRUE;
 	else {
@@ -4260,6 +4260,7 @@ set_termoptions()
 	    real_expression();   /* Silently ignore the request */
 	}
     } else if (equals(c_token,"lw") || almost_equals(c_token,"linew$idth")) {
+	num_tokens = GPMIN(num_tokens,c_token+2);
 	if (term->flags & TERM_LINEWIDTH)
 	    ok_to_call_terminal = TRUE;
 	else {
@@ -4267,10 +4268,17 @@ set_termoptions()
 	    real_expression();   /* Silently ignore the request */
 	}
     } else if (almost_equals(c_token,"dash$ed") || equals(c_token,"solid")) {
+	num_tokens = GPMIN(num_tokens,c_token+1);
 	if (term->flags & TERM_CAN_DASH)
 	    ok_to_call_terminal = TRUE;
 	else
 	    c_token++;
+    } else if (almost_equals(c_token,"dashl$ength") || equals(c_token,"dl")) {
+	num_tokens = GPMIN(num_tokens,c_token+2);
+	if (term->flags & TERM_CAN_DASH)
+	    ok_to_call_terminal = TRUE;
+	else
+	    c_token+=2;
     } else if (!strcmp(term->name,"gif") && equals(c_token,"delay") && num_tokens==4) {
 	ok_to_call_terminal = TRUE;
     } else {
