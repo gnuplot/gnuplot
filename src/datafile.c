@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.236 2012/11/21 18:39:50 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.237 2012/11/23 07:00:19 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -4864,8 +4864,13 @@ df_generate_pseudodata()
 		axis_array[FIRST_X_AXIS].max = 10;
 	    if (axis_array[FIRST_X_AXIS].min == VERYLARGE)
 		axis_array[FIRST_X_AXIS].min = -10;
-	    t_min = X_AXIS.min;
-	    t_max = X_AXIS.max;
+	    if ((axis_array[SAMPLE_AXIS].range_flags & RANGE_SAMPLED)) {
+		t_min = axis_array[SAMPLE_AXIS].min;
+		t_max = axis_array[SAMPLE_AXIS].max;
+	    } else {
+		t_min = X_AXIS.min;
+		t_max = X_AXIS.max;
+	    }
 	    axis_unlog_interval(x_axis, &t_min, &t_max, 1);
 	    t_step = (t_max - t_min) / (samples_1 - 1);
 	}

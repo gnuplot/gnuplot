@@ -1,5 +1,5 @@
 /*
- * $Id: axis.h,v 1.78 2012/09/17 03:05:43 sfeam Exp $
+ * $Id: axis.h,v 1.79 2012/11/12 03:48:30 sfeam Exp $
  *
  */
 
@@ -73,6 +73,7 @@ typedef enum AXIS_INDEX {
 } AXIS_INDEX;
 
 # define AXIS_ARRAY_SIZE 11
+# define SAMPLE_AXIS SECOND_Z_AXIS
 # define LAST_REAL_AXIS  POLAR_AXIS
 
 /* What kind of ticmarking is wanted? */
@@ -197,6 +198,7 @@ typedef struct axis {
     int range_flags;		/* flag bits about autoscale/writeback: */
     /* write auto-ed ranges back to variables for autoscale */
 #define RANGE_WRITEBACK 1
+#define RANGE_SAMPLED   2
     /* allow auto and reversed ranges */
     TBOOLEAN range_is_reverted;	/* range [high:low] silently reverted? */
     double min;			/* 'transient' axis extremal values */
@@ -627,6 +629,12 @@ do {									  \
 	    axis_array[axis].format_is_numeric = 1;		\
 	}
 
+/* FIXME: replace by a subroutine? */
+#define clear_sample_range(axis) do {				\
+	axis_array[SAMPLE_AXIS].range_flags = 0;		\
+	axis_array[SAMPLE_AXIS].min = axis_array[axis].min;	\
+	axis_array[SAMPLE_AXIS].max = axis_array[axis].max;	\
+	} while (0)
 
 /* 'roundoff' check tolerance: less than one hundredth of a tic mark */
 #define SIGNIF (0.01)

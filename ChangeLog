@@ -1,3 +1,12 @@
+2012-11-24  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/axis.c src/axis.h src/datafile.c src/plot2d.c src/plot3d.c
+	src/fit.c demo/piecewise.dem:
+	Add support for piecewise functions by adding an optional sampling range
+	at the beginning of each element in a plot command. For example, to plot
+	a data set and three separate functions covering parts of the range:
+	    plot DATA, [10:20] f(x), [25:35] g(x), [40:*] '+' using 1:(h($1))
+
 2012-11-23  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/datafile.c src/parse.c:  Internal implementation of a pseudocolumn
@@ -6,7 +15,7 @@
 	wrap this so that the user interface is something like column(LAST), but
 	that remains to be done.
 
-	* src/hidden3d.c:  Handle exlicit surface in hidden3d mode.
+	* src/hidden3d.c:  Handle explicit surface in hidden3d mode.
 
 2012-11-20  Ethan A Merritt  <merritt@u.washington.edu>
 

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.199 2012/08/23 00:26:15 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.200 2012/11/12 03:48:30 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -270,12 +270,12 @@ plot3drequest()
     }
 
     /* use the default dummy variable unless changed */
-    if (dummy_token0 >= 0)
+    if (dummy_token0 > 0)
 	copy_str(c_dummy_var[0], dummy_token0, MAX_ID_LEN);
     else
 	(void) strcpy(c_dummy_var[0], set_dummy_var[0]);
 
-    if (dummy_token1 >= 0)
+    if (dummy_token1 > 0)
 	copy_str(c_dummy_var[1], dummy_token1, MAX_ID_LEN);
     else
 	(void) strcpy(c_dummy_var[1], set_dummy_var[1]);

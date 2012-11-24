@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: fit.c,v 1.82 2012/06/19 18:11:06 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: fit.c,v 1.83 2012/11/12 03:48:30 sfeam Exp $"); }
 #endif
 
 /*  NOTICE: Change of Copyright Status
@@ -1255,7 +1255,7 @@ fit_command()
     strcpy(dummy_default[0], set_dummy_var[0]);
     strcpy(dummy_default[1], set_dummy_var[1]);
     for (i=0; i<5; i++){
-      if (dummy_token[i] >= 0)
+      if (dummy_token[i] > 0)
 	copy_str(c_dummy_var[i], dummy_token[i], MAX_ID_LEN);
       else
 	strcpy(c_dummy_var[i], dummy_default[i]);
@@ -1309,7 +1309,7 @@ fit_command()
 
     /* HBB 980401: if this is a single-variable fit, we shouldn't have
      * allowed a variable name specifier for 'y': */
-    if ((dummy_token[1] >= 0) && (num_indep==1))
+    if ((dummy_token[1] > 0) && (num_indep==1))
 	int_error(dummy_token[1], "Can't re-name 'y' in a one-variable fit");
 
     /* depending on number of independent variables, the last range

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.108 2012/11/08 05:36:06 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.109 2012/11/12 03:48:30 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -1994,14 +1994,17 @@ char *c, *cfmt;
  * This routine used to be macros PARSE_RANGE, PARSE_NAMED_RANGE
  */
 
-/* Accepts a range of the form [MIN:MAX] or [var=MIN:MAX] */
-/* In the second case it returns the token pointing to var */
+/* Accepts a range of the form [MIN:MAX] or [var=MIN:MAX]
+ * Returns
+ *	 0 = no range spec present
+ *	-1 = range spec with no attached variable name
+ *	>0 = token indexing the attached variable name
+ */
 int
 parse_range(AXIS_INDEX axis)
 {
-    int dummy_token = -1;
-
     if (equals(c_token, "[")) {
+	int dummy_token = -1;
 	c_token++;
 	/* If the range starts with "[var=" return the token of the named variable. */
 	if (isletter(c_token) && equals(c_token + 1, "=")) {
@@ -2014,9 +2017,9 @@ parse_range(AXIS_INDEX axis)
 	if (!equals(c_token, "]"))
 	    int_error(c_token, "']' expected");
 	c_token++;
-    }
-
-    return dummy_token;
+	return dummy_token;
+    } else
+	return 0;
 }
 
 /* Called if an in-line range is encountered while inside a zoom command */

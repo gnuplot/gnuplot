@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.280 2012/11/14 02:08:43 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.281 2012/11/17 17:54:48 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -95,9 +95,6 @@ static int stack_count = 0;                     /* counter for stackheight */
 
 /* function implementations */
 
-/* HBB 20000508: moved cp_alloc() &friends to the main module using them, and
- * made cp_alloc 'static'.
- */
 /*
  * cp_alloc() allocates a curve_points structure that can hold 'num'
  * points.   Initialize all fields to NULL.
@@ -160,8 +157,6 @@ cp_extend(struct curve_points *cp, int num)
  * cp_free() releases any memory which was previously malloc()'d to hold
  *   curve points (and recursively down the linked list).
  */
-/* HBB 20000506: instead of risking stack havoc by recursion, operate
- * iteratively */
 void
 cp_free(struct curve_points *cp)
 {
@@ -193,7 +188,7 @@ cp_free(struct curve_points *cp)
 void
 plotrequest()
 {
-    int dummy_token = -1;
+    int dummy_token = 0;
     int t_axis;
 
     if (!term)                  /* unknown */
@@ -245,7 +240,7 @@ plotrequest()
     }
 
     /* use the default dummy variable unless changed */
-    if (dummy_token >= 0)
+    if (dummy_token > 0)
 	copy_str(c_dummy_var[0], dummy_token, MAX_ID_LEN);
     else
 	(void) strcpy(c_dummy_var[0], set_dummy_var[0]);
@@ -1103,7 +1098,7 @@ store2d_point(
 	evaluate_at(ydata_func.at, &val);
 	y = undefined ? 0.0 : real(&val);
 
-	/* EAM FIXME - filtering ylow and yhigh is nonsense for many plot styles */
+	/* FIXME - filtering ylow and yhigh is nonsense for many plot styles */
 
 	(void) Gcomplex(&ydata_func.dummy_values[0], ylow, 0.0);
 	ydata_func.dummy_values[2] = ydata_func.dummy_values[0];
@@ -1711,14 +1706,11 @@ typedef enum e_uses_axis {
 } t_uses_axis;
 
 /*
- * This parses the plot command after any range specifications. To support
- * autoscaling on the x axis, we want any data files to define the x range,
- * then to plot any functions using that range. We thus parse the input
+ * This parses the plot command after any global range specifications.
+ * To support autoscaling on the x axis, we want any data files to define the
+ * x range, then to plot any functions using that range. We thus parse the input
  * twice, once to pick up the data files, and again to pick up the functions.
  * Definitions are processed twice, but that won't hurt.
- * div - okay, it doesn't hurt, but every time an option as added for
- * datafiles, code to parse it has to be added here. Change so that
- * we store starting-token in the plot structure.
  */
 static void
 eval_plots()
@@ -1855,8 +1847,15 @@ eval_plots()
 #ifdef EAM_OBJECTS
 	    TBOOLEAN set_ellipseaxes_units = FALSE;
 #endif
+	    int sample_range_token;	/* Only used by function plots */
 
 	    plot_num++;
+
+	    /* Check for a sampling range. */
+	    clear_sample_range(FIRST_X_AXIS);
+	    sample_range_token = parse_range(SAMPLE_AXIS);
+	    if (sample_range_token != 0)
+		axis_array[SAMPLE_AXIS].range_flags |= RANGE_SAMPLED;
 
 	    was_definition = FALSE;
 	    dummy_func = &plot_func;
@@ -2694,6 +2693,7 @@ eval_plots()
 	    } else {
 		struct at_type *at_ptr;
 		char *name_str;
+		int sample_range_token;
 		was_definition = FALSE;
 
 		/* Forgive trailing comma on a multi-element plot command */
@@ -2708,6 +2708,10 @@ eval_plots()
 
 		plot_num++;
 
+		/* Check for a sampling range. */
+		/* Only relevant to function plots, and only needed in second pass. */
+		clear_sample_range(x_axis);
+		sample_range_token = parse_range(SAMPLE_AXIS);
 		dummy_func = &plot_func;
 	
 		if (almost_equals(c_token, "newhist$ogram")) {
@@ -2726,8 +2730,13 @@ eval_plots()
 		    plot_func.at = at_ptr;
 
 		    if (!parametric && !polar) {
-			t_min = X_AXIS.min;
-			t_max = X_AXIS.max;
+			if (sample_range_token != 0) {
+			    t_min = axis_array[SAMPLE_AXIS].min;
+			    t_max = axis_array[SAMPLE_AXIS].max;
+			} else {
+			    t_min = X_AXIS.min;
+			    t_max = X_AXIS.max;
+			}
 			axis_unlog_interval(x_axis, &t_min, &t_max, 1);
 			t_step = (t_max - t_min) / (samples_1 - 1);
 		    }
@@ -2786,7 +2795,6 @@ eval_plots()
 				    this_plot->points[i].type = OUTRANGE;
 			    }
 			    if (temp < R_AXIS.min) {
-				/* FIXME: could do this outside the loop */
 				if (R_AXIS.autoscale & AUTOSCALE_MIN)
 				    R_AXIS.min = 0;
 			    }
@@ -2823,9 +2831,15 @@ eval_plots()
 			    	this_plot->points[i].y, y, this_plot->points[i].type, y_axis,
 			        this_plot->noautoscale, NOOP, goto come_here_if_undefined);
 			} else {        /* neither parametric or polar */
-			    /* If non-para, it must be INRANGE */
 			    /* logscale ? log(x) : x */
 			    this_plot->points[i].x = t;
+
+			    /* A sampled function can only be OUTRANGE if it has a private range */
+			    if (sample_range_token != 0) {
+				if (!inrange(t, axis_array[this_plot->x_axis].min,
+						axis_array[this_plot->x_axis].max))
+				    this_plot->points[i].type = OUTRANGE;
+			    }
 
 			    /* For boxes [only] check use of boxwidth */
 			    if ((this_plot->plot_style == BOXES)
@@ -2841,11 +2855,13 @@ eval_plots()
 				    xlow = x - boxwidth/2;
 				    xhigh = x + boxwidth/2;
 				}
-				STORE_WITH_LOG_AND_UPDATE_RANGE( this_plot->points[i].xlow, xlow, dmy_type, x_axis,
-								    this_plot->noautoscale, NOOP, NOOP );
+				STORE_WITH_LOG_AND_UPDATE_RANGE( this_plot->points[i].xlow,
+					xlow, dmy_type, x_axis,
+					this_plot->noautoscale, NOOP, NOOP );
 				dmy_type = INRANGE;
-				STORE_WITH_LOG_AND_UPDATE_RANGE( this_plot->points[i].xhigh, xhigh, dmy_type, x_axis,
-								    this_plot->noautoscale, NOOP, NOOP );
+				STORE_WITH_LOG_AND_UPDATE_RANGE( this_plot->points[i].xhigh, 
+					xhigh, dmy_type, x_axis,
+					this_plot->noautoscale, NOOP, NOOP );
 			    }
 			    /* Fill in additional fields needed to draw a circle */
 #ifdef EAM_OBJECTS
@@ -2859,8 +2875,9 @@ eval_plots()
 			    }
 #endif	
 
-			    STORE_WITH_LOG_AND_UPDATE_RANGE(this_plot->points[i].y, temp, this_plot->points[i].type, in_parametric ? x_axis : y_axis,
-			    				    this_plot->noautoscale, NOOP, goto come_here_if_undefined);
+			    STORE_WITH_LOG_AND_UPDATE_RANGE(this_plot->points[i].y, temp, 
+			    	this_plot->points[i].type, in_parametric ? x_axis : y_axis,
+			    	this_plot->noautoscale, NOOP, goto come_here_if_undefined);
 
 			    /* could not use a continue in this case */
 			  come_here_if_undefined:
