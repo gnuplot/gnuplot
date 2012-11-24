@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: svg.trm,v 1.144 2012/11/15 05:20:17 sfeam Exp $
+ * $Id: svg.trm,v 1.145 2012/11/16 03:47:30 sfeam Exp $
  */
 
 /*------------------------------------------------------------------------------------------------------------------------------------
@@ -147,6 +147,7 @@ static unsigned int SVG_yLast = UINT_MAX;	/* current pen vertical position*/
 static int SVG_LineType = LT_NODRAW;	/* current line type*/
 static double SVG_LineWidth = 1.0; /* current line width*/
 static double SVG_linewidth_factor = 1.0; /* Multiplier for linewidths */
+static double SVG_dashlength = 1.0; /* Multiplier for dash patterns */
 static TBOOLEAN SVG_rounded = FALSE; /* linejoin and linecap */
 static int SVG_TextAngle = 0;	/* current text orientation*/
 static enum JUSTIFY SVG_TextJust = LEFT; /* current text justification*/
@@ -207,9 +208,16 @@ static TBOOLEAN ENHsvg_preserve_spaces = FALSE;
 /* Support for dashed lines */
 #define SVG_dashtypes 5
 static TBOOLEAN SVG_dashed = FALSE;
-static char *SVG_dashpattern[SVG_dashtypes] = {
+static char *SVG_defaultdashpattern[SVG_dashtypes] = {
     "", " 5,8", " 2,4", " 8,4,2,4", " 9,4,1,4,1,4"
-    };
+};
+static int SVG_dashpattern[SVG_dashtypes][7] = {
+	{ 0,0,0,0,0,0,0},
+	{5,8, 0,0,0,0,0},
+	{2,4, 0,0,0,0,0},
+	{8,4,2,4, 0,0,0},
+	{9,4,1,4,1,4, 0}
+};
 
 /* Support for embedded hypertext */
 static char *SVG_hypertext_text = NULL;
@@ -280,6 +288,8 @@ SVG_GroupClose ()
 static void
 SVG_PathOpen ()
 {
+    int d;
+
     if (!SVG_pathIsOpen) {
 	SVG_GroupFilledClose();
 	    
@@ -291,15 +301,28 @@ SVG_PathOpen ()
 		    SVG_red, SVG_green, SVG_blue);
 	else if (SVG_color_mode == TC_LT)
 	    fprintf(gpoutfile, "stroke='%s' ", SVG_linecolor);
+
+	/* Sort out what dash pattern to use, if any */
+	d = SVG_LineType % SVG_dashtypes;
+
+	/* Axis is always dotted */
+	if (SVG_LineType == -1)
+	    fprintf(gpoutfile, "stroke-dasharray='2,4' ");
 	
-	/* Dash patterns */
-	if (SVG_dashed && SVG_LineType % SVG_dashtypes > 0)
-	    fprintf(gpoutfile, "stroke-dasharray='%s' ",
-		    SVG_dashpattern[SVG_LineType % SVG_dashtypes]);
-	/* Axis is dotted */
-	else if (SVG_LineType == -1)
-	    fprintf(gpoutfile, "stroke-dasharray='%s' ",
-		    SVG_dashpattern[2]);
+	/* Default dash length and sequence */
+	else if (SVG_dashed && d > 0 && SVG_dashlength == 1.0)
+	    fprintf(gpoutfile, "stroke-dasharray='%s' ", SVG_defaultdashpattern[d]);
+
+	/* Dash patterns scaled up by dashlength */
+	else if (SVG_dashed && d > 0) {
+	    int j = 0;
+	    fprintf(gpoutfile, "stroke-dasharray='");
+	    do {
+		fprintf(gpoutfile, "%.1f", SVG_dashpattern[d][j] * SVG_dashlength);
+		j++;
+		fprintf(gpoutfile, "%s", SVG_dashpattern[d][j] ? "," : "' ");
+	    }	while (SVG_dashpattern[d][j] > 0);
+	}
 
 	/* RGBA */
 	if (SVG_alpha != 0.0)
@@ -489,7 +512,7 @@ SVG_options ()
 {
     /* Annoying hack to handle the case of 'set termoption' after */
     /* we have already initialized the terminal settings.         */
-    if (c_token != 2)
+    if (!almost_equals(c_token-1, "termopt$ion"))
 	SVG_local_reset();
 
     while (!END_OF_COMMAND) {
@@ -646,6 +669,14 @@ SVG_options ()
 	    continue;
 	}
 									
+	if (almost_equals(c_token, "dashl$ength") || equals(c_token, "dl")) {
+	    c_token++;
+	    SVG_dashlength = real_expression();
+	    if (SVG_dashlength < 0.5)
+		SVG_dashlength = 1.0;
+	    continue;
+	}
+									
 	if (almost_equals (c_token, "round$ed")) {
 	    c_token++;
 	    SVG_rounded = TRUE;
@@ -712,8 +743,11 @@ SVG_options ()
     sprintf(term_options + strlen(term_options),
 	SVG_rounded ? "rounded " : "butt ");
 
-    sprintf(term_options + strlen(term_options),
-	SVG_dashed ? "dashed " : "solid ");
+    if (SVG_dashed)
+	sprintf(term_options + strlen(term_options),
+		"dashed dashlength %.1f ", SVG_dashlength);
+    else
+	sprintf(term_options + strlen(term_options), "solid ");
 
     if (SVG_linewidth_factor != 1.0) {
 	sprintf(term_options + strlen(term_options),

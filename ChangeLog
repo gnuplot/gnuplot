@@ -7,6 +7,8 @@
 	a data set and three separate functions covering parts of the range:
 	    plot DATA, [10:20] f(x), [25:35] g(x), [40:*] '+' using 1:(h($1))
 
+	* term/svg.trm:  Support for dashlength
+
 2012-11-23  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/datafile.c src/parse.c:  Internal implementation of a pseudocolumn
