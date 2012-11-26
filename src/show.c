@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.275 2012/10/13 18:29:16 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.276 2012/11/04 00:18:04 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -1037,17 +1037,9 @@ show_version(FILE *fp)
 
     /* show version long */
     if (almost_equals(c_token, "l$ong")) {
-	char *helpfile = NULL;
 
 	c_token++;
 	fprintf(stderr, "Compile options:\n%s\n", compile_options);
-
-#ifndef WIN32
-	if ((helpfile = getenv("GNUHELP")) == NULL)
-	    helpfile = HELPFILE;
-#else
-	helpfile = winhelpname;
-#endif
 
 #ifdef X11
 	{
@@ -1059,13 +1051,28 @@ show_version(FILE *fp)
 	}
 #endif
 
-#ifdef GNUPLOT_PS_DIR
 	{
-	    fprintf(stderr, "GNUPLOT_PS_DIR     = \"%s\"\n", GNUPLOT_PS_DIR);
-	}
-#endif
+	    char *psdir = getenv("GNUPLOT_PS_DIR");
 
+#ifdef GNUPLOT_PS_DIR
+	    if (psdir == NULL)
+		psdir = GNUPLOT_PS_DIR;
+#endif
+	    if (psdir != NULL)
+		fprintf(stderr, "GNUPLOT_PS_DIR     = \"%s\"\n", psdir);
+	}
+
+	{
+	    char *helpfile = NULL;
+
+#ifndef WIN32
+	    if ((helpfile = getenv("GNUHELP")) == NULL)
+		helpfile = HELPFILE;
+#else
+	    helpfile = winhelpname;
+#endif
 	fprintf(stderr, "HELPFILE           = \"%s\"\n", helpfile);
+	}
 
 #if defined(WIN32) && !defined(WGP_CONSOLE)
 	fprintf(stderr, "MENUNAME           = \"%s\"\n", szMenuName);

@@ -1,3 +1,10 @@
+2012-11-26  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/show.c (show_version): If the environment variable GNUPLOT_PS_DIR
+	was set, show its value instead of the compile time setting.
+
+	* src/fit.c: Test for error scaling when printing results.
+
 2012-11-24  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/axis.c src/axis.h src/datafile.c src/plot2d.c src/plot3d.c
