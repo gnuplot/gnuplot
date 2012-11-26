@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.244 2012/10/30 04:11:13 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.245 2012/10/30 04:20:21 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -147,7 +147,7 @@ enum set_encoding_id encoding;
 /* table of encoding names, for output of the setting */
 const char *encoding_names[] = {
     "default", "iso_8859_1", "iso_8859_2", "iso_8859_9", "iso_8859_15",
-    "cp437", "cp850", "cp852", "cp950", "cp1250", "cp1251", "cp1254", 
+    "cp437", "cp850", "cp852", "cp950", "cp1250", "cp1251", "cp1254",
     "koi8r", "koi8u", "sjis", "utf8", NULL };
 /* 'set encoding' options */
 const struct gen_table set_encoding_tbl[] =
@@ -171,7 +171,7 @@ const struct gen_table set_encoding_tbl[] =
     { NULL, S_ENC_INVALID }
 };
 
-const char *arrow_head_names[4] = 
+const char *arrow_head_names[4] =
     {"nohead", "head", "backhead", "heads"};
 
 enum { IPC_BACK_UNUSABLE = -2, IPC_BACK_CLOSED = -1 };
@@ -589,7 +589,7 @@ term_end_plot()
 
     /* Sync point for epslatex text positioning */
     (*term->layer)(TERM_LAYER_END_TEXT);
-    
+
     if (!multiplot) {
 	FPRINTF((stderr, "- calling term->text()\n"));
 	(*term->text) ();
@@ -692,7 +692,7 @@ term_start_multiplot()
 	    if (END_OF_COMMAND) {
 		int_error(c_token,"expecting '<num_cols>,<num_rows>'");
 	    }
-	    
+
 	    /* read row,col */
 	    mp_layout.num_rows = int_expression();
 	    if (END_OF_COMMAND || !equals(c_token,",") )
@@ -702,13 +702,13 @@ term_start_multiplot()
 	    if (END_OF_COMMAND)
 		int_error(c_token, "expecting <num_cols>");
 	    mp_layout.num_cols = int_expression();
-	
+
 	    /* remember current values of the plot size */
 	    mp_layout.prev_xsize = xsize;
 	    mp_layout.prev_ysize = ysize;
 	    mp_layout.prev_xoffset = xoffset;
 	    mp_layout.prev_yoffset = yoffset;
-	
+
 	    mp_layout.act_row = 0;
 	    mp_layout.act_col = 0;
 
@@ -805,7 +805,7 @@ term_start_multiplot()
     } else {
 	mp_layout.title_height = 0.0;
     }
-    
+
     mp_layout_size_and_offset();
 
 #ifdef USE_MOUSE
@@ -1014,15 +1014,19 @@ write_multiline(
 	    if (on_page(x, y))
 		(*t->put_text) (x, y, text);
 	} else {
-	    int fix = hor * t->h_char * estimate_strlen(text) / 2;
-	    if (angle) {
-		if (on_page(x, y - fix))
-		    (*t->put_text) (x, y - fix, text);
+	    int len = estimate_strlen(text);
+	    int hfix, vfix;
+
+	    if (angle == 0) {
+		hfix = hor * t->h_char * len / 2;
+		vfix = 0;
+	    } else {
+		/* Attention: This relies on the numeric values of enum JUSTIFY! */
+		hfix = hor * t->h_char * len * cos(angle * DEG2RAD) / 2 + 0.5;
+		vfix = hor * t->v_char * len * sin(angle * DEG2RAD) / 2 + 0.5;
 	    }
-	    else {
-		if (on_page(x - fix, y))
-		    (*t->put_text) (x - fix, y, text);
-	    }
+		if (on_page(x - hfix, y - vfix))
+		    (*t->put_text) (x - hfix, y - vfix, text);
 	}
 	if (angle == 90 || angle == TEXT_VERTICAL)
 	    x += t->v_char;
@@ -1290,7 +1294,7 @@ do_arrow(
 	}
 
 	/* backward arrow head */
-	if ((head & BACKHEAD) && !clip_point(sx,sy)) { 
+	if ((head & BACKHEAD) && !clip_point(sx,sy)) {
 	    if (curr_arrow_headfilled==2) {
 		/* draw filled backward arrow head */
 		filledhead[0].x = sx - xm;
@@ -1337,7 +1341,7 @@ do_arrow(
 
     /* Restore previous clipping box */
     clip_area = clip_save;
-	
+
 }
 
 #ifdef EAM_OBJECTS
@@ -1347,7 +1351,7 @@ do_arrow(
 /* a private implemenation or use this generic one.               */
 
 void
-do_arc( 
+do_arc(
     unsigned int cx, unsigned int cy, /* Center */
     double radius, /* Radius */
     double arc_start, double arc_end, /* Limits of arc in degress */
@@ -1385,7 +1389,7 @@ do_arc(
     vertex[segments].x = cx + cos(DEG2RAD * arc_end) * radius;
     vertex[segments].y = cy + sin(DEG2RAD * arc_end) * radius * aspect;
 
-    if (fabs(arc_end - arc_start) > .1 
+    if (fabs(arc_end - arc_start) > .1
     &&  fabs(arc_end - arc_start) < 359.9) {
 	vertex[++segments].x = cx;
 	vertex[segments].y = cy;
@@ -1409,7 +1413,7 @@ do_arc(
 	    for (i=segments-1; i>=0; i--) {
 		fillarea[in+1] = vertex[i];
 		fillarea[in].x = cx; fillarea[in].y = cy;
-		if (0 > clip_line(&fillarea[in+1].x, &fillarea[in+1].y, 
+		if (0 > clip_line(&fillarea[in+1].x, &fillarea[in+1].y,
 				  &fillarea[in].x, &fillarea[in].y))
 		    in++;
 	    }
@@ -2437,7 +2441,7 @@ enhanced_recursion(
 	/*
 	 * EAM Jun 2009 - treating bytes one at a time does not work for multibyte
 	 * encodings, including utf-8. If we hit a byte with the high bit set, test
-	 * whether it starts a legal UTF-8 sequence and if so copy the whole thing.  
+	 * whether it starts a legal UTF-8 sequence and if so copy the whole thing.
 	 * Other multibyte encodings are still a problem.
 	 * Gnuplot's other defined encodings are all single-byte; for those we
 	 * really do want to treat one byte at a time.
@@ -2811,7 +2815,7 @@ on_page(int x, int y)
     return FALSE;
 }
 
-/* Utility routine for drivers to accept an explicit size for the 
+/* Utility routine for drivers to accept an explicit size for the
  * output image.
  */
 size_units
@@ -2994,10 +2998,10 @@ recycle:
 
 /*
  * Totally bogus estimate of TeX string lengths.
- * Basically 
+ * Basically
  * - don't count anything inside square braces
  * - count regexp \[a-zA-z]* as a single character
- * - ignore characters {}$^_ 
+ * - ignore characters {}$^_
  */
 int
 strlen_tex(const char *str)
