@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: fit.c,v 1.83 2012/11/12 03:48:30 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: fit.c,v 1.84 2012/11/24 21:54:29 sfeam Exp $"); }
 #endif
 
 /*  NOTICE: Change of Copyright Status
@@ -695,7 +695,7 @@ regress(double a[])
 	for (i = 0; i < num_params; i++)
 	    setvarerr(par_name[i], 0.0);
 
-    if (num_data == num_params) {
+    if ((num_data == num_params) && ((columns < 3) || fit_errorscaling)) {
 	int k;
 
 	Dblf("\nExactly as many data points as there are parameters.\n");
@@ -704,7 +704,7 @@ regress(double a[])
 	Dblf("======================= \n\n");
 	for (k = 0; k < num_params; k++)
 	    Dblf3("%-15.15s = %-15g\n", par_name[k], a[k]);
-    } else if (chisq < NEARLY_ZERO) {
+    } else if ((chisq < NEARLY_ZERO) && ((columns < 3) || fit_errorscaling)) {
 	int k;
 
 	Dblf("\nHmmmm.... Sum of squared residuals is zero. Can't compute errors.\n\n");
