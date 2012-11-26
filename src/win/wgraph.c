@@ -1,5 +1,5 @@
 /*
- * $Id: wgraph.c,v 1.155 2012/10/08 09:24:59 markisch Exp $
+ * $Id: wgraph.c,v 1.156 2012/10/08 22:30:53 markisch Exp $
  */
 
 /* GNUPLOT - win/wgraph.c */
@@ -598,9 +598,7 @@ GraphClose(LPGW lpgw)
 	/* close window */
 	if (lpgw->hWndGraph)
 		DestroyWindow(lpgw->hWndGraph);
-#ifndef WGP_CONSOLE
-	TextMessage();
-#endif
+	WinMessageLoop();
 	lpgw->hWndGraph = NULL;
 
 	lpgw->locked = TRUE;

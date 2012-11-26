@@ -1,5 +1,5 @@
 /*
- * $Id: wtext.c,v 1.38 2012/06/30 06:41:33 markisch Exp $
+ * $Id: wtext.c,v 1.39 2012/10/08 22:30:53 markisch Exp $
  */
 
 /* GNUPLOT - win/wtext.c */
@@ -137,15 +137,7 @@ static const COLORREF TextColorTable[16] = {
 void WDPROC
 TextMessage()
 {
-    MSG msg;
-    while (PeekMessage(&msg, 0, 0, 0, PM_REMOVE)) {
-#if 1 /* HBB 19990505: Petzold says we should check this: */
-        if (msg.message == WM_QUIT)
-            return;
-#endif
-        TranslateMessage(&msg);
-        DispatchMessage(&msg);
-    }
+	WinMessageLoop();
 }
 
 

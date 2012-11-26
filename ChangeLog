@@ -1,5 +1,9 @@
 2012-11-26  Bastian Maerkisch  <bmaerkisch@web.de>
 
+	* src/win/wgraph.c src/win/winmain.c|h (WinMessageLoop) src/win/wtext.c:
+	Move Windows message handling from TextMessage() to new WinMessageLoop()
+	and make it accessible in Windows console mode.
+
 	* src/command.c (pause_command): In Windows console mode, handle case
 	when current terminal does not have a waitforinput method. Bug fix.
 

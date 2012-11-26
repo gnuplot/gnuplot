@@ -1,5 +1,5 @@
 /*
- * $Id: winmain.c,v 1.57 2012/10/08 15:53:57 markisch Exp $
+ * $Id: winmain.c,v 1.58 2012/10/08 22:30:53 markisch Exp $
  */
 
 /* GNUPLOT - win/winmain.c */
@@ -1110,3 +1110,18 @@ WinPersistTextClose(void)
 		PostMessage(textwin.hWndParent, WM_CLOSE, 0, 0);
 }
 #endif
+
+
+void
+WinMessageLoop(void)
+{
+	MSG msg;
+
+	while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
+		/* HBB 19990505: Petzold says we should check this: */
+		if (msg.message == WM_QUIT)
+			return;
+		TranslateMessage(&msg);
+		DispatchMessage(&msg);
+	}
+}
