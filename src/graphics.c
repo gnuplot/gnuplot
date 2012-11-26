@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.405 2012/09/25 03:52:01 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.406 2012/11/18 21:20:37 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -5866,7 +5866,7 @@ do_key_sample(
     clip_area = clip_save;
 }
 
-/* 
+/*
  * Label the curve by placing its title at one end of the curve.
  * This option is independent of the plot key, but uses the same
  * color/font/text options controlled by "set key".
@@ -6006,11 +6006,13 @@ do_rectangle( int dimensions, t_object *this_object, int style )
 		(*term->fillbox) (style, x, y, w, h);
 
 	if (need_fill_border(fillstyle)) {
+	    newpath();
 	    (*term->move)   (x, y);
 	    (*term->vector) (x, y+h);
 	    (*term->vector) (x+w, y+h);
 	    (*term->vector) (x+w, y);
 	    (*term->vector) (x, y);
+	    closepath();
 	}
 
     return;
