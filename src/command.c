@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.245 2012/10/30 19:12:27 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.246 2012/11/12 23:47:23 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -340,7 +340,7 @@ do_line()
     /* Expand any string variables in the current input line.
      * Allow up to 3 levels of recursion */
     if (expand_macros)
-    if (string_expand_macros() && string_expand_macros() 
+    if (string_expand_macros() && string_expand_macros()
     &&  string_expand_macros() && string_expand_macros())
 	int_error(NO_CARET, "Too many levels of nested macros");
 #endif
@@ -377,7 +377,7 @@ do_line()
     if_depth = 0;
     num_tokens = scanner(&gp_input_line, &gp_input_line_len);
 
-    /* 
+    /*
      * Expand line if necessary to contain a complete bracketed clause {...}
      * Insert a ';' after current line and append the next input line.
      * NB: This may leave an "else" condition on the next line.
@@ -390,7 +390,7 @@ do_line()
 	     * then we want to display a "more>" prompt to get the rest of the block.
 	     * However, there are two more cases that must be dealt here:
 	     * One is when commands are piped to gnuplot - on the command line,
-	     * the other is when commands are piped to gnuplot which is opened 
+	     * the other is when commands are piped to gnuplot which is opened
 	     * as a slave process. The test for noinputfiles is for the latter case.
 	     * If we didn't have that test here, unterminated blocks sent via a pipe
 	     * would trigger the error message in the else branch below. */
@@ -405,7 +405,7 @@ do_line()
 	}
 	else {
 	    /* Non-interactive mode here means that we got a string from -e.
-	     * Having curly_brace_count > 0 means that there are at least one 
+	     * Having curly_brace_count > 0 means that there are at least one
 	     * unterminated blocks in the string.
 	     * Likely user error, so we die with an error message. */
 	    int_error(NO_CARET, "Syntax error: missing block terminator }");
@@ -440,7 +440,7 @@ do_string(const char *s)
     char *cmdline = gp_strdup(s);
     do_string_and_free(cmdline);
 }
- 
+
 void
 do_string_and_free(char *cmdline)
 {
@@ -589,7 +589,7 @@ undefine_command()
         /* copy next var name into key */
         copy_str(key, c_token, MAX_ID_LEN);
 
-	/* Peek ahead - must do this, because a '*' is returned as a 
+	/* Peek ahead - must do this, because a '*' is returned as a
 	   separate token, not as part of the 'key' */
 	wildcard = equals(c_token+1,"*");
 	if (wildcard)
@@ -1429,16 +1429,16 @@ pause_command()
 	if (!strcmp(term->name, "wxt")) {
 	    /* copy of the code below:  !(_Windows || OS2 || _Macintosh) */
 	    if (term && term->waitforinput && paused_for_mouse){
-		fprintf(stderr,"%s\n", buf);
+		fprintf(stderr, "%s\n", buf);
 		term->waitforinput();
 	    } else {
 #  if defined(WGP_CONSOLE)
-		fprintf(stderr,"%s\n", buf);
+		fprintf(stderr, "%s\n", buf);
 		if (term && term->waitforinput)
-		  while (term->waitforinput() != (int)'\r') {}; /* waiting for Enter*/
+		    while (term->waitforinput() != (int)'\r') {}; /* waiting for Enter*/
 #  else /* !WGP_CONSOLE */
-		if (!Pause(buf)) 
-		bail_to_command_line();
+		if (!Pause(buf))
+		    bail_to_command_line();
 #  endif
 	    }
 	} else
@@ -1446,25 +1446,26 @@ pause_command()
 	{
 	    if (paused_for_mouse && !GraphHasWindow(graphwin)) {
 		if (interactive) { /* cannot wait for Enter in a non-interactive session without the graph window */
-		    if (buf) fprintf(stderr,"%s\n", buf);
+		    if (buf) fprintf(stderr, "%s\n", buf);
 		    EAT_INPUT_WITH(fgetc(stdin));
 		}
 	    } else { /* pausing via graphical windows */
-		int tmp = paused_for_mouse;
-		if (buf && paused_for_mouse) fprintf(stderr,"%s\n", buf);
-		if (!tmp) {
+		if (!paused_for_mouse) {
 #  if defined(WGP_CONSOLE)
-		    fprintf(stderr,"%s\n", buf);
-			if (term && term->waitforinput)
-		      while (term->waitforinput() != (int)'\r') {}; /* waiting for Enter*/
+		    if (buf) fprintf(stderr,"%s\n", buf);
+		    if (term && term->waitforinput) {
+			while (term->waitforinput() != (int)'\r') {}; /* waiting for Enter*/
+		    } else {
+			EAT_INPUT_WITH(fgetc(stdin));
+		    }
 #  else
-		    if (!Pause(buf)) 
-		       bail_to_command_line();
+		    if (!Pause(buf))
+			bail_to_command_line();
 #  endif
 		} else {
-		    if (!Pause(buf)) 
-		      if (!GraphHasWindow(graphwin)) 
-		        bail_to_command_line();
+		    if (buf) fprintf(stderr,"%s\n", buf);
+		    if (!Pause(buf) && !GraphHasWindow(graphwin))
+			bail_to_command_line();
 		}
 	    }
 	}
@@ -1994,7 +1995,7 @@ title 'R,G,B profiles of the current color palette';";
     fputs("e\n", f);
     fputs(post, f);
 
-    /* save current gnuplot 'set' status because of the tricky sets 
+    /* save current gnuplot 'set' status because of the tricky sets
      * for our temporary testing plot.
      */
     save_set(f);
@@ -2260,7 +2261,7 @@ splot_map_activate()
 }
 
 
-/* This routine is called at the end of 3D plot evaluation to undo the 
+/* This routine is called at the end of 3D plot evaluation to undo the
  * changes needed for 'set view map'.
  */
 void
@@ -2459,10 +2460,10 @@ help_command()
         capture(buf, start, c_token - 1, 128);
         link.cbStruct =     sizeof(HH_AKLINK) ;
         link.fReserved =    FALSE;
-        link.pszKeywords =  buf; 
-        link.pszUrl =       NULL; 
-        link.pszMsgText =   NULL; 
-        link.pszMsgTitle =  NULL; 
+        link.pszKeywords =  buf;
+        link.pszUrl =       NULL;
+        link.pszMsgText =   NULL;
+        link.pszMsgTitle =  NULL;
         link.pszWindow =    NULL;
         link.fIndexOnFail = TRUE;
         HtmlHelp(parent, winhelpname, HH_KEYWORD_LOOKUP, (DWORD_PTR)&link);
@@ -2722,9 +2723,9 @@ rlgets(char *s, size_t n, const char *prompt)
 	    }
 	    add_history(line);
 #  elif defined(HAVE_LIBEDITLINE)
-	    /* deleting history entries does not work, so suppress adjacent 
+	    /* deleting history entries does not work, so suppress adjacent
 	    duplicates only */
-      
+
 	    int found;
 	    using_history();
 
@@ -3078,11 +3079,11 @@ string_expand_macros()
 		    COPY_CHAR;
 		break;
 
-	case '"':	
+	case '"':
                 if (!after_backslash)
 		    in_dquote = !in_dquote;
 		COPY_CHAR; break;
-	case '\'':	
+	case '\'':
 		in_squote = !in_squote;
 		COPY_CHAR; break;
         case '\\':
@@ -3092,7 +3093,7 @@ string_expand_macros()
 	case '#':
 		if (!in_squote && !in_dquote)
 		    in_comment = TRUE;
-	default :	
+	default :
 	        COPY_CHAR; break;
 	}
     }

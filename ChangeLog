@@ -1,5 +1,13 @@
 2012-11-26  Bastian Maerkisch  <bmaerkisch@web.de>
 
+	* src/command.c (pause_command): In Windows console mode, handle case
+	when current terminal does not have a waitforinput method. Bug fix.
+
+	* src/term.c (write_multiline): Fix alignment of right- or center-
+	justified text for terminals which do not have a justify method.
+
+	* src/graphics.c (do_rectangle): Add newpath/closepath calls.
+
 	* src/show.c (show_version): If the environment variable GNUPLOT_PS_DIR
 	was set, show its value instead of the compile time setting.
 
