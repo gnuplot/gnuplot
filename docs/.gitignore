@@ -1,4 +1,5 @@
 Makefile
+Makefile.in
 allterm.h
 checkdoc
 doc2gih

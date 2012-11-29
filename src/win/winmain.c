@@ -1,5 +1,5 @@
 /*
- * $Id: winmain.c,v 1.58 2012/10/08 22:30:53 markisch Exp $
+ * $Id: winmain.c,v 1.59 2012/11/26 08:18:23 markisch Exp $
  */
 
 /* GNUPLOT - win/winmain.c */
@@ -421,7 +421,7 @@ int main(int argc, char **argv)
 # define _argc argc
         HINSTANCE hInstance = GetModuleHandle(NULL), hPrevInstance = NULL;
 #else
-#if defined(__MSC__) || defined(__WATCOMC__)
+#if defined(__MSC__) || defined(__WATCOMC__) || defined(__MINGW32__)
 #  define _argv __argv
 #  define _argc __argc
 #endif

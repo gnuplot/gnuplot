@@ -1,5 +1,13 @@
 2012-11-29  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
+	* config/watcom/.cvsignore: Ignore gnerated file.
+
+	* docs/psdoc/.cvsignore: Ignore generated files.
+
+	* docs/.cvsignore: Ignore Makefile.in, now that it is a generated file.
+
+	* src/qtterminal/.cvsignore: Ignore Makefile.in, since it is a generated file.
+
 	* term/x11.trm (X11_options): Calls to strncat were risking buffer
 	overflow by not accounting for the terminating '\0'.  Replace some
 	buffer size macros by actual size of buffer.
@@ -9,6 +17,8 @@
 	* term/cairo.trm (cairotrm_options): Dito.
 
 	* src/win/pgnuplot.c (main): Dito.
+
+	* src/wxterminal/gp_cairo.c (gp_cairo_add_shape, gp_cairo_enhanced_flush): Dito.
 
 	* term/context.trm (CONTEXT_options): Dito.  And let break
 	statements have their own lines instead of hiding them at the end
