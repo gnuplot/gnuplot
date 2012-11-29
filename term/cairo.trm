@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: cairo.trm,v 1.55 2012/05/08 04:18:56 sfeam Exp $
+ * $Id: cairo.trm,v 1.56 2012/05/21 23:15:18 sfeam Exp $
  */
 
 /* GNUPLOT - cairo.trm */
@@ -523,7 +523,7 @@ TERM_PUBLIC void cairotrm_options()
 	/* Save options back into options string in normalized format */
 	if (cairo_params->transparent)
 		strncat(term_options, ISCAIROLATEX ? " nobackground" : " transparent", 
-			sizeof(term_options) - strlen(term_options));
+			sizeof(term_options) - strlen(term_options)-1);
 	else {
 		sprintf(tmp_term_options, " background \"#%02x%02x%02x\"", 
 			(int)(255 * cairo_params->background.r), 
@@ -533,28 +533,28 @@ TERM_PUBLIC void cairotrm_options()
 	}
 
 	if (cairo_params->crop)
-		strncat(term_options, " crop", sizeof(term_options)-strlen(term_options));
+		strncat(term_options, " crop", sizeof(term_options)-strlen(term_options)-1);
 
 	if (set_enhanced)
-		strncat(term_options, " enhanced", sizeof(term_options)-strlen(term_options));
+		strncat(term_options, " enhanced", sizeof(term_options)-strlen(term_options)-1);
 
 	if (set_font) {
 		snprintf(tmp_term_options, sizeof(tmp_term_options), " font \"%s\"", font_setting);
 		free(font_setting);
-		strncat(term_options, tmp_term_options, sizeof(term_options)-strlen(term_options));
+		strncat(term_options, tmp_term_options, sizeof(term_options)-strlen(term_options)-1);
 	}
 
 	/* if (set_fontscale) */
 	{
 		snprintf(tmp_term_options, sizeof(tmp_term_options), " fontscale %.1f", cairo_params->fontscale);
-		strncat(term_options, tmp_term_options, sizeof(term_options)-strlen(term_options));
+		strncat(term_options, tmp_term_options, sizeof(term_options)-strlen(term_options)-1);
 	}
 
 	if (cairo_params->mono)
-		strncat(term_options, " monochrome", sizeof(term_options)-strlen(term_options));
+		strncat(term_options, " monochrome", sizeof(term_options)-strlen(term_options)-1);
 
 	if (cairo_params->dashed)
-		strncat(term_options, " dashed", sizeof(term_options)-strlen(term_options));
+		strncat(term_options, " dashed", sizeof(term_options)-strlen(term_options)-1);
 
 	if (1 || set_size) {
 		if (cairo_params->explicit_units == CM)
@@ -572,22 +572,22 @@ TERM_PUBLIC void cairotrm_options()
 				sizeof(tmp_term_options),
 				" size %.2fin, %.2fin ",
 				cairo_params->width/72., cairo_params->height/72.);
-		strncat(term_options, tmp_term_options, sizeof(term_options)-strlen(term_options));
+		strncat(term_options, tmp_term_options, sizeof(term_options)-strlen(term_options)-1);
 	}
 
 	if (set_capjoin) {
 		strncat(term_options, cairo_params->rounded ? " rounded" : " butt",
-			sizeof(term_options)-strlen(term_options));
+			sizeof(term_options)-strlen(term_options)-1);
 	}
 
 	if (cairo_params->lw != cairo_params_default->lw) {
 		snprintf(tmp_term_options,sizeof(tmp_term_options), " linewidth %g", cairo_params->lw);
-		strncat(term_options, tmp_term_options, sizeof(term_options)-strlen(term_options));
+		strncat(term_options, tmp_term_options, sizeof(term_options)-strlen(term_options)-1);
 	}
 
 	if (cairo_params->dash_length != cairo_params_default->dash_length) {
 		snprintf(tmp_term_options,sizeof(tmp_term_options), " dashlength %g", cairo_params->dash_length);
-		strncat(term_options, tmp_term_options, sizeof(term_options)-strlen(term_options));
+		strncat(term_options, tmp_term_options, sizeof(term_options)-strlen(term_options)-1);
 	}
 
 	/* sync settings with ps_params for latex terminal */

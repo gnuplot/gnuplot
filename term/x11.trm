@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: x11.trm,v 1.199 2012/10/19 15:23:13 sfeam Exp $
+ * $Id: x11.trm,v 1.200 2012/10/23 02:53:36 sfeam Exp $
  *
  */
 
@@ -709,11 +709,11 @@ X11_options()
 	char *title;
 	int save_token = c_token;
 	c_token = c_title_token;
-	strncat(term_options, " title \"", MAX_LINE_LEN-strlen(term_options));
+	strncat(term_options, " title \"", sizeof(term_options)-strlen(term_options)-1);
 	title = term_options + strlen(term_options);
 	if (isstringvalue(c_title_token)) {
 	    char *s = try_to_get_string();
-	    strncat(term_options, s, MAX_LINE_LEN-strlen(term_options));
+	    strncat(term_options, s, sizeof(term_options)-strlen(term_options)-1);
 	    free(s);
 	} else
 	    copy_str(term_options+strlen(term_options), c_title_token, MAX_LINE_LEN-strlen(term_options));
@@ -729,7 +729,7 @@ X11_options()
 	    fputc('\n', X11_ipc);
 	    fflush(X11_ipc);
 	}
-	strncat(term_options, "\"", MAX_LINE_LEN-strlen(term_options));
+	strncat(term_options, "\"", sizeof(term_options)-strlen(term_options)-1);
 	c_token = save_token;
     }
     if (set_size != UNSET)

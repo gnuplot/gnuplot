@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.150 2012/08/03 05:22:53 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.151 2012/11/10 18:18:02 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -693,7 +693,7 @@ get_style()
 
     c_token++;
 
-    if (ps == -1)
+    if (ps == PLOT_STYLE_NONE)
 	int_error(c_token, "unrecognized plot type");
 
     return ps;

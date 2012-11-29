@@ -1,5 +1,5 @@
 /*
- * $Id: axis.h,v 1.79 2012/11/12 03:48:30 sfeam Exp $
+ * $Id: axis.h,v 1.80 2012/11/24 21:54:29 sfeam Exp $
  *
  */
 
@@ -56,20 +56,20 @@
  * FIRST_X_AXIS & SECOND_AXES == 0
  */
 typedef enum AXIS_INDEX {
-#define FIRST_AXES 0
     FIRST_Z_AXIS,
+#define FIRST_AXES FIRST_Z_AXIS
     FIRST_Y_AXIS,
     FIRST_X_AXIS,
     COLOR_AXIS,			/* fill gap */
-#define SECOND_AXES 4
     SECOND_Z_AXIS,		/* not used, yet */
+#define SECOND_AXES SECOND_Z_AXIS
     SECOND_Y_AXIS,
     SECOND_X_AXIS,
     POLAR_AXIS,
     T_AXIS,
-    U_AXIS,			/* never used? */
-    V_AXIS			/* ditto */
-#define NO_AXIS 99
+    U_AXIS,
+    V_AXIS,
+    NO_AXIS = 99
 } AXIS_INDEX;
 
 # define AXIS_ARRAY_SIZE 11
@@ -544,9 +544,7 @@ do {									  \
 	break;  /* this plot is not being used for autoscaling */	  \
     if (TYPE != INRANGE)						  \
 	break;  /* don't set y range if x is outrange, for example */	  \
-    /* NB: we hope for compile-time evaluation of the strcmp */	 	  \
-    /*     which should optimize out the code altogether.    */		  \
-    if (strcmp(#AXIS,"COLOR_AXIS") && axis->linked_to_primary) {	  \
+    if ((AXIS != COLOR_AXIS) && axis->linked_to_primary) {	  	  \
 	axis -= SECOND_AXES;						  \
 	if (axis->link_udf->at) 					  \
 	    curval = eval_link_function(AXIS - SECOND_AXES, curval);	  \

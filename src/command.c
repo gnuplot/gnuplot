@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.246 2012/11/12 23:47:23 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.247 2012/11/26 08:06:15 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -2335,7 +2335,7 @@ read_line(const char *prompt, int start)
     prompt_desc.dsc$w_length = strlen(prompt);
     prompt_desc.dsc$a_pointer = (char *) prompt;
     strcpy(expand_prompt, "_");
-    strncat(expand_prompt, prompt, 38);
+    strncat(expand_prompt, prompt, sizeof(expand_prompt) - 2);
     do {
 	line_desc.dsc$w_length = MAX_LINE_LEN - start;
 	line_desc.dsc$a_pointer = &gp_input_line[start];

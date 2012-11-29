@@ -1,3 +1,43 @@
+2012-11-29  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* term/x11.trm (X11_options): Calls to strncat were risking buffer
+	overflow by not accounting for the terminating '\0'.  Replace some
+	buffer size macros by actual size of buffer.
+
+	* term/wxt.trm (wxt_options): Dito.
+
+	* term/cairo.trm (cairotrm_options): Dito.
+
+	* src/win/pgnuplot.c (main): Dito.
+
+	* term/context.trm (CONTEXT_options): Dito.  And let break
+	statements have their own lines instead of hiding them at the end
+	of a wrapped function call.
+
+	* src/axis.h (AXIS_INDEX, FIRST_AXES, SECOND_AXES): Replace magic
+	numbers by references to existing entries.
+	(AXIS_INDEX): Replace macro NO_AXIS by enum entry, to avoid
+	warnings about mixing enum with non-enum values.
+	(STORE_WITH_LOG_AND_UPDATE_RANGE): No need to invoke strcmp()
+	where a simple comparison of enums would suffice.
+
+	* src/help.c (ShowSubtopics): Replace magic numbers by actual
+	buffer sizes and string lengths involved.
+
+	* src/command.c (read_line): Replace magic number by expression
+	based on actual buffer size.
+
+	* src/gp_types.h (PLOT_STYLE): New enum entry PLOT_STYLE_NONE, to
+	be used instead of magic number -1.
+
+	* src/misc.c (get_style): Use new enum entry.
+
+	* src/tables.c (plotstyle_tbl): Use new enum entry.
+
+	* src/save.c (save_data_func_style): Use new enum entry.
+
+	* src/graph3d.c (do_3dplot): Use new enum entry.
+
 2012-11-26  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/win/wgraph.c src/win/winmain.c|h (WinMessageLoop) src/win/wtext.c:

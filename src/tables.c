@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: tables.c,v 1.114 2012/08/05 19:24:53 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: tables.c,v 1.115 2012/11/25 22:01:21 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - tables.c */
@@ -686,7 +686,7 @@ const struct gen_table plotstyle_tbl[] =
     { "ell$ipses", ELLIPSES },
 #endif
     { "sur$face", SURFACEGRID },
-    { NULL, -1 }
+    { NULL, PLOT_STYLE_NONE }
 };
 
 const struct gen_table filledcurves_opts_tbl[] =

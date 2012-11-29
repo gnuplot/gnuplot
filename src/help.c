@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: help.c,v 1.26 2010/07/30 18:28:38 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: help.c,v 1.27 2011/12/28 19:37:37 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - help.c */
@@ -547,7 +547,7 @@ ShowSubtopics(
 		    subt++;
 		    if (len) {
 			strcpy(line, "\nSubtopics available for ");
-			strncat(line, key->key, BUFSIZ - 25 - 2 - 1);
+			strncat(line, key->key, sizeof(line) - strlen(line)- strlen(":\n")- 1);
 			strcat(line, ":\n");
 		    } else
 			strcpy(line, "\nHelp topics available:\n");
