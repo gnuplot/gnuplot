@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: svg.trm,v 1.128.2.8 2012/11/15 05:24:00 sfeam Exp $
+ * $Id: svg.trm,v 1.128.2.9 2012/11/16 04:19:17 sfeam Exp $
  */
 
 /*------------------------------------------------------------------------------------------------------------------------------------
@@ -945,7 +945,7 @@ SVG_init ()
 	fprintf(gpoutfile,"<g id=\"gnuplot_canvas\">\n\n");
 	fprintf(gpoutfile,"<rect x=\"%d\" y=\"%d\" width=\"%d\" height=\"%d\"",
 		0, 0, (int)(term->xmax/SVG_SCALE), (int)(term->ymax/SVG_SCALE));
-	if (SVG_background > 0)
+	if (SVG_background >= 0)
 		fprintf(gpoutfile," fill=\"#%06x\"", SVG_background);
 	else
 		fprintf(gpoutfile," fill=\"none\"");
