@@ -80,7 +80,7 @@ print STDERR $name, "\n";
 	if ((defined $ENV{DEMOTERM}) && $DEMOTERM ne "") {
 	    print GNUPLOT "set term $DEMOTERM\n";
 	} else {
-	    print GNUPLOT "set term canvas name \"$name"."_$plot\" jsdir \".\"\n";
+	    print GNUPLOT "set term canvas name \"$name"."_$plot\" jsdir \".\" lw 1.6\n";
 	}
 	print GNUPLOT "set output \"$name.$plot.js\"\n";
 	if ($grid) {
@@ -190,10 +190,10 @@ print STDERR $name, "\n";
 			}
 
 			print OUT "<pre>\n";
-	    		print GNUPLOT "set term canvas name \"$name"."_$plot\" jsdir \".\"\n";
+	    		print GNUPLOT "set term canvas name \"$name"."_$plot\" jsdir \".\" lw 1.6\n";
 			print GNUPLOT "set output \"$name.$plot.js\"\n";
 		} elsif (/^pause/) {
-	    		print GNUPLOT "set term canvas name \"$name"."_$plot\" jsdir \".\"\n";
+	    		print GNUPLOT "set term canvas name \"$name"."_$plot\" jsdir \".\" lw 1.6\n";
 			print GNUPLOT "set output \"$name.$plot.js\"\n";
 		} elsif (/^ *reset/) {
 			print GNUPLOT;

@@ -3,6 +3,8 @@
 	* term/svg.trm:  Background color 0x0 was incorrectly interpreted as
 	"none" rather than "black". Bugfix.
 
+	* docs/gnuplot.doc:  Update new features section.
+
 2012-11-29  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* config/watcom/.cvsignore: Ignore gnerated file.

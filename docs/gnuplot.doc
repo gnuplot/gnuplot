@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.759 2012/11/14 19:25:46 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.760 2012/11/24 21:54:29 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -203,23 +203,42 @@ C
 
 2 New features
 ?new-features
- This section lists major additions and changes since version 4.6.
- For a more exhaustive list, see the NEWS file.
+ This section lists major additions since version 4.6 and changes that may
+ cause certain scripts written for earlier versions of gnuplot to behave
+ differently.
 
  * New coordinate system (Degrees, Minutes, Seconds). See `set xdata geographic`.
 
  * Command scripts may contain in-line data that is loaded into a named
  data block for repeated plotting. See `inline data`.
  
- * New support for 32-bit Alpha channel + RGB colors #AARRGGBB.  See `colorspec`.
-
- * Changed handling of NaN or other unexpected input data.  See `missing`.
+ * Support for 32-bit Alpha channel + RGB color #AARRGGBB.  See `colorspec`.
 
  * Secondary axes (x2, y2) may be locked to the primary axis via a mapping
  function.  In the simplest case this guarantees that the primary and secondary
- axis ranges are identical.  In the general case it allows defining a non-linear
- axis scale, which previous has been possible only for log scaling.
+ axis ranges are identical.  In the general case it allows you to define a
+ non-linear axis, something that previously was possible only for log scaling.
  See `set link`.
+
+ * Each function in a plot command may optionally be preceded by a sampling
+ range.  This does not affect the overall range of the plot, only the range
+ over which this function is sampled.  See `plot` and `piecewise.dem`.
+
+ * Changed handling of NaN, inconsistent number of input data columns, or 
+ other unexpected input data.  See the Note under `missing` for examples
+ and figures.
+
+ * `unset xrange` (and other axis ranges) restores the original default range.
+
+ * `unset terminal` restores the original terminal of the gnuplot session.
+
+ * The `reverse` keyword of the `set [axis]range` command affects only
+ autoscaling. It does not invert or otherwise alter the meaning of a command
+ such as `set xrange [0:1]`.  If you want to reverse the direction of the
+ x axis in such a case, say instead `set xrange [1:0]`.
+ 
+ * The optional bandwidth for the kernel density smoothing option is taken from
+ a keyword rather than a data column.  See `smooth kdensity`.
 
 2 Deprecated syntax
 ?deprecated syntax
@@ -233,11 +252,13 @@ C
        set title "Old" 0,-1
        set data linespoints
        plot 1 2 4               # horizontal line at y=1
+       if (defined(VARNAME)) ...
  New:
        TITLE = "New"
        set title TITLE offset char 0, char -1
        set style data linespoints
        plot 1 linetype 2 pointtype 4
+       if (exists("VARNAME")) ...
 
 2 Batch/Interactive Operation
 ?batch/interactive
@@ -284,7 +305,7 @@ C
  In earlier versions of gnuplot, some terminal types used the values from
  `set size` to control also the size of the output canvas; others did not.
  The use of 'set size' for this purpose was deprecated in version 4.2.
- Since version 4.4 almost all terminals now behave as follows:
+ Almost all terminals now behave as follows:
 
  `set term <terminal_type> size <XX>, <YY>` controls the size of the output
  file, or "canvas". By default, the plot will fill this canvas.
@@ -297,7 +318,7 @@ C
 
  The major exception to this convention is the PostScript driver, which
  by default continues to act as it has in earlier versions. Be warned that
- the next version of gnuplot may change the default behaviour of the
+ some future version of gnuplot may change the default behaviour of the
  PostScript driver as well.
 
  Example:
@@ -4321,7 +4342,7 @@ Ffigure_mapcontours
 
  If you supplied valid data errors, the number of data points is large enough,
  and the model is correct, the reduced chisquare should be about unity.  (For
- details, look up the 'chi-squared distribution' in your favourite statistics
+ details, look up the 'chi-squared distribution' in your favorite statistics
  reference.)  If so, there are additional tests, beyond the scope of this
  overview, for determining how well the model fits the data.
 
@@ -4585,9 +4606,8 @@ Ffigure_mapcontours
 ?if if-old
 ?if-old
  Through gnuplot version 4.4, the scope of the if/else commands was limited to
- a single input line. This has been replaced by allowing a multi-line clause to
- be enclosed in curly brackets. The old syntax is still honored by itself but
- cannot be used inside a bracketed clause.
+ a single input line. Now a multi-line clause may be enclosed in curly brackets.
+ The old syntax is still honored but cannot be used inside a bracketed clause.
 
  If no opening "{" follows the `if` keyword, the command(s) in <command-line>
  will be executed if <condition> is true (non-zero) or skipped if <condition> is
@@ -4797,18 +4817,17 @@ Ffigure_mapcontours
 ?plot data binary
  BINARY DATA FILES:
 
- Some earlier versions of `gnuplot` automatically detected binary data files.
- It is now necessary to provide the keyword `binary` after the filename.
+ It is necessary to provide the keyword `binary` after the filename.
  Adequate details of the file format must be given on the command line or
  extracted from the file itself for a supported binary `filetype`.
  In particular, there are two structures for binary files,  binary matrix
  format and binary general format.
 
  The `binary matrix` format contains a two dimensional array of 32 bit IEEE
- float values with an additional column and row of coordinate values.  As
- with ASCII matrix, in the `using` list, enumeration of the coordinate row
- constitutes column 1, enumeration of the coordinate column constitutes
- column 2, and the array of values constitutes column 3.
+ float values plus an additional column and row of coordinate values.  In the
+ `using` specifier of a plot command, column 1 refers to the matrix row
+ coordinate, column 2 refers to the matrix column coordinate, and column 3
+ refers to the value stored in the array at those coordinates.
 
  The `binary general` format contains an arbitrary number of columns for which
  information must be specified at the command line.  For example, `array`,
@@ -7862,7 +7881,7 @@ Ffigure_missing
     iso_8859_2  - used in Central and Eastern Europe
     iso_8859_9  - used in Turkey (also known as Latin5)
     koi8r       - popular Unix cyrillic encoding
-    koi8u       - ukrainian Unix cyrillic encoding
+    koi8u       - Ukrainian Unix cyrillic encoding
     cp437       - codepage for MS-DOS
     cp850       - codepage for OS/2, Western Europe
     cp852       - codepage for OS/2, Central and Eastern Europe
@@ -8949,7 +8968,7 @@ Ffigure_missing
 ?hypertext
 ?label hypertext
 ?set label hypertext
- Some terminals (currently svg, canvas, and wxt) allow you to attach hypertext
+ Some terminals (wxt, qt, svg, canvas, win) allow you to attach hypertext
  to specific points on the graph or elsewhere on the canvas. When the mouse
  hovers over the anchor point, a pop-up box containing the text is displayed.
  Terminals that do not support hypertext will display nothing. You must enable
@@ -8982,8 +9001,8 @@ Ffigure_missing
  line (the previous default meaning of lt 1).  This includes uses such as the
  definition of a temporary linestyle derived from the base linetype 1.
 
- `Note`: This command is new to gnuplot version 4.6.  It supersedes a rather
- cryptic command in version 4.2 "set style increment user".
+ `Note`: This command was introduced in gnuplot version 4.6.  It supersedes a
+ rather cryptic command "set style increment user".
  The older command is now deprecated.
 
  This mechanism can be used to define a set of personal preferences for the
@@ -9030,7 +9049,7 @@ Ffigure_missing
 
  The `set link` command establishes a mapping between the x and x2 axes, or the
  y and y2 axes.  <expression1> maps primary axis coordinates onto the secondary
- axis.  <expresion2> maps secondary axis coordinates onto the primary axis.
+ axis.  <expression2> maps secondary axis coordinates onto the primary axis.
 
  Examples:
        
@@ -10701,7 +10720,7 @@ Ffigure_missing
  Important note:
        In earlier versions of gnuplot, some terminal types used the values from
        `set size` to control also the size of the output canvas; others did not.
-       In version 4.4 almost all terminals now follow the following convention:
+       Almost all terminals now follow the following convention:
 
  `set term <terminal_type> size <XX>, <YY>` controls the size of the output
  file, or `canvas`. Please see individual terminal documentation for allowed
