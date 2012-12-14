@@ -6,6 +6,11 @@
 	that of numbered columns.
 	Bug #3595672
 
+	* src/save.c src/set.c src/show.c:  The hypertext flag on labels was
+	being ignored by save and show commands.  Setting the flag worked only
+	for certain orders of `set` options.
+	Bugfix
+
 2012-12-02  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/svg.trm:  Background color 0x0 was incorrectly interpreted as

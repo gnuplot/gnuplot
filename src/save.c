@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.206 2012/11/04 00:18:04 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.207 2012/11/29 00:12:57 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -442,6 +442,8 @@ set bar %f %s\n",
 		this_label->tag,
 		conv_text(this_label->text));
 	save_position(fp, &this_label->place, FALSE);
+	if (this_label->hypertext)
+	    fprintf(fp, " hypertext");
 
 	switch (this_label->pos) {
 	case LEFT:

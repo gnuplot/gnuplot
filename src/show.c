@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.276 2012/11/04 00:18:04 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.277 2012/11/26 07:17:01 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -1676,6 +1676,8 @@ show_label(int tag)
 		    this_label->tag,
 		    (this_label->text==NULL) ? "" : conv_text(this_label->text));
 	    show_position(&this_label->place);
+	    if (this_label->hypertext)
+		fprintf(stderr, " hypertext");
 	    switch (this_label->pos) {
 	    case LEFT:{
 		    fputs(" left", stderr);
@@ -1706,10 +1708,9 @@ show_label(int tag)
 	    else {
 		fprintf(stderr, " point with color of");
 		save_linetype(stderr, &(this_label->lp_properties), TRUE);
+		fprintf(stderr, " offset ");
 		show_position(&this_label->offset);
 	    }
-	    if (this_label->hypertext)
-		fprintf(stderr, " hypertext");
 
 	    /* Entry font added by DJL */
 	    fputc('\n', stderr);

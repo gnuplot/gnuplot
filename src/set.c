@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.382 2012/11/09 00:49:06 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.383 2012/11/25 22:01:21 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -5554,10 +5554,12 @@ parse_label_options( struct text_label *this_label )
 	    hypertext = TRUE;
 	    set_hypertext = TRUE;
 	    loc_lp = default_hypertext_point_style;
+	    continue;
 	} else if (!set_hypertext && almost_equals(c_token,"nohyper$text")) {
 	    c_token++;
 	    hypertext = FALSE;
 	    set_hypertext = TRUE;
+	    continue;
 	}
 
 	/* get front/back (added by JDP) */
