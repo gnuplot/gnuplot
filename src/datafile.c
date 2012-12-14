@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.212.2.12 2012/11/12 23:22:00 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.212.2.13 2012/11/20 05:21:56 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -2160,8 +2160,7 @@ f_column(union argument *arg)
 	    }
 	}
 	if (column == DF_COLUMN_HEADERS)
-	    int_error(NO_CARET,"could not find column with header \"%s\"\n",
-			a.v.string_val);
+	    FPRINTF(("could not find column with header \"%s\"\n", a.v.string_val));
 	gpfree_string(&a);
     } else
 	column = (int) real(&a);
@@ -2218,8 +2217,7 @@ f_stringcolumn(union argument *arg)
 	    }
 	}
 	if (column == DF_COLUMN_HEADERS)
-	    int_error(NO_CARET,"could not find column with header \"%s\"\n",
-			a.v.string_val);
+	    FPRINTF(("could not find column with header \"%s\"\n", a.v.string_val));
 	gpfree_string(&a);
     } else
 	column = (int) real(&a);
