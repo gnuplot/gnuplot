@@ -11,6 +11,13 @@
 	for certain orders of `set` options.
 	Bugfix
 
+	* src/datafile.c src/graph3d.h src/graphics.h src/plot2d.c src/plot3d.c
+	demo/piecewise.dem docs/gnuplot.doc:
+	Extend the support for piecewise sampling ranges, in particular the use
+	of named variables in piecewise functions.  Allow 1-dimensional 
+	parametric functions in 3D. For example, to plot a helix
+	  splot [-2:2][-2:2] sample [h=1:10] '+' using (cos(h)):(sin(h)):(h)
+
 2012-12-02  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/svg.trm:  Background color 0x0 was incorrectly interpreted as

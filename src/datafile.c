@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.238 2012/11/24 21:54:29 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.239 2012/12/14 18:05:57 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -4874,6 +4874,8 @@ df_generate_pseudodata()
 	}
 	t = t_min + df_pseudorecord * t_step;
 	t = AXIS_DE_LOG_VALUE(x_axis, t);
+	if (df_current_plot->sample_var)
+	    Gcomplex(&(df_current_plot->sample_var->udv_value), t, 0.0);
 	sprintf(line,"%g",t);
 	++df_pseudorecord;
     }

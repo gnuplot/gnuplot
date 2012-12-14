@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.200 2012/11/12 03:48:30 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.201 2012/11/24 21:54:30 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -245,6 +245,8 @@ plot3drequest()
     if (!term)			/* unknown */
 	int_error(c_token, "use 'set term' to set terminal type first");
 
+    /* Range limits for the entire plot are optional but must be given	*/
+    /* in a fixed order. The keyword 'sample' terminates range parsing.	*/
     u_axis = (parametric ? U_AXIS : FIRST_X_AXIS);
     v_axis = (parametric ? V_AXIS : FIRST_Y_AXIS);
 
@@ -259,6 +261,8 @@ plot3drequest()
     check_axis_reversed(FIRST_X_AXIS);
     check_axis_reversed(FIRST_Y_AXIS);
     check_axis_reversed(FIRST_Z_AXIS);
+    if (equals(c_token,"sample") && equals(c_token+1,"["))
+	c_token++;
 
     /* Clear out any tick labels read from data files in previous plot */
     for (u_axis=0; u_axis<AXIS_ARRAY_SIZE; u_axis++) {
@@ -273,12 +277,12 @@ plot3drequest()
     if (dummy_token0 > 0)
 	copy_str(c_dummy_var[0], dummy_token0, MAX_ID_LEN);
     else
-	(void) strcpy(c_dummy_var[0], set_dummy_var[0]);
+	strcpy(c_dummy_var[0], set_dummy_var[0]);
 
     if (dummy_token1 > 0)
 	copy_str(c_dummy_var[1], dummy_token1, MAX_ID_LEN);
     else
-	(void) strcpy(c_dummy_var[1], set_dummy_var[1]);
+	strcpy(c_dummy_var[1], set_dummy_var[1]);
 
     eval_3dplots();
 }
@@ -1302,14 +1306,19 @@ eval_3dplots()
 	    TBOOLEAN set_lpstyle = FALSE;
 	    TBOOLEAN checked_once = FALSE;
 	    TBOOLEAN set_labelstyle = FALSE;
+	    int sample_range_token;
 
 	    if (!was_definition && (!parametric || crnt_param == 0))
 		start_token = c_token;
 	    was_definition = FALSE;
 
+	    /* Check for a sampling range */
+	    sample_range_token = parse_range(SAMPLE_AXIS);
+	    if (sample_range_token > 0)
+		axis_array[SAMPLE_AXIS].range_flags |= RANGE_SAMPLED;
+
+	    /* Should this be saved in this_plot? */
 	    dummy_func = &plot_func;
-	    /* WARNING: do NOT free name_str */
-	    /* FIXME: could also be saved in this_plot */
 	    name_str = string_or_express(NULL);
 	    dummy_func = NULL;
 	    if (name_str) {
@@ -1349,8 +1358,18 @@ eval_3dplots()
 		if (df_matrix)
 		    this_plot->has_grid_topology = TRUE;
 
-		/* parses all datafile-specific modifiers */
-		/* we will load the data after parsing title,with,... */
+		/* EAM FIXME - this seems to work but I am uneasy that c_dummy_var[]	*/
+		/*             is not being loaded with the variable name.		*/
+		if (sample_range_token > 0) {
+		    this_plot->sample_var = add_udv(sample_range_token);
+		    this_plot->sample_var->udv_undef = FALSE;
+		} else {
+		    /* FIXME: This has the side effect of creating a named variable x */
+		    /* or overwriting an existing variable x.  Maybe it should save   */
+		    /* and restore the pre-existing variable in this case?            */
+		    this_plot->sample_var = add_udv_by_name(c_dummy_var[0]);
+		    this_plot->sample_var->udv_undef = FALSE;
+		}
 
 		/* for capture to key */
 		this_plot->token = end_token = c_token - 1;
@@ -1939,6 +1958,11 @@ eval_3dplots()
 		    int_warn(c_token, "ignoring trailing comma in plot command");
 		    break;
 		}
+
+		/* Check for a sampling range */
+		/* Currently we are supporting only sampling of pseudofile '+' and   */
+		/* this loop is for functions only, so the sampling range is ignored */
+		parse_range(SAMPLE_AXIS);
 
 		dummy_func = &plot_func;
 		name_str = string_or_express(&at_ptr);

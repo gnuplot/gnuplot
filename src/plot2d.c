@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.281 2012/11/17 17:54:48 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.282 2012/11/24 21:54:29 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -214,12 +214,14 @@ plotrequest()
     AXIS_INIT2D(COLOR_AXIS, 1);
 
     /* If we are called from a mouse zoom operation we should ignore	*/
-    /* any range limitations because otherwise the zoom won't zoom.	*/
+    /* any range limits because otherwise the zoom won't zoom.		*/
     if (inside_zoom) {
 	while (equals(c_token,"["))
 	    parse_skip_range();
     }
 
+    /* Range limits for the entire plot are optional but must be given	*/
+    /* in a fixed order. The keyword 'sample' terminates range parsing.	*/
     if (parametric || polar) {
 	dummy_token = parse_range(T_AXIS);
 	parse_range(FIRST_X_AXIS);
@@ -229,6 +231,8 @@ plotrequest()
     parse_range(FIRST_Y_AXIS);
     parse_range(SECOND_X_AXIS);
     parse_range(SECOND_Y_AXIS);
+    if (equals(c_token,"sample") && equals(c_token+1,"["))
+	c_token++;
 
     /* Clear out any tick labels read from data files in previous plot */
     for (t_axis=0; t_axis<AXIS_ARRAY_SIZE; t_axis++) {
@@ -243,7 +247,7 @@ plotrequest()
     if (dummy_token > 0)
 	copy_str(c_dummy_var[0], dummy_token, MAX_ID_LEN);
     else
-	(void) strcpy(c_dummy_var[0], set_dummy_var[0]);
+	strcpy(c_dummy_var[0], set_dummy_var[0]);
 
     eval_plots();
 }
@@ -1859,7 +1863,14 @@ eval_plots()
 
 	    was_definition = FALSE;
 	    dummy_func = &plot_func;
-	    /* should this be saved in "this_plot"? */
+
+	    /* Allow replacement of the dummy variable in a function */
+	    if (sample_range_token > 0)
+		copy_str(c_dummy_var[0], sample_range_token, MAX_ID_LEN);
+	    else if (sample_range_token < 0)
+		strcpy(c_dummy_var[0], set_dummy_var[0]);
+
+	    /* Should this be saved in "this_plot"? */
 	    name_str = string_or_express(NULL);
 	    dummy_func = NULL;
 
@@ -1883,6 +1894,21 @@ eval_plots()
 		/* up to MAXDATACOLS cols */
 		df_set_plot_mode(MODE_PLOT);    /* Needed for binary datafiles */
 		specs = df_open(name_str, MAXDATACOLS, this_plot);
+
+		/* Store a pointer to the named variable used for sampling */
+		if (sample_range_token > 0) {
+		    this_plot->sample_var = add_udv(sample_range_token);
+		    this_plot->sample_var->udv_undef = FALSE;
+		} else {
+		    /* FIXME: This has the side effect of creating a named variable x */
+		    /* or overwriting an existing variable x.  Maybe it should save   */
+		    /* and restore the pre-existing variable in this case?            */
+		    this_plot->sample_var = add_udv_by_name(c_dummy_var[0]);
+		    if (this_plot->sample_var->udv_undef) {
+			this_plot->sample_var->udv_undef = FALSE;
+			Gcomplex(&(this_plot->sample_var->udv_value), 0.0, 0.0);
+		    }
+		}
 
 		/* include modifiers in default title */
 		this_plot->token = end_token = c_token - 1;
@@ -2713,15 +2739,19 @@ eval_plots()
 		clear_sample_range(x_axis);
 		sample_range_token = parse_range(SAMPLE_AXIS);
 		dummy_func = &plot_func;
-	
+
 		if (almost_equals(c_token, "newhist$ogram")) {
 		    /* Make sure this isn't interpreted as a function */
 		    name_str = "";
-		} else
-
-		/* WARNING: do NOT free name_str */
-		/* FIXME: should this be saved in "this_plot"? */
-		name_str = string_or_express(&at_ptr);
+		} else {
+		    /* Allow replacement of the dummy variable in a function */
+		    if (sample_range_token > 0)
+			copy_str(c_dummy_var[0], sample_range_token, MAX_ID_LEN);
+		    else if (sample_range_token < 0)
+			strcpy(c_dummy_var[0], set_dummy_var[0]);
+		    /* WARNING: do NOT free name_str */
+		    name_str = string_or_express(&at_ptr);
+		}
 
 		if (!name_str) {            /* function to plot */
 		    if (parametric) {   /* toggle parametric axes */

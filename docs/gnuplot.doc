@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.761 2012/12/03 01:15:17 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.762 2012/12/03 22:45:18 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -5620,10 +5620,13 @@ Ffigure_mapcontours
  The pseudo-file '+' treats the sampled points as column 1, and allows
  additional column values to be specified via a `using` specification, just as
  for a true input file.  The number of samples returned is controlled by
- `set samples`.
+ `set samples`.  By default samples are generated over the full range on x, but
+ an independent sampling range can be provided immediately before the '+'
+ (see `plot sampling`).
  Example:
 
        plot '+' using ($1):(sin($1)):(sin($1)**2) with filledcurves
+       plot $MYDATA, [sample=5:25] '+' using (sample):(f(sample)) with lines
 
  Similarly the pseudo-file '++' returns 2 columns of data forming a regular
  grid of [x,y] coordinates with the number of points along x controlled by
@@ -6089,47 +6092,40 @@ Ffigure_mapcontours
 ?plot ranges
 ?splot ranges
 ?ranges
- The optional axis ranges at the start of a plot command specify the region of
- the graph that will be displayed.  These override any ranges established by a
- previous `set range` statement.
+ This section describes only the optional axis ranges that may appear as the 
+ very first items in a `plot` command.  If present, these ranges override any
+ range limits established by a previous `set range` statement.  For optional
+ ranges elsewhere in a `plot` command that limit sampling of an individual
+ plot component see `sampling`.
 
  Syntax:
        [{<dummy-var>=}{{<min>}:{<max>}}]
        [{{<min>}:{<max>}}]
 
  The first form applies to the independent variable (`xrange` or `trange`, if
- in parametric mode).  The second form applies to the dependent variable
- `yrange` (and `xrange`, too, if in parametric mode).  <dummy-var> is a new
- name for the independent variable.  (The defaults may be changed with `set
- dummy`.)  The optional <min> and <max> terms can be constant expressions or *.
+ in parametric mode).  The second form applies to dependent variables.
+ <dummy-var> optionally establishes a new name for the independent variable.
+ (The default name may be changed with `set dummy`.)
 
- In non-parametric mode, the order in which ranges must be given is `xrange`
- and `yrange`.
+ In non-parametric mode, ranges must be given in the order
+       plot [<xrange>][<yrange>][<x2range>][<y2range>] ...
 
- In parametric mode, the order for the `plot` command is `trange`, `xrange`,
- and `yrange`.  The following `plot` command shows setting the `trange` to
- [-pi:pi], the `xrange` to [-1.3:1.3] and the `yrange` to [-1:1] for the
- duration of the graph:
+ In parametric mode, ranges must be given in the order
+       plot [<trange>][<xrange>][<yrange>][<x2range>][<y2range>] ...
+ The following `plot` command shows setting `trange` to [-pi:pi], `xrange`
+ to [-1.3:1.3] and `yrange` to [-1:1] for the duration of the graph:
 
        plot [-pi:pi] [-1.3:1.3] [-1:1] sin(t),t**2
 
- Note that the x2range and y2range cannot be specified here---`set x2range`
- and `set y2range` must be used.
+ `*` can be used to allow autoscaling of either of min and max.
+ Use an empty range `[]` as a placeholder if necessary. 
 
- Ranges are interpreted in the order listed above for the appropriate mode.
- Once all those needed are specified, no further ones must be listed, but
- unneeded ones cannot be skipped---use an empty range `[]` as a placeholder.
-
- `*` can be used to allow autoscaling of either of min and max.  See also
- `set autoscale`.
-
- Ranges specified on the `plot` or `splot` command line affect only that
+ Ranges specified on the `plot` or `splot` command line affect only that one
  graph; use the `set xrange`, `set yrange`, etc., commands to change the
  default ranges for future graphs.
 
- With time data, you must provide the range (in the same manner as the time
- appears in the datafile) within quotes.  `gnuplot` uses the `timefmt` string
- to read the value---see `set timefmt`.
+ For time data you must provide the range in quotes, using the same format
+ used to read time from the datafile.  See `set timefmt`.
 
  Examples:
 
@@ -6145,11 +6141,11 @@ Ffigure_mapcontours
  This sets both the x and y ranges:
        plot [-pi:pi] [-3:3]  tan(x), 1/x
 
- This sets only the y range, and turns off autoscaling on both axes:
+ This sets only the y range:
        plot [ ] [-2:sin(5)*-8] sin(x)**besj0(x)
 
  This sets xmax and ymin only:
-       plot [:200] [-pi:]  exp(sin(x))
+       plot [:200] [-pi:]  $mydata using 1:2
 
  This sets the x range for a timeseries:
        set timefmt "%d/%m/%y %H:%M"
@@ -6158,12 +6154,13 @@ Ffigure_mapcontours
 3 sampling
 ?sampling
 ?commands plot sampling
+?plot sampling
  By default, computed functions or data generated for the pseudo-file "+" are
  sampled over the entire range of the plot. This range may have been specified
  by a prior `set xrange` command, by an explicit global range specifier at the
  very start of the plot command, or by autoscaling of the range to span data
  seen in all the elements of this plot command.  However, individual plot
- elements can be assigned a more restricted sampling range. 
+ components can be assigned a more restricted sampling range. 
 
  Examples:
 
@@ -6182,9 +6179,12 @@ Ffigure_mapcontours
  probably the intent:
        plot [0:10] f(x), [10:20] g(x), [20:30] h(x)
 
- This command removes the ambiguity of the previous example by inserting a dummy
- definition so that the range is not the first element of the plot command:
-       plot dummy=0, [0:10] f(x), [10:20] g(x), [20:30] h(x)
+ This command removes the ambiguity of the previous example by inserting the
+ keyword `sample` so that the range is not applyied to the entire plot:
+       plot sample [0:10] f(x), [10:20] g(x), [20:30] h(x)
+
+ This example shows one way of tracing out a helix in a 3D plot
+       splot [-2:2][-2:2] sample [h=1:10] '+' using (cos(h)):(sin(h)):(h)
 
 3 for loops in plot command
 ?commands plot for
@@ -12794,9 +12794,8 @@ Ffigure_missing
 2 splot
 ?commands splot
 ?splot
- `splot` is the command for drawing 3D plots (well, actually projections on
- a 2D surface, but you knew that).  It can create a plot from functions or
- data read from files in a manner very similar to the `plot` command.
+ `splot` is the command for drawing 3D plots (well, actually projections on a 2D
+ surface, but you knew that).  It is the 3D equivalent of the `plot` command.
  `splot` provides only a single x, y, and z axis; there is no equivalent to the
  x2 and y2 secondary axes provided by `plot`.
 
@@ -12819,19 +12818,21 @@ Ffigure_missing
  xyplane`.  The orientation of a `splot` projection is controlled by
  `set view`.  See `set view` and `set xyplane` for more information.
 
- The syntax for setting ranges on the `splot` command is the same as for
- `plot`.  In non-parametric mode, the order in which ranges must be given is
- `xrange`, `yrange`, and `zrange`.  In parametric mode, the order is `urange`,
- `vrange`, `xrange`, `yrange`, and `zrange`.
+ The syntax for setting ranges on the `splot` command is the same as for `plot`.
+ In non-parametric mode, ranges must be given in the order
+       splot [<xrange>][<yrange>][<zrange>] ...
+ In parametric mode, the order is
+       splot [<urange>][<vrange>][<xrange>][<yrange>][<zrange>] ...
 
  The `title` option is the same as in `plot`.  The operation of `with` is also
- the same as in `plot`, except that the plotting styles available to `splot`
- are limited to `lines`, `points`, `linespoints`, `dots`, and `impulses`;  the
- error-bar capabilities of `plot` are not available for `splot`.
+ the same as in `plot` except that not all 2D plotting styles are available.
 
  The `datafile` options have more differences.
 
- See also `show plot`.
+ As an alternative to surfaces drawn using parametric or function mode, the
+ pseudo-file '++' can be used to generate samples on a grid in the xy plane.
+
+ See also `show plot`, `set view map`, and `sampling`.
 3 data-file
 ?commands splot datafile
 ?splot datafile

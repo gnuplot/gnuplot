@@ -1,5 +1,5 @@
 /*
- * $Id: graphics.h,v 1.54 2012/06/29 16:30:37 sfeam Exp $
+ * $Id: graphics.h,v 1.55 2012/10/09 22:06:41 sfeam Exp $
  */
 
 /* GNUPLOT - graphics.h */
@@ -61,6 +61,7 @@ typedef struct curve_points {
     struct fill_style_type fill_properties;
     struct text_label *labels;	/* Only used if plot_style == LABELPOINTS */
     struct t_image image_properties;	/* only used if plot_style is IMAGE or RGB_IMAGE */
+    struct udvt_entry *sample_var;	/* Only used if plot has private sampling range */
 
     /* 2D and 3D plot structure fields overlay only to this point */
     filledcurves_opts filledcurves_options;

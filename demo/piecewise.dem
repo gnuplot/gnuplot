@@ -11,7 +11,7 @@ set ytics axis
 set title "Piecewise function sampling" font ",15"
 set xrange [ -2 : 10 ] noreverse nowriteback
 
-plot y=0, [*:1] x, [1:2.*pi] cos(x), [2.*pi:10] (x-8)**2
+plot sample [*:1] x, [1:2.*pi] cos(x), [2.*pi:10] (x-8)**2
 
 pause -1 "Hit <cr> to continue"
 reset
@@ -50,6 +50,24 @@ plot norm(x) lt -1, \
      [0:1] part1(x) ls 1 title part1
 
 pause -1 "Hit <cr> to continue"
-set encoding save_encoding
+
 set termopt solid
+reset
+
+set border 16
+unset xtics
+unset ytics
+set style data lines
+set key center at screen 0.5, screen 0.15
+set title font ",15"
+set title "Piecewise function of one parameter in 3D"
+
+splot [-2:2][-2:2] sample \
+   [h=1:5]   '+' using (cos(h)):(sin(h)):(h), \
+   [h=5:10]  '+' using (cos(h)):(sin(h)):(h), \
+   [h=10:15] '+' using (cos(h)):(sin(h)):(h)
+
+pause -1 "Hit <cr> to continue"
+
+set encoding save_encoding
 reset
