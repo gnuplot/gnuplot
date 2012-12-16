@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: post.trm,v 1.270 2012/09/13 05:04:56 sfeam Exp $
+ * $Id: post.trm,v 1.271 2012/11/25 22:01:22 sfeam Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -245,6 +245,7 @@ static void PS_dump_header_to_file __PROTO((char *name));
 #endif
 
 static float ps_fontsize;
+static float ps_fontsize_previous;
 
 /* for enhanced mode, we keep a separate font name and size, which
  * is restored to the default value on font of ""
@@ -1861,6 +1862,7 @@ doclip\n\
     PS_taken = 0;
     PS_linetype_last = LT_UNDEFINED;
     PS_linewidth_last = PS_linewidth_current = LT_UNDEFINED;
+    ps_fontsize_previous = -1;
 
     if (ps_params->terminal != PSTERM_EPSLATEX) {
 	/* set the background only if all components are >= 0 */
@@ -2222,6 +2224,11 @@ PS_set_font(const char *font)
 	PS_RememberFont(name);
 	fprintf(gppsfile, "/%s findfont %g scalefont setfont\n",
 		name, size*PS_SCF);
+	/* FIXME: instead of trying to keep an approximate vshift current */
+	/*        we could modify Lshow/Rshow/Cshow to query the font.    */
+	if (size != ps_fontsize_previous)
+	    fprintf(gppsfile, "/vshift %d def\n", -(int)((size*PS_SCF)/3.));
+	ps_fontsize_previous = size;
     }
     free(name);
 
