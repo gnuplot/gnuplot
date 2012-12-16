@@ -12,8 +12,10 @@
 	- maxcols is never checked in the splot key layout code
 	Bug #3556892  and other issues visible in key.dem
 
-	* term/post.trm (set_font): quick fix to redefine vshift every time the
+	* term/post.trm (set_font): Quick fix to redefine vshift every time the
 	current font size changes. A better fix would query the font internally.
+
+	* term/svg.trm (set_font): Same fix for svg font metrics.
 
 2012-12-14  Ethan A Merritt  <merritt@u.washington.edu>
 
