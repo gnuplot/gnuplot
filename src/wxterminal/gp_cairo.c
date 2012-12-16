@@ -1,5 +1,5 @@
 /*
- * $Id: gp_cairo.c,v 1.60 2011/10/13 19:56:55 sfeam Exp $
+ * $Id: gp_cairo.c,v 1.60.2.1 2012/03/30 04:22:46 sfeam Exp $
  */
 
 /* GNUPLOT - gp_cairo.c */
@@ -793,10 +793,15 @@ void gp_cairo_draw_text(plot_struct *plot, int x1, int y1, const char* string)
 	
 	pango_layout_get_extents(layout, &ink_rect, &logical_rect);
 
-	/* EAM Mar 2009 - Adjusting the vertical position for every character fragment */
-	/* leads to uneven baselines.  Better to adjust to the "average" character height */
-	/* vert_just = ((double)ink_rect.height/2 +(double)ink_rect.y) / PANGO_SCALE; */
-	vert_just = avg_vchar/2;
+	/* EAM Mar 2009 - Adjusting the vertical position for every character fragment	*/
+	/* leads to uneven baselines. Better to adjust to the "average" character height */
+	/* EAM Dec 2012 - The problem is that avg_vchar is not kept in sync with the	*/
+	/* font size.  It is changed when the set_font command is received, not when	*/
+	/* it is executed in the display list. Try basing off plot->fontsize instead. 	*/
+
+	/* vert_just = ((double)ink_rect.height/2 +(double)ink_rect.y) / PANGO_SCALE;	*/
+	/* vert_just = avg_vchar/2;							*/
+	vert_just = plot->fontsize*16;
 
 	x = (double) x1;
 	y = (double) y1;
@@ -1717,6 +1722,9 @@ void gp_cairo_set_termvar(plot_struct *plot, unsigned int *v_char,
 	if (h_char)
 		*h_char = tmp_h_char;
 
+/* FIXME!!! So far, so good. But now we have a problem. This routine	*/
+/* is called synchronously with the set_font command, but avg_vchar is	*/
+/* needed asynchronously during execution of the display list. 		*/
 	avg_vchar = tmp_v_char;
 }
 

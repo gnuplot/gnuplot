@@ -5,7 +5,9 @@
 	The failure to do this led to poor vertical centering of text using any
 	font other than the default, and bad key box layout for small key fonts.
 
-	* term/svg.trm (set_font): equivalent fix for svg.
+	* term/svg.trm (set_font): Similar fix for svg.
+
+	* src/wxterminal/gp_cairo.c (gp_cairo_draw_text): and for wxt.
 
 2012-12-14  Ethan A Merritt  <merritt@u.washington.edu>
 
