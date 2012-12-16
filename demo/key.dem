@@ -1,10 +1,19 @@
 # Illustration of key positioning commands and concept.
 #
 # Dan Sebald, 7 nov 2004
+# EAM Dec 2012 - exercise opaque/fonts/superscript spacing/etc
 #
+set termopt enhanced
+set xtics font ",6"
+set ytics font ",6"
+
 set key default
 set key box
 set key samplen .2
+
+set key title "Title^{up}" font ",6"
+set obj 1 rectangle from graph 0,0 to graph 1,1 behind fs solid fc rgb "grey"
+set key opaque
 
 set multiplot layout 3,3
 set key ins vert

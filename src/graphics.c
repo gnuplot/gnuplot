@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.406 2012/11/18 21:20:37 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.407 2012/11/26 08:00:02 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -82,8 +82,8 @@ static int key_text_left;	/* offset from x for left-justified text */
 static int key_text_right;	/* offset from x for right-justified text */
 static int key_size_left;	/* size of left bit of key (text or sample, depends on key->reverse) */
 static int key_size_right;	/* size of right part of key (including padding) */
+static int key_xleft;		/* Amount of space on the left required by the key */
 static int max_ptitl_len = 0;	/* max length of plot-titles (keys) */
-static double ktitl_lines = 0;	/* no lines in key->title (key header) */
 static int ptitl_cnt;		/* count keys with len > 0  */
 static int key_rows, key_col_wth, yl_ref;
 
@@ -92,7 +92,11 @@ static double largest_polar_circle;
 
 static int xlablin, x2lablin, ylablin, y2lablin, titlelin, xticlin, x2ticlin;
 
-static int key_entry_height;	/* bigger of t->v_size, pointsize*t->v_tick */
+static int key_width;		/* calculate once, then everyone uses it */
+static int key_height;		/* ditto */
+static int key_entry_height;	/* bigger of t->v_char, pointsize*t->v_tick */
+static int key_title_height;	/* nominal number of lines * character height */
+static int key_title_extra;	/* allow room for subscript/superscript */
 static int p_width, p_height;	/* pointsize * { t->h_tic | t->v_tic } */
 
 /* used for filled points */
@@ -104,6 +108,7 @@ static t_colorspec background_fill = BACKGROUND_COLORSPEC;
  */
 static int ylabel_x, y2label_x, xlabel_y, x2label_y, title_y, time_y, time_x;
 static int ylabel_y, y2label_y, xtic_y, x2tic_y, ytic_x, y2tic_x;
+static int key_cols = 1;	/* # columns in the key */
 /*}}} */
 
 /* Status information for stacked histogram plots */
@@ -163,7 +168,9 @@ static void map_position_double __PROTO((struct position* pos, double* x, double
 
 static int find_maxl_keys __PROTO((struct curve_points *plots, int count, int *kcnt));
 
-static void do_key_layout __PROTO((legend_key *key, TBOOLEAN key_pass, int *xl, int *yl));
+static void do_key_bounds __PROTO((legend_key *key));
+static void do_key_layout __PROTO((legend_key *key));
+static void draw_key __PROTO((legend_key *key, TBOOLEAN key_pass, int *xl, int *yl));
 static void do_key_sample __PROTO((struct curve_points *this_plot, legend_key *key,
 				   char *title,  int xl, int yl));
 static void attach_title_to_plot __PROTO((struct curve_points *this_plot, legend_key *key));
@@ -283,7 +290,6 @@ boundary(struct curve_points *plots, int count)
     legend_key *key = &keyT;
 
     struct termentry *t = term;
-    int key_h, key_w;
     /* FIXME HBB 20000506: this line is the reason for the 'D0,1;D1,0'
      * bug in the HPGL terminal: we actually carry out the switch of
      * text orientation, just for finding out if the terminal can do
@@ -310,9 +316,6 @@ boundary(struct curve_points *plots, int count)
     int xtic_height;
     int ytic_width;
     int y2tic_width;
-    int key_xleft = 0;		/* Amount of space on the left required by the key */
-
-    int key_cols = 1;		/* # columns of keys */
 
     /* figure out which rotatable items are to be rotated
      * (ylabel and y2label are rotated if possible) */
@@ -327,6 +330,10 @@ boundary(struct curve_points *plots, int count)
     lkey = key->visible;	/* but we may have to disable it later */
 
     xticlin = ylablin = y2lablin = xlablin = x2lablin = titlelin = 0;
+
+    /* Some combined values that are used by various routines */
+    p_width = pointsize * t->h_tic;
+    p_height = pointsize * t->v_tic;
 
     /*{{{  count lines in labels and tics */
     if (title.text)
@@ -582,148 +589,11 @@ boundary(struct curve_points *plots, int count)
 
     /*  end of preliminary plot_bounds.ybot calculation }}} */
 
+    /* Determine the size and position of the key box */
     if (lkey) {
-	TBOOLEAN key_panic = FALSE;
-	/*{{{  essential key features */
-
-	p_width = pointsize * t->h_tic;
-	p_height = pointsize * t->v_tic;
-
-	if (key->swidth >= 0)
-	    key_sample_width = key->swidth * t->h_char + p_width;
-	else
-	    key_sample_width = 0;
-
-	key_entry_height = p_height * 1.25 * key->vert_factor;
-	if (key_entry_height < t->v_char)
-	    key_entry_height = t->v_char * key->vert_factor;
-	/* HBB 20020122: safeguard to prevent division by zero later */
-	if (key_entry_height == 0)
-	    key_entry_height = 1;
-
 	/* Count max_len key and number keys with len > 0 */
 	max_ptitl_len = find_maxl_keys(plots, count, &ptitl_cnt);
-
-	/* Key title length and height */
-	if (key->title) {
-	    int ytlen, ytheight;
-	    ytlen = label_width(key->title, &ytheight);
-	    ytlen -= key->swidth + 2;
-	    /* EAM FIXME */
-	    if ((ytlen > max_ptitl_len) && (key->stack_dir != GPKEY_HORIZONTAL))
-		max_ptitl_len = ytlen;
-	    ktitl_lines = (int)ytheight;
-	}
-
-	if (key->reverse) {
-	    key_sample_left = -key_sample_width;
-	    key_sample_right = 0;
-	    /* if key width is being used, adjust right-justified text */
-	    key_text_left = t->h_char;
-	    key_text_right = t->h_char * (max_ptitl_len + 1 + key->width_fix);
-	    key_size_left = t->h_char - key_sample_left; /* sample left is -ve */
-	    key_size_right = key_text_right;
-	} else {
-	    key_sample_left = 0;
-	    key_sample_right = key_sample_width;
-	    /* if key width is being used, adjust left-justified text */
-	    key_text_left = -(int) (t->h_char
-				    * (max_ptitl_len + 1 + key->width_fix));
-	    key_text_right = -(int) t->h_char;
-	    key_size_left = -key_text_left;
-	    key_size_right = key_sample_right + t->h_char;
-	}
-	key_point_offset = (key_sample_left + key_sample_right) / 2;
-
-	/* advance width for cols */
-	key_col_wth = key_size_left + key_size_right;
-
-	key_rows = ptitl_cnt;
-	key_cols = 1;
-
-	/* calculate rows and cols for key */
-
-	if (key->stack_dir == GPKEY_HORIZONTAL) {
-	    /* maximise no cols, limited by label-length */
-	    key_cols = (int) (plot_bounds.xright - plot_bounds.xleft) / key_col_wth;
-	    if (key->maxcols > 0 && key_cols > key->maxcols)
-		key_cols = key->maxcols;
-	    /* EAM Dec 2004 - Rather than turn off the key, try to squeeze */
-	    if (key_cols == 0) {
-		key_cols = 1;
-		key_panic = TRUE;
-		key_col_wth = (plot_bounds.xright - plot_bounds.xleft);
-	    }
-	    key_rows = (int) (ptitl_cnt + key_cols - 1) / key_cols;
-	    /* now calculate actual no cols depending on no rows */
-	    key_cols = (key_rows == 0) ? 1
-		: (int) (ptitl_cnt + key_rows - 1) / key_rows;
-	    if (key_cols == 0) {
-		key_cols = 1;
-		key_panic = TRUE;
-	    }
-	} else {
-	    /* maximise no rows, limited by plot_bounds.ytop-plot_bounds.ybot */
-	    int i = (int) (plot_bounds.ytop - plot_bounds.ybot - key->height_fix * t->v_char
-			   - (ktitl_lines + 1) * t->v_char)
-		/ key_entry_height;
-	    if (key->maxrows > 0 && i > key->maxrows)
-		i = key->maxrows;
-
-	    if (i == 0) {
-		i = 1;
-		key_panic = TRUE;
-	    }
-	    if (ptitl_cnt > i) {
-		key_cols = (int) (ptitl_cnt + i - 1) / i;
-		/* now calculate actual no rows depending on no cols */
-		if (key_cols == 0) {
-		    key_cols = 1;
-		    key_panic = TRUE;
-		}
-		key_rows = (int) (ptitl_cnt + key_cols - 1) / key_cols;
-	    }
-	}
-
-	/* adjust for outside key, leave manually set margins alone */
-	if ((key->region == GPKEY_AUTO_EXTERIOR_LRTBC && (key->vpos != JUST_CENTRE || key->hpos != CENTRE))
-	    || key->region == GPKEY_AUTO_EXTERIOR_MARGIN) {
-	    int more = 0;
-	    if (key->margin == GPKEY_BMARGIN && bmargin.x < 0) {
-		more = key_entry_height * key_rows + (int) (t->v_char * (ktitl_lines + 1))
-			+ (int) (key->height_fix * t->v_char);
-		if (plot_bounds.ybot + more > plot_bounds.ytop)
-		    key_panic = TRUE;
-		else
-		    plot_bounds.ybot += more;
-	    } else if (key->margin == GPKEY_TMARGIN && tmargin.x < 0) {
-		more = key_entry_height * key_rows + (int) (t->v_char * (ktitl_lines + 1))
-			- (int) (key->height_fix * t->v_char);
-		if (plot_bounds.ytop - more < plot_bounds.ybot)
-		    key_panic = TRUE;
-		else
-		    plot_bounds.ytop -= more;
-	    } else if (key->margin == GPKEY_LMARGIN && lmargin.x < 0) {
-		more = key_col_wth * key_cols;
-		if (plot_bounds.xleft + more > plot_bounds.xright)
-		    key_panic = TRUE;
-		else
-		    key_xleft = more;
-		plot_bounds.xleft += key_xleft;
-	    } else if (key->margin == GPKEY_RMARGIN && rmargin.x < 0) {
-		more = key_col_wth * key_cols;
-		if (plot_bounds.xright - more < plot_bounds.xleft)
-		    key_panic = TRUE;
-		else
-		    plot_bounds.xright -= more;
-	    }
-	}
-
-	/* warn if we had to punt on key size calculations */
-	if (key_panic)
-	    int_warn(NO_CARET, "Warning - difficulty fitting plot titles into key");
-
-	/*}}} */
+	do_key_layout(key);
     }
 
     /*{{{  set up y and y2 tics */
@@ -949,7 +819,7 @@ boundary(struct curve_points *plots, int count)
     /*  end of plot_bounds.xright calculation }}} */
 
 
-    /*{{{  set up x and x2 tics */
+    /* Set up x and x2 tics */
     /* we should base the guide on the width of the xtics, but we cannot
      * use widest_tics until tics are set up. Bit of a downer - let us
      * assume tics are 5 characters wide
@@ -1146,116 +1016,9 @@ boundary(struct curve_points *plots, int count)
     axis_set_graphical_range(SECOND_X_AXIS, plot_bounds.xleft, plot_bounds.xright);
     axis_set_graphical_range(SECOND_Y_AXIS, plot_bounds.ybot, plot_bounds.ytop);
 
-    /* Calculate space for keys (do_plot will use these to position key). */
-    key_w = key_col_wth * key_cols;
-    key_h = (ktitl_lines) * t->v_char + key_rows * key_entry_height;
-    key_h += (int) (key->height_fix * t->v_char);
-    if (key->region == GPKEY_AUTO_INTERIOR_LRTBC
-	|| (key->region == GPKEY_AUTO_EXTERIOR_LRTBC && key->vpos == JUST_CENTRE && key->hpos == CENTRE)) {
-	if (key->vpos == JUST_TOP) {
-	    key->bounds.ytop = plot_bounds.ytop - t->v_tic;
-	    key->bounds.ybot = key->bounds.ytop - key_h;
-	} else if (key->vpos == JUST_BOT) {
-	    key->bounds.ybot = plot_bounds.ybot + t->v_tic;
-	    key->bounds.ytop = key->bounds.ybot + key_h;
-	} else /* (key->vpos == JUST_CENTRE) */ {
-	    int key_box_half = key_h / 2;
-	    key->bounds.ybot = (plot_bounds.ybot + plot_bounds.ytop) / 2 - key_box_half;
-	    key->bounds.ytop = (plot_bounds.ybot + plot_bounds.ytop) / 2 + key_box_half;
-	}
-	if (key->hpos == LEFT) {
-	    key->bounds.xleft = plot_bounds.xleft + t->h_char;
-	    key->bounds.xright = key->bounds.xleft + key_w;
-	} else if (key->hpos == RIGHT) {
-	    key->bounds.xright = plot_bounds.xright - t->h_char;
-	    key->bounds.xleft = key->bounds.xright - key_w;
-	} else /* (key->hpos == CENTER) */ {
-	    int key_box_half = key_w / 2;
-	    key->bounds.xleft = (plot_bounds.xright + plot_bounds.xleft) / 2 - key_box_half;
-	    key->bounds.xright = (plot_bounds.xright + plot_bounds.xleft) / 2 + key_box_half;
-	}
-    } else if (key->region == GPKEY_AUTO_EXTERIOR_LRTBC || key->region == GPKEY_AUTO_EXTERIOR_MARGIN) {
+    /* Calculate limiting bounds of the key */
+    do_key_bounds(key);
 
-	/* Vertical alignment */
-	if (key->margin == GPKEY_TMARGIN) {
-	    /* align top first since tmargin may be manual */
-	    key->bounds.ytop = (ysize + yoffset) * t->ymax - t->v_tic;
-	    key->bounds.ybot = key->bounds.ytop - key_h;
-	} else if (key->margin == GPKEY_BMARGIN) {
-	    /* align bottom first since bmargin may be manual */
-	    key->bounds.ybot = yoffset * t->ymax + t->v_tic;
-	    key->bounds.ytop = key->bounds.ybot + key_h;
-	} else {
-	    if (key->vpos == JUST_TOP) {
-		/* align top first since tmargin may be manual */
-		key->bounds.ytop = plot_bounds.ytop;
-		key->bounds.ybot = key->bounds.ytop - key_h;
-	    } else if (key->vpos == JUST_CENTRE) {
-		int key_box_half = key_h / 2;
-		key->bounds.ybot = (plot_bounds.ybot + plot_bounds.ytop) / 2 - key_box_half;
-		key->bounds.ytop = (plot_bounds.ybot + plot_bounds.ytop) / 2 + key_box_half;
-	    } else {
-		/* align bottom first since bmargin may be manual */
-		key->bounds.ybot = plot_bounds.ybot;
-		key->bounds.ytop = key->bounds.ybot + key_h;
-	    }
-	}
-
-	/* Horizontal alignment */
-	if (key->margin == GPKEY_LMARGIN) {
-	    /* align left first since lmargin may be manual */
-	    key->bounds.xleft = xoffset * t->xmax + t->h_char;
-	    key->bounds.xright = key->bounds.xleft + key_w;
-	} else if (key->margin == GPKEY_RMARGIN) {
-	    /* align right first since rmargin may be manual */
-	    key->bounds.xright = (xsize + xoffset) * (t->xmax-1) - t->h_char;
-	    key->bounds.xleft = key->bounds.xright - key_w;
-	} else {
-	    if (key->hpos == LEFT) {
-		/* align left first since lmargin may be manual */
-		key->bounds.xleft = plot_bounds.xleft;
-		key->bounds.xright = key->bounds.xleft + key_w;
-	    } else if (key->hpos == CENTRE) {
-		int key_box_half = key_w / 2;
-		key->bounds.xleft = (plot_bounds.xright + plot_bounds.xleft) / 2 - key_box_half;
-		key->bounds.xright = (plot_bounds.xright + plot_bounds.xleft) / 2 + key_box_half;
-	    } else {
-		/* align right first since rmargin may be manual */
-		key->bounds.xright = plot_bounds.xright;
-		key->bounds.xleft = key->bounds.xright - key_w;
-	    }
-	}
-
-    } else {
-	int x, y;
-
-	map_position(&key->user_pos, &x, &y, "key");
-#if 0
-/* FIXME!!!
-** pm 22.1.2002: if key->user_pos.scalex or scaley == first_axes or second_axes,
-** then the graph scaling is not yet known and the box is positioned incorrectly;
-** you must do "replot" to avoid the wrong plot ... bad luck if output does not
-** go to screen */
-#define OK fprintf(stderr,"Line %i of %s is OK\n",__LINE__,__FILE__)
-	OK;
-	fprintf(stderr,"\tHELE: user pos: x=%i y=%i\n",key->user_pos.x,key->user_pos.y);
-	fprintf(stderr,"\tHELE: user pos: x=%i y=%i\n",x,y);
-#endif
-	/* Here top, bottom, left, right refer to the alignment with respect to point. */
-	key->bounds.xleft = x;
-	if (key->hpos == CENTRE)
-	    key->bounds.xleft -= key_w/2;
-	else if (key->hpos == RIGHT)
-	    key->bounds.xleft -= key_w;
-	key->bounds.xright = key->bounds.xleft + key_w;
-	key->bounds.ytop = y;
-	if (key->vpos == JUST_CENTRE)
-	    key->bounds.ytop += key_h/2;
-	else if (key->vpos == JUST_BOT)
-	    key->bounds.ytop += key_h;
-	key->bounds.ybot = key->bounds.ytop - key_h;
-    }
-    /*}}} */
 
     /* Set default clipping to the plot boundary */
     clip_area = &plot_bounds;
@@ -1838,7 +1601,7 @@ do_plot(struct curve_points *plots, int pcount)
 
     /* Draw the key, or at least reserve space for it (pass 1) */
     if (lkey)
-	do_key_layout( key, key_pass, &xl, &yl );
+	draw_key( key, key_pass, &xl, &yl );
     SECOND_KEY_PASS:
 	/* This tells the canvas and svg terminals to restart the plot count */
 	/* so that the key titles are in sync with the plots they describe.  */
@@ -2123,7 +1886,7 @@ do_plot(struct curve_points *plots, int pcount)
     /* Go back and draw the legend in a separate pass if necessary */
     if (lkey && key->front && !key_pass) {
 	key_pass = TRUE;
-	do_key_layout( key, key_pass, &xl, &yl );
+	draw_key( key, key_pass, &xl, &yl );
 	goto SECOND_KEY_PASS;
     }
 
@@ -5760,16 +5523,16 @@ do_key_sample(
 	(*t->linetype)(LT_BLACK);
 
     if (key->just == GPKEY_LEFT) {
-	write_multiline(xl + key_text_left, yl, title, LEFT, JUST_TOP, 0, key->font);
+	write_multiline(xl + key_text_left, yl, title, LEFT, JUST_CENTRE, 0, key->font);
     } else {
 	if ((*t->justify_text) (RIGHT)) {
-	    write_multiline(xl + key_text_right, yl, title, RIGHT, JUST_TOP, 0, key->font);
+	    write_multiline(xl + key_text_right, yl, title, RIGHT, JUST_CENTRE, 0, key->font);
 	} else {
 	    int x = xl + key_text_right - t->h_char * estimate_strlen(title);
 	    if (key->region == GPKEY_AUTO_EXTERIOR_LRTBC ||	/* HBB 990327 */
 		key->region == GPKEY_AUTO_EXTERIOR_MARGIN ||
 		i_inrange(x, plot_bounds.xleft, plot_bounds.xright))
-		write_multiline(x, yl, title, LEFT, JUST_TOP, 0, key->font);
+		write_multiline(x, yl, title, LEFT, JUST_CENTRE, 0, key->font);
 	}
     }
 
@@ -6880,41 +6643,289 @@ skip_pixel:
 
 }
 
+static void
+do_key_bounds(legend_key *key)
+{
+    struct termentry *t = term;
+
+    key_height = key_title_height + key_title_extra
+		+ key_rows * key_entry_height + key->height_fix * key_entry_height;
+    key_width = key_col_wth * key_cols;
+
+    /* Key inside plot boundaries */
+    if (key->region == GPKEY_AUTO_INTERIOR_LRTBC
+	|| (key->region == GPKEY_AUTO_EXTERIOR_LRTBC && key->vpos == JUST_CENTRE && key->hpos == CENTRE)) {
+	if (key->vpos == JUST_TOP) {
+	    key->bounds.ytop = plot_bounds.ytop - t->v_tic;
+	    key->bounds.ybot = key->bounds.ytop - key_height;
+	} else if (key->vpos == JUST_BOT) {
+	    key->bounds.ybot = plot_bounds.ybot + t->v_tic;
+	    key->bounds.ytop = key->bounds.ybot + key_height;
+	} else /* (key->vpos == JUST_CENTRE) */ {
+	    key->bounds.ybot = ((plot_bounds.ybot + plot_bounds.ytop) - key_height) / 2;
+	    key->bounds.ytop = ((plot_bounds.ybot + plot_bounds.ytop) + key_height) / 2;
+	}
+	if (key->hpos == LEFT) {
+	    key->bounds.xleft = plot_bounds.xleft + t->h_char;
+	    key->bounds.xright = key->bounds.xleft + key_width;
+	} else if (key->hpos == RIGHT) {
+	    key->bounds.xright = plot_bounds.xright - t->h_char;
+	    key->bounds.xleft = key->bounds.xright - key_width;
+	} else /* (key->hpos == CENTER) */ {
+	    key->bounds.xleft = ((plot_bounds.xright + plot_bounds.xleft) - key_width) / 2;
+	    key->bounds.xright = ((plot_bounds.xright + plot_bounds.xleft) + key_width) / 2;
+	}
+
+    /* Key outside plot boundaries */
+    } else if (key->region == GPKEY_AUTO_EXTERIOR_LRTBC || key->region == GPKEY_AUTO_EXTERIOR_MARGIN) {
+
+	/* Vertical alignment */
+	if (key->margin == GPKEY_TMARGIN) {
+	    /* align top first since tmargin may be manual */
+	    key->bounds.ytop = (ysize + yoffset) * t->ymax - t->v_tic;
+	    key->bounds.ybot = key->bounds.ytop - key_height;
+	} else if (key->margin == GPKEY_BMARGIN) {
+	    /* align bottom first since bmargin may be manual */
+	    key->bounds.ybot = yoffset * t->ymax + t->v_tic;
+	    key->bounds.ytop = key->bounds.ybot + key_height;
+	} else {
+	    if (key->vpos == JUST_TOP) {
+		/* align top first since tmargin may be manual */
+		key->bounds.ytop = plot_bounds.ytop;
+		key->bounds.ybot = key->bounds.ytop - key_height;
+	    } else if (key->vpos == JUST_CENTRE) {
+		key->bounds.ybot = ((plot_bounds.ybot + plot_bounds.ytop) - key_height) / 2;
+		key->bounds.ytop = ((plot_bounds.ybot + plot_bounds.ytop) + key_height) / 2;
+	    } else {
+		/* align bottom first since bmargin may be manual */
+		key->bounds.ybot = plot_bounds.ybot;
+		key->bounds.ytop = key->bounds.ybot + key_height;
+	    }
+	}
+
+	/* Horizontal alignment */
+	if (key->margin == GPKEY_LMARGIN) {
+	    /* align left first since lmargin may be manual */
+	    key->bounds.xleft = xoffset * t->xmax + t->h_char;
+	    key->bounds.xright = key->bounds.xleft + key_width;
+	} else if (key->margin == GPKEY_RMARGIN) {
+	    /* align right first since rmargin may be manual */
+	    key->bounds.xright = (xsize + xoffset) * (t->xmax-1) - t->h_char;
+	    key->bounds.xleft = key->bounds.xright - key_width;
+	} else {
+	    if (key->hpos == LEFT) {
+		/* align left first since lmargin may be manual */
+		key->bounds.xleft = plot_bounds.xleft;
+		key->bounds.xright = key->bounds.xleft + key_width;
+	    } else if (key->hpos == CENTRE) {
+		key->bounds.xleft  = ((plot_bounds.xright + plot_bounds.xleft) - key_width) / 2;
+		key->bounds.xright = ((plot_bounds.xright + plot_bounds.xleft) + key_width) / 2;
+	    } else {
+		/* align right first since rmargin may be manual */
+		key->bounds.xright = plot_bounds.xright;
+		key->bounds.xleft = key->bounds.xright - key_width;
+	    }
+	}
+
+    /* Key at explicit position specified by user */
+    } else {
+	int x, y;
+
+	/* FIXME!!!
+	 * pm 22.1.2002: if key->user_pos.scalex or scaley == first_axes or second_axes,
+	 * then the graph scaling is not yet known and the box is positioned incorrectly;
+	 * you must do "replot" to avoid the wrong plot ... bad luck if output does not
+	 * go to screen
+	 */
+	map_position(&key->user_pos, &x, &y, "key");
+
+	/* Here top, bottom, left, right refer to the alignment with respect to point. */
+	key->bounds.xleft = x;
+	if (key->hpos == CENTRE)
+	    key->bounds.xleft -= key_width/2;
+	else if (key->hpos == RIGHT)
+	    key->bounds.xleft -= key_width;
+	key->bounds.xright = key->bounds.xleft + key_width;
+	key->bounds.ytop = y;
+	if (key->vpos == JUST_CENTRE)
+	    key->bounds.ytop += key_height/2;
+	else if (key->vpos == JUST_BOT)
+	    key->bounds.ytop += key_height;
+	key->bounds.ybot = key->bounds.ytop - key_height;
+    }
+}
+
+/* Calculate positioning of components that make up the key box */
+static void
+do_key_layout(legend_key *key)
+{
+    struct termentry *t = term;
+    TBOOLEAN key_panic = FALSE;
+
+    /* If there is a separate font for the key, use it for space calculations */
+    if (key->font)
+	t->set_font(key->font);
+
+    key_xleft = 0;
+
+    if (key->swidth >= 0)
+	key_sample_width = key->swidth * t->h_char + p_width;
+    else
+	key_sample_width = 0;
+
+    key_entry_height = p_height * 1.25 * key->vert_factor;
+    if (key_entry_height < t->v_char)
+	key_entry_height = t->v_char * key->vert_factor;
+    /* HBB 20020122: safeguard to prevent division by zero later */
+    if (key_entry_height == 0)
+	key_entry_height = 1;
+
+    /* Key title length and height */
+    key_title_height = 0;
+    key_title_extra = 0;
+    if (key->title) {
+	int ytlen, ytheight;
+	ytlen = label_width(key->title, &ytheight);
+	ytlen -= key->swidth + 2;
+	/* EAM FIXME */
+	if ((ytlen > max_ptitl_len) && (key->stack_dir != GPKEY_HORIZONTAL))
+	    max_ptitl_len = ytlen;
+	key_title_height = ytheight * t->v_char;
+	if ((*key->title) && (t->flags & TERM_ENHANCED_TEXT)
+	&&  (strchr(key->title,'^') || strchr(key->title,'_')))
+	    key_title_extra = t->v_char;
+    }
+
+    if (key->reverse) {
+	key_sample_left = -key_sample_width;
+	key_sample_right = 0;
+	/* if key width is being used, adjust right-justified text */
+	key_text_left = t->h_char;
+	key_text_right = t->h_char * (max_ptitl_len + 1 + key->width_fix);
+	key_size_left = t->h_char - key_sample_left; /* sample left is -ve */
+	key_size_right = key_text_right;
+    } else {
+	key_sample_left = 0;
+	key_sample_right = key_sample_width;
+	/* if key width is being used, adjust left-justified text */
+	key_text_left = -(int) (t->h_char
+				* (max_ptitl_len + 1 + key->width_fix));
+	key_text_right = -(int) t->h_char;
+	key_size_left = -key_text_left;
+	key_size_right = key_sample_right + t->h_char;
+    }
+    key_point_offset = (key_sample_left + key_sample_right) / 2;
+
+    /* advance width for cols */
+    key_col_wth = key_size_left + key_size_right;
+
+    key_rows = ptitl_cnt;
+    key_cols = 1;
+
+    /* calculate rows and cols for key */
+
+    if (key->stack_dir == GPKEY_HORIZONTAL) {
+	/* maximise no cols, limited by label-length */
+	key_cols = (int) (plot_bounds.xright - plot_bounds.xleft) / key_col_wth;
+	if (key->maxcols > 0 && key_cols > key->maxcols)
+	    key_cols = key->maxcols;
+	/* EAM Dec 2004 - Rather than turn off the key, try to squeeze */
+	if (key_cols == 0) {
+	    key_cols = 1;
+	    key_panic = TRUE;
+	    key_col_wth = (plot_bounds.xright - plot_bounds.xleft);
+	}
+	key_rows = (ptitl_cnt + key_cols - 1) / key_cols;
+	/* now calculate actual no cols depending on no rows */
+	key_cols = (key_rows == 0) ? 1 : (ptitl_cnt + key_rows - 1) / key_rows;
+	if (key_cols == 0) {
+	    key_cols = 1;
+	}
+    } else {
+	/* maximise no rows, limited by plot_bounds.ytop-plot_bounds.ybot */
+	int i = (plot_bounds.ytop - plot_bounds.ybot - key->height_fix * key_entry_height
+		    - key_title_height - key_title_extra)
+		/ key_entry_height;
+	if (key->maxrows > 0 && i > key->maxrows)
+	    i = key->maxrows;
+
+	if (i == 0) {
+	    i = 1;
+	    key_panic = TRUE;
+	}
+	if (ptitl_cnt > i) {
+	    key_cols = (ptitl_cnt + i - 1) / i;
+	    /* now calculate actual no rows depending on no cols */
+	    if (key_cols == 0) {
+		key_cols = 1;
+		key_panic = TRUE;
+	    }
+	    key_rows = (ptitl_cnt + key_cols - 1) / key_cols;
+	}
+    }
+
+    /* adjust for outside key, leave manually set margins alone */
+    if ((key->region == GPKEY_AUTO_EXTERIOR_LRTBC && (key->vpos != JUST_CENTRE || key->hpos != CENTRE))
+	|| key->region == GPKEY_AUTO_EXTERIOR_MARGIN) {
+	int more = 0;
+	if (key->margin == GPKEY_BMARGIN && bmargin.x < 0) {
+	    more = key_rows * key_entry_height + key_title_height + key_title_extra
+		    + key->height_fix * key_entry_height;
+	    if (plot_bounds.ybot + more > plot_bounds.ytop)
+		key_panic = TRUE;
+	    else
+		plot_bounds.ybot += more;
+	} else if (key->margin == GPKEY_TMARGIN && tmargin.x < 0) {
+	    more = key_rows * key_entry_height + key_title_height + key_title_extra
+		    + key->height_fix * key_entry_height;
+	    if (plot_bounds.ytop - more < plot_bounds.ybot)
+		key_panic = TRUE;
+	    else
+		plot_bounds.ytop -= more;
+	} else if (key->margin == GPKEY_LMARGIN && lmargin.x < 0) {
+	    more = key_col_wth * key_cols;
+	    if (plot_bounds.xleft + more > plot_bounds.xright)
+		key_panic = TRUE;
+	    else
+		key_xleft = more;
+	    plot_bounds.xleft += key_xleft;
+	} else if (key->margin == GPKEY_RMARGIN && rmargin.x < 0) {
+	    more = key_col_wth * key_cols;
+	    if (plot_bounds.xright - more < plot_bounds.xleft)
+		key_panic = TRUE;
+	    else
+		plot_bounds.xright -= more;
+	}
+    }
+
+    /* Restore default font */
+    if (key->font)
+	t->set_font("");
+
+    /* warn if we had to punt on key size calculations */
+    if (key_panic)
+	int_warn(NO_CARET, "Warning - difficulty fitting plot titles into key");
+}
+
 /* Graph legend is now optionally done in two passes. The first pass calculates	*/
 /* and reserves the necessary space.  Next the individual plots in the graph 	*/
 /* are drawn. Then the reserved space for the legend is blanked out, and 	*/
 /* finally the second pass through this code draws the legend.			*/
 static void
-do_key_layout(legend_key *key, TBOOLEAN key_pass, int *xinkey, int *yinkey)
+draw_key(legend_key *key, TBOOLEAN key_pass, int *xinkey, int *yinkey)
 {
     struct termentry *t = term;
-    int xl = key->bounds.xleft + key_size_left;
-    int yl = key->bounds.ytop;
 
-    /* In two-pass mode, we blank out the key area after the graph	*/
-    /* is drawn and then redo the key in the blank area.		*/
+    /* In two-pass mode (set key opaque) we blank out the key box after	*/
+    /* the graph is drawn and then redo the key in the blank area.	*/
     if (key_pass && t->fillbox) {
-	double extra_height = 0.0;
-	int adjusted_key_bot = key->bounds.ybot;
-	if (*key->title) {
-	    if ((t->flags & TERM_ENHANCED_TEXT) && strchr(key->title,'^'))
-		extra_height += 0.51;
-	    if ((t->flags & TERM_ENHANCED_TEXT) && strchr(key->title,'_'))
-		extra_height += 0.3;
-	    adjusted_key_bot -= extra_height * t->v_char;
-	}
 	(*t->set_color)(&background_fill);
-	(*t->fillbox)(FS_OPAQUE, key->bounds.xleft, adjusted_key_bot,
-		key->bounds.xright - key->bounds.xleft,
-		key->bounds.ytop - adjusted_key_bot);
+	(*t->fillbox)(FS_OPAQUE, key->bounds.xleft, key->bounds.ybot,
+		key_width, key_height);
     }
 
     if (*key->title) {
 	int center = (key->bounds.xleft + key->bounds.xright) / 2;
-	double extra_height = 0.0;
-
-	if ((t->flags & TERM_ENHANCED_TEXT) && strchr(key->title,'^'))
-	    extra_height += 0.51;
 
 	/* Only draw the title once */
 	if (key_pass || !key->front) {
@@ -6922,20 +6933,11 @@ do_key_layout(legend_key *key, TBOOLEAN key_pass, int *xinkey, int *yinkey)
 		apply_pm3dcolor(&(key->box.pm3d_color), t);
 	    else
 		apply_pm3dcolor(&(key->textcolor), t);
-	    write_multiline(center, yl - (0.5 + extra_height/2.0) * t->v_char,
+	    write_multiline(center, key->bounds.ytop - (key_title_extra + key_entry_height)/2,
 			key->title, CENTRE, JUST_TOP, 0, key->font);
 	    (*t->linetype)(LT_BLACK);
 	}
-
-	if ((t->flags & TERM_ENHANCED_TEXT) && strchr(key->title,'_'))
-	    extra_height += 0.3;
-	ktitl_lines += extra_height;
-	key->bounds.ybot -= extra_height * t->v_char;
-	yl -= t->v_char * ktitl_lines;
     }
-
-    yl -= (int)(0.5 * key->height_fix * t->v_char);
-    yl_ref = yl -= key_entry_height / 2;	/* centralise the keys */
 
     if (key->box.l_type > LT_NODRAW) {
 	BoundingBox *clip_save = clip_area;
@@ -6952,11 +6954,15 @@ do_key_layout(legend_key *key, TBOOLEAN key_pass, int *xinkey, int *yinkey)
 	closepath();
 	/* draw a horizontal line between key title and first entry */
 	if (*key->title)
-	    draw_clip_line( key->bounds.xleft, key->bounds.ytop - (ktitl_lines) * t->v_char,
-			    key->bounds.xright, key->bounds.ytop - (ktitl_lines) * t->v_char);
+	    draw_clip_line( key->bounds.xleft, 
+	    		    key->bounds.ytop - (key_title_height + key_title_extra),
+			    key->bounds.xright,
+	    		    key->bounds.ytop - (key_title_height + key_title_extra));
 	clip_area = clip_save;
     }
 
-    *xinkey = xl;
-    *yinkey = yl;
+    yl_ref = key->bounds.ytop - (key_title_height + key_title_extra);
+    yl_ref -= ((key->height_fix + 1) * key_entry_height) / 2;
+    *xinkey = key->bounds.xleft + key_size_left;
+    *yinkey = yl_ref;
 }

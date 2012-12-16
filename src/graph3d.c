@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.274 2012/10/30 00:45:56 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.275 2012/11/29 00:12:56 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -77,7 +77,9 @@ static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.274 2012/10/30 00:45:56 
 
 static int p_height;
 static int p_width;		/* pointsize * t->h_tic */
-static int key_entry_height;	/* bigger of t->v_size, pointsize*t->v_tick */
+static int key_entry_height;	/* bigger of t->v_char, pointsize*t->v_tick */
+static int key_title_height;
+static int key_title_extra;	/* allow room for subscript/superscript */
 
 /* is contouring wanted ? */
 t_contour_placement draw_contour = CONTOUR_NONE;
@@ -129,9 +131,6 @@ static void cntr3d_impulses __PROTO((struct gnuplot_contours * cntr,
 				     struct lp_style_type * lp));
 static void cntr3d_lines __PROTO((struct gnuplot_contours * cntr,
 				  struct lp_style_type * lp));
-/* HBB UNUSED 20031219 */
-/* static void cntr3d_linespoints __PROTO((struct gnuplot_contours * cntr, */
-/* 					struct lp_style_type * lp)); */
 static void cntr3d_points __PROTO((struct gnuplot_contours * cntr,
 				   struct lp_style_type * lp));
 static void check_corner_height __PROTO((struct coordinate GPHUGE * point,
@@ -336,7 +335,6 @@ boundary3d(struct surface_points *plots, int count)
 	key_rows = key->maxrows;
 	key_cols = (ptitl_cnt - 1)/key_rows + 1;
     }
-
 
     if (key->visible)
     if ((key->region == GPKEY_AUTO_EXTERIOR_MARGIN || key->region == GPKEY_AUTO_EXTERIOR_LRTBC)
@@ -893,25 +891,21 @@ do_3dplot(
 	    closepath();
 
 	    /* draw a horizontal line between key title and first entry  JFi */
-	    clip_move(key->bounds.xleft, key->bounds.ytop - (ktitle_lines) * t->v_char);
-	    clip_vector(key->bounds.xright, key->bounds.ytop - (ktitle_lines) * t->v_char);
+	    clip_move(key->bounds.xleft, 
+			key->bounds.ytop - key_title_height - key_title_extra);
+	    clip_vector(key->bounds.xright, 
+			key->bounds.ytop - key_title_height - key_title_extra);
 	}
 
 	if (*key->title) {
 	    int center = (key->bounds.xright + key->bounds.xleft) / 2;
-	    double extra_height = 0.0;
 
 	    if (key->textcolor.type == TC_RGB && key->textcolor.value < 0)
 		apply_pm3dcolor(&(key->box.pm3d_color), t);
 	    else
 		apply_pm3dcolor(&(key->textcolor), t);
-	    if ((t->flags & TERM_ENHANCED_TEXT) && strchr(key->title,'^'))
-		extra_height += 0.51;
-	    write_multiline(center, key->bounds.ytop - (0.5 + extra_height/2.0) * t->v_char,
+	    write_multiline(center, key->bounds.ytop - (key_title_extra + t->v_char)/2,
 			    key->title, CENTRE, JUST_TOP, 0, key->font);
-	    if ((t->flags & TERM_ENHANCED_TEXT) && strchr(key->title,'_'))
-		extra_height += 0.3;
-	    ktitle_lines += extra_height;
 	    (*t->linetype)(LT_BLACK);
 	}
     }
@@ -3239,8 +3233,9 @@ void
 do_3dkey_layout(legend_key *key, int *xinkey, int *yinkey)
 {
     struct termentry *t = term;
-    int tmp;
+    int key_height, key_width;
 
+    /* NOTE: All of these had better not change after being calculated here! */
     if (key->reverse) {
 	key_sample_left = -key_sample_width;
 	key_sample_right = 0;
@@ -3258,80 +3253,92 @@ do_3dkey_layout(legend_key *key, int *xinkey, int *yinkey)
     }
     key_point_offset = (key_sample_left + key_sample_right) / 2;
 
+    key_title_height = ktitle_lines * t->v_char;
+    key_title_extra = 0;
+    if ((*key->title) && (t->flags & TERM_ENHANCED_TEXT)
+    &&  (strchr(key->title,'^') || strchr(key->title,'_')))
+	    key_title_extra = t->v_char;
+
+    key_width = key_col_wth * (key_cols - 1) + key_size_right + key_size_left;
+    key_height = key_title_height + key_title_extra
+		+ key_entry_height * key_rows + key->height_fix * t->v_char;
+
+    /* Now that we know the size of the key, we can position it as requested */
     if (key->region == GPKEY_USER_PLACEMENT) {
-	map3d_position(&key->user_pos, xinkey, yinkey, "key");
+	int corner_x, corner_y;
+
+	map3d_position(&key->user_pos, &corner_x, &corner_y, "key");
+	if (key->hpos == CENTRE) {
+	    key->bounds.xleft = corner_x - key_width / 2;
+	    key->bounds.xright = corner_x + key_width / 2;
+	} else if (key->hpos == RIGHT) {
+	    key->bounds.xleft = corner_x - key_width;
+	    key->bounds.xright = corner_x;
+	} else {
+	    key->bounds.xleft = corner_x;
+	    key->bounds.xright = corner_x + key_width;
+	}
+
+	key->bounds.ytop = corner_y;
+	key->bounds.ybot = corner_y - key_height;
+
+	*xinkey = key->bounds.xleft + key_size_left;
+	*yinkey = key->bounds.ytop - key_title_height - key_title_extra;
+
     } else {
 	if (key->region != GPKEY_AUTO_INTERIOR_LRTBC && key->margin == GPKEY_BMARGIN) {
-	    /* HBB 19990608: why calculate these again? boundary3d has already
-	     * done it... */
 	    if (ptitl_cnt > 0) {
-		/* maximise no cols, limited by label-length */
-		key_cols = (int) (plot_bounds.xright - plot_bounds.xleft) / key_col_wth;
-		if (key_cols < 1) key_cols = 1;
-		key_rows = (int) (ptitl_cnt + key_cols - 1) / key_cols;
-		if (key_rows > key->maxrows && key->maxrows > 0)
-		    key_rows = key->maxrows;
-		/* now calculate actual no cols depending on no rows */
-		key_cols = (int) (ptitl_cnt + key_rows - 1) / key_rows;
-		key_col_wth = (int) (plot_bounds.xright - plot_bounds.xleft) / key_cols;
 		/* we divide into columns, then centre in column by considering
 		 * ratio of key_left_size to key_right_size
-		 * key_size_left/(key_size_left+key_size_right) 
-		 *  * (plot_bounds.xright-plot_bounds.xleft)/key_cols
-		 * do one integer division to maximise accuracy (hope we dont
-		 * overflow !)
+		 * key_size_left / (key_size_left+key_size_right) 
+		 *               * (plot_bounds.xright-plot_bounds.xleft)/key_cols
+		 * do one integer division to maximise accuracy (hope we dont overflow!)
 		 */
 		*xinkey = plot_bounds.xleft
 		   + ((plot_bounds.xright - plot_bounds.xleft) * key_size_left) 
 		   / (key_cols * (key_size_left + key_size_right));
-		*yinkey = yoffset * t->ymax + (key_rows) * key_entry_height 
-		   + (ktitle_lines + 2) * t->v_char;
+		key->bounds.xleft = *xinkey - key_size_left;
+		key->bounds.xright = key->bounds.xleft + key_width;
+
+		key->bounds.ytop = plot_bounds.ybot;
+		key->bounds.ybot = plot_bounds.ybot - key_height;
+		*yinkey = key->bounds.ytop - key_title_height - key_title_extra;
 	    }
 
 	} else {
 	    if (key->vpos == JUST_TOP) {
-		*yinkey = plot_bounds.ytop - t->v_tic - t->v_char;
+		key->bounds.ytop = plot_bounds.ytop - t->v_tic;
+		key->bounds.ybot = key->bounds.ytop - key_height;
+		*yinkey = key->bounds.ytop - key_title_height - key_title_extra;
 	    } else {
-		*yinkey = plot_bounds.ybot + t->v_tic + key_entry_height * key_rows + ktitle_lines * t->v_char;
+		key->bounds.ybot = plot_bounds.ybot + t->v_tic;
+		key->bounds.ytop = key->bounds.ybot + key_height;
+		*yinkey = key->bounds.ytop - key_title_height - key_title_extra;
 	    }
 	    if (key->region != GPKEY_AUTO_INTERIOR_LRTBC && key->margin == GPKEY_RMARGIN) {
 		/* keys outside plot border (right) */
-		*xinkey = plot_bounds.xright + t->h_tic + key_size_left;
+		key->bounds.xleft = plot_bounds.xright + t->h_tic;
+		key->bounds.xright = key->bounds.xleft + key_width;
+		*xinkey = key->bounds.xleft + key_size_left;
 	    } else if (key->region != GPKEY_AUTO_INTERIOR_LRTBC && key->margin == GPKEY_LMARGIN) {
 		/* keys outside plot border (left) */
-		*xinkey = key_size_left + 2 * t->h_char;
+		key->bounds.xright = plot_bounds.xleft - t->h_tic;
+		key->bounds.xleft = key->bounds.xright - key_width;
+		*xinkey = key->bounds.xleft + key_size_left;
 	    } else if (key->hpos == LEFT) {
-		*xinkey = plot_bounds.xleft + t->h_tic + key_size_left;
-	    } else if (rmargin.scalex == screen 
-		   && (key->region == GPKEY_AUTO_EXTERIOR_LRTBC 
-			|| key->region == GPKEY_AUTO_EXTERIOR_MARGIN)) {
-		*xinkey = plot_bounds.xright - key_size_right + key_col_wth - 2 * t->h_char;
+		key->bounds.xleft = plot_bounds.xleft + t->h_tic;
+		key->bounds.xright = key->bounds.xleft + key_width;
+		*xinkey = key->bounds.xleft + key_size_left;
 	    } else {
-		*xinkey = plot_bounds.xright - key_size_right - key_col_wth * (key_cols - 1);
+		key->bounds.xright = plot_bounds.xright - t->h_tic;
+		key->bounds.xleft = key->bounds.xright - key_width;
+		*xinkey = key->bounds.xleft + key_size_left;
 	    }
 	}
-	yl_ref = *yinkey - ktitle_lines * t->v_char;
-    }
+	yl_ref = *yinkey - key_title_height - key_title_extra;
    
-    /* Key bounds */
-    key->bounds.xright = *xinkey + key_col_wth * (key_cols - 1) + key_size_right;
-    key->bounds.xleft = *xinkey - key_size_left;
-    key->bounds.ytop = *yinkey + t->v_char * ktitle_lines;
-    key->bounds.ybot = *yinkey - key_entry_height * key_rows;
-
-    /* Adjust for superscripts/subscripts in key title */
-    if ((*key->title) && (t->flags & TERM_ENHANCED_TEXT)) {
-	double extra_height = 0.0;
-	if (strchr(key->title,'^'))
-	    extra_height += 0.51;
-	if (strchr(key->title,'_'))
-	    extra_height += 0.3;
-	*yinkey -= t->v_char * extra_height;
-	key->bounds.ybot -= t->v_char * extra_height;
     }
 
-    /* User requested extra vertical space */
-    tmp = key->height_fix * t->v_char;
-    key->bounds.ybot -= tmp;
-    *yinkey -= tmp/2;
+    /* Center the key entries vertically, allowing for requested extra space */
+    *yinkey -= (key->height_fix * t->v_char) / 2;
 }

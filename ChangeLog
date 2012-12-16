@@ -1,3 +1,17 @@
+2012-12-16  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* demo/key.dem src/graph3d.c (boundary3d do_3d_key_layout)
+	src/graphics.c (boundary do_key_layout do_key_bounds draw_key):
+	Refactor code the key box layout code to repair several problems.
+	- left/right/center was not honored for an explicit key position
+	- incorrect key placement due to subscript or superscript in key title
+	- text spacing should be based on key font, not on the default font
+	- vertical centering of text in key samples was incorrect
+	Remaining problems:
+	- postscript terminal does incorrect vertical centering (vshift)
+	- maxcols is never checked in the splot key layout code
+	Bug #3556892  and other issues visible in key.dem
+
 2012-12-14  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/datafile.c:  If a data column requested by name is not found,
