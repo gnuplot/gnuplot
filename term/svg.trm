@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: svg.trm,v 1.128.2.9 2012/11/16 04:19:17 sfeam Exp $
+ * $Id: svg.trm,v 1.128.2.10 2012/12/02 18:32:12 sfeam Exp $
  */
 
 /*------------------------------------------------------------------------------------------------------------------------------------
@@ -1426,6 +1426,9 @@ SVG_set_font (const char *font)
 	if (font[sep] == ',')
 	    sscanf(font + sep + 1, "%lf", &SVG_fontSizeCur);
     }
+
+    /* Set other font metrics */
+    SVG_SetFont(SVG_fontNameCur, SVG_fontSizeCur);
 
     return (TRUE);
 }

@@ -5,6 +5,8 @@
 	The failure to do this led to poor vertical centering of text using any
 	font other than the default, and bad key box layout for small key fonts.
 
+	* term/svg.trm (set_font): equivalent fix for svg.
+
 2012-12-14  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/datafile.c:  If a data column requested by name is not found,
