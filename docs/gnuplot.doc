@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.701.2.23 2012/10/27 02:24:37 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.701.2.24 2012/11/15 20:30:03 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -13243,6 +13243,9 @@ Ffigure_mapcontours
 2 known limitations
  It is not possible to use in-line data (e.g. plot '-' ...) inside the curly
  brackets of a `do` or `while` loop.
+
+ The layout and positioning of the plot key is inaccurate whenever superscripts,
+ subscripts, or explicit fonts are used in the key text.  (Fixed in 4.7)
 
 =gamma
 =bessel
