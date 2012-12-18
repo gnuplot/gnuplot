@@ -1,3 +1,12 @@
+2012-12-18  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/term.c (enhanced_recursion):  Depending on the terminal type and
+	the current encoding, improper enhanced text syntax could cause anything
+	from garbage text to a segfault:
+	  set termopt enhanced; 
+	  set label "~"; plot [0:1][0:1] '+' using 1:1:("~^") with labels
+	Bugfix
+
 2012-12-16  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/post.trm (set_font): quick fix to redefine vshift every time the
