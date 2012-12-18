@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.210.2.3 2012/05/07 16:53:08 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.210.2.4 2012/11/16 06:29:58 sfeam Exp $"); }
 #endif
 
 #define X11_POLYLINE 1
@@ -5579,9 +5579,13 @@ char *fontname;
 		encoding == S_ENC_ISO8859_15 ? "iso8859-15" :
 		encoding == S_ENC_KOI8_R    ? "koi8-r" :
 		encoding == S_ENC_KOI8_U    ? "koi8-u" :
-		encoding == S_ENC_UTF8      ? "utf-8" :
+		encoding == S_ENC_UTF8      ? "iso10646-1" :
 		default_encoding[0] ? default_encoding :
-		"*-*" ) ;
+#if (0)
+		"*-*" ) ;	/* EAM 2011 - This used to work but, alas, no longer. */
+#else
+		"iso8859-1" ) ;	/* biased to English, but since the wildcard doesn't work ... */
+#endif
 
 	sprintf(fontspec, "-*-%s-%s-%c-*-*-%d-*-*-*-*-*-%s",
 		shortname, weight, slant, fontsize, fontencoding
