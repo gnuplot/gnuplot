@@ -7,6 +7,11 @@
 	  set label "~"; plot [0:1][0:1] '+' using 1:1:("~^") with labels
 	Bugfix
 
+	* src/gplt_x11.c:  Change the fallback font string used when the current
+	encoding is UTF-8 (iso10646-1) or when all else fails (iso8859-1).  This
+	is admitted biased towards English as a default, but the previous string
+	(*-*) does not work for common recent x11 implementations.
+
 2012-12-16  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* demo/key.dem src/graph3d.c (boundary3d do_3d_key_layout)
