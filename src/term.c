@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.245 2012/10/30 04:20:21 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.246 2012/11/26 08:04:46 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -2611,6 +2611,8 @@ enhanced_recursion(
 	    p = enhanced_recursion(++p, FALSE, fontname, fontsize, base,
 			      widthflag, showflag, 1);
 	    (term->enhanced_flush)();
+	    if (!*p)
+	        break;
 	    p = enhanced_recursion(++p, FALSE, fontname, fontsize, base,
 			      FALSE, showflag, 2);
 
