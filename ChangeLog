@@ -1,3 +1,8 @@
+2012-12-19  Olaf Booij  <obooij@users.sourceforge.net>
+
+	* src/graph3d.c:  In 3D plots with 'set view equal xyz' the point about
+	which zoom operates should be in the middle of the screen, not at z=0.
+
 2012-12-18  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/term.c (enhanced_recursion):  Depending on the terminal type and
