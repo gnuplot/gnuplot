@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.762 2012/12/03 22:45:18 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.763 2012/12/14 19:39:38 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -13086,6 +13086,7 @@ Ffigure_missing
       STATS_invalid           # number of invalid/incomplete/missing records
       STATS_blank             # number of blank lines in the file
       STATS_blocks            # number of indexable data blocks in the file
+      STATS_columns           # number of data columns in the first row of data
 
  The second set reports properties of the in-range data from a single column.
  If the corresponding axis is autoscaled (x-axis for the 1st column, y-axis 

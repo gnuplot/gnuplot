@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: stats.c,v 1.7 2012/06/19 18:11:06 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: stats.c,v 1.8 2012/06/30 06:41:33 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - stats.c */
@@ -515,6 +515,7 @@ file_variables( struct file_stats s, char *prefix )
     create_and_set_var( s.blanks,  prefix, "blank",   "" );
     create_and_set_var( s.blocks,  prefix, "blocks",  "" );
     create_and_set_var( s.outofrange, prefix, "outofrange", "" );
+    create_and_set_var( df_last_col, prefix, "columns", "" );
 }
 
 static void

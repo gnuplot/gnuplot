@@ -1,5 +1,5 @@
 /*
- * $Id: datafile.h,v 1.38 2012/08/08 03:46:26 sfeam Exp $
+ * $Id: datafile.h,v 1.39 2012/08/23 22:35:52 sfeam Exp $
  */
 
 /* GNUPLOT - datafile.h */
@@ -82,6 +82,9 @@ extern struct udft_entry ydata_func; /* HBB 990829: moved from command.h */
 
 /* Returned to caller by df_readline() */
 extern char *df_tokens[];
+
+/* number of columns in first row of data return to user in STATS_columns */
+extern int df_last_col;
 
 /* string representing missing values, ascii datafiles */
 extern char *missing_val;

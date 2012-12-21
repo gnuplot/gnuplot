@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.239 2012/12/14 18:05:57 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.240 2012/12/14 19:39:38 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -198,6 +198,7 @@ enum COLUMN_TYPE { CT_DEFAULT, CT_STRING, CT_KEYLABEL,
 int df_no_use_specs;            /* how many using columns were specified */
 int df_line_number;
 int df_datum;                   /* suggested x value if none given */
+int df_last_col = 0;		/* visible to user via STATS_columns */
 AXIS_INDEX df_axis[MAXDATACOLS];
 TBOOLEAN df_matrix = FALSE;     /* indicates if data originated from a 2D or 3D format */
 
@@ -1757,6 +1758,10 @@ df_readascii(double v[], int max)
 		return DF_COLUMN_HEADERS;
 	    }
 	}
+
+	/* Used by stats to set STATS_columns */
+	if (df_datum == 0)
+		df_last_col = df_no_cols;
 
 	/*{{{  copy column[] to v[] via use[] */
 	{

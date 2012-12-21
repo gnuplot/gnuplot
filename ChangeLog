@@ -4,6 +4,10 @@
 	These terminals support dashed lines but not the "dashlength" keyword.
 	They should silently ignore it rather than triggering an error.
 
+	* src/datafile.c src/datafile.h src/stats.c docs/gnuplot.doc:
+	Return the number of columns in the first row of a data set as
+	STATS_columns.
+
 2012-12-19  Olaf Booij  <obooij@users.sourceforge.net>
 
 	* src/graph3d.c:  In 3D plots with 'set view equal xyz' the point about
