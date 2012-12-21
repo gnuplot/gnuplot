@@ -804,6 +804,7 @@ enum QT_id {
 	QT_TITLE,
 	QT_CLOSE,
 	QT_DASH,
+	QT_DASHLENGTH,
 	QT_SOLID,
 	QT_OTHER
 };
@@ -823,6 +824,8 @@ static struct gen_table qt_opts[] = {
 	{"ti$tle",      QT_TITLE},
 	{"cl$ose",      QT_CLOSE},
 	{"dash$ed",	QT_DASH},
+	{"dashl$ength",	QT_DASHLENGTH},
+	{"dl",		QT_DASHLENGTH},
 	{"solid",	QT_SOLID},
 	{NULL,          QT_OTHER}
 };
@@ -938,6 +941,11 @@ void qt_options()
 		case QT_DASH:
 			SETCHECKDUP(set_dash);
 			qt_optionDash = true;
+			break;
+		case QT_DASHLENGTH:
+			/* FIXME: This should be easy, at least in Qt 4.8 */
+			c_token++;
+			(void) real_expression();
 			break;
 		case QT_SOLID:
 			SETCHECKDUP(set_dash);

@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: x11.trm,v 1.200 2012/10/23 02:53:36 sfeam Exp $
+ * $Id: x11.trm,v 1.201 2012/11/29 00:12:57 broeker Exp $
  *
  */
 
@@ -624,6 +624,12 @@ X11_options()
 #endif
 	case X11_OTHER:
 	default:
+	    /* Silently ignore these, as they are not yet implemented */
+	    if (equals(c_token, "dl") || almost_equals(c_token, "dashl$ength")) {
+		c_token++;
+		(void) real_expression();
+		break;
+	    }
 	    if (set_number) duplication=TRUE;
 	    /* let gnuplot_x11 check range */
 	    new_term_number = int_expression();
