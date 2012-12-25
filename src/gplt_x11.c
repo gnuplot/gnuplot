@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.225 2012/11/16 06:25:57 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.226 2012/12/19 01:07:49 sfeam Exp $"); }
 #endif
 
 #define MOUSE_ALL_WINDOWS 1
@@ -333,6 +333,8 @@ static void Remove_CMap_From_Linked_List __PROTO((cmap_t *));
 static cmap_t *Find_CMap_In_Linked_List __PROTO((cmap_t *));
 static int cmaps_differ __PROTO((cmap_t *, cmap_t *));
 
+static void clear_used_font_list __PROTO((void));
+
 /* current_cmap always points to a valid colormap.  At start up
  * it is the default colormap.  When a palette command comes
  * across the pipe, the current_cmap is set to point at the
@@ -499,7 +501,7 @@ static char *gpFallbackFont __PROTO((void));
 static int gpXGetFontascent __PROTO((XFontStruct *cfont));
 
 enum set_encoding_id encoding = S_ENC_DEFAULT; /* EAM - mirrored from core code by 'QE' */
-static char default_font[64] = { '\0' };
+static char default_font[196] = { '\0' };
 static char default_encoding[16] = { '\0' };
 
 #define Nwidths 10
@@ -2141,6 +2143,7 @@ exec_cmd(plot_struct *plot, char *command)
 		    int tmp;
 		    sscanf(buffer, "QE%d", &tmp);
 		    encoding = (enum set_encoding_id)tmp;
+		    clear_used_font_list();
 		}
 		FPRINTF((stderr, "gnuplot_x11: changing encoding to %d\n", encoding));
 		break;
@@ -5481,27 +5484,59 @@ pr_encoding()
     }
 }
 
+/* EAM Dec 2012 - To save a lot of overhead in looking for, allocating, and	*/
+/* freeing fonts, we will keep a list of all the fonts we have used so far.	*/
+/* Each new request will be first checked against the list.  If it is already	*/
+/* known, we use it.  If it isn't know, we add it to the list.			*/
+/* Because the requested names may be of the form ",size" we must clear the	*/
+/* list whenever a new default font is set.					*/
+struct used_font {
+	char *requested_name;	/* The name passed to pr_font() */
+	XFontStruct *font;	/* The font we ended up with for that request */
+	int vchar;
+	int hchar;
+	struct used_font *next;	/* pointer to next font in list */
+} used_font;
+static struct used_font fontlist = {NULL, NULL, 12, 8, NULL};
+
+/* Helper routine to clear the used font list */
+static void
+clear_used_font_list() {
+    struct used_font *f;
+    while (fontlist.next) {
+	f = fontlist.next;
+	gpXFreeFont(dpy, f->font);
+	free(f->requested_name);
+	fontlist.next = f->next;
+	free(f);
+    }
+}
+
 static void
 pr_font( fontname )
 char *fontname;
 {
-    static char previous_font_name[128];
     char fontspec[128];
     int  fontsize = 0;
 #ifdef USE_X11_MULTIBYTE
     char *orgfontname = NULL;
 #endif
+    struct used_font *search;
+    char *requested_name;
+    char *try_name;	/* Only for debugging */
 
-    if (!fontname || !(*fontname)) {
+    /* Blank string means "default font".  If none has been set this session,
+     * try to find one from the X11 settings.  Clear any previous font results.
+     */
+    if (!fontname)
+	clear_used_font_list();
+    if (!fontname || !(*fontname))
 	fontname = default_font;
-	*previous_font_name = '\0';
-    }
-
     if (!fontname || !(*fontname)) {
-	if ((fontname = pr_GetR(db, ".font")))
+	if ((fontname = pr_GetR(db, ".font"))) {
 	    strncpy(default_font, fontname, sizeof(default_font)-1);
-	    FPRINTF((stderr, "gnuplot_x11: setting default font %s from Xresource\n",
-		    fontname));
+	    clear_used_font_list();
+	}
     }
 
 #ifdef USE_X11_MULTIBYTE
@@ -5519,12 +5554,23 @@ char *fontname;
     if (!fontname)
       fontname = gpFallbackFont();
 
-    /* EAM DEBUG - Free previous font before searching for a new one. */
-    /* This doesn't seem right, since we will probably need it again  */
-    /* very soon. But if we don't free it, we gradually leak memory.  */
-    gpXFreeFont(dpy, font);
+    /* Look in the used font list to see if this one was requested before */
+    for (search = fontlist.next; search; search = search->next) {
+	if (!strcmp(fontname, search->requested_name)) {
+	    font = search->font;
+	    vchar = search->vchar;
+	    hchar = search->hchar;
+	    return;
+	}
+    }
+    /* If we get here, the request doesn't match a previously used font.
+     * Whatever font we end up with should be recorded in the used_font
+     * list so that we can find it cheaply next time.		
+     */
+    requested_name = strdup(fontname);
 
-    font = gpXLoadQueryFont(dpy, fontname);
+    /* Try using the requested name directly as an x11 font spec. */
+    font = gpXLoadQueryFont(dpy, try_name = fontname);
 
 #ifndef USE_X11_MULTIBYTE
     if (!font) {
@@ -5543,15 +5589,14 @@ char *fontname;
 	/* for whatever the previously selected font was, so we have to save */
 	/* and reuse the previous font name to construct the new spec.       */
 	if (!strncmp(fontname, "DEFAULT", 7)) {
-	    sscanf(&fontname[8], "%d", &fontsize);
+	    fontsize = atof(&(fontname[8])) + 0.5;
 	    fontname = default_font;
-	    *previous_font_name = '\0';
 #ifdef USE_X11_MULTIBYTE
 	    backfont = 1;
 #endif
 	} else if (*fontname == ',') {
-	    sscanf(&fontname[1], "%d", &fontsize);
-	    fontname = previous_font_name;
+	    fontsize = atof(&(fontname[1])) + 0.5;
+	    fontname = default_font;
 #ifdef USE_X11_MULTIBYTE
 	    backfont = 1;
 #endif
@@ -5571,7 +5616,7 @@ char *fontname;
 	strncpy(shortname, fontname, sep);
 	shortname[sep] = '\0';
 	if (!fontsize)
-	    sscanf( &(fontname[sep+1]), "%d", &fontsize);
+	    fontsize = atof(&(fontname[sep+1])) + 0.5;
 	if (fontsize > 99 || fontsize < 1)
 	    fontsize = 12;
 
@@ -5587,7 +5632,9 @@ char *fontname;
 	    fontencoding = "*-*";
 #ifdef USE_X11_MULTIBYTE
 	else if (usemultibyte)
-	    fontencoding = "*-*";
+	    fontencoding = (
+		encoding == S_ENC_UTF8      ? "iso10646-1" :
+		"*-*" ) ;	/* EAM 2011 - This used to work but, alas, no longer. */
 #endif
 	else
 	    fontencoding = (
@@ -5606,10 +5653,10 @@ char *fontname;
 		"iso8859-1" ) ;	/* biased to English, but since the wildcard doesn't work ... */
 #endif
 
-	sprintf(fontspec, "-*-%s-%s-%c-*-*-%d-*-*-*-*-*-%s",
+	sprintf(fontspec, "-*-%s-%s-%c-*--%d-*-*-*-*-*-%s",
 		shortname, weight, slant, fontsize, fontencoding
 		);
-	font = gpXLoadQueryFont(dpy, fontspec);
+	font = gpXLoadQueryFont(dpy, try_name = fontspec);
 
 #ifndef USE_X11_MULTIBYTE
 	if (!font) {
@@ -5679,15 +5726,16 @@ char *fontname;
 		sprintf(fontspec, "-*-gothic-bold-%c-*--%d-*", slant, fontsize);
 	    }
 #endif /* USE_X11_MULTIBYTE */
-	    font = gpXLoadQueryFont(dpy, fontspec);
+	    font = gpXLoadQueryFont(dpy, try_name = fontspec);
 
 #ifdef USE_X11_MULTIBYTE
 	    if (usemultibyte && !mbfont) {
 		/* But (mincho|gothic) X fonts are not provided
 		 * on some X servers even in Japan
 		 */
-		sprintf(fontspec, "*-%s-%c-*--%d-*", weight, slant, fontsize);
-		font = gpXLoadQueryFont(dpy, fontspec);
+		sprintf(fontspec, "*-%s-%c-*--%d-*", 
+			weight, slant, fontsize);
+		font = gpXLoadQueryFont(dpy, try_name = fontspec);
 	    }
 #endif /* USE_X11_MULTIBYTE */
 	}
@@ -5701,8 +5749,6 @@ char *fontname;
 	if (usemultibyte && orgfontname)
 	  fontname = orgfontname;
 #endif
-        strncpy(previous_font_name, fontname, sizeof(previous_font_name)-1);
-        FPRINTF((stderr, "gnuplot_x11:saving current font name \"%s\"\n", previous_font_name));
     }
 
     /* By now we have tried everything we can to honor the specific request. */
@@ -5714,18 +5760,18 @@ char *fontname;
     if (!usemultibyte && !font) {
 #endif
 	sprintf(fontspec, "-*-bitstream vera sans-bold-r-*-*-%d-*-*-*-*-*-*-*", fontsize);
-	font = gpXLoadQueryFont(dpy, fontspec);
+	font = gpXLoadQueryFont(dpy, try_name = fontspec);
 	fontname = fontspec;
 	if (!font) {
 	    sprintf(fontspec, "-*-arial-medium-r-*-*-%d-*-*-*-*-*-*-*", fontsize);
-	    font = gpXLoadQueryFont(dpy, fontspec);
+	    font = gpXLoadQueryFont(dpy, try_name = fontspec);
 	}
 	if (!font) {
 	    sprintf(fontspec, "-*-helvetica-medium-r-*-*-%d-*-*-*-*-*-*", fontsize);
-	    font = gpXLoadQueryFont(dpy, fontspec);
+	    font = gpXLoadQueryFont(dpy, try_name = fontspec);
 	}
 	if (!font) {
-	    font = gpXLoadQueryFont(dpy, gpFallbackFont());
+	    font = gpXLoadQueryFont(dpy, try_name = gpFallbackFont());
 	    fontname = gpFallbackFont();
 	}
 	if (!font) {
@@ -5736,10 +5782,10 @@ char *fontname;
     }
 #ifdef USE_X11_MULTIBYTE
     if (usemultibyte && !mbfont) { /* multibyte font setting */
-	font = gpXLoadQueryFont(dpy, gpFallbackFont());
+	font = gpXLoadQueryFont(dpy, try_name = gpFallbackFont());
 	if (!mbfont) {
 	    usemultibyte=0;
-	    font = gpXLoadQueryFont(dpy, gpFallbackFont());
+	    font = gpXLoadQueryFont(dpy, try_name = gpFallbackFont());
 	    if (!font) {
 		fprintf(stderr, "\ngnuplot_x11: can't find usable font - X11 aborted.\n");
 		EXIT(1);
@@ -5752,8 +5798,22 @@ char *fontname;
     vchar = gpXTextHeight(font);
     hchar = gpXTextWidth(font, "0123456789", 10) / 10;
 
+    /* Save a pointer to this font indexed by the name used to request it */
+    search = &fontlist;
+    while (search->next)
+	search = search->next;
+    search->next = malloc(sizeof(used_font));
+    search = search->next;
+    search->next = NULL;
+    search->font = font;
+    search->requested_name = requested_name;
+    search->vchar = vchar;
+    search->hchar = hchar;
+
     FPRINTF((stderr, "gnuplot_x11: pr_font() set font %s, vchar %d hchar %d\n",
 		fontname, vchar, hchar));
+    FPRINTF((stderr, "gnuplot_x11: requested \"%s\" succeeded with \"%s\"\n", 
+    		requested_name, try_name));
 
 }
 
