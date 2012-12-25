@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.226 2012/12/19 01:07:49 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.227 2012/12/25 18:28:02 sfeam Exp $"); }
 #endif
 
 #define MOUSE_ALL_WINDOWS 1
@@ -483,8 +483,8 @@ static double mouse_to_axis __PROTO((int, axis_scale_t *));
 
 static char *FallbackFont = "fixed";
 #ifdef USE_X11_MULTIBYTE
-static char *FallbackFontMB =
-    "mbfont:*-medium-r-normal--14-*;*-medium-r-normal--16-*";
+static char *FallbackFontMB = "mbfont:*-medium-r-normal--14-*,*-medium-r-normal--16-*";
+static char *FallbackFontMBUTF = "mbfont:*-medium-r-normal--14-*-iso10646-1";
 # define FontSetSep ';'
 static int usemultibyte = 0;
 static int multibyte_fonts_usable=1;
@@ -2216,6 +2216,14 @@ exec_cmd(plot_struct *plot, char *command)
 		    str = buffer + char_byte_offset + 1;
 		    v_offset = vchar/3;		/* Why? */
 		    break;
+	}
+
+	/* FIXME EAM DEBUG: We should not have gotten here without a valid font	*/
+	/* but apparently it can happen in the case of UTF-8.  The sanity check	*/
+	/* below must surely belong somewhere during font selection instead.	*/
+	if (usemultibyte && !mbfont) {
+	    usemultibyte = 0;
+	    fprintf(stderr,"gnuplot_x11: invalid multibyte font\n");
 	}
 
 	sl = strlen(str) - 1;
@@ -5424,7 +5432,7 @@ char *gpFallbackFont(void)
 {
 #ifdef USE_X11_MULTIBYTE
     if (usemultibyte)
-	return FallbackFontMB;
+	return (encoding == S_ENC_UTF8) ? FallbackFontMBUTF : FallbackFontMB;
 #endif
     return FallbackFont;
 }
@@ -5545,6 +5553,8 @@ char *fontname;
 	    usemultibyte = 1;
 	    orgfontname = fontname;
 	    fontname = &fontname[7];
+	    if (!*fontname)
+		fontname = NULL;
 	} else {
 	    usemultibyte=0;
 	    fontname=NULL;
@@ -5554,7 +5564,8 @@ char *fontname;
     if (!fontname)
       fontname = gpFallbackFont();
 
-    /* Look in the used font list to see if this one was requested before */
+    /* Look in the used font list to see if this one was requested before. */
+    /* FIXME: This is probably the wrong thing to do for multibyte fonts.  */
     for (search = fontlist.next; search; search = search->next) {
 	if (!strcmp(fontname, search->requested_name)) {
 	    font = search->font;
@@ -5588,13 +5599,7 @@ char *fontname;
 	/* Enhanced font processing wants a method of requesting a new size  */
 	/* for whatever the previously selected font was, so we have to save */
 	/* and reuse the previous font name to construct the new spec.       */
-	if (!strncmp(fontname, "DEFAULT", 7)) {
-	    fontsize = atof(&(fontname[8])) + 0.5;
-	    fontname = default_font;
-#ifdef USE_X11_MULTIBYTE
-	    backfont = 1;
-#endif
-	} else if (*fontname == ',') {
+	if (*fontname == ',') {
 	    fontsize = atof(&(fontname[1])) + 0.5;
 	    fontname = default_font;
 #ifdef USE_X11_MULTIBYTE
@@ -5627,7 +5632,6 @@ char *fontname;
 	weight = strstr(&fontname[sep+1], "bold")   ? "bold" :
 		 strstr(&fontname[sep+1], "medium") ? "medium" :
 		                                     "*" ;
-
 	if (!strncmp("Symbol", shortname, 6) || !strncmp("symbol", shortname, 6))
 	    fontencoding = "*-*";
 #ifdef USE_X11_MULTIBYTE
@@ -5771,8 +5775,8 @@ char *fontname;
 	    font = gpXLoadQueryFont(dpy, try_name = fontspec);
 	}
 	if (!font) {
-	    font = gpXLoadQueryFont(dpy, try_name = gpFallbackFont());
 	    fontname = gpFallbackFont();
+	    font = gpXLoadQueryFont(dpy, try_name = fontname);
 	}
 	if (!font) {
 	    fprintf(stderr, "\ngnuplot_x11: can't find usable font - X11 aborted.\n");

@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: x11.trm,v 1.201 2012/11/29 00:12:57 broeker Exp $
+ * $Id: x11.trm,v 1.202 2012/12/21 23:05:17 sfeam Exp $
  *
  */
 
@@ -1988,8 +1988,9 @@ ENHX11_put_text(unsigned int x, unsigned int y, const char *str)
     }
 PASS2:
 
-    /* Make sure that we start out using the intended font.  */
-	ENHx11_font = "DEFAULT";
+    /* Make sure that we start out using the intended font.  	*/
+    /*	ENHx11_font = "DEFAULT";	This broke!		*/
+	ENHx11_font = "";
 	ENHx11_fontsize = X11_default_fontsize;
 	if (*X11_next_font_used) {
 	    int sep = strcspn(X11_next_font_used,",");
