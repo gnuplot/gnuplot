@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.763 2012/12/14 19:39:38 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.764 2012/12/21 23:07:20 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -4047,8 +4047,8 @@ Ffigure_mapcontours
  previously user-defined function of the form f(x) or f(x,y).
 
  <datafile> is treated as in the `plot` command.  All the `plot datafile`
- modifiers (`using`, `every`,...) except `smooth` and the deprecated `thru`
- are applicable to `fit`. See `plot datafile`.
+ modifiers (`using`, `every`,...) except `smooth` are applicable to `fit`.
+ See `plot datafile`.
 
  The default data formats for fitting functions with a single
  independent variable, z=f(x), are z or x:z.  That is, if there is
@@ -5151,19 +5151,18 @@ Ffigure_mapcontours
                           {{nonuniform} matrix}
                           {index <index list> | index "<name>"}
                           {every <every list>}
-                          {thru <thru expression>}
                           {using <using list>}
                           {smooth <option>}
                           {volatile} {noautoscale}
 
- The modifiers `binary`, `index`, `every`, `thru`, `using`, and `smooth` are
+ The modifiers `binary`, `index`, `every`, `using`, and `smooth` are
  discussed separately.  In brief, `binary` allows data entry from a binary
  file (default is ASCII), `index` selects which data sets in a multi-data-set
  file are to be plotted, `every` specifies which points within a single data
  set are to be plotted, `using` determines how the columns within a single
- record are to be interpreted (`thru` is a special case of `using`), and
- `smooth` allows for simple interpolation and approximation.  (`splot` has a
- similar syntax, but does not support the `smooth` and `thru` options.)
+ record are to be interpreted, and `smooth` allows for simple interpolation
+ and approximation. `splot` has a similar syntax, but does not support the
+ `smooth` option.
 
  The `noautoscale` keyword means that the points making up this plot will be
  ignored when automatically determining axis range limits.
@@ -5712,7 +5711,7 @@ Ffigure_mapcontours
        plot "< awk '$0 !~ /^#/ {print $1-1965, $2}' population.dat"
 
  While this approach is most flexible, it is possible to achieve simple
- filtering with the `using` or `thru` keywords.
+ filtering with the `using` keyword.
 4 thru
 ?commands plot datafile thru
 ?plot datafile thru
@@ -5720,23 +5719,13 @@ Ffigure_mapcontours
 ?data-file thru
 ?datafile thru
 ?thru
- The `thru` function is provided for backward compatibility.
+ The `thru` keyword is deprecated.
 
- Syntax:
+ Old syntax:
        plot 'file' thru f(x)
 
- It is equivalent to:
-
+ Current syntax:
        plot 'file' using 1:(f($2))
-
- While the latter appears more complex, it is much more flexible.  The more
- natural
-
-       plot 'file' thru f(y)
-
- also works (i.e. you can use y as the dummy variable).
-
- `thru` is parsed for `splot` and `fit` but has no effect.
 4 using
 ?commands plot datafile using
 ?plot datafile using
@@ -12858,7 +12847,7 @@ Ffigure_missing
  does so also, except that the `using` list must provide three entries
  instead of two.
 
- The `plot` options `thru` and `smooth` are not available for `splot`, but
+ The `plot` option `smooth` is not available for `splot`, but
  `cntrparam` and `dgrid3d` provide limited smoothing capabilities.
 
  Data file organization is essentially the same as for `plot`, except that
