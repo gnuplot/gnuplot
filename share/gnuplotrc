@@ -30,7 +30,7 @@
 ### Initialize the default loadpath for shared gnuplot scripts and data.
 ### Please confirm that this path is correct before uncommented the line below.
 ###
-# set loadpath /usr/local/share/gnuplot/4.7/
+# set loadpath "/usr/local/share/gnuplot/4.7/demo"
 
 ###
 ### Some commonly used functions that are not built in
