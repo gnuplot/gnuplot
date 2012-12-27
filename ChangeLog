@@ -1,3 +1,8 @@
+2012-12-27  Daniel J Sebald <daniel.sebald@ieee.org>
+
+	* configure.in:  Repair shell syntax used to control the definition
+	of CC and CXX for cross-building.
+
 2012-12-19  Olaf Booij  <obooij@users.sourceforge.net>
 
 	* src/graph3d.c:  In 3D plots with 'set view equal xyz' the point about
