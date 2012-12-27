@@ -1,5 +1,5 @@
 /* Hey Emacs this is -*- C -*-
- * $Id: emf.trm,v 1.84 2012/09/04 19:15:27 sfeam Exp $
+ * $Id: emf.trm,v 1.85 2012/11/25 22:01:22 sfeam Exp $
  */
 
 /* GNUPLOT - emf.trm */
@@ -1305,8 +1305,8 @@ EMF_put_text(unsigned int x, unsigned int y, const char str[])
     /* positioning... y is recentered from bottom reference set in
      * text align */
     EMF_write_pointl(
-	x + (long) ((EMF_VCHAR / 2) * sin(emf_vert_text * EMF_10THDEG2RAD)),
-	term->ymax - y + (long) (EMF_VCHAR / 2
+	x + (long) ((term->v_char/ 2) * sin(emf_vert_text * EMF_10THDEG2RAD)),
+	term->ymax - y + (long) (term->v_char / 2
 				 * cos(emf_vert_text * EMF_10THDEG2RAD)));
     EMF_write_long(nchars);	/* true number of characters */
     EMF_write_long(76);		/* offset to text */
