@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.407 2012/11/26 08:00:02 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.408 2012/12/17 04:00:41 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -168,6 +168,7 @@ static void map_position_double __PROTO((struct position* pos, double* x, double
 
 static int find_maxl_keys __PROTO((struct curve_points *plots, int count, int *kcnt));
 
+static void draw_titles __PROTO((void));
 static void do_key_bounds __PROTO((legend_key *key));
 static void do_key_layout __PROTO((legend_key *key));
 static void draw_key __PROTO((legend_key *key, TBOOLEAN key_pass, int *xl, int *yl));
@@ -1437,151 +1438,6 @@ do_plot(struct curve_points *plots, int pcount)
     if (draw_border)
 	plot_border();
 
-    /* YLABEL */
-    if (axis_array[FIRST_Y_AXIS].label.text) {
-	ignore_enhanced(axis_array[FIRST_Y_AXIS].label.noenhanced);
-	apply_pm3dcolor(&(axis_array[FIRST_Y_AXIS].label.textcolor),t);
-	/* we worked out x-posn in boundary() */
-	if ((*t->text_angle) (axis_array[FIRST_Y_AXIS].label.rotate)) {
-	    double tmpx, tmpy;
-	    unsigned int x, y;
-	    map_position_r(&(axis_array[FIRST_Y_AXIS].label.offset),
-			   &tmpx, &tmpy, "doplot");
-
-	    x = ylabel_x + (t->v_char / 2);
-	    y = (plot_bounds.ytop + plot_bounds.ybot) / 2 + tmpy;
-
-	    write_multiline(x, y, axis_array[FIRST_Y_AXIS].label.text,
-			    CENTRE, JUST_TOP, axis_array[FIRST_Y_AXIS].label.rotate,
-			    axis_array[FIRST_Y_AXIS].label.font);
-	    (*t->text_angle) (0);
-	} else {
-	    /* really bottom just, but we know number of lines
-	       so we need to adjust x-posn by one line */
-	    unsigned int x = ylabel_x;
-	    unsigned int y = ylabel_y;
-
-	    write_multiline(x, y, axis_array[FIRST_Y_AXIS].label.text,
-			    LEFT, JUST_TOP, 0,
-			    axis_array[FIRST_Y_AXIS].label.font);
-	}
-	reset_textcolor(&(axis_array[FIRST_Y_AXIS].label.textcolor),t);
-	ignore_enhanced(FALSE);
-    }
-
-    /* Y2LABEL */
-    if (axis_array[SECOND_Y_AXIS].label.text) {
-	ignore_enhanced(axis_array[SECOND_Y_AXIS].label.noenhanced);
-	apply_pm3dcolor(&(axis_array[SECOND_Y_AXIS].label.textcolor),t);
-	/* we worked out coordinates in boundary() */
-	if ((*t->text_angle) (axis_array[SECOND_Y_AXIS].label.rotate)) {
-	    double tmpx, tmpy;
-	    unsigned int x, y;
-	    map_position_r(&(axis_array[SECOND_Y_AXIS].label.offset),
-			   &tmpx, &tmpy, "doplot");
-	    x = y2label_x + (t->v_char / 2) - 1;
-	    y = (plot_bounds.ytop + plot_bounds.ybot) / 2 + tmpy;
-
-	    write_multiline(x, y, axis_array[SECOND_Y_AXIS].label.text,
-			    CENTRE, JUST_TOP,
-			    axis_array[SECOND_Y_AXIS].label.rotate,
-			    axis_array[SECOND_Y_AXIS].label.font);
-	    (*t->text_angle) (0);
-	} else {
-	    /* really bottom just, but we know number of lines */
-	    unsigned int x = y2label_x;
-	    unsigned int y = y2label_y;
-
-	    write_multiline(x, y, axis_array[SECOND_Y_AXIS].label.text,
-			    RIGHT, JUST_TOP, 0,
-			    axis_array[SECOND_Y_AXIS].label.font);
-	}
-	reset_textcolor(&(axis_array[SECOND_Y_AXIS].label.textcolor),t);
-	ignore_enhanced(FALSE);
-    }
-
-    /* XLABEL */
-    if (axis_array[FIRST_X_AXIS].label.text) {
-	double tmpx, tmpy;
-	unsigned int x, y;
-	map_position_r(&(axis_array[FIRST_X_AXIS].label.offset),
-		       &tmpx, &tmpy, "doplot");
-
-	x = (plot_bounds.xright + plot_bounds.xleft) / 2 +  tmpx;
-	y = xlabel_y - t->v_char / 2;   /* HBB */
-
-	ignore_enhanced(axis_array[FIRST_X_AXIS].label.noenhanced);
-	apply_pm3dcolor(&(axis_array[FIRST_X_AXIS].label.textcolor), t);
-	write_multiline(x, y, axis_array[FIRST_X_AXIS].label.text,
-			CENTRE, JUST_TOP, 0,
-			axis_array[FIRST_X_AXIS].label.font);
-	reset_textcolor(&(axis_array[FIRST_X_AXIS].label.textcolor), t);
-	ignore_enhanced(FALSE);
-    }
-
-    /* PLACE TITLE */
-    if (title.text) {
-	double tmpx, tmpy;
-	unsigned int x, y;
-	map_position_r(&(title.offset), &tmpx, &tmpy, "doplot");
-	/* we worked out y-coordinate in boundary() */
-	x = (plot_bounds.xleft + plot_bounds.xright) / 2 + tmpx;
-	y = title_y - t->v_char / 2;
-
-	ignore_enhanced(title.noenhanced);
-	apply_pm3dcolor(&(title.textcolor), t);
-	write_multiline(x, y, title.text, CENTRE, JUST_TOP, 0, title.font);
-	reset_textcolor(&(title.textcolor), t);
-	ignore_enhanced(FALSE);
-    }
-
-    /* X2LABEL */
-    if (axis_array[SECOND_X_AXIS].label.text) {
-	double tmpx, tmpy;
-	unsigned int x, y;
-	map_position_r(&(axis_array[SECOND_X_AXIS].label.offset),
-		       &tmpx, &tmpy, "doplot");
-	/* we worked out y-coordinate in boundary() */
-	x = (plot_bounds.xright + plot_bounds.xleft) / 2 + tmpx;
-	y = x2label_y - t->v_char / 2 - 1;
-	ignore_enhanced(axis_array[SECOND_X_AXIS].label.noenhanced);
-	apply_pm3dcolor(&(axis_array[SECOND_X_AXIS].label.textcolor),t);
-	write_multiline(x, y, axis_array[SECOND_X_AXIS].label.text, CENTRE,
-			JUST_TOP, 0, axis_array[SECOND_X_AXIS].label.font);
-	reset_textcolor(&(axis_array[SECOND_X_AXIS].label.textcolor),t);
-	ignore_enhanced(FALSE);
-    }
-
-    /* PLACE TIMEDATE */
-    if (timelabel.text) {
-	/* we worked out coordinates in boundary() */
-	char *str;
-	time_t now;
-	unsigned int x = time_x;
-	unsigned int y = time_y;
-	time(&now);
-	/* there is probably no way to find out in advance how many
-	 * chars strftime() writes */
-	str = gp_alloc(MAX_LINE_LEN + 1, "timelabel.text");
-	strftime(str, MAX_LINE_LEN, timelabel.text, localtime(&now));
-
-	if (timelabel_rotate && (*t->text_angle) (TEXT_VERTICAL)) {
-	    x += t->v_char / 2;	/* HBB */
-	    if (timelabel_bottom)
-		write_multiline(x, y, str, LEFT, JUST_TOP, TEXT_VERTICAL, timelabel.font);
-	    else
-		write_multiline(x, y, str, RIGHT, JUST_TOP, TEXT_VERTICAL, timelabel.font);
-	    (*t->text_angle) (0);
-	} else {
-	    y -= t->v_char / 2;	/* HBB */
-	    if (timelabel_bottom)
-		write_multiline(x, y, str, LEFT, JUST_BOT, 0, timelabel.font);
-	    else
-		write_multiline(x, y, str, LEFT, JUST_TOP, 0, timelabel.font);
-	}
-	free(str);
-    }
-
     /* Add back colorbox if appropriate */
     if (is_plot_with_colorbox() && term->set_color
 	&& color_box.layer == LAYER_BACK)
@@ -1598,6 +1454,10 @@ do_plot(struct curve_points *plots, int pcount)
 
     /* Sync point for epslatex text positioning */
     (term->layer)(TERM_LAYER_FRONTTEXT);
+
+    /* Draw plot title and axis labels */
+    /* Note: As of Dec 2012 these are drawn as "front" text. */
+    draw_titles();
 
     /* Draw the key, or at least reserve space for it (pass 1) */
     if (lkey)
@@ -6965,4 +6825,158 @@ draw_key(legend_key *key, TBOOLEAN key_pass, int *xinkey, int *yinkey)
     yl_ref -= ((key->height_fix + 1) * key_entry_height) / 2;
     *xinkey = key->bounds.xleft + key_size_left;
     *yinkey = yl_ref;
+}
+
+/*
+ * This routine draws the plot title, the axis labels, and an optional time stamp.
+ */
+static void
+draw_titles()
+{
+    struct termentry *t = term;
+
+    /* YLABEL */
+    if (axis_array[FIRST_Y_AXIS].label.text) {
+	ignore_enhanced(axis_array[FIRST_Y_AXIS].label.noenhanced);
+	apply_pm3dcolor(&(axis_array[FIRST_Y_AXIS].label.textcolor),t);
+	/* we worked out x-posn in boundary() */
+	if ((*t->text_angle) (axis_array[FIRST_Y_AXIS].label.rotate)) {
+	    double tmpx, tmpy;
+	    unsigned int x, y;
+	    map_position_r(&(axis_array[FIRST_Y_AXIS].label.offset),
+			   &tmpx, &tmpy, "doplot");
+
+	    x = ylabel_x + (t->v_char / 2);
+	    y = (plot_bounds.ytop + plot_bounds.ybot) / 2 + tmpy;
+
+	    write_multiline(x, y, axis_array[FIRST_Y_AXIS].label.text,
+			    CENTRE, JUST_TOP, axis_array[FIRST_Y_AXIS].label.rotate,
+			    axis_array[FIRST_Y_AXIS].label.font);
+	    (*t->text_angle) (0);
+	} else {
+	    /* really bottom just, but we know number of lines
+	       so we need to adjust x-posn by one line */
+	    unsigned int x = ylabel_x;
+	    unsigned int y = ylabel_y;
+
+	    write_multiline(x, y, axis_array[FIRST_Y_AXIS].label.text,
+			    LEFT, JUST_TOP, 0,
+			    axis_array[FIRST_Y_AXIS].label.font);
+	}
+	reset_textcolor(&(axis_array[FIRST_Y_AXIS].label.textcolor),t);
+	ignore_enhanced(FALSE);
+    }
+
+    /* Y2LABEL */
+    if (axis_array[SECOND_Y_AXIS].label.text) {
+	ignore_enhanced(axis_array[SECOND_Y_AXIS].label.noenhanced);
+	apply_pm3dcolor(&(axis_array[SECOND_Y_AXIS].label.textcolor),t);
+	/* we worked out coordinates in boundary() */
+	if ((*t->text_angle) (axis_array[SECOND_Y_AXIS].label.rotate)) {
+	    double tmpx, tmpy;
+	    unsigned int x, y;
+	    map_position_r(&(axis_array[SECOND_Y_AXIS].label.offset),
+			   &tmpx, &tmpy, "doplot");
+	    x = y2label_x + (t->v_char / 2) - 1;
+	    y = (plot_bounds.ytop + plot_bounds.ybot) / 2 + tmpy;
+
+	    write_multiline(x, y, axis_array[SECOND_Y_AXIS].label.text,
+			    CENTRE, JUST_TOP,
+			    axis_array[SECOND_Y_AXIS].label.rotate,
+			    axis_array[SECOND_Y_AXIS].label.font);
+	    (*t->text_angle) (0);
+	} else {
+	    /* really bottom just, but we know number of lines */
+	    unsigned int x = y2label_x;
+	    unsigned int y = y2label_y;
+
+	    write_multiline(x, y, axis_array[SECOND_Y_AXIS].label.text,
+			    RIGHT, JUST_TOP, 0,
+			    axis_array[SECOND_Y_AXIS].label.font);
+	}
+	reset_textcolor(&(axis_array[SECOND_Y_AXIS].label.textcolor),t);
+	ignore_enhanced(FALSE);
+    }
+
+    /* XLABEL */
+    if (axis_array[FIRST_X_AXIS].label.text) {
+	double tmpx, tmpy;
+	unsigned int x, y;
+	map_position_r(&(axis_array[FIRST_X_AXIS].label.offset),
+		       &tmpx, &tmpy, "doplot");
+
+	x = (plot_bounds.xright + plot_bounds.xleft) / 2 +  tmpx;
+	y = xlabel_y - t->v_char / 2;   /* HBB */
+
+	ignore_enhanced(axis_array[FIRST_X_AXIS].label.noenhanced);
+	apply_pm3dcolor(&(axis_array[FIRST_X_AXIS].label.textcolor), t);
+	write_multiline(x, y, axis_array[FIRST_X_AXIS].label.text,
+			CENTRE, JUST_TOP, 0,
+			axis_array[FIRST_X_AXIS].label.font);
+	reset_textcolor(&(axis_array[FIRST_X_AXIS].label.textcolor), t);
+	ignore_enhanced(FALSE);
+    }
+
+    /* PLACE TITLE */
+    if (title.text) {
+	double tmpx, tmpy;
+	unsigned int x, y;
+	map_position_r(&(title.offset), &tmpx, &tmpy, "doplot");
+	/* we worked out y-coordinate in boundary() */
+	x = (plot_bounds.xleft + plot_bounds.xright) / 2 + tmpx;
+	y = title_y - t->v_char / 2;
+
+	ignore_enhanced(title.noenhanced);
+	apply_pm3dcolor(&(title.textcolor), t);
+	write_multiline(x, y, title.text, CENTRE, JUST_TOP, 0, title.font);
+	reset_textcolor(&(title.textcolor), t);
+	ignore_enhanced(FALSE);
+    }
+
+    /* X2LABEL */
+    if (axis_array[SECOND_X_AXIS].label.text) {
+	double tmpx, tmpy;
+	unsigned int x, y;
+	map_position_r(&(axis_array[SECOND_X_AXIS].label.offset),
+		       &tmpx, &tmpy, "doplot");
+	/* we worked out y-coordinate in boundary() */
+	x = (plot_bounds.xright + plot_bounds.xleft) / 2 + tmpx;
+	y = x2label_y - t->v_char / 2 - 1;
+	ignore_enhanced(axis_array[SECOND_X_AXIS].label.noenhanced);
+	apply_pm3dcolor(&(axis_array[SECOND_X_AXIS].label.textcolor),t);
+	write_multiline(x, y, axis_array[SECOND_X_AXIS].label.text, CENTRE,
+			JUST_TOP, 0, axis_array[SECOND_X_AXIS].label.font);
+	reset_textcolor(&(axis_array[SECOND_X_AXIS].label.textcolor),t);
+	ignore_enhanced(FALSE);
+    }
+
+    /* PLACE TIMEDATE */
+    if (timelabel.text) {
+	/* we worked out coordinates in boundary() */
+	char *str;
+	time_t now;
+	unsigned int x = time_x;
+	unsigned int y = time_y;
+	time(&now);
+	/* there is probably no way to find out in advance how many
+	 * chars strftime() writes */
+	str = gp_alloc(MAX_LINE_LEN + 1, "timelabel.text");
+	strftime(str, MAX_LINE_LEN, timelabel.text, localtime(&now));
+
+	if (timelabel_rotate && (*t->text_angle) (TEXT_VERTICAL)) {
+	    x += t->v_char / 2;	/* HBB */
+	    if (timelabel_bottom)
+		write_multiline(x, y, str, LEFT, JUST_TOP, TEXT_VERTICAL, timelabel.font);
+	    else
+		write_multiline(x, y, str, RIGHT, JUST_TOP, TEXT_VERTICAL, timelabel.font);
+	    (*t->text_angle) (0);
+	} else {
+	    y -= t->v_char / 2;	/* HBB */
+	    if (timelabel_bottom)
+		write_multiline(x, y, str, LEFT, JUST_BOT, 0, timelabel.font);
+	    else
+		write_multiline(x, y, str, LEFT, JUST_TOP, 0, timelabel.font);
+	}
+	free(str);
+    }
 }

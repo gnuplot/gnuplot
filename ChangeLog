@@ -13,6 +13,10 @@
 	* src/wxterminal/gp_cairo.c: Vertical line centering must take into
 	account the current oversampling factor.
 
+	* src/graphics.c (draw_titles): Create a separate routine that draws
+	the plot title and axis labels.  Make these "front" rather than "back"
+	text elements.
+
 2012-12-26  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* docs/gnuplot-ja.doc: Sync with English documentation (rev.1.764)
