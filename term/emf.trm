@@ -1,5 +1,5 @@
 /* Hey Emacs this is -*- C -*-
- * $Id: emf.trm,v 1.82 2012/09/04 16:36:38 sfeam Exp $
+ * $Id: emf.trm,v 1.86 2012/12/27 22:10:47 sfeam Exp $
  */
 
 /* GNUPLOT - emf.trm */
@@ -619,7 +619,7 @@ EMF_options()
 
     /* Annoying hack to handle the case of 'set termoption' after */
     /* we have already initialized the terminal.                  */
-    if (c_token != 2) {
+    if (!almost_equals(c_token-1, "termopt$ion")) {
 	term->xmax = EMF_XMAX;
 	term->ymax = EMF_YMAX;
 	emf_dashed = FALSE;
@@ -1305,8 +1305,8 @@ EMF_put_text(unsigned int x, unsigned int y, const char str[])
     /* positioning... y is recentered from bottom reference set in
      * text align */
     EMF_write_pointl(
-	x + (long) ((EMF_VCHAR / 2) * sin(emf_vert_text * EMF_10THDEG2RAD)),
-	term->ymax - y + (long) (EMF_VCHAR / 2
+	x + (long) ((term->v_char/ 2) * sin(emf_vert_text * EMF_10THDEG2RAD)),
+	term->ymax - y + (long) (term->v_char / 2
 				 * cos(emf_vert_text * EMF_10THDEG2RAD)));
     EMF_write_long(nchars);	/* true number of characters */
     EMF_write_long(76);		/* offset to text */

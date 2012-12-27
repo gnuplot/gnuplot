@@ -1,5 +1,5 @@
 /*
- * $Id: gp_cairo.c,v 1.60.2.1 2012/03/30 04:22:46 sfeam Exp $
+ * $Id: gp_cairo.c,v 1.60.2.2 2012/12/18 06:45:22 sfeam Exp $
  */
 
 /* GNUPLOT - gp_cairo.c */
@@ -801,7 +801,7 @@ void gp_cairo_draw_text(plot_struct *plot, int x1, int y1, const char* string)
 
 	/* vert_just = ((double)ink_rect.height/2 +(double)ink_rect.y) / PANGO_SCALE;	*/
 	/* vert_just = avg_vchar/2;							*/
-	vert_just = plot->fontsize*16;
+	vert_just = 0.8 * (float)(plot->fontsize * plot->oversampling_scale);
 
 	x = (double) x1;
 	y = (double) y1;
