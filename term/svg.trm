@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: svg.trm,v 1.128.2.10 2012/12/02 18:32:12 sfeam Exp $
+ * $Id: svg.trm,v 1.128.2.11 2012/12/17 19:52:14 sfeam Exp $
  */
 
 /*------------------------------------------------------------------------------------------------------------------------------------
@@ -342,10 +342,13 @@ SVG_SetFont (const char *name, double size)
  * 'font-size' (!), we have to to define font properties in a less
  * than optimal way */
 
-    SVG_fontAscent = (int) (SVG_fontSizeCur * 1.00 * SVG_SCALE); /* estimated current font ascent*/
-    SVG_fontDescent = (int) (SVG_fontSizeCur * 0.25 * SVG_SCALE); /* estimated current font descent*/
-    SVG_fontLeading = (int) (SVG_fontSizeCur * 0.25 * SVG_SCALE); /* estimated current font leading*/
-    SVG_fontAvWidth = (int) (SVG_fontSizeCur * 0.70 * SVG_SCALE); /* estimated current font char average width*/
+    SVG_fontAscent = (int) (SVG_fontSizeCur * 1.00 * SVG_SCALE);
+    SVG_fontDescent = (int) (SVG_fontSizeCur * 0.25 * SVG_SCALE);
+    SVG_fontLeading = (int) (SVG_fontSizeCur * 0.25 * SVG_SCALE);
+    SVG_fontAvWidth = (int) (SVG_fontSizeCur * 0.70 * SVG_SCALE);
+
+    term->h_char = SVG_fontAvWidth;
+    term->v_char = (SVG_fontAscent + SVG_fontDescent + SVG_fontLeading);
 }
 
 static void
@@ -788,14 +791,9 @@ SVG_init ()
     term->xmax = SVG_xSize;
     term->ymax = SVG_ySize;
 
-/* set current font*/
+/* set current font, including h_char and v_char */
 
     SVG_SetFont (SVG_fontNameCur, SVG_fontSizeCur);
-
-/* set h_char, v_char*/
-
-    term->h_char = SVG_fontAvWidth;
-    term->v_char = (SVG_fontAscent + SVG_fontDescent + SVG_fontLeading);
 
 /* set h_tic, v_tic*/
 
