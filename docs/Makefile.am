@@ -299,6 +299,7 @@ gnuplot.texi: $(srcdir)/doc2texi.el $(srcdir)/gnuplot.doc
 	   $(EMACS) -batch -l $(srcdir)/doc2texi.el -f d2t-doc-to-texi ; \
 	   echo "Compiling gnuplot-eldoc.el" ; \
 	   $(EMACS) -batch --eval='(byte-compile-file "gnuplot-eldoc.el")' ; \
+	   test "$(top_srcdir)" = "$(top_builddir)" || cp gnuplot.texi $(srcdir) ; \
 	else \
 	   echo "No emacs found - cannot create texinfo file" ; \
 	fi
