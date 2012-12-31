@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.765 2012/12/26 04:05:05 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.766 2012/12/29 14:49:10 broeker Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -213,6 +213,8 @@ C
  data block for repeated plotting. See `inline data`.
  
  * Support for 32-bit Alpha channel + RGB color #AARRGGBB.  See `colorspec`.
+
+ * Support for HSV color space via a translation function hsv2rgb(H,S,V).
 
  * Secondary axes (x2, y2) may be locked to the primary axis via a mapping
  function.  In the simplest case this guarantees that the primary and secondary
@@ -3360,8 +3362,9 @@ Ffigure_histerrorbar
        set style histogram errorbars gap 2 lw 2
        plot for [COL=2:4:2] 'file.dat' using COL:COL+1
 
- To plot the same data as a rowstacked histogram.  Just to be different, this
- example lists the separate columns explicitly rather than using iteration.
+ This shows how to plot the same data as a rowstacked histogram.  Just to be
+ different, this example lists the separate columns explicitly rather than using
+ iteration.
 
        set style histogram rowstacked
        plot 'file.dat' using 2, '' using 4:xtic(1)
@@ -3370,6 +3373,7 @@ Ffigure_histrows
  This will produce a plot in which each vertical bar corresponds to one row of
  data.  Each vertical bar contains a stack of two segments, corresponding in
  height to the values found in columns 2 and 4 of the datafile.
+
 
 
  Finally, the commands

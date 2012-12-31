@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.408 2012/12/17 04:00:41 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.409 2012/12/28 06:50:45 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -6622,7 +6622,11 @@ do_key_layout(legend_key *key)
     struct termentry *t = term;
     TBOOLEAN key_panic = FALSE;
 
-    /* If there is a separate font for the key, use it for space calculations */
+    /* If there is a separate font for the key, use it for space calculations.	*/
+    /* FIXME:  This is problematic for asynchronous terminals like x11. We ask	*/
+    /* for a font change, and the outboard driver will eventually update the	*/
+    /* values of v_char and h_char, but that change will not happen quickly	*/
+    /* enough for us to see it here two lines later in the code.		*/
     if (key->font)
 	t->set_font(key->font);
 

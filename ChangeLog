@@ -1,3 +1,8 @@
+2012-12-31  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/graphics.c: Add a comment documenting the reason for 
+	problems with font size changes in terminals such as x11.
+
 2012-12-29  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* docs/Makefile.am (gnuplot.texi): Generated file has to be copied
