@@ -1,3 +1,28 @@
+2013-01-04  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/gadgets.h (E_Refresh_Allowed, TRefresh_Allowed): New
+	enum/typedef to avoid magic constants in code using refresh_ok;
+	(refresh_ok): Change to new type.
+	(SET_REFRESH_OK): New macro to mask write accesses to refresh_ok
+	and refresh_nplots if VOLATILE_REFRESH is not defined.
+
+	* src/gadgets.c: Change definition of refresh_ok to new type.
+
+	* src/set.c (set_logscale): Use new macro.
+
+	* src/unset.c (unset_logscale, reset_command): Use new macro.
+
+	* src/plot3d.c (eval_3dplots): Use new macro.
+
+	* src/plot2d.c (eval_plots): Use new macro.
+
+	* src/command.c (do_string_replot, refresh_request): Replace magic
+	numbers by enum values.
+	(replotrequest): Use new macro.
+
+	* src/mouse.c (apply_zoom, event_buttonpress, do_save_3dplot):
+	Replace magic numbers by enum values.
+
 2013-01-04  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/command.c (replotrequest):  #ifdef VOLATILE_REFRESH is needed with
@@ -5,7 +30,7 @@
 
 2012-12-31  Ethan A Merritt  <merritt@u.washington.edu>
 
-	* src/graphics.c: Add a comment documenting the reason for 
+	* src/graphics.c: Add a comment documenting the reason for
 	problems with font size changes in terminals such as x11.
 
 2012-12-29  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>

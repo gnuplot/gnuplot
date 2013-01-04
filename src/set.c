@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.383 2012/11/25 22:01:21 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.384 2012/12/14 18:11:09 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -2305,11 +2305,9 @@ set_logscale()
 	}
     }
 
-#ifdef VOLATILE_REFRESH
     /* Because the log scaling is applied during data input, a quick refresh */
     /* using existing stored data will not work if the log setting changes.  */
-    refresh_ok = 0;
-#endif
+    SET_REFRESH_OK(E_REFRESH_NOT_OK, 0);
 }
 
 #ifdef GP_MACROS
@@ -4533,17 +4531,17 @@ set_timefmt()
     } else {
 	if ((axis = lookup_table(axisname_tbl, c_token)) >= 0) {
 	    c_token++;
-	if (isstring(c_token)) {
+	    if (isstring(c_token)) {
 		quote_str(axis_array[axis].timefmt,c_token, MAX_ID_LEN);
 		c_token++;
 	    } else {
 		int_error(c_token, "time format string expected");
-	}
+	    }
 	} else if (isstring(c_token)) {
 	    /* set the given parse string for all current timedata axes: */
 	    for (axis = 0; axis < AXIS_ARRAY_SIZE; axis++)
 		quote_str(axis_array[axis].timefmt, c_token, MAX_ID_LEN);
-	c_token++;
+	    c_token++;
 	} else {
 	    int_error(c_token, "time format string expected");
 	}

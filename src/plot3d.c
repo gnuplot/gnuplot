@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.201 2012/11/24 21:54:30 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.202 2012/12/14 19:39:38 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -352,7 +352,7 @@ refresh_3dbounds(struct surface_points *first_plot, int nplots)
 
     }
 }
-#endif
+#endif /* VOLATILE_REFRESH */
 
 
 static double
@@ -2139,8 +2139,7 @@ eval_3dplots()
 	plot_token = -1;
 	fill_gpval_string("GPVAL_LAST_PLOT", replot_line);
     }
-
-    /* record that all went well */
+/* record that all went well */
     plot3d_num=plot_num;
 
     /* perform the plot */
@@ -2158,11 +2157,8 @@ eval_3dplots()
 	/* update GPVAL_ variables available to user */
 	update_gpval_variables(1);
 
-#ifdef VOLATILE_REFRESH
 	/* Mark these plots as safe for quick refresh */
-	refresh_nplots = plot_num;
-	refresh_ok = 3;
-#endif
+	SET_REFRESH_OK(E_REFRESH_OK_3D, plot_num);
     }
 }
 

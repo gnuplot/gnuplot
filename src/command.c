@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.248 2012/11/29 00:12:56 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.249 2013/01/04 20:54:03 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -483,12 +483,12 @@ do_string_replot(const char *s)
     do_string(s);
 
 #ifdef VOLATILE_REFRESH
-    if (volatile_data && refresh_ok) {
+    if (volatile_data && (E_REFRESH_NOT_OK != refresh_ok)) {
 	if (display_ipc_commands())
 	    fprintf(stderr, "refresh\n");
 	refresh_request();
     } else
-#endif
+#endif /* VOLATILE_REFRESH */
 
     if (!replot_disabled)
 	replotrequest();
@@ -1665,11 +1665,12 @@ refresh_request()
 {
     FPRINTF((stderr,"refresh_request\n"));
 
-    if ((first_plot == NULL && refresh_ok == 2)
-    ||  (first_3dplot == NULL && refresh_ok == 3))
+    if (   ((first_plot == NULL) && (refresh_ok == E_REFRESH_OK_2D))
+        || ((first_3dplot == NULL) && (refresh_ok == E_REFRESH_OK_3D))
+       )
 	int_error(NO_CARET, "no active plot; cannot refresh");
 
-    if (refresh_ok == 0) {
+    if (refresh_ok == E_REFRESH_NOT_OK) {
 	int_warn(NO_CARET, "cannot refresh from this state. trying full replot");
 	replotrequest();
 	return;
@@ -1689,22 +1690,19 @@ refresh_request()
     AXIS_UPDATE2D_REFRESH(FIRST_Z_AXIS);
     AXIS_UPDATE2D_REFRESH(COLOR_AXIS);
 
-    if (refresh_ok == 2)
-	refresh_bounds(first_plot, refresh_nplots);
-    else if (refresh_ok == 3)
-	refresh_3dbounds(first_3dplot, refresh_nplots);
-
-    if (refresh_ok == 2)
+    if (refresh_ok == E_REFRESH_OK_2D) {
+	refresh_bounds(first_plot, refresh_nplots); 
 	do_plot(first_plot, refresh_nplots);
-    else if (refresh_ok == 3)
+    } else if (refresh_ok == E_REFRESH_OK_3D) {
+	refresh_3dbounds(first_3dplot, refresh_nplots);
 	do_3dplot(first_3dplot, refresh_nplots, 0);
-    else
+    } else
 	int_error(NO_CARET, "Internal error - refresh of unknown plot type");
 
 }
+#endif /* VOLATILE_REFRESH */
 
 
-#endif
 /* process the 'replot' command */
 void
 replot_command()
@@ -2209,9 +2207,7 @@ replotrequest()
 	free(replot_args);
     }
     plot_token = 0;		/* whole line to be saved as replot line */
-#ifdef VOLATILE_REFRESH
-    refresh_ok = 0;		/* start of replot will destory existing data */
-#endif
+    SET_REFRESH_OK(E_REFRESH_NOT_OK, 0);		/* start of replot will destory existing data */
 
     screen_ok = FALSE;
     num_tokens = scanner(&gp_input_line, &gp_input_line_len);

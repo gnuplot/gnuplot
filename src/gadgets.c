@@ -160,10 +160,10 @@ TBOOLEAN is_3d_plot = FALSE;
 
 #ifdef VOLATILE_REFRESH
 /* Flag to signal that the existing data is valid for a quick refresh */
-int refresh_ok = 0;		/* 0 = no;  2 = 2D ok;  3 = 3D ok */
+TRefresh_Allowed refresh_ok = E_REFRESH_NOT_OK;
 /* FIXME: do_plot should be able to figure this out on its own! */
 int refresh_nplots = 0;
-#endif
+#endif /* VOLATILE_REFRESH */
 /* Flag to show that volatile input data is present */
 TBOOLEAN volatile_data = FALSE;
 

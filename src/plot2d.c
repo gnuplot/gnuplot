@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.282 2012/11/24 21:54:29 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.283 2012/12/14 19:39:38 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -313,7 +313,7 @@ refresh_bounds(struct curve_points *first_plot, int nplots)
 
     }
 }
-#endif
+#endif /* VOLATILE_REFRESH */
 
 
 /* A quick note about boxes style. For boxwidth auto, we cannot
@@ -3052,11 +3052,8 @@ eval_plots()
 	 */
 	save_writeback_all_axes();
 
-#ifdef VOLATILE_REFRESH
 	/* Mark these plots as safe for quick refresh */
-	refresh_nplots = plot_num;
-	refresh_ok = 2;
-#endif
+	SET_REFRESH_OK(E_REFRESH_OK_2D, plot_num);
     }
 
     /* update GPVAL_ variables available to user */

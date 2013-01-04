@@ -456,12 +456,27 @@ extern TBOOLEAN is_3d_plot;
       ( fabs(fmod(surface_rot_z,90.0))<0.1  \
         && fabs(fmod(surface_rot_x,180.0))<0.1 ) )
 
+typedef enum E_Refresh_Allowed {
+   E_REFRESH_NOT_OK = 0,
+   E_REFRESH_OK_2D = 2,
+   E_REFRESH_OK_3D = 3
+} TRefresh_Allowed;
+
 #ifdef VOLATILE_REFRESH
-extern int refresh_ok;		/* 0 = no;  2 = 2D ok;  3 = 3D ok */
+extern TRefresh_Allowed refresh_ok;
+# define SET_REFRESH_OK(ok, nplots) do { \
+   refresh_ok = (ok); \
+   refresh_nplots = (nplots); \
+} while(0)
 extern int refresh_nplots;
-#else
-#define refresh_ok FALSE
-#endif
+#else /* VOLATILE_REFRESH */
+# define refresh_ok E_REFRESH_NOT_OK
+# define SET_REFRESH_OK(ok, nplots) do { \
+   (void)(ok); \
+   (void)(nplots); \
+} while(0)
+#endif /* VOLATILE_REFRESH */
+
 extern TBOOLEAN volatile_data;
 
 /* WINDOWID to be filled by terminals running on X11 (x11, wxt, qt, ...) */

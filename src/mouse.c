@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: mouse.c,v 1.142 2012/10/27 02:23:38 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: mouse.c,v 1.143 2012/10/31 20:20:36 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - mouse.c */
@@ -691,16 +691,16 @@ apply_zoom(struct t_zoom *z)
 #ifdef VOLATILE_REFRESH
 	/* Falling through to do_string_replot() does not work! */
 	if (volatile_data) {
-	    if (refresh_ok == 2) {
+	    if (refresh_ok == E_REFRESH_OK_2D) {
 		refresh_request();
 		return;
 	    }
-	    if (is_splot_map && refresh_ok == 3) {
+	    if (is_splot_map && (refresh_ok == E_REFRESH_OK_3D)) {
 		refresh_request();
 		return;
 	    }
 	}
-#endif
+#endif /* VOLATILE_REFRESH */
 
     } else {
 	inside_zoom = TRUE;
@@ -1459,7 +1459,7 @@ event_buttonpress(struct gp_event_t *ge)
 
 
     if ((b == 4 || b == 6) && /* 4 - wheel up, 6 - wheel left */
-	(!replot_disabled || refresh_ok)	/* Use refresh if available */
+	(!replot_disabled || (E_REFRESH_NOT_OK != refresh_ok))	/* Use refresh if available */
 	&& !(paused_for_mouse & PAUSE_BUTTON3)) {
       double xmin, ymin, x2min, y2min;
       double xmax, ymax, x2max, y2max;
@@ -1555,7 +1555,7 @@ event_buttonpress(struct gp_event_t *ge)
 	}
       }
     } else if (((b == 5) || (b == 7)) && /* 5 - wheel down, 7 - wheel right */
-	       (!replot_disabled || refresh_ok)	/* Use refresh if available */
+	       (!replot_disabled || (E_REFRESH_NOT_OK != refresh_ok))	/* Use refresh if available */
 	       && !(paused_for_mouse & PAUSE_BUTTON3)) {
       double xmin, ymin, x2min, y2min;
       double xmax, ymax, x2max, y2max;
@@ -1637,7 +1637,7 @@ event_buttonpress(struct gp_event_t *ge)
 	    } else if (2 == b) {
 		/* not bound in 2d graphs */
 	    } else if (3 == b && 
-	    	(!replot_disabled || refresh_ok)	/* Use refresh if available */
+	    	(!replot_disabled || (E_REFRESH_NOT_OK != refresh_ok))	/* Use refresh if available */
 		&& !(paused_for_mouse & PAUSE_BUTTON3)) {
 		/* start zoom; but ignore it when
 		 *   - replot is disabled, e.g. with inline data, or
@@ -2148,7 +2148,7 @@ do_save_3dplot(struct surface_points *plots, int pcount, int quick)
      (A.log && ((!(A.set_autoscale & AUTOSCALE_MIN) && A.set_min <= 0) || \
 		(!(A.set_autoscale & AUTOSCALE_MAX) && A.set_max <= 0)))
 
-    if (!plots || !refresh_ok) {
+    if (!plots || (E_REFRESH_NOT_OK == refresh_ok)) {
 	/* !plots might happen after the `reset' command for example
 	 * (reported by Franz Bakan).
 	 * !refresh_ok can happen for example if log scaling is reset (EAM).
