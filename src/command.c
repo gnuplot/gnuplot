@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.247 2012/11/26 08:06:15 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.248 2012/11/29 00:12:56 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -2209,7 +2209,9 @@ replotrequest()
 	free(replot_args);
     }
     plot_token = 0;		/* whole line to be saved as replot line */
+#ifdef VOLATILE_REFRESH
     refresh_ok = 0;		/* start of replot will destory existing data */
+#endif
 
     screen_ok = FALSE;
     num_tokens = scanner(&gp_input_line, &gp_input_line_len);
