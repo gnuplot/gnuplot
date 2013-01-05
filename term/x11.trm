@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: x11.trm,v 1.202 2012/12/21 23:05:17 sfeam Exp $
+ * $Id: x11.trm,v 1.203 2012/12/26 20:36:01 sfeam Exp $
  *
  */
 
@@ -917,12 +917,12 @@ AGAIN:
 		       later. We also can't use the main pipe at that point. The
 		       'pause' command gets confused, for example. */
 		    if (ge.type == GE_fontprops && !default_font_size_known) {
-		    	if (repeat_count > 0) {
+		    	if (repeat_count > 0)
 		    	    FPRINTF((stderr,
 			        "X11_waitforinput: caught GE_fontprops after %d tries\n",
 				repeat_count));
-			}
-			return(GE_fontprops);
+			if (IPC_LOCK)
+			    return(GE_fontprops);
 		    }
 		    if (ge.type == GE_buttonrelease && (paused_for_mouse & PAUSE_CLICK)) {
 			int button = ge.par1;
@@ -1346,9 +1346,8 @@ X11_reset()
 /* Cached sizing values for the x11 terminal.
  * Updated/Maintained in mouse.c 
  */
-int          h_char_saved, v_char_saved;
-unsigned int h_tic_saved, v_tic_saved;
-double       ymax_saved = -1.0;
+int          X11_hchar_saved, X11_vchar_saved;
+double       X11_ymax_saved = -1.0;
 
 /* common stuff, using macros defined above */
 
@@ -1387,26 +1386,33 @@ X11_graphics()
 #endif
 #endif /* USE_MOUSE */
 
-#ifdef ULTRIX_KLUDGE
-    fflush(X11_ipc);
-#endif
-
     if (encoding != last_encoding) {
 	PRINT1("QE%d\n",encoding);
 	last_encoding = encoding;
     }
 
 #if defined(USE_MOUSE) && defined(PIPE_IPC)
+    /* EAM Jan 2013 - multiplot is incompatible with replot_on_resize.	*/
+    /* FIXME: This disables replot_on_resize until the next 'set term'.	*/
+    /* A cleaner solution would be to have gnuplot_x11 itself track 	*/
+    /* whether the current window contains a multiplot, and not	send	*/
+    /* replot requests if it does.					*/
+    if (multiplot) {
+	fprintf(X11_ipc, "X %d %d %d %d %d\n", 
+		do_raise, persist, dashedlines, ctrlq, no);
+	fflush(X11_ipc);
+    }
+
     /* EAM June 2003 - Flush the set font command through the pipe */
     /* to gnuplot_x11, then wait for it to return the resulting    */
     /* font size information (v_char and h_char). The feedback is  */
     /* caught by do_event() as an event of type GE_fontprops.      */
 
     /* Dima Kogan Sep 2012: Above is true when generating the plot THE FIRST
-       TIME. After the first time, the pipe is busy, and not available to send
-       the sizing information. I now save the sizing information every time the
-       window sizes change (in the ..._saved variables). Thus I no longer need
-       to ask for this information NOW, and can just use it. */
+       TIME.  I now save the sizing information every time the window sizes
+       change (in the ..._saved variables). Thus I no longer need
+       to ask for this information NOW, and can just use it.
+     */
 	if (!default_font_size_known) {
 		IPC_LOCK = TRUE;
 		PRINT1("QG%s\n",X11_default_font);
@@ -1416,25 +1422,23 @@ X11_graphics()
 
 		default_font_size_known = TRUE;
 		IPC_LOCK = FALSE;
-	}
-	else
-	{
+	} else {
 		/* replot. I send a Qg to tell the outboard driver to use the new
 		   window sizes. I also use the stored window sizes to update myself
 		   (inboard driver) */
 		PRINT0("Qg\n");
 		FFLUSH();
 
-		if( ymax_saved > 0.0 ) /* use saved sizes, if they're valid */
-		{
-			term->h_char = h_char_saved;
-			term->v_char = v_char_saved;
-			term->h_tic	 = h_tic_saved;
-			term->v_tic	 = v_tic_saved;
-			term->ymax	 = ymax_saved;
+		if (X11_ymax_saved > 0.0) { /* use saved sizes if they're valid */
+			term->h_char = X11_hchar_saved;
+			term->v_char = X11_vchar_saved;
+			term->h_tic = X11_hchar_saved / 2.5;
+			term->v_tic = X11_vchar_saved / 2.5;
+			term->ymax = X11_ymax_saved;
 		}
 	}
 #endif
+
     /* Force default font at start of plot */
     *X11_last_font_used = '\01';
     X11_set_default_font();

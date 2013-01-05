@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.227 2012/12/25 18:28:02 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.228 2012/12/26 20:36:01 sfeam Exp $"); }
 #endif
 
 #define MOUSE_ALL_WINDOWS 1
@@ -2320,7 +2320,7 @@ exec_cmd(plot_struct *plot, char *command)
 	    /* default width is 0 {which X treats as 1} */
 	    plot->lwidth = widths[plot->lt] ? plot->user_width * widths[plot->lt] : plot->user_width;
 
-	    if ((dashedlines && dashes[plot->lt][0])
+	    if (((dashedlines == yes) && dashes[plot->lt][0])
 	    ||  (plot->lt == LT_AXIS+2 && dashes[LT_AXIS+2][0])) {
 		plot->type = LineOnOffDash;
 		XSetDashes(dpy, gc, 0, dashes[plot->lt], strlen(dashes[plot->lt]));
@@ -4278,7 +4278,7 @@ process_configure_notify_event(XEvent *event)
 		/* Don't replot if we're replotting-on-window-resizes, since replotting
 		   happens elsewhere in those cases. If the inboard driver is dead, and
 		   the window is still around with -persist, replot also. */
-		if( !replot_on_resize || pipe_died )
+		if ((replot_on_resize != yes) || pipe_died)
 			display(plot);
 
 #ifdef USE_MOUSE
@@ -4294,8 +4294,8 @@ process_configure_notify_event(XEvent *event)
 	      gp_exec_event(GE_fontprops, -plot->width, plot->height,
 			    scaled_hchar, scaled_vchar, 0);
 
-	      if( replot_on_resize )
-		gp_exec_event(GE_keypress, 0, 0, 'e', 0, 0); // ask for replot
+	      if (replot_on_resize == yes)
+		gp_exec_event(GE_keypress, 0, 0, 'e', 0, 0);
 	    }
 #endif
 	}

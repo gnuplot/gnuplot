@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.246 2012/11/26 08:04:46 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.247 2012/12/19 00:09:34 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -644,8 +644,6 @@ term_start_multiplot()
     if (multiplot)
 	term_end_multiplot();
 
-    term_start_plot();
-
     /* FIXME: more options should be reset/initialized each time */
     mp_layout.auto_layout = FALSE;
     mp_layout.current_panel = 0;
@@ -769,6 +767,8 @@ term_start_multiplot()
     /* If we reach here, then the command has been successfully parsed */
     multiplot = TRUE;
     fill_gpval_integer("GPVAL_MULTIPLOT", 1);
+
+    term_start_plot();
 
     /* Place overall title before doing anything else */
     if (mp_layout.title.text) {

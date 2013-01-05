@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: mouse.c,v 1.143 2012/10/31 20:20:36 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: mouse.c,v 1.144 2013/01/04 22:03:54 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - mouse.c */
@@ -298,9 +298,6 @@ static void
 MousePosToGraphPosReal(int xx, int yy, double *x, double *y, double *x2, double *y2)
 {
     if (!is_3d_plot) {
-	FPRINTF((stderr, "POS: plot_bounds.xleft=%i, plot_bounds.xright=%i, plot_bounds.ybot=%i, plot_bounds.ytop=%i\n",
-		 plot_bounds.xleft, plot_bounds.xright, plot_bounds.ybot, plot_bounds.ytop));
-
 	if (plot_bounds.xright == plot_bounds.xleft)
 	    *x = *x2 = VERYLARGE;	/* protection */
 	else {
@@ -2031,10 +2028,6 @@ do_event(struct gp_event_t *ge)
     if (!term)
 	return;
 
-    if (multiplot && ge->type != GE_fontprops)
-	/* only informational event processing for multiplot */
-	return;
-
     /* disable `replot` when some data were sent through stdin */
     replot_disabled = plotted_data_from_stdin;
 
@@ -2085,43 +2078,38 @@ do_event(struct gp_event_t *ge)
 	break;
     case GE_fontprops:
 #ifdef X11
-	/* Cached sizing values for the x11 terminal. Each time an X11 window is
-	   resized, these are updated with the new sizes. When a replot happens some
-	   time later, these saved values are used. The normal mechanism for doing this
-	   is sending a QG from inboard to outboard driver, then the outboard driver
-	   responds with the sizing info in a GE_fontprops event. The problem is that if
-	   we're in a "pause" command, this communication would use the channel in a
-	   re-entrant way, resulting in everything breaking.
-	*/
-	/* If mx < 0, we simply save the values for future use, and move on */
-	if (ge->mx < 0) {
-	    /* These are declared in ../term/x11.trm */
-	    extern int          h_char_saved, v_char_saved;
-	    extern unsigned int h_tic_saved,  v_tic_saved;
-	    extern double       ymax_saved;
-
-	    ge->mx *= -1;
-	    h_char_saved = ge->par1;
-	    v_char_saved = ge->par2;
-		/* factor of 2.5 must match default values of X11_VTIC and X11_HTIC
-		   in x11.trm */
-	    h_tic_saved	= (unsigned int) (v_char_saved/2.5);
-	    v_tic_saved	= (unsigned int) (v_char_saved/2.5);
-	    ymax_saved	= (double)term->xmax * (double)ge->my / (double)ge->mx;
-	    break;
-	}
-#endif
-
-	term->h_char = ge->par1;
-	term->v_char = ge->par2;
-
-#ifdef X11
-	/* X11 terminal only: aspect ratio controlled by inboard terminal driver. */
+	/* EAM FIXME:  Despite the name, only X11 uses this to pass font info.	*/
+	/* Everyone else passes just the plot height and width.			*/
 	if (!strcmp(term->name,"x11")) {
-	    term->h_tic = (unsigned int) (term->v_char/2.5);
-	    term->v_tic = (unsigned int) (term->v_char/2.5);
-	    term->ymax  = (double)term->xmax * (double)ge->my / (double)ge->mx;
-	} else 
+	    /* These are declared in ../term/x11.trm */
+	    extern int          X11_hchar_saved, X11_vchar_saved;
+	    extern double       X11_ymax_saved;
+
+	    /* Cached sizing values for the x11 terminal. Each time an X11 window is
+	       resized, these are updated with the new sizes. When a replot happens some
+	       time later, these saved values are used. The normal mechanism for doing this
+	       is sending a QG from inboard to outboard driver, then the outboard driver
+	       responds with the sizing info in a GE_fontprops event. The problem is that
+	       other than during plot initialization the communication is asynchronous.
+	    */
+	    X11_hchar_saved = ge->par1;
+	    X11_vchar_saved = ge->par2;
+	    X11_ymax_saved = (double)term->xmax * (double)ge->my / fabs((double)ge->mx);
+
+	    /* If mx < 0, we simply save the values for future use, and move on */
+	    if (ge->mx < 0) {
+		break;
+	    } else {
+	    /* Otherwise we apply the changes right now */
+		term->h_char = X11_hchar_saved;
+		term->v_char = X11_vchar_saved;
+		/* factor of 2.5 must match the use in x11.trm */
+		term->h_tic = X11_hchar_saved / 2.5;
+		term->v_tic = X11_vchar_saved / 2.5;
+		term->ymax  = X11_ymax_saved;
+	    }
+	} else
+	    /* Fall through to cover non-x11 case */
 #endif
 	/* Other terminals update aspect ratio based on current window size */
 	    term->v_tic = term->h_tic * (double)ge->mx / (double)ge->my;

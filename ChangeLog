@@ -1,3 +1,28 @@
+2013-01-05  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/mouse.c (do_event):  Testing for multiplot when a signal is
+	received from gnuplot_x11 is pointless because gnuplot no longer has any
+	idea whether the plot window sending the event contains a multiplot.
+	Clean up the X11-dependent code that responds to GE_fontprops events.
+
+	* src/term.c: Move term_start_plot() to after the multiplot flag is set.
+	This lets the terminal take a different action if necessary.
+
+	* term/x11.trm (X11_graphics):  Disable replot_on_resize if this is a
+	multiplot.  FIXME:  Better would be to save and restore.  But how?
+	Better yet, gnuplot_x11 could keep track of whether it is currently
+	displaying a multiplot, and if so suppress the replot requests.
+	Variables visible externally should be named X11_<foo>.
+
+	* term/x11.trm (X11_waitforinput): waitforinput() handling of
+	GE_fontprops must be protected by IPC_LOCK.
+
+	* src/gplt_x11.c: dashedlines and replot_on_resize are tristate enums,
+	not TBOOLEANS.
+
+	* src/qtterminal/QtGnuplotWidget.cpp:  Don't even pretend to pass font
+	metrics via GE_fontprops,  only the window height + width are valid.
+
 2013-01-04  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/gadgets.h (E_Refresh_Allowed, TRefresh_Allowed): New
