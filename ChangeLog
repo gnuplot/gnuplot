@@ -23,6 +23,9 @@
 	* src/qtterminal/QtGnuplotWidget.cpp:  Don't even pretend to pass font
 	metrics via GE_fontprops,  only the window height + width are valid.
 
+	* src/graphics.c (do_polygon): Skip degenerate polygons (fewer than 2
+	vertices).
+
 2013-01-04  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/gadgets.h (E_Refresh_Allowed, TRefresh_Allowed): New
