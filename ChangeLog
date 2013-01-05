@@ -1,3 +1,8 @@
+2013-01-05  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/graphics.c (do_polygon): Skip degenerate polygons (fewer than 2
+	vertices).
+
 2013-01-04  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/command.c (replotrequest):  #ifdef VOLATILE_REFRESH is needed with

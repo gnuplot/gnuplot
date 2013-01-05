@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.379.2.11 2012/09/19 00:22:06 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.379.2.12 2012/09/25 18:17:09 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -6052,7 +6052,7 @@ do_polygon( int dimensions, t_polygon *p, int style )
     TBOOLEAN noclip = FALSE;
     int nv;
 
-    if (!p->vertex)
+    if (!p->vertex || p->type < 2)
 	return;
 
     corners = gp_realloc(corners, p->type * sizeof(gpiPoint), "polygon");
@@ -6074,7 +6074,8 @@ do_polygon( int dimensions, t_polygon *p, int style )
 	clip_area = &canvas;
 
     if (term->filled_polygon && style) {
-	int i,o,clipped;
+	int i,o;
+	int clipped = 1;
 	gpiPoint temp;
 	for (i=0,o=0; i<nv-1; i++) {
 	    clpcorn[o] = corners[i];
