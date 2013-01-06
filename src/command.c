@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.249 2013/01/04 20:54:03 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.250 2013/01/04 22:03:54 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -2106,8 +2106,9 @@ update_command()
 void
 invalid_command()
 {
+    int save_token = c_token;
 #ifdef OS2
-   if (token[c_token].is_token) {
+    if (token[c_token].is_token) {
       int rc;
       rc = ExecuteMacro(gp_input_line + token[c_token].start_index,
 	      token[c_token].length);
@@ -2117,7 +2118,11 @@ invalid_command()
       }
     }
 #endif
-    int_error(c_token, "invalid command");
+    /* Skip the rest of the command; otherwise we're left pointing to */
+    /* the middle of a command we already know is not valid.          */
+    while (!END_OF_COMMAND)
+	c_token++;
+    int_error(save_token, "invalid command");
 }
 
 

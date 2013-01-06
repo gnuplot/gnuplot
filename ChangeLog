@@ -3,6 +3,11 @@
 	* src/plot.c (main): Unbuffered stdin is needed for readline even if
 	X11 is not configured, as suggested in the comment added in 2004.
 
+	* src/command.c (invalid_command): When an invalid command is detected,
+	advance the input parsing pointer (c_token) to the end of the command.
+	Otherwise we're left in the middle of an invalid command after the
+	error message is printed.
+
 2013-01-05  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/mouse.c (do_event):  Testing for multiplot when a signal is
