@@ -1,3 +1,8 @@
+2013-01-06  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/plot.c (main): Unbuffered stdin is needed for readline even if
+	X11 is not configured, as suggested in the comment added in 2004.
+
 2013-01-05  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c (do_polygon): Skip degenerate polygons (fewer than 2
