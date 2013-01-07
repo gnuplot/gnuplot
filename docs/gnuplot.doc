@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.766 2012/12/29 14:49:10 broeker Exp $
+C RCS $Id: gnuplot.doc,v 1.767 2012/12/31 16:56:23 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -6148,6 +6148,7 @@ Ffigure_mapcontours
 ?sampling
 ?commands plot sampling
 ?plot sampling
+=sample
  By default, computed functions or data generated for the pseudo-file "+" are
  sampled over the entire range of the plot. This range may have been specified
  by a prior `set xrange` command, by an explicit global range specifier at the
@@ -10672,8 +10673,9 @@ Ffigure_missing
 ?set samples
 ?show samples
 ?samples
- The sampling rate of functions, or for interpolating data, may be changed
- by the `set samples` command.
+ The default sampling rate of functions, or for interpolating data, may be
+ changed by the `set samples` command.  To change the sampling range for a
+ particular plot, see `plot sampling`.
 
  Syntax:
        set samples <samples_1> {,<samples_2>}
