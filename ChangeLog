@@ -1,7 +1,7 @@
 2013-01-06  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/plot.c (main): Unbuffered stdin is needed for readline even if
-	X11 is not configured, as suggested in the comment added in 2004.
+	X11 is not configured, as suggested in the comment from 2004.
 
 	* src/command.c (invalid_command): When an invalid command is detected,
 	advance the input parsing pointer (c_token) to the end of the command.
@@ -31,7 +31,7 @@
 	not TBOOLEANS.
 
 	* src/qtterminal/QtGnuplotWidget.cpp:  Don't even pretend to pass font
-	metrics via GE_fontprops,  only the window height + width are valid.
+	metrics via GE_fontprops;  only the window height + width are valid.
 
 	* src/graphics.c (do_polygon): Skip degenerate polygons (fewer than 2
 	vertices).
@@ -138,14 +138,14 @@
 
 	* src/gplt_x11.c:  Change the fallback font string used when the current
 	encoding is UTF-8 (iso10646-1) or when all else fails (iso8859-1).  This
-	is admitted biased towards English as a default, but the previous string
-	(*-*) does not work for common recent x11 implementations.
+	is admittedly biased towards English as a default, but the previous
+	string (*-*) does not work for common recent x11 implementations.
 
 2012-12-16  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* demo/key.dem src/graph3d.c (boundary3d do_3d_key_layout)
 	src/graphics.c (boundary do_key_layout do_key_bounds draw_key):
-	Refactor code the key box layout code to repair several problems.
+	Refactor the key box layout code to repair several problems.
 	- left/right/center was not honored for an explicit key position
 	- incorrect key placement due to subscript or superscript in key title
 	- text spacing should be based on key font, not on the default font
