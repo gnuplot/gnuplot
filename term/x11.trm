@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: x11.trm,v 1.203 2012/12/26 20:36:01 sfeam Exp $
+ * $Id: x11.trm,v 1.204 2013/01/05 23:15:57 sfeam Exp $
  *
  */
 
@@ -1432,8 +1432,7 @@ X11_graphics()
 		if (X11_ymax_saved > 0.0) { /* use saved sizes if they're valid */
 			term->h_char = X11_hchar_saved;
 			term->v_char = X11_vchar_saved;
-			term->h_tic = X11_hchar_saved / 2.5;
-			term->v_tic = X11_vchar_saved / 2.5;
+			term->h_tic = term->v_tic = X11_vchar_saved / 2.5;
 			term->ymax = X11_ymax_saved;
 		}
 	}
