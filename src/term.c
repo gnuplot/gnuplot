@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.247 2012/12/19 00:09:34 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.248 2013/01/05 23:15:57 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -903,6 +903,7 @@ term_apply_lp_properties(struct lp_style_type *lp)
      *  this function by explicitly issuing additional '(*term)(...)'
      *  commands.
      */
+    t_colorspec colorspec = lp->pm3d_color;
     int lt = lp->l_type;
 
     if (lp->pointflag) {
@@ -928,9 +929,13 @@ term_apply_lp_properties(struct lp_style_type *lp)
 	(*term->linetype) (LT_BLACK);
     else
 	(*term->linetype) (lt);
+
     /* Possibly override the linetype color with a fancier colorspec */
-    if (lp->use_palette)
-	apply_pm3dcolor(&lp->pm3d_color, term);
+    if (!lp->use_palette) {
+	colorspec.type = TC_LT;
+	colorspec.lt = lt;
+    }
+    apply_pm3dcolor(&colorspec, term);
 }
 
 

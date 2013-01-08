@@ -1,3 +1,16 @@
+2013-01-08  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/pslatex.trm (EPSLATEX_layer):  Reset current text color at the
+	start of each layer's block of TeX output.  Bug #3599916
+
+	* src/term.c (term_apply_lp_properties):  Always apply linetype color,
+	even if the flag use_palette in not set.  Many terminals cope with this
+	on their own, but not all of them (e.g. cairolatex).
+	Bug #3599916
+
+	* src/hidden3d.c (in_front):  Inline the single line subroutine
+	handle_edge_fragment() at its sole call site.
+
 2013-01-07  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/mouse.c term/x11.trm: Fix aspect ratio error introduced 2013-01-05

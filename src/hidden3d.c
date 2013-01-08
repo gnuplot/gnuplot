@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.87 2012/07/17 19:06:43 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.88 2012/11/23 21:48:53 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - hidden3d.c */
@@ -313,10 +313,6 @@ static GP_INLINE double area2D __PROTO((p_vertex v1, p_vertex v2,
 					p_vertex v3));
 static void draw_vertex __PROTO((p_vertex v));
 static GP_INLINE void draw_edge __PROTO((p_edge e, p_vertex v1, p_vertex v2));
-static GP_INLINE void handle_edge_fragment __PROTO((long int edgenum,
-						    long int vnum1,
-						    long int vnum2,
-						    long int firstpoly));
 static int in_front __PROTO((long int edgenum,
 			     long int vnum1, long int vnum2,
 			     long int *firstpoly));
@@ -1803,25 +1799,6 @@ area2D(p_vertex v1, p_vertex v2, p_vertex v3)
     return (dx12 * dy13 - dy12 * dx13);
 }
 
-/* Utility routine: takes an edge and makes a new one, which is a fragment
- * of the old one. The fragment inherits the line style and stuff of the
- * given edge; only the two new vertices are different. The new edge
- * is then passed to in_front, for recursive handling */
-/* HBB 20001108: Changed from edge pointer to edge index. Don't
- * allocate a fresh anymore, as this is no longer needed after the
- * change to in_front().  What remains of this function may no longer
- * be worth having. I.e. it can be replaced by a direct recursion call
- * of in_front(), sometime soon. */
-static GP_INLINE void
-handle_edge_fragment(long edgenum, long vnum1, long vnum2, long firstpoly)
-{
-#if !HIDDEN3D_QUADTREE
-    /* Avoid checking against the same polygon again. */
-    firstpoly = plist[firstpoly].next;
-#endif
-    in_front(edgenum, vnum1, vnum2, &firstpoly);
-}
-
 /*********************************************************************/
 /* The actual heart of all this: determines if edge at index 'edgenum'
  * of the elist is in_front of all the polygons, or not. If necessary,
@@ -2026,7 +2003,7 @@ in_front(
 	     * it is removed.
 	     * 
 	     * This routine is general in the sense that the earlier tests
-	     * it are only need for speed.
+	     * are only needed for speed.
 	     * 
 	     * The following website illustrates geometrical concepts and
 	     * formulas:  http://local.wasp.uwa.edu.au/~pbourke/geometry/
@@ -2118,7 +2095,13 @@ in_front(
 				 * segment near end of an edge.  Simply ignore.
 				 */
 				if (newvert[1] != vnum1) {
-				    handle_edge_fragment(edgenum, newvert[1], vnum2, polynum);
+#if HIDDEN3D_QUADTREE
+				    in_front(edgenum, newvert[1], vnum2, &polynum);
+#else
+				    /* Avoid checking against the same polygon again. */
+				    in_front(edgenum, newvert[1], vnum2,
+						&plist[firstpoly].next);
+#endif
 				    setup_edge(vnum1, newvert[0]);
 				}
 				break;
