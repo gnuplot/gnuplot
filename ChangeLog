@@ -1,3 +1,9 @@
+2013-01-08  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/pslatex.trm (EPSLATEX_layer):  Reset current text color at the
+	start of each layer's block of TeX output.
+	Bug #3599916
+
 2013-01-06  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/plot.c (main): Unbuffered stdin is needed for readline even if
