@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: pslatex.trm,v 1.83 2012/05/30 18:15:51 sfeam Exp $
+ * $Id: pslatex.trm,v 1.84 2012/08/04 03:31:20 sfeam Exp $
  */
 
 /* GNUPLOT - pslatex.trm */
@@ -815,19 +815,19 @@ EPSLATEX_set_color(t_colorspec *colorspec)
 {
     double gray;
 
-    /* Fancy footwork to deal with mono/grayscale plots */
+    /* Filter out duplicate requests */
+    if (!memcmp(&tex_previous_colorspec, colorspec, sizeof(t_colorspec)))
+	return;
+    else
+	memcpy(&tex_previous_colorspec, colorspec, sizeof(t_colorspec));
+
 #ifdef HAVE_CAIROPDF
+    /* Fancy footwork to deal with mono/grayscale plots */
     if (ISCAIROTERMINAL) {
         cairotrm_set_color(colorspec);
     } else 
 #endif
     {
-	/* Filter out duplicate requests */
-	if (!memcmp(&tex_previous_colorspec, colorspec, sizeof(t_colorspec)))
-	    return;
-	else
-	    memcpy(&tex_previous_colorspec, colorspec, sizeof(t_colorspec));
-
         if (colorspec->type == TC_LT && !ps_params->color)
             PS_linetype(colorspec->lt);
         else
@@ -910,6 +910,7 @@ EPSLATEX_layer(t_termlayer syncpoint)
 	    fputs("    }%\n", gpoutfile);
 	epslatex_text_layer = 1;
 	fputs("    \\gplgaddtomacro\\gplbacktext{%\n", gpoutfile);
+	tex_color_synced = FALSE;
 	break;
 
     case TERM_LAYER_FRONTTEXT:/* Start of "front" text layer */
@@ -919,6 +920,7 @@ EPSLATEX_layer(t_termlayer syncpoint)
 	    fputs("    }%\n", gpoutfile);
 	epslatex_text_layer = 2;
 	fputs("    \\gplgaddtomacro\\gplfronttext{%\n", gpoutfile);
+	tex_color_synced = FALSE;
 	break;
 
     case TERM_LAYER_END_TEXT:     /* Close off front or back macro before leaving */
