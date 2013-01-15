@@ -1,3 +1,10 @@
+2013-01-15  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/plot2d.c src/plot3d.c:  Downgrade detection of a trailing comma
+	in a plot command to a warning rather than an error.  This allows more
+	convenient re-ordering of multi-line plot elements when replotting.
+	(Backport from 4.7)
+
 2013-01-08  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/pslatex.trm (EPSLATEX_layer):  Reset current text color at the

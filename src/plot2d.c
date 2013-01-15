@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.255.2.8 2012/09/26 23:05:56 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.255.2.9 2012/11/14 01:09:20 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -1764,8 +1764,13 @@ eval_plots()
      */
     plot_iterator = check_for_iteration();
     while (TRUE) {
-	if (END_OF_COMMAND)
-	    int_error(c_token, "function to plot expected");
+
+	/* Forgive trailing comma on a multi-element plot command */
+	if (END_OF_COMMAND) {
+	    if (plot_num == 0)
+		int_error(c_token, "function to plot expected");
+	    break;
+	}
 
 	this_plot = NULL;
 	if (!in_parametric && !was_definition)
@@ -2654,6 +2659,12 @@ eval_plots()
 		struct at_type *at_ptr;
 		char *name_str;
 		was_definition = FALSE;
+
+		/* Forgive trailing comma on a multi-element plot command */
+		if (END_OF_COMMAND || this_plot == NULL) {
+		    int_warn(c_token, "ignoring trailing comma in plot command");
+		    break;
+		}
 
 		/* HBB 20000820: now globals in 'axis.c' */
 		x_axis = this_plot->x_axis;
