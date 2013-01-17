@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.88 2012/11/23 21:48:53 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.89 2013/01/09 05:23:22 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - hidden3d.c */
@@ -2100,7 +2100,7 @@ in_front(
 #else
 				    /* Avoid checking against the same polygon again. */
 				    in_front(edgenum, newvert[1], vnum2,
-						&plist[firstpoly].next);
+						&plist[polynum].next);
 #endif
 				    setup_edge(vnum1, newvert[0]);
 				}
