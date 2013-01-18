@@ -1,3 +1,8 @@
+2013-01-18  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/x11.trm:  Right- or Center- justified enhanced text was losing
+	track of the font size.  This bug was evident in "key.dem".
+
 2013-01-08  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/pslatex.trm (EPSLATEX_layer):  Reset current text color at the

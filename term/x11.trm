@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: x11.trm,v 1.204 2013/01/05 23:15:57 sfeam Exp $
+ * $Id: x11.trm,v 1.205 2013/01/08 01:00:29 sfeam Exp $
  *
  */
 
@@ -1956,6 +1956,7 @@ ENHX11_put_text(unsigned int x, unsigned int y, const char *str)
 {
     char *original_string = (char *)str;
     static char *initial_font = NULL;
+    double firstpass_fontsize = X11_default_fontsize;
     int pass = 1;
 
     if (ignore_enhanced_text) {
@@ -1994,15 +1995,14 @@ PASS2:
     /* Make sure that we start out using the intended font.  	*/
     /*	ENHx11_font = "DEFAULT";	This broke!		*/
 	ENHx11_font = "";
-	ENHx11_fontsize = X11_default_fontsize;
 	if (*X11_next_font_used) {
 	    int sep = strcspn(X11_next_font_used,",");
 	    free(initial_font);
 	    initial_font = gp_strdup(X11_next_font_used);
 	    initial_font[sep] = '\0';
-	    sscanf(&(X11_next_font_used[sep+1]),"%lf",&ENHx11_fontsize);
+	    sscanf(&(X11_next_font_used[sep+1]),"%lf",&firstpass_fontsize);
 	    ENHx11_font = initial_font;
-	    FPRINTF((stderr,"setting font to %s,%g\n",ENHx11_font,ENHx11_fontsize));
+	    FPRINTF((stderr,"Pass %d setting font to %s,%g\n",pass,ENHx11_font,firstpass_fontsize));
 	}
 
     /* Set the recursion going. We say to keep going until a
@@ -2013,7 +2013,7 @@ PASS2:
      * we get stuck in an infinite loop) and try again.
      */
     while (*(str = enhanced_recursion((char *)str, TRUE,
-			ENHx11_font, ENHx11_fontsize,
+			ENHx11_font, firstpass_fontsize,
 			0.0, TRUE, TRUE, 0))) {
 	(term->enhanced_flush)();
 
