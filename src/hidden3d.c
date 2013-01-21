@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.89 2013/01/09 05:23:22 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.90 2013/01/17 00:07:27 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - hidden3d.c */
@@ -1095,6 +1095,7 @@ build_networks(struct surface_points *plots, int pcount)
 	 * plot styles are mapped to others, that are genuinely
 	 * available in 3d. */
 	switch (this_plot->plot_style) {
+	case PM3DSURFACE:
 	case LINESPOINTS:
 	case STEPS:
 	case FSTEPS:
@@ -1173,6 +1174,13 @@ build_networks(struct surface_points *plots, int pcount)
 	if (above == LT_SINGLECOLOR-1)
 	    above = below = LT_SINGLECOLOR;
 
+	/* We will not actually draw PM3D surfaces here, but their 	*/
+	/* edges can be used to calculate occlusion of lines, including */
+	/* the plot borders. (NB: the PM3D surface will _not_ be hidden */
+	/* by other non-PM3D surfaces.					*/
+	if (this_plot->plot_style == PM3DSURFACE)
+	    above = below = LT_NODRAW;
+
 	/* calculate the point symbol type: */
 	/* Assumes that upstream functions have made sure this is
 	 * initialized sensibly --- thou hast been warned */
@@ -1238,6 +1246,7 @@ build_networks(struct surface_points *plots, int pcount)
 		    }
 
 		    switch (this_plot->plot_style) {
+		    case PM3DSURFACE:
 		    case LINESPOINTS:
 		    case STEPS:
 		    case FSTEPS:
@@ -1324,6 +1333,7 @@ build_networks(struct surface_points *plots, int pcount)
 		    = -3;
 
 		switch (this_plot->plot_style) {
+		case PM3DSURFACE:
 		case LINESPOINTS:
 		case STEPS:
 		case FSTEPS:
