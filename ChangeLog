@@ -1,3 +1,11 @@
+2013-01-21  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/hidden3d.c:  Up until now hidden3d handled any pm3d surfaces as
+	a collection of points, which did essentially nothing at all.  Now we
+	treat them as invisible lines (LT_NODRAW) so that they can occluded
+	other objects.
+	This trick was already used in hidden2.dem but now it's built in.
+
 2013-01-18  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/x11.trm:  Right- or Center- justified enhanced text was losing

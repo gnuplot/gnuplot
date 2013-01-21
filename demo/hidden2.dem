@@ -1,11 +1,12 @@
 #
-# PM3D surfaces are not included in the calculation of hidden line removal.
-# However, you can approximate this by drawing the surface twice,
-# once "with pm3d" to produce the surface you want to show, and once 
-# "with lines lt -2" to include the same surface in hidden3d calculations.
-# The "lt -2" makes the hidden3d copy of the surface invisible.
+# PM3D surfaces are not fully included in the calculation of hidden line removal.
+# Older versions of gnuplot allowed you to approximate the correct occlusion
+# by drawing the surface twice, once "with pm3d" to produce the surface you
+# want to show, and once "with lines lt -2" to include the same surface in
+# hidden3d calculations but drawn with invisible lines.
+# Current gnuplot does the approximation for you so the extra copy of the 
+# surface is no longer necessary.
 #
-set hidden3d front
 set isosamples 25,25
 set xyplane at 0
 unset key
@@ -17,8 +18,9 @@ set cbrange [-1:1]
 set title "Mixing pm3d surfaces with hidden-line plots"
 
 f(x,y) = sin(-sqrt((x+5)**2+(y-7)**2)*0.5)
-splot f(x,y) with pm3d, x*x-y*y with lines lt 1 lc rgb "#000000", \
-      f(x,y) with lines lt -2 notitle
+
+set hidden3d front
+splot f(x,y) with pm3d, x*x-y*y with lines lc rgb "black"
 
 pause -1 "Hit return to continue"
 reset

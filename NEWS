@@ -2,6 +2,7 @@ New features, changes and fixes since gnuplot version 4.6.1
 ===========================================================
 
 * NEW Allow the "bind" command to attach a user command to mouse button 1
+* NEW hidden3d can handle occlusion by pm3d surfaces (as in hidden2.dem)
 * CHANGE "unset term" restores original default terminal (GNUTERM)
 * FIX gd terminal fontsize change requested by set_font(",newsize")
 * FIX qt terminal font metrics
