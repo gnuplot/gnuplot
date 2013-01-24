@@ -1,3 +1,8 @@
+2013-01-24  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/set.c (set_timefmt):  Accept the new format as a string variable.
+	Bug #3602057
+
 2013-01-21  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/hidden3d.c:  Up until now hidden3d handled any pm3d surfaces as

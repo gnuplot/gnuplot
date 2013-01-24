@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.354.2.3 2012/04/26 18:16:35 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.354.2.4 2012/05/05 04:24:18 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -4548,6 +4548,7 @@ static void
 set_timefmt()
 {
     int axis;
+    char *newformat = NULL;
 
     c_token++;
     if (END_OF_COMMAND) {
@@ -4557,20 +4558,18 @@ set_timefmt()
     } else {
 	if ((axis = lookup_table(axisname_tbl, c_token)) >= 0) {
 	    c_token++;
-	if (isstring(c_token)) {
-		quote_str(axis_array[axis].timefmt,c_token, MAX_ID_LEN);
-		c_token++;
-	    } else {
-		int_error(c_token, "time format string expected");
-	}
-	} else if (isstring(c_token)) {
-	    /* set the given parse string for all current timedata axes: */
-	    for (axis = 0; axis < AXIS_ARRAY_SIZE; axis++)
-		quote_str(axis_array[axis].timefmt, c_token, MAX_ID_LEN);
-	c_token++;
+	    newformat = try_to_get_string();
+	    if (newformat)
+		strncpy(&(axis_array[axis].timefmt[0]), newformat, MAX_ID_LEN);
 	} else {
-	    int_error(c_token, "time format string expected");
+	    newformat = try_to_get_string();
+	    if (newformat)
+		for (axis = 0; axis < AXIS_ARRAY_SIZE; axis++)
+		    strncpy(&(axis_array[axis].timefmt[0]), newformat, MAX_ID_LEN);
 	}
+	if (!newformat)
+	    int_error(c_token, "time format string expected");
+	free(newformat);
     }
 }
 
