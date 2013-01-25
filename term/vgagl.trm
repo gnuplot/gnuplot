@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: vgagl.trm,v 1.20 2006/07/21 02:35:48 sfeam Exp $
+ * $Id: vgagl.trm,v 1.21 2012/09/17 03:03:33 sfeam Exp $
  */
 
 #if defined(USE_MOUSE)
@@ -447,17 +447,8 @@ void VGAGL_options()
 	    case VGAGL_DUMP:
 		/* since this is not documented it won't hurt too much to leave it in. */
 		++c_token;
-		if (isstring(c_token)) {
-		    if (VGAGL_dump_file)
-			free(VGAGL_dump_file);
-		    /* get text */
-		    VGAGL_dump_file = gp_alloc(token_len(c_token), "vgagl->dump_file");
-		    quote_str(VGAGL_dump_file, c_token, token_len(c_token));
-		    ++c_token;
-		} else {
+		if (!((VGAGL_dump_file = try_to_get_string())))
 		    int_error(NO_CARET, "expecting string value");
-		    return;
-		}
 		break;
 #endif
 	    default:

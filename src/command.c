@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.250 2013/01/04 22:03:54 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.251 2013/01/07 06:14:31 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -748,7 +748,7 @@ bind_command()
 
     /* get left hand side: the key or key sequence */
     if (!END_OF_COMMAND) {
-	char* first = gp_input_line + token[c_token].start_index;
+	char *first = gp_input_line + token[c_token].start_index;
 	int size = (int) (strchr(first, ' ') - first);
 	if (size < 0) {
 	    size = (int) (strchr(first, '\0') - first);
@@ -757,11 +757,9 @@ bind_command()
 	    fprintf(stderr, "(bind_command) %s:%d\n", __FILE__, __LINE__);
 	    return;
 	}
-	lhs = (char*) gp_alloc(size + 1, "bind_command->lhs");
-	if (isstring(c_token)) {
-	    quote_str(lhs, c_token, token_len(c_token));
-	} else {
-	    char* ptr = lhs;
+	if (!(isstring(c_token)) || !((lhs = try_to_get_string()))) {
+	    char *ptr = gp_alloc(size + 1, "bind_command->lhs");
+	    lhs = ptr;
 	    while (!END_OF_COMMAND) {
 		copy_str(ptr, c_token, token_len(c_token) + 1);
 		ptr += token_len(c_token);
@@ -770,20 +768,16 @@ bind_command()
 		}
 		++c_token;
 	    }
+	    ++c_token;
 	}
-	++c_token;
     }
 
     /* get right hand side: the command. allocating the size
      * of gp_input_line is too big, but shouldn't hurt too much. */
     if (!END_OF_COMMAND) {
-	rhs = (char*) gp_alloc(strlen(gp_input_line) + 1, "bind_command->rhs");
-	if (isstring(c_token)) {
-	    /* bind <lhs> "..." */
-	    quote_str(rhs, c_token, token_len(c_token));
-	    c_token++;
-	} else {
-	    char* ptr = rhs;
+	if (!(isstringvalue(c_token)) || !((rhs = try_to_get_string()))) {
+	    char *ptr = gp_alloc(strlen(gp_input_line) + 1, "bind_command->rhs");
+	    rhs = ptr;
 	    while (!END_OF_COMMAND) {
 		/* bind <lhs> ... ... ... */
 		copy_str(ptr, c_token, token_len(c_token) + 1);

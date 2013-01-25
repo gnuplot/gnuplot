@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: corel.trm,v 1.16 2006/07/07 03:51:21 sfeam Exp $
+ * $Id: corel.trm,v 1.17 2006/07/21 02:35:45 sfeam Exp $
  */
 
 /*
@@ -115,9 +115,9 @@ COREL_options()
 	case COREL_OTHER:
 	default:
 	    /* font name */
-	    if (isstring(c_token)) {
-		quote_str(corel_font, c_token, MAX_ID_LEN);
-		c_token++;
+	    if (isstringvalue(c_token)) {
+		char *font = try_to_get_string();
+		strncpy(corel_font, font, MAX_ID_LEN);
 	    } else {
 		/* We have font size specified */
 		corel_fontsize = (int) real(const_express(&a));

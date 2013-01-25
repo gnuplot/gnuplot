@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: ai.trm,v 1.21 2006/07/29 22:35:43 tlecomte Exp $
+ * $Id: ai.trm,v 1.22 2011/08/02 20:40:31 sfeam Exp $
  *
  */
 
@@ -166,9 +166,10 @@ AI_options()
 	case AI_OTHER:
 	default:
 	    if (isstring(c_token)) {
-		quote_str(ai_font, c_token, MAX_ID_LEN);
-		strcpy(ai_oldfont, ai_font);
-		c_token++;
+		char *font = try_to_get_string();
+		strcpy(ai_font, font);
+		strcpy(ai_oldfont, font);
+		free(font);
 	    } else { /* is a number */
 		/* We have font size specified */
 		struct value a;

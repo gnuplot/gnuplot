@@ -1,3 +1,17 @@
+2013-01-25  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/command.c (bind_command):  Convert the last caller of quote_str()
+	in the core code to use instead try_to_get_string().  I.e. allow
+	STRING = "some command"
+	bind KEY STRING
+
+	* term/ai.trm:  Replace quote_str() with try_to_get_string()
+	  Allows font to be provided as a string variable.
+
+	* term/vgagl.trm:  Same
+	* term/corel.trm:  Same
+	* term/djsvga.trm: Same
+
 2013-01-24  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/set.c (set_timefmt):  Accept the new format as a string variable.

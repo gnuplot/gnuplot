@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: djsvga.trm,v 1.20 2006/07/21 02:35:45 sfeam Exp $
+ * $Id: djsvga.trm,v 1.21 2007/06/04 20:54:54 mikulik Exp $
  */
 
 /* GNUPLOT - djsvga.trm */
@@ -158,9 +158,11 @@ static double dj_linewidth;	/* store linewidth assignments here */
 TERM_PUBLIC void
 DJSVGA_options()
 {
-    if (!END_OF_COMMAND && isstring(c_token)) {
-	quote_str(DJSVGA_fontname, c_token, MAX_ID_LEN);
-	c_token++;
+    char *font = NULL;
+
+    if (!END_OF_COMMAND && ((font = try_to_get_string()))) {
+	strncpy(DJSVGA_fontname, font, MAX_ID_LEN-1);
+	free(font);
     }
     sprintf(term_options, "\"%s\"", DJSVGA_fontname);
 }
