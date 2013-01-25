@@ -12,6 +12,9 @@
 	* term/corel.trm:  Same
 	* term/djsvga.trm: Same
 
+	* src/util.h src/util.c:  The routine quote_str() no longer has any
+	callers except the next/openstep terminals.  Mark it #ifdef NEXT.
+
 2013-01-24  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/set.c (set_timefmt):  Accept the new format as a string variable.

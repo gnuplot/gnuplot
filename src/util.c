@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: util.c,v 1.106 2012/11/05 03:53:45 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: util.c,v 1.107 2012/11/05 17:57:09 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - util.c */
@@ -246,6 +246,12 @@ token_len(int t_num)
     return (size_t)(token[t_num].length);
 }
 
+#ifdef NEXT
+/*
+ * quote_str() no longer has any callers in the core code.
+ * However, it is called by the next/openstep terminal.
+ */
+
 /*
  * quote_str() does the same thing as copy_str, except it ignores the
  *   quotes at both ends.  This seems redundant, but is done for
@@ -274,7 +280,7 @@ quote_str(char *str, int t_num, int max)
     else
 	parse_sq(str);
 }
-
+#endif
 
 /*
  * capture() copies into str[] the part of gp_input_line[] which lies between
