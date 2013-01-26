@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*- objc -*-
- * $Id: next.trm,v 1.26 2006/07/07 03:51:22 sfeam Exp $
+ * $Id: next.trm,v 1.27 2006/07/21 02:35:47 sfeam Exp $
  *
  */
 
@@ -919,7 +919,7 @@ NEXT_set_font(const char *font)
     strncpy(name, font, sep);
     name[sep] = NUL;
     size = NEXT_fontsize;
-    if (font[set] == ',')
+    if (font[sep] == ',')
 	sscanf(&(font[sep + 1]), "%d", &size);
     NEXTPrintf("/%s findfont %d scalefont setfont\n", name, size * NEXT_SC);
     NEXT_RememberFont(name);

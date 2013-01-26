@@ -1,5 +1,5 @@
 /* -*- objc -*-
- * $Id: openstep.trm,v 1.17 2006/07/07 03:51:22 sfeam Exp $
+ * $Id: openstep.trm,v 1.18 2006/07/21 02:35:47 sfeam Exp $
  *
  */
 
@@ -959,7 +959,7 @@ NEXT_recurse(
     char *p,
     TBOOLEAN brace,
     char *fontname,
-    double fontsize, double basem,
+    double fontsize, double base,
     TBOOLEAN widthflag)
 {
 
