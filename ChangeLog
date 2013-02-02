@@ -1,3 +1,11 @@
+2013-02-02  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/command.c (read_line):  Reset the token count to zero when
+	starting to read a new line of input.  Otherwise if the read is 
+	interrupted by a mouse event requesting a replot then the internal
+	state is not valid.  Test case:   cat | ./gnuplot      plot and zoom
+	Bug #3602388
+
 2013-01-25  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/command.c (bind_command):  Convert the last caller of quote_str()

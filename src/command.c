@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.251 2013/01/07 06:14:31 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.252 2013/01/26 00:19:20 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -2909,7 +2909,14 @@ read_line(const char *prompt, int start)
     TBOOLEAN more = FALSE;
     int last = 0;
 
-    current_prompt = prompt;	/* HBB NEW 20040727 */
+    current_prompt = prompt;
+
+    /* Feb 2012 - Bug 3602388 showed problems from mouse zoom/replot */
+    /* events coming in while we are waiting for a new line. If the  */
+    /* new line has already started to overwrite the old line but    */
+    /* the old token structures are still in place - boom!           */ 
+    if (start == 0)
+	c_token = num_tokens = 0;
 
     do {
 	/* grab some input */
