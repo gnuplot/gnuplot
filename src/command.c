@@ -2911,12 +2911,15 @@ read_line(const char *prompt, int start)
 
     current_prompt = prompt;
 
-    /* Feb 2012 - Bug 3602388 showed problems from mouse zoom/replot */
-    /* events coming in while we are waiting for a new line. If the  */
-    /* new line has already started to overwrite the old line but    */
-    /* the old token structures are still in place - boom!           */ 
-    if (start == 0)
+    /* Once we start to read a new line, the tokens pointing into the old */
+    /* line are no longer valid.  We used to _not_ clear things here, but */
+    /* that lead to errors when a mouse-triggered replot request came in  */
+    /* while a new line was being read.   Bug 3602388 Feb 2013.           */
+    /* FIXME: If this causes problems, push it down into fgets_ipc().     */
+    if (start == 0) {
 	c_token = num_tokens = 0;
+	gp_input_line[0] = '\0';
+    }
 
     do {
 	/* grab some input */
