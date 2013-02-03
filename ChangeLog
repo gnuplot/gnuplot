@@ -1,3 +1,12 @@
+2013-02-03  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/plot.c:
+	-d or --default-settings Skip reading gnuplotrc and ~/.gnuplot on entry.
+
+	* src/plot.c:
+	Don't assume that X11_args() is there to help parse command line options.
+	Bug #3601907
+
 2013-02-02  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/command.c (read_line):  Reset the token count to zero when

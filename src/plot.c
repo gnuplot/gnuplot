@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot.c,v 1.142 2012/10/08 22:30:52 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot.c,v 1.143 2013/01/07 05:32:24 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot.c */
@@ -135,7 +135,8 @@ static void wrapper_for_write_history __PROTO((void));
 #endif				/* GNUPLOT_HISTORY */
 
 TBOOLEAN interactive = TRUE;	/* FALSE if stdin not a terminal */
-TBOOLEAN noinputfiles = TRUE; /* FALSE if there are script files */
+TBOOLEAN noinputfiles = TRUE;	/* FALSE if there are script files */
+TBOOLEAN skip_gnuplotrc = FALSE;/* skip system gnuplotrc and ~/.gnuplot */
 TBOOLEAN persist_cl = FALSE; /* TRUE if -persist is parsed in the command line */
 
 /* user home directory */
@@ -360,6 +361,7 @@ main(int argc, char **argv)
 		    "  -V, --version\n"
 		    "  -h, --help\n"
 		    "  -p  --persist\n"
+		    "  -d  --default-settings\n"
 		    "  -e  \"command1; command2; ...\"\n"
 		    "gnuplot %s patchlevel %s\n",
 		    gnuplot_version, gnuplot_patchlevel);
@@ -381,6 +383,9 @@ main(int argc, char **argv)
 #endif
 		) {
 	    persist_cl = TRUE;
+	} else if (!strncmp(argv[i], "-d", 2) || !strcmp(argv[i], "--default-settings")) {
+	    /* Skip local customization read from ~/.gnuplot */
+	    skip_gnuplotrc = TRUE;
 	}
     }
 
@@ -437,11 +442,6 @@ main(int argc, char **argv)
 # else
     interactive = isatty(fileno(stdin));
 # endif
-
-    if (argc > 1)
-	interactive = noinputfiles = FALSE;
-    else
-	noinputfiles = TRUE;
 
     /* Need this before show_version is called for the first time */
 
@@ -613,10 +613,8 @@ main(int argc, char **argv)
 	}
     }
 
-    if (argc > 1) {
-
-	/* load filenames given as arguments */
-	while (--argc > 0) {
+    /* load filenames given as arguments */
+    while (--argc > 0) {
 	    ++argv;
 	    c_token = 0;
 	    if (!strncmp(*argv, "-persist", 2) || !strcmp(*argv, "--persist")
@@ -639,21 +637,24 @@ main(int argc, char **argv)
 		    fprintf(stderr, "syntax:  gnuplot -e \"commands\"\n");
 		    return 0;
 		}
+		interactive = FALSE;
 		do_string(*argv);
 
+	    } else if (!strncmp(*argv, "-d", 2) || !strcmp(*argv, "--default-settings")) {
+		/* Ignore this; it already had its effect */
+		FPRINTF((stderr, "ignoring -d\n"));
+	    } else if (*argv[0] == '-') {
+		fprintf(stderr, "unrecognized option %s\n", *argv);
 	    } else {
+		interactive = FALSE;
+		noinputfiles = FALSE;
 		load_file(loadpath_fopen(*argv, "r"), gp_strdup(*argv), FALSE);
 	    }
-	}
-#ifdef _Windows
-	if (persist_cl) {
-	    interactive = TRUE;
-	    while (!com_line());
-	    interactive = FALSE;
-	}
-#endif
-    } else {
-	/* take commands from stdin */
+    }
+
+    /* take commands from stdin */
+    if (noinputfiles) {
+	interactive = TRUE;
 	while (!com_line());
     }
 
@@ -706,6 +707,9 @@ load_rcfile(int where)
 {
     FILE *plotrc = NULL;
     char *rcfile = NULL;
+
+    if (skip_gnuplotrc)
+	return;
 
     if (where == 0) {
 #ifdef GNUPLOT_SHARE_DIR
