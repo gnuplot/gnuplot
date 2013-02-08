@@ -1,3 +1,9 @@
+2013-02-08  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* util.c (gprintf):  Initialize output buffer so that an empty format
+	does not leave an unitialized string.  Test case:
+	set format "%B %b"; plot x
+
 2013-01-24  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/set.c (set_timefmt):  Accept the new format as a string variable.
