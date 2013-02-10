@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.230.2.6 2012/10/30 19:13:18 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.230.2.7 2013/01/04 20:52:52 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -375,11 +375,6 @@ do_line()
 	return (0);
     }
 
-#if 0
-    /* EAM May 2011 */
-    /* Resetting here prevents handling "else" on a separate line */
-    if_condition = TRUE;
-#endif
     if_depth = 0;
     num_tokens = scanner(&gp_input_line, &gp_input_line_len);
 
@@ -2065,6 +2060,7 @@ update_command()
 void
 invalid_command()
 {
+    int save_token = c_token;
 #ifdef OS2
    if (token[c_token].is_token) {
       int rc;
@@ -2076,7 +2072,11 @@ invalid_command()
       }
     }
 #endif
-    int_error(c_token, "invalid command");
+    /* Skip the rest of the command; otherwise we're left pointing to */
+    /* the middle of a command we already know is not valid.          */
+    while (!END_OF_COMMAND)
+	c_token++;
+    int_error(save_token, "invalid command");
 }
 
 
@@ -3151,7 +3151,7 @@ do_system_func(const char *cmd, char **output)
 
 #else /* VMS || PIPES */
 
-    int_warn(NO_CARET, "system evaluation not supported by %s", OS);
+    int_warn(NO_CARET, "system() requires support for pipes");
     *output = gp_strdup("");
     return 0;
 

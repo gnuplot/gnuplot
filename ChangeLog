@@ -1,3 +1,10 @@
+2013-02-10  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/command.c (invalid_command): When an invalid command is detected,
+	advance the input parsing pointer (c_token) to the end of the command.
+	Otherwise we're left in the middle of an invalid command after the
+	error message is printed.
+
 2013-02-08  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* util.c (gprintf):  Initialize output buffer so that an empty format
