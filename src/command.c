@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.230.2.7 2013/01/04 20:52:52 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.230.2.8 2013/02/11 00:50:09 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -2881,6 +2881,16 @@ read_line(const char *prompt, int start)
     int last = 0;
 
     current_prompt = prompt;	/* HBB NEW 20040727 */
+
+    /* Once we start to read a new line, the tokens pointing into the old */
+    /* line are no longer valid.  We used to _not_ clear things here, but */
+    /* that lead to errors when a mouse-triggered replot request came in  */
+    /* while a new line was being read.   Bug 3602388 Feb 2013.           */
+    /* FIXME: If this causes problems, push it down into fgets_ipc().     */
+    if (start == 0 && !interactive) {
+	c_token = num_tokens = 0;
+	gp_input_line[0] = '\0';
+    }
 
     do {
 	/* grab some input */

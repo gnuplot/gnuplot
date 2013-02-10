@@ -5,6 +5,12 @@
 	Otherwise we're left in the middle of an invalid command after the
 	error message is printed.
 
+	* src/command.c (read_line):  Reset the token count to zero when
+	starting to read a new line of input.  Otherwise if the read is
+	interrupted by a mouse event requesting a replot then the internal
+	state is not valid.  Test case:   cat | ./gnuplot      plot and zoom
+	Bug #3602388
+
 2013-02-08  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* util.c (gprintf):  Initialize output buffer so that an empty format
