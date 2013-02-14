@@ -1,3 +1,12 @@
+2013-02-14  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/plot.c:  Merging the option parsing code from the old Windows
+	version and the old X11 version left a conflict as to whether the
+	`interactive` flag was always set if there were no filenames on the
+	command line.  The 03-Feb-2013 version always set it (as per Windows)
+	but this broke use of the Gnuplot.pm perl module under linux.
+	Therefore I have removed the unconditional statement interactive = TRUE.
+
 2013-02-08  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* util.c (gprintf):  Initialize output buffer so that an empty format
