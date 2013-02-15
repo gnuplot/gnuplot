@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.240 2012/12/14 19:39:38 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.241 2012/12/21 23:07:20 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -4485,7 +4485,8 @@ df_readbinary(double v[], int max)
 		}
 	    }
 
-	    df_swap_bytes_by_endianess(&io_val.ch, read_order,
+	    if (read_order != 0)
+		df_swap_bytes_by_endianess(&io_val.ch, read_order,
 				       df_column_bininfo[i].column.read_size);
 
 	    switch (df_column_bininfo[i].column.read_type) {
