@@ -5,6 +5,7 @@ New features, changes and fixes since gnuplot version 4.6.1
 * NEW hidden3d can handle occlusion by pm3d surfaces (as in hidden2.dem)
 * CHANGE "unset term" restores original default terminal (GNUTERM)
 * CHANGE ignore extraneous trailing comma in a plot command
+* CHANGE special case code for faster input of uniform binary matrix data
 * FIX gd terminal fontsize change requested by set_font(",newsize")
 * FIX qt terminal font metrics
 * FIX qt terminal mouse tracking and resize events for persistent plots

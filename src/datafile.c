@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.212.2.13 2012/11/20 05:21:56 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.212.2.14 2012/12/14 18:06:33 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -431,8 +431,7 @@ df_binary_file_record_struct df_bin_record_reset = {
     {0, 0, 0},
     DF_TRANSLATE_DEFAULT,
     {0, 0, 0},
-
-    NULL
+    NULL           /* data_memory */
 };
 
 int df_max_num_bin_records = 0, df_num_bin_records, df_bin_record_count;
@@ -4300,6 +4299,8 @@ df_readbinary(double v[], int max)
 
 	    first_matrix_row_col_count = 0;
 	} else { /* general binary */
+
+	  
 	    for (i = 0; i < 3; i++) {
 		int map;
 		
@@ -4360,7 +4361,7 @@ df_readbinary(double v[], int max)
 	/* byte read order */
 	read_order = byte_read_order(df_bin_file_endianess);
 
-	/* amount to skip before record */
+	/* amount to skip before first record */
 	record_skip = this_record->scan_skip[0];
 
 	end_of_scan_line = FALSE;
@@ -4368,6 +4369,53 @@ df_readbinary(double v[], int max)
 	point_count = -1;
 	line_count = 0;
 	df_current_index = df_bin_record_count;
+
+	/* Craig DeForest Feb 2013 - Fast version of uniform binary matrix.
+	 * Don't apply this to ascii input or special filetypes.
+	 * Slurp all data from file or pipe in one shot to minimize fread calls.
+	 */
+	if (!memory_data && !(df_bin_filetype > 0)
+	&&  df_binary_file &&  df_matrix && !df_nonuniform_matrix) {
+	    int i;
+	    unsigned long int bytes_per_point = 0;
+	    unsigned long int bytes_per_line = 0;
+	    unsigned long int bytes_per_plane = 0;
+	    unsigned long int bytes_total = 0;
+	    size_t fread_ret;
+
+	    /* Accumulate total number of bytes in this tuple */
+	    for (i=0; i<df_no_bin_cols; i++)
+		bytes_per_point +=  
+		  df_column_bininfo[i].skip_bytes +
+		  df_column_bininfo[i].column.read_size;
+	    bytes_per_point += df_column_bininfo[df_no_bin_cols].skip_bytes;
+	  
+	    bytes_per_line  = bytes_per_point
+			    * (  (scan_size[0] > 0) ? scan_size[0] : 1 );
+	    bytes_per_plane = bytes_per_line
+			    * ( (scan_size[1] > 0) ? scan_size[1] : 1 );
+	    bytes_total     = bytes_per_plane
+			    * ( (scan_size[2]>0) ? scan_size[2] : 1);
+	    bytes_total    += record_skip;
+
+	    /* Allocate a chunk of memory and stuff it */
+	    /* EAM FIXME: Is this a leak if the plot errors out? */
+	    memory_data = gp_alloc(bytes_total, "df_readbinary slurper");
+	    this_record->memory_data = memory_data; 
+	 
+	    FPRINTF((stderr,"Fast matrix code:\n"));
+	    FPRINTF((stderr,"\t\t skip %d bytes, read %ld bytes as %d x %d array\n",
+		    record_skip, bytes_total, scan_size[0], scan_size[1]));
+ 
+	    /* Do the actual slurping */
+	    fread_ret = fread(memory_data, 1, bytes_total, data_fp);
+	    if (fread_ret != bytes_total) {
+		int_warn(NO_CARET, "Couldn't slurp %ld bytes (return was %zd)\n",
+			bytes_total, fread_ret);
+		df_eof = 1;
+		return DF_EOF;
+	    }
+	}
     }
 
     while (!df_eof) {

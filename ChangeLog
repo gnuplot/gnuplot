@@ -1,3 +1,10 @@
+2013-02-17  Craig DeForest  <deforest@boulder.swri.edu>
+
+	* src/datafile.c (df_readbinary):  Add special case code to read in a
+	uniform binary matrix in one large chunk rather than reading one matrix
+	element at a time.  When piping a 2000x2000 RGB matrix under linux this
+	speeds the input stage from about 9 seconds to about 2 seconds.
+
 2013-02-10  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/command.c (invalid_command): When an invalid command is detected,
