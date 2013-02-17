@@ -5,6 +5,15 @@
 	element at a time.  When piping a 2000x2000 RGB matrix under linux this
 	speeds the input stage from about 9 seconds to about 2 seconds.
 
+2013-02-17  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/plot.c:
+	-d or --default-settings Skip reading gnuplotrc and ~/.gnuplot on entry.
+
+	* src/plot.c:
+	Don't assume that X11_args() is there to help parse command line options.
+	Bug #3601907
+
 2013-02-10  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/command.c (invalid_command): When an invalid command is detected,

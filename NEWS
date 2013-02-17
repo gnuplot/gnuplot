@@ -3,6 +3,7 @@ New features, changes and fixes since gnuplot version 4.6.1
 
 * NEW Allow the "bind" command to attach a user command to mouse button 1
 * NEW hidden3d can handle occlusion by pm3d surfaces (as in hidden2.dem)
+* NEW -d option from command line skips ~/.gnuplot initialization file
 * CHANGE "unset term" restores original default terminal (GNUTERM)
 * CHANGE ignore extraneous trailing comma in a plot command
 * CHANGE special case code for faster input of uniform binary matrix data
@@ -10,6 +11,7 @@ New features, changes and fixes since gnuplot version 4.6.1
 * FIX qt terminal font metrics
 * FIX qt terminal mouse tracking and resize events for persistent plots
 * FIX x11 terminal sometimes failed to reset the line width
+* FIX -persist option broken if configured without x11
 * FIX -persist mode continued mousing of 3D "set view map" plots
 * FIX reset parsing state after error in parsing string input
 * FIX buffer overflow from very long tic label formats
