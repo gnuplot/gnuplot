@@ -1,17 +1,8 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: binary.c,v 1.12 2004/07/25 12:25:00 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: binary.c,v 1.13 2007/10/02 18:18:57 sfeam Exp $"); }
 #endif
 
 /*
- * The addition of gnubin and binary, along with a small patch
- * to command.c, will permit gnuplot to plot binary files.
- * gnubin  - contains the code that relies on gnuplot include files
- *                     and other definitions
- * binary      - contains those things that are independent of those
- *                     definitions and files
- *
- * With these routines, hidden line removal of your binary data is possible!
- *
  * Last update:  3/29/92 memory allocation bugs fixed. jvdwoude@hut.nl
  *               3/09/92 spelling errors, general cleanup, use alloc with no
  *                       nasty fatal errors
@@ -22,10 +13,10 @@ static char *RCSid() { return RCSid("$Id: binary.c,v 1.12 2004/07/25 12:25:00 br
  *
  */
 
-/* NOTE: a significant fraction of these routines is not called from
- * anywhere in gnuplot.  They're provided as a utility library for
- * people wanting to write binary files usable by gnuplot, as the
- * bf_test.c demo does it. */
+/* NOTE: These routines are not called from anywhere in gnuplot.
+ * They are provided as a utility library for people wanting to 
+ * write binary files usable by gnuplot as in the bf_test.c demo.
+ */
 
 #include "binary.h"
 
