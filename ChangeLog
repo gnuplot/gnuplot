@@ -5,6 +5,8 @@
 	element at a time.  When piping a 2000x2000 RGB matrix under linux this
 	speeds the input stage from about 9 seconds to about 2 seconds.
 
+2013-02-17  Ethan A Merritt  <merritt@u.washington.edu>
+
 	* src/command.c src/datafile.c src/plot2d.c src/plot3d.c src/binary.c
 	src/Makefile.am:  Files binary.c and binary.h are not used by gnuplot
 	proper, only by bf_test.  Remove them from the build dependencies.
