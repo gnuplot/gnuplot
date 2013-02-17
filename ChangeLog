@@ -18,6 +18,9 @@
 	src/Makefile.am:  Files binary.c and binary.h are not used by gnuplot
 	proper, only by bf_test.  Remove them from the build dependencies.
 
+	* src/plot.c: Treat command line option -e similarly to a load file
+	(i.e. do not wait for further input from stdin).
+
 2013-02-14  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/plot.c:  Merging the option parsing code from the old Windows
