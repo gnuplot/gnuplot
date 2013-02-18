@@ -1,4 +1,9 @@
-2012-02-17  W. Trevor King  <wking@tremily.us>
+2013-02-18  Christoph Bersch  <cbersch@users.sf.net>
+
+	* src/graphics.c:  Draw the zero axis lines in the same front/back
+	layer as the axis and grid lines.
+
+2013-02-17  W. Trevor King  <wking@tremily.us>
 
 	* configure.in src/datafile.c (df_open) docs/gnuplot.doc:
 	New special file syntax  "<&N"  plots data read from an arbitrary file
