@@ -1,5 +1,5 @@
 /*
- * $Id: term_api.h,v 1.105 2012/10/27 02:23:39 sfeam Exp $
+ * $Id: term_api.h,v 1.106 2012/10/30 04:11:13 sfeam Exp $
  */
 
 /* GNUPLOT - term_api.h */
@@ -83,6 +83,11 @@ typedef enum VERT_JUSTIFY {
     JUST_BOT
 } VERT_JUSTIFY;
 
+typedef enum t_linecap {
+    BUTT = 0,
+    ROUNDED,
+    SQUARE
+} t_linecap;
 
 typedef struct lp_style_type {	/* contains all Line and Point properties */
     int     pointflag;		/* 0 if points not used, otherwise 1 */

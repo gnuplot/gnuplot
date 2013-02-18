@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_term.h,v 1.18 2012/05/21 23:15:18 sfeam Exp $
+ * $Id: wxt_term.h,v 1.19 2012/10/08 22:30:53 markisch Exp $
  */
 
 /* GNUPLOT - wxt_term.h */
@@ -102,7 +102,6 @@ void wxt_update_title __PROTO((int number));
 void wxt_update_size __PROTO((int number));
 TBOOLEAN wxt_window_opened(void);
 
-
 /* state variables shared between wxt.trm and wxt_gui.cpp */
 extern int wxt_window_number;
 extern TBOOLEAN wxt_enhanced_enabled;
@@ -118,7 +117,7 @@ extern int wxt_toggle;
 extern char wxt_set_fontname[MAX_ID_LEN + 1];
 extern int wxt_set_fontsize;
 extern double wxt_set_fontscale;
-extern int wxt_rounded;
+extern t_linecap wxt_linecap;
 extern char wxt_title[MAX_ID_LEN + 1];
 extern int wxt_width;
 extern int wxt_height;

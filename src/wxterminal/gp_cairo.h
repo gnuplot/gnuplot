@@ -1,5 +1,5 @@
 /*
- * $Id: gp_cairo.h,v 1.18 2012/04/14 03:59:31 sfeam Exp $
+ * $Id: gp_cairo.h,v 1.19 2012/05/21 23:15:18 sfeam Exp $
  */
 
 /* GNUPLOT - gp_cairo.h */
@@ -154,7 +154,7 @@ typedef struct plot_struct {
 
 	TBOOLEAN oversampling;
 
-	TBOOLEAN rounded;
+	t_linecap linecap;
 
 	/* hinting option for horizontal and vertical lines :
 	 * Hinting is the process of fitting outlines to the pixel grid

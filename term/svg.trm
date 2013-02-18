@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: svg.trm,v 1.148 2012/12/17 19:49:45 sfeam Exp $
+ * $Id: svg.trm,v 1.149 2012/12/28 00:52:42 sfeam Exp $
  */
 
 /*------------------------------------------------------------------------------------------------------------------------------------
@@ -148,7 +148,7 @@ static int SVG_LineType = LT_NODRAW;	/* current line type*/
 static double SVG_LineWidth = 1.0; /* current line width*/
 static double SVG_linewidth_factor = 1.0; /* Multiplier for linewidths */
 static double SVG_dashlength = 1.0; /* Multiplier for dash patterns */
-static TBOOLEAN SVG_rounded = FALSE; /* linejoin and linecap */
+static t_linecap SVG_linecap = BUTT; /* linejoin and linecap */
 static int SVG_TextAngle = 0;	/* current text orientation*/
 static enum JUSTIFY SVG_TextJust = LEFT; /* current text justification*/
 
@@ -259,8 +259,8 @@ SVG_GroupOpen ()
 	fprintf (gpoutfile, "\" ");
 	fprintf (gpoutfile, "stroke-width=\"%.2f\" stroke-linecap=\"%s\" stroke-linejoin=\"%s\"",
 		 SVG_pens[SVG_Pen_RealID (SVG_LineType)].width * SVG_linewidth_factor,
-		 SVG_rounded ? "round" : "butt",
-		 SVG_rounded ? "round" : "miter");
+		 SVG_linecap == ROUNDED ? "round" : SVG_linecap == SQUARE ? "square" : "butt",
+		 SVG_linecap == ROUNDED ? "round" : "miter");
 
 	fprintf (gpoutfile, ">\n");
 
@@ -682,13 +682,19 @@ SVG_options ()
 									
 	if (almost_equals (c_token, "round$ed")) {
 	    c_token++;
-	    SVG_rounded = TRUE;
+	    SVG_linecap = ROUNDED;
 	    continue;
 	}
 									
+	if (equals (c_token, "square")) {
+	    c_token++;
+	    SVG_linecap = SQUARE;
+	    continue;
+	}
+
 	if (equals (c_token, "butt")) {
 	    c_token++;
-	    SVG_rounded = FALSE;
+	    SVG_linecap = BUTT;
 	    continue;
 	}
 
@@ -744,7 +750,7 @@ SVG_options ()
     }
 
     sprintf(term_options + strlen(term_options),
-	SVG_rounded ? "rounded " : "butt ");
+	SVG_linecap == ROUNDED ? "rounded " : SVG_linecap == SQUARE ? "square " : "butt ");
 
     if (SVG_dashed)
 	sprintf(term_options + strlen(term_options),
@@ -2099,7 +2105,7 @@ START_HELP(svg)
 "                        {name <plotname>}",
 "                        {font \"<fontname>{,<fontsize>}\"}",
 "                        {fontfile <filename>}",
-"                        {rounded|butt} {solid|dashed} {linewidth <lw>}",
+"                        {rounded|butt|square} {solid|dashed} {linewidth <lw>}",
 "                        {background <rgb_color>}",
 "",
 " where <x> and <y> are the size of the SVG plot to generate,",

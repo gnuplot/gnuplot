@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.cpp,v 1.106 2012/08/29 21:25:35 sfeam Exp $
+ * $Id: wxt_gui.cpp,v 1.107 2012/10/08 22:30:53 markisch Exp $
  */
 
 /* GNUPLOT - wxt_gui.cpp */
@@ -1842,7 +1842,7 @@ void wxt_graphics()
 
 	/* set the line properties */
 	/* FIXME: should this be in wxt_settings_apply() ? */
-	wxt_current_plot->rounded = wxt_rounded;
+	wxt_current_plot->linecap = wxt_linecap;
 
 	/* background as given by set term */
 	wxt_current_plot->background = wxt_rgb_background;

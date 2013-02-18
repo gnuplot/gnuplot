@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: canvas.trm,v 1.70 2012/11/16 03:49:20 sfeam Exp $
+ * $Id: canvas.trm,v 1.71 2012/11/25 22:01:22 sfeam Exp $
  *
  */
 
@@ -113,7 +113,7 @@ static int canvas_text_angle = 0;
 static int canvas_in_a_path = FALSE;
 static int already_closed = FALSE;
 static TBOOLEAN canvas_dashed = FALSE;
-static TBOOLEAN canvas_rounded = FALSE;
+static t_linecap canvas_linecap = ROUNDED;
 static TBOOLEAN CANVAS_mouseable = FALSE;
 static TBOOLEAN CANVAS_standalone = TRUE;
 static char CANVAS_background[18] = {'\0'};
@@ -148,7 +148,7 @@ enum CANVAS_case {
     CANVAS_NAME, CANVAS_STANDALONE, CANVAS_TITLE,
     CANVAS_LINEWIDTH, CANVAS_MOUSING, CANVAS_JSDIR, CANVAS_ENH, CANVAS_NOENH,
     CANVAS_FONTSCALE, CANVAS_SOLID, CANVAS_DASHED, CANVAS_DASHLENGTH,
-    CANVAS_ROUNDED, CANVAS_BUTT, CANVAS_BACKGROUND, CANVAS_OTHER
+    CANVAS_ROUNDED, CANVAS_BUTT, CANVAS_SQUARE, CANVAS_BACKGROUND, CANVAS_OTHER
 };
 
 static struct gen_table CANVAS_opts[] =
@@ -173,6 +173,7 @@ static struct gen_table CANVAS_opts[] =
     { "dl", CANVAS_DASHLENGTH },
     { "round$ed", CANVAS_ROUNDED },
     { "butt", CANVAS_BUTT },
+    { "square", CANVAS_SQUARE },
     { "backg$round", CANVAS_BACKGROUND },
     { NULL, CANVAS_OTHER }
 };
@@ -324,11 +325,15 @@ CANVAS_options()
 	    break;
 
 	case CANVAS_ROUNDED:
-	    canvas_rounded = TRUE;
+	    canvas_linecap = ROUNDED;
 	    break;
 
 	case CANVAS_BUTT:
-	    canvas_rounded = FALSE;
+	    canvas_linecap = BUTT;
+	    break;
+
+	case CANVAS_SQUARE:
+	    canvas_linecap = SQUARE;
 	    break;
 
 	case CANVAS_BACKGROUND:
@@ -351,7 +356,9 @@ CANVAS_options()
     sprintf(term_options, canvas_dashed ? " dashed" : " solid");
     if (canvas_dashed && canvas_dashlength_factor != 1.0)
 	sprintf(term_options + strlen(term_options), " dashlength %3.1f", canvas_dashlength_factor);
-    sprintf(term_options + strlen(term_options), canvas_rounded ? " rounded" : " butt");
+    sprintf(term_options + strlen(term_options), 
+	canvas_linecap == ROUNDED ? " rounded" : 
+	canvas_linecap == SQUARE ? " square" : " butt");
     sprintf(term_options + strlen(term_options), " size %d,%d", (int)(term->xmax/CANVAS_OVERSAMPLE), (int)(term->ymax/CANVAS_OVERSAMPLE));
     sprintf(term_options + strlen(term_options), "%s fsize %g lw %g", 
 	term->put_text == ENHCANVAS_put_text ? " enhanced" : "",
@@ -551,8 +558,8 @@ CANVAS_graphics()
 
     fprintf(gpoutfile,
 	"ctx.lineCap = \"%s\"; ctx.lineJoin = \"%s\";\n",
-	canvas_rounded ? "round" : "butt",
-	canvas_rounded ? "round" : "miter"
+	canvas_linecap == ROUNDED ? "round" : canvas_linecap == SQUARE ? "square" : "butt",
+	canvas_linecap == ROUNDED ? "round" : "miter"
     );
 
     if (*CANVAS_background) {
@@ -1565,7 +1572,7 @@ START_HELP(canvas)
 "       set terminal canvas {size <xsize>, <ysize>} {background <rgb_color>}",
 "                           {font {<fontname>}{,<fontsize>}} | {fsize <fontsize>}",
 "                           {{no}enhanced} {linewidth <lw>}",
-"                           {rounded | butt}",
+"                           {rounded | butt | square}",
 "                           {solid | dashed {dashlength <dl>}}",
 "                           {standalone {mousing} | name '<funcname>'}",
 "                           {jsdir 'URL/for/javascripts'}",

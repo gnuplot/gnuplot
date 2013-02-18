@@ -1,5 +1,5 @@
 /*
- * $Id: wxt.trm,v 1.32 2012/05/21 23:15:18 sfeam Exp $
+ * $Id: wxt.trm,v 1.33 2012/11/29 00:12:57 broeker Exp $
  */
 
 /* GNUPLOT - wxt.trm */
@@ -68,7 +68,7 @@ int wxt_persist = UNSET;
 int wxt_raise = UNSET;
 int wxt_ctrl = UNSET;
 int wxt_toggle = UNSET;
-int wxt_rounded = no;
+t_linecap wxt_linecap = SQUARE;
 /* default text font family: */
 char wxt_set_fontname[MAX_ID_LEN + 1] = "";
 /* default text size*/
@@ -101,6 +101,7 @@ enum WXT_id {
     WXT_CLOSE,
     WXT_ROUNDED,
     WXT_BUTT,
+    WXT_SQUARE,
     WXT_SOLID,
     WXT_DASHED,
     WXT_DASHLENGTH,
@@ -125,6 +126,7 @@ static struct gen_table wxt_opts[] = {
     {"cl$ose", WXT_CLOSE},
     {"round$ed", WXT_ROUNDED},
     {"butt", WXT_BUTT},
+    {"square", WXT_SQUARE},
     {"solid", WXT_SOLID},
     {"dash$ed", WXT_DASHED},
     {"dashl$ength", WXT_DASHLENGTH},
@@ -269,13 +271,19 @@ TERM_PUBLIC void wxt_options()
 		case WXT_ROUNDED:
 			c_token++;
 			if (set_capjoin) duplication=TRUE;
-			wxt_rounded = yes;
+			wxt_linecap = ROUNDED;
 			set_capjoin = TRUE;
 			break;
 		case WXT_BUTT:
 			c_token++;
 			if (set_capjoin) duplication=TRUE;
-			wxt_rounded = no;
+			wxt_linecap = BUTT;
+			set_capjoin = TRUE;
+			break;
+		case WXT_SQUARE:
+			c_token++;
+			if (set_capjoin) duplication=TRUE;
+			wxt_linecap = SQUARE;
 			set_capjoin = TRUE;
 			break;
 		case WXT_DASHED:
@@ -379,7 +387,10 @@ TERM_PUBLIC void wxt_options()
 	}
 
 	if (set_capjoin)
-		strncat(term_options, wxt_rounded ? " rounded" : " butt",
+		strncat(term_options, 
+			wxt_linecap == ROUNDED ? " rounded"
+			: wxt_linecap == SQUARE ? " square"
+			: " butt",
 			sizeof(term_options)-strlen(term_options)-1);
 
 	if (set_persist)

@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: cairo.trm,v 1.56 2012/05/21 23:15:18 sfeam Exp $
+ * $Id: cairo.trm,v 1.57 2012/11/29 00:12:57 broeker Exp $
  */
 
 /* GNUPLOT - cairo.trm */
@@ -104,7 +104,7 @@ typedef struct cairo_params_t {
     float dash_length;
     rgb_color background;
     TBOOLEAN mono;
-    TBOOLEAN rounded;                 /* rounded linecaps and linejoins */
+    t_linecap linecap;           /* butt/rounded/square linecaps and linejoins */
     TBOOLEAN transparent;
     TBOOLEAN crop;
     char fontname[MAX_ID_LEN + 1];    /* name of font */
@@ -172,6 +172,7 @@ enum CAIROTRM_id {
     CAIROTRM_SIZE,
     CAIROTRM_ROUNDED,
     CAIROTRM_BUTT,
+    CAIROTRM_SQUARE,
     CAIROTRM_LINEWIDTH,
     CAIROTRM_DASHED,
     CAIROTRM_SOLID,
@@ -202,6 +203,7 @@ static struct gen_table cairotrm_opts[] = {
     {"si$ze", CAIROTRM_SIZE},
     {"round$ed", CAIROTRM_ROUNDED},
     {"butt", CAIROTRM_BUTT},
+    {"square", CAIROTRM_SQUARE},
     {"lw", CAIROTRM_LINEWIDTH},
     {"linew$idth", CAIROTRM_LINEWIDTH},
     {"dash$ed", CAIROTRM_DASHED},
@@ -323,13 +325,19 @@ TERM_PUBLIC void cairotrm_options()
 		case CAIROTRM_ROUNDED:
 			c_token++;
 			if (set_capjoin) duplication=TRUE;
-			cairo_params->rounded = TRUE;
+			cairo_params->linecap = ROUNDED;
 			set_capjoin = TRUE;
 			break;
 		case CAIROTRM_BUTT:
 			c_token++;
 			if (set_capjoin) duplication=TRUE;
-			cairo_params->rounded = FALSE;
+			cairo_params->linecap = BUTT;
+			set_capjoin = TRUE;
+			break;
+		case CAIROTRM_SQUARE:
+			c_token++;
+			if (set_capjoin) duplication=TRUE;
+			cairo_params->linecap = SQUARE;
 			set_capjoin = TRUE;
 			break;
 		case CAIROTRM_LINEWIDTH:
@@ -576,7 +584,10 @@ TERM_PUBLIC void cairotrm_options()
 	}
 
 	if (set_capjoin) {
-		strncat(term_options, cairo_params->rounded ? " rounded" : " butt",
+		strncat(term_options, 
+			cairo_params->linecap == ROUNDED ? " rounded" 
+			: cairo_params->linecap == BUTT ? " butt"
+			: " square",
 			sizeof(term_options)-strlen(term_options)-1);
 	}
 
@@ -773,7 +784,7 @@ void cairotrm_graphics()
 	plot.yscale = 1.0;
 
 	/* update graphics state properties */
-	plot.rounded = cairo_params->rounded;
+	plot.linecap = cairo_params->linecap;
 
 	FPRINTF((stderr,"Graphics1\n"));
 
@@ -1371,7 +1382,7 @@ START_HELP(cairolatex)
 "                      {mono|color} {solid|dashed}",
 "                      {{no}transparent} {{no}crop} {background <rgbcolor>}",
 "                      {font <font>} {fontscale <scale>}",
-"                      {linewidth <lw>} {rounded|butt} {dashlength <dl>}",
+"                      {linewidth <lw>} {rounded|butt|square} {dashlength <dl>}",
 "                      {size <XX>{unit},<YY>{unit}}",
 "",
 " The cairolatex terminal prints a plot like `terminal epscairo` or",
@@ -1528,7 +1539,7 @@ START_HELP(pdfcairo)
 "         set term pdfcairo",
 "                      {{no}enhanced} {mono|color} {solid|dashed}",
 "                      {font <font>} {fontscale <scale>}",
-"                      {linewidth <lw>} {rounded|butt} {dashlength <dl>}",
+"                      {linewidth <lw>} {rounded|butt|square} {dashlength <dl>}",
 "                      {size <XX>{unit},<YY>{unit}}",
 "",
 " This terminal supports an enhanced text mode, which allows font and other",
@@ -1540,8 +1551,8 @@ START_HELP(pdfcairo)
 " specified in `linewidth`. The default linewidth is 0.25 points.",
 " (1 \"PostScript\" point = 1/72 inch = 0.353 mm)",
 "",
-" `rounded` sets line caps and line joins to be rounded; `butt` is the",
-" default, butt caps and mitered joins.",
+" `rounded` sets line caps and line joins to be rounded;",
+" `butt` is the default, butt caps and mitered joins.",
 "",
 " The default size for the output is 5 inches x 3 inches. The `size` option",
 " changes this to whatever the user requests. By default the X and Y sizes are",
@@ -1616,7 +1627,7 @@ START_HELP(pngcairo)
 "                      {{no}enhanced} {mono|color} {solid|dashed}",
 "                      {{no}transparent} {{no}crop} {background <rgbcolor>",
 "                      {font <font>} {fontscale <scale>}",
-"                      {linewidth <lw>} {rounded|butt} {dashlength <dl>}",
+"                      {linewidth <lw>} {rounded|butt|square} {dashlength <dl>}",
 "                      {size <XX>{unit},<YY>{unit}}",
 "",
 " This terminal supports an enhanced text mode, which allows font and other",
@@ -1626,8 +1637,8 @@ START_HELP(pngcairo)
 "",
 " The width of all lines in the plot can be modified by the factor <lw>.",
 "",
-" `rounded` sets line caps and line joins to be rounded; `butt` is the",
-" default, butt caps and mitered joins.",
+" `rounded` sets line caps and line joins to be rounded;",
+" `butt` is the default, butt caps and mitered joins.",
 "",
 " The default size for the output is 640 x 480 pixels. The `size` option",
 " changes this to whatever the user requests. By default the X and Y sizes are",

@@ -3,6 +3,13 @@
 	* src/graphics.c:  Draw the zero axis lines in the same front/back
 	layer as the axis and grid lines.
 
+2013-02-18  Ethan A Merritt  <merritt@u.washington.edu>
+
+	*  src/term_api.h term/cairo.trm term/canvas.trm term/svg.trm
+	term/wxt.trm src/wxterminal/gp_cairo.c src/wxterminal/gp_cairo.h
+	src/wxterminal/wxt_gui.cpp src/wxterminal/wxt_term.h:
+	Add "square" to linecap options "round" and "butt".
+
 2013-02-17  W. Trevor King  <wking@tremily.us>
 
 	* configure.in src/datafile.c (df_open) docs/gnuplot.doc:
