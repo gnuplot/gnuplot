@@ -18,6 +18,7 @@ New features, changes and fixes since gnuplot version 4.6.1
 * FIX buffer overflow from very long tic label formats
 * FIX broken handling of formatted input via 'using 1:2 "<format>"'
 * FIX exit current command file from inside bracketed clause
+* FIX estimation of space required for rotated x-axis tic labels
 
 
 New features, changes and fixes in gnuplot version 4.6.1

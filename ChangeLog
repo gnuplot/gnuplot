@@ -1,3 +1,10 @@
+2013-02-19  Ethan A Merritt  <merritt@u.washington.edu>
+
+	*  src/graphics.c (boundary):  Rotated x-axis tic labels are set
+	automatically to right justify, but this happens too late for the code
+	that reserves space for them.  Test for this as a special case.
+	Bugs 1204, 1209
+
 2013-02-18  Christoph Bersch  <cbersch@users.sf.net>
 
 	* src/graphics.c:  Draw the zero axis lines in the same front/back
