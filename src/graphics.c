@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.411 2013/01/05 23:21:18 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.412 2013/02/19 04:12:04 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -908,6 +908,10 @@ boundary(struct curve_points *plots, int count)
     }
     if (axis_array[FIRST_X_AXIS].ticmode & TICS_ON_BORDER && vertical_xtics) {
 	double projection;
+	/* This adjustment will happen again in axis_output_tics but we need it now */
+	if (axis_array[FIRST_X_AXIS].tic_rotate == TEXT_VERTICAL
+	&& !axis_array[FIRST_X_AXIS].manual_justify)
+	    axis_array[FIRST_X_AXIS].label.pos = RIGHT;
 	if (axis_array[FIRST_X_AXIS].tic_rotate == 90)
 	    projection = -1.0;
 	else if (axis_array[FIRST_X_AXIS].tic_rotate == TEXT_VERTICAL)
