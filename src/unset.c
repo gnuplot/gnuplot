@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.159 2012/11/18 18:15:56 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.160 2013/01/04 22:03:54 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -1028,7 +1028,10 @@ reset_logscale(AXIS_INDEX axis)
 {
     TBOOLEAN undo_rlog = (axis == POLAR_AXIS && R_AXIS.log);
     axis_array[axis].log = FALSE;
+    /* Do not zero the base because we can still use it for gprintf formats
+     * %L and %l with linear axis scaling.
     axis_array[axis].base = 0.0;
+     */
     if (undo_rlog)
 	rrange_to_xy();
 }

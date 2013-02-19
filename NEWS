@@ -23,6 +23,7 @@ New features, changes and fixes since gnuplot version 4.6
          is used to decide the interpretation of all lines in the file.
 * CHANGE Automake 1.12 imposes an absolute requirement for C prototypes
 * CHANGE binary plot options are less order-dependent, but may be persistent
+* CHANGE leave axis log base non-zero so gprintf format %L works on linear axes
 
 
 New features, changes and fixes in gnuplot version 4.6

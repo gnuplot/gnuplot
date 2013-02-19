@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.109 2012/11/12 03:48:30 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.110 2012/11/24 21:54:29 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -877,7 +877,11 @@ gen_tics(AXIS_INDEX axis, tic_callback callback)
 	double uncertain = (axis_array[axis].max - axis_array[axis].min) / 10;
 	double internal_min = axis_array[axis].min - SIGNIF * uncertain;
 	double internal_max = axis_array[axis].max + SIGNIF * uncertain;
+#if 0
 	double log10_base = axis_array[axis].log ? log10(axis_array[axis].base) : 1.0;
+#else	/* This allows gprintf formats %L %l to work even when log scaling is off */
+	double log10_base = axis_array[axis].base > 0.0 ? log10(axis_array[axis].base) : 1.0;
+#endif
 	double polar_shift = 0;
 
 	/* polar labels always +ve, and if rmin has been set, they are
@@ -965,8 +969,11 @@ gen_tics(AXIS_INDEX axis, tic_callback callback)
 	double ministart = 0, ministep = 1, miniend = 1;	/* internal or user - depends on step */
 
 	/* gprintf uses log10() of base - log_base_array is log() */
+#if 0
 	double log10_base = axis_array[axis].log ? log10(axis_array[axis].base) : 1.0;
-
+#else	/* This allows gprintf formats %L %l to work even when log scaling is off */
+	double log10_base = axis_array[axis].base > 0.0 ? log10(axis_array[axis].base) : 1.0;
+#endif
 	if (lmax < lmin) {
 	    /* hmm - they have set reversed range for some reason */
 	    double temp = lmin;
