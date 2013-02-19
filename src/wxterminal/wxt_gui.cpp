@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.cpp,v 1.91.2.7 2012/09/08 04:50:55 sfeam Exp $
+ * $Id: wxt_gui.cpp,v 1.91.2.8 2012/10/14 02:31:34 sfeam Exp $
  */
 
 /* GNUPLOT - wxt_gui.cpp */
@@ -1211,8 +1211,8 @@ static void wxt_initialize_hidden(int i)
  */
 static void wxt_update_key_box( unsigned int x, unsigned int y )
 {
-	if (wxt_cur_plotno >= wxt_max_key_boxes) {
-		wxt_max_key_boxes += 10;
+	if (wxt_max_key_boxes <= wxt_cur_plotno) {
+		wxt_max_key_boxes = wxt_cur_plotno + 10;
 		wxt_key_boxes = (wxtBoundingBox *)realloc(wxt_key_boxes,
 				wxt_max_key_boxes * sizeof(wxtBoundingBox));
 		wxt_initialize_key_boxes(wxt_cur_plotno);

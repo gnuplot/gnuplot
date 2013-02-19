@@ -5,6 +5,10 @@
 	that reserves space for them.  Test for this as a special case.
 	Bugs 1204, 1209
 
+	* src/wxterminal/wxt_gui.cpp (wxt_update_key_box):  Fix array overrun
+	caused by many 'notitle' plot appearing before any titled plots.
+	Bug 1211
+
 2013-02-18  Christoph Bersch  <cbersch@users.sf.net>
 
 	* src/graphics.c:  Draw the zero axis lines in the same front/back
