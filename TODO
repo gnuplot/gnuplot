@@ -19,16 +19,14 @@ PLATFORMS:
 
  -- Configuration/installation on OSX remains problematic
 
+ -- We've seen a proof-of-principle build of gnuplot into javascript
+    running in a browser.  If the tool chain is simple enough, we could
+    make this a build target for autoconf/make.
+
  -- autoconf handling of TBOOLEAN on Solaris also remains problematic.
     The definition apparently needs to be different for C and C++.
 
  -- update wgnuplot menus for Windows
-
-TERMINALS, GENERAL COMMENTS:
-============================
-
--- verify that terminals don't reset options (I've checked a lot, but 
-should be tested again)
 
 GNUPLOT TOOLS LIBRARY:
 ======================
@@ -126,3 +124,9 @@ Ethan's List (2012):
   + revise the keywords for matrix handling so that the binary and ascii
     versions are consistent
   + apply in-line plot ranges only to the immediately following plot clause
+
+Remove obsolete files.  But are they truly obsolete?
+  term/pc.trm src/*.asm src/corplot.c src/corgraph.c
+  term/openstep.trm term/next.trm src/OpenStep/ src/NeXT/
+  config/makefile.emx config/makefile.unx 
+
