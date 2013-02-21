@@ -1,3 +1,16 @@
+2013-02-21  Ethan A Merritt  <merritt@u.washington.edu>
+
+	*  src/plot.c:  The old test for whether a session was interactive 
+	assumed that everything on the command line was either an input file
+	name or an x11 option parsed by X11_args. This broke because
+	(1) x11 is no longer the only interactive terminal.
+	(2) there are options that occupy space on the command line but are
+	not file names.  Some indicate non-interactive; some don't.
+	Replace this test with one that only enters a non-interactive session
+	if there are command line arguments that do not begin with '-' 
+	(filename) or _do_ begin with '-e' (inline command).
+	Bug #612
+
 2013-02-19  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* src/axis.c (gen_tics) src/unset.c (unset_log):  Do not zero out the

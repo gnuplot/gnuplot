@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot.c,v 1.145 2013/02/14 23:58:01 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot.c,v 1.146 2013/02/17 21:41:24 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot.c */
@@ -442,6 +442,19 @@ main(int argc, char **argv)
 # else
     interactive = isatty(fileno(stdin));
 # endif
+
+    /* Note: we want to know whether this is an interactive session so that we can
+     * decide whether or not to write status information to stderr.  The old test
+     * for this was to see if (argc > 1) but the addition of optional command line
+     * switches broke this.  What we really wanted to know was whether any of the
+     * command line arguments are file names or an explicit in-line "-e command".
+     */
+    for (i = 1; i < argc; i++) {
+	if ((argv[i][0] != '-') || (argv[i][1] == 'e')) {
+	    interactive = FALSE;
+	    break;
+	}
+    }
 
     /* Need this before show_version is called for the first time */
 
