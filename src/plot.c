@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot.c,v 1.146 2013/02/17 21:41:24 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot.c,v 1.147 2013/02/21 20:06:51 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot.c */
@@ -450,6 +450,10 @@ main(int argc, char **argv)
      * command line arguments are file names or an explicit in-line "-e command".
      */
     for (i = 1; i < argc; i++) {
+# ifdef _Windows
+	if (!stricmp(argv[i], "/noend"))
+	    continue;
+# endif
 	if ((argv[i][0] != '-') || (argv[i][1] == 'e')) {
 	    interactive = FALSE;
 	    break;
