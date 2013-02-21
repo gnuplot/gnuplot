@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot.c,v 1.128.2.13 2013/02/17 18:51:39 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot.c,v 1.148 2013/02/21 20:18:16 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot.c */
@@ -329,7 +329,7 @@ main(int argc, char **argv)
 
 #if defined(HAVE_LIBREADLINE) || defined(HAVE_LIBEDITLINE)
     /* T.Walter 1999-06-24: 'rl_readline_name' must be this fix name.
-     * It is used to parse a 'gnuplot' specific section in '~/.inputrc' 
+     * It is used to parse a 'gnuplot' specific section in '~/.inputrc'
      * or gnuplot specific commands in '.editrc' (when using editline
      * instead of readline) */
     rl_readline_name = "Gnuplot";
@@ -377,7 +377,11 @@ main(int argc, char **argv)
 #endif
 	    return 0;
 
-	} else if (!strncmp(argv[i], "-persist", 2) || !strcmp(argv[i], "--persist")) {
+	} else if (!strncmp(argv[i], "-persist", 2) || !strcmp(argv[i], "--persist")
+#ifdef _Windows
+		|| !stricmp(argv[i], "-noend") || !stricmp(argv[i], "/noend")
+#endif
+		) {
 	    persist_cl = TRUE;
 	} else if (!strncmp(argv[i], "-d", 2) || !strcmp(argv[i], "--default-settings")) {
 	    /* Skip local customization read from ~/.gnuplot */
@@ -439,6 +443,23 @@ main(int argc, char **argv)
     interactive = isatty(fileno(stdin));
 # endif
 
+    /* Note: we want to know whether this is an interactive session so that we can
+     * decide whether or not to write status information to stderr.  The old test
+     * for this was to see if (argc > 1) but the addition of optional command line
+     * switches broke this.  What we really wanted to know was whether any of the
+     * command line arguments are file names or an explicit in-line "-e command".
+     */
+    for (i = 1; i < argc; i++) {
+# ifdef _Windows
+	if (!stricmp(argv[i], "/noend"))
+	    continue;
+# endif
+	if ((argv[i][0] != '-') || (argv[i][1] == 'e')) {
+	    interactive = FALSE;
+	    break;
+	}
+    }
+
     /* Need this before show_version is called for the first time */
 
 #ifdef HAVE_SYS_UTSNAME_H
@@ -490,7 +511,7 @@ main(int argc, char **argv)
 	fprintf(stderr,
 	    "\ngnuplot changed the codepage of this console from %i to %i to\n" \
 	    "match the graph window. Some characters might only display correctly\n" \
-	    "if you change the font to a non-raster type.\n", 
+	    "if you change the font to a non-raster type.\n",
 	    cp_input, GetConsoleCP());
     }
 #else
@@ -498,7 +519,7 @@ main(int argc, char **argv)
 	fprintf(stderr,
 	    "\nWarning: The codepage of the graph window (%i) and that of the\n" \
 	    "console (%i) differ. Use `set encoding` or `!chcp` if extended\n" \
-	    "characters don't display correctly.\n", 
+	    "characters don't display correctly.\n",
 	    GetACP(), GetConsoleCP());
     }
 #endif
@@ -613,15 +634,12 @@ main(int argc, char **argv)
     while (--argc > 0) {
 	    ++argv;
 	    c_token = 0;
+	    if (!strncmp(*argv, "-persist", 2) || !strcmp(*argv, "--persist")
 #ifdef _Windows
-	    if (stricmp(*argv, "-noend") == 0 || stricmp(*argv, "/noend") == 0
-	       	|| stricmp(*argv, "-persist") == 0)
-		noend = TRUE;
-	    else
+		|| !stricmp(*argv, "-noend") || !stricmp(*argv, "/noend")
 #endif
-	    if (!strncmp(*argv, "-persist", 2) || !strcmp(*argv, "--persist")) {
+	    ) {
 		FPRINTF((stderr,"'persist' command line option recognized\n"));
-
 	    } else if (strcmp(*argv, "-") == 0) {
 		interactive = TRUE;
 		while (!com_line());
@@ -651,6 +669,10 @@ main(int argc, char **argv)
 
     /* take commands from stdin */
     if (noinputfiles) {
+	/* FIXME: setting interactive true breaks Gnuplot.pm
+	 * but was used in the Windows code prior to Feb 2013.
+	 */
+	/* interactive = TRUE; */
 	while (!com_line());
     }
 
@@ -712,8 +734,8 @@ load_rcfile(int where)
 # if defined(_Windows)
 	/* retrieve path relative to gnuplot executable,
 	 * whose path is in szModuleName (winmain.c) */
-	rcfile = gp_alloc(strlen((char *)szPackageDir) + 1 +
-		strlen(GNUPLOT_SHARE_DIR) + 1 + strlen("gnuplotrc") + 1, "rcfile");
+	rcfile = gp_alloc(strlen((char *)szPackageDir) + 1
+	       + strlen(GNUPLOT_SHARE_DIR) + 1 + strlen("gnuplotrc") + 1, "rcfile");
 	strcpy(rcfile, (char *)szPackageDir);
 	PATH_CONCAT(rcfile, GNUPLOT_SHARE_DIR);
 # else

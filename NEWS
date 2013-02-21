@@ -8,6 +8,7 @@ New features, changes and fixes since gnuplot version 4.6.1
 * CHANGE "unset term" restores original default terminal (GNUTERM)
 * CHANGE ignore extraneous trailing comma in a plot command
 * CHANGE special case code for faster input of uniform binary matrix data
+* CHANGE test for whether the session should be interactive or non-interactive
 * FIX gd terminal fontsize change requested by set_font(",newsize")
 * FIX qt terminal font metrics
 * FIX qt terminal mouse tracking and resize events for persistent plots

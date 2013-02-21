@@ -1,13 +1,27 @@
+2013-02-21  Ethan A Merritt  <merritt@u.washington.edu>
+
+	*  src/plot.c:  The old test for whether a session was interactive 
+	assumed that everything on the command line was either an input file
+	name or an x11 option parsed by X11_args. This broke because
+	(1) X11 is no longer the only interactive terminal.
+	(2) There are options that occupy space on the command line but are
+	not file names.  Some indicate non-interactive; some don't.
+	Replace this test with one that only enters a non-interactive session
+	if there are command line arguments that do not begin with '-' 
+	(filename) or _do_ begin with '-e' (inline command).
+	(Back-ported file plot.c from version 4.7)
+	Bug #612
+
 2013-02-19  Ethan A Merritt  <merritt@u.washington.edu>
 
 	*  src/graphics.c (boundary):  Rotated x-axis tic labels are set
 	automatically to right justify, but this happens too late for the code
 	that reserves space for them.  Test for this as a special case.
-	Bugs 1204, 1209
+	Bugs 604, 609
 
 	* src/wxterminal/wxt_gui.cpp (wxt_update_key_box):  Fix array overrun
 	caused by many 'notitle' plot appearing before any titled plots.
-	Bug 1211
+	Bug 611
 
 2013-02-18  Christoph Bersch  <cbersch@users.sf.net>
 
