@@ -10,18 +10,18 @@
 	if there are command line arguments that do not begin with '-' 
 	(filename) or _do_ begin with '-e' (inline command).
 	(Back-ported file plot.c from version 4.7)
-	Bug #612
+	Bug #1212
 
 2013-02-19  Ethan A Merritt  <merritt@u.washington.edu>
 
 	*  src/graphics.c (boundary):  Rotated x-axis tic labels are set
 	automatically to right justify, but this happens too late for the code
 	that reserves space for them.  Test for this as a special case.
-	Bugs 604, 609
+	Bugs 1204, 1209
 
 	* src/wxterminal/wxt_gui.cpp (wxt_update_key_box):  Fix array overrun
 	caused by many 'notitle' plot appearing before any titled plots.
-	Bug 611
+	Bug 1211
 
 2013-02-18  Christoph Bersch  <cbersch@users.sf.net>
 
