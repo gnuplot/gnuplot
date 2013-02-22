@@ -1,5 +1,5 @@
 #
-# $Id: makefile.vms,v 1.13 2011/06/01 03:44:36 sfeam Exp $
+# $Id: makefile.vms,v 1.14 2011/10/03 16:20:32 sfeam Exp $
 #
 # GNUPLOT Makefile for VMS
 #
@@ -73,7 +73,7 @@ CSOURCE1 = command.c set.c show.c variable.c
 CSOURCE2 = help.c graphics.c graph3d.c internal.c
 CSOURCE3 = misc.c eval.c parse.c plot.c plot2d.c plot3d.c scanner.c standard.c stdfn.c
 CSOURCE4 = bitmap.c term.c time.c util.c version.c interpol.c fit.c matrix.c stats.c
-CSOURCE5 = [-.term]aed.trm [-.term]cgi.trm [-.term]dumb.trm [-.term]dxf.trm [-.term]dxy.trm \
+CSOURCE5 = [-.term]aed.trm [-.term]dumb.trm [-.term]dxf.trm [-.term]dxy.trm \
 	[-.term]eepic.trm [-.term]epson.trm [-.term]fig.trm [-.term]hp26.trm \
 	[-.term]hp2648.trm [-.term]hpgl.trm [-.term]hpljii.trm
 CSOURCE6 = [-.term]impcodes.h [-.term]imagen.trm [-.term]object.h \

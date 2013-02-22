@@ -48,7 +48,7 @@ AM_CPPFLAGS = -I$(top_srcdir)/src -I$(top_srcdir)/term
 
 T = $(top_srcdir)/term/
 CORETERM = $(T)aed.trm $(T)ai.trm $(T)aquaterm.trm $(T)be.trm \
-$(T)cairo.trm $(T)canvas.trm $(T)cgi.trm $(T)cgm.trm $(T)context.trm \
+$(T)cairo.trm $(T)canvas.trm $(T)cgm.trm $(T)context.trm \
 $(T)corel.trm $(T)debug.trm $(T)djsvga.trm $(T)dumb.trm $(T)dxf.trm \
 $(T)dxy.trm $(T)eepic.trm $(T)emf.trm $(T)emxvga.trm $(T)epson.trm \
 $(T)estimate.trm $(T)excl.trm $(T)fig.trm $(T)gd.trm $(T)ggi.trm \

@@ -1,5 +1,5 @@
 #
-# $Id: makefile.emx,v 1.7 2007/11/19 21:17:12 sfeam Exp $
+# $Id: makefile.emx,v 1.8 2011/06/01 03:44:36 sfeam Exp $
 #
 # GNUPLOT Makefile for use with emx-0.8f/gcc and ndmake 4.5 on MS-DOS
 #
@@ -29,7 +29,7 @@ OBJS = 	alloc.o binary.o bitmap.o command.o contour.o datafile.o dynarray.o \
 	standard.o stdfn.o tables.o tabulate.o term.o time.o unset.o util.o util3d.o \
 	variable.o version.o
 
-CSOURCE5 = term\aed.trm term\cgi.trm term/dumb.trm term/dxf.trm term\dxy.trm \
+CSOURCE5 = term\aed.trm term/dumb.trm term/dxf.trm term\dxy.trm \
 	term\eepic.trm term\epson.trm term\fig.trm term\hp26.trm \
 	term\hp2648.trm term\hpgl.trm term\hpljii.trm 
 CSOURCE6 = term\impcodes.h term\imagen.trm term\object.h \

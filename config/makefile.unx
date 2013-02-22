@@ -1,5 +1,5 @@
 #
-# $Id: makefile.unx,v 1.22 2012/07/18 16:42:51 markisch Exp $
+# $Id: makefile.unx,v 1.23 2012/08/06 04:26:30 sfeam Exp $
 #
 #
 ############################################################
@@ -172,7 +172,6 @@ TERMFLAGS = -I. -Iterm $(PLOTXFLAG)
 # machine-dependent definitions below.
 #
 #  -lsuntool -lsunwindow -lpixrect  if you have -DSUN in TERMFLAGS
-#  -lccgi if -DCGI in TERMFLAGS
 #  -lvga if -DLINUXVGA in TERMFLAGS
 #  -lreadline (or -Lsomewhere libreadline.a) if you use the gnu version
 #  -ltermcap might be necessary after -lreadline
@@ -265,7 +264,7 @@ SUN_X11_FLAGS = \
 
 CGI_FLAGS = \
            CFLAGS="$(COPTS) $(OPTIONS) -Dunix" \
-           LIBS="-lccgi $(LIBS)" X11FLAGS=" " X11INCLUDES=" " \
+           LIBS="$(LIBS)" X11FLAGS=" " X11INCLUDES=" " \
            X11LIBS=" " PLOTXFLAG=" " GNUPLOT_X11=" " X11INSTALL=x11_noinstall \
            TERMFLAGS="-I. -Iterm -DCGI"
 
@@ -417,7 +416,7 @@ CSOURCE2 = help.c graphics.c graph3d.c internal.c
 CSOURCE3 = misc.c eval.c parse.c plot.c plot2d.o plot3d.o readline.c scanner.c standard.c stdfn.c
 CSOURCE4 = bitmap.c term.c time.c util.c version.c fit.c matrix.c variable.c tabulate.c stats.c
 CSOURCE5 = term/ai.trm term/aed.trm \
-	term/cgi.trm term/corel.trm \
+	term/corel.trm \
 	term/djsvga.trm term/dumb.trm \
 	term/dxf.trm term/dxy.trm term/debug.trm \
 	term/emxvga.trm term/eepic.trm term/epson.trm term/excl.trm \
@@ -599,9 +598,6 @@ sgi:
 sgix11:
 	$(MAKE) $(MFLAGS) $(MY_FLAGS) $(SGIX11_FLAGS)   $(TARGET)
 
-cgi:
-	$(MAKE) $(MFLAGS) $(MY_FLAGS) $(CGI_FLAGS)      $(TARGET)
-
 3b1:
 	$(MAKE) $(MFLAGS) $(MY_FLAGS) $(3B1_FLAGS)      $(TARGET)
 
@@ -675,7 +671,7 @@ install:
 	@echo
 	@echo "Please do a 'make <MACHINE> TARGET=Install' where <MACHINE> is one of the following:"
 	@echo
-	@echo "dec, hp, sun, sun_x11, sgi, sgix11, cgi,"
+	@echo "dec, hp, sun, sun_x11, sgi, sgix11,"
 	@echo "next, next_x11, 3b1, 386ix, 386ix_x11, aix32, aix32o,"
 	@echo "x11, cray, cray_x11, ptx_x11, sequent_x11, convex_x11"
 	@echo

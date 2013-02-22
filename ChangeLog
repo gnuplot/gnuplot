@@ -1,9 +1,13 @@
 2013-02-22  Ethan A Merritt  <merritt@u.washington.edu>
 
-	* configure.in src/term.h term/cgi.trm:  Remove vestigial support for
-	the SCO "cgi" graphics layer that sat on top of AES and VDI.
-	This was a graphical environment for the IBM PC and the Atari ST.
-	PC GEM was a fairly widely used GUI until the release of Windows 3.0. 
+	* configure.in config/makefile.unx configure.vms config/makefile.dj2
+	config/makefile.emx config/makefile.vms
+	src/makefile.awc src/makefile.all src/Makefile.in src/term.c src/term.h
+	term/cgi.trm term/Makefile.am term/Makefile.in docs/Makefile.am:
+	Remove vestigial support for the SCO "cgi" graphics layer that sat on
+	top of AES and VDI. This was a graphical environment for the IBM PC
+	and the Atari ST. PC GEM was a fairly widely used GUI until the
+	release of Windows 3.0. The SCO cgi variant existed also on SCO unix.
 
 2013-02-21  Ethan A Merritt  <merritt@u.washington.edu>
 
