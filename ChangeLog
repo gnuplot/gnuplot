@@ -9,7 +9,7 @@
 	Replace this test with one that only enters a non-interactive session
 	if there are command line arguments that do not begin with '-' 
 	(filename) or _do_ begin with '-e' (inline command).
-	Bug #612
+	Bug #1212
 
 2013-02-19  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
