@@ -1,5 +1,5 @@
 /* -*- objc -*-
- * $Id: aquaterm.trm,v 1.46 2012/04/25 04:12:20 sfeam Exp $
+ * $Id: aquaterm.trm,v 1.47 2012/08/08 03:55:47 sfeam Exp $
  *
  */
 
@@ -738,15 +738,15 @@ AQUA_previous_palette()
 TERM_PUBLIC void
 AQUA_image (unsigned int M, unsigned int N, coordval *image, gpiPoint *corner, t_imagecolor color_mode)
 {
-  NSRect rect_image, rect_clip;
+  float width = (corner[1].x - corner[0].x)/AQUA_RESOLUTION;   
+  float height = (corner[0].y - corner[1].y)/AQUA_RESOLUTION;
+  float xPos = corner[0].x/AQUA_RESOLUTION;
+  float yPos = corner[1].y/AQUA_RESOLUTION;  
   int bitmapSize = M*N;
   int targetSize = 3 * bitmapSize;
   int srcSize;
   unsigned char *bitmap;
   int i;
-
-  rect_image = NSMakeRect(corner[0].x/AQUA_RESOLUTION, corner[1].y/AQUA_RESOLUTION, (corner[1].x - corner[0].x)/AQUA_RESOLUTION, (corner[0].y - corner[1].y)/AQUA_RESOLUTION);
-  rect_clip  = NSMakeRect(corner[2].x/AQUA_RESOLUTION, corner[3].y/AQUA_RESOLUTION, (corner[3].x - corner[2].x)/AQUA_RESOLUTION, (corner[2].y - corner[3].y)/AQUA_RESOLUTION);
 
   bitmap = malloc(targetSize*sizeof(unsigned char));
   if (bitmap != nil) {
@@ -771,13 +771,10 @@ AQUA_image (unsigned int M, unsigned int N, coordval *image, gpiPoint *corner, t
     } else {
       NSLog(@"Unknown bitmap format");
     }
-
-    [adapter setClipRect:rect_clip];
     [adapter addImageWithBitmap:bitmap 
 	     size:NSMakeSize(M, N)
-	     bounds:rect_image];
+	     bounds:NSMakeRect(xPos, yPos, width, height)];
     free(bitmap);
-    [adapter setDefaultClipRect];
   }
   return;
 }

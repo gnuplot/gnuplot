@@ -1,3 +1,10 @@
+2013-02-24  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/aquaterm.trm:  Revert patch of 24-Apr-2012 because it breaks
+	rgbimage with aquaterm 1.1.  Reversion confirmed to fix the problem
+	by Alexander Hansen of Fink.
+	Bug #1188
+
 2013-02-22  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* configure.in config/makefile.unx configure.vms config/makefile.dj2
