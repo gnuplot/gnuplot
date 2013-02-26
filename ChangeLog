@@ -10,6 +10,9 @@
 	and then via lpr to a (by default Imagen) printer. This script has
 	been deprecated since version 4.0.
 
+	* configure.in src/term.h:  Remove imagen (1980s/1990s laser printer)
+	from default set of included terminals.
+
 	* src/show.c src/version.c src/version.h src/plot.c:
 	Remove the "Build system" line from the version information shown on
 	entry.  It never did report the build system, only the system reported

@@ -1,5 +1,5 @@
 /*
- * $Id: term.h,v 1.56 2012/10/09 23:23:11 sfeam Exp $
+ * $Id: term.h,v 1.57 2013/02/23 01:38:49 sfeam Exp $
  */
 
 /* GNUPLOT - term.h */
@@ -292,7 +292,7 @@
 #endif /* NO_BITMAP_SUPPORT */
 
 /* Imagen laser printers */
-#include "imagen.trm"
+/* #include "imagen.trm" */
 
 /* Kyocera Prescribe printer */
 /* #include "kyo.trm" */

@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot on Unix.
 dnl
-dnl $Id: configure.in,v 1.322 2013/02/23 01:38:48 sfeam Exp $
+dnl $Id: configure.in,v 1.323 2013/02/26 23:35:35 sfeam Exp $
 dnl
 dnl this is actually major.minor ...
 dnl note that for a non-beta release, we need to disable DEVELOPMENT_RELEASE
@@ -1243,9 +1243,9 @@ AC_MSG_RESULT([])
 
 AC_MSG_RESULT([  Standalone terminals: yes (always builtin)])
 AC_MSG_RESULT([    canvas, cgm, context, corel, dumb, dxf, eepic, emf, emtex,])
-AC_MSG_RESULT([    epslatex, fig, gpic, hp2623a, hp2648, hpgl, imagen,])
+AC_MSG_RESULT([    epslatex, fig, gpic, hp2623a, hp2648, hpgl,])
 AC_MSG_RESULT([    latex, metafont, metapost, mif, pcl5, postscript, pslatex,])
-AC_MSG_RESULT([    pstex, pstricks, qms, regis, svg,])
+AC_MSG_RESULT([    pstex, pstricks, qms, svg,])
 AC_MSG_RESULT([    tek40xx, tek410x, texdraw, tgif, tkcanvas, tpic, vttek])
 AC_MSG_RESULT([])
 
@@ -1381,7 +1381,8 @@ else
 fi
 
 AC_MSG_RESULT([])
-AC_MSG_RESULT([  Additional terminals are availaible in platform-specific makefiles:])
+AC_MSG_RESULT([  Additional platform-specific or older terminals omitted by default:])
+AC_MSG_RESULT([   imagen (edit term.h), kyocera (edit term.h) ])
 AC_MSG_RESULT([   pm (makefile.os2), be (BeOS), svga (MSDOS/djgpp)])
 AC_MSG_RESULT([   sun (makefile.unx), unixpc (makefile.unx), windows (several options)])
 
