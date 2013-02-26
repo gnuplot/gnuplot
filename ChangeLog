@@ -10,6 +10,13 @@
 	and then via lpr to a (by default Imagen) printer. This script has
 	been deprecated since version 4.0.
 
+	* src/show.c src/version.c src/version.h src/plot.c:
+	Remove the "Build system" line from the version information shown on
+	entry.  It never did report the build system, only the system reported
+	by the machine it was currently running on.   Could be replaced if
+	someone wants to figure out a generic way to have autoconf fill in the
+	OS definition in syscfg.h
+
 2013-02-24  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/aquaterm.trm:  Revert patch of 24-Apr-2012 because it breaks

@@ -1,5 +1,5 @@
 /*
- * $Id: version.h,v 1.4 2004/04/13 17:24:03 broeker Exp $
+ * $Id: version.h,v 1.5 2006/08/05 21:33:15 sfeam Exp $
  */
 
 /* GNUPLOT - version.h */
@@ -46,9 +46,6 @@ extern const char gnuplot_copyright[];
 extern const char faq_location[];
 extern const char bug_email[];
 extern const char help_email[];
-
-extern char os_name[];
-extern char os_rel[];
 
 extern char *compile_options;
 

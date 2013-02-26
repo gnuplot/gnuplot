@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.277 2012/11/26 07:17:01 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.278 2012/12/14 18:11:09 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -1002,7 +1002,6 @@ show_version(FILE *fp)
 %s\n\
 %s\t%s\n\
 %s\tVersion %s patchlevel %s    last modified %s\n\
-%s\tBuild System: %s %s\n\
 %s\n\
 %s\t%s\n\
 %s\tThomas Williams, Colin Kelley and many others\n\
@@ -1021,7 +1020,6 @@ show_version(FILE *fp)
 	    p,			/* empty line */
 	    p, PROGRAM,
 	    p, gnuplot_version, gnuplot_patchlevel, gnuplot_date,
-	    p, os_name, os_rel,
 	    p,			/* empty line */
 	    p, gnuplot_copyright,
 	    p,			/* authors */

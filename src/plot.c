@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot.c,v 1.147 2013/02/21 20:06:51 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot.c,v 1.148 2013/02/21 20:18:16 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot.c */
@@ -70,11 +70,6 @@ static char *RCSid() { return RCSid("$Id: plot.c,v 1.147 2013/02/21 20:06:51 sfe
 /* on OS/2 this is needed even without USE_MOUSE */
 #if defined(OS2_IPC) && !defined(USE_MOUSE)
 # include "gpexecute.h"
-#endif
-
-/* Used nowhere else */
-#ifdef HAVE_SYS_UTSNAME_H
-# include <sys/utsname.h>
 #endif
 
 #if defined(MSDOS) || defined(__EMX__)
@@ -461,44 +456,6 @@ main(int argc, char **argv)
     }
 
     /* Need this before show_version is called for the first time */
-
-#ifdef HAVE_SYS_UTSNAME_H
-    {
-	struct utsname uts;
-
-	/* something is fundamentally wrong if this fails ... */
-	if (uname(&uts) > -1) {
-# ifdef _AIX
-	    strcpy(os_name, uts.sysname);
-	    sprintf(os_name, "%s.%s", uts.version, uts.release);
-# elif defined(SCO)
-	    strcpy(os_name, "SCO");
-	    strcpy(os_rel, uts.release);
-# elif defined(DJGPP)
-	    if (!strncmp(uts.sysname, "??Un", 4)) /* don't print ??Unknow" */
-		strcpy(os_name, "Unknown");
-	    else {
-		strcpy(os_name, uts.sysname);
-		strcpy(os_rel, uts.release);
-	    }
-# else
-	    strcpy(os_name, uts.sysname);
-	    strcpy(os_rel, uts.machine);
-# ifdef OS2
-	    if (!strchr(os_rel,'.'))
-		/* write either "2.40" or "4.0", or empty -- don't print "OS/2 1" */
-		strcpy(os_rel, "");
-# endif
-
-# endif
-	}
-    }
-#else /* ! HAVE_SYS_UTSNAME_H */
-
-    strcpy(os_name, OS);
-    strcpy(os_rel, "");
-
-#endif /* HAVE_SYS_UTSNAME_H */
 
     if (interactive)
 	show_version(stderr);
