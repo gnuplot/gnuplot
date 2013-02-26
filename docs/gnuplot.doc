@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.768 2013/01/07 17:50:02 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.769 2013/02/17 19:39:13 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -4838,11 +4838,11 @@ Ffigure_mapcontours
  `record`, `format` and `using` can indicate the size, format and dimension
  of data.  There are a variety of useful commands for skipping file headers
  and changing endianess.  There are a set of commands for positioning and
- translating data since often coordinates are not part of the file when
- uniform sampling is inherent in the data.  Different from matrix binary or
- ASCII, general binary does not treat the generated columns as 1, 2 or 3 in
- the `using` list.  Rather, column 1 begins with column 1 of the file, or as
- specified in the `format` list.
+ translating data since often coordinates are not part of the file when uniform
+ sampling is inherent in the data.  Unlike reading from a text or matrix binary
+ file, general binary does not treat the generated columns as 1, 2 or 3 in the
+ `using` list. Instead column 1 refers to column 1 of the file, or as specified
+ in the `format` list.
 
  There are global default settings for the various binary options which may
  be set using the same syntax as the options when used as part of the `(s)plot
@@ -4874,11 +4874,13 @@ Ffigure_mapcontours
 ?datafile binary general
 ?data binary general
 ?binary general
- General binary data in which format information is not necessarily part of
- the file can be read by giving further details about the file format at the
- command line.  Although the syntax is slightly arcane to the casual user,
- general binary is particularly useful for application programs using gnuplot
- and sending large amounts of data.
+ The `binary` keyword appearing alone indicates a binary data file that
+ contains both coordinate information describing a non-uniform grid and
+ the value of each grid point (see `binary matrix`).  Binary data in any other
+ format requires additional keywords to describe the layout of the data.
+ Unfortunately the syntax of these required additional keywords is convoluted.
+ Nevertheless the general binary mode is particularly useful for application
+ programs sending large amounts of data to gnuplot.
 
  Syntax:
        plot '<file_name>' {binary <binary list>} ...
@@ -4886,49 +4888,24 @@ Ffigure_mapcontours
 
  General binary format is activated by keywords in <binary list> pertaining
  to information about file structure, i.e., `array`, `record`, `format` or
- `filetype`.  Otherwise, matrix binary format is assumed.  (See `binary matrix`
- for more details.)
+ `filetype`.  Otherwise, non-uniform matrix binary format is assumed.
+ (See `binary matrix` for more details.)
+
  NB: In previous versions of gnuplot there have been some differences between
  the interpretation of binary data keywords by `plot` and `splot`.  Where the
  meanings differ, one or both may change in a future gnuplot version.
 
- There are some standard file types that may be read for which details about
- the binary format may be extracted automatically.  (Type `show datafile
- binary` at the command line for a list.)  Otherwise, details must be
- specified at the command line or set in the defaults.  Keywords are described
- below.
-
- The keyword `filetype` in <binary list> controls the routine used to
- read the file, i.e., the format of the data.  For a list of the supported
- file types, type `show datafile binary filetypes`.  If no file type is
- given, the rule is that traditional gnuplot binary is assumed for `splot`
- if the `binary` keyword stands alone.  In all other circumstances, for
- `plot` or when one of the <binary list> keywords appears, a raw binary
- file is assumed whereby the keywords specify the binary format.
-
- General binary data files fall into two basic classes, and some files may
- be of both classes depending upon how they are treated.  There is that
- class for which uniform sampling is assumed and point coordinates must be
- generated.  This is the class for which full control via the <binary
- list> keywords applies.  For this class, the settings precedence is that
- command line parameters override in-file parameters, which override
- default settings.  The other class is that set of files for which
- coordinate information is contained within the file or there is possibly
- a non-uniform sampling such as gnuplot binary.
-
- Other than for the unique data files such as gnuplot binary, one should
- think of binary data as conceptually the same as ASCII data.  Each point
- has columns of information which are selected via the `<using list>`
- associated with `using`.  When no `format` string is specified, gnuplot
- will retrieve a number of binary variables equal to the largest column
- given in the `<using list>`.  For example, `using 1:3` will result in
- three columns being read, of which the second will be ignored.  There are
- default using lists based upon the typical number of parameters associated
- with a certain plot type.  For example, `with image` has a default of
- `using 1`, while `with rgbimage` has a default of `using 1:2:3`.  Note
- that the special characters for `using` representing point/line/index
- generally should not be used for binary data.  There are keywords in
- <binary list> that control this.
+ Gnuplot knows how to read a few standard binary file types that are fully
+ self-describing, e.g. PNG images.  Type `show datafile binary` at the
+ command line for a list. Apart from these, you can think of binary data 
+ files as conceptually the same as text data.  Each point has columns of
+ information which are selected via the `using` specification.  If no `format`
+ string is specified, gnuplot will read in a number of binary values equal
+ to the largest column given in the `<using list>`.  For example, `using 1:3`
+ will result in three columns being read, of which the second will be ignored.
+ Certain plot types have an associated default using specification.
+ For example, `with image` has a default of `using 1`, while `with rgbimage`
+ has a default of `using 1:2:3`.  
 4 array
 ?binary array
  Describes the sampling array dimensions associated with the binary file.
@@ -4945,7 +4922,7 @@ Ffigure_mapcontours
               array=(128,128). The older syntax is now deprecated.
 4 record
 ?binary record
- This keyword serves the same function as `array`, having the same syntax.
+ This keyword serves the same function as `array` and has the same syntax.
  However, `record` causes gnuplot to not generate coordinate information.
  This is for the case where such information may be included in one of the
  columns of the binary data file.
@@ -5002,8 +4979,7 @@ Ffigure_mapcontours
  binary file's extension is a quasi-standard extension for a supported format.
 
  Command line keywords may be used to override settings extracted from the file.
- The settings from the file override any defaults.  (See `set datafile binary`
- for details.)
+ The settings from the file override any defaults.  See `set datafile binary`.
 5 avs
 ?binary filetype avs
 ?filetype avs
@@ -5161,17 +5137,16 @@ Ffigure_mapcontours
 
  The modifiers `binary`, `index`, `every`, `using`, and `smooth` are
  discussed separately.  In brief, `binary` allows data entry from a binary
- file (default is ASCII), `index` selects which data sets in a multi-data-set
- file are to be plotted, `every` specifies which points within a single data
- set are to be plotted, `using` determines how the columns within a single
- record are to be interpreted, and `smooth` allows for simple interpolation
- and approximation. `splot` has a similar syntax, but does not support the
- `smooth` option.
+ file, `index` selects which data sets in a multi-data-set file are to be
+ plotted, `every` specifies which points within a single data set are to be
+ plotted, `using` determines how the columns within a single record are to be
+ interpreted, and `smooth` allows for simple interpolation and approximation.
+ `splot` has a similar syntax, but does not support the `smooth` option.
 
  The `noautoscale` keyword means that the points making up this plot will be
  ignored when automatically determining axis range limits.
 
- ASCII DATA FILES:
+ TEXT DATA FILES:
 
  Data files should contain at least one data point per record (`using`
  can select one data point from the record). Records beginning with `#`
@@ -11358,7 +11333,7 @@ Ffigure_missing
 ?set table
 ?table
  When `table` mode is enabled, `plot` and `splot` commands print out a
- multicolumn ASCII table of X Y {Z} R values rather than creating an actual
+ multicolumn text table of X Y {Z} R values rather than creating an actual
  plot on the current terminal.  The character R takes on one of three values:
  "i" if the point is in the active range, "o" if it is out-of-range, or "u"
  if it is undefined.  The data format is determined by the format of the axis
@@ -12901,9 +12876,9 @@ Ffigure_missing
  Gnuplot can interpret matrix input in two different ways.
  The first of these assumes a uniform grid of x and y coordinates, and assigns
  each value in the input matrix to one element of this uniform grid.
- This is the default for ascii data input, but not for binary input.
+ This is the default for text data input, but not for binary input.
  Example commands for plotting uniform matrix data:
-      splot 'file' matrix using 1:2:3          # ascii input
+      splot 'file' matrix using 1:2:3          # text input
       splot 'file' binary general using 1:2:3  # binary input
 
  In a uniform grid matrix the z-values are read in a row at a time, i. e.,
@@ -12912,7 +12887,7 @@ Ffigure_missing
      z31 z32 z33 z34 ...
  and so forth.
 
- For ascii input, a blank line or comment line ends the matrix, and starts a new
+ For text input, a blank line or comment line ends the matrix, and starts a new
  surface mesh.  You can select among the meshes inside a file by the `index`
  option to the `splot` command, as usual. 
 =nonuniform
@@ -12920,10 +12895,10 @@ Ffigure_missing
  coordinates. The first row of input data contains the y coordinates; 
  the first column of input data contains the x coordinates.  For binary input
  data, the first element of the first row must contain the number of data
- columns. (This number is ignored for ascii input).  Both the coordinates and
+ columns. (This number is ignored for text input).  Both the coordinates and
  the data values in a binary input are treated as single precision floats.
  Example commands for plotting non-uniform matrix data:
-      splot 'file' nonuniform matrix using 1:2:3  # ascii input
+      splot 'file' nonuniform matrix using 1:2:3  # text input
       splot 'file' binary matrix using 1:2:3      # binary input
 
  Thus the data organization for non-uniform matrix input is
@@ -12963,10 +12938,10 @@ Ffigure_missing
  using 1:2 the point coordinates (rather useless). Applying the `every` option
  you can specify explicit rows and columns.
 
- Example -- rescale axes of a matrix in an ascii file:
+ Example -- rescale axes of a matrix in a text file:
      splot `a.dat` matrix using (1+$1):(1+$2*10):3
 
- Example -- plot the 3rd row of a matrix in an ascii file:
+ Example -- plot the 3rd row of a matrix in a text file:
      plot 'a.dat' matrix using 1:3 every 1:999:1:2
  (rows are enumerated from 0, thus 2 instead of 3).
 

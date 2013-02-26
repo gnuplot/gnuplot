@@ -1,3 +1,8 @@
+2013-02-26  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* docs/gnuplot.doc: Simplify description of binary file handling.
+	Do not implicitly limit text files to ascii encoding.
+
 2013-02-24  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/aquaterm.trm:  Revert patch of 24-Apr-2012 because it breaks
