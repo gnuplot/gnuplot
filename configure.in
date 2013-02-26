@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot on Unix.
 dnl
-dnl $Id: configure.in,v 1.321 2013/02/17 19:39:13 sfeam Exp $
+dnl $Id: configure.in,v 1.322 2013/02/23 01:38:48 sfeam Exp $
 dnl
 dnl this is actually major.minor ...
 dnl note that for a non-beta release, we need to disable DEVELOPMENT_RELEASE
@@ -300,13 +300,6 @@ AC_FUNC_SELECT_ARGTYPES
 
 dnl On SVR3.
 dnl FIXME AC_DEFINE(CRIPPLED_SELECT)
-
-dnl Deprecated
-dnl Install the lasergnu printer script
-LASERGNU=lasergnu-noinstall
-AC_ARG_WITH(lasergnu,dnl
-[  --with-lasergnu         install lasergnu printer script],
-  test "$withval" = yes && LASERGNU=lasergnu-install)
 
 dnl .gih help file location
 eval gp_datadir=$datadir
@@ -1209,7 +1202,6 @@ AC_SUBST(VERSION_MAJOR)
 AC_SUBST(VERSION)
 AC_SUBST(GIHDIR)
 AC_SUBST(TEXDIR)
-AC_SUBST(LASERGNU)
 AC_SUBST(LINUXSUID)
 AC_SUBST(TERMLIBS)
 AC_SUBST(TERMXLIBS)
@@ -1506,10 +1498,6 @@ fi
 AC_MSG_RESULT([])
 AC_MSG_RESULT([gnuplot will install the following additional materials:])
 AC_MSG_RESULT([])
-
-if test "$with_lasergnu" = yes; then
-  AC_MSG_RESULT([  lasergnu printer script: yes (Deprecated)])
-fi
 
 if test "$with_lisp_files" != no; then
   AC_MSG_RESULT([  gnuplot-mode for X/Emacs: yes])

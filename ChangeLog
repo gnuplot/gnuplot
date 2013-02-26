@@ -3,6 +3,13 @@
 	* docs/gnuplot.doc: Simplify description of binary file handling.
 	Do not implicitly limit text files to ascii encoding.
 
+	* docs/old/makefile.r: Remove ancient version of makefile.
+
+	* configure.in src/Makefile.am man/lasergnu.1 man/Makefile.am
+	src/lasergnu: Remove ancient script that piped a file through gnuplot
+	and then via lpr to a (by default Imagen) printer. This script has
+	been deprecated since version 4.0.
+
 2013-02-24  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/aquaterm.trm:  Revert patch of 24-Apr-2012 because it breaks
