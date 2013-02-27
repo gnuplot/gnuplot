@@ -1,5 +1,8 @@
 2013-02-27  Ethan A Merritt  <merritt@u.washington.edu>
 
+	* src/color.c src/pm3d.c src/interpol.c:
+	Remove unneeded #include headers.
+
 	* src/axis.c src/gadgets.c src/gadgets.h src/graphics.c src/graphics.h
 	(label_width):  Move the label_width() routine from graphics.c to gadgets.c.
 

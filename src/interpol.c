@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: interpol.c,v 1.41 2012/08/23 21:43:47 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: interpol.c,v 1.42 2012/10/09 22:06:41 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - interpol.c */
@@ -119,11 +119,7 @@ static char *RCSid() { return RCSid("$Id: interpol.c,v 1.41 2012/08/23 21:43:47 
 #include "alloc.h"
 #include "axis.h"
 #include "contour.h"
-#include "graphics.h"
-#include "misc.h"
 #include "plot2d.h"
-/*  #include "setshow.h" */
-#include "util.h"
 
 
 /* in order to support multiple axes, and to simplify ranging in
