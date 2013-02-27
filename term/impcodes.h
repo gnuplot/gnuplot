@@ -1,6 +1,8 @@
 /*
- * $Id: impcodes.h,v 1.4 1993/09/27 17:16:08 alex Exp $
+ * $Id: impcodes.h,v 1.1.1.1 1998/04/15 19:16:49 lhecking Exp $
  */
+
+/* This file is used only by imagen.trm */
 
 /*
  * Copyright (c) 1985 Regents of the University of California.
