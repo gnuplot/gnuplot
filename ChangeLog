@@ -1,10 +1,15 @@
 2013-02-27  Ethan A Merritt  <merritt@u.washington.edu>
 
+	* src/graphics.c src/boundary.c src/boundary.h src/Makefile.am:
+	graphics.c has grown into the largest single gnuplot source file
+	(7000+ lines).  Split out the routines dealing with key and border
+	layout into a new separate file boundary.c.
+
 	* src/color.c src/pm3d.c src/interpol.c:
 	Remove unneeded #include headers.
 
 	* src/axis.c src/gadgets.c src/gadgets.h src/graphics.c src/graphics.h
-	(label_width):  Move the label_width() routine from graphics.c to gadgets.c.
+	(label_width):  Move routine label_width() from graphics.c to gadgets.c.
 
 2013-02-26  Ethan A Merritt  <merritt@u.washington.edu>
 

@@ -1,5 +1,5 @@
 #
-# $Id: makefile.unx,v 1.23 2012/08/06 04:26:30 sfeam Exp $
+# $Id: makefile.unx,v 1.24 2013/02/23 01:57:59 sfeam Exp $
 #
 #
 ############################################################
@@ -179,7 +179,7 @@ LIBS = -lm # -lplot is no longer shipped on SUNs
 
 ####################################################################
 # List of object files except version.o
-OBJS = bitmap.o command.o contour.o eval.o graphics.o graph3d.o help.o \
+OBJS = bitmap.o boundary.o command.o contour.o eval.o graphics.o graph3d.o help.o \
        internal.o misc.o parse.o plot.o plot2d.o plot3d.o readline.o \
        scanner.o set.o show.o specfun.o standard.o stdfn.o term.o time.o \
        util.o binary.o interpol.o fit.o matrix.o datafile.o alloc.o \
@@ -412,7 +412,7 @@ LINUX_FLAGS = \
 DIRS = term demo docs docs/latextut
 
 CSOURCE1 = bf_test.c binary.c command.c set.c show.c
-CSOURCE2 = help.c graphics.c graph3d.c internal.c
+CSOURCE2 = help.c graphics.c graph3d.c internal.c boundary.c
 CSOURCE3 = misc.c eval.c parse.c plot.c plot2d.o plot3d.o readline.c scanner.c standard.c stdfn.c
 CSOURCE4 = bitmap.c term.c time.c util.c version.c fit.c matrix.c variable.c tabulate.c stats.c
 CSOURCE5 = term/ai.trm term/aed.trm \
