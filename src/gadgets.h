@@ -545,6 +545,7 @@ extern TBOOLEAN prefer_line_styles;
 extern histogram_style histogram_opts;
 
 void default_arrow_style __PROTO((struct arrow_style_type *arrow));
+void apply_head_properties __PROTO((struct arrow_style_type *arrow_properties));
 
 void free_labels __PROTO((struct text_label *tl));
 

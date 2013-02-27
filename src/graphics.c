@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.414 2013/02/28 05:29:38 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.415 2013/02/28 05:47:41 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -197,29 +197,6 @@ get_arrow(
 	map_position_double(&arrow->end, &ex_d, &ey_d, "arrow");
 	*ex = (int)(ex_d);
 	*ey = (int)(ey_d);
-    }
-}
-
-/* FIXME HBB 20020225: this is shared with graph3d.c, so it shouldn't
- * be in this module */
-void
-apply_head_properties(struct arrow_style_type *arrow_properties)
-{
-    curr_arrow_headfilled = arrow_properties->head_filled;
-    curr_arrow_headlength = 0;
-    if (arrow_properties->head_length > 0) {
-	/* set head length+angle for term->arrow */
-	double xtmp, ytmp;
-	struct position headsize = {first_axes,graph,graph,0.,0.,0.};
-
-	headsize.x = arrow_properties->head_length;
-	headsize.scalex = arrow_properties->head_lengthunit;
-
-	map_position_r(&headsize, &xtmp, &ytmp, "arrow");
-
-	curr_arrow_headangle = arrow_properties->head_angle;
-	curr_arrow_headbackangle = arrow_properties->head_backangle;
-	curr_arrow_headlength = xtmp;
     }
 }
 

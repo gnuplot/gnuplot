@@ -1,5 +1,5 @@
 /*
- * $Id: graphics.h,v 1.56 2012/12/14 19:39:38 sfeam Exp $
+ * $Id: graphics.h,v 1.57 2013/02/28 05:29:38 sfeam Exp $
  */
 
 /* GNUPLOT - graphics.h */
@@ -96,10 +96,6 @@ void do_plot __PROTO((struct curve_points *, int));
 void map_position __PROTO((struct position * pos, int *x, int *y, const char *what));
 void map_position_r __PROTO((struct position* pos, double* x, double* y,
 			     const char* what));
-#if defined(sun386)
-double CheckLog __PROTO((TBOOLEAN, double, double));
-#endif
-void apply_head_properties __PROTO((struct arrow_style_type *arrow_properties));
 
 void init_histogram __PROTO((struct histogram_style *hist, char *title));
 void free_histlist __PROTO((struct histogram_style *hist));

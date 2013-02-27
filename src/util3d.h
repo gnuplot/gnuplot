@@ -1,5 +1,5 @@
 /*
- * $Id: util3d.h,v 1.18 2010/09/27 19:27:10 sfeam Exp $
+ * $Id: util3d.h,v 1.19 2012/01/11 23:40:42 sfeam Exp $
  */
 
 /* GNUPLOT - util3d.h */
@@ -43,7 +43,6 @@
  * known */
 
 #include "graph3d.h"
-#include "graphics.h"	/* only needed for apply_head_properties() */
 
 /* All the necessary information about one vertex. */
 typedef struct vertex {

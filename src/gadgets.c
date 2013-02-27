@@ -461,6 +461,27 @@ default_arrow_style(struct arrow_style_type *arrow)
 }
 
 void
+apply_head_properties(struct arrow_style_type *arrow_properties)
+{
+    curr_arrow_headfilled = arrow_properties->head_filled;
+    curr_arrow_headlength = 0;
+    if (arrow_properties->head_length > 0) {
+	/* set head length+angle for term->arrow */
+	double xtmp, ytmp;
+	struct position headsize = {first_axes,graph,graph,0.,0.,0.};
+
+	headsize.x = arrow_properties->head_length;
+	headsize.scalex = arrow_properties->head_lengthunit;
+
+	map_position_r(&headsize, &xtmp, &ytmp, "arrow");
+
+	curr_arrow_headangle = arrow_properties->head_angle;
+	curr_arrow_headbackangle = arrow_properties->head_backangle;
+	curr_arrow_headlength = xtmp;
+    }
+}
+
+void
 free_labels(struct text_label *label)
 {
 struct text_label *temp;

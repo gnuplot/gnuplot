@@ -11,6 +11,10 @@
 	* src/axis.c src/gadgets.c src/gadgets.h src/graphics.c src/graphics.h
 	(label_width):  Move routine label_width() from graphics.c to gadgets.c.
 
+	* src/graphics.c src/graphics.h src/gadgets.h src/gadgets.c
+	src/util3d.h src/pm3d.c:  Move routine apply_head_properties() from
+	graphics.c to gadgets.c.
+
 2013-02-26  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* docs/gnuplot.doc: Simplify description of binary file handling.
