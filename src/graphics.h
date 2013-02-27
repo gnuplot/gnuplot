@@ -1,5 +1,5 @@
 /*
- * $Id: graphics.h,v 1.55 2012/10/09 22:06:41 sfeam Exp $
+ * $Id: graphics.h,v 1.56 2012/12/14 19:39:38 sfeam Exp $
  */
 
 /* GNUPLOT - graphics.h */
@@ -93,7 +93,6 @@ extern int bar_layer;
 /* function prototypes */
 
 void do_plot __PROTO((struct curve_points *, int));
-int label_width __PROTO((const char *, int *));
 void map_position __PROTO((struct position * pos, int *x, int *y, const char *what));
 void map_position_r __PROTO((struct position* pos, double* x, double* y,
 			     const char* what));

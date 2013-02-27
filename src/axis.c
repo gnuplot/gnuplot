@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.110 2012/11/24 21:54:29 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.111 2013/02/19 20:50:51 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -42,8 +42,6 @@ static char *RCSid() { return RCSid("$Id: axis.c,v 1.110 2012/11/24 21:54:29 sfe
 #include "command.h"
 #include "gadgets.h"
 #include "gp_time.h"
-#include "graphics.h"	/* For label_width() */
-/*  #include "setshow.h" */
 #include "term_api.h"
 #include "variable.h"
 

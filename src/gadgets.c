@@ -35,6 +35,7 @@ static char *RCSid() { return RCSid("gadgets.c,v 1.1.3.1 2000/05/03 21:47:15 hbb
 ]*/
 
 #include "gadgets.h"
+#include "alloc.h"
 #include "command.h"
 #include "graph3d.h" /* for map3d_position_r() */
 #include "graphics.h"
@@ -556,3 +557,43 @@ write_label(unsigned int x, unsigned int y, struct text_label *this_label)
 
 	ignore_enhanced(FALSE);
 }
+
+
+/* STR points to a label string, possibly with several lines separated
+   by \n.  Return the number of characters in the longest line.  If
+   LINES is not NULL, set *LINES to the number of lines in the
+   label. */
+int
+label_width(const char *str, int *lines)
+{
+    char *lab = NULL, *s, *e;
+    int mlen, len, l;
+
+    if (!str || *str == '\0') {
+	if (lines)
+	    *lines = 0;
+	return (0);
+    }
+
+    l = mlen = len = 0;
+    lab = gp_alloc(strlen(str) + 2, "in label_width");
+    strcpy(lab, str);
+    strcat(lab, "\n");
+    s = lab;
+    while ((e = (char *) strchr(s, '\n')) != NULL) {
+	*e = '\0';
+	len = estimate_strlen(s);	/* = e-s ? */
+	if (len > mlen)
+	    mlen = len;
+	if (len || l || *str == '\n')
+	    l++;
+	s = ++e;
+    }
+    /* lines = NULL => not interested - div */
+    if (lines)
+	*lines = l;
+
+    free(lab);
+    return (mlen);
+}
+

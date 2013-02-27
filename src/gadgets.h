@@ -551,5 +551,6 @@ void free_labels __PROTO((struct text_label *tl));
 void get_offsets __PROTO((struct text_label *this_label,
 	struct termentry *t, int *htic, int *vtic));
 void write_label __PROTO((unsigned int x, unsigned int y, struct text_label *label));
+int label_width __PROTO((const char *, int *));
 
 #endif /* GNUPLOT_GADGETS_H */

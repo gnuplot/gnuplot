@@ -1,7 +1,12 @@
+2013-02-27  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/axis.c src/gadgets.c src/gadgets.h src/graphics.c src/graphics.h
+	(label_width):  Move the label_width() routine from graphics.c to gadgets.c.
+
 2013-02-26  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* docs/gnuplot.doc: Simplify description of binary file handling.
-	Do not implicitly limit text files to ascii encoding.
+	Do not imply that text files are limited to ascii encoding.
 
 	* docs/old/makefile.r: Remove ancient version of makefile.
 

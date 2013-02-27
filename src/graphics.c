@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.412 2013/02/19 04:12:04 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.413 2013/02/19 22:18:41 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -5010,45 +5010,6 @@ ytick2d_callback(
 	term_apply_lp_properties(&border_lp);	/* reset to border linetype */
     }
 }
-
-/* STR points to a label string, possibly with several lines separated
-   by \n.  Return the number of characters in the longest line.  If
-   LINES is not NULL, set *LINES to the number of lines in the
-   label. */
-int
-label_width(const char *str, int *lines)
-{
-    char *lab = NULL, *s, *e;
-    int mlen, len, l;
-
-    if (!str || *str == '\0') {
-	if (lines)
-	    *lines = 0;
-	return (0);
-    }
-
-    l = mlen = len = 0;
-    lab = gp_alloc(strlen(str) + 2, "in label_width");
-    strcpy(lab, str);
-    strcat(lab, "\n");
-    s = lab;
-    while ((e = (char *) strchr(s, '\n')) != NULL) {
-	*e = '\0';
-	len = estimate_strlen(s);	/* = e-s ? */
-	if (len > mlen)
-	    mlen = len;
-	if (len || l || *str == '\n')
-	    l++;
-	s = ++e;
-    }
-    /* lines = NULL => not interested - div */
-    if (lines)
-	*lines = l;
-
-    free(lab);
-    return (mlen);
-}
-
 
 /*{{{  map_position, wrapper, which maps double to int */
 void
