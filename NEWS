@@ -9,6 +9,8 @@ New features, changes and fixes since gnuplot version 4.6.1
 * CHANGE ignore extraneous trailing comma in a plot command
 * CHANGE special case code for faster input of uniform binary matrix data
 * CHANGE test for whether the session should be interactive or non-interactive
+* CHANGE draw zeroaxis lines in the same layer as the grid and border
+* FIX aquaterm rendering of rgbimage plot type
 * FIX gd terminal fontsize change requested by set_font(",newsize")
 * FIX qt terminal font metrics
 * FIX qt terminal mouse tracking and resize events for persistent plots
