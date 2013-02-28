@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.284 2013/01/04 22:03:54 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.285 2013/02/17 17:51:25 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -2865,7 +2865,8 @@ eval_plots()
 
 			    /* A sampled function can only be OUTRANGE if it has a private range */
 			    if (sample_range_token != 0) {
-				if (!inrange(t, axis_array[this_plot->x_axis].min,
+				double xx = AXIS_DE_LOG_VALUE(x_axis, t);
+				if (!inrange(xx, axis_array[this_plot->x_axis].min,
 						axis_array[this_plot->x_axis].max))
 				    this_plot->points[i].type = OUTRANGE;
 			    }

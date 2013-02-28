@@ -1,3 +1,14 @@
+2013-02-28  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/command.c (replot_command):  If the input data comes from stdin
+	and is marked volatile, i.e.  plot '-' volatile,  then treat a replot
+	command as if it were a refresh command.  This is a change, but is
+	consistent with the documentation for the "volatile" keyword.
+
+	* src/plot2d.c (eval_plots):  The range check on functions with a 
+	private sampling range did not allow for log scaling.
+	Bug #1215
+
 2013-02-27  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c src/boundary.c src/boundary.h src/Makefile.am:
@@ -150,7 +161,7 @@
 	starting to read a new line of input.  Otherwise if the read is 
 	interrupted by a mouse event requesting a replot then the internal
 	state is not valid.  Test case:   cat | ./gnuplot      plot and zoom
-	Bug #3602388
+	Bug #3602388 (new #1203)
 
 2013-01-25  Ethan A Merritt  <merritt@u.washington.edu>
 

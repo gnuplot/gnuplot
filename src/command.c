@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.254 2013/02/03 18:38:31 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.255 2013/02/17 17:51:24 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -1702,6 +1702,16 @@ replot_command()
 {
     if (!*replot_line)
 	int_error(c_token, "no previous plot");
+
+#ifdef VOLATILE_REFRESH
+    if (volatile_data && (refresh_ok != E_REFRESH_NOT_OK) && !replot_disabled) {
+	FPRINTF((stderr,"volatile_data %d refresh_ok %d plotted_data_from_stdin %d\n",
+		volatile_data, refresh_ok, plotted_data_from_stdin));
+	refresh_command();
+	return;
+    }
+#endif
+
     /* Disable replot for some reason; currently used by the mouse/hotkey
        capable terminals to avoid replotting when some data come from stdin,
        i.e. when  plotted_data_from_stdin==1  after plot "-".
