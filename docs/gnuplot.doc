@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.769 2013/02/17 19:39:13 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.770 2013/02/26 23:30:47 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -3765,8 +3765,9 @@ Ffigure_yerrorbars
  At each point (x,y), a line is drawn from (x,y-ydelta) to (x,y+ydelta) or
  from (x,ylow) to (x,yhigh), depending on how many data columns are provided.
  A tic mark is placed at the ends of the error bar (unless `set bars` is
- used---see `set bars` for details).  Either 3 or 4 input columns are required.
+ used---see `set bars` for details).
 
+      2 columns:  [implicit x] y ydelta
       3 columns:  x  y  ydelta
       4 columns:  x  y  ylow  yhigh
 

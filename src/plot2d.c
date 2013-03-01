@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.286 2013/02/28 21:27:45 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.287 2013/03/01 22:06:46 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -446,7 +446,7 @@ get_data(struct curve_points *current_plot)
 
     case YERRORLINES:
     case YERRORBARS:
-	min_cols = 3;
+	min_cols = 2;
 	max_cols = 5;
 	if (df_no_use_specs >= 4)
 	    /* HBB 20060427: signal 3rd and 4th column are absolute y
@@ -751,6 +751,13 @@ get_data(struct curve_points *current_plot)
 		    		  0.0, 0.0, DEFAULT_ELLIPSE);
 
 #endif
+	    } else if (current_plot->plot_style == YERRORBARS) {
+		/* x is index, assign number to y */
+		v[2] = v[1];
+		v[1] = v[0];
+		v[0] = df_datum;
+		store2d_point(current_plot, i++, v[0], v[1], v[0], v[0],
+			      v[1] - v[2], v[1] + v[2], -1.0);
 	    } else {
 		double w;
 		if (current_plot->plot_style == CANDLESTICKS
