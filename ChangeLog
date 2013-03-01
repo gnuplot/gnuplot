@@ -1,3 +1,8 @@
+2013-03-01  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/plot2d.c (refresh_bounds):  Partial axis ranges, e.g. [*:MAX] or
+	[MIN:*] were not being handled correctly when refreshing volatile data.
+
 2013-02-28  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/command.c (replot_command):  If the input data comes from stdin

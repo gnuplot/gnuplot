@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.285 2013/02/17 17:51:25 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.286 2013/02/28 21:27:45 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -291,20 +291,23 @@ refresh_bounds(struct curve_points *first_plot, int nplots)
 	     * mark everything INRANGE and re-evaluate the axis limits now.
 	     * Otherwise test INRANGE/OUTRANGE against previous axis limits.
 	     */
-	    if (!this_plot->noautoscale
-	    &&  (x_axis->set_autoscale & (AUTOSCALE_MIN|AUTOSCALE_MAX))) {
-		if (point->x > x_axis->max) x_axis->max = point->x;
-		if (point->x < x_axis->min) x_axis->min = point->x;
-	    } else if (!inrange(point->x, x_axis->min, x_axis->max)) {
+	    if (!this_plot->noautoscale) {
+		if (x_axis->set_autoscale & AUTOSCALE_MIN && point->x < x_axis->min)
+		     x_axis->min = point->x;
+		if (x_axis->set_autoscale & AUTOSCALE_MAX && point->x > x_axis->max)
+		     x_axis->max = point->x;
+	    }
+	    if (!inrange(point->x, x_axis->min, x_axis->max)) {
 		point->type = OUTRANGE;
 		continue;
 	    }
-
-	    if (!this_plot->noautoscale
-	    &&  (y_axis->set_autoscale & (AUTOSCALE_MIN|AUTOSCALE_MAX))) {
-		if (point->y > y_axis->max) y_axis->max = point->y;
-		if (point->y < y_axis->min) y_axis->min = point->y;
-	    } else if (!inrange(point->y, y_axis->min, y_axis->max)) {
+	    if (!this_plot->noautoscale) {
+		if (y_axis->set_autoscale & AUTOSCALE_MIN && point->y < y_axis->min)
+		     y_axis->min = point->y;
+		if (y_axis->set_autoscale & AUTOSCALE_MAX && point->y > y_axis->max)
+		     y_axis->max = point->y;
+	    }
+	    if (!inrange(point->y, y_axis->min, y_axis->max)) {
 		point->type = OUTRANGE;
 		continue;
 	    }
