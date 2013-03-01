@@ -22,6 +22,7 @@ New features, changes and fixes since gnuplot version 4.6.1
 * FIX broken handling of formatted input via 'using 1:2 "<format>"'
 * FIX exit current command file from inside bracketed clause
 * FIX estimation of space required for rotated x-axis tic labels
+* FIX partial axis ranges (e.g. xrange [*:MAX]) when refreshing volatile data
 
 
 New features, changes and fixes in gnuplot version 4.6.1
