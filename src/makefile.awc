@@ -1,8 +1,9 @@
 # makefile.all generated automatically by GNU make
 
 # List of core object files except version.$(O)
+
 COREOBJS = alloc.$(O) axis.$(O) binary.$(O) bitmap.$(O) breaders.$(O) &
-color.$(O) command.$(O) contour.$(O) datablock.$(O) datafile.$(O) &
+boundary.$(O) color.$(O) command.$(O) contour.$(O) datablock.$(O) datafile.$(O) &
 dynarray.$(O) eval.$(O) fit.$(O) gadgets.$(O) getcolor.$(O) graph3d.$(O) &
 graphics.$(O) help.$(O) hidden3d.$(O) history.$(O) internal.$(O) &
 interpol.$(O) matrix.$(O) misc.$(O) mouse.$(O) parse.$(O) plot.$(O) &

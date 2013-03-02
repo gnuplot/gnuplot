@@ -1,3 +1,10 @@
+2013-03-02  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/win/wtext.h: Avoid redefinition error for ungetch.
+
+	* src/makefile.awc (COREOBJS): Add new module to Watcom make file
+	list, too.
+
 2013-03-01  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/plot2d.c (refresh_bounds):  Partial axis ranges, e.g. [*:MAX] or

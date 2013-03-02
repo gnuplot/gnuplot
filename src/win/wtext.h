@@ -1,5 +1,5 @@
 /*
- * $Id: wtext.h,v 1.13 2012/10/08 09:28:49 markisch Exp $
+ * $Id: wtext.h,v 1.14 2012/10/08 22:30:53 markisch Exp $
  */
 
 /* GNUPLOT - win/wtext.h */
@@ -120,6 +120,7 @@ int fake_pclose(FILE *stream);
 #else /* WGP_CONSOLE */
 
 #define getch ConsoleGetch
+#undef getchar
 #define getchar ConsoleGetch
 int ConsoleGetch();
 
