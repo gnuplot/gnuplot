@@ -1,3 +1,8 @@
+2013-03-03  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/plot2d.c:  Allow a 2 columns only variant of "with yerrorbars".
+	x is taken from column 0, y from column 1, yerror from column 2.
+
 2013-03-01  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/plot2d.c (refresh_bounds):  Partial axis ranges, e.g. [*:MAX] or
