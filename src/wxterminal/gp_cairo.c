@@ -1,5 +1,5 @@
 /*
- * $Id: gp_cairo.c,v 1.67 2012/12/27 19:19:18 sfeam Exp $
+ * $Id: gp_cairo.c,v 1.68 2013/02/19 05:30:37 sfeam Exp $
  */
 
 /* GNUPLOT - gp_cairo.c */
@@ -298,7 +298,7 @@ void gp_cairo_set_font(plot_struct *plot, const char *name, int fontsize)
     char *c;
     char *fname;
 
-	FPRINTF(("set_font \"%s\" %d\n", name,fontsize));
+	FPRINTF((stderr,"set_font \"%s\" %d\n", name,fontsize));
 
 	/* Split out Bold and Italic attributes from font name */
 	fname = strdup(name);
