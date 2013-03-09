@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.255.2.11 2013/03/01 22:10:03 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.255.2.12 2013/03/04 03:00:52 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -298,6 +298,10 @@ refresh_bounds(struct curve_points *first_plot, int nplots)
 	    /* If the state has been set to autoscale since the last plot,
 	     * mark everything INRANGE and re-evaluate the axis limits now.
 	     * Otherwise test INRANGE/OUTRANGE against previous axis limits.
+	     */
+
+	    /* This autoscaling logic is identical to that in
+	     * refresh_3dbounds() in plot3d.c
 	     */
 	    if (!this_plot->noautoscale) {
 		if (x_axis->set_autoscale & AUTOSCALE_MIN && point->x < x_axis->min)
