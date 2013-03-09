@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.228 2012/12/26 20:36:01 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.229 2013/01/05 23:15:57 sfeam Exp $"); }
 #endif
 
 #define MOUSE_ALL_WINDOWS 1
@@ -413,7 +413,7 @@ static void delete_plot __PROTO((plot_struct *));
 
 static int record __PROTO((void));
 static void process_event __PROTO((XEvent *));	/* from Xserver */
-static void process_configure_notify_event __PROTO((XEvent *event));
+static void process_configure_notify_event __PROTO((XEvent *event, TBOOLEAN isRetry ));
 
 static void mainloop __PROTO((void));
 
@@ -4179,7 +4179,7 @@ update_modifiers(unsigned int state)
 #endif
 
 static void
-process_configure_notify_event(XEvent *event)
+process_configure_notify_event(XEvent *event, TBOOLEAN isRetry )
 {
     plot_struct *plot;
     int force_redraw = 0;
@@ -4216,18 +4216,33 @@ process_configure_notify_event(XEvent *event)
 	    && (h == plot->gheight || h == plot->gheight + vchar)) {
 		/* most likely, it's a resize for showing/hiding the status line.
 		 * Test whether the height is now correct; if not, start another resize. */
-		plot->resizing = FALSE;
 		if (w == plot->width
 		&& h == plot->gheight + (plot->str[0] ? vchar : 0)) {
 			/* Was successful, status line can be drawn without rescaling plot. */
 			plot->height = h;
+			plot->resizing = FALSE;
 			return;
+#ifdef HAVE_USLEEP
+		} else if( !isRetry ) {
+			/* Possibly, a resize attempt _failed_ because window
+			   manager denied it. Some window managers produce extra
+			   ConfigureNotify events at the start (for instance the
+			   notion window manager). Thus it's possible that the
+			   event we're looking at is one of the initial ones,
+			   NOT a response to our XResizeWindow() call. We wait a
+			   bit to see if a more likely response follows, and we
+			   try again */
+			usleep( 100000 );
+			process_configure_notify_event( event, TRUE );
+			return;
+#endif
 		} else {
 			/* Possibly, a resize attempt _failed_ because window manager denied it.
 			   Resizing again goes into a vicious endless loop!
 			   (Seen with fluxbox-1.0.0 and a tab group of gnuplot windows.) */
 			/* Instead of just appending the status line, redraw/scale the plot. */
 			force_redraw = TRUE;
+			plot->resizing = FALSE;
 		}
 	    }
 	}
@@ -4313,7 +4328,7 @@ process_event(XEvent *event)
 
     switch (event->type) {
     case ConfigureNotify:
-	process_configure_notify_event(event);
+	process_configure_notify_event(event, FALSE);
 	break;
 
     case KeyPress:
@@ -4624,7 +4639,7 @@ process_event(XEvent *event)
 	 * Jay Painter Nov 2003.
 	 */
 	if (XCheckTypedWindowEvent(dpy, event->xany.window, ConfigureNotify, event)) {
-	    process_configure_notify_event(event);
+	    process_configure_notify_event(event, FALSE);
 	    break;
 	}
 	while (XCheckTypedWindowEvent(dpy, event->xany.window, Expose, event));

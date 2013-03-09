@@ -1,3 +1,11 @@
+2013-03-09  Dima Kogan  <dima@secretsauce.net>
+
+	* src/gplt_x11.c:  Some window managers produce multiple ConfigureNotify
+	events when a window is created. Some of these were mis-interpreted by
+	gnuplot_x11 as a refusal to resize, which then issued additional
+	unneeded replot actions. Now we wait for 0.1 second for extra
+	ConfigureNotify events before deciding that a resize was rejected.
+
 2013-03-03  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/plot2d.c:  Allow a 2 columns only variant of "with yerrorbars".
