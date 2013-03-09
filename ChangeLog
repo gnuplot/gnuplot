@@ -9,6 +9,9 @@
 	* src/plot3d.c (refresh_3dbounds):  Partial axis ranges, e.g. [*:MAX] or
 	[MIN:*] were not being handled correctly when refreshing volatile data.
 
+	* src/plot2d.c (refresh_bounds) src/plot3d.c (refresh_3dbounds):
+	Extend degenerate range when refreshing.
+
 2013-03-03  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/plot2d.c:  Allow a 2 columns only variant of "with yerrorbars".
