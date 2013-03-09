@@ -6,6 +6,9 @@
 	unneeded replot actions. Now we wait for 0.1 second for extra
 	ConfigureNotify events before deciding that a resize was rejected.
 
+	* src/plot3d.c (refresh_3dbounds):  Partial axis ranges, e.g. [*:MAX] or
+	[MIN:*] were not being handled correctly when refreshing volatile data.
+
 2013-03-03  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/plot2d.c:  Allow a 2 columns only variant of "with yerrorbars".

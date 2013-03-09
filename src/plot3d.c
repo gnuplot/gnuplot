@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.203 2013/01/04 22:03:54 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.204 2013/02/17 17:51:25 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -304,6 +304,7 @@ refresh_3dbounds(struct surface_points *first_plot, int nplots)
 	int i;		/* point index */
 	struct axis *x_axis = &axis_array[FIRST_X_AXIS];
 	struct axis *y_axis = &axis_array[FIRST_Y_AXIS];
+	struct axis *z_axis = &axis_array[FIRST_Z_AXIS];
 	struct iso_curve *this_curve;
 
 	/* IMAGE clipping is done elsewhere, so we don't need INRANGE/OUTRANGE
@@ -331,18 +332,37 @@ refresh_3dbounds(struct surface_points *first_plot, int nplots)
 	     * mark everything INRANGE and re-evaluate the axis limits now.
 	     * Otherwise test INRANGE/OUTRANGE against previous axis limits.
 	     */
-	    if (x_axis->set_autoscale & (AUTOSCALE_MIN|AUTOSCALE_MAX)) {
-		if (point->x > x_axis->max) x_axis->max = point->x;
-		if (point->x < x_axis->min) x_axis->min = point->x;
-	    } else if (!inrange(point->x, x_axis->min, x_axis->max)) {
+
+	    /* This autoscaling logic is identical to that in
+	     * refresh_bounds() in plot2d.c
+	     */
+	    if (!this_plot->noautoscale) {
+		if (x_axis->set_autoscale & AUTOSCALE_MIN && point->x < x_axis->min)
+		     x_axis->min = point->x;
+		if (x_axis->set_autoscale & AUTOSCALE_MAX && point->x > x_axis->max)
+		     x_axis->max = point->x;
+	    }
+	    if (!inrange(point->x, x_axis->min, x_axis->max)) {
 		point->type = OUTRANGE;
 		continue;
 	    }
-
-	    if (y_axis->set_autoscale & (AUTOSCALE_MIN|AUTOSCALE_MAX)) {
-		if (point->y > y_axis->max) y_axis->max = point->y;
-		if (point->y < y_axis->min) y_axis->min = point->y;
-	    } else if (!inrange(point->y, y_axis->min, y_axis->max)) {
+	    if (!this_plot->noautoscale) {
+		if (y_axis->set_autoscale & AUTOSCALE_MIN && point->y < y_axis->min)
+		     y_axis->min = point->y;
+		if (y_axis->set_autoscale & AUTOSCALE_MAX && point->y > y_axis->max)
+		     y_axis->max = point->y;
+	    }
+	    if (!inrange(point->y, y_axis->min, y_axis->max)) {
+		point->type = OUTRANGE;
+		continue;
+	    }
+	    if (!this_plot->noautoscale) {
+		if (z_axis->set_autoscale & AUTOSCALE_MIN && point->z < z_axis->min)
+		     z_axis->min = point->z;
+		if (z_axis->set_autoscale & AUTOSCALE_MAX && point->z > z_axis->max)
+		     z_axis->max = point->z;
+	    }
+	    if (!inrange(point->z, z_axis->min, z_axis->max)) {
 		point->type = OUTRANGE;
 		continue;
 	    }
