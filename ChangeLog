@@ -1,3 +1,12 @@
+2013-03-10  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* term/x11.trm (X11_options): Fix compiler warning about excess
+	argument to fprintf().
+
+	* src/plot3d.c (eval_3dplots): Type-correct enum usage.
+
+	* src/plot2d.c (eval_plots): Type-correct enum usage.
+
 2013-03-09  Dima Kogan  <dima@secretsauce.net>
 
 	* src/plot3d.c (refresh_3dbounds):  Partial axis ranges, e.g. [*:MAX] or
