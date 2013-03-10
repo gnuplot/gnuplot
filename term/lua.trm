@@ -1,6 +1,6 @@
 /*
- *  $Id: lua.trm,v 1.17.2.1 2012/02/07 05:09:19 sfeam Exp $
- *  $Date: 2012/02/07 05:09:19 $
+ *  $Id: lua.trm,v 1.17.2.2 2012/04/01 21:05:05 sfeam Exp $
+ *  $Date: 2012/04/01 21:05:05 $
  *  $Rev: 99 $
  */
 
@@ -871,8 +871,7 @@ TERM_PUBLIC void
 LUA_init()
 {
   fseek(gpoutfile, 0, SEEK_SET);
-  /* ignore compiler warnings here, because `gpoutfile' is already open */
-  if (ftruncate(fileno(gpoutfile), 0));
+  (void)ftruncate(fileno(gpoutfile), 0);
 
   /* reset image counter */
   image_cnt = 0;

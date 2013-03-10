@@ -1,5 +1,11 @@
 2013-03-10  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
+	* term/lua.trm (LUA_Init): Better way of ignoring a return value.
+
+	* src/graphics.c (do_plot): Type-correct enum usage.
+
+	* src/color.c (cbtick_callback): Type-correct enum usage.
+
 	* term/x11.trm (X11_options): Fix compiler warning about excess
 	argument to fprintf().
 
