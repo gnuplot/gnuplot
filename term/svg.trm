@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: svg.trm,v 1.149 2012/12/28 00:52:42 sfeam Exp $
+ * $Id: svg.trm,v 1.150 2013/02/19 05:30:38 sfeam Exp $
  */
 
 /*------------------------------------------------------------------------------------------------------------------------------------
@@ -2133,6 +2133,12 @@ START_HELP(svg)
 " appropriate if you are embedding the svg into a web page.",
 " Alternatively, the `standalone` option embeds the mousing code in the",
 " svg document itself rather than linking to an external resource.",
+"",
+" When an SVG file will be used in conjunction with external files,",
+" e.g. if it embeds a PNG image or is referenced by javascript code",
+" in a web page or embedding document, then a unique name is required",
+" to avoid potential conflicting references to other SVG plots.",
+" Use the `name` option to ensure uniqueness.",
 "",
 " SVG allows you to embed fonts directly into an SVG document, or to",
 " provide a hypertext link to the desired font. The `fontfile` option",
