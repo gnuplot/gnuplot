@@ -1,3 +1,9 @@
+2013-03-12  Carl Michal <michal3@users.sourceforge.net>
+
+	* src/fit.c src/fit.h src/save.c src/set.c src/show.c src/unset.c:
+	"set fit [no]prescale" optionally normalizes fit parameters before
+	starting M-L refinement.
+
 2013-03-09  Dima Kogan  <dima@secretsauce.net>
 
 	* src/gplt_x11.c:  Some window managers produce multiple ConfigureNotify

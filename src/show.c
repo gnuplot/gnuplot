@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.278 2012/12/14 18:11:09 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.279 2013/02/26 23:38:42 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -2506,6 +2506,10 @@ static void
 show_fit()
 {
     SHOW_ALL_NL;
+
+    fprintf(stderr, "\
+\tfit will%s prescale parameters by their initial values\n",
+	    fit_prescale ? "" : " not");
 
     fprintf(stderr, "\
 \tfit will%s place parameter errors in variables\n",

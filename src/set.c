@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.385 2013/01/04 22:03:54 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.386 2013/01/25 05:56:07 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -1515,6 +1515,12 @@ set_fit()
 	    c_token++;
 	} else if (equals(c_token,"noquiet")) {
 	    fit_quiet = FALSE;
+	    c_token++;
+	} else if (equals(c_token,"prescale")) {
+	    fit_prescale = TRUE;
+	    c_token++;
+	} else if (equals(c_token,"noprescale")) {
+	    fit_prescale = FALSE;
 	    c_token++;
 	} else {
 	    int_error(c_token,

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: fit.c,v 1.84 2012/11/24 21:54:29 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: fit.c,v 1.85 2012/11/26 07:11:56 markisch Exp $"); }
 #endif
 
 /*  NOTICE: Change of Copyright Status
@@ -46,6 +46,14 @@ static char *RCSid() { return RCSid("$Id: fit.c,v 1.84 2012/11/24 21:54:29 sfeam
  *
  * Jim Van Zandt, 090201: allow fitting functions with up to five
  * independent variables.
+ *
+ * Carl Michal, 120311: optionally prescale all the parameters that
+ * the L-M routine sees by their initial values, so that parameters
+ * that differ by many orders of magnitude do not cause problems.
+ * With decent initial guesses, fits often take fewer iterations. If
+ * any variables were 0, then don't do it for those variables, since
+ * it may do more harm than good.
+ *
  */
 
 #include "fit.h"
@@ -130,6 +138,7 @@ char *fitlogfile = NULL;
 TBOOLEAN fit_errorvariables = FALSE;
 TBOOLEAN fit_quiet = FALSE;
 TBOOLEAN fit_errorscaling = TRUE;
+TBOOLEAN fit_prescale = FALSE;
 
 /* private variables: */
 
@@ -140,6 +149,7 @@ static double epsilon = DEF_FIT_LIMIT;	/* convergence limit */
 static int maxiter = 0;
 
 static char *fit_script = NULL;
+double *scale_params = 0; /* scaling values for parameters */
 
 /* HBB/H.Harders 20020927: log file name now changeable from inside
  * gnuplot */
@@ -511,7 +521,7 @@ call_gnuplot(double *par, double *data)
 
     /* set parameters first */
     for (i = 0; i < num_params; i++)
-	setvar(par_name[i], par[i]);
+	setvar(par_name[i], par[i] * scale_params[i]);
 
     for (i = 0; i < num_data; i++) {
       /* calculate fit-function value */
@@ -566,7 +576,7 @@ fit_interrupt()
 		fprintf(STANDARD, "executing: %s", tmp);
 		/* set parameters visible to gnuplot */
 		for (i = 0; i < num_params; i++)
-		    setvar(par_name[i], a[i]);
+		    setvar(par_name[i], a[i] * scale_params[i]);
 		do_string(tmp);
 	    }
 	}
@@ -703,7 +713,7 @@ regress(double a[])
 	Dblf("Final set of parameters \n");
 	Dblf("======================= \n\n");
 	for (k = 0; k < num_params; k++)
-	    Dblf3("%-15.15s = %-15g\n", par_name[k], a[k]);
+	    Dblf3("%-15.15s = %-15g\n", par_name[k], a[k] * scale_params[k]);
     } else if ((chisq < NEARLY_ZERO) && ((columns < 3) || fit_errorscaling)) {
 	int k;
 
@@ -711,7 +721,7 @@ regress(double a[])
 	Dblf("Final set of parameters \n");
 	Dblf("======================= \n\n");
 	for (k = 0; k < num_params; k++)
-	    Dblf3("%-15.15s = %-15g\n", par_name[k], a[k]);
+	    Dblf3("%-15.15s = %-15g\n", par_name[k], a[k] * scale_params[k]);
     } else {
 	int ndf          = num_data - num_params;
 	double stdfit    = sqrt(chisq/ndf);
@@ -776,9 +786,9 @@ regress(double a[])
 		: fabs(100.0 * dpar[i] / a[i]);
 
 	    Dblf6("%-15.15s = %-15g  %-3.3s %-12.4g (%.4g%%)\n",
-		  par_name[i], a[i], PLUSMINUS, dpar[i], temp);
+		  par_name[i], a[i] * scale_params[i], PLUSMINUS, dpar[i] * scale_params[i], temp);
 	    if (fit_errorvariables)
-		setvarerr(par_name[i], dpar[i]);
+		setvarerr(par_name[i], dpar[i] * scale_params[i]);
 	}
 
 	Dblf("\n\ncorrelation matrix of the fit parameters:\n\n");
@@ -807,7 +817,7 @@ regress(double a[])
      * its original one after the derivatives have been calculated
      */
     /* restore last parameter's value (not done by calculate) */
-    setvar(par_name[num_params - 1], a[num_params - 1]);
+    setvar(par_name[num_params - 1], a[num_params - 1] * scale_params[num_params - 1]);
 
     /* call destructor for allocated vars */
     lambda = -2;		/* flag value, meaning 'destruct!' */
@@ -839,7 +849,7 @@ show_fit(
 	    chisq - last_chisq, epsilon, lambda,
 	    (i > 0 ? "resultant" : "initial set of free"));
     for (k = 0; k < num_params; k++)
-	fprintf(device, "%-15.15s = %g\n", par_name[k], a[k]);
+	fprintf(device, "%-15.15s = %g\n", par_name[k], a[k] * scale_params[k]);
 }
 
 
@@ -1659,11 +1669,26 @@ fit_command()
     if (num_data < num_params)
 	Eex("Number of data points smaller than number of parameters");
 
-    /* avoid parameters being equal to zero */
-    for (i = 0; i < num_params; i++)
-	if (a[i] == 0)
-	    a[i] = NEARLY_ZERO;
+    /* initialize scaling parameters */
+    if (!redim_vec(&scale_params,num_params)){
+	df_close();
+	Eex2("Out of memory in fit: too many datapoints (%d)?", max_data);
+    }
 
+    for (i = 0; i < num_params; i++) {
+	/* avoid parameters being equal to zero */
+	if (a[i] == 0) {
+	    a[i] = NEARLY_ZERO;
+	    scale_params[i] = 1.0;
+	} else if (fit_prescale) {
+	    /* scale parameters, but preserve sign */
+	    double a_sign = (a[i] > 0) - (a[i] < 0);
+	    scale_params[i] = a_sign * a[i];
+	    a[i] = a_sign;
+	} else {
+	    scale_params[i] = 1.0;
+	}
+    }
 
     if (num_params == 0)
 	int_warn(NO_CARET, "No fittable parameters!\n");
