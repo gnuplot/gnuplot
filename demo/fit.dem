@@ -1,5 +1,5 @@
 #
-# $Id: fit.dem,v 1.8 2009/10/31 05:24:18 sfeam Exp $
+# $Id: fit.dem,v 1.10 2013/03/12 19:57:50 sfeam Exp $
 #
 
 print "Some examples how data fitting using nonlinear least squares fit"
@@ -138,7 +138,11 @@ print "fitted in a more appropriate co-ordinate system:"
 print "fit r 'hemisphr.dat' using 0:($1*$1+$2*$2+$3*$3) via r"
 print "where we are fitting f(x)=r to the radii calculated as the data"
 print "is read from the file. No x value is required in this case."
-pause -1 "(This is left as an excercise for the user). (-> return)"
+print "(This is left as an excercise for the user)."
+print ""
+print "Another possibility is to prescale the variables (set fit prescale),"
+print "which may improve convergence."
+pause -1 "(-> return)"
 undefine FIT_MAXITER   # no limit
 
 print "\n\nNow an example how to fit multi-branch functions\n"
