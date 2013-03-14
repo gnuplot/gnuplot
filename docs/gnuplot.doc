@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.771 2013/03/04 01:15:20 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.772 2013/03/12 18:06:57 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -5765,6 +5765,7 @@ Ffigure_mapcontours
                     '' using (column("Age")):(column(2))
        plot 'datafile' using "Age":"Height", '' using "Age":"Weight"
 
+ The full string must match. Comparison is case-sensitive.
  To use the column labels in the plot legend, use 
  `set key autotitle columnhead`.
 

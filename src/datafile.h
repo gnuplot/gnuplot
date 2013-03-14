@@ -1,5 +1,5 @@
 /*
- * $Id: datafile.h,v 1.39 2012/08/23 22:35:52 sfeam Exp $
+ * $Id: datafile.h,v 1.40 2012/12/21 23:07:20 sfeam Exp $
  */
 
 /* GNUPLOT - datafile.h */
@@ -107,6 +107,7 @@ extern TBOOLEAN df_fortran_constants;
 /* This can speed data input significantly, but assumes valid input.    */
 extern TBOOLEAN df_nofpe_trap;
 extern TBOOLEAN evaluate_inside_using;
+extern TBOOLEAN df_warn_on_missing_columnheader;
 
 /* Prototypes of functions exported by datafile.c */
 

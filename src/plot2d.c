@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.289 2013/03/10 01:12:29 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.290 2013/03/10 01:19:54 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -554,6 +554,9 @@ get_data(struct curve_points *current_plot)
     /* If the user has set an explicit locale for numeric input, apply it */
     /* here so that it affects data fields read from the input file.      */
     set_numeric_locale();
+
+    /* Initial state */
+    df_warn_on_missing_columnheader = TRUE;
 
     while ((j = df_readline(v, max_cols)) != DF_EOF) {
 	/* j <= max_cols */
@@ -2522,8 +2525,7 @@ eval_plots()
 	    if (this_plot->plot_type == DATA) {
 		/* actually get the data now */
 		if (get_data(this_plot) == 0) {
-		    /* EAM 2005 - warn, but keep going */
-		    int_warn(c_token-1,"Skipping data file with no valid points");
+		    int_warn(NO_CARET,"Skipping data file with no valid points");
 		    this_plot->plot_type = NODATA;
 		    goto SKIPPED_EMPTY_FILE;
 		}

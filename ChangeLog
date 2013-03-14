@@ -1,4 +1,10 @@
-2013-03-12  Carl Michal <michal3@users.sourceforge.net>
+2013-03-14  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/datafile.c src/datafile.h src/plot2d.c src/plot3d.c:
+	Issue a warning if a requested column header is not found in the
+	data file being plotted.  Document that an exact match is required.
+
+2013-03-12  Carl Michal <michal@phas.ubc.ca>
 
 	* src/fit.c src/fit.h src/save.c src/set.c src/show.c src/unset.c:
 	"set fit [no]prescale" optionally normalizes fit parameters before
