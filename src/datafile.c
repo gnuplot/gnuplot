@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.245 2013/02/17 19:39:14 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.246 2013/03/14 19:40:18 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -2227,7 +2227,8 @@ f_column(union argument *arg)
 	    }
 	}
 	/* This warning should only trigger once per problematic input file */
-	if (column == DF_COLUMN_HEADERS && df_warn_on_missing_columnheader) {
+	if (column == DF_COLUMN_HEADERS && (*name)
+	&&  df_warn_on_missing_columnheader) {
 	    df_warn_on_missing_columnheader = FALSE;
 	    int_warn(NO_CARET,"no column with header \"%s\"", a.v.string_val);
 	    for (j=0; j<df_no_cols; j++) {
