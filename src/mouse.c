@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: mouse.c,v 1.145 2013/01/05 23:15:57 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: mouse.c,v 1.146 2013/01/08 01:00:29 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - mouse.c */
@@ -207,6 +207,15 @@ static void event_modifier __PROTO((struct gp_event_t * ge));
 static void do_save_3dplot __PROTO((struct surface_points *, int, int));
 static void load_mouse_variables __PROTO((double, double, TBOOLEAN, int));
 
+static void do_zoom_in_around_mouse __PROTO((void));
+static void do_zoom_out_around_mouse __PROTO((void));
+static void do_zoom_in_X __PROTO((void));
+static void do_zoom_out_X __PROTO((void));
+static void do_zoom_scroll_up __PROTO((void));
+static void do_zoom_scroll_down __PROTO((void));
+static void do_zoom_scroll_left __PROTO((void));
+static void do_zoom_scroll_right __PROTO((void));
+
 /* builtins */
 static char *builtin_autoscale __PROTO((struct gp_event_t * ge));
 static char *builtin_toggle_border __PROTO((struct gp_event_t * ge));
@@ -232,6 +241,14 @@ static char *builtin_rotate_up __PROTO((struct gp_event_t * ge));
 static char *builtin_rotate_left __PROTO((struct gp_event_t * ge));
 static char *builtin_rotate_down __PROTO((struct gp_event_t * ge));
 static char *builtin_cancel_zoom __PROTO((struct gp_event_t * ge));
+static char *builtin_zoom_scroll_left __PROTO((struct gp_event_t * ge));
+static char *builtin_zoom_scroll_right __PROTO((struct gp_event_t * ge));
+static char *builtin_zoom_scroll_up __PROTO((struct gp_event_t * ge));
+static char *builtin_zoom_scroll_down __PROTO((struct gp_event_t * ge));
+static char *builtin_zoom_in_X __PROTO((struct gp_event_t * ge));
+static char *builtin_zoom_out_X __PROTO((struct gp_event_t * ge));
+static char *builtin_zoom_in_around_mouse __PROTO((struct gp_event_t * ge));
+static char *builtin_zoom_out_around_mouse __PROTO((struct gp_event_t * ge));
 
 /* prototypes for bind stuff
  * which are used only here. */
@@ -1243,44 +1260,60 @@ builtin_unzoom(struct gp_event_t *ge)
 static char *
 builtin_rotate_right(struct gp_event_t *ge)
 {
-    if (!ge) {
-	return "`builtin-rotate-right` only for splots; <shift> increases amount";
-    }
+    if (!ge)
+	return "`scroll right in 2d, rotate right in 3d`; <Shift> faster";
     if (is_3d_plot)
 	ChangeView(0, -1);
+    else {
+	int k = (modifier_mask & Mod_Shift) ? 3 : 1;
+	while (k-- > 0)
+	    do_zoom_scroll_right();
+    }
     return (char *) 0;
 }
 
 static char *
 builtin_rotate_left(struct gp_event_t *ge)
 {
-    if (!ge) {
-	return "`builtin-rotate-left` only for splots; <shift> increases amount";
-    }
+    if (!ge)
+	return "`scroll left in 2d, rotate left in 3d`; <Shift> faster";
     if (is_3d_plot)
 	ChangeView(0, 1);
+    else {
+	int k = (modifier_mask & Mod_Shift) ? 3 : 1;
+	while (k-- > 0)
+	    do_zoom_scroll_left();
+    }
     return (char *) 0;
 }
 
 static char *
 builtin_rotate_up(struct gp_event_t *ge)
 {
-    if (!ge) {
-	return "`builtin-rotate-up` only for splots; <shift> increases amount";
-    }
+    if (!ge)
+	return "`scroll up in 2d, rotate up in 3d`; <Shift> faster";
     if (is_3d_plot)
 	ChangeView(1, 0);
+    else {
+	int k = (modifier_mask & Mod_Shift) ? 3 : 1;
+	while (k-- > 0)
+	    do_zoom_scroll_up();
+    }
     return (char *) 0;
 }
 
 static char *
 builtin_rotate_down(struct gp_event_t *ge)
 {
-    if (!ge) {
-	return "`builtin-rotate-down` only for splots; <shift> increases amount";
-    }
+    if (!ge)
+	return "`scroll down in 2d, rotate down in 3d`; <Shift> faster";
     if (is_3d_plot)
 	ChangeView(-1, 0);
+    else {
+	int k = (modifier_mask & Mod_Shift) ? 3 : 1;
+	while (k-- > 0)
+	    do_zoom_scroll_down();
+    }
     return (char *) 0;
 }
 
@@ -1426,6 +1459,7 @@ ChangeView(int x, int z)
     }
 }
 
+
 /* Return a new (upper or lower) axis limit that is a linear
    combination of the current limits.  */
 static double
@@ -1436,6 +1470,226 @@ rescale(int AXIS, double w1, double w2)
   val = AXIS_DE_LOG_VALUE(AXIS,logval);
   return val;
 }
+
+
+/* Rescale axes and do zoom. */
+static void
+zoom_rescale_xyx2y2(double a0,double a1,double a2,double a3,double a4,double a5,double a6,
+	double a7,double a8,double a9,double a10,double a11,double a12,double a13,double a14,double a15,
+	char msg[])
+{
+    double xmin  = rescale(FIRST_X_AXIS,   a0, a1);
+    double ymin  = rescale(FIRST_Y_AXIS,   a2, a3);
+    double x2min = rescale(SECOND_X_AXIS,  a4, a5);
+    double y2min = rescale(SECOND_Y_AXIS,  a6, a7);
+
+    double xmax  = rescale(FIRST_X_AXIS,   a8, a9);
+    double ymax  = rescale(FIRST_Y_AXIS,  a10, a11);
+    double x2max = rescale(SECOND_X_AXIS, a12, a13);
+    double y2max = rescale(SECOND_Y_AXIS, a14, a15);
+    do_zoom(xmin, ymin, x2min, y2min, xmax, ymax, x2max, y2max);
+
+    if (msg[0] && display_ipc_commands()) {
+	fputs(msg, stderr); fputs("\n", stderr);
+    }
+}
+
+
+/* Scroll left. */
+static void
+do_zoom_scroll_left()
+{
+    zoom_rescale_xyx2y2(1.1,-0.1, 1,0, 1.1,-0.1, 1,0,  0.1,0.9, 0,1, 0.1,0.9, 0,1,
+	"scroll left.\n");
+}
+
+/* Scroll right. */
+static void
+do_zoom_scroll_right()
+{
+    zoom_rescale_xyx2y2(0.9,0.1, 1,0, 0.9,0.1, 1,0,  -0.1,1.1, 0,1, -0.1,1.1, 0,1,
+	"scroll right");
+}
+
+/* Scroll up. */
+static void
+do_zoom_scroll_up()
+{
+    zoom_rescale_xyx2y2(1,0, 0.9,0.1, 1,0, 0.9,0.1,  0,1, -0.1,1.1, 0,1, -0.1,1.1,
+	"scroll up");
+}
+
+/* Scroll down. */
+static void
+do_zoom_scroll_down()
+{
+    zoom_rescale_xyx2y2(1,0, 1.1,-0.1, 1,0, 1.1,-1,  0,1, 0.1,0.9, 0,1, 0.1,0.9,
+	"scroll down");
+}
+
+
+/* Zoom in/out within x-axis. */
+static void
+zoom_in_X(int zoom_key)
+{
+    /* zoom in (X axis only) */
+    double w1 = (zoom_key=='+') ? 23./25. : 23./21.;
+    double w2 = (zoom_key=='+') ?  2./25. : -2./21.;
+    zoom_rescale_xyx2y2(w1,w2, 1,0, w1,w2, 1,0,  w2,w1, 0,1, w2,w1, 0,1, 
+	(zoom_key=='+' ? "zoom in X" : "zoom out X"));
+}
+
+static void
+do_zoom_in_X()
+{
+    zoom_in_X('+');
+}
+
+static void
+do_zoom_out_X()
+{
+    zoom_in_X('-');
+}
+
+
+/* Return new lower and upper axis limits as current limits resized
+   around current mouse position. */
+static void
+rescale_around_mouse(double *newmin, double *newmax, int AXIS, double mouse_pos, double scale)
+{
+  *newmin = mouse_pos + (axis_array[AXIS].min - mouse_pos) * scale;
+  *newmax = mouse_pos + (axis_array[AXIS].max - mouse_pos) * scale;
+  *newmin = AXIS_DE_LOG_VALUE(AXIS,*newmin);
+  *newmax = AXIS_DE_LOG_VALUE(AXIS,*newmax);
+}
+
+
+/* Zoom around mouse cursor unless the cursor is outside the graph boundary,
+   when it scales around the graph center.
+   Syntax: zoom_key == '+' ... zoom in, zoom_key == '-' ... zoom out
+*/
+static void
+zoom_around_mouse(int zoom_key)
+{
+    double xmin, ymin, x2min, y2min, xmax, ymax, x2max, y2max;
+    int outside = (real_x  <= AXIS_DE_LOG_VALUE(FIRST_X_AXIS,  axis_array[FIRST_X_AXIS].min))  ||
+		  (real_x  >= AXIS_DE_LOG_VALUE(FIRST_X_AXIS,  axis_array[FIRST_X_AXIS].max))  ||
+		  (real_y  <= AXIS_DE_LOG_VALUE(FIRST_Y_AXIS,  axis_array[FIRST_Y_AXIS].min))  ||
+		  (real_y  >= AXIS_DE_LOG_VALUE(FIRST_Y_AXIS,  axis_array[FIRST_Y_AXIS].max))  ||
+		  (real_x2 <= AXIS_DE_LOG_VALUE(SECOND_X_AXIS, axis_array[SECOND_X_AXIS].min)) ||
+		  (real_x2 >= AXIS_DE_LOG_VALUE(SECOND_X_AXIS, axis_array[SECOND_X_AXIS].max)) ||
+		  (real_y2 <= AXIS_DE_LOG_VALUE(SECOND_Y_AXIS, axis_array[SECOND_Y_AXIS].min)) ||
+		  (real_y2 >= AXIS_DE_LOG_VALUE(SECOND_Y_AXIS, axis_array[SECOND_Y_AXIS].max));
+    if (outside) {
+	/* zoom in (factor of approximately 2^(.25), so four steps gives 2x larger) */
+	double w1 = (zoom_key=='+') ? 23./25. : 23./21.;
+	double w2 = (zoom_key=='+') ?  2./25. : -2./21.;
+	xmin  = rescale(FIRST_X_AXIS,  w1, w2);
+	ymin  = rescale(FIRST_Y_AXIS,  w1, w2);
+	x2min = rescale(SECOND_X_AXIS, w1, w2);
+	y2min = rescale(SECOND_Y_AXIS, w1, w2);
+
+	xmax  = rescale(FIRST_X_AXIS,  w2, w1);
+	ymax  = rescale(FIRST_Y_AXIS,  w2, w1);
+	x2max = rescale(SECOND_X_AXIS, w2, w1);
+      	y2max = rescale(SECOND_Y_AXIS, w2, w1);
+    } else {
+	double scale = (zoom_key=='+') ? 0.75 : 1.25;
+	rescale_around_mouse(&xmin,  &xmax,  FIRST_X_AXIS,  real_x,  scale);
+	rescale_around_mouse(&ymin,  &ymax,  FIRST_Y_AXIS,  real_y,  scale);
+	rescale_around_mouse(&x2min, &x2max, SECOND_X_AXIS, real_x2, scale);
+	rescale_around_mouse(&y2min, &y2max, SECOND_Y_AXIS, real_y2, scale);
+    }
+    do_zoom(xmin, ymin, x2min, y2min, xmax, ymax, x2max, y2max);
+    if (display_ipc_commands())
+	fprintf(stderr, "zoom %s.\n", (zoom_key=='+' ? "in" : "out"));
+}
+
+static void
+do_zoom_in_around_mouse()
+{
+    zoom_around_mouse('+');
+}
+
+static void
+do_zoom_out_around_mouse()
+{
+    zoom_around_mouse('-');
+}
+
+
+static char *
+builtin_zoom_scroll_left(struct gp_event_t *ge)
+{
+    if (!ge)
+	return "`builtin-zoom-scroll-left` scroll left";
+    do_zoom_scroll_left();
+    return (char *) 0;
+}
+
+static char *
+builtin_zoom_scroll_right(struct gp_event_t *ge)
+{
+    if (!ge)
+	return "`builtin-zoom-scroll-right` scroll right";
+    do_zoom_scroll_right();
+    return (char *) 0;
+}
+
+static char *
+builtin_zoom_scroll_up(struct gp_event_t *ge)
+{
+    if (!ge)
+	return "`builtin-zoom-scroll-up` scroll up";
+    do_zoom_scroll_up();
+    return (char *) 0;
+}
+
+static char *
+builtin_zoom_scroll_down(struct gp_event_t *ge)
+{
+    if (!ge)
+	return "`builtin-zoom-scroll-down` scroll down";
+    do_zoom_scroll_down();
+    return (char *) 0;
+}
+
+static char *
+builtin_zoom_in_around_mouse(struct gp_event_t *ge)
+{
+    if (!ge)
+	return "`builtin-zoom-in` zoom in";
+    do_zoom_in_around_mouse();
+    return (char *) 0;
+}
+
+static char *
+builtin_zoom_out_around_mouse(struct gp_event_t *ge)
+{
+    if (!ge)
+	return "`builtin-zoom-out` zoom out";
+    do_zoom_out_around_mouse();
+    return (char *) 0;
+}
+
+static char *
+builtin_zoom_in_X(struct gp_event_t *ge)
+{
+    if (!ge)
+	return "`builtin-zoom-in-X` zoom in X axis";
+    do_zoom_in_X();
+    return (char *) 0;
+}
+
+static char *
+builtin_zoom_out_X(struct gp_event_t *ge)
+{
+    if (!ge)
+	return "`builtin-zoom-out-X` zoom out X axis";
+    do_zoom_out_X();
+    return (char *) 0;
+}
+
 
 static void
 event_buttonpress(struct gp_event_t *ge)
@@ -1458,175 +1712,43 @@ event_buttonpress(struct gp_event_t *ge)
     if ((b == 4 || b == 6) && /* 4 - wheel up, 6 - wheel left */
 	(!replot_disabled || (E_REFRESH_NOT_OK != refresh_ok))	/* Use refresh if available */
 	&& !(paused_for_mouse & PAUSE_BUTTON3)) {
-      double xmin, ymin, x2min, y2min;
-      double xmax, ymax, x2max, y2max;
-      if ((b == 4) && (modifier_mask & Mod_Ctrl)) {
-	if (modifier_mask & Mod_Shift) {
-	  /* zoom in (X axis only) */
-	  double w1=23./25.;
-	  double w2= 2./25.;
-	  xmin = rescale(FIRST_X_AXIS, w1, w2);
-	  ymin = rescale(FIRST_Y_AXIS, 1., 0.);
-	  x2min = rescale(SECOND_X_AXIS, w1, w2);
-	  y2min = rescale(SECOND_Y_AXIS, 1., 0.);
 
-	  xmax = rescale(FIRST_X_AXIS, w2,w1);
-	  ymax = rescale(FIRST_Y_AXIS, 0., 1.);
-	  x2max = rescale(SECOND_X_AXIS, w2, w1);
-	  y2max = rescale(SECOND_Y_AXIS, 0., 1.);
+	/* Ctrl+Shift+wheel up or Squeeze (not implemented) */
+	if ((modifier_mask & Mod_Ctrl) && (modifier_mask & Mod_Shift))
+	    do_zoom_in_X();
+	
+	/* Ctrl+wheel up or Ctrl+stroke */
+	else if ((modifier_mask & Mod_Ctrl))
+	    do_zoom_in_around_mouse();
 
-	  do_zoom(xmin, ymin, x2min, y2min, xmax, ymax, x2max, y2max);
-	  if (display_ipc_commands()) {
-	    fprintf(stderr, "zoom in X.\n");
-	  }
-	} else {
-	  /* zoom in (factor of approximatly 2^(.25), so four steps gives 2x larger) */
-	  double w1=23./25.;
-	  double w2= 2./25.;
-	  xmin = rescale(FIRST_X_AXIS,  w1, w2);
-	  ymin = rescale(FIRST_Y_AXIS,  w1, w2);
-	  x2min = rescale(SECOND_X_AXIS, w1, w2);
-	  y2min = rescale(SECOND_Y_AXIS, w1, w2);
-
-	  xmax = rescale(FIRST_X_AXIS,  w2, w1);
-	  ymax = rescale(FIRST_Y_AXIS,  w2, w1);
-	  x2max = rescale(SECOND_X_AXIS, w2, w1);
-	  y2max = rescale(SECOND_Y_AXIS, w2, w1);
-
-	  do_zoom(xmin, ymin, x2min, y2min, xmax, ymax, x2max, y2max);
-	  if (display_ipc_commands()) {
-	    fprintf(stderr, "zoom in.\n");
-	  }
-	}
-      } else {
-#if DO_ZOOM_AND_APPLY_ZOOM_FIXED_TO_HANDLE_Z_AXIS
-	if ((b == 4) && (modifier_mask & Mod_Alt)) {
-	  /* scroll in +Z direction */
-	  xmin = rescale(FIRST_X_AXIS, 1., 0.);
-	  ymin = rescale(FIRST_Y_AXIS, 1., 0.);
-	  x2min = rescale(SECOND_X_AXIS, 1., 0.);
-	  y2min = rescale(SECOND_Y_AXIS, 1., 0.);
-	  zmin = rescale(FIRST_Z_AXIS, .9, .1);
-	  
-	  xmax = rescale(FIRST_X_AXIS,  0., 1.);
-	  ymax = rescale(FIRST_Y_AXIS,  0., 1.);
-	  x2max = rescale(SECOND_X_AXIS, 0., 1.);
-	  y2max = rescale(SECOND_Y_AXIS, 0., 1.);
-	  zmax = rescale(FIRST_Z_AXIS, 1.1, -.1);
-	  do_zoom(xmin, ymin, x2min, y2min, zmin, xmax, ymax, x2max, y2max, zmax);
-	  if (display_ipc_commands()) {
-	    fprintf(stderr, "scroll left.\n");
-	  }
-	} else 
-#endif
-	  if (((b == 4) && (modifier_mask & Mod_Shift)) || (b == 6)) {
-	  /* scroll left */
-          xmin = rescale(FIRST_X_AXIS, 1.1, -.1);
-	  ymin = rescale(FIRST_Y_AXIS, 1., 0.);
-	  x2min = rescale(SECOND_X_AXIS, 1.1, -.1);
-	  y2min = rescale(SECOND_Y_AXIS, 1., 0.);
-	  
-	  xmax = rescale(FIRST_X_AXIS, .1, .9);
-	  ymax = rescale(FIRST_Y_AXIS, 0., 1.);
-	  x2max = rescale(SECOND_X_AXIS, .1, .9);
-	  y2max = rescale(SECOND_Y_AXIS, 0., 1.);
-	  do_zoom(xmin, ymin, x2min, y2min, xmax, ymax, x2max, y2max);
-	  if (display_ipc_commands()) {
-	    fprintf(stderr, "scroll left.\n");
-	  }
-	} else {
-	  /* scroll up */
-	  xmin = rescale(FIRST_X_AXIS, 1., 0.);
-	  ymin = rescale(FIRST_Y_AXIS, .9,.1);
-	  x2min = rescale(SECOND_X_AXIS, 1.,0.);
-	  y2min = rescale(SECOND_Y_AXIS, .9, .1);
-
-	  xmax = rescale(FIRST_X_AXIS, 0., 1.);
-	  ymax = rescale(FIRST_Y_AXIS, -.1,1.1);
-	  x2max = rescale(SECOND_X_AXIS, 0., 1.);
-	  y2max = rescale(SECOND_Y_AXIS, -.1, 1.1);
-	  do_zoom(xmin, ymin, x2min, y2min, xmax, ymax, x2max, y2max);
-	  if (display_ipc_commands()) {
-	    fprintf(stderr, "scroll up.\n");
-	  }
-	}
-      }
+	/* Horizontal stroke (button 6) or Shift+wheel up */
+	else if (b == 6 || (modifier_mask & Mod_Shift)) 
+	    do_zoom_scroll_right();
+	
+	/* Wheel up (no modifier keys) */
+	else
+	    do_zoom_scroll_up();
+	
     } else if (((b == 5) || (b == 7)) && /* 5 - wheel down, 7 - wheel right */
 	       (!replot_disabled || (E_REFRESH_NOT_OK != refresh_ok))	/* Use refresh if available */
 	       && !(paused_for_mouse & PAUSE_BUTTON3)) {
-      double xmin, ymin, x2min, y2min;
-      double xmax, ymax, x2max, y2max;
-      if ((b == 5) && (modifier_mask & Mod_Ctrl)) {
-	if (modifier_mask & Mod_Shift) {
-	  /* zoom out (X axis only) */
-	  double w1= 23./21.;
-	  double w2=-2./21.;
-	  xmin = rescale(FIRST_X_AXIS, w1, w2);
-	  ymin = rescale(FIRST_Y_AXIS, 1., 0.);
-	  x2min = rescale(SECOND_X_AXIS, w1, w2);
-	  y2min = rescale(SECOND_Y_AXIS, 1., 0.);
-	  
-	  xmax = rescale(FIRST_X_AXIS, w2, w1);
-	  ymax = rescale(FIRST_Y_AXIS, 0., 1.);
-	  x2max = rescale(SECOND_X_AXIS, w2, w1);
-	  y2max = rescale(SECOND_Y_AXIS, 0., 1.);
-	  do_zoom(xmin, ymin, x2min, y2min, xmax, ymax, x2max, y2max);
-	  if (display_ipc_commands()) {
-	    fprintf(stderr, "zoom out X.\n");
-	  }
-	} else {
-	  /* zoom out (exactly undo a zoom in step) */
-	  double w1= 23./21.;
-	  double w2=-2./21.;
-	  xmin = rescale(FIRST_X_AXIS,  w1, w2);
-	  ymin = rescale(FIRST_Y_AXIS,  w1, w2);
-	  x2min = rescale(SECOND_X_AXIS, w1, w2);
-	  y2min = rescale(SECOND_Y_AXIS, w1, w2);
 
-	  xmax = rescale(FIRST_X_AXIS,  w2, w1);
-	  ymax = rescale(FIRST_Y_AXIS,  w2, w1);
-	  x2max = rescale(SECOND_X_AXIS, w2, w1);
-	  y2max = rescale(SECOND_Y_AXIS, w2, w1);
-	  do_zoom(xmin, ymin, x2min, y2min, xmax, ymax, x2max, y2max);
-	  if (display_ipc_commands()) {
-	    fprintf(stderr, "zoom out.\n");
-	  }
-	}
-      } else {
-	if (((b == 5) && (modifier_mask & Mod_Shift)) || (b == 7)) {
-	  /* scroll right */
-	  xmin = rescale(FIRST_X_AXIS, .9, .1);
-	  ymin = rescale(FIRST_Y_AXIS, 1., 0.);
-	  x2min = rescale(SECOND_X_AXIS, .9, .1);
-	  y2min = rescale(SECOND_Y_AXIS, 1., 0.);
+	/* Ctrl+Shift+wheel down or Unsqueeze (not implemented) */
+	if ((modifier_mask & Mod_Ctrl) && (modifier_mask & Mod_Shift))
+	    do_zoom_out_X();
+	
+	/* Ctrl+wheel down or Ctrl+stroke */
+	else if ((modifier_mask & Mod_Ctrl))
+	    do_zoom_out_around_mouse();
 
-	  xmax = rescale(FIRST_X_AXIS, -.1, 1.1);
-	  ymax = rescale(FIRST_Y_AXIS, 0., 1.);
-	  x2max = rescale(SECOND_X_AXIS, -.1, 1.1);
-	  y2max = rescale(SECOND_Y_AXIS, 0., 1.);
-	  do_zoom(xmin, ymin, x2min, y2min, xmax, ymax, x2max, y2max);
-	  if (display_ipc_commands()) {
-	    fprintf(stderr, "scroll right.\n");
-	  }
-	} else {
-	  /* scroll down */
-	  xmin = rescale(FIRST_X_AXIS, 1., 0.);
-	  ymin = rescale(FIRST_Y_AXIS, 1.1, -.1);
-	  x2min = rescale(SECOND_X_AXIS, 1., 0.);
-	  y2min = rescale(SECOND_Y_AXIS, 1.1, -.1);
-
-	  xmax = rescale(FIRST_X_AXIS, 0., 1.);
-	  ymax = rescale(FIRST_Y_AXIS, .1, .9);
-	  x2max = rescale(SECOND_X_AXIS, 0., 1.);
-	  y2max = rescale(SECOND_Y_AXIS, .1, .9);
-	  rescale(FIRST_Y_AXIS, 1.1,-.1);
-	  rescale(FIRST_Y_AXIS, .1,.9);
-	  do_zoom(xmin, ymin, x2min, y2min, xmax, ymax, x2max, y2max);
-	  if (display_ipc_commands()) {
-	    fprintf(stderr, "scroll down.\n");
-	  }
-	}
-      }
+	/* Horizontal stroke (button 7) or Shift+wheel down */
+	else if (b == 7 || (modifier_mask & Mod_Shift)) 
+	    do_zoom_scroll_left();
+	
+	/* Wheel down (no modifier keys) */
+	else
+	    do_zoom_scroll_down();
+	
     } else if (ALMOST2D) {
         if (!setting_zoom_region) {
 	    if (1 == b) {
@@ -2183,6 +2305,9 @@ bind_install_default_bindings()
     bind_append("n", (char *) 0, builtin_zoom_next);
     bind_append("p", (char *) 0, builtin_zoom_previous);
     bind_append("u", (char *) 0, builtin_unzoom);
+    bind_append("+", (char *) 0, builtin_zoom_in_around_mouse);
+    bind_append("=", (char *) 0, builtin_zoom_in_around_mouse); /* same key as + but no need for Shift */
+    bind_append("-", (char *) 0, builtin_zoom_out_around_mouse);
     bind_append("Right", (char *) 0, builtin_rotate_right);
     bind_append("Up", (char *) 0, builtin_rotate_up);
     bind_append("Left", (char *) 0, builtin_rotate_left);
@@ -2341,19 +2466,20 @@ bind_display(char *lhs)
 	fprintf(stderr, fmt, "<B2>", "annotate the graph using `mouseformat` (see keys '1', '2')");
 	fprintf(stderr, fmt, "", "or draw labels if `set mouse labels is on`");
 	fprintf(stderr, fmt, "<Ctrl-B2>", "remove label close to pointer if `set mouse labels` is on");
-	fprintf(stderr, fmt, "<B3>", "mark zoom region (only for 2d-plots and maps).");
-	fprintf(stderr, fmt, "<B1-Motion>", "change view (rotation). Use <ctrl> to rotate the axes only.");
-	fprintf(stderr, fmt, "<B2-Motion>", "change view (scaling). Use <ctrl> to scale the axes only.");
+	fprintf(stderr, fmt, "<B3>", "mark zoom region (only for 2d-plots and maps)");
+	fprintf(stderr, fmt, "<B1-Motion>", "change view (rotation); use <Ctrl> to rotate the axes only");
+	fprintf(stderr, fmt, "<B2-Motion>", "change view (scaling); use <Ctrl> to scale the axes only");
 	fprintf(stderr, fmt, "<Shift-B2-Motion>", "vertical motion -- change xyplane");
+
 	/* mouse wheel */
-	fprintf(stderr, fmt, "<wheel-up>", "scroll up (in +Y direction).");
-	fprintf(stderr, fmt, "<wheel-down>", "scroll down.");
-	fprintf(stderr, fmt, "<shift-wheel-up>", "scroll left (in -X direction).");
-	fprintf(stderr, fmt, "<shift-wheel-down>", "scroll right.");
-	fprintf(stderr, fmt, "<control-wheel-up>", "zoom in toward the center of the plot.");
-	fprintf(stderr, fmt, "<control-wheel-down>", " zoom out.");
-	fprintf(stderr, fmt, "<shift-control-wheel-up>", "zoom in only the X axis.");
-	fprintf(stderr, fmt, "<shift-control-wheel-down>", "zoom out only the X axis.");
+	fprintf(stderr, fmt, "<wheel-up>", "  scroll up (in +Y direction)");
+	fprintf(stderr, fmt, "<wheel-down>", "  scroll down");
+	fprintf(stderr, fmt, "<shift-wheel-up>", "  scroll left (in -X direction)");
+	fprintf(stderr, fmt, "<shift-wheel-down>", " scroll right");
+	fprintf(stderr, fmt, "<Control-WheelUp>", "  zoom in on mouse position");
+	fprintf(stderr, fmt, "<Control-WheelDown>", "zoom out on mouse position");
+	fprintf(stderr, fmt, "<Shift-Control-WheelUp>", "  pinch on x");
+	fprintf(stderr, fmt, "<Shift-Control-WheelDown>", "expand on x");
 
 	fprintf(stderr, "\n");
 	/* keystrokes */
