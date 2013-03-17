@@ -1,3 +1,7 @@
+2013-03-17  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* configure.in: modify for use with current automake (1.12/1.13)
+
 2013-03-14  Tag Release_4_6_2
 
 2013-03-14  Ethan A Merritt  <merritt@u.washington.edu>
