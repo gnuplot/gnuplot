@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.249 2013/01/09 05:23:22 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.250 2013/02/23 01:57:59 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -932,6 +932,8 @@ term_apply_lp_properties(struct lp_style_type *lp)
 
     /* Possibly override the linetype color with a fancier colorspec */
     if (!lp->use_palette) {
+	if ((term->flags & TERM_MONOCHROME) != 0)
+	    return;
 	colorspec.type = TC_LT;
 	colorspec.lt = lt;
     }
