@@ -1,3 +1,7 @@
+2013-03-21  Mojca Miklavec  <mojca.miklavec.lists@gmail.com>
+
+	* docs/Makefile.in: Remove nested @ symbols from Makefile
+
 2013-03-21  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/plot2d.c src/misc.c (lp_parse):  The "fillcolor|fc" keyword
