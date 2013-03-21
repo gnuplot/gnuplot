@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.138.2.11 2012/08/03 05:24:21 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.138.2.12 2012/11/10 18:23:48 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -858,7 +858,8 @@ lp_parse(struct lp_style_type *lp, TBOOLEAN allow_ls, TBOOLEAN allow_point)
 		continue;
 	    }
 
-	    if (equals(c_token,"lc") || almost_equals(c_token,"linec$olor")) {
+	    if (equals(c_token,"lc") || almost_equals(c_token,"linec$olor")
+	    ||  equals(c_token,"fc") || almost_equals(c_token,"fillc$olor")) {
 		newlp.use_palette = 1;
 		if (set_pal++)
 		    break;
