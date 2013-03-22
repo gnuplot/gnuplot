@@ -1,5 +1,10 @@
-New features, changes and fixes since gnuplot version 4.6.1
+New features, changes and fixes since gnuplot version 4.6.2
 ===========================================================
+
+* FIX suppression of color in linetypes after "set term ... mono"
+
+New features, changes and fixes in gnuplot version 4.6.2
+========================================================
 
 * NEW Allow the "bind" command to attach a user command to mouse button 1
 * NEW hidden3d can handle occlusion by pm3d surfaces (as in hidden2.dem)

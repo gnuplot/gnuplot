@@ -1,3 +1,12 @@
+2013-03-22  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/term.c (term_apply_lp_properties): A patch of 2013-01-08
+	switched to always applying linetype color even if the use_palette
+	flag was not set.  This broke the TERM_MONOCHROME setting on terminals
+	that have it, as seen in the "test" command.
+	Handle monochrome terminals as a special case.
+	Bug #1225
+
 2013-03-21  Mojca Miklavec  <mojca.miklavec.lists@gmail.com>
 
 	* docs/Makefile.in: Remove nested @ symbols from Makefile
@@ -126,7 +135,7 @@
 	Bug #3602388
 
 	* src/term.c (term_apply_lp_properties):  Always apply linetype color,
-	even if the flag use_palette in not set.  Many terminals cope with this
+	even if the flag use_palette is not set.  Many terminals cope with this
 	on their own, but not all of them (e.g. cairolatex).
 	Bug #3599916
 
