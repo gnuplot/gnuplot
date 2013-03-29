@@ -4,6 +4,9 @@
 	Use actual plot title as the <title> attribute of svg plot elements.
 	If there is no plot title, use name_plotno_panelno as before.
 
+	* src/qtterminal/QtGnuplotScene.cpp (processEvent):  Fix off-by-one
+	iteration over visibility of plots after a zoom or other replot.
+
 2013-03-21  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/plot2d.c src/misc.c (lp_parse):  The "fillcolor|fc" keyword
