@@ -380,7 +380,7 @@ void QtGnuplotScene::processEvent(QtGnuplotEventType type, QDataStream& in)
 			newgroup = createItemGroup(m_currentGroup);
 			newgroup->setZValue(m_currentZ++);
 			// Copy the visible/hidden status from the previous plot/replot
-			if (0 < m_currentPlotNumber  && m_currentPlotNumber < m_key_boxes.count())
+			if (0 < m_currentPlotNumber && m_currentPlotNumber <= m_key_boxes.count())
 				newgroup->setVisible( !(m_key_boxes[m_currentPlotNumber-1].ishidden()) );
 			// Store it in an ordered list so we can toggle it by index
 			if (m_currentPlotNumber >= m_plot_group.count())

@@ -1,3 +1,8 @@
+2013-03-29  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/qtterminal/QtGnuplotScene.cpp (processEvent):  Fix off-by-one
+	iteration over visibility of plots after a zoom or other replot.
+
 2013-03-22  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/term.c (term_apply_lp_properties): A patch of 2013-01-08
