@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: svg.trm,v 1.150 2013/02/19 05:30:38 sfeam Exp $
+ * $Id: svg.trm,v 1.151 2013/03/10 01:53:58 sfeam Exp $
  */
 
 /*------------------------------------------------------------------------------------------------------------------------------------
@@ -1673,7 +1673,13 @@ SVG_layer(t_termlayer syncpoint)
 		    panel[0] = 'a' + mp_layout.current_panel;
 
 		fprintf(gpoutfile, "\t<g id=\"%s_plot_%d%s\" ", name,SVG_plotno,panel);
-		fprintf(gpoutfile, "><title>%s_plot_%d%s</title>\n", name,SVG_plotno,panel);
+		if (SVG_hypertext_text && *SVG_hypertext_text) {
+		    fprintf(gpoutfile, "><title>%s</title>\n", SVG_hypertext_text);
+		    free(SVG_hypertext_text);
+		    SVG_hypertext_text = NULL;
+		} else {
+		    fprintf(gpoutfile, "><title>%s_plot_%d%s</title>\n", name,SVG_plotno,panel);
+		}
 		SVG_LineType = LT_UNDEFINED; /* Force a new group on next stroke */
 		break;
 
@@ -2027,7 +2033,7 @@ SVG_path(int p)
 TERM_PUBLIC void
 SVG_hypertext( int type, const char *text )
 {
-    if (type != TERM_HYPERTEXT_TOOLTIP)
+    if (type != TERM_HYPERTEXT_TOOLTIP && type != TERM_HYPERTEXT_TITLE)
 	return;
 
     free(SVG_hypertext_text);

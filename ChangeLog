@@ -1,3 +1,9 @@
+2013-03-29  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/graphics.c src/term_api.h term/svg.trm:
+	Use actual plot title as the <title> attribute of svg plot elements.
+	If there is no plot title, use name_plotno_panelno as before.
+
 2013-03-21  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/plot2d.c src/misc.c (lp_parse):  The "fillcolor|fc" keyword
