@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.772 2013/03/12 18:06:57 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.773 2013/03/14 19:40:18 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -5518,9 +5518,15 @@ Ffigure_mapcontours
 ?plot frequency
 ?smooth frequency
 ?frequency
+=histogram
  The `frequency` option makes the data monotonic in x; points with the same
- x-value are replaced by a single point having the summed y-values.  The
- resulting points are then connected by straight line segments.
+ x-value are replaced by a single point having the summed y-values.
+ To plot a histogram of the number of data values in equal size bins,
+ set the y-value to 1.0 so that the sum is a count of occurances in that bin:
+ Example:
+      binwidth = <something>  # set width of x values in each bin
+      bin(val) = binwidth * int(val/binwidth)
+      plot "datafile" using (bin(column(1))):(1.0) smooth frequency
  See also
 ^ <a href="http://www.gnuplot.info/demo/smooth.html">
  smooth.dem

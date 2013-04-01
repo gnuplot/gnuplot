@@ -10,6 +10,10 @@
 
 	* src/plot3d.c:  Incomplete initiailization of sample range variable.
 
+	* src/plot2d.c docs/gnuplot.doc:  Provide an indexed example of using 
+	"smooth frequency" to generate a histogram.  Do not let this plot mode 
+	override the user's data style.
+
 2013-03-29  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c src/term_api.h term/svg.trm:
