@@ -1,3 +1,11 @@
+2013-04-01  Christoph Bersch  <cbersch@users.sf.net>
+
+	* term/post.trm: Add support for /FlateDecode compression of images.
+	The image is created as a PNG image using either the libgd or libcairo
+	library depending on which (if either) is present in the current build
+	of gnuplot.  The /FlateDecode method is only used if the terminal option
+	"level3" is given to "set term post".
+
 2013-03-29  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c src/term_api.h term/svg.trm:
