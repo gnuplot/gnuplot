@@ -6,6 +6,10 @@
 	of gnuplot.  The /FlateDecode method is only used if the terminal option
 	"level3" is given to "set term post".
 
+2013-04-01  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/plot3d.c:  Incomplete initiailization of sample range variable.
+
 2013-03-29  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c src/term_api.h term/svg.trm:

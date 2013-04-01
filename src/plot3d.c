@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.206 2013/03/10 01:19:54 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.207 2013/03/14 19:40:18 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -1395,7 +1395,10 @@ eval_3dplots()
 		    /* or overwriting an existing variable x.  Maybe it should save   */
 		    /* and restore the pre-existing variable in this case?            */
 		    this_plot->sample_var = add_udv_by_name(c_dummy_var[0]);
-		    this_plot->sample_var->udv_undef = FALSE;
+		    if (this_plot->sample_var->udv_undef) {
+			this_plot->sample_var->udv_undef = FALSE;
+			Gcomplex(&(this_plot->sample_var->udv_value), 0.0, 0.0);
+		    }
 		}
 
 		/* for capture to key */
