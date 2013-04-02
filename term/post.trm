@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: post.trm,v 1.272 2012/12/17 05:32:42 sfeam Exp $
+ * $Id: post.trm,v 1.273 2013/04/01 19:36:28 sfeam Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -258,6 +258,7 @@ static void write_gradient_definition __PROTO((gradient_struct *gradient, int cn
 static void write_color_space __PROTO((t_sm_palette *palette));
 static void make_palette_formulae __PROTO((void));
 static void PS_make_header __PROTO((t_sm_palette *palette));
+static void PS_skip_image __PROTO((int bytes, int x0, int y0, int dx, int dy));
 #ifndef GNUPLOT_PS_DIR
 static void PS_dump_header_to_file __PROTO((char *name));
 #endif
@@ -1578,6 +1579,7 @@ PS_common_init(
 /Dashlength %g def\n\
 /Landscape %s def\n\
 /Level1 %s def\n\
+/Level3 %s def\n\
 /Rounded %s def\n\
 /ClipToBoundingBox %s def\n\
 /SuppressPDFMark false def\n\
@@ -1678,6 +1680,7 @@ end\n\
 	    ps_params->dash_length,	/* dash length */
 	    ps_params->psformat == PSTERM_LANDSCAPE ? "true" : "false",
 	    ps_params->level1 ? "true" : "false",
+	    ps_params->level3 ? "true" : "false",
 	    ps_params->rounded ? "true" : "false",
 	    ps_params->clipped ? "true" : "false",
 	    PS_LW*ps_params->linewidth_factor,	/* line width */
@@ -3812,24 +3815,18 @@ PS_image (unsigned int M, unsigned int N, coordval *image, gpiPoint *corner, t_i
      * and an indexed palette needs to be constructed.
      */
     if (five_operand_image) {
-
 	if (ps_params->level1) {
 	    print_five_operand_image(M, N, corner, color_mode, bits_per_component);
 	} else {
-	    fputs("InterpretLevel1 {\n"
-		  "  %% Construct a box instead of image\n"
-		  "  LTb\n", gppsfile);
-	    fprintf(gppsfile, "  %d %d M\n", corner[0].x, corner[0].y);
-	    fprintf(gppsfile, "  %d 0 V\n", (corner[1].x - corner[0].x));
-	    fprintf(gppsfile, "  0 %d V\n", (corner[1].y - corner[0].y));
-	    fprintf(gppsfile, "  %d 0 V\n", -(corner[1].x - corner[0].x));
-	    fprintf(gppsfile, "  %d %d L\n", corner[0].x, corner[0].y);
-	    fputs("  40 -110 R\n"
-		  "  (PS level 2 image) Lshow\n"
-		  "  % Read data but ignore it\n", gppsfile);
-	    fprintf(gppsfile, "  /imagebuf %d string def\n", num_encoded_bytes);
-	    fputs("  currentfile imagebuf readstring\n"
-		  "} {\n", gppsfile);
+	    fputs("InterpretLevel1 ", gppsfile);
+	    if (ps_params->level3)
+		fputs(" InterpretLevel3 not or ", gppsfile);
+	    fputs("{\n", gppsfile);
+	    PS_skip_image(num_encoded_bytes,
+			  corner[0].x, corner[0].y,
+			  corner[1].x - corner[0].x,
+			  corner[1].y - corner[0].y);
+	    fputs("} {\n", gppsfile);
 	    print_five_operand_image(M, N, corner, color_mode, bits_per_component);
 	    fputs("} ifelse\n", gppsfile);
 	}
@@ -3841,19 +3838,14 @@ PS_image (unsigned int M, unsigned int N, coordval *image, gpiPoint *corner, t_i
 	unsigned short i_tuple;
 	double fact = 1.0 / (double)(max_colors-1);
 	if (!ps_params->level1) {
-	    fputs("InterpretLevel1 {\n"
-		  "  %% Construct a box instead of image\n"
-		  "  LTb\n", gppsfile);
-	    fprintf(gppsfile, "  %d %d M\n", corner[0].x, corner[0].y);
-	    fprintf(gppsfile, "  %d 0 V\n", (corner[1].x - corner[0].x));
-	    fprintf(gppsfile, "  0 %d V\n", (corner[1].y - corner[0].y));
-	    fprintf(gppsfile, "  %d 0 V\n", -(corner[1].x - corner[0].x));
-	    fprintf(gppsfile, "  %d %d L\n", corner[0].x, corner[0].y);
-	    fprintf(gppsfile, "  40 -110 R\n"
-		    "  (PS level 2 image) Lshow\n"
-		    "  %% Read data but ignore it\n"
-		    "  /imagebuf %d string def\n"
-		    "  currentfile imagebuf readstring\n", num_encoded_bytes);
+	    fputs("InterpretLevel1 ", gppsfile);
+	    if (ps_params->level3)
+		fputs(" InterpretLevel3 not or ", gppsfile);
+	    fputs("{\n", gppsfile);
+	    PS_skip_image(num_encoded_bytes,
+			  corner[0].x, corner[0].y,
+			  corner[1].x - corner[0].x,
+			  corner[1].y - corner[0].y);
 	    fputs("} {\n", gppsfile);
 	}
 	fputs("gsave\n", gppsfile);
@@ -3905,15 +3897,42 @@ PS_image (unsigned int M, unsigned int N, coordval *image, gpiPoint *corner, t_i
 
     if (ps_params->level1)
 	fputs("\ngrestore\n", gppsfile);
-    else
-	fputs("\nInterpretLevel1 not {\n"
-	      "  grestore\n"
-	      "} if\n", gppsfile);
+    else {
+	fputs("\nInterpretLevel1 not ", gppsfile);
+	if (ps_params->level3)
+	    fputs("InterpretLevel3 and ", gppsfile);
+        fputs("{\n  grestore\n} if\n", gppsfile);
+    }
     fputs("grestore\n", gppsfile);
     fputs("%%%%EndImage\n", gppsfile);
     free(encoded_image);
 
     return;
+}
+
+/* Skip the following image and draw a box instead. */
+static void
+PS_skip_image(int bytes, int x0, int y0, int dx, int dy) {
+    fputs("  %% Construct a box instead of image\n"
+	  "  LTb\n", gppsfile);
+    fprintf(gppsfile, "  %d %d M\n", x0, y0);
+    fprintf(gppsfile, "  %d 0 V\n", dx);
+    fprintf(gppsfile, "  0 %d V\n", dy);
+    fprintf(gppsfile, "  %d 0 V\n", -dx);
+    fprintf(gppsfile, "  %d %d L\n", x0, y0);
+    fputs("  40 -110 R\n", gppsfile);
+    fprintf(gppsfile, "  (PS level %d image) Lshow\n", ps_params->level3 ? 3 : 2);
+    fputs("  % Read data but ignore it\n", gppsfile);
+    if (bytes > 65535) {
+	/* this is the usual string length limit for Level 1 interpreters. */
+	fputs("  /imagebuf 65535 string def\n", gppsfile);
+	fprintf(gppsfile, "  /imagebuf_rest %d string def\n", bytes % 65535);
+	fprintf(gppsfile, "   1 1 %d { pop currentfile imagebuf readstring } for\n", bytes / 65535);
+	fputs("  currentfile imagebuf_rest readstring\n", gppsfile);
+    } else {
+	fprintf(gppsfile, "  /imagebuf %d string def\n", bytes);
+	fputs("  currentfile imagebuf readstring\n", gppsfile);
+    }
 }
 
 

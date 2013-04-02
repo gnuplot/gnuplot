@@ -1,3 +1,10 @@
+2013-04-02  Christoph Bersch  <cbersch@users.sf.net>
+
+	* term/post.trm term/PostScript/prologue.ps: Revise the code embedded
+	to skip Level2 PostScript features if /Level1 is set to true in the
+	header records at the top of an output *.ps or *.eps file.  The old
+	version failed if a level 2 image > 64kBytes was encountered.
+
 2013-04-01  Christoph Bersch  <cbersch@users.sf.net>
 
 	* term/post.trm: Add support for /FlateDecode compression of images.
