@@ -1,3 +1,8 @@
+2013-04-04  Shigeharu Takeno  <shige@iee.niit.ac.jp>
+
+	* docs/gnuplot-ja.doc, docs/term-ja.diff:
+	Sync with English documentation (rev.1.774)
+
 2013-04-04  Dima Kogan  <dima@secretsauce.net>
 
 	* src/axis.h src/axis.c src/plot2d.c src/plot3d.c:
