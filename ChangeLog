@@ -1,3 +1,9 @@
+2013-04-04  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/wxterminal/wxt_gui.cpp (wxtPanel::RaiseConsoleWindow),
+	src/wxterminal/wxt_gui.h: Implement space-raises-console for 
+	Windows console mode gnuplot.
+
 2013-04-04  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* docs/gnuplot-ja.doc, docs/term-ja.diff:

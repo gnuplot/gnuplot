@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.cpp,v 1.108 2013/02/19 05:30:38 sfeam Exp $
+ * $Id: wxt_gui.cpp,v 1.109 2013/02/20 05:25:11 sfeam Exp $
  */
 
 /* GNUPLOT - wxt_gui.cpp */
@@ -1416,11 +1416,19 @@ void wxtPanel::RaiseConsoleWindow()
 	}
 #endif /* USE_GTK */
 
-#if defined(_Windows) && !defined(WGP_CONSOLE)
-	/* Make sure the text window is visible: */
-	ShowWindow(textwin.hWndParent, SW_SHOW);
-	/* and activate it (--> Keyboard focus goes there */
-	BringWindowToTop(textwin.hWndParent);
+#ifdef _Windows
+	HWND console = NULL;
+#ifdef WGP_CONSOLE
+	console = GetConsoleWindow();
+#else
+	console = textwin.hWndParent;
+#endif
+	if (console != NULL) {
+		/* Make sure the text window is visible: */
+		ShowWindow(console, SW_SHOW);
+		/* and activate it --> Keyboard focus goes there */
+		BringWindowToTop(console);
+	}
 #endif /* _Windows */
 
 #ifdef OS2
