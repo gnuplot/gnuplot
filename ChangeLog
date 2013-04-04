@@ -1,3 +1,9 @@
+2013-04-04  Dima Kogan  <dima@secretsauce.net>
+
+	* src/axis.h src/axis.c src/plot2d.c src/plot3d.c:
+	Restore the original state of the "reverse" autoscaling flag when
+	refreshing (as opposed to replotting).
+
 2013-04-04  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/plot.c (main): Restore a code snippet for the Windows platform

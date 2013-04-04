@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.292 2013/03/22 03:48:55 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.293 2013/04/01 22:15:14 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -318,9 +318,14 @@ refresh_bounds(struct curve_points *first_plot, int nplots)
 	}
     }
 
-    /* Make sure the bounds are reasonable, and tweak them if they aren't */
     this_plot = first_plot;
     for (iplot = 0;  iplot < nplots; iplot++, this_plot = this_plot->next) {
+
+	/* handle 'reverse' ranges */
+	axis_revert_range( this_plot->x_axis );
+	axis_revert_range( this_plot->y_axis );
+
+	/* Make sure the bounds are reasonable, and tweak them if they aren't */
 	axis_checked_extend_empty_range(this_plot->x_axis, NULL);
 	axis_checked_extend_empty_range(this_plot->y_axis, NULL);
     }
