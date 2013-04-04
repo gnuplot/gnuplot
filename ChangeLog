@@ -1,3 +1,9 @@
+2013-04-04  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/plot.c (main): Restore a code snippet for the Windows platform
+	which got removed by accident on Feb 3rd. Fixes -persist mode on
+	Windows.
+
 2013-04-02  Christoph Bersch  <cbersch@users.sf.net>
 
 	* term/post.trm term/PostScript/prologue.ps: Revise the code embedded
