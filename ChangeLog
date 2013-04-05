@@ -1,3 +1,18 @@
+2013-04-05  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/gp_time.h term/js/gnuplot_mouse.js term/js/gnuplot_svg.js:
+	Change zero point of time coordinates to the unix epoch boundary
+	1-Jan-1970.  Previous to this change gnuplot used a zero point of
+	1-Jan-2000, which caused various user-visible problems when times
+	were input or manipulated as raw seconds.
+	Reversion to the previous choice of epoch boundary can be done by
+	replacing a single #if (0) in gp_time.h and reverting the
+	corresponding time calculation in the javascript files.
+
+	* src/mouse.c src/time.c docs/gnuplot.doc:  Remove unused code
+	and comments specific to the older use of a private epoch 
+	boundary.
+
 2013-04-04  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/wxterminal/wxt_gui.cpp (wxtPanel::RaiseConsoleWindow),
@@ -38,7 +53,7 @@
 
 2013-04-01  Ethan A Merritt  <merritt@u.washington.edu>
 
-	* src/plot3d.c:  Incomplete initiailization of sample range variable.
+	* src/plot3d.c:  Incomplete initialization of sample range variable.
 
 	* src/plot2d.c docs/gnuplot.doc:  Provide an indexed example of using 
 	"smooth frequency" to generate a histogram.  Do not let this plot mode 

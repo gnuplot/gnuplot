@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.773 2013/03/14 19:40:18 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.774 2013/04/01 22:15:14 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -484,7 +484,7 @@ C
  If one (or more) axis is timeseries, the appropriate coordinate should
  be given as a quoted time string according to the `timefmt` format string.
  See `set xdata` and `set timefmt`.  `Gnuplot` will also accept an integer
- expression, which will be interpreted as seconds from 1 January 2000.
+ expression, which will be interpreted as seconds relative to 1 January 1970.
 2 Datastrings
 ?datastrings
  Data files may contain string data consisting of either an arbitrary string
@@ -828,7 +828,7 @@ C
 ^<tr>    <td>strstrt("string","key")</td>    <td>strings</td>    <td>int index of first character of substring "key"</td></tr>
 ^<tr>    <td>substr("string",beg,end)</td>    <td>multiple</td>    <td>string "string"[beg:end]</td></tr>
 ^<tr>    <td>strftime("timeformat",t)</td>    <td>any</td>    <td>string result from applying gnuplot's time parser</td></tr>
-^<tr>    <td>strptime("timeformat",s)</td>    <td>string</td>    <td>seconds since year 2000 as given in string s</td></tr>
+^<tr>    <td>strptime("timeformat",s)</td>    <td>string</td>    <td>seconds since year 1970 as given in string s</td></tr>
 ^<tr>    <td>system("command")</td>    <td>string</td>    <td>string containing output stream of shell command</td></tr>
 ^<tr>    <td>word("string",n)</td>    <td>string, int</td>    <td>returns the nth word in "string"</td></tr>
 ^<tr>    <td>words("string")</td>    <td>string</td>    <td>returns the number of words in "string"</td></tr>
@@ -1290,15 +1290,15 @@ C marker below is used to signal this to doc2html:
 #strftime("timeformat",t) & any & string result from applying gnuplot's time parser \\
 %strftime("timeformat",t)@any@string result from applying gnuplot's time parser
  `strftime("timeformat",t)` applies the timeformat specifiers to the time t
- given in seconds since the year 2000.
+ given in seconds since the year 1970.
  See `time_specifiers` and `strptime`.
 4 strptime
 ?expressions functions strptime
 ?strptime
-#strptime("timeformat",s) & string & seconds since year 2000 as given in string s \\
-%strptime("timeformat",s)@string@seconds since year 2000 as given in string s
+#strptime("timeformat",s) & string & seconds since year 1970 as given in string s \\
+%strptime("timeformat",s)@string@seconds since year 1970 as given in string s
  `strptime("timeformat",s)` reads the time from the string s using the
- timeformat specifiers and converts it into seconds since the year 2000.
+ timeformat specifiers and converts it into seconds since the year 1970.
  See `time_specifiers` and `strftime`.
 4 system
 ?expressions functions system
@@ -1406,14 +1406,14 @@ C marker below is used to signal this to doc2html:
 #tm\_hour(x) & int & the hour \\
 %tm_hour(x)@int@the hour
  The `tm_hour` function interprets its argument as a time, in seconds from
- 1 Jan 2000.  It returns the hour (an integer in the range 0--23) as a real.
+ 1 Jan 1970.  It returns the hour (an integer in the range 0--23) as a real.
 4 tm_mday
 ?expressions tm_mday
 ?tm_mday
 #tm\_mday(x) & int & the day of the month \\
 %tm_mday(x)@int@the day of the month
  The `tm_mday` function interprets its argument as a time, in seconds from
- 1 Jan 2000.  It returns the day of the month (an integer in the range 1--31)
+ 1 Jan 1970.  It returns the day of the month (an integer in the range 1--31)
  as a real.
 4 tm_min
 ?expressions tm_min
@@ -1421,28 +1421,28 @@ C marker below is used to signal this to doc2html:
 #tm\_min(x) & int & the minute \\
 %tm_min(x)@int@the minute
  The `tm_min` function interprets its argument as a time, in seconds from
- 1 Jan 2000.  It returns the minute (an integer in the range 0--59) as a real.
+ 1 Jan 1970.  It returns the minute (an integer in the range 0--59) as a real.
 4 tm_mon
 ?expressions tm_mon
 ?tm_mon
 #tm\_mon(x) & int & the month \\
 %tm_mon(x)@int@the month
  The `tm_mon` function interprets its argument as a time, in seconds from
- 1 Jan 2000.  It returns the month (an integer in the range 0--11) as a real.
+ 1 Jan 1970.  It returns the month (an integer in the range 0--11) as a real.
 4 tm_sec
 ?expressions tm_sec
 ?tm_sec
 #tm\_sec(x) & int & the second \\
 %tm_sec(x)@int@the second
  The `tm_sec` function interprets its argument as a time, in seconds from
- 1 Jan 2000.  It returns the second (an integer in the range 0--59) as a real.
+ 1 Jan 1970.  It returns the second (an integer in the range 0--59) as a real.
 4 tm_wday
 ?expressions tm_wday
 ?tm_wday
 #tm\_wday(x) & int & the day of the week \\
 %tm_wday(x)@int@the day of the week
  The `tm_wday` function interprets its argument as a time, in seconds from
- 1 Jan 2000.  It returns the day of the week (an integer in the range 0--6) as
+ 1 Jan 1970.  It returns the day of the week (an integer in the range 0--6) as
  a real.
 4 tm_yday
 ?expressions tm_yday
@@ -1450,7 +1450,7 @@ C marker below is used to signal this to doc2html:
 #tm\_yday(x) & int & the day of the year \\
 %tm_yday(x)@int@the day of the year
  The `tm_yday` function interprets its argument as a time, in seconds from
- 1 Jan 2000.  It returns the day of the year (an integer in the range 1--366)
+ 1 Jan 1970.  It returns the day of the year (an integer in the range 1--366)
  as a real.
 4 tm_year
 ?expressions tm_year
@@ -1458,7 +1458,7 @@ C marker below is used to signal this to doc2html:
 #tm\_year(x) & int & the year \\
 %tm_year(x)@int@the year
  The `tm_year` function interprets its argument as a time, in seconds from
- 1 Jan 2000.  It returns the year (an integer) as a real.
+ 1 Jan 1970.  It returns the year (an integer) as a real.
 4 time
 ?expressions time
 ?time
@@ -1469,7 +1469,7 @@ C marker below is used to signal this to doc2html:
  in conjunction with `timecolumn` to generate relative time/date plots. 
  The type of the argument determines what is returned. If the argument is an
  integer, time() returns the current time as an integer, in seconds from 
- 1 Jan 2000. If the argument is real (or complex), the result is real as well.
+ 1 Jan 1970. If the argument is real (or complex), the result is real as well.
  If the argument is a string, it is assumed to be a format string, 
  and it is passed to `strftime` to provide a formatted time string.
 4 valid
@@ -2703,7 +2703,7 @@ Ffigure_newsyntax
  etc.
 
  Internally all times and dates are converted to the number of seconds from
- the year 2000.  The command `set timefmt` defines the format for all inputs:
+ the year 1970.  The command `set timefmt` defines the format for all inputs:
  data files, ranges, tics, label positions---in short, anything that accepts a
  data value must receive it in this format.  Since only one input format can
  be in force at a given time, all time/date quantities being input at the same
@@ -2737,7 +2737,7 @@ Ffigure_newsyntax
  used in conjunction with `timecolumn` to generate relative time/date plots.
  The type of the argument determines what is returned. If the argument is an
  integer, `time` returns the current time as an integer, in seconds from 
- 1 Jan 2000. If the argument is real (or complex), the result is real as well.
+ 1 Jan 1970. If the argument is real (or complex), the result is real as well.
  The precision of the fractional (sub-second) part depends on your operating
  system. If the argument is a string, it is assumed to be a format string, 
  and it is passed to `strftime` to provide a formatted time/date string.
@@ -8204,7 +8204,7 @@ Ffigure_missing
        %p           "am" or "pm"
        %r           shorthand for "%I:%M:%S %p" (only output)
        %R           shorthand for "%H:%M" (only output)
-       %s           number of seconds since the start of year 2000
+       %s           number of seconds since the start of year 1970
        %S           second, integer 0--60 on output, (double) on input
        %T           shorthand for "%H:%M:%S" (only output)
        %U           week of the year (week starts on Sunday)
@@ -8234,7 +8234,7 @@ Ffigure_missing
 #\verb@%r@ & shorthand for \verb@"%I:%M:%S %p"@ (only output)\\
 #\verb@%R@ & shorthand for \verb@%H:%M"@ (only output)\\
 #\verb@%S@ & second, integer 0--60 on output, (double) on input\\
-#\verb@%s@ & number of seconds since start of year 2000 \\
+#\verb@%s@ & number of seconds since start of year 1970 \\
 #\verb@%T@ & shorthand for \verb@"%H:%M:%S"@ (only output)\\
 #\verb@%U@ & week of the year (week starts on Sunday) \\
 #\verb@%w@ & day of the week, 0--6 (Sunday = 0) \\
@@ -8262,7 +8262,7 @@ Ffigure_missing
 %%r@shorthand for "%I:%M:%S %p" (only output)
 %%R@shorthand for %H:%M" (only output)
 %%S@second, integer 0--60 on output, (double) on input
-%%s@number of seconds since start of year 2000
+%%s@number of seconds since start of year 1970
 %%T@shorthand for "%H:%M:%S" (only output)
 %%U@week of the year (week starts on Sunday)
 %%w@day of the week, 0--6 (Sunday = 0)
@@ -8300,7 +8300,7 @@ Ffigure_missing
 ^<tr>    <td><tt>%r</tt></td>    <td>shorthand for <tt>%I:%M:%S %p</tt> (only output)</td></tr>
 ^<tr>    <td><tt>%R</tt></td>    <td>shorthand for <tt>%H:%M</tt> (only output)</td></tr>
 ^<tr>    <td><tt>%S</tt></td>    <td>second, integer 0&ndash;60 on output, (double) on input</td></tr>
-^<tr>    <td><tt>%s</tt></td>    <td>number of seconds since start of year 2000</td></tr>
+^<tr>    <td><tt>%s</tt></td>    <td>number of seconds since start of year 1970</td></tr>
 ^<tr>    <td><tt>%T</tt></td>    <td>shorthand for <tt>%H:%M:%S</tt> (only output)</td></tr>
 ^<tr>    <td><tt>%U</tt></td>    <td>week of the year (week starts on Sunday)</td></tr>
 ^<tr>    <td><tt>%w</tt></td>    <td>day of the week, 0&ndash;6 (Sunday = 0)</td></tr>

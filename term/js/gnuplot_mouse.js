@@ -1,7 +1,7 @@
 /*
- * $Id: gnuplot_mouse.js,v 1.19 2012/05/21 23:15:18 sfeam Exp $
+ * $Id: gnuplot_mouse.js,v 1.20 2012/07/24 03:47:51 sfeam Exp $
  */
-    gnuplot.mouse_version = "23 July 2012";
+    gnuplot.mouse_version = " 5 April 2013";
 
 // Mousing code for use with gnuplot's 'canvas' terminal driver.
 // The functions defined here assume that the javascript plot produced by
@@ -256,7 +256,8 @@ gnuplot.datafmt = function (x)
     return gnuplot.convert_to_DMS(x);
   }
 
-  gnuplot.axisdate.setTime(1000. * (x + 946684800));
+  // gnuplot 4.6 used (x + 946684800)
+  gnuplot.axisdate.setTime(1000. * x);
 
   if (gnuplot.plot_timeaxis_x == "DateTime") {
     return gnuplot.axisdate.toUTCString();

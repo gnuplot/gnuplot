@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: time.c,v 1.23 2010/07/01 16:50:33 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: time.c,v 1.24 2011/06/17 06:17:22 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - time.c */
@@ -52,66 +52,7 @@ static char *RCSid() { return RCSid("$Id: time.c,v 1.23 2010/07/01 16:50:33 sfea
 #include "util.h"
 #include "variable.h"
 
-/* build as a standalone test */
-
-#ifdef TEST_TIME
-
-# ifdef HAVE_SYS_TIMEB_H
-#  include <sys/timeb.h>
-# else
-/* declare struct timeb */
-extern int ftime(struct timeb *);
-# endif				/* !HAVE_SYS_TIMEB_H */
-
-# define int_error(x,y) fprintf(stderr, "Error: " y "\n")
-# define int_warn(x,y) fprintf(stderr, "Warn: " y "\n")
-
-/* need (only) these from plot.h */
-# define ZERO_YEAR	2000
-/* 1st jan, 2000 is a Saturday (cal 1 2000 on unix) */
-# define JAN_FIRST_WDAY 6
-
-/*  zero gnuplot (2000) - zero system (1970) */
-# define SEC_OFFS_SYS	946684800.0
-
-/* avg, incl. leap year */
-# define YEAR_SEC	31557600.0
-
-/* YEAR_SEC / 12 */
-# define MON_SEC		2629800.0
-
-# define WEEK_SEC	604800.0
-# define DAY_SEC		86400.0
-
-/* HBB 990826: moved definitions up here, to avoid 'extern' where
- * it is neither wanted nor needed */
-char *abbrev_month_names[] =
-{ "jan", "feb", "mar", "apr", "may", "jun", "jul",
-  "aug", "sep", "oct", "nov", "dec"
-};
-
-char *full_month_names[] =
-{ "January", "February", "March", "April", "May",
-  "June", "July", "August", "September", "October",
-  "November", "December"
-};
-
-char *abbrev_day_names[] =
-{ "sun", "mon", "tue", "wed", "thu", "fri", "sat"};
-
-char *full_day_names[] =
-{ "Sunday", "Monday", "Tuesday", "Wednesday",
-  "Thursday", "Friday", "Saturday"
-};
-
-#else /* TEST_TIME */
-
-/*  # include "setshow.h" */		/* for month names etc */
-
-#endif /* TEST_TIME */
-
 static char *read_int __PROTO((char *s, int nr, int *d));
-
 
 static char *
 read_int(char *s, int nr, int *d)
@@ -660,7 +601,7 @@ double
 gtimegm(struct tm *tm)
 {
     int i;
-    /* returns sec from year ZERO_YEAR, defined in plot.h */
+    /* returns sec from year ZERO_YEAR, defined in gp_time.h */
     double dsec = 0.;
 
     if (tm->tm_year < ZERO_YEAR) {
@@ -855,37 +796,3 @@ gstrptime(char *s, char *fmt, struct tm *tm)
 
 
 #endif /* USE_SYSTEM_TIME */
-
-
-#ifdef TEST_TIME
-
-/* either print current time using supplied format, or read
- * supplied time using supplied format
- */
-
-
-int
-main(int argc, char *argv[])
-{
-    char output[80];
-
-    if (argc < 2) {
-	fputs("usage : test 'format' ['time']\n", stderr);
-	exit(EXIT_FAILURE);
-    }
-    if (argc == 2) {
-	struct timeb now;
-	struct tm *tm;
-	ftime(&now);
-	tm = gmtime(&now.time);
-	xstrftime(output, 80, argv[1], tm, 0.);
-	puts(output);
-    } else {
-	struct tm tm;
-	gstrptime(argv[2], argv[1], &tm);
-	puts(asctime(&tm));
-    }
-    exit(EXIT_SUCCESS);
-}
-
-#endif /* TEST_TIME */
