@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.774 2013/04/01 22:15:14 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.775 2013/04/05 18:36:53 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -6847,7 +6847,7 @@ Ffigure_mapcontours
 
  Syntax:
        set autoscale {<axes>{|min|max|fixmin|fixmax|fix} | fix | keepfix}
-       set autoscale noextend
+       set autoscale {<axes>} noextend
        unset autoscale {<axes>}
        show autoscale
 
@@ -6856,13 +6856,19 @@ Ffigure_mapcontours
  autoscale just the minimum or maximum of that axis.  If no keyword is given,
  all axes are autoscaled.
 
- A keyword with `fixmin`, `fixmax` or `fix` appended tells gnuplot to disable
- extension of the axis range to the next tic mark position, for autoscaled
- axes using equidistant tics; `set autoscale fix` sets this for all axes.
- Command `set autoscale keepfix` autoscales all axes while keeping the fix
- settings.
+=noextend
+ By default autoscaling sets the axis range limits to the nearest tic label
+ position that includes all the plot data.  keywords `fixmin`, `fixmax`, `fix`
+ or `noextend` tell gnuplot to disable extension of the axis range to the next
+ tic mark position. In this case the axis range limit exactly matches the
+ coordinate of the most extreme data point.  `set autoscale noextend` is a
+ synonym for `set autoscale fix`.  Range extension for a single axis can also
+ be disabled by appending the `noextend` keyword to the corresponding range
+ command, e.g.
+      set yrange [0:*] noextend
 
- `set autoscale noextend` is a synonym for `set autoscale fix`.
+ `set autoscale keepfix` autoscales all axes while leaving the fix settings
+ unchanged.
 
  When autoscaling, the axis range is automatically computed and the dependent
  axis (y for a `plot` and z for `splot`) is scaled to include the range of the

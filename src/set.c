@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.386 2013/01/25 05:56:07 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.387 2013/03/12 18:06:58 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -4742,19 +4742,24 @@ set_range(AXIS_INDEX axis)
 	if (!equals(c_token,"]"))
 	    int_error(c_token, "expecting ']'");
 	c_token++;
-	if (almost_equals(c_token, "rev$erse")) {
-	    ++c_token;
-	    axis_array[axis].range_is_reverted = TRUE;
-	} else if (almost_equals(c_token, "norev$erse")) {
-	    ++c_token;
-	    axis_array[axis].range_is_reverted = FALSE;
-	}
-	if (almost_equals(c_token, "wr$iteback")) {
-	    ++c_token;
-	    axis_array[axis].range_flags |= RANGE_WRITEBACK;
-	} else if (almost_equals(c_token, "nowri$teback")) {
-	    ++c_token;
-	    axis_array[axis].range_flags &= ~RANGE_WRITEBACK;
+	while (!END_OF_COMMAND) {
+	    if (almost_equals(c_token, "rev$erse")) {
+		++c_token;
+		axis_array[axis].range_is_reverted = TRUE;
+	    } else if (almost_equals(c_token, "norev$erse")) {
+		++c_token;
+		axis_array[axis].range_is_reverted = FALSE;
+	    } else if (almost_equals(c_token, "wr$iteback")) {
+		++c_token;
+		axis_array[axis].range_flags |= RANGE_WRITEBACK;
+	    } else if (almost_equals(c_token, "nowri$teback")) {
+		++c_token;
+		axis_array[axis].range_flags &= ~RANGE_WRITEBACK;
+	    } else if (almost_equals(c_token, "noext$end")) {
+		++c_token;
+		axis_array[axis].set_autoscale |= AUTOSCALE_FIXMIN | AUTOSCALE_FIXMAX;
+	    } else
+		int_error(c_token,"unrecognized option");
 	}
     }
 

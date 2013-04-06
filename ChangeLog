@@ -1,3 +1,8 @@
+2013-04-06  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/set.c (set_range): Add a loop to parse axis range options
+	so that there is no order dependence.  Add "noextend" option.
+
 2013-04-05  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/gp_time.h term/js/gnuplot_mouse.js term/js/gnuplot_svg.js:
