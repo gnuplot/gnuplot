@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.775 2013/04/05 18:36:53 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.776 2013/04/06 23:05:37 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -6847,7 +6847,7 @@ Ffigure_mapcontours
 
  Syntax:
        set autoscale {<axes>{|min|max|fixmin|fixmax|fix} | fix | keepfix}
-       set autoscale {<axes>} noextend
+       set autoscale noextend
        unset autoscale {<axes>}
        show autoscale
 
@@ -6862,8 +6862,8 @@ Ffigure_mapcontours
  or `noextend` tell gnuplot to disable extension of the axis range to the next
  tic mark position. In this case the axis range limit exactly matches the
  coordinate of the most extreme data point.  `set autoscale noextend` is a
- synonym for `set autoscale fix`.  Range extension for a single axis can also
- be disabled by appending the `noextend` keyword to the corresponding range
+ synonym for `set autoscale fix`.  Range extension for a single axis can be 
+ disabled by appending the `noextend` keyword to the corresponding range
  command, e.g.
       set yrange [0:*] noextend
 
