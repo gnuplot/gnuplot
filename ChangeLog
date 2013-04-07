@@ -1,3 +1,15 @@
+2013-04-07  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/axis.c (make_tics):  Test for an autoscaled axis that is enabled
+	but has no corresponding data (e.g. "set x2tics; plot ... axes x1y1").
+	In this case warn and skip tick generation rather than stopping with an
+	error.
+
+	* src/graphics.c (plot_image_or_update_axes)
+	src/plot2d.c (refresh_bounds):
+	Refresh of image plots tested only for autoscaling on x; now we also
+	test for autoscaling on y.
+
 2013-04-06  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/set.c (set_range): Add a loop to parse axis range options
