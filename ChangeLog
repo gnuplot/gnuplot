@@ -10,6 +10,12 @@
 	Refresh of image plots tested only for autoscaling on x; now we also
 	test for autoscaling on y.
 
+	* src/axis.h: Do not add an extraneous factor of 1e-3 to the axis
+	limits of a refreshed plot.  Yes it prevents log-scale axes from
+	overflowing when zoomed out, but also it prevents the endpoint
+	values from being recognized as autoscaled.  A different fix is
+	needed for the overflowing log-scale axes.
+
 2013-04-06  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/set.c (set_range): Add a loop to parse axis range options

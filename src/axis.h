@@ -1,5 +1,5 @@
 /*
- * $Id: axis.h,v 1.81 2012/11/29 00:12:56 broeker Exp $
+ * $Id: axis.h,v 1.82 2013/04/04 20:34:20 sfeam Exp $
  *
  */
 
@@ -454,14 +454,11 @@ do {									\
 									\
     this->autoscale = this->set_autoscale;				\
     this->min = (infinite && (this->set_autoscale & AUTOSCALE_MIN))	\
-	? VERYLARGE*1e-3 : AXIS_LOG_VALUE(axis, this->set_min);		\
+	? VERYLARGE : AXIS_LOG_VALUE(axis, this->set_min);		\
     this->max = (infinite && (this->set_autoscale & AUTOSCALE_MAX))	\
-	? -VERYLARGE*1e-3 : AXIS_LOG_VALUE(axis, this->set_max);	\
+	? -VERYLARGE : AXIS_LOG_VALUE(axis, this->set_max);		\
     this->log_base = this->log ? log(this->base) : 0;			\
 } while(0)
-/* why multiply by 1e-3: if an already VERYLARGE x2 and y2 ranges are
-   calculated after zoom-out by mouse, then they would become even larger
-*/
 
 #define AXIS_UPDATE2D_REFRESH(axis)					\
 do {									\
