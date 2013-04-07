@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.112 2013/02/28 05:29:37 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.113 2013/04/04 20:34:19 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -607,7 +607,7 @@ make_tics(AXIS_INDEX axis, int guide)
     if (xr == 0)
 	return 1;	/* Anything will do, since we'll never use it */
     if (xr >= VERYLARGE)
-	int_error(NO_CARET,"%s axis range undefined or overflow",
+	int_warn(NO_CARET,"%s axis range undefined or overflow",
 		axis_defaults[axis].name);
     tic = quantize_normal_tics(xr, guide);
     /* FIXME HBB 20010831: disabling this might allow short log axis
@@ -877,6 +877,10 @@ gen_tics(AXIS_INDEX axis, tic_callback callback)
     if (! axis_array[axis].gridminor)
 	mgrd.l_type = LT_NODRAW;
 
+    /* EAM FIXME - This really shouldn't happen, but it triggers for instance */
+    /* if x2tics or y2tics are autoscaled but there is no corresponding data. */
+    if (axis_array[axis].min >= VERYLARGE || axis_array[axis].max <= -VERYLARGE)
+	return;
 
     if (def->def.user) {	/* user-defined tic entries */
 	struct ticmark *mark = def->def.user;
