@@ -16,6 +16,12 @@
 	values from being recognized as autoscaled.  A different fix is
 	needed for the overflowing log-scale axes.
 
+	* src/mouse.c (apply_zoom): Partial fix for the above problem.
+	If the x2 or y2 axis limits contain the magic value VERYLARGE,
+	the initial state of autoscaling, then don't try to interpret it
+	as an actual numerical value passed to "set x2range".
+	Bug #636.
+
 2013-04-06  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/set.c (set_range): Add a loop to parse axis range options
