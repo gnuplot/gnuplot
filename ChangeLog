@@ -1,8 +1,9 @@
 2013-04-08  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* configure.in src/term.h:  Remove gpic (minimal line art sent to groff)
-	and hp2623a (1980 era graphics terminal a.k.a. "the ET-head") from the
-	set of terminals configured in by default.
+	hp2623a (mid 1980s graphics terminal a.k.a. "the ET-head") and
+	hp2648 (1979 720x360 dot graphics terminal) from the set of terminals
+	configured in by default.
 
 2013-04-07  Ethan A Merritt  <merritt@u.washington.edu>
 
