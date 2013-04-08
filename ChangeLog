@@ -1,4 +1,10 @@
-2012-05-04  Bastian Maerkisch  <bmaerkisch@web.de>
+2013-04-08  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/graphics.c (plot_image_or_update_axes)
+	src/plot2d.c (refresh_bounds):  When refreshing images plots we must 
+	recheck range limits on both x and y.
+
+2013-04-07  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	Backports from 4.7 relevant for the Windows platform:
 

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.255.2.16 2013/03/14 19:40:33 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.255.2.17 2013/03/22 03:48:43 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -282,7 +282,7 @@ refresh_bounds(struct curve_points *first_plot, int nplots)
 	 * checks.  
 	 */
 	if (this_plot->plot_style == IMAGE || this_plot->plot_style == RGBIMAGE) {
-	    if (x_axis->set_autoscale)
+	    if (x_axis->set_autoscale || y_axis->set_autoscale)
 		plot_image_or_update_axes(this_plot,TRUE);
 	    continue;
 	}

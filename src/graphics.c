@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.379.2.15 2013/02/19 22:20:09 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.379.2.16 2013/03/10 18:24:00 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -6338,7 +6338,7 @@ plot_image_or_update_axes(void *plot, TBOOLEAN update_axes)
 
     if (update_axes) {
 	for (i=0; i < 4; i++) {
-	    coord_type dummy_type = INRANGE;
+	    coord_type dummy_type;
 	    double x,y;
 
 	    if (X_AXIS.log || Y_AXIS.log) {
@@ -6359,8 +6359,10 @@ plot_image_or_update_axes(void *plot, TBOOLEAN update_axes)
 	    }
 
 	    /* Update range and store value back into itself. */
+	    dummy_type = INRANGE;
 	    STORE_WITH_LOG_AND_UPDATE_RANGE(x, x, dummy_type, ((struct curve_points *)plot)->x_axis,
 				((struct curve_points *)plot)->noautoscale, NOOP, x = -VERYLARGE);
+	    dummy_type = INRANGE;
 	    STORE_WITH_LOG_AND_UPDATE_RANGE(y, y, dummy_type, ((struct curve_points *)plot)->y_axis,
 				((struct curve_points *)plot)->noautoscale, NOOP, y = -VERYLARGE);
 	}
