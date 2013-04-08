@@ -1,3 +1,8 @@
+2013-04-08  Dima Kogan  <dima@secretsauce.net>
+
+	* src/gplt_x11.c: Calculate window resizing based on gheight (plot only)
+	rather than height (full window).
+
 2013-04-08  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* configure.in src/term.h:  Remove gpic (minimal line art sent to groff)

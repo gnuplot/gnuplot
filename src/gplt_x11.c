@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.229 2013/01/05 23:15:57 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.230 2013/03/09 21:12:43 sfeam Exp $"); }
 #endif
 
 #define MOUSE_ALL_WINDOWS 1
@@ -586,7 +586,10 @@ static int gX = 100, gY = 100;
    plot->width and plot->height track the window size, but gW and gH do NOT.
    This allows the plot to be maximally scaled while preserving the aspect
    ratio.
-*/
+
+   gW, gH and plot->width, plot->gheight are just the plot; they do NOT include
+   the modeline at the bottom of the window. plot->height DOES include the
+   modeline */
 static unsigned int gW = 640, gH = 450; /* defaults must match those in x11.trm */
 static unsigned int gFlags = PSize;
 
@@ -1790,9 +1793,9 @@ record()
 		    scaled_vchar = (1.0/scale) * vchar;
 		    FPRINTF((stderr, "gplt_x11: preset default font to %s hchar = %d vchar = %d \n",
 			     default_font, scaled_hchar, scaled_vchar));
-		    gp_exec_event(GE_fontprops, plot->width, plot->height,
+		    gp_exec_event(GE_fontprops, plot->width, plot->gheight,
 				  scaled_hchar, scaled_vchar, 0);
-		    ymax = 4096.0 * (double)plot->height / (double)plot->width;
+		    ymax = 4096.0 * (double)plot->gheight / (double)plot->width;
 		}
 		return 1;
 	    }
@@ -1801,9 +1804,9 @@ record()
 		 We simply take the current window size as the plot size */
 
 		if (plot) {
-		  ymax = 4096.0 * (double)plot->height / (double)plot->width;
+		  ymax = 4096.0 * (double)plot->gheight / (double)plot->width;
 		  gW   = plot->width;
-		  gH   = plot->height;
+		  gH   = plot->gheight;
 		}
 		return 1;
 	    }
@@ -4306,7 +4309,7 @@ process_configure_notify_event(XEvent *event, TBOOLEAN isRetry )
 	      int scaled_hchar = (1.0/scale) * hchar;
 	      int scaled_vchar = (1.0/scale) * vchar;
 
-	      gp_exec_event(GE_fontprops, -plot->width, plot->height,
+	      gp_exec_event(GE_fontprops, -plot->width, plot->gheight,
 			    scaled_hchar, scaled_vchar, 0);
 
 	      if (replot_on_resize == yes)
