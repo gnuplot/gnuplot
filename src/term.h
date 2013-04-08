@@ -1,5 +1,5 @@
 /*
- * $Id: term.h,v 1.57 2013/02/23 01:38:49 sfeam Exp $
+ * $Id: term.h,v 1.58 2013/02/27 00:08:56 sfeam Exp $
  */
 
 /* GNUPLOT - term.h */
@@ -205,7 +205,7 @@
 /* # include "aed.trm" */
 
 /* gpic for groff */
-# include "gpic.trm"
+/* # include "gpic.trm" */
 
 /* REGIS graphics language */
 /* # include "regis.trm" */
@@ -270,8 +270,8 @@
 /* geographical info system */
 /* #include "grass.trm" */
 
-/* HP2623A and probably others */
-#include "hp26.trm"
+/* HP2623A "ET head" 1980 era graphics terminal */
+/* #include "hp26.trm" */
 
 /* HP2647 and 2648 */
 #include "hp2648.trm"
