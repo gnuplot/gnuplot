@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.776 2013/04/06 23:05:37 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.777 2013/04/06 23:08:40 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -203,13 +203,29 @@ C
 
 2 New features
 ?new-features
- This section lists major additions since version 4.6 and changes that may
- cause certain scripts written for earlier versions of gnuplot to behave
+ This section lists major additions introduced in this version and changes that
+ may cause certain scripts written for earlier versions of gnuplot to behave
  differently.
 
+ * Revised handling of input data containing NaN, inconsistent number of data
+ columns, or other unexpected content.  See Note under `missing` for examples
+ and figures.
+
+ * Time coordinates are stored internally as the number of seconds relative to
+ the standard unix epoch 1-Jan-1970.  Earlier versions of gnuplot used a
+ different epoch internally (1-Jan-2000). This change resolves inconsistencies
+ introduced whenever time in seconds was generated externally.  The epoch
+ convention used by a particular gnuplot installation can be determined using
+ the command `print strftime("%F",0)`.
+
+ * The `reverse` keyword of the `set [axis]range` command affects only
+ autoscaling. It does not invert or otherwise alter the meaning of a command
+ such as `set xrange [0:1]`.  If you want to reverse the direction of the
+ x axis in such a case, say instead `set xrange [1:0]`.
+ 
  * New coordinate system (Degrees, Minutes, Seconds). See `set xdata geographic`.
 
- * Command scripts may contain in-line data that is loaded into a named
+ * Command scripts may contain inline data that is loaded into a named
  data block for repeated plotting. See `inline data`.
  
  * Support for 32-bit Alpha channel + RGB color #AARRGGBB.  See `colorspec`.
@@ -226,19 +242,10 @@ C
  range.  This does not affect the overall range of the plot, only the range
  over which this function is sampled.  See `plot` and `piecewise.dem`.
 
- * Changed handling of NaN, inconsistent number of input data columns, or 
- other unexpected input data.  See the Note under `missing` for examples
- and figures.
-
  * `unset xrange` (and other axis ranges) restores the original default range.
 
  * `unset terminal` restores the original terminal of the gnuplot session.
 
- * The `reverse` keyword of the `set [axis]range` command affects only
- autoscaling. It does not invert or otherwise alter the meaning of a command
- such as `set xrange [0:1]`.  If you want to reverse the direction of the
- x axis in such a case, say instead `set xrange [1:0]`.
- 
  * The optional bandwidth for the kernel density smoothing option is taken from
  a keyword rather than a data column.  See `smooth kdensity`.
 
@@ -2066,7 +2073,8 @@ C ... and restart the table:
  newline or end-of-record characters.  A "point" is the datum extracted from
  a single record.  A "datablock" is a set of points from consecutive records,
  delimited by blank records.  A line, when referred to in the context of a
- data file, is a subset of a datablock.
+ data file, is a subset of a datablock.  Note that the term "datablock" may
+ also be used when refering to a named inline data block (see `datablock`).
 2 iteration
 ?iteration
 ?iterate
@@ -3691,7 +3699,7 @@ Ffigure_steps
 
  splot with vectors is supported only for `set mapping cartesian`.
 
- The keywords "with vectors" may be followed by an in-line arrow style
+ The keywords "with vectors" may be followed by an inline arrow style
  specifications, a reference to a predefined arrow style, or a request to read
  the index of the desired arrow style for each vector from a separate column.
  Note: If you choose "arrowstyle variable" it will fill in all arrow properties
@@ -4712,6 +4720,44 @@ Ffigure_mapcontours
 
  The optional parameter is ignored for single plot-window terminals, i.e. `pm`
  and `win`.
+2 merge
+?commands merge
+?merge
+ Syntax:
+       merge $DATABLOCK {format "format-specifier"}
+
+ The `merge` command extracts certain values from the preceding `plot` command
+ and stores them in a named data block. X coordinate values are extracted from
+ the those used by the first graph described by the plot command. If subsequent
+ graphs in the plot command do not share these same X coordinate values, it is
+ reported as an error. Y coordinate values are extracted from each graph in the
+ plot command. The resulting named data block holds a row of column headers 
+ taken from the graph titles, following by one row for each X coordinate value.
+ The data block holds one column of X coordinate values followed by one column
+ of the corresponding Y coordinate values for each graph in the plot.
+
+ Coordinate values are written using format "%10g" by default. A different
+ format specifier may be provided in the `merge` command.
+
+ Example:
+       plot 'file1.dat' using 1:2 title "A", \
+            'file2.dat' using 1:2:3 with labels title "B", \
+            'file3.dat' using 1:4:5 with points pointsize variable title "C"
+       merge $ABC
+       ... other commands ...
+       set key autotitle columnhead
+       plot for [yval=2:4] $ABC using 1:yval
+       set style data yerrorlines
+       plot $ABC using 1:(column("A")):(fabs(column("B")-column("A")))
+
+ The second plot, using values stored in the data block named $ABC, will contain
+ the three graphs reproducing the same y coordinates displayed in the original
+ plot command.  Note that other aspects of the original plot (individual point
+ labels in the second graph, point sizes in the third graph) are not maintained.
+
+ The third plot illustrates combining information drawn from two different files
+ within a single graph, i.e. column 2 from file1.dat and column 2 from file2.dat.
+ Note that this would not have been possible without a merge operation.
 2 pause
 ?commands pause
 ?pause
@@ -5394,6 +5440,9 @@ Ffigure_mapcontours
  other types of persistent variables.  The end-of-data delimiter (EOD in the
  example) may be any sequence of alphanumeric characters.
 
+ The `merge` command provides an alternative method of loading data into a named
+ data block.
+
  The storage associated with named data blocks can be released using `undefine`
  command. `undefine $*` frees all named data blocks at once.
 4 smooth
@@ -5606,7 +5655,7 @@ Ffigure_mapcontours
        plot 'filename' using 1:2, '' using 1:3
 
  The special filenames '+' and '++' are a mechanism to allow the full range of
- `using` specifiers and plot styles with in-line functions.  Normally a function
+ `using` specifiers and plot styles with inline functions.  Normally a function
  plot can only have a single y (or z) value associated with each sampled point.
  The pseudo-file '+' treats the sampled points as column 1, and allows
  additional column values to be specified via a `using` specification, just as
@@ -5809,7 +5858,7 @@ Ffigure_mapcontours
 ?using examples
  This creates a plot of the sum of the 2nd and 3rd data against the first:
  The format string specifies comma- rather than space-separated columns.
- The same result could be achieved by specifying `set datafile separator ","`.
+ The same result could be achieved by specifying `set datafile separator comma`.
        plot 'file' using 1:($2+$3) '%lf,%lf,%lf'
 
  In this example the data are read from the file "MyData" using a more
@@ -6505,7 +6554,7 @@ Ffigure_mapcontours
 ?refresh
  The `refresh` command is similar to `replot`, with two major differences.
  `refresh` reformats and redraws the current plot using the data already read
- in. This means that you can use `refresh` for plots with in-line data
+ in. This means that you can use `refresh` for plots with inline data
  (pseudo-device '-') and for plots from datafiles whose contents are volatile.
  You cannot use the `refresh` command to add new data to an existing plot.
 
@@ -7606,7 +7655,7 @@ Ffigure_missing
  are separated by whitespace.
 
  Syntax:
-       set datafile separator {whitespace | tab | comma | "<char>"}
+       set datafile separator {whitespace | tab | comma | "<chars>"}
 
  Examples:
        # Input file contains tab-separated fields
@@ -7614,6 +7663,9 @@ Ffigure_missing
 
        # Input file contains comma-separated values fields
        set datafile separator comma
+
+       # Input file contains fields separated by either * or |
+       set datafile separator "*|"
 4 set datafile commentschars
 ?set datafile commentschars
 ?commentschars
@@ -11353,7 +11405,7 @@ Ffigure_missing
  If an 3D data set is recognizable as a mesh (grid) then by default the program
  implicitly treats the plot style `with lines` as requesting a gridded surface.
  See `grid_data`.  The command `set surface explicit` suppresses this expansion,
- plotting only the individual lines described by separate data blocks in the
+ plotting only the individual lines described by separate datablocks in the
  input file.  A gridded surface can still be plotted by explicitly requesting
  splot `with surface`.
 3 table
@@ -13096,7 +13148,7 @@ Ffigure_missing
       STATS_outofrange        # number of records filtered out by range limits
       STATS_invalid           # number of invalid/incomplete/missing records
       STATS_blank             # number of blank lines in the file
-      STATS_blocks            # number of indexable data blocks in the file
+      STATS_blocks            # number of indexable datablocks in the file
       STATS_columns           # number of data columns in the first row of data
 
  The second set reports properties of the in-range data from a single column.
@@ -13288,7 +13340,7 @@ Ffigure_missing
  See `seeking-assistance`.
 
 2 known limitations
- It is not possible to use in-line data (e.g. plot '-' ...) inside the curly
+ It is not possible to use inline data (e.g. plot '-' ...) inside the curly
  brackets of a `do` or `while` loop.
 
 =gamma
