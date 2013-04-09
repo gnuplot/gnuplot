@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: svg.trm,v 1.151 2013/03/10 01:53:58 sfeam Exp $
+ * $Id: svg.trm,v 1.152 2013/03/29 19:49:39 sfeam Exp $
  */
 
 /*------------------------------------------------------------------------------------------------------------------------------------
@@ -2059,7 +2059,7 @@ SVG_hypertext( int type, const char *text )
 
 #ifdef TERM_TABLE
 TERM_TABLE_START (svg_driver)
-    "svg", "W3C Scalable Vector Graphics driver",
+    "svg", "W3C Scalable Vector Graphics",
     0 /* xmax */ , 0 /* ymax */ , 0 /* vchar */ , 0 /* hchar */ ,
     0 /* vtic */ , 0 /* htic */ ,
     SVG_options, SVG_init, SVG_reset, SVG_text, null_scale, SVG_graphics,
