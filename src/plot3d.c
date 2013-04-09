@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.208 2013/04/01 21:14:34 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.209 2013/04/04 20:34:20 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -1600,7 +1600,7 @@ eval_3dplots()
 			this_plot->labels->pos = CENTRE;
 			this_plot->labels->layer = LAYER_PLOTLABELS;
 		    }
-		    parse_label_options(this_plot->labels);
+		    parse_label_options(this_plot->labels, TRUE);
 		    checked_once = TRUE;
 		    if (stored_token != c_token) {
 			if (set_labelstyle) {

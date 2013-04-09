@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.387 2013/03/12 18:06:58 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.388 2013/04/06 23:05:38 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -2142,7 +2142,7 @@ set_label()
 
     if (!END_OF_COMMAND) {
 	char* text;
-	parse_label_options( this_label );
+	parse_label_options( this_label, FALSE );
 	text = try_to_get_string();
 	if (text) {
 	    free(this_label->text);
@@ -2152,7 +2152,7 @@ set_label()
     }
 
     /* Now parse the label format and style options */
-    parse_label_options( this_label );
+    parse_label_options( this_label, FALSE );
 }
 
 
@@ -5072,7 +5072,7 @@ set_xyzlabel(text_label *label)
 	return;
     }
 
-    parse_label_options(label);
+    parse_label_options(label, FALSE);
 
     if (!END_OF_COMMAND) {
 	text = try_to_get_string();
@@ -5082,7 +5082,7 @@ set_xyzlabel(text_label *label)
 	}
     }
 
-    parse_label_options(label);
+    parse_label_options(label, FALSE);
 
 }
 
@@ -5473,7 +5473,7 @@ new_text_label(int tag)
  * to handle options for 'plot with labels'
  */
 void
-parse_label_options( struct text_label *this_label )
+parse_label_options( struct text_label *this_label, TBOOLEAN in_plot )
 {
     struct position pos;
     char *font = NULL;
@@ -5493,7 +5493,7 @@ parse_label_options( struct text_label *this_label )
    /* Now parse the label format and style options */
     while (!END_OF_COMMAND) {
 	/* get position */
-	if (! set_position && equals(c_token, "at") && !axis_label) {
+	if (!in_plot && !set_position && equals(c_token, "at") && !axis_label) {
 	    c_token++;
 	    get_position(&pos);
 	    set_position = TRUE;
@@ -5571,7 +5571,7 @@ parse_label_options( struct text_label *this_label )
 	}
 
 	/* get front/back (added by JDP) */
-	if (! set_layer && !axis_label) {
+	if (!in_plot && !set_layer && !axis_label) {
 	    if (equals(c_token, "back")) {
 		layer = 0;
 		c_token++;

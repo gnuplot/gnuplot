@@ -1,3 +1,10 @@
+2013-04-09  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/plot2d.c src/plot3d.c src/set.c(parse_label_options) src/setshow.h
+	parse_label_options() is called both from "set label ..." and from
+	"plot ... with labels". The latter case should not accept keywords "at",
+	"front", "back".
+
 2013-04-08  Dima Kogan  <dima@secretsauce.net>
 
 	* src/gplt_x11.c: Calculate window resizing based on gheight (plot only)
