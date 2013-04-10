@@ -1,3 +1,9 @@
+2013-04-10  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/pslatex.trm (EPSLATEX_set_color):  Revert a portion of the patch
+	from 2013-01-08 (Tracker #1199).  Repairs overzealous removal of redundant
+	color commands.  Bug #1185.
+
 2013-04-09  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/plot2d.c src/plot3d.c src/set.c(parse_label_options) src/setshow.h

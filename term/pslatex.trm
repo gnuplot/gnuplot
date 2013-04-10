@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: pslatex.trm,v 1.84 2012/08/04 03:31:20 sfeam Exp $
+ * $Id: pslatex.trm,v 1.85 2013/01/09 03:45:08 sfeam Exp $
  */
 
 /* GNUPLOT - pslatex.trm */
@@ -815,12 +815,6 @@ EPSLATEX_set_color(t_colorspec *colorspec)
 {
     double gray;
 
-    /* Filter out duplicate requests */
-    if (!memcmp(&tex_previous_colorspec, colorspec, sizeof(t_colorspec)))
-	return;
-    else
-	memcpy(&tex_previous_colorspec, colorspec, sizeof(t_colorspec));
-
 #ifdef HAVE_CAIROPDF
     /* Fancy footwork to deal with mono/grayscale plots */
     if (ISCAIROTERMINAL) {
@@ -828,6 +822,11 @@ EPSLATEX_set_color(t_colorspec *colorspec)
     } else 
 #endif
     {
+	/* Filter out duplicate requests */
+	if (!memcmp(&tex_previous_colorspec, colorspec, sizeof(t_colorspec)))
+	    return;
+	else
+	    memcpy(&tex_previous_colorspec, colorspec, sizeof(t_colorspec));
         if (colorspec->type == TC_LT && !ps_params->color)
             PS_linetype(colorspec->lt);
         else
