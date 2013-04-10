@@ -4,6 +4,11 @@
 	from 2013-01-08 (Tracker #1199).  Repairs overzealous removal of redundant
 	color commands.  Bug #1185.
 
+	* Makefile.am:  Add lisp subdirectory to the list of files in EXTRA_DIST.
+	This forces the subdirectory to be recreated even if it is currently 
+	disabled, and thus allows "make dist" from inside a tree that has been 
+	configured --without-lisp-files.
+
 2013-04-09  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/plot2d.c src/plot3d.c src/set.c(parse_label_options) src/setshow.h

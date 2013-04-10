@@ -4,7 +4,7 @@ AUTOMAKE_OPTIONS = foreign
 SUBDIRS = config m4 term src docs $(LISPDIR) man demo tutorial share
 
 EXTRA_DIST = BUGS CodeStyle Copyright FAQ.pdf GNUmakefile INSTALL INSTALL.gnu \
-Makefile.maint PATCHLEVEL PGPKEYS PORTING README README.1ST \
+Makefile.maint PATCHLEVEL PGPKEYS PORTING README README.1ST lisp \
 VERSION configure.vms pm3d win
 
 DISTCLEANFILES = stamp-h
