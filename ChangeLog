@@ -1,3 +1,8 @@
+2013-04-11  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* Bump patchlevel to 3 so that we don't have a version mismatch
+	between the linux and windows packages being distributed.
+
 2013-04-10  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/pslatex.trm (EPSLATEX_set_color):  Revert a portion of the patch

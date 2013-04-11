@@ -1,5 +1,5 @@
-New features, changes and fixes since gnuplot version 4.6.2
-===========================================================
+New features, changes and fixes in gnuplot version 4.6.3
+========================================================
 
 * NEW space raises console for console mode gnuplot on Windows
 * CHANGE -persist mode does not open text window of wgnuplot
