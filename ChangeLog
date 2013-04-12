@@ -1,3 +1,7 @@
+2013-04-12  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/stats.c:  Fix incorrect emory allocation for large matrices.
+
 2013-04-10  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/pslatex.trm (EPSLATEX_set_color):  Revert a portion of the patch
