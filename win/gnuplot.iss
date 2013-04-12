@@ -1,5 +1,5 @@
 ﻿;
-; $Id: gnuplot.iss,v 1.2.2.7 2012/09/16 17:58:52 markisch Exp $
+; $Id: gnuplot.iss,v 1.2.2.8 2013/04/05 16:11:54 markisch Exp $
 ;
 ; GNUPLOT - gnuplot.iss
 ;
@@ -39,12 +39,12 @@
 
 #define MyAppName "gnuplot"
 #define MyAppVersionShort "4.6"
-#define MyAppVersion "4.6.2"
-#define MyAppNumVersion "4.6.2"
+#define MyAppVersion "4.6.3"
+#define MyAppNumVersion "4.6.3"
 #define MyAppPublisher "gnuplot development team"
 #define MyAppURL "http://www.gnuplot.info/"
 #define MyAppExeName "wgnuplot.exe"
-#define MyInstallerName "gp462-win32-setup"
+#define MyInstallerName "gp463-win32-setup"
 
 [Setup]
 ; NOTE: The value of AppId uniquely identifies this application.

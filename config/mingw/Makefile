@@ -1,5 +1,5 @@
 # Hello, emacs: this is a -*- Makefile -*-
-# $Id: Makefile,v 1.14.2.10 2012/09/16 18:36:47 markisch Exp $
+# $Id: Makefile,v 1.14.2.11 2013/04/05 16:17:46 markisch Exp $
 #
 # GNUPLOT Makefile for MinGW/MSYS on Windows
 # This assumes usual installation of the MinGW32 toolkit, the free
@@ -806,15 +806,15 @@ installer:
 	cp -p $(TOP)/win/*.iss ./dist
 	(cd ./dist; $(ISCC) gnuplot.iss)
 ifdef RELEASE
-	mv ./dist/gp*-setup.exe gp462-win32-setup.exe
+	mv ./dist/gp*-setup.exe gp46`cat $(TOP)/PATCHLEVEL`-win32-setup.exe
 else
-	mv ./dist/gp*-setup.exe gp462-`date +%Y%m%d`-win32-mingw.exe
+	mv ./dist/gp*-setup.exe gp46`cat $(TOP)/PATCHLEVEL`-`date +%Y%m%d`-win32-mingw.exe
 endif
 
 zip:
 	$(MAKE) DESTDIR=./gnuplot install
 ifdef RELEASE
-	zip -mro9 gp462-win32-mingw.zip gnuplot
+	zip -mro9 gp46`cat $(TOP)/PATCHLEVEL`-win32-mingw.zip gnuplot
 else
-	zip -mro9 gp462-`date +%Y%m%d`-win32-mingw.zip gnuplot
+	zip -mro9 gp46`cat $(TOP)/PATCHLEVEL`-`date +%Y%m%d`-win32-mingw.zip gnuplot
 endif
