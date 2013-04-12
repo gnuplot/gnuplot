@@ -1,3 +1,9 @@
+2013-04-12  Tag Release_4_6_3
+
+2013-04-12  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/stats.c:  Fix incorrect emory allocation for large matrices.
+
 2013-04-11  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* Bump patchlevel to 3 so that we don't have a version mismatch

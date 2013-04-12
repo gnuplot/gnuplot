@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: stats.c,v 1.3.2.2 2012/02/22 19:37:41 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: stats.c,v 1.3.2.3 2012/04/09 04:25:37 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - stats.c */
@@ -677,7 +677,8 @@ statsrequest(void)
 	matrix = (float *)df_bin_record[index].memory_data;
 	
 	/* Fill up a vector, so that we can use the existing code. */
-	if ( !redim_vec(&data_x, n ) ) {
+	/* FIXME: matrix code does not actually use data_x         */
+	if ( !redim_vec(&data_x, n) || !redim_vec(&data_y, n)) {
 	    int_error( NO_CARET, 
 		   "Out of memory in stats: too many datapoints (%d)?", n );
 	}
