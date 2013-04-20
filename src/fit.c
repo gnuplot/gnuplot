@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: fit.c,v 1.85 2012/11/26 07:11:56 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: fit.c,v 1.86 2013/03/12 18:06:57 sfeam Exp $"); }
 #endif
 
 /*  NOTICE: Change of Copyright Status
@@ -140,6 +140,12 @@ TBOOLEAN fit_quiet = FALSE;
 TBOOLEAN fit_errorscaling = TRUE;
 TBOOLEAN fit_prescale = FALSE;
 
+/* names of control variables */
+const char * FITLIMIT = "FIT_LIMIT";
+const char * FITSTARTLAMBDA = "FIT_START_LAMBDA";
+const char * FITLAMBDAFACTOR = "FIT_LAMBDA_FACTOR";
+const char * FITMAXITER = "FIT_MAXITER";
+
 /* private variables: */
 
 static int max_data;
@@ -157,10 +163,6 @@ static const char fitlogfile_default[] = "fit.log";
 static const char GNUFITLOG[] = "FIT_LOG";
 
 static const char *GP_FIXED = "# FIXED";
-static const char *FITLIMIT = "FIT_LIMIT";
-static const char *FITSTARTLAMBDA = "FIT_START_LAMBDA";
-static const char *FITLAMBDAFACTOR = "FIT_LAMBDA_FACTOR";
-static const char *FITMAXITER = "FIT_MAXITER";	/* HBB 970304: maxiter patch */
 static const char *FITSCRIPT = "FIT_SCRIPT";
 static const char *DEFAULT_CMD = "replot";	/* if no fitscript spec. */
 static char last_fit_command[LASTFITCMDLENGTH+1] = "";

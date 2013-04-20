@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.778 2013/04/09 18:56:14 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.779 2013/04/10 18:47:53 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -1865,10 +1865,10 @@ C ... and restart the table:
  with the prefix "MOUSE_".  See `mouse variables` for details.
 
  The `fit` mechanism uses several variables with names that begin "FIT_".  It
- is safest to avoid using such names.  "FIT_LIMIT", however, is one that you
- may wish to redefine. Under `set fit errorvariables`, the error for each
- fitted parameter will be stored in a variable named like the parameter, but
- with "_err" appended. See the documentation on `fit` for details.
+ is safest to avoid using such names.  When using `set fit errorvariables`, the
+ error for each fitted parameter will be stored in a variable named like the
+ parameter, but with "_err" appended.  See the documentation on `fit` and
+ `set fit` for details.
 
  See `user-defined variables`, `reset errors`, `mouse variables`, and `fit`.
 
@@ -4115,7 +4115,7 @@ Ffigure_mapcontours
  Examples:
        f(x) = a*x**2 + b*x + c
        g(x,y) = a*x**2 + b*y**2 + c*x*y
-       FIT_LIMIT = 1e-6
+       set fit limit 1e-6
        fit f(x) 'measured.dat' via 'start.par'
        fit f(x) 'measured.dat' using 3:($7-5) via 'start.par'
        fit f(x) './data/trash.dat' using 1:2:3 via a, b, c
@@ -4229,8 +4229,8 @@ Ffigure_mapcontours
  values.  The Marquardt-Levenberg algorithm selects the parameter values for
  the next iteration.  The process continues until a preset criterion is met,
  either (1) the fit has "converged" (the relative change in WSSR is less than
- FIT_LIMIT), or (2) it reaches a preset iteration count limit, FIT_MAXITER
- (see `fit control variables`).  The fit may also be interrupted
+ a certain limit, see `set fit limit`), or (2) it reaches a preset iteration
+ count limit, see `set fit maxiter`).  The fit may also be interrupted
  and subsequently halted from the keyboard (see `fit`).  The user variable
  FIT_CONVERGED contains 1 if the previous fit command terminated due to
  convergence; it contains 0 if the previous fit terminated for any other
@@ -4390,13 +4390,20 @@ Ffigure_mapcontours
 3 control
 ?commands fit control
 ?fit control
- There are a number of `gnuplot` variables that can be defined to affect
- `fit`.  Those which can be defined once `gnuplot` is running are listed
- under 'control_variables' while those defined before starting `gnuplot`
- are listed under 'environment_variables'.
+ Settings of the `fit` command are controlled by `set fit`.  The old `gnuplot`
+ user variables are deprecated as of version 4.7, see `control variables`.
+
+ There are a number of environment variables that can be defined to affect
+ `fit` before starting `gnuplot`, see `environment variables`.
 4 control variables
 ?commands fit control variables
 ?fit control variables
+=FIT_LIMIT
+=FIT_MAXITER
+=FIT_START_LAMBDA
+=FIT_LAMBDA_FACTOR
+ The user defined variables described here are deprecated, see `set fit`.
+
  The default epsilon limit (1e-5) may be changed by declaring a value for
        FIT_LIMIT
  When the sum of squared residuals changes between two iteration steps by
@@ -4434,6 +4441,8 @@ Ffigure_mapcontours
 4 environment variables
 ?commands fit control environment
 ?fit control environment
+=FIT_LOG
+=FIT_SCRIPT
  The environment variables must be defined before `gnuplot` is executed; how
  to do so depends on your operating system.
 
@@ -7916,27 +7925,39 @@ Ffigure_missing
 ?commands show fit
 ?set fit
 ?show fit
- The `fit` setting defines where the `fit` command writes its output and
- controls whether parameter prescaling is used.
+?set fit quiet
+?set fit prescale
+?set fit limit
+?set fit maxiter
+?set fit errorscaling
+?set fit errorvariables
+?set fit logfile
+ The `set fit` command controls the options for the `fit`command.
 
  Syntax:
        set fit {logfile {"<filename>"}}
+               {{no}quiet}
                {{no}errorvariables}
                {{no}errorscaling}
                {{no}prescale}
-               {{no}quiet}
        unset fit
        show fit
 
- The <filename> argument must be enclosed in single or double quotes.
+ The `logfile` option defines where the `fit` command writes its output.  The
+ <filename> argument must be enclosed in single or double quotes.  If no
+ filename is given or `unset fit` is used the log file is reset to its default
+ value "fit.log" or the value of the environmental variable `FIT_LOG`.  If the
+ given logfile name ends with a / or \, it is interpreted to be a directory
+ name, and the actual filename will be "fit.log" in that directory.
 
- If no filename is given or `unset fit` is used the log file is
- reset to its default value "fit.log" or the value of the environmental
- variable `FIT_LOG`.
+ By default the information written to the log file is also echoed to
+ the terminal session. `set fit quiet` turns off the echo.
 
- If the given logfile name ends with a / or \, it is interpreted to be
- a directory name, and the actual filename will be "fit.log" in that
- directory.
+ If the `prescale` option is turned on, parameters are prescaled by their
+ initial values before being passed to the Marquardt-Levenberg
+ routine. This helps tremendously if there are parameters that differ
+ in size by many orders of magnitude. Fit parameters with an initial value
+ of exactly zero are never prescaled.
 
  If the `errorvariables` option is turned on, the error of each fitted
  parameter computed by `fit` will be copied to a user-defined variable
@@ -7957,15 +7978,6 @@ Ffigure_missing
  With the `noerrorscaling` option the estimated errors are the unscaled
  standard deviations of the fit parameters.
  If no weights are specified for the data, parameter errors are always scaled.
-
- If the `prescale` option is turned on, parameters are prescaled by their
- initial values before being passed to the Marquardt-Levenberg
- routine. This helps tremendously if there are parameters that differ
- in size by many orders of magnitude. Fit parameters with an initial value
- of exactly zero are never prescaled.
-
- By default the information written to the log file is also echoed to
- the terminal session. `set fit quiet` turns off the echo.
 3 fontpath
 ?commands set fontpath
 ?commands show fontpath

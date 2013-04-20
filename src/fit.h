@@ -1,5 +1,5 @@
 /*
- * $Id: fit.h,v 1.16 2012/06/09 21:47:16 markisch Exp $
+ * $Id: fit.h,v 1.17 2013/03/12 18:06:58 sfeam Exp $
  */
 
 /* GNUPLOT - fit.h */
@@ -62,6 +62,10 @@
 
 /* Exported Variables of fit.c */
 
+extern const char *FITLIMIT;
+extern const char *FITSTARTLAMBDA;
+extern const char *FITLAMBDAFACTOR;
+extern const char *FITMAXITER;
 extern char fitbuf[];
 extern char *fitlogfile;
 extern TBOOLEAN fit_errorvariables;

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.208 2012/12/14 18:11:09 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.209 2013/03/12 18:06:58 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -967,15 +967,40 @@ set origin %g,%g\n",
     else
 	fprintf(fp, "set psdir\n");
 
-    /* HBB NEW 20020927: fit logfile name option */
-    fprintf(fp, "set fit %serrorvariables",
+    fprintf(fp, "set fit");
+    if (fitlogfile)
+	fprintf(fp, " logfile \'%s\'", fitlogfile);
+    fprintf(fp, " %squiet",
+	fit_quiet ? "" : "no");
+    fprintf(fp, " %serrorvariables",
 	fit_errorvariables ? "" : "no");
     fprintf(fp, " %serrorscaling",
 	fit_errorscaling ? "" : "no");
-    fprintf(fp, " %sprescale",
-	fit_prescale ? "" : "no");
-    if (fitlogfile) {
-	fprintf(fp, " logfile \'%s\'", fitlogfile);
+    fprintf(fp, " %sprescale", fit_prescale ? "" : "no");
+    {
+	struct udvt_entry *v;
+	double d;
+	int i;
+
+	v = get_udv_by_name((char *)FITLIMIT);
+	d = ((v != NULL) && (!v->udv_undef)) ? real(&(v->udv_value)) : -1.0;
+	if ((d > 0.) && (d < 1.))
+	    fprintf(fp, " limit %g", d);
+
+	v = get_udv_by_name((char *)FITMAXITER);
+	i = ((v != NULL) && (!v->udv_undef)) ? real_int(&(v->udv_value)) : -1;
+	if (i > 0)
+	    fprintf(fp, " maxiter %i", i);
+
+	v = get_udv_by_name((char *)FITSTARTLAMBDA);
+	d = ((v != NULL) && (!v->udv_undef)) ? real(&(v->udv_value)) : -1.0;
+	if (d > 0.)
+	    fprintf(fp, " start_lambda %g", d);
+
+	v = get_udv_by_name((char *)FITLAMBDAFACTOR);
+	d = ((v != NULL) && (!v->udv_undef)) ? real(&(v->udv_value)) : -1.0;
+	if (d > 0.)
+	    fprintf(fp, " lambda_factor %g", d);
     }
     fputc('\n', fp);
 

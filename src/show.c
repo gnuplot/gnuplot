@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.279 2013/02/26 23:38:42 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.280 2013/03/12 18:06:58 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -984,7 +984,7 @@ show_version(FILE *fp)
     /* The only effect of fp == NULL is to load the compile_options string */
     if (fp == NULL)
 	return;
-	
+
     if (fp == stderr) {
 	/* No hash mark - let p point to the trailing '\0' */
 	p += sizeof(prefix) - 1;
@@ -1196,8 +1196,8 @@ show_boxplot()
 		(boxplot_opts.labels == BOXPLOT_FACTOR_LABELS_AUTO) ? "are automatic" :
 		"are off");
     fprintf(stderr,"\tfactor labels will %s\n",
-		boxplot_opts.sort_factors ? 
-		"be sorted alphabetically" : 
+		boxplot_opts.sort_factors ?
+		"be sorted alphabetically" :
 		"appear in the order they were found");
 }
 
@@ -1338,19 +1338,19 @@ show_dgrid3d()
 
     if (dgrid3d)
       if( dgrid3d_mode == DGRID3D_QNORM ) {
-	fprintf(stderr, 
+	fprintf(stderr,
 		"\tdata grid3d is enabled for mesh of size %dx%d, norm=%d\n",
 		dgrid3d_row_fineness,
 		dgrid3d_col_fineness,
 		dgrid3d_norm_value );
       } else if( dgrid3d_mode == DGRID3D_SPLINES ){
-	fprintf(stderr, 
+	fprintf(stderr,
 		"\tdata grid3d is enabled for mesh of size %dx%d, splines\n",
 		dgrid3d_row_fineness,
 		dgrid3d_col_fineness );
       } else {
-	fprintf(stderr, 
-		"\tdata grid3d is enabled for mesh of size %dx%d, kernel=%s,\n\tscale factors x=%f, y=%f%s\n", 
+	fprintf(stderr,
+		"\tdata grid3d is enabled for mesh of size %dx%d, kernel=%s,\n\tscale factors x=%f, y=%f%s\n",
 		dgrid3d_row_fineness,
 		dgrid3d_col_fineness,
 		reverse_table_lookup(dgrid3d_mode_tbl, dgrid3d_mode),
@@ -1487,7 +1487,7 @@ show_style()
 	c_token++;
 	break;
     case SHOW_STYLE_ELLIPSE:
-	show_style_ellipse(); 
+	show_style_ellipse();
 	c_token++;
 	break;
 #endif
@@ -1514,11 +1514,11 @@ show_style()
 #ifdef EAM_OBJECTS
 /* called by show_style() - defined for aesthetic reasons */
 static void
-show_style_rectangle() 
+show_style_rectangle()
 {
     SHOW_ALL_NL;
     fprintf(stderr, "\tRectangle style is %s, fill color ",
-		default_rectangle.layer > 0 ? "front" : 
+		default_rectangle.layer > 0 ? "front" :
 		default_rectangle.layer < 0 ? "behind" : "back");
     if (default_rectangle.lp_properties.use_palette)
 	save_pm3dcolor(stderr, &default_rectangle.lp_properties.pm3d_color);
@@ -1542,13 +1542,13 @@ show_style_circle()
 }
 
 static void
-show_style_ellipse() 
+show_style_ellipse()
 {
     SHOW_ALL_NL;
     fprintf(stderr, "\tEllipse style has default size ");
     show_position(&default_ellipse.o.ellipse.extent);
     fprintf(stderr, ", default angle is %.1f degrees", default_ellipse.o.ellipse.orientation);
-    
+
     switch (default_ellipse.o.ellipse.type) {
         case ELLIPSEAXES_XY:
             fputs(", diameters are in different units (major: x axis, minor: y axis)\n", stderr);
@@ -1870,7 +1870,7 @@ show_key()
 	fputc('\n', stderr);
     } else
 	fprintf(stderr, "not boxed\n");
-   
+
     if (key->front)
 	fprintf(stderr, "\tkey box is opaque and drawn in front of the graph\n");
 
@@ -1910,7 +1910,7 @@ show_position(struct position *pos)
     static const char *msg[] = { "(first axes) ", "(second axes) ",
 				 "(graph units) ", "(screen units) ",
 				 "(character units) "};
- 
+
     assert(first_axes == 0 && second_axes == 1 && graph == 2 && screen == 3 &&
 	   character == 4);
 
@@ -2505,34 +2505,57 @@ show_decimalsign()
 static void
 show_fit()
 {
+    struct udvt_entry *v = NULL;
+    double d;
+
     SHOW_ALL_NL;
 
-    fprintf(stderr, "\
-\tfit will%s prescale parameters by their initial values\n",
+    fprintf(stderr, "\tfit will%s prescale parameters by their initial values\n",
 	    fit_prescale ? "" : " not");
 
-    fprintf(stderr, "\
-\tfit will%s place parameter errors in variables\n",
+    fprintf(stderr, "\tfit will%s place parameter errors in variables\n",
 	    fit_errorvariables ? "" : " not");
 
-    fprintf(stderr, "\
-\tfit will%s scale parameter errors with the reduced chi square\n",
-	    fit_errorscaling ? "" : " not");
+    fprintf(stderr,
+            "\tfit will%s scale parameter errors with the reduced chi square\n",
+            fit_errorscaling ? "" : " not");
 
     if (fitlogfile != NULL) {
-        fprintf(stderr, "\
-\tlog-file for fits is was set by the user to be \n\
-\t'%s'\n", fitlogfile);
+	fprintf(stderr,
+	        "\tlog-file for fits was set by the user to \n\t'%s'\n",
+	        fitlogfile);
     } else {
 	char *logfile = getfitlogfile();
 
 	if (logfile) {
-	    fprintf(stderr, "\
-\tlog-file for fits is unchanged from the environment default of\n\
-\t'%s'\n", logfile);
+	    fprintf(stderr,
+	            "\tlog-file for fits is unchanged from the environment default of\n\t'%s'\n",
+	            logfile);
 	    free(logfile);
 	}
     }
+
+    v = get_udv_by_name((char *)FITLIMIT);
+    d = ((v != NULL) && (!v->udv_undef)) ? real(&(v->udv_value)) : -1.0;
+    fprintf(stderr, "\tfit will consider the fit to have converged if epsilon <= %g\n",
+            ((d > 0.) && (d < 1.)) ? d : DEF_FIT_LIMIT);
+
+    v = get_udv_by_name((char *)FITMAXITER);
+    if ((v != NULL) && (!v->udv_undef) && (real_int(&(v->udv_value)) > 0))
+	fprintf(stderr, "\tfit will stop after a maximum of %i iterations\n",
+	        real_int(&(v->udv_value)));
+    else
+	fprintf(stderr, "\tfit has no limit in the number of iterations\n");
+
+    v = get_udv_by_name((char *)FITSTARTLAMBDA);
+    d = ((v != NULL) && (!v->udv_undef)) ? real(&(v->udv_value)) : -1.0;
+    if (d > 0.)
+	fprintf(stderr, "\tfit will start with lambda = %g\n", d);
+
+    v = get_udv_by_name((char *)FITLAMBDAFACTOR);
+    d = ((v != NULL) && (!v->udv_undef)) ? real(&(v->udv_value)) : -1.0;
+    if (d > 0.)
+	fprintf(stderr, "\tfit will change lambda by a factor of %g\n", d);
 }
 
 
@@ -2632,7 +2655,7 @@ static void
 show_histogram()
 {
     if (histogram_opts.type == HT_CLUSTERED)
-	fprintf(stderr, "\tHistogram style is clustered with gap %d ", 
+	fprintf(stderr, "\tHistogram style is clustered with gap %d ",
 		histogram_opts.gap);
     else if (histogram_opts.type == HT_ERRORBARS)
 	fprintf(stderr, "\tHistogram style is errorbars with gap %d lw %g ",
@@ -2644,7 +2667,7 @@ show_histogram()
     fprintf(stderr, " title offset ");
     show_position(&histogram_opts.title.offset);
     if (histogram_opts.title.textcolor.type == TC_LT)
-	fprintf(stderr," textcolor lt %d", histogram_opts.title.textcolor.lt+1); 
+	fprintf(stderr," textcolor lt %d", histogram_opts.title.textcolor.lt+1);
     fprintf(stderr, "\n");
 }
 
@@ -2718,7 +2741,7 @@ show_tics(
 
     if (grid_layer >= 0)
         fprintf(stderr, "tics are in %s of plot\n", (grid_layer==0) ? "back" : "front");
-	
+
     if (showx)
 	show_ticdef(FIRST_X_AXIS);
     if (showx2)
@@ -3228,8 +3251,8 @@ show_ticdef(AXIS_INDEX axis)
 		break;
 	    }
     	}
-    } else 
-        fputs("justified automatically, ", stderr);    
+    } else
+        fputs("justified automatically, ", stderr);
     fprintf(stderr, "format \"%s\"", ticfmt);
     if (axis_array[axis].tic_rotate) {
 	fprintf(stderr," rotated");

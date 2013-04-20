@@ -1,6 +1,14 @@
+2013-04-20  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/fit.c|h src/save.c src/set.c src/show.c src/unset.c docs/gnuplot.doc
+	demo/fit.dem: New options for `set fit`. These options will replace 
+	the FIT_* user variables to be consistent with how the rest of gnuplot's 
+	options are controlled. For now the `set fit` commands simply set (or 
+	undefine) the corresponding FIT_ variable to keep backwards compatibility.
+
 2013-04-12  Ethan A Merritt  <merritt@u.washington.edu>
 
-	* src/stats.c:  Fix incorrect emory allocation for large matrices.
+	* src/stats.c:  Fix incorrect memory allocation for large matrices.
 
 2013-04-10  Ethan A Merritt  <merritt@u.washington.edu>
 

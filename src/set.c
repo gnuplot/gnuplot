@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.388 2013/04/06 23:05:38 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.389 2013/04/09 20:58:53 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -1522,9 +1522,60 @@ set_fit()
 	} else if (equals(c_token,"noprescale")) {
 	    fit_prescale = FALSE;
 	    c_token++;
+	} else if (equals(c_token, "limit")) {
+	    /* preserve compatibility with FIT_LIMIT user variable */
+	    struct udvt_entry *v;
+	    double value;
+	    c_token++;
+	    value = real_expression();
+	    if ((value > 0.) && (value < 1.)) {
+		v = add_udv_by_name((char *)FITLIMIT);
+		v->udv_undef = FALSE;
+		Gcomplex(&v->udv_value, value, 0);
+	    } else {
+		del_udv_by_name((char *)FITLIMIT, FALSE);
+	    }
+	} else if (equals(c_token, "maxiter")) {
+	    /* preserve compatibility with FIT_MAXITER user variable */
+	    struct udvt_entry *v;
+	    int maxiter;
+	    c_token++;
+	    maxiter = int_expression();
+	    if (maxiter > 0) {
+		v = add_udv_by_name((char *)FITMAXITER);
+		v->udv_undef = FALSE;
+		Ginteger(&v->udv_value, maxiter);
+	    } else {
+		del_udv_by_name((char *)FITMAXITER, FALSE);
+	    }
+	} else if (equals(c_token, "start_lambda")) {
+	    /* preserve compatibility with FIT_START_LAMBDA user variable */
+	    struct udvt_entry *v;
+	    double value;
+	    c_token++;
+	    value = real_expression();
+	    if (value > 0.) {
+		v = add_udv_by_name((char *)FITSTARTLAMBDA);
+		v->udv_undef = FALSE;
+		Gcomplex(&v->udv_value, value, 0);
+	    } else {
+		del_udv_by_name((char *)FITSTARTLAMBDA, FALSE);
+	    }
+	} else if (equals(c_token, "lambda_factor")) {
+	    /* preserve compatibility with FIT_LAMBDA_FACTOR user variable */
+	    struct udvt_entry *v;
+	    double value;
+	    c_token++;
+	    value = real_expression();
+	    if (value > 0.) {
+		v = add_udv_by_name((char *)FITLAMBDAFACTOR);
+		v->udv_undef = FALSE;
+		Gcomplex(&v->udv_value, value, 0);
 	} else {
-	    int_error(c_token,
-	            "unknown --- expected 'logfile', [no]errorvariables, [no]errorscaling, or [no]quiet");
+		del_udv_by_name((char *)FITLAMBDAFACTOR, FALSE);
+	    }
+	} else {
+	    int_error(c_token, "unrecognized option --- see `help set fit`");
 	}
     } /* while (!end) */
 }
