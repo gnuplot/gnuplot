@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: x11.trm,v 1.205 2013/01/08 01:00:29 sfeam Exp $
+ * $Id: x11.trm,v 1.206 2013/01/19 06:53:48 sfeam Exp $
  *
  */
 
@@ -57,6 +57,10 @@
 /* Daniel Sebald: added X11 support for images. (27 February 2003)
  */
 
+/* Toggle plots on/off by clicking on the key entry
+ * Ethan A Merritt 2013
+ */
+
 #include "driver.h"
 
 #ifdef TERM_REGISTER
@@ -91,6 +95,7 @@ TERM_PUBLIC void X11_set_ruler __PROTO((int, int));
 TERM_PUBLIC void X11_set_cursor __PROTO((int, int, int));
 TERM_PUBLIC void X11_put_tmptext __PROTO((int, const char str[]));
 TERM_PUBLIC void X11_set_clipboard __PROTO((const char[]));
+TERM_PUBLIC void X11_layer __PROTO((t_termlayer syncpoint));
 # endif
 
 TERM_PUBLIC void X11_update_opts __PROTO((void));
@@ -2052,6 +2057,24 @@ PASS2:
 
 }
 
+TERM_PUBLIC void
+X11_layer(t_termlayer syncpoint)
+{
+    switch (syncpoint)
+	{
+	case TERM_LAYER_RESET:
+	case TERM_LAYER_RESET_PLOTNO:
+	case TERM_LAYER_BEFORE_PLOT:
+	case TERM_LAYER_AFTER_PLOT:
+	case TERM_LAYER_BEGIN_KEYSAMPLE:
+	case TERM_LAYER_END_KEYSAMPLE:
+	case TERM_LAYER_BEFORE_ZOOM:
+		PRINT1("Y%d\n", syncpoint);
+		break;
+	default:
+		break;
+    }
+}
 
 TERM_PUBLIC void
 X11_send_endianess(void)
@@ -2213,6 +2236,7 @@ TERM_TABLE_START(x11_driver)
     X11_set_color, X11_filled_polygon
     , X11_image
     , ENHX11_OPEN, ENHX11_FLUSH, do_enh_writec
+    , X11_layer
 TERM_TABLE_END(x11_driver)
 
 #undef LAST_TERM

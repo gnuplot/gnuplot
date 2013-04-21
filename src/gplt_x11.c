@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.230 2013/03/09 21:12:43 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.231 2013/04/09 05:48:47 sfeam Exp $"); }
 #endif
 
 #define MOUSE_ALL_WINDOWS 1
@@ -237,6 +237,19 @@ typedef struct cmap_struct {
     struct cmap_struct *next_cmap_struct;
 } cmap_struct;
     
+/* Stuff for toggling plots on/off in response to a mouse click on the key entry */
+typedef struct {
+	unsigned int left;
+	unsigned int right;
+	unsigned int ytop;
+	unsigned int ybot;
+	TBOOLEAN hidden;
+} x11BoundingBox;
+static TBOOLEAN x11_in_key_sample = FALSE;
+static TBOOLEAN x11_in_plot = FALSE;
+static TBOOLEAN retain_toggle_state = FALSE;
+static int x11_cur_plotno = 0;
+
 /* information about one window/plot */
 typedef struct plot_struct {
     Window window;
@@ -276,6 +289,9 @@ typedef struct plot_struct {
     int zoombox_x1, zoombox_y1, zoombox_x2, zoombox_y2;	/* coordinates of zoombox as last drawn */
     char zoombox_str1a[64], zoombox_str1b[64], zoombox_str2a[64], zoombox_str2b[64];	/* strings to be drawn at corners of zoombox ; 1/2 indicate corner; a/b indicate above/below */
     TBOOLEAN resizing;		/* TRUE while waiting for an acknowledgement of resize */
+
+    x11BoundingBox *x11_key_boxes;	/* Track key entry coords for toggle clicks */
+    int x11_max_key_boxes;		/* Size of above array */
 #endif
     /* points to the cmap which is currently used for drawing.
      * This is always the default colormap, if not in pm3d.
@@ -442,6 +458,11 @@ static TBOOLEAN is_meta __PROTO((KeySym));
 static unsigned long gnuplotXID = 0; /* WINDOWID of gnuplot */
 static char* getMultiTabConsoleSwitchCommand __PROTO((unsigned long *));
 #endif /* DISABLE_SPACE_RAISES_CONSOLE */
+
+static void x11_initialize_key_boxes __PROTO((plot_struct *plot, int i));
+static void x11_initialize_hidden __PROTO((plot_struct *plot, int i));
+static void x11_update_key_box __PROTO((plot_struct *plot,  unsigned int x, unsigned int y ));
+static int x11_check_for_toggle __PROTO((plot_struct *plot, unsigned int x, unsigned int y));
 
 #endif /* USE_MOUSE */
 
@@ -663,7 +684,6 @@ static int polyline_space = 0;
 static int polyline_size = 0;
 
 static void gpXStoreName __PROTO((Display *, Window, char *));
-
 
 /*
  * Main program
@@ -1048,6 +1068,9 @@ delete_plot(plot_struct *plot)
     plot->commands = NULL;
     plot->max_commands = 0;
 
+    /* Free structure used to track key entries for mouse toggling */
+    free(plot->x11_key_boxes);
+    plot->x11_key_boxes = NULL;
 
     /* Free up memory for window title. */
     if (plot->titlestring) {
@@ -1419,7 +1442,6 @@ record()
 #endif
 #endif
 		/* continue; */
-		/* return 1; To do: Should a "return" be here?  Gnuplot usually sends 'G' followed by other commands.  So perhaps not needed. DJS */
 	    }
 	    break;
 	case 'N':		/* just update the plot number */
@@ -1434,6 +1456,26 @@ record()
 		return 1;
 	    }
 	    break;
+
+	case 'Y':		/* TERM_LAYER information */
+	    {
+		/* Some layering commands must be handling immediately on */
+		/* receipt;  the rest are stored for in-line execution.   */
+		int layer;
+		sscanf(buf+1, "%d", &layer);
+		switch(layer)
+		{
+		case TERM_LAYER_BEFORE_ZOOM:
+		    retain_toggle_state = TRUE;
+		    break;
+		default:
+		    if (plot)
+			store_command(buf, plot);
+		    break;
+		}
+	    }
+	    break;
+
 #ifdef EXTERNAL_X11_WINDOW
 	case X11_GR_SET_WINDOW_ID:	/* X11 window ID */
 	    {
@@ -2089,6 +2131,16 @@ exec_cmd(plot_struct *plot, char *command)
     buffer = command;
     strx = buffer+1;
 
+    /* Skip the plot commands, but not the key sample commands,
+     * if the plot was toggled off by a mouse click in the GUI
+     */
+    if (x11_in_plot && !x11_in_key_sample
+    &&  *command != 'Y'
+    &&  x11_cur_plotno < plot->x11_max_key_boxes
+    &&  plot->x11_key_boxes[x11_cur_plotno].hidden
+    )
+	    return;
+
     /*   X11_vector(x, y) - draw vector  */
     if (*buffer == 'V') {
 	x = strtol(strx, &stry, 0);
@@ -2113,6 +2165,11 @@ exec_cmd(plot_struct *plot, char *command)
 	    XDrawLines(dpy, plot->pixmap, *current_gc,
 			polyline, polyline_size+1, CoordModeOrigin);
 	    polyline_size = 0;
+	}
+	/* Toggle mechanism */
+	if (x11_in_key_sample) {
+	    x11_update_key_box(plot, X(x) - hchar, Y(y) - vchar/2);
+	    x11_update_key_box(plot, X(x) + hchar, Y(y) + vchar/2);
 	}
 	return;
     } else if (polyline_size > 0) {
@@ -2262,6 +2319,12 @@ exec_cmd(plot_struct *plot, char *command)
 	    /* horizontal text */
 	    gpXDrawString(dpy, plot->pixmap, *current_gc,
 		    X(x) + sj, Y(y) + v_offset, str, sl);
+
+	    /* Toggle mechanism */
+	    if (x11_in_key_sample) {
+		x11_update_key_box(plot, X(x)+sj, Y(y) - vchar/2);
+		x11_update_key_box(plot, X(x)+sj + sw, Y(y) + vchar/2);
+	    }
 	}
 
 	/* Update current text position */
@@ -2295,6 +2358,11 @@ exec_cmd(plot_struct *plot, char *command)
 	    w *= xscale;
 	    h *= yscale;
 	    XFillRectangle(dpy, plot->pixmap, fill_gc, X(xtmp), Y(ytmp), w + 1, h + 1);
+	    /* Toggle mechanism */
+	    if (x11_in_key_sample) {
+		x11_update_key_box(plot, X(xtmp), Y(ytmp));
+		x11_update_key_box(plot, X(xtmp) + w, Y(ytmp) + h);
+	    }
 	}
     }
     /*   X11_justify_text(mode) - set text justification mode  */
@@ -2484,6 +2552,12 @@ exec_cmd(plot_struct *plot, char *command)
 		break;
 	    }
 
+	    /* Toggle mechanism */
+	    if (x11_in_key_sample) {
+		x11_update_key_box(plot, X(x) - hchar, Y(y) - vchar/2);
+		x11_update_key_box(plot, X(x) + hchar, Y(y) + vchar/2);
+	    }
+
 	    /* Restore original line style */
 	    XSetLineAttributes(dpy, *current_gc, plot->lwidth, plot->type, CapButt, JoinBevel);
 	}
@@ -2661,6 +2735,12 @@ exec_cmd(plot_struct *plot, char *command)
 
 		XFillPolygon(dpy, plot->pixmap, fill_gc, points, npoints,
 			     Nonconvex, CoordModeOrigin);
+
+		/* Toggle mechanism */
+		if (x11_in_key_sample) {
+		    x11_update_key_box(plot, points[0].x - hchar, points[0].y - vchar/2);
+		    x11_update_key_box(plot, points[0].x + hchar, points[0].y + vchar/2);
+		}
 	    }
 	}
 
@@ -3153,6 +3233,38 @@ exec_cmd(plot_struct *plot, char *command)
 	}
     }
 #endif
+
+    /*   X11_layer(syncpoint) */
+    else if (*buffer == 'Y') {
+    	int layer;
+	sscanf(&buffer[1], "%d", &layer);
+	switch (layer)
+	{
+	case TERM_LAYER_RESET:
+	case TERM_LAYER_RESET_PLOTNO:
+			x11_cur_plotno = 0;
+			break;
+	case TERM_LAYER_BEFORE_PLOT:
+			x11_cur_plotno++;
+			x11_in_plot = TRUE;
+			break;
+	case TERM_LAYER_AFTER_PLOT:
+			x11_in_plot = FALSE;
+			break;
+	case TERM_LAYER_BEGIN_KEYSAMPLE:
+			x11_in_key_sample = TRUE;
+			break;
+	case TERM_LAYER_END_KEYSAMPLE:
+			x11_in_key_sample = FALSE;
+			break;
+	default:
+			break;
+	/* These layer commands must be handled on receipt rather than in-line */
+	case TERM_LAYER_BEFORE_ZOOM:
+			break;
+	}
+    }
+
     /*   Switch to a different color map */
     else if (*buffer == 'e') {
 	if (have_pm3d) {
@@ -3248,6 +3360,18 @@ display(plot_struct *plot)
 	XClearWindow(dpy, plot->window);
 	XFlush(dpy);
     }
+
+    /* Initialize toggle in keybox mechanism */
+    x11_cur_plotno = 0;
+    x11_in_key_sample = FALSE;
+    x11_initialize_key_boxes(plot, 0);
+
+    /* Maintain on/off toggle state when zooming */
+    if (retain_toggle_state)
+	retain_toggle_state = FALSE;
+    else
+	x11_initialize_hidden(plot, 0);
+
     /* loop over accumulated commands from inboard driver */
     for (n = 0; n < plot->ncommands; n++) {
 	exec_cmd(plot, plot->commands[n]);
@@ -4746,11 +4870,19 @@ process_event(XEvent *event)
 	plot = Find_Plot_In_Linked_List_By_Window(event->xbutton.window);
 	if (!plot)
 	    break;
-	{
-	    if (plot == current_plot) {
-		Call_display(plot);
-		gp_exec_event(GE_buttonpress, (int) RevX(event->xbutton.x), (int) RevY(event->xbutton.y), event->xbutton.button, 0, 0);
+
+	/* Toggle mechanism */
+	/* Note: we can toggle even if the plot is not in the active window */
+	if (event->xbutton.button == 1) {
+	    if (x11_check_for_toggle(plot, event->xbutton.x, event->xbutton.y)) {
+		retain_toggle_state = TRUE;
+		display(plot);
 	    }
+	}
+
+	if (plot == current_plot) {
+	    Call_display(plot);
+	    gp_exec_event(GE_buttonpress, (int) RevX(event->xbutton.x), (int) RevY(event->xbutton.y), event->xbutton.button, 0, 0);
 	}
 	break;
     case ButtonRelease:
@@ -6802,3 +6934,71 @@ x11_setfill(GC *gc, int style)
 	}
 }
 #undef plot
+
+
+/* -------------------------------------------------------
+ * Bookkeeping for clickable hot spots and hypertext anchors
+ * --------------------------------------------------------*/
+
+#ifdef USE_MOUSE
+/* Initialize boxes starting from i */
+static void x11_initialize_key_boxes(plot_struct *plot, int i)
+{
+	for (; i < plot->x11_max_key_boxes; i++) {
+		plot->x11_key_boxes[i].left = plot->x11_key_boxes[i].ybot = INT_MAX;
+		plot->x11_key_boxes[i].right = plot->x11_key_boxes[i].ytop = 0;
+	}
+}
+static void x11_initialize_hidden(plot_struct *plot, int i)
+{
+	for (; i < plot->x11_max_key_boxes; i++)
+		plot->x11_key_boxes[i].hidden = FALSE;
+}
+
+
+/* Update the box enclosing the key sample for the current plot
+ * so that later we can detect mouse clicks in that area
+ */
+static void x11_update_key_box( plot_struct *plot, unsigned int x, unsigned int y )
+{
+	x11BoundingBox *bb;
+	if (plot->x11_max_key_boxes <= x11_cur_plotno) {
+		plot->x11_max_key_boxes = x11_cur_plotno + 10;
+		plot->x11_key_boxes = (x11BoundingBox *)realloc(plot->x11_key_boxes,
+				plot->x11_max_key_boxes * sizeof(x11BoundingBox));
+		x11_initialize_key_boxes(plot, x11_cur_plotno);
+		x11_initialize_hidden(plot, x11_cur_plotno);
+	}
+	bb = &(plot->x11_key_boxes[x11_cur_plotno]);
+	if (x < bb->left)  bb->left = x;
+	if (x > bb->right) bb->right = x;
+	if (y < bb->ybot)  bb->ybot = y;
+	if (y > bb->ytop)  bb->ytop = y;
+}
+
+/* Called from x11Panel::OnLeftDown
+ * If the mouse click was on top of a key sample then toggle the
+ * corresponding plot on/off
+ */
+static int x11_check_for_toggle(plot_struct *plot, unsigned int x, unsigned int y)
+{
+	int i;
+	int hit = 0;
+	for (i = 1; i <= x11_cur_plotno && i < plot->x11_max_key_boxes; i++) {
+		if (plot->x11_key_boxes[i].left == INT_MAX)
+			continue;
+		if (x < plot->x11_key_boxes[i].left)
+			continue;
+		if (x > plot->x11_key_boxes[i].right)
+			continue;
+		if (y < plot->x11_key_boxes[i].ybot)
+			continue;
+		if (y > plot->x11_key_boxes[i].ytop)
+			continue;
+		plot->x11_key_boxes[i].hidden = !plot->x11_key_boxes[i].hidden;
+		hit++;
+	}
+    return hit;
+}
+
+#endif /*USE_MOUSE*/

@@ -1,9 +1,15 @@
+2013-04-21  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/gplt_x11.c term/x11.trm:  X11 terminal support for toggling plots
+	on/off by left clicking on the corresponding key entry.  The toggle
+	works for all x11 plot windows, not just the currently active one.
+
 2013-04-20  Bastian Maerkisch  <bmaerkisch@web.de>
 
-	* src/fit.c|h src/save.c src/set.c src/show.c src/unset.c docs/gnuplot.doc
-	demo/fit.dem: New options for `set fit`. These options will replace 
-	the FIT_* user variables to be consistent with how the rest of gnuplot's 
-	options are controlled. For now the `set fit` commands simply set (or 
+	* src/fit.c|h src/save.c src/set.c src/show.c src/unset.c demo/fit.dem
+	docs/gnuplot.doc:  New options for `set fit`. These options will replace
+	the FIT_* user variables to be consistent with how the rest of gnuplot's
+	options are controlled. For now the `set fit` commands simply set (or
 	undefine) the corresponding FIT_ variable to keep backwards compatibility.
 
 2013-04-12  Ethan A Merritt  <merritt@u.washington.edu>
@@ -13,12 +19,12 @@
 2013-04-10  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/pslatex.trm (EPSLATEX_set_color):  Revert a portion of the patch
-	from 2013-01-08 (Tracker #1199).  Repairs overzealous removal of redundant
-	color commands.  Bug #1185.
+	from 2013-01-08 (Tracker #1199).  Repairs overzealous removal of
+	redundant color commands.  Bug #1185.
 
 	* Makefile.am:  Add lisp subdirectory to the list of files in EXTRA_DIST.
-	This forces the subdirectory to be recreated even if it is currently 
-	disabled, and thus allows "make dist" from inside a tree that has been 
+	This forces the subdirectory to be recreated even if it is currently
+	disabled, and thus allows "make dist" from inside a tree that has been
 	configured --without-lisp-files.
 
 2013-04-09  Ethan A Merritt  <merritt@u.washington.edu>
@@ -81,13 +87,12 @@
 	corresponding time calculation in the javascript files.
 
 	* src/mouse.c src/time.c docs/gnuplot.doc:  Remove unused code
-	and comments specific to the older use of a private epoch 
-	boundary.
+	and comments specific to the older use of a private epoch.
 
 2013-04-04  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/wxterminal/wxt_gui.cpp (wxtPanel::RaiseConsoleWindow),
-	src/wxterminal/wxt_gui.h: Implement space-raises-console for 
+	src/wxterminal/wxt_gui.h: Implement space-raises-console for
 	Windows console mode gnuplot.
 
 2013-04-04  Shigeharu Takeno  <shige@iee.niit.ac.jp>
@@ -126,8 +131,8 @@
 
 	* src/plot3d.c:  Incomplete initialization of sample range variable.
 
-	* src/plot2d.c docs/gnuplot.doc:  Provide an indexed example of using 
-	"smooth frequency" to generate a histogram.  Do not let this plot mode 
+	* src/plot2d.c docs/gnuplot.doc:  Provide an indexed example of using
+	"smooth frequency" to generate a histogram.  Do not let this plot mode
 	override the user's data style.
 
 2013-03-29  Ethan A Merritt  <merritt@u.washington.edu>
@@ -218,7 +223,7 @@
 	command as if it were a refresh command.  This is a change, but is
 	consistent with the documentation for the "volatile" keyword.
 
-	* src/plot2d.c (eval_plots):  The range check on functions with a 
+	* src/plot2d.c (eval_plots):  The range check on functions with a
 	private sampling range did not allow for log scaling.
 	Bug #1215
 
@@ -281,14 +286,14 @@
 
 2013-02-21  Ethan A Merritt  <merritt@u.washington.edu>
 
-	*  src/plot.c:  The old test for whether a session was interactive 
+	*  src/plot.c:  The old test for whether a session was interactive
 	assumed that everything on the command line was either an input file
 	name or an x11 option parsed by X11_args. This broke because
 	(1) x11 is no longer the only interactive terminal.
 	(2) there are options that occupy space on the command line but are
 	not file names.  Some indicate non-interactive; some don't.
 	Replace this test with one that only enters a non-interactive session
-	if there are command line arguments that do not begin with '-' 
+	if there are command line arguments that do not begin with '-'
 	(filename) or _do_ begin with '-e' (inline command).
 	Bug #1212
 
@@ -371,7 +376,7 @@
 2013-02-02  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/command.c (read_line):  Reset the token count to zero when
-	starting to read a new line of input.  Otherwise if the read is 
+	starting to read a new line of input.  Otherwise if the read is
 	interrupted by a mouse event requesting a replot then the internal
 	state is not valid.  Test case:   cat | ./gnuplot      plot and zoom
 	Bug #3602388 (new #1203)
