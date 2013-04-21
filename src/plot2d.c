@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.295 2013/04/07 17:20:32 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.296 2013/04/09 20:58:53 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -1696,12 +1696,12 @@ store_label(
     textlen = 0;
     /* FIXME EAM - this code is ugly but seems to work */
     /* We need to handle quoted separators and quoted quotes */
-    if (df_separator) {
+    if (df_separators) {
 	TBOOLEAN in_quote = FALSE;
 	while (string[textlen]) {
 	    if (string[textlen] == '"')
 		in_quote = !in_quote;
-	    else if (string[textlen] == df_separator && !in_quote)
+	    else if (strchr(df_separators,string[textlen]) && !in_quote)
 		break;
 	    textlen++;
 	}

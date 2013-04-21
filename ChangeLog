@@ -4,6 +4,12 @@
 	on/off by left clicking on the corresponding key entry.  The toggle
 	works for all x11 plot windows, not just the currently active one.
 
+	* docs/gnuplot.doc src/datafile.c src/datafile.h src/plot2d.c src/save.c
+	src/set.c src/show.c src/unset.c src/util.c:  Allow more than one 
+	character to be specified as a data field separator.  For example:
+	    set datafile separator "|:\t"
+	means that a field may be terminated by either | or : or tab.
+
 2013-04-20  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/fit.c|h src/save.c src/set.c src/show.c src/unset.c demo/fit.dem

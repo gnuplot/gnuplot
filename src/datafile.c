@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.246 2013/03/14 19:40:18 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.247 2013/03/14 19:59:00 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -210,8 +210,8 @@ struct udft_entry ydata_func;
 /* string representing missing values in ascii datafiles */
 char *missing_val = NULL;
 
-/* input field separator, NUL if whitespace is the separator */
-char df_separator = '\0';
+/* input field separators, NULL if whitespace is the separator */
+char *df_separators = NULL;
 
 /* comments chars */
 char *df_commentschars = 0;
@@ -660,7 +660,7 @@ df_tokenise(char *s)
     for (i = 0; i<MAXDATACOLS; i++)
 	df_tokens[i] = NULL;
 
-#define NOTSEP (*s != df_separator)
+#define NOTSEP (!df_separators || !strchr(df_separators,*s))
 
     df_no_cols = 0;
 
@@ -685,7 +685,7 @@ df_tokenise(char *s)
 
 	/* CSV files must accept numbers inside quotes also,
 	 * so we step past the quote */
-	if (*s == '"' && df_separator != '\0') {
+	if (*s == '"' && df_separators != NULL) {
 	    in_string = TRUE;
 	    df_column[df_no_cols].position = ++s;
 	}
@@ -756,7 +756,7 @@ df_tokenise(char *s)
 		count = (*s && NOTSEP) ? 1 : 0;
 		/* skip chars to end of column */
 		used = 0;
-		if (df_separator != '\0' && in_string) {
+		if (df_separators != NULL && in_string) {
 		    do
 			++s;
 		    while (*s && *s != '"');
@@ -806,10 +806,10 @@ df_tokenise(char *s)
 	}
 
 	/* skip to 1st character past next separator */
-	if (df_separator != '\0') {
+	if (df_separators != NULL) {
 	    while (*s && NOTSEP)
 		++s;
-	    if (*s == df_separator)
+	    if (strchr(df_separators,*s))
 		/* skip leading whitespace in next field */
 		do
 		    ++s;
@@ -2571,11 +2571,10 @@ df_parse_string_field(char *field)
     } else if (*field == '"') {
 	temp_string = gp_strdup(&field[1]);
 	temp_string[strcspn(temp_string,"\"")] = '\0';
-    } else if (df_separator != '\0') {
-	char eor[3];
-	eor[0] = df_separator; eor[1] = '"'; eor[2] = '\0';
+    } else if (df_separators != NULL) {
 	temp_string = gp_strdup(field);
-	temp_string[strcspn(temp_string,eor)] = '\0';
+	temp_string[strcspn(temp_string,df_separators)] = '\0';
+	temp_string[strcspn(temp_string,"\"")] = '\0';
     } else {
 	temp_string = gp_strdup(field);
 	temp_string[strcspn(temp_string,"\t ")] = '\0';

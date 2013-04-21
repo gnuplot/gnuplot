@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.389 2013/04/09 20:58:53 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.390 2013/04/20 13:54:27 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -331,7 +331,7 @@ set_command()
 	case S_DATAFILE:
 	    if (almost_equals(++c_token,"miss$ing"))
 		set_missing();
-	    else if (almost_equals(c_token,"sep$arator"))
+	    else if (almost_equals(c_token,"sep$arators"))
 		set_separator();
 	    else if (almost_equals(c_token,"com$mentschars"))
 		set_datafile_commentschars();
@@ -2431,26 +2431,24 @@ set_margin(t_position *margin)
 static void
 set_separator()
 {
-    char *sep;
     c_token++;
-    if (END_OF_COMMAND) {
-	df_separator = '\0';
+    free(df_separators);
+    df_separators = NULL;
+
+    if (END_OF_COMMAND)
 	return;
-    }
-    if (almost_equals(c_token, "white$space"))
-	df_separator = '\0';
-    else if (equals(c_token, "comma"))
-	df_separator = ',';
-    else if (equals(c_token, "tab") || equals(c_token, "\'\\t\'"))
-	df_separator = '\t';
-    else if (!(sep = try_to_get_string()))
+
+    if (almost_equals(c_token, "white$space")) {
+	c_token++;
+    } else if (equals(c_token, "comma")) {
+	df_separators = gp_strdup(",");
+	c_token++;
+    } else if (equals(c_token, "tab") || equals(c_token, "\'\\t\'")) {
+	df_separators = gp_strdup("\t");
+	c_token++;
+    } else if (!(df_separators = try_to_get_string())) {
 	int_error(c_token, "expected \"<separator_char>\"");
-    else {
-	df_separator = sep[0];
-	free(sep);
-	c_token--;
     }
-    c_token++;
 }
 
 static void

@@ -1,5 +1,5 @@
 /*
- * $Id: datafile.h,v 1.40 2012/12/21 23:07:20 sfeam Exp $
+ * $Id: datafile.h,v 1.41 2013/03/14 19:40:18 sfeam Exp $
  */
 
 /* GNUPLOT - datafile.h */
@@ -89,8 +89,8 @@ extern int df_last_col;
 /* string representing missing values, ascii datafiles */
 extern char *missing_val;
 
-/* input field separator, NUL if whitespace is the separator */
-extern char df_separator;
+/* input field separators, NULL if whitespace is the separator */
+extern char *df_separators;
 
 /* comments chars */
 extern char *df_commentschars;

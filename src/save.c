@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.209 2013/03/12 18:06:58 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.210 2013/04/20 13:54:27 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -658,8 +658,8 @@ set isosamples %d, %d\n\
 
     if (missing_val != NULL)
 	fprintf(fp, "set datafile missing '%s'\n", missing_val);
-    if (df_separator != '\0')
-	fprintf(fp, "set datafile separator \"%c\"\n",df_separator);
+    if (df_separators)
+	fprintf(fp, "set datafile separator \"%s\"\n",df_separators);
     else
 	fprintf(fp, "set datafile separator whitespace\n");
     if (strcmp(df_commentschars, DEFAULT_COMMENTS_CHARS))

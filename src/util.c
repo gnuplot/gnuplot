@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: util.c,v 1.108 2013/01/26 00:40:26 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: util.c,v 1.109 2013/02/08 23:01:02 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - util.c */
@@ -1207,7 +1207,7 @@ parse_esc(char *instr)
 		    *t++ = *s++;
 		}
 	    }
-	} else if (df_separator && *s == '\"' && *(s+1) == '\"') {
+	} else if (df_separators && *s == '\"' && *(s+1) == '\"') {
 	/* EAM Mar 2003 - For parsing CSV strings with quoted quotes */
 	    *t++ = *s++; s++;
 	} else {

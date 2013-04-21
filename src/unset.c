@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.162 2013/03/12 18:06:58 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.163 2013/04/20 13:54:27 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -279,7 +279,8 @@ unset_command()
 	}
 	df_fortran_constants = FALSE;
 	unset_missing();
-	df_separator = '\0';
+	free(df_separators);
+	df_separators = NULL;
 	free(df_commentschars);
 	df_commentschars = gp_strdup(DEFAULT_COMMENTS_CHARS);
 	df_unset_datafile_binary();
@@ -1755,7 +1756,8 @@ reset_command()
     unset_histogram();
 
     unset_missing();
-    df_separator = '\0';
+    free(df_separators);
+    df_separators = NULL;
     free(df_commentschars);
     df_commentschars = gp_strdup(DEFAULT_COMMENTS_CHARS);
 
