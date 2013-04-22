@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.782 2013/04/22 20:36:23 markisch Exp $
+C RCS $Id: gnuplot.doc,v 1.783 2013/04/22 22:10:53 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -4391,10 +4391,10 @@ Ffigure_mapcontours
 ?commands fit control
 ?fit control
  Settings of the `fit` command are controlled by `set fit`.  The old `gnuplot`
- user variables are deprecated as of version 4.7, see `control variables`.
+ user variables are deprecated as of version 4.7, see `fit control variables`.
 
  There are a number of environment variables that can be defined to affect
- `fit` before starting `gnuplot`, see `environment variables`.
+ `fit` before starting `gnuplot`, see `fit control environment`.
 4 control variables
 ?commands fit control variables
 ?fit control variables
