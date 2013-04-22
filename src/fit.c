@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: fit.c,v 1.87 2013/04/20 13:54:26 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: fit.c,v 1.88 2013/04/22 20:37:04 markisch Exp $"); }
 #endif
 
 /*  NOTICE: Change of Copyright Status
@@ -56,10 +56,12 @@ static char *RCSid() { return RCSid("$Id: fit.c,v 1.87 2013/04/20 13:54:26 marki
  *
  */
 
+#ifdef WIN32
+ # ifndef _WIN32_WINNT
+ #  define _WIN32_WINNT 0x0500
+ # endif
+#endif
 #include "fit.h"
-
-#include <signal.h>
-
 #include "alloc.h"
 #include "axis.h"
 #include "command.h"
@@ -72,6 +74,7 @@ static char *RCSid() { return RCSid("$Id: fit.c,v 1.87 2013/04/20 13:54:26 marki
 #include "util.h"
 #include "scanner.h"  /* For legal_identifier() */
 #include "variable.h" /* For locale handling */
+#include <signal.h>
 
 /* Just temporary */
 #if defined(VA_START) && defined(STDC_HEADERS)
