@@ -332,6 +332,7 @@ void QtGnuplotScene::processEvent(QtGnuplotEventType type, QDataStream& in)
 		item->setPos(p0);
 		QPointF size = p1 - p0;
 		item->scale(size.x()/pixmap.width(), size.y()/pixmap.height());
+		m_currentGroup.append(item);
 		/// @todo clipping
 	}
 	else if (type == GEZoomStart)

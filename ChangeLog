@@ -26,6 +26,9 @@
 	necessary if the font name contains a hyphen, which would otherwise be
 	converted to a space.
 
+	* src/qtterminal/QtGnuplotScene.cpp (processEvent):  Add pixmaps to 
+	current plot group so that image plots can be toggled.
+
 2013-04-21  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/gplt_x11.c term/x11.trm:  X11 terminal support for toggling plots
