@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.231 2013/04/09 05:48:47 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.232 2013/04/21 03:51:42 sfeam Exp $"); }
 #endif
 
 #define MOUSE_ALL_WINDOWS 1
@@ -1071,6 +1071,7 @@ delete_plot(plot_struct *plot)
     /* Free structure used to track key entries for mouse toggling */
     free(plot->x11_key_boxes);
     plot->x11_key_boxes = NULL;
+    plot->x11_max_key_boxes = 0;
 
     /* Free up memory for window title. */
     if (plot->titlestring) {
