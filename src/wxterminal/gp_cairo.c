@@ -1,5 +1,5 @@
 /*
- * $Id: gp_cairo.c,v 1.68 2013/02/19 05:30:37 sfeam Exp $
+ * $Id: gp_cairo.c,v 1.69 2013/03/07 22:06:33 sfeam Exp $
  */
 
 /* GNUPLOT - gp_cairo.c */
@@ -302,8 +302,14 @@ void gp_cairo_set_font(plot_struct *plot, const char *name, int fontsize)
 
 	/* Split out Bold and Italic attributes from font name */
 	fname = strdup(name);
-	for (c=fname; *c; c++)
-	    if (*c == '-') *c = ' ';
+	for (c=fname; *c; c++) {
+	    if (*c == '\\') {
+		char *d = c;
+		do { *d = *(d+1); } while (*d++);
+	    } else {
+		if (*c == '-') *c = ' ';
+	    }
+	}
 	if ((c = strstr(fname, " Bold"))) {
 	    do { *c = *(c+5); } while (*c++);
 	    plot->fontweight = PANGO_WEIGHT_BOLD;
@@ -317,7 +323,6 @@ void gp_cairo_set_font(plot_struct *plot, const char *name, int fontsize)
 
 	strncpy( plot->fontname, fname, sizeof(plot->fontname) );
 	plot->fontsize = fontsize;
-
 	free(fname);
 }
 
