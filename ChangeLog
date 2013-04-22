@@ -8,6 +8,9 @@
 	necessary if the font name contains a hyphen since otherwise it would be
 	converted to a space.
 
+	* src/qtterminal/QtGnuplotScene.cpp (processEvent):  Add pixmaps to
+	current plot group so that image plots can be toggled.
+
 2013-04-14  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* docs/Makefile.in (gnuplot.info): Fix out-of-tree build (would
