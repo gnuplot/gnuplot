@@ -2,6 +2,10 @@
 
 	* term/win.trm (WIN_options):  Validate argument to title option.
 
+	* term/dumb.trm (DUMB_options):  New option to change aspect ratio of 
+	the plot by setting tic lengths. Change default to 2:1, which corresponds
+	more to the default fonts found on the systems I tested.
+
 2013-04-22  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/wxterminal/wxt_gui.cpp (wxt_init):  Exit cleanly if initialization

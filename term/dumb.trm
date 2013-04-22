@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: dumb.trm,v 1.31 2011/04/16 06:05:34 sfeam Exp $
+ * $Id: dumb.trm,v 1.32 2011/04/18 19:56:53 broeker Exp $
  *
  */
 
@@ -112,13 +112,14 @@ static int dumb_x;
 static int dumb_y;
 static int dumb_xmax = DUMB_XMAX;
 static int dumb_ymax = DUMB_YMAX;
-static int dumb_feed = 1;
+static TBOOLEAN dumb_feed = TRUE;
 
 #define DUMB_PIXEL(x,y) dumb_matrix[dumb_xmax*(y)+(x)]
 
 static void dumb_set_pixel __PROTO((int x, int y, int v, int p));
 
-enum DUMB_id { DUMB_FEED, DUMB_NOFEED, DUMB_ENH, DUMB_NOENH, DUMB_SIZE, DUMB_OTHER };
+enum DUMB_id { DUMB_FEED, DUMB_NOFEED, DUMB_ENH, DUMB_NOENH, 
+               DUMB_SIZE, DUMB_ASPECT, DUMB_OTHER };
 
 static struct gen_table DUMB_opts[] =
 {
@@ -127,6 +128,7 @@ static struct gen_table DUMB_opts[] =
     { "enh$anced", DUMB_ENH },
     { "noe$nhanced", DUMB_NOENH },
     { "size", DUMB_SIZE },
+    { "aspect", DUMB_ASPECT },
     { NULL, DUMB_OTHER }
 };
 
@@ -139,11 +141,11 @@ DUMB_options()
 	switch(lookup_table(&DUMB_opts[0],c_token)) {
 	case DUMB_FEED:
 	    c_token++;
-	    dumb_feed = 1;
+	    dumb_feed = TRUE;
 	    break;
 	case DUMB_NOFEED:
 	    c_token++;
-	    dumb_feed = 0;
+	    dumb_feed = FALSE;
 	    break;
 #ifndef NO_DUMB_ENHANCED_SUPPORT
 	case DUMB_ENH:
@@ -157,10 +159,22 @@ DUMB_options()
 	    term->flags &= ~TERM_ENHANCED_TEXT;
 	    break;
 #endif
+	case DUMB_ASPECT:
+	    c_token++;
+	    x = int_expression();
+	    y = 1;
+	    if (!END_OF_COMMAND && equals(c_token, ",")) {
+		c_token++;
+		y = int_expression();
+	    }
+	    if (x <= 0) x = 1;
+	    if (y <= 0) y = 1;
+	    term->h_tic = x;
+	    term->v_tic = y;
+ 	    break;
 	case DUMB_SIZE:
 	    c_token++;
 	    /* Fall through */
-
 	case DUMB_OTHER:
 	default:
 	    x = int_expression();
@@ -175,10 +189,11 @@ DUMB_options()
 	}
     }
 
-    sprintf(term_options, "%sfeed %s size %d, %d",
+    sprintf(term_options, "%sfeed %s size %d, %d aspect %i, %i",
 	    dumb_feed ? "" : "no",
 	    term->put_text == ENHdumb_put_text ? "enhanced" : "",
-	    dumb_xmax, dumb_ymax);
+	    dumb_xmax, dumb_ymax,
+	    term->h_tic, term->v_tic);
 }
 
 
@@ -540,7 +555,8 @@ ENHdumb_put_text(unsigned int x, unsigned int y, const char *str)
 TERM_TABLE_START(dumb_driver)
     "dumb", "ascii art for anything that prints text",
     DUMB_XMAX, DUMB_YMAX, 1, 1,
-    1, 1, DUMB_options, DUMB_init, DUMB_reset,
+    1, 2, /* account for typical aspect ratio of characters */
+    DUMB_options, DUMB_init, DUMB_reset,
     DUMB_text, null_scale, DUMB_graphics, DUMB_move, DUMB_vector,
     DUMB_linetype, DUMB_put_text, null_text_angle,
     null_justify_text, DUMB_point, DUMB_arrow, set_font_null,
@@ -576,6 +592,7 @@ START_HELP(dumb)
 "",
 " Syntax:",
 "       set terminal dumb {size <xchars>,<ychars>} {[no]feed}",
+"                         {aspect <htic>{,<vtic>}}",
 #ifndef NO_DUMB_ENHANCED_SUPPORT
 "                         {[no]enhanced}",
 #endif
@@ -583,21 +600,27 @@ START_HELP(dumb)
 " where <xchars> and <ychars> set the size of the text block. The default is",
 " 79 by 24. The last newline is printed only if `feed` is enabled.",
 "",
-" Example:",
-"       set term dumb size 60,15",
-"       plot [-5:6.5] sin(x) with impulse",
+" The `aspect` option can be used to control the aspect ratio of the plot by",
+" setting the length of the horizontal and vertical tic marks. Only integer",
+" values are allowed. Default is 2,1 -- corresponding to the aspect ratio of",
+" common screen fonts.",
 "",
-"            1 +-------------------------------------------------+",
-"          0.8 +|||++                   ++||||++   sin(x) +----+ |",
-"          0.6 +|||||+                 ++|||||||+                |",
-"          0.4 +||||||+               ++|||||||||+               |",
-"          0.2 +|||||||+             ++|||||||||||+             +|",
-"            0 ++++++++++++++++++++++++++++++++++++++++++++++++++|",
-"         -0.2 +        +|||||||||||+              +|||||||||||+ |",
-"         -0.4 +         +|||||||||+                +|||||||||+  |",
-"         -0.6 +          +|||||||+                  +|||||||+   |",
-"         -0.8 +   +       ++||||+   +       +        ++||||+  + |",
-"           -1 +---+--------+--------+-------+--------+--------+-+",
-"                 -4       -2        0       2        4        6  "
+" Example:",
+"       set term dumb size 60,15 aspect 1",
+"       set tics nomirror scale 0.5",
+"       plot [-5:6.5] sin(x) with impulse ls -1",
+"",
+"           1 +-------------------------------------------------+",
+"         0.8 +|||++                   ++||||++                 |",
+"         0.6 +|||||+                 ++|||||||+  sin(x) +----+ |",
+"         0.4 +||||||+               ++|||||||||+               |",
+"         0.2 +|||||||+             ++|||||||||||+             +|",
+"           0 ++++++++++++++++++++++++++++++++++++++++++++++++++|",
+"        -0.2 +        +|||||||||||+              +|||||||||||+ |",
+"        -0.4 +         +|||||||||+                +|||||||||+  |",
+"        -0.6 +          +|||||||+                  +|||||||+   |",
+"        -0.8 +           ++||||+                    ++||||+    |",
+"          -1 +---+--------+--------+-------+--------+--------+-+",
+"                -4       -2        0       2        4        6  "
 END_HELP(dumb)
 #endif /* TERM_HELP */
