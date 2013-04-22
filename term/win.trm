@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: win.trm,v 1.112 2012/07/18 20:29:03 markisch Exp $
+ * $Id: win.trm,v 1.113 2012/10/08 15:15:05 markisch Exp $
  */
 
 /* GNUPLOT - win.trm */
@@ -288,6 +288,10 @@ WIN_options()
 		case WIN_GTITLE:
 			c_token++;
 			title = try_to_get_string();
+			if (title == NULL)
+				int_error(c_token, "expecting string argument");
+			if (strcmp(title, "") == 0)
+				title = NULL;
 			set_title = TRUE;
 			break;
 		case WIN_CLOSE:
