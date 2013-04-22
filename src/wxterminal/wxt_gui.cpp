@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.cpp,v 1.91.2.10 2013/04/05 16:24:36 markisch Exp $
+ * $Id: wxt_gui.cpp,v 1.91.2.11 2013/04/05 16:39:47 markisch Exp $
  */
 
 /* GNUPLOT - wxt_gui.cpp */
@@ -1588,7 +1588,11 @@ void wxt_init()
 		if (!wxInitialize()) {
 			fprintf(stderr,"Failed to initialize wxWidgets.\n");
 			wxt_abort_init = true;
-			return;
+			if (interactive) {
+				change_term("unknown",7);
+				int_error(NO_CARET,"wxt init failure");
+			} else
+				exit(-1);
 		}
 
 		/* app initialization */

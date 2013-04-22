@@ -1,3 +1,8 @@
+2013-04-22  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/wxterminal/wxt_gui.cpp (wxt_init):  Exit cleanly if initialization
+	fails.
+
 2013-04-14  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* docs/Makefile.in (gnuplot.info): Fix out-of-tree build (would
@@ -7,7 +12,7 @@
 
 2013-04-12  Ethan A Merritt  <merritt@u.washington.edu>
 
-	* src/stats.c:  Fix incorrect emory allocation for large matrices.
+	* src/stats.c:  Fix incorrect memory allocation for large matrices.
 
 2013-04-11  Ethan A Merritt  <merritt@u.washington.edu>
 
