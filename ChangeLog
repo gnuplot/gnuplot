@@ -3,6 +3,11 @@
 	* src/wxterminal/wxt_gui.cpp (wxt_init):  Exit cleanly if initialization
 	fails.
 
+	* src/wxterminal/gp_cairo.c (gp_cairo_set_font):  Allow backslash ('\\')
+	to be treated as an escape character in font names.  This can be 
+	necessary if the font name contains a hyphen since otherwise it would be
+	converted to a space.
+
 2013-04-14  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* docs/Makefile.in (gnuplot.info): Fix out-of-tree build (would
