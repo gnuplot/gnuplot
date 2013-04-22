@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: fit.c,v 1.88 2013/04/22 20:37:04 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: fit.c,v 1.89 2013/04/22 21:05:12 markisch Exp $"); }
 #endif
 
 /*  NOTICE: Change of Copyright Status
@@ -56,11 +56,6 @@ static char *RCSid() { return RCSid("$Id: fit.c,v 1.88 2013/04/22 20:37:04 marki
  *
  */
 
-#ifdef WIN32
- # ifndef _WIN32_WINNT
- #  define _WIN32_WINNT 0x0500
- # endif
-#endif
 #include "fit.h"
 #include "alloc.h"
 #include "axis.h"
@@ -564,16 +559,7 @@ fit_interrupt()
     while (TRUE) {
 	fputs("\n\n(S)top fit, (C)ontinue, (E)xecute FIT_SCRIPT:  ", STANDARD);
 #ifdef WIN32
-	{
-	    HWND console = NULL;
-#ifndef WGP_CONSOLE
-	    console = textwin.hWndParent;
-#else
-	    console = GetConsoleWindow();
-#endif
-	    ShowWindow(console, SW_RESTORE);
-	    BringWindowToTop(console);
-	}
+	WinRaiseConsole();
 #endif
 	switch (getchar()) {
 

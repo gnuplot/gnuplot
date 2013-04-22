@@ -12,6 +12,10 @@
 
 	* docs/gnuplot.doc:  Update help texts for `fit`.
 
+	* src/win/winmain.c|h (WinRaiseConsole) src/fit.c src/win/wgraph.c
+	src/wxterminal/wxt_gui.cpp: Consolidate code to raise console in new
+	routine.
+
 2013-04-22  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/wxterminal/wxt_gui.cpp (wxt_init):  Exit cleanly if initialization

@@ -1,5 +1,5 @@
 /*
- * $Id: wgraph.c,v 1.157 2012/11/26 08:18:23 markisch Exp $
+ * $Id: wgraph.c,v 1.158 2013/04/22 20:37:04 markisch Exp $
  */
 
 /* GNUPLOT - win/wgraph.c */
@@ -2735,7 +2735,7 @@ CopyPrint(LPGW lpgw)
 	docInfo.lpszDocName = lpgw->Title;
 
 	if (StartDoc(printer, &docInfo) > 0) {
-		bool aa = lpgw->antialiasing;
+		TBOOLEAN aa = lpgw->antialiasing;
 		lpgw->sampling = 1;
 		/* Mixing GDI/GDI+ does not seem to work properly on printer devices. */
 		lpgw->antialiasing = FALSE;
@@ -2746,6 +2746,7 @@ CopyPrint(LPGW lpgw)
 		MakeFonts(lpgw, &rect, printer);
 		DestroyPens(lpgw);	/* rebuild pens */
 		MakePens(lpgw, printer);
+		/* Always print using GDI only! */
 		drawgraph(lpgw, printer, &rect);
 		if (EndPage(printer) > 0)
 			EndDoc(printer);
@@ -3554,23 +3555,10 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			 * here... */
 #ifndef DISABLE_SPACE_RAISES_CONSOLE
 			if (wParam == VK_SPACE) {
-				HWND console = NULL;
-#ifndef WGP_CONSOLE
-				if (lpgw->lptw != NULL)
-					console = lpgw->lptw->hWndParent;
-#else
-				console = GetConsoleWindow();
-#endif
-				/* HBB 20001023: implement the '<space> in graph returns to
-				 * text window' --- feature already present in OS/2 and X11 */
-				/* Make sure the text window or console is is visible: */
-				ShowWindow(console, SW_RESTORE);
-				/* Activate it --> keyboard focus goes there: */
-				BringWindowToTop(console);
-				return 0;
+				WinRaiseConsole();
+				return 0L;
 			}
 #endif /* DISABLE_SPACE_RAISES_CONSOLE */
-
 #ifdef USE_MOUSE
 			Wnd_exec_event(lpgw, lParam, GE_keypress, (TCHAR)wParam);
 #endif
@@ -3936,8 +3924,10 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			if ( lpgw->lptw && (lpgw->lptw->DragPre!=(LPSTR)NULL) && (lpgw->lptw->DragPost!=(LPSTR)NULL) )
 			    DragAcceptFiles(hwnd, TRUE);
 			return(0);
+
 		case WM_ERASEBKGND:
 			return(1); /* we erase the background ourselves */
+
 		case WM_PAINT: {
 			HDC memdc = NULL;
 			HBITMAP oldbmp;
@@ -4039,7 +4029,7 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			UpdateToolbar(lpgw);
 
 			return 0;
-	}
+		}
 		case WM_SIZE:
 			SendMessage(lpgw->hStatusbar, WM_SIZE, wParam, lParam);
 			if (lpgw->hToolbar) {
@@ -4258,7 +4248,7 @@ Graph_put_tmptext (LPGW lpgw, int where, LPCSTR text )
 		break;
 	default:
 		; /* should NEVER happen */
-    }
+	}
 }
 
 void WDPROC
