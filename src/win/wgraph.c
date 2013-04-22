@@ -1,5 +1,5 @@
 /*
- * $Id: wgraph.c,v 1.156 2012/10/08 22:30:53 markisch Exp $
+ * $Id: wgraph.c,v 1.157 2012/11/26 08:18:23 markisch Exp $
  */
 
 /* GNUPLOT - win/wgraph.c */
@@ -76,6 +76,7 @@
 #ifdef HAVE_GDIPLUS
 #include "wgdiplus.h"
 #endif
+#include "fit.h"
 
 #ifdef USE_MOUSE
 /* Petr Mikulik, February 2001
@@ -3705,6 +3706,10 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 				break;
 			case VK_F12:
 				Wnd_exec_event(lpgw, lParam, GE_keypress, GP_F12);
+				break;
+			case VK_CANCEL:
+				/* FIXME: Currently, this only supports interrupting fit. */
+				ctrlc_flag = TRUE;
 				break;
 			} /* switch (wParam) */
 

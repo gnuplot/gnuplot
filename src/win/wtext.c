@@ -1,5 +1,5 @@
 /*
- * $Id: wtext.c,v 1.39 2012/10/08 22:30:53 markisch Exp $
+ * $Id: wtext.c,v 1.40 2012/11/26 08:18:23 markisch Exp $
  */
 
 /* GNUPLOT - win/wtext.c */
@@ -70,6 +70,7 @@
 #include "wresourc.h"
 #include "wcommon.h"
 #include "stdfn.h"
+#include "fit.h"
 
 /* font stuff */
 #define TEXTFONTSIZE 9
@@ -1416,6 +1417,10 @@ WndTextProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			lptw->KeyBufIn = lptw->KeyBuf;	/* wrap around */
 		}
 	    }
+	    case VK_CANCEL:
+		/* FIXME: Currently, this only supports interrupting fit. */
+		ctrlc_flag = TRUE;
+		break;
 	    } /* switch(wparam) */
 	} /* else(shift) */
 	break;

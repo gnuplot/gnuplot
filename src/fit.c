@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: fit.c,v 1.86 2013/03/12 18:06:57 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: fit.c,v 1.87 2013/04/20 13:54:26 markisch Exp $"); }
 #endif
 
 /*  NOTICE: Change of Copyright Status
@@ -94,6 +94,9 @@ static void Dblfn __PROTO(());
 #  include <fcntl.h>
 # endif				/* !VMS */
 #endif /* !(MSDOS) */
+#ifdef WIN32
+# include "win/winmain.h"
+#endif
 
 enum marq_res {
     OK, ML_ERROR, BETTER, WORSE
@@ -146,6 +149,8 @@ const char * FITSTARTLAMBDA = "FIT_START_LAMBDA";
 const char * FITLAMBDAFACTOR = "FIT_LAMBDA_FACTOR";
 const char * FITMAXITER = "FIT_MAXITER";
 
+TBOOLEAN ctrlc_flag = FALSE;
+
 /* private variables: */
 
 static int max_data;
@@ -155,7 +160,7 @@ static double epsilon = DEF_FIT_LIMIT;	/* convergence limit */
 static int maxiter = 0;
 
 static char *fit_script = NULL;
-double *scale_params = 0; /* scaling values for parameters */
+static double *scale_params = 0; /* scaling values for parameters */
 
 /* HBB/H.Harders 20020927: log file name now changeable from inside
  * gnuplot */
@@ -179,7 +184,6 @@ static double *fit_x = 0;	/* all independent variable values,
 static double *fit_z = 0;	/* dependent data values */
 static double *err_data = 0;	/* standard deviations of dependent data */
 static double *a = 0;		/* array of fitting parameters */
-static TBOOLEAN ctrlc_flag = FALSE;
 static TBOOLEAN user_stop = FALSE;
 
 static struct udft_entry func;
@@ -264,7 +268,7 @@ ctrlc_setup()
  *
  *  I hope that other OSes do it better, if not... add #ifdefs :-(
  */
-#if (defined(__EMX__) || !defined(MSDOS))
+#if (defined(__EMX__) || !defined(MSDOS) && !defined(WIN32))
     (void) signal(SIGINT, (sigfunc) ctrlc_handle);
 #endif
 }
@@ -317,7 +321,7 @@ error_ex()
     interrupt_setup();
 
     /* exit via int_error() so that it can clean up state variables */
-    int_error(NO_CARET,"error during fit");
+    int_error(NO_CARET, "error during fit");
 }
 
 /* HBB 990829: removed the debug print routines */
@@ -377,6 +381,7 @@ marquardt(double a[], double **C, double *chisq, double *lambda)
 	free_matr(tmp_C);
 	return OK;
     }
+
     /* Givens calculates in-place, so make working copies of C and d */
 
     for (j = 0; j < num_data + num_params; j++)
@@ -555,18 +560,30 @@ fit_interrupt()
 {
     while (TRUE) {
 	fputs("\n\n(S)top fit, (C)ontinue, (E)xecute FIT_SCRIPT:  ", STANDARD);
-	switch (getc(stdin)) {
+#ifdef WIN32
+	{
+	    HWND console = NULL;
+#ifndef WGP_CONSOLE
+	    console = textwin.hWndParent;
+#else
+	    console = GetConsoleWindow();
+#endif
+	    ShowWindow(console, SW_RESTORE);
+	    BringWindowToTop(console);
+	}
+#endif
+	switch (getchar()) {
 
 	case EOF:
 	case 's':
 	case 'S':
-	    fputs("Stop.", STANDARD);
+	    fputs("Stop.\n", STANDARD);
 	    user_stop = TRUE;
 	    return FALSE;
 
 	case 'c':
 	case 'C':
-	    fputs("Continue.", STANDARD);
+	    fputs("Continue.\n", STANDARD);
 	    return TRUE;
 
 	case 'e':
@@ -575,7 +592,7 @@ fit_interrupt()
 		const char *tmp;
 
 		tmp = fit_script ? fit_script : DEFAULT_CMD;
-		fprintf(STANDARD, "executing: %s", tmp);
+		fprintf(STANDARD, "executing: %s\n", tmp);
 		/* set parameters visible to gnuplot */
 		for (i = 0; i < num_params; i++)
 		    setvar(par_name[i], a[i] * scale_params[i]);
@@ -624,6 +641,8 @@ regress(double a[])
 
     /* HBB 981118: initialize new variable 'user_break' */
     user_stop = FALSE;
+    /* FIXME: This really should not be necessary, but it is not properly initialised in wgnuplot otherwise. */
+    ctrlc_flag = FALSE;
 
     do {
 /*
@@ -647,7 +666,11 @@ regress(double a[])
 	    ctrlc_flag = TRUE;
 	}
 #endif
-
+#ifdef WIN32
+	/* This call makes the Windows GUI functional during fits.
+	   Pressing Ctrl-Break now finally has an effect. */
+	WinMessageLoop();
+#endif
 
 	if (ctrlc_flag) {
 	    show_fit(iter, chisq, last_chisq, a, lambda, STANDARD);
@@ -1353,6 +1376,7 @@ fit_command()
 	epsilon = tmpd;
     else
 	epsilon = DEF_FIT_LIMIT;
+    FPRINTF((STANDARD, "epsilon=%e\n", epsilon));
 
     /* HBB 970304: maxiter patch */
     maxiter = getivar(FITMAXITER);

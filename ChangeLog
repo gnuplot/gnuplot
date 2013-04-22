@@ -6,6 +6,12 @@
 	the plot by setting tic lengths. Change default to 2:1, which corresponds
 	more to the default fonts found on the systems I tested.
 
+	* src/fit.c|h src/win/wgraph.c src/win/wtext.c:  Unlike on any other
+	platform, long fit runs cannot be interrupted on Windows. Fix this
+	long standing issue at least for wgnuplot by handling Ctrl-Break.
+
+	* docs/gnuplot.doc:  Update help texts for `fit`.
+
 2013-04-22  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/wxterminal/wxt_gui.cpp (wxt_init):  Exit cleanly if initialization
