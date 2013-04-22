@@ -29,6 +29,9 @@
 	* src/qtterminal/QtGnuplotScene.cpp (processEvent):  Add pixmaps to 
 	current plot group so that image plots can be toggled.
 
+	* src/set.c src/unset.c:  Repair a small memory leak from the sequence
+	set key font 'something'; reset
+
 2013-04-21  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/gplt_x11.c term/x11.trm:  X11 terminal support for toggling plots

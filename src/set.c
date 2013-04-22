@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.390 2013/04/20 13:54:27 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.391 2013/04/21 06:26:11 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -1837,7 +1837,6 @@ set_key()
 	    key->visible = FALSE;
 	    break;
 	case S_KEY_DEFAULT:
-	    free(key->font);
 	    reset_key();
 	    break;
 	case S_KEY_TOP:
