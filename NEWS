@@ -16,6 +16,7 @@ New features, changes and fixes since gnuplot version 4.6
 * NEW x11 terminal is aware of current and requested plot aspect ratio
 * NEW x11 support for toggling plots on/off with left mouseclick on the key
 * NEW post term can use /FlateDecode to reduce the size of embedded images
+* NEW 'set fit quiet|results|brief|verbose' changes fit's verbosity
 * CHANGE mouse wheel and +/- keys zoom centered on current mouse position
 * CHANGE Provide kdensity bandwidth via a keyword rather than a data column
 * CHANGE Pipe (popen/pclose) emulation within wgnuplot
@@ -29,7 +30,7 @@ New features, changes and fixes since gnuplot version 4.6
 * CHANGE leave axis log base non-zero so gprintf format %L works on linear axes
 * CHANGE time calcs use the standard epoch date 01-jan-1970 rather than 2000
 * CHANGE fit options are controlled via `set fit` instead of FIT_ variables
-
+* CHANGE fit defaults to brief one-line progress reports
 
 New features, changes and fixes in gnuplot version 4.6
 ======================================================

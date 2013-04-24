@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.391 2013/04/21 06:26:11 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.392 2013/04/23 01:42:59 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -1510,22 +1510,32 @@ set_fit()
 	} else if (almost_equals(c_token, "noerrors$caling")) {
 	    fit_errorscaling = FALSE;
 	    c_token++;
-	} else if (equals(c_token,"quiet")) {
-	    fit_quiet = TRUE;
+	} else if (equals(c_token, "quiet")) {
+	    fit_verbosity = QUIET;
 	    c_token++;
-	} else if (equals(c_token,"noquiet")) {
-	    fit_quiet = FALSE;
+	} else if (equals(c_token, "noquiet")) {
+	    fit_verbosity = BRIEF;
 	    c_token++;
-	} else if (equals(c_token,"prescale")) {
+	} else if (equals(c_token, "results")) {
+	    fit_verbosity = RESULTS;
+	    c_token++;
+	} else if (equals(c_token, "brief")) {
+	    fit_verbosity = BRIEF;
+	    c_token++;
+	} else if (equals(c_token, "verbose")) {
+	    fit_verbosity = VERBOSE;
+	    c_token++;
+	} else if (equals(c_token, "prescale")) {
 	    fit_prescale = TRUE;
 	    c_token++;
-	} else if (equals(c_token,"noprescale")) {
+	} else if (equals(c_token, "noprescale")) {
 	    fit_prescale = FALSE;
 	    c_token++;
 	} else if (equals(c_token, "limit")) {
 	    /* preserve compatibility with FIT_LIMIT user variable */
 	    struct udvt_entry *v;
 	    double value;
+
 	    c_token++;
 	    value = real_expression();
 	    if ((value > 0.) && (value < 1.)) {
@@ -1539,6 +1549,7 @@ set_fit()
 	    /* preserve compatibility with FIT_MAXITER user variable */
 	    struct udvt_entry *v;
 	    int maxiter;
+
 	    c_token++;
 	    maxiter = int_expression();
 	    if (maxiter > 0) {
@@ -1552,6 +1563,7 @@ set_fit()
 	    /* preserve compatibility with FIT_START_LAMBDA user variable */
 	    struct udvt_entry *v;
 	    double value;
+
 	    c_token++;
 	    value = real_expression();
 	    if (value > 0.) {
@@ -1565,6 +1577,7 @@ set_fit()
 	    /* preserve compatibility with FIT_LAMBDA_FACTOR user variable */
 	    struct udvt_entry *v;
 	    double value;
+
 	    c_token++;
 	    value = real_expression();
 	    if (value > 0.) {
@@ -3506,7 +3519,7 @@ set_pm3d()
 		else if (equals(c_token, "max"))
 		    pm3d.which_corner_color = PM3D_WHICHCORNER_MAX;
 		else if (equals(c_token, "rms"))
-			pm3d.which_corner_color = PM3D_WHICHCORNER_RMS;		
+			pm3d.which_corner_color = PM3D_WHICHCORNER_RMS;
 		else if (equals(c_token, "c1"))
 		    pm3d.which_corner_color = PM3D_WHICHCORNER_C1;
 		else if (equals(c_token, "c2"))
@@ -4280,7 +4293,7 @@ set_terminal()
  * Only reasonably common terminal options are supported.
  *
  * If necessary, the code in term->options() can detect that it was called
- * from here because in this case almost_equals(c_token-1, "termopt$ion"); 
+ * from here because in this case almost_equals(c_token-1, "termopt$ion");
  */
 
 static void

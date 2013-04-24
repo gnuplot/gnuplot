@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.164 2013/04/21 06:26:11 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.165 2013/04/23 01:42:59 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -793,7 +793,7 @@ unset_fit()
     fit_errorvariables = FALSE;
     fit_errorscaling = TRUE;
     fit_prescale = FALSE;
-    fit_quiet = FALSE;
+    fit_verbosity = BRIEF;
     del_udv_by_name((char *)FITLIMIT, FALSE);
     del_udv_by_name((char *)FITMAXITER, FALSE);
     del_udv_by_name((char *)FITSTARTLAMBDA, FALSE);
@@ -1610,7 +1610,6 @@ reset_command()
 {
     AXIS_INDEX axis;
     TBOOLEAN save_interactive = interactive;
-    TBOOLEAN save_state;
     static TBOOLEAN set_for_axis[AXIS_ARRAY_SIZE] = AXIS_ARRAY_INITIALIZER(TRUE);
 
     c_token++;
@@ -1762,7 +1761,13 @@ reset_command()
     free(df_commentschars);
     df_commentschars = gp_strdup(DEFAULT_COMMENTS_CHARS);
 
-    save_state = fit_quiet; unset_fit(); fit_quiet = save_state;
+    { /* Preserve some settings for `reset`, but not for `unset fit` */
+	verbosity_level save_verbosity = fit_verbosity;
+	TBOOLEAN save_errorscaling = fit_errorscaling;
+	unset_fit();
+	fit_verbosity = save_verbosity;
+	fit_errorscaling = save_errorscaling;
+    }
 
     update_gpval_variables(0); /* update GPVAL_ inner variables */
 

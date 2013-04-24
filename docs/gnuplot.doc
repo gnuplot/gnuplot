@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.783 2013/04/22 22:10:53 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.784 2013/04/22 23:02:21 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -7930,6 +7930,9 @@ Ffigure_missing
 ?set fit
 ?show fit
 ?set fit quiet
+?set fit verbose
+?set fit brief
+?set fit results
 ?set fit prescale
 ?set fit limit
 ?set fit maxiter
@@ -7940,7 +7943,7 @@ Ffigure_missing
 
  Syntax:
        set fit {logfile {"<filename>"}}
-               {{no}quiet}
+               {{no}quiet|results|brief|verbose}
                {{no}errorvariables}
                {{no}errorscaling}
                {{no}prescale}
@@ -7958,8 +7961,10 @@ Ffigure_missing
  given logfile name ends with a / or \, it is interpreted to be a directory
  name, and the actual filename will be "fit.log" in that directory.
 
- By default the information written to the log file is also echoed to
- the terminal session. `set fit quiet` turns off the echo.
+ By default the information written to the log file is also echoed to the
+ terminal session.  `set fit quiet` turns off the echo, whereas `results`
+ prints only final results.  `brief` gives one line summaries for every
+ iteration of the fit in addition.  `verbose` yields detailed iteration reports as it was the default before version 4.7.
 
  If the `errorvariables` option is turned on, the error of each fitted
  parameter computed by `fit` will be copied to a user-defined variable

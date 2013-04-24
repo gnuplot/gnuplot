@@ -1,4 +1,17 @@
+2013-04-24  Thomas Mattison  <mattison <at> phas.ubc.ca>
+
+	* src/fit.c:  Optional one-line progress reports. Move code to output status
+	reports and final results to new routines.
+	Patchset #230.
+
 2013-04-24  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/fit.c|h src/save.c src/set.c src/show.c src/unset.c docs/gnuplot.doc:
+	New options quiet|results|brief|verbose for `set fit` to select verbosity
+	of fit's output. Default to brief one-line reports. 'verbose' selects the
+	traditional full report.
+
+	* src/show.c (show_variables):  Avoid extra newline in output.
 
 	* src/fit.c (backup_file):  Remove code path for Win32s.
 

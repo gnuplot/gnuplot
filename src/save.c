@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.210 2013/04/20 13:54:27 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.211 2013/04/21 06:26:11 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -852,7 +852,7 @@ set origin %g,%g\n",
 	case PM3D_WHICHCORNER_MIN:     fputs("min", fp); break;
 	case PM3D_WHICHCORNER_MAX:     fputs("max", fp); break;
 	case PM3D_WHICHCORNER_RMS:     fputs("rms", fp); break;
-		
+
 	default: /* PM3D_WHICHCORNER_C1 ... _C4 */
 	     fprintf(fp, "c%i", pm3d.which_corner_color - PM3D_WHICHCORNER_C1 + 1);
     }
@@ -970,8 +970,20 @@ set origin %g,%g\n",
     fprintf(fp, "set fit");
     if (fitlogfile)
 	fprintf(fp, " logfile \'%s\'", fitlogfile);
-    fprintf(fp, " %squiet",
-	fit_quiet ? "" : "no");
+    switch (fit_verbosity) {
+	case QUIET:
+	    fprintf(fp, " quiet");
+	    break;
+	case RESULTS:
+	    fprintf(fp, " results");
+	    break;
+	case BRIEF:
+	    fprintf(fp, " brief");
+	    break;
+	case VERBOSE:
+	    fprintf(fp, " verbose");
+	    break;
+    }
     fprintf(fp, " %serrorvariables",
 	fit_errorvariables ? "" : "no");
     fprintf(fp, " %serrorscaling",

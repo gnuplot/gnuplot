@@ -1,5 +1,5 @@
 /*
- * $Id: fit.h,v 1.18 2013/04/20 13:54:26 markisch Exp $
+ * $Id: fit.h,v 1.19 2013/04/22 20:37:04 markisch Exp $
  */
 
 /* GNUPLOT - fit.h */
@@ -60,6 +60,10 @@
 
 /* Type definitions */
 
+typedef enum e_verbosity_level {
+    QUIET, RESULTS, BRIEF, VERBOSE
+} verbosity_level;
+
 /* Exported Variables of fit.c */
 
 extern const char *FITLIMIT;
@@ -69,7 +73,7 @@ extern const char *FITMAXITER;
 extern char fitbuf[];
 extern char *fitlogfile;
 extern TBOOLEAN fit_errorvariables;
-extern TBOOLEAN fit_quiet;
+extern verbosity_level fit_verbosity;
 extern TBOOLEAN fit_errorscaling;
 extern TBOOLEAN fit_prescale;
 extern TBOOLEAN ctrlc_flag;

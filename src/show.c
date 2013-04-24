@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.281 2013/04/20 13:54:27 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.282 2013/04/21 06:26:11 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -2510,6 +2510,21 @@ show_fit()
 
     SHOW_ALL_NL;
 
+    switch (fit_verbosity) {
+	case QUIET:
+	    fprintf(stderr, "\tfit will not output results to console.\n");
+	    break;
+	case RESULTS:
+	    fprintf(stderr, "\tfit will only print final results to console and log-file.\n");
+	    break;
+	case BRIEF:
+	    fprintf(stderr, "\tfit will output brief results to console and log-file.\n");
+	    break;
+	case VERBOSE:
+	    fprintf(stderr, "\tfit will output verbose results to console and log-file.\n");
+	    break;
+    }
+
     fprintf(stderr, "\tfit will%s prescale parameters by their initial values\n",
 	    fit_prescale ? "" : " not");
 
@@ -3065,8 +3080,6 @@ show_variables()
     int len;
     TBOOLEAN show_all = FALSE;
     char leading_string[MAX_ID_LEN+1] = {'\0'};
-
-    SHOW_ALL_NL;
 
     if (!END_OF_COMMAND) {
 	if (almost_equals(c_token, "all"))
