@@ -1,3 +1,7 @@
+2013-04-24  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/fit.c (backup_file):  Remove code path for Win32s.
+
 2013-04-22  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* term/win.trm (WIN_options):  Validate argument to title option.

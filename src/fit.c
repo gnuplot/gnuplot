@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: fit.c,v 1.89 2013/04/22 21:05:12 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: fit.c,v 1.90 2013/04/22 22:23:11 markisch Exp $"); }
 #endif
 
 /*  NOTICE: Change of Copyright Status
@@ -1111,20 +1111,14 @@ update(char *pfile, char *npfile)
 static void
 backup_file(char *tofile, const char *fromfile)
 {
-#if defined (WIN32) || defined(MSDOS) || defined(VMS)
+#if defined(MSDOS) || defined(VMS)
     char *tmpn;
 #endif
-
-    /* win32 needs to have two attempts at the rename, since it may
-     * be running on win32s with msdos 8.3 names
-     */
 
 /* first attempt, for all o/s other than MSDOS */
 
 #ifndef MSDOS
-
     strcpy(tofile, fromfile);
-
 #ifdef VMS
     /* replace all dots with _, since we will be adding the only
      * dot allowed in VMS names
@@ -1132,17 +1126,13 @@ backup_file(char *tofile, const char *fromfile)
     while ((tmpn = strchr(tofile, '.')) != NULL)
 	*tmpn = '_';
 #endif /*VMS */
-
     strcat(tofile, BACKUP_SUFFIX);
-
     if (rename(fromfile, tofile) == 0)
 	return;			/* hurrah */
 #endif
 
-
-#if defined (WIN32) || defined(MSDOS)
-
-    /* first attempt for msdos. Second attempt for win32s */
+#ifdef MSDOS
+    /* first attempt for msdos. */
 
     /* Copy only the first 8 characters of the filename, to comply
      * with the restrictions of FAT filesystems. */
@@ -1155,8 +1145,7 @@ backup_file(char *tofile, const char *fromfile)
 
     if (rename(fromfile, tofile) == 0)
 	return;			/* success */
-
-#endif /* win32 || msdos */
+#endif /* MSDOS */
 
     /* get here => rename failed. */
     Eex3("Could not rename file %s to %s", fromfile, tofile);
