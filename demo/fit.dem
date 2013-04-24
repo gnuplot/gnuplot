@@ -1,6 +1,10 @@
 #
-# $Id: fit.dem,v 1.12 2013/04/20 13:54:26 markisch Exp $
+# $Id: fit.dem,v 1.13 2013/04/24 06:38:44 markisch Exp $
 #
+
+myencoding = GPVAL_ENCODING
+set encoding utf8
+set termoption enhanced
 
 print "Some examples how data fitting using nonlinear least squares fit can be done."
 print ''
@@ -12,8 +16,8 @@ m = 0.0
 print "  fit function:", GPFUN_l
 print sprintf("  initial parameters: y0 = %g, m = %g", y0, m)
 print "  fit command: fit l(x) 'lcdemo.dat' via y0, m\n"
-set xlabel "Temperature T  (deg Cels.)"
-set ylabel "Density [g/cm3]"
+set xlabel "Temperature T (°C)"
+set ylabel "Density (g/cm^3)"
 set key below
 set title 'data set and initial parameters'
 plot [*:*][-.1:1.2] 'lcdemo.dat', l(x)
@@ -83,6 +87,8 @@ plot 'lcdemo.dat' using 1:2:5 with errorbars, density(x)
 #plot 'lcdemo.dat' using 1:2:5 with errorbars, density(x)
 #set fit limit 1e-5
 pause -1 "Press enter to proceed with the next example."
+unset xlabel
+unset ylabel
 
 
 print "\n\nNow a brief demonstration of 3d fitting."
@@ -202,7 +208,7 @@ pause -1 "Press enter to proceed with the next example."
 
 
 print "\n\nHere comes an example of a rather complex function.\n"
-set xlabel "Delta [degrees]"
+set xlabel "Delta (degrees)"
 set ylabel "Reflectivity"
 load 'reflect.fnc'
 #HBB 970522: Changed initial values to something sensible, i.e. 
@@ -240,7 +246,6 @@ print ''
 pause -1 "Press enter to proceed with the next example."
 
 
-reset
 set xlabel 'x'
 set ylabel 'y'
 set zlabel 'z'
@@ -324,3 +329,4 @@ print "to time."
 print ''
 pause -1 "Done with fitting demo  (-> return)"
 reset
+set encoding myencoding
