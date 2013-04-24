@@ -1,3 +1,9 @@
+2013-04-24  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/win/wgnuplib.h src/win/wgraph.c src/win/wresourc.h term/win.trm:
+	Speed up rotating graphs with the mouse by temporarily disabling
+	antialiasing. Add user interface and ini file setting.
+
 2013-04-24  Thomas Mattison  <mattison <at> phas.ubc.ca>
 
 	* src/fit.c:  Optional one-line progress reports. Move code to output status

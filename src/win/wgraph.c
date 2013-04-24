@@ -1,5 +1,5 @@
 /*
- * $Id: wgraph.c,v 1.158 2013/04/22 20:37:04 markisch Exp $
+ * $Id: wgraph.c,v 1.159 2013/04/22 22:23:11 markisch Exp $
  */
 
 /* GNUPLOT - win/wgraph.c */
@@ -559,9 +559,11 @@ GraphInit(LPGW lpgw)
 	AppendMenu(lpgw->hPopMenu, MF_STRING | (lpgw->antialiasing ? MF_CHECKED : MF_UNCHECKED),
 		M_ANTIALIASING, "&Antialiasing");
 	AppendMenu(lpgw->hPopMenu, MF_STRING | (lpgw->polyaa ? MF_CHECKED : MF_UNCHECKED),
-		M_POLYAA, "Antialiasing of Pol&ygons");
+		M_POLYAA, "Antialiasing of pol&ygons");
 	AppendMenu(lpgw->hPopMenu, MF_STRING | (lpgw->patternaa ? MF_CHECKED : MF_UNCHECKED),
-		M_PATTERNAA, "Antialiasing of Patt&erns");
+		M_PATTERNAA, "Antialiasing of patt&erns");
+	AppendMenu(lpgw->hPopMenu, MF_STRING | (lpgw->fastrotation ? MF_CHECKED : MF_UNCHECKED),
+		M_FASTROTATE, "Fast &rotation w/o antialiasing ");
 #endif
 	AppendMenu(lpgw->hPopMenu, MF_STRING, M_BACKGROUND, "&Background...");
 	AppendMenu(lpgw->hPopMenu, MF_STRING, M_CHOOSE_FONT, "Choose &Font...");
@@ -2806,6 +2808,8 @@ WriteGraphIni(LPGW lpgw)
 	WritePrivateProfileString(section, "GraphPolygonAA", profile, file);
 	wsprintf(profile, "%d", lpgw->patternaa);
 	WritePrivateProfileString(section, "GraphPatternAA", profile, file);
+	wsprintf(profile, "%d", lpgw->fastrotation);
+	WritePrivateProfileString(section, "GraphFastRotation", profile, file);
 	wsprintf(profile, "%d %d %d",GetRValue(lpgw->background),
 			GetGValue(lpgw->background), GetBValue(lpgw->background));
 	WritePrivateProfileString(section, "GraphBackground", profile, file);
@@ -2924,6 +2928,11 @@ ReadGraphIni(LPGW lpgw)
 		GetPrivateProfileString(section, "GraphPatternAA", "", profile, 80, file);
 	if ((p = GetInt(profile, (LPINT)&lpgw->patternaa)) == NULL)
 		lpgw->patternaa = TRUE;
+
+	if (bOKINI)
+		GetPrivateProfileString(section, "GraphFastRotation", "", profile, 80, file);
+	if ((p = GetInt(profile, (LPINT)&lpgw->fastrotation)) == NULL)
+		lpgw->fastrotation = TRUE;
 
 	lpgw->background = RGB(255,255,255);
 	if (bOKINI)
@@ -3524,6 +3533,7 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 				case M_ANTIALIASING:
 				case M_POLYAA:
 				case M_PATTERNAA:
+				case M_FASTROTATE:
 				case M_CHOOSE_FONT:
 				case M_COPY_CLIP:
 				case M_SAVE_AS_EMF:
@@ -3742,6 +3752,10 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 					lpgw->patternaa = !lpgw->patternaa;
 					SendMessage(hwnd, WM_COMMAND, M_REBUILDTOOLS, 0L);
 					return 0;
+				case M_FASTROTATE:
+					lpgw->fastrotation = !lpgw->fastrotation;
+					SendMessage(hwnd, WM_COMMAND, M_REBUILDTOOLS, 0L);
+					return 0;
 				case M_CHOOSE_FONT:
 					SelFont(lpgw);
 					WIN_update_options();
@@ -3805,6 +3819,8 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 						CheckMenuItem(lpgw->hPopMenu, M_PATTERNAA, MF_BYCOMMAND | MF_CHECKED);
 					else
 						CheckMenuItem(lpgw->hPopMenu, M_PATTERNAA, MF_BYCOMMAND | MF_UNCHECKED);
+					CheckMenuItem(lpgw->hPopMenu, M_FASTROTATE, MF_BYCOMMAND | 
+									(lpgw->fastrotation ? MF_CHECKED : MF_UNCHECKED));
 #endif
 					if (lpgw->graphtotop)
 						CheckMenuItem(lpgw->hPopMenu, M_GRAPH_TO_TOP, MF_BYCOMMAND | MF_CHECKED);
@@ -3972,6 +3988,8 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 				memrect.bottom = height * sampling + sampling/2;
 
 				if (!lpgw->buffervalid || (lpgw->hBitmap == NULL)) {
+					BOOL save_aa;
+
 					if (lpgw->hBitmap != NULL)
 						DeleteObject(lpgw->hBitmap);
 					lpgw->hBitmap = CreateCompatibleBitmap(hdc, memrect.right, memrect.bottom);
@@ -3987,8 +4005,16 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 						MakeFonts(lpgw, &memrect, memdc);
 					}
 
+					/* Temporarily switch of antialiasing during rotation */
+					save_aa = lpgw->antialiasing;
+					if (lpgw->rotating && lpgw->fastrotation)
+						lpgw->antialiasing = FALSE;
+
 					/* draw into memdc, then copy to hdc */
 					drawgraph(lpgw, memdc, &memrect);
+
+					/* restore antialiasing */
+					lpgw->antialiasing = save_aa;
 
 					/* drawing by gnuplot still in progress... */
 					lpgw->buffervalid = !lpgw->locked;
@@ -4144,7 +4170,7 @@ win_close_terminal_window(LPGW lpgw)
  * window that we need, in a single large structure. */
 
 void WDPROC
-Graph_set_cursor (LPGW lpgw, int c, int x, int y )
+Graph_set_cursor(LPGW lpgw, int c, int x, int y)
 {
 	switch (c) {
 	case -4: /* switch off line between ruler and mouse cursor */
@@ -4178,10 +4204,15 @@ Graph_set_cursor (LPGW lpgw, int c, int x, int y )
 		zoombox.from.y = zoombox.to.y = y;
 		break;
 	case 0:  /* standard cross-hair cursor */
-		SetCursor( (hptrCurrent = mouse_setting.on ? hptrCrossHair : hptrDefault) );
+		SetCursor((hptrCurrent = mouse_setting.on ? hptrCrossHair : hptrDefault));
+		/* Once done with rotation we have to redraw with aa once more. */
+		if (lpgw->rotating && lpgw->fastrotation && lpgw->antialiasing)
+			GraphRedraw(lpgw);
+		lpgw->rotating = FALSE;
 		break;
 	case 1:  /* cursor during rotation */
 		SetCursor(hptrCurrent = hptrRotating);
+		lpgw->rotating = TRUE;
 		break;
 	case 2:  /* cursor during scaling */
 		SetCursor(hptrCurrent = hptrScaling);

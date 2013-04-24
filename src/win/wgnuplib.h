@@ -1,5 +1,5 @@
 /*
- * $Id: wgnuplib.h,v 1.56 2012/05/23 17:27:34 markisch Exp $
+ * $Id: wgnuplib.h,v 1.57 2012/06/24 00:39:20 markisch Exp $
  */
 
 /* GNUPLOT - win/wgnuplib.h */
@@ -319,6 +319,7 @@ typedef struct tagGW {
 	HMENU	hPopMenu;	/* popup menu */
 	HBITMAP	hBitmap;	/* bitmap of current graph */
 	BOOL	buffervalid;	/* indicates of hBitmap is valid */
+	BOOL	rotating;	/* are we currently rotating the graph? */
 
 	struct GWOPBLK *gwopblk_head;
 	struct GWOPBLK *gwopblk_tail;
@@ -335,6 +336,7 @@ typedef struct tagGW {
 	BOOL	antialiasing;
 	BOOL	polyaa;		/* anti-aliasing for polygons ? */
 	BOOL	patternaa;	/* anti-aliasing for polygons ? */
+	BOOL	fastrotation;	/* rotate without anti-aliasing? */
 
 	BOOL	*hideplot;
 	unsigned int maxhideplots;
@@ -380,7 +382,7 @@ typedef struct tagGW {
 	COLORREF background;		/* background color */
 	HBRUSH	hbrush;				/* background brush */
 	HBRUSH	hcolorbrush;		/* */
-	int		sampling;	/* current sampling factor */
+	int		sampling;			/* current sampling factor */
 
 	struct tagGW * next;		/* pointer to next window */
 } GW;
