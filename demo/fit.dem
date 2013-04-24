@@ -1,117 +1,95 @@
 #
-# $Id: fit.dem,v 1.11 2013/03/12 19:59:09 sfeam Exp $
+# $Id: fit.dem,v 1.12 2013/04/20 13:54:26 markisch Exp $
 #
 
-print "Some examples how data fitting using nonlinear least squares fit"
-print "can be done."
-print ""
-pause -1 "first plotting the pure data set  (-> return)"
+print "Some examples how data fitting using nonlinear least squares fit can be done."
+print ''
 
-set title 'data for first fit demo'
-set xlabel "Temperature T  [deg Cels.]"
-set ylabel "Density [g/cm3]"
-set key below
-plot 'lcdemo.dat'
-
-print "now fitting a straight line to the data :-)"
-print "only as a demo without physical meaning"
-load 'line.fnc'
+print "We fit a straight line to the data -- only as a demo without physical meaning."
+l(x) = y0 + m*x
 y0 = 0.0
 m = 0.0
-print "fit function and initial parameters are as follows:"
-print GPFUN_l
-show variables y0
-show variables m
-#show variables
-pause -1 "add fit function with all parameters set to zero  (-> return)"
-set title 'all fit params set to 0'
+print "  fit function:", GPFUN_l
+print sprintf("  initial parameters: y0 = %g, m = %g", y0, m)
+print "  fit command: fit l(x) 'lcdemo.dat' via y0, m\n"
+set xlabel "Temperature T  (deg Cels.)"
+set ylabel "Density [g/cm3]"
+set key below
+set title 'data set and initial parameters'
 plot [*:*][-.1:1.2] 'lcdemo.dat', l(x)
-print "fit command will be: fit l(x) 'lcdemo.dat' via y0, m"
-pause -1 "now start fitting...  (-> return)"
+pause -1 "Now start fitting...  (-> return)"
+
 fit l(x) 'lcdemo.dat' via y0, m
-pause -1 "now look at the result (-> return)"
 set title 'unweighted fit'
 plot 'lcdemo.dat', l(x)
+pause -1 "Press enter to proceed with the next example."
 
-print ""
-print "now fit with weights from column 3 which favor low temperatures"
-print "command will be: fit l(x) 'lcdemo.dat' using 1:2:3 via y0, m"
-pause -1 "   (-> return)"
-fit l(x) 'lcdemo.dat' using 1:2:3 via y0, m
-pause -1 "now look at the result (-> return)"
-set title 'fit weighted towards low temperatures'
-plot 'lcdemo.dat', l(x)
-
-print ""
-print "now fit with weights from column 4 instead"
-print "command will be: fit l(x) 'lcdemo.dat' using 1:2:4 via y0, m"
-pause -1 "now prefer the high temperature data   (-> return)"
-fit l(x) 'lcdemo.dat' using 1:2:4 via y0, m
-pause -1 "now look at the result (-> return)"
-set title 'bias to high-temperates'
-plot 'lcdemo.dat', l(x)
-pause -1 "(-> return)"
-
-set title 'data with experimental errors'
+# BM: The "errors" given in column 5 of lcdemo.dat are clearly not measurement errors
+#     since the scatter in the data points is _much_ smaller.
+set title 'data with experimental weigths'
 plot 'lcdemo.dat' using 1:2:5 with errorbars
-print ""
-print "now use these real single-measurement errors from column 5 to reach "
-print "such a result (look at the file lcdemo.dat and compare the columns to "
-print "see the difference)"
-print "command will be: fit l(x) 'lcdemo.dat' using 1:2:5 via y0, m"
-pause -1 "(-> return)"
+print ''
+print "Now use the real single-measurement weights from column 5.  (Look at the file"
+print "lcdemo.dat and compare the columns to see the difference.)"
+print "Since these are weights we rescale the resulting parameter errors."
+print "  fit settings: set fit errorscaling"
+print "  fit command : fit l(x) 'lcdemo.dat' using 1:2:5 via y0, m\n"
+pause -1 "Press enter to start the fit."
+
+set fit errorscaling
 fit l(x) 'lcdemo.dat' using 1:2:5 via y0, m
-pause -1 "now look at the result (-> return)"
-set title 'fit weighted by experimental errors'
+set title 'fit weighted by experimental weights'
 plot 'lcdemo.dat' using 1:2:5 with errorbars, l(x)
-pause -1 "(-> return)"
+pause -1 "Press enter to proceed with the next example."
 
 load 'density.fnc'
-set title 'initial parameters for realistic model function'
-plot 'lcdemo.dat', density(x)
-print ""
-print "It's time now to try a more realistic model function:"
-print GPFUN_density
-print GPFUN_curve
-print GPFUN_lowlin
-print GPFUN_high
-#show functions
-print "density(x) is a function which shall fit the whole temperature"
-print "range using a ?: expression. It contains 6 model parameters which"
-print "will all be varied. Now take the start parameters out of the"
-print "file 'start.par' and plot the function."
-print "command will be: fit density(x) 'lcdemo.dat' via 'start.par'"
+print ''
+print "It's time now to try a more realistic model function:\n"
+print "  ", GPFUN_density
+print "  ", GPFUN_curve
+print "  ", GPFUN_lowlin
+print "  ", GPFUN_high
+print "\ndensity(x) is a function which shall fit the whole temperature range using"
+print "a ?: expression. It contains 6 model parameters which will all be varied. Now"
+print "take the start parameters out of the file 'start.par' and plot the function."
+print "  fit command: fit density(x) 'lcdemo.dat' using 1:2:5 via 'start.par'\n"
 load 'start.par'
-pause -1 "(-> return)"
-fit density(x) 'lcdemo.dat' via 'start.par'
-pause -1 "now look at the result (-> return)"
+set title 'initial parameters for realistic model function'
+plot 'lcdemo.dat' using 1:2:5 with errorbars, density(x)
+pause -1 "Press enter to start the fit."
+
+fit density(x) 'lcdemo.dat' using 1:2:5 via 'start.par'
 set title 'fitted to realistic model function'
-plot 'lcdemo.dat', density(x)
+plot 'lcdemo.dat' using 1:2:5 with errorbars, density(x)
 
-print  ""
-print  "looks already rather nice? We will do now the following: set"
-print  "the epsilon limit higher so that we need more iteration steps"
-print  "to convergence. During fitting please hit ctrl-C. You will be asked"
-print  "Stop, Continue, Execute: Try everything. You may define a script"
-print  "using the FIT_SCRIPT environment variable. An example would be"
-print  "'FIT_SCRIPT=plot nonsense.dat'. Normally you don't need to set"
-print  "FIT_SCRIPT since it defaults to 'replot'. Please note that FIT_SCRIPT"
-print  "cannot be set from inside gnuplot."
-print  ""
-print  "command will be: fit density(x) 'lcdemo.dat' via 'start.par'"
-pause -1  "(-> return)"
-set fit limit 1e-10
-fit density(x) 'lcdemo.dat' via 'start.par'
-set fit limit 1e-5
-pause -1 "now look at the result (-> return)"
-set title 'fit with more iterations'
-plot 'lcdemo.dat', density(x)
-pause -1  "(-> return)"
+# FIXME: Nowadays this is fit ends too quickly as to be usefull any more...
+#print ''
+#print "Looks already rather nice?  We will now do the following:  Set the epsilon"
+#print "fit3.dat lower so that we need more iteration steps to convergence."
+#print "During fitting please hit Ctrl-C.  You will be asked:"
+#print "  Stop, Continue, Execute"
+#print "Try all options.  You may define a script using the FIT_SCRIPT environment"
+#print "variable.  An example would be:"
+#print "  FIT_SCRIPT=plot nonsense.dat"
+#print "Normally you don't need to set FIT_SCRIPT since it defaults to 'replot'.  Please"
+#print "note that FIT_SCRIPT cannot be set from inside gnuplot."
+#print "  fit settings: set fit errorscaling limit 1e-10"
+#print "  fit command : fit density(x) 'lcdemo.dat' using 1:2:5 via 'start.par'\n"
+#pause -1 "Press enter to start the fit."
 
-print "\nNow a brief demonstration of 3d fitting."
-print "hemisphr.dat contains random points on a hemisphere of"
-print "radius 1, but we let fit figure this out for us."
-print "It takes many iterations, so we limit them to 50."
+#set fit errorscaling limit 1e-10
+#fit density(x) 'lcdemo.dat' using 1:2:5 via 'start.par'
+#set title 'fit with more iterations'
+#plot 'lcdemo.dat' using 1:2:5 with errorbars, density(x)
+#set fit limit 1e-5
+pause -1 "Press enter to proceed with the next example."
+
+
+print "\n\nNow a brief demonstration of 3d fitting."
+print "hemisphr.dat contains random points on a hemisphere of radius 1, but we let"
+print "fit figure this out for us.  It takes many iterations, so we limit them to 50."
+print "We also do not want intermediate results here."
+print "  fit settings: set fit results maxiter 50"
 #HBB: made this a lot harder: also fit the center of the sphere
 #h(x,y) = sqrt(r*r - (x-x0)**2 - (y-y0)**2) + z0
 #HBB 970522: distort the function, so it won't fit exactly:
@@ -119,139 +97,148 @@ h(x,y) = sqrt(r*r - (abs(x-x0))**2.2 - (abs(y-y0))**1.8) + z0
 x0 = 0.1
 y0 = 0.2
 z0 = 0.3
-r=0.5
-set fit maxiter 50
+r  = 0.5
 set title 'the scattered points, and the initial parameter'
 splot 'hemisphr.dat' using 1:2:3, h(x,y)
-print "fit function will be: " . GPFUN_h
-print "we *must* provide 4 columns for a 3d fit. We fake errors=1"
-print "command will be: fit h(x,y) 'hemisphr.dat' using 1:2:3:(1) via r, x0,y0,z0"
-pause -1 "(-> return)"
+print "  fit function: " . GPFUN_h
+print "We *must* provide 4 columns for a 3d fit. We fake errors=1."
+print "  fit command : fit h(x,y) 'hemisphr.dat' using 1:2:3:(1) via r, x0,y0,z0"
+pause -1 "Press enter to start the fit."
 
-# we *must* provide 4 columns for a 3d fit. We fake errors=1
+set fit results maxiter 50 errorscaling
+# We *must* provide 4 columns for a 3d fit. We fake errors=1.
 fit h(x,y) 'hemisphr.dat' using 1:2:3:(1) via r, x0, y0, z0
 set title 'the scattered points, fitted curve'
 splot 'hemisphr.dat' using 1:2:3, h(x,y)
-print "\n\nNotice, however, that this would converge much faster when"
-print "fitted in a more appropriate co-ordinate system:"
-print "fit r 'hemisphr.dat' using 0:($1*$1+$2*$2+$3*$3) via r"
-print "where we are fitting f(x)=r to the radii calculated as the data"
-print "is read from the file. No x value is required in this case."
+
+print ''
+print "Notice, however, that this would converge much faster when fitted in a more"
+print "appropriate co-ordinate system:"
+print "  fit r 'hemisphr.dat' using 0:($1*$1+$2*$2+$3*$3) via r"
+print "where we are fitting f(x)=r to the radii calculated as the data is read from"
+print "the file.  No x value is required in this case."
 print "(This is left as an excercise for the user)."
-print ""
+print ''
+
 print "Another possibility is to prescale the variables (set fit prescale),"
 print "which may improve convergence."
-pause -1 "(-> return)"
-set fit maxiter 0
+print "  fit settings: set fit maxiter 50 prescale"
+print "  fit command : fit h(x,y) 'hemisphr.dat' using 1:2:3:(1) via r, x0,y0,z0"
+#pause -1 "Press enter to start the fit."
 
-print "\n\nNow an example how to fit multi-branch functions\n"
-print  "The model consists of two branches, the first describing longitudinal"
-print  "sound velocity as function of propagation direction (upper data, from "
-print  "dataset 1), the second describing transverse sound velocity (lower "
-print  "data, from dataset 0).\n"
-print  "The model uses these data in order to fit elastic stiffnesses"
-print  "which occur differently in both branches."
+set fit maxiter 50 prescale
+x0 = 0.1
+y0 = 0.2
+z0 = 0.3
+r  = 0.5
+#fit h(x,y) 'hemisphr.dat' using 1:2:3:(1) via r, x0, y0, z0
+#replot
+set fit maxiter 0 noprescale brief
+pause -1 "Press enter to proceed with the next example."
+
+
+print "\n\nNow an example on how to fit multi-branch functions."
+print "The model consists of two branches, the first describing longitudinal sound"
+print "velocity as function of propagation direction (upper data, from dataset 1),"
+print "the second describing transverse sound velocity (lower data, from dataset 0)."
+print ''
+print "The model uses these data in order to fit elastic stiffnesses which occur"
+print "differently in both branches."
 load 'hexa.fnc'
 load 'sound.par'
 set title 'sound data, and model with initial parameters'
 plot 'soundvel.dat', vlong(x), vtrans(x)
-print ""
-print "fit function will be: " . GPFUN_f
-print GPFUN_vlong
-print GPFUN_vtrans
-print "y will be the index of the dataset"
-print "command will be: fit f(x,y) 'soundvel.dat' using 1:-2:2:(1) via 'sound.par'"
-pause -1 "(-> return)"
-# Must provide an error estimate for a 3d fit. Use constant 1
+print "  fit function: " . GPFUN_f
+print "                " . GPFUN_vlong
+print "                " . GPFUN_vtrans
+print "y will be the index of the dataset."
+print "  fit command: fit f(x,y) 'soundvel.dat' using 1:-2:2:(1) via 'sound.par'\n"
+pause -1 "Press enter to start the fit."
+
+# Must provide a weigth for a 3d fit. Use constant 1
 fit f(x,y) 'soundvel.dat' using 1:-2:2:(1) via 'sound.par'
 #create soundfit.par, reading from sound.par and updating values
 update 'sound.par' 'soundfit.par'
-print  ""
-pause -1 "(-> return)"
 set title 'pseudo-3d multi-branch fit to velocity data'
 plot 'soundvel.dat', vlong(x), vtrans(x)
-print  "Look at the file 'hexa.fnc' to see how the branches are realized"
-print  "using the data index as a pseudo-3d fit"
-print  ""
-print  "Next we only use every fifth data point for fitting by using the"
-print  "'every' keyword. Look at the fitting-speed increase and at"
-print  "fitting result."
-print  "command will be: fit f(x,y) 'soundvel.dat' every 5 using 1:-2:2:(1) via 'sound.par'"
-pause -1 "(-> return)"
+print ''
+print "Look at the file 'hexa.fnc' to see how the branches are realized using the"
+print "data index as input for a pseudo-3d fit."
+print ''
+pause -1 "Press enter to proceed with the next example."
+
+print "Next we only use every fifth data point for fitting by using the 'every'"
+print "keyword. Note the faster fit and its result."
+print "  fit command: fit f(x,y) 'soundvel.dat' every 5 using 1:-2:2:(1) via 'sound.par'\n"
 load 'sound.par'
+plot 'soundvel.dat', vlong(x), vtrans(x)
+pause -1 "Press enter to start the fit."
+
 fit f(x,y) 'soundvel.dat' every 5 using 1:-2:2:(1) via 'sound.par'
 set title 'fitted only every 5th data point'
 plot 'soundvel.dat', vlong(x), vtrans(x)
-print  "When you compare the results (see 'fit.log') you remark that"
-print  "the uncertainties in the fitted constants have become larger,"
-print  "the quality of the plot is only slightly affected."
-print  ""
-print  "By marking some parameters as '# FIXED' in the parameter file"
-print  "you fit only the others (c44 and c13 fixed here)."
-print  ""
-pause -1 "(-> return)"
+print ''
+print "When you compare the results (see 'fit.log') you will note that the error of"
+print "the fitted parameters have become larger, and the quality of the plot is only"
+print "slightly affected."
+pause -1 "Press enter to proceed with the next example."
+
+print ''
+print "By marking some parameters as '# FIXED' in the parameter file, you fit only"
+print "the others (c44 and c13 are fixed here)."
 load 'sound2.par'
 set title 'initial parameters'
 plot 'soundvel.dat', vlong(x), vtrans(x)
+pause -1 "Press enter to start the fit."
+
 fit f(x,y) 'soundvel.dat' using 1:-2:2:(1) via 'sound2.par'
 set title 'fit with c44 and c13 fixed'
 plot 'soundvel.dat', vlong(x), vtrans(x)
-print  "This has the same effect as specifying only the real free"
-print  "parameters by the 'via' syntax."
-print  ""
-print  "fit f(x) 'soundvel.dat' via c33, c11, phi0"
-print  ""
-pause -1 "(-> return)"
-load 'sound.par'
-set title 'initial parameters'
-plot 'soundvel.dat', vlong(x), vtrans(x)
-fit f(x,y) 'soundvel.dat' using 1:-2:2:(1) via c33, c11, phi0
-set title 'fit via c33,c11,phi0'
-plot 'soundvel.dat', vlong(x), vtrans(x)
+print ''
+print "This has the same effect as specifying only the real free parameters by"
+print "the 'via' syntax:"
+print "  fit f(x) 'soundvel.dat' via c33, c11, phi0\n"
+pause -1 "Press enter to proceed with the next example."
 
-print  "Here comes an example of a very complex function..."
-print  ""
-pause -1 "first plotting the pure data set  (-> return)"
 
+print "\n\nHere comes an example of a rather complex function.\n"
 set xlabel "Delta [degrees]"
 set ylabel "Reflectivity"
-set title 'raw data'
-#HBB 970522: here and below, use the error column present in moli3.dat:
-plot 'moli3.dat' w e
-
-print "now fitting the model function to the data"
 load 'reflect.fnc'
-
 #HBB 970522: Changed initial values to something sensible, i.e. 
 #  something an experienced user of fit would actually use.
 #  The fit limit is also reduced, to ensure a better fit.
 eta = 1.2e-4
-tc = 1.8e-3
-set fit limit 1e-10
+tc  = 1.8e-3
 
-#show variables
-#show functions
-pause -1 "first a plot with all parameters set to initial values  (-> return)"
-set title 'initial parameters'
+print "First a plot with all parameters set to initial values."
+set title 'data and initial parameters'
 plot 'moli3.dat' w e, R(x)
-print "fit function is: " . GPFUN_R
-print GPFUN_a
-print GPFUN_W
-print "command will be: fit R(x) 'moli3.dat' u 1:2:3 via eta, tc"
+print "Now fit the model function to the data."
+print "  fit settings: set fit limit 1e-10"
+print "  fit function: " . GPFUN_R
+print "                " . GPFUN_a
+print "                " . GPFUN_W
+print "  initial parameters:"
+print "                " . sprintf("eta = %g", eta)
+print "                " . sprintf("tc  = %g", tc)
+print "  fit command : fit R(x) 'moli3.dat' u 1:2:3 via eta, tc\n"
 pause -1 "now start fitting...  (-> return)"
+
+set fit limit 1e-10
 fit R(x) 'moli3.dat' u 1:2:3 via eta, tc
-pause -1 "Hit return to continue"
 set title 'fitted parameters'
 replot
 
 #HBB 970522: added comment on result of last fit.
-print "Looking at the plot of the resulting fit curve, you can see"
-print "that this function doesn't really fit this set of data points."
-print "This would normally be a reason to check for measurement problems"
-print "not yet accounted for, and maybe even re-think the theoretic"
-print "prediction in use."
-print ""
-pause -1 "Hit return to continue"
+print ''
+print "Looking at the plot of the resulting fit curve, you can see that this function"
+print "doesn't really fit this set of data points.  This would normally be a reason to"
+print "to check for measurement problems not yet accounted for, and maybe even re-think"
+print "the theoretic prediction in use."
+print ''
+pause -1 "Press enter to proceed with the next example."
+
 
 reset
 set xlabel 'x'
@@ -259,86 +246,81 @@ set ylabel 'y'
 set zlabel 'z'
 set ticslevel .2
 set zrange [-3:3]
-splot 'fit3.dat' index 0 using 1:2:4
 print ''
-print 'Next we show a fit with three independent variables.  The file'
-print 'fit3.dat has four columns, with values of the three independent'
-print 'variable x, y, and t, and the resulting value z.  The data'
-print 'lines are in four sections, with t being constant within each'
-print 'section.  The sections are separated by two blank lines, so we'
-print 'can select sections with "index" modifiers.  Here are the data in'
-print 'the first section, where t = -3.'
+print 'Next we show a fit with three independent variables.'
+print 'The file fit3.dat has four columns, with values of the three independent'
+print 'variables x, y and t, and the''resulting value z.  The data lines are in four'
+print 'sections, with t being constant within each section.  The sections are separated'
+print 'by two blank lines, so we can select sections with "index" modifiers.  Here are'
+print 'the data in the first section, where t = -3.'
 print ''
-print 'We will fit the function a0/(1 + a1*x**2 + a2*y**2) to these'
-print 'data. Since at this point we have two independent variables,'
-print 'our "using" spec has four entries, representing x:y:z:s (where'
-print 's is the estimated error in the z value).'
+print 'We will fit the function a0/(1 + a1*x**2 + a2*y**2) to these data.  Since at'
+print 'this point we have two independent variables, our "using" spec has four entries,'
+print 'representing x:y:z:s (where s is the estimated error in the z value).'
 
-print "Command will be: "
-print "  fit a0/(1+a1*x**2+a2*y**2) 'fit3.dat' index 0 using 1:2:4:(1) via a0,a1,a2"
-pause -1 "(-> return)"
 a0=1; a1=.1; a2=.1
-fit a0/(1+a1*x**2+a2*y**2) 'fit3.dat' index 0 using 1:2:4:(1) via a0,a1,a2
-pause -1 "(-> return)"
-splot a0/(1+a1*x**2+a2*y**2), 'fit3.dat' in 0 u 1:2:4
-pause -1 "(-> return)"
+f1(x,y)=a0/(1+a1*x**2+a2*y**2)
+print "  fit function: ", GPFUN_f1
+print "  fit command : fit f1(x,y) 'fit3.dat' index 0 using 1:2:4:(1) via a0,a1,a2\n"
+set title "data and initial parameters"
+splot f1(x,y), 'fit3.dat' in 0 u 1:2:4
+pause -1 "Press enter to start the fit."
 
-splot a0/(1+a1*x**2+a2*y**2), 'fit3.dat' in 3 u 1:2:4
+a0=1; a1=.1; a2=.1
+fit f1(x,y) 'fit3.dat' index 0 using 1:2:4:(1) via a0,a1,a2
+set title "fit to data with t = -3"
+splot f1(x,y), 'fit3.dat' in 0 u 1:2:4
+pause -1 "Press enter to proceed with the next example."
 
-print ""
+print ''
 print "Here is the last set of data where t = 3."
 print "We fit the same function to this set."
-print "Command will be: "
-print "  fit a0/(1+a1*x**2+a2*y**2) 'fit3.dat' in 3 u 1:2:4:(1) via a0,a1,a2"
-pause -1 "(-> return)"
-fit a0/(1+a1*x**2+a2*y**2) 'fit3.dat' in 3 u 1:2:4:(1) via a0,a1,a2
-pause -1 "(-> return)"
-splot a0/(1+a1*x**2+a2*y**2), 'fit3.dat' in 3 u 1:2:4
-pause -1 "(-> return)"
-splot a0/(1+a1*x**2+a2*y**2), 'fit3.dat' u 1:2:4
+print "  fit function: ", GPFUN_f1
+print "  fit command : fit f1(x,y) 'fit3.dat' index 3 using 1:2:4:(1) via a0,a1,a2\n"
+set title "fit to data with t = +3, initial parameters"
+splot f1(x,y), 'fit3.dat' in 3 u 1:2:4
+pause -1 "Press enter to start the fit."
 
-print ""
-print "We also have data for several intermediate values of t.  We"
-print "will fit the function f(x,y,t)=a0*t/(1+a1*x**2+a2*y**2) to all"
-print "the data.  Since there are now three independent variables, we"
-print "need a using spec with five entries, representing x:y:t:z:s."
-print "Command will be: "
-print "  fit f(x,y,t) 'fit3.dat' u 1:2:3:4:(1) via a0,a1,a2"
-pause -1 "(-> return)"
+fit f1(x,y) 'fit3.dat' in 3 u 1:2:4:(1) via a0,a1,a2
+set title "fit to data with t = +3"
+splot f1(x,y), 'fit3.dat' in 3 u 1:2:4
+pause -1 "Press enter to proceed with the next example."
+
+print ''
+print "We also have data for several intermediate values of t.  We will fit the"
+print "function f(x,y,t)=a0*t/(1+a1*x**2+a2*y**2) to all the data.  Since there are now"
+print "three independent variables, we need a using spec with five entries,"
+print "representing x:y:t:z:s." 
 f(x,y,t)=a0*t/(1+a1*x**2+a2*y**2)
+print "  fit function: ", GPFUN_f
+print "  fit command : fit f(x,y,t) 'fit3.dat' u 1:2:3:4:(1) via a0,a1,a2\n"
+set title "data for all indices t, initial parameters"
+splot f(x,y,1), 'fit3.dat' u 1:2:4
+pause -1 "Press enter to start the fit."
+
 fit f(x,y,t) 'fit3.dat' u 1:2:3:4:(1) via a0,a1,a2
-
-print "We plot the data in each section with the corresponding"
-print "function values."
-
-pause -1 "(-> return)"
-set multiplot layout 2, 2
-splot f(x,y,-3), 'fit3.dat' in 0 u 1:2:4
-splot f(x,y,-1), 'fit3.dat' in 1 u 1:2:4
-splot f(x,y,1), 'fit3.dat' in 2 u 1:2:4
-splot f(x,y,3), 'fit3.dat' in 3 u 1:2:4
-unset multiplot
-pause -1 "(-> return)"
+print ''
+print 'Here are all the data together.'
+set title "fit to all data"
 splot f(x,y,3),  'fit3.dat' in 3 u 1:2:4, \
       f(x,y,1),  'fit3.dat' in 2 u 1:2:4, \
       f(x,y,-1), 'fit3.dat' in 1 u 1:2:4, \
       f(x,y,-3), 'fit3.dat' in 0 u 1:2:4
 
-print 'Here are all the data together.'
 print ''
-print 'You can use ranges to rename variables and/or limit the data'
-print 'included in the fit.  The first range corresponds to the first'
-print '"using" entry, etc.  For example, we could have gotten the same'
-print 'fit like this:'
+print 'You can use ranges to rename variables and/or limit the data included in the'
+print 'fit.  The first range corresponds to the first "using" entry, etc. For example,'
+print 'we could have gotten the same fit like this:'
 print '   fit [lon=*:*][lat=*:*][time=*:*]        \'
-print '   a0*time/(1 + a1*lon**2 + a2*lat**2)     \'
-print '   "fit3.dat" u 1:2:3:4:(1) via a0,a1,a2'
-print ''
+print '     a0*time/(1 + a1*lon**2 + a2*lat**2)   \'
+print '     "fit3.dat" u 1:2:3:4:(1) via a0,a1,a2'
 
-print  "You can have a look at all previous fit results by looking into"
-print  "the file 'fit.log' (or whatever you defined the environment"
-print  "variable 'FIT_LOG' to). Remember that this file will always be"
-print  "appended to, so remove it from time to time."
-print  ""
+print ''
+print "You can have a look at all previous fit results by looking into the file"
+print "'fit.log' (or whatever you defined the environment variable 'FIT_LOG' to)."
+print "Remember that this file will always be appended to, so remove it from time"
+print "to time."
+
+print ''
 pause -1 "Done with fitting demo  (-> return)"
 reset

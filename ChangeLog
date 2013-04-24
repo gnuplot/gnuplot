@@ -15,6 +15,10 @@
 
 	* src/fit.c (backup_file):  Remove code path for Win32s.
 
+	* demo/fit.dem:  Update to new syntax. Reduce number of pause statements,
+	remove plots which show only the data or duplicate techniques already
+	demonstrated. Add some more comments and plot titles.
+
 2013-04-22  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* term/win.trm (WIN_options):  Validate argument to title option.
