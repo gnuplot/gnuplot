@@ -1,5 +1,5 @@
 /*
- * $Id: wgraph.c,v 1.159 2013/04/22 22:23:11 markisch Exp $
+ * $Id: wgraph.c,v 1.160 2013/04/24 20:05:33 markisch Exp $
  */
 
 /* GNUPLOT - win/wgraph.c */
@@ -3819,7 +3819,7 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 						CheckMenuItem(lpgw->hPopMenu, M_PATTERNAA, MF_BYCOMMAND | MF_CHECKED);
 					else
 						CheckMenuItem(lpgw->hPopMenu, M_PATTERNAA, MF_BYCOMMAND | MF_UNCHECKED);
-					CheckMenuItem(lpgw->hPopMenu, M_FASTROTATE, MF_BYCOMMAND | 
+					CheckMenuItem(lpgw->hPopMenu, M_FASTROTATE, MF_BYCOMMAND |
 									(lpgw->fastrotation ? MF_CHECKED : MF_UNCHECKED));
 #endif
 					if (lpgw->graphtotop)
@@ -4206,9 +4206,10 @@ Graph_set_cursor(LPGW lpgw, int c, int x, int y)
 	case 0:  /* standard cross-hair cursor */
 		SetCursor((hptrCurrent = mouse_setting.on ? hptrCrossHair : hptrDefault));
 		/* Once done with rotation we have to redraw with aa once more. */
-		if (lpgw->rotating && lpgw->fastrotation && lpgw->antialiasing)
+		if (lpgw->rotating && lpgw->fastrotation && lpgw->antialiasing) {
+			lpgw->rotating = FALSE;
 			GraphRedraw(lpgw);
-		lpgw->rotating = FALSE;
+		}
 		break;
 	case 1:  /* cursor during rotation */
 		SetCursor(hptrCurrent = hptrRotating);
