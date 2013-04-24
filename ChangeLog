@@ -1,9 +1,3 @@
-2013-04-24  Bastian Maerkisch  <bmaerkisch@web.de>
-
-	* src/win/wgnuplib.h src/win/wgraph.c src/win/wresourc.h term/win.trm:
-	Speed up rotating graphs with the mouse by temporarily disabling
-	antialiasing. Add user interface and ini file setting.
-
 2013-04-24  Thomas Mattison  <mattison <at> phas.ubc.ca>
 
 	* src/fit.c:  Optional one-line progress reports. Move code to output status
@@ -17,13 +11,20 @@
 	of fit's output. Default to brief one-line reports. 'verbose' selects the
 	traditional full report.
 
-	* src/show.c (show_variables):  Avoid extra newline in output.
-
 	* src/fit.c (backup_file):  Remove code path for Win32s.
+
+	* src/fit.c (show_results):  Print correlation matrix only if there is
+	more than one parameter.
 
 	* demo/fit.dem:  Update to new syntax. Reduce number of pause statements,
 	remove plots which show only the data or duplicate techniques already
 	demonstrated. Add some more comments and plot titles.
+
+	* src/show.c (show_variables):  Avoid extra newline in output.
+
+	* src/win/wgnuplib.h src/win/wgraph.c src/win/wresourc.h term/win.trm:
+	Speed up rotating graphs with the mouse by temporarily disabling
+	antialiasing. Add user interface and ini file setting.
 
 2013-04-22  Bastian Maerkisch  <bmaerkisch@web.de>
 

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: fit.c,v 1.92 2013/04/24 06:02:08 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: fit.c,v 1.93 2013/04/24 19:59:41 markisch Exp $"); }
 #endif
 
 /*  NOTICE: Change of Copyright Status
@@ -875,20 +875,23 @@ show_results(double chisq, double last_chisq, double* a, double* dpar, double** 
 		setvarerr(par_name[i], dpar[i] * scale_params[i]);
 	}
 
-	Dblf("\ncorrelation matrix of the fit parameters:\n");
-	Dblf("               ");
+	/* Print correlation matrix only if there is more than one parameter. */
+	if (num_params > 1) {
+	    Dblf("\ncorrelation matrix of the fit parameters:\n");
 
-	for (j = 0; j < num_params; j++)
-	    Dblf2("%-6.6s ", par_name[j]);
-
-	Dblf("\n");
-	for (i = 0; i < num_params; i++) {
-	    Dblf2("%-15.15s", par_name[i]);
-	    for (j = 0; j <= i; j++) {
-		/* Only print lower triangle of symmetric matrix */
-		Dblf2("%6.3f ", corel[i][j]);
-	    }
+	    Dblf("                ");
+	    for (j = 0; j < num_params; j++)
+		Dblf2("%-6.6s ", par_name[j]);
 	    Dblf("\n");
+
+	    for (i = 0; i < num_params; i++) {
+		Dblf2("%-15.15s", par_name[i]);
+		for (j = 0; j <= i; j++) {
+		    /* Only print lower triangle of symmetric matrix */
+		    Dblf2("%6.3f ", corel[i][j]);
+		}
+		Dblf("\n");
+	    }
 	}
     }
 }
