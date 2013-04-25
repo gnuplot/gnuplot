@@ -62,7 +62,7 @@ $(T)svg.trm $(T)t410x.trm $(T)tek.trm $(T)texdraw.trm $(T)tgif.trm \
 $(T)tkcanvas.trm $(T)tpic.trm $(T)v384.trm $(T)vgagl.trm \
 $(T)vws.trm $(T)win.trm $(T)wxt.trm $(T)x11.trm $(T)xlib.trm 
 
-DIST_COMMON = README
+# DIST_COMMON = README
 
 SOURCES = checkdoc.c doc2gih.c doc2hlp.c doc2ipf.c doc2ms.c doc2rnh.c	\
 doc2rtf.c doc2tex.c windows/doc2html.c termdoc.c xref.c
@@ -71,8 +71,8 @@ TERM_H = $(top_srcdir)/src/term.h
 
 DOCHEADERS = doc2x.h xref.h
 
-EXTRA_DIST = Makefile.in doc2texi.el gnuplot.doc gpcard.tex	\
-makefile.dst titlepag.ipf titlepag.ms titlepag.tex	\
+EXTRA_DIST = Makefile.in doc2texi.el figure_missing.pdf gnuplot.doc \
+gpcard.tex makefile.dst titlepag.ipf titlepag.ms titlepag.tex	\
 toc_entr.sty psdoc faq-ja.tex gnuplot-ja.doc README.ja	\
 term-ja.diff plotstyles.gnu pdffigures.tex gnuplot.pdf windows
 
@@ -82,7 +82,7 @@ doc2gih gnuplot.gih doc2hlp gnuplot.hlp gnuplot.idx gnuplot.ilg		\
 gnuplot.ind gnuplot.info* gnuplot.out doc2ipf gnuplot.ipf doc2ms	\
 gnuplot.ms doc2rnh gnuplot.rnh doc2rtf gnuplot.rtf gnuplot.nroff	\
 checkdoc gnuplot.txt gnuplot.tmp VERSION gnuplot.4tc gnuplot.4ct	\
-gnuplot.idv gnuplot.xref gnuplot.lg figure*.pdf pdffigures.*		\
+gnuplot.idv gnuplot.xref gnuplot.lg pdffigures.*			\
 wxhelp/*.html wxhelp/wgnuplot.htc windows/wgnuplot.htk gnuplot.pdf	\
 gnuplot.htb gnuplot.texi gnuplot-eldoc.el gnuplot-eldoc.elc
 
@@ -353,6 +353,15 @@ check-local: checkdoc$(EXEEXT)
 	else \
 	  :; \
 	fi
+
+clean-local:
+	@for f in figure*.pdf ; do \
+	   if [ "$$f" != "figure_missing.pdf" ]; then \
+	     rm -f $$f ; \
+	   else \
+	     :; \
+	   fi \
+	 done
 
 checkdoc_SOURCES = checkdoc.c termdoc.c gnuplot.doc
 

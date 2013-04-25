@@ -9,7 +9,8 @@ VERSION configure.vms pm3d win
 
 DISTCLEANFILES = stamp-h
 
-LISP_DISTCLEANFILES = gpelcard.dvi gpelcard.pdf gpelcard.ps
+LISP_DISTCLEANFILES = Makefile gnuplot-gui.elc gnuplot.elc gpelcard.dvi \
+gpelcard.pdf gpelcard.ps
 
 ACLOCAL_AMFLAGS = -I m4
 

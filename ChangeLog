@@ -1,3 +1,9 @@
+2013-04-25  Lars Hecking  <lhecking@users.sourceforge.net>
+
+	* Makefile.am docs/Makefile.am man/Makefile.am: Clean up processing
+	of lisp files gnuplot-gui.elc and gnuplot.elc, packaging of file
+	figure_missing.pdf.
+
 2013-04-25  Christoph Bersch <usenet@bersch.net>
 
 	* src/gadgets.c src/gadgets.h src/graphics.c src/term.c:
