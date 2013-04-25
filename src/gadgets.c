@@ -242,6 +242,52 @@ draw_clip_line(int x1, int y1, int x2, int y2)
     (*t->vector) (x2, y2);
 }
 
+/* Draw a contiguous line path which may be clipped. Compared to
+ * draw_clip_line(), this routine moves to a coordinate only when
+ * necessary.
+ */
+void 
+draw_clip_polygon(int points, gpiPoint *p) 
+{
+    int i;
+    int x1, y1, x2, y2;
+    int pos1, pos2;
+    struct termentry *t = term;
+
+    if (points <= 1) 
+	return;
+    
+    x1 = p[0].x;
+    y1 = p[0].y;
+    pos1 = clip_point(x1, y1);
+    if (!pos1) {
+	/* move to first point if it is inside */
+	(*t->move)(x1, y1);
+    }
+    for (i = 1; i < points; i++) {
+	x2 = p[i].x;
+	y2 = p[i].y;
+	pos2 = clip_point(x2, y2);
+
+	if ((pos1 && !pos2) || (!pos1 && pos2)) {
+	    /* one vertex inside, one is outside */
+	    clip_line(&x1, &y1, &x2, &y2);
+	    if (pos1) {
+		/* moved from outside to inside */
+		(*t->move)(x1, y1);
+	    }
+	} 
+	if (!(pos1 && pos2)) {
+	    /* at least one is inside, draw to next one */
+	    (*t->vector)(x2, y2);
+	}
+
+	x1 = p[i].x;
+	y1 = p[i].y;
+	pos1 = pos2;
+    }
+}
+
 void
 draw_clip_arrow( int sx, int sy, int ex, int ey, int head)
 {
@@ -376,6 +422,103 @@ clip_line(int *x1, int *y1, int *x2, int *y2)
     return -1;
 }
 
+/* test if coordinates of a vertex are inside boundary box. The start
+   and end points for the clip_boundary must be in correct order for
+   this to work properly (see respective definitions in clip_polygon()). */
+TBOOLEAN
+vertex_is_inside(gpiPoint test_vertex, gpiPoint *clip_boundary)
+{
+    if (clip_boundary[1].x > clip_boundary[0].x)              /*bottom edge*/
+	if (test_vertex.y >= clip_boundary[0].y) return TRUE;
+    if (clip_boundary[1].x < clip_boundary[0].x)              /*top edge*/
+	if (test_vertex.y <= clip_boundary[0].y) return TRUE;
+    if (clip_boundary[1].y > clip_boundary[0].y)              /*right edge*/
+	if (test_vertex.x <= clip_boundary[1].x) return TRUE;
+    if (clip_boundary[1].y < clip_boundary[0].y)              /*left edge*/
+	if (test_vertex.x >= clip_boundary[1].x) return TRUE;
+    return FALSE;
+} 
+
+void
+intersect_polyedge_with_boundary(gpiPoint first, gpiPoint second, gpiPoint *intersect, gpiPoint *clip_boundary)
+{
+    /* this routine is called only if one point is outside and the other
+       is inside, which implies that clipping is needed at a horizontal
+       boundary, that second.y is different from first.y and no division
+       by zero occurs. Same for vertical boundary and x coordinates. */
+    if (clip_boundary[0].y == clip_boundary[1].y) { /* horizontal */
+	(*intersect).y = clip_boundary[0].y;
+	(*intersect).x = first.x + (clip_boundary[0].y - first.y) * (second.x - first.x)/(second.y - first.y);
+    } else { /* vertical */
+	(*intersect).x = clip_boundary[0].x;
+	(*intersect).y = first.y + (clip_boundary[0].x - first.x) * (second.y - first.y)/(second.x - first.x);
+    }
+}
+
+/* Clip the given polygon to a single edge of the bounding box. */
+void 
+clip_polygon_to_boundary(gpiPoint *in, gpiPoint *out, int in_length, int *out_length, gpiPoint *clip_boundary)
+{
+    gpiPoint prev, curr; /* start and end point of current polygon edge. */
+    int j;
+
+    *out_length = 0;
+    prev = in[in_length - 1]; /* start with the last vertex */
+    for (j = 0; j < in_length; j++) {
+	curr = in[j];
+	if (vertex_is_inside(curr, clip_boundary)) {
+	    if (vertex_is_inside(prev, clip_boundary)) {
+		/* both are inside, add current vertex */
+		out[*out_length] = in[j];
+		(*out_length)++;
+	    } else {
+		/* changed from outside to inside, add intersection point and current point */
+		intersect_polyedge_with_boundary(prev, curr, out+(*out_length), clip_boundary);
+		out[*out_length+1] = curr;
+		*out_length += 2;
+	    }
+	} else {
+	    if (vertex_is_inside(prev, clip_boundary)) {
+		/* changed from inside to outside, add intersection point */
+		intersect_polyedge_with_boundary(prev, curr, out+(*out_length), clip_boundary);
+		(*out_length)++;
+	    }
+	}
+	prev = curr;
+    }
+}
+
+/* Clip the given polygon to drawing coords defined by BoundingBox.
+ * This routine uses the Sutherland-Hodgman algorithm.  When calling
+ * this function, you must make sure that you reserved enough
+ * memory for the output polygon. out_length can be as big as
+ * 2*(in_length - 1)
+ */
+void
+clip_polygon(gpiPoint *in, gpiPoint *out, int in_length, int *out_length)
+{
+    int i, j;
+    gpiPoint clip_boundary[5];
+    /* vertices of the rectangular clipping window starting from
+       top-left in counterclockwise direction */
+    clip_boundary[0].x = clip_area->xleft;  /* top left */
+    clip_boundary[0].y = clip_area->ytop;
+    clip_boundary[1].x = clip_area->xleft;  /* bottom left */
+    clip_boundary[1].y = clip_area->ybot;
+    clip_boundary[2].x = clip_area->xright; /* bottom right */
+    clip_boundary[2].y = clip_area->ybot;
+    clip_boundary[3].x = clip_area->xright; /* top right */
+    clip_boundary[3].y = clip_area->ytop;
+    clip_boundary[4] = clip_boundary[0];
+
+    for(i = 0; i < 4; i++) {
+	clip_polygon_to_boundary(in, out, in_length, out_length, clip_boundary+i);
+	for (j = 0; j < *out_length; j++) {
+	    in[j] = out[j];
+	}
+	in_length = *out_length;
+    }
+}
 
 /* Two routines to emulate move/vector sequence using line drawing routine. */
 static unsigned int move_pos_x, move_pos_y;

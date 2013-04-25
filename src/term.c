@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.250 2013/02/23 01:57:59 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.251 2013/03/22 04:46:55 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -1204,7 +1204,7 @@ do_arrow(
     double dx = sx - ex;
     double dy = sy - ey;
     double len_arrow = sqrt(dx * dx + dy * dy);
-    gpiPoint filledhead[5];
+    gpiPoint head_points[5];
     int xm = 0, ym = 0;
     BoundingBox *clip_save;
     t_arrow_head head = (t_arrow_head)((headstyle < 0) ? -headstyle : headstyle);
@@ -1270,63 +1270,55 @@ do_arrow(
 	}
 
 	if (head & END_HEAD) {
+	    head_points[0].x = ex + xm;
+	    head_points[0].y = ey + ym;
+	    head_points[1].x = ex + x1;
+	    head_points[1].y = ey + y1;
+	    head_points[2].x = ex;
+	    head_points[2].y = ey;
+	    head_points[3].x = ex + x2;
+	    head_points[3].y = ey + y2;
+	    head_points[4].x = ex + xm;
+	    head_points[4].y = ey + ym;	    
 	    if (curr_arrow_headfilled==2 && !clip_point(ex,ey)) {
 		/* draw filled forward arrow head */
-		filledhead[0].x = ex + xm;
-		filledhead[0].y = ey + ym;
-		filledhead[1].x = ex + x1;
-		filledhead[1].y = ey + y1;
-		filledhead[2].x = ex;
-		filledhead[2].y = ey;
-		filledhead[3].x = ex + x2;
-		filledhead[3].y = ey + y2;
-		filledhead[4].x = ex + xm;
-		filledhead[4].y = ey + ym;
-		filledhead->style = FS_OPAQUE;
+		head_points->style = FS_OPAQUE;
 		if (t->filled_polygon)
-		    (*t->filled_polygon) (5, filledhead);
+		    (*t->filled_polygon) (5, head_points);
 	    }
 	    /* draw outline of forward arrow head */
 	    if (clip_point(ex,ey))
 		;
 	    else if (curr_arrow_headfilled!=0) {
-		draw_clip_line(ex+xm, ey+ym, ex+x1, ey+y1);
-		draw_clip_line(ex+x1, ey+y1, ex, ey);
-		draw_clip_line(ex, ey, ex+x2, ey+y2);
-		draw_clip_line(ex+x2, ey+y2, ex+xm, ey+ym);
+		draw_clip_polygon(5, head_points);
 	    } else {
-		draw_clip_line(ex+x1, ey+y1, ex, ey);
-		draw_clip_line(ex, ey, ex+x2, ey+y2);
+		draw_clip_polygon(3, head_points+1);
 	    }
 	}
 
 	/* backward arrow head */
 	if ((head & BACKHEAD) && !clip_point(sx,sy)) {
+	    head_points[0].x = sx - xm;
+	    head_points[0].y = sy - ym;
+	    head_points[1].x = sx - x1;
+	    head_points[1].y = sy - y1;
+	    head_points[2].x = sx;
+	    head_points[2].y = sy;
+	    head_points[3].x = sx - x2;
+	    head_points[3].y = sy - y2;
+	    head_points[4].x = sx - xm;
+	    head_points[4].y = sy - ym;
 	    if (curr_arrow_headfilled==2) {
 		/* draw filled backward arrow head */
-		filledhead[0].x = sx - xm;
-		filledhead[0].y = sy - ym;
-		filledhead[1].x = sx - x1;
-		filledhead[1].y = sy - y1;
-		filledhead[2].x = sx;
-		filledhead[2].y = sy;
-		filledhead[3].x = sx - x2;
-		filledhead[3].y = sy - y2;
-		filledhead[4].x = sx - xm;
-		filledhead[4].y = sy - ym;
-		filledhead->style = FS_OPAQUE;
+		head_points->style = FS_OPAQUE;
 		if (t->filled_polygon)
-		    (*t->filled_polygon) (5, filledhead);
+		    (*t->filled_polygon) (5, head_points);
 	    }
 	    /* draw outline of backward arrow head */
 	    if (curr_arrow_headfilled!=0) {
-		draw_clip_line(sx-xm, sy-ym, sx-x2, sy-y2);
-		draw_clip_line(sx-x2, sy-y2, sx, sy);
-		draw_clip_line(sx, sy, sx-x1, sy-y1);
-		draw_clip_line(sx-x1, sy-y1, sx-xm, sy-ym);
+		draw_clip_polygon(5, head_points);
 	    } else {
-		draw_clip_line(sx-x2, sy-y2, sx, sy);
-		draw_clip_line(sx, sy, sx-x1, sy-y1);
+		draw_clip_polygon(3, head_points+1);
 	    }
 	}
     }
@@ -1407,23 +1399,10 @@ do_arc(
 	complete_circle = TRUE;
 
     if (style) { /* Fill in the center */
-	/* EAM DEBUG - Do proper clipping */
 	gpiPoint fillarea[250];
-	int xcent, ycent, in;
-	for (i=0, in=0; i<segments; i++) {
-	    xcent = cx; ycent = cy;
-	    fillarea[in] = vertex[i];
-	    if (clip_line(&xcent, &ycent, &fillarea[in].x, &fillarea[in].y))
-		in++;
-	}
-	if (clip_point(cx,cy))
-	    for (i=segments-1; i>=0; i--) {
-		fillarea[in+1] = vertex[i];
-		fillarea[in].x = cx; fillarea[in].y = cy;
-		if (0 > clip_line(&fillarea[in+1].x, &fillarea[in+1].y,
-				  &fillarea[in].x, &fillarea[in].y))
-		    in++;
-	    }
+	int in;
+
+	clip_polygon(vertex, fillarea, segments, &in);
 	fillarea[0].style = style;
 	if (term->filled_polygon)
 	    term->filled_polygon(in, fillarea);
@@ -1431,9 +1410,7 @@ do_arc(
     } else { /* Draw the arc */
 	if (!wedge && !complete_circle)
 	    segments -= 2;
-	for (i=0; i<segments; i++)
-	    draw_clip_line( vertex[i].x, vertex[i].y,
-		vertex[i+1].x, vertex[i+1].y );
+	draw_clip_polygon(segments+1, vertex);
     }
 }
 #endif /* EAM_OBJECTS */

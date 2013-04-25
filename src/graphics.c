@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.418 2013/03/30 00:21:39 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.419 2013/04/07 17:20:33 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -4603,7 +4603,6 @@ do_ellipse( int dimensions, t_ellipse *e, int style, TBOOLEAN do_own_mapping )
     double xoff, yoff;
     double junkfoo;
     int junkw, junkh;
-    int xcent, ycent;
     double cosO = cos(DEG2RAD * e->orientation);
     double sinO = sin(DEG2RAD * e->orientation);
     double A = e->extent.x / 2.0;	/* Major axis radius */
@@ -4689,28 +4688,13 @@ do_ellipse( int dimensions, t_ellipse *e, int style, TBOOLEAN do_own_mapping )
     if (style) {
 	/* Fill in the center */
 	gpiPoint fillarea[120];
-	for (i=0, in=0; i<segments; i++) {
-	    xcent = cx; ycent = cy;
-	    fillarea[in] = vertex[i];
-	    if (clip_line(&xcent, &ycent, &fillarea[in].x, &fillarea[in].y))
-		in++;
-	}
-	if (clip_point(cx,cy))
-	    for (i=segments-1; i>=0; i--) {
-		fillarea[in+1] = vertex[i];
-		fillarea[in].x = cx; fillarea[in].y = cy;
-		if (clip_line(&fillarea[in+1].x, &fillarea[in+1].y, &fillarea[in].x, &fillarea[in].y))
-		    in++;
-	    }
-
+	clip_polygon(vertex, fillarea, segments, &in);
 	fillarea[0].style = style;
 	if (term->filled_polygon)
 	    term->filled_polygon(in, fillarea);
     } else {
 	/* Draw the arc */
-	for (i=0; i<segments; i++)
-	    draw_clip_line( vertex[i].x, vertex[i].y,
-		vertex[i+1].x, vertex[i+1].y );
+	draw_clip_polygon(segments+1, vertex);
     }
 }
 
@@ -4745,35 +4729,14 @@ do_polygon( int dimensions, t_polygon *p, int style )
 	clip_area = &canvas;
 
     if (term->filled_polygon && style) {
-	int i,o;
-	int clipped = 1;
-	gpiPoint temp;
-	for (i=0,o=0; i<nv-1; i++) {
-	    clpcorn[o] = corners[i];
-	    temp = corners[i+1];
-	    clipped = clip_line(&corners[i].x, &corners[i].y, &corners[i+1].x, &corners[i+1].y);
-	    if (clipped == 0) continue;	/* both ends out of range */
-	    if (clipped  > 0) o++;	/* both ends in range */
-	    if (clipped  < 0) {		/* clipped to range */
-		clpcorn[o++] = corners[i];
-		clpcorn[o++] = corners[i+1];
-		corners[i+1] = temp;
-	    }
-	}
-	if (clipped == 1)
-	    clpcorn[o++] = corners[i];
+	int out_length;
+	clip_polygon(corners, clpcorn, nv, &out_length);
 	clpcorn[0].style = style;
-	term->filled_polygon(o, clpcorn);
+	term->filled_polygon(out_length, clpcorn);
 
     } else { /* Just draw the outline? */
-	int i;
  	newpath();
-	for (i=0; i<nv-1; i++)
-	    draw_clip_line( corners[i].x, corners[i].y,
-		corners[i+1].x, corners[i+1].y );
-	if (corners[i].x != corners[0].x || corners[i].y != corners[0].y)
-	    draw_clip_line( corners[i].x, corners[i].y,
-		corners[0].x, corners[0].y );
+	draw_clip_polygon(nv, corners);
 	closepath();
     }
 

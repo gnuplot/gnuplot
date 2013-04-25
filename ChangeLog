@@ -1,3 +1,11 @@
+2013-04-25  Christoph Bersch <usenet@bersch.net>
+
+	* src/gadgets.c src/gadgets.h src/graphics.c src/term.c:
+	Implement the Sutherland-Hodgman algorithm for clipping a general
+	polygon against a rectangular bounding box.  Apply this to clip
+	polygon objects (including circles and ellipses) and arrowheads.
+	It has not yet been applied to 'plot ... with filledcurves'.
+
 2013-04-24  Thomas Mattison  <mattison <at> phas.ubc.ca>
 
 	* src/fit.c:  Optional one-line progress reports. Move code to output
