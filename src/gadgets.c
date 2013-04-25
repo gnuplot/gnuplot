@@ -463,7 +463,11 @@ clip_polygon_to_boundary(gpiPoint *in, gpiPoint *out, int in_length, int *out_le
     int j;
 
     *out_length = 0;
-    prev = in[in_length - 1]; /* start with the last vertex */
+    if (in_length <= 0)
+	return;
+    else
+	prev = in[in_length - 1]; /* start with the last vertex */
+
     for (j = 0; j < in_length; j++) {
 	curr = in[j];
 	if (vertex_is_inside(curr, clip_boundary)) {
