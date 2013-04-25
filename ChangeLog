@@ -4,7 +4,9 @@
 	Implement the Sutherland-Hodgman algorithm for clipping a general
 	polygon against a rectangular bounding box.  Apply this to clip
 	polygon objects (including circles and ellipses) and arrowheads.
-	It has not yet been applied to 'plot ... with filledcurves'.
+
+	* src/graphics.c (plot_filledcurves finish_filled_curve):
+	Use new polygon clipping code for filledcurves.
 
 2013-04-24  Thomas Mattison  <mattison <at> phas.ubc.ca>
 

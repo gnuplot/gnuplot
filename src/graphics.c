@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.419 2013/04/07 17:20:33 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.420 2013/04/25 16:12:14 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -101,9 +101,7 @@ static void plot_boxes __PROTO((struct curve_points * plot, int xaxis_y));
 static void plot_filledcurves __PROTO((struct curve_points * plot));
 static void finish_filled_curve __PROTO((int, gpiPoint *, struct curve_points *));
 static void plot_betweencurves __PROTO((struct curve_points * plot));
-static void fill_missing_corners __PROTO((gpiPoint *corners, int *points, int exit, int reentry, int updown, int leftright));
 static void fill_between __PROTO((double, double, double, double, double, double, double, double, struct curve_points *));
-static TBOOLEAN bound_intersect __PROTO((struct coordinate GPHUGE * points, int i, double *ex, double *ey, filledcurves_opts *filledcurves_options));
 static void plot_vectors __PROTO((struct curve_points * plot));
 static void plot_f_bars __PROTO((struct curve_points * plot));
 static void plot_c_bars __PROTO((struct curve_points * plot));
@@ -1048,6 +1046,8 @@ finish_filled_curve(
     gpiPoint *corners,
     struct curve_points *plot)
 {
+    static gpiPoint *clipcorners = NULL;
+    int clippoints;
     filledcurves_opts *filledcurves_options = &plot->filledcurves_options;
     long side = 0;
     int i;
@@ -1150,9 +1150,11 @@ finish_filled_curve(
     if (filledcurves_options->oneside < 0 && side > 0)
 	return;
 
-    /* EAM Mar 2004 - Apply fill style to filled curves */
-    corners->style = style_from_fill(&plot->fill_properties);
-    term->filled_polygon(points, corners);
+    /* EAM Apr 2013 - Use new polygon clipping code */
+    clipcorners = gp_realloc( clipcorners, 2*points*sizeof(gpiPoint), "filledcurve verticess");
+    clip_polygon(corners, clipcorners, points, &clippoints);
+    clipcorners->style = style_from_fill(&plot->fill_properties);
+    term->filled_polygon(clippoints, clipcorners);
 }
 
 
@@ -1163,18 +1165,9 @@ plot_filledcurves(struct curve_points *plot)
     int x, y;			/* point in terminal coordinates */
     struct termentry *t = term;
     enum coord_type prev = UNDEFINED;	/* type of previous point */
-    double ex, ey;			/* an edge point */
-    double lx[2], ly[2];		/* two edge points */
     int points = 0;			/* how many corners */
     static gpiPoint *corners = 0;	/* array of corners */
     static int corners_allocated = 0;	/* how many allocated */
-
-    /* This set of variables is for tracking closed curve fill areas */
-    int exit_edge = 0;		/* Which edge did an OUTRANGE point exit via? */
-    int reentry_edge = 0;	/* Where did it reenter? */
-    int out_updown = 0;		/* And where has it been in the meantime? */
-    int out_leftright = 0;
-    int first_entry = 0;	/* If the start point of the curve was OUTRANGE */
 
     if (!t->filled_polygon) { /* filled polygons are not available */
 	plot_lines(plot);
@@ -1220,213 +1213,35 @@ plot_filledcurves(struct curve_points *plot)
     for (i = 0; i < plot->p_count; i++) {
 	if (points+2 >= corners_allocated) { /* there are 2 side points */
 	    corners_allocated += 128; /* reallocate more corners */
-	    corners = gp_realloc( corners, corners_allocated*sizeof(gpiPoint), "corners for filledcurves");
+	    corners = gp_realloc( corners, corners_allocated*sizeof(gpiPoint), "filledcurve vertices");
 	}
 	switch (plot->points[i].type) {
-	case INRANGE:{
+	case INRANGE:
+	case OUTRANGE:
 		x = map_x(plot->points[i].x);
 		y = map_y(plot->points[i].y);
-
-		if (prev == INRANGE) {
-		    /* Split this segment if it crosses a bounding line */
-		    if (bound_intersect(plot->points, i, &ex, &ey,
-					&plot->filledcurves_options)) {
-			corners[points].x = map_x(ex);
-			corners[points++].y = map_y(ey);
-			finish_filled_curve(points, corners, plot);
-			points = 0;
-			corners[points].x = map_x(ex);
-			corners[points++].y = map_y(ey);
-		    }
-		    /* vector(x,y) */
-		    corners[points].x = x;
-		    corners[points++].y = y;
-		} else if (prev == OUTRANGE) {
-		    /* from outrange to inrange */
-		    if (clip_fill) {  /* EAM concave bounding curves */
-			reentry_edge = edge_intersect(plot->points, i, &ex, &ey);
-
-			if (!exit_edge)
-			    /* Curve must have started outside the plot area */
-			    first_entry = reentry_edge;
-			else if (reentry_edge != exit_edge)
-			    /* Fill in dummy points at plot corners if the bounding curve */
-			    /* went around the corner while out of range */
-			    fill_missing_corners(corners, &points,
-				exit_edge, reentry_edge, out_updown, out_leftright);
-
-			/* vector(map_x(ex),map_y(ey)); */
-			corners[points].x = map_x(ex);
-			corners[points++].y = map_y(ey);
-			/* vector(x,y); */
-			corners[points].x = x;
-			corners[points++].y = y;
-
-		    } else if (!clip_lines1) {
-			finish_filled_curve(points, corners, plot);
-			points = 0;
-			/* move(x,y) */
-			corners[points].x = x;
-			corners[points++].y = y;
-
-		    } else {
-			finish_filled_curve(points, corners, plot);
-			points = 0;
-			edge_intersect(plot->points, i, &ex, &ey);
-			/* move(map_x(ex),map_y(ey)); */
-			corners[points].x = map_x(ex);
-			corners[points++].y = map_y(ey);
-			/* vector(x,y); */
-			corners[points].x = x;
-			corners[points++].y = y;
-		    }
-		} else {	/* prev == UNDEFINED */
-		    finish_filled_curve(points, corners, plot);
-		    points = 0;
-		    /* move(x,y) */
-		    corners[points].x = x;
-		    corners[points++].y = y;
-		    /* vector(x,y); */
-		    corners[points].x = x;
-		    corners[points++].y = y;
-		}
+		corners[points].x = x;
+		corners[points++].y = y;
 		break;
-	    }
-	case OUTRANGE:{
-		if (clip_fill) {
-		    int where_was_I = clip_point(map_x(plot->points[i].x), map_y(plot->points[i].y));
-		    if (where_was_I & (LEFT_EDGE|RIGHT_EDGE))
-			out_leftright = where_was_I & (LEFT_EDGE|RIGHT_EDGE);
-		    if (where_was_I & (TOP_EDGE|BOTTOM_EDGE))
-			out_updown = where_was_I & (TOP_EDGE|BOTTOM_EDGE);
-		}
-		if (prev == INRANGE) {
-		    /* from inrange to outrange */
-		    if (clip_lines1 || clip_fill) {
-			exit_edge = edge_intersect(plot->points, i, &ex, &ey);
-			/* vector(map_x(ex),map_y(ey)); */
-			corners[points].x = map_x(ex);
-			corners[points++].y = map_y(ey);
-		    }
-		} else if (prev == OUTRANGE) {
-		    /* from outrange to outrange */
-		    if (clip_fill) {
-			if (two_edge_intersect(plot->points, i, lx, ly)) {
-			    coordinate temp;
-
-			    /* vector(map_x(lx[0]),map_y(ly[0])); */
-			    corners[points].x = map_x(lx[0]);
-			    corners[points++].y = map_y(ly[0]);
-
-			    /* Figure out which side we entered by */
-			    temp.x = plot->points[i].x;
-			    temp.y = plot->points[i].y;
-			    plot->points[i].x = lx[1];
-			    plot->points[i].y = ly[1];
-			    reentry_edge = edge_intersect(plot->points, i, &ex, &ey);
-			    plot->points[i].x = temp.x;
-			    plot->points[i].y = temp.y;
-
-			    if (!exit_edge) {
-			    /* Curve must have started outside the plot area */
-				first_entry = reentry_edge;
-			    } else if (reentry_edge != exit_edge) {
-				fill_missing_corners(corners, &points, exit_edge, reentry_edge,
-					out_updown, out_leftright);
-			    }
-			    /* vector(map_x(lx[1]),map_y(ly[1])); */
-			    corners[points].x = map_x(lx[1]);
-			    corners[points++].y = map_y(ly[1]);
-
-			    /* Figure out which side we left by */
-			    temp.x = plot->points[i-1].x;
-			    temp.y = plot->points[i-1].y;
-			    plot->points[i-1].x = lx[0];
-			    plot->points[i-1].y = ly[0];
-			    exit_edge = edge_intersect(plot->points, i, &ex, &ey);
-			    plot->points[i-1].x = temp.x;
-			    plot->points[i-1].y = temp.y;
-			}
-		    }
-		    else if (clip_lines2) {
-			if (two_edge_intersect(plot->points, i, lx, ly)) {
-			    finish_filled_curve(points, corners, plot);
-			    points = 0;
-			    /* move(map_x(lx[0]),map_y(ly[0])); */
-			    corners[points].x = map_x(lx[0]);
-			    corners[points++].y = map_y(ly[0]);
-			    /* vector(map_x(lx[1]),map_y(ly[1])); */
-			    corners[points].x = map_x(lx[1]);
-			    corners[points++].y = map_y(ly[1]);
-			}
-		    }
-		}
-		break;
-	    }
-	case UNDEFINED:{
+	case UNDEFINED:
 		/* UNDEFINED flags a blank line in the input file.
 		 * Unfortunately, it can also mean that the point was undefined.
 		 * Is there a clean way to detect or handle the latter case?
 		 */
 		if (prev != UNDEFINED) {
-		    if (first_entry && first_entry != exit_edge)
-			fill_missing_corners(corners, &points,
-				exit_edge, first_entry, out_updown, out_leftright);
 		    finish_filled_curve(points, corners, plot);
 		    points = 0;
-		    exit_edge = reentry_edge = first_entry = 0;
 		}
 		break;
-	    }
 	default:		/* just a safety */
 		break;
 	}
 	prev = plot->points[i].type;
     }
 
-    if (clip_fill) {   /* Did we finish cleanly, or is there an unresolved corner-crossing? */
-	if (first_entry && first_entry != exit_edge) {
-	    fill_missing_corners(corners, &points, exit_edge, first_entry,
-		out_updown, out_leftright);
-	}
-    }
-
     finish_filled_curve(points, corners, plot);
 }
 
-/*
- * When the bounding curve of a filled area passes through the plot box but
- * exits through a different edge than it entered by, in order to properly
- * fill the enclosed area we must add dummy points at the plot corners.
- */
-static void
-fill_missing_corners(gpiPoint *corners, int *points, int exit, int reentry, int updown, int leftright)
-{
-    if ((exit | reentry) == (LEFT_EDGE | RIGHT_EDGE)) {
-	corners[(*points)].x   = (exit & LEFT_EDGE)
-			? map_x(X_AXIS.min) : map_x(X_AXIS.max);
-	corners[(*points)++].y = (updown & TOP_EDGE)
-			? map_y(Y_AXIS.max) : map_y(Y_AXIS.min);
-	corners[(*points)].x   = (reentry & LEFT_EDGE)
-			? map_x(X_AXIS.min) : map_x(X_AXIS.max);
-	corners[(*points)++].y = (updown & TOP_EDGE)
-			? map_y(Y_AXIS.max) : map_y(Y_AXIS.min);
-    } else  if ((exit | reentry) == (BOTTOM_EDGE | TOP_EDGE)) {
-	corners[(*points)].x   = (leftright & LEFT_EDGE)
-			? map_x(X_AXIS.min) : map_x(X_AXIS.max);
-	corners[(*points)++].y = (exit & TOP_EDGE)
-			? map_y(Y_AXIS.max) : map_y(Y_AXIS.min);
-	corners[(*points)].x   = (leftright & LEFT_EDGE)
-			? map_x(X_AXIS.min) : map_x(X_AXIS.max);
-	corners[(*points)++].y = (reentry & TOP_EDGE)
-			? map_y(Y_AXIS.max) : map_y(Y_AXIS.min);
-    } else {
-	corners[(*points)].x   = (exit | reentry) & LEFT_EDGE
-			? map_x(X_AXIS.min) : map_x(X_AXIS.max);
-	corners[(*points)++].y = (exit | reentry) & TOP_EDGE
-			? map_y(Y_AXIS.max) : map_y(Y_AXIS.min);
-    }
-}
 /*
  * Fill the area between two curves
  */
@@ -3868,54 +3683,6 @@ two_edge_intersect(
 	return (TRUE);
     }
     return (FALSE);
-}
-
-
-/* EAM April 2004 - If the line segment crosses a bounding line we will
- * interpolate an extra corner and split the filled polygon into two.
- */
-static TBOOLEAN
-bound_intersect(
-struct coordinate GPHUGE *points,
-int i,				/* line segment from point i-1 to point i */
-double *ex, double *ey,		/* the point where it crosses a boundary */
-filledcurves_opts *filledcurves_options)
-{
-    double dx1, dx2, dy1, dy2;
-
-    /* If there are no bounding lines in effect, don't bother */
-    if (!filledcurves_options->oneside)
-	return FALSE;
-
-    switch (filledcurves_options->closeto) {
-	case FILLEDCURVES_ATX1:
-	case FILLEDCURVES_ATX2:
-	    dx1 = filledcurves_options->at - points[i-1].x;
-	    dx2 = filledcurves_options->at - points[i].x;
-	    dy1 = points[i].y - points[i-1].y;
-	    if (dx1*dx2 < 0) {
-		*ex = filledcurves_options->at;
-		*ey = points[i-1].y + dy1 * dx1 / (dx1-dx2);
-		return TRUE;
-	    }
-	    break;
-	case FILLEDCURVES_ATY1:
-	case FILLEDCURVES_ATY2:
-	    dy1 = filledcurves_options->at - points[i-1].y;
-	    dy2 = filledcurves_options->at - points[i].y;
-	    dx1 = points[i].x - points[i-1].x;
-	    if (dy1*dy2 < 0) {
-		*ex = points[i-1].x + dx1 * dy1 / (dy1-dy2);
-		*ey = filledcurves_options->at;
-		return TRUE;
-	    }
-	    break;
-	case FILLEDCURVES_ATXY:
-	default:
-	    break;
-    }
-
-    return FALSE;
 }
 
 
