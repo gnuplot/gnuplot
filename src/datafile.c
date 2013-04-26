@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.247 2013/03/14 19:59:00 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.248 2013/04/21 06:26:11 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -665,6 +665,10 @@ df_tokenise(char *s)
     df_no_cols = 0;
 
     while (*s) {
+	/* Data line from an internal datablock ends in '\n' rather than '\0' */
+	if (*s == '\n')
+	    break;
+
 	/* check store - double max cols or add 20, whichever is greater */
 	if (df_max_cols <= df_no_cols)
 	    expand_df_column((df_max_cols < 20) ? df_max_cols+20 : 2*df_max_cols);
@@ -806,20 +810,21 @@ df_tokenise(char *s)
 	}
 
 	/* skip to 1st character past next separator */
+	/* April 2013: test isblank rather than isspace so as not to overrun a \n */
 	if (df_separators != NULL) {
-	    while (*s && NOTSEP)
+	    while (*s && NOTSEP && (*s != '\n'))
 		++s;
 	    if (strchr(df_separators,*s))
 		/* skip leading whitespace in next field */
 		do
 		    ++s;
-		while (*s && isspace((unsigned char) *s) && NOTSEP);
+		while (*s && isblank((unsigned char) *s) && NOTSEP);
 	} else {
 	    /* skip chars to end of column */
 	    while ((!isspace((unsigned char) *s)) && (*s != '\0'))
 		++s;
 	    /* skip spaces to start of next column */
-	    while (isspace((unsigned char) *s))
+	    while (isblank((unsigned char) *s))
 		++s;
 	}
     }

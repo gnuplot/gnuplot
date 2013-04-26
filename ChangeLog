@@ -1,3 +1,10 @@
+2013-04-26  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/datafile.c (df_tokenise): Because the individual lines of an
+	internal data block ("here data") end in \n rather than \0, the test
+	for termination of the final field on the line could fail.  This led
+	to attempted memory access beyond the end of the block.
+
 2013-04-25  Lars Hecking  <lhecking@users.sourceforge.net>
 
 	* Makefile.am docs/Makefile.am man/Makefile.am: Clean up processing
