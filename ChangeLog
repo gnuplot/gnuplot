@@ -5,6 +5,10 @@
 	for termination of the final field on the line could fail.  This led
 	to attempted memory access beyond the end of the block.
 
+	* src/datafile.c (df_tokenise check_missing):  Treat empty fields in
+	a csv file as "missing" rather than "bad".  This allows generating
+	stacked histogram plots from a spreadsheet of sparse data.
+
 2013-04-25  Lars Hecking  <lhecking@users.sourceforge.net>
 
 	* Makefile.am docs/Makefile.am man/Makefile.am: Clean up processing

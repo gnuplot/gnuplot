@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.248 2013/04/21 06:26:11 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.249 2013/04/26 18:52:09 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -657,6 +657,10 @@ df_tokenise(char *s)
     TBOOLEAN in_string;
     int i;
 
+    /* "here data" lines may end in \n rather than \0. */
+    if (s[strlen(s)-1] == '\n')
+	s[strlen(s)-1] = '\0';
+
     for (i = 0; i<MAXDATACOLS; i++)
 	df_tokens[i] = NULL;
 
@@ -665,10 +669,6 @@ df_tokenise(char *s)
     df_no_cols = 0;
 
     while (*s) {
-	/* Data line from an internal datablock ends in '\n' rather than '\0' */
-	if (*s == '\n')
-	    break;
-
 	/* check store - double max cols or add 20, whichever is greater */
 	if (df_max_cols <= df_no_cols)
 	    expand_df_column((df_max_cols < 20) ? df_max_cols+20 : 2*df_max_cols);
@@ -809,24 +809,34 @@ df_tokenise(char *s)
 	    while (*s && (unsigned char) *s != '"');
 	}
 
-	/* skip to 1st character past next separator */
+	/* skip to 1st character in the next field */
 	/* April 2013: test isblank rather than isspace so as not to overrun a \n */
 	if (df_separators != NULL) {
-	    while (*s && NOTSEP && (*s != '\n'))
+	    /* skip to next separator or end of line */
+	    while ((*s != '\0') && (*s != '\n') && NOTSEP)
 		++s;
-	    if (strchr(df_separators,*s))
-		/* skip leading whitespace in next field */
-		do
-		    ++s;
-		while (*s && isblank((unsigned char) *s) && NOTSEP);
+	    if ((*s == '\0') || (*s == '\n'))	/* End of line; we're done */
+		break;
+	    /* step over field separator */
+		++s;
+	    /* skip whitespace at start of next field */
+	    while (isblank((unsigned char) *s) && NOTSEP)
+		++s;
+	    if ((*s == '\0') || (*s == '\n'))	{ /* Last field is empty */
+		df_column[df_no_cols].good = DF_MISSING;
+		df_column[df_no_cols].datum = not_a_number();
+		++df_no_cols;
+		break;
+	    }
 	} else {
-	    /* skip chars to end of column */
-	    while ((!isspace((unsigned char) *s)) && (*s != '\0'))
+	    /* skip trash chars remaining in this column */
+	    while ((*s != '\0') && (*s != '\n') && !isspace((unsigned char) *s))
 		++s;
-	    /* skip spaces to start of next column */
+	    /* skip whitespace to start of next column */
 	    while (isblank((unsigned char) *s))
 		++s;
 	}
+
     }
 
     return df_no_cols;
@@ -2428,6 +2438,10 @@ check_missing(char *s)
 	    (isspace((unsigned char) s[len]) || !s[len]))
 	    return 1;   /* store undefined point in plot */
     }
+    /* April 2013 - Treat an empty csv field as "missing" */
+    if (df_separators && strchr(df_separators,*s))
+	return 1;
+
     return (0);
 }
 
