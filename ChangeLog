@@ -7,7 +7,11 @@
 
 	* src/datafile.c (df_tokenise check_missing):  Treat empty fields in
 	a csv file as "missing" rather than "bad".  This allows generating
-	stacked histogram plots from a spreadsheet of sparse data.
+	stacked histogram plots from a csv spreadsheet of sparse data.
+
+	* src/datafile.c (df_tokenise):  Since we now test for an unwanted \n
+	at the end of a line of data, we might as well test for \r also.
+	That means DOS format *.csv files can be read without conversion.
 
 2013-04-25  Lars Hecking  <lhecking@users.sourceforge.net>
 

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.249 2013/04/26 18:52:09 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.250 2013/04/27 03:30:08 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -658,7 +658,8 @@ df_tokenise(char *s)
     int i;
 
     /* "here data" lines may end in \n rather than \0. */
-    if (s[strlen(s)-1] == '\n')
+    /* DOS/Windows lines may end in \r rather than \0. */
+    if (s[strlen(s)-1] == '\n' || s[strlen(s)-1] == '\r')
 	s[strlen(s)-1] = '\0';
 
     for (i = 0; i<MAXDATACOLS; i++)

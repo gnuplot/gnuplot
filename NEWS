@@ -32,6 +32,7 @@ New features, changes and fixes since gnuplot version 4.6
 * CHANGE fit options are controlled via `set fit` instead of FIT_ variables
 * CHANGE fit defaults to brief one-line progress reports
 * CHANGE treat empty field in a csv file as "missing" rather than "bad"
+* CHANGE strip \r from data lines on input so that DOS format *.csv can be read
 * CHANGE Use Sutherland-Hodgman algorithm for clipping polygons and filled curves
 
 New features, changes and fixes in gnuplot version 4.6
