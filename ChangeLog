@@ -1,3 +1,8 @@
+2013-04-27  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/save.c (save_variables__sub):  Ignore datablocks when saving
+	variables to file.
+
 2013-04-27  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/fit.c src/setshow.h src/show.c:  Extend 'update' so that it
