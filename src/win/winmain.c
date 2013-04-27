@@ -1,5 +1,5 @@
 /*
- * $Id: winmain.c,v 1.61 2013/04/22 22:23:11 markisch Exp $
+ * $Id: winmain.c,v 1.62 2013/04/22 22:55:42 markisch Exp $
  */
 
 /* GNUPLOT - win/winmain.c */
@@ -331,14 +331,6 @@ GetLanguageCode()
 }
 
 
-static BOOL
-FileExists(const char * filename)
-{
-	struct stat buffer;
-	return stat(filename, &buffer) == 0;
-}
-
-
 static char *
 LocalisedFile(const char * name, const char * ext, const char * defaultname)
 {
@@ -357,7 +349,7 @@ LocalisedFile(const char * name, const char * ext, const char * defaultname)
 		strcat(filename, name);
 		strcat(filename, lang);
 		strcat(filename, ext);
-		if (!FileExists(filename)) {
+		if (!existfile(filename)) {
 			strcpy(filename, szModuleName);
 			strcat(filename, defaultname);
 		}
