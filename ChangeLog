@@ -1,3 +1,17 @@
+2013-04-27  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/fit.c src/setshow.h src/show.c:  Extend 'update' so that it
+	does no longer require the parameter file to already exist.  Docs
+	implied this feature since before the start of the CVS.  'fit' now
+	saves the names of parameters and independent variables and this
+	info is used by 'update' to create a new parameter file if it does
+	not exist yet.  Bug #1156.
+
+	* src/fit.c (backup_file):  Backup files will not get overwritten.
+	Add error message for that case.
+
+	* src/util.c|h (existfile) src/win/winmain.c:  New routine.
+
 2013-04-26  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/datafile.c (df_tokenise): Because the individual lines of an

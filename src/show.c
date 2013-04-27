@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.282 2013/04/21 06:26:11 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.283 2013/04/24 06:02:08 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -171,8 +171,6 @@ static void show_arrow __PROTO((int tag));
 static void show_ticdef __PROTO((AXIS_INDEX));
 static void show_position __PROTO((struct position * pos));
 static void show_functions __PROTO((void));
-
-static char *num_to_str __PROTO((double r));
 
 static int var_show_all = 0;
 
@@ -3386,7 +3384,7 @@ disp_value(FILE *fp, struct value *val, TBOOLEAN need_quotes)
  * format. Rotates through 4 buffers 's[j]', and returns pointers to
  * them, to avoid execution ordering problems if this function is
  * called more than once between sequence points. */
-static char *
+char *
 num_to_str(double r)
 {
     static int i = 0;

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: fit.c,v 1.94 2013/04/24 20:11:51 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: fit.c,v 1.95 2013/04/24 20:19:21 markisch Exp $"); }
 #endif
 
 /*  NOTICE: Change of Copyright Status
@@ -19,8 +19,9 @@ static char *RCSid() { return RCSid("$Id: fit.c,v 1.94 2013/04/24 20:11:51 marki
  *      added as Patch to Gnuplot (v3.2 and higher)
  *      by Carsten Grammes
  *
- *      930726:     Recoding of the Unix-like raw console I/O routines by:
- *                  Michele Marziani (marziani@ferrara.infn.it)
+ * Michele Marziani (marziani@ferrara.infn.it), 930726: Recoding of the
+ * Unix-like raw console I/O routines
+ *
  * drd: start unitialised variables at 1 rather than NEARLY_ZERO
  *  (fit is more likely to converge if started from 1 than 1e-30 ?)
  *
@@ -55,7 +56,11 @@ static char *RCSid() { return RCSid("$Id: fit.c,v 1.94 2013/04/24 20:11:51 marki
  * it may do more harm than good.
  *
  * Thomas Mattison, 130421: brief one-line reports, based on patchset #230.
- * Bastian Märkisch, 130421: different output verbosity levels
+ * Bastian Maerkisch, 130421: different output verbosity levels
+ *
+ * Bastian Maerkisch, 130427: remember parameters etc. of last fit and use
+ * this data in a subsequent update command if the parameter file does not
+ * exists yet.
  *
  */
 
@@ -72,6 +77,7 @@ static char *RCSid() { return RCSid("$Id: fit.c,v 1.94 2013/04/24 20:11:51 marki
 #include "util.h"
 #include "scanner.h"  /* For legal_identifier() */
 #include "variable.h" /* For locale handling */
+#include "setshow.h"
 #include <signal.h>
 
 /* Just temporary */
@@ -171,7 +177,6 @@ static const char GNUFITLOG[] = "FIT_LOG";
 static const char *GP_FIXED = "# FIXED";
 static const char *FITSCRIPT = "FIT_SCRIPT";
 static const char *DEFAULT_CMD = "replot";	/* if no fitscript spec. */
-static char last_fit_command[LASTFITCMDLENGTH+1] = "";
 
 static FILE *log_f = NULL;
 
@@ -192,6 +197,11 @@ static struct udft_entry func;
 typedef char fixstr[MAX_ID_LEN+1];
 
 static fixstr *par_name;
+
+static fixstr *last_par_name = NULL;
+static int last_num_params = 0;
+static char last_dummy_var[5][MAX_ID_LEN+1];
+static char last_fit_command[LASTFITCMDLENGTH+1] = "";
 
 static double startup_lambda = 0;
 static double lambda_down_factor = LAMBDA_DOWN_FACTOR;
@@ -300,6 +310,7 @@ getchx()
 }
 #endif
 
+
 /*****************************************************************
     in case of fatal errors
 *****************************************************************/
@@ -329,6 +340,7 @@ error_ex()
     /* exit via int_error() so that it can clean up state variables */
     int_error(NO_CARET, "error during fit");
 }
+
 
 /* HBB 990829: removed the debug print routines */
 /*****************************************************************
@@ -1032,7 +1044,7 @@ init_fit()
 
 
 /*****************************************************************
-	    Set a GNUPLOT user-defined variable
+    Set a GNUPLOT user-defined variable
 ******************************************************************/
 
 static void
@@ -1138,87 +1150,167 @@ update(char *pfile, char *npfile)
     char ifilename[256], *ofilename;
     FILE *of, *nf;
     double pval;
-
+    TBOOLEAN createfile = FALSE;
 
     /* update pfile npfile:
        if npfile is a valid file name,
        take pfile as input file and
        npfile as output file
      */
-    if (VALID_FILENAME(npfile)) {
-	safe_strncpy(ifilename, pfile, sizeof(ifilename));
-	ofilename = npfile;
-    } else {
+    if (existfile(pfile)) {
+	if (VALID_FILENAME(npfile)) {
+	    safe_strncpy(ifilename, pfile, sizeof(ifilename));
+	    ofilename = npfile;
+	} else {
 #ifdef BACKUP_FILESYSTEM
-	/* filesystem will keep original as previous version */
-	safe_strncpy(ifilename, pfile, sizeof(ifilename));
+	    /* filesystem will keep original as previous version */
+	    safe_strncpy(ifilename, pfile, sizeof(ifilename));
 #else
-	backup_file(ifilename, pfile);	/* will Eex if it fails */
+	    backup_file(ifilename, pfile);	/* will Eex if it fails */
 #endif
-	ofilename = pfile;
+	    ofilename = pfile;
+	}
+    } else {
+	/* input file does not exists; will create new file */
+	createfile = TRUE;
+	if (VALID_FILENAME(npfile))
+	    ofilename = npfile;
+	else
+	    ofilename = pfile;
     }
 
     /* split into path and filename */
     splitpath(ifilename, path, fnam);
-    if (!(of = loadpath_fopen(ifilename, "r")))
-	Eex2("parameter file %s could not be read", ifilename);
 
-    if (!(nf = fopen(ofilename, "w")))
-	Eex2("new parameter file %s could not be created", ofilename);
+    if (createfile) {
+	/* The input file does not exists and--strictly speaking--there is
+	   nothing to 'update'. Instead of bailing out we guess the intended use:
+	   We output all INTGR/CMPLX user variables and mark them as '# FIXED' if
+	   they were not used during the last fit command. */
+	struct udvt_entry *udv = first_udv;
 
-    while (fgets(s = sstr, sizeof(sstr), of) != NULL) {
-
-	if (is_empty(s)) {
-	    fputs(s, nf);	/* preserve comments */
-	    continue;
+	if ((last_fit_command == NULL) || (strlen(last_fit_command) == 0)) {
+	    /* Technically, a prior fit command isn't really required. But since
+	    all variables in the parameter file would be marked '# FIXED' in that
+	    case, it cannot be directly used in a subsequent fit command. */
+#if 1
+	    Eex2("'update' requires a prior 'fit' since the parameter file %s does not exist yet.", ofilename);
+#else
+	    fprintf(stderr, "'update' without a prior 'fit' and without a previous parameter file:\n");
+	    fprintf(stderr, " all variables will be marked '# FIXED'!\n");
+#endif
 	}
-	if ((tmp = strchr(s, '#')) != NULL) {
-	    safe_strncpy(tail, tmp, sizeof(tail));
-	    *tmp = NUL;
-	} else
-	    strcpy(tail, "\n");
 
-	tmp = get_next_word(&s, &c);
-	if (!legal_identifier(tmp) || strlen(tmp) > MAX_ID_LEN) {
-	    (void) fclose(nf);
-	    (void) fclose(of);
-	    Eex2("syntax error in parameter file %s", fnam);
+	if (!(nf = fopen(ofilename, "w")))
+	    Eex2("new parameter file %s could not be created", ofilename);
+
+	fputs("# Parameter file created by 'update' from current variables\n", nf);
+	if ((last_fit_command != NULL) && (strlen(last_fit_command) > 0))
+	    fprintf(nf, "## %s\n", last_fit_command);
+
+	while (udv) {
+	    if ((strncmp(udv->udv_name, "GPVAL_", 6) == 0) ||
+	        (strncmp(udv->udv_name, "MOUSE_", 6) == 0) ||
+	        (strncmp(udv->udv_name, "FIT_", 4) == 0) ||
+	        (strcmp(udv->udv_name, "NaN") == 0) ||
+	        (strcmp(udv->udv_name, "pi") == 0)) {
+		/* skip GPVAL_, MOUSE_, FIT_ and builtin variables */
+		udv = udv->next_udv;
+		continue;
+	    }
+	    if (!udv->udv_undef &&
+	        ((udv->udv_value.type == INTGR) || (udv->udv_value.type == CMPLX))) {
+		int k;
+
+		/* ignore indep. variables */
+		for (k = 0; k < 5; k++) {
+		    if (strcmp(last_dummy_var[k], udv->udv_name) == 0)
+			break;
+		}
+		if (k != 5) {
+		    udv = udv->next_udv;
+		    continue;
+		}
+
+		if (udv->udv_value.type == INTGR)
+		    fprintf(nf, "%-15s = %-22i", udv->udv_name, udv->udv_value.v.int_val);
+		else /* CMPLX */
+		    fprintf(nf, "%-15s = %-22s", udv->udv_name, num_to_str(udv->udv_value.v.cmplx_val.real));
+		/* mark variables not used for the last fit as fixed */
+		for (k = 0; k < last_num_params; k++) {
+		    if (strcmp(last_par_name[k], udv->udv_name) == 0)
+			break;
+		}
+		if (k == last_num_params)
+		    fprintf(nf, "   %s", GP_FIXED);
+		putc('\n', nf);
+	    }
+	    udv = udv->next_udv;
 	}
-	safe_strncpy(pname, tmp, sizeof(pname));
-	/* next must be '=' */
-	if (c != '=') {
-	    tmp = strchr(s, '=');
-	    if (tmp == NULL) {
-		(void) fclose(nf);
-		(void) fclose(of);
+
+	if (fclose(nf))
+	    Eex("I/O error during update");
+
+    } else { /* !createfile */
+
+	/* input file exists - this is the originally intended case of
+	   the update command: update an existing parameter file */
+
+	if (!(of = loadpath_fopen(ifilename, "r")))
+	    Eex2("parameter file %s could not be read", ifilename);
+
+	if (!(nf = fopen(ofilename, "w")))
+	    Eex2("new parameter file %s could not be created", ofilename);
+
+	while (fgets(s = sstr, sizeof(sstr), of) != NULL) {
+
+	    if (is_empty(s)) {
+		fputs(s, nf);	/* preserve comments */
+		continue;
+	    }
+	    if ((tmp = strchr(s, '#')) != NULL) {
+		safe_strncpy(tail, tmp, sizeof(tail));
+		*tmp = NUL;
+	    } else
+		strcpy(tail, "\n");
+
+	    tmp = get_next_word(&s, &c);
+	    if (!legal_identifier(tmp) || strlen(tmp) > MAX_ID_LEN) {
+		fclose(nf);
+		fclose(of);
 		Eex2("syntax error in parameter file %s", fnam);
 	    }
-	    s = tmp + 1;
-	}
-	tmp = get_next_word(&s, &c);
-	if (!sscanf(tmp, "%lf", &pval)) {
-	    (void) fclose(nf);
-	    (void) fclose(of);
-	    Eex2("syntax error in parameter file %s", fnam);
-	}
-	if ((tmp = get_next_word(&s, &c)) != NULL) {
-	    (void) fclose(nf);
-	    (void) fclose(of);
-	    Eex2("syntax error in parameter file %s", fnam);
-	}
-	/* now modify */
+	    safe_strncpy(pname, tmp, sizeof(pname));
+	    /* next must be '=' */
+	    if (c != '=') {
+		tmp = strchr(s, '=');
+		if (tmp == NULL) {
+		    fclose(nf);
+		    fclose(of);
+		    Eex2("syntax error in parameter file %s", fnam);
+		}
+		s = tmp + 1;
+	    }
+	    tmp = get_next_word(&s, &c);
+	    if (!sscanf(tmp, "%lf", &pval)) {
+		fclose(nf);
+		fclose(of);
+		Eex2("syntax error in parameter file %s", fnam);
+	    }
+	    if ((tmp = get_next_word(&s, &c)) != NULL) {
+		fclose(nf);
+		fclose(of);
+		Eex2("syntax error in parameter file %s", fnam);
+	    }
 
-	pval = getdvar(pname);
-	sprintf(sstr, "%g", pval);
-	if (!strchr(sstr, '.') && !strchr(sstr, 'e'))
-	    strcat(sstr, ".0");	/* assure CMPLX-type */
+	    /* now modify */
+	    pval = getdvar(pname);
+	    fprintf(nf, "%-15s = %-22s   %s", pname, num_to_str(pval), tail);
+	}
 
-	fprintf(nf, "%-15.15s = %-15.15s   %s", pname, sstr, tail);
+	if (fclose(nf) || fclose(of))
+	    Eex("I/O error during update");
     }
-
-    if (fclose(nf) || fclose(of))
-	Eex("I/O error during update");
-
 }
 
 
@@ -1250,6 +1342,8 @@ backup_file(char *tofile, const char *fromfile)
     strcat(tofile, BACKUP_SUFFIX);
     if (rename(fromfile, tofile) == 0)
 	return;			/* hurrah */
+    if (existfile(tofile))
+	Eex2("The backup file %s already exists and will not be overwritten.", tofile);
 #endif
 
 #ifdef MSDOS
@@ -1271,6 +1365,7 @@ backup_file(char *tofile, const char *fromfile)
     /* get here => rename failed. */
     Eex3("Could not rename file %s to %s", fromfile, tofile);
 }
+
 
 /* A modified copy of save.c:save_range(), but this one reports
  * _current_ values, not the 'set' ones, by default */
@@ -1305,6 +1400,7 @@ log_axis_restriction(FILE *log_f, AXIS_INDEX axis, char *name)
     }
     fputs("]\n", log_f);
 }
+
 
 /*****************************************************************
     Interface to the classic gnuplot-software
@@ -1385,14 +1481,13 @@ fit_command()
     dummy_func = &func;
 
     /* set all five dummy variable names, even if we're using fewer */
-
     strcpy(dummy_default[0], set_dummy_var[0]);
     strcpy(dummy_default[1], set_dummy_var[1]);
-    for (i=0; i<5; i++){
-      if (dummy_token[i] > 0)
-	copy_str(c_dummy_var[i], dummy_token[i], MAX_ID_LEN);
-      else
-	strcpy(c_dummy_var[i], dummy_default[i]);
+    for (i = 0; i < 5; i++) {
+	if (dummy_token[i] > 0)
+	    copy_str(c_dummy_var[i], dummy_token[i], MAX_ID_LEN);
+	else
+	    strcpy(c_dummy_var[i], dummy_default[i]);
     }
 
     func.at = perm_at();	/* parse expression and save action table */
@@ -1416,7 +1511,7 @@ fit_command()
     if (columns == 1)
 	int_error(c_token, "Need 2 to 7 using specs");
 
-    num_indep = (columns<3)?1:columns-2;
+    num_indep = (columns < 3) ? 1 : columns - 2;
 
     /* The following patch was made by Remko Scharroo, 25-Mar-1999
      * We need to check if one of the columns is time data, like
@@ -1593,8 +1688,7 @@ fit_command()
 	case 5:		/* x, y, t, z, error */
 	case 6:		/* x, y, t, u, z, error */
 	case 7:		/* x, y, t, u, v, z, error */
-	  break;
-
+	    break;
 	}
 	num_points++;
 
@@ -1823,16 +1917,23 @@ fit_command()
 	(void) regress(a);	/* fit */
 
     (void) fclose(log_f);
+
     log_f = NULL;
     free(fit_x);
     free(fit_z);
     free(err_data);
     free(a);
-    free(par_name);
     if (func.at) {
 	free_at(func.at);		/* release perm. action table */
 	func.at = (struct at_type *) NULL;
     }
+    /* remember parameter names for 'update' */
+    last_num_params = num_params;
+    free(last_par_name);
+    last_par_name = par_name;
+    /* remember names of indep. variables for 'update' */
+    memcpy(last_dummy_var, c_dummy_var, sizeof(last_dummy_var));
+    /* remember last fit command for 'save' */
     safe_strncpy(last_fit_command, gp_input_line, sizeof(last_fit_command));
 }
 
