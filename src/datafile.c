@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.212.2.16 2013/02/17 21:54:38 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.212.2.17 2013/03/14 19:40:33 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -800,23 +800,35 @@ df_tokenise(char *s)
 	    while (*s && (unsigned char) *s != '"');
 	}
 
-	/* skip to 1st character past next separator */
+	/* skip to 1st character in the next field */
 	if (df_separator != '\0') {
 	    while (*s && NOTSEP)
 		++s;
-	    if (*s == df_separator)
-		/* skip leading whitespace in next field */
-		do
-		    ++s;
-		while (*s && isspace((unsigned char) *s) && NOTSEP);
+	    /* skip to next separator or end of line */
+	    while ((*s != '\0') && NOTSEP)
+		++s;
+	    if (*s == '\0')   /* End of line; we're done */
+		break;
+	    /* step over field separator */
+		++s;
+	    /* skip whitespace at start of next field */
+	    while (isspace((unsigned char) *s) && NOTSEP)
+		++s;
+	    if (*s == '\0')   { /* Last field is empty */
+		df_column[df_no_cols].good = DF_MISSING;
+		df_column[df_no_cols].datum = not_a_number();
+		++df_no_cols;
+		break;
+	    }
 	} else {
-	    /* skip chars to end of column */
+	    /* skip trash chars remaining in this column */
 	    while ((!isspace((unsigned char) *s)) && (*s != '\0'))
 		++s;
-	    /* skip spaces to start of next column */
+	    /* skip whitespace to start of next column */
 	    while (isspace((unsigned char) *s))
 		++s;
 	}
+
     }
 
     return df_no_cols;
@@ -2397,6 +2409,10 @@ check_missing(char *s)
 	    (isspace((unsigned char) s[len]) || !s[len]))
 	    return 1;   /* store undefined point in plot */
     }
+    /* April 2013 - Treat an empty csv field as "missing" */
+    if (*s == df_separator)
+	return 1;
+
     return (0);
 }
 

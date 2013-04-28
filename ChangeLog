@@ -1,3 +1,9 @@
+2013-04-28  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/datafile.c (df_tokenise check_missing):  Treat empty fields in
+	a csv file as "missing" rather than "bad".  This allows generating
+	stacked histogram plots from a csv spreadsheet of sparse data.
+
 2013-04-22  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/wxterminal/wxt_gui.cpp (wxt_init):  Exit cleanly if initialization
