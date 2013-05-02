@@ -1,3 +1,9 @@
+2013-05-02  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/term.c (do_arc):  The new routine draw_clip_polygon() is not
+	working correctly here.  Revert to the previous explicit loop over
+	arc segments using draw_clip_line();
+
 2013-04-27  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/save.c (save_variables__sub):  Ignore datablocks when saving

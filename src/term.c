@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.251 2013/03/22 04:46:55 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.252 2013/04/25 16:12:14 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -1410,7 +1410,9 @@ do_arc(
     } else { /* Draw the arc */
 	if (!wedge && !complete_circle)
 	    segments -= 2;
-	draw_clip_polygon(segments+1, vertex);
+	/* draw_clip_polygon(segments+1, vertex); */ /* Doesn't work correctly */
+	for (i=0; i<segments; i++)	         
+	    draw_clip_line( vertex[i].x, vertex[i].y, vertex[i+1].x, vertex[i+1].y );
     }
 }
 #endif /* EAM_OBJECTS */
