@@ -1,8 +1,12 @@
-2013-05-02  Ethan A Merritt  <merritt@u.washington.edu>
+2013-05-03  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/term.c (do_arc):  The new routine draw_clip_polygon() is not
 	working correctly here.  Revert to the previous explicit loop over
 	arc segments using draw_clip_line();
+
+	* src/term.c (term_start_multiplot) docs/gnuplot.doc:
+	New command "set multiplot next" skips the next plot (i.e. leaves a
+	blank area) in an autolayout multiplot.
 
 2013-04-27  Ethan A Merritt  <merritt@u.washington.edu>
 

@@ -17,6 +17,7 @@ New features, changes and fixes since gnuplot version 4.6
 * NEW x11 support for toggling plots on/off with left mouseclick on the key
 * NEW post term can use /FlateDecode to reduce the size of embedded images
 * NEW 'set fit quiet|results|brief|verbose' changes fit's verbosity
+* NEW 'set multiplot next'
 * CHANGE mouse wheel and +/- keys zoom centered on current mouse position
 * CHANGE Provide kdensity bandwidth via a keyword rather than a data column
 * CHANGE Pipe (popen/pclose) emulation within wgnuplot

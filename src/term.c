@@ -641,8 +641,21 @@ term_start_multiplot()
     FPRINTF((stderr, "term_start_multiplot()\n"));
 
     c_token++;
-    if (multiplot)
-	term_end_multiplot();
+
+    /* Only a few options are possible if we are already in multiplot mode */
+    /* So far we have "next".  Maybe also "previous", "clear"? */
+    if (multiplot) {
+	if (equals(c_token, "next")) {
+	    c_token++;
+	    if (!mp_layout.auto_layout)
+		int_error(c_token, "only valid inside an auto-layout multiplot");
+	    term_start_plot();
+	    term_end_plot();
+	    return;
+	} else {
+	    term_end_multiplot();
+	}
+    }
 
     /* FIXME: more options should be reset/initialized each time */
     mp_layout.auto_layout = FALSE;
