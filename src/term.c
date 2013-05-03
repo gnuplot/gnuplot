@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.252 2013/04/25 16:12:14 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.254 2013/05/03 21:45:55 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -246,12 +246,13 @@ typedef enum {
 static size_units parse_term_size __PROTO((float *xsize, float *ysize, size_units def_units));
 
 /*
- * Bookkeeping and support routine for 'set multiplot layout <rows>, <cols>'
+ * Bookkeeping and support routines for 'set multiplot layout <rows>, <cols>'
  * July 2004
  * Volker Dobler <v.dobler@web.de>
  */
 
 static void mp_layout_size_and_offset __PROTO((void));
+static void term_multiplot_next __PROTO((void));
 
 enum set_multiplot_id {
     S_MULTIPLOT_LAYOUT,
@@ -579,6 +580,67 @@ term_start_plot()
 
 }
 
+/* Helper routines */
+void
+term_multiplot_next()
+{
+    mp_layout.current_panel++;
+    if (mp_layout.auto_layout) {
+	if (mp_layout.row_major) {
+	    mp_layout.act_row++;
+	    if (mp_layout.act_row == mp_layout.num_rows) {
+		mp_layout.act_row = 0;
+		mp_layout.act_col++;
+		if (mp_layout.act_col == mp_layout.num_cols) {
+		    /* int_warn(NO_CARET,"will overplot first plot"); */
+		    mp_layout.act_col = 0;
+		}
+	    }
+	} else { /* column-major */
+	    mp_layout.act_col++;
+	    if (mp_layout.act_col == mp_layout.num_cols ) {
+		mp_layout.act_col = 0;
+		mp_layout.act_row++;
+		if (mp_layout.act_row == mp_layout.num_rows ) {
+		    /* int_warn(NO_CARET,"will overplot first plot"); */
+		    mp_layout.act_row = 0;
+		}
+	    }
+	}
+	mp_layout_size_and_offset();
+    }
+}
+
+void
+term_multiplot_previous()
+{
+    mp_layout.current_panel--;
+    if (mp_layout.auto_layout) {
+	if (mp_layout.row_major) {
+	    mp_layout.act_row--;
+	    if (mp_layout.act_row < 0) {
+		mp_layout.act_row = mp_layout.num_rows-1;
+		mp_layout.act_col--;
+		if (mp_layout.act_col < 0) {
+		    /* int_warn(NO_CARET,"will overplot first plot"); */
+		    mp_layout.act_col = mp_layout.num_cols-1;
+		}
+	    }
+	} else { /* column-major */
+	    mp_layout.act_col--;
+	    if (mp_layout.act_col < 0) {
+		mp_layout.act_col = mp_layout.num_cols-1;
+		mp_layout.act_row--;
+		if (mp_layout.act_row < 0) {
+		    /* int_warn(NO_CARET,"will overplot first plot"); */
+		    mp_layout.act_row = mp_layout.num_rows-1;
+		}
+	    }
+	}
+	mp_layout_size_and_offset();
+    }
+}
+
 void
 term_end_plot()
 {
@@ -595,31 +657,7 @@ term_end_plot()
 	(*term->text) ();
 	term_graphics = FALSE;
     } else {
-	mp_layout.current_panel++;
-	if (mp_layout.auto_layout) {
-	    if (mp_layout.row_major) {
-		mp_layout.act_row++;
-		if (mp_layout.act_row == mp_layout.num_rows ) {
-		    mp_layout.act_row = 0;
-		    mp_layout.act_col++;
-		    if (mp_layout.act_col == mp_layout.num_cols ) {
-			/* int_warn(NO_CARET,"will overplot first plot"); */
-			mp_layout.act_col = 0;
-		    }
-		}
-	    } else { /* column-major */
-		mp_layout.act_col++;
-		if (mp_layout.act_col == mp_layout.num_cols ) {
-		    mp_layout.act_col = 0;
-		    mp_layout.act_row++;
-		    if (mp_layout.act_row == mp_layout.num_rows ) {
-			/* int_warn(NO_CARET,"will overplot first plot"); */
-			mp_layout.act_col = 0;
-		    }
-		}
-	    }
-	    mp_layout_size_and_offset();
-	}
+	term_multiplot_next();
     }
 #ifdef VMS
     if (opened_binary)
@@ -649,8 +687,13 @@ term_start_multiplot()
 	    c_token++;
 	    if (!mp_layout.auto_layout)
 		int_error(c_token, "only valid inside an auto-layout multiplot");
-	    term_start_plot();
-	    term_end_plot();
+	    term_multiplot_next();
+	    return;
+	} else if (almost_equals(c_token, "prev$ious")) {
+	    c_token++;
+	    if (!mp_layout.auto_layout)
+		int_error(c_token, "only valid inside an auto-layout multiplot");
+	    term_multiplot_previous();
 	    return;
 	} else {
 	    term_end_multiplot();
@@ -728,7 +771,7 @@ term_start_multiplot()
 
 	/* The remaining options are only valid for auto-layout mode */
 	if (!mp_layout.auto_layout)
-	    int_error(c_token, "only valid as part of an auto-layout command");
+	    int_error(c_token, "only valid in the context of an auto-layout command");
 
 	switch(lookup_table(&set_multiplot_tbl[0],c_token)) {
 	    case S_MULTIPLOT_COLUMNSFIRST:

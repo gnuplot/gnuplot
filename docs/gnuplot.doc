@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.785 2013/04/24 06:02:08 markisch Exp $
+C RCS $Id: gnuplot.doc,v 1.786 2013/05/03 21:45:55 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -9464,7 +9464,7 @@ Ffigure_missing
              {rowsfirst|columnsfirst} {downwards|upwards}
              {scale <xscale>{,<yscale>}} {offset <xoff>{,<yoff>}}
            }
-       set multiplot next
+       set multiplot {next|previous}
        unset multiplot
 
  For some terminals, no plot is displayed until the command `unset multiplot`
@@ -9522,8 +9522,10 @@ Ffigure_missing
  whether the corresponding option is given in the multiplot command.  The stack
  of plots can grow `downwards` or `upwards`.
  Default is `rowsfirst` and `downwards`.
- The command `set multiplot next` is relevant only in the context of using the
- layout option.  It skips the next position in the grid, leaving a blank space.
+ The commands `set multiplot next` and `set multiplot previous` are relevant
+ only in the context of using the layout option.  `next` skips the next position
+ in the grid, leaving a blank space. `prev` returns to the grid position 
+ immediately preceding the most recently plotted position.
 
  Each plot can be scaled by `scale` and shifted with `offset`; if the y-values
  for scale or offset are omitted, the x-value will be used.  `unset multiplot`

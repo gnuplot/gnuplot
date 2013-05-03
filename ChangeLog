@@ -5,8 +5,10 @@
 	arc segments using draw_clip_line();
 
 	* src/term.c (term_start_multiplot) docs/gnuplot.doc:
-	New command "set multiplot next" skips the next plot (i.e. leaves a
-	blank area) in an autolayout multiplot.
+	New command "set multiplot next|previous" skips forward or back one
+	position in a multiplot autolayout grid.  I.e. "next" leaves a blank
+	area instead of a plot, while "prev" would overwrite the plot that
+	was just drawn.
 
 2013-04-27  Ethan A Merritt  <merritt@u.washington.edu>
 
