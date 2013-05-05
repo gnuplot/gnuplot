@@ -1,3 +1,11 @@
+2013-05-05  Dima Kogan  <dima@secretsauce.net>
+
+	* src/gplt_x11.c src/gplt_x11.h term/x11.trm:
+	Previously it was possible for gnuplot to call display() before all
+	chunks in an image had been received. This resulted in corrupted plots.
+	Now we block display() calls while in the middle of an image transfer.
+	Bugfix.
+
 2013-05-05  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/eval.c (evaluate_at) demo/imageNaN.dem:  Remove old hackish code

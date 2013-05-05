@@ -57,7 +57,8 @@
 #define X11_GR_SET_RGBCOLOR     'g'
 #define X11_GR_SET_LINECOLOR    'l'
 #define X11_GR_BINARY_POLYGON   'f'
-#define X11_GR_IMAGE		'i'
+#define X11_GR_IMAGE		'i' /* indicates an image chunk */
+#define X11_GR_IMAGE_END	'j' /* indicates that we just sent the last chunk in an image */
 
 #ifdef EXTERNAL_X11_WINDOW
 #define X11_GR_SET_WINDOW_ID    'w'

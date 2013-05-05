@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.232 2013/04/21 03:51:42 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.233 2013/04/22 16:17:42 sfeam Exp $"); }
 #endif
 
 #define MOUSE_ALL_WINDOWS 1
@@ -682,6 +682,10 @@ static int stipple_initialized = 0;
 static XPoint *polyline = NULL;
 static int polyline_space = 0;
 static int polyline_size = 0;
+
+/* whether we're in the middle of receiving image chunks. If so, don't try to
+   display() */
+static TBOOLEAN currently_receiving_gr_image = FALSE;
 
 static void gpXStoreName __PROTO((Display *, Window, char *));
 
@@ -1856,8 +1860,16 @@ record()
 	    /* fall through */
 #endif
 	default:
-	    if (plot)
-		store_command(buf, plot);
+	    if (plot) {
+		/* set up the currently_receiving_gr_image variable.
+		   X11_GR_IMAGE_END exists only for
+		   currently_receiving_gr_image, so we don't store it */
+		if     ( *buf == X11_GR_IMAGE     ) currently_receiving_gr_image = TRUE;
+		else if( *buf == X11_GR_IMAGE_END ) currently_receiving_gr_image = FALSE;
+
+		if( *buf != X11_GR_IMAGE_END )
+		    store_command(buf, plot);
+            }
 	    continue;
 	}
     }
@@ -2749,13 +2761,17 @@ exec_cmd(plot_struct *plot, char *command)
 
     else if (*buffer == X11_GR_IMAGE) {	/* image */
 
-	static unsigned char *iptr;
-	static TBOOLEAN transferring = 0;
+	/* the pointer to the next byte to be written, or NULL if we're not currently transferring data */
+	static unsigned char *dest_ptr = NULL;
+
 	static unsigned short *image;
 	static int M, N;
 	static int pixel_1_1_x, pixel_1_1_y, pixel_M_N_x, pixel_M_N_y;
 	static int visual_1_1_x, visual_1_1_y, visual_M_N_x, visual_M_N_y;
 	static int color_mode;
+
+	/* How many symbols are left to transfer in this image. There is 1
+	   symbol for each channel in each pixel */
 	static unsigned int i_remaining;
 
 	/* ignore, if your X server is not supported */
@@ -2766,7 +2782,7 @@ exec_cmd(plot_struct *plot, char *command)
 #define ERROR_NOTICE(str)         "\nGNUPLOT (gplt_x11):  " str
 #define ERROR_NOTICE_NEWLINE(str) "\n                     " str
 
-	if (!transferring) {
+	if (dest_ptr == NULL) {
 
 	    /* Get variables. */
 	    if (11 != sscanf( &buffer[1], "%x %x %x %x %x %x %x %x %x %x %x", &M, &N, &pixel_1_1_x,
@@ -2787,8 +2803,7 @@ exec_cmd(plot_struct *plot, char *command)
 		} else {
 		    image = (unsigned short *) malloc(i_remaining);
 		    if (image) {
-			iptr = (unsigned char *) image;
-			transferring = 1;
+			dest_ptr = (unsigned char *) image;
 		    } else {
 			fprintf(stderr, ERROR_NOTICE("Cannot allocate memory for image.\n\n"));
 		    }
@@ -2808,13 +2823,13 @@ exec_cmd(plot_struct *plot, char *command)
 		unsigned char uctmp = *bptr++;
 		if (code_detected) {
 		    code_detected = 0;
-		    *iptr++ = uctmp - 1 + IMAGE_TRANSLATION_CHAR;
+		    *dest_ptr++ = uctmp - 1 + IMAGE_TRANSLATION_CHAR;
 		    i_remaining--;
 		} else {
 		    if (uctmp == IMAGE_CODE_CHAR) {
 			code_detected = 1;
 		    } else {
-			*iptr++ = uctmp + IMAGE_TRANSLATION_CHAR;
+			*dest_ptr++ = uctmp + IMAGE_TRANSLATION_CHAR;
 			i_remaining--;
 		    }
 		}
@@ -2839,7 +2854,7 @@ exec_cmd(plot_struct *plot, char *command)
 		static short palette_bit_shift=0;
 #endif
 
-		transferring = 0;
+		dest_ptr = NULL;
 
 		/* If the byte order needs to be swapped, do so. */
 		if (swap_endian) {
@@ -3299,6 +3314,9 @@ display(plot_struct *plot)
     FPRINTF((stderr, "Display %d ; %d commands\n", plot->plot_number, plot->ncommands));
 
     if (plot->ncommands == 0)
+	return;
+
+    if (currently_receiving_gr_image)
 	return;
 
     /* make the plot as large as possible, while preserving the aspect ratio and
