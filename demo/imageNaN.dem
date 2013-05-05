@@ -46,6 +46,12 @@ plot $matrixdata matrix with image failsafe
 
 pause -1 "Hit return to continue"
 
+set title "Same thing passing data value through 'using 1:2:($3)'"
+
+plot $matrixdata matrix using 1:2:($3) with image failsafe
+
+pause -1 "Hit return to continue"
+
 set title "Same thing in 3D mode"
 
 splot $matrixdata matrix with image
