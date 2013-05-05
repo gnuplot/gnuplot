@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.786 2013/05/03 21:45:55 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.787 2013/05/04 04:50:05 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -7608,7 +7608,10 @@ Ffigure_missing
 
  Old gnuplot versions handled NaN differently depending of the form of the
  `using` clause, as shown in plots (c) and (d).  Gnuplot now handles NaN the
- same whether the input column was specified as N or ($N).
+ same whether the input column was specified as N or ($N).  See also the
+^ <a href="http://www.gnuplot.info/demo/mgr.html">
+ imageNaN demo.
+^ </a>
 
 4 set datafile separator
 ?set datafile separator

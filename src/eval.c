@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: eval.c,v 1.104 2012/09/13 20:14:16 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: eval.c,v 1.105 2012/10/30 04:43:42 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - eval.c */
@@ -595,12 +595,12 @@ execute_at(struct at_type *at_ptr)
     jump_offset = saved_jump_offset;
 }
 
-/* 20010724: moved here from parse.c, where it didn't belong */
+/* May 2013: Old hackery #ifdef'ed out so that input of Inf/NaN */
+/* values through evaluation is treated equivalently to direct  */
+/* input of a formated value.  See revised imageNaN demo.       */
 void
 evaluate_at(struct at_type *at_ptr, struct value *val_ptr)
 {
-    double temp = 0;
-
     undefined = FALSE;
     errno = 0;
     reset_stack();
@@ -613,20 +613,26 @@ evaluate_at(struct at_type *at_ptr, struct value *val_ptr)
 
     execute_at(at_ptr);
 
-    if (!evaluate_inside_using || !df_nofpe_trap) {
+    if (!evaluate_inside_using || !df_nofpe_trap)
 	(void) signal(SIGFPE, SIG_DFL);
+
+    if (errno == EDOM || errno == ERANGE)
+	undefined = TRUE;
+#if (1)	/* New code */
+    else if (!undefined) {
+	(void) pop(val_ptr);
+	check_stack();
     }
 
-    if (errno == EDOM || errno == ERANGE) {
-	undefined = TRUE;
-    } else if (!undefined) {	/* undefined (but not errno) may have been set by matherr */
+#else /* Old hackery */
+    else if (!undefined) { /* undefined (but not errno) may have been set by matherr */
 	(void) pop(val_ptr);
 	check_stack();
 	/* At least one machine (ATT 3b1) computes Inf without a SIGFPE */
-	if (val_ptr->type != STRING)
-	temp = real(val_ptr);
-	if (temp > VERYLARGE || temp < -VERYLARGE) {
-	    undefined = TRUE;
+	if (val_ptr->type != STRING) {
+	    double temp = real(val_ptr);
+	    if (temp > VERYLARGE || temp < -VERYLARGE)
+		undefined = TRUE;
 	}
     }
 #if defined(NeXT) || defined(ultrix)
@@ -641,7 +647,7 @@ evaluate_at(struct at_type *at_ptr, struct value *val_ptr)
 	Gcomplex(val_ptr, 0.0 / 0.0, 0.0 / 0.0);
     }
 #endif /* NeXT || ultrix */
-
+#endif /* old hackery */
 }
 
 void

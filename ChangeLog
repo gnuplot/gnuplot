@@ -1,3 +1,11 @@
+2013-05-05  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/eval.c (evaluate_at) demo/imageNaN.dem:  Remove old hackish code
+	causing inconsistent treatment of Inf and NaN input values depending on 
+	platform and undefined behaviour of the C compiler.  Now both
+	`using 1:2` and `using 1:($2)` should have the same result, as shown by
+	revised imageNaN demo.
+
 2013-05-03  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/term.c (do_arc):  The new routine draw_clip_polygon() is not
