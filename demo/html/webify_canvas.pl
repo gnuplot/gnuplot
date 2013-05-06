@@ -114,6 +114,7 @@ print STDERR $name, "\n";
 	print OUT "gnuplot.zoomed = false;\n";
 	print OUT "gnuplot.active_plot_name = \"gnuplot_canvas\";\n";
 	print OUT "gnuplot.active_plot = gnuplot.dummyplot;\n";
+	print OUT "gnuplot.display_is_uptodate = false;\n";
 	print OUT "gnuplot.help_URL = \"canvas_help.html\";\n";
 	print OUT "gnuplot.dummyplot = function() {};\n";
 	print OUT "function gnuplot_canvas( plot ) { gnuplot.active_plot(); };\n";

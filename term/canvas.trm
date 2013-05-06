@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: canvas.trm,v 1.71 2012/11/25 22:01:22 sfeam Exp $
+ * $Id: canvas.trm,v 1.72 2013/02/19 05:30:38 sfeam Exp $
  *
  */
 
@@ -501,6 +501,11 @@ CANVAS_graphics()
 		"ctx = canvas.getContext(\"2d\");\n",
 		CANVAS_name, CANVAS_name
 	);
+	fprintf(gpoutfile,
+	    "// Suppress refresh on mouseover if this was the plot we just left\n"
+	    "if ((gnuplot.active_plot == %s && gnuplot.display_is_uptodate)) return;\n"
+	    "else gnuplot.display_is_uptodate = true;\n",
+	    CANVAS_name);
 	fprintf(gpoutfile,
 	    "// Reinitialize mouse tracking and zoom for this particular plot\n"
 	    "if ((typeof(gnuplot.active_plot) == \"undefined\" || gnuplot.active_plot != %s)  &&  typeof(gnuplot.mouse_update) != \"undefined\") {\n"

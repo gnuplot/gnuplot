@@ -1,7 +1,7 @@
 /*
- * $Id: gnuplot_mouse.js,v 1.20 2012/07/24 03:47:51 sfeam Exp $
+ * $Id: gnuplot_mouse.js,v 1.21 2013/04/05 18:36:54 sfeam Exp $
  */
-    gnuplot.mouse_version = " 5 April 2013";
+    gnuplot.mouse_version = " 7 May 2013";
 
 // Mousing code for use with gnuplot's 'canvas' terminal driver.
 // The functions defined here assume that the javascript plot produced by
@@ -34,6 +34,7 @@
     gnuplot.plot_logaxis_y = 0;
     gnuplot.grid_lines = true;
     gnuplot.zoom_text = false;
+    gnuplot.display_is_uptodate = false;
 
 // These are the equivalent parameters while zooming
     gnuplot.zoom_axis_xmin = 0;
@@ -246,6 +247,7 @@ gnuplot.check_hypertext = function()
   if (i == nitems && gnuplot.on_hypertext >= 0) {
     gnuplot.on_hypertext = -1;
     ctx.clearRect(0,0,gnuplot.plot_term_xmax,gnuplot.plot_term_ymax);
+    gnuplot.display_is_uptodate = false;
     gnuplot_canvas();
   }
 }
@@ -411,6 +413,7 @@ gnuplot.toggle_grid = function (e)
   if (!gnuplot.grid_lines) gnuplot.grid_lines = true;
   else gnuplot.grid_lines = false;
   ctx.clearRect(0,0,gnuplot.plot_term_xmax,gnuplot.plot_term_ymax);
+  gnuplot.display_is_uptodate = false;
   gnuplot_canvas();
 }
 
@@ -419,6 +422,7 @@ gnuplot.toggle_zoom_text = function (e)
   if (!gnuplot.zoom_text) gnuplot.zoom_text = true;
   else gnuplot.zoom_text = false;
   ctx.clearRect(0,0,gnuplot.plot_term_xmax,gnuplot.plot_term_ymax);
+  gnuplot.display_is_uptodate = false;
   gnuplot_canvas();
 }
 
@@ -427,6 +431,7 @@ gnuplot.rezoom = function (e)
   if (gnuplot.zoom_axis_width > 0)
     gnuplot.zoomed = true;
   ctx.clearRect(0,0,gnuplot.plot_term_xmax,gnuplot.plot_term_ymax);
+  gnuplot.display_is_uptodate = false;
   gnuplot_canvas();
 }
 
@@ -434,6 +439,7 @@ gnuplot.unzoom = function (e)
 {
   gnuplot.zoomed = false;
   ctx.clearRect(0,0,gnuplot.plot_term_xmax,gnuplot.plot_term_ymax);
+  gnuplot.display_is_uptodate = false;
   gnuplot_canvas();
 }
 
@@ -522,6 +528,7 @@ gnuplot.toggle_plot = function(plotid) {
     	gnuplot["hide_"+plotid] = false;
     gnuplot["hide_"+plotid] = !gnuplot["hide_"+plotid];
     ctx.clearRect(0,0,gnuplot.plot_term_xmax,gnuplot.plot_term_ymax);
+    gnuplot.display_is_uptodate = false;
     gnuplot_canvas();
 }
 
@@ -529,6 +536,7 @@ gnuplot.do_hotkey = function(event) {
     keychar = String.fromCharCode(event.charCode ? event.charCode : event.keyCode);
     switch (keychar) {
     case 'e':	ctx.clearRect(0,0,gnuplot.plot_term_xmax,gnuplot.plot_term_ymax);
+		gnuplot.display_is_uptodate = false;
 		gnuplot_canvas();
 		break;
     case 'g':	gnuplot.toggle_grid();

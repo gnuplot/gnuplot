@@ -8,6 +8,12 @@
 	* src/qtterminal/QtGnuplotScene.cpp:  fillbox(FS_EMPTY, ...) should
 	draw in background color, not necessarily white.
 
+	* demo/html/webify_canvas.pl term/canvas.trm term/js/gnuplot_mouse.js:
+	Do not redraw a plot canvas on mouseover if no intervening plot canvas
+	has been drawn since the mouse left.  This prevents unnecessary redraws
+	if the mouse leaves and then immediately reenters.
+	Bug #1220
+
 2013-05-05  Dima Kogan  <dima@secretsauce.net>
 
 	* src/gplt_x11.c src/gplt_x11.h term/x11.trm:
