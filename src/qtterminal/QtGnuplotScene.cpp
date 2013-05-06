@@ -494,7 +494,7 @@ void QtGnuplotScene::setBrushStyle(int style)
 		/// @todo color & transparent. See other terms
 		m_currentBrush.setStyle(QtGnuplot::brushes[abs(fillpar) % 8]);
 	else if (fillstyle == FS_EMPTY) // fill with background plot->color
-		color = Qt::white;
+		color = m_widget->m_backgroundColor;
 
 	m_currentBrush.setColor(color);
 }
