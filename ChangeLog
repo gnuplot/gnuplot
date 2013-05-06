@@ -1,3 +1,10 @@
+2013-05-06  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/command.c (replotrequest):  Do not trust is_3d_plot as an 
+	indicator of whether a replot request should be 2d or 3d; instead 
+	check the command itself to see if it is "splot ..." or "plot ...".
+	Bug #1235
+
 2013-05-05  Dima Kogan  <dima@secretsauce.net>
 
 	* src/gplt_x11.c src/gplt_x11.h term/x11.trm:
