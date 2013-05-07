@@ -1,3 +1,8 @@
+New features, changes and fixes since gnuplot version 4.6.3
+===========================================================
+
+* FIX svg and canvas terminal mousing of inverted axis coordinates
+
 New features, changes and fixes in gnuplot version 4.6.3
 ========================================================
 
@@ -7,7 +12,7 @@ New features, changes and fixes in gnuplot version 4.6.3
 * FIX -persist mode results in zombie process if using wxt terminal on Windows
 * FIX suppression of color in linetypes after "set term ... mono"
 * FIX synchronization of graphics and text color transitions in latex terminals
-* FIX memory allocation ofr stats command applied to a large matrix
+* FIX memory allocation of stats command applied to a large matrix
 
 New features, changes and fixes in gnuplot version 4.6.2
 ========================================================

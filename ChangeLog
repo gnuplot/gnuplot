@@ -1,3 +1,12 @@
+2013-05-07  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/canvas.trm term/svg.trm:  The 4.6 canvas and svg terminals both 
+	require additional information about axis layout in order to correctly
+	provide mouse coordinates for inverted axes (axis_min > axis_max).
+	This patch changes the output files produced by gnuplot 4.6 so that the
+	same javascript mousing code works for both 4.6 and 4.7 output.
+	Bug #1230
+
 2013-04-28  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/datafile.c (df_tokenise check_missing):  Treat empty fields in

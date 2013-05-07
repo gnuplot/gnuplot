@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: canvas.trm,v 1.56.2.6 2012/11/15 20:30:03 sfeam Exp $
+ * $Id: canvas.trm,v 1.56.2.7 2012/11/16 04:26:01 sfeam Exp $
  *
  */
 
@@ -592,12 +592,21 @@ CANVAS_text()
 	    else if (udv->udv_value.type == CMPLX) \
 		fprintf(gpoutfile, "%s = %g;\n", js_NAME, udv->udv_value.v.cmplx_val.real); \
 	}
-	if (axis_array[FIRST_X_AXIS].datatype != DT_TIMEDATE) {
+	if (axis_array[FIRST_X_AXIS].datatype == DT_TIMEDATE) {
+	} else if (axis_array[FIRST_X_AXIS].range_flags & RANGE_REVERSE) {
+	    MOUSE_PARAM("GPVAL_X_MAX", "gnuplot.plot_axis_xmin");
+	    MOUSE_PARAM("GPVAL_X_MIN", "gnuplot.plot_axis_xmax");
+	} else {
 	    MOUSE_PARAM("GPVAL_X_MIN", "gnuplot.plot_axis_xmin");
 	    MOUSE_PARAM("GPVAL_X_MAX", "gnuplot.plot_axis_xmax");
 	}
-	MOUSE_PARAM("GPVAL_Y_MIN", "gnuplot.plot_axis_ymin");
-	MOUSE_PARAM("GPVAL_Y_MAX", "gnuplot.plot_axis_ymax");
+	if (axis_array[FIRST_Y_AXIS].range_flags & RANGE_REVERSE) {
+	    MOUSE_PARAM("GPVAL_Y_MAX", "gnuplot.plot_axis_ymin");
+	    MOUSE_PARAM("GPVAL_Y_MIN", "gnuplot.plot_axis_ymax");
+	} else {
+	    MOUSE_PARAM("GPVAL_Y_MIN", "gnuplot.plot_axis_ymin");
+	    MOUSE_PARAM("GPVAL_Y_MAX", "gnuplot.plot_axis_ymax");
+	}
 
 	if (polar)
 	    fprintf(gpoutfile, "gnuplot.plot_axis_rmin = %g;\n",

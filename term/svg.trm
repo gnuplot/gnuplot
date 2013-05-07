@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: svg.trm,v 1.128.2.12 2012/12/28 00:56:51 sfeam Exp $
+ * $Id: svg.trm,v 1.128.2.13 2013/03/10 01:53:47 sfeam Exp $
  */
 
 /*------------------------------------------------------------------------------------------------------------------------------------
@@ -1066,12 +1066,21 @@ SVG_text ()
 		fprintf(gpoutfile, "gnuplot_svg.%s = %g;\n", \
 			js_NAME, udv->udv_value.v.cmplx_val.real); \
 	}
-	if (axis_array[FIRST_X_AXIS].datatype != DT_TIMEDATE) {
+	if (axis_array[FIRST_X_AXIS].datatype == DT_TIMEDATE) {
+	} else if (axis_array[FIRST_X_AXIS].range_flags & RANGE_REVERSE) {
+	    MOUSE_PARAM("GPVAL_X_MAX", "plot_axis_xmin");
+	    MOUSE_PARAM("GPVAL_X_MIN", "plot_axis_xmax");
+	} else {
 	    MOUSE_PARAM("GPVAL_X_MIN", "plot_axis_xmin");
 	    MOUSE_PARAM("GPVAL_X_MAX", "plot_axis_xmax");
 	}
-	MOUSE_PARAM("GPVAL_Y_MIN", "plot_axis_ymin");
-	MOUSE_PARAM("GPVAL_Y_MAX", "plot_axis_ymax");
+	if (axis_array[FIRST_Y_AXIS].range_flags & RANGE_REVERSE) {
+	    MOUSE_PARAM("GPVAL_Y_MAX", "plot_axis_ymin");
+	    MOUSE_PARAM("GPVAL_Y_MIN", "plot_axis_ymax");
+	} else {
+	    MOUSE_PARAM("GPVAL_Y_MIN", "plot_axis_ymin");
+	    MOUSE_PARAM("GPVAL_Y_MAX", "plot_axis_ymax");
+	}
 
 	fprintf(gpoutfile, "gnuplot_svg.polar_mode = %s;\n",
 		polar ? "true" : "false");
