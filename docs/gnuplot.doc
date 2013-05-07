@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.787 2013/05/04 04:50:05 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.788 2013/05/05 16:55:26 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -225,7 +225,7 @@ C
  
  * New coordinate system (Degrees, Minutes, Seconds). See `set xdata geographic`.
 
- * Command scripts may contain in-line data that is loaded into a named
+ * Command scripts may contain inline data that is loaded into a named
  data block for repeated plotting. See `inline data`.
  
  * Support for 32-bit Alpha channel + RGB color #AARRGGBB.  See `colorspec`.
@@ -2073,7 +2073,8 @@ C ... and restart the table:
  newline or end-of-record characters.  A "point" is the datum extracted from
  a single record.  A "datablock" is a set of points from consecutive records,
  delimited by blank records.  A line, when referred to in the context of a
- data file, is a subset of a datablock.
+ data file, is a subset of a datablock.  Note that the term "datablock" may
+ also be used when refering to a named inline data block (see `datablock`).
 2 iteration
 ?iteration
 ?iterate
@@ -3698,7 +3699,7 @@ Ffigure_steps
 
  splot with vectors is supported only for `set mapping cartesian`.
 
- The keywords "with vectors" may be followed by an in-line arrow style
+ The keywords "with vectors" may be followed by an inline arrow style
  specifications, a reference to a predefined arrow style, or a request to read
  the index of the desired arrow style for each vector from a separate column.
  Note: If you choose "arrowstyle variable" it will fill in all arrow properties
@@ -5622,7 +5623,7 @@ Ffigure_mapcontours
        plot 'filename' using 1:2, '' using 1:3
 
  The special filenames '+' and '++' are a mechanism to allow the full range of
- `using` specifiers and plot styles with in-line functions.  Normally a function
+ `using` specifiers and plot styles with inline functions.  Normally a function
  plot can only have a single y (or z) value associated with each sampled point.
  The pseudo-file '+' treats the sampled points as column 1, and allows
  additional column values to be specified via a `using` specification, just as
@@ -6521,7 +6522,7 @@ Ffigure_mapcontours
 ?refresh
  The `refresh` command is similar to `replot`, with two major differences.
  `refresh` reformats and redraws the current plot using the data already read
- in. This means that you can use `refresh` for plots with in-line data
+ in. This means that you can use `refresh` for plots with inline data
  (pseudo-device '-') and for plots from datafiles whose contents are volatile.
  You cannot use the `refresh` command to add new data to an existing plot.
 
@@ -8512,10 +8513,7 @@ Ffigure_missing
  a similar effect purely for pm3d surfaces, use instead `set pm3d depthorder`.
  To mix pm3d surfaces with normal `hidden3d` processing, use the option
  `set hidden3d front` to force all elements included in hidden3d processing to
- be drawn after any remaining plot elements. Then draw the surface twice, once
- `with lines lt -2` and a second time `with pm3d`. The first instance will
- include the surface during calculation of occluded elements but will not draw
- the surface itself.
+ be drawn after any remaining plot elements, including the pm3d surface.
 
  Functions are evaluated at isoline intersections.  The algorithm interpolates
  linearly between function points or data points when determining the visible
@@ -11410,7 +11408,7 @@ Ffigure_missing
  If an 3D data set is recognizable as a mesh (grid) then by default the program
  implicitly treats the plot style `with lines` as requesting a gridded surface.
  See `grid_data`.  The command `set surface explicit` suppresses this expansion,
- plotting only the individual lines described by separate data blocks in the
+ plotting only the individual lines described by separate datablocks in the
  input file.  A gridded surface can still be plotted by explicitly requesting
  splot `with surface`.
 3 table
@@ -13153,7 +13151,7 @@ Ffigure_missing
       STATS_outofrange        # number of records filtered out by range limits
       STATS_invalid           # number of invalid/incomplete/missing records
       STATS_blank             # number of blank lines in the file
-      STATS_blocks            # number of indexable data blocks in the file
+      STATS_blocks            # number of indexable datablocks in the file
       STATS_columns           # number of data columns in the first row of data
 
  The second set reports properties of the in-range data from a single column.
@@ -13345,7 +13343,7 @@ Ffigure_missing
  See `seeking-assistance`.
 
 2 known limitations
- It is not possible to use in-line data (e.g. plot '-' ...) inside the curly
+ It is not possible to use inline data (e.g. plot '-' ...) inside the curly
  brackets of a `do` or `while` loop.
 
 =gamma
