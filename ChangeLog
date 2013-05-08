@@ -14,6 +14,9 @@
 	This way, splot ... lt N  will always get contour linetypes starting
 	with N+1.
 
+	* src/datafile.c:  Valgrind found a case where df_column[foo].position
+	had never been initialized.  Boom.
+
 2013-05-08  Thomas Mattison  <mattison <at> phas.ubc.ca>
 
 	* src/fit.c (marquardt):  Zero-change in chisquare is now "BETTER"
