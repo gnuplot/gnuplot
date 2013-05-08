@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.789 2013/05/07 19:24:35 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.790 2013/05/08 03:57:54 markisch Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -4148,10 +4148,11 @@ Ffigure_mapcontours
  The fit may be interrupted by pressing Ctrl-C (Ctrl-Break in wgnuplot).
  After the current iteration completes, you have the option to
  (1) stop the fit and accept the current parameter values,
- (2) continue the fit, (3) execute a `gnuplot` command as specified by the
- environment variable `FIT_SCRIPT`.  The default for `FIT_SCRIPT` is `replot`,
- so if you had previously plotted both the data and the fitting function in
- one graph, you can display the current state of the fit.
+ (2) continue the fit,
+ (3) execute a `gnuplot` command as specified by `set fit script` or the
+ environment variable `FIT_SCRIPT`.  The default is `replot`, so if you
+ had previously plotted both the data and the fitting function in one graph,
+ you can display the current state of the fit.
 
  Once `fit` has finished, the `update` command may be used to store final
  values in a file for subsequent use as a parameter file.   See `update`
@@ -4470,7 +4471,8 @@ Ffigure_mapcontours
        FIT_SCRIPT
  specifies a command that may be executed after an user interrupt. The default
  is `replot`, but a `plot` or `load` command may be useful to display a plot
- customized to highlight the progress of the fit.
+ customized to highlight the progress of the fit. This setting can also be
+ changed using `set fit script`.
 3 multi-branch
 ?commands fit multi-branch
 ?fit multi-branch
@@ -7958,7 +7960,8 @@ Ffigure_missing
 ?set fit errorscaling
 ?set fit errorvariables
 ?set fit logfile
- The `set fit` command controls the options for the `fit`command.
+?set fit script
+ The `set fit` command controls the options for the `fit` command.
 
  Syntax:
        set fit {logfile {"<filename>"}}
@@ -7970,6 +7973,7 @@ Ffigure_missing
                {maxiter <value>}
                {start-lambda <value>}
                {lambda-factor <value>}
+               {script {"<command>"|default}}
        unset fit
        show fit
 
@@ -7983,7 +7987,8 @@ Ffigure_missing
  By default the information written to the log file is also echoed to the
  terminal session.  `set fit quiet` turns off the echo, whereas `results`
  prints only final results.  `brief` gives one line summaries for every
- iteration of the fit in addition.  `verbose` yields detailed iteration reports as it was the default before version 4.7.
+ iteration of the fit in addition.  `verbose` yields detailed iteration
+ reports as it was the default before version 4.7.
 
  If the `errorvariables` option is turned on, the error of each fitted
  parameter computed by `fit` will be copied to a user-defined variable
@@ -8027,6 +8032,10 @@ Ffigure_missing
  by which `lambda` is increased or decreased whenever the chi-squared target
  function increased or decreased significantly. Setting it to zero re-enables
  the default factor of 10.0.
+
+ The `script` option may be used to specify a `gnuplot` command to be executed
+ when a fit is interrupted---see `fit`.  This setting takes precedence over
+ the default of `replot` and the environment variable `FIT_SCRIPT`.
 3 fontpath
 ?commands set fontpath
 ?commands show fontpath
