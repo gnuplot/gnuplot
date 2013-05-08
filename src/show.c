@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.284 2013/04/27 08:45:29 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.285 2013/05/08 04:07:20 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -2542,7 +2542,7 @@ show_fit()
 
 	if (logfile) {
 	    fprintf(stderr,
-	            "\tlog-file for fits is unchanged from the environment default of\n\t'%s'\n",
+	            "\tlog-file for fits is unchanged from the environment default of\n\t\t'%s'\n",
 	            logfile);
 	    free(logfile);
 	}
@@ -2570,7 +2570,7 @@ show_fit()
     if (d > 0.)
 	fprintf(stderr, "\tfit will change lambda by a factor of %g\n", d);
 
-    fprintf(stderr, "\tfit can run the following command when interrupted: '%s'\n", getfitscript());
+    fprintf(stderr, "\tfit can run the following command when interrupted:\n\t\t'%s'\n", getfitscript());
 }
 
 
