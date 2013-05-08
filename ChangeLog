@@ -1,3 +1,11 @@
+2013-05-08  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/fit.c (call_gnuplot):  Print useful info on undefined-function
+	error. Derived from patchset #230 by Thomas Mattison.
+
+	* src/config/msvc/Makefile:  MSVC does not have isblank() so use
+	insspace() instead.
+
 2013-05-06  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/command.c (replotrequest):  Do not trust is_3d_plot as an 

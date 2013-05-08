@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: fit.c,v 1.95 2013/04/24 20:19:21 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: fit.c,v 1.96 2013/04/27 08:45:29 markisch Exp $"); }
 #endif
 
 /*  NOTICE: Change of Copyright Status
@@ -221,12 +221,10 @@ static void calculate __PROTO((double *zfunc, double **dzda, double a[]));
 static void call_gnuplot __PROTO((double *par, double *data));
 static TBOOLEAN fit_interrupt __PROTO((void));
 static TBOOLEAN regress __PROTO((double a[]));
-/* "classic" and one-line show_fit */
 static void show_fit __PROTO((int i, double chisq, double last_chisq, double *a,
 			      double lambda, FILE * device));
 static void show_fit1 __PROTO((int iter, double chisq, double last_chisq, double *parms,
                             double lambda, FILE * device));
-/* "classic" and new chisq, parm & error printing functions */
 static void show_results __PROTO((double chisq, double last_chisq, double* a, double* dpar, double** corel));
 static void log_axis_restriction __PROTO((FILE *log_f, AXIS_INDEX axis, char *name));
 static TBOOLEAN is_empty __PROTO((char *s));
@@ -562,13 +560,31 @@ call_gnuplot(double *par, double *data)
 	             0.0);
 	}
 	/* set actual dummy variables from file data */
-	for (j=0; j<num_indep; j++)
+	for (j = 0; j < num_indep; j++)
 	    Gcomplex(&func.dummy_values[j],
-	             fit_x[i*num_indep+j], 0.0);
+	             fit_x[i * num_indep + j], 0.0);
 	evaluate_at(func.at, &v);
-	if (undefined)
-	    Eex("Undefined value during function evaluation");
 	data[i] = real(&v);
+	if (undefined || isnan(data[i])) {
+	    /* Print useful info on undefined-function error. */
+	    Dblf("\nCurrent data point\n");
+	    Dblf("=========================\n");
+	    Dblf3("%-15s = %i out of %i\n", "#", i + 1, num_data);
+	    for (j = 0; j < num_indep; j++)
+		Dblf3("%-15.15s = %-15g\n", c_dummy_var[i], par[j] * scale_params[j]);
+	    Dblf3("%-15.15s = %-15g\n", "z", fit_z[i]);
+	    Dblf("\nCurrent set of parameters\n");
+	    Dblf("=========================\n");
+	    for (j = 0; j < num_params; j++)
+		Dblf3("%-15.15s = %-15g\n", par_name[j], par[j] * scale_params[j]);
+	    Dblf("\n");
+	    /* FIXME: Eex() aborts before memory is freed. */
+	    if (undefined) {
+		Eex("Undefined value during function evaluation");
+	    } else {
+		Eex("Function evaluation yields NaN (\"not a number\")");
+	    }
+	}
     }
 }
 
