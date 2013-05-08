@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: fit.c,v 1.97 2013/05/08 02:55:40 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: fit.c,v 1.98 2013/05/08 03:00:30 markisch Exp $"); }
 #endif
 
 /*  NOTICE: Change of Copyright Status
@@ -237,6 +237,7 @@ static char *get_next_word __PROTO((char **s, char *subst));
 static void splitpath __PROTO((char *s, char *p, char *f));
 static void backup_file __PROTO((char *, const char *));
 
+
 /*****************************************************************
     Small function to write the last fit command into a file
     Arg: Pointer to the file; if NULL, nothing is written,
@@ -426,12 +427,17 @@ marquardt(double a[], double **C, double *chisq, double *lambda)
 	/* FIXME: will never be reached: always returns TRUE */
 	return ML_ERROR;
     }
-    if (tmp_chisq < *chisq) {	/* Success, accept new solution */
+    /* tsm patchset 230: Changed < to <= in next line */
+    /* so finding exact minimum stops iteration instead of just increasing lambda. */
+    /* Disadvantage is that if lambda is large enough so that chisq doesn't change */
+    /* is taken as success. */
+    if (tmp_chisq <= *chisq) {	/* Success, accept new solution */
 	if (*lambda > MIN_LAMBDA) {
 	    if (fit_verbosity == VERBOSE)
 		putc('/', stderr);
 	    *lambda /= lambda_down_factor;
 	}
+	/* update chisq, C, d, a */
 	*chisq = tmp_chisq;
 	for (j = 0; j < num_data; j++) {
 	    memcpy(C[j], tmp_C[j], num_params * sizeof(double));
