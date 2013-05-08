@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: fit.c,v 1.103 2013/05/08 04:07:20 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: fit.c,v 1.104 2013/05/08 04:23:09 markisch Exp $"); }
 #endif
 
 /*  NOTICE: Change of Copyright Status
@@ -1042,7 +1042,11 @@ show_fit1(int iter, double chisq, double last_chisq, double* parms, double lambd
     lim = chisq;
 
     /* print values */
-    snprintf(buf, sizeof(buf), "%4i %-17.10e %- 10.2e %-9.2e", iter, chisq, delta / lim, lambda);
+    if (iter >= 0)
+	snprintf(buf, sizeof(buf), "%4i", iter);
+    else /* -1 indicates that chisquare increased */
+	snprintf(buf, sizeof(buf), "%4c", '*');
+    snprintf(buf + 4, sizeof(buf) - 4, " %-17.10e %- 10.2e %-9.2e", chisq, delta / lim, lambda);
     for (k = 0, p = buf + 4; (k < 3) && (p != NULL); k++) {
 	p++;
 	pack_float(p);
