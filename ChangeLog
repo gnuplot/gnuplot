@@ -5,6 +5,9 @@
 	* demo/html/webify_canvas.pl:  Re-order main loop to avoid trailing
 	cruft in the output HTML page.  Include support for pattern fill.
 
+	* src/datafile.c:  Remove use of isblank(), since too many of our
+	supported platforms are mired back in the pre C99 era.
+
 2013-05-08  Thomas Mattison  <mattison <at> phas.ubc.ca>
 
 	* src/fit.c (marquardt):  Zero-change in chisquare is now "BETTER"

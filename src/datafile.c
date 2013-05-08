@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.250 2013/04/27 03:30:08 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.251 2013/04/27 04:51:26 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -811,7 +811,6 @@ df_tokenise(char *s)
 	}
 
 	/* skip to 1st character in the next field */
-	/* April 2013: test isblank rather than isspace so as not to overrun a \n */
 	if (df_separators != NULL) {
 	    /* skip to next separator or end of line */
 	    while ((*s != '\0') && (*s != '\n') && NOTSEP)
@@ -821,7 +820,7 @@ df_tokenise(char *s)
 	    /* step over field separator */
 		++s;
 	    /* skip whitespace at start of next field */
-	    while (isblank((unsigned char) *s) && NOTSEP)
+	    while ((*s == ' ' || *s == '\t') && NOTSEP)
 		++s;
 	    if ((*s == '\0') || (*s == '\n'))	{ /* Last field is empty */
 		df_column[df_no_cols].good = DF_MISSING;
@@ -834,7 +833,7 @@ df_tokenise(char *s)
 	    while ((*s != '\0') && (*s != '\n') && !isspace((unsigned char) *s))
 		++s;
 	    /* skip whitespace to start of next column */
-	    while (isblank((unsigned char) *s))
+	    while (*s == ' ' || *s == '\t')
 		++s;
 	}
 
