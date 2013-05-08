@@ -6,6 +6,8 @@
 #	Saturation is the vector magnitude (length)
 #	V = 1
 #
+save_encoding = GPVAL_ENCODING
+set encoding utf8
 
 # We don't use the palette for plotting, but defining it allows us to
 # draw a colorbar showing the phase angle color scheme
@@ -103,4 +105,5 @@ splot '++' using 1:2:(abs(f($1,$2))):(color($1,$2)) with pm3d lc rgb variable
 pause -1
 
 #
+set encoding save_encoding
 reset
