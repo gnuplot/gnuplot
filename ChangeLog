@@ -6,6 +6,11 @@
 
 2013-05-08  Bastian Maerkisch  <bmaerkisch@web.de>
 
+	* src/fit.c (fit_command):  Discard data which contains NaN.  Necessary
+	since df_readline() does not return DF_UNDEFINED in that case.  Now
+	excluding data from the fit works the same for expressions with e.g. 1/0
+	and NaN.
+
 	* src/fit.c (pack_float):  Do not try to dereference NULL result from
 	strchr().
 

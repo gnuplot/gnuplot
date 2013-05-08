@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: fit.c,v 1.99 2013/05/08 03:07:09 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: fit.c,v 1.100 2013/05/08 03:12:56 markisch Exp $"); }
 #endif
 
 /*  NOTICE: Change of Copyright Status
@@ -1691,6 +1691,18 @@ fit_command()
 			max_data);
 	    }
 	} /* if (need to extend storage space) */
+
+	/* BM: silently ignore lines with NaN */
+	{
+	    TBOOLEAN skip_nan = FALSE;
+	    int k;
+	    for (k = 0; k < i; k++) {
+		if (isnan(v[k]))
+		    skip_nan = TRUE;
+	    }
+	    if (skip_nan)
+		continue;
+	}
 
 	switch (i) {
 	case DF_MISSING:
