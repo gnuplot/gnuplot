@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.165 2013/04/23 01:42:59 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.166 2013/04/24 06:02:08 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -787,8 +787,7 @@ unset_decimalsign()
 static void
 unset_fit()
 {
-    if (fitlogfile != NULL)
-	free(fitlogfile);
+    free(fitlogfile);
     fitlogfile = NULL;
     fit_errorvariables = FALSE;
     fit_errorscaling = TRUE;
@@ -798,6 +797,8 @@ unset_fit()
     del_udv_by_name((char *)FITMAXITER, FALSE);
     del_udv_by_name((char *)FITSTARTLAMBDA, FALSE);
     del_udv_by_name((char *)FITLAMBDAFACTOR, FALSE);
+    free(fit_script);
+    fit_script = NULL;
 }
 
 /* process 'unset grid' command */
