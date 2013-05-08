@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.395 2013/05/08 16:44:25 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.396 2013/05/09 10:02:24 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -5553,20 +5553,13 @@ new_text_label(int tag)
 				       0., 0., 0. };
 
     new = gp_alloc( sizeof(struct text_label), "text_label");
-    new->next = NULL;
+    memset(new, 0, sizeof(struct text_label));
     new->tag = tag;
     new->place = default_position;
     new->pos = LEFT;
-    new->rotate = 0;
-    new->layer = 0;
-    new->text = (char *)NULL;
-    new->font = (char *)NULL;
     new->textcolor.type = TC_DEFAULT;
-    new->lp_properties.pointflag = 0;
     new->lp_properties.p_type = 1;
     new->offset = default_offset;
-    new->noenhanced = FALSE;
-    new->hypertext = FALSE;
 
     return(new);
 }
@@ -5583,7 +5576,7 @@ parse_label_options( struct text_label *this_label, TBOOLEAN in_plot )
     char *font = NULL;
     enum JUSTIFY just = LEFT;
     int rotate = 0;
-    TBOOLEAN set_position = FALSE, set_just = FALSE,
+    TBOOLEAN set_position = FALSE, set_just = FALSE, set_point = FALSE,
 	set_rot = FALSE, set_font = FALSE, set_offset = FALSE,
 	set_layer = FALSE, set_textcolor = FALSE, set_hypertext = FALSE;
     int layer = 0;
@@ -5665,7 +5658,8 @@ parse_label_options( struct text_label *this_label, TBOOLEAN in_plot )
 	    c_token++;
 	    hypertext = TRUE;
 	    set_hypertext = TRUE;
-	    loc_lp = default_hypertext_point_style;
+	    if (!set_point)
+		loc_lp = default_hypertext_point_style;
 	    continue;
 	} else if (!set_hypertext && almost_equals(c_token,"nohyper$text")) {
 	    c_token++;
@@ -5698,6 +5692,7 @@ parse_label_options( struct text_label *this_label, TBOOLEAN in_plot )
 		lp_parse(&tmp_lp, TRUE, TRUE);
 		if (stored_token != c_token)
 		    loc_lp = tmp_lp;
+		set_point = TRUE;
 		continue;
 	    } else if (almost_equals(c_token, "nopo$int")) {
 		loc_lp.pointflag = 0;

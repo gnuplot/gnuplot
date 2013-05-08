@@ -1,3 +1,8 @@
+2013-05-08  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/set.c: Remove order dependence of hypertext/point type options.
+	Initialize entire text_label structure when allocated.
+
 2013-05-09  Thomas Mattison  <mattison <at> phas.ubc.ca>
 
 	* src/fit.c|h src/save.c src/show.c src/set.c src/unset.c
@@ -17,7 +22,7 @@
 	cruft in the output HTML page.  Include support for pattern fill.
 
 	* src/datafile.c:  Remove use of isblank(), since too many of our
-	supported platforms are mired back in the pre C99 era.
+	supported platforms are mired back in the pre-C99 era.
 
 	* src/graph3d.c: this_plot->hidden3d_top_linetype is a better start
 	point for calculating contour linetypes than the apparent plot l_type,
