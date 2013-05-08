@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: fit.c,v 1.102 2013/05/08 03:57:54 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: fit.c,v 1.103 2013/05/08 04:07:20 markisch Exp $"); }
 #endif
 
 /*  NOTICE: Change of Copyright Status
@@ -106,10 +106,7 @@ static void Dblfn __PROTO(());
 # include "win/winmain.h"
 #endif
 
-enum marq_res {
-    OK, ML_ERROR, BETTER, WORSE
-};
-typedef enum marq_res marq_res_t;
+/* constants */
 
 #ifdef INFINITY
 # undef INFINITY
@@ -139,10 +136,23 @@ typedef enum marq_res marq_res_t;
 
 #define LASTFITCMDLENGTH 511
 
-/* externally visible variables: */
+/* compatible with gnuplot philosophy */
+#define STANDARD stderr
 
-/* saved copy of last 'fit' command -- for output by "save" */
-char fitbuf[256];
+/* Suffix of a backup file */
+#define BACKUP_SUFFIX ".old"
+
+
+/* type definitions */
+enum marq_res {
+    OK, ML_ERROR, BETTER, WORSE
+};
+typedef enum marq_res marq_res_t;
+
+typedef char fixstr[MAX_ID_LEN+1];
+
+
+/* externally visible variables: */
 
 /* fit control */
 char *fitlogfile = NULL;
@@ -159,27 +169,23 @@ const char * FITLAMBDAFACTOR = "FIT_LAMBDA_FACTOR";
 const char * FITMAXITER = "FIT_MAXITER";
 
 TBOOLEAN ctrlc_flag = FALSE;
+char fitbuf[256]; /* for Eex and error_ex */
 
 /* private variables: */
 
-static int max_data;
-static int max_params;
-
 static double epsilon = DEF_FIT_LIMIT;	/* convergence limit */
 static int maxiter = 0;
-
-static double *scale_params = 0; /* scaling values for parameters */
-
+static double startup_lambda = 0;
+static double lambda_down_factor = LAMBDA_DOWN_FACTOR;
+static double lambda_up_factor = LAMBDA_UP_FACTOR;
 /* HBB/H.Harders 20020927: log file name now changeable from inside
  * gnuplot */
 static const char fitlogfile_default[] = "fit.log";
 static const char GNUFITLOG[] = "FIT_LOG";
-
+static FILE *log_f = NULL;
 static const char *GP_FIXED = "# FIXED";
 static const char *FITSCRIPT = "FIT_SCRIPT";
 static const char *DEFAULT_CMD = "replot";	/* if no fitscript spec. */
-
-static FILE *log_f = NULL;
 
 static int num_data, num_params;
 static int num_indep;	 /* # independent variables in fit function */
@@ -192,11 +198,8 @@ static double *fit_z = 0;	/* dependent data values */
 static double *err_data = 0;	/* standard deviations of dependent data */
 static double *a = 0;		/* array of fitting parameters */
 static TBOOLEAN user_stop = FALSE;
-
+static double *scale_params = 0; /* scaling values for parameters */
 static struct udft_entry func;
-
-typedef char fixstr[MAX_ID_LEN+1];
-
 static fixstr *par_name;
 
 static fixstr *last_par_name = NULL;
@@ -204,9 +207,6 @@ static int last_num_params = 0;
 static char last_dummy_var[5][MAX_ID_LEN+1];
 static char last_fit_command[LASTFITCMDLENGTH+1] = "";
 
-static double startup_lambda = 0;
-static double lambda_down_factor = LAMBDA_DOWN_FACTOR;
-static double lambda_up_factor = LAMBDA_UP_FACTOR;
 
 /*****************************************************************
 			 internal Prototypes
@@ -1471,6 +1471,9 @@ fit_command()
     int num_ranges=0;	 /* # range specs */
     static int var_order[]={FIRST_X_AXIS, FIRST_Y_AXIS, T_AXIS, U_AXIS, V_AXIS, FIRST_Z_AXIS};
     static char dummy_default[MAX_NUM_VAR][MAX_ID_LEN+1]={"x","y","t","u","v","z"};
+
+    int max_data;
+    int max_params;
 
     int dummy_token[7] = {-1,-1,-1,-1,-1,-1,-1};
     int num_points=0;	    /* number of data points read from file */

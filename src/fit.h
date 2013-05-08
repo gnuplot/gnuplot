@@ -1,5 +1,5 @@
 /*
- * $Id: fit.h,v 1.20 2013/04/24 06:02:08 markisch Exp $
+ * $Id: fit.h,v 1.21 2013/05/08 04:07:20 markisch Exp $
  */
 
 /* GNUPLOT - fit.h */
@@ -41,12 +41,6 @@
 #include "syscfg.h"
 #include "stdfn.h"
 
-/* compatible with gnuplot philosophy */
-#define STANDARD stderr
-
-/* Suffix of a backup file */
-#define BACKUP_SUFFIX ".old"
-
 /* defaults */
 #define DEF_FIT_LIMIT 1e-5
 
@@ -70,7 +64,7 @@ extern const char *FITLIMIT;
 extern const char *FITSTARTLAMBDA;
 extern const char *FITLAMBDAFACTOR;
 extern const char *FITMAXITER;
-extern char fitbuf[];
+
 extern char *fitlogfile;
 extern TBOOLEAN fit_errorvariables;
 extern verbosity_level fit_verbosity;
@@ -78,6 +72,8 @@ extern TBOOLEAN fit_errorscaling;
 extern TBOOLEAN fit_prescale;
 extern char *fit_script;
 extern TBOOLEAN ctrlc_flag;
+
+extern char fitbuf[256]; /* for Eex and error_ex  */
 
 /* Prototypes of functions exported by fit.c */
 
