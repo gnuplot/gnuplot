@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: mouse.c,v 1.148 2013/04/05 18:36:54 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: mouse.c,v 1.149 2013/04/08 04:18:20 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - mouse.c */
@@ -241,14 +241,16 @@ static char *builtin_rotate_up __PROTO((struct gp_event_t * ge));
 static char *builtin_rotate_left __PROTO((struct gp_event_t * ge));
 static char *builtin_rotate_down __PROTO((struct gp_event_t * ge));
 static char *builtin_cancel_zoom __PROTO((struct gp_event_t * ge));
+static char *builtin_zoom_in_around_mouse __PROTO((struct gp_event_t * ge));
+static char *builtin_zoom_out_around_mouse __PROTO((struct gp_event_t * ge));
+#if (0)	/* Not currently used */
 static char *builtin_zoom_scroll_left __PROTO((struct gp_event_t * ge));
 static char *builtin_zoom_scroll_right __PROTO((struct gp_event_t * ge));
 static char *builtin_zoom_scroll_up __PROTO((struct gp_event_t * ge));
 static char *builtin_zoom_scroll_down __PROTO((struct gp_event_t * ge));
 static char *builtin_zoom_in_X __PROTO((struct gp_event_t * ge));
 static char *builtin_zoom_out_X __PROTO((struct gp_event_t * ge));
-static char *builtin_zoom_in_around_mouse __PROTO((struct gp_event_t * ge));
-static char *builtin_zoom_out_around_mouse __PROTO((struct gp_event_t * ge));
+#endif
 
 /* prototypes for bind stuff
  * which are used only here. */
@@ -1621,7 +1623,26 @@ do_zoom_out_around_mouse()
     zoom_around_mouse('-');
 }
 
+static char *
+builtin_zoom_in_around_mouse(struct gp_event_t *ge)
+{
+    if (!ge)
+	return "`builtin-zoom-in` zoom in";
+    do_zoom_in_around_mouse();
+    return (char *) 0;
+}
 
+static char *
+builtin_zoom_out_around_mouse(struct gp_event_t *ge)
+{
+    if (!ge)
+	return "`builtin-zoom-out` zoom out";
+    do_zoom_out_around_mouse();
+    return (char *) 0;
+}
+
+
+#if (0) /* Not currently used */
 static char *
 builtin_zoom_scroll_left(struct gp_event_t *ge)
 {
@@ -1659,24 +1680,6 @@ builtin_zoom_scroll_down(struct gp_event_t *ge)
 }
 
 static char *
-builtin_zoom_in_around_mouse(struct gp_event_t *ge)
-{
-    if (!ge)
-	return "`builtin-zoom-in` zoom in";
-    do_zoom_in_around_mouse();
-    return (char *) 0;
-}
-
-static char *
-builtin_zoom_out_around_mouse(struct gp_event_t *ge)
-{
-    if (!ge)
-	return "`builtin-zoom-out` zoom out";
-    do_zoom_out_around_mouse();
-    return (char *) 0;
-}
-
-static char *
 builtin_zoom_in_X(struct gp_event_t *ge)
 {
     if (!ge)
@@ -1693,7 +1696,7 @@ builtin_zoom_out_X(struct gp_event_t *ge)
     do_zoom_out_X();
     return (char *) 0;
 }
-
+#endif /* Not currently used */
 
 static void
 event_buttonpress(struct gp_event_t *ge)
