@@ -2,6 +2,9 @@
 
 	* term/canvas.trm:  Pattern-fill support for the canvas terminal.
 
+	* demo/html/webify_canvas.pl:  Re-order main loop to avoid trailing
+	cruft in the output HTML page.  Include support for pattern fill.
+
 2013-05-08  Thomas Mattison  <mattison <at> phas.ubc.ca>
 
 	* src/fit.c (marquardt):  Zero-change in chisquare is now "BETTER"

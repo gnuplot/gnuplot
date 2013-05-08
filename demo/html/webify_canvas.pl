@@ -37,6 +37,10 @@
 #    FIXME:  mousing should depend on some recognizable line in the demo script,
 #	     or the mouseable demos should have a separate make target
 #
+# EAM May 2013
+#    I've always hated the dangling partial frame at the end of the html page.
+#    Re-order the main loop to get rid of it.
+#
 use Env qw(DEMOTERM GNUPLOT_LIB);
 
 use Time::localtime;
@@ -131,41 +135,13 @@ print STDERR $name, "\n";
 	print OUT "\n<br><i>gnuplot version $version</i>";
 	print OUT "<hr>\n";
 
+# Echo plot commands to a temp file
+	open(ECHO, "+>commands.tmp") or die "can't open commands.tmp";
+	binmode ECHO,":encoding(UTF-8)";
+
 # Start processing
-	print OUT "<table class=\"noborder\"><tr><td class=\"noborder\">";
-
-	print OUT "<script src=\"$name.$plot.js\"></script>\n";
-	print OUT "<canvas id=\"$name"."_$plot\" width=600 height=400 tabindex=\"0\">\n";
-	print OUT "    <div class='box'><h2>Your browser does not support the HTML 5 canvas element</h2></div>\n";
-	print OUT "</canvas>\n";
-	print OUT "<script>\n";
-	print OUT "if (window.attachEvent) {window.attachEvent('onload', $name"."_$plot);}\n";
-	print OUT "else if (window.addEventListener) {window.addEventListener('load', $name"."_$plot, false);}\n";
-	print OUT "else {document.addEventListener('load', $name"."_$plot, false);}\n";
-	print OUT "</script>\n";
-
-	print OUT "</td><td>\n";
-
-	# Copy mouse box into output stream
-	if ($mousing && -e "mousebox.template") {
-	    my $spanid = $name."_".$plot;
-	    open(MOUSEBOX,  "<mousebox.template") or die "can't open mousebox.template";
-	    while (<MOUSEBOX>) { s/ACTIVE_PLOT_NAME/$spanid/; print OUT; }
-	    close MOUSEBOX;
-	}
-
-	print OUT "<pre>\n";
-
 	while (<IN>) {
 		if (/^ *pause -1/) {
-			if ($savescripts) {
-			    print OUT "<br>Click <a href=$name.$plot.gnu>here</a> ",
-				  "for minimal script to generate this plot\n";
-			    print GNUPLOT "save \"| gpsavediff > $name.$plot.gnu\"\n";
-			}
-			print OUT "</pre></td></tr></table>\n<br clear=all>\n<hr>\n";
-			$plot++;
-	
 			print OUT "<table class=\"noborder\"><tr><td>";
 
 			print OUT "<script src=\"$name.$plot.js\"></script>\n";
@@ -191,15 +167,32 @@ print STDERR $name, "\n";
 			}
 
 			print OUT "<pre>\n";
+
+			## FIXME: dump contents of ECHO into OUT here
+			seek ECHO, 0, 0;
+			print OUT <ECHO>;
+			close ECHO;
+			open(ECHO, "+>commands.tmp") or die "can't open commands.tmp";
+			binmode ECHO,":encoding(UTF-8)";
+
+			if ($savescripts) {
+			    print OUT "<br>Click <a href=$name.$plot.gnu>here</a> ",
+				  "for minimal script to generate this plot\n";
+			    print GNUPLOT "save \"| gpsavediff > $name.$plot.gnu\"\n";
+			}
+			print OUT "</pre></td></tr></table>\n<br clear=all>\n<hr>\n";
+
+			$plot++;
 	    		print GNUPLOT "set term canvas name \"$name"."_$plot\" jsdir \".\" lw 1.6\n";
 			print GNUPLOT "set output \"$name.$plot.js\"\n";
+	
 		} elsif (/^pause/) {
 	    		print GNUPLOT "set term canvas name \"$name"."_$plot\" jsdir \".\" lw 1.6\n";
 			print GNUPLOT "set output \"$name.$plot.js\"\n";
 		} elsif (/^ *reset/) {
 			print GNUPLOT;
 		} else {
-			print OUT HTML::Entities::encode($_);
+			print ECHO HTML::Entities::encode($_);
 			print GNUPLOT;
 		}
 	}
@@ -208,9 +201,10 @@ print STDERR $name, "\n";
 # Unlink leftover empty plot before leaving.
 	close GNUPLOT;
 	unlink("$name.$plot.js");
-	print OUT "</pre></td></tr></table>\n";
-# The filled curve mechanism requires an associated canvas element somewhere in the document
-# to hold one tile of the pattern.  We stick it at the end and mark it "hidden".
+	close ECHO;
+	unlink("commands.tmp");
+# The filled curve mechanism requires an associated canvas element somewhere in the document.
+# We stick it at the end and mark it "hidden".
 	print OUT "<canvas id=\"Tile\" width=\"32\" height=\"32\" hidden></canvas>\n";
 	print OUT "</body>\n</html>\n";
 
