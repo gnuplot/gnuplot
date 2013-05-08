@@ -1,10 +1,13 @@
 2013-05-08  Thomas Mattison  <mattison <at> phas.ubc.ca>
 
 	* src/fit.c (marquardt):  Zero-change in chisquare is now "BETTER"
-	rather than "WORSE" to avoid extra iteration which would only
+	rather than "WORSE" to avoid extra iterations which would only
 	increase lambda.
 
 2013-05-08  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/fit.c (pack_float):  Do not try to dereference NULL result from
+	strchr().
 
 	* src/fit.c (fit_command):  New user variable GPVAL_LAST_FIT.
 
@@ -12,7 +15,7 @@
 	error. Derived from patchset #230 by Thomas Mattison.
 
 	* src/config/msvc/Makefile:  MSVC does not have isblank() so use
-	insspace() instead.
+	isspace() instead.
 
 2013-05-06  Ethan A Merritt  <merritt@u.washington.edu>
 

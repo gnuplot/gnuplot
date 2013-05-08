@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: fit.c,v 1.98 2013/05/08 03:00:30 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: fit.c,v 1.99 2013/05/08 03:07:09 markisch Exp $"); }
 #endif
 
 /*  NOTICE: Change of Copyright Status
@@ -1010,9 +1010,10 @@ show_fit1(int iter, double chisq, double last_chisq, double* parms, double lambd
 
     /* print values */
     snprintf(buf, sizeof(buf), "%4i %-17.10e %- 10.2e %-9.2e", iter, chisq, delta / lim, lambda);
-    for (k = 0, p = buf + 5; k < 3; k++) {
+    for (k = 0, p = buf + 4; (k < 3) && (p != NULL); k++) {
+	p++;
 	pack_float(p);
-	p = strchr(p, 'e') + 1;
+	p = strchr(p, 'e');
     }
     fprintf(device, "%s", buf);
     for (k = 0; k < num_params; k++) {
