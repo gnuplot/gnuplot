@@ -592,6 +592,7 @@
 /*#define vsnprintf _vsnprintf*/
 #define isnan _isnan
 #define ftruncate _chsize
+#define isblank isspace
 
 /* Emulated pipe support for wgnuplot */
 #ifdef USE_FAKEPIPES
