@@ -8,6 +8,12 @@
 	* src/datafile.c:  Remove use of isblank(), since too many of our
 	supported platforms are mired back in the pre C99 era.
 
+	* src/graph3d.c: this_plot->hidden3d_top_linetype is a better start
+	point for calculating contour linetypes than the apparent plot l_type,
+	because that may have been overwritten by previous definitions.
+	This way, splot ... lt N  will always get contour linetypes starting
+	with N+1.
+
 2013-05-08  Thomas Mattison  <mattison <at> phas.ubc.ca>
 
 	* src/fit.c (marquardt):  Zero-change in chisquare is now "BETTER"
