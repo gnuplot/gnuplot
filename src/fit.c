@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: fit.c,v 1.101 2013/05/08 03:22:43 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: fit.c,v 1.102 2013/05/08 03:57:54 markisch Exp $"); }
 #endif
 
 /*  NOTICE: Change of Copyright Status
@@ -150,6 +150,7 @@ TBOOLEAN fit_errorvariables = FALSE;
 verbosity_level fit_verbosity = BRIEF;
 TBOOLEAN fit_errorscaling = TRUE;
 TBOOLEAN fit_prescale = FALSE;
+char *fit_script = NULL;
 
 /* names of control variables */
 const char * FITLIMIT = "FIT_LIMIT";
@@ -167,7 +168,6 @@ static int max_params;
 static double epsilon = DEF_FIT_LIMIT;	/* convergence limit */
 static int maxiter = 0;
 
-static char *fit_script = NULL;
 static double *scale_params = 0; /* scaling values for parameters */
 
 /* HBB/H.Harders 20020927: log file name now changeable from inside
@@ -624,18 +624,37 @@ fit_interrupt()
 	case 'e':
 	case 'E':{
 		int i;
-		const char *tmp;
+		char *tmp;
 
-		tmp = fit_script ? fit_script : DEFAULT_CMD;
+		tmp = getfitscript();
 		fprintf(STANDARD, "executing: %s\n", tmp);
+		/* FIXME: Shouldn't we also set FIT_STDFIT etc? */
 		/* set parameters visible to gnuplot */
 		for (i = 0; i < num_params; i++)
 		    setvar(par_name[i], a[i] * scale_params[i]);
 		do_string(tmp);
+		free(tmp);
 	    }
 	}
     }
     return TRUE;
+}
+
+
+/*****************************************************************
+    determine current setting of FIT_SCRIPT
+*****************************************************************/
+char *
+getfitscript(void)
+{
+    char *tmp;
+
+    if (fit_script != NULL)
+	return gp_strdup(fit_script);
+    if ((tmp = getenv(FITSCRIPT)) != NULL)
+	return gp_strdup(tmp);
+    else
+	return gp_strdup(DEFAULT_CMD);
 }
 
 
@@ -1631,12 +1650,6 @@ fit_command()
     } else {
 	lambda_down_factor = LAMBDA_DOWN_FACTOR;
 	lambda_up_factor = LAMBDA_UP_FACTOR;
-    }
-
-    free(fit_script);
-    fit_script = NULL;
-    if ((tmp = getenv(FITSCRIPT)) != NULL) {
-	fit_script = gp_strdup(tmp);
     }
 
     {

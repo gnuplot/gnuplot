@@ -6,6 +6,10 @@
 
 2013-05-08  Bastian Maerkisch  <bmaerkisch@web.de>
 
+	* src/fit.c|h src/save.c src/set.c src/show.c:  The command which can be
+	executed by fit when it is interrupted can be changed with
+	`set fit script`.
+
 	* src/fit.c src/stdfun.c|h docs/gnuplot.doc:  Print p-value of the
 	chisquare distribution.  Saved to user variable FIT_P.
 

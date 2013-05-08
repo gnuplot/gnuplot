@@ -1,5 +1,5 @@
 /*
- * $Id: fit.h,v 1.19 2013/04/22 20:37:04 markisch Exp $
+ * $Id: fit.h,v 1.20 2013/04/24 06:02:08 markisch Exp $
  */
 
 /* GNUPLOT - fit.h */
@@ -76,6 +76,7 @@ extern TBOOLEAN fit_errorvariables;
 extern verbosity_level fit_verbosity;
 extern TBOOLEAN fit_errorscaling;
 extern TBOOLEAN fit_prescale;
+extern char *fit_script;
 extern TBOOLEAN ctrlc_flag;
 
 /* Prototypes of functions exported by fit.c */
@@ -86,5 +87,6 @@ void update __PROTO((char *pfile, char *npfile));
 void fit_command __PROTO((void));
 size_t wri_to_fil_last_fit_cmd __PROTO((FILE *fp));
 char *getfitlogfile __PROTO((void));
+char *getfitscript __PROTO((void));
 
 #endif /* GNUPLOT_FIT_H */

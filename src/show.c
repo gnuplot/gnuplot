@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.283 2013/04/24 06:02:08 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.284 2013/04/27 08:45:29 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -2569,6 +2569,8 @@ show_fit()
     d = ((v != NULL) && (!v->udv_undef)) ? real(&(v->udv_value)) : -1.0;
     if (d > 0.)
 	fprintf(stderr, "\tfit will change lambda by a factor of %g\n", d);
+
+    fprintf(stderr, "\tfit can run the following command when interrupted: '%s'\n", getfitscript());
 }
 
 

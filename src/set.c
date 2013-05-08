@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.392 2013/04/23 01:42:59 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.393 2013/04/24 06:02:08 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -1584,9 +1584,20 @@ set_fit()
 		v = add_udv_by_name((char *)FITLAMBDAFACTOR);
 		v->udv_undef = FALSE;
 		Gcomplex(&v->udv_value, value, 0);
-	} else {
+	    } else {
 		del_udv_by_name((char *)FITLAMBDAFACTOR, FALSE);
 	    }
+	} else if (equals(c_token, "script")) {
+	    c_token++;
+	    if (END_OF_COMMAND) {
+		free(fit_script);
+		fit_script = NULL;
+	    } else if (equals(c_token, "default")) {
+		c_token++;
+		free(fit_script);
+		fit_script = NULL;
+	    } else if (!(fit_script = try_to_get_string()))
+		int_error(c_token, "expecting string");
 	} else {
 	    int_error(c_token, "unrecognized option --- see `help set fit`");
 	}
