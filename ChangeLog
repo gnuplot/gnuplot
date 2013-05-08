@@ -1,5 +1,7 @@
 2013-05-08  Bastian Maerkisch  <bmaerkisch@web.de>
 
+	* Src/fit.c (fit_command):  New user variable GPVAL_LAST_FIT.
+
 	* src/fit.c (call_gnuplot):  Print useful info on undefined-function
 	error. Derived from patchset #230 by Thomas Mattison.
 

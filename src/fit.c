@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: fit.c,v 1.96 2013/04/27 08:45:29 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: fit.c,v 1.97 2013/05/08 02:55:40 markisch Exp $"); }
 #endif
 
 /*  NOTICE: Change of Copyright Status
@@ -1951,6 +1951,8 @@ fit_command()
     memcpy(last_dummy_var, c_dummy_var, sizeof(last_dummy_var));
     /* remember last fit command for 'save' */
     safe_strncpy(last_fit_command, gp_input_line, sizeof(last_fit_command));
+    /* save fit command to user variable */
+    fill_gpval_string("GPVAL_LAST_FIT", last_fit_command);
 }
 
 /*
