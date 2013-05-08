@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: specfun.c,v 1.46 2011/05/16 18:43:41 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: specfun.c,v 1.47 2011/10/15 00:03:33 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - specfun.c */
@@ -553,7 +553,7 @@ lngamma(double x)
 #endif /* !GAMMA */
 
 /*
- * Make all the following internal routines f_whatever() perform 
+ * Make all the following internal routines f_whatever() perform
  * autoconversion from string to numeric value.
  */
 #define pop(x) pop_or_convert_from_string(x)
@@ -680,7 +680,7 @@ f_voigt(union argument *arg)
     (void) arg;				/* avoid -Wunused warning */
     y = real(pop(&a));
     x = real(pop(&a));
-    push(Gcomplex(&a, humlik(x, y), 0.0));	
+    push(Gcomplex(&a, humlik(x, y), 0.0));
 }
 
 /*
@@ -695,7 +695,7 @@ f_voigt(union argument *arg)
  *	real value K(x,y)
  *
  * Algorithm: Josef Humlíček JQSRT 27 (1982) pp 437
- * Fortran program by J.R. Wells  JQSRT 62 (1999) pp 29-48. 
+ * Fortran program by J.R. Wells  JQSRT 62 (1999) pp 29-48.
  * Translated to C++ with f2c program and modified by Marcin Wojdyr
  * Minor adaptations from C++ to C by E. Stambulchik
  * Adapted for gnuplot by Tommaso Vinci
@@ -973,7 +973,7 @@ confrac(double a, double b, double x)
  *
  */
 
-static double
+double
 igamma(double a, double x)
 {
     double arg;
@@ -1058,6 +1058,21 @@ igamma(double a, double x)
     }
     return -1.0;
 }
+
+
+/* ----------------------------------------------------------------
+    Cummulative distribution function of the ChiSquare distribution
+   ---------------------------------------------------------------- */
+double
+chisq_cdf(int dof, double chisqr)
+{
+    if (dof <= 0)
+	return not_a_number();
+    if (chisqr <= 0.)
+	return 0;
+    return igamma(0.5 * dof, 0.5 * chisqr);
+}
+
 
 /***********************************************************************
      double ranf(double init)
@@ -2123,14 +2138,14 @@ f_lambertw(union argument *arg)
    "Two-Point Quasi-Fractional Approximations to the Airy Function Ai(x)"
    by Pablo Martin, Ricardo Perez, Antonio L. Guerrero
    Journal of Computational Physics 99, 337-340 (1992)
-   
+
    Beware of a misprint in equation (5) in this paper: The second term in
-   parentheses must be multiplied by "x", as is clear from equation (3) 
-   and by comparison with equation (6). The implementation in this file 
+   parentheses must be multiplied by "x", as is clear from equation (3)
+   and by comparison with equation (6). The implementation in this file
    uses the CORRECT formula (with the "x").
 
-   This is not a very high accuracy approximation, but sufficient for 
-   plotting and similar applications. Higher accuracy formulas are 
+   This is not a very high accuracy approximation, but sufficient for
+   plotting and similar applications. Higher accuracy formulas are
    available, but are much more complicated (typically requiring iteration).
 
    Added: janert (PKJ) 2009-09-05
@@ -2182,7 +2197,7 @@ f_airy(union argument *arg)
  *
  *   DESCRIBE  Approximate the exponential integral function
  *
- *                           
+ *
  *                       /inf   -n    -zt
  *             E_n(z) =  |     t   * e    dt (n = 0, 1, 2, ...)
  *                       /1
@@ -2190,8 +2205,8 @@ f_airy(union argument *arg)
  *
  *   CALL      p = expint(n, z)
  *
- *             double    n    >= 0  
- *             double    z    >= 0  
+ *             double    n    >= 0
+ *             double    z    >= 0
  *               also: n must be an integer
  *                     either z > 0 or n > 1
  *
@@ -2260,16 +2275,16 @@ expint(double n, double z)
 	  }
 	y = exp(-z)*y;
       }
-    
+
     else
       {	/* For small z, use series (Abramowitz & Stegun 5.1.12):
 	   E_1(z) = -\gamma + \ln z +
-	            \sum_{m=1}^\infty { (-z)^m \over (m) m! }   
+	            \sum_{m=1}^\infty { (-z)^m \over (m) m! }
 	   The series is valid for z>0, and efficient for z<4 or so.  */
 
 	/* from Abramowitz & Stegun, Table 1.1 */
 	double euler_constant = .577215664901532860606512;
-  
+
 	double y_prev = 0;
 	double t, m;
 
@@ -2279,15 +2294,15 @@ expint(double n, double z)
 	  {
 	    t = -t*z/m;
 	    y = y - t/m;
-	    if (y == y_prev) break; 
+	    if (y == y_prev) break;
 	    y_prev = y;
 	  }
 
 	/* For n > 1, use recurrence relation (Abramowitz & Stegun 5.1.14):
-	   n E_{n+1}(z) + z E_n(z) = e^{-z}, n >= 1 
+	   n E_{n+1}(z) + z E_n(z) = e^{-z}, n >= 1
 	   The recurrence is unstable for increasing n and z>4 or so,
 	   but okay for z<3.  */
-  
+
 	for (m=1; m<n; m++)
 	  y=(exp(-z) - z*y)/m;
       }

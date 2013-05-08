@@ -1,5 +1,5 @@
 #
-# $Id: fit.dem,v 1.14 2013/04/24 19:56:30 markisch Exp $
+# $Id: fit.dem,v 1.15 2013/04/24 21:58:18 sfeam Exp $
 #
 
 myencoding = GPVAL_ENCODING
@@ -232,7 +232,7 @@ print "                " . sprintf("tc  = %g", tc)
 print "  fit command : fit R(x) 'moli3.dat' u 1:2:3 via eta, tc\n"
 pause -1 "now start fitting...  (-> return)"
 
-set fit limit 1e-10
+set fit limit 1e-10 noerrorscaling
 fit R(x) 'moli3.dat' u 1:2:3 via eta, tc
 set title 'fitted parameters'
 replot
@@ -272,7 +272,7 @@ set title "data and initial parameters"
 splot f1(x,y), 'fit3.dat' in 0 u 1:2:4
 pause -1 "Press enter to start the fit."
 
-a0=1; a1=.1; a2=.1
+set fit errorscaling
 fit f1(x,y) 'fit3.dat' index 0 using 1:2:4:(1) via a0,a1,a2
 set title "fit to data with t = -3"
 splot f1(x,y), 'fit3.dat' in 0 u 1:2:4

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: fit.c,v 1.100 2013/05/08 03:12:56 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: fit.c,v 1.101 2013/05/08 03:22:43 markisch Exp $"); }
 #endif
 
 /*  NOTICE: Change of Copyright Status
@@ -72,12 +72,13 @@ static char *RCSid() { return RCSid("$Id: fit.c,v 1.100 2013/05/08 03:12:56 mark
 #include "eval.h"
 #include "gp_time.h"
 #include "matrix.h"
-#include "plot.h"
 #include "misc.h"
-#include "util.h"
-#include "scanner.h"  /* For legal_identifier() */
-#include "variable.h" /* For locale handling */
+#include "plot.h"
 #include "setshow.h"
+#include "scanner.h"  /* For legal_identifier() */
+#include "specfun.h"
+#include "util.h"
+#include "variable.h" /* For locale handling */
 #include <signal.h>
 
 /* Just temporary */
@@ -143,7 +144,7 @@ typedef enum marq_res marq_res_t;
 /* saved copy of last 'fit' command -- for output by "save" */
 char fitbuf[256];
 
-/* log-file for fit command */
+/* fit control */
 char *fitlogfile = NULL;
 TBOOLEAN fit_errorvariables = FALSE;
 verbosity_level fit_verbosity = BRIEF;
@@ -784,6 +785,7 @@ regress(double a[])
     {
 	int ndf          = num_data - num_params;
 	double stdfit    = sqrt(chisq/ndf);
+	double pvalue    = 1. - chisq_cdf(ndf, chisq);
 
 	/* Export these to user-accessible variables */
 	v = add_udv_by_name("FIT_NDF");
@@ -795,6 +797,9 @@ regress(double a[])
 	v = add_udv_by_name("FIT_WSSR");
 	v->udv_undef = FALSE;
 	Gcomplex(&v->udv_value, chisq, 0);
+	v = add_udv_by_name("FIT_P");
+	v->udv_undef = FALSE;
+	Gcomplex(&v->udv_value, pvalue, 0);
     }
 
     /* get covariance-, Correlations- and Kurvature-Matrix */
@@ -889,10 +894,19 @@ show_results(double chisq, double last_chisq, double* a, double* dpar, double** 
     } else {
 	int ndf          = num_data - num_params;
 	double stdfit    = sqrt(chisq/ndf);
+	double pvalue    = 1. - chisq_cdf(ndf, chisq);
 
 	Dblf2("degrees of freedom    (FIT_NDF)                        : %d\n", ndf);
 	Dblf2("rms of residuals      (FIT_STDFIT) = sqrt(WSSR/ndf)    : %g\n", stdfit);
-	Dblf2("variance of residuals (reduced chisquare) = WSSR/ndf   : %g\n\n", chisq / ndf);
+	Dblf2("variance of residuals (reduced chisquare) = WSSR/ndf   : %g\n", chisq / ndf);
+	/* We cannot know if the errors supplied by the user are weighting factors
+	or real errors, so we print the p-value in any case, although it does not
+	make much sense in the first case.  This means that we always print this
+	for x,y,z-fits without errors since current syntax requires 4 columns in
+	this case. */
+	if (columns >= 3)
+	    Dblf2("p-value of the Chisq distribution (FIT_P)              : %g\n", pvalue);
+	Dblf("\n");
 
 	if ((fit_errorscaling) || (columns < 3))
 	    Dblf("Final set of parameters            Asymptotic Standard Error\n");

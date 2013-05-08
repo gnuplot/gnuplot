@@ -6,6 +6,9 @@
 
 2013-05-08  Bastian Maerkisch  <bmaerkisch@web.de>
 
+	* src/fit.c src/stdfun.c|h docs/gnuplot.doc:  Print p-value of the
+	chisquare distribution.  Saved to user variable FIT_P.
+
 	* src/fit.c (fit_command):  Discard data which contains NaN.  Necessary
 	since df_readline() does not return DF_UNDEFINED in that case.  Now
 	excluding data from the fit works the same for expressions with e.g. 1/0
