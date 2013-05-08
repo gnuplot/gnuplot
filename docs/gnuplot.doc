@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.790 2013/05/08 03:57:54 markisch Exp $
+C RCS $Id: gnuplot.doc,v 1.791 2013/05/08 04:17:42 markisch Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -4387,12 +4387,12 @@ Ffigure_mapcontours
  The p-value of the fit is one minus the cumulative distribution function of
  the chisquare-distribution for the number of degrees of freedom and the
  resulting chisquare.  This can serve as a measure of the goodness-of-fit.
- The range of the p-value is between zero and one.  A very small or large 
+ The range of the p-value is between zero and one.  A very small or large
  p-value indicates that the model does not describe the data and its errors
  well.  As described above, this might indicate a problem with the data, its
- errors or the model, or a combination therof.  A small p-value might indicate
- that the errors have been understimated and the errors of the final
- parameters should thus be scaled. See also `set fit errorscaling`.
+ errors or the model, or a combination thereof.  A small p-value might
+ indicate that the errors have been underestimated and the errors of the
+ final parameters should thus be scaled. See also `set fit errorscaling`.
 
  You'll have to get used to both `fit` and the kind of problems you apply it
  to before you can relate the standard errors to some more practical estimates
@@ -7964,15 +7964,15 @@ Ffigure_missing
  The `set fit` command controls the options for the `fit` command.
 
  Syntax:
-       set fit {logfile {"<filename>"}}
+       set fit {logfile {"<filename>"}|default}
                {{no}quiet|results|brief|verbose}
                {{no}errorvariables}
                {{no}errorscaling}
                {{no}prescale}
-               {limit <epsilon>}
-               {maxiter <value>}
-               {start-lambda <value>}
-               {lambda-factor <value>}
+               {limit <epsilon>|default}
+               {maxiter <value>|none}
+               {start-lambda <value>|default}
+               {lambda-factor <value>|default}
                {script {"<command>"|default}}
        unset fit
        show fit
@@ -8021,17 +8021,17 @@ Ffigure_missing
  less than this number (epsilon), the fit is considered to have 'converged'.
 
  The maximum number of iterations may be limited with the `maxiter` option.
- A value of 0 means that there is no limit.
+ A value of 0 or `default` means that there is no limit.
 
  If you need even more control about the algorithm, and know the
  Marquardt-Levenberg algorithm well, the folowing options can be used to
  influence it. The startup value of `lambda` is normally calculated
  automatically from the ML-matrix, but if you want to, you may provide your
- own using the `start_lambda` option. Setting it to zero or less will 
+ own using the `start_lambda` option. Setting it to `default` will 
  re-enable the automatic selection. The option `lambda_factor` sets the factor
  by which `lambda` is increased or decreased whenever the chi-squared target
- function increased or decreased significantly. Setting it to zero re-enables
- the default factor of 10.0.
+ function increased or decreased significantly. Setting it to `default`
+ re-enables the default factor of 10.0.
 
  The `script` option may be used to specify a `gnuplot` command to be executed
  when a fit is interrupted---see `fit`.  This setting takes precedence over

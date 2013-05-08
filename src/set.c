@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.393 2013/04/24 06:02:08 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.394 2013/05/08 04:07:20 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -1491,13 +1491,22 @@ set_fit()
 
     while (!END_OF_COMMAND) {
 	if (almost_equals(c_token, "log$file")) {
+	    char *tmp;
+
 	    c_token++;
 	    if (END_OF_COMMAND) {
-		if (fitlogfile != NULL)
-		    free(fitlogfile);
-		fitlogfile=NULL;
-	    } else if (!(fitlogfile = try_to_get_string()))
+		free(fitlogfile);
+		fitlogfile = NULL;
+	    } else if (equals(c_token, "default")) {
+		c_token++;
+		free(fitlogfile);
+		fitlogfile = NULL;
+	    } else if ((tmp = try_to_get_string()) != NULL) {
+		free(fitlogfile);
+		fitlogfile = tmp;
+	    } else {
 		int_error(c_token, "expecting string");
+	    }
 	} else if (almost_equals(c_token, "err$orvariables")) {
 	    fit_errorvariables = TRUE;
 	    c_token++;
@@ -1537,7 +1546,10 @@ set_fit()
 	    double value;
 
 	    c_token++;
-	    value = real_expression();
+	    if (equals(c_token, "default"))
+		value = 0.;
+	    else
+		value = real_expression();
 	    if ((value > 0.) && (value < 1.)) {
 		v = add_udv_by_name((char *)FITLIMIT);
 		v->udv_undef = FALSE;
@@ -1551,7 +1563,10 @@ set_fit()
 	    int maxiter;
 
 	    c_token++;
-	    maxiter = int_expression();
+	    if (equals(c_token, "default"))
+		maxiter = 0;
+	    else
+		maxiter = int_expression();
 	    if (maxiter > 0) {
 		v = add_udv_by_name((char *)FITMAXITER);
 		v->udv_undef = FALSE;
@@ -1565,7 +1580,10 @@ set_fit()
 	    double value;
 
 	    c_token++;
-	    value = real_expression();
+	    if (equals(c_token, "default"))
+		value = 0.;
+	    else
+		value = real_expression();
 	    if (value > 0.) {
 		v = add_udv_by_name((char *)FITSTARTLAMBDA);
 		v->udv_undef = FALSE;
@@ -1579,7 +1597,10 @@ set_fit()
 	    double value;
 
 	    c_token++;
-	    value = real_expression();
+	    if (equals(c_token, "default"))
+		value = 0.;
+	    else
+		value = real_expression();
 	    if (value > 0.) {
 		v = add_udv_by_name((char *)FITLAMBDAFACTOR);
 		v->udv_undef = FALSE;
@@ -1588,6 +1609,8 @@ set_fit()
 		del_udv_by_name((char *)FITLAMBDAFACTOR, FALSE);
 	    }
 	} else if (equals(c_token, "script")) {
+	    char *tmp;
+
 	    c_token++;
 	    if (END_OF_COMMAND) {
 		free(fit_script);
@@ -1596,8 +1619,12 @@ set_fit()
 		c_token++;
 		free(fit_script);
 		fit_script = NULL;
-	    } else if (!(fit_script = try_to_get_string()))
+	    } else if ((tmp = try_to_get_string()) != NULL) {
+		free(fit_script);
+		fit_script = tmp;
+	    } else {
 		int_error(c_token, "expecting string");
+	    }
 	} else {
 	    int_error(c_token, "unrecognized option --- see `help set fit`");
 	}

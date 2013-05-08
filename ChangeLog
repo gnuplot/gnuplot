@@ -6,6 +6,10 @@
 
 2013-05-08  Bastian Maerkisch  <bmaerkisch@web.de>
 
+	* src/set.c (set_fit) docs/gnuplot.doc:  Options logfile, limit
+	maxiter, start_lambda, lambda_factor, and script accept setting 'default'
+	to restore default values or behaviour.  Avoid usage of magic constants.
+
 	* src/fit.c|h:  Cleanup declarations.
 
 	* src/fit.c|h src/save.c src/set.c src/show.c:  The command which can be
