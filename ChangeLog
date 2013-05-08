@@ -2,7 +2,16 @@
 
 	* src/fit.c (marquardt):  Zero-change in chisquare is now "BETTER"
 	rather than "WORSE" to avoid extra iterations which would only
-	increase lambda.
+	increase lambda. 
+	Patch #230.
+
+	* src/fit.c (call_gnuplot):  Print useful info on undefined-function
+	error. Derived from patchset #230.
+
+	* src/fit.c (fit_command):  If the user supplies errors but any of them 
+	are zero, there will be a divide by zero, trashing the fit.  Add a check 
+	which prints info about the offending data point before aborting.
+	Derived from patchset #230.
 
 2013-05-08  Bastian Maerkisch  <bmaerkisch@web.de>
 
@@ -31,9 +40,6 @@
 	strchr().
 
 	* src/fit.c (fit_command):  New user variable GPVAL_LAST_FIT.
-
-	* src/fit.c (call_gnuplot):  Print useful info on undefined-function
-	error. Derived from patchset #230 by Thomas Mattison.
 
 	* src/config/msvc/Makefile:  MSVC does not have isblank() so use
 	isspace() instead.

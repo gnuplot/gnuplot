@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: fit.c,v 1.104 2013/05/08 04:23:09 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: fit.c,v 1.105 2013/05/08 16:51:45 markisch Exp $"); }
 #endif
 
 /*  NOTICE: Change of Copyright Status
@@ -578,7 +578,7 @@ call_gnuplot(double *par, double *data)
 	    Dblf("=========================\n");
 	    Dblf3("%-15s = %i out of %i\n", "#", i + 1, num_data);
 	    for (j = 0; j < num_indep; j++)
-		Dblf3("%-15.15s = %-15g\n", c_dummy_var[i], par[j] * scale_params[j]);
+		Dblf3("%-15.15s = %-15g\n", c_dummy_var[j], par[j] * scale_params[j]);
 	    Dblf3("%-15.15s = %-15g\n", "z", fit_z[i]);
 	    Dblf("\nCurrent set of parameters\n");
 	    Dblf("=========================\n");
@@ -1824,6 +1824,22 @@ fit_command()
 	}
       }
       Eex("No data to fit ");
+    }
+
+    /* tsm patchset 230: check for zero error values */
+    for (i = 0; i < num_data; i++) {
+	if (err_data[i] != 0.0)
+	    continue;
+	Dblf("\nCurrent data point\n");
+	Dblf("=========================\n");
+	Dblf3("%-15s = %i out of %i\n", "#", i + 1, num_data);
+	for (j = 0; j < num_indep; j++)
+	    Dblf3("%-15.15s = %-15g\n", c_dummy_var[j], fit_x[i * num_indep + j]);
+	Dblf3("%-15.15s = %-15g\n", "z", fit_z[i]);
+	Dblf3("%-15.15s = %-15g\n", "s", err_data[i]);
+	Dblf("\n");
+	Eex("Zero error value in data file");
+	/* FIXME: Eex() aborts before memory is freed! */
     }
 
     /* now resize fields to actual length: */
