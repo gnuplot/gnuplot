@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: util.c,v 1.110 2013/04/21 06:26:11 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: util.c,v 1.111 2013/04/27 07:51:17 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - util.c */
@@ -50,6 +50,9 @@ static char *RCSid() { return RCSid("$Id: util.c,v 1.110 2013/04/21 06:26:11 sfe
 # include <dirent.h>
 #elif defined(_Windows)
 # include <windows.h>
+#endif
+#ifdef __MSC__
+# include <io.h>
 #endif
 
 /* Exported (set-table) variables */
