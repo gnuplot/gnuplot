@@ -1,3 +1,7 @@
+2013-05-08  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/canvas.trm:  Pattern-fill support for the canvas terminal.
+
 2013-05-08  Thomas Mattison  <mattison <at> phas.ubc.ca>
 
 	* src/fit.c (marquardt):  Zero-change in chisquare is now "BETTER"

@@ -209,5 +209,8 @@ print STDERR $name, "\n";
 	close GNUPLOT;
 	unlink("$name.$plot.js");
 	print OUT "</pre></td></tr></table>\n";
+# The filled curve mechanism requires an associated canvas element somewhere in the document
+# to hold one tile of the pattern.  We stick it at the end and mark it "hidden".
+	print OUT "<canvas id=\"Tile\" width=\"32\" height=\"32\" hidden></canvas>\n";
 	print OUT "</body>\n</html>\n";
 

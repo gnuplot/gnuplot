@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: canvas.trm,v 1.72 2013/02/19 05:30:38 sfeam Exp $
+ * $Id: canvas.trm,v 1.73 2013/05/07 22:13:46 sfeam Exp $
  *
  */
 
@@ -177,6 +177,12 @@ static struct gen_table CANVAS_opts[] =
     { "backg$round", CANVAS_BACKGROUND },
     { NULL, CANVAS_OTHER }
 };
+
+/* Fill patterns */
+#define PATTERN1 "tile.moveTo(0,0); tile.lineTo(32,32); tile.moveTo(0,16); tile.lineTo(16,32); tile.moveTo(16,0); tile.lineTo(32,16);"
+#define PATTERN2 "tile.moveTo(0,32); tile.lineTo(32,0); tile.moveTo(0,16); tile.lineTo(16,0); tile.moveTo(16,32); tile.lineTo(32,16);"
+#define PATTERN3 "tile.moveTo(8,0); tile.lineTo(32,24); tile.moveTo(0,8); tile.lineTo(24,32); tile.moveTo(24,0); tile.lineTo(32,8); tile.moveTo(0,24); tile.lineTo(8,32); tile.moveTo(8,32); tile.lineTo(32,8); tile.moveTo(0,24); tile.lineTo(24,0); tile.moveTo(24,32); tile.lineTo(32,24); tile.moveTo(0,8); tile.lineTo(8,0);"
+
 
 static void
 CANVAS_start (void)
@@ -731,6 +737,11 @@ CANVAS_text()
 		"<div class=\"gnuplot\">\n",
 			CANVAS_scriptdir ? CANVAS_scriptdir : ""
 	);
+	/* Pattern-fill requires having a canvas element to hold a template
+	 * pattern tile.  Define it here but try to hide it (may not work in IE?)
+	 */
+	fprintf(gpoutfile,
+	    "<canvas id=\"Tile\" width=\"32\" height=\"32\" hidden></canvas>\n");
 
 	/* The format of the plot box and in particular the mouse tracking box
 	 * are determined by the CSS specs in customizable file gnuplot_mouse.css
@@ -1103,6 +1114,8 @@ static char *
 CANVAS_fillstyle(int style)
 {
     float density = (float)(style >> 4) / 100.;
+    int pattern = style >> 4;
+    TBOOLEAN transparent_pattern = TRUE;
     static char fillcolor[24];
 
     switch (style & 0xf) {
@@ -1114,15 +1127,38 @@ CANVAS_fillstyle(int style)
 		strcpy(fillcolor,"rgba(255,255,255,0.00)");
 		break;
 	case FS_PATTERN:
+		transparent_pattern = FALSE;
 	case FS_TRANSPARENT_PATTERN:
-		/* Patterns are possible, but not yet implemented */
-		switch ((style >> 4) % 5) {
-			case 0: density = 0.00; break;
-			case 1: density = 1.00; break;
-			case 2: density = 0.25; break;
-			case 3: density = 0.75; break;
-			case 4: density = 0.50; break;
-		}	/* fall through */
+		if (pattern%6 == 3) {
+			strcpy(fillcolor,canvas_state.color);
+			strcpy(canvas_state.previous_fill, "");
+			break;
+		}
+		/* Write one copy of the pattern into the Tile element. */
+		fprintf(gpoutfile,
+			"var template = document.getElementById('Tile');\n"
+			"var tile = template.getContext('2d');\n"
+			"tile.clearRect(0,0,32,32);\n");
+		if (!transparent_pattern)
+			fprintf(gpoutfile, "tile.fillStyle = \"%s\"; tile.fillRect(0,0,32,32);\n",
+				(*CANVAS_background) ? CANVAS_background : "white");
+		fprintf(gpoutfile,
+			"tile.beginPath();\n");
+		switch(pattern%6) {
+			case 1: fprintf(gpoutfile,"%s %s\n",PATTERN1,PATTERN2); break;
+			case 2: fprintf(gpoutfile,"%s %s %s\n",PATTERN1,PATTERN2,PATTERN3); break;
+			case 4: fprintf(gpoutfile,"%s\n",PATTERN1); break;
+			case 5: fprintf(gpoutfile,"%s\n",PATTERN2); break;
+			default: break;
+		}
+		fprintf(gpoutfile,
+			"tile.strokeStyle=\"%s\"; tile.lineWidth=\"2\"; tile.stroke();\n",
+			canvas_state.color);
+		/* Then load it as a fill style */
+		fprintf(gpoutfile,
+			"ctx.fillStyle = ctx.createPattern(template,\"repeat\");\n");
+		strcpy(fillcolor,"pattern");
+		break;
 	case FS_SOLID:
 		if (canvas_state.alpha > 0) {
 		    sprintf(fillcolor,"rgba(%11.11s,%4.2f)%c",
@@ -1163,6 +1199,7 @@ CANVAS_filled_polygon(int points, gpiPoint *corners)
 
     if (corners->style != FS_OPAQUE && corners->style != FS_DEFAULT) {
 	char *fillcolor = CANVAS_fillstyle(corners->style);
+	if (strcmp(fillcolor,"pattern"))
 	if (strcmp(canvas_state.previous_fill, fillcolor)) {
 	    fprintf(gpoutfile, "ctx.fillStyle = \"%s\";\n", fillcolor);
 	    strcpy(canvas_state.previous_fill, fillcolor);
@@ -1201,6 +1238,7 @@ CANVAS_fillbox(int style, unsigned int x1, unsigned int y1, unsigned int width, 
 
     /* Since filled-rectangle is a primitive operation for the canvas element */
     /* it's worth making this a special case rather than using filled_polygon */
+	if (strcmp(fillcolor,"pattern"))
 	if (strcmp(canvas_state.previous_fill, fillcolor)) {
 	    fprintf(gpoutfile, "ctx.fillStyle = \"%s\";\n", fillcolor);
 	    strcpy(canvas_state.previous_fill, fillcolor);
