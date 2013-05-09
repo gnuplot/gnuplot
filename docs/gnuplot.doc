@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.791 2013/05/08 04:17:42 markisch Exp $
+C RCS $Id: gnuplot.doc,v 1.792 2013/05/08 16:44:25 markisch Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -7964,13 +7964,14 @@ Ffigure_missing
  The `set fit` command controls the options for the `fit` command.
 
  Syntax:
-       set fit {logfile {"<filename>"}|default}
+       set fit {logfile {"<filename>"|default}}
                {{no}quiet|results|brief|verbose}
                {{no}errorvariables}
                {{no}errorscaling}
                {{no}prescale}
-               {limit <epsilon>|default}
                {maxiter <value>|none}
+               {limit <epsilon>|default}
+               {limit_abs <epsilon_abs>   
                {start-lambda <value>|default}
                {lambda-factor <value>|default}
                {script {"<command>"|default}}
@@ -8016,12 +8017,14 @@ Ffigure_missing
  in size by many orders of magnitude. Fit parameters with an initial value
  of exactly zero are never prescaled.
 
+ The maximum number of iterations may be limited with the `maxiter` option.
+ A value of 0 or `default` means that there is no limit.
+
  The `limit` option can be used to change the default epsilon limit (1e-5) to
  detect convergence.  When the sum of squared residuals changes by a factor
  less than this number (epsilon), the fit is considered to have 'converged'.
-
- The maximum number of iterations may be limited with the `maxiter` option.
- A value of 0 or `default` means that there is no limit.
+ The `limit_abs` option imposes an additional absolute limit in the change
+ of the sum of squared residuals and defaults to zero.
 
  If you need even more control about the algorithm, and know the
  Marquardt-Levenberg algorithm well, the folowing options can be used to

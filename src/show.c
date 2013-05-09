@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.285 2013/05/08 04:07:20 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.286 2013/05/08 16:33:29 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -2550,8 +2550,11 @@ show_fit()
 
     v = get_udv_by_name((char *)FITLIMIT);
     d = ((v != NULL) && (!v->udv_undef)) ? real(&(v->udv_value)) : -1.0;
-    fprintf(stderr, "\tfit will consider the fit to have converged if epsilon <= %g\n",
-            ((d > 0.) && (d < 1.)) ? d : DEF_FIT_LIMIT);
+    fprintf(stderr, "\tfits will be considered to have converged if  delta chisq < chisq * %g",
+	((d > 0.) && (d < 1.)) ? d : DEF_FIT_LIMIT);
+    if (epsilon_abs > 0.)
+	fprintf(stderr, " + %g", epsilon_abs);
+    fprintf(stderr, "\n");
 
     v = get_udv_by_name((char *)FITMAXITER);
     if ((v != NULL) && (!v->udv_undef) && (real_int(&(v->udv_value)) > 0))

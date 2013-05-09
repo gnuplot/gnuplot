@@ -1,3 +1,14 @@
+2013-05-09  Thomas Mattison  <mattison <at> phas.ubc.ca>
+
+	* src/fit.c|h src/save.c src/show.c src/set.c src/unset.c
+	docs/gnuplot.doc:  New convergence criterion. The new simpler criterion
+	in regress() is absolute reduction in chisquare for an iteration of less
+	than epsilon*chisquare plus epsilon_abs (new setting).  The default
+	convergence criterion is thus always relative no matter what the
+	chisquare is, but users now have the flexibility of adding an absolute
+	convergence criterion through `set fit limit_abs`.
+	Patch #230.
+
 2013-05-08  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/canvas.trm:  Pattern-fill support for the canvas terminal.

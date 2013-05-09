@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.213 2013/04/27 19:32:22 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.214 2013/05/08 04:07:20 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -999,6 +999,9 @@ set origin %g,%g\n",
 	d = ((v != NULL) && (!v->udv_undef)) ? real(&(v->udv_value)) : -1.0;
 	if ((d > 0.) && (d < 1.))
 	    fprintf(fp, " limit %g", d);
+
+	if (epsilon_abs > 0.)
+	    fprintf(fp, " limit_abs %g", epsilon_abs);
 
 	v = get_udv_by_name((char *)FITMAXITER);
 	i = ((v != NULL) && (!v->udv_undef)) ? real_int(&(v->udv_value)) : -1;

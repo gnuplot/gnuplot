@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: fit.c,v 1.105 2013/05/08 16:51:45 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: fit.c,v 1.106 2013/05/08 17:07:10 markisch Exp $"); }
 #endif
 
 /*  NOTICE: Change of Copyright Status
@@ -61,6 +61,13 @@ static char *RCSid() { return RCSid("$Id: fit.c,v 1.105 2013/05/08 16:51:45 mark
  * Bastian Maerkisch, 130427: remember parameters etc. of last fit and use
  * this data in a subsequent update command if the parameter file does not
  * exists yet.
+ *
+ * Thomas Mattison, 130508: New convergence criterion which is absolute
+ * reduction in chisquare for an iteration of less than epsilon*chisquare
+ * plus epsilon_abs (new setting).  The default convergence criterion is
+ * always relative no matter what the chisquare is, but users now have the
+ * flexibility of adding an absolute convergence criterion through
+ * `set fit limit_abs`. Patchset #230.
  *
  */
 
@@ -173,7 +180,8 @@ char fitbuf[256]; /* for Eex and error_ex */
 
 /* private variables: */
 
-static double epsilon = DEF_FIT_LIMIT;	/* convergence limit */
+static double epsilon = DEF_FIT_LIMIT;	/* relative convergence limit */
+double epsilon_abs = 0.0;               /* default to zero non-relative limit */
 static int maxiter = 0;
 static double startup_lambda = 0;
 static double lambda_down_factor = LAMBDA_DOWN_FACTOR;
@@ -754,11 +762,9 @@ regress(double a[])
     } while ((res != ML_ERROR)
 	     && (lambda < MAX_LAMBDA)
 	     && ((maxiter == 0) || (iter <= maxiter))
-	     && (res == WORSE
-		 || ((chisq > NEARLY_ZERO)
-		     ? ((last_chisq - chisq) / chisq)
-		     : (last_chisq - chisq)) > epsilon
-	     )
+	     && (res == WORSE ||
+	    /* tsm patchset 230: change to new convergence criterion */
+	         ((last_chisq - chisq) > (epsilon * chisq + epsilon_abs)))
 	);
 
     /* fit done */
@@ -1027,7 +1033,7 @@ show_fit1(int iter, double chisq, double last_chisq, double* parms, double lambd
 
     /* on iteration 0 or -2, print labels */
     if (iter == 0 || iter == -2) {
-	fprintf(device, "iter      chisq      delta/chisq lambda  ");
+	fprintf(device, "iter      chisq       delta/lim  lambda  ");
 	              /* 9999 1.1234567890e+00 -1.12e+00 1.00e+00 */
 	for (k = 0; k < num_params; k++)
 	    fprintf(device, " %-13.13s", par_name[k]);
@@ -1037,9 +1043,9 @@ show_fit1(int iter, double chisq, double last_chisq, double* parms, double lambd
     /* on iteration -2, don't print anything else */
     if (iter == -2) return;
 
-    /* convergence test quantities */
+    /* new convergence test quantities */
     delta = chisq - last_chisq;
-    lim = chisq;
+    lim = epsilon * chisq + epsilon_abs;
 
     /* print values */
     if (iter >= 0)
@@ -1635,10 +1641,14 @@ fit_command()
 	epsilon = DEF_FIT_LIMIT;
     FPRINTF((STANDARD, "epsilon=%e\n", epsilon));
 
+    /* tsm patchset 230: new absolute convergence variable */
+    FPRINTF((STANDARD, "epsilon_abs=%e\n", epsilon_abs));
+
     /* HBB 970304: maxiter patch */
     maxiter = getivar(FITMAXITER);
     if (maxiter < 0)
 	maxiter = 0;
+    FPRINTF((STANDARD, "maxiter=%i\n", maxiter));
 
     /* get startup value for lambda, if given */
     tmpd = getdvar(FITSTARTLAMBDA);

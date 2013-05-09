@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.394 2013/05/08 04:07:20 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.395 2013/05/08 16:44:25 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -1557,6 +1557,11 @@ set_fit()
 	    } else {
 		del_udv_by_name((char *)FITLIMIT, FALSE);
 	    }
+	} else if (equals(c_token, "limit_abs")) {
+	    double value;
+	    c_token++;
+	    value = real_expression();
+	    epsilon_abs = (value > 0.) ? value : 0.;
 	} else if (equals(c_token, "maxiter")) {
 	    /* preserve compatibility with FIT_MAXITER user variable */
 	    struct udvt_entry *v;

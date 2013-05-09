@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.166 2013/04/24 06:02:08 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.167 2013/05/08 16:31:16 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -794,6 +794,7 @@ unset_fit()
     fit_prescale = FALSE;
     fit_verbosity = BRIEF;
     del_udv_by_name((char *)FITLIMIT, FALSE);
+    epsilon_abs = 0.;
     del_udv_by_name((char *)FITMAXITER, FALSE);
     del_udv_by_name((char *)FITSTARTLAMBDA, FALSE);
     del_udv_by_name((char *)FITLAMBDAFACTOR, FALSE);
