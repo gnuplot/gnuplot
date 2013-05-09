@@ -134,6 +134,7 @@ The mousing code is new. You may see some browser-dependent glitches.
     <li><a href="margins.html">aligned plots</a></li>
     <li><a href="ellipse.html">axis location</a></li>
     <li><a href="rectangle.html">rectangles</a></li>
+    <li><a href="nokey.html">end-labeled plots</a></li>
     </ul>
 
     <h4>Styles</h4>

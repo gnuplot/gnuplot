@@ -130,6 +130,7 @@ Interactive demo scripts are not included on this page.
     <li><a href="ellipse.html">axis location</a></li>
     <li><a href="tics.html">axis ticmarks</a></li>
     <li><a href="rectangle.html">rectangles</a></li>
+    <li><a href="nokey.html">end-labeled plots</a></li>
     </ul>
 
     <h4>Styles</h4>

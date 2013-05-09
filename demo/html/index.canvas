@@ -134,6 +134,7 @@ To view the results you need a browser that supports the HTML5 'canvas' element.
     <li><a href="margins.html">aligned plots</a></li>
     <li><a href="ellipse.html">axis location</a></li>
     <li><a href="rectangle.html">rectangles</a></li>
+    <li><a href="nokey.html">end-labeled plots</a></li>
     </ul>
 
     <h4>Styles</h4>
