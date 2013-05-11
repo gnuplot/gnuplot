@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.396 2013/05/09 10:02:24 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.397 2013/05/10 16:04:34 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -84,6 +84,7 @@ static void set_boxwidth __PROTO((void));
 static void set_clabel __PROTO((void));
 static void set_clip __PROTO((void));
 static void set_cntrparam __PROTO((void));
+static void set_cntrlabel __PROTO((void));
 static void set_contour __PROTO((void));
 static void set_dgrid3d __PROTO((void));
 static void set_decimalsign __PROTO((void));
@@ -236,6 +237,9 @@ set_command()
 	    break;
 	case S_CNTRPARAM:
 	    set_cntrparam();
+	    break;
+	case S_CNTRLABEL:
+	    set_cntrlabel();
 	    break;
 	case S_CONTOUR:
 	    set_contour();
@@ -1075,7 +1079,7 @@ set_clabel()
     char *new_format;
 
     c_token++;
-    label_contours = TRUE;
+    clabel_onecolor = FALSE;
     if ((new_format = try_to_get_string())) {
 	strncpy(contour_format, new_format, sizeof(contour_format));
 	free(new_format);
@@ -1201,6 +1205,31 @@ set_cntrparam()
 	int_error(c_token, "expecting 'linear', 'cubicspline', 'bspline', 'points', 'levels' or 'order'");
 }
 
+/* process 'set cntrlabel' command */
+static void
+set_cntrlabel()
+{
+    c_token++;
+    if (END_OF_COMMAND) {
+	strcpy(contour_format, "%8.3g");
+	clabel_onecolor = FALSE;
+	return;
+    }
+    while (!END_OF_COMMAND) {
+	if (almost_equals(c_token, "form$at")) {
+	    char *new;
+	    c_token++;
+	    if ((new = try_to_get_string()))
+		strncpy(contour_format,new,sizeof(contour_format));
+	    free(new);
+	} else if (almost_equals(c_token, "same$color")) {
+	    c_token++;
+	    clabel_onecolor = TRUE;
+	} else {
+	    int_error(c_token, "unrecognized option");
+	}
+    }
+}
 
 /* process 'set contour' command */
 static void

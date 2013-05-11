@@ -1,3 +1,9 @@
+2013-05-11  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/graph3d.c src/graph3d.h src/save.c src/set.c src/show.c 
+ 	src/tables.c src/tables.h src/unset.c:  Preparation for new command
+	set cntrlabels
+
 2013-05-08  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/set.c: Remove order dependence of hypertext/point type options.

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.286 2013/05/08 16:33:29 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.287 2013/05/09 10:02:24 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -87,7 +87,6 @@ static void show_fillstyle __PROTO((void));
 static void show_clip __PROTO((void));
 static void show_contour __PROTO((void));
 static void show_dgrid3d __PROTO((void));
-static void show_label_contours __PROTO((void));
 #ifdef GP_MACROS
 static void show_macros __PROTO((void));
 #endif
@@ -716,7 +715,6 @@ show_all()
     show_border();
     show_boxwidth();
     show_clip();
-    show_label_contours();
     show_contour();
     show_dgrid3d();
 #ifdef GP_MACROS
@@ -1254,7 +1252,7 @@ show_clip()
 }
 
 
-/* process 'show cntrparam|contour' commands */
+/* process 'show cntrparam|cntrlabel|contour' commands */
 static void
 show_contour()
 {
@@ -1311,22 +1309,14 @@ show_contour()
 	    /* contour-levels counts both ends */
 	    break;
 	}
-	/* fprintf(stderr,"\t\tcontour line types are %s\n", label_contours ? "varied" : "all the same"); */
-	show_label_contours();
+
+	/* Show contour label options */
+	fprintf(stderr, "\tcontour lines are drawn in %s linetypes\n",
+		clabel_onecolor ? "the same" : "individual");
+	fprintf(stderr, "\tformat for contour labels is '%s'\n",
+		contour_format);
     }
 }
-
-
-/* called by show_contour() */
-static void
-show_label_contours()
-{
-    if (label_contours)
-	fprintf(stderr, "\tcontour line types are varied & labeled with format '%s'\n", contour_format);
-    else
-	fputs("\tcontour line types are all the same\n", stderr);
-}
-
 
 /* process 'show dgrid3d' command */
 static void

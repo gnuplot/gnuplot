@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.277 2012/12/20 06:15:06 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.278 2013/05/09 04:49:35 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -83,8 +83,8 @@ static int key_title_extra;	/* allow room for subscript/superscript */
 
 /* is contouring wanted ? */
 t_contour_placement draw_contour = CONTOUR_NONE;
-/* different linestyles are used for contours when set */
-TBOOLEAN label_contours = TRUE;
+/* use the same linetype for all contours */
+TBOOLEAN clabel_onecolor = FALSE;
 
 /* Draw the surface at all? (FALSE if only contours are wanted) */
 TBOOLEAN draw_surface = TRUE;
@@ -251,7 +251,7 @@ find_maxl_keys3d(struct surface_points *plots, int count, int *kcnt)
 	    if (len > mlen)
 		mlen = len;
 	}
-	if (draw_contour && label_contours && this_plot->contours != NULL) {
+	if (draw_contour && !clabel_onecolor && this_plot->contours != NULL) {
 	    len = find_maxl_cntr(this_plot->contours, &cnt);
 	    if (len > mlen)
 		mlen = len;
@@ -272,7 +272,7 @@ find_maxl_cntr(struct gnuplot_contours *contours, int *count)
 
     mlen = cnt = 0;
     while (cntrs) {
-	if (label_contours && cntrs->isNewLevel) {
+	if (cntrs->isNewLevel) {
 	    len = estimate_strlen(cntrs->label)
 		- strspn(cntrs->label," ");
 	    if (len)
@@ -1123,8 +1123,8 @@ do_3dplot(
 		    else
 			key_sample_line(xl, yl);
 		}
-		/* Contour plot with no surface, no individual contour labels */
-		else if (this_plot->contours != NULL && !label_contours) {
+		/* Contour plot with no surface, all contours use the same linetype */
+		else if (this_plot->contours != NULL && clabel_onecolor) {
 		    key_sample_line(xl, yl);
 		}
 		break;
@@ -1203,7 +1203,7 @@ do_3dplot(
 		term_apply_lp_properties(&(thiscontour_lp_properties));
 
 		while (cntrs) {
-		    if (label_contours && cntrs->isNewLevel) {
+		    if (!clabel_onecolor && cntrs->isNewLevel) {
 			if (key->visible && !this_plot->title_is_suppressed) {
 			    (*t->linetype)(LT_BLACK);
 			    key_text(xl, yl, cntrs->label);
@@ -1217,7 +1217,7 @@ do_3dplot(
 				thiscontour_lp_properties.use_palette = TRUE;
 			    }
 			    ic++;	/* Increment linetype used for contour */
-			    if (prefer_line_styles && label_contours)
+			    if (prefer_line_styles)
 				lp_use_properties(&ls, this_plot->hidden3d_top_linetype + ic);
 			    else
 				load_linetype(&ls, this_plot->hidden3d_top_linetype + ic);
@@ -1253,7 +1253,7 @@ do_3dplot(
 			    NEXT_KEY_LINE();
 
 			} /* key */
-		    } /* label_contours */
+		    } /* clabel_onecolor */
 
 		    /* now draw the contour */
 		    if (!key_pass)

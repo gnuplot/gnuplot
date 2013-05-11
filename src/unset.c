@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.167 2013/05/08 16:31:16 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.168 2013/05/09 10:02:24 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -66,9 +66,9 @@ static void unset_border __PROTO((void));
 static void unset_boxplot __PROTO((void));
 static void unset_boxwidth __PROTO((void));
 static void unset_fillstyle __PROTO((void));
-static void unset_clabel __PROTO((void));
 static void unset_clip __PROTO((void));
 static void unset_cntrparam __PROTO((void));
+static void unset_cntrlabel __PROTO((void));
 static void unset_contour __PROTO((void));
 static void unset_dgrid3d __PROTO((void));
 static void unset_dummy __PROTO((void));
@@ -183,14 +183,17 @@ unset_command()
     case S_BOXWIDTH:
 	unset_boxwidth();
 	break;
-    case S_CLABEL:
-	unset_clabel();
-	break;
     case S_CLIP:
 	unset_clip();
 	break;
     case S_CNTRPARAM:
 	unset_cntrparam();
+	break;
+    case S_CNTRLABEL:
+	unset_cntrlabel();
+	break;
+    case S_CLABEL:	/* deprecated command */
+	clabel_onecolor = TRUE;
 	break;
     case S_CONTOUR:
 	unset_contour();
@@ -690,15 +693,6 @@ unset_fillstyle()
 }
 
 
-/* process 'unset clabel' command */
-static void
-unset_clabel()
-{
-    /* FIXME? reset_command() uses TRUE */
-    label_contours = FALSE;
-}
-
-
 /* process 'unset clip' command */
 static void
 unset_clip()
@@ -729,6 +723,14 @@ unset_cntrparam()
     contour_order = DEFAULT_CONTOUR_ORDER;
     contour_levels = DEFAULT_CONTOUR_LEVELS;
     contour_levels_kind = LEVELS_AUTO;
+}
+
+/* process 'unset cntrlabel' command */
+static void
+unset_cntrlabel()
+{
+    clabel_onecolor = FALSE;
+    strcpy(contour_format, "%8.3g");
 }
 
 
@@ -1727,9 +1729,6 @@ reset_command()
     reset_hidden3doptions();
     hidden3d = FALSE;
 
-    label_contours = TRUE;
-    strcpy(contour_format, "%8.3g");
-
     unset_angles();
     unset_mapping();
 
@@ -1741,6 +1740,7 @@ reset_command()
     unset_offsets();
     unset_contour();
     unset_cntrparam();
+    unset_cntrlabel();
     unset_zero();
     unset_dgrid3d();
     unset_ticslevel();
