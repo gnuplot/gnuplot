@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: fit.c,v 1.106 2013/05/08 17:07:10 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: fit.c,v 1.107 2013/05/09 10:02:24 markisch Exp $"); }
 #endif
 
 /*  NOTICE: Change of Copyright Status
@@ -44,6 +44,9 @@ static char *RCSid() { return RCSid("$Id: fit.c,v 1.106 2013/05/08 17:07:10 mark
  *
  * HBB, 971023: lifted fixed limit on number of datapoints, and number
  * of parameters.
+ *
+ * HBB/H.Harders 20020927: log file name now changeable from inside
+ * gnuplot, , not only by setting an environment variable.
  *
  * Jim Van Zandt, 090201: allow fitting functions with up to five
  * independent variables.
@@ -169,7 +172,7 @@ TBOOLEAN fit_errorscaling = TRUE;
 TBOOLEAN fit_prescale = FALSE;
 char *fit_script = NULL;
 
-/* names of control variables */
+/* names of user control variables */
 const char * FITLIMIT = "FIT_LIMIT";
 const char * FITSTARTLAMBDA = "FIT_START_LAMBDA";
 const char * FITLAMBDAFACTOR = "FIT_LAMBDA_FACTOR";
@@ -186,8 +189,7 @@ static int maxiter = 0;
 static double startup_lambda = 0;
 static double lambda_down_factor = LAMBDA_DOWN_FACTOR;
 static double lambda_up_factor = LAMBDA_UP_FACTOR;
-/* HBB/H.Harders 20020927: log file name now changeable from inside
- * gnuplot */
+
 static const char fitlogfile_default[] = "fit.log";
 static const char GNUFITLOG[] = "FIT_LOG";
 static FILE *log_f = NULL;
@@ -470,12 +472,9 @@ marquardt(double a[], double **C, double *chisq, double *lambda)
 /*****************************************************************
     compute chi-square and numeric derivations
 *****************************************************************/
-/* used by marquardt to evaluate the linearized fitting matrix C and
- * vector d, fills in only the top part of C and d I don't use a
+/* Used by marquardt to evaluate the linearized fitting matrix C and
+ * vector d. Fills in only the top part of C and d. I don't use a
  * temporary array zfunc[] any more. Just use d[] instead.  */
-/* FIXME: in the new code, this function doesn't really do enough to
- * be useful. Maybe it ought to be deleted, i.e. integrated with
- * calculate() ? */
 static TBOOLEAN
 analyze(double a[], double **C, double d[], double *chisq)
 {
@@ -579,6 +578,7 @@ call_gnuplot(double *par, double *data)
 	    Gcomplex(&func.dummy_values[j],
 	             fit_x[i * num_indep + j], 0.0);
 	evaluate_at(func.at, &v);
+
 	data[i] = real(&v);
 	if (undefined || isnan(data[i])) {
 	    /* Print useful info on undefined-function error. */
@@ -802,8 +802,8 @@ regress(double a[])
     /* compute errors in the parameters */
 
     if (fit_errorvariables)
-	/* Set error variable to zero before doing this */
-	/* Thus making sure they are created */
+	/* Set error variable to zero before doing this, */
+	/* thus making sure they are created. */
 	for (i = 0; i < num_params; i++)
 	    setvarerr(par_name[i], 0.0);
 
@@ -858,6 +858,12 @@ regress(double a[])
 	chisq = sqrt(chisq / (num_data - num_params));
 	for (i = 0; i < num_params; i++)
 	    dpar[i] *= chisq;
+    }
+
+    /* Save user error variables. */
+    for (i = 0; i < num_params; i++) {
+	if (fit_errorvariables)
+	    setvarerr(par_name[i], dpar[i] * scale_params[i]);
     }
 
     /* Report final results for VERBOSE, BRIEF, and RESULTS verbosity levels. */
@@ -946,8 +952,6 @@ show_results(double chisq, double last_chisq, double* a, double* dpar, double** 
 
 	    Dblf6("%-15.15s = %-15g  %-3.3s %-12.4g (%.4g%%)\n",
 		  par_name[i], a[i] * scale_params[i], PLUSMINUS, dpar[i] * scale_params[i], temp);
-	    if (fit_errorvariables)
-		setvarerr(par_name[i], dpar[i] * scale_params[i]);
 	}
 
 	/* Print correlation matrix only if there is more than one parameter. */
@@ -1877,6 +1881,7 @@ fit_command()
     if (!equals(c_token++, "via"))
 	int_error(c_token, "Need via and either parameter list or file");
 
+    /* allocate arrays for parameter values, names */
     a = vec(max_params);
     par_name = (fixstr *) gp_alloc((max_params + 1) * sizeof(fixstr),
 				   "fit param");
@@ -2068,8 +2073,10 @@ Dblfn(const char *fmt, va_dcl)
 #endif /* VA_START */
 }
 
-/* HBB/H.Harders NEW 20020927: make fit log filename exchangeable at
- * run-time, not only by setting an environment variable. */
+
+/*****************************************************************
+    Get name of current log-file
+*****************************************************************/
 char *
 getfitlogfile()
 {

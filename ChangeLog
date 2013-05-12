@@ -1,3 +1,9 @@
+2013-05-12  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/fit.c:  Setting of user error variables needs to be done in
+	regress() since show_results() is not called if 'set fit quiet'.
+	Bugfix.
+
 2013-05-11  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graph3d.c src/graph3d.h src/save.c src/set.c src/show.c 
