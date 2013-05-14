@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: fit.c,v 1.109 2013/05/14 20:10:56 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: fit.c,v 1.110 2013/05/14 20:13:31 markisch Exp $"); }
 #endif
 
 /*  NOTICE: Change of Copyright Status
@@ -1693,12 +1693,10 @@ fit_command()
 
     {
 	char *logfile = getfitlogfile();
-
-	if (!log_f && !(log_f = fopen(logfile, "a")))
+	if ((logfile != NULL) && !log_f && !(log_f = fopen(logfile, "a")))
 	    Eex2("could not open log-file %s", logfile);
-
-	if (logfile)
-	    free(logfile);
+	FPRINTF((STANDARD, "log-file=%s\n", logfile));
+	free(logfile);
     }
 
     fputs("\n\n*******************************************************************************\n", log_f);
@@ -1711,27 +1709,27 @@ fit_command()
 	fprintf(log_f, "FIT:    data read from %s\n", line);
 	fprintf(log_f, "        format = ");
 	free(line);
-	for (i=0; i<num_indep && i<columns-1; i++)
-	  fprintf(log_f, "%s:", c_dummy_var[i]);
-	fprintf(log_f, (columns<=2) ? "z\n" : "z:s\n");
+	for (i = 0; (i < num_indep) && (i < columns - 1); i++)
+	    fprintf(log_f, "%s:", c_dummy_var[i]);
+	fprintf(log_f, (columns <= 2) ? "z\n" : "z:s\n");
     }
 
     /* report all range specs */
     j = FIRST_Z_AXIS;		/* check Z axis first */
-    for (i=0; i<=num_indep; i++) {
-      if ((axis_array[j].autoscale & AUTOSCALE_BOTH) != AUTOSCALE_BOTH)
-	log_axis_restriction(log_f, j, i ? c_dummy_var[i] : "z");
-      j=var_order[i];
+    for (i = 0; i <= num_indep; i++) {
+	if ((axis_array[j].autoscale & AUTOSCALE_BOTH) != AUTOSCALE_BOTH)
+	    log_axis_restriction(log_f, j, i ? c_dummy_var[i] : "z");
+	j = var_order[i];
     }
 
     max_data = MAX_DATA;
-    fit_x = vec(max_data*num_indep); /* start with max. value */
+    fit_x = vec(max_data * num_indep); /* start with max. value */
     fit_z = vec(max_data);
     err_data = vec(max_data);
     num_data = 0;
 
-    for (i=0; i<sizeof(skipped)/sizeof(int); i++)
-      skipped[i] = 0;
+    for (i = 0; i < sizeof(skipped) / sizeof(int); i++)
+	skipped[i] = 0;
 
     /* first read in experimental data */
 
@@ -1837,25 +1835,25 @@ fit_command()
     reset_numeric_locale();
 
     if (num_data <= 1) {
-      /* no data! Try to explain why. */
-      printf("         Read %d points\n", num_points);
-      for (i=0; i<6; i++) {
-	int j = var_order[i];
-	AXIS *this = axis_array + j;
-	if (skipped[j]){
-	  printf("         Skipped %d points outside range [%s=",
-		 skipped[j], i<5 ? c_dummy_var[i] : "z");
-	  if (this->autoscale&AUTOSCALE_MIN)
-	    printf("*:");
-	  else
-	    printf("%g:",this->min);
-	  if (this->autoscale&AUTOSCALE_MAX)
-	    printf("*]\n");
-	  else
-	    printf("%g]\n",this->max);
+	/* no data! Try to explain why. */
+	printf("         Read %d points\n", num_points);
+	for (i = 0; i < 6; i++) {
+	    int j = var_order[i];
+	    AXIS *this = axis_array + j;
+	    if (skipped[j]){
+		printf("         Skipped %d points outside range [%s=",
+		skipped[j], i < 5 ? c_dummy_var[i] : "z");
+		if (this->autoscale&AUTOSCALE_MIN)
+		    printf("*:");
+		else
+		    printf("%g:", this->min);
+		if (this->autoscale&AUTOSCALE_MAX)
+		    printf("*]\n");
+		else
+		    printf("%g]\n", this->max);
+	    }
 	}
-      }
-      Eex("No data to fit ");
+	Eex("No data to fit ");
     }
 
     /* tsm patchset 230: check for zero error values */
