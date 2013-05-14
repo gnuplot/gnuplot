@@ -1,3 +1,11 @@
+2013-05-14  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/set.c src/unset.c src/show.c src/save.c src/fit.c|h:  Long brief
+	reports can be wrapped using 'set fit wrap <column>'.
+
+	* src/set.c (set_fit):  Need to advance to next token after
+	'set fit ... default'.
+
 2013-05-12  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/fit.c:  Setting of user error variables needs to be done in

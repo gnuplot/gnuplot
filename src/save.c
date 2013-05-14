@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.215 2013/05/09 10:02:24 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.216 2013/05/11 23:45:30 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -1020,9 +1020,13 @@ set origin %g,%g\n",
     }
     if (fit_script != NULL)
 	fprintf(fp, " script \'%s\'", fit_script);
+    if (fit_wrap != 0)
+	fprintf(fp, " wrap %i", fit_wrap);
+    else
+	fprintf(fp, " nowrap");
     fputc('\n', fp);
-
 }
+
 
 static void
 save_tics(FILE *fp, AXIS_INDEX axis)

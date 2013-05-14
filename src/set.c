@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.398 2013/05/11 23:45:30 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.399 2013/05/14 20:04:14 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -1663,6 +1663,13 @@ set_fit()
 	    } else {
 		int_error(c_token, "expecting string");
 	    }
+	} else if (equals(c_token, "wrap")) {
+	    c_token++;
+	    fit_wrap = int_expression();
+	    if (fit_wrap < 0) fit_wrap = 0;
+	} else if (equals(c_token, "nowrap")) {
+	    c_token++;
+	    fit_wrap = 0;
 	} else {
 	    int_error(c_token, "unrecognized option --- see `help set fit`");
 	}

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: fit.c,v 1.107 2013/05/09 10:02:24 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: fit.c,v 1.108 2013/05/12 04:06:08 markisch Exp $"); }
 #endif
 
 /*  NOTICE: Change of Copyright Status
@@ -45,8 +45,8 @@ static char *RCSid() { return RCSid("$Id: fit.c,v 1.107 2013/05/09 10:02:24 mark
  * HBB, 971023: lifted fixed limit on number of datapoints, and number
  * of parameters.
  *
- * HBB/H.Harders 20020927: log file name now changeable from inside
- * gnuplot, , not only by setting an environment variable.
+ * HBB/H.Harders, 20020927: log file name now changeable from inside
+ * gnuplot, not only by setting an environment variable.
  *
  * Jim Van Zandt, 090201: allow fitting functions with up to five
  * independent variables.
@@ -171,6 +171,7 @@ verbosity_level fit_verbosity = BRIEF;
 TBOOLEAN fit_errorscaling = TRUE;
 TBOOLEAN fit_prescale = FALSE;
 char *fit_script = NULL;
+int fit_wrap = 0;
 
 /* names of user control variables */
 const char * FITLIMIT = "FIT_LIMIT";
@@ -353,6 +354,8 @@ error_ex()
 
 
 /* HBB 990829: removed the debug print routines */
+
+
 /*****************************************************************
     Marquardt's nonlinear least squares fit
 *****************************************************************/
@@ -426,11 +429,9 @@ marquardt(double a[], double **C, double *chisq, double *lambda)
     }
 
     /* FIXME: residues[] isn't used at all. Why? Should it be used? */
-
     Givens(tmp_C, tmp_d, da, residues, num_params + num_data, num_params, 1);
 
     /* check if trial did ameliorate sum of squares */
-
     for (j = 0; j < num_params; j++)
 	temp_a[j] = a[j] + da[j];
 
@@ -438,6 +439,7 @@ marquardt(double a[], double **C, double *chisq, double *lambda)
 	/* FIXME: will never be reached: always returns TRUE */
 	return ML_ERROR;
     }
+
     /* tsm patchset 230: Changed < to <= in next line */
     /* so finding exact minimum stops iteration instead of just increasing lambda. */
     /* Disadvantage is that if lambda is large enough so that chisq doesn't change */
@@ -495,12 +497,12 @@ analyze(double a[], double **C, double d[], double *chisq)
 }
 
 
-/* To use the more exact, but slower two-side formula, activate the
-   following line: */
-/*#define TWO_SIDE_DIFFERENTIATION */
 /*****************************************************************
     compute function values and partial derivatives of chi-square
 *****************************************************************/
+/* To use the more exact, but slower two-side formula, activate the
+   following line: */
+/*#define TWO_SIDE_DIFFERENTIATION */
 static void
 calculate(double *zfunc, double **dzda, double a[])
 {
@@ -1030,17 +1032,27 @@ pack_float(char *num)
 static void
 show_fit1(int iter, double chisq, double last_chisq, double* parms, double lambda, FILE *device)
 {
-    int k;
+    int k, len;
     double delta, lim;
     char buf[256];
     char *p;
+    const int indent = 4;
 
     /* on iteration 0 or -2, print labels */
     if (iter == 0 || iter == -2) {
-	fprintf(device, "iter      chisq       delta/lim  lambda  ");
-	              /* 9999 1.1234567890e+00 -1.12e+00 1.00e+00 */
-	for (k = 0; k < num_params; k++)
-	    fprintf(device, " %-13.13s", par_name[k]);
+	strcpy(buf, "iter      chisq       delta/lim  lambda  ");
+	          /* 9999 1.1234567890e+00 -1.12e+00 1.00e+00 */
+	fprintf(device, buf);
+	len = strlen(buf);
+	for (k = 0; k < num_params; k++) {
+	    snprintf(buf, sizeof(buf), " %-13.13s", par_name[k]);
+	    len += strlen(buf);
+	    if ((fit_wrap > 0) && (len >= fit_wrap)) {
+		fprintf(device, "\n%*c", indent, ' ');
+		len = indent;
+	    }
+	    fprintf(device, buf);
+	}
 	fprintf(device, "\n");
     }
 
@@ -1063,9 +1075,16 @@ show_fit1(int iter, double chisq, double last_chisq, double* parms, double lambd
 	p = strchr(p, 'e');
     }
     fprintf(device, "%s", buf);
+    len = strlen(buf);
     for (k = 0; k < num_params; k++) {
 	snprintf(buf, sizeof(buf), " % 14.6e", parms[k] * scale_params[k]);
-	fprintf(device, "%s", pack_float(buf));
+	pack_float(buf);
+	len += strlen(buf);
+	if ((fit_wrap > 0) && (len >= fit_wrap)) {
+	    fprintf(device, "\n%*c", indent, ' ');
+	    len = indent;
+	}
+	fprintf(device, "%s", buf);
     }
     fprintf(device, "\n");
 }
@@ -1126,10 +1145,10 @@ setvar(char *varname, double data)
 
 
 /*****************************************************************
-            Set a GNUPLOT user-defined variable for an error
-            variable: so take the parameter name, turn it
-            into an error parameter name (e.g. a to a_err)
-            and then set it.
+    Set a GNUPLOT user-defined variable for an error
+    variable: so take the parameter name, turn it
+    into an error parameter name (e.g. a to a_err)
+    and then set it.
 ******************************************************************/
 static void
 setvarerr(char *varname, double value)
@@ -1635,7 +1654,6 @@ fit_command()
 
     /* defer actually reading the data until we have parsed the rest
      * of the line */
-
     token3 = c_token;
 
     tmpd = getdvar(FITLIMIT);	/* get epsilon if given explicitly */
