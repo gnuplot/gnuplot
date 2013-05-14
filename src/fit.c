@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: fit.c,v 1.108 2013/05/12 04:06:08 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: fit.c,v 1.109 2013/05/14 20:10:56 markisch Exp $"); }
 #endif
 
 /*  NOTICE: Change of Copyright Status
@@ -1676,16 +1676,16 @@ fit_command()
     tmpd = getdvar(FITSTARTLAMBDA);
     if (tmpd > 0.0) {
 	startup_lambda = tmpd;
-	printf("Lambda Start value set: %g\n", startup_lambda);
+	Dblf2("lambda start value set: %g\n", startup_lambda);
     } else {
-	startup_lambda = 0;
+	startup_lambda = 0.0;
     }
 
     /* get lambda up/down factor, if given */
     tmpd = getdvar(FITLAMBDAFACTOR);
     if (tmpd > 0.0) {
 	lambda_up_factor = lambda_down_factor = tmpd;
-	printf("Lambda scaling factors reset:  %g\n", lambda_up_factor);
+	Dblf2("lambda scaling factors reset:  %g\n", lambda_up_factor);
     } else {
 	lambda_down_factor = LAMBDA_DOWN_FACTOR;
 	lambda_up_factor = LAMBDA_UP_FACTOR;
