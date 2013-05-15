@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.169 2013/05/11 23:45:30 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.170 2013/05/14 20:10:56 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -730,7 +730,11 @@ static void
 unset_cntrlabel()
 {
     clabel_onecolor = FALSE;
+    clabel_start = 5;
+    clabel_interval = 20;
     strcpy(contour_format, "%8.3g");
+    free(clabel_font);
+    clabel_font = NULL;
 }
 
 

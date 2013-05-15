@@ -1,3 +1,32 @@
+2013-05-15  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/graph3d.c src/graph3d.h src/plot3d.c src/save.c src/set.c
+	src/show.c src/unset.c:
+
+	Contour styles other than `with lines` are already supported, although
+	most styles are treated as either lines or impulses.  We now add support
+	for `set contour; splot ... with labels`, which places contour labels on
+	the plot itself.  Up till now this has been possible only by using an
+	external script to generate and place labels (label_contours.awk).
+ 
+	Format and placement options are controlled by a new command
+	    set cntrlabel {start <int>} {interval <int>} {onecolor}
+	    set cntrlabel {format "format-spec"} {font "font-spec"}
+	`set cntrlabel onecolor` produces the same result as `unset clabel`.
+	`set cntrlabel format "foo"` similarly replaces `set clabel "foo"`.
+	The old command `set/unset clabel` is retained but is now deprecated.
+	Precise layout of the contour labels can be further tweaked by using the
+	usual label options in the splot command itself.  E.g.
+	    splot $FOO with labels textcolor rgb "blue" point offset -1,1
+
+	Known limitations:  The labels are not handled by hidden3d.  Setting
+	large values of samples and/or isosamples can lead to unreasonably
+	dense labels even if the repeat interval is disabled by setting to 0.
+	Hypertext contour labels are possible, but are uglified by an 
+	unnecessary point symbol at each anchor position.
+
+	* docs/gnuplot.doc demo/contours.dem:  Update to illustrate new command.
+
 2013-05-14  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/set.c src/unset.c src/show.c src/save.c src/fit.c|h:  Long brief

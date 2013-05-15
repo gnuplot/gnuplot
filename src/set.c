@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.399 2013/05/14 20:04:14 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.400 2013/05/14 20:10:56 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -1222,9 +1222,21 @@ set_cntrlabel()
 	    if ((new = try_to_get_string()))
 		strncpy(contour_format,new,sizeof(contour_format));
 	    free(new);
-	} else if (almost_equals(c_token, "same$color")) {
+	} else if (equals(c_token, "font")) {
+	    c_token++;
+	    free(clabel_font);
+	    clabel_font = try_to_get_string();
+	} else if (almost_equals(c_token, "one$color")) {
 	    c_token++;
 	    clabel_onecolor = TRUE;
+	} else if (equals(c_token, "start")) {
+	    c_token++;
+	    clabel_start = int_expression();
+	    if (clabel_start <= 0)
+		clabel_start = 5;
+	} else if (almost_equals(c_token, "int$erval")) {
+	    c_token++;
+	    clabel_interval = int_expression();
 	} else {
 	    int_error(c_token, "unrecognized option");
 	}

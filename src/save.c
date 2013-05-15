@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.216 2013/05/11 23:45:30 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.217 2013/05/14 20:10:56 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -635,8 +635,10 @@ set isosamples %d, %d\n\
     }
 
     /* Contour label options */
-    fprintf(fp, "set cntrlabel %s format '%s'\n", 
-	clabel_onecolor ? "samecolor" : "", contour_format);
+    fprintf(fp, "set cntrlabel %s format '%s' font '%s' start %d interval %d\n", 
+	clabel_onecolor ? "onecolor" : "", contour_format,
+	clabel_font ? clabel_font : "",
+	clabel_start, clabel_interval);
 
 #ifdef GP_MACROS
     if (expand_macros)

@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.792 2013/05/08 16:44:25 markisch Exp $
+C RCS $Id: gnuplot.doc,v 1.793 2013/05/09 10:02:24 markisch Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -2074,7 +2074,7 @@ C ... and restart the table:
  a single record.  A "datablock" is a set of points from consecutive records,
  delimited by blank records.  A line, when referred to in the context of a
  data file, is a subset of a datablock.  Note that the term "datablock" may
- also be used when refering to a named inline data block (see `datablock`).
+ also be used when refering to a named inline data block (see `datablocks`).
 2 iteration
 ?iteration
 ?iterate
@@ -2446,7 +2446,7 @@ Ffigure_newsyntax
  `splot` can plot surfaces and contours in addition to points and/or lines.
  See `set isosamples` for information about defining the grid for a 3D function.
  See `splot datafile` for information about the requisite file structure for 3D
- data values, `set contour` and `set cntrparam` for information about contours.
+ data. For contours see `set contour`, `set cntrlabel`, and `set cntrparam`.
 
  In `splot`, control over the scales and labels of the axes are the same as
  with `plot`, except that commands and options controlling the x2 and y2 axes
@@ -7236,24 +7236,9 @@ Ffigure_mapcontours
 ?unset clabel
 ?show clabel
 ?clabel
- `gnuplot` will vary the linetype used for each contour level when clabel is
- set.  When this option on (the default), a legend labels each linestyle with
- the z level it represents.  It is not possible at present to separate the
- contour labels from the surface key.
-
- Syntax:
-       set clabel {'<format>'}
-       unset clabel
-       show clabel
-
- The default for the format string is %8.3g, which gives three decimal places.
- This may produce poor label alignment if the key is altered from its default
- configuration.
-
- The first contour linetype, or only contour linetype when clabel is off, is
- the surface linetype +1; contour points are the same style as surface points.
-
- See also `set contour`.
+ This command is obsolete. Use `set cntrlabel` instead.
+ `unset clabel` is replaced by `set cntrlabel onecolor`.
+ `set clabel "format"` is replaced by `set cntrlabel format "format"`.
 3 clip
 ?commands set clip
 ?commands unset clip
@@ -7307,6 +7292,36 @@ Ffigure_mapcontours
 
  `set clip` is synonymous with `set clip points`; `unset clip` turns off all
  three types of clipping.
+3 cntrlabel
+?commands set cntrlabel
+?commands show cntrlabel
+?set cntrlabel
+?show cntrlabel
+?cntrlabel
+ Syntax:
+       set cntrlabel {format "format"} {font "font"}
+       set cntrlabel {start <int>} {interval <int>}
+       set contrlabel onecolor
+
+ `set cntrlabel` controls the labeling of contours, either in the key (default)
+ or on the plot itself in the case of `splot ... with labels`.  In the latter 
+ case labels are placed along each contour line according to the "pointinterval"
+ property of the label descriptor.  By default a label is placed on the 5th
+ line segment making up the contour line and repeated every 20th segment.
+ These defaults are equivalent to 
+       set cntrlabel start 5 interval 20
+ They can be changed either via the `set cntrlabel` command or by specifying the
+ interval in the `splot` command itself
+       set contours; splot $FOO with labels point pointinterval -1
+ Setting the interval to a negative value means that the label appear only 
+ once per contour line.  However if `set samples` or `set isosamples` is large
+ then many contour lines may be created, each with a single label. 
+
+ A contour label is placed in the plot key for each linetype used. By default
+ each contour level is given its own linetype, so a separate label appears for
+ each.  The command `set cntrlabel onecolor` causes all contours to be drawn
+ using the same linetype, so only one label appears in the plot key.
+ This command replaces an older command `unset clabel`.
 3 cntrparam
 ?commands set cntrparam
 ?commands show cntrparam
@@ -7504,7 +7519,7 @@ Ffigure_mapcontours
  the base and the surface.  If no option is provided, the default is `base`.
 
  See also `set cntrparam` for the parameters that affect the drawing of
- contours, and `set clabel` for control of labelling of the contours.
+ contours, and `set cntrlabel` for control of labelling of the contours.
 
  The surface can be switched off (see `unset surface`), giving a contour-only
  graph.  Though it is possible to use `set size` to enlarge the plot to fill
@@ -8529,12 +8544,10 @@ Ffigure_missing
  and to other surfaces, if more than one surface is plotted.  Contours drawn
  on the surface (`set contour surface`) don't work.
 
- Labels and arrows are always visible and are unaffected.  The key box is never
- hidden by the surface. As of gnuplot version 4.6, hidden3d also affects 3D
- plotting styles `points`, `labels`, `vectors`, and `impulses` even if no
- surface is present in the graph.  Individual plots within the graph may be
- explicitly excluded from this processing by appending the extra option 
- `nohidden3d` to the `with` specifier.
+ As of gnuplot version 4.6, hidden3d also affects 3D plotting styles `points`,
+ `labels`, `vectors`, and `impulses` even if no surface is present in the graph.
+ Individual plots within the graph may be explicitly excluded from this
+ processing by appending the extra option `nohidden3d` to the `with` specifier.
 
  Hidden3d does not affect solid surfaces drawn using the pm3d mode. To achieve
  a similar effect purely for pm3d surfaces, use instead `set pm3d depthorder`.
@@ -8787,10 +8800,8 @@ Ffigure_missing
  string for key positioning.  If the key is to be positioned at the left, it may
  be convenient to use the combination  `set key left Left reverse`.
 
- If `splot` is being used to draw contours, the contour labels will be listed
- in the key.  If the alignment of these labels is poor or a different number
- of decimal places is desired, the label format can be specified.  See
- `set clabel` for details.
+ If `splot` is being used to draw contours, by default the contour labels will
+ be listed in the key.  You can adjust this display using `set cntrlabel format`.
 
  Examples:
 
@@ -11449,8 +11460,7 @@ Ffigure_missing
  if it is undefined.  The data format is determined by the format of the axis
  labels (see `set format`), and the columns are separated by single spaces.
  This can be useful if you want to generate contours and then save them for
- further use, perhaps for plotting with `plot`;  see `set contour` for example.
- The same method can be used to save interpolated data
+ further use.  The same method can be used to save interpolated data
  (see `set samples` and `set dgrid3d`).
 
  Syntax:

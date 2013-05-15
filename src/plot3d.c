@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.209 2013/04/04 20:34:20 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.210 2013/04/09 20:58:53 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -92,6 +92,9 @@ static double splines_kernel __PROTO((double h));
 static void thin_plate_splines_setup __PROTO(( struct iso_curve *old_iso_crvs, double **p_xx, int *p_numpoints ));
 static double qnorm __PROTO(( double dist_x, double dist_y, int q ));
 static double pythag __PROTO(( double dx, double dy ));
+
+/* helper functions for parsing */
+static void load_contour_label_options __PROTO((struct text_label *contour_label));
 
 /* the curves/surfaces of the plot */
 struct surface_points *first_3dplot = NULL;
@@ -1544,7 +1547,8 @@ eval_3dplots()
 		    this_plot->plot_style = get_style();
 		    if ((this_plot->plot_type == FUNC3D) &&
 			((this_plot->plot_style & PLOT_STYLE_HAS_ERRORBAR)
-			|| (this_plot->plot_style == LABELPOINTS))) {
+			|| (this_plot->plot_style == LABELPOINTS && !draw_contour)
+			)) {
 			int_warn(c_token, "This plot style is only for datafiles , reverting to \"points\"");
 			this_plot->plot_style = POINTSTYLE;
 		    }
@@ -1601,6 +1605,8 @@ eval_3dplots()
 			this_plot->labels->layer = LAYER_PLOTLABELS;
 		    }
 		    parse_label_options(this_plot->labels, TRUE);
+		    if (draw_contour)
+			load_contour_label_options(this_plot->labels);
 		    checked_once = TRUE;
 		    if (stored_token != c_token) {
 			if (set_labelstyle) {
@@ -2137,8 +2143,7 @@ eval_3dplots()
 	    }
 
 	    /* Make sure this one can be contoured. */
-	    if (this_plot->plot_style == LABELPOINTS
-	    ||  this_plot->plot_style == VECTOR
+	    if (this_plot->plot_style == VECTOR
 	    ||  this_plot->plot_style == IMAGE
 	    ||  this_plot->plot_style == RGBIMAGE
 	    ||  this_plot->plot_style == RGBA_IMAGE)
@@ -2289,3 +2294,12 @@ parametric_3dfixup(struct surface_points *start_plot, int *plot_num)
     first_3dplot = new_list;
 }
 
+static void load_contour_label_options (struct text_label *contour_label)
+{
+    struct lp_style_type *lp = &(contour_label->lp_properties);
+    if (!contour_label->font)
+	contour_label->font = gp_strdup(clabel_font);
+    lp->p_interval = clabel_interval;
+    lp->pointflag = TRUE;
+    lp_parse(lp, TRUE, TRUE);
+}

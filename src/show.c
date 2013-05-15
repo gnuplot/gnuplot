@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.288 2013/05/11 23:45:30 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.289 2013/05/14 20:10:56 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -1313,8 +1313,10 @@ show_contour()
 	/* Show contour label options */
 	fprintf(stderr, "\tcontour lines are drawn in %s linetypes\n",
 		clabel_onecolor ? "the same" : "individual");
-	fprintf(stderr, "\tformat for contour labels is '%s'\n",
-		contour_format);
+	fprintf(stderr, "\tformat for contour labels is '%s' font '%s'\n",
+		contour_format, clabel_font ? clabel_font : "");
+	fprintf(stderr, "\ton-plot labels placed at segment %d with interval %d\n",
+		clabel_start, clabel_interval);
     }
 }
 

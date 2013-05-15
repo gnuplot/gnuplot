@@ -1,117 +1,128 @@
 #
-# $Id: contours.dem,v 1.13 2006/06/25 17:24:32 sfeam Exp $
+# $Id: contours.dem,v 1.14 2012/11/13 23:59:30 sfeam Exp $
 #
 set samples 20
 set isosamples 21
 set xlabel "X axis"
 set ylabel "Y axis"
-set zlabel "Z axis" offset 1, 0
+set zlabel "Z " offset 1, 0
 set view 60, 30, 0.85, 1.1
-set title "3D gnuplot demo - contour plot"
+set key at screen 1.0, 0.9
+
+set title "contour plot"
 set contour
 splot x*y
 pause -1 "Hit return to continue (1)"
-set cntrparam levels 20
-set title "3D gnuplot demo - contour plot (more contours)"
+
+set cntrparam levels 15
+set title "more contours (15 levels)"
 replot
 pause -1 "Hit return to continue (2)"
+
 set cntrparam levels incr -100,10,100
-set title "3D gnuplot demo - contour plot (every 10, starting at -100)"
+set title "contour by increments (every 10, starting at -100)"
 replot
 pause -1 "Hit return to continue (3)"
+
 set cntrparam levels disc -75,-50,0
-set title "3D gnuplot demo - contour plot (at -75, -50, 0)"
+set title "discrete set of contours (at -75, -50, 0)"
 replot
 pause -1 "Hit return to continue (4)"
+
 set cntrparam levels auto 10
-set title "3D gnuplot demo - contour plot on base grid"
+set view 60, 30, 1.0, 1.1
+set title "contours on base grid with labels"
 set contour base
-splot x**2-y**2
+set cntrlabel font ",7"
+splot x**2-y**2 with lines, x**2-y**2 with labels notitle
 pause -1 "Hit return to continue (5)"
-set title "3D gnuplot demo - contour plot on surface"
+
+set title "contours drawn on surface"
 set contour surface
-replot
+splot x**2-y**2 with lines notitle, x**2-y**2 with lines nosurf lw 3
 pause -1 "Hit return to continue (6)"
-set title "3D gnuplot demo - contour plot on both"
+
+set title "contours on both base and surface"
 set contour both
-replot
+splot x**2-y**2 with lines, x**2-y**2 with labels notitle
 pause -1 "Hit return to continue (7)"
+
 set contour base
-set title "3D gnuplot demo - 2 surfaces"
+set title "2 surfaces"
+set key opaque
 splot x**2*y**3, x**3*y**2
 pause -1 "Hit return to continue (8)"
-set title "3D gnuplot demo - some more interesting contours"
+
+set title "some more interesting contours"
+unset key
 splot x*y / (x**2 + y**2 + 0.1)
 pause -1 "Hit return to continue (9)"
+
+set zrange [-1.0:1.0]
 splot [x=-3:3] [y=-3:3] sin(x) * cos(y)
 pause -1 "Hit return to continue (10)"
-set zrange [-1.0:1.0]
-replot
-pause -1 "Hit return to continue (11)"
+
 set samples 6
 set isosamples 6
 set cntrparam levels 5
-set title "3D gnuplot demo - low resolution (6x6)"
+set title "low resolution (6x6)"
 replot
-pause -1 "Hit return to continue (12)"
-set title "3D gnuplot demo - low resolution (6x6) using cubic splines"
+pause -1 "Hit return to continue (11)"
+
+set title "low resolution (6x6) using cubic splines"
 set cntrparam cubic
 replot
-pause -1 "Hit return to continue (13)"
+pause -1 "Hit return to continue (12)"
+
 set cntrparam bspline
-set title "3D gnuplot demo - low resolution (6x6) using bspline approx."
+set title "low resolution (6x6) using bspline approx."
+replot
+pause -1 "Hit return to continue (13)"
+
+set cntrparam order 8
+set title "low resolution (6x6) raise bspline order."
 replot
 pause -1 "Hit return to continue (14)"
-set cntrparam order 8
-set title "3D gnuplot demo - low resolution (6x6) raise bspline order."
-replot
-pause -1 "Hit return to continue (15)"
+
 set samples 25
 set isosamples 26
-set title "3D gnuplot demo - contour of Sinc function"
+set key default at screen 1.0, 0.9
+set title "contour of Sinc function"
 splot [-5:5.01] [-5:5.01] sin(sqrt(x**2+y**2)) / sqrt(x**2+y**2)
-pause -1 "Hit return to continue (16)"
+pause -1 "Hit return to continue (15)"
+
 splot [-12:12.01] [-12:12.01] sin(sqrt(x**2+y**2)) / sqrt(x**2+y**2)
-pause -1 "Hit return to continue (17)"
+pause -1 "Hit return to continue (16)"
+
 set cntrparam levels 10
 set auto
 set zrange [-1.0:1.0]
 set style data lines
-set title "3D gnuplot demo - contour of data grid plotting"
+set title "contour of data grid plotting"
 set parametric
 splot "glass.dat"
-pause -1 "Hit return to continue (18)"
+pause -1 "Hit return to continue (17)"
+
 set xrange [0:15]
 set yrange [0:15]
 set zrange [-1.2:1.2]
 unset parametric
 splot "glass.dat" using 1
-pause -1 "Hit return to continue (19)"
-set view map
-unset surface
-set title "3D gnuplot demo - 2D contour projection of last plot"
-replot
-pause -1 "Hit return to continue (20)"
+pause -1 "Hit return to continue (18)"
 
-#From: shen@athena.cs.uga.edu (Mingzuo Shen)
-#Subject: Rosenbrock's function: some answers and thanks
-#Date: Wed, 23 Jun 1993 20:50:36 GMT
+set view map
+unset key
+unset surface
+set title "2D contour projection of previous plot"
+set cntrlabel start 2 font ",7"
+splot "glass.dat" using 1 with lines, \
+      "glass.dat" using 1 with labels
+pause -1 "Hit return to continue (19)"
+
 #
-#    Last night I asked for help with a contour plot for the function:
-#
+# The Rosenbrock function [HH Rosenbrock (1960) The Computer Journal 3:175–184]
 #    (1-x)**2 + 100 * (y - x**2)**2
-#
-#which should have a minimum at (x=1,y=1). This is the 2D case of a more
-#general function named after Rosenbrock (the book I am reading does not
-#give a reference to any paper/book by this person):
-#
-#    for even integer n,
-#
-#    f(x) = \sum_{j=1,3,5,\ldots,n} [(1 - x_j)^2 + 100(x_{j+1} - x_j^2)^2]
-#
-#where x is a vector (x1, x2, ..., x_n). This function also have a minimum
-#at (1,1,...,1), which lies at the base of a "banana-shaped valley".
-#Here are the new commands I have tried.
+# is a well-known difficult test case for general purpose minimizers. 
 #
 set auto
 set surface
@@ -121,35 +132,59 @@ set cntrparam linear
 set samples 100
 set logscale z
 set hidden3d
-set isosamples 20
-set view 70,335,1,1
-set xlabel "x"
-set ylabel "y"
-set title "Rosenbrock Function"
-splot [0.9:1.1] [0.9:1.1] (1-x)**2 + 100*(y - x**2)**2
-pause -1 "Hit Return to Continue (21)"
-
-set logscale z
-set hidden3d
 set isosamples 60
 set ticslevel 0.
 set view 20,340	#HBB: ,1,2
 set xlabel "x"
 set ylabel "y"
-splot [-1.5:1.5] [-0.5:1.5] (1-x)**2 + 100*(y - x**2)**2
-pause -1 "Hit Return to Continue (22)"
+Rosenbrock(x,y) = (1-x)**2 + 100*(y - x**2)**2
+
+set title "Rosenbrock Function"
+splot [-1.5:1.5] [-0.5:1.5] Rosenbrock(x,y)
+pause -1 "Hit Return to Continue (20)"
+
 set contour
 unset surface
 unset ztics
 unset zlabel
 set border 15
 replot
-pause -1 "Hit Return to Continue (23)"
+pause -1 "Hit Return to Continue (21)"
+
 #
 set title "All contours drawn in a single color"
-unset clabel
-splot [-1.5:1.5] [-0.5:1.5] (1-x)**2 + 100*(y - x**2)**2 with lines lc rgb "#007700"
-pause -1 "Hit Return to Continue (25)"
+set cntrlabel onecolor
+set cntrparam bspline
+splot [-1.5:1.5] [-0.5:1.5] Rosenbrock(x,y) lc rgb "#007700"
+pause -1 "Hit Return to Continue (22)"
+
+set title "Sometimes it helps to use multiplot"
+set view map
+set xr [-0.5:1.5]
+set yr [0:1.5]
+unset xlabel
+unset ylabel
+set tics scale 0.0
+set lmargin at screen 0.1
+set rmargin at screen 0.9
+set bmargin at screen 0.1
+set tmargin at screen 0.9
+
+set multiplot
+
+set cntrparam levels discrete 0.1, 1.0, 10.0, 100.0
+set isosamples 500,100
+splot Rosenbrock(x,y) with lines lc rgb "#007700"
+save '1.bug'
+
+set isosamples 50,50
+set cntrlabel start 25 interval -1
+splot Rosenbrock(x,y) with labels font ",7" offset -1,0.5
+save '2.bug'
+
+unset multiplot
+pause -1 "Hit Return to Continue (23)"
+
 #
 # Clean up:
 #

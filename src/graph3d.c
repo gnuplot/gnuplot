@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.278 2013/05/09 04:49:35 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.279 2013/05/11 23:45:30 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -83,8 +83,10 @@ static int key_title_extra;	/* allow room for subscript/superscript */
 
 /* is contouring wanted ? */
 t_contour_placement draw_contour = CONTOUR_NONE;
-/* use the same linetype for all contours */
-TBOOLEAN clabel_onecolor = FALSE;
+TBOOLEAN clabel_onecolor = FALSE;	/* use same linetype for all contours */
+int clabel_interval = 20;		/* label every 20th contour segment */
+int clabel_start = 5;			/*       starting with the 5th */
+char *clabel_font = NULL;		/* default to current font */
 
 /* Draw the surface at all? (FALSE if only contours are wanted) */
 TBOOLEAN draw_surface = TRUE;
@@ -133,6 +135,8 @@ static void cntr3d_lines __PROTO((struct gnuplot_contours * cntr,
 				  struct lp_style_type * lp));
 static void cntr3d_points __PROTO((struct gnuplot_contours * cntr,
 				   struct lp_style_type * lp));
+static void cntr3d_labels __PROTO((struct gnuplot_contours * cntr, char * leveltext,
+				   struct text_label * label));
 static void check_corner_height __PROTO((struct coordinate GPHUGE * point,
 					 double height[2][2], double depth[2][2]));
 static void setup_3d_box_corners __PROTO((void));
@@ -251,7 +255,8 @@ find_maxl_keys3d(struct surface_points *plots, int count, int *kcnt)
 	    if (len > mlen)
 		mlen = len;
 	}
-	if (draw_contour && !clabel_onecolor && this_plot->contours != NULL) {
+	if (draw_contour && !clabel_onecolor && this_plot->contours != NULL
+	&&  this_plot->plot_style != LABELPOINTS) {
 	    len = find_maxl_cntr(this_plot->contours, &cnt);
 	    if (len > mlen)
 		mlen = len;
@@ -1072,8 +1077,10 @@ do_3dplot(
 		break;
 
 	    case LABELPOINTS:
-		if (!hidden3d || this_plot->opt_out_of_hidden3d)
-		    place_labels3d(this_plot->labels->next, LAYER_PLOTLABELS);
+		if (draw_this_surface) {
+		    if (!hidden3d || this_plot->opt_out_of_hidden3d)
+			place_labels3d(this_plot->labels->next, LAYER_PLOTLABELS);
+		}
 		break;
 
 	    case HISTOGRAMS: /* Cannot happen */
@@ -1193,18 +1200,20 @@ do_3dplot(
 
 	    /* Draw contours for previous surface */
 	    if (draw_contour && this_plot->contours != NULL) {
-		int ic = 1;	/* ic will index the contour linetypes */
 		struct gnuplot_contours *cntrs = this_plot->contours;
-		struct lp_style_type thiscontour_lp_properties =
-		    this_plot->lp_properties;
+		struct lp_style_type thiscontour_lp_properties;
+		static char *thiscontour_label = NULL;
+		int ic = 1;	/* ic will index the contour linetypes */
 
+		thiscontour_lp_properties = this_plot->lp_properties;
 		thiscontour_lp_properties.l_type += (hidden3d ? 1 : 0);
 
 		term_apply_lp_properties(&(thiscontour_lp_properties));
 
 		while (cntrs) {
 		    if (!clabel_onecolor && cntrs->isNewLevel) {
-			if (key->visible && !this_plot->title_is_suppressed) {
+			if (key->visible && !this_plot->title_is_suppressed
+			&&  this_plot->plot_style != LABELPOINTS) {
 			    (*t->linetype)(LT_BLACK);
 			    key_text(xl, yl, cntrs->label);
 			}
@@ -1281,6 +1290,16 @@ do_3dplot(
 		    case DOTS:
 		    case POINTSTYLE:
 			cntr3d_points(cntrs, &thiscontour_lp_properties);
+			break;
+
+		    case LABELPOINTS:
+			if (cntrs->isNewLevel) {
+			    char *c = &cntrs->label[strspn(cntrs->label," ")];
+			    free(thiscontour_label);
+			    thiscontour_label = gp_strdup(c);
+			}
+			/* cntr3d_lines(cntrs, &thiscontour_lp_properties); */
+			cntr3d_labels(cntrs, thiscontour_label, this_plot->labels);
 			break;
 
 		    default:
@@ -1901,6 +1920,36 @@ cntr3d_points(struct gnuplot_contours *cntr, struct lp_style_type *lp)
 	    /* HBB 20010822: see above */
 	    v.real_z = cntr->coords[i].z;
 	    draw3d_point(&v, lp);
+	}
+    }
+}
+
+/* cntr3d_labels:
+ * Place contour labels on a contour line at the base.
+ * These are the same labels that would be used in the key.
+ * The label density is controlled by the point interval property
+ *     splot FOO with labels point pi 20 nosurface
+ */
+static void
+cntr3d_labels(struct gnuplot_contours *cntr, char *level_text, struct text_label *label)
+{
+    int i;
+    int interval;
+    int x, y;
+    struct lp_style_type *lp = &(label->lp_properties);
+
+    /* Drawing a label at every point would be too crowded */
+    interval = lp->p_interval;
+    if (interval <= 0) interval = 999;	/* Place label only at start point */
+
+    if (draw_contour & CONTOUR_BASE) {
+	for (i = 0; i < cntr->num_pts; i++) {
+	    if ((i-clabel_start) % interval)	/* Offset to avoid sitting on the border */
+		continue;
+	    map3d_xy(cntr->coords[i].x, cntr->coords[i].y, base_z, &x, &y);
+	    label->text = level_text;
+	    write_label(x, y, label);
+	    label->text = NULL;		/* Otherwise someone will try to free it */
 	}
     }
 }
