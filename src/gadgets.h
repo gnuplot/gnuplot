@@ -79,7 +79,7 @@ typedef struct text_label {
     struct text_label *next;	/* pointer to next label in linked list */
     int tag;			/* identifies the label */
     t_position place;
-    enum JUSTIFY pos;
+    enum JUSTIFY pos;		/* left/center/right horizontal justification */
     int rotate;
     int layer;
     char *text;
