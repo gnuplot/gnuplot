@@ -1,5 +1,5 @@
 /*
- * $Id: gp_cairo.c,v 1.69 2013/03/07 22:06:33 sfeam Exp $
+ * $Id: gp_cairo.c,v 1.70 2013/04/22 18:49:17 sfeam Exp $
  */
 
 /* GNUPLOT - gp_cairo.c */
@@ -1260,6 +1260,8 @@ void gp_cairo_enhanced_flush(plot_struct *plot)
 		pango_attr_list_unref( gp_cairo_enhanced_save_AttrList );
 		/* invert the size, so we will go back to the saved state */
 		save_logical_rect.width = -save_logical_rect.width;
+		/* EAM FIXME:  Zero height necessary but I don't understand why */
+		save_logical_rect.height = 0;
 		/* adding a blank character with the corresponding shape */
 		gp_cairo_add_shape(save_logical_rect,start);
 

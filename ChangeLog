@@ -1,3 +1,9 @@
+2013-05-17  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/wxterminal/gp_cairo.c (gp_cairo_enhanced_flush):  Empirical fix
+	for y coordinate after save/restore sequence (enhanced text mode '@').
+	I'm not convinced this is correct, but it does seem to work in practice.
+
 2013-05-15  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graph3d.c src/graph3d.h src/plot3d.c src/save.c src/set.c
