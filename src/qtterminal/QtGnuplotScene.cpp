@@ -285,18 +285,22 @@ void QtGnuplotScene::processEvent(QtGnuplotEventType type, QDataStream& in)
 		QGraphicsTextItem* textItem = addText(text, m_font);
 		textItem->setDefaultTextColor(m_currentPen.color());
 		positionText(textItem, point);
-		if (m_inKeySample) {
-			QRectF rect = textItem->boundingRect();
-			qreal fullheight = rect.height();
-			if (m_textAlignment == Qt::AlignRight)
-				rect.moveBottomRight(point);
-			else
-				rect.moveBottomLeft(point);
-			rect.adjust(0, fullheight/1.8, 0, fullheight/4);
+
+		QRectF rect = textItem->boundingRect();
+		qreal fullheight = rect.height();
+		if (m_textAlignment == Qt::AlignCenter) {
+			rect.moveCenter(point);
+			rect.moveBottom(point.y());
+		} else if (m_textAlignment == Qt::AlignRight)
+			rect.moveBottomRight(point);
+		else
+			rect.moveBottomLeft(point);
+		rect.adjust(0, fullheight/1.8, 0, fullheight/4);
+
+		if (m_inKeySample)
 			update_key_box(rect);
-		} else {
+		else
 			m_currentGroup.append(textItem);
-		}
 	}
 	else if (type == GEEnhancedFlush)
 	{
@@ -315,8 +319,24 @@ void QtGnuplotScene::processEvent(QtGnuplotEventType type, QDataStream& in)
 	else if (type == GEEnhancedFinish)
 	{
 		QPoint point; in >> point;
-		addItem(m_enhanced);
 		positionText(m_enhanced, point);
+		m_enhanced->setZValue(m_currentZ++);
+		addItem(m_enhanced);
+
+		QRectF rect = m_enhanced->boundingRect();
+		if (m_textAlignment == Qt::AlignCenter) {
+			rect.moveCenter(point);
+			rect.moveBottom(point.y());
+		} else if (m_textAlignment == Qt::AlignRight)
+			rect.moveBottomRight(point);
+		else
+			rect.moveBottomLeft(point);
+		rect.adjust(0, rect.height()/2, 0, rect.height()/2);
+
+		if (m_inKeySample)
+			update_key_box(rect);
+		else
+			m_currentGroup.append(m_enhanced);
 		m_enhanced = 0;
 	}
 	else if (type == GEImage)
