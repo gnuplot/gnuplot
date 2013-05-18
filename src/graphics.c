@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.420 2013/04/25 16:12:14 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.421 2013/04/25 23:14:16 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -1154,7 +1154,8 @@ finish_filled_curve(
     clipcorners = gp_realloc( clipcorners, 2*points*sizeof(gpiPoint), "filledcurve verticess");
     clip_polygon(corners, clipcorners, points, &clippoints);
     clipcorners->style = style_from_fill(&plot->fill_properties);
-    term->filled_polygon(clippoints, clipcorners);
+    if (clippoints > 0)
+	term->filled_polygon(clippoints, clipcorners);
 }
 
 

@@ -12,6 +12,9 @@
 	being added to the current plot group so that they could be toggled.
 	"center" justification was not being tracked.
 
+	* src/graphics.c (finish_filled_curve): Don't try to process an
+	empty filled polygon.
+
 2012-05-18  Peter Juhasz  <juhaszp@users.sourceforge.net>
 
 	* src/datafile.c (f_column f_stringcolumn):
