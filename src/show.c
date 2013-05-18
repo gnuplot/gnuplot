@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.289 2013/05/14 20:10:56 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.290 2013/05/15 20:52:45 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -229,6 +229,7 @@ show_command()
 	/* contour labels are shown with 'show contour' */
     case S_CONTOUR:
     case S_CNTRPARAM:
+    case S_CNTRLABEL:
 	show_contour();
 	break;
     case S_DGRID3D:

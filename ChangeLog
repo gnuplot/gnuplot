@@ -1,3 +1,13 @@
+2013-05-18  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/graph3d.c (do_3dplot): For 'set contour; splot ... with labels'
+	do not generate extra blank lines in the key box.
+
+	* src/show.c:  Treat "show cntrlabel" as "show contour".
+
+	* src/plot3d.c (eval_3dplots): Give a more informative error message
+	on "splot with labels" without a prior "set contour".
+
 2012-05-18  Peter Juhasz  <juhaszp@users.sourceforge.net>
 
 	* src/datafile.c (f_column f_stringcolumn):

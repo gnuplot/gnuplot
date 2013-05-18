@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.279 2013/05/11 23:45:30 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.280 2013/05/15 20:52:45 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -1234,7 +1234,8 @@ do_3dplot(
 			    term_apply_lp_properties(&thiscontour_lp_properties);
 			}
 
-			if (key->visible && !this_plot->title_is_suppressed) {
+			if (key->visible && !this_plot->title_is_suppressed
+			&& !(this_plot->plot_style == LABELPOINTS)) {
 
 			    switch (this_plot->plot_style) {
 			    case IMPULSES:
