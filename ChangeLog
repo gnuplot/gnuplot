@@ -26,6 +26,9 @@
 	* src/wxterminal{gp_cairo.c gp_cairo.h wxt_gui.cpp wxt_gui.h wxt_term.h}
 	term/wxt.trm term/cairo.trm: wxt/cairo terminal support for boxed text.
 
+	* term/svg.trm: SVG support for opaque fill behind text. I don't know
+	how to stroke the bounding box outline, so no support yet for "border".
+
 	* demo/contours.dem demo/datastrings.dem: Illustrate boxed text labels.
 
 2013-05-18  Ethan A Merritt  <merritt@u.washington.edu>

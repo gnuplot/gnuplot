@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: svg.trm,v 1.152 2013/03/29 19:49:39 sfeam Exp $
+ * $Id: svg.trm,v 1.153 2013/04/09 20:58:26 sfeam Exp $
  */
 
 /*------------------------------------------------------------------------------------------------------------------------------------
@@ -130,6 +130,7 @@ static TBOOLEAN SVG_mouseable = FALSE;
 static TBOOLEAN SVG_standalone = FALSE;
 
 static TBOOLEAN SVG_groupFilledIsOpen = FALSE; /* open pm3d group flag*/
+static TBOOLEAN SVG_inTextBox = FALSE;
 
 struct SVG_PEN
 {
@@ -1056,6 +1057,12 @@ SVG_init ()
 	     /* NOTE: Fill patterns must be defined after the stroke color has been
 	      * set to use the correct (current) stroke color. Therefore we can't
 	      * define fill patterns here. */
+#ifdef EAM_BOXED_TEXT
+	     "\t<filter id='textbox' filterUnits='objectBoundingBox' x='0' y='0' height='1' width='1'>\n"
+	     "\t  <feFlood flood-color='%s' flood-opacity='1' result='bgnd'/>\n"
+	     "\t  <feComposite in='SourceGraphic' in2='bgnd' operator='atop'/>\n"
+	     "\t</filter>\n"
+#endif
 
 	     "</defs>\n"
 	     , stroke_width
@@ -1065,6 +1072,7 @@ SVG_init ()
 	     , stroke_width
 	     , stroke_width
 	     , stroke_width
+	     , SVG_pens[0].color
 	);
 }
 
@@ -1440,7 +1448,12 @@ SVG_put_text (unsigned int x, unsigned int y, const char *str)
 	    fprintf(gpoutfile, " font-weight=\"%s\" ", SVG_fontWeightCur);
     if (SVG_fontStyleCur && strcmp(SVG_fontStyleCur,"normal"))
 	    fprintf(gpoutfile, " font-style=\"%s\" ", SVG_fontStyleCur);
-    fprintf(gpoutfile, " text-anchor=\"%s\">\n", alignment);
+    fprintf(gpoutfile, " text-anchor=\"%s\"", alignment);
+#ifdef EAM_BOXED_TEXT
+    if (SVG_inTextBox)
+	fprintf(gpoutfile, " style='filter:url(#textbox)'");
+#endif
+    fprintf(gpoutfile, ">\n", alignment);
 
 /* output text (unless the enhanced_text processing is in action) */
 
@@ -2050,7 +2063,24 @@ SVG_hypertext( int type, const char *text )
     }
 }
 
-
+#ifdef EAM_BOXED_TEXT
+TERM_PUBLIC void
+SVG_boxed_text(unsigned int x, unsigned int y, int option)
+{
+    switch (option) {
+    case 0:	/* Mark group containing next text item */
+	SVG_inTextBox = TRUE;
+	break;
+    case 1:	/* Stroke the outline of the bounding box (FIXME: how???) */
+    case 2:	/* Close the group, which will trigger application of the filter */
+	SVG_inTextBox = FALSE;
+	break;
+    case 3:	/* Adjust the size of the bounding box */
+	break;
+    }
+}
+#endif
+	
 #undef Y
 #undef X
 #undef PREC
@@ -2084,6 +2114,9 @@ TERM_TABLE_START (svg_driver)
    , SVG_path 	/* path */
    , SVG_SCALE	/* pixel oversampling scale */
    , SVG_hypertext	/* hypertext support */
+#ifdef EAM_BOXED_TEXT
+   , SVG_boxed_text	/* boxed text labels */
+#endif
 TERM_TABLE_END (svg_driver)
 
 #undef LAST_TERM
