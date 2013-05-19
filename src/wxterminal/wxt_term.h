@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_term.h,v 1.19 2012/10/08 22:30:53 markisch Exp $
+ * $Id: wxt_term.h,v 1.20 2013/02/19 05:30:38 sfeam Exp $
  */
 
 /* GNUPLOT - wxt_term.h */
@@ -92,6 +92,10 @@ void wxt_enhanced_open(char* fontname, double fontsize, double base, TBOOLEAN wi
 
 void wxt_layer(t_termlayer layer);
 void wxt_hypertext(int type, const char *text);
+
+#ifdef EAM_BOXED_TEXT
+void wxt_boxed_text(unsigned int x, unsigned int y, int option);
+#endif
 
 void wxt_raise_terminal_window __PROTO((int));
 void wxt_raise_terminal_group __PROTO((void));

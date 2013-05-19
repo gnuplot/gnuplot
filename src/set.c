@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.400 2013/05/14 20:10:56 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.401 2013/05/15 20:52:45 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -4274,6 +4274,39 @@ set_style()
     case SHOW_STYLE_HISTOGRAM:
 	parse_histogramstyle(&histogram_opts,HT_CLUSTERED,histogram_opts.gap);
 	break;
+#ifdef EAM_BOXED_TEXT
+    case SHOW_STYLE_TEXTBOX:
+	c_token++;
+	while (!END_OF_COMMAND) {
+	    if (almost_equals(c_token,"op$aque")) {
+		textbox_opts.opaque = TRUE;
+		c_token++;
+	    } else if (almost_equals(c_token,"trans$parent")) {
+		textbox_opts.opaque = FALSE;
+		c_token++;
+	    } else if (almost_equals(c_token,"mar$gins")) {
+		struct value a;
+		c_token++;
+		if (END_OF_COMMAND) {
+		    textbox_opts.xmargin = 1.;
+		    textbox_opts.ymargin = 1.;
+		    break;
+		}
+		textbox_opts.xmargin = real(const_express(&a));
+		if (!equals(c_token++,",") || END_OF_COMMAND)
+		    break;
+		textbox_opts.ymargin = real(const_express(&a));
+	    } else if (almost_equals(c_token,"nobo$rder")) {
+		c_token++;
+		textbox_opts.noborder = TRUE;
+	    } else if (almost_equals(c_token,"bo$rder")) {
+		c_token++;
+		textbox_opts.noborder = FALSE;
+	    } else
+		int_error(c_token,"unrecognized option");
+	}
+	break;
+#endif
     case SHOW_STYLE_INCREMENT:
 	c_token++;
 	if (END_OF_COMMAND || almost_equals(c_token,"def$ault"))
@@ -5734,6 +5767,18 @@ parse_label_options( struct text_label *this_label, TBOOLEAN in_plot )
 		continue;
 	    }
 	}
+
+#ifdef EAM_BOXED_TEXT
+	if (almost_equals(c_token, "box$ed")) {
+	    this_label->boxed = 1;
+	    c_token++;
+	    continue;
+	} else if (almost_equals(c_token, "nobox$ed")) {
+	    this_label->boxed = 0;
+	    c_token++;
+	    continue;
+	}
+#endif
 
 	if (!axis_label && (loc_lp.pointflag == -2 || set_hypertext)) {
 	    if (almost_equals(c_token, "po$int")) {

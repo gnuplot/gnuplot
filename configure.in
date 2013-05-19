@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot on Unix.
 dnl
-dnl $Id: configure.in,v 1.325 2013/04/08 22:21:05 sfeam Exp $
+dnl $Id: configure.in,v 1.326 2013/04/08 23:14:08 sfeam Exp $
 dnl
 dnl this is actually major.minor ...
 dnl note that for a non-beta release, we need to disable DEVELOPMENT_RELEASE
@@ -860,6 +860,16 @@ fi
 
 TERMLIBS="$VGAGLLIB $TERMLIBS"
 
+dnl labels with boxes around them
+AC_ARG_ENABLE(boxed_text,dnl
+[  --disable-boxed-text    disable support for boxed labels],,
+  test -z "$enable_boxed_text" && enable_boxed_text=yes)
+
+  if test "$enable_boxed_text" = yes; then
+  AC_DEFINE(EAM_BOXED_TEXT,1,
+               [ Define to support boxed labels ])
+  fi
+
 dnl thin plate splines patch
 AC_ARG_ENABLE(thin-splines,dnl
 [  --enable-thin-splines   enable thin plate splines],
@@ -1406,6 +1416,10 @@ if test "$enable_raise_console" = yes; then
   AC_MSG_RESULT([  Typing <space> in plot window raises console])
 else
   AC_MSG_RESULT([  Treat <space> in plot window like any other key: yes])
+fi
+
+if test "$enable_boxed_text" = yes; then
+  AC_MSG_RESULT([  Boxed text labels (EXPERIMENTAL)])
 fi
 
 if test "$enable_macros" = yes; then

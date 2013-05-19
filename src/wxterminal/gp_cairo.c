@@ -1,5 +1,5 @@
 /*
- * $Id: gp_cairo.c,v 1.70 2013/04/22 18:49:17 sfeam Exp $
+ * $Id: gp_cairo.c,v 1.71 2013/05/17 21:04:39 sfeam Exp $
  */
 
 /* GNUPLOT - gp_cairo.c */
@@ -196,6 +196,12 @@ void gp_cairo_initialize_plot(plot_struct *plot)
 	plot->interrupt = FALSE;
 }
 
+#ifdef EAM_BOXED_TEXT
+/* Boxed text support */
+static int bounding_box[4];
+static double bounding_xmargin = 1.0;
+static double bounding_ymargin = 1.0;
+#endif
 
 /* set the transformation matrix of the context, and other details */
 /* NOTE : depends on the setting of xscale and yscale */
@@ -862,7 +868,7 @@ void gp_cairo_draw_text(plot_struct *plot, int x1, int y1, const char* string,
 	 * Do it by ourselves, or we can get spurious lines on future calls. */
 	cairo_new_path(plot->cr);
 
-#if 0 /* helper boxes to understand how text is positionned */
+#ifdef EAM_BOXED_TEXT
 	cairo_set_line_width(plot->cr, plot->linewidth*plot->oversampling_scale);
 	cairo_rotate(plot->cr, arg);
 	cairo_translate(plot->cr, x, y);
@@ -870,26 +876,19 @@ void gp_cairo_draw_text(plot_struct *plot, int x1, int y1, const char* string,
 
 	{
 	PangoRectangle ink, logical;
-	double lw = cairo_get_line_width (plot->cr);
-	pango_layout_get_extents (layout, &ink, &logical);
+	pango_layout_get_pixel_extents (layout, &ink, &logical);
 
-	cairo_set_source_rgba (plot->cr, 1.0, 0.0, 0.0, 0.75);
-	cairo_rectangle (plot->cr,
-			(double)logical.x / PANGO_SCALE - lw / 2,
-			(double)logical.y / PANGO_SCALE - lw / 2,
-			(double)logical.width / PANGO_SCALE + lw,
-			(double)logical.height / PANGO_SCALE + lw);
-	cairo_stroke (plot->cr);
-
-	cairo_set_source_rgba (plot->cr, 0.0, 1.0, 0.0, 0.75);
-	cairo_rectangle (plot->cr,
-			(double)ink.x / PANGO_SCALE - lw / 2,
-			(double)ink.y / PANGO_SCALE - lw / 2,
-			(double)ink.width / PANGO_SCALE + lw,
-			(double)ink.height / PANGO_SCALE + lw);
-	cairo_stroke (plot->cr);
+	/* Would it look better to use logical bounds rather than ink? */
+	if (bounding_box[0] > x + ink.x)
+	    bounding_box[0] = x + ink.x;
+	if (bounding_box[2] < x + ink.x + ink.width)
+	    bounding_box[2] = x + ink.x + ink.width;
+	if (bounding_box[1] > y + ink.y)
+	    bounding_box[1] = y + ink.y;
+	if (bounding_box[3] < y + ink.y + ink.height)
+	    bounding_box[3] = y + ink.y + ink.height;
 	}
-#endif /* helper boxes to understand how text is positionned */
+#endif
 
 	/* free the layout object */
 	g_object_unref (layout);
@@ -1546,6 +1545,21 @@ void gp_cairo_enhanced_finish(plot_struct *plot, int x, int y)
 	 * Do it by ourselves, or we can get spurious lines on future calls. */
 	cairo_new_path(plot->cr);
 
+#ifdef EAM_BOXED_TEXT
+	/* Bookkeeping for boxed text (Not working yet) */
+	pango_layout_get_pixel_extents (layout, &ink_rect, &logical_rect);
+
+	/* Would it look better to use logical bounds rather than ink_rect? */
+	if (bounding_box[0] > enh_x + ink_rect.x)
+	    bounding_box[0] = enh_x + ink_rect.x;
+	if (bounding_box[2] < enh_x + ink_rect.x + ink_rect.width)
+	    bounding_box[2] = enh_x + ink_rect.x + ink_rect.width;
+	if (bounding_box[1] > enh_y + ink_rect.y)
+	    bounding_box[1] = enh_y + ink_rect.y;
+	if (bounding_box[3] < enh_y + ink_rect.y + ink_rect.height)
+	    bounding_box[3] = enh_y + ink_rect.y + ink_rect.height;
+#endif
+	
 	/* free the layout object */
 	pango_attr_list_unref( gp_cairo_enhanced_AttrList );
 	g_object_unref (layout);
@@ -1608,6 +1622,55 @@ void gp_cairo_fill(plot_struct *plot, int fillstyle, int fillpar)
 	}
 }
 
+#ifdef EAM_BOXED_TEXT
+void gp_cairo_boxed_text(plot_struct *plot, int x, int y, int option)
+{
+	int dx, dy;
+
+	switch (option) {
+	case 0: /* Initialize bounding box for this text string */
+		bounding_box[0] = bounding_box[2] = x;
+		bounding_box[1] = bounding_box[3] = y;
+		break;
+
+	case 1: /* Stroke the outline of the bounding box for previous text */
+	case 2: /* Fill the bounding box with background color */
+		/* begin by stroking any open path */
+		gp_cairo_stroke(plot);
+		gp_cairo_end_polygon(plot);
+
+		cairo_save(plot->cr);
+		dx = 0.5 * bounding_xmargin * (float)(plot->fontsize * plot->oversampling_scale);
+		dy = 0.5 * bounding_ymargin * (float)(plot->fontsize * plot->oversampling_scale);
+		gp_cairo_move(plot,   bounding_box[0]-dx, bounding_box[1]-dy); 
+		gp_cairo_vector(plot, bounding_box[0]-dx, bounding_box[3]+dy); 
+		gp_cairo_vector(plot, bounding_box[2]+dx, bounding_box[3]+dy); 
+		gp_cairo_vector(plot, bounding_box[2]+dx, bounding_box[1]-dy); 
+		gp_cairo_vector(plot, bounding_box[0]+dx, bounding_box[1]-dy); 
+		cairo_close_path(plot->cr);
+		if (option == 2) {
+		    rgb_color *background = &gp_cairo_colorlist[0];
+		    cairo_set_source_rgb(plot->cr, background->r, background->g, background->b);
+		    cairo_fill(plot->cr);
+		} else {
+		    cairo_set_line_width(plot->cr, 1.0*plot->oversampling_scale);
+		    cairo_set_source_rgb(plot->cr,
+			plot->color.r, plot->color.g, plot->color.b);
+		    cairo_stroke(plot->cr);
+		}
+		cairo_restore(plot->cr);
+		break;
+
+	case 3: /* Change the margin between text and box */
+		bounding_xmargin = (double)x/100.;
+		bounding_ymargin = (double)y/100.;
+		break;
+
+	default:
+		break;
+	}
+}
+#endif
 
 #define PATTERN_SIZE 8
 

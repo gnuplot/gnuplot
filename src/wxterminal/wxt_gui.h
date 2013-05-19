@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.h,v 1.38 2012/10/08 22:30:53 markisch Exp $
+ * $Id: wxt_gui.h,v 1.39 2013/04/05 10:09:04 markisch Exp $
  */
 
 /* GNUPLOT - wxt_gui.h */
@@ -282,6 +282,9 @@ typedef enum wxt_gp_command_t {
 	command_image,
 	command_layer,
 	command_hypertext
+#ifdef EAM_BOXED_TEXT
+	,command_boxed_text
+#endif
 } wxt_gp_command_t;
 
 /* base structure for storing gnuplot commands */

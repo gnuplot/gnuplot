@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: post.trm,v 1.273 2013/04/01 19:36:28 sfeam Exp $
+ * $Id: post.trm,v 1.274 2013/04/02 22:40:03 sfeam Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -131,6 +131,10 @@ static TBOOLEAN PS_newpath = FALSE;
 static TBOOLEAN ENHps_opened_string = FALSE;  /* try to cut out empty ()'s */
 
 TERM_PUBLIC void PS_layer __PROTO((t_termlayer syncpoint));
+
+#ifdef EAM_BOXED_TEXT
+TERM_PUBLIC void ENHPS_boxed_text __PROTO((unsigned int, unsigned int, int));
+#endif
 
 #endif /* TERM_PROTO */
 
@@ -322,11 +326,11 @@ static const char GPFAR * GPFAR ENHPS_header[] = {
 "     { 5 get 3 eq {gsave} {grestore} ifelse }\n", /* EAM */
 "     {dup dup 0 get findfont exch 1 get scalefont setfont\n",
 "     [ currentpoint ] exch dup 2 get 0 exch R dup 5 get 2 ne {dup dup 6\n",
-"     get exch 4 get {Gshow} {stringwidth pop 0 R} ifelse }if dup 5 get 0 eq\n",
+"     get exch 4 get {textshow} {stringwidth pop 0 R} ifelse }if dup 5 get 0 eq\n",
 "     {dup 3 get {2 get neg 0 exch R pop} {pop aload pop M} ifelse} {dup 5\n",
 "     get 1 eq {dup 2 get exch dup 3 get exch 6 get stringwidth pop -2 div\n",
 "     dup 0 R} {dup 6 get stringwidth pop -2 div 0 R 6 get\n",
-"     show 2 index {aload pop M neg 3 -1 roll neg R pop pop} {pop pop pop\n",
+"     textshow 2 index {aload pop M neg 3 -1 roll neg R pop pop} {pop pop pop\n",
 "     pop aload pop M} ifelse }ifelse }ifelse }\n",
 "     ifelse }\n", /* EAM */
 "   forall} def\n",
@@ -362,6 +366,34 @@ static const char GPFAR * GPFAR ENHPS_header[] = {
 
 NULL
 };
+
+#ifdef EAM_BOXED_TEXT
+    static const char GPFAR psi4[] = "\
+%%\n\
+%% Support for boxed text - Ethan A Merritt May 2005\n%%\n\
+/InitTextBox { userdict /TBy2 3 -1 roll put userdict /TBx2 3 -1 roll put\n\
+           userdict /TBy1 3 -1 roll put userdict /TBx1 3 -1 roll put\n\
+	   /Boxing true def } def\n\
+/ExtendTextBox { Boxing\n\
+    { gsave dup false charpath pathbbox\n\
+      dup TBy2 gt {userdict /TBy2 3 -1 roll put} {pop} ifelse\n\
+      dup TBx2 gt {userdict /TBx2 3 -1 roll put} {pop} ifelse\n\
+      dup TBy1 lt {userdict /TBy1 3 -1 roll put} {pop} ifelse\n\
+      dup TBx1 lt {userdict /TBx1 3 -1 roll put} {pop} ifelse\n\
+      grestore } if } def\n\
+/PopTextBox { newpath TBx1 TBxmargin sub TBy1 TBymargin sub M\n\
+               TBx1 TBxmargin sub TBy2 TBymargin add L\n\
+	       TBx2 TBxmargin add TBy2 TBymargin add L\n\
+	       TBx2 TBxmargin add TBy1 TBymargin sub L closepath } def\n\
+/DrawTextBox { PopTextBox stroke /Boxing false def} def\n\
+/FillTextBox { gsave PopTextBox BackgroundColor setrgbcolor fill grestore /Boxing false def} def\n\
+0 0 0 0 InitTextBox\n\
+/TBxmargin 20 def\n\
+/TBymargin 20 def\n\
+/Boxing false def\n\
+/textshow { ExtendTextBox Gshow } def\n%%\n";
+#endif
+
 
 /* external/internal prologue files machinery */
 #if defined(GNUPLOT_PS_DIR)
@@ -1776,7 +1808,16 @@ end\n\
 	    free(outstr2);
     }
 
-    fputs("end\n%%EndProlog\n", gppsfile);
+    fputs("end\n", gppsfile);
+
+#ifdef EAM_BOXED_TEXT
+    /* Define macros supporting boxed text */
+    fprintf(gppsfile, psi4);
+#else
+    fputs("/textshow { Gshow } def\n",gppsfile);
+#endif
+
+    fputs("%%EndProlog\n", gppsfile);
 }
 
 /* the init fn for the postscript driver */
@@ -2713,6 +2754,33 @@ if (sm_palette.ps_allcF == 0) { /* print only those 3 used formulae */
 #undef B
 }
 
+#ifdef EAM_BOXED_TEXT
+TERM_PUBLIC void
+ENHPS_boxed_text __PROTO((unsigned int x, unsigned int y, int option))
+{
+    switch (option) {
+    case 0:
+	/* Initialize bounding box for the text string */
+	fprintf(gppsfile,"%d %d %d %d InitTextBox\n",x,y,x,y);
+	break;
+    case 1:
+	/* Stroke the outline of the accumulated bounding box */
+	fputs("DrawTextBox\n", gppsfile);
+	break;
+    case 2:
+	/* Fill bounding box with background color */
+	fputs("FillTextBox\n", gppsfile);
+	break;
+    case 3:
+	/* Change text margins */
+	fprintf(gppsfile,"/TBxmargin %d def\n", (int)(20*x/100));
+	fprintf(gppsfile,"/TBymargin %d def\n", (int)(20*y/100));
+	break;
+    default:
+	break;
+    }
+}
+#endif
 
 
 static void
@@ -4224,6 +4292,10 @@ TERM_TABLE_START(post_driver)
     , PS_layer		/* used only to insert comments */
     , PS_path
     , PS_SC		/* terminal to pixel coord scale factor */
+    , NULL		/* hypertext */
+#ifdef EAM_BOXED_TEXT
+    , ENHPS_boxed_text
+#endif
 TERM_TABLE_END(post_driver)
 
 #undef LAST_TERM

@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: xlib.trm,v 1.25 2012/10/22 22:45:44 sfeam Exp $
+ * $Id: xlib.trm,v 1.26 2012/10/30 04:11:13 sfeam Exp $
  */
 
 /* GNUPLOT - xlib.trm */
@@ -81,6 +81,13 @@ TERM_TABLE_START(xlib_driver)
     X11_set_color, X11_filled_polygon
     , X11_image
     , ENHX11_OPEN, ENHX11_FLUSH, do_enh_writec
+    , NULL	/* layering */
+    , NULL	/* path */
+    , 0.0	/* tscale */
+    , NULL	/* hypertext */
+#ifdef EAM_BOXED_TEXT
+    , ENHX11_boxed_text
+#endif
 TERM_TABLE_END(xlib_driver)
 
 #undef LAST_TERM

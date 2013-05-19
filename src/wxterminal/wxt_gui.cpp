@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.cpp,v 1.111 2013/04/22 17:39:22 sfeam Exp $
+ * $Id: wxt_gui.cpp,v 1.112 2013/04/22 22:23:11 markisch Exp $
  */
 
 /* GNUPLOT - wxt_gui.cpp */
@@ -2594,6 +2594,20 @@ void wxt_set_clipboard(const char s[])
 }
 #endif /*USE_MOUSE*/
 
+#ifdef EAM_BOXED_TEXT
+/* Pass through the boxed text options to cairo */
+void wxt_boxed_text(unsigned int x, unsigned int y, int option)
+{
+	gp_command temp_command;
+	if (option != 3)
+	    y = term->ymax - y;
+	temp_command.command = command_boxed_text;
+	temp_command.x1 = x;
+	temp_command.y1 = y;
+	temp_command.integer_value = option;
+	wxt_command_push(temp_command);
+}
+#endif
 
 /* ===================================================================
  * Command list processing
@@ -2880,6 +2894,11 @@ void wxtPanel::wxt_cairo_exec_command(gp_command command)
 				command.x4, command.y4,
 				command.integer_value, command.integer_value2);
 		return;
+#ifdef EAM_BOXED_TEXT
+	case command_boxed_text :
+		gp_cairo_boxed_text(&plot, command.x1, command.y1, command.integer_value);
+		return;
+#endif /*EAM_BOXED_TEXT */
 	case command_layer :
 		switch (command.integer_value)
 		{

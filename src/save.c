@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.217 2013/05/14 20:10:56 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.218 2013/05/15 20:52:45 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -474,6 +474,10 @@ set bar %f %s\n",
 	    save_linetype(fp, &(this_label->lp_properties), TRUE);
 	}
 	save_position(fp, &this_label->offset, TRUE);
+#ifdef EAM_BOXED_TEXT
+	if (this_label->boxed)
+	    fprintf(fp," boxed ");
+#endif
 	fputc('\n', fp);
     }
     fputs("unset arrow\n", fp);
@@ -560,6 +564,13 @@ set bar %f %s\n",
 
 #ifdef EAM_OBJECTS
     save_object(fp, 0);
+#endif
+
+#ifdef EAM_BOXED_TEXT
+    fprintf(fp, "set style textbox %s margins %4.1f, %4.1f %s\n",
+	    textbox_opts.opaque ? "opaque": "transparent",
+	    textbox_opts.xmargin, textbox_opts.ymargin,
+	    textbox_opts.noborder ? "noborder" : "border");
 #endif
 
     fputs("unset logscale\n", fp);

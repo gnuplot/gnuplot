@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.793 2013/05/09 10:02:24 markisch Exp $
+C RCS $Id: gnuplot.doc,v 1.794 2013/05/15 20:52:45 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -8934,6 +8934,7 @@ Ffigure_missing
                  {textcolor <colorspec>}
                  {point <pointstyle> | nopoint}
                  {offset <offset>}
+                 {boxed}
                  {hypertext}
        unset label {<tag>}
        show label
@@ -8957,6 +8958,8 @@ Ffigure_missing
  indicating that the point is to be at the left, right or center of the text.
  Labels outside the plotted boundaries are permitted but may interfere with
  axis labels or other text.
+
+ Some terminals support enclosing the label in a box.  See `set style textbox`.
 
  If `rotate` is given, the label is written vertically (if the terminal can do
  so, of course).  If `rotate by <degrees>` is given, conforming terminals will
@@ -9006,11 +9009,12 @@ Ffigure_missing
  given as a quoted time string according to the `timefmt` format string.
  See `set xdata` and `set timefmt`.
 
- The EEPIC, Imagen, LaTeX, and TPIC drivers allow \\ in a string to specify
- a newline.
+ The options available for `set label` are also available for the `labels` plot
+ style. See `labels`.
 
- Label coordinates and text can also be read from a data file (see `labels`).
-
+4 examples
+?label examples
+?set label examples
  Examples:
 
  To set a label at (1,2) to "y=x", use:
@@ -10888,17 +10892,14 @@ Ffigure_missing
 
  Syntax:
        set style arrow <n> <arrowstyle>
+       set style boxplot <boxplot style options>
+       set style circle radius <size>
+       set style ellipse size <size> units {xy|xx|yy}
        set style fill <fillstyle>
        set style histogram <histogram style options>
        set style line <n> <linestyle>
-
- If `gnuplot` was built with the support of objects, then the following
- options are also available:
-
- Syntax:
        set style rectangle <object options> <linestyle> <fillstyle>
-       set style circle radius <size>
-       set style ellipse size <size> units {xy|xx|yy}
+       set style textbox {opaque|transparent} {{no}border}
 
 4 set style arrow
 ?commands set style arrow
@@ -11417,7 +11418,17 @@ Ffigure_missing
 
  For defining ellipse objects, see `set object ellipse`;
  for the 2D plot style, see `ellipses`.
+4 set style textbox
+?commands set style textbox
+?commands show style textbox
+?set style textbox
+?unset style textbox
+?show style textbox
 
+ Syntax: set style textbox {opaque|transparent}{{no}border}
+
+ This command controls the appearance of labels with the attribute 'boxed'.
+ Terminal types that do not support boxed text will ignore this style.
 3 surface
 ?commands set surface
 ?commands unset surface

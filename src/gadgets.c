@@ -191,6 +191,10 @@ boxplot_style boxplot_opts = DEFAULT_BOXPLOT_STYLE;
 /* WINDOWID to be filled by terminals running on X11 (x11, wxt, qt, ...) */
 int current_x11_windowid = 0;
 
+#ifdef EAM_BOXED_TEXT
+textbox_style textbox_opts = DEFAULT_TEXTBOX_STYLE;
+#endif
+
 /*****************************************************************/
 /* Routines that deal with global objects defined in this module */
 /*****************************************************************/
@@ -703,6 +707,11 @@ write_label(unsigned int x, unsigned int y, struct text_label *this_label)
 	} else {
 	    /* A normal label (always print text) */
 	    get_offsets(this_label, term, &htic, &vtic);
+#ifdef EAM_BOXED_TEXT
+	    /* Initialize the bounding box accounting */
+	    if (this_label->boxed && term->boxed_text)
+		(*term->boxed_text)(x + htic, y + vtic, 0);
+#endif
 	    if (this_label->rotate && (*term->text_angle) (this_label->rotate)) {
 		write_multiline(x + htic, y + vtic, this_label->text,
 				this_label->pos, justify, this_label->rotate,
@@ -713,6 +722,30 @@ write_label(unsigned int x, unsigned int y, struct text_label *this_label)
 				this_label->pos, justify, 0, this_label->font);
 	    }
 	}
+#ifdef EAM_BOXED_TEXT
+	/* Adjust the bounding box margins */
+	if (this_label->boxed && term->boxed_text)
+	    (*term->boxed_text)((int)(textbox_opts.xmargin * 100.),
+		(int)(textbox_opts.ymargin * 100.), 3);
+
+	if (this_label->boxed && term->boxed_text && textbox_opts.opaque) {
+	    /* Blank out the box and reprint the label */
+	    (*term->boxed_text)(0,0, 2);
+	    if (this_label->rotate && (*term->text_angle) (this_label->rotate)) {
+		write_multiline(x + htic, y + vtic, this_label->text,
+			    this_label->pos, justify, this_label->rotate,
+			    this_label->font);
+		(*term->text_angle) (0);
+	    } else {
+		write_multiline(x + htic, y + vtic, this_label->text,
+			    this_label->pos, justify, 0, this_label->font);
+	    }
+	}
+
+	/* Draw the bounding box - FIXME should set line properties first */
+	if (this_label->boxed && !textbox_opts.noborder && term->boxed_text)
+	    (*term->boxed_text)(0,0, 1);
+#endif
 
 	/* The associated point, if any */
 	/* write_multiline() clips text to on_page; do the same for any point */

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.290 2013/05/15 20:52:45 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.291 2013/05/18 23:47:20 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -137,6 +137,9 @@ static void show_increment __PROTO((void));
 static void show_histogram __PROTO((void));
 #ifdef GNUPLOT_HISTORY
 static void show_historysize __PROTO((void));
+#endif
+#ifdef EAM_BOXED_TEXT
+static void show_textbox __PROTO((void));
 #endif
 static void show_size __PROTO((void));
 static void show_origin __PROTO((void));
@@ -1459,6 +1462,12 @@ show_style()
 	show_histogram();
 	c_token++;
 	break;
+#ifdef EAM_BOXED_TEXT
+    case SHOW_STYLE_TEXTBOX:
+	show_textbox();
+	c_token++;
+	break;
+#endif
     case SHOW_STYLE_ARROW:
 	c_token++;
 	CHECK_TAG_GT_ZERO;
@@ -1490,6 +1499,9 @@ show_style()
 	show_fillstyle();
 	show_increment();
 	show_histogram();
+#ifdef EAM_BOXED_TEXT
+	show_textbox();
+#endif
 	show_arrowstyle(0);
 	show_boxplot();
 #ifdef EAM_OBJECTS
@@ -1700,6 +1712,11 @@ show_label(int tag)
 		fprintf(stderr, " offset ");
 		show_position(&this_label->offset);
 	    }
+
+#ifdef EAM_BOXED_TEXT
+	    if (this_label->boxed)
+		fprintf(stderr," boxed");
+#endif
 
 	    /* Entry font added by DJL */
 	    fputc('\n', stderr);
@@ -2683,6 +2700,18 @@ show_histogram()
 	fprintf(stderr," textcolor lt %d", histogram_opts.title.textcolor.lt+1);
     fprintf(stderr, "\n");
 }
+
+#ifdef EAM_BOXED_TEXT
+static void
+show_textbox()
+{
+	fprintf(stderr, "\ttextboxes are %s ",
+		textbox_opts.opaque ? "opaque" : "transparent");
+	fprintf(stderr, "with margins %4.1f, %4.1f  and %s border\n",
+		textbox_opts.xmargin, textbox_opts.ymargin,
+		textbox_opts.noborder ? "no" : "");
+}
+#endif
 
 #ifdef GNUPLOT_HISTORY
 /* process 'show historysize' command */

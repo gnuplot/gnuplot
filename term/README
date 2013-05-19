@@ -83,6 +83,9 @@ struct TERMENTRY {
     void (*path) __PROTO((int p));
 /* Hypertext support */
     void (*hypertext) __PROTO((int type, const char *text));
+#ifdef EAM_BOXED_TEXT
+    void (*boxed_text)__PROTO((unsigned int x, unsigned int y, int option));
+#endif
 };
 
 One consequence of (1) is that we would like drivers to be backwards
@@ -429,6 +432,19 @@ _image(unsigned M, unsigned N, coordval *image, gpiPoint *corner, t_imagecolor c
    often it is necessary to clip a portion of the outer pixels of the
    image.
 
+There is a single entry point associated with support for boxed text.
+This option is independent of enhanced text mode.  
+
+_boxed_text() - Called first with option==0 to initiate a new text box;
+subsequent calls to put_text() accumulate bounding-box limits for this box;
+then boxed_text() is called again with option>0 to actually draw
+the text box.
+  option 0:	initialize a new text box
+  option 1:	stroke the bounding box of the text box
+  option 2:	fill the text box with background color
+  option 3:	adjust size of whitespace around text to x,y percent of default
+It is the responsibility of the normal term->put_text routine to update
+the text box if one is active.
 
 _layer(t_termlayer syncpoint)
    Driver-specific synchronization or other layering commands.

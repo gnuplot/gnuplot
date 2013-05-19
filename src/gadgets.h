@@ -82,6 +82,7 @@ typedef struct text_label {
     enum JUSTIFY pos;		/* left/center/right horizontal justification */
     int rotate;
     int layer;
+    int boxed;			/* EAM_BOXED_TEXT */
     char *text;
     char *font;			/* Entry font added by DJL */
     struct t_colorspec textcolor;
@@ -98,6 +99,7 @@ typedef struct text_label {
 #define EMPTY_LABELSTRUCT \
     {NULL, NONROTATABLE_LABEL_TAG, \
      {character, character, character, 0.0, 0.0, 0.0}, CENTRE, 0, 0, \
+     0, \
      NULL, NULL, {TC_LT, -2, 0.0}, DEFAULT_LP_STYLE_TYPE, \
      {character, character, character, 0.0, 0.0, 0.0}, FALSE, \
      FALSE}
@@ -266,6 +268,16 @@ typedef struct boxplot_style {
 } boxplot_style;
 extern boxplot_style boxplot_opts;
 #define DEFAULT_BOXPLOT_STYLE { 0, 1.5, TRUE, 6, CANDLESTICKS, 1.0, BOXPLOT_FACTOR_LABELS_AUTO, FALSE }
+
+#ifdef EAM_BOXED_TEXT
+typedef struct textbox_style {
+    TBOOLEAN opaque;	/* True if the box is background-filled before writing into it */
+    TBOOLEAN noborder;	/* True if you want fill only, no lines */
+    double xmargin;	/* fraction of default margin to use */
+    double ymargin;	/* fraction of default margin to use */
+} textbox_style;
+#define DEFAULT_TEXTBOX_STYLE { FALSE, FALSE, 1.0, 1.0 }
+#endif
 
 /***********************************************************/
 /* Variables defined by gadgets.c needed by other modules. */
@@ -545,6 +557,10 @@ extern filledcurves_opts filledcurves_opts_func;
 extern TBOOLEAN prefer_line_styles;
 
 extern histogram_style histogram_opts;
+
+#ifdef EAM_BOXED_TEXT
+extern textbox_style textbox_opts;
+#endif
 
 void default_arrow_style __PROTO((struct arrow_style_type *arrow));
 void apply_head_properties __PROTO((struct arrow_style_type *arrow_properties));

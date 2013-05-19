@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.233 2013/04/22 16:17:42 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.234 2013/05/05 21:57:46 sfeam Exp $"); }
 #endif
 
 #define MOUSE_ALL_WINDOWS 1
@@ -627,7 +627,16 @@ static int cx = 0, cy = 0;
 /* Font characteristics held locally but sent back via pipe to x11.trm */
 static int vchar, hchar;
 
-/* Speficy negative values as indicator of uninitialized state */
+/* Will hold the bounding box of the previous enhanced text string */
+#ifdef EAM_BOXED_TEXT
+    unsigned int bounding_box[4];
+    TBOOLEAN boxing = FALSE;
+#define X11_TEXTBOX_MARGIN 2
+    int box_xmargin = X11_TEXTBOX_MARGIN;
+    int box_ymargin = X11_TEXTBOX_MARGIN;
+#endif
+
+/* Specify negative values as indicator of uninitialized state */
 static double xscale = -1.;
 static double yscale = -1.;
 static int    ymax   = 4096;
@@ -2235,6 +2244,9 @@ exec_cmd(plot_struct *plot, char *command)
 	/* Enhanced text mode added November 2003 - Ethan A Merritt */
 	int x_offset=0, y_offset=0, v_offset=0;
 	int char_byte_offset;
+#ifdef EAM_BOXED_TEXT
+	unsigned int bb[4];
+#endif
 
 	switch (buffer[1]) {
 
@@ -2242,16 +2254,28 @@ exec_cmd(plot_struct *plot, char *command)
 		    sscanf(buffer+2, "%d %d", &x_offset, &y_offset);
 		    plot->xLast = x_offset - (plot->xLast - x_offset);
 		    plot->yLast = y_offset - (vchar/3) / yscale;
+#ifdef EAM_BOXED_TEXT
+		    bounding_box[0] = bounding_box[2] = X(plot->xLast);
+		    bounding_box[1] = bounding_box[3] = Y(plot->yLast);
+#endif
 		    return;
 	case 'k':	/* Set start for center-justified enhanced text */
 		    sscanf(buffer+2, "%d %d", &x_offset, &y_offset);
 		    plot->xLast = x_offset - 0.5*(plot->xLast - x_offset);
 		    plot->yLast = y_offset - (vchar/3) / yscale;
+#ifdef EAM_BOXED_TEXT
+		    bounding_box[0] = bounding_box[2] = X(plot->xLast);
+		    bounding_box[1] = bounding_box[3] = Y(plot->yLast);
+#endif
 		    return;
 	case 'l':	/* Set start for left-justified enhanced text */
 		    sscanf(buffer+2, "%d %d", &x_offset, &y_offset);
 		    plot->xLast = x_offset;
 		    plot->yLast = y_offset - (vchar/3) / yscale;
+#ifdef EAM_BOXED_TEXT
+		    bounding_box[0] = bounding_box[2] = X(plot->xLast);
+		    bounding_box[1] = bounding_box[3] = Y(plot->yLast);
+#endif
 		    return;
 	case 'o':	/* Enhanced mode print with no update */
 	case 'c':	/* Enhanced mode print with update to center */
@@ -2283,6 +2307,45 @@ exec_cmd(plot_struct *plot, char *command)
 		    plot->xLast = plot->xSave;
 		    plot->yLast = plot->ySave;
 		    return;
+#ifdef EAM_BOXED_TEXT
+	case 'b':	/* Initialize text bounding box */
+		    sscanf(buffer, "Tb%d %d", &x, &y);
+		    bounding_box[0] = bounding_box[2] = X(x);
+		    bounding_box[1] = bounding_box[3] = Y(y) + vchar/3;
+		    boxing = TRUE;
+		    return;
+	case 'B':	/* Draw text bounding box */
+		    bb[0] = bounding_box[0] - box_xmargin;
+		    bb[1] = bounding_box[1] - box_ymargin;
+		    bb[2] = bounding_box[2] + box_xmargin;
+		    bb[3] = bounding_box[3] + box_ymargin;
+		    XDrawLine(dpy, plot->pixmap, *current_gc, bb[0], bb[1], bb[0], bb[3]);
+		    XDrawLine(dpy, plot->pixmap, *current_gc, bb[0], bb[3], bb[2], bb[3]);
+		    XDrawLine(dpy, plot->pixmap, *current_gc, bb[2], bb[3], bb[2], bb[1]);
+		    XDrawLine(dpy, plot->pixmap, *current_gc, bb[2], bb[1], bb[0], bb[1]);
+		    boxing = FALSE;
+		    return;
+	case 'F':	/* Erase inside of text bounding box */
+		    bb[0] = bounding_box[0] - box_xmargin;
+		    bb[1] = bounding_box[1] - box_ymargin;
+		    bb[2] = bounding_box[2] + box_xmargin;
+		    bb[3] = bounding_box[3] + box_ymargin;
+		    /* Load selected pattern or fill into a separate gc */
+		    if (!fill_gc)
+			fill_gc = XCreateGC(dpy,plot->window,0,0);
+		    XCopyGC(dpy, *current_gc, ~0, fill_gc);
+		    XSetFillStyle(dpy, fill_gc, FillSolid);
+		    XSetForeground(dpy, fill_gc, plot->cmap->colors[0]);
+		    XFillRectangle(dpy, plot->pixmap, fill_gc, 
+			bb[0], bb[1], bb[2]-bb[0], bb[3]-bb[1]);
+		    /* boxing = FALSE; */
+		    return;
+	case 'm':	/* Change textbox margins */
+		    sscanf(buffer, "Tm%d %d", &x, &y);
+		    box_xmargin = X11_TEXTBOX_MARGIN * (double)(x) / 100.;
+		    box_ymargin = X11_TEXTBOX_MARGIN * (double)(y) / 100.;
+		    return;
+#endif
 	default:
 		    sscanf(buffer, "T%d %d%n", &x, &y, &char_byte_offset);
 		    /* extra 1 for the space before the string start */
@@ -2332,6 +2395,23 @@ exec_cmd(plot_struct *plot, char *command)
 	    /* horizontal text */
 	    gpXDrawString(dpy, plot->pixmap, *current_gc,
 		    X(x) + sj, Y(y) + v_offset, str, sl);
+#ifdef EAM_BOXED_TEXT
+	    if (boxing) {
+		/* Request bounding box information for this string */
+		int ierr, direction, ascent, descent;
+		unsigned int bb[4];
+		XCharStruct overall;
+		ierr = XTextExtents(font, str, sl, &direction, &ascent, &descent, &overall);
+		bb[0] = X(x) + overall.lbearing + sj;
+		bb[2] = X(x) + overall.rbearing + sj;
+		bb[1] = Y(y) - overall.ascent  + v_offset;
+		bb[3] = Y(y) + overall.descent + v_offset;
+		if (bb[0] < bounding_box[0]) bounding_box[0] = bb[0];
+		if (bb[2] > bounding_box[2]) bounding_box[2] = bb[2];
+		if (bb[1] < bounding_box[1]) bounding_box[1] = bb[1];
+		if (bb[3] > bounding_box[3]) bounding_box[3] = bb[3];
+	    }
+#endif
 
 	    /* Toggle mechanism */
 	    if (x11_in_key_sample) {

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.170 2013/05/14 20:10:56 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.171 2013/05/15 20:52:45 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -78,6 +78,9 @@ static void unset_fit __PROTO((void));
 static void unset_grid __PROTO((void));
 static void unset_hidden3d __PROTO((void));
 static void unset_histogram __PROTO((void));
+#ifdef EAM_BOXED_TEXT
+static void unset_textbox_style __PROTO((void));
+#endif
 static void unset_historysize __PROTO((void));
 static void unset_isosamples __PROTO((void));
 static void unset_key __PROTO((void));
@@ -840,6 +843,15 @@ unset_histogram()
     histogram_opts.gap = 2;
 }
 
+#ifdef EAM_BOXED_TEXT
+static void
+unset_textbox_style()
+{
+    textbox_style foo = DEFAULT_TEXTBOX_STYLE;
+    textbox_opts = foo;
+}
+#endif
+
 /* process 'unset historysize' command */
 static void
 unset_historysize()
@@ -1365,6 +1377,9 @@ unset_style()
 #endif
 	unset_histogram();
 	unset_boxplot();
+#ifdef EAM_BOXED_TEXT
+	unset_textbox_style();
+#endif
 	c_token++;
 	return;
     }
@@ -1413,12 +1428,18 @@ unset_style()
 	c_token++;
 	break;
 #endif
+#ifdef EAM_BOXED_TEXT
+    case SHOW_STYLE_TEXTBOX:
+	unset_textbox_style();
+	c_token++;
+	break;
+#endif
     case SHOW_STYLE_BOXPLOT:
 	unset_boxplot();
 	c_token++;
 	break;
     default:
-	int_error(c_token, "expecting 'data', 'function', 'line', 'fill' or 'arrow'");
+	int_error(c_token, "unrecognized style");
     }
 }
 
@@ -1761,6 +1782,9 @@ reset_command()
     df_unset_datafile_binary();
     unset_fillstyle();
     unset_histogram();
+#ifdef EAM_BOXED_TEXT
+    unset_textbox_style();
+#endif
 
     unset_missing();
     free(df_separators);

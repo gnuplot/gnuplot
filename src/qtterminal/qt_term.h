@@ -86,6 +86,9 @@ void qt_enhanced_flush();
 void qt_enhanced_writec(int c);
 void qt_layer(t_termlayer layer);
 void qt_hypertext(int type, const char *text);
+#ifdef EAM_BOXED_TEXT
+void qt_boxed_text(unsigned int x, unsigned int y, int option);
+#endif
 
 #ifdef __cplusplus
 }

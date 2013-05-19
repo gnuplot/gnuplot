@@ -1,5 +1,5 @@
 /*
- * $Id: gp_cairo.h,v 1.19 2012/05/21 23:15:18 sfeam Exp $
+ * $Id: gp_cairo.h,v 1.20 2013/02/19 05:30:38 sfeam Exp $
  */
 
 /* GNUPLOT - gp_cairo.h */
@@ -239,6 +239,11 @@ const char* gp_cairo_get_encoding(plot_struct *plot);
 
 /* determine default font to use */
 const char * gp_cairo_default_font(void);
+
+#ifdef EAM_BOXED_TEXT
+/* Text boxes */
+void gp_cairo_boxed_text(plot_struct *plot, int x, int y, int option);
+#endif
 
 #ifdef __cplusplus
 }

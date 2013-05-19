@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: cairo.trm,v 1.57 2012/11/29 00:12:57 broeker Exp $
+ * $Id: cairo.trm,v 1.58 2013/02/19 05:30:38 sfeam Exp $
  */
 
 /* GNUPLOT - cairo.trm */
@@ -70,6 +70,9 @@ TERM_PUBLIC void cairotrm_image __PROTO ((unsigned int M, unsigned int N, coordv
 TERM_PUBLIC int cairotrm_make_palette __PROTO ((t_sm_palette *palette));
 TERM_PUBLIC void cairotrm_set_color __PROTO ((t_colorspec *colorspec));
 TERM_PUBLIC void cairotrm_filled_polygon __PROTO ((int n, gpiPoint * corners));
+#ifdef EAM_BOXED_TEXT
+TERM_PUBLIC void cairotrm_boxed_text __PROTO ((unsigned int x, unsigned int y, int option));
+#endif
 #endif /* TERM_PROTO */
 
 #ifndef TERM_PROTO_ONLY
@@ -1235,6 +1238,15 @@ void cairotrm_image(unsigned int M, unsigned int N, coordval * image, gpiPoint *
 	free(image255);
 }
 
+#ifdef EAM_BOXED_TEXT
+void cairotrm_boxed_text(unsigned int x, unsigned int y, int option)
+{
+	if (option != 3)
+	    y = term->ymax - y;
+	gp_cairo_boxed_text(&plot, x, y, option);
+}
+#endif
+
 #endif /* TERM_BODY */
 
 #ifdef TERM_TABLE
@@ -1258,6 +1270,10 @@ TERM_TABLE_START (epscairo_driver)
     , cairotrm_image
     , cairotrm_enhanced_open, cairotrm_enhanced_flush, cairotrm_enhanced_writec
     , 0, 0, 1.0
+    , NULL /* hypertext */
+#ifdef EAM_BOXED_TEXT
+    , cairotrm_boxed_text
+#endif 
 TERM_TABLE_END (epscairo_driver)
 
 #undef LAST_TERM
@@ -1287,6 +1303,10 @@ TERM_TABLE_START(cairolatex_driver)
     0, 0, 0, /* Enhanced text mode not used */
     EPSLATEX_layer, /* Used to signal front/back text */
     0, 1.0
+    , NULL /* hypertext */
+#ifdef EAM_BOXED_TEXT
+    , cairotrm_boxed_text
+#endif 
 TERM_TABLE_END(cairolatex_driver)
 
 #undef LAST_TERM
@@ -1312,6 +1332,10 @@ TERM_TABLE_START (pdfcairo_driver)
     , cairotrm_image
     , cairotrm_enhanced_open, cairotrm_enhanced_flush, cairotrm_enhanced_writec
     , 0, 0, 1.0
+    , NULL /* hypertext */
+#ifdef EAM_BOXED_TEXT
+    , cairotrm_boxed_text
+#endif 
 TERM_TABLE_END (pdfcairo_driver)
 
 #undef LAST_TERM
@@ -1337,6 +1361,10 @@ TERM_TABLE_START (pngcairo_driver)
     , cairotrm_image
     , cairotrm_enhanced_open, cairotrm_enhanced_flush, cairotrm_enhanced_writec
     , 0, 0, 1.0
+    , NULL /* hypertext */
+#ifdef EAM_BOXED_TEXT
+    , cairotrm_boxed_text
+#endif 
 TERM_TABLE_END (pngcairo_driver)
 
 #undef LAST_TERM

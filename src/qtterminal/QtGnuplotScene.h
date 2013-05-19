@@ -44,6 +44,8 @@
 #ifndef QTGNUPLOTSCENE_H
 #define QTGNUPLOTSCENE_H
 
+#define EAM_BOXED_TEXT 1
+
 #include "QtGnuplotEvent.h"
 #include "QtGnuplotItems.h"
 
@@ -103,6 +105,8 @@ private:
 	int     m_currentPlotNumber;
 	bool    m_inKeySample;
 	bool    m_preserve_visibility;
+	bool	m_inTextBox;
+	QRectF	m_currentTextBox;
 	QList<QGraphicsItem*> m_currentGroup;
 
 	// User events data

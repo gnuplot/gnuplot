@@ -64,6 +64,7 @@ QtGnuplotScene::QtGnuplotScene(QtGnuplotEventHandler* eventHandler, QObject* par
 	m_currentPlotNumber = 0;
 	m_inKeySample = false;
 	m_preserve_visibility = false;
+	m_inTextBox = false;
 
 	m_currentGroup.clear();
 
@@ -301,6 +302,10 @@ void QtGnuplotScene::processEvent(QtGnuplotEventType type, QDataStream& in)
 			update_key_box(rect);
 		else
 			m_currentGroup.append(textItem);
+#ifdef EAM_BOXED_TEXT
+		if (m_inTextBox)
+			m_currentTextBox |= rect;
+#endif
 	}
 	else if (type == GEEnhancedFlush)
 	{
@@ -337,6 +342,10 @@ void QtGnuplotScene::processEvent(QtGnuplotEventType type, QDataStream& in)
 			update_key_box(rect);
 		else
 			m_currentGroup.append(m_enhanced);
+#ifdef EAM_BOXED_TEXT
+		if (m_inTextBox)
+			m_currentTextBox |= rect;
+#endif
 		m_enhanced = 0;
 	}
 	else if (type == GEImage)
@@ -441,6 +450,37 @@ void QtGnuplotScene::processEvent(QtGnuplotEventType type, QDataStream& in)
 		m_currentHypertext.clear();
 		in >> m_currentHypertext;
 	}
+#ifdef EAM_BOXED_TEXT
+	else if (type == GETextBox)
+	{
+		QPointF point; in >> point;
+		int option; in >> option;
+		QGraphicsRectItem *rectItem;
+
+		switch (option) {
+		case 0:	/* Initialize bounding box */
+			m_currentTextBox = QRectF(point, point);
+			m_inTextBox = true;
+			break;
+		case 1:	/* Stroke bounding box */
+			rectItem = addRect(m_currentTextBox, m_currentPen, Qt::NoBrush);
+			rectItem->setZValue(m_currentZ++);
+			m_currentGroup.append(rectItem);
+			m_inTextBox = false;
+			break;
+		case 2:	/* Fill bounding box */
+			m_currentBrush.setColor(m_widget->m_backgroundColor);
+			m_currentBrush.setStyle(Qt::SolidPattern);
+			rectItem = addRect(m_currentTextBox, Qt::NoPen, m_currentBrush);
+			rectItem->setZValue(m_currentZ++);
+			m_currentGroup.append(rectItem);
+			m_inTextBox = false;
+			break;
+		case 3:	/* Set margins of bounding box */
+			break;
+		}
+	}
+#endif
 	else if (type == GEDone)
 		m_eventHandler->postTermEvent(GE_plotdone, 0, 0, 0, 0, 0);
 		/// @todo m_id;//qDebug() << "Done !" << items().size();

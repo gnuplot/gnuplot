@@ -1030,3 +1030,10 @@ void qt_hypertext( int type, const char *text )
 	if (type == TERM_HYPERTEXT_TOOLTIP)
 		qt_out << GEHypertext << qt_codec->toUnicode(text);
 }
+
+#ifdef EAM_BOXED_TEXT
+void qt_boxed_text(unsigned int x, unsigned int y, int option)
+{
+	qt_out << GETextBox << qt_termCoordF(x, y) << option;
+}
+#endif
