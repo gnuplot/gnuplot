@@ -1,5 +1,5 @@
 #
-# $Id: contours.dem,v 1.14 2012/11/13 23:59:30 sfeam Exp $
+# $Id: contours.dem,v 1.15 2013/05/15 20:52:44 sfeam Exp $
 #
 set samples 20
 set isosamples 21
@@ -8,6 +8,7 @@ set ylabel "Y axis"
 set zlabel "Z " offset 1, 0
 set view 60, 30, 0.85, 1.1
 set key at screen 1.0, 0.9
+set style textbox opaque noborder margins 0.5, 0.5
 
 set title "contour plot"
 set contour
@@ -34,7 +35,7 @@ set view 60, 30, 1.0, 1.1
 set title "contours on base grid with labels"
 set contour base
 set cntrlabel font ",7"
-splot x**2-y**2 with lines, x**2-y**2 with labels notitle
+splot x**2-y**2 with lines, x**2-y**2 with labels boxed notitle
 pause -1 "Hit return to continue (5)"
 
 set title "contours drawn on surface"
@@ -44,7 +45,7 @@ pause -1 "Hit return to continue (6)"
 
 set title "contours on both base and surface"
 set contour both
-splot x**2-y**2 with lines, x**2-y**2 with labels notitle
+splot x**2-y**2 with lines, x**2-y**2 with labels boxed notitle
 pause -1 "Hit return to continue (7)"
 
 set contour base
@@ -116,7 +117,7 @@ unset surface
 set title "2D contour projection of previous plot"
 set cntrlabel start 2 font ",7"
 splot "glass.dat" using 1 with lines, \
-      "glass.dat" using 1 with labels
+      "glass.dat" using 1 with labels boxed
 pause -1 "Hit return to continue (19)"
 
 #
@@ -175,12 +176,10 @@ set multiplot
 set cntrparam levels discrete 0.1, 1.0, 10.0, 100.0
 set isosamples 500,100
 splot Rosenbrock(x,y) with lines lc rgb "#007700"
-save '1.bug'
 
 set isosamples 50,50
-set cntrlabel start 25 interval -1
-splot Rosenbrock(x,y) with labels font ",7" offset -1,0.5
-save '2.bug'
+set cntrlabel start 25 interval -1 font ",7"
+splot Rosenbrock(x,y) with labels boxed
 
 unset multiplot
 pause -1 "Hit Return to Continue (23)"

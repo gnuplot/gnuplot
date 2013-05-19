@@ -65,12 +65,17 @@ pause -1 "<cr> to show double use of y values"
 set title "Plot actual y-value as a label"
 plot 'table.dat' using 0:2:xtic(1) title columnhead with boxes, \
      ''          using 0:2:2 with labels center offset 0,1 notitle
+pause -1 "<cr> to show use of boxed labels"
 #
-pause -1 "<cr> to view star map"
-#
-# Now show the plot with labels options
-#
-reset
-load "starmap.dem"
+# 
+# Not all terminals support boxed labels
+set key box opaque
+set yrange [20:120]
+set grid x
+set style textbox opaque
+set title "Plot using boxed labels"
+plot 'table.dat' using 0:2:xtic(1) title col with lines lw 3, \
+     ''          using 0:2:2 with labels center boxed notitle
+
 #
 pause -1 "<cr> to end demo"
