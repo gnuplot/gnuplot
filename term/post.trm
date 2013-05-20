@@ -386,7 +386,7 @@ NULL
 	       TBx2 TBxmargin add TBy2 TBymargin add L\n\
 	       TBx2 TBxmargin add TBy1 TBymargin sub L closepath } def\n\
 /DrawTextBox { PopTextBox stroke /Boxing false def} def\n\
-/FillTextBox { gsave PopTextBox BackgroundColor setrgbcolor fill grestore /Boxing false def} def\n\
+/FillTextBox { gsave PopTextBox 1 1 1 setrgbcolor fill grestore /Boxing false def} def\n\
 0 0 0 0 InitTextBox\n\
 /TBxmargin 20 def\n\
 /TBymargin 20 def\n\
