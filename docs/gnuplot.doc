@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.794 2013/05/15 20:52:45 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.795 2013/05/19 23:46:34 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -3861,7 +3861,7 @@ Ffigure_yerrorlines
 ?plotting styles 3d (surface) plots
 =3D
 =surface
-Ffigure_surface
+Ffigure_surface+contours
  Surface plots are generated using the `splot` command rather than the `plot`
  command. The style `with lines` draws a surface made from a grid of lines.
  Solid surfaces can be drawn using the style `with pm3d`.
@@ -3870,17 +3870,17 @@ Ffigure_surface
  axes are all visible in the plot. The illusion of 3D is enhanced by choosing
  hidden line removal or depth-sorted surface elements.
  See `hidden3d` and the `depthorder` option of `set pm3d`.
-Ffigure_surface+contours
  The `splot` command can also calculate and draw contour lines corresponding
  to constant Z values. These contour lines may be drawn onto the surface
  itself, or projected onto the XY plane. See `set contour`.
+Ffigure_mapcontours
 3 2D projection (set view map)
 ?2D projection (set view map)
 ?projection
-Ffigure_mapcontours
  An important special case of the `splot` command is to map the Z coordinate
  onto a 2D surface by projecting the plot along the Z axis.  See `set view map`.
- This plot mode can be used to generate contour plots and heat maps.
+ This plot mode can be used to generate contour plots and heat maps. This figure
+ shows contours plotted once with plot style `lines`, once with style `labels`.
 
 1 Commands
 ?commands
