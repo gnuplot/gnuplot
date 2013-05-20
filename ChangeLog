@@ -1,3 +1,8 @@
+2013-05-20  Shigeharu Takeno  <shige@iee.niit.ac.jp>
+
+	* term/emf.trm:  It doesn't work to call EMF_setfont() before we
+	enter graphics state.  Bugfix.
+
 2013-05-10  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/datafile.c:  Valgrind found a case where df_column[foo].position

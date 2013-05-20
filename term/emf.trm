@@ -758,7 +758,9 @@ EMF_options()
 	/* We have old-style bare font size specified */
 	emf_defaultfontsize = int_expression();
     }
+#if (0)	/* Shige May 2013 - Does not function properly until we enter graphics mode */
     EMF_set_font(NULL);		/* set default font */
+#endif
     
     sprintf(term_options, "%s %s %s font \"%s,%g\"",
 	    emf_monochrome ? "monochrome" : "color",
