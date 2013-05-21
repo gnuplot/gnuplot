@@ -288,7 +288,6 @@ void QtGnuplotScene::processEvent(QtGnuplotEventType type, QDataStream& in)
 		positionText(textItem, point);
 
 		QRectF rect = textItem->boundingRect();
-		qreal fullheight = rect.height();
 		if (m_textAlignment == Qt::AlignCenter) {
 			rect.moveCenter(point);
 			rect.moveBottom(point.y());
@@ -296,7 +295,7 @@ void QtGnuplotScene::processEvent(QtGnuplotEventType type, QDataStream& in)
 			rect.moveBottomRight(point);
 		else
 			rect.moveBottomLeft(point);
-		rect.adjust(0, fullheight/1.8, 0, fullheight/4);
+		rect.adjust(0, rect.height()*0.67, 0, rect.height()*0.25);
 
 		if (m_inKeySample)
 			update_key_box(rect);
@@ -336,7 +335,8 @@ void QtGnuplotScene::processEvent(QtGnuplotEventType type, QDataStream& in)
 			rect.moveBottomRight(point);
 		else
 			rect.moveBottomLeft(point);
-		rect.adjust(0, rect.height()/2, 0, rect.height()/2);
+		rect.adjust(-m_currentPen.width()*2, rect.height()/2, 
+			    m_currentPen.width()*2, rect.height()/2);
 
 		if (m_inKeySample)
 			update_key_box(rect);
