@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: cairo.trm,v 1.58 2013/02/19 05:30:38 sfeam Exp $
+ * $Id: cairo.trm,v 1.59 2013/05/19 23:46:34 sfeam Exp $
  */
 
 /* GNUPLOT - cairo.trm */
@@ -1241,7 +1241,7 @@ void cairotrm_image(unsigned int M, unsigned int N, coordval * image, gpiPoint *
 #ifdef EAM_BOXED_TEXT
 void cairotrm_boxed_text(unsigned int x, unsigned int y, int option)
 {
-	if (option != 3)
+	if (option == TEXTBOX_INIT)
 	    y = term->ymax - y;
 	gp_cairo_boxed_text(&plot, x, y, option);
 }

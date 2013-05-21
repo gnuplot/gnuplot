@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: svg.trm,v 1.154 2013/05/20 20:04:49 sfeam Exp $
+ * $Id: svg.trm,v 1.155 2013/05/21 03:49:29 sfeam Exp $
  */
 
 /*------------------------------------------------------------------------------------------------------------------------------------
@@ -2068,14 +2068,18 @@ TERM_PUBLIC void
 SVG_boxed_text(unsigned int x, unsigned int y, int option)
 {
     switch (option) {
-    case 0:	/* Mark group containing next text item */
+    case TEXTBOX_INIT:
+	/* Mark group containing next text item */
 	SVG_inTextBox = TRUE;
 	break;
-    case 1:	/* Stroke the outline of the bounding box (FIXME: how???) */
-    case 2:	/* Close the group, which will trigger application of the filter */
+    case TEXTBOX_OUTLINE:
+	/* Stroke the outline of the bounding box (FIXME: how???) */
+    case TEXTBOX_BACKGROUNDFILL:
+	/* Close the group, which will trigger application of the filter */
 	SVG_inTextBox = FALSE;
 	break;
-    case 3:	/* Adjust the size of the bounding box */
+    case TEXTBOX_MARGINS:
+	/* Adjust the size of the bounding box */
 	break;
     }
 }

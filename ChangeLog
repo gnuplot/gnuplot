@@ -5,6 +5,11 @@
 	Tweak the bounding box used for regular text in Qt to agree better with
 	the bounding box used for enhanced text.
 
+	* src/gadgets.c src/qtterminal/QtGnuplotScene.cpp src/term_api.h
+	src/wxterminal/gp_cairo.c term/README term/cairo.trm term/gd.trm
+	term/post.trm term/svg.trm term/x11.trm:  Define an enum TEXTBOX_* for
+	the options parameter to term->boxed_text().
+
 2013-05-20  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* term/emf.trm:  It doesn't work to call EMF_setfont() before we

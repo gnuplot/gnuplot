@@ -710,7 +710,7 @@ write_label(unsigned int x, unsigned int y, struct text_label *this_label)
 #ifdef EAM_BOXED_TEXT
 	    /* Initialize the bounding box accounting */
 	    if (this_label->boxed && term->boxed_text)
-		(*term->boxed_text)(x + htic, y + vtic, 0);
+		(*term->boxed_text)(x + htic, y + vtic, TEXTBOX_INIT);
 #endif
 	    if (this_label->rotate && (*term->text_angle) (this_label->rotate)) {
 		write_multiline(x + htic, y + vtic, this_label->text,
@@ -726,11 +726,11 @@ write_label(unsigned int x, unsigned int y, struct text_label *this_label)
 	/* Adjust the bounding box margins */
 	if (this_label->boxed && term->boxed_text)
 	    (*term->boxed_text)((int)(textbox_opts.xmargin * 100.),
-		(int)(textbox_opts.ymargin * 100.), 3);
+		(int)(textbox_opts.ymargin * 100.), TEXTBOX_MARGINS);
 
 	if (this_label->boxed && term->boxed_text && textbox_opts.opaque) {
 	    /* Blank out the box and reprint the label */
-	    (*term->boxed_text)(0,0, 2);
+	    (*term->boxed_text)(0,0, TEXTBOX_BACKGROUNDFILL);
 	    if (this_label->rotate && (*term->text_angle) (this_label->rotate)) {
 		write_multiline(x + htic, y + vtic, this_label->text,
 			    this_label->pos, justify, this_label->rotate,
@@ -744,7 +744,7 @@ write_label(unsigned int x, unsigned int y, struct text_label *this_label)
 
 	/* Draw the bounding box - FIXME should set line properties first */
 	if (this_label->boxed && !textbox_opts.noborder && term->boxed_text)
-	    (*term->boxed_text)(0,0, 1);
+	    (*term->boxed_text)(0,0, TEXTBOX_OUTLINE);
 #endif
 
 	/* The associated point, if any */

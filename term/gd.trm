@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: gd.trm,v 1.170 2012/11/25 22:01:22 sfeam Exp $
+ * $Id: gd.trm,v 1.171 2013/05/19 23:46:34 sfeam Exp $
  * based on gif.trm,v 1.26.2.1 2000/05/01 00:17:20 joze
  */
 
@@ -2148,12 +2148,12 @@ TERM_PUBLIC void
 ENHGD_boxed_text(unsigned int x, unsigned int y, int option)
 {
     switch (option) {
-    case 0:
+    case TEXTBOX_INIT:
 	/* Initialize bounding box for this text string */
 	bounding_box[0] = bounding_box[2] = x;
 	bounding_box[1] = bounding_box[3] = Y(y);
 	break;
-    case 1:
+    case TEXTBOX_OUTLINE:
 	/* Stroke the outline of the bounding box for previous text */
 	gdImageLine(png_state.image,
 		bounding_box[0]-bounding_xmargin, bounding_box[1]-bounding_ymargin,
@@ -2172,7 +2172,7 @@ ENHGD_boxed_text(unsigned int x, unsigned int y, int option)
 		bounding_box[0]-bounding_xmargin, bounding_box[1]-bounding_ymargin,
 		png_state.color);
 	break;
-    case 2:
+    case TEXTBOX_BACKGROUNDFILL:
 	/* Fill the box with background color. FIXME - other colors? */
 	gdImageFilledRectangle(png_state.image,
 		bounding_box[0] - bounding_xmargin,
@@ -2181,7 +2181,7 @@ ENHGD_boxed_text(unsigned int x, unsigned int y, int option)
 		bounding_box[3] + bounding_ymargin,
 		png_state.color_table[0]);
 	break;
-    case 3:
+    case TEXTBOX_MARGINS:
 	/* Change the text margins */
 	bounding_xmargin = GD_TEXTBOX_MARGIN * (double)x / 100.;
 	bounding_ymargin = GD_TEXTBOX_MARGIN * (double)y / 100.;

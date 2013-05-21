@@ -1,5 +1,5 @@
 /*
- * $Id: term_api.h,v 1.108 2013/03/29 19:49:39 sfeam Exp $
+ * $Id: term_api.h,v 1.109 2013/05/19 23:46:34 sfeam Exp $
  */
 
 /* GNUPLOT - term_api.h */
@@ -155,6 +155,16 @@ typedef struct fill_style_type {
     int fillpattern;
     t_colorspec border_color;
 } fill_style_type;
+
+#ifdef EAM_BOXED_TEXT
+/* Options used by the terminal entry point term->boxed_text() */
+typedef enum t_textbox_options {
+	TEXTBOX_INIT = 0,
+	TEXTBOX_OUTLINE,
+	TEXTBOX_BACKGROUNDFILL,
+	TEXTBOX_MARGINS
+} t_textbox_options;
+#endif
 
 typedef enum t_fillstyle { FS_EMPTY, FS_SOLID, FS_PATTERN, FS_DEFAULT, 
 			   FS_TRANSPARENT_SOLID, FS_TRANSPARENT_PATTERN }

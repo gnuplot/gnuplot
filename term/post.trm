@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: post.trm,v 1.274 2013/04/02 22:40:03 sfeam Exp $
+ * $Id: post.trm,v 1.276 2013/05/20 00:08:15 sfeam Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -2759,19 +2759,19 @@ TERM_PUBLIC void
 ENHPS_boxed_text __PROTO((unsigned int x, unsigned int y, int option))
 {
     switch (option) {
-    case 0:
+    case TEXTBOX_INIT:
 	/* Initialize bounding box for the text string */
 	fprintf(gppsfile,"%d %d %d %d InitTextBox\n",x,y,x,y);
 	break;
-    case 1:
+    case TEXTBOX_OUTLINE:
 	/* Stroke the outline of the accumulated bounding box */
 	fputs("DrawTextBox\n", gppsfile);
 	break;
-    case 2:
+    case TEXTBOX_BACKGROUNDFILL:
 	/* Fill bounding box with background color */
 	fputs("FillTextBox\n", gppsfile);
 	break;
-    case 3:
+    case TEXTBOX_MARGINS:
 	/* Change text margins */
 	fprintf(gppsfile,"/TBxmargin %d def\n", (int)(20*x/100));
 	fprintf(gppsfile,"/TBymargin %d def\n", (int)(20*y/100));

@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: x11.trm,v 1.208 2013/05/05 21:57:47 sfeam Exp $
+ * $Id: x11.trm,v 1.209 2013/05/19 23:46:34 sfeam Exp $
  *
  */
 
@@ -1884,19 +1884,19 @@ TERM_PUBLIC void
 ENHX11_boxed_text(unsigned int x, unsigned int y, int option)
 {
     switch(option) {
-    case 0:
+    case TEXTBOX_INIT:
 	/* Tell gnuplot_x11 to initialize the text bounding box */
 	PRINT2("Tb%d %d\n", x, y);
 	break;
-    case 1:
+    case TEXTBOX_OUTLINE:
 	/* Tell gnuplot_x11 to draw the text bounding box */
 	PRINT0("TB\n");
 	break;
-    case 2:
+    case TEXTBOX_BACKGROUNDFILL:
 	/* Tell gnuplot_x11 to fill the text bounding box */
 	PRINT0("TF\n");
 	break;
-    case 3:
+    case TEXTBOX_MARGINS:
 	/* Tell gnuplot_x11 to change text margins */
 	PRINT2("Tm%d %d\n", x, y);
 	break;

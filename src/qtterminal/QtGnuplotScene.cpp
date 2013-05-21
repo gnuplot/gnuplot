@@ -457,18 +457,29 @@ void QtGnuplotScene::processEvent(QtGnuplotEventType type, QDataStream& in)
 		int option; in >> option;
 		QGraphicsRectItem *rectItem;
 
+		/* Must match the definition in ../term_api.h */
+		typedef enum t_textbox_options {
+		       TEXTBOX_INIT = 0,
+		       TEXTBOX_OUTLINE,
+		       TEXTBOX_BACKGROUNDFILL,
+		       TEXTBOX_MARGINS
+		} t_textbox_options;
+
 		switch (option) {
-		case 0:	/* Initialize bounding box */
+		case TEXTBOX_INIT:
+			/* Initialize bounding box */
 			m_currentTextBox = QRectF(point, point);
 			m_inTextBox = true;
 			break;
-		case 1:	/* Stroke bounding box */
+		case TEXTBOX_OUTLINE:
+			/* Stroke bounding box */
 			rectItem = addRect(m_currentTextBox, m_currentPen, Qt::NoBrush);
 			rectItem->setZValue(m_currentZ++);
 			m_currentGroup.append(rectItem);
 			m_inTextBox = false;
 			break;
-		case 2:	/* Fill bounding box */
+		case TEXTBOX_BACKGROUNDFILL:
+			/* Fill bounding box */
 			m_currentBrush.setColor(m_widget->m_backgroundColor);
 			m_currentBrush.setStyle(Qt::SolidPattern);
 			rectItem = addRect(m_currentTextBox, Qt::NoPen, m_currentBrush);
@@ -476,7 +487,8 @@ void QtGnuplotScene::processEvent(QtGnuplotEventType type, QDataStream& in)
 			m_currentGroup.append(rectItem);
 			m_inTextBox = false;
 			break;
-		case 3:	/* Set margins of bounding box */
+		case TEXTBOX_MARGINS:
+			/* Set margins of bounding box */
 			break;
 		}
 	}

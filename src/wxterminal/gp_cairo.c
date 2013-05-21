@@ -1,5 +1,5 @@
 /*
- * $Id: gp_cairo.c,v 1.72 2013/05/19 23:46:34 sfeam Exp $
+ * $Id: gp_cairo.c,v 1.73 2013/05/21 18:47:20 sfeam Exp $
  */
 
 /* GNUPLOT - gp_cairo.c */
@@ -1628,13 +1628,16 @@ void gp_cairo_boxed_text(plot_struct *plot, int x, int y, int option)
 	int dx, dy;
 
 	switch (option) {
-	case 0: /* Initialize bounding box for this text string */
+	case TEXTBOX_INIT:
+		/* Initialize bounding box for this text string */
 		bounding_box[0] = bounding_box[2] = x;
 		bounding_box[1] = bounding_box[3] = y;
 		break;
 
-	case 1: /* Stroke the outline of the bounding box for previous text */
-	case 2: /* Fill the bounding box with background color */
+	case TEXTBOX_OUTLINE:
+		/* Stroke the outline of the bounding box for previous text */
+	case TEXTBOX_BACKGROUNDFILL:
+		/* Fill the bounding box with background color */
 		/* begin by stroking any open path */
 		gp_cairo_stroke(plot);
 		gp_cairo_end_polygon(plot);
@@ -1648,7 +1651,7 @@ void gp_cairo_boxed_text(plot_struct *plot, int x, int y, int option)
 		gp_cairo_vector(plot, bounding_box[2]+dx, bounding_box[1]-dy); 
 		gp_cairo_vector(plot, bounding_box[0]+dx, bounding_box[1]-dy); 
 		cairo_close_path(plot->cr);
-		if (option == 2) {
+		if (option == TEXTBOX_BACKGROUNDFILL) {
 		    rgb_color *background = &gp_cairo_colorlist[0];
 		    cairo_set_source_rgb(plot->cr, background->r, background->g, background->b);
 		    cairo_fill(plot->cr);
