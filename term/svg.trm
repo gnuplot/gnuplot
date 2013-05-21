@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: svg.trm,v 1.153 2013/04/09 20:58:26 sfeam Exp $
+ * $Id: svg.trm,v 1.154 2013/05/20 20:04:49 sfeam Exp $
  */
 
 /*------------------------------------------------------------------------------------------------------------------------------------
@@ -1453,7 +1453,7 @@ SVG_put_text (unsigned int x, unsigned int y, const char *str)
     if (SVG_inTextBox)
 	fprintf(gpoutfile, " style='filter:url(#textbox)'");
 #endif
-    fprintf(gpoutfile, ">\n", alignment);
+    fprintf(gpoutfile, ">\n");
 
 /* output text (unless the enhanced_text processing is in action) */
 
