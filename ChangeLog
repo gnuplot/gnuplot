@@ -1,3 +1,10 @@
+2013-05-21  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/README src/wxterminal/gp_cairo.c src/qtterminal/QtGnuplotScene.cpp
+	Clarify comments about use of term->boxed_text().
+	Tweak the bounding box used for regular text in Qt to agree better with
+	the bounding box used for enhanced text.
+
 2013-05-20  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* term/emf.trm:  It doesn't work to call EMF_setfont() before we

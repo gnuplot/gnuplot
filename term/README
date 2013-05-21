@@ -436,15 +436,16 @@ There is a single entry point associated with support for boxed text.
 This option is independent of enhanced text mode.  
 
 _boxed_text() - Called first with option==0 to initiate a new text box;
-subsequent calls to put_text() accumulate bounding-box limits for this box;
+subsequent calls to put_text() and/or internal enhanced text routines
+including enhanced_flush() accumulate bounding-box limits for this box;
 then boxed_text() is called again with option>0 to actually draw
 the text box.
   option 0:	initialize a new text box
   option 1:	stroke the bounding box of the text box
   option 2:	fill the text box with background color
   option 3:	adjust size of whitespace around text to x,y percent of default
-It is the responsibility of the normal term->put_text routine to update
-the text box if one is active.
+It is the responsibility of the term->put_text and term->enhanced_XXX routines
+to update the text box if one is active.
 
 _layer(t_termlayer syncpoint)
    Driver-specific synchronization or other layering commands.

@@ -1,5 +1,5 @@
 /*
- * $Id: gp_cairo.c,v 1.71 2013/05/17 21:04:39 sfeam Exp $
+ * $Id: gp_cairo.c,v 1.72 2013/05/19 23:46:34 sfeam Exp $
  */
 
 /* GNUPLOT - gp_cairo.c */
@@ -1546,7 +1546,7 @@ void gp_cairo_enhanced_finish(plot_struct *plot, int x, int y)
 	cairo_new_path(plot->cr);
 
 #ifdef EAM_BOXED_TEXT
-	/* Bookkeeping for boxed text (Not working yet) */
+	/* Update bounding box for boxed label text */
 	pango_layout_get_pixel_extents (layout, &ink_rect, &logical_rect);
 
 	/* Would it look better to use logical bounds rather than ink_rect? */
