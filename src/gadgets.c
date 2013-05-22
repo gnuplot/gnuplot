@@ -255,12 +255,12 @@ draw_clip_polygon(int points, gpiPoint *p)
 {
     int i;
     int x1, y1, x2, y2;
-    int pos1, pos2;
+    int pos1, pos2, clip_ret;
     struct termentry *t = term;
 
     if (points <= 1) 
 	return;
-    
+
     x1 = p[0].x;
     y1 = p[0].y;
     pos1 = clip_point(x1, y1);
@@ -272,17 +272,13 @@ draw_clip_polygon(int points, gpiPoint *p)
 	x2 = p[i].x;
 	y2 = p[i].y;
 	pos2 = clip_point(x2, y2);
+	clip_ret = clip_line(&x1, &y1, &x2, &y2);
 
-	if ((pos1 && !pos2) || (!pos1 && pos2)) {
-	    /* one vertex inside, one is outside */
-	    clip_line(&x1, &y1, &x2, &y2);
-	    if (pos1) {
-		/* moved from outside to inside */
+	if (clip_ret) {
+	    /* there is a line to draw */
+	    if (pos1) { /* first vertex was recalculated, move to new start point */
 		(*t->move)(x1, y1);
 	    }
-	} 
-	if (!(pos1 && pos2)) {
-	    /* at least one is inside, draw to next one */
 	    (*t->vector)(x2, y2);
 	}
 
@@ -331,9 +327,7 @@ clip_line(int *x1, int *y1, int *x2, int *y2)
      * of this segment with the 4 boundaries for hopefully 2 intersections
      * in. If none are found segment is totaly out.
      * Under rare circumstances there may be up to 4 intersections (e.g.
-     * when the line passes directly through at least one corner). In
-     * this case it is sufficient to take any 2 intersections (e.g. the
-     * first two found).
+     * when the line passes directly through at least one corner).
      */
     count = 0;
     dx = *x2 - *x1;
@@ -366,6 +360,12 @@ clip_line(int *x1, int *y1, int *x2, int *y2)
     }
     if (count < 2)
 	return 0;
+
+    /* check which intersections to use, for more than two intersections the first two may be identical */
+    if ((count > 2) && (x_intr[0] == x_intr[1]) && (y_intr[0] == y_intr[1])) {
+	x_intr[1] = x_intr[2];
+	y_intr[1] = y_intr[2];
+    }	
 
     if (*x1 < *x2) {
 	x_min = *x1;

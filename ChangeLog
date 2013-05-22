@@ -1,3 +1,9 @@
+2013-05-22  Christoph Bersch <usenet@bersch.net>
+
+	* src/gadgets.c(draw_clip_polygon) src/term.c(do_arc):
+	Fix polygon clipping code when intersections are degenerate.
+	Bugs #1237 #1242
+
 2013-05-22  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/datafile.c src/stdfn.c (gp_strtod):
