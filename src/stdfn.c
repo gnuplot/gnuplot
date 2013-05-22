@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: stdfn.c,v 1.24 2011/09/04 11:08:33 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: stdfn.c,v 1.25 2011/09/21 11:43:49 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - stdfn.c */
@@ -329,23 +329,6 @@ gp_strcspn(const char *str1, const char *str2)
     return (pos);
 }
 #endif /* !HAVE_STRCSPN */
-
-double
-gp_strtod(const char *str, char **endptr)
-{
-#if (0)  /* replace with test for platforms with broken strtod() */
-    int used;
-    double d;
-    int n = sscanf(str, "%lf%n", &d, &used);
-    if (n < 1)
-	*endptr = (char *)str;
-    else
-	*endptr = (char *)(str + used);
-    return d;
-#else
-    return strtod(str,endptr);
-#endif
-}
 
 /* Implement portable generation of a NaN value. */
 /* NB: Supposedly DJGPP V2.04 can use atof("NaN"), but... */

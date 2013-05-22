@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.253 2013/05/09 05:35:10 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.254 2013/05/18 18:43:14 juhaszp Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -749,14 +749,12 @@ df_tokenise(char *s)
 		 *  - atof() does not return a count or new position
 		 */
 		 char *next;
-		 df_column[df_no_cols].datum = gp_strtod(s, &next);
+		 df_column[df_no_cols].datum = strtod(s, &next);
 		 used = next - s;
 		 count = (used) ? 1 : 0;
 
 	    } else {
 		/* skip any space at start of column */
-		/* HBB tells me that the cast must be to
-		 * unsigned char instead of int. */
 		while (isspace((unsigned char) *s) && NOTSEP)
 		    ++s;
 		count = (*s && NOTSEP) ? 1 : 0;
@@ -788,7 +786,7 @@ df_tokenise(char *s)
 		/* might be fortran double */
 		s[used] = 'e';
 		/* and try again */
-		df_column[df_no_cols].datum = gp_strtod(s, &endptr);
+		df_column[df_no_cols].datum = strtod(s, &endptr);
 		count = (endptr == s) ? 0 : 1;
 		s[used] = save_char;
 	    }
@@ -834,7 +832,7 @@ df_tokenise(char *s)
 	    while ((*s != '\0') && (*s != '\n') && !isspace((unsigned char) *s))
 		++s;
 	    /* skip whitespace to start of next column */
-	    while (*s == ' ' || *s == '\t')
+	    while (isspace((unsigned char) *s) && *s != '\n')
 		++s;
 	}
 
