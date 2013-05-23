@@ -1,3 +1,9 @@
+2013-05-23  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/plot2d.c (get_data): Treating timedata columns as strings allows
+	functions column(N) and column("HEADER") to work on time data.
+	Bug #1161
+
 2013-05-22  Christoph Bersch <usenet@bersch.net>
 
 	* src/gadgets.c(draw_clip_polygon) src/term.c(do_arc):

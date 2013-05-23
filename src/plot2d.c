@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.296 2013/04/09 20:58:53 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.297 2013/04/21 06:26:11 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -547,6 +547,13 @@ get_data(struct curve_points *current_plot)
 	current_plot->z_axis = FIRST_Z_AXIS;
 	df_axis[2] = FIRST_Z_AXIS;
     }
+
+    /* EXPERIMENTAL May 2013 - Treating timedata columns as strings allows */
+    /* functions column(N) and column("HEADER") to work on time data.	   */
+    if (axis_array[current_plot->x_axis].datatype == DT_TIMEDATE)
+	expect_string(1);
+    if (axis_array[current_plot->y_axis].datatype == DT_TIMEDATE)
+	expect_string(2);
 
     if (df_no_use_specs > max_cols)
 	int_error(NO_CARET, "Too many using specs for this style");
