@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: fit.c,v 1.110 2013/05/14 20:13:31 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: fit.c,v 1.111 2013/05/14 20:19:09 markisch Exp $"); }
 #endif
 
 /*  NOTICE: Change of Copyright Status
@@ -246,7 +246,6 @@ static double createdvar __PROTO((char *varname, double value));
 static void setvar __PROTO((char *varname, double value));
 static void setvarerr __PROTO((char *varname, double value));
 static char *get_next_word __PROTO((char **s, char *subst));
-static void splitpath __PROTO((char *s, char *p, char *f));
 static void backup_file __PROTO((char *, const char *));
 
 
@@ -1208,24 +1207,6 @@ createdvar(char *varname, double value)
 }
 
 
-/*****************************************************************
-    Split Identifier into path and filename
-*****************************************************************/
-static void
-splitpath(char *s, char *p, char *f)
-{
-    char *tmp = s + strlen(s) - 1;
-
-    while (tmp >= s && *tmp != '\\' && *tmp != '/' && *tmp != ':')
-	tmp--;
-    /* FIXME HBB 20010121: unsafe! Sizes of 'f' and 'p' are not known.
-     * May write past buffer end. */
-    strcpy(f, tmp + 1);
-    memcpy(p, s, (size_t) (tmp - s + 1));
-    p[tmp - s + 1] = NUL;
-}
-
-
 /* argument: char *fn */
 #define VALID_FILENAME(fn) ((fn) != NULL && (*fn) != '\0')
 
@@ -1235,18 +1216,15 @@ splitpath(char *s, char *p, char *f)
 void
 update(char *pfile, char *npfile)
 {
-    char fnam[256], path[256], sstr[256], pname[64], tail[127], *s = sstr, *tmp, c;
-    char ifilename[256], *ofilename;
-    FILE *of, *nf;
-    double pval;
+    char ifilename[PATH_MAX];
+    char *ofilename;
     TBOOLEAN createfile = FALSE;
 
-    /* update pfile npfile:
-       if npfile is a valid file name,
-       take pfile as input file and
-       npfile as output file
-     */
     if (existfile(pfile)) {
+	/* update pfile npfile:
+	   if npfile is a valid file name, take pfile as input file and 
+	   npfile as output file
+	*/
 	if (VALID_FILENAME(npfile)) {
 	    safe_strncpy(ifilename, pfile, sizeof(ifilename));
 	    ofilename = npfile;
@@ -1268,18 +1246,16 @@ update(char *pfile, char *npfile)
 	    ofilename = pfile;
     }
 
-    /* split into path and filename */
-    splitpath(ifilename, path, fnam);
-
     if (createfile) {
 	/* The input file does not exists and--strictly speaking--there is
-	   nothing to 'update'. Instead of bailing out we guess the intended use:
+	   nothing to 'update'.  Instead of bailing out we guess the intended use:
 	   We output all INTGR/CMPLX user variables and mark them as '# FIXED' if
 	   they were not used during the last fit command. */
 	struct udvt_entry *udv = first_udv;
+	FILE *nf;
 
 	if ((last_fit_command == NULL) || (strlen(last_fit_command) == 0)) {
-	    /* Technically, a prior fit command isn't really required. But since
+	    /* Technically, a prior fit command isn't really required.  But since
 	    all variables in the parameter file would be marked '# FIXED' in that
 	    case, it cannot be directly used in a subsequent fit command. */
 #if 1
@@ -1344,6 +1320,10 @@ update(char *pfile, char *npfile)
 
 	/* input file exists - this is the originally intended case of
 	   the update command: update an existing parameter file */
+	char sstr[256];
+	char *s = sstr;
+	char * fnam;
+	FILE *of, *nf;
 
 	if (!(of = loadpath_fopen(ifilename, "r")))
 	    Eex2("parameter file %s could not be read", ifilename);
@@ -1351,7 +1331,16 @@ update(char *pfile, char *npfile)
 	if (!(nf = fopen(ofilename, "w")))
 	    Eex2("new parameter file %s could not be created", ofilename);
 
+	fnam = gp_basename(ifilename); /* strip off the path */
+	if (fnam == NULL)
+	    fnam = ifilename;
+
 	while (fgets(s = sstr, sizeof(sstr), of) != NULL) {
+	    char pname[64]; /* name of parameter */
+	    double pval;    /* parameter value */
+	    char tail[127]; /* trailing characters */
+	    char * tmp;
+	    char c;
 
 	    if (is_empty(s)) {
 		fputs(s, nf);	/* preserve comments */
