@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: fit.c,v 1.111 2013/05/14 20:19:09 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: fit.c,v 1.112 2013/05/23 17:32:00 markisch Exp $"); }
 #endif
 
 /*  NOTICE: Change of Copyright Status
@@ -1041,7 +1041,7 @@ show_fit1(int iter, double chisq, double last_chisq, double* parms, double lambd
     if (iter == 0 || iter == -2) {
 	strcpy(buf, "iter      chisq       delta/lim  lambda  ");
 	          /* 9999 1.1234567890e+00 -1.12e+00 1.00e+00 */
-	fprintf(device, buf);
+	fputs(buf, device);
 	len = strlen(buf);
 	for (k = 0; k < num_params; k++) {
 	    snprintf(buf, sizeof(buf), " %-13.13s", par_name[k]);
@@ -1050,9 +1050,9 @@ show_fit1(int iter, double chisq, double last_chisq, double* parms, double lambd
 		fprintf(device, "\n%*c", indent, ' ');
 		len = indent;
 	    }
-	    fprintf(device, buf);
+	    fputs(buf, device);
 	}
-	fprintf(device, "\n");
+	fputs("\n", device);
     }
 
     /* on iteration -2, don't print anything else */
@@ -1073,7 +1073,7 @@ show_fit1(int iter, double chisq, double last_chisq, double* parms, double lambd
 	pack_float(p);
 	p = strchr(p, 'e');
     }
-    fprintf(device, "%s", buf);
+    fputs(buf, device);
     len = strlen(buf);
     for (k = 0; k < num_params; k++) {
 	snprintf(buf, sizeof(buf), " % 14.6e", parms[k] * scale_params[k]);
@@ -1083,9 +1083,9 @@ show_fit1(int iter, double chisq, double last_chisq, double* parms, double lambd
 	    fprintf(device, "\n%*c", indent, ' ');
 	    len = indent;
 	}
-	fprintf(device, "%s", buf);
+	fputs(buf, device);
     }
-    fprintf(device, "\n");
+    fputs("\n", device);
 }
 
 

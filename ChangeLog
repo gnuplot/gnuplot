@@ -1,3 +1,12 @@
+2013-05-23  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/fit.c (update):  Replace splitpath() by a call to gp_basename().
+	Avoid potentially invalid access dicovered by Ethan with the help of
+	valgrind.
+
+	* src/fit.c (show_fit1):  Use fputs instead of fprintf when no formatting
+	is done.
+
 2013-05-23  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/plot2d.c (get_data): Treating timedata columns as strings allows
