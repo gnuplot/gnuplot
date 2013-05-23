@@ -1,3 +1,9 @@
+2013-05-23  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/plot2d.c (get_data): Treating timedata columns as strings allows
+	functions column(N) and column("HEADER") to work on time data.
+	Bug #1161
+
 2013-05-20  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* term/emf.trm:  It doesn't work to call EMF_setfont() before we

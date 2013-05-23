@@ -2,6 +2,7 @@ New features, changes and fixes since gnuplot version 4.6.3
 ===========================================================
 
 * FIX svg and canvas terminal mousing of inverted axis coordinates
+* FIX timedata columns can now be referred to via column(N) and column("HEAD")
 
 New features, changes and fixes in gnuplot version 4.6.3
 ========================================================
