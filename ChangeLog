@@ -4,6 +4,10 @@
 	functions column(N) and column("HEADER") to work on time data.
 	Bug #1161
 
+	* src/qtterminal/QtGnuplotScene.cpp: Enhanced text elements were not 
+	being added to the current display group, so they were ignored by the
+	plot toggling operation.  Now they are handled like any other text.
+
 2013-05-20  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* term/emf.trm:  It doesn't work to call EMF_setfont() before we

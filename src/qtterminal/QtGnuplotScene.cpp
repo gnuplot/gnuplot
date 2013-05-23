@@ -282,7 +282,7 @@ void QtGnuplotScene::processEvent(QtGnuplotEventType type, QDataStream& in)
 			rect.adjust(0, fullheight/1.8, 0, fullheight/4);
 			update_key_box(rect);
 		} else {
-			m_currentGroup.append(textItem);
+			m_currentGroup.append(m_enhanced);
 		}
 	}
 	else if (type == GEEnhancedFlush)
@@ -302,8 +302,21 @@ void QtGnuplotScene::processEvent(QtGnuplotEventType type, QDataStream& in)
 	else if (type == GEEnhancedFinish)
 	{
 		QPoint point; in >> point;
-		addItem(m_enhanced);
 		positionText(m_enhanced, point);
+		m_enhanced->setZValue(m_currentZ++);
+		addItem(m_enhanced);
+		if (m_inKeySample) {
+			QRectF rect = m_enhanced->boundingRect();
+			qreal fullheight = rect.height();
+			if (m_textAlignment == Qt::AlignRight)
+				rect.moveBottomRight(point);
+			else
+				rect.moveBottomLeft(point);
+			rect.adjust(0, fullheight/1.8, 0, fullheight/4);
+			update_key_box(rect);
+		} else {
+			m_currentGroup.append(m_enhanced);
+		}
 		m_enhanced = 0;
 	}
 	else if (type == GEImage)
@@ -471,7 +484,7 @@ void QtGnuplotScene::setBrushStyle(int style)
 		/// @todo color & transparent. See other terms
 		m_currentBrush.setStyle(QtGnuplot::brushes[abs(fillpar) % 8]);
 	else if (fillstyle == FS_EMPTY) // fill with background plot->color
-		color = Qt::white;
+		color = m_widget->m_backgroundColor;
 
 	m_currentBrush.setColor(color);
 }

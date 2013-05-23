@@ -1,8 +1,11 @@
 New features, changes and fixes since gnuplot version 4.6.3
 ===========================================================
 
+* CHANGE treat empty fields in a csv files as "missing" rather than "bad"
 * FIX svg and canvas terminal mousing of inverted axis coordinates
+* FIX emf failed to initialize font correctly on some systems
 * FIX timedata columns can now be referred to via column(N) and column("HEAD")
+* FIX qt terminal toggling of enhanced text elements in plot with labels
 
 New features, changes and fixes in gnuplot version 4.6.3
 ========================================================
