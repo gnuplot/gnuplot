@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.421 2013/04/25 23:14:16 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.422 2013/05/19 20:48:03 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -626,13 +626,14 @@ do_plot(struct curve_points *plots, int pcount)
 		struct lp_style_type save_lp = this_plot->lp_properties;
 		for (key_entry = this_plot->labels->next; key_entry;
 		     key_entry = key_entry->next) {
-		    this_plot->lp_properties.l_type = key_entry->tag;
-		    this_plot->fill_properties.fillpattern = key_entry->tag;
+		    int histogram_linetype = key_entry->tag + this_plot->histogram->startcolor;
+		    this_plot->lp_properties.l_type = histogram_linetype;
+		    this_plot->fill_properties.fillpattern = histogram_linetype;
 		    if (key_entry->text) {
 			if (prefer_line_styles)
-			    lp_use_properties(&this_plot->lp_properties, key_entry->tag + 1);
+			    lp_use_properties(&this_plot->lp_properties, histogram_linetype);
 			else
-			    load_linetype(&this_plot->lp_properties, key_entry->tag + 1);
+			    load_linetype(&this_plot->lp_properties, histogram_linetype);
 			do_key_sample(this_plot, key, key_entry->text, xl, yl);
 		    }
 		    if (++key_count >= key_rows) {
@@ -2133,6 +2134,7 @@ plot_boxes(struct curve_points *plot, int xaxis_y)
 		if (plot->plot_style == HISTOGRAMS) {
 		    int ix = plot->points[i].x;
 		    int histogram_linetype = i;
+		    struct lp_style_type ls;
 		    int stack = i;
 		    if (plot->histogram->startcolor > 0)
 			histogram_linetype += plot->histogram->startcolor;
@@ -2166,15 +2168,11 @@ plot_boxes(struct curve_points *plot, int xaxis_y)
 		    case HT_STACKED_IN_TOWERS: /* columnstacked */
 			stack = 0;
 			/* Line type (color) must match row number */
-			if (prefer_line_styles) {
-			    struct lp_style_type ls;
-			    lp_use_properties(&ls, histogram_linetype+1);
-			    apply_pm3dcolor(&ls.pm3d_color, term);
-			} else {
-			    struct lp_style_type ls;
+			if (prefer_line_styles)
+			    lp_use_properties(&ls, histogram_linetype);
+			else
 			    load_linetype(&ls, histogram_linetype);
-			    apply_pm3dcolor(&ls.pm3d_color, term);
-			}
+			apply_pm3dcolor(&ls.pm3d_color, term);
 			plot->fill_properties.fillpattern = histogram_linetype;
 			/* Fall through */
 		    case HT_STACKED_IN_LAYERS: /* rowstacked */

@@ -13,6 +13,11 @@
 	functions column(N) and column("HEADER") to work on time data.
 	Bug #1161
 
+	* src/graphics.c: Fix two errors in the linetypes used by plot style
+	columnstacked histograms.  The key sample ignored "newhist lt N" and
+	also was off by one in the fillstyle used.  "set style increment user"
+	caused an off-by-one error in the choice of initial line style.
+
 2013-05-22  Christoph Bersch <usenet@bersch.net>
 
 	* src/gadgets.c(draw_clip_polygon) src/term.c(do_arc):
