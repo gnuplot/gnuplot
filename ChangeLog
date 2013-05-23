@@ -8,6 +8,11 @@
 	being added to the current display group, so they were ignored by the
 	plot toggling operation.  Now they are handled like any other text.
 
+	* src/graphics.c:  Fix two errors in the linetypes used by plot style
+	columnstacked histograms.  The key sample ignored "newhist lt N" and
+	also was off by one in the fillstyle used.  "set style increment user"
+	caused an off-by-one error in the choice of initial line style.
+
 2013-05-20  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* term/emf.trm:  It doesn't work to call EMF_setfont() before we
