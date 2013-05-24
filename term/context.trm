@@ -1,5 +1,5 @@
 /*
- * $Id: context.trm,v 1.3.2.1 2011/12/08 21:01:52 sfeam Exp $
+ * $Id: context.trm,v 1.7 2012/11/29 00:12:57 broeker Exp $
  */
 
 /* GNUPLOT - context.trm */
@@ -630,36 +630,42 @@ CONTEXT_options()
 			CONTEXT_params.header == NULL ? "noheader \\\n   " : "\\\n   header ");
 
 	if (CONTEXT_params.header != NULL) {
-		strncat(term_options,"\"",                  sizeof(term_options)-strlen(term_options));
-		strncat(term_options,CONTEXT_params.header, sizeof(term_options)-strlen(term_options));
-		strncat(term_options,"\" \\\n   ",          sizeof(term_options)-strlen(term_options));
+		strncat(term_options,"\"",                  sizeof(term_options)-strlen(term_options)-1);
+		strncat(term_options,CONTEXT_params.header, sizeof(term_options)-strlen(term_options)-1);
+		strncat(term_options,"\" \\\n   ",          sizeof(term_options)-strlen(term_options)-1);
 	}
 
 	strncat(term_options,
 		CONTEXT_params.color ? "color " : "monochrome ",
-		sizeof(term_options)-strlen(term_options));
+		sizeof(term_options)-strlen(term_options)-1);
 
 	switch (CONTEXT_params.linejoin) {
 		case LINEJOIN_MITER:
 			strncat(term_options, "mitered ",
-				sizeof(term_options)-strlen(term_options)); break;
+				sizeof(term_options)-strlen(term_options)-1);
+                        break;
 		case LINEJOIN_ROUND:
 			strncat(term_options, "rounded ",
-				sizeof(term_options)-strlen(term_options)); break;
+				sizeof(term_options)-strlen(term_options)-1);
+                        break;
 		case LINEJOIN_BEVEL:
 			strncat(term_options, "beveled ",
-				sizeof(term_options)-strlen(term_options)); break;
+				sizeof(term_options)-strlen(term_options)-1);
+                        break;
 	}
 	switch (CONTEXT_params.linecap) {
 		case LINECAP_BUTT  :
 			strncat(term_options, "butt",
-				sizeof(term_options)-strlen(term_options)); break;
+				sizeof(term_options)-strlen(term_options)-1);
+                        break;
 		case LINECAP_ROUND :
 			strncat(term_options, "round",
-				sizeof(term_options)-strlen(term_options)); break;
+				sizeof(term_options)-strlen(term_options)-1);
+                        break;
 		case LINECAP_SQUARE:
 			strncat(term_options, "squared",
-				sizeof(term_options)-strlen(term_options)); break;
+				sizeof(term_options)-strlen(term_options)-1);
+                        break;
 	}
 
 	snprintf(tmp_term_options, sizeof(tmp_term_options),
@@ -669,29 +675,33 @@ CONTEXT_options()
 		CONTEXT_params.scale_linewidth,
 		CONTEXT_params.scale_text
 		);
-	strncat(term_options, tmp_term_options, sizeof(term_options)-strlen(term_options));
+	strncat(term_options, tmp_term_options, sizeof(term_options)-strlen(term_options)-1);
 
 	switch (CONTEXT_params.points) {
 		case CONTEXT_POINTS_WITH_TEX :
 			strncat(term_options, "texpoints ",
-				sizeof(term_options)-strlen(term_options)); break;
+				sizeof(term_options)-strlen(term_options)-1);
+                        break;
 		case CONTEXT_POINTS_WITH_METAPOST :
 			strncat(term_options, "mppoints ",
-				sizeof(term_options)-strlen(term_options)); break;
+				sizeof(term_options)-strlen(term_options)-1);
+                        break;
 	}
 #ifdef WRITE_PNG_IMAGE
 	switch (CONTEXT_params.images) {
 		case CONTEXT_IMAGES_INLINE :
 			strncat(term_options, "inlineimages ",
-				sizeof(term_options)-strlen(term_options)); break;
+				sizeof(term_options)-strlen(term_options)-1);
+                        break;
 		case CONTEXT_IMAGES_EXTERNAL :
 			strncat(term_options, "externalimages ",
-				sizeof(term_options)-strlen(term_options)); break;
+				sizeof(term_options)-strlen(term_options)-1);
+                        break;
 	}
 #endif
 	snprintf(tmp_term_options, sizeof(tmp_term_options), "font \"%s,%g\"",
 		CONTEXT_params.font, CONTEXT_params.fontsize);
-	strncat(term_options, tmp_term_options, sizeof(term_options) - strlen(term_options));
+	strncat(term_options, tmp_term_options, sizeof(term_options) - strlen(term_options)-1);
 }
 
 /* **************
@@ -1374,7 +1384,8 @@ CONTEXT_set_font(const char *font)
 		CONTEXT_fontsize = CONTEXT_fontsize_explicit;
 
 		snprintf(tmp_fontstring, sizeof(tmp_fontstring), ",%gpt", CONTEXT_fontsize_explicit);
-		strncat(CONTEXT_font_explicit, tmp_fontstring, sizeof(CONTEXT_font_explicit) - strlen(CONTEXT_font_explicit));
+		strncat(CONTEXT_font_explicit, tmp_fontstring, 
+                        sizeof(CONTEXT_font_explicit) - strlen(CONTEXT_font_explicit)-1);
 		tmp_fontstring[MAX_ID_LEN] = NUL;
 
 	/* no fontsize has been provided: switch back to default terminal fontsize */
@@ -1591,7 +1602,6 @@ CONTEXT_write_palette(t_sm_palette *palette)
 		/* grayscale only */
 		case SMPAL_COLOR_MODE_GRAY:
 			fprintf(gpoutfile, "color_mode(gray)");
-			// XXX: I'm not sure if something has to be done here or not
 			break;
 		/* one of several fixed transformations */
 		case SMPAL_COLOR_MODE_RGB:

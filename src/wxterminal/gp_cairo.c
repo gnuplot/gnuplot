@@ -1,5 +1,5 @@
 /*
- * $Id: gp_cairo.c,v 1.60.2.3 2012/12/27 22:21:52 sfeam Exp $
+ * $Id: gp_cairo.c,v 1.60.2.4 2013/04/22 18:51:15 sfeam Exp $
  */
 
 /* GNUPLOT - gp_cairo.c */
@@ -1149,7 +1149,7 @@ void gp_cairo_add_shape( PangoRectangle rect,int position)
 
 	FPRINTF((stderr, "adding blank custom shape\n"));
 
-	strncat(gp_cairo_utf8, " ", sizeof(gp_cairo_utf8)-strlen(gp_cairo_utf8));
+	strncat(gp_cairo_utf8, " ", sizeof(gp_cairo_utf8)-strlen(gp_cairo_utf8)-1);
 	p_attr_shape = pango_attr_shape_new (&rect,&rect);
 	p_attr_shape->start_index = position;
 	p_attr_shape->end_index = position+1;
@@ -1300,7 +1300,7 @@ void gp_cairo_enhanced_flush(plot_struct *plot)
 	}
 
 	if (gp_cairo_enhanced_showflag) {
-		strncat(gp_cairo_utf8, enhanced_text_utf8, sizeof(gp_cairo_utf8)-strlen(gp_cairo_utf8));
+		strncat(gp_cairo_utf8, enhanced_text_utf8, sizeof(gp_cairo_utf8)-strlen(gp_cairo_utf8)-1);
 		end = strlen(gp_cairo_utf8);
 
 		/* add text attributes to the main list */
@@ -1381,7 +1381,7 @@ void gp_cairo_enhanced_flush(plot_struct *plot)
 
 	if (gp_cairo_enhanced_save) /* we aim at restoring position later */ {
 		save_start = strlen( gp_cairo_save_utf8);
-		strncat(gp_cairo_save_utf8, enhanced_text_utf8, sizeof(gp_cairo_utf8)-strlen(gp_cairo_utf8));
+		strncat(gp_cairo_save_utf8, enhanced_text_utf8, sizeof(gp_cairo_utf8)-strlen(gp_cairo_utf8)-1);
 		save_end = strlen( gp_cairo_save_utf8);
 
 		/* add text attributes to the save list */
@@ -1392,7 +1392,7 @@ void gp_cairo_enhanced_flush(plot_struct *plot)
 		underprinted_start = strlen(gp_cairo_underprinted_utf8);
 		strncat(gp_cairo_underprinted_utf8,
 			enhanced_text_utf8,
-			sizeof(gp_cairo_underprinted_utf8)-strlen(gp_cairo_underprinted_utf8));
+			sizeof(gp_cairo_underprinted_utf8)-strlen(gp_cairo_underprinted_utf8)-1);
 		underprinted_end = strlen(gp_cairo_underprinted_utf8);
 
 		if (gp_cairo_enhanced_underprinted_AttrList)

@@ -1,3 +1,9 @@
+2013-05-24  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/wxterminal/gp_cairo.c term/cairo.trm term/context.trm term/wxt.trm:
+	Calls to strncat were risking buffer overflow by not accounting for the
+	terminating '\0'.  (backported from 4.7 patch 2012-11-29)
+
 2013-05-23  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/plot2d.c (get_data): Treating timedata columns as strings allows

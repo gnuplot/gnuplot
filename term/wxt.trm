@@ -1,5 +1,5 @@
 /*
- * $Id: wxt.trm,v 1.29 2011/11/06 04:06:10 sfeam Exp $
+ * $Id: wxt.trm,v 1.29.2.1 2012/02/10 06:52:22 sfeam Exp $
  */
 
 /* GNUPLOT - wxt.trm */
@@ -315,71 +315,71 @@ TERM_PUBLIC void wxt_options()
 		"%d", wxt_window_number);
 
 	if (set_title) {
-		strncat(term_options, " title \"", sizeof(term_options)-strlen(term_options));
-		strncat(term_options, wxt_title, sizeof(term_options)-strlen(term_options));
-		strncat(term_options, "\"", sizeof(term_options)-strlen(term_options));
+		strncat(term_options, " title \"", sizeof(term_options)-strlen(term_options)-1);
+		strncat(term_options, wxt_title, sizeof(term_options)-strlen(term_options)-1);
+		strncat(term_options, "\"", sizeof(term_options)-strlen(term_options)-1);
 		wxt_update_title(wxt_window_number);
 	}
 
 	if (wxt_dashed)
-		strncat(term_options, " dashed",  sizeof(term_options)-strlen(term_options));
+		strncat(term_options, " dashed",  sizeof(term_options)-strlen(term_options)-1);
 
 	if (wxt_dashlength != 1.0) {
 		char tmp_term_options[MAX_LINE_LEN+1] = "";
 		snprintf(tmp_term_options,sizeof(tmp_term_options), " dashlength %g", wxt_dashlength);
-		strncat(term_options, tmp_term_options, sizeof(term_options)-strlen(term_options));
+		strncat(term_options, tmp_term_options, sizeof(term_options)-strlen(term_options)-1);
 	}
 
 	if (wxt_background != 0xffffff) {
 		char tmp_term_options[MAX_LINE_LEN+1] = "";
 		snprintf(tmp_term_options,sizeof(tmp_term_options), " background '#%06x'", wxt_background);
-		strncat(term_options, tmp_term_options, sizeof(term_options)-strlen(term_options));
+		strncat(term_options, tmp_term_options, sizeof(term_options)-strlen(term_options)-1);
 	}
 
 	if (set_size) {
 		char tmp_term_options[MAX_LINE_LEN+1] = "";
 		snprintf(tmp_term_options, sizeof(tmp_term_options),
 			  " size %d, %d", wxt_width, wxt_height);
-		strncat(term_options, tmp_term_options, sizeof(term_options)-strlen(term_options));
+		strncat(term_options, tmp_term_options, sizeof(term_options)-strlen(term_options)-1);
 		wxt_update_size(wxt_window_number);
 	}
 
 	if (set_enhanced)
 		strncat(term_options,
 			wxt_enhanced_enabled ? " enhanced" : " noenhanced",
-			sizeof(term_options)-strlen(term_options));
+			sizeof(term_options)-strlen(term_options)-1);
 
 	if (set_font) {
-		strncat(term_options, " font \"", sizeof(term_options)-strlen(term_options));
-		strncat(term_options, font_setting, sizeof(term_options)-strlen(term_options));
-		strncat(term_options, "\"", sizeof(term_options)-strlen(term_options));
+		strncat(term_options, " font \"", sizeof(term_options)-strlen(term_options)-1);
+		strncat(term_options, font_setting, sizeof(term_options)-strlen(term_options)-1);
+		strncat(term_options, "\"", sizeof(term_options)-strlen(term_options)-1);
 		free(font_setting);
 	}
 
 	if (wxt_set_fontscale != 1.0) {
 		char tmp_term_options[MAX_LINE_LEN+1] = "";
 		snprintf(tmp_term_options,sizeof(tmp_term_options), " fontscale %.1f", wxt_set_fontscale);
-		strncat(term_options, tmp_term_options, sizeof(term_options)-strlen(term_options));
+		strncat(term_options, tmp_term_options, sizeof(term_options)-strlen(term_options)-1);
 	}
 
 	if (set_capjoin)
 		strncat(term_options, wxt_rounded ? " rounded" : " butt",
-			sizeof(term_options)-strlen(term_options));
+			sizeof(term_options)-strlen(term_options)-1);
 
 	if (set_persist)
 		strncat(term_options,
 			(wxt_persist==yes) ? " persist" : " nopersist",
-			sizeof(term_options)-strlen(term_options));
+			sizeof(term_options)-strlen(term_options)-1);
 
 	if (set_raise)
 		strncat(term_options,
 			(wxt_raise==yes) ? " raise" : " noraise",
-			sizeof(term_options)-strlen(term_options));
+			sizeof(term_options)-strlen(term_options)-1);
 
 	if (set_ctrl)
 		strncat(term_options,
 			(wxt_ctrl==yes) ? " ctrl" : " noctrl",
-			sizeof(term_options)-strlen(term_options));
+			sizeof(term_options)-strlen(term_options)-1);
 
 	if (set_close)
 		wxt_close_terminal_window(wxt_window_number);
