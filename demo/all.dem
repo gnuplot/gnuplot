@@ -1,5 +1,5 @@
 #
-# $Id: all.dem,v 1.52 2012/11/23 06:30:44 sfeam Exp $
+# $Id: all.dem,v 1.53 2012/11/24 21:54:29 sfeam Exp $
 #
 # Executes all demos (OK, MOST demos) in this directory.
 # This serves as a series of unit tests for non-interactive capabilities.
@@ -205,8 +205,12 @@ print "********************** file textrotate.dem *********************"
 load "textrotate.dem"
 reset
 
-print "********************** file enhanced_utf8.dem *********************"
-load "enhanced_utf8.dem"
+print "********************** enhanced text *********************"
+if (GPVAL_TERM eq "postscript") {
+    load "enhancedtext.dem"
+} else {
+    load "enhanced_utf8.dem"
+}
 reset
 
 print "********************** file arrowstyle.dem *********************"

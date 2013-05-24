@@ -8,6 +8,8 @@ print "    current terminal type.  E.g. 'set term post enh'"
 print "    ----------------------------------------------------"
 #
 set termoption enhanced
+save_encoding = GPVAL_ENCODING
+set encoding iso_8859_1
 #
 set title "Test page for enhanced text mode"
 set xrange [-1:1]
@@ -51,4 +53,5 @@ set key title " "
 plot sin(x)**2 lt 2 lw 2 title "sin^2(x)"
 #
 pause -1 "Hit <cr> to continue"
+set encoding save_encoding
 reset
