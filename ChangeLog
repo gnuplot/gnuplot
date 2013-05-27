@@ -1,3 +1,8 @@
+2013-05-27  Thomas Mattison  <mattison <at> phas.ubc.ca>
+
+	* src/fit.c (regress):  Update all user variables after the fit converges
+	or aborts in order to always return the "best" set. Patchset #230.
+
 2013-05-23  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/fit.c (update):  Replace splitpath() by a call to gp_basename().

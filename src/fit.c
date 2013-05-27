@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: fit.c,v 1.112 2013/05/23 17:32:00 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: fit.c,v 1.113 2013/05/23 17:44:51 markisch Exp $"); }
 #endif
 
 /*  NOTICE: Change of Copyright Status
@@ -800,14 +800,7 @@ regress(double a[])
     if (res == ML_ERROR)
 	Eex("FIT: error occurred during fit");
 
-    /* compute errors in the parameters */
-
-    if (fit_errorvariables)
-	/* Set error variable to zero before doing this, */
-	/* thus making sure they are created. */
-	for (i = 0; i < num_params; i++)
-	    setvarerr(par_name[i], 0.0);
-
+    /* fit results */
     {
 	int ndf          = num_data - num_params;
 	double stdfit    = sqrt(chisq/ndf);
@@ -827,6 +820,18 @@ regress(double a[])
 	v->udv_undef = FALSE;
 	Gcomplex(&v->udv_value, pvalue, 0);
     }
+
+    /* Save final parameters. This is necessary since they might have
+       been changed in calculate() to obtain derivatives. */
+    for (i = 0; i < num_params; i++)
+	setvar(par_name[i], a[i] * scale_params[i]);
+
+    /* compute errors in the parameters */
+    if (fit_errorvariables)
+	/* Set error variable to zero before doing this, */
+	/* thus making sure they are created. */
+	for (i = 0; i < num_params; i++)
+	    setvarerr(par_name[i], 0.0);
 
     /* get covariance-, Correlations- and Kurvature-Matrix */
     /* and errors in the parameters                     */
@@ -872,15 +877,6 @@ regress(double a[])
 	show_results(chisq, last_chisq, a, dpar, covar);
 
     free(dpar);
-
-    /* HBB 990220: re-imported this snippet from older versions. Finally,
-     * some user noticed that it *is* necessary, after all. Not even
-     * Carsten Grammes himself remembered what it was for... :-(
-     * The thing is: the value of the last parameter is not reset to
-     * its original one after the derivatives have been calculated
-     */
-    /* restore last parameter's value (not done by calculate) */
-    setvar(par_name[num_params - 1], a[num_params - 1] * scale_params[num_params - 1]);
 
     /* call destructor for allocated vars */
     lambda = -2;		/* flag value, meaning 'destruct!' */
@@ -1222,7 +1218,7 @@ update(char *pfile, char *npfile)
 
     if (existfile(pfile)) {
 	/* update pfile npfile:
-	   if npfile is a valid file name, take pfile as input file and 
+	   if npfile is a valid file name, take pfile as input file and
 	   npfile as output file
 	*/
 	if (VALID_FILENAME(npfile)) {
@@ -1679,6 +1675,9 @@ fit_command()
 	lambda_down_factor = LAMBDA_DOWN_FACTOR;
 	lambda_up_factor = LAMBDA_UP_FACTOR;
     }
+
+    FPRINTF((STANDARD, "prescale=%i\n", fit_prescale));
+    FPRINTF((STANDARD, "errorscaling=%i\n", fit_errorscaling));
 
     {
 	char *logfile = getfitlogfile();
