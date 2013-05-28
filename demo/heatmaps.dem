@@ -67,6 +67,12 @@ plot '$map2' using 2:1:3 with image
 
 pause -1 "Hit return to continue"
 
+set title "Heat map with non-zero pixel values written as labels"
+plot $map1 matrix using 1:2:3 with image, \
+     $map1 matrix using 1:2:($3 == 0 ? "" : sprintf("%g",$3) ) with labels
+
+pause -1 "Hit return to continue"
+
 reset
 
 #
@@ -105,6 +111,7 @@ set title "4D data (3D Heat Map)"\
           ."\nZ is contoured. Independent value is color-mapped"  offset 0,1
 
 set view map
+set ylabel norotate offset -1,0
 
 set contour base
 splot '++' using 1:2:(Z($1,$2)):(color($1,$2)) with pm3d title "4 data columns x/y/z/color"
