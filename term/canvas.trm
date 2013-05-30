@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: canvas.trm,v 1.56.2.7 2012/11/16 04:26:01 sfeam Exp $
+ * $Id: canvas.trm,v 1.56.2.8 2013/05/07 16:51:43 sfeam Exp $
  *
  */
 
@@ -600,9 +600,10 @@ CANVAS_text()
 	    MOUSE_PARAM("GPVAL_X_MIN", "gnuplot.plot_axis_xmin");
 	    MOUSE_PARAM("GPVAL_X_MAX", "gnuplot.plot_axis_xmax");
 	}
-	if (axis_array[FIRST_Y_AXIS].range_flags & RANGE_REVERSE) {
-	    MOUSE_PARAM("GPVAL_Y_MAX", "gnuplot.plot_axis_ymin");
+	if ((axis_array[FIRST_Y_AXIS].range_flags & RANGE_REVERSE)
+	&&  !(is_3d_plot && splot_map)) { 
 	    MOUSE_PARAM("GPVAL_Y_MIN", "gnuplot.plot_axis_ymax");
+	    MOUSE_PARAM("GPVAL_Y_MAX", "gnuplot.plot_axis_ymin");
 	} else {
 	    MOUSE_PARAM("GPVAL_Y_MIN", "gnuplot.plot_axis_ymin");
 	    MOUSE_PARAM("GPVAL_Y_MAX", "gnuplot.plot_axis_ymax");
