@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.210 2013/04/09 20:58:53 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.211 2013/05/15 20:52:45 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -1549,8 +1549,9 @@ eval_3dplots()
 			((this_plot->plot_style & PLOT_STYLE_HAS_ERRORBAR)
 			|| (this_plot->plot_style == LABELPOINTS && !draw_contour)
 			)) {
-			int_warn(c_token, "This plot style is only for datafiles , reverting to \"points\"");
+			int_warn(c_token-1, "This style cannot be used to plot a surface defined by a function");
 			this_plot->plot_style = POINTSTYLE;
+			this_plot->plot_type = NODATA;
 		    }
 
 		    if ((this_plot->plot_style | data_style) & PM3DSURFACE) {

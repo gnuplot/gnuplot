@@ -10,6 +10,10 @@
 	than hanging.
 	Bug #991.
 
+	* src/plot3d.c:  If a surface plot or contour is requested using a funky
+	style (histogram? errorbars?) print a warning and then ignore it rather
+	than plotting with style "points".
+
 2013-05-27  Thomas Mattison  <mattison <at> phas.ubc.ca>
 
 	* src/fit.c (regress):  Update all user variables after the fit converges
