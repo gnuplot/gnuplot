@@ -1,3 +1,15 @@
+2013-05-31  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/wxterminal/wxt_gui.cpp (wxt_sigint_handler):  The wxt terminal
+	deadlocks if connection to the X-server is lost (Bug #991).  Ctrl-C
+	doesn't break the deadlock because this interrupt handler simply flags
+	the signal and waits for the parent process to handle it.  Parent and
+	child are thus waiting on each other -> deadlock.  Now we add a test
+	for Ctrl-C arriving when the Ctrl-C flag is already sent, exiting if so.
+	Thus hitting Ctrl-C twice breaks the deadlock.  Not great but better
+	than hanging.
+	Bug #991.
+
 2013-05-27  Thomas Mattison  <mattison <at> phas.ubc.ca>
 
 	* src/fit.c (regress):  Update all user variables after the fit converges
