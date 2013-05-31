@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.797 2013/05/22 19:19:38 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.798 2013/05/31 22:06:29 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -129,15 +129,11 @@ C
  For built-in help on any topic, type `help` followed by the name of the topic
  or `help ?` to get a menu of available topics.
 
- The new `gnuplot` user should begin by reading about `plotting` (if in an
- interactive session, type `help plotting`).
-
- See the simple.dem demo, also available together with other demos on the web page
+ A large set of demo plots is available on the web page
 ^ <a href="http://www.gnuplot.info/demo/">
            http://www.gnuplot.info/demo/
 ^ </a>
- `Gnuplot` can be started from a command line or from an icon according to the
- desktop environment. Running it from command line can take the syntax
+ When run from command line, gnuplot is invoked using the syntax
        gnuplot {OPTIONS} file1 file2 ...
  where file1, file2, etc. are input file as in the `load` command.
  On X11-based systems, you can use
@@ -191,7 +187,7 @@ C
  Bug reports and code contributions should be uploaded to the trackers at
            http://sourceforge.net/projects/gnuplot/support
  Please check previous bug reports if the bug you want to report has not been
- already fixed in a newer version of gnuplot.
+ already fixed in a newer version.
 
  A mailing list for those interested in development version of gnuplot is:
            gnuplot-beta@lists.sourceforge.net
@@ -217,6 +213,9 @@ C
  introduced whenever time in seconds was generated externally.  The epoch
  convention used by a particular gnuplot installation can be determined using
  the command `print strftime("%F",0)`.
+
+ * Interactive terminals support hypertext labels that only appear when the
+ mouse hovers over the label's anchor point.
 
  * The `reverse` keyword of the `set [axis]range` command affects only
  autoscaling. It does not invert or otherwise alter the meaning of a command
@@ -2457,7 +2456,7 @@ Ffigure_newsyntax
 ?start-up
 ?initialization
 ?.gnuplot
- When gnuplot is run, it first looks for a system-wide initialization file named
+ When gnuplot is run, it first looks for a system-wide initialization file
  `gnuplotrc`.  The location of this file is determined when the program is built
  and is reported by `show loadpath`.  The program then looks in the user's HOME
  directory for a file called `.gnuplot` on Unix-like systems or `GNUPLOT.INI` on
@@ -2498,9 +2497,9 @@ Ffigure_newsyntax
        title = "My Title"
        plot plot title title
 
- There are three binary operators that require string operands: the string
- concatenation operator ".", the string equality operator "eq" and the string
- inequality operator "ne".  The following example will print TRUE.
+ Three binary operators require string operands: the string concatenation
+ operator ".", the string equality operator "eq" and the string inequality
+ operator "ne".  The following example will print TRUE.
 
       if ("A"."B" eq "AB") print "TRUE"
 
@@ -2777,12 +2776,12 @@ Ffigure_newsyntax
 1 plotting styles
 ?plotting styles
 
- There are many plotting styles available in gnuplot.
+ Many plotting styles are available in gnuplot.
  They are listed alphabetically below.
  The commands `set style data` and `set style function` change the
  default plotting style for subsequent `plot` and `splot` commands.
 
- You also have the option to specify the plot style explicitly as part of
+ You can also specify the plot style explicitly as part of
  the `plot` or `splot` command.  If you want to mix plot styles within a
  single plot, you must specify the plot style for each component.
 
@@ -2791,7 +2790,7 @@ Ffigure_newsyntax
       plot 'data' with boxes, sin(x) with lines
 
  Each plot style has its own expected set of data entries in a data file.
- For example by default the `lines` style expects either a single column of
+ For example, by default the `lines` style expects either a single column of
  y values (with implicit x ordering) or a pair of columns with x in the first
  and y in the second.  For more information on how to fine-tune how columns in a
  file are interpreted as plot data, see `using`.
@@ -2801,8 +2800,11 @@ Ffigure_newsyntax
 ?style boxerrorbars
 ?boxerrorbars
  The `boxerrorbars` style is only relevant to 2D data plotting.  It is a
- combination of the `boxes` and `yerrorbars` styles.  It uses 3, 4, or 5
- columns of data:
+ combination of the `boxes` and `yerrorbars` styles.  It requires 3, 4, or 5
+ columns of data.
+ An additional (4th, 5th or 6th) input column may be used to provide variable 
+ (per-datapoint) color information (see `linecolor` and `rgbcolor variable`).
+ The error bar will be drawn in the same color as the border of the box.
 
       3 columns:  x  y  ydelta
       4 columns:  x  y  ydelta xdelta        # boxwidth != -2
@@ -2818,22 +2820,13 @@ Ffigure_boxerrorbars
  box touches the adjacent boxes.  The width will also be calculated in cases
  where three-column data are used.
 
- An additional (4th, 5th or 6th) input column may be used to provide variable 
- (per-datapoint) color information (see `linecolor` and `rgbcolor variable`).
- The error bar will be drawn in the same color as the border of the box.
-
  The box height is determined from the y error in the same way as it is for
  the `yerrorbars` style---either from y-ydelta to y+ydelta or from ylow to
  yhigh, depending on how many data columns are provided.
- See also
-^ <a href="http://www.gnuplot.info/demo/mgr.html">
- errorbar demo.
-^ </a>
 2 boxes
 ?plotting styles boxes
 ?style boxes
 ?boxes
-Ffigure_boxes
  The `boxes` style is only relevant to 2D plotting.  It draws a box centered
  about the given x coordinate that extends from the x axis (not from the graph
  border) to the given y coordinate.  It uses 2 or 3 columns of basic data.
@@ -2843,6 +2836,7 @@ Ffigure_boxes
       2 columns:  x  y
       3 columns:  x  y  x_width
 
+Ffigure_boxes
  The width of the box is obtained in one of three ways.  If the input data has a
  third column, this will be used to set the width of the box.  If not, if a
  width has been set using the `set boxwidth` command, this will be used.
@@ -2852,16 +2846,12 @@ Ffigure_boxes
  The interior of the boxes is drawn according to the current fillstyle.
  See `set style fill` for details.  Alternatively a new fillstyle
  may be specified in the plot command.
-
  For fillstyle `empty` the box is not filled.
-
  For fillstyle `solid` the box is filled with a solid rectangle of the
- current drawing color. There is an optional parameter <density> that
- controls the fill density; it runs from 0 (background color) to 1
- (current drawing color).
-
+ current drawing color. An optional fillstyle parameter controls the fill density;
+ it runs from 0 (background color) to 1 (current drawing color).
  For fillstyle `pattern` the box is filled in the current drawing color with
- a pattern, if supported by the terminal driver.
+ a pattern.
 
  Examples:
 
@@ -3381,9 +3371,9 @@ Ffigure_histrows
  This will produce a plot in which each vertical bar corresponds to one row of
  data.  Each vertical bar contains a stack of two segments, corresponding in
  height to the values found in columns 2 and 4 of the datafile.
-
-
-
+      
+      
+      
  Finally, the commands
 
        set style histogram columnstacked
@@ -3393,6 +3383,7 @@ Ffigure_histcols
  will produce two vertical stacks, one for each column of data.  The stack at
  x=1 will contain a box for each entry in column 2 of the datafile.  The stack
  at x=2 will contain a box for each parallel entry in column 4 of the datafile.
+ 
  Because this interchanges gnuplot's usual interpretation of input rows and
  columns, the specification of key titles and x-axis tic labels must also be
  modified accordingly. See the comments given below.
@@ -3886,7 +3877,6 @@ Ffigure_mapcontours
  onto a 2D surface by projecting the plot along the Z axis.  See `set view map`.
  This plot mode can be used to generate contour plots and heat maps. This figure
  shows contours plotted once with plot style `lines`, once with style `labels`.
-
 1 Commands
 ?commands
  This section lists the commands acceptable to `gnuplot` in alphabetical

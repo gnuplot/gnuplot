@@ -19,6 +19,9 @@
 	of point types as character glyphs and then select which one is used
 	based on column data.
 
+	* docs/doc2tex.c docs/gnuplot.doc:
+	Tweak page layout of the document produced by 'make pdffigures'.
+
 2013-05-27  Thomas Mattison  <mattison <at> phas.ubc.ca>
 
 	* src/fit.c (regress):  Update all user variables after the fit converges

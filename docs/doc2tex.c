@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: doc2tex.c,v 1.23 2011/09/10 06:12:48 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: doc2tex.c,v 1.24 2011/10/13 17:45:43 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - doc2tex.c */
@@ -200,8 +200,9 @@ process_line( char *line, FILE *b)
 	    if (intable)
 		(void) fputs(line + 1, b);	/* copy directly */
 	    else {
-		fprintf(stderr, "warning: # line found outside of table\n");
-		fprintf(stderr, "%s\n", line + 11);
+		// fprintf(stderr, "warning: # line found outside of table\n");
+		// fprintf(stderr, "%s\n", line + 11);
+		(void) fputs(line + 1, b);	/* copy directly */
 	    }
 
 	    break;
@@ -317,8 +318,11 @@ process_line( char *line, FILE *b)
 	}
     default:{
 	    if (isdigit((int) line[0])) {	/* start of section */
-		if (!intable)	/* ignore while in table */
+		if (!intable) {	/* ignore while in table */
+		    if (line[0] == '1')
+			fputs("\\newpage", b);
 		    section(line, b);
+		}
 	    } else
 		fprintf(stderr, "unknown control code '%c' in column 1\n",
 			line[0]);
