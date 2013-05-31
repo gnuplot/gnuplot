@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.796 2013/05/20 23:16:49 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.797 2013/05/22 19:19:38 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -3558,7 +3558,7 @@ Ffigure_impulses
 ?plotting styles labels
 ?style labels
 ?labels
-Ffigure_labels
+Ffigure_labels1
  The `labels` style reads coordinates and text from a data file and places
  the text string at the corresponding 2D or 3D position.  3 or 4 input columns
  of basic data are required.  Additional input columns may be used to provide
@@ -3589,10 +3589,15 @@ Ffigure_labels
 
    plot 'cities.dat' using 5:4:1 with labels hypertext point pt 7
 
- The `labels` style can also be used in 3D plots. In this case four input
- column specifiers are required, corresponding to X Y Z and text.
+Ffigure_labels2
+ The `labels` style can also be used in place of the `points` style when the
+ set of predefined point symbols is not suitable or not sufficiently flexible.
+ For example, here we define a set of chosen single-character symbols and assign
+ one of them to each point in a plot based on the value in data column 3:
 
-   splot 'datafile' using 1:2:3:4 with labels
+   set encoding utf8
+   symbol(z) = "∙□+⊙♠♣♡♢"[int(z):int(z)]
+   splot 'file' using 1:2:(symbol($3)) with labels
 
  See also `datastrings`, `set style data`.
 2 lines

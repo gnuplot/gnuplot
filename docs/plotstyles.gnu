@@ -66,6 +66,11 @@ plot demo . 'silver.dat' u 1:($2-10.) title 'with fillsteps' with fillsteps, \
 #
 set output out . 'figure_histeps' . ext
 plot demo . 'silver.dat' u 1:($2-10.) title 'with histeps' with histeps
+#
+symbol(z) = "●□+⊙♠♣♡♢"[int(z):int(z)]
+set output out . 'figure_labels2' . ext
+plot demo . 'silver.dat' u 1:($2-10.):(symbol(1+int($0)%8)) \
+     with labels font ",18" title "with labels"
 
 #
 # Simple bar charts  (same data plotted)
@@ -381,7 +386,7 @@ Scale(size) = 0.25*sqrt(sqrt(column(size)))
 CityName(String,Size) = sprintf("{/=%d %s}", Scale(Size), stringcolumn(String))
 
 set termoption enhanced
-set output out . 'figure_labels' . ext
+set output out . 'figure_labels1' . ext
 unset xtics
 unset ytics
 unset key
