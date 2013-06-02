@@ -1,5 +1,11 @@
 2013-06-02  Bastian Maerkisch  <bmaerkisch@web.de>
 
+	* src/misc.c (loadpath_fopen):  Always open files in binary mode on
+	Windows.  If this should happen to cause side effects for text inline
+	data, there should still be enough time to correct those before the next
+	release.
+	Bug #880.
+
 	* src/win/wredirect.cpp src/win/winmain.c src/win/wtext.h
 	config/mingw/Makefile config/msvc/Makefile:  Redirect C++ cout and cerr
 	to Windows text window.

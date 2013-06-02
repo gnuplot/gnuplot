@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.152 2012/11/29 00:12:57 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.153 2013/03/22 03:48:55 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -46,7 +46,12 @@ static char *RCSid() { return RCSid("$Id: misc.c,v 1.152 2012/11/29 00:12:57 bro
 #include "variable.h"
 #include "axis.h"
 #include "scanner.h"		/* so that scanner() can count curly braces */
-
+#ifdef _Windows
+# include <fcntl.h>
+# if defined(__WATCOMC__) || defined(__MSC__)
+#  include <io.h>        /* for setmode() */
+# endif
+#endif
 #if defined(HAVE_DIRENT_H)
 # include <sys/types.h>
 # include <dirent.h>
@@ -493,6 +498,10 @@ loadpath_fopen(const char *filename, const char *mode)
 
     }
 
+#ifdef _Windows
+    if (fp != NULL)
+	setmode(fileno(fp), _O_BINARY);
+#endif
     return fp;
 }
 
