@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: fit.c,v 1.113 2013/05/23 17:44:51 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: fit.c,v 1.114 2013/05/27 09:11:29 markisch Exp $"); }
 #endif
 
 /*  NOTICE: Change of Copyright Status
@@ -481,16 +481,16 @@ analyze(double a[], double **C, double d[], double *chisq)
 {
     int i, j;
 
-    *chisq = 0;
     calculate(d, C, a);
 
     for (i = 0; i < num_data; i++) {
 	/* note: order reversed, as used by Schwarz */
 	d[i] = (d[i] - fit_z[i]) / err_data[i];
-	*chisq += d[i] * d[i];
 	for (j = 0; j < num_params; j++)
 	    C[i][j] /= err_data[i];
     }
+    *chisq = sumsq_vec(num_data, d);
+
     /* FIXME: why return a value that is always TRUE ? */
     return TRUE;
 }

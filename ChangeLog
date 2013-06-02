@@ -1,3 +1,9 @@
+2013-06-02  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/fit.c (analyze) src/matrix.c|h (sumsq_vec):  Use the Neumaier
+	variant of the Kahan and Babuska algorithm to sum up the chisq in order
+	to reduce rounding errors.
+
 2013-05-31  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/wxterminal/wxt_gui.cpp (wxt_sigint_handler):  The wxt terminal

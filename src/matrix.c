@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: matrix.c,v 1.10 2004/07/01 17:10:06 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: matrix.c,v 1.11 2012/08/29 18:58:08 sfeam Exp $"); }
 #endif
 
 /*  NOTICE: Change of Copyright Status
@@ -358,4 +358,51 @@ lu_backsubst(double **a, int n, int *indx, double *b)
 	    *bip -= *ac++ * *bp++;
 	*bip /= (*ar--)[i];
     }
+}
+
+
+/*****************************************************************
+
+    Sum up squared components of a vector
+    In order to reduce rounding errors in summing up the entries
+    of a vector, we employ the Neumaier variant of the Kahan and
+    Babuska algorithm:
+    A. Neumaier, Rundungsfehleranalyse einiger Verfahren zur
+    Summation endlicher Summen, Z. angew. Math. Mechanik, 54:39-51, 1974
+
+*****************************************************************/
+double
+sumsq_vec(int n, const double *x)
+{
+    int i;
+    double s;
+    double c = 0.0;
+
+    if ((x == NULL) || (n == 0))
+	return 0;
+
+    s =  x[0] * x[0];
+    for (i = 1; i < n; i++) {
+	double xi = x[i] * x[i];
+	double t  = s + xi;
+	if (fabs(s) >= fabs(xi))
+	    c += ((s - t) + xi);
+	else
+	    c += ((xi - t) + s);
+	s = t;
+    };
+    s += c;
+    return s;
+}
+
+
+/*****************************************************************
+
+    Euclidean norm of a vector
+
+*****************************************************************/
+double
+enorm_vec(int n, const double *x)
+{
+    return sqrt(sumsq_vec(n, x));
 }
