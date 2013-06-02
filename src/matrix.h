@@ -1,5 +1,5 @@
 /*
- * $Id: matrix.h,v 1.10 2004/07/01 17:10:06 broeker Exp $
+ * $Id: matrix.h,v 1.11 2013/06/02 06:49:52 markisch Exp $
  */
 
 /* GNUPLOT - matrix.h */
@@ -45,5 +45,6 @@ void    lu_decomp __PROTO((double **, int, int *, double *));
 void    lu_backsubst __PROTO((double **, int n, int *, double *));
 
 double   enorm_vec(int n, const double *x);
+double   sumsq_vec(int n, const double *x);
 
 #endif /* MATRIX_H */
