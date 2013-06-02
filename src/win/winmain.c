@@ -1,5 +1,5 @@
 /*
- * $Id: winmain.c,v 1.62 2013/04/22 22:55:42 markisch Exp $
+ * $Id: winmain.c,v 1.63 2013/04/27 07:51:18 markisch Exp $
  */
 
 /* GNUPLOT - win/winmain.c */
@@ -181,6 +181,10 @@ WinExit(void)
 
 #ifndef WGP_CONSOLE
     TextMessage();  /* process messages */
+# ifndef __WATCOMC__
+    /* revert C++ stream redirection */
+    RedirectOutputStreams(FALSE);
+# endif
 #else
 #ifdef CONSOLE_SWITCH_CP
     /* restore console codepages */
@@ -540,6 +544,10 @@ int main(int argc, char **argv)
                 InvalidateRect(textwin.hWndParent, (LPRECT) &rect, 1);
                 UpdateWindow(textwin.hWndParent);
         }
+# ifndef __WATCOMC__
+        /* Finally, also redirect C++ standard output streams. */
+        RedirectOutputStreams(TRUE);
+# endif
 #else /* WGP_CONSOLE */
 #ifdef CONSOLE_SWITCH_CP
         /* Change codepage of console to match that of the graph window.

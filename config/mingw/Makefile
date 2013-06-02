@@ -1,5 +1,5 @@
 # Hello, emacs: this is a -*- Makefile -*-
-# $Id: Makefile,v 1.27 2012/07/07 12:38:41 markisch Exp $
+# $Id: Makefile,v 1.28 2012/07/18 16:42:51 markisch Exp $
 #
 # GNUPLOT Makefile for MinGW/MSYS on Windows
 # This assumes usual installation of the MinGW32 toolkit, the free
@@ -403,7 +403,7 @@ OBJS = $(COREOBJS) version.$(O) gpexecute.$(O) $(WX_OBJS) $(CAIRO_OBJS)
 WINOBJS = winmain.$(O) wgnuplib.$(O) wgraph.$(O) wprinter.$(O) \
 	  wpause.$(O) wgdiplus.$(O)
 ifneq ($(TARGET),gnuplot.exe)
-WINOBJS += wtext.$(O) screenbuf.$(O) wmenu.$(O)
+WINOBJS += wtext.$(O) screenbuf.$(O) wmenu.$(O) wredirect.$(O)
 endif
 
 # default rules
@@ -453,7 +453,10 @@ winmain.$(O): $(W)/winmain.c $(W)/wgnuplib.h $(W)/wtext.h plot.h
 	$(CC) -c $(CFLAGS) $(CFLAGSEXTRA) -MMD -MT '$*.$$(O)' -MF $*.d -o $@ $<
 
 wgdiplus.$(O): $(W)/wgdiplus.cpp $(WINDEPS)
-	$(CXX) -c $(CXXFLAGS) $(CFLAGSEXTRA) -MMD -MT '$*.$$(O)' -MF $*.d -o $@ $<
+	$(CXX) -c $(CFLAGS) $(CXXFLAGS) $(CFLAGSEXTRA) -MMD -MT '$*.$$(O)' -MF $*.d -o $@ $<
+
+wredirect.$(O): $(W)/wredirect.cpp $(WINDEPS)
+	$(CXX) -c $(CFLAGS) $(CXXFLAGS) $(CFLAGSEXTRA) -MMD -MT '$*.$$(O)' -MF $*.d -o $@ $<
 
 wgnuplot.mnu: $(W)/wgnuplot.mnu
 	$(CP) $^ $@

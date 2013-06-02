@@ -1,5 +1,5 @@
 /*
- * $Id: wtext.h,v 1.14 2012/10/08 22:30:53 markisch Exp $
+ * $Id: wtext.h,v 1.15 2013/03/02 16:07:43 broeker Exp $
  */
 
 /* GNUPLOT - win/wtext.h */
@@ -37,8 +37,13 @@
 #ifndef GNUPLOT_WTEXT_H
 #define GNUPLOT_WTEXT_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <stdio.h>
 #include <stdarg.h>
+#include "syscfg.h"
 
 /* redefine functions that can talk to tty devices, to use
  * implementation in winmain.c */
@@ -117,6 +122,9 @@ FILE *fake_popen(const char *command, const char *type);
 int fake_pclose(FILE *stream);
 #endif
 
+/* redirect C++ standard output streams */
+void RedirectOutputStreams(int init);
+
 #else /* WGP_CONSOLE */
 
 #define getch ConsoleGetch
@@ -125,5 +133,9 @@ int fake_pclose(FILE *stream);
 int ConsoleGetch();
 
 #endif /* WGP_CONSOLE */
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* GNUPLOT_WTEXT_H */

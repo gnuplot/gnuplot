@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.8 2012/06/30 09:37:08 markisch Exp $
+# $Id: Makefile,v 1.9 2012/07/18 16:42:51 markisch Exp $
 #
 # GNUPLOT Makefile Microsoft Visual C++ 2005 or newer
 
@@ -154,7 +154,8 @@ default: wgnuplot.exe $(HELPFILE) wgnuplot.mnu $(M)bf_test.exe pgnuplot.exe gnup
 OBJS = $(COREOBJS) version.obj
 
 WINOBJS = winmain.obj wgnuplib.obj wgraph.obj wprinter.obj wtext.obj \
-	screenbuf.obj wpause.obj wmenu.obj gpexecute.obj wgdiplus.obj
+	screenbuf.obj wpause.obj wmenu.obj gpexecute.obj wgdiplus.obj \
+	wredirect.obj
 
 ALL_CONSOLE_OBJS = $(OBJS:.obj=.cobj) $(WINOBJS:.obj=.cobj)
 

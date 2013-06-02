@@ -1,5 +1,9 @@
 2013-06-02  Bastian Maerkisch  <bmaerkisch@web.de>
 
+	* src/win/wredirect.cpp src/win/winmain.c src/win/wtext.h
+	config/mingw/Makefile config/msvc/Makefile:  Redirect C++ cout and cerr
+	to Windows text window.
+
 	* src/fit.c (analyze) src/matrix.c|h (sumsq_vec):  Use the Neumaier
 	variant of the Kahan and Babuska algorithm to sum up the chisq in order
 	to reduce rounding errors.
