@@ -1,5 +1,12 @@
 2013-06-02  Bastian Maerkisch  <bmaerkisch@web.de>
 
+	* src/win/wprinter.c (PrintDlgProc):  Safeguard against unavailable
+	printer info.
+	Bug 1152.
+
+	* src/win/wprinter.c (DumpPrinter):  Make this similar to the code in 
+	CopyPrint (wgraph.c) which is supposed to work more reliably.
+
 	* src/win/wgraph.c (SaveAsEMF, CopyClip):  Turn off antialiasing during
 	export to EMF or clipboard in order not to mix GDI and GDI+ calls.  See
 	also change on 2012-07-24.

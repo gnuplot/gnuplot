@@ -1,5 +1,5 @@
 /*
- * $Id: wprinter.c,v 1.7 2011/03/13 19:55:29 markisch Exp $
+ * $Id: wprinter.c,v 1.8 2012/06/30 06:41:33 markisch Exp $
  */
 
 /* GNUPLOT - win/wprinter.c */
@@ -218,23 +218,26 @@ PrintUnregister(GP_LPPRINT lpr)
 BOOL CALLBACK
 PrintDlgProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 {
-    GP_LPPRINT lpr;
-    lpr = (GP_LPPRINT)GetWindowLong(GetParent(hDlg), 4);
+	GP_LPPRINT lpr;
+	lpr = (GP_LPPRINT) GetWindowLong(GetParent(hDlg), 4);
+	/* FIXME: cause of crash in bug #3544949. No idea yet as to why this could happen, though. */
+	if (lpr == NULL)
+	return FALSE;
 
-    switch(message) {
-    case WM_INITDIALOG:
-	lpr->hDlgPrint = hDlg;
-	SetWindowText(hDlg,(LPSTR)lParam);
-	EnableMenuItem(GetSystemMenu(hDlg,FALSE),SC_CLOSE,MF_GRAYED);
-	return TRUE;
-    case WM_COMMAND:
-	lpr->bUserAbort = TRUE;
-	lpr->hDlgPrint = 0;
-	EnableWindow(GetParent(hDlg),TRUE);
-	EndDialog(hDlg, FALSE);
-	return TRUE;
-    }
-    return FALSE;
+	switch (message) {
+	case WM_INITDIALOG:
+		lpr->hDlgPrint = hDlg;
+		SetWindowText(hDlg, (LPSTR)lParam);
+		EnableMenuItem(GetSystemMenu(hDlg, FALSE), SC_CLOSE, MF_GRAYED);
+		return TRUE;
+	case WM_COMMAND:
+		lpr->bUserAbort = TRUE;
+		lpr->hDlgPrint = 0;
+		EnableWindow(GetParent(hDlg), TRUE);
+		EndDialog(hDlg, FALSE);
+		return TRUE;
+	}
+	return FALSE;
 }
 
 
@@ -259,77 +262,105 @@ PrintAbortProc(HDC hdcPrn, int code)
 void WDPROC
 DumpPrinter(HWND hwnd, LPSTR szAppName, LPSTR szFileName)
 {
-    HDC printer;
-    PRINTDLG pd;
-    GP_PRINT pr;
-    DOCINFO di;
-    char *buf;
-    WORD *bufcount;
-    int count;
-    FILE *f;
-    long lsize;
-    long ldone;
-    char pcdone[10];
+	HDC printer;
+	PRINTDLG pd;
+	/* FIXME: share these with CopyPrint */
+	static DEVNAMES * pDevNames = NULL;
+	static DEVMODE * pDevMode = NULL;
+	LPCTSTR szDriver, szDevice, szOutput;
+	GP_PRINT pr;
+	DOCINFO di;
+	char *buf;
+	WORD *bufcount;
+	int count;
+	FILE *f;
+	long lsize;
+	long ldone;
+	char pcdone[10];
 
-    memset(&pd, 0, sizeof(PRINTDLG));
-    pd.lStructSize = sizeof(PRINTDLG);
-    pd.hwndOwner = hwnd;
-    pd.Flags = PD_PRINTSETUP | PD_RETURNDC;
+	if ((f = fopen(szFileName, "rb")) == NULL)
+		return;
+	fseek(f, 0L, SEEK_END);
+	lsize = ftell(f);
+	if (lsize <= 0)
+		lsize = 1;
+	fseek(f, 0L, SEEK_SET);
+	ldone = 0;
 
-    if ((f = fopen(szFileName, "rb")) == (FILE *)NULL)
-	return;
-    fseek(f, 0L, SEEK_END);
-    lsize = ftell(f);
-    if (lsize <= 0)
-	lsize = 1;
-    fseek(f, 0L, SEEK_SET);
-    ldone = 0;
+	/* Print Setup Dialog */
 
-    if (PrintDlg(&pd)) {
-	printer = pd.hDC;
-	if (printer != (HDC)NULL) {
-	    pr.hdcPrn = printer;
-	    SetWindowLong(hwnd, 4, (LONG)((GP_LPPRINT)&pr));
-	    PrintRegister((GP_LPPRINT)&pr);
-	    if ( (buf = malloc(4096+2)) != (char *)NULL ) {
-	    	bufcount = (WORD *)buf;
-		EnableWindow(hwnd,FALSE);
-		pr.bUserAbort = FALSE;
-/* is parent set correctly */
-		pr.hDlgPrint = CreateDialogParam(hdllInstance,
-						 "CancelDlgBox",
-						 hwnd, PrintDlgProc,
-						 (LPARAM) szAppName);
-		SetAbortProc(printer, PrintAbortProc);
-		di.cbSize = sizeof(DOCINFO);
-		di.lpszDocName = szAppName;
-		di.lpszOutput = NULL;
-		if (StartDoc(printer, &di) > 0) {
-		    while ( pr.hDlgPrint && !pr.bUserAbort
-			    && (count = fread(buf+2, 1, 4096, f)) != 0 ) {
-			*bufcount = count;
-			Escape(printer, PASSTHROUGH, count+2, (LPSTR)buf, NULL);
-	    		ldone += count;
-	    		sprintf(pcdone, "%d%% done",
-				(int) (ldone * 100 / lsize));
-	    		SetWindowText(GetDlgItem(pr.hDlgPrint, CANCEL_PCDONE),
-				      pcdone);
-			if (pr.bUserAbort)
-			    AbortDoc(printer);
-			else
-			    EndDoc(printer);
-		    }
-		    if (!pr.bUserAbort) {
-			EnableWindow(hwnd,TRUE);
-			DestroyWindow(pr.hDlgPrint);
-		    }
-		    free(buf);
+	/* See http://support.microsoft.com/kb/240082 */
+	memset(&pd, 0, sizeof(pd));
+	pd.lStructSize = sizeof(pd);
+	pd.hwndOwner = hwnd;
+	pd.Flags = PD_PRINTSETUP;
+	pd.hDevNames = pDevNames;
+	pd.hDevMode = pDevMode;
+
+	if (PrintDlg(&pd)) {
+		pDevNames = (DEVNAMES *) GlobalLock(pd.hDevNames);
+		pDevMode = (DEVMODE *) GlobalLock(pd.hDevMode);
+
+		szDriver = (LPCTSTR)pDevNames + pDevNames->wDriverOffset;
+		szDevice = (LPCTSTR)pDevNames + pDevNames->wDeviceOffset;
+		szOutput = (LPCTSTR)pDevNames + pDevNames->wOutputOffset;
+
+		printer = CreateDC(szDriver, szDevice, szOutput, pDevMode);
+
+		GlobalUnlock(pd.hDevMode);
+		GlobalUnlock(pd.hDevNames);
+
+		/* We no longer free these structures, but preserve them for the next time
+		GlobalFree(pd.hDevMode);
+		GlobalFree(pd.hDevNames);
+		*/
+
+		if (printer == NULL)
+			return;	/* abort */
+
+		pr.hdcPrn = printer;
+		SetWindowLong(hwnd, 4, (LONG)((GP_LPPRINT)&pr));
+		PrintRegister((GP_LPPRINT)&pr);
+		if ((buf = malloc(4096 + 2)) != NULL) {
+			bufcount = (WORD *)buf;
+			EnableWindow(hwnd,FALSE);
+			pr.bUserAbort = FALSE;
+			pr.hDlgPrint = CreateDialogParam(hdllInstance, "CancelDlgBox",
+							 hwnd, PrintDlgProc, (LPARAM)szAppName);
+			SetAbortProc(printer, PrintAbortProc);
+
+			memset(&di, 0, sizeof(DOCINFO));
+			di.cbSize = sizeof(DOCINFO);
+			di.lpszDocName = szAppName;
+			if (StartDoc(printer, &di) > 0) {
+				while (pr.hDlgPrint && !pr.bUserAbort &&
+					   (count = fread(buf + 2, 1, 4096, f)) != 0 ) {
+					int ret;
+					*bufcount = count;
+					ret = Escape(printer, PASSTHROUGH, count + 2, (LPSTR)buf, NULL);
+					ldone += count;
+					if (ret != SP_ERROR) {
+						sprintf(pcdone, "%d%% done", (int)(ldone * 100 / lsize));
+						SetWindowText(GetDlgItem(pr.hDlgPrint, CANCEL_PCDONE), pcdone);
+					} else {
+						SetWindowText(GetDlgItem(pr.hDlgPrint, CANCEL_PCDONE), "Passthrough Error!");
+					}
+					if (pr.bUserAbort)
+						AbortDoc(printer);
+					else
+						EndDoc(printer);
+				}
+				if (!pr.bUserAbort) {
+					EnableWindow(hwnd, TRUE);
+					DestroyWindow(pr.hDlgPrint);
+				}
+				free(buf);
+			}
 		}
-	    }
-	    DeleteDC(printer);
-	    SetWindowLong(hwnd, 4, (LONG)(0L));
-	    PrintUnregister((GP_LPPRINT)&pr);
+		DeleteDC(printer);
+		SetWindowLong(hwnd, 4, 0L);
+		PrintUnregister((GP_LPPRINT)&pr);
 	}
-    }
-    fclose(f);
+
+	fclose(f);
 }
