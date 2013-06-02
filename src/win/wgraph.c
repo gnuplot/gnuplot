@@ -1,5 +1,5 @@
 /*
- * $Id: wgraph.c,v 1.160 2013/04/24 20:05:33 markisch Exp $
+ * $Id: wgraph.c,v 1.161 2013/04/24 20:33:29 markisch Exp $
  */
 
 /* GNUPLOT - win/wgraph.c */
@@ -1503,12 +1503,12 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 	       || (GetDeviceCaps(hdc, TECHNOLOGY) == DT_PLOTTER)
 	       || (GetDeviceCaps(hdc, TECHNOLOGY) == DT_RASPRINTER));
 
-    if (isColor) {
+	if (isColor) {
 		SetBkColor(hdc, lpgw->background);
 		FillRect(hdc, rect, lpgw->hbrush);
-    } else {
+	} else {
 		FillRect(hdc, rect, (HBRUSH)GetStockObject(WHITE_BRUSH));
-    }
+	}
 
 	/* Need to scale line widths for raster printers so they are the same
 	   as on screen */
@@ -2566,15 +2566,23 @@ SaveAsEMF(LPGW lpgw)
 		HDC hdc;
 		HENHMETAFILE hemf;
 		HDC hmf;
+		TBOOLEAN antialiasing;
 
 		/* get the context */
 		hdc = GetDC(hwnd);
 		GetPlotRect(lpgw, &rect);
 		GetPlotRectInMM(lpgw, &mfrect, hdc);
 
+		/* temporarily disable antialiasing */
+		antialiasing = lpgw->antialiasing;
+		lpgw->antialiasing = FALSE;
+
 		hmf = CreateEnhMetaFile(hdc, Ofn.lpstrFile, &mfrect, (LPCTSTR)NULL);
+		/* Always create EMF files using GDI only! */
 		drawgraph(lpgw, hmf, (LPRECT) &rect);
 		hemf = CloseEnhMetaFile(hmf);
+
+		lpgw->antialiasing = antialiasing;
 
 		DeleteEnhMetaFile(hemf);
 		ReleaseDC(hwnd, hdc);
@@ -2639,6 +2647,9 @@ CopyClip(LPGW lpgw)
 		/* make copy of window's main status struct for modification */
 		GW gwclip = *lpgw;
 
+		/* disable antialiasing: do not mix GDI/GDI+ */
+		gwclip.antialiasing = FALSE;
+
 		gwclip.hfonth = gwclip.hfontv = 0;
 		MakePens(&gwclip, hdc);
 		MakeFonts(&gwclip, &rect, hdc);
@@ -2646,6 +2657,7 @@ CopyClip(LPGW lpgw)
 		GetPlotRectInMM(lpgw, &mfrect, hdc);
 
 		hmf = CreateEnhMetaFile(hdc, (LPCTSTR)NULL, &mfrect, (LPCTSTR)NULL);
+		/* Always create EMF files using GDI only! */
 		drawgraph(&gwclip, hmf, (LPRECT) &rect);
 		hemf = CloseEnhMetaFile(hmf);
 
@@ -3342,10 +3354,10 @@ LineStyle(LPGW lpgw)
 static void
 Wnd_exec_event(LPGW lpgw, LPARAM lparam, char type, int par1)
 {
-    int mx, my;
-    static unsigned long lastTimestamp = 0;
-    unsigned long thisTimestamp = GetMessageTime();
-    int par2 = thisTimestamp - lastTimestamp;
+	int mx, my;
+	static unsigned long lastTimestamp = 0;
+	unsigned long thisTimestamp = GetMessageTime();
+	int par2 = thisTimestamp - lastTimestamp;
 
 	if (lpgw == graphwin) {
 		if (type == GE_keypress)
