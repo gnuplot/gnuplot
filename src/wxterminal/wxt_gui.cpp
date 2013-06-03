@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.cpp,v 1.91.2.11 2013/04/05 16:39:47 markisch Exp $
+ * $Id: wxt_gui.cpp,v 1.91.2.12 2013/04/22 17:40:19 sfeam Exp $
  */
 
 /* GNUPLOT - wxt_gui.cpp */
@@ -3694,6 +3694,16 @@ void wxt_sigint_handler(int WXUNUSED(sig))
 {
 	FPRINTF((stderr,"custom interrupt handler called\n"));
 	signal(SIGINT, wxt_sigint_handler);
+
+	/* If this happens, it's bad.  We already flagged that we want	*/
+	/* to quit but nobody acted on it.  This can happen if the 	*/
+	/* connection to the X-server is lost, which can be forced by	*/
+	/* using xkill on the display window.  See bug #991.		*/
+	if (wxt_status == STATUS_INTERRUPT_ON_NEXT_CHECK) {
+		fprintf(stderr,"wxt display server shutting down - no response\n");
+		exit(-1);
+	}
+
 	/* routines must check regularly for wxt_status,
 	 * and abort cleanly on STATUS_INTERRUPT_ON_NEXT_CHECK */
 	wxt_status = STATUS_INTERRUPT_ON_NEXT_CHECK;
