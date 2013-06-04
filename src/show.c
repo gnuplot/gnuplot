@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.291 2013/05/18 23:47:20 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.292 2013/05/19 23:46:34 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -3004,7 +3004,7 @@ show_datafile()
     }
     if (END_OF_COMMAND || almost_equals(c_token,"sep$arators")) {
 	if (df_separators)
-	    fprintf(stderr, "\tdatafile fields separated by any of %d characters \"%s\"\n", strlen(df_separators), df_separators);
+	    fprintf(stderr, "\tdatafile fields separated by any of %d characters \"%s\"\n", (int)strlen(df_separators), df_separators);
 	else
 	    fprintf(stderr, "\tdatafile fields separated by whitespace\n");
     }
