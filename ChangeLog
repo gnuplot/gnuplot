@@ -19,6 +19,9 @@
 
 	* src/scanner.c src/util.c src/util.h:  Allow UTF8 identifiers.
 
+	* src/internal.c (f_range): Allow "string"[x:x] where x is real rather
+	than int.   This makes it more convenient to use column data as an index.
+
 2013-06-02  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/win/wprinter.c (PrintDlgProc):  Safeguard against unavailable

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: internal.c,v 1.67 2011/11/10 05:15:58 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: internal.c,v 1.68 2012/05/06 02:58:54 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - internal.c */
@@ -1130,30 +1130,41 @@ f_range(union argument *arg)
 {
     struct value beg, end, full;
     struct value substr;
+    int ibeg, iend;
 
     (void) arg;			/* avoid -Wunused warning */
     (void) pop(&end);
     (void) pop(&beg);
     (void) pop(&full);
 
-    if (end.type != INTGR || beg.type != INTGR)
-	int_error(NO_CARET, "internal error: substring range specifiers must have integer values");
-
+    if (beg.type == INTGR)
+	ibeg = beg.v.int_val;
+    else if (beg.type == CMPLX)
+	ibeg = floor(beg.v.cmplx_val.real);
+    else
+	int_error(NO_CARET, "internal error: non-numeric substring range specifier");
+    if (end.type == INTGR)
+	iend = end.v.int_val;
+    else if (end.type == CMPLX)
+	iend = floor(end.v.cmplx_val.real);
+    else
+	int_error(NO_CARET, "internal error: non-numeric substring range specifier");
+	
     if (full.type != STRING)
 	int_error(NO_CARET, "internal error: substring range operator applied to non-STRING type");
 
     FPRINTF((stderr,"f_range( \"%s\", %d, %d)\n", full.v.string_val, beg.v.int_val, end.v.int_val));
 
-    if (end.v.int_val > gp_strlen(full.v.string_val))
-	end.v.int_val = gp_strlen(full.v.string_val);
-    if (beg.v.int_val < 1)
-	beg.v.int_val = 1;
+    if (iend > gp_strlen(full.v.string_val))
+	iend = gp_strlen(full.v.string_val);
+    if (ibeg < 1)
+	ibeg = 1;
 
-    if (beg.v.int_val > end.v.int_val) {
+    if (ibeg > iend) {
 	push(Gstring(&substr, ""));
     } else {
-	char *begp = gp_strchrn(full.v.string_val,beg.v.int_val-1);
-	char *endp = gp_strchrn(full.v.string_val,end.v.int_val);
+	char *begp = gp_strchrn(full.v.string_val,ibeg-1);
+	char *endp = gp_strchrn(full.v.string_val,iend);
 	*endp = '\0';
 	push(Gstring(&substr, begp));
     }
