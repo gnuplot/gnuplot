@@ -1,3 +1,22 @@
+2013-06-05  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* configure.in:  Allow building against either Qt4 or Qt5.
+	./configure --with-qt		# Try Qt5 first, fall back to Qt4
+	./configure --with-qt=qt4	# Prefer Qt4 to Qt5 even if present
+	Note: On my machine use of Qt5 also requires compiler option -fPIC, but
+	I have not added this to configure.in.
+
+	* src/qtterminal/{qt_term.cpp QtGnuplotWindow.h QtGnuplotWidget.cpp
+	QtGnuplotWidget.h}:  Trivial changes to #include statements required by 
+	Qt4->Qt5 module organization. 
+	QString::toAscii is deprecated.  Use toUtf8 or toLatin1 as appropriate.
+
+	* src/qtterminal/QtGnuplotScene.cpp (processEvent positionText):
+	Older APIs for transformations (rotate/translate/scale) have been removed
+	in Qt5.  The new ones seem to work OK in 4.6 also, so I have replaced the
+	old ones unconditionally.  If this causes problems we could choose old or
+	new based on QT_VERSION.
+
 2013-06-02  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/win/wprinter.c (PrintDlgProc):  Safeguard against unavailable

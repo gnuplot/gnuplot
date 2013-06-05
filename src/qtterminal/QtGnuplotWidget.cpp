@@ -271,7 +271,7 @@ void QtGnuplotWidget::loadSettings()
 	QSettings settings("gnuplot", "qtterminal");
 	m_antialias = settings.value("view/antialias", true).toBool();
 	m_rounded = settings.value("view/rounded", true).toBool();
-	m_backgroundColor = settings.value("view/backgroundColor", Qt::white).value<QColor>();
+	m_backgroundColor = settings.value("view/backgroundColor", QColor(Qt::white)).value<QColor>();
 	m_replotOnResize = settings.value("view/replotOnResize", true).toBool();
 	applySettings();
 }

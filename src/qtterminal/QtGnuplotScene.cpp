@@ -355,12 +355,16 @@ void QtGnuplotScene::processEvent(QtGnuplotEventType type, QDataStream& in)
 		QPoint p2; in >> p2;
 		QPoint p3; in >> p3;
 		QImage image; in >> image;
+		QPointF size = p1 - p0;
 		QPixmap pixmap = QPixmap::fromImage(image);
-		QGraphicsPixmapItem* item = addPixmap(pixmap);
+		// Qt5 complains that the following operations are not legal
+		// QGraphicsPixmapItem* item = addPixmap(pixmap);
+		// item->scale(size.x()/pixmap.width(), size.y()/pixmap.height());
+		QGraphicsPixmapItem* item = addPixmap(pixmap.scaled(
+				QSize(size.x(), size.y()),
+				Qt::IgnoreAspectRatio, Qt::FastTransformation));
 		item->setZValue(m_currentZ++);
 		item->setPos(p0);
-		QPointF size = p1 - p0;
-		item->scale(size.x()/pixmap.width(), size.y()/pixmap.height());
 		m_currentGroup.append(item);
 		/// @todo clipping
 	}
@@ -584,9 +588,9 @@ void QtGnuplotScene::positionText(QGraphicsItem* item, const QPoint& point)
 	else if (m_textAlignment == Qt::AlignCenter)
 		cx = (item->boundingRect().right() + item->boundingRect().left())/2.;
 
-	item->translate(cx, cy);
-	item->rotate(-m_textAngle);
-	item->translate(-cx, -cy);
+	item->setTransformOriginPoint(cx, cy);
+	item->setRotation(-m_textAngle);
+	item->setTransformOriginPoint(-cx, -cy);
 	item->setPos(point.x() - cx, point.y() - cy);
 }
 
@@ -804,7 +808,7 @@ void QtGnuplotScene::keyPressEvent(QKeyEvent* event)
 	// ASCII keys
 	else if ((event->key() <= 0xff) && (!event->text().isEmpty()))
 		// event->key() does not respect the case
-		key = event->text()[0].toAscii();
+		key = event->text()[0].toLatin1();
 	// Special keys
 	else
 		switch (event->key())

@@ -49,6 +49,13 @@
 #include <QWidget>
 #include <QPainter>
 
+/* I had to add these in order to link against qt5 rather than qt4 */
+#if QT_VERSION >= 0x050000
+#include <QtWidgets>
+#include <QtPrintSupport/QPrinter>
+#include <QtPrintSupport/QPrintDialog>
+#endif
+
 class QtGnuplotScene;
 class QGraphicsView;
 class Ui_settingsDialog;

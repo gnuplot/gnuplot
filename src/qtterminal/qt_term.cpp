@@ -61,6 +61,7 @@ extern "C" {
 
 #include "qt_term.h"
 #include "QtGnuplotEvent.h"
+#include "QtGnuplotApplication.h"
 #include "qt_conversion.cpp"
 
 void qt_atexit();
@@ -136,8 +137,8 @@ void execGnuplotQt()
 			filename = QT_DRIVER_DIR;
 		filename += "/gnuplot_qt";
 
-		execlp(filename.toAscii().data(), "gnuplot_qt", (char*)NULL);
-		fprintf(stderr, "Expected Qt driver: %s\n", filename.toAscii().data());
+		execlp(filename.toUtf8().data(), "gnuplot_qt", (char*)NULL);
+		fprintf(stderr, "Expected Qt driver: %s\n", filename.toUtf8().data());
 		perror("Exec failed");
 		exit(EXIT_FAILURE);
 	}
