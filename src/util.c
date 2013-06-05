@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: util.c,v 1.111 2013/04/27 07:51:17 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: util.c,v 1.112 2013/05/08 03:35:16 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - util.c */
@@ -176,9 +176,9 @@ isanumber(int t_num)
 int
 isletter(int t_num)
 {
+    unsigned char c = gp_input_line[token[t_num].start_index];
     return (token[t_num].is_token &&
-	    ((isalpha((unsigned char) gp_input_line[token[t_num].start_index])) ||
-	     (gp_input_line[token[t_num].start_index] == '_')));
+	    (isalpha(c) || (c == '_') || ALLOWED_8BITVAR(c)));
 }
 
 

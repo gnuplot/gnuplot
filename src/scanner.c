@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: scanner.c,v 1.34 2012/01/08 04:21:14 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: scanner.c,v 1.35 2012/06/19 18:11:06 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - scanner.c */
@@ -55,15 +55,12 @@ static void substitute __PROTO((char **strp, size_t *str_lenp, int current));
 #endif /* VMS */
 
 
-#define isident(c) (isalnum((unsigned char)c) || (c) == '_')
+#define isident(c) (isalnum((unsigned char)(c)) || (c) == '_' || ALLOWED_8BITVAR(c))
 
 #define LBRACE '{'
 #define RBRACE '}'
 
 #define APPEND_TOKEN {token[t_num].length++; current++;}
-
-#define SCAN_IDENTIFIER while (isident(expression[current + 1]))\
-				APPEND_TOKEN
 
 static int t_num;		/* number of token I'm working on */
 
@@ -143,9 +140,13 @@ scanner(char **expressionp, size_t *expressionlenp)
 	    continue;
 	}
 	/* allow _ to be the first character of an identifier */
-	if (isalpha((unsigned char) expression[current])
-	    || expression[current] == '_') {
-	    SCAN_IDENTIFIER;
+	/* allow 8bit characters in identifiers */
+	if (isalpha((unsigned char)expression[current])
+	    || (expression[current] == '_')
+	    || ALLOWED_8BITVAR(expression[current])) {
+		while (isident(expression[current + 1]))
+		    APPEND_TOKEN;
+
 	} else if (isdigit((unsigned char) expression[current])) {
 	    token[t_num].is_token = FALSE;
 	    token[t_num].length = get_num(&expression[current]);

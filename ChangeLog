@@ -17,6 +17,8 @@
 	old ones unconditionally.  If this causes problems we could choose old or
 	new based on QT_VERSION.
 
+	* src/scanner.c src/util.c src/util.h:  Allow UTF8 identifiers.
+
 2013-06-02  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/win/wprinter.c (PrintDlgProc):  Safeguard against unavailable
