@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: fit.c,v 1.115 2013/06/02 06:49:52 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: fit.c,v 1.116 2013/06/06 17:15:25 markisch Exp $"); }
 #endif
 
 /*  NOTICE: Change of Copyright Status
@@ -1453,7 +1453,7 @@ log_axis_restriction(FILE *log_f, AXIS_INDEX axis, char *name)
     char s[80];
     AXIS *this_axis = axis_array + axis;
 
-    fprintf(log_f, "\t%s range restricted to [", name);
+    fprintf(log_f, "        %s range restricted to [", name);
     if (this_axis->autoscale & AUTOSCALE_MIN) {
 	putc('*', log_f);
     } else if (this_axis->datatype == DT_TIMEDATE) {
@@ -1710,7 +1710,7 @@ fit_command()
     j = FIRST_Z_AXIS;		/* check Z axis first */
     for (i = 0; i <= num_indep; i++) {
 	if ((axis_array[j].autoscale & AUTOSCALE_BOTH) != AUTOSCALE_BOTH)
-	    log_axis_restriction(log_f, j, i ? c_dummy_var[i] : "z");
+	    log_axis_restriction(log_f, j, (i != 0) ? c_dummy_var[i-1] : "z");
 	j = var_order[i];
     }
 

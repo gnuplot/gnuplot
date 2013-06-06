@@ -1,3 +1,11 @@
+2013-06-06  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/fit.c (fit_command):  Log file contained the wrong variable name
+	for axis restrictions.  Reported by Victor Slabinski on gnuplot-bugs.
+
+	* src/fit.c:  Make Ctrl-C interrupt fits in Windows console mode gnuplot
+	again.
+
 2013-06-05  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* configure.in:  Allow building against either Qt4 or Qt5.
