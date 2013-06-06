@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: fit.c,v 1.114 2013/05/27 09:11:29 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: fit.c,v 1.115 2013/06/02 06:49:52 markisch Exp $"); }
 #endif
 
 /*  NOTICE: Change of Copyright Status
@@ -223,7 +223,9 @@ static char last_fit_command[LASTFITCMDLENGTH+1] = "";
 			 internal Prototypes
 *****************************************************************/
 
+#if !defined(WIN32) || defined(WGP_CONSOLE)
 static RETSIGTYPE ctrlc_handle __PROTO((int an_int));
+#endif
 static void ctrlc_setup __PROTO((void));
 static marq_res_t marquardt __PROTO((double a[], double **alpha, double *chisq,
 				     double *lambda));
@@ -269,6 +271,7 @@ wri_to_fil_last_fit_cmd(FILE *fp)
     This is called when a SIGINT occurs during fit
 *****************************************************************/
 
+#if !defined(WIN32) || defined(WGP_CONSOLE)
 static RETSIGTYPE
 ctrlc_handle(int an_int)
 {
@@ -277,6 +280,7 @@ ctrlc_handle(int an_int)
     (void) signal(SIGINT, (sigfunc) ctrlc_handle);
     ctrlc_flag = TRUE;
 }
+#endif
 
 
 /*****************************************************************
@@ -294,7 +298,7 @@ ctrlc_setup()
  *
  *  I hope that other OSes do it better, if not... add #ifdefs :-(
  */
-#if (defined(__EMX__) || !defined(MSDOS) && !defined(WIN32))
+#if (defined(__EMX__) || !defined(MSDOS)) && (!defined(WIN32) || defined(WGP_CONSOLE))
     (void) signal(SIGINT, (sigfunc) ctrlc_handle);
 #endif
 }
