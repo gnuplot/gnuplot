@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: win.trm,v 1.107 2011/11/15 22:47:19 markisch Exp $
+ * $Id: win.trm,v 1.107.2.1 2012/07/18 08:28:42 markisch Exp $
  */
 
 /* GNUPLOT - win.trm */
@@ -95,8 +95,7 @@ TERM_PUBLIC void WIN_filled_polygon __PROTO((int points, gpiPoint *corners));
 TERM_PUBLIC void WIN_boxfill __PROTO((int, unsigned int, unsigned int, unsigned int, unsigned int));
 TERM_PUBLIC int WIN_set_font __PROTO((const char *font));
 TERM_PUBLIC void WIN_enhanced_open __PROTO((char * fontname, double fontsize,
-	    		double base, TBOOLEAN widthflag, TBOOLEAN showflag,
-			int overprint));
+					double base, TBOOLEAN widthflag, TBOOLEAN showflag, int overprint));
 TERM_PUBLIC void WIN_enhanced_flush __PROTO((void));
 TERM_PUBLIC void WIN_image __PROTO((unsigned int, unsigned int, coordval *, gpiPoint *, t_imagecolor));
 TERM_PUBLIC void WIN_layer __PROTO((t_termlayer syncpoint));
@@ -177,7 +176,7 @@ WIN_options()
 	int window_number;
 
 	while (!END_OF_COMMAND) {
-		switch(lookup_table(&WIN_opts[0],c_token)) {
+		switch (lookup_table(&WIN_opts[0], c_token)) {
 		case WIN_DEFAULT:
 			color = TRUE;
 			dashed = FALSE;
@@ -272,6 +271,10 @@ WIN_options()
 		case WIN_GTITLE:
 			c_token++;
 			title = try_to_get_string();
+			if (title == NULL)
+				int_error(c_token, "expecting string argument");
+			if (strcmp(title, "") == 0)
+				title = NULL;
 			set_title = TRUE;
 			break;
 		case WIN_CLOSE:
