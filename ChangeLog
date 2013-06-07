@@ -1,6 +1,15 @@
+2013-06-07  Thomas Mattison  <mattison <at> phas.ubc.ca>
+
+	* src/fit.c (regress):  Fit did not converge if maximum lambda was
+	exceeded.  Add new message for this case.
+	Patchset #230.
+
 2013-06-07  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	More backports from version 4.7
+
+	* src/fit.c (backup_file):  Remove code path for Win32s.  Backup files 
+	will not get overwritten.  Add error message for that case.
 
 	* src/fit.c (fit_command):  Log file contained the wrong variable name
 	for axis restrictions.  Reported by Victor Slabinski on gnuplot-bugs.

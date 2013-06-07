@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: fit.c,v 1.78.2.2 2013/06/08 13:25:07 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: fit.c,v 1.78.2.3 2013/06/08 13:30:46 markisch Exp $"); }
 #endif
 
 /*  NOTICE: Change of Copyright Status
@@ -690,6 +690,8 @@ regress(double a[])
 	Dblf2("\nMaximum iteration count (%d) reached. Fit stopped.\n", maxiter);
     } else if (user_stop) {
 	Dblf2("\nThe fit was stopped by the user after %d iterations.\n", iter);
+    } else if (lambda >= MAX_LAMBDA) {
+	Dblf2("\nThe maximum lambda = %e was exceeded. Fit stopped.\n", MAX_LAMBDA);
     } else {
 	Dblf2("\nAfter %d iterations the fit converged.\n", iter);
 	v = add_udv_by_name("FIT_CONVERGED");
