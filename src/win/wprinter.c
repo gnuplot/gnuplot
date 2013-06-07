@@ -1,6 +1,6 @@
-#ifndef lint
-static char *RCSid() { return RCSid("$Id: wprinter.c,v 1.6 2010/12/14 23:02:23 broeker Exp $"); }
-#endif
+/*
+ * $Id: wprinter.c,v 1.7 2011/03/13 19:55:29 markisch Exp $"); }
+ */
 
 /* GNUPLOT - win/wprinter.c */
 /*[
@@ -64,6 +64,8 @@ static char *RCSid() { return RCSid("$Id: wprinter.c,v 1.6 2010/12/14 23:02:23 b
 GP_LPPRINT prlist = NULL;
 
 BOOL CALLBACK PrintSizeDlgProc(HWND hdlg, UINT wmsg, WPARAM wparam, LPARAM lparam);
+static GP_LPPRINT PrintFind(HDC hdc);
+
 
 BOOL CALLBACK
 PrintSizeDlgProc(HWND hdlg, UINT wmsg, WPARAM wparam, LPARAM lparam)
@@ -144,7 +146,7 @@ PrintSize(HDC printer, HWND hwnd, LPRECT lprect)
     BOOL status = FALSE;
     GP_PRINT pr;
 
-    SetWindowLong(hwnd, 4, (LONG)((GP_LPPRINT)&pr));
+    SetWindowLong(hwnd, 4, (LONG)&pr);
     pr.poff.x = 0;
     pr.poff.y = 0;
     pr.psize.x = GetDeviceCaps(printer, HORZSIZE);
@@ -180,7 +182,8 @@ PrintRegister(GP_LPPRINT lpr)
     lpr->next = next;
 }
 
-GP_LPPRINT
+
+static GP_LPPRINT
 PrintFind(HDC hdc)
 {
     GP_LPPRINT this;
@@ -217,6 +220,9 @@ PrintDlgProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 {
     GP_LPPRINT lpr;
     lpr = (GP_LPPRINT)GetWindowLong(GetParent(hDlg), 4);
+	/* FIXME: cause of crash in bug #3544949. No idea yet as to why this could happen, though. */
+	if (lpr == NULL)
+	return FALSE;
 
     switch(message) {
     case WM_INITDIALOG:
