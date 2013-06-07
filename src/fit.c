@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: fit.c,v 1.77 2011/10/25 05:10:58 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: fit.c,v 1.78 2011/11/15 20:23:43 sfeam Exp $"); }
 #endif
 
 /*  NOTICE: Change of Copyright Status
@@ -85,6 +85,9 @@ static void Dblfn __PROTO(());
 #  include <fcntl.h>
 # endif				/* !VMS */
 #endif /* !(MSDOS) */
+#ifdef WIN32
+# include "win/winmain.h"
+#endif
 
 enum marq_res {
     OK, ML_ERROR, BETTER, WORSE
@@ -102,7 +105,7 @@ typedef enum marq_res marq_res_t;
 #define INITIAL_VALUE 1.0
 
 /* Relative change for derivatives */
-#define DELTA	    0.001
+#define DELTA       0.001
 
 #define MAX_DATA    2048
 #define MAX_PARAMS  32
@@ -121,13 +124,12 @@ typedef enum marq_res marq_res_t;
 
 /* externally visible variables: */
 
-/* saved copy of last 'fit' command -- for output by "save" */
-char fitbuf[256];
-
 /* log-file for fit command */
 char *fitlogfile = NULL;
 TBOOLEAN fit_errorvariables = FALSE;
 TBOOLEAN fit_quiet = FALSE;
+TBOOLEAN ctrlc_flag = FALSE;
+char fitbuf[256]; /* for Eex and error_ex */
 
 /* private variables: */
 
@@ -165,7 +167,6 @@ static double *fit_x = 0;	/* all independent variable values,
 static double *fit_z = 0;	/* dependent data values */
 static double *err_data = 0;	/* standard deviations of dependent data */
 static double *a = 0;		/* array of fitting parameters */
-static TBOOLEAN ctrlc_flag = FALSE;
 static TBOOLEAN user_stop = FALSE;
 
 static struct udft_entry func;
@@ -180,7 +181,9 @@ static double startup_lambda = 0, lambda_down_factor = LAMBDA_DOWN_FACTOR, lambd
 			 internal Prototypes
 *****************************************************************/
 
+#if !defined(WIN32) || defined(WGP_CONSOLE)
 static RETSIGTYPE ctrlc_handle __PROTO((int an_int));
+#endif
 static void ctrlc_setup __PROTO((void));
 static marq_res_t marquardt __PROTO((double a[], double **alpha, double *chisq,
 				     double *lambda));
@@ -224,6 +227,7 @@ wri_to_fil_last_fit_cmd(FILE *fp)
     This is called when a SIGINT occurs during fit
 *****************************************************************/
 
+#if !defined(WIN32) || defined(WGP_CONSOLE)
 static RETSIGTYPE
 ctrlc_handle(int an_int)
 {
@@ -232,6 +236,7 @@ ctrlc_handle(int an_int)
     (void) signal(SIGINT, (sigfunc) ctrlc_handle);
     ctrlc_flag = TRUE;
 }
+#endif
 
 
 /*****************************************************************
@@ -249,7 +254,7 @@ ctrlc_setup()
  *
  *  I hope that other OSes do it better, if not... add #ifdefs :-(
  */
-#if (defined(__EMX__) || !defined(MSDOS))
+#if (defined(__EMX__) || !defined(MSDOS)) && (!defined(WIN32) || defined(WGP_CONSOLE))
     (void) signal(SIGINT, (sigfunc) ctrlc_handle);
 #endif
 }
@@ -274,6 +279,7 @@ getchx()
     return c;
 }
 #endif
+
 
 /*****************************************************************
     in case of fatal errors
@@ -302,10 +308,13 @@ error_ex()
     interrupt_setup();
 
     /* exit via int_error() so that it can clean up state variables */
-    int_error(NO_CARET,"error during fit");
+    int_error(NO_CARET, "error during fit");
 }
 
+
 /* HBB 990829: removed the debug print routines */
+
+
 /*****************************************************************
     Marquardt's nonlinear least squares fit
 *****************************************************************/
@@ -362,6 +371,7 @@ marquardt(double a[], double **C, double *chisq, double *lambda)
 	free_matr(tmp_C);
 	return OK;
     }
+
     /* Givens calculates in-place, so make working copies of C and d */
 
     for (j = 0; j < num_data + num_params; j++)
@@ -378,11 +388,9 @@ marquardt(double a[], double **C, double *chisq, double *lambda)
     }
 
     /* FIXME: residues[] isn't used at all. Why? Should it be used? */
-
     Givens(tmp_C, tmp_d, da, residues, num_params + num_data, num_params, 1);
 
     /* check if trial did ameliorate sum of squares */
-
     for (j = 0; j < num_params; j++)
 	temp_a[j] = a[j] + da[j];
 
@@ -542,18 +550,21 @@ fit_interrupt()
 {
     while (TRUE) {
 	fputs("\n\n(S)top fit, (C)ontinue, (E)xecute FIT_SCRIPT:  ", STANDARD);
-	switch (getc(stdin)) {
+#ifdef WIN32
+	WinRaiseConsole();
+#endif
+	switch (getchar()) {
 
 	case EOF:
 	case 's':
 	case 'S':
-	    fputs("Stop.", STANDARD);
+	    fputs("Stop.\n", STANDARD);
 	    user_stop = TRUE;
 	    return FALSE;
 
 	case 'c':
 	case 'C':
-	    fputs("Continue.", STANDARD);
+	    fputs("Continue.\n", STANDARD);
 	    return TRUE;
 
 	case 'e':
@@ -614,6 +625,8 @@ regress(double a[])
 
     /* HBB 981118: initialize new variable 'user_break' */
     user_stop = FALSE;
+    /* FIXME: This really should not be necessary, but it is not properly initialised in wgnuplot otherwise. */
+    ctrlc_flag = FALSE;
 
     do {
 /*
@@ -636,6 +649,11 @@ regress(double a[])
 	    } while (kbhit());
 	    ctrlc_flag = TRUE;
 	}
+#endif
+#ifdef WIN32
+	/* This call makes the Windows GUI functional during fits.
+	   Pressing Ctrl-Break now finally has an effect. */
+	WinMessageLoop();
 #endif
 
 

@@ -1,5 +1,5 @@
 /*
- * $Id: wgraph.c,v 1.144.2.6 2013/06/08 07:47:15 markisch Exp $
+ * $Id: wgraph.c,v 1.144.2.7 2013/06/08 08:08:14 markisch Exp $
  */
 
 /* GNUPLOT - win/wgraph.c */
@@ -76,6 +76,7 @@
 #ifdef HAVE_GDIPLUS
 #include "wgdiplus.h"
 #endif
+#include "fit.h"
 
 #ifdef USE_MOUSE
 /* Petr Mikulik, February 2001
@@ -3362,23 +3363,10 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			 * here... */
 #ifndef DISABLE_SPACE_RAISES_CONSOLE
 			if (wParam == VK_SPACE) {
-				HWND console = NULL;
-#ifndef WGP_CONSOLE
-				if (lpgw->lptw != NULL)
-					console = lpgw->lptw->hWndParent;
-#else
-				console = GetConsoleWindow();
-#endif
-				/* HBB 20001023: implement the '<space> in graph returns to
-				 * text window' --- feature already present in OS/2 and X11 */
-				/* Make sure the text window or console is visible: */
-				ShowWindow(console, SW_RESTORE);
-				/* Activate it --> keyboard focus goes there: */
-				BringWindowToTop(console);
-				return 0;
+				WinRaiseConsole();
+				return 0L;
 			}
 #endif /* DISABLE_SPACE_RAISES_CONSOLE */
-
 #ifdef USE_MOUSE
 			Wnd_exec_event(lpgw, lParam, GE_keypress, (TCHAR)wParam);
 #endif
@@ -3514,6 +3502,10 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 				break;
 			case VK_F12:
 				Wnd_exec_event(lpgw, lParam, GE_keypress, GP_F12);
+				break;
+			case VK_CANCEL:
+				/* FIXME: Currently, this only supports interrupting fit. */
+				ctrlc_flag = TRUE;
 				break;
 			} /* switch (wParam) */
 

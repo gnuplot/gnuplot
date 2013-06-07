@@ -2,6 +2,13 @@
 
 	More backports from version 4.7
 
+	* src/fit.c|h src/win/wgraph.c src/win/wtext.c:  Ctrl-Break interrupts
+	fitting runs in wgnuplot.
+
+	* src/win/winmain.c|h (WinRaiseConsole) src/fit.c src/win/wgraph.c
+	src/wxterminal/wxt_gui.cpp: Consolidate code to raise console in new
+	routine.
+
 	* src/win/wprinter.c (PrintDlgProc):  Verify that printer info is actually
 	available.
 	Bug 1152.
