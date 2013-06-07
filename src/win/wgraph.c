@@ -1,5 +1,5 @@
 /*
- * $Id: wgraph.c,v 1.144.2.4 2013/04/05 16:24:36 markisch Exp $
+ * $Id: wgraph.c,v 1.144.2.5 2013/04/05 16:39:50 markisch Exp $
  */
 
 /* GNUPLOT - win/wgraph.c */
@@ -3797,7 +3797,7 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			UpdateToolbar(lpgw);
 
 			return 0;
-	}
+		}
 		case WM_SIZE:
 			SendMessage(lpgw->hStatusbar, WM_SIZE, wParam, lParam);
 			if (lpgw->hToolbar) {
@@ -3810,6 +3810,7 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			if ((wParam == SIZE_MAXIMIZED) || (wParam == SIZE_RESTORED)) {
 				RECT rect;
 				unsigned width, height;
+
 				GetWindowRect(hwnd, &rect);
 				width = rect.right - rect.left;
 				height = rect.bottom - rect.top;
@@ -3817,6 +3818,14 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 				if ((lpgw->Size.x != width) || (lpgw->Size.y != height)) {
 					lpgw->Size.x = width;
 					lpgw->Size.y = height;
+
+					/* remake fonts */
+					DestroyFonts(lpgw);
+					GetPlotRect(lpgw, &rect);
+					hdc = GetDC(hwnd);
+					MakeFonts(lpgw, &rect, hdc);
+					ReleaseDC(hwnd, hdc);
+
 					GetClientRect(hwnd, &rect);
 					InvalidateRect(hwnd, &rect, 1);
 					UpdateWindow(hwnd);
@@ -3896,7 +3905,7 @@ win_close_terminal_window(LPGW lpgw)
  * window that we need, in a single large structure. */
 
 void WDPROC
-Graph_set_cursor (LPGW lpgw, int c, int x, int y )
+Graph_set_cursor(LPGW lpgw, int c, int x, int y)
 {
 	switch (c) {
 	case -4: /* switch off line between ruler and mouse cursor */
@@ -3930,7 +3939,7 @@ Graph_set_cursor (LPGW lpgw, int c, int x, int y )
 		zoombox.from.y = zoombox.to.y = y;
 		break;
 	case 0:  /* standard cross-hair cursor */
-		SetCursor( (hptrCurrent = mouse_setting.on ? hptrCrossHair : hptrDefault) );
+		SetCursor((hptrCurrent = mouse_setting.on ? hptrCrossHair : hptrDefault));
 		break;
 	case 1:  /* cursor during rotation */
 		SetCursor(hptrCurrent = hptrRotating);
@@ -4000,7 +4009,7 @@ Graph_put_tmptext (LPGW lpgw, int where, LPCSTR text )
 		break;
 	default:
 		; /* should NEVER happen */
-    }
+	}
 }
 
 void WDPROC

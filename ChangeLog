@@ -1,3 +1,23 @@
+2013-06-07  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	More backports from version 4.7
+
+	* src/win/wgraph.c: Recreate fonts after resizing the graph window.
+	This bug causes the plot just to be scaled to the new size, without
+	adjusting spacing/borders etc.
+	Bugfix.
+
+2013-06-07  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	More backports from version 4.7
+
+	* term/win.trm (WIN_options):  Validate argument to title option.
+
+	* term/win.trm (WIN_filled_polygon): Filled polygon are always closed.
+	Ignore the last corner if it's the same as the first one.
+
+	* src/win/wgraph.c: Recreate fonts after resizing the graph window.
+
 2013-06-03  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/wxterminal/wxt_gui.cpp (wxt_sigint_handler):  The wxt terminal
