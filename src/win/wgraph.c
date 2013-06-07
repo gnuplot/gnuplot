@@ -1,5 +1,5 @@
 /*
- * $Id: wgraph.c,v 1.144.2.5 2013/04/05 16:39:50 markisch Exp $
+ * $Id: wgraph.c,v 1.144.2.6 2013/06/08 07:47:15 markisch Exp $
  */
 
 /* GNUPLOT - win/wgraph.c */
@@ -2452,15 +2452,23 @@ SaveAsEMF(LPGW lpgw)
 		HDC hdc;
 		HENHMETAFILE hemf;
 		HDC hmf;
+		TBOOLEAN antialiasing;
 
 		/* get the context */
 		hdc = GetDC(hwnd);
 		GetPlotRect(lpgw, &rect);
 		GetPlotRectInMM(lpgw, &mfrect, hdc);
 
+		/* temporarily disable antialiasing */
+		antialiasing = lpgw->antialiasing;
+		lpgw->antialiasing = FALSE;
+
 		hmf = CreateEnhMetaFile(hdc, Ofn.lpstrFile, &mfrect, (LPCTSTR)NULL);
+		/* Always create EMF files using GDI only! */
 		drawgraph(lpgw, hmf, (LPRECT) &rect);
 		hemf = CloseEnhMetaFile(hmf);
+
+		lpgw->antialiasing = antialiasing;
 
 		DeleteEnhMetaFile(hemf);
 		ReleaseDC(hwnd, hdc);
@@ -2525,6 +2533,9 @@ CopyClip(LPGW lpgw)
 		/* make copy of window's main status struct for modification */
 		GW gwclip = *lpgw;
 
+		/* disable antialiasing: do not mix GDI/GDI+ */
+		gwclip.antialiasing = FALSE;
+
 		gwclip.hfonth = gwclip.hfontv = 0;
 		MakePens(&gwclip, hdc);
 		MakeFonts(&gwclip, &rect, hdc);
@@ -2532,6 +2543,7 @@ CopyClip(LPGW lpgw)
 		GetPlotRectInMM(lpgw, &mfrect, hdc);
 
 		hmf = CreateEnhMetaFile(hdc, (LPCTSTR)NULL, &mfrect, (LPCTSTR)NULL);
+		/* Always create EMF files using GDI only! */
 		drawgraph(&gwclip, hmf, (LPRECT) &rect);
 		hemf = CloseEnhMetaFile(hmf);
 
@@ -2623,7 +2635,7 @@ CopyPrint(LPGW lpgw)
 	docInfo.lpszDocName = lpgw->Title;
 
 	if (StartDoc(printer, &docInfo) > 0) {
-		bool aa = lpgw->antialiasing;
+		TBOOLEAN aa = lpgw->antialiasing;
 		lpgw->sampling = 1;
 		/* Mixing GDI/GDI+ does not seem to work properly on printer devices. */
 		lpgw->antialiasing = FALSE;
@@ -2634,6 +2646,7 @@ CopyPrint(LPGW lpgw)
 		MakeFonts(lpgw, &rect, printer);
 		DestroyPens(lpgw);	/* rebuild pens */
 		MakePens(lpgw, printer);
+		/* Always print using GDI only! */
 		drawgraph(lpgw, printer, &rect);
 		if (EndPage(printer) > 0)
 			EndDoc(printer);

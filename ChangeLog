@@ -2,6 +2,10 @@
 
 	More backports from version 4.7
 
+	* src/win/wgraph.c (SaveAsEMF, CopyClip):  Turn off antialiasing during
+	export to EMF or clipboard in order not to mix GDI and GDI+ calls.  See
+	also change on 2012-07-25.
+
 	* src/win/wgraph.c: Recreate fonts after resizing the graph window.
 	This bug causes the plot just to be scaled to the new size, without
 	adjusting spacing/borders etc.
