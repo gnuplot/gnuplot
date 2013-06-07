@@ -8,6 +8,10 @@
 
 	More backports from version 4.7
 
+	* src/fit.c (fit_command):  Always initialize variables which might be
+	set by user variables.  This is necessary since user variables may be
+	`undefine`d.
+
 	* src/fit.c (backup_file):  Remove code path for Win32s.  Backup files 
 	will not get overwritten.  Add error message for that case.
 

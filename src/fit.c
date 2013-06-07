@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: fit.c,v 1.78.2.3 2013/06/08 13:30:46 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: fit.c,v 1.78.2.4 2013/06/08 13:35:25 markisch Exp $"); }
 #endif
 
 /*  NOTICE: Change of Copyright Status
@@ -1336,7 +1336,7 @@ fit_command()
     if (columns == 1)
 	int_error(c_token, "Need 2 to 7 using specs");
 
-    num_indep = (columns<3)?1:columns-2;
+    num_indep = (columns < 3) ? 1 : columns - 2;
 
     /* The following patch was made by Remko Scharroo, 25-Mar-1999
      * We need to check if one of the columns is time data, like
@@ -1373,13 +1373,13 @@ fit_command()
     else if (num_ranges == num_indep+1 && num_indep < 5) {
       /* last range spec is for the Z axis */
       int i = var_order[num_ranges-1]; /* index for the last range spec */
-      
+
       Z_AXIS.autoscale = axis_array[i].autoscale;
       if (!(axis_array[i].autoscale & AUTOSCALE_MIN))
 	Z_AXIS.min = axis_array[i].min;
       if (!(axis_array[i].autoscale & AUTOSCALE_MAX))
 	Z_AXIS.max = axis_array[i].max;
-      
+
       /* restore former values */
       axis_array[i] = saved_axis;
       dummy_token[num_ranges-1] = dummy_token[6];
@@ -1387,29 +1387,38 @@ fit_command()
 
     /* defer actually reading the data until we have parsed the rest
      * of the line */
-
     token3 = c_token;
 
     tmpd = getdvar(FITLIMIT);	/* get epsilon if given explicitly */
     if (tmpd < 1.0 && tmpd > 0.0)
 	epsilon = tmpd;
+    else
+	epsilon = DEF_FIT_LIMIT;
+    FPRINTF((STANDARD, "epsilon=%e\n", epsilon));
 
     /* HBB 970304: maxiter patch */
     maxiter = getivar(FITMAXITER);
+    if (maxiter < 0)
+	maxiter = 0;
+    FPRINTF((STANDARD, "maxiter=%i\n", maxiter));
 
     /* get startup value for lambda, if given */
     tmpd = getdvar(FITSTARTLAMBDA);
-
     if (tmpd > 0.0) {
 	startup_lambda = tmpd;
-	printf("Lambda Start value set: %g\n", startup_lambda);
+	Dblf2("lambda start value set: %g\n", startup_lambda);
+    } else {
+	startup_lambda = 0.0;
     }
+
     /* get lambda up/down factor, if given */
     tmpd = getdvar(FITLAMBDAFACTOR);
-
     if (tmpd > 0.0) {
 	lambda_up_factor = lambda_down_factor = tmpd;
-	printf("Lambda scaling factors reset:  %g\n", lambda_up_factor);
+	Dblf2("lambda scaling factors reset:  %g\n", lambda_up_factor);
+    } else {
+	lambda_down_factor = LAMBDA_DOWN_FACTOR;
+	lambda_up_factor = LAMBDA_UP_FACTOR;
     }
     free(fit_script);
     fit_script = NULL;
@@ -1419,12 +1428,10 @@ fit_command()
 
     {
 	char *logfile = getfitlogfile();
-
-	if (!log_f && !(log_f = fopen(logfile, "a")))
+	if ((logfile != NULL) && !log_f && !(log_f = fopen(logfile, "a")))
 	    Eex2("could not open log-file %s", logfile);
-
-	if (logfile)
-	    free(logfile);
+	FPRINTF((STANDARD, "log-file=%s\n", logfile));
+	free(logfile);
     }
 
     fputs("\n\n*******************************************************************************\n", log_f);
