@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: fit.c,v 1.78 2011/11/15 20:23:43 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: fit.c,v 1.78.2.1 2013/06/08 11:54:25 markisch Exp $"); }
 #endif
 
 /*  NOTICE: Change of Copyright Status
@@ -1442,21 +1442,21 @@ fit_command()
 	fprintf(log_f, "FIT:    data read from %s\n", line);
 	fprintf(log_f, "        format = ");
 	free(line);
-	for (i=0; i<num_indep && i<columns-1; i++)
-	  fprintf(log_f, "%s:", c_dummy_var[i]);
-	fprintf(log_f, (columns<=2) ? "z\n" : "z:s\n");
+	for (i = 0; (i < num_indep) && (i < columns - 1); i++)
+	    fprintf(log_f, "%s:", c_dummy_var[i]);
+	fprintf(log_f, (columns <= 2) ? "z\n" : "z:s\n");
     }
 
     /* report all range specs */
     j = FIRST_Z_AXIS;		/* check Z axis first */
-    for (i=0; i<=num_indep; i++) {
-      if ((axis_array[j].autoscale & AUTOSCALE_BOTH) != AUTOSCALE_BOTH)
-	log_axis_restriction(log_f, j, i ? c_dummy_var[i] : "z");
-      j=var_order[i];
+    for (i = 0; i <= num_indep; i++) {
+	if ((axis_array[j].autoscale & AUTOSCALE_BOTH) != AUTOSCALE_BOTH)
+	    log_axis_restriction(log_f, j, (i != 0) ? c_dummy_var[i-1] : "z");
+	j = var_order[i];
     }
 
     max_data = MAX_DATA;
-    fit_x = vec(max_data*num_indep); /* start with max. value */
+    fit_x = vec(max_data * num_indep); /* start with max. value */
     fit_z = vec(max_data);
     err_data = vec(max_data);
     num_data = 0;

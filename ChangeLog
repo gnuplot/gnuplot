@@ -2,6 +2,9 @@
 
 	More backports from version 4.7
 
+	* src/fit.c (fit_command):  Log file contained the wrong variable name
+	for axis restrictions.  Reported by Victor Slabinski on gnuplot-bugs.
+
 	* src/fit.c|h src/win/wgraph.c src/win/wtext.c:  Ctrl-Break interrupts
 	fitting runs in wgnuplot.
 
