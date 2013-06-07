@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: win.trm,v 1.107.2.1 2012/07/18 08:28:42 markisch Exp $
+ * $Id: win.trm,v 1.107.2.2 2013/06/07 18:31:24 markisch Exp $
  */
 
 /* GNUPLOT - win.trm */
@@ -756,11 +756,17 @@ TERM_PUBLIC void
 WIN_filled_polygon(int points, gpiPoint *corners)
 {
 	GraphOp(graphwin, W_fillstyle, corners->style, 0, NULL);
+
+	/* Eliminate duplicate polygon points. */
+	if ((corners[0].x == corners[points - 1].x) &&
+	    (corners[0].y == corners[points - 1].y))
+		points--;
+
 	if ((points == 4) &&
-		(((corners[0].x == corners[3].x) && (corners[0].y == corners[1].y) &&
-		  (corners[2].x == corners[1].x) && (corners[2].y == corners[3].y)) ||
-		 ((corners[0].x == corners[1].x) && (corners[0].y == corners[3].y) &&
-		  (corners[2].x == corners[3].x) && (corners[2].y == corners[1].y)))) {
+	    (((corners[0].x == corners[3].x) && (corners[0].y == corners[1].y) &&
+	      (corners[2].x == corners[1].x) && (corners[2].y == corners[3].y)) ||
+	     ((corners[0].x == corners[1].x) && (corners[0].y == corners[3].y) &&
+	      (corners[2].x == corners[3].x) && (corners[2].y == corners[1].y)))) {
 		/* The polygon describes a rectangle. Thus we use boxfill, which
 		   is more efficient. */
 		GraphOp(graphwin, W_move, corners[0].x, corners[0].y, NULL);
@@ -771,7 +777,6 @@ WIN_filled_polygon(int points, gpiPoint *corners)
 			GraphOp(graphwin, W_filled_polygon_pt, corners[i].x, corners[i].y, NULL);
 		GraphOp(graphwin, W_filled_polygon_draw, points, 0, NULL);
 	}
-
 }
 
 
