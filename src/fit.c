@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: fit.c,v 1.78.2.1 2013/06/08 11:54:25 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: fit.c,v 1.78.2.2 2013/06/08 13:25:07 markisch Exp $"); }
 #endif
 
 /*  NOTICE: Change of Copyright Status
@@ -1147,20 +1147,14 @@ update(char *pfile, char *npfile)
 static void
 backup_file(char *tofile, const char *fromfile)
 {
-#if defined (WIN32) || defined(MSDOS) || defined(VMS)
+#if defined(MSDOS) || defined(VMS)
     char *tmpn;
 #endif
-
-    /* win32 needs to have two attempts at the rename, since it may
-     * be running on win32s with msdos 8.3 names
-     */
 
 /* first attempt, for all o/s other than MSDOS */
 
 #ifndef MSDOS
-
     strcpy(tofile, fromfile);
-
 #ifdef VMS
     /* replace all dots with _, since we will be adding the only
      * dot allowed in VMS names
@@ -1168,17 +1162,15 @@ backup_file(char *tofile, const char *fromfile)
     while ((tmpn = strchr(tofile, '.')) != NULL)
 	*tmpn = '_';
 #endif /*VMS */
-
     strcat(tofile, BACKUP_SUFFIX);
-
     if (rename(fromfile, tofile) == 0)
 	return;			/* hurrah */
+    if (existfile(tofile))
+	Eex2("The backup file %s already exists and will not be overwritten.", tofile);
 #endif
 
-
-#if defined (WIN32) || defined(MSDOS)
-
-    /* first attempt for msdos. Second attempt for win32s */
+#ifdef MSDOS
+    /* first attempt for msdos. */
 
     /* Copy only the first 8 characters of the filename, to comply
      * with the restrictions of FAT filesystems. */
@@ -1191,12 +1183,12 @@ backup_file(char *tofile, const char *fromfile)
 
     if (rename(fromfile, tofile) == 0)
 	return;			/* success */
-
-#endif /* win32 || msdos */
+#endif /* MSDOS */
 
     /* get here => rename failed. */
     Eex3("Could not rename file %s to %s", fromfile, tofile);
 }
+
 
 /* A modified copy of save.c:save_range(), but this one reports
  * _current_ values, not the 'set' ones, by default */
@@ -1206,7 +1198,7 @@ log_axis_restriction(FILE *log_f, AXIS_INDEX axis, char *name)
     char s[80];
     AXIS *this_axis = axis_array + axis;
 
-    fprintf(log_f, "\t%s range restricted to [", name);
+    fprintf(log_f, "        %s range restricted to [", name);
     if (this_axis->autoscale & AUTOSCALE_MIN) {
 	putc('*', log_f);
     } else if (this_axis->datatype == DT_TIMEDATE) {
@@ -1231,6 +1223,7 @@ log_axis_restriction(FILE *log_f, AXIS_INDEX axis, char *name)
     }
     fputs("]\n", log_f);
 }
+
 
 /*****************************************************************
     Interface to the classic gnuplot-software
