@@ -1,6 +1,6 @@
-#ifndef lint
-static char *RCSid() { return RCSid("$Id: winmain.c,v 1.52.2.1 2011/12/11 11:39:29 markisch Exp $"); }
-#endif
+/*
+ * $Id: winmain.c,v 1.52.2.2 2013/04/05 16:39:50 markisch Exp $
+ */
 
 /* GNUPLOT - win/winmain.c */
 /*[
@@ -55,6 +55,7 @@ static char *RCSid() { return RCSid("$Id: winmain.c,v 1.52.2.1 2011/12/11 11:39:
 #define STRICT
 /* required for MinGW64 */
 #define _WIN32_IE 0x0501
+#define _WIN32_WINNT 0x0501
 #include <windows.h>
 #include <windowsx.h>
 #include <commctrl.h>
@@ -1052,5 +1053,21 @@ WinMessageLoop(void)
 			return;
 		TranslateMessage(&msg);
 		DispatchMessage(&msg);
+	}
+}
+
+
+void
+WinRaiseConsole(void)
+{
+	HWND console = NULL;
+# ifndef WGP_CONSOLE
+	console = textwin.hWndParent;
+# else
+	console = GetConsoleWindow();
+# endif
+	if (console != NULL) {
+		ShowWindow(console, SW_SHOWNORMAL);
+		BringWindowToTop(console);
 	}
 }
