@@ -2,6 +2,11 @@
 
 	* src/show.c src/unset.c:  show/unset individual datafile options.
 
+	* docs/gnuplot.doc src/specfun.c:  Documentation shows incorrect sign
+	in the exponent of the Voigt function.  
+
+	* docs/gnuplot.doc: typos
+
 2013-06-06  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/fit.c (fit_command):  Log file contained the wrong variable name

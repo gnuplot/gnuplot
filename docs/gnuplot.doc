@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.798 2013/05/31 22:06:29 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.799 2013/06/01 00:12:26 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -1227,7 +1227,7 @@ C marker below is used to signal this to doc2html:
 4 voigt
 ?expressions functions voigt
 ?voigt
-#voigt(x,y) & real & Voigt/Faddeeva function $\frac{y}{\pi} \int{\frac{exp(t^2)}{(x-t)^2+y^2}}dt$ \\
+#voigt(x,y) & real & Voigt/Faddeeva function $\frac{y}{\pi} \int{\frac{exp(-t^2)}{(x-t)^2+y^2}}dt$ \\
 %voigt(x,y)@real@convolution of Gaussian and Lorentzian
  The function `voigt(x,y)` returns an approximation to the Voigt/Faddeeva
  function used in spectral analysis. The approximation is accurate to 
@@ -6780,7 +6780,7 @@ Ffigure_mapcontours
                        {filled | empty | nofilled}
                        {front | back}
                        {linestyle <line_style>}
-                       {linetype <line_type>} {linewidth <line_width}
+                       {linetype <line_type>} {linewidth <line_width>}
 
        unset arrow {<tag>}
        show arrow {<tag>}
@@ -7772,7 +7772,7 @@ Ffigure_missing
 ?show dgrid3d
 ?dgrid3d
 ?nodgrid3d
-?kdensity2d
+?kdensity
  The `set dgrid3d` command enables, and can set parameters for, non-grid to
  grid data mapping.  See `splot grid_data` for more details about the grid data
  structure.
@@ -7843,7 +7843,7 @@ Ffigure_missing
  control the radius over which data points contribute to a grid point
  IN THE UNITS OF THE DATA ITSELF.
 
- The optional keyword `kdensity2d`, which must come after the name of the
+ The optional keyword `kdensity`, which must come after the name of the
  kernel, but before the (optional) scale parameters, modifies the algorithm
  so that the values calculated for the grid points are not divided by the 
  sum of the weights ( z = Sum_i w(d_i) * z_i ). If all z_i are constant, 
@@ -8294,14 +8294,14 @@ Ffigure_missing
        %H           hour, 00--23 (always two digits)
        %l           hour, 1--12 (one or two digits)
        %I           hour, 01--12 (always two digits)
-       %j           day of the year, 1--366
+       %j           day of the year, 001--366
        %m           month, 01--12
-       %M           minute, 0--60
+       %M           minute, 00--60
        %p           "am" or "pm"
        %r           shorthand for "%I:%M:%S %p" (only output)
        %R           shorthand for "%H:%M" (only output)
        %s           number of seconds since the start of year 1970
-       %S           second, integer 0--60 on output, (double) on input
+       %S           second, integer 00--60 on output, (double) on input
        %T           shorthand for "%H:%M:%S" (only output)
        %U           week of the year (week starts on Sunday)
        %w           day of the week, 0--6 (Sunday = 0)
@@ -8323,13 +8323,13 @@ Ffigure_missing
 #\verb@%H@ & hour, 00--23 (always two digits)\\
 #\verb@%l@ & hour, 1--12  (one or two digits)\\
 #\verb@%I@ & hour, 01--12 (always two digits)\\
-#\verb@%j@ & day of the year, 1--366 \\
+#\verb@%j@ & day of the year, 001--366 \\
 #\verb@%m@ & month, 01--12 \\
-#\verb@%M@ & minute, 0--60 \\
+#\verb@%M@ & minute, 00--60 \\
 #\verb@%p@ & "am" or "pm" \\
 #\verb@%r@ & shorthand for \verb@"%I:%M:%S %p"@ (only output)\\
 #\verb@%R@ & shorthand for \verb@%H:%M"@ (only output)\\
-#\verb@%S@ & second, integer 0--60 on output, (double) on input\\
+#\verb@%S@ & second, integer 00--60 on output, (double) on input\\
 #\verb@%s@ & number of seconds since start of year 1970 \\
 #\verb@%T@ & shorthand for \verb@"%H:%M:%S"@ (only output)\\
 #\verb@%U@ & week of the year (week starts on Sunday) \\
@@ -9707,6 +9707,7 @@ Ffigure_missing
          <object-type> <object-properties>
          {front|back|behind} {fc|fillcolor <colorspec>} {fs <fillstyle>}
          {default} {lw|linewidth <width>}
+     unset object <index>
 
  <object-type> is either `rectangle`, `ellipse`, `circle`, or `polygon`.
  Each object type has its own set of characteristic properties.
@@ -13179,7 +13180,8 @@ Ffigure_missing
 ?stats
 ?statistics
  Syntax:
-      stats 'filename' [using N[:M]] [name 'prefix'] [[no]output]]
+      stats 'filename' {using N{:M}} {name 'prefix'} {{no}output}
+
  This command prepares a statistical summary of the data in one or two columns
  of a file. The using specifier is interpreted in the same way as for plot
  commands. See `plot` for details on the `index`, `every`, and `using`

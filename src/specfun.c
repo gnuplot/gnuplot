@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: specfun.c,v 1.47 2011/10/15 00:03:33 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: specfun.c,v 1.48 2013/05/08 03:57:54 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - specfun.c */
@@ -687,7 +687,7 @@ f_voigt(union argument *arg)
  * Calculate the Voigt/Faddeeva function with relative error less than 10^(-4).
  *     (see http://www.atm.ox.ac.uk/user/wells/voigt.html)
  *
- * K(x,y) = \frac{y}{\pi} \int{\frac{e^{t^2}}{(x-t)^2+y^2}}dt
+ * K(x,y) = \frac{y}{\pi} \int{\frac{e^{-t^2}}{(x-t)^2+y^2}}dt
  *
  *  arguments:
  *	x, y - real and imaginary components of complex argument
