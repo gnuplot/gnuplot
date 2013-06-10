@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.292 2013/05/19 23:46:34 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.293 2013/06/04 17:14:18 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -3008,7 +3008,7 @@ show_datafile()
 	else
 	    fprintf(stderr, "\tdatafile fields separated by whitespace\n");
     }
-    if (END_OF_COMMAND || almost_equals(c_token,"com$ments")) {
+    if (END_OF_COMMAND || almost_equals(c_token,"com$mentschars")) {
 	fprintf(stderr, "\tComments chars are \"%s\"\n", df_commentschars);
     }
     if (df_fortran_constants)

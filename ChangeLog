@@ -1,3 +1,7 @@
+2013-06-10  Shigeharu Takeno  <shige@iee.niit.ac.jp>
+
+	* src/show.c src/unset.c:  show/unset individual datafile options.
+
 2013-06-06  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/fit.c (fit_command):  Log file contained the wrong variable name
