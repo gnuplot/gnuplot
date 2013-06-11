@@ -1,5 +1,5 @@
 /*
- * $Id: wgraph.c,v 1.162 2013/06/02 18:09:15 markisch Exp $
+ * $Id: wgraph.c,v 1.163 2013/06/11 20:54:47 markisch Exp $
  */
 
 /* GNUPLOT - win/wgraph.c */
@@ -1665,8 +1665,9 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 					keysample = FALSE;
 					break;
 				case TERM_LAYER_RESET:
+					break;
 				case TERM_LAYER_RESET_PLOTNO:
-					//plotno = 0;
+					plotno = 0;
 					break;
 				default:
 					break;
@@ -1675,7 +1676,8 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 
 		/* hide this layer? */
 		if (!(skipplot || (gridline && lpgw->hidegrid)) ||
-			(keysample || (curptr->op == W_line_type) || (curptr->op == W_setcolor)) ) {
+			keysample || (curptr->op == W_line_type) || (curptr->op == W_setcolor)
+			          || (curptr->op == W_pointsize) || (curptr->op == W_line_width)) {
 
 		/* special case hypertexts */
 		if ((hypertext != NULL) && (hypertype == TERM_HYPERTEXT_TOOLTIP)) {
