@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: fit.c,v 1.78.2.4 2013/06/08 13:35:25 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: fit.c,v 1.78.2.5 2013/06/08 13:42:22 markisch Exp $"); }
 #endif
 
 /*  NOTICE: Change of Copyright Status
@@ -136,7 +136,7 @@ char fitbuf[256]; /* for Eex and error_ex */
 static int max_data;
 static int max_params;
 
-static double epsilon = 1e-5;	/* convergence limit */
+static double epsilon = DEF_FIT_LIMIT;	/* convergence limit */
 static int maxiter = 0;
 
 static char *fit_script = NULL;

@@ -1,5 +1,5 @@
 /*
- * $Id: fit.h,v 1.14 2010/10/10 04:44:34 sfeam Exp $
+ * $Id: fit.h,v 1.14.2.1 2013/06/08 11:54:25 markisch Exp $
  */
 
 /* GNUPLOT - fit.h */
@@ -40,6 +40,9 @@
 
 #include "syscfg.h"
 #include "stdfn.h"
+
+/* defaults */
+#define DEF_FIT_LIMIT 1e-5
 
 /* compatible with gnuplot philosophy */
 #define STANDARD stderr
