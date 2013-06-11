@@ -1,3 +1,7 @@
+2013-06-11  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* configure.in:  More complete autoconfigure tests for qt5.
+
 2013-06-11  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/win/wgnuplib.h src/win/wgraph.c term/win.trm:  Support boxed
