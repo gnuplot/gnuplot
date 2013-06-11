@@ -520,6 +520,9 @@
 /* Define if you want to use the sunview terminal (sun). */
 /* #undef SUN */
 
+/* Define to support boxed labels. */
+#define EAM_BOXED_TEXT 1
+
 /* Define to use thin plate spines. */
 /* #undef THIN_PLATE_SPLINES_GRID */
 
