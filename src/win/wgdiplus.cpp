@@ -1,5 +1,5 @@
 /*
- * $Id: wgdiplus.cpp,v 1.6 2012/05/23 17:18:34 markisch Exp $
+ * $Id: wgdiplus.cpp,v 1.7 2012/06/30 06:40:01 markisch Exp $
  */
 
 /*
@@ -122,7 +122,10 @@ void gdiplusPolylineEx(HDC hdc, POINT *ppt, int polyi, UINT style, float width, 
 		points[i].X = ppt[i].x;
 		points[i].Y = ppt[i].y;
 	}
-	graphics.DrawLines(pen, points, polyi);
+	if ((ppt[0].x != ppt[polyi - 1].x) || (ppt[0].y != ppt[polyi - 1].y))
+		graphics.DrawLines(pen, points, polyi);
+	else
+		graphics.DrawPolygon(pen, points, polyi - 1);
 	delete(pen);
 	delete(points);
 }
