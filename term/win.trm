@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: win.trm,v 1.114 2013/04/22 20:09:10 markisch Exp $
+ * $Id: win.trm,v 1.115 2013/04/24 20:05:33 markisch Exp $
  */
 
 /* GNUPLOT - win.trm */
@@ -877,6 +877,16 @@ WIN_hypertext(int type, const char * text)
 	GraphOp(graphwin, W_hypertext, type, 0, text);
 }
 
+
+#ifdef EAM_BOXED_TEXT
+TERM_PUBLIC void
+WIN_boxed_text(unsigned int x, unsigned int y, int option)
+{
+	GraphOp(graphwin, W_boxedtext, option, 0, NULL);
+	GraphOp(graphwin, W_boxedtext, x, y, NULL);
+}
+#endif
+
 #endif /* TERM_BODY */
 
 #ifdef TERM_TABLE
@@ -907,6 +917,9 @@ TERM_TABLE_START(win_driver)
     0, /* no term->path */
     0.0, /* Scale (unused) */
     WIN_hypertext
+#ifdef EAM_BOXED_TEXT
+    , WIN_boxed_text
+#endif
 TERM_TABLE_END(win_driver)
 
 #undef LAST_TERM

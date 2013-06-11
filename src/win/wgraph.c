@@ -1,5 +1,5 @@
 /*
- * $Id: wgraph.c,v 1.161 2013/04/24 20:33:29 markisch Exp $
+ * $Id: wgraph.c,v 1.162 2013/06/02 18:09:15 markisch Exp $
  */
 
 /* GNUPLOT - win/wgraph.c */
@@ -198,13 +198,16 @@ static struct {
 	int overprint;       /* overprint flag */
 	BOOL widthflag;      /* FALSE for zero width boxes */
 	BOOL sizeonly;       /* only measure length of substring? */
-	double base;         /* current baseline */
+	double base;         /* current baseline position (above initial baseline) */
 	int xsave, ysave;    /* save text position for overprinted text */
 	int x, y;            /* current text position */
 	char fontname[MAXFONTNAME]; /* current font name */
 	double fontsize;     /* current font size */
 	int totalwidth;      /* total width of printed text */
+	int totalasc;        /* total height above center line */
+	int totaldesc;       /* total height below center line */
 	double res_scale;    /* scaling due to different resolution (printers) */
+	int shift;           /* baseline alignment */
 } enhstate;
 
 
@@ -256,9 +259,9 @@ static void	GraphChangeFont(LPGW lpgw, LPCSTR font, int fontsize, HDC hdc, RECT 
 static void
 DestroyBlocks(LPGW lpgw)
 {
-    struct GWOPBLK *this, *next;
-    struct GWOP *gwop;
-    unsigned int i;
+	struct GWOPBLK *this, *next;
+	struct GWOP *gwop;
+	unsigned int i;
 
 	this = lpgw->gwopblk_head;
 	while (this != NULL) {
@@ -447,14 +450,14 @@ GraphInit(LPGW lpgw)
 				  lpgw->hWndGraph, (HMENU)ID_GRAPHSTATUS,
 				  lpgw->hInstance, lpgw);
 	if (lpgw->hStatusbar) {
-	    RECT rect;
-	    /* auto-adjust size */
-	    SendMessage(lpgw->hStatusbar, WM_SIZE, (WPARAM)0, (LPARAM)0);
-	    ShowWindow(lpgw->hStatusbar, TRUE);
+		RECT rect;
+		/* auto-adjust size */
+		SendMessage(lpgw->hStatusbar, WM_SIZE, (WPARAM)0, (LPARAM)0);
+		ShowWindow(lpgw->hStatusbar, TRUE);
 
-	    /* make room */
-	    GetClientRect(lpgw->hStatusbar, &rect);
-	    lpgw->StatusHeight = rect.bottom - rect.top;
+		/* make room */
+		GetClientRect(lpgw->hStatusbar, &rect);
+		lpgw->StatusHeight = rect.bottom - rect.top;
 	}
 
 	/* create a toolbar */
@@ -916,6 +919,10 @@ MakeFonts(LPGW lpgw, LPRECT lprect, HDC hdc)
 		lpgw->rotate = TRUE;	/* vector fonts can all be rotated */
 	if (tm.tmPitchAndFamily & TMPF_TRUETYPE)
 		lpgw->rotate = TRUE;	/* truetype fonts can all be rotated */
+	/* store text metrics for later use */
+	lpgw->tmHeight = tm.tmHeight;
+	lpgw->tmAscent = tm.tmAscent;
+	lpgw->tmDescent = tm.tmDescent;
 	SelectObject(hdc, hfontold);
 	return;
 }
@@ -1169,14 +1176,21 @@ GraphEnhancedFlush(void)
 	width = cos(angle) * len;
 	height = -sin(angle) * len;
 
-	if (enhstate.widthflag && !enhstate.sizeonly && !enhstate.overprint)
-		enhstate.totalwidth += width;
+	if (enhstate.widthflag && !enhstate.sizeonly && !enhstate.overprint) {
+		/* do not take rotation into account */
+		int ypos = -enhstate.base;
+		enhstate.totalwidth += len;
+		if (enhstate.totalasc > (ypos + enhstate.shift - enhstate.lpgw->tmAscent))
+			enhstate.totalasc = ypos + enhstate.shift - enhstate.lpgw->tmAscent;
+		if (enhstate.totaldesc < (ypos + enhstate.shift + enhstate.lpgw->tmDescent))
+			enhstate.totaldesc = ypos + enhstate.shift + enhstate.lpgw->tmDescent;
+	}
 
 	/* display string */
 	if (enhstate.show && !enhstate.sizeonly)
 		draw_put_text(enhstate.lpgw, enhstate.hdc, x, y, enhanced_text);
 
-	/* update drawing position according to len */
+	/* update drawing position according to text length */
 	if (!enhstate.widthflag) {
 		width = 0;
 		height = 0;
@@ -1234,6 +1248,16 @@ draw_enhanced_text(LPGW lpgw, HDC hdc, LPRECT rect, int x, int y, char * str)
 	enhstate.x = x;
 	enhstate.y = y;
 	enhstate.totalwidth = 0;
+	enhstate.totalasc = 0;
+	enhstate.totaldesc = 0;
+
+	enhstate.res_scale = 1.;
+	if ((GetDeviceCaps(hdc, TECHNOLOGY) == DT_RASPRINTER)) {
+		HDC hdc_screen = GetDC(NULL);
+		enhstate.res_scale = (double) GetDeviceCaps(hdc, VERTRES) /
+		           (double) GetDeviceCaps(hdc_screen, VERTRES);
+		ReleaseDC(NULL, hdc_screen);
+	}
 
 	/* Save font information */
 	strcpy(save_fontname, lpgw->fontname);
@@ -1253,21 +1277,15 @@ draw_enhanced_text(LPGW lpgw, HDC hdc, LPRECT rect, int x, int y, char * str)
 		enhstate.sizeonly = TRUE;
 	}
 
-	/* we actually print everything left to right */
+	/* We actually print everything left to right. */
 	SetTextAlign(hdc, TA_LEFT|TA_BASELINE);
-	/* adjust baseline accordingly */
-	{
-		TEXTMETRIC tm;
-		if (GetTextMetrics(hdc, &tm)) {
-			int shift = tm.tmHeight/2 - tm.tmDescent;
-			enhstate.x += sin(lpgw->angle * M_PI/180) * shift;
-			enhstate.y += cos(lpgw->angle * M_PI/180) * shift;
-		}
-	}
+	/* Adjust baseline position: */
+	enhstate.shift = lpgw->tmHeight/2 - lpgw->tmDescent;
+	enhstate.x += sin(lpgw->angle * M_PI/180) * enhstate.shift;
+	enhstate.y += cos(lpgw->angle * M_PI/180) * enhstate.shift;
 
-	/* enhanced_recursion() uses the callback functions
-	   of the current terminal. So we have to temporarily
-	   switch terminal. */
+	/* enhanced_recursion() uses the callback functions of the current
+	   terminal. So we have to switch temporarily. */
 	if (WIN_term) {
 		tsave = term;
 		term = WIN_term;
@@ -1275,12 +1293,12 @@ draw_enhanced_text(LPGW lpgw, HDC hdc, LPRECT rect, int x, int y, char * str)
 
 	for (pass = 1; pass <= num_passes; pass++) {
 		/* Set the recursion going. We say to keep going until a
-		* closing brace, but we don't really expect to find one.
-		* If the return value is not the nul-terminator of the
-		* string, that can only mean that we did find an unmatched
-		* closing brace in the string. We increment past it (else
-		* we get stuck in an infinite loop) and try again.
-		*/
+		 * closing brace, but we don't really expect to find one.
+		 * If the return value is not the nul-terminator of the
+		 * string, that can only mean that we did find an unmatched
+		 * closing brace in the string. We increment past it (else
+		 * we get stuck in an infinite loop) and try again.
+		 */
 		while (*(str = enhanced_recursion((char *)str, TRUE,
 				save_fontname, save_fontsize,
 				0.0, TRUE, TRUE, 0))) {
@@ -1290,9 +1308,10 @@ draw_enhanced_text(LPGW lpgw, HDC hdc, LPRECT rect, int x, int y, char * str)
 			/* else carry on and process the rest of the string */
 		}
 
-		/* In order to do text justification we need to do a second pass that */
-		/* uses information stored during the first pass.                     */
-		/* see GraphEnhancedFlush()                                           */
+		/* In order to do text justification we need to do a second pass
+		 * that uses information stored during the first pass, see
+		 * GraphEnhancedFlush().
+		 */
 		if (pass == 1) {
 			/* do the actual printing in the next pass */
 			enhstate.sizeonly = FALSE;
@@ -1423,6 +1442,7 @@ draw_update_keybox(LPGW lpgw, unsigned plotno, unsigned x, unsigned y)
 	if (y > bb->top)    bb->top = y;
 }
 
+
 /* This one is really the heart of this module: it executes the stored set of
  * commands, whenever it changed or a redraw is necessary */
 static void
@@ -1470,9 +1490,18 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 	bool warn_no_transparent = FALSE;
 
 	/* images */
-	int seq = 0;				/* sequence counter for W_image ops */
 	POINT corners[4];			/* image corners */
 	int color_mode = 0;			/* image color mode */
+
+#ifdef EAM_BOXED_TEXT
+	struct s_boxedtext {
+		t_textbox_options option;
+		POINT margin;
+		POINT start;
+		RECT  box;
+		int   angle;
+	} boxedtext;
+#endif
 
 	/* coordinates and lengths */
 	int xdash, ydash;			/* the transformed coordinates */
@@ -1481,6 +1510,7 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 	int hshift, vshift;			/* correction of text position */
 
 	/* indices */
+	int seq = 0;				/* sequence counter for W_image and W_boxedtext */
 	int i;
 
     if (lpgw->locked) return;
@@ -1522,27 +1552,25 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 		shadedblendcaps = GetDeviceCaps(hdc, SHADEBLENDCAPS);
 		warn_no_transparent = ((shadedblendcaps & SB_CONST_ALPHA) == 0);
 	}
-	/* Also needed for enhanced text */
-	enhstate.res_scale = lw_scale;
 
-    ppt = (POINT *)LocalAllocPtr(LHND, (polymax+1) * sizeof(POINT));
+	ppt = (POINT *)LocalAllocPtr(LHND, (polymax+1) * sizeof(POINT));
 
-    rr = rect->right;
-    rl = rect->left;
-    rt = rect->top;
-    rb = rect->bottom;
+	rr = rect->right;
+	rl = rect->left;
+	rt = rect->top;
+	rb = rect->bottom;
 
-    htic = (lpgw->org_pointsize * MulDiv(lpgw->htic, rr - rl, lpgw->xmax) + 1);
-    vtic = (lpgw->org_pointsize * MulDiv(lpgw->vtic, rb - rt, lpgw->ymax) + 1);
+	htic = (lpgw->org_pointsize * MulDiv(lpgw->htic, rr - rl, lpgw->xmax) + 1);
+	vtic = (lpgw->org_pointsize * MulDiv(lpgw->vtic, rb - rt, lpgw->ymax) + 1);
 
-    lpgw->angle = 0;
-    SetFont(lpgw, hdc);
-    lpgw->justify = LEFT;
-    SetTextAlign(hdc, TA_LEFT|TA_BOTTOM);
+	lpgw->angle = 0;
+	SetFont(lpgw, hdc);
+	lpgw->justify = LEFT;
+	SetTextAlign(hdc, TA_LEFT|TA_BOTTOM);
 
-    /* calculate text shifting for horizontal text */
-    hshift = 0;
-    vshift = MulDiv(lpgw->vchar, rb - rt, lpgw->ymax)/2;
+	/* calculate text shifting for horizontal text */
+	hshift = 0;
+	vshift = MulDiv(lpgw->vchar, rb - rt, lpgw->ymax)/2;
 
 	/* init layer variables */
 	lpgw->numplots = 0;
@@ -1557,18 +1585,18 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 	SelectObject(hdc, lpgw->hapen); /* background brush */
 	SelectObject(hdc, lpgw->colorbrush[2]); /* first user pen */
 
-    /* do the drawing */
-    blkptr = lpgw->gwopblk_head;
-    curptr = NULL;
-    if (blkptr) {
+	/* do the drawing */
+	blkptr = lpgw->gwopblk_head;
+	curptr = NULL;
+	if (blkptr) {
 		if (!blkptr->gwop)
 			blkptr->gwop = (struct GWOP *)GlobalLock(blkptr->hblk);
 		if (!blkptr->gwop)
 			return;
 		curptr = (struct GWOP *)blkptr->gwop;
-    }
+	}
 
-    while (ngwop < lpgw->nGWOP) {
+	while (ngwop < lpgw->nGWOP) {
 		/* transform the coordinates */
 		xdash = MulDiv(curptr->x, rr-rl-1, lpgw->xmax) + rl;
 		ydash = MulDiv(curptr->y, rt-rb+1, lpgw->ymax) + rb - 1;
@@ -1747,14 +1775,37 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 			char * str;
 			str = LocalLock(curptr->htext);
 			if (str) {
+				int dxl, dxr;
+				int slen, vsize;
+
 				/* shift correctly for rotated text */
 				draw_put_text(lpgw, hdc, xdash + hshift, ydash + vshift, str);
+				slen  = GraphGetTextLength(lpgw, hdc, str);
+				vsize = MulDiv(lpgw->vchar, rb - rt, 2 * lpgw->ymax);
+#ifdef EAM_BOXED_TEXT
+				if (lpgw->justify == LEFT) {
+					dxl = 0;
+					dxr = slen;
+				} else if (lpgw->justify == CENTRE) {
+					dxl = dxr = slen / 2;
+				} else {
+					dxl = slen;
+					dxr = 0;
+				}
+				if (boxedtext.box.left > (xdash - boxedtext.start.x - dxl))
+					boxedtext.box.left = xdash - boxedtext.start.x - dxl;
+				if (boxedtext.box.right < (xdash - boxedtext.start.x + dxr))
+					boxedtext.box.right = xdash - boxedtext.start.x + dxr;
+				if (boxedtext.box.top > (ydash - boxedtext.start.y - vsize))
+					boxedtext.box.top = ydash - boxedtext.start.y - vsize;
+				if (boxedtext.box.bottom < (ydash - boxedtext.start.y + vsize))
+					boxedtext.box.bottom = ydash - boxedtext.start.y + vsize;
+				/* We have to remember the text angle as well. */
+				boxedtext.angle = lpgw->angle;
+#endif
 				if (keysample) {
-					int slen = GraphGetTextLength(lpgw, hdc, str);
-					int vsize = MulDiv(lpgw->vchar, rb-rt, 2 * lpgw->ymax);
-					if (lpgw->justify == RIGHT) slen *= -1;
-					draw_update_keybox(lpgw, plotno, xdash, ydash - vsize);
-					draw_update_keybox(lpgw, plotno, xdash + slen, ydash + vsize);
+					draw_update_keybox(lpgw, plotno, xdash - dxl, ydash - vsize);
+					draw_update_keybox(lpgw, plotno, xdash + dxr, ydash + vsize);
 				}
 			}
 			LocalUnlock(curptr->htext);
@@ -1765,13 +1816,42 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 			char * str;
 			str = LocalLock(curptr->htext);
 			if (str) {
-				int slen = draw_enhanced_text(lpgw, hdc, rect, xdash, ydash, str);
-				if (keysample) {
-					int vsize = MulDiv(lpgw->vchar, rb-rt, 2 * lpgw->ymax);
-					if (lpgw->justify == RIGHT) slen *= -1;
-					draw_update_keybox(lpgw, plotno, xdash, ydash - vsize);
-					draw_update_keybox(lpgw, plotno, xdash + slen, ydash + vsize);
+				RECT extend;
+				int slen;
+
+				slen = draw_enhanced_text(lpgw, hdc, rect, xdash, ydash, str);
+				switch (lpgw->justify) {
+				case LEFT:
+					extend.left  = 0;
+					extend.right = slen;
+					break;
+				case CENTRE:
+					extend.left  = slen / 2;
+					extend.right = slen / 2;
+					break;
+				case RIGHT:
+					extend.left  = slen;
+					extend.right = 0;
+					break;
 				}
+				extend.top = - enhstate.totalasc;
+				extend.bottom = enhstate.totaldesc;
+				if (keysample) {
+					draw_update_keybox(lpgw, plotno, xdash - extend.left, ydash - extend.top);
+					draw_update_keybox(lpgw, plotno, xdash + extend.right, ydash + extend.bottom);
+				}
+#ifdef EAM_BOXED_TEXT
+				if (boxedtext.box.left > (boxedtext.start.x - xdash - extend.left))
+					boxedtext.box.left = boxedtext.start.x - xdash - extend.left;
+				if (boxedtext.box.right < (boxedtext.start.x - xdash + extend.right))
+					boxedtext.box.right = boxedtext.start.x - xdash + extend.right;
+				if (boxedtext.box.top > (boxedtext.start.y - ydash - extend.top))
+					boxedtext.box.top = boxedtext.start.y - ydash - extend.top;
+				if (boxedtext.box.bottom < (boxedtext.start.y - ydash + extend.bottom))
+					boxedtext.box.bottom = boxedtext.start.y - ydash + extend.bottom;
+				/* We have to store the text angle as well. */
+				boxedtext.angle = enhstate.lpgw->angle;
+#endif
 			}
 			LocalUnlock(curptr->htext);
 			break;
@@ -1787,6 +1867,139 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 				LocalUnlock(curptr->htext);
 			}
 			break;
+
+#ifdef EAM_BOXED_TEXT
+		case W_boxedtext:
+			if (seq == 0) {
+				boxedtext.option = curptr->x;
+				seq++;
+				break;
+			}
+			seq = 0;
+			switch (boxedtext.option) {
+			case TEXTBOX_INIT:
+				/* initialise bounding box */
+				boxedtext.box.left   = boxedtext.box.right = 0;
+				boxedtext.box.bottom = boxedtext.box.top   = 0;
+				boxedtext.start.x = xdash;
+				boxedtext.start.y = ydash;
+				/* Note: initialising the text angle here would be best IMHO,
+				   but current core code does not set this until the actual
+				   print-out is done. */
+				boxedtext.angle = lpgw->angle;
+				break;
+			case TEXTBOX_OUTLINE:
+			case TEXTBOX_BACKGROUNDFILL: {
+				/* draw rectangle */
+				int dx = boxedtext.margin.x;
+				int dy = boxedtext.margin.y;
+#if 0
+				printf("left %i right %i top %i bottom %i angle %i\n",
+					boxedtext.box.left - dx, boxedtext.box.right + dx,
+					boxedtext.box.top - dy, boxedtext.box.bottom + dy,
+					boxedtext.angle);
+#endif
+				if ((boxedtext.angle % 90) == 0) {
+					RECT rect;
+
+					switch (boxedtext.angle) {
+					case 0:
+						rect.left   = + boxedtext.box.left   - dx;
+						rect.right  = + boxedtext.box.right  + dx;
+						rect.top    = + boxedtext.box.top    - dy;
+						rect.bottom = + boxedtext.box.bottom + dy;
+						break;
+					case 90:
+						rect.left   = + boxedtext.box.top    - dy;
+						rect.right  = + boxedtext.box.bottom + dy;
+						rect.top    = - boxedtext.box.right  - dx;
+						rect.bottom = - boxedtext.box.left   + dx;
+						break;
+					case 180:
+						rect.left   = - boxedtext.box.right  - dx;
+						rect.right  = - boxedtext.box.left   + dx;
+						rect.top    = - boxedtext.box.bottom - dy;
+						rect.bottom = - boxedtext.box.top    + dy;
+						break;
+					case 270:
+						rect.left   = - boxedtext.box.bottom - dy;
+						rect.right  = - boxedtext.box.top    + dy;
+						rect.top    = + boxedtext.box.left   - dx;
+						rect.bottom = + boxedtext.box.right  + dx;
+						break;
+					}
+					rect.left   += boxedtext.start.x;
+					rect.right  += boxedtext.start.x;
+					rect.top    += boxedtext.start.y;
+					rect.bottom += boxedtext.start.y;
+					if (boxedtext.option == TEXTBOX_OUTLINE)
+						/* FIXME: Shouldn't we use the current color brush lpgw->hcolorbrush? */
+						FrameRect(hdc, &rect, GetStockBrush(BLACK_BRUSH));
+					else
+						/* Fill bounding box with background color. */
+						FillRect(hdc, &rect, lpgw->hbrush);
+				} else {
+					double theta = boxedtext.angle * M_PI/180.;
+					double sin_theta = sin(theta);
+					double cos_theta = cos(theta);
+					POINT  rect[5];
+
+					rect[0].x =  (boxedtext.box.left   - dx) * cos_theta +
+								 (boxedtext.box.top    - dy) * sin_theta;
+					rect[0].y = -(boxedtext.box.left   - dx) * sin_theta +
+								 (boxedtext.box.top    - dy) * cos_theta;
+					rect[1].x =  (boxedtext.box.left   - dx) * cos_theta +
+								 (boxedtext.box.bottom + dy) * sin_theta;
+					rect[1].y = -(boxedtext.box.left   - dx) * sin_theta +
+								 (boxedtext.box.bottom + dy) * cos_theta;
+					rect[2].x =  (boxedtext.box.right  + dx) * cos_theta +
+								 (boxedtext.box.bottom + dy) * sin_theta;
+					rect[2].y = -(boxedtext.box.right  + dx) * sin_theta +
+								 (boxedtext.box.bottom + dy) * cos_theta;
+					rect[3].x =  (boxedtext.box.right  + dx) * cos_theta +
+								 (boxedtext.box.top    - dy) * sin_theta;
+					rect[3].y = -(boxedtext.box.right  + dx) * sin_theta +
+								 (boxedtext.box.top    - dy) * cos_theta;
+					for (i = 0; i < 4; i++) {
+						rect[i].x += boxedtext.start.x;
+						rect[i].y += boxedtext.start.y;
+					}
+					if (!lpgw->antialiasing) {
+						HBRUSH save_brush;
+						HPEN save_pen;
+
+						if (boxedtext.option == TEXTBOX_OUTLINE) {
+							save_brush = SelectObject(hdc, GetStockBrush(NULL_BRUSH));
+							/* FIXME: Shouldn't we use the current color brush lpgw->hcolorbrush? */
+							save_pen = SelectObject(hdc, GetStockPen(BLACK_PEN));
+						} else {
+							/* Fill bounding box with background color. */
+							save_brush = SelectObject(hdc, lpgw->hbrush);
+							save_pen = SelectObject(hdc, GetStockPen(NULL_PEN));
+						}
+						Polygon(hdc, rect, 4);
+						SelectObject(hdc, save_brush);
+						SelectObject(hdc, save_pen);
+					} else {
+						if (boxedtext.option == TEXTBOX_OUTLINE) {
+							rect[4].x = rect[0].x;
+							rect[4].y = rect[0].y;
+							gdiplusPolylineEx(hdc, rect, 5, PS_SOLID, line_width, RGB(0,0,0) /* last_color */, 1.);
+						} else {
+							gdiplusSolidFilledPolygonEx(hdc, rect, 4, lpgw->background, 1., lpgw->polyaa);
+						}
+					}
+				}
+				break;
+			}
+			case TEXTBOX_MARGINS:
+				/* Adjust size of whitespace around text: default is 1/2 char height + 2 char widths. */
+				boxedtext.margin.x = MulDiv(curptr->y, (rr - rl) * lpgw->hchar, 100 * lpgw->xmax);
+				boxedtext.margin.y = MulDiv(curptr->y, (rb - rt) * lpgw->vchar, 400 * lpgw->ymax);
+				break;
+			}
+			break;
+#endif
 
 		case W_fillstyle:
 			/* HBB 20010916: new entry, needed to squeeze the many

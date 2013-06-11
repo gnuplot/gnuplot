@@ -1,3 +1,12 @@
+2013-06-11  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/win/wgnuplib.h src/win/wgraph.c term/win.trm:  Support boxed
+	labels.  Includes support for rotated text.
+
+	* src/win/wgdiplus.cpp (gdiplusPolylineEx):  Properly close polygons
+	by using DrawPolygon if the first and last point of the polyline are
+	equal.
+
 2013-06-10  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* src/show.c src/unset.c:  show/unset individual datafile options.

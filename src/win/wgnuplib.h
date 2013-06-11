@@ -1,5 +1,5 @@
 /*
- * $Id: wgnuplib.h,v 1.57 2012/06/24 00:39:20 markisch Exp $
+ * $Id: wgnuplib.h,v 1.58 2013/04/24 20:05:33 markisch Exp $
  */
 
 /* GNUPLOT - win/wgnuplib.h */
@@ -297,6 +297,7 @@ struct GWOPBLK {			/* kept in local memory */
 #define W_layer 46
 #define W_text_encoding 47
 #define W_hypertext 48
+#define W_boxedtext 49
 
 typedef struct tagGW {
 	GP_LPPRINT	lpr;		/* must be first */
@@ -318,7 +319,7 @@ typedef struct tagGW {
 	int		ToolbarHeight;
 	HMENU	hPopMenu;	/* popup menu */
 	HBITMAP	hBitmap;	/* bitmap of current graph */
-	BOOL	buffervalid;	/* indicates of hBitmap is valid */
+	BOOL	buffervalid;	/* indicates if hBitmap is valid */
 	BOOL	rotating;	/* are we currently rotating the graph? */
 
 	struct GWOPBLK *gwopblk_head;
@@ -333,7 +334,7 @@ typedef struct tagGW {
 	BOOL	rounded;	/* rounded line caps and joins? */
 	BOOL	doublebuffer;	/* double buffering? */
 	BOOL	oversample;	/* oversampling? */
-	BOOL	antialiasing;
+	BOOL	antialiasing;	/* anti-aliasing? */
 	BOOL	polyaa;		/* anti-aliasing for polygons ? */
 	BOOL	patternaa;	/* anti-aliasing for polygons ? */
 	BOOL	fastrotation;	/* rotate without anti-aliasing? */
@@ -370,6 +371,9 @@ typedef struct tagGW {
 	int		encoding_error; /* last unknown encoding */
 	double	fontscale;	/* scale factor for font sizes */
 	enum set_encoding_id encoding;	/* text encoding */
+	LONG	tmHeight;	/* text metric of current font */
+	LONG	tmAscent;
+	LONG	tmDescent;
 
 	HPEN	hapen;		/* stored current pen */
 	HPEN	hsolid;		/* solid sibling of current pen */
