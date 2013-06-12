@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.799 2013/06/01 00:12:26 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.800 2013/06/11 03:36:33 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -7879,6 +7879,7 @@ Ffigure_missing
 ?commands show dummy
 ?set dummy
 ?show dummy
+?unset dummy
 ?dummy
  The `set dummy` command changes the default dummy variable names.
 
@@ -7898,14 +7899,14 @@ Ffigure_missing
        set dummy t
        plot sin(t), cos(t)
 
- At least one dummy variable must be set on the command; `set dummy` by itself
- will generate an error message.
-
  Examples:
        set dummy u,v
        set dummy ,s
 
- The second example sets the second variable to s.
+ The second example sets the second variable to s.  To reset the dummy variable
+ names to their default values, use
+ 
+       unset dummy
 3 encoding
 ?commands set encoding
 ?commands show encoding

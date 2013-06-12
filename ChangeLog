@@ -1,6 +1,12 @@
-2013-06-11  Ethan A Merritt  <merritt@u.washington.edu>
+2013-06-12  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* configure.in:  More complete autoconfigure tests for qt5.
+
+	* src/save.c (save_dummy) src/set.c (set_dummy) src/show.c
+	src/unset.c (unset_dumm) docs/gnuplot.doc demo/fit.dem:
+	"fit" can use more dummy variable names than plot or splot, but these
+	were not being shown/reset/saved.  Document "unset dummy".
+	Now we handle the full set of possible dummy variables (MAX_NUM_VAR).
 
 2013-06-11  Bastian Maerkisch  <bmaerkisch@web.de>
 

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.218 2013/05/15 20:52:45 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.219 2013/05/19 23:46:34 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -293,7 +293,14 @@ set bar %f %s\n",
       }
     }
 
-    fprintf(fp, "set dummy %s,%s\n", set_dummy_var[0], set_dummy_var[1]);
+    /* Dummy variable names */ 
+    fprintf(fp, "set dummy %s", set_dummy_var[0]);
+    for (axis=1; axis<MAX_NUM_VAR; axis++) {
+	if (*set_dummy_var[axis] == '\0')
+	    break;
+	fprintf(fp, ", %s", set_dummy_var[axis]);
+    }
+    fprintf(fp, "\n");
 
 #define SAVE_FORMAT(axis)						\
     fprintf(fp, "set format %s \"%s\"\n", axis_defaults[axis].name,	\

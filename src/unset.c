@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.172 2013/05/19 23:46:34 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.173 2013/06/11 03:16:02 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -789,8 +789,11 @@ unset_dgrid3d()
 static void
 unset_dummy()
 {
+    int i;
     strcpy(set_dummy_var[0], "x");
     strcpy(set_dummy_var[1], "y");
+    for (i=2; i<MAX_NUM_VAR; i++)
+	*set_dummy_var[i] = '\0';
 }
 
 

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.293 2013/06/04 17:14:18 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.294 2013/06/11 03:16:02 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -1393,10 +1393,18 @@ show_mapping()
 static void
 show_dummy()
 {
+    int i;
     SHOW_ALL_NL;
-
-    fprintf(stderr, "\tdummy variables are \"%s\" and \"%s\"\n",
-	    set_dummy_var[0], set_dummy_var[1]);
+   
+    fputs("\tdummy variables are ", stderr);
+    for (i=0; i<MAX_NUM_VAR; i++) {
+	if (*set_dummy_var[i] == '\0') {
+	    fputs("\n", stderr);
+	    break;
+	} else {
+	    fprintf(stderr, "%s ", set_dummy_var[i]);
+	}
+    }
 }
 
 

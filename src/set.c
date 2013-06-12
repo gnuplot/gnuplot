@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.401 2013/05/15 20:52:45 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.402 2013/05/19 23:46:34 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -1401,19 +1401,17 @@ set_decimalsign()
 static void
 set_dummy()
 {
+    int i;
     c_token++;
-    if (END_OF_COMMAND)
-	int_error(c_token, "expecting dummy variable name");
-    else {
+    for (i=0; i<MAX_NUM_VAR; i++) {
+	if (END_OF_COMMAND)
+	    return;
 	if (!equals(c_token,","))
-	    copy_str(set_dummy_var[0],c_token++, MAX_ID_LEN);
-	if (!END_OF_COMMAND && equals(c_token,",")) {
-	    c_token++;
-	    if (END_OF_COMMAND)
-		int_error(c_token, "expecting second dummy variable name");
-	    copy_str(set_dummy_var[1],c_token++, MAX_ID_LEN);
-	}
+	    copy_str(set_dummy_var[i],c_token++, MAX_ID_LEN);
+	c_token++;
     }
+    if (!END_OF_COMMAND)
+	int_error(c_token,"too many dummy variables");
 }
 
 
