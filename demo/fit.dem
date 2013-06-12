@@ -1,11 +1,12 @@
 #
-# $Id: fit.dem,v 1.15 2013/04/24 21:58:18 sfeam Exp $
+# $Id: fit.dem,v 1.16 2013/05/08 03:57:53 markisch Exp $
 #
 
 myencoding = GPVAL_ENCODING
 set encoding utf8
 set termoption enhanced
 set style data points
+set dummy x, y
 
 print "Some examples how data fitting using nonlinear least squares fit can be done."
 print ''
