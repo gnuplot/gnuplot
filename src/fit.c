@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: fit.c,v 1.116 2013/06/06 17:15:25 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: fit.c,v 1.117 2013/06/06 17:26:43 markisch Exp $"); }
 #endif
 
 /*  NOTICE: Change of Copyright Status
@@ -1561,12 +1561,12 @@ fit_command()
     }
     dummy_func = &func;
 
-    /* set all five dummy variable names, even if we're using fewer */
-    strcpy(dummy_default[0], set_dummy_var[0]);
-    strcpy(dummy_default[1], set_dummy_var[1]);
+    /* set all possible dummy variable names, even if we're using fewer */
     for (i = 0; i < 5; i++) {
 	if (dummy_token[i] > 0)
 	    copy_str(c_dummy_var[i], dummy_token[i], MAX_ID_LEN);
+	else if (*set_dummy_var[i] != '\0')
+	    strcpy(c_dummy_var[i], set_dummy_var[i]);
 	else
 	    strcpy(c_dummy_var[i], dummy_default[i]);
     }
@@ -1590,22 +1590,13 @@ fit_command()
     if (columns < 0)
 	int_error(NO_CARET,"Can't read data file");
     if (columns == 1)
-	int_error(c_token, "Need 2 to 7 using specs");
+	int_error(c_token, "Need more than 1 input data column");
+    if (columns < 3)
+	if (X_AXIS.datatype == DT_TIMEDATE || Y_AXIS.datatype == DT_TIMEDATE)
+	    int_error(c_token, "Need full using spec for time data");
 
     num_indep = (columns < 3) ? 1 : columns - 2;
 
-    /* The following patch was made by Remko Scharroo, 25-Mar-1999
-     * We need to check if one of the columns is time data, like
-     * in plot2d and plot3d */
-
-    if (X_AXIS.datatype == DT_TIMEDATE) {
-	if (columns < 2)
-	    int_error(c_token, "Need full using spec for x time data");
-    }
-    if (Y_AXIS.datatype == DT_TIMEDATE) {
-	if (columns < 1)
-	    int_error(c_token, "Need using spec for y time data");
-    }
     /* No need for a time data check for the remaining axes.  Those
      * axes are only used iff columns>3, i.e. there are using specs
      * for all the columns, already. */
@@ -1729,7 +1720,7 @@ fit_command()
     /* here so that it affects data fields read from the input file.      */
     set_numeric_locale();
 
-    while ((i = df_readline(v, 7)) != DF_EOF) {
+    while ((i = df_readline(v, num_indep+2)) != DF_EOF) {
         if (num_data >= max_data) {
 	    /* increase max_data by factor of 1.5 */
 	    max_data = (max_data * 3) / 2;
