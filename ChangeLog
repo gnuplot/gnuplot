@@ -4,6 +4,12 @@
 	to the default sequence x y t u v z.
 	Do not ask df_readline() to process more columns than necessary.
 
+	* src/datafile.c:  Replace an assertion (MAXDATACOLS == 7) with the
+	specifically relevant test (<number of requested format terms> <= 7).
+	I.e. the limit is due to applying a fixed format statement to the 
+	current request for data, not from a cap on the number of columns
+	that might hypothetically be requested.
+
 2013-06-12  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* configure.in:  More complete autoconfigure tests for qt5.

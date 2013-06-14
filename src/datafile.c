@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.254 2013/05/18 18:43:14 juhaszp Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.255 2013/05/22 19:19:38 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -307,8 +307,8 @@ static int df_max_cols = 0;     /* space allocated */
 static int df_no_cols;          /* cols read */
 static int fast_columns;        /* corey@cac optimization */
 
-char *df_tokens[MAXDATACOLS];           /* filled in by df_tokenise */
-static char *df_stringexpression[MAXDATACOLS] = {NULL,NULL,NULL,NULL,NULL,NULL,NULL};
+char *df_tokens[MAXDATACOLS];			/* filled in by df_tokenise */
+static char *df_stringexpression[MAXDATACOLS];	/* filled in after evaluate_at() */
 static struct curve_points *df_current_plot;	/* used to process histogram labels + key entries */
 
 /* These control the handling of fields in the first row of a data file.
@@ -1737,7 +1737,10 @@ df_readascii(double v[], int max)
 	    /*{{{  do a sscanf */
 	    int i;
 
-	    assert(MAXDATACOLS == 7);
+	    /* FIXME: plot commands never request more than 7 columns but as of	*/
+	    /* June 2013 "fit" can in principle use more.			*/
+	    if (max > 7)
+		int_error(NO_CARET,"Formatted input can only handle 7 data columns");
 
 	    /* check we have room for at least 7 columns */
 	    if (df_max_cols < 7)
