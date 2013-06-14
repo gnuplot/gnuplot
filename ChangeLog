@@ -8,7 +8,9 @@
 	specifically relevant test (<number of requested format terms> <= 7).
 	I.e. the limit is due to applying a fixed format statement to the 
 	current request for data, not from a cap on the number of columns
-	that might hypothetically be requested.
+	that might hypothetically be requested.  Similarly replace assertion
+	(max_using <= MAXDATACOLS) with a check for whether the limit is
+	actually exceeded by the current using spec.
 
 	* demo/fitmulti.dem:  Include a test script written by Hanno Hoffstadt
 	that exercises multidimensional fitting.  The fit routine currently

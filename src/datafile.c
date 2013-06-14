@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.255 2013/05/22 19:19:38 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.256 2013/06/14 20:25:33 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -1011,8 +1011,6 @@ df_open(const char *cmd_filename, int max_using, struct curve_points *plot)
     df_already_got_headers = FALSE;
     /*}}} */
 
-    assert(max_using <= MAXDATACOLS);
-
     if (!cmd_filename)
 	int_error(c_token, "missing filename");
     if (!cmd_filename[0]) {
@@ -1452,6 +1450,9 @@ plot_option_using(int max_using)
 
     if (!END_OF_COMMAND) {
 	do {                    /* must be at least one */
+	    if (df_no_use_specs >= MAXDATACOLS)
+		int_error(c_token, "at most %d columns allowed in using spec", MAXDATACOLS);
+
 	    if (df_no_use_specs >= max_using)
 		int_error(c_token, "Too many columns in using specification");
 
