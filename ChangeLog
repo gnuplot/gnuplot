@@ -17,6 +17,8 @@
 	handles up to 5 independent dimensions, but the script tries up to six.
 	It incidentally exercises the `set dummy` command and `while {...}`.
 
+	* src/show.c (show_fit):  Report previous 'fit' command.
+
 2013-06-12  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* configure.in:  More complete autoconfigure tests for qt5.
