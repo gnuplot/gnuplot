@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.800 2013/06/11 03:36:33 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.801 2013/06/12 19:33:15 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -7772,7 +7772,7 @@ Ffigure_missing
 ?show dgrid3d
 ?dgrid3d
 ?nodgrid3d
-?kdensity
+=kdensity
  The `set dgrid3d` command enables, and can set parameters for, non-grid to
  grid data mapping.  See `splot grid_data` for more details about the grid data
  structure.
