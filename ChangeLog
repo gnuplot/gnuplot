@@ -19,6 +19,9 @@
 
 	* src/show.c (show_fit):  Report previous 'fit' command.
 
+	* src/datafile.c (df_tokenise):  Get rid of erroneous test against
+	axis_array[foo].timefmt (always evaluates as TRUE).
+
 2013-06-12  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* configure.in:  More complete autoconfigure tests for qt5.
