@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.234 2013/05/05 21:57:46 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.235 2013/05/19 23:46:34 sfeam Exp $"); }
 #endif
 
 #define MOUSE_ALL_WINDOWS 1
@@ -112,6 +112,7 @@ static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.234 2013/05/05 21:57:46
 #ifdef USE_X11_MULTIBYTE
 # include <X11/Xlocale.h>
 #endif
+#include <X11/XKBlib.h>	/* for XkbKeycodeToKeysym */
 
 #include <assert.h>
 #include "syscfg.h"
@@ -4822,7 +4823,8 @@ process_event(XEvent *event)
     case KeyRelease:
 #ifdef USE_MOUSE
 	update_modifiers(event->xkey.state);
-	keysym = XKeycodeToKeysym(dpy, event->xkey.keycode, 0);
+	/* keysym = XKeycodeToKeysym(dpy, event->xkey.keycode, 0); */
+	keysym = XkbKeycodeToKeysym(dpy, event->xkey.keycode, 0, 0);
 	if (is_meta(keysym)) {
 	    plot = Find_Plot_In_Linked_List_By_Window(event->xkey.window);
 	    cursor = cursor_default;
