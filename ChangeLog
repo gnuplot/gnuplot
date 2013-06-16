@@ -1,3 +1,8 @@
+2013-06-16  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/datafile.c (df_tokenise):  Get rid of erroneous test against
+	axis_array[foo].timefmt (always evaluates as TRUE).
+
 2013-06-07  Thomas Mattison  <mattison <at> phas.ubc.ca>
 
 	* src/fit.c (regress):  Fit did not converge if maximum lambda was
@@ -89,6 +94,7 @@
 	* term/emf.trm:  It doesn't work to call EMF_setfont() before we
 	enter graphics state.  Bugfix.
 
+>>>>>>> 1.3943.2.240
 2013-05-10  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/datafile.c:  Valgrind found a case where df_column[foo].position

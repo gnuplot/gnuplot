@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.212.2.18 2013/04/28 18:53:55 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.212.2.19 2013/05/10 15:23:42 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -691,10 +691,7 @@ df_tokenise(char *s)
 	if (*s == '"') {
 	    /* treat contents of a quoted string as single column */
 	    in_string = !in_string;
-	    df_column[df_no_cols].good = DF_MISSING;
-	    /* Allow timedata input to be contained in quotes */
-	    if (axis_array[df_axis[df_no_cols]].timefmt)
-		df_column[df_no_cols].good = DF_STRINGDATA;
+	    df_column[df_no_cols].good = DF_STRINGDATA;
 	} else if (check_missing(s)) {
 	    df_column[df_no_cols].good = DF_MISSING;
 	    df_column[df_no_cols].datum = not_a_number();
