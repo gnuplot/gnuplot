@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.219 2013/05/19 23:46:34 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.220 2013/06/12 19:33:15 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -423,9 +423,9 @@ set bar %f %s\n",
 		key->just == GPKEY_LEFT ? "Left" : "Right",
 		key->reverse ? "" : "no",
 		key->enhanced ? "" : "no",
-		key->auto_titles == COLUMNHEAD_KEYTITLES ? "autotitles columnhead"
-		: key->auto_titles == FILENAME_KEYTITLES ? "autotitles"
-		: "noautotitles" );
+		key->auto_titles == COLUMNHEAD_KEYTITLES ? "autotitle columnhead"
+		: key->auto_titles == FILENAME_KEYTITLES ? "autotitle"
+		: "noautotitle" );
     if (key->box.l_type > LT_NODRAW) {
 	fputs("box", fp);
 	save_linetype(fp, &(key->box), FALSE);
