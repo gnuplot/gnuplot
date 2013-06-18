@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.701.2.26 2013/02/17 21:54:38 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.701.2.27 2013/03/14 19:40:33 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -5365,7 +5365,8 @@ Ffigure_mapcontours
 
  Any of the numbers can be omitted; the increments default to unity, the start
  values to the first point or block, and the end values to the last point or
- block.  If `every` is not specified, all points in all lines are plotted.
+ block. ':' at the end of the `every` option is not permitted.  
+ If `every` is not specified, all points in all lines are plotted.
 
  Examples:
        every :::3::3    # selects just the fourth block ('0' is first)
