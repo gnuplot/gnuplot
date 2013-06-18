@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.257 2013/06/14 21:45:00 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.258 2013/06/16 16:28:05 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -1335,7 +1335,8 @@ plot_option_every()
 
     if (!equals(++c_token, ":")) {
 	everypoint = int_expression();
-	if (everypoint < 1)
+	if (everypoint < 0) everypoint = 1;
+	else if (everypoint < 1)
 	    int_error(c_token, "Expected positive integer");
     }
     /* if it fails on first test, no more tests will succeed. If it
@@ -1343,28 +1344,29 @@ plot_option_every()
      * c_token */
     if (equals(c_token, ":") && !equals(++c_token, ":")) {
 	everyline = int_expression();
-	if (everyline < 1)
+	if (everyline < 0) everyline = 1;
+	else if (everyline < 1)
 	    int_error(c_token, "Expected positive integer");
     }
     if (equals(c_token, ":") && !equals(++c_token, ":")) {
 	firstpoint = int_expression();
-	if (firstpoint < 0)
-	    int_error(c_token, "Expected non-negative integer");
+	if (firstpoint < 0) firstpoint = 0;
     }
     if (equals(c_token, ":") && !equals(++c_token, ":")) {
 	firstline = int_expression();
-	if (firstline < 0)
-	    int_error(c_token, "Expected non-negative integer");
+	if (firstline < 0) firstline = 0;
     }
     if (equals(c_token, ":") && !equals(++c_token, ":")) {
 	lastpoint = int_expression();
-	if (lastpoint < firstpoint)
+	if (lastpoint < 0) lastpoint = MAXINT;
+	else if (lastpoint < firstpoint)
 	    int_error(c_token, "Last point must not be before first point");
     }
     if (equals(c_token, ":")) {
 	++c_token;
 	lastline = int_expression();
-	if (lastline < firstline)
+	if (lastline < 0) lastline = MAXINT;
+	else if (lastline < firstline)
 	    int_error(c_token, "Last line must not be before first line");
     }
 }
