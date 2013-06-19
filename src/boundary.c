@@ -1,5 +1,5 @@
 /*
- * $Id: boundary.c,v 1.1 2013/02/26 19:39:38 sfeam Exp $
+ * $Id: boundary.c,v 1.1 2013/02/28 05:47:41 sfeam Exp $
  */
 
 /* GNUPLOT - boundary.c */
@@ -1319,7 +1319,7 @@ draw_key(legend_key *key, TBOOLEAN key_pass, int *xinkey, int *yinkey)
 		key_width, key_height);
     }
 
-    if (*key->title) {
+    if (key->title) {
 	int center = (key->bounds.xleft + key->bounds.xright) / 2;
 
 	/* Only draw the title once */
@@ -1348,7 +1348,7 @@ draw_key(legend_key *key, TBOOLEAN key_pass, int *xinkey, int *yinkey)
 	draw_clip_line(key->bounds.xright, key->bounds.ybot, key->bounds.xleft, key->bounds.ybot);
 	closepath();
 	/* draw a horizontal line between key title and first entry */
-	if (*key->title)
+	if (key->title)
 	    draw_clip_line( key->bounds.xleft,
 	    		    key->bounds.ytop - (key_title_height + key_title_extra),
 			    key->bounds.xright,

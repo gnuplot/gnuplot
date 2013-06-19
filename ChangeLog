@@ -1,3 +1,10 @@
+2013-06-19  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/boundary.c src/gadgets.h src/graph3d.c src/set.c src/show.c
+	src/unset.c src/tables.c src/tables.h:  Dynamic allocation of key title.
+	Deprecate undocumented commands "set|show|unset keytitle".
+	Redirect "set keytitle foo" to "set key title foo".
+
 2013-06-18  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* src/datafile.c (plot_option_every):  Treat negative numbers as

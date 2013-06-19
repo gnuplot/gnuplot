@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.295 2013/06/12 19:33:17 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.296 2013/06/16 05:58:10 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -310,9 +310,6 @@ show_command()
 	break;
     case S_LINK:
 	show_link();
-	break;
-    case S_KEYTITLE:
-	show_keytitle();
 	break;
     case S_KEY:
 	show_key();
@@ -3448,9 +3445,10 @@ num_to_str(double r)
 char *
 conv_text(const char *t)
 {
+    static char *empty = "";
     static char *r = NULL, *s;
 
-    if (t==NULL) return NULL;
+    if (t==NULL) return empty;
 
     /* is this enough? */
     r = gp_realloc(r, 4 * (strlen(t) + 1), "conv_text buffer");

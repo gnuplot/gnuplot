@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.402 2013/05/19 23:46:34 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.403 2013/06/12 19:33:15 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -99,7 +99,6 @@ static void set_historysize __PROTO((void));
 #endif
 static void set_isosamples __PROTO((void));
 static void set_key __PROTO((void));
-static void set_keytitle __PROTO((void));
 static void set_label __PROTO((void));
 static int assign_label_tag __PROTO((void));
 static void set_loadpath __PROTO((void));
@@ -283,9 +282,6 @@ set_command()
 	    break;
 	case S_KEY:
 	    set_key();
-	    break;
-	case S_KEYTITLE:
-	    set_keytitle();
 	    break;
 	case S_LINESTYLE:
 	    set_linestyle(&first_linestyle);
@@ -1931,6 +1927,10 @@ set_key()
     char *sdir_warn = "Multiple stack direction settings";
     legend_key *key = &keyT;
 
+    /* Only for backward compatibility with deprecated "set keytitle foo" */
+    if (almost_equals(c_token,"keyt$itle"))
+	goto S_KEYTITLE;
+
     c_token++;
     key->visible = TRUE;
 
@@ -2127,19 +2127,15 @@ set_key()
 	    key->auto_titles = NOAUTO_KEYTITLES;
 	    break;
 	case S_KEY_TITLE:
-	    {
-		char *s;
-		c_token++;
-		if ((s = try_to_get_string())) {
-		    strncpy(key->title,s,sizeof(key->title));
-		    free(s);
-		} else
-		    key->title[0] = '\0';
-		c_token--;
-	    }
+	     S_KEYTITLE:
+	    c_token++;
+	    free(key->title);
+	    key->title = try_to_get_string();
+	    c_token--;
 	    break;
 	case S_KEY_NOTITLE:
-	    key->title[0] = '\0';
+	    free(key->title);
+	    key->title = NULL;
 	    break;
 	case S_KEY_FONT:
 	    c_token++;
@@ -2221,24 +2217,6 @@ set_key()
     }
 }
 
-
-/* process 'set keytitle' command */
-static void
-set_keytitle()
-{
-    legend_key *key = &keyT;
-
-    c_token++;
-    if (END_OF_COMMAND) {	/* set to default */
-	key->title[0] = NUL;
-    } else {
-	char *s;
-	if ((s = try_to_get_string())) {
-	    strncpy(key->title,s,sizeof(key->title));
-	    free(s);
-	}
-    }
-}
 
 /* process 'set label' command */
 /* set label {tag} {"label_text"{,<value>{,...}}} {<label options>} */

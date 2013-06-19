@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.173 2013/06/11 03:16:02 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.174 2013/06/12 19:33:17 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -84,7 +84,6 @@ static void unset_textbox_style __PROTO((void));
 static void unset_historysize __PROTO((void));
 static void unset_isosamples __PROTO((void));
 static void unset_key __PROTO((void));
-static void unset_keytitle __PROTO((void));
 static void unset_label __PROTO((void));
 static void delete_label __PROTO((struct text_label * prev, struct text_label * this));
 static void unset_linestyle __PROTO((struct linestyle_def **head));
@@ -234,9 +233,6 @@ unset_command()
 	break;
     case S_KEY:
 	unset_key();
-	break;
-    case S_KEYTITLE:
-	unset_keytitle();
 	break;
     case S_LABEL:
 	unset_label();
@@ -918,15 +914,6 @@ unset_key()
 {
     legend_key *key = &keyT;
     key->visible = FALSE;
-}
-
-
-/* process 'unset keytitle' command */
-static void
-unset_keytitle()
-{
-    legend_key *key = &keyT;
-    key->title[0] = '\0';	/* empty string */
 }
 
 
@@ -1721,7 +1708,6 @@ reset_command()
     unset_axislabel_or_title(&title);
 
     reset_key();
-    unset_keytitle();
 
     unset_timefmt();
     unset_view();

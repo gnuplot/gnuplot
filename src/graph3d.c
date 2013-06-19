@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.280 2013/05/15 20:52:45 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.281 2013/05/18 23:47:20 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -906,7 +906,7 @@ do_3dplot(
 			key->bounds.ytop - key_title_height - key_title_extra);
 	}
 
-	if (*key->title) {
+	if (key->title) {
 	    int center = (key->bounds.xright + key->bounds.xleft) / 2;
 
 	    if (key->textcolor.type == TC_RGB && key->textcolor.value < 0)
@@ -3311,7 +3311,7 @@ do_3dkey_layout(legend_key *key, int *xinkey, int *yinkey)
 
     key_title_height = ktitle_lines * t->v_char;
     key_title_extra = 0;
-    if ((*key->title) && (t->flags & TERM_ENHANCED_TEXT)
+    if ((key->title) && (t->flags & TERM_ENHANCED_TEXT)
     &&  (strchr(key->title,'^') || strchr(key->title,'_')))
 	    key_title_extra = t->v_char;
 
