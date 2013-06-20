@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.802 2013/06/14 00:27:12 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.803 2013/06/18 19:46:36 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -6886,7 +6886,7 @@ Ffigure_mapcontours
  autoscale just the minimum or maximum of that axis.  If no keyword is given,
  all axes are autoscaled.
 
-=noextend
+?noextend
  By default autoscaling sets the axis range limits to the nearest tic label
  position that includes all the plot data.  keywords `fixmin`, `fixmax`, `fix`
  or `noextend` tell gnuplot to disable extension of the axis range to the next
