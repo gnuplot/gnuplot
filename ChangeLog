@@ -1,3 +1,8 @@
+2013-06-22  Mojca Miklavec  <mojca.miklavec.lists@gmail.com>
+
+	* term/context.trm: Explicitly disable color in standalone ConTeXt
+	documents when monochrome option is chosen.
+
 2013-06-18  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* src/datafile.c (plot_option_every):  Treat negative numbers as

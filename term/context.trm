@@ -1,5 +1,5 @@
 /*
- * $Id: context.trm,v 1.7 2012/11/29 00:12:57 broeker Exp $
+ * $Id: context.trm,v 1.3.2.3 2013/05/24 19:42:06 sfeam Exp $
  */
 
 /* GNUPLOT - context.trm */
@@ -805,9 +805,8 @@ CONTEXT_init()
 		}
 		/* load the gnuplot module */
 		fputs("\\usemodule\n   [gnuplot]\n", gpoutfile);
-		/* enable color (the only place where "color" is indeed used so far) */
-		if (CONTEXT_params.color)
-			fputs("\\setupcolors\n   [state=start]\n", gpoutfile);
+		/* enable or disable color (the only place where "color" is indeed used so far) */
+		fprintf(gpoutfile, "\\setupcolors\n   [state=%s]\n", CONTEXT_params.color ? "start" : "stop");
 		/* additional user-provided header information (if available) */
 		if (CONTEXT_params.header)
 			fprintf(gpoutfile, "%s\n", CONTEXT_params.header);
