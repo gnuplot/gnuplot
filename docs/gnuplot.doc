@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.803 2013/06/18 19:46:36 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.804 2013/06/20 05:13:06 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -5614,10 +5614,11 @@ Ffigure_mapcontours
  smooth histogram) for a random collection of points, using Gaussian kernels.
  A Gaussian is placed at the location of each point in the first column and
  the sum of all these Gaussians is plotted as a function. The value in the
- second column is taken as weight of the Gaussian. (To obtain a normalized
- histogram, this should be 1/number-of-points). By default gnuplot calculates
- and uses the bandwidth which would be optimal for normally distributed input
- data. (This will usually be a very conservative, i.e. broad bandwidth.)
+ second column is taken as weight of the Gaussian. To obtain a normalized
+ histogram, this should be 1/number-of-points. By default gnuplot calculates
+ and uses the bandwidth which would be optimal for normally distributed data.
+      default_bandwidth = sigma * (4/3N) ** (0.2)
+ This will usually be a very conservative, i.e. broad bandwidth.
  Alternatively, you can provide an explicit bandwidth.
       plot $DATA smooth kdensity bandwith <value> with boxes
  The bandwidth used in the previous plot is stored in variable 
@@ -7411,7 +7412,7 @@ Ffigure_mapcontours
        set cntrparam levels incremental 100,50
 
  See also `set contour` for control of where the contours are drawn, and
- `set clabel` for control of the format of the contour labels and linetypes.
+ `set cntrlabel` for control of the format of the contour labels and linetypes.
 
  See also
 ^ <a href="http://www.gnuplot.info/demo/contours.html">
@@ -7498,6 +7499,7 @@ Ffigure_mapcontours
 ?unset contour
 ?show contour
 ?contour
+?contours
 ?nocontour
  `set contour` enables contour drawing for surfaces.  This option is available
  for `splot` only.  It requires grid data, see `grid_data` for more details.
@@ -11423,6 +11425,7 @@ Ffigure_missing
 ?set style textbox
 ?unset style textbox
 ?show style textbox
+?textbox
 
  Syntax: set style textbox {opaque|transparent}{{no}border}
 
