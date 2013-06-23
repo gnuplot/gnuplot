@@ -1,3 +1,9 @@
+2013-06-23  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/fit.c (is_empty, get_next_word):  Accept '\r' as end-of-line
+	character of parameter files.  Necessary since files are now always
+	opened in binary mode on Windows, see change on 2013-06-02.
+
 2013-06-22  Mojca Miklavec  <mojca.miklavec.lists@gmail.com>
 
 	* term/context.trm: Explicitly disable color in standalone ConTeXt

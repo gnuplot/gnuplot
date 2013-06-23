@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: fit.c,v 1.117 2013/06/06 17:26:43 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: fit.c,v 1.118 2013/06/14 20:16:12 sfeam Exp $"); }
 #endif
 
 /*  NOTICE: Change of Copyright Status
@@ -1095,7 +1095,7 @@ show_fit1(int iter, double chisq, double last_chisq, double* parms, double lambd
 static TBOOLEAN
 is_empty(char *s)
 {
-    while (*s == ' ' || *s == '\t' || *s == '\n')
+    while (*s == ' ' || *s == '\t' || *s == '\n' || *s == '\r')
 	s++;
     return (TBOOLEAN) (*s == '#' || *s == '\0');
 }
@@ -1111,9 +1111,9 @@ get_next_word(char **s, char *subst)
 
     while (*tmp == ' ' || *tmp == '\t' || *tmp == '=')
 	tmp++;
-    if (*tmp == '\n' || *tmp == '\0')	/* not found */
+    if (*tmp == '\n' || *tmp == '\r' || *tmp == '\0')	/* not found */
 	return NULL;
-    if ((*s = strpbrk(tmp, " =\t\n")) == NULL)
+    if ((*s = strpbrk(tmp, " =\t\n\r")) == NULL)
 	*s = tmp + strlen(tmp);
     *subst = **s;
     *(*s)++ = '\0';
