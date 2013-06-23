@@ -1,5 +1,9 @@
 2013-06-23  Bastian Maerkisch  <bmaerkisch@web.de>
 
+	* src/syscfg.h src/win/wgraph.c src/win/winmain.c src/win/wmenu.c
+	src/win/wtext.c:  Move definition of flags for windows.h.  Minimal
+	required platform is still Windows XP.
+
 	* src/fit.c (is_empty, get_next_word):  Accept '\r' as end-of-line
 	character of parameter files.  Necessary since files are now always
 	opened in binary mode on Windows, see change on 2013-06-02.

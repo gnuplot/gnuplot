@@ -1,5 +1,5 @@
 /*
- * $Id: wtext.c,v 1.40 2012/11/26 08:18:23 markisch Exp $
+ * $Id: wtext.c,v 1.41 2013/04/22 20:37:04 markisch Exp $
  */
 
 /* GNUPLOT - win/wtext.c */
@@ -42,12 +42,7 @@
 /* WARNING: Do not write to stdout/stderr with functions not listed
    in win/wtext.h */
 
-#ifdef HAVE_CONFIG_H
-# include "config.h"
-#endif
-
-#define STRICT
-
+#include "syscfg.h"
 #include <string.h>
 #include <stdlib.h>
 #include <ctype.h>
@@ -57,9 +52,7 @@
 #endif
 #include <sys/stat.h>
 
-/* needed for mouse scroll wheel support */
-#define _WIN32_WINNT 0x0400
-#define _WIN32_IE 0x0501
+#define STRICT
 #include <windows.h>
 #include <windowsx.h>
 #include <commdlg.h>
@@ -1555,7 +1548,6 @@ WndTextProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 	    } /* moved inside viewport */
 	} /* if(dragging) */
 	break;
-#if _WIN32_WINNT >= 0x0400
     case WM_MOUSEWHEEL: {
 	    WORD fwKeys;
 	    short int zDelta;
@@ -1584,7 +1576,6 @@ WndTextProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 	    }
 	}
 	break;
-#endif
     case WM_CHAR: {
 	/* store key in circular buffer */
 	long count = lptw->KeyBufIn - lptw->KeyBufOut;

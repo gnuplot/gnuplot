@@ -1,5 +1,5 @@
 /*
- * $Id: wgraph.c,v 1.163 2013/06/11 20:54:47 markisch Exp $
+ * $Id: wgraph.c,v 1.164 2013/06/11 21:22:21 markisch Exp $
  */
 
 /* GNUPLOT - win/wgraph.c */
@@ -40,19 +40,9 @@
  *   Russell Lang
  */
 
-#ifdef HAVE_CONFIG_H
-# include "config.h"
-#endif
+#include "syscfg.h"
 
 #define STRICT
-#ifdef USE_MOUSE
-/* shige: for mouse wheel, BM: GetConsoleWindow */
-#define _WIN32_WINNT 0x0500
-#endif
-/* BM: for AlphaBlend/TransparentBlt */
-#define WINVER 0x0501
-/* BM: for Toolbars */
-#define _WIN32_IE 0x0501
 #include <windows.h>
 #include <windowsx.h>
 #include <commdlg.h>
@@ -3684,7 +3674,6 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 				Wnd_exec_event(lpgw, lParam, GE_buttonpress, 2);
 				return 0L;
 
-#if _WIN32_WINNT >= 0x0400
 			/* shige : mouse wheel support */
 			case WM_MOUSEWHEEL: {
 			    WORD fwKeys;
@@ -3704,7 +3693,6 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			    last_modifier_mask = modifier_mask;
 			    return 0L;
 			}
-#endif
 
 			case WM_LBUTTONDBLCLK:
 				Wnd_exec_event(lpgw, lParam, GE_buttonrelease, 1);
@@ -3778,12 +3766,12 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 					return 0;
 #endif
 				case M_COMMANDLINE:
-					sysmenu = GetSystemMenu(lpgw->hWndGraph,0);
+					sysmenu = GetSystemMenu(lpgw->hWndGraph, 0);
 					i = GetMenuItemCount (sysmenu);
 					DeleteMenu (sysmenu, --i, MF_BYPOSITION);
 					DeleteMenu (sysmenu, --i, MF_BYPOSITION);
 					if (lpgw->lptw)
-						ShowWindow (lpgw->lptw->hWndParent, SW_SHOW);
+						ShowWindow (lpgw->lptw->hWndParent, SW_SHOWNORMAL);
 					break;
 			}
 			break;

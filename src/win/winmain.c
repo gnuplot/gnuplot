@@ -1,5 +1,5 @@
 /*
- * $Id: winmain.c,v 1.63 2013/04/27 07:51:18 markisch Exp $
+ * $Id: winmain.c,v 1.64 2013/06/02 13:59:26 markisch Exp $
  */
 
 /* GNUPLOT - win/winmain.c */
@@ -49,13 +49,8 @@
 /* and Russell Lang (rjl@monu1.cc.monash.edu.au) 30 Nov 1992          */
 /*                                                                    */
 
-#ifdef HAVE_CONFIG_H
-# include "config.h"
-#endif
+#include "syscfg.h"
 #define STRICT
-/* required for MinGW64 */
-#define _WIN32_IE 0x0501
-#define _WIN32_WINNT 0x0501
 #include <windows.h>
 #include <windowsx.h>
 #include <commctrl.h>
