@@ -3,6 +3,8 @@
 	* src/graph3d.c: Bug fix for contour line colors. If the base linetypes have
 	no color assigned (i.e. "set linetype" has never been done), then we must
 	explicitly set use_palette in order to generate color from the line type.
+	However the hidden3d code currently uses the linetype itself rather than
+	the value in TC_LT, so we set a new linetype also (fix from Don Tabor).
 
 2013-06-24  Bastian Maerkisch  <bmaerkisch@web.de>
 
