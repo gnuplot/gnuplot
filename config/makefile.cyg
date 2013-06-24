@@ -1,6 +1,6 @@
 # Hey, Emacs, this is a -*- Makefile -*-
 #
-# $Id: makefile.cyg,v 1.35 2011/04/17 10:05:11 markisch Exp $
+# $Id: makefile.cyg,v 1.36 2012/07/18 16:42:51 markisch Exp $
 #
 #
 # GNUPLOT Makefile for Cygwin on WinNT and Win95/98/2000
@@ -284,7 +284,7 @@ $(TARGET): $(OBJS) $(WINOBJS) wgplt_res.$(O) texticon.ico grpicon.ico
 		$(OBJS) $(WINOBJS) wgplt_res.$(O) $(LDLIBS) $(TERMLIBS)
 
 $(PGNUPLOT): win/pgnuplot.c version.$(O)
-	gcc -O2 -s -mno-cygwin -DHAVE_STDBOOL_H -o $@ \
+	gcc -O2 -s -mno-cygwin -DWINDOWS_NO_GUI -DHAVE_STDBOOL_H -o $@ \
 		win/pgnuplot.c version.$(O) -I. -luser32
 
 
@@ -339,12 +339,12 @@ geticon.exe: win/geticon.c
 
 #make binary demo files
 $(M)bf_test.exe : bf_test.c dbinary.$(O) alloc.$(O)
-	$(LD) $(LDFLAGS) $(CFLAGS) -U_Windows -o $@ $^
+	$(LD) $(LDFLAGS) $(CFLAGS) -DWINDOWS_NO_GUI -o $@ $^
 	(cd ../demo ; ./bf_test.exe )
 
 # _Windows causes wtext.h to define fread() etc
 dbinary.$(O): binary.c
-	$(CC) -c $(CFLAGS) -U_Windows -o $@ $<
+	$(CC) -c $(CFLAGS) -DWINDOWS_NO_GUI -o $@ $<
 
 
 #

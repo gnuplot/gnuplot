@@ -1,5 +1,5 @@
 # Hello, emacs: this is a -*- Makefile -*-
-# $Id: Makefile,v 1.28 2012/07/18 16:42:51 markisch Exp $
+# $Id: Makefile,v 1.29 2013/06/02 13:59:26 markisch Exp $
 #
 # GNUPLOT Makefile for MinGW/MSYS on Windows
 # This assumes usual installation of the MinGW32 toolkit, the free
@@ -420,7 +420,7 @@ $(TARGET): $(OBJS) $(WINOBJS) wgplt_res.$(O)
 	$(TERMLIBS) $(WX_LIBS) $(PANGOCAIRO_LIBS)
 
 $(PGNUPLOT): $(W)/pgnuplot.c version.$(O)
-	$(CC) -O2 -DHAVE_STDBOOL_H -s -o $@ $^ -I$(W) -I$(S) -luser32
+	$(CC) -O2 -DWINDOWS_NO_GUI -DHAVE_STDBOOL_H -s -o $@ $^ -I$(W) -I$(S) -luser32
 
 # pull in dependency info for existing object files
 ifndef NODEPS
@@ -523,13 +523,13 @@ doc2html-ja.exe: $(JASRC) $(D)windows/doc2html.c $(D)termdoc.c $(D)xref.c versio
 	$(LD) $(LDFLAGS) -o $@ -DWINDOWS_NO_GUI -DJAPANESE_DOC $(CFLAGS) -I. -I$(JAD) -I$(JA)/term $(D)windows/doc2html.c $(D)termdoc.c $(D)xref.c version.$(O)
 
 #make binary demo files
+# WINDOWS_NO_GUI makes sure that wtext.h does not redefine fread() etc.
 $(M)bf_test.exe : bf_test.c dbinary.$(O) alloc.$(O)
-	$(LD) $(LDFLAGS) $(CFLAGS) -U_Windows -o $@ $^
+	$(LD) $(LDFLAGS) $(CFLAGS) -DWINDOWS_NO_GUI -o $@ $^
 	(cd $(M) ; ./bf_test.exe )
 
-# _Windows causes wtext.h to define fread() etc
 dbinary.$(O): binary.c
-	$(CC) -c $(CFLAGS) -U_Windows -o $@ $<
+	$(CC) -c $(CFLAGS) -DWINDOWS_NO_GUI -o $@ $<
 
 #
 # Create config.h

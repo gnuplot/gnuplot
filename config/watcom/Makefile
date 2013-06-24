@@ -1,5 +1,5 @@
 # Hello, emacs: this is a -*- Makefile -*-
-# $Id: Makefile,v 1.9 2012/06/30 09:37:08 markisch Exp $
+# $Id: Makefile,v 1.10 2012/07/18 16:42:51 markisch Exp $
 #
 # GNUPLOT Makefile OpenWatcom 1.3 on Win32
 
@@ -240,7 +240,7 @@ wgnuplot.mnu: $(W)\wgnuplot.mnu
         copy $(W)\wgnuplot.mnu wgnuplot.mnu
 
 pgnuplot.exe: $(W)\pgnuplot.c version.$(O) .AUTODEPEND
-        $(WCL) -5r -zq -d2 -fm $(W)\pgnuplot.c -fe=pgnuplot.exe -I$(S) &
+        $(WCL) -DWINDOWS_NO_GUI -5r -zq -d2 -fm $(W)\pgnuplot.c -fe=pgnuplot.exe -I$(S) &
 	  version.$(O) user32.lib
 
 
@@ -269,6 +269,7 @@ doc2gih.exe: $(D)doc2gih.c $(D)termdoc.c $(D)xref.c .AUTODEPEND
         $(WCL) $(EXTRA_CPPFLAGS_CONSOLE) $(WCFLAGS) -w1 -I$(D);$(T) -fe$^@ $(D)doc2gih.c $(D)termdoc.c $(D)xref.c
 
 #make binary demo files
+# WINDOWS_NO_GUI makes sure that wtext.h does not redefine fread() etc.
 bf_test.exe : bf_test.c dbinary.$(O) alloc.$(O) .AUTODEPEND
         $(WCL) $(WCFLAGS) -w1 -DWINDOWS_NO_GUI -fe$^@ $(S)\bf_test.c dbinary.$(O) alloc.$(O)
 
@@ -276,9 +277,8 @@ $(BINARYFILES): bf_test.exe
         .\bf_test
         move binary? $(M).
 
-# _Windows causes wtext.h to define fread() etc
 dbinary.$(O): $(S)\binary.c
-        $(WCC) $(WCFLAGS) /U_Windows -w1 -fodbinary.$(O) $[@
+        $(WCC) $(WCFLAGS) -w1 -DWINDOWS_NO_GUI -fodbinary.$(O) $[@
 
 # clean up temporary files
 clean: .SYMBOLIC

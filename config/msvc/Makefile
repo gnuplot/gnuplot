@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.9 2012/07/18 16:42:51 markisch Exp $
+# $Id: Makefile,v 1.10 2013/06/02 13:59:26 markisch Exp $
 #
 # GNUPLOT Makefile Microsoft Visual C++ 2005 or newer
 
@@ -207,7 +207,7 @@ gnuplot.exe: $(ALL_CONSOLE_OBJS) wgnuplot.res linkopt-c.msw
 !ENDIF
 
 pgnuplot.exe: $(W)pgnuplot.c
-	$(CC) $(CBASEFLAGS) /I. /I$(TOP) /I$(S) $(W)pgnuplot.c /Fe$@ /link version.obj user32.lib
+	$(CC) $(CBASEFLAGS) /I. /I$(TOP) /I$(S) /DWINDOWS_NO_GUI $(W)pgnuplot.c /Fe$@ /link version.obj user32.lib
 
 linkopt-w.msw: Makefile
 	echo $(OBJS) > linkopt-w.msw
@@ -284,15 +284,15 @@ doc2html.exe: $(D)windows\doc2html.c $(D)termdoc.c $(D)xref.c version.obj
 
 
 # make binary demo files
+# WINDOWS_NO_GUI makes sure that wtext.h does not redefine fread() etc.
 $(M)bf_test.exe : $(S)\\bf_test.c dbinary.obj alloc.obj
 	$(CC) $(CFLAGS) /F 5000 /W1 /DWINDOWS_NO_GUI /Fe$(M)bf_test.exe $(S)\\bf_test.c dbinary.obj alloc.obj
 	cd $(M)
 	bf_test
 	cd ..\\config\\msvc
 
-# _Windows causes wtext.h to define fread() etc
 dbinary.obj: $(S)\\binary.c
-	$(CC) /c $(CFLAGS) /U_Windows /F 5000 /W1 /Fodbinary.obj $(S)\\binary.c
+	$(CC) /c $(CFLAGS) /F 5000 /W1 /DWINDOWS_NO_GUI /Fodbinary.obj $(S)\\binary.c
 
 # clean up temporary files
 clean:

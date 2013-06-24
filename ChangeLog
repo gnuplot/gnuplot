@@ -1,3 +1,9 @@
+2013-06-24  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* config/makefile.cyg config/cygwin/Makefile config/mingw/Makefile
+	config/msvc/Makefile config/watcom/Makefile:  Define WINDOWS_NO_GUI
+	when building text mode tools instead of undefining _Windows.
+
 2013-06-23  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/syscfg.h src/win/wgraph.c src/win/winmain.c src/win/wmenu.c
