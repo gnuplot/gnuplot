@@ -1,3 +1,9 @@
+2013-06-24  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/graph3d.c: Bug fix for contour line colors. If the base linetypes have
+	no color assigned (i.e. "set linetype" has never been done), then we must
+	explicitly set use_palette in order to generate color from the line type.
+
 2013-06-24  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* config/makefile.cyg config/cygwin/Makefile config/mingw/Makefile

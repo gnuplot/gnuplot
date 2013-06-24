@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.281 2013/05/18 23:47:20 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.282 2013/06/19 23:04:59 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -1226,10 +1226,18 @@ do_3dplot(
 				thiscontour_lp_properties.use_palette = TRUE;
 			    }
 			    ic++;	/* Increment linetype used for contour */
-			    if (prefer_line_styles)
+			    if (prefer_line_styles) {
 				lp_use_properties(&ls, this_plot->hidden3d_top_linetype + ic);
-			    else
+			    } else {
+				/* thiscontour_lp_properties.l_type = 
+					this_plot->hidden3d_top_linetype + ic; */
 				load_linetype(&ls, this_plot->hidden3d_top_linetype + ic);
+				/* FIXME: The command below is needed to handle the case
+				 * that the original linetype had no color information.
+				 * e.g. no user-defined linetypes are present.
+				 */
+				thiscontour_lp_properties.use_palette = TRUE;
+			    }
 			    thiscontour_lp_properties.pm3d_color = ls.pm3d_color;
 			    term_apply_lp_properties(&thiscontour_lp_properties);
 			}
