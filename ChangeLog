@@ -1,3 +1,7 @@
+2013-06-24  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/util.c|h (existfile):  New (missing) routine.
+
 2013-06-22  Mojca Miklavec  <mojca.miklavec.lists@gmail.com>
 
 	* term/context.trm: Explicitly disable color in standalone ConTeXt
