@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.379.2.17 2013/04/08 16:47:57 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.379.2.18 2013/05/24 17:36:40 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -869,8 +869,8 @@ boundary(struct curve_points *plots, int count)
 	    tic = tic->next;
 	}
 	xtic_textwidth = maxrightlabel - plot_bounds.xright;
-	if (xtic_textwidth > term->xmax/4) {
-	    xtic_textwidth = term->xmax/4;
+	if (xtic_textwidth > (term->xmax / 4)) {
+	    xtic_textwidth = term->xmax / 4;
 	    int_warn(NO_CARET, "difficulty making room for xtic labels");
 	}
     }
@@ -918,7 +918,7 @@ boundary(struct curve_points *plots, int count)
 
 	    color_box.xoffset -= plot_bounds.xright;
 	    /* EAM 2009 - protruding xtic labels */
-	    if (term->xmax - plot_bounds.xright < xtic_textwidth)
+	    if ((term->xmax - plot_bounds.xright) < xtic_textwidth)
 		plot_bounds.xright = term->xmax - xtic_textwidth;
 	    /* DBT 12-3-98  extra margin just in case */
 	    plot_bounds.xright -= 1.0 * t->h_char;
@@ -1174,7 +1174,7 @@ boundary(struct curve_points *plots, int count)
 		/* align top first since tmargin may be manual */
 		key->bounds.ytop = plot_bounds.ytop;
 		key->bounds.ybot = key->bounds.ytop - key_h;
-	    } else if (key->vpos == CENTRE) {
+	    } else if (key->vpos == JUST_CENTRE) {
 		int key_box_half = key_h / 2;
 		key->bounds.ybot = (plot_bounds.ybot + plot_bounds.ytop) / 2 - key_box_half;
 		key->bounds.ytop = (plot_bounds.ybot + plot_bounds.ytop) / 2 + key_box_half;
@@ -4386,7 +4386,7 @@ plot_boxplot(struct curve_points *plot)
     struct coordinate *save_points = plot->points;
     struct coordinate candle;
     double median, quartile1, quartile3;
-    double whisker_top, whisker_bot;
+    double whisker_top = 0, whisker_bot = 0;
     int level;
     int levels = plot->boxplot_factors;
     if (levels == 0)
@@ -5982,14 +5982,13 @@ do_ellipse( int dimensions, t_ellipse *e, int style, TBOOLEAN do_own_mapping )
      * then the caller plot_ellipses function already did the mapping for us.
      * Else we do it here. The 'ellipses' plot style is 2D only, but objects 
      * can apparently be placed on splot maps too, so we do 3D mapping if needed. */
-	if (!do_own_mapping) {
-	    cx = e->center.x;
-	    cy = e->center.y;
-	}
-	else if (dimensions == 2)
-	    map_position_double(&e->center, &cx, &cy, "ellipse");
+    if (!do_own_mapping) {
+	cx = e->center.x;
+	cy = e->center.y;
+    } else if (dimensions == 2)
+	map_position_double(&e->center, &cx, &cy, "ellipse");
     else
-	    map3d_position_double(&e->center, &cx, &cy, "ellipse");
+	map3d_position_double(&e->center, &cx, &cy, "ellipse");
 
     /* Calculate the vertices */
     vertex[0].style = style;
@@ -5997,58 +5996,67 @@ do_ellipse( int dimensions, t_ellipse *e, int style, TBOOLEAN do_own_mapping )
         /* Given that the (co)sines of same sequence of angles 
          * are calculated every time - shouldn't they be precomputed
          * and put into a table? */
-	    pos.x = A * cosO * cos(angle) - B * sinO * sin(angle);
-	    pos.y = A * sinO * cos(angle) + B * cosO * sin(angle);
-	    if (!do_own_mapping) {
-	        xoff = pos.x;
-	        yoff = pos.y;
-	    }
-	    else if (dimensions == 2)
+	pos.x = A * cosO * cos(angle) - B * sinO * sin(angle);
+	pos.y = A * sinO * cos(angle) + B * cosO * sin(angle);
+	if (!do_own_mapping) {
+	    xoff = pos.x;
+	    yoff = pos.y;
+	} else if (dimensions == 2) {
 	    switch (e->type) {
 	    case ELLIPSEAXES_XY:
-	        map_position_r(&pos, &xoff, &yoff, "ellipse");
-		    break;
+		map_position_r(&pos, &xoff, &yoff, "ellipse");
+		break;
 	    case ELLIPSEAXES_XX:
-	        map_position_r(&pos, &xoff, &junkfoo, "ellipse");
-	        pos.x = pos.y;
-		    map_position_r(&pos, &yoff, &junkfoo, "ellipse");
-	        break;
+		map_position_r(&pos, &xoff, &junkfoo, "ellipse");
+		pos.x = pos.y;
+		map_position_r(&pos, &yoff, &junkfoo, "ellipse");
+		break;
 	    case ELLIPSEAXES_YY:
-	        map_position_r(&pos, &junkfoo, &yoff, "ellipse");
-	        pos.y = pos.x;
-		    map_position_r(&pos, &junkfoo, &xoff, "ellipse");
-		    break;
-		}	        
-	    else {
+		map_position_r(&pos, &junkfoo, &yoff, "ellipse");
+		pos.y = pos.x;
+		map_position_r(&pos, &junkfoo, &xoff, "ellipse");
+		break;
+	    } /* switch */
+	} else {
 	    switch (e->type) {
 	    case ELLIPSEAXES_XY:
-	        map3d_position_r(&pos, &junkw, &junkh, "ellipse");
-	        xoff = junkw;
-	        yoff = junkh;
-		    break;
+		map3d_position_r(&pos, &junkw, &junkh, "ellipse");
+		xoff = junkw;
+		yoff = junkh;
+		break;
 	    case ELLIPSEAXES_XX:
-	        map3d_position_r(&pos, &junkw, &junkh, "ellipse");
-	        xoff = junkw;
-	        pos.x = pos.y;
-		    map3d_position_r(&pos, &junkh, &junkw, "ellipse");
-		    yoff = junkh;
-	        break;
+		map3d_position_r(&pos, &junkw, &junkh, "ellipse");
+		xoff = junkw;
+		pos.x = pos.y;
+		map3d_position_r(&pos, &junkh, &junkw, "ellipse");
+		yoff = junkh;
+		break;
 	    case ELLIPSEAXES_YY:
-	        map3d_position_r(&pos, &junkw, &junkh, "ellipse");
-	        yoff = junkh;
-	        pos.y = pos.x;
-		    map3d_position_r(&pos, &junkh, &junkw, "ellipse");
-		    xoff = junkw;
-		    break;
-		}	      
-	    }
-	    vertex[i].x = cx + xoff;
-	    if (!do_own_mapping) 
-	        vertex[i].y = cy + yoff * aspect;
-	    else
-	        vertex[i].y = cy + yoff;
+		map3d_position_r(&pos, &junkw, &junkh, "ellipse");
+		yoff = junkh;
+		pos.y = pos.x;
+		map3d_position_r(&pos, &junkh, &junkw, "ellipse");
+		xoff = junkw;
+		break;
+	    } /* switch */	      
+	} /* if */
+	vertex[i].x = cx + xoff;
+	if (!do_own_mapping) 
+	    vertex[i].y = cy + yoff * aspect;
+	else
+	    vertex[i].y = cy + yoff;
 	
-	    clip_line((int *)&cx, (int *)&cy, &vertex[i].x, &vertex[i].y);
+	/* clip_line has int* arguments, so transform properly: */
+	{
+	    int cx_to_pass = (int)cx;
+	    int cy_to_pass = (int)cy;
+	    
+	    clip_line(&cx_to_pass, &cy_to_pass, &vertex[i].x, &vertex[i].y);
+	    /* and since clip_line is entitled to modify its arguments, make
+	     * sure they make it back into cx and cy: */
+	    cx = cx_to_pass;
+	    cy = cy_to_pass;
+	}	
     }
 
     if (style) {
@@ -6059,7 +6067,7 @@ do_ellipse( int dimensions, t_ellipse *e, int style, TBOOLEAN do_own_mapping )
 	/* Draw the arc */
 	for (i=0; i<segments; i++)
 	    draw_clip_line( vertex[i].x, vertex[i].y,
-		vertex[i+1].x, vertex[i+1].y );
+			    vertex[i+1].x, vertex[i+1].y );
     }
 }
 

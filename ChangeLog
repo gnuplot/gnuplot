@@ -1,3 +1,8 @@
+2013-06-27  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/graphics.c (do_ellipse): Repair atrocious pointer casts
+	spotted by J. Bollinger.
+
 2013-06-24  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/util.c|h (existfile):  New (missing) routine.
