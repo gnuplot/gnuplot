@@ -1,5 +1,5 @@
 /*
- * $Id: syscfg.h,v 1.48 2011/11/26 13:48:44 markisch Exp $
+ * $Id: syscfg.h,v 1.49 2013/06/23 19:53:02 markisch Exp $
  */
 
 /* GNUPLOT - syscfg.h */
@@ -265,12 +265,12 @@
 
 typedef double coordval;
 
-/* Set max. number of arguments in a user-defined function */
-# define MAX_NUM_VAR	12
-
-/* HBB 20010223: Moved VERYLARGE definition to stdfn.h: it can only be
- * resolved correctly after #include <float.h>, which is done there,
- * not here. */
+/* This is the maximum number of arguments in a user-defined function.
+ * Note: This could be increased further, but in this case it would be good to
+ * make  c_dummy_var[][] and set_dummy_var[][] into pointer arrays rather than
+ * fixed-size storage for long variable name strings that will never be used.
+ */
+#define MAX_NUM_VAR	12
 
 #ifdef VMS
 # define DEFAULT_COMMENTS_CHARS "#!"

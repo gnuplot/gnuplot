@@ -47,8 +47,8 @@ while (x <= xmax) {
     lc5 = lc4 + k5 * f5(x)
     lc6 = lc5 + k6 * f6(x)
 
-    # columns 1-5 contain the "tabulated basis functions"
-    # columns 6-10 contain linear combinations with given coefficients
+    # columns 1-5,11 contain the "tabulated basis functions"
+    # columns 6-10,12 contain linear combinations with given coefficients
     # and increasing number of components
 
     print f1(x), f2(x), f3(x), f4(x), f5(x), lc1, lc2, lc3, lc4, lc5, f6(x), lc6
@@ -88,21 +88,23 @@ pause -1 "Hit return to try for a 2D fit"
 # combination with two components in column 7
 #
 # do not forget to reset the c values so that the fit needs to search anew.
+# Check the functioning of preset axis range limit on y
 
 c1=1
 c2=1
+set yrange [0:.99]
 fit m2(x,y) "fitmulti.dat" u 1:2:7:(1) via c1,c2
 print "---------------------------------------------------------"
 print "2D fit: expected ", k1, " c1 = ", c1
 print "2D fit: expected ", k2, " c2 = ", c2
 print "---------------------------------------------------------"
+set yrange [*:*]
 pause -1 "Hit return to try for a 3D fit"
 
 # 3D fit:
 # basis functions in columns 1, 2, 3,
 # combination with three components in column 8
 
-print "3D fit will fail without patch..."
 c1=1
 c2=1
 c3=1
@@ -151,9 +153,11 @@ print "5D fit: expected ", k5, " c5 = ", c5
 print "---------------------------------------------------------"
 pause -1 "Hit return to try for a 6D fit"
 
+print "This 6D fit will fail in 4.6 and unpatched 4.7"
 # 6D fit:
 # basis functions in columns 1, 2, 3, 4, 5, 11
 # combination with five components in column 12
+# test inline range spec
 
 c1=1
 c2=1
@@ -161,7 +165,7 @@ c3=1
 c4=1
 c5=1
 c6=1
-fit m6(x,y,x2,x3,x4,x5) "fitmulti.dat" u 1:2:3:4:5:11:12:(1) via c1,c2,c3,c4,c5,c6
+fit [][][][][][-0.2:*] m6(x,y,x2,x3,x4,x5) "fitmulti.dat" u 1:2:3:4:5:11:12:(1) via c1,c2,c3,c4,c5,c6
 print "---------------------------------------------------------"
 print "6D fit: expected ", k1, " c1 = ", c1
 print "6D fit: expected ", k2, " c2 = ", c2
@@ -169,6 +173,7 @@ print "6D fit: expected ", k3, " c3 = ", c3
 print "6D fit: expected ", k4, " c4 = ", c4
 print "6D fit: expected ", k5, " c5 = ", c5
 print "6D fit: expected ", k6, " c6 = ", c6
+print "FIT_NDF = ",FIT_NDF," after range filters (expected 14)"
 print "---------------------------------------------------------"
 pause -1 "Hit return to end multidimension fit demo"
 reset

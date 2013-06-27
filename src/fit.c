@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: fit.c,v 1.118 2013/06/14 20:16:12 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: fit.c,v 1.119 2013/06/23 19:42:54 markisch Exp $"); }
 #endif
 
 /*  NOTICE: Change of Copyright Status
@@ -72,6 +72,11 @@ static char *RCSid() { return RCSid("$Id: fit.c,v 1.118 2013/06/14 20:16:12 sfea
  * flexibility of adding an absolute convergence criterion through
  * `set fit limit_abs`. Patchset #230.
  *
+ * Ethan A Merritt, June 2013: Remove limit of 5 independent parameters.
+ * The limit is now the smaller of MAXDATACOLS-2 and MAX_NUM_VAR.
+ * Dissociate parameters other than x/y from "normal" plot axes.
+ * To refine more than 2 parameters, name them with `set dummy`.
+ * x and y still refer to axis_array[] in order to allow time/date formats.
  */
 
 #include "fit.h"
@@ -215,8 +220,8 @@ static fixstr *par_name;
 
 static fixstr *last_par_name = NULL;
 static int last_num_params = 0;
-static char last_dummy_var[5][MAX_ID_LEN+1];
-static char last_fit_command[LASTFITCMDLENGTH+1] = "";
+static char *last_dummy_var[MAX_NUM_VAR];
+static char *last_fit_command = NULL;
 
 
 /*****************************************************************
@@ -240,7 +245,8 @@ static void show_fit __PROTO((int i, double chisq, double last_chisq, double *a,
 static void show_fit1 __PROTO((int iter, double chisq, double last_chisq, double *parms,
                             double lambda, FILE * device));
 static void show_results __PROTO((double chisq, double last_chisq, double* a, double* dpar, double** corel));
-static void log_axis_restriction __PROTO((FILE *log_f, AXIS_INDEX axis, char *name));
+static void log_axis_restriction __PROTO((FILE *log_f, int param, 
+			    double min, double max, int autoscale, char *name));
 static TBOOLEAN is_empty __PROTO((char *s));
 static int getivar __PROTO((const char *varname));
 static double getdvar __PROTO((const char *varname));
@@ -260,6 +266,8 @@ static void backup_file __PROTO((char *, const char *));
 size_t
 wri_to_fil_last_fit_cmd(FILE *fp)
 {
+    if (last_fit_command == NULL)
+	return 0;
     if (fp == NULL)
 	return strlen(last_fit_command);
     else
@@ -386,7 +394,6 @@ marquardt(double a[], double **C, double *chisq, double *lambda)
 	analyze_ret = analyze(a, C, d, chisq);
 
 	/* Calculate a useful startup value for lambda, as given by Schwarz */
-	/* FIXME: this is doesn't turn out to be much better, really... */
 	if (startup_lambda != 0)
 	    *lambda = startup_lambda;
 	else {
@@ -439,7 +446,7 @@ marquardt(double a[], double **C, double *chisq, double *lambda)
 	temp_a[j] = a[j] + da[j];
 
     if (!analyze(temp_a, tmp_C, tmp_d, &tmp_chisq)) {
-	/* FIXME: will never be reached: always returns TRUE */
+	/* will never be reached: always returns TRUE */
 	return ML_ERROR;
     }
 
@@ -495,7 +502,7 @@ analyze(double a[], double **C, double d[], double *chisq)
     }
     *chisq = sumsq_vec(num_data, d);
 
-    /* FIXME: why return a value that is always TRUE ? */
+    /* why return a value that is always TRUE ? */
     return TRUE;
 }
 
@@ -572,7 +579,7 @@ call_gnuplot(double *par, double *data)
 	/* calculate fit-function value */
 	/* initialize extra dummy variables from the corresponding
 	 actual variables, if any. */
-	for (j = 0; j < 5; j++) {
+	for (j = 0; j < MAX_NUM_VAR; j++) {
 	    struct udvt_entry *udv = add_udv_by_name(c_dummy_var[j]);
 	    Gcomplex(&func.dummy_values[j],
 	             udv->udv_undef ? 0 : getdvar(c_dummy_var[j]),
@@ -1288,11 +1295,11 @@ update(char *pfile, char *npfile)
 		int k;
 
 		/* ignore indep. variables */
-		for (k = 0; k < 5; k++) {
-		    if (strcmp(last_dummy_var[k], udv->udv_name) == 0)
+		for (k = 0; k < MAX_NUM_VAR; k++) {
+		    if (last_dummy_var[k] && strcmp(last_dummy_var[k], udv->udv_name) == 0)
 			break;
 		}
-		if (k != 5) {
+		if (k != MAX_NUM_VAR) {
 		    udv = udv->next_udv;
 		    continue;
 		}
@@ -1445,43 +1452,43 @@ backup_file(char *tofile, const char *fromfile)
 }
 
 
-/* A modified copy of save.c:save_range(), but this one reports
- * _current_ values, not the 'set' ones, by default */
+/* Modified from save.c:save_range() */
 static void
-log_axis_restriction(FILE *log_f, AXIS_INDEX axis, char *name)
+log_axis_restriction(FILE *log_f, int param, double min, double max, int autoscale, char *name)
 {
     char s[80];
-    AXIS *this_axis = axis_array + axis;
+    /* FIXME: Is it really worth it to format time values? */
+    AXIS *axis = (param == 1) ? &Y_AXIS : &X_AXIS;
 
     fprintf(log_f, "        %s range restricted to [", name);
-    if (this_axis->autoscale & AUTOSCALE_MIN) {
+    if (autoscale & AUTOSCALE_MIN) {
 	putc('*', log_f);
-    } else if (this_axis->datatype == DT_TIMEDATE) {
+    } else if (param < 2 && axis->datatype == DT_TIMEDATE) {
 	putc('"', log_f);
-	gstrftime(s, 80, this_axis->timefmt, this_axis->min);
+	gstrftime(s, 80, axis->timefmt, min);
 	fputs(s, log_f);
 	putc('"', log_f);
     } else {
-	fprintf(log_f, "%#g", this_axis->min);
+	fprintf(log_f, "%#g", min);
     }
 
     fputs(" : ", log_f);
-    if (this_axis->autoscale & AUTOSCALE_MAX) {
+    if (autoscale & AUTOSCALE_MAX) {
 	putc('*', log_f);
-    } else if (this_axis->datatype == DT_TIMEDATE) {
+    } else if (param < 2 && axis->datatype == DT_TIMEDATE) {
 	putc('"', log_f);
-	gstrftime(s, 80, this_axis->timefmt, this_axis->max);
+	gstrftime(s, 80, axis->timefmt, max);
 	fputs(s, log_f);
 	putc('"', log_f);
     } else {
-	fprintf(log_f, "%#g", this_axis->max);
+	fprintf(log_f, "%#g", max);
     }
     fputs("]\n", log_f);
 }
 
 
 /*****************************************************************
-    Interface to the classic gnuplot-software
+    Interface to the gnuplot "fit" command
 *****************************************************************/
 
 void
@@ -1490,66 +1497,77 @@ fit_command()
 /* HBB 20000430: revised this completely, to make it more similar to
  * what plot3drequest() does */
 
-    int num_ranges=0;	 /* # range specs */
-    static int var_order[]={FIRST_X_AXIS, FIRST_Y_AXIS, T_AXIS, U_AXIS, V_AXIS, FIRST_Z_AXIS};
-    static char dummy_default[MAX_NUM_VAR][MAX_ID_LEN+1]={"x","y","t","u","v","z"};
+    /* Backwards compatibility - these were the default names in 4.4 and 4.6	*/
+    static const char *dummy_old_default[6]={"x","y","t","u","v","z"};
+
+    /* Keep range info in local storage rather than overwriting axis structure.	*/
+    /* The final range is "z" (actually the range of the function value).	*/
+    double range_min[MAX_NUM_VAR+1];
+    double range_max[MAX_NUM_VAR+1];
+    int range_autoscale[MAX_NUM_VAR+1];
+    int num_ranges=0;
 
     int max_data;
     int max_params;
 
-    int dummy_token[7] = {-1,-1,-1,-1,-1,-1,-1};
-    int num_points=0;	    /* number of data points read from file */
-    int skipped[12];	    /* num points out of range */
-    int zrange_token = -1;
+    int dummy_token[MAX_NUM_VAR+1]; /* Point to variable name for each explicit range */
+    int skipped[MAX_NUM_VAR+1];	    /* number of points out of range */
+    int num_points=0;		    /* number of data points read from file */
 
     int i, j;
-    double v[7];
+    double v[MAXDATACOLS];
     double tmpd;
     time_t timer;
     int token1, token2, token3;
     char *tmp, *file_name;
-    AXIS saved_axis;
 
     c_token++;
 
-    /* first look for a restricted x fit range... */
-
-    /* put stuff into arrays to simplify access */
-    AXIS_INIT3D(FIRST_X_AXIS, 0, 0);
-    AXIS_INIT3D(FIRST_Y_AXIS, 0, 0);
-    AXIS_INIT3D(T_AXIS, 0, 0);
-    AXIS_INIT3D(U_AXIS, 0, 0);
-    AXIS_INIT3D(V_AXIS, 0, 0);
-    AXIS_INIT3D(FIRST_Z_AXIS, 0, 1);
-
-    /* use global default indices in axis.c to simplify access to
-     * per-axis variables */
+    /* FIXME EAM - I don't understand what these are needed for. */
     x_axis = FIRST_X_AXIS;
     y_axis = FIRST_Y_AXIS;
     z_axis = FIRST_Z_AXIS;
 
-    /* JRV 20090201: Parsing the range specs would be much simpler if
-     * we knew how many independent variables we had, but we won't
-     * know that until parsing the using specs.  Assume we have one
-     * independent variable to start with (x), and adjust later
-     * if needed. */
-
-    while (equals(c_token, "[")) {
-      int i;
-      if (num_ranges > 5)
-	int_error(c_token, "only 6 range specs are permitted");
-      i=var_order[num_ranges];
-      /* Store the Z axis dummy variable and range (if any) in the axis
-       * for the next independent variable.  Save the current values to be
-       * restored later if there are fewer than 5 independent variables.
-       */
-      saved_axis = axis_array[i];
-      dummy_token[6] = dummy_token[i];
-
-      dummy_token[num_ranges] = parse_range(i);
-      zrange_token = c_token;
-      num_ranges++;
+    /* First look for a restricted fit range... */
+    /* Start with the current range limits on variable 1 ("x"),
+     * variable 2 ("y"), and function range ("z").
+     * Historically variables 3-5 inherited the current range of t, u, and v
+     * but no longer.  NB: THIS IS A CHANGE
+     */
+    AXIS_INIT3D(x_axis, 0, 0);
+    AXIS_INIT3D(y_axis, 0, 0);
+    AXIS_INIT3D(z_axis, 0, 1);
+    for (i=0; i<MAX_NUM_VAR+1; i++)
+	dummy_token[i] = -1;
+    range_min[0] = axis_array[x_axis].min;
+    range_max[0] = axis_array[x_axis].max;
+    range_autoscale[0] = axis_array[x_axis].autoscale;
+    range_min[1] = axis_array[y_axis].min;
+    range_max[1] = axis_array[y_axis].max;
+    range_autoscale[1] = axis_array[y_axis].autoscale;
+    for (i=2; i<MAX_NUM_VAR; i++) {
+	range_min[i] = VERYLARGE;
+	range_max[i] = -VERYLARGE;
+	range_autoscale[i] = AUTOSCALE_BOTH;
     }
+    range_min[MAX_NUM_VAR] = axis_array[z_axis].min;
+    range_max[MAX_NUM_VAR] = axis_array[z_axis].max;
+    range_autoscale[MAX_NUM_VAR] = axis_array[z_axis].autoscale;
+
+    i = 0;
+    while (equals(c_token, "[")) {
+	if (i > MAX_NUM_VAR)
+	    int_error(c_token, "too many range specifiers");
+	/* NB: This has nothing really to do with the Z axis, we're */
+	/* just using that slot of the axis array as scratch space. */
+	AXIS_INIT3D(SECOND_Z_AXIS, 0, 1);
+	dummy_token[i] = parse_range(SECOND_Z_AXIS);
+	range_min[i] = axis_array[SECOND_Z_AXIS].min;
+	range_max[i] = axis_array[SECOND_Z_AXIS].max;
+	range_autoscale[i] = axis_array[SECOND_Z_AXIS].autoscale;
+	i++;
+    }
+    num_ranges = i;
 
     /* now compile the function */
 
@@ -1562,13 +1580,13 @@ fit_command()
     dummy_func = &func;
 
     /* set all possible dummy variable names, even if we're using fewer */
-    for (i = 0; i < 5; i++) {
+    for (i = 0; i < MAX_NUM_VAR; i++) {
 	if (dummy_token[i] > 0)
 	    copy_str(c_dummy_var[i], dummy_token[i], MAX_ID_LEN);
 	else if (*set_dummy_var[i] != '\0')
 	    strcpy(c_dummy_var[i], set_dummy_var[i]);
-	else
-	    strcpy(c_dummy_var[i], dummy_default[i]);
+	else if (i<6)  /* Fall back to legacy ordering x y t u v z */
+	    strcpy(c_dummy_var[i], dummy_old_default[i]);
     }
 
     func.at = perm_at();	/* parse expression and save action table */
@@ -1585,52 +1603,41 @@ fit_command()
 
     /* use datafile module to parse the datafile and qualifiers */
     df_set_plot_mode(MODE_QUERY);  /* Does nothing except for binary datafiles */
-    columns = df_open(file_name, 7, NULL);	/* up to 7 using specs allowed */
+
+    /* Historically we could only handle 7 using specs, hence 5 independent	*/
+    /* variables (the last 2 cols are used for z and z_err).		   	*/
+    /* June 2013 - Now the number of using specs can be increased by changing	*/
+    /* MAXDATACOLS.  Logically this should be at least as large as MAX_NUM_VAR,	*/
+    /* the limit on parameters passed to a user-defined function.		*/
+    /* I.e. we expect that MAXDATACOLS >= MAX_NUM_VAR + 2			*/
+
+    columns = df_open(file_name, MAXDATACOLS, NULL);
     free(file_name);
     if (columns < 0)
 	int_error(NO_CARET,"Can't read data file");
     if (columns == 1)
 	int_error(c_token, "Need more than 1 input data column");
-    if (columns < 3)
+    if (columns < 3) {
 	if (X_AXIS.datatype == DT_TIMEDATE || Y_AXIS.datatype == DT_TIMEDATE)
 	    int_error(c_token, "Need full using spec for time data");
+    } else {
+	/* Allow time data only on first two dimensions (x and y) */
+	df_axis[0] = x_axis;
+	df_axis[1] = y_axis;
+    }
 
     num_indep = (columns < 3) ? 1 : columns - 2;
 
-    /* No need for a time data check for the remaining axes.  Those
-     * axes are only used iff columns>3, i.e. there are using specs
-     * for all the columns, already. */
-
-    for (i=0; i<num_indep; i++)
-      df_axis[i] = var_order[i];
-    df_axis[i++] = FIRST_Z_AXIS;
-    /* don't parse sigma_z as times */
-    df_axis[i] = NO_AXIS;
-
-
     /* HBB 980401: if this is a single-variable fit, we shouldn't have
      * allowed a variable name specifier for 'y': */
+    /* FIXME EAM - Is this relevant any more? */
     if ((dummy_token[1] > 0) && (num_indep==1))
 	int_error(dummy_token[1], "Can't re-name 'y' in a one-variable fit");
 
     /* depending on number of independent variables, the last range
      * spec may be for the Z axis */
     if (num_ranges > num_indep+1)
-      int_error(zrange_token, "Too many range-specs for a %d-variable fit", num_indep);
-    else if (num_ranges == num_indep+1 && num_indep < 5) {
-      /* last range spec is for the Z axis */
-      int i = var_order[num_ranges-1]; /* index for the last range spec */
-
-      Z_AXIS.autoscale = axis_array[i].autoscale;
-      if (!(axis_array[i].autoscale & AUTOSCALE_MIN))
-	Z_AXIS.min = axis_array[i].min;
-      if (!(axis_array[i].autoscale & AUTOSCALE_MAX))
-	Z_AXIS.max = axis_array[i].max;
-
-      /* restore former values */
-      axis_array[i] = saved_axis;
-      dummy_token[num_ranges-1] = dummy_token[6];
-    }
+	int_error(dummy_token[num_ranges-1], "Too many range-specs for a %d-variable fit", num_indep);
 
     /* defer actually reading the data until we have parsed the rest
      * of the line */
@@ -1697,12 +1704,13 @@ fit_command()
 	fprintf(log_f, (columns <= 2) ? "z\n" : "z:s\n");
     }
 
-    /* report all range specs */
-    j = FIRST_Z_AXIS;		/* check Z axis first */
-    for (i = 0; i <= num_indep; i++) {
-	if ((axis_array[j].autoscale & AUTOSCALE_BOTH) != AUTOSCALE_BOTH)
-	    log_axis_restriction(log_f, j, (i != 0) ? c_dummy_var[i-1] : "z");
-	j = var_order[i];
+    /* report all range specs, starting with Z */
+    i = MAX_NUM_VAR;
+    if ((range_autoscale[i] & AUTOSCALE_BOTH) != AUTOSCALE_BOTH)
+	    log_axis_restriction(log_f, i, range_min[i], range_max[i], range_autoscale[i], "function");
+    for (i = 0; i < num_indep; i++) {
+	if ((range_autoscale[i] & AUTOSCALE_BOTH) != AUTOSCALE_BOTH)
+	    log_axis_restriction(log_f, i, range_min[i], range_max[i], range_autoscale[i], c_dummy_var[i]);
     }
 
     max_data = MAX_DATA;
@@ -1711,8 +1719,8 @@ fit_command()
     err_data = vec(max_data);
     num_data = 0;
 
-    for (i = 0; i < sizeof(skipped) / sizeof(int); i++)
-	skipped[i] = 0;
+    /* Set skipped[i] = 0 for all i */
+    memset(skipped, 0, sizeof(skipped));
 
     /* first read in experimental data */
 
@@ -1770,44 +1778,44 @@ fit_command()
 	case 5:		/* x, y, t, z, error */
 	case 6:		/* x, y, t, u, z, error */
 	case 7:		/* x, y, t, u, v, z, error */
+	default:	/* June 2013 - allow more than 7 data columns */
 	    break;
 	}
 	num_points++;
 
 	/* skip this point if it is out of range */
-	for (i=0; i<num_indep; i++){
-	  int j = var_order[i];
-	  AXIS *this = axis_array + j;
-
-	  if (!(this->autoscale & AUTOSCALE_MIN) && (v[i] < this->min)) {
-	    skipped[j]++;
-	    goto out_of_range;
-	  }
-	  if (!(this->autoscale & AUTOSCALE_MAX) && (v[i] > this->max)) {
-	    skipped[j]++;
-	    goto out_of_range;
-	  }
-	  fit_x[num_data*num_indep+i] = v[i]; /* save independent variable data */
+	for (i=0; i<num_indep; i++) {
+	    if (!(range_autoscale[i] & AUTOSCALE_MIN) && (v[i] < range_min[i])) {
+		skipped[i]++;
+		goto out_of_range;
+	    }
+	    if (!(range_autoscale[i] & AUTOSCALE_MAX) && (v[i] > range_max[i])) {
+		skipped[i]++;
+		goto out_of_range;
+	    }
+	    fit_x[num_data*num_indep+i] = v[i]; /* save independent variable data */
 	}
 	/* check Z value too */
-	{
-	  AXIS *this = axis_array + FIRST_Z_AXIS;
-
-	  if (!(this->autoscale & AUTOSCALE_MIN) && (v[i] < this->min)) {
-	    skipped[FIRST_Z_AXIS]++;
-	    goto out_of_range;
-	  }
-	  if (!(this->autoscale & AUTOSCALE_MAX) && (v[i] > this->max)) {
-	    skipped[FIRST_Z_AXIS]++;
-	    goto out_of_range;
-	  }
-	  fit_z[num_data] = v[i++];	      /* save dependent variable data */
+	if (1) {
+	    int iz = MAX_NUM_VAR;
+	    if (!(range_autoscale[iz] & AUTOSCALE_MIN) && (v[i] < range_min[iz])) {
+		skipped[iz]++;
+		goto out_of_range;
+	    }
+	    if (!(range_autoscale[iz] & AUTOSCALE_MAX) && (v[i] > range_max[iz])) {
+		skipped[iz]++;
+		goto out_of_range;
+	    }
+	    fit_z[num_data] = v[i++];	      /* save dependent variable data */
 	}
 
-	/* only use error from data file if _explicitly_ asked for by
-	 * a using spec
+	/* only use error from data file if _explicitly_ asked for by a using spec */
+	err_data[num_data] = (columns > 2) ? v[i] : 1;
+
+	/* Increment index into stored values.
+	 * Note that out-of-range or NaN values bypass this operation.
 	 */
-	err_data[num_data++] = (columns > 2) ? v[i] : 1;
+	num_data++;
 
     out_of_range:
 	;
@@ -1820,22 +1828,32 @@ fit_command()
     if (num_data <= 1) {
 	/* no data! Try to explain why. */
 	printf("         Read %d points\n", num_points);
-	for (i = 0; i < 6; i++) {
-	    int j = var_order[i];
-	    AXIS *this = axis_array + j;
-	    if (skipped[j]){
+	for (i = 0; i < num_indep; i++) {
+	    if (skipped[i]){
 		printf("         Skipped %d points outside range [%s=",
-		skipped[j], i < 5 ? c_dummy_var[i] : "z");
-		if (this->autoscale&AUTOSCALE_MIN)
+		skipped[i], c_dummy_var[i]);
+		if (range_autoscale[i] & AUTOSCALE_MIN)
 		    printf("*:");
 		else
-		    printf("%g:", this->min);
-		if (this->autoscale&AUTOSCALE_MAX)
+		    printf("%g:", range_min[i]);
+		if (range_autoscale[i] & AUTOSCALE_MAX)
 		    printf("*]\n");
 		else
-		    printf("%g]\n", this->max);
+		    printf("%g]\n", range_max[i]);
 	    }
 	}
+	    if (skipped[MAX_NUM_VAR]){
+		printf("         Skipped %d points outside range [%s=",
+		skipped[MAX_NUM_VAR], "z");
+		if (axis_array[FIRST_Z_AXIS].autoscale & AUTOSCALE_MIN)
+		    printf("*:");
+		else
+		    printf("%g:", axis_array[FIRST_Z_AXIS].min);
+		if (axis_array[FIRST_Z_AXIS].autoscale & AUTOSCALE_MAX)
+		    printf("*]\n");
+		else
+		    printf("%g]\n", axis_array[FIRST_Z_AXIS].max);
+	    }
 	Eex("No data to fit ");
     }
 
@@ -2031,9 +2049,19 @@ fit_command()
     free(last_par_name);
     last_par_name = par_name;
     /* remember names of indep. variables for 'update' */
-    memcpy(last_dummy_var, c_dummy_var, sizeof(last_dummy_var));
+    for (i=0; i<MAX_NUM_VAR; i++) {
+	free(last_dummy_var[i]);
+	last_dummy_var[i] = gp_strdup(c_dummy_var[i]);
+    }
     /* remember last fit command for 'save' */
-    safe_strncpy(last_fit_command, gp_input_line, sizeof(last_fit_command));
+    free(last_fit_command);
+    last_fit_command = strdup(gp_input_line);
+    for (i=0; i<num_tokens; i++) {
+	if (equals(i,";")) {
+	    last_fit_command[token[i].start_index] = '\0';
+	    break;
+	}
+    }
     /* save fit command to user variable */
     fill_gpval_string("GPVAL_LAST_FIT", last_fit_command);
 }

@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.804 2013/06/20 05:13:06 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.805 2013/06/22 04:08:47 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -4035,77 +4035,69 @@ Ffigure_mapcontours
 ?fit
 ?least-squares
 ?Marquardt
- The `fit` command can fit a user-supplied expression to a set of data points
- (x,z) or (x,y,z), using an implementation of the nonlinear least-squares
- (NLLS) Marquardt-Levenberg algorithm.  Any user-defined variable occurring in
- the expression may serve as a fit parameter, but the return type of the
- expression must be real.
+ The `fit` command fits a user-supplied expression to a set of data points (x,z)
+ or (x,y,z) or (x1, x2, x3, ..., xN, z), using the nonlinear least-squares
+ Marquardt-Levenberg algorithm.  The dummy parameters x1, ..., xN must be
+ assigned names either using the `set dummy` command or using an in-line range
+ specifier in the `fit` command.  The expression must evaluate to a real number.
+ The parameters to be varied during fitting are specified by the keyword `via`.
 
  Syntax:
        fit {<ranges>} <expression>
            '<datafile>' {datafile-modifiers}
            via '<parameter file>' | <var1>{,<var2>,...}
 
- Ranges may be specified to temporarily limit the data which is to be fitted;
- any out-of-range data points are ignored. The syntax is
+ Ranges may be specified to filter the data used in fitting.
+ Out-of-range data points are ignored. The syntax is
        [{dummy_variable=}{<min>}{:<max>}],
  analogous to `plot`; see `plot ranges`.
 
- <expression> is any valid `gnuplot` expression, although it is usual to use a
- previously user-defined function of the form f(x) or f(x,y).
+ <expression> can be any valid gnuplot expression, although the most common is
+ a previously user-defined function of the form f(x) or f(x,y).
 
  <datafile> is treated as in the `plot` command.  All the `plot datafile`
  modifiers (`using`, `every`,...) except `smooth` are applicable to `fit`.
  See `plot datafile`.
 
- The default data formats for fitting functions with a single
- independent variable, z=f(x), are z or x:z.  That is, if there is
- only a single column then it is the dependent variable and the line
- numbers is the independent variable.  If there are two columns, the
- first is the independent variable and the second is the dependent
- variable.
+ The function being fit may have up to five independent variables (more in
+ gnuplot version 4.7).  In the absence of a `using` specification, the fit
+ implicitly assumes there is only a single independent variable:
 
- Those formats can be changed with the datafile `using` qualifier, for
- example to take the z value from a different column or to calculate
- it from several columns.  A third `using` qualifier (a column number
- or an expression), if present, is interpreted as the standard
- deviation of the corresponding z value and is used to compute a
- weight for the datum, 1/s**2.  Otherwise, all data points are
- weighted equally, with a weight of one. Note that if you don't
- specify a `using` option at all, no z standard deviations are read
- from the datafile even if it does have a third column, so you'll
- always get unit weights.
+       z                           # 1 independent variable (line number)
+       x:z                         # 1 independent variable (1st column)
 
- To fit a function with two independent variables, z=f(x,y), the required
- format is `using` with four items, x:y:z:s.  The complete format must be
- given---no default columns are assumed for a missing token.  Weights for
- each data point are evaluated from 's' as above.  If error estimates are
- not available, a constant value can be specified as a constant expression
- (see `plot datafile using`), e.g., `using 1:2:3:(1)`.
+ The interpretation of additional columns in the using spec is as follows:
 
- The fit function may have up to five independent variables.  There
- must be two more `using` qualifiers than there are independent
- variables, unless there is only one variable.  The allowed formats,
- and the default dummy variable names, are as follows:
+       x:z:s                       # 1 independent variable (3 columns total)
+       x:y:z:s                     # 2 independent variables (4 columns total)
+       x1:x2:x3:z:s                # 3 independent variables (5 columns total)
+       x1:x2:x3:...:xN:z:s         # N independent variables (N+2 columns total)
 
-       z
-       x:z
-       x:z:s
-       x:y:z:s
-       x:y:t:z:s
-       x:y:t:u:z:s
-       x:y:t:u:v:z:s
+ Note that when 3 or more columns are present, the last column is interpreted as
+ the standard deviation of the corresponding z value and is used to compute a
+ weight for the datum, 1/s**2.  
 
- The dummy variable names may be changed with ranges as noted above.
- The first range corresponds to the first `using` spec, etc.  A range
- may also be given for z (the dependent variable), but that name
- cannot be changed.
+ The datafile contents can be interpreted flexibly by providing a `using`
+ qualifier as with plot commands. For example to generate the independent
+ variable x as the sum of columns 2 and 3, while taking z from column 6 and 
+ requesting unit weights:
+
+       fit ... using ($2+$3):6:(1)
+
+ There must be two more `using` qualifiers (z and s) than there are independent
+ variables, unless there is only one independent variable.
+
+ The dummy variable names may be changed when specifying a range as noted above.
+ The first range corresponds to the first `using` spec, and so on.  A range may
+ also be given for z (the dependent variable), in which case data points for
+ which f(x,...) is out of the z range will not contribute to the residual being
+ minimized.
 
  Multiple datasets may be simultaneously fit with functions of one
  independent variable by making y a 'pseudo-variable', e.g., the dataline
  number, and fitting as two independent variables.  See `fit multi-branch`.
 
- The `via` qualifier specifies which parameters are to be adjusted, either
+ The `via` qualifier specifies which parameters are to be optimized, either
  directly, or by referencing a parameter file.
 
  Examples:
@@ -4119,9 +4111,12 @@ Ffigure_mapcontours
        fit a0 + a1*x/(1 + a2*x/(1 + a3*x)) 'measured.dat' via a0,a1,a2,a3
        fit a*x + b*y 'surface.dat' using 1:2:3:(1) via a,b
        fit [*:*][yaks=*:*] a*x+b*yaks 'surface.dat' u 1:2:3:(1) via a,b
-       fit a*x + b*y + c*t 'foo.dat' using 1:2:3:4:(1) via a,b,c
-       h(x,y,t,u,v) = a*x + b*y + c*t + d*u + e*v
-       fit h(x,y,t,u,v) 'foo.dat' using 1:2:3:4:5:6:(1) via a,b,c,d,e
+       
+       fit [][][t=*:*] a*x + b*y + c*t 'foo.dat' using 1:2:3:4:(1) via a,b,c
+
+       set dummy x1, x2, x3, x4, x5
+       h(x1,x2,x3,x4,s5) = a*x1 + b*x2 + c*x3 + d*x4 + e*x5
+       fit h(x1,x2,x3,x4,x5) 'foo.dat' using 1:2:3:4:5:6:(1) via a,b,c,d,e
 
  After each iteration step, detailed information about the current state
  of the fit is written to the display.  The same information about the

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.296 2013/06/16 05:58:10 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.297 2013/06/19 23:04:59 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -2539,6 +2539,9 @@ show_fit()
 	    fprintf(stderr, "\tfit will output verbose results to console and log-file.\n");
 	    break;
     }
+
+    fprintf(stderr, "\tfit can handle up to %d independent variables\n",
+	    GPMIN(MAX_NUM_VAR,MAXDATACOLS-2));
 
     fprintf(stderr, "\tfit will%s prescale parameters by their initial values\n",
 	    fit_prescale ? "" : " not");

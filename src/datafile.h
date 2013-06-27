@@ -1,5 +1,5 @@
 /*
- * $Id: datafile.h,v 1.41 2013/03/14 19:40:18 sfeam Exp $
+ * $Id: datafile.h,v 1.42 2013/04/21 06:26:11 sfeam Exp $
  */
 
 /* GNUPLOT - datafile.h */
@@ -62,9 +62,17 @@ enum DF_STATUS {
 
 /* Variables of datafile.c needed by other modules: */
 
-/* how many using columns were specified, and max possible */
+/* how many using columns were specified in the current command */
 extern int df_no_use_specs;
-#define MAXDATACOLS 7
+
+/* Maximum number of columns returned to caller by df_readline		*/
+/* Various data structures are dimensioned to hold this many entries.	*/
+/* As of June 2013, plot commands never ask for more than 7 columns of	*/
+/* data, but fit commands can use more. "fit" is also limited by	*/
+/* the number of parameters that can be passed	to a user function, so	*/
+/* let's try setting MAXDATACOLS to match.				*/
+/* At present this bumps it from 7 to 14.				*/
+#define MAXDATACOLS (MAX_NUM_VAR+2)
 
 /* suggested x value if none given */
 extern int df_datum;

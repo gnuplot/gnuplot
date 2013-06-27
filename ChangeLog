@@ -3,13 +3,26 @@
 	* src/graph3d.c src/hidden3d.c src/hidden3d.h demo/contours.dem:
 	Apply hidden3d processing to contour labels.
 
+	* src/datafile.h src/fit.c src/show.c demo/fitmulti.dem
+	docs/gnuplot.doc:  Increase the number of independent parameters
+	(dimensions) handled by "fit" from 5 to MAX_NUM_VAR, which is currently
+	12.  MAXDATACOLOS is correspondingly increased to MAX_NUM_VAR+2 = 14.
+	NB: Only the first 2 dimensions, "x" and "y" by default, use the axis
+	structures.  So calling 'set xrange' or 'set yrange' can affect the
+	fit by limiting the range of coordinates that are accepted, just as
+	with previous versions.  However, there is no connection between
+	independent parameters 3, 4, ... and any axis ranges or structures.
+	Therefore time data can be given for the first and second dimensions
+	but not for any additional dimensions.
+
 2013-06-24  Ethan A Merritt  <merritt@u.washington.edu>
 
-	* src/graph3d.c: Bug fix for contour line colors. If the base linetypes have
-	no color assigned (i.e. "set linetype" has never been done), then we must
-	explicitly set use_palette in order to generate color from the line type.
-	However the hidden3d code currently uses the linetype itself rather than
-	the value in TC_LT, so we set a new linetype also (fix from Don Tabor).
+	* src/graph3d.c: Bug fix for contour line colors. If the base linetypes
+	have no color assigned (i.e. "set linetype" has never been done), then
+	we must explicitly set use_palette in order to generate color from the
+	line type.  Since the hidden3d code currently uses the linetype itself
+	rather than the value in TC_LT, we set a new linetype also
+	(bug fix from Don Tabor).
 
 2013-06-24  Bastian Maerkisch  <bmaerkisch@web.de>
 
