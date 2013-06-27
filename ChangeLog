@@ -6,7 +6,7 @@
 	* src/datafile.h src/fit.c src/show.c demo/fitmulti.dem
 	docs/gnuplot.doc:  Increase the number of independent parameters
 	(dimensions) handled by "fit" from 5 to MAX_NUM_VAR, which is currently
-	12.  MAXDATACOLOS is correspondingly increased to MAX_NUM_VAR+2 = 14.
+	12.  MAXDATACOLS is correspondingly increased to MAX_NUM_VAR+2 = 14.
 	NB: Only the first 2 dimensions, "x" and "y" by default, use the axis
 	structures.  So calling 'set xrange' or 'set yrange' can affect the
 	fit by limiting the range of coordinates that are accepted, just as
