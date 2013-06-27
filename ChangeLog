@@ -1,3 +1,8 @@
+2013-06-27  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/graph3d.c src/hidden3d.c src/hidden3d.h demo/contours.dem:
+	Apply hidden3d processing to contour labels.
+
 2013-06-24  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graph3d.c: Bug fix for contour line colors. If the base linetypes have

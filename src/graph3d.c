@@ -1942,6 +1942,7 @@ cntr3d_labels(struct gnuplot_contours *cntr, char *level_text, struct text_label
     int i;
     int interval;
     int x, y;
+    vertex v;
     struct lp_style_type *lp = &(label->lp_properties);
 
     /* Drawing a label at every point would be too crowded */
@@ -1954,7 +1955,14 @@ cntr3d_labels(struct gnuplot_contours *cntr, char *level_text, struct text_label
 		continue;
 	    map3d_xy(cntr->coords[i].x, cntr->coords[i].y, base_z, &x, &y);
 	    label->text = level_text;
-	    write_label(x, y, label);
+	    if (hidden3d) {
+		map3d_xyz(cntr->coords[i].x, cntr->coords[i].y, base_z, &v);
+		v.real_z = cntr->coords[i].z;
+		v.label = label;
+		draw_label_hidden(&v, lp, x, y);
+	    } else {
+		write_label(x, y, label);
+	    }
 	    label->text = NULL;		/* Otherwise someone will try to free it */
 	}
     }

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.90 2013/01/17 00:07:27 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.91 2013/01/21 17:45:44 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - hidden3d.c */
@@ -2192,6 +2192,40 @@ draw_line_hidden(
     if (v2)
 	droplast_dynarray(&vertices);
 }
+
+
+/* Externally callable function to draw a label, but hide it behind any
+ * visible occluding surfaces. */
+void
+draw_label_hidden(p_vertex v, struct lp_style_type *lp, int x, int y)
+{
+    long int thisvertex, edgenum, temp_pfirst;
+
+    /* If there is no surface to hide behind, just draw the label */
+    if (!polygons.end) {
+	write_label(x, y, v->label);
+	return;
+    }
+
+    nextfrom_dynarray(&vertices);
+    thisvertex = vertices.end - 1;
+    vlist[thisvertex] = *v;
+    vlist[thisvertex].lp_style = lp; /* Not sure this is necessary */
+
+    lp->pointflag = 1; /* Labels can use the code for hidden points */
+
+    edgenum = make_edge(thisvertex, thisvertex, lp, lp->l_type, -1);
+
+    FPRINTF((stderr,"label: \"%s\" at [%d %d]  vertex %ld edge %ld\n", 
+    	v->label->text, x, y, thisvertex, edgenum));
+
+    temp_pfirst = pfirst;
+    in_front(edgenum, elist[edgenum].v1, elist[edgenum].v2, &temp_pfirst);
+
+    droplast_dynarray(&edges);
+    droplast_dynarray(&vertices);
+}
+
 
 /***********************************************************************
  * and, finally, the 'mother function' that uses all these lots of tools
