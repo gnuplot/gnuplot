@@ -505,8 +505,11 @@ clip_polygon_to_boundary(gpiPoint *in, gpiPoint *out, int in_length, int *out_le
 void
 clip_polygon(gpiPoint *in, gpiPoint *out, int in_length, int *out_length)
 {
-    int i, j;
+    int i;
     gpiPoint clip_boundary[5];
+    static gpiPoint *tmp_corners = NULL;
+    tmp_corners = gp_realloc(tmp_corners, 2 * in_length * sizeof(gpiPoint), "clip_polygon");
+
     /* vertices of the rectangular clipping window starting from
        top-left in counterclockwise direction */
     clip_boundary[0].x = clip_area->xleft;  /* top left */
@@ -519,11 +522,10 @@ clip_polygon(gpiPoint *in, gpiPoint *out, int in_length, int *out_length)
     clip_boundary[3].y = clip_area->ytop;
     clip_boundary[4] = clip_boundary[0];
 
+    memcpy(tmp_corners, in, in_length * sizeof(gpiPoint));
     for(i = 0; i < 4; i++) {
-	clip_polygon_to_boundary(in, out, in_length, out_length, clip_boundary+i);
-	for (j = 0; j < *out_length; j++) {
-	    in[j] = out[j];
-	}
+	clip_polygon_to_boundary(tmp_corners, out, in_length, out_length, clip_boundary+i);
+	memcpy(tmp_corners, out, *out_length * sizeof(gpiPoint));
 	in_length = *out_length;
     }
 }

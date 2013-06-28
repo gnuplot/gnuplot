@@ -1,3 +1,9 @@
+2013-06-28  Christoph Bersch <usenet@bersch.net>
+
+	* src/gadgets.c(clip_polygon): Use a temporary copy of the input 
+	vertices rather than overwriting them during clipping.
+	Bug #1255
+
 2013-06-28  Jérôme Lodewyck  <lodewyck@users.sourceforge.net>
 
 	* src/qtterminal/QtGnuplotScene.cpp:  Fixed the text transformation
