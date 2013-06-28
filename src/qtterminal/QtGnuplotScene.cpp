@@ -590,7 +590,6 @@ void QtGnuplotScene::positionText(QGraphicsItem* item, const QPoint& point)
 
 	item->setTransformOriginPoint(cx, cy);
 	item->setRotation(-m_textAngle);
-	item->setTransformOriginPoint(-cx, -cy);
 	item->setPos(point.x() - cx, point.y() - cy);
 }
 
