@@ -5,6 +5,10 @@
 	at the top level command line.
 	Bug #1246
 
+	* src/graph3d.c (draw3d_graphbox):  "set [xy]label rotate parallel"
+	is affected by the direction of the complementary axis.
+	Bug #1252
+
 2013-06-27  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/graphics.c (do_ellipse): Repair atrocious pointer casts
