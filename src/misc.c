@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.153 2013/03/22 03:48:55 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.154 2013/06/02 17:45:46 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -290,7 +290,9 @@ load_file(FILE *fp, char *name, TBOOLEAN can_do_args)
 			/* macros in a clause are problematic, as they are */
 			/* only expanded once even if the clause is replayed */
 			if (expand_macros)
-			    string_expand_macros();
+			if (string_expand_macros() && string_expand_macros()
+			&&  string_expand_macros() && string_expand_macros())
+			    int_error(NO_CARET, "Too many levels of nested macros");
 #endif
 			/* Strip off trailing comment and count curly braces */
 			num_tokens = scanner(&gp_input_line, &gp_input_line_len);

@@ -1,3 +1,10 @@
+2013-06-28  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/misc.c (load_file): Expand macros up to 3 levels deep when 
+	stepping through a "load" operation.  This matches the depth allowed
+	for use at the top level command line.
+	Bug #1246
+
 2013-06-28  Christoph Bersch <usenet@bersch.net>
 
 	* src/gadgets.c(clip_polygon): Use a temporary copy of the input 
