@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: color.c,v 1.104 2012/10/30 04:43:42 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: color.c,v 1.105 2013/02/28 05:30:40 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - color.c */
@@ -51,7 +51,7 @@ static t_sm_palette prev_palette = {
 
 static void draw_inside_color_smooth_box_postscript __PROTO((FILE * out));
 static void draw_inside_color_smooth_box_bitmap __PROTO((FILE * out));
-void cbtick_callback __PROTO((AXIS_INDEX axis, double place, char *text, 
+void cbtick_callback __PROTO((AXIS_INDEX axis, double place, char *text, int ticlevel,
 			struct lp_style_type grid, struct ticmark *userlabels));
 
 
@@ -439,10 +439,11 @@ cbtick_callback(
     AXIS_INDEX axis,
     double place,
     char *text,
+    int ticlevel,
     struct lp_style_type grid, /* linetype or -2 for no grid */
     struct ticmark *userlabels)
 {
-    int len = (text ? CB_AXIS.ticscale : CB_AXIS.miniticscale)
+    int len = TIC_SCALE(ticlevel, COLOR_AXIS)
 	* (CB_AXIS.tic_in ? -1 : 1) * (term->h_tic);
     double cb_place = (place - CB_AXIS.min) / (CB_AXIS.max - CB_AXIS.min);
 	/* relative z position along the colorbox axis */

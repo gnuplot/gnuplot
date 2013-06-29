@@ -1,3 +1,9 @@
+2013-06-29  Peter Juhasz  <juhaszp@users.sourceforge.net>
+
+	* src/axis.h src/axis.c src/graphics.c src/graph3d.c src/color.c 
+	doc/gnuplot.doc:
+	Allow minor tic levels 2 or higher to have labels. 
+
 2013-06-28  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/misc.c (load_file): Expand macros up to 3 levels deep when 
@@ -326,7 +332,7 @@
 	* src/graphics.c (finish_filled_curve): Don't try to process an
 	empty filled polygon.
 
-2012-05-18  Peter Juhasz  <juhaszp@users.sourceforge.net>
+2013-05-18  Peter Juhasz  <juhaszp@users.sourceforge.net>
 
 	* src/datafile.c (f_column f_stringcolumn):
 	f_stringcolumn now issues a warning if a named column was not found 

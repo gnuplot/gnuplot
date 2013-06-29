@@ -1,5 +1,5 @@
 /*
- * $Id: axis.h,v 1.82 2013/04/04 20:34:20 sfeam Exp $
+ * $Id: axis.h,v 1.83 2013/04/08 00:16:01 sfeam Exp $
  *
  */
 
@@ -135,7 +135,8 @@ enum en_minitics_status {
 
 /* Function pointer type for callback functions doing operations for a
  * single ticmark */
-typedef void (*tic_callback) __PROTO((AXIS_INDEX, double, char *, struct lp_style_type,
+typedef void (*tic_callback) __PROTO((AXIS_INDEX, double, char *, int, 
+					struct lp_style_type,
 					struct ticmark *));
 
 /* Values to put in the axis_tics[] variables that decides where the
@@ -666,7 +667,7 @@ void parse_skip_range __PROTO((void));
 void check_axis_reversed __PROTO((AXIS_INDEX axis));
 
 /* set widest_tic_label: length of the longest tics label */
-void widest_tic_callback __PROTO((AXIS_INDEX, double place, char *text, 
+void widest_tic_callback __PROTO((AXIS_INDEX, double place, char *text, int ticlevel,
 			struct lp_style_type grid, struct ticmark *));
 
 void get_position __PROTO((struct position *pos));
@@ -685,5 +686,9 @@ int map_y __PROTO((double value));
     || PM3D_IMPLICIT == pm3d.implicit \
     || 1 == (plot)->lp_properties.use_palette)
 int set_cbminmax __PROTO((void));
+
+/* macro for tic scale, used in all tic_callback functions */
+#define TIC_SCALE(ticlevel, axis) \
+    (ticlevel == 0 ? axis_array[axis].ticscale : axis_array[axis].miniticscale)
 
 #endif /* GNUPLOT_AXIS_H */

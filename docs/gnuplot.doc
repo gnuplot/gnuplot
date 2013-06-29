@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.805 2013/06/22 04:08:47 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.806 2013/06/27 20:03:41 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -11620,7 +11620,7 @@ Ffigure_missing
 
  See also `set xtics` for more control of major (labeled) tic marks and
  `set mxtics` for control of minor tic marks.  These commands provide control
- at a axis by axis basis.
+ at an axis by axis basis.
 3 ticslevel
 ?commands set ticslevel
 ?commands show ticslevel
@@ -12436,8 +12436,12 @@ Ffigure_missing
  default label (numerical) is used.
 
  An explicit tic mark has a third parameter, the "level".  The default
- is level 0, a major tic.  A level of 1 generates a minor tic.  If the
- level is specified, then the label must also be supplied.
+ is level 0, a major tic.  A level of 1 or higher generates a minor tic.
+ If the level is specified, then the label must also be supplied.
+ 
+ For compatibility reasons, minor tics with level 1 can't have labels.
+ Any label specified to level 1 tics is ignored.
+ Level 2 or higher generates a minor tic that can have a label.
 
  Examples:
        set xtics ("low" 0, "medium" 50, "high" 100)

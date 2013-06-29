@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.114 2013/04/07 17:09:03 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.115 2013/05/23 01:08:32 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -936,9 +936,11 @@ gen_tics(AXIS_INDEX axis, tic_callback callback)
 		ticlabel = label;
 	    }
 
-	    /* use NULL instead of label for minitic */
+	    /* use NULL instead of label for minor tics with level 1,
+	     * however, allow labels for minor tics with levels > 1 */
 	    (*callback) (axis, internal,
-	    		(mark->level>0)?NULL:ticlabel,
+	    		(mark->level==1)?NULL:ticlabel,
+	    		mark->level,
 	    		(mark->level>0)?mgrd:lgrd, NULL);
 
 	    /* Polar axis tics are mirrored across the origin */
@@ -946,7 +948,8 @@ gen_tics(AXIS_INDEX axis, tic_callback callback)
 		int save_gridline = lgrd.l_type;
 		lgrd.l_type = LT_NODRAW;
 		(*callback) (axis, -internal,
-			(mark->level>0)?NULL:ticlabel,
+			(mark->level==1)?NULL:ticlabel,
+			mark->level,
 	    		(mark->level>0)?mgrd:lgrd, NULL);
 		lgrd.l_type = save_gridline;
 	    }
@@ -1178,7 +1181,7 @@ gen_tics(AXIS_INDEX axis, tic_callback callback)
 			int d = (long) floor(user + 0.5) % 7;
 			if (d < 0)
 			    d += 7;
-			(*callback) (axis, internal, abbrev_day_names[d], lgrd,
+			(*callback) (axis, internal, abbrev_day_names[d], 0, lgrd,
 					def->def.user);
 			break;
 		    }
@@ -1186,7 +1189,7 @@ gen_tics(AXIS_INDEX axis, tic_callback callback)
 			int m = (long) floor(user - 1) % 12;
 			if (m < 0)
 			    m += 12;
-			(*callback) (axis, internal, abbrev_month_names[m], lgrd,
+			(*callback) (axis, internal, abbrev_month_names[m], 0, lgrd,
 					def->def.user);
 			break;
 		    }
@@ -1218,13 +1221,13 @@ gen_tics(AXIS_INDEX axis, tic_callback callback)
 			&&  !inrange(internal,axis_array[axis].data_min,axis_array[axis].data_max))
 			    continue;
 
-			(*callback) (axis, internal, label, lgrd, def->def.user);
+			(*callback) (axis, internal, label, 0, lgrd, def->def.user);
 
 	 		/* Polar axis tics are mirrored across the origin */
 			if (axis == POLAR_AXIS && (R_AXIS.ticmode & TICS_MIRROR)) {
 			    int save_gridline = lgrd.l_type;
 			    lgrd.l_type = LT_NODRAW;
-			    (*callback) (axis, -internal, label, lgrd, def->def.user);
+			    (*callback) (axis, -internal, label, 0, lgrd, def->def.user);
 			    lgrd.l_type = save_gridline;
 			}
 		    }
@@ -1246,7 +1249,7 @@ gen_tics(AXIS_INDEX axis, tic_callback callback)
 			       : mplace);
 		    if (inrange(mtic, internal_min, internal_max)
 			&& inrange(mtic, start - step * SIGNIF, end + step * SIGNIF))
-			(*callback) (axis, mtic, NULL, mgrd, NULL);
+			(*callback) (axis, mtic, NULL, 1, mgrd, NULL);
 		}
 		/* }}} */
 	    }
@@ -1647,13 +1650,18 @@ load_range(AXIS_INDEX axis, double *a, double *b, t_autoscale autoscale)
 
 void
 widest_tic_callback(AXIS_INDEX axis, double place, char *text,
+    int ticlevel,
     struct lp_style_type grid,
     struct ticmark *userlabels)
 {
     (void) axis;		/* avoid "unused parameter" warnings */
     (void) place;
     (void) grid;
-    if (text) {			/* minitics have no text at all */
+
+    /* historically, minitics used to have no text,
+     * but now they can, except at ticlevel 1
+     * (and this restriction is there only for compatibility reasons) */
+    if (ticlevel != 1) {
 	int len = label_width(text, NULL);
 	if (len > widest_tic_strlen)
 	    widest_tic_strlen = len;

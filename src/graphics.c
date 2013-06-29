@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.422 2013/05/19 20:48:03 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.423 2013/05/23 23:00:41 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -128,8 +128,8 @@ static TBOOLEAN two_edge_intersect_steps __PROTO((struct coordinate GPHUGE * poi
 static TBOOLEAN two_edge_intersect_fsteps __PROTO((struct coordinate GPHUGE * points, int i, double *lx, double *ly));
 
 /* HBB 20010118: these should be static, but can't --- HP-UX assembler bug */
-void ytick2d_callback __PROTO((AXIS_INDEX, double place, char *text, struct lp_style_type grid, struct ticmark *userlabels));
-void xtick2d_callback __PROTO((AXIS_INDEX, double place, char *text, struct lp_style_type grid, struct ticmark *userlabels));
+void ytick2d_callback __PROTO((AXIS_INDEX, double place, char *text, int ticlevel, struct lp_style_type grid, struct ticmark *userlabels));
+void xtick2d_callback __PROTO((AXIS_INDEX, double place, char *text, int ticlevel, struct lp_style_type grid, struct ticmark *userlabels));
 int histeps_compare __PROTO((SORTFUNC_ARGS p1, SORTFUNC_ARGS p2));
 
 static void get_arrow __PROTO((struct arrow_def* arrow, int* sx, int* sy, int* ex, int* ey));
@@ -3696,12 +3696,13 @@ xtick2d_callback(
     AXIS_INDEX axis,
     double place,
     char *text,
+    int ticlevel,
     struct lp_style_type grid,	/* grid.l_type == LT_NODRAW means no grid */
     struct ticmark *userlabels)	/* User-specified tic labels */
 {
     struct termentry *t = term;
     /* minitick if text is NULL - beware - h_tic is unsigned */
-    int ticsize = tic_direction * (int) t->v_tic * (text ? axis_array[axis].ticscale : axis_array[axis].miniticscale);
+    int ticsize = tic_direction * (int) t->v_tic * TIC_SCALE(ticlevel, axis);
     int x = map_x(place);
 
     (void) axis;		/* avoid "unused parameter" warning */
@@ -3799,12 +3800,13 @@ ytick2d_callback(
     AXIS_INDEX axis,
     double place,
     char *text,
+    int ticlevel,
     struct lp_style_type grid,	/* grid.l_type == LT_NODRAW means no grid */
     struct ticmark *userlabels)	/* User-specified tic labels */
 {
     struct termentry *t = term;
     /* minitick if text is NULL - v_tic is unsigned */
-    int ticsize = tic_direction * (int) t->h_tic * (text ? axis_array[axis].ticscale : axis_array[axis].miniticscale);
+    int ticsize = tic_direction * (int) t->h_tic * TIC_SCALE(ticlevel, axis);
     int y = map_y(place);
 
     (void) axis;	/* avoid "unused parameter" warning */

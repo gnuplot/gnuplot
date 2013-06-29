@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.282 2013/06/19 23:04:59 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.285 2013/06/27 19:37:14 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -144,11 +144,11 @@ static void draw_3d_graphbox __PROTO((struct surface_points * plot,
 				      int plot_count,
 				      WHICHGRID whichgrid, int current_layer));
 /* HBB 20010118: these should be static, but can't --- HP-UX assembler bug */
-void xtick_callback __PROTO((AXIS_INDEX, double place, char *text,
+void xtick_callback __PROTO((AXIS_INDEX, double place, char *text, int ticlevel,
 			     struct lp_style_type grid, struct ticmark *userlabels));
-void ytick_callback __PROTO((AXIS_INDEX, double place, char *text,
+void ytick_callback __PROTO((AXIS_INDEX, double place, char *text, int ticlevel,
 			     struct lp_style_type grid, struct ticmark *userlabels));
-void ztick_callback __PROTO((AXIS_INDEX, double place, char *text,
+void ztick_callback __PROTO((AXIS_INDEX, double place, char *text, int ticlevel,
 			     struct lp_style_type grid, struct ticmark *userlabels));
 
 static int find_maxl_cntr __PROTO((struct gnuplot_contours * contours, int *count));
@@ -2603,11 +2603,12 @@ xtick_callback(
     AXIS_INDEX axis,
     double place,
     char *text,
+    int ticlevel,
     struct lp_style_type grid,		/* linetype or -2 for none */
     struct ticmark *userlabels)	/* currently ignored in 3D plots */
 {
     vertex v1, v2;
-    double scale = (text ? axis_array[axis].ticscale : axis_array[axis].miniticscale) * (axis_array[axis].tic_in ? 1 : -1);
+    double scale = TIC_SCALE(ticlevel, axis) * (axis_array[axis].tic_in ? 1 : -1);
     double other_end = Y_AXIS.min + Y_AXIS.max - xaxis_y;
     struct termentry *t = term;
 
@@ -2698,11 +2699,12 @@ ytick_callback(
     AXIS_INDEX axis,
     double place,
     char *text,
+    int ticlevel,
     struct lp_style_type grid,
     struct ticmark *userlabels)	/* currently ignored in 3D plots */
 {
     vertex v1, v2;
-    double scale = (text ? axis_array[axis].ticscale : axis_array[axis].miniticscale) * (axis_array[axis].tic_in ? 1 : -1);
+    double scale = TIC_SCALE(ticlevel, axis) * (axis_array[axis].tic_in ? 1 : -1);
     double other_end = X_AXIS.min + X_AXIS.max - yaxis_x;
     struct termentry *t = term;
 
@@ -2793,11 +2795,12 @@ ztick_callback(
     AXIS_INDEX axis,
     double place,
     char *text,
+    int ticlevel,
     struct lp_style_type grid,
     struct ticmark *userlabels)	/* currently ignored in 3D plots */
 {
     /* HBB: inserted some ()'s to shut up gcc -Wall, here and below */
-    int len = (text ? axis_array[axis].ticscale : axis_array[axis].miniticscale)
+    int len = TIC_SCALE(ticlevel, axis)
 	* (axis_array[axis].tic_in ? 1 : -1) * (term->h_tic);
     vertex v1, v2, v3;
     struct termentry *t = term;
