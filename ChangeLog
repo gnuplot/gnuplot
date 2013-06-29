@@ -1,3 +1,9 @@
+2013-06-29  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/graph3d.c (draw3d_graphbox):  "set [xy]label rotate parallel"
+	is affected by the direction of the complementary axis.
+	Bug #1252
+
 2013-06-29  Peter Juhasz  <juhaszp@users.sourceforge.net>
 
 	* src/axis.h src/axis.c src/graphics.c src/graph3d.c src/color.c 
