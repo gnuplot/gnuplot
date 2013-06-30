@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.174 2013/06/12 19:33:17 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.175 2013/06/19 23:04:59 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -132,7 +132,6 @@ static void unset_surface __PROTO((void));
 static void unset_table __PROTO((void));
 static void unset_terminal __PROTO((void));
 static void unset_tics __PROTO((AXIS_INDEX));
-static void unset_ticscale __PROTO((void));
 static void unset_ticslevel __PROTO((void));
 static void unset_timefmt __PROTO((void));
 static void unset_timestamp __PROTO((void));
@@ -383,7 +382,7 @@ unset_command()
 	unset_tics(AXIS_ARRAY_SIZE);
 	break;
     case S_TICSCALE:
-	unset_ticscale();
+	int_warn(c_token, "Deprecated syntax - use 'set tics scale default'");
 	break;
     case S_TICSLEVEL:
     case S_XYPLANE:
@@ -1495,22 +1494,6 @@ unset_terminal()
 }
 
 
-/* process 'unset ticscale' command */
-static void
-unset_ticscale()
-{
-    unsigned int i;
-
-    int_warn(c_token,
-	     "Deprecated syntax - please use 'set tics scale default'");
-
-    for (i = 0; i < AXIS_ARRAY_SIZE; ++i) {
-	axis_array[i].ticscale = 1.0;
-	axis_array[i].miniticscale = 0.5;
-    }
-}
-
-
 /* process 'unset ticslevel' command */
 static void
 unset_ticslevel()
@@ -1650,6 +1633,7 @@ unset_axislabel(AXIS_INDEX axis)
 void
 reset_command()
 {
+    int i;
     AXIS_INDEX axis;
     TBOOLEAN save_interactive = interactive;
     static TBOOLEAN set_for_axis[AXIS_ARRAY_SIZE] = AXIS_ARRAY_INITIALIZER(TRUE);
@@ -1731,6 +1715,8 @@ reset_command()
 	reset_logscale(axis);
     }
     raxis = TRUE;
+    for (i=2; i<MAX_TICLEVEL; i++)
+	ticscale[i] = 1;
 
     unset_boxplot();
     unset_boxwidth();

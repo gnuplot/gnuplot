@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.297 2013/06/19 23:04:59 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.298 2013/06/27 20:03:41 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -2785,6 +2785,7 @@ show_tics(
     TBOOLEAN showx2, TBOOLEAN showy2,
     TBOOLEAN showcb)
 {
+    int i;
     SHOW_ALL_NL;
 
     if (xyplane.absolute)
@@ -2807,6 +2808,11 @@ show_tics(
 	show_ticdef(FIRST_Z_AXIS);
     if (showcb)
 	show_ticdef(COLOR_AXIS);
+
+    fprintf(stderr,"\tScales for user tic levels 2-%d are: ",MAX_TICLEVEL-1);
+    for (i=2; i<MAX_TICLEVEL; i++)
+	fprintf(stderr, " %g%c", ticscale[i], i<MAX_TICLEVEL-1 ? ',' : '\n');
+
     screen_ok = FALSE;
 }
 

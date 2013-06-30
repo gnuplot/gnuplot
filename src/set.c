@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.403 2013/06/12 19:33:15 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.404 2013/06/19 23:04:59 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -4509,26 +4509,7 @@ set_tics()
 		axis_array[i].tic_in = FALSE;
 	    ++c_token;
 	} else if (almost_equals(c_token, "sc$ale")) {
-	    ++c_token;
-	    if (almost_equals(c_token, "def$ault")) {
-		for (i = 0; i < AXIS_ARRAY_SIZE; ++i) {
-		    axis_array[i].ticscale = 1.0;
-		    axis_array[i].miniticscale = 0.5;
-		}
-		++c_token;
-	    } else {
-		double lticscale, lminiticscale;
-		lticscale = real_expression();
-		if (equals(c_token, ",")) {
-		    ++c_token;
-		    lminiticscale = real_expression();
-		} else
-		    lminiticscale = 0.5 * lticscale;
-		for (i = 0; i < AXIS_ARRAY_SIZE; ++i) {
-		    axis_array[i].ticscale = lticscale;
-		    axis_array[i].miniticscale = lminiticscale;
-		}
-	    }
+	    set_ticscale();
 	} else if (almost_equals(c_token, "ro$tate")) {
 	    for (i = 0; i < AXIS_ARRAY_SIZE; ++i) {
 	        axis_array[i].tic_rotate = TEXT_VERTICAL;
@@ -4630,29 +4611,39 @@ set_tics()
 static void
 set_ticscale()
 {
-    double lticscale, lminiticscale;
-    unsigned int i;
-
-    int_warn(c_token,
-	     "Deprecated syntax - please use 'set tics scale' keyword");
+    int i, ticlevel;
 
     ++c_token;
-    if (END_OF_COMMAND) {
-	lticscale = 1.0;
-	lminiticscale = 0.5;
-    } else {
-	lticscale = real_expression();
-	if (END_OF_COMMAND) {
-	    lminiticscale = lticscale*0.5;
-	} else {
-	    if (equals(c_token, ","))
-		++c_token;
-	    lminiticscale = real_expression();
+    if (almost_equals(c_token, "def$ault")) {
+	++c_token;
+	for (i = 0; i < AXIS_ARRAY_SIZE; ++i) {
+	    axis_array[i].ticscale = 1.0;
+	    axis_array[i].miniticscale = 0.5;
 	}
-    }
-    for (i = 0; i < AXIS_ARRAY_SIZE; ++i) {
-	axis_array[i].ticscale = lticscale;
-	axis_array[i].miniticscale = lminiticscale;
+	ticscale[0] = 1.0;
+	ticscale[1] = 0.5;
+	for (ticlevel = 2; ticlevel < MAX_TICLEVEL; ticlevel++)
+	    ticscale[ticlevel] = 1.0;
+    } else {
+	double lticscale, lminiticscale;
+	lticscale = real_expression();
+	if (equals(c_token, ",")) {
+	    ++c_token;
+	    lminiticscale = real_expression();
+	} else {
+	    lminiticscale = 0.5 * lticscale;
+	}
+	for (i = 0; i < AXIS_ARRAY_SIZE; ++i) {
+	    axis_array[i].ticscale = lticscale;
+	    axis_array[i].miniticscale = lminiticscale;
+	}
+	ticlevel = 2;
+	while (equals(c_token, ",")) {
+	    ++c_token;
+	    ticscale[ticlevel++] = real_expression();
+	    if (ticlevel >= MAX_TICLEVEL)
+		break;
+	}
     }
 }
 

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.220 2013/06/12 19:33:15 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.221 2013/06/16 05:12:28 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -746,6 +746,13 @@ set origin %g,%g\n",
 	fprintf(fp, "set xyplane at %g\n", xyplane.z);
     else
 	fprintf(fp, "set ticslevel %g\n", xyplane.z);
+
+    {
+    int i;
+    fprintf(fp, "set tics scale ");
+    for (i=0; i<MAX_TICLEVEL; i++)
+	fprintf(fp, " %g%c", ticscale[i], i<MAX_TICLEVEL-1 ? ',' : '\n');
+    }
 
 #define SAVE_MINI(axis)							\
     switch(axis_array[axis].minitics & TICS_MASK) {			\

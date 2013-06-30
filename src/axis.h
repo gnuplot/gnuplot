@@ -1,5 +1,5 @@
 /*
- * $Id: axis.h,v 1.83 2013/04/08 00:16:01 sfeam Exp $
+ * $Id: axis.h,v 1.84 2013/06/29 12:04:44 juhaszp Exp $
  *
  */
 
@@ -150,6 +150,11 @@ typedef void (*tic_callback) __PROTO((AXIS_INDEX, double, char *, int,
 #define TICS_MASK      3
 #define TICS_MIRROR    4
 
+/* Tic levels 0 and 1 are maintained in the axis structure.
+ * Tic levels 2 - MAX_TICLEVEL have only one property - scale.
+ */
+#define MAX_TICLEVEL 5
+extern double ticscale[MAX_TICLEVEL];
 
 #if 0 /* HBB 20010806 --- move GRID flags into axis struct */
 /* Need to allow user to choose grid at first and/or second axes tics.
@@ -689,6 +694,9 @@ int set_cbminmax __PROTO((void));
 
 /* macro for tic scale, used in all tic_callback functions */
 #define TIC_SCALE(ticlevel, axis) \
-    (ticlevel == 0 ? axis_array[axis].ticscale : axis_array[axis].miniticscale)
+    (ticlevel == 0 ? axis_array[axis].ticscale : \
+     ticlevel == 1 ? axis_array[axis].miniticscale : \
+     ticlevel < MAX_TICLEVEL ? ticscale[ticlevel] : \
+     0)
 
 #endif /* GNUPLOT_AXIS_H */
