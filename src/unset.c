@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.175 2013/06/19 23:04:59 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.176 2013/06/30 17:48:26 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -602,7 +602,6 @@ unset_arrow()
 		return;		/* exit, our job is done */
 	    }
 	}
-	int_error(c_token, "arrow not found");
     }
 }
 
@@ -941,7 +940,6 @@ unset_label()
 		return;		/* exit, our job is done */
 	    }
 	}
-	/* int_warn(c_token, "label not found"); */
     }
 }
 
@@ -992,7 +990,6 @@ unset_linetype()
 }
 
 #ifdef EAM_OBJECTS
-/* process 'unset rectangle' command */
 static void
 unset_object()
 {
@@ -1017,9 +1014,6 @@ unset_object()
 		return;		/* exit, our job is done */
 	    }
 	}
-	/*
-	int_warn(c_token, "object %d not found", tag);
-	 */
     }
 }
 
