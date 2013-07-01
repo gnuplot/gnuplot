@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.92 2013/06/27 19:37:14 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.93 2013/07/01 20:16:14 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - hidden3d.c */
@@ -1836,7 +1836,7 @@ in_front(
 
     coordval xmin, xmax;	/* all of these are for the edge */
     coordval ymin, ymax;
-    coordval zmin, zmax;
+    coordval zmin;
 #if HIDDEN3D_GRIDBOX
     unsigned int xextent;	/* extent bitmask in x direction */
     unsigned int yextent;	/* same, in y direction */
