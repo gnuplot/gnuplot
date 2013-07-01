@@ -3,6 +3,9 @@
 	* src/Makefile.am:  Drop original PC assembly files from the source
 	tarball (corgraph.asm header.mac hrcgraph.asm pcgraph.asm lineproc.mac)
 
+	* src/hidden3d.c src/contour.c src/gplt_x11.c src/qtterminal/qt_term.cpp
+	term/cairo.trm:  Reduce the number of annoying compiler warnings.
+
 2013-06-30  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/axis.c src/axis.h src/set.c src/unset.c src/show.c src/save.c
