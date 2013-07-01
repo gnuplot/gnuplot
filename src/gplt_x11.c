@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.235 2013/05/19 23:46:34 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.236 2013/06/16 17:53:52 sfeam Exp $"); }
 #endif
 
 #define MOUSE_ALL_WINDOWS 1
@@ -2399,10 +2399,10 @@ exec_cmd(plot_struct *plot, char *command)
 #ifdef EAM_BOXED_TEXT
 	    if (boxing) {
 		/* Request bounding box information for this string */
-		int ierr, direction, ascent, descent;
+		int direction, ascent, descent;
 		unsigned int bb[4];
 		XCharStruct overall;
-		ierr = XTextExtents(font, str, sl, &direction, &ascent, &descent, &overall);
+		XTextExtents(font, str, sl, &direction, &ascent, &descent, &overall);
 		bb[0] = X(x) + overall.lbearing + sj;
 		bb[2] = X(x) + overall.rbearing + sj;
 		bb[1] = Y(y) - overall.ascent  + v_offset;
