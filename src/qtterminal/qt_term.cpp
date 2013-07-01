@@ -741,7 +741,7 @@ int qt_waitforinput(void)
 			// are received, only transmit the last one.
 			gp_event_t tempEvent;
 			tempEvent.type = -1;
-			while (qt_socket.bytesAvailable() >= sizeof(gp_event_t))
+			while (qt_socket.bytesAvailable() >= (int)sizeof(gp_event_t))
 			{
 				struct gp_event_t event;
 				qt_socket.read((char*) &event, sizeof(gp_event_t));

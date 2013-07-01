@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: doc2ipf.c,v 1.22 2012/03/03 16:21:24 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: doc2ipf.c,v 1.23 2012/05/21 20:39:20 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - doc2ipf.c */
@@ -139,7 +139,6 @@ process_line(char *line, FILE *b)
 {
     static int line_count = 0;
     static char line2[MAX_LINE_LEN+1];
-    static int last_line;
     char hyplink1[64];
     char *pt, *tablerow;
     int i;
@@ -565,7 +564,6 @@ process_line(char *line, FILE *b)
 		    
 		para = 0;	/* not in a paragraph */
 		tabl = 0;	/* not in a table     */
-		last_line = line_count;
 		startpage = 0;
 	    } else
 		fprintf(stderr, "unknown control code '%c' in column 1, line %d\n",

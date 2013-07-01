@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.91 2013/01/21 17:45:44 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.92 2013/06/27 19:37:14 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - hidden3d.c */
@@ -1882,7 +1882,7 @@ in_front(
 	}					\
 	vnum1 = v1 - vlist;			\
 	vnum2 = v2 - vlist;			\
-	zmax = v1->z;	zmin = v2->z;		\
+	zmin = v2->z;				\
 						\
 	if (v1->x > v2->x) {			\
 	    xmin = v2->x;	xmax = v1->x;	\

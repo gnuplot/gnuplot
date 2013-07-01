@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: cairo.trm,v 1.59 2013/05/19 23:46:34 sfeam Exp $
+ * $Id: cairo.trm,v 1.60 2013/05/21 20:36:46 sfeam Exp $
  */
 
 /* GNUPLOT - cairo.trm */
@@ -247,7 +247,6 @@ TERM_PUBLIC void cairotrm_options()
 	TBOOLEAN set_enhanced = FALSE, set_font = FALSE, set_size = FALSE;
 	TBOOLEAN set_capjoin = FALSE, set_fontscale = FALSE;
 	TBOOLEAN set_standalone = FALSE, set_header = FALSE;
-	TBOOLEAN set_colortext = FALSE;
 
 	char tmp_term_options[MAX_LINE_LEN+1] = "";
 
@@ -459,7 +458,6 @@ TERM_PUBLIC void cairotrm_options()
 			if (!ISCAIROLATEX)
 				int_error(c_token,
 					  "extraneous argument in set terminal %s",term->name);
-			set_colortext = TRUE;
 			ps_params->blacktext = TRUE;
 			c_token++;
 			break;
@@ -467,7 +465,6 @@ TERM_PUBLIC void cairotrm_options()
 			if (!ISCAIROLATEX)
 				int_error(c_token,
 					  "extraneous argument in set terminal %s",term->name);
-			set_colortext = TRUE;
 			ps_params->blacktext = FALSE;
 			c_token++;
 			break;
