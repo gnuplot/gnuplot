@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.807 2013/06/29 12:04:44 juhaszp Exp $
+C RCS $Id: gnuplot.doc,v 1.808 2013/06/30 17:48:25 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -11556,7 +11556,7 @@ Ffigure_missing
 
  The tics may be turned off with the `unset tics` command, and may be turned on
  (the default state) with `set tics`.  Fine control of tics on individual axes
- is possible using the alternative commands `set xtics`, `setztics`, etc.
+ is possible using the alternative commands `set xtics`, `set ztics`, etc.
 
  Syntax:
        set tics {axis | border} {{no}mirror}
