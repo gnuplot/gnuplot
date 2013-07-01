@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.258 2013/06/16 16:28:05 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.259 2013/06/18 19:36:33 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -1539,12 +1539,15 @@ plot_option_using(int max_using)
 }
 
 
-static
-void plot_ticlabel_using(int axis)
+static void
+plot_ticlabel_using(int axis)
 {
     int col = 0;
     
-    c_token += 2;
+    c_token ++;
+    if (!equals(c_token,"("))
+	int_error(c_token, "missing '('");
+    c_token++;
 
     /* FIXME: What we really want is a test for a constant expression as  */
     /* opposed to a dummy expression. This is similar to the problem with */
@@ -1560,6 +1563,8 @@ void plot_ticlabel_using(int axis)
 
     if (col < 1)
 	int_error(c_token, "ticlabels must come from a real column");
+    if (!equals(c_token,")"))
+	int_error(c_token, "missing ')'");
     c_token++;
     use_spec[df_no_use_specs+df_no_tic_specs].expected_type = axis;
     use_spec[df_no_use_specs+df_no_tic_specs].column = col;
