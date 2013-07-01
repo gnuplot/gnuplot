@@ -10,6 +10,10 @@
 	required parentheses are missing from using spec.
 	Bug #1256
 
+	* docs/gnuplot.doc:  (Shigeharu Takeno) Correct the documentation for
+	the order of elements in a binary matrix or ascii nonuniform matrix.
+	Bug #1248
+
 2013-06-30  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/axis.c src/axis.h src/set.c src/unset.c src/show.c src/save.c
@@ -1538,7 +1542,7 @@
 	New user-visible function hsv2rgb(H,S,V) creates a 24-bit RGB value
 	from real H,S,V values in the range [0:1]. This allows use of hsv colors
 	in plots with coloring style "rgb variable".  The new function can be
-	used to implement the capability suggested by Shige Takeno:
+	used to implement the capability suggested by Shigeharu Takeno:
 	  hsv(h,s,v) = sprintf("#%06x",hsv2rgb(h,s,v))
 	  plot FOO lc rgb hsv(H,S,V)
 
