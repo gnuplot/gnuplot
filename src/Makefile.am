@@ -82,10 +82,12 @@ SUBDIRS = $(d_beos) wxterminal qtterminal
 EXTRA_gnuplot_SOURCES = corplot.c strftime.c vms.c
 
 EXTRA_DIST = GNUmakefile Makefile.maint NeXT OpenStep README \
-corgraph.asm genopt.com gnuplot.opt header.mac \
-hrcgraph.asm lineproc.mac linkopt.vms \
-makefile.all makefile.awc os2 pcgraph.asm win x11.opt \
+genopt.com gnuplot.opt x11.opt linkopt.vms \
+makefile.all makefile.awc os2 win \
 $(EXTRA_gnuplot_SOURCES)
+
+# Hercules and original pc graphics driver code
+# corgraph.asm header.mac hrcgraph.asm pcgraph.asm lineproc.mac \
 
 if BUILD_WXWIDGETS
 gnuplot_SOURCES += wxterminal/wxt_gui.cpp
