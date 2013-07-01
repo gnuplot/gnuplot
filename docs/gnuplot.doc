@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.808 2013/06/30 17:48:25 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.809 2013/07/01 07:30:43 markisch Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -9074,10 +9074,8 @@ Ffigure_missing
 
 3 linetype
 ?commands set linetype
-?commands unset linetype
 ?commands show linetype
 ?set linetype
-?unset linetype
 ?show linetype
 ?linetype
  The `set linetype` command allows you to redefine the basic linetypes used
@@ -13036,9 +13034,9 @@ Ffigure_missing
 
  Thus the data organization for non-uniform matrix input is
 
-       <N+1>  <y0>   <y1>   <y2>  ...  <yN>
-        <x0> <z0,0> <z0,1> <z0,2> ... <z0,N>
-        <x1> <z1,0> <z1,1> <z1,2> ... <z1,N>
+       <N+1>  <x0>   <x1>   <x2>  ...  <xN>
+        <y0> <z0,0> <z0,1> <z0,2> ... <z0,N>
+        <y1> <z1,0> <z1,1> <z1,2> ... <z1,N>
          :      :      :      :   ...    :
 
  which is then converted into triplets:
@@ -13323,6 +13321,14 @@ Ffigure_missing
 
        # Unset labels numbered between 100 and 200
        unset for [i=100:200] label i
+3 linetype
+?unset linetype
+ Syntax: 
+       unset linetype N
+ Remove all characteristics previously associated with a single linetype.
+ Subsequent use of this linetype will use whatever characteristics and color
+ that is native to the current terminal type (i.e. the default linetypes
+ properties available in gnuplot versions prior to 4.6).
 3 output
 ?unset output
  Because some terminal types allow multiple plots to be written into a single
