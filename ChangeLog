@@ -16,6 +16,10 @@
 	* docs/Makefile.in:  Modify build commands for gnuplot.texi so that
 	xemacs and newer emacs (25.1) are happy.
 
+	* docs/doc2texi.el:  Map terminal HELP sections to level 3 (subsection)
+	and level 4 (subsubsection) rather than levels 4 and 5.
+	Bug #1226
+
 2013-07-02  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/datafile.c (plot_ticlabel_using):  Explicit error message if
