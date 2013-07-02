@@ -12,6 +12,9 @@
 2013-07-02  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* docs/gnuplot.doc:  Fix typos.
+	Correct the documentation for the order of elements in a binary matrix
+	or ascii nonuniform matrix.
+	Bug #1248
 
 2013-07-01  Ethan A Merritt  <merritt@u.washington.edu>
 
@@ -25,9 +28,7 @@
 	required parentheses are missing from using spec.
 	Bug #1256
 
-	* docs/gnuplot.doc:  (Shigeharu Takeno) Correct the documentation for
-	the order of elements in a binary matrix or ascii nonuniform matrix.
-	Bug #1248
+	* src/command.c (print_command): Print \n after each line of a datablock
 
 2013-06-30  Ethan A Merritt  <merritt@u.washington.edu>
 
