@@ -1,3 +1,7 @@
+2013-07-02  Shigeharu Takeno  <shige@iee.niit.ac.jp>
+
+	* docs/gnuplot.doc:  Fix typos.
+
 2013-07-01  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/Makefile.am:  Drop original PC assembly files from the source

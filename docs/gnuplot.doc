@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.809 2013/07/01 07:30:43 markisch Exp $
+C RCS $Id: gnuplot.doc,v 1.810 2013/07/01 19:08:49 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -4222,7 +4222,7 @@ Ffigure_mapcontours
  the next iteration.  The process continues until a preset criterion is met,
  either (1) the fit has "converged" (the relative change in WSSR is less than
  a certain limit, see `set fit limit`), or (2) it reaches a preset iteration
- count limit, see `set fit maxiter`).  The fit may also be interrupted
+ count limit (see `set fit maxiter`).  The fit may also be interrupted
  and subsequently halted from the keyboard (see `fit`).  The user variable
  FIT_CONVERGED contains 1 if the previous fit command terminated due to
  convergence; it contains 0 if the previous fit terminated for any other
@@ -6884,7 +6884,7 @@ Ffigure_mapcontours
 
 ?noextend
  By default autoscaling sets the axis range limits to the nearest tic label
- position that includes all the plot data.  keywords `fixmin`, `fixmax`, `fix`
+ position that includes all the plot data. Keywords `fixmin`, `fixmax`, `fix`
  or `noextend` tell gnuplot to disable extension of the axis range to the next
  tic mark position. In this case the axis range limit exactly matches the
  coordinate of the most extreme data point.  `set autoscale noextend` is a
@@ -8036,7 +8036,7 @@ Ffigure_missing
  of the sum of squared residuals and defaults to zero.
 
  If you need even more control about the algorithm, and know the
- Marquardt-Levenberg algorithm well, the folowing options can be used to
+ Marquardt-Levenberg algorithm well, the following options can be used to
  influence it. The startup value of `lambda` is normally calculated
  automatically from the ML-matrix, but if you want to, you may provide your
  own using the `start_lambda` option. Setting it to `default` will 
