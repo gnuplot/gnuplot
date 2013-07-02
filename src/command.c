@@ -1598,7 +1598,7 @@ print_command()
 	if (equals(c_token,"$") && isletter(c_token+1)) {
 	    char **line = get_datablock(parse_datablock_name());
 	    while (line && *line) {
-		fputs(*line, print_out);
+		fprintf(print_out, "%s\n", *line);
 		line++;
 	    }
 	    continue;
