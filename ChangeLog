@@ -21,6 +21,7 @@
 
 2013-07-02  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
+	* docs/gnuplot-ja.doc:  Sync translation to version 1.810
 	* docs/gnuplot.doc:  Fix typos.
 	Correct the documentation for the order of elements in a binary matrix
 	or ascii nonuniform matrix.

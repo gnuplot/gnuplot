@@ -1,5 +1,5 @@
-C RCS $Id: gnuplot-ja.doc,v 1.459 2013-04-02 10:16:38+09 shige Exp $
-C corresponding original gnuplot.doc revision: 1.774
+C RCS $Id: gnuplot-ja.doc,v 1.476 2013-07-02 12:33:45+09 shige Exp $
+C corresponding original gnuplot.doc revision: 1.810
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -7,7 +7,7 @@ C Japanese translation: Hiroharu Tamaru (2.0, 3.2), MASUTANI Yasuhiro (3.5),
 C Shigeharu Takeno et al (3.7, 4.X)
 1 gnuplot
 ?gnuplot
-C 下の contributers の表のアクセント文字は、現在のオリジナルでは UTF-8
+C 下の contributors の表のアクセント文字は、現在のオリジナルでは UTF-8
 C で書かれているが、それを HTML 名前参照形式に変更している。
 ^<h2 align="center"> An Interactive Plotting Program </h2>
 ^<p align="center">  Thomas Williams & Colin Kelley</p>
@@ -184,17 +184,11 @@ C 行が長いのは、できればなんとかしたい
  入力して下さい。または単に `help ?` でもヘルプの項目のメニューが現われ
  ます。
 
- 初めて `gnuplot` を使う方は、`plotting` に関する説明から読みはじめると
- 良いでしょう (対話型で使用中ならば `help plotting` と入力して下さい)。
-
- simple.dem デモを参照してください。あるいは以下の Web ページにも他のデ
- モと一緒にあります。
+ 大量のグラフサンプルが、以下の Web ページにあります。
 ^ <a href="http://www.gnuplot.info/demo/">
            http://www.gnuplot.info/demo/
 ^ </a>
- `gnuplot` はコマンドラインから、あるいはデスクトップ環境のアイコンから
- 起動することができます。コマンドラインから起動するときは、以下の書式が
- 使えます。
+ コマンドラインから起動するときは、以下の書式が使えます。
        gnuplot {OPTIONS} file1 file2 ...
  ここで file1, file2 等は、`local` コマンドで取り込むのと同等の入力ファ
  イル (スクリプトファイル) です。
@@ -253,7 +247,7 @@ C 行が長いのは、できればなんとかしたい
  バグリポート、ソースの改良等は以下の trackers に upload してください:
            http://sourceforge.net/projects/gnuplot/support
  ただし、リポートを送る前に、あなたがリポートしようとしているバグが、よ
- り新しい gnuplot で既に修正されていないかチェックしてください。
+ り新しい版で既に修正されていないかチェックしてください。
 
  開発版に関するメーリングリスト:
            gnuplot-beta@lists.sourceforge.net
@@ -266,9 +260,27 @@ C 行が長いのは、できればなんとかしたい
 
 2 新しい機能 (New features)
 ?new-features
- このセクションでは、バージョン 4.6 以降に追加された主なもの、および以
- 前のバージョン用の gnuplot スクリプトでは以前とは異なる挙動を示す可能
- 性があるような仕様の変更の主なものを紹介します。
+ このセクションでは、このバージョンで導入された主なもの、および以前のバ
+ ージョン用の gnuplot スクリプトでは以前とは異なる挙動を示す可能性があ
+ るような仕様の変更の主なものを紹介します。
+
+ * NaN や、正しくないデータ列数、または他の予期しないものを含む入力デー
+ タの処理の改良。例 (や図) については、以下参照: `missing`。
+
+ * 時間座標は、標準的な Unix エポック (1970 年 1 月 1 日) からの秒数と
+ して内部で保存します。以前の版の gnuplot では、別のエポック (2000 年
+ 1 月 1 日) を内部で使用していました。この変更は、gnuplot の外で作られ
+ た秒単位のデータによって矛盾がもたらされる問題を解決します。インストー
+ ルされている個々の gnuplot がどちらのエポックを使用しているかについて
+ は、コマンド `print strftime("%F",0)` で知ることができます。
+
+ * 対話型出力形式は、ハイパーテキストラベルをサポートしていますが、これ
+ はマウスがそのラベルのリンク点上にあるときにのみ現れるものです。
+
+ * コマンド `set [axis]range` のキーワード `reverse` は、自動縮尺
+ (autoscaling) にのみ影響し、`set xrange [0:1]` のようなコマンドの意味
+ を逆にしたり他の変更を行ったりはしません。このような場合に x 軸の方向
+ を逆向きにしたければ、代わりに `set xrange [1:0]` としてください。
 
  * 新しい座標系 (度、分、秒)。以下参照: `set xdata geographic`。
 
@@ -289,18 +301,10 @@ C 行が長いのは、できればなんとかしたい
  これは、plot 全体の範囲には影響せず、その関数のデータをサンプリングす
  る範囲でしかありません。以下参照: `plot`, `piecewise.dem`。
 
- * NaN の処理、不正な入力データ列番号の処理、および他の予期せぬ入力デー
- タの処理の変更。例 (や図) については、以下参照: `missing`。
-
  * `unset xrange` (および他の軸の範囲も) は、元のデフォルトの範囲を復帰
  します。
 
  * `unset terminal` は、gnuplot 開始時の出力形式を復帰します。
-
- * コマンド `set [axis]range` のキーワード `reverse` は、自動縮尺
- (autoscaling) にのみ影響し、`set xrange [0:1]` のようなコマンドの意味
- を逆にしたり他の変更を行ったりはしません。このような場合に x 軸の方向
- を逆向きにしたければ、代わりに `set xrange [1:0]` としてください。
 
  * オプション smooth の kdensity の、bandwidth の追加指定では、データ列
  からでなく 1 つのキーワードとして値を取ります。以下参照:
@@ -548,7 +552,7 @@ C 行が長いのは、できればなんとかしたい
  一つ (あるいはそれ以上) の軸が時間軸である場合、`timefmt` の書式文字列
  に従って、引用符で囲まれた時間文字列で適切な座標を指定する必要がありま
  す。以下参照: `set xdata`, `set timefmt`。また、`gnuplot` は整数表記も
- 認めていて、その場合その整数は 2000 年 1 月 1 日からの秒数と解釈されま
+ 認めていて、その場合その整数は 1970 年 1 月 1 日からの秒数と解釈されま
  す。
 2 文字列データ (Datastrings)
 ?datastrings
@@ -737,9 +741,9 @@ C 行が長いのは、できればなんとかしたい
  Unix では、SHELL が `shell` コマンドの際に使われます。MS-DOS, OS/2 で
  は COMSPEC が `shell` コマンドの際に使われます。
 
- FIT_SCRIPT は、当てはめ (fit) が中断されたときに実行する `gnuplot` コ
- マンドの指定に使われます。以下参照: `fit`。FIT_LOG は当てはめによるロ
- グファイルのデフォルトのファイル名の指定に使われます。
+ `FIT_SCRIPT` は、当てはめ (fit) が中断されたときに実行する `gnuplot`
+ コマンドの指定に使われます。以下参照: `fit`。`FIT_LOG` は当てはめによ
+ るログファイルのデフォルトのファイル名の指定に使われます。
 
  GNUPLOT_LIB は、データやコマンドファイルの検索ディレクトリを追加定義す
  るのに使われます。その変数は、一つのディレクトリ名かまたは複数のディレ
@@ -897,7 +901,7 @@ C 行が長いのは、できればなんとかしたい
 ^<tr>    <td>strstrt("string","key")</td>    <td>文字列</td>    <td>部分文字列 "key" が現れる先頭位置</td></tr>
 ^<tr>    <td>substr("string",beg,end)</td>    <td>複数個</td>    <td>文字列 "string"[beg:end]</td></tr>
 ^<tr>    <td>strftime("timeformat",t)</td>    <td>任意</td>    <td>gnuplot による時刻解析結果の文字列</td></tr>
-^<tr>    <td>strptime("timeformat",s)</td>    <td>文字列</td>    <td>文字列 s を変換した 2000 年からの秒数</td></tr>
+^<tr>    <td>strptime("timeformat",s)</td>    <td>文字列</td>    <td>文字列 s を変換した 1970 年からの秒数</td></tr>
 ^<tr>    <td>system("command")</td>    <td>文字列</td>    <td>シェルコマンドの出力を持つ文字列</td></tr>
 ^<tr>    <td>word("string",n)</td>    <td>文字列, 整数</td>    <td>文字列 "string" の n 番目の単語</td></tr>
 ^<tr>    <td>words("string")</td>    <td>文字列</td>    <td>文字列 "string" 中の単語数</td></tr>
@@ -1273,7 +1277,7 @@ C マーカを doc2html へのこのシグナルとして使用します。
 4 voigt
 ?expressions functions voigt
 ?voigt
-#voigt(x,y) & 実数 & Voigt/Faddeeva 関数 $\frac{y}{\pi} \int{\frac{exp(t^2)}{(x-t)^2+y^2}}dt$ \\
+#voigt(x,y) & 実数 & Voigt/Faddeeva 関数 $\frac{y}{\pi} \int{\frac{exp(-t^2)}{(x-t)^2+y^2}}dt$ \\
 %voigt(x,y)@実数@ガウス関数とローレンツ関数の畳みこみ
  関数 `voigt(x,y)` は、スペクトル解析で使用される Voigt/Faddeeva 関数の
  近似を返します。その誤差は 1/10^4 以内です。
@@ -1340,16 +1344,16 @@ C マーカを doc2html へのこのシグナルとして使用します。
 ?strftime
 #strftime("timeformat",t) & 任意 & gnuplot による時刻解析結果の文字列 \\
 %strftime("timeformat",t)@任意@gnuplot による時刻解析結果の文字列
- `strftime("timeformat",t)` は、2000 年からの秒数による時刻 t に、時刻
+ `strftime("timeformat",t)` は、1970 年からの秒数による時刻 t に、時刻
  書式指定 timeformat を適用します。
  以下参照: `time_specifiers`, `strptime`。
 4 strptime
 ?expressions functions strptime
 ?strptime
-#strptime("timeformat",s) & 文字列 & 文字列 s を変換した 2000 年からの秒数 \\
-%strptime("timeformat",s)@文字列@文字列 s を変換した 2000 年からの秒数
+#strptime("timeformat",s) & 文字列 & 文字列 s を変換した 1970 年からの秒数 \\
+%strptime("timeformat",s)@文字列@文字列 s を変換した 1970 年からの秒数
  `strptime("timeformat",s)` 書式指定 timeformat を使って文字列 s から時
- 刻を読み込んで、それを 2000 年からの秒数に変換します。
+ 刻を読み込んで、それを 1970 年からの秒数に変換します。
  以下参照: `time_specifiers`, `strftime`。
 4 system
 ?expressions functions system
@@ -1459,56 +1463,56 @@ C マーカを doc2html へのこのシグナルとして使用します。
 ?tm_hour
 #tm\_hour(x) & 整数 & 時\\
 %tm_hour(x)@整数@時
- 関数 `tm_hour` は引数を 2000 年 1 月 1 日からの秒数と解釈し、それが
+ 関数 `tm_hour` は引数を 1970 年 1 月 1 日からの秒数と解釈し、それが
  時刻の何時 (0--23 の範囲の整数) であるかを、実数として返します。
 4 tm_mday
 ?expressions tm_mday
 ?tm_mday
 #tm\_mday(x) & 整数 & 日 \\
 %tm_mday(x)@整数@日
- 関数 `tm_mday` は引数を 2000 年 1 月 1 日からの秒数と解釈し、それが
+ 関数 `tm_mday` は引数を 1970 年 1 月 1 日からの秒数と解釈し、それが
  その月の何日 (1--31 の範囲の整数) であるかを、実数として返します。
 4 tm_min
 ?expressions tm_min
 ?tm_min
 #tm\_min(x) & 整数 & 分 \\
 %tm_min(x)@整数@分
- 関数 `tm_min` は引数を 2000 年 1 月 1 日からの秒数と解釈し、それが
+ 関数 `tm_min` は引数を 1970 年 1 月 1 日からの秒数と解釈し、それが
  時刻の何分 (0--59 の範囲の整数) であるかを、実数として返します。
 4 tm_mon
 ?expressions tm_mon
 ?tm_mon
 #tm\_mon(x) & 整数 & 月 \\
 %tm_mon(x)@整数@月
- 関数 `tm_mon` は引数を 2000 年 1 月 1 日からの秒数と解釈し、それが
+ 関数 `tm_mon` は引数を 1970 年 1 月 1 日からの秒数と解釈し、それが
  何月 (0--11 の範囲の整数) であるかを、実数として返します。
 4 tm_sec
 ?expressions tm_sec
 ?tm_sec
 #tm\_sec(x) & 整数 & 秒 \\
 %tm_sec(x)@整数@秒
- 関数 `tm_sec` は引数を 2000 年 1 月 1 日からの秒数と解釈し、それが
+ 関数 `tm_sec` は引数を 1970 年 1 月 1 日からの秒数と解釈し、それが
  時刻の何秒 (0--59 の範囲の整数) であるかを、実数として返します。
 4 tm_wday
 ?expressions tm_wday
 ?tm_wday
 #tm\_wday(x) & 整数 & その週の何日目 \\
 %tm_wday(x)@整数@その週の何日目
- 関数 `tm_wday` は引数を 2000 年 1 月 1 日からの秒数と解釈し、それが
+ 関数 `tm_wday` は引数を 1970 年 1 月 1 日からの秒数と解釈し、それが
  その週の何日目 (0--6 の範囲の整数) であるかを、実数として返します。
 4 tm_yday
 ?expressions tm_yday
 ?tm_yday
 #tm\_yday(x) & 整数 & その年の何日目 \\
 %tm_yday(x)@整数@その年の何日目
- 関数 `tm_yday` は引数を 2000 年 1 月 1 日からの秒数と解釈し、それが
+ 関数 `tm_yday` は引数を 1970 年 1 月 1 日からの秒数と解釈し、それが
  その年の何日目 (1--366 の範囲の整数) であるかを、実数として返します。
 4 tm_year
 ?expressions tm_year
 ?tm_year
 #tm\_year(x) & 整数 & 西暦 \\
 %tm_year(x)@整数@西暦
- 関数 `tm_year` は引数を 2000 年 1 月 1 日からの秒数と解釈し、それが
+ 関数 `tm_year` は引数を 1970 年 1 月 1 日からの秒数と解釈し、それが
  西暦何年 (整数) であるかを、実数として返します。
 4 time
 ?expressions time
@@ -1518,7 +1522,7 @@ C マーカを doc2html へのこのシグナルとして使用します。
  関数 `time` は現在のシステム時刻を返します。この値は `strftime` 関数で
  日時文字列に変換できますし、`timecolumn` と組み合わせて相対的な日時グ
  ラフを作成するのにも使えます。引数の型はそれが返すものを決定します。引
- 数が整数の場合は time() は現在の時刻を 2000 年 1 月 1 日からの整数とし
+ 数が整数の場合は time() は現在の時刻を 1970 年 1 月 1 日からの整数とし
  て返し、引数が実数 (または複素数) ならば同様の値を実数として返します。
  引数が文字列ならば、それを書式文字列であるとみなし、書式化された日時文
  字列を提供するようそれを `strftime` に渡します。
@@ -1901,10 +1905,9 @@ C ... and restart the table:
  変数をいくつか持っています。詳細は、以下参照: `mouse variables`。
 
  `fit` 機能は、"FIT_" で始まるいくつかの変数を使用しますので、そのよう
- な名前を使うのは避けるべきでしょう。しかし、`fit` の使用に際しては、例
- えば "FIT_LIMIT" のように再定義をする必要があるような変数はあります。
- `set fit errorvariables` とすると各当てはめ変数のエラーは、そのパラメ
- ータ名に "_err" を追加した変数に保存されます。詳細は、以下参照: `fit`。
+ な名前を使うのは避けるべきでしょう。`set fit errorvariables` を使用す
+ ると、各当てはめ変数のエラーは、そのパラメータ名に "_err" を追加した変
+ 数に保存されます。詳細は、以下参照: `fit`。
 
  以下も参照: `user-defined variables`, `reset errors`,
  `mouse variables`, `fit`。
@@ -2122,7 +2125,9 @@ C ... and restart the table:
  すのに使います。"点 (point)" は行から取り出した一つのデータです。"デー
  タブロック (datablock)" は、空行で区切られた連続した複数の行からなる点
  の集合です。データファイルの議論の中で "line" が参照される場合は、これ
- はデータブロックの部分集合を指します。
+ はデータブロックの部分集合を指します。"データブロック (datablock)" と
+ いう言葉は、名前付きインラインデータブロックでも使われています。以下参
+ 照: `datablocks`。
 
  (訳注: この日本語訳の中ではここに書かれているような用語の統一は考慮さ
  れてはおらず、よって混乱を引き起こす可能性があります。厳密には原文を参
@@ -2507,7 +2512,8 @@ Ffigure_newsyntax
  `splot` は、点や線に加えて曲面や等高線を書くことができます。3 次元の関
  数の格子定義に関する情報については、以下参照: `set isosamples`。3 次元
  データのファイルに必要な形態については、以下参照: `splot datafile`。等
- 高線に関する情報については、以下参照: `set contour`, `set cntrparam`。
+ 高線に関する情報については、以下参照: `set contour`, `set cntrlabel`,
+ `set cntrparam`。
 
  `splot` での縮尺や見出し付けの制御は、x2 軸と y2 軸を制御するコマンド
  やオプションは効果がなく、z 軸を制御するものにはもちろん効果がある、と
@@ -2559,9 +2565,9 @@ Ffigure_newsyntax
        title = "My Title"
        plot plot title title
 
- 文字列に対する 3 つの二項演算子が用意されています: 文字列の結合演算子
- ".", 文字列の等号演算子 "eq", および文字列の不等号演算子 "ne" です。以
- 下の例では TRUE が表示されます。
+ 次の 3 つの二項演算子は文字列に作用します: 文字列の結合演算子 ".", 文
+ 字列の等号演算子 "eq", および文字列の不等号演算子 "ne" です。以下の例
+ では TRUE が表示されます。
 
       if ("A"."B" eq "AB") print "TRUE"
 
@@ -2772,7 +2778,7 @@ Ffigure_newsyntax
  この機能は `set xdata time`, `set ydata time` などのコマンドによって有
  効になります。
 
- 内部では全ての時間/日付は 2000 年からの秒数に変換されます。コマンド
+ 内部では全ての時間/日付は 1970 年からの秒数に変換されます。コマンド
  `set timefmt` は全ての入力書式を定義します。データファイル、範囲、軸の
  目盛りの見出し、ラベルの位置。手短に言えば、データの値を受けとる全ての
  ものがこの書式にしたがって受けとらなければいけません。一時には一つの入
@@ -2807,7 +2813,7 @@ Ffigure_newsyntax
  関数 `time` は、現在のシステム時刻を得るのに使えます。この値は、
  `strftime` 関数で日時文字列に変換できますし、`timecolumn` と組み合わせ
  て相対的な日時グラフを作成するのにも使えます。引数の型はそれが返すもの
- を決定します。引数が整数の場合は time() は現在の時刻を 2000 年 1 月 1
+ を決定します。引数が整数の場合は time() は現在の時刻を 1970 年 1 月 1
  日からの整数として返し、引数が実数 (または複素数) ならば同様の値を実数
  として返しますが、小数 (秒以下) 部分の精度は、オペレーティングシステム
  に依存します。引数が文字列ならば、それを書式文字列であるとみなし、書式
@@ -2866,8 +2872,10 @@ Ffigure_newsyntax
 ?style boxerrorbars
 ?boxerrorbars
  描画スタイル `boxerrorbars` は 2 次元のデータ描画でのみ利用可能です。
- これは `boxes` と `yerrorbars` スタイルの組合せです。これは、3 列、ま
- たは 4 列、または 5 列のデータを使用します:
+ これは、3 列、または 4 列、または 5 列のデータが必要です。入力列を追加
+ (4,5,6 列目) すると、それらは各データ点毎の variable color 情報 (以下
+ 参照: `linecolor`, `rgbcolor variable`) として使われます。誤差線は、箱
+ の境界と同じ色で描画されます。
 
       3 列:  x  y  ydelta
       4 列:  x  y  ydelta xdelta        # 箱の幅 != -2
@@ -2883,22 +2891,13 @@ Ffigure_boxerrorbars
  の横幅は、隣接する箱にくっつくように自動的に計算されます。3 列のデータ
  の場合も、横幅は自動的に計算されます。
 
- 入力列を追加 (4,5,6 列目) すると、それらは各データ点毎の variable color
- 情報 (以下参照: `linecolor`, `rgbcolor variable`) として使われます。誤
- 差線は、箱の境界と同じ色で描画されます。
-
  箱の高さは、`yerrorbars` スタイル同様に y の誤差の値から決定されます。
  y-ydelta から y+ydelta まで、あるいは ylow から yhigh まで、これらは何
  列のデータが与えられているかによって決まります。
- 以下も参照
-^ <a href="http://www.gnuplot.info/demo/mgr.html">
- errorbar デモ。
-^ </a>
 2 boxes
 ?plotting styles boxes
 ?style boxes
 ?boxes
-Ffigure_boxes
  `boxes` スタイルは 2 次元描画でのみ利用可能です。これは与えられた x 座
  標を中心とし、x 軸から (グラフの境界から、ではありません) 与えられた y
  座標までの箱を書きます。これは基本的に、2 列、または 3 列のデータを使
@@ -2908,6 +2907,7 @@ Ffigure_boxes
       2 列:  x  y
       3 列:  x  y  x_width
 
+Ffigure_boxes
  箱の幅は 3 つのうち一つの方法で決定されます。入力データが 3 列目のデー
  タを持っている場合は、それが箱の幅にセットされます。そうでなくて
  `set boxwidth` コマンドで箱の幅がセットされていた場合は、それが使われ
@@ -2917,15 +2917,12 @@ Ffigure_boxes
  箱の中身は現在の塗りつぶしスタイル (fillstyle) に従って塗りつぶされま
  す。詳細は、以下参照: `set style fill`。新しい塗りつぶしスタイルを
  plot コマンド上で指定することもできます。
-
  塗りつぶしスタイルが `empty` の場合は、箱は塗りつぶされません。
-
  塗りつぶしスタイルが `solid` の場合は、箱は現在の描画色でベタ塗りされ
- ます。これには追加オプション <density> があり、それは塗りつぶし密度を
- 意味し、0 は背景色、1 は描画色そのものになります。
-
- 塗りつぶしスタイルが `pattern` の場合は、箱は現在の描画色であるパター
- ンで塗りつぶされますが、出力ドライバがサポートしている必要があります。
+ ますが、fillstyle パラメータを追加することで塗りつぶし密度を制御できま
+ す。0 は背景色、1 は描画色そのものになります。
+ 塗りつぶしスタイルが `pattern` の場合は、箱は現在の描画色で、あるパタ
+ ーンで塗りつぶします。
 
  例:
 
@@ -2979,7 +2976,7 @@ Ffigure_boxplot
  値のレベルの値の数だけの boxplot を描画します。それらの boxplot の間隔
  はデフォルトでは 1.0 ですが、これは `set style boxplot separation` で
  変更できます。デフォルトでは、因子変数の値は、各 boxplot の下 (または
- 上) の目盛のラベルに表示します。
+ 上) の目盛りのラベルに表示します。
 
  例
 
@@ -3453,9 +3450,11 @@ Ffigure_histcols
  は、一つ一つがそれぞれデータ列に対応する、2 つの鉛直な積み重ねの棒を生
  成します。x=1 にある棒は、データファイルの 2 列目の各行の値に対応する
  箱からなります。x=2 にある棒は、データファイルの 4 列目の各行の値に対
- 応する箱からなります。これは、gnuplot の通常の入力の縦、横の解釈を入れ
- 換えることになりますので、凡例のタイトルや x 軸の目盛りの見出しの指定
- も変更する必要があります。以下のコメント部分を参照してください。
+ 応する箱からなります。
+
+ これは、gnuplot の通常の入力の縦、横の解釈を入れ換えることになりますの
+ で、凡例のタイトルや x 軸の目盛りの見出しの指定も変更する必要がありま
+ す。以下のコメント部分を参照してください。
 
        set style histogram columnstacked
        plot '' u 5:key(1)            # 1 列目を凡例タイトルに使用
@@ -3533,8 +3532,9 @@ Ffigure_newhist
 
 =heatmap
 Ffigure_heatmap
- この図は、スカラー値の配列から温度分布を生成した例です。現在のパレット
- を、各スカラー値から対応するピクセルの色への割り当てに使用します。
+ この図は、スカラー値の配列から温度分布を生成した例です (訳注: 図が表示
+ されている場合)。現在のパレットを、各スカラー値から対応するピクセルの
+ 色への割り当てに使用します。
        plot '-' matrix with image
        5 4 3 1 0
        2 2 0 0 1
@@ -3558,9 +3558,8 @@ Ffigure_scaled_image
  `binary keywords dx`, `dy`。右の画像を生成するのには、同じ入力画像を、
  それぞれ dx, dy, origin を指定して複数回配置しました。入力 PNG 画像で
  あるビルの絵は 50x128 ピクセルです。高いビルは、`dx=0.5 dy=1.5` で割り
- 当てて描画し、低いビルは、`dx=0.5 dy=0.35` としています (訳注: ここで
- 述べている画像とは、pdflatex を使用したマニュアルだけに現れますので、
- 日本語のマニュアルにはこの図は含まれていないでしょう。)
+ 当てて描画し、低いビルは、`dx=0.5 dy=0.35` としています (訳注: 図が表
+ 示されている場合)。
 
  スタイル `image` は、グレイスケール (灰色階調)、またはカラーパレット値
  を含んでいるピクセルの入力を処理します。よって 2 次元描画 (`plot` コマ
@@ -3623,7 +3622,7 @@ Ffigure_impulses
 ?plotting styles labels
 ?style labels
 ?labels
-Ffigure_labels
+Ffigure_labels1
  スタイル `labels` は、データファイルから座標と文字列を読み込み、その文
  字列をその 2 次元、または 3 次元座標に置きます。これは基本的に 3 列、
  または 4 列の入力を必要とします。余分な入力列は、フォントサイズか文字
@@ -3654,10 +3653,18 @@ Ffigure_labels
 
    plot 'cities.dat' using 5:4:1 with labels hypertext point pt 7
 
- スタイル `labels` は 3 次元描画でも使用できます。この場合 X,Y,Z と文字
- 列、の 4 つの入力列指定が必要です。
+Ffigure_labels2
+ スタイル `points` であらかじめ定義されている点の記号が適切でない、ある
+ いは十分でない場合、その代わりとしてスタイル `labels` を使うこともでき
+ ます。例えば、以下は単一文字として選択される組を定義し、3 列目のデータ
+ 値に対応するその一つをグラフの各点に割り当てる例です (訳注: 以下のサン
+ プルの <UTF-8 文字列> の部分には、元々、丸に中点記号や□、＋、トランプ
+ 記号などの UTF-8 文字列が並んでいますが、この日本語訳とは両立しないた
+ め取り除いています):
 
-   splot 'datafile' using 1:2:3:4 with labels
+   set encoding utf8
+   symbol(z) = "<UTF-8 文字列>"[int(z):int(z)]
+   splot 'file' using 1:2:(symbol($3)) with labels
 
  以下も参照: `datastrings`, `set style data`。
 2 lines
@@ -3722,10 +3729,8 @@ Ffigure_polar
  力する 2 次元座標を <x>,<y> の代わりに <角>,<半径> と解釈することを
  gnuplot に指示します。すべてではないが、多くの 2 次元描画スタイルが極
  座標モードでも機能します。図は、描画スタイル `lines` と `filledcurves`
- の組み合わせを示しています。(訳注: ここで述べている図とは、pdflatex を
- 使用したマニュアルだけに現れますので、日本語のマニュアルにはこの図は含
- まれていないでしょう。) 以下参照: `set polar`, `set rrange`,
- `set size square`。
+ の組み合わせを示しています。(訳注: 図が表示されている場合) 以下参照:
+ `set polar`, `set rrange`, `set size square`。
 
 2 steps
 ?plotting styles steps
@@ -3873,9 +3878,9 @@ Ffigure_xerrorlines
  `xerrorlines` は `linespoints` に似ていますが、水平の誤差線が描かれる
  ことが違います。各点 (x,y) で、データ列の個数に応じて (xlow,y) から
  (xhigh,y) まで、または (x-xdelta,y) から (x+xdelta,y) までの線分が描か
- れ、そして刻の印が誤差線の端に置かれます (`set bars` が使われていない
- 場合。詳細は、以下参照: `set bars`)。基本的には、3 列か 4 列のデータが
- 必要です:
+ れ、そして刻みの印が誤差線の端に置かれます (`set bars` が使われていな
+ い場合。詳細は、以下参照: `set bars`)。基本的には、3 列か 4 列のデータ
+ が必要です:
 
       3 列:  x  y  xdelta
       4 列:  x  y  xlow  xhigh
@@ -3893,7 +3898,7 @@ Ffigure_xyerrorlines
  かれることが違います。各点 (x,y) で、データ列の個数に応じて、
  (x,y-ydelta) から (x,y+ydelta) までと (x-xdelta,y) から (x+xdelta,y)
  まで、あるいは (x,ylow) から (x,yhigh) までと (xlow,y) から (xhigh,y)
- までの線分が描かれ、そして刻の印が誤差線の端に置かれます (`set bars`
+ までの線分が描かれ、そして刻みの印が誤差線の端に置かれます (`set bars`
  が使われていない場合。詳細は、以下参照: `set bars`)。これは、4 列か 6
  列の入力データが必要です。
 
@@ -3921,8 +3926,8 @@ Ffigure_yerrorlines
  で利用可能です。`yerrorlines` は `linespoints` に似ていますが、垂直の
  誤差線が描かれることが違います。各点 (x,y) で、データ列の個数に応じて
  (x,y-ydelta) から (x,y+ydelta) まで、または (x,ylow) から (x,yhigh)
- までの線分が描かれ、そして刻の印が誤差線の端に置かれます (詳細は、以下
- 参照: `set bars`)。
+ までの線分が描かれ、そして刻みの印が誤差線の端に置かれます (詳細は、以
+ 下参照: `set bars`)。
  これは、3 列か 4 列の入力が必要です。
 
       3 列:  x  y  ydelta
@@ -3940,7 +3945,7 @@ Ffigure_yerrorlines
 ?plotting styles 3d (surface) plots
 =3D
 =surface
-Ffigure_surface
+Ffigure_surface+contours
  曲面描画は、コマンド `plot` ではなくコマンド `splot` を使って生成しま
  す。スタイル `with lines` を使えば、曲面を格子線で生成できます。曲面の
  塗り潰しは、スタイル `with pm3d` で行うことができます。曲面は通常、そ
@@ -3948,18 +3953,18 @@ Ffigure_surface
  その場合、X, Y, Z 軸はすべて描画内に表示されます。3 次元的な錯覚は、隠
  線処理や、曲面要素の深さ整列により、より増幅されます。以下参照:
  `hidden3d`, および `set pm3d` のオプションである `depthorder`。
-Ffigure_surface+contours
  コマンド `splot` は、定数の Z 値に対する等高線を計算し描画することもで
  きます。これらの等高線は、曲面それ自体の上に書くこともできますし、XY
  平面へ射影することもできます。以下参照: `set contour`。
+Ffigure_mapcontours
 3 2 次元射影 (set view map)
 ?2D projection (set view map)
 ?projection
-Ffigure_mapcontours
  コマンド `splot` の特別な場合として、描画の Z 方向の射影による、Z 座標
  の 2 次元曲面への地図作成 (map) があります。以下参照: `set view map`。
- この描画モードは、等高線の描画や温度分布を生成するのに利用できます。
-
+ この描画モードは、等高線の描画や温度分布を生成するのに利用できます。こ
+ の図は描画スタイル `lines` を一度、`labels` を一度描画した等高線を示し
+ ています (訳注: 図が表示されている場合)。
 1 コマンド (Commands)
 ?commands
  このセクションでは `gnuplot` が受け付けるコマンドをアルファベット順に
@@ -4120,78 +4125,77 @@ Ffigure_mapcontours
 ?fit
 ?least-squares
 ?Marquardt
- `fit` コマンドはユーザの与えた式を (x,y) または (x,y,z) の形式のデータ
- 点の集合への当てはめを可能にします。それには Marquardt-Levenberg 法に
- よる非線形最小自乗法 (NLLS) の実装が用いられます。式の内部に現われるユ
- ーザ定義変数はいずれも当てはめのパラメータとして使うことができます。た
- だ、その式の返り値は実数である必要があります。
+ `fit` コマンドでは、(x,y) か (x,y,z) か (x1, x2, x3, ..., xN, z) の形
+ 式のデータ点の集合に、ユーザが与える式を当てはめることができます。それ
+ には、Marquardt-Levenberg 法による非線形最小自乗法  (NLLS) が用いられ
+ ます。ここで、仮変数 x1, ..., xN の名前は、`set dummy` コマンドを使う
+ か、または `fit` コマンドラインのインライン範囲指定を使うかのいずれか
+ で割り当てる必要があります。数式は、実数値として評価されるものでなけれ
+ ばいけません。当てはめの最中に変化しうるパラメータは、キーワード `via`
+ で指定します。
 
  書式:
        fit {<ranges>} <expression>
            '<datafile>' {datafile-modifiers}
            via '<parameter file>' | <var1>{,<var2>,...}
 
- 範囲 (xrange,yrange) は、当てはめられるデータ点を一時的に制限するのに
- 使うことができ、その範囲を超えたデータは全て無視されます。その書式は
- `plot` コマンド同様
+ 範囲 (xrange, yrange 等) は、当てはめに使用するデータを制限する目的で
+ 使うことができ、その範囲を超えたデータは無視します。その書式は `plot`
+ コマンド同様 
        [{dummy_variable=}{<min>}{:<max>}],
  です。以下参照: `plot ranges`。
 
- <expression> は通常はあらかじめユーザ定義された f(x) または f(x,y) の
- 形の関数ですが、`gnuplot` で有効な任意の数式を指定できます。
+ <expression> は、通常はあらかじめユーザ定義された f(x) または f(x,y)
+ の形の関数ですが、`gnuplot` で有効などんな数式でも指定できます。
 
  <datafile> は `plot` コマンドと同様に扱われます。`plot datafile` の修
  飾子 (`using`, `every`,...) は、`smooth` を除いて、全て `fit` に使うこ
  とができます。以下参照:`plot datafile`。
 
- 当てはめる 1 変数関数 z=f(x) へのデフォルトのデータの書式は z か x:z
- です。つまり、データが 1 列しかなければそれは従属変数値 (関数値) と見
- なされ、行番号が独立変数値 (変数値) となり、2 列のデータがあれば、1 列
- 目が独立変数値、2 列目が従属変数値となります。
+ 当てはめ関数は、最大で 5 つ (gnuplot 4.7 ではそれ以上) の独立変数を持
+ つことができます。`using` 指定が足りない場合は、fit は独立変数は 1 つ
+ だけだと暗黙で仮定します:
 
- これらの形式はデータファイルへの `using` 指定子で変更でき、例えば z の
- 値を他の列から取ったり、あるいは複数の列から計算した値とすることができ
- ます。3 番目の `using` 指定 (列番号、または数式) が与えられた場合は、
- それは対応する z の値の標準偏差として解釈され、それはそのデータへの重
- み (=1/s**2) を計算するのに使われます。そうでなければ、全てのデータは
- 同じ重み (1) で計算されます。`using` オプションを全く指定しなかった場
- 合、3 列目のデータがあった場合でもデータから z の偏差は読まれませんの
- で、その場合は重み 1 になります。
+       z                           # 独立変数は 1 つ (行番号)
+       x:z                         # 独立変数は 1 つ (第 1 列)
 
- 2 変数関数 z=f(x,y) を当てはめる場合、データの書式は `using` による 4
- つの項目 x:y:z:s が要求されます。これは完全に全てが与えられなければな
- らず、不足する項目に対してはどの列もデフォルトは仮定されていません。各
- データ点の重みは上と同様に 's' から計算されます。もし誤差評価を持って
- いなければ、定数値を定数式として指定すればいいでしょう (以下参照:
- `plot datafile using`)。例えば `using 1:2:3:(1)` のように。
+ `using` 指定の追加列については、以下のように解釈します:
 
- 当てはめ関数には、独立変数を 5 つまで持たせられますが、1 変数以外の場
- 合は、その独立変数の個数よりも 2 つ多い `using` 指定をしなければいけま
- せん。許される書式、そしてデフォルトのダミー変数名は以下の通りです:
+       x:z:s                       # 独立変数は 1 つ (全部で 3 列)
+       x:y:z:s                     # 独立変数は 2 つ (全部で 4 列)
+       x1:x2:x3:z:s                # 独立変数は 3 つ (全部で 5 列)
+       x1:x2:x3:...:xN:z:s         # 独立変数は N 個 (全部で N+2 列)
 
-       z
-       x:z
-       x:z:s
-       x:y:z:s
-       x:y:t:z:s
-       x:y:t:u:z:s
-       x:y:t:u:v:z:s
+ 3 列以上を与えた場合は、最後の列は対応する z の値の標準偏差として解釈
+ し、それをデータへの重み (=1/s**2) を計算するのに使います。
 
- ダミー変数名は、下にあげるように範囲指定によって変更できます。最初の範
- 囲は `using` 指定の最初のものに対応し、以下同様です。z (従属変数) の範
- 囲も指定できますが、その名前は変更できません。
+ データファイルの内容は、plot コマンドに使用するのと同じ `using` 指定を
+ 使うことで柔軟に解釈させることができます。例えば、独立変数 x を2 列目
+ と 3 列目の和として生成し、z の値を 6 列目から取り、重みを 1 としたい
+ 場合は以下のようにします:
+
+       fit ... using ($2+$3):6:(1)
+
+ 独立変数が 1 つ以外の場合は、その独立変数の個数よりも 2 つ多い `using`
+ 指定 (z と s の分) をしなければいけません。 
+
+ 仮変数名は、下で紹介するように範囲指定で指定することで変更できます。最
+ 初の範囲は `using` 指定の最初のものに対応し、以下同様です。従属変数で
+ ある z の範囲指定もできますが、それは、f(x,...) の値をその範囲外にして
+ しまうようなデータ点が、残差を最小化することには寄与しない場合に有効で
+ す。
 
  複数のデータ集合も複数の 1 変数関数に同時に当てはめることも、y を '仮
  変数' とすれば可能です。例えばデータ行番号を使い、2 変数関数への当ては
  め、とすればいいでしょう。以下参照: `fit multi-branch`。
 
- `via` 指定子は、パラメータの調節を直接か、またはパラメータファイルを参
- 照することによって行うかを指定します。
+ `via` 指定子は、パラメータの最適化を、直接行うか、またはパラメータファ
+ イルを参照することによって行うかを指定します。
 
  例:
        f(x) = a*x**2 + b*x + c
        g(x,y) = a*x**2 + b*y**2 + c*x*y
-       FIT_LIMIT = 1e-6
+       set fit limit 1e-6
        fit f(x) 'measured.dat' via 'start.par'
        fit f(x) 'measured.dat' using 3:($7-5) via 'start.par'
        fit f(x) './data/trash.dat' using 1:2:3 via a, b, c
@@ -4199,9 +4203,12 @@ Ffigure_mapcontours
        fit a0 + a1*x/(1 + a2*x/(1 + a3*x)) 'measured.dat' via a0,a1,a2,a3
        fit a*x + b*y 'surface.dat' using 1:2:3:(1) via a,b
        fit [*:*][yaks=*:*] a*x+b*yaks 'surface.dat' u 1:2:3:(1) via a,b
-       fit a*x + b*y + c*t 'foo.dat' using 1:2:3:4:(1) via a,b,c
-       h(x,y,t,u,v) = a*x + b*y + c*t + d*u + e*v
-       fit h(x,y,t,u,v) 'foo.dat' using 1:2:3:4:5:6:(1) via a,b,c,d,e
+
+       fit [][][t=*:*] a*x + b*y + c*t 'foo.dat' using 1:2:3:4:(1) via a,b,c
+
+       set dummy x1, x2, x3, x4, x5
+       h(x1,x2,x3,x4,s5) = a*x1 + b*x2 + c*x3 + d*x4 + e*x5
+       fit h(x1,x2,x3,x4,x5) 'foo.dat' using 1:2:3:4:5:6:(1) via a,b,c,d,e
 
  反復の個々のステップの後で、当てはめの現在の状態についての詳細な情報が
  画面に表示されます。そし最初と最後の状態に関する同じ情報が "fit.log"
@@ -4219,14 +4226,15 @@ Ffigure_mapcontours
  があるような場合でも、Marquardt-Levenberg ルーチンがより早く、より信頼
  性のある値に収束させられるようになります。
 
- 当てはめの反復は Ctrl-C を押すことで中断できます。現在の反復が正常に終
- 了した後、
+ 当てはめの反復は Ctrl-C (wgnuplot では Ctrl-Break) を押すことで中断で
+ きます。現在の反復が正常に終了した後、以下のいずれかを選ぶことができま
+ す:
  (1) 当てはめを止めて現在のパラメータの値を採用する
  (2) 当てはめを続行する
- (3) 環境変数 FIT_SCRIPT で指定した `gnuplot` コマンドを実行する
- のいずれかを選ぶことができます。FIT_SCRIPT のデフォルトは `replot` で
- あり、よってもしデータと当てはめ関数を一つのグラフにあらかじめ描画して
- あれば、現在の当てはめの状態を表示することができます。
+ (3) `set fit script` か、環境変数 `FIT_SCRIPT` で指定した `gnuplot` コ
+ マンドを実行する。そのデフォルトは `replot` で、もしデータと当てはめ関
+ 数を一つのグラフにあらかじめ描画してあれば、現在の当てはめの状態を表示
+ することができます。
 
  `fit` が終了した後は、最後のパラメータの値を保存するのに `update` コマ
  ンドを使います。その値は再びパラメータの値として使うことができます。
@@ -4301,13 +4309,13 @@ Ffigure_mapcontours
  は、パラメータの新しい値の組に対して WSSR を計算します。Marquardt-
  Levenberg のアルゴリズムは次のステップのパラメータの値を選択します。そ
  してそれはあらかじめ与えた基準、すなわち、(1) 当てはめが "収束した"
- (WSSR の相対誤差が FIT_LIMIT より小さくなった場合)、または (2) あらか
- じめ設定された反復数の限界 FIT_MAXITER (以下参照:
- `fit control variables`) に達した場合、のいずれかを満たすまで続けられ
- ます。キーボードからその当てはめの反復は中断できますし、それに続いて中
- 止することもできます (以下参照: `fit`)。ユーザ変数 FIT_CONVERGED は、
- 直前の fit コマンドが収束により終了した場合は 1 を含み、それ以外の理由
- で中断した場合は 0 を含みます。
+ (WSSR の相対誤差がある限界値より小さくなった場合。以下参照:
+ `set fit limit`)、または (2) あらかじめ設定された反復数の限界に達した
+ 場合 (以下参照: `set fit maxiter`)、のいずれかを満たすまで続けられます。
+ キーボードからその当てはめの反復は中断できますし、それに続いて中止する
+ こともできます (以下参照: `fit`)。ユーザ変数 FIT_CONVERGED は、 直前の
+ fit コマンドが収束により終了した場合は 1 を含み、それ以外の理由で中断
+ した場合は 0 を含みます。
 
  当てはめに使われる関数はしばしばあるモデル (またはある理論) を元にして
  いて、それはデータの振舞を記述したり、あるいは予測しようとします。よっ
@@ -4337,7 +4345,7 @@ Ffigure_mapcontours
  ります。正確なデータ誤差評価が与えられている場合には、パラメータの誤差
  評価等の `fit` が出力する情報はより役に立つでしょう。
 
- 'statistical overview' では `fit` の出力のいくつかを説明し、
+ `statistical overview` では `fit` の出力のいくつかを説明し、
  'practical guidelines' に対する背景を述べています。
 4 統計的な概要 (statistical overview)
 ?commands fit error statistical_overview
@@ -4364,10 +4372,14 @@ Ffigure_mapcontours
  されたχ自乗' とも呼ばれる残差の分散をレポートします。自由度 (データ点
  の数から当てはめパラメータの数を引いたもの) はこれらの評価で使用されま
  す。なぜなら、データ点の残差の計算で使われるパラメータは同じデータから
- 得られるものだからです。これらの値は以下の変数に代入されます:
+ 得られるものだからです。データ点が重みを持つ場合、`gnuplot` はいわゆる
+ p-値を計算します。それはその自由度と結果のχ自乗値に対するχ自乗分布の
+ 累積分布関数値を 1 から引いた値です。以下参照: `practical_guidelines`。
+ これらの値は以下の変数に代入されます:
        FIT_NDF = 自由度の数
        FIT_WSSR = 重みつき残差の自乗和
        FIT_STDFIT = sqrt(WSSR/NDF)
+       FIT_P = p-値
 
  パラメータに関する信頼レベルを評価することで、当てはめから得られる最小
  のχ自乗と、要求する信頼レベルのχ自乗の値を決定するためのχ自乗の統計
@@ -4421,7 +4433,7 @@ Ffigure_mapcontours
  もし妥当なデータ誤差を与え、データ点が十分多く、モデルが正しければ、
  補正χ自乗値はほぼ 1 になります (詳細は、適当な統計学の本の 'χ自乗分
  布' の項を参照してください)。この場合、この概要に書かれていること以外
- に、モデルがデータにどれくらい良く当てはっているかを決定するための追加
+ に、モデルがデータにどれくらい良く当てまっているかを決定するための追加
  の試験方法がいくつかあります。
 
  補正χ自乗が 1 よりはるかに大きくなったら、それは不正なデータ誤差評価、
@@ -4438,6 +4450,16 @@ Ffigure_mapcontours
  の当てはめになっているのでしょう。最後の場合は、よりシンプルな関数にす
  ればうまく行くでしょう。
 
+ 当てはめの p-値は、自由度と結果のχ自乗値に対するχ自乗分布の累積分布
+ 関数値を 1 から引いた値です。これは、当てはめの良さのものさしを提供し
+ ます。p-値の範囲は 0 から 1 までで、p-値がとても小さい、あるいはとても
+ 大きい場合は、モデルがデータとその誤差をちゃんと記述していないことを意
+ 味します。上で述べたように、これはデータに問題があるか、誤差かモデルに
+ 問題がある、またはそれらの組み合わせなのだろうと思います。p-値が小さい
+ ことは、誤差が過小評価されているので、よって最終的なパラメータ誤差をス
+ ケール変換すべきだろうということを意味するでしょう。以下も参照:
+ `set fit errorscaling`。
+
  標準的なエラーを、パラメータの不確定性に関する、あるより現実的な評価に
  関係付けること、および相関行列の重要性を評価することができるようになる
  前に、あなたは `fit` と、それを適用しようとするある種の問題に慣れてお
@@ -4451,13 +4473,21 @@ Ffigure_mapcontours
 3 制御 (control)
 ?commands fit control
 ?fit control
- `fit` に影響を与えるために定義できるたくさんの `gnuplot` の変数があり
- ます。それらは `gnuplot` の動作中に一度定義できますが、それは
- `control_variable` で紹介し、`gnuplot` が立 ち上がる前に設定する変数は
- `environment_variables` で紹介します。
+ コマンド `fit` の設定は、`set fit` で制御します。以前の `gnuplot` のユ
+ ーザ変数は、バージョン 4.7 で非推奨となっています。以下参照:
+ `fit control variables`。
+
+ `gnuplot` の起動前に `fit` に影響を与えるように定義できる多くの環境変
+ 数があります。以下参照: `fit control environment`。
 4 制御変数 (control variables)
 ?commands fit control variables
 ?fit control variables
+=FIT_LIMIT
+=FIT_MAXITER
+=FIT_START_LAMBDA
+=FIT_LAMBDA_FACTOR
+ ここで説明するユーザ定義変数は、非推奨です。以下参照: `set fit`。
+
  デフォルトのもっとも小さい数字の限界 (1e-5) は、変数
        FIT_LIMIT
  で変更できます。残差の平方自乗和が 2 つの反復ステップ間で、この数値よ
@@ -4493,6 +4523,8 @@ Ffigure_mapcontours
 4 環境変数 (control environment)
 ?commands fit control environment
 ?fit control environment
+=FIT_LOG
+=FIT_SCRIPT
  環境変数は `gnuplot` が立ち上がる前に定義しなければなりません。その設
  定方法はオペレーティングシステムに依存します。
 
@@ -4504,7 +4536,8 @@ Ffigure_mapcontours
        FIT_SCRIPT
  は、ユーザが中断した後に実行するコマンドを指定します。デフォルトでは
  `replot` ですが、`plot` や `load` コマンドとすれば、当てはめの進行状
- 況の表示をカスタマイズするのに便利でしょう。
+ 況の表示をカスタマイズするのに便利でしょう。その設定は、
+ `set fit script` を使って変更できます。
 3 複数の当てはめ (multi-branch)
 ?commands fit multi-branch
 ?fit multi-branch
@@ -5334,8 +5367,9 @@ Ffigure_mapcontours
 
  いくつかの数字は省略することができます; 増分のデフォルトは 1 、開始の
  値は最初のポイントか最初のブロック、そして終了の値は最後のポイントか最
- 後のブロックに設定されます。`every` が指定されないなら、全ての行の全て
- のポイントがプロットされます。
+ 後のブロックに設定されます。`every` のオプションが ':' で終わるのは許
+ されていません。`every` が指定されないなら、全ての行の全てのポイントが
+ プロットされます。
 
  例:
         every :::3::3   # 4 番目のブロックだけ選ばれます (0 番が最初)
@@ -5625,7 +5659,7 @@ Ffigure_mapcontours
  にします:
  例:
       binwidth = <適当な値>  # x の値の各階級幅
-      bin(val) = binwidth * int(val/binwidth)
+      bin(val) = binwidth * floor(val/binwidth)
       plot "datafile" using (bin(column(1))):(1.0) smooth frequency
  以下も参照。
 ^ <a href="http://www.gnuplot.info/demo/smooth.html">
@@ -5681,11 +5715,13 @@ Ffigure_mapcontours
  オプション `kdensity` は、ガウス核を用いた、ランダム選択点の核密度評価
  (それは滑らかなヒストグラムになります) を描画する方法の一つです。ガウ
  ス核が第 1 列の各点の位置に置かれ、これらのガウス核すべての和が関数と
- して描画されます。2 列目の値は、ガウス核の重みとして使用されます。(正
- 規化されたヒストグラムを得るには、これを 1/(点の個数) とすべきです。)
- デフォルトでは、gnuplot は正規分布の入力データに対して最適となるような
- バンド幅を計算し使用します (これは通常はとても保守的で、すなわち幅広
- いバンド幅です) が、バンド幅を明示的に指定することもできます。
+ して描画されます。2 列目の値は、ガウス核の重みとして使用されます。正規
+ 化されたヒストグラムを得るには、これを 1/(点の個数) とすべきです。デフ
+ ォルトでは、gnuplot は正規分布のデータに対して最適となるようなバンド幅
+ を計算し使用します。
+      default_bandwidth = sigma * (4/3N) ** (0.2)
+ これは通常はとても保守的で、すなわち幅広いバンド幅です。バンド幅は、明
+ 示的に指定することもできます。
       plot $DATA smooth kdensity bandwidth <value> with boxes
  前の描画で使用されたバンド幅は、変数 GPVAL_KDENSITY_BANDWIDTH に保存さ
  れます。
@@ -5912,8 +5948,8 @@ Ffigure_mapcontours
 ?using examples
  次の例は、1 番目のデータに対する 2 番目と 3 番目の和の値を plot します。
  書式文字列は、各列データがスペース区切りでなく、コンマ区切りであること
- を指示していますが、同じことが `set datafile separator ","` を指定する
- ことでも可能です。
+ を指示していますが、同じことが `set datafile separator comma` を指定す
+ ることでも可能です。
        plot 'file' using 1:($2+$3) '%lf,%lf,%lf'
 
  次の例は、より複雑な書式指定でデータをファイル "MyData" から読み込み
@@ -6261,7 +6297,7 @@ Ffigure_mapcontours
 ?sampling
 ?commands plot sampling
 ?plot sampling
-+=sample
+=sample
  デフォルトでは、関数や疑似ファイル "+" で生成されるデータは、描画範囲
  全体にわたって標本化 (sample) されます。この範囲は、plot コマンドの直
  前に前もって明示的にグローバルな範囲指定をコマンド `set xrange` で指定
@@ -6654,8 +6690,8 @@ Ffigure_mapcontours
  コマンドの引数に (暗黙の ',' と共に) 追加され、それから再実行されます。
  `replot` は、範囲 (range) を除いては、`plot` や `splot` と同じ引数を
  とることができます。よって、直前のコマンドが `splot` ではなく `plot`
- の場合は、関数をもう一つの軸刻でプロットするのに `replot` を使うことが
- できます。
+ の場合は、関数をもう一つの軸刻みでプロットするのに `replot` を使うこと
+ ができます。
 
  注意:
 
@@ -6881,7 +6917,7 @@ Ffigure_mapcontours
                        {filled | empty | nofilled}
                        {front | back}
                        {linestyle <line_style>}
-                       {linetype <line_type>} {linewidth <line_width}
+                       {linetype <line_type>} {linewidth <line_width>}
 
        unset arrow {<tag>}
        show arrow {<tag>}
@@ -6982,13 +7018,19 @@ Ffigure_mapcontours
  それは `gnuplot` にその軸の最小値、または最大値のみを自動縮尺させるこ
  とになります。軸も何も指定されていない場合は全ての軸が対象となります。
 
- `fixmin` や `fixmax` や `fix` を追加指定すると、等間隔の目盛りの自動縮
- 尺時の、次の目盛り位置までの範囲の自動拡大を gnuplot に行わせないよう
- にします。`set autoscale fix` はこれを全ての軸に対して設定します。コマ
- ンド `set autoscale keepfix` は、直前の `fix` の設定を維持したまま全て
- の軸を自動縮尺にします。
+?noextend
+ デフォルトでは、自動縮尺機能は軸の範囲の限界を、描画データ全体を含む、
+ 最も近い目盛りラベル位置に設定します。キーワード `fixmin`, `fixmax`,
+ `fix`, `noextend` は、次の目盛り位置までの範囲の自動拡大を gnuplot に
+ 行わせないようにします。その場合軸の範囲の限界は、一番端にあるデータ点
+ の座標値に完全に一致します。`set autoscale noextend` は、
+ `set autscale fix` と同じです。軸の範囲指定コマンドの後ろにキーワード
+ `noextend` を追加すれば、一つの軸の範囲の延長機能だけ無効にすることも
+ できます。例:
+      set yrange [0:*] noextend
 
- `set autoscale noextend` は `set autoscale fix` と同じ意味です。
+ `set autoscale keepfix` は、fix の設定を変更せずに残したまま、すべての
+ 軸を自動縮尺にします。
 
  自動縮尺機能を使うときは、描画範囲は自動的に割り出され、従属変数軸
  (`plot` のときは y 軸、`splot` のときは z 軸) は、関数やデータの値域が
@@ -7111,7 +7153,7 @@ Ffigure_mapcontours
  `small` は 0.0, `large` は 1.0 と同じです。サイズを指定しなければデフォ
  ルトの値は 1.0 です。
 
- キーワード `fullwidth` は、errorbar を伴う boxplots と histograms にの
+ キーワード `fullwidth` は、errorbar を伴う boxplot と histograms にの
  み関連します。これは errorbar の両端の幅を、対応する箱の幅と同じに設定
  しますが、箱の幅自体を変更することはありません。
 
@@ -7325,24 +7367,9 @@ Ffigure_mapcontours
 ?unset clabel
 ?show clabel
 ?clabel
- `gnuplot` は、clabel が設定されている時には、各々の等高線のレベルに対
- して使う線種を変化させます。このオプションが有効な場合 (デフォルト)、
- 凡例によって各々の線種を、それが表す z のレベルとともに表示されます。
-
- 書式:
-       set clabel {'<format>'}
-       unset clabel
-       show clabel
-
- 書式文字列のデフォルトは %8.3g で、小数部分は 3 桁表示されます。もし凡
- 例がそのデフォルトの値から変更されていれば、その配置は不十分なものにな
- るかもしれません。
-
- 最初の等高線の線種、または clabel が無効である場合の唯一つの等高線の線
- 種は、(曲面の線種 +1) になります。等高線の点は曲面の点と同じものになり
- ます。
-
- 以下参照: `set contour`。
+ このコマンドは非推奨です。代わりに `set cntrlabel` を使用してください。
+ `unset clabel` は `set cntrlabel onecolor` に、`set clabel "format"`
+ は `set cntrlabel format "format"` に置き換わっています。
 3 clip
 ?commands set clip
 ?commands unset clip
@@ -7397,6 +7424,36 @@ Ffigure_mapcontours
 
  `set clip` は `set clip points` と同義です。`unset clip` は 3 種の
  クリップ型全てを無効にします。
+3 cntrlabel
+?commands set cntrlabel
+?commands show cntrlabel
+?set cntrlabel
+?show cntrlabel
+?cntrlabel
+ 書式:
+       set cntrlabel {format "format"} {font "font"}
+       set cntrlabel {start <int>} {interval <int>}
+       set contrlabel onecolor
+
+ `set cntrlabel` は、凡例内 (デフォルト) か、`splot ... with labels` の
+ 際のグラフ上の等高線のラベルを制御します。後者の場合、ラベルはラベル記
+ 述属性の "pointinterval" に従って各等高線に沿って配置されます。デフォ
+ ルトではラベルは等高線を構成する 5 番目の線分の上に置かれ、20 個の線分
+ 毎に繰り返されます。
+ このデフォルトは、以下と同じです:
+       set cntrlabel start 5 interval 20
+ これらの値はコマンド `set cntrlabel` で、あるいは `splot` コマンドに間
+ 隔を指定することで変更できます:
+       set contours; splot $FOO with labels point pointinterval -1
+ 間隔を負の値に設定すると、ラベルは各等高線に 1 つだけつきます。しかし
+ `set samples` か `set isosamples` が大きな値の場合は多くの等高線をラベ
+ ル一つだけで描きます。
+
+ 凡例 (key) には、等高線ラベルをそれぞれの線種 (linetype) を使用して書
+ きます。デフォルトでは、線種自身が各等高線のレベルを与えるので、それぞ
+ れに対する別々のラベルが現れます。コマンド `set cntrlabel onecolor` は
+ すべての等高線を同じ線種で描画するので、凡例には一つのラベルのみを書き
+ ます。このコマンドは、古いコマンド `unset clabel` を置き換えるものです。
 3 cntrparam
 ?commands set cntrparam
 ?commands show cntrparam
@@ -7488,7 +7545,7 @@ Ffigure_mapcontours
        set cntrparam levels incremental 100,50
 
  等高線を描く場所の制御に関しては、以下参照: `set contour`。等高線のラ
- ベルの書式と線種の制御に関しては、以下参照: `set clabel`。
+ ベルの書式と線種の制御に関しては、以下参照: `set cntrlabel`。
 
  以下も参照してください。
 ^ <a href="http://www.gnuplot.info/demo/contours.html">
@@ -7578,6 +7635,7 @@ Ffigure_mapcontours
 ?unset contour
 ?show contour
 ?contour
+?contours
 ?nocontour
  コマンド `set contour` は曲面の等高線を引くことを指示します。このオプ
  ションは `splot` でのみ有効です。これは、格子状データ (grid data) を必
@@ -7596,7 +7654,7 @@ Ffigure_mapcontours
 
  等高線の描画に影響を与えるパラメータについては、以下参照:
  `set cntrparam`。等高線のラベルの制御に関しては、以下参照:
- `set clabel`。
+ `set cntrlabel`。
 
  等高線のみのグラフを得るために、曲面自身の描画をしないようにすることも
  できます (以下参照: `unset surface`)。`set size` を使って、グラフを画
@@ -7721,7 +7779,10 @@ Ffigure_missing
  (c), (d) のグラフに見られるように、古い gnuplot では NaN を using の指
  定の仕方によって異なった処理をしていました。現在は、gnuplot は入力列と
  して N と指定されていても ($N) と指定されていても NaN に対しては同じ処
- 理を行います。
+ 理を行います。以下のデモも参照してください。
+^ <a href="http://www.gnuplot.info/demo/mgr.html">
+ imageNaN デモ。
+^ </a>
 
 4 set datafile separator
 ?set datafile separator
@@ -7735,7 +7796,7 @@ Ffigure_missing
  ょう。デフォルトのデータ列の分離文字は空白 (whitespace) です。
 
  書式:
-       set datafile separator {whitespace | tab | comma | "<char>"}
+       set datafile separator {whitespace | tab | comma | "<chars>"}
 
  例:
        # タブ区切りのファイルを入力
@@ -7743,6 +7804,9 @@ Ffigure_missing
 
        # コンマ区切りのファイルを入力
        set datafile separator comma
+
+       # 入力ファイルが * か | のいずれかで区切られた列を持つ場合
+       set datafile separator "*|"
 4 set datafile commentschars
 ?set datafile commentschars
 ?commentschars
@@ -7854,7 +7918,7 @@ Ffigure_missing
 ?show dgrid3d
 ?dgrid3d
 ?nodgrid3d
-?kdensity2d
+=kdensity
  コマンド `set dgrid3d` は、非格子状データから格子状データへの写像機能を
  有効にし、そのためのパラメータを設定します。格子状データの構造について
  の詳細は、以下参照: `splot grid_data`。
@@ -7920,15 +7984,15 @@ Ffigure_missing
  dy は、データ点が格子点へ「データそれ自身の単位で」の寄与を行う範囲の
  制御を可能にします。
 
- オプションキーワード `kdensity2d` は、重み付け関数名の後ろで (オプショ
- ンの) スケール変換のパラメータの前に置くもので、これはアルゴリズムを変
- 更して、格子点用に計算する値を重みの和 ( z = Sum_i w(d_i) * z_i ) では
- 割らないようにします。z_i がすべて定数の場合、これは事実上 2 変数の重
- み付け評価を描画します: (上の 5 つのうちの一つの) 重み付け関数が各デー
- タ点に置かれ、それらの重みの和がすべての格子点で評価され、そして元のデ
- ータの代わりにこの滑らかな曲面が描画されます。これは、1 次元のデータ集
- 合に対する `smooth kdensity` オプションが行うこととおおまかには同じで
- す (使用例は kdensity2d.dem を参照してください)。
+ オプションキーワード `kdensity` は、重み付け関数名の後ろで (オプション
+ の) スケール変換のパラメータの前に置くもので、これはアルゴリズムを変更
+ して、格子点用に計算する値を重みの和 ( z = Sum_i w(d_i) * z_i ) では割
+ らないようにします。z_i がすべて定数の場合、これは事実上 2 変数の重み
+ 付け評価を描画します: (上の 5 つのうちの一つの) 重み付け関数が各データ
+ 点に置かれ、それらの重みの和がすべての格子点で評価され、そして元のデー
+ タの代わりにこの滑らかな曲面が描画されます。これは、1 次元のデータ集合
+ に対する `smooth kdensity` オプションが行うこととおおまかには同じです
+ (使用例は kdensity2d.dem を参照してください)。
 
  後方互換性のために、わずかに異なる書式もサポートされています。どのアル
  ゴリズムも明示的に選択しなかった場合、`qnorm` アルゴリズムが仮定され、
@@ -7954,6 +8018,7 @@ Ffigure_missing
 ?commands show dummy
 ?set dummy
 ?show dummy
+?unset dummy
 ?dummy
  コマンド `set dummy` はデフォルトの仮変数名を変更します。
 
@@ -7972,14 +8037,14 @@ Ffigure_missing
        set dummy t
        plot sin(t), cos(t)
 
- このコマンドでは、少なくとも一つの仮変数が設定される必要があります。
- `set dummy` だけだとエラーメッセージが表示されます。
-
  例:
        set dummy u,v
        set dummy ,s
 
- 第二の例は、2 番目の変数を s とします。
+ 第二の例は、2 番目の変数を s とします。仮変数名をデフォルトの値に戻す
+ には以下のようにしてください。
+
+       unset dummy
 3 encoding
 ?commands set encoding
 ?commands show encoding
@@ -7990,6 +8055,7 @@ Ffigure_missing
 =UTF-8
 =SJIS
  コマンド `set encoding` は文字のエンコード (encoding) を選択します。
+
  書式:
        set encoding {<value>}
        set encoding locale
@@ -8033,25 +8099,47 @@ Ffigure_missing
 ?commands show fit
 ?set fit
 ?show fit
- `fit` の設定は、コマンド `fit` がその出力を行うファイルを定義します。
+?set fit quiet
+?set fit verbose
+?set fit brief
+?set fit results
+?set fit prescale
+?set fit limit
+?set fit maxiter
+?set fit errorscaling
+?set fit errorvariables
+?set fit logfile
+?set fit script
+ コマンド `set fit` は、`fit` コマンド用のオプションを制御します。
 
  書式:
-       set fit {logfile {"<filename>"}}
+       set fit {logfile {"<filename>"|default}}
+               {{no}quiet|results|brief|verbose}
                {{no}errorvariables}
                {{no}errorscaling}
                {{no}prescale}
-               {{no}quiet}
+               {maxiter <value>|none}
+               {limit <epsilon>|default}
+               {limit_abs <epsilon_abs>
+               {start-lambda <value>|default}
+               {lambda-factor <value>|default}
+               {script {"<command>"|default}}
        unset fit
        show fit
 
- 引数 <filename> は、単一引用符か二重引用符で囲む必要があります。
+ オプション `logfile` は、`fit` コマンドがその出力を書き出す場所を定義
+ します。 引数 <filename> は、単一引用符か二重引用符で囲む必要がありま
+ す。ファイル名を指定しなかった場合、または `unset fit` を使用した場合
+ は、ログファイルはデフォルトの値である "fit.log"、または環境変数
+ `FIT_LOG` の値にリセットされます。与えられたログファイル名が / か \ で
+ 終っている場合、それはディレクトリ名と解釈され、ログファイルはそのディ
+ レクトリの "fit.log" となります。
 
- ファイル名を指定しなかった場合、または `unset fit` を使用した場合は、
- ログファイルはデフォルトの値である "fit.log"、または環境変数 `FIT_LOG`
- の値にリセットされます。
-
- 与えられたログファイル名が / か \ で終っている場合、それはディレクトリ
- 名と解釈され、ログファイルはそのディレクトリの "fit.log" となります。
+ デフォルトでは、そのログファイルに書かれる情報は、対話型出力にも出力し
+ ます。`set fit quiet` はその対話型出力をオフにし、`results` は最終結果
+ のみを出力します。`brief` は、追加で fit のすべての繰り返しに関して 1
+ 行の要約を提供します。`verbose` は、バージョン 4.7 以前でデフォルトだ
+ った、詳細な繰り返しの報告を行います。
 
  オプション `errorvariables` を ON にすると、`fit` コマンドで計算された
  個々の当てはめパラメータの誤差が、そのパラメータの名前に "_err" をつけ
@@ -8078,8 +8166,28 @@ Ffigure_missing
  効です。ただし、初期値が完全に 0 の当てはめパラメータには、決してこの
  スケール変換は行いません。
 
- デフォルトでは、ログファイルに書き出される情報は画面にも表示されます。
- `set fit quiet` とすればこの画面表示は消えます。
+ 反復数の限界値は、オプション `maxiter` で制限できます。それを 0 か
+ `default` とすると、それは限界がないことを意味します。
+
+ オプション `limit` は、収束を検出するためのもっとも小さい数字の限界
+ (1e-5) のデフォルトの値を変更するのに使えます。自乗残差の和がこの数値
+ 未満の比率の変化しかしない場合は、当てはめは「収束した」と判断されます。
+
+ オプション `limit_abs` は、自乗残差の和の変化の限界 (絶対値) を追加し
+ ます。デフォルトは 0 です。
+
+ アルゴリズムに関する別の制御をしたい場合、そして Marquardt-Levenberg
+ アルゴリズムを良く知っている場合、それに影響を与える以下のオプションが
+ 利用できます: `lambda` の初期値は、通常自動的に ML-行列から計算されま
+ すが、必要ならばオプション `start_lambda` を使ってそれを与えることがで
+ きます。それを `default` とすると、再び自動設定が有効になります。オプ
+ ション `lambda_factor` は、対象とする関数のχ自乗値が意味ありげに増加
+ する/減少するときは常に `lambda` を増加させる/減少させる因子を設定しま
+ す。それを `default` とすると、デフォルトの因子である 10.0 にします。
+
+ オプション `script` は、fit を中断したときに実行する `gnuplot` コマン
+ ドを指定するものです。以下参照: `fit`。この設定はデフォルトの `replot`
+ や環境変数 `FIT_SCRIPT` よりも優先順位は上です。
 3 fontpath
 ?commands set fontpath
 ?commands show fontpath
@@ -8326,14 +8434,14 @@ Ffigure_missing
        %H           時 (00--23; 常に 2 桁)
        %l           時 (1--12; 1 桁または 2 桁)
        %I           時 (01--12; 常に 2 桁)
-       %j           その年の通算日 (1--366)
+       %j           その年の通算日 (001--366)
        %m           月 (01--12)
-       %M           分 (0--60)
+       %M           分 (00--60)
        %p           "am" または "pm"
        %r           "%I:%M:%S %p" の簡略形 (出力のみ)
        %R           "%H:%M" の簡略形 (出力のみ)
-       %S           秒 (出力では 0--60 の整数、入力では実数)
-       %s           2000 年最初からの秒数
+       %S           秒 (出力では 00--60 の整数、入力では実数)
+       %s           1970 年最初からの秒数
        %T           "%H:%M:%S" の簡略形 (出力のみ)
        %U           その年の通算週 (週は日曜日からと数える)
        %w           曜日番号 (0--6, 日曜 = 0)
@@ -8355,14 +8463,14 @@ Ffigure_missing
 #\verb@%H@ & 時 (00--23; 常に 2 桁) \\
 #\verb@%l@ & 時 (1--12; 1 桁または 2 桁) \\
 #\verb@%I@ & 時 (01--12; 常に 2 桁) \\
-#\verb@%j@ & その年の通算日 (1--366) \\
+#\verb@%j@ & その年の通算日 (001--366) \\
 #\verb@%m@ & 月 (01--12) \\
-#\verb@%M@ & 分 (0--60) \\
+#\verb@%M@ & 分 (00--60) \\
 #\verb@%p@ & "am" または "pm" \\
 #\verb@%r@ & \verb@"%I:%M:%S %p"@ の簡略形 (出力のみ)\\
 #\verb@%R@ & \verb@"%H:%M"@ の簡略形 (出力のみ)\\
-#\verb@%S@ & 秒 (出力では 0--60 の整数、入力では実数)\\
-#\verb@%s@ & 2000 年最初からの秒数 \\
+#\verb@%S@ & 秒 (出力では 00--60 の整数、入力では実数)\\
+#\verb@%s@ & 1970 年最初からの秒数 \\
 #\verb@%T@ & \verb@"%H:%M:%S"@ の簡略形 (出力のみ)\\
 #\verb@%U@ & その年の通算週 (週は日曜日からと数える) \\
 #\verb@%w@ & 曜日番号 (0--6, 日曜 = 0) \\
@@ -8390,7 +8498,7 @@ Ffigure_missing
 %%r@"%I:%M:%S %p" の簡略形 (出力のみ)
 %%R@"%H:%M" の簡略形 (出力のみ)
 %%S@秒 (出力では 0--60 の整数、入力では実数)
-%%s@2000 年最初からの秒数
+%%s@1970 年最初からの秒数
 %%T@"%H:%M:%S" の簡略形 (出力のみ)
 %%U@その年の通算週 (週は日曜日からと数える)
 %%w@曜日番号 (0--6, 日曜 = 0)
@@ -8428,7 +8536,7 @@ Ffigure_missing
 ^<tr>    <td><tt>%r</tt></td>    <td><tt>%I:%M:%S %p</tt> の簡略形 (出力のみ)</td></tr>
 ^<tr>    <td><tt>%R</tt></td>    <td><tt>%H:%M</tt> の簡略形 (出力のみ)</td></tr>
 ^<tr>    <td><tt>%S</tt></td>    <td>秒 (出力では 0&ndash;60 の整数、入力では実数)</td></tr>
-^<tr>    <td><tt>%s</tt></td>    <td>2000 年最初からの秒数</td></tr>
+^<tr>    <td><tt>%s</tt></td>    <td>1970 年最初からの秒数</td></tr>
 ^<tr>    <td><tt>%T</tt></td>    <td><tt>%H:%M:%S</tt> の簡略形 (出力のみ)</td></tr>
 ^<tr>    <td><tt>%U</tt></td>    <td>その年の通算週 (週は日曜日からと数える)</td></tr>
 ^<tr>    <td><tt>%w</tt></td>    <td>曜日番号 (0&ndash;6, 日曜 = 0)</td></tr>
@@ -8504,9 +8612,9 @@ Ffigure_missing
        unset grid
        show grid
 
- 格子線は任意の軸の任意の主目盛/副目盛に対して有効/無効にでき、その主目
- 盛りと副目盛りに対する線種、線幅も指定でき、現在の出力装置がサポートす
- る範囲で、あらかじめ定義したラインスタイルを使用することもできます。
+ 格子線は任意の軸の任意の大目盛り/小目盛りに対して有効/無効にでき、その
+ 大目盛りと小目盛りに対する線種、線幅も指定でき、現在の出力装置がサポー
+ トする範囲で、あらかじめ定義したラインスタイルを使用することもできます。
 
  さらに、2 次元の描画では極座標格子も使うことができます。定義可能な区間
  に対して、選択された目盛りを通る同心円と中心からの放射状の線が描かれま
@@ -8518,7 +8626,7 @@ Ffigure_missing
  `gnuplot` は、存在しない目盛りに対する格子の描画の命令は単に無視します。
  しかし、後でその目盛りが有効になればそれに対する格子も描きます。
 
- 副格子線に対する線種を何も指定しなければ、主格子線と同じ線種が使われま
+ 小格子線に対する線種を何も指定しなければ、大格子線と同じ線種が使われま
  す。デフォルトの極座標の角度は 30 度です。
 
  `front` を指定すると、格子線はグラフのデータの上に描かれます。`back`
@@ -8569,22 +8677,18 @@ Ffigure_missing
  各曲面は自分自身と他の曲面で隠される部分も持ちます。曲面上への等高線の
  表示 (`set contour surface`) は機能しません。
 
- 見出しと矢印は常に表示され、影響を受けません。グラフの凡例 (key) も曲
- 面に隠されることはありません。gnuplot バージョン 4.6 では、グラフ上に
- 曲面が一つもない状態でも、hidden3d は `points`, `labels`, `vectors`,
- `impulses` の 3 次元の描画スタイルに影響を与えます。グラフ内の各々の描
- 画をこの処理から明示的に除外したいときは、`with` 指定に特別のオプショ
- ン `nohidden3d` を追加してください。
+ gnuplot バージョン 4.6 では、グラフ上に曲面が一つもない状態でも、
+ hidden3d は `points`, `labels`, `vectors`, `impulses` の 3 次元の描画
+ スタイルに影響を与えます。グラフ内の各々の描画をこの処理から明示的に除
+ 外したいときは、`with` 指定に特別のオプション `nohidden3d` を追加して
+ ください。
 
  hidden3d は、pm3d モードで描画された、塗り潰された曲面には影響を与えま
  せん。pm3d の曲面に対して同様の効果を純粋に得たいならば、これの代わり
  に `set pm3d depthorder` を使ってください。複数の pm3d 曲面に通常の
- `hidden3d` 処理を組み合わせるには、hidden3d 処理の全ての要素を強制的に
- 残りの他の描画要素の後に描画するためのオプション `set hidden3d front`
- を使用し、そして曲面を 2 度描画してください。最初は `with lines lt -2`
- で、2 度目は `with pm3d` で描画します。最初の方では、隠される描画要素
- の計算を行っている間は隠す方の曲面も含まれているのですが、実際にはその
- 曲面自体は描画されません。
+ `hidden3d` 処理を組み合わせるには、オプション `set hidden3d front` を
+ 使用してください。これは、hidden3d 処理の全ての要素を、pm3d 曲面を含む
+ 残りの他の描画要素の後に強制的に描画するものです。
 
  関数値は格子孤立線の交点で評価されます。見ることの出来る線分を求めると
  きは個々の関数値、あるいはデータ点の間はそのアルゴリズムによって線形補
@@ -8825,9 +8929,8 @@ Ffigure_missing
  って凡例を左に置く場合は `set key left Left reverse` という組合せを使
  うのがいいでしょう。
 
- `splot` で等高線を書く場合、凡例には等高線のラベルも表示されます。これ
- らのラベルの並び具合がうまくいかない、または別な位置に小数点を置きたい
- 場合はそのラベルの書式を指定できます。詳細は、以下参照: `set clabel`。
+ `splot` で等高線を書く場合、デフォルトでは凡例に等高線のラベルも表示し
+ ます。その表示は `set cntrlabel format` で調整できます。
 
  例:
 
@@ -8962,6 +9065,7 @@ Ffigure_missing
                  {textcolor <colorspec>}
                  {point <pointstyle> | nopoint}
                  {offset <offset>}
+                 {boxed}
                  {hypertext}
        unset label {<tag>}
        show label
@@ -8984,6 +9088,10 @@ Ffigure_missing
  いずれかが指定でき、それぞれ文章の左、右、真中が指定した点に来るよう
  に配置さるようになります。描画範囲の外にはみ出るような指定も許されま
  すが、座標軸の見出しや他の文字列と重なる場合があります。
+
+ 箱内に入れるラベルをサポートする出力形式もあります。以下参照:
+ `set style textbox`。注意: 今のところ、箱内のラベルは、回転しない文字
+ 列に制限されています。
 
  `rotate` を指定するとラベルは縦書きになります (もちろん出力ドライバが
  対応していれば、ですが)。`rotate by <degrees>` が与えられた場合は、そ
@@ -9035,12 +9143,12 @@ Ffigure_missing
  の書式にしたがって引用符で囲まれた文字列で与える必要があります。以下参
  照: `set xdata`, `set timefmt`。
 
- EEPIC, Imagen, LaTeX, TPIC で出力する場合は、\\ を使うことで見出しを
- 改行させることができます。
+ `set label` に関して有効なオプションは、描画スタイル `labels` でも有効
+ です。以下参照: `labels`。
 
- ラベルの座標と文字列もデータファイルから読み込むことができます (以下参
- 照: `labels`)。
-
+4 examples
+?label examples
+?set label examples
  例:
 
  (1,2) の位置に "y=x" と書く場合:
@@ -9105,10 +9213,8 @@ Ffigure_missing
 
 3 線種 (linetype)
 ?commands set linetype
-?commands unset linetype
 ?commands show linetype
 ?set linetype
-?unset linetype
 ?show linetype
 ?linetype
  コマンド `set linetype` は各種描画に使用される基本的な線種 (linetype)
@@ -9543,6 +9649,7 @@ Ffigure_missing
              {rowsfirst|columnsfirst} {downwards|upwards}
              {scale <xscale>{,<yscale>}} {offset <xoff>{,<yoff>}}
            }
+       set multiplot {next|previous}
        unset multiplot
 
  出力形式 (terminal) によっては、コマンド `unset multiplot` が与えられ
@@ -9602,6 +9709,10 @@ Ffigure_missing
  (columnsfirst) が先に埋められて行きます。描画グラフの積み上げは下方向
  (`downwards`) に、または上方向 (`upwards`) に伸びるようにできます。デ
  フォルトは `rowsfirst` で `downwards` です。
+ コマンド `set multiplot next` と `set multiplot previous` は、レイアウ
+ トオプションを使用している場合のみに関係します。`next` は、格子内の次
+ の位置をスキップし、空白を残します。`prev` は、直前に描画した位置の直
+ 前の格子位置に戻ります。
 
  各描画は `scale` で伸縮を、`offset` で位置の平行移動を行なうことができ
  ます。scale や offset の y の値が省略された場合は、x の値がそれに使用
@@ -9681,14 +9792,14 @@ Ffigure_missing
        set xtics 0, 5, 10
        set xtics add (7.5)
        set mxtics 5
- この場合、大目盛りは 0,5,7.5,10、小目盛は 1,2,3,4,6,7,8,9 の場所
+ この場合、大目盛りは 0,5,7.5,10、小目盛りは 1,2,3,4,6,7,8,9 の場所
        set logscale y
        set ytics format ""
        set ytics 1e-6, 10, 1
        set ytics add ("1" 1, ".1" 0.1, ".01" 0.01, "10^-3" 0.001, \
                       "10^-4" 0.0001)
        set mytics 10
- この場合、大目盛りは指定された書式で、小目盛は対数的に配置
+ この場合、大目盛りは指定された書式で、小目盛りは対数的に配置
 
  デフォルトでは小目盛りの表示は、線形軸ではオフで、対数軸ではオンになっ
  ています。その設定は、大目盛りに対する `axis|border` と `{no}mirror`
@@ -9747,6 +9858,7 @@ Ffigure_missing
          <object-type> <object-properties>
          {front|back|behind} {fc|fillcolor <colorspec>} {fs <fillstyle>}
          {default} {lw|linewidth <width>}
+     unset object <index>
 
  <object-type> は、`rectangle`, `ellipse`, `circle`, `polygon` のいずれ
  かです。個々のオブジェクトの型は、その型に特有の性質もいくつか持ってい
@@ -10893,10 +11005,10 @@ C 下記の以下参照: オプション `positive`, `negative`)。
  長さの比)。
 
  <r> の値を負にするとその意味は違って来ます。<r>=-1 のとき、x 軸、y 軸
- の双方の単位 (つまり 1) の目盛の長さが同一になるよう設定されます。これ
- は `set view equal xy` と同じです。以下参照: `set view equal`。<r>=-2
- のとき、y 軸の単位目盛の長さは x 軸の単位目盛の長さの 2 倍に設定されま
- す。<r> が負の値に関して以下同様です。
+ の双方の単位 (つまり 1) の目盛りの長さが同一になるよう設定されます。こ
+ れは `set view equal xy` と同じです。以下参照: `set view equal`。
+ <r>=-2 のとき、y 軸の単位目盛りの長さは x 軸の単位目盛りの長さの 2 倍
+ に設定されます。<r> が負の値に関して以下同様です。
 
  `gnuplot` が指定されたアスペクト比のグラフをちゃんと書けるかは選択され
  る出力形式に依存します。グラフの領域は出力の指定された部分にちゃんと収
@@ -10943,18 +11055,16 @@ C 下記の以下参照: オプション `positive`, `negative`)。
 
  指定できる描画要素のデフォルトスタイルも設定できます。
 
+ 書式:
        set style arrow <n> <arrowstyle>
+       set style boxplot <boxplot style options>
+       set style circle radius <size>
+       set style ellipse size <size> units {xy|xx|yy}
        set style fill <fillstyle>
        set style histogram <histogram style options>
        set style line <n> <linestyle>
-
- `gnuplot` が object をサポートするようにコンパイルされていれば、以下の
- オプションも有効です:
-
- 書式:
        set style rectangle <object options> <linestyle> <fillstyle>
-       set style circle radius <size>
-       set style ellipse size <size> units {xy|xx|yy}
+       set style textbox {opaque|transparent} {{no}border}
 
 4 set style arrow
 ?commands set style arrow
@@ -11473,7 +11583,18 @@ C 下記の以下参照: オプション `positive`, `negative`)。
 
  楕円の object の定義に関しては以下も参照: `set object ellipse`。2 次元
  の描画スタイルに関しては以下参照: `ellipses`。
+4 set style textbox
+?commands set style textbox
+?commands show style textbox
+?set style textbox
+?unset style textbox
+?show style textbox
+?textbox
 
+ 書式: set style textbox {opaque|transparent}{{no}border}
+
+ このコマンドは、属性 `boxed` による label の表示を制御します。箱付き文
+ 字列をサポートしない出力形式はこのスタイルを無視します。
 3 surface
 ?commands set surface
 ?commands unset surface
@@ -11515,8 +11636,7 @@ C 下記の以下参照: オプション `positive`, `negative`)。
  す: その点が有効な範囲内にある場合は "i"、範囲外の場合は "o"、未定義値
  (undefined) の場合は "u" です。データの書式は、軸のラベルの書式
  (以下参照: `set format`) によって決まり、列は一つの空白で区切られます。
- これは、等高線を生成し、例えば `plot` で描画するなど、それを再利用する
- ために保存したいときに便利です。例については、以下参照: `set contour`。
+ これは、等高線を生成し、それを再利用のために保存したいときに便利です。
  この方法は、補間されたデータを保存するのにも使うことができます (以下参
  照: `set samples`, `set dgrid3d`)。
 
@@ -11603,22 +11723,21 @@ C 下記の以下参照: オプション `positive`, `negative`)。
 ?unset tics
 ?show tics
 ?tics
- 全ての軸の (見出しのつく) 大目盛りの制御を一度に行うことは、コマンド
- `set tics` で可能です。
+ コマンド `set tics` を使えば、全ての軸の見出しのつく目盛りの制御を一度
+ に行うことができます。
 
- 全ての軸の (見出しのつく) 大目盛りは コマンド `set tics` で一度に制御
- できます。目盛りは `unset tics` で消え、`set tics` で (デフォルトの状
- 態の) 目盛りがつきます。各単一軸の大目盛りの制御を行なう同様のコマンド
- があります (`tics` の前に軸名をつけたもの)。
+ 目盛りは `unset tics` で消え、`set tics` で目盛りがつきます (デフォル
+ ト)。個々の軸の目盛りは、これとは別のコマンド `set xtics`, `set ztics`
+ などを使って制御できます。
 
  書式:
        set tics {axis | border} {{no}mirror}
-                {in | out} {scale {default | <major> {,<minor>}}}
+                {in | out} {front | back}
                 {{no}rotate {by <ang>}} {offset <offset> | nooffset}
                 {left | right | center | autojustify}
                 { format "formatstring" } { font "name{,<size>}" }
                 { textcolor <colorspec> }
-       set tics {front | back}
+       set tics scale {default | <major> {,<minor>}}
        unset tics
        show tics
 
@@ -11627,10 +11746,10 @@ C 下記の以下参照: オプション `positive`, `negative`)。
        unset cbtics
 
  tics の `front` または `back` の設定は、2D 描画 (splot は不可) にのみ
- すべての軸に 1 度適用されます。これは、目盛と描画要素が重なった場合に
- 目盛を描画要素の前面に出すか、奥に置くかを制御します。
+ すべての軸に 1 度適用されます。これは、目盛りと描画要素が重なった場合
+ に目盛りを描画要素の前面に出すか、奥に置くかを制御します。
 
- `axis` と `border` は `gnuplot` に目盛り (目盛りの刻自身とその見出し)
+ `axis` と `border` は `gnuplot` に目盛り (目盛りの刻み自身とその見出し)
  を、それぞれ軸につけるのか、境界につけるのかを指示します。軸が境界にと
  ても近い場合、`axis` を使用すると境界が表示されていれば (以下参照:
  `set border`) 目盛りの見出し文字を境界の外に出してしまうでしょう。この
@@ -11643,9 +11762,13 @@ C 下記の以下参照: オプション `positive`, `negative`)。
 
  `in` と `out` は目盛りの刻みを内側に描くか外側に描くかを切り変えます。
 
- 目盛りの刻みのサイズは `scale` で調整できます。<minor> の指定が省略さ
- れた場合は、それは 0.5*<major> になります。デフォルトのサイズは、大目
- 盛りが 1.0 で小目盛りが 0.5 で、これは `scale default` で呼びだせます。
+ `set tics scale` は、目盛りの刻みの大きさを制御します。最初の <major>
+ の値には、自動的に生成され、またユーザも指定できる大目盛り (レベル 0)
+ を指定し、2 つ目の <minor> の値には、自動的に生成され、またユーザも指
+ 定できる小目盛り (レベル 1) を指定します。<major> のデフォルトは 1.0
+ で、<minor> のデフォルトは <major>/2 です。さらに値を追加すれば、レベ
+ ル 2, 3, ... の目盛りの大きさになります。`set tics scale default` でデ
+ フォルトの目盛りの大きさに復帰します。
 
  `rotate` は、文字列を 90 度回転させて出力させようとします。これは、文
  字列の回転をサポートしている出力ドライバ (terminal) では実行されます。
@@ -12397,7 +12520,7 @@ C 度の記号は set encoding locale で出るようになると。
  同じ書式が `ytics`, `ztics`, `x2tics`, `y2tics`, `cbtics` にも適用され
  ます。
 
- `axis` と `border` は `gnuplot` に目盛り (目盛りの刻自身とその見出し)
+ `axis` と `border` は `gnuplot` に目盛り (目盛りの刻み自身とその見出し)
  を、それぞれ軸につけるのか、境界につけるのかを指示します。軸が境界にと
  ても近い場合、`axis` を使用すると目盛りの見出し文字を境界の外に出して
  しまうでしょう。この場合自動的なレイアウトアルゴリズムによる余白設定は
@@ -12496,10 +12619,13 @@ C 度の記号は set encoding locale で出るようになると。
  しい情報については、以下参照: `set format`。もし、文字列が与えられなけ
  れば、デフォルトの数字の見出しが使用されます。
 
- 明示的な形式では 3 つ目のパラメータとして "レベル" (level) を与えるこ
- とができます。デフォルトのレベルは 0 で、これは大目盛りを意味し、レベ
- ルが 1 の場合小目盛りが生成されます。レベルを指定する場合はラベルも必
- ず指定する必要があります。
+ 明示的な形式では 3 つ目のパラメータとしてレベルを指定できます。デフォ
+ ルトのレベルは 0 で、これは大目盛りを意味し、レベル 1 の場合は小目盛り
+ を生成します。ラベルは、小目盛りには決して付きません。大目盛りと小目盛
+ りは gnuplot が自動的に生成しますが、ユーザが明示的に指定もできます。
+ レベルが 2 以上の目盛りは、ユーザが明示的に指定しなければならず、自動
+ 生成の目盛りよりも高い優先度を持ちます。各レベルの目盛りの刻みの大きさ
+ は、`set tics scale` で制御します。
 
  例:
        set xtics ("low" 0, "medium" 50, "high" 100)
@@ -13107,9 +13233,9 @@ C 度の記号は set encoding locale で出るようになると。
 
  よって、非一様な matrix データの構造は以下のようになります:
 
-       <N+1>  <y0>   <y1>   <y2>  ...  <yN>
-        <x0> <z0,0> <z0,1> <z0,2> ... <z0,N>
-        <x1> <z1,0> <z1,1> <z1,2> ... <z1,N>
+       <N+1>  <x0>   <x1>   <x2>  ...  <xN>
+        <y0> <z0,0> <z0,1> <z0,2> ... <z0,N>
+        <y1> <z1,0> <z1,1> <z1,2> ... <z1,N>
          :      :      :      :   ...    :
 
  これらは以下のような 3 つの数字の組に変換されます:
@@ -13263,7 +13389,8 @@ C 度の記号は set encoding locale で出るようになると。
 ?stats
 ?statistics
  書式:
-      stats 'filename' [using N[:M]] [name 'prefix'] [[no]output]]
+      stats 'filename' {using N{:M}} {name 'prefix'} {{no}output}
+
  このコマンドは、ファイルの 1 列、または 2 列のデータの簡単な統計情報を
  提供します。using 指定子は、plot コマンドと同じ形で解釈されますが、
  `index`, `every`, `using` 指定に関する詳細については以下参照: `plot`。
@@ -13401,6 +13528,14 @@ C 度の記号は set encoding locale で出るようになると。
 
        # 番号 100 から 200 までのラベルを unset
        unset for [i=100:200] label i
+3 linetype
+?unset linetype
+ 書式: 
+       unset linetype N
+ 以前に単一の線種に割り当てたすべての特性を削除します。この後にこの線種
+ を使用した場合、特性、色は現在の出力形式にデフォルトで設定されているも
+ のを使用します (すなわち gnuplot 4.6 より前のバージョンで有効だった、
+ いわゆるデフォルトの線種)。
 3 output
 ?unset output
  複数のグラフを一つの出力ファイルに書き出すことができる出力形式もあるの
