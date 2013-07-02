@@ -19,6 +19,10 @@
 	* docs/Makefile.am:  Modify build commands for gnuplot.texi so that
 	xemacs and newer emacs (25.1) are happy.
 
+	* docs/doc2texi.el:  Map terminal HELP sections to level 3 (subsection)
+	and level 4 (subsubsection) rather than levels 4 and 5.
+	Bug #1226
+
 2013-07-02  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* docs/gnuplot-ja.doc:  Sync translation to version 1.810
