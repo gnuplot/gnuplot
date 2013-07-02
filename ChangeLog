@@ -1,3 +1,9 @@
+2013-07-02  Ulrich Müller  <ulimueller@users.sf.net>
+
+	* docs/doc2texi.el:  Provide a substitute for the lisp routine
+	replace-regexp-in-string, which is missing in xemacs prior to version
+	25.1.something.
+
 2013-07-02  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* docs/gnuplot.doc:  Fix typos.

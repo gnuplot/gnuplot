@@ -136,6 +136,12 @@ If PATTERN is omitted, it defaults to \"[ \\f\\t\\n\\r\\v]+\"."
 	  (setq parts (cons (substring string start (match-beginning 0)) parts)
 		start (match-end 0)))
 	(nreverse (cons (substring string start) parts)))) ))
+(eval-and-compile
+  (and (featurep 'xemacs)
+    ;; XEmacs 21.4 doesn't have replace-regexp-in-string
+    (not (fboundp 'replace-regexp-in-string))
+    (defun replace-regexp-in-string (regexp rep string)
+       (replace-in-string string regexp rep))))
 
 (defconst d2t-work-buffer-name "*doc2texi*"
   "Name of scratch buffer where the doc file will be converted into a

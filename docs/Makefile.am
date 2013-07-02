@@ -296,18 +296,16 @@ gnuplot.texi: $(srcdir)/doc2texi.el $(srcdir)/gnuplot.doc
 	@echo "Creating texinfo and eldoc strings file"
 	@if test "$(EMACS)" != no; then \
 	   test "$(top_srcdir)" = "$(top_builddir)" || cp $(srcdir)/gnuplot.doc . ; \
-	   $(EMACS) -batch -l $(srcdir)/doc2texi.el -f d2t-doc-to-texi ; \
+	   $(EMACS) -batch -q --no-site-file -l $(srcdir)/doc2texi.el -f d2t-doc-to-texi ; \
 	   echo "Compiling gnuplot-eldoc.el" ; \
-	   $(EMACS) -batch --eval='(byte-compile-file "gnuplot-eldoc.el")' ; \
+	   $(EMACS) -batch -q --no-site-file -f batch-byte-compile gnuplot-eldoc.el ; \
 	   test "$(top_srcdir)" = "$(top_builddir)" || cp gnuplot.texi $(srcdir) ; \
 	else \
 	   echo "No emacs found - cannot create texinfo file" ; \
 	fi
 
-if BUILD_LISP
 gnuplot.info: gnuplot.texi
 	$(MAKEINFO) -I$(srcdir) $(srcdir)/gnuplot.texi --no-split --output=$@
-endif
 
 install-info: gnuplot.info gnuplot-eldoc.el gnuplot-eldoc.elc
 	$(top_srcdir)/mkinstalldirs $(DESTDIR)$(infodir) $(DESTDIR)$(lispdir)
