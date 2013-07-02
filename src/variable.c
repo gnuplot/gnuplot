@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: variable.c,v 1.42 2011/09/04 11:06:19 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: variable.c,v 1.43 2011/12/28 19:37:37 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - variable.c */
@@ -250,7 +250,7 @@ static const struct path_table fontpath_tbl[] =
 };
 #endif
 
-#if defined(_Macintosh) && !defined(FONTPATHSET)
+#if defined(__APPLE__) && !defined(FONTPATHSET)
 #  define FONTPATHSET
 static const struct path_table fontpath_tbl[] =
 {

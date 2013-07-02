@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot.c,v 1.149 2013/02/26 23:38:42 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot.c,v 1.150 2013/04/04 19:05:24 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - plot.c */
@@ -255,7 +255,7 @@ bail_to_command_line()
     LONGJMP(command_line_env, TRUE);
 }
 
-#if defined(_Windows) || defined(_Macintosh)
+#if defined(_Windows)
 int
 gnu_main(int argc, char **argv)
 #else

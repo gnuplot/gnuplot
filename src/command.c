@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.256 2013/02/28 21:27:45 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.257 2013/05/06 21:52:26 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -1420,7 +1420,7 @@ pause_command()
 #if defined(_Windows)
 # ifdef WXWIDGETS
 	if (!strcmp(term->name, "wxt")) {
-	    /* copy of the code below:  !(_Windows || OS2 || _Macintosh) */
+	    /* copy of the code below:  !(_Windows || OS2) */
 	    if (term && term->waitforinput && paused_for_mouse){
 		fprintf(stderr, "%s\n", buf);
 		term->waitforinput();
@@ -1477,10 +1477,7 @@ pause_command()
 		EAT_INPUT_WITH(fgetc(stdin));
 	    }
 	}
-#elif defined(_Macintosh)
-	if (strcmp(term->name, "macintosh") == 0 && sleep_time < 0)
-	    Pause( (int)sleep_time );
-#else /* !(_Windows || OS2 || _Macintosh) */
+#else /* !(_Windows || OS2) */
 #ifdef USE_MOUSE
 	if (term && term->waitforinput) {
 	    /* It does _not_ work to do EAT_INPUT_WITH(term->waitforinput()) */
@@ -1489,7 +1486,7 @@ pause_command()
 #endif /* USE_MOUSE */
 	    EAT_INPUT_WITH(fgetc(stdin));
 
-#endif /* !(_Windows || OS2 || _Macintosh) */
+#endif /* !(_Windows || OS2) */
     }
     if (sleep_time > 0)
 	GP_SLEEP(sleep_time);

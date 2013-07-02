@@ -1,5 +1,5 @@
 /*
- * $Id: plot.h,v 1.50 2012/02/25 11:41:19 juhaszp Exp $
+ * $Id: plot.h,v 1.51 2012/06/30 06:41:33 markisch Exp $
  */
 
 /* GNUPLOT - plot.h */
@@ -68,7 +68,7 @@ void bail_to_command_line __PROTO((void)) __attribute__((noreturn));
 void bail_to_command_line __PROTO((void));
 #endif
 
-#if defined(_Windows) || defined(_Macintosh)
+#if defined(_Windows)
 int gnu_main __PROTO((int argc, char **argv));
 #endif
 

@@ -1,3 +1,8 @@
+2013-07-02  Mojca Miklavec  <mojca.miklavec.lists@gmail.com>
+
+	* src/command.c src/plot.c src/plot.h src/variable.c:
+	Remove obsolete instances of #ifdef (_Macintosh)
+
 2013-07-02  Ulrich Müller  <ulimueller@users.sf.net>
 
 	* docs/doc2texi.el:  Provide a substitute for the lisp routine
