@@ -1,3 +1,12 @@
+2013-07-02  Ulrich Müller  <ulimueller@users.sf.net>
+
+	* docs/doc2texi.el:  Provide a substitute for the lisp routine
+	replace-regexp-in-string, which is missing in xemacs prior to version
+	25.1.something.
+
+	* docs/Makefile.in:  Modify build commands for gnuplot.texi so that
+	xemacs and newer emacs (25.1) are happy.
+
 2013-07-01  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/datafile.c (plot_ticlabel_using):  Explicit error message if
