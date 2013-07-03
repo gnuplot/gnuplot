@@ -230,11 +230,14 @@ gstrptime(char *s, char *fmt, struct tm *tm, double *usec)
 	     * EPOCH is the std. unix timeformat seconds since 01.01.1970 UTC
 	     */
 	    {
-		char  *frac = strchr(s, decimalsign ? *decimalsign : '.');
+		char  *fraction = strchr(s, decimalsign ? *decimalsign : '.');
+		double ufraction = 0;
 		double when = strtod (s, &s) - SEC_OFFS_SYS;
 		ggmtime(tm, when);
-		if (frac)
-		    *usec = atof(frac);
+		if (fraction)
+		    ufraction = atof(fraction);
+		if (ufraction < 1.)		/* Filter out e.g. 123.456e7 */
+		    *usec = ufraction;
 		break;
 	    }
 

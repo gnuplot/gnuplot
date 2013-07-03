@@ -1,3 +1,8 @@
+2013-07-03  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/time.c (gstrptime): Beware of time in seconds specified as an
+	exponential; e.g. 123.456e7 seconds does not end in 456 usec.
+
 2013-07-02  Mojca Miklavec  <mojca.miklavec.lists@gmail.com>
 
 	* src/command.c src/plot.c src/plot.h src/variable.c:
