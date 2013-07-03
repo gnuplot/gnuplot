@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.810 2013/07/01 19:08:49 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.811 2013/07/02 20:21:52 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -13419,14 +13419,13 @@ Ffigure_missing
 
  Coordinates specified as "time" wrap at 24 hours.
 
- The 'nohidden3d' option that is supposed to exempt individual plots from the
+ Parametric curves: The 'nohidden3d' option to exempt individual plots from the
  global property 'set hidden3d' does not work for parametric curves.
+ Iteration inside a `plot` command does not work for parametric curves.
 
- X11 terminal: It is difficult to select UTF-8 fonts.  The program does not
- track the true aspect ratio of the x11 terminal window.  In order for commands
- such as "set size ratio" to work, the x11 window must itself have equal height
- and width.  Only one color palette at a time is active for any given x11 plot
- window.  This means that multiplots whose constituent plots use different
+ X11 terminal: It is difficult to select UTF-8 fonts.
+ Only one color palette at a time is active for any given x11 plot window.
+ This means that multiplots whose constituent plots use different
  palettes will not display correctly in x11.
 
  Qt terminal: If the local qt environment does not support "opengl" as a
