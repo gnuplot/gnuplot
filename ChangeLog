@@ -1,3 +1,8 @@
+2013-07-03  Mojca Miklavec  <mojca.miklavec.lists@gmail.com>
+
+	* src/command.c src/plot.c src/variable.c:
+	Remove obsolete instances of #ifdef (_Macintosh)
+
 2013-07-03  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graph3d.c: Better fix for	Bug #1252, inverted parallel axis labels
