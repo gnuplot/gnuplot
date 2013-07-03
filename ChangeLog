@@ -9,6 +9,9 @@
 	replace-regexp-in-string, which is missing in xemacs prior to version
 	25.1.something.
 
+	* docs/Makefile.am:  Modify build commands for gnuplot.texi so that
+	xemacs and newer emacs (25.1) are happy.
+
 2013-07-02  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* docs/gnuplot.doc:  Fix typos.
