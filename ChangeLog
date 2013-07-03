@@ -1,3 +1,7 @@
+2013-07-03  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/graph3d.c: Better fix for	Bug #1252, inverted parallel axis labels
+
 2013-07-02  Ulrich Müller  <ulimueller@users.sf.net>
 
 	* docs/doc2texi.el:  Provide a substitute for the lisp routine

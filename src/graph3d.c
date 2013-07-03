@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.253.2.12 2012/12/20 06:16:45 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.253.2.13 2013/06/29 19:22:10 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -2354,9 +2354,9 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid,
 		    map3d_xy_double(X_AXIS.max, xaxis_y, base_z, &angx1, &angy1);
 		    ang = atan2(angy1-angy0, angx1-angx0) / DEG2RAD;
 		    angle = (ang > 0) ? floor(ang + 0.5) : floor(ang - 0.5);
+		    if (angle < -90) angle += 180;
+		    if (angle > 90) angle -= 180;
 		    step /= 2;
-		    if (step > 0  &&  Y_AXIS.max > Y_AXIS.min)
-			angle += 180;
 		}
 
 		if (X_AXIS.ticmode & TICS_ON_AXIS) {
@@ -2480,9 +2480,9 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid,
 			map3d_xy_double(yaxis_x, Y_AXIS.max, base_z, &angx1, &angy1);
 			ang = atan2(angy1-angy0, angx1-angx0) / DEG2RAD;
 			angle = (ang > 0) ? floor(ang + 0.5) : floor(ang - 0.5);
+			if (angle < -90) angle += 180;
+			if (angle > 90) angle -= 180;
 			step /= 2;
-			if (step > 0  &&  X_AXIS.max > X_AXIS.min)
-			    angle += 180;
 		    }
 		    if (Y_AXIS.ticmode & TICS_ON_AXIS) {
 			map3d_xyz((X_AXIS.tic_in ? -step : step)/2., mid_y, base_z, &v1);
