@@ -3,10 +3,14 @@
 #include "wgnuplib.rc"
 
 #ifndef NO_MANIFEST
+#ifdef _WIN64
+CREATEPROCESS_MANIFEST_RESOURCE_ID RT_MANIFEST "wgnuplot.exe.manifest64"
+#else
 CREATEPROCESS_MANIFEST_RESOURCE_ID RT_MANIFEST "wgnuplot.exe.manifest"
 #endif
+#endif
 
-#ifdef MSRC
+#ifdef WIN32
 /* using Microsoft RC.EXE */
   /* texticon.ico and grpicon.ico are created from the */
   /* Borland ascii format icons below using geticon.c */
@@ -20,7 +24,7 @@ TEXTICON ICON  "texticon.ico"
 
 #else
 /* using Borland BRC.EXE */
-GRPICON ICON 
+GRPICON ICON
 BEGIN
 	'00 00 01 00 01 00 20 20 10 00 00 00 00 00 E8 02'
 	'00 00 16 00 00 00 28 00 00 00 20 00 00 00 40 00'
@@ -72,7 +76,7 @@ BEGIN
 	'00 00 00 00 00 00 00 00 00 00 00 00 00 00'
 END
 
-TEXTICON ICON 
+TEXTICON ICON
 BEGIN
 	'00 00 01 00 01 00 20 20 10 00 00 00 00 00 E8 02'
 	'00 00 16 00 00 00 28 00 00 00 20 00 00 00 40 00'

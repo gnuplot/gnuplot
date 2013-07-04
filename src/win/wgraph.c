@@ -1,5 +1,5 @@
 /*
- * $Id: wgraph.c,v 1.144.2.9 2013/12/29 19:50:26 markisch Exp $
+ * $Id: wgraph.c,v 1.144.2.10 2014/02/11 08:47:54 markisch Exp $
  */
 
 /* GNUPLOT - win/wgraph.c */
@@ -217,7 +217,7 @@ static struct {
 /* prototypes for module-local functions */
 
 LRESULT CALLBACK WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);
-BOOL CALLBACK LineStyleDlgProc(HWND hdlg, UINT wmsg, WPARAM wparam, LPARAM lparam);
+INT_PTR CALLBACK LineStyleDlgProc(HWND hdlg, UINT wmsg, WPARAM wparam, LPARAM lparam);
 
 static void	DestroyBlocks(LPGW lpgw);
 static BOOL	AddBlock(LPGW lpgw);
@@ -437,7 +437,7 @@ GraphInit(LPGW lpgw)
 		NULL, NULL, lpgw->hInstance, lpgw);
 
 	if (lpgw->hWndGraph)
-		SetClassLong(lpgw->hWndGraph, GCL_HICON,
+		SetClassLongPtr(lpgw->hWndGraph, GCL_HICON,
 			(LONG) LoadIcon(lpgw->hInstance, "GRPICON"));
 
 	lpgw->hStatusbar = CreateWindowEx(0, STATUSCLASSNAME, (LPSTR)NULL,
@@ -575,7 +575,7 @@ GraphInit(LPGW lpgw)
 	/* modify the system menu to have the new items we want */
 	sysmenu = GetSystemMenu(lpgw->hWndGraph,0);
 	AppendMenu(sysmenu, MF_SEPARATOR, 0, NULL);
-	AppendMenu(sysmenu, MF_POPUP, (UINT)lpgw->hPopMenu, "&Options");
+	AppendMenu(sysmenu, MF_POPUP, (UINT_PTR)lpgw->hPopMenu, "&Options");
 	AppendMenu(sysmenu, MF_STRING, M_ABOUT, "&About");
 
 #ifndef WGP_CONSOLE
@@ -2623,7 +2623,7 @@ CopyPrint(LPGW lpgw)
 	}
 
 	pr.hdcPrn = printer;
-	SetWindowLong(hwnd, 4, (LONG)((GP_LPPRINT)&pr));
+	SetWindowLongPtr(hwnd, 4, (LONG_PTR)((GP_LPPRINT)&pr));
 	PrintRegister((GP_LPPRINT)&pr);
 
 	EnableWindow(hwnd, FALSE);
@@ -2659,7 +2659,7 @@ CopyPrint(LPGW lpgw)
 		DestroyWindow(pr.hDlgPrint);
 	}
 	DeleteDC(printer);
-	SetWindowLong(hwnd, 4, (LONG)(0L));
+	SetWindowLongPtr(hwnd, 4, (LONG_PTR)(0L));
 	PrintUnregister((GP_LPPRINT)&pr);
 	/* make certain that the screen pen set is restored */
 	SendMessage(lpgw->hWndGraph, WM_COMMAND, M_REBUILDTOOLS, 0L);
@@ -2880,7 +2880,7 @@ ReadGraphIni(LPGW lpgw)
 
 #define LS_DEFLINE 2
 typedef struct tagLS {
-	int	widtype;
+	LONG_PTR	widtype;
 	int	wid;
 	HWND	hwnd;
 	int	pen;			/* current pen number */
@@ -2934,7 +2934,7 @@ UpdateColorSample(HWND hdlg)
 }
 
 /* Window handler function for the "Line Styles" dialog */
-BOOL CALLBACK
+INT_PTR CALLBACK
 LineStyleDlgProc(HWND hdlg, UINT wmsg, WPARAM wparam, LPARAM lparam)
 {
 	char buf[16];
@@ -2942,7 +2942,7 @@ LineStyleDlgProc(HWND hdlg, UINT wmsg, WPARAM wparam, LPARAM lparam)
 	int i;
 	UINT pen;
 	LPLOGPEN plpm, plpc;
-	lpls = (LPLS)GetWindowLong(GetParent(hdlg), 4);
+	lpls = (LPLS)GetWindowLongPtr(GetParent(hdlg), 4);
 
 	switch (wmsg) {
 		case WM_INITDIALOG:
@@ -3115,14 +3115,14 @@ LineStyleDlgProc(HWND hdlg, UINT wmsg, WPARAM wparam, LPARAM lparam)
 
 
 
-/* GetWindowLong(hwnd, 4) must be available for use */
+/* GetWindowLongPtr(hwnd, 4) must be available for use */
 static BOOL
 LineStyle(LPGW lpgw)
 {
 	BOOL status = FALSE;
 	LS ls;
 
-	SetWindowLong(lpgw->hWndGraph, 4, (LONG)((LPLS)&ls));
+	SetWindowLongPtr(lpgw->hWndGraph, 4, (LONG_PTR)((LPLS)&ls));
 	_fmemcpy(&ls.colorpen, &lpgw->colorpen, (WGNUMPENS + 2) * sizeof(LOGPEN));
 	_fmemcpy(&ls.monopen, &lpgw->monopen, (WGNUMPENS + 2) * sizeof(LOGPEN));
 
@@ -3132,7 +3132,7 @@ LineStyle(LPGW lpgw)
 		_fmemcpy(&lpgw->monopen, &ls.monopen, (WGNUMPENS + 2) * sizeof(LOGPEN));
 		status = TRUE;
 	}
-	SetWindowLong(lpgw->hWndGraph, 4, (LONG)(0L));
+	SetWindowLongPtr(lpgw->hWndGraph, 4, (LONG_PTR)(0L));
 	return status;
 }
 
@@ -3203,7 +3203,7 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 	static unsigned int last_modifier_mask = -99;
 #endif
 
-	lpgw = (LPGW)GetWindowLong(hwnd, 0);
+	lpgw = (LPGW)GetWindowLongPtr(hwnd, 0);
 
 #ifdef USE_MOUSE
 	/*  mouse events first */
@@ -3717,7 +3717,7 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			return FALSE;
 		case WM_CREATE:
 			lpgw = ((CREATESTRUCT *)lParam)->lpCreateParams;
-			SetWindowLong(hwnd, 0, (LONG)lpgw);
+			SetWindowLongPtr(hwnd, 0, (LONG_PTR)lpgw);
 			lpgw->hWndGraph = hwnd;
 			hdc = GetDC(hwnd);
 			MakePens(lpgw, hdc);

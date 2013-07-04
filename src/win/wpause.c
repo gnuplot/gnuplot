@@ -1,5 +1,5 @@
 /*
- * $Id: wpause.c,v 1.21 2011/11/26 13:56:44 markisch Exp $
+ * $Id: wpause.c,v 1.20.2.1 2011/12/11 11:38:53 markisch Exp $
  */
 
 /* GNUPLOT - win/wpause.c */
@@ -69,12 +69,12 @@ extern int paused_for_mouse;
 /* Non-blocking Sleep function, called by pause_command.
    This allows redrawing and (some) user interaction.
 */
-void 
+void
 win_sleep(DWORD dwMilliSeconds)
 {
     MSG msg;
     DWORD t0, t1, tstop, rc;
-    
+
     t0 = GetTickCount();
     tstop  = t0 + dwMilliSeconds;
     t1 = dwMilliSeconds; /* remaining time to wait */
@@ -169,7 +169,7 @@ PauseBox(LPPW lppw)
 
 	/* Don't show the pause "OK CANCEL" dialog for "pause mouse ..." -- well, show
 	   it only for "pause -1".
-	   Note: maybe to show in the window titlebar or somewhere else a message like 
+	   Note: maybe to show in the window titlebar or somewhere else a message like
 	   graphwin.Title = "gnuplot pausing (waiting for mouse click)";
 	*/
 	if (!paused_for_mouse) {
@@ -197,7 +197,7 @@ PauseBox(LPPW lppw)
 	return(lppw->bPauseCancel);
 }
 
-LRESULT CALLBACK 
+LRESULT CALLBACK
 WndPauseProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	HDC hdc;
@@ -207,7 +207,7 @@ WndPauseProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 	LPPW lppw;
 	int cxChar, cyChar, middle;
 
-	lppw = (LPPW)GetWindowLong(hwnd, 0);
+	lppw = (LPPW)GetWindowLongPtr(hwnd, 0);
 
 	switch(message) {
 		case WM_KEYDOWN:
@@ -251,7 +251,7 @@ WndPauseProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			    ws_opts |= WS_VISIBLE;
 			/* HBB 981202 HMENU sysmenu = GetSystemMenu(hwnd, FALSE); */
 			lppw = ((CREATESTRUCT *)lParam)->lpCreateParams;
-			SetWindowLong(hwnd, 0, (LONG)lppw);
+			SetWindowLongPtr(hwnd, 0, (LONG_PTR)lppw);
 			lppw->hWndPause = hwnd;
 			hdc = GetDC(hwnd);
 			SelectObject(hdc, GetStockObject(SYSTEM_FONT));
@@ -273,10 +273,10 @@ WndPauseProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 					8*cxChar, 7*cyChar/4,
 					hwnd, (HMENU)IDCANCEL,
 					((LPCREATESTRUCT) lParam)->hInstance, NULL);
-			lppw->lpfnOK = (WNDPROC) GetWindowLong(lppw->hOK, GWL_WNDPROC);
-			SetWindowLong(lppw->hOK, GWL_WNDPROC, (LONG)PauseButtonProc);
-			lppw->lpfnCancel = (WNDPROC) GetWindowLong(lppw->hCancel, GWL_WNDPROC);
-			SetWindowLong(lppw->hCancel, GWL_WNDPROC, (LONG)PauseButtonProc);
+			lppw->lpfnOK = (WNDPROC) GetWindowLongPtr(lppw->hOK, GWL_WNDPROC);
+			SetWindowLongPtr(lppw->hOK, GWL_WNDPROC, (LONG_PTR)PauseButtonProc);
+			lppw->lpfnCancel = (WNDPROC) GetWindowLongPtr(lppw->hCancel, GWL_WNDPROC);
+			SetWindowLongPtr(lppw->hCancel, GWL_WNDPROC, (LONG_PTR)PauseButtonProc);
 			if (GetParent(hwnd))
 				EnableWindow(GetParent(hwnd),FALSE);
 #if 0 /* HBB 981203 */
@@ -307,8 +307,8 @@ LRESULT CALLBACK
 PauseButtonProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	LPPW lppw;
-	LONG n = GetWindowLong(hwnd, GWL_ID);
-	lppw = (LPPW)GetWindowLong(GetParent(hwnd), 0);
+	LONG n = GetWindowLongPtr(hwnd, GWL_ID);
+	lppw = (LPPW)GetWindowLongPtr(GetParent(hwnd), 0);
 	switch(message) {
 		case WM_KEYDOWN:
 			switch(wParam) {

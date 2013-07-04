@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: internal.c,v 1.67.2.1 2012/05/06 05:02:58 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: internal.c,v 1.67.2.2 2013/09/14 20:24:45 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - internal.c */
@@ -58,12 +58,13 @@ static char *RCSid() { return RCSid("$Id: internal.c,v 1.67.2.1 2012/05/06 05:02
 
 static enum DATA_TYPES sprintf_specifier __PROTO((const char *format));
 
-
+#ifndef _WIN64
 int
 GP_MATHERR( STRUCT_EXCEPTION_P_X )
 {
     return (undefined = TRUE);	/* don't print error message */
 }
+#endif
 
 #define BAD_DEFAULT default: int_error(NO_CARET, "internal error : type neither INT or CMPLX"); return;
 
@@ -171,7 +172,7 @@ f_calln(union argument *x)
     (void) pop(&num_params);
 
     if (num_params.v.int_val != udf->dummy_num)
-	int_error(NO_CARET, "function %s requires %d variable%c", 
+	int_error(NO_CARET, "function %s requires %d variable%c",
 	    udf->udf_name, udf->dummy_num, (udf->dummy_num == 1)?'\0':'s');
 
     /* if there are more parameters than the function is expecting */
@@ -1311,7 +1312,7 @@ f_sprintf(union argument *arg)
 #if _MSC_VER
        buffer[bufsize-1] = '\0';	/* VC++ is not ANSI-compliant */
        if (errno == ERANGE) errno = save_errno;
-#endif 
+#endif
 
 #else
 	/* FIXME - this is bad; we should dummy up an snprintf equivalent */
@@ -1388,7 +1389,7 @@ f_gprintf(union argument *arg)
     char *buffer;
     int length;
     double base = 10.;
- 
+
     /* Retrieve parameters from top of stack */
     pop(&val);
     pop(&fmt);
@@ -1502,13 +1503,13 @@ f_strptime(union argument *arg)
     push(Gcomplex(&val, result, 0.0));
 }
 
-/* Get current system time in seconds since 2000 
- * The type of the value popped from the stack 
+/* Get current system time in seconds since 2000
+ * The type of the value popped from the stack
  * determines what is returned.
  * If integer, the result is also an integer.
- * If real (complex), the result is also real, 
+ * If real (complex), the result is also real,
  * with microsecond precision (if available).
- * If string, it is assumed to be a format string, 
+ * If string, it is assumed to be a format string,
  * and it is passed to strftime to get a formatted time string.
  */
 void
@@ -1529,8 +1530,8 @@ f_time(union argument *arg)
 #endif
 
     (void) arg; /* Avoid compiler warnings */
-    pop(&val); 
-    
+    pop(&val);
+
     switch(val.type) {
 	case INTGR:
 	    push(Ginteger(&val, (int) time_now));
@@ -1641,7 +1642,7 @@ f_assign(union argument *arg)
     (void) arg;
     (void) pop(&b);	/* new value */
     (void) pop(&a);	/* name of variable */
-    
+
     if (a.type == STRING) {
 	struct udvt_entry *udv;
 	if (!strncmp(a.v.string_val,"GPVAL_",6) || !strncmp(a.v.string_val,"MOUSE_",6))

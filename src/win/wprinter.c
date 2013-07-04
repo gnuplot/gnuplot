@@ -1,5 +1,5 @@
 /*
- * $Id: wprinter.c,v 1.7 2011/03/13 19:55:29 markisch Exp $"); }
+ * $Id: wprinter.c,v 1.7.2.1 2013/06/08 10:52:56 markisch Exp $"); }
  */
 
 /* GNUPLOT - win/wprinter.c */
@@ -63,15 +63,15 @@
 
 GP_LPPRINT prlist = NULL;
 
-BOOL CALLBACK PrintSizeDlgProc(HWND hdlg, UINT wmsg, WPARAM wparam, LPARAM lparam);
+INT_PTR CALLBACK PrintSizeDlgProc(HWND hdlg, UINT wmsg, WPARAM wparam, LPARAM lparam);
 static GP_LPPRINT PrintFind(HDC hdc);
 
 
-BOOL CALLBACK
+INT_PTR CALLBACK
 PrintSizeDlgProc(HWND hdlg, UINT wmsg, WPARAM wparam, LPARAM lparam)
 {
     char buf[8];
-    GP_LPPRINT lpr = (GP_LPPRINT)GetWindowLong(GetParent(hdlg), 4);
+    GP_LPPRINT lpr = (GP_LPPRINT)GetWindowLongPtr(GetParent(hdlg), 4);
 
     switch (wmsg) {
     case WM_INITDIALOG:
@@ -137,7 +137,6 @@ PrintSizeDlgProc(HWND hdlg, UINT wmsg, WPARAM wparam, LPARAM lparam)
 }
 
 
-
 /* GetWindowLong(hwnd, 4) must be available for use */
 BOOL
 PrintSize(HDC printer, HWND hwnd, LPRECT lprect)
@@ -146,7 +145,7 @@ PrintSize(HDC printer, HWND hwnd, LPRECT lprect)
     BOOL status = FALSE;
     GP_PRINT pr;
 
-    SetWindowLong(hwnd, 4, (LONG)&pr);
+    SetWindowLongPtr(hwnd, 4, (LONG_PTR)&pr);
     pr.poff.x = 0;
     pr.poff.y = 0;
     pr.psize.x = GetDeviceCaps(printer, HORZSIZE);
@@ -166,10 +165,11 @@ PrintSize(HDC printer, HWND hwnd, LPRECT lprect)
 	    lprect->bottom = lprect->top + MulDiv(pr.psize.y*10, GetDeviceCaps(printer, LOGPIXELSY), 254);
 	    status = TRUE;
 	}
-    SetWindowLong(hwnd, 4, (LONG)(0L));
+    SetWindowLongPtr(hwnd, 4, (LONG_PTR)(0L));
 
     return status;
 }
+
 
 /* Win32 doesn't support OpenJob() etc. so we must use some old code
  * which attempts to sneak the output through a Windows printer driver */
@@ -194,6 +194,7 @@ PrintFind(HDC hdc)
     return this;
 }
 
+
 void
 PrintUnregister(GP_LPPRINT lpr)
 {
@@ -215,11 +216,11 @@ PrintUnregister(GP_LPPRINT lpr)
 
 
 /* GetWindowLong(GetParent(hDlg), 4) must be available for use */
-BOOL CALLBACK
+INT_PTR CALLBACK
 PrintDlgProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 {
-    GP_LPPRINT lpr;
-    lpr = (GP_LPPRINT)GetWindowLong(GetParent(hDlg), 4);
+	GP_LPPRINT lpr;
+	lpr = (GP_LPPRINT) GetWindowLongPtr(GetParent(hDlg), 4);
 	/* FIXME: cause of crash in bug #3544949. No idea yet as to why this could happen, though. */
 	if (lpr == NULL)
 	return FALSE;
@@ -292,7 +293,7 @@ DumpPrinter(HWND hwnd, LPSTR szAppName, LPSTR szFileName)
 	printer = pd.hDC;
 	if (printer != (HDC)NULL) {
 	    pr.hdcPrn = printer;
-	    SetWindowLong(hwnd, 4, (LONG)((GP_LPPRINT)&pr));
+	    SetWindowLongPtr(hwnd, 4, (LONG_PTR)((GP_LPPRINT)&pr));
 	    PrintRegister((GP_LPPRINT)&pr);
 	    if ( (buf = malloc(4096+2)) != (char *)NULL ) {
 	    	bufcount = (WORD *)buf;
@@ -330,7 +331,7 @@ DumpPrinter(HWND hwnd, LPSTR szAppName, LPSTR szFileName)
 		}
 	    }
 	    DeleteDC(printer);
-	    SetWindowLong(hwnd, 4, (LONG)(0L));
+	    SetWindowLongPtr(hwnd, 4, (LONG_PTR)(0L));
 	    PrintUnregister((GP_LPPRINT)&pr);
 	}
     }
