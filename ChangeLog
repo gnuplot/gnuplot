@@ -1,3 +1,7 @@
+2013-07-04  Shigeharu Takeno  <shige@iee.niit.ac.jp>
+
+	* docs/README.ja docs/term-ja.diff:  Update Japanese help texts.
+
 2013-07-03  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/time.c (gstrptime): Beware of time in seconds specified as an

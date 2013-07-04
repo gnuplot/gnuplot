@@ -1,4 +1,4 @@
-# $Id: README.ja,v 1.12 2009-03-13 18:46:18+09 shige Exp $
+# $Id: README.ja,v 1.14 2013-05-06 14:42:44+09 shige Exp $
 # The Japanese translations of gnuplot manuals
 # Shigeharu TAKENO <shige@iee.niit.ac.jp>
 #
@@ -114,7 +114,7 @@ LaTeX 形式のファイルは以下のように作成します。
 
 % cd docs
 % make doc2tex 
-% ./doc2tex gnuplot-ja.gih tmpf
+% ./doc2tex gnuplot-ja.doc tmpf
 % awk -f tex2ja.awk tmpf > gnuplot-ja.tex
 
 この tex2ja.awk は、\pageref や \index を適切につけるための awk 
@@ -288,12 +288,12 @@ term-ja.diff には、doc2rtf.c に対する日本語用のパッチも含まれてお
 RTF 用にエンコードします。
 
 % ./doc2rtf gnuplot-ja.doc tmpf
-% nkf -s -Lw tmpf | ./sjisenc > gnuplot-ja.rtf
+% nkf --windows tmpf | ./sjisenc > gnuplot-ja.rtf
 
 漢字コード変換ツールとして nkf 以外、または改行コード変換をサポー
 トしていない古い nkf を使用している場合は、最初のコマンド 
 
- nkf -s -Lw 
+ nkf --windows
  = EUC-JP を Shift_JIS に、改行コードを LF から CR+LF に変換する
 
 という部分を適切なツールに適宜読みかえてください。この RTF ファイ
@@ -306,6 +306,13 @@ MS-Windows 上のヘルプコンパイラは、MS-Windows 上の C 開発環境につ
 
  ftp://ftp.microsoft.com/Softlib/MSLFILES/
  HC505.exe : Microsoft Help Compiler (version 3.10.505)
+
+
+[g] chm 形式 (MS-Windows 用オンラインヘルプ) の作成
+
+chm (HTML ヘルプ) 形式の MS-Windows 用のオンラインヘルプもサポー
+トされました。この形式は、docs/windows/doc2html を利用して作成し
+ます。作成方法については、次の版以降に紹介したいと思います。
 
 
 2.3. faq-ja.tex
