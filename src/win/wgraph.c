@@ -1,5 +1,5 @@
 /*
- * $Id: wgraph.c,v 1.144.2.11 2014/07/04 07:45:43 markisch Exp $
+ * $Id: wgraph.c,v 1.144.2.12 2014/07/04 09:31:05 markisch Exp $
  */
 
 /* GNUPLOT - win/wgraph.c */
@@ -3368,6 +3368,10 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 				return 0L;
 			}
 #endif /* DISABLE_SPACE_RAISES_CONSOLE */
+			if (wParam == 'q') {
+				GraphClose(lpgw);
+				return 0L;
+			}
 #ifdef USE_MOUSE
 			Wnd_exec_event(lpgw, lParam, GE_keypress, (TCHAR)wParam);
 #endif
@@ -3395,17 +3399,17 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 				switch(wParam) {
 				case 'C':
 					/* Ctrl-C: Copy to Clipboard */
-					SendMessage(hwnd,WM_COMMAND,M_COPY_CLIP,0L);
+					SendMessage(hwnd, WM_COMMAND, M_COPY_CLIP, 0L);
 					break;
 				case 'S':
 					/* Ctrl-S: Save As EMF */
-					SendMessage(hwnd,WM_COMMAND,M_SAVE_AS_EMF,0L);
+					SendMessage(hwnd, WM_COMMAND, M_SAVE_AS_EMF, 0L);
 					break;
 				} /* switch(wparam) */
 			} else {
 				/* First, look for a change in modifier status */
 				unsigned int modifier_mask = 0;
-				modifier_mask = ((GetKeyState(VK_SHIFT) < 0) ? Mod_Shift : 0 )
+				modifier_mask = ((GetKeyState(VK_SHIFT) < 0) ? Mod_Shift : 0)
 					| ((GetKeyState(VK_CONTROL) < 0) ? Mod_Ctrl : 0)
 					| ((GetKeyState(VK_MENU) < 0) ? Mod_Alt : 0);
 				if (modifier_mask != last_modifier_mask) {

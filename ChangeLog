@@ -6,6 +6,8 @@
 	Backport support for Win64 from version 5 which was originally
 	developed by Allin Cottrell.
 
+	* src/win/wgraph.c:  'q' closes graph window.
+
 2014-07-03  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/wxt/wxt_gui.c|h:  Automatically remove reference to frame from
