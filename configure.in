@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot on Unix.
 dnl
-dnl $Id: configure.in,v 1.328 2013/06/05 23:26:54 sfeam Exp $
+dnl $Id: configure.in,v 1.329 2013/06/12 04:29:48 sfeam Exp $
 dnl
 dnl this is actually major.minor ...
 dnl note that for a non-beta release, we need to disable DEVELOPMENT_RELEASE
@@ -1009,6 +1009,12 @@ if test "${enable_wxwidgets}" = yes ; then
     dnl Ckeck for wxWidgets version
     if expr 2.5.3 \> `${WX_CONFIG} --version` >/dev/null; then
       AC_MSG_WARN([Your development package for wxWidgets is too old, you need at least version 2.5.3. The wxWidgets terminal will not be compiled.])
+      enable_wxwidgets_ok=no
+    fi
+
+    dnl Make sure we're using more than the 'base' wxWidgets. Those 
+    if expr `${WX_CONFIG} --basename` : '.*base' >/dev/null; then
+      AC_MSG_WARN([You only have the 'base' flavor of wxWidgets. A full wxWidgets library is required. On Debian/Ubuntu, please make sure that you have a 'libwx...-dev' package other than just 'libwxbase...-dev' installed. The wxWidgets terminal will not be compiled.])
       enable_wxwidgets_ok=no
     fi
   fi
