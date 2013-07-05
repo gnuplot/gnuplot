@@ -3,6 +3,9 @@
 	* src/gadgets.c src/term_api.h term/cairo.trm term/pslatex.trm:
 	Boxed text support for epslatex and cairolatex terminals.
 
+	* docs/Makefile.am:  --without-lisp-files should also control whether
+	or not gnuplot-eldoc.el and gnuplot-eldoc.elc are installed.
+
 2013-07-04  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* docs/README.ja docs/term-ja.diff:  Update Japanese help texts.

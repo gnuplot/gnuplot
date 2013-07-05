@@ -76,6 +76,9 @@ gpcard.tex makefile.dst titlepag.ipf titlepag.ms titlepag.tex	\
 toc_entr.sty psdoc faq-ja.tex gnuplot-ja.doc README.ja	\
 term-ja.diff plotstyles.gnu pdffigures.tex gnuplot.pdf windows
 
+
+ELCS = gnuplot-eldoc.elc
+
 CLEANFILES = allterm.h gnuplot.tex gnuplot.dvi gnuplot.aux gnuplot.log	\
 gnuplot.toc gnuplot.ps gpcard.dvi gpcard.log gpcard.ps alldoc2gih	\
 doc2gih gnuplot.gih doc2hlp gnuplot.hlp gnuplot.idx gnuplot.ilg		\
@@ -84,7 +87,7 @@ gnuplot.ms doc2rnh gnuplot.rnh doc2rtf gnuplot.rtf gnuplot.nroff	\
 checkdoc gnuplot.txt gnuplot.tmp VERSION gnuplot.4tc gnuplot.4ct	\
 gnuplot.idv gnuplot.xref gnuplot.lg pdffigures.*			\
 wxhelp/*.html wxhelp/wgnuplot.htc windows/wgnuplot.htk gnuplot.pdf	\
-gnuplot.htb gnuplot.texi gnuplot-eldoc.el gnuplot-eldoc.elc
+gnuplot.htb gnuplot.texi gnuplot-eldoc.el $(ELCS)
 
 DISTFILES = $(DIST_COMMON) $(SOURCES) $(DOCHEADERS) $(EXTRA_DIST)
 
@@ -292,32 +295,48 @@ wxhelp/doc2html: wxhelp/doc2html.o termdoc.o xref.o ../src/version.o
 info: gnuplot.info
 
 # Thanks to Bruce Ravel for doc2texi.el!
-gnuplot.texi: $(srcdir)/doc2texi.el $(srcdir)/gnuplot.doc
+gnuplot.texi gnuplot-eldoc.el: $(srcdir)/doc2texi.el $(srcdir)/gnuplot.doc
 	@echo "Creating texinfo and eldoc strings file"
 	@if test "$(EMACS)" != no; then \
 	   test "$(top_srcdir)" = "$(top_builddir)" || cp $(srcdir)/gnuplot.doc . ; \
 	   $(EMACS) -batch -q --no-site-file -l $(srcdir)/doc2texi.el -f d2t-doc-to-texi ; \
 	   echo "Compiling gnuplot-eldoc.el" ; \
 	   $(EMACS) -batch -q --no-site-file -f batch-byte-compile gnuplot-eldoc.el ; \
-	   test "$(top_srcdir)" = "$(top_builddir)" || cp gnuplot.texi $(srcdir) ; \
+	   test "$(top_srcdir)" = "$(top_builddir)" || cp gnuplot.texi gnuplot-eldoc.el $(srcdir) ; \
 	else \
 	   echo "No emacs found - cannot create texinfo file" ; \
+	fi
+
+${ELCS}: gnuplot-eldoc.el
+	@if test "$(EMACS)" != no; then \
+	   echo "Compiling gnuplot-eldoc.el" ; \
+	   $(EMACS) -batch -q --no-site-file -f batch-byte-compile gnuplot-eldoc.el ; \
+	else \
+	   echo "No emacs found - cannot create gnuplot-eldoc.elc file" ; \
 	fi
 
 gnuplot.info: gnuplot.texi
 	$(MAKEINFO) -I$(srcdir) $(srcdir)/gnuplot.texi --no-split --output=$@
 
-install-info: gnuplot.info gnuplot-eldoc.el gnuplot-eldoc.elc
-	$(top_srcdir)/mkinstalldirs $(DESTDIR)$(infodir) $(DESTDIR)$(lispdir)
+install-info: gnuplot.info
+	$(top_srcdir)/mkinstalldirs $(DESTDIR)$(infodir)
 	$(INSTALL_DATA) gnuplot.info $(DESTDIR)$(infodir)/gnuplot.info
-	$(INSTALL_DATA) gnuplot-eldoc.el $(DESTDIR)$(lispdir)/gnuplot-eldoc.el
-	$(INSTALL_DATA) gnuplot-eldoc.elc $(DESTDIR)$(lispdir)/gnuplot-eldoc.elc
 	@if (install-info --version && \
 	     install-info --version | fgrep -i -v debian) >/dev/null 2>&1; then \
 	  echo "install-info --info-dir=$(DESTDIR)$(infodir) $(DESTDIR)$(infodir)/gnuplot.info";\
 	  install-info --info-dir=$(DESTDIR)$(infodir) $(DESTDIR)$(infodir)/gnuplot.info || :;\
 	else : ; fi
 
+install-data-hook: @INSTALL_LISP@
+
+install-lisp: install-eldoc
+
+install-nolisp:
+
+install-eldoc: $(ELCS)
+	$(top_srcdir)/mkinstalldirs $(DESTDIR)$(lispdir)
+	$(INSTALL_DATA) gnuplot-eldoc.el $(DESTDIR)$(lispdir)/gnuplot-eldoc.el
+	$(INSTALL_DATA) gnuplot-eldoc.elc $(DESTDIR)$(lispdir)/gnuplot-eldoc.elc
 
 # this is how to make OS/2 ipfc documentation
 ipf: gnuplot.ipf
