@@ -302,7 +302,7 @@ gnuplot.texi gnuplot-eldoc.el: $(srcdir)/doc2texi.el $(srcdir)/gnuplot.doc
 	   $(EMACS) -batch -q --no-site-file -l $(srcdir)/doc2texi.el -f d2t-doc-to-texi ; \
 	   echo "Compiling gnuplot-eldoc.el" ; \
 	   $(EMACS) -batch -q --no-site-file -f batch-byte-compile gnuplot-eldoc.el ; \
-	   test "$(top_srcdir)" = "$(top_builddir)" || cp gnuplot.texi gnuplot-eldoc.el $(srcdir) ; \
+	   test "$(top_srcdir)" = "$(top_builddir)" || rm -f ./gnuplot.doc ; \
 	else \
 	   echo "No emacs found - cannot create texinfo file" ; \
 	fi
@@ -337,6 +337,12 @@ install-eldoc: $(ELCS)
 	$(top_srcdir)/mkinstalldirs $(DESTDIR)$(lispdir)
 	$(INSTALL_DATA) gnuplot-eldoc.el $(DESTDIR)$(lispdir)/gnuplot-eldoc.el
 	$(INSTALL_DATA) gnuplot-eldoc.elc $(DESTDIR)$(lispdir)/gnuplot-eldoc.elc
+
+uninstall-local:
+	@$(NORMAL_UNINSTALL)
+	@for p in gnuplot-eldoc.el gnuplot-eldoc.elc ; do \
+	  rm -f $(DESTDIR)$(lispdir)/$$p; \
+	done
 
 # this is how to make OS/2 ipfc documentation
 ipf: gnuplot.ipf
