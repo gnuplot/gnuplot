@@ -1,3 +1,8 @@
+2013-07-05  Dima Kogan  <dima@secretsauce.net>
+
+	* configure.in:  Test for incomplete installation of wxWidgets
+	development environment.
+
 2013-07-03  Mojca Miklavec  <mojca.miklavec.lists@gmail.com>
 
 	* src/command.c src/plot.c src/variable.c:
