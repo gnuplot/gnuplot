@@ -1,3 +1,8 @@
+2013-07-05  Shigeharu Takeno  <shige@iee.niit.ac.jp>
+
+	* term/tgif.trm:  Reduce the point size by 50% to match other terminals.
+	Use the generic do_arrow() routine.
+
 2013-07-05  Dima Kogan  <dima@secretsauce.net>
 
 	* configure.in:  Test for incomplete installation of wxWidgets

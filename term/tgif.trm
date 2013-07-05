@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*- */
-/* $Id: tgif.trm,v 1.50 2011/09/27 23:18:02 sfeam Exp $ */
+/* $Id: tgif.trm,v 1.51 2012/09/26 18:23:38 sfeam Exp $ */
 
 /* GNUPLOT - tgif.trm */
 
@@ -147,7 +147,7 @@ static unsigned int uActResolution=100;	/* resolution in percent           */
 static unsigned int uActZoom;	/* zoom factor                             */
 static unsigned int uActAngle;	/* current textangle                       */
 static unsigned int uActThick;	/* actual linethickness                    */
-static unsigned int uActPointSize;	/* point size                      */
+static double uActPointSize = 1;	/* point size                      */
 static unsigned int uActStyle;	/* actual linestyle                        */
 static unsigned int uActJust;	/* actual textjustification                */
 static unsigned int uXshift;	/* actual shift x                          */
@@ -738,7 +738,7 @@ TGIF_point(unsigned int ux, unsigned int uy, int number)
     x = (double) (ux + uXshift);
     y = (double) (uYshift - uy);
 
-    p = pointsize * 8.0;	/* NL: Increased the bounding box (p value) from 4.0 to 8.0 */
+    p = 4.0 * pointsize * uActPointSize;
     if (p == (double) 0.0)
 	p = 0.1;
 
@@ -1693,7 +1693,7 @@ TERM_TABLE_START(tgif_driver)
     TGIF_VTIC, TGIF_HTIC, TGIF_options, TGIF_init, TGIF_reset,
     TGIF_text, null_scale, TGIF_graphics, TGIF_move, TGIF_vector,
     TGIF_linetype, TGIF_put_text, TGIF_text_angle,
-    TGIF_justify_text, TGIF_point, TGIF_arrow, TGIF_set_font,
+    TGIF_justify_text, TGIF_point, do_arrow, TGIF_set_font,
     TGIF_set_pointsize, 
     TERM_CAN_MULTIPLOT|TERM_CAN_DASH|TERM_LINEWIDTH, 
     0, 0, TGIF_fillbox,
