@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: pslatex.trm,v 1.86 2013/04/11 00:10:50 sfeam Exp $
+ * $Id: pslatex.trm,v 1.87 2013/07/05 18:48:27 sfeam Exp $
  */
 
 /* GNUPLOT - pslatex.trm */
@@ -1025,7 +1025,7 @@ EPSLATEX_boxed_text(unsigned int x, unsigned int y, int option)
     }
 }
 #else
-#define EPSLATEX_boxed_text NULL
+#define EPSLATEX_boxed_text
 #endif
 
 #endif /* TERM_BODY */
