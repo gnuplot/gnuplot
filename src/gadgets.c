@@ -745,8 +745,12 @@ write_label(unsigned int x, unsigned int y, struct text_label *this_label)
 	}
 
 	/* Draw the bounding box - FIXME should set line properties first */
-	if (this_label->boxed && !textbox_opts.noborder && term->boxed_text)
-	    (*term->boxed_text)(0,0, TEXTBOX_OUTLINE);
+	if (this_label->boxed && term->boxed_text) {
+	    if (!textbox_opts.noborder)
+		(*term->boxed_text)(0,0, TEXTBOX_OUTLINE);
+	    else
+		(*term->boxed_text)(0,0, TEXTBOX_FINISH);
+	}
 #endif
 
 	/* The associated point, if any */

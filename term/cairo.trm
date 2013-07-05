@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: cairo.trm,v 1.60 2013/05/21 20:36:46 sfeam Exp $
+ * $Id: cairo.trm,v 1.61 2013/07/01 20:16:14 sfeam Exp $
  */
 
 /* GNUPLOT - cairo.trm */
@@ -1302,7 +1302,7 @@ TERM_TABLE_START(cairolatex_driver)
     0, 1.0
     , NULL /* hypertext */
 #ifdef EAM_BOXED_TEXT
-    , cairotrm_boxed_text
+    , EPSLATEX_boxed_text
 #endif 
 TERM_TABLE_END(cairolatex_driver)
 

@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: pslatex.trm,v 1.85 2013/01/09 03:45:08 sfeam Exp $
+ * $Id: pslatex.trm,v 1.86 2013/04/11 00:10:50 sfeam Exp $
  */
 
 /* GNUPLOT - pslatex.trm */
@@ -42,6 +42,8 @@
  *     pstex    -- plain TeX with embedded postscript
  *     epslatex -- LaTeX using \includegraphics, postscript part in an 
  *                 external file
+ * Some routines are also used by terminal drivers
+ *     cairolatex
  *
  * AUTHORS
  *  George Phillips
@@ -99,6 +101,9 @@ TERM_PUBLIC void EPSLATEX_common_init __PROTO((void));
 TERM_PUBLIC void EPSLATEX_put_text __PROTO((unsigned int x, unsigned int y, const char *str));
 TERM_PUBLIC void EPSLATEX_linetype __PROTO((int linetype));
 TERM_PUBLIC void EPSLATEX_layer __PROTO((t_termlayer syncpoint));
+#ifdef EAM_BOXED_TEXT
+TERM_PUBLIC void EPSLATEX_boxed_text __PROTO((unsigned int, unsigned int, int));
+#endif
 
 /* additional LaTeX header information for epslatex terminal */
 TERM_PUBLIC char *epslatex_header = NULL;
@@ -133,6 +138,10 @@ TERM_PUBLIC void cairotrm_set_color __PROTO ((t_colorspec *colorspec));
 #else
 #define ISCAIROTERMINAL (FALSE)
 #endif
+
+/* State variables for boxed text */
+static TBOOLEAN PSLATEX_inbox = FALSE;
+static int PSLATEX_xbox, PSLATEX_ybox;
 
 
 /* Common functions for epslatex and ps(la)tex */
@@ -698,9 +707,18 @@ EPSLATEX_common_init()
   \\fi\n", gpoutfile);
 
         fprintf(gpoutfile,"\
-  \\setlength{\\unitlength}{%.4fbp}%%\n\
-  \\begin{picture}(%.2f,%.2f)%%\n",
-                1.0 / (2*PS_SC), term->xmax * xsize, term->ymax * ysize);
+    \\setlength{\\unitlength}{%.4fbp}%%\n",
+		1.0 / (2*PS_SC));
+#ifdef EAM_BOXED_TEXT
+        fprintf(gpoutfile,"\
+    \\newlength{\\gptboxheight}%%\n\
+    \\newlength{\\gptboxwidth}%%\n\
+    \\newsavebox{\\gptboxtext}%%\n\
+    \\setlength{\\fboxrule}{0.5pt}%%\n\
+    \\setlength{\\fboxsep}{1pt}%%\n");
+#endif
+        fprintf(gpoutfile,"\\begin{picture}(%.2f,%.2f)%%\n",
+                term->xmax * xsize, term->ymax * ysize);
     }
     if (ps_params->background.r >= 0) {
 	fprintf(gpoutfile, "\\definecolor{gpBackground}{rgb}{%.3f, %.3f, %.3f}%%\n",
@@ -726,27 +744,33 @@ EPSLATEX_put_text(unsigned int x, unsigned int y, const char *str)
 	    fputs(tex_current_color, gpoutfile);
 	    tex_color_synced = TRUE;
 	}
-	fprintf(gpoutfile, "      \\put(%d,%d){", x, y);
-        if (ps_ang)
-            fprintf(gpoutfile,"\\rotatebox{%d}{", ps_ang);
-        if (((str[0] == '{') || (str[0] == '['))) {
-            fprintf(gpoutfile, "\\makebox(0,0)%s", str);
-        } else
-            switch (ps_justify) {
-            case LEFT:
-                fprintf(gpoutfile, "\\makebox(0,0)[l]{\\strut{}%s}", str);
-                break;
-            case CENTRE:
-                fprintf(gpoutfile, "\\makebox(0,0){\\strut{}%s}", str);
-                break;
-            case RIGHT:
-                fprintf(gpoutfile, "\\makebox(0,0)[r]{\\strut{}%s}", str);
-                break;
-            }
-        if (ps_ang) {
-            fputs("}", gpoutfile);
-        }
-        fputs("}%\n", gpoutfile);
+	if (PSLATEX_inbox) {
+	    fprintf(gpoutfile, "      \\savebox{\\gptboxtext}{%s}\n", str);
+	    PSLATEX_xbox = x;
+	    PSLATEX_ybox = y;
+	} else {
+	    fprintf(gpoutfile, "      \\put(%d,%d){", x, y);
+	    if (ps_ang)
+		fprintf(gpoutfile,"\\rotatebox{%d}{", ps_ang);
+	    if (((str[0] == '{') || (str[0] == '['))) {
+		fprintf(gpoutfile, "\\makebox(0,0)%s", str);
+	    } else {
+		switch (ps_justify) {
+		case LEFT:
+		    fprintf(gpoutfile, "\\makebox(0,0)[l]{\\strut{}%s}", str);
+		    break;
+		case CENTRE:
+		    fprintf(gpoutfile, "\\makebox(0,0){\\strut{}%s}", str);
+		    break;
+		case RIGHT:
+		    fprintf(gpoutfile, "\\makebox(0,0)[r]{\\strut{}%s}", str);
+		    break;
+		}
+	    }
+	    if (ps_ang)
+		fputs("}", gpoutfile);
+	    fputs("}%\n", gpoutfile);
+	}
     }
 }
 
@@ -943,6 +967,67 @@ EPSLATEX_layer(t_termlayer syncpoint)
     }
 }
 
+#ifdef EAM_BOXED_TEXT
+TERM_PUBLIC void 
+EPSLATEX_boxed_text(unsigned int x, unsigned int y, int option)
+{
+    if (!gpoutfile)
+	return;
+
+    switch (option) {
+    case TEXTBOX_INIT:
+	/* Initialize bounding box for this text string */
+	PSLATEX_inbox = TRUE;
+	break;
+    case TEXTBOX_FINISH:
+	PSLATEX_inbox = FALSE;
+	break;
+    case TEXTBOX_OUTLINE:
+	fprintf(gpoutfile, "\t\\settowidth{\\gptboxwidth}{\\usebox{\\gptboxtext}}\n");
+	fprintf(gpoutfile, "\t\\advance\\gptboxwidth by 2\\fboxsep\n");
+	fprintf(gpoutfile, "\t\\put(%d,%d)", PSLATEX_xbox, PSLATEX_ybox);
+	switch (ps_justify) {
+	case LEFT:
+	    fprintf(gpoutfile, "{\\framebox[\\gptboxwidth][c]{\\usebox{\\gptboxtext}}}\n");
+	    break;
+	case CENTRE:
+	    fprintf(gpoutfile, "{\\makebox[0.5\\width][r]");
+	    fprintf(gpoutfile, "{\\framebox[\\gptboxwidth][c]{\\usebox{\\gptboxtext}}}}\n");
+	    break;
+	case RIGHT:
+	    fprintf(gpoutfile, "{\\makebox[-\\width][c]");
+	    fprintf(gpoutfile, "{\\framebox[\\gptboxwidth][c]{\\usebox{\\gptboxtext}}}}\n");
+	    break;
+	}
+	PSLATEX_inbox = FALSE;
+	break;
+    case TEXTBOX_BACKGROUNDFILL:
+	/* FIXME: should use background fill rather than white */
+	/* FIXME: I have zero idea why CENTER requires r while RIGHT requires c */
+	fprintf(gpoutfile, "\t\\put(%d,%d)", PSLATEX_xbox, PSLATEX_ybox);
+	switch (ps_justify) {
+	case LEFT:
+	    fprintf(gpoutfile, "{\\colorbox{white}{\\usebox{\\gptboxtext}}}\n");
+	    break;
+	case CENTRE:
+	    fprintf(gpoutfile, "{\\makebox[0.5\\width][r]");
+	    fprintf(gpoutfile, "{\\colorbox{white}{\\usebox{\\gptboxtext}}}}\n");
+	    break;
+	case RIGHT:
+	    fprintf(gpoutfile, "{\\makebox[-\\width][c]");
+	    fprintf(gpoutfile, "{\\colorbox{white}{\\usebox{\\gptboxtext}}}}\n");
+	    break;
+	}
+    case TEXTBOX_MARGINS:
+	break;
+    default:
+	break;
+    }
+}
+#else
+#define EPSLATEX_boxed_text NULL
+#endif
+
 #endif /* TERM_BODY */
 
 #ifdef TERM_TABLE
@@ -971,7 +1056,10 @@ TERM_TABLE_START(epslatex_driver)
     PS_image,
     0, 0, 0, /* Enhanced text mode not used */
     EPSLATEX_layer, /* Used to signal front/back text */
-    PS_path
+    PS_path,
+    0.0,	/* scale */
+    0,		/* hypertext */
+    EPSLATEX_boxed_text
 TERM_TABLE_END(epslatex_driver)
 #undef LAST_TERM
 #define LAST_TERM epslatex_driver

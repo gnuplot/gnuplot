@@ -1,3 +1,8 @@
+2013-07-05  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/gadgets.c src/term_api.h term/cairo.trm term/pslatex.trm:
+	Boxed text support for epslatex and cairolatex terminals.
+
 2013-07-04  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* docs/README.ja docs/term-ja.diff:  Update Japanese help texts.
