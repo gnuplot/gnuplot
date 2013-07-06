@@ -1,5 +1,7 @@
 2013-07-06  Bastian Maerkisch  <bmaerkisch@web.de>
 
+	* src/win/wgraph.c (luma_from_color):  New function.
+
 	* src/win/wgraph.c:  Avoid unnecessary tracking of text size for
 	non-boxed text.
 

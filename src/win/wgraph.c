@@ -1,5 +1,5 @@
 /*
- * $Id: wgraph.c,v 1.165 2013/06/23 19:53:02 markisch Exp $
+ * $Id: wgraph.c,v 1.166 2013/07/06 08:20:03 markisch Exp $
  */
 
 /* GNUPLOT - win/wgraph.c */
@@ -223,6 +223,7 @@ static void	SetFont(LPGW lpgw, HDC hdc);
 static void	SelFont(LPGW lpgw);
 static LPWSTR	UnicodeText(const char *str, enum set_encoding_id encoding);
 static void	dot(HDC hdc, int xdash, int ydash);
+static unsigned luma_from_color(unsigned red, unsigned green, unsigned blue);
 static unsigned int WDPROC GraphGetTextLength(LPGW lpgw, HDC hdc, LPCSTR text);
 static int	draw_enhanced_text(LPGW lpgw, HDC hdc, LPRECT rect, int x, int y, char * str);
 static void draw_get_enhanced_text_extend(PRECT extend);
@@ -1076,6 +1077,14 @@ dot(HDC hdc, int xdash, int ydash)
 {
 	MoveTo(hdc, xdash, ydash);
 	LineTo(hdc, xdash, ydash+1);
+}
+
+
+static unsigned
+luma_from_color(unsigned red, unsigned green, unsigned blue)
+{
+	/* convert to gray */
+	return (unsigned)(red * 0.30 + green * 0.59 + blue * 0.11);
 }
 
 
@@ -2269,7 +2278,7 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 					color = RGB(rgb255.r, rgb255.g, rgb255.b);
 				} else {
 					/* convert to gray */
-					int luma = (int)(rgb255.r * 0.3 + rgb255.g * 0.59 + rgb255.b * 0.11);
+					unsigned luma = luma_from_color(rgb255.r, rgb255.g, rgb255.b);
 					color = RGB(luma, luma, luma);
 				}
 			}
@@ -2488,7 +2497,7 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 								for (x = 0; x < width; x ++) {
 									BYTE * p = (BYTE *) dibimage + y * (3 * width + pad_bytes) + x * 3;
 									/* convert to gray */
-									int luma = (int) (p[2] * 0.3 + p[1] * 0.59 + p[0] * 0.11);
+									unsigned luma = luma_from_color(p[2], p[1], p[0]);
 									p[0] = p[1] = p[2] = luma;
 								}
 							}
@@ -2524,7 +2533,7 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 								for (x = 0; x < width; x ++) {
 									UINT32 * p = pvBits + y * width + x;
 									/* convert to gray */
-									int luma = (int)(GetRValue(*p) * 0.3 + GetGValue(*p) * 0.59 + GetBValue(*p) * 0.11);
+									unsigned luma = luma_from_color(GetRValue(*p), GetGValue(*p), GetBValue(*p));
 									*p = (*p & 0xff000000) | RGB(luma, luma, luma);
 								}
 							}
