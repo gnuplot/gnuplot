@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*- */
-/* $Id: tgif.trm,v 1.51 2012/09/26 18:23:38 sfeam Exp $ */
+/* $Id: tgif.trm,v 1.52 2013/07/05 23:08:38 sfeam Exp $ */
 
 /* GNUPLOT - tgif.trm */
 
@@ -738,7 +738,7 @@ TGIF_point(unsigned int ux, unsigned int uy, int number)
     x = (double) (ux + uXshift);
     y = (double) (uYshift - uy);
 
-    p = 4.0 * pointsize * uActPointSize;
+    p = 4.0 * uActPointSize;
     if (p == (double) 0.0)
 	p = 0.1;
 
@@ -1723,10 +1723,8 @@ START_HELP(tgif)
 "?tgif",
 " Tgif is an X11-based drawing tool---it has nothing to do with GIF.",
 "",
-" The `tgif` driver supports different pointsizes (with `set pointsize`),",
-" different label fonts and font sizes (e.g. `set label \"Hallo\" at x,y font",
-" \"Helvetica,34\"`) and multiple graphs on the page.  The proportions of the",
-" axes are not changed.",
+" The `tgif` driver supports a choice of font and font size and multiple",
+" graphs on the page.  The proportions of the axes are not changed.",
 "",
 " Syntax:",
 "       set terminal tgif {portrait | landscape | default} {<[x,y]>}",
