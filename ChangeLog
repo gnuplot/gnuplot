@@ -1,5 +1,8 @@
 2013-07-06  Bastian Maerkisch  <bmaerkisch@web.de>
 
+	* src/win/wtext.c:  Accept Ctrl-C to copy to clipboard.  Fix index out
+	of range error if text selection extends beyond the end of line.
+
 	* config/cygwin/Makefile config/msvc/Makefile config/mingw/Makefile
 	config/watcom/Makefile win/gnuplot.iss:  All Windows binaries now 
 	support some sort of pipes.  Consequently remove pgnuplot from 

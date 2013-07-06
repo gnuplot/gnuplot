@@ -1,5 +1,5 @@
 /*
- * $Id: wtext.c,v 1.41 2013/04/22 20:37:04 markisch Exp $
+ * $Id: wtext.c,v 1.42 2013/06/23 19:53:03 markisch Exp $
  */
 
 /* GNUPLOT - win/wtext.c */
@@ -886,7 +886,9 @@ TextCopyClip(LPTW lptw)
     if (count > 0) {
 	lb = sb_get(&(lptw->ScreenBuffer), pt.y);
 	if (lb->len > pt.x) {
-	    memcpy(cp, lb->str + pt.x, GPMIN(count, lb->len - pt.x));
+	    if (end.x > lb->len)
+		count = lb->len - pt.x;
+	    memcpy(cp, lb->str + pt.x, count);
 	    cp += count;
 	}
     }
@@ -1429,6 +1431,7 @@ WndTextProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 	if (GetKeyState(VK_CONTROL) < 0) {
 	    switch(wParam) {
 	    case VK_INSERT:
+	    case 'C':
 		/* Ctrl-Insert: copy to clipboard */
 		SendMessage(lptw->hWndText, WM_COMMAND, M_COPY_CLIP, (LPARAM)0);
 		break;
@@ -1556,21 +1559,21 @@ WndTextProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 	    zDelta = HIWORD(wParam);
 	    switch (fwKeys) {
 	    case 0:
-	        if (zDelta < 0)
+		if (zDelta < 0)
 		    SendMessage(hwnd, WM_VSCROLL, SB_LINEDOWN, (LPARAM)0);
 		else
 		    SendMessage(hwnd, WM_VSCROLL, SB_LINEUP, (LPARAM)0);
 		return 0;
 	    case MK_SHIFT:
-	        if (zDelta < 0)
-	    	    SendMessage(hwnd, WM_VSCROLL, SB_PAGEDOWN, (LPARAM)0);
-	        else
+		if (zDelta < 0)
+		    SendMessage(hwnd, WM_VSCROLL, SB_PAGEDOWN, (LPARAM)0);
+		else
 		    SendMessage(hwnd, WM_VSCROLL, SB_PAGEUP, (LPARAM)0);
 		return 0;
 	    case MK_CONTROL:
-	        if (zDelta < 0)
-	    	    SendMessage(hwnd, WM_CHAR, 0x0e, (LPARAM)0); // CTRL-N
-	        else
+		if (zDelta < 0)
+		    SendMessage(hwnd, WM_CHAR, 0x0e, (LPARAM)0); // CTRL-N
+		else
 		    SendMessage(hwnd, WM_CHAR, 0x10, (LPARAM)0); // CTRL-P
 		return 0;
 	    }
