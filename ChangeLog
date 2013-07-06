@@ -1,3 +1,10 @@
+2013-07-06  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* config/cygwin/Makefile config/msvc/Makefile config/mingw/Makefile
+	config/watcom/Makefile win/gnuplot.iss:  All Windows binaries now 
+	support some sort of pipes.  Consequently remove pgnuplot from 
+	default build and installation.
+
 2013-07-05  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* term/tgif.trm:  Reduce the point size by 50% to match other terminals.

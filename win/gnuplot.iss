@@ -1,5 +1,5 @@
 ﻿;
-; $Id: gnuplot.iss,v 1.3 2012/01/14 13:47:04 markisch Exp $
+; $Id: gnuplot.iss,v 1.4 2012/03/12 06:17:10 markisch Exp $
 ;
 ; GNUPLOT - gnuplot.iss
 ;
@@ -117,7 +117,6 @@ Source: "bin\gnuplot.exe"; DestDir: "{app}\bin\"; Flags: ignoreversion; Componen
 Source: "bin\*.dll"; DestDir: "{app}\bin\"; Flags: skipifsourcedoesntexist ignoreversion; Components: core
 Source: "bin\wgnuplot.mnu"; DestDir: {app}\bin\; Components: core
 Source: "bin\wgnuplot.chm"; DestDir: {app}\bin\; Components: core
-Source: bin\pgnuplot.exe; DestDir: {app}\bin\; Flags: skipifsourcedoesntexist; Components: core;
 Source: "share\*"; DestDir: {app}\share\; Flags: recursesubdirs; Components: core
 Source: "etc\*"; DestDir: {app}\etc\; Flags: skipifsourcedoesntexist recursesubdirs;  Components: core
 ; demo files / contrib

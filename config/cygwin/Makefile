@@ -1,5 +1,5 @@
 # Hey, Emacs, this is a -*- Makefile -*- #
-# $Id: Makefile,v 1.6 2012/07/18 16:42:51 markisch Exp $
+# $Id: Makefile,v 1.7 2013/06/24 13:45:12 markisch Exp $
 #
 #
 # GNUPLOT Makefile for Cygwin on WinNT and Win95/98/2000
@@ -30,11 +30,6 @@
 #    window it was launched from, or it opens a new one.
 # 3. gnuplot.exe: Console mode instead of GUI for the text input.
 #
-# Comment for programs using gnuplot as their plotting engine:
-# Both wgnuplot*.exe compile also pgnuplot.exe. This small helper program was
-# used when gnuplot.exe was not available on Windows. Nowadays, pgnuplot.exe
-# is deprecated -- plese use gnuplot.exe instead.
-
 TARGET=wgnuplot.exe
 #TARGET=wgnuplot_pipes.exe
 #TARGET=gnuplot.exe
@@ -126,17 +121,12 @@ GNUSORT = /usr/bin/sort
 # PIPES: define if you would prefer support of pipes undef Windows (e.g.
 # plot '<awk -f preprocess.awk my.dat'). Drawback: wgnuplot_pipes.exe keeps
 # attached to a console=DOS window it was launched from, or it opens a new one.
-# Note: Maybe it does not work properly with pgnuplot (not tested recently).
 
 # CONSOLE: define if you would prefer the console (non-GUI) version of the
 # text command window.
 
-# Set PGNUPLOT, PIPES and CONSOLE according to the target
-ifeq ($(TARGET),wgnuplot.exe)
-	PGNUPLOT=pgnuplot.exe
-endif
+# Set PIPES and CONSOLE according to the target
 ifeq ($(TARGET),wgnuplot_pipes.exe)
-	PGNUPLOT=pgnuplot.exe
 	PIPES=1
 endif
 ifeq ($(TARGET),gnuplot.exe)
@@ -255,7 +245,7 @@ else
 endif
 
 
-default: $(TARGET) $(HELPFILE) wgnuplot.mnu $(M)bf_test.exe $(PGNUPLOT)
+default: $(TARGET) $(HELPFILE) wgnuplot.mnu $(M)bf_test.exe
 
 all: default gnuplot.ps gnuplot.pdf
 
@@ -288,7 +278,7 @@ $(TARGET): $(OBJS) $(WINOBJS) wgplt_res.$(O)
 	$(LD) $(LDFLAGS) $(LDFLAGS2) -mwindows -mno-cygwin -o $@ \
 		$(OBJS) $(WINOBJS) wgplt_res.$(O) $(LDLIBS) $(TERMLIBS)
 
-$(PGNUPLOT): $(W)/pgnuplot.c version.$(O)
+pgnuplot.exe: $(W)/pgnuplot.c version.$(O)
 	$(CC) -O2 -s -mno-cygwin -DWINDOWS_NO_GUI -DHAVE_STDBOOL_H -o $@ \
 		$(W)/pgnuplot.c version.$(O) -I$(W) -I$(S) -luser32
 
@@ -417,7 +407,7 @@ clean:
 
 realclean: veryclean
 veryclean: clean
-	$(RM) wgnuplot.exe wgnuplot_pipes.exe gnuplot.exe pgnuplot.exe
+	$(RM) wgnuplot.exe wgnuplot_pipes.exe gnuplot.exe
 	$(RM) wgnuplot.hlp wgnuplot.gid wgnuplot.mnu
 	$(RM) $(M)binary[123] $(M)fit.log $(M)soundfit.par
 
@@ -427,7 +417,6 @@ install: default
 	cp gnuplot.exe $(DESTDIR)/gnuplot.exe
 	cp wgnuplot.exe $(DESTDIR)/wgnuplot.exe
 	cp wgnuplot_pipes.exe $(DESTDIR)/wgnuplot_pipes.exe
-	cp pgnuplot.exe $(DESTDIR)/pgnuplot.exe
 	cp $(W)/wgnuplot.mnu $(DESTDIR)/wgnuplot.mnu
 	cp wgnuplot.hlp $(DESTDIR)/wgnuplot.hlp
 	mkdir -p $(DESTDIR)/$(GNUPLOT_PS_DIR)

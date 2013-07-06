@@ -1,5 +1,5 @@
 # Hello, emacs: this is a -*- Makefile -*-
-# $Id: Makefile,v 1.29 2013/06/02 13:59:26 markisch Exp $
+# $Id: Makefile,v 1.30 2013/06/24 13:45:12 markisch Exp $
 #
 # GNUPLOT Makefile for MinGW/MSYS on Windows
 # This assumes usual installation of the MinGW32 toolkit, the free
@@ -158,15 +158,10 @@ ISCC = "$(PROGRAMFILES)/Inno Setup 5/iscc"
 #    window it was launched from, or it opens a new one.
 # 3. gnuplot.exe: Console mode instead of GUI for the text input.
 #
-# Comment for programs using gnuplot as their plotting engine:
-# Both wgnuplot*.exe compile also pgnuplot.exe. This small helper program was
-# used when gnuplot.exe was not available on Windows. Nowadays, pgnuplot.exe
-# is deprecated -- please use gnuplot.exe instead.
 
 # PIPES: define if you would prefer support of pipes undef Windows (e.g.
 # plot '<awk -f preprocess.awk my.dat'). Drawback: wgnuplot_pipes.exe keeps
 # attached to a console=DOS window it was launched from, or it opens a new one.
-# Note: Maybe it does not work properly with pgnuplot (not tested recently).
 
 # CONSOLE: define if you would prefer the console (non-GUI) version of the
 # text command window.
@@ -177,9 +172,8 @@ TARGET=wgnuplot.exe
 #TARGET=gnuplot.exe
 endif
 
-# Set PGNUPLOT, PIPES and CONSOLE according to the target
+# Set PIPES and CONSOLE according to the target
 ifeq ($(TARGET),wgnuplot.exe)
-	PGNUPLOT=pgnuplot.exe
 	MENUFILE=wgnuplot.mnu
 	O=o
 	CFLAGSEXTRA=-DUSE_FAKEPIPES
@@ -234,7 +228,7 @@ T=$(TOP)/term/
 D=$(TOP)/docs/
 M=$(TOP)/demo/
 
-VPATH = $(S):$(W):$(W):$(S)/wxterminal
+VPATH = $(S):$(W):$(S)/wxterminal
 
 TERMFLAGS = -DGNUPLOT_PS_DIR=\"$(GNUPLOT_PS_DIR)\" -DGNUPLOT_JS_DIR=\"$(GNUPLOT_JS_DIR)\"
 TERMFLAGS += -I$(TOP)/term
@@ -388,7 +382,7 @@ docs:
 	$(MAKE) TARGET=gnuplot.exe gnuplot.pdf gpcard.pdf tutorial.pdf \
 		ps_symbols.pdf ps_fontfile_doc.pdf ps_guide.pdf
 
-support: $(HELPFILE) $(M)bf_test.exe $(PGNUPLOT) $(LUATARGETS) $(HELPFILEJA)
+support: $(HELPFILE) $(M)bf_test.exe $(LUATARGETS) $(HELPFILEJA)
 
 ja: $(HELPFILEJA)
 
@@ -419,7 +413,7 @@ $(TARGET): $(OBJS) $(WINOBJS) wgplt_res.$(O)
 	$(LDX) $(LDFLAGS) $(LDFLAGS2) -o $@ $(OBJS) $(WINOBJS) wgplt_res.$(O) $(LDLIBS)\
 	$(TERMLIBS) $(WX_LIBS) $(PANGOCAIRO_LIBS)
 
-$(PGNUPLOT): $(W)/pgnuplot.c version.$(O)
+pgnuplot.exe: $(W)/pgnuplot.c version.$(O)
 	$(CC) -O2 -DWINDOWS_NO_GUI -DHAVE_STDBOOL_H -s -o $@ $^ -I$(W) -I$(S) -luser32
 
 # pull in dependency info for existing object files
@@ -688,7 +682,6 @@ install:
 	cp -p gnuplot.exe $(DESTDIR)/bin/
 	cp -p wgnuplot.exe $(DESTDIR)/bin/
 	cp -p wgnuplot_pipes.exe $(DESTDIR)/bin/
-	cp -p pgnuplot.exe $(DESTDIR)/bin/
 	cp -p $(W)/wgnuplot.mnu $(DESTDIR)/bin/
 	cp -p $(W)/wgnuplot-ja.mnu $(DESTDIR)/bin/
 	cp -p $(HELPFILE) $(DESTDIR)/bin/

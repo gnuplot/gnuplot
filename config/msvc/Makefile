@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.10 2013/06/02 13:59:26 markisch Exp $
+# $Id: Makefile,v 1.11 2013/06/24 13:45:12 markisch Exp $
 #
 # GNUPLOT Makefile Microsoft Visual C++ 2005 or newer
 
@@ -147,7 +147,7 @@ T=$(TOP)\\term\\
 D=$(TOP)\\docs\\
 M=$(TOP)\\demo\\
 
-default: wgnuplot.exe $(HELPFILE) wgnuplot.mnu $(M)bf_test.exe pgnuplot.exe gnuplot.exe
+default: wgnuplot.exe $(HELPFILE) wgnuplot.mnu $(M)bf_test.exe gnuplot.exe
 
 !INCLUDE $(S)\\makefile.all
 
@@ -326,7 +326,6 @@ install:
 	if not exist $(DESTDIR) mkdir $(DESTDIR)
 	if not exist $(DESTDIR)\bin mkdir $(DESTDIR)\bin
 	copy /Y wgnuplot.exe $(DESTDIR)\bin
-	copy /Y pgnuplot.exe $(DESTDIR)\bin
 	copy /Y gnuplot.exe $(DESTDIR)\bin
 	copy /Y *gnuplot.exe.manifest $(DESTDIR)\bin
 	copy /Y $(W)wgnuplot.mnu $(DESTDIR)\bin

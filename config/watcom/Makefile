@@ -1,5 +1,5 @@
 # Hello, emacs: this is a -*- Makefile -*-
-# $Id: Makefile,v 1.10 2012/07/18 16:42:51 markisch Exp $
+# $Id: Makefile,v 1.11 2013/06/24 13:45:12 markisch Exp $
 #
 # GNUPLOT Makefile OpenWatcom 1.3 on Win32
 
@@ -78,10 +78,10 @@ HELPFILE = wgnuplot.chm
 
 DEFAULT_TARGETS = $(BINARYFILES) $(HELPFILE)
 
-TARGETS_PLAIN=wgnuplot.exe wgnuplot.mnu pgnuplot.exe
+TARGETS_PLAIN=wgnuplot.exe wgnuplot.mnu
 EXTRA_CPPFLAGS_PLAIN = 
 
-TARGETS_PIPES=wgnuplot_pipes.exe wgnuplot.mnu pgnuplot.exe
+TARGETS_PIPES=wgnuplot_pipes.exe wgnuplot.mnu
 EXTRA_CPPFLAGS_PIPES = -DPIPES=1
 
 TARGETS_CONSOLE=gnuplot.exe
