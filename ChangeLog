@@ -1,3 +1,8 @@
+2013-07-06  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/win/wtext.c:  Accept Ctrl-C to copy to clipboard.  Fix index out
+	of range error if text selection extends beyond the end of line.
+
 2013-07-05  Dima Kogan  <dima@secretsauce.net>
 
 	* configure.in:  Test for incomplete installation of wxWidgets
