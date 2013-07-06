@@ -1,5 +1,5 @@
 /*
- * $Id: wgraph.c,v 1.164 2013/06/11 21:22:21 markisch Exp $
+ * $Id: wgraph.c,v 1.165 2013/06/23 19:53:02 markisch Exp $
  */
 
 /* GNUPLOT - win/wgraph.c */
@@ -102,8 +102,10 @@ static void	Wnd_refresh_zoombox(LPGW lpgw, LPARAM lParam);
 static void	Wnd_refresh_ruler_lineto(LPGW lpgw, LPARAM lParam);
 static void	GetMousePosViewport(LPGW lpgw, int *mx, int *my);
 static void	Draw_XOR_Text(LPGW lpgw, const char *text, size_t length, int x, int y);
+#endif
 static void	UpdateStatusLine(LPGW lpgw, const char text[]);
 static void	UpdateToolbar(LPGW lpgw);
+#ifdef USE_MOUSE
 static void	DrawRuler(LPGW lpgw);
 static void	DrawRulerLineTo(LPGW lpgw);
 static void	DrawZoomBox(LPGW lpgw);
@@ -223,6 +225,7 @@ static LPWSTR	UnicodeText(const char *str, enum set_encoding_id encoding);
 static void	dot(HDC hdc, int xdash, int ydash);
 static unsigned int WDPROC GraphGetTextLength(LPGW lpgw, HDC hdc, LPCSTR text);
 static int	draw_enhanced_text(LPGW lpgw, HDC hdc, LPRECT rect, int x, int y, char * str);
+static void draw_get_enhanced_text_extend(PRECT extend);
 static void	draw_text_justify(HDC hdc, int justify);
 static void	draw_put_text(LPGW lpgw, HDC hdc, int x, int y, char * str);
 static void	drawgraph(LPGW lpgw, HDC hdc, LPRECT rect);
@@ -589,8 +592,10 @@ GraphInit(LPGW lpgw)
 void WDPROC
 GraphClose(LPGW lpgw)
 {
+#ifdef USE_MOUSE
 	/* Pass it through mouse handling to check for "bind Close" */
 	Wnd_exec_event(lpgw, (LPARAM)0, GE_reset, 0);
+#endif
 	/* close window */
 	if (lpgw->hWndGraph)
 		DestroyWindow(lpgw->hWndGraph);
@@ -1134,11 +1139,8 @@ GraphEnhancedOpen(char *fontname, double fontsize, double base,
 		SetFont(enhstate.lpgw, enhstate.hdc);
 
 		/* Scale fractional font height to vertical units of display */
-		/* FIXME:
-			Font scaling is not done properly (yet) and will lead to
-			non-optimal results for most font and size selections.
-			OUTLINEFONTMETRICS could be used for better results here.
-		*/
+		/* TODO: Proper use of OUTLINEFONTMETRICS would yield better
+		   results. */
 		enhstate.base = win_scale * base *
 						enhstate.lpgw->sampling * enhstate.lpgw->fontscale *
 						enhstate.res_scale;
@@ -1324,6 +1326,28 @@ draw_enhanced_text(LPGW lpgw, HDC hdc, LPRECT rect, int x, int y, char * str)
 
 
 static void
+draw_get_enhanced_text_extend(PRECT extend)
+{
+	switch (enhstate.lpgw->justify) {
+	case LEFT:
+		extend->left  = 0;
+		extend->right = enhstate.totalwidth;
+		break;
+	case CENTRE:
+		extend->left  = enhstate.totalwidth / 2;
+		extend->right = enhstate.totalwidth / 2;
+		break;
+	case RIGHT:
+		extend->left  = enhstate.totalwidth;
+		extend->right = 0;
+		break;
+	}
+	extend->top = - enhstate.totalasc;
+	extend->bottom = enhstate.totaldesc;
+}
+
+
+static void
 draw_text_justify(HDC hdc, int justify)
 {
 	switch (justify)
@@ -1485,6 +1509,7 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 
 #ifdef EAM_BOXED_TEXT
 	struct s_boxedtext {
+		TBOOLEAN boxing;
 		t_textbox_options option;
 		POINT margin;
 		POINT start;
@@ -1571,6 +1596,10 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 		lpgw->keyboxes[i].bottom = INT_MAX;
 		lpgw->keyboxes[i].top = 0;
 	}
+
+#ifdef EAM_BOXED_TEXT
+	boxedtext.boxing = FALSE;
+#endif
 
 	SelectObject(hdc, lpgw->hapen); /* background brush */
 	SelectObject(hdc, lpgw->colorbrush[2]); /* first user pen */
@@ -1772,33 +1801,41 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 
 				/* shift correctly for rotated text */
 				draw_put_text(lpgw, hdc, xdash + hshift, ydash + vshift, str);
-				slen  = GraphGetTextLength(lpgw, hdc, str);
-				vsize = MulDiv(lpgw->vchar, rb - rt, 2 * lpgw->ymax);
-#ifdef EAM_BOXED_TEXT
-				if (lpgw->justify == LEFT) {
-					dxl = 0;
-					dxr = slen;
-				} else if (lpgw->justify == CENTRE) {
-					dxl = dxr = slen / 2;
-				} else {
-					dxl = slen;
-					dxr = 0;
-				}
-				if (boxedtext.box.left > (xdash - boxedtext.start.x - dxl))
-					boxedtext.box.left = xdash - boxedtext.start.x - dxl;
-				if (boxedtext.box.right < (xdash - boxedtext.start.x + dxr))
-					boxedtext.box.right = xdash - boxedtext.start.x + dxr;
-				if (boxedtext.box.top > (ydash - boxedtext.start.y - vsize))
-					boxedtext.box.top = ydash - boxedtext.start.y - vsize;
-				if (boxedtext.box.bottom < (ydash - boxedtext.start.y + vsize))
-					boxedtext.box.bottom = ydash - boxedtext.start.y + vsize;
-				/* We have to remember the text angle as well. */
-				boxedtext.angle = lpgw->angle;
+#ifndef EAM_BOXED_TEXT
+				if (keysample) {
+#else
+				if (keysample || boxedtext.boxing) {
 #endif
+					slen  = GraphGetTextLength(lpgw, hdc, str);
+					vsize = MulDiv(lpgw->vchar, rb - rt, 2 * lpgw->ymax);
+					if (lpgw->justify == LEFT) {
+						dxl = 0;
+						dxr = slen;
+					} else if (lpgw->justify == CENTRE) {
+						dxl = dxr = slen / 2;
+					} else {
+						dxl = slen;
+						dxr = 0;
+					}
+				}
 				if (keysample) {
 					draw_update_keybox(lpgw, plotno, xdash - dxl, ydash - vsize);
 					draw_update_keybox(lpgw, plotno, xdash + dxr, ydash + vsize);
 				}
+#ifdef EAM_BOXED_TEXT
+				if (boxedtext.boxing) {
+					if (boxedtext.box.left > (xdash - boxedtext.start.x - dxl))
+						boxedtext.box.left = xdash - boxedtext.start.x - dxl;
+					if (boxedtext.box.right < (xdash - boxedtext.start.x + dxr))
+						boxedtext.box.right = xdash - boxedtext.start.x + dxr;
+					if (boxedtext.box.top > (ydash - boxedtext.start.y - vsize))
+						boxedtext.box.top = ydash - boxedtext.start.y - vsize;
+					if (boxedtext.box.bottom < (ydash - boxedtext.start.y + vsize))
+						boxedtext.box.bottom = ydash - boxedtext.start.y + vsize;
+					/* We have to remember the text angle as well. */
+					boxedtext.angle = lpgw->angle;
+				}
+#endif
 			}
 			LocalUnlock(curptr->htext);
 			break;
@@ -1809,40 +1846,26 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 			str = LocalLock(curptr->htext);
 			if (str) {
 				RECT extend;
-				int slen;
 
-				slen = draw_enhanced_text(lpgw, hdc, rect, xdash, ydash, str);
-				switch (lpgw->justify) {
-				case LEFT:
-					extend.left  = 0;
-					extend.right = slen;
-					break;
-				case CENTRE:
-					extend.left  = slen / 2;
-					extend.right = slen / 2;
-					break;
-				case RIGHT:
-					extend.left  = slen;
-					extend.right = 0;
-					break;
-				}
-				extend.top = - enhstate.totalasc;
-				extend.bottom = enhstate.totaldesc;
+				draw_enhanced_text(lpgw, hdc, rect, xdash, ydash, str);
+				draw_get_enhanced_text_extend(&extend);
 				if (keysample) {
 					draw_update_keybox(lpgw, plotno, xdash - extend.left, ydash - extend.top);
 					draw_update_keybox(lpgw, plotno, xdash + extend.right, ydash + extend.bottom);
 				}
 #ifdef EAM_BOXED_TEXT
-				if (boxedtext.box.left > (boxedtext.start.x - xdash - extend.left))
-					boxedtext.box.left = boxedtext.start.x - xdash - extend.left;
-				if (boxedtext.box.right < (boxedtext.start.x - xdash + extend.right))
-					boxedtext.box.right = boxedtext.start.x - xdash + extend.right;
-				if (boxedtext.box.top > (boxedtext.start.y - ydash - extend.top))
-					boxedtext.box.top = boxedtext.start.y - ydash - extend.top;
-				if (boxedtext.box.bottom < (boxedtext.start.y - ydash + extend.bottom))
-					boxedtext.box.bottom = boxedtext.start.y - ydash + extend.bottom;
-				/* We have to store the text angle as well. */
-				boxedtext.angle = enhstate.lpgw->angle;
+				if (boxedtext.boxing) {
+					if (boxedtext.box.left > (boxedtext.start.x - xdash - extend.left))
+						boxedtext.box.left = boxedtext.start.x - xdash - extend.left;
+					if (boxedtext.box.right < (boxedtext.start.x - xdash + extend.right))
+						boxedtext.box.right = boxedtext.start.x - xdash + extend.right;
+					if (boxedtext.box.top > (boxedtext.start.y - ydash - extend.top))
+						boxedtext.box.top = boxedtext.start.y - ydash - extend.top;
+					if (boxedtext.box.bottom < (boxedtext.start.y - ydash + extend.bottom))
+						boxedtext.box.bottom = boxedtext.start.y - ydash + extend.bottom;
+					/* We have to store the text angle as well. */
+					boxedtext.angle = lpgw->angle;
+				}
 #endif
 			}
 			LocalUnlock(curptr->htext);
@@ -1879,6 +1902,7 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 				   but current core code does not set this until the actual
 				   print-out is done. */
 				boxedtext.angle = lpgw->angle;
+				boxedtext.boxing = TRUE;
 				break;
 			case TEXTBOX_OUTLINE:
 			case TEXTBOX_BACKGROUNDFILL: {
@@ -1982,6 +2006,7 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 						}
 					}
 				}
+				boxedtext.boxing = FALSE;
 				break;
 			}
 			case TEXTBOX_MARGINS:
@@ -2414,9 +2439,7 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 
 		case W_image:
 			{
-			/* Due to the structure of gwop in total 6 entries are needed.
-			   These static variables help to collect all the information
-			*/
+			/* Due to the structure of gwop 6 entries are needed in total. */
 			if (seq == 0) {
 				/* First OP contains only the color mode */
 				color_mode = curptr->x;
@@ -3247,9 +3270,9 @@ static void
 clear_tooltips(LPGW lpgw)
 {
 	int i;
-	for (i = 0; i < lpgw->numtooltips; i++) {
+
+	for (i = 0; i < lpgw->numtooltips; i++)
 		free(lpgw->tooltips[i].text);
-	}
 	lpgw->numtooltips = 0;
 	lpgw->maxtooltips = 0;
 	free(lpgw->tooltips);
@@ -3528,7 +3551,6 @@ LineStyleDlgProc(HWND hdlg, UINT wmsg, WPARAM wparam, LPARAM lparam)
 }
 
 
-
 /* GetWindowLong(hwnd, 4) must be available for use */
 static BOOL
 LineStyle(LPGW lpgw)
@@ -3549,6 +3571,7 @@ LineStyle(LPGW lpgw)
 	SetWindowLong(lpgw->hWndGraph, 4, (LONG)(0L));
 	return status;
 }
+
 
 #ifdef USE_MOUSE
 /* ================================== */
@@ -3574,6 +3597,7 @@ Wnd_exec_event(LPGW lpgw, LPARAM lparam, char type, int par1)
 	}
 }
 
+
 static void
 Wnd_refresh_zoombox(LPGW lpgw, LPARAM lParam)
 {
@@ -3586,6 +3610,7 @@ Wnd_refresh_zoombox(LPGW lpgw, LPARAM lParam)
 		DrawZoomBox(lpgw); /*  draw new zoom box */
 	}
 }
+
 
 static void
 Wnd_refresh_ruler_lineto(LPGW lpgw, LPARAM lParam)
@@ -4596,6 +4621,7 @@ Draw_XOR_Text(LPGW lpgw, const char *text, size_t length, int x, int y)
 	ReleaseDC(lpgw->hWndGraph, hdc);
 }
 
+#endif
 
 /* ================================== */
 
@@ -4637,6 +4663,7 @@ UpdateToolbar(LPGW lpgw)
 	}
 }
 
+#ifdef USE_MOUSE
 
 /* Draw the ruler.
  */

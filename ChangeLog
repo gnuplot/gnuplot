@@ -1,5 +1,8 @@
 2013-07-06  Bastian Maerkisch  <bmaerkisch@web.de>
 
+	* src/win/wgraph.c:  Avoid unnecessary tracking of text size for
+	non-boxed text.
+
 	* src/win/wtext.c:  Accept Ctrl-C to copy to clipboard.  Fix index out
 	of range error if text selection extends beyond the end of line.
 
