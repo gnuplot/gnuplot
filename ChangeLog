@@ -8,7 +8,7 @@
 	*  configure.in docs/gnuplot.doc src/Makefile.am src/eval.c
 	src/libcerf.c src/libcerf.h src/specfun.c src/specfun.h:
 
-	The BSD-licensed libcerf library provides a set of special functions
+	The MIT-licensed libcerf library provides a set of special functions
 	related to the complex error function cerf(z).  If it is found during
 	./configure, we compile user-callable wrappers for the routines
 	Complex error function
