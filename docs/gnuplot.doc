@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.811 2013/07/02 20:21:52 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.812 2013/07/03 23:15:36 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -247,6 +247,9 @@ C
 
  * The optional bandwidth for the kernel density smoothing option is taken from
  a keyword rather than a data column.  See `smooth kdensity`.
+
+ * If external library libcerf is available, provide complex math routines
+ cerf, cdawson, erfi, faddeeva, and the Voigt profile VP(x,sigma,gamma).
 
 2 Deprecated syntax
 ?deprecated syntax
@@ -1228,10 +1231,62 @@ C marker below is used to signal this to doc2html:
 ?expressions functions voigt
 ?voigt
 #voigt(x,y) & real & Voigt/Faddeeva function $\frac{y}{\pi} \int{\frac{exp(-t^2)}{(x-t)^2+y^2}}dt$ \\
+#           &       & Note: voigt$(x,y)$ = $real($faddeeva$(x+iy))$ \\
 %voigt(x,y)@real@convolution of Gaussian and Lorentzian
  The function `voigt(x,y)` returns an approximation to the Voigt/Faddeeva
  function used in spectral analysis. The approximation is accurate to 
- one part in 10^4.
+ one part in 10^4.  If the libcerf routines are available, the re_w_of_z()
+ routine is used to provide a more accurate value.
+ Note that voigt(x,y) = real(faddeeva( x + y*{0,1} )).
+#\hline \end{longtable}
+#%% begin dummy tabular because the @end processing wants to end one
+#\begin{tabular}{|ccl|}
+@end table
+
+^<!-- INCLUDE_NEXT_TABLE -->
+@start table
+#\begin{longtable}{|ccl|} \hline
+#\multicolumn{3}{|c|}{Special functions from libcerf (only if available)} \\ \hline \hline
+#Function & Arguments & Returns \\ \hline
+#\endhead \hline \endfoot
+%c c l .
+%Function@Arguments@Returns
+%_
+4 cerf
+?expressions functions cerf
+?cerf
+#cerf(z) & complex &  complex error function \\
+%cerf(z)@complex@complex error function \\
+ `cerf(z)` is the complex version of the error function erf(x)
+4 cdawson
+?expressions functions cdawson
+?cdawson
+=dawson
+%cdawson(z) @ complex @ complex Dawson's integral \\
+#cdawson(z)&complex&complex extension of Dawson's integral $D(z)={\frac{\sqrt{\pi}}{2}e^{-z^2} erfi(z)} $ \\
+ `cdawson(z)` returns Dawson's Integral evaluated for the complex argument z.
+ cdawson(z) = sqrt(pi)/2 * exp(-z^2) * erfi(z)
+4 faddeeva
+?expressions functions faddeeva
+?faddeeva
+%faddeeva(z) @ complex @ rescaled complex error function w(z) = exp(-z^2) * erfc(-i*z) \\
+#faddeeva(z)&complex&rescaled complex error function $w(z) = e^{-z^2}~ erfc(-iz) $ \\
+ `Faddeeva(z) returns the rescaled complex error function w(z) = exp(-z^2) * erfc(-i*z)
+ This corresponds to Eqs 7.1.3 and 7.1.4 of Abramowitz and Stegun.
+4 erfi
+?expressions functions erfi
+?erfi
+%erfi(x) @ real @ imaginary error function erfi(x) = -i * erf(ix) \\
+#erfi(x)&real&imaginary error function $erf(x) = -i * erf(ix)$ \\
+Imaginary error function erfi(x) = -i * erf(ix)
+4 Voigt Profile
+?expressions functions VP
+?VP
+%VP(x,sigma,gamma) @ real @ Voight profile \\
+#VP(x,$\sigma$,$\gamma$)&real& Voigt profile $ VP(x,\sigma,\gamma) = {\int^{\infty}_{-\infty}{G(x^\prime;\sigma) L(x-x^\prime;\gamma) dx^\prime }} $ \\
+ `VP(x,sigma,gamma)` corresponds to the Voigt profile defined by convolution of
+ a Gaussian G(x;sigma) with a Lorentzian L(x;gamma).
+
 #\hline \end{longtable}
 #%% begin dummy tabular because the @end processing wants to end one
 #\begin{tabular}{|ccl|}

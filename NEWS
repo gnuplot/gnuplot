@@ -20,6 +20,7 @@ New features, changes and fixes since gnuplot version 4.6
 * NEW 'set multiplot next/previous'
 * NEW 'set contours; splot FOO with labels' places labels on the contour lines
 * NEW Additional levels of user-specified axis tics
+* NEW complex math routines cerf, cdawson, erfi, faddeeva from libcerf if present
 * CHANGE mouse wheel and +/- keys zoom centered on current mouse position
 * CHANGE Provide kdensity bandwidth via a keyword rather than a data column
 * CHANGE Pipe (popen/pclose) emulation within wgnuplot

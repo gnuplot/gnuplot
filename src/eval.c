@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: eval.c,v 1.105 2012/10/30 04:43:42 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: eval.c,v 1.106 2013/05/05 16:52:35 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - eval.c */
@@ -45,6 +45,7 @@ static char *RCSid() { return RCSid("$Id: eval.c,v 1.105 2012/10/30 04:43:42 sfe
 #include "datafile.h"
 #include "datablock.h"
 #include "internal.h"
+#include "libcerf.h"
 #include "specfun.h"
 #include "standard.h"
 #include "util.h"
@@ -180,6 +181,14 @@ const struct ft_entry GPFAR ft[] =
     {"lambertw",  f_lambertw}, /* HBB, from G.Kuhnle 20001107 */
     {"airy",  f_airy},         /* janert, 20090905 */
     {"expint",  f_expint},     /* Jim Van Zandt, 20101010 */
+
+#ifdef HAVE_LIBCERF
+    {"cerf", f_cerf},		/* complex error function */
+    {"cdawson", f_cdawson},	/* complex Dawson's integral */
+    {"erfi", f_erfi},		/* imaginary error function */
+    {"VP", f_voigtp},		/* Voigt profile */
+    {"faddeeva", f_faddeeva},	/* Faddeeva rescaled complex error function "w_of_z" */
+#endif
 
     {"tm_sec",  f_tmsec},	/* for timeseries */
     {"tm_min",  f_tmmin},	/* for timeseries */

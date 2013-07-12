@@ -5,6 +5,31 @@
 	with code from the Cephes library, the source of other routines
 	already in specfun.c.
 
+	*  configure.in docs/gnuplot.doc src/Makefile.am src/eval.c
+	src/libcerf.c src/libcerf.h src/specfun.c src/specfun.h:
+
+	The BSD-licensed libcerf library provides a set of special functions
+	related to the complex error function cerf(z).  If it is found during
+	./configure, we compile user-callable wrappers for the routines
+	Complex error function
+		   cerf(z) = 2/sqrt(pi) * int[0,z] exp(-t^2) dt
+	Complex Dawson's Integral
+		   cdawson(z) = exp(-z^2) int[0,z] exp(t^2) dt
+		              = sqrt(pi)/2 * exp(-z^2) * erfi(z)
+	Imaginary error function (real valued)
+		   erfi(x) = -i * erf(i * x)
+	Faddeeva rescaled complex error function (Abramowitz & Stegun 7.1.3)
+		   faddeeva(z) = w(z) = exp(-z^2) * erfc(-i*z)
+	Voigt Profile 
+		   VP(x, sigma, gamma) = integral G(t;sigma) L(x-t;gamma) dt
+		corresponding to convolution of
+		Gaussian 
+		   G(x;sigma) = 1/sqrt(2*pi)/|sigma| * exp(-x^2/2/sigma^2)
+		with Lorentzian
+		   L(x;gamma) = |gamma| / pi / ( x^2 + gamma^2 )
+	The libcerf routine re_w_of_z(x,y) is used to provide a higher accuracy
+	version of voigt(x,y).
+
 2013-07-06  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/win/wgraph.c (luma_from_color):  New function.

@@ -1,5 +1,5 @@
 /*
- * $Id: specfun.h,v 1.11 2010/10/22 05:28:24 sfeam Exp $
+ * $Id: specfun.h,v 1.12 2013/05/08 03:57:54 markisch Exp $
  */
 
 /* GNUPLOT - specfun.h */
@@ -53,7 +53,6 @@ double chisq_cdf __PROTO((int dof, double chisqr));
 void f_erf __PROTO((union argument *x));
 void f_erfc __PROTO((union argument *x));
 void f_ibeta __PROTO((union argument *x));
-void f_voigt __PROTO((union argument *x));
 void f_igamma __PROTO((union argument *x));
 void f_gamma __PROTO((union argument *x));
 void f_lgamma __PROTO((union argument *x));
@@ -64,5 +63,9 @@ void f_inverse_erf __PROTO((union argument *x));
 void f_lambertw __PROTO((union argument *x));
 void f_airy __PROTO((union argument *x));
 void f_expint __PROTO((union argument *x));
+
+#ifndef HAVE_LIBCERF
+void f_voigt __PROTO((union argument *x));
+#endif
 
 #endif /* GNUPLOT_SPECFUN_H */

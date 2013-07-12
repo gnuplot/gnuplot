@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: specfun.c,v 1.49 2013/06/11 03:36:33 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: specfun.c,v 1.50 2013/07/12 19:39:29 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - specfun.c */
@@ -676,6 +676,12 @@ void f_rand(union argument *arg)
 
 #endif /* BADRAND */
 
+/*
+ * Fallback implementation of the Faddeeva/Voigt function 
+ *	w(z) = exp(*-z^2) * erfc(-i*z)
+ * if not available from libcerf or some other library
+ */
+#ifndef HAVE_LIBCERF
 void
 f_voigt(union argument *arg)
 {
@@ -837,6 +843,7 @@ static double humlik(double x, double y)
         return k;
     }
 }
+#endif /* libcerf not available */
 
 /* ** ibeta.c
  *
