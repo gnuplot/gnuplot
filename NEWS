@@ -39,6 +39,7 @@ New features, changes and fixes since gnuplot version 4.6
 * CHANGE Use Sutherland-Hodgman algorithm for clipping polygons and filled curves
 * CHANGE Maximum number of fit dimensions increased to 12 (was 5).
 * CHANGE pgnuplot no longer included in binary distribution
+* CHANGE new implementation of Airy function (much higher precision)
 * FIX Hitting ^C twice will forcibly terminate wxt if server connection is lost
 
 New features, changes and fixes in gnuplot version 4.6

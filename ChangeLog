@@ -1,3 +1,10 @@
+2013-07-12  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/specfun.c (f_airy):  The implementation of the Airy function 
+	used in 4.6 has poor precision (up to 2% relative error).  Replace it
+	with code from the Cephes library, the source of other routines
+	already in specfun.c.
+
 2013-07-06  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/win/wgraph.c (luma_from_color):  New function.
