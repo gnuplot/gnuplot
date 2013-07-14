@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.813 2013/07/13 05:52:43 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.814 2013/07/13 22:03:49 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -1271,7 +1271,7 @@ C marker below is used to signal this to doc2html:
 ?faddeeva
 %faddeeva(z) @ complex @ rescaled complex error function w(z) = exp(-z^2) * erfc(-i*z) \\
 #faddeeva(z)&complex&rescaled complex error function $w(z) = e^{-z^2}~ erfc(-iz) $ \\
- `Faddeeva(z) returns the rescaled complex error function 
+ `Faddeeva(z)` returns the rescaled complex error function 
   w(z) = exp(-z^2) * erfc(-i*z)
  This corresponds to Eqs 7.1.3 and 7.1.4 of Abramowitz and Stegun.
 4 erfi
