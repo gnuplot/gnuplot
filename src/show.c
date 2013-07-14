@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.298 2013/06/27 20:03:41 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.299 2013/06/30 17:48:26 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -866,6 +866,13 @@ show_version(FILE *fp)
 		"HISTORY  "
 		"";
 
+	    const char *libcerf =
+#ifdef HAVE_LIBCERF
+		"+LIBCERF  ";
+#else
+		"";
+#endif
+
 	    const char *libgd =
 #ifdef HAVE_LIBGD
 # ifdef HAVE_GD_PNG
@@ -967,10 +974,10 @@ show_version(FILE *fp)
 
 	    sprintf(compile_options, "\
 %s%s\n%s%s\n\
-%s%s\n\
+%s%s%s\n\
 %s%s%s%s\n%s\n",
 		    rdline, gnu_rdline, compatibility, binary_files,
-		    libgd, linuxvga,
+		    libcerf, libgd, linuxvga,
 		    nocwdrc, x11, use_mouse, hiddenline,
 		    plotoptions);
 	}

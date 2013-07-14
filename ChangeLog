@@ -1,3 +1,9 @@
+2013-07-14  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/show.c (show_version):  Report +LIBCERF in 'show version long'.
+
+	* demo/cerf.dem:  Excercise functions imported from libcerf, if present.
+
 2013-07-12  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/specfun.c (f_airy):  The implementation of the Airy function 

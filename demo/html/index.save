@@ -42,7 +42,8 @@ Interactive demo scripts are not included on this page.
     <li><a href="approximate.html">approximation</a></li>
     <li><a href="spline.html">B-splines</a></li>
     <li><a href="airfoil.html">Bezier splines</a></li>
-    <li><a href="complex_trig.html">complex functions</a></li>
+    <li><a href="complex_trig.html">complex trig functions</a></li>
+    <li><a href="cerf.html">complex error function</a></li>
     <li><a href="fit.html">parameter fitting</a></li>
     <li><a href="prob2.html">probability</a></li>
     <li><a href="prob.html">probability (more)</a></li>
@@ -162,7 +163,7 @@ Interactive demo scripts are not included on this page.
 <tbody><tr>
 
     <td>
-    <i>This page created by Ethan Merritt<br>September 2012</i>
+    <i>This page created by Ethan Merritt<br>July 2013</i>
     </td>
 
     <td>

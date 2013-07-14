@@ -53,7 +53,8 @@ The mousing code is new. You may see some browser-dependent glitches.
     <li><a href="approximate.html">approximation</a></li>
     <li><a href="spline.html">B-splines</a></li>
     <li><a href="airfoil.html">Bezier splines</a></li>
-    <li><font color=gray>>complex functions</font></li>
+    <li><font color=gray>complex trig functions</font></li>
+    <li><a href="cerf.html">complex error function</font></li>
     <li><a href="prob2.html">probability</a></li>
     <li><a href="prob.html">probability (more)</a></li>
     <li><a href="random.html">random numbers</a></li>
@@ -176,7 +177,7 @@ The mousing code is new. You may see some browser-dependent glitches.
 <tbody><tr valign="top">
 
     <td>
-    <i>This page created by Ethan Merritt<br>April 2012</i>
+    <i>This page created by Ethan Merritt<br>July 2013</i>
     </td>
 
     <td>
