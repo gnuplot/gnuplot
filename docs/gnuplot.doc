@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.814 2013/07/13 22:03:49 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.815 2013/07/14 02:55:04 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -801,7 +801,7 @@ C
 ^<tr>    <td>imag(x)</td>    <td>complex</td>    <td>Im(<i>x</i>), imaginary part of <i>x</i> as a real number</td></tr>
 ^<tr>    <td>invnorm(x)</td>    <td>any</td>    <td>inverse normal distribution function real(<i>x</i>)</td></tr>
 ^<tr>    <td>int(x)</td>    <td>real</td>    <td>integer part of <i>x</i>, truncated toward zero</td></tr>
-^<tr>    <td>lambertw(x)</td>    <td>real</td>    <td>Lambert W function</td></tr>
+^<tr>    <td>lambertw(x)</td>    <td>real</td>    <td>Lambert <i>W</i> function</td></tr>
 ^<tr>    <td>lgamma(x)</td>    <td>any</td>    <td>lgamma(Re(<i>x</i>)), lgamma function of real(<i>x</i>)</td></tr>
 ^<tr>    <td>log(x)</td>    <td>any</td>    <td>ln <i>x</i>, natural logarithm (base <i>e</i>) of <i>x</i></td></tr>
 ^<tr>    <td>log10(x)</td>    <td>any</td>    <td>log<sub>10</sub> <i>x</i>, logarithm (base 10) of <i>x</i></td></tr>
@@ -815,6 +815,28 @@ C
 ^<tr>    <td>tan(x)</td>    <td>any</td>    <td>tan <i>x</i>, tangent of <i>x</i></td></tr>
 ^<tr>    <td>tanh(x)</td>    <td>any</td>    <td>tanh <i>x</i>, hyperbolic tangent of <i>x</i> in radians</td></tr>
 ^<tr>    <td>voigt(x,y)</td>    <td>real</td>    <td>convolution of Gaussian and Lorentzian</td></tr>
+^</tbody>
+^</table>
+
+^<p>&nbsp;</p>
+
+^<table align="center" border="1" rules="groups" frame="hsides" cellpadding="3" width="90%">
+^<colgroup>
+^  <col align="center">
+^  <col align="center">
+^  <col align="left">
+^</colgroup>
+^<thead>
+^<tr>   <th colspan="3">Special functions from libcerf (only if available)</th></tr>
+^<tr>    <th>Function</th>    <th>Arguments</th>    <th>Returns</th></tr>
+^</thead>
+^<tbody>
+^<tr>    <td>cerf(z)</td>    <td>complex</td>    <td>complex error function</td></tr>
+^<tr>    <td>cdawson(z)</td>    <td>complex</td>    <td>complex Dawson's integral</td></tr>
+^<tr>    <td>faddeeva(z)</td>    <td>complex</td>    <td>rescaled complex error function <i>w</i>(<i>z</i>) = exp(-<i>z</i>²) × erfc(-i<i>z</i>)</td></tr>
+^<tr>    <td>erfi(x)</td>    <td>real</td>    <td>imaginary error function erfi(<i>x</i>) = -i × erf(i<i>x</i>)</td></tr>
+^<tr>    <td>VP(x,sigma,gamma)</td>    <td>real</td>    <td>Voigt profile</td></tr>
+
 ^</tbody>
 ^</table>
 
@@ -1283,7 +1305,7 @@ C marker below is used to signal this to doc2html:
 4 Voigt Profile
 ?expressions functions VP
 ?VP
-%VP(x,sigma,gamma) @ real @ Voight profile \\
+%VP(x,sigma,gamma) @ real @ Voigt profile \\
 #VP(x,$\sigma$,$\gamma$)&real& Voigt profile $ VP(x,\sigma,\gamma) = {\int^{\infty}_{-\infty}{G(x^\prime;\sigma) L(x-x^\prime;\gamma) dx^\prime }} $ \\
  `VP(x,sigma,gamma)` corresponds to the Voigt profile defined by convolution of
  a Gaussian G(x;sigma) with a Lorentzian L(x;gamma).
