@@ -8,6 +8,9 @@ if (!strstrt(GPVAL_COMPILE_OPTIONS,"+LIBCERF")) {
 	exit;
 }
 
+save_encoding = GPVAL_ENCODING
+set encoding utf8
+
 set title "Voigt Profile VP(x,σ,γ)"
 set xrange [-10:10]
 set yrange [0.0:0.3]
@@ -69,3 +72,4 @@ splot '++' using 1:2:(color($1,$2)) with pm3d lc rgb variable nocontour, \
 
 pause -1 "<cr> to continue"
 reset
+set encoding save_encoding
