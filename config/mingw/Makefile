@@ -1,5 +1,5 @@
 # Hello, emacs: this is a -*- Makefile -*-
-# $Id: Makefile,v 1.30 2013/06/24 13:45:12 markisch Exp $
+# $Id: Makefile,v 1.31 2013/07/06 08:09:20 markisch Exp $
 #
 # GNUPLOT Makefile for MinGW/MSYS on Windows
 # This assumes usual installation of the MinGW32 toolkit, the free
@@ -84,6 +84,10 @@ MOUSE=1
 # Uncomment if you have libiconv
 ICONV=1
 
+# Uncomment if you have libcerf
+# http://sourceforge.net/projects/libcerf/
+CERF=1
+
 # Below you can adapt paths according to your software setup:
 
 # Where to install the PostScript prologue files, relatively to the executable
@@ -112,7 +116,7 @@ DESTDIR = "$(PROGRAMFILES)/gnuplot"
 
 # Do you want some special optimization?
 # -mpentium means optimise for Pentium processor
-# -mpentiumpro means optimize for Pentium II and Pro procesors
+# -mpentiumpro means optimize for Pentium II and Pro processors
 #CFLAGS +=
 
 # To compile the .chm file you need the Microsoft HTML Help 1.4 SDK
@@ -350,6 +354,11 @@ endif
 ifdef ICONV
 	CFLAGS += -DHAVE_ICONV
 	TERMLIBS += -liconv
+endif
+
+ifdef CERF
+	CFLAGS += -DHAVE_LIBCERF
+	TERMLIBS += -lcerf
 endif
 
 ifdef GNU_RC

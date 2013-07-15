@@ -1,3 +1,13 @@
+2013-07-15  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/makefile.all src/makefile.awc:  Recreate to include libcerf.
+
+	* demo/cerf.dem:  UTF8 encoding
+
+	* docs/gnuplot.doc:  HTML table for libcerf functions.
+
+	* config/mingw/Makefile:  Build option to use libcerf.
+
 2013-07-14  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/show.c (show_version):  Report +LIBCERF in 'show version long'.
