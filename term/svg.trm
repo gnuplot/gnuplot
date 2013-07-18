@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: svg.trm,v 1.155 2013/05/21 03:49:29 sfeam Exp $
+ * $Id: svg.trm,v 1.156 2013/05/21 20:36:46 sfeam Exp $
  */
 
 /*------------------------------------------------------------------------------------------------------------------------------------
@@ -653,15 +653,7 @@ SVG_options ()
 	    if (!fontfile_name)
 		int_error(c_token, "Font filename expected");
 	    gp_expand_tilde(&fontfile_name);
-#if defined(PIPES)
-	    if ( *fontfile_name == '<' ) {
-		SVG_embedded_font = fontfile_name;
-	    } else
-#endif
-		SVG_embedded_font = fontpath_fullname(fontfile_name);
-	    if (!SVG_embedded_font)
-		int_error(c_token, "Font file '%s' not found", fontfile_name);
-
+	    SVG_embedded_font = fontfile_name;
 	    continue;
 	}
 

@@ -3,6 +3,10 @@
 	* configure.in:  Allow for the case that pkg-config is needed in order
 	to find libcerf (which Mojca Miklavec reports is the case on OSX).
 
+	* term/svg.trm:  The svg terminal should not rely on 'set fontpath',
+	which was written and documented to apply only to the postscript
+	terminal.
+
 2013-07-15  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/makefile.all src/makefile.awc:  Recreate to include libcerf.
