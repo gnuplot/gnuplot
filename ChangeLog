@@ -1,3 +1,8 @@
+2013-07-18  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* configure.in:  Allow for the case that pkg-config is needed in order
+	to find libcerf (which Mojca Miklavec reports is the case on OSX).
+
 2013-07-15  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/makefile.all src/makefile.awc:  Recreate to include libcerf.
@@ -12,7 +17,7 @@
 
 	* src/show.c (show_version):  Report +LIBCERF in 'show version long'.
 
-	* demo/cerf.dem:  Excercise functions imported from libcerf, if present.
+	* demo/cerf.dem:  Exercise functions imported from libcerf, if present.
 
 2013-07-12  Ethan A Merritt  <merritt@u.washington.edu>
 

@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot on Unix.
 dnl
-dnl $Id: configure.in,v 1.330 2013/07/05 22:43:44 sfeam Exp $
+dnl $Id: configure.in,v 1.331 2013/07/13 05:52:43 sfeam Exp $
 dnl
 dnl this is actually major.minor ...
 dnl note that for a non-beta release, we need to disable DEVELOPMENT_RELEASE
@@ -76,10 +76,16 @@ AM_PROG_CC_C_O
 AC_SUBST(CC_FOR_BUILD)
 
 dnl The libcerf library contains a set of complex-valued special functions
-dnl related to the error function (cerf, cerfc, Dawson's integral, Voigt profile).
+dnl related to the error function (cerf, erfi, Dawson's integral, Voigt profile).
 dnl If libcerf is installed then we can use them.
+PKG_CHECK_MODULES_NOFAIL([LIBCERF], [libcerf],
+    [
+    CPPFLAGS="$CPPFLAGS $LIBCERF_CFLAGS"
+    LDFLAGS="$LDFLAGS $LIBCERF_LIBS"
+    ],
+)
 AC_SEARCH_LIBS([cdawson], [cerf],
-    [AC_DEFINE([HAVE_LIBCERF], 1, [define if you have libcerf]),
+    [AC_DEFINE([HAVE_LIBCERF], 1, [define if you have libcerf])
     have_libcerf=yes]
 )
 

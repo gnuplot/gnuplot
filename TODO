@@ -118,9 +118,10 @@ Ethan's List (2012):
 - more demos and more comprehensible descriptions in the user manual
 - support mousing in multiplot output, at least for selected terminals
 - add additional tic levels, possibly to appear only when zoomed
+- violin plots
+- enhanced text mode support for italic, boldface
 
 - Changes for 5.0 (syntax or behavior is not 100% backward compatible)
-  + separate out the handling of junk, NaN, Inf, and missing data entries
   + revise the keywords for matrix handling so that the binary and ascii
     versions are consistent
   + apply in-line plot ranges only to the immediately following plot clause
