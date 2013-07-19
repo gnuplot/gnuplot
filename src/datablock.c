@@ -1,5 +1,5 @@
 /*
- * $Id: datablock.c,v 0.001 2012/06/08 00:17:22 sfeam Exp $
+ * $Id: datablock.c,v 1.1 2012/06/19 18:11:05 sfeam Exp $
  */
 /* GNUPLOT - datablock.c */
 
@@ -122,8 +122,8 @@ datablock_command()
 	/* Allocate space for data lines plus at least 2 empty lines at the end. */
 	if (nlines >= nsize-4) {
 	    nsize *= 2;
-	    datablock->udv_value.v.data_array = 
-		gp_realloc( datablock->udv_value.v.data_array, 
+	    datablock->udv_value.v.data_array =
+		gp_realloc( datablock->udv_value.v.data_array,
 			nsize * sizeof(char *), "datablock");
 	    memset(&datablock->udv_value.v.data_array[nlines], 0,
 		    (nsize - nlines) * sizeof(char *));
@@ -160,7 +160,7 @@ get_datablock(char *name)
     struct udvt_entry *datablock;
 
     datablock = get_udv_by_name(name);
-    if (!datablock || datablock->udv_undef 
+    if (!datablock || datablock->udv_undef
     ||  datablock->udv_value.v.data_array == NULL)
 	int_error(NO_CARET,"no datablock named %s",name);
 
