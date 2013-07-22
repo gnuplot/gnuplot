@@ -1,5 +1,5 @@
 /*
- * $Id: command.h,v 1.58 2012/08/05 19:24:53 sfeam Exp $
+ * $Id: command.h,v 1.59 2013/01/04 22:03:54 broeker Exp $
  */
 
 /* GNUPLOT - command.h */
@@ -140,7 +140,9 @@ extern void wxt_lower_terminal_window __PROTO((int));
 extern void wxt_lower_terminal_group __PROTO((void));
 #endif
 #ifdef GP_MACROS
-extern int string_expand_macros __PROTO((void));
+extern void string_expand_macros __PROTO((void));
+#else
+#define string_expand_macros()
 #endif
 
 #ifdef USE_MOUSE

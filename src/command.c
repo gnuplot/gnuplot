@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.257 2013/05/06 21:52:26 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.259 2013/07/02 22:40:39 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -157,6 +157,7 @@ static int find_clause __PROTO((int *, int *));
 
 #ifdef GP_MACROS
 TBOOLEAN expand_macros = FALSE;
+static int expand_1level_macros __PROTO((void));
 #endif
 
 struct lexical_unit *token;
@@ -335,14 +336,8 @@ do_line()
     /* Line continuation has already been handled by read_line() */
     char *inlptr;
 
-#ifdef GP_MACROS
-    /* Expand any string variables in the current input line.
-     * Allow up to 3 levels of recursion */
-    if (expand_macros)
-    if (string_expand_macros() && string_expand_macros()
-    &&  string_expand_macros() && string_expand_macros())
-	int_error(NO_CARET, "Too many levels of nested macros");
-#endif
+    /* Expand any string variables in the current input line */
+    string_expand_macros();
 
     /* Skip leading whitespace */
     inlptr = gp_input_line;
@@ -398,6 +393,9 @@ do_line()
 	    retval = read_line("more> ", strlen(gp_input_line));
 	    if (retval)
 	 	int_error(NO_CARET, "Syntax error: missing block terminator }");
+	    /* Expand any string variables in the current input line */
+	    string_expand_macros();
+
 	    num_tokens = scanner(&gp_input_line, &gp_input_line_len);
 	    if (gp_input_line[token[num_tokens].start_index] == '#')
 		gp_input_line[token[num_tokens].start_index] = NUL;
@@ -2324,9 +2322,7 @@ done(int status)
     exit(status);
 }
 
-/* please note that the vms version of read_line doesn't support variable line
-   length (yet) */
-
+/* VMS-only version of read_line */
 static int
 read_line(const char *prompt, int start)
 {
@@ -3036,12 +3032,22 @@ call_kill_pending_Pause_dialog()
  * Walk through the input line looking for string variables preceded by @.
  * Replace the characters @<varname> with the contents of the string.
  * Anything inside quotes is not expanded.
+ * Allow up to 3 levels of nested macros.
  */
+void
+string_expand_macros()
+{
+    if (expand_macros) {
+	if (expand_1level_macros() && expand_1level_macros()
+	&&  expand_1level_macros() && expand_1level_macros())
+	    int_error(NO_CARET, "Macros nested too deeply");
+    }
+}
 
 #define COPY_CHAR gp_input_line[o++] = *c; \
                   after_backslash = FALSE;
 int
-string_expand_macros()
+expand_1level_macros()
 {
     TBOOLEAN in_squote = FALSE;
     TBOOLEAN in_dquote = FALSE;

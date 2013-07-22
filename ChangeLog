@@ -1,3 +1,13 @@
+2013-07-22  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/command.h src/command.c (string_expand_macros do_line)
+	src/misc.c (load_file):  Under some conditions, e.g. inside a multi-line
+	clause in curly brackets, the input command line can be extended after
+	it has already been checked for the presence of macros.  This caused any
+	macros in the new part of the input line to be unrecognized.
+	Now we recheck for macros whenever the input line is extended.
+	Bug #1264
+
 2013-07-18  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* configure.in:  Allow for the case that pkg-config is needed in order
