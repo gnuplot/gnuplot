@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.138.2.13 2013/03/22 03:48:42 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.138.2.14 2013/06/28 23:02:46 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -278,14 +278,11 @@ load_file(FILE *fp, char *name, TBOOLEAN can_do_args)
 			 * This code is redundant with part of do_line(),
 			 * but do_line() assumes continuation lines come from stdin.
 			 */
-#ifdef GP_MACROS
+
 			/* macros in a clause are problematic, as they are */
 			/* only expanded once even if the clause is replayed */
-			if (expand_macros)
-			if (string_expand_macros() && string_expand_macros()
-			&&  string_expand_macros() && string_expand_macros())
-			    int_error(NO_CARET, "Too many levels of nested macros");
-#endif
+			string_expand_macros();
+
 			/* Strip off trailing comment and count curly braces */
 			num_tokens = scanner(&gp_input_line, &gp_input_line_len);
 			if (gp_input_line[token[num_tokens].start_index] == '#') {

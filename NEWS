@@ -10,6 +10,7 @@ New features, changes and fixes since gnuplot version 4.6.3
 * FIX color/pattern generated for key entries of columnstacked histograms
 * FIX hitting ^C twice forces temination of wxt session hung by lost X-server
 * FIX win terminal failed to properly adjust plot border after window resize
+* FIX several conditions in which macros were not expanded during command input
 
 New features, changes and fixes in gnuplot version 4.6.3
 ========================================================
