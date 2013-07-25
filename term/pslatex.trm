@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: pslatex.trm,v 1.87 2013/07/05 18:48:27 sfeam Exp $
+ * $Id: pslatex.trm,v 1.88 2013/07/05 21:09:11 sfeam Exp $
  */
 
 /* GNUPLOT - pslatex.trm */
@@ -711,9 +711,11 @@ EPSLATEX_common_init()
 		1.0 / (2*PS_SC));
 #ifdef EAM_BOXED_TEXT
         fprintf(gpoutfile,"\
-    \\newlength{\\gptboxheight}%%\n\
-    \\newlength{\\gptboxwidth}%%\n\
-    \\newsavebox{\\gptboxtext}%%\n\
+    \\ifx\\gptboxheight\\undefined%%\n\
+      \\newlength{\\gptboxheight}%%\n\
+      \\newlength{\\gptboxwidth}%%\n\
+      \\newsavebox{\\gptboxtext}%%\n\
+    \\fi%%\n\
     \\setlength{\\fboxrule}{0.5pt}%%\n\
     \\setlength{\\fboxsep}{1pt}%%\n");
 #endif
