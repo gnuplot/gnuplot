@@ -2,7 +2,7 @@ New features, changes and fixes since gnuplot version 4.6.3
 ===========================================================
 
 * NEW Ctrl-Break interrupts fitting run in wgnuplot
-* CHANGE treat empty fields in a csv files as "missing" rather than "bad"
+* CHANGE treat empty fields in a csv file as "missing" rather than "bad"
 * FIX svg and canvas terminal mousing of inverted axis coordinates
 * FIX emf failed to initialize font correctly on some systems
 * FIX timedata columns can now be referred to via column(N) and column("HEAD")
@@ -11,6 +11,7 @@ New features, changes and fixes since gnuplot version 4.6.3
 * FIX hitting ^C twice forces temination of wxt session hung by lost X-server
 * FIX win terminal failed to properly adjust plot border after window resize
 * FIX several conditions in which macros were not expanded during command input
+* FIX promote a string containing only digits to INTGR rather than CMPLX
 
 New features, changes and fixes in gnuplot version 4.6.3
 ========================================================
