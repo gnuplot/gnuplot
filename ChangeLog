@@ -14,6 +14,9 @@
 	resulting string.
 	Bug #1271
 
+	* src/gadgets.c:  The annoying crypto-definition of RCSid() at the
+	top of the file has been wrong since 2000!?
+
 2013-07-25  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/pslatex.trm:  Make the definition of \gptboxtext and friends 
