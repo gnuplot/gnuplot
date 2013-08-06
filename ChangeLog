@@ -8,6 +8,12 @@
 	contains only digits and whitespace.
 	Bug #1269
 
+	* src/datafile.c:  Generalize the substitution of columnheaders into
+	a string during evaluation of 'using' or 'title' in a plot command.
+	This allows inclusion of more than one columnheader into a single
+	resulting string.
+	Bug #1271
+
 2013-07-22  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/command.h src/command.c (string_expand_macros do_line)

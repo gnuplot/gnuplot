@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.212.2.21 2013/06/18 19:38:41 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.212.2.22 2013/07/01 22:10:25 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -169,6 +169,7 @@ static char *RCSid() { return RCSid("$Id: datafile.c,v 1.212.2.21 2013/06/18 19:
 static int check_missing __PROTO((char *s));
 
 static void expand_df_column __PROTO((int));
+static void clear_df_column_headers __PROTO((void));
 static char *df_gets __PROTO((void));
 static int df_tokenise __PROTO((char *s));
 static float *df_read_matrix __PROTO((int *rows, int *columns));
@@ -266,6 +267,7 @@ static int df_current_index;    /* current mesh */
 /* stuff for named index support */
 static char *indexname = NULL;
 static TBOOLEAN index_found = FALSE;
+static int df_longest_columnhead = 0;
 
 /* stuff for every point:line */
 static int everypoint = 1;
@@ -968,6 +970,7 @@ df_open(const char *cmd_filename, int max_using, struct curve_points *plot)
     df_key_title = NULL;
 
     initialize_use_spec();
+    clear_df_column_headers();
 
     df_datum = -1;              /* it will be preincremented before use */
     df_line_number = 0;         /* ditto */
@@ -1764,6 +1767,8 @@ df_readascii(double v[], int max)
 	    for (j=0; j<df_no_cols; j++) {
 		free(df_column[j].header);
 		df_column[j].header = df_parse_string_field(df_column[j].position);
+		if (df_longest_columnhead < strlen(df_column[j].header))
+		    df_longest_columnhead = strlen(df_column[j].header);
 		FPRINTF((stderr,"Col %d: \"%s\"\n",j,df_column[j].header));
 	    }
 	    df_already_got_headers = TRUE;
@@ -2200,7 +2205,7 @@ f_column(union argument *arg)
 		int offset = (*df_column[j].header == '"') ? 1 : 0;
 		if (streq(name, df_column[j].header + offset)) {
 		    column = j+1;
-		    if (!df_key_title) /* EAM DEBUG - on the off chance we want it */
+		    if (!df_key_title)
 			df_key_title = gp_strdup(df_column[j].header);
 		    break;
 		}
@@ -2257,7 +2262,7 @@ f_stringcolumn(union argument *arg)
 		int offset = (*df_column[j].header == '"') ? 1 : 0;
 		if (streq(name, df_column[j].header + offset)) {
 		    column = j+1;
-		    if (!df_key_title) /* EAM DEBUG - on the off chance we want it */
+		    if (!df_key_title)
 			df_key_title = gp_strdup(df_column[j].header);
 		    break;
 		}
@@ -2306,6 +2311,7 @@ f_stringcolumn(union argument *arg)
 void
 f_columnhead(union argument *arg)
 {
+    static char placeholder[] = "@COLUMNHEAD00@";
     struct value a;
 
     if (!evaluate_inside_using)
@@ -2314,7 +2320,8 @@ f_columnhead(union argument *arg)
     (void) arg;                 /* avoid -Wunused warning */
     (void) pop(&a);
     column_for_key_title = (int) real(&a);
-    push(Gstring(&a, "@COLUMNHEAD@"));
+    snprintf(placeholder+11, 4, "%02d@", column_for_key_title);
+    push(Gstring(&a, placeholder));
 }
 
 
@@ -2509,15 +2516,22 @@ df_set_key_title(struct curve_points *plot)
 
     /* What if there was already a title specified? */
     if (plot->title && !plot->title_is_filename) {
-	char *placeholder = strstr(plot->title, "@COLUMNHEAD@");
-	char *newtitle = NULL;
-	if (!placeholder)
-	    return;
-	newtitle = gp_alloc(strlen(plot->title) + strlen(df_key_title),"plot title");
-	*placeholder = '\0';
-	sprintf(newtitle, "%s%s%s", plot->title, df_key_title, placeholder+12);
-	free(df_key_title);
-	df_key_title = newtitle;
+	int columnhead;
+	char *placeholder = strstr(plot->title, "@COLUMNHEAD");
+
+	while (placeholder) {
+	    char *newtitle = gp_alloc(strlen(plot->title) + df_longest_columnhead, "plot title");
+	    columnhead = atoi(placeholder+11);
+	    *placeholder = '\0';
+	    sprintf(newtitle, "%s%s%s", plot->title, 
+		    (columnhead <= 0) ? df_key_title :
+		    (columnhead <= df_no_cols) ? df_column[columnhead-1].header : "",
+		    placeholder+14);
+	    free(plot->title);
+	    plot->title = newtitle;
+	    placeholder = strstr(newtitle, "@COLUMNHEAD");
+	}
+	return;
     }
     if (plot->title_is_suppressed)
 	return;
@@ -2553,7 +2567,7 @@ df_set_key_title_columnhead(struct curve_points *plot)
     }
     /* This results from  plot 'foo' using (column("name")) title columnhead */
     if (column_for_key_title == NO_COLUMN_HEADER)
-	plot->title = gp_strdup("@COLUMNHEAD@");
+	plot->title = gp_strdup("@COLUMNHEAD-1@");
 }
 
 char *
@@ -5019,4 +5033,16 @@ expand_df_column(int new_max)
 	df_column[df_max_cols].header = NULL;
 	df_column[df_max_cols].position = NULL;
     }
+}
+
+/* Clear column headers stored for previous plot */
+void
+clear_df_column_headers()
+{
+    int i;
+    for (i=0; i<df_max_cols; i++) {
+	free(df_column[i].header);
+	df_column[i].header = NULL;
+    }
+    df_longest_columnhead = 0;
 }
