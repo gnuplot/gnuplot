@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: specfun.c,v 1.50 2013/07/12 19:39:29 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: specfun.c,v 1.51 2013/07/13 05:52:44 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - specfun.c */
@@ -108,7 +108,6 @@ static double polevl __PROTO((double x, const double coef[], int N));
 static double p1evl __PROTO((double x, const double coef[], int N));
 static double confrac __PROTO((double a, double b, double x));
 static double ibeta __PROTO((double a, double b, double x));
-static double humlik __PROTO((double x, double y));
 static double igamma __PROTO((double a, double x));
 static double ranf __PROTO((struct value * init));
 static double inverse_error_func __PROTO((double p));
@@ -117,6 +116,9 @@ static double lambertw __PROTO((double x));
 #if (0)	/* Only used by low-precision Airy version */
 static double airy_neg __PROTO(( double x ));
 static double airy_pos __PROTO((double x));
+#endif
+#ifndef HAVE_LIBCERF
+static double humlik __PROTO((double x, double y));
 #endif
 static double expint __PROTO((double n, double x));
 #ifndef GAMMA

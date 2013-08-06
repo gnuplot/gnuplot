@@ -1,3 +1,13 @@
+2013-08-06  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/eval.c (pop_or_convert_from_string):  Context-dependent 
+	conversion of a string containing a number to an actual number is
+	documented as evaluating to either an integer or a complex variable as
+	appropriate.  However up to now it has always produced a complex in
+	practice.  Now we really do evaluate to an integer if the string
+	contains only digits and whitespace.
+	Bug #1269
+
 2013-07-25  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/pslatex.trm:  Make the definition of \gptboxtext and friends 
