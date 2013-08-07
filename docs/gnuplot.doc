@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.815 2013/07/14 02:55:04 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.816 2013/07/15 07:06:46 markisch Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -1913,8 +1913,11 @@ C ... and restart the table:
  out the summation. If <end> is less than <start> then the value of the
  summation is zero.
 3 Gnuplot-defined variables
+?expressions gnuplot-defined
+?gnuplot-defined
 ?gnuplot-defined variables
 ?GPVAL
+?gpval
  Gnuplot maintains a number of read-only variables that reflect the current
  internal state of the program and the most recent plot. These variables begin
  with the prefix "GPVAL_".
