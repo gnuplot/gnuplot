@@ -1,3 +1,13 @@
+2013-08-08  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/axis.c:  Add comment noting that axis_position_zeroaxis() must
+	be called for each axis before plotting in order to set axis->term_zero.
+
+	* src/graphics.c:  It is incorrect to skip the initial calls to
+	axis_draw_2d_zeroaxis even if we know the zero axes will be drawn
+	again later (e.g. grid is off or front).
+	Bug #1267
+
 2013-08-06  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/eval.c (pop_or_convert_from_string):  Context-dependent 

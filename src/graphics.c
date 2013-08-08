@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.379.2.18 2013/05/24 17:36:40 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.379.2.19 2013/06/27 19:32:52 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -1630,21 +1630,12 @@ do_plot(struct curve_points *plots, int pcount)
     if (grid_layer == 0 || grid_layer == -1)
 	place_grid();
 
-    /* DRAW AXES */
-    /* after grid so that axes linetypes are on top */
-    if (grid_layer == 0 || grid_layer == -1) {
-	x_axis = FIRST_X_AXIS;
-	y_axis = FIRST_Y_AXIS;	/* chose scaling */
-
-	axis_draw_2d_zeroaxis(FIRST_X_AXIS,FIRST_Y_AXIS);
-	axis_draw_2d_zeroaxis(FIRST_Y_AXIS,FIRST_X_AXIS);
-
-	x_axis = SECOND_X_AXIS;
-	y_axis = SECOND_Y_AXIS;	/* chose scaling */
-
-	axis_draw_2d_zeroaxis(SECOND_X_AXIS,SECOND_Y_AXIS);
-	axis_draw_2d_zeroaxis(SECOND_Y_AXIS,SECOND_X_AXIS);
-    }
+    /* DRAW ZERO AXES */
+    /* NB: Has the necessary side effect of initializing axis->term_zero */
+    axis_draw_2d_zeroaxis(FIRST_X_AXIS,FIRST_Y_AXIS);
+    axis_draw_2d_zeroaxis(FIRST_Y_AXIS,FIRST_X_AXIS);
+    axis_draw_2d_zeroaxis(SECOND_X_AXIS,SECOND_Y_AXIS);
+    axis_draw_2d_zeroaxis(SECOND_Y_AXIS,SECOND_X_AXIS);
 
     /* DRAW PLOT BORDER */
     if (draw_border)
@@ -2101,18 +2092,11 @@ do_plot(struct curve_points *plots, int pcount)
     if (polar && raxis)
 	place_raxis();
 
-    /* DRAW AXES */
-    /* after grid so that axes linetypes are on top */
+    /* DRAW ZERO AXES */
+    /* redraw after front grid so that axis lines are on top */
     if (grid_layer == 1) {
-	x_axis = FIRST_X_AXIS;
-	y_axis = FIRST_Y_AXIS;	/* chose scaling */
-
 	axis_draw_2d_zeroaxis(FIRST_X_AXIS,FIRST_Y_AXIS);
 	axis_draw_2d_zeroaxis(FIRST_Y_AXIS,FIRST_X_AXIS);
-
-	x_axis = SECOND_X_AXIS;
-	y_axis = SECOND_Y_AXIS;	/* chose scaling */
-
 	axis_draw_2d_zeroaxis(SECOND_X_AXIS,SECOND_Y_AXIS);
 	axis_draw_2d_zeroaxis(SECOND_Y_AXIS,SECOND_X_AXIS);
     }

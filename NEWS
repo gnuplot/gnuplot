@@ -13,6 +13,7 @@ New features, changes and fixes since gnuplot version 4.6.3
 * FIX win terminal failed to properly adjust plot border after window resize
 * FIX several conditions in which macros were not expanded during command input
 * FIX promote a string containing only digits to INTGR rather than CMPLX
+* FIX 'set grid front' caused failure to initialize location of axis zero point
 
 New features, changes and fixes in gnuplot version 4.6.3
 ========================================================
