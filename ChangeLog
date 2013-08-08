@@ -1,3 +1,11 @@
+2013-08-08  Christoph Bersch <usenet@bersch.net>
+
+	* src/gadgets.c (draw_clip_polygon):  Sometimes the clipping status of
+	the current point and the line segment it is supposedly the end of do
+	not match.  This probably indicates a bug somewhere else, but in any
+	case we need to adjust the clipping to match the line segment.
+	Bug #1268
+
 2013-08-08  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/axis.c:  Add comment noting that axis_position_zeroaxis() must

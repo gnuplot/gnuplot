@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gadgets.c,v 1.95 2000/05/03 21:47:15 hbb Exp $"); }
+static char *RCSid() { return RCSid("$Id: gadgets.c,v 1.96 2013/08/07 16:41:09 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - gadgets.c */
@@ -264,10 +264,9 @@ draw_clip_polygon(int points, gpiPoint *p)
     x1 = p[0].x;
     y1 = p[0].y;
     pos1 = clip_point(x1, y1);
-    if (!pos1) {
-	/* move to first point if it is inside */
+    if (!pos1) /* move to first point if it is inside */
 	(*t->move)(x1, y1);
-    }
+
     for (i = 1; i < points; i++) {
 	x2 = p[i].x;
 	y2 = p[i].y;
@@ -276,15 +275,21 @@ draw_clip_polygon(int points, gpiPoint *p)
 
 	if (clip_ret) {
 	    /* there is a line to draw */
-	    if (pos1) { /* first vertex was recalculated, move to new start point */
+	    if (pos1) /* first vertex was recalculated, move to new start point */
 		(*t->move)(x1, y1);
-	    }
 	    (*t->vector)(x2, y2);
 	}
 
 	x1 = p[i].x;
 	y1 = p[i].y;
-	pos1 = pos2;
+	/* The end point and the line do not necessarily have the same
+	 * status. The end point can be 'inside', but the whole line is
+	 * 'outside'. Do not update pos1 in this case.  Bug #1268.
+	 * FIXME: This is papering over an inconsistency in coordinate
+	 * calculation somewhere else!
+	 */
+	if (!(clip_ret == 0 && pos2 == 0))
+	    pos1 = pos2;
     }
 }
 
