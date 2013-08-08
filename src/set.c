@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.404 2013/06/19 23:04:59 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.405 2013/06/30 17:48:26 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -675,7 +675,8 @@ set_arrow()
 	    || equals(c_token, "size")
 	    || equals(c_token, "filled") || equals(c_token, "empty")
 	    || equals(c_token, "as") || equals(c_token, "arrowstyle")
-	    || almost_equals(c_token, "head$s") || equals(c_token, "nohead")) {
+	    || almost_equals(c_token, "head$s") || equals(c_token, "nohead")
+	    || almost_equals(c_token, "nobo$rder")) {
 	tag = assign_arrow_tag();
 
     } else

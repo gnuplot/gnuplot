@@ -6,6 +6,16 @@
 	case we need to adjust the clipping to match the line segment.
 	Bug #1268
 
+ 	* src/gadgets.c src/misc.c src/save.c src/set.c src/show.c src/term.c
+	src/term_api.h:  New arrow style option "noborder" requests a filled 
+	arrowhead with no line drawn around the outside.  This has the effect
+	of guaranteeing that the tip of the arrow head is exactly on the
+	coordinate of the end of the vector;  otherwise the linewidth of the
+	border causes the tip to extend beyond this coordinate.
+	Bug #1109
+
+ 	* demo/arrowstyle.dem docs/gnuplot.doc:  Document and illustrate.
+
 2013-08-08  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/axis.c:  Add comment noting that axis_position_zeroaxis() must

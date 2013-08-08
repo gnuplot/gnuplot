@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.155 2013/06/28 23:01:30 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.156 2013/07/22 20:20:47 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -1276,25 +1276,32 @@ arrow_parse(
 	    continue;
 	}
 
+	if (almost_equals(c_token, "nobo$rder")) {
+	    if (set_headfilled++)
+		break;
+	    c_token++;
+	    arrow->headfill = AS_NOBORDER;
+	    continue;
+	}
 	if (almost_equals(c_token, "fill$ed")) {
 	    if (set_headfilled++)
 		break;
 	    c_token++;
-	    arrow->head_filled = 2;
+	    arrow->headfill = AS_FILLED;
 	    continue;
 	}
 	if (almost_equals(c_token, "empty")) {
 	    if (set_headfilled++)
 		break;
 	    c_token++;
-	    arrow->head_filled = 1;
+	    arrow->headfill = AS_EMPTY;
 	    continue;
 	}
 	if (almost_equals(c_token, "nofill$ed")) {
 	    if (set_headfilled++)
 		break;
 	    c_token++;
-	    arrow->head_filled = 0;
+	    arrow->headfill = AS_NOFILL;
 	    continue;
 	}
 

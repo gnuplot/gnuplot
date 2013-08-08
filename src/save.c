@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.221 2013/06/16 05:12:28 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.222 2013/06/30 17:48:26 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -507,9 +507,10 @@ set bar %f %s\n",
 	fprintf(fp, " %s %s %s",
 		arrow_head_names[this_arrow->arrow_properties.head],
 		(this_arrow->arrow_properties.layer==0) ? "back" : "front",
-		( (this_arrow->arrow_properties.head_filled==2) ? "filled" :
-		  ( (this_arrow->arrow_properties.head_filled==1) ? "empty" :
-		    "nofilled" )) );
+		(this_arrow->arrow_properties.headfill==AS_FILLED) ? "filled" :
+		(this_arrow->arrow_properties.headfill==AS_EMPTY) ? "empty" :
+		(this_arrow->arrow_properties.headfill==AS_NOBORDER) ? "noborder" :
+		    "nofilled");
 	save_linetype(fp, &(this_arrow->arrow_properties.lp_properties), FALSE);
 	if (this_arrow->arrow_properties.head_length > 0) {
 	    static char *msg[] = {"first", "second", "graph", "screen",
@@ -537,9 +538,10 @@ set bar %f %s\n",
 	fprintf(fp, " %s %s %s",
 		arrow_head_names[this_arrowstyle->arrow_properties.head],
 		(this_arrowstyle->arrow_properties.layer==0)?"back":"front",
-		( (this_arrowstyle->arrow_properties.head_filled==2)?"filled":
-		  ( (this_arrowstyle->arrow_properties.head_filled==1)?"empty":
-		    "nofilled" )) );
+		(this_arrowstyle->arrow_properties.headfill==AS_FILLED)?"filled":
+		(this_arrowstyle->arrow_properties.headfill==AS_EMPTY)?"empty":
+		(this_arrowstyle->arrow_properties.headfill==AS_NOBORDER)?"noborder":
+		   "nofilled");
 	save_linetype(fp, &(this_arrowstyle->arrow_properties.lp_properties), FALSE);
 	if (this_arrowstyle->arrow_properties.head_length > 0) {
 	    static char *msg[] = {"first", "second", "graph", "screen",

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.299 2013/06/30 17:48:26 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.300 2013/07/14 18:20:37 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -1753,9 +1753,10 @@ show_arrow(int tag)
 	    fprintf(stderr, "\tarrow %d, %s %s %s",
 		    this_arrow->tag,
 		    arrow_head_names[this_arrow->arrow_properties.head],
-		    ( (this_arrow->arrow_properties.head_filled==2) ? "filled" :
-		      ( (this_arrow->arrow_properties.head_filled==1) ? "empty" :
-			"nofilled" )),
+		    (this_arrow->arrow_properties.headfill==AS_FILLED) ? "filled" :
+		    (this_arrow->arrow_properties.headfill==AS_EMPTY) ? "empty" :
+		    (this_arrow->arrow_properties.headfill==AS_NOBORDER) ? "noborder" :
+			"nofilled",
 		    this_arrow->arrow_properties.layer ? "front" : "back");
 	    save_linetype(stderr, &(this_arrow->arrow_properties.lp_properties), FALSE);
 	    fprintf(stderr, "\n\t  from ");
@@ -1778,7 +1779,7 @@ show_arrow(int tag)
 		   this_arrow->arrow_properties.head_lengthunit == first_axes ? "" : msg[this_arrow->arrow_properties.head_lengthunit],
 		   this_arrow->arrow_properties.head_length,
                    this_arrow->arrow_properties.head_angle);
-		if (this_arrow->arrow_properties.head_filled!=0)
+		if (this_arrow->arrow_properties.headfill != AS_NOFILL)
 		    fprintf(stderr,", backangle %g deg",
 			    this_arrow->arrow_properties.head_backangle);
 	    }
@@ -3239,9 +3240,10 @@ show_arrowstyle(int tag)
 
 	    if (this_arrowstyle->arrow_properties.head > 0) {
 		fprintf(stderr, "\t  arrow heads: %s, ",
-		  ( (this_arrowstyle->arrow_properties.head_filled==2) ? "filled" :
-		    ( (this_arrowstyle->arrow_properties.head_filled==1) ? "empty" :
-		      "nofilled" )));
+		  (this_arrowstyle->arrow_properties.headfill==AS_FILLED) ? "filled" :
+		  (this_arrowstyle->arrow_properties.headfill==AS_EMPTY) ? "empty" :
+		  (this_arrowstyle->arrow_properties.headfill==AS_NOBORDER) ? "noborder" :
+		    "nofilled" );
 		if (this_arrowstyle->arrow_properties.head_length > 0) {
 		    static char *msg[] =
 			{"(first x axis) ", "(second x axis) ",
@@ -3251,7 +3253,7 @@ show_arrowstyle(int tag)
 			    this_arrowstyle->arrow_properties.head_lengthunit == first_axes ? "" : msg[this_arrowstyle->arrow_properties.head_lengthunit],
 			    this_arrowstyle->arrow_properties.head_length,
 			    this_arrowstyle->arrow_properties.head_angle);
-		    if (this_arrowstyle->arrow_properties.head_filled!=0)
+		    if (this_arrowstyle->arrow_properties.headfill != AS_NOFILL)
 			fprintf(stderr,", backangle %g deg",
 				this_arrowstyle->arrow_properties.head_backangle);
 		    fprintf(stderr,"\n");

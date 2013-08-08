@@ -8,6 +8,7 @@ New features, changes and fixes since gnuplot version 4.6
 * NEW hypertext labels can be displayed on mouse-over
 * NEW geographic (Degrees Minutes Seconds) data axes
 * NEW set arrow <tag> from <start> length <len> angle <ang>
+* NEW arrow style "noborder" guarantees exact placement of arrow head tip
 * NEW the high bits of RGB colors are treated as an alpha channel
 * NEW 'set surface explicit' disables automatic generation of a surface mesh 
 * NEW 'set link [x2|y2]' ties secondary axis range to the primary axis

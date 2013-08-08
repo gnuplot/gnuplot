@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.255 2013/05/04 04:50:05 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.256 2013/05/22 19:35:35 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -1239,7 +1239,7 @@ line_and_point(unsigned int x, unsigned int y, int number)
 int curr_arrow_headlength; /* access head length + angle without changing API */
 double curr_arrow_headangle;    /* angle in degrees */
 double curr_arrow_headbackangle;  /* angle in degrees */
-int curr_arrow_headfilled;      /* arrow head filled or not */
+arrowheadfill curr_arrow_headfilled;      /* arrow head filled or not */
 
 static void
 do_arrow(
@@ -1325,7 +1325,7 @@ do_arrow(
 	    ym = (int) (dy2 + backlen*effective_length * sin( phi + beta ));
 	}
 
-	if (head & END_HEAD) {
+	if ((head & END_HEAD) && !clip_point(ex, ey)) {
 	    head_points[0].x = ex + xm;
 	    head_points[0].y = ey + ym;
 	    head_points[1].x = ex + x1;
@@ -1336,19 +1336,17 @@ do_arrow(
 	    head_points[3].y = ey + y2;
 	    head_points[4].x = ex + xm;
 	    head_points[4].y = ey + ym;	    
-	    if (curr_arrow_headfilled==2 && !clip_point(ex,ey)) {
+	    if (curr_arrow_headfilled >= AS_FILLED) {
 		/* draw filled forward arrow head */
 		head_points->style = FS_OPAQUE;
 		if (t->filled_polygon)
 		    (*t->filled_polygon) (5, head_points);
 	    }
 	    /* draw outline of forward arrow head */
-	    if (clip_point(ex,ey))
-		;
-	    else if (curr_arrow_headfilled!=0) {
-		draw_clip_polygon(5, head_points);
-	    } else {
+	    if (curr_arrow_headfilled == AS_NOFILL) {
 		draw_clip_polygon(3, head_points+1);
+	    } else if (curr_arrow_headfilled != AS_NOBORDER) {
+		draw_clip_polygon(5, head_points);
 	    }
 	}
 
@@ -1364,17 +1362,17 @@ do_arrow(
 	    head_points[3].y = sy - y2;
 	    head_points[4].x = sx - xm;
 	    head_points[4].y = sy - ym;
-	    if (curr_arrow_headfilled==2) {
+	    if (curr_arrow_headfilled >= AS_FILLED) {
 		/* draw filled backward arrow head */
 		head_points->style = FS_OPAQUE;
 		if (t->filled_polygon)
 		    (*t->filled_polygon) (5, head_points);
 	    }
 	    /* draw outline of backward arrow head */
-	    if (curr_arrow_headfilled!=0) {
-		draw_clip_polygon(5, head_points);
-	    } else {
+	    if (curr_arrow_headfilled == AS_NOFILL) {
 		draw_clip_polygon(3, head_points+1);
+	    } else if (curr_arrow_headfilled != AS_NOBORDER) {
+		draw_clip_polygon(5, head_points);
 	    }
 	}
     }
@@ -1382,12 +1380,12 @@ do_arrow(
     /* Draw the line for the arrow. */
     if (headstyle >= 0) {
 	if ((head & BACKHEAD)
-	&&  (fabs(len_arrow) >= DBL_EPSILON) && (curr_arrow_headfilled!=0) ) {
+	&&  (fabs(len_arrow) >= DBL_EPSILON) && (curr_arrow_headfilled != AS_NOFILL) ) {
 	    sx -= xm;
 	    sy -= ym;
 	}
 	if ((head & END_HEAD)
-	&&  (fabs(len_arrow) >= DBL_EPSILON) && (curr_arrow_headfilled!=0) ) {
+	&&  (fabs(len_arrow) >= DBL_EPSILON) && (curr_arrow_headfilled != AS_NOFILL) ) {
 	    ex += xm;
 	    ey += ym;
 	}
@@ -2111,20 +2109,20 @@ test_term()
     xl = t->h_tic * 7;
     yl = t->v_tic * 7;
     i = curr_arrow_headfilled;
-    curr_arrow_headfilled = 0;
+    curr_arrow_headfilled = AS_NOFILL;
     (*t->arrow) (x, y, x + xl, y, END_HEAD);
     curr_arrow_headfilled = 1;
     (*t->arrow) (x, y, x - xl, y, END_HEAD);
     curr_arrow_headfilled = 2;
     (*t->arrow) (x, y, x, y + yl, END_HEAD);
-    curr_arrow_headfilled = 1;		/* Was 3, but no terminals implement it */
+    curr_arrow_headfilled = AS_EMPTY;
     (*t->arrow) (x, y, x, y - yl, END_HEAD);
     curr_arrow_headfilled = i;
     xl = t->h_tic * 5;
     yl = t->v_tic * 5;
     (*t->arrow) (x - xl, y - yl, x + xl, y + yl, END_HEAD | BACKHEAD);
     (*t->arrow) (x - xl, y + yl, x, y, NOHEAD);
-    curr_arrow_headfilled = 1;		/* Was 3, but no terminals implement it */
+    curr_arrow_headfilled = AS_EMPTY;
     (*t->arrow) (x, y, x + xl, y - yl, BACKHEAD);
 
     /* test line widths */

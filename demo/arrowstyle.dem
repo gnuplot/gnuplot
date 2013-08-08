@@ -1,5 +1,5 @@
 #
-# $Id: arrowstyle.dem,v 1.2 2003/07/03 00:13:29 sfeam Exp $
+# $Id: arrowstyle.dem,v 1.3 2011/02/20 23:17:11 sfeam Exp $
 #
 #
 set xrange [-1000:1000]
@@ -13,7 +13,7 @@ set style arrow 1 head filled size screen 0.025,30,45 ls 1
 set style arrow 2 head nofilled size screen 0.03,15 ls 2
 set style arrow 3 head filled size screen 0.03,15,45 ls 1
 set style arrow 4 head filled size screen 0.03,15 ls 2
-set style arrow 5 heads filled size screen 0.03,15,135 ls 1
+set style arrow 5 heads noborder size screen 0.03,15,135 ls 1
 set style arrow 6 head empty size screen 0.03,15,135 ls 2
 set style arrow 7 nohead ls 1
 set style arrow 8 heads size screen 0.008,90 ls 2

@@ -1,5 +1,5 @@
 /*
- * $Id: term_api.h,v 1.110 2013/05/21 20:36:46 sfeam Exp $
+ * $Id: term_api.h,v 1.111 2013/07/05 18:48:27 sfeam Exp $
  */
 
 /* GNUPLOT - term_api.h */
@@ -112,6 +112,13 @@ typedef enum e_arrow_head {
 
 extern const char *arrow_head_names[4];
 
+typedef enum arrowheadfill {
+	AS_NOFILL = 0,
+	AS_EMPTY,
+	AS_FILLED,
+	AS_NOBORDER
+} arrowheadfill;
+
 typedef struct arrow_style_type {    /* contains all Arrow properties */
     int tag;                         /* -1 (local), AS_VARIABLE, or style index */
     int layer;	                     /* 0 = back, 1 = front */
@@ -123,7 +130,7 @@ typedef struct arrow_style_type {    /* contains all Arrow properties */
     int head_lengthunit;             /* unit (x1, x2, screen, graph) */
     double head_angle;               /* front angle / deg */
     double head_backangle;           /* back angle / deg */
-    unsigned int head_filled;        /* filled heads: 0=not, 1=empty, 2=filled */
+    arrowheadfill headfill;	     /* AS_FILLED etc */
     /* ... more to come ? */
 } arrow_style_type;
 
@@ -343,8 +350,7 @@ extern int curr_arrow_headlength;
 /* angle in degrees */
 extern double curr_arrow_headangle;
 extern double curr_arrow_headbackangle;
-/* arrow head filled or not */
-extern int curr_arrow_headfilled;
+extern arrowheadfill curr_arrow_headfilled;
 
 /* Recycle count for user-defined linetypes */
 extern int linetype_recycle_count;
