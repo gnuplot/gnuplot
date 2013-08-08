@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.116 2013/06/29 12:04:44 juhaszp Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.117 2013/06/30 17:48:26 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -1453,8 +1453,8 @@ axis_position_zeroaxis(AXIS_INDEX axis)
     TBOOLEAN is_inside = FALSE;
     AXIS *this = axis_array + axis;
 
-    /* HBB 20020215: correctly treat reversed axes, too! */
-    /* EAM Sep 2005: Nothing wrong with 0 at extreme of the range */
+    /* NB: This is the only place that axis->term_zero is set. */
+    /*     So it is important to reach here before plotting.   */
     if ((this->min > 0.0 && this->max > 0.0)
 	|| this->log) {
 	this->term_zero = (this->max < this->min)
