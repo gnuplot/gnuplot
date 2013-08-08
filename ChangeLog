@@ -8,6 +8,9 @@
 	again later (e.g. grid is off or front).
 	Bug #1267
 
+	* src/datafile.c:  Fix segfault from trying to store strlen of a
+	NULL column header string.
+
 2013-08-06  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/eval.c (pop_or_convert_from_string):  Context-dependent 

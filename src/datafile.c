@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.212.2.22 2013/07/01 22:10:25 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.212.2.23 2013/08/06 18:25:55 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -1767,9 +1767,11 @@ df_readascii(double v[], int max)
 	    for (j=0; j<df_no_cols; j++) {
 		free(df_column[j].header);
 		df_column[j].header = df_parse_string_field(df_column[j].position);
-		if (df_longest_columnhead < strlen(df_column[j].header))
-		    df_longest_columnhead = strlen(df_column[j].header);
-		FPRINTF((stderr,"Col %d: \"%s\"\n",j,df_column[j].header));
+		if (df_column[j].header) {
+		    if (df_longest_columnhead < strlen(df_column[j].header))
+			df_longest_columnhead = strlen(df_column[j].header);
+		    FPRINTF((stderr,"Col %d: \"%s\"\n",j,df_column[j].header));
+		}
 	    }
 	    df_already_got_headers = TRUE;
 
