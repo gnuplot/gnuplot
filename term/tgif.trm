@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*- */
-/* $Id: tgif.trm,v 1.52 2013/07/05 23:08:38 sfeam Exp $ */
+/* $Id: tgif.trm,v 1.53 2013/07/06 18:00:43 sfeam Exp $ */
 
 /* GNUPLOT - tgif.trm */
 
@@ -92,7 +92,6 @@ TERM_PUBLIC void TGIF_put_text __PROTO((unsigned int ux, unsigned int uy, const 
 TERM_PUBLIC int TGIF_text_angle __PROTO((int ang));
 TERM_PUBLIC int TGIF_justify_text __PROTO((enum JUSTIFY mode));
 TERM_PUBLIC void TGIF_point __PROTO((unsigned int ux, unsigned int uy, int number));
-TERM_PUBLIC void TGIF_arrow __PROTO((unsigned int sx, unsigned int sy, unsigned int ex, unsigned int ey, int head));
 TERM_PUBLIC int TGIF_set_font __PROTO((const char *font));
 TERM_PUBLIC void TGIF_set_pointsize __PROTO((double size));
 TERM_PUBLIC void TGIF_set_linewidth __PROTO((double size));
@@ -635,6 +634,7 @@ TGIF_vector(unsigned int ux, unsigned int uy)
     }
 }				/* TGIF_vector */
 /*}}}  */
+#if (0) /* Not used any more */
 /***************************************************************************/
 TERM_PUBLIC void
 TGIF_arrow(
@@ -671,6 +671,8 @@ poly('%s',%d,[\n\
     uLastTgifY = ey;
 
 }				/* TGIF_arrow */
+#endif
+
 /*}}}  */
 /***************************************************************************/
 TERM_PUBLIC void
