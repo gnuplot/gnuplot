@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.405 2013/06/30 17:48:26 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.406 2013/08/08 21:40:31 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -105,9 +105,6 @@ static void set_loadpath __PROTO((void));
 static void set_fontpath __PROTO((void));
 static void set_locale __PROTO((void));
 static void set_logscale __PROTO((void));
-#ifdef GP_MACROS
-static void set_macros __PROTO((void));
-#endif
 static void set_mapping __PROTO((void));
 static void set_margin __PROTO((t_position *));
 static void set_missing __PROTO((void));
@@ -308,11 +305,10 @@ set_command()
 	case S_LOGSCALE:
 	    set_logscale();
 	    break;
-#ifdef GP_MACROS
 	case S_MACROS:
-	    set_macros();
+	    /* Aug 2013 - macros are always enabled */
+	    c_token++;
 	    break;
-#endif
 	case S_MAPPING:
 	    set_mapping();
 	    break;
@@ -2450,15 +2446,6 @@ set_logscale()
     /* using existing stored data will not work if the log setting changes.  */
     SET_REFRESH_OK(E_REFRESH_NOT_OK, 0);
 }
-
-#ifdef GP_MACROS
-static void
-set_macros()
-{
-   c_token++;
-   expand_macros = TRUE;
-}
-#endif
 
 /* process 'set mapping3d' command */
 static void

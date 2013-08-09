@@ -1,8 +1,8 @@
 #
-# Experimental option GP_MACROS
+# Exercise use of macro substitution
 #
-
 set macros
+
 title = "Test of command line macro substitution"
 style1 = "points"
 style2 = "lines lw 2"
@@ -18,15 +18,16 @@ plot @plot1 title 'plot1', \
      @plot2 title 'plot2'
 show var
 #
-pause -1 "<cr> to test recursion depth"
+pause -1 "<cr> to test limit on recursion depth"
 #
+print "testing depth 3"
 plot @plot1 title 'plot1', @plot3 lt 3 title 'Recursion depth 3'
 pause 1
+print "testing depth 4"
 plot @plot1 title 'plot1', @plot4 lt 4 title 'Recursion depth 4'
 pause 1
+print "testing depth 5"
 plot @plot1 title 'plot1', @plot5 lt 5 title 'Recursion depth 5'
-pause 1
-plot @plot1 title 'plot1', @plot6 lt 6 title 'Recursion depth 6'
 pause 1
 #
 pause -1

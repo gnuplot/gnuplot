@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot on Unix.
 dnl
-dnl $Id: configure.in,v 1.332 2013/07/18 23:22:17 sfeam Exp $
+dnl $Id: configure.in,v 1.333 2013/08/09 18:15:38 sfeam Exp $
 dnl
 dnl this is actually major.minor ...
 dnl note that for a non-beta release, we need to disable DEVELOPMENT_RELEASE
@@ -919,15 +919,6 @@ AC_ARG_ENABLE(objects,dnl
                [ Define to allow placement of rectangles and other objects ])
   fi
 
-dnl command line macros
-AC_ARG_ENABLE(macros,dnl
-[  --disable-macros        disable command line macros],,
-  test -z "$enable_macros" && enable_macros=yes)
-  if test "$enable_macros" = yes; then
-      AC_DEFINE(GP_MACROS,1,
-               [ Define to allow command line macros. ])
-  fi
-
 dnl hidden3d compile-time options...
 dnl NOTE: have to check that they're not both turned on --- the code
 dnl doesn't allow that choice.
@@ -1458,12 +1449,6 @@ fi
 
 if test "$enable_boxed_text" = yes; then
   AC_MSG_RESULT([  Boxed text labels (EXPERIMENTAL)])
-fi
-
-if test "$enable_macros" = yes; then
-  AC_MSG_RESULT([  Command line macros: yes ])
-else
-  AC_MSG_RESULT([  Command line macros: no ])
 fi
 
 if test "$enable_objects" = yes; then

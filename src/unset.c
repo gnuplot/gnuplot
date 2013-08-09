@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.176 2013/06/30 17:48:26 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.177 2013/06/30 17:49:38 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -99,9 +99,6 @@ static void unset_loadpath __PROTO((void));
 static void unset_locale __PROTO((void));
 static void reset_logscale __PROTO((AXIS_INDEX));
 static void unset_logscale __PROTO((void));
-#ifdef GP_MACROS
-static void unset_macros __PROTO((void));
-#endif
 static void unset_mapping __PROTO((void));
 static void unset_margin __PROTO((t_position *));
 static void unset_missing __PROTO((void));
@@ -252,11 +249,9 @@ unset_command()
     case S_LOGSCALE:
 	unset_logscale();
 	break;
-#ifdef GP_MACROS
     case S_MACROS:
-	unset_macros();
+	/* Aug 2013 - macros are always enabled */
 	break;
-#endif
     case S_MAPPING:
 	unset_mapping();
 	break;
@@ -1102,15 +1097,6 @@ unset_logscale()
     /* using existing stored data will not work if the log setting changes.  */
     SET_REFRESH_OK(E_REFRESH_NOT_OK, 0);
 }
-
-#ifdef GP_MACROS
-/* process 'unset macros' command */
-static void
-unset_macros()
-{
-    expand_macros = FALSE;
-}
-#endif
 
 /* process 'unset mapping3d' command */
 static void

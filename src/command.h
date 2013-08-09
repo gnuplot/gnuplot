@@ -1,5 +1,5 @@
 /*
- * $Id: command.h,v 1.59 2013/01/04 22:03:54 broeker Exp $
+ * $Id: command.h,v 1.60 2013/07/22 20:20:47 sfeam Exp $
  */
 
 /* GNUPLOT - command.h */
@@ -78,10 +78,6 @@ extern int paused_for_mouse;	/* Flag the end condition we are paused until */
 #define PAUSE_ANY       077		/* Terminate on any of the above */
 #endif
 
-#ifdef GP_MACROS
-extern TBOOLEAN expand_macros;
-#endif
-
 /* output file for the print command */
 extern FILE *print_out;
 extern char *print_out_name;
@@ -139,11 +135,7 @@ extern void wxt_raise_terminal_group __PROTO((void));
 extern void wxt_lower_terminal_window __PROTO((int));
 extern void wxt_lower_terminal_group __PROTO((void));
 #endif
-#ifdef GP_MACROS
 extern void string_expand_macros __PROTO((void));
-#else
-#define string_expand_macros()
-#endif
 
 #ifdef USE_MOUSE
 void bind_command __PROTO((void));

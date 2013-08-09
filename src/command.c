@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.259 2013/07/02 22:40:39 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.260 2013/07/22 20:20:47 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -155,10 +155,7 @@ static void test_palette_subcommand __PROTO((void));
 static void test_time_subcommand __PROTO((void));
 static int find_clause __PROTO((int *, int *));
 
-#ifdef GP_MACROS
-TBOOLEAN expand_macros = FALSE;
 static int expand_1level_macros __PROTO((void));
-#endif
 
 struct lexical_unit *token;
 int token_table_size;
@@ -3027,7 +3024,6 @@ call_kill_pending_Pause_dialog()
 }
 #endif /* _Windows */
 
-#ifdef GP_MACROS
 /*
  * Walk through the input line looking for string variables preceded by @.
  * Replace the characters @<varname> with the contents of the string.
@@ -3037,11 +3033,9 @@ call_kill_pending_Pause_dialog()
 void
 string_expand_macros()
 {
-    if (expand_macros) {
 	if (expand_1level_macros() && expand_1level_macros()
 	&&  expand_1level_macros() && expand_1level_macros())
 	    int_error(NO_CARET, "Macros nested too deeply");
-    }
 }
 
 #define COPY_CHAR gp_input_line[o++] = *c; \
@@ -3126,7 +3120,6 @@ expand_1level_macros()
 
     return(nfound);
 }
-#endif
 
 /* much more than what can be useful */
 #define MAX_TOTAL_LINE_LEN (1024 * MAX_LINE_LEN)
