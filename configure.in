@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot on Unix.
 dnl
-dnl $Id: configure.in,v 1.331 2013/07/13 05:52:43 sfeam Exp $
+dnl $Id: configure.in,v 1.332 2013/07/18 23:22:17 sfeam Exp $
 dnl
 dnl this is actually major.minor ...
 dnl note that for a non-beta release, we need to disable DEVELOPMENT_RELEASE
@@ -1005,17 +1005,17 @@ if test "${enable_wxwidgets}" = yes ; then
 
   dnl The user can specify another path for wx-config
   WXWIDGETS_PATH="${PATH}"
-  AC_ARG_WITH(wx-config,dnl
-  [--with-wx-config=PATH   Use the given path to wx-config, the wxWidgets configuration program
+  AC_ARG_WITH(wx,dnl
+  [--with-wx=DIR   Where to find wx-config, the wxWidgets configuration program
     (default search in $PATH)],
-    [ if test "${with_wx_config}" != "no" ; then
-	WXWIDGETS_PATH="${with_wx_config}:${PATH}"
+    [ if test "${with_wx}" != "no" ; then
+	WXWIDGETS_PATH="${with_wx}:${PATH}"
      fi ])
 
   dnl Look for wx-config in the path
   AC_PATH_PROG(WX_CONFIG, wx-config, no, ${WXWIDGETS_PATH})
   if test "${WX_CONFIG}" = "no"; then
-    AC_MSG_WARN([wxWidgets can't be found. You can try --with-wx-config-path to give the right path to wx-config. The wxWidgets terminal will not be compiled.])
+    AC_MSG_WARN([wxWidgets can't be found. You can try --with-wx=DIR to give the right path to wx-config. The wxWidgets terminal will not be compiled.])
     enable_wxwidgets_ok=no
   else
 

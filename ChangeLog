@@ -1,3 +1,9 @@
+2013-08-09  Mojca Miklavec  <mojca.miklavec.lists@gmail.com>
+
+	* configure.in:  Change configuration option from --with-wx-config=PATH
+	to --with-wx=DIR.  The is more consistent both with other gnuplot
+	configuration options and with the upstream documentation for wx.
+
 2013-08-09  Christoph Bersch <usenet@bersch.net>
 
 	* src/gadgets.c src/misc.c src/save.c src/term_api.h src/term.c:
