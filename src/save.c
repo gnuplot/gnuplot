@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.222 2013/06/30 17:48:26 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.223 2013/08/08 21:40:31 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -551,6 +551,10 @@ set bar %f %s\n",
 		    this_arrowstyle->arrow_properties.head_length,
 		    this_arrowstyle->arrow_properties.head_angle,
 		    this_arrowstyle->arrow_properties.head_backangle);
+	    if (this_arrowstyle->arrow_properties.head_fixedsize) {
+		fputs(" ", fp);
+		fputs(" fixed", fp);
+	    }
 	}
 	fprintf(fp, "\n");
     }

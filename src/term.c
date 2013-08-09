@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.256 2013/05/22 19:35:35 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.257 2013/08/08 21:40:31 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -1240,6 +1240,7 @@ int curr_arrow_headlength; /* access head length + angle without changing API */
 double curr_arrow_headangle;    /* angle in degrees */
 double curr_arrow_headbackangle;  /* angle in degrees */
 arrowheadfill curr_arrow_headfilled;      /* arrow head filled or not */
+TBOOLEAN curr_arrow_headfixedsize;        /* Adapt the head size for short arrows or not */
 
 static void
 do_arrow(
@@ -1305,7 +1306,7 @@ do_arrow(
 	    double dx2, dy2;
 
 	    effective_length = curr_arrow_headlength;
-	    if (curr_arrow_headlength > len_arrow/2.) {
+	    if (!curr_arrow_headfixedsize && (curr_arrow_headlength > len_arrow/2.)) {
 		effective_length = len_arrow/2.;
 		alpha = atan(tan(alpha)*((double)curr_arrow_headlength/effective_length));
 		beta = atan(tan(beta)*((double)curr_arrow_headlength/effective_length));

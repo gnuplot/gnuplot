@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gadgets.c,v 1.97 2013/08/08 17:17:33 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gadgets.c,v 1.98 2013/08/08 21:40:31 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - gadgets.c */
@@ -616,12 +616,14 @@ default_arrow_style(struct arrow_style_type *arrow)
     arrow->head_angle = 15.0;
     arrow->head_backangle = 90.0;
     arrow->headfill = AS_NOFILL;
+    arrow->head_fixedsize = FALSE;
 }
 
 void
 apply_head_properties(struct arrow_style_type *arrow_properties)
 {
     curr_arrow_headfilled = arrow_properties->headfill;
+    curr_arrow_headfixedsize = arrow_properties->head_fixedsize;
     curr_arrow_headlength = 0;
     if (arrow_properties->head_length > 0) {
 	/* set head length+angle for term->arrow */

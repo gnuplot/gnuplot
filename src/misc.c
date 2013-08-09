@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.156 2013/07/22 20:20:47 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.157 2013/08/08 21:40:31 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -1322,6 +1322,13 @@ arrow_parse(
 	    /* invalid backangle --> default of 90.0 degrees */
 	    if (arrow->head_backangle <= arrow->head_angle)
 		arrow->head_backangle = 90.0;
+	    
+	    /* Assume adjustable size but check for 'fixed' instead */
+	    arrow->head_fixedsize = FALSE;
+	    if (almost_equals(c_token, "fix$ed")) {
+		arrow->head_fixedsize = TRUE;
+		c_token++;
+	    }
 	    continue;
 	}
 

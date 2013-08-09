@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.817 2013/08/07 06:08:46 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.818 2013/08/08 21:40:31 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -3787,14 +3787,12 @@ Ffigure_steps
       plot ... with vectors arrowstyle 3
       plot ... using 1:2:3:4:5 with vectors arrowstyle variable
 
- See `arrowstyle` for more details.
-
  Example:
        plot 'file.dat' using 1:2:3:4 with vectors head filled lt 2
        splot 'file.dat' using 1:2:3:(1):(1):(1) with vectors filled head lw 2
 
  `set clip one` and `set clip two` affect vectors drawn in 2D.
- Please see `set clip` and `arrowstyle`.
+ See `set clip` and `arrowstyle`.
 2 xerrorbars
 ?plotting styles xerrorbars
 ?style xerrorbars
@@ -10992,7 +10990,7 @@ Ffigure_missing
  Syntax:
        set style arrow <index> default
        set style arrow <index> {nohead | head | heads}
-                               {size <length>,<angle>{,<backangle>}}
+                               {size <length>,<angle>{,<backangle>} {{no}fixed}}
                                {filled | empty | nofilled | noborder}
                                {front | back}
                                { {linestyle | ls <line_style>}
@@ -11020,13 +11018,13 @@ Ffigure_missing
  branch of the arrow head and `<angle>` the angle (in degrees) they make with
  the arrow.  `<Length>` is in x-axis units; this can be changed by `first`,
  `second`, `graph`, `screen`, or `character` before the <length>;  see
- `coordinates` for details.  `<Backangle>` only takes effect when `filled`
- or `empty` is also used.  Then, `<backangle>` is the angle (in degrees) the
- back branches make with the arrow (in the same direction as `<angle>`).
- The `fig` terminal has a restricted backangle function. It supports three
- different angles. There are two thresholds: Below 70 degrees, the arrow head
- gets an indented back angle. Above 110 degrees, the arrow head has an acute
- back angle. Between these thresholds, the back line is straight.
+ `coordinates` for details.
+
+ By default the size of the arrow head is reduced for very short arrows.
+ The can be disabled using the `fixed` keyword after the `size` command.
+
+ `<backangle>` is the angle (in degrees) the back branches make with the arrow
+ (in the same direction as `<angle>`). It is ignored if the style is `nofilled`.
 
  Specifying `filled` produces filled arrow heads (if heads are used).
  Specifying `noborder` draws filled arrow heads but does not draw a line

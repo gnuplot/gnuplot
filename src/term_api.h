@@ -1,5 +1,5 @@
 /*
- * $Id: term_api.h,v 1.111 2013/07/05 18:48:27 sfeam Exp $
+ * $Id: term_api.h,v 1.112 2013/08/08 21:40:31 sfeam Exp $
  */
 
 /* GNUPLOT - term_api.h */
@@ -131,6 +131,7 @@ typedef struct arrow_style_type {    /* contains all Arrow properties */
     double head_angle;               /* front angle / deg */
     double head_backangle;           /* back angle / deg */
     arrowheadfill headfill;	     /* AS_FILLED etc */
+    TBOOLEAN head_fixedsize;         /* Adapt the head size for short arrow shafts? */
     /* ... more to come ? */
 } arrow_style_type;
 
@@ -351,6 +352,7 @@ extern int curr_arrow_headlength;
 extern double curr_arrow_headangle;
 extern double curr_arrow_headbackangle;
 extern arrowheadfill curr_arrow_headfilled;
+extern TBOOLEAN curr_arrow_headfixedsize;
 
 /* Recycle count for user-defined linetypes */
 extern int linetype_recycle_count;

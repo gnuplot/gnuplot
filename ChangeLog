@@ -1,3 +1,9 @@
+2013-08-09  Christoph Bersch <usenet@bersch.net>
+
+	* src/gadgets.c src/misc.c src/save.c src/term_api.h src/term.c:
+	New arrow style option "fixed" disables the re-sizing of arrow heads
+	for short arrows.
+
 2013-08-08  Christoph Bersch <usenet@bersch.net>
 
 	* src/gadgets.c (draw_clip_polygon):  Sometimes the clipping status of
