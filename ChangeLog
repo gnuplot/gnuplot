@@ -1,3 +1,15 @@
+2013-08-12  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/.cvsignore: Ignore timestamp.h and *.o files.
+
+	* src/version.c [DEVELOPMENT_VERSION]: Include new timestamp.h
+	instead of using fixed time stamp.
+
+	* src/Makefile.maint (version.c): Remove timestamp update
+	mechanism.
+	(timestamp.h): Create new, separate header file that only holds
+	the current timestamp.
+
 2013-08-09  Mojca Miklavec  <mojca.miklavec.lists@gmail.com>
 
 	* configure.in:  Change configuration option from --with-wx-config=PATH

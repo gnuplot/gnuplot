@@ -34,18 +34,20 @@ makefile.all: Makefile.maint
 makefile.awc: makefile.all
 	sed -e 's/\\/\&/g' makefile.all > $@
 
-version.c: ../VERSION ../PATCHLEVEL ../ChangeLog
+version.c: ../VERSION ../PATCHLEVEL
 	@echo Making $@
 	@if [ "$(version)" != "$(file_version)" -o \
 	     "$(patchlevel)" != "$(file_pl)" ]; then \
 	  sed -e '/^const char gnuplot_version/ s/"[^"]*"/"@VERS@"/' \
 	      -e '/^const char gnuplot_patchlevel/ s/"[^"]*"/"@PLVL@"/' \
-	      -e '/^const char gnuplot_date/ s/"[^"]*"/"@DATE@"/' \
 	      -e "s/@VERS@/$(version)/" -e "s/@PLVL@/$(patchlevel)/" \
-	      -e "s/@DATE@/$(date)/" $@ >$@t; \
+	      $@ >$@t; \
 	  if cmp -s $@ $@t; then rm -f $@t; else mv $@t $@; fi \
 	fi
-#	Take most recent change date from the very top of ChangeLog
-	sed -e '/^const char gnuplot_date/ s/"[^"]*"/"$(last_change)"/' \
-	    $@ > $@t;
-	mv $@t $@
+timestamp.h: ../ChangeLog
+	@echo Making $@
+	@echo "#ifndef GNUPLOT_TIMEBASE_H_INCLUDED" >$@t
+	@echo "#define GNUPLOT_TIMEBASE_H_INCLUDED" >>$@t
+	@echo "const char gnuplot_date[] = \"$(last_change)\";" >>$@t
+	@echo "#endif /* GNUPLOT_TIMEBASE_H_INCLUDED */" >> $@t
+	@if cmp -s $@ $@t; then rm -f $@t; else mv $@t $@; fi \
