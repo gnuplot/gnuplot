@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.818 2013/08/08 21:40:31 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.819 2013/08/09 17:56:45 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -10990,7 +10990,7 @@ Ffigure_missing
  Syntax:
        set style arrow <index> default
        set style arrow <index> {nohead | head | heads}
-                               {size <length>,<angle>{,<backangle>} {{no}fixed}}
+                               {size <length>,<angle>{,<backangle>} {fixed}}
                                {filled | empty | nofilled | noborder}
                                {front | back}
                                { {linestyle | ls <line_style>}
@@ -11021,7 +11021,7 @@ Ffigure_missing
  `coordinates` for details.
 
  By default the size of the arrow head is reduced for very short arrows.
- The can be disabled using the `fixed` keyword after the `size` command.
+ This can be disabled using the `fixed` keyword after the `size` command.
 
  `<backangle>` is the angle (in degrees) the back branches make with the arrow
  (in the same direction as `<angle>`). It is ignored if the style is `nofilled`.
