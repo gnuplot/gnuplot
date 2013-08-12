@@ -8,17 +8,17 @@ coresrc := $(filter-out $(noncoresrc),$(wildcard *.c))
 
 coreterm := $(shell cd ../term && echo *.trm)
 
-version := $(shell cat ../VERSION)
+version := $(shell cat $(top_srcdir)/VERSION)
 file_version := $(shell sed -n 's/.*gnuplot_version.*"\(.*\)".*/\1/p' ./version.c|tr -d ' ')
 
-patchlevel := $(shell cat ../PATCHLEVEL)
+patchlevel := $(shell cat $(top_srcdir)/PATCHLEVEL)
 file_pl := $(shell sed -n 's/.*gnuplot_patchlevel.*"\(.*\)".*/\1/p' ./version.c|tr -d ' ')
 
-last_change := $(shell dd if=../ChangeLog bs=11 count=1 2> /dev/null)
+last_change := $(shell dd if=$(top_srcdir)/ChangeLog bs=11 count=1 2> /dev/null)
 
 date := $(shell date)
 
-makefile.all: Makefile.maint
+makefile.all: $(srcdir)/Makefile.maint
 	@echo "# $@ generated automatically by GNU make" >$@t
 	@echo >>$@t
 	@echo '# List of core object files except version.$$(O)' >>$@t
@@ -34,7 +34,7 @@ makefile.all: Makefile.maint
 makefile.awc: makefile.all
 	sed -e 's/\\/\&/g' makefile.all > $@
 
-version.c: ../VERSION ../PATCHLEVEL
+version.c: $(top_srcdir)/VERSION $(top_srcdir)/PATCHLEVEL
 	@echo Making $@
 	@if [ "$(version)" != "$(file_version)" -o \
 	     "$(patchlevel)" != "$(file_pl)" ]; then \
@@ -44,10 +44,4 @@ version.c: ../VERSION ../PATCHLEVEL
 	      $@ >$@t; \
 	  if cmp -s $@ $@t; then rm -f $@t; else mv $@t $@; fi \
 	fi
-timestamp.h: ../ChangeLog
-	@echo Making $@
-	@echo "#ifndef GNUPLOT_TIMEBASE_H_INCLUDED" >$@t
-	@echo "#define GNUPLOT_TIMEBASE_H_INCLUDED" >>$@t
-	@echo "const char gnuplot_date[] = \"$(last_change)\";" >>$@t
-	@echo "#endif /* GNUPLOT_TIMEBASE_H_INCLUDED */" >> $@t
-	@if cmp -s $@ $@t; then rm -f $@t; else mv $@t $@; fi \
+

@@ -102,6 +102,15 @@ if BUILD_BITMAP
 gnuplot_SOURCES += bitmap.c
 endif
 
+BUILT_SOURCES = timestamp.h
+timestamp.h: $(top_srcdir)/ChangeLog Makefile
+	@echo Making $@
+	@echo "#ifndef GNUPLOT_TIMEBASE_H_INCLUDED" >$@t
+	@echo "#define GNUPLOT_TIMEBASE_H_INCLUDED" >>$@t
+	@head -1 $< | sed -e 's,\(^[0-9-]* \).*$$,const char gnuplot_date[] = "\1";,' >>$@t
+	@echo "#endif /* GNUPLOT_TIMEBASE_H_INCLUDED */" >> $@t
+	@if cmp -s $@ $@t; then rm -f $@t; else mv $@t $@; fi
+
 if BUILD_QT
 
 # Call the moc preprocessor

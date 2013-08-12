@@ -1,5 +1,15 @@
 2013-08-12  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
+	* src/Makefile.maint (version, patchlevel, last_change)
+	(makefile.all, version.c): Prepare for possible use out-of-tree.
+
+	* src/Makefile.am (timestamp.h): New rule for timestamp.h that
+	cooperates with automake that should work for non-GNU make and
+	out-of-tree builds.
+	(BUILT_SOURCES): Add timestamp.h to be built before anything else.
+
+	* src/Makefile.maint: timestamp.h rule removed again.
+
 	* src/.cvsignore: Ignore timestamp.h and *.o files.
 
 	* src/version.c [DEVELOPMENT_VERSION]: Include new timestamp.h
