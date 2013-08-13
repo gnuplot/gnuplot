@@ -1,3 +1,8 @@
+2013-08-13  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/eval.c (update_gpval_variables):  Missing GPVAL_* entry
+	for R_AXIS.max.
+
 2013-08-08  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/axis.c:  Add comment noting that axis_position_zeroaxis() must

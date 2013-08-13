@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: eval.c,v 1.96.2.3 2012/09/14 21:13:08 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: eval.c,v 1.96.2.4 2013/08/06 18:16:17 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - eval.c */
@@ -853,6 +853,7 @@ update_gpval_variables(int context)
 	fill_gpval_axis(U_AXIS);
 	fill_gpval_axis(V_AXIS);
 	fill_gpval_float("GPVAL_R_MIN", R_AXIS.min);
+	fill_gpval_float("GPVAL_R_MAX", R_AXIS.max);
 	fill_gpval_float("GPVAL_R_LOG", R_AXIS.base);
 	update_plot_bounds();
 	fill_gpval_integer("GPVAL_PLOT", is_3d_plot ? 0:1);
