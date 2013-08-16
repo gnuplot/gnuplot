@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: internal.c,v 1.68 2012/05/06 02:58:54 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: internal.c,v 1.69 2013/06/05 23:35:54 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - internal.c */
@@ -46,6 +46,12 @@ static char *RCSid() { return RCSid("$Id: internal.c,v 1.68 2012/05/06 02:58:54 
 
 #include <math.h>
 
+#ifndef _WIN64
+/*
+ * FIXME: This is almost certainly out of date on linux, since the matherr
+ * mechanism has been replaced by math_error() and supposedly is only 
+ * enabled via an explicit declaration #define _SVID_SOURCE.
+ */
 /*
  * Excerpt from the Solaris man page for matherr():
  *
@@ -56,14 +62,14 @@ static char *RCSid() { return RCSid("$Id: internal.c,v 1.68 2012/05/06 02:58:54 
  *   matherr() in their programs.
  */
 
-static enum DATA_TYPES sprintf_specifier __PROTO((const char *format));
-
-
 int
 GP_MATHERR( STRUCT_EXCEPTION_P_X )
 {
     return (undefined = TRUE);	/* don't print error message */
 }
+#endif
+
+static enum DATA_TYPES sprintf_specifier __PROTO((const char *format));
 
 #define BAD_DEFAULT default: int_error(NO_CARET, "internal error : type neither INT or CMPLX"); return;
 
