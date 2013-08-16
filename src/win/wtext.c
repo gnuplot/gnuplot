@@ -1,5 +1,5 @@
 /*
- * $Id: wtext.c,v 1.42 2013/06/23 19:53:03 markisch Exp $
+ * $Id: wtext.c,v 1.43 2013/07/06 08:15:18 markisch Exp $
  */
 
 /* GNUPLOT - win/wtext.c */
@@ -280,7 +280,11 @@ TextInit(LPTW lptw)
 
     sysmenu = GetSystemMenu(lptw->hWndParent,0);	/* get the sysmenu */
     AppendMenu(sysmenu, MF_SEPARATOR, 0, NULL);
+#ifdef _WIN64
+    AppendMenu(sysmenu, MF_POPUP, (UINT_PTR)lptw->hPopMenu, "&Options");
+#else
     AppendMenu(sysmenu, MF_POPUP, (UINT)lptw->hPopMenu, "&Options");
+#endif
     AppendMenu(sysmenu, MF_STRING, M_ABOUT, "&About");
 
     if (lptw->lpmw)
@@ -1013,7 +1017,11 @@ WndParentProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
     HDC hdc;
     LPTW lptw;
 
+#ifdef _WIN64
+    lptw = (LPTW)GetWindowLongPtr(hwnd, 0);
+#else
     lptw = (LPTW)GetWindowLong(hwnd, 0);
+#endif
 
     switch(message) {
     case WM_SYSCOMMAND:
@@ -1091,7 +1099,11 @@ WndParentProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 	TEXTMETRIC tm;
 
 	lptw = ((CREATESTRUCT *)lParam)->lpCreateParams;
+#ifdef _WIN64
+	SetWindowLongPtr(hwnd, 0, (LONG_PTR)lptw);
+#else
 	SetWindowLong(hwnd, 0, (LONG)lptw);
+#endif
 	lptw->hWndParent = hwnd;
 	/* get character size */
 	TextMakeFont(lptw);
@@ -1188,7 +1200,11 @@ WndTextProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
     int nYinc, nXinc;
     LPTW lptw;
 
+#ifdef _WIN64
+    lptw = (LPTW)GetWindowLongPtr(hwnd, 0);
+#else
     lptw = (LPTW)GetWindowLong(hwnd, 0);
+#endif
 
     switch(message) {
     case WM_SETFOCUS:
@@ -1857,7 +1873,11 @@ WndTextProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
     }
     case WM_CREATE:
 	lptw = ((CREATESTRUCT *)lParam)->lpCreateParams;
+#ifdef _WIN64
+	SetWindowLongPtr(hwnd, 0, (LONG_PTR)lptw);
+#else
 	SetWindowLong(hwnd, 0, (LONG)lptw);
+#endif
 	lptw->hWndText = hwnd;
 	break;
     case WM_DESTROY:
@@ -2142,7 +2162,11 @@ AboutDlgProc(HWND hDlg, UINT wMsg, WPARAM wParam, LPARAM lParam)
     case WM_DRAWITEM:
     {
 	LPDRAWITEMSTRUCT lpdis = (LPDRAWITEMSTRUCT)lParam;
+#ifdef _WIN64
+	DrawIcon(lpdis->hDC, 0, 0, (HICON)GetClassLongPtr(GetParent(hDlg), GCLP_HICON));
+#else
 	DrawIcon(lpdis->hDC, 0, 0, (HICON)GetClassLong(GetParent(hDlg), GCL_HICON));
+#endif
 	return FALSE;
     }
     case WM_COMMAND:

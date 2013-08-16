@@ -4,6 +4,18 @@
 	The matherr() mechanism is not used by win64. It's also not used by
 	current linux but it doesn't hurt to leave it in place for now.
 
+	* src/win/wprinter.c src/win/winmain.c src/win/wtext.c src/win/wmenu.c
+	src/win/wpause.c src/win/wgraph.c:
+	2nd part of win64 compatability patch.  All changes are #ifdef _WIN64.
+
+	src/win/wgnuplot.rc src/win/wgnuplot.exe.manifest64:
+	The file win/wgnuplot.exe.manifest specifies the processorArchitecture
+	as "X86". For an x86_64 build this must be changed to "amd64"
+	(or wgnuplot.exe won't start). The manifest file is included by
+	win/wgnuplot.rc. The modified wgnuplot.rc includes an alternative file
+	wgnuplot.exe.manifest64 if the symbol _WIN64 is defined. This file 
+	simply substitutes "amd64" for "X86" in two places.
+
 2013-08-13  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/eval.c (update_gpval_variables):  Missing GPVAL_* entry

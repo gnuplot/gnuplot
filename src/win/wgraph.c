@@ -1,5 +1,5 @@
 /*
- * $Id: wgraph.c,v 1.166 2013/07/06 08:20:03 markisch Exp $
+ * $Id: wgraph.c,v 1.167 2013/07/06 08:23:07 markisch Exp $
  */
 
 /* GNUPLOT - win/wgraph.c */
@@ -435,8 +435,13 @@ GraphInit(LPGW lpgw)
 		NULL, NULL, lpgw->hInstance, lpgw);
 
 	if (lpgw->hWndGraph)
+#ifdef _WIN64
+		SetClassLongPtr(lpgw->hWndGraph, GCLP_HICON,
+			(LONG_PTR) LoadIcon(lpgw->hInstance, "GRPICON"));
+#else
 		SetClassLong(lpgw->hWndGraph, GCL_HICON,
 			(LONG) LoadIcon(lpgw->hInstance, "GRPICON"));
+#endif
 
 	lpgw->hStatusbar = CreateWindowEx(0, STATUSCLASSNAME, (LPSTR)NULL,
 				  WS_CHILD | SBARS_SIZEGRIP,
@@ -575,7 +580,11 @@ GraphInit(LPGW lpgw)
 	/* modify the system menu to have the new items we want */
 	sysmenu = GetSystemMenu(lpgw->hWndGraph,0);
 	AppendMenu(sysmenu, MF_SEPARATOR, 0, NULL);
+#ifdef _WIN64
+	AppendMenu(sysmenu, MF_POPUP, (UINT_PTR)lpgw->hPopMenu, "&Options");
+#else
 	AppendMenu(sysmenu, MF_POPUP, (UINT)lpgw->hPopMenu, "&Options");
+#endif
 	AppendMenu(sysmenu, MF_STRING, M_ABOUT, "&About");
 
 #ifndef WGP_CONSOLE
@@ -2972,13 +2981,17 @@ CopyPrint(LPGW lpgw)
 	}
 
 	pr.hdcPrn = printer;
+#ifdef _WIN64
+	SetWindowLongPtr(hwnd, 4, (LONG_PTR)((GP_LPPRINT)&pr));
+#else
 	SetWindowLong(hwnd, 4, (LONG)((GP_LPPRINT)&pr));
+#endif
 	PrintRegister((GP_LPPRINT)&pr);
 
 	EnableWindow(hwnd, FALSE);
 	pr.bUserAbort = FALSE;
 	pr.hDlgPrint = CreateDialogParam(hdllInstance, "CancelDlgBox",
-									hwnd, PrintDlgProc, (LPARAM)lpgw->Title);
+					 hwnd, PrintDlgProc, (LPARAM)lpgw->Title);
 	SetAbortProc(printer, PrintAbortProc);
 
 	memset(&docInfo, 0, sizeof(DOCINFO));
@@ -3326,7 +3339,11 @@ track_tooltip(LPGW lpgw, int x, int y)
 
 #define LS_DEFLINE 2
 typedef struct tagLS {
+#ifdef _WIN64
+	LONG_PTR widtype;
+#else
 	int	widtype;
+#endif
 	int	wid;
 	HWND	hwnd;
 	int	pen;			/* current pen number */
@@ -3388,7 +3405,11 @@ LineStyleDlgProc(HWND hdlg, UINT wmsg, WPARAM wparam, LPARAM lparam)
 	int i;
 	UINT pen;
 	LPLOGPEN plpm, plpc;
+#ifdef _WIN64
+	lpls = (LPLS)GetWindowLongPtr(GetParent(hdlg), 4);
+#else
 	lpls = (LPLS)GetWindowLong(GetParent(hdlg), 4);
+#endif
 
 	switch (wmsg) {
 		case WM_INITDIALOG:
@@ -3567,7 +3588,11 @@ LineStyle(LPGW lpgw)
 	BOOL status = FALSE;
 	LS ls;
 
+#ifdef _WIN64
+	SetWindowLongPtr(lpgw->hWndGraph, 4, (LONG_PTR)((LPLS)&ls));
+#else
 	SetWindowLong(lpgw->hWndGraph, 4, (LONG)((LPLS)&ls));
+#endif
 	_fmemcpy(&ls.colorpen, &lpgw->colorpen, (WGNUMPENS + 2) * sizeof(LOGPEN));
 	_fmemcpy(&ls.monopen, &lpgw->monopen, (WGNUMPENS + 2) * sizeof(LOGPEN));
 
@@ -3651,7 +3676,11 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 	static unsigned int last_modifier_mask = -99;
 #endif
 
+#ifdef _WIN64
+	lpgw = (LPGW)GetWindowLongPtr(hwnd, 0);
+#else
 	lpgw = (LPGW)GetWindowLong(hwnd, 0);
+#endif
 
 #ifdef USE_MOUSE
 	/*  mouse events first */
@@ -4176,7 +4205,11 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			return FALSE;
 		case WM_CREATE:
 			lpgw = ((CREATESTRUCT *)lParam)->lpCreateParams;
+#ifdef _WIN64
+			SetWindowLongPtr(hwnd, 0, (LONG_PTR)lpgw);
+#else
 			SetWindowLong(hwnd, 0, (LONG)lpgw);
+#endif
 			lpgw->hWndGraph = hwnd;
 			hdc = GetDC(hwnd);
 			MakePens(lpgw, hdc);

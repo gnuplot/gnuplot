@@ -1,5 +1,5 @@
 /*
- * $Id: wmenu.c,v 1.23 2012/06/30 06:41:33 markisch Exp $Id: wmenu.c,v 1.23 2012/06/30 06:41:33 markisch Exp $
+ * $Id: wmenu.c,v 1.24 2013/06/23 19:53:03 markisch Exp $Id: wmenu.c,v 1.24 2013/06/23 19:53:03 markisch Exp $
  */
 
 /* GNUPLOT - win/wmenu.c */
@@ -824,8 +824,13 @@ int ButtonIcon[BUTTONMAX];
 			goto errorcleanup;
 		}
 		hMenu[nMenuLevel] = CreateMenu();
+#ifdef _WIN64
+		AppendMenu(hMenu[nMenuLevel > 0 ? nMenuLevel-1 : 0],
+			MF_STRING | MF_POPUP, (UINT_PTR)hMenu[nMenuLevel], (LPCSTR)buf);
+#else
 		AppendMenu(hMenu[nMenuLevel > 0 ? nMenuLevel-1 : 0],
 			MF_STRING | MF_POPUP, (UINT)hMenu[nMenuLevel], (LPCSTR)buf);
+#endif
 	  }
 	  else if (!lstrcmpi(buf,"[EndMenu]")) {
 		if (nMenuLevel > 0)
@@ -1043,7 +1048,11 @@ InputBoxDlgProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 {
 LPTW lptw;
 LPMW lpmw;
+#ifdef _WIN64
+    lptw = (LPTW)GetWindowLongPtr(GetParent(hDlg), 0);
+#else
     lptw = (LPTW)GetWindowLong(GetParent(hDlg), 0);
+#endif
     lpmw = lptw->lpmw;
 
     switch( message) {

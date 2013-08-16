@@ -1,5 +1,5 @@
 /*
- * $Id: wprinter.c,v 1.8 2012/06/30 06:41:33 markisch Exp $
+ * $Id: wprinter.c,v 1.9 2013/06/02 18:22:34 markisch Exp $
  */
 
 /* GNUPLOT - win/wprinter.c */
@@ -63,15 +63,17 @@
 
 GP_LPPRINT prlist = NULL;
 
-BOOL CALLBACK PrintSizeDlgProc(HWND hdlg, UINT wmsg, WPARAM wparam, LPARAM lparam);
 static GP_LPPRINT PrintFind(HDC hdc);
-
 
 BOOL CALLBACK
 PrintSizeDlgProc(HWND hdlg, UINT wmsg, WPARAM wparam, LPARAM lparam)
 {
     char buf[8];
+#ifdef _WIN64
+    GP_LPPRINT lpr = (GP_LPPRINT)GetWindowLongPtr(GetParent(hdlg), 4);
+#else
     GP_LPPRINT lpr = (GP_LPPRINT)GetWindowLong(GetParent(hdlg), 4);
+#endif
 
     switch (wmsg) {
     case WM_INITDIALOG:
@@ -146,7 +148,11 @@ PrintSize(HDC printer, HWND hwnd, LPRECT lprect)
     BOOL status = FALSE;
     GP_PRINT pr;
 
+#ifdef _WIN64
+    SetWindowLongPtr(hwnd, 4, (LONG_PTR)&pr);
+#else
     SetWindowLong(hwnd, 4, (LONG)&pr);
+#endif
     pr.poff.x = 0;
     pr.poff.y = 0;
     pr.psize.x = GetDeviceCaps(printer, HORZSIZE);
@@ -213,13 +219,16 @@ PrintUnregister(GP_LPPRINT lpr)
     }
 }
 
-
 /* GetWindowLong(GetParent(hDlg), 4) must be available for use */
 BOOL CALLBACK
 PrintDlgProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	GP_LPPRINT lpr;
+#ifdef _WIN64
+        lpr = (GP_LPPRINT) GetWindowLongPtr(GetParent(hDlg), 4);
+#else
 	lpr = (GP_LPPRINT) GetWindowLong(GetParent(hDlg), 4);
+#endif
 	/* FIXME: cause of crash in bug #3544949. No idea yet as to why this could happen, though. */
 	if (lpr == NULL)
 	return FALSE;
@@ -239,7 +248,6 @@ PrintDlgProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 	}
 	return FALSE;
 }
-
 
 BOOL CALLBACK
 PrintAbortProc(HDC hdcPrn, int code)
@@ -319,7 +327,11 @@ DumpPrinter(HWND hwnd, LPSTR szAppName, LPSTR szFileName)
 			return;	/* abort */
 
 		pr.hdcPrn = printer;
+#ifdef _WIN64
+		SetWindowLongPtr(hwnd, 4, (LONG_PTR)((GP_LPPRINT)&pr));
+#else
 		SetWindowLong(hwnd, 4, (LONG)((GP_LPPRINT)&pr));
+#endif
 		PrintRegister((GP_LPPRINT)&pr);
 		if ((buf = malloc(4096 + 2)) != NULL) {
 			bufcount = (WORD *)buf;

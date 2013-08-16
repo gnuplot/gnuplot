@@ -1,5 +1,5 @@
 /*
- * $Id: wpause.c,v 1.22 2012/06/30 06:41:33 markisch Exp $
+ * $Id: wpause.c,v 1.23 2012/10/08 10:40:34 markisch Exp $
  */
 
 /* GNUPLOT - win/wpause.c */
@@ -207,7 +207,11 @@ WndPauseProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 	LPPW lppw;
 	int cxChar, cyChar, middle;
 
+#ifdef _WIN64
+	lppw = (LPPW)GetWindowLongPtr(hwnd, 0);
+#else
 	lppw = (LPPW)GetWindowLong(hwnd, 0);
+#endif
 
 	switch(message) {
 		case WM_KEYDOWN:
@@ -245,7 +249,11 @@ WndPauseProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			if (!paused_for_mouse) /* don't show buttons during pausing for mouse or key */
 				ws_opts |= WS_VISIBLE;
 			lppw = ((CREATESTRUCT *)lParam)->lpCreateParams;
+#ifdef _WIN64
+			SetWindowLongPtr(hwnd, 0, (LONG_PTR)lppw);
+#else
 			SetWindowLong(hwnd, 0, (LONG)lppw);
+#endif
 			lppw->hWndPause = hwnd;
 			hdc = GetDC(hwnd);
 			SelectObject(hdc, GetStockObject(SYSTEM_FONT));
@@ -267,10 +275,17 @@ WndPauseProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 					8 * cxChar, 7 * cyChar / 4,
 					hwnd, (HMENU)IDCANCEL,
 					((LPCREATESTRUCT) lParam)->hInstance, NULL);
+#ifdef _WIN64
+			lppw->lpfnOK = (WNDPROC) GetWindowLongPtr(lppw->hOK, GWLP_WNDPROC);
+			SetWindowLongPtr(lppw->hOK, GWLP_WNDPROC, (LONG_PTR)PauseButtonProc);
+			lppw->lpfnCancel = (WNDPROC) GetWindowLongPtr(lppw->hCancel, GWLP_WNDPROC);
+			SetWindowLongPtr(lppw->hCancel, GWLP_WNDPROC, (LONG_PTR)PauseButtonProc);
+#else
 			lppw->lpfnOK = (WNDPROC) GetWindowLong(lppw->hOK, GWL_WNDPROC);
 			SetWindowLong(lppw->hOK, GWL_WNDPROC, (LONG)PauseButtonProc);
 			lppw->lpfnCancel = (WNDPROC) GetWindowLong(lppw->hCancel, GWL_WNDPROC);
 			SetWindowLong(lppw->hCancel, GWL_WNDPROC, (LONG)PauseButtonProc);
+#endif
 			if (GetParent(hwnd))
 				EnableWindow(GetParent(hwnd), FALSE);
 			return 0;
@@ -293,7 +308,11 @@ PauseButtonProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	LPPW lppw;
 	LONG n = GetWindowLong(hwnd, GWL_ID);
+#ifdef _WIN64
+	lppw = (LPPW)GetWindowLongPtr(GetParent(hwnd), 0);
+#else
 	lppw = (LPPW)GetWindowLong(GetParent(hwnd), 0);
+#endif
 	switch (message) {
 		case WM_KEYDOWN:
 			switch (wParam) {
