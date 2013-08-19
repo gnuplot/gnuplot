@@ -1,5 +1,5 @@
 /*
- * $Id: wgraph.c,v 1.167 2013/07/06 08:23:07 markisch Exp $
+ * $Id: wgraph.c,v 1.168 2013/08/17 00:02:08 sfeam Exp $
  */
 
 /* GNUPLOT - win/wgraph.c */
@@ -1702,6 +1702,7 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 					keysample = FALSE;
 					break;
 				case TERM_LAYER_RESET:
+					plotno = 0;
 					break;
 				case TERM_LAYER_RESET_PLOTNO:
 					plotno = 0;
