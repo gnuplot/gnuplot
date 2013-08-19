@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.259 2013/08/19 23:32:16 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.260 2013/08/19 23:47:02 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -820,11 +820,14 @@ term_start_multiplot()
 	}
     }
 
-    /* If we reach here, then the command has been successfully parsed */
+    /* If we reach here, then the command has been successfully parsed.
+     * Aug 2013: call term_start_plot() before setting multiplot so that
+     * the wxt and qt terminals will reset the plot count to 0 before
+     * ignoring subsequent TERM_LAYER_RESET requests. 
+     */
+    term_start_plot();
     multiplot = TRUE;
     fill_gpval_integer("GPVAL_MULTIPLOT", 1);
-
-    term_start_plot();
 
     /* Place overall title before doing anything else */
     if (mp_layout.title.text) {

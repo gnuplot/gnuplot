@@ -2,6 +2,12 @@
 
 	* src/win/wgraph.c:  Must honor TERM_LAYER_RESET.
 
+	* src/term.c (term_start_multiplot):  Several terminals (qt, wxt)
+	ignore TERM_LAYER_RESET during multiplot.  Thus in order to correctly 
+	initialize the plot structures, the reset must happen before the
+	multiplot flag is set.  Without this change, mouse toggle of 
+	multiplots can trigger an access violation.  Bug fix.
+
 2013-08-16  Allin Cottrell  <cottrell@wfu.edu>
 
 	* src/internal.c (GP_MATHERR): 1st part of win64 compatibility patch.
