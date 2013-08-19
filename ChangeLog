@@ -1,10 +1,5 @@
 2013-08-19  Ethan A Merritt  <merritt@u.washington.edu>
 
-	* src/term.c (term_start_multiplot):  Some terminals (qt, wxt) ignore
-	TERM_LAYER_RESET when inside a multiplot. Therefore we must call it 
-	before starting each multiplot in order to clear data structures from 
-	the previous plot, if any.
-
 	* src/win/wgraph.c:  Must honor TERM_LAYER_RESET.
 
 2013-08-16  Allin Cottrell  <cottrell@wfu.edu>
