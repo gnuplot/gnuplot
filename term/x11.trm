@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: x11.trm,v 1.209 2013/05/19 23:46:34 sfeam Exp $
+ * $Id: x11.trm,v 1.210 2013/05/21 20:36:47 sfeam Exp $
  *
  */
 
@@ -2093,6 +2093,8 @@ X11_layer(t_termlayer syncpoint)
 	{
 	case TERM_LAYER_RESET:
 	case TERM_LAYER_RESET_PLOTNO:
+		if (multiplot)
+			break;
 	case TERM_LAYER_BEFORE_PLOT:
 	case TERM_LAYER_AFTER_PLOT:
 	case TERM_LAYER_BEGIN_KEYSAMPLE:
