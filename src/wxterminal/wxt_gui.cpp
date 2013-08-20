@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.cpp,v 1.113 2013/05/19 23:46:34 sfeam Exp $
+ * $Id: wxt_gui.cpp,v 1.114 2013/05/31 06:23:35 sfeam Exp $
  */
 
 /* GNUPLOT - wxt_gui.cpp */
@@ -2608,6 +2608,23 @@ void wxt_boxed_text(unsigned int x, unsigned int y, int option)
 	wxt_command_push(temp_command);
 }
 #endif
+
+void wxt_modify_plots(unsigned int ops)
+{
+	int i;
+	for (i=1; i<=wxt_cur_plotno && i<wxt_max_key_boxes; i++) {
+		if ((ops & MODPLOTS_INVERT_VISIBILITIES) == MODPLOTS_INVERT_VISIBILITIES) {
+			wxt_key_boxes[i].hidden = !wxt_key_boxes[i].hidden;
+		} else if (ops & MODPLOTS_SET_VISIBLE) {
+			wxt_key_boxes[i].hidden = FALSE;
+		} else if (ops & MODPLOTS_SET_INVISIBLE) {
+			wxt_key_boxes[i].hidden = TRUE;
+		}
+	}
+	wxt_MutexGuiEnter();
+	wxt_current_panel->wxt_cairo_refresh();
+	wxt_MutexGuiLeave();
+}
 
 /* ===================================================================
  * Command list processing

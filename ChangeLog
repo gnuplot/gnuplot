@@ -1,8 +1,23 @@
+2013-08-20  Jon Gjengset <jon@thesquareplanet.com>
+
+	* src/term_api.h src/gplt_x11.c src/mouse.c term/x11.trm term/qt.trm
+	term/wxt.trm term/README src/wxterminal/wxt_gui.cpp
+	src/wxterminal/wxt_term.h src/qtterminal/QtGnuplotEvent.h
+	src/qtterminal/QtGnuplotScene.cpp src/qtterminal/qt_term.cpp
+	src/qtterminal/qt_term.h:
+	Add term->modify_plots() interface (and implementations for wxt, qt and
+	x11) for applying operations to every plot in a graph. Current use cases
+	include hiding and showing all plots and inverting plot visibility.
+	Useful in situations where many sets of data are plotted initially, but
+	the user only wishes to focus on a few.
+
 2013-08-19  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/win/wgraph.c:  Must honor TERM_LAYER_RESET.
 
-	* src/term.c (term_start_multiplot):  Several terminals (qt, wxt)
+	* term/x11.trm (X11_layer):  ignore TERM_LAYER_RESET in multiplot.
+
+	* src/term.c (term_start_multiplot):  Several terminals (qt, wxt, x11)
 	ignore TERM_LAYER_RESET during multiplot.  Thus in order to correctly 
 	initialize the plot structures, the reset must happen before the
 	multiplot flag is set.  Without this change, mouse toggle of 

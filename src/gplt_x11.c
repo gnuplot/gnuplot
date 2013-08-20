@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.236 2013/06/16 17:53:52 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.237 2013/07/01 21:33:19 sfeam Exp $"); }
 #endif
 
 #define MOUSE_ALL_WINDOWS 1
@@ -1830,6 +1830,31 @@ record()
 	    }
 	    return 1;
 #endif
+	case 'O': /*   Modify plots */
+#ifdef PIPE_IPC
+	    if (!pipe_died)
+#endif
+	    {
+		unsigned int ops, i;
+		sscanf(buf+1, "%u", &ops);
+
+		if (!plot)
+			return 1;
+
+		for (i = 1; i <= x11_cur_plotno && i < plot->x11_max_key_boxes; i++) {
+		    if ((ops & MODPLOTS_INVERT_VISIBILITIES) == MODPLOTS_INVERT_VISIBILITIES) {
+			plot->x11_key_boxes[i].hidden = !plot->x11_key_boxes[i].hidden;
+		    } else if (ops & MODPLOTS_SET_VISIBLE) {
+			plot->x11_key_boxes[i].hidden = FALSE;
+		    } else if (ops & MODPLOTS_SET_INVISIBLE) {
+			plot->x11_key_boxes[i].hidden = TRUE;
+		    }
+		}
+
+		retain_toggle_state = TRUE;
+		display(plot);
+	    }
+	    return 1;
 #ifdef USE_MOUSE
 	case 'Q':
 	    /* Set default font immediately and return size info through pipe */

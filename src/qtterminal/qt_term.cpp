@@ -1038,3 +1038,15 @@ void qt_boxed_text(unsigned int x, unsigned int y, int option)
 	qt_out << GETextBox << qt_termCoordF(x, y) << option;
 }
 #endif
+
+void qt_modify_plots(unsigned int ops)
+{
+	if ((ops & MODPLOTS_INVERT_VISIBILITIES) == MODPLOTS_INVERT_VISIBILITIES) {
+		qt_out << GEModPlots << QTMODPLOTS_INVERT_VISIBILITIES;
+	} else if (ops & MODPLOTS_SET_VISIBLE) {
+		qt_out << GEModPlots << QTMODPLOTS_SET_VISIBLE;
+	} else if (ops & MODPLOTS_SET_INVISIBLE) {
+		qt_out << GEModPlots << QTMODPLOTS_SET_INVISIBLE;
+	}
+	qt_flushOutBuffer();
+}

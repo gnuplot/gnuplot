@@ -1,5 +1,5 @@
 /* GNUPLOT - qt.trm 
- * $Id: qt.trm,v 1.9 2012/05/21 23:15:18 sfeam Exp $
+ * $Id: qt.trm,v 1.10 2013/05/19 23:46:34 sfeam Exp $
  */
 
 /*[
@@ -68,6 +68,7 @@ TERM_TABLE_START (qt_driver)
 #ifdef EAM_BOXED_TEXT
     , qt_boxed_text
 #endif
+    , qt_modify_plots
 TERM_TABLE_END (qt_driver)
 
 #undef LAST_TERM

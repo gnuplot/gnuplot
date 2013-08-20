@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: mouse.c,v 1.149 2013/04/08 04:18:20 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: mouse.c,v 1.150 2013/05/08 03:32:24 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - mouse.c */
@@ -222,6 +222,9 @@ static char *builtin_toggle_border __PROTO((struct gp_event_t * ge));
 static char *builtin_replot __PROTO((struct gp_event_t * ge));
 static char *builtin_toggle_grid __PROTO((struct gp_event_t * ge));
 static char *builtin_help __PROTO((struct gp_event_t * ge));
+static char *builtin_set_plots_visible __PROTO((struct gp_event_t * ge));
+static char *builtin_set_plots_invisible __PROTO((struct gp_event_t * ge));
+static char *builtin_invert_plot_visibilities __PROTO((struct gp_event_t * ge));
 static char *builtin_toggle_log __PROTO((struct gp_event_t * ge));
 static char *builtin_nearest_log __PROTO((struct gp_event_t * ge));
 static char *builtin_toggle_mouse __PROTO((struct gp_event_t * ge));
@@ -1006,6 +1009,39 @@ builtin_help(struct gp_event_t *ge)
     fprintf(stderr, "\n");
     bind_display((char *) 0);	/* display all bindings */
     restore_prompt();
+    return (char *) 0;
+}
+
+static char *
+builtin_set_plots_visible(struct gp_event_t *ge)
+{
+    if (!ge) {
+	return "`builtin-set-plots-visible`";
+    }
+    if (term->modify_plots)
+	term->modify_plots(MODPLOTS_SET_VISIBLE);
+    return (char *) 0;
+}
+
+static char *
+builtin_set_plots_invisible(struct gp_event_t *ge)
+{
+    if (!ge) {
+	return "`builtin-set-plots-invisible`";
+    }
+    if (term->modify_plots)
+	term->modify_plots(MODPLOTS_SET_INVISIBLE);
+    return (char *) 0;
+}
+
+static char *
+builtin_invert_plot_visibilities(struct gp_event_t *ge)
+{
+    if (!ge) {
+	return "`builtin-invert-plot-visibilities`";
+    }
+    if (term->modify_plots)
+	term->modify_plots(MODPLOTS_INVERT_VISIBILITIES);
     return (char *) 0;
 }
 
@@ -2298,10 +2334,13 @@ bind_install_default_bindings()
     bind_append("e", (char *) 0, builtin_replot);
     bind_append("g", (char *) 0, builtin_toggle_grid);
     bind_append("h", (char *) 0, builtin_help);
+    bind_append("i", (char *) 0, builtin_invert_plot_visibilities);
     bind_append("l", (char *) 0, builtin_toggle_log);
     bind_append("L", (char *) 0, builtin_nearest_log);
     bind_append("m", (char *) 0, builtin_toggle_mouse);
     bind_append("r", (char *) 0, builtin_toggle_ruler);
+    bind_append("V", (char *) 0, builtin_set_plots_invisible);
+    bind_append("v", (char *) 0, builtin_set_plots_visible);
     bind_append("1", (char *) 0, builtin_decrement_mousemode);
     bind_append("2", (char *) 0, builtin_increment_mousemode);
     bind_append("3", (char *) 0, builtin_decrement_clipboardmode);

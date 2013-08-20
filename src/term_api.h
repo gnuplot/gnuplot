@@ -1,5 +1,5 @@
 /*
- * $Id: term_api.h,v 1.112 2013/08/08 21:40:31 sfeam Exp $
+ * $Id: term_api.h,v 1.113 2013/08/09 17:56:45 sfeam Exp $
  */
 
 /* GNUPLOT - term_api.h */
@@ -189,6 +189,11 @@ typedef struct t_image {
     TBOOLEAN fallback; /* true == don't use terminal-specific code */
 } t_image;
 
+/* Operations possible with term->modify_plots() */
+#define MODPLOTS_SET_VISIBLE         (1<<0)
+#define MODPLOTS_SET_INVISIBLE       (1<<1)
+#define MODPLOTS_INVERT_VISIBILITIES (MODPLOTS_SET_VISIBLE|MODPLOTS_SET_INVISIBLE)
+
 /* Values for the flags field of TERMENTRY
  */
 #define TERM_CAN_MULTIPLOT    (1<<0)	/* tested if stdout not redirected */
@@ -306,6 +311,8 @@ typedef struct TERMENTRY {
 #ifdef EAM_BOXED_TEXT
     void (*boxed_text) __PROTO((unsigned int, unsigned int, int));
 #endif
+
+    void (*modify_plots) __PROTO((unsigned int operations));
 
 } TERMENTRY;
 

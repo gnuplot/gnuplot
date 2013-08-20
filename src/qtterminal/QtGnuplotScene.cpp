@@ -442,6 +442,37 @@ void QtGnuplotScene::processEvent(QtGnuplotEventType type, QDataStream& in)
 		}
 		m_currentPlotNumber = newPlotNumber;
 	}
+	else if (type == GEModPlots)
+	{
+		int i = m_key_boxes.count();
+		unsigned int ops_i;
+		in >> ops_i;
+		enum QtGnuplotModPlots ops = (enum QtGnuplotModPlots) ops_i;
+
+		/* FIXME: This shouldn't happen, but it does. */
+		/* Failure to reset lists after multiplot??   */
+		if (i > m_plot_group.count())
+		    i = m_plot_group.count();
+
+		while (i-- > 0) {
+			bool isVisible = m_plot_group[i]->isVisible();
+
+			switch (ops) {
+			case QTMODPLOTS_INVERT_VISIBILITIES:
+				isVisible = !isVisible;
+				break;
+			case QTMODPLOTS_SET_VISIBLE:
+				isVisible = true;
+				break;
+			case QTMODPLOTS_SET_INVISIBLE:
+				isVisible = false;
+				break;
+			}
+
+			m_plot_group[i]->setVisible(isVisible);
+			m_key_boxes[i].setHidden(!isVisible);
+		}
+	}
 	else if (type == GELayer)
 	{
 		int layer; in >> layer;
