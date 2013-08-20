@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.819 2013/08/09 17:56:45 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.820 2013/08/12 17:12:06 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -9691,8 +9691,8 @@ Ffigure_missing
        unset mxtics
        show mxtics
 
- The same syntax applies to `mytics`, `mztics`, `mx2tics`, `my2tics` and
- `mcbtics`.
+ The same syntax applies to `mytics`, `mztics`, `mx2tics`, `my2tics`, `mrtics`
+ and `mcbtics`.
 
  <freq> is the number of sub-intervals (NOT the number of minor tics) between
  major tics (the default for a linear axis is either two or five
@@ -10848,7 +10848,7 @@ Ffigure_missing
  The `set rtics` command places tics along the polar axis. These will only be
  shown in polar plot mode.  The tics and labels are drawn to the right of the
  origin. The `mirror` keyword causes them to be drawn also to the left of the
- origin. See `polar`, and see `set xtics` for discussion of other keywords.
+ origin. See `polar`, `set xtics`, and `set mxtics` for discussion of keywords.
 3 samples
 ?commands set samples
 ?commands show samples

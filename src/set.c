@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.406 2013/08/08 21:40:31 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.407 2013/08/09 20:50:32 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -502,6 +502,8 @@ set_command()
 	    break;
 	case S_RTICS:
 	case S_NORTICS:
+	case S_MRTICS:
+	case S_NOMRTICS:
 	    set_tic_prop(POLAR_AXIS);
 	    break;
 	case S_XDATA:
@@ -1771,6 +1773,7 @@ set_grid()
 	else GRID_MATCH(COLOR_AXIS, "nocb$tics")
 	else GRID_MATCH(COLOR_AXIS, "nomcb$tics")
 	else GRID_MATCH(POLAR_AXIS, "nor$tics")
+	else GRID_MATCH(POLAR_AXIS, "nomr$tics")
 	else if (almost_equals(c_token,"po$lar")) {
 	    if (!some_grid_selected())
 		axis_array[POLAR_AXIS].gridmajor = TRUE;

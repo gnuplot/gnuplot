@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.177 2013/06/30 17:49:38 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.178 2013/08/09 20:50:32 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -458,6 +458,9 @@ unset_command()
     case S_CBDTICS:
     case S_CBMTICS:
 	unset_month_day_tics(FIRST_X_AXIS);
+	break;
+    case S_MRTICS:
+	unset_minitics(POLAR_AXIS);
 	break;
     case S_XDATA:
 	unset_timedata(FIRST_X_AXIS);

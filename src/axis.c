@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.117 2013/06/30 17:48:26 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.118 2013/08/08 06:45:56 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -1240,7 +1240,7 @@ gen_tics(AXIS_INDEX axis, tic_callback callback)
 	    }
 	    if (minitics && axis_array[axis].miniticscale != 0) {
 		/* {{{  process minitics */
-		double mplace, mtic;
+		double mplace, mtic, temptic;
 		for (mplace = ministart; mplace < miniend; mplace += ministep) {
 		    if (axis_array[axis].datatype == DT_TIMEDATE)
 			mtic = time_tic_just(timelevel[axis] - 1,
@@ -1250,8 +1250,10 @@ gen_tics(AXIS_INDEX axis, tic_callback callback)
 			    + (axis_array[axis].log && step <= 1.5
 			       ? AXIS_DO_LOG(axis,mplace)
 			       : mplace);
-		    if (inrange(mtic, internal_min, internal_max)
-			&& inrange(mtic, start - step * SIGNIF, end + step * SIGNIF))
+		    temptic = mtic;
+		    if (polar) temptic += R_AXIS.min;
+		    if (inrange(temptic, internal_min, internal_max)
+			&& inrange(temptic, start - step * SIGNIF, end + step * SIGNIF))
 			(*callback) (axis, mtic, NULL, 1, mgrd, NULL);
 		}
 		/* }}} */

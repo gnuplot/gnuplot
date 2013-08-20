@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.301 2013/08/08 21:40:31 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.302 2013/08/09 20:50:32 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -439,6 +439,9 @@ show_command()
 	break;
     case S_MY2TICS:
 	show_mtics(SECOND_Y_AXIS);
+	break;
+    case S_MRTICS:
+	show_mtics(POLAR_AXIS);
 	break;
     case S_TIMESTAMP:
 	show_timestamp();

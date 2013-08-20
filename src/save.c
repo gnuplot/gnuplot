@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.224 2013/08/09 17:56:45 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.225 2013/08/09 20:50:32 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -778,6 +778,7 @@ set origin %g,%g\n",
     SAVE_MINI(SECOND_X_AXIS);
     SAVE_MINI(SECOND_Y_AXIS);
     SAVE_MINI(COLOR_AXIS);
+    SAVE_MINI(POLAR_AXIS);
 #undef SAVE_MINI
 
     save_tics(fp, FIRST_X_AXIS);
