@@ -1,3 +1,9 @@
+2013-08-21  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/fit.c (regress):  Do not destroy the contents of chisq in the
+	course of doing parameter scaling.  This is a bug just waiting to hit.
+	Bug #1275
+
 2013-08-13  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/eval.c (update_gpval_variables):  Missing GPVAL_* entry

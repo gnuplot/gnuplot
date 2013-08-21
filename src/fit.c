@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: fit.c,v 1.78.2.5 2013/06/08 13:42:22 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: fit.c,v 1.78.2.6 2013/06/11 21:18:50 markisch Exp $"); }
 #endif
 
 /*  NOTICE: Change of Copyright Status
@@ -780,9 +780,8 @@ regress(double a[])
 	}
 
 	/* scale parameter errors based on chisq */
-	chisq = sqrt(chisq / (num_data - num_params));
 	for (i = 0; i < num_params; i++)
-	    dpar[i] *= chisq;
+	    dpar[i] *= stdfit;
 
 	Dblf("Final set of parameters            Asymptotic Standard Error\n");
 	Dblf("=======================            ==========================\n\n");
