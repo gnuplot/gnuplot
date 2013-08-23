@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.820 2013/08/12 17:12:06 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.821 2013/08/20 22:09:18 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -3337,10 +3337,9 @@ Ffigure_histeps
  steps demo.
 ^ </a>
 
- `histeps` is only a plotting style; `gnuplot` does not have the ability to
- create bins and determine their population from some data set.
 2 histograms
 ?style histograms
+?set style histogram
 ?plotting styles histograms
 ?histograms
  The `histograms` style is only relevant to 2D plotting.  It produces a bar
