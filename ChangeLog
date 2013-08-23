@@ -1,3 +1,7 @@
+2013-08-23  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* src/term.c (test_term): "test" was not respecting "set origin".
+
 2013-08-21  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/fit.c (regress):  Do not destroy the contents of chisq in the

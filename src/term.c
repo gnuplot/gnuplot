@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.225.2.14 2013/02/11 01:15:48 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.225.2.15 2013/03/22 16:36:08 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -1885,7 +1885,7 @@ test_term()
     struct termentry *t = term;
     const char *str;
     int x, y, xl, yl, i;
-    unsigned int xmax_t, ymax_t;
+    unsigned int xmax_t, ymax_t, x0, y0;
     char label[MAX_ID_LEN];
     int key_entry_height;
     int p_width;
@@ -1899,6 +1899,8 @@ test_term()
     screen_ok = FALSE;
     xmax_t = (unsigned int) (t->xmax * xsize);
     ymax_t = (unsigned int) (t->ymax * ysize);
+    x0 = (unsigned int) (xoffset * t->xmax);
+    y0 = (unsigned int) (yoffset * t->ymax);
 
     p_width = pointsize * t->h_tic;
     key_entry_height = pointsize * t->v_tic * 1.25;
@@ -1911,11 +1913,11 @@ test_term()
     /* border linetype */
     (*t->linewidth) (1.0);
     (*t->linetype) (LT_BLACK);
-    (*t->move) (0, 0);
-    (*t->vector) (xmax_t - 1, 0);
-    (*t->vector) (xmax_t - 1, ymax_t - 1);
-    (*t->vector) (0, ymax_t - 1);
-    (*t->vector) (0, 0);
+    (*t->move) (x0, y0);
+    (*t->vector) (x0 + xmax_t - 1, y0);
+    (*t->vector) (x0 + xmax_t - 1, y0 + ymax_t - 1);
+    (*t->vector) (x0, y0 + ymax_t - 1);
+    (*t->vector) (x0, y0);
     (*t->linetype)(0);
 
     /* Echo back the current terminal type */
@@ -1926,37 +1928,37 @@ test_term()
 	strcpy(tbuf,term->name);
 	strcat(tbuf,"  terminal test");
 	(void) (*t->justify_text) (LEFT);
-	(*t->put_text) (t->h_char * 2, ymax_t - t->v_char * 0.5, tbuf);
+	(*t->put_text) (x0 + t->h_char * 2, y0 + ymax_t - t->v_char * 0.5, tbuf);
     }
 
 #ifdef USE_MOUSE
     if (t->set_ruler) {
-	(*t->put_text) (t->h_char * 5, ymax_t - t->v_char * 3, "Mouse and hotkeys are supported, hit: h r m 6");
+	(*t->put_text) (x0 + t->h_char * 5, y0 + ymax_t - t->v_char * 3, "Mouse and hotkeys are supported, hit: h r m 6");
     }
 #endif
     (*t->linetype)(LT_BLACK);
     (*t->linetype) (LT_AXIS);
-    (*t->move) (xmax_t / 2, 0);
-    (*t->vector) (xmax_t / 2, ymax_t - 1);
-    (*t->move) (0, ymax_t / 2);
-    (*t->vector) (xmax_t - 1, ymax_t / 2);
+    (*t->move) (x0 + xmax_t / 2, y0);
+    (*t->vector) (x0 + xmax_t / 2, y0 + ymax_t - 1);
+    (*t->move) (x0, y0 + ymax_t / 2);
+    (*t->vector) (x0 + xmax_t - 1, y0 + ymax_t / 2);
     /* test width and height of characters */
     (*t->linetype) (3);
-    (*t->move) (xmax_t / 2 - t->h_char * 10, ymax_t / 2 + t->v_char / 2);
-    (*t->vector) (xmax_t / 2 + t->h_char * 10, ymax_t / 2 + t->v_char / 2);
-    (*t->vector) (xmax_t / 2 + t->h_char * 10, ymax_t / 2 - t->v_char / 2);
-    (*t->vector) (xmax_t / 2 - t->h_char * 10, ymax_t / 2 - t->v_char / 2);
-    (*t->vector) (xmax_t / 2 - t->h_char * 10, ymax_t / 2 + t->v_char / 2);
-    (*t->put_text) (xmax_t / 2 - t->h_char * 10, ymax_t / 2,
+    (*t->move) (x0 + xmax_t / 2 - t->h_char * 10, y0 + ymax_t / 2 + t->v_char / 2);
+    (*t->vector) (x0 + xmax_t / 2 + t->h_char * 10, y0 + ymax_t / 2 + t->v_char / 2);
+    (*t->vector) (x0 + xmax_t / 2 + t->h_char * 10, y0 + ymax_t / 2 - t->v_char / 2);
+    (*t->vector) (x0 + xmax_t / 2 - t->h_char * 10, y0 + ymax_t / 2 - t->v_char / 2);
+    (*t->vector) (x0 + xmax_t / 2 - t->h_char * 10, y0 + ymax_t / 2 + t->v_char / 2);
+    (*t->put_text) (x0 + xmax_t / 2 - t->h_char * 10, y0 + ymax_t / 2,
 		    "12345678901234567890");
-    (*t->put_text) (xmax_t / 2 - t->h_char * 10, ymax_t / 2 + t->v_char * 1.4,
+    (*t->put_text) (x0 + xmax_t / 2 - t->h_char * 10, y0 + ymax_t / 2 + t->v_char * 1.4,
 		    "test of character width:");
     (*t->linetype) (LT_BLACK);
 
     /* Test for enhanced text */
     if (t->flags & TERM_ENHANCED_TEXT) {
 	char *tmptext = gp_strdup("Enhanced text:   {x@_{0}^{n+1}}");
-	(*t->put_text) (xmax_t * 0.5, ymax_t * 0.40, tmptext);
+	(*t->put_text) (x0 + xmax_t * 0.5, y0 + ymax_t * 0.40, tmptext);
 	free(tmptext);
 	if (!already_in_enhanced_text_mode)
 	    do_string("set termopt noenh");
@@ -1964,42 +1966,42 @@ test_term()
 
     /* test justification */
     (void) (*t->justify_text) (LEFT);
-    (*t->put_text) (xmax_t / 2, ymax_t / 2 + t->v_char * 6, "left justified");
+    (*t->put_text) (x0 + xmax_t / 2, y0 + ymax_t / 2 + t->v_char * 6, "left justified");
     str = "centre+d text";
     if ((*t->justify_text) (CENTRE))
-	(*t->put_text) (xmax_t / 2,
-			ymax_t / 2 + t->v_char * 5, str);
+	(*t->put_text) (x0 + xmax_t / 2,
+			y0 + ymax_t / 2 + t->v_char * 5, str);
     else
-	(*t->put_text) (xmax_t / 2 - strlen(str) * t->h_char / 2,
-			ymax_t / 2 + t->v_char * 5, str);
+	(*t->put_text) (x0 + xmax_t / 2 - strlen(str) * t->h_char / 2,
+			y0 + ymax_t / 2 + t->v_char * 5, str);
     str = "right justified";
     if ((*t->justify_text) (RIGHT))
-	(*t->put_text) (xmax_t / 2,
-			ymax_t / 2 + t->v_char * 4, str);
+	(*t->put_text) (x0 + xmax_t / 2,
+			y0 + ymax_t / 2 + t->v_char * 4, str);
     else
-	(*t->put_text) (xmax_t / 2 - strlen(str) * t->h_char,
-			ymax_t / 2 + t->v_char * 4, str);
+	(*t->put_text) (x0 + xmax_t / 2 - strlen(str) * t->h_char,
+			y0 + ymax_t / 2 + t->v_char * 4, str);
     /* test text angle */
     (*t->linetype)(1);
     str = "rotated ce+ntred text";
     if ((*t->text_angle) (TEXT_VERTICAL)) {
 	if ((*t->justify_text) (CENTRE))
-	    (*t->put_text) (t->v_char,
-			    ymax_t / 2, str);
+	    (*t->put_text) (x0 + t->v_char,
+			    y0 + ymax_t / 2, str);
 	else
-	    (*t->put_text) (t->v_char,
-			    ymax_t / 2 - strlen(str) * t->h_char / 2, str);
+	    (*t->put_text) (x0 + t->v_char,
+			    y0 + ymax_t / 2 - strlen(str) * t->h_char / 2, str);
 	(*t->justify_text) (LEFT);
 	str = " rotated by +45 deg";
 	(*t->text_angle)(45);
-	(*t->put_text)(t->v_char * 3, ymax_t / 2, str);
+	(*t->put_text)(x0 + t->v_char * 3, y0 + ymax_t / 2, str);
 	(*t->justify_text) (LEFT);
 	str = " rotated by -45 deg";
 	(*t->text_angle)(-45);
-	(*t->put_text)(t->v_char * 2, ymax_t / 2, str);
+	(*t->put_text)(x0 + t->v_char * 2, y0 + ymax_t / 2, str);
     } else {
 	(void) (*t->justify_text) (LEFT);
-	(*t->put_text) (t->h_char * 2, ymax_t / 2 - t->v_char * 2, "can't rotate text");
+	(*t->put_text) (x0 + t->h_char * 2, y0 + ymax_t / 2 - t->v_char * 2, "can't rotate text");
     }
     (void) (*t->justify_text) (LEFT);
     (void) (*t->text_angle) (0);
@@ -2007,30 +2009,30 @@ test_term()
 
     /* test tic size */
     (*t->linetype)(4);
-    (*t->move) ((unsigned int) (xmax_t / 2 + t->h_tic * (1 + axis_array[FIRST_X_AXIS].ticscale)), (unsigned int) ymax_t - 1);
-    (*t->vector) ((unsigned int) (xmax_t / 2 + t->h_tic * (1 + axis_array[FIRST_X_AXIS].ticscale)),
-		  (unsigned int) (ymax_t - axis_array[FIRST_X_AXIS].ticscale * t->v_tic));
-    (*t->move) ((unsigned int) (xmax_t / 2), (unsigned int) (ymax_t - t->v_tic * (1 + axis_array[FIRST_X_AXIS].ticscale)));
-    (*t->vector) ((unsigned int) (xmax_t / 2 + axis_array[FIRST_X_AXIS].ticscale * t->h_tic),
-		  (unsigned int) (ymax_t - t->v_tic * (1 + axis_array[FIRST_X_AXIS].ticscale)));
+    (*t->move) ((unsigned int) (x0 + xmax_t / 2 + t->h_tic * (1 + axis_array[FIRST_X_AXIS].ticscale)), y0 + (unsigned int) ymax_t - 1);
+    (*t->vector) ((unsigned int) (x0 + xmax_t / 2 + t->h_tic * (1 + axis_array[FIRST_X_AXIS].ticscale)),
+		  (unsigned int) (y0 + ymax_t - axis_array[FIRST_X_AXIS].ticscale * t->v_tic));
+    (*t->move) ((unsigned int) (x0 + xmax_t / 2), y0 + (unsigned int) (ymax_t - t->v_tic * (1 + axis_array[FIRST_X_AXIS].ticscale)));
+    (*t->vector) ((unsigned int) (x0 + xmax_t / 2 + axis_array[FIRST_X_AXIS].ticscale * t->h_tic),
+		  (unsigned int) (y0 + ymax_t - t->v_tic * (1 + axis_array[FIRST_X_AXIS].ticscale)));
     /* HBB 19990530: changed this to use right-justification, if possible... */
     str = "show ticscale";
     if ((*t->justify_text) (RIGHT))
-	(*t->put_text) ((unsigned int) (xmax_t / 2 - 1* t->h_char),
-			(unsigned int) (ymax_t - (t->v_tic * 2 + t->v_char / 2)),
+	(*t->put_text) (x0 + (unsigned int) (xmax_t / 2 - 1* t->h_char),
+			y0 + (unsigned int) (ymax_t - (t->v_tic * 2 + t->v_char / 2)),
 		    str);
     else
-	(*t->put_text) ((unsigned int) (xmax_t / 2 - (strlen(str)+1)     * t->h_char),
-			(unsigned int) (ymax_t - (t->v_tic * 2 + t->v_char / 2)),
+	(*t->put_text) (x0 + (unsigned int) (xmax_t / 2 - (strlen(str)+1) * t->h_char),
+			y0 + (unsigned int) (ymax_t - (t->v_tic * 2 + t->v_char / 2)),
 			str);
     (void) (*t->justify_text) (LEFT);
     (*t->linetype)(LT_BLACK);
 
     /* test line and point types */
-    x = xmax_t - t->h_char * 6 - p_width;
-    y = ymax_t - key_entry_height;
+    x = x0 + xmax_t - t->h_char * 6 - p_width;
+    y = y0 + ymax_t - key_entry_height;
     (*t->pointsize) (pointsize);
-    for (i = -2; y > key_entry_height; i++) {
+    for (i = -2; y > y0 + key_entry_height; i++) {
 	struct lp_style_type ls = DEFAULT_LP_STYLE_TYPE;
 	ls.l_width = 1;
 	load_linetype(&ls,i+1);
@@ -2051,8 +2053,8 @@ test_term()
     /* test some arrows */
     (*t->linewidth) (1.0);
     (*t->linetype) (0);
-    x = xmax_t * .375;
-    y = ymax_t * .250;
+    x = x0 + xmax_t * .375;
+    y = y0 + ymax_t * .250;
     xl = t->h_tic * 7;
     yl = t->v_tic * 7;
     i = curr_arrow_headfilled;
@@ -2076,8 +2078,8 @@ test_term()
     (void) (*t->justify_text) (LEFT);
     xl = xmax_t / 10;
     yl = ymax_t / 25;
-    x = xmax_t * .075;
-    y = yl;
+    x = x0 + xmax_t * .075;
+    y = y0 + yl;
 
     for (i=1; i<7; i++) {
 	(*t->linewidth) ((float)(i)); (*t->linetype)(LT_BLACK);
@@ -2089,14 +2091,14 @@ test_term()
     (*t->put_text) (x, y, "linewidth");
 
     /* test fill patterns */
-    x = xmax_t * 0.5;
-    y = 0;
+    x = x0 + xmax_t * 0.5;
+    y = y0;
     xl = xmax_t / 40;
     yl = ymax_t / 8;
     (*t->linewidth) ((float)(1));
     (*t->linetype)(LT_BLACK);
     (*t->justify_text) (CENTRE);
-    (*t->put_text)(x+xl*7, yl+t->v_char*1.5, "pattern fill");
+    (*t->put_text)(x+xl*7, y + yl+t->v_char*1.5, "pattern fill");
     for (i=0; i<10; i++) {
 	int style = ((i<<4) + FS_PATTERN);
 	if (t->fillbox)
@@ -2112,8 +2114,8 @@ test_term()
     }
 
     {
-	int cen_x = (int)(0.70 * xmax_t);
-	int cen_y = (int)(0.83 * ymax_t);
+	int cen_x = x0 + (int)(0.70 * xmax_t);
+	int cen_y = y0 + (int)(0.83 * ymax_t);
 	int radius = xmax_t / 20;
 
 	/* test pm3d -- filled_polygon(), but not set_color() */
