@@ -1,3 +1,20 @@
+2013-08-23  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/command.c src/qtterminal/qt_term.cpp src/qtterminal/qt_term.h
+	src/readline.c src/term_api.h src/term.c src/wxterminal/wxt_gui.cpp
+	src/wxterminal/wxt_term.h term/ggi.trm term/win.trm term/x11.trm
+	term/README:
+
+	Gnuplot handles mouse events and hotkeys by multiplexing them with
+	terminal input via the interface term->waitforinput(). That means no
+	events are handled if the program is not waiting for terminal input,
+	as in "load", "pause <time>", "eval" or other such commands.
+	Now we add an option term->waitforinput(TERM_ONLY_CHECK_MOUSING)
+	that handles mouse events but does not block waiting for terminal
+	input, and a wrapper routine check_for_mouse_events() that can be
+	called during "load", "pause", etc. However this patch does not yet
+	add such calls, so there should not yet be any change in behavior.
+
 2013-08-23  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/term.c (test_term): "test" was not respecting "set origin".

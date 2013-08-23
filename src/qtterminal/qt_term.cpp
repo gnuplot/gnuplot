@@ -705,27 +705,39 @@ void qt_set_clipboard(const char s[])
 }
 #endif // USE_MOUSE
 
-int qt_waitforinput(void)
+int qt_waitforinput(int options)
 {
 #ifdef USE_MOUSE
 	fd_set read_fds;
+	struct timeval one_msec;
 	int stdin_fd  = fileno(stdin);
 	int socket_fd = qt_socket.socketDescriptor();
 
 	if (!qt_initialized || (socket_fd < 0) || (qt_socket.state() != QLocalSocket::ConnectedState))
-		return getchar();
+		return (options == TERM_ONLY_CHECK_MOUSING) ? '\0' : getchar();
 
 	// Gnuplot event loop
 	do
 	{
 		// Watch file descriptors
+		struct timeval *timeout = NULL;
 		FD_ZERO(&read_fds);
 		FD_SET(socket_fd, &read_fds);
 		if (!paused_for_mouse)
 			FD_SET(stdin_fd, &read_fds);
 
+		// When taking input from the console, we are willing to wait
+		// here until the next character is typed.  But if input is from
+		// a script we just want to check for hotkeys or mouse input and
+		// then leave again without waiting on stdin.
+		if (options == TERM_ONLY_CHECK_MOUSING) {
+			timeout = &one_msec;
+			one_msec.tv_sec = 0;
+			one_msec.tv_usec = 1000;
+		}
+
 		// Wait for input
-		if (select(socket_fd+1, &read_fds, NULL, NULL, NULL) < 0)
+		if (select(socket_fd+1, &read_fds, NULL, NULL, timeout) < 0)
 		{
 			// Display the error message except when Ctrl + C is pressed
 			if (errno != 4)
@@ -764,7 +776,11 @@ int qt_waitforinput(void)
 			if (tempEvent.type == GE_motion)
 				qt_processTermEvent(&tempEvent);
 		}
-	} while (paused_for_mouse || (!paused_for_mouse && !FD_ISSET(stdin_fd, &read_fds)));
+
+		else if (options == TERM_ONLY_CHECK_MOUSING) {
+			return '\0';
+		}
+	} while (paused_for_mouse || !FD_ISSET(stdin_fd, &read_fds));
 #endif
 	return getchar();
 }

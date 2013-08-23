@@ -60,7 +60,7 @@ struct TERMENTRY {
    void (*fillbox) __PROTO((int style, unsigned int x1, unsigned int y1, unsigned int width, unsigned int height)); /* clear part of multiplot */
    void (*linewidth) __PROTO((double linewidth));
 #ifdef USE_MOUSE
-   int (*waitforinput) __PROTO((void));
+   int (*waitforinput) __PROTO((int));
    void (*put_tmptext) __PROTO((int i, const char str[]));
    void (*set_ruler) __PROTO((int x, int y));
    void (*set_cursor) __PROTO((int c, int x, int y));
@@ -338,9 +338,9 @@ _linewidth() - sets the linewidth
 The next five functions are used for mouse support, and should be
 conditioned on USE_MOUSE:
 
-_waitforinput() - used for mouse input.  Return the next character
-   that can be read from stdin.  In the mean time, process any mouse
-   events.
+_waitforinput(int options) - multiplexes mouse and hotkey input with
+   reading from the terminal. Returns the next character read from stdin.
+   In the mean time, process any mouse events.
 
 _put_tmptext(int i, const char str[]) - Display temporary text, after
    erasing any temporary text displayed previously at this location.

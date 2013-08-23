@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_term.h,v 1.21 2013/05/19 23:46:34 sfeam Exp $
+ * $Id: wxt_term.h,v 1.22 2013/08/20 05:36:48 sfeam Exp $
  */
 
 /* GNUPLOT - wxt_term.h */
@@ -76,7 +76,7 @@ void wxt_pointsize(double ptsize);
 void wxt_image(unsigned int M, unsigned int N, coordval * image, gpiPoint * corner, t_imagecolor color_mode);
 
 # ifdef USE_MOUSE
-int wxt_waitforinput(void);
+int wxt_waitforinput(int);
 void wxt_put_tmptext(int, const char str[]);
 void wxt_set_ruler(int x, int y);
 void wxt_set_cursor(int, int, int);

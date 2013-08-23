@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: ggi.trm,v 1.26 2006/07/21 02:35:46 sfeam Exp $
+ * $Id: ggi.trm,v 1.27 2008/06/26 23:12:17 sfeam Exp $
  */
 
 /* GNUPLOT - ggi.trm */
@@ -121,7 +121,7 @@ TERM_PUBLIC int GGI_from_button __PROTO((uint32_t button));
 TERM_PUBLIC int GGI_y __PROTO((int32_t y));
 TERM_PUBLIC int GGI_dispatch_event __PROTO((const ggi_event* event));
 TERM_PUBLIC int GGI_eventually_update_modifiers __PROTO((const ggi_event* event, const int add));
-TERM_PUBLIC int GGI_waitforinput __PROTO((void));
+TERM_PUBLIC int GGI_waitforinput __PROTO((int));
 TERM_PUBLIC void GGI_draw_ruler __PROTO((void));
 TERM_PUBLIC void GGI_clear_zoombox __PROTO((void));
 TERM_PUBLIC void GGI_draw_zoombox __PROTO((void));
@@ -1207,7 +1207,7 @@ GGI_abort_zooming()
 }
 
 TERM_PUBLIC int
-GGI_waitforinput()
+GGI_waitforinput(int options)
 {
     char c;
 
@@ -1215,6 +1215,9 @@ GGI_waitforinput()
      *       mouse events are not processed. This is necessary
      *       as on some systems /dev/null is not selectable.
      */
+    /* FIXME: Not implemented yet */
+    if (options == TERM_ONLY_CHECK_MOUSING) return '\0';
+
     if (GGIvisual) {
 	fd_set fds;
 	int fd = fileno(stdin);

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.260 2013/07/22 20:20:47 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.261 2013/08/09 20:50:32 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -1418,12 +1418,12 @@ pause_command()
 	    /* copy of the code below:  !(_Windows || OS2) */
 	    if (term && term->waitforinput && paused_for_mouse){
 		fprintf(stderr, "%s\n", buf);
-		term->waitforinput();
+		term->waitforinput(0);
 	    } else {
 #  if defined(WGP_CONSOLE)
 		fprintf(stderr, "%s\n", buf);
 		if (term && term->waitforinput)
-		    while (term->waitforinput() != (int)'\r') {}; /* waiting for Enter*/
+		    while (term->waitforinput(0) != (int)'\r') {}; /* waiting for Enter*/
 #  else /* !WGP_CONSOLE */
 		if (!Pause(buf))
 		    bail_to_command_line();
@@ -1442,7 +1442,7 @@ pause_command()
 #  if defined(WGP_CONSOLE)
 		    if (buf) fprintf(stderr,"%s\n", buf);
 		    if (term && term->waitforinput) {
-			while (term->waitforinput() != (int)'\r') {}; /* waiting for Enter*/
+			while (term->waitforinput(0) != (int)'\r') {}; /* waiting for Enter*/
 		    } else {
 			EAT_INPUT_WITH(fgetc(stdin));
 		    }
@@ -1476,7 +1476,7 @@ pause_command()
 #ifdef USE_MOUSE
 	if (term && term->waitforinput) {
 	    /* It does _not_ work to do EAT_INPUT_WITH(term->waitforinput()) */
-	    term->waitforinput();
+	    term->waitforinput(0);
 	} else
 #endif /* USE_MOUSE */
 	    EAT_INPUT_WITH(fgetc(stdin));
@@ -2860,12 +2860,12 @@ fgets_ipc(
 #ifdef USE_MOUSE
     if (term && term->waitforinput) {
 	/* This a mouseable terminal --- must expect input from it */
-	int c;			/* char got from waitforinput() */
+	int c;			/* char gotten from waitforinput() */
 	size_t i=0;		/* position inside dest */
 
 	dest[0] = '\0';
 	for (i=0; i < len-1; i++) {
-	    c = term->waitforinput();
+	    c = term->waitforinput(0);
 	    if ('\n' == c) {
 		dest[i] = '\n';
 		i++;

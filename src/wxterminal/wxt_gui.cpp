@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.cpp,v 1.114 2013/05/31 06:23:35 sfeam Exp $
+ * $Id: wxt_gui.cpp,v 1.115 2013/08/20 05:36:48 sfeam Exp $
  */
 
 /* GNUPLOT - wxt_gui.cpp */
@@ -3548,7 +3548,7 @@ bool wxt_exec_event(int type, int mx, int my, int par1, int par2, wxWindowID id)
 #ifdef WXT_MULTITHREADED
 /* Implements waitforinput used in wxt.trm
  * Returns the next input charachter, meanwhile treats terminal events */
-int wxt_waitforinput()
+int wxt_waitforinput(int options)
 {
 	/* wxt_waitforinput *is* launched immediately after the wxWidgets terminal
 	 * is set using 'set term wxt' whereas wxt_init has not been called.
@@ -3558,30 +3558,42 @@ int wxt_waitforinput()
 	 * we must process window events, so the check is not
 	 * wxt_status != STATUS_OK */
 	if (wxt_status == STATUS_UNINITIALIZED)
-		return getc(stdin);
+		return (options == TERM_ONLY_CHECK_MOUSING) ? '\0' : getc(stdin);
 
 	if (wxt_event_fd<0) {
 		if (paused_for_mouse)
 			int_error(NO_CARET, "wxt communication error, wxt_event_fd<0");
 		FPRINTF((stderr,"wxt communication error, wxt_event_fd<0\n"));
-		return getc(stdin);
+		return (options == TERM_ONLY_CHECK_MOUSING) ? '\0' : getc(stdin);
 	}
 
 	int stdin_fd = fileno(stdin);
 	fd_set read_fds;
+	struct timeval one_msec;
 
 	do {
+		struct timeval *timeout = NULL;
 		FD_ZERO(&read_fds);
 		FD_SET(wxt_event_fd, &read_fds);
 		if (!paused_for_mouse)
 			FD_SET(stdin_fd, &read_fds);
 
+		/* When taking input from the console, we are willing to wait	*/
+		/* here until the next character is typed. But if input is from	*/
+		/* a script we just want to check for hotkeys or mouse input	*/
+		/* and then leave again without waiting for stdin.		*/
+		if (options == TERM_ONLY_CHECK_MOUSING) {
+			timeout = &one_msec;
+			one_msec.tv_sec = 0;
+			one_msec.tv_usec = 1000;
+		}
+
 		int n_changed_fds = select(wxt_event_fd+1, &read_fds,
 					      NULL /* not watching for write-ready */,
 					      NULL /* not watching for exceptions */,
-					      NULL /* no timeout */);
+					      timeout );
 
-		if (n_changed_fds<0) {
+		if (n_changed_fds < 0) {
 			if (paused_for_mouse)
 				int_error(NO_CARET, "wxt communication error: select() error");
 			FPRINTF((stderr, "wxt communication error: select() error\n"));
@@ -3602,16 +3614,17 @@ int wxt_waitforinput()
 				/* exit from paused_for_mouse */
 				return '\0';
 			}
+		} else if (options == TERM_ONLY_CHECK_MOUSING) {
+			return '\0';
 		}
-	} while ( paused_for_mouse
-		   || (!paused_for_mouse && !FD_ISSET(stdin_fd, &read_fds)) );
+	} while ( paused_for_mouse || !FD_ISSET(stdin_fd, &read_fds) );
 
 	return getchar();
 }
 #else /* WXT_MONOTHREADED */
 /* Implements waitforinput used in wxt.trm
  * the terminal events are directly processed when they are received */
-int wxt_waitforinput()
+int wxt_waitforinput(int options)
 {
 #ifdef _Windows
 	if (paused_for_mouse) {

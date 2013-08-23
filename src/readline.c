@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: readline.c,v 1.57 2011/05/05 21:24:10 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: readline.c,v 1.58 2011/09/04 12:01:37 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - readline.c */
@@ -79,7 +79,7 @@ getc_wrapper(FILE* fp /* should be stdin, supplied by readline */)
     while (1) {
 #ifdef USE_MOUSE
 	if (term && term->waitforinput && interactive) {
-	    c = term->waitforinput();
+	    c = term->waitforinput(0);
 	}
 	else
 #endif
@@ -1085,7 +1085,7 @@ ansi_getc()
 
 #ifdef USE_MOUSE
     if (term && term->waitforinput && interactive)
-	c = term->waitforinput();
+	c = term->waitforinput(0);
     else
 #endif
     c = getc(stdin);
@@ -1130,7 +1130,7 @@ static char
 win_getch()
 {
     if (term && term->waitforinput)
-        return term->waitforinput();
+        return term->waitforinput(0);
     else
         return ConsoleGetch();
 }
@@ -1150,7 +1150,7 @@ msdos_getch()
 #else /* not OS2, not DJGPP*/
 # if defined (_Windows) && defined (USE_MOUSE)
     if (term && term->waitforinput && interactive)
-	c = term->waitforinput();
+	c = term->waitforinput(0);
     else
 # endif /* not _Windows && not USE_MOUSE */
     c = getch();

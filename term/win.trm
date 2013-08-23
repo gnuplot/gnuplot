@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: win.trm,v 1.115 2013/04/24 20:05:33 markisch Exp $
+ * $Id: win.trm,v 1.116 2013/06/11 20:54:47 markisch Exp $
  */
 
 /* GNUPLOT - win.trm */
@@ -86,7 +86,7 @@ TERM_PUBLIC void WIN_set_cursor __PROTO((int, int, int));
 TERM_PUBLIC void WIN_put_tmptext __PROTO((int, const char str[]));
 TERM_PUBLIC void WIN_set_clipboard __PROTO((const char[]));
 # ifdef WGP_CONSOLE
-TERM_PUBLIC int WIN_waitforinput __PROTO((void));
+TERM_PUBLIC int WIN_waitforinput __PROTO((int));
 # endif
 #endif
 TERM_PUBLIC int WIN_make_palette __PROTO((t_sm_palette *palette));
@@ -627,8 +627,12 @@ WIN_set_clipboard (const char s[])
 #ifdef WGP_CONSOLE
 
 TERM_PUBLIC int
-WIN_waitforinput()
+WIN_waitforinput(int options)
 {
+    /* Not implemented: hotkeys during non-interactive input */
+    if (options == TERM_ONLY_CHECK_MOUSING)
+	return '\0';
+
     return ConsoleGetch();
 }
 

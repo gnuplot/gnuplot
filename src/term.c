@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.262 2013/08/23 09:31:20 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.263 2013/08/23 09:48:39 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -3083,4 +3083,22 @@ strlen_tex(const char *str)
 
     FPRINTF((stderr,"strlen_tex(\"%s\") = %d\n",str,len));
     return len;
+}
+
+/* The check for asynchronous events such as hotkeys and mouse clicks is
+ * normally done in term->waitforinput() while waiting for the next input
+ * from the command line.  If input is currently coming from a file or 
+ * pipe instead, as with a "load" command, then this path would not be
+ * triggered automatically and these events would back up until input
+ * returned to the command line.  These code paths can explicitly call
+ * check_for_mouse_events() so that event processing is handled sooner.
+ */
+void
+check_for_mouse_events()
+{
+#ifdef USE_MOUSE
+    if (term->waitforinput) {
+	term->waitforinput(TERM_ONLY_CHECK_MOUSING);
+    }
+#endif
 }

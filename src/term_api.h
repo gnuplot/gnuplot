@@ -1,5 +1,5 @@
 /*
- * $Id: term_api.h,v 1.113 2013/08/09 17:56:45 sfeam Exp $
+ * $Id: term_api.h,v 1.114 2013/08/20 05:36:47 sfeam Exp $
  */
 
 /* GNUPLOT - term_api.h */
@@ -153,6 +153,9 @@ typedef enum termlayer {
 	TERM_LAYER_END_PM3D_MAP
 } t_termlayer;
 
+/* Options used by the terminal entry point term->waitforinput(). */
+#define TERM_ONLY_CHECK_MOUSING	1
+
 /* Options used by the terminal entry point term->hypertext(). */
 #define TERM_HYPERTEXT_TOOLTIP 0
 #define TERM_HYPERTEXT_TITLE   1
@@ -249,7 +252,7 @@ typedef struct TERMENTRY {
     void (*fillbox) __PROTO((int, unsigned int, unsigned int, unsigned int, unsigned int)); /* clear in multiplot mode */
     void (*linewidth) __PROTO((double linewidth));
 #ifdef USE_MOUSE
-    int (*waitforinput) __PROTO((void));     /* used for mouse input */
+    int (*waitforinput) __PROTO((int));     /* used for mouse and hotkey input */
     void (*put_tmptext) __PROTO((int, const char []));   /* draws temporary text; int determines where: 0=statusline, 1,2: at corners of zoom box, with \r separating text above and below the point */
     void (*set_ruler) __PROTO((int, int));    /* set ruler location; x<0 switches ruler off */
     void (*set_cursor) __PROTO((int, int, int));   /* set cursor style and corner of rubber band */
@@ -479,5 +482,10 @@ void load_linetype __PROTO((struct lp_style_type *lp, int tag));
 /* Wrappers for term->path() */
 void newpath __PROTO((void));
 void closepath __PROTO((void));
+
+/* Generic wrapper to check for mouse events or hotkeys during
+ * non-interactive input (e.g. "load")
+ */
+void check_for_mouse_events __PROTO((void));
 
 #endif /* GNUPLOT_TERM_API_H */
