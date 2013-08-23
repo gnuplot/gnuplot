@@ -1,3 +1,7 @@
+2013-08-23  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* src/term.c (test_term): "test" was not respecting "set origin".
+
 2013-08-20  Kyle <elconquistador@users.sourceforge.net>
 
 	* src/fit.c (regress): The value of chisq was corrupted in the process
