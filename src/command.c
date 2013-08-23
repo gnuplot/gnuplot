@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.261 2013/08/09 20:50:32 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.262 2013/08/23 18:56:31 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -424,6 +424,9 @@ do_line()
 		int_error(c_token, "';' expected");
 	}
     }
+
+    /* This check allows event handling inside load/eval/while statements */
+    check_for_mouse_events();
     return (0);
 }
 
@@ -1324,6 +1327,23 @@ clause_reset_after_error()
     clause_depth = 0;
 }
 
+/* helper routine to multiplex mouse event handling with a timed pause command */
+void
+timed_pause(double sleep_time)
+{
+#if defined(HAVE_USLEEP)
+    if (term->waitforinput)		/* If the terminal supports it */
+	while (sleep_time > 0.05) {	/* we poll 20 times a second */
+	    usleep(50000-1000);		/* Sleep for 49 msec */
+	    check_for_mouse_events();	/* This sleeps for another 1 msec */
+	    sleep_time -= 0.05;
+	}
+    usleep((useconds_t)(sleep_time * 1e6));
+    check_for_mouse_events();
+#else
+    GP_SLEEP(sleep_time);
+#endif
+}
 
 /* process the 'pause' command */
 #define EAT_INPUT_WITH(slurp) do {int junk=0; do {junk=slurp;} while (junk != EOF && junk != '\n');} while (0)
@@ -1484,7 +1504,7 @@ pause_command()
 #endif /* !(_Windows || OS2) */
     }
     if (sleep_time > 0)
-	GP_SLEEP(sleep_time);
+	timed_pause(sleep_time);
 
     if (text != 0 && sleep_time >= 0)
 	fputc('\n', stderr);
