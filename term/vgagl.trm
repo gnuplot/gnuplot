@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: vgagl.trm,v 1.21 2012/09/17 03:03:33 sfeam Exp $
+ * $Id: vgagl.trm,v 1.22 2013/01/26 00:19:22 sfeam Exp $
  */
 
 #if defined(USE_MOUSE)
@@ -1231,6 +1231,9 @@ VGAGL_put_tmptext(int i, const char str[])
     int y = 0;
     int x;
     char* second;
+
+    if (!VGAGL_graphics_on)
+	return;
 
     switch (i) {
 	case 0:

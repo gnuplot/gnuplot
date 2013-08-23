@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: ggi.trm,v 1.27 2008/06/26 23:12:17 sfeam Exp $
+ * $Id: ggi.trm,v 1.28 2013/08/23 18:56:32 sfeam Exp $
  */
 
 /* GNUPLOT - ggi.trm */
@@ -1279,6 +1279,9 @@ TERM_PUBLIC void
 GGI_put_tmptext(int i, const char str[])
 {
     char* second;
+
+    if (GGIvisual == NULL)
+	return;
 
     switch (i) {
 	case 0: /* statusline text */

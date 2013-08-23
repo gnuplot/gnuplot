@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: mouse.c,v 1.150 2013/05/08 03:32:24 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: mouse.c,v 1.151 2013/08/20 05:36:47 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - mouse.c */
@@ -856,8 +856,17 @@ static void
 UpdateStatuslineWithMouseSetting(mouse_setting_t * ms)
 {
     char s0[256], *sp;
+
+/* This suppresses mouse coordinate update after a ^C, but I think
+ * that the relevant terminals do their own checks anyhow so we
+ * we can just let the ones that care silently skip the update
+ * while the ones that don't care keep on updating as usual.
+ */
+#if (0)
     if (!term_initialised)
 	return;
+#endif
+
     if (!ms->on) {
 	s0[0] = 0;
     } else if (!ALMOST2D) {

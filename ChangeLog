@@ -22,6 +22,14 @@
 	for events 20 times per second while counting down the time given in a
 	"pause <time>" command.
 
+	* term/vgagl.trm term/ggi.trm 
+	src/mouse.c (UpdateStatuslineWithMouseSetting):
+	The ^C interrupt handling code sets term_initialised to FALSE.
+	The mousing update code was interpreting this as meaning that no mouse
+	updates were possible.  This patch adds internal checks to the only two
+	drivers that might have a problem and removes the global suppression of
+	mouse coordinate updates after an interrupt.
+
 2013-08-23  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/term.c (test_term): "test" was not respecting "set origin".
