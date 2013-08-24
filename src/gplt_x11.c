@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.210.2.4 2012/11/16 06:29:58 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.210.2.5 2012/12/19 01:08:44 sfeam Exp $"); }
 #endif
 
 #define X11_POLYLINE 1
@@ -3159,7 +3159,7 @@ exec_cmd(plot_struct *plot, char *command)
 	    sscanf(&buffer[1], "%d %lg %d %lg %lg", &axis,
 		&(plot->axis_scale[axis].min), &(plot->axis_scale[axis].term_lower),
 		&(plot->axis_scale[axis].term_scale), &(plot->axis_scale[axis].logbase));
-	    FPRINTF((stderr, "gnuplot_x11: axis %d scaling %14.3lg %14d %14.3lg %14.3lg\n",
+	    FPRINTF((stderr, "gnuplot_x11: axis %d scaling %16.6lg %14d %16.6lg %16.6lg\n",
 		axis, plot->axis_scale[axis].min, plot->axis_scale[axis].term_lower,
 		plot->axis_scale[axis].term_scale, plot->axis_scale[axis].logbase));
 	}
