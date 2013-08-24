@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: x11.trm,v 1.212 2013/08/20 05:36:48 sfeam Exp $
+ * $Id: x11.trm,v 1.213 2013/08/23 18:56:32 sfeam Exp $
  *
  */
 
@@ -1496,22 +1496,22 @@ X11_text()
 	}
 	PRINT2("S %2d %d\n", -2, ALMOST2D);
 	PRINT2("S %2d %d\n", -1, axis_mask);
-	PRINT5("S %2d %14.3g %14d %14.3g %14.3g\n", FIRST_X_AXIS,
+	PRINT5("S %2d %16.6g %14d %16.6g %16.6g\n", FIRST_X_AXIS,
 		axis_array[FIRST_X_AXIS].min,
 		axis_array[FIRST_X_AXIS].term_lower,
 		axis_array[FIRST_X_AXIS].term_scale,
 		axis_array[FIRST_X_AXIS].log ? axis_array[FIRST_X_AXIS].log_base : 0);
-	PRINT5("S %2d %14.3g %14d %14.3g %14.3g\n", FIRST_Y_AXIS,
+	PRINT5("S %2d %16.6g %14d %16.6g %16.6g\n", FIRST_Y_AXIS,
 		axis_array[FIRST_Y_AXIS].min,
 		axis_array[FIRST_Y_AXIS].term_lower,
 		axis_array[FIRST_Y_AXIS].term_scale,
 		axis_array[FIRST_Y_AXIS].log ? axis_array[FIRST_Y_AXIS].log_base : 0);
-	PRINT5("S %2d %14.3g %14d %14.3g %14.3g\n", SECOND_X_AXIS,
+	PRINT5("S %2d %16.6g %14d %16.6g %16.6g\n", SECOND_X_AXIS,
 		axis_array[SECOND_X_AXIS].min,
 		axis_array[SECOND_X_AXIS].term_lower,
 		axis_array[SECOND_X_AXIS].term_scale,
 		axis_array[SECOND_X_AXIS].log ? axis_array[SECOND_X_AXIS].log_base : 0);
-	PRINT5("S %2d %14.3g %14d %14.3g %14.3g\n", SECOND_Y_AXIS,
+	PRINT5("S %2d %16.6g %14d %16.6g %16.6g\n", SECOND_Y_AXIS,
 		axis_array[SECOND_Y_AXIS].min,
 		axis_array[SECOND_Y_AXIS].term_lower,
 		axis_array[SECOND_Y_AXIS].term_scale,

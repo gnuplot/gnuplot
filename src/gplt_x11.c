@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.237 2013/07/01 21:33:19 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.238 2013/08/20 05:36:47 sfeam Exp $"); }
 #endif
 
 #define MOUSE_ALL_WINDOWS 1
@@ -3349,7 +3349,7 @@ exec_cmd(plot_struct *plot, char *command)
 	    sscanf(&buffer[1], "%d %lg %d %lg %lg", &axis,
 		&(plot->axis_scale[axis].min), &(plot->axis_scale[axis].term_lower),
 		&(plot->axis_scale[axis].term_scale), &(plot->axis_scale[axis].logbase));
-	    FPRINTF((stderr, "gnuplot_x11: axis %d scaling %14.3lg %14d %14.3lg %14.3lg\n",
+	    FPRINTF((stderr, "gnuplot_x11: axis %d scaling %16.6lg %14d %16.6lg %16.6lg\n",
 		axis, plot->axis_scale[axis].min, plot->axis_scale[axis].term_lower,
 		plot->axis_scale[axis].term_scale, plot->axis_scale[axis].logbase));
 	}
