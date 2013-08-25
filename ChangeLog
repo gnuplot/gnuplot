@@ -1,3 +1,9 @@
+2013-08-25  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/x11.trm (x11_waitforinput) term/xlib.trm:   Handle the case of
+	input from a file, output to x11, and TERM_ONLY_CHECK_MOUSING.
+	xlib output should never expect mouse events.
+
 2013-08-24  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/gplt_x11.c term/x11.trm:  Use more precision when writing out

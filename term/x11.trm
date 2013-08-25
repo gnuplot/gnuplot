@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: x11.trm,v 1.213 2013/08/23 18:56:32 sfeam Exp $
+ * $Id: x11.trm,v 1.214 2013/08/24 22:45:23 sfeam Exp $
  *
  */
 
@@ -999,6 +999,9 @@ AGAIN:
     }
 
 #endif /* PIPE_IPC */
+
+    if (options == TERM_ONLY_CHECK_MOUSING)
+	return '\0';
 
 # if 0
 /* HBB 20010620: switching back and forth between X11 and a non-GUI
