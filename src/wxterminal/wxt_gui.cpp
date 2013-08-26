@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.cpp,v 1.115 2013/08/20 05:36:48 sfeam Exp $
+ * $Id: wxt_gui.cpp,v 1.116 2013/08/23 18:56:32 sfeam Exp $
  */
 
 /* GNUPLOT - wxt_gui.cpp */
@@ -3585,7 +3585,7 @@ int wxt_waitforinput(int options)
 		if (options == TERM_ONLY_CHECK_MOUSING) {
 			timeout = &one_msec;
 			one_msec.tv_sec = 0;
-			one_msec.tv_usec = 1000;
+			one_msec.tv_usec = TERM_EVENT_POLL_TIMEOUT;
 		}
 
 		int n_changed_fds = select(wxt_event_fd+1, &read_fds,

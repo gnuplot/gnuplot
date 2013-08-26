@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: x11.trm,v 1.214 2013/08/24 22:45:23 sfeam Exp $
+ * $Id: x11.trm,v 1.215 2013/08/25 23:19:35 sfeam Exp $
  *
  */
 
@@ -909,7 +909,7 @@ AGAIN:
 	    if (options == TERM_ONLY_CHECK_MOUSING) {
 		timeout = &one_msec;
 		one_msec.tv_sec = 0;
-		one_msec.tv_usec = 1000;
+		one_msec.tv_usec = TERM_EVENT_POLL_TIMEOUT;
 	    }
 
 	    ierr = select(ipc_back_fd + 1, SELECT_TYPE_ARG234 &fds, 0, 0, timeout);

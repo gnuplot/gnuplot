@@ -1,5 +1,5 @@
 /*
- * $Id: term_api.h,v 1.114 2013/08/20 05:36:47 sfeam Exp $
+ * $Id: term_api.h,v 1.115 2013/08/23 18:56:32 sfeam Exp $
  */
 
 /* GNUPLOT - term_api.h */
@@ -155,6 +155,7 @@ typedef enum termlayer {
 
 /* Options used by the terminal entry point term->waitforinput(). */
 #define TERM_ONLY_CHECK_MOUSING	1
+#define TERM_EVENT_POLL_TIMEOUT 0	/* select() timeout in usec */
 
 /* Options used by the terminal entry point term->hypertext(). */
 #define TERM_HYPERTEXT_TOOLTIP 0

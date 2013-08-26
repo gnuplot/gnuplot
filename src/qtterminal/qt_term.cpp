@@ -733,7 +733,7 @@ int qt_waitforinput(int options)
 		if (options == TERM_ONLY_CHECK_MOUSING) {
 			timeout = &one_msec;
 			one_msec.tv_sec = 0;
-			one_msec.tv_usec = 1000;
+			one_msec.tv_usec = TERM_EVENT_POLL_TIMEOUT;
 		}
 
 		// Wait for input

@@ -1,3 +1,12 @@
+2013-08-26  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/command.c src/term_api.h term/x11.trm
+	src/qtterminal//qt_term.cpp src/wxterminal//wxt_gui.cpp:
+	Peter Juhasz's game demos show that the 1 msec timeout in 
+	term->waitforinput(TERM_ONLY_CHECK_MOUSING) may be a mistake.
+	This patch #defines it as TERM_EVENT_POLL_TIMEOUT term_api.h and sets
+	it to 0 by default.
+
 2013-08-25  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/x11.trm (x11_waitforinput) term/xlib.trm:   Handle the case of
