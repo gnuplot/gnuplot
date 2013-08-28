@@ -6,7 +6,7 @@
 2013-08-28  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c src/graphics.h src/plot2d.c src/save.c src/save.h
-	src/set.c src/show.c src/unset.c docs/gnuplot.doc:
+	src/set.c src/show.c src/unset.c docs/gnuplot.doc demo/histograms2.dem:
 	Accept an explicit title font and text color in "set style histogram"
 	and "newhistogram" commands.
 

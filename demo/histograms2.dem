@@ -13,12 +13,12 @@ set title "Default Histogram Colouring"
 set key under
 set key invert autotitle columnhead
 set style data histogram
-set style histogram clustered gap 1 title offset 2,-2 font ",12"
+set style histogram clustered gap 1 title offset 2,-2 font ",11" boxed
 set style fill solid noborder
 set boxwidth 0.95
 unset xtics
 set xtics rotate by -45
-set xlabel "Immigration from different regions" offset 0, -1
+set xlabel "Immigration from different regions" offset 0, 0
 set ytics
 set grid y
 set auto y

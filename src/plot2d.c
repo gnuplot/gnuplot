@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.298 2013/05/23 17:28:29 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.299 2013/08/28 19:46:51 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -1847,9 +1847,11 @@ eval_plots()
 		/* Store title in temporary variable and then copy into the */
 		/* new histogram structure when it is allocated.            */
 		if (!histogram_title.text && isstringvalue(c_token)) {
+		    histogram_title.textcolor = histogram_opts.title.textcolor;
+		    histogram_title.boxed = histogram_opts.title.boxed;
+		    histogram_title.pos = histogram_opts.title.pos;
 		    histogram_title.text = try_to_get_string();
 		    histogram_title.font = gp_strdup(histogram_opts.title.font);
-		    histogram_title.textcolor = histogram_opts.title.textcolor;
 		    parse_label_options(&histogram_title, TRUE);
 		}
 

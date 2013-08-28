@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.425 2013/08/08 06:45:56 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.426 2013/08/28 19:46:49 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -4149,11 +4149,11 @@ place_histogram_titles()
 			   "histogram");
 	    x = map_x((hist->start + hist->end) / 2.);
 	    y = xlabel_y;
+	    /* NB: offset in "newhistogram" is additive with that in "set style hist" */
 	    x += (int)xoffset_d;
 	    y += (int)yoffset_d + 0.25 * term->v_char;
-	    apply_pm3dcolor(&hist->title.textcolor,term);
-	    write_multiline(x, y, hist->title.text,
-			    CENTRE, JUST_BOT, 0, hist->title.font);
+
+	    write_label(x, y, &(hist->title));
 	    reset_textcolor(&hist->title.textcolor,term);
 	}
     }
