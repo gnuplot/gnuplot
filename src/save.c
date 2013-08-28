@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.227 2013/08/28 19:46:51 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.228 2013/08/28 21:29:15 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -558,6 +558,7 @@ set bar %f %s\n",
     save_histogram_opts(fp);
 
 #ifdef EAM_OBJECTS
+    fprintf(fp, "unset object\n");
     save_object(fp, 0);
 #endif
 

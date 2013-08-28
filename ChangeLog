@@ -1,3 +1,8 @@
+2013-08-28  Christoph Bersch <usenet@bersch.net>
+
+	* src/save.c (save_set_all): Emit a "unset object" command before
+	saving objects.  Bug #1251
+
 2013-08-28  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c src/graphics.h src/plot2d.c src/save.c src/save.h
