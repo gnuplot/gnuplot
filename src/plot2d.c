@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.297 2013/04/21 06:26:11 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.298 2013/05/23 17:28:29 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -87,10 +87,10 @@ double   boxwidth              = -1.0;
 /* whether box width is absolute (default) or relative */
 TBOOLEAN boxwidth_is_absolute  = TRUE;
 
-static double histogram_rightmost = 0.0;        /* Highest x-coord of histogram so far */
-static char *histogram_title = NULL;            /* Subtitle for this histogram */
+static double histogram_rightmost = 0.0;    /* Highest x-coord of histogram so far */
+static text_label histogram_title;          /* Subtitle for this histogram */
+static int stack_count = 0;                 /* counter for stackheight */
 static struct coordinate GPHUGE *stackheight = NULL; /* Scratch space for y autoscale */
-static int stack_count = 0;                     /* counter for stackheight */
 
 /* function implementations */
 
@@ -1827,8 +1827,7 @@ eval_plots()
 	    int previous_token;
 	    c_token++;
 	    histogram_sequence = -1;
-	    free(histogram_title);
-	    histogram_title = NULL;
+	    memset(&histogram_title, 0, sizeof(text_label));
 
 	    if (histogram_rightmost > 0)
 		newhist_start = histogram_rightmost + 2;
@@ -1847,8 +1846,12 @@ eval_plots()
 
 		/* Store title in temporary variable and then copy into the */
 		/* new histogram structure when it is allocated.            */
-		if (!histogram_title && isstringvalue(c_token))
-		    histogram_title = try_to_get_string();
+		if (!histogram_title.text && isstringvalue(c_token)) {
+		    histogram_title.text = try_to_get_string();
+		    histogram_title.font = gp_strdup(histogram_opts.title.font);
+		    histogram_title.textcolor = histogram_opts.title.textcolor;
+		    parse_label_options(&histogram_title, TRUE);
+		}
 
 		/* Allow explicit starting color or pattern for this histogram */
 		if (equals(c_token,"lt") || almost_equals(c_token,"linet$ype")) {
@@ -2454,8 +2457,7 @@ eval_plots()
 		/* Current histogram always goes at the front of the list */
 		if (this_plot->histogram_sequence == 0) {
 		    this_plot->histogram = gp_alloc(sizeof(struct histogram_style), "New histogram");
-		    init_histogram(this_plot->histogram,histogram_title);
-		    histogram_title = NULL;
+		    init_histogram(this_plot->histogram, &histogram_title);
 		    this_plot->histogram->start = newhist_start;
 		    this_plot->histogram->startcolor = newhist_color;
 		    this_plot->histogram->startpattern = newhist_pattern;

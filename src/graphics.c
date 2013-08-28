@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.424 2013/06/29 12:04:45 juhaszp Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.425 2013/08/08 06:45:56 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -4106,17 +4106,17 @@ plot_border()
 
 
 void
-init_histogram(struct histogram_style *histogram, char *title)
+init_histogram(struct histogram_style *histogram, text_label *title)
 {
     if (stackheight)
 	free(stackheight);
     stackheight = NULL;
     if (histogram) {
-	memcpy(histogram,&histogram_opts,sizeof(histogram_opts));
-	memset(&(histogram->title), 0, sizeof(text_label));
+	memcpy(histogram, &histogram_opts, sizeof(histogram_opts));
+	memcpy(&histogram->title, title, sizeof(text_label));
+	memset(title, 0, sizeof(text_label));
 	/* Insert in linked list */
 	histogram_opts.next = histogram;
-	histogram->title.text = title;
     }
 }
 
@@ -4125,8 +4125,10 @@ free_histlist(struct histogram_style *hist)
 {
     if (!hist)
 	return;
-    if (hist->title.text)
+    if (hist != &histogram_opts) {
 	free(hist->title.text);
+	free(hist->title.font);
+    }
     if (hist->next) {
 	free_histlist(hist->next);
 	free(hist->next);
@@ -4139,6 +4141,7 @@ place_histogram_titles()
 {
     histogram_style *hist = &histogram_opts;
     unsigned int x, y;
+
     while ((hist = hist->next)) {
 	if (hist->title.text && *(hist->title.text)) {
 	    double xoffset_d, yoffset_d;

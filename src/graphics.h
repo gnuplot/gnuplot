@@ -1,5 +1,5 @@
 /*
- * $Id: graphics.h,v 1.57 2013/02/28 05:29:38 sfeam Exp $
+ * $Id: graphics.h,v 1.58 2013/02/28 06:43:00 sfeam Exp $
  */
 
 /* GNUPLOT - graphics.h */
@@ -97,7 +97,7 @@ void map_position __PROTO((struct position * pos, int *x, int *y, const char *wh
 void map_position_r __PROTO((struct position* pos, double* x, double* y,
 			     const char* what));
 
-void init_histogram __PROTO((struct histogram_style *hist, char *title));
+void init_histogram __PROTO((struct histogram_style *hist, text_label *title));
 void free_histlist __PROTO((struct histogram_style *hist));
 
 void plot_image_or_update_axes __PROTO((void *plot, TBOOLEAN update_axes));

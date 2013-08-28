@@ -1,5 +1,5 @@
 /*
- * $Id: save.h,v 1.14 2008/02/22 06:13:49 sfeam Exp $
+ * $Id: save.h,v 1.15 2008/04/30 04:16:15 sfeam Exp $
  */
 
 /* GNUPLOT - save.h */
@@ -59,6 +59,7 @@ void save_textcolor __PROTO((FILE *, const struct t_colorspec *));
 void save_pm3dcolor __PROTO((FILE *, const struct t_colorspec *));
 void save_fillstyle __PROTO((FILE *, const struct fill_style_type *));
 void save_offsets __PROTO((FILE *, char *));
+void save_histogram_opts __PROTO((FILE *fp));
 #ifdef EAM_OBJECTS
 void save_object __PROTO((FILE *, int));
 #endif

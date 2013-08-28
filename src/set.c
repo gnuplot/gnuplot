@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.407 2013/08/09 20:50:32 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.408 2013/08/20 22:09:19 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -171,8 +171,10 @@ static void set_palette_function __PROTO((void));
 static void parse_histogramstyle __PROTO((histogram_style *hs,
 		t_histogram_type def_type, int def_gap));
 
-static struct position default_position
+static const struct position default_position
 	= {first_axes, first_axes, first_axes, 0., 0., 0.};
+static const struct position default_offset
+	= {character, character, character, 0., 0., 0.};
 
 static lp_style_type default_hypertext_point_style
 	= {1, LT_BLACK, 4, 0, 1.0, PTSZ_DEFAULT, TRUE, {TC_RGB, 0x000000, 0.0}};
@@ -2262,8 +2264,6 @@ set_label()
     }
     /* Insert this label into the list if it is a new one */
     if (this_label == NULL || tag != this_label->tag) {
-	struct position default_offset = { character, character, character,
-					   0., 0., 0. };
 	new_label = new_text_label(tag);
 	new_label->offset = default_offset;
 	if (prev_label == NULL)
@@ -4547,11 +4547,9 @@ set_tics()
 	    for (i = 0; i < AXIS_ARRAY_SIZE; ++i)
 		axis_array[i].ticdef.offset = lpos;
 	} else if (almost_equals(c_token, "nooff$set")) {
-	    struct position tics_nooffset =
-		{ character, character, character, 0., 0., 0.};
 	    ++c_token;
 	    for (i = 0; i < AXIS_ARRAY_SIZE; ++i)
-		axis_array[i].ticdef.offset = tics_nooffset;
+		axis_array[i].ticdef.offset = default_offset;
 	} else if (almost_equals(c_token, "format")) {
 	    set_format();
 	} else if (almost_equals(c_token, "f$ont")) {
@@ -5061,10 +5059,8 @@ set_tic_prop(AXIS_INDEX axis)
 		get_position_default(&axis_array[axis].ticdef.offset,
 				     character);
 	    } else if (almost_equals(c_token, "nooff$set")) {
-		struct position tics_nooffset =
-		    { character, character, character, 0., 0., 0.};
 		++c_token;
-		axis_array[axis].ticdef.offset = tics_nooffset;
+		axis_array[axis].ticdef.offset = default_offset;
 	    } else if (almost_equals(c_token, "l$eft")) {
 		axis_array[axis].label.pos = LEFT;
 		axis_array[axis].manual_justify = TRUE;
@@ -5592,8 +5588,6 @@ struct text_label *
 new_text_label(int tag)
 {
     struct text_label *new;
-    struct position default_offset = { character, character, character,
-				       0., 0., 0. };
 
     new = gp_alloc( sizeof(struct text_label), "text_label");
     memset(new, 0, sizeof(struct text_label));
@@ -5625,7 +5619,7 @@ parse_label_options( struct text_label *this_label, TBOOLEAN in_plot )
     int layer = 0;
     TBOOLEAN axis_label = (this_label->tag == -2);
     TBOOLEAN hypertext = FALSE;
-    struct position offset = { character, character, character, 0., 0., 0. };
+    struct position offset = default_offset;
     t_colorspec textcolor = {TC_DEFAULT,0,0.0};
     struct lp_style_type loc_lp = DEFAULT_LP_STYLE_TYPE;
     loc_lp.pointflag = -2;
@@ -5862,10 +5856,10 @@ parse_histogramstyle( histogram_style *hs,
 	} else if (almost_equals(c_token, "ti$tle")) {
 	    title_specs.offset = hs->title.offset;
 	    set_xyzlabel(&title_specs);
-	    hs->title.textcolor = title_specs.textcolor;
-	    hs->title.offset = title_specs.offset;
-	    /* EAM FIXME - could allocate space and copy parsed font instead */
-	    hs->title.font = axis_array[FIRST_X_AXIS].label.font;
+	    free(title_specs.text);
+	    title_specs.text = NULL;
+	    free(hs->title.font);
+	    hs->title = title_specs;
 	} else if ((equals(c_token,"lw") || almost_equals(c_token,"linew$idth"))
 		  && (hs->type == HT_ERRORBARS)) {
 	    c_token++;

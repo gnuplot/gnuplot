@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.821 2013/08/20 22:09:18 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.822 2013/08/23 04:32:45 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -3352,6 +3352,7 @@ Ffigure_histeps
        set style histogram errorbars {gap <gapsize>} {<linewidth>}
        set style histogram rowstacked
        set style histogram columnstacked
+       set style histogram {title font "name,size" tc <colorspec>} 
 
  The default style corresponds to `set style histogram clustered gap 2`.
  In this style, each set of parallel data values is collected into a group of
@@ -3480,7 +3481,8 @@ Ffigure_histcols
 ?plotting style histograms newhistogram
  Syntax:
 
-      newhistogram {"<title>"} {lt <linetype>} {fs <fillstyle>} {at <x-coord>}
+      newhistogram {"<title>" {font "name,size"} {tc <colorspec>}} 
+                   {lt <linetype>} {fs <fillstyle>} {at <x-coord>}
 
  More than one set of histograms can appear in a single plot. In this case you
  can force a gap between them, and a separate label for each set, by using the

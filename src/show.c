@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.302 2013/08/09 20:50:32 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.303 2013/08/20 22:09:21 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -2685,21 +2685,8 @@ show_increment()
 static void
 show_histogram()
 {
-    if (histogram_opts.type == HT_CLUSTERED)
-	fprintf(stderr, "\tHistogram style is clustered with gap %d ",
-		histogram_opts.gap);
-    else if (histogram_opts.type == HT_ERRORBARS)
-	fprintf(stderr, "\tHistogram style is errorbars with gap %d lw %g ",
-		histogram_opts.gap, histogram_opts.bar_lw);
-    else if (histogram_opts.type == HT_STACKED_IN_LAYERS)
-	fprintf(stderr, "\tHistogram style is rowstacked ");
-    else if (histogram_opts.type == HT_STACKED_IN_TOWERS)
-	fprintf(stderr, "\tHistogram style is columnstacked ");
-    fprintf(stderr, " title offset ");
-    show_position(&histogram_opts.title.offset);
-    if (histogram_opts.title.textcolor.type == TC_LT)
-	fprintf(stderr," textcolor lt %d", histogram_opts.title.textcolor.lt+1);
-    fprintf(stderr, "\n");
+    fprintf(stderr,"\tHistogram style is ");
+    save_histogram_opts(stderr);
 }
 
 #ifdef EAM_BOXED_TEXT

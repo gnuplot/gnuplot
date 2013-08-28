@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.225 2013/08/09 20:50:32 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.226 2013/08/20 22:09:18 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -61,8 +61,7 @@ static void save_position __PROTO((FILE *, struct position *, TBOOLEAN offset));
 static void save_zeroaxis __PROTO((FILE *,AXIS_INDEX));
 static void save_set_all __PROTO((FILE *));
 
-static const char *coord_msg[] = { "first ", "second ", "graph ", "screen ",
-				 "character "};
+static const char *coord_msg[] = {"first ", "second ", "graph ", "screen ", "character "};
 /*
  *  functions corresponding to the arguments of the GNUPLOT `save` command
  */
@@ -513,10 +512,8 @@ set bar %f %s\n",
 		    "nofilled");
 	save_linetype(fp, &(this_arrow->arrow_properties.lp_properties), FALSE);
 	if (this_arrow->arrow_properties.head_length > 0) {
-	    static char *msg[] = {"first", "second", "graph", "screen",
-				  "character"};
 	    fprintf(fp, " size %s %.3f,%.3f,%.3f",
-		    msg[this_arrow->arrow_properties.head_lengthunit],
+		    coord_msg[this_arrow->arrow_properties.head_lengthunit],
 		    this_arrow->arrow_properties.head_length,
 		    this_arrow->arrow_properties.head_angle,
 		    this_arrow->arrow_properties.head_backangle);
@@ -544,10 +541,8 @@ set bar %f %s\n",
 		   "nofilled");
 	save_linetype(fp, &(this_arrowstyle->arrow_properties.lp_properties), FALSE);
 	if (this_arrowstyle->arrow_properties.head_length > 0) {
-	    static char *msg[] = {"first", "second", "graph", "screen",
-				  "character"};
 	    fprintf(fp, " size %s %.3f,%.3f,%.3f",
-		    msg[this_arrowstyle->arrow_properties.head_lengthunit],
+		    coord_msg[this_arrowstyle->arrow_properties.head_lengthunit],
 		    this_arrowstyle->arrow_properties.head_length,
 		    this_arrowstyle->arrow_properties.head_angle,
 		    this_arrowstyle->arrow_properties.head_backangle);
@@ -560,20 +555,7 @@ set bar %f %s\n",
     }
 
     fprintf(fp, "set style histogram ");
-    switch (histogram_opts.type) {
-	default:
-	case HT_CLUSTERED:
-	    fprintf(fp,"clustered gap %d ",histogram_opts.gap); break;
-	case HT_ERRORBARS:
-	    fprintf(fp,"errorbars gap %d lw %g",histogram_opts.gap,histogram_opts.bar_lw); break;
-	case HT_STACKED_IN_LAYERS:
-	    fprintf(fp,"rowstacked "); break;
-	case HT_STACKED_IN_TOWERS:
-	    fprintf(fp,"columnstacked "); break;
-    }
-    fprintf(fp,"title ");
-    save_position(fp, &histogram_opts.title.offset, TRUE);
-    fprintf(fp, "\n");
+    save_histogram_opts(fp);
 
 #ifdef EAM_OBJECTS
     save_object(fp, 0);
@@ -1163,6 +1145,9 @@ save_position(FILE *fp, struct position *pos, TBOOLEAN offset)
     assert(first_axes == 0 && second_axes == 1 && graph == 2 && screen == 3 &&
 	   character == 4);
 
+    if (pos->x == 0 && pos->y == 0 && pos->z == 0)
+	return;
+
     if (offset)
 	fprintf(fp, " offset ");
 
@@ -1463,6 +1448,30 @@ save_offsets(FILE *fp, char *lead)
 	roff.scalex == graph ? "graph " : "", roff.x,
 	toff.scaley == graph ? "graph " : "", toff.y,
 	boff.scaley == graph ? "graph " : "", boff.y);
+}
+
+void 
+save_histogram_opts (FILE *fp)
+{
+    switch (histogram_opts.type) {
+	default:
+	case HT_CLUSTERED:
+	    fprintf(fp,"clustered gap %d ",histogram_opts.gap); break;
+	case HT_ERRORBARS:
+	    fprintf(fp,"errorbars gap %d lw %g",histogram_opts.gap,histogram_opts.bar_lw); break;
+	case HT_STACKED_IN_LAYERS:
+	    fprintf(fp,"rowstacked "); break;
+	case HT_STACKED_IN_TOWERS:
+	    fprintf(fp,"columnstacked "); break;
+    }
+    if (fp == stderr)
+	fprintf(fp,"\n\t\t");
+    fprintf(fp,"title");
+    save_textcolor(fp, &histogram_opts.title.textcolor);
+    if (histogram_opts.title.font)
+	fprintf(fp, " font \"%s\" ", histogram_opts.title.font);
+    save_position(fp, &histogram_opts.title.offset, TRUE);
+    fprintf(fp, "\n");
 }
 
 #ifdef EAM_OBJECTS
