@@ -35,7 +35,7 @@ To view the results you need a browser that supports the HTML5 'canvas' element.
     <li><a href="fillbetween.html">fill&nbsp;between&nbsp;curves</a></li>
     <li><a href="candlesticks.html">candlesticks</a></li>
     <li><a href="mgr.html">error bars</a></li>
-    <li><a href="histograms.html">histograms</a></li>
+    <li><a href="histograms.html">histograms</a> (<a href="histograms2.html">more</a>)</li>
     <li><a href="steps.html">step functions</a></li>
     <li><a href="multiaxis.html">multiple axis scales</a></li>
     <li><a href="using.html">mixing styles</a></li>
