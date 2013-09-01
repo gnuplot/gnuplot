@@ -1,5 +1,5 @@
 /*
- * $Id: mouse.h,v 1.22 2012/03/09 20:23:31 sfeam Exp $
+ * $Id: mouse.h,v 1.23 2012/10/27 02:23:39 sfeam Exp $
  */
 
 /* GNUPLOT - mouse.h */
@@ -69,9 +69,26 @@ typedef struct mouse_setting_t {
     char *labelopts;       /* label options                               */
 } mouse_setting_t;
 
+
+#ifdef OS2
+        /* don't start with mouse on default -- clashes with arrow keys on command line */
+#define DEFAULT_MOUSE_MODE    0
+#else
+        /* start with mouse on by default */
+#define DEFAULT_MOUSE_MODE    1
+#endif
+
+#define DEFAULT_MOUSE_SETTING { \
+    DEFAULT_MOUSE_MODE,         \
+    300, /* ms */               \
+    1, 0, 0, 0, 0,              \
+    mouse_fmt_default,          \
+    NULL                        \
+}
+
+extern mouse_setting_t default_mouse_setting;
 extern mouse_setting_t mouse_setting;
 extern char mouse_fmt_default[];
-
 
 /* enum of GP_ -keycodes has moved to mousecmn.h so that it can be
  * accessed by standalone terminals too */

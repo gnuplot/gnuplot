@@ -1,3 +1,9 @@
+2013-09-01  Peter Juhasz  <juhaszp@users.sourceforge.net>
+
+	* src/mouse.h src/mouse.c src/unset.c (reset_command):
+	'reset' command restores default mouse settings, warns on bogus 
+	options, no longer accepts 'x' or similar axis options
+
 2013-08-28  Christoph Bersch <usenet@bersch.net>
 
 	* src/save.c (save_set_all): Emit a "unset object" command before

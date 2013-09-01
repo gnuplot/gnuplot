@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.179 2013/08/20 22:09:21 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.180 2013/08/28 19:46:53 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -1640,6 +1640,12 @@ reset_command()
     }
 #endif
 
+    if (!(END_OF_COMMAND)) {
+	int_warn(c_token, "invalid option, expecting 'bind' or 'errorstate'");
+	while (!(END_OF_COMMAND))
+	    c_token++;
+    }
+
     /* Kludge alert, HBB 20000506: set to noninteractive mode, to
      * suppress some of the commentary output by the individual
      * unset_...() routines. */
@@ -1765,6 +1771,10 @@ reset_command()
     unset_histogram();
 #ifdef EAM_BOXED_TEXT
     unset_textbox_style();
+#endif
+
+#ifdef USE_MOUSE
+    mouse_setting = default_mouse_setting;
 #endif
 
     unset_missing();
