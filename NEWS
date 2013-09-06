@@ -15,6 +15,7 @@ New features, changes and fixes since gnuplot version 4.6.3
 * FIX promote a string containing only digits to INTGR rather than CMPLX
 * FIX 'set grid front' caused failure to initialize location of axis zero point
 * FIX very poor precision in mouse coords reported by x11 in -persist mode
+* FIX parsing of $# (the number of arguments in a "call"). It's not a comment!
 
 New features, changes and fixes in gnuplot version 4.6.3
 ========================================================
