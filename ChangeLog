@@ -5,7 +5,7 @@
 	sometime in the version 4.5.  Trap it as a special case in the scanner.
 	Bugfix
 
-2013-08-24  Ethan A Merritt  <merritt@u.washington.edu>
+2013-09-05  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* configure.in docs/titlepag.tex PATCHLEVEL src/version.c:
 	Bump patchlevel to 4.6.4
