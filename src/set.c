@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.408 2013/08/20 22:09:19 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.409 2013/08/28 19:46:52 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -2871,19 +2871,12 @@ void
 reset_palette()
 {
     if (!enable_reset_palette) return;
-    sm_palette.colorMode = SMPAL_COLOR_MODE_RGB;
-    sm_palette.formulaR = 7; sm_palette.formulaG = 5;
-    sm_palette.formulaB = 15;
-    sm_palette.positive = SMPAL_POSITIVE;
-    sm_palette.ps_allcF = 0;
-    sm_palette.use_maxcolors = 0;
-    sm_palette.gradient_num = 0;
     free(sm_palette.gradient);
-    sm_palette.gradient = NULL;
     free(sm_palette.color);
-    sm_palette.color = NULL;
-    sm_palette.cmodel = C_MODEL_RGB;
-    sm_palette.gamma = 1.5;
+    free_at(sm_palette.Afunc.at);
+    free_at(sm_palette.Bfunc.at);
+    free_at(sm_palette.Cfunc.at);
+    init_color();
     pm3d_last_set_palette_mode = SMPAL_COLOR_MODE_NONE;
 }
 
@@ -3338,10 +3331,10 @@ set_palette()
 	    }
 	    /* ps_allcF: write all rgb formulae into PS file? */
 	    case S_PALETTE_NOPS_ALLCF: /* "nops_allcF" */
-		sm_palette.ps_allcF = 0;
+		sm_palette.ps_allcF = FALSE;
 		continue;
 	    case S_PALETTE_PS_ALLCF: /* "ps_allcF" */
-		sm_palette.ps_allcF = 1;
+		sm_palette.ps_allcF = TRUE;
 		continue;
 	    /* max colors used */
 	    case S_PALETTE_MAXCOLORS: { /* "maxc$olors" */

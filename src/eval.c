@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: eval.c,v 1.108 2013/08/06 18:12:11 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: eval.c,v 1.109 2013/08/13 23:31:56 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - eval.c */
@@ -64,6 +64,8 @@ struct udvt_entry *udv_NaN;
 /* first in linked list */
 struct udvt_entry *first_udv = &udv_pi;
 struct udft_entry *first_udf = NULL;
+/* pointer to first udv users can delete */
+struct udvt_entry **udv_user_head;
 
 TBOOLEAN undefined;
 
@@ -728,14 +730,19 @@ get_udv_by_name(char *key)
     return NULL;
 }
 
+/* This doesn't really delete, it just marks the udv as undefined */
 void
 del_udv_by_name(char *key, TBOOLEAN wildcard)
 {
-    struct udvt_entry *udv_ptr = first_udv;
+    struct udvt_entry *udv_ptr = *udv_user_head;
 
     while (udv_ptr) {
+	/* Forbidden to delete GPVAL_* */
+	if (!strncmp(udv_ptr->udv_name,"GPVAL",5))
+	    ;
+
  	/* exact match */
-	if (!wildcard && !strcmp(key, udv_ptr->udv_name)) {
+	else if (!wildcard && !strcmp(key, udv_ptr->udv_name)) {
 	    udv_ptr->udv_undef = TRUE;
 	    gpfree_string(&(udv_ptr->udv_value));
 	    gpfree_datablock(&(udv_ptr->udv_value));
@@ -743,7 +750,7 @@ del_udv_by_name(char *key, TBOOLEAN wildcard)
 	}
 
 	/* wildcard match: prefix matches */
-	if ( wildcard && !strncmp(key, udv_ptr->udv_name, strlen(key)) ) {
+	else if ( wildcard && !strncmp(key, udv_ptr->udv_name, strlen(key)) ) {
 	    udv_ptr->udv_undef = TRUE;
 	    gpfree_string(&(udv_ptr->udv_value));
 	    gpfree_datablock(&(udv_ptr->udv_value));

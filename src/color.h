@@ -1,5 +1,5 @@
 /*
- * $Id: color.h,v 1.36 2012/04/13 19:30:38 sfeam Exp $
+ * $Id: color.h,v 1.37 2012/10/30 04:43:42 sfeam Exp $
  */
 
 /* GNUPLOT - color.h */
@@ -172,7 +172,7 @@ typedef struct {
    * Note: this option is used by all terminals of the postscript
    * family, i.e. postscript, pslatex, epslatex, so it will not be
    * comfortable to move it to the particular .trm files. */
-  char ps_allcF;
+  TBOOLEAN ps_allcF;
 
   /* These variables are used to define interpolated color palettes:
    * gradient is an array if (gray,color) pairs.  This array is

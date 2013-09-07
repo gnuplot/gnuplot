@@ -1,5 +1,5 @@
 /*
- * $Id: eval.h,v 1.41 2012/06/09 21:44:17 markisch Exp $
+ * $Id: eval.h,v 1.42 2012/08/05 19:24:53 sfeam Exp $
  */
 
 /* GNUPLOT - eval.h */
@@ -126,6 +126,7 @@ extern struct udft_entry *first_udf; /* user-def'd functions */
 extern struct udvt_entry *first_udv; /* user-def'd variables */
 extern struct udvt_entry udv_pi; /* 'pi' variable */
 extern struct udvt_entry *udv_NaN; /* 'NaN' variable */
+extern struct udvt_entry **udv_user_head; /* first udv that can be deleted */
 extern TBOOLEAN undefined;
 
 /* Prototypes of functions exported by eval.c */

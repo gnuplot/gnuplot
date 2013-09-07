@@ -1,3 +1,17 @@
+2013-09-07  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/color.c src/color.h src/eval.c src/eval.h src/plot.c src/plot.h
+	src/set.c src/show.c src/unset.c docs/gnuplot.doc:
+
+	- Consolidate code called on program entry and during "reset".
+	- Group program-defined variables (pi, NaN, GNUTERM) at the start of the
+	  udv list and protect them from deletion.
+	- New command "reset session" does a reset followed by loading gnuplotrc
+	  and ~/.gnuplot.  It also deletes (actually undefines) all user-defined
+	  variables. This puts the program in approximately the same state as it
+	  was on first entry.
+	- Fixes memory leak; palette functions were reset without being freed.
+
 2013-09-01  Peter Juhasz  <juhaszp@users.sourceforge.net>
 
 	* src/mouse.h src/mouse.c src/unset.c (reset_command):

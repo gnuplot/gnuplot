@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.822 2013/08/23 04:32:45 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.823 2013/08/28 19:46:48 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -6705,16 +6705,25 @@ Ffigure_mapcontours
 ?reset
 ?reset errors
 ?reset bind
+?reset session
  The `reset` command causes all graph-related options that can be set with the
- `set` command to take on their default values.  This command is useful, e.g.,
- to restore the default graph settings at the end of a command file, or to
- return to a defined state after lots of settings have been changed within a
- command file.  Please refer to the `set` command to see the default values
- that the various options take.
+ `set` command to return to their default values.  This command can be used to
+ restore the default settings after executing a loaded command file, or to
+ return to a defined state after lots of settings have been changed.
 
  The following are _not_ affected by `reset`.
       `set term` `set output` `set loadpath` `set fontpath` `set linetype`
       `set encoding` `set decimalsign` `set locale` `set psdir`
+
+ Note that `reset` does not necessarily return settings to the state they
+ were in at program entry, because the default values may have been altered by
+ commands in the initialization files gnuplotrc or $HOME/.gnuplot.  However,
+ these commands can be re-executed by using the variant command `reset session`.
+
+=session
+ `reset session` restores default values and then re-executes the system-wide
+ gnuplotrc initialization file and any private $HOME/.gnuplot preferences file.
+ See `initialization`.
 
 =error state
  `reset errors` clears only the error state variables GPVAL_ERRNO and

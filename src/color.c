@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: color.c,v 1.105 2013/02/28 05:30:40 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: color.c,v 1.106 2013/06/29 12:04:44 juhaszp Exp $"); }
 #endif
 
 /* GNUPLOT - color.c */
@@ -36,7 +36,7 @@ static char *RCSid() { return RCSid("$Id: color.c,v 1.105 2013/02/28 05:30:40 sf
 
 /* COLOUR MODES - GLOBAL VARIABLES */
 
-t_sm_palette sm_palette;  /* initialized in init_color() */
+t_sm_palette sm_palette;  /* initialized in plot.c on program entry */
 
 /* Copy of palette previously in use.
  * Exported so that change_term() can invalidate contents
@@ -73,15 +73,13 @@ init_color()
   sm_palette.use_maxcolors = 0;
   sm_palette.colors = 0;
   sm_palette.color = NULL;
-  sm_palette.ps_allcF = 0;
+  sm_palette.ps_allcF = FALSE;
   sm_palette.gradient_num = 0;
   sm_palette.gradient = NULL;
   sm_palette.cmodel = C_MODEL_RGB;
   sm_palette.Afunc.at = sm_palette.Bfunc.at = sm_palette.Cfunc.at = NULL;
+  sm_palette.colorMode = SMPAL_COLOR_MODE_RGB;
   sm_palette.gamma = 1.5;
-
-  /* initialisation of smooth color box */
-  color_box = default_color_box;
 }
 
 

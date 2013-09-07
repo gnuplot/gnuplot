@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot.c,v 1.150 2013/04/04 19:05:24 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot.c,v 1.151 2013/07/02 22:19:09 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot.c */
@@ -417,9 +417,11 @@ main(int argc, char **argv)
 
     /* Initialize pre-loaded user variables */
     (void) Gcomplex(&udv_pi.udv_value, M_PI, 0.0);
+    (void) add_udv_by_name("GNUTERM");
     udv_NaN = add_udv_by_name("NaN");
     (void) Gcomplex(&(udv_NaN->udv_value), not_a_number(), 0.0);
     udv_NaN->udv_undef = FALSE;
+    udv_user_head = &(udv_NaN->next_udv);
 
     init_memory();
 
@@ -495,24 +497,15 @@ main(int argc, char **argv)
     if (!SETJMP(command_line_env, 1)) {
 	/* first time */
 	interrupt_setup();
-	/* should move this stuff another initialisation routine,
+	/* should move this stuff to another initialisation routine,
 	 * something like init_set() maybe */
 	get_user_env();
 	init_loadpath();
 	init_locale();
-	/* HBB: make sure all variables start in the same mode 'reset'
-	 * would set them to. Since the axis variables aren't in
-	 * initialized arrays any more, this is now necessary... */
-	reset_command();
-	init_color();		/* Initialization of color  */
-	load_rcfile(0);		/* System-wide gnuplotrc if configured */
-	load_rcfile(1);		/* ./.gnuplot if configured */
+
+	memset(&sm_palette, 0, sizeof(sm_palette));
 	init_fit();		/* Initialization of fitting module */
-
-	/* After this point we allow pipes and system commands */
-	successful_initialization = TRUE;
-
-	load_rcfile(2);		/* ~/.gnuplot */
+	init_session();
 
 	if (interactive && term != 0) {		/* not unknown */
 #ifdef GNUPLOT_HISTORY
@@ -680,6 +673,33 @@ interrupt_setup()
 
 
 /*
+ * Initialize graphics context, color palette, local preferences.
+ * Called both at program startup and by "reset session".
+ */
+void
+init_session()
+{
+	/* Disable pipes and system commands during initialization */
+	successful_initialization = FALSE;
+
+	/* Undefine any previously-used variables */
+	del_udv_by_name("",TRUE);
+
+	/* HBB: make sure all variables start in the same mode 'reset'
+	 * would set them to. Since the axis variables aren't in
+	 * initialized arrays any more, this is now necessary...
+	 */
+	reset_command();	/* FIXME: this does c_token++ */
+	load_rcfile(0);		/* System-wide gnuplotrc if configured */
+	load_rcfile(1);		/* ./.gnuplot if configured */
+
+	/* After this point we allow pipes and system commands */
+	successful_initialization = TRUE;
+
+	load_rcfile(2);		/* ~/.gnuplot */
+}
+
+/*
  * Read commands from an initialization file.
  * where = 0: look for gnuplotrc in system shared directory
  * where = 1: look for .gnuplot in current directory
@@ -800,8 +820,7 @@ init_memory()
 {
     extend_input_line();
     extend_token_table();
-    replot_line = gp_alloc(1, "string");
-    *replot_line = NUL;
+    replot_line = gp_strdup("");
 }
 
 
