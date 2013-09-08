@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: scanner.c,v 1.35 2012/06/19 18:11:06 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: scanner.c,v 1.36 2013/06/05 23:33:11 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - scanner.c */
@@ -216,8 +216,13 @@ scanner(char **expressionp, size_t *expressionlenp)
 	    }
 	} else
 	    switch (expression[current]) {
-	    case '#':		/* DFK: add comments to gnuplot */
-		goto endline;	/* ignore the rest of the line */
+	    case '#':
+		/* FIXME: This ugly exception handles the documented syntatic */
+		/* entity $# (number of arguments in "call" statement), which */
+		/* otherwise would be treated as introducing a comment.       */
+		if ((t_num == 0) ||
+		    (gp_input_line[token[t_num-1].start_index] != '$'))
+			goto endline;	/* ignore the rest of the line */
 	    case '^':
 	    case '+':
 	    case '-':

@@ -4,6 +4,10 @@
 	remove unused variables, add comments, new parameter to load_file(),
 	all in preparation for a revision to the "call" mechanism.
 
+	* scanner.c (scanner):  The syntactic entity $# (number of arguments
+	in a call statment) has been mishandled as introducing a comment since
+	sometime in version 4.5.  Trap it as a special case in the scanner.
+
 2013-09-07  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/color.c src/color.h src/eval.c src/eval.h src/plot.c src/plot.h
