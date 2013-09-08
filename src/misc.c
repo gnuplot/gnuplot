@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.157 2013/08/08 21:40:31 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.158 2013/08/09 17:56:45 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -73,10 +73,9 @@ static void expand_call_args __PROTO((void));
  */
 LFS *lf_head = NULL;		/* NULL if not in load_file */
 
-/* these two could be in load_file, except for error recovery */
-static TBOOLEAN do_load_arg_substitution = FALSE;
-static char *call_args[10] = { NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL };
-static int call_argc;
+/* these two are global so that plot.c can load them on program entry */
+char *call_args[10] = { NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL };
+int call_argc;
 
 /*
  * iso_alloc() allocates a iso_curve structure that can hold 'num'
@@ -215,119 +214,132 @@ expand_call_args(void)
     free(raw_line);
 }
 
+/*
+ * load_file() is called from
+ * (1) the "load" command, no arguments substitution is done
+ * (2) the "call" command, arguments are substituted for $0, $1, etc.
+ * (3) on program entry to load initialization files (acts like "load")
+ * (4) to execute script files given on the command line (acts like "load")
+ */
 void
-load_file(FILE *fp, char *name, TBOOLEAN can_do_args)
+load_file(FILE *fp, char *name, int calltype)
 {
     int len;
 
     int start, left;
     int more;
     int stop = FALSE;
+    TBOOLEAN substitute_args = (calltype == 2);
 
     lf_push(fp, name, NULL); /* save state for errors and recursion */
-    do_load_arg_substitution = can_do_args;
 
     if (fp == (FILE *) NULL) {
-	os_error(NO_CARET, "Cannot open %s file '%s'",
-		 can_do_args ? "call" : "load", name);
-    } else if (fp == stdin) {
+	int_error(NO_CARET, "Cannot open script file '%s'", name);
+	return; /* won't actually reach here */
+    }
+
+    if (fp == stdin) {
 	/* DBT 10-6-98  go interactive if "-" named as load file */
 	interactive = TRUE;
 	while (!com_line());
+	(void) lf_pop();
+	return;
+    }
+
+    /* We actually will read from a file */
+    if (calltype == 2) {
+	prepare_call();
+	lf_head->c_token = c_token; /* update after prepare_call() */
     } else {
 	call_argc = 0;
-	if (can_do_args) {
-	    prepare_call();
-	    lf_head->c_token = c_token; /* update after prepare_call() */
-	}
-	/* things to do after lf_push */
-	inline_num = 0;
-	/* go into non-interactive mode during load */
-	/* will be undone below, or in load_file_error */
-	interactive = FALSE;
+    }
 
-	while (!stop) {	/* read all lines in file */
-	    left = gp_input_line_len;
-	    start = 0;
-	    more = TRUE;
+    /* things to do after lf_push */
+    inline_num = 0;
+    /* go into non-interactive mode during load */
+    /* will be undone below, or in load_file_error */
+    interactive = FALSE;
 
-	    /* read one logical line */
-	    while (more) {
-		if (fgets(&(gp_input_line[start]), left, fp) == (char *) NULL) {
-		    stop = TRUE;	/* EOF in file */
-		    gp_input_line[start] = '\0';
-		    more = FALSE;
-		} else {
-		    inline_num++;
-		    len = strlen(gp_input_line) - 1;
-		    if (gp_input_line[len] == '\n') {	/* remove any newline */
-			gp_input_line[len] = '\0';
-			/* Look, len was 1-1 = 0 before, take care here! */
+    while (!stop) {	/* read all lines in file */
+	left = gp_input_line_len;
+	start = 0;
+	more = TRUE;
+
+	/* read one logical line */
+	while (more) {
+	    if (fgets(&(gp_input_line[start]), left, fp) == (char *) NULL) {
+		stop = TRUE;	/* EOF in file */
+		gp_input_line[start] = '\0';
+		more = FALSE;
+	    } else {
+		inline_num++;
+		len = strlen(gp_input_line) - 1;
+		if (gp_input_line[len] == '\n') {	/* remove any newline */
+		    gp_input_line[len] = '\0';
+		    /* Look, len was 1-1 = 0 before, take care here! */
+		    if (len > 0)
+			--len;
+		    if (gp_input_line[len] == '\r') {	/* remove any carriage return */
+			gp_input_line[len] = NUL;
 			if (len > 0)
 			    --len;
-			if (gp_input_line[len] == '\r') {	/* remove any carriage return */
-			    gp_input_line[len] = NUL;
-			    if (len > 0)
-				--len;
-			}
-		    } else if (len + 2 >= left) {
-			extend_input_line();
-			left = gp_input_line_len - len - 1;
-			start = len + 1;
-			continue;	/* don't check for '\' */
 		    }
-		    if (gp_input_line[len] == '\\') {
-			/* line continuation */
-			start = len;
-			left = gp_input_line_len - start;
-		    } else {
-			/* EAM May 2011 - handle multi-line bracketed clauses {...}.
-			 * Introduces a requirement for scanner.c and scanner.h
-			 * This code is redundant with part of do_line(),
-			 * but do_line() assumes continuation lines come from stdin.
-			 */
-
-			/* macros in a clause are problematic, as they are */
-			/* only expanded once even if the clause is replayed */
-			string_expand_macros();
-
-			/* Strip off trailing comment and count curly braces */
-			num_tokens = scanner(&gp_input_line, &gp_input_line_len);
-			if (gp_input_line[token[num_tokens].start_index] == '#') {
-			    gp_input_line[token[num_tokens].start_index] = NUL;
-			    start = token[num_tokens].start_index;
-			    left = gp_input_line_len - start;
-			}
-			/* Read additional lines if necessary to complete a
-			 * bracketed clause {...}
-			 */
-			if (curly_brace_count < 0)
-			    int_error(NO_CARET, "Unexpected }");
-			if (curly_brace_count > 0) {
-			    if (len + 4 > gp_input_line_len)
-				extend_input_line();
-			    strcat(gp_input_line,";\n");
-			    start = strlen(gp_input_line);
-			    left = gp_input_line_len - start;
-			    continue;
-			}
-			
-			more = FALSE;
-		    }
-
+		} else if (len + 2 >= left) {
+		    extend_input_line();
+		    left = gp_input_line_len - len - 1;
+		    start = len + 1;
+		    continue;	/* don't check for '\' */
 		}
-	    }
+		if (gp_input_line[len] == '\\') {
+		    /* line continuation */
+		    start = len;
+		    left = gp_input_line_len - start;
+		} else {
+		    /* EAM May 2011 - handle multi-line bracketed clauses {...}.
+		     * Introduces a requirement for scanner.c and scanner.h
+		     * This code is redundant with part of do_line(),
+		     * but do_line() assumes continuation lines come from stdin.
+		     */
 
-	    /* process line */
-	    if (strlen(gp_input_line) > 0) {
-		if (can_do_args)
-		  expand_call_args();
+		    /* macros in a clause are problematic, as they are */
+		    /* only expanded once even if the clause is replayed */
+		    string_expand_macros();
 
-		screen_ok = FALSE;	/* make sure command line is
-					   echoed on error */
-		if (do_line())
-		    stop = TRUE;
+		    /* Strip off trailing comment and count curly braces */
+		    num_tokens = scanner(&gp_input_line, &gp_input_line_len);
+		    if (gp_input_line[token[num_tokens].start_index] == '#') {
+			gp_input_line[token[num_tokens].start_index] = NUL;
+			start = token[num_tokens].start_index;
+			left = gp_input_line_len - start;
+		    }
+		    /* Read additional lines if necessary to complete a
+		     * bracketed clause {...}
+		     */
+		    if (curly_brace_count < 0)
+			int_error(NO_CARET, "Unexpected }");
+		    if (curly_brace_count > 0) {
+			if (len + 4 > gp_input_line_len)
+			    extend_input_line();
+			strcat(gp_input_line,";\n");
+			start = strlen(gp_input_line);
+			left = gp_input_line_len - start;
+			continue;
+		    }
+		    
+		    more = FALSE;
+		}
+
 	    }
+	}
+
+	/* process line */
+	if (strlen(gp_input_line) > 0) {
+	    if (substitute_args)
+		expand_call_args();
+
+	    screen_ok = FALSE;	/* make sure command line is echoed on error */
+	    if (do_line())
+		stop = TRUE;
 	}
     }
 
@@ -364,7 +376,6 @@ lf_pop()
 	call_args[argindex] = lf->call_args[argindex];
     }
     call_argc = lf->call_argc;
-    do_load_arg_substitution = lf->do_load_arg_substitution;
     interactive = lf->interactive;
     inline_num = lf->inline_num;
     if_depth = lf->if_depth;
@@ -413,7 +424,6 @@ lf_push(FILE *fp, char *name, char *cmdline)
 
     lf->interactive = interactive;	/* save current state */
     lf->inline_num = inline_num;	/* save current line number */
-    lf->do_load_arg_substitution = do_load_arg_substitution;
     lf->call_argc = call_argc;
     for (argindex = 0; argindex < 10; argindex++) {
 	lf->call_args[argindex] = call_args[argindex];

@@ -1,5 +1,5 @@
 /*
- * $Id: misc.h,v 1.37 2011/07/25 06:51:29 sfeam Exp $
+ * $Id: misc.h,v 1.38 2012/05/10 21:46:16 sfeam Exp $
  */
 
 /* GNUPLOT - misc.h */
@@ -47,6 +47,9 @@
 
 /* Variables of misc.c needed by other modules: */
 
+/* these two are global so that plot.c can load them on program entry */
+extern char *call_args[10];
+extern int call_argc;
 
 /* Prototypes from file "misc.c" */
 
@@ -54,7 +57,7 @@ struct iso_curve * iso_alloc __PROTO((int num));
 void iso_extend __PROTO((struct iso_curve *ip, int num));
 void iso_free __PROTO((struct iso_curve *ip));
 const char *expand_call_arg __PROTO((int c));
-void load_file __PROTO((FILE *fp, char *name, TBOOLEAN subst_args));
+void load_file __PROTO((FILE *fp, char *name, int calltype));
 FILE *lf_top __PROTO((void));
 TBOOLEAN lf_pop __PROTO((void));
 void lf_push __PROTO((FILE *fp, char *name, char *cmdline));
@@ -91,7 +94,6 @@ typedef struct lf_state_struct {
     char *cmdline;              /* content of command string for do_string() */
     /* last recursion level: */
     TBOOLEAN interactive;	/* value of interactive flag on entry */
-    TBOOLEAN do_load_arg_substitution;	/* likewise ... */
     int inline_num;		/* inline_num on entry */
     int depth;			/* recursion depth */
     int if_depth;		/* used by _old_ if/else syntax */

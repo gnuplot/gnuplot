@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot.c,v 1.151 2013/07/02 22:19:09 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot.c,v 1.152 2013/09/07 17:02:03 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot.c */
@@ -611,12 +611,13 @@ main(int argc, char **argv)
 	    } else if (!strncmp(*argv, "-d", 2) || !strcmp(*argv, "--default-settings")) {
 		/* Ignore this; it already had its effect */
 		FPRINTF((stderr, "ignoring -d\n"));
+
 	    } else if (*argv[0] == '-') {
 		fprintf(stderr, "unrecognized option %s\n", *argv);
 	    } else {
 		interactive = FALSE;
 		noinputfiles = FALSE;
-		load_file(loadpath_fopen(*argv, "r"), gp_strdup(*argv), FALSE);
+		load_file(loadpath_fopen(*argv, "r"), gp_strdup(*argv), 4);
 	    }
     }
 
@@ -750,7 +751,7 @@ load_rcfile(int where)
 
     if (plotrc) {
 	char *rc = gp_strdup(rcfile ? rcfile : PLOTRC);
-	load_file(plotrc, rc, FALSE);
+	load_file(plotrc, rc, 3);
 	push_terminal(0); /* needed if terminal or its options were changed */
     }
 

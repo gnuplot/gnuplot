@@ -1,3 +1,9 @@
+2013-09-08  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/command.c src/misc.c src/misc.h src/plot.c:  Clean up code,
+	remove unused variables, add comments, new parameter to load_file(),
+	all in preparation for a revision to the "call" mechanism.
+
 2013-09-07  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/color.c src/color.h src/eval.c src/eval.h src/plot.c src/plot.h

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.263 2013/08/23 23:36:46 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.264 2013/08/26 19:31:54 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -815,7 +815,7 @@ call_command()
     gp_expand_tilde(&save_file);
 
     /* Argument list follows filename */
-    load_file(loadpath_fopen(save_file, "r"), save_file, TRUE);
+    load_file(loadpath_fopen(save_file, "r"), save_file, 2);
 }
 
 
@@ -1255,7 +1255,7 @@ load_command()
     gp_expand_tilde(&save_file);
 
     fp = strcmp(save_file, "-") ? loadpath_fopen(save_file, "r") : stdout;
-    load_file(fp, save_file, FALSE);
+    load_file(fp, save_file, 1);
 }
 
 
@@ -2015,7 +2015,7 @@ title 'R,G,B profiles of the current color palette';";
 
     /* execute all commands from the temporary file */
     rewind(f);
-    load_file(f, NULL, FALSE); /* note: it does fclose(f) */
+    load_file(f, NULL, 1); /* note: it does fclose(f) */
 
     /* enable reset_palette() and restore replot line */
     enable_reset_palette = 1;
