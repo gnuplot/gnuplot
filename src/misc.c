@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.158 2013/08/09 17:56:45 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.159 2013/09/08 17:20:20 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -60,7 +60,7 @@ static char *RCSid() { return RCSid("$Id: misc.c,v 1.158 2013/08/09 17:56:45 sfe
 #endif
 
 static char *recursivefullname __PROTO((const char *path, const char *filename, TBOOLEAN recursive));
-static void prepare_call __PROTO((void));
+static void prepare_call __PROTO((int calltype));
 static void expand_call_args __PROTO((void));
 
 /* A copy of the declaration from set.c */
@@ -142,19 +142,35 @@ iso_free(struct iso_curve *ip)
 }
 
 static void
-prepare_call(void)
+prepare_call(int calltype)
 {
-    call_argc = 0;
-    /* Gnuplot "call" command can have up to 10 arguments "$0" to "$9" */
-    while (!END_OF_COMMAND && call_argc <= 9) {
-	if (isstring(c_token))
-	    m_quote_capture(&call_args[call_argc++], c_token, c_token);
-	else
-	    m_capture(&call_args[call_argc++], c_token, c_token);
-	c_token++;
+    if (calltype == 2) {
+	/* Gnuplot "call" command can have up to 10 arguments "$0" to "$9" */
+	call_argc = 0;
+	while (!END_OF_COMMAND && call_argc <= 9) {
+	    if (isstring(c_token))
+		m_quote_capture(&call_args[call_argc++], c_token, c_token);
+	    else
+		m_capture(&call_args[call_argc++], c_token, c_token);
+	    c_token++;
+	}
+	lf_head->c_token = c_token;
+	if (!END_OF_COMMAND)
+	    int_error(++c_token, "too many arguments for 'call <file>'");
+
+    } else if (calltype == 5) {
+	/* lf_push() moved our call arguments from call_args[] to lf->call_args[] */
+	/* call_argc was determined at program entry */
+	int argindex;
+	for (argindex = 0; argindex < 10; argindex++) {
+	    call_args[argindex] = lf_head->call_args[argindex];
+	    lf_head->call_args[argindex] = NULL;	/* just to be safe */
+	}
+
+    } else {
+	/* "load" command has no arguments */
+	call_argc = 0;
     }
-    if (!END_OF_COMMAND)
-	int_error(++c_token, "too many arguments for 'call <file>'");
 }
 
 
@@ -220,6 +236,7 @@ expand_call_args(void)
  * (2) the "call" command, arguments are substituted for $0, $1, etc.
  * (3) on program entry to load initialization files (acts like "load")
  * (4) to execute script files given on the command line (acts like "load")
+ * (5) to execute a single script file given with -c (acts like "call")
  */
 void
 load_file(FILE *fp, char *name, int calltype)
@@ -229,7 +246,7 @@ load_file(FILE *fp, char *name, int calltype)
     int start, left;
     int more;
     int stop = FALSE;
-    TBOOLEAN substitute_args = (calltype == 2);
+    TBOOLEAN substitute_args = (calltype == 2 || calltype == 5);
 
     lf_push(fp, name, NULL); /* save state for errors and recursion */
 
@@ -247,12 +264,7 @@ load_file(FILE *fp, char *name, int calltype)
     }
 
     /* We actually will read from a file */
-    if (calltype == 2) {
-	prepare_call();
-	lf_head->c_token = c_token; /* update after prepare_call() */
-    } else {
-	call_argc = 0;
-    }
+    prepare_call(calltype);
 
     /* things to do after lf_push */
     inline_num = 0;

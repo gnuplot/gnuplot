@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot.c,v 1.152 2013/09/07 17:02:03 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot.c,v 1.153 2013/09/08 17:20:20 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot.c */
@@ -451,7 +451,7 @@ main(int argc, char **argv)
 	if (!stricmp(argv[i], "/noend"))
 	    continue;
 # endif
-	if ((argv[i][0] != '-') || (argv[i][1] == 'e')) {
+	if ((argv[i][0] != '-') || (argv[i][1] == 'e') || (argv[i][1] == 'c') ) {
 	    interactive = FALSE;
 	    break;
 	}
@@ -611,6 +611,25 @@ main(int argc, char **argv)
 	    } else if (!strncmp(*argv, "-d", 2) || !strcmp(*argv, "--default-settings")) {
 		/* Ignore this; it already had its effect */
 		FPRINTF((stderr, "ignoring -d\n"));
+
+	    } else if (strcmp(*argv, "-c") == 0) {
+		/* Pass command line arguments to the gnuplot script in the next
+		 * argument. This consumes the remainder of the command line
+		 */
+		interactive = FALSE;
+		noinputfiles = FALSE;
+		--argc; ++argv;
+		if (argc <= 0) {
+		    fprintf(stderr, "syntax:  gnuplot -c scriptname args\n");
+		    exit(EXIT_FAILURE);
+		}
+		for (i=0; i<argc; i++)
+		    /* Need to stash argv[i] somewhere visible to load_file() */
+		    call_args[i] = gp_strdup(argv[i+1]);
+		call_argc = argc - 1;
+
+		load_file(loadpath_fopen(*argv, "r"), gp_strdup(*argv), 5);
+		exit(EXIT_SUCCESS);
 
 	    } else if (*argv[0] == '-') {
 		fprintf(stderr, "unrecognized option %s\n", *argv);

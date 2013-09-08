@@ -4,9 +4,17 @@
 	remove unused variables, add comments, new parameter to load_file(),
 	all in preparation for a revision to the "call" mechanism.
 
-	* scanner.c (scanner):  The syntactic entity $# (number of arguments
+	* src/scanner.c (scanner):  The syntactic entity $# (number of arguments
 	in a call statment) has been mishandled as introducing a comment since
 	sometime in version 4.5.  Trap it as a special case in the scanner.
+
+	* src/misc.c src/plot.c:  New command line option 
+	"gnuplot -c scriptfile ARG1 ARG2 ... " executes scriptfile using 
+	"call" rather "load" and passes arguments ARG1 ARG2 etc.  
+	This patch leaves the old call argument convention in place
+	$0 = ARG1,  $1 = ARG2, etc, $# = number of arguments
+	but the next patch series will introduce a more C-like convention
+	for the arguments.  Modified from an original patch by Shige Takeno.
 
 2013-09-07  Ethan A Merritt  <merritt@u.washington.edu>
 

@@ -25,6 +25,7 @@ New features, changes and fixes since gnuplot version 4.6
 * NEW i/v/V hotkeys to toggle all plots on the screen on/off
 * NEW 'set mrtics'   (minor tics on polar axis)
 * NEW 'reset session'
+* NEW gnuplot -c scriptfile ARG1 ARG2 ARG3
 * CHANGE mouse events are handled even when the program is not waiting on stdin
 * CHANGE mouse wheel and +/- keys zoom centered on current mouse position
 * CHANGE Provide kdensity bandwidth via a keyword rather than a data column
