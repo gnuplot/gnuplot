@@ -1,5 +1,5 @@
 /*
- * $Id: axis.h,v 1.84 2013/06/29 12:04:44 juhaszp Exp $
+ * $Id: axis.h,v 1.85 2013/06/30 17:48:26 sfeam Exp $
  *
  */
 
@@ -694,7 +694,7 @@ int set_cbminmax __PROTO((void));
 
 /* macro for tic scale, used in all tic_callback functions */
 #define TIC_SCALE(ticlevel, axis) \
-    (ticlevel == 0 ? axis_array[axis].ticscale : \
+    (ticlevel <= 0 ? axis_array[axis].ticscale : \
      ticlevel == 1 ? axis_array[axis].miniticscale : \
      ticlevel < MAX_TICLEVEL ? ticscale[ticlevel] : \
      0)
