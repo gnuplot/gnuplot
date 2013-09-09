@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.299 2013/08/28 19:46:51 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.300 2013/08/29 04:31:08 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -1675,7 +1675,10 @@ store_label(
     /* Check for optional (textcolor variable) */
     else if (listhead->textcolor.type == TC_VARIABLE) {
 	struct lp_style_type lptmp;
-	load_linetype(&lptmp, (int)colorval);
+	if (prefer_line_styles)
+	    lp_use_properties(&lptmp, (int)colorval);
+	else
+	    load_linetype(&lptmp, (int)colorval);
 	tl->textcolor = lptmp.pm3d_color;
     }
 
