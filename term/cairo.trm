@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: cairo.trm,v 1.51.2.3 2012/05/08 04:19:44 sfeam Exp $
+ * $Id: cairo.trm,v 1.51.2.4 2013/05/24 19:42:06 sfeam Exp $
  */
 
 /* GNUPLOT - cairo.trm */
@@ -832,10 +832,9 @@ cairostream_write(void *closure, unsigned char *data, unsigned int length)
 	return CAIRO_STATUS_SUCCESS;
 }
 
-cairo_surface_t *
-cairopng_do_crop()
+void
+cairopng_write_cropped_image(cairo_surface_t *surface)
 {
-  cairo_surface_t *surface = cairo_get_target(plot.cr);
   unsigned char *data = cairo_image_surface_get_data(surface);
   int width = cairo_image_surface_get_width(surface);
   int height = cairo_image_surface_get_height(surface);
@@ -844,10 +843,6 @@ cairopng_do_crop()
 
   guint32 *row;
   guint32 BG = (cairo_params->transparent) ? 0x0 : ~0x0;
-
-  /* return unadulterated surface if we're not cropping */
-  if (!cairo_params->crop)
-	return(surface);
 
   /* Row-wise, top-down iteration */
   for (i = 0; i < height; i++) {
@@ -900,12 +895,17 @@ cairopng_do_crop()
   cairo_surface_t *clip = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, 
   			clip_width, clip_height);
   cairo_t *clip_cr = cairo_create(clip);
-  cairo_set_source_surface(clip_cr, cairo_get_target(plot.cr),
+  cairo_set_source_surface(clip_cr, surface,
 			-GPMAX(x1 - padding / 2, 0),
 			-GPMAX(y1 - padding / 2, 0));
   cairo_rectangle(clip_cr, 0, 0, clip_width, clip_height);
   cairo_fill(clip_cr);
-  return clip;
+
+    /* Write out the clipped version of the surface and clean up */
+    cairo_surface_write_to_png_stream(clip,
+	    (cairo_write_func_t)cairostream_write, cairostream_error);
+    cairo_surface_destroy(clip);
+    cairo_destroy(clip_cr);
   }
 }
 
@@ -924,8 +924,13 @@ void cairotrm_text()
 	 * to be written */
 	cairo_show_page(plot.cr);
 	if (!strcmp(term->name,"pngcairo")) {
-		cairo_surface_write_to_png_stream(cairopng_do_crop(),
+	    cairo_surface_t *surface = cairo_get_target(plot.cr);
+	    if (cairo_params->crop) {
+		cairopng_write_cropped_image(surface);
+	    } else {
+		cairo_surface_write_to_png_stream(surface,
 			(cairo_write_func_t)cairostream_write, cairostream_error);
+	    }
 	}
 
 	FPRINTF((stderr,"status = %s\n",cairo_status_to_string(cairo_status(plot.cr))));

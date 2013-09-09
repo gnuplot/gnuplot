@@ -1,3 +1,9 @@
+2013-09-09  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/cairo.trm (cairopng_write_cropped_image):  Must free cropped image
+	and the structure that holds it, otherwise there is a memory leak.
+	Bug #1278
+
 2013-09-06  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* scanner.c (scanner):  The syntactic entity $# (number of arguments
