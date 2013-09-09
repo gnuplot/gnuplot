@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.426 2013/08/28 19:46:49 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.427 2013/08/29 04:31:08 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -4514,7 +4514,12 @@ check_for_variable_color(struct curve_points *plot, double *colorvalue)
 	return TRUE;
     } else if (plot->lp_properties.l_type == LT_COLORFROMCOLUMN) {
 	lp_style_type lptmp;
-	lp_use_properties(&lptmp, (int)(*colorvalue));
+	/* lc variable will only pick up line _style_ as opposed to _type_ */
+	/* in the case of "set style increment user".  THIS IS A CHANGE.   */
+	if (prefer_line_styles)
+	    lp_use_properties(&lptmp, (int)(*colorvalue));
+	else
+	    load_linetype(&lptmp, (int)(*colorvalue));
 	apply_pm3dcolor(&(lptmp.pm3d_color), term);
 	return TRUE;
     } else
