@@ -1,3 +1,12 @@
+2013-09-10  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* pm3d.c (set_plot_with_palette): "tc variable" was incorrectly causing
+	the color bar to be drawn by default.
+
+	* graphics.c (check_for_variable_color): "lc variable" should index the
+	line _type_ (not _style_) colors unless "set style increment user".
+	Bug #1281
+
 2013-09-09  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/cairo.trm (cairopng_write_cropped_image):  Must free cropped image
