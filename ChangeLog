@@ -7,6 +7,9 @@
 	line _type_ (not _style_) colors unless "set style increment user".
 	Bug #1281
 
+	* plot2d.c (store_label):  Same fix for "with labels tc variable".
+	Bug #1281
+
 2013-09-09  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/cairo.trm (cairopng_write_cropped_image):  Must free cropped image
