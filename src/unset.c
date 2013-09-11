@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.149.2.1 2012/08/31 17:34:26 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.149.2.2 2012/10/09 16:30:15 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -1744,6 +1744,7 @@ reset_command()
 #ifdef VOLATILE_REFRESH
     refresh_ok = 0;
 #endif
+    prefer_line_styles = FALSE;
 
     reset_hidden3doptions();
     hidden3d = FALSE;

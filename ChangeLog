@@ -1,3 +1,9 @@
+2013-09-11  Christoph Bersch <usenet@bersch.net>
+
+	* src/set.c src/unset.c: Sanity check "set style increment foo" command,
+	reset to default on "reset" command.
+	Bug #1282
+
 2013-09-10  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* pm3d.c (set_plot_with_palette): "tc variable" was incorrectly causing
