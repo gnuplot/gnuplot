@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.409 2013/08/28 19:46:52 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.410 2013/09/07 17:02:03 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -4273,6 +4273,8 @@ set_style()
 	    prefer_line_styles = FALSE;
 	else if (almost_equals(c_token,"u$serstyles"))
 	    prefer_line_styles = TRUE;
+	else
+	    int_error(c_token,"unrecognized option");
 	c_token++;
 	break;
     case SHOW_STYLE_BOXPLOT:

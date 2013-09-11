@@ -1,3 +1,9 @@
+2013-09-11  Christoph Bersch <usenet@bersch.net>
+
+	* src/set.c src/unset.c: Sanity check "set style increment foo" command,
+	reset to default on "reset" command.
+	Bug #1282
+
 2013-09-09  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/cairo.trm (cairopng_write_cropped_image): Must free cropped image

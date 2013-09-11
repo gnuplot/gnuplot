@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.181 2013/09/01 17:36:56 juhaszp Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.182 2013/09/07 17:02:04 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -1778,6 +1778,7 @@ reset_command()
 #ifdef EAM_BOXED_TEXT
     unset_textbox_style();
 #endif
+    prefer_line_styles = FALSE;
 
 #ifdef USE_MOUSE
     mouse_setting = default_mouse_setting;
