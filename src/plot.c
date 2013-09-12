@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot.c,v 1.153 2013/09/08 17:20:20 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot.c,v 1.154 2013/09/09 05:18:04 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot.c */
@@ -349,7 +349,7 @@ main(int argc, char **argv)
 	    return 0;
 
 	} else if (!strcmp(argv[i], "-h") || !strcmp(argv[i], "--help")) {
-	    printf( "Usage: gnuplot [OPTION]... [FILE]\n"
+	    printf( "Usage: gnuplot [OPTION] ... [FILE]\n"
 #ifdef X11
 		    "for X11 options see 'help X11->command-line-options'\n"
 #endif
@@ -357,6 +357,7 @@ main(int argc, char **argv)
 		    "  -h, --help\n"
 		    "  -p  --persist\n"
 		    "  -d  --default-settings\n"
+		    "  -c  scriptfile ARG1 ARG2 ... \n"
 		    "  -e  \"command1; command2; ...\"\n"
 		    "gnuplot %s patchlevel %s\n",
 		    gnuplot_version, gnuplot_patchlevel);
