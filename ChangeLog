@@ -4,6 +4,9 @@
 	that deletes all currently defined user functions. This is invoked as
 	part of "reset session".
 
+	* src/plot.c (init_constants) src/plot.h src/unset.c:  "reset session"
+	reinitializes variables NaN and pi since bad user code can clobber them.
+
 2013-09-11  Christoph Bersch <usenet@bersch.net>
 
 	* src/set.c src/unset.c: Sanity check "set style increment foo" command,

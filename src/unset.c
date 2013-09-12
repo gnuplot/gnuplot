@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.183 2013/09/11 23:37:51 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.184 2013/09/12 17:05:53 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -1627,6 +1627,7 @@ reset_command()
     /* Reset session state as well as internal graphics state */
     if (equals(c_token, "session")) {
 	clear_udf_list();
+	init_constants();
 	init_session();
 	return;
     }

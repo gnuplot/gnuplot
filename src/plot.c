@@ -417,11 +417,10 @@ main(int argc, char **argv)
     gpoutfile = stdout;
 
     /* Initialize pre-loaded user variables */
-    (void) Gcomplex(&udv_pi.udv_value, M_PI, 0.0);
+    /* "pi" is hard-wired as the first variable */
     (void) add_udv_by_name("GNUTERM");
-    udv_NaN = add_udv_by_name("NaN");
-    (void) Gcomplex(&(udv_NaN->udv_value), not_a_number(), 0.0);
-    udv_NaN->udv_undef = FALSE;
+    (void) add_udv_by_name("NaN");
+    init_constants();
     udv_user_head = &(udv_NaN->next_udv);
 
     init_memory();
@@ -692,6 +691,18 @@ interrupt_setup()
 #endif /* SIGPIPE */
 }
 
+
+/*
+ * Initialize 'constants' stored as variables (user could mangle these)
+ */
+void
+init_constants()
+{
+    (void) Gcomplex(&udv_pi.udv_value, M_PI, 0.0);
+    udv_NaN = get_udv_by_name("NaN");
+    (void) Gcomplex(&(udv_NaN->udv_value), not_a_number(), 0.0);
+    udv_NaN->udv_undef = FALSE;
+}
 
 /*
  * Initialize graphics context, color palette, local preferences.
