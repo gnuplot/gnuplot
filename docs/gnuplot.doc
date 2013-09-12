@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.823 2013/08/28 19:46:48 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.824 2013/09/07 17:02:03 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -6721,9 +6721,9 @@ Ffigure_mapcontours
  these commands can be re-executed by using the variant command `reset session`.
 
 =session
- `reset session` restores default values and then re-executes the system-wide
- gnuplotrc initialization file and any private $HOME/.gnuplot preferences file.
- See `initialization`.
+ `reset session` deletes any user-defined variables and functions, restores
+ default settings, and then re-executes the system-wide gnuplotrc initialization
+ file and any private $HOME/.gnuplot preferences file.  See `initialization`.
 
 =error state
  `reset errors` clears only the error state variables GPVAL_ERRNO and

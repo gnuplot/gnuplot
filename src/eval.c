@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: eval.c,v 1.109 2013/08/13 23:31:56 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: eval.c,v 1.110 2013/09/07 17:02:03 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - eval.c */
@@ -759,6 +759,24 @@ del_udv_by_name(char *key, TBOOLEAN wildcard)
 
 	udv_ptr = udv_ptr->next_udv;
     }
+}
+
+/* Clear (delete) all user defined functions */
+void
+clear_udf_list()
+{
+    struct udft_entry *udf_ptr = first_udf;
+    struct udft_entry *udf_next;
+
+    while (udf_ptr) {
+	free(udf_ptr->udf_name);
+	free(udf_ptr->definition);
+	free_at(udf_ptr->at);
+	udf_next = udf_ptr->next_udf;
+	free(udf_ptr);
+	udf_ptr = udf_next;
+    }
+    first_udf = NULL;
 }
 
 static void update_plot_bounds __PROTO((void));

@@ -1,3 +1,9 @@
+2013-09-12  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/eval.c (clear_udf_list) src/eval.h src/unset.c:  Provide a routine
+	that deletes all currently defined user functions. This is invoked as
+	part of "reset session".
+
 2013-09-11  Christoph Bersch <usenet@bersch.net>
 
 	* src/set.c src/unset.c: Sanity check "set style increment foo" command,
