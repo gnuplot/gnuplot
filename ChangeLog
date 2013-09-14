@@ -7,6 +7,13 @@
 	evaluation.  Now it quietly returns NaN and try_to_get_string() returns
 	FALSE.
 
+	* src/misc.c (prepare_call):  When parsing arguments to "call", treat
+	the next bit of the input line as a string if at all possible.  This
+	includes taking the contents of a string variable or evaluating the
+	result of a string expression.  Only fall back to wrapping each token
+	in quotes if this fails.  This is a CHANGE made in preparation for a
+	re-implementation of the `call` command argument passing mechanism.
+
 2013-09-12  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/eval.c (clear_udf_list) src/eval.h src/unset.c:  Provide a routine

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.159 2013/09/08 17:20:20 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.160 2013/09/09 05:18:03 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -148,11 +148,14 @@ prepare_call(int calltype)
 	/* Gnuplot "call" command can have up to 10 arguments "$0" to "$9" */
 	call_argc = 0;
 	while (!END_OF_COMMAND && call_argc <= 9) {
-	    if (isstring(c_token))
-		m_quote_capture(&call_args[call_argc++], c_token, c_token);
-	    else
-		m_capture(&call_args[call_argc++], c_token, c_token);
-	    c_token++;
+	    call_args[call_argc] = try_to_get_string();
+	    if (!call_args[call_argc]) {
+		/* DEPRECATED old style wrapping of bare tokens as strings */
+		/* is still useful for passing unquoted numbers */
+		m_capture(&call_args[call_argc], c_token, c_token);
+		c_token++;
+	    }
+	    call_argc++;
 	}
 	lf_head->c_token = c_token;
 	if (!END_OF_COMMAND)
