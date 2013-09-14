@@ -1,3 +1,12 @@
+2013-09-14  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/internal.c (f_push) src/parse.c src/parse.h src/command.c:
+	The routine try_to_get_string() was intended to safely return FALSE if
+	the current syntax cannot be evaluated as a string.  But f_push()
+	triggered a fatal error if an unrecognized token was encountered during
+	evaluation.  Now it quietly returns NaN and try_to_get_string() returns
+	FALSE.
+
 2013-09-12  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/eval.c (clear_udf_list) src/eval.h src/unset.c:  Provide a routine

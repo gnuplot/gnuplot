@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: internal.c,v 1.70 2013/08/16 23:52:14 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: internal.c,v 1.71 2013/09/14 20:24:55 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - internal.c */
@@ -39,10 +39,11 @@ static char *RCSid() { return RCSid("$Id: internal.c,v 1.70 2013/08/16 23:52:14 
 
 #include "stdfn.h"
 #include "alloc.h"
-#include "util.h"		/* for int_error() */
-#include "gp_time.h"           /* for str(p|f)time */
-#include "command.h"            /* for do_system_func */
-#include "variable.h" /* For locale handling */
+#include "util.h"	/* for int_error() */
+#include "gp_time.h"	/* for str(p|f)time */
+#include "command.h"	/* for do_system_func */
+#include "variable.h"	/* for locale handling */
+#include "parse.h"	/* for string_result_only */
 
 #include <math.h>
 
@@ -86,8 +87,12 @@ f_push(union argument *x)
     struct udvt_entry *udv;
 
     udv = x->udv_arg;
-    if (udv->udv_undef) {	/* undefined */
-	int_error(NO_CARET, "undefined variable: %s", udv->udv_name);
+    if (udv->udv_undef) {
+	if (string_result_only)
+	/* We're only here to check whether this is a string. It isn't. */
+	    udv = udv_NaN;
+	else
+	    int_error(NO_CARET, "undefined variable: %s", udv->udv_name);
     }
     push(&(udv->udv_value));
 }

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.264 2013/08/26 19:31:54 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.265 2013/09/08 17:20:20 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -421,7 +421,7 @@ do_line()
 	    } else if (equals(c_token, "}")) {
 		end_clause();
 	    } else
-		int_error(c_token, "';' expected");
+		int_error(c_token, "unexpected or unrecognized token");
 	}
     }
 

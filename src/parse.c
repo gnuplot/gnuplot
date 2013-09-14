@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: parse.c,v 1.77 2012/11/21 18:39:50 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: parse.c,v 1.78 2012/11/23 07:00:19 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - parse.c */
@@ -43,9 +43,12 @@ static char *RCSid() { return RCSid("$Id: parse.c,v 1.77 2012/11/21 18:39:50 sfe
 #include "help.h"
 #include "util.h"
 
-/* protection mechanism for parsing string followed by + or - sign */
+/* Protection mechanism for trying to parse a string followed by a + or - sign.
+ * Also suppresses an undefined variable message if an unrecognized token
+ * is encountered during try_to_get_string().
+ */
+TBOOLEAN string_result_only = FALSE;
 static int parse_recursion_level;
-static TBOOLEAN string_result_only = FALSE;
 
 /* Exported globals: the current 'dummy' variable names */
 char c_dummy_var[MAX_NUM_VAR][MAX_ID_LEN+1];
