@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: internal.c,v 1.69 2013/06/05 23:35:54 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: internal.c,v 1.70 2013/08/16 23:52:14 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - internal.c */
@@ -868,7 +868,7 @@ f_mod(union argument *arg)
     (void) pop(&a);		/* now do a%b */
 
     if (a.type != INTGR || b.type != INTGR)
-	int_error(NO_CARET, "can only mod ints");
+	int_error(NO_CARET, "non-integer operand for %%");
     if (b.v.int_val)
 	push(Ginteger(&a, a.v.int_val % b.v.int_val));
     else {
