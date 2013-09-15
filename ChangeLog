@@ -1,3 +1,14 @@
+2013-09-15  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* missing:  Current autoconf complains that our "missing" script is too
+	old.  Replace it with a version timestamped 2012-06-26.16.
+	Unfortunately I don't see how to modify this one to package or install
+	on machines without makeinfo. So...
+
+	* docs/Makefile.in:  install-info is no longer a default target.
+	You can still do "make install-info" as always if you really want it
+	and you do have makeinfo installed.
+
 2013-09-11  Christoph Bersch <usenet@bersch.net>
 
 	* src/set.c src/unset.c: Sanity check "set style increment foo" command,
@@ -26,7 +37,7 @@
 
 	* scanner.c (scanner):  The syntactic entity $# (number of arguments
 	in a call statment) has been mishandled as introducing a comment since
-	sometime in the version 4.5.  Trap it as a special case in the scanner.
+	sometime in version 4.5.  Trap it as a special case in the scanner.
 	Bugfix
 
 2013-09-05  Ethan A Merritt  <merritt@u.washington.edu>

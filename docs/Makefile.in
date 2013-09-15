@@ -449,7 +449,9 @@ checkdoc.o: checkdoc.c $(BUILT_SOURCES)
 	$(COMPILE) -DALL_TERM_DOC -c $(srcdir)/checkdoc.c
 
 # install section
-install: install-gih install-info install-pdf
+# Sep 2013 (version 4.6.4) install-info is no longer a default target
+# install: install-gih install-info install-pdf
+install: install-gih install-pdf
 
 install-gih: gnuplot.gih
 	$(top_srcdir)/mkinstalldirs $(DESTDIR)$(GIHDIR)
