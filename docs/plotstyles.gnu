@@ -229,7 +229,7 @@ set style increment user
 set style fill solid 1.0 border -1
 
 plot demo . 'histopt.dat' using 1 ti col lt 1, '' using 2 ti col fs solid lt 1
-set style increment system
+set style increment default
 #
 # Circles
 #
