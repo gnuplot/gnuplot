@@ -1,5 +1,5 @@
 /* Hey Emacs this is -*- C -*-
- * $Id: emf.trm,v 1.86 2012/12/27 22:10:47 sfeam Exp $
+ * $Id: emf.trm,v 1.78.2.7 2013/05/20 22:12:10 sfeam Exp $
  */
 
 /* GNUPLOT - emf.trm */
@@ -1487,6 +1487,10 @@ EMF_point(unsigned int x, unsigned int y, int number)
 	EMF_DeleteObject(EMF_HANDLE_BRUSH);
 	EMF_CreateBrush(EMF_HANDLE_BRUSH, 0, emf_color, 0);
 	EMF_SelectObject(EMF_HANDLE_BRUSH);
+	EMF_SelectObject(EMF_STOCK_OBJECT_BLACK_PEN);
+	EMF_DeleteObject(EMF_HANDLE_PEN);
+	EMF_CreatePen(EMF_HANDLE_PEN, emf_pentype, 1, emf_color);
+	EMF_SelectObject(EMF_HANDLE_PEN);
 	EMF_Ellipse((long)(x-emf_tic),(long)(y-emf_tic),(long)(x+emf_tic),(long)(y+emf_tic));
 	break;
     case 7:			/* draw triangle (point up) */
