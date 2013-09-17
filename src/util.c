@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: util.c,v 1.112 2013/05/08 03:35:16 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: util.c,v 1.113 2013/06/05 23:33:11 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - util.c */
@@ -87,7 +87,7 @@ equals(int t_num, const char *str)
 {
     int i;
 
-    if (t_num >= num_tokens)	/* safer to test here than to trust all callers */
+    if (t_num < 0 || t_num >= num_tokens)	/* safer to test here than to trust all callers */
 	return (FALSE);
     if (!token[t_num].is_token)
 	return (FALSE);		/* must be a value--can't be equal */
@@ -110,13 +110,17 @@ almost_equals(int t_num, const char *str)
 {
     int i;
     int after = 0;
-    int start = token[t_num].start_index;
-    int length = token[t_num].length;
+    int start, length;
 
+    if (t_num < 0 || t_num >= num_tokens)	/* safer to test here than to trust all callers */
+	return FALSE;
     if (!str)
 	return FALSE;
     if (!token[t_num].is_token)
 	return FALSE;		/* must be a value--can't be equal */
+
+    start = token[t_num].start_index;
+    length = token[t_num].length;
     for (i = 0; i < length + after; i++) {
 	if (str[i] != gp_input_line[start + i]) {
 	    if (str[i] != '$')

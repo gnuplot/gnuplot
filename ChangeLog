@@ -8,6 +8,9 @@
 	orgin with radius rmax over an asymmetric plot produced by treating the
 	data ranges on x and y independently.
 
+	* src/util.c (equals almost_equals):  Additional sanity checking of
+	c_token on entry.
+
 2013-09-14  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/internal.c (f_push) src/parse.c src/parse.h src/command.c:
