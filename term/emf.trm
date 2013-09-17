@@ -1,5 +1,5 @@
 /* Hey Emacs this is -*- C -*-
- * $Id: emf.trm,v 1.78.2.7 2013/05/20 22:12:10 sfeam Exp $
+ * $Id: emf.trm,v 1.78.2.8 2013/09/17 18:52:46 sfeam Exp $
  */
 
 /* GNUPLOT - emf.trm */
@@ -619,7 +619,7 @@ EMF_options()
 
     /* Annoying hack to handle the case of 'set termoption' after */
     /* we have already initialized the terminal.                  */
-    if (!almost_equals(c_token-1, "termopt$ion")) {
+    if (c_token != 2) {
 	term->xmax = EMF_XMAX;
 	term->ymax = EMF_YMAX;
 	emf_dashed = FALSE;
