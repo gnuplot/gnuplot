@@ -3,6 +3,11 @@
 	* term/emf.trm (EMF_point): filled circles (pointtype 7) were
 	incorrectly being drawn with a black border.
 
+	* src/plot2d.c (polar_range_fiddling):  In a polar mode plot, if x, y,
+	and r are all auto-scaled then prefer a symmetric plot centered at the
+	orgin with radius rmax over an asymmetric plot produced by treating the
+	data ranges on x and y independently.
+
 2013-09-14  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/internal.c (f_push) src/parse.c src/parse.h src/command.c:
