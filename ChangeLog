@@ -1,3 +1,8 @@
+2013-09-17  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/emf.trm (EMF_point): filled circles (pointtype 7) were
+	incorrectly being drawn with a black border.
+
 2013-09-14  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/internal.c (f_push) src/parse.c src/parse.h src/command.c:
