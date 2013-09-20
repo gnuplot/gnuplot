@@ -14,8 +14,9 @@
 	x or y tics used, or if they have not been used then nothing at all.
 	Bug #1286
 
-	* src/graphics.c (do_key_layout): If the terminal doesn't support
-	set_color() we can't background-fill an opaque key box.
+	* src/boundary.c (draw_key) src/graph3d.c (do_3dplot):
+	If the terminal doesn't support term->set_color() then we can't
+	background-fill an opaque key box.
 
 2013-09-17  Ethan A Merritt  <merritt@u.washington.edu>
 
