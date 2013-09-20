@@ -5,6 +5,11 @@
 	x or y tics used, or if they have not been used then nothing at all.
 	Bug #1286
 
+	* src/qtterminal/QtGnuplotScene.cpp(QtGnuplotScene::processEvent):
+	Revert one line of patch from 2013-05-23. typo? thinko? Anyhow it
+	can cause gnuplot_qt to freeze or terminate.
+	Bugfix
+
 2013-09-17  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/emf.trm (EMF_point): filled circles (pointtype 7) were

@@ -282,7 +282,7 @@ void QtGnuplotScene::processEvent(QtGnuplotEventType type, QDataStream& in)
 			rect.adjust(0, fullheight/1.8, 0, fullheight/4);
 			update_key_box(rect);
 		} else {
-			m_currentGroup.append(m_enhanced);
+			m_currentGroup.append(textItem);
 		}
 	}
 	else if (type == GEEnhancedFlush)
