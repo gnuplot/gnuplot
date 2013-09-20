@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.379.2.20 2013/08/08 06:45:32 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.379.2.21 2013/09/10 20:42:30 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -1349,6 +1349,7 @@ place_grid()
 	    tic_hjust = (rotate_tics == TEXT_VERTICAL) ? RIGHT : LEFT;
 	if (R_AXIS.manual_justify)
 	    tic_hjust = R_AXIS.label.pos;
+	tic_direction = 1;
 	gen_tics(POLAR_AXIS, xtick2d_callback);
 	(*t->text_angle) (0);
     }
