@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.379.2.21 2013/09/10 20:42:30 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.379.2.22 2013/09/21 03:41:57 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -6823,10 +6823,12 @@ do_key_layout(legend_key *key, TBOOLEAN key_pass, int *xinkey, int *yinkey)
 		extra_height += 0.3;
 	    adjusted_key_bot -= extra_height * t->v_char;
 	}
-	(*t->set_color)(&background_fill);
-	(*t->fillbox)(FS_OPAQUE, key->bounds.xleft, adjusted_key_bot,
-		key->bounds.xright - key->bounds.xleft,
-		key->bounds.ytop - adjusted_key_bot);
+	if (t->set_color) {
+	    (*t->set_color)(&background_fill);
+	    (*t->fillbox)(FS_OPAQUE, key->bounds.xleft, adjusted_key_bot,
+		    key->bounds.xright - key->bounds.xleft,
+		    key->bounds.ytop - adjusted_key_bot);
+	}
     }
 
     if (*key->title) {
