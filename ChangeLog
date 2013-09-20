@@ -1,3 +1,9 @@
+2013-09-20  Per Persson  <persquare@users.sourceforge.net>
+
+	* configure.in m4/apple.m4 src/term.c src/term.h:
+	Modify configuration tests to look for aquaterm as a framework rather
+	than as a library.
+
 2013-09-17  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/emf.trm (EMF_point): filled circles (pointtype 7) were

@@ -1,5 +1,5 @@
 /*
- * $Id: term.h,v 1.59 2013/04/08 22:21:05 sfeam Exp $
+ * $Id: term.h,v 1.60 2013/04/08 23:14:08 sfeam Exp $
  */
 
 /* GNUPLOT - term.h */
@@ -151,7 +151,7 @@
 */
 
 /* Apple Mac OS X */
-#ifdef HAVE_LIBAQUATERM
+#ifdef HAVE_FRAMEWORK_AQUATERM
 /* support for AquaTerm.app */
 # include "aquaterm.trm"
 #endif
