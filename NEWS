@@ -19,6 +19,7 @@ New features, changes and fixes since gnuplot version 4.6.3
 * FIX parsing of $# (the number of arguments in a "call"). It's not a comment!
 * FIX memory leak of cropped images using pngcairo terminal
 * FIX "lc variable" now iterates over linetype colors (not styles) as documented
+* FIX rtics were sometimes drawn with length 0
 
 New features, changes and fixes in gnuplot version 4.6.3
 ========================================================
