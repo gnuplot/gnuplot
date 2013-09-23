@@ -7,6 +7,9 @@
 	check for term->set_color before trying to call it.  It also makes the
 	behavior of non-RGB terminals more consistent, although still imperfect.
 
+	* src/graph3d.c src/boundary.c:  Don't try to use opaque (background)
+	fill if the terminal does not support RGB colors.
+
 	* src/graph3d.c: Always color contour lines via set_color, even for
 	terminals that do not support RGB colors.
 	Bug #1284
