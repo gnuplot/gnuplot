@@ -14,6 +14,8 @@
 	terminals that do not support RGB colors.
 	Bug #1284
 
+	* src/command.c src/graph3d.c: Set can_pm3d based on TERM_NULL_SET_COLOR
+
 2013-09-20  Per Persson  <persquare@users.sourceforge.net>
 
 	* configure.in m4/apple.m4 src/term.c src/term.h:

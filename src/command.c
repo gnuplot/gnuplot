@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.265 2013/09/08 17:20:20 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.266 2013/09/14 23:09:23 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -1917,7 +1917,7 @@ se key top right at scre 0.975,0.975 horizontal \
 title 'R,G,B profiles of the current color palette';";
     static const char post[] = "\
 \n\n\nuns multi;\n"; /* no final 'reset' in favour of mousing */
-    int can_pm3d = (term->make_palette && term->set_color);
+    int can_pm3d = (term->make_palette && ((term->flags & TERM_NULL_SET_COLOR) == 0));
     char *order = "rgb";
     char *save_replot_line;
     TBOOLEAN save_is_3d_plot;

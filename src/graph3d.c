@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.291 2013/09/23 19:09:16 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.292 2013/09/23 21:35:22 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -721,7 +721,8 @@ do_3dplot(
 
     /* Initialize palette */
     if (!quick) {
-	can_pm3d = is_plot_with_palette() && !make_palette() && term->set_color;
+	can_pm3d = is_plot_with_palette() && !make_palette()
+		   && ((term->flags & TERM_NULL_SET_COLOR) == 0);
     }
 
     /* Give a chance for rectangles to be behind everything else */
