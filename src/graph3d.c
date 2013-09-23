@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.289 2013/09/23 03:41:02 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.290 2013/09/23 18:49:03 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -1234,6 +1234,10 @@ do_3dplot(
 					this_plot->hidden3d_top_linetype + ic;
 				/* otherwise the following would be sufficient */
 				load_linetype(&ls, this_plot->hidden3d_top_linetype + ic);
+				/* FIXME: KLUDGE ALERT! This works around a bug	*/
+				/* that non-palette line colors are off by one.	*/
+				/* But why are they off by one to begin with? 	*/
+				thiscontour_lp_properties.use_palette = TRUE;
 			    }
 			    thiscontour_lp_properties.pm3d_color = ls.pm3d_color;
 			    term_apply_lp_properties(&thiscontour_lp_properties);

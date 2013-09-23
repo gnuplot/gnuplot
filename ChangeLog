@@ -7,6 +7,10 @@
 	check for term->set_color before trying to call it.  It also makes the
 	behavior of non-RGB terminals more consistent, although still imperfect.
 
+	* src/graph3d.c: Always color contour lines via set_color, even for
+	terminals that do not support RGB colors.
+	Bug #1284
+
 2013-09-20  Per Persson  <persquare@users.sourceforge.net>
 
 	* configure.in m4/apple.m4 src/term.c src/term.h:
