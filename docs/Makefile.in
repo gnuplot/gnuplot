@@ -497,6 +497,7 @@ uninstall-info:
 	  for file in $$list; do \
 	    relfile=`echo "$$file" | sed 's|^.*/||'`; \
 	    echo " install-info --info-dir=$(DESTDIR)$(infodir) --remove $(DESTDIR)$(infodir)/$$relfile"; \
+	    ! test -d $(DESTDIR)$(infodir) || ! test -e $(DESTDIR)$(infodir)/$$relfile || \
 	    install-info --info-dir=$(DESTDIR)$(infodir) --remove $(DESTDIR)$(infodir)/$$relfile; \
 	  done; \
 	else :; fi

@@ -1,3 +1,8 @@
+2013-09-23  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* docs/Makefile.in:  It is not an error if a file to be uninstalled
+	is already gone.
+
 2013-09-20  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c (place_grid):  Must initialize tic_direction when
