@@ -1,5 +1,5 @@
 /*
- * $Id: term_api.h,v 1.115 2013/08/23 18:56:32 sfeam Exp $
+ * $Id: term_api.h,v 1.116 2013/08/26 19:31:54 sfeam Exp $
  */
 
 /* GNUPLOT - term_api.h */
@@ -215,6 +215,7 @@ typedef struct t_image {
 #define TERM_FONTSCALE       (1<<12)	/* terminal supports fontscale     */
 #define TERM_IS_LATEX        (1<<13)	/* text uses TeX markup            */
 #define TERM_EXTENDED_COLOR  (1<<14)	/* uses EXTENDED_COLOR_SPECS       */
+#define TERM_NULL_SET_COLOR  (1<<15)	/* no support for RGB color        */
 
 /* The terminal interface structure --- heart of the terminal layer.
  *

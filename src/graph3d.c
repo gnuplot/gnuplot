@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.288 2013/07/03 16:17:00 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.289 2013/09/23 03:41:02 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -880,7 +880,7 @@ do_3dplot(
 
 	/* In two-pass mode, we blank out the key area after the graph	*/
 	/* is drawn and then redo the key in the blank area.		*/
-	if (key_pass && t->set_color && t->fillbox) {
+	if (key_pass && t->fillbox) {
 	    t_colorspec background_fill = BACKGROUND_COLORSPEC;
 	    (*t->set_color)(&background_fill);
 	    (*t->fillbox)(FS_OPAQUE, key->bounds.xleft, key->bounds.ybot,

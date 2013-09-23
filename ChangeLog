@@ -1,3 +1,12 @@
+2013-09-23  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/term.c (null_set_color) src/term_api.h (TERM_NULL_SET_COLOR)
+	src/boundary.c src/color.c src/gadgets.c src/graph3d.c src/graphics.c:
+	Provide a null_set_color() routine to cover all terminals that do not
+	provide their own term->set_color() routine.  This removes the need to
+	check for term->set_color before trying to call it.  It also makes the
+	behavior of non-RGB terminals more consistent, although still imperfect.
+
 2013-09-20  Per Persson  <persquare@users.sourceforge.net>
 
 	* configure.in m4/apple.m4 src/term.c src/term.h:

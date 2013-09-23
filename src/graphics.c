@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.428 2013/09/10 20:38:15 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.429 2013/09/21 03:36:33 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -542,8 +542,7 @@ do_plot(struct curve_points *plots, int pcount)
 	plot_border();
 
     /* Add back colorbox if appropriate */
-    if (is_plot_with_colorbox() && term->set_color
-	&& color_box.layer == LAYER_BACK)
+    if (is_plot_with_colorbox() && color_box.layer == LAYER_BACK)
 	    draw_color_smooth_box(MODE_PLOT);
 
     /* And rectangles */
@@ -806,8 +805,7 @@ do_plot(struct curve_points *plots, int pcount)
 	    /* we deferred point sample until now */
 	    if (this_plot->plot_style == LINESPOINTS
 	         &&  this_plot->lp_properties.p_interval < 0) {
-		if (t->set_color)
-		    (*t->set_color)(&background_fill);
+		(*t->set_color)(&background_fill);
 		(*t->pointsize)(pointsize * pointintervalbox);
 		(*t->point)(xl + key_point_offset, yl, 6);
 		term_apply_lp_properties(&this_plot->lp_properties);
@@ -876,8 +874,7 @@ do_plot(struct curve_points *plots, int pcount)
 	plot_border();
 
     /* Add front colorbox if appropriate */
-    if (is_plot_with_colorbox() && term->set_color
-	&& color_box.layer == LAYER_FRONT)
+    if (is_plot_with_colorbox() && color_box.layer == LAYER_FRONT)
 	    draw_color_smooth_box(MODE_PLOT);
 
     /* And rectangles */
@@ -2302,8 +2299,7 @@ plot_points(struct curve_points *plot)
 		/* modification to all terminal drivers. It might be worth it.  */
 		/* term_apply_lp_properties will restore the point type and size*/
 		if (plot->plot_style == LINESPOINTS && interval < 0) {
-		    if (t->set_color)
-			(*t->set_color)(&background_fill);
+		    (*t->set_color)(&background_fill);
 		    (*t->pointsize)(pointsize * pointintervalbox);
 		    (*t->point) (x, y, 6);
 		    term_apply_lp_properties(&(plot->lp_properties));
@@ -4769,7 +4765,8 @@ plot_image_or_update_axes(void *plot, TBOOLEAN update_axes)
 	/* int_warn(NO_CARET, "This terminal does not support palette-based images.\n\n"); */
 	return;
     }
-    if ((pixel_planes == IC_RGB || pixel_planes == IC_RGBA) && !term->set_color) {
+    if ((pixel_planes == IC_RGB || pixel_planes == IC_RGBA)
+    &&  ((term->flags & TERM_NULL_SET_COLOR))) {
 	/* int_warn(NO_CARET, "This terminal does not support rgb images.\n\n"); */
 	return;
     }

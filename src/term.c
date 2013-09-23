@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.264 2013/08/23 18:56:32 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.265 2013/09/20 20:39:20 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -1575,6 +1575,13 @@ null_set_font(const char *font)
     return FALSE;		/* Never used!! */
 }
 
+static void
+null_set_color(struct t_colorspec *colorspec)
+{
+    if (colorspec->type == TC_LT)
+	term->linetype(colorspec->lt);
+}
+
 /* setup the magic macros to compile in the right parts of the
  * terminal drivers included by term.h
  */
@@ -1764,6 +1771,10 @@ change_term(const char *origname, int length)
 	term->tscale = 1.0;
     if (term->set_font == 0)
 	term->set_font = null_set_font;
+    if (term->set_color == 0) {
+	term->set_color = null_set_color;
+	term->flags |= TERM_NULL_SET_COLOR;
+    }
 
     if (interactive)
 	fprintf(stderr, "Terminal type set to '%s'\n", term->name);

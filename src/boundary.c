@@ -1,5 +1,5 @@
 /*
- * $Id: boundary.c,v 1.2 2013/06/19 23:04:59 sfeam Exp $
+ * $Id: boundary.c,v 1.3 2013/09/22 21:07:46 sfeam Exp $
  */
 
 /* GNUPLOT - boundary.c */
@@ -1312,7 +1312,7 @@ draw_key(legend_key *key, TBOOLEAN key_pass, int *xinkey, int *yinkey)
 
     /* In two-pass mode (set key opaque) we blank out the key box after	*/
     /* the graph is drawn and then redo the key in the blank area.	*/
-    if (key_pass && t->set_color && t->fillbox) {
+    if (key_pass && t->fillbox) {
 	t_colorspec background_fill = BACKGROUND_COLORSPEC;
 	(*t->set_color)(&background_fill);
 	(*t->fillbox)(FS_OPAQUE, key->bounds.xleft, key->bounds.ybot,
