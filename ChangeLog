@@ -1,3 +1,8 @@
+2013-09-25  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/axis.h src/plot3d.c:  plot3d.c is the only user of NEED_PALETTE,
+	so move it there.
+
 2013-09-23  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/term.c (null_set_color) src/term_api.h (TERM_NULL_SET_COLOR)

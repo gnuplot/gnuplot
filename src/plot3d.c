@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.211 2013/05/15 20:52:45 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.212 2013/05/31 06:28:32 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -59,6 +59,20 @@ static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.211 2013/05/15 20:52:45 s
 
 #ifndef _Windows
 # include "help.h"
+#endif
+
+/* Sep 2013 - moved from axis.h in the process of doing away with it altogether */
+#if (0)	/* FIXME:  I'm 90% sure TRUE would be fine */
+#define NEED_PALETTE(plot) TRUE
+#else
+#define NEED_PALETTE(plot) \
+    (  (pm3d.implicit == PM3D_IMPLICIT) \
+    || ((plot)->plot_style == PM3DSURFACE) \
+    || ((plot)->plot_style == IMAGE) \
+    || (plot)->lp_properties.pm3d_color.type == TC_CB \
+    || (plot)->lp_properties.pm3d_color.type == TC_FRAC \
+    || (plot)->lp_properties.pm3d_color.type == TC_Z \
+    )
 #endif
 
 /* global variables exported by this module */

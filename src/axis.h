@@ -1,5 +1,5 @@
 /*
- * $Id: axis.h,v 1.85 2013/06/30 17:48:26 sfeam Exp $
+ * $Id: axis.h,v 1.86 2013/09/10 04:44:35 sfeam Exp $
  *
  */
 
@@ -685,11 +685,6 @@ void clone_linked_axes __PROTO((AXIS_INDEX axis2, AXIS_INDEX axis1));
 int map_x __PROTO((double value));
 int map_y __PROTO((double value));
 
-/* ------------ autoscaling of the color axis */
-#define NEED_PALETTE(plot) \
-   (PM3DSURFACE == (plot)->plot_style \
-    || PM3D_IMPLICIT == pm3d.implicit \
-    || 1 == (plot)->lp_properties.use_palette)
 int set_cbminmax __PROTO((void));
 
 /* macro for tic scale, used in all tic_callback functions */
