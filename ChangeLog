@@ -3,6 +3,14 @@
 	* src/axis.h src/plot3d.c:  plot3d.c is the only user of NEED_PALETTE,
 	so move it there.
 
+	* src/color.c (set_rgbcolor_var set_rgbcolor_const) src/color.h
+	src/pm3d.c src/hidden3d.c src/graphics.c src/graph3d.c:
+	Provide two parallel routines for passing RGB color information to a
+	terminal. set_rgbcolor_const sets the color immediately.
+	set_rgbcolor_var flags that this came from a plot with "rgb variable"
+	and passes it to apply_pm3dcolor for possible additional filtering
+	(e.g. decide whether to pass it to a monochrome terminal or not).
+
 2013-09-23  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/term.c (null_set_color) src/term_api.h (TERM_NULL_SET_COLOR)

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.96 2013/02/28 06:43:00 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.97 2013/09/10 20:37:52 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - pm3d.c */
@@ -409,7 +409,7 @@ void pm3d_depth_queue_flush(void)
 	for (qp = quadrangles, qe = quadrangles + current_quadrangle; qp != qe; qp++) {
 
 	    if (color_from_rgbvar)
-		set_rgbcolor(qp->gray);
+		set_rgbcolor_var(qp->gray);
 	    else
 		set_color(qp->gray);
 	    if (pm3d.hidden3d_tag < 0)
@@ -758,7 +758,7 @@ pm3d_plot(struct surface_points *this_plot, int at_which_z)
 		/* set the color */
 		if (pm3d.direction != PM3D_DEPTH) {
 		    if (color_from_rgbvar)
-			set_rgbcolor(gray);
+			set_rgbcolor_var(gray);
 		    else
 			set_color(gray);
 		}
@@ -929,7 +929,7 @@ pm3d_plot(struct surface_points *this_plot, int at_which_z)
 
 			if (pm3d.direction != PM3D_DEPTH) {
 			    if (color_from_rgbvar)
-				set_rgbcolor(gray);
+				set_rgbcolor_var(gray);
 			    else
 				set_color(gray);
 			    filled_quadrangle(corners);

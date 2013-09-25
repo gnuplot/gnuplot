@@ -1,5 +1,5 @@
 /*
- * $Id: color.h,v 1.37 2012/10/30 04:43:42 sfeam Exp $
+ * $Id: color.h,v 1.38 2013/09/07 17:02:03 sfeam Exp $
  */
 
 /* GNUPLOT - color.h */
@@ -226,13 +226,11 @@ int make_palette __PROTO((void));
 void invalidate_palette __PROTO((void));
 
 /*
-   Set the colour on the terminal
-   Currently, each terminal takes care of remembering the current colour,
-   so there is not much to do here---well, except for reversing the gray
-   according to sm_palette.positive == SMPAL_POSITIVE or SMPAL_NEGATIVE
+   Send current colour to the terminal
 */
 void set_color __PROTO(( double gray ));
-void set_rgbcolor __PROTO(( unsigned int rgbvalue ));
+void set_rgbcolor_var __PROTO(( unsigned int rgbvalue ));
+void set_rgbcolor_const __PROTO(( unsigned int rgbvalue ));
 
 void ifilled_quadrangle __PROTO((gpiPoint* icorners));
 

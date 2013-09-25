@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.292 2013/09/23 21:35:22 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.293 2013/09/24 21:50:18 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -1420,7 +1420,7 @@ plot3d_impulses(struct surface_points *plot)
 			&& plot->lp_properties.pm3d_color.value < 0.0;
 
     if (colortype == TC_RGB && !rgb_from_column)
-	set_rgbcolor(plot->lp_properties.pm3d_color.lt);
+	set_rgbcolor_const(plot->lp_properties.pm3d_color.lt);
 
     while (icrvs) {
 	struct coordinate GPHUGE *points = icrvs->points;
@@ -1526,7 +1526,7 @@ plot3d_lines(struct surface_points *plot)
 	for (i = 0, points = icrvs->points; i < icrvs->p_count; i++) {
 
 	    if (rgb_from_column)
-		set_rgbcolor((unsigned int)points[i].CRD_COLOR);
+		set_rgbcolor_var((unsigned int)points[i].CRD_COLOR);
 	    else if (plot->lp_properties.pm3d_color.type == TC_LINESTYLE) {
 		plot->lp_properties.pm3d_color.lt = (int)(points[i].CRD_COLOR);
 		apply_pm3dcolor(&(plot->lp_properties.pm3d_color), term);
@@ -1800,7 +1800,7 @@ plot3d_points(struct surface_points *plot, int p_type)
 
 	/* Apply constant color outside of the loop */
 	if (colortype == TC_RGB && !rgb_from_column)
-	    set_rgbcolor( plot->lp_properties.pm3d_color.lt );
+	    set_rgbcolor_const( plot->lp_properties.pm3d_color.lt );
 
 	for (i = 0; i < icrvs->p_count; i++) {
 	    point = &(icrvs->points[i]);
@@ -3285,7 +3285,7 @@ check_for_variable_color(struct surface_points *plot, struct coordinate *point)
     switch( colortype ) {
     case TC_RGB:
 	if (plot->pm3d_color_from_column)
-	    set_rgbcolor( (unsigned int)point->CRD_COLOR );
+	    set_rgbcolor_var( (unsigned int)point->CRD_COLOR );
 	break;
     case TC_Z:
     case TC_DEFAULT:   /* pm3d mode assumes this is default */

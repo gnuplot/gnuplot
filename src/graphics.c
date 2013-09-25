@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.429 2013/09/21 03:36:33 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.430 2013/09/23 18:49:03 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -4504,7 +4504,7 @@ check_for_variable_color(struct curve_points *plot, double *colorvalue)
 
     if ((plot->lp_properties.pm3d_color.value < 0.0)
     &&  (plot->lp_properties.pm3d_color.type == TC_RGB)) {
-	set_rgbcolor(*colorvalue);
+	set_rgbcolor_var(*colorvalue);
 	return TRUE;
     } else if (plot->lp_properties.pm3d_color.type == TC_Z) {
 	set_color( cb2gray(*colorvalue) );
@@ -5146,7 +5146,7 @@ plot_image_or_update_axes(void *plot, TBOOLEAN update_axes)
 			    int g = cb2gray(points[i_image].CRD_G) * 255. + 0.5;
 			    int b = cb2gray(points[i_image].CRD_B) * 255. + 0.5;
 			    int rgblt = (r << 16) + (g << 8) + b;
-			    set_rgbcolor(rgblt);
+			    set_rgbcolor_var(rgblt);
 			}
 			if (pixel_planes == IC_RGBA) {
 			    int alpha = points[i_image].CRD_A * 100./255.;
