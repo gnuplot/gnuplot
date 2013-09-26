@@ -1,5 +1,5 @@
 /*
- * $Id: axis.h,v 1.67 2011/11/15 20:23:43 sfeam Exp $
+ * $Id: axis.h,v 1.67.2.1 2012/09/26 23:05:56 sfeam Exp $
  *
  */
 
@@ -270,7 +270,7 @@ typedef struct axis {
 	0,        		/* zero axis position */		    \
 	FALSE, 0.0, 0.0,	/* log, base, log(base) */		    \
 	DT_NORMAL, TRUE,	/* datatype, format_numeric */	            \
-	DEF_FORMAT, TIMEFMT,	/* output format, timefmt */		    \
+	TIMEFMT, DEF_FORMAT,	/* timefmt, output format */		    \
 	NO_TICS,		/* tic output positions (border, mirror) */ \
 	DEFAULT_AXIS_TICDEF,	/* tic series definition */		    \
 	0, FALSE, FALSE, 	/* tic_rotate, grid{major,minor} */	    \
