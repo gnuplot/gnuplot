@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.293 2013/09/24 21:50:18 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.294 2013/09/25 22:21:26 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -964,7 +964,6 @@ do_3dplot(
 	     surface < pcount;
 	     this_plot = this_plot->next_sp, surface++) {
 	    /* just an abbreviation */
-	    TBOOLEAN use_palette = can_pm3d && this_plot->lp_properties.use_palette;
 	    TBOOLEAN lkey, draw_this_surface;
 
 	    /* Skip over abortive data structures */
@@ -1011,12 +1010,8 @@ do_3dplot(
 	    case SURFACEGRID:
 	    case LINES:
 		if (draw_this_surface) {
-		    if (!hidden3d || this_plot->opt_out_of_hidden3d) {
-			if (use_palette)
-			    plot3d_lines_pm3d(this_plot);
-			else
-			    plot3d_lines(this_plot);
-		    }
+		    if (!hidden3d || this_plot->opt_out_of_hidden3d)
+			plot3d_lines_pm3d(this_plot);
 		}
 		break;
 	    case YERRORLINES:	/* ignored; treat like points */
@@ -1044,10 +1039,7 @@ do_3dplot(
 	    case LINESPOINTS:
 		if (draw_this_surface) {
 		    if (!hidden3d || this_plot->opt_out_of_hidden3d) {
-			if (use_palette)
-			    plot3d_lines_pm3d(this_plot);
-			else
-			    plot3d_lines(this_plot);
+			plot3d_lines_pm3d(this_plot);
 			plot3d_points(this_plot, this_plot->lp_properties.p_type);
 		    }
 		}
@@ -1125,12 +1117,8 @@ do_3dplot(
 	    case SURFACEGRID:
 	    case LINES:
 		/* Normal case (surface) */
-		if (draw_this_surface) {
-		    if (this_plot->lp_properties.use_palette)
-			key_sample_line_pm3d(this_plot, xl, yl);
-		    else
-			key_sample_line(xl, yl);
-		}
+		if (draw_this_surface)
+		    key_sample_line_pm3d(this_plot, xl, yl);
 		/* Contour plot with no surface, all contours use the same linetype */
 		else if (this_plot->contours != NULL && clabel_onecolor) {
 		    key_sample_line(xl, yl);
@@ -1152,40 +1140,24 @@ do_3dplot(
 	    case ELLIPSES:
 #endif
 	    case POINTSTYLE:
-		if (draw_this_surface) {
-		    if (this_plot->lp_properties.use_palette)
-			key_sample_point_pm3d(this_plot, xl, yl, this_plot->lp_properties.p_type);
-		    else
-			key_sample_point(xl, yl, this_plot->lp_properties.p_type);
-		}
+		if (draw_this_surface)
+		    key_sample_point_pm3d(this_plot, xl, yl, this_plot->lp_properties.p_type);
 		break;
 
 	    case LINESPOINTS:
 		if (draw_this_surface) {
-		    if (this_plot->lp_properties.use_palette) {
-			key_sample_line_pm3d(this_plot, xl, yl);
-			key_sample_point_pm3d(this_plot, xl, yl, this_plot->lp_properties.p_type);
-		    } else {
-			key_sample_line(xl, yl);
-			key_sample_point(xl, yl, this_plot->lp_properties.p_type);
-		    }
+		    key_sample_line_pm3d(this_plot, xl, yl);
+		    key_sample_point_pm3d(this_plot, xl, yl, this_plot->lp_properties.p_type);
 		}
 		break;
 
 	    case DOTS:
-		if (draw_this_surface) {
-		    if (this_plot->lp_properties.use_palette)
-			key_sample_point_pm3d(this_plot, xl, yl, -1);
-		    else
-			key_sample_point(xl, yl, -1);
-		}
+		if (draw_this_surface)
+		    key_sample_point_pm3d(this_plot, xl, yl, -1);
 		break;
 
 	    case VECTOR:
-		if (this_plot->lp_properties.use_palette)
-		    key_sample_line_pm3d(this_plot, xl, yl);
-		else
-		    key_sample_line(xl, yl);
+		key_sample_line_pm3d(this_plot, xl, yl);
 		break;
 
 	    case PLOT_STYLE_NONE:
@@ -1218,13 +1190,12 @@ do_3dplot(
 			    (*t->linetype)(LT_BLACK);
 			    key_text(xl, yl, cntrs->label);
 			}
-			if (use_palette && thiscontour_lp_properties.pm3d_color.type == TC_Z)
+			if (thiscontour_lp_properties.pm3d_color.type == TC_Z)
 			    set_color( cb2gray( z2cb(cntrs->z) ) );
 			else {
 			    struct lp_style_type ls = thiscontour_lp_properties;
 			    if (thiscontour_lp_properties.l_type == LT_COLORFROMCOLUMN) {
 		    		thiscontour_lp_properties.l_type = 0;
-				thiscontour_lp_properties.use_palette = TRUE;
 			    }
 			    ic++;	/* Increment linetype used for contour */
 			    if (prefer_line_styles) {
@@ -1235,10 +1206,6 @@ do_3dplot(
 					this_plot->hidden3d_top_linetype + ic;
 				/* otherwise the following would be sufficient */
 				load_linetype(&ls, this_plot->hidden3d_top_linetype + ic);
-				/* FIXME: KLUDGE ALERT! This works around a bug	*/
-				/* that non-palette line colors are off by one.	*/
-				/* But why are they off by one to begin with? 	*/
-				thiscontour_lp_properties.use_palette = TRUE;
 			    }
 			    thiscontour_lp_properties.pm3d_color = ls.pm3d_color;
 			    term_apply_lp_properties(&thiscontour_lp_properties);
@@ -1636,6 +1603,9 @@ plot3d_lines_pm3d(struct surface_points *plot)
     /* If plot really uses RGB rather than pm3d colors, let plot3d_lines take over */
     if (plot->lp_properties.pm3d_color.type == TC_RGB) {
 	apply_pm3dcolor(&(plot->lp_properties.pm3d_color), term);
+	plot3d_lines(plot);
+	return;
+    } else if (plot->lp_properties.pm3d_color.type == TC_LT) {
 	plot3d_lines(plot);
 	return;
     } else if (plot->lp_properties.pm3d_color.type == TC_LINESTYLE) {
@@ -3289,7 +3259,7 @@ check_for_variable_color(struct surface_points *plot, struct coordinate *point)
 	break;
     case TC_Z:
     case TC_DEFAULT:   /* pm3d mode assumes this is default */
-	if (can_pm3d && plot->lp_properties.use_palette) {
+	if (can_pm3d) {
 	    if (plot->pm3d_color_from_column)
 		set_color( cb2gray(point->CRD_COLOR) );
 	    else

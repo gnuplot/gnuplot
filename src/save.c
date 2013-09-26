@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.229 2013/08/28 21:37:58 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.230 2013/09/26 21:24:21 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -242,10 +242,8 @@ set bar %f %s\n",
     fprintf(fp, "set style rectangle %s fc ",
 	    default_rectangle.layer > 0 ? "front" :
 	    default_rectangle.layer < 0 ? "behind" : "back");
-    if (default_rectangle.lp_properties.use_palette)
-	save_pm3dcolor(fp, &default_rectangle.lp_properties.pm3d_color);
-    else
-	fprintf(fp, "lt %d",default_rectangle.lp_properties.l_type+1);
+    /* FIXME: broke with removal of use_palette? */
+    save_pm3dcolor(fp, &default_rectangle.lp_properties.pm3d_color);
     fprintf(fp, " fillstyle ");
     save_fillstyle(fp, &default_rectangle.fillstyle);
 
@@ -1416,7 +1414,7 @@ save_linetype(FILE *fp, lp_style_type *lp, TBOOLEAN show_point)
 {
 
     fprintf(fp, " linetype %d", lp->l_type + 1);
-    if (lp->use_palette) {
+    if (TRUE) { /* FIXME: Broke with removal of use_palette? */
 	fprintf(fp, " linecolor");
 	if (lp->pm3d_color.type == TC_LT)
     	    fprintf(fp, " %d", lp->pm3d_color.lt+1);
@@ -1572,10 +1570,8 @@ save_object(FILE *fp, int tag)
 	fprintf(fp, "fc ");
 	if (this_object->lp_properties.l_type == LT_DEFAULT)
 		fprintf(fp,"default");
-	else if (this_object->lp_properties.use_palette)
+	else /* FIXME: Broke with removal of use_palette? */
 		save_pm3dcolor(fp, &this_object->lp_properties.pm3d_color);
-	else
-		fprintf(fp, "lt %d",this_object->lp_properties.l_type+1);
 	fprintf(fp, " fillstyle ");
 	save_fillstyle(fp, &this_object->fillstyle);
 

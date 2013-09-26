@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.430 2013/09/23 18:49:03 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.431 2013/09/25 22:21:27 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -2243,8 +2243,7 @@ plot_boxes(struct curve_points *plot, int xaxis_y)
 
 		if( t->fillbox && plot->fill_properties.border_color.type != TC_DEFAULT) {
 		    (*t->linetype)(plot->lp_properties.l_type);
-		    if (plot->lp_properties.use_palette)
-			apply_pm3dcolor(&plot->lp_properties.pm3d_color,t);
+		    apply_pm3dcolor(&plot->lp_properties.pm3d_color,t);
 		}
 
 		break;
@@ -2779,8 +2778,7 @@ plot_c_bars(struct curve_points *plot)
 	&& !( plot->fill_properties.border_color.type == TC_LT &&
 	      plot->fill_properties.border_color.lt == LT_NODRAW)) {
 		(*t->linetype)(plot->lp_properties.l_type);
-		if (plot->lp_properties.use_palette)
-		    apply_pm3dcolor(&plot->lp_properties.pm3d_color,t);
+		apply_pm3dcolor(&plot->lp_properties.pm3d_color,t);
 	}
 
 	/* variable color read from extra data column. June 2010 */
@@ -4168,7 +4166,7 @@ place_raxis()
     t_object raxis_circle = {
 	NULL, 1, 1, OBJ_CIRCLE,	/* link, tag, layer (front), object_type */
 	{FS_SOLID, 100, 0, BLACK_COLORSPEC},
-	{0, LT_BACKGROUND, 0, 0, 0.2, 0.0, FALSE, BACKGROUND_COLORSPEC},
+	{0, LT_BACKGROUND, 0, 0, 0.2, 0.0, BACKGROUND_COLORSPEC},
 	{.circle = {1, {0,0,0,0.,0.,0.}, {graph,0,0,0.02,0.,0.}, 0., 360. }}
     };
 #endif

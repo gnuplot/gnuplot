@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gadgets.c,v 1.99 2013/08/09 17:56:45 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gadgets.c,v 1.100 2013/09/23 18:49:01 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - gadgets.c */
@@ -134,10 +134,10 @@ double pointintervalbox = 1.0;
 int draw_border = 31;	/* The current settings */
 int user_border = 31;	/* What the user last set explicitly */
 int border_layer = 1;
-# define DEFAULT_BORDER_LP { 0, LT_BLACK, 0, 0, 1.0, 1.0, FALSE, BLACK_COLORSPEC }
+# define DEFAULT_BORDER_LP { 0, LT_BLACK, 0, 0, 1.0, 1.0, BLACK_COLORSPEC }
 struct lp_style_type border_lp = DEFAULT_BORDER_LP;
 const struct lp_style_type default_border_lp = DEFAULT_BORDER_LP;
-const struct lp_style_type background_lp = {0, LT_BACKGROUND, 0, 0, 1.0, 0.0, FALSE, BACKGROUND_COLORSPEC};
+const struct lp_style_type background_lp = {0, LT_BACKGROUND, 0, 0, 1.0, 0.0, BACKGROUND_COLORSPEC};
 
 /* set clip */
 TBOOLEAN clip_lines1 = TRUE;
@@ -183,6 +183,9 @@ filledcurves_opts filledcurves_opts_func = EMPTY_FILLEDCURVES_OPTS;
 
 /* Prefer line styles over plain line types */
 TBOOLEAN prefer_line_styles = FALSE;
+
+/* If current terminal claims to be monochrome, don't try to send it colors */
+#define monochrome_terminal ((t->flags & TERM_MONOCHROME) != 0)
 
 histogram_style histogram_opts = DEFAULT_HISTOGRAM_STYLE;
 
@@ -571,11 +574,14 @@ apply_pm3dcolor(struct t_colorspec *tc, const struct termentry *t)
 	return;
     }
     if (tc->type == TC_LT) {
-	t->set_color(tc);
+	if (!monochrome_terminal)
+	    t->set_color(tc);
 	return;
     }
     if (tc->type == TC_RGB) {
-	t->set_color(tc);
+	/* Monochrome terminals are still allowed to display rgb variable colors */
+	if (!monochrome_terminal || tc->value < 0)
+	    t->set_color(tc);
 	return;
     }
     if (!is_plot_with_palette()) {

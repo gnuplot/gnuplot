@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.301 2013/09/11 06:08:24 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.302 2013/09/17 21:22:03 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -1951,8 +1951,6 @@ eval_plots()
 		this_plot->plot_style = data_style;
 		this_plot->plot_smooth = SMOOTH_NONE;
 		this_plot->filledcurves_options.opt_given = 0;
-		/* default no palette */
-		this_plot->lp_properties.use_palette = 0;
 
 		/* up to MAXDATACOLS cols */
 		df_set_plot_mode(MODE_PLOT);    /* Needed for binary datafiles */
@@ -1993,8 +1991,6 @@ eval_plots()
 		this_plot->plot_type = FUNC;
 		this_plot->plot_style = func_style;
 		this_plot->filledcurves_options.opt_given = 0;
-		/* default no palette */
-		this_plot->lp_properties.use_palette = 0;
 		end_token = c_token - 1;
 	    }                   /* end of IS THIS A FILE OR A FUNC block */
 
@@ -2314,7 +2310,6 @@ eval_plots()
 			struct lp_style_type lptmp;
 			lp_parse(&lptmp, FALSE, FALSE);
 			this_plot->lp_properties.pm3d_color = lptmp.pm3d_color;
-			this_plot->lp_properties.use_palette = TRUE;
 			set_lpstyle = TRUE;
 		    }
 		    if (stored_token != c_token)
@@ -2362,7 +2357,6 @@ eval_plots()
 		this_plot->lp_properties.l_width = 1.0;
 		this_plot->lp_properties.p_type = point_num;
 		this_plot->lp_properties.p_size = pointsize;
-		this_plot->lp_properties.use_palette = 0;
 
 		/* user may prefer explicit line styles */
 		if (prefer_line_styles)
@@ -2503,8 +2497,6 @@ eval_plots()
 	    }
 
 	    /* Styles that use palette */
-	    if (this_plot->plot_style == IMAGE)
-		this_plot->lp_properties.use_palette = 1;
 
 	    /* we can now do some checks that we deferred earlier */
 

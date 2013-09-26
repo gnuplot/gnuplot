@@ -3,6 +3,25 @@
 	* src/axis.c src/axis.h src/save.c src/set.c src/stdfn.h src/unset.c:
 	Consolidate axis range flags from two fields into a single field.
 
+	* src/axis.c src/axis.h src/boundary.c src/gadgets.c src/gadgets.h
+	src/graph3d.c src/graphics.c src/hidden3d.c src/misc.c src/plot2d.c
+	src/plot3d.c src/pm3d.c src/save.c src/set.c src/show.c src/term_api.h
+	src/term.c src/util3d.c src/color.c:
+
+	Simplify the historical redundancy of color properties stored in struct
+	lp_style_type by removing the TBOOLEAN use_palette. FALSE meant generate
+	color from l_type; TRUE meant take color from t_colorspec pm3d_color.
+	Now we always use the t_colorspec.  This means that l_type refers only
+	to the dot/dash pattern, not color, so it becomes easier to map it to a
+	user-visible property "dashtype" in the future.  It also has the side
+	effect of creating a single decision point in apply_pm3dcolor() where
+	[almost] all color commands are filtered against the current terminal 
+	setting monochrome/color.  Before this, colors could slip erroneously
+	into a "monochrome" plot.  Now we limit this to an explicit set of
+	conditions, currently plots with rgbimage, rgb variable, or certain
+	user-defined color palettes.  That 3rd category is a bit loose and may
+	need to be more carefully defined.
+
 2013-09-25  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/axis.h src/plot3d.c:  plot3d.c is the only user of NEED_PALETTE,

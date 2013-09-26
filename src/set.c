@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.411 2013/09/11 23:37:51 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.412 2013/09/26 21:24:21 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -177,7 +177,7 @@ static const struct position default_offset
 	= {character, character, character, 0., 0., 0.};
 
 static lp_style_type default_hypertext_point_style
-	= {1, LT_BLACK, 4, 0, 1.0, PTSZ_DEFAULT, TRUE, {TC_RGB, 0x000000, 0.0}};
+	= {1, LT_BLACK, 4, 0, 1.0, PTSZ_DEFAULT, {TC_RGB, 0x000000, 0.0}};
 
 /******** The 'set' command ********/
 void
@@ -4032,7 +4032,6 @@ set_obj(int tag, int obj_type)
 	/* Parse the colorspec */
 	if (!got_lt) {
 	    if (equals(c_token,"fc") || almost_equals(c_token,"fillc$olor")) {
-		this_object->lp_properties.use_palette = TRUE;
 		this_object->lp_properties.l_type = LT_BLACK; /* Anything but LT_DEFAULT */
 		parse_colorspec(&this_object->lp_properties.pm3d_color, TC_FRAC);
 		if (this_object->lp_properties.pm3d_color.type == TC_DEFAULT)

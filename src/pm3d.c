@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.97 2013/09/10 20:37:52 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.98 2013/09/25 22:21:27 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - pm3d.c */
@@ -1142,10 +1142,9 @@ set_plot_with_palette(int plot_num, int plot_mode)
 	while (this_2dplot) {
 	    if (this_2dplot->plot_style == IMAGE)
 		return;
-	    if (this_2dplot->lp_properties.use_palette
-	    && (this_2dplot->lp_properties.pm3d_color.type == TC_CB
+	    if (this_2dplot->lp_properties.pm3d_color.type == TC_CB
 	    ||  this_2dplot->lp_properties.pm3d_color.type == TC_FRAC
-	    ||  this_2dplot->lp_properties.pm3d_color.type == TC_Z))
+	    ||  this_2dplot->lp_properties.pm3d_color.type == TC_Z)
 		return;
 	    if (this_2dplot->labels
 	    && (this_2dplot->labels->textcolor.type == TC_CB
@@ -1160,19 +1159,19 @@ set_plot_with_palette(int plot_num, int plot_mode)
     if (plot_mode == MODE_SPLOT) {
 	/* Any surface 'with pm3d', 'with image' or 'with line|dot palette'? */
 	while (surface++ < plot_num) {
+	    int type;
 	    if (this_3dplot->plot_style == PM3DSURFACE)
 		return;
 	    if (this_3dplot->plot_style == IMAGE)
 		return;
-	    if (this_3dplot->lp_properties.use_palette) {
-	        int type = this_3dplot->lp_properties.pm3d_color.type;
-		if (type == TC_LT || type == TC_LINESTYLE || type == TC_RGB)
-		    /* don't return yet */
-		    ;
-		else
-		    /* TC_DEFAULT: splot x with line|lp|dot palette */
-		    return;
-	    }
+
+	    type = this_3dplot->lp_properties.pm3d_color.type;
+	    if (type == TC_LT || type == TC_LINESTYLE || type == TC_RGB)
+		; /* don't return yet */
+	    else
+		/* TC_DEFAULT: splot x with line|lp|dot palette */
+		return;
+
 	    if (this_3dplot->labels &&
 		this_3dplot->labels->textcolor.type >= TC_CB)
 		return;

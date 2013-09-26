@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.304 2013/08/28 19:46:52 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.305 2013/09/07 17:02:04 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -1517,12 +1517,8 @@ show_style_rectangle()
     fprintf(stderr, "\tRectangle style is %s, fill color ",
 		default_rectangle.layer > 0 ? "front" :
 		default_rectangle.layer < 0 ? "behind" : "back");
-    if (default_rectangle.lp_properties.use_palette)
-	save_pm3dcolor(stderr, &default_rectangle.lp_properties.pm3d_color);
-    else if (default_rectangle.lp_properties.l_type == LT_BACKGROUND)
-	fprintf(stderr, "background");
-    else
-	fprintf(stderr, "lt %d",default_rectangle.lp_properties.l_type+1);
+    /* FIXME: Broke with removal of use_palette? */
+    save_pm3dcolor(stderr, &default_rectangle.lp_properties.pm3d_color);
     fprintf(stderr, ", lw %.1f ", default_rectangle.lp_properties.l_width);
     fprintf(stderr, ", fillstyle");
     save_fillstyle(stderr, &default_rectangle.fillstyle);

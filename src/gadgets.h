@@ -327,7 +327,7 @@ typedef struct {
 
 extern legend_key keyT;
 
-#define DEFAULT_KEYBOX_LP {0, LT_NODRAW, 0, 0, 1.0, PTSZ_DEFAULT, FALSE, DEFAULT_COLORSPEC}
+#define DEFAULT_KEYBOX_LP {0, LT_NODRAW, 0, 0, 1.0, PTSZ_DEFAULT, BLACK_COLORSPEC}
 
 #define DEFAULT_KEY_POSITION { graph, graph, graph, 0.9, 0.9, 0. }
 
@@ -527,24 +527,24 @@ extern fill_style_type default_fillstyle;
 extern struct object default_rectangle;
 #define DEFAULT_RECTANGLE_STYLE { NULL, -1, 0, OBJ_RECTANGLE,	\
 	{FS_SOLID, 100, 0, BLACK_COLORSPEC},   			\
-	{0, LT_BACKGROUND, 0, 0, 1.0, 0.0, FALSE, BACKGROUND_COLORSPEC}, \
+	{0, LT_BACKGROUND, 0, 0, 1.0, 0.0, BACKGROUND_COLORSPEC}, \
 	{.rectangle = {0, {0,0,0,0.,0.,0.}, {0,0,0,0.,0.,0.}, {0,0,0,0.,0.,0.}, {0,0,0,0.,0.,0.}}} }
 
 extern struct object default_circle;
 #define DEFAULT_CIRCLE_STYLE { NULL, -1, 0, OBJ_CIRCLE,       \
 	{FS_SOLID, 100, 0, BLACK_COLORSPEC},   			\
-	{0, LT_BACKGROUND, 0, 0, 1.0, 0.0, FALSE, BACKGROUND_COLORSPEC},			\
+	{0, LT_BACKGROUND, 0, 0, 1.0, 0.0, BACKGROUND_COLORSPEC},			\
 	{.circle = {1, {0,0,0,0.,0.,0.}, {graph,0,0,0.02,0.,0.}, 0., 360., TRUE }} }
 
 extern struct object default_ellipse;
 #define DEFAULT_ELLIPSE_STYLE { NULL, -1, 0, OBJ_ELLIPSE,       \
 	{FS_SOLID, 100, 0, BLACK_COLORSPEC},   			\
-	{0, LT_BACKGROUND, 0, 0, 1.0, 0.0, FALSE, BACKGROUND_COLORSPEC}, \
+	{0, LT_BACKGROUND, 0, 0, 1.0, 0.0, BACKGROUND_COLORSPEC}, \
 	{.ellipse = {ELLIPSEAXES_XY, {0,0,0,0.,0.,0.}, {graph,graph,0,0.05,0.03,0.}, 0. }} }
 
 #define DEFAULT_POLYGON_STYLE { NULL, -1, 0, OBJ_POLYGON,       \
 	{FS_SOLID, 100, 0, BLACK_COLORSPEC},   			\
-	{0, LT_BLACK, 0, 0, 1.0, 0.0, FALSE, BLACK_COLORSPEC}, \
+	{0, LT_BLACK, 0, 0, 1.0, 0.0, BLACK_COLORSPEC}, \
 	{.polygon = {0, NULL} } }
 
 #endif

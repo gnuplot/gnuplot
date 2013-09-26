@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.212 2013/05/31 06:28:32 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.213 2013/09/25 21:09:07 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -62,7 +62,8 @@ static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.212 2013/05/31 06:28:32 s
 #endif
 
 /* Sep 2013 - moved from axis.h in the process of doing away with it altogether */
-#if (0)	/* FIXME:  I'm 90% sure TRUE would be fine */
+#if (1)	/* FIXME:  I'm 99% sure TRUE is fine, i.e. NEED_PALETTE is unnecessary. */
+	/* In any event, the alternative breaks splot with rgb variable */
 #define NEED_PALETTE(plot) TRUE
 #else
 #define NEED_PALETTE(plot) \
@@ -1490,8 +1491,7 @@ eval_3dplots()
 		this_plot->title = NULL;
 	    }
 
-	    /* default line and point types, no palette */
-	    this_plot->lp_properties.use_palette = 0;
+	    /* default line and point types */
 	    this_plot->lp_properties.l_type = line_num;
 	    this_plot->lp_properties.p_type = point_num;
 
@@ -1731,7 +1731,6 @@ eval_3dplots()
 		    this_plot->lp_properties.l_width = 1.0;
 		    this_plot->lp_properties.p_type = point_num;
 		    this_plot->lp_properties.p_size = pointsize;
-		    this_plot->lp_properties.use_palette = 0;
 
 		    /* user may prefer explicit line styles */
 		    if (prefer_line_styles)
@@ -1777,8 +1776,6 @@ eval_3dplots()
 		line_num += 1 + (draw_contour != 0) + (hidden3d != 0);
 	    }
 
-	    if (this_plot->plot_style == IMAGE)
-		this_plot->lp_properties.use_palette = 1;
 	    if (this_plot->plot_style == RGBIMAGE || this_plot->plot_style == RGBA_IMAGE) {
 		if (CB_AXIS.autoscale & AUTOSCALE_MIN)
 		    CB_AXIS.min = 0;

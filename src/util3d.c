@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: util3d.c,v 1.46 2012/03/09 20:08:44 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: util3d.c,v 1.47 2012/04/17 22:42:53 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - util3d.c */
@@ -1008,32 +1008,17 @@ polyline3d_start(p_vertex v1)
 void
 polyline3d_next(p_vertex v2, struct lp_style_type *lp)
 {
-    unsigned int x1, y1;
-    unsigned int x2, y2;
-
-    /* Copied from draw3d_line(): */
-    /* FIXME HBB 20031218: hidden3d mode will still create isolated
-     * edges! */
-    if (hidden3d && draw_surface) {
+    /* FIXME HBB 20031218: hidden3d mode will still create isolated edges! */
+    if (hidden3d && draw_surface)
 	draw_line_hidden(&polyline3d_previous_vertex, v2, lp);
-	polyline3d_previous_vertex = *v2;
-	return;
-    }
-
-    /* Copied from draw3d_line_unconditional: */
-    /* If use_palette is active, polylines can't be used -->
-     * revert back to old method */
-    if (lp->use_palette) {
+    else
 	draw3d_line_unconditional(&polyline3d_previous_vertex, v2,
 				  lp, lp->pm3d_color);
-	polyline3d_previous_vertex = *v2;
-	return;
+    /* NB: There used to be a 3rd case for lines drawn with no palette colors.	*/
+    /*     That case perhaps was originally intended to mean "without pm3d",	*/
+    /*     but if so it was incorrectly written.  Anyhow it became effectively	*/
+    /*     dead code in version 4.6 so I removed it.				*/
 
-    }
-
-    TERMCOORD(&polyline3d_previous_vertex, x1, y1);
-    TERMCOORD(v2, x2, y2);
-    draw_clip_line(x1,y1,x2,y2);
     polyline3d_previous_vertex = *v2;
 }
 

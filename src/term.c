@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.265 2013/09/20 20:39:20 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.266 2013/09/23 18:49:03 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -989,13 +989,6 @@ term_apply_lp_properties(struct lp_style_type *lp)
     else
 	(*term->linetype) (lt);
 
-    /* Possibly override the linetype color with a fancier colorspec */
-    if (!lp->use_palette) {
-	if ((term->flags & TERM_MONOCHROME) != 0)
-	    return;
-	colorspec.type = TC_LT;
-	colorspec.lt = lt;
-    }
     apply_pm3dcolor(&colorspec, term);
 }
 
@@ -2982,14 +2975,6 @@ lp_use_properties(struct lp_style_type *lp, int tag)
 	if (this->tag == tag) {
 	    *lp = this->lp_properties;
 	    lp->pointflag = save_pointflag;
-	    /* FIXME - It would be nicer if this were always true already */
-	    if (!lp->use_palette) {
-		if (lp->pm3d_color.type != TC_LT || lp->pm3d_color.lt != lp->l_type)
-			FPRINTF((stderr,"lp_use_properties: uninitialized linetype %d\n",
-				lp->l_type));
-		lp->pm3d_color.type = TC_LT;
-		lp->pm3d_color.lt = lp->l_type;
-	    }
 	    return;
 	} else {
 	    this = this->next;
@@ -3016,17 +3001,8 @@ recycle:
 	if (this->tag == tag) {
 	    *lp = this->lp_properties;
 	    lp->pointflag = save_pointflag;
-	    if (term->flags & TERM_MONOCHROME) {
+	    if (term->flags & TERM_MONOCHROME)
 		lp->l_type = tag;
-		lp->use_palette = FALSE;
-		return;
-	    }
-	    /* FIXME - It would be nicer if this were always true already */
-	    if (!lp->use_palette) {
-		FPRINTF((stderr,"load_linetype: uninitialized linetype\n"));
-		lp->pm3d_color.type = TC_LT;
-		lp->pm3d_color.lt = lp->l_type;
-	    }
 	    return;
 	} else {
 	    this = this->next;

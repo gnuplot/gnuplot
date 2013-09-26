@@ -1,5 +1,5 @@
 /*
- * $Id: term_api.h,v 1.116 2013/08/26 19:31:54 sfeam Exp $
+ * $Id: term_api.h,v 1.117 2013/09/23 18:49:03 sfeam Exp $
  */
 
 /* GNUPLOT - term_api.h */
@@ -96,12 +96,11 @@ typedef struct lp_style_type {	/* contains all Line and Point properties */
     int     p_interval;		/* Every Nth point in style LINESPOINTS */
     double  l_width;
     double  p_size;
-    TBOOLEAN use_palette;
     struct t_colorspec pm3d_color;
     /* ... more to come ? */
 } lp_style_type;
 
-#define DEFAULT_LP_STYLE_TYPE {0, LT_BLACK, 0, 0, 1.0, PTSZ_DEFAULT, FALSE, DEFAULT_COLORSPEC}
+#define DEFAULT_LP_STYLE_TYPE {0, LT_BLACK, 0, 0, 1.0, PTSZ_DEFAULT, DEFAULT_COLORSPEC}
 
 typedef enum e_arrow_head {
 	NOHEAD = 0,

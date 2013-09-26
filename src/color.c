@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: color.c,v 1.108 2013/09/23 18:49:01 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: color.c,v 1.109 2013/09/25 22:21:26 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - color.c */
@@ -199,7 +199,7 @@ set_rgbcolor_const(unsigned int rgbvalue)
     color.type = TC_RGB;
     *(unsigned int *)(&color.lt) = rgbvalue;
     color.value = 0;	/* 0 flags that this is a constant color */
-    term->set_color(&color);
+    apply_pm3dcolor(&color, term);
 }
 
 void

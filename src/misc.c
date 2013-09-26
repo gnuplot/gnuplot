@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.160 2013/09/09 05:18:03 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.161 2013/09/15 00:36:09 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -860,7 +860,6 @@ lp_parse(struct lp_style_type *lp, TBOOLEAN allow_ls, TBOOLEAN allow_point)
 			break;
 		    c_token--;
 		    parse_colorspec(&(newlp.pm3d_color), TC_RGB);
-		    newlp.use_palette = 1;
 		} else
 		/* both syntaxes allowed: 'with lt pal' as well as 'with pal' */
 		if (almost_equals(c_token, "pal$ette")) {
@@ -868,7 +867,6 @@ lp_parse(struct lp_style_type *lp, TBOOLEAN allow_ls, TBOOLEAN allow_point)
 			break;
 		    c_token--;
 		    parse_colorspec(&(newlp.pm3d_color), TC_Z);
-		    newlp.use_palette = 1;
 		} else if (equals(c_token,"bgnd")) {
 		    *lp = background_lp;
 		    c_token++;
@@ -890,13 +888,11 @@ lp_parse(struct lp_style_type *lp, TBOOLEAN allow_ls, TBOOLEAN allow_point)
 		    break;
 		c_token--;
 		parse_colorspec(&(newlp.pm3d_color), TC_Z);
-		newlp.use_palette = 1;
 		continue;
 	    }
 
 	    if (equals(c_token,"lc") || almost_equals(c_token,"linec$olor")
 	    ||  equals(c_token,"fc") || almost_equals(c_token,"fillc$olor")) {
-		newlp.use_palette = 1;
 		if (set_pal++)
 		    break;
 		c_token++;
@@ -1005,7 +1001,6 @@ lp_parse(struct lp_style_type *lp, TBOOLEAN allow_ls, TBOOLEAN allow_point)
 
 	if (set_pal) {
 	    lp->pm3d_color = newlp.pm3d_color;
-	    lp->use_palette = newlp.use_palette;
 	    new_lt = LT_SINGLECOLOR;
 	}
 	if (set_lw)
