@@ -1,5 +1,5 @@
 /*
- * $Id: stdfn.h,v 1.40 2011/09/21 11:43:50 markisch Exp $
+ * $Id: stdfn.h,v 1.41 2013/05/22 19:19:38 sfeam Exp $
  */
 
 /* GNUPLOT - stdfn.h */
@@ -551,7 +551,7 @@ void          rewinddir __PROTO((DIR *));
 #endif
 
 /* HBB 20030117: new macro to simplify clipping operations in the
- * presence of possibly reverted axes */
+ * presence of possibly reversed axes */
 #ifndef cliptorange
 # define cliptorange(z,min,max)			\
     do {					\

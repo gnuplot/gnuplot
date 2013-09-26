@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.118 2013/08/08 06:45:56 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.119 2013/08/20 22:09:18 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -202,7 +202,7 @@ axis_unlog_interval(AXIS_INDEX axis, double *min, double *max, TBOOLEAN checkran
 void
 axis_revert_range(AXIS_INDEX axis)
 {
-  if ((axis_array[axis].range_is_reverted)
+  if (((axis_array[axis].range_flags & RANGE_IS_REVERSED))
   &&  (axis_array[axis].autoscale != 0)
   &&  (axis_array[axis].max > axis_array[axis].min) ) {
     double temp = axis_array[axis].min;

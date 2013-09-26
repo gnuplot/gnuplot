@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.184 2013/09/12 17:05:53 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.185 2013/09/12 21:22:07 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -1558,7 +1558,6 @@ unset_range(AXIS_INDEX axis)
     axis_array[axis].min_constraint = CONSTRAINT_NONE;
     axis_array[axis].max_constraint = CONSTRAINT_NONE;
     axis_array[axis].range_flags = 0;
-    axis_array[axis].range_is_reverted = FALSE;
 }
 
 /* process 'unset {x|y|x2|y2|z}zeroaxis' command */

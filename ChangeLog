@@ -1,3 +1,8 @@
+2013-09-26  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/axis.c src/axis.h src/save.c src/set.c src/stdfn.h src/unset.c:
+	Consolidate axis range flags from two fields into a single field.
+
 2013-09-25  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/axis.h src/plot3d.c:  plot3d.c is the only user of NEED_PALETTE,

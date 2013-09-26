@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.410 2013/09/07 17:02:03 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.411 2013/09/11 23:37:51 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -4885,10 +4885,10 @@ set_range(AXIS_INDEX axis)
 	while (!END_OF_COMMAND) {
 	    if (almost_equals(c_token, "rev$erse")) {
 		++c_token;
-		axis_array[axis].range_is_reverted = TRUE;
+		axis_array[axis].range_flags |= RANGE_IS_REVERSED;
 	    } else if (almost_equals(c_token, "norev$erse")) {
 		++c_token;
-		axis_array[axis].range_is_reverted = FALSE;
+		axis_array[axis].range_flags &= ~RANGE_IS_REVERSED;
 	    } else if (almost_equals(c_token, "wr$iteback")) {
 		++c_token;
 		axis_array[axis].range_flags |= RANGE_WRITEBACK;

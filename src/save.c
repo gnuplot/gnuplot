@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.228 2013/08/28 21:29:15 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.229 2013/08/28 21:37:58 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -1201,7 +1201,7 @@ save_range(FILE *fp, AXIS_INDEX axis)
     }
 
     fprintf(fp, " ] %sreverse %swriteback",
-	    axis_array[axis].range_is_reverted ? "" : "no",
+	    ((axis_array[axis].range_flags & RANGE_IS_REVERSED)) ? "" : "no",
 	    axis_array[axis].range_flags & RANGE_WRITEBACK ? "" : "no");
 
     if (axis_array[axis].set_autoscale && fp == stderr) {

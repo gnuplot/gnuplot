@@ -1,5 +1,5 @@
 /*
- * $Id: axis.h,v 1.86 2013/09/10 04:44:35 sfeam Exp $
+ * $Id: axis.h,v 1.87 2013/09/25 21:09:06 sfeam Exp $
  *
  */
 
@@ -203,10 +203,9 @@ typedef struct axis {
     t_autoscale set_autoscale;	/* what does 'set' think autoscale to be? */
     int range_flags;		/* flag bits about autoscale/writeback: */
     /* write auto-ed ranges back to variables for autoscale */
-#define RANGE_WRITEBACK 1
-#define RANGE_SAMPLED   2
-    /* allow auto and reversed ranges */
-    TBOOLEAN range_is_reverted;	/* range [high:low] silently reverted? */
+#define RANGE_WRITEBACK   1
+#define RANGE_SAMPLED     2
+#define RANGE_IS_REVERSED 4
     double min;			/* 'transient' axis extremal values */
     double max;
     double set_min;		/* set/show 'permanent' values */
@@ -270,7 +269,7 @@ typedef struct axis {
 
 #define DEFAULT_AXIS_STRUCT {						    \
 	AUTOSCALE_BOTH, AUTOSCALE_BOTH, /* auto, set_auto */		    \
-	0, FALSE,		/* range_flags, rev_range */		    \
+	0, 			/* range_flags for autoscaling */	    \
 	-10.0, 10.0,		/* 3 pairs of min/max for axis itself */    \
 	-10.0, 10.0,							    \
 	-10.0, 10.0,							    \
