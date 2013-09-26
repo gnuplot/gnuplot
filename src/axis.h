@@ -1,5 +1,5 @@
 /*
- * $Id: axis.h,v 1.88 2013/09/26 21:24:21 sfeam Exp $
+ * $Id: axis.h,v 1.89 2013/09/26 22:45:33 sfeam Exp $
  *
  */
 
@@ -242,9 +242,8 @@ typedef struct axis {
 /* time/date axis control */
     td_type datatype;		/* DT_NORMAL | DT_TIMEDATE | DT_DMS */
     TBOOLEAN format_is_numeric;	/* format string looks like numeric??? */
-    char timefmt[MAX_ID_LEN+1];	/* format string for input */
-    char formatstring[MAX_ID_LEN+1];
-				/* the format string for output */
+    char *formatstring;		/* the format string for output */
+    char *timefmt;		/* format string for time input */
 
 /* ticmark control variables */
     int ticmode;		/* tics on border/axis? mirrored? */
@@ -282,7 +281,7 @@ typedef struct axis {
 	FALSE, 0.0, 0.0,	/* log, base, log(base) */		    \
 	FALSE, NULL,		/* linked_to_primary, link function */      \
 	DT_NORMAL, TRUE,	/* datatype, format_numeric */	            \
-	DEF_FORMAT, TIMEFMT,	/* output format, timefmt */		    \
+	NULL, NULL,     	/* output format, timefmt */		    \
 	NO_TICS,		/* tic output positions (border, mirror) */ \
 	DEFAULT_AXIS_TICDEF,	/* tic series definition */		    \
 	0, FALSE, FALSE, 	/* tic_rotate, grid{major,minor} */	    \
@@ -625,7 +624,8 @@ do {									  \
 /* used by set.c */
 #define SET_DEFFORMAT(axis, flag_array)				\
 	if (flag_array[axis]) {					\
-	    (void) strcpy(axis_array[axis].formatstring,DEF_FORMAT);	\
+	    free(axis_array[axis].formatstring);		\
+	    axis_array[axis].formatstring = gp_strdup(DEF_FORMAT);	\
 	    axis_array[axis].format_is_numeric = 1;		\
 	}
 

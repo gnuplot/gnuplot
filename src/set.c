@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.412 2013/09/26 21:24:21 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.413 2013/09/26 22:45:33 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -1721,7 +1721,8 @@ set_format()
 
 #define SET_FORMATSTRING(axis)							\
 	if (set_for_axis[axis]) {						\
-		strncpy(axis_array[axis].formatstring, format, MAX_ID_LEN);	\
+		free(axis_array[axis].formatstring);				\
+		axis_array[axis].formatstring = gp_strdup(format);		\
 		axis_array[axis].format_is_numeric = looks_like_numeric(format);\
 	}
 	SET_FORMATSTRING(FIRST_X_AXIS);
@@ -4672,19 +4673,22 @@ set_timefmt()
     c_token++;
     if (END_OF_COMMAND) {
 	/* set all axes to default */
-	for (axis = 0; axis < AXIS_ARRAY_SIZE; axis++)
-	    strcpy(axis_array[axis].timefmt,TIMEFMT);
+	for (axis = 0; axis < AXIS_ARRAY_SIZE; axis++) {
+	    free(axis_array[axis].timefmt);
+	    axis_array[axis].timefmt = gp_strdup(TIMEFMT);
+	}
     } else {
 	if ((axis = lookup_table(axisname_tbl, c_token)) >= 0) {
 	    c_token++;
 	    newformat = try_to_get_string();
-	    if (newformat)
-		strncpy(&(axis_array[axis].timefmt[0]), newformat, MAX_ID_LEN);
+	    free(axis_array[axis].timefmt);
+	    axis_array[axis].timefmt = newformat;
 	} else {
 	    newformat = try_to_get_string();
-	    if (newformat)
-		for (axis = 0; axis < AXIS_ARRAY_SIZE; axis++)
-		    strncpy(&(axis_array[axis].timefmt[0]), newformat, MAX_ID_LEN);
+	    for (axis = 0; axis < AXIS_ARRAY_SIZE; axis++) {
+		free(axis_array[axis].timefmt);
+		axis_array[axis].timefmt = newformat;
+	    }
 	}
 	if (!newformat)
 	    int_error(c_token, "time format string expected");
@@ -5092,9 +5096,8 @@ set_tic_prop(AXIS_INDEX axis)
 		++c_token;
 		if (!((format = try_to_get_string())))
 		    int_error(c_token,"expected format");
-		strncpy(axis_array[axis].formatstring, format,
-			sizeof(axis_array[axis].formatstring));
-		free(format);
+		free(axis_array[axis].formatstring);
+		axis_array[axis].formatstring  = format;
 		axis_array[axis].format_is_numeric =
 			looks_like_numeric(axis_array[axis].formatstring);
 	    } else if (equals(c_token,"tc") ||

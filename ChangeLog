@@ -22,6 +22,9 @@
 	user-defined color palettes.  That 3rd category is a bit loose and may
 	need to be more carefully defined.
 
+	* src/axis.c src/axis.h src/set.c src/unset.c:
+	Dynamically allocate axis->formatstring and axis->timefmt.
+
 2013-09-25  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/axis.h src/plot3d.c:  plot3d.c is the only user of NEED_PALETTE,
