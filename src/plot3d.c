@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.213 2013/09/25 21:09:07 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.214 2013/09/26 22:45:33 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -1970,12 +1970,6 @@ eval_3dplots()
 	this_plot = first_3dplot;
 	c_token = begin_token;
 	plot_iterator = check_for_iteration();
-
-	/* why do attributes of this_plot matter ? */
-	/* FIXME HBB 20000501: I think they don't, actually. I'm
-	 * taking out references to has_grid_topology in this part of
-	 * the code.  It only deals with function, which always is
-	 * gridded */
 
 	if (hidden3d) {
 	    u_step = (u_max - u_min) / (iso_samples_1 - 1);
