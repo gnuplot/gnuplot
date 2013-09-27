@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.186 2013/09/26 21:24:21 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.187 2013/09/27 03:31:22 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -1496,11 +1496,11 @@ unset_timefmt()
     if (END_OF_COMMAND)
 	for (axis=0; axis < AXIS_ARRAY_SIZE; axis++) {
 	    free(axis_array[axis].timefmt);
-	    axis_array[axis].timefmt = TIMEFMT;
+	    axis_array[axis].timefmt = gp_strdup(TIMEFMT);
 	}
     else if ((axis=lookup_table(axisname_tbl, c_token)) >= 0) {
 	free(axis_array[axis].timefmt);
-	axis_array[axis].timefmt = TIMEFMT;
+	axis_array[axis].timefmt = gp_strdup(TIMEFMT);
 	c_token++;
     }
     else
