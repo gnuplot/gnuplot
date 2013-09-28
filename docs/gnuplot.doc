@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.825 2013/09/12 17:05:53 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.826 2013/09/12 23:57:42 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -10202,12 +10202,14 @@ Ffigure_missing
 ?pm3d scanorder
 ?pm3d depthorder
 ?pm3d flush
+?pm3d ftriangles
 ?depthorder
 =flush
 =scansforward
 =scansbackward
 =scansautomatic
 =depthorder
+=ftriangles
  By default the quadrangles making up a pm3d solid surface are rendered in the
  order they are encountered along the surface grid points.  This order may be
  controlled by the options `scansautomatic`|`scansforward`|`scansbackward`.
@@ -10222,7 +10224,7 @@ Ffigure_missing
 
  If two subsequent scans do not have the same number of points, the option
  `ftriangles` specifies whether color triangles are drawn at the scan tail(s)
- where there are not enough points in either of the scan. This can be used to
+ where there are not enough points in either of the scans. This can be used to
  draw a smooth map boundary.
 
  Gnuplot does not do true hidden surface removal for solid surfaces, but often
