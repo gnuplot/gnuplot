@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.379.2.22 2013/09/21 03:41:57 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.379.2.23 2013/09/22 21:00:55 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -3181,6 +3181,7 @@ plot_bars(struct curve_points *plot)
     double x1, y1, x2, y2, slope;	/* parameters for polar error bars */
     unsigned int xM, ylowM, yhighM;	/* the mapped version of above */
     unsigned int yM, xlowM, xhighM;
+    unsigned int ylowO, yhighO;		/* unclipped */
     TBOOLEAN low_inrange, high_inrange;
     int tic = ERRORBARTIC;
     double halfwidth = 0;		/* Used to calculate full box width */
@@ -3237,6 +3238,7 @@ plot_bars(struct curve_points *plot)
 	    low_inrange = inrange(ylow, Y_AXIS.min, Y_AXIS.max);
 
 	    /* compute the plot position of yhigh */
+	    yhighO = map_y(yhigh);
 	    if (high_inrange)
 		yhighM = map_y(yhigh);
 	    else if (samesign(yhigh - Y_AXIS.max, Y_AXIS.max - Y_AXIS.min))
@@ -3245,6 +3247,7 @@ plot_bars(struct curve_points *plot)
 		yhighM = map_y(Y_AXIS.min);
 
 	    /* compute the plot position of ylow */
+	    ylowO = map_y(ylow);
 	    if (low_inrange)
 		ylowM = map_y(ylow);
 	    else if (samesign(ylow - Y_AXIS.max, Y_AXIS.max - Y_AXIS.min))
@@ -3308,18 +3311,16 @@ plot_bars(struct curve_points *plot)
 		(*t->vector) (xM, yhighM);
 		if (bar_size < 0.0) {
 		    /* draw the bottom tic same width as box */
-		    (*t->move) ((unsigned int) (xlowM), ylowM);
-		    (*t->vector) ((unsigned int) (xhighM), ylowM);
+		    draw_clip_line(xlowM, ylowO, xhighM, ylowO);
 		    /* draw the top tic same width as box */
-		    (*t->move) ((unsigned int) (xlowM), yhighM);
-		    (*t->vector) ((unsigned int) (xhighM), yhighM);
+		    draw_clip_line(xlowM, yhighO, xhighM, yhighO);
 		} else if (bar_size > 0.0) {
 		    /* draw the bottom tic */
-		    (*t->move) ((unsigned int) (xM - bar_size * tic), ylowM);
-		    (*t->vector) ((unsigned int) (xM + bar_size * tic), ylowM);
+		    draw_clip_line((unsigned int)(xM - bar_size * tic), ylowO,
+				   (unsigned int)(xM + bar_size * tic), ylowO);
 		    /* draw the top tic */
-		    (*t->move) ((unsigned int) (xM - bar_size * tic), yhighM);
-		    (*t->vector) ((unsigned int) (xM + bar_size * tic), yhighM);
+		    draw_clip_line((unsigned int)(xM - bar_size * tic), yhighO,
+				   (unsigned int)(xM + bar_size * tic), yhighO);
 		}
 	    } else {
 		/* HBB 981130: see above */

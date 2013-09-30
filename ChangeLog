@@ -1,3 +1,10 @@
+2013-09-30  Josh Ovi  <joshovi@users.sourceforge.net>
+
+	* src/graphics.c (plot_bars):  y errorbar whiskers were incorrectly
+	drawn at the end of a clipped error bar.  If the error bar is clipped
+	then it should have no whisker.
+	Bug #1289
+
 2013-09-26  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/axis.h:  Fix order of axis format initializers. Fortunately
