@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.431 2013/09/25 22:21:27 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.432 2013/09/26 22:45:33 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -1757,12 +1757,10 @@ plot_bars(struct curve_points *plot)
     double x, y;		/* position of the bar */
     double ylow, yhigh;		/* the ends of the bars */
     double xlow, xhigh;
-    double x1, y1, x2, y2, slope;	/* parameters for polar error bars */
-    unsigned int xM, ylowM, yhighM;	/* the mapped version of above */
-    unsigned int yM, xlowM, xhighM;
-    TBOOLEAN low_inrange, high_inrange;
+    int xM, ylowM, yhighM;	/* the mapped version of above */
+    int yM, xlowM, xhighM;
     int tic = ERRORBARTIC;
-    double halfwidth = 0;		/* Used to calculate full box width */
+    double halfwidth = 0;	/* Used to calculate full box width */
 
     /* Limitation: no boxes with x errorbars */
 
@@ -1811,29 +1809,8 @@ plot_bars(struct curve_points *plot)
 	    /* find low and high points of bar, and check yrange */
 	    yhigh = plot->points[i].yhigh;
 	    ylow = plot->points[i].ylow;
-
-	    high_inrange = inrange(yhigh, Y_AXIS.min, Y_AXIS.max);
-	    low_inrange = inrange(ylow, Y_AXIS.min, Y_AXIS.max);
-
-	    /* compute the plot position of yhigh */
-	    if (high_inrange)
-		yhighM = map_y(yhigh);
-	    else if (samesign(yhigh - Y_AXIS.max, Y_AXIS.max - Y_AXIS.min))
-		yhighM = map_y(Y_AXIS.max);
-	    else
-		yhighM = map_y(Y_AXIS.min);
-
-	    /* compute the plot position of ylow */
-	    if (low_inrange)
-		ylowM = map_y(ylow);
-	    else if (samesign(ylow - Y_AXIS.max, Y_AXIS.max - Y_AXIS.min))
-		ylowM = map_y(Y_AXIS.max);
-	    else
-		ylowM = map_y(Y_AXIS.min);
-
-	    if (!high_inrange && !low_inrange && ylowM == yhighM)
-		/* both out of range on the same side */
-		continue;
+	    yhighM = map_y(yhigh);
+	    ylowM = map_y(ylow);
 
 	    /* find low and high points of bar, and check xrange */
 	    xhigh = plot->points[i].xhigh;
@@ -1843,28 +1820,8 @@ plot_bars(struct curve_points *plot)
 		xlowM = map_x(x-halfwidth);
 		xhighM = map_x(x+halfwidth);
 	    } else {
-		high_inrange = inrange(xhigh, X_AXIS.min, X_AXIS.max);
-		low_inrange = inrange(xlow, X_AXIS.min, X_AXIS.max);
-
-		/* compute the plot position of xhigh */
-		if (high_inrange)
-		    xhighM = map_x(xhigh);
-		else if (samesign(xhigh - X_AXIS.max, X_AXIS.max - X_AXIS.min))
-		    xhighM = map_x(X_AXIS.max);
-		else
-		    xhighM = map_x(X_AXIS.min);
-
-		/* compute the plot position of xlow */
-		if (low_inrange)
-		    xlowM = map_x(xlow);
-		else if (samesign(xlow - X_AXIS.max, X_AXIS.max - X_AXIS.min))
-		    xlowM = map_x(X_AXIS.max);
-		else
-		    xlowM = map_x(X_AXIS.min);
-
-		if (!high_inrange && !low_inrange && xlowM == xhighM)
-		    /* both out of range on the same side */
-		    continue;
+		xhighM = map_x(xhigh);
+		xlowM = map_x(xlow);
 	    }
 
 	    /* Check for variable color - June 2010 */
@@ -1880,81 +1837,53 @@ plot_bars(struct curve_points *plot)
 		(void) need_fill_border(&plot->fill_properties);
 
 	    /* by here everything has been mapped */
+	    /* EAM Sep 2013 - use draw_clip_line rather than calculating it here */
 	    if (!polar) {
-		/* HBB 981130: use Igor's routine *only* for polar errorbars */
-		(*t->move) (xM, ylowM);
 		/* draw the main bar */
-		(*t->vector) (xM, yhighM);
+		draw_clip_line(xM, ylowM, xM, yhighM);
+
 		if (bar_size < 0.0) {
 		    /* draw the bottom tic same width as box */
-		    (*t->move) ((unsigned int) (xlowM), ylowM);
-		    (*t->vector) ((unsigned int) (xhighM), ylowM);
+		    draw_clip_line(xlowM, ylowM, xhighM, ylowM);
 		    /* draw the top tic same width as box */
-		    (*t->move) ((unsigned int) (xlowM), yhighM);
-		    (*t->vector) ((unsigned int) (xhighM), yhighM);
+		    draw_clip_line(xlowM, yhighM, xhighM, yhighM);
 		} else if (bar_size > 0.0) {
 		    /* draw the bottom tic */
-		    (*t->move) ((unsigned int) (xM - bar_size * tic), ylowM);
-		    (*t->vector) ((unsigned int) (xM + bar_size * tic), ylowM);
+		    draw_clip_line((int)(xM - bar_size * tic), ylowM,
+				   (int)(xM + bar_size * tic), ylowM);
 		    /* draw the top tic */
-		    (*t->move) ((unsigned int) (xM - bar_size * tic), yhighM);
-		    (*t->vector) ((unsigned int) (xM + bar_size * tic), yhighM);
+		    draw_clip_line((int)(xM - bar_size * tic), yhighM,
+				   (int)(xM + bar_size * tic), yhighM);
 		}
-	    } else {
-		/* HBB 981130: see above */
-		/* The above has been replaced by Igor inorder to get errorbars
-		   coming out in polar mode AND to stop the bar from going
-		   through the symbol */
-		if ((xhighM - xlowM) * (xhighM - xlowM) + (yhighM - ylowM) * (yhighM - ylowM)
-		    > pointsize * tic * pointsize * tic * 4.5) {
-		    /* Only plot the error bar if it is bigger than the
-		     * symbol */
-		    /* The factor of 4.5 should strictly be 4.0, but it looks
-		     * better to drop the error bar if it is only slightly
-		     * bigger than the symbol, Igor. */
-		    if (xlowM == xhighM) {
-			(*t->move) (xM, ylowM);
-			/* draw the main bar to the symbol end */
-			(*t->vector) (xM, (unsigned int) (yM - pointsize * tic));
-			(*t->move) (xM, (unsigned int) (yM + pointsize * tic));
-			/* draw the other part of the main bar */
-			(*t->vector) (xM, yhighM);
-		    } else {
-			(*t->move) (xlowM, ylowM);
-			/* draw the main bar in polar mode. Note that here
-			 * the bar is drawn through the symbol. I tried to
-			 * fix this, but got into trouble with the two bars
-			 * (on either side of symbol) not being perfectly
-			 * parallel due to mapping considerations. Igor
-			 */
-			(*t->vector) (xhighM, yhighM);
-		    }
+	    } else { /* Polar error bars */
+		/* Draw the main bar */
+		draw_clip_line(xlowM, ylowM, xhighM, yhighM);
+
+		/* Draw the whiskers perpendicular to the main bar */
 		    if (bar_size > 0.0) {
-			/* The following attempts to ensure that the tics
-			 * are perpendicular to the error bar, Igor. */
-			/*perpendicular to the main bar */
-			slope = (xlowM * 1.0 - xhighM * 1.0) / (yhighM * 1.0 - ylowM * 1.0 + 1e-10);
-			x1 = xlowM + bar_size * tic / sqrt(1.0 + slope * slope);
-			x2 = xlowM - bar_size * tic / sqrt(1.0 + slope * slope);
-			y1 = slope * (x1 - xlowM) + ylowM;
-			y2 = slope * (x2 - xlowM) + ylowM;
+			int x1, y1, x2, y2;
+			double slope;
+
+			slope = atan2((double)(yhighM - ylowM), (double)(xhighM - xlowM));
+			x1 = xlowM - (bar_size * tic * sin(slope));
+			x2 = xlowM + (bar_size * tic * sin(slope));
+			y1 = ylowM + (bar_size * tic * cos(slope));
+			y2 = ylowM - (bar_size * tic * cos(slope));
 
 			/* draw the bottom tic */
-			(*t->move) ((unsigned int) x1, (unsigned int) y1);
-			(*t->vector) ((unsigned int) x2, (unsigned int) y2);
+			draw_clip_line(x1, y1, x2, y2);
 
-			x1 = xhighM + bar_size * tic / sqrt(1.0 + slope * slope);
-			x2 = xhighM - bar_size * tic / sqrt(1.0 + slope * slope);
-			y1 = slope * (x1 - xhighM) + yhighM;
-			y2 = slope * (x2 - xhighM) + yhighM;
+			x1 += xhighM - xlowM;
+			x2 += xhighM - xlowM;
+			y1 += yhighM - ylowM;
+			y2 += yhighM - ylowM;
 			/* draw the top tic */
-			(*t->move) ((unsigned int) x1, (unsigned int) y1);
-			(*t->vector) ((unsigned int) x2, (unsigned int) y2);
-		    }		/* if error bar is bigger than symbol */
+			draw_clip_line(x1, y1, x2, y2);
+		    }
 		}
-	    }			/* HBB 981130: see above */
-	}			/* for loop */
-    }				/* if yerrorbars OR xyerrorbars OR yerrorlines OR xyerrorlines */
+	}	/* for loop */
+    }		/* if yerrorbars OR xyerrorbars OR yerrorlines OR xyerrorlines */
+
     if ((plot->plot_style == XERRORBARS)
 	|| (plot->plot_style == XYERRORBARS)
 	|| (plot->plot_style == XERRORLINES)
@@ -1975,44 +1904,25 @@ plot_bars(struct curve_points *plot)
 	    /* find low and high points of bar, and check xrange */
 	    xhigh = plot->points[i].xhigh;
 	    xlow = plot->points[i].xlow;
-
-	    high_inrange = inrange(xhigh, X_AXIS.min, X_AXIS.max);
-	    low_inrange = inrange(xlow, X_AXIS.min, X_AXIS.max);
-
-	    /* compute the plot position of xhigh */
-	    if (high_inrange)
-		xhighM = map_x(xhigh);
-	    else if (samesign(xhigh - X_AXIS.max, X_AXIS.max - X_AXIS.min))
-		xhighM = map_x(X_AXIS.max);
-	    else
-		xhighM = map_x(X_AXIS.min);
-
-	    /* compute the plot position of xlow */
-	    if (low_inrange)
-		xlowM = map_x(xlow);
-	    else if (samesign(xlow - X_AXIS.max, X_AXIS.max - X_AXIS.min))
-		xlowM = map_x(X_AXIS.max);
-	    else
-		xlowM = map_x(X_AXIS.min);
-
-	    if (!high_inrange && !low_inrange && xlowM == xhighM)
-		/* both out of range on the same side */
-		continue;
+	    xhighM = map_x(xhigh);
+	    xlowM = map_x(xlow);
+	    /* This can happen if the x errorbar on a log-scaled X goes negative */
+	    if (plot->points[i].xlow == -VERYLARGE)
+		xlowM = map_x(GPMIN(X_AXIS.min, X_AXIS.max));
 
 	    /* Check for variable color - June 2010 */
 	    check_for_variable_color(plot, &plot->varcolor[i]);
 
 	    /* by here everything has been mapped */
-	    (*t->move) (xlowM, yM);
-	    (*t->vector) (xhighM, yM);	/* draw the main bar */
+	    draw_clip_line(xlowM, yM, xhighM, yM);
 	    if (bar_size > 0.0) {
-		(*t->move) (xlowM, (unsigned int) (yM - bar_size * tic));	/* draw the left tic */
-		(*t->vector) (xlowM, (unsigned int) (yM + bar_size * tic));
-		(*t->move) (xhighM, (unsigned int) (yM - bar_size * tic));	/* draw the right tic */
-		(*t->vector) (xhighM, (unsigned int) (yM + bar_size * tic));
+		draw_clip_line( xlowM, (int)(yM - bar_size * tic),
+				xlowM, (int)(yM + bar_size * tic));
+		draw_clip_line( xhighM, (int)(yM - bar_size * tic),
+				xhighM, (int)(yM + bar_size * tic));
 	    }
-	}			/* for loop */
-    }				/* if xerrorbars OR xyerrorbars OR xerrorlines OR xyerrorlines */
+	}	/* for loop */
+    }		/* if xerrorbars OR xyerrorbars OR xerrorlines OR xyerrorlines */
 }
 
 /* plot_boxes:

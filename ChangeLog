@@ -1,3 +1,9 @@
+2013-09-30  Ethan A Merritt  <merritt@u.washington.edu>
+
+        * src/graphics.c (plot_bars):  Draw error bars using draw_clip_line
+	rather than performing ad hoc clipping on the spot.
+	Bug #1289
+
 2013-09-26  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/axis.c src/axis.h src/save.c src/set.c src/stdfn.h src/unset.c:
