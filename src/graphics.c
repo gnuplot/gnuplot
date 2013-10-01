@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.432 2013/09/26 22:45:33 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.433 2013/10/01 04:16:32 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -1811,6 +1811,9 @@ plot_bars(struct curve_points *plot)
 	    ylow = plot->points[i].ylow;
 	    yhighM = map_y(yhigh);
 	    ylowM = map_y(ylow);
+	    /* This can happen if the y errorbar on a log-scaled Y goes negative */
+	    if (plot->points[i].ylow == -VERYLARGE)
+		ylowM = map_y(GPMIN(Y_AXIS.min, Y_AXIS.max));
 
 	    /* find low and high points of bar, and check xrange */
 	    xhigh = plot->points[i].xhigh;
