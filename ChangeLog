@@ -1,3 +1,9 @@
+2013-10-01  Christoph Bersch <usenet@bersch.net>
+
+	* src/plot2d.c (store_label):  Plots with labels should accept variable
+	color both for the label text and for the associated point symbol.
+        Bug #1281
+
 2013-09-30  Ethan A Merritt  <merritt@u.washington.edu>
 
         * src/graphics.c (plot_bars):  Draw error bars using draw_clip_line
