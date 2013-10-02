@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.434 2013/10/01 21:21:21 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.435 2013/10/02 05:08:19 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -117,8 +117,6 @@ static void place_raxis __PROTO((void));
 static void plot_steps __PROTO((struct curve_points * plot));	/* JG */
 static void plot_fsteps __PROTO((struct curve_points * plot));	/* HOE */
 static void plot_histeps __PROTO((struct curve_points * plot));	/* CAC */
-static void histeps_horizontal __PROTO((int *xl, int *yl, double x1, double x2, double y));	/* CAC */
-static void histeps_vertical __PROTO((int *xl, int *yl, double x, double y1, double y2));	/* CAC */
 
 static int edge_intersect __PROTO((struct coordinate GPHUGE * points, int i, double *ex, double *ey));
 static TBOOLEAN two_edge_intersect __PROTO((struct coordinate GPHUGE * points, int i, double *lx, double *ly));
@@ -1551,8 +1549,7 @@ static void
 plot_histeps(struct curve_points *plot)
 {
     int i;			/* point index */
-    int xl, yl;			/* cursor position in terminal coordinates */
-    struct termentry *t = term;
+    int x1m, y1m, x2m, y2m;	/* mapped coordinates */
     double x, y, xn, yn;	/* point position */
     double y_null;		/* y coordinate of histogram baseline */
     int *gl, goodcount;		/* array to hold list of valid points */
@@ -1593,19 +1590,18 @@ plot_histeps(struct curve_points *plot)
     x = (3.0 * plot->points[gl[0]].x - plot->points[gl[1]].x) / 2.0;
     y = y_null;
 
-    xl = map_x(x);
-    yl = map_y(y);
-
-    if (!clip_point(xl,yl))
-	(*t->move) (xl, yl);
-
     for (i = 0; i < goodcount - 1; i++) {	/* loop over all points except last  */
 	yn = plot->points[gl[i]].y;
 	if ((Y_AXIS.log) && yn < y_null)
 	    yn = y_null;
 	xn = (plot->points[gl[i]].x + plot->points[gl[i + 1]].x) / 2.0;
-	histeps_vertical(&xl, &yl, x, y, yn);
-	histeps_horizontal(&xl, &yl, x, xn, yn);
+
+	x1m = map_x(x);
+	x2m = map_x(xn);
+	y1m = map_y(y);
+	y2m = map_y(yn);
+	draw_clip_line(x1m, y1m, x1m, y2m);
+	draw_clip_line(x1m, y2m, x2m, y2m);
 
 	x = xn;
 	y = yn;
@@ -1613,63 +1609,17 @@ plot_histeps(struct curve_points *plot)
 
     yn = plot->points[gl[i]].y;
     xn = (3.0 * plot->points[gl[i]].x - plot->points[gl[i - 1]].x) / 2.0;
-    histeps_vertical(&xl, &yl, x, y, yn);
-    histeps_horizontal(&xl, &yl, x, xn, yn);
-    histeps_vertical(&xl, &yl, xn, yn, y_null);
+
+    x1m = map_x(x);
+    x2m = map_x(xn);
+    y1m = map_y(y);
+    y2m = map_y(yn);
+    draw_clip_line(x1m, y1m, x1m, y2m);
+    draw_clip_line(x1m, y2m, x2m, y2m);
+    draw_clip_line(x2m, y2m, x2m, map_y(y_null));
 
     free(gl);
 }
-
-/* CAC
- * Draw vertical line for the histeps routine.
- * Performs clipping.
- */
-static void
-histeps_vertical(
-    int *cur_x, int *cur_y,	/* keeps track of "cursor" position */
-    double x,
-    double y1, double y2)	/* coordinates of vertical line */
-{
-    struct termentry *t = term;
-    int xm, y1m, y2m;
-
-    xm = map_x(x);
-    y1m = map_y(y1);
-    y2m = map_y(y2);
-    if (clip_line(&xm, &y1m, &xm, &y2m)) {
-	(*t->move)(xm, y1m);
-	(*t->vector)(xm, y2m);
-	*cur_x = xm;
-	*cur_y = y2m;
-    }
-    return;
-}
-
-/* CAC
- * Draw horizontal line for the histeps routine.
- * Performs clipping.
- */
-static void
-histeps_horizontal(
-    int *cur_x, int *cur_y,	/* keeps track of "cursor" position */
-    double x1, double x2,
-    double y)			/* coordinates of vertical line */
-{
-    struct termentry *t = term;
-    int x1m, x2m, ym;
-
-    x1m = map_x(x1);
-    x2m = map_x(x2);
-    ym = map_y(y);
-    if (clip_line(&x1m, &ym, &x2m, &ym)) {
-	(*t->move)(x1m, ym);
-	(*t->vector)(x2m, ym);
-	*cur_x = x2m;
-	*cur_y = ym;
-    }
-    return;
-}
-
 
 /* plot_bars:
  * Plot the curves in ERRORBARS style
