@@ -1,5 +1,10 @@
 2013-10-02  Ethan A Merritt  <merritt@u.washington.edu>
 
+        * src/command.c (expand_1level_macros):  Never try to expand an 
+	undefined variable as a macro.
+
+2013-10-02  Ethan A Merritt  <merritt@u.washington.edu>
+
         * src/graphics.c (plot_steps plot_fsteps plot_histeps):
 	Replace 350 lines of ad hoc clipping with calls to draw_clip_line.
 
