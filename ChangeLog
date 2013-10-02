@@ -1,7 +1,10 @@
 2013-10-02  Ethan A Merritt  <merritt@u.washington.edu>
 
-        * src/graphics.c (plot_steps plot_fsteps):  Replace 300 lines of ad hoc
-	clipping with calls to draw_clip_line.
+        * src/graphics.c (plot_steps plot_fsteps plot_histeps):
+	Replace 350 lines of ad hoc clipping with calls to draw_clip_line.
+
+	* src/gadgets.c src/gadgets.h:  There are no longer any external callers
+	of clip_line(), so make it local to gadgets.
 
 2013-10-01  Christoph Bersch <usenet@bersch.net>
 

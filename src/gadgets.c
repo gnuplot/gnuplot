@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gadgets.c,v 1.100 2013/09/23 18:49:01 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gadgets.c,v 1.101 2013/09/26 22:45:33 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - gadgets.c */
@@ -143,6 +143,8 @@ const struct lp_style_type background_lp = {0, LT_BACKGROUND, 0, 0, 1.0, 0.0, BA
 TBOOLEAN clip_lines1 = TRUE;
 TBOOLEAN clip_lines2 = FALSE;
 TBOOLEAN clip_points = FALSE;
+
+static int clip_line __PROTO((int *, int *, int *, int *));
 
 /* set samples */
 int samples_1 = SAMPLES;

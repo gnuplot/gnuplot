@@ -507,7 +507,6 @@ extern int current_x11_windowid;
 void draw_clip_line __PROTO((int, int, int, int));
 void draw_clip_polygon __PROTO((int , gpiPoint *));
 void draw_clip_arrow __PROTO((int, int, int, int, int));
-int clip_line __PROTO((int *, int *, int *, int *));
 void clip_polygon __PROTO((gpiPoint *, gpiPoint *, int , int *));
 int clip_point __PROTO((unsigned int, unsigned int));
 void clip_put_text __PROTO((unsigned int, unsigned int, char *));
