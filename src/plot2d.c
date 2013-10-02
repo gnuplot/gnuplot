@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.255.2.20 2013/09/11 17:24:27 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.255.2.21 2013/10/01 18:51:22 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -1622,6 +1622,27 @@ histogram_range_fiddling(struct curve_points *plot)
     }
 }
 
+/* If the plot is in polar coordinates and the r axis range is autoscaled,
+ * we need to apply the maximum radius found to both x and y.
+ * Otherwise the autoscaling with be done separately for x and y and the 
+ * resulting plot will not be centered at the origin.
+ */
+void
+polar_range_fiddling(struct curve_points *plot)
+{
+    if (axis_array[POLAR_AXIS].set_autoscale & AUTOSCALE_MAX) {
+	double plotmax = GPMAX(axis_array[plot->x_axis].max, -axis_array[plot->x_axis].min);
+	if ((axis_array[plot->x_axis].set_autoscale & AUTOSCALE_BOTH) == AUTOSCALE_BOTH) {
+	    axis_array[plot->x_axis].max = plotmax;
+	    axis_array[plot->x_axis].min = -plotmax;
+	}
+	if ((axis_array[plot->y_axis].set_autoscale & AUTOSCALE_BOTH) == AUTOSCALE_BOTH) {
+	    axis_array[plot->y_axis].max = plotmax;
+	    axis_array[plot->y_axis].min = -plotmax;
+	}
+    }
+}
+
 /* store_label() is called by get_data for each point */
 /* This routine is exported so it can be shared by plot3d */
 void
@@ -2502,6 +2523,9 @@ eval_plots()
 			CB_AXIS.min = 0;
 		    if (CB_AXIS.autoscale & AUTOSCALE_MAX)
 			CB_AXIS.max = 255;
+		}
+		if (polar) {
+		    polar_range_fiddling(this_plot);
 		}
 
 		/* if needed, sort boxplot factors and assign tic labels to them */

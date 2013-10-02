@@ -5,6 +5,7 @@ New features, changes and fixes since gnuplot version 4.6.3
 * CHANGE treat empty fields in a csv file as "missing" rather than "bad"
 * CHANGE allow reference to more than one column header in 'using' or 'title'
 * CHANGE install-info is no longer a default "make install" target
+* CHANGE if a polar plot is autoscaled, try to place the origin at the center
 * FIX svg and canvas terminal mousing of inverted axis coordinates
 * FIX emf failed to initialize font correctly on some systems
 * FIX timedata columns can now be referred to via column(N) and column("HEAD")
