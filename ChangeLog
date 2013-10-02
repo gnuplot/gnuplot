@@ -1,3 +1,8 @@
+2013-10-02  Ethan A Merritt  <merritt@u.washington.edu>
+
+        * src/graphics.c (plot_steps plot_fsteps):  Replace 300 lines of ad hoc
+	clipping with calls to draw_clip_line.
+
 2013-10-01  Christoph Bersch <usenet@bersch.net>
 
 	* src/plot2d.c (store_label):  Plots with labels should accept variable

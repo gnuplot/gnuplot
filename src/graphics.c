@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.433 2013/10/01 04:16:32 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.434 2013/10/01 21:21:21 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -121,11 +121,7 @@ static void histeps_horizontal __PROTO((int *xl, int *yl, double x1, double x2, 
 static void histeps_vertical __PROTO((int *xl, int *yl, double x, double y1, double y2));	/* CAC */
 
 static int edge_intersect __PROTO((struct coordinate GPHUGE * points, int i, double *ex, double *ey));
-static void edge_intersect_steps __PROTO((struct coordinate GPHUGE * points, int i, double *ex, double *ey));	/* JG */
-static void edge_intersect_fsteps __PROTO((struct coordinate GPHUGE * points, int i, double *ex, double *ey));	/* HOE */
 static TBOOLEAN two_edge_intersect __PROTO((struct coordinate GPHUGE * points, int i, double *lx, double *ly));
-static TBOOLEAN two_edge_intersect_steps __PROTO((struct coordinate GPHUGE * points, int i, double *lx, double *ly));	/* JG */
-static TBOOLEAN two_edge_intersect_fsteps __PROTO((struct coordinate GPHUGE * points, int i, double *lx, double *ly));
 
 /* HBB 20010118: these should be static, but can't --- HP-UX assembler bug */
 void ytick2d_callback __PROTO((AXIS_INDEX, double place, char *text, int ticlevel, struct lp_style_type grid, struct ticmark *userlabels));
@@ -1412,107 +1408,73 @@ struct curve_points *plot)
 }
 
 
-/* XXX - JG  */
 /* plot_steps:
  * Plot the curves in STEPS or FILLSTEPS style
+ * Each new value is reached by tracing horizontally to the new x value
+ * and then up/down to the new y value.
  */
 static void
 plot_steps(struct curve_points *plot)
 {
-    int i;			/* point index */
-    int x=0, y=0;		/* point in terminal coordinates */
     struct termentry *t = term;
+    int i;				/* point index */
+    int x=0, y=0;			/* point in terminal coordinates */
     enum coord_type prev = UNDEFINED;	/* type of previous point */
-    double ex, ey;		/* an edge point */
-    double lx[2], ly[2];	/* two edge points */
-    int xprev, yprev;		/* previous point coordinates */
-    int y0;			/* baseline */
+    int xprev, yprev;			/* previous point coordinates */
+    int xleft, xright, ytop, ybot;	/* plot limits in terminal coords */
+    int y0;				/* baseline */
     int style = 0;
 
     /* EAM April 2011:  Default to lines only, but allow filled boxes */
     if ((plot->plot_style & PLOT_STYLE_HAS_FILL) && t->fillbox) {
+	double ey = 0;
 	style = style_from_fill(&plot->fill_properties);
-	if (Y_AXIS.log) {
+	if (Y_AXIS.log)
 	    ey = Y_AXIS.min;
-	} else {
-	    ey = 0;
+	else
 	    cliptorange(ey, Y_AXIS.min, Y_AXIS.max);
-	}
 	y0 = map_y(ey);
     }
+
+    xleft = map_x(X_AXIS.min);
+    xright = map_x(X_AXIS.max); 
+    ybot = map_y(Y_AXIS.min);
+    ytop = map_y(Y_AXIS.max);
 
     for (i = 0; i < plot->p_count; i++) {
 	xprev = x; yprev = y;
 
 	switch (plot->points[i].type) {
 	case INRANGE:
+	case OUTRANGE:
 		x = map_x(plot->points[i].x);
 		y = map_y(plot->points[i].y);
+		if (style)
+		    cliptorange(y, ybot, ytop);
 
-		if (prev == INRANGE) {
-		    if (style) {
-			if (yprev-y0 < 0)
-			    (*t->fillbox)(style, xprev,yprev,(x-xprev),y0-yprev);
-			else
-			    (*t->fillbox)(style, xprev,y0,(x-xprev),yprev-y0);
-		    } else {
-			(*t->vector) (x, yprev);
-			(*t->vector) (x, y);
-		    }
-		} else if (prev == OUTRANGE) {
-		    /* from outrange to inrange */
-		    if (clip_lines1) {	/* find edge intersection */
-			edge_intersect_steps(plot->points, i, &ex, &ey);
-			xprev = map_x(ex);
-			yprev = map_y(ey);
-			if (style) {
-			    if (yprev-y0 < 0)
-				(*t->fillbox)(style, xprev,yprev,(x-xprev),y0-yprev);
-			    else
-				(*t->fillbox)(style, xprev,y0,(x-xprev),yprev-y0);
-			} else {
-			    (*t->move) (xprev,yprev);
-			    (*t->vector) (x, yprev);
-			    (*t->vector) (x, y);
-			}
-		    }
-		} /* remaining case (prev == UNDEFINED) do nothing */
+		if (prev == UNDEFINED)
+		    break;
+		if (style) {
+		    /* We don't yet have a generalized draw_clip_rectangle routine */
+		    int xl = xprev;
+		    int xr = x;
 
-		(*t->move)(x, y);
-		break;
+		    cliptorange(xr, xleft, xright);
+		    cliptorange(xl, xleft, xright);
 
-	case OUTRANGE:
-		if (prev == INRANGE) {
-		    /* from inrange to outrange */
-		    if (clip_lines1) {
-			edge_intersect_steps(plot->points, i, &ex, &ey);
-			x = map_x(ex); y = map_y(ey);
-			if (style) {
-			    (*t->fillbox)(style, xprev,y0,(x-xprev),yprev-y0);
-			} else {
-			    (*t->vector) (x, yprev);
-			    (*t->vector) (x, y);
-			}
-		    }
-		} else if (prev == OUTRANGE) {
-		    /* from outrange to outrange */
-		    if (clip_lines2) {
-			if (two_edge_intersect_steps(plot->points, i, lx, ly)) {
-			    xprev = map_x(lx[0]);
-			    yprev = map_y(ly[0]);
-			    x = map_x(lx[1]);
-			    y = map_y(ly[1]);
-			    if (style) {
-				(*t->fillbox)(style, xprev,y0,(x-xprev),yprev-y0);
-			    } else {
-				(*t->move) (xprev, yprev);
-				(*t->vector) (x, yprev);
-				(*t->vector) (x, y);
-			    }
-			}
-		    }
+		    /* Entire box is out of range on x */
+		    if (xr == xl && (xr == xleft || xr == xright))
+			break;
+
+		    if (yprev - y0 < 0)
+			(*t->fillbox)(style, xl, yprev, (xr-xl), y0-yprev);
+		    else
+			(*t->fillbox)(style, xl, y0, (xr-xl), yprev-y0);
+		} else {
+		    draw_clip_line(xprev, yprev, x, yprev);
+		    draw_clip_line(x, yprev, x, y);
 		}
-		(*t->move)(x, y);
+
 		break;
 
 	default:		/* just a safety */
@@ -1523,71 +1485,35 @@ plot_steps(struct curve_points *plot)
     }
 }
 
-/* XXX - HOE  */
 /* plot_fsteps:
- * Plot the curves in STEPS style by step on forward yvalue
+ * Each new value is reached by tracing up/down to the new y value
+ * and then horizontally to the new x value.
  */
 static void
 plot_fsteps(struct curve_points *plot)
 {
     int i;			/* point index */
     int x=0, y=0;		/* point in terminal coordinates */
-    struct termentry *t = term;
-    enum coord_type prev = UNDEFINED;	/* type of previous point */
-    double ex, ey;		/* an edge point */
-    double lx[2], ly[2];	/* two edge points */
     int xprev, yprev;		/* previous point coordinates */
+    enum coord_type prev = UNDEFINED;	/* type of previous point */
 
     for (i = 0; i < plot->p_count; i++) {
 	xprev = x; yprev = y;
 
 	switch (plot->points[i].type) {
 	case INRANGE:
+	case OUTRANGE:
 		x = map_x(plot->points[i].x);
 		y = map_y(plot->points[i].y);
 
 		if (prev == INRANGE) {
-		    (*t->vector) (xprev, y);
-		    (*t->vector) (x, y);
+		    draw_clip_line(xprev, yprev, xprev, y);
+		    draw_clip_line(xprev, y, x, y);
 		} else if (prev == OUTRANGE) {
-		    /* from outrange to inrange */
-		    if (clip_lines1) {	/* find edge intersection */
-			edge_intersect_fsteps(plot->points, i, &ex, &ey);
-			xprev = map_x(ex);
-			yprev = map_y(ey);
-			(*t->move) (xprev, yprev);
-			(*t->vector) (xprev, y);
-			(*t->vector) (x, y);
-		    }
+		    draw_clip_line(xprev, yprev, xprev, y);
+		    draw_clip_line(xprev, y, x, y);
 		} /* remaining case (prev == UNDEFINED) do nothing */
 
-		(*t->move)(x, y);
-		break;
-
-	case OUTRANGE:
-		if (prev == INRANGE) {
-		    /* from inrange to outrange */
-		    if (clip_lines1) {
-			edge_intersect_fsteps(plot->points, i, &ex, &ey);
-			x = map_x(ex);  y = map_y(ey);
-			(*t->vector) (xprev, y);
-			(*t->vector) (x, y);
-		    }
-		} else if (prev == OUTRANGE) {
-		    /* from outrange to outrange */
-		    if (clip_lines2) {
-			if (two_edge_intersect_fsteps(plot->points, i, lx, ly)) {
-			    xprev = map_x(lx[0]);
-			    yprev = map_y(ly[0]);
-			    x = map_x(lx[1]);
-			    y = map_y(ly[1]);
-			    (*t->move) (xprev, yprev);
-			    (*t->vector) (xprev, y);
-			    (*t->vector) (x, y);
-			}
-		    }
-		}
-		(*t->move)(x, y);
 		break;
 
 	default:		/* just a safety */
@@ -1608,8 +1534,8 @@ static struct curve_points *histeps_current_plot;
 int
 histeps_compare(SORTFUNC_ARGS p1, SORTFUNC_ARGS p2)
 {
-    double x1=histeps_current_plot->points[*(int *)p1].x;
-    double x2=histeps_current_plot->points[*(int *)p2].x;
+    double x1 = histeps_current_plot->points[*(int *)p1].x;
+    double x2 = histeps_current_plot->points[*(int *)p2].x;
 
     if (x1 < x2)
 	return -1;
@@ -3142,225 +3068,6 @@ edge_intersect(
     return 0;
 }
 
-/* XXX - JG  */
-/* single edge intersection algorithm for "steps" curves */
-/*
- * Given two points, one inside and one outside the plot, return
- * the point where an edge of the plot intersects the line segments
- * forming the step between the two points.
- *
- * Recall that if P1 = (x1,y1) and P2 = (x2,y2), the step from
- * P1 to P2 is drawn as two line segments: (x1,y1)->(x2,y1) and
- * (x2,y1)->(x2,y2).
- */
-static void
-edge_intersect_steps(
-    struct coordinate GPHUGE *points, /* the points array */
-    int i,			/* line segment from point i-1 to point i */
-    double *ex, double *ey)	/* the point where it crosses an edge */
-{
-    /* global X_AXIS.min, X_AXIS.max, Y_AXIS.min, X_AXIS.max */
-    double ax = points[i - 1].x;
-    double ay = points[i - 1].y;
-    double bx = points[i].x;
-    double by = points[i].y;
-
-    if (points[i].type == INRANGE) {	/* from OUTRANGE to INRANG */
-	if (inrange(ay, Y_AXIS.min, Y_AXIS.max)) {
-	    *ey = ay;
-	    cliptorange(ax, X_AXIS.min, X_AXIS.max);
-	    *ex = ax;
-	} else {
-	    *ex = bx;
-	    cliptorange(ay, Y_AXIS.min, Y_AXIS.max);
-	    *ey = ay;
-	}
-    } else {			/* from INRANGE to OUTRANGE */
-	if (inrange(bx, X_AXIS.min, X_AXIS.max)) {
-	    *ex = bx;
-	    cliptorange(by, Y_AXIS.min, Y_AXIS.max);
-	    *ey = by;
-	} else {
-	    *ey = ay;
-	    cliptorange(bx, X_AXIS.min, X_AXIS.max);
-	    *ex = bx;
-	}
-    }
-    return;
-}
-
-/* XXX - HOE  */
-/* single edge intersection algorithm for "fsteps" curves */
-/* fsteps means step on forward y-value.
- * Given two points, one inside and one outside the plot, return
- * the point where an edge of the plot intersects the line segments
- * forming the step between the two points.
- *
- * Recall that if P1 = (x1,y1) and P2 = (x2,y2), the step from
- * P1 to P2 is drawn as two line segments: (x1,y1)->(x1,y2) and
- * (x1,y2)->(x2,y2).
- */
-static void
-edge_intersect_fsteps(
-    struct coordinate GPHUGE *points, /* the points array */
-    int i,			/* line segment from point i-1 to point i */
-    double *ex, double *ey)	/* the point where it crosses an edge */
-{
-    /* global X_AXIS.min, X_AXIS.max, Y_AXIS.min, X_AXIS.max */
-    double ax = points[i - 1].x;
-    double ay = points[i - 1].y;
-    double bx = points[i].x;
-    double by = points[i].y;
-
-    if (points[i].type == INRANGE) {	/* from OUTRANGE to INRANG */
-	if (inrange(ax, X_AXIS.min, X_AXIS.max)) {
-	    *ex = ax;
-	    cliptorange(ay, Y_AXIS.min, Y_AXIS.max);
-	    *ey = ay;
-	} else {
-	    *ey = by;
-	    cliptorange(bx, X_AXIS.min, X_AXIS.max);
-	    *ex = bx;
-	}
-    } else {			/* from INRANGE to OUTRANGE */
-	if (inrange(by, Y_AXIS.min, Y_AXIS.max)) {
-	    *ey = by;
-	    cliptorange(bx, X_AXIS.min, X_AXIS.max);
-	    *ex = bx;
-	} else {
-	    *ex = ax;
-	    cliptorange(by, Y_AXIS.min, Y_AXIS.max);
-	    *ey = by;
-	}
-    }
-    return;
-}
-
-/* XXX - JG  */
-/* double edge intersection algorithm for "steps" plot */
-/* Given two points, both outside the plot, return the points where an
- * edge of the plot intersects the line segments forming a step
- * by the two points. There may be zero, one, two, or an infinite number
- * of intersection points. (One means an intersection at a corner, infinite
- * means overlaying the edge itself). We return FALSE when there is nothing
- * to draw (zero intersections), and TRUE when there is something to
- * draw (the one-point case is a degenerate of the two-point case and we do
- * not distinguish it - we draw it anyway).
- *
- * Recall that if P1 = (x1,y1) and P2 = (x2,y2), the step from
- * P1 to P2 is drawn as two line segments: (x1,y1)->(x2,y1) and
- * (x2,y1)->(x2,y2).
- */
-static TBOOLEAN			/* any intersection? */
-two_edge_intersect_steps(
-    struct coordinate GPHUGE *points, /* the points array */
-    int i,			/* line segment from point i-1 to point i */
-    double *lx, double *ly)	/* lx[2], ly[2]: points where it crosses edges */
-{
-    /* global X_AXIS.min, X_AXIS.max, Y_AXIS.min, X_AXIS.max */
-    double ax = points[i - 1].x;
-    double ay = points[i - 1].y;
-    double bx = points[i].x;
-    double by = points[i].y;
-
-    if (GPMAX(ax, bx) < X_AXIS.min || GPMIN(ax, bx) > X_AXIS.max
-	|| GPMAX(ay, by) < Y_AXIS.min || GPMIN(ay, by) > Y_AXIS.max
-	|| (!inrange(ay, Y_AXIS.min, Y_AXIS.max)
-	    && !inrange(bx, X_AXIS.min, X_AXIS.max))
-	) {
-	return (FALSE);
-    } else if (inrange(ay, Y_AXIS.min, Y_AXIS.max)
-	       && inrange(bx, X_AXIS.min, X_AXIS.max)) {
-	/* corner of step inside plotspace */
-	cliptorange(ax, X_AXIS.min, X_AXIS.max);
-	*lx++ = ax;
-	*ly++ = ay;
-
-	cliptorange(by, Y_AXIS.min, Y_AXIS.max);
-	*lx = bx;
-	*ly = by;
-
-	return (TRUE);
-    } else if (inrange(ay, Y_AXIS.min, Y_AXIS.max)) {
-	/* cross plotspace in x-direction */
-	*lx++ = X_AXIS.min;
-	*ly++ = ay;
-	*lx = X_AXIS.max;
-	*ly = ay;
-	return (TRUE);
-    } else if (inrange(ax, X_AXIS.min, X_AXIS.max)) {
-	/* cross plotspace in y-direction */
-	*lx++ = bx;
-	*ly++ = Y_AXIS.min;
-	*lx = bx;
-	*ly = Y_AXIS.max;
-	return (TRUE);
-    } else
-	return (FALSE);
-}
-
-/* XXX - HOE  */
-/* double edge intersection algorithm for "fsteps" plot */
-/* Given two points, both outside the plot, return the points where an
- * edge of the plot intersects the line segments forming a step
- * by the two points. There may be zero, one, two, or an infinite number
- * of intersection points. (One means an intersection at a corner, infinite
- * means overlaying the edge itself). We return FALSE when there is nothing
- * to draw (zero intersections), and TRUE when there is something to
- * draw (the one-point case is a degenerate of the two-point case and we do
- * not distinguish it - we draw it anyway).
- *
- * Recall that if P1 = (x1,y1) and P2 = (x2,y2), the step from
- * P1 to P2 is drawn as two line segments: (x1,y1)->(x1,y2) and
- * (x1,y2)->(x2,y2).
- */
-static TBOOLEAN			/* any intersection? */
-two_edge_intersect_fsteps(
-    struct coordinate GPHUGE *points, /* the points array */
-    int i,			/* line segment from point i-1 to point i */
-    double *lx, double *ly)	/* lx[2], ly[2]: points where it crosses edges */
-{
-    /* global X_AXIS.min, X_AXIS.max, Y_AXIS.min, X_AXIS.max */
-    double ax = points[i - 1].x;
-    double ay = points[i - 1].y;
-    double bx = points[i].x;
-    double by = points[i].y;
-
-    if (GPMAX(ax, bx) < X_AXIS.min || GPMIN(ax, bx) > X_AXIS.max
-	|| GPMAX(ay, by) < Y_AXIS.min || GPMIN(ay, by) > Y_AXIS.max
-	|| (!inrange(by, Y_AXIS.min, Y_AXIS.max)
-	    && !inrange(ax, X_AXIS.min, X_AXIS.max))
-	) {
-	return (FALSE);
-    } else if (inrange(by, Y_AXIS.min, Y_AXIS.max)
-	       && inrange(ax, X_AXIS.min, X_AXIS.max)) {
-	/* corner of step inside plotspace */
-	cliptorange(ay, Y_AXIS.min, Y_AXIS.max);
-	*lx++ = ax;
-	*ly++ = ay;
-
-	cliptorange(bx, X_AXIS.min, X_AXIS.max);
-	*lx = bx;
-	*ly = by;
-
-	return (TRUE);
-    } else if (inrange(by, Y_AXIS.min, Y_AXIS.max)) {
-	/* cross plotspace in x-direction */
-	*lx++ = X_AXIS.min;
-	*ly++ = by;
-	*lx = X_AXIS.max;
-	*ly = by;
-	return (TRUE);
-    } else if (inrange(ax, X_AXIS.min, X_AXIS.max)) {
-	/* cross plotspace in y-direction */
-	*lx++ = ax;
-	*ly++ = Y_AXIS.min;
-	*lx = ax;
-	*ly = Y_AXIS.max;
-	return (TRUE);
-    } else
-	return (FALSE);
-}
 
 /* double edge intersection algorithm */
 /* Given two points, both outside the plot, return
