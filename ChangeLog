@@ -1,3 +1,13 @@
+2013-10-06  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/aquaterm.trm term/cairo.trm term/canvas.trm term/emf.trm
+	term/gd.trm term/pdf.trm term/post.trm term/svg.trm term/win.trm
+	term/wxt.trm term/x11.trm term/qt.trm src/qtterminal/qt_term.cpp:
+
+	Default to enhanced text mode in terminals that support it.
+	This mode can still be disabled by "set term FOO noenhenced" or
+	"set termoption noenhanced".
+
 2013-10-06  Craig DeForest  <deforest@boulder.swri.edu>
 
 	* src/axis.h src/util.c (gprintf) docs/gnuplot.doc:

@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: svg.trm,v 1.156 2013/05/21 20:36:46 sfeam Exp $
+ * $Id: svg.trm,v 1.157 2013/07/18 23:24:44 sfeam Exp $
  */
 
 /*------------------------------------------------------------------------------------------------------------------------------------
@@ -783,6 +783,9 @@ SVG_local_reset()
     SVG_scriptdir = NULL;
     SVG_gridline = FALSE;
     SVG_hasgrid = FALSE;
+    /* Default to enhanced text */
+    term->put_text = ENHsvg_put_text;
+    term->flags |= TERM_ENHANCED_TEXT;
 }
 
 /*------------------------------------------------------------------------------------------------------------------------------------

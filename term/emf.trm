@@ -1,5 +1,5 @@
 /* Hey Emacs this is -*- C -*-
- * $Id: emf.trm,v 1.87 2013/05/20 22:11:42 sfeam Exp $
+ * $Id: emf.trm,v 1.88 2013/09/17 18:52:25 sfeam Exp $
  */
 
 /* GNUPLOT - emf.trm */
@@ -626,6 +626,9 @@ EMF_options()
 	emf_monochrome = FALSE;
 	emf_background = 0xffffff;
 	emf_tweak = TRUE;
+	/* Default to enhanced text */
+	term->put_text = ENHemf_put_text;
+	term->flags |= TERM_ENHANCED_TEXT;
     }
 
     while (!END_OF_COMMAND) {

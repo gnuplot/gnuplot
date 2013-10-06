@@ -1,5 +1,5 @@
 /* -*- objc -*-
- * $Id: aquaterm.trm,v 1.47 2012/08/08 03:55:47 sfeam Exp $
+ * $Id: aquaterm.trm,v 1.48 2013/02/25 06:05:22 sfeam Exp $
  *
  */
 
@@ -171,6 +171,12 @@ AQUA_options()
   TBOOLEAN set_number = FALSE;
   
   AQUA_title[0] = '\0'; /* Force re-interpretation of title string */
+
+  /* Default to enhanced text mode */
+    if (!almost_equals(c_token-1, "termopt$ion")) {
+	term->put_text = ENHAQUA_put_text;
+	term->flags |= TERM_ENHANCED_TEXT;
+    }
 
   while (!END_OF_COMMAND) {
   

@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: pdf.trm,v 1.89 2012/08/30 21:15:07 sfeam Exp $
+ * $Id: pdf.trm,v 1.90 2012/11/25 22:01:22 sfeam Exp $
  */
 
 /*------------------------------
@@ -329,8 +329,12 @@ PDF_options ()
 {
     /* Annoying hack to handle the case of 'set termoption' after */
     /* we have already initialized the terminal.                  */
-    if (!almost_equals(c_token-1, "termopt$ion"))
+    if (!almost_equals(c_token-1, "termopt$ion")) {
 	pdf_explicit_size = FALSE;
+	/* Default to enhanced text */
+	term->put_text = ENHPDF_put_text;
+	term->flags |= TERM_ENHANCED_TEXT;
+    }
 
     while (!END_OF_COMMAND) {
 

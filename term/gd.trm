@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: gd.trm,v 1.171 2013/05/19 23:46:34 sfeam Exp $
+ * $Id: gd.trm,v 1.172 2013/05/21 20:36:46 sfeam Exp $
  * based on gif.trm,v 1.26.2.1 2000/05/01 00:17:20 joze
  */
 
@@ -681,6 +681,9 @@ PNG_options()
 	png_state.default_ttfsize = 0;
 	PNG_linewidth_factor = 1.0;
 	PNG_dashlength_factor = 1.0;
+	/* Default to enhanced text */
+	term->flags |= TERM_ENHANCED_TEXT;
+	term->put_text = ENHGD_put_text;
     }
 
     while (!END_OF_COMMAND) {

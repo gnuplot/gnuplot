@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: post.trm,v 1.276 2013/05/20 00:08:15 sfeam Exp $
+ * $Id: post.trm,v 1.277 2013/05/21 20:36:46 sfeam Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -655,8 +655,15 @@ PS_options()
 		*ps_params = pstex_params_default;
 		break;
 	    }
-	    term->flags &= ~TERM_ENHANCED_TEXT;
 	    c_token++;
+	    /* Default to enhanced text */
+	    if (ps_params->terminal == PSTERM_PSTEX) {
+		term->flags &= ~TERM_ENHANCED_TEXT;
+	    } else {
+		term->put_text = ENHPS_put_text;
+		term->set_font = ENHPS_set_font;
+		term->flags |= TERM_ENHANCED_TEXT;
+	    }
 	    if (!END_OF_COMMAND) 
 		int_error(c_token,
 			  "extraneous argument in set terminal %s",term->name);

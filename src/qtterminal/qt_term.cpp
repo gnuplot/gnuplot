@@ -73,7 +73,7 @@ void qt_atexit();
 /// @todo per-window options
 
 int  qt_optionWindowId = 0;
-bool qt_optionEnhanced = false;
+bool qt_optionEnhanced = true;
 bool qt_optionPersist  = false;
 bool qt_optionRaise    = true;
 bool qt_optionCtrl     = false;

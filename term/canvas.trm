@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: canvas.trm,v 1.73 2013/05/07 22:13:46 sfeam Exp $
+ * $Id: canvas.trm,v 1.74 2013/05/08 18:36:10 sfeam Exp $
  *
  */
 
@@ -228,6 +228,9 @@ CANVAS_options()
 	canvas_dashed = FALSE;
 	canvas_dashlength_factor = 1.0;
 	CANVAS_background[0] = '\0';
+	/* Default to enhanced text mode */
+	term->put_text = ENHCANVAS_put_text;
+	term->flags |= TERM_ENHANCED_TEXT;
     }
 
     while (!END_OF_COMMAND) {
