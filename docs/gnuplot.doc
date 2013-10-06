@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.826 2013/09/12 23:57:42 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.827 2013/09/28 22:09:03 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -223,6 +223,8 @@ C
  x axis in such a case, say instead `set xrange [1:0]`.
  
  * New coordinate system (Degrees, Minutes, Seconds). See `set xdata geographic`.
+
+ * The default format for axis labels is "% h" ("$%h$" for LaTeX terminals).
 
  * Command scripts may contain inline data that is loaded into a named
  data block for repeated plotting. See `inline data`.
@@ -8200,11 +8202,13 @@ Ffigure_missing
        set ytics format "%.2f"
 
  The length of the string is restricted to 100 characters.  The default format
- is "% g", but other formats such as "%.2f" or "%3.0em" are often desirable.
- The format "$%g$" is often desirable for LaTeX.  If no format string is given,
- the format will be returned to the default.  If the empty string "" is given,
- tics will have no labels, although the tic mark will still be plotted.
- To eliminate the tic marks, use `unset xtics` or `set tics scale 0`.
+ is "% h", "$%h$" for LaTeX terminals. Other formats such as "%.2f" or "%3.0em"
+ are often desirable. "set format" with no following string will restore the
+ default.
+
+ If the empty string "" is given, tics will have no labels, although the tic
+ mark will still be plotted.  To eliminate the tic marks, use `unset xtics` or
+ `set tics scale 0`.
 
  Newline (\n) and enhanced text markup is accepted in the format string.
  Use double-quotes rather than single-quotes in this case.  See also `syntax`.
@@ -8239,6 +8243,7 @@ Ffigure_missing
        %f           floating point notation
        %e or %E     exponential notation; an "e" or "E" before the power
        %g or %G     the shorter of %e (or %E) and %f
+       %h or %H     like %g with "x10^{%S}" or "*10^{%S}" instead of "e%S"
        %x or %X     hex
        %o or %O     octal
        %t           mantissa to base 10
@@ -8258,6 +8263,7 @@ Ffigure_missing
 #\verb@%f@ & floating point notation \\
 #\verb@%e@ or \verb@%E@ & exponential notation; an "e" or "E" before the power \\
 #\verb@%g@ or \verb@%G@ & the shorter of \verb@%e@ (or \verb@%E@) and \verb@%f@ \\
+#\verb@%h@ or \verb@%H@ & like %g with "x10^{%S}" or "*10^{%S}" instead of "e%S"
 #\verb@%x@ or \verb@%X@ & hex \\
 #\verb@%o@ or \verb@%O@ & octal \\
 #\verb@%t@ & mantissa to base 10 \\
@@ -8276,6 +8282,7 @@ Ffigure_missing
 %%f@floating point notation
 %%e or %E@exponential notation; an "e" or "E" before the power
 %%g or %G@the shorter of %e (or %E) and %f
+%%h or %H@like %g with "x10^{%S}" or "*10^{%S}" instead of "e%S"
 %%x or %X@hex
 %%o or %O@octal
 %%t@mantissa to base 10
@@ -8303,6 +8310,7 @@ Ffigure_missing
 ^<tr>    <td><tt>%f</tt></td>    <td>floating point notation</td></tr>
 ^<tr>    <td><tt>%e</tt> or <tt>%E</tt></td>    <td>exponential notation; an "e" or "E" before the power</td></tr>
 ^<tr>    <td><tt>%g</tt> or <tt>%G</tt></td>    <td>the shorter of <tt>%e</tt> (or <tt>%E</tt>) and <tt>%f</tt></td></tr>
+^<tr>    <td><tt>%h</tt> or <tt>%H</tt></td>    <td><tt>%g</tt> with "x10^{%S}" or "*10^{%S}" instead of "e%S"></td></tr>
 ^<tr>    <td><tt>%x</tt> or <tt>%X</tt></td>    <td>hex</td></tr>
 ^<tr>    <td><tt>%o</tt> or <tt>%O</tt></td>    <td>octal</td></tr>
 ^<tr>    <td><tt>%t</tt></td>    <td>mantissa to base 10</td></tr>

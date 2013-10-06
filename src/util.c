@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: util.c,v 1.113 2013/06/05 23:33:11 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: util.c,v 1.114 2013/09/17 23:50:29 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - util.c */
@@ -42,7 +42,7 @@ static char *RCSid() { return RCSid("$Id: util.c,v 1.113 2013/06/05 23:33:11 sfe
 #include "internal.h"		/* for eval_reset_after_error */
 #include "misc.h"
 #include "plot.h"
-#include "term_api.h"		/* for term_end_plot() used by graph_error() */
+#include "term_api.h"		/* for term_end_plot() used by graph_error(), also to detect enhanced mode */
 #include "variable.h" /* For locale handling */
 
 #if defined(HAVE_DIRENT_H)
@@ -559,6 +559,10 @@ gprintf(
 
     set_numeric_locale();
 
+    /* Sep 2013 - fancier default formats */
+    if (!strcmp(format,DEF_FORMAT) && (term->flags & TERM_IS_LATEX) != 0)
+	format = DEF_FORMAT_LATEX;
+
     for (;;) {
 	/*{{{  copy to dest until % */
 	while (*format != '%')
@@ -623,6 +627,61 @@ gprintf(
 	    t[1] = 0;
 	    snprintf(dest, remaining_space, temp, x);
 	    break;
+	case 'h':
+	case 'H':
+	    /* g/G with enhanced formating (if applicable) */
+	    t[0] = (*format == 'h') ? 'g' : 'G';
+	    t[1] = 0;
+
+	    if ((term->flags & (TERM_ENHANCED_TEXT | TERM_IS_LATEX)) == 0) {
+		/* Not enhanced, not latex, just print it */
+	    	snprintf(dest, remaining_space, temp, x);
+
+	    } else if (table_mode) {
+		/* Tabular output should contain no markup */
+	    	snprintf(dest, remaining_space, temp, x);
+
+	    } else {
+	    	/* in enhanced mode -- convert E/e to x10^{foo} or *10^{foo} */
+	    	char tmp[256];
+	    	char tmp2[256];
+	    	int i,j;
+	    	TBOOLEAN bracket_flag = FALSE;
+	    	snprintf(tmp, 240, temp, x);
+	    	for (i=j=0; tmp[i] && i<256; i++) {
+	      	    if (tmp[i]=='E' || tmp[i]=='e') {
+			if ((term-> flags & TERM_IS_LATEX)) {
+			    strcpy(&tmp2[j], "\\times");
+			    j+= 6;
+			} else if (encoding == S_ENC_UTF8) {
+			    strcpy(&tmp2[j], "×");
+			    j+= 2;
+			} else {
+			    tmp2[j++] = (*format=='h') ? 'x' : '*';
+			}
+			strcpy(&tmp2[j], "10^{");
+			j += 4;
+			bracket_flag = TRUE;
+
+			/* Skip + and leading 0 in exponent */
+			i++; // skip E
+			if (tmp[i] == '+')
+		  	    i++;
+			while (tmp[i] == '0')
+		  	    i++;
+			i--; // undo following loop increment
+		    } else {
+			tmp2[j++] = tmp[i];
+		    }
+		}
+		if (bracket_flag)
+		    tmp2[j++] = '}';
+		tmp2[j] = '\0';
+		strncpy(dest, tmp2, remaining_space);
+	    }
+
+	    break;
+
 	    /*}}} */
 	    /*{{{  l --- mantissa to current log base */
 	case 'l':

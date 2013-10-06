@@ -1,5 +1,5 @@
 /*
- * $Id: axis.h,v 1.89 2013/09/26 22:45:33 sfeam Exp $
+ * $Id: axis.h,v 1.90 2013/09/27 03:31:22 sfeam Exp $
  *
  */
 
@@ -317,7 +317,8 @@ extern const struct gen_table axisname_tbl[AXIS_ARRAY_SIZE+1];
 extern const struct ticdef default_axis_ticdef;
 
 /* default format for tic mark labels */
-#define DEF_FORMAT "% g"
+#define DEF_FORMAT "% h"
+#define DEF_FORMAT_LATEX "$%h$"
 
 /* default parse timedata string */
 #define TIMEFMT "%d/%m/%y,%H:%M"

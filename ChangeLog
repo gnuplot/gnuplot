@@ -1,3 +1,11 @@
+2013-10-06  Craig DeForest  <deforest@boulder.swri.edu>
+
+	* src/axis.h src/util.c (gprintf) docs/gnuplot.doc:
+	New format specifier %h expands to the same as %g except that the
+	exponential term, if any, is written using enhanced text or LaTeX markup
+	to generate "x10^{foo}" rather than "E+foo". The default format for axis
+	tics is now "% h" ("$%h$" for LaTeX terminals).
+
 2013-10-02  Ethan A Merritt  <merritt@u.washington.edu>
 
         * src/command.c (expand_1level_macros):  Never try to expand an 
