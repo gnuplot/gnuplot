@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.230.2.10 2013/07/03 16:31:52 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.230.2.11 2013/07/22 22:19:10 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -3043,8 +3043,8 @@ expand_1level_macros()
 		    while (isalnum(*c) || (*c=='_')) c++;
 		    temp_char = *c; *c = '\0';
 		    /* Look up the key and restore the original following char */
-		    udv = add_udv_by_name(m);
-		    if (udv && udv->udv_value.type == STRING) {
+		    udv = get_udv_by_name(m);
+		    if (udv && !udv->udv_undef && udv->udv_value.type == STRING) {
 			nfound++;
 			m = udv->udv_value.v.string_val;
 			FPRINTF((stderr,"Replacing @%s with \"%s\"\n",udv->udv_name,m));
