@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: util.c,v 1.114 2013/09/17 23:50:29 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: util.c,v 1.115 2013/10/07 21:03:48 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - util.c */
@@ -651,8 +651,13 @@ gprintf(
 	    	for (i=j=0; tmp[i] && i<256; i++) {
 	      	    if (tmp[i]=='E' || tmp[i]=='e') {
 			if ((term-> flags & TERM_IS_LATEX)) {
-			    strcpy(&tmp2[j], "\\times");
-			    j+= 6;
+			    if (*format == 'h') {
+				strcpy(&tmp2[j], "\\times");
+				j+= 6;
+			    } else {
+				strcpy(&tmp2[j], "\\cdot");
+				j+= 5;
+			    }
 			} else if (encoding == S_ENC_UTF8) {
 			    strcpy(&tmp2[j], "×");
 			    j+= 2;
