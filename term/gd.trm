@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: gd.trm,v 1.172 2013/05/21 20:36:46 sfeam Exp $
+ * $Id: gd.trm,v 1.173 2013/10/07 21:43:48 sfeam Exp $
  * based on gif.trm,v 1.26.2.1 2000/05/01 00:17:20 joze
  */
 
@@ -973,12 +973,12 @@ PNG_options()
 	}
     }
 
-#ifndef GIF_ANIMATION /* animated gifs not supported by the current GD library */
     if (gif_anim_option) {
+#ifndef GIF_ANIMATION /* animated gifs not supported by the current GD library */
 	png_state.animate = FALSE;
 	int_warn(NO_CARET, "gif animation options ignored (not compiled into this binary)");
-    }
 #endif
+    }
 
 #ifdef HAVE_GD_TTF
     /* If no font has been chosen but there is a default, use it */

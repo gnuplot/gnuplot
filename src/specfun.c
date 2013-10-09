@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: specfun.c,v 1.51 2013/07/13 05:52:44 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: specfun.c,v 1.52 2013/08/06 18:12:11 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - specfun.c */
@@ -3172,12 +3172,11 @@ f_airy(union argument *arg)
     struct value a;
     double x;
     double ai, aip, bi, bip;
-    int ierr;
 
     (void) arg;                        /* avoid -Wunused warning */
     x = real(pop(&a));
 
-    ierr = airy(x, &ai, &aip, &bi, &bip);
+    airy(x, &ai, &aip, &bi, &bip);
 
     push(Gcomplex(&a, ai, 0.0));
 }

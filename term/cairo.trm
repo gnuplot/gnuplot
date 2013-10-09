@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: cairo.trm,v 1.63 2013/09/09 19:18:58 sfeam Exp $
+ * $Id: cairo.trm,v 1.64 2013/10/07 21:43:48 sfeam Exp $
  */
 
 /* GNUPLOT - cairo.trm */
@@ -245,7 +245,7 @@ TERM_PUBLIC void cairotrm_options()
 	int sep;
 	TBOOLEAN duplication = FALSE;
 	TBOOLEAN set_enhanced = FALSE, set_font = FALSE, set_size = FALSE;
-	TBOOLEAN set_capjoin = FALSE, set_fontscale = FALSE;
+	TBOOLEAN set_capjoin = FALSE;
 	TBOOLEAN set_standalone = FALSE, set_header = FALSE;
 
 	char tmp_term_options[MAX_LINE_LEN+1] = "";
@@ -383,7 +383,7 @@ TERM_PUBLIC void cairotrm_options()
 			cairo_params->fontscale = END_OF_COMMAND ? -1 : real_expression();
 			if (cairo_params->fontscale <= 0.0)
 			    cairo_params->fontscale = cairo_params_default->fontscale;
-			set_fontscale = TRUE;
+			/* set_fontscale = TRUE; */
 			break;
 		case CAIROTRM_TRANSPARENT:
 			c_token++;
