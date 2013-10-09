@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: util.c,v 1.115 2013/10/07 21:03:48 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: util.c,v 1.116 2013/10/09 02:45:18 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - util.c */
@@ -559,17 +559,11 @@ gprintf(
 
     set_numeric_locale();
 
-    /* Sep 2013 - fancier default formats */
-    if (!strcmp(format,DEF_FORMAT) && (term->flags & TERM_IS_LATEX) != 0)
-	format = DEF_FORMAT_LATEX;
-
     for (;;) {
 	/*{{{  copy to dest until % */
 	while (*format != '%')
 	    if (!(*dest++ = *format++) || (remaining_space == 0)) {
-		safe_strncpy(outstring,tempdest,count);
-		reset_numeric_locale();
-		return;		/* end of format */
+		goto done;
 	    }
 	/*}}} */
 
@@ -932,6 +926,16 @@ gprintf(
 	dest += strlen(dest);
 	++format;
     } /* for ever */
+
+done:
+
+    /* Sep 2013 - For LaTeX terminals, if the user has not already provided a */
+    /* format in numerical mode, wrap whatever we got by default in $ ... $   */
+    if (((term->flags & TERM_IS_LATEX)) && !strchr(tempdest, '$')) {
+	*(outstring++) = '$';
+	strcat(tempdest, "$");
+	count -= 2;
+    }
 
     /* Copy as much as fits */
     safe_strncpy(outstring, tempdest, count);

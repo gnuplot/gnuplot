@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.827 2013/09/28 22:09:03 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.828 2013/10/07 21:03:48 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -8263,7 +8263,7 @@ Ffigure_missing
 #\verb@%f@ & floating point notation \\
 #\verb@%e@ or \verb@%E@ & exponential notation; an "e" or "E" before the power \\
 #\verb@%g@ or \verb@%G@ & the shorter of \verb@%e@ (or \verb@%E@) and \verb@%f@ \\
-#\verb@%h@ or \verb@%H@ & like %g with "x10^{%S}" or "*10^{%S}" instead of "e%S"
+#\verb@%h@ or \verb@%H@ & like \verb@%g with "x10^{%S}" or "*10^{%S}" instead of "e%S"@ \\
 #\verb@%x@ or \verb@%X@ & hex \\
 #\verb@%o@ or \verb@%O@ & octal \\
 #\verb@%t@ & mantissa to base 10 \\
@@ -8366,6 +8366,14 @@ Ffigure_missing
  If the data type for the axis is time/date, the format string must contain
  valid codes for the 'strftime' function (outside of `gnuplot`, type "man
  strftime").  See `set timefmt` for a list of the allowed input format codes.
+4 latex formats
+?commands set format latex
+?set format latex
+=latex
+ When the current terminal is a LaTeX terminal, gnuplot adds a `$` at the start
+ and end of the format string is given in `set format` (LaTeX math mode).
+ The default format thus becomes "$%h$".  If you specify a format string that
+ already contains a $ character, gnuplot will not add additional `$` characters.
 4 time/date specifiers
 ?commands set format date_specifiers
 ?commands set format time_specifiers
