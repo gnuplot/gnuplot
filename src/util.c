@@ -559,6 +559,10 @@ gprintf(
 
     set_numeric_locale();
 
+    /* Oct 2013 - default format is now expected to be "%h" */
+    if (((term->flags & TERM_IS_LATEX)) && !strcmp(format, DEF_FORMAT))
+	format = DEF_FORMAT_LATEX;
+
     for (;;) {
 	/*{{{  copy to dest until % */
 	while (*format != '%')
@@ -929,13 +933,16 @@ gprintf(
 
 done:
 
-    /* Sep 2013 - For LaTeX terminals, if the user has not already provided a */
-    /* format in numerical mode, wrap whatever we got by default in $ ... $   */
+#if (0)
+    /* Oct 2013 - Not safe because it fails to recognize LaTeX macros.	*/
+    /* For LaTeX terminals, if the user has not already provided a   	*/
+    /* format in math mode, wrap whatever we got by default in $...$ 	*/
     if (((term->flags & TERM_IS_LATEX)) && !strchr(tempdest, '$')) {
 	*(outstring++) = '$';
 	strcat(tempdest, "$");
 	count -= 2;
     }
+#endif
 
     /* Copy as much as fits */
     safe_strncpy(outstring, tempdest, count);

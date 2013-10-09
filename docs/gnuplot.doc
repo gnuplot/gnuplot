@@ -8366,14 +8366,6 @@ Ffigure_missing
  If the data type for the axis is time/date, the format string must contain
  valid codes for the 'strftime' function (outside of `gnuplot`, type "man
  strftime").  See `set timefmt` for a list of the allowed input format codes.
-4 latex formats
-?commands set format latex
-?set format latex
-=latex
- When the current terminal is a LaTeX terminal, gnuplot adds a `$` at the start
- and end of the format string is given in `set format` (LaTeX math mode).
- The default format thus becomes "$%h$".  If you specify a format string that
- already contains a $ character, gnuplot will not add additional `$` characters.
 4 time/date specifiers
 ?commands set format date_specifiers
 ?commands set format time_specifiers

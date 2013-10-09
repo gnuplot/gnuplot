@@ -1,8 +1,6 @@
 2013-10-09  Ethan A Merritt  <merritt@u.washington.edu>
 
-	* src/util.c (gprintf) axis.h:  If TERM_IS_LATEX then wrap the axis tic
-	format in $...$ (LaTeX math mode) unless the user has already provided
-	a format with $ characters in it.
+	* src/util.c (gprintf) axis.h: (REVERTED)
 
 2013-10-06  Ethan A Merritt  <merritt@u.washington.edu>
 
