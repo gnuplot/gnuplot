@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.cpp,v 1.116 2013/08/23 18:56:32 sfeam Exp $
+ * $Id: wxt_gui.cpp,v 1.117 2013/08/26 19:31:54 sfeam Exp $
  */
 
 /* GNUPLOT - wxt_gui.cpp */
@@ -3618,6 +3618,9 @@ int wxt_waitforinput(int options)
 			return '\0';
 		}
 	} while ( paused_for_mouse || !FD_ISSET(stdin_fd, &read_fds) );
+
+	if (options == TERM_ONLY_CHECK_MOUSING)
+		return '\0';
 
 	return getchar();
 }
