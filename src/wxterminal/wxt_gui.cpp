@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.cpp,v 1.117 2013/08/26 19:31:54 sfeam Exp $
+ * $Id: wxt_gui.cpp,v 1.118 2013/10/11 18:11:04 sfeam Exp $
  */
 
 /* GNUPLOT - wxt_gui.cpp */
@@ -88,7 +88,8 @@
  * When compiling for Windows (wxMSW), the text window already implements it, so we
  * don't have to do it, but wxWidgets still have to be initialized correctly.
  * When compiling for Unix (wxGTK), we don't have one, so we launch it in a separate thread.
- * For new platforms, it is necessary to figure out what is necessary.
+ * For new platforms, it is necessary to figure out whether to configure for single
+ * or multi-threaded operation.
  */
 
 
@@ -209,7 +210,6 @@ BEGIN_EVENT_TABLE( wxtConfigDialog, wxDialog )
 	EVT_COMMAND_RANGE( Config_OK, Config_CANCEL,
 		wxEVT_COMMAND_BUTTON_CLICKED, wxtConfigDialog::OnButton )
 END_EVENT_TABLE()
-
 
 #ifdef WXT_MULTITHREADED
 /* ----------------------------------------------------------------------------
@@ -3630,7 +3630,7 @@ int wxt_waitforinput(int options)
 int wxt_waitforinput(int options)
 {
 #ifdef _Windows
-	if (paused_for_mouse) {
+	if (paused_for_mouse || options==TERM_ONLY_CHECK_MOUSING) {
 		MSG msg;
 		BOOL ret;
 		while ((ret = GetMessage(&msg, NULL, 0, 0)) != 0) {
@@ -3648,20 +3648,38 @@ int wxt_waitforinput(int options)
 
 #else /* !_Windows */
 	/* Generic hybrid GUI & console message loop */
+	/* (used mainly on MacOSX - still single threaded) */
 	static int yield = 0;
-	if(yield) return '\0';
-	while(wxTheApp) {
-		yield = 1;
-		wxTheApp->Yield();
-		yield = 0;
+	if (yield)
+		return '\0';
+	
+	if (wxt_status == STATUS_UNINITIALIZED)
+		return (options == TERM_ONLY_CHECK_MOUSING) ? '\0' : getc(stdin);
 
-		struct timeval tv;
-		fd_set read_fd;
-		tv.tv_sec = 0;
-		tv.tv_usec = 10000;
-		FD_ZERO(&read_fd);
-		FD_SET(0, &read_fd);
-		if(select(1, &read_fd, NULL, NULL, &tv) != -1 && FD_ISSET(0, &read_fd)) break;
+	if (options==TERM_ONLY_CHECK_MOUSING) {
+		// If we're just checking mouse status, yield to the app for a while
+		if (wxTheApp) {
+			wxTheApp->Yield();
+			yield = 0;
+		}
+		return '\0'; // gets dropped on floor
+	}
+	
+	while(wxTheApp) {
+	  // Loop with timeout of 10ms until stdin is ready to read, 
+          // while also handling window events.  
+	  yield = 1;
+	  wxTheApp->Yield();
+	  yield = 0;
+	  
+	  struct timeval tv;
+	  fd_set read_fd;
+	  tv.tv_sec = 0;
+	  tv.tv_usec = 10000;
+	  FD_ZERO(&read_fd);
+	  FD_SET(0, &read_fd);
+	  if (select(1, &read_fd, NULL, NULL, &tv) != -1 && FD_ISSET(0, &read_fd))
+		break;
 	}
 	return getchar();
 #endif

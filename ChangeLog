@@ -1,4 +1,10 @@
-2013-10-09  Ethan A Merritt  <merritt@u.washington.edu>
+2013-10-11  Craig DeForest  <deforest@boulder.swri.edu>
+
+	* src/wxterminal/wxt_gui.cpp (wxt_waitforinput):
+	Handle TERM_ONLY_CHECK_MOUSING in the single-threaded code path.
+	Bug #1293
+
+2013-10-11  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/wxterminal/wxt_gui.cpp (wxt_waitforinput):  One code path followed
 	in the case of piped input to a script with mousing enabled failed to 
