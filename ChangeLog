@@ -9,6 +9,9 @@
 	that would lie on top of the major tic/grid.
 	Bug #1292
 
+	* src/pm3d.c: Allow "set pm3d top/bottom" and "set pm3d interpolate N,M"
+	to be active at the same time.
+
 2013-10-11  Craig DeForest  <deforest@boulder.swri.edu>
 
 	* src/wxterminal/wxt_gui.cpp (wxt_waitforinput):

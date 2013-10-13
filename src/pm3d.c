@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.98 2013/09/25 22:21:27 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.99 2013/09/26 22:45:33 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - pm3d.c */
@@ -927,19 +927,23 @@ pm3d_plot(struct surface_points *this_plot, int at_which_z)
 			else /* transform z value to gray, i.e. to interval [0,1] */
 				gray = cb2gray(avgC);
 
-			if (pm3d.direction != PM3D_DEPTH) {
-			    if (color_from_rgbvar)
-				set_rgbcolor_var(gray);
-			    else
-				set_color(gray);
-			    filled_quadrangle(corners);
-			} else {
+			if (pm3d.direction == PM3D_DEPTH) {
 			    /* copy quadrangle */
 			    quadrangle* qp = quadrangles + current_quadrangle;
 			    memcpy(qp->corners, corners, 4 * sizeof (gpdPoint));
 			    qp->gray = gray;
 			    qp->border_color = &this_plot->lp_properties.pm3d_color;
 			    current_quadrangle++;
+			} else {
+			    if (color_from_rgbvar)
+				set_rgbcolor_var(gray);
+			    else
+				set_color(gray);
+				if (at_which_z == PM3D_AT_BASE)
+				    corners[0].z = corners[1].z = corners[2].z = corners[3].z = base_z;
+				else if (at_which_z == PM3D_AT_TOP)
+				    corners[0].z = corners[1].z = corners[2].z = corners[3].z = ceiling_z;
+			    filled_quadrangle(corners);
 			}
 		    }
 		}
