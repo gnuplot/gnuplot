@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.303 2013/09/26 22:45:33 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.304 2013/10/01 18:51:08 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -542,10 +542,19 @@ get_data(struct curve_points *current_plot)
 	break;
     }
 
-    if (current_plot->plot_smooth == SMOOTH_ACSPLINES) {
+    /* Restictions on plots with "smooth" option */
+    switch (current_plot->plot_smooth) {
+    case SMOOTH_NONE:
+	break;
+    case SMOOTH_ACSPLINES:
 	max_cols = 3;
 	current_plot->z_axis = FIRST_Z_AXIS;
 	df_axis[2] = FIRST_Z_AXIS;
+	break;
+    default:
+	if (df_no_use_specs > 2)
+	    int_warn(NO_CARET, "extra columns ignored by smoothing option");
+	break;
     }
 
     /* EXPERIMENTAL May 2013 - Treating timedata columns as strings allows */

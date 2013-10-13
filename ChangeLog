@@ -1,3 +1,10 @@
+2013-10-13  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/axis.c: DEFAULT_GRID_LP
+
+	* src/plot2d.c: Issue warning if "smooth" option causes columns in the
+	using spec to be ignored.
+
 2013-10-11  Craig DeForest  <deforest@boulder.swri.edu>
 
 	* src/wxterminal/wxt_gui.cpp (wxt_waitforinput):
