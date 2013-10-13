@@ -5,6 +5,10 @@
 	* src/plot2d.c: Issue warning if "smooth" option causes columns in the
 	using spec to be ignored.
 
+	* src/axis.c (gen_tics): Suppress log-scaled mtics and minor grid lines 
+	that would lie on top of the major tic/grid.
+	Bug #1292
+
 2013-10-11  Craig DeForest  <deforest@boulder.swri.edu>
 
 	* src/wxterminal/wxt_gui.cpp (wxt_waitforinput):
