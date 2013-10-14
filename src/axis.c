@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.97.2.4 2013/05/23 01:09:53 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.97.2.5 2013/08/08 06:45:31 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -1029,6 +1029,9 @@ gen_tics(AXIS_INDEX axis, tic_callback callback)
  		else if (axis_array[axis].log) {
  		    ministart = ministep = step / minifreq * axis_array[axis].base;
  		    miniend = step * axis_array[axis].base;
+		    /* Suppress minitics that would lie on top of major tic */
+		    while (ministart <= 1)
+			ministart += ministep;
  		} else {
 		    ministart = ministep = step / minifreq;
 		    miniend = step;

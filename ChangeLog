@@ -3,6 +3,10 @@
 	* src/pm3d.c: Allow "set pm3d top/bottom" and "set pm3d interpolate N,M"
 	to be active at the same time.
 
+	* src/axis.c (gen_tics): Suppress log-scaled mtics and minor grid lines
+	that would lie on top of the major tic/grid.
+	Bug #1292
+
 2013-10-06  Tag	Release_4_6_4
 
 2013-10-02  Ethan A Merritt  <merritt@u.washington.edu>
