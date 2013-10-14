@@ -1,3 +1,8 @@
+2013-10-14  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/pm3d.c: Allow "set pm3d top/bottom" and "set pm3d interpolate N,M"
+	to be active at the same time.
+
 2013-10-06  Tag	Release_4_6_4
 
 2013-10-02  Ethan A Merritt  <merritt@u.washington.edu>
