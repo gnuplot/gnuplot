@@ -1,5 +1,10 @@
-New features, changes and fixes since gnuplot version 4.6.3
+New features, changes and fixes since gnuplot version 4.6.4
 ===========================================================
+
+* FIX allow 'set pm3d' interpolate and top/bottom options to coexist
+
+New features, changes and fixes in gnuplot version 4.6.4
+========================================================
 
 * NEW Ctrl-Break interrupts fitting run in wgnuplot
 * CHANGE treat empty fields in a csv file as "missing" rather than "bad"

@@ -1,5 +1,5 @@
-C RCS $Id: gnuplot-ja.doc,v 1.2 2012-03-09 20:06:07+09 shige Exp $
-C corresponding original gnuplot.doc revision: 1.701.2.14
+C RCS $Id: gnuplot-ja.doc,v 1.5 2013-10-12 20:42:47+09 shige Exp $
+C corresponding original gnuplot.doc revision: 1.701.2.30
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -655,7 +655,7 @@ Ffigure_newsyntax
  テキスト部分は 2 次元や 3 次元描画内で例えば以下のように使用されます:
 
    plot 'datafile' using 1:2:4 with labels
-   splot 'datafile using 1:2:3:4 with labels
+   splot 'datafile' using 1:2:3:4 with labels
 
  テキスト部分の列データは 1 つ、または複数の描画軸の目盛りのラベルとし
  て使用できます。次の例は、入力データの 3 列目と 4 列目を (X,Y) 座標と
@@ -1502,7 +1502,7 @@ C マーカを doc2html へのこのシグナルとして使用します。
 #defined(X) & 変数名 & [非推奨] X が定義されていれば 1, そうでなければ 0\\
 %defined(X)@変数名@ [非推奨] X が定義されていれば 1, そうでなければ 0
  `defined(X)` [非推奨] は、X が定義されていれば 1、そうでなければ 0 を
- 返します。
+ 返します。`exists("X")` を代わりに使用してください。
 4 exists
 ?expressions functions exists
 ?exists
@@ -1954,8 +1954,11 @@ C ... and restart the table:
  はできません。そうでないと副作用が起こり得ます。<end> が <start> より
  小さい場合は、和の値は 0 となります。
 3 定義済み変数 (Gnuplot-defined variables)
+?expressions gnuplot-defined
+?gnuplot-defined
 ?gnuplot-defined variables
 ?GPVAL
+?gpval
  gnuplot は、プログラムの現在の内部状態と直前の描画を反映するような読み
  出し専用の変数をいくつか持っています。これらの変数の名前は、例えば
  GPVAL_TERM, GPVAL_X_MIN, GPVAL_X_MAX, GPVAL_Y_MIN のように "GPVAL_" で
@@ -2419,7 +2422,7 @@ C ... and restart the table:
  ー割当を置き換えますが、<space> と 'q' は通常は再定義はできません。そ
  の唯一の例外については、以下参照: `bind space`。
 
- マウスボタンは再定義はできません。
+ マウスボタンは 1 のみ、そして 2D 描画に関してのみ再定義できます。
 
  ホットキーの一覧を得るには `show bind`, または `bind` とタイプするか、
  グラフウィンドウ上でホットキー 'h' を入力してください。
@@ -2485,7 +2488,7 @@ C ... and restart the table:
 
  以下は、実際のキーではなく、ウィンドウに関するイベントです:
 
-    "Close"
+    "Button1" "Close"
 
  以下も参照: `mouse`。
 4 bind space
@@ -3716,8 +3719,8 @@ Ffigure_labels
    CityName(String,Size) = sprintf("{/=%d %s}", Scale(Size), String)
    plot 'cities.dat' using 5:4:(CityName(stringcolumn(1),$3)) with labels
 
- フォントサイズを、個々の市の名前に対して異なるサイズに合わせなくていい
- ならば、コマンドはもっと簡単です:
+ フォントを、個々の市に対して異なるサイズに合わせなくていいならば、コマ
+ ンドはもっと簡単です:
 
    plot 'cities.dat' using 5:4:1 with labels font "Times,8"
 
@@ -4046,13 +4049,11 @@ Ffigure_surface
  れが 3 次元の曲面であるとはっきりわかるような視方向から表示されます。
  その場合、X, Y, Z 軸はすべて描画内に表示されます。3 次元的な錯覚は、隠
  線処理や、曲面要素の深さ整列により、より増幅されます。以下参照:
- `hidden3d`, および `set pm3d` のオプションである `depthorder`。
+ `hidden3d`, `pm3d depthorder`。
 Ffigure_surface+contours
  コマンド `splot` は、定数の Z 値に対する等高線を計算し描画することもで
  きます。これらの等高線は、曲面それ自体の上に書くこともできますし、XY
  平面へ射影することもできます。以下参照: `set contour`。
-
-
 
 
 
@@ -5184,6 +5185,7 @@ Ffigure_mapcontours
  "pdp") エンディアンもサポートできます。
 4 filetype
 ?binary filetype
+?filetype
  gnuplot は、いくつか標準的なバイナリファイル形式については必要な情報を
  そのファイルから抜き出すことができます。例えば "format=edf" は ESRF ヘ
  ッダーファイル形式のファイルとして読み込みます。現在サポートしているフ
@@ -5451,27 +5453,27 @@ Ffigure_mapcontours
                                   {:{<終了ポイント>}
                                     {:<終了ブロック>}}}}}
 
- プロットされるデータポイントは、<開始ポイント> から <終了ポイント> ま
- で <ポイント増分> の増加で選ばれ、ブロックは <開始ブロック> から <終了
- ブロック> まで <ブロック増分> の増加で選ばれます。
+ 描画するデータポイントは、<開始ポイント> から <終了ポイント> まで <ポ
+ イント増分> の増加で選び、ブロックは <開始ブロック> から <終了ブロック>
+ まで <ブロック増分> の増加で選びます。
 
  各ブロックの最初のデータは、ファイル中の最初のブロックと同じように、
- 「0 番」とされます。
+ 「0 番」と数えます。
 
- プロットできない情報を含んでいる行もカウントされることに注意して下さい。
+ プロットできない情報を含む行もカウントすることに注意して下さい。
 
- いくつかの数字は省略することができます; 増分のデフォルトは 1 、開始の
- 値は最初のポイントか最初のブロック、そして終了の値は最後のポイントか最
- 後のブロックに設定されます。`every` が指定されないなら、全ての行の全て
- のポイントがプロットされます。
+ いくつかの数字は省略できます; 増分のデフォルトは 1 、開始の値は最初の
+ ポイントか最初のブロック、そして終了の値は最後のポイントか最後のブロッ
+ クに設定します。`every` のオプションが ':' で終わるのは許されていませ
+ ん。`every` を指定しなければ、全ての行の全てのポイントをプロットします。
 
  例:
-        every :::3::3   # 4 番目のブロックだけ選ばれます (0 番が最初)
-        every :::::9    # 最初の 10 ブロックが選ばれます
-        every 2:2       # 1 つおきのブロックで 1 つおきのポイントが選ば
-                        # れます
-        every ::5::15   # それぞれのブロックでポイント 5 から 15 までが
-                        # 選ばれます
+        every :::3::3   # 4 番目のブロックだけ選びます (0 番が最初)
+        every :::::9    # 最初の 10 ブロックを選びます
+        every 2:2       # 1 つおきのブロックで 1 つおきのポイントを選び
+                        # ます
+        every ::5::15   # それぞれのブロックでポイント 5 から 15 までを
+                        # 選びます
 
  参照:
 ^ <a href="http://www.gnuplot.info/demo/simple.html">
@@ -5895,6 +5897,16 @@ Ffigure_mapcontours
 
  このアプローチは最も柔軟性がありますが、`using` あるいは `thru` キー
  ワードを用いた単純なフィルタリングで行うことも可能です。
+
+ fdopen() 関数を持つシステムでは、データを、ファイルかパイプに結びつけ
+ られた任意のファイルデスクリプタから読み込むことができます。`n` 番のフ
+ ァイルデスクリプタから読み込むには、`'<&n'` としてください。これにより、
+ 1 回の POSIX shell からの呼び出しの中で、複数のデータファイルからのパ
+ イプ入力が容易に行えるようになります:
+
+       $ gnuplot -p -e "plot '<&3', '<&4'" 3<data-3 4<data-4
+       $ ./gnuplot 5< <(myprogram -with -options)
+       gnuplot> plot '<&5'
 4 thru
 ?commands plot datafile thru
 ?plot datafile thru
@@ -5962,6 +5974,7 @@ Ffigure_mapcontours
                     '' using (column("Age")):(column(2))
        plot 'datafile' using "Age":"Height", '' using "Age":"Weight"
 
+ 指定文字列が完全に一致する必要がありますし、大文字小文字も区別します。
  列のラベルを plot タイトルに使うには、`set key autotitle columnhead`
  としてください。
 
@@ -6121,11 +6134,14 @@ Ffigure_mapcontours
  以下参照: `plot using xticlabels`。
 4 volatile
 ?datafile volatile
+?data volatile
 ?plot datafile volatile
- キーワード `volatile` は、入力ストリームかファイルから以前に読み込んだ
- データが、再読み込み時には有効ではないことを意味します。これは、可能な
- 限りプログラムに、`replot` コマンドの代わりに `refresh` コマンドを使わ
- せようとします。以下参照: `refresh`。
+?plot volatile
+?volatile
+ plot コマンドのキーワード `volatile` は、入力ストリームかファイルから
+ 以前に読み込んだデータが、再読み込み時には有効ではないことを意味します。
+ これは、`replot` コマンドの代わりに、可能な限り `refresh` コマンド
+ を使うよう gnuplot に指示します。以下参照: `refresh`。
 3 errorbars
 ?commands plot errorbars
 ?commands splot errorbars
@@ -6278,11 +6294,9 @@ Ffigure_mapcontours
 ?plot ranges
 ?splot ranges
 ?ranges
- オプションの範囲 (range) は、表示されるグラフの領域範囲を指定します。
- plot コマンドとは別に `set range` 文で範囲指定するのではなく plot コマ
- ンド上のその一部として範囲指定する場合、そのグラフを対話的に拡大したり
- 視点移動したりはできなくなるでしょうし、後で範囲を変更して `replot` す
- ることができなくなるでしょう。
+ plot コマンドの最初に置くオプションの軸の範囲 (range) は、表示するグラ
+ フの範囲を指定します。その範囲は、それ以前のどの `set range` による範
+ 囲指定よりも優先して扱います。
 
  書式:
        [{<dummy-var>=}{{<min>}:{<max>}}]
@@ -9284,23 +9298,24 @@ Ffigure_mapcontours
        show logscale
 
  ここで、<axes> (軸) は、`x`, `x2`, `y`, `y2`, `z`, `cb`, `r` の任意の
- 順序の組み合せが可能です。<base> は、対数スケールの底です (デフォルト
- の底は 10)。軸を指定しなかった場合は、`r` 以外のすべての軸が対象となり
- ます。コマンド `unset logscale` は、すべての軸の対数スケールを解除しま
- す。
+ 順序の組み合せが可能です。<base> は、対数目盛りの底です (デフォルトの
+ 底は 10)。軸を指定しなかった場合は、`r` 以外のすべての軸が対象となりま
+ す。コマンド `unset logscale` は、すべての軸の対数目盛りを解除します。
+ 対数軸に作られた目盛りの刻みは一様間隔ではないことに注意してください。
+ 以下参照: `set xtics`。
 
  例:
 
- x, z 両軸について対数スケールを設定する:
+ x, z 両軸について対数目盛りを設定する:
         set logscale xz
 
- y 軸について底 2 とする対数スケールを設定する:
+ y 軸について底 2 とする対数目盛りを設定する:
         set logscale y 2
 
- pm3d plot 用に z と色の軸に対数スケールを設定する:
+ pm3d plot 用に z と色の軸に対数目盛りを設定する:
         set logscale zcb
 
- z 軸の対数スケールを解除する:
+ z 軸の対数目盛りを解除する:
         unset logscale z
 3 macros
 ?commands set macros
@@ -9562,11 +9577,12 @@ Ffigure_mapcontours
  は複数の描画を同じページ、ウィンドウ、スクリーンに表示するものです。
 
  書式:
-       set multiplot { layout <rows>,<cols>
-                       {rowsfirst|columnsfirst} {downwards|upwards}
-                       {title <page title>}
-                       {scale <xscale>{,<yscale>}} {offset <xoff>{,<yoff>}}
-                     }
+       set multiplot
+           { title <page title> {font <fontspec>} {enhanced|noenhanced} }
+           { layout <rows>,<cols> 
+             {rowsfirst|columnsfirst} {downwards|upwards}
+             {scale <xscale>{,<yscale>}} {offset <xoff>{,<yoff>}}
+           }
        unset multiplot
 
  出力形式 (terminal) によっては、コマンド `unset multiplot` が与えられ
@@ -9820,6 +9836,10 @@ Ffigure_mapcontours
 
      # 頂点は移動しないまま、塗り潰しと色をデフォルトに変更
      set object 2 rect default
+
+ 長方形の頂点をスクリーン座標で指定すると、それは現在のグラフの端まで伸
+ びることができます。それ以外の座標系では、長方形はグラフ内に収まるよう
+ にクリッピングされます。
 
 4 ellipse
 ?ellipse
@@ -11586,6 +11606,7 @@ C 下記の以下参照: オプション `positive`, `negative`)。
  搬性を失わずに書くことが出来ます。
 
  詳細は、以下参照: `complete list of terminals`。
+
 3 termoption
 ?commands set termoption
 ?set termoption
@@ -13359,7 +13380,13 @@ C 下記の以下参照: オプション `positive`, `negative`)。
 
        # 番号 100 から 200 までのラベルを unset
        unset for [i=100:200] label i
-
+3 terminal
+?unset terminal
+ プログラムの最初に有効になるデフォルトの出力形式は、個々のシステム環境、
+ gnuplot のコンパイルオプション、および環境変数 GNUTERM に依存します。
+ このデフォルトが何であっても、gnuplot はそれを内部変数 GNUTERM に保存
+ していますが、コマンド `unset terminal` は、この初期値を復帰します。こ
+ れは、`set terminal GNUTERM` とすることと同じです。
 2 update
 ?commands update
 ?update
@@ -13423,6 +13450,13 @@ C 下記の以下参照: オプション `positive`, `negative`)。
  `seeking-assistance`。
 
 2 知られている制限 (limitations)
+ `do` や `while` ループの中括弧内では、plot '-' ... のようなインライン
+ データは使用できません。
+
+ グラフの key の並べ方と位置は、key 文字列として上付き、下付き文字が使
+ われたり、明示的なフォント指定が行われると不正確になります (4.7 では修
+ 正済み)。
+
 =gamma
 =bessel
 =timefmt
