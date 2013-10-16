@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot on Unix.
 dnl
-dnl $Id: configure.in,v 1.334 2013/08/09 20:50:31 sfeam Exp $
+dnl $Id: configure.in,v 1.335 2013/09/20 20:39:20 sfeam Exp $
 dnl
 dnl this is actually major.minor ...
 dnl note that for a non-beta release, we need to disable DEVELOPMENT_RELEASE
@@ -1169,9 +1169,11 @@ if test "${enable_qt}" = yes ; then
       RCC=`$PKG_CONFIG --variable=rcc_location QtCore`
       LRELEASE=`$PKG_CONFIG --variable=lrelease_location QtCore`
       AC_MSG_WARN([The Qt terminal will use Qt4.])
+      QTVER="4"
     fi
   else
     AC_MSG_WARN([The Qt terminal will use Qt5.])
+    QTVER="5"
   fi
 fi
 
@@ -1414,7 +1416,12 @@ else
 fi
 
 if test "$enable_qt_ok" = yes; then
-  AC_MSG_RESULT([  Qt terminal: yes ])
+  if test "$QTVER" = 4; then
+      AC_MSG_RESULT([  Qt terminal: yes (qt4)])
+  fi
+  if test "$QTVER" = 5; then
+      AC_MSG_RESULT([  Qt terminal: yes (qt5)])
+  fi
 else
   AC_MSG_RESULT([  Qt terminal: no (use --with-qt or --with-qt=qt4 to enable])
 fi
