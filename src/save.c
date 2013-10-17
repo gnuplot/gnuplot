@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.230 2013/09/26 21:24:21 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.231 2013/09/26 22:45:33 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -1563,17 +1563,19 @@ save_object(FILE *fp, int tag)
 	}
 
 	/* Properties common to all objects */
-	fprintf(fp, "\n%sobject %2d ", (fp==stderr) ? "\t" : "set ",this_object->tag);
-	fprintf(fp, "%s ", this_object->layer > 0 ? "front" : this_object->layer < 0 ? "behind" : "back");
-	if (this_object->lp_properties.l_width)
-		fprintf(fp, "lw %.1f ",this_object->lp_properties.l_width);
-	fprintf(fp, "fc ");
-	if (this_object->lp_properties.l_type == LT_DEFAULT)
-		fprintf(fp,"default");
-	else /* FIXME: Broke with removal of use_palette? */
-		save_pm3dcolor(fp, &this_object->lp_properties.pm3d_color);
-	fprintf(fp, " fillstyle ");
-	save_fillstyle(fp, &this_object->fillstyle);
+	if (tag == 0 || tag == this_object->tag) {
+	    fprintf(fp, "\n%sobject %2d ", (fp==stderr) ? "\t" : "set ",this_object->tag);
+	    fprintf(fp, "%s ", this_object->layer > 0 ? "front" : this_object->layer < 0 ? "behind" : "back");
+	    if (this_object->lp_properties.l_width)
+		    fprintf(fp, "lw %.1f ",this_object->lp_properties.l_width);
+	    fprintf(fp, "fc ");
+	    if (this_object->lp_properties.l_type == LT_DEFAULT)
+		    fprintf(fp,"default");
+	    else /* FIXME: Broke with removal of use_palette? */
+		    save_pm3dcolor(fp, &this_object->lp_properties.pm3d_color);
+	    fprintf(fp, " fillstyle ");
+	    save_fillstyle(fp, &this_object->fillstyle);
+	}
 
     }
     if (tag > 0 && !showed)
