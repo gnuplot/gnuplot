@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.436 2013/10/02 21:02:42 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.437 2013/10/17 23:53:37 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -378,7 +378,7 @@ place_objects(struct object *listhead, int layer, int dimensions)
 
 	    term_apply_lp_properties(&lpstyle);
 
-	    if (e->center.scalex == screen && e->center.scaley == screen)
+	    if (e->center.scalex == screen || e->center.scaley == screen)
 	    	clip_area = &canvas;
 
 	    do_arc((int)x1, (int)y1, radius, e->arc_begin, e->arc_end, style, FALSE);
@@ -398,7 +398,7 @@ place_objects(struct object *listhead, int layer, int dimensions)
 
 	    term_apply_lp_properties(&lpstyle);
 
-	    if (e->center.scalex == screen && e->center.scaley == screen)
+	    if (e->center.scalex == screen || e->center.scaley == screen)
 	    	clip_area = &canvas;
 
 	    if (dimensions == 2)
@@ -4044,10 +4044,8 @@ do_polygon( int dimensions, t_polygon *p, int style )
 	else
 	    map_position(&p->vertex[nv], &corners[nv].x, &corners[nv].y, "pvert");
 
-	/* Any vertex not given in plot coords will disable clipping */
+	/* Any vertex given in screen coords will disable clipping */
 	if (p->vertex[nv].scalex == screen || p->vertex[nv].scaley == screen)
-	    noclip = TRUE;
-	if (p->vertex[nv].scalex == graph || p->vertex[nv].scaley == graph)
 	    noclip = TRUE;
     }
 
