@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.435 2013/10/02 05:08:19 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.436 2013/10/02 21:02:42 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -393,19 +393,26 @@ place_objects(struct object *listhead, int layer, int dimensions)
 
 	case OBJ_ELLIPSE:
 	{
+	    t_ellipse *e = &this_object->o.ellipse;
+	    BoundingBox *clip_save = clip_area;
+
 	    term_apply_lp_properties(&lpstyle);
 
+	    if (e->center.scalex == screen && e->center.scaley == screen)
+	    	clip_area = &canvas;
+
 	    if (dimensions == 2)
-		do_ellipse(2, &this_object->o.ellipse, style, TRUE);
+		do_ellipse(2, e, style, TRUE);
 	    else if (splot_map)
-		do_ellipse(3, &this_object->o.ellipse, style, TRUE);
+		do_ellipse(3, e, style, TRUE);
 	    else
 		break;
 
 	    /* Retrace the border if the style requests it */
 	    if (need_fill_border(fillstyle))
-		do_ellipse(dimensions, &this_object->o.ellipse, 0, TRUE);
+		do_ellipse(dimensions, e, 0, TRUE);
 
+	    clip_area = clip_save;
 	    break;
 	}
 

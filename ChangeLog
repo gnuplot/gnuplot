@@ -1,3 +1,11 @@
+2013-10-17  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/graphics.c (place_objects):  Make clipping of ellipses consistent
+	with other objects.
+
+	* src/save.c (save_object):  "show object N" was incorrectly printing
+	lines for other objects as well.
+
 2013-10-13  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/axis.c: DEFAULT_GRID_LP
