@@ -1,5 +1,5 @@
 #
-# $Id: surface1.dem,v 1.11 2004/09/17 05:01:12 sfeam Exp $
+# $Id: surface1.dem,v 1.12 2012/07/07 05:18:18 sfeam Exp $
 #
 set title "3D surface from a grid (matrix) of Z values"
 set xrange [-0.5:4.5]
@@ -120,7 +120,7 @@ set label 2 "u=0" at 5,6.5,-1
 set arrow from 5,6,sinc(5,5) to 5,5,sinc(5,5) lt -1
 set label 3 "u=1" at 5,6.5,sinc(5,5)
 set parametric
-set hidden3d
+set hidden3d offset 0	# front/back coloring makes no sense for fenceplot #
 set isosamples 2,33
 xx=-5; dx=(4.99-(-4.99))/9
 x0=xx; xx=xx+dx
@@ -169,7 +169,7 @@ set arrow from 5,6,sinc(5,5) to 5,5,sinc(5,5) lt -1
 set label 4 "floor(u)%3=1" at 5,6.5,sinc(5,5)
 splot [u=.5:3*n-.5][v=-4.99:4.99] \
 	 xmin+floor(u/3)*dx, v, ((floor(u)%3)==0) ? zbase : \
-			 (((floor(u)%3)==1) ? sinc(xmin+u/3.*dx,v) : 1/0) notitle
+			 (((floor(u)%3)==1) ? sinc(xmin+u/3.*dx,v) : 1/0) lt 3 notitle
 pause -1 "Hit return to continue (17)"
 unset hidden3d; unset parametric; set isosamples 20,20
 set xrange [-1:1]; set yrange [-1:1]
