@@ -1,3 +1,7 @@
+2013-10-18  Shigeharu Takeno  <shige@iee.niit.ac.jp>
+
+	* docs/gnuplot-ja.doc term-ja.diff:  Sync translation to version 1.830
+
 2013-10-17  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c (place_objects):  Make clipping of various objects

@@ -1,5 +1,5 @@
-C RCS $Id: gnuplot-ja.doc,v 1.476 2013-07-02 12:33:45+09 shige Exp $
-C corresponding original gnuplot.doc revision: 1.810
+C RCS $Id: gnuplot-ja.doc,v 1.490 2013-10-16 19:53:53+09 shige Exp $
+C corresponding original gnuplot.doc revision: 1.830
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -284,6 +284,8 @@ C 行が長いのは、できればなんとかしたい
 
  * 新しい座標系 (度、分、秒)。以下参照: `set xdata geographic`。
 
+ * 軸の見出しのデフォルト書式用の "% h" (LaTeX 系出力形式では "$%h$")。
+
  * スクリプト内に書くインラインデータを、名前付きのデータブロックに保存
  することで再描画できるように。以下参照: `inline data`。
 
@@ -309,6 +311,10 @@ C 行が長いのは、できればなんとかしたい
  * オプション smooth の kdensity の、bandwidth の追加指定では、データ列
  からでなく 1 つのキーワードとして値を取ります。以下参照:
  `smooth kdensity`。
+
+ * 外部ライブラリ libcerf が利用可能であれば、複素数学関数 cerf,
+ cdawson, erfi, faddeeva, および Voigt プロファイル VP(x,sigma,gamma)
+ を提供します。
 
 2 非推奨な書式 (Deprecated syntax)
 ?deprecated syntax
@@ -865,7 +871,7 @@ C 行が長いのは、できればなんとかしたい
 ^<tr>    <td>imag(x)</td>    <td>複素数</td>    <td>Im(<i>x</i>), <i>x</i> の虚数部分 (実数)</td></tr>
 ^<tr>    <td>invnorm(x)</td>    <td>任意</td>    <td><i>x</i> の実部の逆正規分布関数</td></tr>
 ^<tr>    <td>int(x)</td>    <td>実数</td>    <td><i>x</i> の整数部分 (0 に向かって丸め)</td></tr>
-^<tr>    <td>lambertw(x)</td>    <td>実数</td>    <td>Lambert W 関数</td></tr>
+^<tr>    <td>lambertw(x)</td>    <td>実数</td>    <td>Lambert <i>W</i> 関数</td></tr>
 ^<tr>    <td>lgamma(x)</td>    <td>任意</td>    <td>lgamma(Re(<i>x</i>)), <i>x</i> の実部のガンマ対数関数</td></tr>
 ^<tr>    <td>log(x)</td>    <td>任意</td>    <td>ln <i>x</i>, <i>x</i> の自然対数 (底 <i>e</i>)</td></tr>
 ^<tr>    <td>log10(x)</td>    <td>任意</td>    <td>log<sub>10</sub> <i>x</i>, <i>x</i> の対数 (底 10)</td></tr>
@@ -879,6 +885,28 @@ C 行が長いのは、できればなんとかしたい
 ^<tr>    <td>tan(x)</td>    <td>任意</td>    <td>tan <i>x</i>, <i>x</i> のタンジェント</td></tr>
 ^<tr>    <td>tanh(x)</td>    <td>任意</td>    <td>tanh <i>x</i>, ラジアンでの <i>x</i> のハイパボリックタンジェント</td></tr>
 ^<tr>    <td>voigt(x,y)</td>    <td>実数</td>    <td>ガウス関数とローレンツ関数の畳みこみ</td></tr>
+^</tbody>
+^</table>
+
+^<p>&nbsp;</p>
+
+^<table align="center" border="1" rules="groups" frame="hsides" cellpadding="3" width="90%">
+^<colgroup>
+^  <col align="center">
+^  <col align="center">
+^  <col align="left">
+^</colgroup>
+^<thead>
+^<tr>   <th colspan="3">libcerf (利用可能な場合のみ) による特殊関数</th></tr>
+^<tr>    <th>関数</th>    <th>引数</th>    <th>戻り値</th></tr>
+^</thead>
+^<tbody>
+^<tr>    <td>cerf(z)</td>    <td>複素数</td>    <td>複素誤差関数</td></tr>
+^<tr>    <td>cdawson(z)</td>    <td>複素数</td>    <td>複素 Dawson 積分</td></tr>
+^<tr>    <td>faddeeva(z)</td>    <td>複素数</td>    <td>再スケール化複素誤差関数 <i>w</i>(<i>z</i>) = exp(-<i>z</i><sup>2</sup>) × erfc(-i<i>z</i>)</td></tr>
+^<tr>    <td>erfi(x)</td>    <td>実数</td>    <td>虚誤差関数 erfi(<i>x</i>) = -i × erf(i<i>x</i>)</td></tr>
+^<tr>    <td>VP(x,sigma,gamma)</td>    <td>実数</td>    <td>Voigt プロファイル</td></tr>
+
 ^</tbody>
 ^</table>
 
@@ -1278,11 +1306,65 @@ C マーカを doc2html へのこのシグナルとして使用します。
 ?expressions functions voigt
 ?voigt
 #voigt(x,y) & 実数 & Voigt/Faddeeva 関数 $\frac{y}{\pi} \int{\frac{exp(-t^2)}{(x-t)^2+y^2}}dt$ \\
+#           &       & 注意: voigt$(x,y)$ = $real($faddeeva$(x+iy))$ \\
 %voigt(x,y)@実数@ガウス関数とローレンツ関数の畳みこみ
  関数 `voigt(x,y)` は、スペクトル解析で使用される Voigt/Faddeeva 関数の
- 近似を返します。その誤差は 1/10^4 以内です。
+ 近似を返します。その誤差は 1/10^4 以内です。libcerf ルーチンが利用可能
+ ならば、より正確な値を求めるために re_w_of_z() ルーチンが使われます。
+ voigt(x,y) = real(faddeeva( x + y*{0,1} )) に注意してください。
 #\hline \end{longtable}
-#%% begin dummy tabular because the @end processing wants to end one
+#%% @end が必要とするため、ダミーの tabular の開始
+#\begin{tabular}{|ccl|}
+@end table
+
+^<!-- INCLUDE_NEXT_TABLE -->
+@start table
+#\begin{longtable}{|ccl|} \hline
+#\multicolumn{3}{|c|}{libcerf (利用可能な場合のみ) による特殊関数} \\ \hline \hline
+#関数 & 引数 & 戻り値 \\ \hline
+#\endhead \hline \endfoot
+%c c l .
+%関数@引数@戻り値
+%_
+4 cerf
+?expressions functions cerf
+?cerf
+#cerf(z) & 複素数 & 複素誤差関数 \\
+%cerf(z)@複素数@複素誤差関数 \\
+ `cerf(z)` は誤差関数 erf(x) の複素バージョンです。
+4 cdawson
+?expressions functions cdawson
+?cdawson
+=dawson
+%cdawson(z) @ 複素数 @ 複素 Dawson 積分 \\
+#cdawson(z)&複素数&Dawson 積分 $D(z)={\frac{\sqrt{\pi}}{2}e^{-z^2} erfi(z)}$ の複素拡張 \\
+ `cdawson(z)` は複素引数に対する Dawson 積分の値を返します。
+ cdawson(z) = sqrt(pi)/2 * exp(-z^2) * erfi(z)
+4 faddeeva
+?expressions functions faddeeva
+?faddeeva
+%faddeeva(z) @ 複素数 @ 再スケール化複素誤差関数 w(z) = exp(-z^2) * erfc(-i*z) \\
+#faddeeva(z)&複素数&再スケール化複素誤差関数 $w(z) = e^{-z^2}~ erfc(-iz) $ \\
+ `Faddeeva(z)` は再スケール化複素誤差関数です。
+ w(z) = exp(-z^2) * erfc(-i*z)
+ これは、Abramowitz-Stegun の式 7.1.3, 7.1.4 に対応します。 
+4 erfi
+?expressions functions erfi
+?erfi
+%erfi(x) @ 実数 @ 虚誤差関数 erfi(x) = -i * erf(ix) \\
+#erfi(x)&実数&虚誤差関数 $erf(x) = -i * erf(ix)$ \\
+ 虚誤差関数 erfi(x) = -i * erf(ix)
+4 Voigt Profile
+?expressions functions VP
+?VP
+%VP(x,sigma,gamma) @ 実数 @ Voigt プロファイル \\
+#VP(x,$\sigma$,$\gamma$)&実数& Voigt プロファイル $ VP(x,\sigma,\gamma) = {\int^{\infty}_{-\infty}{G(x^\prime;\sigma) L(x-x^\prime;\gamma) dx^\prime }} $ \\
+ `VP(x,sigma,gamma)` はガウス密度関数 G(x;sigma) とローレンツ密度関数
+  L(x;gamma) の畳み込みで定義される Voigt プロファイル (密度関数) に対
+ 応します。
+
+#\hline \end{longtable}
+#%% @end が必要とするため、ダミーの tabular の開始
 #\begin{tabular}{|ccl|}
 @end table
 
@@ -1416,8 +1498,8 @@ C マーカを doc2html へのこのシグナルとして使用します。
 ?defined
 #defined(X) & 変数名 & [非推奨] X が定義されていれば 1, そうでなければ 0\\
 %defined(X)@変数名@ [非推奨] X が定義されていれば 1, そうでなければ 0
- `defined(X)` [非推奨] は、X が定義されていれば 1、そうでなければ 0 を
- 返します。
+ `defined(X)` ([非推奨]) は、X が定義されていれば 1、そうでなければ 0
+ を返しますが、これの代わりに `exists("X")` を使ってください。
 4 exists
 ?expressions functions exists
 ?exists
@@ -1876,8 +1958,11 @@ C ... and restart the table:
  はできません。そうでないと副作用が起こり得ます。<end> が <start> より
  小さい場合は、和の値は 0 となります。
 3 定義済み変数 (Gnuplot-defined variables)
+?expressions gnuplot-defined
+?gnuplot-defined
 ?gnuplot-defined variables
 ?GPVAL
+?gpval
  gnuplot は、プログラムの現在の内部状態と直前の描画を反映するような読み
  出し専用の変数をいくつか持っています。これらの変数の名前は、例えば
  GPVAL_TERM, GPVAL_X_MIN, GPVAL_X_MAX, GPVAL_Y_MIN のように "GPVAL_" で
@@ -3322,10 +3407,9 @@ Ffigure_histeps
  steps デモ。
 ^ </a>
 
- `histeps` は単なる描画スタイルにすぎず、`gnuplot` には、ヒストグラムの
- 箱を生成する能力や、データ集合から母集団を決定する能力などはありません。
 2 histograms
 ?style histograms
+?set style histogram
 ?plotting styles histograms
 ?histograms
  スタイル `histograms` は 2 次元描画でのみ有効です。これは、データの各
@@ -3338,6 +3422,7 @@ Ffigure_histeps
        set style histogram errorbars {gap <gapsize>} {<linewidth>}
        set style histogram rowstacked
        set style histogram columnstacked
+       set style histogram {title font "name,size" tc <colorspec>}
 
  デフォルトのスタイルは `set style histogram clustered gap 2` に対応し
  ています。このスタイルでは、並列に指定されたデータの値の集合は、選択さ
@@ -3468,7 +3553,8 @@ Ffigure_histcols
 ?plotting style histograms newhistogram
  書式:
 
-      newhistogram {"<title>"} {lt <linetype>} {fs <fillstyle>} {at <x-coord>}
+      newhistogram {"<title>" {font "name,size"} {tc <colorspec>}}
+                   {lt <linetype>} {fs <fillstyle>} {at <x-coord>}
 
  一回の描画に 2 つ以上のヒストグラムの組を作ることもできます。この場合
  コマンド `newhistogram` を使うことで、それらを強制的に分離し、またそれ
@@ -3787,14 +3873,12 @@ Ffigure_steps
       plot ... with vectors arrowstyle 3
       plot ... using 1:2:3:4:5 with vectors arrowstyle variable
 
- 詳細は、以下参照: `arrowstyle`。
-
  例:
        plot 'file.dat' using 1:2:3:4 with vectors head filled lt 2
        splot 'file.dat' using 1:2:3:(1):(1):(1) with vectors filled head lw 2
 
  `set clip one` と `set clip two` は 2 次元のベクトルの描画に影響を与え
- ます。詳細は、以下参照: `set clip`, `arrowstyle`。
+ ます。以下参照: `set clip`, `arrowstyle`。
 2 xerrorbars
 ?plotting styles xerrorbars
 ?style xerrorbars
@@ -5356,28 +5440,27 @@ Ffigure_mapcontours
                                   {:{<終了ポイント>}
                                     {:<終了ブロック>}}}}}
 
- プロットされるデータポイントは、<開始ポイント> から <終了ポイント> ま
- で <ポイント増分> の増加で選ばれ、ブロックは <開始ブロック> から <終了
- ブロック> まで <ブロック増分> の増加で選ばれます。
+ 描画するデータポイントは、<開始ポイント> から <終了ポイント> まで <ポ
+ イント増分> の増加で選び、ブロックは <開始ブロック> から <終了ブロック>
+ まで <ブロック増分> の増加で選びます。
 
  各ブロックの最初のデータは、ファイル中の最初のブロックと同じように、
- 「0 番」とされます。
+ 「0 番」と数えます。
 
- プロットできない情報を含んでいる行もカウントされることに注意して下さい。
+ プロットできない情報を含む行もカウントすることに注意して下さい。
 
- いくつかの数字は省略することができます; 増分のデフォルトは 1 、開始の
- 値は最初のポイントか最初のブロック、そして終了の値は最後のポイントか最
- 後のブロックに設定されます。`every` のオプションが ':' で終わるのは許
- されていません。`every` が指定されないなら、全ての行の全てのポイントが
- プロットされます。
+ いくつかの数字は省略できます; 増分のデフォルトは 1 、開始の値は最初の
+ ポイントか最初のブロック、そして終了の値は最後のポイントか最後のブロッ
+ クに設定します。`every` のオプションが ':' で終わるのは許されていませ
+ ん。`every` を指定しなければ、全ての行の全てのポイントをプロットします。
 
  例:
-        every :::3::3   # 4 番目のブロックだけ選ばれます (0 番が最初)
-        every :::::9    # 最初の 10 ブロックが選ばれます
-        every 2:2       # 1 つおきのブロックで 1 つおきのポイントが選ば
-                        # れます
-        every ::5::15   # それぞれのブロックでポイント 5 から 15 までが
-                        # 選ばれます
+        every :::3::3   # 4 番目のブロックだけ選びます (0 番が最初)
+        every :::::9    # 最初の 10 ブロックを選びます
+        every 2:2       # 1 つおきのブロックで 1 つおきのポイントを選び
+                        # ます
+        every ::5::15   # それぞれのブロックでポイント 5 から 15 までを
+                        # 選びます
 
  参照:
 ^ <a href="http://www.gnuplot.info/demo/simple.html">
@@ -6760,16 +6843,27 @@ Ffigure_mapcontours
 ?reset
 ?reset errors
 ?reset bind
- コマンド `reset` は `set` コマンドで定義できる、グラフに関する全てのオ
- プションをデフォルトの値に設定します。このコマンドは、例えばコマンドフ
- ァイルの最後にグラフのデフォルトの設定に復帰する、あるいはコマンドファ
- イル内でたくさんの設定を行なった場合に元の状態に戻すときなどに便利です。
- 様々なオプションの取るデフォルトの値を知るには、`set` コマンドの結果を
- 参照してください。
+?reset session
+ コマンド `reset` は、`set` コマンドで定義できる、グラフに関する全ての
+ オプションをデフォルトの値に戻します。このコマンドは、load したコマン
+ ドファイルを実行した後でデフォルトの設定を復帰したり、設定をたくさん変
+ 更した後で元の状態に戻したいときなどに便利です。
 
  以下のものは、`reset` の影響を受けません。
       `set term` `set output` `set loadpath` `set fontpath` `set linetype`
       `set encoding` `set decimalsign` `set locale` `set psdir`
+
+ `reset` は、必ずしもプログラム立ち上がった初期状態には戻さないことに注
+ 意してください。それは、初期設定ファイル gnuplotrc や $HOME/.gnuplot
+ 内のコマンドでデフォルトの値を変更した場合は、それもリセットされてしま
+ うからです。しかし `reset session` とすれば、それらのコマンドも再実行
+ します。
+
+=session
+ `reset session` は、ユーザ定義変数、ユーザ定義関数すべてを削除し、デフ
+ ォルトの設定を復帰し、システム全体の初期設定ファイル gnuplotrc と個人
+ 用の初期設定ファイル $HOME/.gnuplot を再実行します。以下参照:
+ `initialization`。
 
 =error state
  `reset errors` は、エラー状態変数 GPVAL_ERRNO と GPVAL_ERRMSG のみをク
@@ -6914,7 +7008,7 @@ Ffigure_mapcontours
        set arrow <tag> arrowstyle | as <arrow_style>
        set arrow <tag> {nohead | head | backhead | heads}
                        {size <headlength>,<headangle>{,<backangle>}}
-                       {filled | empty | nofilled}
+                       {filled | empty | nofilled | noborder}
                        {front | back}
                        {linestyle <line_style>}
                        {linetype <line_type>} {linewidth <line_width>}
@@ -8251,11 +8345,13 @@ Ffigure_missing
        set ytics format "%.2f"
 
  書式文字列の長さは 100 文字まで、と制限されています。デフォルトの書式
- 文字列は "% g" ですが、、"%.2f" や "%3.0em" などの書式が好まれることも
- 多いでしょう。。LaTeX 用にはよく "$%g$" が好まれます。書式文字列を何も
- 与えない場合は、format はデフォルトに戻ります。空文字列 "" を指定した
- 場合、刻み自身は表示されますが見出しはつきません。刻み自身を消すには、
- `unset xtics` または `set tics scale 0` を使用してください。
+ 文字列は "% h" で、LaTeX 系の出力形式では "$%h$" です。他に "%.2f" や
+ "%3.0em" のような書式が好まれることも多いでしょう。"set format" の後ろ
+ に何もつけずに実行すると、デフォルトに戻します。
+
+ 空文字列 "" を指定した場合、刻み自身は表示しますが見出しはつけません。
+ 刻み自身を消すには、 `unset xtics` または `set tics scale 0` を使用し
+ てください。
 
  書式文字列では、改行文字 (\n) や拡張文字列処理 (enhanced text) 用のマ
  ークアップも使えます。 この場合は、単一引用符 (') でなく (") を使って
@@ -8293,6 +8389,7 @@ Ffigure_missing
        %f         固定小数点表記
        %e, %E     指数表記; 指数の前に "e", "E" をつける
        %g, %G     %e (または %E) と %f の略記
+       %h, %H     %g に "e%S" でなく "x10^{%S}" か "*10^{%S}" をつける
        %x, %X     16 進表記
        %o, %O     8 進表記
        %t         10 進の仮数部
@@ -8312,6 +8409,7 @@ Ffigure_missing
 #\verb@%f@ & 固定小数点表記 \\
 #\verb@%e@, \verb@%E@ & 指数表記; 指数の前に "e", "E" をつける \\
 #\verb@%g@, \verb@%G@ & \verb@%e@ (または \verb@%E@) と \verb@%f@ の略記 \\
+#\verb@%h@, \verb@%H@ & \verb@%g に "e%S" でなく "x10^{%S}" か "*10^{%S}" をつける@\\
 #\verb@%x@, \verb@%X@ & 16 進表記 \\
 #\verb@%o@, \verb@%O@ & 8 進表記 \\
 #\verb@%t@ & 10 進の仮数部 \\
@@ -8330,6 +8428,7 @@ Ffigure_missing
 %%f@固定小数点表記
 %%e, %E@指数表記; 指数の前に "e", "E" をつける
 %%g, %G@%e (または %E) と %f の略記
+%%h, %H@%g に "e%S" でなく "x10^{%S}" か "*10^{%S}" をつける
 %%x, %X@16 進表記
 %%o, %O@8 進表記
 %%t@10 進の仮数部
@@ -8357,6 +8456,7 @@ Ffigure_missing
 ^<tr>    <td><tt>%f</tt></td>    <td>固定小数点表記</td></tr>
 ^<tr>    <td><tt>%e</tt>, <tt>%E</tt></td>    <td>指数表記; 指数の前に "e", "E" をつける</td></tr>
 ^<tr>    <td><tt>%g</tt>, <tt>%G</tt></td>    <td><tt>%e</tt> (または <tt>%E</tt>) と <tt>%f</tt>の略記</td></tr>
+^<tr>    <td><tt>%h</tt>, <tt>%H</tt></td>    <td><tt>%g</tt> に "e%S" の代わりに "x10^{%S}" か "*10^{%S}" をつける</td></tr>
 ^<tr>    <td><tt>%x</tt>, <tt>%X</tt></td>    <td>16 進表記</td></tr>
 ^<tr>    <td><tt>%o</tt>, <tt>%O</tt></td>    <td>8 進表記</td></tr>
 ^<tr>    <td><tt>%t</tt></td>    <td>10 進の仮数部</td></tr>
@@ -9763,8 +9863,8 @@ Ffigure_missing
        unset mxtics
        show mxtics
 
- これらの書式は `mytics`, `mztics`, `mx2tics`, `my2tics`, `mcbtics` に
- 対しても同じです。
+ これらの書式は `mytics`, `mztics`, `mx2tics`, `my2tics`, `mrtics`,
+ `mcbtics` に対しても同じです。
 
  <freq> は大目盛り間の、小目盛りによって分割される区間の数 (小目盛りの
  数ではありません) です。通常の線形軸に対してはデフォルトの値は 2 か 5
@@ -10275,12 +10375,14 @@ Ffigure_missing
 ?pm3d scanorder
 ?pm3d depthorder
 ?pm3d flush
+?pm3d ftriangles
 ?depthorder
 =flush
 =scansforward
 =scansbackward
 =scansautomatic
 =depthorder
+=ftriangles
  デフォルトでは、pm3d の塗り潰し曲面を構成する四角形は、それらが曲面の
  格子点に沿って出会う順番に塗り潰されます。この順番は、オプション
  `scansautomatic`|`scansforward`|`scansbackward` で制御できます。これら
@@ -10937,7 +11039,8 @@ C 下記の以下参照: オプション `positive`, `negative`)。
  コマンド `set rtics` は、動径軸に沿って目盛りを配置します。これは、極
  座標モードでのみ表示されます。目盛りとその見出しは原点の右側に描かれま
  す。キーワード `mirror` は、それらを原点の左側にも描きます。その他のキ
- ーワードに関する話については以下参照: `polar`, `set xtics`。
+ ーワードに関する話については以下参照: `polar`, `set xtics`,
+ `set mxtics`。
 3 samples
 ?commands set samples
 ?commands show samples
@@ -11082,8 +11185,8 @@ C 下記の以下参照: オプション `positive`, `negative`)。
  書式:
        set style arrow <index> default
        set style arrow <index> {nohead | head | heads}
-                               {size <length>,<angle>{,<backangle>}}
-                               {filled | empty | nofilled}
+                               {size <length>,<angle>{,<backangle>} {fixed}}
+                               {filled | empty | nofilled | noborder}
                                {front | back}
                                { {linestyle | ls <line_style>}
                                  | {linetype | lt <line_type>}
@@ -11107,25 +11210,24 @@ C 下記の以下参照: オプション `positive`, `negative`)。
  矢先の大きさは `size <length>,<angle>` または
  `size <length>,<angle>,<backangle>` で制御できます。`<length>` は矢先
  の各枝の長さで、`<angle>` は矢先の枝と矢軸がなす角度 (単位は度) です。
- `<length>` の単位は x 軸と同じですが、それは `<length>` の前に
- `first`, `second`, `graph`, `screen`, `character` をつけることで変更で
- きます。詳細は、以下参照: `coordinates`。`<backangle>` は、`filled` か
- または `empty` がともに使われた場合のみ効力を持ち、その場合、
- `<backangle>` は矢先の後ろの部分の矢軸との切り角 (`<angle>` と同じ方向;
- 単位は度) になります。出力形式 `fig` は、制限された切り角関数を持って
- いて、それは 3 つの異なる形をサポートしていて、それは 2 つの閾値で決定
- します: 70 度未満の場合、矢先はへこんだ切り角を持ち、110 度を超える場
- 合、後ろの部分に尖った角を持ち、その間の角では、矢先の後ろは直線になり
+ `<length>` の単位は x 軸と同じですが、それは `<length>` の前に `first`,
+ `second`, `graph`, `screen`, `character` をつけることで変更できます。
+ 詳細は、以下参照: `coordinates`。
+
+ デフォルトでは、とても短い矢の矢先は小さくしますが、これは、`size` コ
+ マンドの後ろに `fixed` を使うことで無効にできます。
+
+ `<backangle>` は、矢先の後ろの部分の矢軸との切り角 (`<angle>` と同じ方
+ 向、単位は度) になりますが、スタイルが `nofilled` の場合はこれを無視し
  ます。
 
  `filled` を指定すると、塗りつぶされた矢先を作ります (`heads` が使われ
- ている場合)。塗りつぶしは、多角形の塗りつぶしが行えるような出力形式で
- サポートされていて、そのリストについては、以下参照: `pm3d`。他の出力形
- 式では矢先は閉じられますが塗りつぶされません。それと同じ効果 (閉じらる
- が塗られない) は、`empty` を指定しても得られます。また、`metafont`,
- `metapost`, `latex`, `tgif` のように、矢をそれら自身の独自のルーチンで
- 描くような出力形式では、矢先の塗りつぶしや矢先の枠線描きはもちろんサポ
- ートされません。
+ ている場合)。`noborder` を指定すると、塗りつぶされた矢先は描きますが、
+ 矢先の回りの線 (境界線) は描きません。これは 2 つの効果を持ちます。一
+ つは、矢先が少し小さくなることで、もう一つは矢先の先端がベクトルの終点
+ ピッタリの場所に置かれることです。境界線を描くと、境界線の幅の何割分か
+ だけ終点から少し先に矢先が伸びます。矢先の塗りつぶしは、すべての出力形
+ 式がサポートしているとは限りません。
 
  線種はユーザの定義したラインスタイルのリストから選ぶこともできますし
  (以下参照: `set style line`)、用意されている `<line_type>` の値 (デフ
@@ -13631,17 +13733,16 @@ C 度の記号は set encoding locale で出るようになると。
 
  "時刻" として指定された座標は 24 時で折り返します。
 
- `nohidden3d` は、全体的な設定である `set hidden3d` を、個々の描画に対
- して免除するためのオプションですが、これは媒介変数の曲線 (parametric)
- に対しては機能しません。
+ 媒介変数の曲線: `nohidden3d` は、全体的な設定である `set hidden3d` を
+ 個々のグラフに対して免除するためのオプションですが、これは媒介変数の曲
+ 線 (parametric) に対しては機能しません。
+ コマンド `plot` 内の繰り返し (iteration) は、媒介変数の曲線に対しては
+ 機能しません。
 
- X11 出力形式: UTF-8 フォントの選択が困難です。プログラムは、x11 出力ウ
- ィンドウのアスペクト比の正しさを追求しません。それは、"set size ratio"
- のようなコマンドが正常に機能するためには、x11 ウィンドウ自体が等しい高
- さと幅を持たなければならないからです。 すべての x11 描画ウィンドウに対
- して、一度に 1 つのカラーパレットのみが有効です。これは、異なるパレッ
- トを使用する描画を含んだ multiplot では x11 上では正しく表示されない、
- ということを意味します。
+ X11 出力形式: UTF-8 フォントの選択が困難です。
+ すべての x11 描画ウィンドウに対して、一度には 1 つのカラーパレットのみ
+ が有効です。これは、異なるパレットを使用する描画を含んだ multiplot で
+ は x11 上では正しく表示されないことを意味します。
 
  Qt 出力形式: コンパイル時に使用される qt 環境がレンダリングモードとし
  て "opengl" をサポートしていなければ多角形と曲面表示はかなり遲くなる可
