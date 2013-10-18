@@ -1,3 +1,11 @@
+2013-10-18  Christoph Bersch <usenet@bersch.net>
+
+	* src/gadgets.h  src/graphics.c  src/graphics.h src/save.c src/set.c 
+	demo/all.dem demo/clipobject.dem docs/gnuplot.doc:
+	New object attribute clip/noclip.  "clip" retains the current default,
+	clip to plot boundary unless one or more vertices are given in screen
+	coordinates.  "noclip" clips to the canvas.
+
 2013-10-18  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* docs/gnuplot-ja.doc term-ja.diff:  Sync translation to version 1.830

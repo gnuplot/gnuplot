@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.231 2013/09/26 22:45:33 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.232 2013/10/17 23:52:13 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -1566,6 +1566,11 @@ save_object(FILE *fp, int tag)
 	if (tag == 0 || tag == this_object->tag) {
 	    fprintf(fp, "\n%sobject %2d ", (fp==stderr) ? "\t" : "set ",this_object->tag);
 	    fprintf(fp, "%s ", this_object->layer > 0 ? "front" : this_object->layer < 0 ? "behind" : "back");
+	    if (this_object->clip == OBJ_NOCLIP)
+		fputs("noclip ", fp);
+	    else 
+		fputs("clip ", fp);
+
 	    if (this_object->lp_properties.l_width)
 		    fprintf(fp, "lw %.1f ",this_object->lp_properties.l_width);
 	    fprintf(fp, "fc ");

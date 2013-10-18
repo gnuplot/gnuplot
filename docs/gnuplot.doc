@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.828 2013/10/07 21:03:48 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.830 2013/10/10 22:23:03 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -9799,7 +9799,8 @@ Ffigure_missing
  Syntax:
      set object <index>
          <object-type> <object-properties>
-         {front|back|behind} {fc|fillcolor <colorspec>} {fs <fillstyle>}
+         {front|back|behind} {clip|noclip}
+         {fc|fillcolor <colorspec>} {fs <fillstyle>}
          {default} {lw|linewidth <width>}
      unset object <index>
 
@@ -9812,6 +9813,10 @@ Ffigure_missing
  object behind everything including the axes and `back` rectangles, thus
      set object rectangle from screen 0,0 to screen 1,1 behind
  can be used to provide a colored background for the entire graph or page.
+
+ By default, objects are clipped to the graph boundary unless one or more
+ vertices are given in screen coordinates.  Setting `noclip` will disable
+ clipping to the graph boundary, but will still clip against the screen size.
 
  The fill color of the object is taken from the <colorspec>. `fillcolor`
  may be abbreviated `fc`.  The fill style is taken from <fillstyle>.
@@ -10986,8 +10991,8 @@ Ffigure_missing
  Syntax:
        set style arrow <n> <arrowstyle>
        set style boxplot <boxplot style options>
-       set style circle radius <size>
-       set style ellipse size <size> units {xy|xx|yy}
+       set style circle radius <size> {clip|noclip}
+       set style ellipse size <size> units {xy|xx|yy} {clip|noclip}
        set style fill <fillstyle>
        set style histogram <histogram style options>
        set style line <n> <linestyle>
@@ -11435,13 +11440,17 @@ Ffigure_missing
 ?show style circle
 
  Syntax:
-       set style circle {radius {graph|screen} <R>} {{no}wedge}
+       set style circle {radius {graph|screen} <R>} 
+                        {{no}wedge} 
+                        {clip|noclip}
 
  This command sets the default radius used in plot style "with circles".  It
  applies to data plots with only 2 columns of data (x,y) and to function plots.
  The default is "set style circle radius graph 0.02".  `Nowedge` disables
  drawing of the two radii that connect the ends of an arc to the center.
- The default is `wedge`.  This parameter has no effect on full circles.
+ The default is `wedge`. This parameter has no effect on full circles. `Clip`
+ clips the circle at the plot boundaries, `noclip` disables this. Default is 
+ `clip`.
 
 4 set style rectangle
 ?commands set style rectangle
@@ -11479,6 +11488,7 @@ Ffigure_missing
        set style ellipse {units xx|xy|yy}
                          {size {graph|screen} <a>, {{graph|screen} <b>}}
                          {angle <angle>}
+			 {clip|noclip}
 
  This command governs whether the diameters of ellipses are interpreted in
  the same units or not.
@@ -11507,6 +11517,9 @@ Ffigure_missing
  Last, but not least it is possible to set the default orientation with the
  `angle` keyword. The orientation, which is defined as the angle between the
  major axis of the ellipse and the plot's x axis, must be given in degrees.
+
+ `Clip` clips the ellipse at the plot boundaries, `noclip` disables this. 
+ Default is `clip`.
 
  For defining ellipse objects, see `set object ellipse`;
  for the 2D plot style, see `ellipses`.

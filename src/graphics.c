@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.437 2013/10/17 23:53:37 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.438 2013/10/18 03:59:08 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -378,7 +378,8 @@ place_objects(struct object *listhead, int layer, int dimensions)
 
 	    term_apply_lp_properties(&lpstyle);
 
-	    if (e->center.scalex == screen || e->center.scaley == screen)
+	    if ((e->center.scalex == screen || e->center.scaley == screen) 
+	    ||  (this_object->clip == OBJ_NOCLIP))
 	    	clip_area = &canvas;
 
 	    do_arc((int)x1, (int)y1, radius, e->arc_begin, e->arc_end, style, FALSE);
@@ -398,7 +399,8 @@ place_objects(struct object *listhead, int layer, int dimensions)
 
 	    term_apply_lp_properties(&lpstyle);
 
-	    if (e->center.scalex == screen || e->center.scaley == screen)
+	    if ((e->center.scalex == screen || e->center.scaley == screen)
+	    ||  (this_object->clip == OBJ_NOCLIP))
 	    	clip_area = &canvas;
 
 	    if (dimensions == 2)
@@ -420,11 +422,11 @@ place_objects(struct object *listhead, int layer, int dimensions)
 	{
 	    term_apply_lp_properties(&lpstyle);
 
-	    do_polygon(dimensions, &this_object->o.polygon, style);
+	    do_polygon(dimensions, &this_object->o.polygon, style, this_object->clip);
 
 	    /* Retrace the border if the style requests it */
 	    if (need_fill_border(fillstyle))
-		    do_polygon(dimensions, &this_object->o.polygon, 0);
+		do_polygon(dimensions, &this_object->o.polygon, 0, this_object->clip);
 
 	    break;
 	}
@@ -2122,6 +2124,10 @@ plot_circles(struct curve_points *plot)
     struct fill_style_type *fillstyle = &plot->fill_properties;
     int style = style_from_fill(fillstyle);
     TBOOLEAN withborder = FALSE;
+    BoundingBox *clip_save = clip_area;
+
+    if (default_circle.clip == OBJ_NOCLIP)
+	clip_area = &canvas;
 
     if (fillstyle->border_color.type != TC_LT
     ||  fillstyle->border_color.lt != LT_NODRAW)
@@ -2150,6 +2156,8 @@ plot_circles(struct curve_points *plot)
 	    }
 	}
     }
+
+    clip_area = clip_save;
 }
 
 /* plot_ellipses:
@@ -2164,6 +2172,10 @@ plot_ellipses(struct curve_points *plot)
     struct fill_style_type *fillstyle = &plot->fill_properties;
     int style = style_from_fill(fillstyle);
     TBOOLEAN withborder = FALSE;
+    BoundingBox *clip_save = clip_area;
+
+    if (default_ellipse.clip == OBJ_NOCLIP)
+	clip_area = &canvas;
 
     if (fillstyle->border_color.type != TC_LT
     ||  fillstyle->border_color.lt != LT_NODRAW)
@@ -2231,7 +2243,7 @@ plot_ellipses(struct curve_points *plot)
 	}
     }
     free(e);
-    /* free(willy); */
+    clip_area = clip_save; 
 }
 #endif
 
@@ -2255,6 +2267,7 @@ plot_dots(struct curve_points *plot)
 	    (*t->point) (x, y, -1);
 	}
     }
+
 }
 
 /* plot_vectors:
@@ -3741,7 +3754,7 @@ place_raxis()
 {
 #ifdef EAM_OBJECTS
     t_object raxis_circle = {
-	NULL, 1, 1, OBJ_CIRCLE,	/* link, tag, layer (front), object_type */
+	NULL, 1, 1, OBJ_CIRCLE,	OBJ_CLIP, /* link, tag, layer (front), object_type, clip */
 	{FS_SOLID, 100, 0, BLACK_COLORSPEC},
 	{0, LT_BACKGROUND, 0, 0, 0.2, 0.0, BACKGROUND_COLORSPEC},
 	{.circle = {1, {0,0,0,0.,0.,0.}, {graph,0,0,0.02,0.,0.}, 0., 360. }}
@@ -3838,12 +3851,14 @@ do_rectangle( int dimensions, t_object *this_object, int style )
 	    y2 = y1 + height;
 	    w = width;
 	    h = height;
-	    if (this_rect->extent.scalex == first_axes
-	    ||  this_rect->extent.scalex == second_axes)
-		clip_x = TRUE;
-	    if (this_rect->extent.scaley == first_axes
-	    ||  this_rect->extent.scaley == second_axes)
-		clip_y = TRUE;
+	    if (this_object->clip == OBJ_CLIP) {
+		if (this_rect->extent.scalex == first_axes
+		    ||  this_rect->extent.scalex == second_axes)
+		    clip_x = TRUE;
+		if (this_rect->extent.scaley == first_axes
+		    ||  this_rect->extent.scaley == second_axes)
+		    clip_y = TRUE;
+	    }
 
 	} else {
 	    if ((dimensions == 2)
@@ -3858,10 +3873,12 @@ do_rectangle( int dimensions, t_object *this_object, int style )
 
 	    if (x1 > x2) {double t=x1; x1=x2; x2=t;}
 	    if (y1 > y2) {double t=y1; y1=y2; y2=t;}
-	    if (this_rect->bl.scalex != screen && this_rect->tr.scalex != screen)
-		clip_x = TRUE;
-	    if (this_rect->bl.scaley != screen && this_rect->tr.scaley != screen)
-		clip_y = TRUE;
+	    if (this_object->clip == OBJ_CLIP) {
+		if (this_rect->bl.scalex != screen && this_rect->tr.scalex != screen)
+		    clip_x = TRUE;
+		if (this_rect->bl.scaley != screen && this_rect->tr.scaley != screen)
+		    clip_y = TRUE;
+	    }
 	}
 
 	/* FIXME - Should there be a generic clip_rectangle() routine?	*/
@@ -4025,12 +4042,11 @@ do_ellipse( int dimensions, t_ellipse *e, int style, TBOOLEAN do_own_mapping )
 }
 
 void
-do_polygon( int dimensions, t_polygon *p, int style )
+do_polygon( int dimensions, t_polygon *p, int style, t_clip_object clip )
 {
     static gpiPoint *corners = NULL;
     static gpiPoint *clpcorn = NULL;
     BoundingBox *clip_save = clip_area;
-    TBOOLEAN noclip = FALSE;
     int nv;
 
     if (!p->vertex || p->type < 2)
@@ -4038,6 +4054,7 @@ do_polygon( int dimensions, t_polygon *p, int style )
 
     corners = gp_realloc(corners, p->type * sizeof(gpiPoint), "polygon");
     clpcorn = gp_realloc(clpcorn, 2 * p->type * sizeof(gpiPoint), "polygon");
+
     for (nv = 0; nv < p->type; nv++) {
 	if (dimensions == 3)
 	    map3d_position(&p->vertex[nv], &corners[nv].x, &corners[nv].y, "pvert");
@@ -4046,10 +4063,10 @@ do_polygon( int dimensions, t_polygon *p, int style )
 
 	/* Any vertex given in screen coords will disable clipping */
 	if (p->vertex[nv].scalex == screen || p->vertex[nv].scaley == screen)
-	    noclip = TRUE;
+	    clip = OBJ_NOCLIP;
     }
 
-    if (noclip)
+    if (clip == OBJ_NOCLIP)
 	clip_area = &canvas;
 
     if (term->filled_polygon && style) {
@@ -4065,7 +4082,6 @@ do_polygon( int dimensions, t_polygon *p, int style )
     }
 
     clip_area = clip_save;
-
 }
 #endif
 

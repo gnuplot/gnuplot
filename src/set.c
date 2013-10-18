@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.414 2013/09/27 03:31:22 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.415 2013/09/27 04:54:33 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -4006,6 +4006,14 @@ set_obj(int tag, int obj_type)
 	    got_fill = got_lt = TRUE;
 	    c_token++;
 	    continue;
+	} else if (equals(c_token, "clip")) {
+	    this_object->clip = OBJ_CLIP;
+	    c_token++;
+	    continue;
+	} else if (equals(c_token, "noclip")) {
+	    this_object->clip = OBJ_NOCLIP;
+	    c_token++;
+	    continue;
 	}
 
 	/* Now parse the style options; default to whatever the global style is  */
@@ -4196,6 +4204,12 @@ set_style()
 	    } else if (almost_equals(c_token, "nowedge$s")) {
 		c_token++;
 		default_circle.o.circle.wedge = FALSE;
+	    } else if (equals(c_token, "clip") || almost_equals(c_token, "clipdef$ault")) {
+		c_token++;
+		default_circle.clip = OBJ_CLIP;
+	    } else if (equals(c_token, "noclip")) {
+		c_token++;
+		default_circle.clip = OBJ_NOCLIP;
 	    } else
 		int_error(c_token, "unrecognized style option" );
 	}
@@ -4224,6 +4238,12 @@ set_style()
 	        } else {
 	            int_error(c_token, "expecting 'xy', 'xx' or 'yy'" );
 	        }
+	    } else if (equals(c_token, "clip") || almost_equals(c_token, "clipdef$ault")) {
+		c_token++;
+		default_ellipse.clip = OBJ_CLIP;
+	    } else if (equals(c_token, "noclip")) {
+		c_token++;
+		default_ellipse.clip = OBJ_NOCLIP;
 	    } else
 	        int_error(c_token, "expecting 'units {xy|xx|yy}', 'angle <number>' or 'size <position>'" );
 
