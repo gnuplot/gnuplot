@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.415 2013/09/27 04:54:33 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.416 2013/10/19 04:31:04 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -4204,7 +4204,7 @@ set_style()
 	    } else if (almost_equals(c_token, "nowedge$s")) {
 		c_token++;
 		default_circle.o.circle.wedge = FALSE;
-	    } else if (equals(c_token, "clip") || almost_equals(c_token, "clipdef$ault")) {
+	    } else if (equals(c_token, "clip")) {
 		c_token++;
 		default_circle.clip = OBJ_CLIP;
 	    } else if (equals(c_token, "noclip")) {
@@ -4238,7 +4238,7 @@ set_style()
 	        } else {
 	            int_error(c_token, "expecting 'xy', 'xx' or 'yy'" );
 	        }
-	    } else if (equals(c_token, "clip") || almost_equals(c_token, "clipdef$ault")) {
+	    } else if (equals(c_token, "clip")) {
 		c_token++;
 		default_ellipse.clip = OBJ_CLIP;
 	    } else if (equals(c_token, "noclip")) {
