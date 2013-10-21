@@ -1,3 +1,15 @@
+2013-10-21  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/color.h src/set.c src/getcolor.c (quantize_gray):
+	Change the algorithm used to assign palette colors in the case
+	   set palette defined (...) maxcolors N
+	where the gradient boundaries are unevenly spaced. Previous versions
+	of quantize_gray() have shown a variety of bad outcomes.  This version
+	has fewer, less ugly, bad outcomes but it is still sensitive to the
+	choice of maxcolors.  Try changing maxcolors by +/- one if the generated
+	palette is bad.
+	Bug #1140 and others
+
 2013-10-17  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/save.c (place_objects): "show object N" was incorrectly printing

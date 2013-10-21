@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.354.2.5 2013/01/25 05:55:53 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.354.2.6 2013/09/11 23:38:37 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -2833,6 +2833,7 @@ set_palette_defined()
 
     free( sm_palette.gradient );
     sm_palette.gradient = gp_alloc( actual_size*sizeof(gradient_struct), "pm3d gradient" );
+    sm_palette.smallest_gradient_interval = 1;
 
     if (END_OF_COMMAND) {
 	/* lets use some default gradient */
@@ -2849,6 +2850,7 @@ set_palette_defined()
 	}
 	sm_palette.gradient_num = 8;
 	sm_palette.cmodel = C_MODEL_RGB;
+	sm_palette.smallest_gradient_interval = 0.1;  /* From pal[][] */
 	return 0;
     }
 
@@ -3098,24 +3100,33 @@ check_palette_grayscale()
 {
     int i;
     double off, f;
+    gradient_struct *gradient = sm_palette.gradient;
 
     /* check if gray values are sorted */
     for (i=0; i<sm_palette.gradient_num-1; ++i ) {
-	if (sm_palette.gradient[i].pos > sm_palette.gradient[i+1].pos) {
+	if (gradient[i].pos > gradient[i+1].pos) {
 	    int_error( c_token, "Gray scale not sorted in gradient." );
 	}
     }
 
     /* fit gray axis into [0:1]:  subtract offset and rescale */
-    off = sm_palette.gradient[0].pos;
-    f = 1.0 / ( sm_palette.gradient[sm_palette.gradient_num-1].pos-off );
+    off = gradient[0].pos;
+    f = 1.0 / ( gradient[sm_palette.gradient_num-1].pos-off );
     for (i=1; i<sm_palette.gradient_num-1; ++i ) {
-	sm_palette.gradient[i].pos = f*(sm_palette.gradient[i].pos-off);
+	gradient[i].pos = f*(gradient[i].pos-off);
     }
 
     /* paranoia on the first and last entries */
-    sm_palette.gradient[0].pos = 0.0;
-    sm_palette.gradient[sm_palette.gradient_num-1].pos = 1.0;
+    gradient[0].pos = 0.0;
+    gradient[sm_palette.gradient_num-1].pos = 1.0;
+
+    /* save smallest interval */
+    sm_palette.smallest_gradient_interval = 1.0;
+    for (i=1; i<sm_palette.gradient_num-1; ++i ) {
+	if (((gradient[i].pos - gradient[i-1].pos) > 0)
+	&&  (sm_palette.smallest_gradient_interval > (gradient[i].pos - gradient[i-1].pos)))
+	     sm_palette.smallest_gradient_interval = (gradient[i].pos - gradient[i-1].pos);
+    }
 }
 
 

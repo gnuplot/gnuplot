@@ -2,6 +2,7 @@ New features, changes and fixes since gnuplot version 4.6.4
 ===========================================================
 
 * FIX allow 'set pm3d' interpolate and top/bottom options to coexist
+* revised handling of defined palettes with explicit maxcolors
 
 New features, changes and fixes in gnuplot version 4.6.4
 ========================================================
