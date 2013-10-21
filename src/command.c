@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.267 2013/09/24 21:50:18 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.268 2013/10/03 21:07:45 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -2022,9 +2022,6 @@ title 'R,G,B profiles of the current color palette';";
     free(replot_line);
     replot_line = save_replot_line;
     is_3d_plot = save_is_3d_plot;
-
-    /* further, gp_input_line[] and token[] now destroyed! */
-    c_token = num_tokens = 0;
 }
 
 
