@@ -1,3 +1,12 @@
+2013-10-21  Christoph Bersch <usenet@bersch.net>
+
+	* src/gadgets.h  src/graphics.c  src/graphics.h src/save.c src/set.c
+	demo/clipobject.dem docs/gnuplot.doc:
+	New object attribute clip/noclip.  "clip" retains the current default,
+	clip to plot boundary unless one or more vertices are given in screen
+	coordinates.  "noclip" clips to the canvas. Does not fix broken ellipse
+	clipping.
+
 2013-10-21  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/color.h src/set.c src/getcolor.c (quantize_gray):

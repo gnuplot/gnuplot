@@ -1,5 +1,5 @@
 /*
- * $Id: graphics.h,v 1.52 2011/10/10 21:17:04 juhaszp Exp $
+ * $Id: graphics.h,v 1.52.2.1 2011/12/29 06:36:05 sfeam Exp $
  */
 
 /* GNUPLOT - graphics.h */
@@ -107,7 +107,7 @@ void plot_image_or_update_axes __PROTO((void *plot, TBOOLEAN update_axes));
 #ifdef EAM_OBJECTS
 void place_objects __PROTO((struct object *listhead, int layer, int dimensions));
 void do_ellipse __PROTO((int dimensions, t_ellipse *e, int style, TBOOLEAN do_own_mapping ));
-void do_polygon __PROTO((int dimensions, t_polygon *p, int style ));
+void do_polygon __PROTO((int dimensions, t_polygon *p, int style, t_clip_object clip ));
 #else
 #define place_objects(listhead,layer,dimensions) /* void() */
 #endif
