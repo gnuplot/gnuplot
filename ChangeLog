@@ -10,6 +10,10 @@
 	palette is bad.
 	Bug #1140 and others
 
+	* src/command.c (test_palette_subcommand):  The "test palette" command
+	does not need to zero the current input line, and hasn't needed to since
+	lf_push/lf_pop were introduced 5 years ago.
+
 2013-10-17  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/save.c (place_objects): "show object N" was incorrectly printing
