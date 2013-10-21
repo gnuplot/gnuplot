@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: getcolor.c,v 1.32 2011/10/08 00:07:41 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: getcolor.c,v 1.33 2012/10/30 04:43:42 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - getcolor.c */
@@ -346,27 +346,44 @@ rgb1maxcolors_from_gray(double gray, rgb_color *color)
 double 
 quantize_gray( double gray )
 {
-    double degray = floor(gray * sm_palette.use_maxcolors)
-			/ (sm_palette.use_maxcolors-1);
+    double qgray = floor(gray * sm_palette.use_maxcolors)
+		 / (sm_palette.use_maxcolors-1);
 
     if (sm_palette.colorMode == SMPAL_COLOR_MODE_GRADIENT) {
 	int j;
-	if ((sm_palette.gradient_num <= 2) && (degray == 0))
-	    ; /* Backward compatibility with common case of 1 segment */
+	gradient_struct *g = sm_palette.gradient;
+	double small = 1. / sm_palette.use_maxcolors;
+
+	/* Backward compatibility with common case of 1 segment */
+	if ((sm_palette.gradient_num <= 2) && (qgray == 0))
+	    ;
+
+	/* All palette segments are large compared to the sampling interval.
+	 * Simple truncation of gray is good enough.
+	 */
+	else if (sm_palette.smallest_gradient_interval > small)
+	    ;
+
+	/* There is at least one palette segment that is smaller than the sampling
+	 * interval. Earlier versions of quantize_gray() handled this case poorly.
+	 * This version isn't perfect either.  In particular it fails to handle the
+	 * converse problematic case where qgray is inside some small interval but
+	 * the true gray value is not.  This causes a color from the narrow segment 
+	 *  to be applied incorrectly to neighoring segments as well.
+	 */
 	else for (j=0; j<sm_palette.gradient_num; j++) {
-	    if ((gray >= sm_palette.gradient[j].pos)
-	    &&  (gray <  sm_palette.gradient[j+1].pos)) {
-		if ((degray < sm_palette.gradient[j].pos)
-		||  (degray > sm_palette.gradient[j+1].pos))
-		    degray = (sm_palette.gradient[j].pos
-			    + sm_palette.gradient[j+1].pos) / 2.;
-	    }
-	    if (gray < sm_palette.gradient[j+1].pos)
+	    /* Does the true gray value lie in this interval? */
+	    if ((gray >= g[j].pos) &&  (gray <  g[j+1].pos)) {
+		/* See if it is so small that truncation missed it */
+		if ((g[j+1].pos - g[j].pos) < small)
+		    qgray = (g[j].pos + g[j+1].pos) / 2.;
 		break;
+	    }
+
 	}
     }
 
-    return degray;	
+    return qgray;	
 }
 
 
