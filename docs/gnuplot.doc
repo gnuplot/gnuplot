@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.830 2013/10/10 22:23:03 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.831 2013/10/19 04:31:04 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -221,14 +221,14 @@ C
  autoscaling. It does not invert or otherwise alter the meaning of a command
  such as `set xrange [0:1]`.  If you want to reverse the direction of the
  x axis in such a case, say instead `set xrange [1:0]`.
- 
+
  * New coordinate system (Degrees, Minutes, Seconds). See `set xdata geographic`.
 
  * The default format for axis labels is "% h" ("$%h$" for LaTeX terminals).
 
  * Command scripts may contain inline data that is loaded into a named
  data block for repeated plotting. See `inline data`.
- 
+
  * Support for 32-bit Alpha channel + RGB color #AARRGGBB.  See `colorspec`.
 
  * Support for HSV color space via a translation function hsv2rgb(H,S,V).
@@ -3454,9 +3454,8 @@ Ffigure_histrows
  This will produce a plot in which each vertical bar corresponds to one row of
  data.  Each vertical bar contains a stack of two segments, corresponding in
  height to the values found in columns 2 and 4 of the datafile.
-      
-      
-      
+
+
  Finally, the commands
 
        set style histogram columnstacked
@@ -3466,7 +3465,7 @@ Ffigure_histcols
  will produce two vertical stacks, one for each column of data.  The stack at
  x=1 will contain a box for each entry in column 2 of the datafile.  The stack
  at x=2 will contain a box for each parallel entry in column 4 of the datafile.
- 
+
  Because this interchanges gnuplot's usual interpretation of input rows and
  columns, the specification of key titles and x-axis tic labels must also be
  modified accordingly. See the comments given below.
@@ -4193,7 +4192,7 @@ Ffigure_mapcontours
        fit a0 + a1*x/(1 + a2*x/(1 + a3*x)) 'measured.dat' via a0,a1,a2,a3
        fit a*x + b*y 'surface.dat' using 1:2:3:(1) via a,b
        fit [*:*][yaks=*:*] a*x+b*yaks 'surface.dat' u 1:2:3:(1) via a,b
-       
+
        fit [][][t=*:*] a*x + b*y + c*t 'foo.dat' using 1:2:3:4:(1) via a,b,c
 
        set dummy x1, x2, x3, x4, x5
@@ -7994,7 +7993,7 @@ Ffigure_missing
 
  The second example sets the second variable to s.  To reset the dummy variable
  names to their default values, use
- 
+
        unset dummy
 3 encoding
 ?commands set encoding
@@ -9241,14 +9240,14 @@ Ffigure_missing
  axis.  <expression2> maps secondary axis coordinates onto the primary axis.
 
  Examples:
-       
+
        set link x
 
  This is the simplest form of the command. It forces the x2 axis to have
  identically the same range, scale, and direction as the x axis.
  Commands `set xrange`, `set auto x`, etc will affect both the x and x2 axes.
  Commands `set x2range`, etc, will be ignored while the linkage is in effect.
-       
+
        set link x2 via x**2 inverse sqrt(x)
        plot "sqrt_data" using 1:2 axes x2y1, "linear_data" using 1:2 axes x1y1
 
@@ -11488,7 +11487,7 @@ Ffigure_missing
        set style ellipse {units xx|xy|yy}
                          {size {graph|screen} <a>, {{graph|screen} <b>}}
                          {angle <angle>}
-			 {clip|noclip}
+                         {clip|noclip}
 
  This command governs whether the diameters of ellipses are interpreted in
  the same units or not.
@@ -12329,7 +12328,7 @@ Ffigure_missing
 
  The same syntax applies to `yrange`, `zrange`, `x2range`, `y2range`, `cbrange`,
  `rrange`, `trange`, `urange` and `vrange`.
- 
+
  See `set link` for options that link the ranges of x and x2, or y and y2.
 
  The `reverse` option reverses the direction of an autoscaled axis. For example,
@@ -12552,7 +12551,7 @@ Ffigure_missing
  Tics with level 2 and higher must be explicitly specified by the user, and
  take priority over auto-generated tics.  The size of tics marks at each
  level is controlled by the command `set tics scale`.
- 
+
  Examples:
        set xtics ("low" 0, "medium" 50, "high" 100)
        set xtics (1,2,4,8,16,32,64,128,256,512,1024)
