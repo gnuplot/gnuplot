@@ -6,7 +6,12 @@
 	Bug #1295
 
 	* src/mouse.c (event_reset) src/term.c (check_for_mouse_events):  
-	Must not send commands to the terminal if it has not yet been initialized.
+	Must not send commands to the terminal if it has not yet been
+	initialized.
+
+	* term/gd.trm src/wxterminal/gp_cairo.c:
+	Inboard terminal drivers should not write errors to stdout and normally
+	should not call exit() themselves.
 
 2013-10-21  Ethan A Merritt  <merritt@u.washington.edu>
 

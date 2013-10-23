@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: gd.trm,v 1.173 2013/10/07 21:43:48 sfeam Exp $
+ * $Id: gd.trm,v 1.174 2013/10/09 02:41:22 sfeam Exp $
  * based on gif.trm,v 1.26.2.1 2000/05/01 00:17:20 joze
  */
 
@@ -1265,10 +1265,6 @@ TERM_PUBLIC int PNG_make_palette (t_sm_palette *palette)
 	    (int)( palette->color[i].r * 255 + 0.5 ), /* r,g,b values for png */
 	    (int)( palette->color[i].g * 255 + 0.5 ), /* terminal are [0;255] */
 	    (int)( palette->color[i].b * 255 + 0.5 ) );
-	if (png_smooth_color[i] < 0) { /* this should never happen! take away? */
-	    FPRINTF((stderr,"png_smooth_color[i]<0 cannot happen"));
-	    exit(1);
-	}
     }
     return 0;
 }

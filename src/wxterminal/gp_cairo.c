@@ -1,5 +1,5 @@
 /*
- * $Id: gp_cairo.c,v 1.73 2013/05/21 18:47:20 sfeam Exp $
+ * $Id: gp_cairo.c,v 1.74 2013/05/21 20:36:46 sfeam Exp $
  */
 
 /* GNUPLOT - gp_cairo.c */
@@ -1825,9 +1825,9 @@ void gp_cairo_set_termvar(plot_struct *plot, unsigned int *v_char,
 void gp_cairo_solid_background(plot_struct *plot)
 {
 	if (cairo_status (plot->cr)) {
-		printf("Cairo is unhappy: %s\n",
+		fprintf(stderr, "Cairo is unhappy: %s\n",
 			cairo_status_to_string (cairo_status (plot->cr)));
-		exit(0);
+		exit(-1);
 	}
 	cairo_set_source_rgb(plot->cr, plot->background.r, plot->background.g, plot->background.b);
 	cairo_paint(plot->cr);
@@ -1836,9 +1836,9 @@ void gp_cairo_solid_background(plot_struct *plot)
 void gp_cairo_clear_background(plot_struct *plot)
 {
 	if (cairo_status (plot->cr)) {
-		printf("Cairo is unhappy: %s\n",
+		fprintf(stderr, "Cairo is unhappy: %s\n",
 			cairo_status_to_string (cairo_status (plot->cr)));
-		exit(0);
+		exit(-1);
 	}
 	cairo_set_source_rgba(plot->cr, 0.0, 0.0, 0.0, 0.0);
 	cairo_paint(plot->cr);
