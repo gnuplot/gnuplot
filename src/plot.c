@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot.c,v 1.128.2.16 2013/04/05 16:39:50 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot.c,v 1.128.2.17 2013/07/03 16:31:53 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot.c */
@@ -136,6 +136,7 @@ static void wrapper_for_write_history __PROTO((void));
 
 TBOOLEAN interactive = TRUE;	/* FALSE if stdin not a terminal */
 TBOOLEAN noinputfiles = TRUE;	/* FALSE if there are script files */
+TBOOLEAN reading_from_dash=FALSE; /* True if processing "-" as an input file */
 TBOOLEAN skip_gnuplotrc = FALSE;/* skip system gnuplotrc and ~/.gnuplot */
 TBOOLEAN persist_cl = FALSE; /* TRUE if -persist is parsed in the command line */
 
@@ -624,6 +625,19 @@ main(int argc, char **argv)
 	    gpoutfile = stdout;
 	}
 #endif /* VMS */
+
+	/* Why a goto?  Because we exited the loop below via int_error */
+	/* using LONGJMP.  The compiler was not expecting this, and    */
+	/* "optimized" the handling of argc and argv such that simply  */
+	/* entering the loop again from the top finds them messed up.  */
+	/* If we reenter the loop via a goto then there is some hope   */
+	/* that code reordering does not hurt us.                      */
+	/* NB: the test for interactive means that execution from a    */
+	/* pipe will not continue after an error. Do we want this?     */
+	if (reading_from_dash && interactive)
+	    goto RECOVER_FROM_ERROR_IN_DASH;
+	reading_from_dash = FALSE;
+
 	if (!interactive && !noinputfiles) {
 	    term_reset();
 	    exit(EXIT_FAILURE);	/* exit on non-interactive error */
@@ -643,9 +657,15 @@ main(int argc, char **argv)
 	    } else if (strcmp(*argv, "-") == 0) {
 #if defined(_Windows) && !defined(WGP_CONSOLE)
 		TextShow(&textwin);
-#endif
 		interactive = TRUE;
+#else
+		interactive = isatty(fileno(stdin));
+#endif
+
+RECOVER_FROM_ERROR_IN_DASH:
+		reading_from_dash = TRUE;
 		while (!com_line());
+		reading_from_dash = FALSE;
 		interactive = FALSE;
 
 	    } else if (strcmp(*argv, "-e") == 0) {

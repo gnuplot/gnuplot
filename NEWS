@@ -4,6 +4,7 @@ New features, changes and fixes since gnuplot version 4.6.4
 * NEW new object attribute clip/noclip
 * FIX allow 'set pm3d' interpolate and top/bottom options to coexist
 * FIX revised handling of defined palettes with explicit maxcolors
+* FIX continue as normal after an interactive session error from "gnuplot -" 
 
 New features, changes and fixes in gnuplot version 4.6.4
 ========================================================
