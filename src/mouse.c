@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: mouse.c,v 1.152 2013/08/24 03:33:35 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: mouse.c,v 1.153 2013/09/01 17:36:56 juhaszp Exp $"); }
 #endif
 
 /* GNUPLOT - mouse.c */
@@ -2156,7 +2156,7 @@ event_reset(struct gp_event_t *ge)
     modifier_mask = 0;
     button = 0;
     builtin_cancel_zoom(ge);
-    if (term && term->set_cursor) {
+    if (term && term_initialised && term->set_cursor) {
 	term->set_cursor(0, 0, 0);
 	if (mouse_setting.annotate_zoom_box && term->put_tmptext) {
 	    term->put_tmptext(1, "");
