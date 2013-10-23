@@ -1,3 +1,10 @@
+2013-10-23  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/plot.c (main):  If commands are being executed interactively
+	because the user said something like "gnuplot -", then execution should
+	continue after an error message just as in a normal interactive session.
+	Bug #1295
+
 2013-10-21  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/color.h src/set.c src/getcolor.c (quantize_gray):
