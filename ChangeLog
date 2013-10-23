@@ -5,8 +5,8 @@
 	continue after an error message just as in a normal interactive session.
 	Bug #1295
 
-	* src/mouse.c (event_reset):  Must not send commands to the terminal if
-	it has not yet been initialized.
+	* src/mouse.c (event_reset) src/term.c (check_for_mouse_events):  
+	Must not send commands to the terminal if it has not yet been initialized.
 
 2013-10-21  Ethan A Merritt  <merritt@u.washington.edu>
 

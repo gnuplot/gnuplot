@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.266 2013/09/23 18:49:03 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.267 2013/09/26 22:45:33 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -3084,7 +3084,7 @@ void
 check_for_mouse_events()
 {
 #ifdef USE_MOUSE
-    if (term->waitforinput) {
+    if (term_initialised && term->waitforinput) {
 	term->waitforinput(TERM_ONLY_CHECK_MOUSING);
     }
 #endif
