@@ -340,7 +340,8 @@ conditioned on USE_MOUSE:
 
 _waitforinput(int options) - multiplexes mouse and hotkey input with
    reading from the terminal. Returns the next character read from stdin.
-   In the mean time, process any mouse events.
+   In the mean time, process any mouse events. If the terminal has not yet
+   been initialised, this routine should return getc(stdin).
 
 _put_tmptext(int i, const char str[]) - Display temporary text, after
    erasing any temporary text displayed previously at this location.
@@ -483,6 +484,7 @@ The following should illustrate the order in which calls to these
 routines are made:
 
  _options()
+  _waitforinput()	/* If present, may be called before init() */
   _init()
     _scale(xs,ys)
     _graphics()
