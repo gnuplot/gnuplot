@@ -178,7 +178,10 @@ the value of c_token is either 3 or 2, respectively.
 This procedure should parse options on the command line.  A list of the 
 currently selected options should be stored in term_options[] in a form 
 suitable for use with the set term command.  term_options[] is used by 
-the save command.  Use options_null() if no options are available. 
+the save command.  Use options_null() if no options are available.
+_options() and _waitforinput() are the only terminal functions that may
+be called prior to _init(), so they must take not to perform actions
+that require previous initialisation.
 
 _init()  Called once, when the device is first selected.  This procedure
 should set up things that only need to be set once, like handshaking and
