@@ -80,7 +80,7 @@ endif
 
 SUBDIRS = $(d_beos) wxterminal qtterminal
 
-EXTRA_gnuplot_SOURCES = corplot.c strftime.c vms.c
+EXTRA_gnuplot_SOURCES = strftime.c vms.c
 
 EXTRA_DIST = GNUmakefile Makefile.maint NeXT OpenStep README \
 genopt.com gnuplot.opt x11.opt linkopt.vms \
