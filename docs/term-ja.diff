@@ -181,7 +181,7 @@ diff -rc docs/tex2ja.awk.ORG docs/tex2ja.awk
 *** 0 ****
 --- 1,54 ----
 + #
-+ # $Id: tex2ja.awk,v 1.5 2008-06-22 20:22:11+09 shige Exp $
++ # $Id: term-ja.diff,v 1.41 2013/10/18 18:42:00 sfeam Exp $
 + # doc2tex の出力の後処理スクリプト
 + # tex2ja.awk
 + # 06/20 2008
@@ -5734,38 +5734,6 @@ diff -rc term/tpic.trm.ORG term/tpic.trm
 + #endif /* JAPANESE_DOC */
   END_HELP(tpic)
   #endif /* TERM_TABLE */
-diff -rc term/unixpc.trm.ORG term/unixpc.trm
-*** term/unixpc.trm	2006-07-21.ORG 11:35:48.000000000 +0900
---- term/unixpc.trm	2013-07-08 10:07:34.000000000 +0900
-***************
-*** 615,620 ****
---- 615,621 ----
-  
-  #ifdef TERM_HELP
-  START_HELP(unixpc)
-+ #ifndef JAPANESE_DOC
-  "1 unixpc",
-  "?commands set terminal unixpc",
-  "?set terminal unixpc",
-***************
-*** 624,628 ****
---- 625,640 ----
-  "?unixpc",
-  " The `unixpc` terminal driver supports AT&T 3b1 and AT&T 7300 Unix PC.  It has",
-  " no options."
-+ #else /* JAPANESE_DOC */
-+ "1 unixpc",
-+ "?commands set terminal unixpc",
-+ "?set terminal unixpc",
-+ "?set term unixpc",
-+ "?terminal unixpc",
-+ "?term unixpc",
-+ "?unixpc",
-+ " `unixpc` ドライバは AT&T 3b1 と AT&T 7300 Unix PC をサポートします。オ",
-+ " プションはありません。"
-+ #endif /* JAPANESE_DOC */
-  END_HELP(unixpc)
-  #endif /* TERM_HELP */
 diff -rc term/v384.trm.ORG term/v384.trm
 *** term/v384.trm	2006-07-21.ORG 11:35:48.000000000 +0900
 --- term/v384.trm	2013-07-08 10:07:34.000000000 +0900
