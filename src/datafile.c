@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.261 2013/08/06 18:22:36 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.262 2013/08/08 07:01:22 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -164,6 +164,9 @@ static char *RCSid() { return RCSid("$Id: datafile.c,v 1.261 2013/08/06 18:22:36
 
 /* is it a comment line? */
 #define is_comment(c) ((c) && (strchr(df_commentschars, (c)) != NULL))
+
+/* Used to skip whitespace but not cross a field boundary */
+#define NOTSEP (!df_separators || !strchr(df_separators,*s))
 
 /*{{{  static fns */
 static int check_missing __PROTO((char *s));
@@ -667,8 +670,6 @@ df_tokenise(char *s)
     for (i = 0; i<MAXDATACOLS; i++)
 	df_tokens[i] = NULL;
 
-#define NOTSEP (!df_separators || !strchr(df_separators,*s))
-
     df_no_cols = 0;
 
     while (*s) {
@@ -838,7 +839,6 @@ df_tokenise(char *s)
     }
 
     return df_no_cols;
-#undef NOTSEP
 }
 
 /*}}} */
@@ -871,7 +871,7 @@ df_read_matrix(int *rows, int *cols)
 	    return linearized_matrix;   
 	}
 
-	while (isspace((unsigned char) *s))
+	while (isspace((unsigned char) *s) && NOTSEP)
 	    ++s;
 
 	if (!*s || is_comment(*s)) {
@@ -1620,7 +1620,7 @@ df_readascii(double v[], int max)
 
 	/*{{{  check for blank lines, and reject by index/every */
 	/*{{{  skip leading spaces */
-	while (isspace((unsigned char) *s))
+	while (isspace((unsigned char) *s) && NOTSEP)
 	    ++s;                /* will skip the \n too, to point at \0  */
 	/*}}} */
 
