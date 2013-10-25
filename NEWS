@@ -5,6 +5,7 @@ New features, changes and fixes since gnuplot version 4.6.4
 * FIX allow 'set pm3d' interpolate and top/bottom options to coexist
 * FIX revised handling of defined palettes with explicit maxcolors
 * FIX continue as normal after an interactive session error from "gnuplot -" 
+* FIX empty first field in a tab-separated-values file was incorrectly ignored
 
 New features, changes and fixes in gnuplot version 4.6.4
 ========================================================

@@ -1,3 +1,9 @@
+2013-10-25  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/datafile.c (df_readascii df_readmatrix):  If the first field of a
+	tab-separated csv file was empty, it would be incorrectly ignored when
+	processing that input line.
+
 2013-10-25  Thomas Bleher <tbleher@gmx.de>
 
 	* src/getcolor.c (quantize_gray):  Windows compile error ("small" is not
