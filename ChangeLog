@@ -3,6 +3,10 @@
 	* src/corgraph.asm  src/hrcgraph.asm  src/pcgraph.asm src/corplot.c:
 	Remove vestigial files from the era of 16-bit DOS.	
 
+	* config/makefile.unx term/unixpc.trm:
+	Remove vestigial driver and makefile for the AT&T 3b1 "unix pc".
+	Early M6800-based tiny (256Kb!) machine.
+
 2013-10-23  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/plot.c (main):  If commands are being executed interactively
