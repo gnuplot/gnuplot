@@ -1,5 +1,5 @@
 /*
- * $Id: term.h,v 1.60 2013/04/08 23:14:08 sfeam Exp $
+ * $Id: term.h,v 1.61 2013/09/20 20:39:20 sfeam Exp $
  */
 
 /* GNUPLOT - term.h */
@@ -190,11 +190,6 @@
 /* VAX Windowing System requires UIS libraries */
 #ifdef UIS
 # include "vws.trm"
-#endif
-
-/* AT&T Unix-PC */
-#ifdef UNIXPC
-# include "unixpc.trm"
 #endif
 
 /****************************************************************************/

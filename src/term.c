@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.267 2013/09/26 22:45:33 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.268 2013/10/23 19:28:37 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -1864,12 +1864,6 @@ init_terminal()
 	if (X11_Display)
 	    term_name = "x11";
 #endif /* x11 */
-
-#ifdef UNIXPC
-	if (iswind() == 0) {
-	    term_name = "unixpc";
-	}
-#endif /* unixpc */
 
 #ifdef DJGPP
 	term_name = "svga";
