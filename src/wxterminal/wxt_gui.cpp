@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.cpp,v 1.119 2013/10/11 18:15:11 sfeam Exp $
+ * $Id: wxt_gui.cpp,v 1.120 2013/10/25 04:45:23 sfeam Exp $
  */
 
 /* GNUPLOT - wxt_gui.cpp */
@@ -2051,6 +2051,8 @@ void wxt_put_text(unsigned int x, unsigned int y, const char * string)
 		/* init */
 		temp_command.command = command_enhanced_init;
 		temp_command.integer_value = strlen(string);
+		temp_command.x1 = x;
+		temp_command.y1 = term->ymax - y;
 		wxt_command_push(temp_command);
 
 		/* set up the global variables needed by enhanced_recursion() */
@@ -2862,7 +2864,7 @@ void wxtPanel::wxt_cairo_exec_command(gp_command command)
 	case command_put_text :
 	case command_enhanced_put_text :
 		if (wxt_in_key_sample) {
-			int slen = strlen(command.string) * term->h_char * 0.75;
+			int slen = gp_strlen(command.string) * term->h_char * 0.75;
 			if (text_justification_mode == RIGHT) slen = -slen;
 			wxt_update_key_box(command.x1, command.y1);
 			wxt_update_key_box(command.x1 + slen, command.y1 - term->v_tic);
@@ -2870,6 +2872,12 @@ void wxtPanel::wxt_cairo_exec_command(gp_command command)
 		gp_cairo_draw_text(&plot, command.x1, command.y1, command.string, NULL, NULL);
 		return;
 	case command_enhanced_init :
+		if (wxt_in_key_sample) {
+			int slen = command.integer_value * term->h_char * 0.75;
+			if (text_justification_mode == RIGHT) slen = -slen;
+			wxt_update_key_box(command.x1, command.y1);
+			wxt_update_key_box(command.x1 + slen, command.y1 - term->v_tic);
+		}
 		gp_cairo_enhanced_init(&plot, command.integer_value);
 		return;
 	case command_enhanced_finish :
