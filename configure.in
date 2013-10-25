@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot on Unix.
 dnl
-dnl $Id: configure.in,v 1.336 2013/10/16 19:57:44 sfeam Exp $
+dnl $Id: configure.in,v 1.337 2013/10/25 03:10:27 sfeam Exp $
 dnl
 dnl this is actually major.minor ...
 dnl note that for a non-beta release, we need to disable DEVELOPMENT_RELEASE
@@ -1284,9 +1284,8 @@ AC_MSG_RESULT([])
 
 AC_MSG_RESULT([  Standalone terminals: yes (always builtin)])
 AC_MSG_RESULT([    canvas, cgm, context, corel, dumb, dxf, eepic, emf, emtex,])
-AC_MSG_RESULT([    epslatex, fig, hpgl,])
-AC_MSG_RESULT([    latex, metafont, metapost, mif, pcl5, postscript, pslatex,])
-AC_MSG_RESULT([    pstex, pstricks, qms, svg,])
+AC_MSG_RESULT([    epslatex, fig, hpgl,latex, metafont, metapost, mif, pcl5,])
+AC_MSG_RESULT([    postscript, pslatex, pstex, pstricks, qms, svg,])
 AC_MSG_RESULT([    tek40xx, tek410x, texdraw, tgif, tkcanvas, tpic, vttek])
 AC_MSG_RESULT([])
 
@@ -1363,10 +1362,8 @@ if test "$with_linux_vga" = yes; then
   fi
   AC_MSG_RESULT([    SECURITY NOTICE: SVGAlib requires that gnuplot is installed suid root!])
 else
-  AC_MSG_RESULT([  linux terminal (vga console): no (use --with-linux-vga to enable,])
-  AC_MSG_RESULT([                                       requires SVGAlib)])
-  AC_MSG_RESULT([  vgagl terminal ((s)vga console): no (use --with-linux-vga to enable,])
-  AC_MSG_RESULT([                                       requires SVGAlib with vgagl)])
+  AC_MSG_RESULT([  linux terminal (vga console): no (use --with-linux-vga to enable)])
+  AC_MSG_RESULT([  vgagl terminal ((s)vga console): no (use --with-linux-vga to enable)])
 fi
 
 if test "$GGI_SUPPORT" = yes; then
@@ -1430,7 +1427,7 @@ AC_MSG_RESULT([])
 AC_MSG_RESULT([  Additional platform-specific or older terminals omitted by default:])
 AC_MSG_RESULT([   gpic, hp2623a, hp2648, imagen, kyocera ])
 AC_MSG_RESULT([   pm (makefile.os2), be (BeOS), svga (MSDOS/djgpp)])
-AC_MSG_RESULT([   sun (makefile.unx), windows (several options)])
+AC_MSG_RESULT([   sun, windows (several options)])
 
 AC_MSG_RESULT([])
 AC_MSG_RESULT([gnuplot will be compiled with the following features:])
