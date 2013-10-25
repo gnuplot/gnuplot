@@ -24,6 +24,6 @@ $(T)mif.trm $(T)next.trm $(T)openstep.trm $(T)pbm.trm $(T)pc.trm &
 $(T)pdf.trm $(T)pm.trm $(T)post.trm $(T)pslatex.trm $(T)pstricks.trm &
 $(T)qms.trm $(T)qt.trm $(T)regis.trm $(T)sun.trm $(T)svg.trm $(T)t410x.trm &
 $(T)tek.trm $(T)texdraw.trm $(T)tgif.trm $(T)tkcanvas.trm $(T)tpic.trm &
-$(T)unixpc.trm $(T)v384.trm $(T)vgagl.trm $(T)vws.trm $(T)win.trm &
+$(T)v384.trm $(T)vgagl.trm $(T)vws.trm $(T)win.trm &
 $(T)wxt.trm $(T)x11.trm $(T)xlib.trm
 

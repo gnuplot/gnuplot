@@ -321,7 +321,6 @@ Major contributors (alphabetic order):
 	"tikz"
 	"tkcanvas"
 	"tpic"
-	"unixpc"
 	"v384"
 	"vgagl"
 	"vws"
