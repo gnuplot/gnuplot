@@ -1,4 +1,4 @@
-2013-10-26  Thomas Bleher <tbleher@gmx.de>
+2013-10-25  Thomas Bleher <tbleher@gmx.de>
 
 	* src/stdfn.c(gp_atexit gp_exit) src/stdfn.h src/command.c(exit_command)
 	src/plot.c(main) src/qtterminal/qt_term.cpp src/win/winmain.c
@@ -15,6 +15,9 @@
 	Introduce a new function gp_exit() which calls the gnuplot atexit handlers
 	and then calls exit(3). Also create gp_atexit() to register gnuplot exit
 	handlers.
+
+	* src/getcolor.c (quantize_gray):  Windows compile error ("small" is not
+	accepted as a variable name).
 
 2013-10-25  Ethan A Merritt  <merritt@u.washington.edu>
 
