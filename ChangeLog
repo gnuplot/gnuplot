@@ -1,3 +1,8 @@
+2013-10-25  Thomas Bleher <tbleher@gmx.de>
+
+	* src/getcolor.c (quantize_gray):  Windows compile error ("small" is not
+	accepted as a variable name).
+
 2013-10-23  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/plot.c (main):  If commands are being executed interactively

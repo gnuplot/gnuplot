@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: getcolor.c,v 1.32 2011/10/08 00:07:41 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: getcolor.c,v 1.32.2.1 2013/10/21 22:31:49 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - getcolor.c */
@@ -352,7 +352,7 @@ quantize_gray( double gray )
     if (sm_palette.colorMode == SMPAL_COLOR_MODE_GRADIENT) {
 	int j;
 	gradient_struct *g = sm_palette.gradient;
-	double small = 1. / sm_palette.use_maxcolors;
+	double small_interval = 1. / sm_palette.use_maxcolors;
 
 	/* Backward compatibility with common case of 1 segment */
 	if ((sm_palette.gradient_num <= 2) && (qgray == 0))
@@ -361,7 +361,7 @@ quantize_gray( double gray )
 	/* All palette segments are large compared to the sampling interval.
 	 * Simple truncation of gray is good enough.
 	 */
-	else if (sm_palette.smallest_gradient_interval > small)
+	else if (sm_palette.smallest_gradient_interval > small_interval)
 	    ;
 
 	/* There is at least one palette segment that is smaller than the sampling
@@ -375,7 +375,7 @@ quantize_gray( double gray )
 	    /* Does the true gray value lie in this interval? */
 	    if ((gray >= g[j].pos) &&  (gray <  g[j+1].pos)) {
 		/* See if it is so small that truncation missed it */
-		if ((g[j+1].pos - g[j].pos) < small)
+		if ((g[j+1].pos - g[j].pos) < small_interval)
 		    qgray = (g[j].pos + g[j+1].pos) / 2.;
 		break;
 	    }
