@@ -3,6 +3,11 @@
 	* src/datafile.c (df_readascii df_readmatrix):  If the first field of a
 	tab-separated csv file was empty, it would be incorrectly ignored when
 	processing that input line.
+	Bugfix. 
+
+	* src/wxterminal/wxt_gui.cpp:  Extend toggling active region in key box
+	to include enhanced text as well as non-enhanced text.
+	Bugfix. 
 
 2013-10-25  Thomas Bleher <tbleher@gmx.de>
 
