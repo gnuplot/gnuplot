@@ -19,6 +19,8 @@
 	* src/getcolor.c (quantize_gray):  Windows compile error ("small" is not
 	accepted as a variable name).
 
+	* config/msvc/Makefile:  DEBUG option when compiling with MSVC
+
 2013-10-25  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/corgraph.asm  src/hrcgraph.asm  src/pcgraph.asm src/corplot.c:

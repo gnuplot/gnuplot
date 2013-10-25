@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.11 2013/06/24 13:45:12 markisch Exp $
+# $Id: Makefile,v 1.12 2013/07/06 08:09:20 markisch Exp $
 #
 # GNUPLOT Makefile Microsoft Visual C++ 2005 or newer
 
@@ -51,6 +51,9 @@ WXT = 0
 # Build the lua/tikz terminal?
 LUA = 0
 
+# Create debug build?
+DEBUG = 0
+
 # Location of additional libraries
 GDDIR = gdwin32
 LUADIR = lua
@@ -83,7 +86,12 @@ LD = link
 # /O2 mans optimize for speed
 # /Zi means prepare for codeview
 # /MD means include multi-thread support (DLL)
+# /GR means Enable Run-Time Type Information
+!IF "$(DEBUG)" == "1"
+CBASEFLAGS = /EHsc /GR /MD /Od /nologo /Zi /DDEBUG
+!ELSE
 CBASEFLAGS = /EHsc /GR /MD /O2 /nologo
+!ENDIF
 CFLAGS = $(CBASEFLAGS) /I. /I$(TOP) /I$(S) /D_Windows /DWIN32 /DHAVE_CONFIG_H /D__MSC__ $(OPTIONS)
 CFLAGS = $(CFLAGS) /DGNUPLOT_SHARE_DIR=\"$(GNUPLOT_SHARE_DIR)\"
 WIN_CFLAGS = /DUSE_FAKEPIPES
@@ -98,6 +106,9 @@ TERMFLAGS = /I$(T) /DGNUPLOT_PS_DIR=\"$(GNUPLOT_PS_DIR)\" /DGNUPLOT_JS_DIR=\"$(G
 # linker flags, append paths for external libs later
 LDFLAGS = /nologo /MACHINE:$(MACHINE) /MANIFEST
 LDFLAGS = $(LDFLAGS) /MANIFESTDEPENDENCY:"type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'"
+!IF "$(DEBUG)" == "1"
+LDFLAGS = $(LDFLAGS) /DEBUG
+!ENDIF
 COMMONLIBS = kernel32.lib user32.lib gdi32.lib winspool.lib \
              comdlg32.lib comctl32.lib advapi32.lib shell32.lib \
              msimg32.lib gdiplus.lib
