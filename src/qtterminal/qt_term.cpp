@@ -140,7 +140,7 @@ void execGnuplotQt()
 		execlp(filename.toUtf8().data(), "gnuplot_qt", (char*)NULL);
 		fprintf(stderr, "Expected Qt driver: %s\n", filename.toUtf8().data());
 		perror("Exec failed");
-		exit(EXIT_FAILURE);
+		gp_exit(EXIT_FAILURE);
 	}
 	qt_localServerName = "qtgnuplot" + QString::number(pid);
 	qt_gnuplot_qtStarted = true;
@@ -321,7 +321,7 @@ void qt_init()
 	qt_out.setVersion(QDataStream::Qt_4_4);
 	qt_initialized = true;
 	term_interlock = (void *)qt_init;
-	GP_ATEXIT(qt_atexit);
+	gp_atexit(qt_atexit);
 }
 
 // Called just before a plot is going to be displayed.

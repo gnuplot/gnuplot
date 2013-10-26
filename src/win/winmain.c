@@ -1,5 +1,5 @@
 /*
- * $Id: winmain.c,v 1.65 2013/06/23 19:53:02 markisch Exp $
+ * $Id: winmain.c,v 1.66 2013/08/17 00:02:08 sfeam Exp $
  */
 
 /* GNUPLOT - win/winmain.c */
@@ -132,7 +132,7 @@ CheckMemory(LPSTR str)
 {
         if (str == (LPSTR)NULL) {
                 MessageBox(NULL, "out of memory", "gnuplot", MB_ICONSTOP | MB_OK);
-                exit(1);
+                gp_exit(EXIT_FAILURE);
         }
 }
 
@@ -202,7 +202,7 @@ ShutDown()
 {
 	/* First chance for wgnuplot to close help system. */
 	WinCloseHelp();
-	exit(0);
+	gp_exit(EXIT_SUCCESS);
 	return 0;
 }
 
@@ -524,7 +524,7 @@ int main(int argc, char **argv)
 
 #ifndef WGP_CONSOLE
         if (TextInit(&textwin))
-                exit(1);
+                gp_exit(EXIT_FAILURE);
         textwin.hIcon = LoadIcon(hInstance, "TEXTICON");
 #ifdef _WIN64
         SetClassLongPtr(textwin.hWndParent, GCLP_HICON, (LONG_PTR)textwin.hIcon);
@@ -565,7 +565,7 @@ int main(int argc, char **argv)
 #endif
 #endif
 
-        atexit(WinExit);
+        gp_atexit(WinExit);
 
         if (!isatty(fileno(stdin)))
             setmode(fileno(stdin), O_BINARY);
@@ -575,6 +575,7 @@ int main(int argc, char **argv)
         /* First chance to close help system for console gnuplot,
         second for wgnuplot */
         WinCloseHelp();
+        gp_exit_cleanup();
         return 0;
 }
 

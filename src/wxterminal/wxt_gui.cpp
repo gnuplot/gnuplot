@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.cpp,v 1.118 2013/10/11 18:11:04 sfeam Exp $
+ * $Id: wxt_gui.cpp,v 1.119 2013/10/11 18:15:11 sfeam Exp $
  */
 
 /* GNUPLOT - wxt_gui.cpp */
@@ -1653,7 +1653,7 @@ void wxt_init()
 				change_term("unknown",7);
 				int_error(NO_CARET,"wxt init failure");
 			} else
-				exit(-1);
+				gp_exit(EXIT_FAILURE);
 		}
 
 		/* app initialization */
@@ -1686,7 +1686,7 @@ void wxt_init()
 		term_interlock = (void *)wxt_init;
 
 		/* register call for "persist" effect and cleanup */
-		GP_ATEXIT(wxt_atexit);
+		gp_atexit(wxt_atexit);
 	}
 
 	wxt_sigint_check();

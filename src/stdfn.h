@@ -1,5 +1,5 @@
 /*
- * $Id: stdfn.h,v 1.41 2013/05/22 19:19:38 sfeam Exp $
+ * $Id: stdfn.h,v 1.42 2013/09/26 21:24:21 sfeam Exp $
  */
 
 /* GNUPLOT - stdfn.h */
@@ -370,13 +370,21 @@ size_t strnlen __PROTO((const char *str, size_t n));
 #  define GP_SLEEP(delay) sleep ((unsigned int) (delay+0.5))
 #endif
 
-#ifdef HAVE_ATEXIT
-# define GP_ATEXIT(x) atexit((x))
-#elif defined(HAVE_ON_EXIT)
-# define GP_ATEXIT(x) on_exit((x),0)
-#else
-# define GP_ATEXIT(x) /* you lose */
-#endif
+/* Gnuplot replacement for atexit(3) */
+void gp_atexit __PROTO((void (*function)(void)));
+
+/* Gnuplot replacement for exit(3). Calls the functions registered using
+ * gp_atexit(). Always use this function instead of exit(3)!
+ */
+void gp_exit __PROTO((int status));
+
+/* Calls the cleanup functions registered using gp_atexit().
+ * Normally gnuplot should be exited using gp_exit(). In some cases, this is not
+ * possible (notably when returning from main(), where some compilers get
+ * confused because they expect a return statement at the very end. In that
+ * case, gp_exit_cleanup() should be called before the return statement.
+ */
+void gp_exit_cleanup __PROTO((void));
 
 char * gp_basename __PROTO((char *path));
 

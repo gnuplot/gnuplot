@@ -1,5 +1,5 @@
 /*
- * $Id: gp_cairo_helpers.c,v 1.2 2009/08/26 19:14:13 sfeam Exp $
+ * $Id: gp_cairo_helpers.c,v 1.3 2009/10/31 05:24:18 sfeam Exp $
  */
 
 /* GNUPLOT - gp_cairo_helpers.c */
@@ -61,7 +61,7 @@ unsigned int * gp_cairo_helper_coordval_to_chars(coordval* image, int M, int N, 
 	/* cairo image buffer, upper bits are alpha, then r, g and b
 	 * Depends on endianess */
 	image255 = (unsigned int*) malloc(M*N*sizeof(unsigned int));
-	if (!image255) { fprintf(stderr,"cairo terminal: out of memory!\n"); exit(-1);}
+	if (!image255) { fprintf(stderr,"cairo terminal: out of memory!\n"); gp_exit(EXIT_FAILURE);}
 	image255copy = image255;
 
 	/* TrueColor 24-bit plot->color mode */

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot.c,v 1.156 2013/09/12 21:22:07 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot.c,v 1.157 2013/10/23 18:25:04 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot.c */
@@ -433,7 +433,7 @@ main(int argc, char **argv)
     /* reset the terminal when exiting */
     /* this is done through gp_atexit so that other terminal functions
      * can be registered to be executed before the terminal is reset. */
-    GP_ATEXIT(term_reset);
+    gp_atexit(term_reset);
 
 # if defined(_Windows) && ! defined(WGP_CONSOLE)
     interactive = TRUE;
@@ -535,7 +535,7 @@ main(int argc, char **argv)
 	     * In case you don't have one of these functions, or you don't
 	     * want to use them, 'write_history()' is called directly.
 	     */
-	    GP_ATEXIT(wrapper_for_write_history);
+	    gp_atexit(wrapper_for_write_history);
 #endif /* GNUPLOT_HISTORY */
 
 	    fprintf(stderr, "\nTerminal type set to '%s'\n", term->name);
@@ -590,7 +590,7 @@ main(int argc, char **argv)
 
 	if (!interactive && !noinputfiles) {
 	    term_reset();
-	    exit(EXIT_FAILURE);	/* exit on non-interactive error */
+	    gp_exit(EXIT_FAILURE);	/* exit on non-interactive error */
 	}
     }
 
@@ -641,7 +641,7 @@ RECOVER_FROM_ERROR_IN_DASH:
 		--argc; ++argv;
 		if (argc <= 0) {
 		    fprintf(stderr, "syntax:  gnuplot -c scriptname args\n");
-		    exit(EXIT_FAILURE);
+		    gp_exit(EXIT_FAILURE);
 		}
 		for (i=0; i<argc; i++)
 		    /* Need to stash argv[i] somewhere visible to load_file() */
@@ -649,7 +649,7 @@ RECOVER_FROM_ERROR_IN_DASH:
 		call_argc = argc - 1;
 
 		load_file(loadpath_fopen(*argv, "r"), gp_strdup(*argv), 5);
-		exit(EXIT_SUCCESS);
+		gp_exit(EXIT_SUCCESS);
 
 	    } else if (*argv[0] == '-') {
 		fprintf(stderr, "unrecognized option %s\n", *argv);
@@ -687,6 +687,10 @@ RECOVER_FROM_ERROR_IN_DASH:
 
     /* HBB 20040223: Not all compilers like exit() to end main() */
     /* exit(exit_status); */
+#if ! defined(_Windows)
+    /* Windows does the cleanup later */
+    gp_exit_cleanup();
+#endif
     return exit_status;
 }
 

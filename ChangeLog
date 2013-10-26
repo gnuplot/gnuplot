@@ -1,3 +1,21 @@
+2013-10-26  Thomas Bleher <tbleher@gmx.de>
+
+	* src/stdfn.c(gp_atexit gp_exit) src/stdfn.h src/command.c(exit_command)
+	src/plot.c(main) src/qtterminal/qt_term.cpp src/win/winmain.c
+	src/wxterminal/gp_cairo.c src/wxterminal/gp_cairo_helpers.c
+	src/wxterminal/wxt_gui.cpp term/be.trm term/x11.trm:
+
+	Create gnuplot atexit handlers that are called before exit(3)
+	
+	Normal atexit-handlers are called in the reverse order of registration.
+	This causes problems when a library has its own global destructors which
+	do not handle the case that objects of the library may still be active
+	and destroyed in the atexit handler. This has been observed with Qt.
+	
+	Introduce a new function gp_exit() which calls the gnuplot atexit handlers
+	and then calls exit(3). Also create gp_atexit() to register gnuplot exit
+	handlers.
+
 2013-10-25  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/corgraph.asm  src/hrcgraph.asm  src/pcgraph.asm src/corplot.c:

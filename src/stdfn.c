@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: stdfn.c,v 1.25 2011/09/21 11:43:49 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: stdfn.c,v 1.26 2013/05/22 19:19:38 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - stdfn.c */
@@ -367,6 +367,80 @@ char * gp_basename(char *path)
     return path;
 }
 
+#ifdef HAVE_ATEXIT
+# define GP_ATEXIT(x) atexit((x))
+#elif defined(HAVE_ON_EXIT)
+# define GP_ATEXIT(x) on_exit((x),0)
+#else
+# define GP_ATEXIT(x) /* you lose */
+#endif
+
+struct EXIT_HANDLER {
+    void (*function)(void);
+    struct EXIT_HANDLER* next;
+};
+
+static struct EXIT_HANDLER* exit_handlers = NULL;
+
+/* Calls the cleanup functions registered using gp_atexit().
+ * Normally gnuplot should be exited using gp_exit(). In some cases, this is not
+ * possible (notably when returning from main(), where some compilers get
+ * confused because they expect a return statement at the very end. In that
+ * case, gp_exit_cleanup() should be called before the return statement.
+ */
+void gp_exit_cleanup(void)
+{
+    /* Call exit handlers registered using gp_atexit(). This is used instead of
+     * normal atexit-handlers, because some libraries (notably Qt) seem to have
+     * problems with the destruction order when some objects are only destructed
+     * on atexit(3). Circumvent this problem by calling the gnuplot
+     * atexit-handlers, before any global destructors are run.
+     */
+    while (exit_handlers) {
+        struct EXIT_HANDLER* handler = exit_handlers;
+        (*handler->function)();
+        /* note: assumes that function above has not called gp_atexit() */
+        exit_handlers = handler->next;
+        free(handler);
+    }
+}
+
+/* Called from exit(3). Verifies that all exit handlers have already been
+ * called.
+ */
+static void debug_exit_handler(void)
+{
+    if (exit_handlers) {
+        fprintf(stderr, "Gnuplot not exited using gp_exit(). Exit handlers may"
+                "not work correctly!\n");
+        gp_exit_cleanup();
+    }
+}
+
+/* Gnuplot replacement for atexit(3) */
+void gp_atexit(void (*function)(void))
+{
+    /* Register new handler */
+    static bool debug_exit_handler_registered = false;
+    struct EXIT_HANDLER* new_handler = (struct EXIT_HANDLER*) malloc(sizeof(struct EXIT_HANDLER));
+    new_handler->function = function;
+    new_handler->next = exit_handlers;
+    exit_handlers = new_handler;
+
+    if (!debug_exit_handler_registered) {
+        GP_ATEXIT(debug_exit_handler);
+        debug_exit_handler_registered = true;
+    }
+}
+
+/* Gnuplot replacement for exit(3). Calls the functions registered using
+ * gp_atexit(). Always use this function instead of exit(3)!
+ */
+void gp_exit(int status)
+{
+    gp_exit_cleanup();
+    exit(status);
+}
 
 #if !defined(HAVE_DIRENT_H) && defined(WIN32)  && (!defined(__WATCOMC__))
 /* BM: OpenWatcom has dirent functions in direct.h!*/

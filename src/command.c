@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.268 2013/10/03 21:07:45 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.269 2013/10/21 23:21:03 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -879,7 +879,7 @@ exit_command()
 {
     /* If the command is "exit gnuplot" then do so */
     if (equals(c_token+1,"gnuplot"))
-	exit(0);
+	gp_exit(EXIT_SUCCESS);
 
     /* else graphics will be tidied up in main */
     command_exit_status = 1;
@@ -2333,7 +2333,7 @@ void
 done(int status)
 {
     term_reset();
-    exit(status);
+    gp_exit(status);
 }
 
 /* VMS-only version of read_line */

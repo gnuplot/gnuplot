@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: be.trm,v 1.19 2011/08/02 20:40:31 sfeam Exp $
+ * $Id: be.trm,v 1.20 2011/11/10 07:30:53 markisch Exp $
  *
  */
 
@@ -165,7 +165,7 @@ BE_args(int argc, char *argv[])
 
     if (!xargv) {
 	fputs ("not enough memory to copy argv - quitting\n", stderr);
-	exit (EXIT_FAILURE);
+	gp_exit (EXIT_FAILURE);
     }
 
     /* We make a copy of the argument vector because
@@ -231,7 +231,7 @@ BE_init()
 	    execvp(BE_command, optvec);
 	    /* if we get here, something went wrong */
 	    perror("exec failed");
-	    exit(1);
+	    gp_exit(EXIT_FAILURE);
 	}
 	/* parent */
 	close(fdes[0]);		/* read end of pipe */
@@ -239,7 +239,7 @@ BE_init()
     } {
 	static int been_here = 0;
 	if (!been_here) {
-	    atexit(BE_atexit);
+	    gp_atexit(BE_atexit);
 	    been_here = 1;
 	}
     }

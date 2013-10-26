@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: x11.trm,v 1.216 2013/08/26 19:31:55 sfeam Exp $
+ * $Id: x11.trm,v 1.217 2013/10/07 21:43:48 sfeam Exp $
  *
  */
 
@@ -1087,7 +1087,7 @@ X11_init()
 	    fprintf(stderr,"Expected X11 driver: %s\n",X11_full_command_path);
 	    perror("Exec failed");
 	    fprintf(stderr,"See 'help x11' for more details\n");
-	    exit(EXIT_FAILURE);
+	    gp_exit(EXIT_FAILURE);
 	}
 	/* parent */
 # ifdef PIPE_IPC
@@ -1120,7 +1120,7 @@ X11_init()
     }
 
     if (!been_here) {
-	GP_ATEXIT(X11_atexit);
+	gp_atexit(X11_atexit);
 	been_here++;
     }
     X11_send_endianess();
@@ -1184,7 +1184,7 @@ X11_reset()
 
 #define BEFORE_GRAPHICS \
  if (!(X11_ipc = fopen(X11_tmp0, "w"))) { \
-   perror(X11_tmp0); system(X11_shutdown); exit(1); \
+   perror(X11_tmp0); system(X11_shutdown); gp_exit(EXIT_FAILURE); \
  }
 
 #define AFTER_TEXT \
@@ -1312,7 +1312,7 @@ X11_init()
     {
 	static int been_here = 0;
 	if (!been_here) {
-	    GP_ATEXIT(X11_atexit);
+	    gp_atexit(X11_atexit);
 	    been_here = 1;
 	}
     }
@@ -1335,7 +1335,7 @@ do { \
    } \
    status = sys$qiow(0, X11_channel, IO$_WRITEVBLK, &iosb, 0, 0, buffer, strlen(buffer), 0, 0, 0, 0); \
    if ((status & SS$_NORMAL) == SS$_NORMAL) status = iosb.stat; \
-   if((status & SS$_NORMAL) != SS$_NORMAL) exit(status); \
+   if((status & SS$_NORMAL) != SS$_NORMAL) gp_exit(status); \
  } while (0)
 
 #define PRINT0(fmt)          GO((buffer, fmt))
