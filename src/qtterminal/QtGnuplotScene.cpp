@@ -793,6 +793,7 @@ void QtGnuplotScene::keyPressEvent(QKeyEvent* event)
 	updateModifiers();
 
 	int key = -1;
+	int live;
 
 	/// @todo quit on 'q' or Ctrl+'q'
 
@@ -874,8 +875,30 @@ void QtGnuplotScene::keyPressEvent(QKeyEvent* event)
 			case Qt::Key_F12        : key = GP_F12        ; break;
 		}
 
+	live = TRUE;
 	if (key >= 0)
-		m_eventHandler->postTermEvent(GE_keypress, int(m_lastMousePos.x()), int(m_lastMousePos.y()), key, 0, 0); /// @todo m_id
+		live = m_eventHandler->postTermEvent(GE_keypress, int(m_lastMousePos.x()), int(m_lastMousePos.y()), key, 0, 0); /// @todo m_id
+
+	/* DEBUG Aug 2013 - persistant key handling */
+	/* !live means (I think!) that we are in persist mode */
+	if (!live) {
+		switch (key) {
+		default:
+			break;
+		case 'i':
+			int i = m_key_boxes.count();
+			/* FIXME: This shouldn't happen, but it does. */
+			if (i > m_plot_group.count())
+			    i = m_plot_group.count();
+			while (i-- > 0) {
+				bool isVisible = m_plot_group[i]->isVisible();
+				isVisible = !isVisible;
+				m_plot_group[i]->setVisible(isVisible);
+				m_key_boxes[i].setHidden(!isVisible);
+			}
+			break;
+		}
+	}
 
 	QGraphicsScene::keyPressEvent(event);
 }
