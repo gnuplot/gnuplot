@@ -5,7 +5,8 @@
 	colors in a hidden3d plot to implicitly do "set hidden3d offset 0".
 
 	* src/qtterminal/QtGnuplotScene.cpp: gnuplot_qt can handle hotkey 'i'
-	in persist mode.
+	in persist mode.  Revise the timing code for responding to mouse button
+	press/release (needed for Qt5).
 
 2013-10-26  Thomas Bleher <tbleher@gmx.de>
 

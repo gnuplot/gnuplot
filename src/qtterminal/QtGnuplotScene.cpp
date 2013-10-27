@@ -671,6 +671,7 @@ void QtGnuplotScene::mousePressEvent(QGraphicsSceneMouseEvent* event)
 	else if (event->button()== Qt::MidButton)   button = 2;
 	else if (event->button()== Qt::RightButton) button = 3;
 
+	m_watches[button].start();	/* Count down time to ReleaseEvent */
 	m_eventHandler->postTermEvent(GE_buttonpress, 
 			int(event->scenePos().x()), int(event->scenePos().y()), 
 			button, 0, 0); /// @todo m_id
@@ -742,16 +743,13 @@ void QtGnuplotScene::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
 	else if (event->button()== Qt::MidButton)   button = 2;
 	else if (event->button()== Qt::RightButton) button = 3;
 
-	// EAM FIXME - If the press/release events get out of order or if we see
-	// a very fast double-click then the following call causes the program
-	// to error out during event processing.  Also note that I can't find
-	// where the timers are initialized on entry - maybe a problem there?
-	// Finally, why do we need or want a timer at all?
+	// If the press/release events get out of order or if we see a very
+	// fast double-click then the program errors out during event processing.
+	// So we enforce a minimum time between press/release.
 	int time = m_watches[button].elapsed();
-	if (time > 300) // purely empical work-around
-	if (m_eventHandler->postTermEvent(GE_buttonrelease, int(event->scenePos().x()),
-	    int(event->scenePos().y()), button, time, 0))
-		m_watches[button].start();
+	if (time > 100)
+		m_eventHandler->postTermEvent(GE_buttonrelease,
+			int(event->scenePos().x()), int(event->scenePos().y()), button, time, 0);
 
 	/* Check for click in one of the keysample boxes */
 	int i = m_key_boxes.count();
@@ -875,12 +873,14 @@ void QtGnuplotScene::keyPressEvent(QKeyEvent* event)
 			case Qt::Key_F12        : key = GP_F12        ; break;
 		}
 
-	live = TRUE;
 	if (key >= 0)
-		live = m_eventHandler->postTermEvent(GE_keypress, int(m_lastMousePos.x()), int(m_lastMousePos.y()), key, 0, 0); /// @todo m_id
+		live = m_eventHandler->postTermEvent(GE_keypress,
+			int(m_lastMousePos.x()), int(m_lastMousePos.y()), key, 0, 0); /// @todo m_id
+	else
+		live = true;
 
-	/* DEBUG Aug 2013 - persistant key handling */
-	/* !live means (I think!) that we are in persist mode */
+	// Key handling in persist mode 
+	// !live means (I think!) that we are in persist mode
 	if (!live) {
 		switch (key) {
 		default:
