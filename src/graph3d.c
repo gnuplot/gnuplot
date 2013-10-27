@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.253.2.13 2013/06/29 19:22:10 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.253.2.14 2013/07/03 16:18:21 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -1206,6 +1206,7 @@ do_3dplot(
 		NEXT_KEY_LINE();
 
 	    if (draw_contour && this_plot->contours != NULL) {
+		int ic = 1;	/* ic will index the contour linetypes */
 		struct gnuplot_contours *cntrs = this_plot->contours;
 		struct lp_style_type thiscontour_lp_properties =
 		    this_plot->lp_properties;
@@ -1279,10 +1280,14 @@ do_3dplot(
 		    		thiscontour_lp_properties.l_type = 0;
 				thiscontour_lp_properties.use_palette = TRUE;
 			    }
+			    ic++;	/* Increment linetype used for contour */
 			    if (prefer_line_styles && label_contours)
-				lp_use_properties(&ls, ++thiscontour_lp_properties.l_type+1);
-			    else
-				load_linetype(&ls, ++thiscontour_lp_properties.l_type+1);
+				lp_use_properties(&ls, this_plot->hidden3d_top_linetype + ic);
+			    else {
+				thiscontour_lp_properties.l_type = this_plot->hidden3d_top_linetype + ic;
+				thiscontour_lp_properties.use_palette = TRUE;
+				load_linetype(&ls, this_plot->hidden3d_top_linetype + ic);
+			    }
 			    thiscontour_lp_properties.pm3d_color = ls.pm3d_color;
 			    term_apply_lp_properties(&thiscontour_lp_properties);
 			}

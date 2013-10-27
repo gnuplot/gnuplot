@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.82.2.3 2012/07/17 19:09:52 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.82.2.4 2013/01/21 17:46:51 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - hidden3d.c */
@@ -1174,6 +1174,7 @@ build_networks(struct surface_points *plots, int pcount)
 
 	/* This is a special flag indicating that the user specified an	*/
 	/* explicit surface color in the splot command.			*/
+	/* FIXME:  Currently never set.					*/
 	if (above == LT_SINGLECOLOR-1)
 	    above = below = LT_SINGLECOLOR;
 
