@@ -1,3 +1,9 @@
+2013-10-27  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/misc.c(lp_parse): Fix bug involving color assignment to contours.
+	Unfortunately this negates a previous fix that allowed explicit surface
+	colors in a hidden3d plot to implicitly do "set hidden3d offset 0".
+
 2013-10-26  Thomas Bleher <tbleher@gmx.de>
 
 	* src/qtterminal/qt_term.cpp:  Change the Qt terminal to only create its

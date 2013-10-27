@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.161 2013/09/15 00:36:09 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.162 2013/09/26 22:45:33 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -1001,7 +1001,8 @@ lp_parse(struct lp_style_type *lp, TBOOLEAN allow_ls, TBOOLEAN allow_point)
 
 	if (set_pal) {
 	    lp->pm3d_color = newlp.pm3d_color;
-	    new_lt = LT_SINGLECOLOR;
+	    /* FIXME:  This was used by hidden3d but it breaks contour colors! */
+	    /* new_lt = LT_SINGLECOLOR; */
 	}
 	if (set_lw)
 	    lp->l_width = newlp.l_width;
