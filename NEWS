@@ -50,6 +50,7 @@ New features, changes and fixes since gnuplot version 4.6
 * CHANGE pgnuplot no longer included in binary distribution
 * CHANGE new implementation of Airy function (much higher precision)
 * CHANGE 'call' arguments are evaluated to yield a string if at all possible
+* CHANGE reworked qt driver for use with qt5
 * FIX Hitting ^C twice will forcibly terminate wxt if server connection is lost
 
 New features, changes and fixes in gnuplot version 4.6

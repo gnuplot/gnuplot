@@ -1,3 +1,9 @@
+2013-10-29  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/plot3d.c (get_3ddata): Pass through Inf and NaN to image code when
+	the pixel value is presented in column 4. The column 3 (z) case was
+	already handled.
+
 2013-10-27  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/misc.c(lp_parse): Fix bug involving color assignment to contours.

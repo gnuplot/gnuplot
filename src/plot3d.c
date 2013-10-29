@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.214 2013/09/26 22:45:33 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.215 2013/09/27 21:26:21 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -1078,7 +1078,7 @@ get_3ddata(struct surface_points *this_plot)
 		/* EAM Sep 2008 - Otherwise z=Nan or z=Inf or DF_MISSING fails */
 		/* to set CRD_COLOR at all, since the z test bails to a goto.  */
 		if (this_plot->plot_style == IMAGE) {
-			cp->CRD_COLOR = z;
+			cp->CRD_COLOR = (pm3d_color_from_column) ? color : z;
 	        }
 
 		STORE_WITH_LOG_AND_UPDATE_RANGE(cp->z, z, cp->type, z_axis, this_plot->noautoscale, NOOP, goto come_here_if_undefined);
