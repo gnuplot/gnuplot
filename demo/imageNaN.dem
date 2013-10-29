@@ -63,6 +63,13 @@ set title "Same thing in failsafe mode (3D)"
 splot $matrixdata matrix with image failsafe
 
 pause -1 "Hit return to continue"
+
+set title "3D image with pixel value in 4th column"
+
+splot $matrixdata matrix using 1:2:(0):3 with image
+
+pause -1 "Hit return to continue"
+
 reset
 
 $DATA << EOD
