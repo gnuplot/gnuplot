@@ -153,7 +153,7 @@ print "5D fit: expected ", k5, " c5 = ", c5
 print "---------------------------------------------------------"
 pause -1 "Hit return to try for a 6D fit"
 
-print "This 6D fit will fail in 4.6 and unpatched 4.7"
+print "This 6D fit will fail in 4.6 but 4.7 can handle more parameters"
 # 6D fit:
 # basis functions in columns 1, 2, 3, 4, 5, 11
 # combination with five components in column 12
