@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.212.2.24 2013/08/08 07:02:35 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.212.2.25 2013/10/25 21:00:58 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -1730,9 +1730,7 @@ df_readascii(double v[], int max)
 	    /*{{{  do a sscanf */
 	    int i;
 
-	    assert(MAXDATACOLS == 7);
-
-	    /* check we have room for at least 7 columns */
+	    /* Formatted input is limited to 7 data columns */
 	    if (df_max_cols < 7)
 		expand_df_column(7);
 

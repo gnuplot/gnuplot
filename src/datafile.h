@@ -1,5 +1,5 @@
 /*
- * $Id: datafile.h,v 1.35.2.2 2012/09/05 23:35:46 sfeam Exp $
+ * $Id: datafile.h,v 1.35.2.3 2013/03/14 19:40:33 sfeam Exp $
  */
 
 /* GNUPLOT - datafile.h */
@@ -66,9 +66,11 @@
 
 /* Variables of datafile.c needed by other modules: */
 
-/* how many using columns were specified, and max possible */
+/* how many using columns were specified */
 extern int df_no_use_specs;
-#define MAXDATACOLS 7
+/* Maximum allowed number of using specs */
+/* 6 data columns (boxxyerror) + 1 variable color + 4 axis tic labels */
+#define MAXDATACOLS 11 
 
 /* suggested x value if none given */
 extern int df_datum;

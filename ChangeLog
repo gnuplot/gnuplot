@@ -1,3 +1,12 @@
+2013-10-29  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/datafile.c src/datafile.h (MAXDATACOLS):  (MAXDATACOLS=7) assumed
+	that every column in a using spec needs to be stored in the coordinate
+	data structure.  But that is no longer true since xticlabel and friends
+	take up a using spec column but store their content elsewhere.  Increase
+	MAXDATACOLS from 7 to 11 (6 data + 1 variable color + 4 axis ticlabels).
+	Bug #1297
+
 2013-10-27  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graph3d.c src/plot3d.c src/misc.c(lp_parse):
