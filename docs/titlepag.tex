@@ -1,5 +1,5 @@
 %
-% $Id: titlepag.tex,v 1.32.2.3 2012/02/22 04:31:41 sfeam Exp $
+% $Id: titlepag.tex,v 1.32.2.4 2013/09/05 19:10:58 sfeam Exp $
 %
 
 \ifx\LaTeXe\undefined
@@ -31,6 +31,13 @@
   %     ,pdfcreator={}
   %     ,pdfkeywords={...}
   ]{hyperref}
+
+% This replaces the default ugly red boxes around hyperlinks
+   \hypersetup{
+     colorlinks   = true, %Colours links instead of ugly boxes
+     linkcolor    = blue, %Colour of internal links
+     urlcolor     = blue %Colour for external hyperlinks
+   }
 
   \usepackage{fancyhdr}
 
