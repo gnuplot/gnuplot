@@ -2,10 +2,14 @@
 
 	* src/axis.c src/axis.h src/eval.c src/save.c src/set.c src/show.c:
 	Replace axis_defaults[index].name with axis_name(index) everywhere.
-	Currently this is a macro that expands to the same thing, but is now
-	ready to be replaced by something more complicated.
+	Currently this is a macro that expands to the same thing, but now
+	it is ready to be replaced by something more complicated.
 
 	* src/unset.c (unset_tics): Change the flag for unset all to -1.
+
+	* src/set.c (set_range):  We already accept "set xrange [] noextend" as
+	a more intuitive alternative to "set auto xfix".  Now we also accept
+	"set xrange [] extend" to undo it.
 
 2013-10-29  Ethan A Merritt  <merritt@u.washington.edu>
 

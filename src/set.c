@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.418 2013/10/21 22:31:59 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.419 2013/11/06 19:32:57 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -4929,6 +4929,9 @@ set_range(AXIS_INDEX axis)
 	    } else if (almost_equals(c_token, "nowri$teback")) {
 		++c_token;
 		axis_array[axis].range_flags &= ~RANGE_WRITEBACK;
+	    } else if (almost_equals(c_token, "ext$end")) {
+		++c_token;
+		axis_array[axis].set_autoscale &= ~(AUTOSCALE_FIXMIN | AUTOSCALE_FIXMAX);
 	    } else if (almost_equals(c_token, "noext$end")) {
 		++c_token;
 		axis_array[axis].set_autoscale |= AUTOSCALE_FIXMIN | AUTOSCALE_FIXMAX;
