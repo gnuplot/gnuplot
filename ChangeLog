@@ -7,9 +7,12 @@
 
 	* src/unset.c (unset_tics): Change the flag for unset all to -1.
 
-	* src/set.c (set_range):  We already accept "set xrange [] noextend" as
-	a more intuitive alternative to "set auto xfix".  Now we also accept
-	"set xrange [] extend" to undo it.
+	* src/set.c (set_range):  We already accept "set xrange [*:*] noextend"
+	as a more intuitive alternative to "set auto xfix".  Now we also accept
+	"set xrange [*:*] extend" to go back to the default behavior.
+
+	* src/save.c (save_range): Due to a typo, the fix/nofix extend/noextend
+	axis property was not written by the "save" command.
 
 2013-10-29  Ethan A Merritt  <merritt@u.washington.edu>
 
