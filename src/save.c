@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.232 2013/10/17 23:52:13 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.233 2013/10/19 04:31:04 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -219,10 +219,10 @@ set bar %f %s\n",
     for (axis = FIRST_AXES; axis < LAST_REAL_AXIS; axis++) {
 	if (axis == SECOND_Z_AXIS) continue;
 	if (strlen(axis_array[axis].timefmt))
-	    fprintf(fp, "set timefmt %s \"%s\"\n", axis_defaults[axis].name,
+	    fprintf(fp, "set timefmt %s \"%s\"\n", axis_name(axis),
 		conv_text(axis_array[axis].timefmt));
 	if (axis == COLOR_AXIS) continue;
-	fprintf(fp, "set %sdata %s\n", axis_defaults[axis].name,
+	fprintf(fp, "set %sdata %s\n", axis_name(axis),
 		axis_array[axis].datatype == DT_TIMEDATE ? "time" :
 		axis_array[axis].datatype == DT_DMS ? "geographic" :
 		"");
@@ -300,7 +300,7 @@ set bar %f %s\n",
     fprintf(fp, "\n");
 
 #define SAVE_FORMAT(axis)						\
-    fprintf(fp, "set format %s \"%s\"\n", axis_defaults[axis].name,	\
+    fprintf(fp, "set format %s \"%s\"\n", axis_name(axis),	\
 	    conv_text(axis_array[axis].formatstring));
     SAVE_FORMAT(FIRST_X_AXIS );
     SAVE_FORMAT(FIRST_Y_AXIS );
@@ -329,9 +329,9 @@ set bar %f %s\n",
 #define SAVE_GRID(axis)					\
 	fprintf(fp, " %s%stics %sm%stics",		\
 		axis_array[axis].gridmajor ? "" : "no",	\
-		axis_defaults[axis].name,		\
+		axis_name(axis),		\
 		axis_array[axis].gridminor ? "" : "no",	\
-		axis_defaults[axis].name);
+		axis_name(axis));
 	fputs("set grid", fp);
 	SAVE_GRID(FIRST_X_AXIS);
 	SAVE_GRID(FIRST_Y_AXIS);
@@ -570,7 +570,7 @@ set bar %f %s\n",
     fputs("unset logscale\n", fp);
 #define SAVE_LOG(axis)							\
     if (axis_array[axis].log)						\
-	fprintf(fp, "set logscale %s %g\n", axis_defaults[axis].name,	\
+	fprintf(fp, "set logscale %s %g\n", axis_name(axis),	\
 		axis_array[axis].base);
     SAVE_LOG(FIRST_X_AXIS );
     SAVE_LOG(FIRST_Y_AXIS );
@@ -739,16 +739,16 @@ set origin %g,%g\n",
 #define SAVE_MINI(axis)							\
     switch(axis_array[axis].minitics & TICS_MASK) {			\
     case 0:								\
-	fprintf(fp, "set nom%stics\n", axis_defaults[axis].name);	\
+	fprintf(fp, "set nom%stics\n", axis_name(axis));	\
 	break;								\
     case MINI_AUTO:							\
-	fprintf(fp, "set m%stics\n", axis_defaults[axis].name);		\
+	fprintf(fp, "set m%stics\n", axis_name(axis));		\
 	break;								\
     case MINI_DEFAULT:							\
-	fprintf(fp, "set m%stics default\n", axis_defaults[axis].name);	\
+	fprintf(fp, "set m%stics default\n", axis_name(axis));	\
 	break;								\
     case MINI_USER:							\
-	fprintf(fp, "set m%stics %f\n", axis_defaults[axis].name,	\
+	fprintf(fp, "set m%stics %f\n", axis_name(axis),	\
 		axis_array[axis].mtic_freq);				\
 	break;								\
     }
@@ -799,7 +799,7 @@ set origin %g,%g\n",
     save_range(fp, V_AXIS);
 
 #define SAVE_AXISLABEL(axis)					\
-    SAVE_AXISLABEL_OR_TITLE(axis_defaults[axis].name,"label",	\
+    SAVE_AXISLABEL_OR_TITLE(axis_name(axis),"label",	\
 			    axis_array[axis].label)
 
     SAVE_AXISLABEL(FIRST_X_AXIS);
@@ -1042,11 +1042,11 @@ static void
 save_tics(FILE *fp, AXIS_INDEX axis)
 {
     if ((axis_array[axis].ticmode & TICS_MASK) == NO_TICS) {
-	fprintf(fp, "set no%stics\n", axis_defaults[axis].name);
+	fprintf(fp, "set no%stics\n", axis_name(axis));
 	return;
     }
     fprintf(fp, "set %stics %s %s scale %g,%g %smirror %s ",
-	    axis_defaults[axis].name,
+	    axis_name(axis),
 	    ((axis_array[axis].ticmode & TICS_MASK) == TICS_ON_AXIS)
 	    ? "axis" : "border",
 	    (axis_array[axis].tic_in) ? "in" : "out",
@@ -1073,18 +1073,18 @@ save_tics(FILE *fp, AXIS_INDEX axis)
     	}
     } else
         fputs(" autojustify", fp);
-    fprintf(fp, "\nset %stics ", axis_defaults[axis].name);
+    fprintf(fp, "\nset %stics ", axis_name(axis));
     switch (axis_array[axis].ticdef.type) {
     case TIC_COMPUTED:{
 	    fputs("autofreq ", fp);
 	    break;
 	}
     case TIC_MONTH:{
-	    fprintf(fp, "\nset %smtics", axis_defaults[axis].name);
+	    fprintf(fp, "\nset %smtics", axis_name(axis));
 	    break;
 	}
     case TIC_DAY:{
-	    fprintf(fp, "\nset %sdtics", axis_defaults[axis].name);
+	    fprintf(fp, "\nset %sdtics", axis_name(axis));
 	    break;
 	}
     case TIC_SERIES:
@@ -1118,7 +1118,7 @@ save_tics(FILE *fp, AXIS_INDEX axis)
 
     if (axis_array[axis].ticdef.def.user) {
 	struct ticmark *t;
-	fprintf(fp, "set %stics %s ", axis_defaults[axis].name,
+	fprintf(fp, "set %stics %s ", axis_name(axis),
 		(axis_array[axis].ticdef.type == TIC_USER) ? "" : "add");
 	fputs(" (", fp);
 	for (t = axis_array[axis].ticdef.def.user; t != NULL; t = t->next) {
@@ -1161,7 +1161,7 @@ void
 save_range(FILE *fp, AXIS_INDEX axis)
 {
     if (axis_array[axis].linked_to_primary) {
-	fprintf(fp, "set link %c2 ", axis_defaults[axis].name[0]);
+	fprintf(fp, "set link %c2 ", axis_name(axis)[0]);
 	if (axis_array[axis].link_udf->at)
 	    fprintf(fp, "via %s ", axis_array[axis].link_udf->definition);
 	if (axis_array[axis-SECOND_AXES].link_udf->at)
@@ -1169,7 +1169,7 @@ save_range(FILE *fp, AXIS_INDEX axis)
 	fputs("\n\t", fp);
     }
 
-    fprintf(fp, "set %srange [ ", axis_defaults[axis].name);
+    fprintf(fp, "set %srange [ ", axis_name(axis));
     if (axis_array[axis].set_autoscale & AUTOSCALE_MIN) {
 	if (axis_array[axis].min_constraint & CONSTRAINT_LOWER ) {
 	    SAVE_NUM_OR_TIME(fp, axis_array[axis].min_lb, axis);
@@ -1215,9 +1215,9 @@ save_range(FILE *fp, AXIS_INDEX axis)
 	fputs("] )\n", fp);
 
 	if (axis_array[axis].set_autoscale & (AUTOSCALE_FIXMIN))
-	    fprintf(fp, "set autoscale %sfixmin\n", axis_defaults[axis].name);
+	    fprintf(fp, "set autoscale %sfixmin\n", axis_name(axis));
 	if (axis_array[axis].set_autoscale & AUTOSCALE_FIXMAX)
-	    fprintf(fp, "set autoscale %sfixmax\n", axis_defaults[axis].name);
+	    fprintf(fp, "set autoscale %sfixmax\n", axis_name(axis));
     } else
 	putc('\n', fp);
 }
@@ -1225,7 +1225,7 @@ save_range(FILE *fp, AXIS_INDEX axis)
 static void
 save_zeroaxis(FILE *fp, AXIS_INDEX axis)
 {
-    fprintf(fp, "set %szeroaxis", axis_defaults[axis].name);
+    fprintf(fp, "set %szeroaxis", axis_name(axis));
     save_linetype(fp, &(axis_array[axis].zeroaxis), FALSE);
     putc('\n', fp);
 }

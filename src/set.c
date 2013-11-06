@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.417 2013/10/19 04:54:38 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.418 2013/10/21 22:31:59 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -799,7 +799,7 @@ set_autoscale_axis(AXIS_INDEX axis)
 {
     char keyword[16];
     AXIS *this = axis_array + axis;
-    char *name = (char *) &(axis_defaults[axis].name[0]);
+    char *name = (char *) &(axis_name(axis)[0]);
 
     if (equals(c_token, name)) {
 	this->set_autoscale = AUTOSCALE_BOTH;
@@ -5024,7 +5024,7 @@ set_tic_prop(AXIS_INDEX axis)
 
     (void) strcpy(nocmd, "no");
     cmdptr = &nocmd[2];
-    (void) strcpy(cmdptr, axis_defaults[axis].name);
+    (void) strcpy(cmdptr, axis_name(axis));
     sfxptr = &nocmd[strlen(nocmd)];
     (void) strcpy(sfxptr, "t$ics");	/* STRING */
 
@@ -5199,7 +5199,7 @@ set_tic_prop(AXIS_INDEX axis)
 	match = 1;
     }
     *cmdptr = 'm';
-    (void) strcpy(cmdptr + 1, axis_defaults[axis].name);
+    (void) strcpy(cmdptr + 1, axis_name(axis));
     (void) strcat(cmdptr, "t$ics");	/* MINISTRING */
 
     if (almost_equals(c_token, cmdptr)) {

@@ -1,5 +1,5 @@
 /*
- * $Id: axis.h,v 1.91 2013/10/07 21:03:48 sfeam Exp $
+ * $Id: axis.h,v 1.93 2013/10/10 22:23:04 sfeam Exp $
  *
  */
 
@@ -643,6 +643,7 @@ do {									  \
 /* FIXME HBB 20000521: these seem not to be used much, anywhere... */
 #define CheckZero(x,tic) (fabs(x) < ((tic) * SIGNIF) ? 0.0 : (x))
 
+#define axis_name(axis) axis_defaults[axis].name
 
 /* ------------ functions exported by axis.c */
 t_autoscale load_range __PROTO((AXIS_INDEX, double *, double *, t_autoscale));

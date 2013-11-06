@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: eval.c,v 1.110 2013/09/07 17:02:03 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: eval.c,v 1.111 2013/09/12 17:05:53 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - eval.c */
@@ -788,7 +788,7 @@ set_gpval_axis_sth_double(const char *prefix, AXIS_INDEX axis, const char *suffi
 {
     struct udvt_entry *v;
     char *cc, s[24];
-    sprintf(s, "%s_%s_%s", prefix, axis_defaults[axis].name, suffix);
+    sprintf(s, "%s_%s_%s", prefix, axis_name(axis), suffix);
     for (cc=s; *cc; cc++) *cc = toupper(*cc); /* make the name uppercase */
     v = add_udv_by_name(s);
     if (!v) return; /* should not happen */

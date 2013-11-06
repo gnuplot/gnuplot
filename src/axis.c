@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.123 2013/10/14 03:42:43 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.124 2013/10/14 20:04:51 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -189,7 +189,7 @@ axis_unlog_interval(AXIS_INDEX axis, double *min, double *max, TBOOLEAN checkran
 	if (checkrange && (*min<= 0.0 || *max <= 0.0))
 	    int_error(NO_CARET,
 		      "%s range must be greater than 0 for log scale",
-		      axis_defaults[axis].name);
+		      axis_name(axis));
 	*min = (*min<=0) ? -VERYLARGE : AXIS_DO_LOG(axis,*min);
 	*max = (*max<=0) ? -VERYLARGE : AXIS_DO_LOG(axis,*max);
     }
@@ -229,7 +229,7 @@ axis_log_value_checked(AXIS_INDEX axis, double coord, const char *what)
     if (axis_array[axis].log) {
 	if (coord <= 0.0) {
 	    graph_error("%s has %s coord of %g; must be above 0 for log scale!",
-			what, axis_defaults[axis].name, coord);
+			what, axis_name(axis), coord);
 	} else
 	    return (AXIS_DO_LOG(axis,coord));
     }
@@ -336,7 +336,7 @@ axis_checked_extend_empty_range(AXIS_INDEX axis, const char *mesg)
 		: FIXUP_RANGE__WIDEN_NONZERO_REL * fabs(dmax);
 	    if (!(axis == FIRST_Z_AXIS && !mesg)) /* set view map */
 		fprintf(stderr, "Warning: empty %s range [%g:%g], ",
-		    axis_defaults[axis].name, dmin, dmax);
+		    axis_name(axis), dmin, dmax);
 	    /* HBB 20010525: correctly handle single-ended
 	     * autoscaling, too: */
 	    if (axis_array[axis].autoscale & AUTOSCALE_MIN)
@@ -350,7 +350,7 @@ axis_checked_extend_empty_range(AXIS_INDEX axis, const char *mesg)
 	    /* user has explicitly set the range (to something empty)
                ==> we're in trouble */
 	    int_error(NO_CARET, "Can't plot with an empty %s range!",
-		      axis_defaults[axis].name);
+		      axis_name(axis));
 	}
     }
 }
@@ -611,7 +611,7 @@ make_tics(AXIS_INDEX axis, int guide)
 	return 1;	/* Anything will do, since we'll never use it */
     if (xr >= VERYLARGE)
 	int_warn(NO_CARET,"%s axis range undefined or overflow",
-		axis_defaults[axis].name);
+		axis_name(axis));
     tic = quantize_normal_tics(xr, guide);
     /* FIXME HBB 20010831: disabling this might allow short log axis
      * to receive better ticking... */

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.305 2013/09/07 17:02:04 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.306 2013/09/26 22:45:33 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -1086,7 +1086,7 @@ show_autoscale()
 	t_autoscale ascale = axis_array[axis].set_autoscale;		      \
 									      \
 	fprintf(stderr, "\t%s: %s%s%s%s%s, ",				      \
-		axis_defaults[axis].name,				      \
+		axis_name(axis),				      \
 		(ascale & AUTOSCALE_BOTH) ? "ON" : "OFF",		      \
 		((ascale & AUTOSCALE_BOTH) == AUTOSCALE_MIN) ? " (min)" : "", \
 		((ascale & AUTOSCALE_BOTH) == AUTOSCALE_MAX) ? " (max)" : "", \
@@ -1402,7 +1402,7 @@ show_format()
 
     fprintf(stderr, "\ttic format is:\n");
 #define SHOW_FORMAT(_axis)						\
-    fprintf(stderr, "\t  %s-axis: \"%s\"\n", axis_defaults[_axis].name,	\
+    fprintf(stderr, "\t  %s-axis: \"%s\"\n", axis_name(_axis),	\
 	    conv_text(axis_array[_axis].formatstring));
     SHOW_FORMAT(FIRST_X_AXIS );
     SHOW_FORMAT(FIRST_Y_AXIS );
@@ -1599,9 +1599,9 @@ show_grid()
 	    (polar_grid_angle != 0) ? "Polar" : "Rectangular");
 #define SHOW_GRID(axis)						\
     if (axis_array[axis].gridmajor)				\
-	fprintf(stderr, " %s", axis_defaults[axis].name);	\
+	fprintf(stderr, " %s", axis_name(axis));	\
     if (axis_array[axis].gridminor)				\
-	fprintf(stderr, " m%s", axis_defaults[axis].name);
+	fprintf(stderr, " m%s", axis_name(axis));
     SHOW_GRID(FIRST_X_AXIS );
     SHOW_GRID(FIRST_Y_AXIS );
     SHOW_GRID(SECOND_X_AXIS);
@@ -1639,11 +1639,11 @@ show_zeroaxis(AXIS_INDEX axis)
     SHOW_ALL_NL;
 
     if (axis_array[axis].zeroaxis.l_type > LT_NODRAW) {
-	fprintf(stderr, "\t%szeroaxis is drawn with", axis_defaults[axis].name);
+	fprintf(stderr, "\t%szeroaxis is drawn with", axis_name(axis));
 	save_linetype(stderr, &(axis_array[axis].zeroaxis), FALSE);
 	fputc('\n',stderr);
     } else
-	fprintf(stderr, "\t%szeroaxis is OFF\n", axis_defaults[axis].name);
+	fprintf(stderr, "\t%szeroaxis is OFF\n", axis_name(axis));
 
     if ((axis / SECOND_AXES) == 0) {
 	/* this is a 'first' axis. To output secondary axis, call self
@@ -1934,7 +1934,7 @@ show_logscale()
 	if (axis_array[axis].log) 					\
 	    fprintf(stderr, "%s %s (base %g)",				\
 		    !count++ ? "\tlogscaling" : " and",			\
-		    axis_defaults[axis].name,axis_array[axis].base);	\
+		    axis_name(axis),axis_array[axis].base);	\
     }
     SHOW_LOG(FIRST_X_AXIS );
     SHOW_LOG(FIRST_Y_AXIS );
@@ -2796,20 +2796,20 @@ show_mtics(AXIS_INDEX axis)
 {
     switch (axis_array[axis].minitics) {
     case MINI_OFF:
-	fprintf(stderr, "\tminor %stics are off\n", axis_defaults[axis].name);
+	fprintf(stderr, "\tminor %stics are off\n", axis_name(axis));
 	break;
     case MINI_DEFAULT:
 	fprintf(stderr, "\
 \tminor %stics are off for linear scales\n\
-\tminor %stics are computed automatically for log scales\n", axis_defaults[axis].name, axis_defaults[axis].name);
+\tminor %stics are computed automatically for log scales\n", axis_name(axis), axis_name(axis));
 	break;
     case MINI_AUTO:
-	fprintf(stderr, "\tminor %stics are computed automatically\n", axis_defaults[axis].name);
+	fprintf(stderr, "\tminor %stics are computed automatically\n", axis_name(axis));
 	break;
     case MINI_USER:
 	fprintf(stderr, "\
 \tminor %stics are drawn with %d subintervals between major xtic marks\n",
-		axis_defaults[axis].name, (int) axis_array[axis].mtic_freq);
+		axis_name(axis), (int) axis_array[axis].mtic_freq);
 	break;
     default:
 	int_error(NO_CARET, "Unknown minitic type in show_mtics()");
@@ -2838,9 +2838,9 @@ show_range(AXIS_INDEX axis)
 {
     SHOW_ALL_NL;
     if (axis_array[axis].datatype == DT_TIMEDATE)
-	fprintf(stderr, "\tset %sdata time\n", axis_defaults[axis].name);
+	fprintf(stderr, "\tset %sdata time\n", axis_name(axis));
     else if (axis_array[axis].datatype == DT_DMS)
-	fprintf(stderr, "\tset %sdata geographic\n", axis_defaults[axis].name);
+	fprintf(stderr, "\tset %sdata geographic\n", axis_name(axis));
     fprintf(stderr,"\t");
     save_range(stderr, axis);
 }
@@ -2889,7 +2889,7 @@ static void
 show_axislabel(AXIS_INDEX axis)
 {
     SHOW_ALL_NL;
-    show_xyzlabel(axis_defaults[axis].name, "label", &axis_array[axis].label);
+    show_xyzlabel(axis_name(axis), "label", &axis_array[axis].label);
 }
 
 
@@ -2898,7 +2898,7 @@ static void
 show_data_is_timedate(AXIS_INDEX axis)
 {
     SHOW_ALL_NL;
-    fprintf(stderr, "\t%s is set to %s\n", axis_defaults[axis].name,
+    fprintf(stderr, "\t%s is set to %s\n", axis_name(axis),
 	    axis_array[axis].datatype == DT_TIMEDATE ? "time" :
 	    axis_array[axis].datatype == DT_DMS ? "geographic" :
 	    "numerical");
@@ -2916,7 +2916,7 @@ show_timefmt()
     if ((axis = lookup_table(axisname_tbl, c_token)) >= 0) {
 	c_token++;
 	fprintf(stderr, "\tread format for time on %s axis is \"%s\"\n",
-		axis_defaults[axis].name,
+		axis_name(axis),
 		conv_text(axis_array[axis].timefmt));
     } else {
         /* show all currently active time axes' formats: */
@@ -2924,7 +2924,7 @@ show_timefmt()
 	    if (axis_array[axis].datatype == DT_TIMEDATE)
 		fprintf(stderr,
 			"\tread format for time on %s axis is \"%s\"\n",
-			axis_defaults[axis].name,
+			axis_name(axis),
 			conv_text(axis_array[axis].timefmt));
     }
 }
@@ -3243,11 +3243,11 @@ show_ticdef(AXIS_INDEX axis)
 
     fprintf(stderr, "\t%s-axis tics are %s, \
 \tmajor ticscale is %g and minor ticscale is %g\n",
-	    axis_defaults[axis].name,
+	    axis_name(axis),
 	    (axis_array[axis].tic_in ? "IN" : "OUT"),
 	    axis_array[axis].ticscale, axis_array[axis].miniticscale);
 
-    fprintf(stderr, "\t%s-axis tics:\t", axis_defaults[axis].name);
+    fprintf(stderr, "\t%s-axis tics:\t", axis_name(axis));
     switch (axis_array[axis].ticmode & TICS_MASK) {
     case NO_TICS:
 	fputs("OFF\n", stderr);
