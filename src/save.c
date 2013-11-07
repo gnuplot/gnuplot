@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.197.2.1 2013/10/18 02:05:20 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.197.2.2 2013/10/22 03:41:14 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -1130,13 +1130,13 @@ save_range(FILE *fp, AXIS_INDEX axis)
 	    SAVE_NUM_OR_TIME(fp, axis_array[axis].max, axis);
 	}
 	fputs("] )\n", fp);
-
-	if (axis_array[axis].set_autoscale & (AUTOSCALE_FIXMIN))
-	    fprintf(fp, "set autoscale %sfixmin\n", axis_defaults[axis].name);
-	if (axis_array[axis].set_autoscale & AUTOSCALE_FIXMAX)
-	    fprintf(fp, "set autoscale %sfixmax\n", axis_defaults[axis].name);
     } else
 	putc('\n', fp);
+
+    if (axis_array[axis].set_autoscale & (AUTOSCALE_FIXMIN))
+	fprintf(fp, "set autoscale %sfixmin\n", axis_defaults[axis].name);
+    if (axis_array[axis].set_autoscale & AUTOSCALE_FIXMAX)
+	fprintf(fp, "set autoscale %sfixmax\n", axis_defaults[axis].name);
 }
 
 static void
