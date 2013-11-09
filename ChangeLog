@@ -4,6 +4,9 @@
 	just because a color request specifies a linetype color.
 	Bugfix.
 
+	* Add a check for valid timer status.  This reduces the number of
+	spurious events that are passed through to the main program.
+
 2013-11-07  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/save.c (save_range):  Due to a typo, the fix/nofix axis property
