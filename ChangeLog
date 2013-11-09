@@ -1,7 +1,8 @@
 2013-11-09  Ethan A Merritt  <merritt@u.washington.edu>
 
-	* src/qtterminal/qt_term.cpp (qt_set_color):  Do not change line type
-	just because a color request specifies a linetype color.
+	* src/qtterminal/qt_term.cpp (qt_set_color) term/gd.trm (PNG_set_color):
+	Do not change line type just because a color request specifies a
+	linetype color.
 	Bugfix.
 
 	* src/qtterminal/QtGnuplotScene.cpp (mouseReleaseEvent):

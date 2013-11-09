@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: gd.trm,v 1.174 2013/10/09 02:41:22 sfeam Exp $
+ * $Id: gd.trm,v 1.175 2013/10/24 21:41:34 sfeam Exp $
  * based on gif.trm,v 1.26.2.1 2000/05/01 00:17:20 joze
  */
 
@@ -1274,11 +1274,14 @@ TERM_PUBLIC
 void PNG_set_color (t_colorspec *colorspec)
 {
     double gray = colorspec->value;
+    int save;
 
     switch (colorspec->type) {
 
     case TC_LT:
+	save = png_state.linetype;
 	PNG_linetype(colorspec->lt);
+	png_state.linetype = save;
 	break;
 
     case TC_RGB:
