@@ -1,3 +1,9 @@
+2013-11-09  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/qtterminal/qt_term.cpp (qt_set_color):  Do not change line type
+	just because a color request specifies a linetype color.
+	Bugfix.
+
 2013-11-07  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/save.c (save_range):  Due to a typo, the fix/nofix axis property

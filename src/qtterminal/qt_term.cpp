@@ -607,8 +607,12 @@ int qt_make_palette(t_sm_palette* palette)
 
 void qt_set_color(t_colorspec* colorspec)
 {
-	if (colorspec->type == TC_LT)
-		qt_linetype(colorspec->lt);
+	if (colorspec->type == TC_LT) {
+		if (colorspec->lt <= LT_NODRAW)
+			qt->out << GEBackgroundColor;
+		else
+			qt->out << GEPenColor << qt_colorList[colorspec->lt % 9 + 3];
+	}
 	else if (colorspec->type == TC_FRAC)
 	{
 		rgb_color rgb;
