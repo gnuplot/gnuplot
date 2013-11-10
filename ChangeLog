@@ -1,3 +1,9 @@
+2013-11-10  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/mouse.c (event_buttonrelease): "pause mouse" only worked for
+	center and right mouse buttons, not for left mouse.
+	Bug #1301
+
 2013-11-09  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/qtterminal/qt_term.cpp (qt_set_color):  Do not change line type

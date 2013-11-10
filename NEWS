@@ -9,6 +9,7 @@ New features, changes and fixes since gnuplot version 4.6.4
 * FIX empty first field in a tab-separated-values file was incorrectly ignored
 * FIX several problems with color assignment to contour lines
 * FIX qt terminal incorrectly changed linetype (dot/dash) to match line color
+* FIX "pause mouse" worked only for right- or center- click, not left-click.
 
 New features, changes and fixes in gnuplot version 4.6.4
 ========================================================
