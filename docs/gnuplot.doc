@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.832 2013/10/21 20:03:11 broeker Exp $
+C RCS $Id: gnuplot.doc,v 1.833 2013/11/07 21:23:32 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -12324,7 +12324,7 @@ Ffigure_missing
  autoscaling.  If the data are time/date, you must give the range as a quoted
  string according to the `set timefmt` format.
  If <min> or <max> is omitted the current value will not be changed.
- See below for full autoscaling syntax.  See also `autoscale extend`.
+ See below for full autoscaling syntax.  See also `noextend`.
 
  The same syntax applies to `yrange`, `zrange`, `x2range`, `y2range`, `cbrange`,
  `rrange`, `trange`, `urange` and `vrange`.
