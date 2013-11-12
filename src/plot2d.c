@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.305 2013/10/14 03:46:32 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.306 2013/11/12 06:34:23 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -608,7 +608,7 @@ get_data(struct curve_points *current_plot)
 		case BOXXYERROR:
 				if (j != 7 && j != 5) int_error(NO_CARET,errmsg);
 				break;
-		case VECTOR:	
+		case VECTOR:
 				if (j < 5) int_error(NO_CARET,errmsg);
 				break;
 		case LABELPOINTS:
@@ -620,17 +620,17 @@ get_data(struct curve_points *current_plot)
 				if (j < 4) int_error(NO_CARET,errmsg);
 				break;
 #ifdef EAM_OBJECTS
-		case CIRCLES: 	
+		case CIRCLES: 
 				if (j == 5 || j < 3) int_error(NO_CARET,errmsg);
 				break;
-		case ELLIPSES:	
+		case ELLIPSES:
 #endif
-		case BOXES:	
+		case BOXES:
 		case POINTSTYLE:
 		case LINESPOINTS:
 		case IMPULSES:
 		case LINES:
-		case DOTS:	
+		case DOTS:
 				if (j < 3) int_error(NO_CARET,errmsg);
 				break;
 		default:
@@ -1007,7 +1007,7 @@ get_data(struct curve_points *current_plot)
 		store2d_point(current_plot, i++, v[0], v[1], fabs(v[2]), fabs(v[3]),
 				0.0, v[2], ((v[2] >= 0) && (v[3] >= 0)) ? 0.0 : DEFAULT_RADIUS);
 		break;
-#endif	
+#endif
 
 	    }                   /*inner switch */
 
@@ -1051,7 +1051,7 @@ get_data(struct curve_points *current_plot)
 		    store2d_point(current_plot, i++, v[0], v[1], fabs(v[2]), fabs(v[3]),
 		    		  v[4], v[2], ((v[2] >= 0) && (v[3] >= 0)) ? 0.0 : DEFAULT_RADIUS);
 		    break;
-#endif	
+#endif
 
 		case RGBIMAGE:  /* x_center y_center r_value g_value b_value (rgb) */
 		    goto images;
@@ -1272,7 +1272,7 @@ store2d_point(
 	break;
     case BOXES:			/* auto-scale to xlow xhigh */
 	cp->ylow = ylow;
-	cp->yhigh = yhigh;	
+	cp->yhigh = yhigh;
 	STORE_WITH_LOG_AND_UPDATE_RANGE(cp->xlow, xlow, dummy_type, current_plot->x_axis, 
 					current_plot->noautoscale, NOOP, cp->xlow = -VERYLARGE);
 	STORE_WITH_LOG_AND_UPDATE_RANGE(cp->xhigh, xhigh, dummy_type, current_plot->x_axis,
@@ -1287,13 +1287,13 @@ store2d_point(
 	STORE_WITH_LOG_AND_UPDATE_RANGE(cp->xhigh, xhigh, dummy_type, current_plot->x_axis,
 					current_plot->noautoscale, NOOP, cp->xhigh = -VERYLARGE);
 	break;
-#ifdef EAM_OBJECTS	
+#ifdef EAM_OBJECTS
     case CIRCLES:
-	cp->yhigh = yhigh;	
+	cp->yhigh = yhigh;
 	STORE_WITH_LOG_AND_UPDATE_RANGE(cp->xlow, xlow, dummy_type, current_plot->x_axis, 
 					current_plot->noautoscale, NOOP, cp->xlow = -VERYLARGE);
 	STORE_WITH_LOG_AND_UPDATE_RANGE(cp->xhigh, xhigh, dummy_type, current_plot->x_axis,
-					current_plot->noautoscale, NOOP, cp->xhigh = -VERYLARGE);	
+					current_plot->noautoscale, NOOP, cp->xhigh = -VERYLARGE);
 	cp->ylow = ylow;	/* arc begin */
 	cp->xhigh = yhigh;	/* arc end */
 	if (fabs(ylow) > 1000. || fabs(yhigh) > 1000.) /* safety check for insane arc angles */
@@ -1329,7 +1329,7 @@ store2d_point(
 	cp->xlow = xlow;    /* major axis */
 	cp->xhigh = xhigh;  /* minor axis */
 	cp->ylow = ylow;    /* orientation */
-	break;	
+	break;
 #endif
 
     default:			/* auto-scale to xlow xhigh ylow yhigh */
@@ -2220,7 +2220,7 @@ eval_plots()
 			}
 		    }
 		}
-		
+
 #ifdef EAM_OBJECTS
 		/* pick up the special 'units' keyword the 'ellipses' style allows */
 		if (this_plot->plot_style == ELLIPSES) {
@@ -2250,7 +2250,7 @@ eval_plots()
 			    continue;
 			}
 		    }
-		}		
+		}
 #endif
 
 		/* Labels can have font and text property info as plot options */
@@ -2408,7 +2408,7 @@ eval_plots()
 		case CIRCLES:
 		case YERRORBARS:
 		case YERRORLINES:
-				break;	
+				break;
 		default:
 				int_error(NO_CARET, 
 				    "This plot style is not available in polar mode");
@@ -2444,7 +2444,7 @@ eval_plots()
 		    (x_axis == SECOND_X_AXIS) ? second_axes : first_axes;
 		this_plot->labels->place.scaley =
 		    (y_axis == SECOND_Y_AXIS) ? second_axes : first_axes;
-		
+
 		/* Needed for variable color - June 2010 */
 		this_plot->lp_properties.pm3d_color = this_plot->labels->textcolor;
 		if (this_plot->labels->textcolor.type == TC_VARIABLE)
@@ -2971,7 +2971,7 @@ eval_plots()
 				this_plot->points[i].z = DEFAULT_RADIUS;
 				this_plot->points[i].ylow = default_ellipse.o.ellipse.orientation;
 			    }
-#endif	
+#endif
 
 			    STORE_WITH_LOG_AND_UPDATE_RANGE(this_plot->points[i].y, temp, 
 			    	this_plot->points[i].type, in_parametric ? x_axis : y_axis,
