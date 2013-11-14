@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: parse.c,v 1.78 2012/11/23 07:00:19 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: parse.c,v 1.79 2013/09/14 23:09:23 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - parse.c */
@@ -474,6 +474,19 @@ parse_primary_expression()
 	    enum operators whichfunc = is_builtin_function(c_token);
 	    struct value num_params;
 	    num_params.type = INTGR;
+
+#if (1)	    /* DEPRECATED */
+	    if (whichfunc && (strcmp(ft[whichfunc].f_name,"defined")==0)) {
+		/* Deprecated syntax:   if (defined(foo)) ...  */
+		/* New syntax:          if (exists("foo")) ... */
+		struct udvt_entry *udv = add_udv(c_token+2);
+		union argument *foo = add_action(PUSHC);
+		foo->v_arg.type = INTGR;
+		foo->v_arg.v.int_val = udv->udv_undef ? 0 : 1;
+		c_token += 4;  /* skip past "defined ( <foo> ) " */
+		return;
+	    }
+#endif
 
 	    if (whichfunc) {
 		c_token += 2;	/* skip fnc name and '(' */

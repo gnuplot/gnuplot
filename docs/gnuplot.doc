@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.833 2013/11/07 21:23:32 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.834 2013/11/11 01:49:10 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -883,7 +883,6 @@ C
 ^<tbody>
 ^<tr>    <td>column(x)</td>    <td>int or string</td>    <td> contents of column <i>x</i> during data input.</td></tr>
 ^<tr>    <td>columnhead(x)</td>    <td>int</td>    <td> string containing first entry of column <i>x</i> in datafile.</td></tr>
-^<tr>    <td>defined(X)</td>    <td>variable name</td>    <td> [DEPRECATED] returns 1 if X is defined, 0 otherwise.</td></tr>
 ^<tr>    <td>exists("X")</td>    <td>string</td>    <td> returns 1 if a variable named X is defined, 0 otherwise.</td></tr>
 ^<tr>    <td>hsv2rgb(h,s,v)</td>    <td>h,s,v in [0:1]</td>    <td> converts HSV color to 24bit RGB color.</td></tr>
 ^<tr>    <td>stringcolumn(x)</td>    <td>int</td>    <td> content column <i>x</i> as a string.</td></tr>
@@ -1439,13 +1438,6 @@ C marker below is used to signal this to doc2html:
  `columnhead(x)` may only be used in expressions as part of `using` manipulations
  to fits or datafile plots.  It evaluates to a string containing the contents of
  column x in the first line of data. See `plot datafile using`.
-4 defined
-?expressions functions defined
-?defined
-#defined(X) & variable name & [DEPRECATED] returns 1 if X is defined, 0 otherwise. \\
-%defined(X)@variable name@ [DEPRECATED] returns 1 if X is defined, 0 otherwise.
- `defined(X)` [DEPRECATED] returns 1 if a variable named X has been defined, otherwise
- it returns 0.  Please use `exists("X")` instead.
 4 exists
 ?expressions functions exists
 ?exists
@@ -2478,7 +2470,7 @@ Ffigure_newsyntax
 
        plot 'something'
        pause mouse
-       if (defined(MOUSE_BUTTON)) call 'something_else'; \
+       if (exists("MOUSE_BUTTON")) call 'something_else'; \
        else print "No mouse click."
 
  It is also possible to track keystrokes in the plot window using the mousing

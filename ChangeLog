@@ -6,6 +6,11 @@
 	* src/plot2d.c src/plot3d.c:
 	Allowed enhanced/noenhanced key word after individual plot titles.
 
+	* src/eval.c src/parse.c docs/gnuplot.doc:
+	Restore backwards-compatibility by continuing to accept deprecated
+	function defined(FOO).  Remove help entry so that the deprecation
+	is taken more seriously.
+
 2013-11-09  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/qtterminal/qt_term.cpp (qt_set_color) term/gd.trm (PNG_set_color):
