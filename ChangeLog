@@ -3,6 +3,9 @@
 	* src/qtterminal/embed_example.h:
 	Support for building qt terminal with either Qt4 or Qt5
 
+	* src/plot2d.c src/plot3d.c:
+	Allowed enhanced/noenhanced key word after individual plot titles.
+
 2013-11-09  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/qtterminal/qt_term.cpp (qt_set_color) term/gd.trm (PNG_set_color):
