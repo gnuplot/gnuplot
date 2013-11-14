@@ -48,6 +48,7 @@
 
 #include <QtCore>
 #include <QtGui>
+#include <QWidget>
 
 class QtGnuplotWidget;
 class QPlainTextEdit;

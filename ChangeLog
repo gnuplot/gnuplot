@@ -1,3 +1,8 @@
+2013-11-14  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/qtterminal/embed_example.h:
+	Support for building qt terminal with either Qt4 or Qt5
+
 2013-11-09  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/qtterminal/qt_term.cpp (qt_set_color) term/gd.trm (PNG_set_color):
