@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.191.2.6 2013/03/14 19:40:33 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.191.2.7 2013/10/27 22:13:43 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -1527,6 +1527,16 @@ eval_3dplots()
 		    if (ytitle != NULL)
 			ytitle[0] = '\0';
 		    set_title = TRUE;
+		    continue;
+		}
+
+		if (almost_equals(c_token, "enh$anced")) {
+		    c_token++;
+		    this_plot->title_no_enhanced = FALSE;
+		    continue;
+		} else if (almost_equals(c_token, "noenh$anced")) {
+		    c_token++;
+		    this_plot->title_no_enhanced = TRUE;
 		    continue;
 		}
 

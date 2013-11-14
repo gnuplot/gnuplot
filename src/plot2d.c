@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.255.2.21 2013/10/01 18:51:22 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.255.2.22 2013/10/03 03:11:20 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -2076,6 +2076,16 @@ eval_plots()
 		    if (xtitle != NULL)
 			xtitle[0] = '\0';
 		    set_title = TRUE;
+		    continue;
+		}
+
+		if (almost_equals(c_token, "enh$anced")) {
+		    c_token++;
+		    this_plot->title_no_enhanced = FALSE;
+		    continue;
+		} else if (almost_equals(c_token, "noenh$anced")) {
+		    c_token++;
+		    this_plot->title_no_enhanced = TRUE;
 		    continue;
 		}
 

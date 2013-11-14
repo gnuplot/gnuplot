@@ -1,3 +1,8 @@
+2013-11-14  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/plot2d.c src/plot3d.c:
+	Allowed enhanced/noenhanced key word after individual plot titles.
+
 2013-11-10  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/mouse.c (event_buttonrelease): "pause mouse" only worked for
