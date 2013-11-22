@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.189 2013/10/15 21:47:24 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.190 2013/11/06 19:32:12 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -374,7 +374,7 @@ unset_command()
 	unset_terminal();
 	break;
     case S_TICS:
-	unset_tics(-1);
+	unset_tics(ALL_AXES);
 	break;
     case S_TICSCALE:
 	int_warn(c_token, "Deprecated syntax - use 'set tics scale default'");
@@ -1158,7 +1158,7 @@ unset_tics(AXIS_INDEX axis)
     unsigned int iend = AXIS_ARRAY_SIZE;
     unsigned int i;
 
-    if (axis >= 0) {
+    if (axis != ALL_AXES) {
 	istart = axis;
 	iend = axis + 1;
     }

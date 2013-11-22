@@ -1,3 +1,9 @@
+2013-11-22  Christoph Bersch <usenet@bersch.net>
+
+	* src/axis.h (ALL_AXES = -1) src/unset.c (unset_tics):
+	unset_tics() requires a defined ENUM parameter.
+	Bug #1305
+
 2013-11-14  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/qtterminal/embed_example.h:
