@@ -1,5 +1,5 @@
 /* Hey Emacs this is -*- C -*-
- * $Id: emf.trm,v 1.78.2.9 2013/09/17 23:40:33 sfeam Exp $
+ * $Id: emf.trm,v 1.78.2.10 2013/12/11 04:59:04 sfeam Exp $
  */
 
 /* GNUPLOT - emf.trm */
@@ -1122,7 +1122,7 @@ EMF_filled_polygon(int points, gpiPoint *corners)
 	EMF_SelectObject(EMF_HANDLE_BRUSH);
 
 	EMF_DeleteObject(EMF_HANDLE_PEN);
-	EMF_CreatePen(EMF_HANDLE_PEN, emf_pentype, 0, color);
+	EMF_CreatePen(EMF_HANDLE_PEN, emf_pentype, emf_linewidth * EMF_PX2HM, color);
 	EMF_SelectObject(EMF_HANDLE_PEN);
 
 	EMF_CreatePolygon(points);
@@ -1543,7 +1543,7 @@ EMF_point(unsigned int x, unsigned int y, int number)
 	EMF_CreateBrush(EMF_HANDLE_BRUSH, 1, 0, 0);	/* transparent brush */
 	EMF_SelectObject(EMF_HANDLE_BRUSH);
 	EMF_DeleteObject(EMF_HANDLE_PEN);
-	EMF_CreatePen(EMF_HANDLE_PEN, emf_pentype, 1, emf_color);
+	EMF_CreatePen(EMF_HANDLE_PEN, emf_pentype, emf_linewidth * EMF_PX2HM, emf_color);
 	EMF_SelectObject(EMF_HANDLE_PEN);
 	EMF_Ellipse((long)(x-emf_tic),(long)(y-emf_tic),(long)(x+emf_tic),(long)(y+emf_tic));
 	break;
@@ -1555,7 +1555,7 @@ EMF_point(unsigned int x, unsigned int y, int number)
 	EMF_SelectObject(EMF_HANDLE_BRUSH);
 	EMF_SelectObject(EMF_STOCK_OBJECT_BLACK_PEN);
 	EMF_DeleteObject(EMF_HANDLE_PEN);
-	EMF_CreatePen(EMF_HANDLE_PEN, emf_pentype, 1, emf_color);
+	EMF_CreatePen(EMF_HANDLE_PEN, emf_pentype, emf_linewidth * EMF_PX2HM, emf_color);
 	EMF_SelectObject(EMF_HANDLE_PEN);
 	EMF_Ellipse((long)(x-emf_tic),(long)(y-emf_tic),(long)(x+emf_tic),(long)(y+emf_tic));
 	break;

@@ -1,8 +1,8 @@
-2013-11-14  Ethan A Merritt  <merritt@u.washington.edu>
 2013-12-11  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
-	* term/emf.trm: Support true pattern-fill.
+	* term/emf.trm: Support true pattern-fill. Apply global linewidth.
 
+2013-11-14  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/plot2d.c src/plot3d.c:
 	Allowed enhanced/noenhanced key word after individual plot titles.
