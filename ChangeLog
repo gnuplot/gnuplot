@@ -2,6 +2,9 @@
 
 	* term/emf.trm: Support true pattern-fill. Apply global linewidth.
 
+	* src/util.c (gprintf):  C compiler in SJIS locale does not like
+	in-line UTF-8 string constants.
+
 2013-11-22  Christoph Bersch <usenet@bersch.net>
 
 	* src/axis.h (ALL_AXES = -1) src/unset.c (unset_tics):
