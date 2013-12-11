@@ -1,3 +1,18 @@
+2013-12-11  Thomas Bleher <tbleher@gmx.de>
+
+	* src/qtterminal/QtGnuplotScene.cpp src/qtterminal/QtGnuplotWidget.*
+ 	src/qtterminal/QtGnuplotWindow.*:
+
+	QtGnuplotWidget can be used to embed gnuplot into an existing Qt
+	application. This patch makes integration easier.
+	- QtGnuplotWidget gets the parent QWidget pointer as its first parameter
+	  so that QtGnuplotWidget can be loaded from ui files.
+	- The export functions in QtGnuplotWidget get the target filename from a
+	  parameter, enabling the embedding application to query for the
+	  filename in some other way.
+	- loadSettings and saveSettings can use a configurable path for their
+	  settings, so different plot windows can have different settings.
+
 2013-12-11  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* term/emf.trm: Support true pattern-fill. Apply global linewidth.

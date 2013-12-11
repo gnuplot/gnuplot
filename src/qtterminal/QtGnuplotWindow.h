@@ -55,6 +55,7 @@
 
 class QToolBar;
 class QtGnuplotWidget;
+class Ui_settingsDialog;
 
 class QtGnuplotWindow : public QMainWindow, public QtGnuplotEventReceiver
 {
@@ -71,6 +72,14 @@ public slots:
 	void on_setStatusText(const QString& status);
 	void on_keyAction();
 
+private slots:
+	void print();
+	void exportToPdf();
+	void exportToImage();
+	void exportToSvg();
+	void showSettingsDialog();
+	void settingsSelectBackgroundColor();
+
 private:
 	void createAction(const QString& name, int key, const QString& icon);
 
@@ -79,6 +88,8 @@ private:
 	int m_id;
 	QToolBar* m_toolBar;
 	QtGnuplotWidget* m_widget;
+	Ui_settingsDialog* m_ui;
+	QColor m_chosenBackgroundColor;
 };
 
 #endif // QTGNUPLOTWINDOW_H

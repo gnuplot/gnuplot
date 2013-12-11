@@ -58,22 +58,24 @@
 
 class QtGnuplotScene;
 class QGraphicsView;
-class Ui_settingsDialog;
+class QSettings;
 
 class QtGnuplotWidget : public QWidget, public QtGnuplotEventReceiver
 {
 Q_OBJECT
 
 public:
-	QtGnuplotWidget(int id = 0, QtGnuplotEventHandler* eventHandler = 0, QWidget* parent = 0);
+	QtGnuplotWidget(QWidget* parent = 0, int id = 0, QtGnuplotEventHandler* eventHandler = 0);
+
+	Q_PROPERTY(bool antialias READ antialias WRITE setAntialias);
+	Q_PROPERTY(bool rounded READ rounded WRITE setRounded);
+	Q_PROPERTY(bool replotOnResize READ replotOnResize WRITE setReplotOnResize);
+	Q_PROPERTY(QColor backgroundColor READ backgroundColor WRITE setBackgroundColor);
 
 public:
 	bool isActive() const;
 	void setStatusText(const QString& status);
 	QSize plotAreaSize() const;
-	// these can be set from the tool widget or from the command line
-	bool m_rounded;
-	QColor m_backgroundColor;
 
 signals:
 	void statusTextChanged(const QString& status);
@@ -81,15 +83,32 @@ signals:
 public:
 	void processEvent(QtGnuplotEventType type, QDataStream& in);
 
+	bool antialias() const
+	{ return m_antialias; }
+
+	bool rounded() const
+	{ return m_rounded; }
+
+	bool replotOnResize() const
+	{ return m_replotOnResize; }
+
+	const QColor& backgroundColor() const
+	{ return m_backgroundColor; }
+
+	void setAntialias(bool value);
+	void setRounded(bool value);
+	void setReplotOnResize(bool value);
+	void setBackgroundColor(const QColor& color);
+
+	void loadSettings(const QSettings& settings);
+	void saveSettings(QSettings& settings) const;
 public slots:
 	void copyToClipboard();
-	void print();
-	void exportToPdf();
+	void print(QPrinter& printer);
+	void exportToPdf(const QString& fileName);
 	void exportToEps();
-	void exportToImage();
-	void exportToSvg();
-	void showSettingsDialog();
-	void settingsSelectBackgroundColor();
+	void exportToImage(const QString& fileName);
+	void exportToSvg(const QString& fileName);
 
 // Qt functions
 protected:
@@ -98,9 +117,6 @@ protected:
 private:
 	void setViewMatrix();
 	QPixmap createPixmap();
-	void loadSettings();
-	void applySettings();
-	void saveSettings();
 	QPainter::RenderHints renderHints() const;
 
 private:
@@ -109,14 +125,14 @@ private:
 	QtGnuplotScene* m_scene;
 	QGraphicsView* m_view;
 	QSize m_lastSizeRequest;
-
-	static int m_widgetUid;
-
+	// these can be set from the tool widget or from the command line
+	bool m_rounded;
+	QColor m_backgroundColor;
 	// Settings
-	Ui_settingsDialog* m_ui;
-	QColor m_chosenBackgroundColor;
 	bool m_antialias;
 	bool m_replotOnResize;
+
+	static int m_widgetUid;
 };
 
 #endif // QTGNUPLOTWIDGET_H

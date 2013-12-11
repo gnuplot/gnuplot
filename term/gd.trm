@@ -1,6 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: gd.trm,v 1.175 2013/10/24 21:41:34 sfeam Exp $
- * based on gif.trm,v 1.26.2.1 2000/05/01 00:17:20 joze
+ * $Id: gd.trm,v 1.176 2013/11/10 19:42:55 sfeam Exp $
  */
 
 /* GNUPLOT -- gd.trm */

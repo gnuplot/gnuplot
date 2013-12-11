@@ -189,13 +189,13 @@ void QtGnuplotScene::processEvent(QtGnuplotEventType type, QDataStream& in)
 	}
 	else if (type == GEBackgroundColor)
 	{
-		m_currentPen.setColor(m_widget->m_backgroundColor);
+		m_currentPen.setColor(m_widget->backgroundColor());
 	}
 	else if (type == GEPenStyle)
 	{
 		int style; in >> style;
 		m_currentPen.setStyle(Qt::PenStyle(style));
-		if (m_widget->m_rounded) {
+		if (m_widget->rounded()) {
 			m_currentPen.setJoinStyle(Qt::RoundJoin);
 			m_currentPen.setCapStyle(Qt::RoundCap);
 		} else {
@@ -515,7 +515,7 @@ void QtGnuplotScene::processEvent(QtGnuplotEventType type, QDataStream& in)
 			break;
 		case TEXTBOX_BACKGROUNDFILL:
 			/* Fill bounding box */
-			m_currentBrush.setColor(m_widget->m_backgroundColor);
+			m_currentBrush.setColor(m_widget->backgroundColor());
 			m_currentBrush.setStyle(Qt::SolidPattern);
 			rectItem = addRect(m_currentTextBox, Qt::NoPen, m_currentBrush);
 			rectItem->setZValue(m_currentZ++);
@@ -601,7 +601,7 @@ void QtGnuplotScene::setBrushStyle(int style)
 		/// @todo color & transparent. See other terms
 		m_currentBrush.setStyle(QtGnuplot::brushes[abs(fillpar) % 8]);
 	else if (fillstyle == FS_EMPTY) // fill with background plot->color
-		color = m_widget->m_backgroundColor;
+		color = m_widget->backgroundColor();
 
 	m_currentBrush.setColor(color);
 }
