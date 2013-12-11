@@ -3,6 +3,9 @@
 	* src/graph3d.c (key_text):  Apply key title font to key entries.
 	Bug #1309
 
+	* src/qtterminal/qt_term.cpp (qt_options):  qt structure has not yet
+	been initialized at the time qt_options is first called.
+
 2013-12-11  Thomas Bleher <tbleher@gmx.de>
 
 	* src/qtterminal/QtGnuplotScene.cpp src/qtterminal/QtGnuplotWidget.*

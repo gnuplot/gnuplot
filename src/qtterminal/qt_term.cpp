@@ -1025,7 +1025,7 @@ void qt_options()
 			if (!(s = try_to_get_string()))
 				int_error(c_token, "title: expecting string");
 			if (*s)
-				qt_option->Title = qt->codec->toUnicode(s);
+				qt_option->Title = qt_encodingToCodec(encoding)->toUnicode(s);
 			free(s);
 			break;
 		case QT_CLOSE:
