@@ -1,4 +1,8 @@
 2013-11-22  Christoph Bersch <usenet@bersch.net>
+2013-12-11  Shigeharu Takeno  <shige@iee.niit.ac.jp>
+
+	* term/emf.trm: Support true pattern-fill.
+
 
 	* src/axis.h (ALL_AXES = -1) src/unset.c (unset_tics):
 	unset_tics() requires a defined ENUM parameter.
