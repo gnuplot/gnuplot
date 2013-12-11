@@ -1,3 +1,8 @@
+2013-12-11  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/graph3d.c (key_text):  Apply key title font to key entries.
+	Bug #1309
+
 2013-12-11  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* term/emf.trm: Support true pattern-fill. Apply global linewidth.

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.253.2.14 2013/07/03 16:18:21 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.253.2.15 2013/10/27 22:13:42 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -3070,14 +3070,13 @@ key_text(int xl, int yl, char *text)
 
     (term->layer)(TERM_LAYER_BEGIN_KEYSAMPLE);
     if (key->just == GPKEY_LEFT && key->region != GPKEY_USER_PLACEMENT) {
-	(*term->justify_text) (LEFT);
-	(*term->put_text) (xl + key_text_left, yl, text);
+	write_multiline(xl + key_text_left, yl, text, LEFT, JUST_TOP, 0, key->font);
     } else {
 	if ((*term->justify_text) (RIGHT)) {
-	    (*term->put_text) (xl + key_text_right, yl, text);
+	    write_multiline(xl + key_text_right, yl, text, RIGHT, JUST_TOP, 0, key->font);
 	} else {
 	    int x = xl + key_text_right - (term->h_char) * estimate_strlen(text);
-	    (*term->put_text) (x, yl, text);
+	    write_multiline(x, yl, text, LEFT, JUST_TOP, 0, key->font);
 	}
     }
     (term->layer)(TERM_LAYER_END_KEYSAMPLE);
