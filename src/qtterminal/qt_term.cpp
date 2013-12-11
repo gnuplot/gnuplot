@@ -609,9 +609,9 @@ void qt_set_color(t_colorspec* colorspec)
 {
 	if (colorspec->type == TC_LT) {
 		if (colorspec->lt <= LT_NODRAW)
-			qt->out << GEBackgroundColor;
+			qt_out << GEBackgroundColor;
 		else
-			qt->out << GEPenColor << qt_colorList[colorspec->lt % 9 + 3];
+			qt_out << GEPenColor << qt_colorList[colorspec->lt % 9 + 3];
 	}
 	else if (colorspec->type == TC_FRAC)
 	{
