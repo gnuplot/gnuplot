@@ -11,6 +11,10 @@
 	* term/emf.trm:  Invalidate font name at start of each plot.
 	Bug #1306
 
+	* src/wxterminal/gp_cairo.c src/wxterminal/wxt_gui.*:
+	Modify vertical centering of enhanced text to match default case.
+	Bug #1309
+
 2013-12-11  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graph3d.c (key_text):  Apply key title font to key entries.

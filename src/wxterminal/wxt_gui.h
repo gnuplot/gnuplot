@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.h,v 1.36.2.1 2013/04/05 16:24:36 markisch Exp $
+ * $Id: wxt_gui.h,v 1.36.2.2 2013/04/05 16:39:47 markisch Exp $
  */
 
 /* GNUPLOT - wxt_gui.h */
@@ -265,7 +265,6 @@ typedef enum wxt_gp_command_t {
 	command_move,
 	command_vector,
 	command_put_text,
-	command_enhanced_put_text,
 	command_enhanced_init,
 	command_enhanced_open,
 	command_enhanced_writec,

@@ -12,6 +12,7 @@ New features, changes and fixes since gnuplot version 4.6.4
 * FIX qt terminal incorrectly changed linetype (dot/dash) to match line color
 * FIX "pause mouse" worked only for right- or center- click, not left-click
 * FIX emf terminal font initialization
+* FIX wxt terminal vertical centering of enhanced text
 
 New features, changes and fixes in gnuplot version 4.6.4
 ========================================================

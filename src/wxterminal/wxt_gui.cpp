@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.cpp,v 1.91.2.14 2013/06/08 11:52:33 markisch Exp $
+ * $Id: wxt_gui.cpp,v 1.91.2.15 2013/10/26 03:52:01 sfeam Exp $
  */
 
 /* GNUPLOT - wxt_gui.cpp */
@@ -706,9 +706,8 @@ void wxtPanel::ClearCommandlist()
 
 	/* run through the list, and free allocated memory */
 	for(iter = command_list.begin(); iter != command_list.end(); ++iter) {
-		if (iter->command == command_enhanced_put_text ||
-			iter->command == command_put_text ||
-			iter->command == command_set_font)
+		if (iter->command == command_put_text
+		||  iter->command == command_set_font)
 			delete[] iter->string;
 		if (iter->command == command_filled_polygon)
 			delete[] iter->corners;
@@ -2697,7 +2696,6 @@ void wxtPanel::wxt_cairo_exec_command(gp_command command)
 		text_justification_mode = command.mode;
 		return;
 	case command_put_text :
-	case command_enhanced_put_text :
 		if (wxt_in_key_sample) {
 			int slen = gp_strlen(command.string) * term->h_char * 0.75;
 			if (text_justification_mode == RIGHT) slen = -slen;
