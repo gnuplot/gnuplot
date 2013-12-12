@@ -8,6 +8,9 @@
 	* src/util.h (gprintf):  Interpret %h as %g (forward compatibility
 	with version 4.7 save files).
 
+	* term/emf.trm:  Invalidate font name at start of each plot.
+	Bug #1306
+
 2013-12-11  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graph3d.c (key_text):  Apply key title font to key entries.

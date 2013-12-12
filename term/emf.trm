@@ -1,5 +1,5 @@
 /* Hey Emacs this is -*- C -*-
- * $Id: emf.trm,v 1.78.2.10 2013/12/11 04:59:04 sfeam Exp $
+ * $Id: emf.trm,v 1.78.2.11 2013/12/11 05:02:50 sfeam Exp $
  */
 
 /* GNUPLOT - emf.trm */
@@ -386,6 +386,8 @@ static double emf_dashlength = 1.0;
 static int emf_coords = 0;	/* # polyline coordinates saved */
 static char emf_fontname[255] = EMF_FONTNAME;
 static float emf_fontsize = EMF_FONTSIZE;
+static float emf_last_fontsize = -1;
+static char *emf_last_fontname = NULL;
 static enum JUSTIFY emf_justify = LEFT;
 static char emf_defaultfontname[255] = EMF_FONTNAME;
 static float emf_defaultfontsize = EMF_FONTSIZE;
@@ -802,9 +804,6 @@ EMF_options()
 	/* We have old-style bare font size specified */
 	emf_defaultfontsize = int_expression();
     }
-#if (0)	/* Shige May 2013 - Does not function properly until we enter graphics mode */
-    EMF_set_font(NULL);		/* set default font */
-#endif
     
     sprintf(term_options, "%s %s %s font \"%s,%g\"",
 	    emf_monochrome ? "monochrome" : "color",
@@ -891,6 +890,9 @@ EMF_graphics()
     EMF_SetBkMode(1);		/* transparent background for text */
     EMF_CreateBrush(EMF_HANDLE_BRUSH, 1, 0, 0);		/* transparent brush for polygons */
     EMF_SelectObject(EMF_HANDLE_BRUSH);
+
+    free(emf_last_fontname);	/* invalidate any previous font */
+    emf_last_fontname = NULL;
     EMF_set_font(NULL);		/* init default font */
 
     emf_color = emf_textcolor = LT_UNDEFINED;
@@ -899,9 +901,6 @@ EMF_graphics()
 TERM_PUBLIC int 
 EMF_set_font(const char *font)
 {
-    static float last_fontsize = -1;
-    static char last_fontname[256] = {'\0'};
-
     /* FIXME: This condition is somehow triggered by enhanced_recursion */
     if (font == emf_fontname)
 	;
@@ -919,11 +918,13 @@ EMF_set_font(const char *font)
     }
 
     /* Skip redundant requests for the same font */
-    if (!strcmp(last_fontname, emf_fontname) && last_fontsize == emf_fontsize) {
+    if (emf_last_fontname && !strcmp(emf_last_fontname, emf_fontname)
+    &&  emf_last_fontsize == emf_fontsize) {
 	return TRUE;
     } else {
-	safe_strncpy(last_fontname, emf_fontname, sizeof(last_fontname));
-	last_fontsize = emf_fontsize;
+	free(emf_last_fontname);
+	emf_last_fontname = gp_strdup(emf_fontname);
+	emf_last_fontsize = emf_fontsize;
     }
 
     term->h_char = 0.6 * (emf_fontsize * EMF_PT2HM * emf_fontscale);
