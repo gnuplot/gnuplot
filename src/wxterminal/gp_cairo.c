@@ -1,5 +1,5 @@
 /*
- * $Id: gp_cairo.c,v 1.75 2013/10/24 21:41:34 sfeam Exp $
+ * $Id: gp_cairo.c,v 1.76 2013/10/25 04:45:22 sfeam Exp $
  */
 
 /* GNUPLOT - gp_cairo.c */
@@ -822,7 +822,6 @@ void gp_cairo_draw_text(plot_struct *plot, int x1, int y1, const char* string,
 	/* EAM Dec 2012 - The problem is that avg_vchar is not kept in sync with the	*/
 	/* font size.  It is changed when the set_font command is received, not when	*/
 	/* it is executed in the display list. Try basing off plot->fontsize instead. 	*/
-
 	/* vert_just = ((double)ink_rect.height/2 +(double)ink_rect.y) / PANGO_SCALE;	*/
 	/* vert_just = avg_vchar/2;							*/
 	vert_just = 0.8 * (float)(plot->fontsize * plot->oversampling_scale);
@@ -1506,8 +1505,9 @@ void gp_cairo_enhanced_finish(plot_struct *plot, int x, int y)
 	pango_layout_set_attributes (layout, gp_cairo_enhanced_AttrList);
 
 	pango_layout_get_extents(layout, &ink_rect, &logical_rect);
-	/* vert_just = ((double)ink_rect.height/2 +(double)ink_rect.y) / PANGO_SCALE; */
-	vert_just = avg_vchar/2;
+	
+	/* NB: See explanatory comments in gp_cairo_draw_text() */
+	vert_just = 0.8 * (float)(plot->fontsize * plot->oversampling_scale);
 
 	arg = plot->text_angle * M_PI/180;
 	enh_x = x - vert_just * sin(arg);
