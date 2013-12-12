@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: tek.trm,v 1.20 2009/08/14 01:16:58 sfeam Exp $
+ * $Id: tek.trm,v 1.21 2013/12/12 20:49:44 sfeam Exp $
  *
  */
 
@@ -1438,8 +1438,11 @@ START_HELP(tek40)
 " Syntax:",
 "    set terminal sixel {<fontsize>} {<mode>} {size <x>,<y>}",
 "",
-" The `sixel` output format was originally used by DEC terminals and printers,",
-" and is emulated by some versions of xterm.",
+" The `sixel` output format was originally used by DEC terminals and printers.",
+" For use with xterm emulation, xterm must be compiled/configured with",
+" \"--enable-sixel-graphics\" and started with \"-ti 340\" on the command line.",
+" Furthermore, the menu option \"sixelScrolling\" should be checked;",
+" foreground black and background white.",
 #endif
 #ifdef BITGRAPH
 "?commands set terminal bitgraph",
