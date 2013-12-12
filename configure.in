@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot on Unix.
 dnl
-dnl $Id: configure.in,v 1.337 2013/10/25 03:10:27 sfeam Exp $
+dnl $Id: configure.in,v 1.338 2013/10/25 22:19:52 sfeam Exp $
 dnl
 dnl this is actually major.minor ...
 dnl note that for a non-beta release, we need to disable DEVELOPMENT_RELEASE
@@ -550,12 +550,15 @@ if test "$with_gd" != no; then
   elif test -d "$with_gd"; then
     libgd_CPPFLAGS="-I$with_gd/include"
     libgd_LDFLAGS="-L$with_gd/lib"
+    libgd_LIBS="-ljpeg -lpng -lfreetype -lz"
   fi
 
   _cppflags="$CPPFLAGS"
   _ldflags="$LDFLAGS"
+  _libs="$LIBS"
   CPPFLAGS="$CPPFLAGS $libgd_CPPFLAGS"
   LDFLAGS="$LDFLAGS $libgd_LDFLAGS"
+  LIBS="$LIBS $libgd_LIBS"
 
   AC_CHECK_LIB(gd,gdImageCreateTrueColor,
     [dnl found gd library
@@ -569,30 +572,18 @@ if test "$with_gd" != no; then
      AC_CHECK_LIB(gd,gdImageGifAnimBegin,
        [AC_DEFINE(GIF_ANIMATION,1,[ Define if libgd supports animated gifs. ])])
 
-     _libs="$LIBS"
-     LIBS="$LIBS -ljpeg"
      dnl jpeg support in libgd
      AC_CHECK_LIB(gd,gdImageJpeg,
-       [AC_DEFINE(HAVE_GD_JPEG,1,[ Define if libgd supports jpeg. ])
-        libgd_LIBS="$libgd_LIBS -ljpeg"])
+       [AC_DEFINE(HAVE_GD_JPEG,1,[ Define if libgd supports jpeg. ])])
 
-     LIBS="$_libs $libgd_LIBS -lfreetype"
      dnl freetype support in libgd
      AC_CHECK_LIB(gd,gdImageStringFT,
-       [have_ttf=yes],)
-
-     if test "$have_ttf" = yes; then
        AC_DEFINE(HAVE_GD_TTF,1,
-                 [ Define if libgd supports TrueType fonts through libfreetype. ])
-       libgd_LIBS="$libgd_LIBS -lfreetype"
-     fi
+           [ Define if libgd supports TrueType fonts through libfreetype. ]))
 
-     LIBS="$_libs $libgd_LIBS -lpng"
      dnl png support in libgd
      AC_CHECK_LIB(gd,gdImagePng,
-       [AC_DEFINE(HAVE_GD_PNG,1,[ Define if libgd supports png. ])
-        libgd_LIBS="$libgd_LIBS -lpng"])
-     LIBS="$_libs"
+       [AC_DEFINE(HAVE_GD_PNG,1,[ Define if libgd supports png. ])])
 
     ],[dnl gd library not found
        AC_MSG_WARN([libgd not found or too old, version >= 2.0 is required])
@@ -603,7 +594,9 @@ if test "$with_gd" != no; then
   if test "$with_gd" = no; then
     CPPFLAGS="$_cppflags"
     LDFLAGS="$_ldflags"
+    LIBS="$_libs"
   else
+    LIBS="$_libs"
     TERMLIBS="$TERMLIBS -lgd $libgd_LIBS"
   fi
 
@@ -1509,7 +1502,9 @@ else
 fi
 
 if test "$have_libcerf" = yes; then
-  AC_MSG_RESULT([  cerf() and other special functions will be taken from libcerf])
+  AC_MSG_RESULT([  cerf() and other special functions from libcerf: yes])
+else
+  AC_MSG_RESULT([  cerf() and other special functions: no (libcerf not found)])
 fi
 
 if test "$with_kpsexpand" = yes; then

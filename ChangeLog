@@ -1,3 +1,7 @@
+2013-12-12  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* configure.in:  Simplify tests for libgd support libraries.
+
 2013-12-11  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graph3d.c (key_text):  Apply key title font to key entries.
