@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: util.c,v 1.99.2.6 2013/02/08 23:01:39 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: util.c,v 1.99.2.7 2013/06/23 22:13:35 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - util.c */
@@ -604,6 +604,14 @@ gprintf(
 	case 'g':
 	case 'G':
 	    t[0] = *format;
+	    t[1] = 0;
+	    snprintf(dest, remaining_space, temp, x);
+	    break;
+	    /*}}} */
+	    /*{{{  Forward compatibility: treat %h as %g */
+	case 'h':
+	case 'H':
+	    t[0] = 'g';
 	    t[1] = 0;
 	    snprintf(dest, remaining_space, temp, x);
 	    break;

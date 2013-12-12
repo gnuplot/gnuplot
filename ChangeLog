@@ -1,3 +1,13 @@
+2013-12-12  Erik Olofsen  <olofsen@users.sf.net>
+
+	* term/tek.trm:  New terminal driver "sixel" for old DEC terminals
+	and printers, emulated by some versions of xterm.
+
+2013-12-12  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/util.h (gprintf):  Interpret %h as %g (forward compatibility
+	with version 4.7 save files).
+
 2013-12-11  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graph3d.c (key_text):  Apply key title font to key entries.

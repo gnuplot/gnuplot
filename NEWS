@@ -1,6 +1,7 @@
 New features, changes and fixes since gnuplot version 4.6.4
 ===========================================================
 
+* NEW "sixel" terminal driver
 * NEW new object attribute clip/noclip
 * CHANGE maximum number of using spec columns is now 11
 * FIX allow 'set pm3d' interpolate and top/bottom options to coexist
