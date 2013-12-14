@@ -1,5 +1,5 @@
 /*
- * $Id: gp_hist.h,v 1.10 2008/12/12 21:06:13 sfeam Exp $
+ * $Id: gp_hist.h,v 1.11 2011/02/21 07:56:57 markisch Exp $
  */
 
 /* GNUPLOT - gp_hist.h */
@@ -79,10 +79,12 @@ void write_history_n __PROTO((const int, const char *, const char *));
 void write_history __PROTO((char *));
 void read_history __PROTO((char *));
 const char *history_find __PROTO((char *));
+const char *history_find_by_number __PROTO((int));
 int history_find_all __PROTO((char *));
 #elif defined(HAVE_LIBREADLINE) || defined(HAVE_LIBEDITLINE)
 void write_history_n __PROTO((const int, const char *, const char *));
 const char *history_find __PROTO((char *));
+const char *history_find_by_number __PROTO((int));
 int history_find_all __PROTO((char *));
 #endif /* READLINE && !HAVE_LIBREADLINE && !HAVE_LIBEDITLINE */
 

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: history.c,v 1.28 2011/08/23 11:06:50 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: history.c,v 1.29 2011/12/28 19:37:37 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - history.c */
@@ -256,6 +256,32 @@ read_history(char *filename)
     }
 }
 
+/* finds and returns a command from the history list by number */
+const char *
+history_find_by_number(int n)
+{
+    struct hist *entry = history;
+    int hist_entries = 0;
+    int index;
+
+    if (history == NULL || n <= 0)
+	return NULL;	/* no history yet */
+
+    /* count number of entries */
+    for (entry = history; entry->prev != NULL; entry = entry->prev)
+	hist_entries++;
+
+    if (n > hist_entries)
+	return NULL;
+
+    /* step backwards to the requested entry */
+    for (entry = history->prev, index = hist_entries; --index > 0; entry = entry->prev)
+	if (index + 1 == n)
+	    return entry->line;
+
+    return NULL;	/* should not happen */
+}
+
 
 /* finds and returns a command from the history which starts with <cmd>
  * (ignores leading spaces in <cmd>)
@@ -364,16 +390,17 @@ write_history_list(const int num, const char *const filename, const char *mode)
 	    restrict_popen();
             out = popen(filename+1, "w");
             is_pipe = 1;
-        } else {
+        } else
 #endif
+	{
             if (! (out = fopen(filename, mode) ) ) {
-                /* Fall back to 'stdout' */
                 int_warn(NO_CARET, "Cannot open file to save history, using standard output.\n");
                 out = stdout;
-            } else is_file = 1;
-#ifdef PIPES
+            } else {
+		is_file = 1;
+	    }
         }
-#endif
+
     } else if (filename && !filename[0])
         is_quiet = 1;
 
@@ -381,22 +408,20 @@ write_history_list(const int num, const char *const filename, const char *mode)
      * For some reason the readline functions append_history() 
      * and write_history() do not work they way I thought they did...
      */
-    if (num > 0) {
+    if (num > 0)
         istart = history_length - num;
-        if (istart <= 0 || istart > history_length)
-            istart = 1;
-    } else istart = 1;
+    else
+	istart = 1;
+    if (istart <= 0 || istart > history_length)
+	istart = 1;
 
-        for (i = istart; (list_entry = history_get(i)); i++) {
-            /* don't add line numbers when writing to file to make file loadable */
-            if (is_file)
-                fprintf(out, "%s\n", list_entry->line);
-            else {
-                if (!is_quiet) fprintf(out, "%5i", i + history_base - 1);
-                fprintf(out, "  %s\n", list_entry->line);
-            }
-        }
-    /* close if something was opened */
+    for (i = istart; (list_entry = history_get(i)); i++) {
+        /* don't add line numbers when writing to file to make file loadable */
+	if (!is_file && !is_quiet)
+	    fprintf(out, "%5i ", i + history_base - 1);
+	fprintf(out, "  %s\n", list_entry->line);
+    }
+
 #ifdef PIPES
     if (is_pipe) pclose(out);
 #endif
@@ -408,6 +433,16 @@ void
 write_history_n(const int n, const char *filename, const char *mode)
 {
     write_history_list(n, filename, mode);
+}
+
+/* finds and returns a command from the history list by number */
+const char *
+history_find_by_number(int n)
+{
+    if (0 < n && n < history_length)
+	return history_get(n)->line;
+    else
+	return NULL;
 }
 
 /* finds and returns a command from the history which starts with <cmd>

@@ -1,6 +1,7 @@
 New features, changes and fixes since gnuplot version 4.6
 =========================================================
 
+* NEW "history !N" reexecutes the command at history entry N.
 * NEW piecewise functions via separate sampling ranges for each plot element
 * NEW function hsv2rgb(H,S,V) creates a 24-bit RGB value
 * NEW plot title can be placed next to the plot line in the graph proper

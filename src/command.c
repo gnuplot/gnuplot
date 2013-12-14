@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.269 2013/10/21 23:21:03 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.270 2013/10/25 04:45:22 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -911,15 +911,30 @@ history_command()
 	c_token++;
 
     } else if (!END_OF_COMMAND && equals(c_token,"!")) {
-	char *search_str = NULL;  /* string from command line to search for */
-	const char *line_to_do = NULL;  /* command to execute at end if necessary */
+	const char *line_to_do = NULL;  /* command returned by search	*/
 
 	c_token++;
-	m_capture(&search_str, c_token, c_token);
-	line_to_do = history_find(search_str);
-	free(search_str);
+	if (isanumber(c_token)) {
+	    int i = int_expression();
+	    line_to_do = history_find_by_number(i);
+	} else {
+	    char *search_str = NULL;  /* string from command line to search for */
+	    m_capture(&search_str, c_token, c_token);
+	    line_to_do = history_find(search_str);
+	    free(search_str);
+	}
 	if (line_to_do == NULL)
 	    int_error(c_token, "not in history");
+
+	/* Replace current entry "history !..." in history list	*/
+	/* with the command we found by searching.		*/
+#if defined(HAVE_LIBREADLINE)
+	free(replace_history_entry(history_length-1, line_to_do, NULL)->line);
+#elif defined(READLINE)
+	free(history->line);
+	history->line = line_to_do;
+#endif
+
 	printf("  Executing:\n\t%s\n", line_to_do);
 	do_string(line_to_do);
 	c_token++;
