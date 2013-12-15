@@ -1,11 +1,13 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: bitmap.c,v 1.25 2008/05/22 21:17:47 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: bitmap.c,v 1.26 2008/11/15 19:38:54 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - bitmap.c */
 
 /*[
- * Copyright 1986 - 1993, 1998, 2004   Thomas Williams, Colin Kelley
+ * Copyright Jyrki Yli-Nokari 1987
+ *
+ * Gnuplot license:
  *
  * Permission to use, copy, and distribute this software and its
  * documentation for any purpose with or without fee is hereby granted,
@@ -32,33 +34,49 @@ static char *RCSid() { return RCSid("$Id: bitmap.c,v 1.25 2008/05/22 21:17:47 sf
  *
  * This software is provided "as is" without express or implied warranty
  * to the extent permitted by applicable law.
+ *
+ * Alternative license:
+ *
+ * As an alternative to distributing code in this file under the gnuplot license,
+ * you may instead comply with the terms below. In this case, redistribution and
+ * use in source and binary forms, with or without modification, are permitted
+ * provided that the following conditions are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright notice,
+ * this list of conditions and the following disclaimer.
+ *
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ * this list of conditions and the following disclaimer in the documentation
+ * and/or other materials provided with the distribution.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE 
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE 
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR 
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF 
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS 
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN 
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
+ * POSSIBILITY OF SUCH DAMAGE.
+ *
 ]*/
-
 
 /*
  * AUTHORS
  *
  *   Original Software:
- *     Jyrki Yli-Nokari <jty@intrin.UUCP>
+ *     Jyrki Yli-Nokari <jty@intrin.UUCP> (1987)
+ *   Modified for use with gnuplot (1990):
  *     Ronald J. Hartranft <rjh2@ns.cc.lehigh.edu>
  *     Russell Lang <rjl@monu1.cc.monash.edu.au>
  */
 
-
 /*
-   ** General raster plotting routines.
-   ** Raster routines written and copyrighted 1987 by
-   ** Jyrki Yli-Nokari (jty@intrin.UUCP)
-   ** Intrinsic, Ltd.
-   **
-   ** You may use this code for anything you like as long as
-   ** you are not selling it and the credit is given and
-   ** this message retained.
-   **
- */
-
-/* Bitmap plotting routines derived from above raster plotting routines
- * Russell Lang, 1990
+   ** Jyrki Yli-Nokari, December 2013.
+   ** Change to dual licence (Gnuplot + BSD) and remove previous
+   ** restriction to noncommercial use.
  */
 
 #include "bitmap.h"

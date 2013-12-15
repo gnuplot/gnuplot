@@ -1,3 +1,11 @@
+2013-12-15  Jyrki Yli-Nokari  <jyrkiylinokari@gmail.com>
+
+	* src/bitmap.c configure.in:
+	Jyrki Yli-Nokari, the original author of the code in bitmap.c,
+	has agreed to relicense it as dual license (gnuplot + BSD).
+	This removes a restriction to non-commercial use imposed by the
+	license terms that appeared in earlier versions of file bitmap.c.
+
 2013-12-12  Erik Olofsen  <olofsen@users.sf.net>
 
 	* term/tek.trm:  New terminal driver "sixel" for old DEC terminals
