@@ -9,7 +9,9 @@
 2013-12-14  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/command.c src/history.c src/gp_hist.h docs/gnuplot.doc:
-	New: "history !N" reexecutes the command at history entry N.
+	New: "history !N" reexecutes the command at history entry numbered N.
+	The current entry ("history !...") in the history list is replaced
+	with the command found by searching.
 
 2013-12-12  Erik Olofsen  <olofsen@users.sf.net>
 
