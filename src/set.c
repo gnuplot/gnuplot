@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.419 2013/11/06 19:32:57 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.420 2013/11/07 21:23:32 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -609,7 +609,7 @@ set_command()
 	    set_ticslevel();
 	    break;
 	default:
-	    int_error(c_token, "Unrecognized option.  See 'help set'.");
+	    int_error(c_token, "unrecognized option - see 'help set'.");
 	    break;
 	}
 
@@ -1326,7 +1326,7 @@ set_dgrid3d()
 			} else if( token_cnt == 2) {
 		        	normval = int_expression();
 			} else
-				int_error(c_token,"Unrecognize keyword or unexpected value");
+				int_error(c_token,"Unrecognized keyword or unexpected value");
 			break;
 	}
 
@@ -2928,7 +2928,7 @@ set_palette_defined()
     }
 
     if ( !equals(c_token,"(") )
-	int_error( c_token, "Expected ( to start gradient definition." );
+	int_error( c_token, "expected ( to start gradient definition" );
 
     ++c_token;
     num = -1;
@@ -2995,7 +2995,7 @@ set_palette_defined()
 	sm_palette.gradient[num].col.b = b;
 	if (equals(c_token,")") ) break;
 	if ( !equals(c_token,",") )
-	    int_error( c_token, "Expected comma." );
+	    int_error( c_token, "expected comma" );
 	++c_token;
 
     }
@@ -3126,7 +3126,7 @@ set_palette_function()
     m_capture(&(sm_palette.Afunc.definition), start_token, c_token-1);
     dummy_func = NULL;
     if (!equals(c_token,","))
-	int_error(c_token,"Expected comma" );
+	int_error(c_token,"expected comma" );
     ++c_token;
 
     /* Bfunc */
@@ -3142,7 +3142,7 @@ set_palette_function()
     m_capture(&(sm_palette.Bfunc.definition), start_token, c_token-1);
     dummy_func = NULL;
     if (!equals(c_token,","))
-	int_error(c_token,"Expected comma" );
+	int_error(c_token,"expected comma" );
     ++c_token;
 
     /* Cfunc */
@@ -3334,10 +3334,10 @@ set_palette()
 
 		++c_token;
 		if (END_OF_COMMAND)
-		    int_error( c_token, "Expected color model." );
+		    int_error( c_token, "expected color model" );
 		model = lookup_table(&color_model_tbl[0],c_token);
 		if (model == -1)
-		    int_error(c_token,"Unknown color model.");
+		    int_error(c_token,"unknown color model");
 		sm_palette.cmodel = model;
 		continue;
 	    }
@@ -3989,7 +3989,7 @@ set_obj(int tag, int obj_type)
 			int_error(c_token, "Unrecognized polygon syntax");
 
 	default:
-		int_error(c_token, "Unrecoginized object type");
+		int_error(c_token, "unrecognized object type");
 	} /* End of object-specific options */
 
 	/* The rest of the options apply to any type of object */
