@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot.c,v 1.157 2013/10/23 18:25:04 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot.c,v 1.158 2013/10/25 04:45:22 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot.c */
@@ -510,30 +510,19 @@ main(int argc, char **argv)
 
 	if (interactive && term != 0) {		/* not unknown */
 #ifdef GNUPLOT_HISTORY
-	    FPRINTF((stderr, "Before read_history\n"));
 #if defined(HAVE_LIBREADLINE) || defined(HAVE_LIBEDITLINE)
 	    expanded_history_filename = tilde_expand(GNUPLOT_HISTORY_FILE);
 #else
 	    expanded_history_filename = gp_strdup(GNUPLOT_HISTORY_FILE);
 	    gp_expand_tilde(&expanded_history_filename);
 #endif
-	    FPRINTF((stderr, "expanded_history_filename = %s\n", expanded_history_filename));
 	    read_history(expanded_history_filename);
-	    {
-		/* BEGIN: Go local to get environment variable */
-		const char *temp_env = getenv ("GNUPLOT_HISTORY_SIZE");
-		if (temp_env)
-		    gnuplot_history_size = strtol (temp_env, (char **) NULL, 10);
-	    } /* END: Go local to get environment variable */
 
 	    /*
 	     * It is safe to ignore the return values of 'atexit()' and
 	     * 'on_exit()'. In the worst case, there is no history of your
 	     * currrent session and you have to type all again in your next
 	     * session.
-	     * This is the default behaviour (traditional reasons), too.
-	     * In case you don't have one of these functions, or you don't
-	     * want to use them, 'write_history()' is called directly.
 	     */
 	    gp_atexit(wrapper_for_write_history);
 #endif /* GNUPLOT_HISTORY */

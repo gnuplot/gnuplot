@@ -1,3 +1,20 @@
+2013-12-16  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/command.c src/gp_hist.h src/history.c src/plot.c src/set.c
+	src/show.c src/tables.c src/tables.h src/unset.c docs/gnuplot.doc:
+
+	New command `set history` to control history output
+	Syntax:
+	    set history {size <N>} {quiet|numbers} {full|trim} {default}
+
+	set history size N	replaces "set historysize N"
+	set history size -1	replaces "unset historysize"
+	set history quiet	subsequent `history` commands will not show numbers
+	set history numbers	subsequent `history` commands will show numbers
+	set history trim	[old default] remove duplicate history entries
+	set history full	do not alter list by removing old duplicate entries
+	set history default	equivalent to "set history size 500, numbers, trim"
+
 2013-12-15  Jyrki Yli-Nokari  <jyrkiylinokari@gmail.com>
 
 	* src/bitmap.c configure.in:

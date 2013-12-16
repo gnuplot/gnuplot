@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.270 2013/10/25 04:45:22 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.271 2013/12/15 01:46:10 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -944,7 +944,7 @@ history_command()
 	TBOOLEAN append = FALSE;   /* rewrite output file or append it */
 	static char *name = NULL;  /* name of the output file; NULL for stdout */
 
-	TBOOLEAN quiet = FALSE;
+	TBOOLEAN quiet = history_quiet;
 	if (!END_OF_COMMAND && almost_equals(c_token,"q$uiet")) {
 	    /* option quiet to suppress history entry numbers */
 	    quiet = TRUE;
@@ -966,7 +966,7 @@ history_command()
 
 #else
     c_token++;
-    int_warn(NO_CARET, "You have to compile gnuplot with builtin readline or GNU readline or BSD editline to enable history support.");
+    int_warn(NO_CARET, "This copy of gnuplot was built without support for command history.");
 #endif /* defined(READLINE) || defined(HAVE_LIBREADLINE) || defined(HAVE_LIBEDITLINE) */
 }
 
@@ -2738,29 +2738,29 @@ rlgets(char *s, size_t n, const char *prompt)
 	    /* search in the history for entries containing line.
 	     * They may have other tokens before and after line, hence
 	     * the check on strcmp below. */
-	    found = history_search(line, -1);
-	    if (found != -1 && !strcmp(current_history()->line,line)) {
-		/* this line is already in the history, remove the earlier entry */
-		HIST_ENTRY *removed = remove_history(where_history());
-		/* according to history docs we are supposed to free the stuff */
-		if (removed) {
-		    free(removed->line);
-		    free(removed->data);
-		    free(removed);
+	    if (!history_full) {
+		found = history_search(line, -1);
+		if (found != -1 && !strcmp(current_history()->line,line)) {
+		    /* this line is already in the history, remove the earlier entry */
+		    HIST_ENTRY *removed = remove_history(where_history());
+		    /* according to history docs we are supposed to free the stuff */
+		    if (removed) {
+			free(removed->line);
+			free(removed->data);
+			free(removed);
+		    }
 		}
 	    }
 	    add_history(line);
 #  elif defined(HAVE_LIBEDITLINE)
-	    /* deleting history entries does not work, so suppress adjacent
-	    duplicates only */
-
-	    int found;
+	    /* deleting history entries does not work, so suppress adjacent duplicates only */
+	    int found = 0;
 	    using_history();
 
-	    found = history_search(line, -1);
-	    if (found <= 0) {
+	    if (!history_full)
+		found = history_search(line, -1);
+	    if (found <= 0)
                add_history(line);
-            }
 #  else /* builtin readline */
 	    add_history(line);
 #  endif

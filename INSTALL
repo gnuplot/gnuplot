@@ -530,10 +530,6 @@ On the DOS family of platforms (including all versions of Windows and
 OS/2) the variable looked at is COMSPEC.  Other platforms will consult
 SHELL.
 
-If gnuplot is configured to use its own, private history file, the
-size of this file can be set via GNUPLOT_HISTORY_SIZE. The default is
-666 (lines).
-
 If gnuplot is configured for the X11 window system, it looks for the
 X11 driver program in GNUPLOT_DRIVER_DIR.  The default position used
 for the driver is fixed by the build process, so you should only have

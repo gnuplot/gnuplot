@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.306 2013/09/26 22:45:33 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.307 2013/11/06 19:32:57 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -132,9 +132,7 @@ static void show_surface __PROTO((void));
 static void show_hidden3d __PROTO((void));
 static void show_increment __PROTO((void));
 static void show_histogram __PROTO((void));
-#ifdef GNUPLOT_HISTORY
-static void show_historysize __PROTO((void));
-#endif
+static void show_history __PROTO((void));
 #ifdef EAM_BOXED_TEXT
 static void show_textbox __PROTO((void));
 #endif
@@ -402,11 +400,10 @@ show_command()
     case S_HIDDEN3D:
 	show_hidden3d();
 	break;
-#ifdef GNUPLOT_HISTORY
     case S_HISTORYSIZE:
-	show_historysize();
+    case S_HISTORY:
+	show_history();
 	break;
-#endif
     case S_SIZE:
 	show_size();
 	break;
@@ -752,9 +749,7 @@ show_all()
     show_view();
     show_surface();
     show_hidden3d();
-#ifdef GNUPLOT_HISTORY
-    show_historysize();
-#endif
+    show_history();
     show_size();
     show_origin();
     show_term();
@@ -2697,19 +2692,18 @@ show_textbox()
 }
 #endif
 
-#ifdef GNUPLOT_HISTORY
-/* process 'show historysize' command */
+/* process 'show history' command */
 static void
-show_historysize()
+show_history()
 {
-    if (gnuplot_history_size >= 0) {
-	fprintf(stderr, "\thistory size: %ld\n", gnuplot_history_size);
-    } else {
-	fprintf(stderr, "\thistory will not be truncated.\n");
-    }
-}
+#ifndef GNUPLOT_HISTORY
+    fprintf(stderr, "\tThis copy of gnuplot was not built to use a command history file\n");
 #endif
-
+    fprintf(stderr, "\t history size %d%s,  %s,  %s\n", 
+		gnuplot_history_size, gnuplot_history_size<0 ? "(unlimited)" : "",
+		history_quiet ? "quiet" : "numbers",
+		history_full ? "full" : "suppress duplicates");
+}
 
 /* process 'show size' command */
 static void

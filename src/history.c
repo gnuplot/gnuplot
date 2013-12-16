@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: history.c,v 1.29 2011/12/28 19:37:37 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: history.c,v 1.30 2013/12/15 01:46:10 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - history.c */
@@ -42,15 +42,9 @@ static char *RCSid() { return RCSid("$Id: history.c,v 1.29 2011/12/28 19:37:37 s
 #include "plot.h"
 #include "util.h"
 
-
-/* moved here from plot.c */
-#ifdef GNUPLOT_HISTORY
-# ifndef HISTORY_SIZE
-/* Can be overriden with the environment variable 'GNUPLOT_HISTORY_SIZE' */
-#  define HISTORY_SIZE 666
-# endif
-long int gnuplot_history_size = HISTORY_SIZE;
-#endif
+int gnuplot_history_size = HISTORY_SIZE;
+TBOOLEAN history_quiet = FALSE;
+TBOOLEAN history_full = FALSE;
 
 
 #if defined(READLINE) && !defined(HAVE_LIBREADLINE) && !defined(HAVE_LIBEDITLINE)
@@ -70,6 +64,7 @@ add_history(char *line)
     struct hist *entry;
 
     entry = history;
+    if (!history_full)
     while (entry != NULL) {
 	/* Don't store duplicate entries */
 	if (!strcmp(entry->line, line)) {

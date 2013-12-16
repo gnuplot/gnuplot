@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.190 2013/11/06 19:32:12 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.191 2013/11/22 01:30:04 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -221,7 +221,9 @@ unset_command()
     case S_HIDDEN3D:
 	unset_hidden3d();
 	break;
-    case S_HISTORYSIZE:
+    case S_HISTORY:
+	break; /* FIXME: reset to default values? */
+    case S_HISTORYSIZE:	/* Deprecated */
 	unset_historysize();
 	break;
     case S_ISOSAMPLES:
@@ -870,15 +872,11 @@ unset_textbox_style()
 }
 #endif
 
-/* process 'unset historysize' command */
+/* process 'unset historysize' command DEPRECATED */
 static void
 unset_historysize()
 {
-#ifdef GNUPLOT_HISTORY
     gnuplot_history_size = -1; /* don't ever truncate the history. */
-#else
-    int_error(c_token, "Command 'unset historysize' requires history support.");
-#endif
 }
 
 

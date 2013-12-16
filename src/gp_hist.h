@@ -1,5 +1,5 @@
 /*
- * $Id: gp_hist.h,v 1.11 2011/02/21 07:56:57 markisch Exp $
+ * $Id: gp_hist.h,v 1.12 2013/12/15 01:46:10 sfeam Exp $
  */
 
 /* GNUPLOT - gp_hist.h */
@@ -47,14 +47,16 @@ struct hist {
     struct hist *next;
 };
 
+#define HISTORY_SIZE 500
+
 /* Variables of history.c needed by other modules: */
 
 extern struct hist *history;
 extern struct hist *cur_entry;
 
-#ifdef GNUPLOT_HISTORY
-extern long int gnuplot_history_size;
-#endif
+extern int gnuplot_history_size;
+extern TBOOLEAN history_quiet;
+extern TBOOLEAN history_full;
 
 /* Prototypes of functions exported by history.c */
 

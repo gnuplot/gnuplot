@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.420 2013/11/07 21:23:32 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.421 2013/12/16 22:12:00 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -94,9 +94,7 @@ static void set_encoding __PROTO((void));
 static void set_fit __PROTO((void));
 static void set_grid __PROTO((void));
 static void set_hidden3d __PROTO((void));
-#ifdef GNUPLOT_HISTORY
-static void set_historysize __PROTO((void));
-#endif
+static void set_history __PROTO((void));
 static void set_isosamples __PROTO((void));
 static void set_key __PROTO((void));
 static void set_label __PROTO((void));
@@ -269,12 +267,9 @@ set_command()
 	case S_HIDDEN3D:
 	    set_hidden3d();
 	    break;
-	case S_HISTORYSIZE:
-#ifdef GNUPLOT_HISTORY
-	    set_historysize();
-#else
-	    int_error(c_token, "Command 'set historysize' requires history support.");
-#endif
+	case S_HISTORYSIZE:	/* Deprecated in favor of "set history size" */
+	case S_HISTORY:
+	    set_history();
 	    break;
 	case S_ISOSAMPLES:
 	    set_isosamples();
@@ -1831,19 +1826,45 @@ set_hidden3d()
 }
 
 
-#ifdef GNUPLOT_HISTORY
-/* process 'set historysize' command */
 static void
-set_historysize()
+set_history()
 {
     c_token++;
 
-    gnuplot_history_size = int_expression();
-    if (gnuplot_history_size < 0) {
-	gnuplot_history_size = 0;
+    while (!END_OF_COMMAND) {
+	if (equals(c_token, "quiet")) {
+	    c_token++;
+	    history_quiet = TRUE;
+	    continue;
+	} else if (almost_equals(c_token, "num$bers")) {
+	    c_token++;
+	    history_quiet = FALSE; 
+	    continue;
+	} else if (equals(c_token, "full")) {
+	    c_token++;
+	    history_full = TRUE;
+	    continue;
+	} else if (equals(c_token, "trim")) {
+	    c_token++;
+	    history_full = FALSE;
+	    continue;
+	} else if (almost_equals(c_token, "def$ault")) {
+	    c_token++;
+	    history_quiet = FALSE;
+	    history_full = TRUE;
+	    gnuplot_history_size = HISTORY_SIZE;
+	    continue;
+	} else if (equals(c_token, "size")) {
+	    c_token++;
+	    /* fall through */
+	}
+	/* Catches both the deprecated "set historysize" and "set history size" */
+	gnuplot_history_size = int_expression();
+#ifndef GNUPLOT_HISTORY
+	int_warn(NO_CARET, "This copy of gnuplot was built without support for command history.");
+#endif
     }
 }
-#endif
 
 
 /* process 'set isosamples' command */

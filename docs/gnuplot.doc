@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.835 2013/11/16 05:07:15 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.836 2013/12/15 01:46:10 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -4669,10 +4669,11 @@ Ffigure_mapcontours
 2 history
 ?commands history
 ?history
- `history` command lists or saves previous entries in the history of the
- command line editing, or executes an entry.
+ The `history` command print or saves previous commands in the history list,
+ or reexecutes an previous entry in the list.  To modify the behavior of this
+ command, see `set history`.
 
- Here you find 'usage by examples':
+ Examples:
 
        history               # show the complete history
        history 5             # show last 5 entries in the history
@@ -8715,18 +8716,30 @@ Ffigure_missing
 ?set historysize
 ?unset historysize
 ?historysize
-?nohistorysize
- Note: the command `set historysize` is only available when
- gnuplot has been configured to use the GNU readline library.
+ (Deprecated).
+ `set historysize N` is equivalent to `set history size N`.
+ `unset historysize` is equivalent to `set history size -1`.
+3 history
+?commands set history
+?set history
 
  Syntax:
-       set historysize <int>
-       unset historysize
+    set history {size <N>} {quiet|numbers} {full|trim} {default}
 
- When leaving gnuplot, the value of historysize is used for truncating
- the history to at most that much lines. The default is 500.
- `unset historysize` will disable history truncation and thus
- allow an infinite number of lines to be written to the history file.
+ When leaving gnuplot the value of history size limits the number of lines
+ saved to the history file. `set history size -1` allows an unlimited number
+ of lines to be written to the history file.
+
+ By default the `history` command prints a line number in front of each command.
+ `history quiet` suppress the number for this command only. `set history quiet`
+ suppresses numbers for all future `history` commands.
+
+ The `trim` option reduces the number of duplicate lines in the history list
+ by removing earlier instances of the current command.  This was the default
+ behavior prior to gnuplot version 5.
+
+ Default settings: `set history size 500 numbers trim`.
+
 3 isosamples
 ?commands set isosamples
 ?commands show isosamples
