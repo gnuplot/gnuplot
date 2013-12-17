@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.836 2013/12/15 01:46:10 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.837 2013/12/17 00:49:51 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -8722,7 +8722,6 @@ Ffigure_missing
 3 history
 ?commands set history
 ?set history
-
  Syntax:
     set history {size <N>} {quiet|numbers} {full|trim} {default}
 
@@ -8731,15 +8730,14 @@ Ffigure_missing
  of lines to be written to the history file.
 
  By default the `history` command prints a line number in front of each command.
- `history quiet` suppress the number for this command only. `set history quiet`
- suppresses numbers for all future `history` commands.
+ `history quiet` suppresses the number for this command only.
+ `set history quiet` suppresses numbers for all future `history` commands.
 
  The `trim` option reduces the number of duplicate lines in the history list
  by removing earlier instances of the current command.  This was the default
  behavior prior to gnuplot version 5.
 
  Default settings: `set history size 500 numbers trim`.
-
 3 isosamples
 ?commands set isosamples
 ?commands show isosamples
