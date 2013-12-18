@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: svg.trm,v 1.157 2013/07/18 23:24:44 sfeam Exp $
+ * $Id: svg.trm,v 1.158 2013/10/07 21:43:48 sfeam Exp $
  */
 
 /*------------------------------------------------------------------------------------------------------------------------------------
@@ -1067,7 +1067,9 @@ SVG_init ()
 	     , stroke_width
 	     , stroke_width
 	     , stroke_width
+#ifdef EAM_BOXED_TEXT
 	     , SVG_pens[0].color
+#endif
 	);
 }
 
