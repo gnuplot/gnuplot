@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.421 2013/12/16 22:12:00 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.422 2013/12/17 00:49:52 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -159,7 +159,6 @@ static void load_tic_series __PROTO((AXIS_INDEX axis));
 static void set_linestyle __PROTO((struct linestyle_def **head));
 static void set_arrowstyle __PROTO((void));
 static int assign_arrowstyle_tag __PROTO((void));
-static int looks_like_numeric __PROTO((char *));
 static int set_tic_prop __PROTO((AXIS_INDEX));
 
 static void check_palette_grayscale __PROTO((void));
@@ -1718,7 +1717,6 @@ set_format()
 	if (set_for_axis[axis]) {						\
 		free(axis_array[axis].formatstring);				\
 		axis_array[axis].formatstring = gp_strdup(format);		\
-		axis_array[axis].format_is_numeric = looks_like_numeric(format);\
 	}
 	SET_FORMATSTRING(FIRST_X_AXIS);
 	SET_FORMATSTRING(FIRST_Y_AXIS);
@@ -4979,18 +4977,15 @@ set_raxis()
 static void
 set_zeroaxis(AXIS_INDEX axis)
 {
-
     c_token++;
     if (END_OF_COMMAND)
-	axis_array[axis].zeroaxis.l_type = -1;
+	axis_array[axis].zeroaxis = (void *)(&default_axis_zeroaxis);
     else {
-	int old_token = c_token;
-	axis_array[axis].zeroaxis.l_type = LT_AXIS;
-	lp_parse(&axis_array[axis].zeroaxis, TRUE, FALSE);
-	if (old_token == c_token)
-	    axis_array[axis].zeroaxis.l_type = int_expression() - 1;
-	}
-
+	/* Some non-default style for the zeroaxis */
+	axis_array[axis].zeroaxis = gp_alloc(sizeof(lp_style_type), "zeroaxis");
+	*(axis_array[axis].zeroaxis) = default_axis_zeroaxis;
+	lp_parse(axis_array[axis].zeroaxis, TRUE, FALSE);
+    }
 }
 
 /* process 'set zeroaxis' command */
@@ -4998,8 +4993,10 @@ static void
 set_allzeroaxis()
 {
     set_zeroaxis(FIRST_X_AXIS);
-    axis_array[FIRST_Y_AXIS].zeroaxis = axis_array[FIRST_X_AXIS].zeroaxis;
-    axis_array[FIRST_Z_AXIS].zeroaxis = axis_array[FIRST_X_AXIS].zeroaxis;
+    axis_array[FIRST_Y_AXIS].zeroaxis = gp_alloc(sizeof(lp_style_type), "zeroaxis");
+    axis_array[FIRST_Z_AXIS].zeroaxis = gp_alloc(sizeof(lp_style_type), "zeroaxis");
+    *(axis_array[FIRST_Y_AXIS].zeroaxis) = *(axis_array[FIRST_X_AXIS].zeroaxis);
+    *(axis_array[FIRST_Z_AXIS].zeroaxis) = *(axis_array[FIRST_X_AXIS].zeroaxis);
 }
 
 /*********** Support functions for set_command ***********/
@@ -5153,8 +5150,6 @@ set_tic_prop(AXIS_INDEX axis)
 		    int_error(c_token,"expected format");
 		free(axis_array[axis].formatstring);
 		axis_array[axis].formatstring  = format;
-		axis_array[axis].format_is_numeric =
-			looks_like_numeric(axis_array[axis].formatstring);
 	    } else if (equals(c_token,"tc") ||
 		       almost_equals(c_token,"text$color")) {
 		parse_colorspec(&axis_array[axis].ticdef.textcolor,
@@ -5605,31 +5600,6 @@ load_tic_series(AXIS_INDEX axis)
     tdef->def.series.start = start;
     tdef->def.series.incr = incr;
     tdef->def.series.end = end;
-}
-
-
-/* return 1 if format looks like a numeric format
- * ie more than one %{efg}, or %something-else
- */
-/* FIXME HBB 20000430: as coded, this will only check the *first*
- * format string, not all of them. */
-static int
-looks_like_numeric(char *format)
-{
-    if (!(format = strchr(format, '%')))
-	return 0;
-
-    while (++format && (*format == ' '
-			|| *format == '-'
-			|| *format == '+'
-			|| *format == '#'))
-	;			/* do nothing */
-
-    while (isdigit((unsigned char) *format)
-	   || *format == '.')
-	++format;
-
-    return (*format == 'f' || *format == 'g' || *format == 'e');
 }
 
 /*

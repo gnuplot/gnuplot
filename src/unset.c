@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.191 2013/11/22 01:30:04 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.192 2013/12/17 00:49:54 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -1566,7 +1566,9 @@ unset_range(AXIS_INDEX axis)
 static void
 unset_zeroaxis(AXIS_INDEX axis)
 {
-    axis_array[axis].zeroaxis = default_axis_zeroaxis;
+    if (axis_array[axis].zeroaxis != &default_axis_zeroaxis)
+	free(axis_array[axis].zeroaxis);
+    axis_array[axis].zeroaxis = NULL;
 }
 
 

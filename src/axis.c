@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.124 2013/10/14 20:04:51 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.125 2013/11/06 19:32:57 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -455,21 +455,38 @@ make_auto_time_minitics(t_timelevel tlevel, double incr)
 /* }}} */
 
 /* {{{ copy_or_invent_formatstring() */
+/* Rarely called helper function looks_like_numeric() */
+int
+looks_like_numeric(char *format)
+{
+    if (!(format = strchr(format, '%')))
+	return 0;
+
+    while (++format && (*format == ' '
+			|| *format == '-'
+			|| *format == '+'
+			|| *format == '#'))
+	;			/* do nothing */
+
+    while (isdigit((unsigned char) *format) || *format == '.')
+	++format;
+
+    return (*format == 'f' || *format == 'g' || *format == 'e');
+}
+
+
 /* Either copies the axis formatstring over to the ticfmt[] array, or
  * in case that's not applicable because the format hasn't been
  * specified correctly, invents a time/date output format by looking
  * at the range of values.  Considers time/date fields that don't
  * change across the range to be unimportant */
-/* HBB 20010803: removed two arguments, and renamed function */
 char *
 copy_or_invent_formatstring(AXIS_INDEX axis)
 {
     struct tm t_min, t_max;
 
-    /* HBB 20010803: moved this here ... was done whenever this was called,
-     * anyway */
-    if ( axis_array[axis].datatype != DT_TIMEDATE
-	|| !axis_array[axis].format_is_numeric) {
+    if (axis_array[axis].datatype != DT_TIMEDATE
+    ||  looks_like_numeric(axis_array[axis].formatstring)) {
 	/* The simple case: formatstring is usable, so use it! */
 	strncpy(ticfmt[axis], axis_array[axis].formatstring, MAX_ID_LEN);
 	/* Ensure enough precision to distinguish tics */
@@ -849,7 +866,6 @@ setup_tics(AXIS_INDEX axis, int max)
 	if (this->max_constraint & CONSTRAINT_UPPER && this->max > this->max_ub)
 	    this->max = this->max_ub;
     }
-
 
     /* Set up ticfmt[axis] correctly. If necessary (time axis, but not
      * time/date output format), make up a formatstring that suits the
@@ -1485,9 +1501,8 @@ axis_draw_2d_zeroaxis(AXIS_INDEX axis, AXIS_INDEX crossaxis)
 {
     AXIS *this = axis_array + axis;
 
-    if (axis_position_zeroaxis(crossaxis)
-	    && (this->zeroaxis.l_type > LT_NODRAW)) {
-	term_apply_lp_properties(&this->zeroaxis);
+    if (axis_position_zeroaxis(crossaxis) && this->zeroaxis) {
+	term_apply_lp_properties(this->zeroaxis);
 	if ((axis % SECOND_AXES) == FIRST_X_AXIS) {
 	    (*term->move) (this->term_lower, axis_array[crossaxis].term_zero);
 	    (*term->vector) (this->term_upper, axis_array[crossaxis].term_zero);

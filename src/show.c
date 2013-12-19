@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.307 2013/11/06 19:32:57 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.308 2013/12/17 00:49:52 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -1633,9 +1633,9 @@ show_zeroaxis(AXIS_INDEX axis)
 {
     SHOW_ALL_NL;
 
-    if (axis_array[axis].zeroaxis.l_type > LT_NODRAW) {
+    if (axis_array[axis].zeroaxis) {
 	fprintf(stderr, "\t%szeroaxis is drawn with", axis_name(axis));
-	save_linetype(stderr, &(axis_array[axis].zeroaxis), FALSE);
+	save_linetype(stderr, axis_array[axis].zeroaxis, FALSE);
 	fputc('\n',stderr);
     } else
 	fprintf(stderr, "\t%szeroaxis is OFF\n", axis_name(axis));

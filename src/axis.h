@@ -1,5 +1,5 @@
 /*
- * $Id: axis.h,v 1.94 2013/11/06 19:32:57 sfeam Exp $
+ * $Id: axis.h,v 1.95 2013/11/22 01:30:04 sfeam Exp $
  *
  */
 
@@ -242,7 +242,6 @@ typedef struct axis {
 
 /* time/date axis control */
     td_type datatype;		/* DT_NORMAL | DT_TIMEDATE | DT_DMS */
-    TBOOLEAN format_is_numeric;	/* format string looks like numeric??? */
     char *formatstring;		/* the format string for output */
     char *timefmt;		/* format string for time input */
 
@@ -261,11 +260,11 @@ typedef struct axis {
 /* other miscellaneous fields */
     text_label label;		/* label string and position offsets */
     TBOOLEAN manual_justify;	/* override automatic justification */
-    lp_style_type zeroaxis;	/* drawing style for zeroaxis, if any */
+    lp_style_type *zeroaxis;	/* usually points to default_axis_zeroaxis */
 } AXIS;
 
 #define DEFAULT_AXIS_TICDEF {TIC_COMPUTED, NULL, {TC_DEFAULT, 0, 0.0}, {NULL, {0.,0.,0.}, FALSE},  { character, character, character, 0., 0., 0. }, FALSE }
-#define DEFAULT_AXIS_ZEROAXIS {0, LT_NODRAW, 0, 0, 1.0, PTSZ_DEFAULT, BLACK_COLORSPEC}
+#define DEFAULT_AXIS_ZEROAXIS {0, LT_AXIS, 0, 0, 1.0, PTSZ_DEFAULT, BLACK_COLORSPEC}
 
 #define DEFAULT_AXIS_STRUCT {						    \
 	AUTOSCALE_BOTH, AUTOSCALE_BOTH, /* auto, set_auto */		    \
@@ -281,7 +280,7 @@ typedef struct axis {
 	0,        		/* zero axis position */		    \
 	FALSE, 0.0, 0.0,	/* log, base, log(base) */		    \
 	FALSE, NULL,		/* linked_to_primary, link function */      \
-	DT_NORMAL, TRUE,	/* datatype, format_numeric */	            \
+	DT_NORMAL,		/* datatype */			            \
 	NULL, NULL,     	/* output format, timefmt */		    \
 	NO_TICS,		/* tic output positions (border, mirror) */ \
 	DEFAULT_AXIS_TICDEF,	/* tic series definition */		    \
@@ -290,7 +289,7 @@ typedef struct axis {
         1.0, 0.5, TRUE,		/* ticscale, miniticscale, tic_in */	    \
 	EMPTY_LABELSTRUCT,	/* axis label */			    \
 	FALSE,			/* override automatic justification */	    \
-	DEFAULT_AXIS_ZEROAXIS	/* zeroaxis line style */		    \
+	NULL			/* NULL means &default_axis_zeroaxis */	    \
 }
 
 /* This much of the axis structure is cloned by the "set x2range link" command */
@@ -472,7 +471,7 @@ do {									\
     if ((this_axis->set_autoscale & AUTOSCALE_MIN) == 0)		\
 	this_axis->min = AXIS_LOG_VALUE(axis, this_axis->set_min);	\
     if ((this_axis->set_autoscale & AUTOSCALE_MAX) == 0)		\
-	this_axis->max = AXIS_LOG_VALUE(axis, this_axis->set_max);				\
+	this_axis->max = AXIS_LOG_VALUE(axis, this_axis->set_max);	\
 } while (0)
 
 #endif
@@ -628,7 +627,6 @@ do {									  \
 	if (flag_array[axis]) {					\
 	    free(axis_array[axis].formatstring);		\
 	    axis_array[axis].formatstring = gp_strdup(DEF_FORMAT);	\
-	    axis_array[axis].format_is_numeric = 1;		\
 	}
 
 /* FIXME: replace by a subroutine? */

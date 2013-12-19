@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.235 2013/11/08 00:44:17 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.236 2013/11/12 17:38:14 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -1227,8 +1227,13 @@ save_range(FILE *fp, AXIS_INDEX axis)
 static void
 save_zeroaxis(FILE *fp, AXIS_INDEX axis)
 {
-    fprintf(fp, "set %szeroaxis", axis_name(axis));
-    save_linetype(fp, &(axis_array[axis].zeroaxis), FALSE);
+    if (axis_array[axis].zeroaxis == NULL) {
+	fprintf(fp, "unset %szeroaxis", axis_name(axis));
+    } else {
+	fprintf(fp, "set %szeroaxis", axis_name(axis));
+	if (axis_array[axis].zeroaxis != &default_axis_zeroaxis)
+	    save_linetype(fp, axis_array[axis].zeroaxis, FALSE);
+    }
     putc('\n', fp);
 }
 

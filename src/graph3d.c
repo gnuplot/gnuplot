@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.295 2013/09/26 22:45:33 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.296 2013/12/11 22:16:20 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -2480,7 +2480,7 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid,
 	) {
 	gen_tics(FIRST_Z_AXIS, ztick_callback);
     }
-    if ((Y_AXIS.zeroaxis.l_type > LT_NODRAW)
+    if ((Y_AXIS.zeroaxis)
 	&& !X_AXIS.log
 	&& inrange(0, X_AXIS.min, X_AXIS.max)
 	) {
@@ -2489,9 +2489,9 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid,
 	/* line through x=0 */
 	map3d_xyz(0.0, Y_AXIS.min, base_z, &v1);
 	map3d_xyz(0.0, Y_AXIS.max, base_z, &v2);
-	draw3d_line(&v1, &v2, &Y_AXIS.zeroaxis);
+	draw3d_line(&v1, &v2, Y_AXIS.zeroaxis);
     }
-    if ((Z_AXIS.zeroaxis.l_type > LT_NODRAW)
+    if ((Z_AXIS.zeroaxis)
 	&& !X_AXIS.log
 	&& inrange(0, X_AXIS.min, X_AXIS.max)
 	) {
@@ -2500,19 +2500,19 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid,
 	/* line through x=0 y=0 */
 	map3d_xyz(0.0, 0.0, Z_AXIS.min, &v1);
 	map3d_xyz(0.0, 0.0, Z_AXIS.max, &v2);
-	draw3d_line(&v1, &v2, &Z_AXIS.zeroaxis);
+	draw3d_line(&v1, &v2, Z_AXIS.zeroaxis);
     }
-    if ((X_AXIS.zeroaxis.l_type > LT_NODRAW)
+    if ((X_AXIS.zeroaxis)
 	&& !Y_AXIS.log
 	&& inrange(0, Y_AXIS.min, Y_AXIS.max)
 	) {
 	vertex v1, v2;
 
-	term_apply_lp_properties(&X_AXIS.zeroaxis);
+	term_apply_lp_properties(X_AXIS.zeroaxis);
 	/* line through y=0 */
 	map3d_xyz(X_AXIS.min, 0.0, base_z, &v1);
 	map3d_xyz(X_AXIS.max, 0.0, base_z, &v2);
-	draw3d_line(&v1, &v2, &X_AXIS.zeroaxis);
+	draw3d_line(&v1, &v2, X_AXIS.zeroaxis);
     }
     /* PLACE ZLABEL - along the middle grid Z axis - eh ? */
     if (Z_AXIS.label.text

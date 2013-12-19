@@ -1,3 +1,8 @@
+2013-12-19  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/axis.h src/axis.c src/graph3d.c src/show.c src/set.c src/unset.c
+	src/save.c:  Reduce size of the AXIS structure.
+
 2013-12-16  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/command.c src/gp_hist.h src/history.c src/plot.c src/set.c
