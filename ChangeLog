@@ -2,6 +2,9 @@
 
 	* configure.in: automake 1.14 wants an option subdir-objects
 
+	* src/parse.c (next_iteration): survive clobbered iteration variable
+	Bug #1312
+
 2013-12-15  Jyrki Yli-Nokari  <jyrkiylinokari@gmail.com>
 
 	* src/bitmap.c configure.in:

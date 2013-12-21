@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: parse.c,v 1.66.2.2 2012/07/18 23:30:25 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: parse.c,v 1.66.2.3 2012/10/31 20:14:44 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - parse.c */
@@ -1145,9 +1145,9 @@ next_iteration(t_iterator *iter)
 	this_iter->iteration_current = this_iter->iteration_start;
 	this_iter->done = FALSE;
 	if (this_iter->iteration_string) {
-	    free(this_iter->iteration_udv->udv_value.v.string_val);
-	    this_iter->iteration_udv->udv_value.v.string_val
-	         = gp_word(this_iter->iteration_string, this_iter->iteration_current);
+	    gpfree_string(&(this_iter->iteration_udv->udv_value));
+	    Gstring(&(this_iter->iteration_udv->udv_value), 
+		    gp_word(this_iter->iteration_string, this_iter->iteration_current));
     } else
 	    this_iter->iteration_udv->udv_value.v.int_val = this_iter->iteration_current;	
 	
@@ -1163,9 +1163,9 @@ next_iteration(t_iterator *iter)
     if (!iter->really_done)
 	this_iter->iteration_current += this_iter->iteration_increment;
     if (this_iter->iteration_string) {
-	free(this_iter->iteration_udv->udv_value.v.string_val);
-	this_iter->iteration_udv->udv_value.v.string_val
-	    = gp_word(this_iter->iteration_string, this_iter->iteration_current);
+	gpfree_string(&(this_iter->iteration_udv->udv_value));
+	Gstring(&(this_iter->iteration_udv->udv_value), 
+		gp_word(this_iter->iteration_string, this_iter->iteration_current));
     } else
 	this_iter->iteration_udv->udv_value.v.int_val = this_iter->iteration_current;
     
