@@ -1,6 +1,8 @@
 2013-12-21  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* configure.in: automake 1.14 wants an option subdir-objects
+	* src/set.c (set_zeroaxis): memory leak
+	* src/unset.c (unset_histogram): memory leak
 
 2013-12-19  Ethan A Merritt  <merritt@u.washington.edu>
 

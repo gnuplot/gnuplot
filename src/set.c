@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.422 2013/12/17 00:49:52 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.423 2013/12/20 04:06:44 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -4978,6 +4978,8 @@ static void
 set_zeroaxis(AXIS_INDEX axis)
 {
     c_token++;
+    if (axis_array[axis].zeroaxis != (void *)(&default_axis_zeroaxis))
+	free(axis_array[axis].zeroaxis);
     if (END_OF_COMMAND)
 	axis_array[axis].zeroaxis = (void *)(&default_axis_zeroaxis);
     else {
@@ -4992,11 +4994,9 @@ set_zeroaxis(AXIS_INDEX axis)
 static void
 set_allzeroaxis()
 {
-    set_zeroaxis(FIRST_X_AXIS);
-    axis_array[FIRST_Y_AXIS].zeroaxis = gp_alloc(sizeof(lp_style_type), "zeroaxis");
-    axis_array[FIRST_Z_AXIS].zeroaxis = gp_alloc(sizeof(lp_style_type), "zeroaxis");
-    *(axis_array[FIRST_Y_AXIS].zeroaxis) = *(axis_array[FIRST_X_AXIS].zeroaxis);
-    *(axis_array[FIRST_Z_AXIS].zeroaxis) = *(axis_array[FIRST_X_AXIS].zeroaxis);
+    set_zeroaxis(FIRST_X_AXIS);	/* This eats up the rest of the parsible options */
+    set_zeroaxis(FIRST_Y_AXIS);
+    set_zeroaxis(FIRST_Z_AXIS);
 }
 
 /*********** Support functions for set_command ***********/

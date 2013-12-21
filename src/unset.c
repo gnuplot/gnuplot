@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.192 2013/12/17 00:49:54 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.193 2013/12/20 04:06:44 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -860,6 +860,7 @@ unset_histogram()
 {
     histogram_style foo = DEFAULT_HISTOGRAM_STYLE;
     free(histogram_opts.title.font);
+    free_histlist(&histogram_opts);
     histogram_opts = foo;
 }
 
