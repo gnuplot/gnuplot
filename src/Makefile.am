@@ -1,5 +1,5 @@
 ## Process this file with automake to produce Makefile.in -*-Makefile-*-
-AUTOMAKE_OPTIONS = foreign
+AUTOMAKE_OPTIONS = foreign subdir-objects
 
 # in the spirit of automake ...
 pkglibexecdir = $(libexecdir)/@PACKAGE@/@VERSION_MAJOR@

@@ -1,3 +1,7 @@
+2013-12-21  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* configure.in: automake 1.14 wants an option subdir-objects
+
 2013-12-19  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/axis.h src/axis.c src/graph3d.c src/show.c src/set.c src/unset.c
