@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.95 2013/09/25 22:21:27 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.96 2013/09/26 22:45:33 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - hidden3d.c */
@@ -722,7 +722,7 @@ intersect_line_plane(p_vertex v1, p_vertex v2, t_plane p)
 	return 0;
     else {
 	double denominator = p[0]*(v1->x - v2->x) + p[1]*(v1->y - v2->y) + p[2]*(v1->z - v2->z);
-	return numerator/denominator;
+	return (denominator==0 ? (numerator>0?VERYLARGE:-VERYLARGE) : numerator/denominator);
     }
 }
 
@@ -737,7 +737,7 @@ intersect_line_line(p_vertex v1, p_vertex v2, p_vertex w1, p_vertex w2)
 	return 0;
     else {
 	double denominator = (w2->y - w1->y)*(v2->x - v1->x) - (w2->x - w1->x)*(v2->y - v1->y);
-	return numerator/denominator;
+	return (denominator==0 ? (numerator>0?VERYLARGE:-VERYLARGE) : numerator/denominator);
     }
 }
 

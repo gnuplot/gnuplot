@@ -149,7 +149,8 @@ $HAVEMAKETOOL:
 $ !
 $ ! Check if the system has DECWindows.
 $ !
-$ DECW = F$TRNLNM("DECW$INCLUDE") .NES. ""
+$ ! DECW = F$TRNLNM("DECW$INCLUDE") .NES. ""
+$ DECW = 0
 $ !
 $ ! Get the architecture.
 $ !
@@ -237,6 +238,7 @@ $ X_DISPLAY_MISSING = 0
 $ time_t = 0
 $ HAVE_ATEXIT = DECC
 $ HAVE_BCOPY = DECC
+$ HAVE__BOOL = DECC
 $ HAVE_BZERO = DECC
 $ HAVE_DOPRNT = 0
 $ HAVE_ERF = DPML
@@ -266,6 +268,7 @@ $ HAVE_STRERROR = DECC
 $ HAVE_STRICMP = 0
 $ HAVE_STRNCASECMP = __CRTL_VER .GE. 70000000
 $ HAVE_STRNICMP = 0
+$ HAVE_STRNLEN = DECC
 $ HAVE_STRRCHR = DECC
 $ HAVE_STRSTR = DECC
 $ HAVE_SYSINFO = 0
@@ -295,6 +298,7 @@ $ HAVE_SYS_TYPES_H = DECC
 $ HAVE_SYS_UTSNAME_H = __CRTL_VER .GE. 70000000
 $ HAVE_TERMIOS_H = 0
 $ HAVE_TIME_H = DECC
+$ HAVE_TIME_T_IN_TIME_H = DECC
 $ HAVE_UNISTD_H = DECC
 $ HAVE_VALUES_H = 0
 $ HAVE_LIBM = DECC
@@ -374,7 +378,8 @@ $ OTHERTERM = "[-.term]impcodes.h [-.term]object.h gplt_x11.c"
 $ !
 $ ! Define CFLAGS.
 $ !
-$ CFLAGS = "/DEFINE=(NO_GIH,HAVE_CONFIG_H,''RTL')/INCLUDE=[-]"
+$ CFLAGS = "/FLOAT=IEEE/IEEE_MODE=UNDERFLOW_TO_ZERO/DEFINE=(HAVE_CONFIG_H,''RTL')/INCLUDE=[-]"
+$ ! CFLAGS = "/DEFINE=(HAVE_CONFIG_H,''RTL')/INCLUDE=[-]"
 $ IF (DECC) THEN CFLAGS = CFLAGS + "/PREFIX=ALL"
 $ !
 $ ! Write the make file.
@@ -434,7 +439,7 @@ $ IF (RTL .EQS. "VAXCRTL") THEN -
     WRITE MAKE "CRTL_SHARE = ,SYS$DISK:[]VAXC.OPT/OPT"
 $ IF (RTL .NES. "VAXCRTL") THEN WRITE MAKE "CRTL_SHARE ="
 $ WRITE MAKE "CFLAGS = ", CFLAGS
-$ WRITE MAKE "TERMFLAGS = /INCLUDE=([-],[-.TERM])"
+$ WRITE MAKE "TERMFLAGS = /INCLUDE=([-],[-.TERM],[-.TERM.POSTSCRIPT],[-.SRC])"
 $ WRITE MAKE ""
 $ WRITE MAKE "OBJS = \"
 $ N = 0
@@ -480,7 +485,7 @@ gnuplot.$(X) : $(OBJS)
 
 gnuplot_x11.$(X) : gplt_x11.$(O) stdfn.$(O)
 	link /executable=gnuplot_x11.$(X) \
-            gplt_x11.$(O),stdfn.$(O),x11.opt/option$(EXTRALIB)$(CRTL_SHARE)
+            gplt_x11.$(O),stdfn.$(O),version.$(O),x11.opt/option$(EXTRALIB)$(CRTL_SHARE)
 
 gplt_x11.$(O) : gplt_x11.c
 	$(CC) $(CFLAGS) $(X11FLAGS) $<
@@ -565,7 +570,7 @@ $ IF (RTL .EQS. "VAXCRTL") THEN -
     WRITE MAKE "$ CRTL_SHARE = "",SYS$DISK:[]VAXC.OPT/OPT"""
 $ IF (RTL .NES. "VAXCRTL") THEN WRITE MAKE "$ CRTL_SHARE = """""
 $ WRITE MAKE "$ CFLAGS = ""''CFLAGS'"""
-$ WRITE MAKE "$ TERMFLAGS = ""/INCLUDE=([-],[-.TERM])"""
+$ WRITE MAKE "$ TERMFLAGS = ""/INCLUDE=([-],[-.TERM],[-.TERM.POSTSCRIPT],[-.SRC])"""
 $ IF (VAXC .AND. DECW) THEN WRITE MAKE "$ define/nolog x11 decw$include"
 $ IF (VAXC .AND. DECW) THEN WRITE MAKE "$ define/nolog sys sys$library"
 $ WRITE MAKE "$ set verify"
@@ -602,8 +607,9 @@ $ WRITE MAKE "$ run [-.src]bf_test.exe"
 $ WRITE MAKE "$ cd [-.src]"
 $ IF (DECW) THEN WRITE MAKE "$ cc 'CFLAGS' gplt_x11.c"
 $ IF (DECW) THEN WRITE MAKE "$ cc 'CFLAGS' stdfn.c"
+$ IF (DECW) THEN WRITE MAKE "$ cc 'CFLAGS' version.c"
 $ IF (DECW) THEN WRITE MAKE "$ link /executable=gnuplot_x11.exe -"
-$ IF (DECW) THEN WRITE MAKE "    gplt_x11.obj,stdfn.obj -"
+$ IF (DECW) THEN WRITE MAKE "    gplt_x11.obj,stdfn.obj,version.obj -"
 $ IF (DECW) THEN WRITE MAKE "    'EXTRALIB' 'CTRL_SHARE',x11.opt/option"
 $ COPY SYS$INPUT: MAKE
 $ DECK

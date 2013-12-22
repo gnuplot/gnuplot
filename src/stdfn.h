@@ -1,5 +1,5 @@
 /*
- * $Id: stdfn.h,v 1.42 2013/09/26 21:24:21 sfeam Exp $
+ * $Id: stdfn.h,v 1.43 2013/10/25 04:45:22 sfeam Exp $
  */
 
 /* GNUPLOT - stdfn.h */
@@ -542,6 +542,7 @@ void          rewinddir __PROTO((DIR *));
  * may or may not end with a "directory separation" character.
  * Path must not be NULL, but can be empty
  */
+#ifndef VMS
 #define PATH_CONCAT(path,file) \
  { char *p = path; \
    p += strlen(path); \
@@ -551,6 +552,9 @@ void          rewinddir __PROTO((DIR *));
    } \
    strcat (path, file); \
  }
+#else
+#define PATH_CONCAT(path,file) strcat(path,file)
+#endif
 
 #ifndef inrange
 # define inrange(z,min,max) \

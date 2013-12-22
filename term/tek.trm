@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: tek.trm,v 1.21 2013/12/12 20:49:44 sfeam Exp $
+ * $Id: tek.trm,v 1.22 2013/12/12 21:00:00 sfeam Exp $
  *
  */
 
@@ -652,7 +652,7 @@ SIXEL_init()
 	ypixels *= ysize;
     }
 
-    b_makebitmap(xpixels, ypixels, SIXEL_NCOL);
+    b_makebitmap(xpixels, ypixels, 5);
 
     if (SIXEL_mode != 0)
 	b_setlinetype(0);	/* solid lines */
@@ -671,7 +671,7 @@ SIXEL_reset()
 TERM_PUBLIC void
 SIXEL_text()
 {
-    int i, j, k, l, ic, n, pr;
+    int i, j, k, l, ic, n, pr, no;
     char c, pc;
 
 /* initialization to Sixel mode and pixel aspect ratio,
@@ -688,6 +688,7 @@ SIXEL_text()
 
     for (j=b_ysize-6; j>=0; j-=6) {
       for (k=1; k<=SIXEL_NCOL; k++) {
+	no = 0; /* for finite line records (VMS) */
 	pr = 0;
         pc = '\0';
         n = 0;
@@ -705,18 +706,26 @@ SIXEL_text()
 	    if (n>0 && pr==0) {
               pr++;
               if (n<b_xsize-1 || pc!='?' || k==1) { /* do not output empty lines */
-	        fprintf(gpoutfile,"#%d",k-1);
+	        no += fprintf(gpoutfile,"#%d",k-1);
 	        pr++;
 	      }
             }
             if (pr==2) {
 	      if (i==b_xsize-1 && c==pc) n++;
 	      if (n>3) {
-	        fprintf(gpoutfile,"!%d%c",n,pc);
+	        no += fprintf(gpoutfile,"!%d%c",n,pc);
 	      } else {
 	        for (l=1; l<=n; l++) fputc(pc,gpoutfile);
+	        no += n;
 	      }
-	      if (i==b_xsize-1 && c!=pc) fputc(c,gpoutfile);
+	      if (i==b_xsize-1 && c!=pc) {
+	        fputc(c,gpoutfile);
+	        no++;
+	      }
+	      if (no>70 && i<b_xsize-1) {
+	        fprintf(gpoutfile,"\n");
+	        no = 0;
+	      }
             }
 	    n = 1;
 	  }
@@ -732,8 +741,11 @@ SIXEL_text()
 
 /* get out of Sixel mode */
 
+#ifndef VMS
     fputs("\033\\\n",gpoutfile);
-
+#else
+    fputs("\033\\\n\n",gpoutfile);
+#endif
     (void) fflush(gpoutfile);	/* finish the graphics */
 }
 

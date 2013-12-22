@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.271 2013/12/15 01:46:10 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.272 2013/12/17 00:49:52 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -2498,6 +2498,7 @@ help_command()
     }
 }
 #else  /* !_Windows */
+#ifndef VMS
 void
 help_command()
 {
@@ -2505,6 +2506,7 @@ help_command()
 	c_token++;
     fputs("This gnuplot was not built with inline help\n", stderr);
 }
+#endif /* VMS */
 #endif /* _Windows */
 #endif /* NO_GIH */
 

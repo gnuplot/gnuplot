@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.268 2013/10/23 19:28:37 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.269 2013/10/25 03:10:28 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -2243,8 +2243,10 @@ vms_init()
     /* Save terminal characteristics in old_char_buf and
        initialise cur_char_buf to current settings. */
     int i;
+#ifdef X11
     if (getenv("DECW$DISPLAY"))
 	return ("x11");
+#endif
     atexit(vms_reset);
     sys$assign(&sysoutput_desc, &chan, 0, 0);
     sys$qiow(0, chan, IO$_SENSEMODE, 0, 0, 0, old_char_buf, 12, 0, 0, 0, 0);

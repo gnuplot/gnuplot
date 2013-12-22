@@ -1,3 +1,11 @@
+2013-12-22  Erik Olofsen  <olofsen@users.sf.net>
+
+	* configure.vms src/command.c src/hidden3d.c src/stdfn.c src/stdfn.h
+	src/syscfg.h src/term.c src/term.h term/tek.trm:
+
+	Update VMS build support. Tested using HP C V7.1-015 OpenVMS Alpha V8.3
+	on an AlphaServer DS10.
+
 2013-12-21  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* configure.in: automake 1.14 wants an option subdir-objects

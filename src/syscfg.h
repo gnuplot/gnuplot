@@ -1,5 +1,5 @@
 /*
- * $Id: syscfg.h,v 1.50 2013/06/27 20:03:41 sfeam Exp $
+ * $Id: syscfg.h,v 1.51 2013/10/25 03:17:34 sfeam Exp $
  */
 
 /* GNUPLOT - syscfg.h */
@@ -83,7 +83,7 @@
 # ifndef VMS
 #  define VMS
 # endif
-# define HOME   "sys$login:"
+# define HOME   "sys$login"
 # define PLOTRC "gnuplot.ini"
 # ifdef NO_GIH
    /* for show version long */
@@ -162,7 +162,11 @@
 #endif
 
 #ifndef HELPFILE
+#ifndef VMS
 # define HELPFILE "docs/gnuplot.gih"
+#else
+# define HELPFILE "sys$login:gnuplot.gih"
+#endif
 #endif
 
 #ifndef HOME
