@@ -41,7 +41,7 @@
 
 2013-12-23  Ethan A Merritt  <merritt@u.washington.edu>
 
-	* src/plot2d.c src/plot3.c:  Make "title foo ..." and "notitle foo ..."
+	* src/plot2d.c src/plot3d.c:  Make "title foo ..." and "notitle foo ..."
 	truly identical in terms of what options they accept.
 	Bug #1313
 

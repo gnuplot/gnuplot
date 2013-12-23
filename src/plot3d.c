@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.218 2013/12/24 00:27:23 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.219 2013/12/24 02:09:55 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -1510,9 +1510,11 @@ eval_3dplots()
 			break;
 		    }
 		    set_title = TRUE;
-		    if (almost_equals(c_token, "not$itle"))
+		    if (almost_equals(c_token++, "not$itle")) {
 			this_plot->title_is_suppressed = TRUE;
-		    c_token++;
+			if (equals(c_token,","))
+			    continue;
+		    }
 
 		    if (parametric || this_plot->title_is_suppressed) {
 			if (xtitle != NULL)
