@@ -8,7 +8,7 @@
 
 2013-12-21  Ethan A Merritt  <merritt@u.washington.edu>
 
-	* configure.in: automake 1.14 wants an option subdir-objects
+	* src/Makefile.am: automake 1.14 wants an option subdir-objects
 	* src/set.c (set_zeroaxis): memory leak
 	* src/unset.c (unset_histogram): memory leak
 	* src/parse.c (next_iteration): survive clobbered iteration variable
