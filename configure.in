@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot on Unix.
 dnl
-dnl $Id: configure.in,v 1.339 2013/12/12 19:16:22 sfeam Exp $
+dnl $Id: configure.in,v 1.340 2013/12/15 06:18:55 sfeam Exp $
 dnl
 dnl this is actually major.minor ...
 dnl note that for a non-beta release, we need to disable DEVELOPMENT_RELEASE
@@ -1288,7 +1288,7 @@ else
   AC_MSG_RESULT([  dot-matrix terminals: no])
 fi
 AC_MSG_RESULT([    epson, nec, okidata, tandy, and seiko dp414 printers])
-AC_MSG_RESULT([    hp500c, hpdj, hpljii, hppj, pbm, starc])
+AC_MSG_RESULT([    hp500c, hpdj, hpljii, hppj, pbm, sixel, starc])
 AC_MSG_RESULT([])
 
 if test "$no_x" != yes; then
