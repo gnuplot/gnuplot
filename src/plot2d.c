@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.308 2013/11/14 23:10:40 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.309 2013/12/24 00:27:23 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -252,7 +252,6 @@ plotrequest()
 }
 
 
-#ifdef VOLATILE_REFRESH
 /* Helper function for refresh command.  Reexamine each data point and update the
  * flags for INRANGE/OUTRANGE/UNDEFINED based on the current limits for that axis.
  * Normally the axis limits are already known at this point. But if the user has
@@ -330,7 +329,6 @@ refresh_bounds(struct curve_points *first_plot, int nplots)
 	axis_checked_extend_empty_range(this_plot->y_axis, NULL);
     }
 }
-#endif /* VOLATILE_REFRESH */
 
 
 /* A quick note about boxes style. For boxwidth auto, we cannot

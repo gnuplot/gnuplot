@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.217 2013/11/14 23:10:40 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.218 2013/12/24 00:27:23 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -305,7 +305,6 @@ plot3drequest()
 }
 
 
-#ifdef VOLATILE_REFRESH
 /* Helper function for refresh command.  Reexamine each data point and update the
  * flags for INRANGE/OUTRANGE/UNDEFINED based on the current limits for that axis.
  * Normally the axis limits are already known at this point. But if the user has
@@ -399,7 +398,6 @@ refresh_3dbounds(struct surface_points *first_plot, int nplots)
     axis_checked_extend_empty_range(FIRST_Y_AXIS, NULL);
     axis_checked_extend_empty_range(FIRST_Z_AXIS, NULL);
 }
-#endif /* VOLATILE_REFRESH */
 
 
 static double

@@ -1,5 +1,5 @@
 /*
- * $Id: axis.h,v 1.95 2013/11/22 01:30:04 sfeam Exp $
+ * $Id: axis.h,v 1.96 2013/12/20 04:06:43 sfeam Exp $
  *
  */
 
@@ -452,7 +452,7 @@ do {									\
     this->data_max = -VERYLARGE;					\
 } while(0)
 
-#ifdef VOLATILE_REFRESH
+/* AXIS_INIT2D_REFRESH and AXIS_UPDATE2D_REFRESH(axis) are for volatile data */
 #define AXIS_INIT2D_REFRESH(axis, infinite)				\
 do {									\
     AXIS *this = axis_array + axis;					\
@@ -473,8 +473,6 @@ do {									\
     if ((this_axis->set_autoscale & AUTOSCALE_MAX) == 0)		\
 	this_axis->max = AXIS_LOG_VALUE(axis, this_axis->set_max);	\
 } while (0)
-
-#endif
 
 /* parse a position of the form
  *    [coords] x, [coords] y {,[coords] z}

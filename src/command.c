@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.272 2013/12/17 00:49:52 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.273 2013/12/22 20:47:25 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -479,19 +479,16 @@ do_string_replot(const char *s)
 {
     do_string(s);
 
-#ifdef VOLATILE_REFRESH
     if (volatile_data && (E_REFRESH_NOT_OK != refresh_ok)) {
 	if (display_ipc_commands())
 	    fprintf(stderr, "refresh\n");
 	refresh_request();
-    } else
-#endif /* VOLATILE_REFRESH */
 
-    if (!replot_disabled)
+    } else if (!replot_disabled)
 	replotrequest();
+
     else
 	int_warn(NO_CARET, "refresh not possible and replot is disabled");
-
 }
 
 void
@@ -1667,7 +1664,6 @@ pwd_command()
 }
 
 
-#ifdef VOLATILE_REFRESH
 /* EAM April 2007
  * The "refresh" command replots the previous graph without going back to read
  * the original data. This allows zooming or other operations on data that was
@@ -1720,8 +1716,6 @@ refresh_request()
 	int_error(NO_CARET, "Internal error - refresh of unknown plot type");
 
 }
-#endif /* VOLATILE_REFRESH */
-
 
 /* process the 'replot' command */
 void
@@ -1730,14 +1724,12 @@ replot_command()
     if (!*replot_line)
 	int_error(c_token, "no previous plot");
 
-#ifdef VOLATILE_REFRESH
     if (volatile_data && (refresh_ok != E_REFRESH_NOT_OK) && !replot_disabled) {
 	FPRINTF((stderr,"volatile_data %d refresh_ok %d plotted_data_from_stdin %d\n",
 		volatile_data, refresh_ok, plotted_data_from_stdin));
 	refresh_command();
 	return;
     }
-#endif
 
     /* Disable replot for some reason; currently used by the mouse/hotkey
        capable terminals to avoid replotting when some data come from stdin,

@@ -481,20 +481,12 @@ typedef enum E_Refresh_Allowed {
    E_REFRESH_OK_3D = 3
 } TRefresh_Allowed;
 
-#ifdef VOLATILE_REFRESH
 extern TRefresh_Allowed refresh_ok;
 # define SET_REFRESH_OK(ok, nplots) do { \
    refresh_ok = (ok); \
    refresh_nplots = (nplots); \
 } while(0)
 extern int refresh_nplots;
-#else /* VOLATILE_REFRESH */
-# define refresh_ok E_REFRESH_NOT_OK
-# define SET_REFRESH_OK(ok, nplots) do { \
-   (void)(ok); \
-   (void)(nplots); \
-} while(0)
-#endif /* VOLATILE_REFRESH */
 
 extern TBOOLEAN volatile_data;
 

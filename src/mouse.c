@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: mouse.c,v 1.153 2013/09/01 17:36:56 juhaszp Exp $"); }
+static char *RCSid() { return RCSid("$Id: mouse.c,v 1.154 2013/10/23 19:16:11 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - mouse.c */
@@ -702,7 +702,6 @@ apply_zoom(struct t_zoom *z)
 	memcpy(axis_array, axis_array_copy, sizeof(axis_array));
 	s[0] = '\0';	/* FIXME:  Is this better than calling replotrequest()? */
 
-#ifdef VOLATILE_REFRESH
 	/* Falling through to do_string_replot() does not work! */
 	if (volatile_data) {
 	    if (refresh_ok == E_REFRESH_OK_2D) {
@@ -714,7 +713,6 @@ apply_zoom(struct t_zoom *z)
 		return;
 	    }
 	}
-#endif /* VOLATILE_REFRESH */
 
     } else {
 	inside_zoom = TRUE;

@@ -1,5 +1,5 @@
 /*
- * $Id: command.h,v 1.60 2013/07/22 20:20:47 sfeam Exp $
+ * $Id: command.h,v 1.61 2013/08/09 20:50:32 sfeam Exp $
  */
 
 /* GNUPLOT - command.h */
@@ -143,10 +143,8 @@ void restore_prompt __PROTO((void));
 #else
 #define bind_command()
 #endif
-#ifdef VOLATILE_REFRESH
 void refresh_request __PROTO((void));
 void refresh_command __PROTO((void));
-#endif
 void call_command __PROTO((void));
 void changedir_command __PROTO((void));
 void clear_command __PROTO((void));

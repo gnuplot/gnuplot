@@ -4,6 +4,10 @@
 	truly identical in terms of what options they accept.
 	Bug #1313
 
+	* configure.in src/axis.h src/command.c src/command.h src/gadgets.c
+	src/gadgets.h src/mouse.c src/plot2d.c src/plot3d.c src/tables.c:
+	Remove conditional compilation test from the volatile data code.
+
 2013-12-22  Erik Olofsen  <olofsen@users.sf.net>
 
 	* configure.vms src/command.c src/hidden3d.c src/stdfn.c src/stdfn.h
