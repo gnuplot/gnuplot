@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.216 2013/10/29 19:22:32 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.217 2013/11/14 23:10:40 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -1506,49 +1506,34 @@ eval_3dplots()
 	    while (!END_OF_COMMAND || !checked_once) {
 
 		/* deal with title */
-		if (almost_equals(c_token, "t$itle")) {
+		if (almost_equals(c_token, "t$itle") || almost_equals(c_token, "not$itle")) {
 		    if (set_title) {
 			duplication=TRUE;
 			break;
 		    }
-		    this_plot->title_no_enhanced = !key->enhanced;
-			/* title can be enhanced if not explicitly disabled */
-		    if (parametric) {
-			if (crnt_param != 0)
-			    int_error(c_token, "\"title\" allowed only after parametric function fully specified");
-			else {
-			    if (xtitle != NULL)
-				xtitle[0] = NUL;	/* Remove default title . */
-			    if (ytitle != NULL)
-				ytitle[0] = NUL;	/* Remove default title . */
-			}
-		    }
+		    set_title = TRUE;
+		    if (almost_equals(c_token, "not$itle"))
+			this_plot->title_is_suppressed = TRUE;
 		    c_token++;
+
+		    if (parametric || this_plot->title_is_suppressed) {
+			if (xtitle != NULL)
+			    xtitle[0] = NUL;	/* Remove default title . */
+			if (ytitle != NULL)
+			    ytitle[0] = NUL;	/* Remove default title . */
+		    }
+
+		    /* title can be enhanced if not explicitly disabled */
+		    this_plot->title_no_enhanced = !key->enhanced;
 
 		    if (almost_equals(c_token,"col$umnheader")) {
 			df_set_key_title_columnhead((struct curve_points *)this_plot);
+		    } else {
+			char *temp;
+			temp = try_to_get_string();
+			if (!this_plot->title_is_suppressed && !(this_plot->title = temp))
+			    int_error(c_token, "expecting \"title\" for plot");
 		    }
-
-		    else if (!(this_plot->title = try_to_get_string()))
-			int_error(c_token, "expecting \"title\" for plot");
-		    set_title = TRUE;
-		    continue;
-		}
-
-		if (almost_equals(c_token, "not$itle")) {
-		    if (set_title) {
-			duplication=TRUE;
-			break;
-		    }
-		    c_token++;
-		    if (isstringvalue(c_token))
-			try_to_get_string(); /* ignore optionally given title string */
-		    this_plot->title_is_suppressed = TRUE;
-		    if (xtitle != NULL)
-			xtitle[0] = '\0';
-		    if (ytitle != NULL)
-			ytitle[0] = '\0';
-		    set_title = TRUE;
 		    continue;
 		}
 

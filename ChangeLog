@@ -1,3 +1,9 @@
+2013-12-23  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/plot2d.c src/plot3.c:  Make "title foo ..." and "notitle foo ..."
+	truly identical in terms of what options they accept.
+	Bug #1313
+
 2013-12-22  Erik Olofsen  <olofsen@users.sf.net>
 
 	* configure.vms src/command.c src/hidden3d.c src/stdfn.c src/stdfn.h

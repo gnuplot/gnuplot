@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.307 2013/11/12 17:22:17 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.308 2013/11/14 23:10:40 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -2097,12 +2097,19 @@ eval_plots()
 		}
 
 		/* deal with title */
-		if (almost_equals(c_token, "t$itle")) {
+		if (almost_equals(c_token, "t$itle") || almost_equals(c_token, "not$itle")) {
 		    if (set_title) {
 			duplication=TRUE;
 			break;
 		    }
 		    set_title = TRUE;
+
+		    if (almost_equals(c_token, "not$itle")) {
+			this_plot->title_is_suppressed = TRUE;
+			if (xtitle != NULL)
+			    xtitle[0] = '\0';
+		    }
+
 		    this_plot->title_no_enhanced = !key->enhanced;
 			/* title can be enhanced if not explicitly disabled */
 		    if (parametric) {
@@ -2121,10 +2128,14 @@ eval_plots()
 		    } else if (equals(c_token,"at")) {
 			set_title = FALSE;
 		    } else {
+			char *temp;
 			evaluate_inside_using = TRUE;
-			if (!(this_plot->title = try_to_get_string()))
-			    int_error(c_token, "expecting \"title\" for plot");
+			temp = try_to_get_string();
 			evaluate_inside_using = FALSE; 
+			if (!this_plot->title_is_suppressed) {
+			    if (!(this_plot->title = temp))
+				int_error(c_token, "expecting \"title\" for plot");
+			}
 		    }
 		    if (equals(c_token,"at")) {
 			c_token++;
@@ -2136,21 +2147,6 @@ eval_plots()
 			    int_error(c_token, "expecting \"at beginning\" or \"at end\"");
 			c_token++;
 		    }
-		    continue;
-		}
-
-		if (almost_equals(c_token, "not$itle")) {
-		    if (set_title) {
-			duplication=TRUE;
-			break;
-		    }
-		    c_token++;
-		    if (isstringvalue(c_token))
-			try_to_get_string(); /* ignore optionally given title string */
-		    this_plot->title_is_suppressed = TRUE;
-		    if (xtitle != NULL)
-			xtitle[0] = '\0';
-		    set_title = TRUE;
 		    continue;
 		}
 
