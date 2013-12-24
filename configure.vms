@@ -439,7 +439,7 @@ $ IF (RTL .EQS. "VAXCRTL") THEN -
     WRITE MAKE "CRTL_SHARE = ,SYS$DISK:[]VAXC.OPT/OPT"
 $ IF (RTL .NES. "VAXCRTL") THEN WRITE MAKE "CRTL_SHARE ="
 $ WRITE MAKE "CFLAGS = ", CFLAGS
-$ WRITE MAKE "TERMFLAGS = /INCLUDE=([-],[-.TERM],[-.TERM.POSTSCRIPT],[-.SRC])"
+$ WRITE MAKE "TERMFLAGS = /INCLUDE=(""../"",""../term/"",""../src/"")"
 $ WRITE MAKE ""
 $ WRITE MAKE "OBJS = \"
 $ N = 0
@@ -570,7 +570,7 @@ $ IF (RTL .EQS. "VAXCRTL") THEN -
     WRITE MAKE "$ CRTL_SHARE = "",SYS$DISK:[]VAXC.OPT/OPT"""
 $ IF (RTL .NES. "VAXCRTL") THEN WRITE MAKE "$ CRTL_SHARE = """""
 $ WRITE MAKE "$ CFLAGS = ""''CFLAGS'"""
-$ WRITE MAKE "$ TERMFLAGS = ""/INCLUDE=([-],[-.TERM],[-.TERM.POSTSCRIPT],[-.SRC])"""
+$ WRITE MAKE "$ TERMFLAGS = ""/INCLUDE=(""""../"""",""""../term/"""",""""../src/"""")"""
 $ IF (VAXC .AND. DECW) THEN WRITE MAKE "$ define/nolog x11 decw$include"
 $ IF (VAXC .AND. DECW) THEN WRITE MAKE "$ define/nolog sys sys$library"
 $ WRITE MAKE "$ set verify"
