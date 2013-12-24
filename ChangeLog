@@ -1,3 +1,11 @@
+2013-12-24  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/gp_types.h src/plot2d.c src/tables.c src/interpol.c:
+
+	New smoothing option "mcsplines" - piecewise monotonic cubic splines
+	calculated using the algorithm of FN Fritsch & RE Carlson (1980),
+	SIAM Journal on Numerical Analysis 17: 238-246.
+
 2013-12-23  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/plot2d.c src/plot3.c:  Make "title foo ..." and "notitle foo ..."

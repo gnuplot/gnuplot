@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: interpol.c,v 1.42 2012/10/09 22:06:41 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: interpol.c,v 1.43 2013/02/28 05:30:40 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - interpol.c */
@@ -1050,8 +1050,8 @@ gen_interp_frequency(struct curve_points *plot)
 }
 
 /*
- * This is the main entry point used for everything except frequencies.
- * As stated in the header, it is fine, but I'm not too happy with it.
+ * This is the shared entry point used for the original smoothing options
+ * csplines acsplines bezier sbezier
  */
 
 void
@@ -1305,4 +1305,112 @@ cp_implode(struct curve_points *cp)
     }				/* end while */
     cp->p_count = j;
     cp_extend(cp, j);
+}
+
+/*
+ * EAM December 2013
+ * monotonic cubic spline using the Fritsch-Carlson algorithm
+ * FN Fritsch & RE Carlson (1980). "Monotone Piecewise Cubic Interpolation".
+ * SIAM Journal on Numerical Analysis (SIAM) 17 (2): 238–246. doi:10.1137/0717021.
+ */
+
+void
+mcs_interp(struct curve_points *plot)
+{
+    /* These track the original (pre-sorted) data points */
+    int N = plot->p_count;
+    struct coordinate *p = gp_realloc(plot->points, (N+1) * sizeof(coordinate), "mcs");
+    int i;
+
+    /* These will track the resulting smoothed curve */
+    struct coordinate *new_points = gp_alloc((samples_1+1) * sizeof(coordinate), "mcs");
+    double sxmin = AXIS_LOG_VALUE(plot->x_axis, X_AXIS.min);
+    double sxmax = AXIS_LOG_VALUE(plot->x_axis, X_AXIS.max);
+    double xstart, xend, xstep;
+
+    xstart = GPMAX(p[0].x, sxmin);
+    xend = GPMIN(p[N-1].x, sxmax);
+    xstep = (xend - xstart) / (samples_1 - 1);
+
+    /* Calculate spline coefficients */
+#define DX	xlow
+#define SLOPE	xhigh
+#define C1	ylow
+#define C2	yhigh
+#define C3	z
+
+    for (i = 0; i < N-1; i++) {
+	p[i].DX = p[i+1].x - p[i].x;
+	p[i].SLOPE = (p[i+1].y - p[i].y) / p[i].DX;
+    }
+    p[N-1].SLOPE = 0;
+
+    p[0].C1 = p[0].SLOPE;
+    for (i = 0; i < N-1; i++) {
+	if (p[i].SLOPE * p[i+1].SLOPE <= 0) {
+	    p[i+1].C1 = 0;
+	} else {
+	    double sum = p[i].DX + p[i+1].DX;
+	    p[i+1].C1 = (3. * sum)
+		    / ((sum + p[i+1].DX) /  p[i].SLOPE + (sum + p[i].DX) /  p[i+1].SLOPE);
+	}
+    }
+    p[N].C1 = p[N-1].SLOPE;
+
+    for (i = 0; i < N; i++) {
+	double temp = p[i].C1 + p[i+1].C1 - 2*p[i].SLOPE;
+	p[i].C2 = (p[i].SLOPE - p[i].C1 -temp) / p[i].DX;
+	p[i].C3 = temp / (p[i].DX * p[i].DX);
+    }
+
+    /* Use the coefficients C1, C2, C3 to interpolate over the requested range */
+    for (i = 0; i < samples_1; i++) {
+	double x = xstart + i * xstep;
+	double y;
+	TBOOLEAN exact = FALSE;
+
+	if (x == p[N-1].x) {	/* Exact value for right-most point of original data */
+	    y = p[N-1].y;
+	    exact = TRUE;
+	} else {
+	    int low = 0;
+	    int mid; 
+	    int high = N-1;
+	    while (low <= high) {
+		mid = floor((low + high) / 2);
+		if (p[mid].x < x)
+		    low = mid + 1;
+		else if (p[mid].x > x)
+		    high = mid - 1;
+		else {		/* Exact value for some point in original data */
+		    y = p[mid].y;
+		    exact = TRUE;
+		    break;
+		}
+	    }
+	    if (!exact) {
+		int j = GPMAX(0, high);
+		double diff = x - p[j].x;
+		y = p[j].y + p[j].C1 * diff + p[j].C2 * diff * diff + p[j].C3 * diff * diff * diff;
+	    }
+	}
+
+	/* FIXME:  Log x?  autoscale x? */
+	new_points[i].x = x;
+	new_points[i].type = INRANGE;
+	STORE_WITH_LOG_AND_UPDATE_RANGE(new_points[i].y, y, new_points[i].type,
+		plot->y_axis, plot->noautoscale, NOOP, NOOP);
+    }
+
+    /* Replace original data with the interpolated curve */
+    free(p);
+    plot->points = new_points;
+    plot->p_count = samples_1;
+    plot->p_max = samples_1 + 1;
+
+#undef DX
+#undef SLOPE
+#undef C1
+#undef C2
+#undef C3
 }

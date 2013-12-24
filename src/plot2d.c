@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.309 2013/12/24 00:27:23 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.310 2013/12/24 02:09:55 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -2041,6 +2041,7 @@ eval_plots()
 		    case SMOOTH_UNIQUE:
 		    case SMOOTH_CUMULATIVE:
 		    case SMOOTH_CUMULATIVE_NORMALISED:
+		    case SMOOTH_MONOTONE_CSPLINE:
 			this_plot->plot_smooth = found_token;
 			this_plot->plot_style = LINES;
 			break;
@@ -2615,6 +2616,7 @@ eval_plots()
 		case SMOOTH_CSPLINES:
 		case SMOOTH_ACSPLINES:
 		case SMOOTH_SBEZIER:
+		case SMOOTH_MONOTONE_CSPLINE:
 		    sort_points(this_plot);
 		    cp_implode(this_plot);
 		case SMOOTH_NONE:
@@ -2641,6 +2643,9 @@ eval_plots()
 		    gen_interp(this_plot);
 		    fill_gpval_float("GPVAL_KDENSITY_BANDWIDTH", 
 			fabs(this_plot->smooth_parameter));
+		    break;
+		case SMOOTH_MONOTONE_CSPLINE:
+		    mcs_interp(this_plot);
 		    break;
 		case SMOOTH_NONE:
 		case SMOOTH_UNIQUE:
