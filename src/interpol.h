@@ -1,5 +1,5 @@
 /*
- * $Id: interpol.h,v 1.6 2001/08/09 15:03:52 broeker Exp $
+ * $Id: interpol.h,v 1.7 2004/04/13 17:23:58 broeker Exp $
  */
 
 /* GNUPLOT - interpol.h */
@@ -49,6 +49,7 @@
 /* Prototypes of functions exported by interpol.c */
 void gen_interp __PROTO((struct curve_points *plot));
 void gen_interp_frequency __PROTO((struct curve_points *plot));
+void mcs_interp __PROTO((struct curve_points *plot));
 void sort_points __PROTO((struct curve_points *plot));
 void cp_implode __PROTO((struct curve_points *cp));
 
