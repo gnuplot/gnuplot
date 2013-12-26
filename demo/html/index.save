@@ -1,20 +1,20 @@
 <html><head><title>Demo scripts for gnuplot CVS version</title>
 
-<link type="text/css" href="gnuplot_demo.css" rel="stylesheet"></head><body>
+<link text="text/css" href="gnuplot_demo.css" rel="stylesheet"></head><body>
 
 
+<h2 align=center>Demo scripts for gnuplot CVS version (PNG terminal)<br>
+    See also the demo output for the
+    <a href="../demo_svg_4.7/">SVG</a> and
+    <a href="../demo_canvas_4.7/">canvas</a> terminals.
+</h2>
 
-<h2 align=center>Demo scripts for gnuplot CVS version</h2>
 <p>
-Gnuplot is distributed with a large set of scripts that demonstrate
-various features.  Collected below are the results of running
-many of these scripts through the CVS version of gnuplot.
-Interactive demo scripts are not included on this page.
+Gnuplot is distributed with a large set of demonstration scripts.
+Here are samples of PNG output from some of the demos.
 
-
-
-<table>
-<tbody><tr>
+<table border="0" width="100%">
+<tbody><tr valign="top">
 
 <td rowspan=2>
     <h4>Basic 2D plot styles</h4>
@@ -29,12 +29,14 @@ Interactive demo scripts are not included on this page.
     <li><a href="multiaxis.html">multiple axis scales</a></li>
     <li><a href="using.html">mixing styles</a></li>
     <li><a href="pointsize.html">variable size points</a></li>
+    <li><a href="parallel.html">parallel axis plots</a></li>
     <li><a href="param.html">parametric&nbsp;functions</a></li>
     <li><a href="piecewise.html">piecewise&nbsp;functions</a></li>
     <li><a href="vector.html">vector fields</a></li>
     <li><a href="circles.html">circles</a></li>
     <li><a href="boxplot.html">boxplots</a></li>
     <li><a href="rugplot.html">rug plot</a></li>
+    <li><a href="cities.html">text</a></li>
     </ul>
 
     <h4>Math functions and<br> curve fitting</h4>
@@ -50,11 +52,6 @@ Interactive demo scripts are not included on this page.
     <li><a href="random.html">random numbers</a></li>
     <li><a href="bivariat.html">recursion, etc...</a></li>
     <li><a href="stats.html">data statistics</a></li>
-    </ul>
-
-    <h4>Animation</h4>
-    <ul>
-    <li><a href="animate2.html">animated gif</a></li>
     </ul>
 
 </td>
@@ -87,14 +84,14 @@ Interactive demo scripts are not included on this page.
     <li><a href="image.html">image data</a></li>
     <li><a href="image2.html">binary and image tricks</a></li>
     <li><a href="rgbalpha.html">RGB + alpha channel</a></li>
-    <li><a href="barchart_art.html">rescaled images</a></li>
+    <li><a href="barchart_art.html">bar chart art</a></li>
     </ul>
 
     <h4>Colors</h4>
     <ul>
     <li><a href="varcolor.html">data-dependent coloring</a></li>
-    <li><a href="rgb_variable.html">RGB and HSV coloring</a></li>
-    <li><a href="rgba_lines.html">RGB + Alpha</a></li>
+    <li><a href="rgb_variable.html">RGB coloring</a></li>
+    <li><a href="rgba_lines.html">RGB + alpha channel</a></li>
     <li><a href="pm3dcolors.html">pm3d colors</a></li>
     <li><a href="pm3dgamma.html">pm3d gamma</a></li>
     </ul>
@@ -109,14 +106,14 @@ Interactive demo scripts are not included on this page.
     <li><a href="finance.html">financial data</a></li>
     <li><a href="scatter.html">non-gridded data</a></li>
     <li><a href="running_avg.html">running averages</a></li>
-    <li><a href="smooth.html">cummulative smoothing</a></li>
+    <li><a href="smooth.html">binning/histograms</a></li>
     <li><a href="heatmaps.html">2D and 3D heat maps</a></li>
     </ul>
 
     <h4>Text options</h4>
     <ul>
     <li><a href="textrotate.html">rotated text</a></li>
-    <li><a href="enhancedtext.html">enhanced text</a></li>
+    <li><a href="enhanced_utf8.html">'enhanced' text</a></li>
     <li><a href="datastrings.html">string data</a></li>
     <li><a href="cities.html">variable font size</a></li>
     <li><a href="stringvar.html">string variables</a></li>
@@ -125,13 +122,13 @@ Interactive demo scripts are not included on this page.
 
     <h4>Page Layout</h4>
     <ul>
+    <!-- li><a href="key.html">plot key</a></li -->
     <li><a href="layout.html">multiplot&nbsp;layout</a></li>
     <li><a href="multiplt.html">multiple plots</a></li>
     <li><a href="margins.html">aligned plots</a></li>
     <li><a href="ellipse.html">axis location</a></li>
     <li><a href="tics.html">axis ticmarks</a></li>
     <li><a href="rectangle.html">rectangles</a></li>
-    <li><a href="nokey.html">end-labeled plots</a></li>
     </ul>
 
     <h4>Styles</h4>
@@ -141,17 +138,23 @@ Interactive demo scripts are not included on this page.
     <li><a href="transparent.html">transparency</a></li>
     <li><a href="transparent_solids.html">transparent solids</a></li>
     </ul>
+
+    <h4>Animation</h4>
+    <ul>
+    <li><a href="animate2.html">animated gif</a></li>
+    </ul>
 </td>
 
 <td align=center valign=bot>
-	<h4></h4>
-	Most of these plots were generated using
-	<font size="-1"><pre>set terminal png transparent font "arial" 8</pre></font>
+	<h3>
+	Recent additions
+	</h3>
+	<a href="index2.html">more</a>
 </td>
 </tr>
 
-<tr><td align=center>
-<img src="showcase_plot.png">
+<tr valign=top><td align=center>
+<img src="showcase_plot.7.png"><br clear=all>
 </td></tr>
 
 </tbody></table>
@@ -159,21 +162,22 @@ Interactive demo scripts are not included on this page.
 <hr>
 
 
-<table>
-<tbody><tr>
+<table border="0" width="100%">
+<tbody><tr valign="top">
 
     <td>
-    <i>This page created by Ethan Merritt<br>July 2013</i>
+    <i>This page generated December 2013</i>
     </td>
 
     <td>
     <ul>
     <li><a href="http://sourceforge.net/projects/gnuplot/">
 	Gnuplot development pages on SourceForge</a></li>
-    <li>On-line documentation in
-	<a href="http://gnuplot.sourceforge.net/docs/index.html">HTML</a>
+    <li>On-line PDF documentation in
+	<a href="http://gnuplot.sourceforge.net/docs_cvs/gnuplot.pdf">English</a>
 	and
-	<a href="http://gnuplot.sourceforge.net/docs/gnuplot.pdf">PDF</a></li>
+	<a href="http://gnuplot.sourceforge.net/docs_cvs/gnuplot-ja.pdf">Japanese</a>
+    </li>
     </ul>
     </td>
     

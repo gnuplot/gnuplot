@@ -19,7 +19,7 @@
 </canvas>
 
 <p>
-The canvas driver for gnuplot was contributed by Bruce Lueckenhoff, and extended by Ethan Merritt (sfeam).
+The canvas driver for gnuplot was contributed by Bruce Lueckenhoff and extended by Ethan Merritt (sfeam).
 To view the results you need a browser that supports the HTML5 'canvas' element.
 </p>
 
@@ -40,6 +40,7 @@ To view the results you need a browser that supports the HTML5 'canvas' element.
     <li><a href="multiaxis.html">multiple axis scales</a></li>
     <li><a href="using.html">mixing styles</a></li>
     <li><a href="pointsize.html">variable size points</a></li>
+    <li><a href="parallel.html">parallel axis plots</a></li>
     <li><a href="param.html">parametric&nbsp;functions</a></li>
     <li><a href="piecewise.html">piecewise&nbsp;functions</a></li>
     <li><a href="vector.html">vector fields</a></li>
@@ -59,11 +60,6 @@ To view the results you need a browser that supports the HTML5 'canvas' element.
     <li><a href="random.html">random numbers</a></li>
     <li><a href="bivariat.html">recursion, etc...</a></li>
     <li><a href="stats.html">data statistics</a></li>
-    </ul>
-
-    <h4>Animation</h4>
-    <ul>
-    <li><font color=gray>not supported</font></li>
     </ul>
 
 </td>
@@ -100,8 +96,8 @@ To view the results you need a browser that supports the HTML5 'canvas' element.
     <h4>Colors</h4>
     <ul>
     <li><a href="varcolor.html">data-dependent coloring</a></li>
-    <li><a href="rgb_variable.html">RGB and HSV coloring</a></li>
-    <li><a href="rgba_lines.html">RGB + Alpha</a></li>
+    <li><a href="rgb_variable.html">RGB coloring</a></li>
+    <li><a href="rgba_lines.html">RGB + alpha channel</a></li>
     <li><a href="pm3dcolors.html">pm3d colors</a></li>
     </ul>
 </td>
@@ -114,7 +110,7 @@ To view the results you need a browser that supports the HTML5 'canvas' element.
     <li><a href="finance.html">financial data</a></li>
     <li><a href="scatter.html">non-gridded data</a></li>
     <li><a href="running_avg.html">running averages</a></li>
-    <li><a href="smooth.html">cummulative smoothing</a></li>
+    <li><a href="smooth.html">binning/histograms</a></li>
     <li><a href="heatmaps.html">2D and 3D heat maps</a></li>
     </ul>
 
@@ -143,6 +139,11 @@ To view the results you need a browser that supports the HTML5 'canvas' element.
     <li><a href="fillstyle.html">fill styles</a></li>
     <li><a href="transparent.html">transparency</a></li>
     <li><a href="transparent_solids.html">transparent solids</a></li>
+    </ul>
+
+    <h4>Animation</h4>
+    <ul>
+    <li><font color=gray>not supported</font></li>
     </ul>
 </td>
 
@@ -206,7 +207,7 @@ To view the results you need a browser that supports the HTML5 'canvas' element.
 <tbody><tr valign="top">
 
     <td>
-    <i>This page created by Ethan Merritt<br>May 2012</i>
+    <i>This page created by Ethan Merritt<br>December 2013</i>
     </td>
 
     <td>

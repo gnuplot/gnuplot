@@ -40,6 +40,7 @@ The mousing code is new. You may see some browser-dependent glitches.
     <li><a href="multiaxis.html">multiple axis scales</a></li>
     <li><a href="using.html">mixing styles</a></li>
     <li><a href="pointsize.html">variable size points</a></li>
+    <li><a href="parallel.html">parallel axis plots</a></li>
     <li><a href="param.html">parametric&nbsp;functions</a></li>
     <li><a href="piecewise.html">piecewise&nbsp;functions</a></li>
     <li><a href="vector.html">vector fields</a></li>
@@ -60,11 +61,6 @@ The mousing code is new. You may see some browser-dependent glitches.
     <li><a href="random.html">random numbers</a></li>
     <li><a href="bivariat.html">recursion, etc...</a></li>
     <li><a href="stats.html">data statistics</a></li>
-    </ul>
-
-    <h4>Animation</h4>
-    <ul>
-    <li><font color=gray>not supported</font></li>
     </ul>
 
 </td>
@@ -145,6 +141,11 @@ The mousing code is new. You may see some browser-dependent glitches.
     <li><a href="transparent.html">transparency</a></li>
     <li><a href="transparent_solids.html">transparent solids</a></li>
     </ul>
+
+    <h4>Animation</h4>
+    <ul>
+    <li><font color=gray>not supported</font></li>
+    </ul>
 </td>
 
 <td align=center valign=bot>
@@ -177,7 +178,7 @@ The mousing code is new. You may see some browser-dependent glitches.
 <tbody><tr valign="top">
 
     <td>
-    <i>This page created by Ethan Merritt<br>July 2013</i>
+    <i>This page created by Ethan Merritt<br>December 2013</i>
     </td>
 
     <td>
