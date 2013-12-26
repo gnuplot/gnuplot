@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.310 2013/12/24 02:09:55 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.311 2013/12/25 05:47:27 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -2103,10 +2103,12 @@ eval_plots()
 		    }
 		    set_title = TRUE;
 
-		    if (almost_equals(c_token, "not$itle")) {
+		    if (almost_equals(c_token++, "not$itle")) {
 			this_plot->title_is_suppressed = TRUE;
 			if (xtitle != NULL)
 			    xtitle[0] = '\0';
+			if (equals(c_token,","))
+			    continue;
 		    }
 
 		    this_plot->title_no_enhanced = !key->enhanced;
@@ -2117,7 +2119,6 @@ eval_plots()
 			else if (xtitle != NULL)
 			    xtitle[0] = '\0';       /* Remove default title . */
 		    }
-		    c_token++;
 
 		    /* This ugliness is because columnheader can be either a keyword */
 		    /* or a function name.  Yes, the design could have been better. */
