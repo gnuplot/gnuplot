@@ -1,5 +1,5 @@
 /*
- * $Id: gp_types.h,v 1.49 2010/10/27 04:22:43 sfeam Exp $
+ * $Id: gp_types.h,v 1.50 2011/04/16 04:55:26 sfeam Exp $
  */
 
 /* GNUPLOT - gp_types.h */
@@ -119,7 +119,8 @@ typedef enum PLOT_SMOOTH {
     SMOOTH_FREQUENCY,
     SMOOTH_CUMULATIVE,
     SMOOTH_KDENSITY,
-    SMOOTH_CUMULATIVE_NORMALISED
+    SMOOTH_CUMULATIVE_NORMALISED,
+    SMOOTH_MONOTONE_CSPLINE
 } PLOT_SMOOTH;
 
 /* FIXME HBB 20000521: 'struct value' and its part, 'cmplx', should go

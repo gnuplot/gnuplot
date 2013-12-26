@@ -1,9 +1,16 @@
+2013-12-26  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/gp_types.h src/plot2d.c src/tables.c src/interpol.c src/interpol.h
+	docs/gnuplot.doc:
+
+	New smoothing option "mcsplines" - piecewise monotonic cubic splines
+	calculated using the algorithm of FN Fritsch & RE Carlson (1980),
+	SIAM Journal on Numerical Analysis 17: 238-246.
+
 2013-12-21  Ethan A Merritt  <merritt@u.washington.edu>
 
-	* configure.in: automake 1.14 wants an option subdir-objects
-	The option --enable-thin-splines no longer does anything; remove it.
-
 	* src/Makefile.am: automake 1.14 wants an option subdir-objects
+	The option --enable-thin-splines no longer does anything; remove it.
 
 	* src/parse.c (next_iteration): survive clobbered iteration variable
 	Bug #1312

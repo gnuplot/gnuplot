@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.701.2.30 2013/09/17 18:52:45 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.701.2.31 2013/10/22 03:41:11 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -5509,7 +5509,7 @@ Ffigure_mapcontours
 
  Syntax:
        smooth {unique | frequency | cumulative | cnormal | kdensity 
-                      | csplines | acsplines | bezier | sbezier}
+                      | csplines | acsplines | mcsplines | bezier | sbezier}
 
  `unique`, `frequency`, `cumulative` and `cnormal` plot the data after
  making them monotonic.  Each of the other routines uses the data to
@@ -5585,6 +5585,21 @@ Ffigure_mapcontours
 ?csplines
  The `csplines` option connects consecutive points by natural cubic splines
  after rendering the data monotonic (see `smooth unique`).
+5 mcsplines
+?commands plot datafile smooth mcsplines
+?plot datafile smooth mcsplines
+?plot smooth mcsplines
+?data-file smooth mcsplines
+?datafile smooth mcsplines
+?plot mcsplines
+?smooth mcsplines
+?mcsplines
+ The `mcsplines` option connects consecutive points by cubic splines constrained
+ such that the smoothed function preserves the monotonicity and convexity of the
+ original data points.
+ FN Fritsch & RE Carlson (1980) "Monotone Piecewise Cubic Interpolation",
+ SIAM Journal on Numerical Analysis 17: 238–246.
+5 sbezier
 5 sbezier
 ?commands plot datafile smooth sbezier
 ?plot datafile smooth sbezier
