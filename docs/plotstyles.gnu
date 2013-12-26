@@ -413,6 +413,23 @@ butterfly(x)=exp(cos(x))-2*cos(4*x)+sin(x/12)**5
 GPFUN_butterfly = "butterfly(x)=exp(cos(x))-2*cos(4*x)+sin(x/12)**5"
 plot 3.+sin(t)*cos(5*t) with filledcurve above r=2.5 notitle, \
      3.+sin(t)*cos(5*t) with line
+reset
+
+# Parallel axis plot
+if (GPVAL_TERM eq "pdfcairo") \
+    set term pdfcairo color font fontspec size 3.5,2.0 dashlength 0.2
+set output out . 'figure_parallel' . ext
+unset border
+unset key
+set xrange [] noextend
+unset ytics
+set xtics 1 format "axis %g" scale 0,0
+set for [axis=1:4] paxis axis tics
+set paxis 2 range [0:30]
+set paxis 4 range [-1:15]
+set paxis 4 tics  auto 1 left offset 5
+
+plot 'silver.dat' using 2:3:1:($3/2):(int($0/25)) with parallel lt 1 lc variable
 
 reset
 #
@@ -429,7 +446,7 @@ fourier(k, x) = sin(3./2*k)/k * 2./3*cos(k*x)
 do for [power = 0:3] {
     TERMS = 10**power
     set xlabel sprintf("%g term Fourier series",TERMS)
-    plot 0.5 + sum [k=1:TERMS] fourier(k,x) notitle 
+    plot 0.5 + sum [k=1:TERMS] fourier(k,x) notitle lt -1
 }
 unset multiplot
 

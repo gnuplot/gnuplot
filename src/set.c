@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.423 2013/12/20 04:06:44 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.424 2013/12/22 05:46:25 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -142,6 +142,7 @@ static void set_view __PROTO((void));
 static void set_zero __PROTO((void));
 static void set_timedata __PROTO((AXIS_INDEX));
 static void set_range __PROTO((AXIS_INDEX));
+static void set_paxis __PROTO((void));
 static void set_raxis __PROTO((void));
 static void set_xyplane __PROTO((void));
 static void set_ticslevel __PROTO((void));
@@ -167,6 +168,7 @@ static void set_palette_file __PROTO((void));
 static void set_palette_function __PROTO((void));
 static void parse_histogramstyle __PROTO((histogram_style *hs,
 		t_histogram_type def_type, int def_gap));
+static void set_style_parallel __PROTO((void));
 
 static const struct position default_position
 	= {first_axes, first_axes, first_axes, 0., 0., 0.};
@@ -574,6 +576,9 @@ set_command()
 	    break;
 	case S_VRANGE:
 	    set_range(V_AXIS);
+	    break;
+	case S_PAXIS:
+	    set_paxis();
 	    break;
 	case S_RAXIS:
 	    set_raxis();
@@ -4330,6 +4335,9 @@ set_style()
     case SHOW_STYLE_BOXPLOT:
 	set_boxplot();
 	break;
+    case SHOW_STYLE_PARALLEL:
+	set_style_parallel();
+	break;
     default:
 	int_error(c_token, "unrecognized option - see 'help set style'");
     }
@@ -4966,6 +4974,27 @@ set_range(AXIS_INDEX axis)
 	    clone_linked_axes(axis + SECOND_AXES, axis);
 }
 
+/*
+ * set paxis <axis> {range <range-options> | tics <tic-options> }
+ */
+static void
+set_paxis()
+{
+    int p;
+    c_token++;
+    p = int_expression();
+
+    if (p <= 0 || p > MAX_PARALLEL_AXES)
+	int_error(c_token-1, "expecting parallel axis number 1 - %d",MAX_PARALLEL_AXES);
+
+    if (equals(c_token, "range"))
+	set_range(PARALLEL_AXES+p-1);
+    else if (almost_equals(c_token, "tic$s"))
+	set_tic_prop(PARALLEL_AXES+p-1);
+    else
+	int_error(c_token, "expecting 'range' or 'tics'");
+}
+
 static void
 set_raxis()
 {
@@ -5049,7 +5078,7 @@ set_tic_prop(AXIS_INDEX axis)
     sfxptr = &nocmd[strlen(nocmd)];
     (void) strcpy(sfxptr, "t$ics");	/* STRING */
 
-    if (almost_equals(c_token, cmdptr)) {
+    if (almost_equals(c_token, cmdptr) || axis >= PARALLEL_AXES) {
 	TBOOLEAN axisset = FALSE;
 	TBOOLEAN mirror_opt = FALSE; /* set to true if (no)mirror option specified) */
 	axis_array[axis].ticdef.def.mix = FALSE;
@@ -5172,7 +5201,10 @@ set_tic_prop(AXIS_INDEX axis)
 
 	/* if tics are off and not set by axis, reset to default (border) */
 	if (((axis_array[axis].ticmode & TICS_MASK) == NO_TICS) && (!axisset)) {
-	    axis_array[axis].ticmode |= TICS_ON_BORDER;
+	    if (axis >= PARALLEL_AXES)
+		axis_array[axis].ticmode |= TICS_ON_AXIS;
+	    else
+		axis_array[axis].ticmode |= TICS_ON_BORDER;
 	    if ((mirror_opt == FALSE) && ((axis == FIRST_X_AXIS) || (axis == FIRST_Y_AXIS) || (axis == COLOR_AXIS))) {
 		axis_array[axis].ticmode |= TICS_MIRROR;
 	    }
@@ -5891,6 +5923,26 @@ parse_histogramstyle( histogram_style *hs,
 	} else
 	    /* We hit something unexpected */
 	    break;
+    }
+}
+
+/* process 'set style parallelaxis' command */
+static void
+set_style_parallel()
+{
+    c_token++;
+    while (!END_OF_COMMAND) {
+	int save_token = c_token;
+	lp_parse( &parallel_axis_style.lp_properties, FALSE, FALSE );
+	if (save_token != c_token)
+	    continue;
+	if (equals(c_token, "front"))
+	    parallel_axis_style.layer = LAYER_FRONT;
+	else if (equals(c_token, "back"))
+	    parallel_axis_style.layer = LAYER_BACK;
+	else
+	    int_error(c_token, "unrecognized option");
+	c_token++;
     }
 }
 

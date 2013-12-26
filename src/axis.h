@@ -1,5 +1,5 @@
 /*
- * $Id: axis.h,v 1.96 2013/12/20 04:06:43 sfeam Exp $
+ * $Id: axis.h,v 1.97 2013/12/24 02:09:55 sfeam Exp $
  *
  */
 
@@ -70,10 +70,14 @@ typedef enum AXIS_INDEX {
     T_AXIS,
     U_AXIS,
     V_AXIS,
+    PARALLEL_AXES,	/* The first of up to MAX_PARALLEL_AXES */
     NO_AXIS = 99
 } AXIS_INDEX;
 
-# define AXIS_ARRAY_SIZE 11
+#ifndef MAX_PARALLEL_AXES
+# define MAX_PARALLEL_AXES MAX_NUM_VAR
+#endif
+# define AXIS_ARRAY_SIZE (11 + MAX_PARALLEL_AXES)
 # define SAMPLE_AXIS SECOND_Z_AXIS
 # define LAST_REAL_AXIS  POLAR_AXIS
 
@@ -615,7 +619,7 @@ do {									  \
 #define NOOP ((void)0)
 
 /* HBB 20000506: new macro to automatically build initializer lists
- * for arrays of AXIS_ARRAY_SIZE equal elements */
+ * for arrays of AXIS_ARRAY_SIZE=11 equal elements */
 #define AXIS_ARRAY_INITIALIZER(value) {			\
     value, value, value, value, value,			\
 	value, value, value, value, value, value }
@@ -639,8 +643,6 @@ do {									  \
 /* (DFK) Watch for cancellation error near zero on axes labels */
 /* FIXME HBB 20000521: these seem not to be used much, anywhere... */
 #define CheckZero(x,tic) (fabs(x) < ((tic) * SIGNIF) ? 0.0 : (x))
-
-#define axis_name(axis) axis_defaults[axis].name
 
 /* ------------ functions exported by axis.c */
 t_autoscale load_range __PROTO((AXIS_INDEX, double *, double *, t_autoscale));
@@ -684,6 +686,12 @@ int map_x __PROTO((double value));
 int map_y __PROTO((double value));
 
 int set_cbminmax __PROTO((void));
+
+#if (defined MAX_PARALLEL_AXES) && (MAX_PARALLEL_AXES > 0)
+char * axis_name __PROTO((AXIS_INDEX));
+#else
+#define axis_name(axis) axis_defaults[axis].name
+#endif
 
 /* macro for tic scale, used in all tic_callback functions */
 #define TIC_SCALE(ticlevel, axis) \

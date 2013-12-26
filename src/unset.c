@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.193 2013/12/20 04:06:44 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.194 2013/12/22 05:46:25 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -148,6 +148,7 @@ unset_command()
 {
     int found_token;
     int save_token;
+    int i;
 
     c_token++;
 
@@ -356,6 +357,15 @@ unset_command()
 #endif
     case S_RTICS:
 	unset_tics(POLAR_AXIS);
+	break;
+    case S_PAXIS:
+	i = int_expression();
+	if (i <= 0 || i > MAX_PARALLEL_AXES)
+	    int_error(c_token, "expecting parallel axis number");
+	if (almost_equals(c_token, "tic$s")) {
+	    unset_tics(PARALLEL_AXES+i-1);
+	    c_token++;
+	}
 	break;
     case S_SAMPLES:
 	unset_samples();
@@ -1173,7 +1183,7 @@ unset_tics(AXIS_INDEX axis)
 	axis_array[i].ticdef.textcolor.lt = 0;
 	axis_array[i].ticdef.textcolor.value = 0;
 	axis_array[i].ticdef.offset = tics_nooffset;
-	axis_array[i].ticdef.rangelimited = FALSE;
+	axis_array[i].ticdef.rangelimited = (i >= PARALLEL_AXES) ? TRUE : FALSE;
 	axis_array[i].tic_rotate = 0;
 	axis_array[i].ticscale = 1.0;
 	axis_array[i].miniticscale = 0.5;
@@ -1555,9 +1565,9 @@ unset_range(AXIS_INDEX axis)
 {
     axis_array[axis].set_autoscale = AUTOSCALE_BOTH;
     axis_array[axis].writeback_min = axis_array[axis].set_min
-	= axis_defaults[axis].min;
+	= axis_defaults[GPMIN(axis,PARALLEL_AXES)].min;
     axis_array[axis].writeback_max = axis_array[axis].set_max
-	= axis_defaults[axis].max;
+	= axis_defaults[GPMIN(axis,PARALLEL_AXES)].max;
     axis_array[axis].min_constraint = CONSTRAINT_NONE;
     axis_array[axis].max_constraint = CONSTRAINT_NONE;
     axis_array[axis].range_flags = 0;
@@ -1624,7 +1634,6 @@ reset_command()
     int i;
     AXIS_INDEX axis;
     TBOOLEAN save_interactive = interactive;
-    static TBOOLEAN set_for_axis[AXIS_ARRAY_SIZE] = AXIS_ARRAY_INITIALIZER(TRUE);
 
     c_token++;
 
@@ -1695,22 +1704,39 @@ reset_command()
 
     reset_key();
 
-    unset_timefmt();
     unset_view();
 
     for (axis=0; axis<AXIS_ARRAY_SIZE; axis++) {
-	SET_DEFFORMAT(axis, set_for_axis);
-	unset_timedata(axis);
+
+	AXIS default_axis_state = DEFAULT_AXIS_STRUCT;
+
+	/* Free contents before overwriting with default values */
+	free(axis_array[axis].formatstring);
+	free(axis_array[axis].timefmt);
+	if (axis_array[axis].link_udf)
+	    free(axis_array[axis].link_udf->at);
+	free_marklist(axis_array[axis].ticdef.def.user);
+	free(axis_array[axis].ticdef.font);
 	unset_zeroaxis(axis);
 	unset_axislabel(axis);
+
+	memcpy(axis_array+axis, &default_axis_state, sizeof(AXIS));
+
+	axis_array[axis].formatstring = gp_strdup(DEF_FORMAT);
+
+	unset_timedata(axis);
 	unset_range(axis);
 
 	/* 'tics' default is on for some, off for the other axes: */
 	unset_tics(axis);
-	axis_array[axis].ticmode = axis_defaults[axis].ticmode;
+	axis_array[axis].ticmode = axis_defaults[GPMIN(axis,PARALLEL_AXES)].ticmode;
 	unset_minitics(axis);
 	axis_array[axis].ticdef = default_axis_ticdef;
 	axis_array[axis].minitics = MINI_DEFAULT;
+	if (axis >= PARALLEL_AXES) {
+	    axis_array[axis].ticdef.rangelimited = TRUE;
+	    axis_array[axis].set_autoscale |= AUTOSCALE_FIXMIN | AUTOSCALE_FIXMAX;
+	}
 
 	axis_array[axis].linked_to_primary = FALSE;
 
@@ -1719,6 +1745,7 @@ reset_command()
     raxis = TRUE;
     for (i=2; i<MAX_TICLEVEL; i++)
 	ticscale[i] = 1;
+    unset_timefmt();
 
     unset_boxplot();
     unset_boxwidth();

@@ -1,3 +1,18 @@
+2013-12-26  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/axis.c src/axis.h src/gadgets.c src/gadgets.h src/gp_types.h
+	src/graph3d.c src/graphics.c src/graphics.h src/mouse.c src/parse.c
+	src/plot2d.c src/save.c src/save.h src/set.c src/show.c src/tables.c
+	src/tables.h src/unset.c:
+
+	New plot style "with parallelaxes".
+
+	* configure.in demo/parallel.dem docs/gnuplot.doc docs/plotstyles.gnu:
+
+	Documentation and demo for parallel axis plots. Default configuration
+	is to support up to 7 parallel axes.  This can be increased by editing
+	MAX_PARALLEL_AXES, but MAX_PARALLEL_AXES must be <= MAX_NUM_VAR.
+
 2013-12-24  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/gp_types.h src/plot2d.c src/tables.c src/interpol.c:

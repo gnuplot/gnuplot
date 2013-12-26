@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: tables.c,v 1.123 2013/12/24 02:09:55 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: tables.c,v 1.124 2013/12/25 05:47:27 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - tables.c */
@@ -331,6 +331,7 @@ const struct gen_table set_tbl[] =
     { "zzeroa$xis", S_ZZEROAXIS },
     { "zeroa$xis", S_ZEROAXIS },
     { "rax$is", S_RAXIS },
+    { "paxis", S_PAXIS },
 
     { "z$ero", S_ZERO },
     { NULL, S_INVALID }
@@ -645,6 +646,7 @@ const struct gen_table show_style_tbl[] =
     { "ell$ipse", SHOW_STYLE_ELLIPSE },
     { "rect$angle", SHOW_STYLE_RECTANGLE },
     { "boxplot", SHOW_STYLE_BOXPLOT },
+    { "parallel$axis", SHOW_STYLE_PARALLEL },
 #ifdef EAM_BOXED_TEXT
     { "textbox", SHOW_STYLE_TEXTBOX },
 #endif
@@ -690,6 +692,7 @@ const struct gen_table plotstyle_tbl[] =
     { "ell$ipses", ELLIPSES },
 #endif
     { "sur$face", SURFACEGRID },
+    { "parallel$axes", PARALLELPLOT },
     { NULL, PLOT_STYLE_NONE }
 };
 

@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.838 2013/12/17 01:08:21 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.839 2013/12/25 05:47:26 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -3708,6 +3708,22 @@ Ffigure_linespoints
  of the erased portion is controlled by `set pointintervalbox`.
 
  `linespoints` may be abbreviated `lp`.
+2 parallelaxes
+?plotting style parallelaxes
+?style parallelaxes
+?parallelaxes
+Ffigure_parallel
+ Parallel axis plots can highlight correlation in a multidimensional data set.
+ Each input column is associated with a separately scaled vertical axis.
+ The column values read from each line of input are connected by line segments
+ drawn from axis 1 to axis 2 to axis 3 and so on.  That is, each line of input
+ is represented by a separate line in the parallel axes plot.
+ It is common to use some discrete categorization to assign line colors,
+ allowing visual exploration of the corellation between this categorization and
+ the axis dimensions.
+ By default gnuplot will automatically determine the range and scale of the
+ individual axes from the input data, but the usual `set axis range` commands
+ can be used to customize this.  See `set paxis`.
 2 points
 ?plotting styles points
 ?style points
@@ -10088,6 +10104,17 @@ Ffigure_missing
  and `set vrange`, or by specifying the range on the `plot` or `splot`
  commands.  Currently the default range for these parametric variables is
  [-5:5].  Setting the ranges to something more meaningful is expected.
+3 paxis
+?commands set paxis
+?set paxis
+?show paxis
+ Syntax:
+       set paxis <axisno> {range <range-options> | tics <tic-options>}
+       show paxis <axisno> {range | tics}
+ The `set paxis` command is equivalent to the `set xrange` and `set xtics`
+ commands except that it acts on one of the axes p1, p2, ... used in parallel
+ axis plots.  The normal options to these commands are accepted although not
+ all options make sense for this kind of plot.  See `set xrange`, `set xtics`.
 3 plot
 ?commands show plot
 ?show plot

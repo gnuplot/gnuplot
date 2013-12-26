@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gadgets.c,v 1.102 2013/10/02 21:03:16 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gadgets.c,v 1.103 2013/12/24 02:09:55 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - gadgets.c */
@@ -103,6 +103,9 @@ struct linestyle_def *first_perm_linestyle = NULL;
 
 /* Pointer to first 'set style arrow' definition in linked list */
 struct arrowstyle_def *first_arrowstyle = NULL;
+
+/* Holds the properties from 'set style parallelaxis' */
+struct pa_style parallel_axis_style = DEFAULT_PARALLEL_AXIS_STYLE;
 
 /* set arrow */
 struct arrow_def *first_arrow = NULL;

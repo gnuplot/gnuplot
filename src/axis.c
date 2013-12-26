@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.126 2013/12/20 04:06:42 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.127 2013/12/21 01:18:41 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -45,16 +45,17 @@ static char *RCSid() { return RCSid("$Id: axis.c,v 1.126 2013/12/20 04:06:42 sfe
 #include "term_api.h"
 #include "variable.h"
 
-/* HBB 20000416: this is the start of my try to centralize everything
- * related to axes, once and for all. It'll probably end up as a
- * global array of OO-style 'axis' objects, when it's done */
-
 /* HBB 20000725: gather all per-axis variables into a struct, and set
  * up a single large array of such structs. Next step might be to use
- * isolated AXIS structs, instead of an array. At least for *some* of
- * the axes... */
-AXIS axis_array[AXIS_ARRAY_SIZE]
-    = AXIS_ARRAY_INITIALIZER(DEFAULT_AXIS_STRUCT);
+ * isolated AXIS structs, instead of an array.
+ * EAM 2013: tried that.  The problem is that all the routines and macros
+ * that manipulate axis data take an index, not a pointer.  We'd have to
+ * rewrite all of them and it just didn't seem worth it.
+ * Instead I've added additional non-standard entries on the end, used for
+ * parallel axis plots if nothing else.
+ * Note: This array is now initialized in reset_command().
+ */
+AXIS axis_array[AXIS_ARRAY_SIZE];
 
 /* Keep defaults varying by axis in their own array, to ease initialization
  * of the main array */
@@ -70,6 +71,7 @@ const AXIS_DEFAULTS axis_defaults[AXIS_ARRAY_SIZE] = {
     { - 5,  5, "t" , NO_TICS,                      },
     { - 5,  5, "u" , NO_TICS,                      },
     { - 5,  5, "v" , NO_TICS,                      },
+    {   0,  1, "p" , NO_TICS,                      }, /* shared by all parallel axes */
 };
 
 
@@ -237,6 +239,19 @@ axis_log_value_checked(AXIS_INDEX axis, double coord, const char *what)
 }
 
 /* }}} */
+
+#if (defined MAX_PARALLEL_AXES) && (MAX_PARALLEL_AXES > 0)
+char *
+axis_name(AXIS_INDEX axis)
+{
+    static char name[] = "p  ";
+    if (axis >= PARALLEL_AXES) {
+	sprintf(name, "p%d", axis-PARALLEL_AXES+1);
+	return name;
+    }
+    return (char *)axis_defaults[axis].name;
+}
+#endif
 
 /* {{{ axis_checked_extend_empty_range() */
 /*
@@ -944,6 +959,12 @@ gen_tics(AXIS_INDEX axis, tic_callback callback)
 	    } else if (mark->label && !strchr(mark->label, '%')) {
 		/* string constant that contains no format keys */
 		ticlabel = mark->label;
+	    } else if (axis >= PARALLEL_AXES) {
+		/* FIXME: needed because ticfmt array is not maintained for parallel axes */
+		gprintf(label, sizeof(label),
+			mark->label ? mark->label : axis_array[axis].formatstring,
+			log10_base, mark->position);
+		ticlabel = label;
 	    } else if (axis_array[axis].datatype == DT_TIMEDATE) {
 		gstrftime(label, MAX_ID_LEN-1, mark->label ? mark->label : ticfmt[axis], mark->position);
 		ticlabel = label;
@@ -1236,6 +1257,10 @@ gen_tics(AXIS_INDEX axis, tic_callback callback)
 			    }
 
 			    gprintf(label, sizeof(label), ticfmt[axis], log10_base, r);
+			} else if (axis >= PARALLEL_AXES) {
+			    /* FIXME: needed because ticfmt array is not maintained for parallel axes */
+			    gprintf(label, sizeof(label), axis_array[axis].formatstring,
+				    log10_base, user);
 			} else {
 			    gprintf(label, sizeof(label), ticfmt[axis], log10_base, user);
 			}
@@ -1352,6 +1377,7 @@ axis_output_tics(
     TBOOLEAN axis_is_second = ((axis / SECOND_AXES) == 1);
     int axis_position;		/* 'non-running' coordinate */
     int mirror_position;	/* 'non-running' coordinate, 'other' side */
+    double axis_coord = 0.0;	/* coordinate of this axis along non-running axis */
 
     if (zeroaxis_basis / SECOND_AXES) {
 	axis_position = axis_array[zeroaxis_basis].term_upper;
@@ -1360,6 +1386,9 @@ axis_output_tics(
 	axis_position = axis_array[zeroaxis_basis].term_lower;
 	mirror_position = axis_array[zeroaxis_basis].term_upper;
     }
+
+    if (axis >= PARALLEL_AXES)
+	axis_coord = axis - PARALLEL_AXES + 1;
 
     if (axis_array[axis].ticmode) {
 	/* set the globals needed by the _callback() function */
@@ -1414,10 +1443,10 @@ axis_output_tics(
 
 	if ((axis_array[axis].ticmode & TICS_ON_AXIS)
 	    && !axis_array[zeroaxis_basis].log
-	    && inrange(0.0, axis_array[zeroaxis_basis].min,
+	    && inrange(axis_coord, axis_array[zeroaxis_basis].min,
 		       axis_array[zeroaxis_basis].max)
 	    ) {
-	    tic_start = AXIS_MAP(zeroaxis_basis, 0.0);
+	    tic_start = AXIS_MAP(zeroaxis_basis, axis_coord);
 	    tic_direction = axis_is_second ? 1 : -1;
 	    if (axis_array[axis].ticmode & TICS_MIRROR)
 		tic_mirror = tic_start;

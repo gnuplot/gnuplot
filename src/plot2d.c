@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.311 2013/12/25 05:47:27 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.312 2013/12/26 05:28:06 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -141,6 +141,12 @@ cp_extend(struct curve_points *cp, int num)
 	    if (cp->varcolor)
 		cp->varcolor = gp_realloc(cp->varcolor, num * sizeof(double),
 					"expanding curve variable colors");
+	    if (cp->z_n) {
+		int i;
+		for (i = 0; i < cp->n_par_axes; i++)
+		    cp->z_n[i] = gp_realloc(cp->z_n[i], num * sizeof(double),
+					"expanding curve z_n[i]");
+	    }
 	}
 	cp->p_max = num;
     } else {
@@ -149,6 +155,14 @@ cp_extend(struct curve_points *cp, int num)
 	cp->p_max = 0;
 	free(cp->varcolor);
 	cp->varcolor = NULL;
+	if (cp->z_n) {
+	    int i;
+	    for (i = 0; i < cp->n_par_axes; i++)
+		free(cp->z_n[i]);
+	    free(cp->z_n);
+	    cp->n_par_axes = 0;
+	    cp->z_n = NULL;
+	}
     }
 }
 
@@ -173,6 +187,14 @@ cp_free(struct curve_points *cp)
 	cp->labels = NULL;
 	free(cp->boxplot_factor_order);
 	cp->boxplot_factor_order = NULL;
+	if (cp->z_n) {
+	    int i;
+	    for (i = 0; i < cp->n_par_axes; i++)
+		free(cp->z_n[i]);
+	    free(cp->z_n);
+	    cp->n_par_axes = 0;
+	    cp->z_n = NULL;
+	}
 
 	free(cp);
 	cp = next;
@@ -370,6 +392,10 @@ get_data(struct curve_points *current_plot)
 	if (variable_color)
 	    current_plot->varcolor = gp_alloc(current_plot->p_max * sizeof(double),
 		"varcolor array");
+	if (variable_color && current_plot->plot_style == PARALLELPLOT) {
+	    /* Oops, we reserved one column of data too many */
+	    free(current_plot->z_n[--(current_plot->n_par_axes)]);
+	}
     }
 
     /* eval_plots has already opened file */
@@ -535,6 +561,15 @@ get_data(struct curve_points *current_plot)
 	max_cols = 4;
 	break;
 
+    case PARALLELPLOT:
+	/* First N columns are data; one more is optional varcolor */
+	min_cols = current_plot->n_par_axes;
+	max_cols = current_plot->n_par_axes + 1;
+	/* We have not yet read in any data, so we cannot do complete initialization */
+	for (j = 0; j < current_plot->n_par_axes; j++)
+	    AXIS_INIT2D(PARALLEL_AXES+j, 1);
+	break;
+
     default:
 	min_cols = 1;
 	max_cols = 2;
@@ -631,6 +666,9 @@ get_data(struct curve_points *current_plot)
 		case DOTS:
 				if (j < 3) int_error(NO_CARET,errmsg);
 				break;
+		case PARALLELPLOT:
+				if (j < 4) int_error(NO_CARET,errmsg);
+				break;
 		default:
 		    break;
 		}
@@ -638,6 +676,34 @@ get_data(struct curve_points *current_plot)
 		current_plot->varcolor[i] = v[--j];
 	    }
 	}
+
+	/* TODO: It would make more sense to organize the switch below by plot	*/
+	/* rather than by number of columns in use.  The mis-organization is	*/
+	/* particularly evident for parallel axis plots, to the point where I	*/
+	/* decided the only reasonable option is to handle it separately.	*/
+	if (current_plot->plot_style == PARALLELPLOT && j > 0) {
+	    int iaxis;
+	    /* FIXME: this apparently cannot trigger.  Good or bad? */
+	    if (j != current_plot->n_par_axes)
+		fprintf(stderr,"Expecting %d input columns, got %d\n",
+			current_plot->n_par_axes, j);
+	    /* Primary coordinate structure holds only x range and 1st y value.	*/
+	    /* The x range brackets the parallel axes by 0.5 on either side.	*/
+	    store2d_point(current_plot, i, 1.0, v[0], 
+				0.5, (double)(current_plot->n_par_axes)+0.5,
+				v[0], v[0], 0.0);
+	    /* The parallel axis data is stored in separate arrays */
+	    for (iaxis = 0; iaxis < current_plot->n_par_axes; iaxis++) {
+		int dummy_type = INRANGE;
+		STORE_WITH_LOG_AND_UPDATE_RANGE( current_plot->z_n[iaxis][i],
+			v[iaxis], dummy_type, PARALLEL_AXES+iaxis,
+			current_plot->noautoscale, NOOP, NOOP );
+	    }
+	    i++;
+
+	} else
+	/* The "else" switch currently handles all other plot styles */
+
 	switch (j) {
 	default:
 	    {
@@ -2182,11 +2248,26 @@ eval_plots()
 		    if ((this_plot->plot_type == FUNC) &&
 			((this_plot->plot_style & PLOT_STYLE_HAS_ERRORBAR)
 			|| (this_plot->plot_style == LABELPOINTS)
+			|| (this_plot->plot_style == PARALLELPLOT)
 			))
 			{
 			    int_warn(c_token, "This plot style is only for datafiles, reverting to \"points\"");
 			    this_plot->plot_style = POINTSTYLE;
 			}
+
+		    /* Parallel plots require allocating additional storage.		*/
+		    /* NB: This will be one column more than needed if the final column	*/
+		    /*     contains variable color information. We will free it later.	*/
+		    if (this_plot->plot_style == PARALLELPLOT) {
+			int i;
+			if (df_no_use_specs < 2)
+			    int_error(NO_CARET, "not enough 'using' columns");
+			this_plot->n_par_axes = df_no_use_specs;
+			this_plot->z_n = gp_alloc((df_no_use_specs) * sizeof(double*), "z_n");
+			for (i = 0; i < this_plot->n_par_axes; i++)
+			    this_plot->z_n[i] = gp_alloc(this_plot->p_max * sizeof(double), "z_n[i]");
+		    }
+		
 		    set_with = TRUE;
 		    continue;
 		}

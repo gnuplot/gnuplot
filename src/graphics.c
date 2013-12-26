@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.438 2013/10/18 03:59:08 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.439 2013/10/19 04:31:04 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -113,6 +113,7 @@ static void place_labels __PROTO((struct text_label * listhead, int layer, TBOOL
 static void place_arrows __PROTO((int layer));
 static void place_grid __PROTO((void));
 static void place_raxis __PROTO((void));
+static void place_parallel_axes __PROTO((struct curve_points *plots, int pcount, int layer));
 
 static void plot_steps __PROTO((struct curve_points * plot));	/* JG */
 static void plot_fsteps __PROTO((struct curve_points * plot));	/* HOE */
@@ -140,6 +141,8 @@ static void plot_circles __PROTO((struct curve_points *plot));
 static void plot_ellipses __PROTO((struct curve_points *plot));
 static void do_rectangle __PROTO((int dimensions, t_object *this_object, int style));
 #endif
+
+static void plot_parallel __PROTO((struct curve_points *plot));
 
 /* for plotting error bars
  * half the width of error bar tic mark
@@ -540,6 +543,9 @@ do_plot(struct curve_points *plots, int pcount)
     axis_draw_2d_zeroaxis(SECOND_X_AXIS,SECOND_Y_AXIS);
     axis_draw_2d_zeroaxis(SECOND_Y_AXIS,SECOND_X_AXIS);
 
+    /* DRAW VERTICAL AXES OF PARALLEL AXIS PLOTS */
+    place_parallel_axes(plots, pcount, LAYER_BACK);
+
     /* DRAW PLOT BORDER */
     if (draw_border)
 	plot_border();
@@ -795,6 +801,11 @@ do_plot(struct curve_points *plots, int pcount)
 		break;
 
 #endif
+
+	    case PARALLELPLOT:
+		plot_parallel(this_plot);
+		break;
+
 	    default:
 		int_error(NO_CARET, "unknown plot style");
 	    }
@@ -871,6 +882,10 @@ do_plot(struct curve_points *plots, int pcount)
 	axis_draw_2d_zeroaxis(SECOND_X_AXIS,SECOND_Y_AXIS);
 	axis_draw_2d_zeroaxis(SECOND_Y_AXIS,SECOND_X_AXIS);
     }
+
+    /* DRAW VERTICAL AXES OF PARALLEL AXIS PLOTS */
+    if (parallel_axis_style.layer == LAYER_FRONT)
+	place_parallel_axes(plots, pcount, LAYER_FRONT);
 
     /* REDRAW PLOT BORDER */
     if (draw_border && border_layer == 1)
@@ -2691,6 +2706,30 @@ compare_ypoints(SORTFUNC_ARGS arg1, SORTFUNC_ARGS arg2)
     return (0);
 }
 
+static void
+plot_parallel(struct curve_points *plot)
+{
+    int i, j;
+    int x0, y0, x1, y1;
+
+    for (i = 0; i < plot->p_count; i++) {
+
+	/* rgb variable  -  color read from data column */
+	check_for_variable_color(plot, &plot->varcolor[i]);
+
+	x0 = map_x(1.0);
+	y0 = AXIS_MAP(PARALLEL_AXES+0, plot->z_n[0][i]);
+	for (j = 1; j < plot->n_par_axes; j++) {
+	    x1 = map_x((double)(j+1));
+	    y1 = AXIS_MAP(PARALLEL_AXES+j, plot->z_n[j][i]);
+	    draw_clip_line(x0, y0, x1, y1);
+	    x0 = x1;
+	    y0 = y1;
+	}
+
+    }
+}
+
 int
 filter_boxplot(struct curve_points *plot)
 {
@@ -3375,9 +3414,12 @@ ytick2d_callback(
     struct termentry *t = term;
     /* minitick if text is NULL - v_tic is unsigned */
     int ticsize = tic_direction * (int) t->h_tic * TIC_SCALE(ticlevel, axis);
-    int y = map_y(place);
+    int y;
 
-    (void) axis;	/* avoid "unused parameter" warning */
+    if (axis >= PARALLEL_AXES)
+	y = AXIS_MAP(axis, place);
+    else
+	y = map_y(place);
 
     /* Skip label if we've already written a user-specified one here */
 #   define MINIMUM_SEPARATION 2
@@ -3779,6 +3821,50 @@ place_raxis()
 
 }
 
+static void
+place_parallel_axes(struct curve_points *first_plot, int pcount, int layer)
+{
+    int j;
+    int axes_in_use = 0;
+    struct curve_points *plot = first_plot;
+
+    /* Check for use of parallel axes */
+    for (j = 0; j < pcount; j++, plot = plot->next)
+	if (axes_in_use < plot->n_par_axes)
+	    axes_in_use = plot->n_par_axes;
+
+    /* Set up the vertical scales used by AXIS_MAP() */
+    for (j = 0; j < axes_in_use; j++) {
+	axis_revert_range(PARALLEL_AXES+j);
+	axis_array[PARALLEL_AXES+j].term_lower = plot_bounds.ybot;
+	axis_array[PARALLEL_AXES+j].term_scale =
+	    (plot_bounds.ytop - plot_bounds.ybot)
+	    / (axis_array[PARALLEL_AXES+j].max - axis_array[PARALLEL_AXES+j].min);
+
+	FPRINTF((stderr,
+	    "axis p%d: min %g max %g set_min %g set_max %g autoscale %o set_autoscale %o\n",
+	    j, axis_array[PARALLEL_AXES+j].min, axis_array[PARALLEL_AXES+j].max,
+	    axis_array[PARALLEL_AXES+j].set_min, axis_array[PARALLEL_AXES+j].set_max,
+	    axis_array[PARALLEL_AXES+j].autoscale, axis_array[PARALLEL_AXES+j].set_autoscale));
+	setup_tics(PARALLEL_AXES+j, 20);
+    }
+
+    if (parallel_axis_style.layer == LAYER_FRONT && layer == LAYER_BACK)
+	return;
+
+    /* Draw the axis lines */
+    term_apply_lp_properties(&parallel_axis_style.lp_properties);
+    for (j = 0; j < axes_in_use; j++) {
+	int max = AXIS_MAP(PARALLEL_AXES+j, axis_array[PARALLEL_AXES+j].data_max);
+	int min = AXIS_MAP(PARALLEL_AXES+j, axis_array[PARALLEL_AXES+j].data_min);
+	int axis_x = map_x((double)(j+1));
+	draw_clip_line( axis_x, min, axis_x, max );
+    }
+
+    /* Draw the axis tickmarks and labels */
+    for (j = 0; j < axes_in_use; j++)
+	axis_output_tics(PARALLEL_AXES+j, &xtic_y, FIRST_X_AXIS, ytick2d_callback);
+}
 
 /*
  * Label the curve by placing its title at one end of the curve.

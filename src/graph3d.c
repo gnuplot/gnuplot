@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.296 2013/12/11 22:16:20 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.297 2013/12/20 04:06:43 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -1094,6 +1094,10 @@ do_3dplot(
 	    case RGBA_IMAGE:
 		this_plot->image_properties.type = IC_RGBA;
 		plot_image_or_update_axes(this_plot, FALSE);
+		break;
+
+	    case PARALLELPLOT:
+		int_error(NO_CARET, "plot style parallelaxes not supported in 3D");
 		break;
 
 	    case PLOT_STYLE_NONE:

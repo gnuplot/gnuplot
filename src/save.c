@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.236 2013/11/12 17:38:14 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.237 2013/12/20 04:06:43 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -350,6 +350,9 @@ set bar %f %s\n",
 	fputc('\n', fp);
     }
     fprintf(fp, "%sset raxis\n", raxis ? "" : "un");
+
+    /* Save parallel axis state */
+    save_style_parallel(fp);
 
     fprintf(fp, "set key title \"%s\"", conv_text(key->title));
     if (key->font)
@@ -1138,6 +1141,15 @@ save_tics(FILE *fp, AXIS_INDEX axis)
 
 }
 
+void
+save_style_parallel(FILE *fp)
+{
+    fprintf(fp, "set style parallel %s ",
+	    parallel_axis_style.layer == LAYER_BACK ? "back" : "front");
+    save_linetype(fp, &(parallel_axis_style.lp_properties), FALSE);
+    fprintf(fp, "\n");
+}
+
 static void
 save_position(FILE *fp, struct position *pos, TBOOLEAN offset)
 {
@@ -1169,7 +1181,10 @@ save_range(FILE *fp, AXIS_INDEX axis)
 	fputs("\n\t", fp);
     }
 
-    fprintf(fp, "set %srange [ ", axis_name(axis));
+    if (axis < PARALLEL_AXES)
+	fprintf(fp, "set %srange [ ", axis_name(axis));
+    else
+	fprintf(fp, "set paxis %d range [ ", axis-PARALLEL_AXES+1);
     if (axis_array[axis].set_autoscale & AUTOSCALE_MIN) {
 	if (axis_array[axis].min_constraint & CONSTRAINT_LOWER ) {
 	    SAVE_NUM_OR_TIME(fp, axis_array[axis].min_lb, axis);
@@ -1201,6 +1216,9 @@ save_range(FILE *fp, AXIS_INDEX axis)
     fprintf(fp, " ] %sreverse %swriteback",
 	    ((axis_array[axis].range_flags & RANGE_IS_REVERSED)) ? "" : "no",
 	    axis_array[axis].range_flags & RANGE_WRITEBACK ? "" : "no");
+
+    if (axis >= PARALLEL_AXES)
+	return;
 
     if (axis_array[axis].set_autoscale && fp == stderr) {
 	/* add current (hidden) range as comments */

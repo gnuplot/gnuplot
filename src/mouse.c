@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: mouse.c,v 1.154 2013/10/23 19:16:11 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: mouse.c,v 1.155 2013/12/24 02:09:55 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - mouse.c */
@@ -622,7 +622,7 @@ GetRulerString(char *p, double x, double y)
 
 
 static struct t_zoom *zoom_head = NULL, *zoom_now = NULL;
-static AXIS axis_array_copy[AXIS_ARRAY_SIZE];
+static AXIS *axis_array_copy = NULL;
 
 /* Applies the zoom rectangle of  z  by sending the appropriate command
    to gnuplot
@@ -649,6 +649,7 @@ apply_zoom(struct t_zoom *z)
      * broke refresh. Just save the complete axis state and have done with it.
      */
     if (zoom_now == zoom_head && z != zoom_head) {
+	axis_array_copy = gp_realloc( axis_array_copy, sizeof(axis_array), "axis_array copy");
 	memcpy(axis_array_copy, axis_array, sizeof(axis_array));
     }
 

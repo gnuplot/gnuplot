@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.309 2013/12/20 04:06:44 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.310 2013/12/26 01:34:33 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -99,6 +99,7 @@ static void show_style_ellipse __PROTO((void));
 #endif
 static void show_grid __PROTO((void));
 static void show_raxis __PROTO((void));
+static void show_paxis __PROTO((void));
 static void show_zeroaxis __PROTO((AXIS_INDEX));
 static void show_label __PROTO((int tag));
 static void show_keytitle __PROTO((void));
@@ -253,6 +254,9 @@ show_command()
 	break;
     case S_RAXIS:
 	show_raxis();
+	break;
+    case S_PAXIS:
+	show_paxis();
 	break;
     case S_ZEROAXIS:
 	show_zeroaxis(FIRST_X_AXIS);
@@ -1455,6 +1459,10 @@ show_style()
 	c_token++;
 	break;
 #endif
+    case SHOW_STYLE_PARALLEL:
+	save_style_parallel(stderr);
+	c_token++;
+	break;
     case SHOW_STYLE_ARROW:
 	c_token++;
 	CHECK_TAG_GT_ZERO;
@@ -1489,6 +1497,7 @@ show_style()
 #ifdef EAM_BOXED_TEXT
 	show_textbox();
 #endif
+	save_style_parallel(stderr);
 	show_arrowstyle(0);
 	show_boxplot();
 #ifdef EAM_OBJECTS
@@ -1623,6 +1632,19 @@ static void
 show_raxis()
 {
     fprintf(stderr,"raxis is %sdrawn\n",raxis ? "" : "not ");
+}
+
+static void
+show_paxis()
+{
+    int p = int_expression();
+    if (p <=0 || p > MAX_PARALLEL_AXES)
+	int_error(c_token, "expecting parallel axis number 1 - %d",MAX_PARALLEL_AXES);
+    if (equals(c_token, "range"))
+	show_range(PARALLEL_AXES+p-1);
+    else if (almost_equals(c_token, "tic$s"))
+	show_ticdef(PARALLEL_AXES+p-1);
+    c_token++;
 }
 
 /* process 'show {x|y|z}zeroaxis' command */

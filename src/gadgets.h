@@ -194,6 +194,14 @@ struct arrowstyle_def {
     struct arrow_style_type arrow_properties;
 };
 
+/* For 'set style parallelaxis' */
+struct pa_style {
+    lp_style_type lp_properties;/* used to draw the axes themselves */
+    int layer;			/* front/back */
+};
+#define DEFAULT_PARALLEL_AXIS_STYLE \
+	{{0, LT_BLACK, 0, 0, 2.0, 0.0, BLACK_COLORSPEC}, LAYER_FRONT }
+
 /* The stacking direction of the key box: (vertical, horizontal) */
 typedef enum en_key_stack_direction {
     GPKEY_VERTICAL,
@@ -409,6 +417,8 @@ extern struct linestyle_def *first_linestyle;
 extern struct linestyle_def *first_perm_linestyle;
 
 extern struct arrowstyle_def *first_arrowstyle;
+
+extern struct pa_style parallel_axis_style;
 
 #ifdef EAM_OBJECTS
 extern struct object *first_object;
