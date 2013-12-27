@@ -1,5 +1,11 @@
 2013-12-27  Bastian Maerkisch  <bmaerkisch@web.de>
 
+	* src/win/wcommon.h src/win/wgraph.c src/win/winmain.c src/win/wmenu.c
+	src/win/wprinter.c src/win/wtext.c:  No need to have separate code
+	for win32 and win64 since minimal supported platform is XP.  System 
+	headers deal with that already. Also include Allin Cottrell's patch to
+	the dialog callbacks. The correct return type is indeed INT_PTR.
+
 	* src/win/wgnuplib.h src/win/wgraph.c term/win.trm:  Implement
 	modify_plots() terminal interface.
 

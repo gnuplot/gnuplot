@@ -1,5 +1,5 @@
 /*
- * $Id: wtext.c,v 1.43 2013/07/06 08:15:18 markisch Exp $
+ * $Id: wtext.c,v 1.44 2013/08/17 00:02:09 sfeam Exp $
  */
 
 /* GNUPLOT - win/wtext.c */
@@ -78,7 +78,7 @@
 /* limits */
 static POINT ScreenMinSize = {16,4};
 
-BOOL CALLBACK AboutDlgProc(HWND hDlg, UINT wMsg, WPARAM wParam, LPARAM lParam);
+INT_PTR CALLBACK AboutDlgProc(HWND hDlg, UINT wMsg, WPARAM wParam, LPARAM lParam);
 static LRESULT CALLBACK WndParentProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);
 static LRESULT CALLBACK WndTextProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);
 
@@ -280,11 +280,7 @@ TextInit(LPTW lptw)
 
     sysmenu = GetSystemMenu(lptw->hWndParent,0);	/* get the sysmenu */
     AppendMenu(sysmenu, MF_SEPARATOR, 0, NULL);
-#ifdef _WIN64
     AppendMenu(sysmenu, MF_POPUP, (UINT_PTR)lptw->hPopMenu, "&Options");
-#else
-    AppendMenu(sysmenu, MF_POPUP, (UINT)lptw->hPopMenu, "&Options");
-#endif
     AppendMenu(sysmenu, MF_STRING, M_ABOUT, "&About");
 
     if (lptw->lpmw)
@@ -1017,11 +1013,7 @@ WndParentProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
     HDC hdc;
     LPTW lptw;
 
-#ifdef _WIN64
     lptw = (LPTW)GetWindowLongPtr(hwnd, 0);
-#else
-    lptw = (LPTW)GetWindowLong(hwnd, 0);
-#endif
 
     switch(message) {
     case WM_SYSCOMMAND:
@@ -1099,11 +1091,7 @@ WndParentProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 	TEXTMETRIC tm;
 
 	lptw = ((CREATESTRUCT *)lParam)->lpCreateParams;
-#ifdef _WIN64
 	SetWindowLongPtr(hwnd, 0, (LONG_PTR)lptw);
-#else
-	SetWindowLong(hwnd, 0, (LONG)lptw);
-#endif
 	lptw->hWndParent = hwnd;
 	/* get character size */
 	TextMakeFont(lptw);
@@ -1200,11 +1188,7 @@ WndTextProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
     int nYinc, nXinc;
     LPTW lptw;
 
-#ifdef _WIN64
     lptw = (LPTW)GetWindowLongPtr(hwnd, 0);
-#else
-    lptw = (LPTW)GetWindowLong(hwnd, 0);
-#endif
 
     switch(message) {
     case WM_SETFOCUS:
@@ -1873,11 +1857,7 @@ WndTextProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
     }
     case WM_CREATE:
 	lptw = ((CREATESTRUCT *)lParam)->lpCreateParams;
-#ifdef _WIN64
 	SetWindowLongPtr(hwnd, 0, (LONG_PTR)lptw);
-#else
-	SetWindowLong(hwnd, 0, (LONG)lptw);
-#endif
 	lptw->hWndText = hwnd;
 	break;
     case WM_DESTROY:
@@ -2146,7 +2126,7 @@ ReadTextIni(LPTW lptw)
 
 
 /* About Box */
-BOOL CALLBACK
+INT_PTR CALLBACK
 AboutDlgProc(HWND hDlg, UINT wMsg, WPARAM wParam, LPARAM lParam)
 {
     switch (wMsg) {
@@ -2162,11 +2142,7 @@ AboutDlgProc(HWND hDlg, UINT wMsg, WPARAM wParam, LPARAM lParam)
     case WM_DRAWITEM:
     {
 	LPDRAWITEMSTRUCT lpdis = (LPDRAWITEMSTRUCT)lParam;
-#ifdef _WIN64
 	DrawIcon(lpdis->hDC, 0, 0, (HICON)GetClassLongPtr(GetParent(hDlg), GCLP_HICON));
-#else
-	DrawIcon(lpdis->hDC, 0, 0, (HICON)GetClassLong(GetParent(hDlg), GCL_HICON));
-#endif
 	return FALSE;
     }
     case WM_COMMAND:
