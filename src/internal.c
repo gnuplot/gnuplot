@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: internal.c,v 1.72 2013/09/14 23:09:23 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: internal.c,v 1.73 2013/10/09 02:41:22 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - internal.c */
@@ -142,8 +142,15 @@ f_call(union argument *x)
     struct value save_dummy;
 
     udf = x->udf_arg;
-    if (!udf->at)
+    if (!udf->at) {
+	if (string_result_only) {
+	    /* We're only here to check whether this is a string. It isn't. */
+	    f_pop(x);
+	    push(&(udv_NaN->udv_value));
+	    return;
+	}
 	int_error(NO_CARET, "undefined function: %s", udf->udf_name);
+    }
 
     save_dummy = udf->dummy_values[0];
     (void) pop(&(udf->dummy_values[0]));

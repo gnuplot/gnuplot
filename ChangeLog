@@ -1,3 +1,10 @@
+2013-12-27  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/internal.c (f_call):  Repair odd side effect of recent "notitle"
+	patch.  "plot FOO notitle lw (1/2)"  contains what looks like an
+	undefined string function lw().  Explicitly ignore this just as we 
+	would an undefined string variable.
+
 2013-12-27  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* docs/gnuplot-ja.doc term-ja.diff:  Sync translation to version 1.840
