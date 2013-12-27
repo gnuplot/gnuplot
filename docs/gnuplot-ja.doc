@@ -1,5 +1,5 @@
-C RCS $Id: gnuplot-ja.doc,v 1.490 2013-10-16 19:53:53+09 shige Exp $
-C corresponding original gnuplot.doc revision: 1.830
+C RCS $Id: gnuplot-ja.doc,v 1.498 2013-12-27 12:25:10+09 shige Exp $
+C corresponding original gnuplot.doc revision: 1.840
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -951,7 +951,6 @@ C 行が長いのは、できればなんとかしたい
 ^<tbody>
 ^<tr>    <td>column(x)</td>    <td>整数か文字列</td>    <td> 入力データ中の <i>x</i> 列目の内容</td></tr>
 ^<tr>    <td>columnhead(x)</td>    <td>整数</td>    <td> データファイルの最初の <i>x</i> 列目中の文字列</td></tr>
-^<tr>    <td>defined(X)</td>    <td>変数名</td>    <td> [非推奨] X が定義されていれば 1, そうでなければ 0</td></tr>
 ^<tr>    <td>exists("X")</td>    <td>文字列</td>    <td> 変数名 X が定義されていれば 1, そうでなければ 0</td></tr>
 ^<tr>    <td>hsv2rgb(h,s,v)</td>    <td>[0:1] 内の実数 h,s,v</td>    <td> HSV 色を 24ビットの RGB 色へ変換</td></tr>
 ^<tr>    <td>stringcolumn(x)</td>    <td>整数</td>    <td> 文字列としての <i>x</i> 列目の内容</td></tr>
@@ -1347,7 +1346,7 @@ C マーカを doc2html へのこのシグナルとして使用します。
 #faddeeva(z)&複素数&再スケール化複素誤差関数 $w(z) = e^{-z^2}~ erfc(-iz) $ \\
  `Faddeeva(z)` は再スケール化複素誤差関数です。
  w(z) = exp(-z^2) * erfc(-i*z)
- これは、Abramowitz-Stegun の式 7.1.3, 7.1.4 に対応します。 
+ これは、Abramowitz-Stegun の式 7.1.3, 7.1.4 に対応します。
 4 erfi
 ?expressions functions erfi
 ?erfi
@@ -1493,13 +1492,6 @@ C マーカを doc2html へのこのシグナルとして使用します。
  として、あるいはデータファイル描画でのいずれかのみで使えます。これは、
  データの最初の行の x 列目の内容を含む文字列と評価されます。以下参照:
  `plot datafile using`。
-4 defined
-?expressions functions defined
-?defined
-#defined(X) & 変数名 & [非推奨] X が定義されていれば 1, そうでなければ 0\\
-%defined(X)@変数名@ [非推奨] X が定義されていれば 1, そうでなければ 0
- `defined(X)` ([非推奨]) は、X が定義されていれば 1、そうでなければ 0
- を返しますが、これの代わりに `exists("X")` を使ってください。
 4 exists
 ?expressions functions exists
 ?exists
@@ -2547,7 +2539,7 @@ Ffigure_newsyntax
 
        plot 'something'
        pause mouse
-       if (defined(MOUSE_BUTTON)) call 'something_else'; \
+       if (exists("MOUSE_BUTTON")) call 'something_else'; \
        else print "No mouse click."
 
  描画ウィンドウ上での一連のキー入力を追跡することも、マウスコードを使う
@@ -3525,7 +3517,6 @@ Ffigure_histrows
  ータファイルの 2 列目と 4 列目の値に対応します。
 
 
-
  最後に以下のコマンド
 
        set style histogram columnstacked
@@ -3796,6 +3787,21 @@ Ffigure_linespoints
  御できます。
 
  `linespoints` は `lp` と略すことが出来ます。
+2 parallelaxes
+?plotting style parallelaxes
+?style parallelaxes
+?parallelaxes
+Ffigure_parallel
+ 平行座標描画 (parallel axis plot, parallel coordinates plot とも呼ばれ
+ る) は、多次元データの相関を視覚化します。各入力列は、別々のスケールの
+ 縦軸に割り当てられます。入力 1 行から読み込んだそれぞれの列の値は、1
+ つ目の軸から 2 つ目の軸へ、2 つ目の軸から 3 つ目の軸へと線分で結ばれま
+ す。すなわち平行座標描画中では、入力の各行がそれぞれ独立した折れ線にな
+ ります。それらを数種類に分類して色を割り当てることはよく行われますが、
+ それは、その分類と軸との間の関係を視覚的に調査することを可能にします。
+ デフォルトでは、gnuplot は自動的に個々の軸の範囲、スケールを入力データ
+ から決定しますが、通常の `set axis range` コマンドによってそれをカスタ
+ マイズすることも可能です。以下参照: `set paxis`。
 2 points
 ?plotting styles points
 ?style points
@@ -4225,7 +4231,7 @@ Ffigure_mapcontours
 
  範囲 (xrange, yrange 等) は、当てはめに使用するデータを制限する目的で
  使うことができ、その範囲を超えたデータは無視します。その書式は `plot`
- コマンド同様 
+ コマンド同様
        [{dummy_variable=}{<min>}{:<max>}],
  です。以下参照: `plot ranges`。
 
@@ -4261,7 +4267,7 @@ Ffigure_mapcontours
        fit ... using ($2+$3):6:(1)
 
  独立変数が 1 つ以外の場合は、その独立変数の個数よりも 2 つ多い `using`
- 指定 (z と s の分) をしなければいけません。 
+ 指定 (z と s の分) をしなければいけません。
 
  仮変数名は、下で紹介するように範囲指定で指定することで変更できます。最
  初の範囲は `using` 指定の最初のものに対応し、以下同様です。従属変数で
@@ -4759,10 +4765,11 @@ Ffigure_mapcontours
 2 history
 ?commands history
 ?history
- コマンド `history` は、過去に編集したコマンドラインの履歴 (history) の
- 一覧を表示したり、その一部を保存したり、その一つを実行したりします。
+ コマンド `history` は、コマンド履歴の一覧を表示したり、保存したり、一
+ 覧の中のコマンドを再実行したりします。このコマンドの挙動を変えるには、
+ 以下参照: `set history`。
 
- 具体例で使用法を紹介します:
+ 例:
 
        history               # 履歴全体を表示
        history 5             # 履歴内の直前の 5 つを表示
@@ -4775,12 +4782,7 @@ Ffigure_mapcontours
        history ?"set c"      # 上と同様 (複数の語は引用符で囲む)
        hi !reread            # "reread" で始まる最も新しい行を実行
        hist !"set xr"        # 上と同様 (複数の語は引用符で囲む)
-       hi !hi                # 当ててみて :-))
-
- popen 関数をサポートするようなシステム (Unix など) では、履歴の出力を
- パイプ経由で他の外部プログラムに渡すことができます。その場合、上の例の
- 一つにあるように、ファイル名としてコマンド名の先頭に '|' をつけたもの
- を使います。
+       hist !55              # 55 番目の履歴項目のコマンドを再実行
 2 if
 ?commands if
 ?if
@@ -5272,7 +5274,7 @@ Ffigure_mapcontours
  バイナリデータファイルの走査方向が gnuplot の走査方向と一致しないこと
  がたまにあります。これらのキーワードは、それぞれ x, y, z 方向のデータ
  の走査方向を逆向きにします。
-5 origin 
+5 origin
 ?binary keywords origin
  gnuplot は転置 (transpose) や反転 (flip) において座標を生成する場合、
  常に配列の左下の点が原点になるようにします。すなわち、データが、転置や
@@ -5625,7 +5627,7 @@ Ffigure_mapcontours
 
  書式:
        smooth {unique | frequency | cumulative | cnormal | kdensity {bandwidth}
-                      | csplines | acsplines | bezier | sbezier}
+                      | csplines | acsplines | mcsplines | bezier | sbezier}
 
  `unique`, `frequency`, `cumulative`, `cnormal` は、データを単調に揃え
  た後でそれらを plot します。他のルーチンはいずれも、データの両端の点の
@@ -5702,6 +5704,19 @@ Ffigure_mapcontours
 ?csplines
  `csplines` オプションはデータを単調に揃えた後で (以下参照:
  `smooth unique`) 自然 3 次スプライン曲線で引き続く点をつなぎます。
+5 mcsplines
+?commands plot datafile smooth mcsplines
+?plot datafile smooth mcsplines
+?plot smooth mcsplines
+?data-file smooth mcsplines
+?datafile smooth mcsplines
+?plot mcsplines
+?smooth mcsplines
+?mcsplines
+ `mcsplines` オプションは、平滑化された関数が元の点の単調性と凸性を保存
+ するような 3 次スプライン曲線で引き続く点をつなぎます。
+ FN Fritsch & RE Carlson (1980) "Monotone Piecewise Cubic Interpolation",
+ SIAM Journal on Numerical Analysis 17: 238-246.
 5 sbezier
 ?commands plot datafile smooth sbezier
 ?plot datafile smooth sbezier
@@ -8871,18 +8886,28 @@ Ffigure_missing
 ?set historysize
 ?unset historysize
 ?historysize
-?nohistorysize
- 注意: コマンド `set historysize` は、gnuplot が GNU readline ライブラ
- リを使うように configure された場合のみ有効です。
-
+ (非推奨)
+ `set historysize N` は、`set history size N` と同じです。
+ `unset historysize` は、`set history size -1` と同じです。
+3 history
+?commands set history
+?set history
  書式:
-       set historysize <int>
-       unset historysize
+    set history {size <N>} {quiet|numbers} {full|trim} {default}
 
- historysize の値は、gnuplot の終了時に history の行を高々その行数まで
- に切り捨てるために使われます。デフォルトは 500 です。
- `unset historysize` は history の切捨てを無効にしますので、history フ
- ァイルに書き出す行数の制限をしません。
+ gnuplot の終了時にヒストリファイルに保存する行数を、history size の値
+ に制限します。`set history size -1` とすると、ヒストリファイルに書き出
+ す行数の制限がなくなります。
+
+ デフォルトでは、コマンド `history` は各コマンドの前に行番号を出力しま
+ す。`history quiet` は、今回の実行に対してのみ番号を省略しますが、
+ `set history quiet` は、今後のすべての `history` の番号を省略します。
+
+ オプション `trim` は、現在のコマンドに対する前の同じものを削除すること
+ で、コマンド履歴内の重複する行の数を減らします。gnuplot のバージョン 5
+ 以前では、これがデフォルトの挙動でした。
+
+ デフォルトの設定: `set history size 500 numbers trim`
 3 isosamples
 ?commands set isosamples
 ?commands show isosamples
@@ -9956,7 +9981,8 @@ Ffigure_missing
  書式:
      set object <index>
          <object-type> <object-properties>
-         {front|back|behind} {fc|fillcolor <colorspec>} {fs <fillstyle>}
+         {front|back|behind} {clip|noclip}
+         {fc|fillcolor <colorspec>} {fs <fillstyle>}
          {default} {lw|linewidth <width>}
      unset object <index>
 
@@ -9971,6 +9997,11 @@ Ffigure_missing
  す。よって、
      set object rectangle from screen 0,0 to screen 1,1 behind
  は、グラフやページ全体の背景に色をつけるのに利用できます。
+
+ デフォルトでは、オブジェクトは、少なくとも 1 つの頂点がスクリーン座標
+ で与えられていない限り、グラフ境界でクリッピングされます。`noclip` と
+ 設定すると、グラフ境界でのクリッピングは無効になりますが、スクリーンサ
+ イズに対するクリッピングは行われます。
 
  オブジェクトの塗り潰しの色は <colorspec> で指定します。`fillcolor` は
  `fc` と省略できます。塗り潰しスタイルは <fillstyle> で指定します。詳細
@@ -10227,6 +10258,17 @@ Ffigure_missing
  によって直接指定することも、`plot` や `splot` で指定することもできます。
  現時点では、これらの媒介変数のデフォルトの変域は [-5:5] となっています。
  将来的にはこれらのデフォルト値をもっと有意なものに変更する予定です。
+3 paxis
+?commands set paxis
+?set paxis
+?show paxis
+ 書式:
+       set paxis <axisno> {range <range-options> | tics <tic-options>}
+       show paxis <axisno> {range | tics}
+ コマンド `set paxis` は、平行座標描画の p1, p2, ... 軸の一つに作用する
+ こと以外は、`set xrange` や `set xtics` と同じです。これらのコマンドへ
+ の通常のオプションは、この描画スタイルには意味のないものもありますが、
+ 一応すべてを受けつけます。以下参照: `set xrange`, `set xtics`。
 3 plot
 ?commands show plot
 ?show plot
@@ -11161,8 +11203,8 @@ C 下記の以下参照: オプション `positive`, `negative`)。
  書式:
        set style arrow <n> <arrowstyle>
        set style boxplot <boxplot style options>
-       set style circle radius <size>
-       set style ellipse size <size> units {xy|xx|yy}
+       set style circle radius <size> {clip|noclip}
+       set style ellipse size <size> units {xy|xx|yy} {clip|noclip}
        set style fill <fillstyle>
        set style histogram <histogram style options>
        set style line <n> <linestyle>
@@ -11614,7 +11656,9 @@ C 下記の以下参照: オプション `positive`, `negative`)。
 ?show style circle
 
  書式:
-       set style circle {radius {graph|screen} <R>} {{no}wedge}
+       set style circle {radius {graph|screen} <R>}
+                        {{no}wedge}
+                        {clip|noclip}
 
  このコマンドは、描画スタイル "with circles" で使われるデフォルトの半径
  を設定します。これは、データ描画で 2 列のデータ (x,y) しか与えなかった
@@ -11622,6 +11666,8 @@ C 下記の以下参照: オプション `positive`, `negative`)。
  なっています: "set style circle radius graph 0.02"。`nowedge` は、扇形
  の円弧部分から中心に向かう 2 本の半径を描かないようにしますが、デフォ
  ルトは `wedge` です。このパラメータは完全な円に対しては何もしません。
+ `clip` は円を描画境界でクリッピングしますが、`noclip` はこれを無効にし
+ ます。デフォルトは `clip` です。
 
 4 set style rectangle
 ?commands set style rectangle
@@ -11658,6 +11704,7 @@ C 下記の以下参照: オプション `positive`, `negative`)。
        set style ellipse {units xx|xy|yy}
                          {size {graph|screen} <a>, {{graph|screen} <b>}}
                          {angle <angle>}
+                         {clip|noclip}
 
  このコマンドは、楕円の直径を同じ単位で計算するかどうかを制御します。
  デフォルトは `xy` で、これは楕円の主軸 (第 1 軸) の直径は x (または x2)
@@ -11682,6 +11729,9 @@ C 下記の以下参照: オプション `positive`, `negative`)。
  最後になりますが、デフォルトの向きをキーワード `angle` で設定もできま
  す。向きは、楕円の主軸とグラフの x 軸の方向となす角で、単位は度で与え
  る必要があります。
+
+ `clip` は楕円を描画境界でクリッピングしますが、`noclip` はこれを無効に
+ します。デフォルトは `clip` です。
 
  楕円の object の定義に関しては以下も参照: `set object ellipse`。2 次元
  の描画スタイルに関しては以下参照: `ellipses`。
@@ -12486,14 +12536,15 @@ C 度の記号は set encoding locale で出るようになると。
  にも存在します。
 
  書式:
-       set xrange { [{{<min>}:{<max>}}] {{no}reverse} {{no}writeback} }
+       set xrange [{{<min>}:{<max>}}] {{no}reverse} {{no}writeback} {{no}extend}
                   | restore
        show xrange
 
- ここで <min> と <max> には定数、数式、または '*' で、'*' は自動縮尺機
- 能を意味します。自動縮尺機能に関する詳細は下に述べます。日時データの場
- 合、範囲は `set timefmt` の書式に従った文字列を引用符で囲む必要があり
- ます。省略された値は変更されません。
+ ここで <min> と <max> は定数、数式、または '*' で、'*' は自動縮尺機能
+ を意味します。日時データの場合、範囲は `set timefmt` の書式に従った文
+ 字列を引用符で囲む必要があります。<min> や <max> を省略した場合は、現
+ 在の値を変更しません。自動縮尺機能に関する詳細は下に述べます。以下も参
+ 照: `noextend`。
 
  `yrange`, `zrange`, `x2range`, `y2range`, `cbrange`, `rrange`, `trange`,
  `urange`, `vrange` は同じ書式を使用します。
@@ -13632,7 +13683,7 @@ C 度の記号は set encoding locale で出るようになると。
        unset for [i=100:200] label i
 3 linetype
 ?unset linetype
- 書式: 
+ 書式:
        unset linetype N
  以前に単一の線種に割り当てたすべての特性を削除します。この後にこの線種
  を使用した場合、特性、色は現在の出力形式にデフォルトで設定されているも

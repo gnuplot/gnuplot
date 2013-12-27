@@ -1,3 +1,7 @@
+2013-12-27  Shigeharu Takeno  <shige@iee.niit.ac.jp>
+
+	* docs/gnuplot-ja.doc term-ja.diff:  Sync translation to version 1.840
+
 2013-12-27  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/win/wcommon.h src/win/wgraph.c src/win/winmain.c src/win/wmenu.c
