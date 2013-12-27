@@ -10,6 +10,8 @@
 2013-12-21  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/Makefile.am: automake 1.14 wants an option subdir-objects
+	
+	* configure.in src/show.c:
 	The option --enable-thin-splines no longer does anything; remove it.
 
 	* src/parse.c (next_iteration): survive clobbered iteration variable
