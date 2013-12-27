@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: win.trm,v 1.117 2013/08/23 18:56:32 sfeam Exp $
+ * $Id: win.trm,v 1.118 2013/10/07 21:43:48 sfeam Exp $
  */
 
 /* GNUPLOT - win.trm */
@@ -618,7 +618,7 @@ WIN_set_cursor(int c, int x, int y)
 
 
 TERM_PUBLIC void
-WIN_set_clipboard (const char s[])
+WIN_set_clipboard(const char s[])
 {
 	Graph_set_clipboard(graphwin, s);
 }
@@ -869,8 +869,13 @@ WIN_enhanced_flush()
 
 
 TERM_PUBLIC void
-WIN_layer (t_termlayer syncpoint)
+WIN_layer(t_termlayer syncpoint)
 {
+	/* ignore LAYER_RESET in multiplot mode */
+    if (((syncpoint == TERM_LAYER_RESET) || 
+	     (syncpoint == TERM_LAYER_RESET_PLOTNO)) && 
+		multiplot)
+				return;
 	GraphOp(graphwin, W_layer, syncpoint, 0, NULL);
 }
 
