@@ -1,5 +1,5 @@
 /*
- * $Id: wgraph.c,v 1.168 2013/08/17 00:02:08 sfeam Exp $
+ * $Id: wgraph.c,v 1.169 2013/08/19 23:32:17 sfeam Exp $
  */
 
 /* GNUPLOT - win/wgraph.c */
@@ -1702,8 +1702,6 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 					keysample = FALSE;
 					break;
 				case TERM_LAYER_RESET:
-					plotno = 0;
-					break;
 				case TERM_LAYER_RESET_PLOTNO:
 					plotno = 0;
 					break;
@@ -4705,6 +4703,51 @@ UpdateToolbar(LPGW lpgw)
 		}
 	}
 }
+
+
+/*
+ * Toggle active plots
+ */
+void WDPROC 
+GraphModifyPlots(LPGW lpgw, unsigned int ops)
+{
+	int i;
+	TBOOLEAN changed = FALSE;
+
+	for (i = 0; i < GPMIN(lpgw->numplots, lpgw->maxhideplots); i++) {
+		switch (ops) {
+		case MODPLOTS_INVERT_VISIBILITIES:
+			lpgw->hideplot[i] = !lpgw->hideplot[i];
+			changed = TRUE;
+			SendMessage(lpgw->hToolbar, TB_CHECKBUTTON, M_HIDEPLOT + i, (LPARAM)lpgw->hideplot[i]);
+			break;
+		case MODPLOTS_SET_VISIBLE:
+			if (lpgw->hideplot[i] == TRUE) {
+				changed = TRUE;
+				SendMessage(lpgw->hToolbar, TB_CHECKBUTTON, M_HIDEPLOT + i, (LPARAM)FALSE);
+			}
+			lpgw->hideplot[i] = FALSE;
+			break;
+		case MODPLOTS_SET_INVISIBLE:
+			if (lpgw->hideplot[i] == FALSE) {
+				changed = TRUE;
+				SendMessage(lpgw->hToolbar, TB_CHECKBUTTON, M_HIDEPLOT + i, (LPARAM)TRUE);
+			}
+			lpgw->hideplot[i] = TRUE;
+			break;
+		}
+	}
+	if (changed) {
+		RECT rect;
+
+		lpgw->buffervalid = FALSE;
+		GetClientRect(lpgw->hWndGraph, &rect);
+		InvalidateRect(lpgw->hWndGraph, (LPRECT) &rect, 1);
+		UpdateToolbar(lpgw);
+		UpdateWindow(lpgw->hWndGraph);
+	}
+}
+
 
 #ifdef USE_MOUSE
 

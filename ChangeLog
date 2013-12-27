@@ -1,5 +1,8 @@
 2013-12-27  Bastian Maerkisch  <bmaerkisch@web.de>
 
+	* src/win/wgnuplib.h src/win/wgraph.c term/win.trm:  Implement
+	modify_plots() terminal interface.
+
 	* term/win.trm (WIN_layer):  Ignore TERM_LAYER_RESET in multiplot
 	mode.
 

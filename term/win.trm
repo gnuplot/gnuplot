@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: win.trm,v 1.118 2013/10/07 21:43:48 sfeam Exp $
+ * $Id: win.trm,v 1.119 2013/12/27 19:22:02 markisch Exp $
  */
 
 /* GNUPLOT - win.trm */
@@ -100,6 +100,7 @@ TERM_PUBLIC void WIN_enhanced_flush __PROTO((void));
 TERM_PUBLIC void WIN_image __PROTO((unsigned int, unsigned int, coordval *, gpiPoint *, t_imagecolor));
 TERM_PUBLIC void WIN_layer __PROTO((t_termlayer syncpoint));
 TERM_PUBLIC void WIN_hypertext __PROTO((int type, const char * text));
+TERM_PUBLIC void WIN_modify_plots __PROTO((unsigned int operations));
 
 /* Initialization values - guess now, scale later */
 #define WIN_XMAX (24000)
@@ -896,6 +897,13 @@ WIN_boxed_text(unsigned int x, unsigned int y, int option)
 }
 #endif
 
+
+TERM_PUBLIC void 
+WIN_modify_plots(unsigned int operations)
+{
+	GraphModifyPlots(graphwin, operations);
+}
+
 #endif /* TERM_BODY */
 
 #ifdef TERM_TABLE
@@ -931,6 +939,7 @@ TERM_TABLE_START(win_driver)
 #ifdef EAM_BOXED_TEXT
     , WIN_boxed_text
 #endif
+	, WIN_modify_plots
 TERM_TABLE_END(win_driver)
 
 #undef LAST_TERM
