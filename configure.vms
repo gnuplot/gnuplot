@@ -15,6 +15,8 @@ $ ! MMS, MMK, MAK, COM -- The build procedure.  If you specify MMS or MMK,
 $ !    you get DESCRIP.MMS in the [.SRC] directory; if you specify MAK,
 $ !    you get MAKEFILE. in the [.SRC] directory; if you specify COM, you
 $ !    get BUILD.COM in the [.SRC] directory.
+$ ! Use MMS or MMK with /IGNORE to prevent warnings to stop the building
+$ ! process.
 $ ! DECC$CRTL -- Use the DECC$CRTL backport library.  See
 $ !    SYS$LIBRARY:DECC$CRTL.README for information on it.
 $ ! READLINE -- Use the included readline function.
@@ -148,6 +150,8 @@ $ IF (MMS) THEN MAKETOOL = "MMS"
 $HAVEMAKETOOL:
 $ !
 $ ! Check if the system has DECWindows.
+$ ! Commented out because building "gnuplot_x11.exe" is currently
+$ ! not successful.
 $ !
 $ ! DECW = F$TRNLNM("DECW$INCLUDE") .NES. ""
 $ DECW = 0
@@ -376,9 +380,9 @@ $ CORETERM = "aed dumb dxf dxy eepic epson fig hp26 hp2648 hpgl hpljii " -
            + "imagen kyo latex pbm pc post qms regis sun t410x tek x11"
 $ OTHERTERM = "[-.term]impcodes.h [-.term]object.h gplt_x11.c"
 $ !
-$ ! Define CFLAGS.
+$ ! Define CFLAGS. ("NO_GIH" may be omitted to generate and use "gnuplot.gih".)
 $ !
-$ CFLAGS = "/FLOAT=IEEE/IEEE_MODE=UNDERFLOW_TO_ZERO/DEFINE=(HAVE_CONFIG_H,''RTL')/INCLUDE=[-]"
+$ CFLAGS = "/FLOAT=IEEE/IEEE_MODE=UNDERFLOW_TO_ZERO/DEFINE=(NO_GIH,HAVE_CONFIG_H,''RTL')/INCLUDE=[-]"
 $ ! CFLAGS = "/DEFINE=(HAVE_CONFIG_H,''RTL')/INCLUDE=[-]"
 $ IF (DECC) THEN CFLAGS = CFLAGS + "/PREFIX=ALL"
 $ !
@@ -467,7 +471,7 @@ $ ALL = ""
 $ IF (DECC$CRTL) THEN ALL = ALL + " logicals"
 $ ALL = ALL + " gnuplot.$(X)"
 $ IF (DECW) THEN ALL = ALL + " gnuplot_x11.$(X)"
-$ ALL = ALL + " gnuplot.hlp gnuplot.hlb \"
+$ ALL = ALL + " gnuplot.hlp gnuplot.hlb gnuplot.gih\"
 $ WRITE MAKE "all :  ", ALL
 $ WRITE MAKE "        [-.demo]binary1. [-.demo]binary2. [-.demo]binary3."
 $ WRITE MAKE "        @       ! a no-op to suppress a MMS warning"
@@ -518,10 +522,19 @@ gnuplot.hlp : [-.docs]gnuplot.rnh
 [-.docs]gnuplot.rnh : [-.docs]doc2rnh.$(X) [-.docs]gnuplot.doc
 	MCR $< [-.docs]gnuplot.doc $@
 
+gnuplot.gih : [-.docs]doc2gih.$(X) [-.docs]gnuplot.doc
+	MCR $< [-.docs]gnuplot.doc $@
+
 [-.docs]doc2rnh.$(X) : [-.docs]doc2rnh.$(O) [-.docs]termdoc.$(O)
 	link /executable=$@  $+ $(CRTL_SHARE)
 
+[-.docs]doc2gih.$(X) : [-.docs]doc2gih.$(O) [-.docs]termdoc.$(O)
+	link /executable=$@  $+ $(CRTL_SHARE)
+
 [-.docs]doc2rnh.$(O) [-.docs]termdoc.$(O) : [-.docs]termdoc.c ![-.docs]allterm.h
+	$(CC) /object=$@ $(CFLAGS) /include=([],[-],[-.term]) $*.c
+
+[-.docs]doc2gih.$(O) : [-.docs]termdoc.c ![-.docs]allterm.h
 	$(CC) /object=$@ $(CFLAGS) /include=([],[-],[-.term]) $*.c
 .ENDIF
 
@@ -544,7 +557,7 @@ clean :
 	purge/log
 	delete/log *.$(O);*
         delete/log *.$(X);*
-        delete/log gnuplot.hlp;*,gnuplot.hlb;*
+        delete/log gnuplot.hlp;*,gnuplot.hlb;*,gnuplot.gih;*
         delete/log [-.docs]*.$(O);*,*.$(X);*,gnuplot.rnh;*
 	delete/log [-.demo]binary1.;*,binary2.;*,binary3.;*
 $EOD
@@ -617,11 +630,16 @@ $ set def [-.docs]
 $ if f$locate("ALL_TERM_DOC",CFLAGS).ne.f$length(CFLAGS) then -
 	copy /concatenate [-.term]*.trm []allterm.h
 $ cc 'CFLAGS' /OBJ=doc2rnh.obj/include=([],[-],[-.term],[-.src]) doc2rnh.c
+$ cc 'CFLAGS' /OBJ=doc2gih.obj/include=([],[-],[-.term],[-.src]) doc2gih.c
 $ cc 'CFLAGS' /OBJ=termdoc.obj/include=([],[-],[-.term],[-.src]) termdoc.c
 $ SET DEF [-.src]		! CTRL_SHARE is defined as being in []
 $ link [-.docs]doc2rnh.obj,termdoc.obj /exe=[-.docs]doc2rnh 'extralib''CTRL_SHARE'
+$ link [-.docs]doc2gih.obj,termdoc.obj /exe=[-.docs]doc2gih 'extralib''CTRL_SHARE'
 $ doc2rnh := $sys$disk:[-.docs]doc2rnh
+$ doc2gih := $sys$disk:[-.docs]doc2gih
 $ doc2rnh [-.docs]gnuplot.doc [-.docs]gnuplot.rnh
+$ doc2gih [-.docs]gnuplot.doc []gnuplot.gih
+$ ON SEVERE_ERROR THEN GOTO FINISH
 $ RUNOFF [-.docs]gnuplot.rnh
 $ library/create/help sys$disk:[]gnuplot.hlb gnuplot.hlp
 $!
