@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.262 2013/08/08 07:01:22 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.263 2013/10/25 21:00:41 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -179,15 +179,16 @@ static float *df_read_matrix __PROTO((int *rows, int *columns));
 
 static void plot_option_every __PROTO((void));
 static void plot_option_index __PROTO((void));
-static void plot_option_thru __PROTO((void));
 static void plot_option_using __PROTO((int));
 static TBOOLEAN valid_format __PROTO((const char *));
 static void plot_ticlabel_using __PROTO((int));
-/*static char * df_parse_string_field __PROTO((char *));*/
 static void add_key_entry __PROTO((char *temp_string, int df_datum));
 static char * df_generate_pseudodata __PROTO((void));
 static int df_skip_bytes __PROTO((int nbytes));
 
+#ifdef BACKWARDS_COMPATIBLE
+static void plot_option_thru __PROTO((void));
+#endif
 /*}}} */
 
 /*{{{  variables */
@@ -955,7 +956,7 @@ df_open(const char *cmd_filename, int max_using, struct curve_points *plot)
 {
     int name_token = c_token - 1;
     TBOOLEAN duplication = FALSE;
-    TBOOLEAN set_index = FALSE, set_every = FALSE, set_thru = FALSE;
+    TBOOLEAN set_index = FALSE, set_every = FALSE;
     TBOOLEAN set_using = FALSE;
     TBOOLEAN set_matrix = FALSE;
 
@@ -1094,14 +1095,14 @@ df_open(const char *cmd_filename, int max_using, struct curve_points *plot)
 	    continue;
 	}
 
+#ifdef BACKWARDS_COMPATIBLE
 	/* deal with thru */
 	/* jev -- support for passing data from file thru user function */
 	if (almost_equals(c_token, "thru$")) {
-	    if (set_thru) { duplication=TRUE; break; }
 	    plot_option_thru();
-	    set_thru = TRUE;
 	    continue;
 	}
+#endif
 
 	/* deal with using */
 	if (almost_equals(c_token, "u$sing")) {
@@ -1409,7 +1410,7 @@ plot_option_index()
 	df_upper_index = df_lower_index;
 }
 
-
+#ifdef BACKWARDS_COMPATIBLE
 static void
 plot_option_thru()
 {
@@ -1426,6 +1427,7 @@ plot_option_thru()
     ydata_func.at = perm_at();
     dummy_func = NULL;
 }
+#endif
 
 
 static void

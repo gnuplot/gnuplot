@@ -1,3 +1,13 @@
+2013-12-28  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* configure.in:  Restore the configuration option
+	--enable-backwards-compatability and apply it to syntax that has been
+	deprecated but can still be supported for running old scripts (i.e.
+	scripts that do not use any modern syntax that would conflict with the
+	deprecated commands).
+
+	* src/datafile.c:  backwards compatibility support for "thru"
+
 2013-12-28  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/stdfn.c config/mingw/Makefile:  Some versions of MinGW are missing
