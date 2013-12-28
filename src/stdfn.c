@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: stdfn.c,v 1.27 2013/10/25 04:45:22 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: stdfn.c,v 1.28 2013/12/22 20:47:25 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - stdfn.c */
@@ -50,7 +50,10 @@ static char *RCSid() { return RCSid("$Id: stdfn.c,v 1.27 2013/10/25 04:45:22 sfe
 #include <io.h> /* _findfirst and _findnext set errno iff they return -1 */
 #endif
 #endif
-
+#ifdef NEED_CEXP
+#include <math.h>
+#include <complex.h>
+#endif
 
 /*
  * ANSI C functions
@@ -343,6 +346,16 @@ not_a_number(void)
 	return atof("NaN");
 #endif
 }
+
+
+#ifdef NEED_CEXP
+double _Complex cexp(double _Complex z)
+{
+	double x = creal(z);
+	double y = cimag(z);
+	return exp(x) * (cos(y) + I*sin(y));
+}
+#endif
 
 
 /* Version of basename, which does take two possible

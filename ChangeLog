@@ -1,5 +1,8 @@
 2013-12-28  Bastian Maerkisch  <bmaerkisch@web.de>
 
+	* src/stdfn.c config/mingw/Makefile:  Some versions of MinGW are missing
+	a cexp() implementation. Supply our own.
+
 	* config/mingw/Makefile:  Create timestamp.h for non-release builds.
 	
 2013-12-27  Ethan A Merritt  <merritt@u.washington.edu>
