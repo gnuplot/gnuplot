@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: scanner.c,v 1.36 2013/06/05 23:33:11 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: scanner.c,v 1.37 2013/09/08 17:47:22 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - scanner.c */
@@ -217,11 +217,13 @@ scanner(char **expressionp, size_t *expressionlenp)
 	} else
 	    switch (expression[current]) {
 	    case '#':
-		/* FIXME: This ugly exception handles the documented syntatic */
+#ifdef OLD_STYLE_CALL_ARGS
+		/* FIXME: This ugly exception handles the old-style syntatic  */
 		/* entity $# (number of arguments in "call" statement), which */
 		/* otherwise would be treated as introducing a comment.       */
 		if ((t_num == 0) ||
 		    (gp_input_line[token[t_num-1].start_index] != '$'))
+#endif
 			goto endline;	/* ignore the rest of the line */
 	    case '^':
 	    case '+':

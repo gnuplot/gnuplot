@@ -1,5 +1,5 @@
 /*
- * $Id: command.h,v 1.61 2013/08/09 20:50:32 sfeam Exp $
+ * $Id: command.h,v 1.62 2013/12/24 02:09:55 sfeam Exp $
  */
 
 /* GNUPLOT - command.h */
@@ -105,6 +105,11 @@ extern char HelpFile[];         /* patch for do_help  - AP */
 /* wrapper for calling kill_pending_Pause_dialog() from win/winmain.c */
 #ifdef _Windows
 void call_kill_pending_Pause_dialog(void);
+#endif
+
+/* Include code to support deprecated "call" syntax. */
+#ifdef BACKWARDS_COMPATIBLE
+#define OLD_STYLE_CALL_ARGS
 #endif
 
 /* input data, parsing variables */

@@ -11,6 +11,13 @@
 	* src/set.c src/gadgets.c src/gadgets.h src/save.c src/unset.c:
 	backwards compatibility support for "set style increment user"
 
+	* src/misc.c src/scanner.c src/command.h:  New mechanism for call
+	arguments (ARG0 ... ARGN) replaces old mechanidm ($0 $1 ... $N).
+	The old method is still available via --enable-backwards-compatibility
+
+	* demo/callargs.dem demo/all.dem docs/gnuplot.doc: docs and demo for
+	new call argument method
+
 2013-12-28  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/stdfn.c config/mingw/Makefile:  Some versions of MinGW are missing

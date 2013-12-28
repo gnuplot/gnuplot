@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.162 2013/09/26 22:45:33 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.163 2013/10/27 22:20:35 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -61,7 +61,6 @@ static char *RCSid() { return RCSid("$Id: misc.c,v 1.162 2013/09/26 22:45:33 sfe
 
 static char *recursivefullname __PROTO((const char *path, const char *filename, TBOOLEAN recursive));
 static void prepare_call __PROTO((int calltype));
-static void expand_call_args __PROTO((void));
 
 /* A copy of the declaration from set.c */
 /* There should only be one declaration in a header file. But I do not know
@@ -73,9 +72,10 @@ static void expand_call_args __PROTO((void));
  */
 LFS *lf_head = NULL;		/* NULL if not in load_file */
 
-/* these two are global so that plot.c can load them on program entry */
-char *call_args[10] = { NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL };
+/* these are global so that plot.c can load them for the -c option */
 int call_argc;
+char *call_args[10] = { NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL };
+static char *argname[] = {"ARG0","ARG1","ARG2","ARG3","ARG4","ARG5","ARG6","ARG7","ARG8","ARG9"};
 
 /*
  * iso_alloc() allocates a iso_curve structure that can hold 'num'
@@ -144,8 +144,9 @@ iso_free(struct iso_curve *ip)
 static void
 prepare_call(int calltype)
 {
+    struct udvt_entry *udv;
+    int argindex;
     if (calltype == 2) {
-	/* Gnuplot "call" command can have up to 10 arguments "$0" to "$9" */
 	call_argc = 0;
 	while (!END_OF_COMMAND && call_argc <= 9) {
 	    call_args[call_argc] = try_to_get_string();
@@ -164,7 +165,6 @@ prepare_call(int calltype)
     } else if (calltype == 5) {
 	/* lf_push() moved our call arguments from call_args[] to lf->call_args[] */
 	/* call_argc was determined at program entry */
-	int argindex;
 	for (argindex = 0; argindex < 10; argindex++) {
 	    call_args[argindex] = lf_head->call_args[argindex];
 	    lf_head->call_args[argindex] = NULL;	/* just to be safe */
@@ -174,8 +174,27 @@ prepare_call(int calltype)
 	/* "load" command has no arguments */
 	call_argc = 0;
     }
+
+    /* Old-style "call" arguments were referenced as $0 ... $9 and $# */
+    /* New-style has ARG0 = script-name, ARG1 ... ARG9 and ARGC */
+    /* FIXME:  If we defined these on entry, we could use get_udv* here */
+    udv = add_udv_by_name("ARGC");
+    Ginteger(&(udv->udv_value), call_argc);
+    udv->udv_undef = FALSE;
+    udv = add_udv_by_name("ARG0");
+    gpfree_string(&(udv->udv_value));
+    Gstring(&(udv->udv_value), gp_strdup(lf_head->name));
+    udv->udv_undef = FALSE;
+    for (argindex = 1; argindex <= 9; argindex++) {
+	char *arg = gp_strdup(call_args[argindex-1]);
+	udv = add_udv_by_name(argname[argindex]);
+	gpfree_string(&(udv->udv_value));
+	Gstring(&(udv->udv_value), arg ? arg : gp_strdup(""));
+	udv->udv_undef = FALSE;
+    }
 }
 
+#ifdef OLD_STYLE_CALL_ARGS
 
 const char *
 expand_call_arg(int c)
@@ -232,6 +251,7 @@ expand_call_args(void)
     gp_input_line[il] = '\0';
     free(raw_line);
 }
+#endif /* OLD_STYLE_CALL_ARGS */
 
 /*
  * load_file() is called from
@@ -249,7 +269,6 @@ load_file(FILE *fp, char *name, int calltype)
     int start, left;
     int more;
     int stop = FALSE;
-    TBOOLEAN substitute_args = (calltype == 2 || calltype == 5);
 
     lf_push(fp, name, NULL); /* save state for errors and recursion */
 
@@ -349,9 +368,10 @@ load_file(FILE *fp, char *name, int calltype)
 
 	/* process line */
 	if (strlen(gp_input_line) > 0) {
-	    if (substitute_args)
+#ifdef OLD_STYLE_CALL_ARGS
+	    if (calltype == 2 || calltype == 5)
 		expand_call_args();
-
+#endif
 	    screen_ok = FALSE;	/* make sure command line is echoed on error */
 	    if (do_line())
 		stop = TRUE;
@@ -370,6 +390,7 @@ lf_pop()
 {
     LFS *lf;
     int argindex;
+    struct udvt_entry *udv;
 
     if (lf_head == NULL)
 	return (FALSE);
@@ -391,6 +412,25 @@ lf_pop()
 	call_args[argindex] = lf->call_args[argindex];
     }
     call_argc = lf->call_argc;
+
+    /* Restore ARGC and ARG0 ... ARG9 */
+    if ((udv = get_udv_by_name("ARGC"))) {
+	Ginteger(&(udv->udv_value), call_argc);
+    }
+    if ((udv = get_udv_by_name("ARG0"))) {
+	gpfree_string(&(udv->udv_value));
+	Gstring(&(udv->udv_value),
+	    (lf->prev && lf->prev->name) ? gp_strdup(lf->prev->name) : gp_strdup(""));
+    }
+    for (argindex = 1; argindex <= 9; argindex++) {
+	if ((udv = get_udv_by_name(argname[argindex]))) {
+	    gpfree_string(&(udv->udv_value));
+	    Gstring(&(udv->udv_value), gp_strdup(call_args[argindex-1]));
+	    if (!call_args[argindex-1])
+		udv->udv_undef = TRUE;
+	}
+    }
+
     interactive = lf->interactive;
     inline_num = lf->inline_num;
     if_depth = lf->if_depth;

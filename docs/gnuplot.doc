@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.840 2013/12/26 17:58:28 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.841 2013/12/28 21:27:32 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -238,6 +238,12 @@ C
  axis ranges are identical.  In the general case it allows you to define a
  non-linear axis, something that previously was possible only for log scaling.
  See `set link`.
+
+ * The `call` command is implemented by providing a set of variables ARGC,
+ ARG0, ..., ARG9. ARG0 holds the name of the script file being executed.
+ ARG1 to ARG9 are string variables and thus may either be referenced directly
+ or expanded as macros, e.g. @ARG1.  The older convention for referencing
+ call parameters as tokens $0 ... $9 is deprecated.
 
  * Each function in a plot command may optionally be preceded by a sampling
  range.  This does not affect the overall range of the plot, only the range
@@ -4011,26 +4017,69 @@ Ffigure_mapcontours
 2 call
 ?commands call
 ?call
- The `call` command is identical to the load command with one exception: you
- can have up to ten additional parameters to the command (delimited according
- to the standard parser rules) which can be substituted into the lines read
- from the file.  As each line is read from the `call`ed input file, it is
- scanned for the sequence `$` (dollar-sign) followed by a digit (0--9).  If
- found, the sequence is replaced by the corresponding parameter from the
- `call` command line.  If the parameter was specified as a string in the
- `call` line, it is substituted without its enclosing quotes.  Sequence `$#`
- is replaced by the number of passed parameters.  `$` followed by any character
- will be that character; e.g. use `$$` to get a single `$`.  Providing more
- than ten parameters on the `call` command line will cause an error.  A
- parameter that was not provided substitutes as nothing.  Files being `call`ed
- may themselves contain `call` or `load` commands.
+ The `call` command is identical to the `load` command with one exception:
+ the name of the file being loaded may be followed by up to nine parameters.
 
- Syntax:
-       call "<input-file>" <parameter-0> <parm-1> ... <parm-9>
+      call "inputfile" <param-1> <param-2> <param-3> ... <param-9>
 
- The name of the input file must be enclosed in quotes, and it is recommended
- that parameters are similarly enclosed in quotes (future versions of gnuplot
- may treat quoted and unquoted arguments differently).
+ Previous versions of gnuplot performed macro-like substitution of the special
+ tokens $0, $1, ... $9 with the literal contents of these parameters.
+ This mechanism is now deprecated (see `call old-style`).
+
+ Gnuplot now provides a set of string variables ARG0, ARG1, ..., ARG9 and an
+ integer variable ARGC. When a `call` command is executed ARG0 is set to the
+ name of the input file, ARGC is set to the number of parameters present, and
+ ARG1 to ARG9 are loaded from the parameters that follow it on the command line.
+ Any existing contents of the ARG variables are saved and restored across a
+ `call` command.
+
+ Because the parameters are stored in ordinary string variables, they may be
+ dereferenced by macro expansion (analagous to the old-style deprecated syntax).
+ However in many cases it is more natural to use them as you would any other
+ variable.
+3 Example
+?call example
+?commands call example
+      Call site
+          MYFILE = "script1.gp"
+          FUNC = "sin(x)"
+          call MYFILE FUNC 1.23 "This is a plot title"
+      Upon entry to the called script
+          ARG0 holds "script1.gp"
+          ARG1 holds the string "sin(x)"
+          ARG2 holds the string "1.23"
+          ARG3 holds the string "This is a plot title"
+          ARGC is 3
+      The script itself can now execute
+          plot @ARG1 with lines title ARG3
+          print ARG2 * 4.56, @ARG2 * 4.56
+          print "This plot produced by script ", ARG0
+
+ Notice that ARG1 must be dereferenced as a macro, but ARG2 may be dereferenced
+ either as a macro (yielding a numerical constant) or a variable (yielding that
+ same numerical value after auto-promotion of the string "1.23" to a real).
+
+ The same result could be obtained directly from a shell script by invoking
+ gnuplot with the `-c` command line option:
+
+      gnuplot -persist -c "script1.gp" "sin(x)" 1.23 "This is a plot title"
+
+3 old-style
+?commands call old-style
+?call old-style
+ This describes the call mechanism used by previous versions of gnuplot, now
+ deprecated.
+
+       call "<input-file>" <param-0> <param-1> ... <param-9>
+
+ The name of the input file must be enclosed in quotes.
+ As each line is read from the input file, it is scanned for the following
+ special character sequences: $0 $1 $2 $3 $4 $5 $6 $7 $8 $9 $#.  If found, the
+ sequence `$`+digit is replaced by the corresponding parameter from the `call`
+ command line. Quote characters are not copied and string variable substitution
+ is not performed. The character sequence `$#` is replaced by the number of
+ passed parameters. `$` followed by any other character is treated as an escape
+ sequence; use `$$` to get a single `$`.
 
  Example:
 
@@ -4043,9 +4092,11 @@ Ffigure_mapcontours
  will display:
        argc=7 p0=abcd p1=1.2 p2=+ p3='quoted' p4=- p5=- p6=$2 p7=xx
 
- NOTE: there is a clash in syntax with the datafile `using` callback
- operator.  Use `$$n` or `column(n)` to access column n from a datafile inside
- a `call`ed datafile plot.
+ NOTES: This use of the `$` character conflicts both with gnuplot's own syntax
+ for datafile columns and with the use of `$` to indicate environmental 
+ variables in a unix-like shell. The special sequence `$#` was mis-interpreted
+ as a comment delimiter in gnuplot versions 4.5 through 4.6.3.  Quote characters
+ are ignored during substitution, so string constants are easily corrupted.
 2 clear
 ?commands clear
 ?clear

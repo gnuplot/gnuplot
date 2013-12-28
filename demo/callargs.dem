@@ -1,0 +1,28 @@
+#
+# This script exercises the ARG* variable-passing mechanism
+# used by the "call" command.  Note that the only difference between
+# "load" and "call" is that "load" has no parameters (ARGC = 0).
+#
+if (!exists("ARGC")) {
+    print "This copy of gnuplot does not support the ARG call method"
+    exit
+}
+print "Entering ", ARG0, " with ", ARGC, " parameters"
+if (ARGC == 0) {
+    undefine FOO
+    BAZ = 5.67
+    print "Now Exercise the call mechanism"
+    call ARG0 1.23e4 "string constant" FOO BAZ "3 + log(BAZ)"
+} else {
+    show variable ARG
+    print "ARG1 (numerical constant) came through as ", ARG1
+    print "     @ARG1 = ", @ARG1
+    print "     (ARG1 == @ARG1) is ", (ARG1 == @ARG1) ? "TRUE" : "FALSE"
+    print "ARG2 (string constant) came through as ", ARG2
+    print "     words(ARG2) = ", words(ARG2)
+    print "ARG3 (undefined variable FOO) came through as ", ARG3
+    print "ARG4 (numerical variable BAZ=5.67) came through as ", ARG4
+    print "     @ARG4 = ", @ARG4
+    print "ARG5 (quoted expression) came through as ", ARG5
+    print "     @ARG5 = ", @ARG5
+}
