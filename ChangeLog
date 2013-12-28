@@ -8,6 +8,9 @@
 
 	* src/datafile.c:  backwards compatibility support for "thru"
 
+	* src/set.c src/gadgets.c src/gadgets.h src/save.c src/unset.c:
+	backwards compatibility support for "set style increment user"
+
 2013-12-28  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/stdfn.c config/mingw/Makefile:  Some versions of MinGW are missing

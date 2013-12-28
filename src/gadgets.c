@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gadgets.c,v 1.103 2013/12/24 02:09:55 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gadgets.c,v 1.104 2013/12/26 17:58:28 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - gadgets.c */
@@ -184,8 +184,10 @@ struct object default_ellipse = DEFAULT_ELLIPSE_STYLE;
 filledcurves_opts filledcurves_opts_data = EMPTY_FILLEDCURVES_OPTS;
 filledcurves_opts filledcurves_opts_func = EMPTY_FILLEDCURVES_OPTS;
 
+#ifdef BACKWARDS_COMPATIBLE
 /* Prefer line styles over plain line types */
 TBOOLEAN prefer_line_styles = FALSE;
+#endif
 
 /* If current terminal claims to be monochrome, don't try to send it colors */
 #define monochrome_terminal ((t->flags & TERM_MONOCHROME) != 0)
