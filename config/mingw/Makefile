@@ -1,5 +1,5 @@
 # Hello, emacs: this is a -*- Makefile -*-
-# $Id: Makefile,v 1.31 2013/07/06 08:09:20 markisch Exp $
+# $Id: Makefile,v 1.32 2013/07/15 07:08:40 markisch Exp $
 #
 # GNUPLOT Makefile for MinGW/MSYS on Windows
 # This assumes usual installation of the MinGW32 toolkit, the free
@@ -79,7 +79,7 @@ MOUSE=1
 #CAIROLIBS=1
 
 # Uncomment the following line to select the lua/tikz terminal
-#LUA=lua5.1
+#LUA=lua52
 
 # Uncomment if you have libiconv
 ICONV=1
@@ -123,11 +123,11 @@ DESTDIR = "$(PROGRAMFILES)/gnuplot"
 # It can be obtained here:
 # http://go.microsoft.com/fwlink/?LinkId=154968
 # We need to explicitly set the correct path here since we also need
-# adjust the include and linrary paths.
+# adjust the include and library paths.
 HHWPATH = "$(PROGRAMFILES)/HTML Help Workshop/"
 HHC = $(HHWPATH)hhc
 
-# Choose which windres/rc do you want to use (GNU windres or MS RC):
+# Choose which resource compiler you want to use (GNU windres or MS rc):
 GNU_RC = 1
 ifndef GNU_RC
   # If uncommented GNU_RC above and rc.exe not in PATH, then set:
@@ -376,15 +376,21 @@ else
   RES2COFF = res2coff -i wgnuplot.res -o wgplt_res.$(O)
 endif
 
-default: $(TARGET) $(MENUFILE) support
+ifndef RELEASE
+VERSIONING = timestamp.h
+else
+VERSIONING = all: $(S)/version.c
+endif
 
-console:
+default: $(VERSIONING) $(TARGET) $(MENUFILE) support
+
+console: $(VERSIONING)
 	$(MAKE) TARGET=gnuplot.exe gnuplot.exe
 
-windows: $(MENUFILE)
+windows: $(MENUFILE) $(VERSIONING)
 	$(MAKE) TARGET=wgnuplot.exe wgnuplot.exe
 
-pipes:
+pipes: $(VERSIONING)
 	$(MAKE) TARGET=wgnuplot_pipes.exe wgnuplot_pipes.exe
 
 docs:
@@ -395,7 +401,7 @@ support: $(HELPFILE) $(M)bf_test.exe $(LUATARGETS) $(HELPFILEJA)
 
 ja: $(HELPFILEJA)
 
-all: $(S)/version.c console windows pipes support docs
+all: $(VERSIONING) console windows pipes support docs
 
 
 # include the 'core makefile template'
@@ -443,11 +449,17 @@ show.$(O): show.c plot.h setshow.h
 term.$(O): term.c term.h plot.h setshow.h bitmap.h $(CORETERM)
 	$(CC) -c $(CFLAGS) $(CFLAGSEXTRA) $(TERMFLAGS) -MMD -MT '$*.$$(O)' -MF $*.d -o $@ $<
 
-version.$(O): $(S)/version.c
-
 ifndef RELEASE
+timestamp.h: $(TOP)/ChangeLog
+	@echo Creating $@
+	@echo "#ifndef GNUPLOT_TIMEBASE_H_INCLUDED" >$@t
+	@echo "#define GNUPLOT_TIMEBASE_H_INCLUDED" >>$@t
+	@head -1 $< | sed -e 's,\(^[0-9-]* \).*$$,const char gnuplot_date[] = "\1";,' >>$@t
+	@echo "#endif /* GNUPLOT_TIMEBASE_H_INCLUDED */" >> $@t
+	@if cmp -s $@ $@t; then rm -f $@t; else mv $@t $@; fi
+else
 $(S)/version.c: $(TOP)/VERSION $(TOP)/PATCHLEVEL $(TOP)/ChangeLog $(S)/Makefile.maint
-	$(MAKE) -C $(S) -f Makefile.maint version.c
+	$(MAKE) -C $(S) -Dtop_srcdir=.. -f Makefile.maint version.c
 endif
 
 WINDEPS = $(W)/wgnuplib.h $(W)/wcommon.h $(W)/wresourc.h $(W)/screenbuf.h $(W)/wgdiplus.h
