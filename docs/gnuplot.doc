@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.841 2013/12/28 21:27:32 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.842 2013/12/28 21:53:57 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -281,10 +281,14 @@ C
        if (defined(VARNAME)) ...
        set style increment user
        plot 'file' thru f(x)
+       call 'script' 1.23 ABC 
+          (in script:  print $0, "$1", "number of args = $#")
  Current equivalent:
        if (exists("VARNAME")) ...
        set linetype
        plot 'file' using 1:(f(column(2)))
+       call 'script' 1.23 "ABC"
+          (in script:  print ARG1, ARG2, "number of args = ", ARGC
 
 2 Batch/Interactive Operation
 ?batch/interactive
