@@ -1,5 +1,5 @@
 /*
- * $Id: wgraph.c,v 1.144.2.7 2013/06/08 08:08:14 markisch Exp $
+ * $Id: wgraph.c,v 1.144.2.8 2013/06/08 11:54:25 markisch Exp $
  */
 
 /* GNUPLOT - win/wgraph.c */
@@ -1851,7 +1851,7 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 				memdc = CreateCompatibleDC(hdc);
 
 				/* create standard bitmap, no alpha channel needed */
-				membmp = CreateCompatibleBitmap(hdc, xdash, abs(ydash));
+				membmp = CreateCompatibleBitmap(hdc, width, height);
 				oldbmp = (HBITMAP)SelectObject(memdc, membmp);
 
 				/* prepare memory context */
