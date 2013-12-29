@@ -1,6 +1,12 @@
+2013-12-29  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* unset.c (reset_command):  Reinitialize axis labels after copying the
+	default axis structure. Fixes default text orientation of y- and color-
+	axes.
+
 2013-12-28  Ethan A Merritt  <merritt@u.washington.edu>
 
-	* configure.in:  Restore the --enable-backwards-compatability 
+	* configure.in:  Restore the --enable-backwards-compatibility 
 	configuration option and apply it to syntax that has been deprecated but
 	can still be supported for running old scripts (i.e. scripts that do not
 	also use recent syntax that would conflict with the deprecated commands).
@@ -11,7 +17,7 @@
 	backwards compatibility support for "set style increment user"
 
 	* src/misc.c src/scanner.c src/command.h:  New mechanism for call
-	arguments (ARG0 ... ARGN) replaces old mechanidm ($0 $1 ... $N).
+	arguments (ARG0 ... ARGN) replaces old mechanism ($0 $1 ... $N).
 	The old method is still available via --enable-backwards-compatibility
 
 	* demo/callargs.dem demo/all.dem docs/gnuplot.doc: docs and demo for
