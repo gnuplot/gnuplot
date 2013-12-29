@@ -1,5 +1,5 @@
 /*
- * $Id: wgraph.c,v 1.170 2013/12/27 19:28:15 markisch Exp $
+ * $Id: wgraph.c,v 1.171 2013/12/27 19:51:22 markisch Exp $
  */
 
 /* GNUPLOT - win/wgraph.c */
@@ -2119,30 +2119,25 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 			POINT p;
 			UINT  height, width;
 
-			width = xdash - ppt[0].x;
-			height = ppt[0].y - ydash;
-			p.x = ppt[0].x;
-			p.y = ydash;
+			width = abs(xdash - ppt[0].x);
+			height = abs(ppt[0].y - ydash);
+			p.x = GPMIN(ppt[0].x, xdash);
+			p.y = GPMIN(ydash, ppt[0].y);
 
 #ifdef HAVE_GDIPLUS
-			ppt[1].x = ppt[0].x;
-			ppt[1].y = ydash;
-			ppt[2].x = xdash;
-			ppt[2].y = ydash;
-			ppt[3].x = xdash;
-			ppt[3].y = ppt[0].y;
-			ppt[4].x = ppt[0].x;
-			ppt[4].y = ppt[0].y;
 
 			if (lpgw->antialiasing && lpgw->patternaa &&
 			    (((fillstyle & 0x0f) == FS_PATTERN) ||
 			     ((fillstyle & 0x0f) == FS_TRANSPARENT_PATTERN))) {
+				ppt[1].x = ppt[0].x;
+				ppt[1].y = ydash;
+				ppt[2].x = xdash;
+				ppt[2].y = ydash;
+				ppt[3].x = xdash;
+				ppt[3].y = ppt[0].y;
+				ppt[4].x = ppt[0].x;
+				ppt[4].y = ppt[0].y;
 				gdiplusPatternFilledPolygonEx(hdc, ppt, 5, fill_color, 1., lpgw->background, transparent, pattern);
-			} else if (lpgw->antialiasing && (((fillstyle & 0x0f) == FS_SOLID) || ((fillstyle & 0x0f) == FS_TRANSPARENT_SOLID))) {
-				if (transparent)
-					gdiplusSolidFilledPolygonEx(hdc, ppt, 5, fill_color, 1, lpgw->antialiasing && lpgw->polyaa);
-				else
-					gdiplusSolidFilledPolygonEx(hdc, ppt, 5, fill_color, alpha_c, lpgw->antialiasing && lpgw->polyaa);
 			} else
 #endif
 			if (transparent) {
@@ -2155,7 +2150,7 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 				memdc = CreateCompatibleDC(hdc);
 
 				/* create standard bitmap, no alpha channel needed */
-				membmp = CreateCompatibleBitmap(hdc, xdash, abs(ydash));
+				membmp = CreateCompatibleBitmap(hdc, width, height);
 				oldbmp = (HBITMAP)SelectObject(memdc, membmp);
 
 				/* prepare memory context */

@@ -1,5 +1,12 @@
 2013-12-29  Bastian Maerkisch  <bmaerkisch@web.de>
 
+	* src/win/wgraph.c (drawgraph) term/win.trm (WIN_filled_polygon):
+	Rectangular filled polygons are drawn using boxfill. This routine
+	contained a bug in the allocation of an internal bitmap which prevented
+	those polygons from being drawn under certain circumstances. Also
+	the routine was sensitive to the order of the corner points.
+	Bug #1279
+
 	* unset.c (reset_command):  Reinitialize axis labels after copying the
 	default axis structure. Fixes default text orientation of y- and color-
 	axes.
