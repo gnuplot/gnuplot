@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.255.2.23 2013/11/14 23:12:57 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.255.2.24 2013/12/27 02:56:06 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -545,10 +545,19 @@ get_data(struct curve_points *current_plot)
 	break;
     }
 
-    if (current_plot->plot_smooth == SMOOTH_ACSPLINES) {
+    /* Restictions on plots with "smooth" option */
+    switch (current_plot->plot_smooth) {
+    case SMOOTH_NONE:
+	break;
+    case SMOOTH_ACSPLINES:
 	max_cols = 3;
 	current_plot->z_axis = FIRST_Z_AXIS;
 	df_axis[2] = FIRST_Z_AXIS;
+	break;
+    default:
+	if (df_no_use_specs > 2)
+	    int_warn(NO_CARET, "extra columns ignored by smoothing option");
+	break;
     }
 
     /* EXPERIMENTAL May 2013 - Treating timedata columns as strings allows */
@@ -1984,7 +1993,7 @@ eval_plots()
 			break;
 		    case SMOOTH_NONE:
 		    default:
-			int_error(c_token, "expecting 'unique', 'frequency', 'cumulative', 'cnormal', 'kdensity', 'acsplines', 'csplines', 'bezier' or 'sbezier'");
+			int_error(c_token, "unrecognized 'smooth' option");
 			break;
 		    }
 		    this_plot->plot_style = LINES;
