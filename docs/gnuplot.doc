@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.701.2.31 2013/10/22 03:41:11 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.701.2.32 2013/12/27 02:56:05 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -24,11 +24,12 @@ C
 ^  James R. Van Zandt, Alex Woo, Johannes Zellner<br>
 ^</p>
 ^<p align="center">  Copyright (C) 1986 - 1993, 1998 - 2004   Thomas Williams, Colin Kelley<br>
-^     Copyright (C) 2004 - 2011 various authors</p>
+^     Copyright (C) 2004 - 2014 various authors</p>
 ^<p align="center">   Mailing list for comments: <tt>gnuplot-info@lists.sourceforge.net</tt><br>
 ^      Mailing list for bug reports: <tt>gnuplot-bugs@lists.sourceforge.net</tt><br>
 ^      Web access (preferred): <tt>http://sourceforge.net/projects/gnuplot</tt></p>
 ^<p align="center"> This manual was originally prepared by Dick Crawford</p>
+^<p align="right">2014 Version 4.6.5</p>
 2 Copyright
 ?copyright
 ?license

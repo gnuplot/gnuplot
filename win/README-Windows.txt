@@ -1,4 +1,4 @@
-This is gnuplot version 4.6 patchlevel 3 -- binary distribution for Windows
+This is gnuplot version 4.6 patchlevel 5 -- binary distribution for Windows
 ===========================================================================
 
 gnuplot is a command-line driven interactive function plotting utility
@@ -47,16 +47,20 @@ are dual-licensed.
 gnuplot binaries
 ----------------
 
-* wgnuplot.exe: The default gnuplot executable.
+* wgnuplot.exe:  The default gnuplot executable.
 
-* gnuplot.exe: Text (console) mode version of the gnuplot executable with full
+* gnuplot.exe:  Text (console) mode version of the gnuplot executable with full
   pipe functionality as it is common on other platforms. In contrast to
   wgnuplot.exe, this program can also accept commands on stdin (standard input)
   and print messages on stdout (standard output). It replaces pgnuplot.exe and
   is recommended to be used with 3rd party applications using gnuplot as graph
   engine, like e.g. Octave (www.octave.org).
 
-* pgnuplot.exe: This program will accept commands on stdin (standard input),
+* wgnuplot_pipes.exe:  A variant of wgnuplot.exe with the added capability to
+  use piping in gnuplot commands. The drawback is that it opens an additional
+  console window or keeps attached to the console window it was launched from.
+
+* pgnuplot.exe:  This program will accept commands on stdin (standard input),
   and pipe them to an active (or newly created) wgnuplot.exe text window.
   Command line options are passed on to wgnuplot.
   Effectively, this means `pgnuplot' is an almost complete substitute for
@@ -199,4 +203,4 @@ Currently, there are a few bugs specific to the Windows version:
 
 --------------------------------------------------------------------------------
 
-The gnuplot team, September 2012
+The gnuplot team, December 2013
