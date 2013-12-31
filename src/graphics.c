@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.379.2.24 2013/10/01 03:00:06 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.379.2.25 2013/10/22 03:41:13 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -5987,7 +5987,12 @@ do_ellipse( int dimensions, t_ellipse *e, int style, TBOOLEAN do_own_mapping )
     int segments = 72;
     double ang_inc  =  M_PI / 36.;
 
-    /* Find the center of the ellipse */
+#ifdef WIN32
+    if (strcmp(term->name, "windows") == 0)
+	aspect = 1.;
+#endif
+
+	/* Find the center of the ellipse */
     /* If this ellipse is part of a plot - as opposed to an object -
      * then the caller plot_ellipses function already did the mapping for us.
      * Else we do it here. The 'ellipses' plot style is 2D only, but objects 

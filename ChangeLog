@@ -1,3 +1,12 @@
+2013-12-31  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/graphics.c (get_arrow) src/term.c (do_arc):  The aspect ratio
+	of the internal coordinates	of the windows terminal is always one.
+	Bug #1253
+
+	* src/win/wtext.c (WndTextProc) src/fit.c (regress):  The ctrlc_flag
+	got clobbered due to a missing break statement.
+
 2013-12-31  Ethan A Merritt  <merritt@u.washington.edu>
 
 	Increment patchlevel to 4.6.5
