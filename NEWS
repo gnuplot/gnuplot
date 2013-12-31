@@ -15,6 +15,7 @@ New features, changes and fixes since gnuplot version 4.6.4
 * FIX "pause mouse" worked only for right- or center- click, not left-click
 * FIX emf terminal font initialization
 * FIX wxt terminal vertical centering of enhanced text
+* FIX win terminal filled polygon bugs
 
 New features, changes and fixes in gnuplot version 4.6.4
 ========================================================

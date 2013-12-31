@@ -1,3 +1,7 @@
+2013-12-31  Ethan A Merritt  <merritt@u.washington.edu>
+
+	Increment patchlevel to 4.6.5
+
 2013-12-29  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/win/wgraph.c (drawgraph) term/win.trm (WIN_filled_polygon):
