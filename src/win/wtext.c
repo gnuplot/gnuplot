@@ -1,5 +1,5 @@
 /*
- * $Id: wtext.c,v 1.45 2013/12/27 19:51:22 markisch Exp $
+ * $Id: wtext.c,v 1.46 2014/01/01 09:48:09 markisch Exp $
  */
 
 /* GNUPLOT - win/wtext.c */
@@ -524,6 +524,9 @@ TextPutCh(LPTW lptw, BYTE ch)
 	case '\t': {
 	    uint tab = 8 - (lptw->CursorPos.x  % 8);
 	    sb_last_insert_str(&(lptw->ScreenBuffer), lptw->CursorPos.x, "        ", tab);
+	    UpdateText(lptw, tab);
+	    UpdateScrollBars(lptw);
+	    TextToCursor(lptw);
 	    break;
 	}
 	case 0x08:
@@ -1582,6 +1585,11 @@ WndTextProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
     case WM_CHAR: {
 	/* store key in circular buffer */
 	long count = lptw->KeyBufIn - lptw->KeyBufOut;
+	WPARAM key = wParam;
+
+	/* Remap Shift-Tab to FS */
+	if ((GetKeyState(VK_SHIFT) < 0) && (key == 0x09))
+		key = 034;
 
 	if (count < 0)
 	    count += lptw->KeyBufSize;
@@ -1594,7 +1602,7 @@ WndTextProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		return 0; /* not enough memory */
 	}
 	if (count < lptw->KeyBufSize-1) {
-	    *lptw->KeyBufIn++ = wParam;
+	    *lptw->KeyBufIn++ = key;
 	    if (lptw->KeyBufIn - lptw->KeyBuf >= lptw->KeyBufSize)
 		lptw->KeyBufIn = lptw->KeyBuf;	/* wrap around */
 	}
@@ -1631,7 +1639,7 @@ WndTextProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		    cbuf = (BYTE *) GlobalLock(hGMem);
 		    while (*cbuf) {
 			if (*cbuf != '\n')
-			    SendMessage(lptw->hWndText,WM_CHAR,*cbuf,1L);
+			    SendMessage(lptw->hWndText, WM_CHAR, *cbuf, 1L);
 			cbuf++;
 		    }
 		    GlobalUnlock(hGMem);

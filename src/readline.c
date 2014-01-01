@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: readline.c,v 1.58 2011/09/04 12:01:37 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: readline.c,v 1.59 2013/08/23 18:56:32 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - readline.c */
@@ -250,7 +250,7 @@ static int ansi_getc __PROTO((void));
 #   define special_getc() win_getch()
 static char win_getch __PROTO((void));
 #  else
-#  define special_getc() msdos_getch()
+#   define special_getc() msdos_getch()
 #  endif /* WGP_CONSOLE */
 static char msdos_getch __PROTO((void));	/* HBB 980308: PROTO'ed it */
 #  define DEL_ERASES_CURRENT_CHAR
@@ -361,12 +361,12 @@ user_puts(char *str)
 /* EAM FIXME
  * This test is intended to determine if the current character, of which
  * we have only seen the first byte so far, will require twice the width
- * of an ascii character.  The test catches glyphs above unicode 0x3000, 
+ * of an ascii character.  The test catches glyphs above unicode 0x3000,
  * which is roughly the set of CJK characters.
  * It should be replaced with a more accurate test.
  */
 static int
-mbwidth(char *c) 
+mbwidth(char *c)
 {
     switch (encoding) {
 
@@ -375,7 +375,7 @@ mbwidth(char *c)
 	wchar_t wc;
 	if (mbtowc(&wc, c, MB_CUR_MAX) < 0)
 	    return 1;
-	else 
+	else
 	    return wcwidth(wc);
 #else
 	return ((unsigned char)(*c) >= 0xe3 ? 2 : 1);
@@ -407,7 +407,7 @@ char_seqlen()
     case S_ENC_UTF8:
 	i = cur_pos;
 	do {i++;}
-	    while ((cur_line[i] & 0xc0) != 0xc0 
+	    while ((cur_line[i] & 0xc0) != 0xc0
 	        && (cur_line[i] & 0x80) != 0
 		&& i < max_pos);
 	return (i - cur_pos);
@@ -431,10 +431,10 @@ backspace()
     case S_ENC_UTF8:
 	seqlen = 0;
 	do {cur_pos--; seqlen++;}
-	    while ((cur_line[cur_pos] & 0xc0) != 0xc0 
+	    while ((cur_line[cur_pos] & 0xc0) != 0xc0
 	        && (cur_line[cur_pos] & 0x80) != 0
 		&& cur_pos > 0);
-    
+
 	if ((cur_line[cur_pos] & 0xc0) == 0xc0
 	||  isprint(cur_line[cur_pos]))
 	    user_putc(BACKSPACE);
@@ -549,7 +549,7 @@ fn_completion(size_t anchor_pos, int direction)
 	    n_completions = 0;
 	    completion_idx = 0;
 	}
-	
+
 	/* extract path to complete */
 	start = cur_line + anchor_pos;
 	if (anchor_pos > 0) {
@@ -604,7 +604,8 @@ fn_completion(size_t anchor_pos, int direction)
 	    struct dirent * entry;
 	    while ((entry = readdir(dir)) != NULL) {
 		/* ignore files and directories starting with a dot */
-		if (entry->d_name[0] == '.') continue; 
+		if (entry->d_name[0] == '.')
+		    continue;
 
 		/* skip entries which don't match */
 		if (nlen > 0)
@@ -619,10 +620,10 @@ fn_completion(size_t anchor_pos, int direction)
 	    closedir(dir);
 	    free(search);
 	    if (name) free(name);
-            if (n_completions > 0)
-	        return completions[0];
-            else 
-                return NULL;
+	    if (n_completions > 0)
+		return completions[0];
+	    else
+		return NULL;
 	}
 	free(search);
 	if (name) free(name);
@@ -686,8 +687,8 @@ tab_completion(TBOOLEAN forward)
 
     /* insert completion string */
     if (max_pos > (last_tab_pos - last_completion_len))
-	memmove(cur_line + last_tab_pos + completion_len, 
-		cur_line + last_tab_pos + last_completion_len, 
+	memmove(cur_line + last_tab_pos + completion_len,
+		cur_line + last_tab_pos + last_completion_len,
 		max_pos  - last_tab_pos - last_completion_len);
     memcpy(cur_line + last_tab_pos, completion, completion_len);
     max_pos += completion_len - last_completion_len;
@@ -766,7 +767,7 @@ readline(const char *prompt)
 			fix_line(); /* Normal ascii character */
 		    else if ((cur_char & 0xc0) == 0xc0)
 			; /* start of a multibyte sequence. */
-		    else if (((cur_char & 0xc0) == 0x80) && 
+		    else if (((cur_char & 0xc0) == 0x80) &&
 			 ((unsigned char)(cur_line[cur_pos-2]) >= 0xe0))
 			; /* second byte of a >2 byte sequence */
 		    else {
@@ -846,6 +847,9 @@ readline(const char *prompt)
 #if defined(HAVE_DIRENT_H) || defined(WIN32)
 	    case 011:		/* ^I / TAB */
 		tab_completion(TRUE); /* next tab completion */
+		break;
+	    case 034:		/* remapped by wtext.c or ansi_getc from Shift-Tab */
+		tab_completion(FALSE); /* previous tab completion */
 		break;
 #endif
 	    case 013:		/* ^K */
@@ -1113,6 +1117,9 @@ ansi_getc()
 	    case 'H':		/* home key */
 		c = 001;
 		break;
+	    case 'Z':		/* shift-tab key */
+		c = 034;	/* FS: non-standard! */
+		break;
 	    case '3':		/* DEL can be <esc>[3~ */
 		getc(stdin);	/* eat the ~ */
 		c = 023;	/* DC3 ^S NB: non-standard!! */
@@ -1141,7 +1148,7 @@ static char
 msdos_getch()
 {
 	char c;
-	
+
 #ifdef DJGPP
     int ch = getkey();
     c = (ch & 0xff00) ? 0 : ch & 0xff;

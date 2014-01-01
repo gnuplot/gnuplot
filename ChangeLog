@@ -1,5 +1,9 @@
 2014-01-01  Bastian Maerkisch  <bmaerkisch@web.de>
 
+	* src/readline.c (readline, ansi_getc) src/win/wtext.c (WndTextProc):
+	Builtin-readline: Shift-Tab cycles through the list of completions
+	in reverse direction.
+
 	* src/graphics.c (get_arrow, do_ellipse) src/graph3d.c (get_arrow3d)
 	src/term.c (do_arc):  The aspect ratio of the internal coordinates
 	of the windows terminal is always one. 
