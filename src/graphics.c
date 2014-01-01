@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.439 2013/10/19 04:31:04 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.440 2013/12/26 17:58:29 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -185,6 +185,11 @@ get_arrow(
     } else if (arrow->type == arrow_end_oriented) {
 	double aspect = (double)term->v_tic / (double)term->h_tic;
 	double radius, junk;
+
+#ifdef WIN32
+	if (strcmp(term->name, "windows") == 0)
+	    aspect = 1.;
+#endif
 	map_position_r(&arrow->end, &radius, &junk, "arrow");
 	*ex = *sx + cos(DEG2RAD * arrow->angle) * radius;
 	*ey = *sy + sin(DEG2RAD * arrow->angle) * radius * aspect;
@@ -3899,7 +3904,7 @@ attach_title_to_plot(struct curve_points *this_plot, legend_key *key)
 	/* Draw key text in black */
 	(*t->linetype)(LT_BLACK);
 
-    write_multiline(x, y, this_plot->title, 
+    write_multiline(x, y, this_plot->title,
     	(this_plot->title_position > 0) ? LEFT : RIGHT, JUST_TOP, 0, key->font);
 }
 
@@ -4042,6 +4047,11 @@ do_ellipse( int dimensions, t_ellipse *e, int style, TBOOLEAN do_own_mapping )
     /* Choose how many segments to draw for this ellipse */
     int segments = 72;
     double ang_inc  =  M_PI / 36.;
+
+#ifdef WIN32
+    if (strcmp(term->name, "windows") == 0)
+	aspect = 1.;
+#endif
 
     /* Find the center of the ellipse */
     /* If this ellipse is part of a plot - as opposed to an object -

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.269 2013/10/25 03:10:28 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.270 2013/12/22 20:47:25 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -1332,7 +1332,7 @@ do_arrow(
 	    head_points[3].x = ex + x2;
 	    head_points[3].y = ey + y2;
 	    head_points[4].x = ex + xm;
-	    head_points[4].y = ey + ym;	    
+	    head_points[4].y = ey + ym;
 	    if (curr_arrow_headfilled >= AS_FILLED) {
 		/* draw filled forward arrow head */
 		head_points->style = FS_OPAQUE;
@@ -1431,6 +1431,10 @@ do_arc(
 
     /* Calculate the vertices */
     aspect = (double)term->v_tic / (double)term->h_tic;
+#ifdef WIN32
+    if (strcmp(term->name, "windows") == 0)
+	aspect = 1.;
+#endif
     for (i=0; i<segments; i++) {
 	vertex[i].x = cx + cos(DEG2RAD * (arc_start + i*INC)) * radius;
 	vertex[i].y = cy + sin(DEG2RAD * (arc_start + i*INC)) * radius * aspect;

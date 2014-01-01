@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.297 2013/12/20 04:06:43 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.298 2013/12/26 17:58:28 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -346,7 +346,7 @@ boundary3d(struct surface_points *plots, int count)
 	&& key->margin == GPKEY_BMARGIN) {
 	if (ptitl_cnt > 0) {
 	    /* calculate max no cols, limited by label-length */
-	    key_cols = (int) (plot_bounds.xright - plot_bounds.xleft) 
+	    key_cols = (int) (plot_bounds.xright - plot_bounds.xleft)
 		     / ((max_ptitl_len + 4) * t->h_char + key_sample_width);
 	    /* HBB 991019: fix division by zero problem */
 	    if (key_cols == 0)
@@ -446,7 +446,7 @@ boundary3d(struct surface_points *plots, int count)
     xmiddle = (plot_bounds.xright + plot_bounds.xleft) / 2;
     ymiddle = (plot_bounds.ytop + plot_bounds.ybot) / 2;
 
-    
+
     /* HBB: Magic number alert! */
     xscaler = ((plot_bounds.xright - plot_bounds.xleft) * 4L) / 7L;
     yscaler = ((plot_bounds.ytop - plot_bounds.ybot) * 4L) / 7L;
@@ -511,6 +511,11 @@ get_arrow3d(
 	double aspect = (double)term->v_tic / (double)term->h_tic;
 	double radius;
 	int junkw, junkh;
+
+#ifdef WIN32
+	if (strcmp(term->name, "windows") == 0)
+	    aspect = 1.;
+#endif
 	if (arrow->end.scalex != screen && arrow->end.scalex != character && !splot_map)
 	    return FALSE;
 	map3d_position_r(&arrow->end, &junkw, &junkh, "arrow");
@@ -871,7 +876,7 @@ do_3dplot(
     /* "set key opaque" requires two passes, with the key drawn in the second pass */
     xl_save = xl; yl_save = yl;
     SECOND_KEY_PASS:
-	
+
     /* This tells the canvas and svg terminals to restart the plot count */
     /* so that the key titles are in sync with the plots they describe.  */
     (*t->layer)(TERM_LAYER_RESET_PLOTNO);
@@ -901,9 +906,9 @@ do_3dplot(
 	    closepath();
 
 	    /* draw a horizontal line between key title and first entry  JFi */
-	    clip_move(key->bounds.xleft, 
+	    clip_move(key->bounds.xleft,
 			key->bounds.ytop - key_title_height - key_title_extra);
-	    clip_vector(key->bounds.xright, 
+	    clip_vector(key->bounds.xright,
 			key->bounds.ytop - key_title_height - key_title_extra);
 	}
 
@@ -1291,7 +1296,7 @@ do_3dplot(
 		    cntrs = cntrs->next;
 		} /* loop over contours */
 	    } /* draw contours */
-	    
+
 	    /* Sync point for end of this curve (used by svg, post, ...) */
 	    (term->layer)(TERM_LAYER_AFTER_PLOT);
 
@@ -1502,7 +1507,7 @@ plot3d_lines(struct surface_points *plot)
 		plot->lp_properties.pm3d_color.lt = (int)(points[i].CRD_COLOR);
 		apply_pm3dcolor(&(plot->lp_properties.pm3d_color), term);
 	    }
-	
+
 	    switch (points[i].type) {
 	    case INRANGE:{
 		    map3d_xy(points[i].x, points[i].y, points[i].z, &x, &y);
@@ -2460,7 +2465,7 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid,
 		    write_multiline(x1, y1, Y_AXIS.label.text, h_just, v_just,
 				    0, Y_AXIS.label.font);
 		}
-		
+
 		reset_textcolor(&(Y_AXIS.label.textcolor),t);
 		ignore_enhanced(FALSE);
 #ifdef USE_GRID_LAYERS
@@ -3228,7 +3233,7 @@ plot3d_vectors(struct surface_points *plot)
     apply_3dhead_properties(&ap);
 
     for (i = 0; i < plot->iso_crvs->p_count; i++) {
-	
+
 	if (heads[i].type == UNDEFINED || tails[i].type == UNDEFINED)
 	    continue;
 
@@ -3340,12 +3345,12 @@ do_3dkey_layout(legend_key *key, int *xinkey, int *yinkey)
 	    if (ptitl_cnt > 0) {
 		/* we divide into columns, then centre in column by considering
 		 * ratio of key_left_size to key_right_size
-		 * key_size_left / (key_size_left+key_size_right) 
+		 * key_size_left / (key_size_left+key_size_right)
 		 *               * (plot_bounds.xright-plot_bounds.xleft)/key_cols
 		 * do one integer division to maximise accuracy (hope we dont overflow!)
 		 */
 		*xinkey = plot_bounds.xleft
-		   + ((plot_bounds.xright - plot_bounds.xleft) * key_size_left) 
+		   + ((plot_bounds.xright - plot_bounds.xleft) * key_size_left)
 		   / (key_cols * (key_size_left + key_size_right));
 		key->bounds.xleft = *xinkey - key_size_left;
 		key->bounds.xright = key->bounds.xleft + key_width;
@@ -3386,7 +3391,7 @@ do_3dkey_layout(legend_key *key, int *xinkey, int *yinkey)
 	    }
 	}
 	yl_ref = *yinkey - key_title_height - key_title_extra;
-   
+
     }
 
     /* Center the key entries vertically, allowing for requested extra space */
