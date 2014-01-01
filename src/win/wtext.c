@@ -1,5 +1,5 @@
 /*
- * $Id: wtext.c,v 1.44 2013/08/17 00:02:09 sfeam Exp $
+ * $Id: wtext.c,v 1.45 2013/12/27 19:51:22 markisch Exp $
  */
 
 /* GNUPLOT - win/wtext.c */
@@ -1412,8 +1412,8 @@ WndTextProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			lptw->KeyBufIn = lptw->KeyBuf;	/* wrap around */
 		}
 	    }
+		break;
 	    case VK_CANCEL:
-		/* FIXME: Currently, this only supports interrupting fit. */
 		ctrlc_flag = TRUE;
 		break;
 	    } /* switch(wparam) */

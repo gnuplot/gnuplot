@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: fit.c,v 1.120 2013/06/27 20:03:41 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: fit.c,v 1.121 2013/08/21 04:05:57 sfeam Exp $"); }
 #endif
 
 /*  NOTICE: Change of Copyright Status
@@ -719,8 +719,6 @@ regress(double a[])
 
     /* HBB 981118: initialize new variable 'user_break' */
     user_stop = FALSE;
-    /* FIXME: This really should not be necessary, but it is not properly initialised in wgnuplot otherwise. */
-    ctrlc_flag = FALSE;
 
     do {
 /*
