@@ -1,3 +1,11 @@
+2014-01-02  Jérôme Lodewyck  <lodewyck@users.sourceforge.net>
+
+	* src/qtterminal/QtGnuplotWidget.* src/qtterminal/QtGnuplotWindow.cpp:
+	The Qt guidelines state that the "parent" variable should be the last
+	argument of the contructor of a class derived from QWidget. Revert the
+	QtGnuplotWidget constructor declaration to respect this rule. Add a second
+	contructor with a single argument to enable loading from a ui file.
+
 2014-01-01  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/readline.c (readline, ansi_getc) src/win/wtext.c (WndTextProc):

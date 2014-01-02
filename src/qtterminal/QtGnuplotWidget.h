@@ -65,7 +65,8 @@ class QtGnuplotWidget : public QWidget, public QtGnuplotEventReceiver
 Q_OBJECT
 
 public:
-	QtGnuplotWidget(QWidget* parent = 0, int id = 0, QtGnuplotEventHandler* eventHandler = 0);
+	QtGnuplotWidget(QWidget* parent);
+	QtGnuplotWidget(int id = 0, QtGnuplotEventHandler* eventHandler = 0, QWidget* parent = 0);
 
 	Q_PROPERTY(bool antialias READ antialias WRITE setAntialias);
 	Q_PROPERTY(bool rounded READ rounded WRITE setRounded);
@@ -115,6 +116,7 @@ protected:
 	virtual void resizeEvent(QResizeEvent* event);
 
 private:
+	void init();
 	void setViewMatrix();
 	QPixmap createPixmap();
 	QPainter::RenderHints renderHints() const;

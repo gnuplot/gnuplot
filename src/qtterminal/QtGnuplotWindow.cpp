@@ -62,7 +62,7 @@ QtGnuplotWindow::QtGnuplotWindow(int id, QtGnuplotEventHandler* eventHandler, QW
 		                 "qtgnuplot" + QString::number(QCoreApplication::applicationPid()));
 
 	// Central widget
-	m_widget = new QtGnuplotWidget(this, m_id, m_eventHandler);
+	m_widget = new QtGnuplotWidget(m_id, m_eventHandler, this);
 	QSettings settings("gnuplot", "qtterminal");
 	settings.beginGroup("view");
 	m_widget->loadSettings(settings);

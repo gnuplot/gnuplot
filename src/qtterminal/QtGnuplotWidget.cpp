@@ -51,17 +51,31 @@
 
 int QtGnuplotWidget::m_widgetUid = 1;
 
-QtGnuplotWidget::QtGnuplotWidget(QWidget* parent, int id, QtGnuplotEventHandler* eventHandler)
+QtGnuplotWidget::QtGnuplotWidget(QWidget* parent)
+	: QWidget(parent)
+	, m_id(0)
+{
+	m_eventHandler = 0;
+	init();
+}
+
+QtGnuplotWidget::QtGnuplotWidget(int id, QtGnuplotEventHandler* eventHandler, QWidget* parent)
 	: QWidget(parent)
 	, m_id(id)
-	, m_active(false)
-	, m_lastSizeRequest(-1, -1)
-	, m_rounded(true)
-	, m_backgroundColor(Qt::white)
-	, m_antialias(true)
-	, m_replotOnResize(true)
 {
 	m_eventHandler = eventHandler;
+	init();
+}
+
+void QtGnuplotWidget::init()
+{
+	m_active = false;
+	m_lastSizeRequest = QSize(-1, -1);
+	m_rounded = true;
+	m_backgroundColor = Qt::white;
+	m_antialias = true;
+	m_replotOnResize = true;
+
 	// Register as the main event receiver if not already created
 	if (m_eventHandler == 0)
 		m_eventHandler = new QtGnuplotEventHandler(this,"qtgnuplot" +
