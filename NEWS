@@ -1,7 +1,8 @@
-New features, changes and fixes since gnuplot version 4.6.4
-===========================================================
+New features, changes and fixes in gnuplot version 4.6.5
+========================================================
 
 * NEW monotonic cubic splines using "smooth mcsplines"
+* NEW allow '+' pseudofile to sample the T axis in 2D parametric plots
 * NEW "sixel" terminal driver
 * NEW new object attribute clip/noclip
 * CHANGE maximum number of using spec columns is now 11

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.212.2.25 2013/10/25 21:00:58 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.212.2.26 2013/10/29 05:18:05 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -4946,26 +4946,30 @@ static char *
 df_generate_pseudodata()
 {
     /* Pseudofile '+' returns a set of (samples) x coordinates */
-    /* This code copied from that in second pass through eval_plots() */
+    /* This code based on that in second pass through eval_plots() */
     if (df_pseudodata == 1) {
 	static double t, t_min, t_max, t_step;
 	if (df_pseudorecord >= samples_1)
 	    return NULL;
 	if (df_pseudorecord == 0) {
-	    if (parametric || polar)
-		int_error(NO_CARET,"Pseudodata not yet implemented for polar or parametric graphs");
-	    if (axis_array[FIRST_X_AXIS].max == -VERYLARGE)
-		axis_array[FIRST_X_AXIS].max = 10;
-	    if (axis_array[FIRST_X_AXIS].min == VERYLARGE)
-		axis_array[FIRST_X_AXIS].min = -10;
-	    t_min = X_AXIS.min;
-	    t_max = X_AXIS.max;
-	    axis_unlog_interval(x_axis, &t_min, &t_max, 1);
+	    if (polar) {
+		int_error(NO_CARET,"Pseudodata not implemented for polar graphs");
+	    } else if (parametric) {
+		t_min = axis_array[T_AXIS].min;
+		t_max = axis_array[T_AXIS].max;
+	    } else {
+		if (axis_array[FIRST_X_AXIS].max == -VERYLARGE)
+		    axis_array[FIRST_X_AXIS].max = 10;
+		if (axis_array[FIRST_X_AXIS].min == VERYLARGE)
+		    axis_array[FIRST_X_AXIS].min = -10;
+		t_min = X_AXIS.min;
+		t_max = X_AXIS.max;
+		axis_unlog_interval(x_axis, &t_min, &t_max, 1);
+	    }
 	    t_step = (t_max - t_min) / (samples_1 - 1);
 	}
 	t = t_min + df_pseudorecord * t_step;
-	t = AXIS_DE_LOG_VALUE(x_axis, t);
-	sprintf(line,"%g",t);
+	sprintf(line,"%g", (parametric) ? t : AXIS_DE_LOG_VALUE(x_axis, t));
 	++df_pseudorecord;
     }
 
