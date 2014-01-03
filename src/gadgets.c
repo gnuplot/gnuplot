@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gadgets.c,v 1.104 2013/12/26 17:58:28 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gadgets.c,v 1.105 2013/12/28 21:36:46 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - gadgets.c */
@@ -521,6 +521,12 @@ clip_polygon(gpiPoint *in, gpiPoint *out, int in_length, int *out_length)
     int i;
     gpiPoint clip_boundary[5];
     static gpiPoint *tmp_corners = NULL;
+
+    if (!clip_area) {
+	memcpy(out, in, in_length * sizeof(gpiPoint));
+	*out_length = in_length;
+	return;
+    }
     tmp_corners = gp_realloc(tmp_corners, 2 * in_length * sizeof(gpiPoint), "clip_polygon");
 
     /* vertices of the rectangular clipping window starting from
