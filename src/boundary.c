@@ -1,5 +1,5 @@
 /*
- * $Id: boundary.c,v 1.5 2013/09/23 21:35:22 sfeam Exp $
+ * $Id: boundary.c,v 1.6 2013/09/26 22:45:33 sfeam Exp $
  */
 
 /* GNUPLOT - boundary.c */
@@ -1224,6 +1224,10 @@ do_key_sample(
 #ifdef EAM_OBJECTS
 	if (this_plot->plot_style == CIRCLES && w > 0) {
 	    do_arc(xl + key_point_offset, yl, key_entry_height/4, 0., 360., style, FALSE);
+	    /* Retrace the border if the style requests it */
+	    if (need_fill_border(fs)) {
+	        do_arc(xl + key_point_offset, yl, key_entry_height/4, 0., 360., 0, FALSE);
+	    }
 	} else if (this_plot->plot_style == ELLIPSES && w > 0) {
 	    t_ellipse *key_ellipse = (t_ellipse *) gp_alloc(sizeof(t_ellipse),
 	        "cute little ellipse for the key sample");
@@ -1234,6 +1238,10 @@ do_key_sample(
 	    key_ellipse->orientation = 0.0;
 	    /* already in term coords, no need to map */
 	    do_ellipse(2, key_ellipse, style, FALSE);
+	    /* Retrace the border if the style requests it */
+	    if (need_fill_border(fs)) {
+		do_ellipse(2, key_ellipse, 0, FALSE);
+	    }
 	    free(key_ellipse);
 	} else
 #endif
