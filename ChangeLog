@@ -1,3 +1,9 @@
+2014-01-03  Christoph Bersch <usenet@bersch.net>
+
+	* src/graphics.c (do_key_sample):  Apply requested border around filled
+	circle or ellipse used as a key sample.
+	Bug #1315
+
 2014-01-03  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/datafile.c (df_generate_pseudodata):  Allow use of '+' pseudofile

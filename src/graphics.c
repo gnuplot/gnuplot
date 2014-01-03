@@ -5773,6 +5773,10 @@ do_key_sample(
 #ifdef EAM_OBJECTS
 	if (this_plot->plot_style == CIRCLES && w > 0) {
 	    do_arc(xl + key_point_offset, yl, key_entry_height/4, 0., 360., style);
+	    /* Retrace the border if the style requests it */
+	    if (need_fill_border(fs)) {
+	        do_arc(xl + key_point_offset, yl, key_entry_height/4, 0., 360., 0);
+	    }
 	} else if (this_plot->plot_style == ELLIPSES && w > 0) {
 	    t_ellipse *key_ellipse = (t_ellipse *) gp_alloc(sizeof(t_ellipse), 
 	        "cute little ellipse for the key sample");
@@ -5783,6 +5787,10 @@ do_key_sample(
 	    key_ellipse->orientation = 0.0;
 	    /* already in term coords, no need to map */
 	    do_ellipse(2, key_ellipse, style, FALSE);
+	    /* Retrace the border if the style requests it */
+	    if (need_fill_border(fs)) {
+		do_ellipse(2, key_ellipse, 0, FALSE);
+	    }
 	    free(key_ellipse);
 	} else
 #endif
@@ -5987,12 +5995,7 @@ do_ellipse( int dimensions, t_ellipse *e, int style, TBOOLEAN do_own_mapping )
     int segments = 72;
     double ang_inc  =  M_PI / 36.;
 
-#ifdef WIN32
-    if (strcmp(term->name, "windows") == 0)
-	aspect = 1.;
-#endif
-
-	/* Find the center of the ellipse */
+    /* Find the center of the ellipse */
     /* If this ellipse is part of a plot - as opposed to an object -
      * then the caller plot_ellipses function already did the mapping for us.
      * Else we do it here. The 'ellipses' plot style is 2D only, but objects 
