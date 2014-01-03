@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.263 2013/10/25 21:00:41 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.264 2013/12/28 21:27:32 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -5007,24 +5007,29 @@ df_generate_pseudodata()
 	if (df_pseudorecord >= samples_1)
 	    return NULL;
 	if (df_pseudorecord == 0) {
-	    if (parametric || polar)
-		int_error(NO_CARET,"Pseudodata not yet implemented for polar or parametric graphs");
-	    if (axis_array[FIRST_X_AXIS].max == -VERYLARGE)
-		axis_array[FIRST_X_AXIS].max = 10;
-	    if (axis_array[FIRST_X_AXIS].min == VERYLARGE)
-		axis_array[FIRST_X_AXIS].min = -10;
+	    if (polar)
+		int_error(NO_CARET,"Pseudodata not implemented for polar graphs");
 	    if ((axis_array[SAMPLE_AXIS].range_flags & RANGE_SAMPLED)) {
 		t_min = axis_array[SAMPLE_AXIS].min;
 		t_max = axis_array[SAMPLE_AXIS].max;
+		/* FIXME:  Do we need to hangle log-scaled SAMPLE_AXIS? */
+	    } else if (parametric) {
+		t_min = axis_array[T_AXIS].min;
+		t_max = axis_array[T_AXIS].max;
 	    } else {
+		if (axis_array[FIRST_X_AXIS].max == -VERYLARGE)
+		    axis_array[FIRST_X_AXIS].max = 10;
+		if (axis_array[FIRST_X_AXIS].min == VERYLARGE)
+		    axis_array[FIRST_X_AXIS].min = -10;
 		t_min = X_AXIS.min;
 		t_max = X_AXIS.max;
+		axis_unlog_interval(x_axis, &t_min, &t_max, 1);
 	    }
-	    axis_unlog_interval(x_axis, &t_min, &t_max, 1);
 	    t_step = (t_max - t_min) / (samples_1 - 1);
 	}
 	t = t_min + df_pseudorecord * t_step;
-	t = AXIS_DE_LOG_VALUE(x_axis, t);
+	if (!parametric)
+	    t = AXIS_DE_LOG_VALUE(x_axis, t);
 	if (df_current_plot->sample_var)
 	    Gcomplex(&(df_current_plot->sample_var->udv_value), t, 0.0);
 	sprintf(line,"%g",t);
