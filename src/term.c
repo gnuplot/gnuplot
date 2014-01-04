@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.270 2013/12/22 20:47:25 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.271 2014/01/01 09:48:38 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -3086,6 +3086,19 @@ check_for_mouse_events()
 #ifdef USE_MOUSE
     if (term_initialised && term->waitforinput) {
 	term->waitforinput(TERM_ONLY_CHECK_MOUSING);
+    }
+#endif
+#ifdef WIN32
+    /* Process windows GUI events (e.g. for text window, or wxt and windows terminals) */
+    WinMessageLoop();
+    /* On Windows, Ctrl-C only sets this flag. */
+    /* The next block duplicates the behaviour of inter(). */
+    if (ctrlc_flag) {
+    ctrlc_flag = FALSE;
+	term_reset();
+	putc('\n', stderr);
+    fprintf(stderr, "Ctrl-C detected!\n");
+	bail_to_command_line();	/* return to prompt */
     }
 #endif
 }

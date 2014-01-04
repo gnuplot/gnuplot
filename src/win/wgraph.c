@@ -1,5 +1,5 @@
 /*
- * $Id: wgraph.c,v 1.171 2013/12/27 19:51:22 markisch Exp $
+ * $Id: wgraph.c,v 1.172 2013/12/29 19:16:23 markisch Exp $
  */
 
 /* GNUPLOT - win/wgraph.c */
@@ -66,7 +66,7 @@
 #ifdef HAVE_GDIPLUS
 #include "wgdiplus.h"
 #endif
-#include "fit.h"
+#include "plot.h"
 
 #ifdef USE_MOUSE
 /* Petr Mikulik, February 2001
@@ -223,10 +223,10 @@ static void	SetFont(LPGW lpgw, HDC hdc);
 static void	SelFont(LPGW lpgw);
 static LPWSTR	UnicodeText(const char *str, enum set_encoding_id encoding);
 static void	dot(HDC hdc, int xdash, int ydash);
-static unsigned luma_from_color(unsigned red, unsigned green, unsigned blue);
+static unsigned	luma_from_color(unsigned red, unsigned green, unsigned blue);
 static unsigned int WDPROC GraphGetTextLength(LPGW lpgw, HDC hdc, LPCSTR text);
 static int	draw_enhanced_text(LPGW lpgw, HDC hdc, LPRECT rect, int x, int y, char * str);
-static void draw_get_enhanced_text_extend(PRECT extend);
+static void	draw_get_enhanced_text_extend(PRECT extend);
 static void	draw_text_justify(HDC hdc, int justify);
 static void	draw_put_text(LPGW lpgw, HDC hdc, int x, int y, char * str);
 static void	drawgraph(LPGW lpgw, HDC hdc, LPRECT rect);
@@ -3845,6 +3845,11 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 					/* Ctrl-S: Save As EMF */
 					SendMessage(hwnd,WM_COMMAND,M_SAVE_AS_EMF,0L);
 					break;
+				case VK_END:
+					/* use CTRL-END as break key */
+					ctrlc_flag = TRUE;
+					PostMessage(graphwin->hWndGraph, WM_NULL, 0, 0);
+					break;
 				} /* switch(wparam) */
 			} else {
 				/* First, look for a change in modifier status */
@@ -3949,8 +3954,8 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 				Wnd_exec_event(lpgw, lParam, GE_keypress, GP_F12);
 				break;
 			case VK_CANCEL:
-				/* FIXME: Currently, this only supports interrupting fit. */
 				ctrlc_flag = TRUE;
+				PostMessage(graphwin->hWndGraph, WM_NULL, 0, 0);
 				break;
 			} /* switch (wParam) */
 

@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: win.trm,v 1.120 2013/12/27 19:28:15 markisch Exp $
+ * $Id: win.trm,v 1.121 2013/12/29 19:16:24 markisch Exp $
  */
 
 /* GNUPLOT - win.trm */
@@ -347,11 +347,13 @@ WIN_options()
 			lpgw = lpgw->next;
 			lpgw->Id = window_number;
 		}
+#ifdef USE_MOUSE
 		/* set status line of previous graph window */
 		sprintf(status, "(inactive, window number %i)", graphwin->Id);
 		Graph_put_tmptext(graphwin, 0, status);
 		/* reset status text */
 		Graph_put_tmptext(lpgw, 0, "");
+#endif
 		graphwin = lpgw;
 	}
 
@@ -630,11 +632,11 @@ WIN_set_clipboard(const char s[])
 TERM_PUBLIC int
 WIN_waitforinput(int options)
 {
-    /* Not implemented: hotkeys during non-interactive input */
-    if (options == TERM_ONLY_CHECK_MOUSING)
-	return '\0';
+	/* Not required: message handling already done elsewhere. */
+	if (options == TERM_ONLY_CHECK_MOUSING)
+		return NUL;
 
-    return ConsoleGetch();
+	return ConsoleGetch();
 }
 
 #endif /* WGP_CONSOLE */

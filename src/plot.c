@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot.c,v 1.158 2013/10/25 04:45:22 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot.c,v 1.159 2013/12/17 00:49:52 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot.c */
@@ -72,7 +72,7 @@ static char *RCSid() { return RCSid("$Id: plot.c,v 1.158 2013/10/25 04:45:22 sfe
 # include "gpexecute.h"
 #endif
 
-#if defined(MSDOS) || defined(__EMX__)
+#if defined(MSDOS) || defined(__EMX__) || (defined(WGP_CONSOLE) && defined(MSVC))
 # include <io.h>
 #endif
 
@@ -154,19 +154,16 @@ char HelpFile[MAXPATH];
 #endif /*   - DJL */
 
 /* a longjmp buffer to get back to the command line */
-/* FIXME HBB 20001103: should probably just use GPFAR, rather than
- * check for _Windows */
-#ifdef _Windows
-static JMP_BUF far command_line_env;
-#else
 static JMP_BUF command_line_env;
-#endif
 
 static void load_rcfile __PROTO((int where));
 static RETSIGTYPE inter __PROTO((int anint));
 static void init_memory __PROTO((void));
 
 static int exit_status = EXIT_SUCCESS;
+
+/* Flag for asynchronous handling of Ctrl-C. Used by fit.c and Windows */
+TBOOLEAN ctrlc_flag = FALSE;
 
 #ifdef OS2
 # include <process.h>
@@ -190,11 +187,22 @@ inter(int anint)
 	 */
     } else
 #endif
+#if defined(WGP_CONSOLE)
+	/* The Windows console Ctrl-C handler runs in another thread. So a
+	   longjmp() would result in crash. Instead, we handle these
+	   events asynchronously.
+	*/
+	ctrlc_flag = TRUE;
+	/* Interrupt ConsoleGetch. */
+	SendMessage(graphwin->hWndGraph, WM_NULL, 0, 0);
+	SendMessage(GetConsoleWindow(), WM_CHAR, 0x20, 0);
+#else
     {
     term_reset();
     (void) putc('\n', stderr);
     bail_to_command_line();	/* return to prompt */
     }
+#endif
 }
 
 #ifdef LINUXVGA
@@ -653,14 +661,16 @@ RECOVER_FROM_ERROR_IN_DASH:
     /* On Windows 'persist' is handled by keeping the main input loop running. */
     if (persist_cl) {
 	interactive = TRUE;
-	while (!com_line());
+	while (!com_line())
+	    ctrlc_flag = FALSE; /* reset asynchronous Ctrl-C flag */
 	interactive = FALSE;
     } else
 #endif
     {
 	/* take commands from stdin */
 	if (noinputfiles)
-	    while (!com_line());
+	    while (!com_line())
+		ctrlc_flag = FALSE; /* reset asynchronous Ctrl-C flag */
     }
 
 #if (defined(HAVE_LIBREADLINE) || defined(HAVE_LIBEDITLINE)) && defined(GNUPLOT_HISTORY)
@@ -688,15 +698,7 @@ RECOVER_FROM_ERROR_IN_DASH:
 void
 interrupt_setup()
 {
-#if defined(WGP_CONSOLE)
-    /* FIXME. CTRC+C crashes console mode gnuplot for windows.
-       Failure of longjmp() is not easy to fix so that the signal
-       of SIGINT is just ignored at the moment.
-    */
-    (void) signal(SIGINT, SIG_IGN);
-#else
     (void) signal(SIGINT, (sigfunc) inter);
-#endif
 
 #ifdef SIGPIPE
     /* ignore pipe errors, this might happen with set output "|head" */

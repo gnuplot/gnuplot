@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: fit.c,v 1.121 2013/08/21 04:05:57 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: fit.c,v 1.122 2014/01/01 09:48:09 markisch Exp $"); }
 #endif
 
 /*  NOTICE: Change of Copyright Status
@@ -184,7 +184,6 @@ const char * FITSTARTLAMBDA = "FIT_START_LAMBDA";
 const char * FITLAMBDAFACTOR = "FIT_LAMBDA_FACTOR";
 const char * FITMAXITER = "FIT_MAXITER";
 
-TBOOLEAN ctrlc_flag = FALSE;
 char fitbuf[256]; /* for Eex and error_ex */
 
 /* private variables: */

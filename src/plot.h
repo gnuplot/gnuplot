@@ -1,5 +1,5 @@
 /*
- * $Id: plot.h,v 1.53 2013/09/07 17:02:03 sfeam Exp $
+ * $Id: plot.h,v 1.54 2013/09/12 21:22:07 sfeam Exp $
  */
 
 /* GNUPLOT - plot.h */
@@ -55,6 +55,8 @@ extern TBOOLEAN noinputfiles;
 extern TBOOLEAN persist_cl;
 
 extern const char *user_shell;
+
+extern TBOOLEAN ctrlc_flag;
 
 #ifdef OS2
 extern TBOOLEAN CallFromRexx;

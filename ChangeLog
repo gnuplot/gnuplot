@@ -1,5 +1,12 @@
 2014-01-04  Bastian Maerkisch  <bmaerkisch@web.de>
 
+	* src/command.c src/fit.c|h src/plot.c|h src/term.c src/win/wgraph.c 
+	src/win/winmain.c src/win/wtext.c term/win.trm:  Handle Ctrl-C
+	asynchronously on Windows (GUI and console mode). This is done by
+	setting ctrlc_flag and testing it in check_for_mouse_event(). Thus,
+	scripts etc. can now finally be interrupted by pressing Ctrl-C in
+	console mode gnuplot or Ctrl-Break in wgnuplot.
+
 	* src/win/winmain.c (ConsoleGetch):  Remap Shift-Tab key-code in
 	console mode, too.
 

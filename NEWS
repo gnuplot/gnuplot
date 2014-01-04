@@ -31,6 +31,8 @@ New features, changes and fixes since gnuplot version 4.6
 * NEW gnuplot -c scriptfile ARG1 ARG2 ARG3
 * NEW format %h is like %g but uses LaTeX or enhanced markup for the exponent
 * NEW LaTeX terminals use math mode for axis tic labels
+* NEW Interrupt scripts or fits by pressing Ctrl-C in Windows console mode
+      gnuplot or Ctrl-Break in wgnuplot.
 * CHANGE mouse events are handled even when the program is not waiting on stdin
 * CHANGE mouse wheel and +/- keys zoom centered on current mouse position
 * CHANGE Provide kdensity bandwidth via a keyword rather than a data column
