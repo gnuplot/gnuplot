@@ -1,5 +1,16 @@
 2014-01-04  Bastian Maerkisch  <bmaerkisch@web.de>
 
+	* src/win/wcommon.h src/win/wgdiplus.cpp|h src/win/wgnuplib.h
+	src/win/wgraph.c src/win/resourc.h term/win.trm:  New (optional)
+	variant of the windows terminal backend which draws using the GDI+ API
+	whenever possible. This is much faster in some cases than the old
+	backend which switches between GDI and GDI+ to support antialiasing
+	and RGBA colors. Images are drawn using GDI since GDI+ always uses some
+	sort of interpolation when scaling images. Enhanced text is currently
+	still drawn using GDI. Adjacent polygons of the same color are merged
+	in order to avoid "seams" between them caused by antialiasing. See also
+	Bug #1096.
+
 	* src/term_api.h src/graphics (plot_image_or_update_axes):  Wrap
 	the fallback image output with term->layer() commands using
 	TERM_LAYER_BEGIN_IMAGE and TERM_LAYER_END_IMAGE. This can be

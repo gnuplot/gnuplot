@@ -1,5 +1,5 @@
 /*
- * $Id: wgraph.c,v 1.173 2014/01/04 02:55:06 markisch Exp $
+ * $Id: wgraph.c,v 1.174 2014/01/04 14:24:24 markisch Exp $
  */
 
 /* GNUPLOT - win/wgraph.c */
@@ -219,14 +219,9 @@ static void	Wnd_GetTextSize(HDC hdc, LPCSTR str, size_t len, int *cx, int *cy);
 static void	GetPlotRect(LPGW lpgw, LPRECT rect);
 static void	MakeFonts(LPGW lpgw, LPRECT lprect, HDC hdc);
 static void	DestroyFonts(LPGW lpgw);
-static void	SetFont(LPGW lpgw, HDC hdc);
 static void	SelFont(LPGW lpgw);
-static LPWSTR	UnicodeText(const char *str, enum set_encoding_id encoding);
 static void	dot(HDC hdc, int xdash, int ydash);
-static unsigned	luma_from_color(unsigned red, unsigned green, unsigned blue);
 static unsigned int WDPROC GraphGetTextLength(LPGW lpgw, HDC hdc, LPCSTR text);
-static int	draw_enhanced_text(LPGW lpgw, HDC hdc, LPRECT rect, int x, int y, char * str);
-static void	draw_get_enhanced_text_extend(PRECT extend);
 static void	draw_text_justify(HDC hdc, int justify);
 static void	draw_put_text(LPGW lpgw, HDC hdc, int x, int y, char * str);
 static void	drawgraph(LPGW lpgw, HDC hdc, LPRECT rect);
@@ -236,13 +231,10 @@ static void	CopyPrint(LPGW lpgw);
 static void	WriteGraphIni(LPGW lpgw);
 static char *	GraphDefaultFont(void);
 static void	ReadGraphIni(LPGW lpgw);
-static void	add_tooltip(LPGW lpgw, PRECT rect, LPWSTR text);
-static void	clear_tooltips(LPGW lpgw);
 static void	track_tooltip(LPGW lpgw, int x, int y);
 static COLORREF	GetColor(HWND hwnd, COLORREF ref);
 static void	UpdateColorSample(HWND hdlg);
 static BOOL	LineStyle(LPGW lpgw);
-static void	GraphChangeFont(LPGW lpgw, LPCSTR font, int fontsize, HDC hdc, RECT rect);
 
 
 /* ================================== */
@@ -553,14 +545,18 @@ GraphInit(LPGW lpgw)
 	AppendMenu(lpgw->hPopMenu, MF_STRING | (lpgw->oversample ? MF_CHECKED : MF_UNCHECKED),
 		M_OVERSAMPLE, "O&versampling");
 #ifdef HAVE_GDIPLUS
+	AppendMenu(lpgw->hPopMenu, MF_STRING | (lpgw->gdiplus ? MF_CHECKED : MF_UNCHECKED),
+		M_GDIPLUS, "GDI&+ only backend");
 	AppendMenu(lpgw->hPopMenu, MF_STRING | (lpgw->antialiasing ? MF_CHECKED : MF_UNCHECKED),
 		M_ANTIALIASING, "&Antialiasing");
 	AppendMenu(lpgw->hPopMenu, MF_STRING | (lpgw->polyaa ? MF_CHECKED : MF_UNCHECKED),
 		M_POLYAA, "Antialiasing of pol&ygons");
-	AppendMenu(lpgw->hPopMenu, MF_STRING | (lpgw->patternaa ? MF_CHECKED : MF_UNCHECKED),
+	AppendMenu(lpgw->hPopMenu, MF_STRING | (lpgw->patternaa || lpgw->gdiplus ? MF_CHECKED : MF_UNCHECKED),
 		M_PATTERNAA, "Antialiasing of patt&erns");
 	AppendMenu(lpgw->hPopMenu, MF_STRING | (lpgw->fastrotation ? MF_CHECKED : MF_UNCHECKED),
 		M_FASTROTATE, "Fast &rotation w/o antialiasing ");
+	if (lpgw->gdiplus)
+		EnableMenuItem(lpgw->hPopMenu, M_PATTERNAA, MF_BYCOMMAND | MF_DISABLED);
 #endif
 	AppendMenu(lpgw->hPopMenu, MF_STRING, M_BACKGROUND, "&Background...");
 	AppendMenu(lpgw->hPopMenu, MF_STRING, M_CHOOSE_FONT, "Choose &Font...");
@@ -939,7 +935,7 @@ DestroyFonts(LPGW lpgw)
 }
 
 
-static void
+void
 SetFont(LPGW lpgw, HDC hdc)
 {
 	SelectObject(hdc, lpgw->hfonth);
@@ -1001,7 +997,7 @@ SelFont(LPGW lpgw)
 }
 
 
-static LPWSTR
+LPWSTR
 UnicodeText(const char *str, enum set_encoding_id encoding)
 {
     UINT codepage;
@@ -1080,7 +1076,7 @@ dot(HDC hdc, int xdash, int ydash)
 }
 
 
-static unsigned
+unsigned
 luma_from_color(unsigned red, unsigned green, unsigned blue)
 {
 	/* convert to gray */
@@ -1229,7 +1225,7 @@ GraphEnhancedFlush(void)
 }
 
 
-static int
+int
 draw_enhanced_text(LPGW lpgw, HDC hdc, LPRECT rect, int x, int y, char * str)
 {
 	char * original_string = str;
@@ -1334,7 +1330,7 @@ draw_enhanced_text(LPGW lpgw, HDC hdc, LPRECT rect, int x, int y, char * str)
 }
 
 
-static void
+void
 draw_get_enhanced_text_extend(PRECT extend)
 {
 	switch (enhstate.lpgw->justify) {
@@ -1441,7 +1437,7 @@ draw_new_brush(LPGW lpgw, HDC hdc, COLORREF color)
 	lpgw->hcolorbrush = new_brush;
 }
 
-static void
+void
 draw_update_keybox(LPGW lpgw, unsigned plotno, unsigned x, unsigned y)
 {
 	LPRECT bb;
@@ -1924,6 +1920,7 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 						dxr = 0;
 					}
 				}
+
 				if (keysample) {
 					draw_update_keybox(lpgw, plotno, xdash - dxl, ydash - vsize);
 					draw_update_keybox(lpgw, plotno, xdash + dxr, ydash + vsize);
@@ -2086,7 +2083,10 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 						rect[i].x += boxedtext.start.x;
 						rect[i].y += boxedtext.start.y;
 					}
-					if (!lpgw->antialiasing) {
+#ifdef HAVE_GDIPLUS
+					if (!lpgw->antialiasing)
+#endif
+					{
 						HBRUSH save_brush;
 						HPEN save_pen;
 
@@ -2102,7 +2102,9 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 						Polygon(hdc, rect, 4);
 						SelectObject(hdc, save_brush);
 						SelectObject(hdc, save_pen);
-					} else {
+					}
+#ifdef HAVE_GDIPLUS
+					else {
 						if (boxedtext.option == TEXTBOX_OUTLINE) {
 							rect[4].x = rect[0].x;
 							rect[4].y = rect[0].y;
@@ -2111,6 +2113,7 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 							gdiplusSolidFilledPolygonEx(hdc, rect, 4, lpgw->background, 1., lpgw->polyaa);
 						}
 					}
+#endif
 				}
 				boxedtext.boxing = FALSE;
 				break;
@@ -2223,7 +2226,6 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 			p.y = GPMIN(ydash, ppt[0].y);
 
 #ifdef HAVE_GDIPLUS
-
 			if (lpgw->antialiasing && lpgw->patternaa &&
 			    (((fillstyle & 0x0f) == FS_PATTERN) ||
 			     ((fillstyle & 0x0f) == FS_TRANSPARENT_PATTERN))) {
@@ -3050,6 +3052,8 @@ WriteGraphIni(LPGW lpgw)
 	WritePrivateProfileString(section, "GraphDoublebuffer", profile, file);
 	wsprintf(profile, "%d", lpgw->oversample);
 	WritePrivateProfileString(section, "GraphOversampling", profile, file);
+	wsprintf(profile, "%d", lpgw->gdiplus);
+	WritePrivateProfileString(section, "GraphGDI+", profile, file);
 	wsprintf(profile, "%d", lpgw->antialiasing);
 	WritePrivateProfileString(section, "GraphAntialiasing", profile, file);
 	wsprintf(profile, "%d", lpgw->polyaa);
@@ -3163,6 +3167,11 @@ ReadGraphIni(LPGW lpgw)
 		lpgw->oversample = FALSE;
 
 	if (bOKINI)
+		GetPrivateProfileString(section, "GraphGDI+", "", profile, 80, file);
+	if ( (p = GetInt(profile, (LPINT)&lpgw->gdiplus)) == NULL)
+		lpgw->gdiplus = TRUE;
+
+	if (bOKINI)
 		GetPrivateProfileString(section, "GraphAntialiasing", "", profile, 80, file);
 	if ( (p = GetInt(profile, (LPINT)&lpgw->antialiasing)) == NULL)
 		lpgw->antialiasing = TRUE;
@@ -3231,7 +3240,7 @@ ReadGraphIni(LPGW lpgw)
 
 /* Hypertext support functions */
 
-static void
+void
 add_tooltip(LPGW lpgw, PRECT rect, LPWSTR text)
 {
 	int idx = lpgw->numtooltips;
@@ -3274,7 +3283,7 @@ add_tooltip(LPGW lpgw, PRECT rect, LPWSTR text)
 }
 
 
-static void
+void
 clear_tooltips(LPGW lpgw)
 {
 	int i;
@@ -3778,6 +3787,7 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 				case M_COLOR:
 				case M_DOUBLEBUFFER:
 				case M_OVERSAMPLE:
+				case M_GDIPLUS:
 				case M_ANTIALIASING:
 				case M_POLYAA:
 				case M_PATTERNAA:
@@ -3993,6 +4003,10 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 					lpgw->doublebuffer = !lpgw->doublebuffer;
 					SendMessage(hwnd, WM_COMMAND, M_REBUILDTOOLS, 0L);
 					return 0;
+				case M_GDIPLUS:
+					lpgw->gdiplus = !lpgw->gdiplus;
+					SendMessage(hwnd, WM_COMMAND, M_REBUILDTOOLS, 0L);
+					return 0;
 				case M_ANTIALIASING:
 					lpgw->antialiasing = !lpgw->antialiasing;
 					SendMessage(hwnd, WM_COMMAND, M_REBUILDTOOLS, 0L);
@@ -4060,6 +4074,13 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 					else
 						CheckMenuItem(lpgw->hPopMenu, M_OVERSAMPLE, MF_BYCOMMAND | MF_UNCHECKED);
 #ifdef HAVE_GDIPLUS
+					if (lpgw->gdiplus) {
+						CheckMenuItem(lpgw->hPopMenu, M_GDIPLUS, MF_BYCOMMAND | MF_CHECKED);
+						EnableMenuItem(lpgw->hPopMenu, M_PATTERNAA, MF_BYCOMMAND | MF_DISABLED);
+					} else {
+						CheckMenuItem(lpgw->hPopMenu, M_GDIPLUS, MF_BYCOMMAND | MF_UNCHECKED);
+						EnableMenuItem(lpgw->hPopMenu, M_PATTERNAA, MF_BYCOMMAND | MF_ENABLED);
+					}
 					if (lpgw->antialiasing)
 						CheckMenuItem(lpgw->hPopMenu, M_ANTIALIASING, MF_BYCOMMAND | MF_CHECKED);
 					else
@@ -4068,7 +4089,7 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 						CheckMenuItem(lpgw->hPopMenu, M_POLYAA, MF_BYCOMMAND | MF_CHECKED);
 					else
 						CheckMenuItem(lpgw->hPopMenu, M_POLYAA, MF_BYCOMMAND | MF_UNCHECKED);
-					if (lpgw->patternaa)
+					if (lpgw->patternaa || lpgw->gdiplus)
 						CheckMenuItem(lpgw->hPopMenu, M_PATTERNAA, MF_BYCOMMAND | MF_CHECKED);
 					else
 						CheckMenuItem(lpgw->hPopMenu, M_PATTERNAA, MF_BYCOMMAND | MF_UNCHECKED);
@@ -4264,7 +4285,12 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 						lpgw->antialiasing = FALSE;
 
 					/* draw into memdc, then copy to hdc */
-					drawgraph(lpgw, memdc, &memrect);
+#ifdef HAVE_GDIPLUS
+					if (lpgw->gdiplus && !(lpgw->rotating && lpgw->fastrotation))
+						drawgraph_gdiplus(lpgw, memdc, &memrect);
+					else
+#endif
+						drawgraph(lpgw, memdc, &memrect);
 
 					/* restore antialiasing */
 					lpgw->antialiasing = save_aa;
@@ -4293,7 +4319,12 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 					DeleteDC(memdc);
 				}
 			} else {
-			    drawgraph(lpgw, hdc, &rect);
+#ifdef HAVE_GDIPLUS
+				if (lpgw->gdiplus && !(lpgw->rotating && lpgw->fastrotation))
+					drawgraph_gdiplus(lpgw, hdc, &rect);
+				else
+#endif
+					drawgraph(lpgw, hdc, &rect);
 			}
 			EndPaint(hwnd, &ps);
 #ifdef USE_MOUSE
@@ -4535,6 +4566,7 @@ Graph_put_tmptext (LPGW lpgw, int where, LPCSTR text )
 		; /* should NEVER happen */
 	}
 }
+
 
 void WDPROC
 Graph_set_clipboard (LPGW lpgw, LPCSTR s)

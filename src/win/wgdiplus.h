@@ -1,5 +1,5 @@
 /*
- * $Id: wgdiplus.h,v 1.4 2011/11/18 07:48:28 markisch Exp $
+ * $Id: wgdiplus.h,v 1.5 2012/05/23 17:18:34 markisch Exp $
  */
 
 /*
@@ -26,11 +26,13 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVE
 ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+
+#include <windows.h>
+#include "wgnuplib.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#include <windows.h>
 
 extern void gdiplusInit(void);
 extern void gdiplusCleanup(void);
@@ -45,6 +47,8 @@ extern void gdiplusSolidFilledPolygonEx(HDC hdc, POINT *ppt, int polyi, COLORREF
 extern void gdiplusPatternFilledPolygonEx(HDC hdc, POINT *ppt, int polyi, COLORREF color, double alpha, COLORREF backcolor, BOOL transparent, int style);
 
 extern void gdiplusCircleEx(HDC hdc, POINT *p, int radius, UINT style, float width, COLORREF color, double alpha);
+
+extern void drawgraph_gdiplus(LPGW lpgw, HDC hdc, LPRECT rect);
 
 #ifdef __cplusplus
 }

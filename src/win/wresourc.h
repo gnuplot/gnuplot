@@ -1,5 +1,5 @@
 /*
- * $Id: wresourc.h,v 1.17 2011/11/18 07:48:28 markisch Exp $
+ * $Id: wresourc.h,v 1.18 2013/04/24 20:05:33 markisch Exp $
  */
 
 /* GNUPLOT - win/wresourc.h */
@@ -73,21 +73,21 @@
 #define M_ABOUT        NUMMENU+10
 #define M_REBUILDTOOLS NUMMENU+11
 #define M_COMMANDLINE  NUMMENU+12
-/* wtext.c */
-#define M_SYSCOLORS    NUMMENU+13
-#define M_WRAP         NUMMENU+17
-
-/* wgraph.c */
-#define M_SAVE_AS_EMF  NUMMENU+14
-#define M_DOUBLEBUFFER NUMMENU+15
-#define M_OVERSAMPLE   NUMMENU+16
+#define M_SAVE_AS_EMF  NUMMENU+13
+#define M_DOUBLEBUFFER NUMMENU+14
+#define M_OVERSAMPLE   NUMMENU+15
+#define M_GDIPLUS      NUMMENU+16
 #define M_ANTIALIASING NUMMENU+17
 #define M_POLYAA       NUMMENU+18
 #define M_PATTERNAA    NUMMENU+19
 #define M_FASTROTATE   NUMMENU+20
 #define M_HIDEGRID     NUMMENU+21
 #define M_HIDEPLOT     NUMMENU+22
-/* Warning: need MAXPLOTSHIDE slots */
+/* Warning: need MAXPLOTSHIDE free slots */
+/* wtext.c */
+#define M_SYSCOLORS    NUMMENU+50
+#define M_WRAP         NUMMENU+51
+
 
 /* wprinter.c */
 #define PSIZE_SBOX 100

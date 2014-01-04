@@ -1,5 +1,5 @@
 /*
- * $Id: wgnuplib.h,v 1.59 2013/06/11 20:54:47 markisch Exp $
+ * $Id: wgnuplib.h,v 1.60 2013/12/27 19:28:15 markisch Exp $
  */
 
 /* GNUPLOT - win/wgnuplib.h */
@@ -44,6 +44,11 @@
 #define WGNUPLIB_H
 
 #include <windows.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "screenbuf.h"
 #include "term_api.h"
 
@@ -334,6 +339,7 @@ typedef struct tagGW {
 	BOOL	rounded;	/* rounded line caps and joins? */
 	BOOL	doublebuffer;	/* double buffering? */
 	BOOL	oversample;	/* oversampling? */
+	BOOL	gdiplus;	/* Use GDI+ only backend? */
 	BOOL	antialiasing;	/* anti-aliasing? */
 	BOOL	polyaa;		/* anti-aliasing for polygons ? */
 	BOOL	patternaa;	/* anti-aliasing for polygons ? */
@@ -434,5 +440,9 @@ void WIN_update_options __PROTO((void));
 
 
 /* ================================== */
+
+#ifdef __cplusplus
+};
 #endif
 
+#endif
