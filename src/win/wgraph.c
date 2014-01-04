@@ -1,5 +1,5 @@
 /*
- * $Id: wgraph.c,v 1.172 2013/12/29 19:16:23 markisch Exp $
+ * $Id: wgraph.c,v 1.173 2014/01/04 02:55:06 markisch Exp $
  */
 
 /* GNUPLOT - win/wgraph.c */
@@ -1466,6 +1466,104 @@ draw_update_keybox(LPGW lpgw, unsigned plotno, unsigned x, unsigned y)
 }
 
 
+
+void
+draw_image(LPGW lpgw, HDC hdc, char *image, POINT corners[4], unsigned int width, unsigned int height, int color_mode)
+{
+	BITMAPINFO bmi;
+	HRGN hrgn;
+	int rc;
+
+	if (image == NULL)
+		return;
+
+	ZeroMemory(&bmi, sizeof(BITMAPINFO));
+	bmi.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
+	bmi.bmiHeader.biWidth = width;
+	bmi.bmiHeader.biHeight = height;
+	bmi.bmiHeader.biPlanes = 1;
+	bmi.bmiHeader.biCompression = BI_RGB;
+
+	/* create clip region */
+	hrgn = CreateRectRgn(
+		GPMIN(corners[2].x, corners[3].x), GPMIN(corners[2].y, corners[3].y),
+		GPMAX(corners[2].x, corners[3].x) + 1, GPMAX(corners[2].y, corners[3].y) + 1);
+	SelectClipRgn(hdc, hrgn);
+
+	if (color_mode != IC_RGBA) {
+		char * dibimage;
+		bmi.bmiHeader.biBitCount = 24;
+
+		if (!lpgw->color) {
+			/* create a copy of the color image */
+			int pad_bytes = (4 - (3 * width) % 4) % 4; /* scan lines start on ULONG boundaries */
+			int image_size = (width * 3 + pad_bytes) * height;
+			int x, y;
+			dibimage = (char *) malloc(image_size);
+			memcpy(dibimage, image, image_size);
+			for (y = 0; y < height; y ++) {
+				for (x = 0; x < width; x ++) {
+					BYTE * p = (BYTE *) dibimage + y * (3 * width + pad_bytes) + x * 3;
+					/* convert to gray */
+					unsigned luma = luma_from_color(p[2], p[1], p[0]);
+					p[0] = p[1] = p[2] = luma;
+				}
+			}
+
+		} else {
+			dibimage = image;
+		}
+
+		rc = StretchDIBits(hdc,
+			GPMIN(corners[0].x, corners[1].x) , GPMIN(corners[0].y, corners[1].y),
+			abs(corners[1].x - corners[0].x), abs(corners[1].y - corners[0].y),
+			0, 0, width, height,
+			dibimage, &bmi, DIB_RGB_COLORS, SRCCOPY);
+
+		if (!lpgw->color) free(dibimage);
+	} else {
+		HDC memdc;
+		HBITMAP membmp, oldbmp;
+		UINT32 *pvBits;
+		BLENDFUNCTION ftn;
+
+		bmi.bmiHeader.biBitCount = 32;
+		memdc = CreateCompatibleDC(hdc);
+		membmp = CreateDIBSection(memdc, &bmi, DIB_RGB_COLORS, (void **)&pvBits, NULL, 0x0);
+		oldbmp = (HBITMAP)SelectObject(memdc, membmp);
+
+		memcpy(pvBits, image, width * height * 4);
+
+		/* convert to grayscale? */
+		if (!lpgw->color) {
+			int x, y;
+			for (y = 0; y < height; y ++) {
+				for (x = 0; x < width; x ++) {
+					UINT32 * p = pvBits + y * width + x;
+					/* convert to gray */
+					unsigned luma = luma_from_color(GetRValue(*p), GetGValue(*p), GetBValue(*p));
+					*p = (*p & 0xff000000) | RGB(luma, luma, luma);
+				}
+			}
+		}
+
+		ftn.BlendOp = AC_SRC_OVER;
+		ftn.BlendFlags = 0;
+		ftn.AlphaFormat = AC_SRC_ALPHA; /* bitmap has an alpha channel */
+		ftn.SourceConstantAlpha = 0xff;
+		AlphaBlend(hdc,
+			GPMIN(corners[0].x, corners[1].x) , GPMIN(corners[0].y, corners[1].y),
+			abs(corners[1].x - corners[0].x), abs(corners[1].y - corners[0].y),
+			memdc, 0, 0, width, height, ftn);
+
+		SelectObject(memdc, oldbmp);
+		DeleteObject(membmp);
+		DeleteDC(memdc);
+	}
+	SelectClipRgn(hdc, NULL);
+}
+
+
 /* This one is really the heart of this module: it executes the stored set of
  * commands, whenever it changed or a redraw is necessary */
 static void
@@ -2440,8 +2538,7 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 			}
 			break;
 
-		case W_image:
-			{
+		case W_image: {
 			/* Due to the structure of gwop 6 entries are needed in total. */
 			if (seq == 0) {
 				/* First OP contains only the color mode */
@@ -2452,102 +2549,10 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 				corners[seq-1].y = ydash;
 			} else {
 				/* The last OP contains the image and it's size */
-				char *image;
-				unsigned int width, height;
-				int rc;
-
-				width = curptr->x;
-				height = curptr->y;
-				image = LocalLock(curptr->htext);
-				if (image) {
-					BITMAPINFO bmi;
-					HRGN hrgn;
-
-					ZeroMemory(&bmi, sizeof(BITMAPINFO));
-					bmi.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
-					bmi.bmiHeader.biWidth = width;
-					bmi.bmiHeader.biHeight = height;
-					bmi.bmiHeader.biPlanes = 1;
-					bmi.bmiHeader.biCompression = BI_RGB;
-
-					/* create clip region */
-					hrgn = CreateRectRgn(
-						GPMIN(corners[2].x, corners[3].x), GPMIN(corners[2].y, corners[3].y),
-						GPMAX(corners[2].x, corners[3].x) + 1, GPMAX(corners[2].y, corners[3].y) + 1);
-					SelectClipRgn(hdc, hrgn);
-
-					if (color_mode != IC_RGBA) {
-						char * dibimage;
-						bmi.bmiHeader.biBitCount = 24;
-
-						if (!lpgw->color) {
-							/* create a copy of the color image */
-							int pad_bytes = (4 - (3 * width) % 4) % 4; /* scan lines start on ULONG boundaries */
-							int image_size = (width * 3 + pad_bytes) * height;
-							int x, y;
-							dibimage = (char *) malloc(image_size);
-							memcpy(dibimage, image, image_size);
-							for (y = 0; y < height; y ++) {
-								for (x = 0; x < width; x ++) {
-									BYTE * p = (BYTE *) dibimage + y * (3 * width + pad_bytes) + x * 3;
-									/* convert to gray */
-									unsigned luma = luma_from_color(p[2], p[1], p[0]);
-									p[0] = p[1] = p[2] = luma;
-								}
-							}
-
-						} else {
-							dibimage = image;
-						}
-
-						rc = StretchDIBits(hdc,
-							GPMIN(corners[0].x, corners[1].x) , GPMIN(corners[0].y, corners[1].y),
-							abs(corners[1].x - corners[0].x), abs(corners[1].y - corners[0].y),
-							0, 0, width, height,
-							dibimage, &bmi, DIB_RGB_COLORS, SRCCOPY);
-
-						if (!lpgw->color) free(dibimage);
-					} else {
-						HDC memdc;
-						HBITMAP membmp, oldbmp;
-						UINT32 *pvBits;
-						BLENDFUNCTION ftn;
-
-						bmi.bmiHeader.biBitCount = 32;
-						memdc = CreateCompatibleDC(hdc);
-						membmp = CreateDIBSection(memdc, &bmi, DIB_RGB_COLORS, (void **)&pvBits, NULL, 0x0);
-						oldbmp = (HBITMAP)SelectObject(memdc, membmp);
-
-						memcpy(pvBits, image, width * height * 4);
-
-						/* convert to grayscale? */
-						if (!lpgw->color) {
-							int x, y;
-							for (y = 0; y < height; y ++) {
-								for (x = 0; x < width; x ++) {
-									UINT32 * p = pvBits + y * width + x;
-									/* convert to gray */
-									unsigned luma = luma_from_color(GetRValue(*p), GetGValue(*p), GetBValue(*p));
-									*p = (*p & 0xff000000) | RGB(luma, luma, luma);
-								}
-							}
-						}
-
-						ftn.BlendOp = AC_SRC_OVER;
-						ftn.BlendFlags = 0;
-						ftn.AlphaFormat = AC_SRC_ALPHA; /* bitmap has an alpha channel */
-						ftn.SourceConstantAlpha = 0xff;
-						AlphaBlend(hdc,
-							GPMIN(corners[0].x, corners[1].x) , GPMIN(corners[0].y, corners[1].y),
-							abs(corners[1].x - corners[0].x), abs(corners[1].y - corners[0].y),
-							memdc, 0, 0, width, height, ftn);
-
-						SelectObject(memdc, oldbmp);
-						DeleteObject(membmp);
-						DeleteDC(memdc);
-					}
-					SelectClipRgn(hdc, NULL);
-				}
+				char * image = (char *) LocalLock(curptr->htext);
+				unsigned int width = curptr->x;
+				unsigned int height = curptr->y;
+				draw_image(lpgw, hdc, image, corners, width, height, color_mode);
 				LocalUnlock(curptr->htext);
 			}
 			seq = (seq + 1) % 6;

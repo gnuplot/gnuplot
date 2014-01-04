@@ -1,5 +1,8 @@
 2014-01-04  Bastian Maerkisch  <bmaerkisch@web.de>
 
+	* src/win/wgraph.c (drawgraph):  Move GDI image drawing code from
+	drawgraph() to a new routine draw_image().
+
 	* src/command.c src/fit.c|h src/plot.c|h src/term.c src/win/wgraph.c 
 	src/win/winmain.c src/win/wtext.c term/win.trm:  Handle Ctrl-C
 	asynchronously on Windows (GUI and console mode). This is done by
