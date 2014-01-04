@@ -1,5 +1,10 @@
 2014-01-04  Bastian Maerkisch  <bmaerkisch@web.de>
 
+	* src/term_api.h src/graphics (plot_image_or_update_axes):  Wrap
+	the fallback image output with term->layer() commands using
+	TERM_LAYER_BEGIN_IMAGE and TERM_LAYER_END_IMAGE. This can be
+	used by terminals to optimize output.
+
 	* src/win/wgraph.c (drawgraph):  Move GDI image drawing code from
 	drawgraph() to a new routine draw_image().
 

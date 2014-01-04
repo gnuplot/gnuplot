@@ -1,5 +1,5 @@
 /*
- * $Id: term_api.h,v 1.117 2013/09/23 18:49:03 sfeam Exp $
+ * $Id: term_api.h,v 1.118 2013/09/26 22:45:33 sfeam Exp $
  */
 
 /* GNUPLOT - term_api.h */
@@ -149,7 +149,9 @@ typedef enum termlayer {
 	TERM_LAYER_RESET_PLOTNO,
 	TERM_LAYER_BEFORE_ZOOM,
 	TERM_LAYER_BEGIN_PM3D_MAP,
-	TERM_LAYER_END_PM3D_MAP
+	TERM_LAYER_END_PM3D_MAP,
+	TERM_LAYER_BEGIN_IMAGE,
+	TERM_LAYER_END_IMAGE
 } t_termlayer;
 
 /* Options used by the terminal entry point term->waitforinput(). */
@@ -178,7 +180,7 @@ typedef enum t_textbox_options {
 } t_textbox_options;
 #endif
 
-typedef enum t_fillstyle { FS_EMPTY, FS_SOLID, FS_PATTERN, FS_DEFAULT, 
+typedef enum t_fillstyle { FS_EMPTY, FS_SOLID, FS_PATTERN, FS_DEFAULT,
 			   FS_TRANSPARENT_SOLID, FS_TRANSPARENT_PATTERN }
 	     t_fillstyle;
 #define FS_OPAQUE (FS_SOLID + (100<<4))
@@ -298,7 +300,7 @@ typedef struct TERMENTRY {
  */
     void (*layer) __PROTO((t_termlayer));
 
-/* Begin/End path control. 
+/* Begin/End path control.
  * Needed by PostScript-like devices in order to join the endpoints of
  * a polygon cleanly.
  */
@@ -324,8 +326,8 @@ typedef struct TERMENTRY {
 
 enum set_encoding_id {
    S_ENC_DEFAULT, S_ENC_ISO8859_1, S_ENC_ISO8859_2, S_ENC_ISO8859_9, S_ENC_ISO8859_15,
-   S_ENC_CP437, S_ENC_CP850, S_ENC_CP852, S_ENC_CP950, 
-   S_ENC_CP1250, S_ENC_CP1251, S_ENC_CP1254, 
+   S_ENC_CP437, S_ENC_CP850, S_ENC_CP852, S_ENC_CP950,
+   S_ENC_CP1250, S_ENC_CP1251, S_ENC_CP1254,
    S_ENC_KOI8_R, S_ENC_KOI8_U, S_ENC_SJIS,
    S_ENC_UTF8,
    S_ENC_INVALID
@@ -452,7 +454,7 @@ int style_from_fill __PROTO((struct fill_style_type *));
 #ifdef EAM_OBJECTS
 /* Terminal-independent routine to draw a circle or arc */
 void do_arc __PROTO(( unsigned int cx, unsigned int cy, double radius,
-                      double arc_start, double arc_end, 
+                      double arc_start, double arc_end,
 		      int style, TBOOLEAN wedge));
 #endif
 

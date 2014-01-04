@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.440 2013/12/26 17:58:29 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.441 2014/01/01 09:48:38 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -4686,6 +4686,8 @@ plot_image_or_update_axes(void *plot, TBOOLEAN update_axes)
 	if (!term->filled_polygon)
 	    int_error(NO_CARET, "This terminal does not support filled polygons");
 
+	(term->layer)(TERM_LAYER_BEGIN_IMAGE);
+
 	/* Grid spacing in 3D space. */
 	if (log_axes) {
 	    delta_grid[0].x = (GRIDX(grid_corner[1]) - GRIDX(grid_corner[0])) / (K-1);
@@ -4858,6 +4860,8 @@ skip_pixel:
 		i_image++;
 	    }
 	}
+
+	(term->layer)(TERM_LAYER_END_IMAGE);
     }
     }
 
