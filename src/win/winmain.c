@@ -1,5 +1,5 @@
 /*
- * $Id: winmain.c,v 1.67 2013/10/25 04:45:22 sfeam Exp $
+ * $Id: winmain.c,v 1.68 2013/12/27 19:51:22 markisch Exp $
  */
 
 /* GNUPLOT - win/winmain.c */
@@ -953,7 +953,10 @@ int ConsoleGetch()
                          rec.Event.KeyEvent.wVirtualKeyCode > VK_MENU))
                 {
                     if (rec.Event.KeyEvent.uChar.AsciiChar)
-                        return rec.Event.KeyEvent.uChar.AsciiChar;
+						if ((rec.Event.KeyEvent.dwControlKeyState == SHIFT_PRESSED) && (rec.Event.KeyEvent.wVirtualKeyCode == VK_TAB))
+							return 034; /* remap Shift-Tab */
+						else
+							return rec.Event.KeyEvent.uChar.AsciiChar;
                     else
                         switch (rec.Event.KeyEvent.wVirtualKeyCode)
                         {
@@ -1128,11 +1131,11 @@ void
 WinRaiseConsole(void)
 {
 	HWND console = NULL;
-# ifndef WGP_CONSOLE
+#ifndef WGP_CONSOLE
 	console = textwin.hWndParent;
-# else
+#else
 	console = GetConsoleWindow();
-# endif
+#endif
 	if (console != NULL) {
 		ShowWindow(console, SW_SHOWNORMAL);
 		BringWindowToTop(console);

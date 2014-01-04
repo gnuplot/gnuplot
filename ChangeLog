@@ -1,3 +1,8 @@
+2014-01-04  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/win/winmain.c (ConsoleGetch):  Remap Shift-Tab key-code in
+	console mode, too.
+
 2014-01-03  Christoph Bersch <usenet@bersch.net>
 
 	* src/gadgets.c (clip_polygon):  Handle the case of a NULL clipping box,
