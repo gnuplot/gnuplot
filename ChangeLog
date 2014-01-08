@@ -1,3 +1,9 @@
+2014-01-08  Thomas Bleher <tbleher@gmx.de>
+
+	* config/msvc/Makefile:  Add configuration option for compiling the qt
+	terminal on Windows/MSVC.  Note that the terminal itself does not work
+	yet on Windows, but this patch makes it easier to work on fixing that.
+
 2014-01-04  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/win/wcommon.h src/win/wgdiplus.cpp|h src/win/wgnuplib.h

@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.12 2013/07/06 08:09:20 markisch Exp $
+# $Id: Makefile,v 1.13 2013/10/25 17:34:32 sfeam Exp $
 #
 # GNUPLOT Makefile Microsoft Visual C++ 2005 or newer
 
@@ -48,6 +48,12 @@ PDFLIB = 0
 # See http://wiki.wxwidgets.org/Microsoft_Visual_C%2B%2B_Guide
 #     http://wiki.wxwidgets.org/Visual_Studio_2008_%289.0%29
 WXT = 0
+# Build qt terminal? WARNING: the qt terminal should build, but does not work correctly.
+# Only enable it if you want to work on fixing qt terminal on windows.
+# (Basic problem: qt_waitforinput() uses select() to wait on stdin and a named
+# pipe simultaneously. On Windows, this fails, because select() on Windows can
+# only be used on network sockets)
+QT = 0
 # Build the lua/tikz terminal?
 LUA = 0
 
@@ -58,6 +64,7 @@ DEBUG = 0
 GDDIR = gdwin32
 LUADIR = lua
 PDFDIR = pdflib
+QTDIR = C:\\Qt\\4.8.4
 
 # installation directory
 DESTDIR = "$(PROGRAMFILES)\gnuplot"
@@ -72,6 +79,9 @@ GNUPLOT_JS_DIR = share\\js
 
 # Similarly for scripts used by the lua terminal
 GNUPLOT_LUA_DIR = share\\lua
+
+# directory for Qt translation files
+GNUPLOT_QT_DIR = share\\qt
 
 # gnuplot will look for gnuplotrc here:
 GNUPLOT_SHARE_DIR = share
@@ -98,6 +108,8 @@ WIN_CFLAGS = /DUSE_FAKEPIPES
 CONSOLE_CFLAGS = /DWGP_CONSOLE /DCONSOLE_SWITCH_CP /DPIPES
 OPTIONS = /DUSE_MOUSE
 OPTIONS = $(OPTIONS) /DGNUPLOT_HISTORY
+
+EXTRA_TARGETS =
 
 # flags for terminals
 # see other terminal defines in term.h
@@ -132,6 +144,21 @@ WXTLIBS = glib-2.0.lib gobject-2.0.lib gmodule-2.0.lib \
 	wxmsw28.lib wxtiff.lib
 !ENDIF
 
+!IF "$(QT)" == "1"
+!IF "$(DEBUG)" == "1"
+QTLIBS = QtCored4.lib QtGuid4.lib QtNetworkd4.lib QtSvgd4.lib ws2_32.lib
+!ELSE
+QTLIBS = QtCore4.lib QtGui4.lib QtNetwork4.lib QtSvg4.lib ws2_32.lib
+!ENDIF
+QTOPTIONS = /I$(QTDIR)\include /I$(QTDIR)\include\QtCore /I$(QTDIR)\include\QtGui /I$(QTDIR)\include\QtNetwork /I$(QTDIR)\include\QtSvg /DQTGNUPLOT_DATA_DIR=\"$(GNUPLOT_QT_DIR)\"
+LDFLAGS = $(LDFLAGS) /libpath:$(QTDIR)\lib
+CFLAGS = $(CFLAGS) -DQTTERM
+MOC=$(QTDIR)\\bin\\moc
+UIC=$(QTDIR)\\bin\\uic
+RCC=$(QTDIR)\\bin\\rcc
+EXTRA_TARGETS = $(EXTRA_TARGETS) gnuplot_qt.exe
+!ENDIF
+
 !IF "$(LUA)" == "1"
 OPTIONS = $(OPTIONS) /DHAVE_LUA
 OPTIONS = $(OPTIONS) /I$(LUADIR)/include
@@ -154,15 +181,59 @@ MACHINE = IX86
 O=obj
 S=$(TOP)\\src
 W=$(S)\\win\\
+Q=$(S)\\qtterminal\\
 T=$(TOP)\\term\\
 D=$(TOP)\\docs\\
 M=$(TOP)\\demo\\
 
-default: wgnuplot.exe $(HELPFILE) wgnuplot.mnu $(M)bf_test.exe gnuplot.exe
+default: wgnuplot.exe $(HELPFILE) wgnuplot.mnu $(M)bf_test.exe gnuplot.exe $(EXTRA_TARGETS)
 
 !INCLUDE $(S)\\makefile.all
 
 OBJS = $(COREOBJS) version.obj
+
+!IF "$(QT)" == "1"
+OBJS = $(OBJS) $(Q)qt_term.$(O)
+GNUPLOTQTOBJS = $(Q)gnuplot_qt.$(O) $(Q)QtGnuplotWindow.$(O) \
+$(Q)QtGnuplotApplication.$(O) $(Q)QtGnuplotWidget.$(O) \
+$(Q)QtGnuplotScene.$(O) $(Q)QtGnuplotItems.$(O) \
+$(Q)QtGnuplotEvent.$(O) \
+$(Q)moc_QtGnuplotWindow.$(O) $(Q)moc_QtGnuplotApplication.$(O) \
+$(Q)moc_QtGnuplotWidget.$(O) $(Q)moc_QtGnuplotScene.$(O) \
+$(Q)moc_QtGnuplotEvent.$(O) $(Q)qrc_QtGnuplotResource.$(O)
+
+# Call the Qt resource compiler
+$(Q)qrc_QtGnuplotResource.cpp: $(Q)QtGnuplotResource.qrc
+	$(RCC) -name QtGnuplotResource -o $@ $**
+
+# Call the Qt ui compiler
+$(Q)ui_QtGnuplotSettings.h: $(Q)QtGnuplotSettings.ui
+	$(UIC) -o $@ $**
+
+$(Q)moc_QtGnuplotWindow.cpp: $(Q)QtGnuplotWindow.h
+	$(MOC) -o $@ $**
+
+$(Q)moc_QtGnuplotApplication.cpp: $(Q)QtGnuplotApplication.h
+	$(MOC) -o $@ $**
+
+$(Q)moc_QtGnuplotWidget.cpp: $(Q)QtGnuplotWidget.h
+	$(MOC) -o $@ $**
+
+$(Q)moc_QtGnuplotScene.cpp: $(Q)QtGnuplotScene.h
+	$(MOC) -o $@ $**
+
+$(Q)moc_QtGnuplotEvent.cpp: $(Q)QtGnuplotEvent.h
+	$(MOC) -o $@ $**
+
+{$(Q)}.cpp.obj:
+	$(CC) /c $(CFLAGS) $(QTOPTIONS) $(Q)$*.cpp /Fo$@
+
+{$(Q)}.cpp.cobj:
+	$(CC) /c $(CFLAGS) $(QTOPTIONS) $(CONSOLE_CFLAGS) $(Q)$*.cpp /Fo$@
+
+gnuplot_qt.exe: $(Q)ui_QtGnuplotSettings.h $(GNUPLOTQTOBJS)
+	$(LD) /entry:mainCRTStartup /subsystem:windows $(LDFLAGS) /map:wgnuplot.map /out:$@ $(GNUPLOTQTOBJS) $(QTLIBS) shell32.lib
+!ENDIF
 
 WINOBJS = winmain.obj wgnuplib.obj wgraph.obj wprinter.obj wtext.obj \
 	screenbuf.obj wpause.obj wmenu.obj gpexecute.obj wgdiplus.obj \
@@ -235,6 +306,9 @@ linkopt-w.msw: Makefile
 !IF "$(WXT)" == "1"
 	echo $(WXTLIBS) >> linkopt-w.msw
 !ENDIF
+!IF "$(QT)" == "1"
+	echo $(QTLIBS) >> linkopt-w.msw
+!ENDIF
 !IF "$(LUA)" == "1"
 	echo $(LUALIBS) >> linkopt-w.msw
 !ENDIF
@@ -253,6 +327,9 @@ linkopt-c.msw: Makefile
 !ENDIF
 !IF "$(WXT)" == "1"
 	echo $(WXTLIBS) >> linkopt-c.msw
+!ENDIF
+!IF "$(QT)" == "1"
+	echo $(QTLIBS) >> linkopt-c.msw
 !ENDIF
 !IF "$(LUA)" == "1"
 	echo $(LUALIBS) >> linkopt-c.msw
@@ -310,6 +387,9 @@ clean:
 	if exist *.obj del *.obj
 	if exist *.cobj del *.cobj
 	if exist *.map del *.map
+	if exist $(Q)moc_*.cpp del $(Q)moc_*.cpp
+	if exist $(Q)qrc_*.cpp del $(Q)qrc_*.cpp
+	if exist $(Q)ui_*.h del $(Q)ui_*.h
 	if exist wgnuplot.res del wgnuplot.res
 	if exist wgnuplot.chw del wgnuplot.chw
 	if exist $(M)bf_test.exe del $(M)bf_test.exe
@@ -325,6 +405,7 @@ veryclean: clean
 	if exist wgnuplot.mnu del wgnuplot.mnu
 	if exist pgnuplot.exe del pgnuplot.exe
 	if exist gnuplot.exe del gnuplot.exe
+	if exist gnuplot_qt.exe del gnuplot_qt.exe
 	if exist *.manifest del *.manifest
 	if exist $(M)binary1 del $(M)binary1
 	if exist $(M)binary2 del $(M)binary2
