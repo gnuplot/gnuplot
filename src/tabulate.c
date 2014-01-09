@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: tabulate.c,v 1.16 2012/09/05 23:36:17 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: tabulate.c,v 1.17 2012/11/15 03:53:24 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - tabulate.c */
@@ -97,6 +97,10 @@ print_table(struct curve_points *current_plot, int plot_num)
     for (curve = 0; curve < plot_num;
 	 curve++, current_plot = current_plot->next) {
 	struct coordinate GPHUGE *point = NULL;
+
+	/* "with table" already wrote the output */
+	if (current_plot->plot_style == TABLESTYLE)
+	    continue;
 
 	/* two blank lines between tabulated plots by prepending \n here */
 	fprintf(outfile, "\n# Curve %d of %d, %d points",

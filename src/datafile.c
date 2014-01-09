@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.265 2014/01/03 22:50:45 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.266 2014/01/09 21:03:46 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -2953,6 +2953,7 @@ df_bin_default_columns default_style_cols[] = {
     , {CIRCLES, 2, 1}
     , {ELLIPSES, 2, 3}
 #endif
+    , {TABLESTYLE, 0, 0}
 };
 
 

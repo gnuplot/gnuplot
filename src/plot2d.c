@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.314 2014/01/03 22:50:45 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.315 2014/01/09 21:03:46 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -570,6 +570,11 @@ get_data(struct curve_points *current_plot)
 	    AXIS_INIT2D(PARALLEL_AXES+j, 1);
 	break;
 
+    case TABLESTYLE:
+	min_cols = 1;
+	max_cols = MAXDATACOLS;
+	break;
+
     default:
 	min_cols = 1;
 	max_cols = 2;
@@ -675,6 +680,22 @@ get_data(struct curve_points *current_plot)
 
 		current_plot->varcolor[i] = v[--j];
 	    }
+
+	    if (current_plot->plot_style == TABLESTYLE) {
+	    /* Echo the values directly to the output file. FIXME: formats? */
+		int col;
+		int dummy_type = INRANGE;
+		FILE *outfile = (table_outfile) ? table_outfile : gpoutfile;
+		for (col = 0; col < j; col++)
+		    fprintf(outfile, " %g", v[col]);
+		fprintf(outfile, "\n");
+		/* This tracks x range and avoids "invalid x range" error message */
+		STORE_WITH_LOG_AND_UPDATE_RANGE( current_plot->points[i].x,
+			v[0], dummy_type, current_plot->x_axis,
+			current_plot->noautoscale, NOOP, NOOP );
+		continue;
+	    }
+
 	}
 
 	/* TODO: It would make more sense to organize the switch below by plot	*/
@@ -2256,6 +2277,10 @@ eval_plots()
 			    int_warn(c_token, "This plot style is only for datafiles, reverting to \"points\"");
 			    this_plot->plot_style = POINTSTYLE;
 			}
+		    if (this_plot->plot_style == TABLESTYLE) {
+			if (!table_mode)
+			    int_error(c_token, "'with table' requires a previous 'set table'");
+		    }
 
 		    /* Parallel plots require allocating additional storage.		*/
 		    /* NB: This will be one column more than needed if the final column	*/
@@ -2677,6 +2702,9 @@ eval_plots()
 			CB_AXIS.min = 0;
 		    if (CB_AXIS.autoscale & AUTOSCALE_MAX)
 			CB_AXIS.max = 255;
+		}
+		if (this_plot->plot_style == TABLESTYLE) {
+		    Y_AXIS.min = Y_AXIS.max = not_a_number();
 		}
 		if (polar) {
 		    polar_range_fiddling(this_plot);

@@ -1,5 +1,5 @@
 /*
- * $Id: gp_types.h,v 1.56 2013/12/25 05:47:26 sfeam Exp $
+ * $Id: gp_types.h,v 1.57 2013/12/26 17:58:28 sfeam Exp $
  */
 
 /* GNUPLOT - gp_types.h */
@@ -110,6 +110,7 @@ typedef enum PLOT_STYLE {
     ELLIPSES     = 30*PLOT_STYLE_BITS + PLOT_STYLE_HAS_LINE + PLOT_STYLE_HAS_FILL,
     SURFACEGRID  = 31*PLOT_STYLE_BITS + PLOT_STYLE_HAS_LINE,
     PARALLELPLOT = 32*PLOT_STYLE_BITS + PLOT_STYLE_HAS_LINE,
+    TABLESTYLE   = 33*PLOT_STYLE_BITS,
     PLOT_STYLE_NONE = -1
 } PLOT_STYLE;
 

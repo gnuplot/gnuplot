@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.298 2013/12/26 17:58:28 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.299 2014/01/01 09:48:38 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -1106,6 +1106,7 @@ do_3dplot(
 		break;
 
 	    case PLOT_STYLE_NONE:
+	    case TABLESTYLE:
 		/* cannot happen */
 		break;
 	    }			/* switch(plot-style) plot proper */

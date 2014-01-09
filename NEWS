@@ -1,6 +1,7 @@
 New features, changes and fixes since gnuplot version 4.6
 =========================================================
 
+* NEW tabulation option "set table; plot ... with table" 
 * NEW smoothing option "mcsplines" for piecewise monotonic cubic splines
 * NEW 'history !N' reexecutes the command at history entry N.
 * NEW 'set history {size <N>} {quiet|numbers} {full|trim} {default}'

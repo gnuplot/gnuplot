@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.219 2013/12/24 02:09:55 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.220 2013/12/27 23:56:15 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -1562,6 +1562,8 @@ eval_3dplots()
 			this_plot->plot_style = POINTSTYLE;
 			this_plot->plot_type = NODATA;
 		    }
+		    if (this_plot->plot_style == TABLESTYLE)
+			int_error(NO_CARET, "use `plot with table` rather than `splot with table`"); 
 
 		    if ((this_plot->plot_style | data_style) & PM3DSURFACE) {
 			if (equals(c_token, "at")) {

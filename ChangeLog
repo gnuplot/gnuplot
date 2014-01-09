@@ -3,6 +3,14 @@
 	* src/datafile.c src/datafile.h src/plot2d.c:  Only include support for
 	"thru" if configured with --enable-backwards-compatibility
 
+	* src/datafile.c src/gp_types.h src/graph3d.c src/plot2d.c src/plot3d.c
+	src/tables.c src/tabulate.c:
+
+	New keyword pair "with table" that bypasses all style-specific input
+	processing, column restrictions, smoothing, etc.  For example:
+	    set table "table.dat"
+	    plot FOO using 1:2:3:4:5:($6+$7):8:9:10 with table
+
 2014-01-08  Thomas Bleher <tbleher@gmx.de>
 
 	* config/msvc/Makefile:  Add configuration option for compiling the qt

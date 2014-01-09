@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.842 2013/12/28 21:53:57 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.843 2013/12/28 22:55:43 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -11675,7 +11675,7 @@ Ffigure_missing
  plot on the current terminal.  The character R takes on one of three values:
  "i" if the point is in the active range, "o" if it is out-of-range, or "u"
  if it is undefined.  The data format is determined by the format of the axis
- labels (see `set format`), and the columns are separated by single spaces.
+ tickmarks (see `set format`), and the columns are separated by single spaces.
  This can be useful if you want to generate contours and then save them for
  further use.  The same method can be used to save interpolated data
  (see `set samples` and `set dgrid3d`).
@@ -11688,6 +11688,14 @@ Ffigure_missing
  Tabular output is written to the named file, if any, otherwise it is written
  to the current value of `set output`.  You must explicitly `unset table`
  in order to go back to normal plotting on the current terminal.
+
+ To avoid any style-dependent processing of the input data (smoothing,
+ errorbar expansion, secondary range checking, etc), or to increase the number
+ of columns that can be tabulated, you can use the keyword "table" instead of a
+ normal plot style.  For example
+
+      set table
+      plot <file> using 1:2:3:4:5:6:7:8:9:10 with table
 3 terminal
 ?commands set terminal
 ?commands show terminal
