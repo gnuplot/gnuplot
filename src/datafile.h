@@ -1,5 +1,5 @@
 /*
- * $Id: datafile.h,v 1.42 2013/04/21 06:26:11 sfeam Exp $
+ * $Id: datafile.h,v 1.43 2013/06/27 20:03:41 sfeam Exp $
  */
 
 /* GNUPLOT - datafile.h */
@@ -86,7 +86,10 @@ extern TBOOLEAN df_binary;
 extern char *df_filename;
 extern int df_line_number;
 extern AXIS_INDEX df_axis[];
-extern struct udft_entry ydata_func; /* HBB 990829: moved from command.h */
+
+#ifdef BACKWARDS_COMPATIBLE
+extern struct udft_entry ydata_func; /* deprecated "thru" function */
+#endif
 
 /* Returned to caller by df_readline() */
 extern char *df_tokens[];

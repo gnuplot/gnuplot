@@ -1,7 +1,7 @@
 2014-01-09  Ethan A Merritt  <merritt@u.washington.edu>
 
-	* src/datafile.c, src/plot2d.c:  Only include support for "thru" if
-	configured with --enable-backwards-compatibility
+	* src/datafile.c src/datafile.h src/plot2d.c:  Only include support for
+	"thru" if configured with --enable-backwards-compatibility
 
 2014-01-08  Thomas Bleher <tbleher@gmx.de>
 
