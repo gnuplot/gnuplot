@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.264 2013/12/28 21:27:32 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.265 2014/01/03 22:50:45 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -208,9 +208,10 @@ TBOOLEAN df_matrix = FALSE;     /* indicates if data originated from a 2D or 3D 
 
 void *df_pixeldata;		/* pixel data from an external library (e.g. libgd) */
 
+#ifdef BACKWARDS_COMPATIBLE
 /* jev -- the 'thru' function --- NULL means no dummy vars active */
-/* HBB 990829: moved this here, from command.c */
 struct udft_entry ydata_func;
+#endif
 
 /* string representing missing values in ascii datafiles */
 char *missing_val = NULL;
@@ -1024,9 +1025,10 @@ df_open(const char *cmd_filename, int max_using, struct curve_points *plot)
 
     /* defer opening until we have parsed the modifiers... */
 
-    if (ydata_func.at) /* something for thru (?) */
-	free_at(ydata_func.at);
+#ifdef BACKWARDS_COMPATIBLE
+    free_at(ydata_func.at);
     ydata_func.at = NULL;
+#endif
 
     /* pm 25.11.2001 allow any order of options */
     while (!END_OF_COMMAND) {
@@ -1268,10 +1270,10 @@ df_close()
     if (!data_fp && !df_datablock)
 	return;
 
-    if (ydata_func.at) {
-	free_at(ydata_func.at);
-	ydata_func.at = NULL;
-    }
+#ifdef BACKWARDS_COMPATIBLE
+    free_at(ydata_func.at);
+    ydata_func.at = NULL;
+#endif
 
     /* free any use expression storage */
     for (i = 0; i < MAXDATACOLS; ++i)

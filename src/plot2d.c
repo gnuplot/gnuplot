@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.313 2013/12/26 17:58:29 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.314 2014/01/03 22:50:45 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -1200,6 +1200,7 @@ store2d_point(
     struct coordinate GPHUGE *cp = &(current_plot->points[i]);
     coord_type dummy_type = INRANGE;   /* sometimes we dont care about outranging */
 
+#ifdef BACKWARDS_COMPATIBLE
     /* jev -- pass data values thru user-defined function */
     /* div -- y is dummy variable 2 - copy value there */
     if (ydata_func.at) {
@@ -1222,6 +1223,7 @@ store2d_point(
 	evaluate_at(ydata_func.at, &val);
 	yhigh = undefined ? 0 : real(&val);
     }
+#endif
 
     dummy_type = cp->type = INRANGE;
 
