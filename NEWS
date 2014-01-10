@@ -17,6 +17,7 @@ New features, changes and fixes in gnuplot version 4.6.5
 * FIX emf terminal font initialization
 * FIX wxt terminal vertical centering of enhanced text
 * FIX win terminal filled polygon bugs
+* FIX iteration over parametric function plots
 
 New features, changes and fixes in gnuplot version 4.6.4
 ========================================================

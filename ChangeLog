@@ -1,3 +1,8 @@
+2014-01-10  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/plot2d.c:  Fix iteration over parametric function plots.
+	Bug #1314
+
 2014-01-03  Christoph Bersch <usenet@bersch.net>
 
 	* src/graphics.c (do_key_sample):  Apply requested border around filled
@@ -12,7 +17,7 @@
 2013-12-31  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/graphics.c (get_arrow) src/term.c (do_arc):  The aspect ratio
-	of the internal coordinates	of the windows terminal is always one.
+	of the internal coordinates of the windows terminal is always one.
 	Bug #1253
 
 	* src/win/wtext.c (WndTextProc) src/fit.c (regress):  The ctrlc_flag
