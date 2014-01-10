@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.315 2014/01/09 21:03:46 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.316 2014/01/10 03:31:08 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -3115,8 +3115,17 @@ eval_plots()
 		this_plot = this_plot->next;
 	    }
 
+	    /* Jan 2014: Earlier 2.6 versions missed this case,   */
+	    /*           breaking iteration over parametric plots */
+	    if (in_parametric) {
+		if (equals(c_token, ",")) {
+		    c_token++;
+		    continue;
+		}
+	    }
+
 	    /* Iterate-over-plot mechanism */
-	    if (!in_parametric && next_iteration(plot_iterator)) {
+	    if (next_iteration(plot_iterator)) {
 		c_token = start_token;
 		continue;
 	    }
@@ -3124,8 +3133,7 @@ eval_plots()
 	    plot_iterator = cleanup_iteration(plot_iterator);
 	    if (equals(c_token, ",")) {
 		c_token++;
-		if (!in_parametric)
-		    plot_iterator = check_for_iteration();
+		plot_iterator = check_for_iteration();
 	    } else
 		break;
 	}

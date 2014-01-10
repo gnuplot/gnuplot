@@ -1,3 +1,8 @@
+2014-01-10  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/plot2d.c:  Fix iteration over parametric function plots.
+	Bug #1314
+
 2014-01-09  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/datafile.c src/datafile.h src/plot2d.c:  Only include support for
