@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.212.2.26 2013/10/29 05:18:05 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.212.2.27 2014/01/03 21:40:42 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -4994,12 +4994,19 @@ df_generate_pseudodata()
 	if (df_pseudospan == 0) {
 	    if (samples_1 < 2 || samples_2 < 2 || iso_samples_1 < 2 || iso_samples_2 < 2)
 		int_error(NO_CARET, "samples or iso_samples < 2. Must be at least 2.");
-	    axis_checked_extend_empty_range(FIRST_X_AXIS, "x range is invalid");
-	    axis_checked_extend_empty_range(FIRST_Y_AXIS, "y range is invalid");
-	    u_min = axis_log_value_checked(u_axis, axis_array[u_axis].min, "x range");
-	    u_max = axis_log_value_checked(u_axis, axis_array[u_axis].max, "x range");
-	    v_min = axis_log_value_checked(v_axis, axis_array[v_axis].min, "y range");
-	    v_max = axis_log_value_checked(v_axis, axis_array[v_axis].max, "y range");
+	    if (parametric) {
+		u_min = axis_array[U_AXIS].min;
+		u_max = axis_array[U_AXIS].max;
+		v_min = axis_array[V_AXIS].min;
+		v_max = axis_array[V_AXIS].max;
+	    } else {
+		axis_checked_extend_empty_range(FIRST_X_AXIS, "x range is invalid");
+		axis_checked_extend_empty_range(FIRST_Y_AXIS, "y range is invalid");
+		u_min = axis_log_value_checked(u_axis, axis_array[u_axis].min, "x range");
+		u_max = axis_log_value_checked(u_axis, axis_array[u_axis].max, "x range");
+		v_min = axis_log_value_checked(v_axis, axis_array[v_axis].min, "y range");
+		v_max = axis_log_value_checked(v_axis, axis_array[v_axis].max, "y range");
+	    }
 
 	    if (hidden3d) {
 		 u_step = (u_max - u_min) / (iso_samples_1 - 1);
@@ -5018,7 +5025,10 @@ df_generate_pseudodata()
 	/* Duplicate algorithm from calculate_set_of_isolines() */
 	u = u_min + df_pseudorecord * u_step;
 	v = v_max - df_pseudospan * v_isostep;
-	sprintf(line,"%g %g", AXIS_DE_LOG_VALUE(u_axis,u), AXIS_DE_LOG_VALUE(v_axis,v));
+	if (parametric) 
+	    sprintf(line,"%g %g", u, v);
+	else
+	    sprintf(line,"%g %g", AXIS_DE_LOG_VALUE(u_axis,u), AXIS_DE_LOG_VALUE(v_axis,v));
 	++df_pseudorecord;
     }
 

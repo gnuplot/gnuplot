@@ -3,6 +3,9 @@
 	* src/plot2d.c:  Fix iteration over parametric function plots.
 	Bug #1314
 
+	* src/datafile.c (df_generate_pseudodata):  Allow use of '++' pseudofile
+	to sample the parametric variables U and V in 3D parametric mode.
+
 2014-01-03  Christoph Bersch <usenet@bersch.net>
 
 	* src/graphics.c (do_key_sample):  Apply requested border around filled
