@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.843 2013/12/28 22:55:43 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.844 2014/01/10 03:31:08 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -5811,7 +5811,8 @@ Ffigure_mapcontours
  Similarly the pseudo-file '++' returns 2 columns of data forming a regular
  grid of [x,y] coordinates with the number of points along x controlled by
  `set samples` and the number of points along y controlled by `set isosamples`.
- You must set xrange and yrange before plotting '++'.
+ In parametric mode the samples are along u and v rather than along x and y.
+ You must set xrange and yrange (or urange and vrange) before plotting '++'.
  Examples:
 
        splot '++' using 1:2:(sin($1)*sin($2)) with pm3d
