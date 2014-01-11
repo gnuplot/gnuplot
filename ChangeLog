@@ -1,5 +1,15 @@
 2014-01-11  Bastian Maerkisch  <bmaerkisch@web.de>
 
+	* src/win/wgraph.c (drawgraph):  When drawing to the screen, point
+	symbols are drawn to a memory bitmap first, which is then copied to
+	the target device. That way subsequent draws of the same point symbol
+	just need to copy the bitmap. This speeds up drawing of graphs with
+	a large number of point symbols.
+
+	* src/win/wgdiplus.cpp (drawgraph_gdiplus):  The GDI+ backend uses
+	the same technique, but was missing a case when to invalidate the
+	cached bitmap.
+
 	* src/win/wgnuplib.h src/win/wgdiplus.cpp src/win/wgraph.c:  Using
 	MinGW 4.8.1, FontFamily::GenericSansSerif() results in unresolved
 	externals during linking. This is a bug in MinGW's runtime.

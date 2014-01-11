@@ -1,5 +1,5 @@
 /*
- * $Id: wgraph.c,v 1.175 2014/01/04 15:46:38 markisch Exp $
+ * $Id: wgraph.c,v 1.176 2014/01/11 09:22:47 markisch Exp $
  */
 
 /* GNUPLOT - win/wgraph.c */
@@ -1620,6 +1620,14 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 	} boxedtext;
 #endif
 
+	/* point symbols */
+	bool ps_caching = FALSE;
+	int last_symbol = 0;
+	HDC cb_memdc = NULL;
+	HBITMAP cb_old_bmp;
+	HBITMAP cb_membmp;
+	POINT cb_ofs;
+
 	/* coordinates and lengths */
 	int xdash, ydash;			/* the transformed coordinates */
 	int rr, rl, rt, rb;			/* coordinates of drawing area */
@@ -1669,6 +1677,10 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 		shadedblendcaps = GetDeviceCaps(hdc, SHADEBLENDCAPS);
 		warn_no_transparent = ((shadedblendcaps & SB_CONST_ALPHA) == 0);
 	}
+
+	ps_caching = !((GetDeviceCaps(hdc, TECHNOLOGY) == DT_METAFILE)
+	            || (GetDeviceCaps(hdc, TECHNOLOGY) == DT_PLOTTER)
+	            || (GetDeviceCaps(hdc, TECHNOLOGY) == DT_RASPRINTER));
 
 	ppt = (POINT *)LocalAllocPtr(LHND, (polymax+1) * sizeof(POINT));
 
@@ -2335,6 +2347,8 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 				htic = pointsize * MulDiv(lpgw->htic, rr-rl, lpgw->xmax) + 1;
 				vtic = pointsize * MulDiv(lpgw->vtic, rb-rt, lpgw->ymax) + 1;
 			}
+			/* invalidate point symbol cache */
+			last_symbol = 0;
 			break;
 
 		case W_line_width:
@@ -2343,6 +2357,8 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 			 * state */
 			line_width = curptr->x == 100 ? 1 : (curptr->x / 100.0);
 			line_width *= lpgw->sampling * lpgw->linewidth * lw_scale;
+			/* invalidate point symbol cache */
+			last_symbol = 0;
 			break;
 
 		case W_setcolor: {
@@ -2386,6 +2402,11 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 
 			/* set text color, which is also used for pattern fill */
 			SetTextColor(hdc, color);
+
+			/* invalidate point symbol cache */
+			if (last_color != color)					
+				last_symbol = 0;
+
 			/* remember this color */
 			last_color = color;
 			fill_color = color;
@@ -2560,173 +2581,222 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 			}
 			break;
 
-		case W_dot:
-			dot(hdc, xdash, ydash);
-			if (keysample) {
-				draw_update_keybox(lpgw, plotno, xdash + htic, ydash + vtic);
-				draw_update_keybox(lpgw, plotno, xdash - htic, ydash - vtic);
-			}
-			break;
-		case W_plus: /* do plus */
-		case W_star: /* do star: first plus, then cross */
-#ifdef HAVE_GDIPLUS
-			if (lpgw->antialiasing) {
-				POINT a, b;
-				a.x = xdash - htic;
-				a.y = ydash;
-				b.x = xdash + htic;
-				b.y = ydash;
-				gdiplusLineEx(hdc, a, b, PS_SOLID, line_width, last_color, alpha_c);
-				a.x = xdash;
-				a.y = ydash - vtic;
-				b.x = xdash;
-				b.y = ydash + vtic;
-				gdiplusLineEx(hdc, a, b, PS_SOLID, line_width, last_color, alpha_c);
-			} else
-#endif
-			{
-				SelectObject(hdc, lpgw->hsolid);
-				MoveTo(hdc, xdash - htic, ydash);
-				LineTo(hdc, xdash + htic + 1, ydash);
-				MoveTo(hdc, xdash, ydash - vtic);
-				LineTo(hdc, xdash, ydash + vtic + 1);
-				SelectObject(hdc, lpgw->hapen);
-			}
-			if (keysample) {
-				draw_update_keybox(lpgw, plotno, xdash + htic, ydash + vtic);
-				draw_update_keybox(lpgw, plotno, xdash - htic, ydash - vtic);
-			}
-			if (curptr->op == W_plus) break;
-		case W_cross: /* do X */
-#ifdef HAVE_GDIPLUS
-			if (lpgw->antialiasing) {
-				POINT a, b;
-				a.x = xdash - htic;
-				a.y = ydash - vtic;
-				b.x = xdash + htic;
-				b.y = ydash + vtic;
-				gdiplusLineEx(hdc, a, b, PS_SOLID, line_width, last_color, alpha_c);
-				a.x = xdash - htic;
-				a.y = ydash + vtic;
-				b.x = xdash + htic;
-				b.y = ydash - vtic;
-				gdiplusLineEx(hdc, a, b, PS_SOLID, line_width, last_color, alpha_c);
-			} else
-#endif
-			{
-				SelectObject(hdc, lpgw->hsolid);
-				MoveTo(hdc, xdash - htic, ydash - vtic);
-				LineTo(hdc, xdash + htic + 1, ydash + vtic + 1);
-				MoveTo(hdc, xdash - htic, ydash + vtic);
-				LineTo(hdc, xdash + htic + 1, ydash - vtic - 1);
-				SelectObject(hdc, lpgw->hapen);
-			}
-			if (keysample) {
-				draw_update_keybox(lpgw, plotno, xdash + htic, ydash + vtic);
-				draw_update_keybox(lpgw, plotno, xdash - htic, ydash - vtic);
-			}
-			break;
-		case W_circle: /* do open circle */
-			SelectObject(hdc, lpgw->hsolid);
-#ifdef HAVE_GDIPLUS
-			if (lpgw->antialiasing) {
-				POINT p;
-				p.x = xdash;
-				p.y = ydash;
-				gdiplusCircleEx(hdc, &p, htic, PS_SOLID, line_width, last_color, alpha_c);
-			} else
-#endif
-				Arc(hdc, xdash-htic, ydash-vtic, xdash+htic+1, ydash+vtic+1,
-					xdash, ydash+vtic+1, xdash, ydash+vtic+1);
-			dot(hdc, xdash, ydash);
-			SelectObject(hdc, lpgw->hapen);
-			if (keysample) {
-				draw_update_keybox(lpgw, plotno, xdash + htic, ydash + vtic);
-				draw_update_keybox(lpgw, plotno, xdash - htic, ydash - vtic);
-			}
-			break;
-		case W_fcircle: /* do filled circle */
-			SelectObject(hdc, lpgw->hsolid);
-			Ellipse(hdc, xdash-htic, ydash-vtic,
-				xdash+htic+1, ydash+vtic+1);
-			SelectObject(hdc, lpgw->hapen);
-#ifdef HAVE_GDIPLUS
-			if (lpgw->antialiasing) {
-				POINT p;
-				p.x = xdash;
-				p.y = ydash;
-				gdiplusCircleEx(hdc, &p, htic, PS_SOLID, line_width, last_color, alpha_c);
-			}
-#endif
-			if (keysample) {
-				draw_update_keybox(lpgw, plotno, xdash + htic, ydash + vtic);
-				draw_update_keybox(lpgw, plotno, xdash - htic, ydash - vtic);
-			}
-			break;
-		default:	/* potentially closed figure */
-			{
-			POINT p[6];
-			int i;
-			int shape = 0;
-			int filled = 0;
-			int index = 0;
-			static float pointshapes[6][10] = {
-				{-1, -1, +1, -1, +1, +1, -1, +1, 0, 0}, /* box */
-				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, /* dummy, circle */
-				{ 0, +1, -1,  0,  0, -1, +1,  0, 0, 0}, /* diamond */
-				{ 0, -4./3, -4./3, 2./3,
-				  4./3,  2./3, 0, 0}, /* triangle */
-				{ 0, 4./3, -4./3, -2./3,
-				  4./3,  -2./3, 0, 0}, /* inverted triangle */
-				{ 0, 1, 0.95106, 0.30902, 0.58779, -0.80902,
-				  -0.58779, -0.80902, -0.95106, 0.30902} /* pentagon */
-			};
+		default: {
+			int xofs, yofs;
+			HDC dc;
+			HBRUSH old_brush;
+			HPEN old_pen;
 
-			/* BM: calculate index, instead of an ugly long switch statement;
-			   Depends on definition of commands in wgnuplib.h.
-			*/
-			index = (curptr->op - W_box);
-			if ((index > 0) && (index <= W_fpentagon - W_box)) {
+			/* This covers only point symbols. All other codes should be
+			   handled in the switch statement. */
+			if ((curptr->op < W_dot) || (curptr->op > W_dot + WIN_POINT_TYPES))
+				break;
+
+			/* draw cached point symbol */
+			if (ps_caching && (last_symbol == curptr->op) && (cb_memdc != NULL)) {
+				TransparentBlt(hdc, xdash - cb_ofs.x, ydash - cb_ofs.y, 2*htic+2, 2*vtic+2,
+					           cb_memdc, 0, 0, 2*htic+2, 2*vtic+2, 0x00ffffff);
+				break;
+			} else {
+				if (cb_memdc != NULL) {
+					SelectObject(cb_memdc, cb_old_bmp);
+					DeleteObject(cb_membmp);
+					DeleteDC(cb_memdc);
+					cb_memdc = NULL;
+				}
+			}
+
+			/* caching of point symbols? */
+			if (ps_caching) {
+				RECT rect;
+
+				/* create memory device context for bitmap */
+				dc = cb_memdc = CreateCompatibleDC(hdc);
+
+				/* create standard bitmap, no alpha channel */
+				cb_membmp = CreateCompatibleBitmap(hdc, 2*htic+2, 2*vtic+2);
+				cb_old_bmp = (HBITMAP) SelectObject(dc, cb_membmp);
+
+				/* prepare memory context */
+				SetTextColor(dc, fill_color);
+				old_brush = (HBRUSH) SelectObject(dc, solid_brush);
+				old_pen = (HPEN) SelectObject(dc, lpgw->hapen);
+				rect.left = rect.bottom = 0;
+				rect.top = 2*vtic+2;
+				rect.right = 2*htic+2;
+				FillRect(dc, &rect, (HBRUSH) GetStockObject(WHITE_BRUSH));
+
+				cb_ofs.x = xofs = htic+1;
+				cb_ofs.y = yofs = vtic+1;
+				last_symbol = curptr->op;
+			} else {
+				dc = hdc;
+				xofs = xdash;
+				yofs = ydash;
+			}
+
+			switch (curptr->op) {
+			case W_dot:
+				dot(dc, xofs, yofs);
+				break;
+			case W_plus: /* do plus */
+			case W_star: /* do star: first plus, then cross */
+#ifdef HAVE_GDIPLUS
+				if (lpgw->antialiasing) {
+					POINT a, b;
+					a.x = xofs - htic;
+					a.y = yofs;
+					b.x = xofs + htic;
+					b.y = yofs;
+					gdiplusLineEx(dc, a, b, PS_SOLID, line_width, last_color, alpha_c);
+					a.x = xofs;
+					a.y = yofs - vtic;
+					b.x = xofs;
+					b.y = yofs + vtic;
+					gdiplusLineEx(dc, a, b, PS_SOLID, line_width, last_color, alpha_c);
+				} else
+#endif
+				{
+					SelectObject(dc, lpgw->hsolid);
+					MoveTo(dc, xofs - htic, yofs);
+					LineTo(dc, xofs + htic, yofs);
+					MoveTo(dc, xofs, yofs - vtic);
+					LineTo(dc, xofs, yofs + vtic);
+					SelectObject(dc, lpgw->hapen);
+				}
+				if (curptr->op == W_plus) break;
+			case W_cross: /* do X */
+#ifdef HAVE_GDIPLUS
+				if (lpgw->antialiasing) {
+					POINT a, b;
+					a.x = xofs - htic;
+					a.y = yofs - vtic;
+					b.x = xofs + htic;
+					b.y = yofs + vtic;
+					gdiplusLineEx(dc, a, b, PS_SOLID, line_width, last_color, alpha_c);
+					a.x = xofs - htic;
+					a.y = yofs + vtic;
+					b.x = xofs + htic;
+					b.y = yofs - vtic;
+					gdiplusLineEx(dc, a, b, PS_SOLID, line_width, last_color, alpha_c);
+				} else
+#endif
+				{
+					SelectObject(dc, lpgw->hsolid);
+					MoveTo(dc, xofs - htic, yofs - vtic);
+					LineTo(dc, xofs + htic, yofs + vtic);
+					MoveTo(dc, xofs - htic, yofs + vtic);
+					LineTo(dc, xofs + htic, yofs - vtic);
+					SelectObject(dc, lpgw->hapen);
+				}
+				break;
+			case W_circle: /* do open circle */
+				SelectObject(dc, lpgw->hsolid);
+#ifdef HAVE_GDIPLUS
+				if (lpgw->antialiasing) {
+					POINT p;
+					p.x = xofs;
+					p.y = yofs;
+					gdiplusCircleEx(dc, &p, htic, PS_SOLID, line_width, last_color, alpha_c);
+				} else
+#endif
+					Arc(dc, xofs-htic, yofs-vtic, xofs+htic+1, yofs+vtic+1,
+						xofs, yofs+vtic+1, xofs, yofs+vtic+1);
+				dot(dc, xofs, yofs);
+				SelectObject(dc, lpgw->hapen);
+				break;
+			case W_fcircle: /* do filled circle */
+				SelectObject(dc, lpgw->hsolid);
+				Ellipse(dc, xofs-htic, yofs-vtic,
+				            xofs+htic+1, yofs+vtic+1);
+				SelectObject(dc, lpgw->hapen);
+#ifdef HAVE_GDIPLUS
+				if (lpgw->antialiasing) {
+					POINT p;
+					p.x = xofs;
+					p.y = yofs;
+					gdiplusCircleEx(dc, &p, htic, PS_SOLID, line_width, last_color, alpha_c);
+				}
+#endif
+				break;
+			default: {	/* potentially closed figure */
+				POINT p[6];
+				int i;
+				int shape = 0;
+				int filled = 0;
+				int index = 0;
+				static float pointshapes[6][10] = {
+					{-1, -1, +1, -1, +1, +1, -1, +1, 0, 0}, /* box */
+					{0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, /* dummy, circle */
+					{ 0, +1, -1,  0,  0, -1, +1,  0, 0, 0}, /* diamond */
+					{ 0, -4./3, -4./3, 2./3,
+						4./3,  2./3, 0, 0}, /* triangle */
+					{ 0, 4./3, -4./3, -2./3,
+						4./3,  -2./3, 0, 0}, /* inverted triangle */
+					{ 0, 1, 0.95106, 0.30902, 0.58779, -0.80902,
+						-0.58779, -0.80902, -0.95106, 0.30902} /* pentagon */
+				};
+
+				/* This should never happen since all other codes should be
+				   handled in the switch statement. */
+				if ((curptr->op < W_box) || (curptr->op > W_fpentagon))
+					break;
+
+				/* Calculate index, instead of an ugly long switch statement;
+				   Depends on definition of commands in wgnuplib.h.
+				*/
+				index = (curptr->op - W_box);
 				shape = index / 2;
 				filled = (index % 2) > 0;
+
+				for (i = 0; i < 5; ++i) {
+					if (pointshapes[shape][i * 2 + 1] == 0
+						&& pointshapes[shape][i * 2] == 0)
+						break;
+					p[i].x = xofs + htic * pointshapes[shape][i * 2] + 0.5;
+					p[i].y = yofs + vtic * pointshapes[shape][i * 2 + 1] + 0.5;
+				}
+				if (filled) {
+					/* Filled polygon */
+	#ifdef HAVE_GDIPLUS
+					if (lpgw->antialiasing) {
+						/* filled polygon with border */
+						gdiplusSolidFilledPolygonEx(dc, p, i, last_color, alpha_c, TRUE);
+					} else
+	#endif
+					{
+						SelectObject(dc, lpgw->hsolid);
+						Polygon(dc, p, i);
+						SelectObject(dc, lpgw->hapen);
+					}
+				} else {
+					/* Outline polygon */
+					p[i].x = p[0].x;
+					p[i].y = p[0].y;
+	#ifdef HAVE_GDIPLUS
+					if (lpgw->antialiasing) {
+						gdiplusPolylineEx(dc, p, i + 1, PS_SOLID, line_width, last_color, alpha_c);
+					} else
+	#endif
+					{
+						SelectObject(dc, lpgw->hsolid);
+						Polyline(dc, p, i + 1);
+						SelectObject(dc, lpgw->hapen);
+					}
+					dot(dc, xofs, yofs);
+				}
+			} /* default case */
+			} /* switch (point symbol) */
+
+			if (ps_caching) {
+				/* copy memory bitmap to screen */
+				TransparentBlt(hdc, xdash - xofs, ydash - yofs, 2*htic+2, 2*vtic+2,
+					           dc, 0, 0, 2*htic+2, 2*vtic+2, 0x00ffffff);
+				/* partial clean up */
+				SelectObject(dc, old_brush);
+				SelectObject(dc, old_pen);
 			}
 
-			for (i = 0; i < 5; ++i) {
-				if (pointshapes[shape][i * 2 + 1] == 0
-				 && pointshapes[shape][i * 2] == 0)
-					break;
-				p[i].x = xdash + htic * pointshapes[shape][i * 2] + 0.5;
-				p[i].y = ydash + vtic * pointshapes[shape][i * 2 + 1] + 0.5;
-			}
-			if (filled) {
-				/* Filled polygon */
-#ifdef HAVE_GDIPLUS
-				if (lpgw->antialiasing) {
-					/* filled polygon with border */
-					gdiplusSolidFilledPolygonEx(hdc, p, i, last_color, alpha_c, TRUE);
-				} else
-#endif
-				{
-					SelectObject(hdc, lpgw->hsolid);
-					Polygon(hdc, p, i);
-					SelectObject(hdc, lpgw->hapen);
-				}
-			} else {
-				/* Outline polygon */
-				p[i].x = p[0].x;
-				p[i].y = p[0].y;
-#ifdef HAVE_GDIPLUS
-				if (lpgw->antialiasing) {
-					gdiplusPolylineEx(hdc, p, i + 1, PS_SOLID, line_width, last_color, alpha_c);
-				} else
-#endif
-				{
-					SelectObject(hdc, lpgw->hsolid);
-					Polyline(hdc, p, i + 1);
-					SelectObject(hdc, lpgw->hapen);
-				}
-				dot(hdc, xdash, ydash);
-			}
 			if (keysample) {
 				draw_update_keybox(lpgw, plotno, xdash + htic, ydash + vtic);
 				draw_update_keybox(lpgw, plotno, xdash - htic, ydash - vtic);
