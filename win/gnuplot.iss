@@ -1,5 +1,5 @@
 ﻿;
-; $Id: gnuplot.iss,v 1.2.2.9 2013/04/12 16:33:14 markisch Exp $
+; $Id: gnuplot.iss,v 1.2.2.10 2013/12/31 10:06:48 markisch Exp $
 ;
 ; GNUPLOT - gnuplot.iss
 ;
@@ -71,7 +71,7 @@ OutputBaseFilename={#MyInstallerName}
 SetupIconFile=bin\grpicon.ico
 Compression=lzma2/Max
 SolidCompression=true
-MinVersion=,5.0.2195
+MinVersion=0,5.01
 Uninstallable=true
 ChangesEnvironment=true
 PrivilegesRequired=admin

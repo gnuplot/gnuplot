@@ -4,6 +4,9 @@
 	version of __argc/__argv, but _argv/_argv. A web search shows that
 	MinGW-w64 is different. This is a bug in MinGW's runtime.
 
+	* win/gnuplot.iss (MinVersion):  Minimum required version of the
+	installer is XP.
+
 2014-01-10  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/plot2d.c:  Fix iteration over parametric function plots.
