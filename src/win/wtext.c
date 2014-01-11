@@ -1,5 +1,5 @@
 /*
- *$Id: wtext.c,v 1.37.2.3 2013/07/06 08:28:24 markisch Exp $
+ *$Id: wtext.c,v 1.37.2.4 2013/12/31 15:59:55 markisch Exp $
  */
 
 /* GNUPLOT - win/wtext.c */
@@ -1590,6 +1590,11 @@ WndTextProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
     case WM_CHAR: {
 	/* store key in circular buffer */
 	long count = lptw->KeyBufIn - lptw->KeyBufOut;
+	WPARAM key = wParam;
+
+	/* Remap Shift-Tab to FS */
+	if ((GetKeyState(VK_SHIFT) < 0) && (key == 0x09))
+		key = 034;
 
 	if (count < 0)
 	    count += lptw->KeyBufSize;
@@ -1602,7 +1607,7 @@ WndTextProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		return 0; /* not enough memory */
 	}
 	if (count < lptw->KeyBufSize-1) {
-	    *lptw->KeyBufIn++ = wParam;
+	    *lptw->KeyBufIn++ = key;
 	    if (lptw->KeyBufIn - lptw->KeyBuf >= lptw->KeyBufSize)
 		lptw->KeyBufIn = lptw->KeyBuf;	/* wrap around */
 	}
@@ -1639,7 +1644,7 @@ WndTextProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		    cbuf = (BYTE *) GlobalLock(hGMem);
 		    while (*cbuf) {
 			if (*cbuf != '\n')
-			    SendMessage(lptw->hWndText,WM_CHAR,*cbuf,1L);
+			    SendMessage(lptw->hWndText, WM_CHAR, *cbuf, 1L);
 			cbuf++;
 		    }
 		    GlobalUnlock(hGMem);

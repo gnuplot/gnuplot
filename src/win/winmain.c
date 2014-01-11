@@ -1,5 +1,5 @@
 /*
- * $Id: winmain.c,v 1.52.2.3 2013/06/08 11:52:33 markisch Exp $
+ * $Id: winmain.c,v 1.52.2.4 2014/01/11 08:37:28 markisch Exp $
  */
 
 /* GNUPLOT - win/winmain.c */
@@ -885,12 +885,16 @@ int ConsoleGetch()
                 DWORD recRead;
 
                 ReadConsoleInput(h, &rec, 1, &recRead);
+				/* FIXME: We should handle rec.Event.KeyEvent.wRepeatCount > 1, too. */
                 if (recRead == 1 && rec.EventType == KEY_EVENT && rec.Event.KeyEvent.bKeyDown &&
                         (rec.Event.KeyEvent.wVirtualKeyCode < VK_SHIFT ||
                          rec.Event.KeyEvent.wVirtualKeyCode > VK_MENU))
                 {
                     if (rec.Event.KeyEvent.uChar.AsciiChar)
-                        return rec.Event.KeyEvent.uChar.AsciiChar;
+						if ((rec.Event.KeyEvent.dwControlKeyState == SHIFT_PRESSED) && (rec.Event.KeyEvent.wVirtualKeyCode == VK_TAB))
+							return 034; /* remap Shift-Tab */
+						else
+							return rec.Event.KeyEvent.uChar.AsciiChar;
                     else
                         switch (rec.Event.KeyEvent.wVirtualKeyCode)
                         {
