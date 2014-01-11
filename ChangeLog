@@ -1,5 +1,8 @@
 2014-01-11  Bastian Maerkisch  <bmaerkisch@web.de>
 
+	* config/mingw/Makefile:  Automatically update version numbers for
+	installer.
+
 	* src/win/wgraph.c (drawgraph):  When drawing to the screen, point
 	symbols are drawn to a memory bitmap first, which is then copied to
 	the target device. That way subsequent draws of the same point symbol

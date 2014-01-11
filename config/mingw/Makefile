@@ -1,5 +1,5 @@
 # Hello, emacs: this is a -*- Makefile -*-
-# $Id: Makefile,v 1.33 2013/12/28 05:25:18 markisch Exp $
+# $Id: Makefile,v 1.34 2013/12/28 05:44:43 markisch Exp $
 #
 # GNUPLOT Makefile for MinGW/MSYS on Windows
 # This assumes usual installation of the MinGW32 toolkit, the free
@@ -382,6 +382,11 @@ else
 VERSIONING = all: $(S)/version.c
 endif
 
+MAINVERSION := `cat $(TOP)/VERSION`
+SHORTVERSION := `cut -b 2 --complement $(TOP)/VERSION``cat $(TOP)/PATCHLEVEL`
+LONGVERSION := `cat $(TOP)/VERSION`.`cat $(TOP)/PATCHLEVEL`
+FULLVERSION := `cat $(TOP)/VERSION` patchlevel `cat $(TOP)/PATCHLEVEL`
+
 default: $(VERSIONING) $(TARGET) $(MENUFILE) support
 
 console: $(VERSIONING)
@@ -680,8 +685,9 @@ clean:
 	$(RM) eg?.tex eg?.eps linepoin.tex test.tex test_tikz.tex
 	$(RM) $(D)windows/wgnuplot.log $(D)windows/wgnuplot.hhc
 	$(RM) $(D)windows/*.png $(D)windows/wgnuplot.html
+	-$(RM) timestamp.h *.tmp *.par
 	-$(RM) -rf ./dist/ ./gnuplot/
-	$(RM) -rf $(JA)
+	-$(RM) -rf $(JA)
 
 realclean: veryclean
 veryclean: clean
@@ -749,6 +755,8 @@ endif
 # demo and contrib
 	mkdir -p $(DESTDIR)/demo
 	-cp -p $(M)* $(DESTDIR)/demo/
+	mkdir -p $(DESTDIR)/demo/games/
+	-cp -p $(M)* $(DESTDIR)/demo/games
 	mkdir -p $(DESTDIR)/contrib/pm3d/
 	-cp -p $(TOP)/pm3d/contrib/* $(DESTDIR)/contrib/pm3d/
 # docs
@@ -773,17 +781,26 @@ installer:
 	$(MAKE) DESTDIR=./dist install
 	cp -p $(W)/grpicon.ico ./dist/bin/
 	cp -p $(TOP)/win/*.iss ./dist
+	sed -e '/^#define MyAppVersionShort/ s/"[^"]*"/"@VERSHORT@"/' \
+	    -e '/^#define MyAppVersion/ s/"[^"]*"/"@VER@"/' \
+	    -e '/^#define MyAppNumVersion/ s/"[^"]*"/"@VERLONG@"/' \
+	    -e '/^#define MyInstallerName/ s/"[^"]*"/"@INSTALLER@"/' \
+	    -e "s/@VERSHORT@/$(MAINVERSION)/" \
+	    -e "s/@VER@/$(FULLVERSION)/" \
+	    -e "s/@VERLONG@/$(LONGVERSION)/" \
+	    -e "s/@INSTALLER@/gp$(SHORTVERSION)-win32-setup/" \
+	    $(TOP)/win/gnuplot.iss > ./dist/gnuplot.iss
 	(cd ./dist; $(ISCC) gnuplot.iss)
 ifdef RELEASE
-	mv ./dist/gp*-setup.exe gp470-win32-setup.exe
+	mv ./dist/gp*-setup.exe gp$(SHORTVERSION)-win32-setup.exe
 else
-	mv ./dist/gp*-setup.exe gp470-`date +%Y%m%d`-win32-mingw.exe
+	mv ./dist/gp*-setup.exe gp$(SHORTVERSION)-`date +%Y%m%d`-win32-mingw.exe
 endif
 
 zip:
 	$(MAKE) DESTDIR=./gnuplot install
 ifdef RELEASE
-	zip -mro9 gp470-win32-mingw.zip gnuplot
+	zip -mro9 gp$(SHORTVERSION)-win32-mingw.zip gnuplot
 else
-	zip -mro9 gp470-`date +%Y%m%d`-win32-mingw.zip gnuplot
+	zip -mro9 gp$(SHORTVERSION)-`date +%Y%m%d`-win32-mingw.zip gnuplot
 endif
