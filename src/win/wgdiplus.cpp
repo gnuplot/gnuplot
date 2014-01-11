@@ -1,5 +1,5 @@
 /*
- * $Id: wgdiplus.cpp,v 1.8 2013/06/11 20:52:52 markisch Exp $
+ * $Id: wgdiplus.cpp,v 1.9 2014/01/04 15:46:38 markisch Exp $
  */
 
 /*
@@ -352,7 +352,14 @@ SetFont_gdiplus(Graphics &graphics, LPRECT rect, LPGW lpgw, char * fontname, int
 	int fontHeight;
 	if (fontFamily->GetLastStatus() != Ok) {
 		delete fontFamily;
+#ifndef __MINGW32__
 		fontFamily = FontFamily::GenericSansSerif();
+#else
+		// FIXME: MinGW 4.8.1 gives an unresolved external error for the above
+		family = UnicodeText(GraphDefaultFont(), S_ENC_DEFAULT); // should always be available
+		fontFamily = new FontFamily(family);
+		free(family);
+#endif
 		font = new Font(fontFamily, size * lpgw->sampling, fontStyle, UnitPoint);
 		fontHeight = font->GetSize() / fontFamily->GetEmHeight(fontStyle) * graphics.GetDpiY() / 72. *
 			(fontFamily->GetCellAscent(fontStyle) + fontFamily->GetCellDescent(fontStyle));

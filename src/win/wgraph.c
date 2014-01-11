@@ -1,5 +1,5 @@
 /*
- * $Id: wgraph.c,v 1.174 2014/01/04 14:24:24 markisch Exp $
+ * $Id: wgraph.c,v 1.175 2014/01/04 15:46:38 markisch Exp $
  */
 
 /* GNUPLOT - win/wgraph.c */
@@ -229,7 +229,6 @@ static void	CopyClip(LPGW lpgw);
 static void	SaveAsEMF(LPGW lpgw);
 static void	CopyPrint(LPGW lpgw);
 static void	WriteGraphIni(LPGW lpgw);
-static char *	GraphDefaultFont(void);
 static void	ReadGraphIni(LPGW lpgw);
 static void	track_tooltip(LPGW lpgw, int x, int y);
 static COLORREF	GetColor(HWND hwnd, COLORREF ref);
@@ -3086,7 +3085,8 @@ WriteGraphIni(LPGW lpgw)
 }
 
 
-static char * GraphDefaultFont(void)
+char * 
+GraphDefaultFont(void)
 {
 	if (GetACP() == 932) /* Japanese Shift-JIS */
 		return WINJPFONT;

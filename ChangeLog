@@ -1,3 +1,16 @@
+2014-01-11  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/win/wgnuplib.h src/win/wgdiplus.cpp src/win/wgraph.c:  Using
+	MinGW 4.8.1, FontFamily::GenericSansSerif() results in unresolved
+	externals during linking. This is a bug in MinGW's runtime.
+
+	* src/win/winmain.c:  Current version of MinGW does not offer working
+	version of __argc/__argv, but _argv/_argv. A web search shows that
+	MinGW-w64 is different. This is a bug in MinGW's runtime.
+
+	* win/gnuplot.iss (MinVersion):  Minimum required version of the
+	installer is XP.
+
 2014-01-10  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/plot2d.c:  Fix iteration over parametric function plots.
