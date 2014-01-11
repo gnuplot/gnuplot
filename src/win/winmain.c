@@ -1,5 +1,5 @@
 /*
- * $Id: winmain.c,v 1.69 2014/01/04 02:29:27 markisch Exp $
+ * $Id: winmain.c,v 1.70 2014/01/04 02:55:06 markisch Exp $
  */
 
 /* GNUPLOT - win/winmain.c */
@@ -360,7 +360,7 @@ LocalisedFile(const char * name, const char * ext, const char * defaultname)
 static void
 ReadMainIni(LPSTR file, LPSTR section)
 {
-    char profile[81] = "";
+	char profile[81] = "";
 	const char hlpext[] = ".chm";
 	const char name[] = "wgnuplot-";
 
@@ -401,22 +401,27 @@ ReadMainIni(LPSTR file, LPSTR section)
 
 #ifndef WGP_CONSOLE
 int PASCAL WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
-                LPSTR lpszCmdLine, int nCmdShow)
+                   LPSTR lpszCmdLine, int nCmdShow)
 #else
 int main(int argc, char **argv)
 #endif
 {
-        LPSTR tail;
+	LPSTR tail;
+	int i;
 
 #ifdef WGP_CONSOLE
-# define _argv argv
-# define _argc argc
-        HINSTANCE hInstance = GetModuleHandle(NULL), hPrevInstance = NULL;
-#else
-#if defined(__MSC__) || defined(__WATCOMC__) || defined(__MINGW32__)
-#  define _argv __argv
-#  define _argc __argc
+	HINSTANCE hInstance = GetModuleHandle(NULL), hPrevInstance = NULL;
 #endif
+
+
+#ifndef WGP_CONSOLE
+# if defined( __MINGW32__) && !defined(_W64)
+#  define argc _argc
+#  define argv _argv
+# else /* MSVC, WATCOM, MINGW-W64 */
+#  define argc __argc
+#  define argv __argv
+# endif
 #endif /* WGP_CONSOLE */
 
         szModuleName = (LPSTR)malloc(MAXSTR+1);
@@ -523,25 +528,37 @@ int main(int argc, char **argv)
 	}
 
 #ifndef WGP_CONSOLE
-        if (TextInit(&textwin))
-                gp_exit(EXIT_FAILURE);
-        textwin.hIcon = LoadIcon(hInstance, "TEXTICON");
-        SetClassLongPtr(textwin.hWndParent, GCLP_HICON, (LONG_PTR)textwin.hIcon);
-	if (_argc > 1) {
-		if (persist_cl)
-			ShowWindow(textwin.hWndParent, textwin.nCmdShow);
-	} else {
-		ShowWindow(textwin.hWndParent, textwin.nCmdShow);
+	if (TextInit(&textwin))
+		gp_exit(EXIT_FAILURE);
+	textwin.hIcon = LoadIcon(hInstance, "TEXTICON");
+	SetClassLongPtr(textwin.hWndParent, GCLP_HICON, (LONG_PTR)textwin.hIcon);
+
+	/* Note: we want to know whether this is an interactive session so that we can
+	 * decide whether or not to write status information to stderr.  The old test
+	 * for this was to see if (argc > 1) but the addition of optional command line
+	 * switches broke this.  What we really wanted to know was whether any of the
+	 * command line arguments are file names or an explicit in-line "-e command".
+	 * (This is a copy of a code snippet from plot.c)
+	 */
+	for (i = 1; i < argc; i++) {
+		if (!stricmp(argv[i], "/noend"))
+			continue;
+		if ((argv[i][0] != '-') || (argv[i][1] == 'e')) {
+			interactive = FALSE;
+			break;
+		}
 	}
-        if (IsIconic(textwin.hWndParent)) { /* update icon */
-                RECT rect;
-                GetClientRect(textwin.hWndParent, (LPRECT) &rect);
-                InvalidateRect(textwin.hWndParent, (LPRECT) &rect, 1);
-                UpdateWindow(textwin.hWndParent);
-        }
+	if (interactive)
+		ShowWindow(textwin.hWndParent, textwin.nCmdShow);
+	if (IsIconic(textwin.hWndParent)) { /* update icon */
+		RECT rect;
+		GetClientRect(textwin.hWndParent, (LPRECT) &rect);
+		InvalidateRect(textwin.hWndParent, (LPRECT) &rect, 1);
+		UpdateWindow(textwin.hWndParent);
+	}
 # ifndef __WATCOMC__
-        /* Finally, also redirect C++ standard output streams. */
-        RedirectOutputStreams(TRUE);
+	/* Finally, also redirect C++ standard output streams. */
+	RedirectOutputStreams(TRUE);
 # endif
 #else /* WGP_CONSOLE */
 #ifdef CONSOLE_SWITCH_CP
@@ -561,18 +578,18 @@ int main(int argc, char **argv)
 #endif
 #endif
 
-        gp_atexit(WinExit);
+	gp_atexit(WinExit);
 
-        if (!isatty(fileno(stdin)))
-            setmode(fileno(stdin), O_BINARY);
+	if (!isatty(fileno(stdin)))
+		setmode(fileno(stdin), O_BINARY);
 
-        gnu_main(_argc, _argv);
+	gnu_main(argc, argv);
 
-        /* First chance to close help system for console gnuplot,
-        second for wgnuplot */
-        WinCloseHelp();
-        gp_exit_cleanup();
-        return 0;
+	/* First chance to close help system for console gnuplot,
+	   second for wgnuplot */
+	WinCloseHelp();
+	gp_exit_cleanup();
+	return 0;
 }
 
 
