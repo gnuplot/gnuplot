@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.274 2013/12/24 02:09:55 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.275 2014/01/04 02:55:05 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -1236,21 +1236,27 @@ link_command()
 	memset(axis_array[secondary_axis].link_udf, 0, sizeof(udft_entry));
     }
 
-    if (!equals(c_token,"via")) {
+    if (equals(c_token,"via")) {
+	parse_link_via(axis_array[secondary_axis].link_udf,
+		    (secondary_axis==SECOND_X_AXIS) ? "x" : "y");
+	if (almost_equals(c_token,"inv$erse")) {
+	    parse_link_via(axis_array[primary_axis].link_udf,
+			  (secondary_axis==SECOND_X_AXIS) ? "x" : "y");
+	} else {
+	    int_warn(c_token,"inverse mapping function required");
+	    linked = FALSE;
+	}
+    }
+
+    if (linked) {
+	/* Clone the range information */
+	clone_linked_axes(secondary_axis, primary_axis);
+    } else {
 	free_at(axis_array[secondary_axis].link_udf->at);
 	axis_array[secondary_axis].link_udf->at = NULL;
 	free_at(axis_array[primary_axis].link_udf->at);
 	axis_array[primary_axis].link_udf->at = NULL;
-    } else {
-	parse_link_via(axis_array[secondary_axis].link_udf,
-		    (secondary_axis==SECOND_X_AXIS) ? "x" : "y");
-	if (!almost_equals(c_token,"inv$erse"))
-	    int_error(c_token,"inverse mapping function required");
-	parse_link_via(axis_array[primary_axis].link_udf,
-		    (secondary_axis==SECOND_X_AXIS) ? "x" : "y");
     }
-    /* Clone the range information */
-    clone_linked_axes(secondary_axis, primary_axis);
 }
 
 /* process the 'load' command */
