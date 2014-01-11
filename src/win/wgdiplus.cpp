@@ -1,5 +1,5 @@
 /*
- * $Id: wgdiplus.cpp,v 1.9 2014/01/04 15:46:38 markisch Exp $
+ * $Id: wgdiplus.cpp,v 1.10 2014/01/11 09:22:47 markisch Exp $
  */
 
 /*
@@ -1125,10 +1125,7 @@ drawgraph_gdiplus(LPGW lpgw, HDC hdc, LPRECT rect)
 				htic = pointsize * MulDiv(lpgw->htic, rr-rl, lpgw->xmax) + 1;
 				vtic = pointsize * MulDiv(lpgw->vtic, rb-rt, lpgw->ymax) + 1;
 				/* invalidate point symbol cache */
-				if (cb != NULL) {
-					delete cb;
-					cb = NULL;
-				}
+				last_symbol = 0;
 			}
 			break;
 
@@ -1141,10 +1138,7 @@ drawgraph_gdiplus(LPGW lpgw, HDC hdc, LPRECT rect)
 			solid_pen.SetWidth(line_width);
 			pen.SetWidth(line_width);
 			/* invalidate point symbol cache */
-			if (cb != NULL) {
-				delete cb;
-				cb = NULL;
-			}
+			last_symbol = 0;
 			break;
 
 		case W_setcolor: {
@@ -1181,6 +1175,10 @@ drawgraph_gdiplus(LPGW lpgw, HDC hdc, LPRECT rect)
 			solid_brush.SetColor(pcolor);
 			pen.SetColor(pcolor);
 			solid_pen.SetColor(pcolor);
+
+			/* invalidate point symbol cache */
+			if (last_color != color)					
+				last_symbol = 0;
 
 			/* remember this color */
 			cur_penstruct.lopnColor = color;
@@ -1348,8 +1346,8 @@ drawgraph_gdiplus(LPGW lpgw, HDC hdc, LPRECT rect)
 		}
 
 		default: {
-			// This should never happen since all other codes should be
-			// handled in the switch statement.
+			/* This covers only point symbols. All other codes should be
+			   handled in the switch statement. */
 			if ((curptr->op < W_dot) || (curptr->op > W_dot + WIN_POINT_TYPES))
 				break;
 
@@ -1376,8 +1374,9 @@ drawgraph_gdiplus(LPGW lpgw, HDC hdc, LPRECT rect)
 				g = Graphics::FromImage(b);
 				if (lpgw->antialiasing)
 					g->SetSmoothingMode(SmoothingModeAntiAlias8x8);
-				xofs = htic+1;
-				yofs = vtic+1;
+				cb_ofs.x = xofs = htic+1;
+				cb_ofs.y = yofs = vtic+1;
+				last_symbol = curptr->op;
 			} else {
 				g = &graphics;
 				xofs = xdash;
@@ -1426,9 +1425,8 @@ drawgraph_gdiplus(LPGW lpgw, HDC hdc, LPRECT rect)
 				if ((curptr->op < W_box) || (curptr->op > W_fpentagon))
 					break;
 
-				/* BM: calculate index, instead of an ugly long switch statement;
-					Depends on definition of commands in wgnuplib.h.
-				*/
+				// Calculate index, instead of an ugly long switch statement;
+				// Depends on definition of commands in wgnuplib.h.
 				index = (curptr->op - W_box);
 				shape = index / 2;
 				filled = (index % 2) > 0;
@@ -1450,26 +1448,24 @@ drawgraph_gdiplus(LPGW lpgw, HDC hdc, LPRECT rect)
 					gdiplusPolyline(*g, solid_pen, p, i + 1);
 					gdiplusDot(*g, solid_brush, xofs, yofs);
 				}
-				} /* default case */
-			}
-			if (keysample) {
-				draw_update_keybox(lpgw, plotno, xdash + htic, ydash + vtic);
-				draw_update_keybox(lpgw, plotno, xdash - htic, ydash - vtic);
-			}
+			} /* default case */
+			} /* switch (point symbol) */
 
 			if (b != NULL) {
 				// create a chached bitmap for faster redrawing
 				cb = new CachedBitmap(b, &graphics);
-				last_symbol = curptr->op;
-				cb_ofs.x = xofs;
-				cb_ofs.y = yofs;
 				// display bitmap
 				graphics.DrawCachedBitmap(cb, xdash - xofs, ydash - yofs);
 				delete b;
 				delete g;
 			}
+
+			if (keysample) {
+				draw_update_keybox(lpgw, plotno, xdash + htic, ydash + vtic);
+				draw_update_keybox(lpgw, plotno, xdash - htic, ydash - vtic);
+			}
 			break;
-		} /* default case */
+			} /* default case */
 		} /* switch(opcode) */
 		} /* hide layer? */
 
