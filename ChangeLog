@@ -5,6 +5,11 @@
 	function or neither.
 	Bug #1318
 
+	* src/plot3d.c (plot3drequest) src/graph3d.c ([x|y]tick_callback):
+	Support x2 and y2 axis labels in 3D plots ('set view map' mode only).
+	In order for this to work, the secondary axis must be linked to the
+	primary axis first ("set link").
+
 2014-01-11  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* config/mingw/Makefile:  Automatically update version numbers for

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.127 2013/12/21 01:18:41 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.128 2013/12/26 17:58:28 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -2158,7 +2158,8 @@ clone_linked_axes(AXIS_INDEX axis2, AXIS_INDEX axis1)
  * transform to get back to the primary coordinate system before mapping.
  */
 
-int map_x(double value)
+int
+map_x(double value)
 {
     if ((x_axis == SECOND_X_AXIS) 
     &&  axis_array[SECOND_X_AXIS].linked_to_primary
@@ -2171,7 +2172,8 @@ int map_x(double value)
     return AXIS_MAP(x_axis, value);
 }
 
-int map_y(double value)
+int
+map_y(double value)
 {
     if ((y_axis == SECOND_Y_AXIS)
     &&  axis_array[SECOND_Y_AXIS].linked_to_primary

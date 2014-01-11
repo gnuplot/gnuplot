@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.844 2014/01/10 03:31:08 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.845 2014/01/11 01:00:10 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -2529,7 +2529,7 @@ Ffigure_newsyntax
  (left) and y2 (right) -- as an independent axis.  The `axes` option lets you
  choose which pair of axes a given function or data set is plotted against.  A
  full complement of `set` commands exists to give you complete control over
- the scales and labelling of each axis.  Some commands have the name of an
+ the scales and labeling of each axis.  Some commands have the name of an
  axis built into their names, such as `set xlabel`.  Other commands have one
  or more axis names as options, such as `set logscale xy`.  Commands and
  options controlling the z axis have no effect on 2D graphs.
@@ -2540,8 +2540,8 @@ Ffigure_newsyntax
  data. For contours see `set contour`, `set cntrlabel`, and `set cntrparam`.
 
  In `splot`, control over the scales and labels of the axes are the same as
- with `plot`, except that commands and options controlling the x2 and y2 axes
- have no effect whereas of course those controlling the z axis do take effect.
+ with `plot` except that there is also a z axis and labeling the x2 and y2 axes
+ is possible only for pseudo-2D plots created using `set view map`.
 2 Start-up (initialization)
 ?startup
 ?start
@@ -7685,7 +7685,7 @@ Ffigure_mapcontours
  the base and the surface.  If no option is provided, the default is `base`.
 
  See also `set cntrparam` for the parameters that affect the drawing of
- contours, and `set cntrlabel` for control of labelling of the contours.
+ contours, and `set cntrlabel` for control of labeling of the contours.
 
  The surface can be switched off (see `unset surface`), giving a contour-only
  graph.  Though it is possible to use `set size` to enlarge the plot to fill

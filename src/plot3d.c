@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.220 2013/12/27 23:56:15 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.221 2014/01/10 03:31:08 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -300,6 +300,15 @@ plot3drequest()
 	copy_str(c_dummy_var[1], dummy_token1, MAX_ID_LEN);
     else
 	strcpy(c_dummy_var[1], set_dummy_var[1]);
+
+    /* In "set view map" mode the x2 and y2 axes are legal */
+    /* but must be linked to the respective primary axis. */
+    if (splot_map) {
+	if ((axis_array[SECOND_X_AXIS].ticmode && !axis_array[SECOND_X_AXIS].linked_to_primary)
+	||  (axis_array[SECOND_Y_AXIS].ticmode && !axis_array[SECOND_Y_AXIS].linked_to_primary))
+	    int_error(NO_CARET,
+		"Secondary axis must be linked to primary axis in order to draw tics");
+    }
 
     eval_3dplots();
 }
@@ -2110,6 +2119,10 @@ eval_3dplots()
     setup_tics(FIRST_X_AXIS, 20);
     setup_tics(FIRST_Y_AXIS, 20);
     setup_tics(FIRST_Z_AXIS, 20);
+    if (splot_map) {
+	setup_tics(SECOND_X_AXIS, 20);
+	setup_tics(SECOND_Y_AXIS, 20);
+    }
 
     set_plot_with_palette(plot_num, MODE_SPLOT);
     if (is_plot_with_palette()) {
