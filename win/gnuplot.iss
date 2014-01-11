@@ -1,5 +1,5 @@
 ﻿;
-; $Id: gnuplot.iss,v 1.4 2012/03/12 06:17:10 markisch Exp $
+; $Id: gnuplot.iss,v 1.5 2013/07/06 08:09:20 markisch Exp $
 ;
 ; GNUPLOT - gnuplot.iss
 ;
@@ -71,13 +71,13 @@ OutputBaseFilename={#MyInstallerName}
 SetupIconFile=bin\grpicon.ico
 Compression=lzma2/Max
 SolidCompression=true
-MinVersion=,5.0.2195
+MinVersion=0,5.01
 Uninstallable=true
 ChangesEnvironment=true
 PrivilegesRequired=admin
 UseSetupLdr=true
 WindowStartMaximized=true
-VersionInfoVersion={#MyappNumVersion}
+VersionInfoVersion={#MyAppNumVersion}
 VersionInfoCompany={#MyAppPublisher}
 VersionInfoDescription=Famous scientific plotting package.
 VersionInfoProductName=gnuplot
