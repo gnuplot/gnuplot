@@ -14,6 +14,9 @@ if (ARGC == 0) {
     print "Now Exercise the call mechanism"
     call ARG0 1.23e4 "string constant" FOO BAZ "3 + log(BAZ)"
 } else {
+    print "\n\tTest whether this copy of gnuplot also supports deprecated"
+    print "\tcall parameter syntax "."$"."0 "."$"."1 "."$"."2 "."etc: "
+    print "\t\t", exists("$3") ? "yes" : "no"
     show variable ARG
     print "ARG1 (numerical constant) came through as ", ARG1
     print "     @ARG1 = ", @ARG1
