@@ -1,4 +1,4 @@
-2014-01-11  Ethan A Merritt  <merritt@u.washington.edu>
+2014-01-12  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/command.c (link_command):  Enforce a consistent linkage state;
 	we must either have both a forward and a reverse ("via" and "inverse")
@@ -9,6 +9,8 @@
 	Support x2 and y2 axis labels in 3D plots ('set view map' mode only).
 	In order for this to work, the secondary axis must be linked to the
 	primary axis first ("set link").
+
+	* src/color.c: remove unnecessary parameter
 
 2014-01-11  Bastian Maerkisch  <bmaerkisch@web.de>
 

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: color.c,v 1.109 2013/09/25 22:21:26 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: color.c,v 1.110 2013/09/26 22:45:33 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - color.c */
@@ -49,8 +49,8 @@ static t_sm_palette prev_palette = {
 
 /* Internal prototype declarations: */
 
-static void draw_inside_color_smooth_box_postscript __PROTO((FILE * out));
-static void draw_inside_color_smooth_box_bitmap __PROTO((FILE * out));
+static void draw_inside_color_smooth_box_postscript __PROTO((void));
+static void draw_inside_color_smooth_box_bitmap __PROTO((void));
 void cbtick_callback __PROTO((AXIS_INDEX axis, double place, char *text, int ticlevel,
 			struct lp_style_type grid, struct ticmark *userlabels));
 
@@ -326,30 +326,30 @@ filled_polygon_3dcoords_zfixed(int points, struct coordinate GPHUGE * coords, do
    PS routine.
  */
 static void
-draw_inside_color_smooth_box_postscript(FILE * out)
+draw_inside_color_smooth_box_postscript()
 {
     int scale_x = (color_box.bounds.xright - color_box.bounds.xleft), scale_y = (color_box.bounds.ytop - color_box.bounds.ybot);
     fputs("stroke gsave\t%% draw gray scale smooth box\n"
-	  "maxcolors 0 gt {/imax maxcolors def} {/imax 1024 def} ifelse\n", out);
+	  "maxcolors 0 gt {/imax maxcolors def} {/imax 1024 def} ifelse\n", gppsfile);
 
     /* nb. of discrete steps (counted in the loop) */
-    fprintf(out, "%i %i translate %i %i scale 0 setlinewidth\n", color_box.bounds.xleft, color_box.bounds.ybot, scale_x, scale_y);
+    fprintf(gppsfile, "%i %i translate %i %i scale 0 setlinewidth\n", color_box.bounds.xleft, color_box.bounds.ybot, scale_x, scale_y);
     /* define left bottom corner and scale of the box so that all coordinates
        of the box are from [0,0] up to [1,1]. Further, this normalization
        makes it possible to pass y from [0,1] as parameter to setgray */
-    fprintf(out, "/ystep 1 imax div def /y0 0 def /ii 0 def\n");
+    fprintf(gppsfile, "/ystep 1 imax div def /y0 0 def /ii 0 def\n");
     /* local variables; y-step, current y position and counter ii;  */
     if (sm_palette.positive == SMPAL_NEGATIVE)	/* inverted gray for negative figure */
-	fputs("{ 0.99999 y0 sub g ", out); /* 1 > x > 1-1.0/1024 */
+	fputs("{ 0.99999 y0 sub g ", gppsfile); /* 1 > x > 1-1.0/1024 */
     else
-	fputs("{ y0 g ", out);
+	fputs("{ y0 g ", gppsfile);
     if (color_box.rotation == 'v')
-	fputs("0 y0 N 1 0 V 0 ystep V -1 0 f\n", out);
+	fputs("0 y0 N 1 0 V 0 ystep V -1 0 f\n", gppsfile);
     else
-	fputs("y0 0 N 0 1 V ystep 0 V 0 -1 f\n", out);
+	fputs("y0 0 N 0 1 V ystep 0 V 0 -1 f\n", gppsfile);
     fputs("/y0 y0 ystep add def /ii ii 1 add def\n"
 	  "ii imax ge {exit} if } loop\n"
-	  "grestore 0 setgray\n", out);
+	  "grestore 0 setgray\n", gppsfile);
 }
 
 
@@ -360,7 +360,7 @@ draw_inside_color_smooth_box_postscript(FILE * out)
    over all thin rectangles
  */
 static void
-draw_inside_color_smooth_box_bitmap(FILE * out)
+draw_inside_color_smooth_box_bitmap()
 {
     int steps = 128; /* I think that nobody can distinguish more colours drawn in the palette */
     int i, j, xy, xy2, xy_from, xy_to;
@@ -368,7 +368,6 @@ draw_inside_color_smooth_box_bitmap(FILE * out)
     double xy_step, gray, range;
     gpiPoint corners[4];
 
-    (void) out;			/* to avoid "unused parameter" warning */
     if (color_box.rotation == 'v') {
 	corners[0].x = corners[3].x = color_box.bounds.xleft;
 	corners[1].x = corners[2].x = color_box.bounds.xright;
@@ -555,7 +554,6 @@ void
 draw_color_smooth_box(int plot_mode)
 {
     double tmp;
-    FILE *out = gppsfile;	/* either gpoutfile or PSLATEX_auxfile */
 
     if (color_box.where == SMCOLOR_BOX_NO)
 	return;
@@ -645,13 +643,11 @@ draw_color_smooth_box(int plot_mode)
 	color_box.bounds.ybot = tmp;
     }
 
-    /* Optimized version of the smooth colour box in postscript. Advantage:
-       only few lines of code is written into the output file.
-     */
+    /* The PostScript terminal has an Optimized version */
     if ((term->flags & TERM_IS_POSTSCRIPT) != 0)
-	draw_inside_color_smooth_box_postscript(out);
+	draw_inside_color_smooth_box_postscript();
     else
-	draw_inside_color_smooth_box_bitmap(out);
+	draw_inside_color_smooth_box_bitmap();
 
     if (color_box.border) {
 	/* now make boundary around the colour box */
