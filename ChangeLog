@@ -12,6 +12,9 @@
 
 	* src/color.c: remove unnecessary parameter
 
+	* src/README -> docs/old/README.intercals:
+	Delete ancient comments on code refactoring circa 2000
+
 2014-01-11  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* config/mingw/Makefile:  Automatically update version numbers for
