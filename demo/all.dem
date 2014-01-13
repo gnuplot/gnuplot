@@ -1,5 +1,5 @@
 #
-# $Id: all.dem,v 1.55 2013/10/19 04:31:03 sfeam Exp $
+# $Id: all.dem,v 1.56 2013/12/28 21:53:57 sfeam Exp $
 #
 # Executes all demos (OK, MOST demos) in this directory.
 # This serves as a series of unit tests for non-interactive capabilities.
@@ -304,6 +304,10 @@ reset
 
 print "********************** file approximate.dem *********************"
 load "approximate.dem"
+reset
+
+print "********************** file parallel.dem *********************"
+load "parallel.dem"
 reset
 
 print "********************** file transparent.dem *********************"
