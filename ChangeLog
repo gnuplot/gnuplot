@@ -10,9 +10,9 @@
 	In order for this to work, the secondary axis must be linked to the
 	primary axis first ("set link").
 
-	* src/color.c: remove unnecessary parameter
+	* src/color.c (draw_inside_color_smooth_*): remove unnecessary parameter
 
-	* src/README -> docs/old/README.intercals:
+	* src/README -> docs/old/README.internals:
 	Delete ancient comments on code refactoring circa 2000
 
 2014-01-11  Bastian Maerkisch  <bmaerkisch@web.de>
