@@ -1,6 +1,7 @@
 2014-01-13  Ethan A Merritt  <merritt@u.washington.edu>
 
-	* src/set.c (set_allzeroaxis):  Bug fix.
+	* src/set.c (set_allzeroaxis set_palette_defined set_clip set_encoding):
+	Fuzz-testing found improper handling of END_OF_COMMAND cases.
 
 2014-01-12  Ethan A Merritt  <merritt@u.washington.edu>
 

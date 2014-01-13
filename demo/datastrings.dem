@@ -79,3 +79,4 @@ plot 'table.dat' using 0:2:xtic(1) title col with lines lw 3, \
 
 #
 pause -1 "<cr> to end demo"
+reset

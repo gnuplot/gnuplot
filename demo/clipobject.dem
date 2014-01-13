@@ -74,5 +74,5 @@ do for [i=1:4]{ set object i noclip; set object i*11 noclip; set object i*111 no
 plot 0
 
 pause -1 "Hit return to continue"
-
+undefine fs
 reset
