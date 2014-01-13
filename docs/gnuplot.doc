@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.845 2014/01/11 01:00:10 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.846 2014/01/12 22:49:31 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -12990,6 +12990,7 @@ Ffigure_missing
 ?zeroaxis
  The x axis may be drawn by `set xzeroaxis` and removed by `unset xzeroaxis`.
  Similar commands behave similarly for the y, x2, y2, and z axes.
+ `set zeroaxis ...` (no prefix) acts on the x, y, and z axes jointly.
 
  Syntax:
        set {x|x2|y|y2|z}zeroaxis { {linestyle | ls <line_style>}
@@ -13006,9 +13007,6 @@ Ffigure_missing
 
  If no linetype is specified, any zero axes selected will be drawn
  using the axis linetype (linetype 0).
-
- `set zeroaxis` is equivalent to `set xzeroaxis; set yzeroaxis`.
- Note that the z-axis must be set separately using `set zzeroaxis`.
 
  Examples:
 
