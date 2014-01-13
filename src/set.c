@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.354.2.7 2013/10/21 22:31:49 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.354.2.8 2013/10/22 03:41:14 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -1111,18 +1111,20 @@ static void
 set_clip()
 {
     c_token++;
-    if (END_OF_COMMAND)
+    if (END_OF_COMMAND) {
 	/* assuming same as points */
 	clip_points = TRUE;
-    else if (almost_equals(c_token, "p$oints"))
+    } else if (almost_equals(c_token, "p$oints")) {
 	clip_points = TRUE;
-    else if (almost_equals(c_token, "o$ne"))
+	c_token++;
+    } else if (almost_equals(c_token, "o$ne")) {
 	clip_lines1 = TRUE;
-    else if (almost_equals(c_token, "t$wo"))
+	c_token++;
+    } else if (almost_equals(c_token, "t$wo")) {
 	clip_lines2 = TRUE;
-    else
+	c_token++;
+    } else
 	int_error(c_token, "expecting 'points', 'one', or 'two'");
-    c_token++;
 }
 
 
@@ -1420,10 +1422,21 @@ set_encoding()
     } else {
 	int temp = lookup_table(&set_encoding_tbl[0],c_token);
 
+	/* allow string variables as parameter */
+	if ((temp == S_ENC_INVALID) && isstringvalue(c_token)) {
+	    int i;
+	    char *senc = try_to_get_string();
+	    for (i = 0; encoding_names[i] != NULL; i++)
+		if (strcmp(encoding_names[i], senc) == 0)
+		    temp = i;
+	    free(senc);
+	} else {
+	    c_token++;
+	}
+
 	if (temp == S_ENC_INVALID)
 	    int_error(c_token, "unrecognized encoding specification; see 'help encoding'.");
 	encoding = temp;
-	c_token++;
     }
 
     /* Set degree sign to match encoding */
@@ -2851,6 +2864,7 @@ set_palette_defined()
 	sm_palette.gradient_num = 8;
 	sm_palette.cmodel = C_MODEL_RGB;
 	sm_palette.smallest_gradient_interval = 0.1;  /* From pal[][] */
+	c_token--; /* Caller will increment! */
 	return 0;
     }
 

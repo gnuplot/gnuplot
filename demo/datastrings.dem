@@ -99,9 +99,5 @@ splot 'labelplot.pdb' using 7:8:9 with lines notitle, \
       '' using 7:8:9:4 with labels left offset 1,0 point \
 	   ps 2 pt 1 tc lt 3 font "Helvetica,10" notitle
 #
-pause -1 "<cr> to view star map"
-#
-reset
-load "starmap.dem"
-#
 pause -1 "<cr> to end demo"
+reset

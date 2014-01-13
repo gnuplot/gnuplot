@@ -75,4 +75,5 @@ plot 0
 
 pause -1 "Hit return to continue"
 
+undefine fs
 reset
