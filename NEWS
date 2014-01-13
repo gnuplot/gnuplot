@@ -17,6 +17,7 @@ New features, changes and fixes since gnuplot version 4.6
 * NEW 'set surface explicit' disables automatic generation of a surface mesh 
 * NEW 'set link [x2|y2]' ties secondary axis range to the primary axis
 * NEW 'set link x2 via f(x) inverse g(x)' introduces generic nonlinear axes
+* NEW linked axes can be used to place x2 and y2 labels on 3D plots in map mode
 * NEW 'set key opaque' works for 3D plots also
 * NEW x11 terminal is aware of current and requested plot aspect ratio
 * NEW x11 support for toggling plots on/off with left mouseclick on the key
@@ -29,7 +30,8 @@ New features, changes and fixes since gnuplot version 4.6
 * NEW i/v/V hotkeys to toggle all plots on the screen on/off
 * NEW 'set mrtics'   (minor tics on polar axis)
 * NEW 'reset session'
-* NEW gnuplot -c scriptfile ARG1 ARG2 ARG3
+* NEW call argument convention ARGC, ARG0 ARG1 ... ARG<ARGC>
+* NEW shell invocation gnuplot -c scriptfile ARG1 ARG2 ARG3
 * NEW format %h is like %g but uses LaTeX or enhanced markup for the exponent
 * NEW LaTeX terminals use math mode for axis tic labels
 * NEW Interrupt scripts or fits by pressing Ctrl-C in Windows console mode
