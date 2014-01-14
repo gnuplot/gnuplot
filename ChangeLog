@@ -3,6 +3,11 @@
 	* src/misc.c (load_file lf_pop):  Provide a user-visible copy of the
 	current line number GPVAL_LINENO when executing commands from a file.
 
+	* src/datafile.c (df_open df_readascii):  New keyword "skip" tells the
+	program to skip lines at the start of an ascii data file.  Note this is
+	different from "every ::N", which skips lines at the start of the data
+	file but also at the start of each subsequent data block in the file.
+
 2014-01-13  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/set.c (set_allzeroaxis set_palette_defined set_clip set_encoding):

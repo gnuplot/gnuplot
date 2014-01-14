@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.267 2014/01/10 03:31:08 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.268 2014/01/10 23:26:30 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -280,6 +280,9 @@ static int firstline = 0;
 static int lastline = MAXINT;
 static int point_count = -1;    /* point counter - preincrement and test 0 */
 static int line_count = 0;      /* line counter */
+
+/* for ascii file "skip" lines at head of file */
+static int df_skip_at_front = 0;
 
 /* for pseudo-data (1 if filename = '+'; 2 if filename = '++') */
 static int df_pseudodata = 0;
@@ -957,7 +960,7 @@ df_open(const char *cmd_filename, int max_using, struct curve_points *plot)
 {
     int name_token = c_token - 1;
     TBOOLEAN duplication = FALSE;
-    TBOOLEAN set_index = FALSE, set_every = FALSE;
+    TBOOLEAN set_index = FALSE, set_every = FALSE, set_skip = FALSE;
     TBOOLEAN set_using = FALSE;
     TBOOLEAN set_matrix = FALSE;
 
@@ -1002,6 +1005,7 @@ df_open(const char *cmd_filename, int max_using, struct curve_points *plot)
     df_num_bin_records = 0;
     df_matrix = FALSE;
     df_nonuniform_matrix = FALSE;
+    df_skip_at_front = 0;
 
     df_eof = 0;
 
@@ -1038,7 +1042,7 @@ df_open(const char *cmd_filename, int max_using, struct curve_points *plot)
 	    if (df_filename[0] == '$')
 		int_error(c_token, "data blocks cannot be binary");
 	    c_token++;
-	    if (df_binary_file) {
+	    if (df_binary_file || set_skip) {
 		duplication=TRUE;
 		break;
 	    }
@@ -1094,6 +1098,17 @@ df_open(const char *cmd_filename, int max_using, struct curve_points *plot)
 	    if (set_every) { duplication=TRUE; break; }
 	    plot_option_every();
 	    set_every = TRUE;
+	    continue;
+	}
+
+	/* deal with skip */
+	if (equals(c_token, "skip")) {
+	    if (set_skip || df_binary_file) { duplication=TRUE; break; }
+	    set_skip = TRUE;
+	    c_token++;
+	    df_skip_at_front = int_expression();
+	    if (df_skip_at_front < 0)
+		df_skip_at_front = 0;
 	    continue;
 	}
 
@@ -1618,6 +1633,12 @@ df_readascii(double v[], int max)
     while ((s = df_gets()) != NULL) {
 	int line_okay = 1;
 	int output = 0;         /* how many numbers written to v[] */
+
+	/* "skip" option */
+	if (df_skip_at_front > 0) {
+	    df_skip_at_front--;
+	    continue;
+	}
 
 	++df_line_number;
 	df_no_cols = 0;
