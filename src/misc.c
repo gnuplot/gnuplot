@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.163 2013/10/27 22:20:35 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.164 2013/12/28 21:53:58 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -270,6 +270,11 @@ load_file(FILE *fp, char *name, int calltype)
     int more;
     int stop = FALSE;
 
+    /* Provide a user-visible copy of the current line number in the input file */
+    udvt_entry *gpval_lineno = add_udv_by_name("GPVAL_LINENO");
+    Ginteger(&gpval_lineno->udv_value, 0);
+    gpval_lineno->udv_undef = FALSE;
+
     lf_push(fp, name, NULL); /* save state for errors and recursion */
 
     if (fp == (FILE *) NULL) {
@@ -307,6 +312,7 @@ load_file(FILE *fp, char *name, int calltype)
 		more = FALSE;
 	    } else {
 		inline_num++;
+		gpval_lineno->udv_value.v.int_val = inline_num;	/* User visible copy */
 		len = strlen(gp_input_line) - 1;
 		if (gp_input_line[len] == '\n') {	/* remove any newline */
 		    gp_input_line[len] = '\0';
@@ -433,6 +439,7 @@ lf_pop()
 
     interactive = lf->interactive;
     inline_num = lf->inline_num;
+    add_udv_by_name("GPVAL_LINENO")->udv_value.v.int_val = inline_num;
     if_depth = lf->if_depth;
     if_condition = lf->if_condition;
     if_open_for_else = lf->if_open_for_else;
