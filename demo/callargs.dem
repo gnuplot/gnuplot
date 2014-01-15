@@ -7,11 +7,11 @@ if (!exists("ARGC")) {
     print "This copy of gnuplot does not support the ARG call method"
     exit
 }
-print "Entering ", ARG0, " with ", ARGC, " parameters"
+print "\nEntering ", ARG0, " with ", ARGC, " parameters"
 if (ARGC == 0) {
     undefine FOO
     BAZ = 5.67
-    print "Now Exercise the call mechanism"
+    print "Now exercise the call mechanism at line ", GPVAL_LINENO
     call ARG0 1.23e4 "string constant" FOO BAZ "3 + log(BAZ)"
 } else {
     print "\n\tTest whether this copy of gnuplot also supports deprecated"
