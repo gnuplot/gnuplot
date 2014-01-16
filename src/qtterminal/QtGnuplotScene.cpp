@@ -418,10 +418,9 @@ void QtGnuplotScene::processEvent(QtGnuplotEventType type, QDataStream& in)
 		for (int i = 0; i < 4; i++)
 			in >> m_axisValid[i] >> m_axisMin[i] >> m_axisLower[i] >> m_axisScale[i] >> m_axisLog[i];
 	}
-	else if (type == GEPlotNumber) 
+	else if (type == GEAfterPlot) 
 	{
-		int newPlotNumber;  in >> newPlotNumber;
-		if (newPlotNumber == 0 && m_currentPlotNumber > 0) {
+		if (m_currentPlotNumber >= m_plot_group.count()) {
 			// End of previous plot, create group holding the accumulated elements
 			QGraphicsItemGroup *newgroup;
 			newgroup = createItemGroup(m_currentGroup);
@@ -430,16 +429,20 @@ void QtGnuplotScene::processEvent(QtGnuplotEventType type, QDataStream& in)
 			if (0 < m_currentPlotNumber && m_currentPlotNumber <= m_key_boxes.count())
 				newgroup->setVisible( !(m_key_boxes[m_currentPlotNumber-1].ishidden()) );
 			// Store it in an ordered list so we can toggle it by index
-			if (m_currentPlotNumber >= m_plot_group.count())
-				m_plot_group.insert(m_currentPlotNumber, newgroup);
-			else
-				m_plot_group.replace(m_currentPlotNumber-1, newgroup);
+			m_plot_group.insert(m_currentPlotNumber, newgroup);
 		} 
-		else
-		{
+		m_currentPlotNumber = 0;
+	}
+	else if (type == GEPlotNumber) 
+	{
+		int newPlotNumber;  in >> newPlotNumber;
+		if (newPlotNumber >= m_plot_group.count()) {
 			// Initialize list of elements for next group
 			m_currentGroup.clear();
-		}
+		} 
+		// Otherwise we are making a second pass through the same plots
+		// (currently used only to draw key samples on an opaque key box)
+
 		m_currentPlotNumber = newPlotNumber;
 	}
 	else if (type == GEModPlots)
@@ -756,8 +759,8 @@ void QtGnuplotScene::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
 	m_watches[button].start();
 
 	/* Check for click in one of the keysample boxes */
-	int i = m_key_boxes.count();
-	while (i-- > 0) {
+	int n = m_key_boxes.count();
+	for (int i = 0; i < n; i++) {
 		if (m_key_boxes[i].contains(m_lastMousePos)) {
 			if (m_plot_group[i]->isVisible()) {
 				m_plot_group[i]->setVisible(false);

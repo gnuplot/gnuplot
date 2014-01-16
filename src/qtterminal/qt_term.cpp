@@ -1103,10 +1103,17 @@ void qt_layer( t_termlayer syncpoint )
 		current_plotno++;
 		qt->out << GEPlotNumber << current_plotno; break;
 	case TERM_LAYER_AFTER_PLOT:
-		qt->out << GEPlotNumber << 0; break;
-	case TERM_LAYER_RESET:
+		qt->out << GEAfterPlot; break;
 	case TERM_LAYER_RESET_PLOTNO:
-		if (!multiplot) current_plotno = 0; break;
+		// FIXME: This should handle the case of a multiplot with opaque keys
+		// by resetting plotno to that of the 1st plot in the current panel.
+		// For the non-multiplot case that's 0, so we can just fall through.
+	case TERM_LAYER_RESET:
+		if (!multiplot) {
+			current_plotno = 0;
+			qt->out << GEPlotNumber << 0;
+		}
+		break;
 	case TERM_LAYER_BEGIN_KEYSAMPLE:
 		qt->out << GELayer << QTLAYER_BEGIN_KEYSAMPLE; break;
 	case TERM_LAYER_END_KEYSAMPLE:

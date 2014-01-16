@@ -2,6 +2,11 @@
 
 	* src/help.c:  Allocate help file path dynamically.
 
+	* src/qtterminal/QtGnuplotEvent.h src/qtterminal/QtGnuplotScene.cpp
+	src/qtterminal/qt_term.cpp:  Better tracking of current plot number in
+	the case of multiple passes through a set of plots, e.g. when the key
+	samples in an opaque key box are drawn in a separate pass.
+
 2014-01-14  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/misc.c (load_file lf_pop):  Provide a user-visible copy of the
