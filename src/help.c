@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: help.c,v 1.27 2011/12/28 19:37:37 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: help.c,v 1.28 2012/11/29 00:12:57 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - help.c */
@@ -175,7 +175,7 @@ help(
     TBOOLEAN *subtopics)	/* (in) - subtopics only? */
 				/* (out) - are there subtopics? */
 {
-    static char oldpath[PATHSIZE] = "";		/* previous help file */
+    static char *oldpath = NULL;/* previous help file */
     int status;			/* result of LoadHelp */
     KEY *key;			/* key that matches keyword */
 
@@ -186,7 +186,7 @@ help(
      ** Calling routine may access errno to determine cause of H_ERROR.
      */
     errno = 0;
-    if (strncmp(oldpath, path, PATHSIZE) != 0)
+    if (oldpath && strcmp(oldpath, path) != 0)
 	FreeHelp();
     if (keys == NULL) {
 	status = LoadHelp(path);
@@ -194,7 +194,8 @@ help(
 	    return (status);
 
 	/* save the new path in oldpath */
-	safe_strncpy(oldpath, path, PATHSIZE);
+	free(oldpath);
+	oldpath = gp_strdup(path);
     }
     /* look for the keyword in the help file */
     key = FindHelp(keyword);
@@ -217,7 +218,7 @@ LoadHelp(char *path)
 {
     LINKEY *key = 0;		/* this key */
     long pos = 0;		/* ftell location within help file */
-    char buf[BUFSIZ];		/* line from help file */
+    char buf[MAX_LINE_LEN];		/* line from help file */
     LINEBUF *head;		/* head of text list  */
     LINEBUF *firsthead = NULL;
     TBOOLEAN primary;		/* first ? line of a set is primary */
@@ -230,7 +231,7 @@ LoadHelp(char *path)
     /*
      ** The help file is open.  Look in there for the keyword.
      */
-    if (!fgets(buf, BUFSIZ - 1, helpfp) || *buf != KEYFLAG)
+    if (!fgets(buf, MAX_LINE_LEN - 1, helpfp) || *buf != KEYFLAG)
 	return (H_ERROR);	/* it is probably not the .gih file */
 
     while (!feof(helpfp)) {
@@ -245,7 +246,7 @@ LoadHelp(char *path)
 	    key->pos = 0;	/* fill in with real value later */
 	    primary = FALSE;
 	    pos = ftell(helpfp);
-	    if (fgets(buf, BUFSIZ - 1, helpfp) == (char *) NULL)
+	    if (fgets(buf, MAX_LINE_LEN - 1, helpfp) == (char *) NULL)
 		break;
 	}
 	/*
@@ -254,7 +255,7 @@ LoadHelp(char *path)
 	 */
 	firsthead = storeline(buf);
 	head = firsthead;
-	while ((fgets(buf, BUFSIZ - 1, helpfp) != (char *) NULL)
+	while ((fgets(buf, MAX_LINE_LEN - 1, helpfp) != (char *) NULL)
 	       && (buf[0] != KEYFLAG)) {
 	    /* save text line */
 	    head->next = storeline(buf);
