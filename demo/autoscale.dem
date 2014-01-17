@@ -1,5 +1,5 @@
 #
-# $Id:$
+# $Id: autoscale.dem,v 1.1 2010/09/28 17:14:38 sfeam Exp $
 # Demo of constraint autoscaling: Autoscaling with limits.
 # 
 
@@ -109,3 +109,4 @@ plot "silver.dat"
 unset multiplot
 
 pause -1 "Hit return to continue"
+reset
