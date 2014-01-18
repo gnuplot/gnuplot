@@ -1,9 +1,18 @@
+2014-01-18  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* configure.in config/mingw/Makefile config/msvc/Makefile
+	src/show.c src/term.h src/win/wgnuplib.h src/win/wpause.c
+	term/caca.trm:  New utterly useless, interactive color character art
+	terminal driver "caca" using libcaca. Supports (RGB) colors, filled
+	boxes and polygons, images, enhanced and rotated text, boxed labels,
+	hypertext and mouse interaction. Export to different file formats is
+	supported.
+	Patch #605
+
 2014-01-18  Jérôme Lodewyck  <lodewyck@users.sourceforge.net>
 
 	* src/qtterminal/qt_term.cpp: Replace calls to fork and execlp by
 	the portable QProcess::startDetached function.
-
-2014-01-18  Jérôme Lodewyck  <lodewyck@users.sourceforge.net>
 
 	* src/qtterminal/qt_term.cpp: Delegate the font metric calculation to
 	QtGnuplotScene. This eliminates the need of a QApplication in the main
