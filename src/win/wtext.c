@@ -1,5 +1,5 @@
 /*
- * $Id: wtext.c,v 1.47 2014/01/01 11:07:37 markisch Exp $
+ * $Id: wtext.c,v 1.48 2014/01/04 02:55:06 markisch Exp $
  */
 
 /* GNUPLOT - win/wtext.c */
@@ -1876,6 +1876,26 @@ WndTextProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 }
 
 
+void
+TextStartEditing(LPTW lptw)
+{
+    TextToCursor(lptw);
+    lptw->bGetCh = TRUE;
+    if (lptw->bFocus) {
+	UpdateCaretPos(lptw);
+	ShowCaret(lptw->hWndText);
+    }
+}
+
+
+void
+TextStopEditing(LPTW lptw)
+{
+    if (lptw->bFocus)
+	HideCaret(lptw->hWndText);
+    lptw->bGetCh = FALSE;
+}
+
 /* ================================== */
 /* replacement stdio routines */
 
@@ -1886,19 +1906,16 @@ TextKBHit(LPTW lptw)
     return (lptw->KeyBufIn != lptw->KeyBufOut);
 }
 
+
 /* get character from keyboard, no echo */
 /* need to add extended codes */
 int WDPROC
 TextGetCh(LPTW lptw)
 {
     int ch;
-    TextToCursor(lptw);
-    lptw->bGetCh = TRUE;
-    if (lptw->bFocus) {
-	UpdateCaretPos(lptw);
-	ShowCaret(lptw->hWndText);
-    }
-    while (!TextKBHit(lptw)) {
+
+    TextStartEditing(lptw);
+	while (!TextKBHit(lptw)) {
 	/* CMW: can't use TextMessage here as it does not idle properly */
 	MSG msg;
 	GetMessage(&msg, 0, 0, 0);
@@ -1910,9 +1927,7 @@ TextGetCh(LPTW lptw)
 	ch = '\n';
     if (lptw->KeyBufOut - lptw->KeyBuf >= lptw->KeyBufSize)
 	lptw->KeyBufOut = lptw->KeyBuf;	/* wrap around */
-    if (lptw->bFocus)
-	HideCaret(lptw->hWndText);
-    lptw->bGetCh = FALSE;
+	TextStopEditing(lptw);
     return ch;
 }
 
@@ -1926,6 +1941,7 @@ TextGetChE(LPTW lptw)
     TextPutCh(lptw, (BYTE)ch);
     return ch;
 }
+
 
 LPSTR WDPROC
 TextGetS(LPTW lptw, LPSTR str, unsigned int size)
@@ -1954,6 +1970,7 @@ TextGetS(LPTW lptw, LPSTR str, unsigned int size)
     *next = 0;
     return str;
 }
+
 
 int WDPROC
 TextPutS(LPTW lptw, LPSTR str)

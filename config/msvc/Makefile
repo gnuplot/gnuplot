@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.13 2013/10/25 17:34:32 sfeam Exp $
+# $Id: Makefile,v 1.14 2014/01/08 20:14:34 sfeam Exp $
 #
 # GNUPLOT Makefile Microsoft Visual C++ 2005 or newer
 
@@ -44,7 +44,7 @@
 GDLIB = 0
 # Is pdflib available? (required by terminal pdf)
 PDFLIB = 0
-# Build wxt terminal? (required GTK, wxWidgets, cairo and pango libraries)
+# Build wxt terminal? (requires GTK, wxWidgets, cairo and pango libraries)
 # See http://wiki.wxwidgets.org/Microsoft_Visual_C%2B%2B_Guide
 #     http://wiki.wxwidgets.org/Visual_Studio_2008_%289.0%29
 WXT = 0
@@ -56,6 +56,8 @@ WXT = 0
 QT = 0
 # Build the lua/tikz terminal?
 LUA = 0
+# Build caca terminal? Requires libcaca
+CACA = 0
 
 # Create debug build?
 DEBUG = 0
@@ -65,6 +67,7 @@ GDDIR = gdwin32
 LUADIR = lua
 PDFDIR = pdflib
 QTDIR = C:\\Qt\\4.8.4
+CACADIR = libcaca
 
 # installation directory
 DESTDIR = "$(PROGRAMFILES)\gnuplot"
@@ -102,7 +105,7 @@ CBASEFLAGS = /EHsc /GR /MD /Od /nologo /Zi /DDEBUG
 !ELSE
 CBASEFLAGS = /EHsc /GR /MD /O2 /nologo
 !ENDIF
-CFLAGS = $(CBASEFLAGS) /I. /I$(TOP) /I$(S) /D_Windows /DWIN32 /DHAVE_CONFIG_H /D__MSC__ $(OPTIONS)
+CFLAGS = $(CBASEFLAGS) /I. /I$(TOP) /I$(S) /I$(T) /D_Windows /DWIN32 /DHAVE_CONFIG_H /D__MSC__ $(OPTIONS)
 CFLAGS = $(CFLAGS) /DGNUPLOT_SHARE_DIR=\"$(GNUPLOT_SHARE_DIR)\"
 WIN_CFLAGS = /DUSE_FAKEPIPES
 CONSOLE_CFLAGS = /DWGP_CONSOLE /DCONSOLE_SWITCH_CP /DPIPES
@@ -165,6 +168,12 @@ OPTIONS = $(OPTIONS) /I$(LUADIR)/include
 LDFLAGS = $(LDFLAGS) /libpath:$(LUADIR)
 TERMFLAGS = $(TERMFLAGS) /DGNUPLOT_LUA_DIR=\"$(GNUPLOT_LUA_DIR)\"
 LUALIBS = lua51.lib
+!ENDIF
+
+!IF "$(CACA)" == "1"
+OPTIONS = $(OPTIONS) /DHAVE_LIBCACA /I$(CACADIR)
+LDFLAGS = $(LDFLAGS) /libpath:$(CACADIR)
+CACALIBS = caca.lib
 !ENDIF
 
 HELPFILE = wgnuplot.chm
@@ -278,6 +287,9 @@ wgnuplot.exe: $(OBJS) $(WINOBJS) wgnuplot.res linkopt-w.msw
 !IF "$(LUA)" == "1"
 	copy $(LUADIR)\*.dll .
 !ENDIF
+!IF "$(CACA)" == "1"
+	copy $(CACADIR)\*.dll .
+!ENDIF
 
 gnuplot.exe: $(ALL_CONSOLE_OBJS) wgnuplot.res linkopt-c.msw
 	$(LD) /subsystem:console $(LDFLAGS) /map:wgnuplot.map /out:$@ @linkopt-c.msw
@@ -286,6 +298,9 @@ gnuplot.exe: $(ALL_CONSOLE_OBJS) wgnuplot.res linkopt-c.msw
 !ENDIF
 !IF "$(LUA)" == "1"
 	copy $(LUADIR)\*.dll .
+!ENDIF
+!IF "$(CACA)" == "1"
+	copy $(CACADIR)\*.dll .
 !ENDIF
 
 pgnuplot.exe: $(W)pgnuplot.c
@@ -312,6 +327,9 @@ linkopt-w.msw: Makefile
 !IF "$(LUA)" == "1"
 	echo $(LUALIBS) >> linkopt-w.msw
 !ENDIF
+!IF "$(CACA)" == "1"
+	echo $(CACALIBS) >> linkopt-w.msw
+!ENDIF
 
 linkopt-c.msw: Makefile
 	echo $(ALL_CONSOLE_OBJS) > linkopt-c.msw
@@ -333,6 +351,9 @@ linkopt-c.msw: Makefile
 !ENDIF
 !IF "$(LUA)" == "1"
 	echo $(LUALIBS) >> linkopt-c.msw
+!ENDIF
+!IF "$(CACA)" == "1"
+	echo $(CACALIBS) >> linkopt-c.msw
 !ENDIF
 
 # rules

@@ -1,5 +1,5 @@
 /*
- * $Id: wpause.c,v 1.24 2013/08/17 00:02:09 sfeam Exp $
+ * $Id: wpause.c,v 1.25 2013/12/27 19:51:22 markisch Exp $
  */
 
 /* GNUPLOT - win/wpause.c */
@@ -60,6 +60,12 @@
 /* for paused_for_mouse */
 #include "command.h"
 
+#ifdef HAVE_LIBCACA
+# define TERM_PUBLIC_PROTO
+# include "caca.trm"
+# undef TERM_PUBLIC_PROTO
+#endif
+
 
 /* Pause Window */
 static void CreatePauseClass(LPPW lppw);
@@ -73,21 +79,27 @@ LRESULT CALLBACK PauseButtonProc(HWND, UINT, WPARAM, LPARAM);
 void
 win_sleep(DWORD dwMilliSeconds)
 {
-	MSG msg;
 	DWORD t0, t1, tstop, rc;
 
 	t0 = GetTickCount();
 	tstop  = t0 + dwMilliSeconds;
 	t1 = dwMilliSeconds; /* remaining time to wait */
 	do {
+#ifndef HAVE_LIBCACA
 		rc = MsgWaitForMultipleObjects(0, NULL, FALSE, t1, QS_ALLINPUT);
 		if (rc != WAIT_TIMEOUT) {
-			while (PeekMessage(&msg, 0, 0, 0, PM_REMOVE)) {
-				if (msg.message == WM_QUIT)
-					return;
-				TranslateMessage(&msg);
-				DispatchMessage(&msg);
-			}
+#else
+		HANDLE h = GetStdHandle(STD_INPUT_HANDLE);
+		if (h != NULL)
+			rc = MsgWaitForMultipleObjects(1, &h, FALSE, t1, QS_ALLINPUT);
+		else
+			rc = MsgWaitForMultipleObjects(0, NULL, FALSE, t1, QS_ALLINPUT);
+		if (rc != WAIT_TIMEOUT) {
+
+			if (strcmp(term->name, "caca") == 0)
+				CACA_process_events();
+#endif
+			WinMessageLoop();
 
 			/* calculate remaining time, detect overflow */
 			t1 = GetTickCount();
@@ -129,7 +141,6 @@ CreatePauseClass(LPPW lppw)
 int WDPROC
 PauseBox(LPPW lppw)
 {
-	MSG msg;
 	HDC hdc;
 	int width, height;
 	TEXTMETRIC tm;
@@ -181,14 +192,14 @@ PauseBox(LPPW lppw)
 	lppw->bPauseCancel = IDCANCEL;
 
 	while (lppw->bPause) {
-	    /* HBB 20021211: Nigel Nunn found a better way to avoid
-	     * 100% CPU load --> use it */
-	    if (PeekMessage(&msg, 0, 0, 0, PM_REMOVE)) {
-		/* wait until window closed */
-		TranslateMessage(&msg);
-		DispatchMessage(&msg);
-	    } else
-		WaitMessage();
+		if (strcmp(term->name, "caca") != 0) {
+			WinMessageLoop();
+			WaitMessage();
+		} else {
+			/* Call the non-blocking sleep function,
+			   which also handles console input. */
+			win_sleep(100);
+		}
 	}
 
 	DestroyWindow(lppw->hWndPause);

@@ -38,6 +38,7 @@ New features, changes and fixes since gnuplot version 4.6
       gnuplot or Ctrl-Break in wgnuplot.
 * NEW optional faster windows terminal variant using GDI+
 * NEW plot option to "skip N" lines at start of an ascii data file
+* NEW interactive color character art terminal "caca"
 * CHANGE mouse events are handled even when the program is not waiting on stdin
 * CHANGE mouse wheel and +/- keys zoom centered on current mouse position
 * CHANGE Provide kdensity bandwidth via a keyword rather than a data column

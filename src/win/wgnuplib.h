@@ -1,5 +1,5 @@
 /*
- * $Id: wgnuplib.h,v 1.61 2014/01/04 15:46:38 markisch Exp $
+ * $Id: wgnuplib.h,v 1.62 2014/01/11 09:22:47 markisch Exp $
  */
 
 /* GNUPLOT - win/wgnuplib.h */
@@ -210,6 +210,8 @@ int WDPROC TextGetChE(LPTW);
 LPSTR WDPROC TextGetS(LPTW lptw, LPSTR str, unsigned int size);
 int WDPROC TextPutCh(LPTW, BYTE);
 int WDPROC TextPutS(LPTW lptw, LPSTR str);
+void TextStartEditing(LPTW lptw);
+void TextStopEditing(LPTW lptw);
 #if 0
 /* The new screen buffer currently does not support these */
 void WDPROC TextGotoXY(LPTW lptw, int x, int y);

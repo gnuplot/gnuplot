@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.310 2013/12/26 01:34:33 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.311 2013/12/26 17:58:29 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -70,7 +70,10 @@ static char *RCSid() { return RCSid("$Id: show.c,v 1.310 2013/12/26 01:34:33 sfe
 #include "getcolor.h"
 #include <ctype.h>
 #ifdef WIN32
-#include "win/winmain.h"
+# include "win/winmain.h"
+#endif
+#ifdef HAVE_LIBCACA
+# include <caca.h>
 #endif
 
 /******** Local functions ********/
@@ -1069,7 +1072,12 @@ show_version(FILE *fp)
 #if defined(WIN32) && !defined(WGP_CONSOLE)
 	fprintf(stderr, "MENUNAME           = \"%s\"\n", szMenuName);
 #endif
-    }
+
+#ifdef HAVE_LIBCACA
+	fprintf(stderr, "libcaca version    : %s\n", caca_get_version());
+#endif
+
+    } /* show version long */
 }
 
 

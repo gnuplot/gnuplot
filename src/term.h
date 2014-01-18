@@ -1,5 +1,5 @@
 /*
- * $Id: term.h,v 1.62 2013/10/25 03:10:28 sfeam Exp $
+ * $Id: term.h,v 1.63 2013/12/22 20:47:25 sfeam Exp $
  */
 
 /* GNUPLOT - term.h */
@@ -249,6 +249,11 @@
 
 /* dumb terminal */
 #include "dumb.trm"
+
+/* caca: color ascii art terminal using libcaca */
+#ifdef HAVE_LIBCACA
+# include "caca.trm"
+#endif
 
 /* DXF format for use with AutoCad (Release 10.x) */
 #include "dxf.trm"

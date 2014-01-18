@@ -1,5 +1,5 @@
 # Hello, emacs: this is a -*- Makefile -*-
-# $Id: Makefile,v 1.34 2013/12/28 05:44:43 markisch Exp $
+# $Id: Makefile,v 1.35 2014/01/11 15:18:27 markisch Exp $
 #
 # GNUPLOT Makefile for MinGW/MSYS on Windows
 # This assumes usual installation of the MinGW32 toolkit, the free
@@ -79,7 +79,10 @@ MOUSE=1
 #CAIROLIBS=1
 
 # Uncomment the following line to select the lua/tikz terminal
-#LUA=lua52
+#LUA=lua
+
+# Uncomment the following line to select the caca terminal
+CACA=1
 
 # Uncomment if you have libiconv
 ICONV=1
@@ -143,7 +146,7 @@ ISCC = "$(PROGRAMFILES)/Inno Setup 5/iscc"
 
 # Directory that might contain extra files to be shipped with the installer.
 # This should include dependencies like DLLs, but also fontconfig configuration files.
-#EXTRADIST = /d/Software/gnuplot-misc/gp-dist
+#EXTRADIST = /d/gnuplot/dist
 
 #
 # *************** End of Configuration section *************************
@@ -239,7 +242,7 @@ TERMFLAGS += -I$(TOP)/term
 
 TERMLIBS =
 
-CFLAGS += -I. -I$(S) -D_Windows -DHAVE_CONFIG_H $(OPTS)
+CFLAGS += -I. -I$(S) -I$(T) -D_Windows -DHAVE_CONFIG_H $(OPTS)
 CFLAGS += -DGNUPLOT_SHARE_DIR=\"$(GNUPLOT_SHARE_DIR)\"
 
 ifndef RELEASE
@@ -349,6 +352,11 @@ ifdef LUA
 	TERMLIBS += -l$(LUA)
 	TERMFLAGS += -DGNUPLOT_LUA_DIR=\"$(GNUPLOT_LUA_DIR)\"
 	LUATARGETS += gnuplot-lua-tikz.sty
+endif
+
+ifdef CACA
+	CFLAGS += -DHAVE_LIBCACA
+	TERMLIBS += -lcaca
 endif
 
 ifdef ICONV
@@ -752,11 +760,12 @@ endif
 	cp -p $(TOP)/BUGS $(DESTDIR)/
 	cp -p $(TOP)/win/README-Windows.txt $(DESTDIR)/
 	cp -p $(TOP)/win/README-Windows-ja.txt $(DESTDIR)/
+	-cp -p $(TOP)/win/README-testing.txt $(DESTDIR)/
 # demo and contrib
 	mkdir -p $(DESTDIR)/demo
 	-cp -p $(M)* $(DESTDIR)/demo/
-	mkdir -p $(DESTDIR)/demo/games/
-	-cp -p $(M)* $(DESTDIR)/demo/games
+	mkdir -p $(DESTDIR)/demo/games
+	-cp -p $(M)/games/* $(DESTDIR)/demo/games/
 	mkdir -p $(DESTDIR)/contrib/pm3d/
 	-cp -p $(TOP)/pm3d/contrib/* $(DESTDIR)/contrib/pm3d/
 # docs
@@ -781,8 +790,8 @@ installer:
 	$(MAKE) DESTDIR=./dist install
 	cp -p $(W)/grpicon.ico ./dist/bin/
 	cp -p $(TOP)/win/*.iss ./dist
-	sed -e '/^#define MyAppVersionShort/ s/"[^"]*"/"@VERSHORT@"/' \
-	    -e '/^#define MyAppVersion/ s/"[^"]*"/"@VER@"/' \
+	sed -e '/^#define MyAppVersion/ s/"[^"]*"/"@VER@"/' \
+	    -e '/^#define MyAppVersionShort/ s/"[^"]*"/"@VERSHORT@"/' \
 	    -e '/^#define MyAppNumVersion/ s/"[^"]*"/"@VERLONG@"/' \
 	    -e '/^#define MyInstallerName/ s/"[^"]*"/"@INSTALLER@"/' \
 	    -e "s/@VERSHORT@/$(MAINVERSION)/" \
