@@ -1,5 +1,10 @@
 2014-01-18  Jérôme Lodewyck  <lodewyck@users.sourceforge.net>
 
+	* src/qtterminal/qt_term.cpp: Replace calls to fork and execlp by
+	the portable QProcess::startDetached function.
+
+2014-01-18  Jérôme Lodewyck  <lodewyck@users.sourceforge.net>
+
 	* src/qtterminal/qt_term.cpp: Delegate the font metric calculation to
 	QtGnuplotScene. This eliminates the need of a QApplication in the main
 	gnuplot program and thus significantly reduce the initialization time of

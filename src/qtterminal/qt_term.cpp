@@ -195,28 +195,26 @@ QPoint qt_termCoord(unsigned int x, unsigned int y)
 // Start the GUI application
 void execGnuplotQt()
 {
-	// Fork the GUI and exec the gnuplot_qt program in the child process
-	pid_t pid = fork();
-	if (pid < 0)
-		fprintf(stderr, "Forking error\n");
-	else if (pid == 0) // Child: start the GUI
-	{
-		// Make sure the forked copy doesn't trash the history file 
-		cancel_history();
+	QString filename;
+	char* path = getenv("GNUPLOT_DRIVER_DIR");
+	if (path)
+		filename = QString(path);
+#ifdef WIN32
+	if (filename.isEmpty())
+		filename = QCoreApplication::applicationDirPath();
+	filename += "/gnuplot_qt.exe";
+#else
+	if (filename.isEmpty())
+		filename = QT_DRIVER_DIR;
+	filename += "/gnuplot_qt";
+#endif
 
-		// Start the gnuplot_qt program
-		QString filename = getenv("GNUPLOT_DRIVER_DIR");
-		if (filename.isEmpty())
-			filename = QT_DRIVER_DIR;
-		filename += "/gnuplot_qt";
-
-		execlp(filename.toUtf8().data(), "gnuplot_qt", (char*)NULL);
-		fprintf(stderr, "Expected Qt driver: %s\n", filename.toUtf8().data());
-		perror("Exec failed");
-		gp_exit(EXIT_FAILURE);
-	}
-	qt->localServerName = "qtgnuplot" + QString::number(pid);
-	qt->gnuplot_qtStarted = true;
+	qint64 pid;
+	qt->gnuplot_qtStarted = QProcess::startDetached(filename, QStringList(), QString(), &pid);
+	if (qt->gnuplot_qtStarted)
+		qt->localServerName = "qtgnuplot" + QString::number(pid);
+	else
+		qDebug() << "Could not start gnuplot_qt with path" << filename;
 }
 
 /*-------------------------------------------------------
