@@ -1,3 +1,14 @@
+2014-01-18  Jérôme Lodewyck  <lodewyck@users.sourceforge.net>
+
+	* src/qtterminal/qt_term.cpp: Delegate the font metric calculation to
+	QtGnuplotScene. This eliminates the need of a QApplication in the main
+	gnuplot program and thus significantly reduce the initialization time of
+	the Qt terminal.
+
+	* src/qtterminal/QtGnuplot*: Move the inclusion of gnuplot headers from
+	QtGnuplotEvent.h to .cpp files. With this, QtGnuplot*.h files can be
+	included out of the gnuplot tree.
+
 2014-01-16  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/help.c:  Allocate help file path dynamically.

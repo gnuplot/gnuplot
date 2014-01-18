@@ -43,6 +43,10 @@
 
 #include "QtGnuplotEvent.h"
 
+extern "C" {
+#include "../mousecmn.h"
+}
+
 #include <QtNetwork>
 
 QString QtGnuplotEventReceiver::serverName()

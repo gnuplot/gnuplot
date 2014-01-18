@@ -80,10 +80,8 @@ static char* emptyp = &empty;
 struct QtGnuplotState {
     /// @todo per-window options
 
-    // Create a QApplication without event loop for QObject's that need it, namely font handling
-    // A better strategy would be to transfer the font handling to the QtGnuplotWidget, but it would require
-    // some synchronization between the widget and the gnuplot process.
-    QApplication application;
+    // Create a QCoreApplication without event loop if any QObject needs it.
+    QCoreApplication application;
 
     /*-------------------------------------------------------
      * State variables
@@ -324,6 +322,14 @@ bool qt_processTermEvent(gp_event_t* event)
 	// Intercepts resize event
 	if (event->type == GE_fontprops)
 	{
+		// This is an answer to a font metric request. We process it directly without sending back to gnuplot
+		if ((event->par1 > 0) && (event->par2 > 0))
+		{
+			term->v_char = qt_oversampling*event->par1;
+			term->h_char = qt_oversampling*event->par2;
+			return false;
+		}
+		// This is a resize event
 		qt_setSize   = true;
 		qt_setWidth  = event->mx;
 		qt_setHeight = event->my;
@@ -391,6 +397,32 @@ void qt_init()
 	gp_atexit(qt_atexit);
 }
 
+// Send a "Set font" event to the GUI, and wait for the font metrics answer
+void qt_sendFont()
+{
+	qt->out << GESetFont << qt->currentFontName << qt->currentFontSize;
+
+	static QString lastFontName;
+	static int lastFontSize;
+
+	// The font has changed, ask the GUI for an updated font metrics
+	if ((qt->currentFontName != lastFontName) || (qt->currentFontSize != lastFontSize))
+	{
+		qt->out << GEFontMetricRequest;
+		qt_flushOutBuffer();
+		qt->socket.waitForReadyRead(1000);
+		while (qt->socket.bytesAvailable() >= (int)sizeof(gp_event_t))
+		{
+			gp_event_t event;
+			qt->socket.read((char*) &event, sizeof(gp_event_t));
+			qt_processTermEvent(&event);
+		}
+	}
+
+	lastFontName = qt->currentFontName;
+	lastFontSize = qt->currentFontSize;
+}
+
 // Called just before a plot is going to be displayed.
 void qt_graphics()
 {
@@ -407,12 +439,7 @@ void qt_graphics()
 	qt->currentFontSize = qt_optionFontSize;
 	qt->currentFontName = qt_option->FontName;
 
-	// Set plot metrics
-	QFontMetrics metrics(QFont(qt->currentFontName, qt->currentFontSize));
-	term->v_char = qt_oversampling * (metrics.ascent() + metrics.descent());
-	term->h_char = qt_oversampling * metrics.width("0123456789")/10.;
-	term->v_tic = (unsigned int) (term->v_char/2.5);
-	term->h_tic = (unsigned int) (term->v_char/2.5);
+	// Set plot size
 	if (qt_setSize)
 	{
 		term->xmax = qt_oversampling*qt_setWidth;
@@ -431,7 +458,9 @@ void qt_graphics()
 	qt->out << GESetSceneSize << QSize(term->xmax, term->ymax)/qt_oversampling;
 	qt->out << GEClear;
 	// Initialize the font
-	qt->out << GESetFont << qt->currentFontName << qt->currentFontSize;
+	qt_sendFont();
+	term->v_tic = (unsigned int) (term->v_char/2.5);
+	term->h_tic = (unsigned int) (term->v_char/2.5);
 }
 
 // Called after plotting is done
@@ -613,12 +642,7 @@ int qt_set_font (const char* font)
 		return 1;
 	}
 
-	qt->out << GESetFont << qt->currentFontName << qt->currentFontSize;
-
-	/* Update the font size as seen by the core gnuplot code */
-	QFontMetrics metrics(QFont(qt->currentFontName, qt->currentFontSize));
-	term->v_char = qt_oversampling * (metrics.ascent() + metrics.descent());
-	term->h_char = qt_oversampling * metrics.width("0123456789")/10.;
+	qt_sendFont();
 
 	return 1;
 }

@@ -45,6 +45,10 @@
 #include "QtGnuplotWidget.h"
 #include "QtGnuplotEvent.h"
 
+extern "C" {
+#include "../mousecmn.h"
+}
+
 #include <QtGui>
 
 QtGnuplotWindow::QtGnuplotWindow(int id, QtGnuplotEventHandler* eventHandler, QWidget* parent)

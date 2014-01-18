@@ -46,6 +46,10 @@
 #include "QtGnuplotScene.h"
 #include "QtGnuplotItems.h"
 
+extern "C" {
+#include "../mousecmn.h"
+}
+
 #include <QtGui>
 #include <QSvgGenerator>
 

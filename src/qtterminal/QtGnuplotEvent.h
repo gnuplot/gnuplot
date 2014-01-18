@@ -46,13 +46,6 @@
 
 #include <QObject>
 
-extern "C" {
-#include "../mousecmn.h"
-#ifndef GNUPLOT_TERM_API_H
-typedef enum t_fillstyle { FS_EMPTY, FS_SOLID, FS_PATTERN, FS_DEFAULT, FS_TRANSPARENT_SOLID, FS_TRANSPARENT_PATTERN } t_fillstyle;
-#endif
-}
-
 // Defines events used to communicate from qt_term.cpp to the GUI elements
 
 enum QtGnuplotEventType {
@@ -68,7 +61,7 @@ GEFillBox, GEPutText, GEFilledPolygon, GETextAngle, GETextAlignment, GEPoint, GE
 GEZoomStart, GEZoomStop, GERuler, GECopyClipboard, GEMove, GEVector, GELineTo,
 GESetFont, GEEnhancedFlush, GEEnhancedFinish, GEImage, GESetSceneSize, GERaise,
 GEWrapCursor, GEScale, GEActivate, GEDesactivate, GELayer, GEPlotNumber, GEHypertext,
-GETextBox, GEModPlots, GEAfterPlot,
+GETextBox, GEModPlots, GEAfterPlot, GEFontMetricRequest,
 GEDone
 };
 

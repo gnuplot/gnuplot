@@ -46,6 +46,12 @@
 #include "QtGnuplotEvent.h"
 #include "QtGnuplotItems.h"
 
+extern "C" {
+#include "../mousecmn.h"
+// This is defined in term_api.h, but including it there fails to compile
+typedef enum t_fillstyle { FS_EMPTY, FS_SOLID, FS_PATTERN, FS_DEFAULT, FS_TRANSPARENT_SOLID, FS_TRANSPARENT_PATTERN } t_fillstyle;
+}
+
 #include <QtGui>
 #include <QDebug>
 
@@ -531,6 +537,13 @@ void QtGnuplotScene::processEvent(QtGnuplotEventType type, QDataStream& in)
 		}
 	}
 #endif
+	else if (type == GEFontMetricRequest)
+	{
+		QFontMetrics metrics(m_font);
+		int par1 = (metrics.ascent() + metrics.descent());
+		int par2 = metrics.width("0123456789")/10.;
+		m_eventHandler->postTermEvent(GE_fontprops, 0, 0, par1, par2, 0);
+	}
 	else if (type == GEDone)
 		m_eventHandler->postTermEvent(GE_plotdone, 0, 0, 0, 0, 0);
 		/// @todo m_id;//qDebug() << "Done !" << items().size();
