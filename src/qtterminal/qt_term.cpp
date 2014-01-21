@@ -408,12 +408,22 @@ void qt_sendFont()
 	{
 		qt->out << GEFontMetricRequest;
 		qt_flushOutBuffer();
-		qt->socket.waitForReadyRead(1000);
-		while (qt->socket.bytesAvailable() >= (int)sizeof(gp_event_t))
+		bool receivedFontPropos = false;
+		while (!receivedFontPropos)
 		{
-			gp_event_t event;
-			qt->socket.read((char*) &event, sizeof(gp_event_t));
-			qt_processTermEvent(&event);
+			qt->socket.waitForReadyRead(1000);
+			while (qt->socket.bytesAvailable() >= (int)sizeof(gp_event_t))
+			{
+				gp_event_t event;
+				qt->socket.read((char*) &event, sizeof(gp_event_t));
+				// Here, we discard other events than fontprops.
+				if ((event.type == GE_fontprops) && (event.par1 > 0) && (event.par2 > 0))
+				{
+					qt_processTermEvent(&event);
+					receivedFontPropos = true;
+					break;
+				}
+			}
 		}
 	}
 

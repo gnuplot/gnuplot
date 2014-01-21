@@ -1,3 +1,8 @@
+2014-01-21  Jérôme Lodewyck  <lodewyck@users.sourceforge.net>
+
+	* src/qtterminal/qt_term.cpp: Fixed a regression introduced on 2014-01-18
+	that caused glitches in font rendering when GE_fontprops events are missed.
+
 2014-01-18  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* configure.in config/mingw/Makefile config/msvc/Makefile
