@@ -320,11 +320,10 @@ bool qt_processTermEvent(gp_event_t* event)
 	// Intercepts resize event
 	if (event->type == GE_fontprops)
 	{
-		// This is an answer to a font metric request. We process it directly without sending back to gnuplot
+		// This is an answer to a font metric request. We don't send it back to gnuplot
 		if ((event->par1 > 0) && (event->par2 > 0))
 		{
-			term->v_char = qt_oversampling*event->par1;
-			term->h_char = qt_oversampling*event->par2;
+			qDebug() << "qt_processTermEvent received a GE_fontprops event. This should not have happened";
 			return false;
 		}
 		// This is a resize event
@@ -400,11 +399,20 @@ void qt_sendFont()
 {
 	qt->out << GESetFont << qt->currentFontName << qt->currentFontSize;
 
-	static QString lastFontName;
-	static int lastFontSize;
+	QPair<QString, int> currentFont(qt->currentFontName, qt->currentFontSize);
+	static QPair<QString, int> lastFont("", 0);
 
-	// The font has changed, ask the GUI for an updated font metrics
-	if ((qt->currentFontName != lastFontName) || (qt->currentFontSize != lastFontSize))
+	// The font has not changed
+	if (currentFont == lastFont)
+		return;
+
+	static QMap<QPair<QString, int>, QPair<int, int> > fontMetricCache;
+	QPair<int, int> metric;
+
+	// Try to find the font metric in the cache or ask the GUI for the font metrics
+	if (fontMetricCache.contains(currentFont))
+		metric = fontMetricCache[currentFont];
+	else
 	{
 		qt->out << GEFontMetricRequest;
 		qt_flushOutBuffer();
@@ -419,16 +427,18 @@ void qt_sendFont()
 				// Here, we discard other events than fontprops.
 				if ((event.type == GE_fontprops) && (event.par1 > 0) && (event.par2 > 0))
 				{
-					qt_processTermEvent(&event);
 					receivedFontPropos = true;
+					metric = QPair<int, int>(event.par1, event.par2);
+					fontMetricCache[currentFont] = metric;
 					break;
 				}
 			}
 		}
 	}
 
-	lastFontName = qt->currentFontName;
-	lastFontSize = qt->currentFontSize;
+	term->v_char = qt_oversampling*metric.first;
+	term->h_char = qt_oversampling*metric.second;
+	lastFont = currentFont;
 }
 
 // Called just before a plot is going to be displayed.

@@ -98,6 +98,24 @@ void QtGnuplotInstance::exec(const QByteArray& command)
 		qDebug() << "Not running";
 }
 
+QByteArray QtGnuplotInstance::execAndRead(const QByteArray& command, int msecs)
+{
+	m_gnuplot.waitForReadyRead(0);
+	QByteArray trailing;
+	do
+	{
+		trailing = m_gnuplot.readAllStandardOutput();
+		emit(gnuplotOutput(trailing.constData()));
+	} while (!trailing.isEmpty());
+
+	m_gnuplot.disconnect(SIGNAL(readyReadStandardOutput()));
+	exec(command);
+	m_gnuplot.waitForReadyRead(msecs);
+	QByteArray answer = m_gnuplot.readAllStandardOutput();
+	connect(&m_gnuplot, SIGNAL(readyReadStandardOutput()), this, SLOT(gnuplotDataReady()));
+	return answer;
+}
+
 QtGnuplotInstance& operator<<(QtGnuplotInstance& instance, const QString& command)
 {
 	QByteArray array;

@@ -63,6 +63,8 @@ public:
 	QtGnuplotWidget* widget();
 	/// Send the given command to gnuplot
 	void exec(const QByteArray& command);
+	/// Send the given command to gnuplot and return the result string. Timeout after @p msecs milliseconds
+	QByteArray execAndRead(const QByteArray& command, int msecs = 30000);
 
 signals:
 	/// Emitted when gnuplot sends data through it standards outputs

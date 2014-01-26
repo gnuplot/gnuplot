@@ -1,3 +1,12 @@
+2014-01-26  Jérôme Lodewyck  <lodewyck@users.sourceforge.net>
+
+	* src/qtterminal/qt_term.cpp: Implement font metric caching. This solves a
+	flickering issue when a large number of font changes are called (for
+	example when rotating the world plot in world2.dem).
+
+	* src/qtterminal/QtGnuplotInstance.*: New public function that sends a
+	command to gnuplot and blocks until it receives the answer.
+
 2014-01-21  Jérôme Lodewyck  <lodewyck@users.sourceforge.net>
 
 	* src/qtterminal/qt_term.cpp: Fixed a regression introduced on 2014-01-18
