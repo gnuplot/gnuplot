@@ -1,3 +1,8 @@
+2014-01-26  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/plot2d.c:  Fix several problems with autoscaling of plots in 
+	polar mode (related to Bug #1323).
+
 2014-01-13  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/set.c (set_palette_defined set_clip set_encoding):

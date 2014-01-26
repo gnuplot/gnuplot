@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.255.2.25 2013/12/30 20:15:28 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.255.2.26 2014/01/10 20:18:49 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -1146,8 +1146,11 @@ store2d_point(
 	if (y < R_AXIS.data_min)
 	    R_AXIS.data_min = y;
 	if (y < R_AXIS.min) {
+	    /* Jan 2014 - The documentation says autoscaled R_AXIS.min is always 0 */
 	    if (R_AXIS.autoscale & AUTOSCALE_MIN)
-		    R_AXIS.min = (y>0) ? 0 : y;
+		R_AXIS.min = 0;
+	    else
+		cp->type = OUTRANGE;
 	}
 	if (y > R_AXIS.data_max)
 	    R_AXIS.data_max = y;
@@ -1633,14 +1636,17 @@ histogram_range_fiddling(struct curve_points *plot)
 
 /* If the plot is in polar coordinates and the r axis range is autoscaled,
  * we need to apply the maximum radius found to both x and y.
- * Otherwise the autoscaling with be done separately for x and y and the 
+ * Otherwise the autoscaling will be done separately for x and y and the 
  * resulting plot will not be centered at the origin.
  */
 void
 polar_range_fiddling(struct curve_points *plot)
 {
     if (axis_array[POLAR_AXIS].set_autoscale & AUTOSCALE_MAX) {
-	double plotmax = GPMAX(axis_array[plot->x_axis].max, -axis_array[plot->x_axis].min);
+	double plotmax_x, plotmax_y, plotmax;
+	plotmax_x = GPMAX(axis_array[plot->x_axis].max, -axis_array[plot->x_axis].min);
+	plotmax_y = GPMAX(axis_array[plot->y_axis].max, -axis_array[plot->y_axis].min);
+	plotmax = GPMAX(plotmax_x, plotmax_y);
 	if ((axis_array[plot->x_axis].set_autoscale & AUTOSCALE_BOTH) == AUTOSCALE_BOTH) {
 	    axis_array[plot->x_axis].max = plotmax;
 	    axis_array[plot->x_axis].min = -plotmax;
@@ -2959,6 +2965,10 @@ eval_plots()
 		axis_checked_extend_empty_range(SECOND_X_AXIS, NULL);
 	    }
 	}
+
+	/* This is the earliest that polar autoscaling can be done for function plots */
+	polar_range_fiddling(first_plot);
+
     }   /* some_functions */
 
     /* if first_plot is NULL, we have no functions or data at all. This can
@@ -3130,6 +3140,8 @@ parametric_fixup(struct curve_points *start_plot, int *plot_num)
 			yp->points[i].type = OUTRANGE;
 		    if (!(R_AXIS.autoscale & AUTOSCALE_MIN)) {
 			/* store internally as if plotting r(t)-rmin */
+			if (r < R_AXIS.min)
+			    yp->points[i].type = OUTRANGE;
 			r -= R_AXIS.min;
 		    }
 		    x = r * cos(t);
