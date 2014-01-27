@@ -1,3 +1,8 @@
+2014-01-27  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/time.c (xstrftime):  Explicit use of (double) when processing
+	fractional seconds.
+
 2014-01-26  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/plot2d.c:  Fix several problems with autoscaling of plots in 
