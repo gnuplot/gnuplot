@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.149.2.2 2012/10/09 16:30:15 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.149.2.3 2013/09/11 23:38:38 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -1429,7 +1429,7 @@ unset_style()
 	c_token++;
 	break;
     default:
-	int_error(c_token, "expecting 'data', 'function', 'line', 'fill' or 'arrow'");
+	int_error(c_token, "unrecognized style option");
     }
 }
 
