@@ -19,6 +19,7 @@ New features, changes and fixes in gnuplot version 4.6.5
 * FIX wxt terminal vertical centering of enhanced text
 * FIX win terminal filled polygon bugs
 * FIX iteration over parametric function plots
+* FIX autoscaling of polar mode plots
 
 New features, changes and fixes in gnuplot version 4.6.4
 ========================================================
