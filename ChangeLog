@@ -1,7 +1,12 @@
+2014-01-27  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/time.c (xstrftime):  Explicit use of (double) when processing
+	fractional seconds.
+
 2014-01-26  Jérôme Lodewyck  <lodewyck@users.sourceforge.net>
 
-	* src/qtterminal/qt_term.cpp: Implement font metric caching. This solves a
-	flickering issue when a large number of font changes are called (for
+	* src/qtterminal/qt_term.cpp: Implement font metric caching. This solves
+	a flickering issue when a large number of font changes are called (for
 	example when rotating the world plot in world2.dem).
 
 	* src/qtterminal/QtGnuplotInstance.*: New public function that sends a
