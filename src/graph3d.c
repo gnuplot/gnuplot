@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.300 2014/01/10 03:31:08 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.301 2014/01/12 22:49:31 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -877,8 +877,8 @@ do_3dplot(
     xl_save = xl; yl_save = yl;
     SECOND_KEY_PASS:
 
-    /* This tells the canvas and svg terminals to restart the plot count */
-    /* so that the key titles are in sync with the plots they describe.  */
+    /* This tells the canvas, qt, and svg terminals to restart the plot   */
+    /* count so that key titles are in sync with the plots they describe. */
     (*t->layer)(TERM_LAYER_RESET_PLOTNO);
 
     /* Key box */
@@ -2847,8 +2847,6 @@ ztick_callback(
 	* (axis_array[axis].tic_in ? 1 : -1) * (term->h_tic);
     vertex v1, v2, v3;
     struct termentry *t = term;
-
-    (void) axis;		/* avoid -Wunused warning */
 
     if (axis_array[axis].ticmode & TICS_ON_AXIS)
 	map3d_xyz(0., 0., place, &v1);

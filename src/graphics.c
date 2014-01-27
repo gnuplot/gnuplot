@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.441 2014/01/01 09:48:38 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.442 2014/01/04 14:45:29 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -579,8 +579,8 @@ do_plot(struct curve_points *plots, int pcount)
     if (key->visible)
 	draw_key( key, key_pass, &xl, &yl );
     SECOND_KEY_PASS:
-	/* This tells the canvas and svg terminals to restart the plot count */
-	/* so that the key titles are in sync with the plots they describe.  */
+	/* This tells the canvas, qt, and svg terminals to restart the plot   */
+	/* count so that key titles are in sync with the plots they describe. */
 	(*t->layer)(TERM_LAYER_RESET_PLOTNO);
 
     /* DRAW CURVES */
@@ -3316,8 +3316,6 @@ xtick2d_callback(
     /* minitick if text is NULL - beware - h_tic is unsigned */
     int ticsize = tic_direction * (int) t->v_tic * TIC_SCALE(ticlevel, axis);
     int x = map_x(place);
-
-    (void) axis;		/* avoid "unused parameter" warning */
 
     /* Skip label if we've already written a user-specified one here */
 #   define MINIMUM_SEPARATION 2
