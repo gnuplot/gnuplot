@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.269 2014/01/16 00:03:33 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.270 2014/01/27 23:59:48 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -1927,8 +1927,10 @@ df_readascii(double v[], int max)
 			if (a.type == STRING) {
 			    add_tic_user(axis, a.v.string_val, xpos, -1);
 			    gpfree_string(&a);
-			} else
-			    fprintf(stderr,"Tic label does not evaluate as string!\n");
+			} else {
+			    add_tic_user(axis, "", xpos, -1);
+			    int_warn(NO_CARET,"Tic label does not evaluate as string!\n");
+			}
 		    } else {
 			char *temp_string = df_parse_string_field(df_tokens[output]);
 			add_tic_user(axis, temp_string, xpos, -1);

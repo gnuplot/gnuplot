@@ -9,6 +9,9 @@
 	* src/datafile.c:  [xyz]ticlabels were losing resolution due to being
 	passed through a float rather than a double.
 
+	* src/datafile.c:  Handle error case of ticlabel function not returning
+	a string.
+
 2014-01-26  Jérôme Lodewyck  <lodewyck@users.sourceforge.net>
 
 	* src/qtterminal/qt_term.cpp: Implement font metric caching. This solves
