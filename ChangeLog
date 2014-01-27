@@ -3,6 +3,9 @@
 	* src/time.c (xstrftime):  Explicit use of (double) when processing
 	fractional seconds.
 
+	* src/datafile.c:  [xyz]ticlabels were losing resolution due to being
+	passed through a float rather than a double.
+
 2014-01-26  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/plot2d.c:  Fix several problems with autoscaling of plots in 
