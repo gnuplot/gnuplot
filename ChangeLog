@@ -3,6 +3,9 @@
 	* src/time.c (xstrftime):  Explicit use of (double) when processing
 	fractional seconds.
 
+	* src/Makefile.am:  Build *.moc and *.qrc files for qt terminal in the
+	same subdirectory as the *.o files.
+
 2014-01-26  Jérôme Lodewyck  <lodewyck@users.sourceforge.net>
 
 	* src/qtterminal/qt_term.cpp: Implement font metric caching. This solves

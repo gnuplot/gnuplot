@@ -114,11 +114,11 @@ timestamp.h: $(top_srcdir)/ChangeLog Makefile
 if BUILD_QT
 
 # Call the moc preprocessor
-moc_%.cpp : qtterminal/%.h
+qtterminal/moc_%.cpp : qtterminal/%.h
 	$(MOC) -o $@ $<
 
 # Call the Qt resource compiler
-qrc_%.cpp: qtterminal/%.qrc
+qtterminal/qrc_%.cpp: qtterminal/%.qrc
 	$(RCC) -name QtGnuplotResource -o $@ $<
 
 # Call the Qt ui compiler
@@ -143,7 +143,7 @@ endif # HAVE_LRELEASE
 
 # Clean moc & qrc files
 clean-qt-extra:
-	rm -vf moc_*.cpp qrc_*.cpp qrc_*.o ui_*.h qtgnuplot*.qm
+	rm -vf qtterminal/moc_*.cpp qtterminal/qrc_*.cpp qtterminal/qrc_*.o ui_*.h qtgnuplot*.qm
 
 # Clean transform gnuplot_x11 for demo
 clean-demo:
@@ -163,9 +163,10 @@ pkglibexec_PROGRAMS += gnuplot_qt
 
 $(gnuplot_qt_OBJECTS) : ui_QtGnuplotSettings.h
 
-nodist_gnuplot_qt_SOURCES = moc_QtGnuplotWindow.cpp moc_QtGnuplotApplication.cpp \
-                            moc_QtGnuplotWidget.cpp moc_QtGnuplotScene.cpp \
-                            moc_QtGnuplotEvent.cpp qrc_QtGnuplotResource.cpp
+nodist_gnuplot_qt_SOURCES = \
+        qtterminal/moc_QtGnuplotWindow.cpp qtterminal/moc_QtGnuplotApplication.cpp \
+        qtterminal/moc_QtGnuplotWidget.cpp qtterminal/moc_QtGnuplotScene.cpp \
+        qtterminal/moc_QtGnuplotEvent.cpp qtterminal/qrc_QtGnuplotResource.cpp
 
 gnuplot_qt_SOURCES = qtterminal/gnuplot_qt.cpp qtterminal/QtGnuplotWindow.cpp \
 qtterminal/QtGnuplotApplication.cpp qtterminal/QtGnuplotWidget.cpp \
