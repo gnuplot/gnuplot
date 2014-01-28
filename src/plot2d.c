@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.255.2.26 2014/01/10 20:18:49 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.255.2.27 2014/01/27 02:06:00 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -2967,7 +2967,9 @@ eval_plots()
 	}
 
 	/* This is the earliest that polar autoscaling can be done for function plots */
-	polar_range_fiddling(first_plot);
+	if (polar) {
+	    polar_range_fiddling(first_plot);
+	}
 
     }   /* some_functions */
 
