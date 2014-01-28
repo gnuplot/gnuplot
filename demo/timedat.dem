@@ -1,5 +1,5 @@
 #
-# $Id: timedat.dem,v 1.8 2011/01/01 15:33:32 juhaszp Exp $
+# $Id: timedat.dem,v 1.10 2014/01/28 21:56:08 sfeam Exp $
 #
 
 set title "Fsteps plot\nwith date and time as x-values"
@@ -21,3 +21,25 @@ pause -1 "Hit return to continue"
 
 reset
 
+set title "Time data on Y, microsecond precision" font ",14"
+set ydata time
+set timefmt "%s"
+set offset 0.5,1.5,.2,.2
+unset key
+
+fulltime(col) = strftime("%d %b %Y\n%H:%M:%.3S",column(col))
+parttime(col) = strftime("%H:%M:%.3S",column(col))
+
+plot '-' using 0:1:(fulltime(1)):xticlabels(2):yticlabels(parttime(1)) \
+         with labels point pt 7 left offset 1,1 font ",7"
+1390852607.1	A
+1390852607.2	B
+1390852607.4	C
+1390852607.8	D
+1390852608.4	E
+1390852610.001	F
+e
+
+pause -1 "Hit return to continue"
+
+reset
