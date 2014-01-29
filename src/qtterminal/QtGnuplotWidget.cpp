@@ -124,17 +124,31 @@ void QtGnuplotWidget::processEvent(QtGnuplotEventType type, QDataStream& in)
 	{
 		QSize s;
 		in >> s;
-//		qDebug() << "Size request" << s << " / viewport" << m_view->maximumViewportSize();
 		m_lastSizeRequest = s;
 		m_view->resetMatrix();
 		QWidget* viewport = m_view->viewport();
-
+/*		qDebug() << "QtGnuplotWidget::processEvent Size request" << s << size() << " / viewport" << m_view->maximumViewportSize();
+		qDebug() << " widget size   " << size();
+		qDebug() << " view size     " << m_view->size();
+		qDebug() << " viewport size " << viewport->size();
+		qDebug() << " last size req." << m_lastSizeRequest;
+*/
 		if (s != viewport->size())
 		{
 //			qDebug() << " -> resizing";
 			QMainWindow* parent = dynamic_cast<QMainWindow*>(parentWidget());
 			if (parent)
-				parent->resize(s + parent->size() - viewport->size());
+			{
+				// The parent is not visible : resize via the sizeHint mechanism because the "resize" function is not active
+				if (!parent->isVisible())
+				{
+					m_sizeHint = s + m_view->size() - viewport->size();
+					parent->updateGeometry();
+					parent->show();
+				}
+				else
+					parent->resize(s + parent->size() - viewport->size());
+			}
 			viewport->resize(s);
 		}
 	}
@@ -173,11 +187,18 @@ void QtGnuplotWidget::processEvent(QtGnuplotEventType type, QDataStream& in)
 void QtGnuplotWidget::resizeEvent(QResizeEvent* event)
 {
 	QWidget* viewport = m_view->viewport();
-//	qDebug() << "QtGnuplotWidget::resizeEvent" << "W" << size() << "V" << m_view->size() << "P" << viewport->size();
-
+/*	qDebug() << "QtGnuplotWidget::resizeEvent" << isVisible();
+	qDebug() << " event->size   " << event->size();
+	qDebug() << " event->oldSize" << event->oldSize();
+	qDebug() << " widget size   " << size();
+	qDebug() << " view size     " << m_view->size();
+	qDebug() << " viewport size " << viewport->size();
+	qDebug() << " last size req." << m_lastSizeRequest;
+*/
 	// We only inform gnuplot of a new size, and not of the first resize event
 	if ((viewport->size() != m_lastSizeRequest) && (m_lastSizeRequest != QSize(-1, -1)))
 	{
+//		qDebug() << " -> Sending event";
 		m_eventHandler->postTermEvent(GE_fontprops,viewport->size().width(),
 		                               viewport->size().height(), 0, 0, 0); /// @todo m_id
 		if (m_replotOnResize && m_active)
@@ -196,6 +217,11 @@ QPainter::RenderHints QtGnuplotWidget::renderHints() const
 		hint |= QPainter::Antialiasing;
 
 	return hint;
+}
+
+QSize QtGnuplotWidget::sizeHint() const
+{
+	return m_sizeHint;
 }
 
 /////////////////////////////////////////////////

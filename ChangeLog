@@ -1,3 +1,13 @@
+2014-01-29  Jérôme Lodewyck  <lodewyck@users.sourceforge.net>
+
+	* src/command.c: Update GPVAL_* variables after a refresh command.
+	Bug #1327
+
+	* src/qtterminal/QtGnuplotWidget.* src/qtterminal/QtGnuplotApplication.cpp:
+	Only show the QtGnuplotWindow after a size event is received from gnuplot.
+	It avoids a visible fast resize of the window after the first plot command,
+	and it also avoids that the plot window infrequently sticks to a wrong size.
+
 2014-01-27  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/time.c (xstrftime):  Explicit use of (double) when processing

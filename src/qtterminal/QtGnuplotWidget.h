@@ -77,6 +77,7 @@ public:
 	bool isActive() const;
 	void setStatusText(const QString& status);
 	QSize plotAreaSize() const;
+	virtual QSize sizeHint() const;
 
 signals:
 	void statusTextChanged(const QString& status);
@@ -103,6 +104,7 @@ public:
 
 	void loadSettings(const QSettings& settings);
 	void saveSettings(QSettings& settings) const;
+
 public slots:
 	void copyToClipboard();
 	void print(QPrinter& printer);
@@ -127,6 +129,7 @@ private:
 	QtGnuplotScene* m_scene;
 	QGraphicsView* m_view;
 	QSize m_lastSizeRequest;
+	QSize m_sizeHint;
 	// these can be set from the tool widget or from the command line
 	bool m_rounded;
 	QColor m_backgroundColor;

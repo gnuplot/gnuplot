@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.275 2014/01/04 02:55:05 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.276 2014/01/12 22:10:17 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -1722,9 +1722,11 @@ refresh_request()
     if (refresh_ok == E_REFRESH_OK_2D) {
 	refresh_bounds(first_plot, refresh_nplots); 
 	do_plot(first_plot, refresh_nplots);
+	update_gpval_variables(1);
     } else if (refresh_ok == E_REFRESH_OK_3D) {
 	refresh_3dbounds(first_3dplot, refresh_nplots);
 	do_3dplot(first_3dplot, refresh_nplots, 0);
+	update_gpval_variables(1);
     } else
 	int_error(NO_CARET, "Internal error - refresh of unknown plot type");
 

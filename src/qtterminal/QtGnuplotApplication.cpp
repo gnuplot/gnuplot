@@ -101,7 +101,6 @@ void QtGnuplotApplication::processEvent(QtGnuplotEventType type, QDataStream& in
 		m_currentWindow = new QtGnuplotWindow(m_lastId, m_eventHandler);
 		connect(m_currentWindow, SIGNAL(destroyed(QObject*)), this, SLOT(windowDestroyed(QObject*)));
 		m_windows.insert(m_lastId, m_currentWindow);
-		m_currentWindow->show();
 	}
 	else if (type == GECloseWindow)
 	{
