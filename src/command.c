@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.230.2.12 2013/10/07 16:51:59 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.230.2.13 2013/10/22 01:45:47 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -1641,12 +1641,15 @@ refresh_request()
     CHECK_REVERSE(SECOND_Y_AXIS);
 #undef CHECK_REVERSE
 
-    if (refresh_ok == 2)
+    if (refresh_ok == 2) {
 	do_plot(first_plot, refresh_nplots);
-    else if (refresh_ok == 3)
+	update_gpval_variables(1);
+    } else if (refresh_ok == 3) {
 	do_3dplot(first_3dplot, refresh_nplots, 0);
-    else
+	update_gpval_variables(1);
+    } else {
 	int_error(NO_CARET, "Internal error - refresh of unknown plot type");
+    }
 
 }
 

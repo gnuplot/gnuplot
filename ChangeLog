@@ -1,3 +1,8 @@
+2014-01-29  Jérôme Lodewyck  <lodewyck@users.sourceforge.net>
+
+	* src/command.c: Update GPVAL_* variables after a refresh command.
+	Bug #1327
+
 2014-01-27  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/time.c (xstrftime):  Explicit use of (double) when processing
