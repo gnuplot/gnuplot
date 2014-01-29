@@ -1,3 +1,7 @@
+2014-01-29  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/win/wgraph.c:  Horizontal scroll wheel support.
+
 2014-01-29  Jérôme Lodewyck  <lodewyck@users.sourceforge.net>
 
 	* src/command.c: Update GPVAL_* variables after a refresh command.

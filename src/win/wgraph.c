@@ -1,5 +1,5 @@
 /*
- * $Id: wgraph.c,v 1.176 2014/01/11 09:22:47 markisch Exp $
+ * $Id: wgraph.c,v 1.177 2014/01/11 14:00:51 markisch Exp $
  */
 
 /* GNUPLOT - win/wgraph.c */
@@ -64,9 +64,13 @@
 #include "color.h"
 #include "getcolor.h"
 #ifdef HAVE_GDIPLUS
-#include "wgdiplus.h"
+# include "wgdiplus.h"
 #endif
 #include "plot.h"
+
+#ifndef WM_MOUSEHWHEEL /* requires _WIN32_WINNT >= 0x0600 */
+# define WM_MOUSEHWHEEL 0x020E
+#endif
 
 #ifdef USE_MOUSE
 /* Petr Mikulik, February 2001
@@ -558,7 +562,7 @@ GraphInit(LPGW lpgw)
 		EnableMenuItem(lpgw->hPopMenu, M_PATTERNAA, MF_BYCOMMAND | MF_DISABLED);
 #endif
 	AppendMenu(lpgw->hPopMenu, MF_STRING, M_BACKGROUND, "&Background...");
-	AppendMenu(lpgw->hPopMenu, MF_STRING, M_CHOOSE_FONT, "Choose &Font...");
+	AppendMenu(lpgw->hPopMenu, MF_STRING, M_CHOOSE_FONT, "&Font...");
 	AppendMenu(lpgw->hPopMenu, MF_STRING, M_LINESTYLE, "&Line Styles...");
 	/* save settings */
 	AppendMenu(lpgw->hPopMenu, MF_SEPARATOR, 0, NULL);
@@ -3786,24 +3790,26 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 				Wnd_exec_event(lpgw, lParam, GE_buttonpress, 2);
 				return 0L;
 
-			/* shige : mouse wheel support */
-			case WM_MOUSEWHEEL: {
-			    WORD fwKeys;
-			    short int zDelta;
-			    int modifier_mask;
+			case WM_MOUSEWHEEL:	/* shige, BM : mouse wheel support */
+			case WM_MOUSEHWHEEL: {
+				WORD fwKeys;
+				short int zDelta;
+				int modifier_mask;
 
-			    fwKeys = LOWORD(wParam);
-			    zDelta = HIWORD(wParam);
-			    modifier_mask = ((fwKeys & MK_SHIFT)? Mod_Shift : 0)
-				| ((fwKeys & MK_CONTROL)? Mod_Ctrl : 0)
-				| ((fwKeys & MK_ALT)? Mod_Alt : 0);
-			    if (last_modifier_mask != modifier_mask)
-					Wnd_exec_event(lpgw, lParam, GE_modifier,
-					       modifier_mask);
-			    Wnd_exec_event(lpgw, lParam, GE_buttonpress,
-					   zDelta > 0 ? 4 : 5);
-			    last_modifier_mask = modifier_mask;
-			    return 0L;
+				fwKeys = LOWORD(wParam);
+				zDelta = HIWORD(wParam);
+				modifier_mask = ((fwKeys & MK_SHIFT)? Mod_Shift : 0) |
+				                ((fwKeys & MK_CONTROL)? Mod_Ctrl : 0) |
+				                ((fwKeys & MK_ALT)? Mod_Alt : 0);
+				if (last_modifier_mask != modifier_mask) {
+					Wnd_exec_event(lpgw, lParam, GE_modifier, modifier_mask);
+					last_modifier_mask = modifier_mask;
+				}
+				if (message == WM_MOUSEWHEEL)
+					Wnd_exec_event(lpgw, lParam, GE_buttonpress, zDelta > 0 ? 4 : 5);
+				else
+					Wnd_exec_event(lpgw, lParam, GE_buttonpress, zDelta > 0 ? 6 : 7);
+				return 0L;
 			}
 
 			case WM_LBUTTONDBLCLK:
