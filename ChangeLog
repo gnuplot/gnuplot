@@ -1,3 +1,7 @@
+2014-01-29  Shigeharu Takeno  <shige@iee.niit.ac.jp>
+
+	* docs/gnuplot-ja.doc term-ja.diff:  Sync translation to version 1.848
+
 2014-01-29  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/win/wgraph.c:  Horizontal scroll wheel support.
