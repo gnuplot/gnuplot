@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.847 2014/01/13 18:39:38 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.848 2014/01/16 00:03:33 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -10977,6 +10977,7 @@ Ffigure_missing
  However if you later change the x or y range, for example by zooming, this does
  not change rrange, so data points continue to be clipped against rrange.
  Autoscaling of rmin always results in rmin = 0.
+ Note: Setting a negative value for rmin may produce unexpected results.
 3 rtics
 ?commands set rtics
 ?commands show rtics

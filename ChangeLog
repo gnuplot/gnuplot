@@ -1,3 +1,10 @@
+2014-01-29  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/plot2d.c (store2d_point parametric_fixup): Fix several problems
+	with autoscaling of plots in polar mode.  One side effect was that the
+	polar grid lines did not work in parametric plots.
+	Bug #1323
+
 2014-01-29  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* docs/gnuplot-ja.doc term-ja.diff:  Sync translation to version 1.848

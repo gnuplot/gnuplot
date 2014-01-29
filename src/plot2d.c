@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.316 2014/01/10 03:31:08 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.317 2014/01/10 20:22:11 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -1255,20 +1255,19 @@ store2d_point(
 	    R_AXIS.data_min = y;
 	if (y < R_AXIS.min) {
 	    if (R_AXIS.autoscale & AUTOSCALE_MIN)
-		    R_AXIS.min = (y>0) ? 0 : y;
+		R_AXIS.min = 0;
+	    else
+		cp->type = OUTRANGE;
 	}
 	if (y > R_AXIS.data_max)
 	    R_AXIS.data_max = y;
 	if (y > R_AXIS.max) {
 	    if (R_AXIS.autoscale & AUTOSCALE_MAX)	{
-		if (R_AXIS.max_constraint & CONSTRAINT_UPPER) {
-		    if (R_AXIS.max_ub >= y)
-			R_AXIS.max = y;
-		    else
+		if ((R_AXIS.max_constraint & CONSTRAINT_UPPER)
+		&&  (R_AXIS.max_ub < y))
 			R_AXIS.max = R_AXIS.max_ub;
-		} else {
+		else
 		    R_AXIS.max = y;
-		}
 	    } else {
 		cp->type = OUTRANGE;
 	    }
@@ -1280,9 +1279,10 @@ store2d_point(
 	    y = AXIS_DO_LOG(POLAR_AXIS,y) - AXIS_DO_LOG(POLAR_AXIS,R_AXIS.min);
 	} else
 
-	if (!(R_AXIS.autoscale & AUTOSCALE_MIN))
+	if (!(R_AXIS.autoscale & AUTOSCALE_MIN)) {
 	    /* we store internally as if plotting r(t)-rmin */
-	    y -= R_AXIS.min;
+		y -= R_AXIS.min;
+	}
 
 	newx = y * cos(x * ang2rad);
 	newy = y * sin(x * ang2rad);
@@ -1737,14 +1737,18 @@ histogram_range_fiddling(struct curve_points *plot)
 
 /* If the plot is in polar coordinates and the r axis range is autoscaled,
  * we need to apply the maximum radius found to both x and y.
- * Otherwise the autoscaling with be done separately for x and y and the 
+ * Otherwise the autoscaling will be done separately for x and y and the 
  * resulting plot will not be centered at the origin.
  */
 void
 polar_range_fiddling(struct curve_points *plot)
 {
     if (axis_array[POLAR_AXIS].set_autoscale & AUTOSCALE_MAX) {
-	double plotmax = GPMAX(axis_array[plot->x_axis].max, -axis_array[plot->x_axis].min);
+	double plotmax_x, plotmax_y, plotmax;
+	plotmax_x = GPMAX(axis_array[plot->x_axis].max, -axis_array[plot->x_axis].min);
+	plotmax_y = GPMAX(axis_array[plot->y_axis].max, -axis_array[plot->y_axis].min);
+	plotmax = GPMAX(plotmax_x, plotmax_y);
+
 	if ((axis_array[plot->x_axis].set_autoscale & AUTOSCALE_BOTH) == AUTOSCALE_BOTH) {
 	    axis_array[plot->x_axis].max = plotmax;
 	    axis_array[plot->x_axis].min = -plotmax;
@@ -3107,6 +3111,7 @@ eval_plots()
 		    }   /* loop over samples_1 */
 		    this_plot->p_count = i;     /* samples_1 */
 		}
+
 		/* skip all modifers func / whole of data plots */
 		c_token = this_plot->token;
 
@@ -3149,6 +3154,12 @@ eval_plots()
 		axis_checked_extend_empty_range(SECOND_X_AXIS, NULL);
 	    }
 	}
+
+	/* This is the earliest that polar autoscaling can be done for function plots */
+	if (polar) {
+	    polar_range_fiddling(first_plot);
+	}
+
     }   /* some_functions */
 
     /* if first_plot is NULL, we have no functions or data at all. This can
@@ -3317,14 +3328,30 @@ parametric_fixup(struct curve_points *start_plot, int *plot_num)
 		    double r = yp->points[i].y;
 		    double t = xp->points[i].y * ang2rad;
 		    double x, y;
+
 		    if (!(R_AXIS.autoscale & AUTOSCALE_MAX) && r > R_AXIS.max)
 			yp->points[i].type = OUTRANGE;
-		    if (!(R_AXIS.autoscale & AUTOSCALE_MIN)) {
-			/* store internally as if plotting r(t)-rmin */
-			r -= R_AXIS.min;
+
+		    /* Fill in the R_AXIS min/max if autoscaling */
+		    /* EAM FIXME: This was Bug #1323.  What about log scale? */
+		    if ((R_AXIS.autoscale & AUTOSCALE_MAX) && (abs(r) > R_AXIS.max)) {
+			if ((R_AXIS.max_constraint & CONSTRAINT_UPPER)
+			&&  (R_AXIS.max_ub < abs(r)))
+			    R_AXIS.max = R_AXIS.max_ub;
+			else
+			    R_AXIS.max = abs(r);
 		    }
+		    if (R_AXIS.autoscale & AUTOSCALE_MIN) {
+			    R_AXIS.min = 0;
+		    } else {
+			/* store internally as if plotting r(t)-rmin */
+			r -= (r > 0) ? R_AXIS.min : -R_AXIS.min;
+		    }
+
+		    /* Convert from polar to cartesian for plotting */
 		    x = r * cos(t);
 		    y = r * sin(t);
+
 		    if (boxwidth >= 0 && boxwidth_is_absolute) {
 			coord_type dmy_type = INRANGE;
 			STORE_WITH_LOG_AND_UPDATE_RANGE( yp->points[i].xlow, x - boxwidth/2, dmy_type, xp->x_axis,
