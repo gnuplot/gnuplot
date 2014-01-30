@@ -1,5 +1,5 @@
 /*
- * $Id: context.trm,v 1.7 2012/11/29 00:12:57 broeker Exp $
+ * $Id: context.trm,v 1.8 2013/06/22 17:26:32 sfeam Exp $
  */
 
 /* GNUPLOT - context.trm */
@@ -2071,7 +2071,7 @@ START_HELP(context)
 "      set term context font \"myfont,ss,10\"",
 " will result in",
 "      \\setupbodyfont[myfont,ss,10pt]",
-" If you additionaly set `fontscale` to 0.8 for example,",
+" If you additionally set `fontscale` to 0.8 for example,",
 " then the resulting font will be 8pt big and",
 "      set label ... font \"myfont,12\"",
 " will come out as 9.6pt.",

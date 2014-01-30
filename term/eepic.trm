@@ -1,6 +1,6 @@
 /* Hello, Emacs! This is -*-C-*- !*/
 /*
- * $Id: eepic.trm,v 1.30 2008/02/24 19:49:38 sfeam Exp $
+ * $Id: eepic.trm,v 1.31 2011/05/09 20:13:20 sfeam Exp $
  *
  */
 
@@ -601,7 +601,7 @@ START_HELP(eepic)
 " Options:",
 " You can give options in any order you wish.",
 " 'color' causes gnuplot to produce \\color{...} commands so that the graphs are",
-" colored. Using this option, you must include \\usepackage{color} in the preambel",
+" colored. Using this option, you must include \\usepackage{color} in the preamble",
 " of your latex document.",
 " 'dashed' will allow dashed line types; without this option, only solid lines",
 " with varying thickness will be used.",

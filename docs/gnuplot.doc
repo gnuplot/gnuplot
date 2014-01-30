@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.849 2014/01/30 00:45:59 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.850 2014/01/30 04:35:14 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -265,7 +265,7 @@ C
 ?backwards compatibility
 ?compatibility
  Gnuplot version 4 deprecated certain syntax used in earlier versions but
- provided a configuration option that allowed backward compatability.
+ provided a configuration option that allowed backward compatibility.
  Support for the old syntax has now been removed.
 
  Deprecated in version 4 and removed in version 5:
@@ -2165,7 +2165,7 @@ C ... and restart the table:
  a single record.  A "datablock" is a set of points from consecutive records,
  delimited by blank records.  A line, when referred to in the context of a
  data file, is a subset of a datablock.  Note that the term "datablock" may
- also be used when refering to a named inline data block (see `datablocks`).
+ also be used when referring to a named inline data block (see `datablocks`).
 2 iteration
 ?iteration
 ?iterate
@@ -2995,7 +2995,7 @@ Ffigure_boxplot
 
  By default only one boxplot is produced that represents all y values from the
  second column of the using specification. However, an additional (fourth) 
- colunm can be added to the specification. If present, the values of that
+ column can be added to the specification. If present, the values of that
  column will be interpreted as the discrete levels of a factor variable.
  As many boxplots will be drawn as there are levels in the factor variable.
  The separation between these boxplots is 1.0 by default, but it can be changed
@@ -3736,7 +3736,7 @@ Ffigure_parallel
  drawn from axis 1 to axis 2 to axis 3 and so on.  That is, each line of input
  is represented by a separate line in the parallel axes plot.
  It is common to use some discrete categorization to assign line colors,
- allowing visual exploration of the corellation between this categorization and
+ allowing visual exploration of the correlation between this categorization and
  the axis dimensions.
  By default gnuplot will automatically determine the range and scale of the
  individual axes from the input data, but the usual `set axis range` commands
@@ -6373,7 +6373,7 @@ Ffigure_mapcontours
        plot [0:10] f(x), [10:20] g(x), [20:30] h(x)
 
  This command removes the ambiguity of the previous example by inserting the
- keyword `sample` so that the range is not applyied to the entire plot:
+ keyword `sample` so that the range is not applied to the entire plot:
        plot sample [0:10] f(x), [10:20] g(x), [20:30] h(x)
 
  This example shows one way of tracing out a helix in a 3D plot
@@ -7763,7 +7763,7 @@ Ffigure_mapcontours
 ?missing
  The `set datafile missing` command tells `gnuplot` there is a special string
  used in input data files to denote a missing data entry.  There is no default
- character for `missing`, but in many cases any non-parsible string of
+ character for `missing`, but in many cases any non-parseable string of
  characters found where a numerical value is expected will cause the line to be
  treated as missing data. There is a distinction between missing data and 
  invalid data (e.g. "NaN", 1/0.).  Invalid data causes a gap in the line drawn
@@ -12468,7 +12468,7 @@ Ffigure_missing
  sets <lb> = 0 and <ub> = 200.  With such a setting <min> would be autoscaled,
  but its final value will be between 0 and 200 (both inclusive despite the
  '<' sign).  If no lower or upper bound is specified, the '<' to also be
- ommited.  If <ub> is lower than <lb> the constraints will be turned off
+ omitted.  If <ub> is lower than <lb> the constraints will be turned off
  and full autoscaling will happen.
  This feature is useful to plot measured data with autoscaling but providing
  a limit on the range, to clip outliers, or to guarantee a minimum range

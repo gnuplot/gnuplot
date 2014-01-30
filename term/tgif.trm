@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*- */
-/* $Id: tgif.trm,v 1.53 2013/07/06 18:00:43 sfeam Exp $ */
+/* $Id: tgif.trm,v 1.54 2013/08/09 02:54:16 sfeam Exp $ */
 
 /* GNUPLOT - tgif.trm */
 
@@ -1740,7 +1740,7 @@ START_HELP(tgif)
 " \"<fontname>\" is the name of a valid PostScript font, and <fontsize>",
 " specifies the size of the PostScript font.",
 " `defaults` sets all options to their defaults: `portrait`, `[1,1]`, `color`,",
-" `linwidth 1.0`, `dashed`, `\"Helvetica,18\"`.",
+" `linewidth 1.0`, `dashed`, `\"Helvetica,18\"`.",
 "",
 " The `solid` option is usually prefered if lines are colored, as they often",
 " are in the editor.  Hardcopy will be black-and-white, so `dashed` should be",

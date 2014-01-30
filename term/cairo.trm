@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: cairo.trm,v 1.64 2013/10/07 21:43:48 sfeam Exp $
+ * $Id: cairo.trm,v 1.65 2013/10/09 02:41:22 sfeam Exp $
  */
 
 /* GNUPLOT - cairo.trm */
@@ -1390,7 +1390,7 @@ START_HELP(epscairo)
 "?term epscairo",
 "?epscairo",
 " The `epscairo` terminal device generates encapsulated PostScript (*.eps) using",
-" the cairo and pango support libraries.  cairo verion >= 1.6 is required.",
+" the cairo and pango support libraries.  cairo version >= 1.6 is required.",
 "",
 " Please read the help for the `pdfcairo` terminal."
 ""
@@ -1425,7 +1425,7 @@ START_HELP(cairolatex)
 " `terminal pdfcairo` but transfers the texts to LaTeX instead of including",
 " them in the graph. For reference of options not explained here see `pdfcairo`.",
 "",
-" `eps` and `pdf` select the type of grahics output. Use `eps` with",
+" `eps` and `pdf` select the type of graphics output. Use `eps` with",
 " latex/dvips and `pdf` for pdflatex.",
 "",
 " `blacktext` forces all text to be written in black even in color mode;",
