@@ -1,5 +1,5 @@
 /*
- * $Id: gp_types.h,v 1.57 2013/12/26 17:58:28 sfeam Exp $
+ * $Id: gp_types.h,v 1.58 2014/01/10 03:31:08 sfeam Exp $
  */
 
 /* GNUPLOT - gp_types.h */
@@ -121,6 +121,7 @@ typedef enum PLOT_SMOOTH {
     SMOOTH_CSPLINES,
     SMOOTH_SBEZIER,
     SMOOTH_UNIQUE,
+    SMOOTH_UNWRAP,
     SMOOTH_FREQUENCY,
     SMOOTH_CUMULATIVE,
     SMOOTH_KDENSITY,

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.317 2014/01/10 20:22:11 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.318 2014/01/30 00:46:00 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -2117,6 +2117,7 @@ eval_plots()
 		    c_token++;
 
 		    switch(found_token) {
+		    case SMOOTH_UNWRAP:
 		    case SMOOTH_FREQUENCY:
 			this_plot->plot_smooth = found_token;
 			break;
@@ -2744,6 +2745,9 @@ eval_plots()
 		switch (this_plot->plot_smooth) {
 		/* create new data set by evaluation of
 		 * interpolation routines */
+		case SMOOTH_UNWRAP:
+		    gen_interp_unwrap(this_plot);
+		    break;
 		case SMOOTH_FREQUENCY:
 		case SMOOTH_CUMULATIVE:
 		case SMOOTH_CUMULATIVE_NORMALISED:

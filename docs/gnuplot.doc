@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.850 2014/01/30 04:35:14 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.851 2014/01/30 05:50:52 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -5595,15 +5595,18 @@ Ffigure_mapcontours
 
  Syntax:
        smooth {unique | frequency | cumulative | cnormal | kdensity {bandwidth}
-                      | csplines | acsplines | mcsplines | bezier | sbezier}
+                      | csplines | acsplines | mcsplines | bezier | sbezier
+                      | unwrap}
 
  `unique`, `frequency`, `cumulative` and `cnormal` plot the data after
- making them monotonic.  Each of the other routines uses the data to
- determine the coefficients of a continuous curve between the endpoints
- of the data.  This curve is then plotted in the same manner as a
- function, that is, by finding its value at uniform intervals along the
- abscissa (see `set samples`) and connecting these points with straight
- line segments (if a line style is chosen).
+ making them monotonic.  `unwrap` manipulates the data to avoid jumps
+ of more than pi by adding or subtracting multiples of 2*pi.  Each of
+ the other routines uses the data to determine the coefficients of a
+ continuous curve between the endpoints of the data.  This curve is
+ then plotted in the same manner as a function, that is, by finding
+ its value at uniform intervals along the abscissa (see `set samples`)
+ and connecting these points with straight line segments (if a line
+ style is chosen).
 
  If `autoscale` is in effect, the ranges will be computed such that the
  plotted curve lies within the borders of the graph.
@@ -5708,6 +5711,20 @@ Ffigure_mapcontours
  The `unique` option makes the data monotonic in x; points with the same
  x-value are replaced by a single point having the average y-value.  The
  resulting points are then connected by straight line segments.
+5 unwrap
+?commands plot datafile smooth unwrap
+?plot datafile smooth unwrap
+?plot smooth unwrap
+?data-file smooth unwrap
+?datafile smooth unwrap
+?plot unwrap
+?smooth unwrap
+?unwrap
+ The `unwrap` option modifies the input data so that any two successive
+ points will not differ by more than pi; a point whose y value is
+ outside this range will be incremented or decremented by multiples of
+ 2pi until it falls within pi of the previous point. This operation is
+ useful for making wrapped phase measurements continuous over time.
 5 frequency
 ?commands plot datafile smooth frequency
 ?plot datafile smooth frequency

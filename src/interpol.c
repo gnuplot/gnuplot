@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: interpol.c,v 1.43 2013/02/28 05:30:40 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: interpol.c,v 1.44 2013/12/25 05:47:26 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - interpol.c */
@@ -824,6 +824,41 @@ cp_tridiag(struct curve_points *plot, int first_point, int num_points)
     free(yp);
 
     return (sc);
+}
+
+void
+gen_interp_unwrap(struct curve_points *plot)
+{
+    int i, j, curves;
+    int first_point, num_points;
+    double y, lasty, diff;
+
+    curves = num_curves(plot);
+
+    first_point = 0;
+    for (i = 0; i < curves; i++) {
+        num_points = next_curve(plot, &first_point);
+
+	lasty = 0; /* make all plots start the same place */
+	for (j = first_point; j < first_point + num_points; j++) {
+                if (plot->points[j].type == UNDEFINED) 
+                    continue;
+
+		y = plot->points[j].y;
+		do {
+			diff = y - lasty;
+			if (diff >  M_PI) y -= 2*M_PI;
+			if (diff < -M_PI) y += 2*M_PI;
+		} while (fabs(diff) > M_PI);
+		plot->points[j].y = y;
+
+		lasty = y;
+	}
+
+        do_freq(plot, first_point, num_points);
+        first_point += num_points + 1;
+    }
+    return;
 }
 
 static void

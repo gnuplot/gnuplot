@@ -1,3 +1,10 @@
+2014-01-30  Jon Gjengset <jon@thesquareplanet.com>
+
+	* src/gp_types.h src/interpol.c src/interpol.h src/plot2d.c
+	src/tables.c docs/gnuplot.doc:  New smoothing option "unwrap" adjusts
+	input y values by multiples of 2pi so that the difference between two
+	successive y values is never more than pi.
+
 2014-01-29  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/plot2d.c (store2d_point parametric_fixup): Fix several problems
