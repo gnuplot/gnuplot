@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.701.2.33 2013/12/31 10:06:47 markisch Exp $
+C RCS $Id: gnuplot.doc,v 1.701.2.34 2014/01/11 01:00:26 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -5509,13 +5509,14 @@ Ffigure_mapcontours
  externally or by using `fit` with an appropriate model.
 
  Syntax:
-       smooth {unique | frequency | cumulative | cnormal | kdensity 
+       smooth {unique | frequency | cumulative | cnormal | kdensity | unwrap
                       | csplines | acsplines | mcsplines | bezier | sbezier}
 
  `unique`, `frequency`, `cumulative` and `cnormal` plot the data after
- making them monotonic.  Each of the other routines uses the data to
- determine the coefficients of a continuous curve between the endpoints
- of the data.  This curve is then plotted in the same manner as a
+ making them monotonic.  `unwrap` manipulates the data to avoid jumps of more
+ than pi between the y value of successive points.  Each of the other routines
+ uses the data to determine the coefficients of a continuous curve between the
+ endpoints of the data.  This curve is then plotted in the same manner as a
  function, that is, by finding its value at uniform intervals along the
  abscissa (see `set samples`) and connecting these points with straight
  line segments (if a line style is chosen).
@@ -5624,6 +5625,20 @@ Ffigure_mapcontours
  The `unique` option makes the data monotonic in x; points with the same
  x-value are replaced by a single point having the average y-value.  The
  resulting points are then connected by straight line segments.
+5 unwrap
+?commands plot datafile smooth unwrap
+?plot datafile smooth unwrap
+?plot smooth unwrap
+?data-file smooth unwrap
+?datafile smooth unwrap
+?plot unwrap
+?smooth unwrap
+?unwrap
+ The `unwrap` option modifies the input data so that any two successive
+ points will not differ by more than pi; a point whose y value is
+ outside this range will be incremented or decremented by multiples of
+ 2pi until it falls within pi of the previous point. This operation is
+ useful for making wrapped phase measurements continuous over time.
 5 frequency
 ?commands plot datafile smooth frequency
 ?plot datafile smooth frequency

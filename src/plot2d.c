@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.255.2.27 2014/01/27 02:06:00 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.255.2.28 2014/01/28 00:49:11 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -1990,6 +1990,7 @@ eval_plots()
 		    case SMOOTH_CSPLINES:
 		    case SMOOTH_SBEZIER:
 		    case SMOOTH_UNIQUE:
+		    case SMOOTH_UNWRAP:
 		    case SMOOTH_FREQUENCY:
 		    case SMOOTH_CUMULATIVE:
 		    case SMOOTH_KDENSITY:
@@ -2584,6 +2585,9 @@ eval_plots()
 		switch (this_plot->plot_smooth) {
 		/* create new data set by evaluation of
 		 * interpolation routines */
+		case SMOOTH_UNWRAP:
+		    gen_interp_unwrap(this_plot);
+		    break;
 		case SMOOTH_FREQUENCY:
 		case SMOOTH_CUMULATIVE:
 		case SMOOTH_CUMULATIVE_NORMALISED:
