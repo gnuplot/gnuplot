@@ -5,6 +5,12 @@
 	input y values by multiples of 2pi so that the difference between two
 	successive y values is never more than pi.
 
+2014-01-30  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/qtterminal/QtGnuplotScene.cpp (mouseReleaseEvent):
+	Timing initialization failure of mouse clicks can result in a spurious
+	event that the program does not handle well.
+
 2014-01-29  Jérôme Lodewyck  <lodewyck@users.sourceforge.net>
 
 	* src/command.c: Update GPVAL_* variables after a refresh command.

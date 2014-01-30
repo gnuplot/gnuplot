@@ -617,7 +617,7 @@ void QtGnuplotScene::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
 	qint64 time = 0;
 	if (m_watches[button].isValid())
 		time = m_watches[button].elapsed();
-	if (time == 0 || time > 300) {
+	if (time > 300) {
 		m_eventHandler->postTermEvent(GE_buttonrelease, int(event->scenePos().x()),
 				int(event->scenePos().y()), button, time, 0);
 		m_watches[button].start();
