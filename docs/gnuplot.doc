@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.848 2014/01/16 00:03:33 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.849 2014/01/30 00:45:59 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -4038,7 +4038,7 @@ Ffigure_mapcontours
  `call` command.
 
  Because the parameters are stored in ordinary string variables, they may be
- dereferenced by macro expansion (analagous to the old-style deprecated syntax).
+ dereferenced by macro expansion (analogous to the old-style deprecated syntax).
  However in many cases it is more natural to use them as you would any other
  variable.
 3 Example
@@ -5686,7 +5686,6 @@ Ffigure_mapcontours
  FN Fritsch & RE Carlson (1980) "Monotone Piecewise Cubic Interpolation",
  SIAM Journal on Numerical Analysis 17: 238–246.
 5 sbezier
-5 sbezier
 ?commands plot datafile smooth sbezier
 ?plot datafile smooth sbezier
 ?plot smooth sbezier
@@ -5790,7 +5789,7 @@ Ffigure_mapcontours
       default_bandwidth = sigma * (4/3N) ** (0.2)
  This will usually be a very conservative, i.e. broad bandwidth.
  Alternatively, you can provide an explicit bandwidth.
-      plot $DATA smooth kdensity bandwith <value> with boxes
+      plot $DATA smooth kdensity bandwidth <value> with boxes
  The bandwidth used in the previous plot is stored in variable 
  GPVAL_KDENSITY_BANDWIDTH.
 4 special-filenames
@@ -8404,7 +8403,7 @@ Ffigure_missing
 ^<tr>    <td><tt>%f</tt></td>    <td>floating point notation</td></tr>
 ^<tr>    <td><tt>%e</tt> or <tt>%E</tt></td>    <td>exponential notation; an "e" or "E" before the power</td></tr>
 ^<tr>    <td><tt>%g</tt> or <tt>%G</tt></td>    <td>the shorter of <tt>%e</tt> (or <tt>%E</tt>) and <tt>%f</tt></td></tr>
-^<tr>    <td><tt>%h</tt> or <tt>%H</tt></td>    <td><tt>%g</tt> with "x10^{%S}" or "*10^{%S}" instead of "e%S"></td></tr>
+^<tr>    <td><tt>%h</tt> or <tt>%H</tt></td>    <td><tt>%g</tt> with "x10^{%S}" or "*10^{%S}" instead of "e%S"</td></tr>
 ^<tr>    <td><tt>%x</tt> or <tt>%X</tt></td>    <td>hex</td></tr>
 ^<tr>    <td><tt>%o</tt> or <tt>%O</tt></td>    <td>octal</td></tr>
 ^<tr>    <td><tt>%t</tt></td>    <td>mantissa to base 10</td></tr>

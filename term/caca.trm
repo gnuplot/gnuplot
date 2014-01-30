@@ -1,7 +1,7 @@
 /*
  * GNUPLOT - caca.trm
  *
- * $Id$
+ * $Id: caca.trm,v 1.1 2014/01/18 16:14:50 markisch Exp $
  *
  * This file uses UTF8 encoding and a tab size of 4.
  *
@@ -3281,7 +3281,7 @@ START_HELP(caca)
 " filled polygons, unicode character encoding and mouse interaction.",
 "",
 " Syntax:",
-"       set terminal caca {driver | format {default | \"<driver>\" | list}",
+"       set terminal caca {{driver | format} {default | \"<driver>\" | list}}",
 "                         {color | monochrome}",
 "                         {{no}inverted}",
 "                         {enhanced | noenhanced}",
