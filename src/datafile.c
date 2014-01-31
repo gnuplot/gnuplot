@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.212.2.28 2014/01/10 23:26:15 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.212.2.29 2014/01/27 23:59:59 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -666,8 +666,8 @@ df_tokenise(char *s)
     df_no_cols = 0;
 
     while (*s) {
-	/* check store - double max cols or add 20, whichever is greater */
-	if (df_max_cols <= df_no_cols)
+	/* We may poke at 2 new fields before coming back here - make sure there is room */
+	if (df_max_cols <= df_no_cols + 2)
 	    expand_df_column((df_max_cols < 20) ? df_max_cols+20 : 2*df_max_cols);
 
 	/* have always skipped spaces at this point */

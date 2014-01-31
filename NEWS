@@ -22,6 +22,7 @@ New features, changes and fixes in gnuplot version 4.6.5
 * FIX iteration over parametric function plots
 * FIX autoscaling of polar mode plots
 * FIX increase precision of xticlabel placement from (float) to (double)
+* FIX allocation error affecting certain cvs files
 
 New features, changes and fixes in gnuplot version 4.6.4
 ========================================================
