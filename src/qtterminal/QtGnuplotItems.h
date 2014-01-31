@@ -46,6 +46,7 @@
 
 #include <QGraphicsItem>
 #include <QFont>
+#include <QPen>
 
 class QtGnuplotPoint : public QGraphicsItem
 {
@@ -55,6 +56,9 @@ public:
 public:
 	virtual QRectF boundingRect() const;
 	virtual void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget);
+
+public:
+	static void drawPoint(QPainter* painter, const QPointF& origin, double size, int style);
 
 private:
 	QColor m_color;
@@ -105,6 +109,53 @@ public:
 
 private:
 	bool m_hidden;
+};
+
+struct QtGnuplotPoints_PointData
+{
+	unsigned int z;
+	QPointF point;
+	int style;
+	double pointSize;
+	QColor color;
+};
+
+struct QtGnuplotPoints_PolygonData
+{
+	unsigned int z;
+	QPolygonF polygon;
+	QPen pen;
+};
+
+struct QtGnuplotPoints_FilledPolygonData
+{
+	unsigned int z;
+	QPolygonF polygon;
+	QBrush brush;
+};
+
+// Single item that gathers many points and line to increase the performance of the terminal
+class QtGnuplotPoints : public QGraphicsItem
+{
+public:
+	QtGnuplotPoints(QGraphicsItem* parent = 0);
+
+public:
+	void addPoint(const QPointF& point, int style, double pointSize, const QColor& color);
+	void addPolygon(const QPolygonF& polygon, const QPen& pen);
+	void addFilledPolygon(const QPolygonF& polygon, const QBrush& brush);
+	bool isEmpty() const;
+
+public:
+	virtual QRectF boundingRect() const;
+	virtual void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget);
+
+private:
+	QVector<QtGnuplotPoints_PointData> m_points;
+	QVector<QtGnuplotPoints_PolygonData> m_polygons;
+	QVector<QtGnuplotPoints_FilledPolygonData> m_filledPolygons;
+	QRectF m_boundingRect;
+	unsigned int m_currentZ;
 };
 
 #endif // QTGNUPLOTITEMS_H

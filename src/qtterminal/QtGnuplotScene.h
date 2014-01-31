@@ -62,6 +62,7 @@ Q_OBJECT
 
 public:
 	QtGnuplotScene(QtGnuplotEventHandler* eventHandler, QObject* parent = 0);
+	~QtGnuplotScene();
 
 public:
 	virtual void mouseMoveEvent(QGraphicsSceneMouseEvent* event);
@@ -78,6 +79,7 @@ private:
 	void setBrushStyle(int style);
 	void updateRuler(const QPoint& point);
 	void flushCurrentPolygon();
+	void flushCurrentPointsItem();
 	QPolygonF& clipPolygon(QPolygonF& polygon, bool checkDiag = true) const;
 	QPointF&   clipPoint(QPointF& point) const;
 	QRectF&    clipRect(QRectF& point) const;
@@ -108,6 +110,7 @@ private:
 	bool	m_inTextBox;
 	QRectF	m_currentTextBox;
 	QList<QGraphicsItem*> m_currentGroup;
+	QtGnuplotPoints* m_currentPointsItem;
 
 	// User events data
 	QPointF m_lastMousePos;

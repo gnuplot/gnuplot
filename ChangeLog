@@ -1,3 +1,11 @@
+2014-01-31  Jérôme Lodewyck  <lodewyck@users.sourceforge.net>
+	* src/qtterminal/QtGnuplotScene.* src/qtterminal/QtGnuplotItems.*:
+	introduce a new QGraphicsItem type that gathers consecutive points, lines
+	and polygons. It greatly improves the rendering speed of plots with a large
+	number of these elements by reducing the number of QGraphicsItem that the
+	scene has to manage.
+	Patch #651
+
 2014-01-30  Jon Gjengset <jon@thesquareplanet.com>
 
 	* src/gp_types.h src/interpol.c src/interpol.h src/plot2d.c

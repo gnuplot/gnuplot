@@ -71,10 +71,16 @@ QtGnuplotScene::QtGnuplotScene(QtGnuplotEventHandler* eventHandler, QObject* par
 	m_inKeySample = false;
 	m_preserve_visibility = false;
 	m_inTextBox = false;
+	m_currentPointsItem = new QtGnuplotPoints;
 
 	m_currentGroup.clear();
 
 	resetItems();
+}
+
+QtGnuplotScene::~QtGnuplotScene()
+{
+	delete m_currentPointsItem;
 }
 
 /////////////////////////////////////////////////
@@ -128,14 +134,33 @@ void QtGnuplotScene::flushCurrentPolygon()
 	}
 
 	clipPolygon(m_currentPolygon);
-	QPainterPath path;
-	path.addPolygon(m_currentPolygon);
-	QGraphicsPathItem *pathItem;
-	pathItem = addPath(path, m_currentPen, Qt::NoBrush);
-	pathItem->setZValue(m_currentZ++);
-	m_currentPolygon.clear();
 	if (!m_inKeySample)
-		m_currentGroup.append(pathItem);
+		m_currentPointsItem->addPolygon(m_currentPolygon, m_currentPen);
+	else
+	{
+		flushCurrentPointsItem();
+		// Including the polygon in a path is necessary to avoid closing the polygon
+		QPainterPath path;
+		path.addPolygon(m_currentPolygon);
+		QGraphicsPathItem *pathItem;
+		pathItem = addPath(path, m_currentPen, Qt::NoBrush);
+		pathItem->setZValue(m_currentZ++);
+		// Because of the item grouping, this code is now unreachable 
+		//if (!m_inKeySample)
+		//	m_currentGroup.append(pathItem);
+	}
+	m_currentPolygon.clear();
+}
+
+void QtGnuplotScene::flushCurrentPointsItem()
+{
+	if (m_currentPointsItem->isEmpty())
+		return;
+
+	m_currentPointsItem->setZValue(m_currentZ++);
+	addItem(m_currentPointsItem);
+	m_currentGroup.append(m_currentPointsItem);
+	m_currentPointsItem = new QtGnuplotPoints();
 }
 
 void QtGnuplotScene::update_key_box(const QRectF rect)
@@ -186,7 +211,10 @@ void QtGnuplotScene::processEvent(QtGnuplotEventType type, QDataStream& in)
 		QPointF point; in >> point;
 		m_currentPolygon << point;
 		if (m_inKeySample)
+		{
+			flushCurrentPointsItem();
 			update_key_box( QRectF(point, QSize(0,1)) );
+		}
 	}
 	else if (type == GEPenColor)
 	{
@@ -221,6 +249,7 @@ void QtGnuplotScene::processEvent(QtGnuplotEventType type, QDataStream& in)
 	}
 	else if (type == GEFillBox)
 	{
+		flushCurrentPointsItem();
 		QRect rect; in >> rect;
 		QGraphicsRectItem *rectItem;
 		rectItem = addRect(rect, Qt::NoPen, m_currentBrush);
@@ -233,15 +262,23 @@ void QtGnuplotScene::processEvent(QtGnuplotEventType type, QDataStream& in)
 	else if (type == GEFilledPolygon)
 	{
 		QPolygonF polygon; in >> polygon;
-		QPen pen = Qt::NoPen;
-		if (m_currentBrush.style() == Qt::SolidPattern)
-			pen = m_currentBrush.color();
-		clipPolygon(polygon, false);
-		QGraphicsPolygonItem *path;
-		path = addPolygon(polygon, pen, m_currentBrush);
-		path->setZValue(m_currentZ++);
+
 		if (!m_inKeySample)
-			m_currentGroup.append(path);
+			m_currentPointsItem->addFilledPolygon(clipPolygon(polygon, false), m_currentBrush);
+		else
+		{
+			flushCurrentPointsItem();
+			QPen pen = Qt::NoPen;
+			if (m_currentBrush.style() == Qt::SolidPattern)
+				pen = m_currentBrush.color();
+			clipPolygon(polygon, false);
+			QGraphicsPolygonItem *path;
+			path = addPolygon(polygon, pen, m_currentBrush);
+			path->setZValue(m_currentZ++);
+			// Because of the item grouping, this code is now unreachable 
+			//if (!m_inKeySample)
+			//	m_currentGroup.append(path);
+		}
 	}
 	else if (type == GEBrushStyle)
 	{
@@ -264,14 +301,22 @@ void QtGnuplotScene::processEvent(QtGnuplotEventType type, QDataStream& in)
 	{
 		QPointF point; in >> point;
 		int style    ; in >> style;
-		QtGnuplotPoint* pointItem = new QtGnuplotPoint(style, m_currentPointSize, m_currentPen.color());
-		pointItem->setPos(clipPoint(point));
-		pointItem->setZValue(m_currentZ++);
-		addItem(pointItem);
-		if (m_inKeySample)
-			update_key_box( QRectF(point, QSize(2,2)) );
+		// Append the point to a points item to speed-up drawing
+		if (!m_inKeySample)
+			m_currentPointsItem->addPoint(clipPoint(point), style, m_currentPointSize, m_currentPen.color());
 		else
-			m_currentGroup.append(pointItem);
+		{
+			flushCurrentPointsItem();
+			QtGnuplotPoint* pointItem = new QtGnuplotPoint(style, m_currentPointSize, m_currentPen.color());
+			pointItem->setPos(clipPoint(point));
+			pointItem->setZValue(m_currentZ++);
+			addItem(pointItem);
+			// Because of the item grouping, this code is now unreachable 
+			//if (m_inKeySample)
+				update_key_box( QRectF(point, QSize(2,2)) );
+			//else
+			//	m_currentGroup.append(pointItem);
+		}
 
 		// EAM DEBUG 
 		// Create a hypertext label that will become visible on mouseover.
@@ -287,6 +332,7 @@ void QtGnuplotScene::processEvent(QtGnuplotEventType type, QDataStream& in)
 	}
 	else if (type == GEPutText)
 	{
+		flushCurrentPointsItem();
 		QPoint point; in >> point;
 		QString text; in >> text;
 		QGraphicsTextItem* textItem = addText(text, m_font);
@@ -314,6 +360,7 @@ void QtGnuplotScene::processEvent(QtGnuplotEventType type, QDataStream& in)
 	}
 	else if (type == GEEnhancedFlush)
 	{
+		flushCurrentPointsItem();
 		QString fontName; in >> fontName;
 		double fontSize ; in >> fontSize;
 		double base     ; in >> base;
@@ -328,6 +375,7 @@ void QtGnuplotScene::processEvent(QtGnuplotEventType type, QDataStream& in)
 	}
 	else if (type == GEEnhancedFinish)
 	{
+		flushCurrentPointsItem();
 		QPoint point; in >> point;
 		positionText(m_enhanced, point);
 		m_enhanced->setZValue(m_currentZ++);
@@ -356,6 +404,7 @@ void QtGnuplotScene::processEvent(QtGnuplotEventType type, QDataStream& in)
 	}
 	else if (type == GEImage)
 	{
+		flushCurrentPointsItem();
 		QPoint p0; in >> p0;
 		QPoint p1; in >> p1;
 		QPoint p2; in >> p2;
@@ -426,6 +475,7 @@ void QtGnuplotScene::processEvent(QtGnuplotEventType type, QDataStream& in)
 	}
 	else if (type == GEAfterPlot) 
 	{
+		flushCurrentPointsItem();
 		if (m_currentPlotNumber >= m_plot_group.count()) {
 			// End of previous plot, create group holding the accumulated elements
 			QGraphicsItemGroup *newgroup;
@@ -441,6 +491,7 @@ void QtGnuplotScene::processEvent(QtGnuplotEventType type, QDataStream& in)
 	}
 	else if (type == GEPlotNumber) 
 	{
+		flushCurrentPointsItem();
 		int newPlotNumber;  in >> newPlotNumber;
 		if (newPlotNumber >= m_plot_group.count()) {
 			// Initialize list of elements for next group
@@ -448,7 +499,6 @@ void QtGnuplotScene::processEvent(QtGnuplotEventType type, QDataStream& in)
 		} 
 		// Otherwise we are making a second pass through the same plots
 		// (currently used only to draw key samples on an opaque key box)
-
 		m_currentPlotNumber = newPlotNumber;
 	}
 	else if (type == GEModPlots)
@@ -484,6 +534,7 @@ void QtGnuplotScene::processEvent(QtGnuplotEventType type, QDataStream& in)
 	}
 	else if (type == GELayer)
 	{
+		flushCurrentPointsItem();
 		int layer; in >> layer;
 		if (layer == QTLAYER_BEGIN_KEYSAMPLE) m_inKeySample = true;
 		if (layer == QTLAYER_END_KEYSAMPLE) m_inKeySample = false;
@@ -497,6 +548,7 @@ void QtGnuplotScene::processEvent(QtGnuplotEventType type, QDataStream& in)
 #ifdef EAM_BOXED_TEXT
 	else if (type == GETextBox)
 	{
+		flushCurrentPointsItem();
 		QPointF point; in >> point;
 		int option; in >> option;
 		QGraphicsRectItem *rectItem;
@@ -545,8 +597,10 @@ void QtGnuplotScene::processEvent(QtGnuplotEventType type, QDataStream& in)
 		m_eventHandler->postTermEvent(GE_fontprops, 0, 0, par1, par2, 0);
 	}
 	else if (type == GEDone)
-		m_eventHandler->postTermEvent(GE_plotdone, 0, 0, 0, 0, 0);
-		/// @todo m_id;//qDebug() << "Done !" << items().size();
+	{
+		flushCurrentPointsItem();
+		m_eventHandler->postTermEvent(GE_plotdone, 0, 0, 0, 0, 0); /// @todo m_id;
+	}
 	else
 		swallowEvent(type, in);
 }
@@ -554,6 +608,8 @@ void QtGnuplotScene::processEvent(QtGnuplotEventType type, QDataStream& in)
 void QtGnuplotScene::resetItems()
 {
 	clear();
+	delete m_currentPointsItem;
+	m_currentPointsItem = new QtGnuplotPoints;
 
 	m_currentZ = 1.;
 
