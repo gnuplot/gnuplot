@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: svg.trm,v 1.158 2013/10/07 21:43:48 sfeam Exp $
+ * $Id: svg.trm,v 1.159 2013/12/18 22:32:55 sfeam Exp $
  */
 
 /*------------------------------------------------------------------------------------------------------------------------------------
@@ -347,8 +347,7 @@ SVG_PathClose ()
 {
     if (SVG_pathIsOpen) {
 	SVG_GroupFilledClose();
-	/* FIXME: HORRIBLE KLUDGE TO WORK AROUNG BUG IN FIREFOX V3.x */
-	fprintf(gpoutfile," h0.01'/>");
+	fprintf(gpoutfile," '/>");
 	SVG_path_count = 0;
 	SVG_pathIsOpen = FALSE;
     }
