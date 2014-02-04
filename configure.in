@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot on Unix.
 dnl
-dnl $Id: configure.in,v 1.297.2.26 2013/12/26 01:31:27 sfeam Exp $
+dnl $Id: configure.in,v 1.297.2.27 2013/12/30 20:16:21 sfeam Exp $
 dnl
 dnl this is actually major.minor ...
 dnl note that for a non-beta release, we need to
@@ -1034,6 +1034,12 @@ if test "${enable_wxwidgets_ok}" = yes ; then
     WX_LIBS="$WX_LIBS $GTK_LIBS"
   fi
 
+  dnl The user can force single-threaded mode
+  AC_ARG_WITH(wx-single-threaded, dnl
+  [--with-wx-single-threaded   do not use multithreaded wxgtk even if available],
+  WX_CXXFLAGS="$WX_CXXFLAGS -DWXT_MONOTHREADED", 
+  )
+
   dnl Check for gtk>2.8 for direct rendering to screen
   PKG_CHECK_MODULES(GTK28, [gtk+-2.0 >= 2.8.0], have_gtk28=yes, have_gtk28=no)
   if  test "${have_gtk28}" = yes ; then
@@ -1374,7 +1380,11 @@ else
 fi
 
 if test "$enable_wxwidgets_ok" = yes; then
-  AC_MSG_RESULT([  wxt terminal: yes ])
+  if test "$with_wx_single_threaded" = yes; then
+    AC_MSG_RESULT([  wxt terminal: yes (single-threaded)])
+  else
+    AC_MSG_RESULT([  wxt terminal: yes ])
+  fi
 else
   AC_MSG_RESULT([  wxt terminal: no (requires C++, wxWidgets>2.6, cairo>0.9, pango>1.10)])
 fi

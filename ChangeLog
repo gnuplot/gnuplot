@@ -1,3 +1,12 @@
+2014-02-04  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* configure.in src/wxterminal/wxt_gui.h:  New configure option
+	--with-wx-single-threaded forces the WXT_MONOTHREADED code option even
+	if the platform otherwise would default to WXT_MULTITHREADED.
+	This is intended to provide a workaround for reported problems using
+	the wxt terminal on Haswell CPUs, where apparently gnuplot's use of a
+	mutex to synchronize communication with the gui can fail badly.
+
 2014-01-31  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/datafile.c (df_tokenise):  Fix off-by-one allocation error

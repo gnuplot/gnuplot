@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.h,v 1.36.2.2 2013/04/05 16:39:47 markisch Exp $
+ * $Id: wxt_gui.h,v 1.36.2.3 2013/12/13 05:44:09 sfeam Exp $
  */
 
 /* GNUPLOT - wxt_gui.h */
@@ -153,12 +153,14 @@ extern "C" {
 
 /* depending on the platform, and mostly because of the Windows terminal which
  * already has its event loop, we may or may not be multithreaded */
+#ifndef WXT_MONOTHREADED
 #if defined(__WXGTK__)
 # define WXT_MULTITHREADED
 #elif defined(__WXMSW__) || defined(__WXMAC__)
 # define WXT_MONOTHREADED
 #else
-# error "wxt does not know if this platform has to be mono- or multi-threaded"
+# error "wxt does not know if this platform has to be single- or multi-threaded"
+#endif
 #endif
 
 extern "C" {
