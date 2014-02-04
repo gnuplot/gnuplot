@@ -7,6 +7,10 @@
 	the wxt terminal on Haswell CPUs, where apparently gnuplot's use of a
 	mutex to synchronize communication with the gui can fail badly.
 
+	* term/svg.trm:  Remove "horrible kludge" added in 2011 to work around
+	a bug in Firefox 3.x rendering.  Now it is causing more problems than it
+	solves.
+
 2014-01-31  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/datafile.c (df_tokenise):  Fix off-by-one allocation error
