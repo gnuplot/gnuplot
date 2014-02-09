@@ -1,3 +1,8 @@
+2014-02-09  Jérôme Lodewyck  <lodewyck@users.sourceforge.net>
+
+	* src/qtterminal/QtGnuplotWidget.*: Correctly handle the size of the
+	plot window on the first plot and after the plot window has been closed
+
 2014-02-15  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/qtterminal/qt_term.cpp (qt_flushOutBuffer):  Avoid dead-locking

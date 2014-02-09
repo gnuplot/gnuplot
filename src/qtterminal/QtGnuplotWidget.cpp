@@ -79,6 +79,7 @@ void QtGnuplotWidget::init()
 	m_backgroundColor = Qt::white;
 	m_antialias = true;
 	m_replotOnResize = true;
+	m_skipResize = false;
 
 	// Register as the main event receiver if not already created
 	if (m_eventHandler == 0)
@@ -141,18 +142,27 @@ void QtGnuplotWidget::processEvent(QtGnuplotEventType type, QDataStream& in)
 		qDebug() << " viewport size " << viewport->size();
 		qDebug() << " last size req." << m_lastSizeRequest;
 */
-		if (s != viewport->size())
+		// Qt has no reliable mechanism to set the size of widget while having it resizable. So we heuristically use the
+		// resize function to set the size of the plotting area when the plot window is already displayed.
+		// When the window is not yet displayed, this does not work because the window messes up with its content sizes before
+		// showing up. In this case, we use the sizeHint mechanism to tell the window which size we prefer for the plotting area.
+		// On MacOS, it looks like QMainWindow forgets the status bar area when it layouts its contents
+		// This makes the plot area 14 pixels too small in the vertical direction when the plot window
+		// is first displayed.
+		QMainWindow* parent = dynamic_cast<QMainWindow*>(parentWidget());
+		if ((s != viewport->size()) || (parent && !parent->isVisible()))
 		{
 //			qDebug() << " -> resizing";
-			QMainWindow* parent = dynamic_cast<QMainWindow*>(parentWidget());
 			if (parent)
 			{
 				// The parent is not visible : resize via the sizeHint mechanism because the "resize" function is not active
 				if (!parent->isVisible())
 				{
-					m_sizeHint = s + m_view->size() - viewport->size();
+					m_skipResize = true;
+					m_sizeHint = s + QSize(2*m_view->frameWidth(), 2*m_view->frameWidth());
 					parent->updateGeometry();
 					parent->show();
+					m_skipResize = false;
 				}
 				else
 					parent->resize(s + parent->size() - viewport->size());
@@ -203,8 +213,9 @@ void QtGnuplotWidget::resizeEvent(QResizeEvent* event)
 	qDebug() << " viewport size " << viewport->size();
 	qDebug() << " last size req." << m_lastSizeRequest;
 */
+
 	// We only inform gnuplot of a new size, and not of the first resize event
-	if ((viewport->size() != m_lastSizeRequest) && (m_lastSizeRequest != QSize(-1, -1)))
+	if ((viewport->size() != m_lastSizeRequest) && (m_lastSizeRequest != QSize(-1, -1)) && !m_skipResize)
 	{
 //		qDebug() << " -> Sending event";
 		m_eventHandler->postTermEvent(GE_fontprops,viewport->size().width(),

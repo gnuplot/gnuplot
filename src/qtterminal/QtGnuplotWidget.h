@@ -139,6 +139,7 @@ private:
 	bool m_replotOnResize;
 
 	static int m_widgetUid;
+	bool m_skipResize;
 };
 
 #endif // QTGNUPLOTWIDGET_H
