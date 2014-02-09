@@ -273,7 +273,7 @@ void qt_connectToServer(const QString& server, bool retry = true)
 		// The gnuplot_qt program could not be reached: try to start a new one
 		else
 		{
-			qDebug() << "Could not connect gnuplot_qt" << qt_option->Widget << ". Starting a new one";
+			qDebug() << "Could not connect gnuplot_qt" << server << ". Starting a new one";
 			execGnuplotQt();
 			qt_connectToServer(qt->localServerName, false);
 		}
