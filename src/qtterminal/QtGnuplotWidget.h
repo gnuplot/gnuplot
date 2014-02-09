@@ -80,6 +80,7 @@ public:
 	virtual QSize sizeHint() const;
 
 signals:
+	void plotDone();
 	void statusTextChanged(const QString& status);
 
 public:

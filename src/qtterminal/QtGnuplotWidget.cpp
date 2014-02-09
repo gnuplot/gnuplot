@@ -120,6 +120,14 @@ void QtGnuplotWidget::setViewMatrix()
 
 void QtGnuplotWidget::processEvent(QtGnuplotEventType type, QDataStream& in)
 {
+	// Plot is done. Emit a signal and forward to the scene
+	if (type == GEDone)
+	{
+		emit plotDone();
+		m_scene->processEvent(type, in);
+		return;
+	}
+
 	if (type == GESetWidgetSize)
 	{
 		QSize s;

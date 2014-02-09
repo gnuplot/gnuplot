@@ -1,3 +1,8 @@
+2014-02-09  Jérôme Lodewyck  <lodewyck@users.sourceforge.net>
+
+	* src/qtterminal/QtGnuplotWidget.*: QtGnuplotWidget emits a signal
+	after a plot is done
+
 2014-02-04  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* configure.in src/wxterminal/wxt_gui.h:  New configure option
@@ -18,6 +23,7 @@
 	Bug #1333
 
 2014-01-31  Jérôme Lodewyck  <lodewyck@users.sourceforge.net>
+
 	* src/qtterminal/QtGnuplotScene.* src/qtterminal/QtGnuplotItems.*:
 	introduce a new QGraphicsItem type that gathers consecutive points, lines
 	and polygons. It greatly improves the rendering speed of plots with a large
