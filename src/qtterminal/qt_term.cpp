@@ -249,14 +249,18 @@ void qt_connectToServer(const QString& server, bool retry = true)
 	ensureOptionsCreated();
 	bool connectToWidget = (server != qt->localServerName);
 
-	// The QLocalSocket::waitForConnected does not respect the time out argument when the
-	// gnuplot_qt application is not yet started. To wait for it, we need to implement the timeout ourselves
-	QDateTime timeout = QDateTime::currentDateTime().addMSecs(1000);
+	// The QLocalSocket::waitForConnected does not respect the time out argument when
+	// the gnuplot_qt application is not yet started or has not yet self-initialized.
+	// To wait for it, we need to implement the timeout ourselves
+	QDateTime timeout = QDateTime::currentDateTime().addMSecs(30000);
+	qDebug() << "qt_connectToServer " << server;
 	do
 	{
 		qt->socket.connectToServer(server);
-		qt->socket.waitForConnected(200);
-		// TODO: yield CPU ?
+		if (!qt->socket.waitForConnected(-1)) {
+			// qDebug() << qt->socket.errorString();
+			GP_SLEEP(0.2);	// yield CPU for 0.2 seconds
+		}
 	}
 	while((qt->socket.state() != QLocalSocket::ConnectedState) && (QDateTime::currentDateTime() < timeout));
 

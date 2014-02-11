@@ -1,3 +1,11 @@
+2014-02-11  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/qtterminal/qt_term.cpp (qt_connectToServer):
+	The timeout parameter in socket.waitForConnected() cannot be used to
+	wait for an unready socket, as that returns an error immediately.
+	Rewrite the delay loop using an explicit GP_SLEEP() instead.
+	Also increase the overall timeout for the retry loop.
+
 2014-02-09  Jérôme Lodewyck  <lodewyck@users.sourceforge.net>
 
 	* src/qtterminal/QtGnuplotWidget.*: QtGnuplotWidget emits a signal
