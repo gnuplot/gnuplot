@@ -1,5 +1,5 @@
 /*
- * $Id: wgraph.c,v 1.144.2.8 2013/06/08 11:54:25 markisch Exp $
+ * $Id: wgraph.c,v 1.144.2.9 2013/12/29 19:50:26 markisch Exp $
  */
 
 /* GNUPLOT - win/wgraph.c */
@@ -74,9 +74,13 @@
 #include "color.h"
 #include "getcolor.h"
 #ifdef HAVE_GDIPLUS
-#include "wgdiplus.h"
+# include "wgdiplus.h"
 #endif
 #include "fit.h"
+
+#ifndef WM_MOUSEHWHEEL /* requires _WIN32_WINNT >= 0x0600 */
+# define WM_MOUSEHWHEEL 0x020E
+#endif
 
 #ifdef USE_MOUSE
 /* Petr Mikulik, February 2001
@@ -559,7 +563,7 @@ GraphInit(LPGW lpgw)
 		M_PATTERNAA, "Antialiasing of Patt&erns");
 #endif
 	AppendMenu(lpgw->hPopMenu, MF_STRING, M_BACKGROUND, "&Background...");
-	AppendMenu(lpgw->hPopMenu, MF_STRING, M_CHOOSE_FONT, "Choose &Font...");
+	AppendMenu(lpgw->hPopMenu, MF_STRING, M_CHOOSE_FONT, "&Font...");
 	AppendMenu(lpgw->hPopMenu, MF_STRING, M_LINESTYLE, "&Line Styles...");
 	/* save settings */
 	AppendMenu(lpgw->hPopMenu, MF_SEPARATOR, 0, NULL);
@@ -1126,11 +1130,8 @@ GraphEnhancedOpen(char *fontname, double fontsize, double base,
 		SetFont(enhstate.lpgw, enhstate.hdc);
 
 		/* Scale fractional font height to vertical units of display */
-		/* FIXME:
-			Font scaling is not done properly (yet) and will lead to
-			non-optimal results for most font and size selections.
-			OUTLINEFONTMETRICS could be used for better results here.
-		*/
+		/* TODO: Proper use of OUTLINEFONTMETRICS would yield better
+		   results. */
 		enhstate.base = win_scale * base *
 						enhstate.lpgw->sampling * enhstate.lpgw->fontscale *
 						enhstate.res_scale;
@@ -1242,9 +1243,9 @@ draw_enhanced_text(LPGW lpgw, HDC hdc, LPRECT rect, int x, int y, char * str)
 		enhstate.sizeonly = TRUE;
 	}
 
-	/* we actually print everything left to right */
+	/* We actually print everything left to right. */
 	SetTextAlign(hdc, TA_LEFT|TA_BASELINE);
-	/* adjust baseline accordingly */
+	/* Adjust baseline position: */
 	{
 		TEXTMETRIC tm;
 		if (GetTextMetrics(hdc, &tm)) {
@@ -1264,12 +1265,12 @@ draw_enhanced_text(LPGW lpgw, HDC hdc, LPRECT rect, int x, int y, char * str)
 
 	for (pass = 1; pass <= num_passes; pass++) {
 		/* Set the recursion going. We say to keep going until a
-		* closing brace, but we don't really expect to find one.
-		* If the return value is not the nul-terminator of the
-		* string, that can only mean that we did find an unmatched
-		* closing brace in the string. We increment past it (else
-		* we get stuck in an infinite loop) and try again.
-		*/
+		 * closing brace, but we don't really expect to find one.
+		 * If the return value is not the nul-terminator of the
+		 * string, that can only mean that we did find an unmatched
+		 * closing brace in the string. We increment past it (else
+		 * we get stuck in an infinite loop) and try again.
+		 */
 		while (*(str = enhanced_recursion((char *)str, TRUE,
 				save_fontname, save_fontsize,
 				0.0, TRUE, TRUE, 0))) {
@@ -3256,27 +3257,27 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 				Wnd_exec_event(lpgw, lParam, GE_buttonpress, 2);
 				return 0L;
 
-#if _WIN32_WINNT >= 0x0400
-			/* shige : mouse wheel support */
-			case WM_MOUSEWHEEL: {
-			    WORD fwKeys;
-			    short int zDelta;
-			    int modifier_mask;
+			case WM_MOUSEWHEEL:	/* shige, BM : mouse wheel support */
+			case WM_MOUSEHWHEEL: {
+				WORD fwKeys;
+				short int zDelta;
+				int modifier_mask;
 
-			    fwKeys = LOWORD(wParam);
-			    zDelta = HIWORD(wParam);
-			    modifier_mask = ((fwKeys & MK_SHIFT)? Mod_Shift : 0)
-				| ((fwKeys & MK_CONTROL)? Mod_Ctrl : 0)
-				| ((fwKeys & MK_ALT)? Mod_Alt : 0);
-			    if (last_modifier_mask != modifier_mask)
-					Wnd_exec_event(lpgw, lParam, GE_modifier,
-					       modifier_mask);
-			    Wnd_exec_event(lpgw, lParam, GE_buttonpress,
-					   zDelta > 0 ? 4 : 5);
-			    last_modifier_mask = modifier_mask;
-			    return 0L;
+				fwKeys = LOWORD(wParam);
+				zDelta = HIWORD(wParam);
+				modifier_mask = ((fwKeys & MK_SHIFT)? Mod_Shift : 0) |
+				                ((fwKeys & MK_CONTROL)? Mod_Ctrl : 0) |
+				                ((fwKeys & MK_ALT)? Mod_Alt : 0);
+				if (last_modifier_mask != modifier_mask) {
+					Wnd_exec_event(lpgw, lParam, GE_modifier, modifier_mask);
+					last_modifier_mask = modifier_mask;
+				}
+				if (message == WM_MOUSEWHEEL)
+					Wnd_exec_event(lpgw, lParam, GE_buttonpress, zDelta > 0 ? 4 : 5);
+				else
+					Wnd_exec_event(lpgw, lParam, GE_buttonpress, zDelta > 0 ? 6 : 7);
+				return 0L;
 			}
-#endif
 
 			case WM_LBUTTONDBLCLK:
 				Wnd_exec_event(lpgw, lParam, GE_buttonrelease, 1);
@@ -3349,7 +3350,7 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 					return 0;
 #endif
 				case M_COMMANDLINE:
-					sysmenu = GetSystemMenu(lpgw->hWndGraph,0);
+					sysmenu = GetSystemMenu(lpgw->hWndGraph, 0);
 					i = GetMenuItemCount (sysmenu);
 					DeleteMenu (sysmenu, --i, MF_BYPOSITION);
 					DeleteMenu (sysmenu, --i, MF_BYPOSITION);
@@ -3729,8 +3730,10 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			if ( lpgw->lptw && (lpgw->lptw->DragPre!=(LPSTR)NULL) && (lpgw->lptw->DragPost!=(LPSTR)NULL) )
 			    DragAcceptFiles(hwnd, TRUE);
 			return(0);
+
 		case WM_ERASEBKGND:
 			return(1); /* we erase the background ourselves */
+
 		case WM_PAINT: {
 			HDC memdc;
 			HBITMAP membmp, oldbmp;
@@ -4016,6 +4019,7 @@ Graph_put_tmptext (LPGW lpgw, int where, LPCSTR text )
 		; /* should NEVER happen */
 	}
 }
+
 
 void WDPROC
 Graph_set_clipboard (LPGW lpgw, LPCSTR s)

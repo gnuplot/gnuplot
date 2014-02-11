@@ -1,4 +1,8 @@
-2014-02-04  Ethan A Merritt  <merritt@u.washington.edu>
+2014-02-11  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/win/wgraph.c:  Horizontal scroll wheel support.
+
+	2014-02-04  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* configure.in src/wxterminal/wxt_gui.h:  New configure option
 	--with-wx-single-threaded forces the WXT_MONOTHREADED code option even
