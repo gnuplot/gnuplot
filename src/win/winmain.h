@@ -1,5 +1,5 @@
 /*
- * $Id: winmain.h,v 1.12 2012/11/26 08:18:23 markisch Exp $
+ * $Id: winmain.h,v 1.13 2013/04/22 22:23:11 markisch Exp $
  */
 
 /* GNUPLOT - win/winmain.h */
@@ -68,5 +68,8 @@ TBOOLEAN WinWindowOpened(void);
 void WinPersistTextClose(void);
 void WinMessageLoop(void);
 void WinRaiseConsole(void);
+
+int ConsoleReadCh();
+DWORD WINAPI stdin_pipe_reader(LPVOID param);
 
 #endif /* GNUPLOT_WINMAIN_H */
