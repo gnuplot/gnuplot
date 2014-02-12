@@ -1,5 +1,9 @@
 2014-02-12  Bastian Maerkisch  <bmaerkisch@web.de>
 
+	* src/qtterminal/qt_term.cpp:  Add some more checks if the qt object
+	is actually available. This is needed if some other terminal continues
+	to send events even though it is no longer active.
+
 	* src/win/winmain.c|h (ConsoleReadCh, stdin_pipe_reader):  Extract the 
 	code to read a character from console and mapping it to a gnuplot code
 	from ConsoleGetCh. Export stdin_pipe_reader.

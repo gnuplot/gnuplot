@@ -810,12 +810,16 @@ void qt_set_cursor(int c, int x, int y)
 
 void qt_set_ruler(int x, int y)
 {
+	if (!qt)
+		return;
 	qt->out << GERuler << qt_termCoord(x, y);
 	qt_flushOutBuffer();
 }
 
 void qt_set_clipboard(const char s[])
 {
+	if (!qt)
+		return;
 	qt->out << GECopyClipboard << s;
 	qt_flushOutBuffer();
 }
@@ -1142,6 +1146,8 @@ void qt_options()
 void qt_layer( t_termlayer syncpoint )
 {
     static int current_plotno = 0;
+	if (!qt)
+		return;
 
     /* We must ignore all syncpoints that we don't recognize */
     switch (syncpoint) {
