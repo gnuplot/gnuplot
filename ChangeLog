@@ -1,5 +1,12 @@
 2014-02-12  Bastian Maerkisch  <bmaerkisch@web.de>
 
+	* config/msvc/Makefile:  cairo/pango terminals can be included in build
+	without wxt. Support building with Qt5. Build qt files out of tree.
+	Install gnuplot_qt. Required libraries can be installed in a common
+	directory tree, referenced by LIBDIR. The individual package references
+	GDDIR, LUADIR, CACADIR, CAIRODIR, and PDFDIR are now optional. Make
+	the install target more similar to MinGW installs.
+
 	* src/qtterminal/qt_term.cpp:  Add some more checks if the qt object
 	is actually available. This is needed if some other terminal continues
 	to send events even though it is no longer active.

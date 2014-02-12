@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.17 2014/02/12 21:17:17 markisch Exp $
+# $Id: Makefile,v 1.18 2014/02/12 21:24:19 markisch Exp $
 #
 # GNUPLOT Makefile Microsoft Visual C++ 2005 or newer
 
@@ -524,11 +524,17 @@ install:
 	if not exist $(DESTDIR)\share\LaTeX mkdir $(DESTDIR)\share\LaTeX
 	copy /Y $(TOP)\share\LaTeX\README $(DESTDIR)\share\LaTeX
 	copy /Y $(TOP)\share\LaTeX\gnuplot.cfg $(DESTDIR)\share\LaTeX
-	for %f in (BUGS README Copyright NEWS ChangeLog) do copy $(TOP)\%f $(DESTDIR)\%f
-	if exist $(TOP)\win\README.Windows copy /Y $(TOP)\win\README.Windows $(DESTDIR)
-	copy /Y $(TOP)\src\win\README.win-ja $(DESTDIR)
+	if not exist $(DESTDIR)\docs mkdir $(DESTDIR)\docs
+	for %f in (NEWS) do copy $(TOP)\%f $(DESTDIR)\%f
+	for %f in (BUGS README Copyright ChangeLog FAQ.pdf) do copy $(TOP)\%f $(DESTDIR)\docs\%f
+	if not exist $(DESTDIR)\license mkdir $(DESTDIR)\license
+	for %f in (Copyright) do copy $(TOP)\%f $(DESTDIR)\license\%f
+	if exist $(TOP)\win\README-Windows.txt copy /Y $(TOP)\win\README-Windows.txt $(DESTDIR)
+	if exist $(TOP)\win\README-Windows-ja.txt copy /Y $(TOP)\win\README-Windows-ja.txt $(DESTDIR)
 	if not exist $(DESTDIR)\demo mkdir $(DESTDIR)\demo
 	xcopy /Y $(TOP)\demo $(DESTDIR)\demo
+	if not exist $(DESTDIR)\demo\games mkdir $(DESTDIR)\demo\games
+	xcopy /Y $(TOP)\demo\games $(DESTDIR)\demo\games
 	if not exist $(DESTDIR)\contrib\pm3d mkdir $(DESTDIR)\contrib\pm3d
 	xcopy /Y $(TOP)\pm3d\contrib\*.* $(DESTDIR)\contrib\pm3d
 
