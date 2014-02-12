@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.15 2014/01/18 16:14:50 markisch Exp $
+# $Id: Makefile,v 1.16 2014/02/12 21:12:30 markisch Exp $
 #
 # GNUPLOT Makefile Microsoft Visual C++ 2005 or newer
 
@@ -56,6 +56,8 @@ CAIRO = 1
 # pipe simultaneously. On Windows, this fails, because select() on Windows can
 # only be used on network sockets)
 QT = 0
+# Set to one if you have Qt5 (instead of Qt4)
+QT5 = 1
 # Build the lua/tikz terminal?
 LUA = 0
 # Build caca terminal? Requires libcaca
@@ -68,7 +70,8 @@ DEBUG = 0
 GDDIR = gdwin32
 LUADIR = lua
 PDFDIR = pdflib
-QTDIR = C:\\Qt\\4.8.4
+#QTDIR = C:\\Qt\\4.8.4
+QTDIR = d:\Source\Qt-5.2.1\5.2.1\msvc2012
 #CAIRODIR = d:\msvc-libs
 CACADIR = libcaca
 
@@ -161,13 +164,21 @@ WXTLIBS = wxmsw28.lib wxtiff.lib
 
 !IF "$(QT)" == "1"
 !IF "$(DEBUG)" == "1"
-QTLIBS = QtCored4.lib QtGuid4.lib QtNetworkd4.lib QtSvgd4.lib ws2_32.lib
+!IF "$(QT5)" == "1"
+QTLIBS = Qt5Cored.lib Qt5Guid.lib Qt5Networkd.lib Qt5Svgd.lib Qt5Widgetsd.lib Qt5PrintSupportd.lib qtmaind.lib
 !ELSE
-QTLIBS = QtCore4.lib QtGui4.lib QtNetwork4.lib QtSvg4.lib ws2_32.lib
+QTLIBS = QtCored4.lib QtGuid4.lib QtNetworkd4.lib QtSvgd4.lib
 !ENDIF
-QTOPTIONS = /I$(QTDIR)\include /I$(QTDIR)\include\QtCore /I$(QTDIR)\include\QtGui /I$(QTDIR)\include\QtNetwork /I$(QTDIR)\include\QtSvg /DQTGNUPLOT_DATA_DIR=\"$(GNUPLOT_QT_DIR)\"
+!ELSE
+!IF "$(QT5)" == "1"
+QTLIBS = Qt5Core.lib Qt5Gui.lib Qt5Network.lib Qt5Svg.lib Qt5Widgets.lib Qt5PrintSupport.lib qtmain.lib
+!ELSE
+QTLIBS = QtCore4.lib QtGui4.lib QtNetwork4.lib QtSvg4.lib
+!ENDIF
+!ENDIF
+CFLAGS = $(CFLAGS) /I$(QTDIR)\include /I$(QTDIR)\include\QtCore /I$(QTDIR)\include\QtGui /I$(QTDIR)\include\QtWidgets /I$(QTDIR)\include\QtNetwork /I$(QTDIR)\include\QtSvg /DQTGNUPLOT_DATA_DIR=\"$(GNUPLOT_QT_DIR)\"
 LDFLAGS = $(LDFLAGS) /libpath:$(QTDIR)\lib
-CFLAGS = $(CFLAGS) -DQTTERM
+CFLAGS = $(CFLAGS) -DQTTERM -DQT_NO_OPENGL
 MOC=$(QTDIR)\\bin\\moc
 UIC=$(QTDIR)\\bin\\uic
 RCC=$(QTDIR)\\bin\\rcc
@@ -219,46 +230,40 @@ OBJS = $(OBJS) gp_cairo.$(O) gp_cairo_helpers.$(O)
 !ENDIF
 
 !IF "$(QT)" == "1"
-OBJS = $(OBJS) $(Q)qt_term.$(O)
-GNUPLOTQTOBJS = $(Q)gnuplot_qt.$(O) $(Q)QtGnuplotWindow.$(O) \
-$(Q)QtGnuplotApplication.$(O) $(Q)QtGnuplotWidget.$(O) \
-$(Q)QtGnuplotScene.$(O) $(Q)QtGnuplotItems.$(O) \
-$(Q)QtGnuplotEvent.$(O) \
-$(Q)moc_QtGnuplotWindow.$(O) $(Q)moc_QtGnuplotApplication.$(O) \
-$(Q)moc_QtGnuplotWidget.$(O) $(Q)moc_QtGnuplotScene.$(O) \
-$(Q)moc_QtGnuplotEvent.$(O) $(Q)qrc_QtGnuplotResource.$(O)
+OBJS = $(OBJS) qt_term.$(O)
+GNUPLOTQTOBJS = gnuplot_qt.$(O) QtGnuplotWindow.$(O) \
+QtGnuplotApplication.$(O) QtGnuplotWidget.$(O) \
+QtGnuplotScene.$(O) QtGnuplotItems.$(O) \
+QtGnuplotEvent.$(O) \
+moc_QtGnuplotWindow.$(O) moc_QtGnuplotApplication.$(O) \
+moc_QtGnuplotWidget.$(O) moc_QtGnuplotScene.$(O) \
+moc_QtGnuplotEvent.$(O) qrc_QtGnuplotResource.$(O)
 
 # Call the Qt resource compiler
-$(Q)qrc_QtGnuplotResource.cpp: $(Q)QtGnuplotResource.qrc
+qrc_QtGnuplotResource.cpp: $(Q)QtGnuplotResource.qrc
 	$(RCC) -name QtGnuplotResource -o $@ $**
 
 # Call the Qt ui compiler
-$(Q)ui_QtGnuplotSettings.h: $(Q)QtGnuplotSettings.ui
+ui_QtGnuplotSettings.h: $(Q)QtGnuplotSettings.ui
 	$(UIC) -o $@ $**
 
-$(Q)moc_QtGnuplotWindow.cpp: $(Q)QtGnuplotWindow.h
+moc_QtGnuplotWindow.cpp: $(Q)QtGnuplotWindow.h
 	$(MOC) -o $@ $**
 
-$(Q)moc_QtGnuplotApplication.cpp: $(Q)QtGnuplotApplication.h
+moc_QtGnuplotApplication.cpp: $(Q)QtGnuplotApplication.h
 	$(MOC) -o $@ $**
 
-$(Q)moc_QtGnuplotWidget.cpp: $(Q)QtGnuplotWidget.h
+moc_QtGnuplotWidget.cpp: $(Q)QtGnuplotWidget.h
 	$(MOC) -o $@ $**
 
-$(Q)moc_QtGnuplotScene.cpp: $(Q)QtGnuplotScene.h
+moc_QtGnuplotScene.cpp: $(Q)QtGnuplotScene.h
 	$(MOC) -o $@ $**
 
-$(Q)moc_QtGnuplotEvent.cpp: $(Q)QtGnuplotEvent.h
+moc_QtGnuplotEvent.cpp: $(Q)QtGnuplotEvent.h
 	$(MOC) -o $@ $**
 
-{$(Q)}.cpp.obj:
-	$(CC) /c $(CFLAGS) $(QTOPTIONS) $(Q)$*.cpp /Fo$@
-
-{$(Q)}.cpp.cobj:
-	$(CC) /c $(CFLAGS) $(QTOPTIONS) $(CONSOLE_CFLAGS) $(Q)$*.cpp /Fo$@
-
-gnuplot_qt.exe: $(Q)ui_QtGnuplotSettings.h $(GNUPLOTQTOBJS)
-	$(LD) /entry:mainCRTStartup /subsystem:windows $(LDFLAGS) /map:wgnuplot.map /out:$@ $(GNUPLOTQTOBJS) $(QTLIBS) shell32.lib
+gnuplot_qt.exe: ui_QtGnuplotSettings.h $(GNUPLOTQTOBJS)
+	$(LD) /entry:mainCRTStartup /subsystem:windows $(LDFLAGS) /map:gnuplot_qt.map /out:$@ $(GNUPLOTQTOBJS) $(QTLIBS) shell32.lib
 !ENDIF
 
 WINOBJS = winmain.obj wgnuplib.obj wgraph.obj wprinter.obj wtext.obj \
@@ -269,6 +274,12 @@ ALL_CONSOLE_OBJS = $(OBJS:.obj=.cobj) $(WINOBJS:.obj=.cobj)
 
 
 # default rules
+.cpp.obj:
+	$(CC) /c $(CFLAGS) $(WIN_CFLAGS) $*.cpp /Fo$@
+
+.cpp.cobj:
+	$(CC) /c $(CFLAGS) $(CONSOLE_CFLAGS) $*.cpp /Fo$@
+
 {$(S)}.c.obj:
 	$(CC) /c $(CFLAGS) $(WIN_CFLAGS) $(S)\\$*.c
 
@@ -292,6 +303,12 @@ ALL_CONSOLE_OBJS = $(OBJS:.obj=.cobj) $(WINOBJS:.obj=.cobj)
 
 {$(WX)}.c.cobj:
 	$(CC) /c $(CFLAGS) $(CONSOLE_CFLAGS) $(WX)$*.c /Fo$@
+
+{$(Q)}.cpp.obj:
+	$(CC) /c $(CFLAGS) $(WIN_CFLAGS) $(Q)$*.cpp /Fo$@
+
+{$(Q)}.cpp.cobj:
+	$(CC) /c $(CFLAGS) $(CONSOLE_CFLAGS) $(Q)$*.cpp /Fo$@
 
 {$(S)}.c{$(M)}.exe:
 	$(CC) /c $(CFLAGS) $(W)$*.c /Fo$@
@@ -437,9 +454,9 @@ clean:
 	if exist *.obj del *.obj
 	if exist *.cobj del *.cobj
 	if exist *.map del *.map
-	if exist $(Q)moc_*.cpp del $(Q)moc_*.cpp
-	if exist $(Q)qrc_*.cpp del $(Q)qrc_*.cpp
-	if exist $(Q)ui_*.h del $(Q)ui_*.h
+	if exist moc_*.cpp del moc_*.cpp
+	if exist qrc_*.cpp del qrc_*.cpp
+	if exist ui_*.h del ui_*.h
 	if exist wgnuplot.res del wgnuplot.res
 	if exist wgnuplot.chw del wgnuplot.chw
 	if exist $(M)bf_test.exe del $(M)bf_test.exe
@@ -447,6 +464,7 @@ clean:
 	if exist linkopt-c.msw del linkopt-c.msw
 	if exist doc2html.exe del doc2html.exe
 	if exist gnuplot rmdir /s /q gnuplot
+	if exist *.tmp del *.tmp
 
 veryclean: clean
 	if exist wgnuplot.exe del wgnuplot.exe
@@ -469,6 +487,7 @@ install:
 	if not exist $(DESTDIR)\bin mkdir $(DESTDIR)\bin
 	copy /Y wgnuplot.exe $(DESTDIR)\bin
 	copy /Y gnuplot.exe $(DESTDIR)\bin
+	copy /Y gnuplot_qt.exe $(DESTDIR)\bin
 	copy /Y *gnuplot.exe.manifest $(DESTDIR)\bin
 	copy /Y $(W)wgnuplot.mnu $(DESTDIR)\bin
 	copy /Y $(W)wgnuplot-ja.mnu $(DESTDIR)\bin
@@ -476,6 +495,8 @@ install:
 	if exist wgnuplot-ja.chm copy /Y wgnuplot-ja.chm $(DESTDIR)\bin
 	if exist wgnuplot.hlp copy /Y wgnuplot.hlp $(DESTDIR)\bin
 	copy /Y *.dll $(DESTDIR)\bin
+	if exist platform\ if not exist $(DESTDIR)\bin\platform mkdir $(DESTDIR)\bin\platform
+	if exist platform\ xcopy /Y /S platform $(DESTDIR)\bin\platform
 	if not exist $(DESTDIR)\$(GNUPLOT_PS_DIR) mkdir $(DESTDIR)\$(GNUPLOT_PS_DIR)
 	xcopy /Y $(T)PostScript\*.ps $(DESTDIR)\$(GNUPLOT_PS_DIR)
 	if not exist $(DESTDIR)\$(GNUPLOT_JS_DIR) mkdir $(DESTDIR)\$(GNUPLOT_JS_DIR)
