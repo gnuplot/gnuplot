@@ -11,6 +11,8 @@
 	small to be an event structure, issue an error and continue rather than
 	spinning futilely.  Suggested by Yuriy Kaminskiy <yumkam@gmail.com>
 
+	* src/qtterminal/QtGnuplotScene.cpp: Remove dead code.
+
 2014-02-12  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* config/msvc/Makefile:  cairo/pango terminals can be included in build

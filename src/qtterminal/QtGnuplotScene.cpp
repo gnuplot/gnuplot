@@ -145,9 +145,6 @@ void QtGnuplotScene::flushCurrentPolygon()
 		QGraphicsPathItem *pathItem;
 		pathItem = addPath(path, m_currentPen, Qt::NoBrush);
 		pathItem->setZValue(m_currentZ++);
-		// Because of the item grouping, this code is now unreachable 
-		//if (!m_inKeySample)
-		//	m_currentGroup.append(pathItem);
 	}
 	m_currentPolygon.clear();
 }
@@ -275,9 +272,6 @@ void QtGnuplotScene::processEvent(QtGnuplotEventType type, QDataStream& in)
 			QGraphicsPolygonItem *path;
 			path = addPolygon(polygon, pen, m_currentBrush);
 			path->setZValue(m_currentZ++);
-			// Because of the item grouping, this code is now unreachable 
-			//if (!m_inKeySample)
-			//	m_currentGroup.append(path);
 		}
 	}
 	else if (type == GEBrushStyle)
@@ -311,14 +305,9 @@ void QtGnuplotScene::processEvent(QtGnuplotEventType type, QDataStream& in)
 			pointItem->setPos(clipPoint(point));
 			pointItem->setZValue(m_currentZ++);
 			addItem(pointItem);
-			// Because of the item grouping, this code is now unreachable 
-			//if (m_inKeySample)
-				update_key_box( QRectF(point, QSize(2,2)) );
-			//else
-			//	m_currentGroup.append(pointItem);
+			update_key_box( QRectF(point, QSize(2,2)) );
 		}
 
-		// EAM DEBUG 
 		// Create a hypertext label that will become visible on mouseover.
 		// The Z offset is a kludge to force the label into the foreground.
 		if (!m_currentHypertext.isEmpty()) {
