@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.16 2014/02/12 21:12:30 markisch Exp $
+# $Id: Makefile,v 1.17 2014/02/12 21:17:17 markisch Exp $
 #
 # GNUPLOT Makefile Microsoft Visual C++ 2005 or newer
 
@@ -24,7 +24,7 @@
 #     so they can be turned on/off more easily.
 # Bastian Maerkisch bmaerkisch@web.de:
 #   Out of tree version. Moved to config\msvc
-#
+#   See ChangeLog for further changes.
 
 #
 # To compile with Visual C:
@@ -67,13 +67,15 @@ CACA = 0
 DEBUG = 0
 
 # Location of additional libraries
-GDDIR = gdwin32
-LUADIR = lua
+#GDDIR = gdwin32
+#LUADIR = lua
 PDFDIR = pdflib
 #QTDIR = C:\\Qt\\4.8.4
 QTDIR = d:\Source\Qt-5.2.1\5.2.1\msvc2012
-#CAIRODIR = d:\msvc-libs
-CACADIR = libcaca
+#CAIRODIR = cairo-pango
+#CACADIR = libcaca
+LIBDIR =  d:\msvc-libs
+
 
 # installation directory
 DESTDIR = "$(PROGRAMFILES)\gnuplot"
@@ -135,14 +137,22 @@ COMMONLIBS = kernel32.lib user32.lib gdi32.lib winspool.lib \
              msimg32.lib gdiplus.lib
 CONSOLELIBS = ole32.lib oleaut32.lib comctl32.lib
 
+!IFDEF LIBDIR
+OPTIONS = $(OPTIONS) /I$(LIBDIR)\include
+LDFLAGS = $(LDFLAGS) /libpath:$(LIBDIR)\lib
+!ENDIF
+
 !IF "$(GDLIB)" == "1"
 OPTIONS = $(OPTIONS) /DHAVE_LIBGD /DHAVE_GD_H /DHAVE_GD_GIF /DGIF_ANIMATION /DHAVE_GD_PNG /DHAVE_GD_JPEG /DHAVE_GD_TTF
+!IFDEF GDDIR
 OPTIONS = $(OPTIONS) /I$(GDDIR)\include
 LDFLAGS = $(LDFLAGS) /libpath:$(GDDIR)\lib
+!ENDIF
 !ENDIF
 
 !IF "$(PDFLIB)" == "1"
 OPTIONS = $(OPTIONS) /DHAVE_LIBPDF
+!IFDEF PDFDIR
 LDFLAGS = $(LDFLAGS) /libpath:$(PDFDIR)\pdflib
 TERMFLAGS = $(TERMFLAGS) /I$(PDFDIR)\pdflib
 !ENDIF
@@ -187,16 +197,21 @@ EXTRA_TARGETS = $(EXTRA_TARGETS) gnuplot_qt.exe
 
 !IF "$(LUA)" == "1"
 OPTIONS = $(OPTIONS) /DHAVE_LUA
+!IFDEF LUADIR
 OPTIONS = $(OPTIONS) /I$(LUADIR)/include
 LDFLAGS = $(LDFLAGS) /libpath:$(LUADIR)
+!ENDIF
 TERMFLAGS = $(TERMFLAGS) /DGNUPLOT_LUA_DIR=\"$(GNUPLOT_LUA_DIR)\"
-LUALIBS = lua51.lib
+LUALIBS = lua52.lib
 !ENDIF
 
 !IF "$(CACA)" == "1"
-OPTIONS = $(OPTIONS) /DHAVE_LIBCACA /I$(CACADIR)
+OPTIONS = $(OPTIONS) /DHAVE_LIBCACA 
+!IFDEF CACADIR
+OPTIONS = $(OPTIONS) /I$(CACADIR)
 LDFLAGS = $(LDFLAGS) /libpath:$(CACADIR)
-CACALIBS = caca.lib
+!ENDIF
+CACALIBS = libcaca.lib
 !ENDIF
 
 HELPFILE = wgnuplot.chm
@@ -321,25 +336,25 @@ config.h: $(TOP)\config\config.nt
 
 wgnuplot.exe: $(OBJS) $(WINOBJS) wgnuplot.res linkopt-w.msw
 	$(LD) /subsystem:windows $(LDFLAGS) /map:wgnuplot.map /out:$@ @linkopt-w.msw
-!IF "$(GDLIB)" == "1"
+!IFDEF GDDIR
 	copy $(GDDIR)\bin\*.dll .
 !ENDIF
-!IF "$(LUA)" == "1"
+!IFDEF LUADIR
 	copy $(LUADIR)\*.dll .
 !ENDIF
-!IF "$(CACA)" == "1"
+!IFDEF CACADIR
 	copy $(CACADIR)\*.dll .
 !ENDIF
 
 gnuplot.exe: $(ALL_CONSOLE_OBJS) wgnuplot.res linkopt-c.msw
 	$(LD) /subsystem:console $(LDFLAGS) /map:wgnuplot.map /out:$@ @linkopt-c.msw
-!IF "$(GDLIB)" == "1"
+!IFDEF GDDIR
 	copy $(GDDIR)\bin\*.dll .
 !ENDIF
-!IF "$(LUA)" == "1"
+!IFDEF LUADIR
 	copy $(LUADIR)\*.dll .
 !ENDIF
-!IF "$(CACA)" == "1"
+!IFDEF CACADIR
 	copy $(CACADIR)\*.dll .
 !ENDIF
 
