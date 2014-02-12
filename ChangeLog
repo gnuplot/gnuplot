@@ -1,3 +1,9 @@
+2014-02-12  Mojca Miklavec  <mojca.miklavec.lists@gmail.com>
+
+	* configure.in src/Makefile.am src/qtterminal/qt_term.cpp
+	src/qtterminal/qt_term_mac.m:  Revert special handling of dock icons
+	on OSX (2012-06-23).
+
 2014-02-12  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/qtterminal/qt_term.cpp (qt_sendFont qt_waitforinput):

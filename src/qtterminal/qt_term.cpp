@@ -63,7 +63,6 @@ extern "C" {
 	#include "parse.h"     // for real_expression
 	#include "axis.h"
 	#include <signal.h>
-	double removeDockIcon();
 }
 
 #include "qt_term.h"
@@ -380,12 +379,6 @@ void qt_init()
 	// If we are not connecting to an existing QtGnuplotWidget, start a QtGnuplotApplication
 	if (qt_option->Widget.isEmpty())
 		execGnuplotQt();
-
-
-#ifdef Q_WS_MAC
-	// Don't display this application in the MAC OS X dock
-	removeDockIcon();
-#endif
 
 	// The creation of a QApplication mangled our locale settings
 #ifdef HAVE_LOCALE_H

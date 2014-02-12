@@ -155,10 +155,6 @@ clean-local: clean-qt-extra clean-demo
 
 gnuplot_SOURCES += qtterminal/qt_term.cpp
 
-if BUILD_ON_APPLE 
-gnuplot_SOURCES += qtterminal/qt_term_mac.m 
-endif 
-
 pkglibexec_PROGRAMS += gnuplot_qt
 
 $(gnuplot_qt_OBJECTS) : ui_QtGnuplotSettings.h
