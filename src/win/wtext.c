@@ -1,5 +1,5 @@
 /*
- * $Id: wtext.c,v 1.48 2014/01/04 02:55:06 markisch Exp $
+ * $Id: wtext.c,v 1.49 2014/01/18 16:14:50 markisch Exp $
  */
 
 /* GNUPLOT - win/wtext.c */
@@ -958,6 +958,7 @@ TextMakeFont(LPTW lptw)
     return;
 }
 
+
 static void
 TextSelectFont(LPTW lptw) {
     LOGFONT lf;
@@ -1880,18 +1881,18 @@ void
 TextStartEditing(LPTW lptw)
 {
     TextToCursor(lptw);
-    lptw->bGetCh = TRUE;
-    if (lptw->bFocus) {
+    if (lptw->bFocus && !lptw->bGetCh) {
 	UpdateCaretPos(lptw);
 	ShowCaret(lptw->hWndText);
     }
+    lptw->bGetCh = TRUE;
 }
 
 
 void
 TextStopEditing(LPTW lptw)
 {
-    if (lptw->bFocus)
+    if (lptw->bFocus && lptw->bGetCh)
 	HideCaret(lptw->hWndText);
     lptw->bGetCh = FALSE;
 }

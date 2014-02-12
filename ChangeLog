@@ -1,5 +1,9 @@
 2014-02-12  Bastian Maerkisch  <bmaerkisch@web.de>
 
+	* src/win/wtext.c (TextStartEditing, TextStopEditing):  Make sure that
+	calls to ShowCaret/HideCaret are balanced even if called if calls to
+	these routines are not.
+
 	* src/readline.c (msdos_getch):  Handle extended key codes returned
 	from term->waitforinput.
 
@@ -13,7 +17,7 @@
 
 2014-02-09  Jérôme Lodewyck  <lodewyck@users.sourceforge.net>
 
-	* src/qtterminal/QtGnuplotWidget.*: QtGnuplotWidget emits a signal
+	* src/qtterminal/QtGnuplotWidget.*:  QtGnuplotWidget emits a signal
 	after a plot is done
 
 2014-02-04  Ethan A Merritt  <merritt@u.washington.edu>
