@@ -1,3 +1,8 @@
+2014-02-12  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/readline.c (msdos_getch):  Handle extended key codes returned
+	from term->waitforinput.
+
 2014-02-11  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/qtterminal/qt_term.cpp (qt_connectToServer):

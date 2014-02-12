@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: readline.c,v 1.59 2013/08/23 18:56:32 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: readline.c,v 1.60 2014/01/01 11:07:37 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - readline.c */
@@ -967,7 +967,6 @@ fix_line()
     i = cur_pos;
     for (cur_pos = max_pos; cur_pos > i; )
 	backspace();
-
 }
 
 /* redraw the entire line, putting the cursor where it belongs */
@@ -1155,24 +1154,27 @@ msdos_getch()
 #elif defined (OS2)
     c = getc(stdin);
 #else /* not OS2, not DJGPP*/
-# if defined (_Windows) && defined (USE_MOUSE)
+# if defined (USE_MOUSE)
     if (term && term->waitforinput && interactive)
 	c = term->waitforinput(0);
     else
-# endif /* not _Windows && not USE_MOUSE */
+# endif /* not USE_MOUSE */
     c = getch();
 #endif /* not DJGPP, not OS2 */
 
     if (c == 0) {
 #ifdef DJGPP
 	c = ch & 0xff;
-#else /* not DJGPP */
-# ifdef OS2
+#elif defined(OS2)
 	c = getc(stdin);
-# else				/* not OS2 */
+#else /* not OS2, not DJGPP */
+# if defined (USE_MOUSE)
+    if (term && term->waitforinput && interactive)
+	c = term->waitforinput(0);
+    else
+# endif /* not USE_MOUSE */
 	c = getch();		/* Get the extended code. */
-# endif				/* OS2 */
-#endif /* not DJGPP */
+#endif /* not DJGPP, not OS2 */
 
 	switch (c) {
 	case 75:		/* Left Arrow. */
