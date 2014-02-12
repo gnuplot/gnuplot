@@ -1,5 +1,9 @@
 2014-02-12  Bastian Maerkisch  <bmaerkisch@web.de>
 
+	* src/win/winmain.c|h (ConsoleReadCh, stdin_pipe_reader):  Extract the 
+	code to read a character from console and mapping it to a gnuplot code
+	from ConsoleGetCh. Export stdin_pipe_reader.
+
 	* src/win/wtext.c (TextStartEditing, TextStopEditing):  Make sure that
 	calls to ShowCaret/HideCaret are balanced even if called if calls to
 	these routines are not.

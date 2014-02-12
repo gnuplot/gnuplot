@@ -1,5 +1,5 @@
 /*
- * $Id: winmain.c,v 1.70 2014/01/04 02:55:06 markisch Exp $
+ * $Id: winmain.c,v 1.71 2014/01/11 09:21:30 markisch Exp $
  */
 
 /* GNUPLOT - win/winmain.c */
@@ -456,7 +456,7 @@ int main(int argc, char **argv)
 #endif
 
 		/* create structure of first graph window */
-		graphwin = calloc(1, sizeof(GW));
+		graphwin = (LPGW) calloc(1, sizeof(GW));
 		listgraphs = graphwin;
 
 		/* locate ini file */
@@ -926,6 +926,7 @@ int fake_pclose(FILE *stream)
 
 #else /* WGP_CONSOLE */
 
+
 DWORD WINAPI stdin_pipe_reader(LPVOID param)
 {
 #if 0
@@ -943,78 +944,81 @@ DWORD WINAPI stdin_pipe_reader(LPVOID param)
 #endif
 }
 
+
 int ConsoleGetch()
 {
-    int fd = fileno(stdin);
-    HANDLE h;
-    DWORD waitResult;
+	int fd = fileno(stdin);
+	HANDLE h;
+	DWORD waitResult;
 
-    if (!isatty(fd))
-        h = CreateThread(NULL, 0, stdin_pipe_reader, NULL, 0, NULL);
-    else
-        h = (HANDLE)_get_osfhandle(fd);
+	if (!isatty(fd))
+		h = CreateThread(NULL, 0, stdin_pipe_reader, NULL, 0, NULL);
+	else
+		h = (HANDLE)_get_osfhandle(fd);
 
-    do
-    {
-        waitResult = MsgWaitForMultipleObjects(1, &h, FALSE, INFINITE, QS_ALLINPUT);
-        if (waitResult == WAIT_OBJECT_0)
-        {
-            if (isatty(fd))
-            {
-                INPUT_RECORD rec;
-                DWORD recRead;
-
-                ReadConsoleInput(h, &rec, 1, &recRead);
-				/* FIXME: We should handle rec.Event.KeyEvent.wRepeatCount > 1, too. */
-                if (recRead == 1 && rec.EventType == KEY_EVENT && rec.Event.KeyEvent.bKeyDown &&
-                        (rec.Event.KeyEvent.wVirtualKeyCode < VK_SHIFT ||
-                         rec.Event.KeyEvent.wVirtualKeyCode > VK_MENU))
-                {
-                    if (rec.Event.KeyEvent.uChar.AsciiChar)
-						if ((rec.Event.KeyEvent.dwControlKeyState == SHIFT_PRESSED) && (rec.Event.KeyEvent.wVirtualKeyCode == VK_TAB))
-							return 034; /* remap Shift-Tab */
-						else
-							return rec.Event.KeyEvent.uChar.AsciiChar;
-                    else
-                        switch (rec.Event.KeyEvent.wVirtualKeyCode)
-                        {
-                            case VK_UP: return 020;
-                            case VK_DOWN: return 016;
-                            case VK_LEFT: return 002;
-                            case VK_RIGHT: return 006;
-                            case VK_HOME: return 001;
-                            case VK_END: return 005;
-                            case VK_DELETE: return 0117;
-                        }
-                }
-            }
-            else
-            {
-                DWORD c;
-                GetExitCodeThread(h, &c);
-                CloseHandle(h);
-                return c;
-            }
-        }
-        else if (waitResult == WAIT_OBJECT_0+1)
-        {
-            MSG msg;
-
-            while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
-            {
-                TranslateMessage(&msg);
-                DispatchMessage(&msg);
-            }
-
+	do {
+		waitResult = MsgWaitForMultipleObjects(1, &h, FALSE, INFINITE, QS_ALLINPUT);
+		if (waitResult == WAIT_OBJECT_0) {
+				DWORD c;
+			if (isatty(fd)) {
+				c = ConsoleReadCh();
+				if (c != NUL)
+					return c;
+			} else {
+				GetExitCodeThread(h, &c);
+				CloseHandle(h);
+				return c;
+			}
+		} else if (waitResult == WAIT_OBJECT_0+1) {
+			WinMessageLoop();
 			if (ctrlc_flag)
 				return '\r';
-        }
-        else
-            break;
-    } while (1);
+		} else
+			break;
+	} while (1);
 }
 
 #endif /* WGP_CONSOLE */
+
+
+int ConsoleReadCh()
+{
+	INPUT_RECORD rec;
+	DWORD recRead;
+	HANDLE h;
+
+	h = GetStdHandle(STD_INPUT_HANDLE);
+	if (h == NULL)
+		return NUL;
+
+	ReadConsoleInput(h, &rec, 1, &recRead);
+	/* FIXME: We should handle rec.Event.KeyEvent.wRepeatCount > 1, too. */
+	if (recRead == 1 && rec.EventType == KEY_EVENT && rec.Event.KeyEvent.bKeyDown &&
+			(rec.Event.KeyEvent.wVirtualKeyCode < VK_SHIFT ||
+				rec.Event.KeyEvent.wVirtualKeyCode > VK_MENU)) {
+		if (rec.Event.KeyEvent.uChar.AsciiChar) {
+			if ((rec.Event.KeyEvent.dwControlKeyState == SHIFT_PRESSED) && (rec.Event.KeyEvent.wVirtualKeyCode == VK_TAB))
+				return 034; /* remap Shift-Tab */
+			else
+				return rec.Event.KeyEvent.uChar.AsciiChar;
+		} else {
+			switch (rec.Event.KeyEvent.wVirtualKeyCode) {
+				case VK_UP: return 020;
+				case VK_DOWN: return 016;
+				case VK_LEFT: return 002;
+				case VK_RIGHT: return 006;
+				case VK_HOME: return 001;
+				case VK_END: return 005;
+				case VK_DELETE: return 0117;
+			}
+		}
+	}
+
+	/* Error reading event or, key up or, one of the following event records:
+	   MOUSE_EVENT_RECORD, WINDOW_BUFFER_SIZE_RECORD, MENU_EVENT_RECORD, FOCUS_EVENT_RECORD */
+	return NUL;
+}
+
 
 /* public interface to printer routines : Windows PRN emulation
  * (formerly in win.trm)
@@ -1029,17 +1033,17 @@ open_printer()
     char *temp;
 
     if ((temp = getenv("TEMP")) == (char *)NULL)
-        *win_prntmp='\0';
+        *win_prntmp = '\0';
     else  {
-        strncpy(win_prntmp,temp,MAX_PRT_LEN);
+        strncpy(win_prntmp, temp, MAX_PRT_LEN);
         /* stop X's in path being converted by mktemp */
-        for (temp=win_prntmp; *temp; temp++)
+        for (temp = win_prntmp; *temp; temp++)
             *temp = tolower(*temp);
-        if ( strlen(win_prntmp) && (win_prntmp[strlen(win_prntmp)-1]!='\\') )
+        if ((strlen(win_prntmp) > 0) && (win_prntmp[strlen(win_prntmp) - 1] != '\\'))
             strcat(win_prntmp,"\\");
     }
-    strncat(win_prntmp, "_gptmp",MAX_PRT_LEN-strlen(win_prntmp));
-    strncat(win_prntmp, "XXXXXX",MAX_PRT_LEN-strlen(win_prntmp));
+    strncat(win_prntmp, "_gptmp", MAX_PRT_LEN - strlen(win_prntmp));
+    strncat(win_prntmp, "XXXXXX", MAX_PRT_LEN - strlen(win_prntmp));
     mktemp(win_prntmp);
     return fopen(win_prntmp, "w");
 }
@@ -1102,7 +1106,7 @@ win_lower_terminal_group(void)
 }
 
 
-/* return the number of graph windows (win terminal)*/
+/* returns true if there are any graph windows open (win terminal) */
 TBOOLEAN
 WinWindowOpened(void)
 {
