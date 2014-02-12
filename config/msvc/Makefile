@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.14 2014/01/08 20:14:34 sfeam Exp $
+# $Id: Makefile,v 1.15 2014/01/18 16:14:50 markisch Exp $
 #
 # GNUPLOT Makefile Microsoft Visual C++ 2005 or newer
 
@@ -48,6 +48,8 @@ PDFLIB = 0
 # See http://wiki.wxwidgets.org/Microsoft_Visual_C%2B%2B_Guide
 #     http://wiki.wxwidgets.org/Visual_Studio_2008_%289.0%29
 WXT = 0
+# Build Cairo Terminals (cairolatex, epslatex, pdflatex)
+CAIRO = 1
 # Build qt terminal? WARNING: the qt terminal should build, but does not work correctly.
 # Only enable it if you want to work on fixing qt terminal on windows.
 # (Basic problem: qt_waitforinput() uses select() to wait on stdin and a named
@@ -67,6 +69,7 @@ GDDIR = gdwin32
 LUADIR = lua
 PDFDIR = pdflib
 QTDIR = C:\\Qt\\4.8.4
+#CAIRODIR = d:\msvc-libs
 CACADIR = libcaca
 
 # installation directory
@@ -140,11 +143,20 @@ OPTIONS = $(OPTIONS) /DHAVE_LIBPDF
 LDFLAGS = $(LDFLAGS) /libpath:$(PDFDIR)\pdflib
 TERMFLAGS = $(TERMFLAGS) /I$(PDFDIR)\pdflib
 !ENDIF
+!ENDIF
+
+!IF ("$(CAIRO)" == "1") || ("$(WXT)" == "1")
+CAIROLIBS = glib-2.0.lib gobject-2.0.lib gmodule-2.0.lib \
+	cairo.lib pango-1.0.lib pangocairo-1.0.lib
+CFLAGS = $(CFLAGS) /DHAVE_CAIROPDF
+TERMFLAGS = $(TERMFLAGS) /DHAVE_CAIROEPS
+!IFDEF CAIRODIR
+CFLAGS = $(CFLAGS) /I$(CAIRODIR)\include\glib-2.0 /I$(CAIRODIR)\lib\glib-2.0\include /I$(CAIRODIR)\include\pango-1.0 /I$(CAIRODIR)\include\msvc
+!ENDIF
+!ENDIF
 
 !IF "$(WXT)" == "1"
-WXTLIBS = glib-2.0.lib gobject-2.0.lib gmodule-2.0.lib \
-	cairo.lib pango-1.0.lib pangocairo-1.0.lib \
-	wxmsw28.lib wxtiff.lib
+WXTLIBS = wxmsw28.lib wxtiff.lib
 !ENDIF
 
 !IF "$(QT)" == "1"
@@ -190,6 +202,7 @@ MACHINE = IX86
 O=obj
 S=$(TOP)\\src
 W=$(S)\\win\\
+WX=$(S)\\wxterminal\\
 Q=$(S)\\qtterminal\\
 T=$(TOP)\\term\\
 D=$(TOP)\\docs\\
@@ -200,6 +213,10 @@ default: wgnuplot.exe $(HELPFILE) wgnuplot.mnu $(M)bf_test.exe gnuplot.exe $(EXT
 !INCLUDE $(S)\\makefile.all
 
 OBJS = $(COREOBJS) version.obj
+
+!IF "$(CAIRO)" == "1"
+OBJS = $(OBJS) gp_cairo.$(O) gp_cairo_helpers.$(O)
+!ENDIF
 
 !IF "$(QT)" == "1"
 OBJS = $(OBJS) $(Q)qt_term.$(O)
@@ -270,6 +287,12 @@ ALL_CONSOLE_OBJS = $(OBJS:.obj=.cobj) $(WINOBJS:.obj=.cobj)
 {$(W)}.cpp.cobj:
 	$(CC) /c $(CFLAGS) $(CONSOLE_CFLAGS) $(W)$*.cpp /Fo$@
 
+{$(WX)}.c.obj:
+	$(CC) /c $(CFLAGS) $(WIN_CFLAGS) $(WX)$*.c /Fo$@
+
+{$(WX)}.c.cobj:
+	$(CC) /c $(CFLAGS) $(CONSOLE_CFLAGS) $(WX)$*.c /Fo$@
+
 {$(S)}.c{$(M)}.exe:
 	$(CC) /c $(CFLAGS) $(W)$*.c /Fo$@
 
@@ -318,6 +341,9 @@ linkopt-w.msw: Makefile
 !IF "$(PDFLIB)" == "1"
 	echo pdflib.lib >> linkopt-w.msw
 !ENDIF
+!IF "$(CAIRO)" == "1"
+	echo $(CAIROLIBS) >> linkopt-w.msw
+!ENDIF
 !IF "$(WXT)" == "1"
 	echo $(WXTLIBS) >> linkopt-w.msw
 !ENDIF
@@ -342,6 +368,9 @@ linkopt-c.msw: Makefile
 !ENDIF
 !IF "$(PDFLIB)" == "1"
 	echo pdflib.lib >> linkopt-c.msw
+!ENDIF
+!IF "$(CAIRO)" == "1"
+	echo $(CAIROLIBS) >> linkopt-c.msw
 !ENDIF
 !IF "$(WXT)" == "1"
 	echo $(WXTLIBS) >> linkopt-c.msw
@@ -388,7 +417,7 @@ $(HELPFILE): doc2html.exe $(D)gnuplot.doc gnuplot.exe
 	cd ..\\config\\msvc
 	if exist $(D)windows\wgnuplot.chm copy $(D)windows\wgnuplot.chm .
 
-doc2html.exe: $(D)windows\doc2html.c $(D)termdoc.c $(D)xref.c version.obj
+doc2html.exe: $(D)windows\doc2html.c $(D)termdoc.c $(D)xref.c version.obj $(CORETERM)
 	$(CC) $(CFLAGS) /F 5000 /W1 /I. /DWINDOWS_NO_GUI /I$(D) /I$(T) -Fedoc2html.exe $(D)windows\doc2html.c $(D)termdoc.c $(D)xref.c version.obj
 
 
