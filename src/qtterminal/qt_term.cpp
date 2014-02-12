@@ -248,12 +248,12 @@ void qt_connectToServer(const QString& server, bool retry = true)
 {
 	ensureOptionsCreated();
 	bool connectToWidget = (server != qt->localServerName);
+	// qDebug() << "qt_connectToServer " << server;
 
 	// The QLocalSocket::waitForConnected does not respect the time out argument when
 	// the gnuplot_qt application is not yet started or has not yet self-initialized.
 	// To wait for it, we need to implement the timeout ourselves
 	QDateTime timeout = QDateTime::currentDateTime().addMSecs(30000);
-	qDebug() << "qt_connectToServer " << server;
 	do
 	{
 		qt->socket.connectToServer(server);
@@ -420,10 +420,14 @@ void qt_sendFont()
 	{
 		qt->out << GEFontMetricRequest;
 		qt_flushOutBuffer();
-		bool receivedFontPropos = false;
-		while (!receivedFontPropos)
+		bool receivedFontProps = false;
+		while (!receivedFontProps)
 		{
 			qt->socket.waitForReadyRead(1000);
+			if (qt->socket.bytesAvailable() < (int)sizeof(gp_event_t)) {
+				qDebug() << "Error: short read from gnuplot_qt socket";
+				return;
+			}
 			while (qt->socket.bytesAvailable() >= (int)sizeof(gp_event_t))
 			{
 				gp_event_t event;
@@ -431,7 +435,7 @@ void qt_sendFont()
 				// Here, we discard other events than fontprops.
 				if ((event.type == GE_fontprops) && (event.par1 > 0) && (event.par2 > 0))
 				{
-					receivedFontPropos = true;
+					receivedFontProps = true;
 					metric = QPair<int, int>(event.par1, event.par2);
 					fontMetricCache[currentFont] = metric;
 					break;
@@ -869,10 +873,14 @@ int qt_waitforinput(int options)
 		if (FD_ISSET(socket_fd, &read_fds))
 		{
 			qt->socket.waitForReadyRead(-1);
-			// Temporary event for mouse move events. If several consecutive move events
-			// are received, only transmit the last one.
+			// Temporary event for mouse move events. If several consecutive
+			// move events are received, only transmit the last one.
 			gp_event_t tempEvent;
 			tempEvent.type = -1;
+			if (qt->socket.bytesAvailable() < (int)sizeof(gp_event_t)) {
+				qDebug() << "Error: short read from gnuplot_qt socket";
+				return '\0';
+			}
 			while (qt->socket.bytesAvailable() >= (int)sizeof(gp_event_t))
 			{
 				struct gp_event_t event;

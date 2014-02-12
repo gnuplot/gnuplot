@@ -1,3 +1,10 @@
+2014-02-12  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/qtterminal/qt_term.cpp (qt_sendFont qt_waitforinput):
+	If the amount of data available via the socket from gnuplot_qt is too
+	small to be an event structure, issue an error and continue rather than
+	spinning futilely.  Suggested by Yuriy Kaminskiy <yumkam@gmail.com>
+
 2014-02-12  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* config/msvc/Makefile:  cairo/pango terminals can be included in build
