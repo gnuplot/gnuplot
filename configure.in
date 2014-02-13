@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot on Unix.
 dnl
-dnl $Id: configure.in,v 1.347 2014/02/04 22:11:34 sfeam Exp $
+dnl $Id: configure.in,v 1.348 2014/02/13 04:36:59 sfeam Exp $
 dnl
 dnl this is actually major.minor ...
 dnl note that for a non-beta release, we need to disable DEVELOPMENT_RELEASE
@@ -28,6 +28,7 @@ AC_DEFINE(PROTOTYPES,1,[Automake 1.12 dropped support for building without proto
 AC_GNU_SOURCE
 AC_PROG_CC
 AC_PROG_CPP
+AC_PROG_OBJC
 AC_C_CONST
 AC_C_INLINE
 AC_C_STRINGIZE
