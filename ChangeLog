@@ -1,3 +1,23 @@
+2014-02-14  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/qtterminal/qt_term.cpp (qt_waitforinput):  Windows 
+	implementation. Instead of using select(), which on Windows only works
+	on network sockets, we use MsgWaitForMultiple objects to wait for
+	stdin, console, qt pipe and message queue events. Works for console
+	mode gnuplot and wgnuplot. In principle this scheme could be used for
+	all graphical terminals on Windows. Probably we should eventually
+	replace the individual term->waitforinput routines by a common 
+	WinWaitForInput routine to reduce code duplication.
+	Patch #645
+
+2014-02-14  Thomas Bleher
+
+	* src/qtterminal/qt_term.cpp (ScopeCounter, qt_waitforinput):  Avoid
+	recursion in qt_waitforinput (TERM_ONLY_CHECK_MOUSING) which causes
+	the routine to incorrectly wait for user input. Applied to Windows
+	code only at the moment.
+	Patch #642
+
 2014-02-12  Mojca Miklavec  <mojca.miklavec.lists@gmail.com>
 
 	* configure.in src/Makefile.am src/qtterminal/qt_term.cpp

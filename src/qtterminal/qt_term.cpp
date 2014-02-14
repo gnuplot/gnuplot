@@ -62,8 +62,15 @@ extern "C" {
 	#include "alloc.h"     // for gp_alloc
 	#include "parse.h"     // for real_expression
 	#include "axis.h"
+#ifdef WIN32
+	#include "win/winmain.h"  // for WinMessageLoop, ConsoleReadCh, stdin_pipe_reader
+	#include "win/wgnuplib.h" // for TextStartEditing, TextStopEditing
+	#include "win/wtext.h"    // for kbhit, getchar
+	#include <io.h>           // for isatty
+#endif
 	#include <signal.h>
 }
+
 
 #include "qt_term.h"
 #include "QtGnuplotEvent.h"
@@ -822,9 +829,23 @@ void qt_set_clipboard(const char s[])
 }
 #endif // USE_MOUSE
 
+
+struct ScopeCounter {
+	ScopeCounter(int & var)
+		: mVar(var)
+	{ mVar++; }
+
+	~ScopeCounter()
+	{ mVar--; }
+private:
+	int& mVar;
+};
+
+
 int qt_waitforinput(int options)
 {
 #ifdef USE_MOUSE
+#ifndef WIN32
 	fd_set read_fds;
 	struct timeval one_msec;
 	int stdin_fd  = fileno(stdin);
@@ -902,8 +923,157 @@ int qt_waitforinput(int options)
 			return '\0';
 		}
 	} while (paused_for_mouse || !FD_ISSET(stdin_fd, &read_fds));
+		return getchar();
+#else // Windows console and wgnuplot
+#ifdef WGP_CONSOLE
+	int fd = fileno(stdin);
 #endif
+	HANDLE h[2];	// list of handles to wait for
+	DWORD idx = 0;	// count of handles to wait for and current index
+	DWORD idx_stdin = -1;	// return value MsgWaitForMultipleObjects for stdin
+	DWORD idx_socket = -1;	// return value MsgWaitForMultipleObjects for the Qt socket
+	DWORD idx_msg = -1;		// return value MsgWaitForMultipleObjects for message queue events
+	int c = NUL;
+	bool waitOK = true;
+	bool quitLoop = false;
+	static int nrConcurrentCalls = 0;
+	ScopeCounter scopeCounter(nrConcurrentCalls);
+
+	// avoid recursion when check_for_mouse_events() is called as a result of a
+	// keypress sent from Qt
+	if ((nrConcurrentCalls > 1) && (options == TERM_ONLY_CHECK_MOUSING))
+		return NUL;
+
+#ifndef WGP_CONSOLE
+	if (options != TERM_ONLY_CHECK_MOUSING)
+		TextStartEditing(&textwin);
+#endif
+
+	// stdin or console
+	if (options != TERM_ONLY_CHECK_MOUSING) { // NOTE: change this if used also for the caca terminal
+#ifdef WGP_CONSOLE
+		if (!isatty(fd))
+			h[0] = CreateThread(NULL, 0, stdin_pipe_reader, NULL, 0, NULL);
+		else
+#endif
+			h[0] = GetStdHandle(STD_INPUT_HANDLE);
+		if (h[0] != NULL)
+			idx_stdin = WAIT_OBJECT_0 + idx++;
+	}
+
+	// Named pipe of QLocalSocket
+	if (qt != NULL) {
+		h[idx] = (HANDLE) qt->socket.socketDescriptor();
+		DWORD flags;
+		if (GetHandleInformation(h[idx], &flags) == 0)
+			fprintf(stderr, "Error: QtLocalSocket handle is invalid\n");
+		else
+			idx_socket = WAIT_OBJECT_0 + idx++;
+	}
+
+	// Windows Messages
+	idx_msg = WAIT_OBJECT_0 + idx; // do not increment count
+
+	// Process any pending message queue events
+	WinMessageLoop();
+
+	do {
+		DWORD timeout = (options != TERM_ONLY_CHECK_MOUSING) ? INFINITE : 50; // ms
+		DWORD waitResult;
+		
+		// Wait for new event, or process pending qt events
+		if ((idx_socket != -1) && // (qt != NULL)) &&
+			(qt->socket.waitForReadyRead(0)) && (qt->socket.bytesAvailable() >= (int)sizeof(gp_event_t)))
+			waitResult = idx_socket; // data already available
+		else
+			waitResult = MsgWaitForMultipleObjects(idx, h, FALSE, timeout, QS_ALLINPUT);  // wait for new data
+		
+		if (waitResult == idx_stdin) { // console windows or caca terminal (TBD)
+#ifdef WGP_CONSOLE
+			if (!isatty(fd)) {
+				DWORD dw;
+				GetExitCodeThread(h, &dw);
+				CloseHandle(h);
+				c = dw;
+				quitLoop = true;
+			} else 
+#endif
+			{
+				c = ConsoleReadCh();
+				if (c != NUL)
+					quitLoop = true;
+				// Otherwise, this wasn't a key down event and we cycle again
+			}
+
+		} else if (waitResult == idx_socket) { // qt terminal
+			qt->socket.waitForReadyRead(0);
+			// Temporary event for mouse move events. If several consecutive move events
+			// are received, only transmit the last one.
+			gp_event_t tempEvent;
+			tempEvent.type = -1;
+			while (qt->socket.bytesAvailable() >= (int)sizeof(gp_event_t)) {
+				struct gp_event_t event;
+				qt->socket.read((char*) &event, sizeof(gp_event_t));
+				// Delay move events
+				if (event.type == GE_motion)
+					tempEvent = event;
+				// Other events. Replay the last move event if present
+				else {
+					if (tempEvent.type == GE_motion) {
+						qt_processTermEvent(&tempEvent);
+						tempEvent.type = -1;
+					}
+					if (qt_processTermEvent(&event)) {
+						c = NUL; // exit from paused_for_mouse
+						quitLoop = true;
+					}
+				}
+			}
+			// Replay move event
+			if (tempEvent.type == GE_motion)
+				qt_processTermEvent(&tempEvent);
+
+		} else if (waitResult == idx_msg) {	// Text window, windows and wxt terminals
+			// process windows message queue events
+			WinMessageLoop();
+			if (options == TERM_ONLY_CHECK_MOUSING) {
+				quitLoop = true;
+			} else {
+#ifdef WGP_CONSOLE
+				if (ctrlc_flag) {
+					c = '\r';
+					quitLoop = true;
+				}
+#else
+				// get key from text window if available
+				if (kbhit()) {
+					c = getchar();
+					quitLoop = true;
+				}
+#endif
+			}
+
+		} else { // Time-out or Error
+			waitOK = false;
+			quitLoop = true;
+		}
+	} while (!quitLoop);
+
+
+#ifndef WGP_CONSOLE
+	if (options != TERM_ONLY_CHECK_MOUSING)
+		TextStopEditing(&textwin);
+	
+	// This happens if neither the qt queue is alive, nor there is a console window.
+	WinMessageLoop();
+	if ((options != TERM_ONLY_CHECK_MOUSING) && !waitOK && kbhit())
+		return getchar();
+#endif
+	return c;
+#endif // WIN32
+#else
 	return getchar();
+#endif // USE_MOUSE
 }
 
 /*-------------------------------------------------------
