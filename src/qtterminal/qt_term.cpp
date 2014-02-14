@@ -182,13 +182,16 @@ void qt_connectToServer(const QString& server, bool retry = true)
 	bool connectToWidget = (server != qt_localServerName);
 
 	// The QLocalSocket::waitForConnected does not respect the time out argument when the
-	// gnuplot_qt application is not yet started. To wait for it, we need to implement the timeout ourselves
-	QDateTime timeout = QDateTime::currentDateTime().addMSecs(1000);
+	// gnuplot_qt application is not yet started or has not yet self-initialized.
+	// To wait for it, we need to implement the timeout ourselves
+	QDateTime timeout = QDateTime::currentDateTime().addMSecs(30000);
 	do
 	{
 		qt_socket.connectToServer(server);
-		qt_socket.waitForConnected(200);
-		// TODO: yield CPU ?
+		if (!qt_socket.waitForConnected(-1)) {
+			// qDebug() << qt->socket.errorString();
+			GP_SLEEP(0.2);  // yield CPU for 0.2 seconds
+		}
 	}
 	while((qt_socket.state() != QLocalSocket::ConnectedState) && (QDateTime::currentDateTime() < timeout));
 
@@ -205,7 +208,7 @@ void qt_connectToServer(const QString& server, bool retry = true)
 		// The gnuplot_qt program could not be reached: try to start a new one
 		else
 		{
-			qDebug() << "Could not connect gnuplot_qt" << qt_optionWidget << ". Starting a new one";
+			qDebug() << "Could not connect gnuplot_qt" << server << ". Starting a new one";
 			execGnuplotQt();
 			qt_connectToServer(qt_localServerName, false);
 		}
@@ -733,10 +736,14 @@ int qt_waitforinput(void)
 		if (FD_ISSET(socket_fd, &read_fds))
 		{
 			qt_socket.waitForReadyRead(-1);
-			// Temporary event for mouse move events. If several consecutive move events
-			// are received, only transmit the last one.
+			// Temporary event for mouse move events. If several consecutive
+			// move events are received, only transmit the last one.
 			gp_event_t tempEvent;
 			tempEvent.type = -1;
+			if (qt_socket.bytesAvailable() < sizeof(gp_event_t)) {
+				qDebug() << "Error: short read from gnuplot_qt socket";
+				return '\0';
+			}
 			while (qt_socket.bytesAvailable() >= sizeof(gp_event_t))
 			{
 				struct gp_event_t event;

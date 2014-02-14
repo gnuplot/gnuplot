@@ -1,8 +1,21 @@
+2014-02-14  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/qtterminal/qt_term.cpp (qt_waitforinput):
+	If the amount of data available via the socket from gnuplot_qt is too
+	small to be an event structure, issue an error and continue rather than
+	spinning futilely.  Suggested by Yuriy Kaminskiy <yumkam@gmail.com>
+
+	* src/qtterminal/qt_term.cpp (qt_connectToServer):
+	The timeout parameter in socket.waitForConnected() cannot be used to
+	wait for an unready socket, as that returns an error immediately.
+	Rewrite the delay loop using an explicit GP_SLEEP() instead.
+	Also increase the overall timeout for the retry loop.
+
 2014-02-11  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/win/wgraph.c:  Horizontal scroll wheel support.
 
-	2014-02-04  Ethan A Merritt  <merritt@u.washington.edu>
+2014-02-04  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* configure.in src/wxterminal/wxt_gui.h:  New configure option
 	--with-wx-single-threaded forces the WXT_MONOTHREADED code option even
