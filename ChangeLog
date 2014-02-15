@@ -1,3 +1,8 @@
+2014-02-15  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/qtterminal/qt_term.cpp (qt_flushOutBuffer):  Avoid dead-locking
+	when no more data is to be written after flushing the socket.
+
 2014-02-14  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/qtterminal/qt_term.cpp (qt_waitforinput):  Windows 

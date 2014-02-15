@@ -238,11 +238,13 @@ void qt_flushOutBuffer()
 	// Write the block to the QLocalSocket
 	qt->socket.write(qt->outBuffer);
 	// waitForBytesWritten(-1) is supposed implement this loop, but it does not seem to work !
-	// update: seems to work with Qt 4.5
+	// update: seems to work with Qt 4.5 on Linux and Qt 5.1 on Windows, but not on Mac
 	while (qt->socket.bytesToWrite() > 0)
 	{
 		qt->socket.flush();
-		qt->socket.waitForBytesWritten(-1);
+		// Avoid dead-locking when no more data is available
+		if (qt->socket.bytesToWrite() > 0)
+			qt->socket.waitForBytesWritten(-1);
 	}
 	// Reset the buffer
 	qt->out.device()->seek(0);
