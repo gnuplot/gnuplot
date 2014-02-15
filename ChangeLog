@@ -3,6 +3,10 @@
 	* src/qtterminal/qt_term.cpp (qt_flushOutBuffer):  Avoid dead-locking
 	when no more data is to be written after flushing the socket.
 
+	* src/win/wpause.c (win_sleep):  Handle terminal "mousing" events by
+	calling term->waitforinput. Fixes mouse interaction for the qt terminal
+	during pause.
+
 2014-02-14  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/qtterminal/qt_term.cpp (qt_waitforinput):  Windows 

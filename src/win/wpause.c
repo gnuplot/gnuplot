@@ -1,5 +1,5 @@
 /*
- * $Id: wpause.c,v 1.25 2013/12/27 19:51:22 markisch Exp $
+ * $Id: wpause.c,v 1.26 2014/01/18 16:14:50 markisch Exp $
  */
 
 /* GNUPLOT - win/wpause.c */
@@ -85,11 +85,16 @@ win_sleep(DWORD dwMilliSeconds)
 	tstop  = t0 + dwMilliSeconds;
 	t1 = dwMilliSeconds; /* remaining time to wait */
 	do {
+		HANDLE h;
+
+		if (term->waitforinput != NULL)
+			term->waitforinput(TERM_ONLY_CHECK_MOUSING);
+
 #ifndef HAVE_LIBCACA
 		rc = MsgWaitForMultipleObjects(0, NULL, FALSE, t1, QS_ALLINPUT);
 		if (rc != WAIT_TIMEOUT) {
 #else
-		HANDLE h = GetStdHandle(STD_INPUT_HANDLE);
+		h = GetStdHandle(STD_INPUT_HANDLE);
 		if (h != NULL)
 			rc = MsgWaitForMultipleObjects(1, &h, FALSE, t1, QS_ALLINPUT);
 		else
@@ -148,8 +153,10 @@ PauseBox(LPPW lppw)
 	char *current_pause_title = lppw->Title;
 	static char TITLE_PAUSE_MOUSE[] = "waiting for mouse click";
 
+#ifdef USE_MOUSE
 	if (paused_for_mouse)
 	    current_pause_title = TITLE_PAUSE_MOUSE;
+#endif
 
 	if (!lppw->hPrevInstance)
 		CreatePauseClass(lppw);
@@ -182,23 +189,27 @@ PauseBox(LPPW lppw)
 	   Note: maybe to show in the window titlebar or somewhere else a message like
 	   graphwin.Title = "gnuplot pausing (waiting for mouse click)";
 	*/
-	if (!paused_for_mouse) {
+#ifdef USE_MOUSE
+	if (!paused_for_mouse)
+#endif
+	{
 	    ShowWindow(lppw->hWndPause, SW_SHOWNORMAL);
 	    BringWindowToTop(lppw->hWndPause);
 	    UpdateWindow(lppw->hWndPause);
 	}
-
 	lppw->bPause = TRUE;
 	lppw->bPauseCancel = IDCANCEL;
 
 	while (lppw->bPause) {
-		if (strcmp(term->name, "caca") != 0) {
+		if (term->waitforinput == NULL) {
+			/* Only handle message queue events */ 
 			WinMessageLoop();
 			WaitMessage();
 		} else {
 			/* Call the non-blocking sleep function,
-			   which also handles console input. */
-			win_sleep(100);
+			   which also handles console input (caca terminal)
+			   and mousing of the current terminal (e.g. qt) */
+			win_sleep(50);
 		}
 	}
 
@@ -229,13 +240,17 @@ WndPauseProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			return 0;
 		case WM_COMMAND:
 			if ((LOWORD(wParam) == IDCANCEL) || (LOWORD(wParam) == IDOK)) {
+#ifdef USE_MOUSE
 				if (!paused_for_mouse) { /* ignore OK and Cancel buttons during "pause mouse" */
+#endif
 					lppw->bPauseCancel = LOWORD(wParam);
 					lppw->bPause = FALSE;
 				}
 				break;
+#ifdef USE_MOUSE
 			}
 			return 0;
+#endif
 		case WM_SETFOCUS:
 			SetFocus(lppw->bDefOK ? lppw->hOK : lppw->hCancel);
 			return 0;
@@ -253,9 +268,11 @@ WndPauseProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		case WM_CREATE: {
 			int ws_opts = WS_CHILD | WS_TABSTOP;
 
+#ifdef USE_MOUSE
 			if (!paused_for_mouse) /* don't show buttons during pausing for mouse or key */
 				ws_opts |= WS_VISIBLE;
-			lppw = ((CREATESTRUCT *)lParam)->lpCreateParams;
+#endif
+			lppw = (LPPW) ((CREATESTRUCT *)lParam)->lpCreateParams;
 			SetWindowLongPtr(hwnd, 0, (LONG_PTR)lppw);
 			lppw->hWndPause = hwnd;
 			hdc = GetDC(hwnd);
