@@ -1,3 +1,8 @@
+2014-02-16  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/command.c (timed_pause): Fix conditional compilation when
+	./configure --disable-mouse
+
 2014-02-16  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/qtterminal/qt_term.cpp (qt_waitforinput):  Safeguard the test
@@ -5,7 +10,7 @@
 	matches when it returns WAIT_FAILED==-1. Disable the recursion test
 	for now as it seems no longer necessary.
 
-	2014-02-16  Jérôme Lodewyck  <lodewyck@users.sourceforge.net>
+2014-02-16  Jérôme Lodewyck  <lodewyck@users.sourceforge.net>
 
 	* src/qtterminal/QtGnuplotWidget.*: Correctly handle the size of the
 	plot window on the first plot and after the plot window has been closed
