@@ -938,6 +938,7 @@ int qt_waitforinput(int options)
 	int c = NUL;
 	bool waitOK = true;
 	bool quitLoop = false;
+#if 0  // Maybe not necessary after all?
 	static int nrConcurrentCalls = 0;
 	ScopeCounter scopeCounter(nrConcurrentCalls);
 
@@ -945,7 +946,7 @@ int qt_waitforinput(int options)
 	// keypress sent from Qt
 	if ((nrConcurrentCalls > 1) && (options == TERM_ONLY_CHECK_MOUSING))
 		return NUL;
-
+#endif
 #ifndef WGP_CONSOLE
 	if (options != TERM_ONLY_CHECK_MOUSING)
 		TextStartEditing(&textwin);
@@ -990,7 +991,7 @@ int qt_waitforinput(int options)
 		else
 			waitResult = MsgWaitForMultipleObjects(idx, h, FALSE, timeout, QS_ALLINPUT);  // wait for new data
 		
-		if (waitResult == idx_stdin) { // console windows or caca terminal (TBD)
+		if ((waitResult == idx_stdin) && (idx_stdin != -1)) { // console windows or caca terminal (TBD)
 #ifdef WGP_CONSOLE
 			if (!isatty(fd)) {
 				DWORD dw;
@@ -1007,7 +1008,7 @@ int qt_waitforinput(int options)
 				// Otherwise, this wasn't a key down event and we cycle again
 			}
 
-		} else if (waitResult == idx_socket) { // qt terminal
+		} else if ((waitResult == idx_socket) && (idx_socket != -1)) { // qt terminal
 			qt->socket.waitForReadyRead(0);
 			// Temporary event for mouse move events. If several consecutive move events
 			// are received, only transmit the last one.

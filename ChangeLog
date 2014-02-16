@@ -1,4 +1,11 @@
-2014-02-09  Jérôme Lodewyck  <lodewyck@users.sourceforge.net>
+2014-02-16  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/qtterminal/qt_term.cpp (qt_waitforinput):  Safeguard the test
+	of the return value of MsgWaitForMultipleObjects against accidental
+	matches when it returns WAIT_FAILED==-1. Disable the recursion test
+	for now as it seems no longer necessary.
+
+	2014-02-16  Jérôme Lodewyck  <lodewyck@users.sourceforge.net>
 
 	* src/qtterminal/QtGnuplotWidget.*: Correctly handle the size of the
 	plot window on the first plot and after the plot window has been closed
@@ -6,7 +13,7 @@
 2014-02-15  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/qtterminal/qt_term.cpp (qt_flushOutBuffer):  Avoid dead-locking
-	when no more data is to be written after flushing the socket.
+	when no more data is available after flushing the socket.
 
 	* src/win/wpause.c (win_sleep):  Handle terminal "mousing" events by
 	calling term->waitforinput. Fixes mouse interaction for the qt terminal
@@ -19,7 +26,7 @@
 	on network sockets, we use MsgWaitForMultiple objects to wait for
 	stdin, console, qt pipe and message queue events. Works for console
 	mode gnuplot and wgnuplot. In principle this scheme could be used for
-	all graphical terminals on Windows. Probably we should eventually
+	all interactive terminals on Windows. Probably we should eventually
 	replace the individual term->waitforinput routines by a common 
 	WinWaitForInput routine to reduce code duplication.
 	Patch #645
