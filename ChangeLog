@@ -1,3 +1,9 @@
+2014-02-18  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* configure.in: The interactive terminals wxt, qt, etc, no longer build
+	correctly if mousing support is not configured.  So force mouse support
+	if any of these terminals are selected during configuration.
+
 2014-02-16  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/command.c (timed_pause): Fix conditional compilation when
