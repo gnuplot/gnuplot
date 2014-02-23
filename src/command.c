@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.277 2014/01/29 15:48:51 lodewyck Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.278 2014/02/16 21:34:58 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -1495,12 +1495,14 @@ pause_command()
 		    if (!Pause(buf))
 			bail_to_command_line();
 #  endif
+# ifdef USE_MOUSE
 		} else {
 		    if (buf) fprintf(stderr,"%s\n", buf);
 		    if (!Pause(buf) && !GraphHasWindow(graphwin))
 			bail_to_command_line();
 		}
 	    }
+# endif
 	}
 #elif defined(OS2)
 	if (strcmp(term->name, "pm") == 0 && sleep_time < 0) {
