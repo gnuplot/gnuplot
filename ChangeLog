@@ -1,3 +1,9 @@
+2014-02-23  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* term/caca.trm:  No longer expect the name of the backend driver to be
+	specified in quotes. Fix some initialization issues found by the VS11
+	code analysis tool.
+
 2014-02-18  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* configure.in: The interactive terminals wxt, qt, etc, no longer build

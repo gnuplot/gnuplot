@@ -1,7 +1,7 @@
 /*
  * GNUPLOT - caca.trm
  *
- * $Id: caca.trm,v 1.1 2014/01/18 16:14:50 markisch Exp $
+ * $Id: caca.trm,v 1.2 2014/01/30 04:35:14 sfeam Exp $
  *
  * This file uses UTF8 encoding and a tab size of 4.
  *
@@ -386,9 +386,11 @@ CACA_options()
 					return;
 				} else {
 					if (!END_OF_COMMAND) {
-						char * driver = strdup(try_to_get_string());
+						char * driver = NULL;
+						m_capture(&driver, c_token, c_token);
+						c_token++;
 						/* Has driver changed? */
-						if ((CACA_driver == NULL) || (strcmp(CACA_driver, driver) != 0))
+						if ((CACA_driver != NULL) && (strcmp(CACA_driver, driver) != 0))
 							CACA_close_display();
 						free(CACA_driver);
 						CACA_driver = driver;
@@ -503,20 +505,23 @@ static void
 CACA_update_options(void)
 {
 	char options[MAX_LINE_LEN + 1];
+	int n;
 
 	term_options[0] = NUL;
 	if (CACA_driver != NULL)
-		snprintf(term_options, MAX_LINE_LEN, "%s \"%s\" ", CACA_exportonly ? "format" : "driver", CACA_driver);
+		snprintf(term_options, MAX_LINE_LEN + 1, "%s %s ", CACA_exportonly ? "format" : "driver", CACA_driver);
 	if (CACA_title != NULL) {
-		snprintf(options, MAX_LINE_LEN, "title \"%s\" ", CACA_title);
+		n = snprintf(options, MAX_LINE_LEN, "title \"%s\" ", CACA_title);
+		if (n >= MAX_LINE_LEN) options[MAX_LINE_LEN] = NUL;
 		strcat(term_options, options);
 	}
-	snprintf(options, MAX_LINE_LEN, "%senhanced size %d, %d background rgb \"%s\" %s %s ",
+	n = snprintf(options, MAX_LINE_LEN + 1, "%senhanced size %d, %d background rgb \"%s\" %s %s ",
 		(term->flags & TERM_ENHANCED_TEXT) ? "" : "no",
 		CACA_xmax + 1, CACA_ymax + 1,
 		CACA_get_color_name(CACA_background),
 		CACA_mono ? "monochrome" : "color",
 		CACA_inverted ? "inverted" : "noinverted");
+	if (n >= MAX_LINE_LEN) options[MAX_LINE_LEN] = NUL;
 	strcat(term_options, options);
 	strcat(term_options, "charset ");
 	switch (CACA_charset) {
@@ -709,7 +714,8 @@ CACA_init_display(void)
 	}
 
 	if (CACA_dp != NULL) {
-		CACA_driver = strdup(caca_get_display_driver(CACA_dp));
+		if (CACA_driver == NULL)
+			CACA_driver = strdup(caca_get_display_driver(CACA_dp));
 		CACA_windowed = (strcmp(CACA_driver, "x11") == 0);
 		CACA_windowed |= (strcmp(CACA_driver, "gl") == 0);
 #if defined(WIN32) && !defined(WGP_CONSOLE)
@@ -1251,8 +1257,8 @@ CACA_update_keybox(unsigned plotno, unsigned x, unsigned y)
 	if (plotno > CACA_maxkeyboxes) {
 		int i;
 		CACA_maxkeyboxes += 10;
-		CACA_keyboxes = (CACA_RECT *) realloc(CACA_keyboxes,
-				CACA_maxkeyboxes * sizeof(CACA_RECT));
+		CACA_keyboxes = (CACA_RECT *) gp_realloc(CACA_keyboxes,
+				CACA_maxkeyboxes * sizeof(CACA_RECT), "key boxes");
 		for (i = plotno - 1; i < CACA_maxkeyboxes; i++) {
 			CACA_keyboxes[i].left   = INT_MAX;
 			CACA_keyboxes[i].right  = 0;
@@ -1281,7 +1287,7 @@ CACA_layer(t_termlayer layer)
 			CACA_plotno++;
 			if (CACA_plotno >= CACA_maxhideplots) {
 				CACA_maxhideplots += 10;
-				CACA_hideplot = (TBOOLEAN *) realloc(CACA_hideplot, CACA_maxhideplots * sizeof(TBOOLEAN));
+				CACA_hideplot = (TBOOLEAN *) gp_realloc(CACA_hideplot, CACA_maxhideplots * sizeof(TBOOLEAN), "hideplot");
 				for (idx = CACA_plotno - 1; idx < CACA_maxhideplots; idx++)
 					CACA_hideplot[idx] = FALSE;
 			}
@@ -1352,8 +1358,8 @@ CACA_add_path_point(int x, int y)
 {
 	if (CACA_polygon_points >= CACA_maxpath) {
 		CACA_maxpath += 10;
-		CACA_path_x = realloc(CACA_path_x, CACA_maxpath * sizeof(int));
-		CACA_path_y = realloc(CACA_path_y, CACA_maxpath * sizeof(int));
+		CACA_path_x = (int *) gp_realloc(CACA_path_x, CACA_maxpath * sizeof(int), "path_x");
+		CACA_path_y = (int *) gp_realloc(CACA_path_y, CACA_maxpath * sizeof(int), "path_y");
 	}
 	CACA_path_x[CACA_polygon_points] = x;
 	CACA_path_y[CACA_polygon_points] = CACA_ymax - y;
@@ -1408,13 +1414,16 @@ CACA_encode_text(const char *str)
 	char * text = (char * ) str;
 	int i;
 
+	if (text == NULL)
+		return NULL;
+
 	if (((encoding == S_ENC_DEFAULT) || (encoding == S_ENC_UTF8))
 		&& (CACA_charset == CACA_ASCII)) {
 		/* convert from utf8 to ascii */
 		char const * s = str;
 		size_t len = strlen_utf8(str);
 
-		text = malloc(len + 1);
+		text = (char *) malloc(len + 1);
 		i = 0;
 		while ((*s != NUL) && (i < len)) {
 			size_t bytes;
@@ -1429,7 +1438,7 @@ CACA_encode_text(const char *str)
 		text[i] = NUL;
 	} else if ((encoding == S_ENC_CP437) && (CACA_charset == CACA_ASCII)) {
 		/* convert from cp437 to ascii */
-		text = malloc(strlen(str) + 1);
+		text = (char *) gp_alloc(strlen(str) + 1, "text");
 		for (i = 0; i < strlen(str); i++) {
 			uint32_t c = caca_cp437_to_utf32(str[i]);
 			text[i] = caca_utf32_to_ascii(c);
@@ -1437,7 +1446,7 @@ CACA_encode_text(const char *str)
 		text[strlen(str)] = NUL;
 	} else if (encoding == S_ENC_CP437) {
 		/* convert from cp437 to utf8 */
-		char * s = text = malloc(4 * strlen(str) + 1);
+		char * s = text = (char *) gp_alloc(4 * strlen(str) + 1, "text");
 		for (i = 0; i < strlen(str); i++) {
 			uint32_t c = caca_cp437_to_utf32(str[i]);
 			s += caca_utf32_to_utf8(s, c);
@@ -1455,7 +1464,7 @@ CACA_put_text(unsigned int x, unsigned int y, const char *str)
 	/* Convert text encoding if necessary. */
 	char * text = CACA_encode_text(str);
 	int xpos, ypos;
-	int xmax, ymax;
+	int xmax = x, ymax = y;
 
 	if (CACA_cv == NULL)
 		return;
@@ -2149,8 +2158,11 @@ CACA_filled_polygon(int points, gpiPoint *corners)
 	if ((corners[0].x == corners[points - 1].x) && (corners[0].y == corners[points - 1].y))
 		points--;
 
-	fillchar = CACA_fillstyle(corners->style);
+	/* Need at least three remaining points */
+	if (points < 3)
+	    return;
 
+	fillchar = CACA_fillstyle(corners->style);
 	attr = caca_get_attr(CACA_cv, -1, -1);
 	if (CACA_invertfill) {
 		/* Switch foreground/background color */
@@ -2193,7 +2205,7 @@ CACA_filled_polygon(int points, gpiPoint *corners)
 		}
 
 		/* Dynamically allocate node list. */
-		nodeX = malloc(sizeof(* nodeX) * points);
+		nodeX = (float *) gp_alloc(sizeof(* nodeX) * points, "nodeX");
 
 		/* Loop through the rows of the image. */
 		for (pixelY = ymin; pixelY <= ymax + 1; pixelY++) {
@@ -2291,7 +2303,7 @@ CACA_image(unsigned int M, unsigned int N, coordval *image,
 	}
 
 	/* convert image to integer */
-	data = malloc(M * N * bpp / 8);
+	data = (uint8_t *) gp_alloc(M * N * bpp / 8, "image data");
 	for (n = 0; n < M * N * bpp / 8; n++)
 		data[n] = 255 * image[n];
 
@@ -3281,7 +3293,7 @@ START_HELP(caca)
 " filled polygons, unicode character encoding and mouse interaction.",
 "",
 " Syntax:",
-"       set terminal caca {{driver | format} {default | \"<driver>\" | list}}",
+"       set terminal caca {{driver | format} {default | <driver> | list}}",
 "                         {color | monochrome}",
 "                         {{no}inverted}",
 "                         {enhanced | noenhanced}",
@@ -3291,7 +3303,6 @@ START_HELP(caca)
 "                         {charset ascii|blocks|unicode}",
 "",
 " The `driver` option selects the `libcaca` display driver or export `format`.",
-" Note that driver names need to be in double quotes.",
 " Use `default` to let `libcaca` choose the platform default display driver.",
 " The default driver can be changed by setting the environment variable",
 " CACA_DRIVER before starting `gnuplot`.",
