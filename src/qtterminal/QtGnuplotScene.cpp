@@ -542,6 +542,7 @@ void QtGnuplotScene::processEvent(QtGnuplotEventType type, QDataStream& in)
 		int option; in >> option;
 		QGraphicsRectItem *rectItem;
 
+#if (0) // testbox options not yet implemented for qt
 		/* Must match the definition in ../term_api.h */
 		typedef enum t_textbox_options {
 		       TEXTBOX_INIT = 0,
@@ -549,6 +550,7 @@ void QtGnuplotScene::processEvent(QtGnuplotEventType type, QDataStream& in)
 		       TEXTBOX_BACKGROUNDFILL,
 		       TEXTBOX_MARGINS
 		} t_textbox_options;
+#endif // testbox options not yet implemented for qt
 
 		switch (option) {
 		case TEXTBOX_INIT:
