@@ -1,5 +1,5 @@
 # Hello, emacs: this is a -*- Makefile -*-
-# $Id: Makefile,v 1.35 2014/01/11 15:18:27 markisch Exp $
+# $Id: Makefile,v 1.36 2014/01/18 16:14:50 markisch Exp $
 #
 # GNUPLOT Makefile for MinGW/MSYS on Windows
 # This assumes usual installation of the MinGW32 toolkit, the free
@@ -206,10 +206,10 @@ RM = rm -f
 CP = cp -p
 
 ifdef DEBUG
-  CFLAGS += -g -Wall
+  CFLAGS += -g -Wall -pipe
   LDFLAGS += -g
 else
-  CFLAGS += -O2
+  CFLAGS += -O2 -pipe
   LDFLAGS += -s
 endif
 
