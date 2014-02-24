@@ -229,7 +229,7 @@ void execGnuplotQt()
 
 void qt_flushOutBuffer()
 {
-	if (!qt)
+	if (!qt || !qt->socket.isValid())
 		return;
 
 	// Write the block size at the beginning of the bock

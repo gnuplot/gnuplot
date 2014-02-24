@@ -1,3 +1,8 @@
+2014-02-24  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/qtterminal/qt_term.cpp(qt_flushOutBuffer):
+	Check for valid socket before flushing.
+
 2014-02-23  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* term/caca.trm:  No longer expect the name of the backend driver to be
