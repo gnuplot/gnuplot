@@ -1,3 +1,9 @@
+2014-02-24  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/qtterminal/qt_term.cpp (qt_waitforinput):  Avoid unnecessary
+	timeouts on Windows when only checking for mouse interaction. These
+	would slow down drawing considerably in some cases.
+
 2014-02-24  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/qtterminal/qt_term.cpp(qt_flushOutBuffer):

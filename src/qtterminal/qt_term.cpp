@@ -981,15 +981,22 @@ int qt_waitforinput(int options)
 	WinMessageLoop();
 
 	do {
-		DWORD timeout = (options != TERM_ONLY_CHECK_MOUSING) ? INFINITE : 50; // ms
-		DWORD waitResult;
+		DWORD waitResult = -1;
 		
-		// Wait for new event, or process pending qt events
+#ifndef WGP_CONSOLE
+		// Process pending key events of the text console
+		if (kbhit() && (options != TERM_ONLY_CHECK_MOUSING))
+			waitResult = idx_msg;
+#endif
+
+		// Process pending qt events
 		if ((idx_socket != -1) && // (qt != NULL)) &&
 			(qt->socket.waitForReadyRead(0)) && (qt->socket.bytesAvailable() >= (int)sizeof(gp_event_t)))
 			waitResult = idx_socket; // data already available
-		else
-			waitResult = MsgWaitForMultipleObjects(idx, h, FALSE, timeout, QS_ALLINPUT);  // wait for new data
+		
+		// Wait for a new event 
+		if ((waitResult == -1) && (options != TERM_ONLY_CHECK_MOUSING))
+			waitResult = MsgWaitForMultipleObjects(idx, h, FALSE, INFINITE, QS_ALLINPUT);  // wait for new data
 		
 		if ((waitResult == idx_stdin) && (idx_stdin != -1)) { // console windows or caca terminal (TBD)
 #ifdef WGP_CONSOLE
@@ -1068,8 +1075,7 @@ int qt_waitforinput(int options)
 		TextStopEditing(&textwin);
 	
 	// This happens if neither the qt queue is alive, nor there is a console window.
-	WinMessageLoop();
-	if ((options != TERM_ONLY_CHECK_MOUSING) && !waitOK && kbhit())
+	if ((options != TERM_ONLY_CHECK_MOUSING) && !waitOK)
 		return getchar();
 #endif
 	return c;
