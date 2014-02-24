@@ -543,12 +543,12 @@ void QtGnuplotScene::processEvent(QtGnuplotEventType type, QDataStream& in)
 		QGraphicsRectItem *rectItem;
 
 		/* Must match the definition in ../term_api.h */
-		typedef enum t_textbox_options {
+		enum t_textbox_options {
 		       TEXTBOX_INIT = 0,
 		       TEXTBOX_OUTLINE,
 		       TEXTBOX_BACKGROUNDFILL,
 		       TEXTBOX_MARGINS
-		} t_textbox_options;
+		};
 
 		switch (option) {
 		case TEXTBOX_INIT:
