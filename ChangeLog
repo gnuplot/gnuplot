@@ -9,6 +9,9 @@
 	* src/qtterminal/qt_term.cpp(qt_flushOutBuffer):
 	Check for valid socket before flushing.
 
+	* configure.in:  --with-qt=qt5 forces qt5 even if auto-detection
+	would otherwise choose qt4.
+
 2014-02-23  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* term/caca.trm:  No longer expect the name of the backend driver to be

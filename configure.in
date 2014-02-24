@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot on Unix.
 dnl
-dnl $Id: configure.in,v 1.349 2014/02/13 21:01:42 sfeam Exp $
+dnl $Id: configure.in,v 1.350 2014/02/19 01:14:38 sfeam Exp $
 dnl
 dnl this is actually major.minor ...
 dnl note that for a non-beta release, we need to disable DEVELOPMENT_RELEASE
@@ -1182,7 +1182,11 @@ if test "${enable_qt}" = yes ; then
   fi
 
   dnl First check for Qt5
-  try_qt4=yes
+  if test "x${with_qt}" = "xqt5"; then
+    try_qt4=no
+  else
+    try_qt4=yes
+  fi
   if test "x${with_qt}" != "xqt4"; then
     PKG_CHECK_MODULES_NOFAIL(QT, [Qt5Core Qt5Gui Qt5Network Qt5Svg Qt5PrintSupport])
     if test $pkg_failed = no; then
