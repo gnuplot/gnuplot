@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.701.2.34 2014/01/11 01:00:26 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.701.2.35 2014/01/31 05:22:05 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -11575,9 +11575,9 @@ Ffigure_mapcontours
  `set tics` with no options restores to place tics inwards. Every other
  options are retained.
 
- See also `set xtics` for more control of major (labelled) tic marks and
+ See also `set xtics` for more control of major (labeled) tic marks and
  `set mxtics` for control of minor tic marks.  These commands provide control
- at a axis by axis basis.
+ for each axis separately.
 3 ticslevel
 ?commands set ticslevel
 ?commands show ticslevel
