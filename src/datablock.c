@@ -1,5 +1,5 @@
 /*
- * $Id: datablock.c,v 1.1 2012/06/19 18:11:05 sfeam Exp $
+ * $Id: datablock.c,v 1.2 2013/07/19 22:23:15 sfeam Exp $
  */
 /* GNUPLOT - datablock.c */
 
@@ -117,6 +117,8 @@ datablock_command()
     if (!fin)
 	int_error(NO_CARET,"attempt to define data block from invalid context");
     for (nlines = 0; fgets(dataline, MAX_LINE_LEN, fin); nlines++) {
+	int n;
+
 	if (!strncmp(eod, dataline, strlen(eod)))
 	    break;
 	/* Allocate space for data lines plus at least 2 empty lines at the end. */
@@ -128,6 +130,10 @@ datablock_command()
 	    memset(&datablock->udv_value.v.data_array[nlines], 0,
 		    (nsize - nlines) * sizeof(char *));
 	}
+	/* Strip trailing newline character */
+	n = strlen(dataline);
+	if (n > 0 && dataline[n - 1] == '\n')
+	    dataline[n - 1] = NUL;
 	datablock->udv_value.v.data_array[nlines] = gp_strdup(dataline);
     }
     inline_num += nlines + 1;	/* Update position in input file */

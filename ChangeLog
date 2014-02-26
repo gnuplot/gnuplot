@@ -7,6 +7,8 @@
 	src/mouse.c (xDateTimeFormat):  gmtime() might return NULL for
 	invalid arguments.
 
+	src/datablock.c (datablock_command):  Strip trailing newline character.
+
 2014-02-26  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/qtterminal/qt_term.cpp(qt_sendFont):  Work-around possibly very
