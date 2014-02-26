@@ -3,6 +3,11 @@
 	* src/qtterminal/qt_term.cpp(qt_sendFont):  Work-around possibly very
 	slow response to font metrics query on OSX. May only be needed for Qt5.
 
+	* src/qtterminal/qt_term.cpp(qt_connectToServer qt_waitforinput):
+	If the outboard server gnuplot_qt is killed while gnuplot is connected
+	to it, it gets restarted with a different server name.  Don't waste
+	time trying to connect to a server with the old name.
+
 2014-02-24  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/qtterminal/qt_term.cpp (qt_waitforinput):  Avoid unnecessary

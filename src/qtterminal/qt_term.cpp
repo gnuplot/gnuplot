@@ -256,7 +256,6 @@ void qt_connectToServer(const QString& server, bool retry = true)
 {
 	ensureOptionsCreated();
 	bool connectToWidget = (server != qt->localServerName);
-	// qDebug() << "qt_connectToServer " << server;
 
 	// The QLocalSocket::waitForConnected does not respect the time out argument when
 	// the gnuplot_qt application is not yet started or has not yet self-initialized.
@@ -285,7 +284,7 @@ void qt_connectToServer(const QString& server, bool retry = true)
 		// The gnuplot_qt program could not be reached: try to start a new one
 		else
 		{
-			qDebug() << "Could not connect gnuplot_qt" << server << ". Starting a new one";
+			qDebug() << "Could not connect to gnuplot_qt" << server << ". Starting a new one";
 			execGnuplotQt();
 			qt_connectToServer(qt->localServerName, false);
 		}
@@ -316,8 +315,10 @@ void qt_connectToServer()
 	}
 
 	// Start the gnuplot_qt helper program if not already started
-	if (!connectToWidget && !qt->gnuplot_qtStarted)
+	if (!connectToWidget && !qt->gnuplot_qtStarted) {
 		execGnuplotQt();
+		server = qt->localServerName;
+	}
 
 	// Connect to the server, or local server if not available.
 	qt_connectToServer(server);
@@ -895,7 +896,13 @@ int qt_waitforinput(int options)
 		// Terminal event coming
 		if (FD_ISSET(socket_fd, &read_fds))
 		{
-			qt->socket.waitForReadyRead(-1);
+			if (!(qt->socket.waitForReadyRead(-1))) {
+				// Must be a socket error; we need to restart qt_gnuplot
+				qDebug() << "Error: gnuplot_qt socket not responding";
+				qt->gnuplot_qtStarted = false;
+				return '\0';
+			}
+
 			// Temporary event for mouse move events. If several consecutive
 			// move events are received, only transmit the last one.
 			gp_event_t tempEvent;
