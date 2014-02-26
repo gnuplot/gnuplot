@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: fit.c,v 1.78.2.7 2013/08/21 18:38:32 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: fit.c,v 1.78.2.8 2013/12/31 15:59:55 markisch Exp $"); }
 #endif
 
 /*  NOTICE: Change of Copyright Status
@@ -19,8 +19,9 @@ static char *RCSid() { return RCSid("$Id: fit.c,v 1.78.2.7 2013/08/21 18:38:32 s
  *      added as Patch to Gnuplot (v3.2 and higher)
  *      by Carsten Grammes
  *
- *      930726:     Recoding of the Unix-like raw console I/O routines by:
- *                  Michele Marziani (marziani@ferrara.infn.it)
+ * Michele Marziani (marziani@ferrara.infn.it), 930726: Recoding of the
+ * Unix-like raw console I/O routines
+ *
  * drd: start unitialised variables at 1 rather than NEARLY_ZERO
  *  (fit is more likely to converge if started from 1 than 1e-30 ?)
  *
@@ -46,6 +47,14 @@ static char *RCSid() { return RCSid("$Id: fit.c,v 1.78.2.7 2013/08/21 18:38:32 s
  *
  * Jim Van Zandt, 090201: allow fitting functions with up to five
  * independent variables.
+ *
+ * Carl Michal, Feb 14: optionally prescale all the parameters that
+ * the L-M routine sees by their initial values, so that parameters
+ * that differ by many orders of magnitude do not cause problems.
+ * With decent initial guesses, fits often take fewer iterations. If
+ * any variables were 0, then don't do it for those variables, since
+ * it may do more harm than good.
+ *
  */
 
 #include "fit.h"
@@ -128,6 +137,7 @@ typedef enum marq_res marq_res_t;
 char *fitlogfile = NULL;
 TBOOLEAN fit_errorvariables = FALSE;
 TBOOLEAN fit_quiet = FALSE;
+TBOOLEAN fit_prescale = FALSE;
 TBOOLEAN ctrlc_flag = FALSE;
 char fitbuf[256]; /* for Eex and error_ex */
 
@@ -168,7 +178,7 @@ static double *fit_z = 0;	/* dependent data values */
 static double *err_data = 0;	/* standard deviations of dependent data */
 static double *a = 0;		/* array of fitting parameters */
 static TBOOLEAN user_stop = FALSE;
-
+static double *scale_params = 0; /* scaling values for parameters */
 static struct udft_entry func;
 
 typedef char fixstr[MAX_ID_LEN+1];
@@ -516,7 +526,7 @@ call_gnuplot(double *par, double *data)
 
     /* set parameters first */
     for (i = 0; i < num_params; i++) {
-	(void) Gcomplex(&v, par[i], 0.0);
+	(void) Gcomplex(&v, par[i] * scale_params[i], 0.0);
 	setvar(par_name[i], v);
     }
 
@@ -577,7 +587,7 @@ fit_interrupt()
 		fprintf(STANDARD, "executing: %s", tmp);
 		/* set parameters visible to gnuplot */
 		for (i = 0; i < num_params; i++) {
-		    (void) Gcomplex(&v, a[i], 0.0);
+		    (void) Gcomplex(&v, a[i]* scale_params[i], 0.0);
 		    setvar(par_name[i], v);
 		}
 		do_string(tmp);
@@ -709,9 +719,11 @@ regress(double a[])
 
     /* compute errors in the parameters */
 
+
+    /* compute errors in the parameters */
     if (fit_errorvariables)
-	/* Set error variable to zero before doing this */
-	/* Thus making sure they are created */
+	/* Set error variable to zero before doing this, */
+	/* thus making sure they are created. */
 	for (i = 0; i < num_params; i++)
 	    setvarerr(par_name[i], 0.0);
 
@@ -723,7 +735,7 @@ regress(double a[])
 	Dblf("Final set of parameters \n");
 	Dblf("======================= \n\n");
 	for (k = 0; k < num_params; k++)
-	    Dblf3("%-15.15s = %-15g\n", par_name[k], a[k]);
+	    Dblf3("%-15.15s = %-15g\n", par_name[k], a[k] * scale_params[k]);
     } else if (chisq < NEARLY_ZERO) {
 	int k;
 
@@ -731,7 +743,7 @@ regress(double a[])
 	Dblf("Final set of parameters \n");
 	Dblf("======================= \n\n");
 	for (k = 0; k < num_params; k++)
-	    Dblf3("%-15.15s = %-15g\n", par_name[k], a[k]);
+	    Dblf3("%-15.15s = %-15g\n", par_name[k], a[k] * scale_params[k]);
     } else {
 	int ndf          = num_data - num_params; 
 	double stdfit    = sqrt(chisq/ndf);
@@ -790,9 +802,9 @@ regress(double a[])
 		: fabs(100.0 * dpar[i] / a[i]);
 
 	    Dblf6("%-15.15s = %-15g  %-3.3s %-12.4g (%.4g%%)\n",
-		  par_name[i], a[i], PLUSMINUS, dpar[i], temp);
+		  par_name[i], a[i] * scale_params[i], PLUSMINUS, dpar[i] * scale_params[i], temp);
 	    if (fit_errorvariables)
-		setvarerr(par_name[i], dpar[i]);
+		setvarerr(par_name[i], dpar[i] * scale_params[i]);
 	}
 
 	Dblf("\n\ncorrelation matrix of the fit parameters:\n\n");
@@ -823,7 +835,7 @@ regress(double a[])
     /* restore last parameter's value (not done by calculate) */
     {
 	struct value val;
-	Gcomplex(&val, a[num_params - 1], 0.0);
+	Gcomplex(&val, a[num_params - 1] * scale_params[num_params - 1], 0.0);
 	setvar(par_name[num_params - 1], val);
     }
 
@@ -857,7 +869,7 @@ show_fit(
 	    chisq - last_chisq, epsilon, lambda,
 	    (i > 0 ? "resultant" : "initial set of free"));
     for (k = 0; k < num_params; k++)
-	fprintf(device, "%-15.15s = %g\n", par_name[k], a[k]);
+	fprintf(device, "%-15.15s = %g\n", par_name[k], a[k] * scale_params[k]);
 }
 
 
@@ -1712,11 +1724,26 @@ fit_command()
     if (num_data < num_params)
 	Eex("Number of data points smaller than number of parameters");
 
-    /* avoid parameters being equal to zero */
-    for (i = 0; i < num_params; i++)
-	if (a[i] == 0)
-	    a[i] = NEARLY_ZERO;
+    /* initialize scaling parameters */
+    if (!redim_vec(&scale_params, num_params)){
+	df_close();
+	Eex2("Out of memory in fit: too many datapoints (%d)?", max_data);
+    }
 
+    for (i = 0; i < num_params; i++) {
+	/* avoid parameters being equal to zero */
+	if (a[i] == 0) {
+	    a[i] = NEARLY_ZERO;
+	    scale_params[i] = 1.0;
+	} else if (fit_prescale) {
+	    /* scale parameters, but preserve sign */
+	    double a_sign = (a[i] > 0) - (a[i] < 0);
+	    scale_params[i] = a_sign * a[i];
+	    a[i] = a_sign;
+	} else {
+	    scale_params[i] = 1.0;
+	}
+    }
 
     if (num_params == 0)
 	int_warn(NO_CARET, "No fittable parameters!\n");

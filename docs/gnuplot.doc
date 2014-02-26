@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.701.2.35 2014/01/31 05:22:05 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.701.2.36 2014/02/25 06:01:45 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -4239,7 +4239,12 @@ Ffigure_mapcontours
  a variable named like the parameter, but with "_err" appended.  Thus the
  errors can be used as input for further computations.
 
- The fit may be interrupted by pressing Ctrl-C.
+ If `set fit prescale` is activated, fit parameters are prescaled by
+ their initial values. This helps the Marquardt-Levenberg routine
+ converge more quickly and reliably in cases where parameters differ
+ in size by several orders of magnitude.
+
+ The fit may be interrupted by pressing Ctrl-C (Ctrl-Break in wgnuplot).
  After the current iteration completes, you have the option to
  (1) stop the fit and accept the current parameter values,
  (2) continue the fit, (3) execute a `gnuplot` command as specified by the
@@ -4622,13 +4627,14 @@ Ffigure_mapcontours
  you are fitting.  For example, don't try to fit a*exp(x+b), because
  a*exp(x+b)=a*exp(b)*exp(x).  Instead, fit either a*exp(x) or exp(x+b).
 
- A technical issue:  the parameters must not be too different in magnitude.
- The larger the ratio of the largest and the smallest absolute parameter
- values, the slower the fit will converge.  If the ratio is close to or above
- the inverse of the machine floating point precision, it may take next to
- forever to converge, or refuse to converge at all.  You will have to adapt
- your function to avoid this, e.g., replace 'parameter' by '1e9*parameter' in
- the function definition, and divide the starting value by 1e9.
+ A technical issue: The larger the ratio of the largest and the
+ smallest absolute parameter values, the slower the fit will converge.
+ If the ratio is close to or above the inverse of the machine floating
+ point precision, it may take next to forever to converge, or refuse
+ to converge at all.  You will either have to adapt your function to avoid
+ this, e.g., replace 'parameter' by '1e9*parameter' in the function
+ definition, and divide the starting value by 1e9 or use `set fit prescale` 
+ which does this internally according to the parameter starting values.
 
  If you can write your function as a linear combination of simple functions
  weighted by the parameters to be fitted, by all means do so.  That helps a
@@ -8025,10 +8031,16 @@ Ffigure_mapcontours
 ?commands show fit
 ?set fit
 ?show fit
- The `fit` setting defines where the `fit` command writes its output.
+?set fit quiet
+?set fit prescale
+?set fit logfile
+ The `set fit` command controls the options for the `fit` command.
 
  Syntax:
-       set fit {logfile {"<filename>"}} {{no}errorvariables} {{no}quiet}
+       set fit {logfile {"<filename>"}}
+               {{no}quiet}
+               {{no}errorvariables}
+               {{no}prescale}
        unset fit
        show fit
 
@@ -8053,6 +8065,12 @@ Ffigure_mapcontours
         print "error of a is:", a_err
         set label 'a=%6.2f', a, '+/- %6.2f', a_err
         plot 'datafile' using 1:2, f(x)
+
+ If the `prescale` option is turned on, parameters are prescaled by their
+ initial values before being passed to the Marquardt-Levenberg
+ routine. This helps tremendously if there are parameters that differ
+ in size by many orders of magnitude. Fit parameters with an initial value
+ of exactly zero are never prescaled.
 
  By default the information written to the log file is also echoed to
  the terminal session. `set fit quiet` turns off the echo.

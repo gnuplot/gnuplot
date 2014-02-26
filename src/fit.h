@@ -1,5 +1,5 @@
 /*
- * $Id: fit.h,v 1.14.2.1 2013/06/08 11:54:25 markisch Exp $
+ * $Id: fit.h,v 1.14.2.2 2013/06/11 21:18:50 markisch Exp $
  */
 
 /* GNUPLOT - fit.h */
@@ -66,6 +66,7 @@ extern char fitbuf[];
 extern char *fitlogfile;
 extern TBOOLEAN fit_errorvariables;
 extern TBOOLEAN fit_quiet;
+extern TBOOLEAN fit_prescale;
 extern TBOOLEAN ctrlc_flag;
 
 /* Prototypes of functions exported by fit.c */

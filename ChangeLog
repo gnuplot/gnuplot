@@ -1,3 +1,11 @@
+2014-02-26  Carl Michal <michal@phas.ubc.ca>
+
+	* src/fit.c src/fit.h src/save.c src/set.c src/show.c src/unset.c
+	docs/gnuplot.doc:
+	"set fit [no]prescale" optionally normalizes fit parameters before
+	starting M-L refinement. Backport from 4.7.
+	Patch #507
+
 2014-02-26  Release 4.6.5  (cvs tag Release_4_6_5)
 
 2014-02-14  Ethan A Merritt  <merritt@u.washington.edu>

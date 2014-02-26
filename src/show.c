@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.261.2.4 2012/10/13 18:30:47 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.261.2.5 2013/12/26 01:31:27 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -2525,14 +2525,16 @@ show_fit()
 {
     SHOW_ALL_NL;
 
-    fprintf(stderr, "\
-\tfit will%s place parameter errors in variables\n",
+    fprintf(stderr, "\tfit will%s prescale parameters by their initial values\n",
+	    fit_prescale ? "" : " not");
+
+    fprintf(stderr, "\tfit will%s place parameter errors in variables\n",
 	    fit_errorvariables ? "" : " not");
 
     if (fitlogfile != NULL) {
-        fprintf(stderr, "\
-\tlog-file for fits is was set by the user to be \n\
-\t'%s'\n", fitlogfile);
+	fprintf(stderr,
+	        "\tlog-file for fits was set by the user to \n\t'%s'\n",
+	        fitlogfile);
     } else {
 	char *logfile = getfitlogfile();
 
