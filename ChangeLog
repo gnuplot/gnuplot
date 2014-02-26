@@ -1,3 +1,12 @@
+2014-02-26  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	src/stats.c:  Calculate errors of linear regression parameters.
+	Results saved to user variables STATS_slope_err and
+	STATS_intercept_err.
+
+	src/mouse.c (xDateTimeFormat):  gmtime() might return NULL for
+	invalid arguments.
+
 2014-02-26  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/qtterminal/qt_term.cpp(qt_sendFont):  Work-around possibly very

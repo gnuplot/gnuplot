@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: stats.c,v 1.9 2012/12/21 23:07:20 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: stats.c,v 1.10 2013/04/12 17:17:01 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - stats.c */
@@ -251,18 +251,36 @@ analyze_two_columns( double *x, double *y,
 
     long i;
     double s = 0;
+    double ssyy, ssxx, ssxy;
 
     for( i=0; i<n; i++ ) {
 	s += x[i]*y[i];
     }
     res.sum_xy = s;
 
-    res.slope = res.sum_xy - res_x.sum*res_y.sum/n;
-    res.slope /= res_x.sum_sq - (res_x.sum)*(res_x.sum)/n;
+    /* Definitions according to 
+       http://mathworld.wolfram.com/LeastSquaresFitting.html 
+     */
+    ssyy = res_y.sum_sq - res_y.sum * res_y.sum / n;
+    ssxx = res_x.sum_sq - res_x.sum * res_x.sum / n;
+    ssxy = res.sum_xy   - res_x.sum * res_y.sum / n;
 
+    res.slope = ssxy / ssxx;
     res.intercept = res_y.mean - res.slope * res_x.mean;
 
     res.correlation = res.slope * res_x.stddev/res_y.stddev;
+
+    if (n > 2) {
+	double ss = (ssyy - res.slope * ssxy) / (n - 2);
+	res.slope_err = sqrt(ss / ssxx);
+	res.intercept_err = sqrt(ss * (1./n + res_x.sum * res_x.sum / (n * n * ssxx)));
+    } else {
+	if (n == 2)
+	    fprintf(stderr, "Warning:  Errors of slope and intercept are zero. There are as many data points as there are parameters.\n");
+	else
+	    fprintf(stderr, "Warning:  Can't compute errors of slope and intercept. Not enough data points.\n");
+	res.slope_err = res.intercept_err = 0;
+    }
 
     res.pos_min_y = x[res_y.min.index];
     res.pos_max_y = x[res_y.max.index];
@@ -428,7 +446,11 @@ two_column_output( struct sgl_column_stats x,
 	sgl_column_output_nonformat( y, "_y" );
 
 	fprintf( print_out, "%s\t%f\n", "slope", xy.slope );
+	if ( n > 2 )
+	fprintf( print_out, "%s\t%f\n", "slope_err", xy.slope_err );
 	fprintf( print_out, "%s\t%f\n", "intercept", xy.intercept );
+	if ( n > 2 )
+	fprintf( print_out, "%s\t%f\n", "intercept_err", xy.intercept_err );
 	fprintf( print_out, "%s\t%f\n", "correlation", xy.correlation );
 	fprintf( print_out, "%s\t%f\n", "sumxy", xy.sum_xy );
 	return;
@@ -464,12 +486,15 @@ two_column_output( struct sgl_column_stats x,
 
     /* Simpler below - don't care about alignment */
     if ( xy.intercept < 0.0 )
-	fprintf( print_out, "  Linear Model: y = %.4g x - %.4g\n", xy.slope, -xy.intercept );
+	fprintf( print_out, "  Linear Model:  y = %.4g x - %.4g\n", xy.slope, -xy.intercept );
     else
-	fprintf( print_out, "  Linear Model: y = %.4g x + %.4g\n", xy.slope, xy.intercept );
+	fprintf( print_out, "  Linear Model:  y = %.4g x + %.4g\n", xy.slope, xy.intercept );
 
-    fprintf( print_out, "  Correlation:  r = %.4g\n", xy.correlation );
-    fprintf( print_out, "  Sum xy:       %.4g\n", xy.sum_xy );
+    fprintf( print_out, "  Slope:         %.4g +- %.4g\n", xy.slope, xy.slope_err );
+    fprintf( print_out, "  Intercept:     %.4g +- %.4g\n", xy.intercept, xy.intercept_err );
+
+    fprintf( print_out, "  Correlation:   r = %.4g\n", xy.correlation );
+    fprintf( print_out, "  Sum xy:        %.4g\n", xy.sum_xy );
     fprintf( print_out, "\n" );
 }
 
@@ -546,16 +571,19 @@ sgl_column_variables( struct sgl_column_stats s, char *prefix, char *suffix )
 }
 
 static void
-two_column_variables( struct two_column_stats s, char *prefix)
+two_column_variables( struct two_column_stats s, char *prefix, long n )
 {
     /* Suffix does not make sense here! */
-    create_and_set_var( s.slope,       prefix, "slope",       "" );
-    create_and_set_var( s.intercept,   prefix, "intercept",   "" );
-    create_and_set_var( s.correlation, prefix, "correlation", "" );
-    create_and_set_var( s.sum_xy,      prefix, "sumxy",  "" );
+    create_and_set_var( s.slope,         prefix, "slope",         "" );
+    create_and_set_var( s.intercept,     prefix, "intercept",     "" );
+    /* The errors can only calculated for n > 2, but we set them (to zero) anyway. */
+    create_and_set_var( s.slope_err,     prefix, "slope_err",     "" );
+    create_and_set_var( s.intercept_err, prefix, "intercept_err", "" );
+    create_and_set_var( s.correlation,   prefix, "correlation",   "" );
+    create_and_set_var( s.sum_xy,        prefix, "sumxy",         "" );
 
-    create_and_set_var( s.pos_min_y,   prefix, "pos_min_y", "" );
-    create_and_set_var( s.pos_max_y,   prefix, "pos_max_y", "" );
+    create_and_set_var( s.pos_min_y,     prefix, "pos_min_y",     "" );
+    create_and_set_var( s.pos_max_y,     prefix, "pos_max_y",     "" );
 }
 
 /* =================================================================
@@ -853,7 +881,7 @@ statsrequest(void)
 	prefix = gp_strdup("STATS_");
     i = strlen(prefix);
     if (prefix[i-1] != '_') {
-	prefix = gp_realloc(prefix, i+2, "prefix");
+	prefix = (char *) gp_realloc(prefix, i+2, "prefix");
 	strcat(prefix,"_");
     }
 
@@ -883,7 +911,7 @@ statsrequest(void)
     if ( columns == 2 ) {
 	sgl_column_variables( res_x, prefix, "_x" );
 	sgl_column_variables( res_y, prefix, "_y" );
-	two_column_variables( res_xy, prefix );
+	two_column_variables( res_xy, prefix, n );
     }
 
     /* Output */
