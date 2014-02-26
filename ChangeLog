@@ -1,3 +1,10 @@
+2014-02-26  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/qtterminal/qt_term.cpp(qt_connectToServer qt_waitforinput):
+	If the outboard server gnuplot_qt is killed while gnuplot is connected
+	to it, it gets restarted with a different server name.  Don't waste
+	time trying to connect to a server with the old name.
+
 2014-02-26  Carl Michal <michal@phas.ubc.ca>
 
 	* src/fit.c src/fit.h src/save.c src/set.c src/show.c src/unset.c
