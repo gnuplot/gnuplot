@@ -427,7 +427,14 @@ void qt_sendFont()
 		{
 			qt->socket.waitForReadyRead(1000);
 			if (qt->socket.bytesAvailable() < (int)sizeof(gp_event_t)) {
-				qDebug() << "Error: short read from gnuplot_qt socket";
+				qDebug() << "Error: short read from gnuplot_qt socket while expecting font metrics";
+#ifdef Q_OS_MAC
+				// OSX can be slow (>30 seconds?!) in determining font metrics
+				// Give it more time rather than failing after 1 second 
+				// Possibly this is only relevant to Qt5
+				GP_SLEEP(0.5);
+				continue;
+#endif
 				return;
 			}
 			while (qt->socket.bytesAvailable() >= (int)sizeof(gp_event_t))

@@ -1,3 +1,8 @@
+2014-02-26  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/qtterminal/qt_term.cpp(qt_sendFont):  Work-around possibly very
+	slow response to font metrics query on OSX. May only be needed for Qt5.
+
 2014-02-24  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/qtterminal/qt_term.cpp (qt_waitforinput):  Avoid unnecessary
