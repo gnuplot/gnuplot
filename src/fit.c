@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: fit.c,v 1.122 2014/01/01 09:48:09 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: fit.c,v 1.123 2014/01/04 02:55:05 markisch Exp $"); }
 #endif
 
 /*  NOTICE: Change of Copyright Status
@@ -20,7 +20,7 @@ static char *RCSid() { return RCSid("$Id: fit.c,v 1.122 2014/01/01 09:48:09 mark
  *      by Carsten Grammes
  *
  * Michele Marziani (marziani@ferrara.infn.it), 930726: Recoding of the
- * Unix-like raw console I/O routines
+ * Unix-like raw console I/O routines.
  *
  * drd: start unitialised variables at 1 rather than NEARLY_ZERO
  *  (fit is more likely to converge if started from 1 than 1e-30 ?)
@@ -174,7 +174,7 @@ char *fitlogfile = NULL;
 TBOOLEAN fit_errorvariables = FALSE;
 verbosity_level fit_verbosity = BRIEF;
 TBOOLEAN fit_errorscaling = TRUE;
-TBOOLEAN fit_prescale = FALSE;
+TBOOLEAN fit_prescale = TRUE;
 char *fit_script = NULL;
 int fit_wrap = 0;
 
