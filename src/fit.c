@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: fit.c,v 1.123 2014/01/04 02:55:05 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: fit.c,v 1.124 2014/02/27 07:30:01 markisch Exp $"); }
 #endif
 
 /*  NOTICE: Change of Copyright Status
@@ -77,6 +77,14 @@ static char *RCSid() { return RCSid("$Id: fit.c,v 1.123 2014/01/04 02:55:05 mark
  * Dissociate parameters other than x/y from "normal" plot axes.
  * To refine more than 2 parameters, name them with `set dummy`.
  * x and y still refer to axis_array[] in order to allow time/date formats.
+ *
+ * Bastian Maerkisch, Feb 2014: New syntax to specify errors. The new
+ * parameter 'errors' accepts a comma separated list of (dummy) variables
+ * to specify which (in-)dependent variable has associated errors. 'z' always
+ * denotes the indep. variable. 'noerrors' tells fit to use equal (1) weights
+ * for the fit. The new syntax removes the ambiguity between x:y:z:(1)
+ * and x:z:s. The old syntax is still accepted but deprecated.
+ *
  */
 
 #include "fit.h"
@@ -204,13 +212,15 @@ static const char *DEFAULT_CMD = "replot";	/* if no fitscript spec. */
 
 static int num_data, num_params;
 static int num_indep;	 /* # independent variables in fit function */
+static int num_errors;	 /* # error columns */
+static TBOOLEAN err_cols[MAX_NUM_VAR+1];    /* TRUE if variable has an associated error */
 static int columns;	 /* # values read from data file for each point */
 static double *fit_x = 0;	/* all independent variable values,
 				   e.g. value of the ith variable from
 				   the jth data point is in
 				   fit_x[j*num_indep+i] */
 static double *fit_z = 0;	/* dependent data values */
-static double *err_data = 0;	/* standard deviations of dependent data */
+static double *err_data = 0;	/* standard deviations of indep. and dependent data */
 static double *a = 0;		/* array of fitting parameters */
 static TBOOLEAN user_stop = FALSE;
 static double *scale_params = 0; /* scaling values for parameters */
@@ -244,7 +254,7 @@ static void show_fit __PROTO((int i, double chisq, double last_chisq, double *a,
 static void show_fit1 __PROTO((int iter, double chisq, double last_chisq, double *parms,
                             double lambda, FILE * device));
 static void show_results __PROTO((double chisq, double last_chisq, double* a, double* dpar, double** corel));
-static void log_axis_restriction __PROTO((FILE *log_f, int param, 
+static void log_axis_restriction __PROTO((FILE *log_f, int param,
 			    double min, double max, int autoscale, char *name));
 static TBOOLEAN is_empty __PROTO((char *s));
 static int getivar __PROTO((const char *varname));
@@ -867,7 +877,7 @@ regress(double a[])
 	    covar[i][j] /= dpar[i] * dpar[j];
     }
 
-    if ((fit_errorscaling) || (columns < 3)) {
+    if (fit_errorscaling || (num_errors == 0)) {
 	/* scale parameter errors based on chisq */
 	double temp = sqrt(chisq / (num_data - num_params));
 	for (i = 0; i < num_params; i++)
@@ -910,7 +920,7 @@ show_results(double chisq, double last_chisq, double* a, double* dpar, double** 
 	Dblf2("abs. change during last iteration : %g\n\n", (chisq - last_chisq));
     }
 
-    if ((num_data == num_params) && ((columns < 3) || fit_errorscaling)) {
+    if ((num_data == num_params) && ((num_errors == 0) || fit_errorscaling)) {
 	int k;
 
 	Dblf("\nExactly as many data points as there are parameters.\n");
@@ -919,7 +929,7 @@ show_results(double chisq, double last_chisq, double* a, double* dpar, double** 
 	Dblf("======================= \n\n");
 	for (k = 0; k < num_params; k++)
 	    Dblf3("%-15.15s = %-15g\n", par_name[k], a[k] * scale_params[k]);
-    } else if ((chisq < NEARLY_ZERO) && ((columns < 3) || fit_errorscaling)) {
+    } else if ((chisq < NEARLY_ZERO) && ((num_errors == 0) || fit_errorscaling)) {
 	int k;
 
 	Dblf("\nHmmmm.... Sum of squared residuals is zero. Can't compute errors.\n\n");
@@ -937,14 +947,13 @@ show_results(double chisq, double last_chisq, double* a, double* dpar, double** 
 	Dblf2("variance of residuals (reduced chisquare) = WSSR/ndf   : %g\n", chisq / ndf);
 	/* We cannot know if the errors supplied by the user are weighting factors
 	or real errors, so we print the p-value in any case, although it does not
-	make much sense in the first case.  This means that we always print this
-	for x,y,z-fits without errors since current syntax requires 4 columns in
-	this case. */
-	if (columns >= 3)
+	make much sense in the first case.  This means that we print this for x:y:z:(1)
+	fits without errors using the old syntax since this requires 4 columns. */
+	if (num_errors > 0)
 	    Dblf2("p-value of the Chisq distribution (FIT_P)              : %g\n", pvalue);
 	Dblf("\n");
 
-	if ((fit_errorscaling) || (columns < 3))
+	if (fit_errorscaling || (num_errors == 0))
 	    Dblf("Final set of parameters            Asymptotic Standard Error\n");
 	else
 	    Dblf("Final set of parameters            Standard Deviation\n");
@@ -1157,7 +1166,7 @@ static void
 setvarerr(char *varname, double value)
 {
 	/* Create the variable name by appending _err */
-	char * pErrValName = gp_alloc(strlen(varname) + 5 * sizeof(char), "setvarerr");
+	char * pErrValName = (char *) gp_alloc(strlen(varname) + 5 * sizeof(char), "setvarerr");
 	sprintf(pErrValName, "%s_err", varname);
 	setvar(pErrValName, value);
 	free(pErrValName);
@@ -1495,21 +1504,22 @@ fit_command()
  * what plot3drequest() does */
 
     /* Backwards compatibility - these were the default names in 4.4 and 4.6	*/
-    static const char *dummy_old_default[6]={"x","y","t","u","v","z"};
+    static const char *dummy_old_default[5] = {"x","y","t","u","v"};
 
     /* Keep range info in local storage rather than overwriting axis structure.	*/
     /* The final range is "z" (actually the range of the function value).	*/
     double range_min[MAX_NUM_VAR+1];
     double range_max[MAX_NUM_VAR+1];
     int range_autoscale[MAX_NUM_VAR+1];
-    int num_ranges=0;
+    int num_ranges = 0;
 
     int max_data;
     int max_params;
 
-    int dummy_token[MAX_NUM_VAR+1]; /* Point to variable name for each explicit range */
-    int skipped[MAX_NUM_VAR+1];	    /* number of points out of range */
-    int num_points=0;		    /* number of data points read from file */
+    int dummy_token[MAX_NUM_VAR+1];    /* Point to variable name for each explicit range */
+    int skipped[MAX_NUM_VAR+1];        /* number of points out of range */
+    int num_points = 0;                /* number of data points read from file */
+    static const int iz = MAX_NUM_VAR;
 
     int i, j;
     double v[MAXDATACOLS];
@@ -1534,7 +1544,7 @@ fit_command()
     AXIS_INIT3D(x_axis, 0, 0);
     AXIS_INIT3D(y_axis, 0, 0);
     AXIS_INIT3D(z_axis, 0, 1);
-    for (i=0; i<MAX_NUM_VAR+1; i++)
+    for (i = 0; i < MAX_NUM_VAR+1; i++)
 	dummy_token[i] = -1;
     range_min[0] = axis_array[x_axis].min;
     range_max[0] = axis_array[x_axis].max;
@@ -1542,7 +1552,7 @@ fit_command()
     range_min[1] = axis_array[y_axis].min;
     range_max[1] = axis_array[y_axis].max;
     range_autoscale[1] = axis_array[y_axis].autoscale;
-    for (i=2; i<MAX_NUM_VAR; i++) {
+    for (i = 2; i < MAX_NUM_VAR; i++) {
 	range_min[i] = VERYLARGE;
 	range_max[i] = -VERYLARGE;
 	range_autoscale[i] = AUTOSCALE_BOTH;
@@ -1567,7 +1577,6 @@ fit_command()
     num_ranges = i;
 
     /* now compile the function */
-
     token1 = c_token;
 
     if (func.at) {
@@ -1582,7 +1591,7 @@ fit_command()
 	    copy_str(c_dummy_var[i], dummy_token[i], MAX_ID_LEN);
 	else if (*set_dummy_var[i] != '\0')
 	    strcpy(c_dummy_var[i], set_dummy_var[i]);
-	else if (i<6)  /* Fall back to legacy ordering x y t u v z */
+	else if (i < 5)  /* Fall back to legacy ordering x y t u v */
 	    strcpy(c_dummy_var[i], dummy_old_default[i]);
     }
 
@@ -1611,7 +1620,7 @@ fit_command()
     columns = df_open(file_name, MAXDATACOLS, NULL);
     free(file_name);
     if (columns < 0)
-	int_error(NO_CARET,"Can't read data file");
+	int_error(NO_CARET, "Can't read data file");
     if (columns == 1)
 	int_error(c_token, "Need more than 1 input data column");
     if (columns < 3) {
@@ -1623,12 +1632,114 @@ fit_command()
 	df_axis[1] = y_axis;
     }
 
-    num_indep = (columns < 3) ? 1 : columns - 2;
+    /* BM: New options to distinguish fits with and without errors */
+    /* reset error columns */
+    memset(err_cols, FALSE, sizeof(TBOOLEAN) * MAX_NUM_VAR);
+    if (almost_equals(c_token, "noerr$ors")) {
+	/* no error columns given */
+	c_token++;
+	num_indep = (columns == 0) ? 1 : columns - 1;
+	num_errors = 0;
+    } else if (almost_equals(c_token, "err$ors")) {
+	/* error column specs follow */
+	c_token++;
+	do {
+	    char * err_spec = NULL;
+
+	    if (!isletter(c_token))
+		Eex("no variable specified");
+	    m_capture(&err_spec, c_token, c_token);
+	    /* check if this is a valid dummy var */
+	    for (i = 0; i < MAX_NUM_VAR; i++) {
+		if (strcmp(err_spec, c_dummy_var[i]) == 0) {
+		    err_cols[i] = TRUE;
+		    num_errors++;
+		    break;
+		}
+	    }
+	    if (i == MAX_NUM_VAR) { /* variable name not found, yet */
+		if (strcmp(err_spec, "z") == 0) {
+		    err_cols[iz] = TRUE;
+		    num_errors++;
+		 } else
+		    int_error(c_token, "Invalid variable spec.");
+	    }
+	    FPRINTF((stderr, "error spec \"%s\"\n", err_spec));
+	    free(err_spec);
+	} while (equals(++c_token, ",") && ++c_token);
+
+	/* z-errors are required. */
+	if (!err_cols[iz]) {
+	    int_warn(c_token, "z-errors are required.");
+	    err_cols[iz] = TRUE;
+	    num_errors++;
+	}
+
+	/* The dummy variable with the highest index indicates the minimum number
+	   of indep. variables required. */
+	num_indep = 0;
+	for (i = 0; i < MAX_NUM_VAR; i++) {
+	    if (err_cols[i])
+		num_indep = i + 1;
+	}
+
+	/* Check if there are enough columns.  Require # of indep. and dependent variables + # of errors */
+	if ((columns != 0) && (columns < num_indep + 1 + num_errors))
+	    int_error(c_token, "Not enough columns in using spec.  At least %i are required for this error spec.",
+		num_indep + 1 + num_errors);
+
+	/* Success. */
+	if (columns > 0)
+	    num_indep = columns - num_errors - 1;
+    } else if (almost_equals(c_token, "zerr$or")) {
+	/* convenience alias */
+	if (columns == 1)
+	    int_error(c_token, "zerror requires at least 2 columns");
+	num_indep = (columns == 0) ? 1 : columns - 2;
+	num_errors = 1;
+	err_cols[iz] = TRUE;
+	c_token++;
+    } else if (almost_equals(c_token, "xerr$or")) {
+	/* convenience alias, z:sz (or x:sx) */
+	if ((columns != 0) && (columns != 2))
+	    int_error(c_token, "xerror requires exactly 2 columns");
+	num_indep = 0;
+	num_errors = 1;
+	err_cols[iz] = TRUE;
+	c_token++;
+    } else if (almost_equals(c_token, "yerr$or")) {
+	/* convenience alias, x:z:sz (or x:y:sy) */
+	if ((columns != 0) && (columns != 3))
+	    int_error(c_token, "yerror requires exactly 3 columns");
+	num_indep = 1;
+	num_errors = 1;
+	err_cols[iz] = TRUE;
+	c_token++;
+    } else if (almost_equals(c_token, "xyerr$or")) {
+	/* convienience alias, x:z:sx:sz (or x:y:sx:sy) */
+	if ((columns != 0) && (columns != 4))
+	    int_error(c_token, "xyerror requires exactly 4 columns");
+	num_indep = 1;
+	num_errors = 2;
+	err_cols[0] = TRUE;
+	err_cols[iz] = TRUE;
+	c_token++;
+    } else {
+	/* no error keyword found, using old syntax */
+	num_indep = (columns < 3) ? 1 : columns - 2;
+	num_errors = (columns < 3) ? 0 : 1;
+	if (num_errors > 0)
+	    err_cols[iz] = TRUE;
+	printf("fit: Deprecated syntax. Consider using the '%serror' option, see `help fit`.\n", (num_errors > 0) ? "" : "no");
+    }
+
+    FPRINTF((stderr, "cmd=%s\n", gp_input_line));
+    FPRINTF((stderr, "cols=%i indep=%i errors=%i\n", columns, num_indep, num_errors));
 
     /* HBB 980401: if this is a single-variable fit, we shouldn't have
      * allowed a variable name specifier for 'y': */
     /* FIXME EAM - Is this relevant any more? */
-    if ((dummy_token[1] > 0) && (num_indep==1))
+    if ((dummy_token[1] > 0) && (num_indep == 1))
 	int_error(dummy_token[1], "Can't re-name 'y' in a one-variable fit");
 
     /* depending on number of independent variables, the last range
@@ -1639,6 +1750,15 @@ fit_command()
     /* defer actually reading the data until we have parsed the rest
      * of the line */
     token3 = c_token;
+
+    /* open logfile before we use any Dblfn calls */
+    {
+	char *logfile = getfitlogfile();
+	if ((logfile != NULL) && !log_f && !(log_f = fopen(logfile, "a")))
+	    Eex2("could not open log-file %s", logfile);
+	FPRINTF((STANDARD, "log-file=%s\n", logfile));
+	free(logfile);
+    }
 
     tmpd = getdvar(FITLIMIT);	/* get epsilon if given explicitly */
     if (tmpd < 1.0 && tmpd > 0.0)
@@ -1678,14 +1798,6 @@ fit_command()
     FPRINTF((STANDARD, "prescale=%i\n", fit_prescale));
     FPRINTF((STANDARD, "errorscaling=%i\n", fit_errorscaling));
 
-    {
-	char *logfile = getfitlogfile();
-	if ((logfile != NULL) && !log_f && !(log_f = fopen(logfile, "a")))
-	    Eex2("could not open log-file %s", logfile);
-	FPRINTF((STANDARD, "log-file=%s\n", logfile));
-	free(logfile);
-    }
-
     fputs("\n\n*******************************************************************************\n", log_f);
     (void) time(&timer);
     fprintf(log_f, "%s\n\n", ctime(&timer));
@@ -1698,11 +1810,15 @@ fit_command()
 	free(line);
 	for (i = 0; (i < num_indep) && (i < columns - 1); i++)
 	    fprintf(log_f, "%s:", c_dummy_var[i]);
-	fprintf(log_f, (columns <= 2) ? "z\n" : "z:s\n");
+	if (num_errors > 0)
+	    for (i = 0; (i < num_indep) && (i < columns - 1); i++)
+		if (err_cols[i])
+		    fprintf(log_f, "s%s:", c_dummy_var[i]);
+	fprintf(log_f, (num_errors == 0) ? "z\n" : "z:s\n");
     }
 
     /* report all range specs, starting with Z */
-    i = MAX_NUM_VAR;
+    i = iz;
     if ((range_autoscale[i] & AUTOSCALE_BOTH) != AUTOSCALE_BOTH)
 	    log_axis_restriction(log_f, i, range_min[i], range_max[i], range_autoscale[i], "function");
     for (i = 0; i < num_indep; i++) {
@@ -1710,10 +1826,12 @@ fit_command()
 	    log_axis_restriction(log_f, i, range_min[i], range_max[i], range_autoscale[i], c_dummy_var[i]);
     }
 
+    /* start by allocting memory for MAX_DATA datapoints */
     max_data = MAX_DATA;
-    fit_x = vec(max_data * num_indep); /* start with max. value */
+    fit_x = vec(max_data * num_indep);
     fit_z = vec(max_data);
-    err_data = vec(max_data);
+    /* allocate error array, last one is always the z-error */
+    err_data = vec(max_data * num_errors);
     num_data = 0;
 
     /* Set skipped[i] = 0 for all i */
@@ -1725,14 +1843,14 @@ fit_command()
     /* here so that it affects data fields read from the input file.      */
     set_numeric_locale();
 
-    while ((i = df_readline(v, num_indep+2)) != DF_EOF) {
+    while ((i = df_readline(v, num_indep + num_errors + 1)) != DF_EOF) {
         if (num_data >= max_data) {
 	    /* increase max_data by factor of 1.5 */
 	    max_data = (max_data * 3) / 2;
 	    if (0
-		|| !redim_vec(&fit_x, max_data*num_indep)
+		|| !redim_vec(&fit_x, max_data * num_indep)
 		|| !redim_vec(&fit_z, max_data)
-		|| !redim_vec(&err_data, max_data)
+		|| !redim_vec(&err_data, max_data * num_errors)
 		) {
 		/* Some of the reallocations went bad: */
 		df_close();
@@ -1748,6 +1866,7 @@ fit_command()
 	{
 	    TBOOLEAN skip_nan = FALSE;
 	    int k;
+
 	    for (k = 0; k < i; k++) {
 		if (isnan(v[k]))
 		    skip_nan = TRUE;
@@ -1769,19 +1888,13 @@ fit_command()
 	    v[1] = v[0];
 	    v[0] = (double) df_datum;
 	    break;
-	case 2:		/* x, z */
-	case 3:		/* x, z, error */
-	case 4:		/* x, y, z, error */
-	case 5:		/* x, y, t, z, error */
-	case 6:		/* x, y, t, u, z, error */
-	case 7:		/* x, y, t, u, v, z, error */
 	default:	/* June 2013 - allow more than 7 data columns */
 	    break;
 	}
 	num_points++;
 
 	/* skip this point if it is out of range */
-	for (i=0; i<num_indep; i++) {
+	for (i = 0; i < num_indep; i++) {
 	    if (!(range_autoscale[i] & AUTOSCALE_MIN) && (v[i] < range_min[i])) {
 		skipped[i]++;
 		goto out_of_range;
@@ -1790,24 +1903,40 @@ fit_command()
 		skipped[i]++;
 		goto out_of_range;
 	    }
-	    fit_x[num_data*num_indep+i] = v[i]; /* save independent variable data */
+	    fit_x[num_data * num_indep + i] = v[i]; /* save independent variable data */
 	}
 	/* check Z value too */
-	if (1) {
-	    int iz = MAX_NUM_VAR;
-	    if (!(range_autoscale[iz] & AUTOSCALE_MIN) && (v[i] < range_min[iz])) {
-		skipped[iz]++;
-		goto out_of_range;
-	    }
-	    if (!(range_autoscale[iz] & AUTOSCALE_MAX) && (v[i] > range_max[iz])) {
-		skipped[iz]++;
-		goto out_of_range;
-	    }
-	    fit_z[num_data] = v[i++];	      /* save dependent variable data */
+	if (!(range_autoscale[iz] & AUTOSCALE_MIN) && (v[i] < range_min[iz])) {
+	    skipped[iz]++;
+	    goto out_of_range;
+	}
+	if (!(range_autoscale[iz] & AUTOSCALE_MAX) && (v[i] > range_max[iz])) {
+	    skipped[iz]++;
+	    goto out_of_range;
 	}
 
+	fit_z[num_data] = v[i++];	      /* save dependent variable data */
+
 	/* only use error from data file if _explicitly_ asked for by a using spec */
-	err_data[num_data] = (columns > 2) ? v[i] : 1;
+
+	if (num_errors == 0)
+	    err_data[num_data] = 1; /* constant weight */
+	else if (num_errors == 1)
+	    err_data[num_data] = v[i++]; /* z-error */
+	else {
+	    int k, idx;
+
+	    for (k = 0, idx = 0; k < MAX_NUM_VAR; k++) {
+		if (err_cols[k])
+		    /* TODO: Actually store errors */
+		    i++;
+	    }
+	    if (err_cols[iz])
+		err_data[num_errors * num_data + idx] = v[i++]; /* z-error */
+	    else
+		/* This case is not currently allowed. We always require z-errors. */
+		int_error(NO_CARET, "z errors are always required");
+	}
 
 	/* Increment index into stored values.
 	 * Note that out-of-range or NaN values bypass this operation.
@@ -1826,9 +1955,9 @@ fit_command()
 	/* no data! Try to explain why. */
 	printf("         Read %d points\n", num_points);
 	for (i = 0; i < num_indep; i++) {
-	    if (skipped[i]){
+	    if (skipped[i]) {
 		printf("         Skipped %d points outside range [%s=",
-		skipped[i], c_dummy_var[i]);
+		    skipped[i], c_dummy_var[i]);
 		if (range_autoscale[i] & AUTOSCALE_MIN)
 		    printf("*:");
 		else
@@ -1839,45 +1968,47 @@ fit_command()
 		    printf("%g]\n", range_max[i]);
 	    }
 	}
-	    if (skipped[MAX_NUM_VAR]){
-		printf("         Skipped %d points outside range [%s=",
-		skipped[MAX_NUM_VAR], "z");
-		if (axis_array[FIRST_Z_AXIS].autoscale & AUTOSCALE_MIN)
-		    printf("*:");
-		else
-		    printf("%g:", axis_array[FIRST_Z_AXIS].min);
-		if (axis_array[FIRST_Z_AXIS].autoscale & AUTOSCALE_MAX)
-		    printf("*]\n");
-		else
-		    printf("%g]\n", axis_array[FIRST_Z_AXIS].max);
-	    }
+	if (skipped[iz]) {
+	    printf("         Skipped %d points outside range [%s=",
+		skipped[iz], "z");
+	if (axis_array[FIRST_Z_AXIS].autoscale & AUTOSCALE_MIN)
+	    printf("*:");
+	else
+	    printf("%g:", axis_array[FIRST_Z_AXIS].min);
+	if (axis_array[FIRST_Z_AXIS].autoscale & AUTOSCALE_MAX)
+	    printf("*]\n");
+	else
+	    printf("%g]\n", axis_array[FIRST_Z_AXIS].max);
+	}
 	Eex("No data to fit ");
     }
 
     /* tsm patchset 230: check for zero error values */
-    for (i = 0; i < num_data; i++) {
-	if (err_data[i] != 0.0)
-	    continue;
-	Dblf("\nCurrent data point\n");
-	Dblf("=========================\n");
-	Dblf3("%-15s = %i out of %i\n", "#", i + 1, num_data);
-	for (j = 0; j < num_indep; j++)
-	    Dblf3("%-15.15s = %-15g\n", c_dummy_var[j], fit_x[i * num_indep + j]);
-	Dblf3("%-15.15s = %-15g\n", "z", fit_z[i]);
-	Dblf3("%-15.15s = %-15g\n", "s", err_data[i]);
-	Dblf("\n");
-	Eex("Zero error value in data file");
-	/* FIXME: Eex() aborts before memory is freed! */
+    if (num_errors > 0) {
+	for (i = 0; i < num_data; i++) {
+	    if (err_data[i * num_errors + (num_errors - 1)] != 0.0)
+		continue;
+	    Dblf("\nCurrent data point\n");
+	    Dblf("=========================\n");
+	    Dblf3("%-15s = %i out of %i\n", "#", i + 1, num_data);
+	    for (j = 0; j < num_indep; j++)
+		Dblf3("%-15.15s = %-15g\n", c_dummy_var[j], fit_x[i * num_indep + j]);
+	    Dblf3("%-15.15s = %-15g\n", "z", fit_z[i]);
+	    Dblf3("%-15.15s = %-15g\n", "s", err_data[i * num_errors + (num_errors - 1)]);
+	    Dblf("\n");
+	    Eex("Zero error value in data file");
+	    /* FIXME: Eex() aborts before memory is freed! */
+	}
     }
 
     /* now resize fields to actual length: */
-    redim_vec(&fit_x, num_data*num_indep);
+    redim_vec(&fit_x, num_data * num_indep);
     redim_vec(&fit_z, num_data);
-    redim_vec(&err_data, num_data);
+    redim_vec(&err_data, num_data * num_errors);
 
     fprintf(log_f, "        #datapoints = %d\n", num_data);
 
-    if (columns < 3)
+    if (num_errors == 0)
 	fputs("        residuals are weighted equally (unit weight)\n\n", log_f);
 
     {
@@ -1889,7 +2020,6 @@ fit_command()
     }
 
     /* read in parameters */
-
     max_params = MAX_PARAMS;	/* HBB 971023: make this resizeable */
 
     if (!equals(c_token++, "via"))
@@ -1959,7 +2089,7 @@ fit_command()
 		    max_params = (max_params * 3) / 2;
 		    if (0
 			|| !redim_vec(&a, max_params)
-			|| !(par_name = gp_realloc(par_name, (max_params + 1) * sizeof(fixstr), "fit param resize"))
+			|| !(par_name = (fixstr *) gp_realloc(par_name, (max_params + 1) * sizeof(fixstr), "fit param resize"))
 			) {
 			(void) fclose(f);
 			Eex("Out of memory in fit: too many parameters?");
@@ -1987,7 +2117,7 @@ fit_command()
 		max_params = (max_params * 3) / 2;
 		if (0
 		    || !redim_vec(&a, max_params)
-		    || !(par_name = gp_realloc(par_name, (max_params + 1) * sizeof(fixstr), "fit param resize"))
+		    || !(par_name = (fixstr *) gp_realloc(par_name, (max_params + 1) * sizeof(fixstr), "fit param resize"))
 		    ) {
 		    Eex("Out of memory in fit: too many parameters?");
 		}
@@ -2025,6 +2155,10 @@ fit_command()
 	}
     }
 
+    /* TODO: We do not support x-errors just yet, though. */
+    if (num_errors > 1)
+	int_error(err_token, "Only z-errors are supported at this time.");
+
     if (num_params == 0)
 	int_warn(NO_CARET, "No fittable parameters!\n");
     else
@@ -2046,14 +2180,14 @@ fit_command()
     free(last_par_name);
     last_par_name = par_name;
     /* remember names of indep. variables for 'update' */
-    for (i=0; i<MAX_NUM_VAR; i++) {
+    for (i = 0; i < MAX_NUM_VAR; i++) {
 	free(last_dummy_var[i]);
 	last_dummy_var[i] = gp_strdup(c_dummy_var[i]);
     }
     /* remember last fit command for 'save' */
     free(last_fit_command);
     last_fit_command = strdup(gp_input_line);
-    for (i=0; i<num_tokens; i++) {
+    for (i = 0; i < num_tokens; i++) {
 	if (equals(i,";")) {
 	    last_fit_command[token[i].start_index] = '\0';
 	    break;
@@ -2115,7 +2249,7 @@ getfitlogfile()
 	    /* if given log file name ends in path separator, treat it
 	     * as a directory to store the default "fit.log" in */
 	    if (*tmp2 == '/' || *tmp2 == '\\') {
-		logfile = gp_alloc(strlen(tmp)
+		logfile = (char *) gp_alloc(strlen(tmp)
 				   + strlen(fitlogfile_default) + 1,
 				   "logfile");
 		strcpy(logfile, tmp);

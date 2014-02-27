@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.852 2014/01/31 03:43:39 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.853 2014/02/25 06:04:36 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -4196,6 +4196,7 @@ Ffigure_mapcontours
  Syntax:
        fit {<ranges>} <expression>
            '<datafile>' {datafile-modifiers}
+           {noerrors | zerror | errors z}
            via '<parameter file>' | <var1>{,<var2>,...}
 
  Ranges may be specified to filter the data used in fitting.
@@ -4203,7 +4204,7 @@ Ffigure_mapcontours
        [{dummy_variable=}{<min>}{:<max>}],
  analogous to `plot`; see `plot ranges`.
 
- <expression> can be any valid gnuplot expression, although the most common is
+ <expression> can be any valid `gnuplot` expression, although the most common is
  a previously user-defined function of the form f(x) or f(x,y).
 
  <datafile> is treated as in the `plot` command.  All the `plot datafile`
@@ -4219,24 +4220,53 @@ Ffigure_mapcontours
 
  The interpretation of additional columns in the using spec is as follows:
 
+       z:s                         # 1 independent variable (line number)
+       x:z{:s}                     # 1 independent variable
+       x:y:z{:s}                   # 2 independent variables
+       x1:x2:x3:z{:s}              # 3 independent variables
+       x1:x2:x3:...:xN:z{:s}       # N independent variables
+
+ If specified using the `errors` or `zerrors` keyword, the last column `s` is
+ interpreted as the standard deviation of the corresponding z value and is
+ used to compute a weight for the datum, 1/s**2.  Otherwise, all data points
+ are weighted equally, with a weight of one.  Note that if you do not specify
+ `using` specs at all, no z errors are read from the datafile even if it does
+ have a third column.
+
+ Since the number of using specifiers is ambiguous, you need to specify which
+ columns correspond to errors using the `error` keyword. `noerror` means that
+ no errors `s` are supplied.  `zerror` is an alias for `errors z` and you may
+ use the alias `yerror` in the following common case where we denote the
+ dependent variable with y instead of z:
+
+       x:y:s     yerror    (similar to `plot` with `yerrorbars`)
+
+ Note that for compatibility reasons with `gnuplot` versions prior to 4.7,
+ the `error` keyword is not required.  If you do not specify the error columns
+ explicitly, there must be two more `using` qualifiers (z and s) than there are
+ independent variables, unless there is only one variable.  `gnuplot` then uses
+ the following formats, depending on the number of columns given in the `using`
+ specifcation:
+
+       z                           # 1 independent variable (line number)
+       x:z                         # 1 independent variable (1st column)
        x:z:s                       # 1 independent variable (3 columns total)
        x:y:z:s                     # 2 independent variables (4 columns total)
        x1:x2:x3:z:s                # 3 independent variables (5 columns total)
        x1:x2:x3:...:xN:z:s         # N independent variables (N+2 columns total)
 
- Note that when 3 or more columns are present, the last column is interpreted as
- the standard deviation of the corresponding z value and is used to compute a
- weight for the datum, 1/s**2.  
+ Please beware that this means that you always have to supply z-errors s in a
+ fit with two independent variables x, y if you do not specify the `{no}error`
+ keyword.  There must be two more `using` qualifiers (z and s) than there are
+ independent variables, unless there is only one independent variable.
+
 
  The datafile contents can be interpreted flexibly by providing a `using`
  qualifier as with plot commands. For example to generate the independent
  variable x as the sum of columns 2 and 3, while taking z from column 6 and 
  requesting unit weights:
 
-       fit ... using ($2+$3):6:(1)
-
- There must be two more `using` qualifiers (z and s) than there are independent
- variables, unless there is only one independent variable.
+       fit ... noerrors using ($2+$3):6
 
  The dummy variable names may be changed when specifying a range as noted above.
  The first range corresponds to the first `using` spec, and so on.  A range may
@@ -4257,17 +4287,17 @@ Ffigure_mapcontours
        set fit limit 1e-6
        fit f(x) 'measured.dat' via 'start.par'
        fit f(x) 'measured.dat' using 3:($7-5) via 'start.par'
-       fit f(x) './data/trash.dat' using 1:2:3 via a, b, c
-       fit g(x,y) 'surface.dat' using 1:2:3:(1) via a, b, c
+       fit f(x) './data/trash.dat' using 1:2:3 yerror via a, b, c
+       fit g(x,y) 'surface.dat' using 1:2:3 noerror via a, b, c
        fit a0 + a1*x/(1 + a2*x/(1 + a3*x)) 'measured.dat' via a0,a1,a2,a3
-       fit a*x + b*y 'surface.dat' using 1:2:3:(1) via a,b
-       fit [*:*][yaks=*:*] a*x+b*yaks 'surface.dat' u 1:2:3:(1) via a,b
+       fit a*x + b*y 'surface.dat' using 1:2:3 noerror via a,b
+       fit [*:*][yaks=*:*] a*x+b*yaks 'surface.dat' u 1:2:3 noerror via a,b
 
-       fit [][][t=*:*] a*x + b*y + c*t 'foo.dat' using 1:2:3:4:(1) via a,b,c
+       fit [][][t=*:*] a*x + b*y + c*t 'foo.dat' using 1:2:3:4 noerror via a,b,c
 
        set dummy x1, x2, x3, x4, x5
        h(x1,x2,x3,x4,s5) = a*x1 + b*x2 + c*x3 + d*x4 + e*x5
-       fit h(x1,x2,x3,x4,x5) 'foo.dat' using 1:2:3:4:5:6:(1) via a,b,c,d,e
+       fit h(x1,x2,x3,x4,x5) 'foo.dat' using 1:2:3:4:5:6 noerror via a,b,c,d,e
 
  After each iteration step, detailed information about the current state
  of the fit is written to the display.  The same information about the

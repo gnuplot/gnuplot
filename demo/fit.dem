@@ -1,5 +1,5 @@
 #
-# $Id: fit.dem,v 1.16 2013/05/08 03:57:53 markisch Exp $
+# $Id: fit.dem,v 1.17 2013/06/12 19:04:10 sfeam Exp $
 #
 
 myencoding = GPVAL_ENCODING
@@ -39,11 +39,11 @@ print "Now use the real single-measurement weights from column 5.  (Look at the 
 print "lcdemo.dat and compare the columns to see the difference.)"
 print "Since these are weights we rescale the resulting parameter errors."
 print "  fit settings: set fit errorscaling"
-print "  fit command : fit l(x) 'lcdemo.dat' using 1:2:5 via y0, m\n"
+print "  fit command : fit l(x) 'lcdemo.dat' using 1:2:5 yerr via y0, m\n"
 pause -1 "Press enter to start the fit."
 
 set fit errorscaling
-fit l(x) 'lcdemo.dat' using 1:2:5 via y0, m
+fit l(x) 'lcdemo.dat' using 1:2:5 yerr via y0, m
 set title 'fit weighted by experimental weights'
 plot 'lcdemo.dat' using 1:2:5 with errorbars, l(x)
 pause -1 "Press enter to proceed with the next example."
@@ -58,13 +58,13 @@ print "  ", GPFUN_high
 print "\ndensity(x) is a function which shall fit the whole temperature range using"
 print "a ?: expression. It contains 6 model parameters which will all be varied. Now"
 print "take the start parameters out of the file 'start.par' and plot the function."
-print "  fit command: fit density(x) 'lcdemo.dat' using 1:2:5 via 'start.par'\n"
+print "  fit command: fit density(x) 'lcdemo.dat' using 1:2:5 yerror via 'start.par'\n"
 load 'start.par'
 set title 'initial parameters for realistic model function'
 plot 'lcdemo.dat' using 1:2:5 with errorbars, density(x)
 pause -1 "Press enter to start the fit."
 
-fit density(x) 'lcdemo.dat' using 1:2:5 via 'start.par'
+fit density(x) 'lcdemo.dat' using 1:2:5 yerror via 'start.par'
 set title 'fitted to realistic model function'
 plot 'lcdemo.dat' using 1:2:5 with errorbars, density(x)
 
@@ -84,7 +84,7 @@ plot 'lcdemo.dat' using 1:2:5 with errorbars, density(x)
 #pause -1 "Press enter to start the fit."
 
 #set fit errorscaling limit 1e-10
-#fit density(x) 'lcdemo.dat' using 1:2:5 via 'start.par'
+#fit density(x) 'lcdemo.dat' using 1:2:5 yerror via 'start.par'
 #set title 'fit with more iterations'
 #plot 'lcdemo.dat' using 1:2:5 with errorbars, density(x)
 #set fit limit 1e-5
@@ -109,13 +109,11 @@ r  = 0.5
 set title 'the scattered points, and the initial parameter'
 splot 'hemisphr.dat' using 1:2:3, h(x,y)
 print "  fit function: " . GPFUN_h
-print "We *must* provide 4 columns for a 3d fit. We fake errors=1."
-print "  fit command : fit h(x,y) 'hemisphr.dat' using 1:2:3:(1) via r, x0,y0,z0"
+print "  fit command : fit h(x,y) 'hemisphr.dat' using 1:2:3 noerr via r, x0, y0, z0"
 pause -1 "Press enter to start the fit."
 
 set fit results maxiter 50 errorscaling
-# We *must* provide 4 columns for a 3d fit. We fake errors=1.
-fit h(x,y) 'hemisphr.dat' using 1:2:3:(1) via r, x0, y0, z0
+fit h(x,y) 'hemisphr.dat' using 1:2:3 noerr via r, x0, y0, z0
 set title 'the scattered points, fitted curve'
 splot 'hemisphr.dat' using 1:2:3, h(x,y)
 
@@ -131,7 +129,7 @@ print ''
 print "Another possibility is to prescale the variables (set fit prescale),"
 print "which may improve convergence."
 print "  fit settings: set fit maxiter 50 prescale"
-print "  fit command : fit h(x,y) 'hemisphr.dat' using 1:2:3:(1) via r, x0,y0,z0"
+print "  fit command : fit h(x,y) 'hemisphr.dat' using 1:2:3 noerr via r, x0,y0,z0"
 #pause -1 "Press enter to start the fit."
 
 set fit maxiter 50 prescale
@@ -139,7 +137,7 @@ x0 = 0.1
 y0 = 0.2
 z0 = 0.3
 r  = 0.5
-#fit h(x,y) 'hemisphr.dat' using 1:2:3:(1) via r, x0, y0, z0
+#fit h(x,y) 'hemisphr.dat' using 1:2:3 noerr via r, x0, y0, z0
 #replot
 set fit maxiter 0 noprescale brief
 pause -1 "Press enter to proceed with the next example."
@@ -160,11 +158,11 @@ print "  fit function: " . GPFUN_f
 print "                " . GPFUN_vlong
 print "                " . GPFUN_vtrans
 print "y will be the index of the dataset."
-print "  fit command: fit f(x,y) 'soundvel.dat' using 1:-2:2:(1) via 'sound.par'\n"
+print "  fit command: fit f(x,y) 'soundvel.dat' using 1:-2:2 noerr via 'sound.par'\n"
 pause -1 "Press enter to start the fit."
 
-# Must provide a weigth for a 3d fit. Use constant 1
-fit f(x,y) 'soundvel.dat' using 1:-2:2:(1) via 'sound.par'
+# Must provide 'noerr' for a 3d fit.
+fit f(x,y) 'soundvel.dat' using 1:-2:2 noerr via 'sound.par'
 #create soundfit.par, reading from sound.par and updating values
 update 'sound.par' 'soundfit.par'
 set title 'pseudo-3d multi-branch fit to velocity data'
@@ -177,12 +175,12 @@ pause -1 "Press enter to proceed with the next example."
 
 print "Next we only use every fifth data point for fitting by using the 'every'"
 print "keyword. Note the faster fit and its result."
-print "  fit command: fit f(x,y) 'soundvel.dat' every 5 using 1:-2:2:(1) via 'sound.par'\n"
+print "  fit command: fit f(x,y) 'soundvel.dat' every 5 using 1:-2:2 noerr via 'sound.par'\n"
 load 'sound.par'
 plot 'soundvel.dat', vlong(x), vtrans(x)
 pause -1 "Press enter to start the fit."
 
-fit f(x,y) 'soundvel.dat' every 5 using 1:-2:2:(1) via 'sound.par'
+fit f(x,y) 'soundvel.dat' every 5 using 1:-2:2 noerr via 'sound.par'
 set title 'fitted only every 5th data point'
 plot 'soundvel.dat', vlong(x), vtrans(x)
 print ''
@@ -199,7 +197,7 @@ set title 'initial parameters'
 plot 'soundvel.dat', vlong(x), vtrans(x)
 pause -1 "Press enter to start the fit."
 
-fit f(x,y) 'soundvel.dat' using 1:-2:2:(1) via 'sound2.par'
+fit f(x,y) 'soundvel.dat' using 1:-2:2 noerr via 'sound2.par'
 set title 'fit with c44 and c13 fixed'
 plot 'soundvel.dat', vlong(x), vtrans(x)
 print ''
@@ -230,11 +228,11 @@ print "                " . GPFUN_W
 print "  initial parameters:"
 print "                " . sprintf("eta = %g", eta)
 print "                " . sprintf("tc  = %g", tc)
-print "  fit command : fit R(x) 'moli3.dat' u 1:2:3 via eta, tc\n"
+print "  fit command : fit R(x) 'moli3.dat' u 1:2:3 zerror via eta, tc\n"
 pause -1 "now start fitting...  (-> return)"
 
 set fit limit 1e-10 noerrorscaling
-fit R(x) 'moli3.dat' u 1:2:3 via eta, tc
+fit R(x) 'moli3.dat' u 1:2:3 zerror via eta, tc
 set title 'fitted parameters'
 replot
 
@@ -268,13 +266,13 @@ print 'representing x:y:z:s (where s is the estimated error in the z value).'
 a0=1; a1=.1; a2=.1
 f1(x,y)=a0/(1+a1*x**2+a2*y**2)
 print "  fit function: ", GPFUN_f1
-print "  fit command : fit f1(x,y) 'fit3.dat' index 0 using 1:2:4:(1) via a0,a1,a2\n"
+print "  fit command : fit f1(x,y) 'fit3.dat' index 0 using 1:2:4 noerr via a0,a1,a2\n"
 set title "data and initial parameters"
 splot f1(x,y), 'fit3.dat' in 0 u 1:2:4
 pause -1 "Press enter to start the fit."
 
 set fit errorscaling
-fit f1(x,y) 'fit3.dat' index 0 using 1:2:4:(1) via a0,a1,a2
+fit f1(x,y) 'fit3.dat' index 0 using 1:2:4 noerr via a0,a1,a2
 set title "fit to data with t = -3"
 splot f1(x,y), 'fit3.dat' in 0 u 1:2:4
 pause -1 "Press enter to proceed with the next example."
@@ -283,12 +281,12 @@ print ''
 print "Here is the last set of data where t = 3."
 print "We fit the same function to this set."
 print "  fit function: ", GPFUN_f1
-print "  fit command : fit f1(x,y) 'fit3.dat' index 3 using 1:2:4:(1) via a0,a1,a2\n"
+print "  fit command : fit f1(x,y) 'fit3.dat' index 3 using 1:2:4 noerr via a0,a1,a2\n"
 set title "fit to data with t = +3, initial parameters"
 splot f1(x,y), 'fit3.dat' in 3 u 1:2:4
 pause -1 "Press enter to start the fit."
 
-fit f1(x,y) 'fit3.dat' in 3 u 1:2:4:(1) via a0,a1,a2
+fit f1(x,y) 'fit3.dat' in 3 u 1:2:4 noerr via a0,a1,a2
 set title "fit to data with t = +3"
 splot f1(x,y), 'fit3.dat' in 3 u 1:2:4
 pause -1 "Press enter to proceed with the next example."
@@ -296,16 +294,16 @@ pause -1 "Press enter to proceed with the next example."
 print ''
 print "We also have data for several intermediate values of t.  We will fit the"
 print "function f(x,y,t)=a0*t/(1+a1*x**2+a2*y**2) to all the data.  Since there are now"
-print "three independent variables, we need a using spec with five entries,"
-print "representing x:y:t:z:s." 
+print "three independent variables, we need a using spec with four entries,"
+print "representing x:y:t:z and the keyword 'noerr'." 
 f(x,y,t)=a0*t/(1+a1*x**2+a2*y**2)
 print "  fit function: ", GPFUN_f
-print "  fit command : fit f(x,y,t) 'fit3.dat' u 1:2:3:4:(1) via a0,a1,a2\n"
+print "  fit command : fit f(x,y,t) 'fit3.dat' u 1:2:3:4 noerr via a0,a1,a2\n"
 set title "data for all indices t, initial parameters"
 splot f(x,y,1), 'fit3.dat' u 1:2:4
 pause -1 "Press enter to start the fit."
 
-fit f(x,y,t) 'fit3.dat' u 1:2:3:4:(1) via a0,a1,a2
+fit f(x,y,t) 'fit3.dat' u 1:2:3:4 noerr via a0,a1,a2
 print ''
 print 'Here are all the data together.'
 set title "fit to all data"
@@ -320,7 +318,7 @@ print 'fit.  The first range corresponds to the first "using" entry, etc. For ex
 print 'we could have gotten the same fit like this:'
 print '   fit [lon=*:*][lat=*:*][time=*:*]        \'
 print '     a0*time/(1 + a1*lon**2 + a2*lat**2)   \'
-print '     "fit3.dat" u 1:2:3:4:(1) via a0,a1,a2'
+print '     "fit3.dat" u 1:2:3:4 noerror via a0,a1,a2'
 
 print ''
 print "You can have a look at all previous fit results by looking into the file"

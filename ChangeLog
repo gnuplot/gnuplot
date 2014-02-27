@@ -1,5 +1,13 @@
 2014-02-27  Bastian Maerkisch  <bmaerkisch@web.de>
 
+	src/fit.c demo/fit.dem docs/gnuplot.doc:  New syntax to specify errors.
+	The new parameter 'errors' accepts a comma separated list of (dummy)
+	variable names to specify which (in-)dependent variable has associated
+	errors. 'z' always denotes the indep. variable. 'noerrors' tells fit
+	to use equal (1) weights for the fit. The new syntax removes the 
+	ambiguity between x:y:z:(1) and x:z:s. The old syntax is still
+	accepted but deprecated.
+
 	src/fit.c src/unset.c:  Default to prescaling of fit parameters.
 
 2014-02-26  Bastian Maerkisch  <bmaerkisch@web.de>
