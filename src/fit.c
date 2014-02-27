@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: fit.c,v 1.124 2014/02/27 07:30:01 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: fit.c,v 1.125 2014/02/27 07:57:50 markisch Exp $"); }
 #endif
 
 /*  NOTICE: Change of Copyright Status
@@ -1525,7 +1525,7 @@ fit_command()
     double v[MAXDATACOLS];
     double tmpd;
     time_t timer;
-    int token1, token2, token3;
+    int token1, token2, token3, err_token;
     char *tmp, *file_name;
 
     c_token++;
@@ -1634,6 +1634,7 @@ fit_command()
 
     /* BM: New options to distinguish fits with and without errors */
     /* reset error columns */
+    err_token = c_token;
     memset(err_cols, FALSE, sizeof(TBOOLEAN) * MAX_NUM_VAR);
     if (almost_equals(c_token, "noerr$ors")) {
 	/* no error columns given */
