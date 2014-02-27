@@ -45,8 +45,8 @@ AM_CPPFLAGS = -I../term -I$(top_srcdir)/term -DBINDIR=\"$(bindir)\" -DX11_DRIVER
 gnuplot_SOURCES = alloc.c alloc.h axis.c axis.h breaders.c breaders.h bitmap.h \
 boundary.c boundary.h color.c color.h command.c command.h contour.c contour.h \
 datablock.c datablock.h datafile.c datafile.h dynarray.c dynarray.h \
-eval.c eval.h fit.c fit.h gadgets.c gadgets.h getcolor.c getcolor.h gp_hist.h \
-gp_time.h gp_types.h gplt_x11.h graph3d.c graph3d.h graphics.c graphics.h \
+eval.c eval.h external.c external.h fit.c fit.h gadgets.c gadgets.h getcolor.c getcolor.h \
+gp_hist.h gp_time.h gp_types.h gplt_x11.h graph3d.c graph3d.h graphics.c graphics.h \
 help.c help.h hidden3d.c hidden3d.h history.c internal.c internal.h \
 interpol.c interpol.h libcerf.c libcerf.h \
 matrix.c matrix.h misc.c misc.h mouse.c mouse.h \

@@ -1,5 +1,5 @@
 /*
- * $Id: gp_types.h,v 1.58 2014/01/10 03:31:08 sfeam Exp $
+ * $Id: gp_types.h,v 1.59 2014/01/31 03:43:39 sfeam Exp $
  */
 
 /* GNUPLOT - gp_types.h */
@@ -49,7 +49,8 @@ enum DATA_TYPES {
 	INTGR=1,
 	CMPLX,
 	STRING,
-	DATABLOCK
+	DATABLOCK,
+	INVALID_VALUE	/* used only for error return by external functions */
 };
 
 enum MODE_PLOT_TYPE {

@@ -74,9 +74,14 @@ Makefile.am: Makefile.am.in
 	sed -n '1,/^##m4-files-begin/p' Makefile.am.in > $@t
 	echo EXTRA_DIST = Makefile.am.in *.bin *.cfg *.cor *.dat *.dem *.edf \
 	  *.fnc *.inc *.pdb *.png *.r3d *.rgb sound.par sound2.par \
-	  start.par *.rot gnu-valley random-points gpdemos.tcl html | fmt | \
+	  start.par *.rot gnu-valley random-points gpdemos.tcl html plugin | fmt | \
 	  (tr '\012' @; echo) | sed 's/@$$/%/;s/@/ \\@/g' | tr @% '\012 ' \
 	  >> $@t
+	echo if BUILD_PLUGIN >> $@t
+	echo     SUBDIRS = plugin >> $@t
+	echo else >> $@t
+	echo     SUBDIRS = >> $@t
+	echo endif >> $@t
 	sed -n '/^##m4-files-end/,$$p' $< >> $@t
 	chmod og-w $@t
 	mv $@t $@

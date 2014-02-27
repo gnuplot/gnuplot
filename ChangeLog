@@ -1,3 +1,21 @@
+2014-02-27  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/command.c src/command.h src/eval.c src/eval.h src/external.c
+	src/external.h src/gp_types.h src/Makefile.am src/show.c src/tables.c:
+	New command `import func(x) from "sharedobject"` extends gnuplot
+	expresssion evaluation to allow calling functions exported by an
+	external shared object (a.k.a. plugins). 
+	- original patch  2002 Stephan Boettcher <boettcher@physik.uni-kiel.de>
+	- updated for 4.7 2014 Alexander Täschner <taschna@users.sf.net>
+	- revised syntax and error handling 2014 Ethan A Merritt
+
+	* config/config.nt configure.in demo/Makefile.am.in:
+	./configure --disable-plugins [enabled by default]
+	
+	* demo/plugin/demo_plugin.c demo/plugin/gnuplot_plugin.h
+	demo/plugin/Makefile demo/plugin/plugin.dem docs/gnuplot.doc:
+	Template files demonstrating the creation of custom plugin libraries.
+
 2014-02-27  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	src/fit.c demo/fit.dem docs/gnuplot.doc:  New syntax to specify errors.

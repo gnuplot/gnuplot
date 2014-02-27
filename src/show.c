@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.311 2013/12/26 17:58:29 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.312 2014/01/18 16:14:50 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -962,6 +962,9 @@ show_version(FILE *fp)
 		"+STATS "
 #else
 		"-STATS "
+#endif
+#ifdef HAVE_EXTERNAL_FUNCTIONS
+		"+EXTERNAL_FUNCTIONS "
 #endif
 	    "";
 

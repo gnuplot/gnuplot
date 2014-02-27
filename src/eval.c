@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: eval.c,v 1.113 2013/11/16 05:07:49 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: eval.c,v 1.114 2014/02/23 06:49:44 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - eval.c */
@@ -44,6 +44,7 @@ static char *RCSid() { return RCSid("$Id: eval.c,v 1.113 2013/11/16 05:07:49 sfe
 #include "alloc.h"
 #include "datafile.h"
 #include "datablock.h"
+#include "external.h"	/* for f_calle */
 #include "internal.h"
 #include "libcerf.h"
 #include "specfun.h"
@@ -125,6 +126,10 @@ const struct ft_entry GPFAR ft[] =
 
 /* Placeholder for SF_START */
     {"", NULL},
+
+#ifdef HAVE_EXTERNAL_FUNCTIONS
+    {"", f_calle},
+#endif
 
 /* legal in using spec only */
     {"column",  f_column},
@@ -687,6 +692,11 @@ free_at(struct at_type *at_ptr)
 	    free_at(a->arg.udf_arg->at);
 	    free(a->arg.udf_arg);
 	}
+#ifdef HAVE_EXTERNAL_FUNCTIONS
+	/* external function calls contain a parameter list */
+	if (a->index == CALLE)
+	    free(a->arg.exf_arg);
+#endif
     }
     free(at_ptr);
 }

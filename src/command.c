@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.278 2014/02/16 21:34:58 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.279 2014/02/23 12:50:52 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -94,6 +94,7 @@ static char *RCSid() { return RCSid("$Id: command.c,v 1.278 2014/02/16 21:34:58 
 #include "tables.h"
 #include "term_api.h"
 #include "util.h"
+#include "external.h"
 
 #ifdef USE_MOUSE
 # include "mouse.h"
@@ -522,6 +523,7 @@ define()
 	/* function ! */
 	int dummy_num = 0;
 	struct at_type *at_tmp;
+	char *tmpnam;
 	char save_dummy[MAX_NUM_VAR][MAX_ID_LEN+1];
 	memcpy(save_dummy, c_dummy_var, sizeof(save_dummy));
 	start_token = c_token;
@@ -546,13 +548,12 @@ define()
 	dummy_func = NULL;	/* dont let anyone else use our workspace */
 
 	/* Save function definition in a user-accessible variable */
-	if (1) {
-	    char *tmpnam = gp_alloc(8+strlen(udf->udf_name), "varname");
-	    strcpy(tmpnam, "GPFUN_");
-	    strcat(tmpnam, udf->udf_name);
-	    fill_gpval_string(tmpnam, udf->definition);
-	    free(tmpnam);
-	}
+	tmpnam = gp_alloc(8+strlen(udf->udf_name), "varname");
+	strcpy(tmpnam, "GPFUN_");
+	strcat(tmpnam, udf->udf_name);
+	fill_gpval_string(tmpnam, udf->definition);
+	free(tmpnam);
+
     } else {
 	/* variable ! */
 	char *varname = gp_input_line + token[c_token].start_index;
@@ -2137,6 +2138,58 @@ update_command()
     free(opfname);
 }
 
+/* the "import" command is only implemented if support is configured for */
+/* using functions from external shared objects as plugins. */
+void
+import_command()
+{
+    int start_token = c_token;
+
+#ifdef HAVE_EXTERNAL_FUNCTIONS
+    struct udft_entry *udf;
+
+    int dummy_num = 0;
+    char save_dummy[MAX_NUM_VAR][MAX_ID_LEN+1];
+
+    if (!equals(++c_token + 1, "("))
+	int_error(c_token, "Expecting function template");
+
+    memcpy(save_dummy, c_dummy_var, sizeof(save_dummy));
+    do {
+	c_token += 2;	/* skip to the next dummy */
+	copy_str(c_dummy_var[dummy_num++], c_token, MAX_ID_LEN);
+    } while (equals(c_token + 1, ",") && (dummy_num < MAX_NUM_VAR));
+    if (equals(++c_token, ","))
+	int_error(c_token + 1, "function contains too many parameters");
+    if (!equals(c_token++, ")"))
+	int_error(c_token, "missing ')'");
+
+    if (!equals(c_token, "from"))
+	int_error(c_token, "Expecting 'from <sharedobj>'");
+    c_token++;
+
+    udf = dummy_func = add_udf(start_token+1);
+    udf->dummy_num = dummy_num;
+    free_at(udf->at);	/* In case there was a previous function by this name */
+
+    udf->at = external_at(udf->udf_name);
+    memcpy(c_dummy_var, save_dummy, sizeof(save_dummy));
+    dummy_func = NULL;	/* dont let anyone else use our workspace */
+
+    if (!udf->at) {
+	/* FIXME: more cleanup than this needed? */
+	int_error(NO_CARET, "failed to load external function");
+    }
+
+    /* Don't copy the definition until we know it worked */
+    m_capture(&(udf->definition), start_token, c_token - 1);
+
+#else
+    while (!END_OF_COMMAND)
+	c_token++;
+    int_error(start_token, "This copy of gnuplot does not support plugins");
+#endif
+}
 
 /* process invalid commands and, on OS/2, REXX commands */
 void

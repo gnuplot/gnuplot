@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.853 2014/02/25 06:04:36 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.854 2014/02/27 07:57:50 markisch Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -259,6 +259,11 @@ C
  * If the external library libcerf is available, it is used to provide complex
  math routines cerf, cdawson, erfi, faddeeva, and the Voigt profile
  VP(x,sigma,gamma).
+
+ * The `import` command attaches a user-defined function name to a function
+ exported by an external shared object (support is operating-system dependent).
+ A template header and example source and make files for creating a suitable
+ external shared object are provided in the demo collection.
 
 2 Deprecated syntax
 ?deprecated syntax
@@ -4866,6 +4871,32 @@ Ffigure_mapcontours
        set for [i=1:9] for [j=1:9] label i*10+j sprintf("%d",i*10+j) at i,j
 
  See additional documentation for `iteration`, `do`.
+2 import
+?commands import
+?import
+ The `import` command associates a user-defined function name with a function
+ exported by an external shared object.  This constitutes a plugin mechanism
+ that extends the set of functions available in gnuplot.
+
+ Syntax:
+       import func(x[,y,z,...]) from "sharedobj[:symbol]"
+
+ Examples:
+       # make the function myfun, exported by "mylib.so" or "mylib.dll"
+       # available for plotting or numerical calculation in gnuplot
+       import myfun(x) from "mylib"
+       import myfun(x) from "mylib:myfun"    # same as above
+
+       # make the function theirfun, defined in "theirlib.so" or "theirlib.dll"
+       # available under a different name
+       import myfun(x,y,z) from "theirlib:theirfun"
+
+ The program extends the name given for the shared object by either ".so" or
+ ".dll" depending on the operating system, and searches for it first as a full
+ path name and then as a path relative to the current directory. The operating
+ system itself may also search any directories in LD_LIBRARY_PATH or
+ DYLD_LIBRARY_PATH.
+
 2 load
 ?commands load
 ?load

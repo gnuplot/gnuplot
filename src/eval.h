@@ -1,5 +1,5 @@
 /*
- * $Id: eval.h,v 1.43 2013/09/07 17:02:03 sfeam Exp $
+ * $Id: eval.h,v 1.44 2013/09/12 17:05:53 sfeam Exp $
  */
 
 /* GNUPLOT - eval.h */
@@ -47,8 +47,6 @@
 #define STACK_DEPTH 250		/* maximum size of the execution stack */
 #define MAX_AT_LEN 150		/* max number of entries in action table */
 
-/* Type definitions */
-
 /* These are used by add_action() to index the subroutine list ft[] in eval.c */
 enum operators {
     /* keep this in line with table in eval.c */
@@ -61,6 +59,11 @@ enum operators {
     ASSIGN,
     /* only jump operators go between jump and sf_start, for is_jump() */
     JUMP, JUMPZ, JUMPNZ, JTERN, SF_START,
+
+    /* External function call */
+#ifdef HAVE_EXTERNAL_FUNCTIONS
+    CALLE,
+#endif
 
     /* functions specific to using spec */
     COLUMN, STRINGCOLUMN
@@ -93,6 +96,9 @@ typedef union argument {
 	struct value v_arg;	/* constant value */
 	struct udvt_entry *udv_arg; /* pointer to dummy variable */
 	struct udft_entry *udf_arg; /* pointer to udf to execute */
+#ifdef HAVE_EXTERNAL_FUNCTIONS
+	struct exft_entry *exf_arg; /* pointer to external function */
+#endif
 } argument;
 
 

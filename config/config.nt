@@ -94,6 +94,9 @@
 /* Define to 1 if you have the <errno.h> header file. */
 #define HAVE_ERRNO_H 1
 
+/* Define if external function plugins are to be supported.  */
+#define HAVE_EXTERNAL_FUNCTIONS 1
+
 /* Define to 1 if you have the <float.h> header file. */
 #define HAVE_FLOAT_H 1
 

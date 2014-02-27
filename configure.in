@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot on Unix.
 dnl
-dnl $Id: configure.in,v 1.350 2014/02/19 01:14:38 sfeam Exp $
+dnl $Id: configure.in,v 1.351 2014/02/24 22:12:38 sfeam Exp $
 dnl
 dnl this is actually major.minor ...
 dnl note that for a non-beta release, we need to disable DEVELOPMENT_RELEASE
@@ -198,7 +198,8 @@ AC_CHECK_HEADERS(dirent.h errno.h float.h langinfo.h limits.h locale.h math.h \
   stdlib.h string.h time.h sys/time.h sys/types.h \
   sys/bsdtypes.h sys/ioctl.h sys/param.h sys/select.h sys/socket.h \
   sys/stat.h sys/systeminfo.h sys/timeb.h sys/utsname.h \
-  libc.h malloc.h poll.h sgtty.h termios.h values.h dirent.h
+  libc.h malloc.h poll.h sgtty.h termios.h values.h dirent.h \
+  dlfcn.h dl.h
 )
 
 AC_HEADER_STDBOOL
@@ -216,6 +217,26 @@ fi
 if test "$ac_cv_header_sys_stat_h" = yes; then
   AC_HEADER_STAT
 fi
+
+dnl Check for external functions plugin infrastructure
+AC_ARG_ENABLE(plugins,dnl
+[  --disable-plugins       disable support for importing external functions],,)
+
+if test "$enable_plugins" != no; then
+  if test "$ac_cv_header_dl_h" = yes; then
+    AC_SEARCH_LIBS(shl_load, dld,
+      [AC_DEFINE(HAVE_EXTERNAL_FUNCTIONS,1,[ Define if external function plugins are to be supported. ])
+       have_external_functions=yes
+      ])
+  fi
+  if test "$ac_cv_header_dlfcn_h" = yes; then
+    AC_SEARCH_LIBS(dlopen, dl,
+      [AC_DEFINE(HAVE_EXTERNAL_FUNCTIONS,1,[ Define if external function plugins are to be supported. ])
+       have_external_functions=yes
+      ])
+  fi
+fi
+AM_CONDITIONAL(BUILD_PLUGIN, test "$have_external_functions" = yes)
 
 dnl check if unistd actually declares anything. On NeXT 3.2 unistd is
 dnl conditionalized for _POSIX_SOURCE
@@ -1566,6 +1587,12 @@ if test "$have_libcerf" = yes; then
   AC_MSG_RESULT([  cerf() and other special functions from libcerf: yes])
 else
   AC_MSG_RESULT([  cerf() and other special functions: no (libcerf not found)])
+fi
+
+if test "$have_external_functions" = yes; then
+  AC_MSG_RESULT([  plugin support for loading external functions: yes (EXPERIMENTAL)])
+else
+  AC_MSG_RESULT([  plugin support for loading external functions: no (EXPERIMENTAL)])
 fi
 
 if test "$with_kpsexpand" = yes; then
