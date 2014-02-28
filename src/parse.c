@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: parse.c,v 1.81 2013/12/22 23:00:08 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: parse.c,v 1.82 2013/12/26 17:58:29 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - parse.c */
@@ -908,7 +908,7 @@ parse_unary_expression()
  * expression2 maps secondary coordinates into the primary coordinate space.
  */
 void
-parse_link_via( struct udft_entry *udf, char *domain )
+parse_link_via( struct udft_entry *udf )
 {
     int start_token;
     

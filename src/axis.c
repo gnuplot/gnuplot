@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.128 2013/12/26 17:58:28 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.129 2014/01/12 22:49:31 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -1711,6 +1711,7 @@ widest_tic_callback(AXIS_INDEX axis, double place, char *text,
     (void) axis;		/* avoid "unused parameter" warnings */
     (void) place;
     (void) grid;
+    (void) userlabels;
 
     /* historically, minitics used to have no text,
      * but now they can, except at ticlevel 1

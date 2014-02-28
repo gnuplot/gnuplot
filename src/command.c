@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.279 2014/02/23 12:50:52 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.280 2014/02/28 00:24:20 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -1238,11 +1238,9 @@ link_command()
     }
 
     if (equals(c_token,"via")) {
-	parse_link_via(axis_array[secondary_axis].link_udf,
-		    (secondary_axis==SECOND_X_AXIS) ? "x" : "y");
+	parse_link_via(axis_array[secondary_axis].link_udf);
 	if (almost_equals(c_token,"inv$erse")) {
-	    parse_link_via(axis_array[primary_axis].link_udf,
-			  (secondary_axis==SECOND_X_AXIS) ? "x" : "y");
+	    parse_link_via(axis_array[primary_axis].link_udf);
 	} else {
 	    int_warn(c_token,"inverse mapping function required");
 	    linked = FALSE;
@@ -2176,10 +2174,8 @@ import_command()
     memcpy(c_dummy_var, save_dummy, sizeof(save_dummy));
     dummy_func = NULL;	/* dont let anyone else use our workspace */
 
-    if (!udf->at) {
-	/* FIXME: more cleanup than this needed? */
+    if (!udf->at)
 	int_error(NO_CARET, "failed to load external function");
-    }
 
     /* Don't copy the definition until we know it worked */
     m_capture(&(udf->definition), start_token, c_token - 1);

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.164 2013/12/28 21:53:58 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.165 2014/01/15 00:35:35 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -39,7 +39,6 @@ static char *RCSid() { return RCSid("$Id: misc.c,v 1.164 2013/12/28 21:53:58 sfe
 #include "alloc.h"
 #include "command.h"
 #include "graphics.h"
-#include "parse.h"		/* for const_*() */
 #include "plot.h"
 #include "tables.h"
 #include "util.h"
@@ -61,11 +60,6 @@ static char *RCSid() { return RCSid("$Id: misc.c,v 1.164 2013/12/28 21:53:58 sfe
 
 static char *recursivefullname __PROTO((const char *path, const char *filename, TBOOLEAN recursive));
 static void prepare_call __PROTO((int calltype));
-
-/* A copy of the declaration from set.c */
-/* There should only be one declaration in a header file. But I do not know
- * where to put it */
-/* void get_position __PROTO((struct position * pos)); */
 
 /* State information for load_file(), to recover from errors
  * and properly handle recursive load_file calls
@@ -526,12 +520,6 @@ load_file_error()
     while (lf_pop());
 }
 
-/* find max len of keys and count keys with len > 0 */
-
-/* FIXME HBB 2000508: by design, this one belongs into 'graphics', and the
- * next to into 'graph3d'. Actually, the existence of a module like this
- * 'misc' is almost always a sign of bad design, IMHO */
-/* may return NULL */
 FILE *
 loadpath_fopen(const char *filename, const char *mode)
 {

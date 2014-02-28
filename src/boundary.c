@@ -1,5 +1,5 @@
 /*
- * $Id: boundary.c,v 1.6 2013/09/26 22:45:33 sfeam Exp $
+ * $Id: boundary.c,v 1.7 2014/01/04 00:17:13 sfeam Exp $
  */
 
 /* GNUPLOT - boundary.c */
@@ -965,10 +965,6 @@ do_key_layout(legend_key *key)
     TBOOLEAN key_panic = FALSE;
 
     /* If there is a separate font for the key, use it for space calculations.	*/
-    /* FIXME:  This is problematic for asynchronous terminals like x11. We ask	*/
-    /* for a font change, and the outboard driver will eventually update the	*/
-    /* values of v_char and h_char, but that change will not happen quickly	*/
-    /* enough for us to see it here two lines later in the code.		*/
     if (key->font)
 	t->set_font(key->font);
 

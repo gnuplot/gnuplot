@@ -1,3 +1,9 @@
+2014-02-28  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/misc.c src/axis.c src/parse.c src/parse.h src/internal.c
+	src/color.c src/boundary.c src/command.c src/contour.c src/datafile.c:
+	Trivial removal of dead code and old comments. Flag unused parameters.
+
 2014-02-28  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* config/config.mgw config/mingw/Makefile config/msvc/Makefile:

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: contour.c,v 1.30 2012/08/27 20:23:21 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: contour.c,v 1.31 2013/07/01 20:16:14 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - contour.c */
@@ -530,8 +530,6 @@ update_cntr_pt(edge_struct *p_edge, double z_level)
 
 /* Simple routine to decide if two contour points are equal by
  * calculating the relative error (< EPSILON).  */
-/* HBB 20010121: don't use absolute value 'zero' to compare to data
- * values. */
 static int
 fuzzy_equal(cntr_struct *p_cntr1, cntr_struct *p_cntr2)
 {

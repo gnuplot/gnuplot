@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: internal.c,v 1.73 2013/10/09 02:41:22 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: internal.c,v 1.74 2013/12/28 00:07:35 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - internal.c */
@@ -1254,6 +1254,7 @@ f_sprintf(union argument *arg)
     enum DATA_TYPES spec_type;
 
     /* Retrieve number of parameters from top of stack */
+    (void) arg;
     pop(&num_params);
     nargs = num_params.v.int_val;
     if (nargs > 10) {	/* Fall back to slow but sure allocation */
@@ -1416,6 +1417,7 @@ f_gprintf(union argument *arg)
     double base = 10.;
  
     /* Retrieve parameters from top of stack */
+    (void) arg;
     pop(&val);
     pop(&fmt);
 
@@ -1631,6 +1633,7 @@ f_system(union argument *arg)
     int output_len, ierr;
 
     /* Retrieve parameters from top of stack */
+    (void) arg;
     pop(&val);
 
     /* Make sure parameters are of the correct type */
