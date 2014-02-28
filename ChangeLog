@@ -3,6 +3,10 @@
 	* src/misc.c src/axis.c src/parse.c src/parse.h src/internal.c
 	src/color.c src/boundary.c src/command.c src/contour.c src/datafile.c:
 	Trivial removal of dead code and old comments. Flag unused parameters.
+	
+	* term/js/gnuplot_svg.js: Do not let hypertext box run off the bottom
+	of the svg viewBox.  (running off the right edge is harder to fix).
+	Bug #1340
 
 2014-02-28  Bastian Maerkisch  <bmaerkisch@web.de>
 
@@ -19,7 +23,7 @@
 	variables into account.
 	Patch #585
 
-	* src/fit.dem:  fit always requires descent initial parameter values.
+	* src/fit.dem:  fit always requires decent initial parameter values.
 	Never initialize them to zero.
 
 	* src/matric.c (free_matr):  Accept NULL pointers.
@@ -29,7 +33,7 @@
 	* src/command.c src/command.h src/eval.c src/eval.h src/external.c
 	src/external.h src/gp_types.h src/Makefile.am src/show.c src/tables.c:
 	New command `import func(x) from "sharedobject"` extends gnuplot
-	expresssion evaluation to allow calling functions exported by an
+	expression evaluation to allow calling functions exported by an
 	external shared object (a.k.a. plugins). 
 	- original patch  2002 Stephan Boettcher <boettcher@physik.uni-kiel.de>
 	- updated for 4.7 2014 Alexander Täschner <taschna@users.sf.net>

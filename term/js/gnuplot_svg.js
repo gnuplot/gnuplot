@@ -1,12 +1,12 @@
 /*
- * $Id: gnuplot_svg.js,v 1.11 2012/05/21 23:15:18 sfeam Exp $
+ * $Id: gnuplot_svg.js,v 1.12 2013/04/05 18:36:54 sfeam Exp $
  */
 // Javascript routines for interaction with SVG documents produced by 
 // gnuplot's SVG terminal driver.
 
 var gnuplot_svg = { };
 
-gnuplot_svg.version = "05 Apr 2013";
+gnuplot_svg.version = "28 Feb 2014";
 
 gnuplot_svg.SVGDoc = null;
 gnuplot_svg.SVGRoot = null;
@@ -174,9 +174,17 @@ gnuplot_svg.showHypertext = function(evt, mouseovertext)
     hypertext.setAttributeNS(null,"visibility","visible");
 
     var lines = mouseovertext.split('\n');
-    hypertextbox.setAttributeNS(null,"height",2+16*lines.length);
+    var height = 2+16*lines.length;
+    hypertextbox.setAttributeNS(null,"height",height);
     var length = hypertext.getComputedTextLength();
     hypertextbox.setAttributeNS(null,"width",length+8);
+
+    // bounce off frame bottom
+    if (anchor_y > gnuplot_svg.plot_ybot + 16 - height) {
+	anchor_y -= height;
+	hypertextbox.setAttributeNS(null,"y",anchor_y+4);
+	hypertext.setAttributeNS(null,"y",anchor_y+18);
+    }
 
     while (null != hypertext.firstChild) {
         hypertext.removeChild(hypertext.firstChild);
