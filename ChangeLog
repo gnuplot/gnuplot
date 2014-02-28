@@ -1,3 +1,14 @@
+2014-02-28  Alexander Täschner  <taschna@users.sourceforge.net>
+
+	* src/fit.c demo/fit.dem:  Optionally take errors of independent
+	variables into account.
+	Patch #585
+
+	* src/fit.dem:  fit always requires descent initial parameter values.
+	Never initialize them to zero.
+
+	* src/matric.c (free_matr):  Accept NULL pointers.
+
 2014-02-27  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/command.c src/command.h src/eval.c src/eval.h src/external.c
@@ -25,6 +36,7 @@
 	to use equal (1) weights for the fit. The new syntax removes the 
 	ambiguity between x:y:z:(1) and x:z:s. The old syntax is still
 	accepted but deprecated.
+	Patch #621
 
 	src/fit.c src/unset.c:  Default to prescaling of fit parameters.
 

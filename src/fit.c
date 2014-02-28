@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: fit.c,v 1.125 2014/02/27 07:57:50 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: fit.c,v 1.126 2014/02/27 18:54:05 markisch Exp $"); }
 #endif
 
 /*  NOTICE: Change of Copyright Status
@@ -85,6 +85,9 @@ static char *RCSid() { return RCSid("$Id: fit.c,v 1.125 2014/02/27 07:57:50 mark
  * for the fit. The new syntax removes the ambiguity between x:y:z:(1)
  * and x:z:s. The old syntax is still accepted but deprecated.
  *
+ * Alexander Taeschner, Feb 2014: Optionally take errors of independent
+ * variables into account.
+ *
  */
 
 #include "fit.h"
@@ -165,6 +168,7 @@ static void Dblfn __PROTO(());
 /* Suffix of a backup file */
 #define BACKUP_SUFFIX ".old"
 
+#define SQR(x) ((x) * (x))
 
 /* type definitions */
 enum marq_res {
@@ -210,7 +214,8 @@ static const char *GP_FIXED = "# FIXED";
 static const char *FITSCRIPT = "FIT_SCRIPT";
 static const char *DEFAULT_CMD = "replot";	/* if no fitscript spec. */
 
-static int num_data, num_params;
+static int num_data;
+static int num_params;
 static int num_indep;	 /* # independent variables in fit function */
 static int num_errors;	 /* # error columns */
 static TBOOLEAN err_cols[MAX_NUM_VAR+1];    /* TRUE if variable has an associated error */
@@ -244,8 +249,9 @@ static void ctrlc_setup __PROTO((void));
 static marq_res_t marquardt __PROTO((double a[], double **alpha, double *chisq,
 				     double *lambda));
 static TBOOLEAN analyze __PROTO((double a[], double **alpha, double beta[],
-				 double *chisq));
+				 double *chisq, double **deriv));
 static void calculate __PROTO((double *zfunc, double **dzda, double a[]));
+static void calc_derivatives(double *par, double *data, double **deriv);
 static void call_gnuplot __PROTO((double *par, double *data));
 static TBOOLEAN fit_interrupt __PROTO((void));
 static TBOOLEAN regress __PROTO((double a[]));
@@ -385,7 +391,7 @@ marquardt(double a[], double **C, double *chisq, double *lambda)
     int i, j;
     static double *da = 0,	/* delta-step of the parameter */
     *temp_a = 0,		/* temptative new params set   */
-    *d = 0, *tmp_d = 0, **tmp_C = 0, *residues = 0;
+    *d = 0, *tmp_d = 0, **tmp_C = 0, *residues = 0, **deriv = 0;
     double tmp_chisq;
 
     /* Initialization when lambda == -1 */
@@ -399,8 +405,11 @@ marquardt(double a[], double **C, double *chisq, double *lambda)
 	da = vec(num_params);
 	residues = vec(num_data + num_params);
 	tmp_C = matr(num_data + num_params, num_params);
+	deriv = NULL;
+	if (num_errors > 1)
+	    deriv = matr(num_errors - 1, num_data);
 
-	analyze_ret = analyze(a, C, d, chisq);
+	analyze_ret = analyze(a, C, d, chisq, deriv);
 
 	/* Calculate a useful startup value for lambda, as given by Schwarz */
 	if (startup_lambda != 0)
@@ -429,6 +438,7 @@ marquardt(double a[], double **C, double *chisq, double *lambda)
 	free(temp_a);
 	free(residues);
 	free_matr(tmp_C);
+	free_matr(deriv);
 	return OK;
     }
 
@@ -454,7 +464,7 @@ marquardt(double a[], double **C, double *chisq, double *lambda)
     for (j = 0; j < num_params; j++)
 	temp_a[j] = a[j] + da[j];
 
-    if (!analyze(temp_a, tmp_C, tmp_d, &tmp_chisq)) {
+    if (!analyze(temp_a, tmp_C, tmp_d, &tmp_chisq, deriv)) {
 	/* will never be reached: always returns TRUE */
 	return ML_ERROR;
     }
@@ -491,27 +501,62 @@ marquardt(double a[], double **C, double *chisq, double *lambda)
 
 
 /*****************************************************************
+    compute the (effective) error
+*****************************************************************/
+static double
+effective_error(double **deriv, int i)
+{
+    double tot_err;
+    int j, k;
+
+    if (num_errors <= 1) /* z-errors or equal weights */
+	tot_err = err_data[i];
+    else {
+	/* "Effective variance" according to 
+	 *  Jay Orear, Am. J. Phys., Vol. 50, No. 10, October 1982 
+	 */
+	tot_err = SQR(err_data[i * num_errors + (num_errors - 1)]);
+	for (j = 0, k = 0; j < num_indep; j++) {
+	    if (err_cols[j]) {
+		tot_err += SQR(deriv[k][i] * err_data[i * num_errors + k]);
+		k++;
+	    }
+	}
+	tot_err = sqrt(tot_err);
+    }
+
+    return tot_err;
+}
+
+
+/*****************************************************************
     compute chi-square and numeric derivations
 *****************************************************************/
 /* Used by marquardt to evaluate the linearized fitting matrix C and
  * vector d. Fills in only the top part of C and d. I don't use a
  * temporary array zfunc[] any more. Just use d[] instead.  */
 static TBOOLEAN
-analyze(double a[], double **C, double d[], double *chisq)
+analyze(double a[], double **C, double d[], double *chisq, double ** deriv)
 {
     int i, j;
 
     calculate(d, C, a);
 
+    /* derivatives in indep. variables are required for 
+       effective variance method */
+    if (num_errors > 1)
+	calc_derivatives(a, d, deriv);
+
     for (i = 0; i < num_data; i++) {
+	double err = effective_error(deriv, i);
 	/* note: order reversed, as used by Schwarz */
-	d[i] = (d[i] - fit_z[i]) / err_data[i];
+	d[i] = (d[i] - fit_z[i]) / err;
 	for (j = 0; j < num_params; j++)
-	    C[i][j] /= err_data[i];
+	    C[i][j] /= err;
     }
     *chisq = sumsq_vec(num_data, d);
 
-    /* why return a value that is always TRUE ? */
+    /* FIXME: why return a value that is always TRUE ? */
     return TRUE;
 }
 
@@ -539,11 +584,9 @@ calculate(double *zfunc, double **dzda, double a[])
     tmp_pars = vec(num_params);
 
     /* first function values */
-
     call_gnuplot(a, zfunc);
 
-    /* then derivatives */
-
+    /* then derivatives in parameters */
     for (p = 0; p < num_params; p++)
 	tmp_pars[p] = a[p];
     for (p = 0; p < num_params; p++) {
@@ -620,6 +663,54 @@ call_gnuplot(double *par, double *data)
 	    } else {
 		Eex("Function evaluation yields NaN (\"not a number\")");
 	    }
+	}
+    }
+}
+
+
+static void
+calc_derivatives(double *par, double *data, double **deriv)
+{
+    int i, j, k, m;
+    struct value v;
+    double h;
+
+    /* set parameters first */
+    for (i = 0; i < num_params; i++)
+	setvar(par_name[i], par[i] * scale_params[i]);
+
+    for (i = 0; i < num_data; i++) { /* loop over data points */
+	for (j = 0, m = 0; j < num_indep; j++) { /* loop over indep. variables */
+	    double tmp_high;
+	    double tmp_x;
+#ifdef TWO_SIDE_DIFFERENTIATION
+	    double tmp_low;
+#endif
+	    /* only calculate derivatives if necessary */
+	    if (!err_cols[j])
+		continue;
+
+	    /* set actual dummy variables from file data */
+	    for (k = 0; k < num_indep; k++) {
+		if (j != k)
+		    Gcomplex(&func.dummy_values[k],
+		             fit_x[i * num_indep + k], 0.0);
+	    }
+	    tmp_x = fit_x[i * num_indep + j];
+	    /* optimal step size */
+	    h = GPMAX(DELTA * fabs(tmp_x), 8*1e-8*(fabs(tmp_x) + 1e-8));
+	    Gcomplex(&func.dummy_values[j], tmp_x + h, 0.0);
+	    evaluate_at(func.at, &v);
+	    tmp_high = real(&v);
+#ifdef TWO_SIDE_DIFFERENTIATION
+	    Gcomplex(&func.dummy_values[j], tmp_x - h, 0.0);
+	    evaluate_at(func.at, &v);
+	    tmp_low = real(&v);
+	    deriv[m][i] = (tmp_high - tmp_low) / (2 * h);
+#else
+	    deriv[m][i] = (tmp_high - data[i]) / h;
+#endif
+	    m++;
 	}
     }
 }
@@ -1525,7 +1616,7 @@ fit_command()
     double v[MAXDATACOLS];
     double tmpd;
     time_t timer;
-    int token1, token2, token3, err_token;
+    int token1, token2, token3;
     char *tmp, *file_name;
 
     c_token++;
@@ -1634,7 +1725,6 @@ fit_command()
 
     /* BM: New options to distinguish fits with and without errors */
     /* reset error columns */
-    err_token = c_token;
     memset(err_cols, FALSE, sizeof(TBOOLEAN) * MAX_NUM_VAR);
     if (almost_equals(c_token, "noerr$ors")) {
 	/* no error columns given */
@@ -1921,7 +2011,7 @@ fit_command()
 	/* only use error from data file if _explicitly_ asked for by a using spec */
 
 	if (num_errors == 0)
-	    err_data[num_data] = 1; /* constant weight */
+	    ; /* constant weight */
 	else if (num_errors == 1)
 	    err_data[num_data] = v[i++]; /* z-error */
 	else {
@@ -1929,8 +2019,7 @@ fit_command()
 
 	    for (k = 0, idx = 0; k < MAX_NUM_VAR; k++) {
 		if (err_cols[k])
-		    /* TODO: Actually store errors */
-		    i++;
+		    err_data[num_errors * num_data + idx++] = v[i++];
 	    }
 	    if (err_cols[iz])
 		err_data[num_errors * num_data + idx] = v[i++]; /* z-error */
@@ -2155,10 +2244,6 @@ fit_command()
 	    scale_params[i] = 1.0;
 	}
     }
-
-    /* TODO: We do not support x-errors just yet, though. */
-    if (num_errors > 1)
-	int_error(err_token, "Only z-errors are supported at this time.");
 
     if (num_params == 0)
 	int_warn(NO_CARET, "No fittable parameters!\n");
