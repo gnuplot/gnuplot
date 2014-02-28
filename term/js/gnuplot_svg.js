@@ -1,12 +1,12 @@
 /*
- * $Id: gnuplot_svg.js,v 1.12 2013/04/05 18:36:54 sfeam Exp $
+ * $Id: gnuplot_svg.js,v 1.13 2014/02/28 23:01:44 sfeam Exp $
  */
 // Javascript routines for interaction with SVG documents produced by 
 // gnuplot's SVG terminal driver.
 
 var gnuplot_svg = { };
 
-gnuplot_svg.version = "28 Feb 2014";
+gnuplot_svg.version = "02 Mar 2014";
 
 gnuplot_svg.SVGDoc = null;
 gnuplot_svg.SVGRoot = null;
@@ -200,10 +200,11 @@ gnuplot_svg.showHypertext = function(evt, mouseovertext)
 	tspan_element.appendChild(textNode);
 	hypertext.appendChild(tspan_element);
 	length = tspan_element.getComputedTextLength();
+	var ll = length;
 
 	for (var l=1; l<lines.length; l++) {
 	    var tspan_element = document.createElementNS(xmlns, "tspan");
-	    tspan_element.setAttributeNS(null, "x", anchor_x+14);
+	    tspan_element.setAttributeNS(null, "dx", -ll);
 	    tspan_element.setAttributeNS(null,"dy", 16);
 	    textNode = document.createTextNode(lines[l]);
 	    tspan_element.appendChild(textNode);
@@ -214,6 +215,14 @@ gnuplot_svg.showHypertext = function(evt, mouseovertext)
 	}
 	hypertextbox.setAttributeNS(null,"width",length+8);
     }
+
+    // bounce off right edge
+    if (anchor_x > gnuplot_svg.plot_xmax + 14 - length) {
+	anchor_x -= length;
+	hypertextbox.setAttributeNS(null,"x",anchor_x-4);
+	hypertext.setAttributeNS(null,"x",anchor_x);
+    }
+
 }
 
 gnuplot_svg.hideHypertext = function ()

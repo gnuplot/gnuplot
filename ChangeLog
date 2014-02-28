@@ -5,7 +5,7 @@
 	Trivial removal of dead code and old comments. Flag unused parameters.
 	
 	* term/js/gnuplot_svg.js: Do not let hypertext box run off the bottom
-	of the svg viewBox.  (running off the right edge is harder to fix).
+	and right edge of the svg viewBox.
 	Bug #1340
 
 2014-02-28  Bastian Maerkisch  <bmaerkisch@web.de>
