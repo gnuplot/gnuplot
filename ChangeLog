@@ -1,3 +1,12 @@
+2014-02-28  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* config/config.mgw config/mingw/Makefile config/msvc/Makefile:
+	Build support for plugins. Build demo plugin.
+
+	* config/mingw/Makefile: New target 'maint' to recreate makefile.all.
+
+	* src/makefile.all src/makefile.awc:  Recreate to include external.c.
+
 2014-02-28  Alexander Täschner  <taschna@users.sourceforge.net>
 
 	* src/fit.c demo/fit.dem:  Optionally take errors of independent

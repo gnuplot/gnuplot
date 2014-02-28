@@ -33,7 +33,7 @@
 /* #undef EXTENDED_COLOR_SPECS */
 
 /* Define if you want to supply pre-existing X11 windows. */
-#define EXTERNAL_X11_WINDOW 1
+/* #undef EXTERNAL_X11_WINDOW */
 
 /* Define if <errno.h> declares errno. */
 /* #undef EXTERN_ERRNO */
@@ -96,6 +96,9 @@
 
 /* Define to 1 if you have the <errno.h> header file. */
 #define HAVE_ERRNO_H 1
+
+/* Define if external function plugins are to be supported.  */
+#define HAVE_EXTERNAL_FUNCTIONS 1
 
 /* Define to 1 if you have the <float.h> header file. */
 #define HAVE_FLOAT_H 1

@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.18 2014/02/12 21:24:19 markisch Exp $
+# $Id: Makefile,v 1.19 2014/02/12 21:28:19 markisch Exp $
 #
 # GNUPLOT Makefile Microsoft Visual C++ 2005 or newer
 
@@ -234,7 +234,7 @@ T=$(TOP)\\term\\
 D=$(TOP)\\docs\\
 M=$(TOP)\\demo\\
 
-default: wgnuplot.exe $(HELPFILE) wgnuplot.mnu $(M)bf_test.exe gnuplot.exe $(EXTRA_TARGETS)
+default: wgnuplot.exe $(HELPFILE) wgnuplot.mnu $(M)bf_test.exe gnuplot.exe demo_plugin.dll $(EXTRA_TARGETS)
 
 !INCLUDE $(S)\\makefile.all
 
@@ -464,6 +464,9 @@ $(M)bf_test.exe : $(S)\\bf_test.c dbinary.obj alloc.obj
 dbinary.obj: $(S)\\binary.c
 	$(CC) /c $(CFLAGS) /F 5000 /W1 /DWINDOWS_NO_GUI /Fodbinary.obj $(S)\\binary.c
 
+demo_plugin.dll: $(M)plugin\\demo_plugin.c
+	$(CC) $(CFLAGS) /LD /D_USRDLL /D_WINDLL $(M)plugin\\$*.c /link /out:$@
+
 # clean up temporary files
 clean:
 	if exist *.obj del *.obj
@@ -493,6 +496,7 @@ veryclean: clean
 	if exist $(M)binary1 del $(M)binary1
 	if exist $(M)binary2 del $(M)binary2
 	if exist $(M)binary3 del $(M)binary3
+	if exist demo_plugin.dll del demo_plugin.*
 	if exist $(M)fit.log del $(M)fit.log
 	if exist $(M)soundfit.par del $(M)soundfit.par
 	if exist config.h del config.h

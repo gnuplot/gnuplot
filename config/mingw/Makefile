@@ -1,5 +1,5 @@
 # Hello, emacs: this is a -*- Makefile -*-
-# $Id: Makefile,v 1.36 2014/01/18 16:14:50 markisch Exp $
+# $Id: Makefile,v 1.37 2014/02/23 12:53:02 markisch Exp $
 #
 # GNUPLOT Makefile for MinGW/MSYS on Windows
 # This assumes usual installation of the MinGW32 toolkit, the free
@@ -472,7 +472,7 @@ timestamp.h: $(TOP)/ChangeLog
 	@if cmp -s $@ $@t; then rm -f $@t; else mv $@t $@; fi
 else
 $(S)/version.c: $(TOP)/VERSION $(TOP)/PATCHLEVEL $(TOP)/ChangeLog $(S)/Makefile.maint
-	$(MAKE) -C $(S) -Dtop_srcdir=.. -f Makefile.maint version.c
+	$(MAKE) -C $(S) srcdir=. top_srcdir=.. -f Makefile.maint version.c
 endif
 
 WINDEPS = $(W)/wgnuplib.h $(W)/wcommon.h $(W)/wresourc.h $(W)/screenbuf.h $(W)/wgdiplus.h
@@ -494,6 +494,9 @@ wxt_gui.$(O): $(S)/wxterminal/wxt_gui.cpp $(S)/wxterminal/wxt_gui.h
 
 gp_cairo.$(O): $(S)/wxterminal/gp_cairo.c $(S)/wxterminal/gp_cairo.h
 	$(CC) -c $(CFLAGS) $(CFLAGSEXTRA) $(CXXFLAGS) $(PANGOCAIRO_CFLAGS) -MMD -MT '$*.$$(O)' -MF $*.d -o $@ $<
+
+demo_plugin.dll: $(M)plugin/demo_plugin.c
+	$(CC) $(CFLAGS) -I$(M)plugin -shared -o $@ $<
 
 # convert gnuplot.doc to windows/wgnuplot.html
 $(BUILDHELPFILE): doc2html.exe $(D)gnuplot.doc $(D)windows/wgnuplot.hhp $(D)windows/wgnuplot.hhk \
@@ -813,3 +816,8 @@ ifdef RELEASE
 else
 	zip -mro9 gp$(SHORTVERSION)-`date +%Y%m%d`-win32-mingw.zip gnuplot
 endif
+
+# rebuild makefile.all
+maint: 
+	-$(RM) $(S)/makefile.all $(S)/makefile.awc
+	$(MAKE) -C $(S) srcdir=. top_srcdir=.. -f Makefile.maint makefile.all makefile.awc
