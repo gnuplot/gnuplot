@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: fit.c,v 1.126 2014/02/27 18:54:05 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: fit.c,v 1.127 2014/02/28 10:22:50 markisch Exp $"); }
 #endif
 
 /*  NOTICE: Change of Copyright Status
@@ -1922,7 +1922,7 @@ fit_command()
     fit_x = vec(max_data * num_indep);
     fit_z = vec(max_data);
     /* allocate error array, last one is always the z-error */
-    err_data = vec(max_data * num_errors);
+    err_data = vec(max_data * GPMAX(num_errors, 1));
     num_data = 0;
 
     /* Set skipped[i] = 0 for all i */
@@ -1941,7 +1941,7 @@ fit_command()
 	    if (0
 		|| !redim_vec(&fit_x, max_data * num_indep)
 		|| !redim_vec(&fit_z, max_data)
-		|| !redim_vec(&err_data, max_data * num_errors)
+		|| !redim_vec(&err_data, max_data * GPMAX(num_errors, 1))
 		) {
 		/* Some of the reallocations went bad: */
 		df_close();
@@ -2011,7 +2011,7 @@ fit_command()
 	/* only use error from data file if _explicitly_ asked for by a using spec */
 
 	if (num_errors == 0)
-	    ; /* constant weight */
+	    err_data[num_data] = 1.0; /* constant weight */
 	else if (num_errors == 1)
 	    err_data[num_data] = v[i++]; /* z-error */
 	else {
@@ -2094,7 +2094,7 @@ fit_command()
     /* now resize fields to actual length: */
     redim_vec(&fit_x, num_data * num_indep);
     redim_vec(&fit_z, num_data);
-    redim_vec(&err_data, num_data * num_errors);
+    redim_vec(&err_data, num_data * GPMAX(num_errors, 1));
 
     fprintf(log_f, "        #datapoints = %d\n", num_data);
 
