@@ -8,6 +8,9 @@ epslatex.ps epslatex.tex random.tmp stringvar.tmp fit.log fitmulti.dat
 
 BINARY_FILES = binary1 binary2 binary3
 
+SUBDIRS = $(PLUGIN_DIR)
+DIST_SUBDIRS = plugin
+
 DEMO = all.dem
 
 GNUPLOT = gnuplot
@@ -77,12 +80,10 @@ Makefile.am: Makefile.am.in
 	  start.par *.rot gnu-valley random-points gpdemos.tcl html plugin | fmt | \
 	  (tr '\012' @; echo) | sed 's/@$$/%/;s/@/ \\@/g' | tr @% '\012 ' \
 	  >> $@t
-	echo if BUILD_PLUGIN >> $@t
-	echo     SUBDIRS = plugin >> $@t
-	echo else >> $@t
-	echo     SUBDIRS = >> $@t
-	echo endif >> $@t
 	sed -n '/^##m4-files-end/,$$p' $< >> $@t
+	echo if BUILD_PLUGIN >> $@t
+	echo    PLUGIN_DIR = plugin >> $@t
+	echo endif >> $@t
 	chmod og-w $@t
 	mv $@t $@
 

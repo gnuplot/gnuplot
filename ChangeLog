@@ -1,3 +1,8 @@
+2014-03-01  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* demo/Makefile.am.in:  Fix a typo, but the plugin subdir is still
+	not being properly created by "make distcheck".
+
 2014-02-28  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/misc.c src/axis.c src/parse.c src/parse.h src/internal.c
@@ -5,7 +10,7 @@
 	Trivial removal of dead code and old comments. Flag unused parameters.
 	
 	* term/js/gnuplot_svg.js: Do not let hypertext box run off the bottom
-	and right edge of the svg viewBox.
+	or right edge of the svg viewBox.
 	Bug #1340
 
 2014-02-28  Bastian Maerkisch  <bmaerkisch@web.de>
