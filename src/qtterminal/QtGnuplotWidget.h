@@ -72,6 +72,7 @@ public:
 	Q_PROPERTY(bool rounded READ rounded WRITE setRounded);
 	Q_PROPERTY(bool replotOnResize READ replotOnResize WRITE setReplotOnResize);
 	Q_PROPERTY(QColor backgroundColor READ backgroundColor WRITE setBackgroundColor);
+	Q_PROPERTY(bool statusLabelActive READ statusLabelActive WRITE setStatusLabelActive);
 
 public:
 	bool isActive() const;
@@ -86,22 +87,17 @@ signals:
 public:
 	void processEvent(QtGnuplotEventType type, QDataStream& in);
 
-	bool antialias() const
-	{ return m_antialias; }
-
-	bool rounded() const
-	{ return m_rounded; }
-
-	bool replotOnResize() const
-	{ return m_replotOnResize; }
-
-	const QColor& backgroundColor() const
-	{ return m_backgroundColor; }
+	bool antialias() const { return m_antialias; }
+	bool rounded() const { return m_rounded; }
+	bool replotOnResize() const { return m_replotOnResize; }
+	const QColor& backgroundColor() const { return m_backgroundColor; }
+	bool statusLabelActive() const { return m_statusLabelActive; }
 
 	void setAntialias(bool value);
 	void setRounded(bool value);
 	void setReplotOnResize(bool value);
 	void setBackgroundColor(const QColor& color);
+	void setStatusLabelActive(bool active);
 
 	void loadSettings(const QSettings& settings);
 	void saveSettings(QSettings& settings) const;
@@ -129,6 +125,7 @@ private:
 	bool m_active;
 	QtGnuplotScene* m_scene;
 	QGraphicsView* m_view;
+	QLabel* m_statusLabel;
 	QSize m_lastSizeRequest;
 	QSize m_sizeHint;
 	// these can be set from the tool widget or from the command line
@@ -137,6 +134,7 @@ private:
 	// Settings
 	bool m_antialias;
 	bool m_replotOnResize;
+	bool m_statusLabelActive;
 
 	static int m_widgetUid;
 	bool m_skipResize;

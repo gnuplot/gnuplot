@@ -79,6 +79,7 @@ void QtGnuplotWidget::init()
 	m_backgroundColor = Qt::white;
 	m_antialias = true;
 	m_replotOnResize = true;
+	m_statusLabelActive = false;
 	m_skipResize = false;
 
 	// Register as the main event receiver if not already created
@@ -97,10 +98,21 @@ void QtGnuplotWidget::init()
 	layout->addWidget(m_view);
 	setLayout(layout);
 	setViewMatrix();
+	m_statusLabel = new QLabel(m_view->viewport());
+	m_statusLabel->setStyleSheet("QLabel { background-color :  rgba(230, 212, 166, 150) }");
+	m_statusLabel->setMargin(1);
+	m_statusLabel->setVisible(false);
 }
 
 void QtGnuplotWidget::setStatusText(const QString& status)
 {
+	if (m_statusLabelActive)
+	{
+		m_statusLabel->setText(status);
+		m_statusLabel->adjustSize();
+		m_statusLabel->move(m_view->viewport()->width() - m_statusLabel->width(), 0);
+		m_statusLabel->setVisible(true);
+	}
 	emit statusTextChanged(status);
 }
 
@@ -213,6 +225,7 @@ void QtGnuplotWidget::resizeEvent(QResizeEvent* event)
 	qDebug() << " viewport size " << viewport->size();
 	qDebug() << " last size req." << m_lastSizeRequest;
 */
+	m_statusLabel->move(viewport->width() - m_statusLabel->width(), 0);
 
 	// We only inform gnuplot of a new size, and not of the first resize event
 	if ((viewport->size() != m_lastSizeRequest) && (m_lastSizeRequest != QSize(-1, -1)) && !m_skipResize)
@@ -312,6 +325,7 @@ void QtGnuplotWidget::loadSettings(const QSettings& settings)
 	setRounded(settings.value("rounded", true).toBool());
 	setBackgroundColor(settings.value("backgroundColor", QColor(Qt::white)).value<QColor>());
 	setReplotOnResize(settings.value("replotOnResize", true).toBool());
+	setStatusLabelActive(settings.value("statusLabelActive", false).toBool());
 }
 
 void QtGnuplotWidget::saveSettings(QSettings& settings) const
@@ -320,6 +334,7 @@ void QtGnuplotWidget::saveSettings(QSettings& settings) const
 	settings.setValue("rounded", m_rounded);
 	settings.setValue("backgroundColor", m_backgroundColor);
 	settings.setValue("replotOnResize", m_replotOnResize);
+	settings.setValue("statusLabelActive", m_statusLabelActive);
 }
 
 void QtGnuplotWidget::setAntialias(bool value)
@@ -342,5 +357,12 @@ void QtGnuplotWidget::setBackgroundColor(const QColor& color)
 {
 	m_backgroundColor = color;
 	m_view->setBackgroundBrush(m_backgroundColor);
+}
+
+void QtGnuplotWidget::setStatusLabelActive(bool active)
+{
+	m_statusLabelActive = active;
+	if (!active)
+		m_statusLabel->setVisible(false);
 }
 

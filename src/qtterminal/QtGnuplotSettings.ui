@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>271</width>
-    <height>97</height>
+    <width>269</width>
+    <height>186</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -71,6 +71,44 @@
         <string>Rounded line ends</string>
        </property>
       </widget>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout_2">
+       <item>
+        <widget class="QLabel" name="label">
+         <property name="text">
+          <string>Mouse label</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QComboBox" name="mouseLabelComboBox">
+         <item>
+          <property name="text">
+           <string>Status bar</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Tool bar</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Inline</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>None</string>
+          </property>
+         </item>
+        </widget>
+       </item>
+      </layout>
      </item>
     </layout>
    </item>

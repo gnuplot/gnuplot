@@ -53,6 +53,8 @@
 #include <QtWidgets>
 #endif
 
+class QLabel;
+class QStatusBar;
 class QToolBar;
 class QtGnuplotWidget;
 class Ui_settingsDialog;
@@ -63,6 +65,7 @@ Q_OBJECT
 
 public:
 	QtGnuplotWindow(int id, QtGnuplotEventHandler* eventHandler = 0, QWidget* parent = 0);
+	~QtGnuplotWindow();
 
 public:
 	virtual void keyPressEvent(QKeyEvent* event);
@@ -82,11 +85,17 @@ private slots:
 
 private:
 	void createAction(const QString& name, int key, const QString& icon);
+	void loadSettings();
+	void saveSettings() const;
 
 private:
 	bool m_ctrl;
 	int m_id;
+	bool m_statusBarActive;
+	QStatusBar* m_statusBar;
 	QToolBar* m_toolBar;
+	QToolBar* m_mouseToolBar;
+	QLabel* m_mouseToolBarLabel;
 	QtGnuplotWidget* m_widget;
 	Ui_settingsDialog* m_ui;
 	QColor m_chosenBackgroundColor;

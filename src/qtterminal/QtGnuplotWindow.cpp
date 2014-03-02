@@ -67,16 +67,17 @@ QtGnuplotWindow::QtGnuplotWindow(int id, QtGnuplotEventHandler* eventHandler, QW
 
 	// Central widget
 	m_widget = new QtGnuplotWidget(m_id, m_eventHandler, this);
-	QSettings settings("gnuplot", "qtterminal");
-	settings.beginGroup("view");
-	m_widget->loadSettings(settings);
 	connect(m_widget, SIGNAL(statusTextChanged(const QString&)), this, SLOT(on_setStatusText(const QString&)));
 	setCentralWidget(m_widget);
 
 	// Bars
-	m_toolBar = new QToolBar(this);
-	addToolBar(m_toolBar);
-	statusBar()->showMessage(tr("Qt frontend for gnuplot"));
+	m_toolBar = addToolBar("Main tool bar");
+
+	m_mouseToolBar = addToolBar("Mouse tool bar");
+	m_mouseToolBarLabel = new QLabel();
+	m_mouseToolBar->addWidget(m_mouseToolBarLabel);
+
+	m_statusBar = statusBar();
 
 	// Actions
 	QAction* copyToClipboardAction = new QAction(QIcon(":/images/clipboard"   ), tr("Copy to clipboard"), this);
@@ -109,6 +110,13 @@ QtGnuplotWindow::QtGnuplotWindow(int id, QtGnuplotEventHandler* eventHandler, QW
 	createAction(tr("Next zoom")    , 'n', ":/images/zoomNext");
 	createAction(tr("Autoscale")    , 'a', ":/images/autoscale");
 	m_toolBar->addAction(settingsAction);
+
+	loadSettings();
+}
+
+QtGnuplotWindow::~QtGnuplotWindow()
+{
+	saveSettings();
 }
 
 void QtGnuplotWindow::createAction(const QString& name, int key, const QString& icon)
@@ -121,7 +129,10 @@ void QtGnuplotWindow::createAction(const QString& name, int key, const QString& 
 
 void QtGnuplotWindow::on_setStatusText(const QString& status)
 {
-	statusBar()->showMessage(status);
+	if (m_mouseToolBar->toggleViewAction()->isChecked())
+		m_mouseToolBarLabel->setText(status);
+	if (m_statusBar->isVisible())
+		m_statusBar->showMessage(status);
 }
 
 void QtGnuplotWindow::on_keyAction()
@@ -134,9 +145,7 @@ void QtGnuplotWindow::print()
 {
 	QPrinter printer;
 	if (QPrintDialog(&printer).exec() == QDialog::Accepted)
-        {
-            m_widget->print(printer);
-        }
+		m_widget->print(printer);
 }
 
 void QtGnuplotWindow::exportToPdf()
@@ -145,7 +154,7 @@ void QtGnuplotWindow::exportToPdf()
 	if (fileName.isEmpty())
 		return;
 	if (!fileName.endsWith(".pdf", Qt::CaseInsensitive))
-			fileName += ".pdf";
+		fileName += ".pdf";
 
 	m_widget->exportToPdf(fileName);
 }
@@ -159,7 +168,7 @@ void QtGnuplotWindow::exportToImage()
 		return;
 	if (!fileName.endsWith(".png", Qt::CaseInsensitive) &&
 	    !fileName.endsWith(".bmp", Qt::CaseInsensitive))
-			fileName += ".png";
+		fileName += ".png";
 
 	m_widget->exportToImage(fileName);
 }
@@ -170,12 +179,33 @@ void QtGnuplotWindow::exportToSvg()
 	if (fileName.isEmpty())
 		return;
 	if (!fileName.endsWith(".svg", Qt::CaseInsensitive))
-			fileName += ".svg";
+		fileName += ".svg";
 
 	m_widget->exportToSvg(fileName);
 }
 
 #include "ui_QtGnuplotSettings.h"
+
+void QtGnuplotWindow::loadSettings()
+{
+	QSettings settings("gnuplot", "qtterminal");
+	settings.beginGroup("view");
+	m_widget->loadSettings(settings);
+	m_statusBarActive = settings.value("statusBarActive", true).toBool();
+	m_statusBar->setVisible(m_statusBarActive);
+	bool mouseToolBarActive = settings.value("mouseToolBarActive", false).toBool();
+	m_mouseToolBar->toggleViewAction()->setChecked(mouseToolBarActive);
+	m_mouseToolBar->setVisible(mouseToolBarActive);
+}
+
+void QtGnuplotWindow::saveSettings() const
+{
+	QSettings settings("gnuplot", "qtterminal");
+	settings.beginGroup("view");
+	m_widget->saveSettings(settings);
+	settings.setValue("statusBarActive", m_statusBarActive);
+	settings.setValue("mouseToolBarActive", m_mouseToolBar->toggleViewAction()->isChecked());
+}
 
 void QtGnuplotWindow::showSettingsDialog()
 {
@@ -185,6 +215,14 @@ void QtGnuplotWindow::showSettingsDialog()
 	m_ui->antialiasCheckBox->setCheckState(m_widget->antialias() ? Qt::Checked : Qt::Unchecked);
 	m_ui->roundedCheckBox->setCheckState(m_widget->rounded() ? Qt::Checked : Qt::Unchecked);
 	m_ui->replotOnResizeCheckBox->setCheckState(m_widget->replotOnResize() ? Qt::Checked : Qt::Unchecked);
+	if (m_statusBar->isVisible())
+		m_ui->mouseLabelComboBox->setCurrentIndex(0);
+	else if (m_mouseToolBar->toggleViewAction()->isChecked())
+		m_ui->mouseLabelComboBox->setCurrentIndex(1);
+	else if (m_widget->statusLabelActive())
+		m_ui->mouseLabelComboBox->setCurrentIndex(2);
+	else
+		m_ui->mouseLabelComboBox->setCurrentIndex(3);
 	QPixmap samplePixmap(m_ui->sampleColorLabel->size());
 	samplePixmap.fill(m_widget->backgroundColor());
 	m_ui->sampleColorLabel->setPixmap(samplePixmap);
@@ -198,9 +236,13 @@ void QtGnuplotWindow::showSettingsDialog()
 		m_widget->setAntialias(m_ui->antialiasCheckBox->checkState() == Qt::Checked);
 		m_widget->setRounded(m_ui->roundedCheckBox->checkState() == Qt::Checked);
 		m_widget->setReplotOnResize(m_ui->replotOnResizeCheckBox->checkState() == Qt::Checked);
-		QSettings settings("gnuplot", "qtterminal");
-		settings.beginGroup("view");
-		m_widget->saveSettings(settings);
+		int statusIndex = m_ui->mouseLabelComboBox->currentIndex();
+		m_statusBarActive = (statusIndex == 0);
+		m_statusBar->setVisible(m_statusBarActive);
+		m_mouseToolBar->toggleViewAction()->setChecked(statusIndex == 1);
+		m_mouseToolBar->setVisible(statusIndex == 1);
+		m_widget->setStatusLabelActive(statusIndex == 2);
+		saveSettings();
 	}
 }
 

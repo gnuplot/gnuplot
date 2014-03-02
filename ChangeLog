@@ -1,3 +1,10 @@
+2014-03-02  Jérôme Lodewyck  <lodewyck@users.sourceforge.net>
+
+	* src/qtterminal/QtGnuplotWidget.* src/qtterminal/QtGnuplotWindow.*
+	src/qtterminal/QtGnuplotSettings.ui: New settings option for displaying
+	mouse coordinates. Possible choices are Status bar, Tool bar, Inline or
+	None.
+
 2014-03-01  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* demo/Makefile.am.in:  Fix a typo, but the plugin subdir is still
