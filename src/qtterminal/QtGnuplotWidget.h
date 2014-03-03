@@ -59,6 +59,7 @@
 class QtGnuplotScene;
 class QGraphicsView;
 class QSettings;
+class QLabel;
 
 class QtGnuplotWidget : public QWidget, public QtGnuplotEventReceiver
 {
