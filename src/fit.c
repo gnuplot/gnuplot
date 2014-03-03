@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: fit.c,v 1.127 2014/02/28 10:22:50 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: fit.c,v 1.128 2014/02/28 10:44:29 markisch Exp $"); }
 #endif
 
 /*  NOTICE: Change of Copyright Status
@@ -457,8 +457,7 @@ marquardt(double a[], double **C, double *chisq, double *lambda)
 	tmp_d[num_data + i] = 0;
     }
 
-    /* FIXME: residues[] isn't used at all. Why? Should it be used? */
-    Givens(tmp_C, tmp_d, da, residues, num_params + num_data, num_params, 1);
+    Givens(tmp_C, tmp_d, da, num_params + num_data, num_params);
 
     /* check if trial did ameliorate sum of squares */
     for (j = 0; j < num_params; j++)
@@ -946,7 +945,7 @@ regress(double a[])
     /* and errors in the parameters                     */
 
     /* compute covar[][] directly from C */
-    Givens(C, 0, 0, 0, num_data, num_params, 0);
+    Givens(C, 0, 0, num_data, num_params);
 
     /* Use lower square of C for covar */
     covar = C + num_data;

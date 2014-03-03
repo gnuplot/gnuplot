@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.318 2014/01/30 00:46:00 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.319 2014/01/31 03:43:40 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -699,9 +699,9 @@ get_data(struct curve_points *current_plot)
 	}
 
 	/* TODO: It would make more sense to organize the switch below by plot	*/
-	/* rather than by number of columns in use.  The mis-organization is	*/
-	/* particularly evident for parallel axis plots, to the point where I	*/
-	/* decided the only reasonable option is to handle it separately.	*/
+	/* type rather than by number of columns in use.  The mis-organization 	*/
+	/* is particularly evident for parallel axis plots, to the point where	*/
+	/* I decided the only reasonable option is to handle it separately.	*/
 	if (current_plot->plot_style == PARALLELPLOT && j > 0) {
 	    int iaxis;
 	    /* FIXME: this apparently cannot trigger.  Good or bad? */
@@ -1231,8 +1231,6 @@ store2d_point(
 	ydata_func.dummy_values[2] = ydata_func.dummy_values[0];
 	evaluate_at(ydata_func.at, &val);
 	y = undefined ? 0.0 : real(&val);
-
-	/* FIXME - filtering ylow and yhigh is nonsense for many plot styles */
 
 	(void) Gcomplex(&ydata_func.dummy_values[0], ylow, 0.0);
 	ydata_func.dummy_values[2] = ydata_func.dummy_values[0];
