@@ -1,3 +1,9 @@
+2014-03-03  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* demo/plugin/Makefile.am: New file.
+	* demo/plugin/Makefile: Dropped.
+	* configure.in: generate demo/plugin/Makefile in build directory.
+
 2014-03-02  Jérôme Lodewyck  <lodewyck@users.sourceforge.net>
 
 	* src/qtterminal/QtGnuplotWidget.* src/qtterminal/QtGnuplotWindow.*
