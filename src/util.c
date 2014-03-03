@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: util.c,v 1.118 2013/10/10 22:23:04 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: util.c,v 1.119 2013/12/11 05:05:55 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - util.c */
@@ -51,7 +51,7 @@ static char *RCSid() { return RCSid("$Id: util.c,v 1.118 2013/10/10 22:23:04 sfe
 #elif defined(_Windows)
 # include <windows.h>
 #endif
-#ifdef __MSC__
+#if defined(__MSC__) || defined (__WATCOMC__)
 # include <io.h>
 #endif
 

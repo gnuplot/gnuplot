@@ -102,6 +102,7 @@ if BUILD_BITMAP
 gnuplot_SOURCES += bitmap.c
 endif
 
+DISTCLEANFILES = timestamp.h
 BUILT_SOURCES = timestamp.h
 timestamp.h: $(top_srcdir)/ChangeLog Makefile
 	@echo Making $@
