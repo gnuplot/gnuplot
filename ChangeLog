@@ -3,6 +3,12 @@
 	* src/fit.c src/matrix.c src/matrix.h:  Dead code removal.
 	src/plot2d.c: Dead comment removal.
 
+	* configure.in:  Build qt terminal by default if either qt5 or qt4
+	libraries are detected.
+
+	* docs/Makefile.am:  "make dist" should not trigger build of gnuplot.pdf
+	if it is current (it gets confused by regenerated file pdffigures.tex).
+
 2014-03-03  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/Makefile.am (DISTCLEANFILES): Clean off timestamp.h for
