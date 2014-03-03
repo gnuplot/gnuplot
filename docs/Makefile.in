@@ -141,7 +141,7 @@ HEADERS = doc2x.h xref.h
 EXTRA_DIST = doc2texi.el gnuplot.doc gnuplot.texi gpcard.tex	\
 makefile.dst titlepag.ipf titlepag.ms titlepag.tex	\
 toc_entr.sty psdoc faq-ja.tex gnuplot-ja.doc README.ja	\
-term-ja.diff plotstyles.gnu pdffigures.tex gnuplot.pdf windows
+term-ja.diff plotstyles.gnu gnuplot.pdf windows
 
 CLEANFILES = doc2tex gnuplot.tex gnuplot.dvi gnuplot.aux gnuplot.log	\
 gnuplot.toc gnuplot.ps gpcard.dvi gpcard.log gpcard.ps alldoc2gih	\

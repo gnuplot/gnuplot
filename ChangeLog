@@ -1,3 +1,8 @@
+2014-03-03  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* docs/Makefile.in:  Do not include generated file pdffigures.tex
+	in the distribution package.
+
 2014-02-26  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/qtterminal/qt_term.cpp(qt_connectToServer qt_waitforinput):
