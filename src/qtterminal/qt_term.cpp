@@ -424,11 +424,13 @@ void qt_sendFont()
 		qt->out << GEFontMetricRequest;
 		qt_flushOutBuffer();
 		bool receivedFontProps = false;
+		int waitcount = 0;
 		while (!receivedFontProps)
 		{
 			qt->socket.waitForReadyRead(1000);
 			if (qt->socket.bytesAvailable() < (int)sizeof(gp_event_t)) {
-				qDebug() << "Error: short read from gnuplot_qt socket while expecting font metrics";
+				fprintf(stderr, (waitcount++ % 10 > 0) ? "  ."
+					: "\nWarning: slow font initialization");
 #ifdef Q_OS_MAC
 				// OSX can be slow (>30 seconds?!) in determining font metrics
 				// Give it more time rather than failing after 1 second 
@@ -452,6 +454,8 @@ void qt_sendFont()
 				}
 			}
 		}
+		if (waitcount > 0)
+			fprintf(stderr,"\n");
 	}
 
 	term->v_char = qt_oversampling*metric.first;

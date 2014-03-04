@@ -4,6 +4,9 @@
 
 	* term/pdf.trm:  Fix crash on point size = 0.
 
+	* src/qtterminal/qt_term.cpp:  More friendly warning if fonts are
+	slow to initialize. May only be relevant to OSX + Qt5.
+
 2014-03-04  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/fit.c (regress) src/fit.h:  Facilitate the inclusion of
