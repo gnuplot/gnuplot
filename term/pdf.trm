@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: pdf.trm,v 1.90 2012/11/25 22:01:22 sfeam Exp $
+ * $Id: pdf.trm,v 1.91 2013/10/07 21:43:48 sfeam Exp $
  */
 
 /*------------------------------
@@ -740,7 +740,7 @@ PDF_point (unsigned int x, unsigned int y, int number)
     PDF_PathClose ();
     PDF_save(myPDF);
 
-    if (number < 0) {
+    if (number < 0 || term_pointsize <= 0) {
 	/* Treat all negative point sizes as  dots */
 	PDF_dot(x, y);
     } else {
