@@ -9,6 +9,13 @@
 
 	* src/datafile.c: Allow pseudofile '+' for polar plots.
 
+	* src/scanner.c (get_num): The scanner has trouble reading hexadecimal
+	constants with the top bit set since strtol treats this as an overflow.
+	Use strtoll instead and mask the result back to 32 bits.
+	Bug #1344
+
+	* src/stdfn.h:  Provide MSVC alias for strtoll.
+
 2014-03-04  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/fit.c (regress) src/fit.h:  Facilitate the inclusion of

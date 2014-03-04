@@ -1,5 +1,5 @@
 /*
- * $Id: stdfn.h,v 1.43 2013/10/25 04:45:22 sfeam Exp $
+ * $Id: stdfn.h,v 1.44 2013/12/22 20:47:25 sfeam Exp $
  */
 
 /* GNUPLOT - stdfn.h */
@@ -346,6 +346,10 @@ size_t strnlen __PROTO((const char *str, size_t n));
 
 #ifdef WIN32
 # include <windows.h>
+#endif
+
+#if defined(_MSC_VER)
+#define strtoll _strtoi64
 #endif
 
 /* sleep delay time, where delay is a double value */
