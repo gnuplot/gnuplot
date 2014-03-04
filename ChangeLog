@@ -9,7 +9,7 @@
 
 	* src/datafile.c: Allow pseudofile '+' for polar plots.
 
-	* src/scanner.c (get_num): The scanner has trouble reading hexadecimal
+	* src/scanner.c (get_num): The parser has trouble reading hexadecimal
 	constants with the top bit set since strtol treats this as an overflow.
 	Use strtoll instead and mask the result back to 32 bits.
 	Bug #1344

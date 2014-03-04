@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: scanner.c,v 1.38 2013/12/28 21:53:58 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: scanner.c,v 1.39 2014/03/06 07:34:48 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - scanner.c */
@@ -317,11 +317,12 @@ get_num(char str[])
 	errno = 0;
 	lval = strtoll(str, &endptr, 0);
 	if (!errno) {
+	    count = endptr - str;
 	    if ((token[t_num].l_val.v.int_val = lval) == lval)
-		return(endptr-str);
+		return(count);
 	    if (str[0] == '0' && (str[1] == 'x' || str[1] == 'X')) {
 		if ((unsigned long)(token[t_num].l_val.v.int_val & 0xffffffff) == lval)
-		    return(endptr-str);
+		    return(count);
 	    }
 	}
 	int_warn(t_num, "integer overflow; changing to floating point");

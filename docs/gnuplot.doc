@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.855 2014/02/28 00:24:19 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.856 2014/03/04 19:35:00 markisch Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -13330,6 +13330,7 @@ Ffigure_missing
  surface mesh.  You can select among the meshes inside a file by the `index`
  option to the `splot` command, as usual. 
 =nonuniform
+?nonuniform
  The second interpretation assumes a non-uniform grid with explicit x and y
  coordinates. The first row of input data contains the y coordinates; 
  the first column of input data contains the x coordinates.  For binary input
