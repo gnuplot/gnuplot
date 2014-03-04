@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.272 2014/02/01 06:42:16 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.273 2014/02/28 19:23:52 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -5033,13 +5033,11 @@ df_generate_pseudodata()
 	if (df_pseudorecord >= samples_1)
 	    return NULL;
 	if (df_pseudorecord == 0) {
-	    if (polar)
-		int_error(NO_CARET,"Pseudodata not implemented for polar graphs");
 	    if ((axis_array[SAMPLE_AXIS].range_flags & RANGE_SAMPLED)) {
 		t_min = axis_array[SAMPLE_AXIS].min;
 		t_max = axis_array[SAMPLE_AXIS].max;
 		/* FIXME:  Do we need to hangle log-scaled SAMPLE_AXIS? */
-	    } else if (parametric) {
+	    } else if (parametric || polar) {
 		t_min = axis_array[T_AXIS].min;
 		t_max = axis_array[T_AXIS].max;
 	    } else {

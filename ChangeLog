@@ -7,6 +7,8 @@
 	* src/qtterminal/qt_term.cpp:  More friendly warning if fonts are
 	slow to initialize. May only be relevant to OSX + Qt5.
 
+	* src/datafile.c: Allow pseudofile '+' for polar plots.
+
 2014-03-04  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/fit.c (regress) src/fit.h:  Facilitate the inclusion of
