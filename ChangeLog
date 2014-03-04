@@ -1,5 +1,8 @@
 2014-03-04  Bastian Maerkisch  <bmaerkisch@web.de>
 
+	* docs/gnuplot.doc (stats):  Document variables which hold the
+	errors of linear regression analysis.
+
 	* src/fit.c:  Dead code removal.
 
 2014-03-03  Ethan A Merritt  <merritt@u.washington.edu>

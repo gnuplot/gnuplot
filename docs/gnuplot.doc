@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.854 2014/02/27 07:57:50 markisch Exp $
+C RCS $Id: gnuplot.doc,v 1.855 2014/02/28 00:24:19 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -13533,7 +13533,9 @@ Ffigure_missing
  The third set of variables is only relevant to analysis of two data columns.
       STATS_correlation       # correlation coefficient between x and y values
       STATS_slope             # A corresponding to a linear fit y = Ax + B
+      STATS_slope_err         # uncertainty of A
       STATS_intercept         # B corresponding to a linear fit y = Ax + B
+      STATS_intercept_err     # uncertainty of B
       STATS_sumxy             # sum of x*y
       STATS_pos_min_y         # x coordinate of a point with minimum y value
       STATS_pos_max_y         # x coordinate of a point with maximum y value
