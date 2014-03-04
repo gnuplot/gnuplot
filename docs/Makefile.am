@@ -203,7 +203,7 @@ gnuplot.pdf: gnuplot.tex
 ### LaTeX documentation
 tex: gnuplot.tex
 
-gnuplot.tex: doc2tex$(EXEEXT) $(srcdir)/gnuplot.doc
+gnuplot.tex: allterm.h doc2tex$(EXEEXT) $(srcdir)/gnuplot.doc
 	./doc2tex$(EXEEXT) $(srcdir)/gnuplot.doc gnuplot.tex
 
 doc2tex_SOURCES = doc2tex.c termdoc.c
