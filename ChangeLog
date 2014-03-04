@@ -1,5 +1,11 @@
 2014-03-04  Bastian Maerkisch  <bmaerkisch@web.de>
 
+	* src/fit.c (regress) src/fit.h:  Facilitate the inclusion of
+	alternative minimization algorithms: Move code from regress()
+	to new functions regress_init(), regress_finalize(),
+	regress_check_stop(), and fit_progress(). Rename show_fit1() to
+	show_fit_brief().
+
 	* docs/gnuplot.doc (stats):  Document variables which hold the
 	errors of linear regression analysis.
 

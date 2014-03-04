@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: fit.c,v 1.129 2014/03/03 04:09:30 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: fit.c,v 1.130 2014/03/04 07:20:53 markisch Exp $"); }
 #endif
 
 /*  NOTICE: Change of Copyright Status
@@ -88,6 +88,9 @@ static char *RCSid() { return RCSid("$Id: fit.c,v 1.129 2014/03/03 04:09:30 sfea
  * Alexander Taeschner, Feb 2014: Optionally take errors of independent
  * variables into account.
  *
+ * Bastian Maerkisch, Feb 2014: Split regress() into several functions
+ * in order to facilitate the inclusion of alternative fitting codes.
+ *
  */
 
 #include "fit.h"
@@ -123,11 +126,9 @@ static void Dblfn __PROTO(());
 # include <io.h>
 # include <conio.h>
 # include <dos.h>
-#else /* !(MSDOS) */
-# ifndef VMS
+#elif !defined(VMS)
 #  include <fcntl.h>
-# endif				/* !VMS */
-#endif /* !(MSDOS) */
+#endif
 #ifdef WIN32
 # include "win/winmain.h"
 #endif
@@ -176,8 +177,6 @@ enum marq_res {
 };
 typedef enum marq_res marq_res_t;
 
-typedef char fixstr[MAX_ID_LEN+1];
-
 
 /* externally visible variables: */
 
@@ -202,7 +201,7 @@ char fitbuf[256]; /* for Eex and error_ex */
 
 static double epsilon = DEF_FIT_LIMIT;	/* relative convergence limit */
 double epsilon_abs = 0.0;               /* default to zero non-relative limit */
-static int maxiter = 0;
+int maxiter = 0;
 static double startup_lambda = 0;
 static double lambda_down_factor = LAMBDA_DOWN_FACTOR;
 static double lambda_up_factor = LAMBDA_UP_FACTOR;
@@ -210,6 +209,7 @@ static double lambda_up_factor = LAMBDA_UP_FACTOR;
 static const char fitlogfile_default[] = "fit.log";
 static const char GNUFITLOG[] = "FIT_LOG";
 static FILE *log_f = NULL;
+static TBOOLEAN fit_show_lambda = TRUE;
 static const char *GP_FIXED = "# FIXED";
 static const char *FITSCRIPT = "FIT_SCRIPT";
 static const char *DEFAULT_CMD = "replot";	/* if no fitscript spec. */
@@ -251,14 +251,15 @@ static marq_res_t marquardt __PROTO((double a[], double **alpha, double *chisq,
 static void analyze (double a[], double **alpha, double beta[],
 				 double *chisq, double **deriv);
 static void calculate __PROTO((double *zfunc, double **dzda, double a[]));
-static void calc_derivatives(double *par, double *data, double **deriv);
-static void call_gnuplot __PROTO((double *par, double *data));
+static void calc_derivatives(const double *par, double *data, double **deriv);
 static TBOOLEAN fit_interrupt __PROTO((void));
 static TBOOLEAN regress __PROTO((double a[]));
-static void show_fit __PROTO((int i, double chisq, double last_chisq, double *a,
-			      double lambda, FILE * device));
-static void show_fit1 __PROTO((int iter, double chisq, double last_chisq, double *parms,
-                            double lambda, FILE * device));
+void fit_progress(int i, double chisq, double last_chisq, double *a,
+                          double lambda, FILE * device);
+void fit_show(int i, double chisq, double last_chisq, double *a,
+                          double lambda, FILE * device);
+void fit_show_brief(int iter, double chisq, double last_chisq, double *parms,
+                          double lambda, FILE * device);
 static void show_results __PROTO((double chisq, double last_chisq, double* a, double* dpar, double** corel));
 static void log_axis_restriction __PROTO((FILE *log_f, int param,
 			    double min, double max, int autoscale, char *name));
@@ -487,7 +488,7 @@ marquardt(double a[], double **C, double *chisq, double *lambda)
 	if (fit_verbosity == VERBOSE)
 	    (void) putc('*', stderr);
 	else if (fit_verbosity == BRIEF)  /* one-line report even if chisq increases */
-	    show_fit1(-1, tmp_chisq, *chisq, temp_a, *lambda, STANDARD);
+	    fit_show_brief(-1, tmp_chisq, *chisq, temp_a, *lambda, STANDARD);
 
 	return WORSE;
     }
@@ -608,8 +609,8 @@ calculate(double *zfunc, double **dzda, double a[])
 /*****************************************************************
     call internal gnuplot functions
 *****************************************************************/
-static void
-call_gnuplot(double *par, double *data)
+void
+call_gnuplot(const double *par, double *data)
 {
     int i, j;
     struct value v;
@@ -659,8 +660,12 @@ call_gnuplot(double *par, double *data)
 }
 
 
+/*****************************************************************
+    calculate derivatives wrt the parameters
+*****************************************************************/
+/* Used to calculate the effective variance in effective_error() */
 static void
-calc_derivatives(double *par, double *data, double **deriv)
+calc_derivatives(const double *par, double *data, double **deriv)
 {
     int i, j, k, m;
     struct value v;
@@ -770,118 +775,52 @@ getfitscript(void)
 
 
 /*****************************************************************
-    frame routine for the marquardt-fit
+    initial setup for regress()
 *****************************************************************/
-static TBOOLEAN
-regress(double a[])
+static void
+regress_init(void)
 {
-    double **covar, *dpar, **C, chisq, last_chisq, lambda;
-    int iter, i, j;
-    marq_res_t res;
     struct udvt_entry *v;	/* For exporting results to the user */
-
-    chisq = last_chisq = INFINITY;
-    C = matr(num_data + num_params, num_params);
-    lambda = -1;		/* use sign as flag */
-    iter = 0;			/* iteration counter  */
-
-    /* ctrlc now serves as Hotkey */
-    ctrlc_setup();
-
-    /* Initialize internal variables and 1st chi-square check */
-    if ((res = marquardt(a, C, &chisq, &lambda)) == ML_ERROR)
-	Eex("FIT: error occurred during fit");
-    res = BETTER;
-
-    if (fit_verbosity == VERBOSE) {
-	show_fit(iter, chisq, chisq, a, lambda, STANDARD);
-	show_fit(iter, chisq, chisq, a, lambda, log_f);
-    } else if (fit_verbosity == BRIEF) {
-	show_fit1(iter, chisq, chisq, a, lambda, STANDARD);
-	show_fit1(iter, chisq, chisq, a, lambda, log_f);
-    }
 
     /* Reset flag describing fit result status */
     v = add_udv_by_name("FIT_CONVERGED");
     v->udv_undef = FALSE;
     Ginteger(&v->udv_value, 0);
 
-    /* MAIN FIT LOOP: do the regression iteration */
+    /* Ctrl-C now serves as Hotkey */
+    ctrlc_setup();
 
     /* HBB 981118: initialize new variable 'user_break' */
     user_stop = FALSE;
+}
 
-    do {
-/*
- *  MSDOS defines signal(SIGINT) but doesn't handle it through
- *  real interrupts. So there remain cases in which a ctrl-c may
- *  be uncaught by signal. We must use kbhit() instead that really
- *  serves the keyboard interrupt (or write an own interrupt func
- *  which also generates #ifdefs)
- *
- *  I hope that other OSes do it better, if not... add #ifdefs :-(
- *  EMX does not have kbhit.
- *
- *  HBB: I think this can be enabled for DJGPP V2. SIGINT is actually
- *  handled there, AFAIK.
- */
-#if (defined(MSDOS) && !defined(__EMX__))
-	if (kbhit()) {
-	    do {
-		getchx();
-	    } while (kbhit());
-	    ctrlc_flag = TRUE;
-	}
-#endif
-#ifdef WIN32
-	/* This call makes the Windows GUI functional during fits.
-	   Pressing Ctrl-Break now finally has an effect. */
-	WinMessageLoop();
-#endif
 
-	if (ctrlc_flag) {
-	    /* Always report on current status. */
-	    if (fit_verbosity == VERBOSE)
-		show_fit(iter, chisq, last_chisq, a, lambda, STANDARD);
-	    else
-		show_fit1(iter, chisq, last_chisq, a, lambda, STANDARD);
-
-	    ctrlc_flag = FALSE;
-	    if (!fit_interrupt())	/* handle keys */
-		break;
-	}
-	if (res == BETTER) {
-	    iter++;
-	    last_chisq = chisq;
-	}
-	if ((res = marquardt(a, C, &chisq, &lambda)) == BETTER) {
-	    if (fit_verbosity == VERBOSE)
-		show_fit(iter, chisq, last_chisq, a, lambda, STANDARD);
-	    else if (fit_verbosity == BRIEF)
-		show_fit1(iter, chisq, last_chisq, a, lambda, STANDARD);
-	}
-    } while ((res != ML_ERROR)
-	     && (lambda < MAX_LAMBDA)
-	     && ((maxiter == 0) || (iter <= maxiter))
-	     && (res == WORSE ||
-	    /* tsm patchset 230: change to new convergence criterion */
-	         ((last_chisq - chisq) > (epsilon * chisq + epsilon_abs)))
-	);
-
-    /* fit done */
-
-    /* tsm patchset 230: final progress report labels to console */
-    if (fit_verbosity == BRIEF)
-	show_fit1(-2, chisq, chisq, a, lambda, STANDARD);
-
-    /* tsm patchset 230: final progress report to log file */
-    if (fit_verbosity == VERBOSE)
-	show_fit(iter, chisq, last_chisq, a, lambda, log_f);
-    else
-	show_fit1(iter, chisq, last_chisq, a, lambda, log_f);
+/*****************************************************************
+    finalize regression: print results and set user variables
+*****************************************************************/
+static void
+regress_finalize(int iter, double chisq, double last_chisq, double lambda, double **covar)
+{
+    int i, j;
+    struct udvt_entry *v;	/* For exporting results to the user */
+    int ndf;
+    double stdfit;
+    double pvalue;
+    double *dpar;
+    double **corel = NULL;
 
     /* restore original SIGINT function */
     interrupt_setup();
+
+    /* tsm patchset 230: final progress report labels to console */
+    if (fit_verbosity == BRIEF)
+	fit_show_brief(-2, chisq, chisq, a, lambda, STANDARD);
+
+    /* tsm patchset 230: final progress report to log file */
+    if (fit_verbosity == VERBOSE)
+	fit_show(iter, chisq, last_chisq, a, lambda, log_f);
+    else
+	fit_show_brief(iter, chisq, last_chisq, a, lambda, log_f);
 
     /* HBB 970304: the maxiter patch: */
     if ((maxiter > 0) && (iter > maxiter)) {
@@ -897,32 +836,28 @@ regress(double a[])
 	Ginteger(&v->udv_value, 1);
     }
 
-    if (res == ML_ERROR)
-	Eex("FIT: error occurred during fit");
-
     /* fit results */
-    {
-	int ndf          = num_data - num_params;
-	double stdfit    = sqrt(chisq/ndf);
-	double pvalue    = 1. - chisq_cdf(ndf, chisq);
+    ndf    = num_data - num_params;
+    stdfit = sqrt(chisq / ndf);
+    pvalue = 1. - chisq_cdf(ndf, chisq);
 
-	/* Export these to user-accessible variables */
-	v = add_udv_by_name("FIT_NDF");
-	v->udv_undef = FALSE;
-	Ginteger(&v->udv_value, ndf);
-	v = add_udv_by_name("FIT_STDFIT");
-	v->udv_undef = FALSE;
-	Gcomplex(&v->udv_value, stdfit, 0);
-	v = add_udv_by_name("FIT_WSSR");
-	v->udv_undef = FALSE;
-	Gcomplex(&v->udv_value, chisq, 0);
-	v = add_udv_by_name("FIT_P");
-	v->udv_undef = FALSE;
-	Gcomplex(&v->udv_value, pvalue, 0);
-    }
+    /* Export these to user-accessible variables */
+    v = add_udv_by_name("FIT_NDF");
+    v->udv_undef = FALSE;
+    Ginteger(&v->udv_value, ndf);
+    v = add_udv_by_name("FIT_STDFIT");
+    v->udv_undef = FALSE;
+    Gcomplex(&v->udv_value, stdfit, 0);
+    v = add_udv_by_name("FIT_WSSR");
+    v->udv_undef = FALSE;
+    Gcomplex(&v->udv_value, chisq, 0);
+    v = add_udv_by_name("FIT_P");
+    v->udv_undef = FALSE;
+    Gcomplex(&v->udv_value, pvalue, 0);
 
-    /* Save final parameters. This is necessary since they might have
-       been changed in calculate() to obtain derivatives. */
+    /* Save final parameters. Depending on the backend and
+       its internal state, the last call_gnuplot may not have been
+       at the minimum */
     for (i = 0; i < num_params; i++)
 	setvar(par_name[i], a[i] * scale_params[i]);
 
@@ -933,30 +868,27 @@ regress(double a[])
 	for (i = 0; i < num_params; i++)
 	    setvarerr(par_name[i], 0.0);
 
-    /* get covariance-, Correlations- and Kurvature-Matrix */
-    /* and errors in the parameters                     */
-
-    /* compute covar[][] directly from C */
-    Givens(C, 0, 0, num_data, num_params);
-
-    /* Use lower square of C for covar */
-    covar = C + num_data;
-    Invert_RtR(C, covar, num_params);
-
     /* calculate unscaled parameter errors in dpar[]: */
     dpar = vec(num_params);
-    for (i = 0; i < num_params; i++) {
-	/* FIXME: can this still happen ? */
-	if (covar[i][i] <= 0.0)	/* HBB: prevent floating point exception later on */
-	    Eex("Calculation error: non-positive diagonal element in covar. matrix");
-	dpar[i] = sqrt(covar[i][i]);
-    }
-
-    /* transform covariances into correlations */
-    for (i = 0; i < num_params; i++) {
-	/* only lower triangle needs to be handled */
-	for (j = 0; j <= i; j++)
-	    covar[i][j] /= dpar[i] * dpar[j];
+    if (covar != NULL) {
+	/* calculate unscaled parameter errors in dpar[]: */
+	for (i = 0; i < num_params; i++) {
+	    /* FIXME: can this still happen ? */
+	    if (covar[i][i] <= 0.0)	/* HBB: prevent floating point exception later on */
+		Eex("Calculation error: non-positive diagonal element in covar. matrix");
+	    dpar[i] = sqrt(covar[i][i]);
+	}
+	/* transform covariances into correlations */
+	corel = matr(num_params, num_params);
+	for (i = 0; i < num_params; i++) {
+	    /* only lower triangle needs to be handled */
+	    for (j = 0; j < i; j++)
+		corel[i][j] = covar[i][j] / (dpar[i] * dpar[j]);
+	    corel[i][i] = 1.;
+        }
+    } else {
+	for (i = 0; i < num_params; i++)
+	    dpar[i] = 0.0;
     }
 
     if (fit_errorscaling || (num_errors == 0)) {
@@ -974,13 +906,127 @@ regress(double a[])
 
     /* Report final results for VERBOSE, BRIEF, and RESULTS verbosity levels. */
     if (fit_verbosity != QUIET)
-	show_results(chisq, last_chisq, a, dpar, covar);
+	show_results(chisq, last_chisq, a, dpar, corel);
 
     free(dpar);
+    free_matr(corel);
+}
+
+
+/*****************************************************************
+    test for user request to stop the fit
+*****************************************************************/
+TBOOLEAN
+regress_check_stop(int iter, double chisq, double last_chisq, double lambda)
+{
+/*
+ *  MSDOS defines signal(SIGINT) but doesn't handle it through
+ *  real interrupts. So there remain cases in which a ctrl-c may
+ *  be uncaught by signal. We must use kbhit() instead that really
+ *  serves the keyboard interrupt (or write an own interrupt func
+ *  which also generates #ifdefs)
+ *
+ *  I hope that other OSes do it better, if not... add #ifdefs :-(
+ *  EMX does not have kbhit.
+ *
+ *  HBB: I think this can be enabled for DJGPP V2. SIGINT is actually
+ *  handled there, AFAIK.
+ */
+#if (defined(MSDOS) && !defined(__EMX__))
+    if (kbhit()) {
+	do {
+	    getchx();
+	} while (kbhit());
+	ctrlc_flag = TRUE;
+    }
+#endif
+#ifdef WIN32
+    /* This call makes the Windows GUI functional during fits.
+       Pressing Ctrl-Break now finally has an effect. */
+    WinMessageLoop();
+#endif
+
+    if (ctrlc_flag) {
+	/* Always report on current status. */
+	if (fit_verbosity == VERBOSE)
+	    fit_show(iter, chisq, last_chisq, a, lambda, STANDARD);
+	else
+	    fit_show_brief(iter, chisq, last_chisq, a, lambda, STANDARD);
+
+	ctrlc_flag = FALSE;
+	if (!fit_interrupt())	/* handle keys */
+	    return FALSE;
+    }
+    return TRUE;
+}
+
+
+/*****************************************************************
+    frame routine for the marquardt-fit
+*****************************************************************/
+static TBOOLEAN
+regress(double a[])
+{
+    double **covar, **C, chisq, last_chisq, lambda;
+    int iter;
+    marq_res_t res;
+
+    chisq = last_chisq = INFINITY;
+    C = matr(num_data + num_params, num_params);
+    lambda = -1;		/* use sign as flag */
+    iter = 0;			/* iteration counter  */
+
+    /* Initialize internal variables and 1st chi-square check */
+    if ((res = marquardt(a, C, &chisq, &lambda)) == ML_ERROR)
+	Eex("FIT: error occurred during fit");
+    res = BETTER;
+
+    fit_show_lambda = TRUE;
+    fit_progress(iter, chisq, chisq, a, lambda, STANDARD);
+    fit_progress(iter, chisq, chisq, a, lambda, log_f);
+
+    regress_init();
+
+    /* MAIN FIT LOOP: do the regression iteration */
+
+    do {
+	if (!regress_check_stop(iter, chisq, last_chisq, lambda))
+	    break;
+	if (res == BETTER) {
+	    iter++;
+	    last_chisq = chisq;
+	}
+	if ((res = marquardt(a, C, &chisq, &lambda)) == BETTER)
+	    fit_progress(iter, chisq, last_chisq, a, lambda, STANDARD);
+    } while ((res != ML_ERROR)
+	     && (lambda < MAX_LAMBDA)
+	     && ((maxiter == 0) || (iter <= maxiter))
+	     && (res == WORSE ||
+	    /* tsm patchset 230: change to new convergence criterion */
+	         ((last_chisq - chisq) > (epsilon * chisq + epsilon_abs))));
+
+    /* fit done */
+
+    if (res == ML_ERROR)
+	Eex("FIT: error occurred during fit");
+
+    /* compute errors in the parameters */
+
+    /* get covariance-, correlation- and curvature-matrix */
+    /* and errors in the parameters                     */
+
+    /* compute covar[][] directly from C */
+    Givens(C, 0, 0, num_data, num_params);
+
+    /* Use lower square of C for covar */
+    covar = C + num_data;
+    Invert_RtR(C, covar, num_params);
+
+    regress_finalize(iter, chisq, last_chisq, lambda, covar);
 
     /* call destructor for allocated vars */
     lambda = -2;		/* flag value, meaning 'destruct!' */
-    (void) marquardt(a, C, &chisq, &lambda);
+    marquardt(a, C, &chisq, &lambda);
 
     free_matr(C);
     return TRUE;
@@ -1051,7 +1097,7 @@ show_results(double chisq, double last_chisq, double* a, double* dpar, double** 
 	}
 
 	/* Print correlation matrix only if there is more than one parameter. */
-	if (num_params > 1) {
+	if ((num_params > 1) && (corel != NULL)) {
 	    Dblf("\ncorrelation matrix of the fit parameters:\n");
 
 	    Dblf("                ");
@@ -1075,18 +1121,32 @@ show_results(double chisq, double last_chisq, double* a, double* dpar, double** 
 /*****************************************************************
     display actual state of the fit
 *****************************************************************/
-static void
-show_fit(int i, double chisq, double last_chisq, double* a, double lambda, FILE *device)
+void
+fit_progress(int i, double chisq, double last_chisq, double* a, double lambda, FILE *device)
+{
+    if (fit_verbosity == VERBOSE)
+	fit_show(i, chisq, last_chisq, a, lambda, device);
+    else if (fit_verbosity == BRIEF)
+	fit_show_brief(i, chisq, last_chisq, a, lambda, device);
+}
+
+
+void
+fit_show(int i, double chisq, double last_chisq, double* a, double lambda, FILE *device)
 {
     int k;
 
     fprintf(device, "\n\n\
  Iteration %d\n\
  WSSR        : %-15g   delta(WSSR)/WSSR   : %g\n\
- delta(WSSR) : %-15g   limit for stopping : %g\n\
- lambda	  : %g\n\n%s parameter values\n\n",
+ delta(WSSR) : %-15g   limit for stopping : %g\n",
 	    i, chisq, chisq > NEARLY_ZERO ? (chisq - last_chisq) / chisq : 0.0,
-	    chisq - last_chisq, epsilon, lambda,
+	    chisq - last_chisq, epsilon);
+    if (fit_show_lambda)
+	fprintf(device, "\
+ lambda	     : %g\n", lambda);
+	fprintf(device, "\n\
+%s parameter values\n\n",
 	    (i > 0 ? "resultant" : "initial set of free"));
     for (k = 0; k < num_params; k++)
 	fprintf(device, "%-15.15s = %g\n", par_name[k], a[k] * scale_params[k]);
@@ -1123,8 +1183,8 @@ pack_float(char *num)
 
 
 /* tsm patchset 230: new one-line version of progress report */
-static void
-show_fit1(int iter, double chisq, double last_chisq, double* parms, double lambda, FILE *device)
+void
+fit_show_brief(int iter, double chisq, double last_chisq, double* parms, double lambda, FILE *device)
 {
     int k, len;
     double delta, lim;
@@ -1134,8 +1194,11 @@ show_fit1(int iter, double chisq, double last_chisq, double* parms, double lambd
 
     /* on iteration 0 or -2, print labels */
     if (iter == 0 || iter == -2) {
-	strcpy(buf, "iter      chisq       delta/lim  lambda  ");
-	          /* 9999 1.1234567890e+00 -1.12e+00 1.00e+00 */
+	strcpy(buf, "iter      chisq       delta/lim ");
+	          /* 9999 1.1234567890e+00 -1.12e+00 */
+	if (fit_show_lambda)
+	    strcat(buf, " lambda  ");
+		      /* 1.00e+00 */
 	fputs(buf, device);
 	len = strlen(buf);
 	for (k = 0; k < num_params; k++) {
@@ -1162,7 +1225,9 @@ show_fit1(int iter, double chisq, double last_chisq, double* parms, double lambd
 	snprintf(buf, sizeof(buf), "%4i", iter);
     else /* -1 indicates that chisquare increased */
 	snprintf(buf, sizeof(buf), "%4c", '*');
-    snprintf(buf + 4, sizeof(buf) - 4, " %-17.10e %- 10.2e %-9.2e", chisq, delta / lim, lambda);
+    snprintf(buf + 4, sizeof(buf) - 4, " %-17.10e %- 10.2e", chisq, delta / lim);
+    if (fit_show_lambda)
+        snprintf(buf + strlen(buf), sizeof(buf) - strlen(buf), " %-9.2e", lambda);
     for (k = 0, p = buf + 4; (k < 3) && (p != NULL); k++) {
 	p++;
 	pack_float(p);
@@ -2239,9 +2304,9 @@ fit_command()
     if (num_params == 0)
 	int_warn(NO_CARET, "No fittable parameters!\n");
     else
-	(void) regress(a);	/* fit */
+	regress(a);	/* fit */
 
-    (void) fclose(log_f);
+    fclose(log_f);
 
     log_f = NULL;
     free(fit_x);

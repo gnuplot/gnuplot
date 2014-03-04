@@ -1,5 +1,5 @@
 /*
- * $Id: fit.h,v 1.24 2013/05/14 20:10:56 markisch Exp $
+ * $Id: fit.h,v 1.25 2014/01/04 02:55:05 markisch Exp $
  */
 
 /* GNUPLOT - fit.h */
@@ -40,6 +40,7 @@
 
 #include "syscfg.h"
 #include "stdfn.h"
+#include "gp_types.h"
 
 /* defaults */
 #define DEF_FIT_LIMIT 1e-5
@@ -58,6 +59,8 @@ typedef enum e_verbosity_level {
     QUIET, RESULTS, BRIEF, VERBOSE
 } verbosity_level;
 
+typedef char fixstr[MAX_ID_LEN+1];
+
 /* Exported Variables of fit.c */
 
 extern const char *FITLIMIT;
@@ -72,6 +75,7 @@ extern TBOOLEAN fit_errorscaling;
 extern TBOOLEAN fit_prescale;
 extern char *fit_script;
 extern double epsilon_abs;  /* absolute convergence criterion */
+extern int maxiter;
 extern int fit_wrap;
 
 extern char fitbuf[256]; /* for Eex and error_ex  */
@@ -85,5 +89,9 @@ void fit_command __PROTO((void));
 size_t wri_to_fil_last_fit_cmd __PROTO((FILE *fp));
 char *getfitlogfile __PROTO((void));
 char *getfitscript __PROTO((void));
+
+void call_gnuplot(const double *par, double *data);
+TBOOLEAN regress_check_stop(int iter, double chisq, double last_chisq, double lambda);
+void fit_progress(int i, double chisq, double last_chisq, double* a, double lambda, FILE *device);
 
 #endif /* GNUPLOT_FIT_H */
