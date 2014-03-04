@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: fit.c,v 1.128 2014/02/28 10:44:29 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: fit.c,v 1.129 2014/03/03 04:09:30 sfeam Exp $"); }
 #endif
 
 /*  NOTICE: Change of Copyright Status
@@ -248,8 +248,8 @@ static RETSIGTYPE ctrlc_handle __PROTO((int an_int));
 static void ctrlc_setup __PROTO((void));
 static marq_res_t marquardt __PROTO((double a[], double **alpha, double *chisq,
 				     double *lambda));
-static TBOOLEAN analyze __PROTO((double a[], double **alpha, double beta[],
-				 double *chisq, double **deriv));
+static void analyze (double a[], double **alpha, double beta[],
+				 double *chisq, double **deriv);
 static void calculate __PROTO((double *zfunc, double **dzda, double a[]));
 static void calc_derivatives(double *par, double *data, double **deriv);
 static void call_gnuplot __PROTO((double *par, double *data));
@@ -397,8 +397,6 @@ marquardt(double a[], double **C, double *chisq, double *lambda)
     /* Initialization when lambda == -1 */
 
     if (*lambda == -1) {	/* Get first chi-square check */
-	TBOOLEAN analyze_ret;
-
 	temp_a = vec(num_params);
 	d = vec(num_data + num_params);
 	tmp_d = vec(num_data + num_params);
@@ -409,7 +407,7 @@ marquardt(double a[], double **C, double *chisq, double *lambda)
 	if (num_errors > 1)
 	    deriv = matr(num_errors - 1, num_data);
 
-	analyze_ret = analyze(a, C, d, chisq, deriv);
+	analyze(a, C, d, chisq, deriv);
 
 	/* Calculate a useful startup value for lambda, as given by Schwarz */
 	if (startup_lambda != 0)
@@ -427,7 +425,7 @@ marquardt(double a[], double **C, double *chisq, double *lambda)
 	for (i = 0; i < num_params; i++)
 	    for (j = 0; j < i; j++)
 		C[num_data + i][j] = 0, C[num_data + j][i] = 0;
-	return analyze_ret ? OK : ML_ERROR;
+	return OK;
     }
     /* once converged, free dynamic allocated vars */
 
@@ -463,10 +461,7 @@ marquardt(double a[], double **C, double *chisq, double *lambda)
     for (j = 0; j < num_params; j++)
 	temp_a[j] = a[j] + da[j];
 
-    if (!analyze(temp_a, tmp_C, tmp_d, &tmp_chisq, deriv)) {
-	/* will never be reached: always returns TRUE */
-	return ML_ERROR;
-    }
+    analyze(temp_a, tmp_C, tmp_d, &tmp_chisq, deriv);
 
     /* tsm patchset 230: Changed < to <= in next line */
     /* so finding exact minimum stops iteration instead of just increasing lambda. */
@@ -534,7 +529,7 @@ effective_error(double **deriv, int i)
 /* Used by marquardt to evaluate the linearized fitting matrix C and
  * vector d. Fills in only the top part of C and d. I don't use a
  * temporary array zfunc[] any more. Just use d[] instead.  */
-static TBOOLEAN
+static void
 analyze(double a[], double **C, double d[], double *chisq, double ** deriv)
 {
     int i, j;
@@ -554,9 +549,6 @@ analyze(double a[], double **C, double d[], double *chisq, double ** deriv)
 	    C[i][j] /= err;
     }
     *chisq = sumsq_vec(num_data, d);
-
-    /* FIXME: why return a value that is always TRUE ? */
-    return TRUE;
 }
 
 
