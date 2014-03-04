@@ -11,6 +11,9 @@ config.h
 *.obj
 *.pobj
 *.res
+moc_*.cpp
+qrc_*.cpp
+ui_*.h
 gdwin32
 lua
 share
