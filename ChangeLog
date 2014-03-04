@@ -1,3 +1,9 @@
+2014-03-04  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* configure.in:  More compact summary of terminal configuration.
+
+	* term/pdf.trm:  Fix crash on point size = 0.
+
 2014-03-04  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/fit.c (regress) src/fit.h:  Facilitate the inclusion of
