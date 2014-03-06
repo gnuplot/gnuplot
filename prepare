@@ -1,5 +1,5 @@
 #! /bin/sh --
-# $Id: prepare,v 1.12 2012/04/04 20:33:42 sfeam Exp $
+# $Id: prepare,v 1.13 2012/10/04 19:53:28 sfeam Exp $
 # Small shell script to prepare the gnuplot sources when
 # checked out from CVS.
 
@@ -14,13 +14,13 @@ AUTOCONF=${AUTOCONF:-autoconf}
 AUTOHEADER=${AUTOHEADER:-autoheader}
 AUTOMAKE=${AUTOMAKE:-automake}
 
-exelist="configure configure.vms depcomp install-sh missing mkinstalldirs config/djconfig.sh lisp/configure"
+exelist="configure configure.vms depcomp install-sh missing mkinstalldirs config/djconfig.sh"
 
 chmod 755 $exelist >/dev/null 2>&1
-chmod og-w docs/* lisp/* >/dev/null 2>&1
+chmod og-w docs/* >/dev/null 2>&1
 
 # Clean up
-rm -rf autom4te.cache lisp/autom4te.cache config.cache config.status
+rm -rf autom4te.cache config.cache config.status
 
 if ${ACLOCAL} -I m4 && ${AUTOHEADER} \
   && (cd config && make -f Makefile.am.in Makefile.am ) \
