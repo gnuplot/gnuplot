@@ -9,6 +9,9 @@
 	wanting to install gnuplot-mode.  README.emacs documents the
 	removal and provides a pointer to the project's own repository.
 
+	* docs/Makefile.am: Include figures in the pdf manual by default.
+	If you really don't want figures, say `make nofigures pdf`.
+
 2014-03-04  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* configure.in:  More compact summary of terminal configuration.

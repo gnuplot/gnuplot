@@ -10,10 +10,9 @@
 #       make gnuplot.dvi
 #     or
 #       make pdf
-#	(requires pdflatex)
+#	(requires pdflatex and also graphicx and picins packages) 
 #     or
-#	make pdffigures
-#	(requires also graphicx and picins packages) 
+#	make nofigures pdf
 #     or
 #       make ps
 #
@@ -85,7 +84,7 @@ doc2gih gnuplot.gih doc2hlp gnuplot.hlp gnuplot.idx gnuplot.ilg		\
 gnuplot.ind gnuplot.info* gnuplot.out doc2ipf gnuplot.ipf doc2ms	\
 gnuplot.ms doc2rnh gnuplot.rnh doc2rtf gnuplot.rtf gnuplot.nroff	\
 checkdoc gnuplot.txt gnuplot.tmp VERSION gnuplot.4tc gnuplot.4ct	\
-gnuplot.idv gnuplot.xref gnuplot.lg pdffigures.*			\
+gnuplot.idv gnuplot.xref gnuplot.lg figures pdffigures.*		\
 wxhelp/*.html wxhelp/wgnuplot.htc windows/wgnuplot.htk gnuplot.pdf	\
 gnuplot.htb gnuplot.texi gnuplot-eldoc.el $(ELCS)
 
@@ -102,7 +101,7 @@ allterm.h: $(CORETERM)
 	done >$@
 
 # for debugging
-alldoc: check dvi gih hlp html info ipf ms nroff pdffigures ps rnh rtf htb
+alldoc: check dvi gih hlp html info ipf ms nroff pdf ps rnh rtf htb
 
 ### [tn]roff documentation
 troff: gnuplot.ms titlepag.ms
@@ -170,22 +169,31 @@ htmldocs/gnuplot.html: gnuplot.tex
 
 ### PDF documentation
 pdffigures: pdffigures.tex $(top_srcdir)/src/gnuplot $(top_srcdir)/docs/plotstyles.gnu
+	rm -f figures
 
-pdffigures.tex:	figures gnuplot.pdf
-	rm -f gnuplot.tex
-	echo "" > pdffigures.tex
+pdffigures.tex:	figures
+	echo "\usepackage{graphicx}" > pdffigures.tex ; \
+	echo "\usepackage{picins}" >> pdffigures.tex
 
 figures: allterm.h doc2tex$(EXEEXT) $(srcdir)/gnuplot.doc
 	@if [ -a $(top_srcdir)/src/gnuplot ] ; then \
 	  GNUPLOT_LIB=$(top_srcdir)/demo ../src/gnuplot $(srcdir)/plotstyles.gnu ; \
 	  ./doc2tex$(EXEEXT) -figures $(srcdir)/gnuplot.doc gnuplot.tex ; \
-	  echo "\usepackage{graphicx}" > pdffigures.tex ; \
-	  echo "\usepackage{picins}" >> pdffigures.tex ; \
 	else \
 	  echo gnuplot executable not found - cannot regenerate manual figures ; \
 	fi
 
-pdf: gnuplot.pdf
+nofigures:
+	echo "" > pdffigures.tex
+	touch figures
+	@if [ -a $(top_srcdir)/src/gnuplot ] ; then \
+	  GNUPLOT_LIB=$(top_srcdir)/demo ../src/gnuplot $(srcdir)/plotstyles.gnu ; \
+	  ./doc2tex$(EXEEXT) $(srcdir)/gnuplot.doc gnuplot.tex ; \
+	else \
+	  echo gnuplot executable not found - cannot regenerate manual figures ; \
+	fi
+
+pdf: pdffigures.tex gnuplot.pdf
 
 gnuplot.pdf: gnuplot.tex
 	@if test $(PDFLATEX) != no ; then \
