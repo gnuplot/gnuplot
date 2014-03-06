@@ -33,7 +33,7 @@ my-distcheck:
 	mkdir $(t)
 	GZIP=$(GZIP) $(TAR) -C $(t) -zxf $(distdir).tar.gz
 	cd $(t)/$(distdir) \
-	  && ./configure --with-gd=no --with-png=no --with-lisp-files --with-tutorial \
+	  && ./configure --with-gd=no --with-qt=no --with-tutorial \
 	  && $(MAKE) CFLAGS='-Wformat -Werror' \
 	  && $(MAKE) dvi \
 	  && $(MAKE) check \

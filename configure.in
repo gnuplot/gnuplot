@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot on Unix.
 dnl
-dnl $Id: configure.in,v 1.355 2014/03/03 23:48:09 sfeam Exp $
+dnl $Id: configure.in,v 1.356 2014/03/04 21:23:52 sfeam Exp $
 dnl
 dnl this is actually major.minor ...
 dnl note that for a non-beta release, we need to disable DEVELOPMENT_RELEASE
@@ -90,9 +90,7 @@ AC_SEARCH_LIBS([cdawson], [cerf],
 )
 
 dnl Various programs
-dnl X/Emacs for building lisp packages and creating .texi version of docs
-# If set to t, that means we are running in a shell under Emacs.
-# If you have an Emacs named "t", then use the full path.
+dnl X/Emacs for building .texi version of docs
 test x"$EMACS" = xt && EMACS=
 AC_CHECK_PROGS(EMACS, emacs xemacs, no)
 
@@ -815,29 +813,6 @@ if test "$with_cwdrc" = yes; then
                [ Define if you want to read .gnuplot from current directory (SECURITY RISK!).])
 fi
 
-
-dnl Conditional actions based on whether or not we want to build the lisp files
-dnl This replaces a separate configure.in file in the lisp subdirectory
-if test "$EMACS" = no; then
-  LISPFILES=noelcs
-  INSTALL_LISP=install-nolisp
-else
-  LISPFILES=elcs
-  INSTALL_LISP=install-lisp
-fi
-AC_ARG_WITH(lisp-files,dnl
-[  --without-lisp-files    do not build emacs lisp files],
-  [if test "$with_lisp_files" = no; then
-     LISPFILES=noelcs
-     INSTALL_LISP=install-nolisp
-   fi])
-AM_PATH_LISPDIR
-AC_SUBST(lispdir)
-AC_SUBST(LISPFILES)
-AC_SUBST(INSTALL_LISP)
-
-
-
 dnl Sort help/subtopic tables by row or column
 AC_ARG_WITH(row-help,dnl
 [  --with-row-help         format help and subtopic tables by row (default)
@@ -1301,15 +1276,6 @@ if test -n "${DIST_CONTACT}"; then
   AC_DEFINE_UNQUOTED([DIST_CONTACT],["$DIST_CONTACT"],[Contact address for modified and binary distributed gnuplot versions])
 fi
 
-dnl build lisp files
-if test "$with_lisp_files" != no; then
-  LISPDIR=lisp
-else
-  LISPDIR=
-fi
-AC_SUBST(LISPDIR)
-AM_CONDITIONAL(BUILD_LISP, test "${with_lisp_files}" != no)
-
 dnl No configuration option for this one yet
 AC_DEFINE(MAX_PARALLEL_AXES,7, [Maximum number of parallel axes supported])
 
@@ -1331,7 +1297,6 @@ AC_OUTPUT([Makefile
            demo/Makefile
            demo/plugin/Makefile
            docs/Makefile
-	   lisp/Makefile
            m4/Makefile
            man/Makefile
            share/Makefile
@@ -1619,12 +1584,6 @@ fi
 AC_MSG_RESULT([])
 AC_MSG_RESULT([gnuplot will install the following additional materials:])
 AC_MSG_RESULT([])
-
-if test "$with_lisp_files" != no; then
-  AC_MSG_RESULT([  gnuplot-mode for X/Emacs: yes])
-else
-  AC_MSG_RESULT([  gnuplot-mode for X/Emacs: no])
-fi
 
 if test "$TUTORIAL" = tutorial; then
   AC_MSG_RESULT([  LaTeX tutorial: yes])

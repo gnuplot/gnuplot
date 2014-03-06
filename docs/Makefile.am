@@ -327,23 +327,6 @@ install-info: gnuplot.info
 	  install-info --info-dir=$(DESTDIR)$(infodir) $(DESTDIR)$(infodir)/gnuplot.info || :;\
 	else : ; fi
 
-install-data-hook: @INSTALL_LISP@
-
-install-lisp: install-eldoc
-
-install-nolisp:
-
-install-eldoc: $(ELCS)
-	$(top_srcdir)/mkinstalldirs $(DESTDIR)$(lispdir)
-	$(INSTALL_DATA) gnuplot-eldoc.el $(DESTDIR)$(lispdir)/gnuplot-eldoc.el
-	$(INSTALL_DATA) gnuplot-eldoc.elc $(DESTDIR)$(lispdir)/gnuplot-eldoc.elc
-
-uninstall-local:
-	@$(NORMAL_UNINSTALL)
-	@for p in gnuplot-eldoc.el gnuplot-eldoc.elc ; do \
-	  rm -f $(DESTDIR)$(lispdir)/$$p; \
-	done
-
 # this is how to make OS/2 ipfc documentation
 ipf: gnuplot.ipf
 

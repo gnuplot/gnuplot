@@ -1,3 +1,14 @@
+2014-03-06  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* Makefile.am Makefile.maint aclocal.m4 configure.in docs/Makefile.am
+	lisp/* README.emacs:
+
+	Bruce Ravel's gnuplot-mode package for emacs is now maintained 
+	elsewhere.  Remove the outdated copy (2002 era) from the gnuplot
+	repository, since it causes more confusion than help for people
+	wanting to install gnuplot-mode.  README.emacs documents the
+	removal and provides a pointer to the project's own repository.
+
 2014-03-04  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* configure.in:  More compact summary of terminal configuration.
