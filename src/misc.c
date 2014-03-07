@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.165 2014/01/15 00:35:35 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.166 2014/02/28 19:23:52 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -1236,14 +1236,17 @@ parse_color_name()
     if (almost_equals(c_token,"rgb$color") && almost_equals(c_token-1,"back$ground"))
 	c_token++;
     if ((string = try_to_get_string())) {
-	color = lookup_table_nth(pm3d_color_names_tbl, string);
-	if (color >= 0)
-	    color = pm3d_color_names_tbl[color].value;
-	else
-	    sscanf(string,"#%lx",&color);
+	int iret;
+	iret = lookup_table_nth(pm3d_color_names_tbl, string);
+	if (iret >= 0)
+	    color = pm3d_color_names_tbl[iret].value;
+	else if (string[0] == '#')
+	    iret = sscanf(string,"#%lx",&color);
+	else if (string[0] == '0' && (string[1] == 'x' || string[1] == 'X'))
+	    iret = sscanf(string,"%lx",&color);
 	free(string);
 	if (color == -2)
-	    int_error(c_token, "unrecognized color name and not a string \"#AARRGGBB\"");
+	    int_error(c_token, "unrecognized color name and not a string \"#AARRGGBB\" or \"0xAARRGGBB\"");
     } else {
 	color = int_expression();
     }

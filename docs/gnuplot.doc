@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.857 2014/03/06 17:08:08 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.858 2014/03/07 16:16:38 markisch Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -2267,8 +2267,10 @@ Ffigure_newsyntax
  where <colorspec> has one of the following forms:
 
        rgbcolor "colorname"    # e.g. "blue"
-       rgbcolor "#RRGGBB"      # string containing hexadecimal value
-       rgbcolor "#AARRGGBB"    # string containing hexadecimal value
+       rgbcolor "0xRRGGBB"     # string containing hexadecimal constant
+       rgbcolor "0xAARRGGBB"   # string containing hexadecimal constant
+       rgbcolor "#RRGGBB"      # string containing hexadecimal in x11 format
+       rgbcolor "#AARRGGBB"    # string containing hexadecimal in x11 format
        rgbcolor <integer val>  # integer value representing AARRGGBB
        rgbcolor variable       # integer value is read from input file
        palette frac <val>      # <val> runs from 0 to 1
@@ -2281,10 +2283,10 @@ Ffigure_newsyntax
  "colorname" refers to one of the color names built in to gnuplot. For a list
  of the available names, see `show colornames`.
 
- "#RRGGBB" is a hexadecimal constant preceded by the "#" symbol. The RRGGBB
- represents the red, green, and blue components of the color, each on a scale
- from 0 - 255.  For example, magenta = full-scale red + full-scale blue would
- be represented by #FF00FF, which is the hexadecimal representation of
+ Hexadecimal constants can be given in quotes as "#RRGGBB" or "0xRRGGBB", where
+ RRGGBB represents the red, green, and blue components of the color and must be
+ between 00 and FF.  For example, magenta = full-scale red + full-scale blue
+ could be represented by "0xFF00FF", which is the hexadecimal representation of
  (255 << 16) + (0 << 8) + (255).
 
  "#AARRGGBB" represents an RGB color with an alpha channel (transparency) 
@@ -9261,7 +9263,8 @@ Ffigure_missing
     `tc palette cb <val>` selects a color corresponding to <val> on the colorbar.
     `tc palette fraction <val>`, with 0<=val<=1, selects a color corresponding to
         the mapping [0:1] to grays/colors of the `palette`.
-    `tc rgb "#RRGGBB"` selects an arbitrary 24-bit RGB color.
+    `tc rgb "#RRGGBB"` or `tc rgb "0xRRGGBB"` sets an arbitrary 24-bit RGB color.
+    `tc rgb 0xRRGGBB`  As above; a hexadecimal constant does not require quotes.
 
  If a <pointstyle> is given, using keywords `lt`, `pt` and `ps`, see `style`,
  a point with the given style and color of the given line type is plotted at

@@ -10,6 +10,12 @@
 	"undefined".
 	Patch #656
 
+2014-03-07  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/misc.c (parse_color_name) src/set.c (set_palette_defined):
+	Accept quoted hexadecimal constant as a color name.
+	E.g.  plot $foo linecolor rgb "0xFFAABB"
+
 2014-03-06  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* Makefile.am Makefile.maint aclocal.m4 configure.in docs/Makefile.am

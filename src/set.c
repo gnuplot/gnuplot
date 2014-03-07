@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.428 2014/01/13 18:39:39 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.429 2014/01/13 21:47:07 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -2967,12 +2967,13 @@ set_palette_defined()
 	col_str = try_to_get_string();
 	if (col_str) {
 	    /* either color name or X-style rgb value "#rrggbb" */
-	    if (col_str[0] == '#') {
+	    if (col_str[0] == '#' || col_str[0] == '0') {
 		/* X-style specifier */
 		int rr,gg,bb;
-		if (sscanf( col_str, "#%2x%2x%2x", &rr, &gg, &bb ) != 3 )
+		if ((sscanf( col_str, "#%2x%2x%2x", &rr, &gg, &bb ) != 3 )
+		&&  (sscanf( col_str, "0x%2x%2x%2x", &rr, &gg, &bb ) != 3 ))
 		    int_error( c_token-1,
-			       "Unknown color specifier. Use '#rrggbb'." );
+			       "Unknown color specifier. Use '#RRGGBB' of '0xRRGGBB'." );
 		r = (double)(rr)/255.;
 		g = (double)(gg)/255.;
 		b = (double)(bb)/255.;
