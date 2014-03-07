@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.856 2014/03/04 19:35:00 markisch Exp $
+C RCS $Id: gnuplot.doc,v 1.857 2014/03/06 17:08:08 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -13528,8 +13528,15 @@ Ffigure_missing
       STATS_up_quartile       # value of the upper (3rd) quartile boundary
       STATS_mean              # mean value of in-range data points
       STATS_stddev            # standard deviation of the in-range data points
+      STATS_skewness          # skewness of in-range data points
+      STATS_kurtosis          # excess kurtosis of in-range data points
+      STATS_adev              # mean absolute deviation of the data points
       STATS_sum               # sum
       STATS_sumsq             # sum of squares
+      STATS_mean_err          # standard error of the mean value
+      STATS_stddev_err        # standard error of the standard deviation
+      STATS_skewness_err      # standard error of the skewness
+      STATS_kurtosis_err      # standard error of the excess kurtosis
 
  The third set of variables is only relevant to analysis of two data columns.
       STATS_correlation       # correlation coefficient between x and y values

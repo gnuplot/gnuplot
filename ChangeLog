@@ -1,3 +1,15 @@
+2014-03-07  Alexander Täschner  <taschna@users.sourceforge.net>
+
+	src/stats.c docs/gnuplot.doc:  Add the calculation of the skewness,
+	the kurtosis, and the standard errors of mean, stddev, skewness,
+	and kurtosis to the stats command. Change the calculation formula
+	for the variance to the "corrected two-pass algorithm" to avoid
+	round-off errors. Re-indent printed output to accommodate the
+	longer descriptions of the new values. In case values cannot be
+	calculated set corresponding user variables to NaN and print
+	"undefined".
+	Patch #656
+
 2014-03-06  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* Makefile.am Makefile.maint aclocal.m4 configure.in docs/Makefile.am
@@ -94,16 +106,16 @@
 
 	* src/makefile.all src/makefile.awc:  Recreate to include external.c.
 
+	* src/fit.dem:  fit always requires decent initial parameter values.
+	Never initialize them to zero.
+
+	* src/matrix.c (free_matr):  Accept NULL pointers.
+
 2014-02-28  Alexander Täschner  <taschna@users.sourceforge.net>
 
 	* src/fit.c demo/fit.dem:  Optionally take errors of independent
 	variables into account.
 	Patch #585
-
-	* src/fit.dem:  fit always requires decent initial parameter values.
-	Never initialize them to zero.
-
-	* src/matric.c (free_matr):  Accept NULL pointers.
 
 2014-02-27  Ethan A Merritt  <merritt@u.washington.edu>
 

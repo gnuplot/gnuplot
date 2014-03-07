@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: stats.c,v 1.10 2013/04/12 17:17:01 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: stats.c,v 1.11 2014/02/26 21:03:23 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - stats.c */
@@ -98,9 +98,17 @@ struct sgl_column_stats {
     int sy;
 
     double mean;
+    double adev;
     double stddev;
+    double skewness;
+    double kurtosis;
 
-    double sum;        /* sum x    */
+    double mean_err;
+    double stddev_err;
+    double skewness_err;
+    double kurtosis_err;
+
+    double sum;          /* sum x    */
     double sum_sq;       /* sum x**2 */
 
     struct pair min;
@@ -171,10 +179,16 @@ analyze_sgl_column( double *data, long n, long nr )
 
     long i;
 
-    double s = 0.0;
+    double s  = 0.0;
     double s2 = 0.0;
+    double ad = 0.0;
+    double d  = 0.0;
+    double d2 = 0.0;
+    double d3 = 0.0;
+    double d4 = 0.0;
     double cx = 0.0;
     double cy = 0.0;
+    double var;
 
     struct pair *tmp = (struct pair *)gp_alloc( n*sizeof(struct pair),
 					      "analyze_sgl_column" );
@@ -187,7 +201,7 @@ analyze_sgl_column( double *data, long n, long nr )
 	res.sy = n;
     }
 
-    /* Mean and Std Dev and centre of gravity */
+    /* Mean and centre of gravity */
     for( i=0; i<n; i++ ) {
 	s  += data[i];
 	s2 += data[i]*data[i];
@@ -197,10 +211,34 @@ analyze_sgl_column( double *data, long n, long nr )
 	}
     }
     res.mean = s/(double)n;
-    res.stddev = sqrt( s2/(double)n - res.mean*res.mean );
 
     res.sum  = s;
     res.sum_sq = s2;
+
+    /* Standard deviation, mean absolute deviation, skewness, and kurtosis */
+    for( i=0; i<n; i++ ) {
+	double t = data[i] - res.mean;
+	ad += abs(t);
+	d  += t;
+	d2 += t*t;
+	d3 += t*t*t;
+	d4 += t*t*t*t;
+    }
+    /* two-pass algorithm for variance */
+    var = (d2 - d * d / n) / n;  /* population, not sample */
+    res.stddev = sqrt(var);
+    res.adev = ad / n;
+    if (var != 0.0) {
+	res.skewness = d3 / (n * var * res.stddev);
+	res.kurtosis = d4 / (n * var * var);
+    } else {
+	res.skewness = res.kurtosis = not_a_number();
+    }
+
+    res.mean_err = res.stddev / sqrt((double) n);
+    res.stddev_err = res.stddev / sqrt(2.0 * n);
+    res.skewness_err = sqrt(6.0 / n);
+    res.kurtosis_err = sqrt(24.0 / n);
 
     for( i=0; i<n; i++ ) {
 	tmp[i].val = data[i];
@@ -254,7 +292,7 @@ analyze_two_columns( double *x, double *y,
     double ssyy, ssxx, ssxy;
 
     for( i=0; i<n; i++ ) {
-	s += x[i]*y[i];
+	s += x[i] * y[i];
     }
     res.sum_xy = s;
 
@@ -265,21 +303,31 @@ analyze_two_columns( double *x, double *y,
     ssxx = res_x.sum_sq - res_x.sum * res_x.sum / n;
     ssxy = res.sum_xy   - res_x.sum * res_y.sum / n;
 
-    res.slope = ssxy / ssxx;
+    if (ssxx != 0.0)
+	res.slope = ssxy / ssxx;
+    else
+	res.slope = not_a_number();
     res.intercept = res_y.mean - res.slope * res_x.mean;
 
-    res.correlation = res.slope * res_x.stddev/res_y.stddev;
+    if (res_y.stddev != 0.0)
+	res.correlation = res.slope * res_x.stddev / res_y.stddev;
+    else
+	res.correlation = not_a_number();
 
     if (n > 2) {
 	double ss = (ssyy - res.slope * ssxy) / (n - 2);
-	res.slope_err = sqrt(ss / ssxx);
-	res.intercept_err = sqrt(ss * (1./n + res_x.sum * res_x.sum / (n * n * ssxx)));
+	if (ssxx != 0.0) {
+	    res.slope_err = sqrt(ss / ssxx);
+	    res.intercept_err = sqrt(ss * (1./n + res_x.sum * res_x.sum / (n * n * ssxx)));
+	} else {
+	    res.slope_err = res.intercept_err = not_a_number();
+	}
+    } else if (n == 2) {
+	fprintf(stderr, "Warning:  Errors of slope and intercept are zero. There are as many data points as there are parameters.\n");
+	res.slope_err = res.intercept_err = 0.0;
     } else {
-	if (n == 2)
-	    fprintf(stderr, "Warning:  Errors of slope and intercept are zero. There are as many data points as there are parameters.\n");
-	else
-	    fprintf(stderr, "Warning:  Can't compute errors of slope and intercept. Not enough data points.\n");
-	res.slope_err = res.intercept_err = 0;
+	fprintf(stderr, "Warning:  Can't compute errors of slope and intercept. Not enough data points.\n");
+	res.slope_err = res.intercept_err = not_a_number();
     }
 
     res.pos_min_y = x[res_y.min.index];
@@ -305,7 +353,9 @@ ensure_output()
 static char*
 fmt( char *buf, double val )
 {
-    if ( fabs(val) < 1e-14 )
+    if ( isnan(val) ) 
+	sprintf( buf, "%11s", "undefined");
+    else if ( fabs(val) < 1e-14 )
 	sprintf( buf, "%11.4f", 0.0 );
     else if ( fabs(log10(fabs(val))) < 6 )
 	sprintf( buf, "%11.4f", val );
@@ -338,20 +388,28 @@ file_output( struct file_stats s )
     /* Formatted to screen */
     fprintf( print_out, "\n" );
     fprintf( print_out, "* FILE: \n" );
-    fprintf( print_out, "  Records:      %*ld\n", width, s.records );
-    fprintf( print_out, "  Out of range: %*ld\n", width, s.outofrange );
-    fprintf( print_out, "  Invalid:      %*ld\n", width, s.invalid );
-    fprintf( print_out, "  Blank:        %*ld\n", width, s.blanks );
-    fprintf( print_out, "  Data Blocks:  %*ld\n", width, s.blocks );
+    fprintf( print_out, "  Records:           %*ld\n", width, s.records );
+    fprintf( print_out, "  Out of range:      %*ld\n", width, s.outofrange );
+    fprintf( print_out, "  Invalid:           %*ld\n", width, s.invalid );
+    fprintf( print_out, "  Blank:             %*ld\n", width, s.blanks );
+    fprintf( print_out, "  Data Blocks:       %*ld\n", width, s.blocks );
 }
 
 static void
 sgl_column_output_nonformat( struct sgl_column_stats s, char *x )
 {
-    fprintf( print_out, "%s%s\t%f\n", "mean",   x, s.mean );
-    fprintf( print_out, "%s%s\t%f\n", "stddev", x, s.stddev );
-    fprintf( print_out, "%s%s\t%f\n", "sum",   x, s.sum );
-    fprintf( print_out, "%s%s\t%f\n", "sum_sq",  x, s.sum_sq );
+    fprintf( print_out, "%s%s\t%f\n", "mean",     x, s.mean );
+    fprintf( print_out, "%s%s\t%f\n", "stddev",   x, s.stddev );
+    fprintf( print_out, "%s%s\t%f\n", "skewness", x, s.skewness );
+    fprintf( print_out, "%s%s\t%f\n", "kurtosis", x, s.kurtosis );
+    fprintf( print_out, "%s%s\t%f\n", "adev",     x, s.adev);
+    fprintf( print_out, "%s%s\t%f\n", "sum",      x, s.sum );
+    fprintf( print_out, "%s%s\t%f\n", "sum_sq",   x, s.sum_sq );
+
+    fprintf( print_out, "%s%s\t%f\n", "mean_err",     x, s.mean_err );
+    fprintf( print_out, "%s%s\t%f\n", "stddev_err",   x, s.stddev_err );
+    fprintf( print_out, "%s%s\t%f\n", "skewness_err", x, s.skewness_err );
+    fprintf( print_out, "%s%s\t%f\n", "kurtosis_err", x, s.kurtosis_err );
 
     fprintf( print_out, "%s%s\t%f\n", "min",     x, s.min.val );
     if ( s.sx == 0 ) {
@@ -402,26 +460,35 @@ sgl_column_output( struct sgl_column_stats s, long n )
      else
 	 fprintf( print_out, "* COLUMN: \n" );
 
-    fprintf( print_out, "  Mean:     %s\n", fmt( buf, s.mean ) );
-    fprintf( print_out, "  Std Dev:  %s\n", fmt( buf, s.stddev ) );
-    fprintf( print_out, "  Sum:      %s\n", fmt( buf, s.sum ) );
-    fprintf( print_out, "  Sum Sq.:  %s\n", fmt( buf, s.sum_sq ) );
+    fprintf( print_out, "  Mean:          %s\n", fmt( buf, s.mean ) );
+    fprintf( print_out, "  Std Dev:       %s\n", fmt( buf, s.stddev ) );
+    fprintf( print_out, "  Skewness:      %s\n", fmt( buf, s.skewness ) );
+    fprintf( print_out, "  Kurtosis:      %s\n", fmt( buf, s.kurtosis ) );
+    fprintf( print_out, "  Avg Dev:       %s\n", fmt( buf, s.adev ) );
+    fprintf( print_out, "  Sum:           %s\n", fmt( buf, s.sum ) );
+    fprintf( print_out, "  Sum Sq.:       %s\n", fmt( buf, s.sum_sq ) );
+    fprintf( print_out, "\n" );
+
+    fprintf( print_out, "  Mean Err.:     %s\n", fmt( buf, s.mean_err ) );
+    fprintf( print_out, "  Std Dev Err.:  %s\n", fmt( buf, s.stddev_err ) );
+    fprintf( print_out, "  Skewness Err.: %s\n", fmt( buf, s.skewness_err ) );
+    fprintf( print_out, "  Kurtosis Err.: %s\n", fmt( buf, s.kurtosis_err ) );
     fprintf( print_out, "\n" );
 
     /* For matrices, the quartiles and the median do not make too much sense */
     if ( s.sx > 0 ) {
-	fprintf( print_out, "  Minimum:  %s [%*ld %ld ]\n", fmt(buf, s.min.val), width,
+	fprintf( print_out, "  Minimum:       %s [%*ld %ld ]\n", fmt(buf, s.min.val), width,
 	     (s.min.index) / s.sx, (s.min.index) % s.sx);
-	fprintf( print_out, "  Maximum:  %s [%*ld %ld ]\n", fmt(buf, s.max.val), width,
+	fprintf( print_out, "  Maximum:       %s [%*ld %ld ]\n", fmt(buf, s.max.val), width,
 	     (s.max.index) / s.sx, (s.max.index) % s.sx);
-	fprintf( print_out, "  COG:      %s %s\n", fmt(buf, s.cog_x), fmt(buf2, s.cog_y) );
+	fprintf( print_out, "  COG:           %s %s\n", fmt(buf, s.cog_x), fmt(buf2, s.cog_y) );
     } else {
 	/* FIXME:  The "position" are randomly selected from a non-unique set. Bad! */
-	fprintf( print_out, "  Minimum:  %s [%*ld]\n", fmt(buf, s.min.val), width, s.min.index );
-	fprintf( print_out, "  Maximum:  %s [%*ld]\n", fmt(buf, s.max.val), width, s.max.index );
-	fprintf( print_out, "  Quartile: %s \n", fmt(buf, s.lower_quartile) );
-	fprintf( print_out, "  Median:   %s \n", fmt(buf, s.median) );
-	fprintf( print_out, "  Quartile: %s \n", fmt(buf, s.upper_quartile) );
+	fprintf( print_out, "  Minimum:       %s [%*ld]\n", fmt(buf, s.min.val), width, s.min.index );
+	fprintf( print_out, "  Maximum:       %s [%*ld]\n", fmt(buf, s.max.val), width, s.max.index );
+	fprintf( print_out, "  Quartile:      %s \n", fmt(buf, s.lower_quartile) );
+	fprintf( print_out, "  Median:        %s \n", fmt(buf, s.median) );
+	fprintf( print_out, "  Quartile:      %s \n", fmt(buf, s.upper_quartile) );
 	fprintf( print_out, "\n" );
     }
 }
@@ -464,37 +531,46 @@ two_column_output( struct sgl_column_stats x,
 
     fprintf( print_out, "\n" );
     fprintf( print_out, "* COLUMNS:\n" );
-    fprintf( print_out, "  Mean:     %s %s %s\n", fmt(bfx, x.mean),   blank, fmt(bfy, y.mean) );
-    fprintf( print_out, "  Std Dev:  %s %s %s\n", fmt(bfx, x.stddev), blank, fmt(bfy, y.stddev ) );
-    fprintf( print_out, "  Sum:      %s %s %s\n", fmt(bfx, x.sum),  blank, fmt(bfy, y.sum) );
-    fprintf( print_out, "  Sum Sq.:  %s %s %s\n", fmt(bfx, x.sum_sq), blank, fmt(bfy, y.sum_sq ) );
+    fprintf( print_out, "  Mean:          %s %s %s\n", fmt(bfx, x.mean),   blank, fmt(bfy, y.mean) );
+    fprintf( print_out, "  Std Dev:       %s %s %s\n", fmt(bfx, x.stddev), blank, fmt(bfy, y.stddev ) );
+    fprintf( print_out, "  Skewness:      %s %s %s\n", fmt(bfx, x.skewness), blank, fmt(bfy, y.skewness) );
+    fprintf( print_out, "  Kurtosis:      %s %s %s\n", fmt(bfx, x.kurtosis), blank, fmt(bfy, y.kurtosis) );
+    fprintf( print_out, "  Avg Dev:       %s %s %s\n", fmt(bfx, x.adev), blank, fmt(bfy, y.adev ) );
+    fprintf( print_out, "  Sum:           %s %s %s\n", fmt(bfx, x.sum),  blank, fmt(bfy, y.sum) );
+    fprintf( print_out, "  Sum Sq.:       %s %s %s\n", fmt(bfx, x.sum_sq), blank, fmt(bfy, y.sum_sq ) );
+    fprintf( print_out, "\n" );
+
+    fprintf( print_out, "  Mean Err.:     %s %s %s\n", fmt(bfx, x.mean_err),   blank, fmt(bfy, y.mean_err) );
+    fprintf( print_out, "  Std Dev Err.:  %s %s %s\n", fmt(bfx, x.stddev_err), blank, fmt(bfy, y.stddev_err) );
+    fprintf( print_out, "  Skewness Err.: %s %s %s\n", fmt(bfx, x.skewness_err), blank, fmt(bfy, y.skewness_err) );
+    fprintf( print_out, "  Kurtosis Err.: %s %s %s\n", fmt(bfx, x.kurtosis_err), blank, fmt(bfy, y.kurtosis_err) );
     fprintf( print_out, "\n" );
 
     /* FIXME:  The "positions" are randomly selected from a non-unique set.  Bad! */
-    fprintf( print_out, "  Minimum:  %s [%*ld]   %s [%*ld]\n", fmt(bfx, x.min.val),
+    fprintf( print_out, "  Minimum:       %s [%*ld]   %s [%*ld]\n", fmt(bfx, x.min.val),
     	width, x.min.index, fmt(bfy, y.min.val), width, y.min.index );
-    fprintf( print_out, "  Maximum:  %s [%*ld]   %s [%*ld]\n", fmt(bfx, x.max.val),
+    fprintf( print_out, "  Maximum:       %s [%*ld]   %s [%*ld]\n", fmt(bfx, x.max.val),
     	width, x.max.index, fmt(bfy, y.max.val), width, y.max.index );
 
-    fprintf( print_out, "  Quartile: %s %s %s\n",
+    fprintf( print_out, "  Quartile:      %s %s %s\n",
 	fmt(bfx, x.lower_quartile), blank, fmt(bfy, y.lower_quartile) );
-    fprintf( print_out, "  Median:   %s %s %s\n",
+    fprintf( print_out, "  Median:        %s %s %s\n",
 	fmt(bfx, x.median), blank, fmt(bfy, y.median) );
-    fprintf( print_out, "  Quartile: %s %s %s\n",
+    fprintf( print_out, "  Quartile:      %s %s %s\n",
 	fmt(bfx, x.upper_quartile), blank, fmt(bfy, y.upper_quartile) );
     fprintf( print_out, "\n" );
 
     /* Simpler below - don't care about alignment */
     if ( xy.intercept < 0.0 )
-	fprintf( print_out, "  Linear Model:  y = %.4g x - %.4g\n", xy.slope, -xy.intercept );
+	fprintf( print_out, "  Linear Model:       y = %.4g x - %.4g\n", xy.slope, -xy.intercept );
     else
-	fprintf( print_out, "  Linear Model:  y = %.4g x + %.4g\n", xy.slope, xy.intercept );
+	fprintf( print_out, "  Linear Model:       y = %.4g x + %.4g\n", xy.slope, xy.intercept );
 
-    fprintf( print_out, "  Slope:         %.4g +- %.4g\n", xy.slope, xy.slope_err );
-    fprintf( print_out, "  Intercept:     %.4g +- %.4g\n", xy.intercept, xy.intercept_err );
+    fprintf( print_out, "  Slope:              %.4g +- %.4g\n", xy.slope, xy.slope_err );
+    fprintf( print_out, "  Intercept:          %.4g +- %.4g\n", xy.intercept, xy.intercept_err );
 
-    fprintf( print_out, "  Correlation:   r = %.4g\n", xy.correlation );
-    fprintf( print_out, "  Sum xy:        %.4g\n", xy.sum_xy );
+    fprintf( print_out, "  Correlation:        r = %.4g\n", xy.correlation );
+    fprintf( print_out, "  Sum xy:             %.4g\n", xy.sum_xy );
     fprintf( print_out, "\n" );
 }
 
@@ -546,11 +622,19 @@ file_variables( struct file_stats s, char *prefix )
 static void
 sgl_column_variables( struct sgl_column_stats s, char *prefix, char *suffix )
 {
-    create_and_set_var( s.mean,   prefix, "mean",   suffix );
-    create_and_set_var( s.stddev, prefix, "stddev", suffix );
+    create_and_set_var( s.mean,     prefix, "mean",     suffix );
+    create_and_set_var( s.stddev,   prefix, "stddev",   suffix );
+    create_and_set_var( s.skewness, prefix, "skewness", suffix );
+    create_and_set_var( s.kurtosis, prefix, "kurtosis", suffix );
+    create_and_set_var( s.adev,     prefix, "adev",     suffix );
 
-    create_and_set_var( s.sum,  prefix, "sum",   suffix );
-    create_and_set_var( s.sum_sq, prefix, "sumsq",  suffix );
+    create_and_set_var( s.mean_err,     prefix, "mean_err",     suffix );
+    create_and_set_var( s.stddev_err,   prefix, "stddev_err",   suffix );
+    create_and_set_var( s.skewness_err, prefix, "skewness_err", suffix );
+    create_and_set_var( s.kurtosis_err, prefix, "kurtosis_err", suffix );
+
+    create_and_set_var( s.sum,    prefix, "sum",   suffix );
+    create_and_set_var( s.sum_sq, prefix, "sumsq", suffix );
 
     create_and_set_var( s.min.val, prefix, "min", suffix );
     create_and_set_var( s.max.val, prefix, "max", suffix );
