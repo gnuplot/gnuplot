@@ -1,3 +1,10 @@
+2014-03-08  Alexander Täschner  <taschna@users.sourceforge.net>
+
+	* src/fit.c (print_function_definitions):  Print a list of function
+	definitions used by the fit command to fit.log. Limit maximum number
+	of functions and recursions (changes by BM).
+	Patch #654
+
 2014-03-08  Dima Kogan  <dima@secretsauce.net>
 
 	* docs/doc2texi.el docs/gpcard.tex: Remove last traces of cgi.trm

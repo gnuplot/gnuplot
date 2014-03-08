@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: fit.c,v 1.130 2014/03/04 07:20:53 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: fit.c,v 1.131 2014/03/04 20:45:06 markisch Exp $"); }
 #endif
 
 /*  NOTICE: Change of Copyright Status
@@ -263,6 +263,7 @@ void fit_show_brief(int iter, double chisq, double last_chisq, double *parms,
 static void show_results __PROTO((double chisq, double last_chisq, double* a, double* dpar, double** corel));
 static void log_axis_restriction __PROTO((FILE *log_f, int param,
 			    double min, double max, int autoscale, char *name));
+static void print_function_definitions(struct at_type *at, FILE * device);
 static TBOOLEAN is_empty __PROTO((char *s));
 static int getivar __PROTO((const char *varname));
 static double getdvar __PROTO((const char *varname));
@@ -1641,6 +1642,65 @@ log_axis_restriction(FILE *log_f, int param, double min, double max, int autosca
 
 
 /*****************************************************************
+    Recursively print definitions of function referenced.
+*****************************************************************/
+static int
+print_function_definitions_recursion(struct at_type *at, int *count, int maxfun, char *definitions[], int depth, int maxdepth)
+{
+    int i, k;
+    int rc = 0;
+
+    if (at->a_count == 0)
+	return 0;
+    if (*count == maxfun) /* limit the maximum number of unique function definitions  */
+	return 1;
+    if (depth >= maxdepth) /* limit the maximum recursion depth */
+	return 2;
+
+    for (i = 0; (i < at->a_count) && (*count < maxfun); i++) {
+	if (((at->actions[i].index == CALL) || (at->actions[i].index == CALLN)) &&
+	    (at->actions[i].arg.udf_arg->definition != NULL)) {
+	    for (k = 0; k < maxfun; k++) {
+		if (definitions[k] == at->actions[i].arg.udf_arg->definition)
+		    break; /* duplicate definition already in list */
+		if (definitions[k] == NULL) {
+		    *count += 1; /* increment counter */
+		    definitions[k] = at->actions[i].arg.udf_arg->definition;
+		    break;
+		}
+	    }
+	    rc |= print_function_definitions_recursion(at->actions[i].arg.udf_arg->at, 
+	                                               count, maxfun, definitions,
+	                                               depth + 1, maxdepth);
+	}
+    }
+
+    return rc;
+}
+
+
+static void
+print_function_definitions(struct at_type *at, FILE * device)
+{
+    char *definitions[32];
+    const int maxfun   = 32;  /* maximum number of unique functions definitions */
+    const int maxdepth = 20;  /* maximum recursion depth */
+    int count = 0;
+    int k, rc;
+
+    memset(definitions, 0, maxfun * sizeof(char *));
+    rc = print_function_definitions_recursion(at, &count, maxfun, definitions, 0, maxdepth);
+    for (k = 0; k < count; k++)
+	fprintf(device, "\t%s\n", definitions[k]);
+    if ((rc & 1) != 0)
+	fprintf(device, "\t[omitting further function definitions (max=%i)]\n", maxfun);
+    if ((rc & 2) != 0)
+	fprintf(device, "\t[too many nested (or recursive) function definitions (max=%i)]\n", maxdepth);
+}
+
+
+
+/*****************************************************************
     Interface to the gnuplot "fit" command
 *****************************************************************/
 
@@ -2162,6 +2222,7 @@ fit_command()
 
 	m_capture(&line, token1, token2 - 1);
 	fprintf(log_f, "function used for fitting: %s\n", line);
+	print_function_definitions(func.at, log_f);
 	free(line);
     }
 
