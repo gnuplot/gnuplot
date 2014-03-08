@@ -1,3 +1,7 @@
+2014-03-08  Christoph Bersch <usenet@bersch.net>
+
+	* src/set.c src/boundary.c: Allow changing textcolor of the timestamp.
+
 2014-03-08  Alexander Täschner  <taschna@users.sourceforge.net>
 
 	* src/fit.c (print_function_definitions):  Print a list of function

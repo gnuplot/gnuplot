@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.429 2014/01/13 21:47:07 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.430 2014/03/07 21:17:15 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -4804,6 +4804,11 @@ set_timestamp()
 	    new = try_to_get_string();
 	    free(timelabel.font);
 	    timelabel.font = new;
+	    continue;
+	}
+
+	if (equals(c_token,"tc") || almost_equals(c_token,"text$color")) {
+	    parse_colorspec(&(timelabel.textcolor), TC_VARIABLE);
 	    continue;
 	}
 

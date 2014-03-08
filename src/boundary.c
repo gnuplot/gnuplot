@@ -1,5 +1,5 @@
 /*
- * $Id: boundary.c,v 1.7 2014/01/04 00:17:13 sfeam Exp $
+ * $Id: boundary.c,v 1.8 2014/02/28 19:23:52 sfeam Exp $
  */
 
 /* GNUPLOT - boundary.c */
@@ -1500,6 +1500,7 @@ draw_titles()
 	str = gp_alloc(MAX_LINE_LEN + 1, "timelabel.text");
 	strftime(str, MAX_LINE_LEN, timelabel.text, localtime(&now));
 
+	apply_pm3dcolor(&(timelabel.textcolor), t);
 	if (timelabel_rotate && (*t->text_angle) (TEXT_VERTICAL)) {
 	    x += t->v_char / 2;	/* HBB */
 	    if (timelabel_bottom)
