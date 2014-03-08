@@ -260,7 +260,6 @@ Major contributors (alphabetic order):
 	"be"
 	"cairo"
 	"canvas"
-	"cgi"
 	"cgm"
 	"context"
 	"corel"
@@ -460,7 +459,6 @@ particular conversion chore."
     ("windows" "win")
     ("next" "next")
     ("os2" "pm" "emxvga")
-    ("sco" "cgi")
     ("sun" "sun")
     ("vms" "vws"))
 
