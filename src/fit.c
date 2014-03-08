@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: fit.c,v 1.131 2014/03/04 20:45:06 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: fit.c,v 1.132 2014/03/08 10:16:25 markisch Exp $"); }
 #endif
 
 /*  NOTICE: Change of Copyright Status
@@ -2307,7 +2307,7 @@ fit_command()
 
 	    if ((tmp = get_next_word(&s, &c)) != NULL) {
 		(void) fclose(f);
-		Eex("syntax error in parameter file");
+		Eex2("syntax error in parameter file %s", viafile);
 	    }
 	}
 	(void) fclose(f);
