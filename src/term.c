@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.271 2014/01/01 09:48:38 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.272 2014/01/04 02:55:06 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -230,6 +230,7 @@ static int null_scale __PROTO((double x, double y));
 static void null_layer __PROTO((t_termlayer layer));
 static int null_set_font __PROTO((const char *font));
 static void options_null __PROTO((void));
+static void graphics_null __PROTO((void));
 static void UNKNOWN_null __PROTO((void));
 static void MOVE_null __PROTO((unsigned int, unsigned int));
 static void LINETYPE_null __PROTO((int));
@@ -1533,6 +1534,14 @@ options_null()
 }
 
 static void
+graphics_null()
+{
+    fprintf(stderr,
+            "WARNING: Plotting with an 'unknown' terminal.\n"
+            "No output will be generated. Please select a terminal with 'set terminal'.\n");
+}
+
+static void
 UNKNOWN_null()
 {
 }
@@ -1596,7 +1605,7 @@ static struct termentry term_tbl[] =
     {"unknown", "Unknown terminal type - not a plotting device",
      100, 100, 1, 1,
      1, 1, options_null, UNKNOWN_null, UNKNOWN_null,
-     UNKNOWN_null, null_scale, UNKNOWN_null, MOVE_null, MOVE_null,
+     UNKNOWN_null, null_scale, graphics_null, MOVE_null, MOVE_null,
      LINETYPE_null, PUTTEXT_null}
 
 #include "term.h"

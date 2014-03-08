@@ -2,6 +2,9 @@
 
 	* docs/doc2texi.el docs/gpcard.tex: Remove last traces of cgi.trm
 
+	* src/term.c: Print a warning if someone tries to plot while the
+	terminal type is "unknown".
+
 2014-03-07  Alexander Täschner  <taschna@users.sourceforge.net>
 
 	src/stats.c docs/gnuplot.doc:  Add the calculation of the skewness,
