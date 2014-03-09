@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: parse.c,v 1.82 2013/12/26 17:58:29 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: parse.c,v 1.83 2014/02/28 19:23:52 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - parse.c */
@@ -79,6 +79,7 @@ static void accept_exclusive_OR_expression __PROTO((void));
 static void accept_AND_expression __PROTO((void));
 static void accept_equality_expression __PROTO((void));
 static void accept_relational_expression __PROTO((void));
+static void accept_bitshift_expression __PROTO((void));
 static void accept_additive_expression __PROTO((void));
 static void accept_multiplicative_expression __PROTO((void));
 static void parse_primary_expression __PROTO((void));
@@ -90,6 +91,7 @@ static void parse_exclusive_OR_expression __PROTO((void));
 static void parse_AND_expression __PROTO((void));
 static void parse_equality_expression __PROTO((void));
 static void parse_relational_expression __PROTO((void));
+static void parse_bitshift_expression __PROTO((void));
 static void parse_additive_expression __PROTO((void));
 static void parse_multiplicative_expression __PROTO((void));
 static void parse_unary_expression __PROTO((void));
@@ -378,8 +380,16 @@ accept_equality_expression()
 static void
 accept_relational_expression()
 {
-    accept_additive_expression();
+    accept_bitshift_expression();
     parse_relational_expression();
+}
+
+
+static void
+accept_bitshift_expression()
+{
+    accept_additive_expression();
+    parse_bitshift_expression();
 }
 
 
@@ -785,10 +795,9 @@ parse_relational_expression()
      * operators */
 
     while (TRUE) {
-	/* I hate "else if" statements */
 	if (equals(c_token, ">")) {
 	    c_token++;
-	    accept_additive_expression();
+	    accept_bitshift_expression();
 	    (void) add_action(GT);
 	} else if (equals(c_token, "<")) {
 	    /*  Workaround for * in syntax of range constraints  */
@@ -796,20 +805,40 @@ parse_relational_expression()
 		break;
 	    }
 	    c_token++;
-	    accept_additive_expression();
+	    accept_bitshift_expression();
 	    (void) add_action(LT);
 	} else if (equals(c_token, ">=")) {
 	    c_token++;
-	    accept_additive_expression();
+	    accept_bitshift_expression();
 	    (void) add_action(GE);
 	} else if (equals(c_token, "<=")) {
 	    c_token++;
-	    accept_additive_expression();
+	    accept_bitshift_expression();
 	    (void) add_action(LE);
 	} else
 	    break;
     }
 
+}
+
+
+
+static void
+parse_bitshift_expression()
+{
+    /* create action codes for << and >> operators */
+    while (TRUE) {
+	if (equals(c_token, "<<")) {
+	    c_token++;
+	    accept_additive_expression();
+	    (void) add_action(LEFTSHIFT);
+	} else if (equals(c_token, ">>")) {
+	    c_token++;
+	    accept_additive_expression();
+	    (void) add_action(RIGHTSHIFT);
+	} else
+	    break;
+    }
 }
 
 

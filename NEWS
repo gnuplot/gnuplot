@@ -1,6 +1,7 @@
 New features, changes and fixes since gnuplot version 4.6
 =========================================================
 
+* NEW bit-shifing binary operators << and >>
 * NEW stat calculates skewness, kurtosis, and standard errors
 * NEW function plugins, e.g. 'import f(x) from "plugins.so"'
 * NEW option to tabulate all input columns "set table; plot ... with table" 

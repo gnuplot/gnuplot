@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: scanner.c,v 1.39 2014/03/06 07:34:48 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: scanner.c,v 1.40 2014/03/06 17:08:08 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - scanner.c */
@@ -254,6 +254,8 @@ scanner(char **expressionp, size_t *expressionlenp)
 	    case '!':
 	    case '>':
 		if (expression[current + 1] == '=')
+		    APPEND_TOKEN;
+		if (expression[current + 1] == '>')
 		    APPEND_TOKEN;
 		break;
 	    case '<':

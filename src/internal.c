@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: internal.c,v 1.74 2013/12/28 00:07:35 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: internal.c,v 1.75 2014/02/28 19:23:52 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - internal.c */
@@ -73,6 +73,7 @@ GP_MATHERR( STRUCT_EXCEPTION_P_X )
 static enum DATA_TYPES sprintf_specifier __PROTO((const char *format));
 
 #define BAD_DEFAULT default: int_error(NO_CARET, "internal error : type neither INT or CMPLX"); return;
+#define BADINT_DEFAULT default: int_error(NO_CARET, "error: bit shift applied to non-INT"); return;
 
 static int recursion_depth = 0;
 void
@@ -640,6 +641,54 @@ f_le(union argument *arg)
     }
     push(Ginteger(&a, result));
 }
+
+
+void
+f_leftshift(union argument *arg)
+{
+    struct value a, b, result;
+
+    (void) arg;			/* avoid -Wunused warning */
+    (void) pop(&b);
+    (void) pop(&a);
+    switch (a.type) {
+    case INTGR:
+	switch (b.type) {
+	case INTGR:
+	    (void) Ginteger(&result, (unsigned)(a.v.int_val) << b.v.int_val);
+	    break;
+	BADINT_DEFAULT
+	}
+	break;
+    BADINT_DEFAULT
+    }
+    push(&result);
+}
+
+
+
+void
+f_rightshift(union argument *arg)
+{
+    struct value a, b, result;
+
+    (void) arg;			/* avoid -Wunused warning */
+    (void) pop(&b);
+    (void) pop(&a);
+    switch (a.type) {
+    case INTGR:
+	switch (b.type) {
+	case INTGR:
+	    (void) Ginteger(&result, (unsigned)(a.v.int_val) >> b.v.int_val);
+	    break;
+	BADINT_DEFAULT
+	}
+	break;
+    BADINT_DEFAULT
+    }
+    push(&result);
+}
+
 
 
 void

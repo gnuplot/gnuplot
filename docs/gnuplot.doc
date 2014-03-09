@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.861 2014/03/09 14:36:17 juhaszp Exp $
+C RCS $Id: gnuplot.doc,v 1.862 2014/03/09 19:15:52 markisch Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -1736,6 +1736,8 @@ C ... and restart the table:
        <=          a<=b          less than or equal to
        >           a>b           greater than
        >=          a>=b          greater than or equal to
+       <<          0xff<<1       left shift unsigned
+       >>          0xff>>2       right shift unsigned
        &           a&b         * bitwise AND
        ^           a^b         * bitwise exclusive OR
        |           a|b         * bitwise inclusive OR
@@ -1765,6 +1767,8 @@ C ... and restart the table:
 #\verb~<=~ & \verb~a<=b~ & less than or equal to\\
 #\verb~>~ & \verb~a>b~ & greater than\\
 #\verb~>=~ & \verb~a>=b~ & greater than or equal to\\
+#\verb~<<~ & \verb~0xff<<1~ & left shift unsigned\\
+#\verb~>>~ & \verb~0xff>>1~ & right shift unsigned\\
 #\verb~&~ & \verb~a&b~ & * bitwise AND\\
 #\verb~^~ & \verb~a^b~ & * bitwise exclusive OR\\
 #\verb~|~ & \verb~a|b~ & * bitwise inclusive OR\\
@@ -1790,6 +1794,8 @@ C ... and restart the table:
 %<=@a<=b@less than or equal to
 %>@a>b@greater than
 %>=@a>=b@greater than or equal to
+%<<@0xff<<1@left shift unsigned
+%>>@0xff>>1@right shift unsigned
 %&@a&b@* bitwise AND
 %^@a^b@* bitwise exclusive OR
 %|@a|b@* bitwise inclusive OR
@@ -1825,6 +1831,8 @@ C ... and restart the table:
 ^<tr>    <td><tt>&lt;=</tt></td>    <td><tt>a&lt;=b</tt></td>    <td>less than or equal to</td></tr>
 ^<tr>    <td><tt>&gt;</tt></td>    <td><tt>a&gt;b</tt></td>    <td>greater than</td></tr>
 ^<tr>    <td><tt>&gt;=</tt></td>    <td><tt>a&gt;=b</tt></td>    <td>greater than or equal to</td></tr>
+^<tr>    <td><tt>&lt;&lt;</tt></td>    <td><tt>0xff&lt;&lt;1</tt></td>    <td>left shift unsigned</td></tr>
+^<tr>    <td><tt>&gt;&gt;</tt></td>    <td><tt>0xff&gt;&gt;1</tt></td>    <td>right shift unsigned</td></tr>
 ^<tr>    <td><tt>&amp;</tt></td>    <td><tt>a&amp;b</tt></td>    <td>* bitwise AND</td></tr>
 ^<tr>    <td><tt>^</tt></td>    <td><tt>a^b</tt></td>    <td>* bitwise exclusive OR</td></tr>
 ^<tr>    <td><tt>|</tt></td>    <td><tt>a|b</tt></td>    <td>* bitwise inclusive OR</td></tr>
