@@ -1,5 +1,5 @@
 #
-# $Id: arrowstyle.dem,v 1.3 2011/02/20 23:17:11 sfeam Exp $
+# $Id: arrowstyle.dem,v 1.4 2013/08/08 21:40:31 sfeam Exp $
 #
 #
 set xrange [-1000:1000]
@@ -21,64 +21,19 @@ set style arrow 8 heads size screen 0.008,90 ls 2
 print ' We have defined the following arrowstyles:'
 show style arrow
 
-set arrow from -500,-100 to 500,-100 as 1
-set arrow from -500,-110 to 500,-110 as 2
-set arrow from -500,-120 to 500,-120 as 3
-set arrow from -500,-130 to 500,-130 as 4
-set arrow from -500,-140 to 500,-140 as 5
-set arrow from -500,-150 to 500,-150 as 6
-set arrow from -500,-160 to 500,-160 as 7
-set arrow from -500,-170 to 500,-170 as 8
+set for [i=1:8] arrow from -500, (-90 - i * 10) to 500, (-90 - i * 10) as i
+set for [i=1:8] label sprintf('arrowstyle %i:', i) at -520, (-90 - i * 10) right
 
-set label 'arrowstyle 1:' at -520,-100 right
-set label 'arrowstyle 2:' at -520,-110 right
-set label 'arrowstyle 3:' at -520,-120 right
-set label 'arrowstyle 4:' at -520,-130 right
-set label 'arrowstyle 5:' at -520,-140 right
-set label 'arrowstyle 6:' at -520,-150 right
-set label 'arrowstyle 7:' at -520,-160 right
-set label 'arrowstyle 8:' at -520,-170 right
+set samples 50
+set angles rad
+pos(x) = 69 * sin(0.01 * x)
+len(x) = 49 * sin(0.01 * x + pi/2)
 
-set title 'Top: plot with vectors arrowstyle 1, Bottom: explicit arrows'
-plot \
-     'arrowstyle.dat' using 1:2:(0):3 notitle with vectors arrowstyle 1
-pause -1 "Hit return to continue"
-
-set title 'Top: plot with vectors arrowstyle 2, Bottom: explicit arrows'
-plot \
-     'arrowstyle.dat' using 1:2:(0):3 notitle with vectors arrowstyle 2
-pause -1 "Hit return to continue"
-
-set title 'Top: plot with vectors arrowstyle 3, Bottom: explicit arrows'
-plot \
-     'arrowstyle.dat' using 1:2:(0):3 notitle with vectors arrowstyle 3
-pause -1 "Hit return to continue"
-
-set title 'Top: plot with vectors arrowstyle 4, Bottom: explicit arrows'
-plot \
-     'arrowstyle.dat' using 1:2:(0):3 notitle with vectors arrowstyle 4
-pause -1 "Hit return to continue"
-
-set title 'Top: plot with vectors arrowstyle 5, Bottom: explicit arrows'
-plot \
-     'arrowstyle.dat' using 1:2:(0):3 notitle with vectors arrowstyle 5
-pause -1 "Hit return to continue"
-
-set title 'Top: plot with vectors arrowstyle 6, Bottom: explicit arrows'
-plot \
-     'arrowstyle.dat' using 1:2:(0):3 notitle with vectors arrowstyle 6
-pause -1 "Hit return to continue"
-
-set title 'Top: plot with vectors arrowstyle 7, Bottom: explicit arrows'
-plot \
-     'arrowstyle.dat' using 1:2:(0):3 notitle with vectors arrowstyle 7
-pause -1 "Hit return to continue"
-
-set title 'Top: plot with vectors arrowstyle 8, Bottom: explicit arrows'
-plot \
-     'arrowstyle.dat' using 1:2:(0):3 notitle with vectors arrowstyle 8
-pause -1 "Hit return to continue"
-
+do for [i=1:8] {
+    set title sprintf('Top: plot with vectors arrowstyle %i,  Bottom: explicit arrows', i)
+    plot '+' using 1:(pos(x)):(0):(len(x)) notitle with vectors arrowstyle i
+    pause -1 "Hit return to continue"
+}
 #reset
 
 #
