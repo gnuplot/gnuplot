@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.273 2014/03/08 07:34:32 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.274 2014/03/09 06:42:51 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -2637,6 +2637,11 @@ enhanced_recursion(
 		}
 		if (!strncmp(p, "\\bf", 3)) {
 			isbold = TRUE;
+			p += 3;
+			while (*++p == ' ');
+		}
+		if (!strncmp(p, "\\it", 3)) {  /* could be in either order */
+			isitalic = TRUE;
 			p += 3;
 			while (*++p == ' ');
 		}

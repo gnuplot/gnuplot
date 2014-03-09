@@ -4,6 +4,8 @@
 	src/internal.h demo/rgba_lines.dem docs/gnuplot.doc:
 	Bit shifting binary operators << and >>.
 
+	* src/term.c:  boldface or italic markup can be in either order.
+
 2014-03-09  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* demo/arrowstyle.dem:  Simplify by using loops and the special
