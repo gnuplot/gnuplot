@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.860 2014/03/08 19:16:24 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.861 2014/03/09 14:36:17 juhaszp Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -8240,6 +8240,7 @@ Ffigure_missing
        set fit {logfile {"<filename>"|default}}
                {{no}quiet|results|brief|verbose}
                {{no}errorvariables}
+               {{no}covariancevariables}
                {{no}errorscaling}
                {{no}prescale}
                {maxiter <value>|none}
@@ -8312,6 +8313,13 @@ Ffigure_missing
  The `script` option may be used to specify a `gnuplot` command to be executed
  when a fit is interrupted---see `fit`.  This setting takes precedence over
  the default of `replot` and the environment variable `FIT_SCRIPT`.
+
+ If the `covariancevariables` option is turned on, the covariances between
+ final parameters will be saved to user-defined variables. The variable name
+ for a certain parameter combination is formed by prepending "FIT_COV_" to
+ the name of the first parameter and combining the two parameter names by
+ "_". For example given the parameters "a" and "b" the covariance variable is
+ named "FIT_COV_a_b".
 3 fontpath
 ?commands set fontpath
 ?commands show fontpath

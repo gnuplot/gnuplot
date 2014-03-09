@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: fit.c,v 1.132 2014/03/08 10:16:25 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: fit.c,v 1.133 2014/03/08 10:19:21 markisch Exp $"); }
 #endif
 
 /*  NOTICE: Change of Copyright Status
@@ -183,6 +183,7 @@ typedef enum marq_res marq_res_t;
 /* fit control */
 char *fitlogfile = NULL;
 TBOOLEAN fit_errorvariables = FALSE;
+TBOOLEAN fit_covarvariables = FALSE;
 verbosity_level fit_verbosity = BRIEF;
 TBOOLEAN fit_errorscaling = TRUE;
 TBOOLEAN fit_prescale = TRUE;
@@ -270,6 +271,7 @@ static double getdvar __PROTO((const char *varname));
 static double createdvar __PROTO((char *varname, double value));
 static void setvar __PROTO((char *varname, double value));
 static void setvarerr __PROTO((char *varname, double value));
+static void setvarcovar(char *varname1, char *varname2, double value);
 static char *get_next_word __PROTO((char **s, char *subst));
 static void backup_file __PROTO((char *, const char *));
 
@@ -862,12 +864,23 @@ regress_finalize(int iter, double chisq, double last_chisq, double lambda, doubl
     for (i = 0; i < num_params; i++)
 	setvar(par_name[i], a[i] * scale_params[i]);
 
-    /* compute errors in the parameters */
-    if (fit_errorvariables)
-	/* Set error variable to zero before doing this, */
-	/* thus making sure they are created. */
+    /* Set error and covariance variables to zero, 
+       thus making sure they are created. */
+    if (fit_errorvariables) {
 	for (i = 0; i < num_params; i++)
 	    setvarerr(par_name[i], 0.0);
+    }
+    if (fit_covarvariables) {
+	/* first, remove all previous covariance variables */
+	del_udv_by_name("FIT_COV_*", TRUE);
+	for (i = 0; i < num_params; i++) {
+	    for (j = 0; j < i; j++) {
+		setvarcovar(par_name[i], par_name[j], 0.0);
+		setvarcovar(par_name[j], par_name[i], 0.0);
+	    }
+	    setvarcovar(par_name[i], par_name[i], 0.0);
+	}
+    }
 
     /* calculate unscaled parameter errors in dpar[]: */
     dpar = vec(num_params);
@@ -900,9 +913,24 @@ regress_finalize(int iter, double chisq, double last_chisq, double lambda, doubl
     }
 
     /* Save user error variables. */
-    for (i = 0; i < num_params; i++) {
-	if (fit_errorvariables)
+    if (fit_errorvariables) {
+	for (i = 0; i < num_params; i++)
 	    setvarerr(par_name[i], dpar[i] * scale_params[i]);
+    }
+
+    /* fill covariance variables if needed */
+    if (fit_covarvariables) {
+	double scale =
+	    (fit_errorscaling || (num_errors == 0)) ?
+	    (chisq / (num_data - num_params)) : 1.0;
+	for (i = 0; i < num_params; i++) {
+	    /* only lower triangle needs to be handled */
+	    for (j = 0; j <= i; j++) {
+		double temp = scale * scale_params[i] * scale_params[j];
+		setvarcovar(par_name[i], par_name[j], covar[i][j] * temp);
+		setvarcovar(par_name[j], par_name[i], covar[i][j] * temp);
+	    }
+	}
     }
 
     /* Report final results for VERBOSE, BRIEF, and RESULTS verbosity levels. */
@@ -1305,19 +1333,34 @@ setvar(char *varname, double data)
 
 
 /*****************************************************************
-    Set a GNUPLOT user-defined variable for an error
-    variable: so take the parameter name, turn it
-    into an error parameter name (e.g. a to a_err)
-    and then set it.
+    Set a user-defined variable from an error variable: 
+    Take the parameter name, turn it  into an error parameter
+    name (e.g. a to a_err) and then set it.
 ******************************************************************/
 static void
 setvarerr(char *varname, double value)
 {
-	/* Create the variable name by appending _err */
-	char * pErrValName = (char *) gp_alloc(strlen(varname) + 5 * sizeof(char), "setvarerr");
-	sprintf(pErrValName, "%s_err", varname);
-	setvar(pErrValName, value);
-	free(pErrValName);
+    /* Create the variable name by appending _err */
+    char * pErrValName = (char *) gp_alloc(strlen(varname) + 6, "setvarerr");
+    sprintf(pErrValName, "%s_err", varname);
+    setvar(pErrValName, value);
+    free(pErrValName);
+}
+
+
+/*****************************************************************
+    Set a user-defined covariance variable:
+    Take the two parameter names, turn them into an covariance
+    parameter name (e.g. a and b to FIT_COV_a_b) and then set it.
+******************************************************************/
+static void
+setvarcovar(char *varname1, char *varname2, double value)
+{
+    /* The name of the (new) covariance variable */
+    char * pCovValName = (char *) gp_alloc(strlen(varname1) + strlen(varname2) + 6, "setvarcovar");
+    sprintf(pCovValName, "FIT_COV_%s_%s", varname1, varname2);
+    setvar(pCovValName, value);
+    free(pCovValName);
 }
 
 

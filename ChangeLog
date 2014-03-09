@@ -1,3 +1,11 @@
+2014-03-09  Alexander Täschner  <taschna@users.sourceforge.net>
+
+	* src/fit.c src/fit.h src/save.c src/setshow.h src/set.c src/show.c
+	src/unset.c docs/gnuplot.doc:  Optionally store final covariance
+	matrix to user variables named "FIT_COV_a_b", where 'a', 'b' are
+	parameter names.
+	Patch #654
+
 2014-03-09  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/term.c (enhanced_recursion): Add LaTeX-like markup for boldface
