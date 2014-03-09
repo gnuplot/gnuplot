@@ -48,7 +48,9 @@
 /////////////////////////////
 // QtGnuplotEnhanced
 
-void QtGnuplotEnhanced::addText(const QString& fontName, double fontSize, double base, bool widthFlag,
+void QtGnuplotEnhanced::addText(const QString& fontName, double fontSize, 
+				QFont::Style fontStyle, QFont::Weight fontWeight,
+				double base, bool widthFlag,
                                 bool showFlag, int overprint, const QString& text, QColor color)
 {
 	if ((overprint == 1) && !(m_overprintMark)) // Underprint
@@ -62,6 +64,12 @@ void QtGnuplotEnhanced::addText(const QString& fontName, double fontSize, double
 		m_currentPos = m_savedPos;
 
 	QFont font(fontName, fontSize);
+	if (fontName.isEmpty()) {
+		// qDebug() << "Empty font name";
+		font.setFamily("Sans");		// FIXME: use default? use previous?
+	}
+	font.setStyle(fontStyle);
+	font.setWeight(fontWeight);
 	QtGnuplotEnhancedFragment* item = new QtGnuplotEnhancedFragment(font, text, this);
 	item->setPos(m_currentPos + QPointF(0., -base));
 	if (showFlag)

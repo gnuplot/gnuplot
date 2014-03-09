@@ -352,6 +352,8 @@ void QtGnuplotScene::processEvent(QtGnuplotEventType type, QDataStream& in)
 		flushCurrentPointsItem();
 		QString fontName; in >> fontName;
 		double fontSize ; in >> fontSize;
+		int fontStyle   ; in >> fontStyle;	// really QFont::Style
+		int fontWeight  ; in >> fontWeight;	// really QFont::Weight
 		double base     ; in >> base;
 		bool widthFlag  ; in >> widthFlag;
 		bool showFlag   ; in >> showFlag;
@@ -359,7 +361,9 @@ void QtGnuplotScene::processEvent(QtGnuplotEventType type, QDataStream& in)
 		QString text    ; in >> text;
 		if (m_enhanced == 0)
 			m_enhanced = new QtGnuplotEnhanced();
-		m_enhanced->addText(fontName, fontSize, base, widthFlag, showFlag,
+		m_enhanced->addText(fontName, fontSize, 
+				    (QFont::Style)fontStyle, (QFont::Weight)fontWeight,
+				    base, widthFlag, showFlag,
 		                    overprint, text, m_currentPen.color());
 	}
 	else if (type == GEEnhancedFinish)

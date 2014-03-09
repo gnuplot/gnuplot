@@ -113,6 +113,8 @@ struct QtGnuplotState {
     bool       enhancedWidthFlag;
     bool       enhancedShowFlag;
     int        enhancedOverprint;
+    enum QFont::Weight enhancedFontWeight;
+    enum QFont::Style enhancedFontStyle;
     QByteArray enhancedText;
 
     /// Constructor
@@ -136,6 +138,8 @@ struct QtGnuplotState {
         , enhancedWidthFlag()
         , enhancedShowFlag()
         , enhancedOverprint()
+        , enhancedFontWeight(QFont::Normal)
+        , enhancedFontStyle(QFont::StyleNormal)
         , enhancedText()
     {
     }
@@ -556,8 +560,10 @@ void qt_vector(unsigned int x, unsigned int y)
 void qt_enhanced_flush()
 {
 	qt->out << GEEnhancedFlush << qt->enhancedFontName << qt->enhancedFontSize
-	       << qt->enhancedBase << qt->enhancedWidthFlag << qt->enhancedShowFlag
-	       << qt->enhancedOverprint << qt->codec->toUnicode(qt->enhancedText);
+		<< (int)qt->enhancedFontStyle << (int)qt->enhancedFontWeight
+		<< qt->enhancedBase << qt->enhancedWidthFlag << qt->enhancedShowFlag
+		<< qt->enhancedOverprint 
+		<< qt->codec->toUnicode(qt->enhancedText);
 	qt->enhancedText.clear();
 }
 
@@ -571,7 +577,30 @@ void qt_enhanced_writec(int c)
 
 void qt_enhanced_open(char* fontname, double fontsize, double base, TBOOLEAN widthflag, TBOOLEAN showflag, int overprint)
 {
-	qt->enhancedFontName = fontname;
+	qt->enhancedFontSize  = fontsize;
+	qt->enhancedBase      = base;
+	qt->enhancedWidthFlag = widthflag;
+	qt->enhancedShowFlag  = showflag;
+	qt->enhancedOverprint = overprint;
+
+	// strip Bold or Italic property out of font name
+	QString tempname = fontname;
+	if (tempname.contains(",italic", Qt::CaseInsensitive))
+		qt->enhancedFontStyle = QFont::StyleItalic;
+	else
+		qt->enhancedFontStyle = QFont::StyleNormal;
+	if (tempname.contains(",bold", Qt::CaseInsensitive))
+		qt->enhancedFontWeight = QFont::Bold;
+	else
+		qt->enhancedFontWeight = QFont::Normal;
+	int comma = tempname.indexOf(",");
+	if (comma >= 0)
+		tempname.truncate(comma);
+	
+	// Blank font name means keep using the previous font
+	if (!tempname.isEmpty())
+		qt->enhancedFontName = tempname;
+
 	if (qt->enhancedFontName.toLower() == "symbol")
 	{
 		qt->enhancedSymbol = true;
@@ -579,12 +608,6 @@ void qt_enhanced_open(char* fontname, double fontsize, double base, TBOOLEAN wid
 	}
 	else
 		qt->enhancedSymbol = false;
-
-	qt->enhancedFontSize  = fontsize;
-	qt->enhancedBase      = base;
-	qt->enhancedWidthFlag = widthflag;
-	qt->enhancedShowFlag  = showflag;
-	qt->enhancedOverprint = overprint;
 }
 
 void qt_put_text(unsigned int x, unsigned int y, const char* string)

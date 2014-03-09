@@ -90,7 +90,9 @@ public:
 	virtual void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget);
 
 public:
-	void addText(const QString& fontName, double fontSize, double base, bool widthFlag,
+	void addText(const QString& fontName, double fontSize, 
+		     QFont::Style fontStyle, QFont::Weight fontWeight,
+		     double base, bool widthFlag,
 	             bool showFlag, int overprint, const QString& text, QColor color);
 
 private:

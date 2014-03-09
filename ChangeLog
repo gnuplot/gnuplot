@@ -1,3 +1,18 @@
+2014-03-09  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/term.c (enhanced_recursion): Add LaTeX-like markup for boldface
+	and italic in enhanced text mode:
+		'{\it italic} {/Times=12 \bf boldface}'
+	The backslash is a bit annoying because in double quotes you need to
+	escape it: "{\\it italic}".  We may want to change it.
+
+	* src/qtterminal/QtGnuplotItems.* src/qtterminal/QtGnuplotScene.cpp
+	src/qtterminal/qt_term.cpp:  Implement boldface and italic markup for
+	enhanced text.
+
+	* src/wxterminal/gp_cairo.c: Implement boldface and italic markup for
+	cairo terminals.
+
 2014-03-08  Christoph Bersch <usenet@bersch.net>
 
 	* src/set.c src/boundary.c: Allow changing textcolor of the timestamp.

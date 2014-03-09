@@ -1,5 +1,5 @@
 /*
- * $Id: gp_cairo.c,v 1.76 2013/10/25 04:45:22 sfeam Exp $
+ * $Id: gp_cairo.c,v 1.77 2013/12/12 19:18:19 sfeam Exp $
  */
 
 /* GNUPLOT - gp_cairo.c */
@@ -314,6 +314,7 @@ void gp_cairo_set_font(plot_struct *plot, const char *name, int fontsize)
 		do { *d = *(d+1); } while (*d++);
 	    } else {
 		if (*c == '-') *c = ' ';
+		if (*c == ',') *c = ' ';
 	    }
 	}
 	if ((c = strstr(fname, " Bold"))) {
@@ -1138,6 +1139,7 @@ void gp_cairo_draw_image(plot_struct *plot, unsigned int * image, int x1, int y1
 void gp_cairo_add_attr(plot_struct *plot, PangoAttrList * AttrList, int start, int end )
 {
 	PangoAttribute *p_attr_rise, *p_attr_size, *p_attr_family;
+	PangoAttribute *p_attr_weight, *p_attr_style;
 
 	p_attr_size = pango_attr_size_new ((int) (gp_cairo_enhanced_fontsize*PANGO_SCALE));
 	p_attr_size->start_index = start;
@@ -1153,6 +1155,16 @@ void gp_cairo_add_attr(plot_struct *plot, PangoAttrList * AttrList, int start, i
 	p_attr_family->start_index = start;
 	p_attr_family->end_index = end;
 	pango_attr_list_insert (AttrList, p_attr_family);
+
+	p_attr_weight = pango_attr_weight_new (plot->fontweight);
+	p_attr_weight->start_index = start;
+	p_attr_weight->end_index = end;
+	pango_attr_list_insert (AttrList, p_attr_weight);
+
+	p_attr_style = pango_attr_style_new (plot->fontstyle);
+	p_attr_style->start_index = start;
+	p_attr_style->end_index = end;
+	pango_attr_list_insert (AttrList, p_attr_style);
 }
 
 /* add a blank character to the text string with a custom shape */
@@ -1206,14 +1218,16 @@ void gp_cairo_enhanced_flush(plot_struct *plot)
 	if (!gp_cairo_enhanced_opened_string)
 		return;
 
-	FPRINTF((stderr, "enhanced flush str=\"%s\" font=%s op=%d sf=%d wf=%d base=%f os=%d\n",
+	FPRINTF((stderr, "enhanced flush str=\"%s\" font=%s op=%d sf=%d wf=%d base=%f os=%d wt=%d sl=%d\n",
 		enhanced_text,
 		gp_cairo_enhanced_font,
 		gp_cairo_enhanced_overprint,
 		gp_cairo_enhanced_showflag,
 		gp_cairo_enhanced_widthflag,
 		gp_cairo_enhanced_base,
-		gp_cairo_enhanced_opened_string ));
+		gp_cairo_enhanced_opened_string,
+		plot->fontweight,
+		plot->fontstyle ));
 
 	gp_cairo_enhanced_opened_string = FALSE;
 
@@ -1457,9 +1471,16 @@ void gp_cairo_enhanced_open(plot_struct *plot, char* fontname, double fontsize, 
 	}
 
 	if (!gp_cairo_enhanced_opened_string) {
+		// Strip off Bold or Italic and apply immediately
+		// Is it really necessary to preserve plot->fontname?
+		char *save_plot_font = strdup(plot->fontname);
+		gp_cairo_set_font(plot, fontname, plot->fontsize);
+		strncpy(gp_cairo_enhanced_font, plot->fontname, sizeof(gp_cairo_enhanced_font));
+		strcpy(plot->fontname, save_plot_font);
+		free(save_plot_font);
+
 		gp_cairo_enhanced_opened_string = TRUE;
 		gp_cairo_enhanced_char = gp_cairo_enhanced_string;
-		strncpy(gp_cairo_enhanced_font, fontname, sizeof(gp_cairo_enhanced_font));
 		gp_cairo_enhanced_fontsize = fontsize*plot->oversampling_scale;
 		gp_cairo_enhanced_base = base*plot->oversampling_scale;
 		gp_cairo_enhanced_showflag = showflag;

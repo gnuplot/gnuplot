@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.272 2014/01/04 02:55:06 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.273 2014/03/08 07:34:32 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -237,6 +237,8 @@ static void LINETYPE_null __PROTO((int));
 static void PUTTEXT_null __PROTO((unsigned int, unsigned int, const char *));
 
 static int strlen_tex __PROTO((const char *));
+
+static char *stylefont __PROTO((const char *fontname, TBOOLEAN isbold, TBOOLEAN isitalic));
 
 /* Used by terminals and by shared routine parse_term_size() */
 typedef enum {
@@ -2472,7 +2474,15 @@ enhanced_recursion(
     TBOOLEAN showflag,
     int overprint)
 {
-    ENH_DEBUG(("RECURSE WITH [%p] \"%s\", %d %s %.1f %.1f %d %d %d\n", p, p, brace, fontname, fontsize, base, widthflag, showflag, overprint));
+    TBOOLEAN isitalic = FALSE;
+    TBOOLEAN isbold = FALSE;
+
+    /* Keep track of the style of the font passed in at this recursion level */
+    isitalic = (strstr(fontname, ",Italic") != NULL);
+    isbold = (strstr(fontname, ",Bold") != NULL);
+
+    FPRINTF((stderr, "RECURSE WITH \"%s\", %d %s %.1f %.1f %d %d %d", p, brace, fontname, fontsize, base, widthflag, showflag, overprint));
+    FPRINTF((stderr, "%s%s\n", isbold ? " bold" : " .", isitalic ? " italic" : " ."));
 
     /* Start each recursion with a clean string */
     (term->enhanced_flush)();
@@ -2542,6 +2552,9 @@ enhanced_recursion(
 		char *savepos = NULL, save = 0;
 		char *localfontname = fontname, ch;
 		float f = fontsize, ovp;
+
+		/* Mar 2014 - this will hold "fontfamily{,Italic}{,Bold}" */
+		char *styledfontname = NULL;
 
 		/*{{{  recurse (possibly with a new font) */
 
@@ -2613,14 +2626,33 @@ enhanced_recursion(
 		}
 		/*}}}*/
 
+		/* New syntax for font style markup:
+		 *  { ...font stuff... \it ... text to print in italic }
+		 *  { ...font stuff... \bf ... text to print in boldface }
+		 */
+		if (!strncmp(p, "\\it", 3)) {
+			isitalic = TRUE;
+			p += 3;
+			while (*++p == ' ');
+		}
+		if (!strncmp(p, "\\bf", 3)) {
+			isbold = TRUE;
+			p += 3;
+			while (*++p == ' ');
+		}
+
+		styledfontname = stylefont(localfontname, isbold, isitalic);
+
 		ENH_DEBUG(("Before recursing, we are at [%p] \"%s\"\n", p, p));
 
-		p = enhanced_recursion(p, TRUE, localfontname, f, base,
+		p = enhanced_recursion(p, TRUE, styledfontname, f, base,
 				  widthflag, showflag, overprint);
 
 		ENH_DEBUG(("BACK WITH \"%s\"\n", p));
 
 		(term->enhanced_flush)();
+
+		free(styledfontname);
 
 		if (savepos)
 		    /* restore overwritten character */
@@ -2758,6 +2790,26 @@ enhanced_recursion(
 
     (term->enhanced_flush)();
     return p;
+}
+
+/* Strip off anything trailing the requested font name,
+ * then add back markup requests.
+ */
+char *
+stylefont(const char *fontname, TBOOLEAN isbold, TBOOLEAN isitalic)
+{
+    char *div;
+    char *markup = gp_alloc( strlen(fontname) + 16, "font markup");
+    strcpy(markup, fontname);
+    if ((div = strchr(markup,',')))
+	*div = '\0';
+    if (isbold)
+	strcat(markup, ",Bold");
+    if (isitalic)
+	strcat(markup, ",Italic");
+
+    FPRINTF((stderr, "MARKUP FONT: %s\n", markup));
+    return markup;
 }
 
 /* Called after the end of recursion to check for errors */
