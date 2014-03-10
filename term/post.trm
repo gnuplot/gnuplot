@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: post.trm,v 1.277 2013/05/21 20:36:46 sfeam Exp $
+ * $Id: post.trm,v 1.278 2013/10/07 21:43:48 sfeam Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -623,17 +623,15 @@ PS_options()
 	ps_params = &pstex_params;
     else if (strcmp(term->name, "pslatex") == 0)
 	ps_params = &pslatex_params;
-    else if (strcmp(term->name, "epslatex") == 0) {
+    else if (strcmp(term->name, "epslatex") == 0)
 	ps_params = &epslatex_params;
-    } else
+    else
 	ps_params = &post_params;
 
     if (ps_params->terminal == PSTERM_POSTSCRIPT) {
 	if (pslatex_auxname)
 	    free(pslatex_auxname);
 	pslatex_auxname = NULL;
-    } else {
-	term->set_font = PS_set_font;
     }
 
     if (!END_OF_COMMAND) {
@@ -656,18 +654,20 @@ PS_options()
 		break;
 	    }
 	    c_token++;
-	    /* Default to enhanced text */
-	    if (ps_params->terminal == PSTERM_PSTEX) {
-		term->flags &= ~TERM_ENHANCED_TEXT;
-	    } else {
-		term->put_text = ENHPS_put_text;
-		term->set_font = ENHPS_set_font;
-		term->flags |= TERM_ENHANCED_TEXT;
-	    }
 	    if (!END_OF_COMMAND) 
 		int_error(c_token,
 			  "extraneous argument in set terminal %s",term->name);
 	}
+    }
+
+    /* Default to enhanced text */
+    if (ps_params->terminal == PSTERM_POSTSCRIPT) {
+	term->put_text = ENHPS_put_text;
+	term->set_font = ENHPS_set_font;
+	term->flags |= TERM_ENHANCED_TEXT;
+    } else {
+	term->set_font = PS_set_font;
+	term->flags &= ~TERM_ENHANCED_TEXT;
     }
 
     while (!END_OF_COMMAND) {

@@ -14,6 +14,9 @@
 	a clever system font manager.  Still needed: documentation and support
 	for more terminals.
 
+	* term/post.trm: Not all "set temr post" commands were correctly
+	defaulting to enhanced text mode.
+
 2014-03-09  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/eval.c src/eval.h src/internal.c src/parse.c src/scanner.c
