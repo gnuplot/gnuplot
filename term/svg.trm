@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: svg.trm,v 1.159 2013/12/18 22:32:55 sfeam Exp $
+ * $Id: svg.trm,v 1.160 2014/02/05 22:58:13 sfeam Exp $
  */
 
 /*------------------------------------------------------------------------------------------------------------------------------------
@@ -1821,19 +1821,41 @@ ENHsvg_OPEN(
 
 	/* Start a new textspan fragment */
 	fputs("<tspan", gpoutfile);
+#if (0)
 	if (strcmp(SVG_fontNameCur, fontname)) {
 	    free(SVG_fontNameCur);
 	    SVG_fontNameCur = gp_strdup(fontname);
 	    fprintf(gpoutfile, " font-family=\"%s\" ", SVG_fontNameCur);
 	}
-	if (SVG_fontSizeCur != fontsize) {
-	    SVG_fontSizeCur = fontsize;
-	    fprintf(gpoutfile, " font-size=\"%.1f\"", SVG_fontSizeCur * SVG_fontscale);
-	}
 	if (SVG_fontWeightCur && strcmp(SVG_fontWeightCur,"normal"))
 	    fprintf(gpoutfile, " font-weight=\"%s\" ", SVG_fontWeightCur);
 	if (SVG_fontStyleCur && strcmp(SVG_fontStyleCur,"normal"))
 	    fprintf(gpoutfile, " font-style=\"%s\" ", SVG_fontStyleCur);
+#else
+	if (!fontname)
+	    fprintf(stderr,"ENHsvg_OPEN: null fontname\n");
+	else {
+	    char *family = strdup(fontname);
+	    char *sep = strchr(family, ':');
+	    if (sep)
+		*sep = '\0';
+	    if (strcmp(SVG_fontNameCur, family)) {
+		free(SVG_fontNameCur);
+		SVG_fontNameCur = family;
+	    } else {
+		free(family);
+	    }
+	    fprintf(gpoutfile, " font-family=\"%s\" ", SVG_fontNameCur);
+	    if (strstr(fontname,":Bold"))
+		fprintf(gpoutfile, " font-weight=\"bold\" ");
+	    if (strstr(fontname,":Italic"))
+		fprintf(gpoutfile, " font-style=\"italic\" ");
+	}
+#endif
+	if (SVG_fontSizeCur != fontsize) {
+	    SVG_fontSizeCur = fontsize;
+	    fprintf(gpoutfile, " font-size=\"%.1f\"", SVG_fontSizeCur * SVG_fontscale);
+	}
 	if (ENHsvg_x_offset != 0) {
 	    fprintf(gpoutfile, " dx=\"%.2fem\"", ENHsvg_x_offset);
 	    ENHsvg_x_offset = 0.0;
