@@ -1,7 +1,8 @@
 2014-03-09  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/eval.c src/eval.h src/internal.c src/parse.c src/scanner.c
-	src/internal.h:  Bit shifting binary operators << and >>.
+	src/internal.h demo/rgba_lines.dem docs/gnuplot.doc:
+	Bit shifting binary operators << and >>.
 
 2014-03-09  Bastian Maerkisch  <bmaerkisch@web.de>
 
