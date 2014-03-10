@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.274 2014/03/09 06:42:51 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.275 2014/03/10 06:12:09 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -1690,13 +1690,13 @@ set_term()
 
     if (!END_OF_COMMAND) {
 	input_name = gp_input_line + token[c_token].start_index;
-    	t = change_term(input_name, token[c_token].length);
+	t = change_term(input_name, token[c_token].length);
 	if (!t && isstringvalue(c_token)) {
 	    input_name = try_to_get_string();  /* Cannot fail if isstringvalue succeeded */
 	    t = change_term(input_name, strlen(input_name));
 	    free(input_name);
 	} else {
-    	    c_token++;
+	    c_token++;
 	}
     }
 
@@ -2463,9 +2463,9 @@ do_enh_writec(int c)
  *              (overprinted text is centered horizontally on underprinted text
  */
 
-char *
+const char *
 enhanced_recursion(
-    char *p,
+    const char *p,
     TBOOLEAN brace,
     char *fontname,
     double fontsize,
@@ -2478,8 +2478,8 @@ enhanced_recursion(
     TBOOLEAN isbold = FALSE;
 
     /* Keep track of the style of the font passed in at this recursion level */
-    isitalic = (strstr(fontname, ",Italic") != NULL);
-    isbold = (strstr(fontname, ",Bold") != NULL);
+    isitalic = (strstr(fontname, ":Italic") != NULL);
+    isbold = (strstr(fontname, ":Bold") != NULL);
 
     FPRINTF((stderr, "RECURSE WITH \"%s\", %d %s %.1f %.1f %d %d %d", p, brace, fontname, fontsize, base, widthflag, showflag, overprint));
     FPRINTF((stderr, "%s%s\n", isbold ? " bold" : " .", isitalic ? " italic" : " ."));
@@ -2549,11 +2549,13 @@ enhanced_recursion(
 	    /*}}}*/
 	case '{'  :
 	    {
-		char *savepos = NULL, save = 0;
-		char *localfontname = fontname, ch;
+		const char *start_of_fontname = NULL;
+		const char *end_of_fontname = NULL;
+		char *localfontname = NULL;
+		char ch;
 		float f = fontsize, ovp;
 
-		/* Mar 2014 - this will hold "fontfamily{,Italic}{,Bold}" */
+		/* Mar 2014 - this will hold "fontfamily{:Italic}{:Bold}" */
 		char *styledfontname = NULL;
 
 		/*{{{  recurse (possibly with a new font) */
@@ -2563,7 +2565,9 @@ enhanced_recursion(
 		/* get vertical offset (if present) for overprinted text */
 		while (*++p == ' ');
 		if (overprint == 2) {
-		    ovp = (float)strtod(p,&p);
+		    char *end;
+		    ovp = (float)strtod(p,&end);
+		    p = end;
 		    if (term->flags & TERM_IS_POSTSCRIPT)
 			base = ovp*f;
 		    else
@@ -2579,89 +2583,85 @@ enhanced_recursion(
 			while (*++p == ' ')
 			    ;   /* do nothing */
 		    }
-		    localfontname = p;
-		    while ((ch = *p) > ' ' && ch != '=' && ch != '*' && ch != '}')
+		    start_of_fontname = p;
+		    while ((ch = *p) > ' ' && ch != '=' && ch != '*' && ch != '}' && ch != ':')
 			++p;
-		    save = *(savepos=p);
-		    if (ch == '=') {
-			*p++ = '\0';
-			/*{{{  get optional font size*/
-			ENH_DEBUG(("Calling strtod(\"%s\") ...", p));
-			f = (float)strtod(p, &p);
-			ENH_DEBUG(("Returned %.1f and \"%s\"\n", f, p));
+		    end_of_fontname = p;
+		    do {
+			if (ch == '=') {
+			    /* get optional font size */
+			    char *end;
+			    p++;
+			    ENH_DEBUG(("Calling strtod(\"%s\") ...", p));
+			    f = (float)strtod(p, &end);
+			    p = end;
+			    ENH_DEBUG(("Returned %.1f and \"%s\"\n", f, p));
 
-			if (f == 0)
-			    f = fontsize;
-			else
-			    f *= enhanced_fontscale;  /* remember the scaling */
+			    if (f == 0)
+				f = fontsize;
+			    else
+				f *= enhanced_fontscale;  /* remember the scaling */
 
-			ENH_DEBUG(("Font size %.1f\n", f));
-			/*}}}*/
-		    } else if (ch == '*') {
-			*p++ = '\0';
-			/*{{{  get optional font size scale factor*/
-			ENH_DEBUG(("Calling strtod(\"%s\") ...", p));
-			f = (float)strtod(p, &p);
-			ENH_DEBUG(("Returned %.1f and \"%s\"\n", f, p));
+			    ENH_DEBUG(("Font size %.1f\n", f));
+			} else if (ch == '*') {
+			    /* get optional font size scale factor */
+			    char *end;
+			    p++;
+			    ENH_DEBUG(("Calling strtod(\"%s\") ...", p));
+			    f = (float)strtod(p, &end);
+			    p = end;
+			    ENH_DEBUG(("Returned %.1f and \"%s\"\n", f, p));
 
-			if (f)
-			    f *= fontsize;  /* apply the scale factor */
-			else
-			    f = fontsize;
+			    if (f)
+				f *= fontsize;  /* apply the scale factor */
+			    else
+				f = fontsize;
 
-			ENH_DEBUG(("Font size %.1f\n", f));
-			/*}}}*/
-		    } else if (ch == '}') {
+			    ENH_DEBUG(("Font size %.1f\n", f));
+			} else if (ch == ':') {
+			    /* get optional style markup attributes */
+			    p++;
+			    if (!strncmp(p,"Bold",4))
+				isbold = TRUE;
+			    if (!strncmp(p,"Italic",6))
+				isitalic = TRUE;
+			    if (!strncmp(p,"Normal",6))
+				isitalic = isbold = FALSE;
+			    while (isalpha(*p)) {p++;}
+			}
+		    } while (((ch = *p) == '=') || (ch == ':') || (ch == '*'));
+
+		    if (ch == '}')
 			int_warn(NO_CARET,"bad syntax in enhanced text string");
-			*p++ = '\0';
-		    } else {
-			*p++ = '\0';
-			f = fontsize;
-		    }
 
 		    while (*p == ' ')
 			++p;
-		    if (! *localfontname)
-			localfontname = fontname;
+		    if (!start_of_fontname || (start_of_fontname == end_of_fontname)) {
+			/* Use the font name passed in to us */
+			localfontname = gp_strdup(fontname);
+		    } else {
+			/* We found a new font name {/Font ...} */
+			int len = end_of_fontname - start_of_fontname;
+			localfontname = gp_alloc(len+1,"localfontname");
+			strncpy(localfontname, start_of_fontname, len);
+			localfontname[len] = '\0';
+		    }
 		}
 		/*}}}*/
 
-		/* New syntax for font style markup:
-		 *  { ...font stuff... \it ... text to print in italic }
-		 *  { ...font stuff... \bf ... text to print in boldface }
-		 */
-		if (!strncmp(p, "\\it", 3)) {
-			isitalic = TRUE;
-			p += 3;
-			while (*++p == ' ');
-		}
-		if (!strncmp(p, "\\bf", 3)) {
-			isbold = TRUE;
-			p += 3;
-			while (*++p == ' ');
-		}
-		if (!strncmp(p, "\\it", 3)) {  /* could be in either order */
-			isitalic = TRUE;
-			p += 3;
-			while (*++p == ' ');
-		}
+		FPRINTF((stderr,"Before recursing, we are at \"%s\" with fontsize %.2f\n", p, f));
 
-		styledfontname = stylefont(localfontname, isbold, isitalic);
-
-		ENH_DEBUG(("Before recursing, we are at [%p] \"%s\"\n", p, p));
+		styledfontname = stylefont(localfontname ? localfontname : "",
+						isbold, isitalic);
 
 		p = enhanced_recursion(p, TRUE, styledfontname, f, base,
 				  widthflag, showflag, overprint);
 
-		ENH_DEBUG(("BACK WITH \"%s\"\n", p));
-
 		(term->enhanced_flush)();
 
 		free(styledfontname);
+		free(localfontname);
 
-		if (savepos)
-		    /* restore overwritten character */
-		    *savepos = save;
 		break;
 	    } /* case '{' */
 	case '@' :
@@ -2806,14 +2806,14 @@ stylefont(const char *fontname, TBOOLEAN isbold, TBOOLEAN isitalic)
     char *div;
     char *markup = gp_alloc( strlen(fontname) + 16, "font markup");
     strcpy(markup, fontname);
-    if ((div = strchr(markup,',')))
+    if ((div = strchr(markup,':')))
 	*div = '\0';
     if (isbold)
-	strcat(markup, ",Bold");
+	strcat(markup, ":Bold");
     if (isitalic)
-	strcat(markup, ",Italic");
+	strcat(markup, ":Italic");
 
-    FPRINTF((stderr, "MARKUP FONT: %s\n", markup));
+    FPRINTF((stderr, "MARKUP FONT: %s -> %s\n", fontname, markup));
     return markup;
 }
 
@@ -3163,7 +3163,7 @@ check_for_mouse_events()
     ctrlc_flag = FALSE;
 	term_reset();
 	putc('\n', stderr);
-    fprintf(stderr, "Ctrl-C detected!\n");
+	fprintf(stderr, "Ctrl-C detected!\n");
 	bail_to_command_line();	/* return to prompt */
     }
 #endif

@@ -1,5 +1,5 @@
 /*
- * $Id: gp_cairo.c,v 1.77 2013/12/12 19:18:19 sfeam Exp $
+ * $Id: gp_cairo.c,v 1.78 2014/03/09 06:42:52 sfeam Exp $
  */
 
 /* GNUPLOT - gp_cairo.c */
@@ -314,7 +314,7 @@ void gp_cairo_set_font(plot_struct *plot, const char *name, int fontsize)
 		do { *d = *(d+1); } while (*d++);
 	    } else {
 		if (*c == '-') *c = ' ';
-		if (*c == ',') *c = ' ';
+		if (*c == ':') *c = ' ';
 	    }
 	}
 	if ((c = strstr(fname, " Bold"))) {

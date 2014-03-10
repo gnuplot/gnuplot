@@ -585,17 +585,17 @@ void qt_enhanced_open(char* fontname, double fontsize, double base, TBOOLEAN wid
 
 	// strip Bold or Italic property out of font name
 	QString tempname = fontname;
-	if (tempname.contains(",italic", Qt::CaseInsensitive))
+	if (tempname.contains(":italic", Qt::CaseInsensitive))
 		qt->enhancedFontStyle = QFont::StyleItalic;
 	else
 		qt->enhancedFontStyle = QFont::StyleNormal;
-	if (tempname.contains(",bold", Qt::CaseInsensitive))
+	if (tempname.contains(":bold", Qt::CaseInsensitive))
 		qt->enhancedFontWeight = QFont::Bold;
 	else
 		qt->enhancedFontWeight = QFont::Normal;
-	int comma = tempname.indexOf(",");
-	if (comma >= 0)
-		tempname.truncate(comma);
+	int sep = tempname.indexOf(":");
+	if (sep >= 0)
+		tempname.truncate(sep);
 	
 	// Blank font name means keep using the previous font
 	if (!tempname.isEmpty())

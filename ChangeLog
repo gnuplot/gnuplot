@@ -1,3 +1,19 @@
+2014-03-10  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/term.c src/qtterminal/qt_term.cpp src/wxterminal/gp_cairo.c
+	src/term_api.h demo/bolditalic.dem:
+
+	Revised syntax for bold/italic markup of text as per suggestions on
+	gnuplot-beta list. Rather than the TeX-like \bf and \it it now accepts
+	    {/font=size:Bold:Italic  text}
+	    {/font:Bold:Italic=size  text}
+	    {/:Bold text_{:/Normal text}
+	Tested on wxt, qt, cairo terminals, libgd terminals, and PostScript.
+	I don't know how it manages to work on libgd or PostScript (I did
+	not modify the existing code), but suspect that it depends on having
+	a clever system font manager.  Still needed: documentation and support
+	for more terminals.
+
 2014-03-09  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/eval.c src/eval.h src/internal.c src/parse.c src/scanner.c
