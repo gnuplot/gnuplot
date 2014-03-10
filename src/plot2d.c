@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.319 2014/01/31 03:43:40 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.320 2014/03/03 04:09:30 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -1883,7 +1883,7 @@ eval_plots()
     struct curve_points *this_plot, **tp_ptr;
     t_uses_axis uses_axis[AXIS_ARRAY_SIZE];
     int some_functions = 0;
-    int plot_num, line_num, point_num;
+    int plot_num, line_num;
     TBOOLEAN in_parametric = FALSE;
     TBOOLEAN was_definition = FALSE;
     int pattern_num;
@@ -1920,7 +1920,6 @@ eval_plots()
     tp_ptr = &(first_plot);
     plot_num = 0;
     line_num = 0;               /* default line type */
-    point_num = 0;              /* default point type */
     pattern_num = default_fillstyle.fillpattern;        /* default fill pattern */
 
     xtitle = NULL;
@@ -2397,7 +2396,7 @@ eval_plots()
 		    struct lp_style_type lp = DEFAULT_LP_STYLE_TYPE;
 
 		    lp.l_type = line_num;
-		    lp.p_type = point_num;
+		    lp.p_type = line_num;
 
 		    /* user may prefer explicit line styles */
 		    if (prefer_line_styles)
@@ -2485,7 +2484,7 @@ eval_plots()
 	    if (! set_lpstyle) {
 		this_plot->lp_properties.l_type = line_num;
 		this_plot->lp_properties.l_width = 1.0;
-		this_plot->lp_properties.p_type = point_num;
+		this_plot->lp_properties.p_type = line_num;
 		this_plot->lp_properties.p_size = pointsize;
 
 		/* user may prefer explicit line styles */
@@ -2633,8 +2632,6 @@ eval_plots()
 	    if (this_plot->plot_type == DATA) {
 		if (specs < 0) {
 		    /* Error check to handle missing or unreadable file */
-		    if (this_plot->plot_style & PLOT_STYLE_HAS_POINT)
-			++point_num;
 		    ++line_num;
 		    this_plot->plot_type = NODATA;
 		    goto SKIPPED_EMPTY_FILE;
@@ -2681,8 +2678,6 @@ eval_plots()
 		/* don't increment the default line/point properties if
 		 * this_plot is an image */
 	    ) {
-		if (this_plot->plot_style & PLOT_STYLE_HAS_POINT)
-		    ++point_num;
 		++line_num;
 	    }
 	    if (this_plot->plot_type == DATA) {

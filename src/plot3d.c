@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.221 2014/01/10 03:31:08 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.222 2014/01/12 22:49:32 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -1293,7 +1293,7 @@ eval_3dplots()
     TBOOLEAN some_data_files = FALSE, some_functions = FALSE;
     TBOOLEAN was_definition = FALSE;
     int df_return = 0;
-    int plot_num, line_num, point_num;
+    int plot_num, line_num;
     /* part number of parametric function triplet: 0 = z, 1 = y, 2 = x */
     int crnt_param = 0;
     char *xtitle;
@@ -1316,7 +1316,6 @@ eval_3dplots()
     tp_3d_ptr = &(first_3dplot);
     plot_num = 0;
     line_num = 0;		/* default line type */
-    point_num = 0;		/* default point type */
 
     /* Assume that the input data can be re-read later */
     volatile_data = FALSE;
@@ -1500,7 +1499,7 @@ eval_3dplots()
 
 	    /* default line and point types */
 	    this_plot->lp_properties.l_type = line_num;
-	    this_plot->lp_properties.p_type = point_num;
+	    this_plot->lp_properties.p_type = line_num;
 
 	    /* user may prefer explicit line styles */
 	    this_plot->hidden3d_top_linetype = line_num;
@@ -1670,7 +1669,7 @@ eval_3dplots()
 		    int new_lt = 0;
 
 		    lp.l_type = line_num;
-		    lp.p_type = point_num;
+		    lp.p_type = line_num;
 
 		    /* user may prefer explicit line styles */
 		    if (prefer_line_styles)
@@ -1735,7 +1734,7 @@ eval_3dplots()
 		    int new_lt = 0;
 		    this_plot->lp_properties.l_type = line_num;
 		    this_plot->lp_properties.l_width = 1.0;
-		    this_plot->lp_properties.p_type = point_num;
+		    this_plot->lp_properties.p_type = line_num;
 		    this_plot->lp_properties.p_size = pointsize;
 
 		    /* user may prefer explicit line styles */
@@ -1777,8 +1776,6 @@ eval_3dplots()
 		&& this_plot->plot_style != RGBA_IMAGE
 		/* same as above, for an (rgb)image plot */
 		) {
-		if (this_plot->plot_style & PLOT_STYLE_HAS_POINT)
-		    point_num += 1 + (draw_contour != 0) + (hidden3d != 0);
 		line_num += 1 + (draw_contour != 0) + (hidden3d != 0);
 	    }
 

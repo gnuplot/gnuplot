@@ -14,8 +14,12 @@
 	a clever system font manager.  Still needed: documentation and support
 	for more terminals.
 
-	* term/post.trm: Not all "set temr post" commands were correctly
+	* term/post.trm: Not all "set term post" commands were correctly
 	defaulting to enhanced text mode.
+
+	* src/plot2d.c src/plot3d.c: Auto-increment point types strictly in
+	sync with line types.  This removes the oddity that automatically
+	generated point types would not necessarily match the plot number.
 
 2014-03-09  Ethan A Merritt  <merritt@u.washington.edu>
 
