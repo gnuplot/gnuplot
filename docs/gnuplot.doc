@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.701.2.36 2014/02/25 06:01:45 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.701.2.37 2014/02/26 07:36:16 markisch Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -3371,7 +3371,7 @@ Ffigure_histeps
  requires additional columns of input for each entry. The first column holds
  the height (y value) of that box, exactly as for the `clustered` style.
       2 columns:        y yerr          bar extends from y-yerr to y+err
-      3 columns:        y ymin yman     bar extends from ymin to ymax
+      3 columns:        y ymin ymax     bar extends from ymin to ymax
  The appearance of the error bars is controlled by the current value of
  `set bars` and by the optional <linewidth> specification.
 
