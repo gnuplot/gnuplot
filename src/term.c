@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.275 2014/03/10 06:12:09 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.276 2014/03/11 00:47:22 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -2474,15 +2474,14 @@ enhanced_recursion(
     TBOOLEAN showflag,
     int overprint)
 {
-    TBOOLEAN isitalic = FALSE;
-    TBOOLEAN isbold = FALSE;
+    TBOOLEAN wasitalic, wasbold;
 
     /* Keep track of the style of the font passed in at this recursion level */
-    isitalic = (strstr(fontname, ":Italic") != NULL);
-    isbold = (strstr(fontname, ":Bold") != NULL);
+    wasitalic = (strstr(fontname, ":Italic") != NULL);
+    wasbold = (strstr(fontname, ":Bold") != NULL);
 
-    FPRINTF((stderr, "RECURSE WITH \"%s\", %d %s %.1f %.1f %d %d %d", p, brace, fontname, fontsize, base, widthflag, showflag, overprint));
-    FPRINTF((stderr, "%s%s\n", isbold ? " bold" : " .", isitalic ? " italic" : " ."));
+    FPRINTF((stderr, "RECURSE WITH \"%s\", %d %s %.1f %.1f %d %d %d",
+		p, brace, fontname, fontsize, base, widthflag, showflag, overprint));
 
     /* Start each recursion with a clean string */
     (term->enhanced_flush)();
@@ -2549,6 +2548,7 @@ enhanced_recursion(
 	    /*}}}*/
 	case '{'  :
 	    {
+		TBOOLEAN isitalic = FALSE, isbold = FALSE, isnormal = FALSE;
 		const char *start_of_fontname = NULL;
 		const char *end_of_fontname = NULL;
 		char *localfontname = NULL;
@@ -2626,7 +2626,7 @@ enhanced_recursion(
 			    if (!strncmp(p,"Italic",6))
 				isitalic = TRUE;
 			    if (!strncmp(p,"Normal",6))
-				isitalic = isbold = FALSE;
+				isnormal = TRUE;
 			    while (isalpha(*p)) {p++;}
 			}
 		    } while (((ch = *p) == '=') || (ch == ':') || (ch == '*'));
@@ -2649,10 +2649,12 @@ enhanced_recursion(
 		}
 		/*}}}*/
 
-		FPRINTF((stderr,"Before recursing, we are at \"%s\" with fontsize %.2f\n", p, f));
+		/* Collect cumulative style markup before passing it in the font name */
+		isitalic = (wasitalic || isitalic) && !isnormal;
+		isbold = (wasbold || isbold) && !isnormal;
 
 		styledfontname = stylefont(localfontname ? localfontname : "",
-						isbold, isitalic);
+					    isbold, isitalic);
 
 		p = enhanced_recursion(p, TRUE, styledfontname, f, base,
 				  widthflag, showflag, overprint);

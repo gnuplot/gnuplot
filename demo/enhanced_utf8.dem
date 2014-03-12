@@ -1,6 +1,5 @@
 #
 # Test page for enhanced text mode in UTF-8 encoding
-# E A Merritt - November 2007
 #
 # Suggested PostScript font test
 # set term post color fontfile /usr/local/fonts/'l_10646.ttf' font "LucidaSansUnicode,12"
@@ -46,6 +45,8 @@ set label 22 at 0.5, -.2
 set label 22 "Right ^{centered} ƒ(αβγδεζ)" right
 set label 23 at 0.5, -.3
 set label 23 "Center^{centered} ƒ(αβγδεζ)" center
+
+set label 30 at -.9, 0.0 "{/:Bold Bold} and {/:Italic Italic} markup"
 #
 set key title " "
 plot sin(x)**2 lt 2 lw 2 title "sin^2(x)"
