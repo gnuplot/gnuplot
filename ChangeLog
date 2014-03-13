@@ -1,8 +1,11 @@
-2014-03-12  Ethan A Merritt  <merritt@u.washington.edu>
+2014-03-13  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/term.c (enhanced_recursion):  Bugfix for bold/italic.
 
-	* demo/enhanced_utf8.dem:  And bold/italic markup to demo.
+	* demo/enhanced_utf8.dem:  Add bold/italic markup to demo.
+
+	* term/js/gnuplot_svg.js:  Work around a Firefox bug (incorrect
+	text length calculation affects alignment of multiline hypertext).
 
 2014-03-10  Ethan A Merritt  <merritt@u.washington.edu>
 

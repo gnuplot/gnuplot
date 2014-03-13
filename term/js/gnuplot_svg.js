@@ -1,12 +1,12 @@
 /*
- * $Id: gnuplot_svg.js,v 1.13 2014/02/28 23:01:44 sfeam Exp $
+ * $Id: gnuplot_svg.js,v 1.14 2014/03/02 00:32:14 sfeam Exp $
  */
 // Javascript routines for interaction with SVG documents produced by 
 // gnuplot's SVG terminal driver.
 
 var gnuplot_svg = { };
 
-gnuplot_svg.version = "02 Mar 2014";
+gnuplot_svg.version = "13 Mar 2014";
 
 gnuplot_svg.SVGDoc = null;
 gnuplot_svg.SVGRoot = null;
@@ -204,7 +204,6 @@ gnuplot_svg.showHypertext = function(evt, mouseovertext)
 
 	for (var l=1; l<lines.length; l++) {
 	    var tspan_element = document.createElementNS(xmlns, "tspan");
-	    tspan_element.setAttributeNS(null, "dx", -ll);
 	    tspan_element.setAttributeNS(null,"dy", 16);
 	    textNode = document.createTextNode(lines[l]);
 	    tspan_element.appendChild(textNode);
@@ -219,8 +218,15 @@ gnuplot_svg.showHypertext = function(evt, mouseovertext)
     // bounce off right edge
     if (anchor_x > gnuplot_svg.plot_xmax + 14 - length) {
 	anchor_x -= length;
-	hypertextbox.setAttributeNS(null,"x",anchor_x-4);
-	hypertext.setAttributeNS(null,"x",anchor_x);
+	hypertextbox.setAttributeNS(null,"x",anchor_x+10);
+	hypertext.setAttributeNS(null,"x",anchor_x+14);
+    }
+
+    // left-justify multiline text
+    var tspan_element = hypertext.firstChild;
+    while (tspan_element) {
+	tspan_element.setAttributeNS(null,"x",anchor_x+14);
+	tspan_element = tspan_element.nextElementSibling;
     }
 
 }
