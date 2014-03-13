@@ -4,6 +4,9 @@
 
 	* demo/enhanced_utf8.dem:  Add bold/italic markup to demo.
 
+	* docs/gnuplot.doc:  Add bold/italic examples to the section on
+	enhanced text.
+
 	* term/js/gnuplot_svg.js:  Work around a Firefox bug (incorrect
 	text length calculation affects alignment of multiline hypertext).
 

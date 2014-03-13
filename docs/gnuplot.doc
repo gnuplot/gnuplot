@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.863 2014/03/10 01:28:37 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.864 2014/03/11 18:17:07 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -564,10 +564,9 @@ C
  Many terminal types support an enhanced text mode in which additional
  formatting information is embedded in the text string.  For example, "x^2"
  will write x-squared as we are used to seeing it, with a superscript 2.
- This mode is normally selected when you set the terminal, e.g.
- "set term png enhanced", but may also be toggled afterward using
- "set termoption enhanced", or by marking individual strings as in
- "set label 'x_2' noenhanced".
+ This mode is selected by default when you set the terminal, but may be
+ toggled afterward using "set termoption [no]enhanced", or by marking
+ individual strings as in "set label 'x_2' noenhanced".
 
 @start table - first is interactive cleartext form
   Control      Examples        Explanation
@@ -577,7 +576,11 @@ C
    &           &{space}        inserts space of specified length
    ~           ~a{.8-}         overprints '-' on 'a', raised by .8
                                times the current fontsize
-#\begin{tabular}{|cccl|} \hline
+   {/Times abc}                print abc in font Times at current size
+   {/Times*2 abc}              print abc in font Times at twice current size
+   {/Times:Italic abc}         print abs in Times with style italic
+   {/Arial:Bold=20 abc}        print abc in boldface Arial font size 20 
+#\begin{tabular}{|clll|} \hline
 #\multicolumn{4}{|c|}{Enhanced Text Control Codes} \\ \hline
 #Control & Example & Result & Explanation \\ \hline
 #\verb~^~ & \verb~a^x~ & $a^x$ & superscript\\
@@ -586,6 +589,10 @@ C
 #\verb~&~ & \verb~d&{space}b~ & d\verb*+     +b & inserts space of specified length\\
 #\verb|~| & \verb|~a{.8-}| & $\tilde{a}$ & overprints '-' on 'a', raised by .8\\
 #\verb~ ~ & \verb~ ~ & ~ ~ & times the current fontsize\\
+#\verb| | & \verb|{/Times abc}| & {\rm abc} & print abc in font Times at current size\\
+#\verb| | & \verb|{/Times*2 abc}| & \Large{\rm abc} & print abc in font Times at twice current size\\
+#\verb| | & \verb|{/Times:Italic abc}| & {\it abc} & print abc Times with style italic\\
+#\verb| | & \verb|{/Arial:Bold=20 abc}| & \Large\textsf{\textbf{abc}} & print abc in boldface Arial font size 20\\
 %c c l .
 %.TE", /* ugly - doc2ms uses @ for column separator, but here we */
 %.TS", /* need @ in table, so end and restart the table ! */
@@ -619,11 +626,17 @@ C
 ^</tbody>
 ^</table>
 
- Braces can be used to place multiple-character text where a single character
- is expected (e.g., 2^{10}).  To change the font and/or size, use the full form:
- {/[fontname][=fontsize | *fontscale] text}.  Thus {/Symbol=20 G} is a 20 pt
- GAMMA and {/*0.75 K} is a K at three-quarters of whatever fontsize is currently
- in effect.  (The '/' character MUST be the first character after the '{'.)
+ The markup control characers act on a single following character or on the
+ content of a following bracketed clause. The clause in brackets may contain
+ a string of characters with no additional markup, e.g. 2^{10}, or it may
+ contain additional markup that changes font properties. This example
+ illustrates nesting one bracketed clause inside another to produce a
+ boldface A with an italic subscript i, all in the current font. If the
+ clause introduced by :Normal were omitted the subscript woult be both 
+ italic and boldface.
+      {/:Bold A_{/:Normal{/:Italic i}}}
+ Font specifiers MUST be preceeded by a '/' character that immediately follows
+ the opening '{'.
 
  The phantom box is useful for a@^b_c to align superscripts and subscripts
  but does not work well for overwriting an accent on a letter.  For the latter,
@@ -666,13 +679,11 @@ C
  enclosed in single-quotes.  The major difference is that backslashes may need
  to be doubled when in double-quoted strings.
 
- Examples (these are hard to describe in words---try them!):
-       set xlabel 'Time (10^6 {/Symbol m}s)'
-       set title '{/Symbol=18 \\362@_{/=9.6 0}^{/=12 x}} \\
-                  {/Helvetica e^{-{/Symbol m}^2/2} d}{/Symbol m}'
-
  The file "ps_guide.ps" in the /docs/psdoc subdirectory of the gnuplot source
- distribution contains more examples of the enhanced syntax.
+ distribution contains more examples of the enhanced syntax, as does the
+^ <a href="http://www.gnuplot.info/demo/enhanced_utf8.html">
+ demo script `enhanced_utf8.dem`
+^ </a>
 2 Environment
 ?environment
  A number of shell environment variables are understood by `gnuplot`.  None of
