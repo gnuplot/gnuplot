@@ -1,3 +1,11 @@
+2014-03-13  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/datafile.c (df_open df_readascii):  New keyword "skip" tells the
+	program to skip lines at the start of an ascii data file.  Note this is
+	different from "every ::N", which skips lines at the start of the data
+	file but also at the start of each subsequent data block in the file.
+	Backport from 4.7
+
 2014-03-03  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* docs/Makefile.in:  Do not include generated file pdffigures.tex
@@ -331,7 +339,7 @@
 
 	* src/plot2d.c (store_label):  Plots with labels should accept variable
 	color both for the label text and for the associated point symbol.
-        Bug #1281
+	Bug #1281
 
 2013-09-30  Josh Ovi  <joshovi@users.sourceforge.net>
 

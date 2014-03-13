@@ -1,6 +1,7 @@
 New features, changes and fixes in gnuplot version 4.6.6
 ========================================================
 
+* NEW plot option to "skip N" lines at start of an ascii data file
 * NEW 'set fit prescale' normalized fit parameters before M-L refinement
 * FIX Faster recovery from outboard server gnuplot_qt being killed
 
