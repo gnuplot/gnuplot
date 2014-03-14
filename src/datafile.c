@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.273 2014/02/28 19:23:52 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.274 2014/03/05 07:01:57 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -2646,20 +2646,25 @@ char *
 df_parse_string_field(char *field)
 {
     char *temp_string;
+    int length;
 
     if (!field) {
 	return NULL;
     } else if (*field == '"') {
-	temp_string = gp_strdup(&field[1]);
-	temp_string[strcspn(temp_string,"\"")] = '\0';
+	field++;
+	length = strcspn(field, "\"");
     } else if (df_separators != NULL) {
-	temp_string = gp_strdup(field);
-	temp_string[strcspn(temp_string,df_separators)] = '\0';
-	temp_string[strcspn(temp_string,"\"")] = '\0';
-    } else {
-	temp_string = gp_strdup(field);
-	temp_string[strcspn(temp_string,"\t ")] = '\0';
+	length = strcspn(field, df_separators);
+	if (length > strcspn(field, "\""))	/* Why? */
+	    length = strcspn(field, "\"");
+   } else {
+	length = strcspn(field,"\t ");
     }
+
+    temp_string = malloc(length+1);
+    strncpy(temp_string, field, length);
+    temp_string[length] = '\0';
+
     parse_esc(temp_string);
 
     return temp_string;
