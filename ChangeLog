@@ -11,6 +11,11 @@
 	when handling string-value data columns in long input lines.
 	Bug #1355
 
+	* src/fit.c:  The bottleneck in the fitting code was lookup of dummy
+	variables by name (4x10^9 lookups in fit.dem). All but the first lookup
+	is unnecessary. Saving a pointer after the first lookup for later
+	direct access speeds up fit.dem by a factor of 3x.
+
 2014-03-13  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/term.c (enhanced_recursion):  Bugfix for bold/italic.

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: fit.c,v 1.133 2014/03/08 10:19:21 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: fit.c,v 1.134 2014/03/09 19:15:52 markisch Exp $"); }
 #endif
 
 /*  NOTICE: Change of Copyright Status
@@ -238,6 +238,11 @@ static int last_num_params = 0;
 static char *last_dummy_var[MAX_NUM_VAR];
 static char *last_fit_command = NULL;
 
+/* Mar 2014 - the single hottest call path in fit was looking up the
+ * dummy parameters by name (4 billion times in fit.dem).
+ * A total waste, since they don't change.  Look up once and store here.
+ */
+static udvt_entry *fit_dummy_udvs[MAX_NUM_VAR];
 
 /*****************************************************************
 			 internal Prototypes
@@ -627,7 +632,9 @@ call_gnuplot(const double *par, double *data)
 	/* initialize extra dummy variables from the corresponding
 	 actual variables, if any. */
 	for (j = 0; j < MAX_NUM_VAR; j++) {
-	    struct udvt_entry *udv = add_udv_by_name(c_dummy_var[j]);
+	    struct udvt_entry *udv = fit_dummy_udvs[j];
+	    if (!udv)
+		int_error(NO_CARET, "Internal error: lost a dummy parameter!");
 	    Gcomplex(&func.dummy_values[j],
 	             udv->udv_undef ? 0 : getdvar(c_dummy_var[j]),
 	             0.0);
@@ -1843,6 +1850,7 @@ fit_command()
 	    strcpy(c_dummy_var[i], set_dummy_var[i]);
 	else if (i < 5)  /* Fall back to legacy ordering x y t u v */
 	    strcpy(c_dummy_var[i], dummy_old_default[i]);
+	fit_dummy_udvs[i] = add_udv_by_name(c_dummy_var[i]);
     }
 
     func.at = perm_at();	/* parse expression and save action table */
