@@ -120,10 +120,11 @@ void QtGnuplotEnhancedFragment::paint(QPainter* painter, const QStyleOptionGraph
 /////////////////////////////
 // QtGnuplotPoint
 
-QtGnuplotPoint::QtGnuplotPoint(int style, double size, QColor color, QGraphicsItem * parent)
+QtGnuplotPoint::QtGnuplotPoint(int style, double size, QPen pen, QGraphicsItem * parent)
 	: QGraphicsItem(parent)
 {
-	m_color = color;
+	m_pen   = pen;
+	m_color = pen.color();
 	m_style = style;
 	m_size = 3.*size;
 }
@@ -140,9 +141,13 @@ void QtGnuplotPoint::paint(QPainter* painter, const QStyleOptionGraphicsItem* op
 
 	const int style = m_style % 13;
 
-	painter->setPen(m_color);
 	if ((style % 2 == 0) && (style > 3)) // Filled points
+	{
+		painter->setPen(m_color);
 		painter->setBrush(m_color);
+	}
+	else
+		painter->setPen(m_pen);
 
 	drawPoint(painter, QPointF(0., 0.), m_size, style);
 }
@@ -206,13 +211,13 @@ QRectF QtGnuplotPoints::boundingRect() const
 	return m_boundingRect;
 }
 
-void QtGnuplotPoints::addPoint(const QPointF& point, int style, double pointSize, const QColor& color)
+void QtGnuplotPoints::addPoint(const QPointF& point, int style, double pointSize, const QPen& pen)
 {
 	QtGnuplotPoints_PointData pointData;
 	pointData.point = point;
 	pointData.style = style;
 	pointData.pointSize = 3*pointSize;
-	pointData.color = color;
+	pointData.pen = pen;
 	pointData.z = m_currentZ++;
 	m_points << pointData;
 
@@ -264,11 +269,14 @@ void QtGnuplotPoints::paint(QPainter* painter, const QStyleOptionGraphicsItem* o
 		{
 			const int style = m_points[i].style % 13;
 
-			painter->setPen(m_points[i].color);
+			painter->setPen(m_points[i].pen.color());
 			if ((style % 2 == 0) && (style > 3)) // Filled points
-				painter->setBrush(m_points[i].color);
+				painter->setBrush(m_points[i].pen.color());
 			else
+			{
+				painter->setPen(m_points[i].pen);
 				painter->setBrush(Qt::NoBrush);
+			}
 
 			QtGnuplotPoint::drawPoint(painter, m_points[i].point, m_points[i].pointSize, style);
 		}

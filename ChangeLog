@@ -1,3 +1,8 @@
+2014-03-14  Dieter Ries  <dieter.ries@psi.ch>
+
+	* src/qtterminal/QtGnuplotItems.* src/qtterminal/QtGnuplotScene.cpp:
+	Use the current linewidth to draw point symbols.
+
 2014-03-14  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/datafile.c (df_parse_string_field):  Memory allocation for column

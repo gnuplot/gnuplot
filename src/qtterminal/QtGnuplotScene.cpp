@@ -297,11 +297,11 @@ void QtGnuplotScene::processEvent(QtGnuplotEventType type, QDataStream& in)
 		int style    ; in >> style;
 		// Append the point to a points item to speed-up drawing
 		if (!m_inKeySample)
-			m_currentPointsItem->addPoint(clipPoint(point), style, m_currentPointSize, m_currentPen.color());
+			m_currentPointsItem->addPoint(clipPoint(point), style, m_currentPointSize, m_currentPen);
 		else
 		{
 			flushCurrentPointsItem();
-			QtGnuplotPoint* pointItem = new QtGnuplotPoint(style, m_currentPointSize, m_currentPen.color());
+			QtGnuplotPoint* pointItem = new QtGnuplotPoint(style, m_currentPointSize, m_currentPen);
 			pointItem->setPos(clipPoint(point));
 			pointItem->setZValue(m_currentZ++);
 			addItem(pointItem);
