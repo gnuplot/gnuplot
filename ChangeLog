@@ -1,3 +1,11 @@
+2014-03-14  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/datafile.c (df_parse_string_field):  Memory allocation for column
+	header strings had O(n^2) dependence on the length of the first line.
+	Replace this with an O(n) scheme.  This should also improve performance
+	when handling string-value data columns in long input lines.
+	Bug #1355
+
 2014-03-13  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/datafile.c (df_open df_readascii):  New keyword "skip" tells the
