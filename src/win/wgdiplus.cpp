@@ -1,5 +1,5 @@
 /*
- * $Id: wgdiplus.cpp,v 1.10 2014/01/11 09:22:47 markisch Exp $
+ * $Id: wgdiplus.cpp,v 1.11 2014/01/11 13:58:20 markisch Exp $
  */
 
 /*
@@ -333,7 +333,11 @@ SetFont_gdiplus(Graphics &graphics, LPRECT rect, LPGW lpgw, char * fontname, int
 	char * italic, * bold, * underline, * strikeout;
 	if ((italic = strstr(fontname, " Italic")) != NULL)
 		fontStyle |= FontStyleItalic;
+	else if ((italic = strstr(fontname, ":Italic")) != NULL)
+		fontStyle |= FontStyleItalic;
 	if ((bold = strstr(fontname, " Bold")) != NULL)
+		fontStyle |= FontStyleBold;
+	else if ((bold = strstr(fontname, ":Bold")) != NULL)
 		fontStyle |= FontStyleBold;
 	if ((underline = strstr(fontname, " Underline")) != NULL)
 		fontStyle |= FontStyleUnderline;

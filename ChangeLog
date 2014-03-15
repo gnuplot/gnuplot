@@ -1,3 +1,10 @@
+2014-03-15  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/win/wgraph.c (MakeFonts) src/win/wgdiplus.c (SetFont_gdiplus):
+	Implement boldface and italic markup for enhanced text. The windows
+	terminal already accepted "Fontface Bold Italic" in font specifiers,
+	now it also accepts "Fontface:Bold:Italic".
+
 2014-03-14  Dieter Ries  <dieter.ries@psi.ch>
 
 	* src/qtterminal/QtGnuplotItems.* src/qtterminal/QtGnuplotScene.cpp:

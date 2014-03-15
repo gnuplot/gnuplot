@@ -1,5 +1,5 @@
 /*
- * $Id: wgraph.c,v 1.177 2014/01/11 14:00:51 markisch Exp $
+ * $Id: wgraph.c,v 1.178 2014/01/29 17:48:09 markisch Exp $
  */
 
 /* GNUPLOT - win/wgraph.c */
@@ -869,12 +869,14 @@ MakeFonts(LPGW lpgw, LPRECT lprect, HDC hdc)
 	_fstrncpy(lpgw->lf.lfFaceName,lpgw->fontname,LF_FACESIZE);
 	lpgw->lf.lfHeight = -MulDiv(lpgw->fontsize * lpgw->fontscale, GetDeviceCaps(hdc, LOGPIXELSY), 72) * lpgw->sampling;
 	lpgw->lf.lfCharSet = DEFAULT_CHARSET;
-	if ( (p = _fstrstr(lpgw->fontname," Italic")) != (LPSTR)NULL ) {
-		lpgw->lf.lfFaceName[ (unsigned int)(p-lpgw->fontname) ] = '\0';
+	if (((p = strstr(lpgw->fontname," Italic")) != NULL) ||
+		((p = strstr(lpgw->fontname,":Italic")) != NULL)) {
+		lpgw->lf.lfFaceName[(unsigned int) (p - lpgw->fontname)] = NUL;
 		lpgw->lf.lfItalic = TRUE;
 	}
-	if ( (p = _fstrstr(lpgw->fontname," Bold")) != (LPSTR)NULL ) {
-		lpgw->lf.lfFaceName[ (unsigned int)(p-lpgw->fontname) ] = '\0';
+	if (((p = strstr(lpgw->fontname," Bold")) != NULL) ||
+		((p = strstr(lpgw->fontname,":Bold")) != NULL)) {
+		lpgw->lf.lfFaceName[(unsigned int) (p - lpgw->fontname)] = NUL;
 		lpgw->lf.lfWeight = FW_BOLD;
 	}
 	lpgw->lf.lfOutPrecision = OUT_OUTLINE_PRECIS;
