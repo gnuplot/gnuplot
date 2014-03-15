@@ -180,8 +180,8 @@ If PATTERN is omitted, it defaults to \"[ \\f\\t\\n\\r\\v]+\"."
 
             An Interactive Plotting Program
              Thomas Williams & Colin Kelley
-                Version 4.7 organized by:
-    Hans-Bernhard Broeker, Ethan A Merritt, and others
+                Version 5.0 organized by
+       Ethan A Merritt with help from many others
 
    Copyright (C) 1986 - 1993, 1998, 2004   Thomas Williams, Colin Kelley
            Copyright (C) 2004 - 2012  various authors
@@ -190,7 +190,7 @@ If PATTERN is omitted, it defaults to \"[ \\f\\t\\n\\r\\v]+\"."
      Mailing list for bug reports: gnuplot-bugs@@lists.sourceforge.net
 
          This manual was originally prepared by Dick Crawford
-                   Version 4.7 - March 2012
+                   Version 5.0 - March 2014
 
 
 Major contributors (alphabetic order):

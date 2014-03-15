@@ -1,3 +1,11 @@
+2014-03-15  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* configure.in VERSION PATCHLEVEL share/gnuplotrc src/version.c
+	demo/html/index.canvas demo/html/index.save demo/html/index.svg
+	docs/doc2texi.el docs/gnuplot.doc docs/titlepag.tex:
+
+	>>>>> Bump version to 5.0 alpha <<<<<
+
 2014-03-15  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/win/wgraph.c (MakeFonts) src/win/wgdiplus.c (SetFont_gdiplus):

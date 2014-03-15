@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.864 2014/03/11 18:17:07 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.865 2014/03/14 00:10:11 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -6,7 +6,7 @@ C
 ?gnuplot
 ^<h2 align="center"> An Interactive Plotting Program </h2>
 ^<p align="center">  Thomas Williams & Colin Kelley</p>
-^<p align="center">  Version 4.4 organized by Ethan A Merritt and others</p>
+^<p align="center">  Version 5.0 organized by Ethan A Merritt and others</p>
 ^<p align="center">Major contributors (alphabetic order):<br>
 ^<br>
 ^  Hans-Bernhard Broeker, John Campbell,<br>
@@ -24,7 +24,7 @@ C
 ^  James R. Van Zandt, Alex Woo, Johannes Zellner<br>
 ^</p>
 ^<p align="center">  Copyright (C) 1986 - 1993, 1998 - 2004   Thomas Williams, Colin Kelley<br>
-^     Copyright (C) 2004 - 2011 various authors</p>
+^     Copyright (C) 2004 - 2014 various authors</p>
 ^<p align="center">   Mailing list for comments: <tt>gnuplot-info@lists.sourceforge.net</tt><br>
 ^      Mailing list for bug reports: <tt>gnuplot-bugs@lists.sourceforge.net</tt><br>
 ^      Web access (preferred): <tt>http://sourceforge.net/projects/gnuplot</tt></p>
@@ -72,7 +72,7 @@ C
        Gnuplot 3.0 additions:
           Gershon Elber and many others.
 
-       Gnuplot 4.0 additions:
+       Gnuplot 4.0 and 5.0 additions:
           See list of contributors at head of this document.
 2 Introduction
 ?introduction
@@ -4237,8 +4237,8 @@ Ffigure_mapcontours
  modifiers (`using`, `every`,...) except `smooth` are applicable to `fit`.
  See `plot datafile`.
 
- The function being fit may have up to five independent variables (more in
- gnuplot version 4.7).  In the absence of a `using` specification, the fit
+ The function being fit may have up to 12 independent variables (more if
+ specially configured).  In the absence of a `using` specification, the fit
  implicitly assumes there is only a single independent variable:
 
        z                           # 1 independent variable (line number)
@@ -4267,7 +4267,7 @@ Ffigure_mapcontours
 
        x:y:s     yerror    (similar to `plot` with `yerrorbars`)
 
- Note that for compatibility reasons with `gnuplot` versions prior to 4.7,
+ Note that for compatibility reasons with `gnuplot` versions prior to 5.0,
  the `error` keyword is not required.  If you do not specify the error columns
  explicitly, there must be two more `using` qualifiers (z and s) than there are
  independent variables, unless there is only one variable.  `gnuplot` then uses
@@ -4605,7 +4605,7 @@ Ffigure_mapcontours
 ?commands fit control
 ?fit control
  Settings of the `fit` command are controlled by `set fit`.  The old `gnuplot`
- user variables are deprecated as of version 4.7, see `fit control variables`.
+ user variables are deprecated as of version 5, see `fit control variables`.
 
  There are a number of environment variables that can be defined to affect
  `fit` before starting `gnuplot`, see `fit control environment`.
@@ -8282,7 +8282,7 @@ Ffigure_missing
  terminal session.  `set fit quiet` turns off the echo, whereas `results`
  prints only final results.  `brief` gives one line summaries for every
  iteration of the fit in addition.  `verbose` yields detailed iteration
- reports as it was the default before version 4.7.
+ reports as it was the default before version 5.
 
  If the `errorvariables` option is turned on, the error of each fitted
  parameter computed by `fit` will be copied to a user-defined variable

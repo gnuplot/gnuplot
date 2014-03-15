@@ -1,6 +1,6 @@
 <!DOCTYPE HTML>
 <html>
-<head><title>Gnuplot Version 4.7 SVG terminal demos</title>
+<head><title>Gnuplot Version 5.0 SVG terminal demos</title>
 <link type="text/css" href="gnuplot_demo.css" rel="stylesheet">
 <meta charset="UTF-8">
 </head>
@@ -8,10 +8,10 @@
 <body>
 
 <h2 align=center>
-    Gnuplot Version 4.7 SVG terminal demos<br>
+    Gnuplot Version 5.0 SVG terminal demos<br>
     See also the demo output for the 
-       <a href="../demo_4.7/">PNG</a> and
-       <a href="../demo_canvas_4.7/">canvas</a> terminals.
+       <a href="../demo_5.0/">PNG</a> and
+       <a href="../demo_canvas_5.0/">canvas</a> terminals.
 </h2>
 
 <p>
