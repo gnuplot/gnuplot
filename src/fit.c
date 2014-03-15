@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: fit.c,v 1.138 2014/03/15 04:36:01 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: fit.c,v 1.139 2014/03/15 04:38:43 markisch Exp $"); }
 #endif
 
 /*  NOTICE: Change of Copyright Status
@@ -182,7 +182,7 @@ typedef enum marq_res marq_res_t;
 
 /* fit control */
 char *fitlogfile = NULL;
-TBOOLEAN fit_errorvariables = FALSE;
+TBOOLEAN fit_errorvariables = TRUE;
 TBOOLEAN fit_covarvariables = FALSE;
 verbosity_level fit_verbosity = BRIEF;
 TBOOLEAN fit_errorscaling = TRUE;
