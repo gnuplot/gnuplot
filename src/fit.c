@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: fit.c,v 1.137 2014/03/15 04:27:37 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: fit.c,v 1.138 2014/03/15 04:36:01 markisch Exp $"); }
 #endif
 
 /*  NOTICE: Change of Copyright Status
@@ -1825,6 +1825,7 @@ fit_command()
     time_t timer;
     int token1, token2, token3;
     char *tmp, *file_name;
+    TBOOLEAN zero_initial_value;
 
     c_token++;
 
@@ -2436,11 +2437,14 @@ fit_command()
     if (!redim_vec(&scale_params, num_params))
 	Eex2("Out of memory in fit: too many datapoints (%d)?", max_data);
 
+    zero_initial_value = FALSE;
     for (i = 0; i < num_params; i++) {
 	/* avoid parameters being equal to zero */
-	if (a[i] == 0) {
+	if (a[i] == 0.0) {
+	    Dblf2("Warning: Initial value of parameter '%s' is zero.\n", par_name[i]);
 	    a[i] = NEARLY_ZERO;
 	    scale_params[i] = 1.0;
+	    zero_initial_value = TRUE;
 	} else if (fit_prescale) {
 	    /* scale parameters, but preserve sign */
 	    double a_sign = (a[i] > 0) - (a[i] < 0);
@@ -2449,6 +2453,12 @@ fit_command()
 	} else {
 	    scale_params[i] = 1.0;
 	}
+    }
+    if (zero_initial_value) {  /* print this message only once */
+	/* tsm patchset 230: explain what good initial parameter values are */
+	fprintf(STANDARD, "  Please provide non-zero initial values for the parameters, at least of\n");
+	fprintf(STANDARD, "  the right order of magnitude. If the expected value is zero, then use\n");
+	fprintf(STANDARD, "  the magnitude of the expected error. If all else fails, try 1.0\n\n");
     }
 
     if (num_params == 0)

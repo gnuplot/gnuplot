@@ -16,6 +16,8 @@
 	* src/fit.c (regress_finalize):  fit did not converge if the covariance
 	matrix is invalid.
 
+	* src/fit.c (fit_command):  Warn about zero initial parameter values.
+	Help message taken from patch #230 by T. Mattison.
 
 2014-03-14  Dieter Ries  <dieter.ries@psi.ch>
 
