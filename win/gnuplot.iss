@@ -1,5 +1,5 @@
 ﻿;
-; $Id: gnuplot.iss,v 1.5 2013/07/06 08:09:20 markisch Exp $
+; $Id: gnuplot.iss,v 1.6 2014/01/11 09:20:46 markisch Exp $
 ;
 ; GNUPLOT - gnuplot.iss
 ;
@@ -177,7 +177,7 @@ Filename: "{app}\bin\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringC
 Root: HKLM; SubKey: "SYSTEM\CurrentControlSet\Control\Session Manager\Environment"; ValueType: string; ValueName: GNUTERM; ValueData: windows; Flags: NoError UninsDeleteValue; Tasks: defaulttermwin;
 Root: HKLM; SubKey: "SYSTEM\CurrentControlSet\Control\Session Manager\Environment"; ValueType: string; ValueName: GNUTERM; ValueData: wxt; Flags: NoError UninsDeleteValue; Tasks: defaulttermwxt;
 ; include demo directory in gnuplot's search path
-Root: HKLM; SubKey: "SYSTEM\CurrentControlSet\Control\Session Manager\Environment"; ValueType: string; ValueName: GNUPLOT_LIB; ValueData: {app}\demo; Flags: CreateValueIfDoesntExist NoError UninsDeleteValue; Components: demo;
+Root: HKLM; SubKey: "SYSTEM\CurrentControlSet\Control\Session Manager\Environment"; ValueType: string; ValueName: GNUPLOT_LIB; ValueData: "{app}\demo;{app}\demo\games;{app}\share"; Flags: CreateValueIfDoesntExist NoError UninsDeleteValue; Components: demo;
 ; easy start in explorer's run dialog
 Root: HKLM; Subkey: "SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\wgnuplot.exe"; ValueType: string; ValueName: ""; ValueData: "{app}\bin\wgnuplot.exe"; Flags: uninsdeletekey
 Root: HKLM; Subkey: "SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\gnuplot.exe"; ValueType: string; ValueName: ""; ValueData: "{app}\bin\gnuplot.exe"; Flags: uninsdeletekey
