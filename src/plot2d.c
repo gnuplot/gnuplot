@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.320 2014/03/03 04:09:30 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.321 2014/03/12 03:55:07 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -2397,6 +2397,7 @@ eval_plots()
 
 		    lp.l_type = line_num;
 		    lp.p_type = line_num;
+		    lp.d_type = line_num;
 
 		    /* user may prefer explicit line styles */
 		    if (prefer_line_styles)
@@ -2485,6 +2486,7 @@ eval_plots()
 		this_plot->lp_properties.l_type = line_num;
 		this_plot->lp_properties.l_width = 1.0;
 		this_plot->lp_properties.p_type = line_num;
+		this_plot->lp_properties.d_type = line_num;
 		this_plot->lp_properties.p_size = pointsize;
 
 		/* user may prefer explicit line styles */

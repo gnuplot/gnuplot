@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.222 2014/01/12 22:49:32 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.223 2014/03/12 03:55:07 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -1500,6 +1500,7 @@ eval_3dplots()
 	    /* default line and point types */
 	    this_plot->lp_properties.l_type = line_num;
 	    this_plot->lp_properties.p_type = line_num;
+		this_plot->lp_properties.d_type = line_num;
 
 	    /* user may prefer explicit line styles */
 	    this_plot->hidden3d_top_linetype = line_num;
@@ -1670,6 +1671,7 @@ eval_3dplots()
 
 		    lp.l_type = line_num;
 		    lp.p_type = line_num;
+			lp.d_type = line_num;
 
 		    /* user may prefer explicit line styles */
 		    if (prefer_line_styles)
@@ -1735,6 +1737,7 @@ eval_3dplots()
 		    this_plot->lp_properties.l_type = line_num;
 		    this_plot->lp_properties.l_width = 1.0;
 		    this_plot->lp_properties.p_type = line_num;
+			this_plot->lp_properties.d_type = line_num;
 		    this_plot->lp_properties.p_size = pointsize;
 
 		    /* user may prefer explicit line styles */

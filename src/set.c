@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.432 2014/03/09 19:15:52 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.433 2014/03/15 22:01:03 juhaszp Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -5360,6 +5360,9 @@ set_linestyle(struct linestyle_def **head)
         struct lp_style_type loc_lp = DEFAULT_LP_STYLE_TYPE;
 	loc_lp.l_type = tag - 1;
 	loc_lp.p_type = tag - 1;
+	loc_lp.d_type = tag - 1;
+	loc_lp.pm3d_color.type = TC_LT;
+	loc_lp.pm3d_color.lt = tag - 1;
 
 	new_linestyle = gp_alloc(sizeof(struct linestyle_def), "linestyle");
 	if (prev_linestyle != NULL)

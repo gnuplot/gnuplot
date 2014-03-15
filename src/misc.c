@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.167 2014/03/07 21:17:15 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.168 2014/03/15 22:01:03 juhaszp Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -1033,7 +1033,7 @@ lp_parse(struct lp_style_type *lp, TBOOLEAN allow_ls, TBOOLEAN allow_point)
 		if (set_dt++)
 		    break;
 		c_token++;
-		tmp = int_expression();
+		tmp = int_expression(); /* TODO custom dash patterns */
 		newlp.d_type = tmp - 1;
 		continue;
 	    }

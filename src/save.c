@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.239 2013/12/28 21:36:46 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.240 2014/03/09 19:15:52 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -531,6 +531,7 @@ set bar %f %s\n",
 	save_linetype(fp, &(this_linestyle->lp_properties), TRUE);
 	fprintf(fp, "\n");
     }
+	/* TODO save "set linetype" as well, or instead */ 
     fputs("unset style arrow\n", fp);
     for (this_arrowstyle = first_arrowstyle; this_arrowstyle != NULL;
 	 this_arrowstyle = this_arrowstyle->next) {
@@ -1442,7 +1443,8 @@ void
 save_linetype(FILE *fp, lp_style_type *lp, TBOOLEAN show_point)
 {
 
-    fprintf(fp, " linetype %d", lp->l_type + 1);
+    /* linetype is no longer printed */
+    /* fprintf(fp, " linetype %d", lp->l_type + 1); */
     if (TRUE) { /* FIXME: Broke with removal of use_palette? */
 	fprintf(fp, " linecolor");
 	if (lp->pm3d_color.type == TC_LT)
@@ -1456,6 +1458,14 @@ save_linetype(FILE *fp, lp_style_type *lp, TBOOLEAN show_point)
 
     if (show_point) {
 	fprintf(fp, " pointtype %d", lp->p_type + 1);
+
+	if (lp->d_type == DASHTYPE_CUSTOM) {
+		/* TODO print custom dash pattern */
+		fprintf(fp, " dashtype %d", lp->d_type + 1);
+	}
+	else {
+		fprintf(fp, " dashtype %d", lp->d_type + 1);
+	}
 	if (lp->p_size == PTSZ_VARIABLE)
 	    fprintf(fp, " pointsize variable");
 	else if (lp->p_size == PTSZ_DEFAULT)
