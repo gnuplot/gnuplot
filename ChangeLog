@@ -11,6 +11,12 @@
 	* src/fit.c src/fit.h:  Always call error_ex() to abort, which now does
 	the proper memory cleanup. Fixes the (most obvious) memory leaks.
 
+	* src/fit.c (regress):  The fit converged if chisq == 0.
+
+	* src/fit.c (regress_finalize):  fit did not converge if the covariance
+	matrix is invalid.
+
+
 2014-03-14  Dieter Ries  <dieter.ries@psi.ch>
 
 	* src/qtterminal/QtGnuplotItems.* src/qtterminal/QtGnuplotScene.cpp:

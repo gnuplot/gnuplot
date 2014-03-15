@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: fit.c,v 1.136 2014/03/15 03:52:00 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: fit.c,v 1.137 2014/03/15 04:27:37 markisch Exp $"); }
 #endif
 
 /*  NOTICE: Change of Copyright Status
@@ -826,6 +826,7 @@ regress_finalize(int iter, double chisq, double last_chisq, double lambda, doubl
     double pvalue;
     double *dpar;
     double **corel = NULL;
+    TBOOLEAN covar_invalid = FALSE;
 
     /* restore original SIGINT function */
     interrupt_setup();
@@ -840,6 +841,18 @@ regress_finalize(int iter, double chisq, double last_chisq, double lambda, doubl
     else
 	fit_show_brief(iter, chisq, last_chisq, a, lambda, log_f);
 
+    /* test covariance matrix */
+    if (covar != NULL) {
+	for (i = 0; i < num_params; i++) {
+	    /* diagonal elements must be larger tan zero */
+	    if (covar[i][i] <= 0.0) {
+		/* Not a fatal error, but prevent floating point exception later on */
+		Dblf2("Calculation error: non-positive diagonal element in covar. matrix of parameter '%s'.\n", par_name[i]);
+		covar_invalid = TRUE;
+	    }
+	}
+    }
+
     /* HBB 970304: the maxiter patch: */
     if ((maxiter > 0) && (iter > maxiter)) {
 	Dblf2("\nMaximum iteration count (%d) reached. Fit stopped.\n", maxiter);
@@ -847,6 +860,8 @@ regress_finalize(int iter, double chisq, double last_chisq, double lambda, doubl
 	Dblf2("\nThe fit was stopped by the user after %d iterations.\n", iter);
     } else if (lambda >= MAX_LAMBDA) {
 	Dblf2("\nThe maximum lambda = %e was exceeded. Fit stopped.\n", MAX_LAMBDA);
+    } else if (covar_invalid) {
+	Dblf2("\nThe covariance matrix is invalid. Fit did not converge properly.\n");
     } else {
 	Dblf2("\nAfter %d iterations the fit converged.\n", iter);
 	v = add_udv_by_name("FIT_CONVERGED");
@@ -899,23 +914,24 @@ regress_finalize(int iter, double chisq, double last_chisq, double lambda, doubl
 
     /* calculate unscaled parameter errors in dpar[]: */
     dpar = vec(num_params);
-    if (covar != NULL) {
+    if ((covar != NULL) || covar_invalid) {
 	/* calculate unscaled parameter errors in dpar[]: */
 	for (i = 0; i < num_params; i++) {
-	    /* FIXME: can this still happen ? */
-	    if (covar[i][i] <= 0.0)	/* HBB: prevent floating point exception later on */
-		Eex("Calculation error: non-positive diagonal element in covar. matrix");
 	    dpar[i] = sqrt(covar[i][i]);
 	}
+
 	/* transform covariances into correlations */
-	corel = matr(num_params, num_params);
-	for (i = 0; i < num_params; i++) {
-	    /* only lower triangle needs to be handled */
-	    for (j = 0; j < i; j++)
-		corel[i][j] = covar[i][j] / (dpar[i] * dpar[j]);
-	    corel[i][i] = 1.;
-        }
+	if (!covar_invalid) {
+	    corel = matr(num_params, num_params);
+	    for (i = 0; i < num_params; i++) {
+		/* only lower triangle needs to be handled */
+		for (j = 0; j < i; j++)
+		    corel[i][j] = covar[i][j] / (dpar[i] * dpar[j]);
+		corel[i][i] = 1.;
+	    }
+	}
     } else {
+	/* set all errors to zero if covariance matrix invalid or unavailable */
 	for (i = 0; i < num_params; i++)
 	    dpar[i] = 0.0;
     }
@@ -934,7 +950,7 @@ regress_finalize(int iter, double chisq, double last_chisq, double lambda, doubl
     }
 
     /* fill covariance variables if needed */
-    if (fit_covarvariables) {
+    if (fit_covarvariables && !covar_invalid) {
 	double scale =
 	    (fit_errorscaling || (num_errors == 0)) ?
 	    (chisq / (num_data - num_params)) : 1.0;
@@ -1063,6 +1079,7 @@ regress(double a[])
     } while ((res != ML_ERROR)
 	     && (lambda < MAX_LAMBDA)
 	     && ((maxiter == 0) || (iter <= maxiter))
+	     && (chisq != 0)
 	     && (res == WORSE ||
 	    /* tsm patchset 230: change to new convergence criterion */
 	         ((last_chisq - chisq) > (epsilon * chisq + epsilon_abs))));
