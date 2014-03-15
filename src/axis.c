@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.129 2014/01/12 22:49:31 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.130 2014/02/28 19:23:52 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -140,7 +140,7 @@ const lp_style_type default_axis_zeroaxis = DEFAULT_AXIS_ZEROAXIS;
 
 /* grid drawing */
 /* int grid_selection = GRID_OFF; */
-#define DEFAULT_GRID_LP {0, LT_AXIS, 0, 0, 0.5, 0.0, {TC_LT, LT_AXIS, 0.0}}
+#define DEFAULT_GRID_LP {0, LT_AXIS, 0, DASHTYPE_AXIS, 0, 0.5, 0.0, {TC_LT, LT_AXIS, 0.0}, DEFAULT_DASHPATTERN}
 const struct lp_style_type default_grid_lp = DEFAULT_GRID_LP;
 struct lp_style_type grid_lp   = DEFAULT_GRID_LP;
 struct lp_style_type mgrid_lp  = DEFAULT_GRID_LP;

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.442 2014/01/04 14:45:29 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.443 2014/01/27 05:29:51 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -3801,7 +3801,7 @@ place_raxis()
     t_object raxis_circle = {
 	NULL, 1, 1, OBJ_CIRCLE,	OBJ_CLIP, /* link, tag, layer (front), object_type, clip */
 	{FS_SOLID, 100, 0, BLACK_COLORSPEC},
-	{0, LT_BACKGROUND, 0, 0, 0.2, 0.0, BACKGROUND_COLORSPEC},
+	{0, LT_BACKGROUND, 0, DASHTYPE_AXIS, 0, 0.2, 0.0, BACKGROUND_COLORSPEC, DEFAULT_DASHPATTERN},
 	{.circle = {1, {0,0,0,0.,0.,0.}, {graph,0,0,0.02,0.,0.}, 0., 360. }}
     };
 #endif

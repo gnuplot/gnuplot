@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.166 2014/02/28 19:23:52 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.167 2014/03/07 21:17:15 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -869,7 +869,9 @@ int
 lp_parse(struct lp_style_type *lp, TBOOLEAN allow_ls, TBOOLEAN allow_point)
 {
     /* keep track of which options were set during this call */
-    int set_lt = 0, set_pal = 0, set_lw = 0, set_pt = 0, set_ps = 0, set_pi = 0;
+    int set_lt = 0, set_pal = 0, set_lw = 0; 
+	int set_pt = 0, set_ps  = 0, set_pi = 0;
+	int set_dt = 0;
     int new_lt = 0;
 
     /* EAM Mar 2010 - We don't want properties from a user-defined default
@@ -1026,12 +1028,22 @@ lp_parse(struct lp_style_type *lp, TBOOLEAN allow_ls, TBOOLEAN allow_point)
 		continue;
 	    }
 
+	    if (almost_equals(c_token, "dasht$ype") || equals(c_token, "dt")) {
+		int tmp;
+		if (set_dt++)
+		    break;
+		c_token++;
+		tmp = int_expression();
+		newlp.d_type = tmp - 1;
+		continue;
+	    }
+
 
 	    /* caught unknown option -> quit the while(1) loop */
 	    break;
 	}
 
-	if (set_lt > 1 || set_pal > 1 || set_lw > 1 || set_pt > 1 || set_ps > 1)
+	if (set_lt > 1 || set_pal > 1 || set_lw > 1 || set_pt > 1 || set_ps > 1 || set_dt > 1)
 	    int_error(c_token, "duplicated arguments in style specification");
 
 	if (set_pal) {
@@ -1049,6 +1061,8 @@ lp_parse(struct lp_style_type *lp, TBOOLEAN allow_ls, TBOOLEAN allow_point)
 	    lp->p_interval = newlp.p_interval;
 	if (newlp.l_type == LT_COLORFROMCOLUMN)
 	    lp->l_type = LT_COLORFROMCOLUMN;
+	if (set_dt)
+	    lp->d_type = newlp.d_type;
 
     return new_lt;
 }
