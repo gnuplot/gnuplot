@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: fit.c,v 1.134 2014/03/09 19:15:52 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: fit.c,v 1.136 2014/03/15 03:52:00 sfeam Exp $"); }
 #endif
 
 /*  NOTICE: Change of Copyright Status
@@ -63,7 +63,7 @@ static char *RCSid() { return RCSid("$Id: fit.c,v 1.134 2014/03/09 19:15:52 mark
  *
  * Bastian Maerkisch, 130427: remember parameters etc. of last fit and use
  * this data in a subsequent update command if the parameter file does not
- * exists yet.
+ * exist yet.
  *
  * Thomas Mattison, 130508: New convergence criterion which is absolute
  * reduction in chisquare for an iteration of less than epsilon*chisquare
@@ -196,8 +196,6 @@ const char * FITSTARTLAMBDA = "FIT_START_LAMBDA";
 const char * FITLAMBDAFACTOR = "FIT_LAMBDA_FACTOR";
 const char * FITMAXITER = "FIT_MAXITER";
 
-char fitbuf[256]; /* for Eex and error_ex */
-
 /* private variables: */
 
 static double epsilon = DEF_FIT_LIMIT;	/* relative convergence limit */
@@ -228,6 +226,8 @@ static double *fit_x = 0;	/* all independent variable values,
 static double *fit_z = 0;	/* dependent data values */
 static double *err_data = 0;	/* standard deviations of indep. and dependent data */
 static double *a = 0;		/* array of fitting parameters */
+static double **regress_C = 0;	/* global copy of C matrix in regress */
+static void (* regress_cleanup)(void) = NULL;	/* memory cleanup function callback */
 static TBOOLEAN user_stop = FALSE;
 static double *scale_params = 0; /* scaling values for parameters */
 static struct udft_entry func;
@@ -254,17 +254,17 @@ static RETSIGTYPE ctrlc_handle __PROTO((int an_int));
 static void ctrlc_setup __PROTO((void));
 static marq_res_t marquardt __PROTO((double a[], double **alpha, double *chisq,
 				     double *lambda));
-static void analyze (double a[], double **alpha, double beta[],
+static void analyze(double a[], double **alpha, double beta[],
 				 double *chisq, double **deriv);
 static void calculate __PROTO((double *zfunc, double **dzda, double a[]));
 static void calc_derivatives(const double *par, double *data, double **deriv);
 static TBOOLEAN fit_interrupt __PROTO((void));
 static TBOOLEAN regress __PROTO((double a[]));
-void fit_progress(int i, double chisq, double last_chisq, double *a,
+static void regress_init(void);
+static void regress_finalize(int iter, double chisq, double last_chisq, double lambda, double **covar);
+static void fit_show(int i, double chisq, double last_chisq, double *a,
                           double lambda, FILE * device);
-void fit_show(int i, double chisq, double last_chisq, double *a,
-                          double lambda, FILE * device);
-void fit_show_brief(int iter, double chisq, double last_chisq, double *parms,
+static void fit_show_brief(int iter, double chisq, double last_chisq, double *parms,
                           double lambda, FILE * device);
 static void show_results __PROTO((double chisq, double last_chisq, double* a, double* dpar, double** corel));
 static void log_axis_restriction __PROTO((FILE *log_f, int param,
@@ -361,34 +361,43 @@ getchx()
     in case of fatal errors
 *****************************************************************/
 void
-error_ex()
+error_ex(int t_num, const char *str, ...)
 {
-    char *sp;
+    char buf[128];
+    va_list args;
 
-    memcpy(fitbuf, "         ", 9);	/* start after GNUPLOT> */
-    sp = strchr(fitbuf, NUL);
-    while (*--sp == '\n');
-    strcpy(sp + 1, "\n");
-    fputs(fitbuf, STANDARD);
-    strcpy(sp + 2, "\n");	/* terminate with exactly 2 newlines */
+    va_start(args, str);
+    vsnprintf(buf, sizeof(buf), str, args);
+    va_end(args);
+
+    /* cleanup - free memory */
     if (log_f) {
-	fprintf(log_f, "BREAK: %s", fitbuf);
-	(void) fclose(log_f);
+	fprintf(log_f, "BREAK: %s", buf);
+	fclose(log_f);
 	log_f = NULL;
     }
+    free(fit_x);
+    free(fit_z);
+    free(err_data);
+    free(a);
+    a = fit_x = fit_z = err_data = NULL;
     if (func.at) {
 	free_at(func.at);		/* release perm. action table */
 	func.at = (struct at_type *) NULL;
     }
+
+    if (regress_cleanup != NULL)
+	(*regress_cleanup)();
+
+    /* the datafile may still be open */
+    df_close();
+
     /* restore original SIGINT function */
     interrupt_setup();
 
     /* exit via int_error() so that it can clean up state variables */
-    int_error(NO_CARET, "error during fit");
+    int_error(t_num, buf);
 }
-
-
-/* HBB 990829: removed the debug print routines */
 
 
 /*****************************************************************
@@ -404,7 +413,6 @@ marquardt(double a[], double **C, double *chisq, double *lambda)
     double tmp_chisq;
 
     /* Initialization when lambda == -1 */
-
     if (*lambda == -1) {	/* Get first chi-square check */
 	temp_a = vec(num_params);
 	d = vec(num_data + num_params);
@@ -436,8 +444,8 @@ marquardt(double a[], double **C, double *chisq, double *lambda)
 		C[num_data + i][j] = 0, C[num_data + j][i] = 0;
 	return OK;
     }
-    /* once converged, free dynamic allocated vars */
 
+    /* once converged, free allocated vars */
     if (*lambda == -2) {
 	free(d);
 	free(tmp_d);
@@ -446,17 +454,18 @@ marquardt(double a[], double **C, double *chisq, double *lambda)
 	free(residues);
 	free_matr(tmp_C);
 	free_matr(deriv);
+	/* may be called more than once */
+	d = tmp_d = da = temp_a = residues = (double *) NULL;
+	tmp_C = deriv = (double **) NULL;
 	return OK;
     }
 
     /* Givens calculates in-place, so make working copies of C and d */
-
     for (j = 0; j < num_data + num_params; j++)
 	memcpy(tmp_C[j], C[j], num_params * sizeof(double));
     memcpy(tmp_d, d, num_data * sizeof(double));
 
     /* fill in additional parts of tmp_C, tmp_d */
-
     for (i = 0; i < num_params; i++) {
 	/* fill in low diag. of tmp_C ... */
 	tmp_C[num_data + i][i] = *lambda;
@@ -659,7 +668,6 @@ call_gnuplot(const double *par, double *data)
 	    for (j = 0; j < num_params; j++)
 		Dblf3("%-15.15s = %-15g\n", par_name[j], par[j] * scale_params[j]);
 	    Dblf("\n");
-	    /* FIXME: Eex() aborts before memory is freed. */
 	    if (undefined) {
 		Eex("Undefined value during function evaluation");
 	    } else {
@@ -998,6 +1006,21 @@ regress_check_stop(int iter, double chisq, double last_chisq, double lambda)
 
 
 /*****************************************************************
+    free memory allocated by gnuplot's internal fitting code
+*****************************************************************/
+static void
+internal_cleanup(void)
+{
+    double lambda;
+
+    free_matr(regress_C);
+    regress_C = NULL;
+    lambda = -2;		/* flag value, meaning 'destruct!' */
+    marquardt(NULL, NULL, NULL, &lambda);
+}
+
+
+/*****************************************************************
     frame routine for the marquardt-fit
 *****************************************************************/
 static TBOOLEAN
@@ -1007,8 +1030,11 @@ regress(double a[])
     int iter;
     marq_res_t res;
 
+    regress_cleanup = &internal_cleanup;
+
     chisq = last_chisq = INFINITY;
-    C = matr(num_data + num_params, num_params);
+    /* the global copy to is accessible to error_ex, too */
+    regress_C = C = matr(num_data + num_params, num_params);
     lambda = -1;		/* use sign as flag */
     iter = 0;			/* iteration counter  */
 
@@ -1061,10 +1087,8 @@ regress(double a[])
     regress_finalize(iter, chisq, last_chisq, lambda, covar);
 
     /* call destructor for allocated vars */
-    lambda = -2;		/* flag value, meaning 'destruct!' */
-    marquardt(a, C, &chisq, &lambda);
-
-    free_matr(C);
+    internal_cleanup();
+    regress_cleanup = NULL;
     return TRUE;
 }
 
@@ -1167,7 +1191,7 @@ fit_progress(int i, double chisq, double last_chisq, double* a, double lambda, F
 }
 
 
-void
+static void
 fit_show(int i, double chisq, double last_chisq, double* a, double lambda, FILE *device)
 {
     int k;
@@ -1219,7 +1243,7 @@ pack_float(char *num)
 
 
 /* tsm patchset 230: new one-line version of progress report */
-void
+static void
 fit_show_brief(int iter, double chisq, double last_chisq, double* parms, double lambda, FILE *device)
 {
     int k, len;
@@ -1821,7 +1845,7 @@ fit_command()
     i = 0;
     while (equals(c_token, "[")) {
 	if (i > MAX_NUM_VAR)
-	    int_error(c_token, "too many range specifiers");
+	    Eexc(c_token, "too many range specifiers");
 	/* NB: This has nothing really to do with the Z axis, we're */
 	/* just using that slot of the axis array as scratch space. */
 	AXIS_INIT3D(SECOND_Z_AXIS, 0, 1);
@@ -1863,27 +1887,27 @@ fit_command()
     if (file_name )
 	file_name = gp_strdup(file_name);
     else
-	int_error(token2, "missing filename or datablock");
+	Eexc(token2, "missing filename or datablock");
 
     /* use datafile module to parse the datafile and qualifiers */
     df_set_plot_mode(MODE_QUERY);  /* Does nothing except for binary datafiles */
 
     /* Historically we could only handle 7 using specs, hence 5 independent	*/
-    /* variables (the last 2 cols are used for z and z_err).		   	*/
+    /* variables (the last 2 cols are used for z and z_err).			*/
     /* June 2013 - Now the number of using specs can be increased by changing	*/
     /* MAXDATACOLS.  Logically this should be at least as large as MAX_NUM_VAR,	*/
     /* the limit on parameters passed to a user-defined function.		*/
     /* I.e. we expect that MAXDATACOLS >= MAX_NUM_VAR + 2			*/
 
     columns = df_open(file_name, MAXDATACOLS, NULL);
-    free(file_name);
     if (columns < 0)
-	int_error(NO_CARET, "Can't read data file");
+	Eexc2(token2, "Can't read data from", file_name);
+    free(file_name);
     if (columns == 1)
-	int_error(c_token, "Need more than 1 input data column");
+	Eexc(c_token, "Need more than 1 input data column");
     if (columns < 3) {
 	if (X_AXIS.datatype == DT_TIMEDATE || Y_AXIS.datatype == DT_TIMEDATE)
-	    int_error(c_token, "Need full using spec for time data");
+	    Eexc(c_token, "Need full using spec for time data");
     } else {
 	/* Allow time data only on first two dimensions (x and y) */
 	df_axis[0] = x_axis;
@@ -1905,7 +1929,7 @@ fit_command()
 	    char * err_spec = NULL;
 
 	    if (!isletter(c_token))
-		Eex("no variable specified");
+		Eexc(c_token, "Expecting a variable specifier.");
 	    m_capture(&err_spec, c_token, c_token);
 	    /* check if this is a valid dummy var */
 	    for (i = 0; i < MAX_NUM_VAR; i++) {
@@ -1920,7 +1944,7 @@ fit_command()
 		    err_cols[iz] = TRUE;
 		    num_errors++;
 		 } else
-		    int_error(c_token, "Invalid variable spec.");
+		    Eexc(c_token, "Invalid variable specifier.");
 	    }
 	    FPRINTF((stderr, "error spec \"%s\"\n", err_spec));
 	    free(err_spec);
@@ -1928,7 +1952,7 @@ fit_command()
 
 	/* z-errors are required. */
 	if (!err_cols[iz]) {
-	    int_warn(c_token, "z-errors are required.");
+	    Eexc(c_token, "z-errors are required.");
 	    err_cols[iz] = TRUE;
 	    num_errors++;
 	}
@@ -1943,7 +1967,7 @@ fit_command()
 
 	/* Check if there are enough columns.  Require # of indep. and dependent variables + # of errors */
 	if ((columns != 0) && (columns < num_indep + 1 + num_errors))
-	    int_error(c_token, "Not enough columns in using spec.  At least %i are required for this error spec.",
+	    Eexc2(c_token, "Not enough columns in using spec.  At least %i are required for this error spec.",
 		num_indep + 1 + num_errors);
 
 	/* Success. */
@@ -1952,7 +1976,7 @@ fit_command()
     } else if (almost_equals(c_token, "zerr$or")) {
 	/* convenience alias */
 	if (columns == 1)
-	    int_error(c_token, "zerror requires at least 2 columns");
+	    Eexc(c_token, "zerror requires at least 2 columns");
 	num_indep = (columns == 0) ? 1 : columns - 2;
 	num_errors = 1;
 	err_cols[iz] = TRUE;
@@ -1960,7 +1984,7 @@ fit_command()
     } else if (almost_equals(c_token, "xerr$or")) {
 	/* convenience alias, z:sz (or x:sx) */
 	if ((columns != 0) && (columns != 2))
-	    int_error(c_token, "xerror requires exactly 2 columns");
+	    Eexc(c_token, "xerror requires exactly 2 columns");
 	num_indep = 0;
 	num_errors = 1;
 	err_cols[iz] = TRUE;
@@ -1968,7 +1992,7 @@ fit_command()
     } else if (almost_equals(c_token, "yerr$or")) {
 	/* convenience alias, x:z:sz (or x:y:sy) */
 	if ((columns != 0) && (columns != 3))
-	    int_error(c_token, "yerror requires exactly 3 columns");
+	    Eexc(c_token, "yerror requires exactly 3 columns");
 	num_indep = 1;
 	num_errors = 1;
 	err_cols[iz] = TRUE;
@@ -1976,7 +2000,7 @@ fit_command()
     } else if (almost_equals(c_token, "xyerr$or")) {
 	/* convienience alias, x:z:sx:sz (or x:y:sx:sy) */
 	if ((columns != 0) && (columns != 4))
-	    int_error(c_token, "xyerror requires exactly 4 columns");
+	    Eexc(c_token, "xyerror requires exactly 4 columns");
 	num_indep = 1;
 	num_errors = 2;
 	err_cols[0] = TRUE;
@@ -1998,12 +2022,12 @@ fit_command()
      * allowed a variable name specifier for 'y': */
     /* FIXME EAM - Is this relevant any more? */
     if ((dummy_token[1] > 0) && (num_indep == 1))
-	int_error(dummy_token[1], "Can't re-name 'y' in a one-variable fit");
+	Eexc(dummy_token[1], "Can't re-name 'y' in a one-variable fit");
 
     /* depending on number of independent variables, the last range
      * spec may be for the Z axis */
     if (num_ranges > num_indep+1)
-	int_error(dummy_token[num_ranges-1], "Too many range-specs for a %d-variable fit", num_indep);
+	Eexc2(dummy_token[num_ranges-1], "Too many range-specs for a %d-variable fit", num_indep);
 
     /* defer actually reading the data until we have parsed the rest
      * of the line */
@@ -2040,6 +2064,7 @@ fit_command()
 	startup_lambda = tmpd;
 	Dblf2("lambda start value set: %g\n", startup_lambda);
     } else {
+	/* use default value or calculation */
 	startup_lambda = 0.0;
     }
 
@@ -2111,7 +2136,6 @@ fit_command()
 		|| !redim_vec(&err_data, max_data * GPMAX(num_errors, 1))
 		) {
 		/* Some of the reallocations went bad: */
-		df_close();
 		Eex2("Out of memory in fit: too many datapoints (%d)?", max_data);
 	    } else {
 		/* Just so we know that the routine is at work: */
@@ -2192,7 +2216,7 @@ fit_command()
 		err_data[num_errors * num_data + idx] = v[i++]; /* z-error */
 	    else
 		/* This case is not currently allowed. We always require z-errors. */
-		int_error(NO_CARET, "z errors are always required");
+		Eexc(NO_CARET, "z errors are always required");
 	}
 
 	/* Increment index into stored values.
@@ -2237,7 +2261,7 @@ fit_command()
 	else
 	    printf("%g]\n", axis_array[FIRST_Z_AXIS].max);
 	}
-	Eex("No data to fit ");
+	Eex("No data to fit");
     }
 
     /* tsm patchset 230: check for zero error values */
@@ -2254,7 +2278,6 @@ fit_command()
 	    Dblf3("%-15.15s = %-15g\n", "s", err_data[i * num_errors + (num_errors - 1)]);
 	    Dblf("\n");
 	    Eex("Zero error value in data file");
-	    /* FIXME: Eex() aborts before memory is freed! */
 	}
     }
 
@@ -2281,7 +2304,7 @@ fit_command()
     max_params = MAX_PARAMS;	/* HBB 971023: make this resizeable */
 
     if (!equals(c_token++, "via"))
-	int_error(c_token, "Need via and either parameter list or file");
+	Eexc(c_token, "Need via and either parameter list or file");
 
     /* allocate arrays for parameter values, names */
     a = vec(max_params);
@@ -2393,10 +2416,8 @@ fit_command()
 	Eex("Number of data points smaller than number of parameters");
 
     /* initialize scaling parameters */
-    if (!redim_vec(&scale_params,num_params)){
-	df_close();
+    if (!redim_vec(&scale_params, num_params))
 	Eex2("Out of memory in fit: too many datapoints (%d)?", max_data);
-    }
 
     for (i = 0; i < num_params; i++) {
 	/* avoid parameters being equal to zero */
@@ -2419,12 +2440,12 @@ fit_command()
 	regress(a);	/* fit */
 
     fclose(log_f);
-
     log_f = NULL;
     free(fit_x);
     free(fit_z);
     free(err_data);
     free(a);
+    a = fit_x = fit_z = err_data = NULL;
     if (func.at) {
 	free_at(func.at);		/* release perm. action table */
 	func.at = (struct at_type *) NULL;

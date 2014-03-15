@@ -5,6 +5,12 @@
 	terminal already accepted "Fontface Bold Italic" in font specifiers,
 	now it also accepts "Fontface:Bold:Italic".
 
+	* win/gnuplot.iss:  Include directories share and demo/games in
+	GNUPLOT_LIB
+
+	* src/fit.c src/fit.h:  Always call error_ex() to abort, which now does
+	the proper memory cleanup. Fixes the (most obvious) memory leaks.
+
 2014-03-14  Dieter Ries  <dieter.ries@psi.ch>
 
 	* src/qtterminal/QtGnuplotItems.* src/qtterminal/QtGnuplotScene.cpp:

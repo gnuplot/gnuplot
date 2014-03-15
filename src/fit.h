@@ -1,5 +1,5 @@
 /*
- * $Id: fit.h,v 1.26 2014/03/04 20:45:06 markisch Exp $
+ * $Id: fit.h,v 1.27 2014/03/09 19:15:52 markisch Exp $
  */
 
 /* GNUPLOT - fit.h */
@@ -45,13 +45,12 @@
 /* defaults */
 #define DEF_FIT_LIMIT 1e-5
 
-/*****************************************************************
-    Useful macros
-    We avoid any use of varargs/stdargs (not good style but portable)
-*****************************************************************/
-#define Eex(a)	    {sprintf (fitbuf+9, (a));         error_ex ();}
-#define Eex2(a,b)   {sprintf (fitbuf+9, (a),(b));     error_ex ();}
-#define Eex3(a,b,c) {sprintf (fitbuf+9, (a),(b),(c)); error_ex ();}
+/* error interrupt for fitting routines */
+#define Eex(a)       { error_ex(NO_CARET, (a)); }
+#define Eex2(a,b)    { error_ex(NO_CARET, (a), (b)); }
+#define Eex3(a,b,c)  { error_ex(NO_CARET, (a), (b), (c)); }
+#define Eexc(c,a)    { error_ex((c), (a)); }
+#define Eexc2(c,a,b) { error_ex((c), (a), (b)); }
 
 /* Type definitions */
 
@@ -79,11 +78,9 @@ extern double epsilon_abs;  /* absolute convergence criterion */
 extern int maxiter;
 extern int fit_wrap;
 
-extern char fitbuf[256]; /* for Eex and error_ex  */
-
 /* Prototypes of functions exported by fit.c */
 
-void error_ex __PROTO((void));
+void error_ex(int t_num, const char *str, ...);
 void init_fit __PROTO((void));
 void update __PROTO((char *pfile, char *npfile));
 void fit_command __PROTO((void));
