@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.276 2014/03/11 00:47:22 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.277 2014/03/13 06:02:37 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -223,6 +223,7 @@ static void do_point __PROTO((unsigned int x, unsigned int y, int number));
 static void do_pointsize __PROTO((double size));
 static void line_and_point __PROTO((unsigned int x, unsigned int y, int number));
 static void do_arrow __PROTO((unsigned int sx, unsigned int sy, unsigned int ex, unsigned int ey, int head));
+static void null_dashtype __PROTO((int type, t_dashtype *custom_dash_pattern));
 
 static int null_text_angle __PROTO((int ang));
 static int null_justify_text __PROTO((enum JUSTIFY just));
@@ -967,6 +968,8 @@ term_apply_lp_properties(struct lp_style_type *lp)
      */
     t_colorspec colorspec = lp->pm3d_color;
     int lt = lp->l_type;
+	int dt = lp->d_type;
+	t_dashtype custom_dash_pattern = lp->custom_dash_pattern;
 
     if (lp->pointflag) {
 	/* change points, too
@@ -991,6 +994,11 @@ term_apply_lp_properties(struct lp_style_type *lp)
 	(*term->linetype) (LT_BLACK);
     else
 	(*term->linetype) (lt);
+
+    /* Apply dashtype, which may override dot/dash pattern defined by 
+	 * linetype, possibly with a custom dash pattern */
+
+    (*term->dashtype) (dt, (dt == DASHTYPE_CUSTOM) ? &custom_dash_pattern : NULL);
 
     apply_pm3dcolor(&colorspec, term);
 }
@@ -1590,6 +1598,13 @@ null_set_color(struct t_colorspec *colorspec)
 	term->linetype(colorspec->lt);
 }
 
+static void
+null_dashtype(int type, t_dashtype *custom_dash_pattern)
+{
+	(void) type;
+	(void) custom_dash_pattern;
+}
+
 /* setup the magic macros to compile in the right parts of the
  * terminal drivers included by term.h
  */
@@ -1783,6 +1798,8 @@ change_term(const char *origname, int length)
 	term->set_color = null_set_color;
 	term->flags |= TERM_NULL_SET_COLOR;
     }
+    if (term->dashtype == 0)
+	term->dashtype = null_dashtype;
 
     if (interactive)
 	fprintf(stderr, "Terminal type set to '%s'\n", term->name);
