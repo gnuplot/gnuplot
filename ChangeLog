@@ -1,3 +1,21 @@
+2014-03-16  Peter Juhasz  <juhaszp@users.sourceforge.net>
+
+	* src/term_api.h src/term.c src/misc.c src/plot2d.c src/plot2d.c
+	src/set.c src/save.c src/graphics.c src/gadgets.c src/gadgets.h:
+	Introduce new "dashtype" line property that controls dot/dash 
+	pattern independently. Allow it in "set|show linetype|linestyle",
+	"plot", etc., display it in "save".
+	Only numeric "dashtype N" supported for now. 
+	New function dashtype() added to termentry struct, but none of the
+	terminals use it yet.
+
+	* src/set.c (set_linestyle): Set pm3d_color.type to TC_LT and
+	pm3d_color.lt to line number by default. This is necessary because
+	since the use_palette flag was removed, pm3d_color information is
+	used everywhere, yet, it was not set properly. This resulted,
+	among others, a broken "show linetype" output with empty "linecolor"
+	spec.
+
 2014-03-16  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/axis.h (en_minitics_status): Give enum a typedef name, too.
