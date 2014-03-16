@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.443 2014/01/27 05:29:51 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.444 2014/03/15 22:01:03 juhaszp Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -841,8 +841,14 @@ do_plot(struct curve_points *plots, int pcount)
 		if (this_plot->lp_properties.p_size == PTSZ_VARIABLE)
 		    (*t->pointsize)(pointsize);
 		(t->layer)(TERM_LAYER_BEGIN_KEYSAMPLE);
-		if (on_page(xl + key_point_offset, yl))
-		    (*t->point) (xl + key_point_offset, yl, this_plot->lp_properties.p_type);
+		if (on_page(xl + key_point_offset, yl)) {
+		    if (this_plot->lp_properties.p_type == PT_CHARACTER)
+			(*t->put_text) (xl + key_point_offset, yl, 
+					(char *)(&this_plot->lp_properties.p_char));
+		    else
+			(*t->point) (xl + key_point_offset, yl, 
+					this_plot->lp_properties.p_type);
+		}
 		(t->layer)(TERM_LAYER_END_KEYSAMPLE);
 	    }
 
@@ -2092,6 +2098,14 @@ plot_points(struct curve_points *plot)
     int interval = plot->lp_properties.p_interval;
     struct termentry *t = term;
 
+    /* Set whatever we can that applies to every point in the loop */
+    if (plot->lp_properties.p_type == PT_CHARACTER) {
+	ignore_enhanced(TRUE);
+	if (plot->labels->font && plot->labels->font[0])
+	    (*t->set_font) (plot->labels->font);
+	(*t->justify_text) (CENTRE);
+    }
+
     for (i = 0; i < plot->p_count; i++) {
 	if ((plot->plot_style == LINESPOINTS) && (interval) && (i % interval)) {
 	    continue;
@@ -2125,9 +2139,24 @@ plot_points(struct curve_points *plot)
 		/* rgb variable  -  color read from data column */
 		check_for_variable_color(plot, &plot->varcolor[i]);
 
-		(*t->point) (x, y, plot->lp_properties.p_type);
+		/* The normal case */
+		if (plot->lp_properties.p_type >= 0)
+		    (*t->point) (x, y, plot->lp_properties.p_type);
+
+		/* Print special character rather than drawn symbol */
+		else if (plot->lp_properties.p_type == PT_CHARACTER) {
+		    apply_pm3dcolor(&(plot->labels->textcolor), t);
+		    (*t->put_text)(x, y, (char *)(&(plot->lp_properties.p_char)));
+		}
 	    }
 	}
+    }
+
+    /* Return to initial state */
+    if (plot->lp_properties.p_type == PT_CHARACTER) {
+	if (plot->labels->font && plot->labels->font[0])
+	    (*t->set_font) ("");
+	ignore_enhanced(FALSE);
     }
 }
 
@@ -3801,7 +3830,7 @@ place_raxis()
     t_object raxis_circle = {
 	NULL, 1, 1, OBJ_CIRCLE,	OBJ_CLIP, /* link, tag, layer (front), object_type, clip */
 	{FS_SOLID, 100, 0, BLACK_COLORSPEC},
-	{0, LT_BACKGROUND, 0, DASHTYPE_AXIS, 0, 0.2, 0.0, BACKGROUND_COLORSPEC, DEFAULT_DASHPATTERN},
+	{0, LT_BACKGROUND, 0, DASHTYPE_AXIS, 0, 0.2, 0.0, 0, BACKGROUND_COLORSPEC, DEFAULT_DASHPATTERN},
 	{.circle = {1, {0,0,0,0.,0.,0.}, {graph,0,0,0.02,0.,0.}, 0., 360. }}
     };
 #endif

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.321 2014/03/12 03:55:07 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.322 2014/03/15 23:42:01 juhaszp Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -2369,29 +2369,9 @@ eval_plots()
 		}
 #endif
 
-		/* Labels can have font and text property info as plot options */
-		/* In any case we must allocate one instance of the text style */
-		/* that all labels in the plot will share.                     */
-		if (this_plot->plot_style == LABELPOINTS) {
-		    int stored_token = c_token;
-
-		    if (this_plot->labels == NULL) {
-			this_plot->labels = new_text_label(-1);
-			this_plot->labels->pos = CENTRE;
-			this_plot->labels->layer = LAYER_PLOTLABELS;
-		    }
-		    parse_label_options(this_plot->labels, TRUE);
-		    if (stored_token != c_token) {
-			if (set_labelstyle) {
-			    duplication = TRUE;
-			    break;
-			} else {
-			    set_labelstyle = TRUE;
-			    continue;
-			}
-		    }
-
-		} else {
+		/* Most plot styles accept line and point properties */
+		/* but do not want font or text properties           */
+		if (this_plot->plot_style != LABELPOINTS) {
 		    int stored_token = c_token;
 		    struct lp_style_type lp = DEFAULT_LP_STYLE_TYPE;
 
@@ -2417,6 +2397,33 @@ eval_plots()
 			} else {
 			    this_plot->lp_properties = lp;
 			    set_lpstyle = TRUE;
+			    if (this_plot->lp_properties.p_type != PT_CHARACTER)
+				continue;
+			}
+		    }
+		}
+
+		/* Labels can have font and text property info as plot options */
+		/* In any case we must allocate one instance of the text style */
+		/* that all labels in the plot will share.                     */
+		if ((this_plot->plot_style == LABELPOINTS)
+		||  (this_plot->plot_style & PLOT_STYLE_HAS_POINT
+			&& this_plot->lp_properties.p_type == PT_CHARACTER)) {
+		    int stored_token = c_token;
+
+		    if (this_plot->labels == NULL) {
+			this_plot->labels = new_text_label(-1);
+			this_plot->labels->pos = CENTRE;
+			this_plot->labels->layer = LAYER_PLOTLABELS;
+		    }
+		    parse_label_options(this_plot->labels, TRUE);
+		    if ((stored_token != c_token)
+		    ||  (this_plot->lp_properties.p_type == PT_CHARACTER)) {
+			if (set_labelstyle) {
+			    duplication = TRUE;
+			    break;
+			} else {
+			    set_labelstyle = TRUE;
 			    continue;
 			}
 		    }

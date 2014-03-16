@@ -51,10 +51,13 @@ plot demo . 'silver.dat' u 1:($2-10.):(1+rand(0)) title 'with points ps variable
      with points ps variable pt 6
 #
 set output out . 'figure_linespoints' . ext
+set key opaque height 1
 f(x) = 8 + 8*sin(x/20)
 plot demo . 'silver.dat' u 1:($2-10.) title 'with linespoints' \
      with linespoints pt 6 ps 1, \
-     '' u 1:($2) title 'pointinterval -2' with lp pt 4 ps 1 pi -2
+     '' u 1:($2) title 'pointinterval -2' with lp pt 4 ps 1 pi -2, \
+     '' u 1:($2+10.) with lp pt "α" pi -1 font ",18" title 'with lp pt "α" pi -1'
+set key noopaque
 #
 set output out . 'figure_fsteps' . ext
 plot demo . 'silver.dat' u 1:($2-10.) title 'with fsteps' with fsteps

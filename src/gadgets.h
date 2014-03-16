@@ -200,7 +200,7 @@ struct pa_style {
     int layer;			/* front/back */
 };
 #define DEFAULT_PARALLEL_AXIS_STYLE \
-	{{0, LT_BLACK, 0, DASHTYPE_SOLID, 0, 2.0, 0.0, BLACK_COLORSPEC, DEFAULT_DASHPATTERN}, LAYER_FRONT }
+	{{0, LT_BLACK, 0, DASHTYPE_SOLID, 0, 2.0, 0.0, 0, BLACK_COLORSPEC, DEFAULT_DASHPATTERN}, LAYER_FRONT }
 
 /* The stacking direction of the key box: (vertical, horizontal) */
 typedef enum en_key_stack_direction {
@@ -342,7 +342,7 @@ typedef struct {
 
 extern legend_key keyT;
 
-#define DEFAULT_KEYBOX_LP {0, LT_NODRAW, 0, DASHTYPE_SOLID, 0, 1.0, PTSZ_DEFAULT, BLACK_COLORSPEC, DEFAULT_DASHPATTERN}
+#define DEFAULT_KEYBOX_LP {0, LT_NODRAW, 0, DASHTYPE_SOLID, 0, 1.0, PTSZ_DEFAULT, 0, BLACK_COLORSPEC, DEFAULT_DASHPATTERN}
 
 #define DEFAULT_KEY_POSITION { graph, graph, graph, 0.9, 0.9, 0. }
 
@@ -535,24 +535,24 @@ extern fill_style_type default_fillstyle;
 extern struct object default_rectangle;
 #define DEFAULT_RECTANGLE_STYLE { NULL, -1, 0, OBJ_RECTANGLE, OBJ_CLIP,	\
 	{FS_SOLID, 100, 0, BLACK_COLORSPEC},   			\
-	{0, LT_BACKGROUND, 0, DASHTYPE_SOLID, 0, 1.0, 0.0, BACKGROUND_COLORSPEC, DEFAULT_DASHPATTERN}, \
+	{0, LT_BACKGROUND, 0, DASHTYPE_SOLID, 0, 1.0, 0.0, 0, BACKGROUND_COLORSPEC, DEFAULT_DASHPATTERN}, \
 	{.rectangle = {0, {0,0,0,0.,0.,0.}, {0,0,0,0.,0.,0.}, {0,0,0,0.,0.,0.}, {0,0,0,0.,0.,0.}}} }
 
 extern struct object default_circle;
 #define DEFAULT_CIRCLE_STYLE { NULL, -1, 0, OBJ_CIRCLE, OBJ_CLIP, \
 	{FS_SOLID, 100, 0, BLACK_COLORSPEC},   			\
-	{0, LT_BACKGROUND, 0, DASHTYPE_SOLID, 0, 1.0, 0.0, BACKGROUND_COLORSPEC, DEFAULT_DASHPATTERN},	\
+	{0, LT_BACKGROUND, 0, DASHTYPE_SOLID, 0, 1.0, 0.0, 0, BACKGROUND_COLORSPEC, DEFAULT_DASHPATTERN}, \
 	{.circle = {1, {0,0,0,0.,0.,0.}, {graph,0,0,0.02,0.,0.}, 0., 360., TRUE }} }
 
 extern struct object default_ellipse;
 #define DEFAULT_ELLIPSE_STYLE { NULL, -1, 0, OBJ_ELLIPSE, OBJ_CLIP, \
 	{FS_SOLID, 100, 0, BLACK_COLORSPEC},   			\
-	{0, LT_BACKGROUND, 0, DASHTYPE_SOLID, 0, 1.0, 0.0, BACKGROUND_COLORSPEC, DEFAULT_DASHPATTERN}, \
+	{0, LT_BACKGROUND, 0, DASHTYPE_SOLID, 0, 1.0, 0.0, 0, BACKGROUND_COLORSPEC, DEFAULT_DASHPATTERN}, \
 	{.ellipse = {ELLIPSEAXES_XY, {0,0,0,0.,0.,0.}, {graph,graph,0,0.05,0.03,0.}, 0. }} }
 
 #define DEFAULT_POLYGON_STYLE { NULL, -1, 0, OBJ_POLYGON, OBJ_CLIP, \
 	{FS_SOLID, 100, 0, BLACK_COLORSPEC},   			\
-	{0, LT_BLACK, 0, DASHTYPE_SOLID, 0, 1.0, 0.0, BLACK_COLORSPEC, DEFAULT_DASHPATTERN}, \
+	{0, LT_BLACK, 0, DASHTYPE_SOLID, 0, 1.0, 0.0, 0, BLACK_COLORSPEC, DEFAULT_DASHPATTERN}, \
 	{.polygon = {0, NULL} } }
 
 #endif

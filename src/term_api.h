@@ -1,5 +1,5 @@
 /*
- * $Id: term_api.h,v 1.121 2014/03/15 22:01:03 juhaszp Exp $
+ * $Id: term_api.h,v 1.122 2014/03/16 00:39:27 juhaszp Exp $
  */
 
 /* GNUPLOT - term_api.h */
@@ -64,6 +64,9 @@
 #define DASHTYPE_SOLID  (-1)
 /* more...? */
 
+/* magic point type that indicates a character rather than a predefined symbol */
+#define PT_CHARACTER  (-9)
+
 /* Constant value passed to (term->text_angle)(ang) to generate vertical
  * text corresponding to old keyword "rotate", which produced the equivalent
  * of "rotate by 90 right-justified".
@@ -110,16 +113,17 @@ typedef struct lp_style_type {	/* contains all Line and Point properties */
     int     pointflag;		/* 0 if points not used, otherwise 1 */
     int     l_type;
     int	    p_type;
-	int     d_type;			/* Dashtype */
+    int     d_type;		/* Dashtype */
     int     p_interval;		/* Every Nth point in style LINESPOINTS */
     double  l_width;
     double  p_size;
+    ulong   p_char;		/* char used if p_type = PT_CHARACTER */
     struct t_colorspec pm3d_color;
-	t_dashtype custom_dash_pattern;	/* per-line, user defined dashtype */
+    t_dashtype custom_dash_pattern;	/* per-line, user defined dashtype */
     /* ... more to come ? */
 } lp_style_type;
 
-#define DEFAULT_LP_STYLE_TYPE {0, LT_BLACK, 0, DASHTYPE_SOLID, 0, 1.0, PTSZ_DEFAULT, DEFAULT_COLORSPEC, DEFAULT_DASHPATTERN}
+#define DEFAULT_LP_STYLE_TYPE {0, LT_BLACK, 0, DASHTYPE_SOLID, 0, 1.0, PTSZ_DEFAULT, 0, DEFAULT_COLORSPEC, DEFAULT_DASHPATTERN}
 
 typedef enum e_arrow_head {
 	NOHEAD = 0,

@@ -1,5 +1,5 @@
 /*
- * $Id: axis.h,v 1.99 2014/03/15 22:01:03 juhaszp Exp $
+ * $Id: axis.h,v 1.100 2014/03/16 01:54:56 broeker Exp $
  *
  */
 
@@ -268,7 +268,7 @@ typedef struct axis {
 } AXIS;
 
 #define DEFAULT_AXIS_TICDEF {TIC_COMPUTED, NULL, {TC_DEFAULT, 0, 0.0}, {NULL, {0.,0.,0.}, FALSE},  { character, character, character, 0., 0., 0. }, FALSE }
-#define DEFAULT_AXIS_ZEROAXIS {0, LT_AXIS, 0, DASHTYPE_AXIS, 0, 1.0, PTSZ_DEFAULT, BLACK_COLORSPEC, DEFAULT_DASHPATTERN}
+#define DEFAULT_AXIS_ZEROAXIS {0, LT_AXIS, 0, DASHTYPE_AXIS, 0, 1.0, PTSZ_DEFAULT, 0, BLACK_COLORSPEC, DEFAULT_DASHPATTERN}
 
 #define DEFAULT_AXIS_STRUCT {						    \
 	AUTOSCALE_BOTH, AUTOSCALE_BOTH, /* auto, set_auto */		    \

@@ -1,3 +1,13 @@
+2014-03-16  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/axis.c src/axis.h src/gadgets.c src/gadgets.h src/graphics.c
+	src/misc.c src/plot2d.c src/set.c src/term_api.h docs/gnuplot.doc
+	docs/plotstyles.gnu:
+	New point type that consists of a single character (possibly a
+	multibyte character).  This is particularly useful as
+	    plot $FOO with linespoints pointtype "#" pointinterval -1
+	where # is the desired character drawn at each point.
+
 2014-03-16  Peter Juhasz  <juhaszp@users.sourceforge.net>
 
 	* src/term_api.h src/term.c src/misc.c src/plot2d.c src/plot2d.c

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.168 2014/03/15 22:01:03 juhaszp Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.169 2014/03/15 23:42:01 juhaszp Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -982,10 +982,25 @@ lp_parse(struct lp_style_type *lp, TBOOLEAN allow_ls, TBOOLEAN allow_point)
 
 	    if (almost_equals(c_token, "pointt$ype") || equals(c_token, "pt")) {
 		if (allow_point) {
+		    char *symbol;
 		    if (set_pt++)
 			break;
 		    c_token++;
-		    newlp.p_type = int_expression() - 1;
+		    if ((symbol = try_to_get_string())) {
+			newlp.p_type = PT_CHARACTER;
+			/* An alternative mechanism would be to use
+			 * utf8toulong(&newlp.p_char, symbol);
+			 */
+			strncpy((char *)(&newlp.p_char), symbol, 3);
+			/* Truncate ascii text to single character */
+			if ((((char *)&newlp.p_char)[0] & 0x80) == 0)
+			    ((char *)&newlp.p_char)[1] = '\0';
+			/* UTF-8 characters may use up to 3 bytes */
+			((char *)&newlp.p_char)[3] = '\0';
+			free(symbol);
+		    } else {
+			newlp.p_type = int_expression() - 1;
+		    }
 		} else {
 		    int_warn(c_token, "No pointtype specifier allowed, here");
 		    c_token += 2;
@@ -1053,8 +1068,10 @@ lp_parse(struct lp_style_type *lp, TBOOLEAN allow_ls, TBOOLEAN allow_point)
 	}
 	if (set_lw)
 	    lp->l_width = newlp.l_width;
-	if (set_pt)
+	if (set_pt) {
 	    lp->p_type = newlp.p_type;
+	    lp->p_char = newlp.p_char;
+	}
 	if (set_ps)
 	    lp->p_size = newlp.p_size;
 	if (set_pi)
