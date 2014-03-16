@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.130 2014/02/28 19:23:52 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.131 2014/03/15 22:01:03 juhaszp Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -899,32 +899,32 @@ setup_tics(AXIS_INDEX axis, int max)
 void
 gen_tics(AXIS_INDEX axis, tic_callback callback)
 {
-    struct ticdef *def = &axis_array[axis].ticdef;
-    int minitics = axis_array[axis].minitics; /* off/default/auto/explicit */
-    double minifreq = axis_array[axis].mtic_freq; /* minitic frequency */
+    AXIS *this = axis_array + axis;
+    struct ticdef *def = & this->ticdef;
+    t_minitics_status minitics = this->minitics; /* off/default/auto/explicit */
 
     struct lp_style_type lgrd = grid_lp;
     struct lp_style_type mgrd = mgrid_lp;
 
-    if (! axis_array[axis].gridmajor)
+    if (! this->gridmajor)
 	lgrd.l_type = LT_NODRAW;
-    if (! axis_array[axis].gridminor)
+    if (! this->gridminor)
 	mgrd.l_type = LT_NODRAW;
 
     /* EAM FIXME - This really shouldn't happen, but it triggers for instance */
     /* if x2tics or y2tics are autoscaled but there is no corresponding data. */
-    if (axis_array[axis].min >= VERYLARGE || axis_array[axis].max <= -VERYLARGE)
+    if (this->min >= VERYLARGE || this->max <= -VERYLARGE)
 	return;
 
     if (def->def.user) {	/* user-defined tic entries */
 	struct ticmark *mark = def->def.user;
-	double uncertain = (axis_array[axis].max - axis_array[axis].min) / 10;
-	double internal_min = axis_array[axis].min - SIGNIF * uncertain;
-	double internal_max = axis_array[axis].max + SIGNIF * uncertain;
+	double uncertain = (this->max - this->min) / 10;
+	double internal_min = this->min - SIGNIF * uncertain;
+	double internal_max = this->max + SIGNIF * uncertain;
 #if 0
-	double log10_base = axis_array[axis].log ? log10(axis_array[axis].base) : 1.0;
+	double log10_base = this->log ? log10(this->base) : 1.0;
 #else	/* This allows gprintf formats %L %l to work even when log scaling is off */
-	double log10_base = axis_array[axis].base > 0.0 ? log10(axis_array[axis].base) : 1.0;
+	double log10_base = this->base > 0.0 ? log10(this->base) : 1.0;
 #endif
 	double polar_shift = 0;
 
@@ -962,13 +962,13 @@ gen_tics(AXIS_INDEX axis, tic_callback callback)
 	    } else if (axis >= PARALLEL_AXES) {
 		/* FIXME: needed because ticfmt array is not maintained for parallel axes */
 		gprintf(label, sizeof(label),
-			mark->label ? mark->label : axis_array[axis].formatstring,
+			mark->label ? mark->label : this->formatstring,
 			log10_base, mark->position);
 		ticlabel = label;
-	    } else if (axis_array[axis].datatype == DT_TIMEDATE) {
+	    } else if (this->datatype == DT_TIMEDATE) {
 		gstrftime(label, MAX_ID_LEN-1, mark->label ? mark->label : ticfmt[axis], mark->position);
 		ticlabel = label;
-	    } else if (axis_array[axis].datatype == DT_DMS) {
+	    } else if (this->datatype == DT_DMS) {
 		gstrdms(label, mark->label ? mark->label : ticfmt[axis], mark->position);
 		ticlabel = label;
 	    } else {
@@ -1017,15 +1017,15 @@ gen_tics(AXIS_INDEX axis, tic_callback callback)
 	double user;		/* in user co-ords */
 	double start, step, end;
 	int    nsteps;
-	double lmin = axis_array[axis].min, lmax = axis_array[axis].max;
+	double lmin = this->min, lmax = this->max;
 	double internal_min, internal_max;	/* to allow for rounding errors */
 	double ministart = 0, ministep = 1, miniend = 1;	/* internal or user - depends on step */
 
 	/* gprintf uses log10() of base - log_base_array is log() */
 #if 0
-	double log10_base = axis_array[axis].log ? log10(axis_array[axis].base) : 1.0;
+	double log10_base = this->log ? log10(this->base) : 1.0;
 #else	/* This allows gprintf formats %L %l to work even when log scaling is off */
-	double log10_base = axis_array[axis].base > 0.0 ? log10(axis_array[axis].base) : 1.0;
+	double log10_base = this->base > 0.0 ? log10(this->base) : 1.0;
 #endif
 	if (lmax < lmin) {
 	    /* hmm - they have set reversed range for some reason */
@@ -1036,7 +1036,7 @@ gen_tics(AXIS_INDEX axis, tic_callback callback)
 	/* {{{  choose start, step and end */
 	switch (def->type) {
 	case TIC_SERIES:
-	    if (axis_array[axis].log && axis != POLAR_AXIS) {
+	    if (this->log && axis != POLAR_AXIS) {
 		/* we can tolerate start <= 0 if step and end > 0 */
 		if (def->def.series.end <= 0 || def->def.series.incr <= 0)
 		    return;	/* just quietly ignore */
@@ -1095,25 +1095,25 @@ gen_tics(AXIS_INDEX axis, tic_callback callback)
 	step = fabs(step);
 	/* }}} */
 
-	if (minitics && axis_array[axis].miniticscale != 0) {
+	if ((minitics != MINI_OFF) && (this->miniticscale != 0)) {
 	    FPRINTF((stderr,"axis.c: %d  start = %g end = %g step = %g\n", 
 			__LINE__, start, end, step));
 	    /* {{{  figure out ministart, ministep, miniend */
 	    if (minitics == MINI_USER) {
 		/* they have said what they want */
-		if (minifreq <= 0)
-		    minitics = 0;	/* not much else we can do */
- 		else if (axis_array[axis].log) {
- 		    ministart = ministep = step / minifreq * axis_array[axis].base;
- 		    miniend = step * axis_array[axis].base;
+		if (this->mtic_freq <= 0)
+		    minitics = MINI_OFF;
+ 		else if (this->log) {
+ 		    ministart = ministep = step / this->mtic_freq * this->base;
+ 		    miniend = step * this->base;
 		    /* Suppress minitics that would lie on top of major tic */
 		    while (ministart <= 1)
 			ministart += ministep;
  		} else {
-		    ministart = ministep = step / minifreq;
+		    ministart = ministep = step / this->mtic_freq;
 		    miniend = step;
  		}
-	    } else if (axis_array[axis].log) {
+	    } else if (this->log) {
 		if (step > 1.5) {	/* beware rounding errors */
 		    /* {{{  10,100,1000 case */
 		    /* no more than five minitics */
@@ -1127,9 +1127,9 @@ gen_tics(AXIS_INDEX axis, tic_callback callback)
 		    /* }}} */
 		} else {
 		    /* {{{  2,5,8 case */
-		    miniend = axis_array[axis].base;
+		    miniend = this->base;
 		    if (end - start >= 10)
-			minitics = 0;	/* none */
+			minitics = MINI_OFF;
 		    else if (end - start >= 5) {
 			ministart = 2;
 			ministep = 3;
@@ -1139,7 +1139,7 @@ gen_tics(AXIS_INDEX axis, tic_callback callback)
 		    }
 		    /* }}} */
 		}
-	    } else if (axis_array[axis].datatype == DT_TIMEDATE) {
+	    } else if (this->datatype == DT_TIMEDATE) {
 		ministart = ministep =
 		    make_auto_time_minitics(timelevel[axis], step);
 		miniend = step * 0.9;
@@ -1150,10 +1150,10 @@ gen_tics(AXIS_INDEX axis, tic_callback callback)
 		ministart = ministep = (k==2 ? 0.5 : 0.2) * step;
 		miniend = step;
 	    } else
-		minitics = 0;
+		minitics = MINI_OFF;
 
 	    if (ministep <= 0)
-		minitics = 0;	/* dont get stuck in infinite loop */
+		minitics = MINI_OFF;	/* dont get stuck in infinite loop */
 	    /* }}} */
 	}
 
@@ -1206,8 +1206,8 @@ gen_tics(AXIS_INDEX axis, tic_callback callback)
 	    if (axis == POLAR_AXIS) {
 		/* Defer translation until after limit check */
 		internal = tic;
-	    } else if (!axis_array[axis].log) {
-		internal = (axis_array[axis].datatype == DT_TIMEDATE)
+	    } else if (!this->log) {
+		internal = (this->datatype == DT_TIMEDATE)
 		    ? time_tic_just(timelevel[axis], tic)
 		    : tic;
 		user = CheckZero(internal, step);
@@ -1240,10 +1240,10 @@ gen_tics(AXIS_INDEX axis, tic_callback callback)
 		    }
 		default:{	/* comp or series */
 			char label[MAX_ID_LEN]; /* Leave room for enhanced text markup */
-			if (axis_array[axis].datatype == DT_TIMEDATE) {
+			if (this->datatype == DT_TIMEDATE) {
 			    /* If they are doing polar time plot, good luck to them */
 			    gstrftime(label, MAX_ID_LEN-1, ticfmt[axis], (double) user);
-			} else if (axis_array[axis].datatype == DT_DMS) {
+			} else if (this->datatype == DT_DMS) {
 			    gstrdms(label, ticfmt[axis], (double)user);
 			} else if (polar) {
 			    double min = (R_AXIS.autoscale & AUTOSCALE_MIN) ? 0 : R_AXIS.min;
@@ -1259,7 +1259,7 @@ gen_tics(AXIS_INDEX axis, tic_callback callback)
 			    gprintf(label, sizeof(label), ticfmt[axis], log10_base, r);
 			} else if (axis >= PARALLEL_AXES) {
 			    /* FIXME: needed because ticfmt array is not maintained for parallel axes */
-			    gprintf(label, sizeof(label), axis_array[axis].formatstring,
+			    gprintf(label, sizeof(label), this->formatstring,
 				    log10_base, user);
 			} else {
 			    gprintf(label, sizeof(label), ticfmt[axis], log10_base, user);
@@ -1267,7 +1267,7 @@ gen_tics(AXIS_INDEX axis, tic_callback callback)
 
 			/* Range-limited tic placement */
 			if (def->rangelimited
-			&&  !inrange(internal,axis_array[axis].data_min,axis_array[axis].data_max))
+			&&  !inrange(internal,this->data_min,this->data_max))
 			    continue;
 
 			(*callback) (axis, internal, label, 0, lgrd, def->def.user);
@@ -1284,16 +1284,16 @@ gen_tics(AXIS_INDEX axis, tic_callback callback)
 		/* }}} */
 
 	    }
-	    if (minitics && axis_array[axis].miniticscale != 0) {
+	    if ((minitics != MINI_OFF) && (this->miniticscale != 0)) {
 		/* {{{  process minitics */
 		double mplace, mtic, temptic;
 		for (mplace = ministart; mplace < miniend; mplace += ministep) {
-		    if (axis_array[axis].datatype == DT_TIMEDATE)
+		    if (this->datatype == DT_TIMEDATE)
 			mtic = time_tic_just(timelevel[axis] - 1,
 					     internal + mplace);
 		    else
 			mtic = internal
-			    + (axis_array[axis].log && step <= 1.5
+			    + (this->log && step <= 1.5
 			       ? AXIS_DO_LOG(axis,mplace)
 			       : mplace);
 		    temptic = mtic;

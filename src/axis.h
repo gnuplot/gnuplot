@@ -1,5 +1,5 @@
 /*
- * $Id: axis.h,v 1.98 2013/12/26 17:58:28 sfeam Exp $
+ * $Id: axis.h,v 1.99 2014/03/15 22:01:03 juhaszp Exp $
  *
  */
 
@@ -131,12 +131,12 @@ typedef struct ticdef {
  * simply test bit 0 to see if it must do the minitics automatically.
  * similarly, conventional plot can test bit 1 to see if minitics are
  * required */
-enum en_minitics_status {
+typedef enum en_minitics_status {
     MINI_OFF,
     MINI_DEFAULT,
     MINI_USER,
     MINI_AUTO
-};
+} t_minitics_status;
 
 /* Function pointer type for callback functions doing operations for a
  * single ticmark */
@@ -255,7 +255,7 @@ typedef struct axis {
     int tic_rotate;		/* ticmarks rotated by this angle */
     TBOOLEAN gridmajor;		/* Grid lines wanted on major tics? */
     TBOOLEAN gridminor;		/* Grid lines for minor tics? */
-    int minitics;		/* minor tic mode (none/auto/user)? */
+    t_minitics_status minitics;	/* minor tic mode (none/auto/user)? */
     double mtic_freq;		/* minitic stepsize */
     double ticscale;		/* scale factor for tic marks (was (0..1])*/
     double miniticscale;	/* and for minitics */
@@ -516,8 +516,9 @@ do {							\
  * Note: see the particular implementation for COLOR AXIS below.
  */
 
-#define STORE_WITH_LOG_AND_UPDATE_RANGE(STORE, VALUE, TYPE, AXIS,	  \
-				NOAUTOSCALE, OUT_ACTION, UNDEF_ACTION)	  \
+#define ACTUAL_STORE_WITH_LOG_AND_UPDATE_RANGE(STORE, VALUE, TYPE, AXIS,  \
+					       NOAUTOSCALE, OUT_ACTION,   \
+					       UNDEF_ACTION, is_cb_axis)  \
 do {									  \
     struct axis *axis = &axis_array[AXIS];				  \
     double curval = VALUE;						  \
@@ -548,7 +549,7 @@ do {									  \
 	break;  /* this plot is not being used for autoscaling */	  \
     if (TYPE != INRANGE)						  \
 	break;  /* don't set y range if x is outrange, for example */	  \
-    if ((AXIS != COLOR_AXIS) && axis->linked_to_primary) {	  	  \
+    if ((! is_cb_axis) && axis->linked_to_primary) {	  		  \
 	axis -= SECOND_AXES;						  \
 	if (axis->link_udf->at) 					  \
 	    curval = eval_link_function(AXIS - SECOND_AXES, curval);	  \
@@ -600,6 +601,9 @@ do {									  \
     }									  \
 } while(0)
 
+/* normal calls go though this macro, marked as not being a color axis */
+#define STORE_WITH_LOG_AND_UPDATE_RANGE(STORE, VALUE, TYPE, AXIS, NOAUTOSCALE, OUT_ACTION, UNDEF_ACTION)	 \
+ ACTUAL_STORE_WITH_LOG_AND_UPDATE_RANGE(STORE, VALUE, TYPE, AXIS, NOAUTOSCALE, OUT_ACTION, UNDEF_ACTION, 0)
 
 /* Implementation of the above for the color axis. It should not change
  * the type of the point (out-of-range color is plotted with the color
@@ -609,8 +613,8 @@ do {									  \
 			       NOAUTOSCALE, OUT_ACTION, UNDEF_ACTION)	  \
 {									  \
     coord_type c_type_tmp = TYPE;					  \
-    STORE_WITH_LOG_AND_UPDATE_RANGE(STORE, VALUE, c_type_tmp, AXIS,	  \
-			       NOAUTOSCALE, OUT_ACTION, UNDEF_ACTION);	  \
+    ACTUAL_STORE_WITH_LOG_AND_UPDATE_RANGE(STORE, VALUE, c_type_tmp, AXIS,	  \
+					   NOAUTOSCALE, OUT_ACTION, UNDEF_ACTION, 1); \
 }
 
 /* Empty macro arguments triggered NeXT cpp bug       */
