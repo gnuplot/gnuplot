@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.171 2014/03/17 16:26:57 juhaszp Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.172 2014/03/17 20:47:13 juhaszp Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -1132,7 +1132,12 @@ lp_parse(struct lp_style_type *lp, TBOOLEAN allow_ls, TBOOLEAN allow_point)
 		    break;
 		c_token++;
 		tmp = parse_dashtype(&newlp.custom_dash_pattern);
-		newlp.d_type = tmp;   /* TODO dash patterns from 'set dashtype' */
+		/* Pull the dashtype from the list of already defined dashtypes, */
+		/* but only if it we didn't get an explicit one back from parse_dashtype */ 
+		if (tmp >= 0) {
+			tmp = load_dashtype(&newlp.custom_dash_pattern, tmp + 1);
+		}
+		newlp.d_type = tmp;
 		continue;
 	    }
 

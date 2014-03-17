@@ -14,6 +14,10 @@
 	New commands 'set|show|unset dashtype <N> <dashtype_spec>' to
 	specify permanent, user-defined dashtypes.
 
+	* src/termp_api.h src/term.c src/misc.c: lp_parse() loads dashtype
+	from the list of user-defined dashtypes if the absence of an explicit
+	definition.
+
 2014-03-16  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/axis.c src/axis.h src/gadgets.c src/gadgets.h src/graphics.c

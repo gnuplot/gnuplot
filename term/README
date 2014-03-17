@@ -87,6 +87,8 @@ struct TERMENTRY {
     void (*boxed_text)__PROTO((unsigned int x, unsigned int y, int option));
 #endif
    void (*modify_plots) __PROTO((unsigned int));
+   
+   void (*dashtype) __PROTO((int type, t_dashtype *custom_dash_pattern));
 };
 
 One consequence of (1) is that we would like drivers to be backwards
@@ -482,6 +484,17 @@ _modify_plots(unsigned int operations) - used for interactive terminals.
    in the passed bitmask.  Possible values are given in term_api.h
    and include SET_VISIBLE and SET_INVISIBLE.
 
+_dashtype(int type, t_dashtype *custom_dash_pattern) - set dash/dot 
+   pattern independently from linetype. The integer parameter, 
+   if non-negative, may refer to the Nth dash/dot pattern pre-defined by
+   the specific terminal. The terminal must handle values larger than
+   the number pre-defined patterns (e.g. by wrapping around).
+   Negative values have special meaning, as defined in term_api.h.
+   The t_dashtype parameter can be used to set explicitly defined patterns.
+   Alternating numbers in the pattern field of this parameter specify
+   dash lengths and spaces between them, in units of the terminal's
+   dashlength.
+
 
 The following should illustrate the order in which calls to these
 routines are made:
@@ -493,6 +506,7 @@ routines are made:
     _graphics()
       _linewidth(lw)
       _linetype(lt)
+      _dashtype(dt)
       _path(0)
          _move(x,y)
          _vector(x,y)

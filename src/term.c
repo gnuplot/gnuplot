@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.277 2014/03/13 06:02:37 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.278 2014/03/16 00:39:27 juhaszp Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -3045,6 +3045,32 @@ style_from_fill(struct fill_style_type *fs)
 }
 
 
+/*
+ * Load dt with the properties of a user-defined dashtype
+ * return d_type (can be SOLID or CUSTOM, 
+ * or a positive number if no user-defined dashtype was found)
+ */
+int
+load_dashtype(struct t_dashtype *dt, int tag)
+{
+    struct custom_dashtype_def *this;
+	struct t_dashtype loc_dt = DEFAULT_DASHPATTERN;
+
+    this = first_custom_dashtype;
+    while (this != NULL) {
+	if (this->tag == tag) {
+	    *dt = this->dashtype;
+	    return this->d_type;
+	} else {
+	    this = this->next;
+	}
+    }
+	/* not found, fall back to default, terminal-dependent dashtype */
+	*dt = loc_dt;
+	return tag - 1;
+}
+
+
 void
 lp_use_properties(struct lp_style_type *lp, int tag)
 {
@@ -3107,6 +3133,7 @@ recycle:
     lp->pm3d_color.type = TC_LT;
     lp->pm3d_color.lt = lp->l_type;
     lp->p_type = tag - 1;
+	lp->d_type = tag - 1;
 }
 
 /*

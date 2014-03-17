@@ -1,5 +1,5 @@
 /*
- * $Id: term_api.h,v 1.125 2014/03/17 17:47:25 sfeam Exp $
+ * $Id: term_api.h,v 1.126 2014/03/17 20:47:13 juhaszp Exp $
  */
 
 /* GNUPLOT - term_api.h */
@@ -504,6 +504,7 @@ void PM_set_gpPMmenu __PROTO((struct t_gpPMmenu * gpPMmenu));
 # endif
 #endif
 
+int load_dashtype __PROTO((struct t_dashtype *dt, int tag));
 void lp_use_properties __PROTO((struct lp_style_type *lp, int tag));
 void load_linetype __PROTO((struct lp_style_type *lp, int tag));
 
