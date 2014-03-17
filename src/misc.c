@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.169 2014/03/15 23:42:01 juhaszp Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.170 2014/03/16 22:03:04 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -860,6 +860,78 @@ need_fill_border(struct fill_style_type *fillstyle)
     return TRUE;
 }
 
+int
+parse_dashtype(struct t_dashtype *dt)
+{
+	int res = DASHTYPE_SOLID;
+	int j = 0;
+	int k = 0;
+	char *dash_str = NULL;
+
+	if (equals(c_token, "solid")) {
+		res = DASHTYPE_SOLID;
+		c_token++;
+	}
+	else if (equals(c_token, "(")) {
+		c_token++;
+		while (!END_OF_COMMAND && j < DASHPATTERN_LENGTH) {
+			if (!END_OF_COMMAND
+			&&  !equals(c_token, ",")
+			&&  !equals(c_token, ")")) {
+				dt->pattern[j] = real_expression(); 
+				j++;
+				
+				/* expect "," or ")" here */
+				if (!END_OF_COMMAND && equals(c_token, ","))
+					c_token++;		/* loop again */
+				else
+					break;		/* hopefully ")" */
+			}
+		}
+
+		if (END_OF_COMMAND || !equals(c_token, ")")) {
+			int_error(c_token, "expecting comma , or right parenthesis )");
+		}
+		c_token++;
+		res = DASHTYPE_CUSTOM;
+	}
+	else if (dash_str = try_to_get_string()) {
+		while (dash_str[j] && (k < DASHPATTERN_LENGTH)) {
+			/* .      Dot with short space 
+			 * -      Dash with regular space
+			 * _      Long dash with regular space
+			 * space  Don't add new dash, just increase last space */
+			switch (dash_str[j]) {
+				case '.':
+					dt->pattern[k++] = 0.2;
+					dt->pattern[k++] = 0.5;
+					break;
+				case '-':
+					dt->pattern[k++] = 1.0;
+					dt->pattern[k++] = 1.0;
+					break;
+				case '_':
+					dt->pattern[k++] = 2.0;
+					dt->pattern[k++] = 1.0;
+					break;
+				case ' ':
+					dt->pattern[k] += 1.0;
+					break;
+				default:
+					int_error(c_token - 1, "expecting one of . - _ or space");
+			}
+			j++;
+		}
+		dt->str = gp_strdup(dash_str);
+		free(dash_str);
+		res = DASHTYPE_CUSTOM;
+	}
+	else {
+		res = int_expression() - 1;
+	}
+	return res;
+}
+
 /*
  * allow_ls controls whether we are allowed to accept linestyle in
  * the current context [ie not when doing a  set linestyle command]
@@ -1048,8 +1120,8 @@ lp_parse(struct lp_style_type *lp, TBOOLEAN allow_ls, TBOOLEAN allow_point)
 		if (set_dt++)
 		    break;
 		c_token++;
-		tmp = int_expression(); /* TODO custom dash patterns */
-		newlp.d_type = tmp - 1;
+		tmp = parse_dashtype(&newlp.custom_dash_pattern);
+		newlp.d_type = tmp;   /* TODO dash patterns from 'set dashtype' */
 		continue;
 	    }
 
@@ -1078,8 +1150,11 @@ lp_parse(struct lp_style_type *lp, TBOOLEAN allow_ls, TBOOLEAN allow_point)
 	    lp->p_interval = newlp.p_interval;
 	if (newlp.l_type == LT_COLORFROMCOLUMN)
 	    lp->l_type = LT_COLORFROMCOLUMN;
-	if (set_dt)
+	if (set_dt) {
 	    lp->d_type = newlp.d_type;
+	    lp->custom_dash_pattern = newlp.custom_dash_pattern;
+	}	
+		
 
     return new_lt;
 }

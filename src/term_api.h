@@ -1,5 +1,5 @@
 /*
- * $Id: term_api.h,v 1.122 2014/03/16 00:39:27 juhaszp Exp $
+ * $Id: term_api.h,v 1.123 2014/03/16 22:03:04 sfeam Exp $
  */
 
 /* GNUPLOT - term_api.h */
@@ -100,14 +100,14 @@ typedef enum t_linecap {
 
 /* custom dash pattern definition modeled after SVG terminal,
  * but string specifications like "--.. " are also allowed and stored */
-#define DASHPATTERN_LENGTH 7
+#define DASHPATTERN_LENGTH 8
 
 typedef struct t_dashtype {
-	int pattern[DASHPATTERN_LENGTH];
+	float pattern[DASHPATTERN_LENGTH];
 	char* str;
 } t_dashtype;
 
-#define DEFAULT_DASHPATTERN {{0, 0, 0, 0, 0, 0, 0}, NULL}
+#define DEFAULT_DASHPATTERN {{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0}, NULL}
 
 typedef struct lp_style_type {	/* contains all Line and Point properties */
     int     pointflag;		/* 0 if points not used, otherwise 1 */

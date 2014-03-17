@@ -1,3 +1,14 @@
+2014-03-17  Peter Juhasz  <juhaszp@users.sourceforge.net>
+
+	* src/term_api.h src/misc.c src/misc.h src/save.c src/save.h:
+	Parse and save dashtype specification in the form of "-_. " or 
+	"(1.0, 0.3, 1.5, 2.0)". In the latter form alternating numbers 
+	specify dash lengths and spaces between them.
+
+	* src/gadgets.c src/gadgets.h:
+	Added new type custom_dashtype_def and global variable 
+	first_custom_dashtype in preparation of new "set dashtype" command.
+
 2014-03-16  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/axis.c src/axis.h src/gadgets.c src/gadgets.h src/graphics.c
