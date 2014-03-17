@@ -1,5 +1,5 @@
 /*
- * $Id: term_api.h,v 1.123 2014/03/16 22:03:04 sfeam Exp $
+ * $Id: term_api.h,v 1.124 2014/03/17 16:26:57 juhaszp Exp $
  */
 
 /* GNUPLOT - term_api.h */
@@ -117,7 +117,7 @@ typedef struct lp_style_type {	/* contains all Line and Point properties */
     int     p_interval;		/* Every Nth point in style LINESPOINTS */
     double  l_width;
     double  p_size;
-    ulong   p_char;		/* char used if p_type = PT_CHARACTER */
+    unsigned long p_char;	/* char used if p_type = PT_CHARACTER */
     struct t_colorspec pm3d_color;
     t_dashtype custom_dash_pattern;	/* per-line, user defined dashtype */
     /* ... more to come ? */
