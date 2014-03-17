@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.313 2014/02/28 00:24:21 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.314 2014/03/09 19:15:53 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -89,6 +89,7 @@ static void show_boxplot __PROTO((void));
 static void show_fillstyle __PROTO((void));
 static void show_clip __PROTO((void));
 static void show_contour __PROTO((void));
+static void show_dashtype __PROTO((int));
 static void show_dgrid3d __PROTO((void));
 static void show_mapping __PROTO((void));
 static void show_dummy __PROTO((void));
@@ -307,6 +308,10 @@ show_command()
     case S_LINETYPE:
 	CHECK_TAG_GT_ZERO;
 	show_linetype(tag);
+	break;
+    case S_DASHTYPE:
+	CHECK_TAG_GT_ZERO;
+	show_dashtype(tag);
 	break;
     case S_LINK:
 	show_link();
@@ -1328,6 +1333,28 @@ show_contour()
 		clabel_start, clabel_interval);
     }
 }
+
+
+/* process 'show dashtype' command (tag 0 means show all) */
+static void
+show_dashtype(int tag)
+{
+    struct custom_dashtype_def *this_dashtype;
+    TBOOLEAN showed = FALSE;
+
+    for (this_dashtype = first_custom_dashtype; this_dashtype != NULL;
+	 this_dashtype = this_dashtype->next) {
+	if (tag == 0 || tag == this_dashtype->tag) {
+	    showed = TRUE;
+	    fprintf(stderr, "\tdashtype %d, ", this_dashtype->tag);
+	    save_dashtype(stderr, this_dashtype->d_type, &(this_dashtype->dashtype));
+	    fputc('\n', stderr);
+	}
+    }
+    if (tag > 0 && !showed)
+	int_error(c_token, "dashtype not found");	
+}
+
 
 /* process 'show dgrid3d' command */
 static void

@@ -1,5 +1,5 @@
 /*
- * $Id: term_api.h,v 1.124 2014/03/17 16:26:57 juhaszp Exp $
+ * $Id: term_api.h,v 1.125 2014/03/17 17:47:25 sfeam Exp $
  */
 
 /* GNUPLOT - term_api.h */
@@ -107,7 +107,7 @@ typedef struct t_dashtype {
 	char* str;
 } t_dashtype;
 
-#define DEFAULT_DASHPATTERN {{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0}, NULL}
+#define DEFAULT_DASHPATTERN {{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f}, NULL}
 
 typedef struct lp_style_type {	/* contains all Line and Point properties */
     int     pointflag;		/* 0 if points not used, otherwise 1 */

@@ -417,6 +417,8 @@ extern t_position lmargin, bmargin, rmargin, tmargin;
 extern FILE *table_outfile;
 extern TBOOLEAN table_mode;
 
+extern struct custom_dashtype_def *first_custom_dashtype;
+
 extern struct arrow_def *first_arrow;
 
 extern struct text_label *first_label;

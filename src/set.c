@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.434 2014/03/15 23:42:01 juhaszp Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.435 2014/03/16 22:03:04 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -86,6 +86,7 @@ static void set_clip __PROTO((void));
 static void set_cntrparam __PROTO((void));
 static void set_cntrlabel __PROTO((void));
 static void set_contour __PROTO((void));
+static void set_dashtype __PROTO((void));
 static void set_dgrid3d __PROTO((void));
 static void set_decimalsign __PROTO((void));
 static void set_degreesign __PROTO((char *));
@@ -240,6 +241,9 @@ set_command()
 	    break;
 	case S_CONTOUR:
 	    set_contour();
+	    break;
+	case S_DASHTYPE:
+	    set_dashtype();
 	    break;
 	case S_DGRID3D:
 	    set_dgrid3d();
@@ -1262,6 +1266,72 @@ set_contour()
     }
 }
 
+/* process 'set dashtype' command */
+static void
+set_dashtype()
+{
+    struct custom_dashtype_def *this_dashtype = NULL;
+    struct custom_dashtype_def *new_dashtype = NULL;
+    struct custom_dashtype_def *prev_dashtype = NULL;
+    int tag, d_type, is_new = FALSE;
+
+    c_token++;
+
+    /* get tag */
+    if (END_OF_COMMAND || ((tag = int_expression()) <= 0))
+	int_error(c_token, "tag must be > zero");
+
+    /* Check if dashtype is already defined */
+    for (this_dashtype = first_custom_dashtype; this_dashtype != NULL;
+	 prev_dashtype = this_dashtype, this_dashtype = this_dashtype->next)
+	if (tag <= this_dashtype->tag)
+		break;
+
+    if (this_dashtype == NULL || tag != this_dashtype->tag) {
+	struct t_dashtype loc_dt = DEFAULT_DASHPATTERN;
+	new_dashtype = gp_alloc(sizeof(struct custom_dashtype_def), "dashtype");
+	if (prev_dashtype != NULL)
+	    prev_dashtype->next = new_dashtype;	/* add it to end of list */
+	else
+	    first_custom_dashtype = new_dashtype;	/* make it start of list */
+	new_dashtype->tag = tag;
+	new_dashtype->d_type = DASHTYPE_SOLID;
+	new_dashtype->next = this_dashtype;
+	new_dashtype->dashtype = loc_dt;
+	this_dashtype = new_dashtype;
+	is_new = TRUE;
+    }
+
+    if (almost_equals(c_token, "def$ault")) {
+	delete_dashtype(prev_dashtype, this_dashtype);
+	c_token++;
+    } else
+	this_dashtype->d_type = parse_dashtype(&this_dashtype->dashtype);
+
+    if (!END_OF_COMMAND) {
+	if (is_new) {
+		delete_dashtype(prev_dashtype, this_dashtype);
+	}
+	int_error(c_token,"Extraneous arguments to set dashtype");
+    }
+}
+
+/*
+ * Delete dashtype from linked list.
+ */
+void
+delete_dashtype(struct custom_dashtype_def *prev, struct custom_dashtype_def *this)
+{
+    if (this != NULL) {		/* there really is something to delete */
+	if (this == first_custom_dashtype) {
+	    first_custom_dashtype = this->next;
+	}
+	else {
+	    prev->next = this->next;
+	}
+	free(this);
+    }
+}
 
 /* process 'set dgrid3d' command */
 static void

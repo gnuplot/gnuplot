@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.170 2014/03/16 22:03:04 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.171 2014/03/17 16:26:57 juhaszp Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -893,6 +893,14 @@ parse_dashtype(struct t_dashtype *dt)
 			int_error(c_token, "expecting comma , or right parenthesis )");
 		}
 		c_token++;
+		/* cleanup */
+		if (dt->str) {
+			free(dt->str);
+			dt->str = NULL;
+		}
+		while (j < DASHPATTERN_LENGTH) {
+			dt->pattern[j++] = 0.0f; 
+		}
 		res = DASHTYPE_CUSTOM;
 	}
 	else if (dash_str = try_to_get_string()) {
@@ -928,6 +936,9 @@ parse_dashtype(struct t_dashtype *dt)
 	}
 	else {
 		res = int_expression() - 1;
+		if (res < 0) {
+			int_error(c_token - 1, "tag must be > 0");
+		}
 	}
 	return res;
 }

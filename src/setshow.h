@@ -1,5 +1,5 @@
 /*
- * $Id: setshow.h,v 1.46 2013/04/09 20:58:53 sfeam Exp $
+ * $Id: setshow.h,v 1.47 2013/04/27 08:45:29 markisch Exp $
  */
 
 /* GNUPLOT - setshow.h */
@@ -72,6 +72,7 @@ void set_format __PROTO((void));
 char *num_to_str(double r);
 char *conv_text __PROTO((const char *s));
 void delete_linestyle __PROTO((struct linestyle_def **, struct linestyle_def *, struct linestyle_def *));
+void delete_dashtype __PROTO((struct custom_dashtype_def *, struct custom_dashtype_def *));
 /* void delete_arrowstyle __PROTO((struct arrowstyle_def *, struct arrowstyle_def *)); */
 void reset_key __PROTO((void));
 void free_marklist __PROTO((struct ticmark * list));

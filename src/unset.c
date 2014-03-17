@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.199 2014/03/09 19:15:53 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.200 2014/03/15 04:55:14 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -70,6 +70,7 @@ static void unset_clip __PROTO((void));
 static void unset_cntrparam __PROTO((void));
 static void unset_cntrlabel __PROTO((void));
 static void unset_contour __PROTO((void));
+static void unset_dashtype __PROTO((void));
 static void unset_dgrid3d __PROTO((void));
 static void unset_dummy __PROTO((void));
 static void unset_encoding __PROTO((void));
@@ -196,6 +197,9 @@ unset_command()
 	break;
     case S_CONTOUR:
 	unset_contour();
+	break;
+    case S_DASHTYPE:
+	unset_dashtype();
 	break;
     case S_DGRID3D:
 	unset_dgrid3d();
@@ -772,6 +776,29 @@ static void
 unset_contour()
 {
     draw_contour = CONTOUR_NONE;
+}
+
+
+/* process 'unset dashtype' command */
+static void
+unset_dashtype()
+{
+    struct custom_dashtype_def *this, *prev;
+    if (END_OF_COMMAND) {
+	/* delete all */
+	while (first_custom_dashtype != NULL)
+	    delete_dashtype((struct custom_dashtype_def *) NULL, first_custom_dashtype);
+	}
+    else {		
+	int tag = int_expression();
+	for (this = first_custom_dashtype, prev = NULL; this != NULL;
+	 prev = this, this = this->next) {
+	    if (this->tag == tag) {
+		delete_dashtype(prev, this);
+		break;
+	    }
+	}
+    }
 }
 
 
