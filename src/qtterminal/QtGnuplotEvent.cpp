@@ -42,6 +42,7 @@
 ]*/
 
 #include "QtGnuplotEvent.h"
+#include "QtGnuplotWidget.h"
 
 extern "C" {
 #include "../mousecmn.h"
@@ -134,11 +135,9 @@ void QtGnuplotEventHandler::readEvent()
 	}
 }
 
-bool QtGnuplotEventHandler::postTermEvent(int type, int mx, int my, int par1, int par2, int winid)
+bool QtGnuplotEventHandler::postTermEvent(int type, int mx, int my, int par1, int par2, QtGnuplotWidget* widget)
 {
-	/// @todo catch events if not the active window
-
-	if ((m_socket == 0) || (m_socket->state() != QLocalSocket::ConnectedState))
+	if ((m_socket == 0) || (m_socket->state() != QLocalSocket::ConnectedState) || (widget && !widget->isActive()))
 		return false;
 
 	gp_event_t event;
@@ -147,7 +146,7 @@ bool QtGnuplotEventHandler::postTermEvent(int type, int mx, int my, int par1, in
 	event.my = my;
 	event.par1 = par1;
 	event.par2 = par2;
-	event.winid = winid;
+	event.winid = 0; // We don't forward any window id to gnuplot
 	m_socket->write((char*) &event, sizeof(gp_event_t));
 
 	return true;

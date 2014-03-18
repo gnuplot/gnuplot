@@ -1,3 +1,9 @@
+2014-03-18  Jérôme Lodewyck  <lodewyck@users.sourceforge.net>
+
+	* src/qtterminal/QtGnuplotEvent.* src/qtterminal/QtGnuplotWindow.cpp
+	src/qtterminal/QtGnuplotWidget.cpp src/qtterminal/QtGnuplotScene.cpp:
+	Block events that come from inactive plot widgets.
+
 2014-03-17  Peter Juhasz  <juhaszp@users.sourceforge.net>
 
 	* src/term_api.h src/misc.c src/misc.h src/save.c src/save.h:

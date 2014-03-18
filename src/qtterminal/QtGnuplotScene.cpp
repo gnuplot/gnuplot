@@ -587,12 +587,12 @@ void QtGnuplotScene::processEvent(QtGnuplotEventType type, QDataStream& in)
 		QFontMetrics metrics(m_font);
 		int par1 = (metrics.ascent() + metrics.descent());
 		int par2 = metrics.width("0123456789")/10.;
-		m_eventHandler->postTermEvent(GE_fontprops, 0, 0, par1, par2, 0);
+		m_eventHandler->postTermEvent(GE_fontprops, 0, 0, par1, par2, m_widget);
 	}
 	else if (type == GEDone)
 	{
 		flushCurrentPointsItem();
-		m_eventHandler->postTermEvent(GE_plotdone, 0, 0, 0, 0, 0); /// @todo m_id;
+		m_eventHandler->postTermEvent(GE_plotdone, 0, 0, 0, 0, m_widget);
 	}
 	else
 		swallowEvent(type, in);
@@ -722,7 +722,7 @@ void QtGnuplotScene::updateModifiers()
 	if (modifierMask != m_lastModifierMask)
 	{
 		m_lastModifierMask = modifierMask;
-		m_eventHandler->postTermEvent(GE_modifier, 0, 0, modifierMask, 0, 0); /// @todo m_id
+		m_eventHandler->postTermEvent(GE_modifier, 0, 0, modifierMask, 0, m_widget);
 	}
 }
 
@@ -738,7 +738,7 @@ void QtGnuplotScene::mousePressEvent(QGraphicsSceneMouseEvent* event)
 
 	m_eventHandler->postTermEvent(GE_buttonpress, 
 			int(event->scenePos().x()), int(event->scenePos().y()), 
-			button, 0, 0); /// @todo m_id
+			button, 0, m_widget);
 	QGraphicsScene::mousePressEvent(event);
 }
 
@@ -793,7 +793,7 @@ void QtGnuplotScene::mouseMoveEvent(QGraphicsSceneMouseEvent* event)
 	}
 	m_hypertextList[0]->setVisible(hit);
 
-	m_eventHandler->postTermEvent(GE_motion, int(event->scenePos().x()), int(event->scenePos().y()), 0, 0, 0); /// @todo m_id
+	m_eventHandler->postTermEvent(GE_motion, int(event->scenePos().x()), int(event->scenePos().y()), 0, 0, m_widget);
 	QGraphicsScene::mouseMoveEvent(event);
 }
 
@@ -816,7 +816,7 @@ void QtGnuplotScene::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
 		time = m_watches[button].elapsed();
 	if (time > 300) {
 		m_eventHandler->postTermEvent(GE_buttonrelease,
-			int(event->scenePos().x()), int(event->scenePos().y()), button, time, 0);
+			int(event->scenePos().x()), int(event->scenePos().y()), button, time, m_widget);
 	}
 	m_watches[button].start();
 
@@ -846,12 +846,12 @@ void QtGnuplotScene::wheelEvent(QGraphicsSceneWheelEvent* event)
 		// 6 = scroll left, 7 = scroll right
 		m_eventHandler->postTermEvent(GE_buttonpress,
 			int(event->scenePos().x()), int(event->scenePos().y()), 
-			event->delta() > 0 ? 6 : 7, 0, 0);
+			event->delta() > 0 ? 6 : 7, 0, m_widget);
 	} else { /* if (event->orientation() == Qt::Vertical) */
 		// 4 = scroll up, 5 = scroll down
 		m_eventHandler->postTermEvent(GE_buttonpress,
 			int(event->scenePos().x()), int(event->scenePos().y()), 
-			event->delta() > 0 ? 4 : 5, 0, 0);
+			event->delta() > 0 ? 4 : 5, 0, m_widget);
 	} 
 }
 
@@ -944,7 +944,7 @@ void QtGnuplotScene::keyPressEvent(QKeyEvent* event)
 
 	if (key >= 0)
 		live = m_eventHandler->postTermEvent(GE_keypress,
-			int(m_lastMousePos.x()), int(m_lastMousePos.y()), key, 0, 0); /// @todo m_id
+			int(m_lastMousePos.x()), int(m_lastMousePos.y()), key, 0, m_widget);
 	else
 		live = true;
 

@@ -138,7 +138,7 @@ void QtGnuplotWindow::on_setStatusText(const QString& status)
 void QtGnuplotWindow::on_keyAction()
 {
 	QAction* action = qobject_cast<QAction *>(sender());
-	m_eventHandler->postTermEvent(GE_keypress, 0, 0, action->data().toInt(), 0, m_id);
+	m_eventHandler->postTermEvent(GE_keypress, 0, 0, action->data().toInt(), 0, m_widget);
 }
 
 void QtGnuplotWindow::print()

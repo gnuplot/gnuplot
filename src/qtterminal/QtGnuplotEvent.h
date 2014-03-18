@@ -78,6 +78,7 @@ QTLAYER_BEGIN_KEYSAMPLE, QTLAYER_END_KEYSAMPLE, QTLAYER_BEFORE_ZOOM
 class QLocalServer;
 class QLocalSocket;
 class QtGnuplotEventHandler;
+class QtGnuplotWidget;
 
 /**
 * A GUI object that wishes to receive gnuplot events has to inherit from
@@ -114,7 +115,7 @@ public:
 
 public:
 	/// Send an event from the GUI elements to gnuplot core
-	bool postTermEvent(int type, int mx, int my, int par1, int par2, int winid);
+	bool postTermEvent(int type, int mx, int my, int par1, int par2, QtGnuplotWidget* widget);
 	QString serverName();
 
 signals:

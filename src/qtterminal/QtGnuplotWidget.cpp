@@ -232,9 +232,9 @@ void QtGnuplotWidget::resizeEvent(QResizeEvent* event)
 	{
 //		qDebug() << " -> Sending event";
 		m_eventHandler->postTermEvent(GE_fontprops,viewport->size().width(),
-		                               viewport->size().height(), 0, 0, 0); /// @todo m_id
-		if (m_replotOnResize && m_active)
-			m_eventHandler->postTermEvent(GE_keypress, 0, 0, 'e', 0, 0); // ask for replot
+		                               viewport->size().height(), 0, 0, this);
+		if (m_replotOnResize && isActive())
+			m_eventHandler->postTermEvent(GE_keypress, 0, 0, 'e', 0, this); // ask for replot
 		else
 			m_view->fitInView(m_scene->sceneRect(), Qt::KeepAspectRatio);
 	}
