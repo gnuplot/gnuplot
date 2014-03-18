@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.435 2014/03/16 22:03:04 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.436 2014/03/17 20:47:13 juhaszp Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -1328,6 +1328,9 @@ delete_dashtype(struct custom_dashtype_def *prev, struct custom_dashtype_def *th
 	}
 	else {
 	    prev->next = this->next;
+	}
+	if (this->dashtype.str) {
+		free(this->dashtype.str);
 	}
 	free(this);
     }
@@ -5471,6 +5474,9 @@ delete_linestyle(struct linestyle_def **head, struct linestyle_def *prev, struct
 	    *head = this->next;
 	else
 	    prev->next = this->next;
+	if (this->lp_properties.custom_dash_pattern.str) {
+	    free(this->lp_properties.custom_dash_pattern.str);
+	}
 	free(this);
     }
 }
