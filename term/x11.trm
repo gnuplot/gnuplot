@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: x11.trm,v 1.217 2013/10/07 21:43:48 sfeam Exp $
+ * $Id: x11.trm,v 1.218 2013/10/25 04:45:23 sfeam Exp $
  *
  */
 
@@ -226,7 +226,7 @@ static char *X11_command_parsed = NULL;
 static char *X11_full_command_path = NULL;
 
 /* must match the definition in src/gplt_x11.c: */
-static int persist = UNSET;
+static int x11_persist = UNSET;
 static int do_raise = UNSET;
 static int replot_on_resize = UNSET;
 static int dashedlines = UNSET;
@@ -456,7 +456,8 @@ X11_options()
     do_raise = dashedlines = ctrlq = UNSET;
     replot_on_resize = UNSET;
     set_size = set_position = UNSET;
-    persist = persist_cl;	/* previously set from command line */
+    x11_persist = persist_cl		/* previously set from command line */
+	    || (x11_persist > 0);	/* or previously set here */
     strcpy(x11_userbkg,"#RRGGBB");
 
     while (!END_OF_COMMAND) {
@@ -472,13 +473,13 @@ X11_options()
 	    set_close = TRUE;
 	    break;
 	case X11_PERSIST:
-	    persist = yes;
+	    x11_persist = yes;
 	    c_token++;
 	    if (set_persist) duplication=TRUE;
 	    set_persist = TRUE;
 	    break;
 	case X11_NOPERSIST:
-	    persist = no;
+	    x11_persist = no;
 	    c_token++;
 	    if (set_persist) duplication=TRUE;
 	    set_persist = TRUE;
@@ -699,8 +700,8 @@ X11_options()
     if (UNSET != replot_on_resize) {
 	strcat(term_options, (yes == replot_on_resize ? " replotonresize" : " noreplotonresize"));
     }
-    if (UNSET != persist) {
-	strcat(term_options, (yes == persist ? " persist" : " nopersist"));
+    if (UNSET != x11_persist) {
+	strcat(term_options, (yes == x11_persist ? " persist" : " nopersist"));
     }
     if (UNSET != ctrlq) {
 	strcat(term_options, (yes == ctrlq ? " ctrlq" : " noctrlq"));
@@ -809,11 +810,11 @@ X11_update_opts()
     if (!strcmp("xlib",term->name))
 	return;
 
-    if (UNSET != do_raise || UNSET != persist || UNSET != dashedlines ||
+    if (UNSET != do_raise || UNSET != x11_persist || UNSET != dashedlines ||
         UNSET != ctrlq || UNSET != replot_on_resize)
     {
 	fprintf(X11_ipc, "X %d %d %d %d %d\n", 
-		do_raise, persist, dashedlines, ctrlq, replot_on_resize);
+		do_raise, x11_persist, dashedlines, ctrlq, replot_on_resize);
 	fflush(X11_ipc);
     }
 
@@ -1427,7 +1428,7 @@ X11_graphics()
     /* replot requests if it does.					*/
     if (multiplot) {
 	fprintf(X11_ipc, "X %d %d %d %d %d\n", 
-		do_raise, persist, dashedlines, ctrlq, no);
+		do_raise, x11_persist, dashedlines, ctrlq, no);
 	fflush(X11_ipc);
     }
 

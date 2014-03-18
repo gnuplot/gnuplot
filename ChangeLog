@@ -19,6 +19,10 @@
 
 	* src/wxterminal/gp_cairo.c:  PANGO_WEIGHT_NORMAL is not the same as 0.
 
+	* term/x11.trm:  Make the "persist" flag local to x11 and remember
+	what is was the last time we set the terminal to x11.
+	Bug #1348
+
 2014-03-18  Jérôme Lodewyck  <lodewyck@users.sourceforge.net>
 
 	* src/qtterminal/QtGnuplotEvent.* src/qtterminal/QtGnuplotWindow.cpp
