@@ -1,3 +1,7 @@
+2014-03-18  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/wxterminal/gp_cairo.c:  PANGO_WEIGHT_NORMAL is not the same as 0.
+
 2014-03-18  Jérôme Lodewyck  <lodewyck@users.sourceforge.net>
 
 	* src/qtterminal/QtGnuplotEvent.* src/qtterminal/QtGnuplotWindow.cpp
