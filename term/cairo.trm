@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: cairo.trm,v 1.65 2013/10/09 02:41:22 sfeam Exp $
+ * $Id: cairo.trm,v 1.66 2014/01/30 05:50:52 sfeam Exp $
  */
 
 /* GNUPLOT - cairo.trm */
@@ -1576,6 +1576,7 @@ START_HELP(pdfcairo)
 "                      {{no}enhanced} {mono|color} {solid|dashed}",
 "                      {font <font>} {fontscale <scale>}",
 "                      {linewidth <lw>} {rounded|butt|square} {dashlength <dl>}",
+"                      {background <rgbcolor>}",
 "                      {size <XX>{unit},<YY>{unit}}",
 "",
 " This terminal supports an enhanced text mode, which allows font and other",
