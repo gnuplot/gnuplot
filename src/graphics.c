@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.444 2014/03/15 22:01:03 juhaszp Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.445 2014/03/16 22:03:04 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -818,39 +818,13 @@ do_plot(struct curve_points *plots, int pcount)
 
 
 	/* If there are two passes, defer key sample till the second */
+	/* KEY SAMPLES */
 	if (key->front && !key_pass)
 	    ;
 	else if (localkey && this_plot->title && !this_plot->title_is_suppressed) {
 	    /* we deferred point sample until now */
-	    if (this_plot->plot_style == LINESPOINTS
-	         &&  this_plot->lp_properties.p_interval < 0) {
-		(*t->set_color)(&background_fill);
-		(*t->pointsize)(pointsize * pointintervalbox);
-		(*t->point)(xl + key_point_offset, yl, 6);
-		term_apply_lp_properties(&this_plot->lp_properties);
-	    }
-
-	    if (this_plot->plot_style == BOXPLOT) {
-		;	/* Don't draw a sample point in the key */
-
-	    } else if (this_plot->plot_style == DOTS) {
-		if (on_page(xl + key_point_offset, yl))
-		    (*t->point) (xl + key_point_offset, yl, -1);
-
-	    } else if (this_plot->plot_style & PLOT_STYLE_HAS_POINT) {
-		if (this_plot->lp_properties.p_size == PTSZ_VARIABLE)
-		    (*t->pointsize)(pointsize);
-		(t->layer)(TERM_LAYER_BEGIN_KEYSAMPLE);
-		if (on_page(xl + key_point_offset, yl)) {
-		    if (this_plot->lp_properties.p_type == PT_CHARACTER)
-			(*t->put_text) (xl + key_point_offset, yl, 
-					(char *)(&this_plot->lp_properties.p_char));
-		    else
-			(*t->point) (xl + key_point_offset, yl, 
-					this_plot->lp_properties.p_type);
-		}
-		(t->layer)(TERM_LAYER_END_KEYSAMPLE);
-	    }
+	    if (this_plot->plot_style & PLOT_STYLE_HAS_POINT)
+		do_key_sample_point(this_plot, key, xl, yl);
 
 	    if (key->invert)
 		yl = key->bounds.ybot + yl_ref + key_entry_height/2 - yl;

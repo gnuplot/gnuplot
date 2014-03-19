@@ -1,5 +1,5 @@
 /*
- * $Id: boundary.c,v 1.8 2014/02/28 19:23:52 sfeam Exp $
+ * $Id: boundary.c,v 1.9 2014/03/08 19:16:24 sfeam Exp $
  */
 
 /* GNUPLOT - boundary.c */
@@ -1156,9 +1156,8 @@ find_maxl_keys(struct curve_points *plots, int count, int *kcnt)
 }
 
 /*
- * Make this code a subroutine, rather than in-line, so that it can
- * eventually be shared by other callers. It would be nice to share it
- * with the 3d code also, but as of now the two code sections are not
+ * Make the key sample code a subroutine so that it can eventually be
+ * shared by the 3d code also. As of now the two code sections are not
  * very parallel.  EAM Nov 2003
  */
 
@@ -1293,14 +1292,56 @@ do_key_sample(
 
     /* oops - doing the point sample now would break the postscript
      * terminal for example, which changes current line style
-     * when drawing a point, but does not restore it. We must wait
-     then draw the point sample at the end of do_plot (line 2058)
+     * when drawing a point, but does not restore it. We must wait to
+     * draw the point sample at the end of do_plot (comment KEY SAMPLES).
      */
 
     (*t->layer)(TERM_LAYER_END_KEYSAMPLE);
 
     /* Restore previous clipping area */
     clip_area = clip_save;
+}
+
+void
+do_key_sample_point(
+    struct curve_points *this_plot,
+    legend_key *key,
+    int xl, int yl)
+{
+    struct termentry *t = term;
+
+    (t->layer)(TERM_LAYER_BEGIN_KEYSAMPLE);
+
+    if (this_plot->plot_style == LINESPOINTS
+	 &&  this_plot->lp_properties.p_interval < 0) {
+	t_colorspec background_fill = BACKGROUND_COLORSPEC;
+	(*t->set_color)(&background_fill);
+	(*t->pointsize)(pointsize * pointintervalbox);
+	(*t->point)(xl + key_point_offset, yl, 6);
+	term_apply_lp_properties(&this_plot->lp_properties);
+    }
+
+    if (this_plot->plot_style == BOXPLOT) {
+	;	/* Don't draw a sample point in the key */
+
+    } else if (this_plot->plot_style == DOTS) {
+	if (on_page(xl + key_point_offset, yl))
+	    (*t->point) (xl + key_point_offset, yl, -1);
+
+    } else if (this_plot->plot_style & PLOT_STYLE_HAS_POINT) {
+	if (this_plot->lp_properties.p_size == PTSZ_VARIABLE)
+	    (*t->pointsize)(pointsize);
+	if (on_page(xl + key_point_offset, yl)) {
+	    if (this_plot->lp_properties.p_type == PT_CHARACTER)
+		(*t->put_text) (xl + key_point_offset, yl, 
+				(char *)(&this_plot->lp_properties.p_char));
+	    else
+		(*t->point) (xl + key_point_offset, yl, 
+				this_plot->lp_properties.p_type);
+	}
+    }
+
+    (t->layer)(TERM_LAYER_END_KEYSAMPLE);
 }
 
 /* Graph legend is now optionally done in two passes. The first pass calculates	*/

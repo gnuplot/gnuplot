@@ -1,5 +1,5 @@
 /*
- * $Id: boundary.h,v 1.1 2013/02/26 19:39:38 sfeam Exp $
+ * $Id: boundary.h,v 1.1 2013/02/28 05:47:41 sfeam Exp $
  */
 
 #ifndef GNUPLOT_BOUNDARY_H
@@ -10,8 +10,10 @@ void boundary __PROTO((struct curve_points *plots, int count));
 void do_key_bounds __PROTO((legend_key *key));
 void do_key_layout __PROTO((legend_key *key));
 int find_maxl_keys __PROTO((struct curve_points *plots, int count, int *kcnt));
-void do_key_sample __PROTO((struct curve_points *this_plot, legend_key *key,
-			   char *title,  int xl, int yl));
+void do_key_sample __PROTO((struct curve_points *this_plot,
+			   legend_key *key, char *title,  int xl, int yl));
+void do_key_sample_point __PROTO((struct curve_points *this_plot,
+			   legend_key *key, int xl, int yl));
 void draw_titles __PROTO((void));
 void draw_key __PROTO((legend_key *key, TBOOLEAN key_pass, int *xl, int *yl));
 

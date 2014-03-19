@@ -1,3 +1,10 @@
+2014-03-19  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/plot2d.c: Fix parsing error for "with lp pt 'X', ..."
+
+	* src/boundary.c src/boundary.h src/graphics.c:  Refactor code that
+	draws key samples for point plots.
+
 2014-03-19  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/misc.c (parse_dashtype): Avoid warning about assignment used
