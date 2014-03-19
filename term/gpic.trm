@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: gpic.trm,v 1.18 2006/07/21 02:35:46 sfeam Exp $
+ * $Id: gpic.trm,v 1.19 2012/03/02 00:53:34 sfeam Exp $
  */
 
 /* GNUPLOT - gpic.trm */
@@ -105,7 +105,7 @@ static enum JUSTIFY GPIC_justify = LEFT;
 static const char *GPIC_lines[] =
 {
     "thickness 1.0",		/* -2 border */
-    "",				/* -1 axes */
+    "dotted",			/* -1 axes */
     "",				/*  0 solid thin  */
     "dotted",
     "dashed 0.05",		/*  1 solid thick */
@@ -113,7 +113,7 @@ static const char *GPIC_lines[] =
 };
 
 /* number of linetypes above */
-#define GPIC_NUMLINES (sizeof(GPIC_lines)/sizeof(char *))
+#define GPIC_NUMLINES 6
 
 
 static int GPIC_linecount = 0;	/* number of points in line so far */

@@ -5,6 +5,9 @@
 	* src/boundary.c src/boundary.h src/graphics.c:  Refactor code that
 	draws key samples for point plots.
 
+	* configure.in term/gpic.trm src/term.h:
+	Add configuration option --with-gpic
+
 2014-03-19  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/misc.c (parse_dashtype): Avoid warning about assignment used

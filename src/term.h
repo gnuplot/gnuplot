@@ -1,5 +1,5 @@
 /*
- * $Id: term.h,v 1.63 2013/12/22 20:47:25 sfeam Exp $
+ * $Id: term.h,v 1.64 2014/01/18 16:14:50 markisch Exp $
  */
 
 /* GNUPLOT - term.h */
@@ -200,7 +200,9 @@
 /* # include "aed.trm" */
 
 /* gpic for groff */
-/* # include "gpic.trm" */
+#ifdef HAVE_GPIC
+# include "gpic.trm"
+#endif
 
 /* REGIS graphics language */
 #ifdef VMS
