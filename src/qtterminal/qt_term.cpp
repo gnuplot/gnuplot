@@ -191,15 +191,21 @@ static int  qt_setHeight = qt_optionHeight;
  * ------------------------------------------------------*/
 
 // Convert gnuplot coordinates into floating point term coordinates
-QPointF qt_termCoordF(unsigned int x, unsigned int y)
+QPointF qt_termCoordF(int x, int y)
 {
-	return QPointF(double(x)/qt_oversamplingF, double(term->ymax - y)/qt_oversamplingF);
+	return QPointF(double(x)/qt_oversamplingF, double(int(term->ymax) - y)/qt_oversamplingF);
 }
 
 // The same, but with coordinates clipped to the nearest pixel
-QPoint qt_termCoord(unsigned int x, unsigned int y)
+QPoint qt_termCoord(int x, int y)
 {
 	return QPoint(qRound(double(x)/qt_oversamplingF), qRound(double(term->ymax - y)/qt_oversamplingF));
+}
+
+// Inverse of the previous function
+QPoint qt_gnuplotCoord(int x, int y)
+{
+	return QPoint(x*qt_oversampling, int(term->ymax) - y*qt_oversampling);
 }
 
 // Start the GUI application
@@ -351,8 +357,9 @@ bool qt_processTermEvent(gp_event_t* event)
 	// Scale mouse events
 	else
 	{
-		event->mx *= qt_oversampling;
-		event->my = (qt_setHeight - event->my)*qt_oversampling;
+		QPoint p = qt_gnuplotCoord(event->mx, event->my);
+		event->mx = p.x();
+		event->my = p.y();
 	}
 
 	// Send the event to gnuplot core
@@ -795,7 +802,7 @@ void qt_image(unsigned int M, unsigned int N, coordval* image, gpiPoint* corner,
 	QImage qimage = qt_imageToQImage(M, N, image, color_mode);
 	qt->out << GEImage;
 	for (int i = 0; i < 4; i++)
-		qt->out << qt_termCoord(corner[i].x, corner[i].y);
+		qt->out << qt_termCoordF(corner[i].x, corner[i].y);
 	qt->out << qimage;
 }
 

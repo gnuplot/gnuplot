@@ -1,3 +1,10 @@
+2014-03-19  Jérôme Lodewyck  <lodewyck@users.sourceforge.net>
+
+	* src/qtterminal/QtGnuplotScene.cpp src/qtterminal/QtGnuplotItems.h
+	src/qtterminal/qt_term.cpp: Implement image clipping for the Qt terminal.
+	Fix issue with unsigned variables in terminal coordinates.
+	Bug #1349
+
 2014-03-18  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/wxterminal/gp_cairo.c:  PANGO_WEIGHT_NORMAL is not the same as 0.

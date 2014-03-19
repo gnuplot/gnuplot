@@ -25,7 +25,6 @@ Known issues
 ============
 
 - export to EPS
-- image clipping not implemented
 - mouse coordinate readout is not handling UTF-8 correctly
 - "opengl" not accepted as a rendering mode (at least under linux)
 - wxt/Qt terminals must not be active within the same gnuplot session

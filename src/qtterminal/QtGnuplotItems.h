@@ -67,6 +67,28 @@ private:
 	double m_size;
 };
 
+class QtGnuplotClippedPixmap : public QGraphicsPixmapItem
+{
+public:
+	QtGnuplotClippedPixmap(const QRectF& clipRect, const QPixmap& pixmap, QGraphicsItem* parent = 0)
+		: QGraphicsPixmapItem(pixmap, parent)
+		, m_clipRect(clipRect)
+	{
+		setFlags(flags() | QGraphicsItem::ItemClipsToShape);
+	}
+
+public:
+	virtual QPainterPath shape() const
+	{
+		QPainterPath p;
+		p.addRect(m_clipRect);
+		return p;
+	}
+
+private:
+	QRectF m_clipRect;
+};
+
 class QtGnuplotEnhancedFragment : public QAbstractGraphicsShapeItem
 {
 public:

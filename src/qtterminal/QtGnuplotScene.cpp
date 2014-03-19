@@ -398,23 +398,19 @@ void QtGnuplotScene::processEvent(QtGnuplotEventType type, QDataStream& in)
 	else if (type == GEImage)
 	{
 		flushCurrentPointsItem();
-		QPoint p0; in >> p0;
-		QPoint p1; in >> p1;
-		QPoint p2; in >> p2;
-		QPoint p3; in >> p3;
+		QPointF p0; in >> p0;
+		QPointF p1; in >> p1;
+		QPointF p2; in >> p2;
+		QPointF p3; in >> p3;
 		QImage image; in >> image;
-		QPointF size = p1 - p0;
-		QPixmap pixmap = QPixmap::fromImage(image);
-		// Qt5 complains that the following operations are not legal
-		// QGraphicsPixmapItem* item = addPixmap(pixmap);
-		// item->scale(size.x()/pixmap.width(), size.y()/pixmap.height());
-		QGraphicsPixmapItem* item = addPixmap(pixmap.scaled(
-				QSize(size.x(), size.y()),
-				Qt::IgnoreAspectRatio, Qt::FastTransformation));
+		QSize size(p1.x() - p0.x(), p1.y() - p0.y());
+		QRectF clipRect(p2 - p0, p3 - p0);
+		QPixmap pixmap = QPixmap::fromImage(image).scaled(size, Qt::IgnoreAspectRatio, Qt::FastTransformation);
+		QtGnuplotClippedPixmap* item = new QtGnuplotClippedPixmap(clipRect, pixmap);
+		addItem(item);
 		item->setZValue(m_currentZ++);
 		item->setPos(p0);
 		m_currentGroup.append(item);
-		/// @todo clipping
 	}
 	else if (type == GEZoomStart)
 	{
