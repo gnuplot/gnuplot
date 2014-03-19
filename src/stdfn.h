@@ -1,5 +1,5 @@
 /*
- * $Id: stdfn.h,v 1.44 2013/12/22 20:47:25 sfeam Exp $
+ * $Id: stdfn.h,v 1.45 2014/03/06 07:34:48 sfeam Exp $
  */
 
 /* GNUPLOT - stdfn.h */
@@ -330,6 +330,11 @@ char *strndup __PROTO((const char * str, size_t n));
 
 #ifndef HAVE_STRNLEN
 size_t strnlen __PROTO((const char *str, size_t n));
+#endif
+
+#if defined(_MSC_VER)
+int ms_vsnprintf(char *str, size_t size, const char *format, va_list ap);
+int ms_snprintf(char *str, size_t size, const char * format, ...);
 #endif
 
 #ifndef GP_GETCWD

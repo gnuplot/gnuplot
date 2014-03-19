@@ -1,5 +1,5 @@
 /*
- * $Id: wtext.h,v 1.15 2013/03/02 16:07:43 broeker Exp $
+ * $Id: wtext.h,v 1.16 2013/06/02 13:59:26 markisch Exp $
  */
 
 /* GNUPLOT - win/wtext.h */
@@ -45,10 +45,10 @@ extern "C" {
 #include <stdarg.h>
 #include "syscfg.h"
 
+#ifndef WGP_CONSOLE
+
 /* redefine functions that can talk to tty devices, to use
  * implementation in winmain.c */
-
-#ifndef WGP_CONSOLE
 
 #define kbhit()  MyKBHit()
 #define getche() MyGetChE()
@@ -133,6 +133,13 @@ void RedirectOutputStreams(int init);
 int ConsoleGetch();
 
 #endif /* WGP_CONSOLE */
+
+/* Standard compliant replacement functions */
+/* Note that stdio.h has to be included first. */
+#ifdef _MSC_VER
+#define snprintf ms_snprintf
+#define vsnprintf ms_vsnprintf
+#endif
 
 #ifdef __cplusplus
 }

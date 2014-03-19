@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: internal.c,v 1.75 2014/02/28 19:23:52 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: internal.c,v 1.76 2014/03/10 01:28:37 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - internal.c */
@@ -1385,10 +1385,6 @@ f_sprintf(union argument *arg)
 	default:
 	    int_error(NO_CARET,"internal error: invalid spec_type");
 	}
-#if _MSC_VER
-       buffer[bufsize-1] = '\0';	/* VC++ is not ANSI-compliant */
-#endif 
-
 #else
 	/* FIXME - this is bad; we should dummy up an snprintf equivalent */
 	switch(spec_type) {

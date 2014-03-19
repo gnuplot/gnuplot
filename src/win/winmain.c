@@ -1,5 +1,5 @@
 /*
- * $Id: winmain.c,v 1.71 2014/01/11 09:21:30 markisch Exp $
+ * $Id: winmain.c,v 1.72 2014/02/12 20:57:39 markisch Exp $
  */
 
 /* GNUPLOT - win/winmain.c */
@@ -722,78 +722,72 @@ MyPutS(char *str)
 int
 MyFPrintF(FILE *file, const char *fmt, ...)
 {
-    int count;
-    va_list args;
+	int count;
+	va_list args;
 
-    va_start(args, fmt);
-    if (isterm(file)) {
-        char *buf;
-#ifdef __MSC__
-        count = _vscprintf(fmt, args) + 1;
-#else
-        count = vsnprintf(NULL,0,fmt,args) + 1;
-        if (count == 0) count = MAXPRINTF;
-#endif
-        va_end(args);
-        va_start(args, fmt);
-        buf = (char *)malloc(count * sizeof(char));
-        count = vsnprintf(buf, count, fmt, args);
-        TextPutS(&textwin, buf);
-        free(buf);
-    } else
-        count = vfprintf(file, fmt, args);
-    va_end(args);
-    return count;
+	va_start(args, fmt);
+	if (isterm(file)) {
+		char *buf;
+
+		count = vsnprintf(NULL, 0, fmt, args) + 1;
+		if (count == 0)
+			count = MAXPRINTF;
+		va_end(args);
+		va_start(args, fmt);
+		buf = (char *) malloc(count * sizeof(char));
+		count = vsnprintf(buf, count, fmt, args);
+		TextPutS(&textwin, buf);
+		free(buf);
+	} else {
+		count = vfprintf(file, fmt, args);
+	}
+	va_end(args);
+	return count;
 }
 
 int
 MyVFPrintF(FILE *file, const char *fmt, va_list args)
 {
-    int count;
+	int count;
 
-    if (isterm(file)) {
-        char *buf;
+	if (isterm(file)) {
+		char *buf;
+		va_list args_copied;
 
-#ifdef __MSC__
-        count = _vscprintf(fmt, args) + 1;
-#else
-        va_list args_copied;
-        va_copy(args_copied, args);
-        count = vsnprintf(NULL, 0U, fmt, args_copied) + 1;
-        if (count == 0) count = MAXPRINTF;
-        va_end(args_copied);
-#endif
-        buf = (char *)malloc(count * sizeof(char));
-        count = vsnprintf(buf, count, fmt, args);
-        TextPutS(&textwin, buf);
-        free(buf);
-    } else
-        count = vfprintf(file, fmt, args);
-    return count;
+		va_copy(args_copied, args);
+		count = vsnprintf(NULL, 0U, fmt, args) + 1;
+		if (count == 0)
+			count = MAXPRINTF;
+		va_end(args_copied);
+		buf = (char *) malloc(count * sizeof(char));
+		count = vsnprintf(buf, count, fmt, args);
+		TextPutS(&textwin, buf);
+		free(buf);
+	} else {
+		count = vfprintf(file, fmt, args);
+	}
+	return count;
 }
 
 int
 MyPrintF(const char *fmt, ...)
 {
-    int count;
-    char *buf;
-    va_list args;
+	int count;
+	char *buf;
+	va_list args;
 
-    va_start(args, fmt);
-#ifdef __MSC__
-    count = _vscprintf(fmt, args) + 1;
-#else
-    count = vsnprintf(NULL, 0, fmt, args) + 1;
-    if (count == 0) count = MAXPRINTF;
-#endif
-    va_end(args);
-    va_start(args, fmt);
-    buf = (char *)malloc(count * sizeof(char));
-    count = vsnprintf(buf, count, fmt, args);
-    TextPutS(&textwin, buf);
-    free(buf);
-    va_end(args);
-    return count;
+	va_start(args, fmt);
+	count = vsnprintf(NULL, 0, fmt, args) + 1;
+	if (count == 0)
+		count = MAXPRINTF;
+	va_end(args);
+	va_start(args, fmt);
+	buf = (char *) malloc(count * sizeof(char));
+	count = vsnprintf(buf, count, fmt, args);
+	TextPutS(&textwin, buf);
+	free(buf);
+	va_end(args);
+	return count;
 }
 
 size_t

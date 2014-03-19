@@ -594,11 +594,12 @@
 #define GP_INLINE __inline
 #define GP_EXCEPTION_NAME _exception
 #define GP_MATHERR _matherr
-#define snprintf _snprintf
-/*#define vsnprintf _vsnprintf*/
 #define isnan _isnan
 #define ftruncate _chsize
 #define isblank isspace
+#if _MSC_VER <= 1800
+# define va_copy(dest, src) (dest = src)
+#endif
 
 /* Emulated pipe support for wgnuplot */
 #ifdef USE_FAKEPIPES

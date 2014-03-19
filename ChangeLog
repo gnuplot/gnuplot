@@ -1,3 +1,10 @@
+2014-03-19  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/stdfn.c src/stdfn.h src/internal.c src/win/winmain.c
+	src/win/wtext.h config/config.nt:  Standard compliant replacements
+	of snprintf() and vsnprintf() for MSVC.  Note that _snprintf does set
+	errno=ERANGE if the destination buffer is too small.
+
 2014-03-19  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/plot2d.c: Fix parsing error for "with lp pt 'X', ..."
@@ -130,8 +137,8 @@
 	* src/fit.c (fit_command):  Warn about zero initial parameter values.
 	Help message taken from patch #230 by T. Mattison.
 
-	* src/fit.c src/unset.c:  Default to "set fit errorvar" as was the intent
-	of a change on 2010-05-02.
+	* src/fit.c src/unset.c:  Default to "set fit errorvar" as was the
+	intent of a change on 2010-05-02.
 	Feature Request #230
 
 2014-03-14  Dieter Ries  <dieter.ries@psi.ch>

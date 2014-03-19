@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: stdfn.c,v 1.28 2013/12/22 20:47:25 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: stdfn.c,v 1.29 2013/12/28 05:44:43 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - stdfn.c */
@@ -308,6 +308,7 @@ safe_strncpy(char *d, const char *s, size_t n)
     return ret;
 }
 
+
 #ifndef HAVE_STRCSPN
 /*
  * our own substitute for strcspn()
@@ -332,6 +333,36 @@ gp_strcspn(const char *str1, const char *str2)
     return (pos);
 }
 #endif /* !HAVE_STRCSPN */
+
+
+/* Standard compliant replacement functions for MSVC */
+#if defined(_MSC_VER)
+int
+ms_vsnprintf(char *str, size_t size, const char *format, va_list ap)
+{
+    int count = -1;
+
+    if ((size != 0) && (str != NULL))
+	count = _vsnprintf_s(str, size, _TRUNCATE, format, ap);
+    if (count == -1)
+	count = _vscprintf(format, ap);
+    return count;
+}
+
+
+int
+ms_snprintf(char *str, size_t size, const char * format, ...)
+{
+    int result;
+    va_list ap;
+
+    va_start(ap, format);
+    result = ms_vsnprintf(str, size, format, ap);
+    va_end(ap);
+    return result;
+}
+#endif
+
 
 /* Implement portable generation of a NaN value. */
 /* NB: Supposedly DJGPP V2.04 can use atof("NaN"), but... */
