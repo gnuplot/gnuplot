@@ -1,13 +1,18 @@
+2014-03-19  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/misc.c (parse_dashtype): Avoid warning about assignment used
+	as a condition value.  Some reindentation.
+
 2014-03-19  Jérôme Lodewyck  <lodewyck@users.sourceforge.net>
 
-	* src/qtterminal/QtGnuplotScene.cpp src/qtterminal/QtGnuplotItems.h
-	src/qtterminal/qt_term.cpp: Implement image clipping for the Qt terminal.
-	Fix issue with unsigned variables in terminal coordinates.
-	Bug #1349
+	* src/qtterminal/QtGnuplotScene.cpp
+	src/qtterminal/QtGnuplotItems.h src/qtterminal/qt_term.cpp:
+	Implement image clipping for the Qt terminal.  Fix issue with
+	unsigned variables in terminal coordinates.  Bug #1349
 
 2014-03-18  Peter Juhasz  <juhaszp@users.sourceforge.net>
 
-	* src/term.c src/set.c: Fix leaks and invalid reads associated 
+	* src/term.c src/set.c: Fix leaks and invalid reads associated
 	with dashtype strings.
 
 2014-03-18  Ethan A Merritt  <merritt@u.washington.edu>

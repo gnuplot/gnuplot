@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.172 2014/03/17 20:47:13 juhaszp Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.173 2014/03/17 21:38:22 juhaszp Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -352,7 +352,7 @@ load_file(FILE *fp, char *name, int calltype)
 		    if (curly_brace_count < 0)
 			int_error(NO_CARET, "Unexpected }");
 		    if (curly_brace_count > 0) {
-			if (len + 4 > gp_input_line_len)
+			if ((len + 4) > gp_input_line_len)
 			    extend_input_line();
 			strcat(gp_input_line,";\n");
 			start = strlen(gp_input_line);
@@ -863,84 +863,82 @@ need_fill_border(struct fill_style_type *fillstyle)
 int
 parse_dashtype(struct t_dashtype *dt)
 {
-	int res = DASHTYPE_SOLID;
-	int j = 0;
-	int k = 0;
-	char *dash_str = NULL;
+    int res = DASHTYPE_SOLID;
+    int j = 0;
+    int k = 0;
+    char *dash_str = NULL;
 
-	if (equals(c_token, "solid")) {
-		res = DASHTYPE_SOLID;
-		c_token++;
+    if (equals(c_token, "solid")) {
+	res = DASHTYPE_SOLID;
+	c_token++;
+    } else if (equals(c_token, "(")) {
+	c_token++;
+	while (!END_OF_COMMAND && j < DASHPATTERN_LENGTH) {
+	    if (!END_OF_COMMAND
+		&&  !equals(c_token, ",")
+		&&  !equals(c_token, ")")
+		) {
+		dt->pattern[j] = real_expression(); 
+		j++;
+			
+		/* expect "," or ")" here */
+		if (!END_OF_COMMAND && equals(c_token, ","))
+		    c_token++;		/* loop again */
+		else
+		    break;		/* hopefully ")" */
+	    }
 	}
-	else if (equals(c_token, "(")) {
-		c_token++;
-		while (!END_OF_COMMAND && j < DASHPATTERN_LENGTH) {
-			if (!END_OF_COMMAND
-			&&  !equals(c_token, ",")
-			&&  !equals(c_token, ")")) {
-				dt->pattern[j] = real_expression(); 
-				j++;
-				
-				/* expect "," or ")" here */
-				if (!END_OF_COMMAND && equals(c_token, ","))
-					c_token++;		/* loop again */
-				else
-					break;		/* hopefully ")" */
-			}
-		}
 
-		if (END_OF_COMMAND || !equals(c_token, ")")) {
-			int_error(c_token, "expecting comma , or right parenthesis )");
-		}
-		c_token++;
-		/* cleanup */
-		if (dt->str) {
-			free(dt->str);
-			dt->str = NULL;
-		}
-		while (j < DASHPATTERN_LENGTH) {
-			dt->pattern[j++] = 0.0f; 
-		}
-		res = DASHTYPE_CUSTOM;
+	if (END_OF_COMMAND || !equals(c_token, ")")) {
+	    int_error(c_token, "expecting comma , or right parenthesis )");
 	}
-	else if (dash_str = try_to_get_string()) {
-		while (dash_str[j] && (k < DASHPATTERN_LENGTH)) {
-			/* .      Dot with short space 
-			 * -      Dash with regular space
-			 * _      Long dash with regular space
-			 * space  Don't add new dash, just increase last space */
-			switch (dash_str[j]) {
-				case '.':
-					dt->pattern[k++] = 0.2;
-					dt->pattern[k++] = 0.5;
-					break;
-				case '-':
-					dt->pattern[k++] = 1.0;
-					dt->pattern[k++] = 1.0;
-					break;
-				case '_':
-					dt->pattern[k++] = 2.0;
-					dt->pattern[k++] = 1.0;
-					break;
-				case ' ':
-					dt->pattern[k] += 1.0;
-					break;
-				default:
-					int_error(c_token - 1, "expecting one of . - _ or space");
-			}
-			j++;
-		}
-		dt->str = gp_strdup(dash_str);
-		free(dash_str);
-		res = DASHTYPE_CUSTOM;
+	c_token++;
+	/* cleanup */
+	if (dt->str) {
+	    free(dt->str);
+	    dt->str = NULL;
 	}
-	else {
-		res = int_expression() - 1;
-		if (res < 0) {
-			int_error(c_token - 1, "tag must be > 0");
-		}
+	while (j < DASHPATTERN_LENGTH) {
+	    dt->pattern[j++] = 0.0f; 
 	}
-	return res;
+	res = DASHTYPE_CUSTOM;
+    } else if ((dash_str = try_to_get_string())) {
+	while (dash_str[j] && (k < DASHPATTERN_LENGTH)) {
+	    /* .      Dot with short space 
+	     * -      Dash with regular space
+	     * _      Long dash with regular space
+	     * space  Don't add new dash, just increase last space */
+	    switch (dash_str[j]) {
+	    case '.':
+		dt->pattern[k++] = 0.2;
+		dt->pattern[k++] = 0.5;
+		break;
+	    case '-':
+		dt->pattern[k++] = 1.0;
+		dt->pattern[k++] = 1.0;
+		break;
+	    case '_':
+		dt->pattern[k++] = 2.0;
+		dt->pattern[k++] = 1.0;
+		break;
+	    case ' ':
+		dt->pattern[k] += 1.0;
+		break;
+	    default:
+		int_error(c_token - 1, "expecting one of . - _ or space");
+	    }
+	    j++;
+	}
+	dt->str = gp_strdup(dash_str);
+	free(dash_str);
+	res = DASHTYPE_CUSTOM;
+    } else {
+	res = int_expression() - 1;
+	if (res < 0) {
+	    int_error(c_token - 1, "tag must be > 0");
+	}
+    }
+    return res;
 }
 
 /*
@@ -953,8 +951,8 @@ lp_parse(struct lp_style_type *lp, TBOOLEAN allow_ls, TBOOLEAN allow_point)
 {
     /* keep track of which options were set during this call */
     int set_lt = 0, set_pal = 0, set_lw = 0; 
-	int set_pt = 0, set_ps  = 0, set_pi = 0;
-	int set_dt = 0;
+    int set_pt = 0, set_ps  = 0, set_pi = 0;
+    int set_dt = 0;
     int new_lt = 0;
 
     /* EAM Mar 2010 - We don't want properties from a user-defined default
@@ -964,23 +962,23 @@ lp_parse(struct lp_style_type *lp, TBOOLEAN allow_ls, TBOOLEAN allow_point)
      */
     struct lp_style_type newlp = *lp;
 	
-	if (allow_ls &&
-	    (almost_equals(c_token, "lines$tyle") || equals(c_token, "ls"))) {
-	    c_token++;
-	    lp_use_properties(lp, int_expression());
-	} 
+    if (allow_ls &&
+	(almost_equals(c_token, "lines$tyle") || equals(c_token, "ls"))) {
+	c_token++;
+	lp_use_properties(lp, int_expression());
+    } 
     
-	while (!END_OF_COMMAND) {
-	    if (almost_equals(c_token, "linet$ype") || equals(c_token, "lt")) {
-		if (set_lt++)
+    while (!END_OF_COMMAND) {
+	if (almost_equals(c_token, "linet$ype") || equals(c_token, "lt")) {
+	    if (set_lt++)
+		break;
+	    c_token++;
+	    if (almost_equals(c_token, "rgb$color")) {
+		if (set_pal++)
 		    break;
-		c_token++;
-		if (almost_equals(c_token, "rgb$color")) {
-		    if (set_pal++)
-			break;
-		    c_token--;
-		    parse_colorspec(&(newlp.pm3d_color), TC_RGB);
-		} else
+		c_token--;
+		parse_colorspec(&(newlp.pm3d_color), TC_RGB);
+	    } else
 		/* both syntaxes allowed: 'with lt pal' as well as 'with pal' */
 		if (almost_equals(c_token, "pal$ette")) {
 		    if (set_pal++)
@@ -1000,176 +998,177 @@ lp_parse(struct lp_style_type *lp, TBOOLEAN allow_ls, TBOOLEAN allow_point)
 		    else
 			load_linetype(lp, new_lt);
 		}
-	    } /* linetype, lt */
+	} /* linetype, lt */
 
-	    /* both syntaxes allowed: 'with lt pal' as well as 'with pal' */
-	    if (almost_equals(c_token, "pal$ette")) {
-		if (set_pal++)
-		    break;
+	/* both syntaxes allowed: 'with lt pal' as well as 'with pal' */
+	if (almost_equals(c_token, "pal$ette")) {
+	    if (set_pal++)
+		break;
+	    c_token--;
+	    parse_colorspec(&(newlp.pm3d_color), TC_Z);
+	    continue;
+	}
+
+	if (equals(c_token,"lc") || almost_equals(c_token,"linec$olor")
+	    ||  equals(c_token,"fc") || almost_equals(c_token,"fillc$olor")
+	   ) {
+	    if (set_pal++)
+		break;
+	    c_token++;
+	    if (almost_equals(c_token, "rgb$color")) {
+		c_token--;
+		parse_colorspec(&(newlp.pm3d_color), TC_RGB);
+	    } else if (almost_equals(c_token, "pal$ette")) {
 		c_token--;
 		parse_colorspec(&(newlp.pm3d_color), TC_Z);
-		continue;
-	    }
-
-	    if (equals(c_token,"lc") || almost_equals(c_token,"linec$olor")
-	    ||  equals(c_token,"fc") || almost_equals(c_token,"fillc$olor")) {
-		if (set_pal++)
-		    break;
+	    } else if (equals(c_token,"bgnd")) {
+		newlp.pm3d_color.type = TC_LT;
+		newlp.pm3d_color.lt = LT_BACKGROUND;
 		c_token++;
-		if (almost_equals(c_token, "rgb$color")) {
-		    c_token--;
-		    parse_colorspec(&(newlp.pm3d_color), TC_RGB);
-		} else if (almost_equals(c_token, "pal$ette")) {
-		    c_token--;
-		    parse_colorspec(&(newlp.pm3d_color), TC_Z);
-		} else if (equals(c_token,"bgnd")) {
+	    } else if (almost_equals(c_token, "var$iable")) {
+		c_token++;
+		newlp.l_type = LT_COLORFROMCOLUMN;
+		newlp.pm3d_color.type = TC_LINESTYLE;
+	    } else {
+		/* Pull the line colour from a default linetype, but */
+		/* only if we are not in the middle of defining one! */
+		if (allow_ls) {
+		    struct lp_style_type temp;
+		    load_linetype(&temp, int_expression());
+		    newlp.pm3d_color = temp.pm3d_color;
+		} else {
 		    newlp.pm3d_color.type = TC_LT;
-		    newlp.pm3d_color.lt = LT_BACKGROUND;
-		    c_token++;
-		} else if (almost_equals(c_token, "var$iable")) {
-		    c_token++;
-		    newlp.l_type = LT_COLORFROMCOLUMN;
-		    newlp.pm3d_color.type = TC_LINESTYLE;
-		} else {
-		    /* Pull the line colour from a default linetype, but */
-		    /* only if we are not in the middle of defining one! */
-		    if (allow_ls) {
-			struct lp_style_type temp;
-			load_linetype(&temp, int_expression());
-			newlp.pm3d_color = temp.pm3d_color;
-		    } else {
-			newlp.pm3d_color.type = TC_LT;
-			newlp.pm3d_color.lt = int_expression() - 1;
-		    }
+		    newlp.pm3d_color.lt = int_expression() - 1;
 		}
-		continue;
 	    }
+	    continue;
+	}
 
-	    if (almost_equals(c_token, "linew$idth") || equals(c_token, "lw")) {
-		if (set_lw++)
+	if (almost_equals(c_token, "linew$idth") || equals(c_token, "lw")) {
+	    if (set_lw++)
+		break;
+	    c_token++;
+	    newlp.l_width = real_expression();
+	    if (newlp.l_width < 0)
+		newlp.l_width = 0;
+	    continue;
+	}
+
+	if (equals(c_token,"bgnd")) {
+	    if (set_lt++)
+		break;;
+	    c_token++;
+	    *lp = background_lp;
+	    continue;
+	}
+
+	if (almost_equals(c_token, "pointt$ype") || equals(c_token, "pt")) {
+	    if (allow_point) {
+		char *symbol;
+		if (set_pt++)
 		    break;
 		c_token++;
-		newlp.l_width = real_expression();
-		if (newlp.l_width < 0)
-		    newlp.l_width = 0;
-		continue;
-	    }
-
-	    if (equals(c_token,"bgnd")) {
-		if (set_lt++)
-		    break;;
-		c_token++;
-		*lp = background_lp;
-		continue;
-	    }
-
-	    if (almost_equals(c_token, "pointt$ype") || equals(c_token, "pt")) {
-		if (allow_point) {
-		    char *symbol;
-		    if (set_pt++)
-			break;
-		    c_token++;
-		    if ((symbol = try_to_get_string())) {
-			newlp.p_type = PT_CHARACTER;
-			/* An alternative mechanism would be to use
-			 * utf8toulong(&newlp.p_char, symbol);
-			 */
-			strncpy((char *)(&newlp.p_char), symbol, 3);
-			/* Truncate ascii text to single character */
-			if ((((char *)&newlp.p_char)[0] & 0x80) == 0)
-			    ((char *)&newlp.p_char)[1] = '\0';
-			/* UTF-8 characters may use up to 3 bytes */
-			((char *)&newlp.p_char)[3] = '\0';
-			free(symbol);
-		    } else {
-			newlp.p_type = int_expression() - 1;
-		    }
+		if ((symbol = try_to_get_string())) {
+		    newlp.p_type = PT_CHARACTER;
+		    /* An alternative mechanism would be to use
+		     * utf8toulong(&newlp.p_char, symbol);
+		     */
+		    strncpy((char *)(&newlp.p_char), symbol, 3);
+		    /* Truncate ascii text to single character */
+		    if ((((char *)&newlp.p_char)[0] & 0x80) == 0)
+			((char *)&newlp.p_char)[1] = '\0';
+		    /* UTF-8 characters may use up to 3 bytes */
+		    ((char *)&newlp.p_char)[3] = '\0';
+		    free(symbol);
 		} else {
-		    int_warn(c_token, "No pointtype specifier allowed, here");
-		    c_token += 2;
+		    newlp.p_type = int_expression() - 1;
 		}
-		continue;
+	    } else {
+		int_warn(c_token, "No pointtype specifier allowed, here");
+		c_token += 2;
 	    }
+	    continue;
+	}
 
-	    if (almost_equals(c_token, "points$ize") || equals(c_token, "ps")) {
-		if (allow_point) {
-		    if (set_ps++)
-			break;
-		    c_token++;
-		    if (almost_equals(c_token, "var$iable")) {
-			newlp.p_size = PTSZ_VARIABLE;
-			c_token++;
-		    } else if (almost_equals(c_token, "def$ault")) {
-			newlp.p_size = PTSZ_DEFAULT;
-			c_token++;
-		    } else {
-			newlp.p_size = real_expression();
-			if (newlp.p_size < 0)
-			    newlp.p_size = 0;
-		    }
-		} else {
-		    int_warn(c_token, "No pointsize specifier allowed, here");
-		    c_token += 2;
-		}
-		continue;
-	    }
-
-	    if (almost_equals(c_token, "pointi$nterval") || equals(c_token, "pi")) {
-		c_token++;
-		if (allow_point) {
-		    newlp.p_interval = int_expression();
-		    set_pi = 1;
-		} else {
-		    int_warn(c_token, "No pointinterval specifier allowed, here");
-		    int_expression();
-		}
-		continue;
-	    }
-
-	    if (almost_equals(c_token, "dasht$ype") || equals(c_token, "dt")) {
-		int tmp;
-		if (set_dt++)
+	if (almost_equals(c_token, "points$ize") || equals(c_token, "ps")) {
+	    if (allow_point) {
+		if (set_ps++)
 		    break;
 		c_token++;
-		tmp = parse_dashtype(&newlp.custom_dash_pattern);
-		/* Pull the dashtype from the list of already defined dashtypes, */
-		/* but only if it we didn't get an explicit one back from parse_dashtype */ 
-		if (tmp >= 0) {
-			tmp = load_dashtype(&newlp.custom_dash_pattern, tmp + 1);
+		if (almost_equals(c_token, "var$iable")) {
+		    newlp.p_size = PTSZ_VARIABLE;
+		    c_token++;
+		} else if (almost_equals(c_token, "def$ault")) {
+		    newlp.p_size = PTSZ_DEFAULT;
+		    c_token++;
+		} else {
+		    newlp.p_size = real_expression();
+		    if (newlp.p_size < 0)
+			newlp.p_size = 0;
 		}
-		newlp.d_type = tmp;
-		continue;
+	    } else {
+		int_warn(c_token, "No pointsize specifier allowed, here");
+		c_token += 2;
 	    }
-
-
-	    /* caught unknown option -> quit the while(1) loop */
-	    break;
+	    continue;
 	}
 
-	if (set_lt > 1 || set_pal > 1 || set_lw > 1 || set_pt > 1 || set_ps > 1 || set_dt > 1)
-	    int_error(c_token, "duplicated arguments in style specification");
+	if (almost_equals(c_token, "pointi$nterval") || equals(c_token, "pi")) {
+	    c_token++;
+	    if (allow_point) {
+		newlp.p_interval = int_expression();
+		set_pi = 1;
+	    } else {
+		int_warn(c_token, "No pointinterval specifier allowed, here");
+		int_expression();
+	    }
+	    continue;
+	}
 
-	if (set_pal) {
-	    lp->pm3d_color = newlp.pm3d_color;
-	    /* FIXME:  This was used by hidden3d but it breaks contour colors! */
-	    /* new_lt = LT_SINGLECOLOR; */
+	if (almost_equals(c_token, "dasht$ype") || equals(c_token, "dt")) {
+	    int tmp;
+	    if (set_dt++)
+		break;
+	    c_token++;
+	    tmp = parse_dashtype(&newlp.custom_dash_pattern);
+	    /* Pull the dashtype from the list of already defined dashtypes, */
+	    /* but only if it we didn't get an explicit one back from parse_dashtype */ 
+	    if (tmp >= 0) {
+		tmp = load_dashtype(&newlp.custom_dash_pattern, tmp + 1);
+	    }
+	    newlp.d_type = tmp;
+	    continue;
 	}
-	if (set_lw)
-	    lp->l_width = newlp.l_width;
-	if (set_pt) {
-	    lp->p_type = newlp.p_type;
-	    lp->p_char = newlp.p_char;
-	}
-	if (set_ps)
-	    lp->p_size = newlp.p_size;
-	if (set_pi)
-	    lp->p_interval = newlp.p_interval;
-	if (newlp.l_type == LT_COLORFROMCOLUMN)
-	    lp->l_type = LT_COLORFROMCOLUMN;
-	if (set_dt) {
-	    lp->d_type = newlp.d_type;
-	    lp->custom_dash_pattern = newlp.custom_dash_pattern;
-	}	
+
+
+	/* caught unknown option -> quit the while(1) loop */
+	break;
+    }
+
+    if (set_lt > 1 || set_pal > 1 || set_lw > 1 || set_pt > 1 || set_ps > 1 || set_dt > 1)
+	int_error(c_token, "duplicated arguments in style specification");
+
+    if (set_pal) {
+	lp->pm3d_color = newlp.pm3d_color;
+	/* FIXME:  This was used by hidden3d but it breaks contour colors! */
+	/* new_lt = LT_SINGLECOLOR; */
+    }
+    if (set_lw)
+	lp->l_width = newlp.l_width;
+    if (set_pt) {
+	lp->p_type = newlp.p_type;
+	lp->p_char = newlp.p_char;
+    }
+    if (set_ps)
+	lp->p_size = newlp.p_size;
+    if (set_pi)
+	lp->p_interval = newlp.p_interval;
+    if (newlp.l_type == LT_COLORFROMCOLUMN)
+	lp->l_type = LT_COLORFROMCOLUMN;
+    if (set_dt) {
+	lp->d_type = newlp.d_type;
+	lp->custom_dash_pattern = newlp.custom_dash_pattern;
+    }	
 		
 
     return new_lt;
