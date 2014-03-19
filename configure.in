@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot on Unix.
 dnl
-dnl $Id: configure.in,v 1.358 2014/03/15 17:59:31 sfeam Exp $
+dnl $Id: configure.in,v 1.359 2014/03/19 20:42:44 sfeam Exp $
 dnl
 dnl this is actually major.minor ...
 dnl note that for a non-beta release, we need to disable DEVELOPMENT_RELEASE
@@ -1112,6 +1112,13 @@ AS_IF([test "x${with_gpic}" = "xyes"],
   AC_DEFINE(HAVE_GPIC,1,
           [ Define to include support for gpic terminal ],))
 
+dnl  Allow to include mif (FrameMaker 3) terminal
+AC_ARG_WITH(mif,dnl
+[  --with-mif                     mif terminal (FrameMaker 3)])
+AS_IF([test "x${with_mif}" = "xyes"],
+  AC_DEFINE(HAVE_MIF,1,
+          [ Define to include support for mif terminal ],))
+
 AC_ARG_WITH(cairo,dnl
 [  --without-cairo      cairo-based terminals (default enabled)],,
   [test -z "${with_cairo}" && with_cairo=yes])
@@ -1404,6 +1411,12 @@ else
   AC_MSG_RESULT([  gpic terminal: no   (use --with-gpic to enable)])
 fi
 
+if test "$with_mif" == yes; then
+  AC_MSG_RESULT([  mif terminal: yes])
+else
+  AC_MSG_RESULT([  mif terminal: no   (use --with-mif to enable)])
+fi
+
 if test "$is_msdos" = yes; then
   AC_MSG_RESULT([  svga terminal (MSDOS/djgpp): yes])
 fi
@@ -1475,7 +1488,7 @@ fi
 
 AC_MSG_RESULT([])
 AC_MSG_RESULT([  Additional platform-specific or older terminals omitted by default:])
-AC_MSG_RESULT([   gpic, hp2623a, hp2648, imagen, kyocera ])
+AC_MSG_RESULT([   gpic, mif (FrameMaker 3), hp2623a, hp2648, imagen, kyocera ])
 AC_MSG_RESULT([   pm (makefile.os2), be (BeOS), svga (MSDOS/djgpp)])
 AC_MSG_RESULT([   sun, windows (several options)])
 

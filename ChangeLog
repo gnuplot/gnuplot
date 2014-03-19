@@ -8,6 +8,10 @@
 	* configure.in term/gpic.trm src/term.h:
 	Add configuration option --with-gpic
 
+	* configure.in src/term.h:  FrameMaker now allows import of svg, so the
+	utility of the ancient mif v3 support is dubious. Disable by default.
+	Add configuration option --with-mif
+
 2014-03-19  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/misc.c (parse_dashtype): Avoid warning about assignment used

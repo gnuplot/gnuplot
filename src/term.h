@@ -302,7 +302,9 @@
 /* #include "kyo.trm" */
 
 /* Frame Maker MIF 3.00 format driver */
+#ifdef HAVE_MIF
 #include "mif.trm"
+#endif
 
 /* Adobe Portable Document Format (PDF) */
 /* NOTE THAT PDF REQUIRES A SEPARATE LIBRARY : see term/pdf.trm */
