@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.322 2014/03/15 23:42:01 juhaszp Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.323 2014/03/16 22:03:04 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -2417,8 +2417,7 @@ eval_plots()
 			this_plot->labels->layer = LAYER_PLOTLABELS;
 		    }
 		    parse_label_options(this_plot->labels, TRUE);
-		    if ((stored_token != c_token)
-		    ||  (this_plot->lp_properties.p_type == PT_CHARACTER)) {
+		    if (stored_token != c_token) {
 			if (set_labelstyle) {
 			    duplication = TRUE;
 			    break;
@@ -2426,6 +2425,11 @@ eval_plots()
 			    set_labelstyle = TRUE;
 			    continue;
 			}
+		    } else if (this_plot->lp_properties.p_type == PT_CHARACTER) {
+			if (equals(c_token, ","))
+			    break;
+			else
+			    continue;
 		    }
 		}
 
