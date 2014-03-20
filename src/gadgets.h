@@ -184,7 +184,7 @@ typedef struct object {
 struct custom_dashtype_def {
     struct custom_dashtype_def *next;	/* pointer to next linestyle in linked list */
     int tag;			/* identifies the dashtype */
-    int d_type;                 /* for DASHTYPE_SOLID or CUSTOM */;
+    int d_type;                 /* for DASHTYPE_SOLID or CUSTOM */
     struct t_dashtype dashtype;
 };
 
