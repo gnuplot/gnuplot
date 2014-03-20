@@ -15,7 +15,7 @@ index.html: index.svg
 	cp index.svg index.html
 
 lines_arrows.html: $(GNUPLOT_LIB)/lines_arrows.dem ./webify_svg.pl
-	export DEMOTERM="svg dashed enhanced font 'arial,11' size 600,400 dynamic"; ./webify_svg.pl lines_arrows
+	export DEMOTERM="svg dashed font 'arial,11' size 600,400 dynamic mouse jsdir '.'"; ./webify_svg.pl lines_arrows
 
 rugplot.html: random.html
 

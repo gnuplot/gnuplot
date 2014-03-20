@@ -1,3 +1,8 @@
+2014-03-20  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/svg.trm:  svg was losing the current linetype (i.e. dash type)
+	between drawing the key sample and drawing the main plot.
+
 2014-03-19  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/stdfn.c src/stdfn.h src/internal.c src/win/winmain.c
@@ -18,6 +23,9 @@
 	* configure.in src/term.h:  FrameMaker now allows import of svg, so the
 	utility of the ancient mif v3 support is dubious. Disable by default.
 	Add configuration option --with-mif
+
+	* demo/lines_arrows.dem demo/stringvar.dem demo/html/Makefile
+	demo/html/index.* demo/html/webify.pl: Update demos for version 5.
 
 2014-03-19  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
