@@ -1,5 +1,5 @@
 /*
- * $Id: wgraph.c,v 1.178 2014/01/29 17:48:09 markisch Exp $
+ * $Id: wgraph.c,v 1.179 2014/03/15 04:23:28 markisch Exp $
  */
 
 /* GNUPLOT - win/wgraph.c */
@@ -1023,6 +1023,7 @@ UnicodeText(const char *str, enum set_encoding_id encoding)
         case S_ENC_CP950:      codepage =   950; break;
         case S_ENC_CP1250:     codepage =  1250; break;
         case S_ENC_CP1251:     codepage =  1251; break;
+        case S_ENC_CP1252:     codepage =  1252; break;
         case S_ENC_CP1254:     codepage =  1254; break;
         case S_ENC_KOI8_R:     codepage = 20866; break;
         case S_ENC_KOI8_U:     codepage = 21866; break;

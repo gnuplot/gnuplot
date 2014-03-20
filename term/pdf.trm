@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: pdf.trm,v 1.91 2013/10/07 21:43:48 sfeam Exp $
+ * $Id: pdf.trm,v 1.92 2014/03/04 21:25:13 sfeam Exp $
  */
 
 /*------------------------------
@@ -198,6 +198,8 @@ PDF_SetFont ()
         pdfenc = "iso8859-15";
     } else if (encoding == S_ENC_CP1250) {
         pdfenc = "cp1250";
+    } else if (encoding == S_ENC_CP1252) {
+        pdfenc = "cp1252";
     }
         
     font_handle = PDF_findfont(myPDF, PDF_fontNameCur, pdfenc, 0);

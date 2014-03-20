@@ -1,5 +1,5 @@
 /*
- * $Id: gp_cairo.c,v 1.79 2014/03/11 00:47:22 sfeam Exp $
+ * $Id: gp_cairo.c,v 1.80 2014/03/18 19:17:26 sfeam Exp $
  */
 
 /* GNUPLOT - gp_cairo.c */
@@ -1938,6 +1938,7 @@ const char* gp_cairo_get_encoding(plot_struct *plot)
 	case S_ENC_CP850 :  return "cp850";
 	case S_ENC_CP852 :  return "cp852";
 	case S_ENC_CP1250 : return "windows-1250";
+	case S_ENC_CP1252 : return "windows-1252";
 	case S_ENC_KOI8_R : return "KOI8-R";
 	case S_ENC_KOI8_U :  return "KOI8-U";
 	case S_ENC_ISO8859_1 : return "ISO-8859-1";

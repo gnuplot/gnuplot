@@ -1,9 +1,20 @@
 2014-03-20  Bastian Maerkisch  <bmaerkisch@web.de>
 
+	* src/set.c src/term.c src/term_api.h src/util.c src/win/wgraph.c
+	src/wxterminal/gp_cairo.c term/aquaterm.trm term/pdf.trm term/post.trm
+	term/pslatex.trm term/svg.trm:  Add support for codepage 1252, the
+	standard Western European encoding on Windows.
+
 	* src/set.c:  "set encoding locale" only handles utf8 and sjis. Extend
 	this to all supported encodings on Windows, probably the only platform
 	where this is still relevant.
 	Bug #1270
+
+2014-03-20  Thomas Henlich  <thenlich@users.sourceforge.net>
+
+	* term/PostScript/cp1252.ps:  CP1252 encoding support for PostScript
+	terminal. Based on Patch #341, but with non-standard characters
+	removed.
 
 2014-03-20  Ethan A Merritt  <merritt@u.washington.edu>
 

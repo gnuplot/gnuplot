@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: post.trm,v 1.278 2013/10/07 21:43:48 sfeam Exp $
+ * $Id: post.trm,v 1.279 2014/03/11 03:16:58 sfeam Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -480,6 +480,9 @@ PS_RememberFont(char *fname)
 	break;
     case S_ENC_CP1251 :
 	recode = "reencodeCP1251 def\n";
+	break;
+    case S_ENC_CP1252:
+	recode = "reencodeCP1252 def\n";
 	break;
     case S_ENC_KOI8_U :
 	recode = "reencodeKOI8U def\n";
@@ -1761,6 +1764,7 @@ end\n\
 	    case S_ENC_CP852:	    PS_dump_prologue_file("cp852.ps"); break;
 	    case S_ENC_CP1250:	    PS_dump_prologue_file("cp1250.ps"); break;
 	    case S_ENC_CP1251:	    PS_dump_prologue_file("cp1251.ps"); break;
+	    case S_ENC_CP1252:	    PS_dump_prologue_file("cp1252.ps"); break;
 	    case S_ENC_KOI8_R:	    PS_dump_prologue_file("koi8r.ps"); break;
 	    case S_ENC_KOI8_U:	    PS_dump_prologue_file("koi8u.ps"); break;
 	    case S_ENC_UTF8:   	    PS_dump_prologue_file("utf-8.ps");

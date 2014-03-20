@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.437 2014/03/18 20:46:31 juhaszp Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.438 2014/03/20 19:59:45 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -1528,6 +1528,7 @@ set_encoding()
 	    case 950:   encoding = S_ENC_CP950; break;
 	    case 1250:  encoding = S_ENC_CP1250; break;
 	    case 1251:  encoding = S_ENC_CP1251; break;
+	    case 1252:  encoding = S_ENC_CP1252; break;
 	    case 1254:  encoding = S_ENC_CP1254; break;
 	    case 20866: encoding = S_ENC_KOI8_R; break;
 	    case 21866: encoding = S_ENC_KOI8_U; break;
@@ -1536,12 +1537,6 @@ set_encoding()
 	    case 28599: encoding = S_ENC_ISO8859_9; break;
 	    case 28605: encoding = S_ENC_ISO8859_15; break;
 	    case 65001: encoding = S_ENC_UTF8; break;
-	    case 1252:
-		/* FIXME: The default western european encoding is not supported by gnuplot! */
-		int_warn(NO_CARET, "Locale \"%s\" not supported by gnuplot.", l);
-		int_warn(NO_CARET, "Using closest match \"iso_8859_1\" instead.");
-		encoding = S_ENC_ISO8859_1;
-		break;
 	    case 0:
 		int_warn(NO_CARET, "Error converting locale \"%s\" to codepage number", l);
 		encoding = S_ENC_DEFAULT;
