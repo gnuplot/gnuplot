@@ -2,6 +2,8 @@
 # Demonstrate explicit choice of both dot/dash pattern (linetype) and color (linecolor).
 #
 set termoption dash
+save_encoding = GPVAL_ENCODING
+set encoding utf8
 
 reset
 set xrange [-0.5:3.5]
@@ -85,4 +87,5 @@ plot '+' using 1:(cos(x-1.))  with line lt -1 lw 1 title 'lw 1',  \
 
 pause -1 "Hit return to continue"
 
+set encoding save_encoding
 reset

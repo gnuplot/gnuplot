@@ -10,6 +10,8 @@
 	where this is still relevant.
 	Bug #1270
 
+	* demo/dashcolor.dem:  UTF-8 encoding.
+
 2014-03-20  Thomas Henlich  <thenlich@users.sourceforge.net>
 
 	* term/PostScript/cp1252.ps:  CP1252 encoding support for PostScript
