@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.354.2.10 2014/01/27 02:00:50 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.354.2.11 2014/02/26 07:36:17 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -1411,12 +1411,62 @@ set_encoding()
     if (END_OF_COMMAND) {
 	encoding = S_ENC_DEFAULT;
 #ifdef HAVE_LOCALE_H
-    } else if (equals(c_token,"locale")) {
-	l = setlocale(LC_CTYPE,"");
-	if (l && (strstr(l,"utf") || strstr(l,"UTF")))
+    } else if (equals(c_token, "locale")) {
+#ifndef WIN32
+	l = setlocale(LC_CTYPE, "");
+	if (l && (strstr(l, "utf") || strstr(l, "UTF")))
 	    encoding = S_ENC_UTF8;
-	if (l && (strstr(l,"sjis") || strstr(l,"SJIS") || strstr(l,"932")))
+	if (l && (strstr(l, "sjis") || strstr(l, "SJIS") || strstr(l, "932")))
 	    encoding = S_ENC_SJIS;
+	/* FIXME: "set encoding locale" supports only sjis and utf8 on non-Windows systems */
+#else
+	char * cp_str;
+
+	l = setlocale(LC_CTYPE, "");
+	/* preserve locale string, skip language information */
+	cp_str = strchr(l, '.');
+	if (cp_str) {
+	    unsigned cp;
+
+	    cp_str++; /* Step past the dot in, e.g., German_Germany.1252 */
+	    cp = strtoul(cp_str, NULL, 10);
+
+	    /* The code below is the inverse to the code found in UnicodeText().
+	       For a list of code page identifiers see
+	       http://msdn.microsoft.com/en-us/library/dd317756%28v=vs.85%29.aspx
+	    */
+	    switch (cp) {
+	    case 437:   encoding = S_ENC_CP437; break;
+	    case 850:   encoding = S_ENC_CP850; break;
+	    case 852:   encoding = S_ENC_CP852; break;
+	    case 932:   encoding = S_ENC_SJIS; break;
+	    case 950:   encoding = S_ENC_CP950; break;
+	    case 1250:  encoding = S_ENC_CP1250; break;
+	    case 1251:  encoding = S_ENC_CP1251; break;
+	    case 1254:  encoding = S_ENC_CP1254; break;
+	    case 20866: encoding = S_ENC_KOI8_R; break;
+	    case 21866: encoding = S_ENC_KOI8_U; break;
+	    case 28591: encoding = S_ENC_ISO8859_1; break;
+	    case 28592: encoding = S_ENC_ISO8859_2; break;
+	    case 28599: encoding = S_ENC_ISO8859_9; break;
+	    case 28605: encoding = S_ENC_ISO8859_15; break;
+	    case 65001: encoding = S_ENC_UTF8; break;
+	    case 1252:
+		/* FIXME: The default western european encoding is not supported by gnuplot! */
+		int_warn(NO_CARET, "Locale \"%s\" not supported by gnuplot.", l);
+		int_warn(NO_CARET, "Using closest match \"iso_8859_1\" instead.");
+		encoding = S_ENC_ISO8859_1;
+		break;
+	    case 0:
+		int_warn(NO_CARET, "Error converting locale \"%s\" to codepage number", l);
+		encoding = S_ENC_DEFAULT;
+		break;
+	    default:
+		int_warn(NO_CARET, "Locale not supported by gnuplot: %s", l);
+		encoding = S_ENC_DEFAULT;
+	    }
+	}
+#endif
 	c_token++;
 #endif
     } else {

@@ -1,3 +1,10 @@
+2014-03-20  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/set.c:  "set encoding locale" only handles utf8 and sjis. Extend
+	this to all supported encodings on Windows, probably the only platform
+	where this is still relevant.
+	Bug #1270
+
 2014-03-20  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/svg.trm:  svg was losing the current linetype (i.e. dash type)
