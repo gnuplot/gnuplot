@@ -1,3 +1,8 @@
+2014-03-20  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/svg.trm:  svg was losing the current linetype (i.e. dash type)
+	between drawing the key sample and drawing the main plot.
+
 2014-03-14  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/datafile.c (df_parse_string_field):  Memory allocation for column

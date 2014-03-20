@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: svg.trm,v 1.128.2.15 2013/05/30 05:53:14 sfeam Exp $
+ * $Id: svg.trm,v 1.128.2.16 2014/02/05 22:58:03 sfeam Exp $
  */
 
 /*------------------------------------------------------------------------------------------------------------------------------------
@@ -1623,7 +1623,6 @@ SVG_layer(t_termlayer syncpoint)
 		    SVG_PathClose();
 		    SVG_GroupFilledClose();
 		    fprintf(gpoutfile, "\t</g>\n");
-		    SVG_LineType = LT_UNDEFINED;
 		}
 		break;
 
