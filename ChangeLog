@@ -12,6 +12,9 @@
 
 	* demo/dashcolor.dem:  UTF-8 encoding.
 
+	* src/fit.c (show_results):  Do not try to print parameter errors if
+	the covariance matrix is unavailable or invalid.
+
 2014-03-20  Thomas Henlich  <thenlich@users.sourceforge.net>
 
 	* term/PostScript/cp1252.ps:  CP1252 encoding support for PostScript

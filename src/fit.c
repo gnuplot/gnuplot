@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: fit.c,v 1.139 2014/03/15 04:38:43 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: fit.c,v 1.140 2014/03/15 04:55:14 markisch Exp $"); }
 #endif
 
 /*  NOTICE: Change of Copyright Status
@@ -1114,9 +1114,10 @@ regress(double a[])
     display results of the fit
 *****************************************************************/
 static void
-show_results(double chisq, double last_chisq, double* a, double* dpar, double** corel)
+show_results(double chisq, double last_chisq, double *a, double *dpar, double **corel)
 {
-    int i, j;
+    int i, j, k;
+    TBOOLEAN have_errors = TRUE;
 
     Dblf2("final sum of squares of residuals : %g\n", chisq);
     if (chisq > NEARLY_ZERO) {
@@ -1126,18 +1127,18 @@ show_results(double chisq, double last_chisq, double* a, double* dpar, double** 
     }
 
     if ((num_data == num_params) && ((num_errors == 0) || fit_errorscaling)) {
-	int k;
-
 	Dblf("\nExactly as many data points as there are parameters.\n");
 	Dblf("In this degenerate case, all errors are zero by definition.\n\n");
-	Dblf("Final set of parameters \n");
-	Dblf("======================= \n\n");
-	for (k = 0; k < num_params; k++)
-	    Dblf3("%-15.15s = %-15g\n", par_name[k], a[k] * scale_params[k]);
+	have_errors = FALSE;
     } else if ((chisq < NEARLY_ZERO) && ((num_errors == 0) || fit_errorscaling)) {
-	int k;
-
 	Dblf("\nHmmmm.... Sum of squared residuals is zero. Can't compute errors.\n\n");
+	have_errors = FALSE;
+    } else if (corel == NULL) {
+	Dblf("\nCovariance matric unavailable. Can't compute errors.\n\n");
+	have_errors = FALSE;
+    }
+
+    if (!have_errors) {
 	Dblf("Final set of parameters \n");
 	Dblf("======================= \n\n");
 	for (k = 0; k < num_params; k++)
