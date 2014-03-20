@@ -1,9 +1,9 @@
-<html><head><title>Demo scripts for gnuplot CVS version</title>
+<html><head><title>Demo scripts for gnuplot version 5</title>
 
 <link text="text/css" href="gnuplot_demo.css" rel="stylesheet"></head><body>
 
 
-<h2 align=center>Demo scripts for gnuplot CVS version (PNG terminal)<br>
+<h2 align=center>Demo scripts for gnuplot version 5 (pngcairo terminal)<br>
     See also the demo output for the
     <a href="../demo_svg_5.0/">SVG</a> and
     <a href="../demo_canvas_5.0/">canvas</a> terminals.
@@ -145,16 +145,19 @@ Here are samples of PNG output from some of the demos.
     </ul>
 </td>
 
+<!---
 <td align=center valign=bot>
 	<h3>
 	Recent additions
 	</h3>
 	<a href="index2.html">more</a>
 </td>
+ --->
 </tr>
 
 <tr valign=top><td align=center>
-<img src="showcase_plot.7.png"><br clear=all>
+<img src="showcase_plot_1.png"><br clear=all>
+<img src="showcase_plot_2.png"><br clear=all>
 </td></tr>
 
 </tbody></table>
@@ -166,7 +169,7 @@ Here are samples of PNG output from some of the demos.
 <tbody><tr valign="top">
 
     <td>
-    <i>This page generated December 2013</i>
+    <i>This page generated March 2014</i>
     </td>
 
     <td>

@@ -24,8 +24,7 @@
 # If DEMOTERM is present as an environmental variable, then use
 #    set term DEMOTERM
 # rather than the default terminal settings
-# E.g. (for image demo)
-#    setenv DEMOTERM "png truecolor enhanced font 'arial,8' transparent size 450,320"
+#    setenv DEMOTERM "pngcairo font 'arial,10' transparent size 600,400"
 #    ./webify.pl image
 #
 # EAM Apr 2009

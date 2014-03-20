@@ -96,14 +96,6 @@ plot 'silver.dat' u 1:2:($3+$1/50.) w filledcurves above title 'Above', \
 #
 pause -1 "Hit return to continue"
 #
-plot 'silver.dat' \
-        u 1:2 lt -1 lw 0.5 notitle, \
-     '' u 1:($3+$1/50.) lt 3 lw 0.5 notitle, \
-     '' using 1:2:( ($2>($3+$1/50.)) ? "J" : "D" ) with labels font "WingDings,28"\
-        title 'Same thing using character glyphs from WingDings font'
-#
-pause -1 "Hit return to continue"
-#
 reset
 set title "String-valued functions to generate datafile names"
 set key title 'file(i) = sprintf("%1d.dat",i); N=2; M=3'

@@ -71,6 +71,22 @@ plot cos(x)     lt -1 pi -4 pt 6 title 'pi -4',   \
 
 #
 pause -1 "Hit return to continue"
+
+set title "The pointinterval property also works with character point symbols"
+set style data linespoints
+set pointintervalbox 1.5
+unset xlabel
+
+plot '+' using 1:(cos(x-1.))  with line lt -1 lw 1 title 'lw 1',  \
+     '+' using 1:(cos(x))     lt -1 pi -4 pt "C" title 'pi -4',   \
+     '+' using 1:(cos(x-.8))  lt -1 pi -3 pt "D" ps 0.2 title 'pi -3 pt "D" ps 0.2',  \
+     '+' using 1:(cos(x-.2))  lt -1 pi -6 pt "✩" title 'pi -6',\
+     '+' using 1:(cos(x-.4))  lt -1 pi -3 pt "✲" title 'pi -3',\
+     '+' using 1:(cos(x-.6))  lt -1 pi -5 pt "☺" title 'pi -5', \
+     '+' using 1:(cos(x+.2))  with line lt -1 lw 2 title 'lw 2'
+
+pause -1 "Hit return to continue"
+
 reset
 
 set xrange [-1000:1000]
