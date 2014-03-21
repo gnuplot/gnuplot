@@ -5,6 +5,16 @@
 	doesn't fail due to overflow of integer multiplication.
 	Bug #1358
 
+	* src/term.c (enhanced_recursion) term/post.trm(ENHPS_OPEN):
+	The bold/italic support code has revealed a problem with PostScript
+	output. The core code assumes that passing a blank font name means
+	"keep the previous font" or at worst "use the default font". post.trm
+	failed to do this for some command sequences. Fix it in two places.
+	In term.c pass the previous font if we already know it.
+	In post.trm fall back to the default rather than place a blank
+	string in the ouput *.ps file.
+	Bug #1359
+
 2014-03-20  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/set.c src/term.c src/term_api.h src/util.c src/win/wgraph.c

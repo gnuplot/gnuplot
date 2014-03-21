@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.280 2014/03/18 20:46:31 juhaszp Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.281 2014/03/20 20:50:10 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -2671,7 +2671,7 @@ enhanced_recursion(
 		isitalic = (wasitalic || isitalic) && !isnormal;
 		isbold = (wasbold || isbold) && !isnormal;
 
-		styledfontname = stylefont(localfontname ? localfontname : "",
+		styledfontname = stylefont(localfontname ? localfontname : fontname,
 					    isbold, isitalic);
 
 		p = enhanced_recursion(p, TRUE, styledfontname, f, base,

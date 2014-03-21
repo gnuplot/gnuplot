@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: post.trm,v 1.279 2014/03/11 03:16:58 sfeam Exp $
+ * $Id: post.trm,v 1.280 2014/03/20 20:50:10 markisch Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -2502,8 +2502,10 @@ ENHPS_OPEN(
 	    int safelen = strlen(fontname) + 40;
 	    free(ENHps_opensequence);
 	    ENHps_opensequence = gp_alloc(safelen,"ENHPS_opensequence");
-	    /* EAM November 2007 - moved here from enhanced_recursion() */
-	    PS_RememberFont(fontname);
+	    if (!fontname || !*fontname)
+		fontname = ps_enh_font;
+	    else
+		PS_RememberFont(fontname);
 #ifdef HAVE_SNPRINTF
 	    snprintf(ENHps_opensequence, safelen, "[(%s) %.1f %.1f %s %s %d ",
 		    fontname, fontsize, base,
