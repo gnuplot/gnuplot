@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: parse.c,v 1.83 2014/02/28 19:23:52 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: parse.c,v 1.84 2014/03/10 01:28:37 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - parse.c */
@@ -1164,9 +1164,12 @@ check_for_iteration()
 	    int_error(c_token-1, errormsg);
 
 	iteration_current = iteration_start;
-	
-	empty_iteration = iteration_udv 
-	    && ((iteration_end - iteration_start) * iteration_increment < 0);
+
+	empty_iteration = FALSE;	
+	if ( (iteration_udv != NULL)
+	&&   ((iteration_end > iteration_start && iteration_increment < 0)
+	   || (iteration_end < iteration_start && iteration_increment > 0)))
+		empty_iteration = TRUE;
         
 	/* allocating a node of the linked list and initializing its fields */
 	/* iterating just once is the same as not iterating at all, 

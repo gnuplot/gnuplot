@@ -1,3 +1,10 @@
+2014-03-21  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/parse.c (check_for_iteration):  Replace an overly clever check
+	for empty iterations (end condition already satisfied) with one that
+	doesn't fail due to overflow of integer multiplication.
+	Bug #1358
+
 2014-03-20  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/set.c src/term.c src/term_api.h src/util.c src/win/wgraph.c
