@@ -1,8 +1,8 @@
 2014-03-21  Ethan A Merritt  <merritt@u.washington.edu>
 
-	* src/parse.c (check_for_iteration):  Replace an overly clever check
-	for empty iterations (end condition already satisfied) with one that
-	doesn't fail due to overflow of integer multiplication.
+	* src/parse.c (check_for_iteration next_iteration):
+	Replace overly clever checks for end condition already satisfied with
+	one that doesn't fail due to overflow of integer multiplication.
 	Bug #1358
 
 	* src/term.c (enhanced_recursion) term/post.trm(ENHPS_OPEN):
