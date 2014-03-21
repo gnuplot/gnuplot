@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: parse.c,v 1.66.2.4 2013/12/22 18:50:13 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: parse.c,v 1.66.2.5 2014/03/21 06:25:45 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - parse.c */
@@ -1083,7 +1083,7 @@ check_for_iteration()
 	&&   ((iteration_end > iteration_start && iteration_increment < 0)
 	   || (iteration_end < iteration_start && iteration_increment > 0)))
 		empty_iteration = TRUE;
-        
+
 	/* allocating a node of the linked list and initializing its fields */
 	/* iterating just once is the same as not iterating at all, 
 	 * so we skip building the node in that case */
@@ -1172,13 +1172,17 @@ next_iteration(t_iterator *iter)
     } else
 	this_iter->iteration_udv->udv_value.v.int_val = this_iter->iteration_current;
     
-    /* no need to check for increment <> 0 here, 
-     * because that case was already caught in check_for_iteration */
-    this_iter->done = 
-	!((this_iter->iteration_end - this_iter->iteration_current - this_iter->iteration_increment)
-	   * this_iter->iteration_increment >= 0);
+    /* Mar 2014 revised to avoid integer overflow */
+    if (this_iter->iteration_increment > 0
+    &&  this_iter->iteration_end - this_iter->iteration_current < this_iter->iteration_increment)
+	this_iter->done = TRUE;
+    else if (this_iter->iteration_increment < 0
+    &&  this_iter->iteration_end - this_iter->iteration_current > this_iter->iteration_increment)
+	this_iter->done = TRUE;
+    else
+	this_iter->done = FALSE;
     
-    /* We return false only if we're, erm, really done */
+    /* We return false only if we're, um, really done */
     this_iter = iter;
     while (this_iter) {
 	condition = condition || (!this_iter->done);
