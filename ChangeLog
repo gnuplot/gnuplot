@@ -15,6 +15,9 @@
 	* src/set.c (set_linestyle):  Dash type of newly created linetype should
 	by solid unless otherwise specified.
 
+	* src/misc.c:  Allow `black` as a colorspec or linetype, analogous to
+	`bgnd`.
+
 2014-03-21  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/parse.c (check_for_iteration next_iteration):

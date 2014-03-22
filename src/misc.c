@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.173 2014/03/17 21:38:22 juhaszp Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.174 2014/03/18 22:43:21 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -988,6 +988,9 @@ lp_parse(struct lp_style_type *lp, TBOOLEAN allow_ls, TBOOLEAN allow_point)
 		} else if (equals(c_token,"bgnd")) {
 		    *lp = background_lp;
 		    c_token++;
+		} else if (equals(c_token,"black")) {
+		    *lp = default_border_lp;
+		    c_token++;
 		} else {
 		    /* These replace the base style */
 		    new_lt = int_expression();
@@ -1025,6 +1028,10 @@ lp_parse(struct lp_style_type *lp, TBOOLEAN allow_ls, TBOOLEAN allow_point)
 		newlp.pm3d_color.type = TC_LT;
 		newlp.pm3d_color.lt = LT_BACKGROUND;
 		c_token++;
+	    } else if (equals(c_token,"black")) {
+		newlp.pm3d_color.type = TC_LT;
+		newlp.pm3d_color.lt = LT_BLACK;
+		c_token++;
 	    } else if (almost_equals(c_token, "var$iable")) {
 		c_token++;
 		newlp.l_type = LT_COLORFROMCOLUMN;
@@ -1059,6 +1066,14 @@ lp_parse(struct lp_style_type *lp, TBOOLEAN allow_ls, TBOOLEAN allow_point)
 		break;;
 	    c_token++;
 	    *lp = background_lp;
+	    continue;
+	}
+
+	if (equals(c_token,"black")) {
+	    if (set_lt++)
+		break;;
+	    c_token++;
+	    *lp = default_border_lp;
 	    continue;
 	}
 
@@ -1282,6 +1297,10 @@ parse_colorspec(struct t_colorspec *tc, int options)
 	c_token++;
 	tc->type = TC_LT;
 	tc->lt = LT_BACKGROUND;
+    } else if (equals(c_token,"black")) {
+	c_token++;
+	tc->type = TC_LT;
+	tc->lt = LT_BLACK;
     } else if (equals(c_token,"lt")) {
 	c_token++;
 	if (END_OF_COMMAND)

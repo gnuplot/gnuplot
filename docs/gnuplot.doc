@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.869 2014/03/22 19:35:23 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.870 2014/03/22 23:09:06 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -2310,6 +2310,8 @@ Ffigure_newsyntax
        palette cb <value>      # <val> lies within cbrange
        palette z
        variable                # color index is read from input file
+       bgnd                    # background color
+       black
 
  The "<n>" is the linetype number the color of which is used, see `test`.
 
@@ -2341,6 +2343,9 @@ Ffigure_newsyntax
  cbrange mapping of the palette. This allows smoothly-varying color along a
  3d line or surface. It also allows coloring 2D plots by palette values read
  from an extra column of data (not all 2D plot styles allow an extra column).
+=bgnd
+=black
+ There are two special color specifiers: `bgnd` for background color and `black`.
 4 background color
 ?background
 ?bgnd
