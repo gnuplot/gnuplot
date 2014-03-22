@@ -3,6 +3,15 @@
 	* docs/gnuplot.doc docs/doc2tex.c docs/titlepag.tex:
 	Update documentation New Features, Changes for version 5.
 
+	* src/plot.c (init_session) src/set.c (set_colorsequence) src/setshow.h
+	src/show.c src/tables.c src/tables.h src/term_api.h:
+	New command:
+		set colorsequence {default | classic | podo}
+	Built-in command to select one of the linetype color sequences provided
+	in .../share.  The default sequence is visibly changed from the old
+	red/green/blue ugliness, which should make users immediately aware that
+	the colors can be customized.
+
 2014-03-21  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/parse.c (check_for_iteration next_iteration):

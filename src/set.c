@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.438 2014/03/20 19:59:45 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.439 2014/03/20 20:50:10 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -232,6 +232,9 @@ set_command()
 	    break;
 	case S_CLIP:
 	    set_clip();
+	    break;
+	case S_COLORSEQUENCE:
+	    set_colorsequence(0);
 	    break;
 	case S_CNTRPARAM:
 	    set_cntrparam();
@@ -1264,6 +1267,52 @@ set_contour()
 	    int_error(c_token, "expecting 'base', 'surface', or 'both'");
 	c_token++;
     }
+}
+
+/* process 'set colorsequence command */
+void
+set_colorsequence(int option)
+{
+    unsigned long default_colors[] = DEFAULT_COLOR_SEQUENCE;
+    unsigned long podo_colors[] = PODO_COLOR_SEQUENCE;
+
+    if (option == 0) {	/* Read option from command line */
+	if (equals(++c_token, "default"))
+	    option = 1;
+	else if (equals(c_token, "podo"))
+	    option = 2;
+	else if (equals(c_token, "classic"))
+	    option = 3;
+	else
+	    int_error(c_token, "unrecognized color set");
+    }
+
+    if (option == 1 || option == 2) {
+	int i;
+	char *command;
+	char *command_template = "set linetype %2d lc rgb 0x%06x";
+	unsigned long *colors = default_colors;
+	if (option == 2)
+	    colors = podo_colors;
+	linetype_recycle_count = 8;
+	for (i = 1; i <= 8; i++) {
+	    command = gp_alloc(strlen(command_template)+8, "dynamic command"); 
+	    sprintf(command, command_template, i, colors[i-1]);
+	    do_string_and_free(command);
+	}
+
+    } else if (option == 3) {
+	struct linestyle_def *this;
+	for (this = first_perm_linestyle; this != NULL; this = this->next) {
+	    this->lp_properties.pm3d_color.type = TC_LT;
+	    this->lp_properties.pm3d_color.lt = this->tag-1;
+	}
+	linetype_recycle_count = 0;
+
+    } else {
+	int_error(c_token, "Expecting 'classic' or 'default'");
+    }
+    c_token++;
 }
 
 /* process 'set dashtype' command */

@@ -1,5 +1,5 @@
 /*
- * $Id: term_api.h,v 1.127 2014/03/17 21:38:22 juhaszp Exp $
+ * $Id: term_api.h,v 1.128 2014/03/20 20:50:10 markisch Exp $
  */
 
 /* GNUPLOT - term_api.h */
@@ -124,6 +124,11 @@ typedef struct lp_style_type {	/* contains all Line and Point properties */
 } lp_style_type;
 
 #define DEFAULT_LP_STYLE_TYPE {0, LT_BLACK, 0, DASHTYPE_SOLID, 0, 1.0, PTSZ_DEFAULT, 0, DEFAULT_COLORSPEC, DEFAULT_DASHPATTERN}
+
+#define DEFAULT_COLOR_SEQUENCE { 0x9400d3, 0x009e73, 0x56b4e9, 0xe69f00, \
+                                 0xf0e442, 0x0072b2, 0xe51e10, 0x000000 }
+#define PODO_COLOR_SEQUENCE { 0x000000, 0xe69f00, 0x56b4e9, 0x009e73, \
+                              0xf0e442, 0x0072b2, 0xd55e00, 0xcc79a7 }
 
 typedef enum e_arrow_head {
 	NOHEAD = 0,

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot.c,v 1.159 2013/12/17 00:49:52 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot.c,v 1.160 2014/01/04 02:55:05 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - plot.c */
@@ -732,9 +732,11 @@ init_session()
 	/* Undefine any previously-used variables */
 	del_udv_by_name("",TRUE);
 
-	/* HBB: make sure all variables start in the same mode 'reset'
-	 * would set them to. Since the axis variables aren't in
-	 * initialized arrays any more, this is now necessary...
+	/* Restore default colors before loadin local preferences */
+	set_colorsequence(1);
+
+	/* Make sure all variables start in the same state 'reset'
+	 * would set them to.
 	 */
 	reset_command();	/* FIXME: this does c_token++ */
 	load_rcfile(0);		/* System-wide gnuplotrc if configured */
