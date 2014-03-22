@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.867 2014/03/16 22:03:04 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.868 2014/03/20 21:14:42 markisch Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -51,8 +51,7 @@ C
     in addition to the base release version number,
    3. provide your name and address as the primary contact for the
     support of your modified version, and
-   4. retain our contact information in regard to use of the base
-    software.
+   4. retain our contact information in regard to use of the base software.
  Permission to distribute the released version of the source code along
  with corresponding source modifications in the form of a patch file is
  granted with same provisions 2 through 4 for binary distributions.
@@ -60,20 +59,15 @@ C
  This software is provided "as is" without express or implied warranty
  to the extent permitted by applicable law.
 
-
        AUTHORS
-
-       Original Software:
-          Thomas Williams,  Colin Kelley.
-
-       Gnuplot 2.0 additions:
-          Russell Lang, Dave Kotz, John Campbell.
-
-       Gnuplot 3.0 additions:
-          Gershon Elber and many others.
-
-       Gnuplot 4.0 and 5.0 additions:
-          See list of contributors at head of this document.
+               Original Software:
+                  Thomas Williams,  Colin Kelley.
+               Gnuplot 2.0 additions:
+                  Russell Lang, Dave Kotz, John Campbell.
+               Gnuplot 3.0 additions:
+                  Gershon Elber and many others.
+               Gnuplot 4.0 and 5.0 additions:
+                  See list of contributors at head of this document.
 2 Introduction
 ?introduction
 ?
@@ -104,10 +98,9 @@ C
  not ambiguous. Any number of commands may appear on a line, separated by
  semicolons (;). Strings may be set off by either single or double quotes,
  although there are some subtle differences.  See `syntax` and `quotes` for
- more details. Examples:
+ more details. Example:
 
-       load "filename"
-       cd 'dir'
+       set title "My First Plot";  plot 'data';  print "all done!"
 
  Commands may extend over several input lines by ending each line but the last
  with a backslash (\).  The backslash must be the _last_ character on each
@@ -197,37 +190,24 @@ C
  demonstrating the problem may be useful.  Function plots are preferable to
  datafile plots.
 
-2 New features
+2 New features in version 5
 ?new-features
- This section lists major additions introduced in this version and changes that
- may cause certain scripts written for earlier versions of gnuplot to behave
- differently.
 
- * Revised handling of input data containing NaN, inconsistent number of data
- columns, or other unexpected content.  See Note under `missing` for examples
- and figures.
-
- * Time coordinates are stored internally as the number of seconds relative to
- the standard unix epoch 1-Jan-1970.  Earlier versions of gnuplot used a
- different epoch internally (1-Jan-2000). This change resolves inconsistencies
- introduced whenever time in seconds was generated externally.  The epoch
- convention used by a particular gnuplot installation can be determined using
- the command `print strftime("%F",0)`.
+ * Text markup now supports bold and italic font settings in addition to 
+ subscript, superscript, font size and other previously available properties.
+ This mode is now the default. See `enhanced text`.
 
  * Interactive terminals support hypertext labels that only appear when the
  mouse hovers over the label's anchor point.
 
- * The `reverse` keyword of the `set [axis]range` command affects only
- autoscaling. It does not invert or otherwise alter the meaning of a command
- such as `set xrange [0:1]`.  If you want to reverse the direction of the
- x axis in such a case, say instead `set xrange [1:0]`.
-
  * New coordinate system (Degrees, Minutes, Seconds). See `set xdata geographic`.
 
  * The default format for axis labels is "% h" ("$%h$" for LaTeX terminals).
+ This format is like the C standard format %g except that the exponential term,
+ if present, is written using a superscript.  E.g. 1.2 x 10^5 rather than 1.2E05.
 
- * Command scripts may contain inline data that is loaded into a named
- data block for repeated plotting. See `inline data`.
+ * Command scripts may place in-line data in a named data block for repeated
+ plotting. See `inline data`.
 
  * Support for 32-bit Alpha channel + RGB color #AARRGGBB.  See `colorspec`.
 
@@ -239,22 +219,9 @@ C
  non-linear axis, something that previously was possible only for log scaling.
  See `set link`.
 
- * The `call` command is implemented by providing a set of variables ARGC,
- ARG0, ..., ARG9. ARG0 holds the name of the script file being executed.
- ARG1 to ARG9 are string variables and thus may either be referenced directly
- or expanded as macros, e.g. @ARG1.  The older convention for referencing
- call parameters as tokens $0 ... $9 is deprecated.
-
  * Each function in a plot command may optionally be preceded by a sampling
  range.  This does not affect the overall range of the plot, only the range
  over which this function is sampled.  See `plot` and `piecewise.dem`.
-
- * `unset xrange` (and other axis ranges) restores the original default range.
-
- * `unset terminal` restores the original terminal of the gnuplot session.
-
- * The optional bandwidth for the kernel density smoothing option is taken from
- a keyword rather than a data column.  See `smooth kdensity`.
 
  * If the external library libcerf is available, it is used to provide complex
  math routines cerf, cdawson, erfi, faddeeva, and the Voigt profile
@@ -264,6 +231,61 @@ C
  exported by an external shared object (support is operating-system dependent).
  A template header and example source and make files for creating a suitable
  external shared object are provided in the demo collection.
+
+ * Previous commands in the history list of an interactive session can be
+ reexecuted by number.  For example, `history !5` will reexecute the command
+ numbered 5 in the `history` list.
+3 New commands
+#start
+# history !N                               # re-execute prior command by number
+# import f(x) from "plugin.so"             # load function from shared library
+# plot <datafile> skip N                   # skip lines at start of ascii data file
+# plot ... smooth mcsplines                # monotonic cubic spline fit to data
+# plot ... with parallelaxes               # new plot style
+# reset session                            # restore initial state of current session
+# set arrow <tag> from <start> length <len> angle <ang>
+# set dashtype <tag> <dash-spec>           # user-defined dash patterns
+# set link x2 via f(x) inverse g(x)        # allows non-linear axis scaling
+# set fit quiet|results|brief|verbose      # control the amount of fit output
+# set multiplot next|previous              # out-of-order plotting to an autolayout
+# set contours; splot ... with labels      # label contour lines with numeric values
+# set style textbox                        # text elements can be enclosed in a box
+#end
+
+2 Changes in version 5
+?changes
+ These changes introduced in version 5 may cause certain scripts written
+ for earlier versions of gnuplot to behave differently.
+
+ * Revised handling of input data containing NaN, inconsistent number of data
+ columns, or other unexpected content.  See Note under `missing` for examples
+ and figures.
+
+ * Time coordinates are stored internally as the number of seconds relative to
+ the standard unix epoch 1-Jan-1970.  Earlier versions of gnuplot used a
+ different epoch internally (1-Jan-2000). This change resolves inconsistencies
+ introduced whenever time in seconds was generated externally.  The epoch
+ convention used by a particular gnuplot installation can be determined using
+ the command `print strftime("%F",0)`.  Time is now stored to at least
+ millisecond precision.
+
+ * The `reverse` keyword of the `set [axis]range` command affects only
+ autoscaling. It does not invert or otherwise alter the meaning of a command
+ such as `set xrange [0:1]`.  If you want to reverse the direction of the
+ x axis in such a case, say instead `set xrange [1:0]`.
+
+ * The `call` command is implemented by providing a set of variables ARGC,
+ ARG0, ..., ARG9. ARG0 holds the name of the script file being executed.
+ ARG1 to ARG9 are string variables and thus may either be referenced directly
+ or expanded as macros, e.g. @ARG1.  The older convention for referencing
+ call parameters as tokens $0 ... $9 is deprecated.
+
+ * The optional bandwidth for the kernel density smoothing option is taken from
+ a keyword rather than a data column.  See `smooth kdensity`.
+
+ * `unset xrange` (and other axis ranges) restores the original default range.
+
+ * `unset terminal` restores the original terminal of the gnuplot session.
 
 2 Deprecated syntax
 ?deprecated syntax
@@ -282,7 +304,7 @@ C
        set title TITLE offset char 0, char -1
        set style data linespoints
        plot 1 linetype 2 pointtype 4
- Deprecated but in version 5 if configured --enable-backwards-compatibility
+ Deprecated but present in version 5 if configured --enable-backwards-compatibility
        if (defined(VARNAME)) ...
        set style increment user
        plot 'file' thru f(x)
@@ -561,6 +583,8 @@ C
 2 Enhanced text mode
 ?enhanced text
 ?enhanced
+?text_markup
+?markup
  Many terminal types support an enhanced text mode in which additional
  formatting information is embedded in the text string.  For example, "x^2"
  will write x-squared as we are used to seeing it, with a superscript 2.
@@ -626,14 +650,13 @@ C
 ^</tbody>
 ^</table>
 
- The markup control characers act on a single following character or on the
- content of a following bracketed clause. The clause in brackets may contain
- a string of characters with no additional markup, e.g. 2^{10}, or it may
- contain additional markup that changes font properties. This example
- illustrates nesting one bracketed clause inside another to produce a
- boldface A with an italic subscript i, all in the current font. If the
- clause introduced by :Normal were omitted the subscript woult be both 
- italic and boldface.
+ The markup control characers act on the following single character or
+ bracketed clause. The bracketed clause may contain a string of characters with
+ no additional markup, e.g. 2^{10}, or it may contain additional markup that
+ changes font properties. This example illustrates nesting one bracketed clause
+ inside another to produce a boldface A with an italic subscript i, all in the
+ current font. If the clause introduced by :Normal were omitted the subscript
+ would be both italic and boldface.
       {/:Bold A_{/:Normal{/:Italic i}}}
  Font specifiers MUST be preceeded by a '/' character that immediately follows
  the opening '{'.
@@ -667,39 +690,37 @@ C
  special syntax within either string.  You can, of course, use control
  characters by escaping them (see below), such as '~a{\^}'
 
- You can access special symbols numerically by specifying \character-code (in
- octal), e.g., {/Symbol \245} is the symbol for infinity. This does not work
- for multibyte encodings like UTF-8, however.  In a UTF-8 environment, you
- should be able to enter multibyte sequences implicitly by typing or otherwise
- selecting the character you want.
+ You can specify special symbols numerically by giving a character code in
+ octal, e.g. {/Symbol \245} is the symbol for infinity in the Adobe Symbol font.
+ This does not work for multibyte encodings like UTF-8, however.  In a UTF-8
+ environment, you should be able to enter multibyte sequences implicitly by
+ typing or otherwise selecting the character you want.
 
  You can escape control characters using \, e.g.,  \\, \{, and so on.
 
- But be aware that strings in double-quotes are parsed differently than those
- enclosed in single-quotes.  The major difference is that backslashes may need
- to be doubled when in double-quoted strings.
+ Note that strings in double-quotes are parsed differently than those enclosed
+ in single-quotes.  The major difference is that backslashes may need to be
+ doubled when in double-quoted strings.
 
  The file "ps_guide.ps" in the /docs/psdoc subdirectory of the gnuplot source
- distribution contains more examples of the enhanced syntax, as does the
+ distribution contains more examples of the enhanced syntax, as does the demo
 ^ <a href="http://www.gnuplot.info/demo/enhanced_utf8.html">
- demo script `enhanced_utf8.dem`
+ `enhanced_utf8.dem`
 ^ </a>
 2 Environment
 ?environment
  A number of shell environment variables are understood by `gnuplot`.  None of
  these are required, but may be useful.
 
- If GNUTERM is defined, it is used as the name of the terminal type to be
- used.  This overrides any terminal type sensed by `gnuplot` on start-up, but
- is itself overridden by the .gnuplot (or equivalent) start-up file
- (see `startup`) and, of course, by later explicit changes.
+ GNUTERM, if defined, is used as the default terminal type on start-up.
+ This can be overridden by the ~/.gnuplot (or equivalent) start-up file
+ (see `startup`) and of course by later explicit `set term` commands.
 
  GNUHELP may be defined to be the pathname of the HELP file (gnuplot.gih).
 
  On VMS, the logical name GNUPLOT$HELP should be defined as the name of the
- help library for `gnuplot`.  The `gnuplot` help can be put inside any system
- help library, allowing access to help from both within and outside `gnuplot`
- if desired.
+ help library for `gnuplot`.  The `gnuplot` help can be put inside any VMS
+ system help library.
 
  On Unix, HOME is used as the name of a directory to search for a .gnuplot
  file if none is found in the current directory.  On MS-DOS, Windows and OS/2,
@@ -785,10 +806,8 @@ C
  omit either beg or end from the function call.
 3 Functions
 ?expressions functions
- The math functions in `gnuplot` are the same as the corresponding functions in
- the Unix math library, except that all functions accept integer, real, and
- complex arguments unless otherwise noted.
- Functions that accept or return angles (e.g. sin(x), cos(x), arg(z))
+ Arguments to math functions in `gnuplot` can be integer, real, or complex
+ unless otherwise noted.  Functions that accept or return angles (e.g. sin(x))
  treat angle values as radians, but this may be changed to degrees using the
  command `set angles`.
 
@@ -2056,14 +2075,19 @@ C ... and restart the table:
  handling, the details of which unfortunately vary from one terminal type to
  another. Brief documentation of font mechanisms that apply to more than one
  terminal type is given here. For information on font use by other individual
- terminals, see the documentation for that terminal.
+ terminals, see the documentation for that terminal. 
+
+ Although it is possible to include non-alphabetic symbols by temporarily
+ switching to a special font, e.g. the Adobe Symbol font, the preferred method
+ is now to specify the unicode entry point for the desired symbols using their
+ UTF-8 encoding.  See `encoding` and `locale`.
+
 3 cairo (pdfcairo, pngcairo, epscairo, wxt terminals)
 ?fonts cairo
 =fonts
 =pdf
 =png
 =wxt
- Sorry, this section is under construction.
  These terminals find and access fonts using the external fontconfig tool set.
  Please see the
 ^ <a href="http://fontconfig.org/fontconfig-user.html">
@@ -2535,21 +2559,19 @@ Ffigure_newsyntax
 
 2 Plotting
 ?plotting
- There are three `gnuplot` commands which actually create a plot: `plot`,
- `splot` and `replot`.  `plot` generates 2D plots, `splot` generates 3D
- plots (actually 2D projections, of course), and `replot` appends its
+ There are four `gnuplot` commands which actually create a plot: `plot`,
+ `splot`, `replot`, and `refresh`.  `plot` generates 2D plots, `splot` generates
+ 3D plots (actually 2D projections, of course), and `replot` appends its
  arguments to the previous `plot` or `splot` and executes the modified
- command.
+ command.  `refresh` reexecutes the previous `plot` or `splot` command using
+ previously stored data rather than rereading data from a file.
 
  Much of the general information about plotting can be found in the discussion
  of `plot`; information specific to 3D can be found in the `splot` section.
 
- `plot` operates in either rectangular or polar coordinates -- see `set polar`
- for details of the latter.  `splot` operates only in rectangular coordinates,
- but the `set mapping` command allows for a few other coordinate systems to be
- treated.  In addition, the `using` option allows both `plot` and `splot` to
- treat almost any coordinate system you'd care to define.
-
+ `plot` operates in either rectangular or polar coordinates -- see `set polar`.
+ `splot` operates in Cartesian coordinates, but will accept azimuthal or 
+ cylindrical coordinates on input. See `set mapping`.
 =axes
  `plot` also lets you use each of the four borders -- x (bottom), x2 (top), y
  (left) and y2 (right) -- as an independent axis.  The `axes` option lets you

@@ -1,3 +1,8 @@
+2014-03-22  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* docs/gnuplot.doc docs/doc2tex.c docs/titlepag.tex:
+	Update documentation New Features, Changes for version 5.
+
 2014-03-21  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/parse.c (check_for_iteration next_iteration):

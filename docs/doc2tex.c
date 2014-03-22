@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: doc2tex.c,v 1.24 2011/10/13 17:45:43 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: doc2tex.c,v 1.25 2013/06/01 00:12:26 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - doc2tex.c */
@@ -200,11 +200,17 @@ process_line( char *line, FILE *b)
 	    if (intable)
 		(void) fputs(line + 1, b);	/* copy directly */
 	    else {
-		// fprintf(stderr, "warning: # line found outside of table\n");
-		// fprintf(stderr, "%s\n", line + 11);
-		(void) fputs(line + 1, b);	/* copy directly */
+		/* Itemized list outside of table */
+		if (line[1] == 's')
+		    (void) fputs("\\begin{itemize}\\setlength{\\itemsep}{0pt}\n", b);
+		else if (line[1] == 'e')
+		    (void) fputs("\\end{itemize}\n", b);
+		else {
+		    if (strchr(line, '\n'))
+			*(strchr(line, '\n')) = '\0';
+		    fprintf(b, "\\item\n\\begin{verbatim}%s\\end{verbatim}\n", line + 1);
+		}
 	    }
-
 	    break;
 	}
     case '^':{			/* external link escape */
