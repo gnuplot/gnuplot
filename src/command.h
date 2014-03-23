@@ -1,5 +1,5 @@
 /*
- * $Id: command.h,v 1.63 2013/12/28 21:53:58 sfeam Exp $
+ * $Id: command.h,v 1.64 2014/02/28 00:24:20 sfeam Exp $
  */
 
 /* GNUPLOT - command.h */
@@ -80,6 +80,7 @@ extern int paused_for_mouse;	/* Flag the end condition we are paused until */
 
 /* output file for the print command */
 extern FILE *print_out;
+extern struct udvt_entry * print_out_var;
 extern char *print_out_name;
 
 extern struct udft_entry *dummy_func;
@@ -204,7 +205,7 @@ void define __PROTO((void));
 
 void replotrequest __PROTO((void)); /* used in command.c & mouse.c */
 
-void print_set_output __PROTO((char *, TBOOLEAN)); /* set print output file */
+void print_set_output __PROTO((char *, TBOOLEAN, TBOOLEAN)); /* set print output file */
 char *print_show_output __PROTO((void)); /* show print output file */
 
 /* Activate/deactive effects of 'set view map' before 'splot'/'plot',

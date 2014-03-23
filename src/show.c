@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.316 2014/03/22 23:09:06 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.317 2014/03/23 12:17:59 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -2073,7 +2073,10 @@ show_print()
 {
     SHOW_ALL_NL;
 
-    fprintf(stderr, "\tprint output is sent to '%s'\n", print_show_output());
+    if (print_out_var == NULL)
+	fprintf(stderr, "\tprint output is sent to '%s'\n", print_show_output());
+    else
+	fprintf(stderr, "\tprint output is saved to datablock %s\n", print_show_output());
 }
 
 /* process 'show print' command */

@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.870 2014/03/22 23:09:06 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.871 2014/03/23 03:03:07 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -11085,14 +11085,17 @@ Ffigure_missing
  Syntax:
        set print
        set print "-"
-       set print "<filename>"
-       set print "<filename>" append
+       set print "<filename>" [append]
        set print "|<shell_command>"
+       set print $datablock [append]
 
  Without "<filename>", the output file is restored to <STDERR>.  The <filename>
  "-" means <STDOUT>. The `append` flag causes the file to be opened in append
  mode.  A <filename> starting with "|" is opened as a pipe to the
  <shell_command> on platforms that support piping.
+
+ The destination for `print` commands can also be a named data block. Data
+ block names start with '$', see also `inline data`.
 3 psdir
 ?commands set psdir
 ?commands show psdir

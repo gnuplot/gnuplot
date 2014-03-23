@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.280 2014/02/28 00:24:20 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.281 2014/02/28 19:23:52 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -178,6 +178,7 @@ TBOOLEAN replot_disabled = FALSE;
 
 /* output file for the print command */
 FILE *print_out = NULL;
+struct udvt_entry *print_out_var = NULL;
 char *print_out_name = NULL;
 
 /* input data, parsing variables */
@@ -1563,7 +1564,7 @@ plot_command()
 
 
 void
-print_set_output(char *name, TBOOLEAN append_p)
+print_set_output(char *name, TBOOLEAN datablock, TBOOLEAN append_p)
 {
     if (print_out && print_out != stderr && print_out != stdout) {
 #ifdef PIPES
@@ -1576,23 +1577,22 @@ print_set_output(char *name, TBOOLEAN append_p)
 		perror(print_out_name);
     }
 
-    if (print_out_name)
-	free(print_out_name);
-
+    free(print_out_name);
     print_out_name = NULL;
 
     if (! name) {
 	print_out = stderr;
+	print_out_var = NULL;
 	return;
     }
 
-    if (! strcmp(name, "-")) {
+    if (strcmp(name, "-") == 0) {
 	print_out = stdout;
 	return;
     }
 
 #ifdef PIPES
-    if (name[0]=='|') {
+    if (name[0] == '|') {
 	restrict_popen();
 	print_out = popen(name + 1, "w");
 	if (!print_out)
@@ -1603,10 +1603,29 @@ print_set_output(char *name, TBOOLEAN append_p)
     }
 #endif
 
-    print_out = fopen(name, append_p ? "a" : "w");
-    if (!print_out) {
-	perror(name);
-	return;
+    if (!datablock) {
+	print_out = fopen(name, append_p ? "a" : "w");
+	if (!print_out) {
+	    perror(name);
+	    return;
+	}
+    } else {
+	print_out_var = add_udv_by_name(name);
+	if (print_out_var == NULL) {
+	    fprintf(stderr, "Error allocating datablock \"%s\"\n", name);
+	    return;
+	}
+	if (!print_out_var->udv_undef) {
+	    gpfree_string(&print_out_var->udv_value);
+	    if (!append_p)
+		gpfree_datablock(&print_out_var->udv_value);
+	    if (print_out_var->udv_value.type != DATABLOCK)
+	        print_out_var->udv_value.v.data_array = NULL;
+	} else {
+	    print_out_var->udv_value.v.data_array = NULL;
+	}
+	print_out_var->udv_value.type = DATABLOCK;
+	print_out_var->udv_undef = FALSE;
     }
 
     print_out_name = name;
@@ -1615,12 +1634,15 @@ print_set_output(char *name, TBOOLEAN append_p)
 char *
 print_show_output()
 {
-    if (print_out==stdout)
+    if (print_out_name)
+	return print_out_name;
+    if (print_out == stdout)
 	return "<stdout>";
-    if (!print_out || print_out==stderr || !print_out_name)
+    if (!print_out || print_out == stderr || !print_out_name)
 	return "<stderr>";
     return print_out_name;
 }
+
 
 /* process the 'print' command */
 void
@@ -1629,36 +1651,59 @@ print_command()
     struct value a;
     /* space printed between two expressions only */
     int need_space = 0;
+    char *dataline = NULL;
+    size_t size = 256;
 
-    if (!print_out) {
+    if (!print_out)
 	print_out = stderr;
+    if (print_out_var != NULL) { /* print to datablock */
+	dataline = (char *) gp_alloc(size, "dataline");
+	*dataline = NUL;
     }
     screen_ok = FALSE;
     do {
 	++c_token;
-	if (equals(c_token,"$") && isletter(c_token+1)) {
+	if (equals(c_token, "$") && isletter(c_token+1)) {
 	    char **line = get_datablock(parse_datablock_name());
 	    while (line && *line) {
-		fprintf(print_out, "%s\n", *line);
+		if (print_out_var != NULL)
+		    append_to_datablock(&print_out_var->udv_value, strdup(*line));
+		else
+		    fprintf(print_out, "%s\n", *line);
 		line++;
 	    }
 	    continue;
 	}
 	const_express(&a);
 	if (a.type == STRING) {
-	    fputs(a.v.string_val, print_out);
+	    if (dataline)
+		strappend(&dataline, &size, a.v.string_val);
+	    else
+		fputs(a.v.string_val, print_out);
 	    gpfree_string(&a);
 	    need_space = 0;
 	} else {
 	    if (need_space)
-		putc(' ', print_out);
-	    disp_value(print_out, &a, FALSE);
+		if (dataline)
+		    strappend(&dataline, &size, " ");
+		else
+		    putc(' ', print_out);
+	    if (dataline) {
+		char * val = value_to_str(&a, FALSE);
+		strappend(&dataline, &size, val);
+	    } else {
+		disp_value(print_out, &a, FALSE);
+	    }
 	    need_space = 1;
 	}
     } while (!END_OF_COMMAND && equals(c_token, ","));
 
-    (void) putc('\n', print_out);
-    fflush(print_out);
+    if (dataline)
+	append_to_datablock(&print_out_var->udv_value, dataline);
+    else {
+	(void) putc('\n', print_out);
+	fflush(print_out);
+    }
 }
 
 

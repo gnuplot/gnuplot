@@ -1,3 +1,20 @@
+2014-03-23 Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/command.c src/command.h src/datablock.c src/datablock.h 
+	src/set.c src/show.c src/unset.c docs/gnuplot.doc demo/ellipse.dem
+	demo/fitmulti.dem demo/gen-random.inc demo/rugplot.dem:
+	Implement 'set print $datablock' which redirects 'print' output to
+	an in-memory datablock.
+	Patch #662
+
+	* src/setshow.h src/show.c src/util.c src/util.h:  Factor out
+	new routine value_to_str() which returns a string representation
+	of a struct value from disp_value().
+
+	* demo/tango_colors.dem:  set linetype cycle.
+
+	* docs/plotstyles.gnu:  Encoding is utf8.
+
 2014-03-22  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* docs/gnuplot.doc docs/doc2tex.c docs/titlepag.tex:

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.440 2014/03/22 23:09:06 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.441 2014/03/23 00:34:44 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -47,6 +47,7 @@ static char *RCSid() { return RCSid("$Id: set.c,v 1.440 2014/03/22 23:09:06 sfea
 #include "command.h"
 #include "contour.h"
 #include "datafile.h"
+#include "datablock.h"
 #include "fit.h"
 #include "gadgets.h"
 #include "gp_hist.h"
@@ -3014,8 +3015,20 @@ set_print()
 
     c_token++;
     if (END_OF_COMMAND) {	/* no file specified */
-	print_set_output(NULL, append_p);
-    } else if ((testfile = try_to_get_string())) {
+	print_set_output(NULL, FALSE, append_p);
+    } else if (equals(c_token, "$") && isletter(c_token + 1)) { /* datablock */
+	/* NB: has to come first because try_to_get_string will choke on the datablock name */
+	char * datablock_name = strdup(parse_datablock_name());
+	if (!END_OF_COMMAND) {
+	    if (equals(c_token, "append")) {
+		append_p = TRUE;
+		c_token++;
+	    } else {
+		int_error(c_token, "expecting keyword \'append\'");
+	    }
+	}
+	print_set_output(datablock_name, TRUE, append_p);
+    } else if ((testfile = try_to_get_string())) {  /* file name */
 	gp_expand_tilde(&testfile);
 	if (!END_OF_COMMAND) {
 	    if (equals(c_token, "append")) {
@@ -3025,9 +3038,9 @@ set_print()
 		int_error(c_token, "expecting keyword \'append\'");
 	    }
 	}
-	print_set_output(testfile, append_p);
+	print_set_output(testfile, FALSE, append_p);
     } else
-	int_error(c_token, "expecting filename");
+	int_error(c_token, "expecting filename or datablock");
 }
 
 /* process 'set psdir' command */
