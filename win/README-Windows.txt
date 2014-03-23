@@ -1,4 +1,4 @@
-This is gnuplot version 4.6 patchlevel 0 -- binary distribution for Windows
+This is gnuplot version 5.0 alpha -- binary distribution for Windows
 ===========================================================================
 
 gnuplot is a command-line driven interactive function plotting utility
