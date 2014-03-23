@@ -7,13 +7,18 @@
 	an in-memory datablock.
 	Patch #662
 
-	* src/setshow.h src/show.c src/util.c src/util.h:  Factor out
-	new routine value_to_str() which returns a string representation
-	of a struct value from disp_value().
+	* src/setshow.h src/show.c src/util.c src/util.h:  Factor out new
+	routine value_to_str() which returns a string representation of a
+	struct value from disp_value().
 
 	* demo/tango_colors.dem:  set linetype cycle.
 
 	* docs/plotstyles.gnu:  Encoding is utf8.
+
+	* src/win/wcommon.h src/win/wgraph.c:  Fix const-ness for
+	enhanced_recursion().
+
+	* src/util.c (gprintf):  Skip leading zeroes of negative exponents.
 
 2014-03-22  Ethan A Merritt  <merritt@u.washington.edu>
 
