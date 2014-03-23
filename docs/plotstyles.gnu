@@ -29,6 +29,8 @@ demo = "../demo/"
 if (GPVAL_TERM eq "pngcairo" || GPVAL_TERM eq "png") ext=".png"
 if (GPVAL_TERM eq "pdfcairo" || GPVAL_TERM eq "pdf") ext=".pdf"
 
+set encoding utf8
+
 #
 # Line and point type plots  (same data plotted)
 # ==============================================
