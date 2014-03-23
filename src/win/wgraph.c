@@ -1,5 +1,5 @@
 /*
- * $Id: wgraph.c,v 1.179 2014/03/15 04:23:28 markisch Exp $
+ * $Id: wgraph.c,v 1.180 2014/03/20 20:50:10 markisch Exp $
  */
 
 /* GNUPLOT - win/wgraph.c */
@@ -1232,9 +1232,9 @@ GraphEnhancedFlush(void)
 
 
 int
-draw_enhanced_text(LPGW lpgw, HDC hdc, LPRECT rect, int x, int y, char * str)
+draw_enhanced_text(LPGW lpgw, HDC hdc, LPRECT rect, int x, int y, const char * str)
 {
-	char * original_string = str;
+	const char * original_string = str;
 	unsigned int pass, num_passes;
 	struct termentry *tsave;
 	char save_fontname[MAXFONTNAME];
@@ -1302,7 +1302,7 @@ draw_enhanced_text(LPGW lpgw, HDC hdc, LPRECT rect, int x, int y, char * str)
 		 * closing brace in the string. We increment past it (else
 		 * we get stuck in an infinite loop) and try again.
 		 */
-		while (*(str = enhanced_recursion((char *)str, TRUE,
+		while (*(str = enhanced_recursion(str, TRUE,
 				save_fontname, save_fontsize,
 				0.0, TRUE, TRUE, 0))) {
 			GraphEnhancedFlush();
