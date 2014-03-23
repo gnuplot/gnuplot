@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.315 2014/03/17 20:47:13 juhaszp Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.316 2014/03/22 23:09:06 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -3417,65 +3417,7 @@ show_ticdef(AXIS_INDEX axis)
 void
 disp_value(FILE *fp, struct value *val, TBOOLEAN need_quotes)
 {
-    switch (val->type) {
-    case INTGR:
-	fprintf(fp, "%d", val->v.int_val);
-	break;
-    case CMPLX:
-	if (isnan(val->v.cmplx_val.real))
-	    fprintf(fp, "NaN");
-	else if (val->v.cmplx_val.imag != 0.0)
-	    fprintf(fp, "{%s, %s}",
-		    num_to_str(val->v.cmplx_val.real),
-		    num_to_str(val->v.cmplx_val.imag));
-	else
-	    fprintf(fp, "%s",
-		    num_to_str(val->v.cmplx_val.real));
-	break;
-    case STRING:
-    	if (val->v.string_val) {
-	    if (need_quotes)
-		fprintf(fp, "\"%s\"", conv_text(val->v.string_val));
-	    else
-		fprintf(fp, "%s", val->v.string_val);
-	}
-	break;
-    case DATABLOCK:
-	{
-	char **dataline = val->v.data_array;
-	int nlines = 0;
-	if (dataline)
-	    while (*dataline++)
-		nlines++;
-	fprintf(fp, "<%d line data block>", nlines);
-	break;
-	}
-    default:
-	int_error(NO_CARET, "unknown type in disp_value()");
-    }
-}
-
-/* Helper for disp_value(): display a single number in decimal
- * format. Rotates through 4 buffers 's[j]', and returns pointers to
- * them, to avoid execution ordering problems if this function is
- * called more than once between sequence points. */
-char *
-num_to_str(double r)
-{
-    static int i = 0;
-    static char s[4][25];
-    int j = i++;
-
-    if (i > 3)
-	i = 0;
-
-    sprintf(s[j], "%.15g", r);
-    if (strchr(s[j], '.') == NULL &&
-	strchr(s[j], 'e') == NULL &&
-	strchr(s[j], 'E') == NULL)
-	strcat(s[j], ".0");
-
-    return s[j];
+    fprintf(fp, "%s", value_to_str(val, need_quotes));
 }
 
 

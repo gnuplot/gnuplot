@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: util.c,v 1.120 2014/03/03 01:27:55 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: util.c,v 1.121 2014/03/20 20:50:10 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - util.c */
@@ -44,6 +44,7 @@ static char *RCSid() { return RCSid("$Id: util.c,v 1.120 2014/03/03 01:27:55 bro
 #include "plot.h"
 #include "term_api.h"		/* for term_end_plot() used by graph_error(), also to detect enhanced mode */
 #include "variable.h" /* For locale handling */
+#include "setshow.h"		/* for conv_text() */
 
 #if defined(HAVE_DIRENT_H)
 # include <sys/types.h>
@@ -1492,6 +1493,7 @@ gp_strchrn(const char *s, int N)
 	return (char *)&s[N];
 }
 
+
 /* TRUE if strings a and b are identical save for leading or trailing whitespace */
 TBOOLEAN
 streq(const char *a, const char *b)
@@ -1513,3 +1515,113 @@ streq(const char *a, const char *b)
 
     return (enda == endb) ? !strncmp(a,b,++enda) : FALSE;
 }
+
+
+/* append string src to dest, re-allocate memory if necessary */
+char *
+strappend(char **dest, size_t *size, char *src)
+{
+    if (strlen(*dest) + strlen(src) + 1 > *size) {
+	*size *= 2;
+	*dest = (char *) gp_realloc(*dest, *size, "strappend");
+    }
+    strcat(*dest, src);
+    return *dest;
+}
+
+
+/* convert a struct value to a string */
+char *
+value_to_str(struct value *val, TBOOLEAN need_quotes)
+{
+    static int i = 0;
+    static char * s[4] = {NULL, NULL, NULL, NULL};
+    static size_t c[4] = {0, 0, 0, 0};
+    static const int minbufsize = 54;
+    int j = i;
+
+    i = (i + 1) % 4;
+    if (s[j] == NULL) {
+	s[j] = (char *) gp_alloc(minbufsize, "value_to_str");
+	if (s[j] == NULL) 
+	    int_error(NO_CARET, "out of memory");
+	c[j] = minbufsize;
+    }
+
+    switch (val->type) {
+    case INTGR:
+	sprintf(s[j], "%d", val->v.int_val);
+	break;
+    case CMPLX:
+	if (isnan(val->v.cmplx_val.real))
+	    sprintf(s[j], "NaN");
+	else if (val->v.cmplx_val.imag != 0.0)
+	    sprintf(s[j], "{%s, %s}",
+	            num_to_str(val->v.cmplx_val.real),
+	            num_to_str(val->v.cmplx_val.imag));
+	else
+	    return num_to_str(val->v.cmplx_val.real);
+	break;
+    case STRING:
+	if (val->v.string_val) {
+	    if (!need_quotes) {
+		return val->v.string_val;
+	    } else {
+		char * cstr = conv_text(val->v.string_val);
+		size_t reqsize = strlen(cstr) + 3;
+		if (reqsize > c[j])
+		    s[j] = (char *) gp_realloc(s[j], reqsize + 20, "value_to_str");
+		if (s[j] != NULL) {
+		    c[j] = reqsize + 20;
+		    sprintf(s[j], "\"%s\"", cstr);
+		} else {
+		    c[j] = 0;
+		    int_error(NO_CARET, "out of memory");
+		}
+	    }
+	} else {
+	    s[j][0] = NUL;
+	}
+	break;
+    case DATABLOCK:
+	{
+	char **dataline = val->v.data_array;
+	int nlines = 0;
+	if (dataline != NULL) {
+	    while (*dataline++ != NULL)
+		nlines++;
+	}
+	sprintf(s[j], "<%d line data block>", nlines);
+	break;
+	}
+    default:
+	int_error(NO_CARET, "unknown type in value_to_str()");
+    }
+
+    return s[j];
+}
+
+
+/* Helper for value_to_str(): convert a single number to decimal
+ * format. Rotates through 4 buffers 's[j]', and returns pointers to
+ * them, to avoid execution ordering problems if this function is
+ * called more than once between sequence points. */
+char *
+num_to_str(double r)
+{
+    static int i = 0;
+    static char s[4][25];
+    int j = i++;
+
+    if (i > 3)
+	i = 0;
+
+    sprintf(s[j], "%.15g", r);
+    if (strchr(s[j], '.') == NULL &&
+	strchr(s[j], 'e') == NULL &&
+	strchr(s[j], 'E') == NULL)
+	strcat(s[j], ".0");
+
+    return s[j];
+}
+
