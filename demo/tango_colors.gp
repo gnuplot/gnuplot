@@ -9,3 +9,5 @@ set linetype 5 lc rgb "#3465a4" lw 2 # Sky Blue
 set linetype 6 lc rgb "#c17d11" lw 2 # Chocolate
 set linetype 7 lc rgb "#555753" lw 2 # Aluminum 5
 set linetype 8 lc rgb "#f57900" lw 2 # Orange
+set linetype cycle 8
+
