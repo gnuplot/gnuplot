@@ -6,6 +6,7 @@ New features, changes and fixes in gnuplot version 4.6.6
 * FIX Faster recovery from outboard server gnuplot_qt being killed
 * FIX get rid of O(N^2) memory allocation for string data in long input lines
 * FIX large integers in iteration spec could cause overflow end condition check
+* FIX object fillcolors should be consistent with the color of current linetypes
 
 
 New features, changes and fixes in gnuplot version 4.6.5

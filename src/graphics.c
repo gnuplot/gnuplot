@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.379.2.25 2013/10/22 03:41:13 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.379.2.27 2014/01/04 00:16:15 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -1450,6 +1450,7 @@ place_objects(struct object *listhead, int layer, int dimensions)
     for (this_object = listhead; this_object != NULL; this_object = this_object->next) {
 	struct lp_style_type lpstyle;
 	struct fill_style_type *fillstyle;
+	double border_width;
     
 	if (this_object->layer != layer)
 	    continue;
@@ -1460,6 +1461,10 @@ place_objects(struct object *listhead, int layer, int dimensions)
 	    lpstyle = default_rectangle.lp_properties;
 	else
 	    lpstyle = this_object->lp_properties;
+	border_width = lpstyle.l_width;
+	if (lpstyle.pm3d_color.type == TC_LT)
+	    load_linetype(&lpstyle, lpstyle.pm3d_color.lt + 1);
+	lpstyle.l_width = border_width;
 	
 	if (this_object->fillstyle.fillstyle == FS_DEFAULT
 	    && this_object->object_type == OBJ_RECTANGLE)
@@ -5945,24 +5950,32 @@ do_rectangle( int dimensions, t_object *this_object, int style )
 	if (w == 0 || h == 0)
 	    return;
 
+	/* First the fill color */
 	if (this_object->lp_properties.l_type == LT_DEFAULT)
 	    lpstyle = default_rectangle.lp_properties;
 	else
 	    lpstyle = this_object->lp_properties;
-	if (lpstyle.l_width > 0)
-	    lpstyle.l_width = this_object->lp_properties.l_width;
 	
 	if (this_object->fillstyle.fillstyle == FS_DEFAULT)
 	    fillstyle = &default_rectangle.fillstyle;
 	else
 	    fillstyle = &this_object->fillstyle;
 
+	if (lpstyle.pm3d_color.type == TC_LT)
+	    load_linetype(&lpstyle, lpstyle.pm3d_color.lt + 1);
+	if (lpstyle.l_width > 0)
+	    lpstyle.l_width = this_object->lp_properties.l_width;
 	term_apply_lp_properties(&lpstyle);
-	style = style_from_fill(fillstyle);
 
+	style = style_from_fill(fillstyle);
 	if (style != FS_EMPTY && term->fillbox)
 		(*term->fillbox) (style, x, y, w, h);
 
+	/* Now the border */
+	if (this_object->lp_properties.l_type == LT_DEFAULT)
+	    lpstyle = default_rectangle.lp_properties;
+	else
+	    lpstyle = this_object->lp_properties;
 	if (need_fill_border(fillstyle)) {
 	    (*term->move)   (x, y);
 	    (*term->vector) (x, y+h);
