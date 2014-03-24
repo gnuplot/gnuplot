@@ -1,3 +1,9 @@
+2014-03-24  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/graphics.c (place_objects do_rectangle): When fillcolor for an
+	objects is given as a linecolor it should be interpreted as referring
+	to a current linetype.
+
 2014-03-23 Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/command.c src/command.h src/datablock.c src/datablock.h 
