@@ -6,6 +6,8 @@
 
 	* src/command.c: clean up to remove compiler warnings.
 
+	* term/emf.trm:  Bold/Italic markup in enhanced text mode
+
 2014-03-23 Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/command.c src/command.h src/datablock.c src/datablock.h 

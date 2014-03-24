@@ -1,5 +1,5 @@
 /* Hey Emacs this is -*- C -*-
- * $Id: emf.trm,v 1.92 2013/12/13 05:21:13 sfeam Exp $
+ * $Id: emf.trm,v 1.93 2014/03/03 01:27:55 broeker Exp $
  */
 
 /* GNUPLOT - emf.trm */
@@ -1679,9 +1679,13 @@ ENHemf_OPEN(
 #endif
 
     if (!ENHemf_opened_string) {
+	int i;
 	ENHemf_opened_string = TRUE;
 	enhanced_cur_text = &enhanced_text[0];
-	ENHemf_font = fontname;
+	free(ENHemf_font);
+	ENHemf_font = gp_strdup(fontname);
+	for (i=0; ENHemf_font[i]; i++)
+	    if (ENHemf_font[i] == ':') ENHemf_font[i] = ' ';
 	ENHemf_fontsize = fontsize;
 	ENHemf_base = base * emf_fontscale;
 	ENHemf_show = showflag;
@@ -1813,7 +1817,6 @@ ENHemf_put_text(unsigned int x, unsigned int y, const char *str)
 
     ENHemf_opened_string = FALSE;
     ENHemf_overprint = 0;
-    ENHemf_font = emf_fontname;
     ENHemf_fontsize = emf_fontsize;
 
     if (emf_justify == RIGHT || emf_justify == CENTRE)
@@ -1834,7 +1837,7 @@ ENHemf_put_text(unsigned int x, unsigned int y, const char *str)
      */
 
     while (*(str = enhanced_recursion((char *)str, TRUE,
-			ENHemf_font, ENHemf_fontsize,
+			emf_fontname, ENHemf_fontsize,
 			0.0, TRUE, TRUE, 0))) {
 	(term->enhanced_flush)();
 
