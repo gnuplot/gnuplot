@@ -1,5 +1,5 @@
 /*
- * $Id: boundary.c,v 1.9 2014/03/08 19:16:24 sfeam Exp $
+ * $Id: boundary.c,v 1.10 2014/03/19 17:30:33 sfeam Exp $
  */
 
 /* GNUPLOT - boundary.c */
@@ -1332,12 +1332,15 @@ do_key_sample_point(
 	if (this_plot->lp_properties.p_size == PTSZ_VARIABLE)
 	    (*t->pointsize)(pointsize);
 	if (on_page(xl + key_point_offset, yl)) {
-	    if (this_plot->lp_properties.p_type == PT_CHARACTER)
+	    if (this_plot->lp_properties.p_type == PT_CHARACTER) {
+		apply_pm3dcolor(&(this_plot->labels->textcolor), t);
 		(*t->put_text) (xl + key_point_offset, yl, 
 				(char *)(&this_plot->lp_properties.p_char));
-	    else
+		apply_pm3dcolor(&(this_plot->lp_properties.pm3d_color), t);
+	    } else {
 		(*t->point) (xl + key_point_offset, yl, 
 				this_plot->lp_properties.p_type);
+	    }
 	}
     }
 

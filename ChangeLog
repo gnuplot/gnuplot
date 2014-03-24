@@ -8,6 +8,9 @@
 
 	* term/emf.trm:  Bold/Italic markup in enhanced text mode
 
+	* src/boundary.c (do_key_sample_point) demo/lines_arrows.dem:
+	Apply textcolor to character point type in key sample.
+
 2014-03-23 Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/command.c src/command.h src/datablock.c src/datablock.h 
