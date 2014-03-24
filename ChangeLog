@@ -4,6 +4,8 @@
 	objects is given as a linecolor it should be interpreted as referring
 	to a current linetype.
 
+	* src/command.c: clean up to remove compiler warnings.
+
 2014-03-23 Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/command.c src/command.h src/datablock.c src/datablock.h 
