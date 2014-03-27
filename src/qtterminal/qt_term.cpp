@@ -525,6 +525,9 @@ void qt_text()
 
 void qt_text_wrapper()
 {
+	if (!qt)
+		return;
+
 	// Remember scale to update the status bar while the plot is inactive
 	qt->out << GEScale;
 

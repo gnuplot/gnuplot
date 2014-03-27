@@ -1,3 +1,8 @@
+2014-03-27  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/qtterminal/qt_term.cpp (qt_text_wrapper):
+	Prevent segfault on "set term qt; set multiplot; quit".
+
 2014-03-24  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c (place_objects do_rectangle): When fillcolor for an
