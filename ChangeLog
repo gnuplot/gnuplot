@@ -1,3 +1,12 @@
+2014-03-27  Shigeharu Takeno  <shige@iee.niit.ac.jp>
+
+	* docs/gnuplot-ja.doc term-ja.diff:  Sync translation to version 1.872
+	* docs/gnuplot.doc: typos
+
+2014-03-27  Dima Kogan  <dima@secretsauce.net>
+
+	* docs/gnuplot.doc
+
 2014-03-27  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/qtterminal/qt_term.cpp (qt_text_wrapper):
