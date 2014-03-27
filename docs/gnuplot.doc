@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.871 2014/03/23 03:03:07 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.872 2014/03/23 13:27:27 markisch Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -603,7 +603,7 @@ C
                                times the current fontsize
    {/Times abc}                print abc in font Times at current size
    {/Times*2 abc}              print abc in font Times at twice current size
-   {/Times:Italic abc}         print abs in Times with style italic
+   {/Times:Italic abc}         print abc in Times with style italic
    {/Arial:Bold=20 abc}        print abc in boldface Arial font size 20 
 #\begin{tabular}{|clll|} \hline
 #\multicolumn{4}{|c|}{Enhanced Text Control Codes} \\ \hline
@@ -7549,7 +7549,6 @@ Ffigure_mapcontours
  `set colorsequence podo` selects eight colors drawn from a set recommended by
  Wong (2011) [Nature Methods 9:441] as being easily distinguished by color-blind
  viewers with either protanopia or deuteranopia.
- of eight colors.
 
  In each case you can further customize the length of the sequence and the
  colors used. See `set linetype`, `colors`.
@@ -10178,11 +10177,15 @@ Ffigure_missing
  coordinates. See `coordinates`. In all cases the radius is calculated
  relative to the horizontal scale of the axis, graph, or canvas.  Any
  disparity between the horizontal and vertical scaling will be corrected for
- so that the result is always a circle.
+ so that the result is always a circle. If you want to draw a circle in plot
+ coordinates (such that it will appear as an ellipse if the horizontal and
+ vertical scales are different), use `set object ellipse` instead.
 
  By default a full circle is drawn. The optional qualifier `arc` specifies
  a starting angle and ending angle, in degrees, for one arc of the circle.
  The arc is always drawn counterclockwise.
+
+ See also `set object ellipse`.
 
 4 polygon
 ?polygon
