@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.281 2014/03/20 20:50:10 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.282 2014/03/21 21:00:10 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -644,6 +644,12 @@ term_multiplot_previous()
 	}
 	mp_layout_size_and_offset();
     }
+}
+
+int
+multiplot_current_panel()
+{
+    return mp_layout.current_panel;
 }
 
 void

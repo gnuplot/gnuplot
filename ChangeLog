@@ -1,3 +1,8 @@
+2014-03-28  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/term.c (multiplot_current_panel) term/svg.trm src/term_api.h:
+	Hide internal data structure behind an access function.
+
 2014-03-27  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* docs/gnuplot-ja.doc term-ja.diff:  Sync translation to version 1.872
