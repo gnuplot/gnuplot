@@ -49,8 +49,8 @@ eval.c eval.h external.c external.h fit.c fit.h gadgets.c gadgets.h getcolor.c g
 gp_hist.h gp_time.h gp_types.h gplt_x11.h graph3d.c graph3d.h graphics.c graphics.h \
 help.c help.h hidden3d.c hidden3d.h history.c internal.c internal.h \
 interpol.c interpol.h libcerf.c libcerf.h \
-matrix.c matrix.h misc.c misc.h mouse.c mouse.h \
-mousecmn.h national.h parse.c parse.h plot.c plot.h plot2d.c plot2d.h \
+matrix.c matrix.h misc.c misc.h mouse.c mouse.h mousecmn.h \
+multiplot.c multiplot.h national.h parse.c parse.h plot.c plot.h plot2d.c plot2d.h \
 plot3d.c plot3d.h pm3d.c pm3d.h readline.c readline.h save.c \
 save.h scanner.c scanner.h set.c setshow.h show.c specfun.c specfun.h \
 standard.c standard.h stats.h stats.c stdfn.c stdfn.h syscfg.h tables.c tables.h \

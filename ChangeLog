@@ -1,7 +1,18 @@
-2014-03-28  Ethan A Merritt  <merritt@u.washington.edu>
+2014-03-29  Christoph Bersch <usenet@bersch.net>
+
+	* src/multiplot.h src/multiplot.c demo/layout.dem docs/gnuplot.doc:
+	New autolayout options for multiplot:
+	  set multiplot layout margins LEFT, RIGHT, BOTTOM, TOP spacing GAP
+	Patch #611
+
+2014-03-29  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/term.c (multiplot_current_panel) term/svg.trm src/term_api.h:
 	Hide internal data structure behind an access function.
+
+	* src/multiplot.h src/multiplot.c src/term.c src/term_api.h
+	src/Makefile.am:  Move multiplot layout code from term.c into a new
+	file multiplot.c.
 
 2014-03-27  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 

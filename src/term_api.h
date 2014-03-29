@@ -449,7 +449,6 @@ void term_start_plot __PROTO((void));
 void term_end_plot __PROTO((void));
 void term_start_multiplot __PROTO((void));
 void term_end_multiplot __PROTO((void));
-int multiplot_current_panel __PROTO((void));
 /* void term_suspend __PROTO((void)); */
 void term_reset __PROTO((void));
 void term_apply_lp_properties __PROTO((struct lp_style_type *lp));

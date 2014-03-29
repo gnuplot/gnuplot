@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.872 2014/03/23 13:27:27 markisch Exp $
+C RCS $Id: gnuplot.doc,v 1.873 2014/03/27 20:10:58 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -9855,6 +9855,8 @@ Ffigure_missing
            { layout <rows>,<cols> 
              {rowsfirst|columnsfirst} {downwards|upwards}
              {scale <xscale>{,<yscale>}} {offset <xoff>{,<yoff>}}
+             {margins <left>,<right>,<bottom>,<top>}
+             {spacing <xspacing>{,<yspacing>}}
            }
        set multiplot {next|previous}
        unset multiplot
@@ -9862,13 +9864,10 @@ Ffigure_missing
  For some terminals, no plot is displayed until the command `unset multiplot`
  is given, which causes the entire page to be drawn and then returns gnuplot
  to its normal single-plot mode.  For other terminals, each separate `plot`
- command produces an updated display, either by redrawing all previous ones
- and the newly added plot, or by just adding the new plot to the existing
- display.
+ command produces an updated display.
 
- The area to be used by the next plot is not erased before doing the
- new plot.  The `clear` command can be used to do this if wanted, as is
- typically the case for "inset" plots.
+ The `clear` command is used to erase the rectangular area of the page that will
+ be used for the next plot.  This is typically needed for "inset" plots.
 
  Any labels or arrows that have been defined will be drawn for each plot
  according to the current size and origin (unless their coordinates are
@@ -9934,6 +9933,24 @@ Ffigure_missing
  The above example will produce 6 plots in 2 columns filled top to bottom,
  left to right.  Each plot will have a horizontal size of 1.1/2 and a vertical
  size of 0.9/3.
+
+ Another possibility is to set explicit margins for each plot with options
+ `margins` and `spacing`. With `margins` you set the outer margins of the whole
+ multiplot grid, given as fractions of the whole drawing area. This can be very
+ useful if only some plots have labels but their sizes should all be equal.
+
+ Example:
+       set multiplot layout 2,2 columnsfirst margins 0.1,0.9,0.1,0.9 spacing 0.1
+       set ylabel 'ylabel'
+       plot sin(x)
+       set xlabel 'xlabel'
+       plot cos(x)
+       unset ylabel
+       unset xlabel
+       plot sin(2*x)
+       set xlabel 'xlabel'
+       plot cos(2*x)
+       unset multiplot
 
  See also
 ^ <a href="http://www.gnuplot.info/demo/multiplt.html">
