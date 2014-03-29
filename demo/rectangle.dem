@@ -1,23 +1,17 @@
 # demo for the use of "set object rectangle"
-#
-# Ethan A Merritt - 2006
+# Updated for version 5
+#	show front/back/behind, opaque key box
 
-
-set style line 1 bgnd
-set style line 2 lt rgb "cyan"
-
-set object 1 rect from 0,0 to 1,4 fc lt 2
+set object 1 rect from 0,0 to 1,4 fc lt 2 front
 set object 2 rect from -1,1 to 0,5 fc rgb "gold"
-set object 5 rect from 0, -3 to 2, -2 fc ls 2 fs pattern 1 bo -1
-
+set object 5 rect from 0, -3 to 2, -2 fc rgb "cyan" fs pattern 1 bo -1
 
 set style fill pattern 2 bo 1
 
 #
-# Illustrate putting a different color under the key box
+# The key box has its own option "opaque" to generate a filled rectangle
 #
-set key nobox
-set object 7 rect from graph 0.65,graph 0.85 to graph 0.99, graph 0.99 fc ls 1
+set key box opaque height 2
 
 #
 # Illustrate using character widths to put a box around a label
