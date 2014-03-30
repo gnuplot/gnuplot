@@ -1,5 +1,5 @@
 /*
- * $Id: syscfg.h,v 1.51 2013/10/25 03:17:34 sfeam Exp $
+ * $Id: syscfg.h,v 1.52 2013/12/22 20:47:25 sfeam Exp $
  */
 
 /* GNUPLOT - syscfg.h */
@@ -215,18 +215,12 @@
 
 /* DOS/Windows stuff. Moved here from command.c */
 #if defined(MSDOS)
-
 # ifdef DJGPP
 #  include <dos.h>
 #  include <dir.h>              /* HBB: for setdisk() */
 # else
 #  include <process.h>
 # endif                         /* !DJGPP */
-
-# ifdef __MSC__
-#  include <direct.h>        /* for _chdrive() */
-# endif                      /* __MSC__ */
-
 #endif /* MSDOS */
 
 /* Watcom's compiler; this should probably be somewhere

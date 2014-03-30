@@ -1,5 +1,5 @@
 /*
- * $Id: wprinter.c,v 1.10 2013/08/17 00:02:09 sfeam Exp $
+ * $Id: wprinter.c,v 1.11 2013/12/27 19:51:22 markisch Exp $
  */
 
 /* GNUPLOT - win/wprinter.c */
@@ -52,10 +52,8 @@
 #include <commdlg.h>
 #include <stdio.h>
 #include <stdlib.h>
-#ifdef __MSC__
-#include <memory.h>
-#else
-#include <mem.h>
+#ifndef __MSC__
+# include <mem.h>
 #endif
 #include "wgnuplib.h"
 #include "wresourc.h"
@@ -236,6 +234,7 @@ PrintDlgProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 	}
 	return FALSE;
 }
+
 
 BOOL CALLBACK
 PrintAbortProc(HDC hdcPrn, int code)

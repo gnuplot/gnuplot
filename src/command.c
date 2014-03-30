@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.282 2014/03/23 13:27:27 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.283 2014/03/25 01:50:01 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -131,9 +131,6 @@ static int winsystem __PROTO((const char *));
 #  include <direct.h>          /* getcwd() */
 # else
 #  include <alloc.h>
-#  ifndef __WATCOMC__
-#   include <dir.h>		/* setdisk() */
-#  endif
 # endif				/* !MSC */
 # include <htmlhelp.h>
 # include "win/winmain.h"
@@ -1650,7 +1647,7 @@ print_command()
 {
     struct value a;
     /* space printed between two expressions only */
-    int need_space = 0;
+    TBOOLEAN need_space = FALSE;
     char *dataline = NULL;
     size_t size = 256;
 
@@ -1676,32 +1673,30 @@ print_command()
 	}
 	const_express(&a);
 	if (a.type == STRING) {
-	    if (dataline)
+	    if (dataline != NULL)
 		strappend(&dataline, &size, a.v.string_val);
 	    else
 		fputs(a.v.string_val, print_out);
 	    gpfree_string(&a);
-	    need_space = 0;
+	    need_space = FALSE;
 	} else {
 	    if (need_space) {
-		if (dataline)
+		if (dataline != NULL)
 		    strappend(&dataline, &size, " ");
 		else
 		    putc(' ', print_out);
 	    }
-	    if (dataline) {
-		char * val = value_to_str(&a, FALSE);
-		strappend(&dataline, &size, val);
-	    } else {
+	    if (dataline != NULL)
+		strappend(&dataline, &size, value_to_str(&a, FALSE));
+	    else
 		disp_value(print_out, &a, FALSE);
-	    }
-	    need_space = 1;
+	    need_space = TRUE;
 	}
     } while (!END_OF_COMMAND && equals(c_token, ","));
 
-    if (dataline)
+    if (dataline != NULL) {
 	append_to_datablock(&print_out_var->udv_value, dataline);
-    else {
+    } else {
 	(void) putc('\n', print_out);
 	fflush(print_out);
     }
@@ -2271,11 +2266,9 @@ changedir(char *path)
     if (isalpha(path[0]) && (path[1] == ':')) {
 	int driveno = toupper(path[0]) - 'A';	/* 0=A, 1=B, ... */
 
-# if (defined(MSDOS) && defined(__EMX__)) || defined(__MSC__)
+# if defined(__EMX__)
 	(void) _chdrive(driveno + 1);
-# endif
-
-# ifdef DJGPP
+# elif defined(__DJGPP__) 
 	(void) setdisk(driveno);
 # endif
 	path += 2;		/* move past drive letter */

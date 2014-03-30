@@ -5,6 +5,12 @@
 	functions to write to screen.
 	Bug #1361
 
+	* src/command.c src/command.h src/plot.c src/stdfn.h src/syscfg.h
+	src/win/wgraph.c src/win/winmain.c src/win/wprinter.c:  Include file
+	cleanup.
+
+	* src/win/screenbuf.c:  Avoid crashes on memory allocation errors.
+
 	* src/makefile.all src/makefile.awc:  Recreate to include multiplot.c.
 
 	* demo/lines_arrows.dem:  UTF-8 encoding.

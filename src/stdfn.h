@@ -1,5 +1,5 @@
 /*
- * $Id: stdfn.h,v 1.45 2014/03/06 07:34:48 sfeam Exp $
+ * $Id: stdfn.h,v 1.46 2014/03/20 00:58:36 markisch Exp $
  */
 
 /* GNUPLOT - stdfn.h */
@@ -351,10 +351,6 @@ int ms_snprintf(char *str, size_t size, const char * format, ...);
 
 #ifdef WIN32
 # include <windows.h>
-#endif
-
-#if defined(_MSC_VER)
-#define strtoll _strtoi64
 #endif
 
 /* sleep delay time, where delay is a double value */

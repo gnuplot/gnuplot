@@ -1,5 +1,5 @@
 /*
- * $Id: winmain.c,v 1.72 2014/02/12 20:57:39 markisch Exp $
+ * $Id: winmain.c,v 1.73 2014/03/20 00:58:36 markisch Exp $
  */
 
 /* GNUPLOT - win/winmain.c */
@@ -64,9 +64,6 @@
 #include <stdarg.h>
 #include <ctype.h>
 #include <fcntl.h>
-#ifdef __MSC__
-# include <malloc.h>
-#endif
 #ifdef __WATCOMC__
 # define mktemp _mktemp
 #endif
