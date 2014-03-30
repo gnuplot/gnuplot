@@ -6,10 +6,11 @@ breaders.$(O) color.$(O) command.$(O) contour.$(O) datablock.$(O) &
 datafile.$(O) dynarray.$(O) eval.$(O) external.$(O) fit.$(O) gadgets.$(O) &
 getcolor.$(O) graph3d.$(O) graphics.$(O) help.$(O) hidden3d.$(O) &
 history.$(O) internal.$(O) interpol.$(O) libcerf.$(O) matrix.$(O) &
-misc.$(O) mouse.$(O) parse.$(O) plot.$(O) plot2d.$(O) plot3d.$(O) &
-pm3d.$(O) readline.$(O) save.$(O) scanner.$(O) set.$(O) show.$(O) &
-specfun.$(O) standard.$(O) stats.$(O) stdfn.$(O) tables.$(O) tabulate.$(O) &
-term.$(O) time.$(O) unset.$(O) util.$(O) util3d.$(O) variable.$(O)
+misc.$(O) mouse.$(O) multiplot.$(O) parse.$(O) plot.$(O) plot2d.$(O) &
+plot3d.$(O) pm3d.$(O) readline.$(O) save.$(O) scanner.$(O) set.$(O) &
+show.$(O) specfun.$(O) standard.$(O) stats.$(O) stdfn.$(O) tables.$(O) &
+tabulate.$(O) term.$(O) time.$(O) unset.$(O) util.$(O) util3d.$(O) &
+variable.$(O)
 
 # List of terminal driver sources
 CORETERM = $(T)aed.trm $(T)ai.trm $(T)aquaterm.trm $(T)be.trm $(T)caca.trm &
