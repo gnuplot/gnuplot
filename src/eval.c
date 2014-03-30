@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: eval.c,v 1.115 2014/02/28 00:24:20 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: eval.c,v 1.116 2014/03/10 01:28:37 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - eval.c */
@@ -214,7 +214,7 @@ const struct ft_entry GPFAR ft[] =
     {"strlen",  f_strlen},	/* for string variables only */
     {"strstrt",  f_strstrt},	/* for string variables only */
     {"substr",  f_range},	/* for string variables only */
-    {"word", f_words},		/* for string variables only */
+    {"word",  f_word},		/* for string variables only */
     {"words", f_words},		/* implemented as word(s,-1) */
     {"strftime",  f_strftime},  /* time to string */
     {"strptime",  f_strptime},  /* string to time */
@@ -1007,10 +1007,9 @@ gp_words(char *string)
 {
     struct value a;
 
-	push(Gstring(&a,string));
-	push(Ginteger(&a,-1));
-	f_words((union argument *)NULL);
-	pop(&a);
+    push(Gstring(&a, string));
+    f_words((union argument *)NULL);
+    pop(&a);
 
     return a.v.int_val;
 }
@@ -1021,10 +1020,10 @@ gp_word(char *string, int i)
 {
     struct value a;
 
-	push(Gstring(&a,string));
-	push(Ginteger(&a,i));
-	f_words((union argument *)NULL);
-	pop(&a);
+    push(Gstring(&a, string));
+    push(Ginteger(&a, i));
+    f_word((union argument *)NULL);
+    pop(&a);
 
     return a.v.string_val;
 }

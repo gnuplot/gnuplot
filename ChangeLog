@@ -5,6 +5,9 @@
 	functions to write to screen.
 	Bug #1361
 
+	* src/eval.c src/internal.c|h src/parse.c:  Implement f_words instead
+	of treating it as a special case in the parser.
+
 	* src/command.c src/command.h src/plot.c src/stdfn.h src/syscfg.h
 	src/win/wgraph.c src/win/winmain.c src/win/wprinter.c:  Include file
 	cleanup.

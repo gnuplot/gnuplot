@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: internal.c,v 1.76 2014/03/10 01:28:37 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: internal.c,v 1.77 2014/03/20 00:58:35 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - internal.c */
@@ -1240,6 +1240,16 @@ f_range(union argument *arg)
 
 void
 f_words(union argument *arg)
+{
+    struct value a;
+
+    /* "words(s)" is implemented as "word(s,-1)" */
+    push(Ginteger(&a, -1));
+    f_word(arg);
+}
+
+void
+f_word(union argument *arg)
 {
     struct value a, b, result;
     int nwords = 0;

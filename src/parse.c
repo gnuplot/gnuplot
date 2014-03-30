@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: parse.c,v 1.85 2014/03/21 06:24:50 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: parse.c,v 1.86 2014/03/21 21:40:06 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - parse.c */
@@ -516,12 +516,6 @@ parse_primary_expression()
 		/* with a variable number of arguments.         */
 		if (!strcmp(ft[whichfunc].f_name,"sprintf"))
 		    add_action(PUSHC)->v_arg = num_params;
-
-		/* "words(s)" is implemented as "word(s,-1)" */
-		if (!strcmp(ft[whichfunc].f_name,"words")) {
-		    num_params.v.int_val = -1;
-		    add_action(PUSHC)->v_arg = num_params;
-		}
 
 		/* The column() function has side effects requiring special handling */
 		if (!strcmp(ft[whichfunc].f_name,"column")) {
