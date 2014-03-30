@@ -76,6 +76,8 @@ set title "The pointinterval property also works with character point symbols"
 set style data linespoints
 set pointintervalbox 1.5
 unset xlabel
+myencoding = GPVAL_ENCODING
+set encoding utf8
 
 plot '+' using 1:(cos(x-1.))  with line lt -1 lw 1 title 'lw 1',  \
      '+' using 1:(cos(x))     lt -1 pi -4 pt "C" title 'pi -4',   \
@@ -87,6 +89,7 @@ plot '+' using 1:(cos(x-1.))  with line lt -1 lw 1 title 'lw 1',  \
 
 pause -1 "Hit return to continue"
 
+set encoding myencoding
 reset
 
 set xrange [-1000:1000]
