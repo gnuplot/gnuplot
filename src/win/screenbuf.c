@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id$"); }
+static char *RCSid() { return RCSid("$Id: screenbuf.c,v 1.1 2011/03/07 21:41:36 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - screenbuf.c 
@@ -105,12 +105,6 @@ lb_length(LPLB lb)
 {
     assert(lb != NULL);
     return lb->len;
-/*
-    if (lb->str != NULL)
-	return strlen(lb->str);
-    else
-	return 0;
-*/
 }
 
 
@@ -139,9 +133,19 @@ lb_insert_str(LPLB lb, uint pos, char *s, uint count)
 
     /* enlarge string buffer if necessary */
     if (lb->size <= pos + count) {
+	char * newstr;
 	uint newsize = ((pos + count + 8) / 8) * 8 + 32;
-	lb->str = realloc(lb->str, newsize);
-	lb->size = newsize;
+	newstr = (char *) realloc(lb->str, newsize);
+	if (newstr) {
+	    lb->str = newstr;
+	    lb->size = newsize;
+	} else {
+	    /* memory allocation failed */
+	    if (pos < lb->size)
+		return;
+	    else
+		count = lb->size - pos - 1;
+	}
     }
     
     /* fill up with spaces */
@@ -169,6 +173,8 @@ lb_substr(LPLB lb, uint offset, uint count)
 
     /* allocate return string */
     retval = (char *) malloc(count + 1);
+    if (retval == NULL)
+	return NULL;
 
     if (offset >= len) {
 	memset(retval, ' ', count);
@@ -201,9 +207,9 @@ sb_init(LPSB sb, uint size)
 
     sb->head = sb->tail = 0;
     sb->wrap_at = 0;
-    sb->size = size + 1;
-    sb->lb = calloc(size + 1, sizeof(LB));
-    sb->current_line = malloc(sizeof(LB));
+    sb->lb = (LPLB) calloc(size + 1, sizeof(LB));
+    sb->size = (sb->lb != NULL) ? size + 1 : 0;
+    sb->current_line = (LPLB) malloc(sizeof(LB));
     sb->length = 0;
     sb->last_line = 0;
     sb->last_line_index = 0;
@@ -426,7 +432,9 @@ sb_resize(LPSB sb, uint size)
     uint len;
 
     /* allocate new buffer */
-    lb = calloc(size + 1, sizeof(LB));
+    lb = (LPLB) calloc(size + 1, sizeof(LB));
+    if (lb == NULL) /* memory allocation failed */
+	return;
 
     len = sb_internal_length(sb);
     sidx = (size > len) ? 0 : (len - size);
