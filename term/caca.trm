@@ -1,7 +1,7 @@
 /*
  * GNUPLOT - caca.trm
  *
- * $Id: caca.trm,v 1.2 2014/01/30 04:35:14 sfeam Exp $
+ * $Id: caca.trm,v 1.3 2014/02/23 10:42:03 markisch Exp $
  *
  * This file uses UTF8 encoding and a tab size of 4.
  *
@@ -191,6 +191,7 @@ static caca_canvas_t * CACA_suspend_cv = NULL;
 static TBOOLEAN CACA_windowed = FALSE; /* graphics output in different window*/
 static TBOOLEAN CACA_exportonly = FALSE; /* no output to screen but to file */
 static TBOOLEAN CACA_processing_events = FALSE; /* flag processing of events in CACA_text() */
+static unsigned CACA_codepage = 0;
 
 /* drawing */
 static char CACA_pen;		/* current character used to draw point symbols */
@@ -752,6 +753,16 @@ CACA_init_display(void)
 			/* NOTE: The slang backend driver sets its own signal handler for SIGINT */
 			signal(SIGINT, CACA_sigint_handler);
 		}
+#ifdef WIN32
+		if (strcmp(CACA_driver, "win32") == 0) {
+			/* On Japanese Windows we change the codepage. Not sure why this
+			   solves the display problems, but apparently it works. See bug #1361. */
+			if (GetConsoleOutputCP() == 932) {
+				CACA_codepage = GetConsoleOutputCP();
+				SetConsoleOutputCP(437);
+			}
+		}
+#endif
 	} else if (CACA_exportonly) {
 		/* NOTE: Info on truecolor support is not available from libcaca and
 		is thus hard-coded here. The checks below have to be adopted
@@ -921,9 +932,15 @@ CACA_close_display(void)
 		caca_set_display_title(CACA_dp, "gnuplot");
 		caca_free_display(CACA_dp);
 		CACA_dp = NULL;
-#if defined(WIN32) && !defined(WGP_CONSOLE)
-		if (strcmp(CACA_driver, "win32") == 0)
+#ifdef WIN32
+		if (strcmp(CACA_driver, "win32") == 0) {
+#ifndef WGP_CONSOLE
 			FreeConsole(); /* close the console window */
+#endif
+			/* Revert to previous codepage if necessary */
+			if (CACA_codepage != 0)
+				SetConsoleOutputCP(CACA_codepage);
+		}
 #endif
 		/* NOTE: The slang backend driver sets its own signal handler for SIGINT,
 		   but does not seem to restore the previous handler on exit.
@@ -2479,7 +2496,7 @@ CACA_modify_plots(unsigned int operations)
 
 /* -------------------------------------------------------------------------
    The "enhanced text" code below is a modified copy of the dumb terminal's
-   code written by Ethan Merrit. See dumb.trm for Copyright on this section.
+   code written by Ethan Merritt. See dumb.trm for Copyright on this section.
    ------------------------------------------------------------------------- */
 
 static TBOOLEAN CACA_enhanced_opened_string;
@@ -3328,18 +3345,19 @@ START_HELP(caca)
 "",
 " The `charset` option selects the character set used for lines, points,",
 " filling of polygons and boxes and dithering of images.  Note that some",
-" backend/terminal combinations might not support some characters of the",
-" `blocks` or `unicode` char set.",
+" backend/terminal/font combinations might not support some characters of the",
+" `blocks` or `unicode` character set.  On Windows it is recommend to use",
+" a non-raster font such as \"Lucida Console\" or \"Consolas\".",
 "",
 " The caca terminal supports mouse interaction. Please beware that some",
 " backends of `libcaca` (e.g. slang, ncurses) only update the mouse position",
 " on mouse clicks.  Modifier keys (ctrl, alt, shift) are not supported by",
 " `libcaca` and are thus unavailable.",
 "",
-" The default `encoding` of the `caca` terminal is utf8. Please note that",
-" some versions of `libcaca` contain a bug which results in an endless loop",
-" if you supply illegal 8bit sequences.  The \"x11\" backend supports unicode",
-" since libcaca version 0.99.beta17",
+" The default `encoding` of the `caca` terminal is utf8. It also supports",
+" the cp437 `encoding`.  The \"x11\" backend supports unicode since libcaca",
+" version 0.99.beta17.  Please note that some versions of `libcaca` contain a",
+" bug which results in an endless loop if you supply illegal 8bit sequences.",
 "",
 " The number of colors supported by `libcaca` backends differs.  Most backends",
 " support 16 foreground and 16 background colors only, whereas e.g. the ",
@@ -3368,8 +3386,9 @@ START_HELP(caca)
 "?caca bugs",
 " The `caca` terminal has some known bugs and limitations:",
 "",
-" Unicode support depends on driver and terminal.  Bright background colors ",
-" may cause blinking.  Mousing does not support modifier keys, see `term caca`.",
+" Unicode support depends on the driver and the terminal.",
+" Bright background colors may cause blinking.",
+" Modifier keys are not supported for mousing, see `term caca`.",
 "",
 " Rotated enhanced text, and transparency are not supported.",
 " The `size` option is not considered for on-screen display.",

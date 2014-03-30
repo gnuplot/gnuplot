@@ -1,3 +1,17 @@
+2014-03-30 Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* term/caca.trm:  Change codepage from 932 to 437 on Japanese Windows.
+	Apparently this fixes display problems, although libcaca uses unicode
+	functions to write to screen.
+	Bug #1361
+
+	* src/makefile.all src/makefile.awc:  Recreate to include multiplot.c.
+
+	* demo/lines_arrows.dem:  UTF-8 encoding.
+
+	* config/mingw/Makefile:  Fix non-numeric version number due to
+	patchlevel "alpha".
+
 2014-03-29  Christoph Bersch <usenet@bersch.net>
 
 	* src/multiplot.h src/multiplot.c demo/layout.dem docs/gnuplot.doc:
