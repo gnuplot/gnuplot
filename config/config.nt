@@ -596,6 +596,7 @@
 #define GP_MATHERR _matherr
 #define isnan _isnan
 #define ftruncate _chsize
+#define strtoll _strtoi64
 #define isblank isspace
 #if _MSC_VER <= 1800
 # define va_copy(dest, src) (dest = src)
