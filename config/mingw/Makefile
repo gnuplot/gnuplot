@@ -1,5 +1,5 @@
 # Hello, emacs: this is a -*- Makefile -*-
-# $Id: Makefile,v 1.38 2014/02/28 13:49:21 markisch Exp $
+# $Id: Makefile,v 1.39 2014/03/30 17:42:42 markisch Exp $
 #
 # GNUPLOT Makefile for MinGW/MSYS on Windows
 # This assumes usual installation of the MinGW32 toolkit, the free
@@ -82,6 +82,9 @@ MOUSE=1
 #LUA=lua
 
 # Uncomment the following line to select the caca terminal
+# Requires libcaca version 0.99.beta15 or newer. A post-beta18
+# svn version is recommended since it contains an improved
+# win32 backend.
 CACA=1
 
 # Uncomment if you have libiconv
@@ -799,8 +802,8 @@ installer:
 	$(MAKE) DESTDIR=./dist install
 	cp -p $(W)/grpicon.ico ./dist/bin/
 	cp -p $(TOP)/win/*.iss ./dist
-	sed -e '/^#define MyAppVersion/ s/"[^"]*"/"@VER@"/' \
-	    -e '/^#define MyAppVersionShort/ s/"[^"]*"/"@VERSHORT@"/' \
+	sed -e '/^#define MyAppVersionShort/ s/"[^"]*"/"@VERSHORT@"/' \
+	    -e '/^#define MyAppVersion/ s/"[^"]*"/"@VER@"/' \
 	    -e '/^#define MyAppNumVersion/ s/"[^"]*"/"@VERLONG@"/' \
 	    -e '/^#define MyInstallerName/ s/"[^"]*"/"@INSTALLER@"/' \
 	    -e "s/@VERSHORT@/$(MAINVERSION)/" \

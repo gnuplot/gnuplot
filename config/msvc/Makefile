@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.19 2014/02/12 21:28:19 markisch Exp $
+# $Id: Makefile,v 1.20 2014/02/28 13:49:21 markisch Exp $
 #
 # GNUPLOT Makefile Microsoft Visual C++ 2005 or newer
 
@@ -61,6 +61,9 @@ QT5 = 1
 # Build the lua/tikz terminal?
 LUA = 0
 # Build caca terminal? Requires libcaca
+# Requires libcaca version 0.99.beta15 or newer. A post-beta18
+# svn version is recommended since it contains an improved
+# win32 backend.
 CACA = 0
 
 # Create debug build?
@@ -74,6 +77,7 @@ PDFDIR = pdflib
 QTDIR = d:\Source\Qt-5.2.1\5.2.1\msvc2012
 #CAIRODIR = cairo-pango
 #CACADIR = libcaca
+CAIRODIR = d:\msvc-libs
 LIBDIR =  d:\msvc-libs
 
 
