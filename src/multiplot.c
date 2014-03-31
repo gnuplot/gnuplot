@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: multiplot.c,v 1.0 2014/03/21 21:00:10 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: multiplot.c,v 1.1 2014/03/29 05:12:51 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -37,7 +37,7 @@ static char *RCSid() { return RCSid("$Id: multiplot.c,v 1.0 2014/03/21 21:00:10 
 /*
  * Bookkeeping and support routines for 'set multiplot layout ...'
  * Jul 2004 Volker Dobler     layout rows, columns
- * Feb 2014 Christoph Bersch  layout margins spacing
+ * Feb 2013 Christoph Bersch  layout margins spacing
  * Mar 2014 Ethan A Merritt   refactor into separate file (used to be in term.c)
  */
 
