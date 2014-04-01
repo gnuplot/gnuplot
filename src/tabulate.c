@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: tabulate.c,v 1.17 2012/11/15 03:53:24 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: tabulate.c,v 1.18 2014/01/10 03:31:09 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - tabulate.c */
@@ -389,7 +389,7 @@ print_3dtable(int pcount)
 		    /* put # in case user wants to use it for a plot */
 		    /* double blank line to allow plot ... index ... */
 		    fprintf(outfile, "\n# Contour %d, label: %s\n",
-			    number++, c->label);
+			    number++, c->label ? c->label : "");
 
 		for (; --count >= 0; ++point) {
 		    OUTPUT_NUMBER(point->x, FIRST_X_AXIS);
