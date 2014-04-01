@@ -1,3 +1,10 @@
+2014-04-01  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/command.c (test_palette_command):  Write the palette colors into
+	a datablock $PALETTE rather than writing them as in-line data in a temp
+	file.  Simplify the internal command sequence that generates the test
+	output.  TODO: Move the command sequence into a datablock as well.
+
 2014-03-30 Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* term/caca.trm:  Change codepage from 932 to 437 on Japanese Windows.
