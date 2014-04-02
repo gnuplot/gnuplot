@@ -1,7 +1,12 @@
+2014-04-02  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/misc.c: Accept "with image pixels" as a synonym for
+	"with image failsafe".
+
 2014-03-24  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c (place_objects do_rectangle): When fillcolor for an
-	objects is given as a linecolor it should be interpreted as referring
+	object is given as a linecolor it should be interpreted as referring
 	to the color of a current linetype.
 
 2014-03-21  Ethan A Merritt  <merritt@u.washington.edu>
