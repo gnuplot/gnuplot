@@ -73,6 +73,22 @@ plot $map1 matrix using 1:2:3 with image, \
 
 pause -1 "Hit return to continue"
 
+# Some output modes (SVG, HTML5) allow smoothing of adjacent pixels,
+# which may not be desired. This is not normally an issue with PNG or PDF.
+# The `pixels` option forces pixel-by-pixel drawing with no smoothing.
+
+unset colorbox
+set format xy ""
+set multiplot layout 1,2 title "Compare 'image' and 'image pixels' modes" \
+    margin 0.05, 0.95, 0.10, 0.85 spacing 0.05
+set title "plot with image"
+plot $map1 matrix using 1:2:3 with image
+set title "plot with image pixels"
+plot $map1 matrix using 1:2:3 with image pixels
+unset multiplot
+
+pause -1 "Hit return to continue"
+
 reset
 
 #

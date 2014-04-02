@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.874 2014/03/29 05:12:51 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.875 2014/04/02 05:09:04 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -3656,19 +3656,24 @@ Ffigure_scaled_image
  extreme cases.  A pixel with 0 < alpha < 255 is partially transparent.
  Only a few terminal types can handle this correctly; other terminals will
  approximate this by treating alpha as being either 0 or 255.
-3 image failsafe
+3 image pixels
+?plotting styles image pixels
+?style image pixels
+?image pixels
+?pixels
 ?plotting styles image failsafe
 ?style image failsafe
 ?image failsafe
 ?failsafe
  Some terminals use device- or library-specific optimizations to render image
  data within a rectangular 2D area.  This sometimes produces undesirable output,
- e.g. bad clipping or scaling, missing edges.  The `failsafe` keyword tells
+ e.g. bad clipping or scaling, missing edges.  The `pixels` keyword tells
  gnuplot to use generic code that renders the image pixel-by-pixel instead.
  This rendering mode is slower and may result in much larger output files, but
  should produce a consistent rendered view on all terminals.
+ (The `pixels` options was called `failsafe` mode in previous gnuplot versions.)
  Example:
-       plot 'data' with image failsafe
+       plot 'data' with image pixels
 2 impulses
 ?plotting styles impulses
 ?style impulses
