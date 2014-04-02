@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.100 2013/10/14 23:41:39 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.101 2013/10/14 23:51:54 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - pm3d.c */
@@ -29,7 +29,10 @@ static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.100 2013/10/14 23:41:39 sfe
 
 #include <stdlib.h> /* qsort() */
 
-/* Needed by routine filled_quadrangle() in color.c */
+/* Used to initialize `set pm3d border` */
+struct lp_style_type default_pm3d_border = DEFAULT_LP_STYLE_TYPE;
+
+/* Used by routine filled_quadrangle() in color.c */
 struct lp_style_type pm3d_border_lp;
 
 /*
@@ -42,11 +45,11 @@ pm3d_struct pm3d = {
     0,				/* no flushing triangles */
     PM3D_SCANS_AUTOMATIC,	/* scans direction is determined automatically */
     PM3D_CLIP_4IN,		/* clipping: all 4 points in ranges */
-    0,				/* no pm3d hidden3d is drawn */
     PM3D_EXPLICIT,		/* implicit */
     PM3D_WHICHCORNER_MEAN,	/* color from which corner(s) */
     1,				/* interpolate along scanline */
-    1				/* interpolate between scanlines */
+    1,				/* interpolate between scanlines */
+    DEFAULT_LP_STYLE_TYPE	/* for the border */
 };
 
 typedef struct {
@@ -412,8 +415,10 @@ void pm3d_depth_queue_flush(void)
 		set_rgbcolor_var(qp->gray);
 	    else
 		set_color(qp->gray);
-	    if (pm3d.hidden3d_tag < 0)
+#if (0)	/* FIXME: It used to do this, but I can't see when it would make sense */
+	    if (pm3d.border.l_type < 0)
 		pm3d_border_lp.pm3d_color = *(qp->border_color);
+#endif
 #ifdef EXTENDED_COLOR_SPECS
 	    ifilled_quadrangle(qp->icorners);
 #else
@@ -461,8 +466,6 @@ pm3d_plot(struct surface_points *this_plot, int at_which_z)
 
     /* Apply and save the user-requested line properties */
     pm3d_border_lp = this_plot->lp_properties;
-    if (pm3d.hidden3d_tag > 0)
-	lp_use_properties(&pm3d_border_lp, pm3d.hidden3d_tag);
     term_apply_lp_properties(&pm3d_border_lp);
 
     if (at_which_z != PM3D_AT_BASE && at_which_z != PM3D_AT_TOP && at_which_z != PM3D_AT_SURFACE)
@@ -1033,11 +1036,11 @@ pm3d_reset()
     pm3d.ftriangles = 0;
     pm3d.direction = PM3D_SCANS_AUTOMATIC;
     pm3d.clip = PM3D_CLIP_4IN;
-    pm3d.hidden3d_tag = 0;
     pm3d.implicit = PM3D_EXPLICIT;
     pm3d.which_corner_color = PM3D_WHICHCORNER_MEAN;
     pm3d.interp_i = 1;
     pm3d.interp_j = 1;
+    pm3d.border.l_type = LT_NODRAW;
 }
 
 

@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.875 2014/04/02 05:09:04 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.876 2014/04/02 19:34:27 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -10609,22 +10609,27 @@ Ffigure_missing
  contributing to the color of any quadrangle.  For example, applying the pm3d
  algorithm to the 4x4 grid of data points in script `demo/pm3d.dem` (please have
  a look) produces only (4-1)x(4-1)=9 colored rectangles.
-4 hidden3d
+4 border
 ?set pm3d hidden3d
 ?pm3d hidden3d
- The option `set pm3d hidden3d` draws the bounding lines of each quadrangle
- at the same time that the quadrangle itself is drawn. Normally it is used in
- conjunction with the `depthorder` option to achieve an approximation to true
- hidden line removal.  This is far more efficient than using the command
- `set hidden3d`.  The command takes an optional linestyle controlling the
- appearance of the bounding lines.  If the linestyle parameter is negative,
- or omitted, then the line properties given in the plot command are used.
+?set pm3d border
+?pm3d border
+ The option `set pm3d border {line-properties}` draws bounding lines around each
+ quadrangle as it is rendered. Normally this is used in conjunction with the
+ `depthorder` option to approximate hidden line removal.
+ Note that the global option `set hidden3d` has no effect on pm3d plots.
+ Default line properties (color, width) optionally follow the keyword `border`.
+ These defaults can be overridden later in an splot command.
+
  Example of recommended usage:
 
-       set pm3d at s hidden3d depthorder
+       set pm3d at s depthorder border lw 0.2 lt black
        unset hidden3d
        unset surf
-       splot x*x+y*y linecolor rgb "black" linewidth 0.5
+       splot x*x+y*y linecolor rgb "blue"	# otherwise it would be black
+
+ NB: The deprecated option `set pm3d hidden3d N` is still accepted. It is 
+ equivalent to `set pm3d border ls N`.
 
 4 interpolate
 ?set pm3d interpolate

@@ -1,5 +1,5 @@
 /*
- * $Id: pm3d.h,v 1.29 2012/10/04 20:19:08 sfeam Exp $
+ * $Id: pm3d.h,v 1.30 2012/11/04 00:18:04 sfeam Exp $
  */
 
 /* GNUPLOT - pm3d.h */
@@ -107,8 +107,6 @@ typedef struct {
   char ftriangles;   	/* 0/1 (don't) draw flushing triangles */
   char direction;	/* forward, backward */
   char clip;		/* 1in, 4in */
-  int hidden3d_tag;     /* if this is > 0, pm3d hidden lines are drawn with
-			   this linestyle (which must naturally present). */
   PM3D_IMPL_MODE implicit;
 			/* 1: [default] draw ALL surfaces with pm3d
 			   0: only surfaces specified with 'with pm3d' */
@@ -116,11 +114,16 @@ typedef struct {
 			/* default: average color from all 4 points */
   int interp_i;		/* # of interpolation steps along scanline */
   int interp_j;		/* # of interpolation steps between scanlines */
+  lp_style_type border;	/* LT_NODRAW to disable.  From `set pm3d border <linespec> */
 } pm3d_struct;
 
-
 extern pm3d_struct pm3d;
-extern struct lp_style_type pm3d_border_lp;
+
+/* Used to initialize `set pm3d border` */
+extern struct lp_style_type default_pm3d_border;
+
+/* Used by routine filled_quadrangle() in color.c */
+extern struct lp_style_type pm3d_border_lp;	/* FIXME: Needed anymore? */
 
 
 

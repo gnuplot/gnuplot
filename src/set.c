@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.441 2014/03/23 00:34:44 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.442 2014/03/23 13:27:27 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -3758,19 +3758,24 @@ set_pm3d()
 	    case S_PM3D_NOFTRIANGLES: /* "noftr$iangles" */
 		pm3d.ftriangles = 0;
 		continue;
-	    /* pm3d-specific hidden line overwrite */
-	    case S_PM3D_HIDDEN: /* "hi$dden3d" */
-		c_token++;
-		pm3d.hidden3d_tag = -1;
-		if (isanumber(c_token) || type_udv(c_token)==INTGR) {
-		    pm3d.hidden3d_tag = int_expression();
-		    if (pm3d.hidden3d_tag < -1)
-			pm3d.hidden3d_tag = -1;
+	    /* deprecated pm3d "hidden3d" option, now used for borders */
+	    case S_PM3D_HIDDEN:
+		if (isanumber(c_token+1)) {
+		    c_token++;
+		    load_linetype(&pm3d.border, int_expression());
+		    c_token--;
+		    continue;
 		}
-		--c_token;
+		/* fall through */
+	    case S_PM3D_BORDER: /* border {linespec} */
+		c_token++;
+		pm3d.border = default_pm3d_border;
+		lp_parse(&pm3d.border, TRUE, FALSE);
+		c_token--;
 		continue;
-	    case S_PM3D_NOHIDDEN: /* "nohi$dden3d" */
-		pm3d.hidden3d_tag = 0;
+	    case S_PM3D_NOHIDDEN:
+	    case S_PM3D_NOBORDER:
+		pm3d.border.l_type = LT_NODRAW;
 		continue;
 	    case S_PM3D_SOLID: /* "so$lid" */
 	    case S_PM3D_NOTRANSPARENT: /* "notr$ansparent" */

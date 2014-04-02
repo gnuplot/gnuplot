@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.223 2014/03/12 03:55:07 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.224 2014/03/15 23:42:01 juhaszp Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -1664,6 +1664,18 @@ eval_3dplots()
 			    continue;
 			}
 		    }
+
+		} else if (this_plot->plot_style == PM3DSURFACE) {
+		    /* both previous and subsequent line properties override pm3d default border */
+		    int stored_token = c_token;
+		    if (!set_lpstyle)
+			this_plot->lp_properties = pm3d.border;
+ 		    lp_parse(&this_plot->lp_properties, TRUE, FALSE);
+		    if (stored_token != c_token) {
+			set_lpstyle = TRUE;
+			continue;
+		    }
+
 		} else {
 		    int stored_token = c_token;
 		    struct lp_style_type lp = DEFAULT_LP_STYLE_TYPE;
@@ -1732,6 +1744,12 @@ eval_3dplots()
 		    this_plot->arrow_properties.lp_properties.l_type = line_num;
 		    arrow_parse(&this_plot->arrow_properties, TRUE);
 		    this_plot->lp_properties = this_plot->arrow_properties.lp_properties;
+
+		} else if (this_plot->plot_style == PM3DSURFACE) {
+		    /* Use default pm3d border unless we see explicit line properties */
+		    this_plot->lp_properties = pm3d.border;
+ 		    lp_parse(&this_plot->lp_properties, TRUE, FALSE);
+
 		} else {
 		    int new_lt = 0;
 		    this_plot->lp_properties.l_type = line_num;

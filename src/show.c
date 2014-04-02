@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.317 2014/03/23 12:17:59 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.318 2014/03/23 13:27:27 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -2486,11 +2486,12 @@ show_pm3d()
 	fputs("at least 1 point of the quadrangle in x,y ranges\n", stderr);
     else
 	fputs( "all 4 points of the quadrangle in x,y ranges\n", stderr);
-    if (pm3d.hidden3d_tag > 0) {
-	fprintf(stderr,"\tpm3d-hidden3d is on and will use linestyle %d\n",
-	    pm3d.hidden3d_tag);
+    if (pm3d.border.l_type == LT_NODRAW) {
+	fprintf(stderr,"\tpm3d quadrangles will have no border\n");
     } else {
-	fprintf(stderr,"\tpm3d-hidden3d is %s\n", pm3d.hidden3d_tag ? "on" : "off");
+	fprintf(stderr,"\tpm3d quadrangle borders will default to ");
+	save_linetype(stderr, &(pm3d.border), FALSE);
+	fprintf(stderr,"\n");
     }
 
     fprintf(stderr,"\tsteps for bilinear interpolation: %d,%d\n",

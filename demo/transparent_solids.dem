@@ -14,10 +14,9 @@ set dummy u,v
 set urange [ -pi : pi ]
 set vrange [ -pi : pi ]
 
-set pm3d depthorder hidden3d 2
 set palette rgbformulae 8, 9, 7
-set style line 2  linetype 2 linecolor rgb "#a0a0f0"  linewidth 0.5
 set style fill  transparent solid 0.30 border
+set pm3d depthorder border linecolor rgb "#a0a0f0"  linewidth 0.5
 
 splot cos(u)+.5*cos(u)*cos(v),sin(u)+.5*sin(u)*cos(v),.5*sin(v) with pm3d, \
     1+cos(u)+.5*cos(u)*cos(v),.5*sin(v),sin(u)+.5*sin(u)*cos(v) with pm3d
@@ -27,8 +26,7 @@ pause -1 "Hit return to continue"
 unset title
 set label 1 "Kuen's Surface" at screen 0.57, 0.9
 set label 1 font "frscript,20"
-set style line 3  linetype -1 linewidth 0.5
-set pm3d depthorder hidden3d 3
+set pm3d depthorder border linetype -1 linewidth 0.5
 set style fill  transparent solid 0.65 border
 set palette
 set hidden3d

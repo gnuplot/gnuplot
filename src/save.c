@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.241 2014/03/15 23:42:01 juhaszp Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.242 2014/03/17 16:26:57 juhaszp Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -858,8 +858,12 @@ set origin %g,%g\n",
     }
     fputs((pm3d.ftriangles ? " " : " no"), fp);
     fputs("ftriangles", fp);
-    if (pm3d.hidden3d_tag > 0) fprintf(fp," hidden3d %d", pm3d.hidden3d_tag);
-	else fputs(pm3d.hidden3d_tag ? " hidden3d" : " nohidden3d", fp);
+    if (pm3d.border.l_type == LT_NODRAW) {
+	fprintf(fp," noborder");
+    } else {
+	fprintf(fp," border");
+	save_linetype(fp, &(pm3d.border), FALSE);
+    }
     fputs(" corners2color ", fp);
     switch (pm3d.which_corner_color) {
 	case PM3D_WHICHCORNER_MEAN:    fputs("mean", fp); break;
@@ -1467,9 +1471,7 @@ void
 save_linetype(FILE *fp, lp_style_type *lp, TBOOLEAN show_point)
 {
 
-    /* "linetype" is no longer printed */
-    /* fprintf(fp, " linetype %d", lp->l_type + 1); */
-    if (TRUE) { /* FIXME: Broke with removal of use_palette? */
+    if (lp->pm3d_color.type != TC_DEFAULT) {
 	fprintf(fp, " linecolor");
 	if (lp->pm3d_color.type == TC_LT)
     	    fprintf(fp, " %d", lp->pm3d_color.lt+1);

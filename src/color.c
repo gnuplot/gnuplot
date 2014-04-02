@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: color.c,v 1.111 2014/01/12 23:21:45 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: color.c,v 1.112 2014/02/28 19:23:52 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - color.c */
@@ -212,7 +212,7 @@ ifilled_quadrangle(gpiPoint* icorners)
 	icorners->style = style_from_fill(&default_fillstyle);
     term->filled_polygon(4, icorners);
 
-    if (pm3d.hidden3d_tag) {
+    if (pm3d.border.l_type != LT_NODRAW) {
 	int i;
 
 	/* It should be sufficient to set only the color, but for some */
