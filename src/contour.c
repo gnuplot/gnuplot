@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: contour.c,v 1.31 2013/07/01 20:16:14 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: contour.c,v 1.32 2014/02/28 19:23:52 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - contour.c */
@@ -315,6 +315,7 @@ end_crnt_cntr()
 	cntr->coords[i].z = contour_level;
     }
     cntr->num_pts = crnt_cntr_pt_index;
+    cntr->label[0] = '\0';
 
     cntr->next = contour_list;
     contour_list = cntr;

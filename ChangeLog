@@ -14,6 +14,8 @@
 	* demo/transparent_solids.dem docs/gnuplot.doc:
 	Update documentation and demo to show new syntax
 
+	* src/contour.c (end_crnt_cntr): Initialize blank label in new contour.
+
 2014-04-01  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/command.c (test_palette_command):  Write the palette colors into
