@@ -1,5 +1,5 @@
 /*
- * $Id: wgdiplus.cpp,v 1.11 2014/01/11 13:58:20 markisch Exp $
+ * $Id: wgdiplus.cpp,v 1.12 2014/03/15 04:23:28 markisch Exp $
  */
 
 /*
@@ -573,13 +573,15 @@ drawgraph_gdiplus(LPGW lpgw, HDC hdc, LPRECT rect)
 	/* do the drawing */
 	blkptr = lpgw->gwopblk_head;
 	curptr = NULL;
-	if (blkptr) {
+	if (blkptr != NULL) {
 		if (!blkptr->gwop)
 			blkptr->gwop = (struct GWOP *) GlobalLock(blkptr->hblk);
 		if (!blkptr->gwop)
 			return;
 		curptr = (struct GWOP *)blkptr->gwop;
 	}
+	if (curptr == NULL)
+	    return;
 
 	while (ngwop < lpgw->nGWOP) {
 		/* transform the coordinates */
