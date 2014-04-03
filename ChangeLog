@@ -1,3 +1,19 @@
+2014-04-03  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/fit.h (error_ex):  Add noreturn attribute to avoid compiler
+	warnings.
+
+	* src/fit.c:  Correct test for invalid covariance matrix.
+
+	* src/util.h (int_error, os_error, graph_error):  noreturn attribute
+	for MSVC.
+
+	* src/wgdiplus.cpp (drawgraph_gdiplus) src/win/wgraph.c (drawgraph):
+	Test if command list is available.
+
+	* src/win.trm (WIN_update_options) src/win/wmenu.c:  Incomplete format
+	strings.
+
 2014-04-02  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/misc.c demo/heatmaps.dem docs/gnuplot.doc:
@@ -23,7 +39,7 @@
 	file.  Simplify the internal command sequence that generates the test
 	output.  TODO: Move the command sequence into a datablock as well.
 
-2014-03-30 Bastian Maerkisch  <bmaerkisch@web.de>
+2014-03-30  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* term/caca.trm:  Change codepage from 932 to 437 on Japanese Windows.
 	Apparently this fixes display problems, although libcaca uses unicode
@@ -89,7 +105,7 @@
 	* src/boundary.c (do_key_sample_point) demo/lines_arrows.dem:
 	Apply textcolor to character point type in key sample.
 
-2014-03-23 Bastian Maerkisch  <bmaerkisch@web.de>
+2014-03-23  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/command.c src/command.h src/datablock.c src/datablock.h 
 	src/set.c src/show.c src/unset.c docs/gnuplot.doc demo/ellipse.dem

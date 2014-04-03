@@ -1,5 +1,5 @@
 /*
- * $Id: fit.h,v 1.27 2014/03/09 19:15:52 markisch Exp $
+ * $Id: fit.h,v 1.28 2014/03/15 04:27:37 markisch Exp $
  */
 
 /* GNUPLOT - fit.h */
@@ -80,7 +80,13 @@ extern int fit_wrap;
 
 /* Prototypes of functions exported by fit.c */
 
+#if defined(__GNUC__)
+void error_ex(int t_num, const char *str, ...) __attribute__((noreturn));
+#elif defined(_MSC_VER)
+__declspec(noreturn) void error_ex(int t_num, const char *str, ...);
+#else
 void error_ex(int t_num, const char *str, ...);
+#endif
 void init_fit __PROTO((void));
 void update __PROTO((char *pfile, char *npfile));
 void fit_command __PROTO((void));
