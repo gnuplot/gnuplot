@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: fit.c,v 1.140 2014/03/15 04:55:14 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: fit.c,v 1.141 2014/03/20 21:26:23 markisch Exp $"); }
 #endif
 
 /*  NOTICE: Change of Copyright Status
@@ -844,7 +844,7 @@ regress_finalize(int iter, double chisq, double last_chisq, double lambda, doubl
     /* test covariance matrix */
     if (covar != NULL) {
 	for (i = 0; i < num_params; i++) {
-	    /* diagonal elements must be larger tan zero */
+	    /* diagonal elements must be larger than zero */
 	    if (covar[i][i] <= 0.0) {
 		/* Not a fatal error, but prevent floating point exception later on */
 		Dblf2("Calculation error: non-positive diagonal element in covar. matrix of parameter '%s'.\n", par_name[i]);
@@ -914,21 +914,19 @@ regress_finalize(int iter, double chisq, double last_chisq, double lambda, doubl
 
     /* calculate unscaled parameter errors in dpar[]: */
     dpar = vec(num_params);
-    if ((covar != NULL) || covar_invalid) {
+    if ((covar != NULL) && !covar_invalid) {
 	/* calculate unscaled parameter errors in dpar[]: */
 	for (i = 0; i < num_params; i++) {
 	    dpar[i] = sqrt(covar[i][i]);
 	}
 
 	/* transform covariances into correlations */
-	if (!covar_invalid) {
-	    corel = matr(num_params, num_params);
-	    for (i = 0; i < num_params; i++) {
-		/* only lower triangle needs to be handled */
-		for (j = 0; j < i; j++)
-		    corel[i][j] = covar[i][j] / (dpar[i] * dpar[j]);
-		corel[i][i] = 1.;
-	    }
+	corel = matr(num_params, num_params);
+	for (i = 0; i < num_params; i++) {
+	    /* only lower triangle needs to be handled */
+	    for (j = 0; j < i; j++)
+		corel[i][j] = covar[i][j] / (dpar[i] * dpar[j]);
+	    corel[i][i] = 1.;
 	}
     } else {
 	/* set all errors to zero if covariance matrix invalid or unavailable */
