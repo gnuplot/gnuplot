@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: win.trm,v 1.122 2014/01/04 02:55:06 markisch Exp $
+ * $Id: win.trm,v 1.123 2014/01/04 15:46:38 markisch Exp $
  */
 
 /* GNUPLOT - win.trm */
@@ -117,9 +117,6 @@ TERM_PUBLIC void WIN_modify_plots __PROTO((unsigned int operations));
 #include <windows.h>
 #include "win/winmain.h"
 
-#ifdef __MSC__
-#include <io.h>			/* for mktemp() */
-#endif
 
 /* Interface routines - create list of actions for Windows */
 
@@ -420,7 +417,7 @@ WIN_update_options()
 	TBOOLEAN set_font = FALSE, set_fontsize = FALSE;
 
 	/* update term_options */
-	sprintf(term_options, "%i %s %s %s",
+	sprintf(term_options, "%i %s %s %s %s",
 		graphwin->Id,
 		graphwin->color ? "color" : "monochrome",
 		graphwin->dashed ? "dashed" : "solid",
@@ -486,13 +483,13 @@ WIN_text()
 TERM_PUBLIC void
 WIN_graphics()
 {
-    GraphStart(graphwin, pointsize);
-    /* Fix up the text size if the user has resized the window. */
-    term->h_char = graphwin->hchar;
-    term->v_char = graphwin->vchar;
-    term->h_tic = graphwin->htic;
-    term->v_tic = graphwin->vtic;
-    WIN_last_linetype = LT_NODRAW;		/* HBB 20000813: linetype caching */
+	GraphStart(graphwin, pointsize);
+	/* Fix up the text size if the user has resized the window. */
+	term->h_char = graphwin->hchar;
+	term->v_char = graphwin->vchar;
+	term->h_tic = graphwin->htic;
+	term->v_tic = graphwin->vtic;
+	WIN_last_linetype = LT_NODRAW;		/* HBB 20000813: linetype caching */
 
 	/* Save current text encoding */
 	GraphOp(graphwin, W_text_encoding, encoding, 0, NULL);
@@ -502,14 +499,14 @@ WIN_graphics()
 TERM_PUBLIC void
 WIN_move(unsigned int x, unsigned int y)
 {
-    GraphOp(graphwin, W_move, x, y, NULL);
+	GraphOp(graphwin, W_move, x, y, NULL);
 }
 
 
 TERM_PUBLIC void
 WIN_vector(unsigned int x, unsigned int y)
 {
-    GraphOp(graphwin, W_vect, x, y, NULL);
+	GraphOp(graphwin, W_vect, x, y, NULL);
 }
 
 
@@ -571,25 +568,24 @@ WIN_point(unsigned int x, unsigned int y, int number)
 TERM_PUBLIC void
 WIN_resume()
 {
-    GraphResume(graphwin);
+	GraphResume(graphwin);
 }
 
 
 TERM_PUBLIC void
 WIN_set_pointsize(double s)
 {
-    if (s < 0) s = 1;
-    /* Pass the scale as a scaled-up integer. */
-    GraphOp(graphwin, W_pointsize, (int) 100 * s, 0, NULL);
+	if (s < 0) s = 1;
+	/* Pass the scale as a scaled-up integer. */
+	GraphOp(graphwin, W_pointsize, (int) 100 * s, 0, NULL);
 }
 
 
 TERM_PUBLIC void
 WIN_linewidth(double linewidth)
 {
-    /* HBB 20000813: New routine */
-    WIN_last_linetype = LT_NODRAW;        /* invalidate cached linetype */
-    GraphOp(graphwin, W_line_width, (int) 100 * linewidth, 0, NULL);
+	WIN_last_linetype = LT_NODRAW;        /* invalidate cached linetype */
+	GraphOp(graphwin, W_line_width, (int) 100 * linewidth, 0, NULL);
 }
 
 
@@ -650,28 +646,31 @@ TERM_PUBLIC void
 WIN_image(unsigned int M, unsigned int N, coordval *image,
 	  gpiPoint *corner, t_imagecolor color_mode)
 {
-    PBYTE rgb_image;
-    unsigned int image_size;
-    unsigned int pad_bytes;
+	PBYTE rgb_image;
+	unsigned int image_size;
+	unsigned int pad_bytes;
 
-    /* BM: IC_PALETTE, IC_RGB and IC_RGBA images are converted to a format
-       suitable for Windows:
-        - sequence of lines is reversed
-        - each line starts at a 4 byte boundary
-        - 24bits RGB  for IC_PALETTE and IC_RGB
-        - 32bits RGBA for IC_RGBA
-    */
-    if ((color_mode == IC_PALETTE) || (color_mode == IC_RGB)) {
+	/* BM: IC_PALETTE, IC_RGB and IC_RGBA images are converted to a format
+	   suitable for Windows:
+	    - sequence of lines is reversed
+	    - each line starts at a 4 byte boundary
+	    - 24bits RGB  for IC_PALETTE and IC_RGB
+	    - 32bits RGBA for IC_RGBA
+	*/
+	if ((color_mode == IC_PALETTE) || (color_mode == IC_RGB)) {
 		pad_bytes = (4 - (3 * M) % 4) % 4; /* scan lines start on ULONG boundaries */
 		image_size = (3 * M + pad_bytes) * N;
-    } else if (color_mode == IC_RGBA) {
+	} else if (color_mode == IC_RGBA) {
 		pad_bytes = 0;
 		image_size = M * N * 4;
-    }
-    rgb_image = (PBYTE) gp_alloc(image_size, "WIN RGB image");
+	} else {
+		int_warn(NO_CARET, "Unknown color mode in WIN_image");
+		return;
+	}
+	rgb_image = (PBYTE) gp_alloc(image_size, "WIN RGB image");
 
-    if (color_mode == IC_PALETTE) {
-    	unsigned int x, y;
+	if (color_mode == IC_PALETTE) {
+		unsigned int x, y;
 
 		rgb_image += N * (3 * M + pad_bytes);
 		for (y=0; y<N; y++) {
@@ -685,8 +684,8 @@ WIN_image(unsigned int M, unsigned int N, coordval *image,
 			}
 			rgb_image -= 3 * M;
 		}
-    } else if (color_mode == IC_RGB) {
-    	unsigned int x, y;
+	} else if (color_mode == IC_RGB) {
+		unsigned int x, y;
 
 		rgb_image += N * (3 * M + pad_bytes);
 		for (y=0; y<N; y++) {
@@ -702,8 +701,8 @@ WIN_image(unsigned int M, unsigned int N, coordval *image,
 			}
 			rgb_image -= 3 * M;
 		}
-    } else if (color_mode == IC_RGBA) {
-    	unsigned int x, y;
+	} else if (color_mode == IC_RGBA) {
+		unsigned int x, y;
 
 		rgb_image += M * N * 4;
 		for (y=0; y<N; y++) {
@@ -742,13 +741,13 @@ WIN_image(unsigned int M, unsigned int N, coordval *image,
 TERM_PUBLIC int
 WIN_make_palette(t_sm_palette *palette)
 {
-    /* Win can do continuous colors. However, we round them only to WIN_PAL_COLORS levels
-     * in order to pass an integer to GraphOp; it also reasonably limits
-     * the number of colors if "copy to clipboard" is used.
-     * EAM: Would it be better to use the approximate_palette() mechanism instead,
-     * like the x11 terminal?
-     */
-    return WIN_PAL_COLORS;
+	/* Win can do continuous colors. However, we round them only to WIN_PAL_COLORS levels
+	    * in order to pass an integer to GraphOp; it also reasonably limits
+	    * the number of colors if "copy to clipboard" is used.
+	    * EAM: Would it be better to use the approximate_palette() mechanism instead,
+	    * like the x11 terminal?
+	    */
+	return WIN_PAL_COLORS;
 }
 
 
@@ -800,10 +799,10 @@ WIN_boxfill(
     unsigned int xleft, unsigned int ybottom,
     unsigned int width, unsigned int height)
 {
-    /* split into multiple commands to squeeze through all the necessary info */
-    GraphOp(graphwin, W_fillstyle, style, 0, NULL);
-    GraphOp(graphwin, W_move, xleft, ybottom, NULL);
-    GraphOp(graphwin, W_boxfill, xleft + width, ybottom + height, NULL);
+	/* split into multiple commands to squeeze through all the necessary info */
+	GraphOp(graphwin, W_fillstyle, style, 0, NULL);
+	GraphOp(graphwin, W_move, xleft, ybottom, NULL);
+	GraphOp(graphwin, W_boxfill, xleft + width, ybottom + height, NULL);
 }
 
 
