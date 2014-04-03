@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.444 2014/04/05 03:51:23 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.445 2014/04/05 05:25:53 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -49,16 +49,15 @@ static char *RCSid() { return RCSid("$Id: set.c,v 1.444 2014/04/05 03:51:23 sfea
 #include "datafile.h"
 #include "datablock.h"
 #include "fit.h"
-#include "gadgets.h"
 #include "gp_hist.h"
 #include "gp_time.h"
 #include "hidden3d.h"
 #include "misc.h"
-/* #include "parse.h" */
 #include "plot.h"
 #include "plot2d.h"
 #include "plot3d.h"
 #include "tables.h"
+#include "tabulate.h"
 #include "term_api.h"
 #include "util.h"
 #include "variable.h"
@@ -4570,16 +4569,28 @@ set_table()
 	fclose(table_outfile);
 	table_outfile = NULL;
     }
+    table_var = NULL;
 
-    if ((tablefile = try_to_get_string())) {
-    /* 'set table "foo"' creates a new output file */
+    if (equals(c_token, "$") && isletter(c_token + 1)) { /* datablock */
+	/* NB: has to come first because try_to_get_string will choke on the datablock name */
+	char * datablock_name = strdup(parse_datablock_name());
+	table_var = add_udv_by_name(datablock_name);
+	if (!table_var->udv_undef) {
+	    gpfree_string(&table_var->udv_value);
+	    gpfree_datablock(&table_var->udv_value);
+	}
+	table_var->udv_value.type = DATABLOCK;
+	table_var->udv_value.v.data_array = NULL;
+	table_var->udv_undef = FALSE;
+
+    } else if ((tablefile = try_to_get_string())) {  /* file name */
+	/* 'set table "foo"' creates a new output file */
 	if (!(table_outfile = fopen(tablefile, "w")))
 	   os_error(c_token, "cannot open table output file");
 	free(tablefile);
     }
 
     table_mode = TRUE;
-
 }
 
 

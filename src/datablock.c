@@ -1,5 +1,5 @@
 /*
- * $Id: datablock.c,v 1.3 2014/02/26 21:10:58 markisch Exp $
+ * $Id: datablock.c,v 1.4 2014/03/23 13:27:27 markisch Exp $
  */
 /* GNUPLOT - datablock.c */
 
@@ -167,6 +167,7 @@ parse_datablock_name()
     return name;
 }
 
+
 char **
 get_datablock(char *name)
 {
@@ -228,9 +229,9 @@ enlarge_datablock(struct value *datablock_value, int extra)
 
 /* append a single line to a datablock */
 void
-append_to_datablock(struct value *datablock_value, char *line)
+append_to_datablock(struct value *datablock_value, const char *line)
 {
     int nlines = enlarge_datablock(datablock_value, 1);
-    datablock_value->v.data_array[nlines] = line;
+    datablock_value->v.data_array[nlines] = (char *) line;
     datablock_value->v.data_array[nlines + 1] = NULL;
 }

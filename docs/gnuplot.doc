@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.876 2014/04/02 19:34:27 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.877 2014/04/02 21:35:46 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -7854,17 +7854,17 @@ Ffigure_mapcontours
  The surface can be switched off (see `unset surface`), giving a contour-only
  graph.  Though it is possible to use `set size` to enlarge the plot to fill
  the screen, more control over the output format can be obtained by writing
- the contour information to a file, and rereading it as a 2D datafile plot:
+ the contour information to a datablock, and rereading it as a 2D datafile plot:
 
        unset surface
        set contour
        set cntrparam ...
-       set table 'filename'
+       set table $datablock
        splot ...
        unset table
-       # contour info now in filename
+       # contour info now in $datablock
        set term <whatever>
-       plot 'filename'
+       plot $datablock
 
  In order to draw contours, the data should be organized as "grid data".  In
  such a file all the points for a single y-isoline are listed, then all the
@@ -11886,13 +11886,15 @@ Ffigure_missing
  (see `set samples` and `set dgrid3d`).
 
  Syntax:
-       set table {"outfile"}
+       set table {"outfile" | $datablock}
        plot <whatever>
        unset table
 
  Tabular output is written to the named file, if any, otherwise it is written
- to the current value of `set output`.  You must explicitly `unset table`
- in order to go back to normal plotting on the current terminal.
+ to the current value of `set output`.  Alternatively, tabular output can be
+ redirected to a named data block. Data block names start with '$', see also
+ `inline data`. You must explicitly `unset table` in order to go back to normal
+ plotting on the current terminal.
 
  To avoid any style-dependent processing of the input data (smoothing,
  errorbar expansion, secondary range checking, etc), or to increase the number

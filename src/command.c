@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.284 2014/03/30 18:33:21 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.285 2014/04/02 05:09:04 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -1650,6 +1650,7 @@ print_command()
     TBOOLEAN need_space = FALSE;
     char *dataline = NULL;
     size_t size = 256;
+    size_t len = 0;
 
     if (!print_out)
 	print_out = stderr;
@@ -1674,7 +1675,7 @@ print_command()
 	const_express(&a);
 	if (a.type == STRING) {
 	    if (dataline != NULL)
-		strappend(&dataline, &size, a.v.string_val);
+		len = strappend(&dataline, &size, len, a.v.string_val);
 	    else
 		fputs(a.v.string_val, print_out);
 	    gpfree_string(&a);
@@ -1682,12 +1683,12 @@ print_command()
 	} else {
 	    if (need_space) {
 		if (dataline != NULL)
-		    strappend(&dataline, &size, " ");
+		    len = strappend(&dataline, &size, len, " ");
 		else
 		    putc(' ', print_out);
 	    }
 	    if (dataline != NULL)
-		strappend(&dataline, &size, value_to_str(&a, FALSE));
+		len = strappend(&dataline, &size, len, value_to_str(&a, FALSE));
 	    else
 		disp_value(print_out, &a, FALSE);
 	    need_space = TRUE;

@@ -1,15 +1,15 @@
 #
-# $Id: vector.dem,v 1.11 2006/07/12 17:21:14 tlecomte Exp $
+# $Id: vector.dem,v 1.12 2009/10/31 05:24:18 sfeam Exp $
 #
 # This file demonstrates
-# -1- saving contour lines as a gnuplottable file
+# -1- saving contour lines as a gnuplottable datablock
 # -2- plotting a vector field on the same graph
 # -3- manipulating columns using the '$1,$2' syntax.
 # the example is taken here from Physics is the display of equipotential
 # lines and electrostatic field for a dipole (+q,-q)
 
 print "\n This file demonstrates"
-print " -1- saving contour lines as a gnuplottable file"
+print " -1- saving contour lines as a gnuplottable datablock"
 print " -2- plotting a vector field on the same graph"
 print " -3- manipulating columns using the '$1,$2' syntax."
 print " the example is taken here from Physics is the display of equipotential"
@@ -59,22 +59,22 @@ set cntrparam points 5
 set label "-q" at -1,0 center
 set label "+q" at  1,0 center
 splot vtot(x,y) w l
-print "Now create a file with equipotential lines"
+print "Now create a in-memory datablock with equipotential lines"
 pause -1 "Hit return to continue"
 
-set table "equipo2.tmp"
+set table $equipo2
 replot
 unset table
 reset
 pause 0
 
-plot "equipo2.tmp" w l
-print "Now create a x/y datafile for plotting with vectors "
+plot $equipo2 w l
+print "Now create a x/y datablock for plotting with vectors "
 print "and display vectors parallel to the electrostatic field"
 pause -1 "Hit return to continue"
 set isosam 31,31
 
-set table "field2xy.tmp"
+set table $field2xy
 splot vtot(x,y) w l
 unset table
 pause 0
@@ -84,8 +84,8 @@ set xr [xmin:xmax]
 set yr [ymin:ymax]
 set isosam 31,31
 set key under Left reverse
-plot "field2xy.tmp" u 1:2:(coef*dx1($1,$2)):(coef*dy1($1,$2)) w vec, \
-     "equipo2.tmp" w l
+plot $field2xy u 1:2:(coef*dx1($1,$2)):(coef*dy1($1,$2)) w vec, \
+     $equipo2 w l
 pause -1 "Hit return to continue"
 
 reset

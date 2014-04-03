@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.202 2014/03/23 13:27:27 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.203 2014/04/02 21:36:05 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -41,7 +41,6 @@ static char *RCSid() { return RCSid("$Id: unset.c,v 1.202 2014/03/23 13:27:27 ma
 #include "contour.h"
 #include "datafile.h"
 #include "fit.h"
-#include "gadgets.h"
 #include "gp_hist.h"
 #include "hidden3d.h"
 #include "misc.h"
@@ -50,6 +49,7 @@ static char *RCSid() { return RCSid("$Id: unset.c,v 1.202 2014/03/23 13:27:27 ma
 #include "plot2d.h"
 #include "plot3d.h"
 #include "tables.h"
+#include "tabulate.h"
 #include "term_api.h"
 #include "util.h"
 #include "variable.h"
@@ -1493,6 +1493,7 @@ unset_table()
     if (table_outfile)
 	fclose(table_outfile);
     table_outfile = NULL;
+    table_var = NULL;
     table_mode = FALSE;
 }
 

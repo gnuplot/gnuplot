@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: util.c,v 1.124 2014/04/04 17:01:21 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: util.c,v 1.125 2014/04/04 18:58:49 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - util.c */
@@ -43,8 +43,9 @@ static char *RCSid() { return RCSid("$Id: util.c,v 1.124 2014/04/04 17:01:21 sfe
 #include "misc.h"
 #include "plot.h"
 #include "term_api.h"		/* for term_end_plot() used by graph_error(), also to detect enhanced mode */
-#include "variable.h" /* For locale handling */
+#include "variable.h"		/* For locale handling */
 #include "setshow.h"		/* for conv_text() */
+#include "tabulate.h"		/* for table_mode */
 
 #if defined(HAVE_DIRENT_H)
 # include <sys/types.h>
@@ -634,21 +635,21 @@ gprintf(
 
 	    if ((term->flags & (TERM_ENHANCED_TEXT | TERM_IS_LATEX)) == 0) {
 		/* Not enhanced, not latex, just print it */
-	    	snprintf(dest, remaining_space, temp, x);
+		snprintf(dest, remaining_space, temp, x);
 
 	    } else if (table_mode) {
 		/* Tabular output should contain no markup */
-	    	snprintf(dest, remaining_space, temp, x);
+		snprintf(dest, remaining_space, temp, x);
 
 	    } else {
-	    	/* in enhanced mode -- convert E/e to x10^{foo} or *10^{foo} */
-	    	char tmp[256];
-	    	char tmp2[256];
-	    	int i,j;
-	    	TBOOLEAN bracket_flag = FALSE;
-	    	snprintf(tmp, 240, temp, x);
-	    	for (i=j=0; tmp[i] && i<256; i++) {
-	      	    if (tmp[i]=='E' || tmp[i]=='e') {
+		/* in enhanced mode -- convert E/e to x10^{foo} or *10^{foo} */
+		char tmp[256];
+		char tmp2[256];
+		int i,j;
+		TBOOLEAN bracket_flag = FALSE;
+		snprintf(tmp, 240, temp, x);
+		for (i=j=0; tmp[i] && i<256; i++) {
+		    if (tmp[i]=='E' || tmp[i]=='e') {
 			if ((term-> flags & TERM_IS_LATEX)) {
 			    if (*format == 'h') {
 				strcpy(&tmp2[j], "\\times");
@@ -672,11 +673,11 @@ gprintf(
 			/* Skip + and leading 0 in exponent */
 			i++; /* skip E */
 			if (tmp[i] == '+')
-		  	    i++;
+			    i++;
 			else if (tmp[i] == '-') /* copy sign */
 			    tmp2[j++] = tmp[i++];
 			while (tmp[i] == '0')
-		  	    i++;
+			    i++;
 			i--; /* undo following loop increment */
 		    } else {
 			tmp2[j++] = tmp[i];
@@ -1519,16 +1520,21 @@ streq(const char *a, const char *b)
 }
 
 
-/* append string src to dest, re-allocate memory if necessary */
-char *
-strappend(char **dest, size_t *size, char *src)
+/* append string src to dest
+   re-allocates memory if necessary, (re-)determines the length of the 
+   destination string only if len==0
+ */
+size_t
+strappend(char **dest, size_t *size, size_t len, const char *src)
 {
-    if (strlen(*dest) + strlen(src) + 1 > *size) {
+    size_t destlen = (len != 0) ? len : strlen(*dest);
+    size_t srclen = strlen(src);
+    if (destlen + srclen + 1 > *size) {
 	*size *= 2;
 	*dest = (char *) gp_realloc(*dest, *size, "strappend");
     }
-    strcat(*dest, src);
-    return *dest;
+    memcpy(*dest + destlen, src, srclen + 1);
+    return destlen + srclen;
 }
 
 

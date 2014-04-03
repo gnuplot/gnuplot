@@ -414,9 +414,6 @@ extern int aspect_ratio_3D;	/* 2 for equal scaling of x and y; 3 for z also */
 extern t_position lmargin, bmargin, rmargin, tmargin;
 #define DEFAULT_MARGIN_POSITION {character, character, character, -1, -1, -1}
 
-extern FILE *table_outfile;
-extern TBOOLEAN table_mode;
-
 extern struct custom_dashtype_def *first_custom_dashtype;
 
 extern struct arrow_def *first_arrow;

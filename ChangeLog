@@ -1,3 +1,11 @@
+2014-04-03  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	demo/vector.dem docs/gnuplot.doc src/command.c src/datablock.c
+	src/datablock.h src/gadgets.c src/gadgets.h src/plot2d.c src/set.c
+	src/tabulate.c src/tabulate.h src/unset.c src/util.c src/util.h:
+	'set table $datablock' redirects table output to a named data block.
+	Patch #662
+
 2014-04-04  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/term.c (load_linetype):  If a line style is based on a lt < 0
