@@ -6,6 +6,9 @@
 	isn't fully in place yet.
 	Bug #1369
 
+	* src/util.c (value_to_str):  Fix error in buffer length accounting.
+	Bug #1372
+
 2014-04-03  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/fit.h (error_ex):  Add noreturn attribute to avoid compiler

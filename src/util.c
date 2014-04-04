@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: util.c,v 1.122 2014/03/23 12:17:59 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: util.c,v 1.123 2014/03/23 14:10:02 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - util.c */
@@ -1571,15 +1571,16 @@ value_to_str(struct value *val, TBOOLEAN need_quotes)
 	    } else {
 		char * cstr = conv_text(val->v.string_val);
 		size_t reqsize = strlen(cstr) + 3;
-		if (reqsize > c[j])
+		if (reqsize > c[j]) {
 		    s[j] = (char *) gp_realloc(s[j], reqsize + 20, "value_to_str");
-		if (s[j] != NULL) {
-		    c[j] = reqsize + 20;
-		    sprintf(s[j], "\"%s\"", cstr);
-		} else {
-		    c[j] = 0;
-		    int_error(NO_CARET, "out of memory");
+		    if (s[j] != NULL) {
+			c[j] = reqsize + 20;
+		    } else {
+			c[j] = 0;
+			int_error(NO_CARET, "out of memory");
+		    }
 		}
+		sprintf(s[j], "\"%s\"", cstr);
 	    }
 	} else {
 	    s[j][0] = NUL;
