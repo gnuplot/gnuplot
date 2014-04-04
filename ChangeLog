@@ -11,7 +11,7 @@
 
 	* src/alloc.c src/alloc.h src/bf_test.c: The conditional code in
 	alloc.c for tracking memory allocation/free has bit-rotted to a point
-	where the program segaults on entry if it is enabled.  Since this sort
+	where the program segfaults on entry if it is enabled.  Since this sort
 	of accounting is now better done using valgrind it is not worth fixing
 	the old code.  Delete it.
 
@@ -19,6 +19,8 @@
 	entangling the help system with every memory allocation seems excessive.
 	If we're about to run out of memory there are deeper problems than old
 	help messages.
+
+	* configure.in: Remove EXPERIMENTAL warning from older options.
 
 2014-04-03  Bastian Maerkisch  <bmaerkisch@web.de>
 

@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot on Unix.
 dnl
-dnl $Id: configure.in,v 1.359 2014/03/19 20:42:44 sfeam Exp $
+dnl $Id: configure.in,v 1.360 2014/03/19 23:36:07 sfeam Exp $
 dnl
 dnl this is actually major.minor ...
 dnl note that for a non-beta release, we need to disable DEVELOPMENT_RELEASE
@@ -366,7 +366,7 @@ dnl TODO: simplify, get rid of GGI_SUPPORT
 dnl new ggi driver
 GGI_SUPPORT=no
 AC_ARG_WITH(ggi,dnl
-[  --with-ggi[=DIR]        enable the ggi driver (EXPERIMENTAL)],
+[  --with-ggi[=DIR]        enable the ggi driver],
   [if test "$withval" != no; then
      if test -d $withval/include; then
        CPPFLAGS="$CPPFLAGS -I$withval/include"
@@ -1397,9 +1397,9 @@ fi
 
 if test "$GGI_SUPPORT" = yes; then
   if test "$ac_cv_header_ggi_xmi_h" = yes; then
-    AC_MSG_RESULT([  ggi terminal: yes (EXPERIMENTAL) (with pm3d support)])
+    AC_MSG_RESULT([  ggi terminal: yes (with pm3d support)])
   else
-    AC_MSG_RESULT([  ggi terminal: yes (EXPERIMENTAL) (without pm3d support, requires libxmi)])
+    AC_MSG_RESULT([  ggi terminal: yes (without pm3d support, requires libxmi)])
   fi
 else
   AC_MSG_RESULT([  ggi terminal: no (use --with-ggi to enable, requires libggi)])
@@ -1509,7 +1509,7 @@ else
 fi
 
 if test "$enable_boxed_text" = yes; then
-  AC_MSG_RESULT([  Boxed text labels (EXPERIMENTAL)])
+  AC_MSG_RESULT([  Boxed text labels ])
 fi
 
 AC_MSG_RESULT([  Maximum number of parallel axes: 5 ])
@@ -1570,9 +1570,9 @@ else
 fi
 
 if test "$have_external_functions" = yes; then
-  AC_MSG_RESULT([  plugin support for loading external functions: yes (EXPERIMENTAL)])
+  AC_MSG_RESULT([  plugin support for loading external functions: yes ])
 else
-  AC_MSG_RESULT([  plugin support for loading external functions: no (EXPERIMENTAL)])
+  AC_MSG_RESULT([  plugin support for loading external functions: no ])
 fi
 
 if test "$with_kpsexpand" = yes; then
