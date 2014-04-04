@@ -1,5 +1,5 @@
 /*
- * $Id: alloc.h,v 1.11 2011/03/13 19:55:29 markisch Exp $
+ * $Id: alloc.h,v 1.12 2011/09/04 11:08:33 markisch Exp $
  */
 
 /* GNUPLOT - alloc.h */
@@ -49,29 +49,5 @@
 
 generic *gp_alloc __PROTO((size_t size, const char *message));
 generic *gp_realloc __PROTO((generic *p, size_t size, const char *message));
-
-/* dont define CHECK_HEAP_USE on a FARALLOC machine ! */
-
-#ifdef CHECK_HEAP_USE
-
-/* all allocated blocks have guards at front and back.
- * CHECK_POINTER checks guards on block, and checks that p is in range
- * START_LEAK_CHECK and END_LEAK_CHECK allow assert that no net memory
- * is allocated within enclosed block
- */
-
-void checked_free(void *p);
-void check_pointer_in_block(void *block, void *p, int size, char *file, int line);
-void start_leak_check(char *file,int line);
-void end_leak_check(char *file,int line);
-# define free(x) checked_free(x)
-# define CHECK_POINTER(block, p) check_pointer_in_block(block, p, sizeof(*p), __FILE__, __LINE__)
-# define START_LEAK_CHECK() start_leak_check(__FILE__, __LINE__)
-# define END_LEAK_CHECK() end_leak_check(__FILE__, __LINE__)
-#else
-# define CHECK_POINTER(block, p) /*nowt*/
-# define START_LEAK_CHECK() /*nowt*/
-# define END_LEAK_CHECK() /*nowt*/
-#endif
 
 #endif /* GNUPLOT_ALLOC_H */

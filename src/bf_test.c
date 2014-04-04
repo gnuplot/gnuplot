@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: bf_test.c,v 1.9 2004/07/01 17:10:03 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: bf_test.c,v 1.10 2007/10/02 18:18:57 sfeam Exp $"); }
 #endif
 
 
@@ -28,7 +28,6 @@ static char *RCSid() { return RCSid("$Id: bf_test.c,v 1.9 2004/07/01 17:10:03 br
 
 /* we declare these here instead of including more header files */
 void int_error __PROTO((int, const char *));
-void FreeHelp __PROTO((void));
 
 /* static functions */
 static float function __PROTO((int p, double x, double y));
@@ -54,11 +53,6 @@ int_error(int dummy, const char *error_text)
     exit(EXIT_FAILURE);
 }
 
-
-void
-FreeHelp()
-{
-}
 
 /*---- End of stubs ----*/
 

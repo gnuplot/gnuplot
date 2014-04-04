@@ -9,6 +9,17 @@
 	* src/util.c (value_to_str):  Fix error in buffer length accounting.
 	Bug #1372
 
+	* src/alloc.c src/alloc.h src/bf_test.c: The conditional code in
+	alloc.c for tracking memory allocation/free has bit-rotted to a point
+	where the program segaults on entry if it is enabled.  Since this sort
+	of accounting is now better done using valgrind it is not worth fixing
+	the old code.  Delete it.
+
+	* src/alloc.c: Although freeing old help messages may free some memory,
+	entangling the help system with every memory allocation seems excessive.
+	If we're about to run out of memory there are deeper problems than old
+	help messages.
+
 2014-04-03  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/fit.h (error_ex):  Add noreturn attribute to avoid compiler
