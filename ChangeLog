@@ -22,6 +22,8 @@
 
 	* configure.in: Remove EXPERIMENTAL warning from older options.
 
+	* src/save.c src/set.c src/term.c:  Code style / whitespace cleanup
+
 2014-04-03  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/fit.h (error_ex):  Add noreturn attribute to avoid compiler

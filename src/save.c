@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.242 2014/03/17 16:26:57 juhaszp Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.243 2014/04/02 21:36:05 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -258,8 +258,8 @@ set bar %f %s\n",
     fprintf(fp, " angle %g ", default_ellipse.o.ellipse.orientation);
     fputs("units ", fp);
     switch (default_ellipse.o.ellipse.type) {
-        case ELLIPSEAXES_XY:
-            fputs("xy\n", fp);
+	case ELLIPSEAXES_XY:
+	    fputs("xy\n", fp);
 	    break;
 	case ELLIPSEAXES_XX:
 	    fputs("xx\n", fp);
@@ -273,20 +273,20 @@ set bar %f %s\n",
     if (dgrid3d) {
       if( dgrid3d_mode == DGRID3D_QNORM ) {
 	fprintf(fp, "set dgrid3d %d,%d, %d\n",
-          	dgrid3d_row_fineness,
-          	dgrid3d_col_fineness,
-          	dgrid3d_norm_value);
+	  	dgrid3d_row_fineness,
+	  	dgrid3d_col_fineness,
+	  	dgrid3d_norm_value);
       } else if( dgrid3d_mode == DGRID3D_SPLINES ) {
 	fprintf(fp, "set dgrid3d %d,%d splines\n",
-          	dgrid3d_row_fineness, dgrid3d_col_fineness );
+	  	dgrid3d_row_fineness, dgrid3d_col_fineness );
       } else {
 	fprintf(fp, "set dgrid3d %d,%d %s%s %f,%f\n",
-          	dgrid3d_row_fineness,
-          	dgrid3d_col_fineness,
+	  	dgrid3d_row_fineness,
+	  	dgrid3d_col_fineness,
 		reverse_table_lookup(dgrid3d_mode_tbl, dgrid3d_mode),
 		dgrid3d_kdensity ? " kdensity2d" : "",
-          	dgrid3d_x_scale,
-          	dgrid3d_y_scale );
+	  	dgrid3d_x_scale,
+	  	dgrid3d_y_scale );
       }
     }
 
@@ -323,7 +323,7 @@ set bar %f %s\n",
     else {
 	if (polar_grid_angle) 	/* set angle already output */
 	    fprintf(fp, "set grid polar %f\n", polar_grid_angle / ang2rad);
-        else
+	else
 	    fputs("set grid nopolar\n", fp);
 
 #define SAVE_GRID(axis)					\
@@ -606,7 +606,7 @@ set encoding %s\n\
     if (decimalsign != NULL)
 	fprintf(fp, "set decimalsign '%s'\n", decimalsign);
     if (!numeric_locale && !decimalsign)
-        fprintf(fp, "unset decimalsign\n");
+	fprintf(fp, "unset decimalsign\n");
 
     fputs("set view ", fp);
     if (splot_map == TRUE)
@@ -781,7 +781,7 @@ set origin %g,%g\n",
 	fprintf(fp, "set %s%s \"%s\" ",					 \
 		name, suffix, lab.text ? conv_text(lab.text) : "");	 \
 	fprintf(fp, "\nset %s%s ", name, suffix);			 \
-        save_position(fp, &(lab.offset), TRUE);				 \
+	save_position(fp, &(lab.offset), TRUE);				 \
 	fprintf(fp, " font \"%s\"", lab.font ? conv_text(lab.font) : "");\
 	save_textcolor(fp, &(lab.textcolor));				 \
 	if (lab.tag == ROTATE_IN_3D_LABEL_TAG)				 \
@@ -894,12 +894,12 @@ set origin %g,%g\n",
     else {
       fputs( "color model ", fp );
       switch( sm_palette.cmodel ) {
-        case C_MODEL_RGB: fputs( "RGB ", fp ); break;
-        case C_MODEL_HSV: fputs( "HSV ", fp ); break;
-        case C_MODEL_CMY: fputs( "CMY ", fp ); break;
-        case C_MODEL_YIQ: fputs( "YIQ ", fp ); break;
-        case C_MODEL_XYZ: fputs( "XYZ ", fp ); break;
-        default:
+	case C_MODEL_RGB: fputs( "RGB ", fp ); break;
+	case C_MODEL_HSV: fputs( "HSV ", fp ); break;
+	case C_MODEL_CMY: fputs( "CMY ", fp ); break;
+	case C_MODEL_YIQ: fputs( "YIQ ", fp ); break;
+	case C_MODEL_XYZ: fputs( "XYZ ", fp ); break;
+	default:
 	  fprintf( stderr, "%s:%d ooops: Unknown color model '%c'.\n",
 		   __FILE__, __LINE__, (char)(sm_palette.cmodel) );
       }
@@ -1084,7 +1084,7 @@ save_tics(FILE *fp, AXIS_INDEX axis)
 	    }
     	}
     } else
-        fputs(" autojustify", fp);
+	fputs(" autojustify", fp);
     fprintf(fp, "\nset %stics ", axis_name(axis));
     switch (axis_array[axis].ticdef.type) {
     case TIC_COMPUTED:{
@@ -1121,10 +1121,10 @@ save_tics(FILE *fp, AXIS_INDEX axis)
     fprintf(fp, (axis_array[axis].ticdef.rangelimited)?" rangelimit":" norangelimit");
 
     if (axis_array[axis].ticdef.font && *axis_array[axis].ticdef.font)
-        fprintf(fp, " font \"%s\"", axis_array[axis].ticdef.font);
+	fprintf(fp, " font \"%s\"", axis_array[axis].ticdef.font);
 
     if (axis_array[axis].ticdef.textcolor.type != TC_DEFAULT)
-        save_textcolor(fp, &axis_array[axis].ticdef.textcolor);
+	save_textcolor(fp, &axis_array[axis].ticdef.textcolor);
 
     putc('\n', fp);
 
@@ -1594,8 +1594,8 @@ save_object(FILE *fp, int tag)
 	    fprintf(fp, "  angle %g", this_ellipse->orientation);
 	    fputs(" units ", fp);
 	    switch (this_ellipse->type) {
-        	case ELLIPSEAXES_XY:
-        	    fputs("xy", fp);
+		case ELLIPSEAXES_XY:
+		    fputs("xy", fp);
 		    break;
 		case ELLIPSEAXES_XX:
 		    fputs("xx", fp);

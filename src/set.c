@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.442 2014/03/23 13:27:27 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.443 2014/04/02 21:36:05 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -1323,7 +1323,7 @@ set_dashtype()
     struct custom_dashtype_def *this_dashtype = NULL;
     struct custom_dashtype_def *new_dashtype = NULL;
     struct custom_dashtype_def *prev_dashtype = NULL;
-    int tag, d_type, is_new = FALSE;
+    int tag, is_new = FALSE;
 
     c_token++;
 
@@ -1359,9 +1359,8 @@ set_dashtype()
 	this_dashtype->d_type = parse_dashtype(&this_dashtype->dashtype);
 
     if (!END_OF_COMMAND) {
-	if (is_new) {
-		delete_dashtype(prev_dashtype, this_dashtype);
-	}
+	if (is_new)
+	    delete_dashtype(prev_dashtype, this_dashtype);
 	int_error(c_token,"Extraneous arguments to set dashtype");
     }
 }
@@ -1373,15 +1372,12 @@ void
 delete_dashtype(struct custom_dashtype_def *prev, struct custom_dashtype_def *this)
 {
     if (this != NULL) {		/* there really is something to delete */
-	if (this == first_custom_dashtype) {
+	if (this == first_custom_dashtype)
 	    first_custom_dashtype = this->next;
-	}
-	else {
+	else
 	    prev->next = this->next;
-	}
-	if (this->dashtype.str) {
-		free(this->dashtype.str);
-	}
+	if (this->dashtype.str)
+	    free(this->dashtype.str);
 	free(this);
     }
 }
@@ -1406,7 +1402,7 @@ set_dgrid3d()
 
     c_token++;
     while ( !(END_OF_COMMAND) ) {
-        int tmp_mode = lookup_table(&dgrid3d_mode_tbl[0],c_token);
+	int tmp_mode = lookup_table(&dgrid3d_mode_tbl[0],c_token);
 	if (tmp_mode != DGRID3D_OTHER) {
 	    dgrid3d_mode = tmp_mode;
 	    c_token++;
@@ -1443,12 +1439,12 @@ set_dgrid3d()
 				c_token++;
 				token_cnt++;
 			} else if( token_cnt == 0) {
-		        	gridx = int_expression();
-		        	gridy = gridx; /* gridy defaults to gridx, unless overridden below */
+				gridx = int_expression();
+				gridy = gridx; /* gridy defaults to gridx, unless overridden below */
 			} else if( token_cnt == 1) {
-		        	gridy = int_expression();
+				gridy = int_expression();
 			} else if( token_cnt == 2) {
-		        	normval = int_expression();
+				normval = int_expression();
 			} else
 				int_error(c_token,"Unrecognized keyword or unexpected value");
 			break;
@@ -1458,16 +1454,16 @@ set_dgrid3d()
 
     /* we could warn here about floating point values being truncated... */
     if( gridx < 2 || gridx > 1000 || gridy < 2 || gridy > 1000 )
-        int_error( NO_CARET,
-                   "Number of grid points must be in [2:1000] - not changed!");
+	int_error( NO_CARET,
+		   "Number of grid points must be in [2:1000] - not changed!");
 
     /* no mode token found: classic format */
     if( dgrid3d_mode == DGRID3D_DEFAULT )
-        dgrid3d_mode = DGRID3D_QNORM;
+	dgrid3d_mode = DGRID3D_QNORM;
 
     if( scalex < 0.0 || scaley < 0.0 )
-        int_error( NO_CARET,
-                   "Scale factors must be greater than zero - not changed!" );
+	int_error( NO_CARET,
+		   "Scale factors must be greater than zero - not changed!" );
 
     dgrid3d_row_fineness = gridx;
     dgrid3d_col_fineness = gridy;
@@ -2739,7 +2735,7 @@ set_datafile_commentschars()
 	df_commentschars = gp_strdup(DEFAULT_COMMENTS_CHARS);
     } else if ((s = try_to_get_string())) {
 	free(df_commentschars);
-        df_commentschars = s;
+	df_commentschars = s;
     } else /* Leave it the way it was */
 	int_error(c_token, "expected string with comments chars");
 }
@@ -3710,7 +3706,7 @@ set_pm3d()
 		    c_token++;
 		    pm3d.interp_j = int_expression();
 		    c_token--;
-                }
+		}
 		continue;
 	    /* forward and backward drawing direction */
 	    case S_PM3D_SCANSFORWARD: /* "scansfor$ward" */
@@ -4147,15 +4143,15 @@ set_obj(int tag, int obj_type)
 		} else if (almost_equals(c_token,"unit$s")) {
 		    c_token++;
 		    if (equals(c_token,"xy") || END_OF_COMMAND) {
-	                this_ellipse->type = ELLIPSEAXES_XY;
-	            } else if (equals(c_token,"xx")) {
-	                this_ellipse->type = ELLIPSEAXES_XX;
-	            } else if (equals(c_token,"yy")) {
-	                this_ellipse->type = ELLIPSEAXES_YY;
-	            } else {
-	                int_error(c_token, "expecting 'xy', 'xx' or 'yy'" );
-	            }
-	            c_token++;
+			this_ellipse->type = ELLIPSEAXES_XY;
+		    } else if (equals(c_token,"xx")) {
+			this_ellipse->type = ELLIPSEAXES_XX;
+		    } else if (equals(c_token,"yy")) {
+			this_ellipse->type = ELLIPSEAXES_YY;
+		    } else {
+			int_error(c_token, "expecting 'xy', 'xx' or 'yy'" );
+		    }
+		    c_token++;
 		    continue;
 
 		}
@@ -4446,29 +4442,29 @@ set_style()
 	}
 	break;
     case SHOW_STYLE_ELLIPSE:
-        c_token++;
+	c_token++;
 	while (!END_OF_COMMAND) {
 	    if (equals(c_token,"size")) {
-	        c_token++;
-	        get_position(&default_ellipse.o.ellipse.extent);
-	        c_token--;
+		c_token++;
+		get_position(&default_ellipse.o.ellipse.extent);
+		c_token--;
 	    } else if (almost_equals(c_token,"ang$le")) {
-	        c_token++;
-	        if (isanumber(c_token) || type_udv(c_token) == INTGR || type_udv(c_token) == CMPLX) {
-	            default_ellipse.o.ellipse.orientation = real_expression();
-	            c_token--;
-	        }
+		c_token++;
+		if (isanumber(c_token) || type_udv(c_token) == INTGR || type_udv(c_token) == CMPLX) {
+		    default_ellipse.o.ellipse.orientation = real_expression();
+		    c_token--;
+		}
 	    } else if (almost_equals(c_token,"unit$s")) {
-	        c_token++;
-	        if (equals(c_token,"xy") || END_OF_COMMAND) {
-	            default_ellipse.o.ellipse.type = ELLIPSEAXES_XY;
-	        } else if (equals(c_token,"xx")) {
-	            default_ellipse.o.ellipse.type = ELLIPSEAXES_XX;
-	        } else if (equals(c_token,"yy")) {
-	            default_ellipse.o.ellipse.type = ELLIPSEAXES_YY;
-	        } else {
-	            int_error(c_token, "expecting 'xy', 'xx' or 'yy'" );
-	        }
+		c_token++;
+		if (equals(c_token,"xy") || END_OF_COMMAND) {
+		    default_ellipse.o.ellipse.type = ELLIPSEAXES_XY;
+		} else if (equals(c_token,"xx")) {
+		    default_ellipse.o.ellipse.type = ELLIPSEAXES_XX;
+		} else if (equals(c_token,"yy")) {
+		    default_ellipse.o.ellipse.type = ELLIPSEAXES_YY;
+		} else {
+		    int_error(c_token, "expecting 'xy', 'xx' or 'yy'" );
+		}
 	    } else if (equals(c_token, "clip")) {
 		c_token++;
 		default_ellipse.clip = OBJ_CLIP;
@@ -4476,7 +4472,7 @@ set_style()
 		c_token++;
 		default_ellipse.clip = OBJ_NOCLIP;
 	    } else
-	        int_error(c_token, "expecting 'units {xy|xx|yy}', 'angle <number>' or 'size <position>'" );
+		int_error(c_token, "expecting 'units {xy|xx|yy}', 'angle <number>' or 'size <position>'" );
 
 	    c_token++;
 	}
@@ -4653,7 +4649,7 @@ set_termoptions()
 	return;
 
     if (almost_equals(c_token,"enh$anced")
-           ||  almost_equals(c_token,"noenh$anced")) {
+	   ||  almost_equals(c_token,"noenh$anced")) {
 	num_tokens = GPMIN(num_tokens,c_token+1);
 	if (term->enhanced_open)
 	    ok_to_call_terminal = TRUE;
@@ -4754,7 +4750,7 @@ set_tics()
 	    set_ticscale();
 	} else if (almost_equals(c_token, "ro$tate")) {
 	    for (i = 0; i < AXIS_ARRAY_SIZE; ++i) {
-	        axis_array[i].tic_rotate = TEXT_VERTICAL;
+		axis_array[i].tic_rotate = TEXT_VERTICAL;
 	    }
 	    ++c_token;
 	    if (equals(c_token, "by")) {
@@ -5542,7 +5538,7 @@ set_linestyle(struct linestyle_def **head)
 
     if (this_linestyle == NULL || tag != this_linestyle->tag) {
 	/* Default style is based on linetype with the same tag id */
-        struct lp_style_type loc_lp = DEFAULT_LP_STYLE_TYPE;
+	struct lp_style_type loc_lp = DEFAULT_LP_STYLE_TYPE;
 	loc_lp.l_type = tag - 1;
 	loc_lp.p_type = tag - 1;
 	loc_lp.d_type = DASHTYPE_SOLID;

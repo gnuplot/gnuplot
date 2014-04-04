@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.285 2014/04/02 21:36:05 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.286 2014/04/04 04:00:45 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -285,7 +285,7 @@ void fflush_binary();
 #endif
 
 #if defined(__WATCOMC__) || defined(__MSC__)
-# include <io.h>        /* for setmode() */
+# include <io.h>	/* for setmode() */
 #endif
 
 #define NICE_LINE               0
@@ -454,7 +454,7 @@ term_initialise()
 	 */
 	char *temp = gp_alloc(strlen(outstr) + 1, "temp file string");
 	if (temp) {
-            FPRINTF((stderr, "term_initialise: reopening \"%s\" as %s\n",
+	    FPRINTF((stderr, "term_initialise: reopening \"%s\" as %s\n",
 		     outstr, term->flags & TERM_BINARY ? "binary" : "text"));
 	    strcpy(temp, outstr);
 	    term_set_output(temp);      /* will free outstr */
@@ -495,7 +495,7 @@ term_start_plot()
     FPRINTF((stderr, "term_start_plot()\n"));
 
     if (!term_initialised)
-        term_initialise();
+	term_initialise();
 
     if (!term_graphics) {
 	FPRINTF((stderr, "- calling term->graphics()\n"));
@@ -1221,8 +1221,8 @@ static void
 graphics_null()
 {
     fprintf(stderr,
-            "WARNING: Plotting with an 'unknown' terminal.\n"
-            "No output will be generated. Please select a terminal with 'set terminal'.\n");
+	    "WARNING: Plotting with an 'unknown' terminal.\n"
+	    "No output will be generated. Please select a terminal with 'set terminal'.\n");
 }
 
 static void
