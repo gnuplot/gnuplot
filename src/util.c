@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: util.c,v 1.123 2014/03/23 14:10:02 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: util.c,v 1.124 2014/04/04 17:01:21 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - util.c */
@@ -1545,8 +1545,6 @@ value_to_str(struct value *val, TBOOLEAN need_quotes)
     i = (i + 1) % 4;
     if (s[j] == NULL) {
 	s[j] = (char *) gp_alloc(minbufsize, "value_to_str");
-	if (s[j] == NULL) 
-	    int_error(NO_CARET, "out of memory");
 	c[j] = minbufsize;
     }
 
@@ -1572,7 +1570,8 @@ value_to_str(struct value *val, TBOOLEAN need_quotes)
 		char * cstr = conv_text(val->v.string_val);
 		size_t reqsize = strlen(cstr) + 3;
 		if (reqsize > c[j]) {
-		    s[j] = (char *) gp_realloc(s[j], reqsize + 20, "value_to_str");
+		    /* Don't leave c[j[ non-zero if realloc fails */
+		    s[j] = (char *) gp_realloc(s[j], reqsize + 20, NULL);
 		    if (s[j] != NULL) {
 			c[j] = reqsize + 20;
 		    } else {
