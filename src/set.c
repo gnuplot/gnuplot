@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.443 2014/04/02 21:36:05 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.444 2014/04/05 03:51:23 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -1355,8 +1355,11 @@ set_dashtype()
     if (almost_equals(c_token, "def$ault")) {
 	delete_dashtype(prev_dashtype, this_dashtype);
 	c_token++;
-    } else
+    } else {
+	/* FIXME: Maybe this should reject return values > 0 because */
+	/* otherwise we have potentially recursive definitions.      */
 	this_dashtype->d_type = parse_dashtype(&this_dashtype->dashtype);
+    }
 
     if (!END_OF_COMMAND) {
 	if (is_new)

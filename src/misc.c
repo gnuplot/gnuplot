@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.175 2014/03/23 03:03:07 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.176 2014/04/02 19:34:27 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -868,9 +868,15 @@ parse_dashtype(struct t_dashtype *dt)
     int k = 0;
     char *dash_str = NULL;
 
+    /* Erase any previous contents */
+    memset(dt, 0, sizeof(struct t_dashtype));
+
+    /* Fill in structure based on keyword ... */ 
     if (equals(c_token, "solid")) {
 	res = DASHTYPE_SOLID;
 	c_token++;
+
+    /* Or numerical pattern ... */
     } else if (equals(c_token, "(")) {
 	c_token++;
 	while (!END_OF_COMMAND && j < DASHPATTERN_LENGTH) {
@@ -889,21 +895,15 @@ parse_dashtype(struct t_dashtype *dt)
 	    }
 	}
 
-	if (END_OF_COMMAND || !equals(c_token, ")")) {
+	if (END_OF_COMMAND || !equals(c_token, ")"))
 	    int_error(c_token, "expecting comma , or right parenthesis )");
-	}
+
 	c_token++;
-	/* cleanup */
-	if (dt->str) {
-	    free(dt->str);
-	    dt->str = NULL;
-	}
-	while (j < DASHPATTERN_LENGTH) {
-	    dt->pattern[j++] = 0.0f; 
-	}
 	res = DASHTYPE_CUSTOM;
+
+    /* Or string representing pattern elements ... */
     } else if ((dash_str = try_to_get_string())) {
-	while (dash_str[j] && (k < DASHPATTERN_LENGTH)) {
+	while (dash_str[j] && (k < DASHPATTERN_LENGTH || dash_str[j] == ' ')) {
 	    /* .      Dot with short space 
 	     * -      Dash with regular space
 	     * _      Long dash with regular space
@@ -929,15 +929,21 @@ parse_dashtype(struct t_dashtype *dt)
 	    }
 	    j++;
 	}
+	/* truncate dash_str if we ran out of space in the array representation */
+	dash_str[j] = '\0';
 	dt->str = gp_strdup(dash_str);
 	free(dash_str);
 	res = DASHTYPE_CUSTOM;
+
+    /* Or index of previously defined dashtype */
+    /* FIXME: Is the index enough or should we copy its contents into this one? */
+    /* FIXME: What happens if there is a recursive definition? */
     } else {
 	res = int_expression() - 1;
-	if (res < 0) {
+	if (res < 0)
 	    int_error(c_token - 1, "tag must be > 0");
-	}
     }
+
     return res;
 }
 
@@ -1148,9 +1154,8 @@ lp_parse(struct lp_style_type *lp, TBOOLEAN allow_ls, TBOOLEAN allow_point)
 	    tmp = parse_dashtype(&newlp.custom_dash_pattern);
 	    /* Pull the dashtype from the list of already defined dashtypes, */
 	    /* but only if it we didn't get an explicit one back from parse_dashtype */ 
-	    if (tmp >= 0) {
+	    if (tmp >= 0)
 		tmp = load_dashtype(&newlp.custom_dash_pattern, tmp + 1);
-	    }
 	    newlp.d_type = tmp;
 	    continue;
 	}

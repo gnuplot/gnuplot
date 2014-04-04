@@ -24,6 +24,9 @@
 
 	* src/save.c src/set.c src/term.c:  Code style / whitespace cleanup
 
+	* src/set.c (set_dashtype) src/misc.c (parse_dashtype):  Add comments.
+	Truncate dashtype string to match size of stored pattern array.
+
 2014-04-03  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/fit.h (error_ex):  Add noreturn attribute to avoid compiler
