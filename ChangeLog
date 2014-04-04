@@ -1,3 +1,11 @@
+2014-04-04  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/term.c (load_linetype):  If a line style is based on a lt < 0
+	(LT_NODRAW, LT_BACKGROUND, LT_BLACK, etc), take only the line color.
+	FIXME: LT_AXIS should also take the dash pattern but that mechanism
+	isn't fully in place yet.
+	Bug #1369
+
 2014-04-03  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/fit.h (error_ex):  Add noreturn attribute to avoid compiler
