@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.445 2014/04/05 05:25:53 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.446 2014/04/05 06:17:09 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -4573,8 +4573,7 @@ set_table()
 
     if (equals(c_token, "$") && isletter(c_token + 1)) { /* datablock */
 	/* NB: has to come first because try_to_get_string will choke on the datablock name */
-	char * datablock_name = strdup(parse_datablock_name());
-	table_var = add_udv_by_name(datablock_name);
+	table_var = add_udv_by_name(parse_datablock_name());
 	if (!table_var->udv_undef) {
 	    gpfree_string(&table_var->udv_value);
 	    gpfree_datablock(&table_var->udv_value);
