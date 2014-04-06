@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.446 2014/03/19 17:30:33 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.447 2014/03/24 23:43:57 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -1310,113 +1310,46 @@ double x1, double xu1, double yl1, double yu1,
 double x2, double xu2, double yl2, double yu2,
 struct curve_points *plot)
 {
-    double xmin, xmax, ymin, ymax, dx, dy1, dy2;
-    int axis;
-    int ic, iy;
-    gpiPoint box[8];
-    struct { double x,y; } corners[8];
+    gpiPoint box[5]; /* Must leave room for additional point if needed after clipping */
 
-    /* Clip against x-axis range */
-    /* It would be nice if we could trust xmin to be less than xmax */
-	axis = plot->x_axis;
-	xmin = GPMIN(axis_array[axis].min, axis_array[axis].max);
-	xmax = GPMAX(axis_array[axis].min, axis_array[axis].max);
-	if (!(inrange(x1, xmin, xmax)) && !(inrange(x2, xmin, xmax)))
-	    return;
+    box[0].x   = map_x(x1);
+    box[0].y   = map_y(yl1);
+    box[1].x   = map_x(xu1);
+    box[1].y   = map_y(yu1);
+    box[2].x   = map_x(xu2);
+    box[2].y   = map_y(yu2);
+    box[3].x   = map_x(x2);
+    box[3].y   = map_y(yl2);
+    
+    /* finish_filled_curve() will handle clipping, fill style, and */
+    /* any distinction between above/below (flagged in box[4].x)   */
+    if (polar) {
+	/* "above" or "below" evaluated in terms of radial distance from origin */
+	/* FIXME: Most of this should be offloaded to a separate subroutine */
+	double ox = map_x(0);
+	double oy = map_y(0);
+	double plx = map_x(x1);
+	double ply = map_y(yl1);
+	double pux = map_x(xu1);
+	double puy = map_y(yu1);
+	double drl = (plx-ox)*(plx-ox) + (ply-oy)*(ply-oy);
+	double dru = (pux-ox)*(pux-ox) + (puy-oy)*(puy-oy);
+	double dx1 = dru - drl;
+	
+	double dx2;
+	plx = map_x(x2);
+	ply = map_y(yl2);
+	pux = map_x(xu2);
+	puy = map_y(yu2);
+	drl = (plx-ox)*(plx-ox) + (ply-oy)*(ply-oy);
+	dru = (pux-ox)*(pux-ox) + (puy-oy)*(puy-oy);
+	dx2 = dru - drl;
+	
+	box[4].x = (dx1+dx2 < 0) ? 1 : 0;
+    } else
+	box[4].x = ((yu1-yl1) + (yu2-yl2) < 0) ? 1 : 0;
 
-    /* Clip end segments. It would be nice to use edge_intersect() here, */
-    /* but as currently written it cannot handle the second curve.       */
-	dx = x2 - x1;
-	if (x1<xmin) {
-	    yl1 += (yl2-yl1) * (xmin - x1) / dx;
-	    yu1 += (yu2-yu1) * (xmin - x1) / dx;
-	    x1 = xmin;
-	}
-	if (x2>xmax) {
-	    yl2 += (yl2-yl1) * (xmax - x2) / dx;
-	    yu2 += (yu2-yu1) * (xmax - x2) / dx;
-	    x2 = xmax;
-	}
-	if (!polar) {
-	    xu1 = x1;
-	    xu2 = x2;
-	}
-	dx = x2 - x1;
-
-    /* Clip against y-axis range */
-	axis = plot->y_axis;
-	ymin = GPMIN(axis_array[axis].min, axis_array[axis].max);
-	ymax = GPMAX(axis_array[axis].min, axis_array[axis].max);
-	if (yl1<ymin && yu1<ymin && yl2<ymin && yu2<ymin)
-	    return;
-	if (yl1>ymax && yu1>ymax && yl2>ymax && yu2>ymax)
-	    return;
-
-	ic = 0;
-	corners[ic].x   = map_x(x1);
-	corners[ic++].y = map_y(yl1);
-	corners[ic].x   = map_x(xu1);
-	corners[ic++].y = map_y(yu1);
-
-#define INTERPOLATE(Y1,Y2,YBOUND) do { \
-	dy1 = YBOUND - Y1; \
-	dy2 = YBOUND - Y2; \
-	if (dy1 != dy2 && dy1*dy2 < 0) { \
-	    corners[ic].y = map_y(YBOUND); \
-	    corners[ic++].x = map_x(x1 + dx * dy1 / (dy1-dy2)); \
-	} \
-	} while (0)
-
-	INTERPOLATE( yu1, yu2, ymin );
-	INTERPOLATE( yu1, yu2, ymax );
-
-	corners[ic].x   = map_x(xu2);
-	corners[ic++].y = map_y(yu2);
-	corners[ic].x   = map_x(x2);
-	corners[ic++].y = map_y(yl2);
-
-	INTERPOLATE( yl1, yl2, ymin );
-	INTERPOLATE( yl1, yl2, ymax );
-
-#undef INTERPOLATE
-
-    /* Copy the polygon vertices into a gpiPoints structure */
-	for (iy=0; iy<ic; iy++) {
-	    box[iy].x = corners[iy].x;
-	    cliptorange(corners[iy].y, map_y(ymin), map_y(ymax));
-	    box[iy].y = corners[iy].y;
-	}
-
-    /* finish_filled_curve() will handle   */
-    /* current fill style (stored in plot) */
-    /* above/below (stored in box[ic].x)   */
-	if (polar) {
-	    /* "above" or "below" evaluated in terms of radial distance from origin */
-	    /* FIXME: Most of this should be offloaded to a separate subroutine */
-	    double ox = map_x(0);
-	    double oy = map_y(0);
-	    double plx = map_x(x1);
-	    double ply = map_y(yl1);
-	    double pux = map_x(xu1);
-	    double puy = map_y(yu1);
-	    double drl = (plx-ox)*(plx-ox) + (ply-oy)*(ply-oy);
-	    double dru = (pux-ox)*(pux-ox) + (puy-oy)*(puy-oy);
-	    double dx1 = dru - drl;
-
-	    double dx2;
-	    plx = map_x(x2);
-	    ply = map_y(yl2);
-	    pux = map_x(xu2);
-	    puy = map_y(yu2);
-	    drl = (plx-ox)*(plx-ox) + (ply-oy)*(ply-oy);
-	    dru = (pux-ox)*(pux-ox) + (puy-oy)*(puy-oy);
-	    dx2 = dru - drl;
-
-	    box[ic].x = (dx1+dx2 < 0) ? 1 : 0;
-	} else
-	    box[ic].x = ((yu1-yl1) + (yu2-yl2) < 0) ? 1 : 0;
-
-	finish_filled_curve(ic, box, plot);
+    finish_filled_curve(4, box, plot);
 }
 
 

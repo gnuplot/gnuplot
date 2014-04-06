@@ -5,6 +5,11 @@
 	This should allow terminals without a private dashtype implementation
 	to continue working as they did before (pre-version 5).
 
+2014-04-06  Christoph Bersch <usenet@bersch.net>
+
+	* src/graphics.c (fill_between):  It is no longer necessary to clip in
+	this routine because the component quadrilaterals will be clipped later.
+
 2014-04-05  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/set.c (set_table): Name leak.
