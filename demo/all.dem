@@ -1,5 +1,5 @@
 #
-# $Id: all.dem,v 1.56 2013/12/28 21:53:57 sfeam Exp $
+# $Id: all.dem,v 1.57 2014/01/13 20:16:20 sfeam Exp $
 #
 # Executes all demos (OK, MOST demos) in this directory.
 # This serves as a series of unit tests for non-interactive capabilities.
@@ -171,6 +171,10 @@ reset
 
 print "********************** file rgb_variable.dem *********************"
 load "rgb_variable.dem"
+reset
+
+print "********************** file varcolor.dem *********************"
+load "varcolor.dem"
 reset
 
 print "********************** file pm3d.dem *********************"

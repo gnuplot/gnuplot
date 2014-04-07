@@ -11,6 +11,8 @@
 	* src/boundary.c (do_key_sample) src/graphics.c (plot_boxes plot_c_bars):
 	Funnel requests for linetype changes through term_apply_lp_properties().
 
+	* demo/all.dem:  Add varcolor.dem to the test set.
+
 2014-04-06  Christoph Bersch <usenet@bersch.net>
 
 	* src/graphics.c (fill_between):  It is no longer necessary to clip in
