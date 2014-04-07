@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.325 2014/04/05 06:17:09 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.326 2014/04/07 21:16:32 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -2464,7 +2464,6 @@ eval_plots()
 		    }
 		    if (equals(c_token,"fc") || almost_equals(c_token,"fillc$olor")) {
 			parse_colorspec(&this_plot->lp_properties.pm3d_color, TC_VARIABLE);
-			set_fillstyle = TRUE;
 		    }
 		    if (stored_token != c_token)
 			continue;

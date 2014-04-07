@@ -1,9 +1,9 @@
 2014-04-07  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/term.c (null_dashtype):  Ignore custom dashtypes. Pass through
-	dashtypes > 0 to term->linetype.  Treat negative dashtypes as LT_BLACK.
-	This should allow terminals without a private dashtype implementation
-	to continue working as they did before (pre-version 5).
+	dashtypes > 0 to term->linetype(). Treat negative dashtypes as LT_BLACK.
+	This should allow terminals without a private dashtype implementation to
+	continue working as they did before (pre-version 5).
 
 	* src/plot2d.c (eval_plots):  Don't call lp_parse if all we want is
 	a fill color.
