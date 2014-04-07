@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.447 2014/03/24 23:43:57 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.448 2014/04/07 05:51:54 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -733,6 +733,7 @@ do_plot(struct curve_points *plots, int pcount)
 		    plot_boxes(this_plot, Y_AXIS.term_zero);
 		/* Draw the bars first, so that the box will cover the bottom half */
 		if (histogram_opts.type == HT_ERRORBARS) {
+		    /* Note that the bar linewidth may not match the border or plot linewidth */
 		    (term->linewidth)(histogram_opts.bar_lw);
 		    if (!need_fill_border(&default_fillstyle))
 			(term->linetype)(this_plot->lp_properties.l_type);
@@ -1978,8 +1979,7 @@ plot_boxes(struct curve_points *plot, int xaxis_y)
 		closepath();
 
 		if( t->fillbox && plot->fill_properties.border_color.type != TC_DEFAULT) {
-		    (*t->linetype)(plot->lp_properties.l_type);
-		    apply_pm3dcolor(&plot->lp_properties.pm3d_color,t);
+		    term_apply_lp_properties(&plot->lp_properties);
 		}
 
 		break;
@@ -2547,8 +2547,7 @@ plot_c_bars(struct curve_points *plot)
 	if (plot->fill_properties.border_color.type != TC_DEFAULT
 	&& !( plot->fill_properties.border_color.type == TC_LT &&
 	      plot->fill_properties.border_color.lt == LT_NODRAW)) {
-		(*t->linetype)(plot->lp_properties.l_type);
-		apply_pm3dcolor(&plot->lp_properties.pm3d_color,t);
+		term_apply_lp_properties(&plot->lp_properties);
 	}
 
 	/* variable color read from extra data column. June 2010 */
