@@ -1,5 +1,5 @@
 /*
- * $Id: boundary.c,v 1.10 2014/03/19 17:30:33 sfeam Exp $
+ * $Id: boundary.c,v 1.11 2014/03/25 17:24:20 sfeam Exp $
  */
 
 /* GNUPLOT - boundary.c */
@@ -1204,8 +1204,7 @@ do_key_sample(
     }
 
     /* Draw sample in same style and color as the corresponding plot */
-    (*t->linetype)(this_plot->lp_properties.l_type);
-    apply_pm3dcolor(&this_plot->lp_properties.pm3d_color,t);
+    term_apply_lp_properties(&this_plot->lp_properties);
 
     /* draw sample depending on bits set in plot_style */
     if (this_plot->plot_style & PLOT_STYLE_HAS_FILL && t->fillbox) {
@@ -1262,8 +1261,8 @@ do_key_sample(
 	    }
 	    if (fs->fillstyle != FS_EMPTY && fs->fillstyle != FS_DEFAULT
 	    && !(fs->border_color.type == TC_LT && fs->border_color.lt == LT_NODRAW)) {
-		(*t->linetype)(this_plot->lp_properties.l_type);
-		apply_pm3dcolor(&this_plot->lp_properties.pm3d_color,t);
+		/* need_fill_border() might have changed our original linetype */
+		term_apply_lp_properties(&this_plot->lp_properties);
 	    }
 	}
 
