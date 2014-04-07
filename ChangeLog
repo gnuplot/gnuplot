@@ -5,6 +5,9 @@
 	This should allow terminals without a private dashtype implementation
 	to continue working as they did before (pre-version 5).
 
+	* src/plot2d.c (eval_plots):  Don't call lp_parse if all we want is
+	a fill color.
+
 2014-04-06  Christoph Bersch <usenet@bersch.net>
 
 	* src/graphics.c (fill_between):  It is no longer necessary to clip in

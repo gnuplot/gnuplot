@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.324 2014/03/19 17:27:50 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.325 2014/04/05 06:17:09 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -2463,10 +2463,8 @@ eval_plots()
 			set_fillstyle = TRUE;
 		    }
 		    if (equals(c_token,"fc") || almost_equals(c_token,"fillc$olor")) {
-			struct lp_style_type lptmp;
-			lp_parse(&lptmp, FALSE, FALSE);
-			this_plot->lp_properties.pm3d_color = lptmp.pm3d_color;
-			set_lpstyle = TRUE;
+			parse_colorspec(&this_plot->lp_properties.pm3d_color, TC_VARIABLE);
+			set_fillstyle = TRUE;
 		    }
 		    if (stored_token != c_token)
 			continue;
