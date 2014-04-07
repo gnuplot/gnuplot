@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.286 2014/04/04 04:00:45 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.287 2014/04/05 03:51:23 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -1275,8 +1275,16 @@ null_set_color(struct t_colorspec *colorspec)
 static void
 null_dashtype(int type, t_dashtype *custom_dash_pattern)
 {
-	(void) type;
-	(void) custom_dash_pattern;
+    (void) custom_dash_pattern;	/* ignore */
+    /*
+     * If the terminal does not support user-defined dashtypes all we can do
+     * do is fall through to the old (pre-v5) assumption that the dashtype,
+     * if any, is part of the linetype.  We also assume that the color will
+     * be adjusted after this.
+     */
+    if (type <= 0)
+	type = LT_BLACK;
+    term->linetype(type);
 }
 
 /* setup the magic macros to compile in the right parts of the
