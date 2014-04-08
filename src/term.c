@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.287 2014/04/05 03:51:23 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.288 2014/04/07 05:41:53 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -611,10 +611,10 @@ term_apply_lp_properties(struct lp_style_type *lp)
      *  this function by explicitly issuing additional '(*term)(...)'
      *  commands.
      */
-    t_colorspec colorspec = lp->pm3d_color;
     int lt = lp->l_type;
-	int dt = lp->d_type;
-	t_dashtype custom_dash_pattern = lp->custom_dash_pattern;
+    int dt = lp->d_type;
+    t_dashtype custom_dash_pattern = lp->custom_dash_pattern;
+    t_colorspec colorspec = lp->pm3d_color;
 
     if (lp->pointflag) {
 	/* change points, too
@@ -632,19 +632,29 @@ term_apply_lp_properties(struct lp_style_type *lp)
      */
     (*term->linewidth) (lp->l_width);
 
-    /* Apply "linetype", which can include both color and dot/dash */
+    /* The paradigm for handling linetype and dashtype in version 5 is */
+    /* linetype < 0 (e.g. LT_BACKGROUND, LT_NODRAW) means some special */
+    /* category that will be handled directly by term->linetype().     */
+    /* linetype > 0 is now redundant. It used to encode both a color   */
+    /* and a dash pattern.  Now we have separate mechanisms for those. */ 
     if (lt <= LT_COLORFROMCOLUMN)
-	/* The color will be picked up in a moment, but we first need */
-	/* to set a reasonable line type.                             */
 	(*term->linetype) (LT_BLACK);
-    else
+    else if (lt <= 0)
 	(*term->linetype) (lt);
 
     /* Apply dashtype, which may override dot/dash pattern defined by 
      * linetype, possibly with a custom dash pattern
      */
-    (*term->dashtype) (dt, (dt == DASHTYPE_CUSTOM) ? &custom_dash_pattern : NULL);
+    else if (dt == DASHTYPE_CUSTOM)
+	(*term->dashtype) (dt, &custom_dash_pattern);
+    else if (dt > 0)
+	/* dash pattern was predefined somehow (not fully implemented) */
+	(*term->dashtype) (dt, NULL);
+    else
+	/* in the absence of an explicit dash type, use the old line type */
+	(*term->dashtype) (lt, NULL);
 
+    /* Finally adjust the color of the line */
     apply_pm3dcolor(&colorspec, term);
 }
 

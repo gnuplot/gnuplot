@@ -10,6 +10,12 @@
 	I.e. this draws blue points but no lines:
 	  plot $FOO with linespoints lt nodraw pointtype 6 lc rgb "blue"
 
+	* src/term.c (term_apply_lp_properties):  Distinguish between l_type
+	values that really indicate a linetype (e.g. LT_NODRAW, LT_AXIS) and
+	those which indicate a dash pattern. Send the former directly to
+	term->linetype(). Send the latter to term->dashtype(), which may itself
+	call term->linetype() if there is no private implementation of dashes.
+
 2014-04-07  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/term.c (null_dashtype):  Ignore custom dashtypes. Pass through
