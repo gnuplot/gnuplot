@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.448 2014/04/07 05:51:54 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.449 2014/04/07 23:28:26 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -969,6 +969,10 @@ plot_lines(struct curve_points *plot)
     enum coord_type prev = UNDEFINED;	/* type of previous point */
     double ex, ey;		/* an edge point */
     double lx[2], ly[2];	/* two edge points */
+
+    /* If all the lines are invisible, don't bother to draw them */
+    if (plot->lp_properties.l_type == LT_NODRAW)
+	return;
 
     for (i = 0; i < plot->p_count; i++) {
 

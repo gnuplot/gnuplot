@@ -1,5 +1,5 @@
 /*
- * $Id: boundary.c,v 1.11 2014/03/25 17:24:20 sfeam Exp $
+ * $Id: boundary.c,v 1.12 2014/04/07 23:07:08 sfeam Exp $
  */
 
 /* GNUPLOT - boundary.c */
@@ -1275,6 +1275,7 @@ do_key_sample(
     } else if ((this_plot->plot_style & PLOT_STYLE_HAS_LINE)
 		   || ((this_plot->plot_style & PLOT_STYLE_HAS_ERRORBAR)
 		       && this_plot->plot_type == DATA)) {
+	if (this_plot->lp_properties.l_type != LT_NODRAW)
 	    /* errors for data plots only */
 	    draw_clip_line(xl + key_sample_left, yl, xl + key_sample_right, yl);
     }

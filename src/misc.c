@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.176 2014/04/02 19:34:27 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.177 2014/04/05 05:25:53 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -996,6 +996,9 @@ lp_parse(struct lp_style_type *lp, TBOOLEAN allow_ls, TBOOLEAN allow_point)
 		    c_token++;
 		} else if (equals(c_token,"black")) {
 		    *lp = default_border_lp;
+		    c_token++;
+		} else if (equals(c_token,"nodraw")) {
+		    lp->l_type = LT_NODRAW;
 		    c_token++;
 		} else {
 		    /* These replace the base style */

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.301 2014/01/12 22:49:31 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.302 2014/01/27 05:29:51 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -1156,7 +1156,8 @@ do_3dplot(
 
 	    case LINESPOINTS:
 		if (draw_this_surface) {
-		    key_sample_line_pm3d(this_plot, xl, yl);
+		    if (this_plot->lp_properties.l_type != LT_NODRAW)
+			key_sample_line_pm3d(this_plot, xl, yl);
 		    key_sample_point_pm3d(this_plot, xl, yl, this_plot->lp_properties.p_type);
 		}
 		break;
@@ -1489,8 +1490,12 @@ plot3d_lines(struct surface_points *plot)
     double lx[2], ly[2], lz[2];	/* two edge points */
     TBOOLEAN rgb_from_column;
 
-/* These are handled elsewhere.  */
+    /* These are handled elsewhere.  */
     if (plot->has_grid_topology && hidden3d)
+	return;
+
+    /* These don't need to be drawn at all */
+    if (plot->lp_properties.l_type == LT_NODRAW)
 	return;
 
     rgb_from_column = plot->pm3d_color_from_column

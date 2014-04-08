@@ -1,3 +1,15 @@
+2014-04-08  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/save.c (save_linetype) src/misc.c (lp_parse)
+	src/graphics.c (plot_lines) src/graph3d.c (do_3dplot plot3d_lines)
+	src/boundary.c (do_key_sample):
+
+	New linetype keyword "nodraw" maps to existing internal value LT_NODRAW.
+	Apply this in the graphics layer rather than the terminal layer in order
+	to distinguish between line properties and point properties.
+	I.e. this draws blue points but no lines:
+	  plot $FOO with linespoints lt nodraw pointtype 6 lc rgb "blue"
+
 2014-04-07  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/term.c (null_dashtype):  Ignore custom dashtypes. Pass through
