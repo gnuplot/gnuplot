@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.379.2.27 2014/01/04 00:16:15 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.379.2.28 2014/03/24 23:47:53 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -2208,6 +2208,10 @@ plot_lines(struct curve_points *plot)
     enum coord_type prev = UNDEFINED;	/* type of previous point */
     double ex, ey;		/* an edge point */
     double lx[2], ly[2];	/* two edge points */
+
+    /* If all the lines are invisible, don't bother to draw them */
+    if (plot->lp_properties.l_type == LT_NODRAW)
+	return;
 
     for (i = 0; i < plot->p_count; i++) {
 
@@ -5836,6 +5840,7 @@ do_key_sample(
     } else if ((this_plot->plot_style & PLOT_STYLE_HAS_LINE)
 		   || ((this_plot->plot_style & PLOT_STYLE_HAS_ERRORBAR)
 		       && this_plot->plot_type == DATA)) {
+	if (this_plot->lp_properties.l_type != LT_NODRAW)
 	    /* errors for data plots only */
 	    draw_clip_line(xl + key_sample_left, yl, xl + key_sample_right, yl);
     }
