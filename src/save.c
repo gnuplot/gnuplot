@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.245 2014/04/08 18:49:22 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.246 2014/04/08 21:40:51 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -1472,6 +1472,8 @@ save_linetype(FILE *fp, lp_style_type *lp, TBOOLEAN show_point)
 {
     if (lp->l_type == LT_NODRAW)
 	fprintf(fp, " lt nodraw");
+    else if (lp->l_type < 0)
+	fprintf(fp, " lt %d", lp->l_type+1);
 
     if (lp->pm3d_color.type != TC_DEFAULT) {
 	fprintf(fp, " linecolor");
