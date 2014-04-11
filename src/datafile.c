@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.212.2.31 2014/03/13 19:25:47 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.212.2.32 2014/03/14 18:41:34 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -564,7 +564,9 @@ df_binary_details_struct df_binary_details[] = {
     {lo_names,sizeof(lo_names)/sizeof(lo_names[0]),{DF_LONG,sizeof(long)}},
     {ul_names,sizeof(ul_names)/sizeof(ul_names[0]),{DF_ULONG,sizeof(unsigned long)}},
     {fl_names,sizeof(fl_names)/sizeof(fl_names[0]),{DF_FLOAT,sizeof(float)}},
-    {db_names,sizeof(db_names)/sizeof(db_names[0]),{DF_DOUBLE,sizeof(double)}}
+    {db_names,sizeof(db_names)/sizeof(db_names[0]),{DF_DOUBLE,sizeof(double)}},
+    {NULL,0,                                       {DF_LONGLONG,sizeof(long long)}},
+    {NULL,0,                                       {DF_ULONGLONG,sizeof(unsigned long long)}}
 };
 
 df_binary_details_struct df_binary_details_independent[] = {
@@ -3903,6 +3905,7 @@ void
 df_set_read_type(int col, df_data_type type)
 {
     assert(col > 0);
+    assert(type < DF_BAD_TYPE);
     /* Check if we have room at least col columns */
     if (col > df_max_bininfo_cols) {
 	df_column_bininfo = gp_realloc(df_column_bininfo,
