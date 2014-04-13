@@ -1,3 +1,14 @@
+2014-04-13  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* configure.in (AC_CHECK_TYPES([off_t])) src/syscfg.h (#define off_t)
+	src/binary.c src/datafile.c src/datafile.h:  Change the declared type
+	of all variables contributing to calculation of file offsets from (int)
+	to (off_t).  This is sufficient to allow seeking in files > 2GB on 64bit
+	platforms.  It may also allow LFS support on some 32bit platforms if
+	compiled with -D_FILE_OFFSET_BITS=64 but in general it will also be
+	necessary to replace fseek/ftell with fseeko/ftello (32bit linux) or
+	_fseeki64/_ftelli64 (MSVC).
+
 2014-04-11  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/datafile.c (df_binary_details[]): Handle int64 and uint64 types 

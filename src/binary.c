@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: binary.c,v 1.13 2007/10/02 18:18:57 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: binary.c,v 1.14 2013/02/17 17:51:24 sfeam Exp $"); }
 #endif
 
 /*
@@ -33,7 +33,7 @@ is_binary_file(FILE *fp)
 {
     int i, len;
     int odd;		/* Contains a count of the odd characters */
-    long where;
+    off_t where;
     unsigned char *c;
     unsigned char buffer[512];
 

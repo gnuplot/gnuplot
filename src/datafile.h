@@ -1,5 +1,5 @@
 /*
- * $Id: datafile.h,v 1.43 2013/06/27 20:03:41 sfeam Exp $
+ * $Id: datafile.h,v 1.44 2014/01/09 21:12:56 sfeam Exp $
  */
 
 /* GNUPLOT - datafile.h */
@@ -239,7 +239,7 @@ typedef struct df_binary_file_record_struct {
 
     df_sample_scan_type cart_scan[3]; /* how to assign the dimensions read from file when generating coordinates */
     TBOOLEAN scan_generate_coord;     /* whether or not Gnuplot should generate coordinates. */
-    int scan_skip[3];                 /* skip bytes before the record, line, plane */
+    off_t scan_skip[3];               /* skip bytes before the record, line, plane */
 
     /* Not controllable by the user, only by file type functions.
      * These are all points/lines/planes format.
