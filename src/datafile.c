@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.276 2014/04/11 16:20:34 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.277 2014/04/13 17:55:23 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -2136,7 +2136,7 @@ df_determine_matrix_info(FILE *fin)
 
 	/* Binary matrix format. */
 	float fdummy;
-	off_t nc, nr;	/* long because they contribute to fseek offset */
+	off_t nc, nr;	/* off_t because they contribute to fseek offset */
 	off_t flength;
 
 	/* Read first value for number of columns. */
@@ -5044,7 +5044,7 @@ df_generate_pseudodata()
 	    if ((axis_array[SAMPLE_AXIS].range_flags & RANGE_SAMPLED)) {
 		t_min = axis_array[SAMPLE_AXIS].min;
 		t_max = axis_array[SAMPLE_AXIS].max;
-		/* FIXME:  Do we need to hangle log-scaled SAMPLE_AXIS? */
+		/* FIXME:  Do we need to handle log-scaled SAMPLE_AXIS? */
 	    } else if (parametric || polar) {
 		t_min = axis_array[T_AXIS].min;
 		t_max = axis_array[T_AXIS].max;
