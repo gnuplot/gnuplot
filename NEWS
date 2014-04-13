@@ -9,6 +9,7 @@ New features, changes and fixes in gnuplot version 4.6.6
 * FIX get rid of O(N^2) memory allocation for string data in long input lines
 * FIX large integers in iteration spec could cause overflow end condition check
 * FIX object fillcolors should be consistent with the color of current linetypes
+* FIX LFS support on 64bit platforms (still not current on 32bit platforms)
 
 
 New features, changes and fixes in gnuplot version 4.6.5

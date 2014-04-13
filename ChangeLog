@@ -1,3 +1,9 @@
+2014-04-13  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/datafile.h src/datafile.c:  Change the declared type of all
+	variables contributing to file offsets from (int) to (long). This 
+	should allow fseek in large (>2GB) files on 64bit platforms.
+
 2014-04-11  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/datafile.c (df_binary_details[]): Handle int64 and uint64 types 
