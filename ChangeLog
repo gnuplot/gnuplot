@@ -1,3 +1,8 @@
+2014-04-14  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* configure.in (AC_FUNC_FSEEKO) src/datafile.h: LFS support part 2.
+	If possible, use fseeko/ftello to navigate input data files.
+
 2014-04-13  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* configure.in (AC_CHECK_TYPES([off_t])) src/syscfg.h (#define off_t)

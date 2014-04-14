@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot on Unix.
 dnl
-dnl $Id: configure.in,v 1.361 2014/04/04 22:05:10 sfeam Exp $
+dnl $Id: configure.in,v 1.362 2014/04/13 17:55:23 sfeam Exp $
 dnl
 dnl this is actually major.minor ...
 dnl note that for a non-beta release, we need to disable DEVELOPMENT_RELEASE
@@ -75,7 +75,10 @@ fi
 AM_PROG_CC_C_O
 AC_SUBST(CC_FOR_BUILD)
 
+dnl large file support
 AC_CHECK_TYPES([off_t])
+AC_FUNC_FSEEKO
+AC_SYS_LARGEFILE
 
 dnl The libcerf library contains a set of complex-valued special functions
 dnl related to the error function (cerf, erfi, Dawson's integral, Voigt profile).

@@ -1,5 +1,5 @@
 /*
- * $Id: datafile.h,v 1.44 2014/01/09 21:12:56 sfeam Exp $
+ * $Id: datafile.h,v 1.45 2014/04/13 17:55:24 sfeam Exp $
  */
 
 /* GNUPLOT - datafile.h */
@@ -59,6 +59,11 @@ enum DF_STATUS {
     DF_COLUMN_HEADERS = -9
 };
 
+/* large file support (offsets potentially > 2GB) */
+#if defined(HAVE_FSEEKO) && defined(HAVE_OFF_T)
+#define fseek(stream,pos,whence) fseeko(stream,pos,whence)
+#define ftell(stream) ftello(stream)
+#endif
 
 /* Variables of datafile.c needed by other modules: */
 
