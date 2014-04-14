@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.277 2014/04/13 17:55:23 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.278 2014/04/13 17:59:13 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -4226,12 +4226,14 @@ df_show_binary(FILE *fp)
 		    break;
 		}
 	    }
-	    fprintf(fp, "\n\t    Skip bytes: %ld before record",
-		    bin_record[i].scan_skip[0]);
+	    fprintf(fp, "\n\t    Skip bytes: %lld before record",
+		    (long long)bin_record[i].scan_skip[0]);
 	    if (dimension > 1)
-		fprintf(fp, ", %ld before line", bin_record[i].scan_skip[1]);
+		fprintf(fp, ", %lld before line",
+		    (long long)bin_record[i].scan_skip[1]);
 	    if (dimension > 2)
-		fprintf(fp, ", %ld before plane", bin_record[i].scan_skip[2]);
+		fprintf(fp, ", %lld before plane",
+		    (long long) bin_record[i].scan_skip[2]);
 	}
 	fprintf(fp, "\n");
     }
