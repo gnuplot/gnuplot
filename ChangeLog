@@ -1,3 +1,8 @@
+2014-04-14  Dima Kogan  <dima@secretsauce.net>
+
+	* src/mouse.c (event_buttonpress):  Flip direction of horizontal 
+	scrolling to match the convention used by vertical scrolling.
+
 2014-04-14  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* configure.in (AC_FUNC_FSEEKO) src/datafile.h: LFS support part 2.

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: mouse.c,v 1.156 2013/12/26 17:58:29 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: mouse.c,v 1.157 2014/02/26 21:02:45 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - mouse.c */
@@ -1770,7 +1770,7 @@ event_buttonpress(struct gp_event_t *ge)
 
 	/* Horizontal stroke (button 6) or Shift+wheel up */
 	else if (b == 6 || (modifier_mask & Mod_Shift)) 
-	    do_zoom_scroll_right();
+	    do_zoom_scroll_left();
 	
 	/* Wheel up (no modifier keys) */
 	else
@@ -1790,7 +1790,7 @@ event_buttonpress(struct gp_event_t *ge)
 
 	/* Horizontal stroke (button 7) or Shift+wheel down */
 	else if (b == 7 || (modifier_mask & Mod_Shift)) 
-	    do_zoom_scroll_left();
+	    do_zoom_scroll_right();
 	
 	/* Wheel down (no modifier keys) */
 	else
