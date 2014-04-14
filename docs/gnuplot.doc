@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.878 2014/04/05 06:17:08 markisch Exp $
+C RCS $Id: gnuplot.doc,v 1.879 2014/04/14 22:43:32 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -13611,7 +13611,7 @@ Ffigure_missing
 ?stats
 ?statistics
  Syntax:
-      stats 'filename' {using N{:M}} {name 'prefix'} {{no}output}
+      stats {<ranges>} 'filename' {using N{:M}} {name 'prefix'} {{no}output}
 
  This command prepares a statistical summary of the data in one or two columns
  of a file. The using specifier is interpreted in the same way as for plot
@@ -13631,13 +13631,17 @@ Ffigure_missing
       STATS_blocks            # number of indexable datablocks in the file
       STATS_columns           # number of data columns in the first row of data
 
- The second set reports properties of the in-range data from a single column.
- If the corresponding axis is autoscaled (x-axis for the 1st column, y-axis 
- for the optional second column) then no range limits are applied. If two
- columns are being analysed in a single `stats` command, the the suffix "_x"
- or "_y" is appended to each variable name.  I.e. STATS_min_x is the minimum
- value found in the first column, while STATS_min_y is the minimum value found
- in the second column.
+ The second set reports properties of the in-range data from a single
+ column.  If the corresponding axis is autoscaled then no range limits
+ are applied. If a single column is used, it is affected by the y-axis
+ settings. Otherwise the x-axis settings apply to the first and the
+ y-axis settings to the second column.
+
+ If two columns are being analysed in a single `stats` command, the
+ suffix "_x" or "_y" is appended to each variable name.
+ I.e. STATS_min_x is the minimum value found in the first column, while
+ STATS_min_y is the minimum value found in the second column.
+
       STATS_min               # minimum value of in-range data points
       STATS_max               # maximum value of in-range data points
       STATS_index_min         # index i for which data[i] == STATS_min
