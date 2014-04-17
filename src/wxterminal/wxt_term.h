@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_term.h,v 1.22 2013/08/20 05:36:48 sfeam Exp $
+ * $Id: wxt_term.h,v 1.23 2013/08/23 18:56:32 sfeam Exp $
  */
 
 /* GNUPLOT - wxt_term.h */
@@ -99,6 +99,8 @@ void wxt_boxed_text(unsigned int x, unsigned int y, int option);
 
 void wxt_modify_plots(unsigned int);
 
+void wxt_dashtype(int type, t_dashtype *custom_dash_pattern);
+
 void wxt_raise_terminal_window __PROTO((int));
 void wxt_raise_terminal_group __PROTO((void));
 void wxt_lower_terminal_window __PROTO((int));
@@ -111,7 +113,6 @@ TBOOLEAN wxt_window_opened(void);
 /* state variables shared between wxt.trm and wxt_gui.cpp */
 extern int wxt_window_number;
 extern TBOOLEAN wxt_enhanced_enabled;
-extern TBOOLEAN wxt_dashed;
 extern double wxt_dashlength;
 extern double wxt_lw;
 extern int wxt_background;

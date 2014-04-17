@@ -9,6 +9,10 @@
 
 	* term/svg.trm:  Support for custom dashtypes.
 
+	* src/wxterminal/gp_cairo.* src/wxterminal/wxt_gui.*
+	src/wxterminal/wxt_term.h term/cairo.trm term/wxt.trm:
+	Support for custom dashtype in all cairo-based terminals.
+
 2014-04-14  Dima Kogan  <dima@secretsauce.net>
 
 	* src/mouse.c (event_buttonpress):  Flip direction of horizontal 

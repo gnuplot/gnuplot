@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.cpp,v 1.121 2013/10/26 03:52:11 sfeam Exp $
+ * $Id: wxt_gui.cpp,v 1.122 2013/12/12 19:18:19 sfeam Exp $
  */
 
 /* GNUPLOT - wxt_gui.cpp */
@@ -744,6 +744,8 @@ void wxtPanel::ClearCommandlist()
 			delete[] iter->corners;
 		if (iter->command == command_image)
 			free(iter->image);
+		if (iter->command == command_dashtype)
+			free(iter->dashpattern);
 	}
 
 	command_list.clear();
@@ -1843,6 +1845,7 @@ void wxt_graphics()
 	/* set the line properties */
 	/* FIXME: should this be in wxt_settings_apply() ? */
 	wxt_current_plot->linecap = wxt_linecap;
+	wxt_current_plot->dashlength = wxt_dashlength;
 
 	/* background as given by set term */
 	wxt_current_plot->background = wxt_rgb_background;
@@ -2106,12 +2109,9 @@ void wxt_linetype(int lt)
 	gp_command temp_command2;
 
 	temp_command2.command = command_linestyle;
-	if (lt == -1)
+	if (lt == LT_AXIS)
 		temp_command2.integer_value = GP_CAIRO_DOTS;
-	else if (wxt_dashed && lt >= 0) {
-		temp_command2.integer_value = GP_CAIRO_DASH;
-		wxt_current_plot->dashlength = wxt_dashlength;
-	} else
+	else
 		temp_command2.integer_value = GP_CAIRO_SOLID;
 	wxt_command_push(temp_command2);
 
@@ -2125,6 +2125,22 @@ void wxt_linetype(int lt)
 	wxt_command_push(temp_command);
 }
 
+void wxt_dashtype(int type, t_dashtype *custom_dash_pattern)
+{
+	if (wxt_status != STATUS_OK)
+		return;
+
+	gp_command temp_command;
+	temp_command.command = command_dashtype;
+	temp_command.integer_value = type;
+	if (type == DASHTYPE_CUSTOM) {
+	    temp_command.dashpattern = (t_dashtype *)malloc(sizeof(t_dashtype));
+	    memcpy(temp_command.dashpattern, custom_dash_pattern, sizeof(t_dashtype));
+	} else {
+	    temp_command.dashpattern = NULL;
+	}
+	wxt_command_push(temp_command);
+}
 
 /* - fonts are selected as strings "name,size".
  * - _set_font("") restores the terminal's default font.*/
@@ -2830,6 +2846,9 @@ void wxtPanel::wxt_cairo_exec_command(gp_command command)
 		return;
 	case command_pointsize :
 		gp_cairo_set_pointsize(&plot, command.double_value);
+		return;
+	case command_dashtype :
+		gp_cairo_set_dashtype(&plot, command.integer_value, command.dashpattern);
 		return;
 	case command_hypertext :
 		current_href = command.string;

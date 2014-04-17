@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: cairo.trm,v 1.66 2014/01/30 05:50:52 sfeam Exp $
+ * $Id: cairo.trm,v 1.67 2014/03/18 22:10:43 sfeam Exp $
  */
 
 /* GNUPLOT - cairo.trm */
@@ -73,6 +73,7 @@ TERM_PUBLIC void cairotrm_filled_polygon __PROTO ((int n, gpiPoint * corners));
 #ifdef EAM_BOXED_TEXT
 TERM_PUBLIC void cairotrm_boxed_text __PROTO ((unsigned int x, unsigned int y, int option));
 #endif
+TERM_PUBLIC void cairotrm_dashtype __PROTO ((int type, t_dashtype *custom_dash_pattern));
 #endif /* TERM_PROTO */
 
 #ifndef TERM_PROTO_ONLY
@@ -1055,10 +1056,9 @@ void cairotrm_linetype(int lt)
 {
 	gp_cairo_set_linetype(&plot, lt);
 
-	if (cairo_params->dashed || lt == -1)
-	    gp_cairo_set_linestyle(&plot,  GP_CAIRO_DASH);
-	else
-	    gp_cairo_set_linestyle(&plot,  GP_CAIRO_SOLID);
+	/* Version 5: always set solid lines at this point.  If a dashed */
+	/* line is wanted there will be a later call to term->dashtype() */
+	gp_cairo_set_linestyle(&plot,  GP_CAIRO_SOLID);
 
 	if (cairo_params->mono && lt >= -1)
 	    gp_cairo_set_color(&plot, gp_cairo_linetype2color( -1 ), 0.0);
@@ -1255,6 +1255,11 @@ void cairotrm_boxed_text(unsigned int x, unsigned int y, int option)
 }
 #endif
 
+void cairotrm_dashtype(int type, t_dashtype *custom_dash_pattern)
+{
+	gp_cairo_set_dashtype(&plot, type, custom_dash_pattern);
+}
+
 #endif /* TERM_BODY */
 
 #ifdef TERM_TABLE
@@ -1282,6 +1287,8 @@ TERM_TABLE_START (epscairo_driver)
 #ifdef EAM_BOXED_TEXT
     , cairotrm_boxed_text
 #endif 
+    , NULL /* modify_plots */
+    , cairotrm_dashtype
 TERM_TABLE_END (epscairo_driver)
 
 #undef LAST_TERM
@@ -1315,6 +1322,8 @@ TERM_TABLE_START(cairolatex_driver)
 #ifdef EAM_BOXED_TEXT
     , EPSLATEX_boxed_text
 #endif 
+    , NULL /* modify_plots */
+    , cairotrm_dashtype
 TERM_TABLE_END(cairolatex_driver)
 
 #undef LAST_TERM
@@ -1344,6 +1353,8 @@ TERM_TABLE_START (pdfcairo_driver)
 #ifdef EAM_BOXED_TEXT
     , cairotrm_boxed_text
 #endif 
+    , NULL /* modify_plots */
+    , cairotrm_dashtype
 TERM_TABLE_END (pdfcairo_driver)
 
 #undef LAST_TERM
@@ -1373,6 +1384,8 @@ TERM_TABLE_START (pngcairo_driver)
 #ifdef EAM_BOXED_TEXT
     , cairotrm_boxed_text
 #endif 
+    , NULL /* modify_plots */
+    , cairotrm_dashtype
 TERM_TABLE_END (pngcairo_driver)
 
 #undef LAST_TERM

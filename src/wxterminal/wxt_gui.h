@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.h,v 1.41 2013/12/12 19:18:22 sfeam Exp $
+ * $Id: wxt_gui.h,v 1.42 2014/02/04 22:11:34 sfeam Exp $
  */
 
 /* GNUPLOT - wxt_gui.h */
@@ -286,6 +286,7 @@ typedef enum wxt_gp_command_t {
 #ifdef EAM_BOXED_TEXT
 	,command_boxed_text
 #endif
+	,command_dashtype
 } wxt_gp_command_t;
 
 /* base structure for storing gnuplot commands */
@@ -303,6 +304,7 @@ typedef struct gp_command {
 	int integer_value2;
 	double double_value;
 	double double_value2;
+	t_dashtype *dashpattern;
 	char *string;
 	gpiPoint *corners;
 	enum JUSTIFY mode;

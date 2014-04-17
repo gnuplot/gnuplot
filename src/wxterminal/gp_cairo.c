@@ -1,5 +1,5 @@
 /*
- * $Id: gp_cairo.c,v 1.80 2014/03/18 19:17:26 sfeam Exp $
+ * $Id: gp_cairo.c,v 1.81 2014/03/20 20:50:10 markisch Exp $
  */
 
 /* GNUPLOT - gp_cairo.c */
@@ -163,7 +163,7 @@ void gp_cairo_initialize_plot(plot_struct *plot)
 	plot->justify_mode = LEFT;
 	plot->linetype = 1;
 	plot->linewidth = 1.0;
-	plot->linestyle = 1;
+	plot->linestyle = GP_CAIRO_SOLID;
 	plot->pointsize = 1.0;
 	plot->dashlength = 1.0;
 	plot->text_angle = 0.0;
@@ -530,9 +530,8 @@ void gp_cairo_end_polygon(plot_struct *plot)
 	cairo_paint( plot->cr );
 }
 
-void gp_cairo_stroke(plot_struct *plot)
+void gp_cairo_set_dashtype(plot_struct *plot, int type, t_dashtype *custom_dash_type)
 {
-	double dashes[8];
 	static double dashpattern[4][8] =
 	{
 	    {5, 8, 5, 8, 5, 8, 5, 8},	/* Medium dash */
@@ -540,6 +539,43 @@ void gp_cairo_stroke(plot_struct *plot)
 	    {8, 4, 2, 4, 8, 4, 2, 4},	/* dash dot */
 	    {9, 4, 1, 4, 1, 4, 0, 0}	/* dash dot dot */
 	};
+	int lt = (type) % 5;
+
+	FPRINTF((stderr,"set_dashtype %d\n", type));
+
+	if (type == DASHTYPE_CUSTOM && custom_dash_type) {
+		/* Convert to internal representation */
+		int i;
+		for (i=0; i<8; i++)
+			plot->current_dashpattern[i] = custom_dash_type->pattern[i]
+				* plot->dashlength
+				* plot->oversampling_scale;
+		FPRINTF((stderr,"gp_cairo_set_dashtype: custom pattern\n"));
+		FPRINTF((stderr,"	%f %f %f %f %f %f %f %f\n",
+			plot->current_dashpattern[0], plot->current_dashpattern[1],
+			plot->current_dashpattern[2], plot->current_dashpattern[3],
+			plot->current_dashpattern[4], plot->current_dashpattern[5],
+			plot->current_dashpattern[6], plot->current_dashpattern[7]));
+		plot->linestyle = GP_CAIRO_DASH;
+
+	} else if (type > 0 && lt != 0) {
+		/* Use old (version 4) set of linetype patterns */
+		int i;
+		for (i=0; i<8; i++)
+			plot->current_dashpattern[i] = dashpattern[lt-1][i]
+				* plot->dashlength
+				* plot->oversampling_scale;
+		plot->linestyle = GP_CAIRO_DASH;
+
+	} else {
+		/* Every 5th pattern in the old set is solid */
+		plot->linestyle = GP_CAIRO_SOLID;
+	}
+
+}
+
+void gp_cairo_stroke(plot_struct *plot)
+{
 	int lt = plot->linetype;
 	double lw = plot->linewidth * plot->oversampling_scale;
 
@@ -559,20 +595,15 @@ void gp_cairo_stroke(plot_struct *plot)
 
 	else if (lt == LT_AXIS || plot->linestyle == GP_CAIRO_DOTS) {
 		/* Grid lines (lt 0) */
+		double dashes[2];
 		dashes[0] = 0.4 * plot->oversampling_scale * plot->dashlength;
 		dashes[1] = 4.0 * plot->oversampling_scale * plot->dashlength;
 		cairo_set_dash(plot->cr, dashes, 2 /*num_dashes*/, 0 /*offset*/);
 		lw *= 0.6;
 	}
 
-	else if (plot->linestyle == GP_CAIRO_DASH
-		&& lt >= 0 && (lt % 5 != 0)) {
-		int i;
-		for (i=0; i<8; i++)
-			dashes[i] = dashpattern[(lt-1) % 5][i]
-				* plot->dashlength
-				* plot->oversampling_scale;
-		cairo_set_dash(plot->cr, dashes, 8 /*num_dashes*/, 0 /*offset*/);
+	else if (plot->linestyle == GP_CAIRO_DASH) {
+		cairo_set_dash(plot->cr, &(plot->current_dashpattern[0]), 8 /*num_dashes*/, 0 /*offset*/);
 	}
 
 	cairo_set_source_rgba(plot->cr, plot->color.r, plot->color.g, plot->color.b,

@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: svg.trm,v 1.163 2014/03/20 20:50:10 markisch Exp $
+ * $Id: svg.trm,v 1.164 2014/03/29 04:42:03 sfeam Exp $
  */
 
 /*------------------------------------------------------------------------------------------------------------------------------------
@@ -75,6 +75,7 @@ TERM_PUBLIC void SVG_init __PROTO ((void));
 TERM_PUBLIC void SVG_graphics __PROTO ((void));
 TERM_PUBLIC void SVG_text __PROTO ((void));
 TERM_PUBLIC void SVG_linetype __PROTO ((int linetype));
+TERM_PUBLIC void SVG_dashtype __PROTO ((int type, t_dashtype *custom_dash_type));
 TERM_PUBLIC void SVG_move __PROTO ((unsigned int x, unsigned int y));
 TERM_PUBLIC void SVG_vector __PROTO ((unsigned int x, unsigned int y));
 TERM_PUBLIC void SVG_put_text __PROTO ((unsigned int x, unsigned int y, const char *str));
@@ -212,13 +213,16 @@ static TBOOLEAN SVG_dashed = FALSE;
 static char *SVG_defaultdashpattern[SVG_dashtypes] = {
     "", " 5,8", " 2,4", " 8,4,2,4", " 9,4,1,4,1,4"
 };
-static int SVG_dashpattern[SVG_dashtypes][7] = {
+static char *SVG_axis_dashpattern = "2,4";
+static int SVG_dasharray[SVG_dashtypes][7] = {
 	{ 0,0,0,0,0,0,0},
 	{5,8, 0,0,0,0,0},
 	{2,4, 0,0,0,0,0},
 	{8,4,2,4, 0,0,0},
 	{9,4,1,4,1,4, 0}
 };
+static char *SVG_dashpattern = NULL;
+static char  SVG_custom_dash_pattern[64];
 
 /* Support for embedded hypertext */
 static char *SVG_hypertext_text = NULL;
@@ -289,8 +293,6 @@ SVG_GroupClose ()
 static void
 SVG_PathOpen ()
 {
-    int d;
-
     if (!SVG_pathIsOpen) {
 	SVG_GroupFilledClose();
 	    
@@ -303,28 +305,14 @@ SVG_PathOpen ()
 	else if (SVG_color_mode == TC_LT)
 	    fprintf(gpoutfile, "stroke='%s' ", SVG_linecolor);
 
-	/* Sort out what dash pattern to use, if any */
-	d = SVG_LineType % SVG_dashtypes;
-
 	/* Axis is always dotted */
-	if (SVG_LineType == -1)
+	if (SVG_LineType == LT_AXIS)
 	    fprintf(gpoutfile, "stroke-dasharray='2,4' ");
+
+	/* Other patterns were selected by a previous call to SVG_dashtype */
+	else if (SVG_dashpattern)
+	    fprintf(gpoutfile, "stroke-dasharray='%s' ", SVG_dashpattern);
 	
-	/* Default dash length and sequence */
-	else if (SVG_dashed && d > 0 && SVG_dashlength == 1.0)
-	    fprintf(gpoutfile, "stroke-dasharray='%s' ", SVG_defaultdashpattern[d]);
-
-	/* Dash patterns scaled up by dashlength */
-	else if (SVG_dashed && d > 0) {
-	    int j = 0;
-	    fprintf(gpoutfile, "stroke-dasharray='");
-	    do {
-		fprintf(gpoutfile, "%.1f", SVG_dashpattern[d][j] * SVG_dashlength);
-		j++;
-		fprintf(gpoutfile, "%s", SVG_dashpattern[d][j] ? "," : "' ");
-	    }	while (SVG_dashpattern[d][j] > 0);
-	}
-
 	/* RGBA */
 	if (SVG_alpha != 0.0)
 	    fprintf(gpoutfile, "opacity='%4.2f' ", 1.0 - SVG_alpha);
@@ -1244,11 +1232,74 @@ TERM_PUBLIC void
 SVG_linetype (int linetype)
 {
     SVG_color_mode = TC_DEFAULT;
-    if (linetype != SVG_LineType) {
+    if (TRUE || linetype != SVG_LineType) {
 	SVG_PathClose ();
 	SVG_GroupClose ();
 	SVG_LineType = linetype;
 	SVG_GroupOpen ();
+    }
+    if (linetype == LT_AXIS)
+	SVG_dashpattern = SVG_axis_dashpattern;
+    if (linetype == LT_SOLID)
+	SVG_dashpattern = NULL;
+}
+
+/*------------------------------------------------------------------------------------------------------------------------------------
+	SVG_dashtype
+------------------------------------------------------------------------------------------------------------------------------------*/
+TERM_PUBLIC void
+SVG_dashtype (int type, t_dashtype *custom_dash_type)
+{
+    int d, j;
+
+    SVG_dashpattern = NULL;	/* Assume solid line */
+
+    switch(type) {
+
+	case DASHTYPE_SOLID:
+	    break;
+
+	case DASHTYPE_AXIS:
+	    /* Currently handled elsewhere via LT_AXIS */
+	    break;
+
+	case DASHTYPE_CUSTOM:
+	    if (custom_dash_type) {
+		SVG_dashpattern = SVG_custom_dash_pattern;
+		*SVG_dashpattern = '\0';
+		j = 0;
+		do {
+		    char *p = &SVG_dashpattern[strlen(SVG_dashpattern)];
+		    snprintf(p, 8, "%.1f", custom_dash_type->pattern[j] * SVG_dashlength);
+		    if (custom_dash_type->pattern[++j])
+			strcat(p,",");
+		} while (custom_dash_type->pattern[j] > 0);
+	    }
+	    break;
+
+	default:
+	    /* Fall back to whatever version 4 would have provided */
+	    d = type % SVG_dashtypes;
+	    if (d <= 0)
+		break;
+
+	    /* Default dash length and sequence */
+	    if (SVG_dashlength == 1.0)
+		SVG_dashpattern = SVG_defaultdashpattern[d];
+
+	    /* Dash patterns scaled up by dashlength */
+	    else {
+		SVG_dashpattern = SVG_custom_dash_pattern;
+		*SVG_dashpattern = '\0';
+		j = 0;
+		do {
+		    char *p = &SVG_dashpattern[strlen(SVG_dashpattern)];
+		    snprintf(p, 8, "%.1f", SVG_dasharray[d][j] * SVG_dashlength);
+		    if (SVG_dasharray[d][++j])
+			strcat(p,",");
+		} while (SVG_dasharray[d][j] > 0);
+	    }
+	    break;
     }
 }
 
@@ -2139,6 +2190,8 @@ TERM_TABLE_START (svg_driver)
 #ifdef EAM_BOXED_TEXT
    , SVG_boxed_text	/* boxed text labels */
 #endif
+   , NULL		/* modify_plots */
+   , SVG_dashtype	/* Version 5 dashtype support */
 TERM_TABLE_END (svg_driver)
 
 #undef LAST_TERM

@@ -1,5 +1,5 @@
 /*
- * $Id: gp_cairo.h,v 1.20 2013/02/19 05:30:38 sfeam Exp $
+ * $Id: gp_cairo.h,v 1.21 2013/05/19 23:46:34 sfeam Exp $
  */
 
 /* GNUPLOT - gp_cairo.h */
@@ -133,6 +133,7 @@ typedef struct plot_struct {
 	int linestyle;
 	double pointsize;
 	double dashlength;
+	double current_dashpattern[8];
 	double text_angle;
 	rgba_color color;
 	rgb_color background;
@@ -244,6 +245,8 @@ const char * gp_cairo_default_font(void);
 /* Text boxes */
 void gp_cairo_boxed_text(plot_struct *plot, int x, int y, int option);
 #endif
+
+void gp_cairo_set_dashtype(plot_struct *plot, int type, t_dashtype *custom_dash_pattern);
 
 #ifdef __cplusplus
 }
