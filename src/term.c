@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.288 2014/04/07 05:41:53 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.289 2014/04/08 19:20:22 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -637,22 +637,29 @@ term_apply_lp_properties(struct lp_style_type *lp)
     /* category that will be handled directly by term->linetype().     */
     /* linetype > 0 is now redundant. It used to encode both a color   */
     /* and a dash pattern.  Now we have separate mechanisms for those. */ 
-    if (lt <= LT_COLORFROMCOLUMN)
-	(*term->linetype) (LT_BLACK);
-    else if (lt <= 0)
+    if (LT_COLORFROMCOLUMN < lt && lt < 0)
 	(*term->linetype) (lt);
+    else /* All normal lines will be solid unless a dashtype is given */
+	(*term->linetype) (LT_SOLID);
 
     /* Apply dashtype, which may override dot/dash pattern defined by 
      * linetype, possibly with a custom dash pattern
      */
-    else if (dt == DASHTYPE_CUSTOM)
+    if (dt == DASHTYPE_CUSTOM)
 	(*term->dashtype) (dt, &custom_dash_pattern);
+    else if (dt == DASHTYPE_SOLID)
+	(*term->dashtype) (dt, NULL);
     else if (dt > 0)
 	/* dash pattern was predefined somehow (not fully implemented) */
 	(*term->dashtype) (dt, NULL);
+#if (0)
+    /* Could use this to mimic old behaviour of "set term ... dash"
+     * or introduce a new global command "set dash";
+     * I.e. all lines are treated at dt=lt.
+     */
     else
-	/* in the absence of an explicit dash type, use the old line type */
 	(*term->dashtype) (lt, NULL);
+#endif
 
     /* Finally adjust the color of the line */
     apply_pm3dcolor(&colorspec, term);
@@ -1293,7 +1300,7 @@ null_dashtype(int type, t_dashtype *custom_dash_pattern)
      * be adjusted after this.
      */
     if (type <= 0)
-	type = LT_BLACK;
+	type = LT_SOLID;
     term->linetype(type);
 }
 
@@ -1695,7 +1702,6 @@ test_term()
     (*t->vector) (x0, y0 + ymax_t - 1);
     (*t->vector) (x0, y0);
     closepath();
-    (*t->linetype)(0);
 
     /* Echo back the current terminal type */
     if (!strcmp(term->name,"unknown"))
@@ -1705,15 +1711,15 @@ test_term()
 	strcpy(tbuf,term->name);
 	strcat(tbuf,"  terminal test");
 	(void) (*t->justify_text) (LEFT);
-	(*t->put_text) (x0 + t->h_char * 2, y0 + ymax_t - t->v_char * 0.5, tbuf);
+	(*t->put_text) (x0 + t->h_char * 2, y0 + ymax_t - t->v_char, tbuf);
     }
 
 #ifdef USE_MOUSE
-    if (t->set_ruler) {
-	(*t->put_text) (x0 + t->h_char * 5, y0 + ymax_t - t->v_char * 3, "Mouse and hotkeys are supported, hit: h r m 6");
-    }
+    if (t->set_ruler)
+	(*t->put_text) (x0 + t->h_char * 2, y0 + ymax_t - t->v_char * 2.5,
+			"Mouse and hotkeys are supported");
 #endif
-    (*t->linetype)(LT_BLACK);
+
     (*t->linetype) (LT_AXIS);
     (*t->move) (x0 + xmax_t / 2, y0);
     (*t->vector) (x0 + xmax_t / 2, y0 + ymax_t - 1);
@@ -1736,9 +1742,10 @@ test_term()
 
     /* Test for enhanced text */
     if (t->flags & TERM_ENHANCED_TEXT) {
-	char *tmptext = gp_strdup("Enhanced text:   {x@_{0}^{n+1}}");
-	(*t->put_text) (x0 + xmax_t * 0.5, y0 + ymax_t * 0.40, tmptext);
-	free(tmptext);
+	char *tmptext1 =   "Enhanced text:   {x@_{0}^{n+1}}";
+	char *tmptext2 = "&{Enhanced text:   }{/:Bold  Bold}{/:Italic  Italic}";  
+	(*t->put_text) (x0 + xmax_t * 0.5, y0 + ymax_t * 0.40, tmptext1);
+	(*t->put_text) (x0 + xmax_t * 0.5, y0 + ymax_t * 0.35, tmptext2);
 	if (!already_in_enhanced_text_mode)
 	    do_string("set termopt noenh");
     }
@@ -1784,31 +1791,24 @@ test_term()
     }
     (void) (*t->justify_text) (LEFT);
     (void) (*t->text_angle) (0);
-    (*t->linetype)(LT_BLACK);
 
     /* test tic size */
-    (*t->linetype)(4);
+    (*t->linetype)(2);
     (*t->move) ((unsigned int) (x0 + xmax_t / 2 + t->h_tic * (1 + axis_array[FIRST_X_AXIS].ticscale)), y0 + (unsigned int) ymax_t - 1);
     (*t->vector) ((unsigned int) (x0 + xmax_t / 2 + t->h_tic * (1 + axis_array[FIRST_X_AXIS].ticscale)),
 		  (unsigned int) (y0 + ymax_t - axis_array[FIRST_X_AXIS].ticscale * t->v_tic));
     (*t->move) ((unsigned int) (x0 + xmax_t / 2), y0 + (unsigned int) (ymax_t - t->v_tic * (1 + axis_array[FIRST_X_AXIS].ticscale)));
     (*t->vector) ((unsigned int) (x0 + xmax_t / 2 + axis_array[FIRST_X_AXIS].ticscale * t->h_tic),
 		  (unsigned int) (y0 + ymax_t - t->v_tic * (1 + axis_array[FIRST_X_AXIS].ticscale)));
-    /* HBB 19990530: changed this to use right-justification, if possible... */
-    str = "show ticscale";
-    if ((*t->justify_text) (RIGHT))
-	(*t->put_text) (x0 + (unsigned int) (xmax_t / 2 - 1* t->h_char),
-			y0 + (unsigned int) (ymax_t - (t->v_tic * 2 + t->v_char / 2)),
-		    str);
-    else
-	(*t->put_text) (x0 + (unsigned int) (xmax_t / 2 - (strlen(str)+1) * t->h_char),
-			y0 + (unsigned int) (ymax_t - (t->v_tic * 2 + t->v_char / 2)),
-			str);
+    (void) (*t->justify_text) (RIGHT);
+    (*t->put_text) (x0 + (unsigned int) (xmax_t / 2 - 1* t->h_char),
+		    y0 + (unsigned int) (ymax_t - t->v_char),
+		    "show ticscale");
     (void) (*t->justify_text) (LEFT);
     (*t->linetype)(LT_BLACK);
 
     /* test line and point types */
-    x = x0 + xmax_t - t->h_char * 6 - p_width;
+    x = x0 + xmax_t - t->h_char * 7 - p_width;
     y = y0 + ymax_t - key_entry_height;
     (*t->pointsize) (pointsize);
     for (i = -2; y > y0 + key_entry_height; i++) {
@@ -1823,9 +1823,9 @@ test_term()
 	else
 	    (*t->put_text) (x - strlen(label) * t->h_char, y, label);
 	(*t->move) (x + t->h_char, y);
-	(*t->vector) (x + t->h_char * 4, y);
+	(*t->vector) (x + t->h_char * 5, y);
 	if (i >= -1)
-	    (*t->point) (x + t->h_char * 5 + p_width / 2, y, i);
+	    (*t->point) (x + t->h_char * 6 + p_width / 2, y, i);
 	y -= key_entry_height;
     }
 
@@ -1878,7 +1878,7 @@ test_term()
     (*t->linetype)(LT_BLACK);
     (*t->justify_text) (CENTRE);
     (*t->put_text)(x+xl*7, y + yl+t->v_char*1.5, "pattern fill");
-    for (i=0; i<10; i++) {
+    for (i=0; i<9; i++) {
 	int style = ((i<<4) + FS_PATTERN);
 	if (t->fillbox)
 	    (*t->fillbox) ( style, x, y, xl, yl );
@@ -2704,31 +2704,31 @@ style_from_fill(struct fill_style_type *fs)
 
 
 /*
- * Load dt with the properties of a user-defined dashtype
- * return d_type (can be SOLID or CUSTOM, 
- * or a positive number if no user-defined dashtype was found)
+ * Load dt with the properties of a user-defined dashtype.
+ * Return: DASHTYPE_SOLID or DASHTYPE_CUSTOM or a positive number
+ * if no user-defined dashtype was found.
  */
 int
 load_dashtype(struct t_dashtype *dt, int tag)
 {
     struct custom_dashtype_def *this;
-	struct t_dashtype loc_dt = DEFAULT_DASHPATTERN;
+    struct t_dashtype loc_dt = DEFAULT_DASHPATTERN;
 
     this = first_custom_dashtype;
     while (this != NULL) {
 	if (this->tag == tag) {
 	    *dt = this->dashtype;
-	    if (this->dashtype.str) {
-			dt->str = gp_strdup(this->dashtype.str);
-	    }
+	    if (this->dashtype.str)
+		dt->str = gp_strdup(this->dashtype.str);
 	    return this->d_type;
 	} else {
 	    this = this->next;
 	}
     }
-	/* not found, fall back to default, terminal-dependent dashtype */
-	*dt = loc_dt;
-	return tag - 1;
+
+    /* not found, fall back to default, terminal-dependent dashtype */
+    *dt = loc_dt;
+    return tag - 1;
 }
 
 

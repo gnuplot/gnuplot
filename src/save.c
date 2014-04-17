@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.246 2014/04/08 21:40:51 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.247 2014/04/08 21:52:42 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -1445,26 +1445,22 @@ save_data_func_style(FILE *fp, const char *which, enum PLOT_STYLE style)
 
 void save_dashtype(FILE *fp, int d_type, const t_dashtype *dt)
 {
-	if (d_type == DASHTYPE_CUSTOM) {
-		if (dt->str) {
-			fprintf(fp, " dashtype \"%s\"", dt->str);
-		}
-		else {
-			int i = 0;
-			fputs(" dashtype (", fp);
-			while (dt->pattern[i]) {
-				fprintf(fp, i ? ", %.2f" : "%.2f", dt->pattern[i]);
-				i++;
-			}
-			fputs(")", fp);
-		}
+    fprintf(fp, " dashtype");
+    if (d_type == DASHTYPE_CUSTOM) {
+	if (dt->str)
+	    fprintf(fp, " \"%s\"", dt->str);
+	if (fp == stderr || !dt->str) {
+	    int i;
+	    fputs(" (", fp);
+	    for (i = 0; i < DASHPATTERN_LENGTH && dt->pattern[i] > 0; i++)
+		fprintf(fp, i ? ", %.2f" : "%.2f", dt->pattern[i]);
+	    fputs(")", fp);
 	}
-	else if (d_type == DASHTYPE_SOLID) {
-		fprintf(fp, " dashtype solid");
-	}
-	else {
-		fprintf(fp, " dashtype %d", d_type + 1);
-	}
+    } else if (d_type == DASHTYPE_SOLID) {
+	fprintf(fp, " solid");
+    } else {
+	fprintf(fp, " %d", d_type + 1);
+    }
 }
 
 void

@@ -1,3 +1,12 @@
+2014-04-17  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/misc.c (parse_dashtype) src/save.c (save_dashtype) src/term_api.h
+	src/term.c (term_apply_lp_properties) demo/dashcolor.dem: 
+	Fix some glitches found while testing custom dashtypes.
+
+	* src/term.c (test_term): Exercise bold/italic.  Longer line samples to
+	make it easier to distinguish dashtypes.  Minor layout changes.
+
 2014-04-14  Dima Kogan  <dima@secretsauce.net>
 
 	* src/mouse.c (event_buttonpress):  Flip direction of horizontal 

@@ -17,7 +17,7 @@ unset colorbox
 #
 # reset linetypes to base dash patterns
 #
-set for [i=1:5] linetype i lt i
+set for [i=1:5] linetype i lt i dt i
 
 #
 # define line styles using explicit rgbcolor names
@@ -36,7 +36,7 @@ set label 5 'plot ... lt 1 lc 3 ' at -0.4, -0.65 tc lt 3
 set label 6 'plot ... lt 3 lc 3 ' at -0.4, -0.75 tc lt 3
 set label 7 'plot ... lt 5 lc 3 ' at -0.4, -0.85 tc lt 3
 #
-set xlabel "You will only see dashed lines if your current terminal setting permits it"
+set xlabel "You will only see dashed lines if your current terminal supports it"
 #
 show style line
 #

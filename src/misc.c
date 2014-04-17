@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.177 2014/04/05 05:25:53 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.178 2014/04/08 18:49:22 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -903,6 +903,7 @@ parse_dashtype(struct t_dashtype *dt)
 
     /* Or string representing pattern elements ... */
     } else if ((dash_str = try_to_get_string())) {
+#define DSCALE 10.
 	while (dash_str[j] && (k < DASHPATTERN_LENGTH || dash_str[j] == ' ')) {
 	    /* .      Dot with short space 
 	     * -      Dash with regular space
@@ -910,24 +911,25 @@ parse_dashtype(struct t_dashtype *dt)
 	     * space  Don't add new dash, just increase last space */
 	    switch (dash_str[j]) {
 	    case '.':
-		dt->pattern[k++] = 0.2;
-		dt->pattern[k++] = 0.5;
+		dt->pattern[k++] = 0.2 * DSCALE;
+		dt->pattern[k++] = 0.5 * DSCALE;
 		break;
 	    case '-':
-		dt->pattern[k++] = 1.0;
-		dt->pattern[k++] = 1.0;
+		dt->pattern[k++] = 1.0 * DSCALE;
+		dt->pattern[k++] = 1.0 * DSCALE;
 		break;
 	    case '_':
-		dt->pattern[k++] = 2.0;
-		dt->pattern[k++] = 1.0;
+		dt->pattern[k++] = 2.0 * DSCALE;
+		dt->pattern[k++] = 1.0 * DSCALE;
 		break;
 	    case ' ':
-		dt->pattern[k] += 1.0;
+		dt->pattern[k-1] += 1.0 * DSCALE;
 		break;
 	    default:
 		int_error(c_token - 1, "expecting one of . - _ or space");
 	    }
 	    j++;
+#undef  DSCALE
 	}
 	/* truncate dash_str if we ran out of space in the array representation */
 	dash_str[j] = '\0';
