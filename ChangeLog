@@ -7,6 +7,8 @@
 	* src/term.c (test_term): Exercise bold/italic.  Longer line samples to
 	make it easier to distinguish dashtypes.  Minor layout changes.
 
+	* term/svg.trm:  Support for custom dashtypes.
+
 2014-04-14  Dima Kogan  <dima@secretsauce.net>
 
 	* src/mouse.c (event_buttonpress):  Flip direction of horizontal 
