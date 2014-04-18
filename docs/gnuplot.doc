@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.879 2014/04/14 22:43:32 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.880 2014/04/14 22:48:22 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -192,6 +192,9 @@ C
 
 2 New features in version 5
 ?new-features
+
+ * The dot-dash pattern of a line can now be specified independent of other
+ line properties. See `dashtype`, `set dashtype`, `set linetype`.
 
  * Text markup now supports bold and italic font settings in addition to 
  subscript, superscript, font size and other previously available properties.
@@ -2403,7 +2406,41 @@ Ffigure_newsyntax
 3 dashtype
 ?dashtype
 =dashtype
- [New in version 5. Implementation and documentation in progress]
+ In gnuplot version 5 the dash pattern (`dashtype`) is a seperate property 
+ associated with each line, equivalent to `linecolor` or `linewidth`.  It is not
+ necessary to place the current terminal in a special mode just to draw dashed
+ lines.  I.e. the command `set term <termname> {solid|dashed}` is now ignored.
+
+ All lines have the property `dashtype solid` unless you specify otherwise.
+ You can change the default for a particular linetype using the command
+ `set linetype` so that it affects all subsequent commands, or you can include
+ the desired dashtype as part of the `plot` or other command.
+
+ Syntax:
+       dashtype N          # predefined dashtype invoked by number
+       dashtype "pattern"  # string containing a combination of the characters
+                           # dot (.) hyphen (-) underscore(_) and space.
+       dashtype (s1,e1,s2,e2,s3,e3,s4,e4)  # dash pattern specified by 1 to 4
+                           # numerical pairs <solid length>, <emptyspace length> 
+ 
+ Example:
+       # Two functions using linetype 1 but distinguished by dashtype
+       plot f1(x) with lines lt N dt solid, f2(x) with lines lt N dt 3
+
+ Some terminals support user-defined dash patterns in addition to whatever 
+ set of predefined dash patterns they offer.
+
+ Examples:
+      plot f(x) dt 3            # use terminal-specific dash pattern 3
+      plot f(x) dt ".. "        # construct a dash pattern on the spot
+      plot f(x) dt (2,5,2,15)   # numerical representation of the same pattern
+      set dashtype 11 (2,4,4,7) # define new dashtype to be called by index
+      plot f(x) dt 11           # plot using our new dashtype
+
+ If you specify a dash pattern using a string the program will convert this to
+ a sequence of <solid>,<empty> pairs.  The command `show dashtype` will show both
+ the original string and the converted numerical sequence.
+
 3 linestyles vs linetypes
 ? linestyles vs linetypes
  Lines can have additional properties such as linewidth.  You can associate
@@ -7881,6 +7918,22 @@ Ffigure_mapcontours
 ^ <a href="http://www.gnuplot.info/demo/discrete.html">
  contours with user defined levels demo (discrete.dem).
 ^ </a>
+3 dashtype
+?commands set dashtype
+?commands show dashtype
+?set dashtype
+?show dashtype
+ The `set dashtype` command allows you to define a dash pattern that can 
+ then be referred to by its index.  This is purely a convenience, as anywhere
+ that would accept the dashtype by its numerical index would also accept an
+ explicit dash pattern.
+ Example:
+      set dashtype 5 (2,4,2,6)   # define or redefine dashtype number 5
+      plot f1(x) dt 5            # plot using the new dashtype
+      plot f1(x) dt (2,4,2,6)    # exactly the same plot as above
+      set linetype 5 dt 5        # always use this dash pattern with linetype 5
+      set dashtype 66 "..-"      # define a new dashtype using a string
+ See also `dashtype`
 3 data style
 ?set data style
  This form of the command is deprecated. Please see `set style data`.

@@ -1,7 +1,7 @@
-New features, changes and fixes since gnuplot version 4.6
-=========================================================
+New features, changes and fixes in gnuplot version 5.0
+======================================================
 
-* NEW separate dashtype from linetype
+* NEW The dashtype property on any line can be seperately controlled
 * NEW custom dashtypes
 * NEW LFS support for datafiles
 * NEW 'nodraw' keyword to suppress lines (e.g. in style linespoints)
@@ -77,6 +77,7 @@ New features, changes and fixes since gnuplot version 4.6
 * CHANGE reworked qt driver for use with qt5, much faster rendering
 * CHANGE gnuplot-mode (emacs plugin) now maintained as a separate project
 * FIX Hitting ^C twice will forcibly terminate wxt if server connection is lost
+
 
 New features, changes and fixes in gnuplot version 4.6
 ======================================================

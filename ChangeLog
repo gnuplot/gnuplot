@@ -15,6 +15,9 @@
 	* src/term.c (enhanced_recursion):  Consume only a single space following
 	the font name in an enhanced text string "{/Fontname      text}".
 
+	* docs/gnuplot.doc:  Initial documentation for `set dashtype` and
+	dash properties in version 5.
+
 2014-04-17  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/misc.c (parse_dashtype) src/save.c (save_dashtype) src/term_api.h
