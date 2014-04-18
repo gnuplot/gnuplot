@@ -61,7 +61,7 @@ GEFillBox, GEPutText, GEFilledPolygon, GETextAngle, GETextAlignment, GEPoint, GE
 GEZoomStart, GEZoomStop, GERuler, GECopyClipboard, GEMove, GEVector, GELineTo,
 GESetFont, GEEnhancedFlush, GEEnhancedFinish, GEImage, GESetSceneSize, GERaise,
 GEWrapCursor, GEScale, GEActivate, GEDesactivate, GELayer, GEPlotNumber, GEHypertext,
-GETextBox, GEModPlots, GEAfterPlot, GEFontMetricRequest,
+GETextBox, GEModPlots, GEAfterPlot, GEFontMetricRequest, GEDashPattern,
 GEDone
 };
 

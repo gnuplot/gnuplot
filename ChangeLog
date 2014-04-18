@@ -5,6 +5,13 @@
 	* src/misc.c (parse_dashtype):  A custom pattern must contain an even
 	number of entries.
 
+	* demo/dashtypes.dem demo/all.dem:  New dashtype demo.
+
+	* src/qtterminal/QtGnuplotEvent.h src/qtterminal/QtGnuplotScene.cpp
+	src/qtterminal/qt_term.cpp src/qtterminal/qt_term.h term/qt.trm:
+	Support for custom dashtypes and dashlength in qt terminal.
+	Change implementation of "lt nodraw" from background color to NoPen.
+
 2014-04-17  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/misc.c (parse_dashtype) src/save.c (save_dashtype) src/term_api.h

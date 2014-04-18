@@ -1,5 +1,5 @@
 /* GNUPLOT - qt.trm 
- * $Id: qt.trm,v 1.11 2013/08/20 05:36:48 sfeam Exp $
+ * $Id: qt.trm,v 1.12 2013/10/07 21:43:48 sfeam Exp $
  */
 
 /*[
@@ -69,6 +69,7 @@ TERM_TABLE_START (qt_driver)
     , qt_boxed_text
 #endif
     , qt_modify_plots
+    , qt_dashtype
 TERM_TABLE_END (qt_driver)
 
 #undef LAST_TERM
@@ -90,12 +91,10 @@ START_HELP(qt)
 " Syntax:",
 "         set term qt {<n>}",
 "                     {size <width>,<height>}",
-"                     {{no}enhanced}",
-"                     {font <font>}",
 "                     {title \"title\"}",
-"                     {{no}persist}",
-"                     {{no}raise}",
-"                     {{no}ctrl}",
+"                     {font <font>} {{no}enhanced}",
+"                     {dashlength <dl>}",
+"                     {{no}persist} {{no}raise} {{no}ctrl}",
 "                     {close}",
 "                     {widget <id>}",
 "",
@@ -140,6 +139,8 @@ START_HELP(qt)
 "       set term qt font \"Arial\" # to change the font face only",
 "       set term qt font \",12\" # to change the font size only",
 "       set term qt font \"\" # to reset the font name and size",
+"",
+" The dashlength affects only custom dash patterns, not Qt's built-in set.",
 "",
 " The Qt rendering speed is affected strongly by the rendering mode used.",
 " In Qt version 4.7 or newer this can be controlled by the environmental",

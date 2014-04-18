@@ -159,10 +159,12 @@ static bool qt_optionEnhanced = true;
 static bool qt_optionPersist  = false;
 static bool qt_optionRaise    = true;
 static bool qt_optionCtrl     = false;
-static bool qt_optionDash     = false;
+static bool qt_optionDash     = true;
 static int  qt_optionWidth    = 640;
 static int  qt_optionHeight   = 480;
 static int  qt_optionFontSize = 9;
+static double qt_optionDashLength = 1.0;
+
 /* Encapsulates all Qt options that have a constructor and destructor. */
 struct QtOption {
     QtOption()
@@ -664,18 +666,12 @@ void qt_linetype(int lt)
 	if (lt <= LT_NODRAW)
 		lt = LT_NODRAW; // background color
 
-	if (lt == -1)
+	/* Version 5: dash pattern will be set later by term->dashtype */
+	if (lt == LT_AXIS)
 		qt->out << GEPenStyle << Qt::DotLine;
-	else if (qt_optionDash && lt > 0) {
-		Qt::PenStyle style;
-		style =
-			(lt%4 == 1) ? Qt::DashLine :
-			(lt%4 == 2) ? Qt::DashDotLine :
-			(lt%4 == 3) ? Qt::DashDotDotLine :
-			              Qt::SolidLine ;
-		qt->out << GEPenStyle << style;
-		}
-	else
+	else if (lt == LT_NODRAW)
+		qt->out << GEPenStyle << Qt::NoPen;
+	else 
 		qt->out << GEPenStyle << Qt::SolidLine;
 
 	if ((lt-1) == LT_BACKGROUND) {
@@ -683,6 +679,43 @@ void qt_linetype(int lt)
 		qt->out << GEBackgroundColor;
 	} else
 		qt->out << GEPenColor << qt_colorList[lt % 9 + 3];
+}
+
+void qt_dashtype (int type, t_dashtype *custom_dash_type)
+{
+	switch (type) {
+	case DASHTYPE_SOLID:
+		qt->out << GEPenStyle << Qt::SolidLine;
+		break;
+	case DASHTYPE_AXIS:
+		qt->out << GEPenStyle << Qt::DotLine;
+		break;
+	case DASHTYPE_CUSTOM:
+		if (custom_dash_type) {
+			QVector<qreal> dashpattern;
+			for (int j = 0; j < 8 && custom_dash_type->pattern[j] > 0; j++) {
+				dashpattern.append(
+					custom_dash_type->pattern[j] * qt_optionDashLength );
+			}
+			qt->out << GEDashPattern << dashpattern;
+			qt->out << GEPenStyle << Qt::CustomDashLine;
+		}
+		break;
+	default:
+		/* Fall back to whatever version 4 would have provided */
+		if (type > 0) {
+			Qt::PenStyle style;
+			style =
+				(type%4 == 1) ? Qt::DashLine :
+				(type%4 == 2) ? Qt::DashDotLine :
+				(type%4 == 3) ? Qt::DashDotDotLine :
+					      Qt::SolidLine ;
+			qt->out << GEPenStyle << style;
+		} else {
+			qt->out << GEPenStyle << Qt::SolidLine;
+		}
+		break;
+	}
 }
 
 int qt_set_font (const char* font)
@@ -1221,6 +1254,7 @@ void qt_options()
 	bool set_size = false;
 	bool set_widget = false;
 	bool set_dash = false;
+	bool set_dashlength = false;
 
 	if (term_interlock != NULL && term_interlock != (void *)qt_init) {
 		term = NULL;
@@ -1317,13 +1351,14 @@ void qt_options()
 			qt_optionDash = true;
 			break;
 		case QT_DASHLENGTH:
-			/* FIXME: This should be easy, at least in Qt 4.8 */
-			c_token++;
-			(void) real_expression();
+			SETCHECKDUP(set_dashlength);
+			qt_optionDashLength = real_expression();
 			break;
 		case QT_SOLID:
-			SETCHECKDUP(set_dash);
-			qt_optionDash = false;
+			// Not wanted in version 5
+			// SETCHECKDUP(set_dash);
+			// qt_optionDash = false;
+			c_token++;
 			break;
 		case QT_OTHER:
 		default:
@@ -1362,7 +1397,7 @@ void qt_options()
 
 	if (set_enhanced) termOptions += qt_optionEnhanced ? " enhanced" : " noenhanced";
 	                  termOptions += " font \"" + fontSettings + '"';
-	if (set_dash)     termOptions += qt_optionDash ? " dashed" : " solid";
+	if (set_dashlength) termOptions += " dashlength " + QString::number(qt_optionDashLength);
 	if (set_widget)   termOptions += " widget \"" + qt_option->Widget + '"';
 	if (set_persist)  termOptions += qt_optionPersist ? " persist" : " nopersist";
 	if (set_raise)    termOptions += qt_optionRaise ? " raise" : " noraise";

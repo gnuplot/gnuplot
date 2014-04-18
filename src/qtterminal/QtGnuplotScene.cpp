@@ -234,6 +234,11 @@ void QtGnuplotScene::processEvent(QtGnuplotEventType type, QDataStream& in)
 			m_currentPen.setCapStyle(Qt::FlatCap);
 		}
 	}
+	else if (type == GEDashPattern)
+	{
+		QVector<qreal> dashpattern; in >> dashpattern;
+		m_currentPen.setDashPattern(dashpattern);
+	}
 	else if (type == GEPointSize)
 		in >> m_currentPointSize;
 	else if (type == GETextAngle)

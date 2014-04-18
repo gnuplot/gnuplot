@@ -61,6 +61,7 @@ void qt_graphics(void);
 void qt_move(unsigned int x, unsigned int y);
 void qt_vector(unsigned int x, unsigned int y);
 void qt_linetype(int linetype);
+void qt_dashtype (int type, t_dashtype *custom_dash_type);
 void qt_put_text(unsigned int x, unsigned int y, const char *str);
 int  qt_text_angle(int ang);
 int  qt_justify_text(enum JUSTIFY mode);
