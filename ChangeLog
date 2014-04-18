@@ -2,6 +2,9 @@
 
 	* term/svg.trm (set_dashtype):  Fix potential buffer overrun;
 
+	* src/misc.c (parse_dashtype):  A custom pattern must contain an even
+	number of entries.
+
 2014-04-17  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/misc.c (parse_dashtype) src/save.c (save_dashtype) src/term_api.h

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.178 2014/04/08 18:49:22 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.179 2014/04/18 04:07:18 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -876,27 +876,25 @@ parse_dashtype(struct t_dashtype *dt)
 	res = DASHTYPE_SOLID;
 	c_token++;
 
-    /* Or numerical pattern ... */
+    /* Or numerical pattern consisting of pairs solid,empty,solid,empty... */
     } else if (equals(c_token, "(")) {
 	c_token++;
-	while (!END_OF_COMMAND && j < DASHPATTERN_LENGTH) {
-	    if (!END_OF_COMMAND
-		&&  !equals(c_token, ",")
-		&&  !equals(c_token, ")")
-		) {
-		dt->pattern[j] = real_expression(); 
-		j++;
-			
-		/* expect "," or ")" here */
-		if (!END_OF_COMMAND && equals(c_token, ","))
-		    c_token++;		/* loop again */
-		else
-		    break;		/* hopefully ")" */
+	while (!END_OF_COMMAND) {
+	    if (j >= DASHPATTERN_LENGTH) {
+		int_error(c_token, "too many pattern elements");
 	    }
+	    dt->pattern[j++] = real_expression();	/* The solid portion */
+	    if (!equals(c_token++, ","))
+		int_error(c_token, "expecting comma");
+	    dt->pattern[j++] = real_expression();	/* The empty portion */
+	    if (equals(c_token, ")"))
+		break;
+	    if (!equals(c_token++, ","))
+		int_error(c_token, "expecting comma");
 	}
 
-	if (END_OF_COMMAND || !equals(c_token, ")"))
-	    int_error(c_token, "expecting comma , or right parenthesis )");
+	if (!equals(c_token, ")"))
+	    int_error(c_token, "expecting , or )");
 
 	c_token++;
 	res = DASHTYPE_CUSTOM;
