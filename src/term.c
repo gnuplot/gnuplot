@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.289 2014/04/08 19:20:22 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.290 2014/04/18 04:07:19 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -2343,7 +2343,7 @@ enhanced_recursion(
 		    if (ch == '}')
 			int_warn(NO_CARET,"bad syntax in enhanced text string");
 
-		    while (*p == ' ')
+		    if (*p == ' ')	/* Eat up a single space following a font spec */
 			++p;
 		    if (!start_of_fontname || (start_of_fontname == end_of_fontname)) {
 			/* Use the font name passed in to us */
