@@ -1,5 +1,5 @@
 #
-# $Id: all.dem,v 1.57 2014/01/13 20:16:20 sfeam Exp $
+# $Id: all.dem,v 1.58 2014/04/07 23:36:14 sfeam Exp $
 #
 # Executes all demos (OK, MOST demos) in this directory.
 # This serves as a series of unit tests for non-interactive capabilities.
@@ -219,6 +219,10 @@ reset
 
 print "********************** file arrowstyle.dem *********************"
 load "arrowstyle.dem"
+reset
+
+print "********************** file dashtypes.dem *********************"
+load "dashtypes.dem"
 reset
 
 print "********************** file vector.dem *********************"
