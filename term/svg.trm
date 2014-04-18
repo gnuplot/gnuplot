@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: svg.trm,v 1.164 2014/03/29 04:42:03 sfeam Exp $
+ * $Id: svg.trm,v 1.165 2014/04/18 04:08:27 sfeam Exp $
  */
 
 /*------------------------------------------------------------------------------------------------------------------------------------
@@ -1267,13 +1267,12 @@ SVG_dashtype (int type, t_dashtype *custom_dash_type)
 	    if (custom_dash_type) {
 		SVG_dashpattern = SVG_custom_dash_pattern;
 		*SVG_dashpattern = '\0';
-		j = 0;
-		do {
+		for (j = 0; j < 8 && custom_dash_type->pattern[j] > 0; j++) {
 		    char *p = &SVG_dashpattern[strlen(SVG_dashpattern)];
 		    snprintf(p, 8, "%.1f", custom_dash_type->pattern[j] * SVG_dashlength);
-		    if (custom_dash_type->pattern[++j])
+		    if (j < 7 && custom_dash_type->pattern[j+1])
 			strcat(p,",");
-		} while (custom_dash_type->pattern[j] > 0);
+		}
 	    }
 	    break;
 

@@ -1,3 +1,7 @@
+2014-04-18  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/svg.trm (set_dashtype):  Fix potential buffer overrun;
+
 2014-04-17  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/misc.c (parse_dashtype) src/save.c (save_dashtype) src/term_api.h
