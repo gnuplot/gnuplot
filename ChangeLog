@@ -3,6 +3,12 @@
 	* src/command.c (test_command):  When "test" is issued before any plot
 	command, suppress error messages if the window is resized.
 
+	* term/PostScript/prologue.ps term/PostScript/prologues.h:
+	Update PostScript prolog for version 5 and regenerate headers.
+
+	* term/post.trm:
+	Support for custom dashtypes in PostScript output.
+
 2014-04-18  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/svg.trm (set_dashtype):  Fix potential buffer overrun;

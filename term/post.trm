@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: post.trm,v 1.280 2014/03/20 20:50:10 markisch Exp $
+ * $Id: post.trm,v 1.281 2014/03/21 21:00:11 sfeam Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -96,6 +96,7 @@ TERM_PUBLIC void PS_graphics __PROTO((void));
 TERM_PUBLIC void PS_text __PROTO((void));
 TERM_PUBLIC void PS_reset __PROTO((void));
 TERM_PUBLIC void PS_linetype __PROTO((int linetype));
+TERM_PUBLIC void PS_dashtype __PROTO((int type, t_dashtype *custom_dash_type));
 TERM_PUBLIC void PS_move __PROTO((unsigned int x, unsigned int y));
 TERM_PUBLIC void PS_vector __PROTO((unsigned int x, unsigned int y));
 TERM_PUBLIC void PS_put_text __PROTO((unsigned int x, unsigned int y, const char *str));
@@ -2021,6 +2022,31 @@ PS_linetype(int linetype)
     ps_path_count = 0;
 }
 
+TERM_PUBLIC void
+PS_dashtype(int type, t_dashtype *custom_dash_type)
+{
+    int i;
+
+    switch (type) {
+    case DASHTYPE_AXIS:
+		/* Handled by LT_AXIS */
+		break;
+    case DASHTYPE_SOLID:
+		if (PS_linetype_last != LT_SOLID+3 && PS_linetype_last != LT_AXIS+3)
+		    fprintf(gppsfile, "[] 0 setdash\n");
+		break;
+    case DASHTYPE_CUSTOM:
+		fprintf(gppsfile, "[");
+		for (i = 0; custom_dash_type->pattern[i] > 0; i++)
+		    fprintf(gppsfile, "%.1f ", PS_SCF * custom_dash_type->pattern[i]);
+		fprintf(gppsfile, "] 0 setdash\n");
+		break;
+    default:
+		if (type > 0)
+		    PS_linetype(type);
+		break;
+    }
+}
 
 TERM_PUBLIC void
 PS_linewidth (double linewidth)
@@ -4309,6 +4335,8 @@ TERM_TABLE_START(post_driver)
 #ifdef EAM_BOXED_TEXT
     , ENHPS_boxed_text
 #endif
+    , NULL		/* modify_plots */
+    , PS_dashtype
 TERM_TABLE_END(post_driver)
 
 #undef LAST_TERM
