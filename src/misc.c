@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.179 2014/04/18 04:07:18 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.180 2014/04/18 20:52:35 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -921,6 +921,7 @@ parse_dashtype(struct t_dashtype *dt)
 		dt->pattern[k++] = 1.0 * DSCALE;
 		break;
 	    case ' ':
+		if (k > 0)
 		dt->pattern[k-1] += 1.0 * DSCALE;
 		break;
 	    default:
