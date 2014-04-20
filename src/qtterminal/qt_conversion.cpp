@@ -69,10 +69,14 @@ QTextCodec* qt_encodingToCodec(set_encoding_id encoding)
 	case S_ENC_CP437      : return QTextCodec::codecForMib(2011);
 	case S_ENC_CP850      : return QTextCodec::codecForMib(2009);
 	case S_ENC_CP852      : return QTextCodec::codecForMib(2010);
+	case S_ENC_CP950      : return QTextCodec::codecForMib(2026); // Note: CP950 has no IANA number. 2026 is for Big5, which is close to CP950
 	case S_ENC_CP1250     : return QTextCodec::codecForMib(2250);
+	case S_ENC_CP1251     : return QTextCodec::codecForMib(2251);
+	case S_ENC_CP1252     : return QTextCodec::codecForMib(2252);
 	case S_ENC_CP1254     : return QTextCodec::codecForMib(2254);
 	case S_ENC_KOI8_R     : return QTextCodec::codecForMib(2084);
 	case S_ENC_KOI8_U     : return QTextCodec::codecForMib(2088);
+	case S_ENC_SJIS       : return QTextCodec::codecForMib(  17);
 	case S_ENC_UTF8       : return QTextCodec::codecForMib( 106);
 	default               : return QTextCodec::codecForLocale();
 	}

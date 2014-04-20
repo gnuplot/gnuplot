@@ -4,101 +4,100 @@
 <context>
     <name>QtGnuplotWindow</name>
     <message>
-        <location filename="../QtGnuplotWindow.cpp" line="81"/>
-        <location filename="../QtGnuplotWindow.cpp" line="140"/>
+        <location filename="../QtGnuplotWindow.cpp" line="86"/>
+        <location filename="../QtGnuplotWindow.cpp" line="153"/>
         <source>Export to PDF</source>
         <translation>PDF形式でエクスポート</translation>
     </message>
     <message>
-        <location filename="../QtGnuplotWindow.cpp" line="140"/>
+        <location filename="../QtGnuplotWindow.cpp" line="153"/>
         <source>PDF files (*.pdf)</source>
         <translation>PDF (*.pdf)</translation>
     </message>
     <message>
-        <location filename="../QtGnuplotWindow.cpp" line="152"/>
+        <location filename="../QtGnuplotWindow.cpp" line="165"/>
         <source>Export to Image</source>
         <translation>画像としてエクスポート</translation>
     </message>
     <message>
-        <location filename="../QtGnuplotWindow.cpp" line="153"/>
+        <location filename="../QtGnuplotWindow.cpp" line="166"/>
         <source>Image files (*.png *.bmp)</source>
         <translation>画像 (*.png *.bmp)</translation>
     </message>
     <message>
-        <location filename="../QtGnuplotWindow.cpp" line="83"/>
-        <location filename="../QtGnuplotWindow.cpp" line="165"/>
+        <location filename="../QtGnuplotWindow.cpp" line="88"/>
+        <location filename="../QtGnuplotWindow.cpp" line="178"/>
         <source>Export to SVG</source>
         <translation>SVG形式でエクスポート</translation>
     </message>
     <message>
-        <location filename="../QtGnuplotWindow.cpp" line="165"/>
+        <location filename="../QtGnuplotWindow.cpp" line="178"/>
         <source>SVG files (*.svg)</source>
         <translation>SVG (*.svg)</translation>
     </message>
     <message>
-        <location filename="../QtGnuplotWindow.cpp" line="75"/>
         <source>Qt frontend for gnuplot</source>
-        <translation>gnuplotのためのQtフロントエンド</translation>
+        <translation type="obsolete">gnuplotのためのQtフロントエンド</translation>
     </message>
     <message>
-        <location filename="../QtGnuplotWindow.cpp" line="78"/>
+        <location filename="../QtGnuplotWindow.cpp" line="83"/>
         <source>Copy to clipboard</source>
         <translation>クリップボードにコピー</translation>
     </message>
     <message>
-        <location filename="../QtGnuplotWindow.cpp" line="79"/>
+        <location filename="../QtGnuplotWindow.cpp" line="84"/>
         <source>Print</source>
         <translation>印刷</translation>
     </message>
     <message>
-        <location filename="../QtGnuplotWindow.cpp" line="80"/>
+        <location filename="../QtGnuplotWindow.cpp" line="85"/>
         <source>Export</source>
         <translation>エクスポート</translation>
     </message>
     <message>
-        <location filename="../QtGnuplotWindow.cpp" line="82"/>
+        <location filename="../QtGnuplotWindow.cpp" line="87"/>
         <source>Export to EPS</source>
         <translation>EPS形式でエクスポート</translation>
     </message>
     <message>
-        <location filename="../QtGnuplotWindow.cpp" line="84"/>
+        <location filename="../QtGnuplotWindow.cpp" line="89"/>
         <source>Export to image</source>
         <translation>画像としてエクスポート</translation>
     </message>
     <message>
-        <location filename="../QtGnuplotWindow.cpp" line="85"/>
+        <location filename="../QtGnuplotWindow.cpp" line="90"/>
         <source>Settings</source>
         <translation>設定</translation>
     </message>
     <message>
-        <location filename="../QtGnuplotWindow.cpp" line="102"/>
+        <location filename="../QtGnuplotWindow.cpp" line="107"/>
         <source>Replot</source>
         <translation>再描画</translation>
     </message>
     <message>
-        <location filename="../QtGnuplotWindow.cpp" line="103"/>
+        <location filename="../QtGnuplotWindow.cpp" line="108"/>
         <source>Show grid</source>
         <translation>グリッド線を表示</translation>
     </message>
     <message>
-        <location filename="../QtGnuplotWindow.cpp" line="104"/>
+        <location filename="../QtGnuplotWindow.cpp" line="109"/>
         <source>Previous zoom</source>
         <translation>前のズーム設定</translation>
     </message>
     <message>
-        <location filename="../QtGnuplotWindow.cpp" line="105"/>
+        <location filename="../QtGnuplotWindow.cpp" line="110"/>
         <source>Next zoom</source>
         <translation>次のズーム設定</translation>
     </message>
     <message>
-        <location filename="../QtGnuplotWindow.cpp" line="106"/>
+        <location filename="../QtGnuplotWindow.cpp" line="111"/>
         <source>Autoscale</source>
         <translation>自動でスケーリング</translation>
     </message>
     <message>
-        <location filename="../QtGnuplotWindow.cpp" line="218"/>
+        <location filename="../QtGnuplotWindow.cpp" line="264"/>
         <source>Gnuplot window </source>
-        <translation type="unfinished">Gnuplotウィンドウ </translation>
+        <translation>Gnuplotウィンドウ </translation>
     </message>
 </context>
 <context>
@@ -131,6 +130,31 @@
     <message>
         <location filename="../QtGnuplotSettings.ui" line="71"/>
         <source>Rounded line ends</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../QtGnuplotSettings.ui" line="80"/>
+        <source>Mouse label</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../QtGnuplotSettings.ui" line="91"/>
+        <source>Status bar</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../QtGnuplotSettings.ui" line="96"/>
+        <source>Tool bar</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../QtGnuplotSettings.ui" line="101"/>
+        <source>Inline</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../QtGnuplotSettings.ui" line="106"/>
+        <source>None</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

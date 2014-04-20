@@ -1,3 +1,9 @@
+2014-04-20  Jérôme Lodewyck  <lodewyck@users.sourceforge.net>
+
+	* src/qtterminal/po/*.ts: Update translations.
+
+	* src/qtterminal/qt_conversion.cpp: Add new encoding types.
+
 2014-04-19  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/command.c (test_command):  When "test" is issued before any plot
