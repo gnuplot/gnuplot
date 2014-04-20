@@ -268,6 +268,12 @@ void QtGnuplotWindow::processEvent(QtGnuplotEventType type, QDataStream& in)
 		raise();
 	else if (type == GESetCtrl)
 		in >> m_ctrl;
+	else if (type == GESetPosition)
+	{
+		QPoint pos;
+		in >> pos;
+		move(pos);
+	}
 	else
 		m_widget->processEvent(type, in);
 }

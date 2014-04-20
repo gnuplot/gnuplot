@@ -174,6 +174,7 @@ struct QtOption {
     QString FontName;
     QString Title;
     QString Widget;
+	QPoint  position;
 };
 static QtOption* qt_option = NULL;
 
@@ -183,7 +184,7 @@ static void ensureOptionsCreated()
 	    qt_option = new QtOption();
 }
 
-
+static bool qt_setPosition = false;
 static bool qt_setSize   = true;
 static int  qt_setWidth  = qt_optionWidth;
 static int  qt_setHeight = qt_optionHeight;
@@ -514,6 +515,12 @@ void qt_graphics()
 	qt_sendFont();
 	term->v_tic = (unsigned int) (term->v_char/2.5);
 	term->h_tic = (unsigned int) (term->v_char/2.5);
+
+	if (qt_setPosition)
+	{
+		qt->out << GESetPosition << qt_option->position;
+		qt_setPosition = false;
+	}
 }
 
 // Called after plotting is done
@@ -1201,6 +1208,7 @@ enum QT_id {
 	QT_ENHANCED,
 	QT_NOENHANCED,
 	QT_SIZE,
+	QT_POSITION,
 	QT_PERSIST,
 	QT_NOPERSIST,
 	QT_RAISE,
@@ -1221,6 +1229,7 @@ static struct gen_table qt_opts[] = {
 	{"enh$anced",   QT_ENHANCED},
 	{"noenh$anced", QT_NOENHANCED},
 	{"s$ize",       QT_SIZE},
+	{"pos$ition,",  QT_POSITION},
 	{"per$sist",    QT_PERSIST},
 	{"noper$sist",  QT_NOPERSIST},
 	{"rai$se",      QT_RAISE},
@@ -1251,7 +1260,7 @@ void qt_options()
 	bool set_persist = false, set_number = false;
 	bool set_raise = false, set_ctrl = false;
 	bool set_title = false, set_close = false;
-	bool set_size = false;
+	bool set_size = false, set_position = false;
 	bool set_widget = false;
 	bool set_dash = false;
 	bool set_dashlength = false;
@@ -1310,6 +1319,15 @@ void qt_options()
 			qt_optionHeight = real_expression();
 			if (qt_optionWidth < 1 || qt_optionHeight < 1)
 				int_error(c_token, "size is out of range");
+			break;
+		case QT_POSITION:
+			SETCHECKDUP(set_position);
+			if (END_OF_COMMAND)
+				int_error(c_token, "position requires 'x,y'");
+			qt_option->position.setX(real_expression());
+			if (!equals(c_token++, ","))
+				int_error(c_token, "position requires 'x,y'");
+			qt_option->position.setY(real_expression());
 			break;
 		case QT_PERSIST:
 			SETCHECKDUP(set_persist);
@@ -1393,6 +1411,13 @@ void qt_options()
 		qt_setSize   = true;
 		qt_setWidth  = qt_optionWidth;
 		qt_setHeight = qt_optionHeight;
+	}
+
+	if (set_position)
+	{
+		termOptions += " position " + QString::number(qt_option->position.x()) + ", "
+		                            + QString::number(qt_option->position.y());
+		qt_setPosition = true;
 	}
 
 	if (set_enhanced) termOptions += qt_optionEnhanced ? " enhanced" : " noenhanced";

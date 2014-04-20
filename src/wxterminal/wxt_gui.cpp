@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.cpp,v 1.122 2013/12/12 19:18:19 sfeam Exp $
+ * $Id: wxt_gui.cpp,v 1.123 2014/04/18 04:12:46 sfeam Exp $
  */
 
 /* GNUPLOT - wxt_gui.cpp */
@@ -395,7 +395,7 @@ void wxtApp::SendEvent( wxEvent &event)
 
 /* frame constructor*/
 wxtFrame::wxtFrame( const wxString& title, wxWindowID id )
-	: wxFrame((wxFrame *)NULL, id, title, wxDefaultPosition, wxDefaultSize, wxDEFAULT_FRAME_STYLE|wxWANTS_CHARS)
+	: wxFrame((wxFrame *)NULL, id, title, wxPoint(wxt_posx, wxt_posy), wxDefaultSize, wxDEFAULT_FRAME_STYLE|wxWANTS_CHARS)
 {
 	FPRINTF((stderr,"wxtFrame constructor\n"));
 
@@ -3264,6 +3264,29 @@ void wxt_update_size(int number)
 	if ((window = wxt_findwindowbyid(number))) {
 		FPRINTF((stderr,"wxt : update size of window %d\n",number));
 		window->frame->SetClientSize( wxSize(wxt_width, wxt_height) );
+	}
+
+	wxt_MutexGuiLeave();
+
+	wxt_sigint_check();
+	wxt_sigint_restore();
+}
+
+/* update the position of the plot window */
+void wxt_update_position(int number)
+{
+	wxt_window_t *window;
+
+	if (wxt_status != STATUS_OK)
+		return;
+
+	wxt_sigint_init();
+
+	wxt_MutexGuiEnter();
+
+	if ((window = wxt_findwindowbyid(number))) {
+		FPRINTF((stderr,"wxt : update position of window %d\n",number));
+		window->frame->SetPosition( wxPoint(wxt_posx, wxt_posy) );
 	}
 
 	wxt_MutexGuiLeave();

@@ -1,5 +1,5 @@
 /* GNUPLOT - qt.trm 
- * $Id: qt.trm,v 1.12 2013/10/07 21:43:48 sfeam Exp $
+ * $Id: qt.trm,v 1.13 2014/04/18 21:09:26 sfeam Exp $
  */
 
 /*[
@@ -91,6 +91,7 @@ START_HELP(qt)
 " Syntax:",
 "         set term qt {<n>}",
 "                     {size <width>,<height>}",
+"                     {position <x>,<y>}",
 "                     {title \"title\"}",
 "                     {font <font>} {{no}enhanced}",
 "                     {dashlength <dl>}",
@@ -118,6 +119,11 @@ START_HELP(qt)
 " If you type `replot`, click the `replot` icon in the terminal toolbar or",
 " type a new `plot` command, the new plot will completely fit in the window",
 " and the font size and the linewidths will be reset to their defaults.",
+"",
+" The position option can be used to set the position of the plot window.",
+" The position option only applies to the first plot after the `set term`",
+" command.",
+"",
 "",
 " The active plot window (the one selected by `set term qt <n>`) is",
 " interactive. Its behaviour is shared with other terminal types. See `mouse`",

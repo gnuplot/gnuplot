@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_term.h,v 1.23 2013/08/23 18:56:32 sfeam Exp $
+ * $Id: wxt_term.h,v 1.24 2014/04/18 04:12:47 sfeam Exp $
  */
 
 /* GNUPLOT - wxt_term.h */
@@ -108,6 +108,7 @@ void wxt_lower_terminal_group __PROTO((void));
 void wxt_close_terminal_window __PROTO((int number));
 void wxt_update_title __PROTO((int number));
 void wxt_update_size __PROTO((int number));
+void wxt_update_position __PROTO((int number));
 TBOOLEAN wxt_window_opened(void);
 
 /* state variables shared between wxt.trm and wxt_gui.cpp */
@@ -128,6 +129,8 @@ extern t_linecap wxt_linecap;
 extern char wxt_title[MAX_ID_LEN + 1];
 extern int wxt_width;
 extern int wxt_height;
+extern int wxt_posx;
+extern int wxt_posy;
 
 extern int wxt_axis_mask;
 typedef struct wxt_axis_state_t {

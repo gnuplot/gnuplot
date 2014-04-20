@@ -4,6 +4,12 @@
 
 	* src/qtterminal/qt_conversion.cpp: Add new encoding types.
 
+	* src/qtterminal/QtGnuplotEvent.* src/qtterminal/QtGnuplotWindow.cpp
+	src/qtterminal/qt_term.cpp src/wxterminal/wxt_gui.cpp
+	src/wxterminal/wxt_term.h term/qt.trm term/wxt.trm: new terminal option
+	"position" that specifies the initial position of the plot window.
+	Applies to Qt and wxt terminals. Feature request #386.
+
 2014-04-19  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/command.c (test_command):  When "test" is issued before any plot

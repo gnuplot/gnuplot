@@ -155,6 +155,7 @@ bool QtGnuplotEventHandler::postTermEvent(int type, int mx, int my, int par1, in
 // Catch events for which the receiver is not active
 void QtGnuplotEventReceiver::swallowEvent(QtGnuplotEventType type, QDataStream& in)
 {
+	QPoint point;
 	QString string;
 	int i;
 	bool b;
@@ -172,5 +173,6 @@ void QtGnuplotEventReceiver::swallowEvent(QtGnuplotEventType type, QDataStream& 
 	else if (type == GEZoomStop)         in >> string;   // 1023
 	else if (type == GERaise)            ;               // 1034
 	else if (type == GEDesactivate)      ;               // 1038
+	else if (type == GESetPosition)      in >> point;
 	else qDebug() << "Event not swallowed !" << type;
 }

@@ -1,5 +1,5 @@
 /*
- * $Id: wxt.trm,v 1.37 2013/10/07 21:43:48 sfeam Exp $
+ * $Id: wxt.trm,v 1.38 2014/04/18 04:12:47 sfeam Exp $
  */
 
 /* GNUPLOT - wxt.trm */
@@ -80,6 +80,9 @@ char wxt_title[MAX_ID_LEN + 1] = "";
  * (window is bigger, includes toolbar and status bar) */
 int wxt_width = 640;
 int wxt_height = 384;
+/* initial position of the plot window. wxPoint(-1, -1) is equivalent to wxDefaultPosition */
+int wxt_posx = -1;
+int wxt_posy = -1;
 
 /* These are used to pass axis scaling information at the end of each plot */
 int wxt_axis_mask;
@@ -91,6 +94,7 @@ enum WXT_id {
     WXT_ENHANCED,
     WXT_NOENHANCED,
     WXT_SIZE,
+    WXT_POSITION,
     WXT_PERSIST,
     WXT_NOPERSIST,
     WXT_RAISE,
@@ -116,6 +120,7 @@ static struct gen_table wxt_opts[] = {
     {"enh$anced", WXT_ENHANCED},
     {"noenh$anced", WXT_NOENHANCED},
     {"s$ize", WXT_SIZE},
+    {"pos$ition", WXT_POSITION},
     {"per$sist", WXT_PERSIST},
     {"noper$sist", WXT_NOPERSIST},
     {"rai$se", WXT_RAISE},
@@ -153,6 +158,7 @@ TERM_PUBLIC void wxt_options()
 	TBOOLEAN set_raise = FALSE, set_ctrl = FALSE;
 	TBOOLEAN set_title = FALSE, set_close = FALSE;
 	TBOOLEAN set_capjoin = FALSE, set_size = FALSE;
+	TBOOLEAN set_position = FALSE;
 
 	if (term_interlock != NULL && term_interlock != (void *)wxt_init) {
 		term = NULL;
@@ -216,6 +222,17 @@ TERM_PUBLIC void wxt_options()
 				int_error(c_token, "size is out of range");
 			if (set_size) duplication=TRUE;
 			set_size = TRUE;
+			break;
+		case WXT_POSITION:
+			c_token++;
+			if (END_OF_COMMAND)
+				int_error(c_token,"position requires 'x,y'");
+			wxt_posx = real_expression();
+			if (!equals(c_token++,","))
+				int_error(c_token,"position requires 'x,y'");
+			wxt_posy = real_expression();
+			if (set_position) duplication = TRUE;
+			set_position = TRUE;
 			break;
 		case WXT_PERSIST:
 			c_token++;
@@ -368,6 +385,14 @@ TERM_PUBLIC void wxt_options()
 		wxt_update_size(wxt_window_number);
 	}
 
+	if (set_position) {
+		char tmp_term_options[MAX_LINE_LEN+1] = "";
+		snprintf(tmp_term_options, sizeof(tmp_term_options),
+			  " position %d, %d", wxt_posx, wxt_posy);
+		strncat(term_options, tmp_term_options, sizeof(term_options)-strlen(term_options)-1);
+		wxt_update_position(wxt_window_number);
+	}
+
 	if (set_enhanced)
 		strncat(term_options,
 			wxt_enhanced_enabled ? " enhanced" : " noenhanced",
@@ -495,7 +520,8 @@ START_HELP(wxt)
 "",
 " Syntax:",
 "         set term wxt {<n>}",
-"                      {size <width>,<height>} {background <rgb_color>}",
+"                      {size <width>,<height>} {position <x>,<y>}",
+"                      {background <rgb_color>}",
 "                      {{no}enhanced}",
 "                      {font <font>} {fontscale <scale>}",
 "                      {title \"title\"}",
@@ -527,6 +553,10 @@ START_HELP(wxt)
 " If you type `replot`, click the `replot` icon in the terminal toolbar or",
 " type a new `plot` command, the new plot will completely fit in the window",
 " and the font size and the linewidths will be reset to their defaults.",
+"",
+" The position option can be used to set the position of the plot window.",
+" The position option only applies to the first plot after the `set term`",
+" command.",
 "",
 " The active plot window (the one selected by `set term wxt <n>`) is",
 " interactive. Its behaviour is shared with other terminal types. See `mouse`",
