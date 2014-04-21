@@ -1,3 +1,7 @@
+2014-04-21  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/canvas.trm: Support for custom dashtypes.
+
 2014-04-20  Jérôme Lodewyck  <lodewyck@users.sourceforge.net>
 
 	* src/qtterminal/po/*.ts: Update translations.

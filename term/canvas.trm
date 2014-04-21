@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: canvas.trm,v 1.74 2013/05/08 18:36:10 sfeam Exp $
+ * $Id: canvas.trm,v 1.75 2013/10/07 21:43:48 sfeam Exp $
  *
  */
 
@@ -59,6 +59,7 @@ TERM_PUBLIC int CANVAS_justify_text __PROTO((enum JUSTIFY mode));
 TERM_PUBLIC void CANVAS_text __PROTO((void));
 TERM_PUBLIC void CANVAS_reset __PROTO((void));
 TERM_PUBLIC void CANVAS_linetype __PROTO((int linetype));
+TERM_PUBLIC void CANVAS_dashtype __PROTO((int type, t_dashtype *custom_dash_type));
 TERM_PUBLIC void CANVAS_fillbox __PROTO((int style, unsigned int x1, unsigned int y1,
 					unsigned int width, unsigned int height));
 TERM_PUBLIC void CANVAS_linewidth __PROTO((double linewidth));
@@ -101,6 +102,7 @@ static int canvas_y = -1;	/* current Y position */
 static int canvas_xmax = CANVAS_XMAX;
 static int canvas_ymax = CANVAS_YMAX;
 static int canvas_line_type = LT_UNDEFINED;
+static int canvas_dash_type = DASHTYPE_SOLID;
 static double canvas_linewidth = 1.0;
 static double canvas_dashlength_factor = 1.0;
 static double CANVAS_ps = 1;	/* pointsize multiplier */
@@ -112,7 +114,7 @@ static char *canvas_justify = "";
 static int canvas_text_angle = 0;
 static int canvas_in_a_path = FALSE;
 static int already_closed = FALSE;
-static TBOOLEAN canvas_dashed = FALSE;
+static TBOOLEAN canvas_dashed = TRUE;		/* Version 5: dashes always enabled */
 static t_linecap canvas_linecap = ROUNDED;
 static TBOOLEAN CANVAS_mouseable = FALSE;
 static TBOOLEAN CANVAS_standalone = TRUE;
@@ -225,7 +227,7 @@ CANVAS_options()
 	free(CANVAS_scriptdir);
 	CANVAS_scriptdir = NULL;
 	canvas_linewidth = 1.0;
-	canvas_dashed = FALSE;
+	canvas_dashed = TRUE;
 	canvas_dashlength_factor = 1.0;
 	CANVAS_background[0] = '\0';
 	/* Default to enhanced text mode */
@@ -320,7 +322,7 @@ CANVAS_options()
 	    break;
 
 	case CANVAS_SOLID:
-	    canvas_dashed = FALSE;
+	    // canvas_dashed = FALSE;
 	    break;
 
 	case CANVAS_DASHED:
@@ -567,7 +569,7 @@ CANVAS_graphics()
     if (canvas_dashed)
 	fprintf(gpoutfile,
 	    "gnuplot.dashlength = %d;\n",
-	    (int)(200 * canvas_dashlength_factor)
+	    (int)(400 * canvas_dashlength_factor)
 	);
 
     fprintf(gpoutfile,
@@ -880,8 +882,9 @@ CANVAS_linetype(int linetype)
 	"rgb(171,214,000)", /* green yellow*/
     };
 
-    if (linetype == canvas_line_type)
-	return;
+    // FIXME
+    // if (linetype == canvas_line_type) return;
+
     canvas_line_type = linetype;
     CANVAS_finish();
 
@@ -897,16 +900,49 @@ CANVAS_linetype(int linetype)
 	fprintf(gpoutfile, "ctx.strokeStyle = \"%s\";\n", canvas_state.color);
 	strcpy(canvas_state.previous_color, canvas_state.color);
     }
-    if (canvas_dashed) {
-	if (0 < linetype && linetype < 5)
-	    fprintf(gpoutfile, "DT(gnuplot.dashpattern%1d);\n",linetype+1);
-	else if (linetype == -1)	/* Axis */
-	    fprintf(gpoutfile, "DT(gnuplot.dashpattern3);\n");
-	else
-	    fprintf(gpoutfile, "DT(gnuplot.solid);\n");
-    }
 }
 
+TERM_PUBLIC void
+CANVAS_dashtype(int type, t_dashtype *custom_dash_type)
+{
+    if (canvas_line_type == LT_AXIS)
+	type = DASHTYPE_AXIS;
+
+    switch (type) {
+
+    case DASHTYPE_AXIS:
+	fprintf(gpoutfile, "DT(gnuplot.dashpattern3);\n");
+	break;
+
+    case DASHTYPE_SOLID:
+	if (canvas_dash_type != DASHTYPE_SOLID)
+	    fprintf(gpoutfile, "DT(gnuplot.solid);\n");
+	break;
+
+    default:
+	type = type % 5;
+	if (canvas_dash_type != type)
+	    fprintf(gpoutfile, "DT(gnuplot.dashpattern%1d);\n", type + 1);
+	break;
+
+    case DASHTYPE_CUSTOM:
+	if (custom_dash_type) {
+	    double length = 0;
+	    double cumulative = 0;
+	    int i;
+	    for (i = 0; i < DASHPATTERN_LENGTH && custom_dash_type->pattern[i] > 0; i++)
+		length += custom_dash_type->pattern[i];
+	    fprintf(gpoutfile, "DT([");
+	    for (i = 0; i < DASHPATTERN_LENGTH && custom_dash_type->pattern[i] > 0; i++) {
+		cumulative += custom_dash_type->pattern[i];
+		fprintf(gpoutfile, " %4.2f,", cumulative / length);
+	    }
+	    fprintf(gpoutfile, " 0]);\n");
+	}
+	break;
+    }
+    canvas_dash_type = type;
+}
 
 TERM_PUBLIC void
 CANVAS_move(unsigned int arg_x, unsigned int arg_y)
@@ -1271,6 +1307,7 @@ CANVAS_layer(t_termlayer layer)
 	    CANVAS_finish();
 	    fprintf(gpoutfile,"} // End %s_plot_%d \n", basename, canvas_state.plotno);
 	    canvas_line_type = LT_UNDEFINED;
+	    canvas_dash_type = LT_UNDEFINED;
 	    canvas_state.previous_linewidth = -1;
 	    canvas_state.previous_color[0] = '\0';
 	    canvas_state.previous_fill[0] = '\0';
@@ -1596,6 +1633,11 @@ TERM_TABLE_START(canvas_driver)
     , CANVAS_path		/* path */
     , 1.0			/* Should this be CANVAS_OVERSAMPLE? */
     , CANVAS_hypertext
+#ifdef EAM_BOXED_TEXT
+    , NULL			/* boxed text */
+#endif 
+    , NULL			/* modify_plots */
+    , CANVAS_dashtype
 TERM_TABLE_END(canvas_driver)
 
 #undef LAST_TERM
