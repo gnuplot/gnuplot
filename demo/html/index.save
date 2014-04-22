@@ -104,6 +104,7 @@ Here are samples of PNG output from some of the demos.
     <li><a href="discrete.html">discrete&nbsp;contours</a></li>
     <!--- <li><a href="electron.html">electron</a></li> --->
     <li><a href="finance.html">financial data</a></li>
+    <li><a href="iterate.html">iteration</a></li>
     <li><a href="scatter.html">non-gridded data</a></li>
     <li><a href="running_avg.html">running averages</a></li>
     <li><a href="smooth.html">binning/histograms</a></li>
@@ -155,7 +156,7 @@ Here are samples of PNG output from some of the demos.
  --->
 </tr>
 
-<tr valign=top><td align=center>
+<tr valign=top><td align=center width=500>
 <img src="showcase_plot_1.png"><br clear=all>
 <img src="showcase_plot_2.png"><br clear=all>
 </td></tr>
@@ -169,7 +170,7 @@ Here are samples of PNG output from some of the demos.
 <tbody><tr valign="top">
 
     <td>
-    <i>This page generated March 2014</i>
+    <i>This page generated April 2014</i>
     </td>
 
     <td>

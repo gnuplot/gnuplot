@@ -108,6 +108,7 @@ To view the results you need a browser that supports the HTML5 'canvas' element.
     <li><a href="controls.html">control models</a></li>
     <li><a href="discrete.html">discrete&nbsp;contours</a></li>
     <li><a href="finance.html">financial data</a></li>
+    <li><a href="iterate.html">iteration</a></li>
     <li><a href="scatter.html">non-gridded data</a></li>
     <li><a href="running_avg.html">running averages</a></li>
     <li><a href="smooth.html">binning/histograms</a></li>
@@ -207,7 +208,7 @@ To view the results you need a browser that supports the HTML5 'canvas' element.
 <tbody><tr valign="top">
 
     <td>
-    <i>This page created by Ethan Merritt<br>December 2013</i>
+    <i>This page created by Ethan Merritt<br>April 2014</i>
     </td>
 
     <td>
