@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.278 2014/04/13 17:59:13 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.279 2014/04/14 23:11:19 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -1858,8 +1858,7 @@ df_readascii(double v[], int max)
 		limit = max + df_no_tic_specs;
 
 	    for (output = 0; output < limit; ++output) {
-		/* if there was no using spec, column is output+1 and
-		 * at=NULL */
+		/* if there was no using spec, column is output+1 and at=NULL */
 		int column = use_spec[output].column;
 		current_using_spec = output;
 
@@ -1997,6 +1996,7 @@ df_readascii(double v[], int max)
 				line_okay = 0;
 			}
 			gpfree_string(&a);
+			v[output] = not_a_number();	/* found a string, not a number */
 		    }
 
 		    else

@@ -8,6 +8,12 @@
 	* src/command.c (replotrequest):  It's now OK to have a range in a
 	replot command, since it can be applied to the new plot piece only.
 
+	* src/datafile.c (df_readascii):  If a read request returns a string
+	rather than a numerical value, nevertheless fill in the numerical 
+	value as NaN.  This is better than leaving some random garbage there
+	(in practice probably some earlier data value).
+	Bugfix.
+
 2014-04-21  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/canvas.trm: Support for custom dashtypes.
