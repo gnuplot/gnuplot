@@ -1,3 +1,11 @@
+2014-04-23  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/datafile.c (df_readascii):  If a read request returns a string
+	rather than a numerical value, nevertheless fill in the numerical 
+	value as NaN.  This is better than leaving some random garbage there
+	(in practice probably some earlier data value).
+	Bugfix.
+
 2014-04-13  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/datafile.h src/datafile.c:  Change the declared type of all
