@@ -6,6 +6,9 @@
 	(in practice probably some earlier data value).
 	Bugfix.
 
+	* src/term.c (enhanced_recursion):  Consume only a single space
+	following the font name in an enhanced test string "{/Font    text}".
+
 2014-04-13  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/datafile.h src/datafile.c:  Change the declared type of all
