@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.279 2014/04/14 23:11:19 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.280 2014/04/23 19:27:21 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -1974,6 +1974,8 @@ df_readascii(double v[], int max)
 		    }
 
 		    if (a.type == STRING) {
+			v[output] = not_a_number();	/* found a string, not a number */
+
 			/* This string value will get parsed as if it were a data column */
 			/* so put it in quotes to allow embedded whitespace.             */
 			if (use_spec[output].expected_type == CT_STRING) {
@@ -1996,7 +1998,6 @@ df_readascii(double v[], int max)
 				line_okay = 0;
 			}
 			gpfree_string(&a);
-			v[output] = not_a_number();	/* found a string, not a number */
 		    }
 
 		    else
