@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.287 2014/04/19 20:24:27 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.288 2014/04/22 20:49:28 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -2261,10 +2261,7 @@ changedir(char *path)
 void
 replotrequest()
 {
-    if (equals(c_token, "["))
-	int_error(c_token, "cannot set range with replot");
-
-    /* do not store directly into the replot_line string, until the
+    /* do not store directly into the replot_line string until the
      * new plot line has been successfully plotted. This way,
      * if user makes a typo in a replot line, they do not have
      * to start from scratch. The replot_line will be committed

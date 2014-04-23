@@ -5,6 +5,9 @@
 	and set the default size of a plot in this mode to approximately the
 	same as a default 2D plot.
 
+	* src/command.c (replotrequest):  It's now OK to have a range in a
+	replot command, since it can be applied to the new plot piece only.
+
 2014-04-21  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/canvas.trm: Support for custom dashtypes.
