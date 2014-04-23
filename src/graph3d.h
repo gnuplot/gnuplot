@@ -1,5 +1,5 @@
 /*
- * $Id: graph3d.h,v 1.45 2013/05/11 23:45:30 sfeam Exp $
+ * $Id: graph3d.h,v 1.46 2013/05/15 20:52:45 sfeam Exp $
  */
 
 /* GNUPLOT - graph3d.h */
@@ -155,6 +155,7 @@ extern float surface_rot_x;
 extern float surface_scale;
 extern float surface_zscale;
 extern float surface_lscale;
+extern float mapview_scale;
 extern int splot_map;
 
 typedef struct { 

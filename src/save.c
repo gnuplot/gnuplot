@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.247 2014/04/08 21:52:42 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.248 2014/04/18 04:07:19 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -610,7 +610,7 @@ set encoding %s\n\
 
     fputs("set view ", fp);
     if (splot_map == TRUE)
-	fputs("map", fp);
+	fprintf(fp, "map scale %g", mapview_scale);
     else {
 	fprintf(fp, "%g, %g, %g, %g",
 	    surface_rot_x, surface_rot_z, surface_scale, surface_zscale);

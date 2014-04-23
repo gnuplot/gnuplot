@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.286 2014/04/05 06:17:08 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.287 2014/04/19 20:24:27 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -2350,7 +2350,8 @@ splot_map_activate()
     /* set new values */
     surface_rot_x = 180;
     surface_rot_z = 0;
-    surface_scale = 1.3;
+    /* version 4 had constant value surface_scale = 1.3 */
+    surface_scale = 1.425 * mapview_scale;
     /* The Y axis runs backwards from a normal 2D plot */
     temp = axis_array[FIRST_Y_AXIS].min;
     axis_array[FIRST_Y_AXIS].min = axis_array[FIRST_Y_AXIS].max;

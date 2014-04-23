@@ -1,3 +1,10 @@
+2014-04-23  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/command.c src/graph3d.* src/set.c src/show.c src/save.c
+	docs/gnuplot.doc:  Introduce a scale parameter "set view map {scale}"
+	and set the default size of a plot in this mode to approximately the
+	same as a default 2D plot.
+
 2014-04-21  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/canvas.trm: Support for custom dashtypes.

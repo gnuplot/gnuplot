@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.318 2014/03/23 13:27:27 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.319 2014/04/02 21:36:05 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -171,7 +171,7 @@ static void show_arrowstyle __PROTO((int tag));
 static void show_arrow __PROTO((int tag));
 
 static void show_ticdef __PROTO((AXIS_INDEX));
-static void show_position __PROTO((struct position * pos));
+       void show_position __PROTO((struct position * pos));
 static void show_functions __PROTO((void));
 
 static int var_show_all = 0;
@@ -1957,7 +1957,7 @@ show_key()
 }
 
 
-static void
+void
 show_position(struct position *pos)
 {
     static const char *msg[] = { "(first axes) ", "(second axes) ",
@@ -2696,7 +2696,7 @@ show_view()
     SHOW_ALL_NL;
     fputs("\tview is ", stderr);
     if (splot_map == TRUE) {
-	fputs("map\n", stderr);
+	fprintf(stderr,"map scale %g\n", mapview_scale);
 	return;
     }
     fprintf(stderr, "%g rot_x, %g rot_z, %g scale, %g scale_z\n",

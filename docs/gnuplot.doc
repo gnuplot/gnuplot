@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.880 2014/04/14 22:48:22 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.881 2014/04/19 00:21:16 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -10712,10 +10712,6 @@ Ffigure_missing
 
  The command `set pm3d map` is equivalent to `set pm3d at b`; `set view map`;
  `set style data pm3d`; `set style func pm3d`;.
- It is used for backwards compatibility, when `set view map` was not available.
- Take care that you properly use `zrange` and `cbrange` for input data point
- filtering and color range scaling, respectively; and also `set (no)surface`
- seems to have a (side?) effect.
 3 palette
 ?commands set palette
 ?commands show palette
@@ -12378,7 +12374,7 @@ Ffigure_missing
 
  Syntax:
        set view <rot_x>{,{<rot_z>}{,{<scale>}{,<scale_z>}}}
-       set view map
+       set view map {scale <scale>}
        set view {no}equal {xy|xyz}
        show view
 
@@ -12389,10 +12385,10 @@ Ffigure_missing
  The first rotation applied is <rot_x> around the x axis.  The second rotation
  applied is <rot_z> around the new z axis.
 
- Command `set view map` is used to represent the drawing as a map. It can be
- used for `contour` plots, or for color `pm3d` maps. In the latter, take care
- that you properly use `zrange` and `cbrange` for input data point filtering
- and color range scaling, respectively.
+ Command `set view map` is used to represent the drawing as a map. It is useful
+ for `contour` plots or 2D heatmaps using pm3d mode rather than `with image`.
+ In the latter case, take care that you properly use `zrange` and `cbrange` for
+ input data point filtering and color range scaling, respectively.
 
  <rot_x> is bounded to the [0:180] range with a default of 60 degrees, while
  <rot_z> is bounded to the [0:360] range with a default of 30 degrees.
