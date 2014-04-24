@@ -1,3 +1,9 @@
+2014-04-24  Dima Kogan  <dima@secretsauce.net>
+
+	* src/mouse.c (do_zoom_scroll_up):  Fix typo that causes incorrect
+	manipulation of y2 axis scale during zoom.
+	Bug (Patch #647)
+
 2014-04-23  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/command.c src/graph3d.* src/set.c src/show.c src/save.c
