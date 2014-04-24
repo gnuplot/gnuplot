@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.224 2014/03/15 23:42:01 juhaszp Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.225 2014/04/02 21:35:46 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -1670,7 +1670,7 @@ eval_3dplots()
 		    int stored_token = c_token;
 		    if (!set_lpstyle)
 			this_plot->lp_properties = pm3d.border;
- 		    lp_parse(&this_plot->lp_properties, TRUE, FALSE);
+ 		    lp_parse(&this_plot->lp_properties, LP_ADHOC, FALSE);
 		    if (stored_token != c_token) {
 			set_lpstyle = TRUE;
 			continue;
@@ -1691,7 +1691,7 @@ eval_3dplots()
 		    else
 			load_linetype(&lp, line_num+1);
 
- 		    new_lt = lp_parse(&lp, TRUE,
+ 		    new_lt = lp_parse(&lp, LP_ADHOC,
 			     this_plot->plot_style & PLOT_STYLE_HAS_POINT);
 
 		    checked_once = TRUE;
@@ -1748,7 +1748,7 @@ eval_3dplots()
 		} else if (this_plot->plot_style == PM3DSURFACE) {
 		    /* Use default pm3d border unless we see explicit line properties */
 		    this_plot->lp_properties = pm3d.border;
- 		    lp_parse(&this_plot->lp_properties, TRUE, FALSE);
+ 		    lp_parse(&this_plot->lp_properties, LP_ADHOC, FALSE);
 
 		} else {
 		    int new_lt = 0;
@@ -1764,7 +1764,7 @@ eval_3dplots()
 		    else
 			load_linetype(&this_plot->lp_properties, line_num+1);
 
-		    new_lt = lp_parse(&this_plot->lp_properties, TRUE,
+		    new_lt = lp_parse(&this_plot->lp_properties, LP_ADHOC,
 			 this_plot->plot_style & PLOT_STYLE_HAS_POINT);
 		    if (new_lt)
 			this_plot->hidden3d_top_linetype = new_lt - 1;
@@ -2335,5 +2335,5 @@ static void load_contour_label_options (struct text_label *contour_label)
 	contour_label->font = gp_strdup(clabel_font);
     lp->p_interval = clabel_interval;
     lp->pointflag = TRUE;
-    lp_parse(lp, TRUE, TRUE);
+    lp_parse(lp, LP_ADHOC, TRUE);
 }

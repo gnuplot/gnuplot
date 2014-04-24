@@ -1,3 +1,9 @@
+2014-04-24  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/gp_types.h src/misc.c (lp_parse) src/misc.h src/plot2d.c
+	src/plot3d.c src/set.c:  Revise the parameters passed to lp_parse() so
+	that the legal options can vary depending on the identity of the caller.
+
 2014-04-24  Dima Kogan  <dima@secretsauce.net>
 
 	* src/mouse.c (do_zoom_scroll_up):  Fix typo that causes incorrect

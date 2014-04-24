@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.326 2014/04/07 21:16:32 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.327 2014/04/07 22:52:35 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -2403,7 +2403,7 @@ eval_plots()
 		    if (this_plot->plot_style == BOXPLOT)
 			lp.p_type = boxplot_opts.pointtype;
 
-		    lp_parse(&lp, TRUE,
+		    lp_parse(&lp, LP_ADHOC,
 			     this_plot->plot_style & PLOT_STYLE_HAS_POINT);
 		    if (stored_token != c_token) {
 			if (set_lpstyle) {
@@ -2521,7 +2521,7 @@ eval_plots()
 		if (this_plot->plot_style == BOXPLOT)
 		    this_plot->lp_properties.p_type = boxplot_opts.pointtype;
 
-		lp_parse(&this_plot->lp_properties, TRUE,
+		lp_parse(&this_plot->lp_properties, LP_ADHOC,
 			 this_plot->plot_style & PLOT_STYLE_HAS_POINT);
 
 	    }

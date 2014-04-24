@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.447 2014/04/05 18:23:24 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.448 2014/04/22 20:49:28 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -158,7 +158,7 @@ static void load_tics __PROTO((AXIS_INDEX axis));
 static void load_tic_user __PROTO((AXIS_INDEX axis));
 static void load_tic_series __PROTO((AXIS_INDEX axis));
 
-static void set_linestyle __PROTO((struct linestyle_def **head));
+static void set_linestyle __PROTO((struct linestyle_def **head, lp_class destination_class));
 static void set_arrowstyle __PROTO((void));
 static int assign_arrowstyle_tag __PROTO((void));
 static int set_tic_prop __PROTO((AXIS_INDEX));
@@ -286,14 +286,14 @@ set_command()
 	    set_key();
 	    break;
 	case S_LINESTYLE:
-	    set_linestyle(&first_linestyle);
+	    set_linestyle(&first_linestyle, LP_STYLE);
 	    break;
 	case S_LINETYPE:
 	    if (equals(c_token+1,"cycle")) {
 		c_token += 2;
 		linetype_recycle_count = int_expression();
 	    } else
-		set_linestyle(&first_perm_linestyle);
+		set_linestyle(&first_perm_linestyle, LP_TYPE);
 	    break;
 	case S_LABEL:
 	    set_label();
@@ -956,7 +956,7 @@ set_border()
 	    c_token++;
 	} else {
 	    int save_token = c_token;
-	    lp_parse(&border_lp, TRUE, FALSE);
+	    lp_parse(&border_lp, LP_ADHOC, FALSE);
 	    if (save_token != c_token)
 		continue;
 	    draw_border = int_expression();
@@ -1971,10 +1971,10 @@ set_grid()
 	    c_token++;
 	} else { /* only remaining possibility is a line type */
 	    int save_token = c_token;
-	    lp_parse(&grid_lp, TRUE, FALSE);
+	    lp_parse(&grid_lp, LP_ADHOC, FALSE);
 	    if (equals(c_token,",")) {
 		c_token++;
-		lp_parse(&mgrid_lp, TRUE, FALSE);
+		lp_parse(&mgrid_lp, LP_ADHOC, FALSE);
 	    } else if (save_token != c_token)
 		mgrid_lp = grid_lp;
 	    if (save_token == c_token)
@@ -2284,7 +2284,7 @@ set_key()
 	    key->box.l_type = LT_BLACK;
 	    if (!END_OF_COMMAND) {
 		int old_token = c_token;
-		lp_parse(&key->box, TRUE, FALSE);
+		lp_parse(&key->box, LP_ADHOC, FALSE);
 		if (old_token == c_token && isanumber(c_token)) {
 		    key->box.l_type = int_expression() - 1;
 		    c_token++;
@@ -3768,7 +3768,7 @@ set_pm3d()
 	    case S_PM3D_BORDER: /* border {linespec} */
 		c_token++;
 		pm3d.border = default_pm3d_border;
-		lp_parse(&pm3d.border, TRUE, FALSE);
+		lp_parse(&pm3d.border, LP_ADHOC, FALSE);
 		c_token--;
 		continue;
 	    case S_PM3D_NOHIDDEN:
@@ -4404,7 +4404,7 @@ set_style()
 	    break;
 	}
     case SHOW_STYLE_LINE:
-	set_linestyle(&first_linestyle);
+	set_linestyle(&first_linestyle, LP_STYLE);
 	break;
     case SHOW_STYLE_FILLING:
 	parse_fillstyle( &default_fillstyle,
@@ -5232,7 +5232,7 @@ set_zeroaxis(AXIS_INDEX axis)
 	/* Some non-default style for the zeroaxis */
 	axis_array[axis].zeroaxis = gp_alloc(sizeof(lp_style_type), "zeroaxis");
 	*(axis_array[axis].zeroaxis) = default_axis_zeroaxis;
-	lp_parse(axis_array[axis].zeroaxis, TRUE, FALSE);
+	lp_parse(axis_array[axis].zeroaxis, LP_ADHOC, FALSE);
     }
 }
 
@@ -5535,7 +5535,7 @@ set_xyzlabel(text_label *label)
  * and the new "set style line" and "set linetype" commands.
  */
 static void
-set_linestyle(struct linestyle_def **head)
+set_linestyle(struct linestyle_def **head, lp_class destination_class)
 {
     struct linestyle_def *this_linestyle = NULL;
     struct linestyle_def *new_linestyle = NULL;
@@ -5579,7 +5579,7 @@ set_linestyle(struct linestyle_def **head)
 	c_token++;
     } else
 	/* pick up a line spec; dont allow ls, do allow point type */
-	lp_parse(&this_linestyle->lp_properties, FALSE, TRUE);
+	lp_parse(&this_linestyle->lp_properties, destination_class, TRUE);
 
     if (!END_OF_COMMAND)
 	int_error(c_token,"Extraneous arguments to set %s",
@@ -6018,7 +6018,7 @@ parse_label_options( struct text_label *this_label, TBOOLEAN in_plot )
 		struct lp_style_type tmp_lp;
 		loc_lp.pointflag = 1;
 		tmp_lp = loc_lp;
-		lp_parse(&tmp_lp, TRUE, TRUE);
+		lp_parse(&tmp_lp, LP_ADHOC, TRUE);
 		if (stored_token != c_token)
 		    loc_lp = tmp_lp;
 		set_point = TRUE;
@@ -6159,7 +6159,7 @@ set_style_parallel()
     c_token++;
     while (!END_OF_COMMAND) {
 	int save_token = c_token;
-	lp_parse( &parallel_axis_style.lp_properties, FALSE, FALSE );
+	lp_parse( &parallel_axis_style.lp_properties,  LP_ADHOC, FALSE );
 	if (save_token != c_token)
 	    continue;
 	if (equals(c_token, "front"))

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.180 2014/04/18 20:52:35 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.181 2014/04/19 05:18:09 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -949,12 +949,13 @@ parse_dashtype(struct t_dashtype *dt)
 }
 
 /*
- * allow_ls controls whether we are allowed to accept linestyle in
- * the current context [ie not when doing a  set linestyle command]
- * allow_point is whether we accept a point command
+ * destination_class tells us whether we are filling in a line style ('set style line'),
+ * a persistant linetype ('set linetype') or an ad hoc set of properties for a single
+ * use ('plot ... lc foo lw baz').
+ * allow_point controls whether we accept a point attribute in this lp_style.
  */
 int
-lp_parse(struct lp_style_type *lp, TBOOLEAN allow_ls, TBOOLEAN allow_point)
+lp_parse(struct lp_style_type *lp, lp_class destination_class, TBOOLEAN allow_point)
 {
     /* keep track of which options were set during this call */
     int set_lt = 0, set_pal = 0, set_lw = 0; 
@@ -969,8 +970,8 @@ lp_parse(struct lp_style_type *lp, TBOOLEAN allow_ls, TBOOLEAN allow_point)
      */
     struct lp_style_type newlp = *lp;
 	
-    if (allow_ls &&
-	(almost_equals(c_token, "lines$tyle") || equals(c_token, "ls"))) {
+    if ((destination_class == LP_ADHOC)
+    && (almost_equals(c_token, "lines$tyle") || equals(c_token, "ls"))) {
 	c_token++;
 	lp_use_properties(lp, int_expression());
     } 
@@ -1006,7 +1007,7 @@ lp_parse(struct lp_style_type *lp, TBOOLEAN allow_ls, TBOOLEAN allow_point)
 		    new_lt = int_expression();
 		    lp->l_type = new_lt - 1;
 		    /* user may prefer explicit line styles */
-		    if (prefer_line_styles && allow_ls)
+		    if (prefer_line_styles && (destination_class != LP_STYLE))
 			lp_use_properties(lp, new_lt);
 		    else
 			load_linetype(lp, new_lt);
@@ -1049,7 +1050,7 @@ lp_parse(struct lp_style_type *lp, TBOOLEAN allow_ls, TBOOLEAN allow_point)
 	    } else {
 		/* Pull the line colour from a default linetype, but */
 		/* only if we are not in the middle of defining one! */
-		if (allow_ls) {
+		if (destination_class != LP_STYLE) {
 		    struct lp_style_type temp;
 		    load_linetype(&temp, int_expression());
 		    newlp.pm3d_color = temp.pm3d_color;
@@ -1558,7 +1559,7 @@ arrow_parse(
 	/* pick up a line spec - allow ls, but no point. */
 	{
 	    int stored_token = c_token;
-	    lp_parse(&arrow->lp_properties, TRUE, FALSE);
+	    lp_parse(&arrow->lp_properties, LP_ADHOC, FALSE);
 	    if (stored_token == c_token || set_line++)
 		break;
 	    continue;
