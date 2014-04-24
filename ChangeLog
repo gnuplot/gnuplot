@@ -4,6 +4,9 @@
 	src/plot3d.c src/set.c:  Revise the parameters passed to lp_parse() so
 	that the legal options can vary depending on the identity of the caller.
 
+	* src/term.c (test_term): Reset to default font after Bold/Italic test.
+	Bug #1387
+
 2014-04-24  Dima Kogan  <dima@secretsauce.net>
 
 	* src/mouse.c (do_zoom_scroll_up):  Fix typo that causes incorrect

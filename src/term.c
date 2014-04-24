@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.290 2014/04/18 04:07:19 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.291 2014/04/18 21:25:25 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -1743,9 +1743,10 @@ test_term()
     /* Test for enhanced text */
     if (t->flags & TERM_ENHANCED_TEXT) {
 	char *tmptext1 =   "Enhanced text:   {x@_{0}^{n+1}}";
-	char *tmptext2 = "&{Enhanced text:   }{/:Bold  Bold}{/:Italic  Italic}";  
+	char *tmptext2 = "&{Enhanced text:  }{/:Bold Bold}{/:Italic  Italic}";  
 	(*t->put_text) (x0 + xmax_t * 0.5, y0 + ymax_t * 0.40, tmptext1);
 	(*t->put_text) (x0 + xmax_t * 0.5, y0 + ymax_t * 0.35, tmptext2);
+	(*t->set_font)("");
 	if (!already_in_enhanced_text_mode)
 	    do_string("set termopt noenh");
     }
