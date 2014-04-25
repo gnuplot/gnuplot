@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.181 2014/04/19 05:18:09 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.182 2014/04/25 00:22:23 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -980,6 +980,8 @@ lp_parse(struct lp_style_type *lp, lp_class destination_class, TBOOLEAN allow_po
 	if (almost_equals(c_token, "linet$ype") || equals(c_token, "lt")) {
 	    if (set_lt++)
 		break;
+	    if (destination_class == LP_TYPE)
+		int_error(c_token, "linetype definition cannot use linetype");
 	    c_token++;
 	    if (almost_equals(c_token, "rgb$color")) {
 		if (set_pal++)

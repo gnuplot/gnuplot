@@ -1,3 +1,12 @@
+2014-04-25  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/misc.c (lp_parse):  Disallow defining "set lt N lt M".
+	This used to mean "define effective linetype N to be the hidden device
+	specific linetype M", except that in other contexts it meant "use 
+	effective linetype M rather than effective linetype N". Version 5
+	distinguishes between color and dashpatten, so require an explicit 
+	command to set one or both rather than an ambiguous old-style request.
+
 2014-04-24  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/gp_types.h src/misc.c (lp_parse) src/misc.h src/plot2d.c
