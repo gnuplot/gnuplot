@@ -7,6 +7,9 @@
 	distinguishes between color and dashpatten, so require an explicit 
 	command to set one or both rather than an ambiguous old-style request.
 
+	* src/save.c (save_pm3dcolor save_linetype):  Save special linetypes
+	by keyword rather than a magic number (e.g. lt bgnd rather than -3).
+
 2014-04-24  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/gp_types.h src/misc.c (lp_parse) src/misc.h src/plot2d.c

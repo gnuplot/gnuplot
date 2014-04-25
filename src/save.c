@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.248 2014/04/18 04:07:19 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.249 2014/04/22 20:49:28 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -1311,7 +1311,12 @@ save_pm3dcolor(FILE *fp, const struct t_colorspec *tc)
 {
     if (tc->type) {
 	switch(tc->type) {
-	case TC_LT:   fprintf(fp," lt %d", tc->lt+1);
+	case TC_LT:   if (tc->lt == LT_NODRAW)
+			fprintf(fp," nodraw");
+		      else if (tc->lt == LT_BACKGROUND)
+			fprintf(fp," bgnd");
+		      else
+			fprintf(fp," lt %d", tc->lt+1);
 		      break;
 	case TC_LINESTYLE:   fprintf(fp," linestyle %d", tc->lt);
 		      break;
@@ -1468,10 +1473,14 @@ save_linetype(FILE *fp, lp_style_type *lp, TBOOLEAN show_point)
 {
     if (lp->l_type == LT_NODRAW)
 	fprintf(fp, " lt nodraw");
+    else if (lp->l_type == LT_BLACK)
+	fprintf(fp, " lt black");
+    else if (lp->l_type == LT_BACKGROUND)
+	fprintf(fp, " lt bgnd");
     else if (lp->l_type < 0)
 	fprintf(fp, " lt %d", lp->l_type+1);
 
-    if (lp->pm3d_color.type != TC_DEFAULT) {
+    else if (lp->pm3d_color.type != TC_DEFAULT) {
 	fprintf(fp, " linecolor");
 	if (lp->pm3d_color.type == TC_LT)
     	    fprintf(fp, " %d", lp->pm3d_color.lt+1);
