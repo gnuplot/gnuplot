@@ -1,3 +1,8 @@
+2014-04-26  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/graphics.c (plot_steps): Avoid overflow in clipping code.
+	Bug #1390
+
 2014-04-25  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/misc.c (lp_parse):  Disallow defining "set lt N lt M".

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.449 2014/04/07 23:28:26 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.450 2014/04/08 18:49:22 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -1399,8 +1399,6 @@ plot_steps(struct curve_points *plot)
 	case OUTRANGE:
 		x = map_x(plot->points[i].x);
 		y = map_y(plot->points[i].y);
-		if (style)
-		    cliptorange(y, ybot, ytop);
 
 		if (prev == UNDEFINED)
 		    break;
@@ -1411,6 +1409,7 @@ plot_steps(struct curve_points *plot)
 
 		    cliptorange(xr, xleft, xright);
 		    cliptorange(xl, xleft, xright);
+		    cliptorange(y, ybot, ytop);
 
 		    /* Entire box is out of range on x */
 		    if (xr == xl && (xr == xleft || xr == xright))
@@ -1421,6 +1420,7 @@ plot_steps(struct curve_points *plot)
 		    else
 			(*t->fillbox)(style, xl, y0, (xr-xl), yprev-y0);
 		} else {
+		    cliptorange(x, xleft, xright);
 		    draw_clip_line(xprev, yprev, x, yprev);
 		    draw_clip_line(x, yprev, x, y);
 		}
