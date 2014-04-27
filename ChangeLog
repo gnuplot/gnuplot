@@ -1,13 +1,18 @@
+2014-04-27  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/graphics.c (plot_steps): Avoid overflow in clipping code.
+	==> Reverted in favor of fixing the clipping code itself.
+
+	* src/gadgets.c (clip_line): It is not safe to use (A*B >= 0) as a
+	substitute for the test (sign(A) != sign(B)).
+	It fails when A and B are integers and their product overflows.
+	Bugs #1390, #1392	See also Bug #1358
+
 2014-04-26  Dima Kogan  <dima@secretsauce.net>
 
 	* src/mouse.c (do_zoom rescale_around_mouse):  Handle various conditions
 	that caused zooming around the current mouse position to fail.
 	Bug #1380
-
-2014-04-26  Ethan A Merritt  <merritt@u.washington.edu>
-
-	* src/graphics.c (plot_steps): Avoid overflow in clipping code.
-	Bug #1390
 
 2014-04-25  Ethan A Merritt  <merritt@u.washington.edu>
 

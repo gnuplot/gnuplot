@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.450 2014/04/08 18:49:22 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.451 2014/04/26 19:19:35 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -1420,7 +1420,6 @@ plot_steps(struct curve_points *plot)
 		    else
 			(*t->fillbox)(style, xl, y0, (xr-xl), yprev-y0);
 		} else {
-		    cliptorange(x, xleft, xright);
 		    draw_clip_line(xprev, yprev, x, yprev);
 		    draw_clip_line(x, yprev, x, y);
 		}
