@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: mouse.c,v 1.159 2014/04/24 16:34:15 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: mouse.c,v 1.160 2014/04/27 05:11:19 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - mouse.c */
@@ -1948,7 +1948,6 @@ event_buttonpress(struct gp_event_t *ge)
 		ymax = real_y;
 		y2max = real_y2;
 		/* keep the axes (no)reversed as they are now */
-#define sgn(x) (x==0 ? 0 : (x>0 ? 1 : -1))
 #define rev(a1,a2,A) if (sgn(a2-a1) != sgn(axis_array[A].max-axis_array[A].min)) \
 			    { double tmp = a1; a1 = a2; a2 = tmp; }
 		rev(xmin,  xmax,  FIRST_X_AXIS);
@@ -1956,7 +1955,6 @@ event_buttonpress(struct gp_event_t *ge)
 		rev(x2min, x2max, SECOND_X_AXIS);
 		rev(y2min, y2max, SECOND_Y_AXIS);
 #undef rev
-#undef sgn
 		do_zoom(xmin, ymin, x2min, y2min, xmax, ymax, x2max, y2max);
 		if (display_ipc_commands()) {
 		    fprintf(stderr, "zoom region finished.\n");

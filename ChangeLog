@@ -17,6 +17,8 @@
 
 	* src/graphics.c: Use sgn() function to defint samesign().
 
+	* src/mouse.c: No longer need a local definition of sgn().
+
 2014-04-26  Dima Kogan  <dima@secretsauce.net>
 
 	* src/mouse.c (do_zoom rescale_around_mouse):  Handle various conditions
