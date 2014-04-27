@@ -1,3 +1,8 @@
+2014-04-27  Dima Kogan  <dima@secretsauce.net>
+
+	* src/gplt_x11.c: Fix off-by-one error in selection string.
+	Allow clipboard contents to be retrieved more than once.
+
 2014-04-27  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c (plot_steps): Avoid overflow in clipping code.

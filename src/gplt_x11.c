@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.239 2013/08/24 22:45:23 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.240 2013/10/17 23:52:55 sfeam Exp $"); }
 #endif
 
 #define MOUSE_ALL_WINDOWS 1
@@ -1820,7 +1820,7 @@ record()
 		int len = strlen(buf + 1) - 1;	/* discard newline '\n' */
 		memcpy(selection, buf + 1, len < SEL_LEN ? len : SEL_LEN);
 		/* terminate */
-		selection[len + 1 < SEL_LEN ? len + 1 : SEL_LEN - 1] = '\0';
+		selection[len < SEL_LEN ? len : SEL_LEN - 1] = '\0';
 		XStoreBytes(dpy, buf + 1, len);
 		XFlush(dpy);
 #ifdef EXPORT_SELECTION
@@ -6484,7 +6484,6 @@ handle_selection_event(XEvent *event)
 		XChangeProperty(dpy, reply.xselection.requestor,
 				reply.xselection.property, reply.xselection.target,
 				8, PropModeReplace, (unsigned char *) selection, strlen(selection));
-		*selection = '\0';
 #endif
 	    } else {
 		FPRINTF((stderr, "selection request target: %d\n", reply.xselection.target));
