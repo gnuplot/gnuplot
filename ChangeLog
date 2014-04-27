@@ -13,6 +13,10 @@
 	It fails when A and B are integers and their product overflows.
 	Bugs #1390, #1392	See also Bug #1358
 
+	* src/stdfn.h: Define a sgn() function.
+
+	* src/graphics.c: Use sgn() function to defint samesign().
+
 2014-04-26  Dima Kogan  <dima@secretsauce.net>
 
 	* src/mouse.c (do_zoom rescale_around_mouse):  Handle various conditions
