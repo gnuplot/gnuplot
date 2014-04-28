@@ -1,5 +1,5 @@
-C RCS $Id: gnuplot-ja.doc,v 1.509 2014-03-25 19:31:11+09 shige Exp $
-C corresponding original gnuplot.doc revision: 1.872
+C RCS $Id: gnuplot-ja.doc,v 1.513 2014-04-25 17:05:38+09 shige Exp $
+C corresponding original gnuplot.doc revision: 1.882
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -247,6 +247,9 @@ C 行が長いのは、できればなんとかしたい
 
 2 バージョン 5 での新しい機能 (New features in version 5)
 ?new-features
+
+ * 線の点線/破線パターンは、現在は線の他の属性と独立に指定できます。以
+ 下参照: `dashtype`, `set dashtype`, `set linetype`。
 
  * 文字の書式制御は、下付き、上付き、フォントサイズ、その他以前有効だっ
  たものに加え、今は太字体 (bold) と斜体 (italic) フォント設定もサポート
@@ -2468,7 +2471,42 @@ Ffigure_newsyntax
 3 dashtype
 ?dashtype
 =dashtype
- [バージョン 5 での新機能。実装と解説は作成中]
+ gnuplot バージョン 5 で、`linecolor` や `linewidth` と同様に、点線/破
+ 線パターン (`dashtype`) が各曲線毎の属性として独立しました。従来のよう
+ な、使用中の出力形式の点線を書くための特別なモードとして指定する必要は
+ ありません。すなわち、`set term <termname> {solid|dashed}` のようなコ
+ マンドは現在は無視されます。
+
+ すべての線は、ほかに指定しなければ、`dashtype solid` という属性を持ち
+ ますが、このデフォルト値をコマンド `set linetype` で特定の線種に変更し
+ その後のコマンドで使えるようにできます。または、`plot` や他のコマンド
+ の一部分として使用したい点線/破線の型を指定できます。
+
+ 書式:
+       dashtype N          # 定義済み点線/破線型を番号で呼び出し
+       dashtype "pattern"  # 点 (.) 横線 (-) 下線 (_) と空白の組み合わ
+                           # せ文字列による指定
+       dashtype (s1,e1,s2,e2,s3,e3,s4,e4)  # 1~4 個の <実線長>,<空白長>
+                           # の組による点線/破線パターン指定
+
+ 例:
+       # 2 つの関数が 1 つの線種を使うが dashtype で区別
+       plot f1(x) with lines lt N dt solid, f2(x) with lines lt N dt 3
+
+ いくつかの出力形式は、それが提供する定義済み点線/破線パターンに、ユー
+ ザ定義パターンを追加することをサポートしています。
+
+ 例:
+      plot f(x) dt 3            # 出力形式の持つパターン 3 を使用
+      plot f(x) dt ".. "        # 一時的なパターンを作成
+      plot f(x) dt (2,5,2,15)   # 同じパターンを数値で表現
+      set dashtype 11 (2,4,4,7) # 新パターンを番号で呼び出せるよう定義
+      plot f(x) dt 11           # 新パターンを使って描画
+
+ 点線/破線パターンを文字列で指定した場合、gnuplot はそれを <実線長>,
+ <空白長> の組の列に変換します。その場合、コマンド `show dashtype` は、
+ 元の文字列と変換後の数値の列の両方を表示します。
+
 3 linestyles と linetypes
 ? linestyles vs linetypes
  線は、線幅のような他の属性も持つことができます。点 (point) の記号に対
@@ -3734,7 +3772,11 @@ Ffigure_scaled_image
  トします。0 < alpha < 255 のピクセルは半透明で、これは 2,3 の出力形式
  しか完全には対応しておらず、他の出力形式ではこれを 0 か 255 として扱う
  ことによる近似しか行いません。
-3 image failsafe
+3 image pixels
+?plotting styles image pixels
+?style image pixels
+?image pixels
+?pixels
 ?plotting styles image failsafe
 ?style image failsafe
 ?image failsafe
@@ -3742,13 +3784,14 @@ Ffigure_scaled_image
  出力形式によっては、2 次元の長方形領域内での画像データ描画の、デバイス
  やライブラリに依存した最適化ルーチンを使用しています。これは、例えばク
  リッピングや伸縮がうまくなかったり、縁が欠けるなど、望ましくない出力を
- 生成することがあります。キーワード `failsafe` は、そのようなルーチンの
- 代わりに、画像を 1 ピクセルずつ描画するような一般的なコードを使用する
- よう gnuplot に指示します。この描画モードでは、描画は遅く、とても大き
- な出力ファイルを生成しますが、どの出力形式でも共通的な見た目を作成して
- くれるでしょう。
+ 生成することがあります。キーワード `pixels` は、そのようなルーチンの代
+ わりに、画像を 1 ピクセルずつ描画するような一般的なコードを使用するよ
+ う gnuplot に指示します。この描画モードでは、描画は遅く、とても大きな
+ 出力ファイルを生成しますが、どの出力形式でも共通的な見た目を作成してく
+ れるでしょう (オプション `pixels` は、以前の gnuplot では `failsafe`
+ と呼ばれていました)。
  例:
-       plot 'data' with image failsafe
+       plot 'data' with image pixels
 2 impulses
 ?plotting styles impulses
 ?style impulses
@@ -7990,18 +8033,18 @@ Ffigure_mapcontours
  等高線のみのグラフを得るために、曲面自身の描画をしないようにすることも
  できます (以下参照: `unset surface`)。`set size` を使って、グラフを画
  面一杯に描画することも可能ですが、そういった出力形式よりも、等高線のデ
- ータをファイルに書き出し、それを再び 2 次元データとして読み込んで描画
- すればよりよい制御が可能になります:
+ ータをデータブロックに書き出し、それを再び 2 次元データとして読み込ん
+ で描画すればよりよい制御が可能になります:
 
        unset surface
        set contour
        set cntrparam ...
-       set table 'filename'
+       set table $datablock
        splot ...
        unset table
-       # contour info now in filename
+       # 等高線の情報は今 $datablock の中にある
        set term <whatever>
-       plot 'filename'
+       plot $datablock
 
  等高線を描くためには、データは格子状データ ("grid data") である必要が
  あります。そのようなファイルでは、一つの y-孤立線上の全ての点が順に
@@ -8017,6 +8060,22 @@ Ffigure_mapcontours
 ^ <a href="http://www.gnuplot.info/demo/discrete.html">
  ユーザ定義レベルの等高線のデモ (discrete.dem).
 ^ </a>
+3 dashtype
+?commands set dashtype
+?commands show dashtype
+?set dashtype
+?show dashtype
+ コマンド `set dashtype` は、点線/破線パターンを番号で参照できるように
+ 登録します。これはとても便利で、その点線/破線パターンをその番号で受け
+ つけてくれる場所ならば、どこでも明示的な点線/破線パターンも受けつけて
+ くれます。
+ 例:
+      set dashtype 5 (2,4,2,6)   # 5 番の dashtype を定義または再定義
+      plot f1(x) dt 5            # その dashtype を使って plot
+      plot f1(x) dt (2,4,2,6)    # 上と全く同じグラフ
+      set linetype 5 dt 5        # このパターンを linetype 5 で常に使う
+      set dashtype 66 "..-"      # 文字列で新しい dashtype を定義
+ 以下参照: `dashtype`。
 3 data style
 ?set data style
  このコマンドの形式は現在は推奨されていません。以下参照:
@@ -9656,7 +9715,9 @@ Ffigure_missing
  このコマンドは、x 軸と x2 軸の、順方向と逆方向の対応を設定しています。
  順方向の対応は、x2 軸の刻みラベルと、マウスの x2 座標を生成するのに使
  い、逆方向の対応は、x2 軸系で指定された座標を描画するのに使います。こ
- の対応は、非負の x 座標にのみ有効であることに注意してください。
+ の対応は、非負の x 座標にのみ有効であることに注意してください。y2 軸に
+ 対応させた場合、<expression1> と <expression2> には仮変数として y を使
+ う必要があります。
 3 lmargin
 ?commands set lmargin
 ?set lmargin
@@ -10005,6 +10066,8 @@ Ffigure_missing
            { layout <rows>,<cols>
              {rowsfirst|columnsfirst} {downwards|upwards}
              {scale <xscale>{,<yscale>}} {offset <xoff>{,<yoff>}}
+             {margins <left>,<right>,<bottom>,<top>}
+             {spacing <xspacing>{,<yspacing>}}
            }
        set multiplot {next|previous}
        unset multiplot
@@ -10012,14 +10075,10 @@ Ffigure_missing
  出力形式 (terminal) によっては、コマンド `unset multiplot` が与えられ
  るまで何の描画も表示されないことがあります。この場合このコマンドにより
  ページ全体の描画が行なわれ、gnuplot は標準の単一描画モードになります。
- それ以外の出力形式では、各 `plot` コマンドがそれぞれ表示を更新しますが、
- それは、それまで出力したものすべてを再描画し、それに新しいものを追加す
- る方法、あるいは、現在の表示に単に新しいものを追加するだけのやり方、の
- いずれかです。
+ それ以外の出力形式では、各 `plot` コマンドがそれぞれ表示を更新します。
 
- 次の描画で使われる領域は、新しい描画が行われる前に消されることはありま
- せんから、描画を "挿入" するような場合などでそうしたいなら、`clear` コ
- マンドを使用してください。
+ コマンド `clear` は、次の描画に使う長方形領域を消すのに使えます。典型
+ 的には、グラフを "挿入" するような場合に必要です。
 
  定義済の見出しやベクトルは、各描画において、毎回現在のサイズと原点に従
  って書かれます (それらが `screen` 座表系で定義されていない場合)。それ
@@ -10086,6 +10145,25 @@ Ffigure_missing
 
  上の例では 6 つの描画が 2 列の中に上から下へ、左から右へと埋められて行
  きます。各描画は水平サイズが 1.1/2、垂直サイズが 0.9/3 となります。
+
+ 他にも、個々のグラフに対する明示的なマージンを、オプション `margins`,
+ `spacing` で設定できます。`margins` は、格子配置の複数グラフ全体の外側
+ に対するマージンを、全体の描画領域に対する割合で設定します。これは、グ
+ ラフのうちいくつかのものだけにラベルがあるけれど、すべてのグラフのサイ
+ ズを等しいものにしたい場合にとても役に立ちます。
+
+ 例:
+       set multiplot layout 2,2 columnsfirst margins 0.1,0.9,0.1,0.9 spacing 0.1
+       set ylabel 'ylabel'
+       plot sin(x)
+       set xlabel 'xlabel'
+       plot cos(x)
+       unset ylabel
+       unset xlabel
+       plot sin(2*x)
+       set xlabel 'xlabel'
+       plot cos(2*x)
+       unset multiplot
 
  以下も参照
 ^ <a href="http://www.gnuplot.info/demo/multiplt.html">
@@ -10331,11 +10409,16 @@ Ffigure_missing
  内の相対座標 (`graph`)、スクリーン座標 (`screen`) のいずれかを使用でき
  ます (以下参照: `coordinates`)。そのいずれの場合でも、半径は軸、グラフ、
  スクリーンの水平方向の縮尺に対して計られ、水平方向と垂直方向の縮尺にず
- れがあっても、結果が常に正しく円になるように直されます。
+ れがあっても、結果が常に正しく円になるように直されます。円をグラフの座
+ 標で描きたい (つまり水平軸と垂直軸のスケールが違う場合にはそれが楕円と
+ して表示されるようにしたい) 場合は、代わりに `set object ellipse` を使
+ ってください。
 
  デフォルトでは、完全な円が描画されます。オプションの `arc` に開始角と
  終了角を度を単位として指定すると円弧を描画します。円弧は、常に反時計回
  りに描かれます。
+
+ 以下も参照: `set object ellipse`。
 
 4 polygon
 ?polygon
@@ -10747,21 +10830,28 @@ Ffigure_missing
  角形の色にも寄与しない、という結果をもたらします。例えば、pm3d アルゴ
  リズムを 4x4 のデータ点の格子に適用するスクリプト `demo/pm3d.dem` (是
  非見てください) では、(4-1)x(4-1)=9 色しかない長方形が生成されます。
-4 hidden3d
+4 border
 ?set pm3d hidden3d
 ?pm3d hidden3d
- オプション `set pm3d hidden3d` は、各四角形の境界線を、四角形それ自身
- が描画されるのと同時に描画します。通常は、それは擬似的な隠線処理を達成
- するために、オプション `depthorder` とともに使用します。これは、コマン
- ド `set hidden3d` を用いるよりもずっと効果的でしょう。このコマンドは、
- 境界線の見た目を制御するための追加のラインスタイルオプションを一つ取り
- ます。ライスタイルパラメータを負と指定するか省略した場合は、その plot
- コマンドで与えられた線の属性が使用されます。推奨する使用例:
+?set pm3d border
+?pm3d border
+ オプション `set pm3d border {line-properties}` は、各四角形の境界線を、
+ 四角形が描画されてあるように描画します。通常これは、擬似的な隠線処理を
+ 行うために、オプション `depthorder` とともに使用します。pm3d グラフで
+ は、大域的なオプション `set hidden3d` は何の効果も生まないことに注意し
+ てください。デフォルトの線の属性 (色、幅) を、キーワード border の後ろ
+ にオプションとして後ろにつけます。そのデフォルト値は、その後の splot
+ コマンドで変更できます。
 
-       set pm3d at s hidden3d depthorder
+ 推奨する使用例:
+
+       set pm3d at s depthorder border lw 0.2 lt black
        unset hidden3d
        unset surf
-       splot x*x+y*y linecolor rgb "black" linewidth 0.5
+       splot x*x+y*y linecolor rgb "blue"      # こうしないと黒
+
+ 注: 非推奨のオプション `set pm3d hidden3d N` もまだ使えますが、これは
+ `set pm3d border ls N` と同じです。
 
 4 interpolate
 ?set pm3d interpolate
@@ -10788,11 +10878,7 @@ Ffigure_missing
  ことができます。
 
  コマンド `set pm3d map` は以下の一連のものと同値です: `set pm3d at b`;
- `set view map`; `set style data pm3d`; `set style func pm3d`;。これは
- `set view map` がなかったころの旧バージョンへの互換のためのものです。
- 入力データ点をフィルタするための `zrange`、および色の範囲の変更用の
- `cbrange` を注意して適切に使用してください。`set (no)surface` も 効果
- (副作用 ?) があるようです。
+ `set view map`; `set style data pm3d`; `set style func pm3d`;。
 3 palette
 ?commands set palette
 ?commands show palette
@@ -10847,9 +10933,9 @@ Ffigure_missing
  の広い表は、追加のオプション float または int によって、3 列の [0..1]
  の実数値だけにするか [0..255] の整数値だけにするかをそれぞれ指定できま
  す。この方法で gnuplot のカラーパレットを、Octave のような他の画像アプ
- リケーションに渡すことができます。このようなテキスト形式の RGB の一覧
- 表に加え、`test palette` コマンドにより、現在のパレットの R,G,B の状態
- を描画させることもできます。
+ リケーションに渡すことができます。この他にも、コマンド `test palette`
+ で、現在のパレットの R,G,B 成分の対応状態 (profile) を描画しその値をデ
+ ータブロック $PALETTE に残させることもできます。
 
  以下のオプションは、色付けの属性を決定します。
 
@@ -12029,13 +12115,15 @@ C 下記の以下参照: オプション `positive`, `negative`)。
  照: `set samples`, `set dgrid3d`)。
 
  書式:
-       set table {"outfile"}
+       set table {"outfile" | $datablock}
        plot <whatever>
        unset table
 
- 表形式の出力は、指定されたファイルに書き出されますが、指定がない場合は
- 現在 `set output` で指定されている値に出力されます。現在の出力形式の標
- 準的な描画に戻すには、`unset table` を明示的に行なう必要があります。
+ 表形式の出力は、指定したファイルに書き出しますが、指定がない場合は現在
+ の `set output` が指定するものに出力します。他に、表形式出力を名前付き
+ データブロックにリダイレクトすることもできます。データブロック名は '$'
+ で始まります。以下も参照: `inline data`。現在の出力形式の標準的な描画
+ に戻すには、`unset table` を明示的に行なう必要があります。
 
  入力データのスタイル依存の処理 (平滑化、誤差線、2 軸範囲のチェック等)
  を避けるため、あるいは表出力する列を増やすには、通常の描画スタイルの代
@@ -12468,7 +12556,7 @@ C 下記の以下参照: オプション `positive`, `negative`)。
 
  書式:
        set view <rot_x>{,{<rot_z>}{,{<scale>}{,<scale_z>}}}
-       set view map
+       set view map {scale <scale>}
        set view {no}equal {xy|xyz}
        show view
 
@@ -12478,11 +12566,11 @@ C 下記の以下参照: オプション `positive`, `negative`)。
  ています。最初は x 軸の周りに <rot_x> だけ回転されます。次に、新しい
  z 軸の周りに <rot_z> だけ回転されます。
 
- コマンド `set view map` は、描画を地図として表示するのに使います。これ
- は等高線 (`contour`) の描画、およびカラー表示 (`pm3d`) の色地図に使え
- ます。後者に関しては、入力データ点のフィルタ用の `zrange` の設定、およ
- び色の範囲の縮尺に関する `cbrange` の設定を適切に行うことに注意してく
- ださい。
+ コマンド `set view map` は、グラフを地図のように表示するのに使います。
+ これは等高線 (`contour`) のグラフや、pm3d モードによる 2 次元温度分布
+ などで `with image` よりもむしろ有用です。後者では、入力データ点のフィ
+ ルタ用の `zrange` の設定、および色の範囲の縮尺に関する `cbrange` の設
+ 定を適切に行うことに注意してください。
 
  <rot_x> は [0:180] の範囲に制限されていて、デフォルトでは 60 度です。
  <rot_z> は [0:360] の範囲に制限されていて、デフォルトでは 30 度です。
@@ -13785,7 +13873,7 @@ C 度の記号は set encoding locale で出るようになると。
 ?stats
 ?statistics
  書式:
-      stats 'filename' {using N{:M}} {name 'prefix'} {{no}output}
+      stats {<ranges>} 'filename' {using N{:M}} {name 'prefix'} {{no}output}
 
  このコマンドは、ファイルの 1 列、または 2 列のデータの簡単な統計情報を
  提供します。using 指定子は、plot コマンドと同じ形で解釈されますが、
@@ -13807,11 +13895,14 @@ C 度の記号は set encoding locale で出るようになると。
       STATS_columns           # データ先頭行の列数
 
  2 番目の変数グループは、1 つの列の、範囲内のデータの性質を示します。対
- 応する軸 (1 つ目の列には x 軸、追加の 2 つ目の列には y 軸) が自動縮尺
- の場合は、範囲に制限はありません。2 つの列を 1 回の `stats` コマンドで
- 解析する場合は、各変数名には "_x", "_y" という接尾辞が追加されます。例
- えば STATS_mix_x は、1 つ目の列のデータの最小値で、STATS_min_y は 2 つ
- 目の列のデータの最小値を意味します。
+ 応する軸が自動縮尺の場合は、範囲に制限はありません。1 つの列を使用して
+ いる場合はそれは y 軸の設定に支配され、その他の場合は最初の列に x 軸の
+ 設定を、2 番目の列には y 軸の設定を適用します。
+
+ 2 つの列を 1 回の `stats` コマンドで解析する場合は、各変数名には "_x",
+ "_y" という接尾辞が追加されます。例えば STATS_min_x は、1 つ目の列のデ
+ ータの最小値で、STATS_min_y は 2 つ目の列のデータの最小値を意味します。
+
       STATS_min               # 範囲内のデータ点の最小値
       STATS_max               # 範囲内のデータ点の最大値
       STATS_index_min         # data[i] == STATS_min となる添字 i
@@ -13886,17 +13977,15 @@ C 度の記号は set encoding locale で出るようになると。
  テストし表示します。
 
  書式:
-       test {terminal | palette [rgb|rbg|grb|gbr|brg|bgr]}
+       test {terminal | palette}
 
  `test` または `test terminal` は、現在使用中の出力形式 (`terminal`) で
- 使える線の種類、点の種類、または有用なそして利用可能なその他の描画を生
- 成します。
+ 使える線の種類、点の種類、または利用可能なその他の描画を生成します。
 
  `test palette` は、R(z),G(z),B(z) (0<=z<=1) の状態を描画します。これら
  は現在のカラーパレット (`palette`) の RGB 成分を示します。また、RGB を
- 灰色階調に写像する NTSC 係数を用いて計算された視光度も描画します。追加
- のパラメータは、r,g,b の文字の組合せで、それにより描画する順番が決定さ
- れます。
+ 灰色階調に写像する NTSC 係数を用いて計算された視光度も描画します。この
+ 対応関係は、$PALETTE という名前のデータブロックにも取り込まれます。
 2 undefine
 ?commands undefine
 ?undefine

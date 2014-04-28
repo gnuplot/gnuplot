@@ -1,3 +1,8 @@
+2014-04-28  Shigeharu Takeno  <shige@iee.niit.ac.jp>
+
+	* docs/gnuplot-ja.doc term-ja.diff:  Sync translation to version 1.882
+	* docs/gnuplot.doc: typos
+
 2014-04-28  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c src/graph3d.c src/save.c src/show.c: Use named

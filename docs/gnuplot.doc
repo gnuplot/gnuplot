@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.882 2014/04/22 20:49:28 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.883 2014/04/28 19:36:22 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -2425,7 +2425,7 @@ Ffigure_newsyntax
  
  Example:
        # Two functions using linetype 1 but distinguished by dashtype
-       plot f1(x) with lines lt N dt solid, f2(x) with lines lt N dt 3
+       plot f1(x) with lines lt 1 dt solid, f2(x) with lines lt 1 dt 3
 
  Some terminals support user-defined dash patterns in addition to whatever 
  set of predefined dash patterns they offer.
@@ -7612,7 +7612,7 @@ Ffigure_mapcontours
  This was the default behaviour of earlier gnuplot versions.
 
  `set colorsequence podo` selects eight colors drawn from a set recommended by
- Wong (2011) [Nature Methods 9:441] as being easily distinguished by color-blind
+ Wong (2011) [Nature Methods 8:441] as being easily distinguished by color-blind
  viewers with either protanopia or deuteranopia.
 
  In each case you can further customize the length of the sequence and the
@@ -7956,7 +7956,7 @@ Ffigure_mapcontours
       plot f1(x) dt (2,4,2,6)    # exactly the same plot as above
       set linetype 5 dt 5        # always use this dash pattern with linetype 5
       set dashtype 66 "..-"      # define a new dashtype using a string
- See also `dashtype`
+ See also `dashtype`.
 3 data style
 ?set data style
  This form of the command is deprecated. Please see `set style data`.
