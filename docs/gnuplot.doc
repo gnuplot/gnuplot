@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.881 2014/04/19 00:21:16 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.882 2014/04/22 20:49:28 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -2460,6 +2460,29 @@ Ffigure_newsyntax
       set style line 5 lt rgb "cyan" lw 3 pt 6
       plot sin(x) with linespoints ls 5          # user-defined line style 5
 
+2 layers
+? layers
+=behind
+=front
+=back
+ A gnuplot plot is built up by drawing its various components in a fixed order.
+ This order can be modified by assigning some components to a specific layer
+ using the keywords `behind`, `back`, or `front`. For example, to replace the
+ background color of the plot area you could define a colored rectangle with the
+ attribute `behind`.
+      set object 1 rectangle from graph 0,0 to graph 1,1 fc rgb "gray" behind
+ The order of drawing is
+      behind
+      back
+      the plot itself
+      the plot legend (`key`)
+      front
+ Within each layer elements are drawn in the order
+      objects (rectangles, circles, ellipse, polygons) in numerical order
+      labels in numerical order
+      arrows in numerical order
+ In the case of multiple plots on a single page (multiplot mode) this order 
+ applies separately to each component plot, not to the multiplot as a whole.
 2 mouse input
 ?mouse input
  Many terminals allow interaction with the current plot using the mouse. Some
