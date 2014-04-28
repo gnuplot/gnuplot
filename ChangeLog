@@ -1,3 +1,8 @@
+2014-04-28  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/graphics.c src/graph3d.c src/save.c src/show.c: Use named
+	values LAYER_{BEHIND|BACK|FRONT} rather than magic numbers.
+
 2014-04-27  Dima Kogan  <dima@secretsauce.net>
 
 	* src/gplt_x11.c: Fix off-by-one error in selection string.

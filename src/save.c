@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.249 2014/04/22 20:49:28 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.250 2014/04/25 18:51:40 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -210,7 +210,7 @@ set bar %f %s\n",
 	    bar_size, (bar_layer == LAYER_BACK) ? "back" : "front");
 
     if (draw_border) {
-	fprintf(fp, "set border %d %s", draw_border, border_layer == 0 ? "back" : "front");
+	fprintf(fp, "set border %d %s", draw_border, border_layer == LAYER_BACK ? "back" : "front");
 	save_linetype(fp, &border_lp, FALSE);
 	fprintf(fp, "\n");
     } else
@@ -316,7 +316,7 @@ set bar %f %s\n",
 
     /* Grid back/front controls tics also. Make sure it is saved */
     if (grid_layer >= 0)
-	fprintf(fp,"set tics %s\n", grid_layer == 0 ? "back" : "front");
+	fprintf(fp,"set tics %s\n", grid_layer == LAYER_BACK ? "back" : "front");
 
     if (! some_grid_selected())
 	fputs("unset grid\n", fp);

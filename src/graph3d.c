@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.303 2014/04/08 18:49:21 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.304 2014/04/22 20:49:28 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -732,7 +732,7 @@ do_3dplot(
     }
 
     /* Give a chance for rectangles to be behind everything else */
-    place_objects( first_object, -1, 3);
+    place_objects( first_object, LAYER_BEHIND, 3);
 
     term_apply_lp_properties(&border_lp);	/* border linetype */
 
@@ -742,13 +742,13 @@ do_3dplot(
     /* DRAW GRID AND BORDER */
     /* Original behaviour: draw entire grid in back, if 'set grid back': */
     /* HBB 20040331: but not if in hidden3d mode */
-    if (!hidden3d && grid_layer == 0)
+    if (!hidden3d && grid_layer == LAYER_BACK)
 	draw_3d_graphbox(plots, pcount, ALLGRID, LAYER_BACK);
-    else if (splot_map && border_layer == 0)
+    else if (splot_map && border_layer == LAYER_BACK)
 	draw_3d_graphbox(plots, pcount, BORDERONLY, LAYER_BACK);
 
 #ifdef USE_GRID_LAYERS
-    if (!hidden3d && (grid_layer == -1))
+    if (!hidden3d && (grid_layer == LAYER_BEHIND))
 	/* Default layering mode.  Draw the back part now, but not if
 	 * hidden3d is in use, because that relies on all isolated
 	 * lines being output after all surfaces have been defined. */
@@ -855,13 +855,13 @@ do_3dplot(
 	draw_color_smooth_box(MODE_SPLOT);
 
     /* Add 'back' rectangles */
-    place_objects(first_object, 0, 3);
+    place_objects(first_object, LAYER_BACK, 3);
 
     /* PLACE LABELS */
-    place_labels3d(first_label, 0);
+    place_labels3d(first_label, LAYER_BACK);
 
     /* PLACE ARROWS */
-    place_arrows3d(0);
+    place_arrows3d(LAYER_BACK);
 
     /* Sync point for epslatex text positioning */
     (term->layer)(TERM_LAYER_FRONTTEXT);
@@ -1327,11 +1327,11 @@ do_3dplot(
     /* HBB NEW 20040311: do front part now, after surfaces have been
      * output. If "set grid front", or hidden3d is active, must output
      * the whole shebang now, otherwise only the front part. */
-    if (hidden3d || grid_layer == 1)
+    if (hidden3d || grid_layer == LAYER_FRONT)
 	draw_3d_graphbox(plots, pcount, ALLGRID, LAYER_FRONT);
-    else if (grid_layer == -1)
+    else if (grid_layer == LAYER_BEHIND)
 	draw_3d_graphbox(plots, pcount, FRONTGRID, LAYER_FRONT);
-    if (splot_map && (border_layer == 1))
+    if (splot_map && (border_layer == LAYER_FRONT))
 	draw_3d_graphbox(plots, pcount, BORDERONLY, LAYER_FRONT);
 #endif /* USE_GRID_LAYERS */
 
@@ -1347,13 +1347,13 @@ do_3dplot(
 	draw_color_smooth_box(MODE_SPLOT);
 
     /* Add 'front' rectangles */
-    place_objects(first_object, 1, 3);
+    place_objects(first_object, LAYER_FRONT, 3);
 
     /* PLACE LABELS */
-    place_labels3d(first_label, 1);
+    place_labels3d(first_label, LAYER_FRONT);
 
     /* PLACE ARROWS */
-    place_arrows3d(1);
+    place_arrows3d(LAYER_FRONT);
 
 #ifdef USE_MOUSE
     /* finally, store the 2d projection of the x and y axis, to enable zooming by mouse */

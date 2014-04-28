@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.452 2014/04/27 19:08:59 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.453 2014/04/28 04:35:29 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -536,7 +536,7 @@ do_plot(struct curve_points *plots, int pcount)
 	make_palette();
 
     /* Give a chance for rectangles to be behind everything else */
-    place_objects( first_object, -1, 2);
+    place_objects( first_object, LAYER_BEHIND, 2);
 
     screen_ok = FALSE;
 
@@ -544,7 +544,7 @@ do_plot(struct curve_points *plots, int pcount)
     (term->layer)(TERM_LAYER_BACKTEXT);
 
     /* DRAW TICS AND GRID */
-    if (grid_layer == 0 || grid_layer == -1)
+    if (grid_layer == LAYER_BACK || grid_layer == LAYER_BEHIND)
 	place_grid();
 
     /* DRAW ZERO AXES and update axis->term_zero */
@@ -565,13 +565,13 @@ do_plot(struct curve_points *plots, int pcount)
 	    draw_color_smooth_box(MODE_PLOT);
 
     /* And rectangles */
-    place_objects( first_object, 0, 2);
+    place_objects( first_object, LAYER_BACK, 2);
 
     /* PLACE LABELS */
-    place_labels( first_label, 0, FALSE );
+    place_labels( first_label, LAYER_BACK, FALSE );
 
     /* PLACE ARROWS */
-    place_arrows( 0 );
+    place_arrows( LAYER_BACK );
 
     /* Sync point for epslatex text positioning */
     (term->layer)(TERM_LAYER_FRONTTEXT);
@@ -860,14 +860,14 @@ do_plot(struct curve_points *plots, int pcount)
     }
 
     /* DRAW TICS AND GRID */
-    if (grid_layer == 1)
+    if (grid_layer == LAYER_FRONT)
 	place_grid();
     if (polar && raxis)
 	place_raxis();
 
     /* DRAW ZERO AXES */
     /* redraw after grid so that axes linetypes are on top */
-    if (grid_layer == 1) {
+    if (grid_layer == LAYER_FRONT) {
 	axis_draw_2d_zeroaxis(FIRST_X_AXIS,FIRST_Y_AXIS);
 	axis_draw_2d_zeroaxis(FIRST_Y_AXIS,FIRST_X_AXIS);
 	axis_draw_2d_zeroaxis(SECOND_X_AXIS,SECOND_Y_AXIS);
@@ -879,7 +879,7 @@ do_plot(struct curve_points *plots, int pcount)
 	place_parallel_axes(plots, pcount, LAYER_FRONT);
 
     /* REDRAW PLOT BORDER */
-    if (draw_border && border_layer == 1)
+    if (draw_border && border_layer == LAYER_FRONT)
 	plot_border();
 
     /* Add front colorbox if appropriate */
@@ -887,16 +887,16 @@ do_plot(struct curve_points *plots, int pcount)
 	    draw_color_smooth_box(MODE_PLOT);
 
     /* And rectangles */
-    place_objects( first_object, 1, 2);
+    place_objects( first_object, LAYER_FRONT, 2);
 
     /* PLACE LABELS */
-    place_labels( first_label, 1, FALSE );
+    place_labels( first_label, LAYER_FRONT, FALSE );
 
     /* PLACE HISTOGRAM TITLES */
     place_histogram_titles();
 
     /* PLACE ARROWS */
-    place_arrows( 1 );
+    place_arrows( LAYER_FRONT );
 
     /* Release the palette if we have used one (PostScript only?) */
     if (is_plot_with_palette() && term->previous_palette)
@@ -3762,7 +3762,7 @@ place_raxis()
 
 #ifdef EAM_OBJECTS
     if (!(R_AXIS.autoscale & AUTOSCALE_MIN) && R_AXIS.set_min != 0)
-	place_objects( &raxis_circle, 1, 2);
+	place_objects( &raxis_circle, LAYER_FRONT, 2);
 #endif
 
 }
