@@ -1,3 +1,13 @@
+2014-04-28  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/datafile.c (f_timecolumn):  This function basically does not work.
+	If it ever appears in a using spec slot other than 0 or 1, it will fail
+	with either a segfault or a garbage return value because there is no
+	no associated timefmt.  Version 5 fixes this by requiring the timefmt to
+	be passed as a second parameter. Here we don't redefine the function but
+	at least we report an error rather than faulting.
+	Bug #1394
+
 2014-04-23  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/datafile.c (df_readascii):  If a read request returns a string
