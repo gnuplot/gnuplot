@@ -515,6 +515,7 @@ extern int current_x11_windowid;
 #define LAYER_BEHIND     -1
 #define LAYER_BACK        0
 #define LAYER_FRONT       1
+#define LAYER_FOREGROUND  2	/* not currently used */
 #define LAYER_PLOTLABELS 99
 
 /* Functions exported by gadgets.c */
