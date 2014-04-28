@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.320 2014/04/22 20:49:28 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.321 2014/04/28 18:50:13 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -3113,11 +3113,6 @@ show_mouse()
 	}
 	fprintf(stderr, "\tformatting numbers with \"%s\"\n",
 	    mouse_setting.fmt);
-	fprintf(stderr, "\tformat for Button 1 is %d\n", (int) clipboard_mode);
-	if (clipboard_alt_string) {
-	    fprintf(stderr, "\talternative format for Button 1 is '%s'\n",
-		clipboard_alt_string);
-	}
 	fprintf(stderr, "\tformat for Button 2 is %d\n", (int) mouse_mode);
 	if (mouse_alt_string) {
 	    fprintf(stderr, "\talternative format for Button 2 is '%s'\n",

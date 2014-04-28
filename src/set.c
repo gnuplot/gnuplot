@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.448 2014/04/22 20:49:28 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.449 2014/04/25 00:22:23 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -2819,35 +2819,6 @@ set_mouse()
 		mouse_setting.fmt = try_to_get_string();
 	    } else
 		mouse_setting.fmt = mouse_fmt_default;
-	} else if (almost_equals(c_token, "cl$ipboardformat")) {
-	    ++c_token;
-	    if (isstringvalue(c_token)) {
-		free(clipboard_alt_string);
-		clipboard_alt_string = try_to_get_string();
-		if (!strlen(clipboard_alt_string)) {
-		    free(clipboard_alt_string);
-		    clipboard_alt_string = NULL;
-		    if (MOUSE_COORDINATES_ALT == mouse_mode)
-			mouse_mode = MOUSE_COORDINATES_REAL;
-		} else {
-		    clipboard_mode = MOUSE_COORDINATES_ALT;
-		}
-	    } else {
-		int itmp = int_expression();
-		if (itmp >= MOUSE_COORDINATES_REAL
-		    && itmp <= MOUSE_COORDINATES_XDATETIME) {
-		    if (MOUSE_COORDINATES_ALT == itmp
-			&& !clipboard_alt_string) {
-			fprintf(stderr,
-			    "please 'set mouse clipboard <fmt>' first.\n");
-		    } else {
-			clipboard_mode = itmp;
-		    }
-		} else {
-		    fprintf(stderr, "should be: %d <= clipboardformat <= %d\n",
-			MOUSE_COORDINATES_REAL, MOUSE_COORDINATES_XDATETIME);
-		}
-	    }
 	} else if (almost_equals(c_token, "mo$useformat")) {
 	    ++c_token;
 	    if (isstringvalue(c_token)) {

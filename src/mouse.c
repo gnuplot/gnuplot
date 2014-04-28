@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: mouse.c,v 1.160 2014/04/27 05:11:19 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: mouse.c,v 1.161 2014/04/28 17:18:10 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - mouse.c */
@@ -186,7 +186,6 @@ static void ZoomNext __PROTO((void));
 static void ZoomPrevious __PROTO((void));
 static void ZoomUnzoom __PROTO((void));
 static void incr_mousemode __PROTO((const int amount));
-static void incr_clipboardmode __PROTO((const int amount));
 static void UpdateStatuslineWithMouseSetting __PROTO((mouse_setting_t * ms));
 
 static void event_keypress __PROTO((struct gp_event_t * ge, TBOOLEAN current));
@@ -222,8 +221,6 @@ static char *builtin_toggle_mouse __PROTO((struct gp_event_t * ge));
 static char *builtin_toggle_ruler __PROTO((struct gp_event_t * ge));
 static char *builtin_decrement_mousemode __PROTO((struct gp_event_t * ge));
 static char *builtin_increment_mousemode __PROTO((struct gp_event_t * ge));
-static char *builtin_decrement_clipboardmode __PROTO((struct gp_event_t * ge));
-static char *builtin_increment_clipboardmode __PROTO((struct gp_event_t * ge));
 static char *builtin_toggle_polardistance __PROTO((struct gp_event_t * ge));
 static char *builtin_toggle_verbose __PROTO((struct gp_event_t * ge));
 static char *builtin_toggle_ratio __PROTO((struct gp_event_t * ge));
@@ -826,27 +823,6 @@ incr_mousemode(const int amount)
 	fprintf(stderr, "switched mouse format from %ld to %ld\n", old, mouse_mode);
 }
 
-static void
-incr_clipboardmode(const int amount)
-{
-    long int old = clipboard_mode;
-    clipboard_mode += amount;
-    if (MOUSE_COORDINATES_ALT == clipboard_mode && !clipboard_alt_string) {
-	clipboard_mode += amount;	/* stepping over */
-    }
-    if (clipboard_mode > MOUSE_COORDINATES_ALT) {
-	clipboard_mode = MOUSE_COORDINATES_REAL;
-    } else if (clipboard_mode < MOUSE_COORDINATES_REAL) {
-	clipboard_mode = MOUSE_COORDINATES_ALT;
-	if (MOUSE_COORDINATES_ALT == clipboard_mode && !clipboard_alt_string) {
-	    clipboard_mode--;	/* stepping over */
-	}
-    }
-    if (display_ipc_commands()) {
-	fprintf(stderr, "switched clipboard format from %ld to %ld\n", old, clipboard_mode);
-    }
-}
-
 # define TICS_ON(ti) (((ti)&TICS_MASK)!=NO_TICS)
 
 void
@@ -1206,26 +1182,6 @@ builtin_increment_mousemode(struct gp_event_t *ge)
 	return "`builtin-next-mouse-format`";
     }
     incr_mousemode(1);
-    return (char *) 0;
-}
-
-static char *
-builtin_decrement_clipboardmode(struct gp_event_t *ge)
-{
-    if (!ge) {
-	return "`builtin-decrement-clipboardmode`";
-    }
-    incr_clipboardmode(-1);
-    return (char *) 0;
-}
-
-static char *
-builtin_increment_clipboardmode(struct gp_event_t *ge)
-{
-    if (!ge) {
-	return "`builtin-increment-clipboardmode`";
-    }
-    incr_clipboardmode(1);
     return (char *) 0;
 }
 
@@ -2016,7 +1972,7 @@ event_buttonrelease(struct gp_event_t *ge)
 	     * only place, if the user didn't drag (rotate) the plot */
 
 	    if (!is_3d_plot || !motion) {
-		GetAnnotateString(s0, real_x, real_y, clipboard_mode, clipboard_alt_string);
+		GetAnnotateString(s0, real_x, real_y, mouse_mode, mouse_alt_string);
 		term->set_clipboard(s0);
 		if (display_ipc_commands()) {
 		    fprintf(stderr, "put `%s' to clipboard.\n", s0);
@@ -2410,8 +2366,6 @@ bind_install_default_bindings()
     bind_append("v", (char *) 0, builtin_set_plots_visible);
     bind_append("1", (char *) 0, builtin_decrement_mousemode);
     bind_append("2", (char *) 0, builtin_increment_mousemode);
-    bind_append("3", (char *) 0, builtin_decrement_clipboardmode);
-    bind_append("4", (char *) 0, builtin_increment_clipboardmode);
     bind_append("5", (char *) 0, builtin_toggle_polardistance);
     bind_append("6", (char *) 0, builtin_toggle_verbose);
     bind_append("7", (char *) 0, builtin_toggle_ratio);

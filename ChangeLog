@@ -1,3 +1,10 @@
+2014-04-28  Dima Kogan  <dima@secretsauce.net>
+
+	* src/mouse.c src/mouse.h src/set.c src/show.c docs/gnuplot.doc:
+	Remove the distinction between "coordinate format echoed to the screen
+	during mousing" and "coordinate format saved to the clipboard on click".
+	This removes the default bindings for hotkeys 3 and 4.
+
 2014-04-28  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* docs/gnuplot-ja.doc term-ja.diff:  Sync translation to version 1.882

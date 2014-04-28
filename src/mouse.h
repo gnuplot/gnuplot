@@ -1,5 +1,5 @@
 /*
- * $Id: mouse.h,v 1.23 2012/10/27 02:23:39 sfeam Exp $
+ * $Id: mouse.h,v 1.24 2013/09/01 17:36:56 juhaszp Exp $
  */
 
 /* GNUPLOT - mouse.h */
@@ -189,14 +189,10 @@ enum {
 /* FIXME HBB 20010207: Codestyle violation: these should be in mouse.c! */
 #if defined(_MOUSE_C)
     long mouse_mode = MOUSE_COORDINATES_REAL;
-    long clipboard_mode = MOUSE_COORDINATES_REAL;
     char* mouse_alt_string = (char*) 0;
-    char* clipboard_alt_string = (char*) 0;
 #else
     extern long mouse_mode;
-    extern long clipboard_mode;
     extern char* mouse_alt_string;
-    extern char* clipboard_alt_string;
 #endif
 
 

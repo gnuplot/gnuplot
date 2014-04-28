@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.883 2014/04/28 19:36:22 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.884 2014/04/28 20:26:15 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -9813,7 +9813,6 @@ Ffigure_missing
                  {noruler | ruler {at x,y}} \
                  {polardistance{deg|tan} | nopolardistance} \
                  {format <string>} \
-                 {clipboardformat <int>/<string>} \
                  {mouseformat <int>/<string>} \
                  {{no}labels {"labeloptions"}} \
                  {{no}zoomjump} {{no}verbose}
@@ -9863,11 +9862,11 @@ Ffigure_missing
  determines how the mouse cursor [x,y] coordinates are printed to the plot
  window and to the clipboard.  The default is "% #g".
 
- `set mouse clipboardformat` and `set mouse mouseformat` are used for formatting
- the text on Button1 and Button2 actions -- copying the coordinates to the
- clipboard and temporarily annotating the mouse position.  An integer argument
- selects one of the format options in the table below. A string argument is used
- as a format for sprintf() in option 6 and should contain two float specifiers.
+ `set mouse mouseformat` is used for formatting the text on Button1 and Button2
+ actions -- copying the coordinates to the clipboard and temporarily annotating
+ the mouse position. An integer argument selects one of the format options in
+ the table below. A string argument is used as a format for sprintf() in option
+ 6 and should contain two float specifiers.
  Example:
       `set mouse mouseformat "mouse x,y = %5.2g, %10.3f"`.
  Use `set mouse mouseformat ""` to turn this string off again.
