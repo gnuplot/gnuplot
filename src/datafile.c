@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.212.2.35 2014/04/23 19:31:54 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.212.2.36 2014/04/29 20:50:25 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -2406,7 +2406,7 @@ f_timecolumn(union argument *arg)
 
     whichaxis = df_axis[current_using_spec];
     if (whichaxis == NO_AXIS)
-	int_error(NO_CARET, "timecolumn() has no associated axis");
+	whichaxis = FIRST_X_AXIS;
 
     if (column < 1
 	|| column > df_no_cols
