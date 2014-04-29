@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.240 2013/10/17 23:52:55 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.241 2014/04/28 04:05:34 sfeam Exp $"); }
 #endif
 
 #define MOUSE_ALL_WINDOWS 1
@@ -527,10 +527,10 @@ static char default_font[196] = { '\0' };
 static char default_encoding[16] = { '\0' };
 
 #define Nwidths 10
-static unsigned int widths[Nwidths] = { 2, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+static unsigned int widths[Nwidths] = { 1, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
 #define Ndashes 10
-static char dashes[Ndashes][5];
+static char dashes[Ndashes][DASHPATTERN_LENGTH+1];
 
 t_sm_palette sm_palette = {
     -1,				/* colorFormulae */
@@ -582,7 +582,7 @@ static TBOOLEAN fast_rotate = TRUE;
 static int feedback = yes;
 static int ctrlq = no;
 static int replot_on_resize = yes;
-static int dashedlines = no;
+static int dashedlines = yes;
 #ifdef EXPORT_SELECTION
 static TBOOLEAN exportselection = TRUE;
 #endif
@@ -1641,8 +1641,10 @@ record()
 		    do_raise = tmp_do_raise;
 		if (UNSET != tmp_persist)
 		    persist = tmp_persist;
+/* Version 5 - always enabled
 		if (UNSET != tmp_dashed)
 		    dashedlines = tmp_dashed;
+ */
 		if (UNSET != tmp_ctrlq)
 		    ctrlq = tmp_ctrlq;
 		if (UNSET != tmp_replot_on_resize)
@@ -2495,20 +2497,38 @@ exec_cmd(plot_struct *plot, char *command)
     else if (*buffer == 'W')
 	sscanf(buffer + 1, "%d", &plot->user_width);
 
+    /* X11_dashtype() - set custom dash pattern */
+    else if (*buffer == 'D') {
+	int len;
+	char pattern[DASHPATTERN_LENGTH+1];
+	memset(pattern, '\0', sizeof(pattern));
+	sscanf(buffer, "D%8s", pattern);
+	for (len=0; isalpha(pattern[len]); len++) {
+	    pattern[len] = pattern[len] + 1 - 'A';
+	}
+	pattern[len] = '\0';
+	XSetDashes(dpy, gc, 0, pattern, len);
+	plot->type = LineOnOffDash;
+	XSetLineAttributes(dpy, gc, plot->lwidth, plot->type, CapButt, JoinBevel);
+    }
+
     /*   X11_linetype(plot->type) - set line type  */
     else if (*buffer == 'L') {
 	sscanf(buffer, "L%d", &plot->lt);
 
 	plot->lt = (plot->lt % 8) + 2;
+	plot->lwidth = plot->user_width;
 
 	/* Fixme: no mechanism to hold width or dashstyle for LT_BACKGROUND */
 	if (plot->lt < 0) { /* LT_NODRAW, LT_BACKGROUND, LT_UNDEFINED */
 	    plot->lt = -3;
-	    plot->lwidth = plot->user_width;
 
-	} else { 
+	} else {
+	    /* LT_SOLID is a special case because version 5 uses it for all  */
+	    /* solid lines, whereas versions < 5 used it only for the border */
 	    /* default width is 0 {which X treats as 1} */
-	    plot->lwidth = widths[plot->lt] ? plot->user_width * widths[plot->lt] : plot->user_width;
+	    if (plot->lt > 0 && widths[plot->lt] > 0)
+		plot->lwidth *= widths[plot->lt];
 
 	    if (((dashedlines == yes) && dashes[plot->lt][0])
 	    ||  (plot->lt == LT_AXIS+2 && dashes[LT_AXIS+2][0])) {
@@ -5538,9 +5558,10 @@ static char dash_mono[Ndashes][10] = {
     "0", "42", "13", "44", "15", "4441", "42", "13"
 };
 
+/* Version 5 default dash types */
 static char dash_color[Ndashes][10] = {
     "0", "16",
-    "0", "0", "0", "0", "0", "0", "0", "0"
+    "0", "64", "26", "6424", "642424", "0", "64", "26" 
 };
 
 static void
@@ -5549,9 +5570,11 @@ pr_dashes()
     int n, j, l, ok;
     char option[20], *v;
 
+/*  Version 5 - always enabled
     if (pr_GetR(db, ".dashed")) {
 	dashedlines = (!strncasecmp(value.addr, "on", 2) || !strncasecmp(value.addr, "true", 4));
     }
+ */
 
     for (n = 0; n < Ndashes; n++) {
 	strcpy(option, ".");
@@ -5559,8 +5582,9 @@ pr_dashes()
 	strcat(option, "Dashes");
 	v = pr_GetR(db, option)
 	    ? (char *) value.addr : ((Mono) ? dash_mono[n] : dash_color[n]);
-	l = strlen(v);
+	l = GPMIN( strlen(v), DASHPATTERN_LENGTH );
 	if (l == 1 && *v == '0') {
+	    /* "0" solid line */
 	    dashes[n][0] = (unsigned char) 0;
 	    continue;
 	}
@@ -5568,7 +5592,7 @@ pr_dashes()
 	    if (v[j] >= '1' && v[j] <= '9')
 		ok++;
 	}
-	if (ok != l || (ok != 2 && ok != 4)) {
+	if (ok != l) {
 	    fprintf(stderr, "gnuplot: illegal dashes value %s:%s\n",
 		    option, v);
 	    dashes[n][0] = (unsigned char) 0;

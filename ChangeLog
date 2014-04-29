@@ -9,6 +9,9 @@
 	any particular axis or time setting.
 	Bug #1394
 
+	* src/gplt_x11.c term/x11.trm term/xlib.trm:
+	Custom dashtype support for X11.
+
 2014-04-28  Dima Kogan  <dima@secretsauce.net>
 
 	* src/mouse.c src/mouse.h src/set.c src/show.c docs/gnuplot.doc:

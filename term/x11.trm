@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: x11.trm,v 1.218 2013/10/25 04:45:23 sfeam Exp $
+ * $Id: x11.trm,v 1.219 2014/03/19 05:00:32 sfeam Exp $
  *
  */
 
@@ -81,6 +81,7 @@ TERM_PUBLIC void X11_vector __PROTO((unsigned int x, unsigned int y));
 TERM_PUBLIC void X11_linewidth __PROTO((double lw));
 TERM_PUBLIC void X11_pointsize __PROTO((double ps));
 TERM_PUBLIC void X11_linetype __PROTO((int lt));
+TERM_PUBLIC void X11_dashtype __PROTO((int type, t_dashtype *custom_dash_type));
 TERM_PUBLIC void X11_put_text __PROTO((unsigned int x, unsigned int y, const char str[]));
 TERM_PUBLIC int X11_text_angle __PROTO((int i));
 TERM_PUBLIC int X11_justify_text __PROTO((enum JUSTIFY mode));
@@ -1576,6 +1577,42 @@ X11_linetype(int lt)
 }
 
 TERM_PUBLIC void
+X11_dashtype(int type, t_dashtype *custom_dash_type)
+{
+    int len;
+
+    switch (type) {
+
+    case DASHTYPE_SOLID:
+	break;
+
+    case DASHTYPE_AXIS:
+	/* Currently handled elsewhere? */
+	break;
+
+    case DASHTYPE_CUSTOM:
+	if (custom_dash_type) {
+	    char pattern[DASHPATTERN_LENGTH+1];
+
+	    for (len = 0; len < DASHPATTERN_LENGTH && custom_dash_type->pattern[len] > 0; len++) {
+		int bit = custom_dash_type->pattern[len];
+		/* NB: A-Z encodes 1-26 */
+		pattern[len] = 'A' + GPMIN(bit, 26) - 1;
+	    }
+	    pattern[len] = '\0';
+	    PRINT1("D%s\n", pattern);
+	}
+	break;
+
+    default:
+	/* Fall back to the built-in dash patterns indexed by linetype */
+	if (type > 0)
+	    X11_linetype( type % 5 );	/* However many patterns we put in gplt_x11.c */
+	break;
+    }
+}
+
+TERM_PUBLIC void
 X11_put_text(unsigned int x, unsigned int y, const char str[])
 {
     /* Only send the font change request to X11 if it really is a change */
@@ -2310,6 +2347,7 @@ TERM_TABLE_START(x11_driver)
     , ENHX11_boxed_text
 #endif
     , X11_modify_plots
+    , X11_dashtype
 TERM_TABLE_END(x11_driver)
 
 #undef LAST_TERM
@@ -2334,7 +2372,7 @@ START_HELP(x11)
 "    set terminal x11 {<n> | window \"<string>\"}",
 "                     {title \"<string>\"}",
 "                     {{no}enhanced} {font <fontspec>}",
-"                     {linewidth LW} {solid|dashed}",
+"                     {linewidth LW}",
 "                     {{no}persist} {{no}raise} {{no}ctrlq}",
 "                     {{no}replotonresize}",
 "                     {close}",
@@ -2584,12 +2622,11 @@ START_HELP(x11)
 " requests white-on-black.",
 "",
 "2 color_resources",
-"?commands set terminal x11 color_resources",
 "?set terminal x11 color_resources",
 "?set term x11 color_resources",
 "?x11 color_resources",
-"?color_resources",
 "=X resources",
+" NB: THIS SECTION IS LARGELY IRRELEVANT IN GNUPLOT VERSION 5",
 " The X11 terminal honors the following resources (shown here with their",
 " default values) or the greyscale resources.  The values may be color names",
 " as listed in the X11 rgb.txt file on your system, hexadecimal RGB color",
@@ -2702,18 +2739,17 @@ START_HELP(x11)
 "@end table",
 "",
 "2 line_resources",
-"?commands set terminal x11 line_resources",
 "?set terminal x11 line_resources",
 "?set term x11 line_resources",
 "?x11 line_resources",
-"?line_resources",
 "=X resources",
+" NB: THIS SECTION IS LARGELY IRRELEVANT IN GNUPLOT VERSION 5",
 " `gnuplot` honors the following resources for setting the width (in pixels) of",
 " plot lines (shown here with their default values.)  0 or 1 means a minimal",
 " width line of 1 pixel width.  A value of 2 or 3 may improve the appearance of",
 " some plots.",
 "@start table - first is interactive cleartext form",
-"  gnuplot*borderWidth: 2",
+"  gnuplot*borderWidth: 1",
 "  gnuplot*axisWidth:   0",
 "  gnuplot*line1Width:  0",
 "  gnuplot*line2Width:  0",
@@ -2724,7 +2760,7 @@ START_HELP(x11)
 "  gnuplot*line7Width:  0",
 "  gnuplot*line8Width:  0",
 "#\\begin{tabular}{|cl|} \\hline",
-"#&gnuplot*borderWidth: 2\\\\",
+"#&gnuplot*borderWidth: 1\\\\",
 "#&gnuplot*axisWidth: 0\\\\",
 "#&gnuplot*line1Width: 0\\\\",
 "#&gnuplot*line2Width: 0\\\\",
@@ -2735,7 +2771,7 @@ START_HELP(x11)
 "#&gnuplot*line7Width: 0\\\\",
 "#&gnuplot*line8Width: 0\\\\",
 "%c l .",
-"%@gnuplot*borderWidth: 2",
+"%@gnuplot*borderWidth: 1",
 "%@gnuplot*axisWidth: 0",
 "%@gnuplot*line1Width: 0",
 "%@gnuplot*line2Width: 0",
@@ -2795,13 +2831,12 @@ START_HELP(x11)
 "@end table"
 , "",
 "2 x11 pm3d_resources",
-"?commands set terminal x11 pm3d_resources",
 "?set terminal x11 pm3d_resources",
 "?set term x11 pm3d_resources",
 "?x11 pm3d_resources",
-"?pm3d_resources",
 "?x11 pm3d",
 "=X resources",
+" NB: THIS SECTION IS LARGELY IRRELEVANT IN GNUPLOT VERSION 5",
 " Choosing the appropriate visual class and number of colors is a crucial",
 " point in X11 applications and a bit awkward, since X11 supports six visual",
 " types in different depths.",
