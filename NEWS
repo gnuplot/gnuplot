@@ -4,6 +4,7 @@ New features, changes and fixes in gnuplot version 5.0
 * NEW The dashtype property on any line can be seperately controlled
 * NEW custom dashtypes
 * NEW LFS support for datafiles
+* NEW timecolumn(col,"timeformat') now requires 2nd parameter, the format
 * NEW 'set view map {scale}' allows resizing a 3D projection plot
 * NEW 'nodraw' keyword to suppress lines (e.g. in style linespoints)
 * NEW bold/italic text markup in enhanced text mode

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.280 2014/04/23 19:27:21 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.281 2014/04/23 19:32:34 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -297,7 +297,6 @@ static char **df_datablock_line = NULL;
 struct use_spec_s use_spec[MAXDATACOLS];
 static char *df_format = NULL;
 static char *df_binary_format = NULL;
-static int current_using_spec;
 TBOOLEAN evaluate_inside_using = FALSE;
 TBOOLEAN df_warn_on_missing_columnheader = FALSE;
 
@@ -1860,7 +1859,6 @@ df_readascii(double v[], int max)
 	    for (output = 0; output < limit; ++output) {
 		/* if there was no using spec, column is output+1 and at=NULL */
 		int column = use_spec[output].column;
-		current_using_spec = output;
 
 		if (column == -3) /* pseudocolumn -3 means "last column" */
 		    column = use_spec[output].column = df_no_cols;
@@ -2436,51 +2434,40 @@ f_valid(union argument *arg)
 /*}}} */
 
 /*{{{  void f_timecolumn() */
-/* HBB NOTE 20050505: this job is excessively tricky.  We have one
- * timefmt string per axis.  Back then, that was essentially the only
- * possibility, but it now poses a severe limitation.  For simple
- * using specs, the time parsing format should be a function of the
- * column number in the datafile, not of the axis the data will be
- * used for.  For extended using specs, the value to go on a given
- * axis could conceivably be built from multiple time/date entries in
- * the datafile, each with its own format. */
-/* HBB FIXME 20050505: this really should take two arguments, at
- * least.  First, the datafile column number.  Second either a timefmt
- * string (variable), or an axis index.  For now, we have to try to
- * guess the right axis index */
-/* JP 20110823: Each using spec has an axis (thus the correct timefmt)
- * associated with it, in df_axis[]. Furthermore, this function can 
- * only be called while evaluating an using spec, we just didn't know
- * which one it was called from - hence the need for guessing.
- * This information is now stored in the new global variable 
- * current_using_spec. */
+/* Version 5 - replace the old and very broken timecolumn(N) with 
+ * a 2-parameter version that requires an explicit time format
+ * timecolumn(N, "format").
+ */
 void
 f_timecolumn(union argument *arg)
 {
     struct value a;
-    int column;
-    AXIS_INDEX whichaxis;
+    struct value b;
     struct tm tm;
+    int column;
     double usec = 0.0;
 
     (void) arg;                 /* avoid -Wunused warning */
-    (void) pop(&a);
-    column = (int) magnitude(&a); /* HBB 20050505: removed - 1*/
+    (void) pop(&b);		/* this is the time format string */
+    
+    column = (int) magnitude(pop(&a));
 
     if (!evaluate_inside_using)
 	int_error(c_token-1, "timecolumn() called from invalid context");
-
-    whichaxis = df_axis[current_using_spec];
+    if (b.type != STRING)
+	int_error(NO_CARET, "non-string passed as a format to timecolumn");
 
     if (column < 1
 	|| column > df_no_cols
 	|| !df_column[column - 1].position
-	|| !gstrptime(df_column[column - 1].position,
-		      axis_array[whichaxis].timefmt, &tm, &usec)) {
+	|| !gstrptime(df_column[column - 1].position, b.v.string_val, &tm, &usec)) {
 	undefined = TRUE;
-	push(&a);               /* any objection to this ? */
-    } else
+	push(&a);
+    } else {
 	push(Gcomplex(&a, gtimegm(&tm) + usec, 0.0));
+    }
+
+    gpfree_string(&b);
 }
 
 /*}}} */

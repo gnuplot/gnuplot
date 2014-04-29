@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.884 2014/04/28 20:26:15 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.885 2014/04/28 21:16:13 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -272,6 +272,11 @@ C
  convention used by a particular gnuplot installation can be determined using
  the command `print strftime("%F",0)`.  Time is now stored to at least
  millisecond precision.
+
+ * The function `timecolumn(N,"timeformat")` now has 2 parameters. Because the
+ required second parameter is not associated with any particular data axis, this
+ allows using the `timecolumn` function to read time data for reasons other than
+ specifying the x or y coordinate.
 
  * The `reverse` keyword of the `set [axis]range` command affects only
  autoscaling. It does not invert or otherwise alter the meaning of a command
@@ -942,7 +947,7 @@ C
 ^<tr>    <td>exists("X")</td>    <td>string</td>    <td> returns 1 if a variable named X is defined, 0 otherwise.</td></tr>
 ^<tr>    <td>hsv2rgb(h,s,v)</td>    <td>h,s,v in [0:1]</td>    <td> converts HSV color to 24bit RGB color.</td></tr>
 ^<tr>    <td>stringcolumn(x)</td>    <td>int</td>    <td> content column <i>x</i> as a string.</td></tr>
-^<tr>    <td>timecolumn(x)</td>    <td>int</td>    <td> timecolumn <i>x</i> during datafile manipulation.</td></tr>
+^<tr>    <td>timecolumn(N,format)</td>    <td>int, string</td>    <td> time data in column <i>N</i> during data input</td></tr>
 ^<tr>    <td>tm_hour(x)</td>    <td>int</td>    <td>the hour</td></tr>
 ^<tr>    <td>tm_mday(x)</td>    <td>int</td>    <td>the day of the month</td></tr>
 ^<tr>    <td>tm_min(x)</td>    <td>int</td>    <td>the minute</td></tr>
@@ -1522,19 +1527,15 @@ C marker below is used to signal this to doc2html:
 4 timecolumn
 ?expressions functions timecolumn
 ?timecolumn
-#timecolumn(x) & int & timecolumn $x$ during datafile manipulation. \\
-%timecolumn(x)@int@ timecolumn $x$ during datafile manipulation.
- `timecolumn(x)` may be used only in expressions as part of `using`
+#timecolumn(N,"timeformat") & int, string & time data from column $N$ during data input. \\
+%timecolumn(N,"timeformat")@int, string@ time data from column $N$ during data input.
+ `timecolumn(N,"timeformat)` may be used only in expressions as part of `using`
  manipulations to fits or datafile plots.   See `plot datafile using`.
 
- It reads the data starting at that column as a time/date value and
- returns its value in gnuplot's internal time representation of
- "seconds since the millennium".
-
- To find the right `timefmt` string to use, `timecolumn` searches for a
- `using` specification with the same column number as its argument.
- If one is found, `timefmt` pattern of the target axis for this specifier
- is used.  Otherwise, `timecolumn` chooses the x axis `timefmt` per default.
+ It reads string data starting at column N as a time/date value and uses "timeformat"
+ to interpret this as "seconds since the epoch" to millisecond precision.
+ Note: prior to version 5 this function took only a single parameter and worked only
+ for columns that contained purely an axis coordinate.
 4 tm_hour
 ?expressions tm_hour
 ?tm_hour

@@ -1,3 +1,14 @@
+2014-04-29  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/datafile.c (f_timecolumn): Replace the old 1-parameter function
+	timecolumn(col) with a 2-parameter timecolumn(col,"timeformat"). The
+	old version had no way to handle time data that didn't correspond to
+	a coordinate on a plot axis in time format (e.g. set xdata time).
+	It would segfault if the function appeared in a using spec slot >= 2.
+	Now we require an explicit format, so data input is dissociated from
+	any particular axis or time setting.
+	Bug #1394
+
 2014-04-28  Dima Kogan  <dima@secretsauce.net>
 
 	* src/mouse.c src/mouse.h src/set.c src/show.c docs/gnuplot.doc:
