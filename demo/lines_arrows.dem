@@ -17,7 +17,7 @@ unset colorbox
 #
 # reset linetypes to base dash patterns
 #
-set for [i=1:5] linetype i lt i dt i
+set for [i=1:5] linetype i dt i
 
 #
 # define line styles using explicit rgbcolor names
