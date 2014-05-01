@@ -1,6 +1,7 @@
 2014-05-01  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* demo/gantt.dem demo/html/*:  Add Gantt chart to demo collection.
+	Add dashtypes to demo collection.
 
 	* src/show.c:  Show "fixed" property of arrow style.
 

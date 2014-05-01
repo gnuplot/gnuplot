@@ -137,6 +137,7 @@ Here are samples of PNG output from some of the demos.
     <ul>
     <li><a href="lines_arrows.html">line and arrow styles</a></li>
     <li><a href="fillstyle.html">fill styles</a></li>
+    <li><a href="dashtypes.html">dashed lines</a></li>
     <li><a href="transparent.html">transparency</a></li>
     <li><a href="transparent_solids.html">transparent solids</a></li>
     </ul>
