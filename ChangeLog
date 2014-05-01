@@ -1,3 +1,10 @@
+2014-05-01  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/stdfn.h (sgn): Fix parenthesization of macro.
+	(PATH_MAX): CLang compiler on Cygwin needs a silly little tweak.
+
+	* src/graphics.c (samesign): Improve parenthesization a bit.
+
 2014-05-01  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* demo/gantt.dem demo/html/*:  Add Gantt chart to demo collection.

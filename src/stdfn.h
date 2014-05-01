@@ -1,5 +1,5 @@
 /*
- * $Id: stdfn.h,v 1.47 2014/03/30 18:33:21 markisch Exp $
+ * $Id: stdfn.h,v 1.48 2014/04/28 04:35:29 sfeam Exp $
  */
 
 /* GNUPLOT - stdfn.h */
@@ -535,8 +535,12 @@ void          rewinddir __PROTO((DIR *));
 #ifdef HAVE_SYS_PARAM_H
 # include <sys/param.h>
 #endif
+/* HBB 2012-03-18: clang brings its own <limits.h>, which lacks PATH_MAX,
+ * and on top of that, Cygwin's MAXPATHLEN is defined by reference to PATH_MAX.
+ * So even though clang sees a #defined MAXPATHLEN, there's still no 
+ * definition available OA*/
 #ifndef PATH_MAX
-# ifndef MAXPATHLEN
+# if !defined(MAXPATHLEN) || (MAXPATHLEN <= 0)
 #  define PATH_MAX 1024
 # else
 #  define PATH_MAX MAXPATHLEN
@@ -595,7 +599,7 @@ void          rewinddir __PROTO((DIR *));
 /*
  * Do any supported platforms already have a sgn function?
  */
-#define sgn(x) ((x) > 0) ? 1 : (((x) < 0) ? -1 : 0)
+#define sgn(x) (((x) > 0) ? 1 : (((x) < 0) ? -1 : 0))
 
 /* Prototypes from "stdfn.c" */
 

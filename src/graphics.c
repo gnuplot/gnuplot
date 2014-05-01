@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.453 2014/04/28 04:35:29 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.454 2014/04/28 18:50:13 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -162,7 +162,7 @@ static void plot_parallel __PROTO((struct curve_points *plot));
 #define f_min(a,b) GPMIN((a),(b))
 
 /* True if a and b have the same sign or zero (positive or negative) */
-#define samesign(a,b) (sgn(a) * sgn(b) >= 0)
+#define samesign(a,b) ((sgn(a) * sgn(b)) >= 0)
 /*}}} */
 
 static void
