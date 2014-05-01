@@ -1,5 +1,5 @@
 #
-# $Id: all.dem,v 1.58 2014/04/07 23:36:14 sfeam Exp $
+# $Id: all.dem,v 1.59 2014/04/18 21:06:32 sfeam Exp $
 #
 # Executes all demos (OK, MOST demos) in this directory.
 # This serves as a series of unit tests for non-interactive capabilities.
@@ -157,8 +157,9 @@ print "******************** file bivariat.dem ********************"
 load "bivariat.dem"
 reset
 
-print "******************** file timedat.dem ********************"
+print "******************** Time/Date data ********************"
 load "timedat.dem"
+load "gantt.dem"
 reset
 
 print "******************** file animate.dem ********************"

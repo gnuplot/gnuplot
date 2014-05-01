@@ -112,6 +112,7 @@ To view the results you need a browser that supports the HTML5 'canvas' element.
     <li><a href="scatter.html">non-gridded data</a></li>
     <li><a href="running_avg.html">running averages</a></li>
     <li><a href="smooth.html">binning/histograms</a></li>
+    <li><a href="gantt.html">Gantt chart</a></li>
     <li><a href="heatmaps.html">2D and 3D heat maps</a></li>
     </ul>
 
