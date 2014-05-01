@@ -2,6 +2,8 @@
 
 	* demo/gantt.dem demo/html/*:  Add Gantt chart to demo collection.
 
+	* src/show.c:  Show "fixed" property of arrow style.
+
 2014-04-29  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/datafile.c (f_timecolumn): Replace the old 1-parameter function

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.321 2014/04/28 18:50:13 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.322 2014/04/28 21:16:13 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -3275,10 +3275,12 @@ show_arrowstyle(int tag)
 		    if (this_arrowstyle->arrow_properties.headfill != AS_NOFILL)
 			fprintf(stderr,", backangle %g deg",
 				this_arrowstyle->arrow_properties.head_backangle);
-		    fprintf(stderr,"\n");
+		} else {
+		    fprintf(stderr," (default length and angles)");
 		}
-		else
-		    fprintf(stderr," (default length and angles)\n");
+
+		fprintf(stderr, 
+		    (this_arrowstyle->arrow_properties.head_fixedsize) ? " fixed\n" : "\n");
 	    }
 	}
     }
