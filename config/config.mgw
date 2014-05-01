@@ -1,18 +1,17 @@
 /* config.h for mingw/Makefile
  *
  * Prepared according to config.h from ./configure and by means of
- * config_strip.sh as of gnuplot 4.7 in July 2012.
+ * config_strip.sh as of gnuplot 5.0 in April 2014.
  */
 
-
-/* Define if you want to use the CGI terminal under SCO. */
-/* #undef CGI */
+/* Define to allow use of certain deprecated syntax. */
+/* #undef BACKWARDS_COMPATIBLE */
 
 /* Define if you want online help and subtopic tables sorted by column. */
 /* #undef COLUMN_HELP */
 
 /* Provide contact info for gnuplot develoment */
-/* #undef DEVELOPMENT_VERSION */
+#define DEVELOPMENT_VERSION 1
 
 /* Define to treat spacebar like any other keystroke. */
 /* #undef DISABLE_SPACE_RAISES_CONSOLE */
@@ -25,6 +24,9 @@
 
 /* Define if this system uses a 32-bit DOS extender (djgpp/emx). */
 /* #undef DOS32 */
+
+/* Define to support boxed labels */
+#define EAM_BOXED_TEXT 1
 
 /* Define to allow placement of rectangles and other objects */
 #define EAM_OBJECTS 1
@@ -44,9 +46,6 @@
 
 /* Define if you want to use a gnuplot history file. */
 #define GNUPLOT_HISTORY 1
-
-/* Define to allow command line macros. */
-#define GP_MACROS 1
 
 /* Define if you want to use a newer version of libgrx under MSDOS/djgpp. */
 /* #undef GRX21 */
@@ -78,6 +77,12 @@
 /* Define to 1 if you have the <dirent.h> header file. */
 #define HAVE_DIRENT_H 1
 
+/* Define to 1 if you have the <dlfcn.h> header file. */
+/* #undef HAVE_DLFCN_H */
+
+/* Define to 1 if you have the <dl.h> header file. */
+/* #undef HAVE_DL_H */
+
 /* Define to 1 if you have the `doprnt' function. */
 /* #undef HAVE_DOPRNT */
 
@@ -98,13 +103,22 @@
 #define HAVE_ERRNO_H 1
 
 /* Define if external function plugins are to be supported.  */
-#define HAVE_EXTERNAL_FUNCTIONS 1
+/* #undef HAVE_EXTERNAL_FUNCTIONS */
+
+/* Define to 1 if you have the `fdopen' function. */
+#define HAVE_FDOPEN 1
 
 /* Define to 1 if you have the <float.h> header file. */
 #define HAVE_FLOAT_H 1
 
 /* Define to 1 if you have the `fork' function. */
 /* #undef HAVE_FORK */
+
+/* Define to 1 if you're using the Aquaterm framework on Mac OS X */
+/* #undef HAVE_FRAMEWORK_AQUATERM */
+
+/* Define to 1 if fseeko (and presumably ftello) exists and is declared. */
+/* #undef HAVE_FSEEKO */
 
 /* Define to 1 if you have the `gamma' function. */
 /* #undef HAVE_GAMMA */
@@ -138,6 +152,9 @@
 /* Define to 1 if you have the <ggi/xmi.h> header file. */
 /* #undef HAVE_GGI_XMI_H */
 
+/* Define to include support for gpic terminal */
+/* #undef HAVE_GPIC */
+
 /* Define to use gtk/gdk tweaks */
 /* #undef HAVE_GTK */
 
@@ -168,8 +185,11 @@
 /* Comment: lgamma() is available in MingW 3.4.4, but without signgam required by f_gamma() */
 #endif
 
-/* Define to 1 if you're using the aquaterm library on Mac OS X */
-/* #undef HAVE_LIBAQUATERM */
+/* Define if you have the caca library. */
+/* #undef HAVE_LIBCACA */
+
+/* define if you have libcerf */
+/* #undef HAVE_LIBCERF */
 
 /* Define to 1 if you have the <libc.h> header file. */
 /* #undef HAVE_LIBC_H */
@@ -230,8 +250,14 @@
 /* Define to 1 if you have the `memset' function. */
 #define HAVE_MEMSET 1
 
+/* Define to include support for mif terminal */
+/* #undef HAVE_MIF */
+
 /* Define if your pdf library doesn't support dash patterns. */
 /* #undef HAVE_NODASH_LIBPDF */
+
+/* Define to 1 if the system has the type `off_t'. */
+#define HAVE_OFF_T 1
 
 /* Define if your pdf library is too old to support patterns. */
 /* #undef HAVE_OLD_LIBPDF */
@@ -249,7 +275,7 @@
 /* #undef HAVE_POLL */
 
 /* Define to 1 if you have the <poll.h> header file. */
-#define HAVE_POLL_H 1
+/* #undef HAVE_POLL_H */
 
 /* Define to 1 if you have the `popen' function. */
 #define HAVE_POPEN 1
@@ -271,7 +297,7 @@
 
 /* Define to 1 if you have the `setvbuf' function. */
 /* #define HAVE_SETVBUF 1 */
-  /* it is defined, but setvbuf(stdout) does not work for Windows GUI redirected stdout */
+/* it is defined, but setvbuf(stdout) does not work for Windows GUI redirected stdout */
 
 /* Define to 1 if you have the <sgtty.h> header file. */
 /* #undef HAVE_SGTTY_H */
@@ -403,7 +429,7 @@
 #define HAVE_UNISTD_H 1
 
 /* Define to 1 if you have the `usleep' function. */
-/* #undef HAVE_USLEEP */
+#define HAVE_USLEEP 1
 
 /* Define to 1 if you have the <values.h> header file. */
 #define HAVE_VALUES_H 1
@@ -450,14 +476,17 @@
 /* Define to 1 if malloc(0)==0 */
 /* #undef MALLOC_ZERO_RETURNS_ZERO */
 
+/* Maximum number of parallel axes supported */
+#define MAX_PARALLEL_AXES 7
+
 /* Define if your libreadline has no rl_ding */
-/* #undef MISSING_RL_DING */
+#define MISSING_RL_DING 1
 
 /* Define if your libreadline has no rl_force_update_display */
-/* #undef MISSING_RL_FORCED_UPDATE_DISPLAY */
+#define MISSING_RL_FORCED_UPDATE_DISPLAY 1
 
 /* Define if your libreadline has no rl_complete_with_tilde_expansion */
-/* #undef MISSING_RL_TILDE_EXPANSION */
+#define MISSING_RL_TILDE_EXPANSION 1
 
 /* Define if this is an MSDOS system. */
 /* #undef MSDOS */
@@ -469,22 +498,25 @@
 /* #undef NO_MINUS_C_MINUS_O */
 
 /* Name of package */
-/* #undef PACKAGE */
+#define PACKAGE "gnuplot"
 
 /* Define to the address where bug reports for this package should be sent. */
-/* #undef PACKAGE_BUGREPORT */
+#define PACKAGE_BUGREPORT ""
 
 /* Define to the full name of this package. */
-/* #undef PACKAGE_NAME */
+#define PACKAGE_NAME "gnuplot"
 
 /* Define to the full name and version of this package. */
-/* #undef PACKAGE_STRING */
+#define PACKAGE_STRING "gnuplot 5.0"
 
 /* Define to the one symbol short name of this package. */
-/* #undef PACKAGE_TARNAME */
+#define PACKAGE_TARNAME "gnuplot"
+
+/* Define to the home page for this package. */
+#define PACKAGE_URL ""
 
 /* Define to the version of this package. */
-/* #undef PACKAGE_VERSION */
+#define PACKAGE_VERSION "5.0"
 
 /* Define if you do have the popen and pclose functions. */
 /* #undef PIPES */
@@ -506,13 +538,13 @@
 #define RETSIGTYPE void
 
 /* Define to the type of arg 1 for `select'. */
-/* #undef SELECT_TYPE_ARG1 */
+#define SELECT_TYPE_ARG1 int
 
 /* Define to the type of args 2, 3 and 4 for `select'. */
-/* #undef SELECT_TYPE_ARG234 */
+#define SELECT_TYPE_ARG234 (int *)
 
 /* Define to the type of arg 5 for `select'. */
-/* #undef SELECT_TYPE_ARG5 */
+#define SELECT_TYPE_ARG5 (struct timeval *)
 
 /* Define to 1 if the `S_IS*' macros in <sys/stat.h> do not work properly. */
 /* #undef STAT_MACROS_BROKEN */
@@ -523,14 +555,12 @@
 /* Define if you want to use the sunview terminal (sun). */
 /* #undef SUN */
 
-/* Define to support boxed labels. */
-#define EAM_BOXED_TEXT 1
-
-/* Define to use thin plate spines. */
-/* #undef THIN_PLATE_SPLINES_GRID */
-
 /* Define if the 3dkit libray is present. */
 /* #undef THREEDKIT */
+
+/* Define if your libcaca does not have caca_export_canvas_to_memory but the
+   old caca_export_memory */
+/* #undef USE_CACA_EXPORT_MEMORY */
 
 /* Define if you want to read .gnuplot from current directory (SECURITY
    RISK!). */
@@ -539,24 +569,43 @@
 /* Define if you want to use the experimental ggi driver. */
 /* #undef USE_GGI_DRIVER */
 
-/* Define if you want to have mouse support in interactive terminals. */
+/* Define if you have interactive terminals that use mouse support. */
 /* #undef USE_MOUSE */
 /* Don't change it here -- this define is set in config/mingw/Makefile. */
 
 /* Define to add support for generating a statistical summary of data */
 #define USE_STATS 1
 
+/* Enable extensions on AIX 3, Interix.  */
+#ifndef _ALL_SOURCE
+# define _ALL_SOURCE 1
+#endif
+/* Enable GNU extensions on systems that have them.  */
+#ifndef _GNU_SOURCE
+# define _GNU_SOURCE 1
+#endif
+/* Enable threading extensions on Solaris.  */
+#ifndef _POSIX_PTHREAD_SEMANTICS
+# define _POSIX_PTHREAD_SEMANTICS 1
+#endif
+/* Enable extensions on HP NonStop.  */
+#ifndef _TANDEM_SOURCE
+# define _TANDEM_SOURCE 1
+#endif
+/* Enable general extensions on Solaris.  */
+#ifndef __EXTENSIONS__
+# define __EXTENSIONS__ 1
+#endif
+
+
 /* Define to enable multi-byte font support for x11 */
 /* #undef USE_X11_MULTIBYTE */
 
 /* Version number of package */
-/* #undef VERSION */
+#define VERSION "5.0"
 
 /* Define if the vgagl libray is present. */
 /* #undef VGAGL */
-
-/* Define to allow zooming or refresh of volatile data. */
-#define VOLATILE_REFRESH 1
 
 /* Define if you want the wxwidgets terminal. */
 /* #undef WXWIDGETS */
@@ -566,12 +615,31 @@
 /* #undef X11 */
 
 /* Define to 1 if the X Window System is missing or not being used. */
-/* #undef X_DISPLAY_MISSING */
+#define X_DISPLAY_MISSING 1
 
-/* Enable GNU extensions on systems that have them.  */
-#ifndef _GNU_SOURCE
-# define _GNU_SOURCE 1
+/* Enable large inode numbers on Mac OS X 10.5.  */
+#ifndef _DARWIN_USE_64_BIT_INODE
+# define _DARWIN_USE_64_BIT_INODE 1
 #endif
+
+/* Number of bits in a file offset, on hosts where this is settable. */
+/* #undef _FILE_OFFSET_BITS */
+
+/* Define to 1 to make fseeko visible on some hosts (e.g. glibc 2.2). */
+/* #undef _LARGEFILE_SOURCE */
+
+/* Define for large files, on AIX-style hosts. */
+/* #undef _LARGE_FILES */
+
+/* Define to 1 if on MINIX. */
+/* #undef _MINIX */
+
+/* Define to 2 if the system does not provide POSIX.1 features except with
+   this defined. */
+/* #undef _POSIX_1_SOURCE */
+
+/* Define to 1 if you need to in order for `stat' and other things to work. */
+/* #undef _POSIX_SOURCE */
 
 /* Define to empty if `const' does not conform to ANSI C. */
 /* #undef const */

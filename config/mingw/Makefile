@@ -1,5 +1,5 @@
 # Hello, emacs: this is a -*- Makefile -*-
-# $Id: Makefile,v 1.39 2014/03/30 17:42:42 markisch Exp $
+# $Id: Makefile,v 1.40 2014/03/31 06:04:43 markisch Exp $
 #
 # GNUPLOT Makefile for MinGW/MSYS on Windows
 # This assumes usual installation of the MinGW32 toolkit, the free
@@ -23,7 +23,7 @@
 # Comment out the definition lines to disable the according features:
 
 # Define this only if doing a release build
-#RELEASE=1
+# RELEASE=1
 
 # GIF, PNG, JPEG device drivers
 # Requires gd library. There are two possibilities how to configure these
@@ -216,7 +216,7 @@ else
   LDFLAGS += -s
 endif
 
-LDFLAGS2 = -mwindows
+LDFLAGS2 = -mwindows -Wl,--enable-auto-import
 ifdef PIPES
   OPTS += -DPIPES
   LDFLAGS2 = -mconsole
@@ -390,7 +390,7 @@ endif
 ifndef RELEASE
 VERSIONING = timestamp.h
 else
-VERSIONING = all: $(S)/version.c
+VERSIONING = $(S)/version.c
 endif
 
 PATCHLEVEL := `cat $(TOP)/PATCHLEVEL`
@@ -446,7 +446,7 @@ LDLIBS = -lkernel32 -lgdi32 -lwinspool -lcomdlg32 -lcomctl32 -ladvapi32 -lshell3
 LDLIBS += -lhtmlhelp
 LDFLAGS2 += -L$(HHWPATH)lib
 
-$(TARGET): $(OBJS) $(WINOBJS) wgplt_res.$(O)
+$(TARGET): $(OBJS) $(WINOBJS) wgplt_res.$(O) texticon.ico grpicon.ico Makefile
 	$(LDX) $(LDFLAGS) $(LDFLAGS2) -o $@ $(OBJS) $(WINOBJS) wgplt_res.$(O) $(LDLIBS)\
 	$(TERMLIBS) $(WX_LIBS) $(PANGOCAIRO_LIBS)
 

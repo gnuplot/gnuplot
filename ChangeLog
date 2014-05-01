@@ -1,5 +1,12 @@
 2014-05-01  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
+	* config/mingw/Makefile (LDFLAGS2): Add auto-import flag.
+	($(TARGET)): Add icon files and Makefile as dependencies.
+
+	* config/config.mgw, config/config.cyg: The set of used /
+	available configuration macros has changed across the past several
+	years.
+
 	* src/stdfn.h (sgn): Fix parenthesization of macro.
 	(PATH_MAX): CLang compiler on Cygwin needs a silly little tweak.
 
