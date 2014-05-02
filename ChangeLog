@@ -1,3 +1,10 @@
+2014-05-02  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/gadgets.c (clip_line): It is not safe to use (A*B >= 0) as a
+	substitute for the test (sign(A) != sign(B)).
+	It fails when A and B are integers and their product overflows.
+	Bugs #1390, #1392       See also Bug #1358
+
 2014-04-28  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/datafile.c (f_timecolumn):  This function basically does not work.

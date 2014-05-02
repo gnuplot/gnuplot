@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gadgets.c,v 1.1.3.1 2000/05/03 21:47:15 hbb Exp $"); }
+static char *RCSid() { return RCSid("$Id: gadgets.c,v 1.80.2.1 2013/08/07 16:57:15 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - gadgets.c */
@@ -268,7 +268,18 @@ draw_clip_arrow( int sx, int sy, int ex, int ey, int head)
 int
 clip_line(int *x1, int *y1, int *x2, int *y2)
 {
-    int x, y, dx, dy, x_intr[4], y_intr[4], count, pos1, pos2;
+    /* Apr 2014: This algorithm apparently assumed infinite precision
+     * integer arithmetic. It was failing when passed coordinates that
+     * were hugely out of bounds because tests for signedness of the
+     * form (dx * dy > 0) would overflow rather than correctly evaluating
+     * to (sign(dx) == sign(dy)).  Worse yet, the numerical values are
+     * used to determine which end of the segment to update.
+     * This is now addressed by making dx and dy (double) rather than (int)
+     * but it might be better to hard-code the sign tests.
+     */
+    double dx, dy;
+
+    int x, y, x_intr[4], y_intr[4], count, pos1, pos2;
     int x_max, x_min, y_max, y_min;
     pos1 = clip_point(*x1, *y1);
     pos2 = clip_point(*x2, *y2);
