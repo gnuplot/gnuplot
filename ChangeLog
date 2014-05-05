@@ -5,6 +5,9 @@
 	Allow object borders to have a full set of line properties including
 	dashtype.
 
+	* docs/gnuplot.doc: Update documentation to better describe recent
+	changes.
+
 2014-05-05  Tatsuro MATSUOKA <tmacchant3@yahoo.co.jp>
 
 	* src/qtterminal/po/qtgnuplot_ja.ts: Update translations

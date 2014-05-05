@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.885 2014/04/28 21:16:13 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.886 2014/04/29 21:15:09 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -198,7 +198,7 @@ C
 
  * Text markup now supports bold and italic font settings in addition to 
  subscript, superscript, font size and other previously available properties.
- This mode is now the default. See `enhanced text`.
+ Enhanced text mode is now enabled by default. See `enhanced text`.
 
  * Interactive terminals support hypertext labels that only appear when the
  mouse hovers over the label's anchor point.
@@ -231,13 +231,18 @@ C
  VP(x,sigma,gamma).
 
  * The `import` command attaches a user-defined function name to a function
- exported by an external shared object (support is operating-system dependent).
+ provided by an external shared object (support is operating-system dependent).
  A template header and example source and make files for creating a suitable
  external shared object are provided in the demo collection.
 
  * Previous commands in the history list of an interactive session can be
  reexecuted by number.  For example, `history !5` will reexecute the command
  numbered 5 in the `history` list.
+
+ * Bit-shift operators >> and <<.
+
+ * New plot styles: `with parallelaxes`, labeled contours.
+
 3 New commands
 #start
 # history !N                               # re-execute prior command by number
@@ -611,7 +616,7 @@ C
                                times the current fontsize
    {/Times abc}                print abc in font Times at current size
    {/Times*2 abc}              print abc in font Times at twice current size
-   {/Times:Italic abc}         print abc in Times with style italic
+   {/Times:Italic abc}         print abc in font Times with style italic
    {/Arial:Bold=20 abc}        print abc in boldface Arial font size 20 
 #\begin{tabular}{|clll|} \hline
 #\multicolumn{4}{|c|}{Enhanced Text Control Codes} \\ \hline
@@ -624,7 +629,7 @@ C
 #\verb~ ~ & \verb~ ~ & ~ ~ & times the current fontsize\\
 #\verb| | & \verb|{/Times abc}| & {\rm abc} & print abc in font Times at current size\\
 #\verb| | & \verb|{/Times*2 abc}| & \Large{\rm abc} & print abc in font Times at twice current size\\
-#\verb| | & \verb|{/Times:Italic abc}| & {\it abc} & print abc Times with style italic\\
+#\verb| | & \verb|{/Times:Italic abc}| & {\it abc} & print abc in font Times with style italic\\
 #\verb| | & \verb|{/Arial:Bold=20 abc}| & \Large\textsf{\textbf{abc}} & print abc in boldface Arial font size 20\\
 %c c l .
 %.TE", /* ugly - doc2ms uses @ for column separator, but here we */
@@ -2408,7 +2413,7 @@ Ffigure_newsyntax
 ?dashtype
 =dashtype
  In gnuplot version 5 the dash pattern (`dashtype`) is a seperate property 
- associated with each line, equivalent to `linecolor` or `linewidth`.  It is not
+ associated with each line, analogous to `linecolor` or `linewidth`.  It is not
  necessary to place the current terminal in a special mode just to draw dashed
  lines.  I.e. the command `set term <termname> {solid|dashed}` is now ignored.
 
@@ -2444,15 +2449,13 @@ Ffigure_newsyntax
 
 3 linestyles vs linetypes
 ? linestyles vs linetypes
- Lines can have additional properties such as linewidth.  You can associate
- these various properties, as well as equivalent properties for point symbols,
- into user-defined "linestyles" using the command `set style line`.  Once
- you have defined a linestyle, you can use it in a plot command to control
- the appearance of one or more plot elements.
-
- Whereas `linetypes` are permanent (they last until you explicitly redefine
- them), `linestyles` are temporary.  They only last until the next reset 
- of the graphics state. 
+ A `linestyle` is a temporary association of properties linecolor, linewidth,
+ dashtype, and pointtype.  It is defined using the command `set style line`.
+ Once you have defined a linestyle, you can use it in a plot command to control
+ the appearance of one or more plot elements.  In other words, it is just like
+ a linetype except for its lifetime.  Whereas `linetypes` are permanent (they
+ last until you explicitly redefine them), `linestyles` last until the next
+ reset of the graphics state. 
 
  Examples:
 
@@ -10160,7 +10163,7 @@ Ffigure_missing
          <object-type> <object-properties>
          {front|back|behind} {clip|noclip}
          {fc|fillcolor <colorspec>} {fs <fillstyle>}
-         {default} {lw|linewidth <width>}
+         {default} {lw|linewidth <width>} {dt|dashtype <dashtype>}
      unset object <index>
 
  <object-type> is either `rectangle`, `ellipse`, `circle`, or `polygon`.
