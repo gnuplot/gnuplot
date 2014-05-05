@@ -300,6 +300,10 @@ void QtGnuplotScene::processEvent(QtGnuplotEventType type, QDataStream& in)
 	{
 		QPointF point; in >> point;
 		int style    ; in >> style;
+
+		// Make sure point symbols are always drawn with a solid line
+		m_currentPen.setStyle(Qt::SolidLine);
+
 		// Append the point to a points item to speed-up drawing
 		if (!m_inKeySample)
 			m_currentPointsItem->addPoint(clipPoint(point), style, m_currentPointSize, m_currentPen);
