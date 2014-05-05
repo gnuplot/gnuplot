@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.225 2014/04/02 21:35:46 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.226 2014/04/25 00:22:23 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -1886,6 +1886,19 @@ eval_3dplots()
 		} while (df_return != DF_EOF);
 
 		df_close();
+
+		/* Plot-type specific range-fiddling */
+		if (this_plot->plot_style == IMPULSES) {
+		    if (axis_array[FIRST_Z_AXIS].autoscale & AUTOSCALE_MIN) {
+			if (axis_array[FIRST_Z_AXIS].min > 0)
+			    axis_array[FIRST_Z_AXIS].min = 0;
+		    }
+		    if (axis_array[FIRST_Z_AXIS].autoscale & AUTOSCALE_MAX) {
+			if (axis_array[FIRST_Z_AXIS].max < 0)
+			    axis_array[FIRST_Z_AXIS].max = 0;
+		    }
+		}
+
 		/*}}} */
 
 	    } else {		/* not a data file */

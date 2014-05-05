@@ -15,6 +15,9 @@
 	term/x11.trm src/term.c:  Terminals that have been upgraded to version 5
 	dash handling should ignore the "dashed/solid" terminal setting.
 
+	* src/plot2d.c (impulse_range_fiddling) src/plot3d.c:  Autoscaled plots
+	"with impulses" should include y=0 (z=0 in 3D).
+
 2014-05-05  Tatsuro MATSUOKA <tmacchant3@yahoo.co.jp>
 
 	* src/qtterminal/po/qtgnuplot_ja.ts: Update translations

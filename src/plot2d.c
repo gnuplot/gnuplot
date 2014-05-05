@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.327 2014/04/07 22:52:35 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.328 2014/04/25 00:22:23 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -72,6 +72,7 @@ static void parametric_fixup __PROTO((struct curve_points * start_plot, int *plo
 static void box_range_fiddling __PROTO((struct curve_points *plot));
 static void boxplot_range_fiddling __PROTO((struct curve_points *plot));
 static void histogram_range_fiddling __PROTO((struct curve_points *plot));
+static void impulse_range_fiddling __PROTO((struct curve_points *plot));
 static int check_or_add_boxplot_factor __PROTO((struct curve_points *plot, char* string, double x));
 static void add_tics_boxplot_factors __PROTO((struct curve_points *plot));
 static void sort_boxplot_factors __PROTO((struct curve_points *plot));
@@ -1773,6 +1774,21 @@ polar_range_fiddling(struct curve_points *plot)
     }
 }
 
+/* Extend auto-scaling of y-axis to include zero */
+static void
+impulse_range_fiddling(struct curve_points *plot)
+{
+    if (axis_array[plot->y_axis].autoscale & AUTOSCALE_MIN) {
+	if (axis_array[plot->y_axis].min > 0)
+	    axis_array[plot->y_axis].min = 0;
+    }
+    if (axis_array[plot->y_axis].autoscale & AUTOSCALE_MAX) {
+	if (axis_array[plot->y_axis].max < 0)
+	    axis_array[plot->y_axis].max = 0;
+    }
+}
+
+
 /* store_label() is called by get_data for each point */
 /* This routine is exported so it can be shared by plot3d */
 struct text_label *
@@ -2720,6 +2736,9 @@ eval_plots()
 		    box_range_fiddling(this_plot);
 		if (this_plot->plot_style == BOXPLOT)
 		    boxplot_range_fiddling(this_plot);
+		if (this_plot->plot_style == IMPULSES)
+		    impulse_range_fiddling(this_plot);
+
 		if (this_plot->plot_style == RGBIMAGE || this_plot->plot_style == RGBA_IMAGE) {
 		    if (CB_AXIS.autoscale & AUTOSCALE_MIN)
 			CB_AXIS.min = 0;
