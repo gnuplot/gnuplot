@@ -150,7 +150,7 @@ d&apos;arrière plan</translation>
     </message>
     <message>
         <location filename="../QtGnuplotSettings.ui" line="101"/>
-        <source>Inline</source>
+        <source>Above plot</source>
         <translation>Incrusté</translation>
     </message>
     <message>

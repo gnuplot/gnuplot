@@ -130,17 +130,17 @@
     <message>
         <location filename="../QtGnuplotSettings.ui" line="71"/>
         <source>Rounded line ends</source>
-        <translation>線の端を丸く</translation>
+	<translation>線の端を丸める</translation>
     </message>
     <message>
         <location filename="../QtGnuplotSettings.ui" line="80"/>
         <source>Mouse label</source>
-        <translation>マウス座標</translation>
+        <translation>マウス座標の表示場所</translation>
     </message>
     <message>
         <location filename="../QtGnuplotSettings.ui" line="91"/>
         <source>Status bar</source>
-        <translation>状態バー</translation>
+        <translation>ステイタスバー</translation>
     </message>
     <message>
         <location filename="../QtGnuplotSettings.ui" line="96"/>
@@ -149,13 +149,13 @@
     </message>
     <message>
         <location filename="../QtGnuplotSettings.ui" line="101"/>
-        <source>Inline</source>
-        <translation>描画の上</translation>
+        <source>Above plot</source>
+        <translation>グラフの上</translation>
     </message>
     <message>
         <location filename="../QtGnuplotSettings.ui" line="106"/>
         <source>None</source>
-        <translation>無し</translation>
+        <translation>表示しない</translation>
     </message>
 </context>
 </TS>
