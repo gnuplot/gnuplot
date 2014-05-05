@@ -1,3 +1,10 @@
+2014-05-05  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/gp_types.h src/graphics.c (place_objects do_rectangle)
+	src/misc.c (lp_parse) src/save.c (save_object) src/set.c (set_obj):
+	Allow object borders to have a full set of line properties including
+	dashtype.
+
 2014-05-05  Tatsuro MATSUOKA <tmacchant3@yahoo.co.jp>
 
 	* src/qtterminal/po/qtgnuplot_ja.ts: Update translations

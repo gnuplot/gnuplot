@@ -1,5 +1,5 @@
 /*
- * $Id: gp_types.h,v 1.60 2014/02/28 00:24:21 sfeam Exp $
+ * $Id: gp_types.h,v 1.61 2014/04/25 00:22:23 sfeam Exp $
  */
 
 /* GNUPLOT - gp_types.h */
@@ -179,10 +179,10 @@ typedef struct coordinate {
 } coordinate;
 
 typedef enum lp_class {
-	LP_TYPE  = 0,	/* lp_style_type defined by 'set linetype' */
-	LP_STYLE = 1,	/* lp_style_type defined by 'set style line' */
-	LP_ADHOC = 2,	/* lp_style_type used for single purpose */
-	LP_FILL  = 3	/* only interested in fillcolor (may not be needed) */
+	LP_TYPE   = 0,	/* lp_style_type defined by 'set linetype' */
+	LP_STYLE  = 1,	/* lp_style_type defined by 'set style line' */
+	LP_ADHOC  = 2,	/* lp_style_type used for single purpose */
+	LP_NOFILL = 3	/* special treatment of fillcolor */
 } lp_class;
 
 #endif /* GNUPLOT_GPTYPES_H */

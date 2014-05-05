@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.454 2014/04/28 18:50:13 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.455 2014/05/01 19:50:15 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -139,7 +139,7 @@ static void hyperplane_between_points __PROTO((double *p1, double *p2, double *w
 #ifdef EAM_OBJECTS
 static void plot_circles __PROTO((struct curve_points *plot));
 static void plot_ellipses __PROTO((struct curve_points *plot));
-static void do_rectangle __PROTO((int dimensions, t_object *this_object, int style));
+static void do_rectangle __PROTO((int dimensions, t_object *this_object, fill_style_type *fillstyle));
 #endif
 
 static void plot_parallel __PROTO((struct curve_points *plot));
@@ -347,7 +347,6 @@ place_objects(struct object *listhead, int layer, int dimensions)
     for (this_object = listhead; this_object != NULL; this_object = this_object->next) {
 	struct lp_style_type lpstyle;
 	struct fill_style_type *fillstyle;
-	double border_width;
 
 	if (this_object->layer != layer)
 	    continue;
@@ -358,10 +357,12 @@ place_objects(struct object *listhead, int layer, int dimensions)
 	    lpstyle = default_rectangle.lp_properties;
 	else
 	    lpstyle = this_object->lp_properties;
-	border_width = lpstyle.l_width;
-	if (lpstyle.pm3d_color.type == TC_LT)
-	    load_linetype(&lpstyle, lpstyle.pm3d_color.lt + 1);
-	lpstyle.l_width = border_width;
+	
+	if (lpstyle.pm3d_color.type == TC_LT) {
+	    lp_style_type temp;
+	    load_linetype(&temp, lpstyle.pm3d_color.lt + 1);
+	    lpstyle.pm3d_color = temp.pm3d_color;
+	}
 
 	if (this_object->fillstyle.fillstyle == FS_DEFAULT
 	    && this_object->object_type == OBJ_RECTANGLE)
@@ -369,6 +370,8 @@ place_objects(struct object *listhead, int layer, int dimensions)
 	else
 	    fillstyle = &this_object->fillstyle;
 	style = style_from_fill(fillstyle);
+
+	term_apply_lp_properties(&lpstyle);
 
 	switch (this_object->object_type) {
 
@@ -389,8 +392,6 @@ place_objects(struct object *listhead, int layer, int dimensions)
 	    } else
 		break;
 
-	    term_apply_lp_properties(&lpstyle);
-
 	    if ((e->center.scalex == screen || e->center.scaley == screen) 
 	    ||  (this_object->clip == OBJ_NOCLIP))
 	    	clip_area = &canvas;
@@ -409,8 +410,6 @@ place_objects(struct object *listhead, int layer, int dimensions)
 	{
 	    t_ellipse *e = &this_object->o.ellipse;
 	    BoundingBox *clip_save = clip_area;
-
-	    term_apply_lp_properties(&lpstyle);
 
 	    if ((e->center.scalex == screen || e->center.scaley == screen)
 	    ||  (this_object->clip == OBJ_NOCLIP))
@@ -433,8 +432,6 @@ place_objects(struct object *listhead, int layer, int dimensions)
 
 	case OBJ_POLYGON:
 	{
-	    term_apply_lp_properties(&lpstyle);
-
 	    do_polygon(dimensions, &this_object->o.polygon, style, this_object->clip);
 
 	    /* Retrace the border if the style requests it */
@@ -446,7 +443,7 @@ place_objects(struct object *listhead, int layer, int dimensions)
 
 	case OBJ_RECTANGLE:
 	{
-	    do_rectangle(dimensions, this_object, style);
+	    do_rectangle(dimensions, this_object, fillstyle);
 	    break;
 	}
 
@@ -3851,15 +3848,14 @@ attach_title_to_plot(struct curve_points *this_plot, legend_key *key)
 
 #ifdef EAM_OBJECTS
 void
-do_rectangle( int dimensions, t_object *this_object, int style )
+do_rectangle( int dimensions, t_object *this_object, fill_style_type *fillstyle )
 {
     double x1, y1, x2, y2;
     int x, y;
+    int style;
     unsigned int w, h;
     TBOOLEAN clip_x = FALSE;
     TBOOLEAN clip_y = FALSE;
-    struct lp_style_type lpstyle;
-    struct fill_style_type *fillstyle;
     t_rectangle *this_rect = &this_object->o.rectangle;
 
 	if (this_rect->type == 1) {	/* specified as center + size */
@@ -3937,32 +3933,11 @@ do_rectangle( int dimensions, t_object *this_object, int style )
 	if (w == 0 || h == 0)
 	    return;
 
-	/* First the fill color */
-	if (this_object->lp_properties.l_type == LT_DEFAULT)
-	    lpstyle = default_rectangle.lp_properties;
-	else
-	    lpstyle = this_object->lp_properties;
-
-	if (this_object->fillstyle.fillstyle == FS_DEFAULT)
-	    fillstyle = &default_rectangle.fillstyle;
-	else
-	    fillstyle = &this_object->fillstyle;
-
-	if (lpstyle.pm3d_color.type == TC_LT)
-	    load_linetype(&lpstyle, lpstyle.pm3d_color.lt + 1);
-	if (lpstyle.l_width > 0)
-	    lpstyle.l_width = this_object->lp_properties.l_width;
-	term_apply_lp_properties(&lpstyle);
-
 	style = style_from_fill(fillstyle);
 	if (style != FS_EMPTY && term->fillbox)
 		(*term->fillbox) (style, x, y, w, h);
 
 	/* Now the border */
-	if (this_object->lp_properties.l_type == LT_DEFAULT)
-	    lpstyle = default_rectangle.lp_properties;
-	else
-	    lpstyle = this_object->lp_properties;
 	if (need_fill_border(fillstyle)) {
 	    newpath();
 	    (*term->move)   (x, y);

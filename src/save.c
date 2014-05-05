@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.250 2014/04/25 18:51:40 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.251 2014/04/28 18:50:13 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -1642,7 +1642,10 @@ save_object(FILE *fp, int tag)
 
 	    if (this_object->lp_properties.l_width)
 		    fprintf(fp, "lw %.1f ",this_object->lp_properties.l_width);
-	    fprintf(fp, "fc ");
+	    if (this_object->lp_properties.d_type)
+		    save_dashtype(fp, this_object->lp_properties.d_type,
+					&this_object->lp_properties.custom_dash_pattern);
+	    fprintf(fp, " fc ");
 	    if (this_object->lp_properties.l_type == LT_DEFAULT)
 		    fprintf(fp,"default");
 	    else /* FIXME: Broke with removal of use_palette? */

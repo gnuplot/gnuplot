@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.449 2014/04/25 00:22:23 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.450 2014/04/28 21:16:13 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -3954,11 +3954,10 @@ set_obj(int tag, int obj_type)
     t_object *prev_object = NULL;
     TBOOLEAN got_fill = FALSE;
     TBOOLEAN got_lt = FALSE;
-    TBOOLEAN got_lw = FALSE;
+    TBOOLEAN got_fc = FALSE;
     TBOOLEAN got_corners = FALSE;
     TBOOLEAN got_center = FALSE;
     TBOOLEAN got_origin = FALSE;
-    double lw = 1.0;
 
     c_token++;
 
@@ -4239,7 +4238,7 @@ set_obj(int tag, int obj_type)
 	}
 
 	/* Parse the colorspec */
-	if (!got_lt) {
+	if (!got_fc) {
 	    if (equals(c_token,"fc") || almost_equals(c_token,"fillc$olor")) {
 		this_object->lp_properties.l_type = LT_BLACK; /* Anything but LT_DEFAULT */
 		parse_colorspec(&this_object->lp_properties.pm3d_color, TC_FRAC);
@@ -4248,28 +4247,27 @@ set_obj(int tag, int obj_type)
 	    }
 
 	    if (c_token != save_token) {
-		got_lt = TRUE;
+		got_fc = TRUE;
 		continue;
 	    }
 	}
 
-	/* And linewidth */
-	if (!got_lw) {
-	    if (equals(c_token,"lw") || almost_equals(c_token,"linew$idth")) {
-		c_token++;
-		lw = real_expression();
-	    }
+	/* And line properties (will be used for the object boder if the fillstyle uses one */
+	/* LP_NOFILL means don't eat fillcolor here since that is set separately with "fc" */
+	if (!got_lt) {
+	    lp_style_type lptmp = this_object->lp_properties;
+	    lp_parse(&lptmp, LP_NOFILL, FALSE);
 	    if (c_token != save_token) {
-		got_lw = TRUE;
+		this_object->lp_properties.l_width = lptmp.l_width;
+		this_object->lp_properties.d_type = lptmp.d_type;
+		this_object->lp_properties.custom_dash_pattern = lptmp.custom_dash_pattern;
+		got_lt = TRUE;
 		continue;
 	    }
 	}
 
 	int_error(c_token, "Unrecognized or duplicate option");
     }
-
-    if (got_lw)
-	this_object->lp_properties.l_width = lw;
 
     if (got_center && got_corners)
 	int_error(NO_CARET,"Inconsistent options");

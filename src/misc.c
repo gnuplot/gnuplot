@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.182 2014/04/25 00:22:23 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.183 2014/04/25 18:49:54 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -1025,8 +1025,15 @@ lp_parse(struct lp_style_type *lp, lp_class destination_class, TBOOLEAN allow_po
 	    continue;
 	}
 
+	/* This is so that "set obj ... lw N fc <colorspec>" doesn't eat */
+	/* up the colorspec as a line property.  We need to parse it later */
+	/* as a _fill_ property */
+	if ((destination_class == LP_NOFILL)
+	&&  (equals(c_token,"fc") || almost_equals(c_token,"fillc$olor")))
+	    break;
+
 	if (equals(c_token,"lc") || almost_equals(c_token,"linec$olor")
-	    ||  equals(c_token,"fc") || almost_equals(c_token,"fillc$olor")
+	||  equals(c_token,"fc") || almost_equals(c_token,"fillc$olor")
 	   ) {
 	    if (set_pal++)
 		break;
