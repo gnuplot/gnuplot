@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: post.trm,v 1.281 2014/03/21 21:00:11 sfeam Exp $
+ * $Id: post.trm,v 1.282 2014/04/19 23:42:37 sfeam Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -610,7 +610,7 @@ PS_options()
     char tmp_term_options[MAX_LINE_LEN+1] = "";
 
     TBOOLEAN set_orientation = FALSE, set_enhanced = FALSE, set_plex = FALSE;
-    TBOOLEAN set_level = FALSE, set_color = FALSE, set_dashed = FALSE;
+    TBOOLEAN set_level = FALSE, set_color = FALSE;
     TBOOLEAN set_dashlen = FALSE, set_linewidth = FALSE, set_round = FALSE;
     TBOOLEAN set_clip = FALSE, set_palfunc = FALSE, set_colortext = FALSE;
     TBOOLEAN set_standalone = FALSE, set_epslheader = FALSE;
@@ -890,18 +890,8 @@ PS_options()
 	    c_token++;
 	    break;
 	case PS_SOLIDE:
-	    if (set_dashed)
-		int_error(c_token,
-			  "extraneous argument in set terminal %s",term->name);
-	    set_dashed = TRUE;
-	    ps_params->solid = TRUE;
-	    c_token++;
-	    break;
 	case PS_DASHED:
-	    if (set_dashed)
-		int_error(c_token,
-			  "extraneous argument in set terminal %s",term->name);
-	    set_dashed = TRUE;
+	    /* Version 5 always allows dashes */
 	    ps_params->solid = FALSE;
 	    c_token++;
 	    break;
@@ -1259,11 +1249,10 @@ PS_options()
 	term_options[0] = '\0';
 
     sprintf(tmp_term_options,"   %s %s %s \\\n\
-   %s dashlength %.1f linewidth %.1f %s %s \\\n",
+   dashlength %.1f linewidth %.1f %s %s \\\n",
 	    ps_params->level1 ? "level1" : (ps_params->level3 ? "level3" : "leveldefault"),
 	    ps_params->color ? "color" : "monochrome",
 	    ps_params->blacktext ? "blacktext" : "colortext",
-	    ps_params->solid ? "solid" : "dashed",
 	    ps_params->dash_length,
 	    ps_params->linewidth_factor,
 	    ps_params->rounded ? "rounded" : "butt",
@@ -4361,7 +4350,6 @@ START_HELP(00psglobal)
 "                               {level1 | leveldefault | level3}",\
 "                               {color | colour | monochrome}",\
 "                               {background <rgbcolor> | nobackground}",\
-"                               {solid | dashed}",\
 "                               {dashlength | dl <DL>}",\
 "                               {linewidth | lw <LW>}",\
 "                               {rounded | butt}",\
@@ -4382,8 +4370,7 @@ START_HELP(00psglobal)
 " drawing elements. Further, `monochrome` uses gray `palette` but it does not",\
 " change color of objects specified with an explicit `colorspec`."\
 "",\
-" `solid` draws all plots with solid lines, overriding any dashed patterns.",\
-" `dashlength` or `dl` scales the length of the dashed-line segments by <DL>,",\
+" `dashlength` or `dl` scales the length of dashed-line segments by <DL>,",\
 " which is a floating-point number greater than zero.",\
 " `linewidth` or `lw` scales all linewidths by <LW>.",\
 "",\
@@ -4666,7 +4653,7 @@ PS_COMMON_DOC1
 " Look there if you want to know what they do.",
 "",
 " Examples:",
-"       set term pslatex monochrome dashed rotate       # set to defaults",
+"       set term pslatex monochrome rotate       # set to defaults",
 " To write the PostScript commands into the file \"foo.ps\":",
 "       set term pslatex auxfile",
 "       set output \"foo.tex\"; plot ...; set output",
@@ -4730,7 +4717,7 @@ PS_COMMON_PROLOG_INFO
 " \"Symbol-Oblique\".",
 "",
 " `default` sets all options to their defaults: `landscape`, `monochrome`,",
-" `dashed`, `dl 1.0`, `lw 1.0`, `defaultplex`, `noenhanced`, \"Helvetica\" and",
+" `dl 1.0`, `lw 1.0`, `defaultplex`, `noenhanced`, \"Helvetica\" and",
 " 14pt.  Default size of a PostScript plot is 10 inches wide and 7 inches high.",
 PS_COMMON_DOC1
 " Fonts listed by `fontfile` or `fontfile add` encapsulate the font",

@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: cairo.trm,v 1.67 2014/03/18 22:10:43 sfeam Exp $
+ * $Id: cairo.trm,v 1.68 2014/04/18 04:12:47 sfeam Exp $
  */
 
 /* GNUPLOT - cairo.trm */
@@ -356,12 +356,10 @@ TERM_PUBLIC void cairotrm_options()
 			    cairo_params->lw = cairo_params_default->lw;
 			break;
 		case CAIROTRM_DASHED:
+		case CAIROTRM_SOLID:
+			/* dashes always enabled in version 5 */
 			c_token++;
 			cairo_params->dashed = TRUE;
-			break;
-		case CAIROTRM_SOLID:
-			c_token++;
-			cairo_params->dashed = FALSE;
 			break;
 		case CAIROTRM_MONO:
 			c_token++;
@@ -567,9 +565,6 @@ TERM_PUBLIC void cairotrm_options()
 
 	if (cairo_params->mono)
 		strncat(term_options, " monochrome", sizeof(term_options)-strlen(term_options)-1);
-
-	if (cairo_params->dashed)
-		strncat(term_options, " dashed", sizeof(term_options)-strlen(term_options)-1);
 
 	if (1 || set_size) {
 		if (cairo_params->explicit_units == CM)
@@ -1428,7 +1423,7 @@ START_HELP(cairolatex)
 "                      {standalone | input}",
 "                      {blacktext | colortext | colourtext}",
 "                      {header <header> | noheader}",
-"                      {mono|color} {solid|dashed}",
+"                      {mono|color}",
 "                      {{no}transparent} {{no}crop} {background <rgbcolor>}",
 "                      {font <font>} {fontscale <scale>}",
 "                      {linewidth <lw>} {rounded|butt|square} {dashlength <dl>}",
@@ -1586,7 +1581,7 @@ START_HELP(pdfcairo)
 "",
 " Syntax:",
 "         set term pdfcairo",
-"                      {{no}enhanced} {mono|color} {solid|dashed}",
+"                      {{no}enhanced} {mono|color}",
 "                      {font <font>} {fontscale <scale>}",
 "                      {linewidth <lw>} {rounded|butt|square} {dashlength <dl>}",
 "                      {background <rgbcolor>}",
@@ -1674,7 +1669,7 @@ START_HELP(pngcairo)
 "",
 " Syntax:",
 "         set term pngcairo",
-"                      {{no}enhanced} {mono|color} {solid|dashed}",
+"                      {{no}enhanced} {mono|color}",
 "                      {{no}transparent} {{no}crop} {background <rgbcolor>",
 "                      {font <font>} {fontscale <scale>}",
 "                      {linewidth <lw>} {rounded|butt|square} {dashlength <dl>}",

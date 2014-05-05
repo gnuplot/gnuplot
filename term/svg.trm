@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: svg.trm,v 1.165 2014/04/18 04:08:27 sfeam Exp $
+ * $Id: svg.trm,v 1.166 2014/04/18 18:39:50 sfeam Exp $
  */
 
 /*------------------------------------------------------------------------------------------------------------------------------------
@@ -209,7 +209,6 @@ static TBOOLEAN ENHsvg_preserve_spaces = FALSE;
 
 /* Support for dashed lines */
 #define SVG_dashtypes 5
-static TBOOLEAN SVG_dashed = FALSE;
 static char *SVG_defaultdashpattern[SVG_dashtypes] = {
     "", " 5,8", " 2,4", " 8,4,2,4", " 9,4,1,4,1,4"
 };
@@ -678,15 +677,9 @@ SVG_options ()
 	    continue;
 	}
 
-	if (equals(c_token, "solid")) {
+	/* Not used in version 5 */
+	if (equals(c_token, "solid") || almost_equals(c_token, "dash$ed")) {
 	    c_token++;
-	    SVG_dashed = FALSE;
-	    continue;
-	}
-									
-	if (almost_equals(c_token, "dash$ed")) {
-	    c_token++;
-	    SVG_dashed = TRUE;
 	    continue;
 	}
 
@@ -732,11 +725,8 @@ SVG_options ()
     sprintf(term_options + strlen(term_options),
 	SVG_linecap == ROUNDED ? "rounded " : SVG_linecap == SQUARE ? "square " : "butt ");
 
-    if (SVG_dashed)
-	sprintf(term_options + strlen(term_options),
-		"dashed dashlength %.1f ", SVG_dashlength);
-    else
-	sprintf(term_options + strlen(term_options), "solid ");
+    sprintf(term_options + strlen(term_options),
+	    "dashlength %.1f ", SVG_dashlength);
 
     if (SVG_linewidth_factor != 1.0) {
 	sprintf(term_options + strlen(term_options),

@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: x11.trm,v 1.219 2014/03/19 05:00:32 sfeam Exp $
+ * $Id: x11.trm,v 1.220 2014/04/30 04:49:45 sfeam Exp $
  *
  */
 
@@ -448,13 +448,14 @@ X11_options()
     TBOOLEAN set_reset = FALSE, set_persist = FALSE, set_raise = FALSE, set_font = FALSE;
     TBOOLEAN set_replotonresize = FALSE;
     TBOOLEAN set_ctrlq = FALSE;
-    TBOOLEAN set_title = FALSE, set_number = FALSE, set_close = FALSE, set_solid = FALSE;
+    TBOOLEAN set_title = FALSE, set_number = FALSE, set_close = FALSE;
 #ifdef EXTERNAL_X11_WINDOW
     unsigned long existing_X11_window_id = 0;
     TBOOLEAN set_window = FALSE;
 #endif
 
-    do_raise = dashedlines = ctrlq = UNSET;
+    do_raise = ctrlq = UNSET;
+    dashedlines = yes;
     replot_on_resize = UNSET;
     set_size = set_position = UNSET;
     x11_persist = persist_cl		/* previously set from command line */
@@ -498,16 +499,9 @@ X11_options()
 	    set_ctrlq = TRUE;
 	    break;
 	case X11_SOLID:
-	    dashedlines = FALSE;
-	    c_token++;
-	    if (set_solid) duplication=TRUE;
-	    set_solid = TRUE;
-	    break;
 	case X11_DASHED:
-	    dashedlines = TRUE;
+	    /* Dashes always allowed in version 5 */
 	    c_token++;
-	    if (set_solid) duplication=TRUE;
-	    set_solid = TRUE;
 	    break;
 	case X11_LINEWIDTH:
 	    c_token++;
@@ -707,9 +701,6 @@ X11_options()
     if (UNSET != ctrlq) {
 	strcat(term_options, (yes == ctrlq ? " ctrlq" : " noctrlq"));
     }
-    if (UNSET != dashedlines) {
-	strcat(term_options, (yes == dashedlines ? " dashed" : " solid"));
-    }
     if (term->put_text == ENHX11_put_text) {
 	strcat(term_options, " enhanced");
     }
@@ -811,7 +802,7 @@ X11_update_opts()
     if (!strcmp("xlib",term->name))
 	return;
 
-    if (UNSET != do_raise || UNSET != x11_persist || UNSET != dashedlines ||
+    if (UNSET != do_raise || UNSET != x11_persist || 
         UNSET != ctrlq || UNSET != replot_on_resize)
     {
 	fprintf(X11_ipc, "X %d %d %d %d %d\n", 

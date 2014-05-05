@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.291 2014/04/18 21:25:25 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.292 2014/04/25 04:23:11 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -642,24 +642,18 @@ term_apply_lp_properties(struct lp_style_type *lp)
     else /* All normal lines will be solid unless a dashtype is given */
 	(*term->linetype) (LT_SOLID);
 
-    /* Apply dashtype, which may override dot/dash pattern defined by 
-     * linetype, possibly with a custom dash pattern
-     */
+    /* Apply dashtype or user-specified dash pattern, which may override  */
+    /* the terminal-specific dot/dash pattern belonging to this linetype. */
     if (dt == DASHTYPE_CUSTOM)
 	(*term->dashtype) (dt, &custom_dash_pattern);
     else if (dt == DASHTYPE_SOLID)
 	(*term->dashtype) (dt, NULL);
     else if (dt > 0)
-	/* dash pattern was predefined somehow (not fully implemented) */
+	/* The null_dashtype() routine or a version 5 terminal's private  */
+	/* dashtype routine converts this into a call to term->linetype() */
+	/* yielding the same result as in version 4 except possibly for a */
+	/* different line width.					  */
 	(*term->dashtype) (dt, NULL);
-#if (0)
-    /* Could use this to mimic old behaviour of "set term ... dash"
-     * or introduce a new global command "set dash";
-     * I.e. all lines are treated at dt=lt.
-     */
-    else
-	(*term->dashtype) (lt, NULL);
-#endif
 
     /* Finally adjust the color of the line */
     apply_pm3dcolor(&colorspec, term);

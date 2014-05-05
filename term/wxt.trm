@@ -1,5 +1,5 @@
 /*
- * $Id: wxt.trm,v 1.38 2014/04/18 04:12:47 sfeam Exp $
+ * $Id: wxt.trm,v 1.39 2014/04/20 20:23:35 lodewyck Exp $
  */
 
 /* GNUPLOT - wxt.trm */
@@ -59,7 +59,7 @@ TERM_PUBLIC void wxt_text_wrapper __PROTO ((void));
 /* terminal state, defined extern in wxt_term.h */
 int wxt_window_number = 0;
 TBOOLEAN wxt_enhanced_enabled = TRUE;
-TBOOLEAN wxt_dashed = FALSE;
+TBOOLEAN wxt_dashed = TRUE;
 double wxt_dashlength = 1.0;
 double wxt_lw = 1.0;
 int wxt_background = 0xffffff;
@@ -304,6 +304,8 @@ TERM_PUBLIC void wxt_options()
 			set_capjoin = TRUE;
 			break;
 		case WXT_DASHED:
+		case WXT_SOLID:
+			/* dashes always enabled in version 5 */
 			c_token++;
 			wxt_dashed = TRUE;
 			break;
@@ -312,10 +314,6 @@ TERM_PUBLIC void wxt_options()
 			wxt_dashlength = real_expression();
 			if (wxt_dashlength <= 0)
 			    wxt_dashlength = 1.0;
-			break;
-		case WXT_SOLID:
-			c_token++;
-			wxt_dashed = FALSE;
 			break;
 		case WXT_LINEWIDTH:
 			c_token++;
@@ -355,9 +353,6 @@ TERM_PUBLIC void wxt_options()
 		strncat(term_options, "\"", sizeof(term_options)-strlen(term_options)-1);
 		wxt_update_title(wxt_window_number);
 	}
-
-	if (wxt_dashed)
-		strncat(term_options, " dashed",  sizeof(term_options)-strlen(term_options)-1);
 
 	if (wxt_dashlength != 1.0) {
 		char tmp_term_options[MAX_LINE_LEN+1] = "";
@@ -526,7 +521,7 @@ START_HELP(wxt)
 "                      {font <font>} {fontscale <scale>}",
 "                      {title \"title\"}",
 "                      {linewidth <lw>}",
-"                      {dashed|solid} {dashlength <dl>}",
+"                      {dashlength <dl>}",
 "                      {{no}persist}",
 "                      {{no}raise}",
 "                      {{no}ctrl}",

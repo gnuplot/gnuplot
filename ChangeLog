@@ -11,6 +11,10 @@
 	* src/qtterminal/QtGnuplotScene.cpp: Always use a solid line to draw
 	point symbols, even if the current linetype has a dash pattern.
 
+	* term/cairo.trm term/canvas.trm term/post.trm term/svg.trm term/wxt.trm
+	term/x11.trm src/term.c:  Terminals that have been upgraded to version 5
+	dash handling should ignore the "dashed/solid" terminal setting.
+
 2014-05-05  Tatsuro MATSUOKA <tmacchant3@yahoo.co.jp>
 
 	* src/qtterminal/po/qtgnuplot_ja.ts: Update translations

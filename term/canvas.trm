@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: canvas.trm,v 1.75 2013/10/07 21:43:48 sfeam Exp $
+ * $Id: canvas.trm,v 1.76 2014/04/21 22:57:25 sfeam Exp $
  *
  */
 
@@ -322,10 +322,8 @@ CANVAS_options()
 	    break;
 
 	case CANVAS_SOLID:
-	    // canvas_dashed = FALSE;
-	    break;
-
 	case CANVAS_DASHED:
+	    /* Version 5 always allows dashes */
 	    canvas_dashed = TRUE;
 	    break;
 
@@ -364,8 +362,7 @@ CANVAS_options()
     term->v_char = canvas_font_size * canvas_fontscale * CANVAS_OVERSAMPLE;
     term->h_char = canvas_font_size * canvas_fontscale * 0.8 * CANVAS_OVERSAMPLE;
 
-    sprintf(term_options, canvas_dashed ? " dashed" : " solid");
-    if (canvas_dashed && canvas_dashlength_factor != 1.0)
+    if (canvas_dashlength_factor != 1.0)
 	sprintf(term_options + strlen(term_options), " dashlength %3.1f", canvas_dashlength_factor);
     sprintf(term_options + strlen(term_options), 
 	canvas_linecap == ROUNDED ? " rounded" : 
@@ -566,11 +563,10 @@ CANVAS_graphics()
 	"    gnuplot.hypertext_list.push(newtext);\n"
 	"}\n"
     );
-    if (canvas_dashed)
-	fprintf(gpoutfile,
-	    "gnuplot.dashlength = %d;\n",
-	    (int)(400 * canvas_dashlength_factor)
-	);
+    fprintf(gpoutfile,
+	"gnuplot.dashlength = %d;\n",
+	(int)(400 * canvas_dashlength_factor)
+    );
 
     fprintf(gpoutfile,
 	"ctx.lineCap = \"%s\"; ctx.lineJoin = \"%s\";\n",
@@ -1661,7 +1657,7 @@ START_HELP(canvas)
 "                           {font {<fontname>}{,<fontsize>}} | {fsize <fontsize>}",
 "                           {{no}enhanced} {linewidth <lw>}",
 "                           {rounded | butt | square}",
-"                           {solid | dashed {dashlength <dl>}}",
+"                           {dashlength <dl>}",
 "                           {standalone {mousing} | name '<funcname>'}",
 "                           {jsdir 'URL/for/javascripts'}",
 "                           {title '<some string>'}",
