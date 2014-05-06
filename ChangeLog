@@ -1,3 +1,7 @@
+2014-05-06  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/emf.trm: Custom dashtype support.
+
 2014-05-05  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/gp_types.h src/graphics.c (place_objects do_rectangle)

@@ -1,5 +1,5 @@
 /* Hey Emacs this is -*- C -*-
- * $Id: emf.trm,v 1.93 2014/03/03 01:27:55 broeker Exp $
+ * $Id: emf.trm,v 1.94 2014/03/25 16:57:15 sfeam Exp $
  */
 
 /* GNUPLOT - emf.trm */
@@ -138,8 +138,9 @@ TERM_PUBLIC void EMF_move __PROTO((unsigned int x, unsigned int y));
 TERM_PUBLIC void EMF_dashed_vector __PROTO((unsigned int ux, unsigned int uy));
 TERM_PUBLIC void EMF_solid_vector __PROTO((unsigned int ux, unsigned int uy));
 TERM_PUBLIC void EMF_linetype __PROTO((int linetype));
+TERM_PUBLIC void EMF_dashtype __PROTO((int type, t_dashtype *custom_dash_type));
 TERM_PUBLIC void EMF_linecolor __PROTO((int color));
-TERM_PUBLIC void EMF_dashtype __PROTO((int dashtype));
+TERM_PUBLIC void EMF_load_dashtype __PROTO((int dashtype));
 TERM_PUBLIC void EMF_linewidth __PROTO((double width));
 TERM_PUBLIC void EMF_put_text __PROTO((unsigned int x, unsigned int y, const char *str));
 TERM_PUBLIC int EMF_text_angle __PROTO((int ang));
@@ -377,7 +378,7 @@ static long emf_textcolor = LT_UNDEFINED;
 static unsigned long emf_pentype = 0x2200;		/* cap=flat join=miter */
 static unsigned int emf_polyline[EMF_MAX_SEGMENTS];	/* stored polyline coordinates */
 static unsigned int emf_graphics = FALSE;
-static unsigned int emf_dashed = FALSE;
+static unsigned int emf_dashed = TRUE;
 static unsigned int emf_monochrome = FALSE;
 static unsigned int emf_background = 0xffffff; /* defaults to white */
 static double emf_linewidth;	/* line width in plot units */
@@ -399,7 +400,8 @@ static int emf_tic, emf_tic707, emf_tic866, emf_tic500, emf_tic1241, emf_tic1077
 
 static TBOOLEAN emf_tweak = TRUE;	/* Empirical hack to adjust character widths */
 static double emf_fontscale = 1.0;
-static int emf_dashtype_count = 0;	/* count > 0 if EMF_dashtype needed before drawing */
+static int emf_dashtype_count = 0;	/* count > 0 if EMF_load_dashtype needed before drawing */
+static int emf_dashpattern[8];		/* filled by EMF_dashtype */
 
 /* shige: hatch pattern (from src/win/wgraph.c) */
 static unsigned char pattern_bitmaps[][16] = {
@@ -668,7 +670,6 @@ EMF_options()
     if (!almost_equals(c_token-1, "termopt$ion")) {
 	term->xmax = EMF_XMAX;
 	term->ymax = EMF_YMAX;
-	emf_dashed = FALSE;
 	emf_monochrome = FALSE;
 	emf_background = 0xffffff;
 	emf_tweak = TRUE;
@@ -682,7 +683,6 @@ EMF_options()
 	    strcpy(emf_defaultfontname, EMF_FONTNAME);
 	    emf_defaultfontsize = EMF_FONTSIZE;
 	    emf_monochrome = FALSE;
-	    emf_dashed = FALSE;
 	    term->flags &= ~TERM_MONOCHROME;
 	    c_token++;
 	    continue;
@@ -699,8 +699,8 @@ EMF_options()
 	    c_token++;
 	    continue;
 	}
-	if (almost_equals(c_token, "da$shed")) {
-	    emf_dashed = TRUE;
+	if (almost_equals(c_token, "da$shed") || almost_equals(c_token, "s$olid")) {
+	    /* dashed lines always enabled in version 5 */
 	    c_token++;
 	    continue;
 	}
@@ -719,11 +719,6 @@ EMF_options()
 	    emf_dashlength = real_expression();
 	    if (emf_dashlength < 0.5)
 		emf_dashlength = 1.0;
-	    continue;
-	}
-	if (almost_equals(c_token, "s$olid")) {
-	    emf_dashed = FALSE;
-	    c_token++;
 	    continue;
 	}
 	if (equals(c_token, "lw") || almost_equals(c_token, "linew$idth")) {
@@ -808,9 +803,8 @@ EMF_options()
 	emf_defaultfontsize = int_expression();
     }
     
-    sprintf(term_options, "%s %s %s font \"%s,%g\"",
+    sprintf(term_options, "%s %s font \"%s,%g\"",
 	    emf_monochrome ? "monochrome" : "color",
-	    emf_dashed ? "dashed" : "solid",
 	    emf_pentype ? "butt" : "rounded",
 	    emf_defaultfontname, emf_defaultfontsize);
 
@@ -977,20 +971,36 @@ EMF_linetype(int linetype)
 {
     EMF_flush_polyline();
 
-    /* Note : separating linetype and color would have not been futile, but anyway... */
-
-#if (0)  /* Not safe because linetype/color/pen are intermixed */
-    if (linetype == emf_linetype)
-	return;
-#endif
-
     if (linetype == LT_NODRAW)
 	linetype = LT_BACKGROUND;
 	
     emf_linetype = linetype;
 
     EMF_linecolor(linetype);
-    EMF_dashtype(linetype);
+}
+
+TERM_PUBLIC void
+EMF_dashtype (int type, t_dashtype *custom_dash_type)
+{
+    int i;
+
+    switch (type) {
+
+    case DASHTYPE_SOLID:
+	EMF_load_dashtype(0);
+	break;
+
+    case DASHTYPE_CUSTOM:
+	for (i = 0; i < 8; i++)
+	    emf_dashpattern[i] = custom_dash_type->pattern[i];
+	EMF_load_dashtype(DASHTYPE_CUSTOM);
+	break;
+	
+    default:
+	EMF_load_dashtype(type);
+	break;
+
+    }
 }
 
 TERM_PUBLIC void 
@@ -1060,7 +1070,6 @@ EMF_set_color(t_colorspec *colorspec)
     */
 
     /* Force reevaluation of dash type */
-    emf_dashtype = emf_linetype;
     emf_dashtype_count++;
 }
 
@@ -1112,7 +1121,7 @@ EMF_filled_polygon(int points, gpiPoint *corners)
 	EMF_SelectObject(EMF_STOCK_OBJECT_WHITE_BRUSH);
 
 	EMF_DeleteObject(EMF_HANDLE_BRUSH);
-#if 1
+
 	if (style == FS_PATTERN || style == FS_TRANSPARENT_PATTERN) { 
 	    emf_textcolor = color;
 	    EMF_SetTextColor(emf_textcolor);
@@ -1120,7 +1129,6 @@ EMF_filled_polygon(int points, gpiPoint *corners)
 	    for (i = 15; i >= 0; i -= 2)
 	      EMF_write_long(pattern[i] | (pattern[i-1] << 8));
 	} else
-#endif
 	    EMF_CreateBrush(EMF_HANDLE_BRUSH, 0, color, 0);
 
 	EMF_SelectObject(EMF_HANDLE_BRUSH);
@@ -1170,8 +1178,8 @@ TERM_PUBLIC void
 EMF_flush_dashtype(void)
 {
     if (emf_dashtype_count > 0) {
-       EMF_dashtype(emf_dashtype);
-       emf_dashtype_count = 0;	/* EMF_dashtype clears this also (shrug) */
+       EMF_load_dashtype(emf_dashtype);
+       emf_dashtype_count = 0;
     }
 }
 
@@ -1179,19 +1187,20 @@ EMF_flush_dashtype(void)
  * Resets _both_ line color and dash type!
  */
 TERM_PUBLIC void 
-EMF_dashtype(int dashtype)
+EMF_load_dashtype(int dashtype)
 {
     int i, j;
     /* Each group of 8 entries in dot_length[] defines a dash
        pattern.  Entries in each group are alternately length of
-       whitespace and length of line, in units of 2/3 of the
-       linewidth. */
-    static int dot_length[EMF_LINE_TYPES * 8] =
+       line and length of whitespace, in units of 2/3 of the linewidth.
+     */
+    static int dot_length[(EMF_LINE_TYPES+1) * 8] =
     {				/* 0 - solid             */
-	5, 8, 5, 8, 5, 8, 5, 8,	/* 1 - dashes            */
-	4, 2, 4, 2, 4, 2, 4, 2,	/* 2 - dotted            */
-	4, 8, 4, 2, 4, 8, 4, 2,	/* 3 - dash-dot          */
-	4, 9, 4, 2, 4, 2, 0, 0,	/* 4 - dash-dot-dot      */
+	8, 5, 8, 5, 8, 5, 8, 5, /* 1 - dashes            */
+	2, 4, 2, 4, 2, 4, 2, 4, /* 2 - dotted            */
+	8, 4, 2, 4, 8, 4, 2, 4, /* 3 - dash-dot          */
+	9, 4, 2, 4, 2, 0, 0, 4, /* 4 - dash-dot-dot      */
+	1, 1, 1, 1, 1, 1, 1, 1  /* Placeholder for custom pattern */
     };
 
     emf_dashtype = dashtype;
@@ -1202,13 +1211,19 @@ EMF_dashtype(int dashtype)
     if (dashtype == LT_AXIS)
 	dashtype = 2;
 
+    if (dashtype == DASHTYPE_CUSTOM) {
+	dashtype = EMF_LINE_TYPES;	/* Point to placeholder array */
+	for (i = 0; i < 8; i += 2)
+	    dot_length[(EMF_LINE_TYPES-1)*8 + i] = emf_dashpattern[i];
+    }
+
     if (dashtype < 1 || !emf_dashed) {	/* solid mode */
 	EMF_SelectObject(EMF_STOCK_OBJECT_BLACK_PEN);
 	EMF_DeleteObject(EMF_HANDLE_PEN);
 	EMF_CreatePen(EMF_HANDLE_PEN, emf_pentype, emf_linewidth * EMF_PX2HM, emf_color);
 	EMF_SelectObject(EMF_HANDLE_PEN);
-
 	term->vector = EMF_solid_vector;
+
     } else {
 	/* Since win32 dashed lines works only with 1 pixel linewith we must emulate */
 	EMF_SelectObject(EMF_STOCK_OBJECT_BLACK_PEN);
@@ -1220,15 +1235,14 @@ EMF_dashtype(int dashtype)
 
 	/* set up dash dimensions */
 	j = (dashtype - 1) * 8;
-	for (i = 0; i < 8; i++, j++) {
+	for (i = 0; i < 8; i++, j++)
 	    emf_step_sizes[i] = dot_length[j] * emf_dashlength * EMF_PX2HM;
-	}
+
 	/* first thing drawn will be a line */
-	emf_step = emf_step_sizes[1];
-	emf_step_index = 1;
+	emf_step = emf_step_sizes[0];
+	emf_step_index = 0;
     }
 
-    emf_dashtype_count = 0;
 }
 
 TERM_PUBLIC void 
@@ -1250,8 +1264,8 @@ EMF_dashed_vector(unsigned int ux, unsigned int uy)
 {
     int xa, ya;
     int dx, dy, adx, ady;
-    int dist;			/* approximate distance in plot units from starting point to specified end point. */
-    long remain;		/* approximate distance in plot units remaining to specified end point. */
+    int dist;	/* approximate distance in plot units from starting point to end point. */
+    long remain;/* approximate distance in plot units remaining to specified end point. */
 
     if (ux >= term->xmax || uy >= term->ymax)
 	int_warn(NO_CARET, "emf_dashed_vector: (%d,%d) out of range",ux,uy);
@@ -1275,22 +1289,22 @@ EMF_dashed_vector(unsigned int ux, unsigned int uy)
     ya = emf_posy;
     while (remain > emf_step) {
 	remain -= emf_step;
-	if (emf_step_index & 1)
-	    EMF_solid_vector((int) (ux - (remain * dx) / dist),
-			     (int) (uy - (remain * dy) / dist));
-	else {
+	if (emf_step_index & 1) {
 	    xa = (int) (ux - (remain * dx) / dist);
 	    ya = (int) (uy - (remain * dy) / dist);
 	    EMF_move(xa, ya);
+	} else {
+	    EMF_solid_vector((int) (ux - (remain * dx) / dist),
+			     (int) (uy - (remain * dy) / dist));
 	}
 	if (++emf_step_index >= 8)
 	    emf_step_index = 0;
 	emf_step = emf_step_sizes[emf_step_index];
     }
     if (emf_step_index & 1)
-	EMF_solid_vector(ux, uy);
-    else
 	EMF_move(ux, uy);
+    else
+	EMF_solid_vector(ux, uy);
     emf_step -= (int) remain;
 }
 
@@ -1358,8 +1372,7 @@ EMF_put_text(unsigned int x, unsigned int y, const char str[])
 	emf_textcolor = emf_color;
     }
 
-    /* SB 20040506: offset array now included since it won't work with MS Security patch (kb835732) */
-    /* SB 20040506: also changed function from unicode to ansi version */
+    /* Use ansi unless we can convert to unicode */
     if (alen % 4)
 	alen += 4 - (slen % 4); /* Structure must be long aligned! */
 #ifdef HAVE_ICONV
@@ -1400,7 +1413,6 @@ EMF_put_text(unsigned int x, unsigned int y, const char str[])
     for (i = 0; i < nchars; i++)
 	/* writing intercharacter spacing array (but we don't use it) */
 	EMF_write_long(300); 
-    /* SB 20040506: end of modification */
 
     /* Invalidate current position */
     emf_posx = emf_posy = -2000;
@@ -1899,6 +1911,15 @@ TERM_TABLE_START(emf_driver)
    EMF_filled_polygon
     , NULL /* image */
     , ENHemf_OPEN, ENHemf_FLUSH, do_enh_writec
+    , NULL	/* layer */
+    , NULL	/* path */
+    , 0.0
+    , NULL	/* hypertext */
+#ifdef EAM_BOXED_TEXT
+    , NULL
+#endif
+    , NULL	/* modify_plots */
+    , EMF_dashtype
 TERM_TABLE_END(emf_driver)
 #undef LAST_TERM
 #define LAST_TERM emf_driver
@@ -1919,7 +1940,7 @@ START_HELP(emf)
 " This file format is recognized by many Windows applications.",
 "",
 " Syntax:",
-"       set terminal emf {color | monochrome} {solid | dashed}",
+"       set terminal emf {color | monochrome}",
 "                        {enhanced {noproportional}}",
 "                        {rounded | butt}",
 "                        {linewidth <LW>} {dashlength <DL>}",
@@ -1928,9 +1949,6 @@ START_HELP(emf)
 "                        {fontscale <scale>}",
 "",
 " In `monochrome` mode successive line types cycle through dash patterns.",
-" In `color` mode successive line types use successive colors, and only after",
-" all 8 default colors are exhausted is the dash pattern incremented.",
-" `solid` draws all curves with solid lines, overriding any dashed patterns;",
 " `linewidth <factor>` multiplies all line widths by this factor.",
 " `dashlength <factor>` is useful for thick lines.",
 " <fontname> is the name of a font; and ",
@@ -1943,11 +1961,10 @@ START_HELP(emf)
 " If you are using a monospaced font, or don't like the approximation, you",
 " can turn off this correction using the `noproportional` option.",
 "",
-" The default settings are `color solid font \"Arial,12\" size 1024,768`",
+" The default settings are `color font \"Arial,12\" size 1024,768`",
 " Selecting `default` sets all options to their default values.",
 "",
 " Examples:",
 "       set terminal emf 'Times Roman Italic, 12'",
-"       set terminal emf dashed    # otherwise all lines are solid"
 END_HELP(emf)
 #endif /* TERM_HELP */
