@@ -2,6 +2,10 @@
 
 	* term/emf.trm: Custom dashtype support.
 
+	* configure.in term/pdf.trm: Modify PDFlib terminal for use with 
+	version 5 dashtypes (but no custom dashtype support).  Do not build
+	by default.
+
 2014-05-05  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/gp_types.h src/graphics.c (place_objects do_rectangle)

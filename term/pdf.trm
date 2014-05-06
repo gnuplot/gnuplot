@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: pdf.trm,v 1.92 2014/03/04 21:25:13 sfeam Exp $
+ * $Id: pdf.trm,v 1.93 2014/03/20 20:50:10 markisch Exp $
  */
 
 /*------------------------------
@@ -96,10 +96,15 @@ static int PDF_TextAngle = 0;			/* current text orientation*/
 static enum JUSTIFY PDF_TextJust = LEFT;	/* current text justification*/
 static double PDF_linewidth_factor = 1.0;	/* multiplier for line width */
 static double PDF_dashlength_factor = 1.0;	/* multiplier for dash length */
-static TBOOLEAN PDF_dashedlines = FALSE;	/* solid or dashed? */
 static TBOOLEAN PDF_monochrome = FALSE;		/* default all linetypes to black */
 static rgb_color PDF_current_rgb = {0.,0.,0.};	/* Last color set */
 static double PDF_current_gray = 0.0;		/* Last color set (mono version) */
+
+#ifdef HAVE_NODASH_LIBPDF
+static TBOOLEAN PDF_dashedlines = FALSE;	/* solid or dashed? */
+#else
+static TBOOLEAN PDF_dashedlines = TRUE;		/* solid or dashed? */
+#endif
 
 /* default text font family: */
 static char PDF_fontNameDef[MAX_ID_LEN + 1] = "Helvetica";
@@ -422,9 +427,9 @@ PDF_options ()
 	    continue;
 	}
 
-	if (equals(c_token, "solid")) {
+	if (almost_equals(c_token, "dash$ed") || equals(c_token, "solid")) {
+	    /* Version 5 always enables dashed lines */
 	    c_token++;
-	    PDF_dashedlines = FALSE;
 	    continue;
 	}
 
@@ -446,18 +451,7 @@ PDF_options ()
 	    continue;
 	}
 
-#ifdef HAVE_NODASH_LIBPDF
-	int_warn(NO_CARET,"gnuplot was linked against a version of pdflib with no dash or pattern support");
-#else
-	if (almost_equals(c_token, "dash$ed")) {
-	    c_token++;
-	    PDF_dashedlines = TRUE;
-	    continue;
-	}
-#endif
-
 	int_error(c_token, "unexpected text at end of command");
-
     }
 
     /* Save options back into options string in normalized format */
@@ -467,7 +461,7 @@ PDF_options ()
 	    PDF_fontNameDef, PDF_fontSizeDef, PDF_fontscale, PDF_linewidth_factor,
 	    PDF_LineCap == 1 ? "rounded" : "");
     if (PDF_dashedlines)
-	sprintf(&(term_options[strlen(term_options)]), "dashed dl %3.1f",
+	sprintf(&(term_options[strlen(term_options)]), "dl %3.1f",
 		PDF_dashlength_factor);
     if (pdf_explicit_size) {
 	if (pdf_explicit_units == CM)
@@ -1740,12 +1734,11 @@ START_HELP(pdf)
 "                        {fname \"<font>\"} {fsize <fontsize>}",
 "                        {font \"<fontname>{,<fontsize>}\"} {fontscale <scale>}",
 "                        {linewidth <lw>} {rounded|butt}",
-"                        {solid|dashed} {dl <dashlength>}}",
+"                        {dl <dashlength>}}",
 "                        {size <XX>{unit},<YY>{unit}}",
 "",
 " The default is to use a different color for each line type. Selecting",
-" `monochome` will use black for all linetypes, in which case you probably",
-" want to select `dashed` to distinguish line types. Even in in mono mode",
+" `monochome` will use black for all linetypes, Even in in mono mode",
 " you can still use explicit colors for filled areas or linestyles.",
 "",
 " where <font> is the name of the default font to use (default Helvetica)",
