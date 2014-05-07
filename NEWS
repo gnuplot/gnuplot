@@ -78,6 +78,8 @@ New features, changes and fixes in gnuplot version 5.0
 * CHANGE 'call' arguments are evaluated to yield a string if at all possible
 * CHANGE reworked qt driver for use with qt5, much faster rendering
 * CHANGE gnuplot-mode (emacs plugin) now maintained as a separate project
+* CHANGE autoscaled impulse plots will extend to y=0
+* CHANGE object borders can have dashtype and other line properties
 * FIX Hitting ^C twice will forcibly terminate wxt if server connection is lost
 
 
