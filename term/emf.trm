@@ -1,5 +1,5 @@
 /* Hey Emacs this is -*- C -*-
- * $Id: emf.trm,v 1.94 2014/03/25 16:57:15 sfeam Exp $
+ * $Id: emf.trm,v 1.95 2014/05/07 04:10:30 sfeam Exp $
  */
 
 /* GNUPLOT - emf.trm */
@@ -1965,6 +1965,6 @@ START_HELP(emf)
 " Selecting `default` sets all options to their default values.",
 "",
 " Examples:",
-"       set terminal emf 'Times Roman Italic, 12'",
+"       set terminal emf 'Times Roman Italic, 12'"
 END_HELP(emf)
 #endif /* TERM_HELP */
