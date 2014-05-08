@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: tabulate.c,v 1.20 2014/04/02 22:43:39 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: tabulate.c,v 1.21 2014/04/05 06:17:09 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - tabulate.c */
@@ -74,16 +74,18 @@ static FILE *outfile;
 
 static void
 output_number(double coord, int axis, char *buffer) {
+    if (isnan(coord)) {
+	sprintf(buffer, " NaN");
+
     /* treat timedata and "%s" output format as a special case:
      * return a number.
      * "%s" in combination with any other character is treated
      * like a normal time format specifier and handled in time.c
      */
-    if (axis_array[axis].datatype == DT_TIMEDATE &&
+    } else if (axis_array[axis].datatype == DT_TIMEDATE &&
 	strcmp(axis_array[axis].formatstring, "%s") == 0) {
 	gprintf(buffer, BUFFERSIZE, "%.0f", 1.0, coord);
-    } else
-    if (axis_array[axis].datatype == DT_TIMEDATE) {
+    } else if (axis_array[axis].datatype == DT_TIMEDATE) {
 	buffer[0] = '"';
 	gstrftime(buffer+1, BUFFERSIZE-1, axis_array[axis].formatstring, coord);
 	while (strchr(buffer,'\n')) {*(strchr(buffer,'\n')) = ' ';}

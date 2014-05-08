@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.328 2014/04/25 00:22:23 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.329 2014/05/06 04:51:37 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -621,13 +621,22 @@ get_data(struct curve_points *current_plot)
     df_warn_on_missing_columnheader = TRUE;
 
     while ((j = df_readline(v, max_cols)) != DF_EOF) {
-	/* j <= max_cols */
 
 	if (i >= current_plot->p_max) {
 	    /* overflow about to occur. Extend size of points[]
 	     * array. Double the size, and add 1000 points, to avoid
 	     * needlessly small steps. */
 	    cp_extend(current_plot, i + i + 1000);
+	}
+
+	/* Version 5	DEBUG DEBUG
+	 * We are now trying to pass back all available info even if one of the requested
+	 * columns was missing or undefined.  This check replaces the DF_UNDEFINED case in
+	 * the main switch statement below.
+	 */
+	if (j == DF_UNDEFINED) {
+	    current_plot->points[i].type = UNDEFINED;
+	    j = df_no_use_specs;
 	}
 
 	if (j > 0) {
@@ -738,8 +747,8 @@ get_data(struct curve_points *current_plot)
 	    }
 	    i++;
 
-	} else
-	/* The "else" switch currently handles all other plot styles */
+	} else {
+	/* This "else" block currently handles all plot styles other than PARALLEL_AXES */
 
 	switch (j) {
 	default:
@@ -764,9 +773,11 @@ get_data(struct curve_points *current_plot)
 
 	case DF_UNDEFINED:
 	    /* NaN or bad result from extended using expression */
+	    /* Version 5:
+	     * FIXME - can't actually get here because we trapped DF_UNDEFINED above
+	     */
 	    current_plot->points[i].type = UNDEFINED;
 	    FPRINTF((stderr,"undefined point %g %g %g\n", v[0], v[1], v[2]));
-	    /* FIXME: Are there other plot styles that require copying v[i]? */
 	    if (current_plot->plot_style == IMAGE)
 		goto images;
 	    i++;
@@ -1203,6 +1214,7 @@ images:
 	    }
 
 	}                       /*switch */
+	}                       /* "else" case for all plot types */
 
     }                           /*while */
 
@@ -1347,14 +1359,12 @@ store2d_point(
 	}
     }
 
-    /* return immediately if x or y are undefined
-     * we dont care if outrange for high/low.
-     * BUT if high/low undefined (ie log( < 0 ), no number is stored.
-     */
+    /* Version 5: Allow to store Inf or NaN 
+     *  We used to exit immediately in this case rather than storing anything */
     STORE_WITH_LOG_AND_UPDATE_RANGE(cp->x, x, cp->type, current_plot->x_axis,
-			current_plot->noautoscale, NOOP, return);
+			current_plot->noautoscale, NOOP, NOOP);
     STORE_WITH_LOG_AND_UPDATE_RANGE(cp->y, y, cp->type, current_plot->y_axis,
-			current_plot->noautoscale, NOOP, return);
+			current_plot->noautoscale, NOOP, NOOP);
 
     switch (current_plot->plot_style) {
     case POINTSTYLE:		/* Only x and y are relevant to axis scaling */

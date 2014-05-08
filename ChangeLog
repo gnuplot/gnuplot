@@ -1,3 +1,19 @@
+2014-05-08  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/axis.h (ACTUAL_STORE_WITH_LOG_AND_UPDATE_RANGE)
+	src/plot2d.c (store2d_point) src/plot3d.c (get_3ddata)
+	src/datafile.c (df_readascii) src/tabulate.c:
+	Revised handling of NaN or Inf in the input data stream.  The program
+	used to set type=undefined for this point but left all the data fields
+	untouched (i.e. left them containing random garbage).  Version 5 fills
+	in all data fields, including the one[s] containing NaN or Inf.
+	This means that the output from "set table" matches the input data
+	whereas before any line marked "u" contained garbage in the data fields.
+
+	Note: For 3D data z=NaN or z=Inf is replaced by z=0.  This is needed to
+	avoid problems with image data.  Possibly this special case should be
+	handled in the image code itself rather than at the input stage.
+
 2014-05-06  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/emf.trm: Custom dashtype support.

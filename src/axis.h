@@ -1,5 +1,5 @@
 /*
- * $Id: axis.h,v 1.100 2014/03/16 01:54:56 broeker Exp $
+ * $Id: axis.h,v 1.101 2014/03/16 22:03:04 sfeam Exp $
  *
  */
 
@@ -524,7 +524,8 @@ do {									  \
     double curval = VALUE;						  \
     if (AXIS == NO_AXIS)						  \
 	break;								  \
-    /* HBB 20040304: new check to avoid storing infinities and NaNs */	  \
+    /* Version 5: OK to store infinities or NaN */			  \
+    STORE = curval;							  \
     if (! (curval > -VERYLARGE && curval < VERYLARGE)) {		  \
 	TYPE = UNDEFINED;						  \
 	UNDEF_ACTION;							  \
@@ -543,8 +544,7 @@ do {									  \
 	} else {							  \
 	    STORE = log(curval) / axis->log_base; /* AXIS_DO_LOG() */	  \
 	}								  \
-    } else								  \
-	STORE = curval;							  \
+    }									  \
     if (NOAUTOSCALE)							  \
 	break;  /* this plot is not being used for autoscaling */	  \
     if (TYPE != INRANGE)						  \

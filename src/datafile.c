@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.281 2014/04/23 19:32:34 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.282 2014/04/29 21:15:09 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -800,7 +800,6 @@ df_tokenise(char *s)
 	    df_column[df_no_cols].good = count == 1 ? DF_GOOD : DF_BAD;
 
 	    if (isnan(df_column[df_no_cols].datum)) {
-		/* EAM April 2012 */
 		df_column[df_no_cols].good = DF_UNDEFINED;
 		FPRINTF((stderr,"NaN in column %d\n", df_no_cols));
 	    }
@@ -1623,6 +1622,13 @@ int
 df_readascii(double v[], int max)
 {
     char *s;
+    /* Version 5:
+     * We used to return DF_MISSING or DF_UNDEFINED immediately if any column
+     * could not be parsed.  Now we note this failure in return_value but
+     * continue to process any additional requested columns before returning.
+     * This is a CHANGE.
+     */
+    int return_value = DF_GOOD;
 
     assert(max <= MAXDATACOLS);
 
@@ -1634,6 +1640,7 @@ df_readascii(double v[], int max)
     while ((s = df_gets()) != NULL) {
 	int line_okay = 1;
 	int output = 0;         /* how many numbers written to v[] */
+	return_value = DF_GOOD;
 
 	/* "skip" option */
 	if (df_skip_at_front > 0) {
@@ -1951,8 +1958,11 @@ df_readascii(double v[], int max)
 		    evaluate_inside_using = TRUE;
 		    evaluate_at(use_spec[output].at, &a);
 		    evaluate_inside_using = FALSE;
-		    if (undefined)
-			return DF_UNDEFINED;    /* store undefined point in plot */
+		    if (undefined) {
+			return_value = DF_UNDEFINED;
+			v[output] = not_a_number();
+			continue;
+		    }
 
 		    if ((df_axis[output] != NO_AXIS)
 			   && axis_array[df_axis[output]].datatype == DT_TIMEDATE)
@@ -1992,8 +2002,8 @@ df_readascii(double v[], int max)
 			    if (gstrptime(a.v.string_val,
 					  axis_array[df_axis[output]].timefmt, &tm, &usec))
 				v[output] = (double) gtimegm(&tm) + usec;
-			    else /* FIXME - Is this correct? Is it needed? */
-				line_okay = 0;
+			    else
+				return_value = DF_BAD;
 			}
 			gpfree_string(&a);
 		    }
@@ -2035,25 +2045,23 @@ df_readascii(double v[], int max)
 		} else {
 		    /* column > 0 */
 		    if ((column <= df_no_cols)
-			&& df_column[column - 1].good == DF_GOOD)
+			&& df_column[column - 1].good == DF_GOOD) {
 			v[output] = df_column[column - 1].datum;
-		    /* EAM - Oct 2002 Distinguish between
-		     * DF_MISSING and DF_BAD.  Previous versions
-		     * would never notify caller of either case.
-		     * Now missing data will be noted. Bad data
-		     * should arguably be noted also, but that
-		     * would change existing default behavior.  */
-		    else if ((column <= df_no_cols)
-			     && (df_column[column - 1].good == DF_MISSING))
-			return DF_MISSING;
-		    else if ((column <= df_no_cols)
+
+		    /* Version 5:
+		     * Do not return immediately on DF_MISSING or DF_UNDEFINED.
+		     * THIS IS A CHANGE.
+		     */
+		    } else if ((column <= df_no_cols)
+			     && (df_column[column - 1].good == DF_MISSING)) {
+			v[output] = not_a_number();
+			return_value = DF_MISSING;
+		    } else if ((column <= df_no_cols)
 			     && (df_column[column - 1].good == DF_UNDEFINED)) {
-			/* EAM October 2012 - return or continue?? */
 			v[output] = df_column[column - 1].datum;
-			return DF_UNDEFINED;
+			return_value = DF_UNDEFINED;
 		    } else {
-			/* line bad only if user explicitly asked
-			 * for this column */
+			/* line bad only if user explicitly asked for this column */
 			if (df_no_use_specs)
 			    line_okay = 0;
 			break;      /* return or ignore depending on line_okay */
@@ -2073,7 +2081,7 @@ df_readascii(double v[], int max)
 	}
 	/*}}} */
 
-	if (!line_okay)
+	if (!line_okay) /* Ignore this line (pretend we never read it) */
 	    continue;
 
 	/* output == df_no_use_specs if using was specified -
@@ -2095,7 +2103,23 @@ df_readascii(double v[], int max)
 	 if (df_no_use_specs == 0)
 		df_no_use_specs = output;
 
-	return output;
+	/* Version 5:
+	 * If all requested values were OK, return number of columns read.
+	 * If a requested column was bad, return an error but nevertheless
+	 * return the other requested columns. The number of columns is
+	 * available to the caller in df_no_use_specs.
+	 * THIS IS A CHANGE!
+	 */
+	switch (return_value) {
+	case DF_MISSING:
+	case DF_UNDEFINED:
+	case DF_BAD:
+			return return_value;
+			break;
+	default:
+			return output;
+			break;
+	}
 
     }
     /*}}} */
