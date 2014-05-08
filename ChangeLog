@@ -20,6 +20,9 @@
 	avoid problems with image data.  Possibly this special case should be
 	handled in the image code itself rather than at the input stage.
 
+	* src/plot2d.c (impulse_range_fiddling) src/plot3d.c: Don't extend
+	range to zero for log-scaled axes.
+
 2014-05-06  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/emf.trm: Custom dashtype support.
@@ -46,7 +49,7 @@
 	dash handling should ignore the "dashed/solid" terminal setting.
 
 	* src/plot2d.c (impulse_range_fiddling) src/plot3d.c:  Autoscaled plots
-	"with impulses" should include y=0 (z=0 in 3D).
+	"with impulses" should include y=0 (z=0 in 3D) unless log-scaled.
 
 2014-05-05  Tatsuro MATSUOKA <tmacchant3@yahoo.co.jp>
 

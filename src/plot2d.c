@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.329 2014/05/06 04:51:37 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.330 2014/05/08 17:35:42 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -1788,6 +1788,9 @@ polar_range_fiddling(struct curve_points *plot)
 static void
 impulse_range_fiddling(struct curve_points *plot)
 {
+    if (axis_array[plot->y_axis].log)
+	return;
+
     if (axis_array[plot->y_axis].autoscale & AUTOSCALE_MIN) {
 	if (axis_array[plot->y_axis].min > 0)
 	    axis_array[plot->y_axis].min = 0;
