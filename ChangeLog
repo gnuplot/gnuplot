@@ -1,3 +1,9 @@
+2014-05-08  Dima Kogan  <dima@secretsauce.net>
+
+	REVERT patch from 2014-04-26 because it broke normal zoom operations.
+	* src/mouse.c (do_zoom rescale_around_mouse):  Handle various conditions
+	that caused zooming around the current mouse position to fail.
+
 2014-05-08  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/axis.h (ACTUAL_STORE_WITH_LOG_AND_UPDATE_RANGE)
@@ -130,6 +136,7 @@
 	* src/mouse.c (do_zoom rescale_around_mouse):  Handle various conditions
 	that caused zooming around the current mouse position to fail.
 	Bug #1380
+	[REVERTED 2013-05-08 because it broke normal zoom]
 
 2014-04-25  Ethan A Merritt  <merritt@u.washington.edu>
 

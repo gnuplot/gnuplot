@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: mouse.c,v 1.161 2014/04/28 17:18:10 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: mouse.c,v 1.162 2014/04/28 21:16:13 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - mouse.c */
@@ -748,22 +748,14 @@ do_zoom(double xmin, double ymin, double x2min, double y2min, double xmax, doubl
 	z->prev = zoom_now;
     } else			/* overwrite next item */
 	z = zoom_now->next;
-
-#define SET_AXIS(axis, name, minmax, condition)                         \
-    z->name ## minmax = (axis_array[axis].minmax condition) ? name ## minmax : axis_array[axis].minmax
-
-    SET_AXIS(FIRST_X_AXIS,  x,  min, < VERYLARGE);
-    SET_AXIS(FIRST_Y_AXIS,  y,  min, < VERYLARGE);
-    SET_AXIS(SECOND_X_AXIS, x2, min, < VERYLARGE);
-    SET_AXIS(SECOND_Y_AXIS, y2, min, < VERYLARGE);
-
-    SET_AXIS(FIRST_X_AXIS,  x,  max, > -VERYLARGE);
-    SET_AXIS(FIRST_Y_AXIS,  y,  max, > -VERYLARGE);
-    SET_AXIS(SECOND_X_AXIS, x2, max, > -VERYLARGE);
-    SET_AXIS(SECOND_Y_AXIS, y2, max, > -VERYLARGE);
-
-#undef SET_AXIS
-
+    z->xmin = xmin;
+    z->ymin = ymin;
+    z->x2min = x2min;
+    z->y2min = y2min;
+    z->xmax = xmax;
+    z->ymax = ymax;
+    z->x2max = x2max;
+    z->y2max = y2max;
     apply_zoom(z);
 }
 
@@ -1469,26 +1461,6 @@ ChangeView(int x, int z)
     }
 }
 
-int is_mouse_outside_plot(void)
-{
-    // Here I look at both min/max each time because reversed ranges can make
-    // min > max
-#define CHECK_AXIS_OUTSIDE(real, axis)                                  \
-    ( axis_array[axis].min <  VERYLARGE &&                              \
-      axis_array[axis].max > -VERYLARGE &&                              \
-      ( (real < AXIS_DE_LOG_VALUE(axis, axis_array[axis].min) &&        \
-         real < AXIS_DE_LOG_VALUE(axis, axis_array[axis].max)) ||       \
-        (real > AXIS_DE_LOG_VALUE(axis, axis_array[axis].min) &&        \
-         real > AXIS_DE_LOG_VALUE(axis, axis_array[axis].max))))
-
-    return
-        CHECK_AXIS_OUTSIDE(real_x,  FIRST_X_AXIS)  ||
-        CHECK_AXIS_OUTSIDE(real_y,  FIRST_Y_AXIS)  ||
-        CHECK_AXIS_OUTSIDE(real_x2, SECOND_X_AXIS) ||
-        CHECK_AXIS_OUTSIDE(real_y2, SECOND_Y_AXIS);
-
-#undef CHECK_AXIS_OUTSIDE
-}
 
 /* Return a new (upper or lower) axis limit that is a linear
    combination of the current limits.  */
@@ -1586,44 +1558,15 @@ do_zoom_scroll_down()
 }
 
 
-/* Return new lower and upper axis limits as current limits resized
-   around current mouse position. */
-static void
-rescale_around_mouse(double *newmin, double *newmax, int AXIS, double mouse_pos, double scale)
-{
-  double unlog_pos = AXIS_LOG_VALUE(AXIS, mouse_pos);
-
-  *newmin = unlog_pos + (axis_array[AXIS].min - unlog_pos) * scale;
-  *newmin = AXIS_DE_LOG_VALUE(AXIS,*newmin);
-
-  *newmax = unlog_pos + (axis_array[AXIS].max - unlog_pos) * scale;
-  *newmax = AXIS_DE_LOG_VALUE(AXIS,*newmax);
-}
-
-
 /* Zoom in/out within x-axis. */
 static void
 zoom_in_X(int zoom_key)
 {
-    // I don't check for "outside" here. will do that later
-    if (is_mouse_outside_plot()) {
-        /* zoom in (X axis only) */
-        double w1 = (zoom_key=='+') ? 23./25. : 23./21.;
-        double w2 = (zoom_key=='+') ?  2./25. : -2./21.;
-        zoom_rescale_xyx2y2(w1,w2, 1,0, w1,w2, 1,0,  w2,w1, 0,1, w2,w1, 0,1, 
-                            (zoom_key=='+' ? "zoom in X" : "zoom out X"));
-    } else {
-        double xmin, ymin, x2min, y2min, xmax, ymax, x2max, y2max;
-	double scale = (zoom_key=='+') ? 0.75 : 1.25;
-	rescale_around_mouse(&xmin,  &xmax,  FIRST_X_AXIS,  real_x,  scale);
-	rescale_around_mouse(&x2min, &x2max, SECOND_X_AXIS, real_x2, scale);
-
-        ymin  = rescale(FIRST_Y_AXIS,  1,0);
-        y2min = rescale(SECOND_Y_AXIS, 1,0);
-        ymax  = rescale(FIRST_Y_AXIS,  0,1);
-        y2max = rescale(SECOND_Y_AXIS, 0,1);
-        do_zoom(xmin, ymin, x2min, y2min, xmax, ymax, x2max, y2max);
-    }
+    /* zoom in (X axis only) */
+    double w1 = (zoom_key=='+') ? 23./25. : 23./21.;
+    double w2 = (zoom_key=='+') ?  2./25. : -2./21.;
+    zoom_rescale_xyx2y2(w1,w2, 1,0, w1,w2, 1,0,  w2,w1, 0,1, w2,w1, 0,1, 
+	(zoom_key=='+' ? "zoom in X" : "zoom out X"));
 }
 
 static void
@@ -1639,6 +1582,18 @@ do_zoom_out_X()
 }
 
 
+/* Return new lower and upper axis limits as current limits resized
+   around current mouse position. */
+static void
+rescale_around_mouse(double *newmin, double *newmax, int AXIS, double mouse_pos, double scale)
+{
+  *newmin = mouse_pos + (axis_array[AXIS].min - mouse_pos) * scale;
+  *newmax = mouse_pos + (axis_array[AXIS].max - mouse_pos) * scale;
+  *newmin = AXIS_DE_LOG_VALUE(AXIS,*newmin);
+  *newmax = AXIS_DE_LOG_VALUE(AXIS,*newmax);
+}
+
+
 /* Zoom around mouse cursor unless the cursor is outside the graph boundary,
    when it scales around the graph center.
    Syntax: zoom_key == '+' ... zoom in, zoom_key == '-' ... zoom out
@@ -1647,7 +1602,15 @@ static void
 zoom_around_mouse(int zoom_key)
 {
     double xmin, ymin, x2min, y2min, xmax, ymax, x2max, y2max;
-    if (is_mouse_outside_plot()) {
+    int outside = (real_x  <= AXIS_DE_LOG_VALUE(FIRST_X_AXIS,  axis_array[FIRST_X_AXIS].min))  ||
+		  (real_x  >= AXIS_DE_LOG_VALUE(FIRST_X_AXIS,  axis_array[FIRST_X_AXIS].max))  ||
+		  (real_y  <= AXIS_DE_LOG_VALUE(FIRST_Y_AXIS,  axis_array[FIRST_Y_AXIS].min))  ||
+		  (real_y  >= AXIS_DE_LOG_VALUE(FIRST_Y_AXIS,  axis_array[FIRST_Y_AXIS].max))  ||
+		  (real_x2 <= AXIS_DE_LOG_VALUE(SECOND_X_AXIS, axis_array[SECOND_X_AXIS].min)) ||
+		  (real_x2 >= AXIS_DE_LOG_VALUE(SECOND_X_AXIS, axis_array[SECOND_X_AXIS].max)) ||
+		  (real_y2 <= AXIS_DE_LOG_VALUE(SECOND_Y_AXIS, axis_array[SECOND_Y_AXIS].min)) ||
+		  (real_y2 >= AXIS_DE_LOG_VALUE(SECOND_Y_AXIS, axis_array[SECOND_Y_AXIS].max));
+    if (outside) {
 	/* zoom in (factor of approximately 2^(.25), so four steps gives 2x larger) */
 	double w1 = (zoom_key=='+') ? 23./25. : 23./21.;
 	double w2 = (zoom_key=='+') ?  2./25. : -2./21.;
