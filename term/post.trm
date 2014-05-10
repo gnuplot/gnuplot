@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: post.trm,v 1.283 2014/05/05 22:19:22 sfeam Exp $
+ * $Id: post.trm,v 1.284 2014/05/09 22:14:12 broeker Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -4717,7 +4717,7 @@ PS_COMMON_PROLOG_INFO
 " \"Symbol-Oblique\".",
 "",
 " `default` sets all options to their defaults: `landscape`, `monochrome`,",
-" `dl 1.0`, `lw 1.0`, `defaultplex`, `noenhanced`, \"Helvetica\" and",
+" `dl 1.0`, `lw 1.0`, `defaultplex`, `enhanced`, \"Helvetica\" and",
 " 14pt.  Default size of a PostScript plot is 10 inches wide and 7 inches high.",
 PS_COMMON_DOC1
 " Fonts listed by `fontfile` or `fontfile add` encapsulate the font",

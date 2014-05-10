@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.886 2014/04/29 21:15:09 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.887 2014/05/05 06:17:36 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -1534,7 +1534,7 @@ C marker below is used to signal this to doc2html:
 ?timecolumn
 #timecolumn(N,"timeformat") & int, string & time data from column $N$ during data input. \\
 %timecolumn(N,"timeformat")@int, string@ time data from column $N$ during data input.
- `timecolumn(N,"timeformat)` may be used only in expressions as part of `using`
+ `timecolumn(N,"timeformat")` may be used only in expressions as part of `using`
  manipulations to fits or datafile plots.   See `plot datafile using`.
 
  It reads string data starting at column N as a time/date value and uses "timeformat"
@@ -2448,7 +2448,7 @@ Ffigure_newsyntax
  the original string and the converted numerical sequence.
 
 3 linestyles vs linetypes
-? linestyles vs linetypes
+?linestyles vs linetypes
  A `linestyle` is a temporary association of properties linecolor, linewidth,
  dashtype, and pointtype.  It is defined using the command `set style line`.
  Once you have defined a linestyle, you can use it in a plot command to control
@@ -2465,7 +2465,7 @@ Ffigure_newsyntax
       plot sin(x) with linespoints ls 5          # user-defined line style 5
 
 2 layers
-? layers
+?layers
 =behind
 =front
 =back
@@ -2482,7 +2482,7 @@ Ffigure_newsyntax
       the plot legend (`key`)
       front
  Within each layer elements are drawn in the order
-      objects (rectangles, circles, ellipse, polygons) in numerical order
+      objects (rectangles, circles, ellipses, polygons) in numerical order
       labels in numerical order
       arrows in numerical order
  In the case of multiple plots on a single page (multiplot mode) this order 

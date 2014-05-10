@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: gd.trm,v 1.176 2013/11/10 19:42:55 sfeam Exp $
+ * $Id: gd.trm,v 1.177 2013/12/11 19:38:40 sfeam Exp $
  */
 
 /* GNUPLOT -- gd.trm */
@@ -843,9 +843,9 @@ PNG_options()
 		    c_token++;
 		    PNG_YMAX = real_expression();
 		}
-		if (PNG_XMAX < 0)
+		if (PNG_XMAX <= 0)
 		    PNG_XMAX = GREG_XMAX;
-		if (PNG_YMAX < 0)
+		if (PNG_YMAX <= 0)
 		    PNG_YMAX = GREG_YMAX;
 	    }
 	    term->ymax = PNG_YMAX;
