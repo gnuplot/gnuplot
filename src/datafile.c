@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.282 2014/04/29 21:15:09 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.283 2014/05/08 17:35:42 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -1660,7 +1660,7 @@ df_readascii(double v[], int max)
 	/*{{{  skip comments */
 	if (is_comment(*s)) {
 	    if (indexname) { /* Look for index name in comment */
-		while (is_comment(*s) || isspace((int)*s))
+		while (is_comment(*s) || isspace((unsigned char)*s))
 		    ++s;
 		if (*s && !strncmp(s, indexname, strlen(indexname)))
 		    index_found = TRUE;
@@ -4061,7 +4061,7 @@ plot_option_binary_format(char *format_string)
 		substr++;
 
 	    /* Check for field repeat number. */
-	    field_repeat = isdigit(*substr) ? strtol(substr, &substr, 10) : 1;
+	    field_repeat = isdigit((unsigned char)*substr) ? strtol(substr, &substr, 10) : 1;
 
 	    /* Try finding the word among the valid type names. */
 	    for (j = 0, breakout = 0;

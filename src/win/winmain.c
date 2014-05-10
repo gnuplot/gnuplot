@@ -1,5 +1,5 @@
 /*
- * $Id: winmain.c,v 1.73 2014/03/20 00:58:36 markisch Exp $
+ * $Id: winmain.c,v 1.74 2014/03/30 18:33:21 markisch Exp $
  */
 
 /* GNUPLOT - win/winmain.c */
@@ -317,8 +317,8 @@ GetLanguageCode()
 		if (strcmp(lang, "JPN") == 0)
 			lang[1] = 'A';
 		/* prefer lower case */
-		lang[0] = tolower(lang[0]);
-		lang[1] = tolower(lang[1]);
+		lang[0] = tolower((unsigned char)lang[0]);
+		lang[1] = tolower((unsigned char)lang[1]);
 		/* only use two character sequence */
 		lang[2] = NUL;
 	}
@@ -1029,7 +1029,7 @@ open_printer()
         strncpy(win_prntmp, temp, MAX_PRT_LEN);
         /* stop X's in path being converted by mktemp */
         for (temp = win_prntmp; *temp; temp++)
-            *temp = tolower(*temp);
+            *temp = tolower((unsigned char)*temp);
         if ((strlen(win_prntmp) > 0) && (win_prntmp[strlen(win_prntmp) - 1] != '\\'))
             strcat(win_prntmp,"\\");
     }

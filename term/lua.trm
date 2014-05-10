@@ -1,6 +1,6 @@
 /*
- *  $Id: lua.trm,v 1.20 2012/04/01 21:07:27 sfeam Exp $
- *  $Date: 2012/04/01 21:07:27 $
+ *  $Id: lua.trm,v 1.21 2012/10/17 04:32:13 sfeam Exp $
+ *  $Date: 2012/10/17 04:32:13 $
  *  $Rev: 99 $
  */
 
@@ -1269,7 +1269,7 @@ LUA_image (unsigned m, unsigned n, coordval *image, gpiPoint *corner, t_imagecol
   if(LUA_init_luaterm_function("image")) {
     int i;
     rgb_color rgb1;
-    coordval alpha;
+    coordval alpha = 0;
     char *image_file = NULL;
 
 #ifdef LUA_EXTERNAL_IMAGES

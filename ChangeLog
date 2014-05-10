@@ -1,3 +1,70 @@
+2014-05-10  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* term/lua.trm: Ensure initialization of alpha.
+
+	* src/hidden3d.c (store_polygon): Ensure initialization of v[],
+	just in case somebody calls this function with an illegal
+	'direction' enum value.
+
+	* src/win/wgraph.c (PATTERN_BITMAP_LENGTH): Give name to magic number.
+	(pattern_bitmaps): Use new name.
+
+	* term/emf.trm (PATTERN_BITMAP_LENGTH): Give name to magic number.
+	(pattern_bitmaps): Use new name and make const.
+	(EMF_filled_polygon): Define pattern pointer more locally and make
+	it point to const. Use named constant in loop.  Fix table
+	underrun.
+
+	* src/win/wgnuplib.c (GetInt): Add some parentheses.
+
+	* src/stats.c (statsrequest): Initialize local data structs, to
+	avoid warnings about printing uninitialized results.
+
+	* src/readline.c (BACKSPACE): Define as a character constant, not
+	some hex number.
+	(readline): Write TAB as character constant, not some hex number.
+
+	* src/interpol.c (gen_interp_frequency): Ensure initialization of
+	y_total regardless of smooth type.
+
+	* src/plot3d.c (grid_nongrid_data): Ensure initialization of
+	numpoints.
+
+	* src/pm3d.c (pm3d_plot): Ensure initialiation of gray.
+
+	All the following concern the same problem: Macros from <ctype.h>
+	cannot safely be called with arguments of type 'char' (because
+	that may be signed).  Such values have to be cast to unsigned char
+	on passing.
+
+	* src/win/wtext.c (TextPutStr): See above.
+
+	* term/post.trm (PS_load_fontfile): See above.
+
+	* src/win/winmain.c (GetLanguageCode, open_printer): See above.
+
+	* src/util.c (streq): See above.
+
+	* src/term.c (enhanced_recursion): See above.
+
+	* src/scanner.c (legal_identifier, scanner): See above.
+
+	* src/readline.c (backspace): See above.
+
+	* src/plot2d.c (store_label): See above.
+
+	* src/internal.c (f_word): See above.
+
+	* src/gplt_x11.c (exec_cmd): See above.
+
+	* src/eval.c (set_gpval_axis_sth_double): See above.
+
+	* src/datafile.c (df_readascii, plot_option_binary_format): See above.
+
+	* src/command.c (changedir, expand_1level_macros): See above.
+
+	* src/breaders.c (edf_findInHeader): See above.
+
 2014-05-08  Dima Kogan  <dima@secretsauce.net>
 
 	REVERT patch from 2014-04-26 because it broke normal zoom operations.

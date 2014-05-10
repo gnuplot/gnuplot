@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: internal.c,v 1.77 2014/03/20 00:58:35 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: internal.c,v 1.78 2014/03/30 19:05:46 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - internal.c */
@@ -1267,7 +1267,7 @@ f_word(union argument *arg)
 
     Gstring(&result, "");
     while (*s) {
-	while (isspace(*s)) s++;
+	while (isspace((unsigned char)*s)) s++;
 	if (!*s)
 	    break;
 	nwords++;
@@ -1275,7 +1275,7 @@ f_word(union argument *arg)
 	    Gstring(&result,s);
 	    s = result.v.string_val;
 	}
-	while (*s && !isspace(*s)) s++;
+	while (*s && !isspace((unsigned char)*s)) s++;
 	if (nwords == ntarget) { /* Terminate this word cleanly */
 	    *s = '\0';
 	    break;

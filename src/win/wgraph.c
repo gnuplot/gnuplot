@@ -1,5 +1,5 @@
 /*
- * $Id: wgraph.c,v 1.182 2014/03/30 18:33:21 markisch Exp $
+ * $Id: wgraph.c,v 1.183 2014/04/03 00:31:16 markisch Exp $
  */
 
 /* GNUPLOT - win/wgraph.c */
@@ -146,7 +146,8 @@ int wginitstyle[WGDEFSTYLE] = {PS_SOLID, PS_DASH, PS_DOT, PS_DASHDOT, PS_DASHDOT
 
 /* bitmaps for filled boxes (ULIG) */
 /* zeros represent the foreground color and ones represent the background color */
-static unsigned char pattern_bitmaps[][16] = {
+#define PATTERN_BITMAP_LENGTH 16
+static const unsigned char pattern_bitmaps[][PATTERN_BITMAP_LENGTH] = {
   {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
    0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF}, /* no fill */
   {0xFE, 0xFE, 0x7D, 0x7D, 0xBB, 0xBB, 0xD7, 0xD7,

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: interpol.c,v 1.44 2013/12/25 05:47:26 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: interpol.c,v 1.45 2014/01/31 03:43:39 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - interpol.c */
@@ -1018,12 +1018,12 @@ gen_interp_frequency(struct curve_points *plot)
 {
     int i, j, curves;
     int first_point, num_points;
-    double y, y_total;
+    double y;
+    double y_total = 0.0;
 
     curves = num_curves(plot);
 
     if (plot->plot_smooth == SMOOTH_CUMULATIVE_NORMALISED) {
-	y_total = 0.0;
 	first_point = 0;
 
 	for (i = 0; i < curves; i++) {

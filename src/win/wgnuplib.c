@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: wgnuplib.c,v 1.7 2011/03/13 19:55:29 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: wgnuplib.c,v 1.8 2011/03/20 18:47:47 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - win/wgnuplib.c */
@@ -108,14 +108,14 @@ GetInt(LPSTR str, LPINT pval)
 
     if (!str)
 	return NULL;
-    while ( (ch = *str)!=0 && isspace(ch) )
+    while (((ch = *str) != 0) && isspace(ch))
 	str++;
 
     if (ch == '-') {
 	negative = TRUE;
 	str++;
     }
-    while ( (ch = *str)!=0 && isdigit(ch) ) {
+    while (((ch = *str) != 0) && isdigit(ch)) {
 	success = TRUE;
 	val = val * 10 + (ch - '0');
 	str++;

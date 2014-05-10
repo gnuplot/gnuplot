@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.330 2014/05/08 17:35:42 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.331 2014/05/08 19:45:32 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -1882,14 +1882,14 @@ store_label(
 		break;
 	    textlen++;
 	}
-	while (textlen > 0 && isspace(string[textlen-1]))
+	while (textlen > 0 && isspace((unsigned char)string[textlen-1]))
 	    textlen--;
     } else {
     /* This is the normal case (no special separator character) */
 	if (*string == '"') {
 	    for (textlen=1; string[textlen] && string[textlen] != '"'; textlen++);
 	}
-	while (string[textlen] && !isspace(string[textlen]))
+	while (string[textlen] && !isspace((unsigned char)string[textlen]))
 	    textlen++;
     }
 

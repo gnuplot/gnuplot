@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: breaders.c,v 1.11 2012/01/22 01:32:47 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: breaders.c,v 1.12 2012/06/08 17:33:41 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - breaders.c */
@@ -131,10 +131,13 @@ static char*
 edf_findInHeader ( const char* header, const char* key )
 {
     char *value_ptr = strstr( header, key );
-    if (!value_ptr) return NULL;
+
+    if (!value_ptr) 
+	return NULL;
     /* an edf line is "key     = value ;" */
-    value_ptr = 1 + strchr( value_ptr + strlen(key), '=' );
-    while (isspace(*value_ptr)) value_ptr++;
+    value_ptr = 1 + strchr(value_ptr + strlen(key), '=');
+    while (isspace((unsigned char)*value_ptr)) 
+	value_ptr++;
     return value_ptr;
 }
  

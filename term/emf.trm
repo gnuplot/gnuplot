@@ -1,5 +1,5 @@
 /* Hey Emacs this is -*- C -*-
- * $Id: emf.trm,v 1.95 2014/05/07 04:10:30 sfeam Exp $
+ * $Id: emf.trm,v 1.96 2014/05/07 04:34:29 sfeam Exp $
  */
 
 /* GNUPLOT - emf.trm */
@@ -404,7 +404,8 @@ static int emf_dashtype_count = 0;	/* count > 0 if EMF_load_dashtype needed befo
 static int emf_dashpattern[8];		/* filled by EMF_dashtype */
 
 /* shige: hatch pattern (from src/win/wgraph.c) */
-static unsigned char pattern_bitmaps[][16] = {
+#define PATTERN_BITMAP_LENGTH 16
+static const unsigned char pattern_bitmaps[][PATTERN_BITMAP_LENGTH] = {
   {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
    0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF}, /* no fill */
   {0xFE, 0xFE, 0x7D, 0x7D, 0xBB, 0xBB, 0xD7, 0xD7,
@@ -1073,6 +1074,7 @@ EMF_set_color(t_colorspec *colorspec)
     emf_dashtype_count++;
 }
 
+
 TERM_PUBLIC void
 EMF_filled_polygon(int points, gpiPoint *corners)
 {
@@ -1080,66 +1082,65 @@ EMF_filled_polygon(int points, gpiPoint *corners)
     unsigned long color = emf_color;
     int fillpar = corners->style >> 4;
     int style = corners->style & 0xf;
-#if 1
-    unsigned char *pattern;
-#endif
 
     switch (style) {
-	case FS_EMPTY: /* fill with background color */
-		color = emf_background;
-		break;
-	case FS_PATTERN:
-	case FS_TRANSPARENT_PATTERN:
-#if 1
-		/* shige */
-		pattern = pattern_bitmaps[fillpar % pattern_num];
-		break;
+    case FS_EMPTY: /* fill with background color */
+	color = emf_background;
+	break;
+    case FS_PATTERN:
+    case FS_TRANSPARENT_PATTERN:
+#if 1 /* fill pattern implemented as bitmaps, implementation further down */
+	break;
 #else
-		/* pattern fill implemented as partial density */
-		fillpar *= 12;
-		/* Fall through */
+	/* pattern fill implemented as partial density */
+	fillpar *= 12;
+	/* Fall through */
 #endif
-	case FS_SOLID: /* solid fill */
-		if (fillpar >= 0 && fillpar < 100) {
-		    double density = (double)fillpar / 100.;
-		    color = ((int)((double)((emf_color>>16)&0xff)*density) << 16)
-			  + ((int)((double)((emf_color>>8)&0xff)*density) << 8)
-			  + ((int)((double)(emf_color&0xff)*density));
-		    color += ((int)(255.*(1.-density)) << 16)
-		           + ((int)(255.*(1.-density)) << 8)
-			   + ((int)(255.*(1.-density)));
-		}
-		break;
-	default:
-		break;
+    case FS_SOLID: /* solid fill */
+	if (fillpar >= 0 && fillpar < 100) {
+	    double density = (double)fillpar / 100.;
+	    color = ((int)((double)((emf_color>>16)&0xff)*density) << 16)
+		+ ((int)((double)((emf_color>>8)&0xff)*density) << 8)
+		+ ((int)((double)(emf_color&0xff)*density));
+	    color += ((int)(255.*(1.-density)) << 16)
+		+ ((int)(255.*(1.-density)) << 8)
+		+ ((int)(255.*(1.-density)));
+	}
+	break;
+    default:
+	break;
     }
 
     EMF_flush_dashtype();
 
     /* MS documentation says not to delete an object while it is selected */
-	EMF_SelectObject(EMF_STOCK_OBJECT_BLACK_PEN);
-	EMF_SelectObject(EMF_STOCK_OBJECT_WHITE_BRUSH);
+    EMF_SelectObject(EMF_STOCK_OBJECT_BLACK_PEN);
+    EMF_SelectObject(EMF_STOCK_OBJECT_WHITE_BRUSH);
 
-	EMF_DeleteObject(EMF_HANDLE_BRUSH);
+    EMF_DeleteObject(EMF_HANDLE_BRUSH);
 
-	if (style == FS_PATTERN || style == FS_TRANSPARENT_PATTERN) { 
-	    emf_textcolor = color;
-	    EMF_SetTextColor(emf_textcolor);
-	    EMF_CreateMonoBrush(EMF_HANDLE_BRUSH);
-	    for (i = 15; i >= 0; i -= 2)
-	      EMF_write_long(pattern[i] | (pattern[i-1] << 8));
-	} else
-	    EMF_CreateBrush(EMF_HANDLE_BRUSH, 0, color, 0);
+    if (style == FS_PATTERN || style == FS_TRANSPARENT_PATTERN) { 
+	/* Implementation of bitmapped pattern fill */
+	const unsigned char *pattern;
 
-	EMF_SelectObject(EMF_HANDLE_BRUSH);
+	pattern = pattern_bitmaps[fillpar % pattern_num];
+	emf_textcolor = color;
+	EMF_SetTextColor(emf_textcolor);
+	EMF_CreateMonoBrush(EMF_HANDLE_BRUSH);
+	for (i = (PATTERN_BITMAP_LENGTH - 1); i >= 1; i -= 2)
+	    EMF_write_long(pattern[i] | (pattern[i-1] << 8));
+    } else
+	EMF_CreateBrush(EMF_HANDLE_BRUSH, 0, color, 0);
 
-	EMF_DeleteObject(EMF_HANDLE_PEN);
-	EMF_CreatePen(EMF_HANDLE_PEN, emf_pentype, emf_linewidth * EMF_PX2HM, color);
-	EMF_SelectObject(EMF_HANDLE_PEN);
+    EMF_SelectObject(EMF_HANDLE_BRUSH);
 
-	EMF_CreatePolygon(points);
-	for (i=0; i<points; i++)
-	    EMF_write_pointl(corners[i].x, term->ymax - corners[i].y);
+    EMF_DeleteObject(EMF_HANDLE_PEN);
+    EMF_CreatePen(EMF_HANDLE_PEN, emf_pentype, emf_linewidth * EMF_PX2HM, color);
+    EMF_SelectObject(EMF_HANDLE_PEN);
+
+    EMF_CreatePolygon(points);
+    for (i=0; i<points; i++)
+	EMF_write_pointl(corners[i].x, term->ymax - corners[i].y);
 
     /* Force re-evaluation of linetype next time we draw a line */
     emf_linetype = LT_UNDEFINED;

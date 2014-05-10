@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.292 2014/04/25 04:23:11 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.293 2014/05/05 22:19:21 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -2331,7 +2331,7 @@ enhanced_recursion(
 				isitalic = TRUE;
 			    if (!strncmp(p,"Normal",6))
 				isnormal = TRUE;
-			    while (isalpha(*p)) {p++;}
+			    while (isalpha((unsigned char)*p)) {p++;}
 			}
 		    } while (((ch = *p) == '=') || (ch == ':') || (ch == '*'));
 
@@ -2819,7 +2819,7 @@ strlen_tex(const char *str)
 		break;
 	case '\\':
 		s++;
-		while (*s && isalpha(*s)) s++;
+		while (*s && isalpha((unsigned char)*s)) s++;
 		len++;
 		break;
 	case '{':

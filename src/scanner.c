@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: scanner.c,v 1.40 2014/03/06 17:08:08 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: scanner.c,v 1.41 2014/03/10 01:28:37 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - scanner.c */
@@ -67,7 +67,7 @@ static int t_num;		/* number of token I'm working on */
 TBOOLEAN
 legal_identifier(char *p)
 {
-    if (!p || !(*p) || isdigit(*p))
+    if (!p || !(*p) || isdigit((unsigned char)*p))
 	return FALSE;
     while (*p) {
 	if (!isident(*p))
@@ -154,7 +154,7 @@ scanner(char **expressionp, size_t *expressionlenp)
 
 	} else if (expression[current] == '.') {
 	    /* Rule 9 */
-	    if (isdigit(expression[current+1])) {
+	    if (isdigit((unsigned char)expression[current+1])) {
 		token[t_num].is_token = FALSE;
 		token[t_num].length = get_num(&expression[current]);
 		current += (token[t_num].length - 1);

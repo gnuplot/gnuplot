@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.228 2014/05/08 17:35:42 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.229 2014/05/08 19:45:32 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -559,7 +559,8 @@ grid_nongrid_data(struct surface_points *this_plot)
     
     /* these are only needed for thin_plate_splines */
     double *xx, *yy, *zz, *b;
-    int numpoints;
+    int numpoints = 0;
+
     xx = NULL; /* save to call free() on NULL if xx has never been used */
     
     /* Compute XY bounding box on the original data. */

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: util.c,v 1.125 2014/04/04 18:58:49 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: util.c,v 1.126 2014/04/05 06:17:09 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - util.c */
@@ -1503,17 +1503,17 @@ streq(const char *a, const char *b)
 {
     int enda, endb;
 
-    while (isspace(*a))
+    while (isspace((unsigned char)*a))
 	a++;
-    while (isspace(*b))
+    while (isspace((unsigned char)*b))
 	b++;
 
     enda = strlen(a) - 1;
     endb = strlen(b) - 1;
 
-    while (isspace(a[enda]))
+    while (isspace((unsigned char)a[enda]))
 	enda--;
-    while (isspace(b[endb]))
+    while (isspace((unsigned char)b[endb]))
 	endb--;
 
     return (enda == endb) ? !strncmp(a,b,++enda) : FALSE;

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.288 2014/04/22 20:49:28 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.289 2014/04/23 05:29:05 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -2231,8 +2231,8 @@ changedir(char *path)
 #if defined(MSDOS)
     /* first deal with drive letter */
 
-    if (isalpha(path[0]) && (path[1] == ':')) {
-	int driveno = toupper(path[0]) - 'A';	/* 0=A, 1=B, ... */
+    if (isalpha((unsigned char)path[0]) && (path[1] == ':')) {
+	int driveno = toupper((unsigned char)path[0]) - 'A';	/* 0=A, 1=B, ... */
 
 # if defined(__EMX__)
 	(void) _chdrive(driveno + 1);
@@ -3168,10 +3168,10 @@ expand_1level_macros()
     for (c=temp_string; len && c && *c; c++, len--) {
 	switch (*c) {
 	case '@':	/* The only tricky bit */
-		if (!in_squote && !in_dquote && !in_comment && isalpha(c[1])) {
+		if (!in_squote && !in_dquote && !in_comment && isalpha((unsigned char)c[1])) {
 		    /* Isolate the udv key as a null-terminated substring */
 		    m = ++c;
-		    while (isalnum(*c) || (*c=='_')) c++;
+		    while (isalnum((unsigned char )*c) || (*c=='_')) c++;
 		    temp_char = *c; *c = '\0';
 		    /* Look up the key and restore the original following char */
 		    udv = get_udv_by_name(m);

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.101 2013/10/14 23:51:54 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.102 2014/04/02 21:35:46 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - pm3d.c */
@@ -446,7 +446,7 @@ pm3d_plot(struct surface_points *this_plot, int at_which_z)
     struct coordinate GPHUGE *pointsA, *pointsB;
     struct iso_curve **scan_array;
     int scan_array_n;
-    double avgC, gray;
+    double avgC, gray = 0;
     double cb1, cb2, cb3, cb4;
     gpdPoint corners[4];
     int interp_i, interp_j;
@@ -814,6 +814,7 @@ pm3d_plot(struct surface_points *this_plot, int at_which_z)
 	    if (pm3d.direction == PM3D_DEPTH) {
 		/* copy quadrangle */
 		quadrangle* qp = quadrangles + current_quadrangle;
+
 		memcpy(qp->corners, corners, 4 * sizeof (gpdPoint));
 		qp->gray = gray;
 		for (i = 0; i < 4; i++) {

@@ -1,5 +1,5 @@
 /*
- * $Id: wtext.c,v 1.49 2014/01/18 16:14:50 markisch Exp $
+ * $Id: wtext.c,v 1.50 2014/02/12 20:49:09 markisch Exp $
  */
 
 /* GNUPLOT - win/wtext.c */
@@ -563,7 +563,7 @@ TextPutStr(LPTW lptw, LPSTR str)
 
     while (*str) {
 	idx = lptw->CursorPos.x;
-	for (count = 0, n = 0; *str && (isprint(*str) || *str == '\t'); str++) {
+	for (count = 0, n = 0; *str && (isprint((unsigned char)*str) || (*str == '\t')); str++) {
 	    if (*str == '\t') {
 		uint tab;
 
@@ -588,7 +588,7 @@ TextPutStr(LPTW lptw, LPSTR str)
 	    NewLine(lptw);
 	    str++;
 	    n = 0;
-	} else if (*str && !isprint(*str) && *str != '\t') {
+	} else if (*str && !isprint((unsigned char)*str) && (*str != '\t')) {
 	    TextPutCh(lptw, *str++);
 	}
     }

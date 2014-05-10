@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: stats.c,v 1.11 2014/02/26 21:03:23 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: stats.c,v 1.12 2014/03/07 16:16:38 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - stats.c */
@@ -52,9 +52,9 @@ static int comparator __PROTO(( const void *a, const void *b ));
 static struct file_stats analyze_file __PROTO(( long n, int outofrange, int invalid, int blank, int dblblank ));
 static struct sgl_column_stats analyze_sgl_column __PROTO(( double *data, long n, long nr ));
 static struct two_column_stats analyze_two_columns __PROTO(( double *x, double *y,
-			      struct sgl_column_stats res_x,
-			      struct sgl_column_stats res_y,
-			      long n ));
+							     struct sgl_column_stats res_x,
+							     struct sgl_column_stats res_y,
+							     long n ));
 
 static void ensure_output __PROTO((void));
 static char* fmt __PROTO(( char *buf, double val ));
@@ -495,9 +495,9 @@ sgl_column_output( struct sgl_column_stats s, long n )
 
 static void
 two_column_output( struct sgl_column_stats x,
-			struct sgl_column_stats y,
-			struct two_column_stats xy,
-			long n )
+		   struct sgl_column_stats y,
+		   struct two_column_stats xy,
+		   long n )
 {
     int width = 1;
     char bfx[32];
@@ -505,7 +505,7 @@ two_column_output( struct sgl_column_stats x,
     char blank[32];
 
     if ( n > 0 )
-	width = 1 + (int)( log10( (double)n ) );
+	width = 1 + (int)log10((double)n);
 
     /* Non-formatted to disk */
     if ( print_out != stdout && print_out != stderr ) {
@@ -721,8 +721,8 @@ statsrequest(void)
     long out_of_range;     /* number pts rejected, because out of range */
 
     struct file_stats res_file;
-    struct sgl_column_stats res_x, res_y;
-    struct two_column_stats res_xy;
+    struct sgl_column_stats res_x = {0}, res_y = {0};
+    struct two_column_stats res_xy = {0};
 
     float *matrix;            /* matrix data. This must be float. */
     int nc, nr;               /* matrix dimensions. */

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: readline.c,v 1.60 2014/01/01 11:07:37 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: readline.c,v 1.61 2014/02/12 20:42:53 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - readline.c */
@@ -284,7 +284,7 @@ static char os2_getch __PROTO((void));
 
 /* initial size and increment of input line length */
 #define MAXBUF	1024
-#define BACKSPACE 0x08   /* ^H */
+#define BACKSPACE '\b'   /* ^H */
 #define SPACE	' '
 #define NEWLINE	'\n'
 
@@ -402,17 +402,14 @@ char_seqlen()
 {
     int i;
 
-    switch (encoding) {
-
-    case S_ENC_UTF8:
+    if (S_ENC_UTF8 == encoding) {
 	i = cur_pos;
 	do {i++;}
-	    while ((cur_line[i] & 0xc0) != 0xc0
-	        && (cur_line[i] & 0x80) != 0
-		&& i < max_pos);
+	while (((cur_line[i] & 0xc0) != 0xc0)
+	       && ((cur_line[i] & 0x80) != 0)
+	       && (i < max_pos));
 	return (i - cur_pos);
-
-    default:
+    } else {
 	return 1;
     }
 }
@@ -426,23 +423,24 @@ backspace()
 {
     int seqlen;
 
-    switch (encoding) {
-
-    case S_ENC_UTF8:
+    if (S_ENC_UTF8 == encoding) {
 	seqlen = 0;
-	do {cur_pos--; seqlen++;}
-	    while ((cur_line[cur_pos] & 0xc0) != 0xc0
-	        && (cur_line[cur_pos] & 0x80) != 0
-		&& cur_pos > 0);
+	do {
+	    cur_pos--;
+	    seqlen++;
+	} while (((cur_line[cur_pos] & 0xc0) != 0xc0)
+	         && ((cur_line[cur_pos] & 0x80) != 0)
+		 && (cur_pos > 0)
+	        );
 
-	if ((cur_line[cur_pos] & 0xc0) == 0xc0
-	||  isprint(cur_line[cur_pos]))
+	if (   ((cur_line[cur_pos] & 0xc0) == 0xc0)
+	    || isprint((unsigned char)cur_line[cur_pos])
+	   )
 	    user_putc(BACKSPACE);
 	if (isdoublewidth(cur_pos))
 	    user_putc(BACKSPACE);
 	return seqlen;
-
-    default:
+    } else {
 	cur_pos--;
 	user_putc(BACKSPACE);
 	return 1;
@@ -742,9 +740,9 @@ readline(const char *prompt)
 	 * and all leading 8bit characters.
 	 */
 	if ((isprint(cur_char)
-	      || (((cur_char & 0x80) != 0) && (cur_char != EOF)))
-	    && (cur_char != 0x09) /* TAB is a printable character in some locales */
-	    ) {
+	     || (((cur_char & 0x80) != 0) && (cur_char != EOF)))
+	    && (cur_char != '\t') /* TAB is a printable character in some locales */
+	   ) {
 	    size_t i;
 
 	    if (max_pos + 1 >= line_len) {

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.241 2014/04/28 04:05:34 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.242 2014/04/30 04:49:45 sfeam Exp $"); }
 #endif
 
 #define MOUSE_ALL_WINDOWS 1
@@ -2501,9 +2501,10 @@ exec_cmd(plot_struct *plot, char *command)
     else if (*buffer == 'D') {
 	int len;
 	char pattern[DASHPATTERN_LENGTH+1];
+
 	memset(pattern, '\0', sizeof(pattern));
 	sscanf(buffer, "D%8s", pattern);
-	for (len=0; isalpha(pattern[len]); len++) {
+	for (len=0; isalpha((unsigned char)pattern[len]); len++) {
 	    pattern[len] = pattern[len] + 1 - 'A';
 	}
 	pattern[len] = '\0';
