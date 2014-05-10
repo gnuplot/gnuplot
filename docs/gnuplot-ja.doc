@@ -1,5 +1,5 @@
-C RCS $Id: gnuplot-ja.doc,v 1.513 2014-04-25 17:05:38+09 shige Exp $
-C corresponding original gnuplot.doc revision: 1.882
+C RCS $Id: gnuplot-ja.doc,v 1.516 2014-05-09 12:36:00+09 shige Exp $
+C corresponding original gnuplot.doc revision: 1.887
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -253,8 +253,8 @@ C 行が長いのは、できればなんとかしたい
 
  * 文字の書式制御は、下付き、上付き、フォントサイズ、その他以前有効だっ
  たものに加え、今は太字体 (bold) と斜体 (italic) フォント設定もサポート
- しています。このモード (拡張文字処理) は今はデフォルトです。以下参照:
- `enhanced text`。
+ しています。このモード (拡張文字処理) は、現在はデフォルトで有効となっ
+ ています。以下参照: `enhanced text`。
 
  * 対話型出力形式は、ハイパーテキストラベルをサポートしていますが、これ
  はマウスがそのラベルのリンク点上にあるときにのみ現れるものです。
@@ -288,12 +288,17 @@ C 行が長いのは、できればなんとかしたい
  を提供するのに使われます。
 
  * コマンド `import` は、外部共有オブジェクト (サポートはオペレーティン
- グシステム依存) から取り込む関数にユーザ定義関数名を割り当てます。適当
- な外部共有オブジェクトを作るためのテンプレートヘッダファイル、サンプル
- ソース、makefile などが demo の中にあります。
+ グシステム依存) が提供する関数にユーザ定義関数名を割り当てます。適当な
+ 外部共有オブジェクトを作るためのテンプレートヘッダファイル、サンプルソ
+ ース、makefile などが demo の中にあります。
 
  * 対話作業の履歴一覧内の直前のコマンドは、番号で再実行できます。例えば
  `history !5` は、`history` の一覧内の 5 番のコマンドを再実行します。
+
+ * ビットシフト演算子 >> と <<。
+
+ * 新しい描画スタイル `with parallelaxes`、および等高線のラベル付け。
+
 3 新しいコマンド (New commands)
 #start
 # history !N                               # 以前のコマンドを番号で再実行
@@ -328,6 +333,11 @@ C バージョン 5 での変更 (Changes in version 5)
  ルされている個々の gnuplot がどちらのエポックを使用しているかについて
  は、コマンド `print strftime("%F",0)` で知ることができます。現在は、時
  間は少なくともミリ秒の精度で保存されます。
+
+ * 関数 `timecolumn(N,"timeformat")` は、現在は 2 つの引数を持ちます。
+ 2 つ目の必須な引数はどのデータ軸とも関連しておらず、よってこれにより、
+ 関数 `timecolumn` を、x や y 軸に指定するのとは違う形式の日時データの
+ 読み込みに使えるようになります。
 
  * コマンド `set [axis]range` のキーワード `reverse` は、自動縮尺
  (autoscaling) にのみ影響し、`set xrange [0:1]` のようなコマンドの意味
@@ -1009,7 +1019,7 @@ C バージョン 5 での変更 (Changes in version 5)
 ^<tr>    <td>exists("X")</td>    <td>文字列</td>    <td> 変数名 X が定義されていれば 1, そうでなければ 0</td></tr>
 ^<tr>    <td>hsv2rgb(h,s,v)</td>    <td>[0:1] 内の実数 h,s,v</td>    <td> HSV 色を 24ビットの RGB 色へ変換</td></tr>
 ^<tr>    <td>stringcolumn(x)</td>    <td>整数</td>    <td> 文字列としての <i>x</i> 列目の内容</td></tr>
-^<tr>    <td>timecolumn(x)</td>    <td>整数</td>    <td> データファイル処理中の <i>x</i> 列目の日時データ</td></tr>
+^<tr>    <td>timecolumn(N,format)</td>    <td>整数, 文字列</td>    <td> データ入力中の <i>N</i> 列目の日時データ</td></tr>
 ^<tr>    <td>tm_hour(x)</td>    <td>整数</td>    <td>時</td></tr>
 ^<tr>    <td>tm_mday(x)</td>    <td>整数</td>    <td>日</td></tr>
 ^<tr>    <td>tm_min(x)</td>    <td>整数</td>    <td>分</td></tr>
@@ -1575,19 +1585,17 @@ C マーカを doc2html へのこのシグナルとして使用します。
 4 timecolumn
 ?expressions functions timecolumn
 ?timecolumn
-#timecolumn(x) & 整数 & データファイル処理中の $x$ 列目の日時データ \\
-%timecolumn(x)@整数@ データファイル処理中の $x$ 列目の日時データ
- `timecolumn(x)` は fit あるいはデータファイルプロットでの `using` 処理
- 中の数式の一部としてのみ使われます。以下参照: `plot datafile using`。
+#timecolumn(N,"timeformat") & 整数, 文字列 & データ入力中の $N$ 列目の日時データ \\
+%timecolumn(N,"timeformat")@整数, 文字列@データファイル入力中の $N$ 列目の日時データ
+ `timecolumn(N,"timeformat")` は fit、あるいはデータファイル描画での
+ `using` 処理の数式の一部としてのみ使います。以下参照:
+ `plot datafile using`。
 
- これは、その指定した列から始まるデータを日時データ値として読み、その値
- を gnuplot の内部時間表現である "2000 年からの秒数" で返します。
-
- 処理のために正しい `timefmt` 文字列を見つけるため、`timecolumn` はその
- 引数と同じ列番号を `using` 指定の中で探します。もしそれが見つかったら、
- その指定の対象となる軸の `timefmt` 文字列が使用されます。見つからなか
- ったら、`timecolumn` はデフォルトでは x 軸の `timefmt` 文字列を選択し
- ます。
+ これは、N 列目から始まる文字列データを日時データ値として読み、これをミ
+ リ秒精度の "Unix エポック (1970 年 1 月 1 日) からの秒数" として解釈す
+ るために "timeformat" を使用します。
+ 注意: バージョン 5 より前は、この関数は一つの引数しか取らず、また純粋
+ に軸の座標を含んでいる列にしか機能していませんでした。
 4 tm_hour
 ?expressions tm_hour
 ?tm_hour
@@ -2490,8 +2498,8 @@ Ffigure_newsyntax
                            # の組による点線/破線パターン指定
 
  例:
-       # 2 つの関数が 1 つの線種を使うが dashtype で区別
-       plot f1(x) with lines lt N dt solid, f2(x) with lines lt N dt 3
+       # 2 つの関数が線種 1 を使うが dashtype で区別
+       plot f1(x) with lines lt 1 dt solid, f2(x) with lines lt 1 dt 3
 
  いくつかの出力形式は、それが提供する定義済み点線/破線パターンに、ユー
  ザ定義パターンを追加することをサポートしています。
@@ -2508,16 +2516,15 @@ Ffigure_newsyntax
  元の文字列と変換後の数値の列の両方を表示します。
 
 3 linestyles と linetypes
-? linestyles vs linetypes
- 線は、線幅のような他の属性も持つことができます。点 (point) の記号に対
- する同様の属性とともに、これらの属性をコマンド `set style line` を使っ
- てユーザ定義 "ラインスタイル (linestyle)" として結びつけることができま
- す。一度定義された linestyle は、plot コマンド中で、一つまたは多くの描
- 画要素に対してその表示を制御するのに使うことができます。
-
+?linestyles vs linetypes
+ `linestyle` は、属性 linecolor, linewidth, dashtype, pointtype の一時
+ 的な組み合わせで、これはコマンド `set style line` で定義します。一度
+ linestyle を定義すると、1 回の plot コマンド上でそれを使って、1 つ、ま
+ たはより多くの描画要素の見た目を制御できます。言い換えれば、これは丁度
+ linetype から永続性を取り除いたもの、と言うことができるでしょう。
  `linetypes` は永続的 (明示的にそれらを再定義するまでは保持される) です
- が、`linestyles` は一時的なものです。次のグラフィックの状態がリセット
- されるまでの間しか保持されません。
+ が、`linestyles` は、次のグラフィックの状態がリセットされるまでの間し
+ か保持されません。
 
  例:
 
@@ -2526,6 +2533,29 @@ Ffigure_newsyntax
       set style line 5 lt rgb "cyan" lw 3 pt 6
       plot sin(x) with linespoints ls 5          # 定義スタイル 5 で
 
+2 layers
+?layers
+=behind
+=front
+=back
+ gnuplot のグラフは、色々な要素を固定された順番で描き上げていくことで構
+ 成されています。この順番は、キーワード `behind`, `back`, `front` を使
+ って要素に特定の階層を割り当てることで変更できます。例えば、グラフ領域
+ の背景色を変更するには、色のついた長方形を属性 `behind` で定義すればい
+ いわけです。
+      set object 1 rectangle from graph 0,0 to graph 1,1 fc rgb "gray" behind
+ 描画の順番は以下の通りです:
+      behind
+      back
+      グラフ自体
+      グラフの表題 (`key`)
+      front
+ 各階層内では、要素の描画は以下の順番です:
+      番号順のオブジェクト (rectangle, circle, ellipse, polygon)
+      番号順のラベル (label)
+      番号順の矢印 (arrow)
+ 1 ページに複数のグラフがある場合 (multiplot モード)、この順序は、複数
+ グラフを全体として適用するのではなく、各描画要素に別々に適用します。
 2 マウス入力 (mouse input)
 ?mouse input
  多くの出力形式で、現在の描画にマウスを使って作用をすることが可能になっ
@@ -7727,7 +7757,7 @@ Ffigure_mapcontours
  の多くは、赤、緑、青、紫、水色、黄色、で始まります。これが以前の版の
  gnuplot のデフォルトの挙動です。
 
- `set colorsequence podo` は、Wong (2011) [Nature Methods 9:441] で推奨
+ `set colorsequence podo` は、Wong (2011) [Nature Methods 8:441] で推奨
  されている、P 型、D 型 (Protanopia, Deuteranopia) の色弱者が容易に区別
  できる 8 色の組を選択します。
 
@@ -9937,7 +9967,6 @@ Ffigure_missing
                  {noruler | ruler {at x,y}} \
                  {polardistance{deg|tan} | nopolardistance} \
                  {format <string>} \
-                 {clipboardformat <int>/<string>} \
                  {mouseformat <int>/<string>} \
                  {{no}labels {"labeloptions"}} \
                  {{no}zoomjump} {{no}verbose}
@@ -9990,12 +10019,11 @@ Ffigure_missing
  マウスカーソルの [x,y] 座標を描画ウィンドウとクリップボードにどのよう
  に表示するかを決定します。デフォルトは "% #g" です。
 
- `set mouse clipboardformat` と `set mouse mouseformat` は、ボタン 1 と
- ボタン 2 の作用時 (座標をクリップボードへコピーし、マウス位置に一時的
- に注釈をつける) の文字列の書式用に使われます。引数が整数の場合、以下の
- 表にある書式オプションの一つを選択します。引数が文字列の場合は、書式オ
- プション 6 の sprintf() の書式文字列として使われますので、2 つの実数の
- 指定子を含む必要があります。例:
+ `set mouse mouseformat` は、ボタン 1 とボタン 2 の作用時 (座標をクリッ
+ プボードへコピーし、マウス位置に一時的に注釈をつける) の文字列の書式用
+ に使われます。引数が整数の場合、以下の表にある書式オプションの一つを選
+ 択します。引数が文字列の場合は、書式オプション 6 の sprintf() の書式文
+ 字列として使われますので、2 つの実数の指定子を含む必要があります。例:
       `set mouse mouseformat "mouse x,y = %5.2g, %10.3f"`.
  この文字列をまたオフにするには、`set mouse mouseformat ""` とします。
 
@@ -10293,7 +10321,7 @@ Ffigure_missing
          <object-type> <object-properties>
          {front|back|behind} {clip|noclip}
          {fc|fillcolor <colorspec>} {fs <fillstyle>}
-         {default} {lw|linewidth <width>}
+         {default} {lw|linewidth <width>} {dt|dashtype <dashtype>}
      unset object <index>
 
  <object-type> は、`rectangle`, `ellipse`, `circle`, `polygon` のいずれ
