@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.332 2014/05/09 22:14:12 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.333 2014/05/11 16:05:50 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -704,12 +704,13 @@ get_data(struct curve_points *current_plot)
 		    fprintf(outfile, "\n");
 		} else {
 		    char buf[64]; /* buffer large enough to hold %g + 2 extra chars */
-		    size_t size = 64;
+		    size_t size = sizeof(buf);
 		    char *line = (char *) gp_alloc(size, "");
 		    size_t len = 0;
+
 		    line[0] = NUL;
 		    for (col = 0; col < j; col++) {
-			snprintf(buf, 64, " %g", v[col]);
+			snprintf(buf, sizeof(buf), " %g", v[col]);
 			len = strappend(&line, &size, len, buf);
 		    }
 		    append_to_datablock(&table_var->udv_value, line);
@@ -1538,7 +1539,8 @@ compare_boxplot_factors(SORTFUNC_ARGS arg1, SORTFUNC_ARGS arg2)
     struct text_label * const *p1 = arg1;
     struct text_label * const *p2 = arg2;
 
-    return strncmp((*p1)->text, (*p2)->text, 64);
+    /* magic number alert: why 64? */
+    return strncmp((*p1)->text, (*p2)->text, 64); 
 }
 
 /* Sort boxplot factors */

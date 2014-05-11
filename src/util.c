@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: util.c,v 1.126 2014/04/05 06:17:09 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: util.c,v 1.127 2014/05/09 22:14:12 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - util.c */
@@ -643,12 +643,13 @@ gprintf(
 
 	    } else {
 		/* in enhanced mode -- convert E/e to x10^{foo} or *10^{foo} */
-		char tmp[256];
-		char tmp2[256];
+#define LOCAL_BUFFER_SIZE 256
+		char tmp[LOCAL_BUFFER_SIZE];
+		char tmp2[LOCAL_BUFFER_SIZE];
 		int i,j;
 		TBOOLEAN bracket_flag = FALSE;
-		snprintf(tmp, 240, temp, x);
-		for (i=j=0; tmp[i] && i<256; i++) {
+		snprintf(tmp, 240, temp, x); /* magic number alert: why 240? */
+		for (i=j=0; tmp[i] && (i < LOCAL_BUFFER_SIZE); i++) {
 		    if (tmp[i]=='E' || tmp[i]=='e') {
 			if ((term-> flags & TERM_IS_LATEX)) {
 			    if (*format == 'h') {
@@ -687,6 +688,7 @@ gprintf(
 		    tmp2[j++] = '}';
 		tmp2[j] = '\0';
 		strncpy(dest, tmp2, remaining_space);
+#undef LOCAL_BUFFER_SIZE
 	    }
 
 	    break;

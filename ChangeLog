@@ -1,3 +1,13 @@
+2014-05-11  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/util.c (LOCAL_BUFFER_SIZE): New constant.
+	(gprintf): Use constant to identify buffer size, instead of typing
+	the same magic number multiple times. Insert warning about
+	remaining magig number.
+
+	* src/plot2d.c (get_data): Fix buffer overflow a bit more cleanly.
+	(compare_boxplot_factors): Insert warning about magic number.
+
 2014-05-11  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/plot2d.c (get_data): fix buffer overflow
