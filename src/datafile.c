@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.284 2014/05/09 22:14:11 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.285 2014/05/11 20:26:42 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -1934,8 +1934,12 @@ df_readascii(double v[], int max)
 			    add_tic_user(axis, a.v.string_val, xpos, -1);
 			    gpfree_string(&a);
 			} else {
+			    /* Version 5: In this case do not generate a tic at all. */
+			    /* E.g. plot $FOO using 1:2:(filter(3) ? strcol(3) : NaN) */
+			    /*
 			    add_tic_user(axis, "", xpos, -1);
 			    int_warn(NO_CARET,"Tic label does not evaluate as string!\n");
+			     */
 			}
 		    } else {
 			char *temp_string = df_parse_string_field(df_tokens[output]);

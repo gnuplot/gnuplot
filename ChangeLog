@@ -17,6 +17,10 @@
 	return NULL which may cause a segfault later on.
 	Bugfix.
 
+	* src/datafile.c (df_readascii): If xticlabels(f(n)) returns a 
+	non-string value then do not generate an axis tic.  It used to issue
+	a warning about illegal string values but generated a tic anyway.
+
 2014-05-10  Dima Kogan  <dima@secretsauce.net>
 
 	* src/mouse.c (do_zoom rescale_around_mouse):  Handle various conditions
