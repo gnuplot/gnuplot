@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.331 2014/05/08 19:45:32 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.332 2014/05/09 22:14:12 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -709,7 +709,7 @@ get_data(struct curve_points *current_plot)
 		    size_t len = 0;
 		    line[0] = NUL;
 		    for (col = 0; col < j; col++) {
-			snprintf(buf, 128, " %g", v[col]);
+			snprintf(buf, 64, " %g", v[col]);
 			len = strappend(&line, &size, len, buf);
 		    }
 		    append_to_datablock(&table_var->udv_value, line);

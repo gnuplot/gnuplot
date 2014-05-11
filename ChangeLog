@@ -1,3 +1,7 @@
+2014-05-11  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/plot2d.c (get_data): fix buffer overflow
+
 2014-05-10  Dima Kogan  <dima@secretsauce.net>
 
 	* src/mouse.c (do_zoom rescale_around_mouse):  Handle various conditions
