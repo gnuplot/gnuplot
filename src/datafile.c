@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.283 2014/05/08 17:35:42 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.284 2014/05/09 22:14:11 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -2416,7 +2416,7 @@ f_stringcolumn(union argument *arg)
 	push(&a);               /* any objection to this ? */
     } else {
 	char *temp_string = df_parse_string_field(df_column[column-1].position);
-	push(Gstring(&a, temp_string ));
+	push(Gstring(&a, temp_string ? temp_string : ""));
 	free(temp_string);
     }
 }
