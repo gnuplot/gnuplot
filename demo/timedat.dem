@@ -1,5 +1,5 @@
 #
-# $Id: timedat.dem,v 1.10 2014/01/28 21:56:08 sfeam Exp $
+# $Id: timedat.dem,v 1.9.2.1 2014/01/28 22:03:03 sfeam Exp $
 #
 
 set title "Fsteps plot\nwith date and time as x-values"
@@ -21,7 +21,7 @@ pause -1 "Hit return to continue"
 
 reset
 
-set title "Time data on Y, microsecond precision" font ",14"
+set title "Time data on Y, millisecond precision" font ",14"
 set ydata time
 set timefmt "%s"
 set offset 0.5,1.5,.2,.2
