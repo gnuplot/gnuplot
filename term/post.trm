@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: post.trm,v 1.284 2014/05/09 22:14:12 broeker Exp $
+ * $Id: post.trm,v 1.285 2014/05/10 17:20:42 sfeam Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -2021,10 +2021,12 @@ PS_dashtype(int type, t_dashtype *custom_dash_type)
 		/* Handled by LT_AXIS */
 		break;
     case DASHTYPE_SOLID:
+		PS_FLUSH_PATH;
 		if (PS_linetype_last != LT_SOLID+3 && PS_linetype_last != LT_AXIS+3)
 		    fprintf(gppsfile, "[] 0 setdash\n");
 		break;
     case DASHTYPE_CUSTOM:
+		PS_FLUSH_PATH;
 		fprintf(gppsfile, "[");
 		for (i = 0; custom_dash_type->pattern[i] > 0; i++)
 		    fprintf(gppsfile, "%.1f ", PS_SCF * custom_dash_type->pattern[i]);

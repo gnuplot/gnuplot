@@ -11,6 +11,9 @@
 	#ifdef PM3D_CONTOURS . This disabled code may or may not be useful for
 	some future implementation of filled contours.
 
+	* term/post.trm (PS_dashtype): Always stroke the previous path before
+	setting a new dashtype.
+
 2014-05-11  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/util.c (LOCAL_BUFFER_SIZE): New constant.
