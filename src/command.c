@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.289 2014/04/23 05:29:05 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.290 2014/05/09 22:14:11 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -150,7 +150,6 @@ static char* gp_get_string __PROTO((char *, size_t, const char *));
 static int read_line __PROTO((const char *prompt, int start));
 static void do_system __PROTO((const char *));
 static void test_palette_subcommand __PROTO((void));
-static void test_time_subcommand __PROTO((void));
 static int find_clause __PROTO((int *, int *));
 
 static int expand_1level_macros __PROTO((void));
@@ -2051,48 +2050,6 @@ $PALETTE u 1:2 t 'red' w l lt 1 lc rgb 'red',\
     is_3d_plot = save_is_3d_plot;
 }
 
-
-/* process the undocumented 'test time' command
- *	test time 'format' 'string'
- * to assist testing of time routines
- */
-static void
-test_time_subcommand()
-{
-    char *format = NULL;
-    char *string = NULL;
-    struct tm tm;
-    double secs;
-    double usec;
-
-    /* given a format and a time string, exercise the time code */
-
-    if (isstring(++c_token)) {
-	m_quote_capture(&format, c_token, c_token);
-	if (isstring(++c_token)) {
-	    m_quote_capture(&string, c_token, c_token);
-	    memset(&tm, 0, sizeof(tm));
-	    gstrptime(string, format, &tm, &usec);
-	    secs = gtimegm(&tm);
-	    fprintf(stderr, "internal = %f - %d/%d/%d::%d:%d:%d , wday=%d, yday=%d\n",
-		    secs, tm.tm_mday, tm.tm_mon + 1, tm.tm_year % 100,
-		    tm.tm_hour, tm.tm_min, tm.tm_sec, tm.tm_wday,
-		    tm.tm_yday);
-	    memset(&tm, 0, sizeof(tm));
-	    ggmtime(&tm, secs);
-	    gstrftime(string, strlen(string), format, secs);
-	    fprintf(stderr, "convert back \"%s\" - %d/%d/%d::%d:%d:%d , wday=%d, yday=%d\n",
-		    string, tm.tm_mday, tm.tm_mon + 1, tm.tm_year % 100,
-		    tm.tm_hour, tm.tm_min, tm.tm_sec, tm.tm_wday,
-		    tm.tm_yday);
-	    free(string);
-	    ++c_token;
-	} /* else: expecting time string */
-	free(format);
-    } /* else: expecting format string */
-}
-
-
 /* process the 'test' command */
 void
 test_command()
@@ -2111,7 +2068,6 @@ test_command()
 	    /* otherwise fall through to test_term */
 	case TEST_TERMINAL: test_term(); break;
 	case TEST_PALETTE: test_palette_subcommand(); break;
-	case TEST_TIME: test_time_subcommand(); break;
     }
 
     /* prevent annoying error messages if there was no previous plot */
