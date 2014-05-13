@@ -138,19 +138,6 @@ set output out . 'figure_xerrorlines' . ext
 plot demo . 'candlesticks.dat' using 1:4:($1-sin($1)/2.):($1+sin($1)/2.) \
      with xerrorlines title 'with xerrorlines'
 #
-# Filled curves
-# =============
-#
-set output out . 'figure_filledcurves' . ext
-set style fill solid 1.0 border -1
-set xrange [250:500]
-set auto y
-set key box title "with filledcurves"
-plot demo . 'silver.dat' u 1:2:($3+$1/50.) w filledcurves above title 'above' lc rgb "grey10", \
-               '' u 1:2:($3+$1/50.) w filledcurves below title 'below' lc rgb "grey75", \
-               '' u 1:2 w lines lt -1 lw 1 title 'curve 1', \
-               '' u 1:($3+$1/50.) w lines lt -1 lw 3 title 'curve 2'
-#
 # Boxplot
 # =======
 #
@@ -418,9 +405,12 @@ butterfly(x)=exp(cos(x))-2*cos(4*x)+sin(x/12)**5
 GPFUN_butterfly = "butterfly(x)=exp(cos(x))-2*cos(4*x)+sin(x/12)**5"
 plot 3.+sin(t)*cos(5*t) with filledcurve above r=2.5 notitle, \
      3.+sin(t)*cos(5*t) with line
-reset
 
+reset
+#
 # Parallel axis plot
+# ==================
+#
 if (GPVAL_TERM eq "pdfcairo") \
     set term pdfcairo color font fontspec size 3.5,2.0 dashlength 0.2
 set output out . 'figure_parallel' . ext
@@ -437,6 +427,19 @@ set paxis 4 tics  auto 1 left offset 5
 plot 'silver.dat' using 2:3:1:($3/2):(int($0/25)) with parallel lt 1 lc variable
 
 reset
+#
+# Filled curves
+# =============
+#
+set output out . 'figure_filledcurves' . ext
+set style fill solid 0.75 border -1
+set xrange [250:500]
+set auto y
+set key box title "with filledcurves"
+plot demo . 'silver.dat' u 1:2:($3+$1/50.) w filledcurves above title 'above' lc rgb "honeydew", \
+               '' u 1:2:($3+$1/50.) w filledcurves below title 'below' lc rgb "dark-violet", \
+               '' u 1:2 w lines lt -1 lw 1 title 'curve 1', \
+               '' u 1:($3+$1/50.) w lines lt -1 lw 4 title 'curve 2'
 #
 # New syntax features
 #
