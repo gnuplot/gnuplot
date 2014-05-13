@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.102 2014/04/02 21:35:46 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.103 2014/05/09 22:14:12 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - pm3d.c */
@@ -75,7 +75,6 @@ static double rms4 __PROTO((double, double, double, double));
 static void pm3d_plot __PROTO((struct surface_points *, int));
 static void pm3d_option_at_error __PROTO((void));
 static void pm3d_rearrange_part __PROTO((struct iso_curve *, const int, struct iso_curve ***, int *));
-static void filled_color_contour_plot  __PROTO((struct surface_points *, int));
 static TBOOLEAN color_from_rgbvar = FALSE;
 
 /*
@@ -976,7 +975,7 @@ pm3d_plot(struct surface_points *this_plot, int at_which_z)
     free(scan_array);
 }				/* end of pm3d splotting mode */
 
-
+#ifdef PM3D_CONTOURS
 /*
  *  Now the implementation of the filled color contour plot
 */
@@ -1024,6 +1023,7 @@ filled_color_contour_plot(struct surface_points *this_plot, int contours_where)
 	cntr = cntr->next;
     }
 }				/* end of filled color contour plot splot mode */
+#endif
 
 
 /*
@@ -1067,6 +1067,7 @@ pm3d_draw_one(struct surface_points *plot)
 	pm3d_plot(plot, where[i]);
     }
 
+#ifdef PM3D_CONTOURS
     if (strchr(where, 'C') != NULL) {
 	/* !!!!! FILLED COLOR CONTOURS, *UNDOCUMENTED*
 	   !!!!! LATER CHANGE TO STH LIKE
@@ -1080,6 +1081,7 @@ pm3d_draw_one(struct surface_points *plot)
 	if (draw_contour & CONTOUR_BASE)
 	    filled_color_contour_plot(plot, CONTOUR_BASE);
     }
+#endif
 
     /* for pm3dCompress.awk */
     if (pm3d.direction != PM3D_DEPTH)

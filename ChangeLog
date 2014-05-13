@@ -5,6 +5,12 @@
 	and in any case the functionality is now coverted adequately by
 	"print strptime()" and "print strftime()".
 
+	* src/color.c (filled_polygon_3dcoords filled_polygon_zfixed)
+	src/pm3d.c (filled_color_contour_plot):	 The option "set pm3d at C" is
+	undocumented and doesn't work anyhow.  Wrap the corresponding code in
+	#ifdef PM3D_CONTOURS . This disabled code may or may not be useful for
+	some future implementation of filled contours.
+
 2014-05-11  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/util.c (LOCAL_BUFFER_SIZE): New constant.

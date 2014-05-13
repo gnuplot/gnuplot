@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: color.c,v 1.112 2014/02/28 19:23:52 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: color.c,v 1.113 2014/04/02 21:35:46 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - color.c */
@@ -253,49 +253,21 @@ filled_quadrangle(gpdPoint * corners)
     ifilled_quadrangle(icorners);
 }
 
-
+#ifdef PM3D_CONTOURS
 /*
    Makes mapping from real 3D coordinates, passed as coords array,
    to 2D terminal coordinates, then draws filled polygon
  */
 void
-filled_polygon_3dcoords(int points, struct coordinate GPHUGE * coords)
+filled_polygon_common(int points, struct coordinate GPHUGE * coords, TBOOLEAN fixed, double z)
 {
     int i;
     double x, y;
     gpiPoint *icorners;
     icorners = gp_alloc(points * sizeof(gpiPoint), "filled_polygon3d corners");
     for (i = 0; i < points; i++) {
-	map3d_xy_double(coords[i].x, coords[i].y, coords[i].z, &x, &y);
-	icorners[i].x = x;
-	icorners[i].y = y;
-    }
-#ifdef EXTENDED_COLOR_SPECS
-    if ((term->flags & TERM_EXTENDED_COLOR)) {
-	icorners[0].spec.gray = -1;	/* force solid color */
-    }
-#endif
-    if (default_fillstyle.fillstyle == FS_EMPTY)
-	icorners->style = FS_OPAQUE;
-    else
-	icorners->style = style_from_fill(&default_fillstyle);
-    term->filled_polygon(points, icorners);
-    free(icorners);
-}
-
-
-/*
-   Makes mapping from real 3D coordinates, passed as coords array, but at z coordinate
-   fixed (base_z, for instance) to 2D terminal coordinates, then draws filled polygon
- */
-void
-filled_polygon_3dcoords_zfixed(int points, struct coordinate GPHUGE * coords, double z)
-{
-    int i;
-    double x, y;
-    gpiPoint *icorners;
-    icorners = gp_alloc(points * sizeof(gpiPoint), "filled_polygon_zfix corners");
-    for (i = 0; i < points; i++) {
+	if (fixed)
+	    z = coords[i].z;
 	map3d_xy_double(coords[i].x, coords[i].y, z, &x, &y);
 	icorners[i].x = x;
 	icorners[i].y = y;
@@ -312,6 +284,24 @@ filled_polygon_3dcoords_zfixed(int points, struct coordinate GPHUGE * coords, do
     term->filled_polygon(points, icorners);
     free(icorners);
 }
+
+void
+filled_polygon_3dcoords(int points, struct coordinate GPHUGE * coords)
+{
+    filled_polygon_common(points, coords, FALSE, 0.0);
+}
+
+/*
+   Makes mapping from real 3D coordinates, passed as coords array, but at z coordinate
+   fixed (base_z, for instance) to 2D terminal coordinates, then draws filled polygon
+ */
+void
+filled_polygon_3dcoords_zfixed(int points, struct coordinate GPHUGE * coords, double z)
+{
+    filled_polygon_common(points, coords, TRUE, z);
+}
+
+#endif /* PM3D_CONTOURS */
 
 
 /*
