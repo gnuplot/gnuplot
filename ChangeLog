@@ -8,6 +8,9 @@
 	* term/svg.trm src/wxterminal/gp_cairo.c:
 	Add point types pentagon (14) and filled pentagon (15)
 
+	* src/qtterminal/QtGnuplotItems.cpp:
+	(EAM) Add point types pentagon (14) and filled pentagon (15)
+
 2014-05-13  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/command.c src/tables.c src/tables.h: Remove undocumented routine
