@@ -1,8 +1,13 @@
+2014-05-14  Karl Ratzsch  <kf2402@users.sf.net>
+
+	* term/svg.trm src/wxterminal/gp_cairo.c:
+	Add point types pentagon (14) and filled pentagon (15)
+
 2014-05-13  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/command.c src/tables.c src/tables.h: Remove undocumented routine
 	test_time(). It was never updated to handle sub-second time precision,
-	and in any case the functionality is now coverted adequately by
+	and in any case the functionality is now covered adequately by
 	"print strptime()" and "print strftime()".
 
 	* src/color.c (filled_polygon_3dcoords filled_polygon_zfixed)

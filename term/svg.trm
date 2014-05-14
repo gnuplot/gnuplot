@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: svg.trm,v 1.166 2014/04/18 18:39:50 sfeam Exp $
+ * $Id: svg.trm,v 1.167 2014/05/05 22:19:22 sfeam Exp $
  */
 
 /*------------------------------------------------------------------------------------------------------------------------------------
@@ -1026,6 +1026,10 @@ SVG_init ()
 	     "\t<use xlink:href='#gpPt3' id='gpPt11' stroke='currentColor' transform='rotate(45)'/>\n"
 	     /* 12 diamond               filled */
 	     "\t<use xlink:href='#gpPt11' id='gpPt12' fill='currentColor' stroke='none'/>\n"
+	     /* 13 pentagon */
+	     "\t<path id='gpPt13' stroke-width='%.3f' stroke='currentColor' d='M0,1.330 L1.265,0.411 L0.782,-1.067 L-0.782,-1.076 L-1.265,0.411 z'/>\n"
+	     /* 14 pentagon              filled */
+	     "\t<use xlink:href='#gpPt13' id='gpPt14' fill='currentColor' stroke='none'/>\n"
 
 	     /* NOTE: Fill patterns must be defined after the stroke color has been
 	      * set to use the correct (current) stroke color. Therefore we can't
@@ -1038,6 +1042,7 @@ SVG_init ()
 #endif
 
 	     "</defs>\n"
+	     , stroke_width
 	     , stroke_width
 	     , stroke_width
 	     , stroke_width
@@ -1393,7 +1398,7 @@ onmouseout=\"gnuplot_svg.hideHypertext()\"><title> </title>\n",
     } else {			/* draw a point symbol */
 	fprintf (gpoutfile, "\
 \t<use xlink:href='#gpPt%u' transform='translate(%.*f,%.*f) scale(%.2f)'%s/>",
-		 number % 13, PREC, X(x), PREC, Y(y),
+		 number % 15, PREC, X(x), PREC, Y(y),
 		 term_pointsize * term->h_tic / (2 * SVG_SCALE),
 		 color_spec);
     }

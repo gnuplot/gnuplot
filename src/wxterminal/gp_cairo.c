@@ -1,5 +1,5 @@
 /*
- * $Id: gp_cairo.c,v 1.81 2014/03/20 20:50:10 markisch Exp $
+ * $Id: gp_cairo.c,v 1.82 2014/04/18 04:12:46 sfeam Exp $
  */
 
 /* GNUPLOT - gp_cairo.c */
@@ -970,7 +970,9 @@ void gp_cairo_draw_point(plot_struct *plot, int x1, int y1, int style)
 		cairo_fill (plot->cr);
 	}
 
-	switch (style%13) {
+
+	style = style % 15;
+	switch (style) {
 	case 0: /* plus */
 		cairo_move_to(plot->cr, x-size, y);
 		cairo_line_to(plot->cr, x+size,y);
@@ -1002,20 +1004,14 @@ void gp_cairo_draw_point(plot_struct *plot, int x1, int y1, int style)
 		cairo_stroke(plot->cr);
 		break;
 	case 3: /* box */
-		cairo_move_to(plot->cr, x-size, y-size);
-		cairo_line_to(plot->cr, x-size,y+size);
-		cairo_line_to(plot->cr, x+size,y+size);
-		cairo_line_to(plot->cr, x+size,y-size);
-		cairo_close_path(plot->cr);
-		cairo_stroke(plot->cr);
-		break;
 	case 4: /* filled box */
 		cairo_move_to(plot->cr, x-size, y-size);
 		cairo_line_to(plot->cr, x-size,y+size);
 		cairo_line_to(plot->cr, x+size,y+size);
 		cairo_line_to(plot->cr, x+size,y-size);
 		cairo_close_path(plot->cr);
-		cairo_fill_preserve(plot->cr);
+		if (style == 4)
+			cairo_fill_preserve(plot->cr);
 		cairo_stroke(plot->cr);
 		break;
 	case 5: /* circle */
@@ -1028,52 +1024,48 @@ void gp_cairo_draw_point(plot_struct *plot, int x1, int y1, int style)
 		cairo_stroke(plot->cr);
 		break;
 	case 7: /* triangle */
-		cairo_move_to(plot->cr, x-size, y+size-plot->oversampling_scale);
-		cairo_line_to(plot->cr, x,y-size);
-		cairo_line_to(plot->cr, x+size,y+size-plot->oversampling_scale);
-		cairo_close_path(plot->cr);
-		cairo_stroke(plot->cr);
-		break;
 	case 8: /* filled triangle */
 		cairo_move_to(plot->cr, x-size, y+size-plot->oversampling_scale);
 		cairo_line_to(plot->cr, x,y-size);
 		cairo_line_to(plot->cr, x+size,y+size-plot->oversampling_scale);
 		cairo_close_path(plot->cr);
-		cairo_fill_preserve(plot->cr);
+		if (style == 8)
+			cairo_fill_preserve(plot->cr);
 		cairo_stroke(plot->cr);
 		break;
 	case 9: /* upside down triangle */
-		cairo_move_to(plot->cr, x-size, y-size+plot->oversampling_scale);
-		cairo_line_to(plot->cr, x,y+size);
-		cairo_line_to(plot->cr, x+size,y-size+plot->oversampling_scale);
-		cairo_close_path(plot->cr);
-		cairo_stroke(plot->cr);
-		break;
 	case 10: /* filled upside down triangle */
 		cairo_move_to(plot->cr, x-size, y-size+plot->oversampling_scale);
 		cairo_line_to(plot->cr, x,y+size);
 		cairo_line_to(plot->cr, x+size,y-size+plot->oversampling_scale);
 		cairo_close_path(plot->cr);
-		cairo_fill_preserve(plot->cr);
+		if (style == 10)
+			cairo_fill_preserve(plot->cr);
 		cairo_stroke(plot->cr);
 		break;
 	case 11: /* diamond */
-		cairo_move_to(plot->cr, x-size, y);
-		cairo_line_to(plot->cr, x,y+size);
-		cairo_line_to(plot->cr, x+size,y);
-		cairo_line_to(plot->cr, x,y-size);
-		cairo_close_path(plot->cr);
-		cairo_stroke(plot->cr);
-		break;
 	case 12: /* filled diamond */
 		cairo_move_to(plot->cr, x-size, y);
 		cairo_line_to(plot->cr, x,y+size);
 		cairo_line_to(plot->cr, x+size,y);
 		cairo_line_to(plot->cr, x,y-size);
 		cairo_close_path(plot->cr);
-		cairo_fill_preserve(plot->cr);
+		if (style == 12)
+			cairo_fill_preserve(plot->cr);
 		cairo_stroke(plot->cr);
 		break;
+	case 13: /* pentagon */
+	case 14: /* filled pentagon */
+		cairo_move_to(plot->cr, x+size*0.5878, y-size*0.8090);
+		cairo_line_to(plot->cr, x-size*0.5878, y-size*0.8090);
+		cairo_line_to(plot->cr, x-size*0.9511, y+size*0.3090);
+		cairo_line_to(plot->cr, x,             y+size);
+		cairo_line_to(plot->cr, x+size*0.9511, y+size*0.3090);
+		cairo_close_path(plot->cr);
+		if (style == 14)
+			cairo_fill_preserve(plot->cr);
+		cairo_stroke(plot->cr);
+		break;				
 	default :
 		break;
 	}
