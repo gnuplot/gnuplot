@@ -1,3 +1,8 @@
+2014-05-15  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* configure.in PATCHLEVEL src/version.c docs/titlepag.tex:
+	Bump version information to 5.0.rc1
+
 2014-05-14  Karl Ratzsch  <kf2402@users.sf.net>
 
 	* term/svg.trm src/wxterminal/gp_cairo.c:

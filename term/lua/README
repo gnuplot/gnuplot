@@ -4,20 +4,19 @@ Gnuplot PGF/TikZ terminal
 
 The PGF/TikZ terminal mainly consists of a generic Lua terminal to
 wrap the gnuplot terminal C functions. This allows writing gnuplot
-terminals in Lua instead of C. The first (and currently only) implemented
-`backend' is the PGF/TikZ terminal for the use with TeX/LaTeX.
+terminals in Lua instead of C. The first implemented `backend' is the
+PGF/TikZ terminal for the use with TeX/LaTeX.
 
 The actual terminal functionality is a provided by a separate Lua script
-`gnuplot-tikz.lua'. The LaTeX style file is usually derived from PGF/TikZ terminal
-script to keep things consistent.
+`gnuplot-tikz.lua'. The LaTeX style file is usually derived from the 
+PGF/TikZ terminal script to keep things consistent.
 
 
 
 Why all that hassle?
 ====================
 
-There are are couple of terminals allready usable for LaTeX so why
-writing another one?
+There are already a couple of terminals usable for LaTeX so why another one?
 
 Here is a brief list of reasons:
 
