@@ -6,6 +6,7 @@ set border 0
 unset xtics
 unset ytics
 unset key
+set yrange [0:1]
 
 y = 0.9
 set label 101 at screen 0.1, screen y "Terminal's native dashtypes"
