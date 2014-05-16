@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.293 2014/05/05 22:19:21 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.294 2014/05/09 22:14:12 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -2760,16 +2760,31 @@ void
 load_linetype(struct lp_style_type *lp, int tag)
 {
     struct linestyle_def *this;
-    int save_pointflag = lp->pointflag;
+    TBOOLEAN recycled = FALSE;
 
 recycle:
     this = first_perm_linestyle;
     while (this != NULL) {
 	if (this->tag == tag) {
-	    *lp = this->lp_properties;
-	    lp->pointflag = save_pointflag;
+	    /* Always load color, width, and dash properties */
+	    lp->l_type = this->lp_properties.l_type;
+	    lp->l_width = this->lp_properties.l_width;
+	    lp->pm3d_color = this->lp_properties.pm3d_color;
+	    lp->d_type = this->lp_properties.d_type;
+	    lp->custom_dash_pattern = this->lp_properties.custom_dash_pattern;
+
+	    /* FIXME:  Not sure this is correct for version 5 */
 	    if (term->flags & TERM_MONOCHROME)
 		lp->l_type = tag;
+
+	    /* Do not recycle point properties. */
+	    /* FIXME: there should be a separate command "set pointtype cycle N" */
+	    if (!recycled) {
+	    	lp->p_type = this->lp_properties.p_type;
+	    	lp->p_interval = this->lp_properties.p_interval;
+	    	lp->p_char = this->lp_properties.p_char;
+	    	lp->p_size = this->lp_properties.p_size;
+	    }
 	    return;
 	} else {
 	    this = this->next;
@@ -2780,6 +2795,7 @@ recycle:
     /* Should we recycle one of the first N linetypes?	*/
     if (tag > linetype_recycle_count && linetype_recycle_count > 0) {
 	tag = (tag-1) % linetype_recycle_count + 1;
+	recycled = TRUE;
 	goto recycle;
     }
 
