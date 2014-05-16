@@ -38,10 +38,9 @@ are using sources downloaded directly from a CVS repository you may need to
 regenerate it using the preliminary script "./prepare".
 
    A complete overview of configure options is below in the Basic
-Installation section. On platforms which do not support GNU
-autoconf/configure, ie. most non-Unix platforms, look for a makefile
-that looks suitable in the "config" directory.  Check "config/README"
-to see which of them to use for which platform.
+Installation section. On platforms that do not support GNU
+autoconf/configure look for a suitable makefile in the "config" directory.
+Check "config/README" to see which of them to use for which platform.
 
 File location defaults
 ----------------------
@@ -49,11 +48,14 @@ File location defaults
 PREFIX                          /usr/local
 gnuplot                         PREFIX/bin
 gnuplot_x11                     PREFIX/libexec/gnuplot/$VERSION
+gnuplot_qt                      PREFIX/libexec/gnuplot/$VERSION
 gnuplot.1                       PREFIX/man/man1
 gnuplot.gih                     PREFIX/share/gnuplot/$VERSION
+terminal support files          PREFIX/share/gnuplot/$VERSION/js
+                                PREFIX/share/gnuplot/$VERSION/PostScript
+                                PREFIX/share/gnuplot/$VERSION/lua
+                                PREFIX/share/gnuplot/$VERSION/qt
 
-Gnuplot				PREFIX/share/gnuplot/$VERSION/app-defaults
-				(please copy to system app-defaults location)
 
    The only files where the runtime location is defined at compile time are
 gnuplot.gih and show.c. This is important if gnuplot is not installed 
@@ -170,22 +172,17 @@ $ ./configure --help
   --disable-history-file  do not use history file
   --disable-mouse         disable mouse for interactive terminals
   --disable-x11-mbfonts   disable multi-byte font support for x11
-  --disable-binary-x11-polygon  disable binary_x11_polygon
   --disable-x11-external  disable drawing to windows belonging to external apps
-  --disable-volatile-data disable zooming of volatile data
   --disable-raise-console spacebar in plot window does not raise console
   --disable-macros        disable command line macros
-  --enable-h3d-gridbox    enable gridbox optimization in hidden3d code
   --disable-wxwidgets     wxWidgets terminal (default enabled)
   --enable-backwards-compatibility       enable deprecated syntax
-  --disable-bitmap-terminals
-			the code in bitmap.c has a copyright notice that is more
-			restrictive that the gnuplot license.  This option
-			disables inclusion of this code and any terminals that
-			depend on it (mostly HP deskjet era dot matrix printers).
+  --enable-bitmap-terminals
+			  enable support for HP deskjet era dot matrix printers
+			  and *.pbm files
   --with-readline={gnu|bsd|builtin}
-			Override the automatic choice of terminal input modes.
-			See below for more detail.
+			  Override the automatic choice of terminal input modes.
+			  See below for more detail.
 
 Options marked with (*) are enabled by default, ie. these features or
 packages are used if configure detects them even if the corresponding
@@ -216,10 +213,10 @@ Readline issues:
   As I understand the situation, Apple ships OSX with a "fake" libreadline
   shared library. The file /usr/lib/libreadline.dylib is really a symlink to a
   compatibility layer over the BSD libedit library.  But the compatibility isn't
-  complete, and in particular it is missing many of the routines used for readline
-  support by gnuplot. As of version 4.4, the ./configure script should be able
-  to cope with this. But you will still be left without some of the functionality
-  of the "real" libreadline.  For one thing, libedit doesn't handle UTF input.
+  complete, and in particular it is missing some routines used for readline
+  support by gnuplot. The ./configure script should be able to cope with this.
+  But you will still be left without some of the functionality of the "real"
+  libreadline.  For one thing, libedit doesn't handle UTF-8 input.
   You have several options:
   
   1) Delete the fake libreadline libraries from OSX and install
@@ -232,8 +229,8 @@ Readline issues:
   definitions in CFLAGS, and is probably harder than replacing the
   system copy of the library.
 
-  3) Use gnuplot's built-in readline routines.  These have been enhanced
-  in version 4.6 to support UTF-8 input and tab-completion of file names.
+  3) Use gnuplot's built-in readline routines.  These now support UTF-8
+  input and tab-completion of file names.
   ./configure --with-readline=builtin
 
 wxt terminal:

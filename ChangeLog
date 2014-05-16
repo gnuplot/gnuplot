@@ -12,7 +12,7 @@
 	that you can choose M to be prime relative to N.
 	Bugfix.
 
-	* docs/gnuplot.doc:  More complete list of new features.
+	* INSTALL docs/gnuplot.doc:  Update description of new features.
 
 2014-05-15  Ethan A Merritt  <merritt@u.washington.edu>
 
