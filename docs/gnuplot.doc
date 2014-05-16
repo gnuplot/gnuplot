@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.887 2014/05/05 06:17:36 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.888 2014/05/10 17:20:42 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -241,15 +241,18 @@ C
 
  * Bit-shift operators >> and <<.
 
- * New plot styles: `with parallelaxes`, labeled contours.
+ * New plot styles: `with parallelaxes`, `with table`, labeled contours.
+
+ * Shell invocation of gnuplot can pass parameters to a gnuplot script.
+ gnuplot -c scriptfile.gp ARG1 ARG2 ARG3 ...
 
 3 New commands
 #start
-# history !N                               # re-execute prior command by number
 # import f(x) from "plugin.so"             # load function from shared library
+# set history {quiet|numers} {full|trim}   # controls output of history command
+# history !N                               # re-execute prior command by number
 # plot <datafile> skip N                   # skip lines at start of ascii data file
 # plot ... smooth mcsplines                # monotonic cubic spline fit to data
-# plot ... with parallelaxes               # new plot style
 # reset session                            # restore initial state of current session
 # set arrow <tag> from <start> length <len> angle <ang>
 # set colorsequence default|classic|podo   # colors used by successive plot elements
@@ -259,6 +262,9 @@ C
 # set multiplot next|previous              # out-of-order plotting to an autolayout
 # set contours; splot ... with labels      # label contour lines with numeric values
 # set style textbox                        # text elements can be enclosed in a box
+# set view map {scale}                     # allows resizing a 3D projection plot
+# set multiplot {next|previous}            # navigate within the auto-layout grid
+# plot 'data' skip N ...                   # skip lines at start of ascii data file
 #end
 
 2 Changes in version 5

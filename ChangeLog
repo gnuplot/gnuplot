@@ -1,15 +1,18 @@
 2014-05-16  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/term.c (load_linetype):  As documented, "set linetype cycle N"
-	should only affect line properties (color width dash), not point
+	should only affect line properties (color, width, dash), not point
 	properties (type, interval, size).  This got lost somewhere, which 
 	meant point types > linetype_recycle_count were never used by default.
 	Now they are.  This means that, as intended, 'with linespoints' cycles
 	through (linetype_recycle_count * terminal's_max_point_type) distinct
 	combinations before repeating so long as those two numbers are
 	mutually prime.  Unfortunately that's not guaranteed and is terminal-
-	dependent.  We really need a "set pointtype cycle N" command also.
+	dependent.  We really need a "set pointtype cycle M" command also so
+	that you can choose M to be prime relative to N.
 	Bugfix.
+
+	* docs/gnuplot.doc:  More complete list of new features.
 
 2014-05-15  Ethan A Merritt  <merritt@u.washington.edu>
 
