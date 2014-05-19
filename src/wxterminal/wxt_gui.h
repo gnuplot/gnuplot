@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.h,v 1.42 2014/02/04 22:11:34 sfeam Exp $
+ * $Id: wxt_gui.h,v 1.43 2014/04/18 04:12:47 sfeam Exp $
  */
 
 /* GNUPLOT - wxt_gui.h */
@@ -208,6 +208,8 @@ extern "C" {
  * ====================================================================*/
 
 #ifdef WXT_MULTITHREADED
+#include <X11/Xlib.h>	/* Magic fix for linking against wxgtk3.0 */
+
 /* thread class, where the gui loop runs.
  * Not needed with Windows, where the main loop
  * already processes the gui messages */
@@ -239,6 +241,11 @@ DEFINE_EVENT_TYPE(wxStatusTextEvent)
 class wxtApp : public wxApp
 {
 public:
+#ifdef WXT_MULTITHREADED 
+	/* Magic fix needed by wxgtk3.0 */
+        wxtApp() : wxApp() { XInitThreads(); } 
+#endif 
+
 	/* This one is called just after wxWidgets initialization */
 	bool OnInit();
 	/* cleanup on exit */

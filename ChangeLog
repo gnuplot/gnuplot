@@ -1,3 +1,10 @@
+2014-05-19  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/wxterminal/wxt_gui.h: Apparently wxWidgets3 (wxgtk3) threads call
+	into Xlib but fail to initialize X threading before doing so. Therefore
+	we must call XInitThreads before forking wxt threads.
+	Bug #1401
+
 2014-05-19  Karl Ratzsch  <kf2402@users.sf.net>
 
 	* term/emf.trm: Add point types pentagon (14) and filled pentagon (15)
