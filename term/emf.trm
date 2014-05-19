@@ -1,5 +1,5 @@
 /* Hey Emacs this is -*- C -*-
- * $Id: emf.trm,v 1.96 2014/05/07 04:34:29 sfeam Exp $
+ * $Id: emf.trm,v 1.97 2014/05/09 22:14:12 broeker Exp $
  */
 
 /* GNUPLOT - emf.trm */
@@ -44,6 +44,8 @@
  *
  * HISTORY
  *
+ * 5.0   19-May-2014 Karl Ratzsch
+ * - Revised point types to include pentagons
  * 4.6.1 04-Sep-2012 Shige Takeno
  * - Revised order of object handling   Deselect/Delete/Create/Select
  * - Defer application of new dash+color style until needed for a new line segment
@@ -189,7 +191,7 @@ TERM_PUBLIC void ENHemf_FLUSH __PROTO((void));
 #define EMF_VCHAR ((EMF_FONTSIZE * EMF_PT2HM) * 1.3)
 #define EMF_LINE_TYPES 5	/* number of line types we support */
 #define EMF_COLORS 15		/* number of colors we support */
-#define EMF_POINTS 13		/* number of markers we support */
+#define EMF_POINTS 15		/* number of markers we support */
 #define EMF_MAX_SEGMENTS 104	/* maximum # polyline coordinates */
 
 #define EMF_HANDLE_PEN		1
@@ -396,8 +398,7 @@ static int emf_vert_text = 0;	/* text orientation -- nonzero for vertical */
 static int emf_step_sizes[8];	/* array of currently used dash lengths in plot units */
 static int emf_step_index = 0;	/* index into emf_step_sizes[] */
 static int emf_step = 0;	/* amount of current dash not yet drawn, in plot units */
-static int emf_tic, emf_tic707, emf_tic866, emf_tic500, emf_tic1241, emf_tic1077, emf_tic621;	/* marker dimensions */
-
+static int emf_tic, emf_tic707, emf_tic866, emf_tic500, emf_tic1241, emf_tic1077, emf_tic621, emf_tic9511, emf_tic5878, emf_tic8090, emf_tic3090;	/* marker dimensions */
 static TBOOLEAN emf_tweak = TRUE;	/* Empirical hack to adjust character widths */
 static double emf_fontscale = 1.0;
 static int emf_dashtype_count = 0;	/* count > 0 if EMF_load_dashtype needed before drawing */
@@ -1614,6 +1615,22 @@ EMF_point(unsigned int x, unsigned int y, int number)
 	corners[3].x = x           ; corners[3].y = y + emf_tic;
 	EMF_filled_polygon(4, corners);
 	break;
+    case 13:			/* draw pentagon */
+	EMF_move(x + emf_tic5878, y + emf_tic8090);
+	EMF_solid_vector(x - emf_tic5878, y + emf_tic8090);
+	EMF_solid_vector(x - emf_tic9511, y - emf_tic3090);
+	EMF_solid_vector(x,                  y - emf_tic);
+	EMF_solid_vector(x + emf_tic9511, y - emf_tic3090);
+	EMF_flush_polygon();
+	break;
+    case 14: /* filled pentagon */
+	corners[0].x = x + emf_tic5878;  corners[0].y = y + emf_tic8090;
+	corners[1].x = x - emf_tic5878;  corners[1].y = y + emf_tic8090;
+	corners[2].x = x - emf_tic9511;  corners[2].y = y - emf_tic3090;
+	corners[3].x = x;                corners[3].y = y - emf_tic;
+	corners[4].x = x + emf_tic9511;  corners[4].y = y - emf_tic3090;
+	EMF_filled_polygon(5, corners);
+	break;	
     }
 /* end_points: */
 
@@ -1633,6 +1650,11 @@ EMF_set_pointsize(double size)
     emf_tic500 = emf_tic / 2;
     emf_tic1241 = emf_tic * 36 / 29;
     emf_tic1077 = emf_tic * 14 / 13;
+    emf_tic9511 = emf_tic * 0.9511;
+    emf_tic5878 = emf_tic * 0.5878;
+    emf_tic8090 = emf_tic * 0.8090;
+    emf_tic3090 = emf_tic * 0.3090;
+    
     emf_tic621 = emf_tic * 18 / 29;
 }
 
