@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot on Unix.
 dnl
-dnl $Id: configure.in,v 1.364 2014/05/07 04:37:27 sfeam Exp $
+dnl $Id: configure.in,v 1.365 2014/05/14 23:37:40 sfeam Exp $
 dnl
 dnl this is actually major.minor ...
 dnl note that for a non-beta release, we need to disable DEVELOPMENT_RELEASE
@@ -787,13 +787,6 @@ if test "$with_caca" != no; then
   fi
 fi
 dnl end caca
-
-dnl How do we detect the Ultrix X libraries?
-dnl Or is it really a server (run-time) problem?
-dnl FIXME AC_DEFINE(ULTRIX_KLUDGE)
-
-dnl Removed enable options for these
-dnl Just autodetect
 
 dnl Sun sunview
 AC_EGREP_CPP(yes,
