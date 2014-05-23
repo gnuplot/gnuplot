@@ -1,3 +1,11 @@
+2014-05-23  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/boundary.c:  A width adjustment for the length of the key title
+	was being applied to every column of entries in the key instead of just
+	once for the whole key.  Apply the "set key {no}enhanced" property to
+	the key title as well as to the individual plot titles.
+	Bugfix
+
 2014-05-19  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/wxterminal/wxt_gui.h: Apparently wxWidgets3 (wxgtk3) threads call

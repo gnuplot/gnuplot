@@ -1,7 +1,9 @@
 Changes since 5.0.rc1
 =====================
 
+* CHANGE apply "set key {no}enhanced}" to the key title
 * FIX wxgtk3 requires initialization of Xthreads
+* FIX width adjustment for long key title in multicolumn keys
 
 New features, changes and fixes in gnuplot version 5.0
 ======================================================

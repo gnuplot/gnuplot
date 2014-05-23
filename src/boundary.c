@@ -1,5 +1,5 @@
 /*
- * $Id: boundary.c,v 1.12 2014/04/07 23:07:08 sfeam Exp $
+ * $Id: boundary.c,v 1.13 2014/04/08 18:49:21 sfeam Exp $
  */
 
 /* GNUPLOT - boundary.c */
@@ -988,12 +988,8 @@ do_key_layout(legend_key *key)
     key_title_height = 0;
     key_title_extra = 0;
     if (key->title) {
-	int ytlen, ytheight;
-	ytlen = label_width(key->title, &ytheight);
-	ytlen -= key->swidth + 2;
-	/* EAM FIXME */
-	if ((ytlen > max_ptitl_len) && (key->stack_dir != GPKEY_HORIZONTAL))
-	    max_ptitl_len = ytlen;
+	int ytheight;
+	(void) label_width(key->title, &ytheight);
 	key_title_height = ytheight * t->v_char;
 	if ((*key->title) && (t->flags & TERM_ENHANCED_TEXT)
 	&&  (strchr(key->title,'^') || strchr(key->title,'_')))
@@ -1068,7 +1064,15 @@ do_key_layout(legend_key *key)
 	}
     }
 
-    /* adjust for outside key, leave manually set margins alone */
+    /* If the key title is wider than the contents, try to make room for it */
+    if (key->title) {
+	int ytlen = label_width(key->title, NULL) - key->swidth + 2;
+	ytlen *= t->h_char;
+	if (ytlen > key_cols * key_col_wth)
+	    key_col_wth = ytlen / key_cols;
+    }
+
+    /* Adjust for outside key, leave manually set margins alone */
     if ((key->region == GPKEY_AUTO_EXTERIOR_LRTBC && (key->vpos != JUST_CENTRE || key->hpos != CENTRE))
 	|| key->region == GPKEY_AUTO_EXTERIOR_MARGIN) {
 	int more = 0;
@@ -1374,8 +1378,10 @@ draw_key(legend_key *key, TBOOLEAN key_pass, int *xinkey, int *yinkey)
 		apply_pm3dcolor(&(key->box.pm3d_color), t);
 	    else
 		apply_pm3dcolor(&(key->textcolor), t);
+	    ignore_enhanced(!key->enhanced);
 	    write_multiline(center, key->bounds.ytop - (key_title_extra + key_entry_height)/2,
 			key->title, CENTRE, JUST_TOP, 0, key->font);
+	    ignore_enhanced(FALSE);
 	    (*t->linetype)(LT_BLACK);
 	}
     }
