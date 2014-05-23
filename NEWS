@@ -15,6 +15,7 @@ New features, changes and fixes in gnuplot version 4.6.6
 * FIX timecolumn() applied to non-axis data reports an error rather than faulting
 * FIX clipping could fail on integer overflow
 * FIX segfault resulting from strcol(N) applied to empty field in a *.csv file
+* FIX adjustment of key size to accommodate long key title
 
 
 New features, changes and fixes in gnuplot version 4.6.5

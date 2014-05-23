@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.379.2.28 2014/03/24 23:47:53 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.379.2.29 2014/04/08 20:01:42 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -586,12 +586,8 @@ boundary(struct curve_points *plots, int count)
 
 	/* Key title length and height */
 	if (key->title) {
-	    int ytlen, ytheight;
-	    ytlen = label_width(key->title, &ytheight);
-	    ytlen -= key->swidth + 2;
-	    /* EAM FIXME */
-	    if ((ytlen > max_ptitl_len) && (key->stack_dir != GPKEY_HORIZONTAL))
-		max_ptitl_len = ytlen;
+	    int ytheight;
+	    (void) label_width(key->title, &ytheight);
 	    ktitl_lines = (int)ytheight;
 	}
 
@@ -665,7 +661,15 @@ boundary(struct curve_points *plots, int count)
 	    }
 	}
 
-	/* adjust for outside key, leave manually set margins alone */
+	/* If the key title is wider than the content, try to make room for it */
+	if (key->title) {
+	    int ytlen = label_width(key->title, NULL) - key->swidth + 2;
+	    ytlen *= t->h_char;
+	    if (ytlen > key_cols * key_col_wth)
+		key_col_wth = ytlen / key_cols;
+	}
+
+	/* Adjust for outside key, leave manually set margins alone */
 	if ((key->region == GPKEY_AUTO_EXTERIOR_LRTBC && (key->vpos != JUST_CENTRE || key->hpos != CENTRE))
 	    || key->region == GPKEY_AUTO_EXTERIOR_MARGIN) {
 	    int more = 0;
