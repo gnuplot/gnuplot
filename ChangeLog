@@ -1,3 +1,9 @@
+2014-05-24  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/wxterminal/wxt_gui.cpp (wxt_waitforinput):  Do not wait for an
+	event when only checking for mouse events.
+	Bugfix
+
 2014-05-23  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/boundary.c:  A width adjustment for the length of the key title

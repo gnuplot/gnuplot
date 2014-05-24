@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.cpp,v 1.123 2014/04/18 04:12:46 sfeam Exp $
+ * $Id: wxt_gui.cpp,v 1.124 2014/04/20 20:23:35 lodewyck Exp $
  */
 
 /* GNUPLOT - wxt_gui.cpp */
@@ -3678,9 +3678,14 @@ int wxt_waitforinput(int options)
 int wxt_waitforinput(int options)
 {
 #ifdef _Windows
-	if (paused_for_mouse || options==TERM_ONLY_CHECK_MOUSING) {
+	if (options == TERM_ONLY_CHECK_MOUSING) {
+		WinMessageLoop();
+		return NUL;
+	} else if (paused_for_mouse) {
 		MSG msg;
 		BOOL ret;
+
+		/* wait for next event  */
 		while ((ret = GetMessage(&msg, NULL, 0, 0)) != 0) {
 			if (ret == -1)
 				break;
@@ -3689,9 +3694,8 @@ int wxt_waitforinput(int options)
 			if (!paused_for_mouse)
 				break;
 		}
-		return '\0';
-	}
-	else
+		return NUL;
+	} else
 		return getch();
 
 #else /* !_Windows */
@@ -3700,7 +3704,7 @@ int wxt_waitforinput(int options)
 	static int yield = 0;
 	if (yield)
 		return '\0';
-	
+
 	if (wxt_status == STATUS_UNINITIALIZED)
 		return (options == TERM_ONLY_CHECK_MOUSING) ? '\0' : getc(stdin);
 
@@ -3712,14 +3716,14 @@ int wxt_waitforinput(int options)
 		}
 		return '\0'; // gets dropped on floor
 	}
-	
-	while(wxTheApp) {
-	  // Loop with timeout of 10ms until stdin is ready to read, 
-          // while also handling window events.  
+
+	while (wxTheApp) {
+	  // Loop with timeout of 10ms until stdin is ready to read,
+	  // while also handling window events.
 	  yield = 1;
 	  wxTheApp->Yield();
 	  yield = 0;
-	  
+
 	  struct timeval tv;
 	  fd_set read_fd;
 	  tv.tv_sec = 0;
