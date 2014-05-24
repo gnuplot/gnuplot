@@ -1,4 +1,4 @@
-This is gnuplot version 5.0 alpha -- binary distribution for Windows
+This is gnuplot version 5.0 -- binary distribution for Windows
 ===========================================================================
 
 gnuplot is a command-line driven interactive function plotting utility
@@ -47,27 +47,26 @@ are dual-licensed.
 gnuplot binaries
 ----------------
 
-* wgnuplot.exe: The default gnuplot executable.
+* wgnuplot.exe:  GUI version and the default gnuplot executable. As of version 5 
+  it emulates pipe functionality.
+  
+* wgnuplot_pipes.exe:  Variant with full pipe functionality at the expense of
+  an additional console window.
 
-* gnuplot.exe: Text (console) mode version of the gnuplot executable with full
+* gnuplot.exe:  Text (console) mode version of the gnuplot executable with full
   pipe functionality as it is common on other platforms. In contrast to
   wgnuplot.exe, this program can also accept commands on stdin (standard input)
   and print messages on stdout (standard output). It replaces pgnuplot.exe and
   is recommended to be used with 3rd party applications using gnuplot as graph
   engine, like e.g. Octave (www.octave.org).
 
-* pgnuplot.exe: This program will accept commands on stdin (standard input),
-  and pipe them to an active (or newly created) wgnuplot.exe text window.
-  Command line options are passed on to wgnuplot.
-  Effectively, this means `pgnuplot' is an almost complete substitute for
-  `wgnuplot', on the command line, with the added benefit that it does accept
-  commands from redirected stdin. (Being a Windows GUI application, `wgnuplot'
-  itself cannot read stdin at all.)
+* pgnuplot.exe:  This helper program is no longer shipped with binary package.
+  Use gnuplot.exe instead.
 
 * runtime library files
   Runtime library files (e.g. freetype6.dll) that are required for gnuplot
   are included in the package.  Licenses of these runtime libraries can be
-  found in 'license' directory.
+  found in the 'license' directory.
 
 
 Installation
@@ -190,13 +189,6 @@ Please see and use
 
 for an up-to-date bug tracking system.
 
-Currently, there are a few bugs specific to the Windows version:
-
-  * Binary data through a pipe is not working (Bug #2981027)
-  * Plots (or inifinite loops) cannot be interrupted by pressing Ctrl-C,
-  as it is the case on other platforms.
-
-
 --------------------------------------------------------------------------------
 
-The gnuplot team, November 2011
+The gnuplot team, Mai 2014
