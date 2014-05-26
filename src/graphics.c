@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.379.2.29 2014/04/08 20:01:42 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.379.2.30 2014/05/24 04:54:10 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -3588,6 +3588,11 @@ plot_boxes(struct curve_points *plot, int xaxis_y)
 			dxl += plot->histogram->start;
 			dxr += plot->histogram->start;
 		    }
+
+		    /* May 2014: This is necessary if the key is disabled.	*/
+		    /*           Without it user linestyles are ignored. Why?	*/
+		    if (plot->lp_properties.use_palette)
+			apply_pm3dcolor(&plot->lp_properties.pm3d_color,t);
 
 		    switch (histogram_opts.type) {
 		    case HT_STACKED_IN_TOWERS: /* columnstacked */

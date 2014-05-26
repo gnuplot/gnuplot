@@ -3,6 +3,10 @@
 	* term/js/gnuplot_svg.js term/svg.trm:
 	Grey out key entries when corresponding plot is toggled off.
 
+	* src/graphics.c: Autoincremented user linestyle was not applied to
+	histograms if the key was disabled. 
+	Bugfix
+
 2014-05-23  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/boundary.c:  A width adjustment for the length of the key title
