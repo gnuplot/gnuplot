@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.cpp,v 1.124 2014/04/20 20:23:35 lodewyck Exp $
+ * $Id: wxt_gui.cpp,v 1.125 2014/05/24 07:51:59 markisch Exp $
  */
 
 /* GNUPLOT - wxt_gui.cpp */
@@ -1267,6 +1267,22 @@ static void wxt_update_key_box( unsigned int x, unsigned int y )
 	if (x > bb->right) bb->right = x;
 	if (y < bb->ybot)  bb->ybot = y;
 	if (y > bb->ytop)  bb->ytop = y;
+}
+
+/* Grey out the box for a particular key sample if the corresponding
+ * plot has been toggled off.
+ */
+static void wxt_grey_out_key_box( plot_struct *plot, wxtBoundingBox *w )
+{
+    cairo_set_source_rgba(plot->cr, 0.75, 0.75, 0.75, 0.50);
+    cairo_move_to(plot->cr, w->left, plot->ymax - w->ybot);
+    cairo_line_to(plot->cr, w->left, plot->ymax - w->ytop);
+    cairo_line_to(plot->cr, w->right, plot->ymax - w->ytop);
+    cairo_line_to(plot->cr, w->right, plot->ymax - w->ybot);
+    cairo_line_to(plot->cr, w->left, plot->ymax - w->ybot);
+    cairo_close_path(plot->cr);
+    cairo_fill(plot->cr);
+    // do we need to restore plot rgb?	
 }
 
 /* Keep a list of hypertext anchor points so that we can
@@ -2697,6 +2713,13 @@ void wxtPanel::wxt_cairo_refresh()
 		&&  wxt_cur_plotno < wxt_max_key_boxes
 		&&  wxt_key_boxes[wxt_cur_plotno].hidden)
 			continue;
+
+		if (wxt_in_key_sample
+		&&  wxt_iter->command == command_layer	/* catches TERM_LAYER_END_KEYSAMPLE */
+		&&  wxt_cur_plotno < wxt_max_key_boxes
+		&&  wxt_key_boxes[wxt_cur_plotno].hidden) {
+			wxt_grey_out_key_box(&plot, &wxt_key_boxes[wxt_cur_plotno]);
+		}
 
 		wxt_cairo_exec_command( *wxt_iter );
 

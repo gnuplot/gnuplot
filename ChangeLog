@@ -6,6 +6,9 @@
 	* src/qtterminal/QtGnuplotItems.* src/qtterminal/QtGnuplotScene.cpp:
 	Grey out key entries when corresponding plot is toggled off.
 
+	* src/wxterminal/wxt_gui.cpp (wxt_grey_out_key_box):
+	Grey out key entries when corresponding plot is toggled off.
+
 2014-05-24  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/wxterminal/wxt_gui.cpp (wxt_waitforinput):  Do not wait for an
