@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.20 2014/02/28 13:49:21 markisch Exp $
+# $Id: Makefile,v 1.21 2014/03/31 06:04:43 markisch Exp $
 #
 # GNUPLOT Makefile Microsoft Visual C++ 2005 or newer
 
@@ -50,11 +50,7 @@ PDFLIB = 0
 WXT = 0
 # Build Cairo Terminals (cairolatex, epslatex, pdflatex)
 CAIRO = 1
-# Build qt terminal? WARNING: the qt terminal should build, but does not work correctly.
-# Only enable it if you want to work on fixing qt terminal on windows.
-# (Basic problem: qt_waitforinput() uses select() to wait on stdin and a named
-# pipe simultaneously. On Windows, this fails, because select() on Windows can
-# only be used on network sockets)
+# Build qt terminal?
 QT = 0
 # Set to one if you have Qt5 (instead of Qt4)
 QT5 = 1
