@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: svg.trm,v 1.128.2.16 2014/02/05 22:58:03 sfeam Exp $
+ * $Id: svg.trm,v 1.128.2.17 2014/03/20 15:42:36 sfeam Exp $
  */
 
 /*------------------------------------------------------------------------------------------------------------------------------------
@@ -998,6 +998,11 @@ SVG_init ()
 	      * set to use the correct (current) stroke color. Therefore we can't
 	      * define fill patterns here. */
 
+	     "\t<filter id='greybox' filterUnits='objectBoundingBox' x='0' y='0' height='1' width='1'>\n"
+	     "\t  <feFlood flood-color='lightgrey' flood-opacity='1' result='grey'/>\n"
+	     "\t  <feComposite in='SourceGraphic' in2='grey' operator='atop'/>\n"
+	     "\t</filter>\n"
+
 	     "</defs>\n"
 	     , stroke_width
 	     , stroke_width
@@ -1610,7 +1615,8 @@ SVG_layer(t_termlayer syncpoint)
 		    if (multiplot && mp_layout.current_panel < 26)
 			panel[0] = 'a' + mp_layout.current_panel;
 
-		    fprintf(gpoutfile, "\t<g visibility=\"visible\" ");
+		    fprintf(gpoutfile, "\t<g id=\"%s_plot_%d%s_keyentry\" visibility=\"visible\" ",
+			name,SVG_plotno,panel);
 		    fprintf(gpoutfile,
 			"onclick=\"gnuplot_svg.toggleVisibility(evt,'%s_plot_%d%s')\"",
 			name,SVG_plotno,panel);

@@ -4,6 +4,7 @@ New features, changes and fixes in gnuplot version 4.6.6
 * NEW linetype keyword "nodraw" can be used to draw only the points in "with lp"
 * NEW plot option to "skip N" lines at start of an ascii data file
 * NEW 'set fit prescale' normalized fit parameters before M-L refinement
+* NEW update svg terminal to grey out the key entry when a plot is toggled off
 * CHANGE Accept "with image pixels" as a synonym for "with image failsafe"
 * CHANGE return NaN if a requested numerical data value fins a string instead
 * CHANGE Consume only one space following the font name in an enhanced test string
