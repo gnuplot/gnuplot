@@ -131,9 +131,12 @@ public:
 	QtGnuplotKeybox(const QRectF& rect);
 	void setHidden(bool state);
 	bool ishidden() const;
+	void showStatus(QGraphicsRectItem* me);
+	void resetStatus();
 
 private:
 	bool m_hidden;
+	QGraphicsRectItem *m_statusBox;
 };
 
 struct QtGnuplotPoints_PointData

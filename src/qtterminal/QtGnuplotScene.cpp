@@ -534,9 +534,23 @@ void QtGnuplotScene::processEvent(QtGnuplotEventType type, QDataStream& in)
 	{
 		flushCurrentPointsItem();
 		int layer; in >> layer;
-		if (layer == QTLAYER_BEGIN_KEYSAMPLE) m_inKeySample = true;
-		if (layer == QTLAYER_END_KEYSAMPLE) m_inKeySample = false;
 		if (layer == QTLAYER_BEFORE_ZOOM) m_preserve_visibility = true;
+		if (layer == QTLAYER_BEGIN_KEYSAMPLE) m_inKeySample = true;
+		if (layer == QTLAYER_END_KEYSAMPLE)
+		{
+			m_inKeySample = false;
+
+			// FIXME: this catches mislabeled opaque keyboxes in multiplot mode
+			if (m_currentPlotNumber > m_key_boxes.length()) {
+				return;
+			}
+			// Draw an invisible grey rectangle in the key box.
+			// It will be set to visible if the plot is toggled off.
+			QtGnuplotKeybox *keybox = &m_key_boxes[m_currentPlotNumber-1];
+			QGraphicsRectItem *statusBox = addRect(*keybox, Qt::NoPen, Qt::Dense4Pattern);
+			statusBox->setZValue(m_currentZ-1);
+			keybox->showStatus(statusBox);
+		}
 	}
 	else if (type == GEHypertext)
 	{
@@ -627,6 +641,7 @@ void QtGnuplotScene::resetItems()
 	int i = m_key_boxes.count();
 	while (i-- > 0) {
 		m_key_boxes[i].setSize( QSizeF(0,0) );
+		m_key_boxes[i].resetStatus();
 		if (!m_preserve_visibility)
 			m_key_boxes[i].setHidden(false);
 	}

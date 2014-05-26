@@ -321,6 +321,7 @@ void QtGnuplotPoints::paint(QPainter* painter, const QStyleOptionGraphicsItem* o
 QtGnuplotKeybox::QtGnuplotKeybox(const QRectF& rect) : QRectF(rect)
 {
 	m_hidden = false;
+	m_statusBox = NULL;
 }
 
 bool QtGnuplotKeybox::ishidden() const
@@ -331,4 +332,17 @@ bool QtGnuplotKeybox::ishidden() const
 void QtGnuplotKeybox::setHidden(bool state)
 {
 	m_hidden = state;
+	if (m_statusBox)
+		m_statusBox->setVisible(m_hidden);
+}
+
+void QtGnuplotKeybox::showStatus(QGraphicsRectItem* me)
+{
+	m_statusBox = me;
+	m_statusBox->setVisible(m_hidden);
+}
+
+void QtGnuplotKeybox::resetStatus()
+{
+	m_statusBox = NULL;
 }

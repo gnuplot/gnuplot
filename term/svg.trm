@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: svg.trm,v 1.167 2014/05/05 22:19:22 sfeam Exp $
+ * $Id: svg.trm,v 1.168 2014/05/14 23:33:07 sfeam Exp $
  */
 
 /*------------------------------------------------------------------------------------------------------------------------------------
@@ -1040,6 +1040,10 @@ SVG_init ()
 	     "\t  <feComposite in='SourceGraphic' in2='bgnd' operator='atop'/>\n"
 	     "\t</filter>\n"
 #endif
+	     "\t<filter id='greybox' filterUnits='objectBoundingBox' x='0' y='0' height='1' width='1'>\n"
+	     "\t  <feFlood flood-color='lightgrey' flood-opacity='1' result='grey'/>\n"
+	     "\t  <feComposite in='SourceGraphic' in2='grey' operator='atop'/>\n"
+	     "\t</filter>\n"
 
 	     "</defs>\n"
 	     , stroke_width
@@ -1762,7 +1766,8 @@ SVG_layer(t_termlayer syncpoint)
 		    if (multiplot && multiplot_current_panel() < 26)
 			panel[0] = 'a' + multiplot_current_panel();
 
-		    fprintf(gpoutfile, "\t<g visibility=\"visible\" ");
+		    fprintf(gpoutfile, "\t<g id=\"%s_plot_%d%s_keyentry\" visibility=\"visible\" ",
+			name,SVG_plotno,panel);
 		    fprintf(gpoutfile,
 			"onclick=\"gnuplot_svg.toggleVisibility(evt,'%s_plot_%d%s')\"",
 			name,SVG_plotno,panel);

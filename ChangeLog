@@ -1,3 +1,11 @@
+2014-05-26  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/js/gnuplot_svg.js term/svg.trm:
+	Grey out key entries when corresponding plot is toggled off.
+
+	* src/qtterminal/QtGnuplotItems.* src/qtterminal/QtGnuplotScene.cpp:
+	Grey out key entries when corresponding plot is toggled off.
+
 2014-05-24  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/wxterminal/wxt_gui.cpp (wxt_waitforinput):  Do not wait for an
