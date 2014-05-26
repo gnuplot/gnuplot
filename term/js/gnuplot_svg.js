@@ -1,12 +1,12 @@
 /*
- * $Id: gnuplot_svg.js,v 1.15 2014/03/13 18:44:09 sfeam Exp $
+ * $Id: gnuplot_svg.js,v 1.16 2014/05/26 20:16:43 sfeam Exp $
  */
 // Javascript routines for interaction with SVG documents produced by 
 // gnuplot's SVG terminal driver.
 
 var gnuplot_svg = { };
 
-gnuplot_svg.version = "13 Mar 2014";
+gnuplot_svg.version = "26 May 2014";
 
 gnuplot_svg.SVGDoc = null;
 gnuplot_svg.SVGRoot = null;
