@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: stats.c,v 1.12 2014/03/07 16:16:38 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: stats.c,v 1.13 2014/05/09 22:14:12 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - stats.c */
@@ -867,12 +867,6 @@ statsrequest(void)
 	    switch (i) {
 	    case DF_MISSING:
 	    case DF_UNDEFINED:
-	      /* Invalids are only recognized if the syntax is like this:
-		     stats "file" using ($1):($2)
-		 If the syntax is simply:
-		     stats "file" using 1:2
-		 then df_readline simply skips invalid records (does not
-		 return anything!) Status: 2009-11-02 */
 	      invalid += 1;
 	      continue;
 

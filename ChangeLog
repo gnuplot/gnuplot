@@ -1,3 +1,12 @@
+2014-05-27  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/datafile.c (df_readascii): Report status DF_UNDEFINED if a data
+	value evaluates to the constant "NaN", just as if we calculated it on
+	the fly to be e.g. 1/0.
+	* src/stats.c: Remove out-of-date comment that incorrectly describes 
+	what happens in this case.
+	Bug #1408
+
 2014-05-26  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/js/gnuplot_svg.js term/svg.trm:
