@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: fit.c,v 1.78.2.8 2013/12/31 15:59:55 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: fit.c,v 1.78.2.9 2014/02/26 07:36:17 markisch Exp $"); }
 #endif
 
 /*  NOTICE: Change of Copyright Status
@@ -318,7 +318,7 @@ error_ex()
     interrupt_setup();
 
     /* exit via int_error() so that it can clean up state variables */
-    int_error(NO_CARET, "error during fit");
+    int_error(NO_CARET, "");
 }
 
 
@@ -1063,6 +1063,8 @@ update(char *pfile, char *npfile)
     FILE *of, *nf;
     double pval;
 
+    if (!existfile(pfile))
+	Eex2("parameter file not found: %s", pfile);
 
     /* update pfile npfile:
        if npfile is a valid file name,

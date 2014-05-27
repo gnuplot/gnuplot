@@ -1,3 +1,12 @@
+2014-05-27  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/fit.c:  'update' fails if parameter file does not exits yet.
+	Provide proper error message.
+	See bugs #1385 and #1156
+
+	config/config.nt config/config.mgw:  Sync with config.h from configure
+	script.
+
 2014-05-27  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/datafile.c (df_readascii): Report status DF_UNDEFINED if a data
