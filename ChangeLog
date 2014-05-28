@@ -1,3 +1,11 @@
+2014-05-28  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/graph3d.c (plot3d_points):  Handle pointtype PT_CHARACTER.
+
+	* src/plot3d.c:  Rearrange the order of testing for plot style options
+	so that it is not possible to end up with uninitialized font or text
+	properties.
+
 2014-05-27  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/datafile.c (df_readascii): Report status DF_UNDEFINED if a data

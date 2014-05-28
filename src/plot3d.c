@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.229 2014/05/08 19:45:32 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.230 2014/05/09 22:14:12 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -1621,35 +1621,8 @@ eval_3dplots()
 		    continue;
 		}
 
-		/* Labels can have font and text property info as plot options */
-		/* In any case we must allocate one instance of the text style */
-		/* that all labels in the plot will share.                     */
-		if (this_plot->plot_style == LABELPOINTS)  {
-		    int stored_token = c_token;
-		    if (this_plot->labels == NULL) {
-			this_plot->labels = new_text_label(-1);
-			this_plot->labels->pos = CENTRE;
-			this_plot->labels->layer = LAYER_PLOTLABELS;
-		    }
-		    parse_label_options(this_plot->labels, TRUE);
-		    if (draw_contour)
-			load_contour_label_options(this_plot->labels);
-		    checked_once = TRUE;
-		    if (stored_token != c_token) {
-			if (set_labelstyle) {
-			    duplication = TRUE;
-			    break;
-			} else {
-			    set_labelstyle = TRUE;
-			    continue;
-			}
-		    }
-		}
-
-		/* pick up line/point specs
-		 * - point spec allowed if style uses points, ie style&2 != 0
-		 * - keywords are optional
-		 */
+		/* Most plot styles accept line and point properties but do not */
+		/* want font or text properties.				*/
 		if (this_plot->plot_style == VECTOR) {
 		    int stored_token = c_token;
 
@@ -1671,7 +1644,9 @@ eval_3dplots()
 			}
 		    }
 
-		} else if (this_plot->plot_style == PM3DSURFACE) {
+		}
+
+		if (this_plot->plot_style == PM3DSURFACE) {
 		    /* both previous and subsequent line properties override pm3d default border */
 		    int stored_token = c_token;
 		    if (!set_lpstyle)
@@ -1682,7 +1657,9 @@ eval_3dplots()
 			continue;
 		    }
 
-		} else {
+		}
+
+		if (this_plot->plot_style != LABELPOINTS) {
 		    int stored_token = c_token;
 		    struct lp_style_type lp = DEFAULT_LP_STYLE_TYPE;
 		    int new_lt = 0;
@@ -1710,6 +1687,34 @@ eval_3dplots()
 			    set_lpstyle = TRUE;
 			    if (new_lt)
 				this_plot->hidden3d_top_linetype = new_lt - 1;
+			    if (this_plot->lp_properties.p_type != PT_CHARACTER)
+				continue;
+			}
+		    }
+		}
+
+		/* Labels can have font and text property info as plot options */
+		/* In any case we must allocate one instance of the text style */
+		/* that all labels in the plot will share.                     */
+		if ((this_plot->plot_style == LABELPOINTS)
+		||  (this_plot->plot_style & PLOT_STYLE_HAS_POINT
+			&& this_plot->lp_properties.p_type == PT_CHARACTER)) {
+		    int stored_token = c_token;
+		    if (this_plot->labels == NULL) {
+			this_plot->labels = new_text_label(-1);
+			this_plot->labels->pos = CENTRE;
+			this_plot->labels->layer = LAYER_PLOTLABELS;
+		    }
+		    parse_label_options(this_plot->labels, TRUE);
+		    if (draw_contour)
+			load_contour_label_options(this_plot->labels);
+		    checked_once = TRUE;
+		    if (stored_token != c_token) {
+			if (set_labelstyle) {
+			    duplication = TRUE;
+			    break;
+			} else {
+			    set_labelstyle = TRUE;
 			    continue;
 			}
 		    }
@@ -1884,7 +1889,9 @@ eval_3dplots()
 		    this_plot->iteration = plot_iterator ? plot_iterator->iteration : 0;
 		    this_plot->plot_style = first_dataset->plot_style;
 		    this_plot->lp_properties = first_dataset->lp_properties;
-		    if (this_plot->plot_style == LABELPOINTS) {
+		    if ((this_plot->plot_style == LABELPOINTS)
+		    ||  (this_plot->plot_style & PLOT_STYLE_HAS_POINT
+			    && this_plot->lp_properties.p_type == PT_CHARACTER)) {
 			this_plot->labels = new_text_label(-1);
 			*(this_plot->labels) = *(first_dataset->labels);
 			this_plot->labels->next = NULL;

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.304 2014/04/22 20:49:28 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.305 2014/04/28 18:50:13 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -125,7 +125,7 @@ typedef enum { ALLGRID, FRONTGRID, BACKGRID, BORDERONLY } WHICHGRID;
 static void do_3dkey_layout __PROTO((legend_key *key, int *xinkey, int *yinkey));
 static void plot3d_impulses __PROTO((struct surface_points * plot));
 static void plot3d_lines __PROTO((struct surface_points * plot));
-static void plot3d_points __PROTO((struct surface_points * plot, int p_type));
+static void plot3d_points __PROTO((struct surface_points * plot));
 static void plot3d_vectors __PROTO((struct surface_points * plot));
 /* no pm3d for impulses */
 static void plot3d_lines_pm3d __PROTO((struct surface_points * plot));
@@ -1038,7 +1038,7 @@ do_3dplot(
 	    case POINTSTYLE:
 		if (draw_this_surface) {
 		    if (!hidden3d || this_plot->opt_out_of_hidden3d)
-			plot3d_points(this_plot, this_plot->lp_properties.p_type);
+			plot3d_points(this_plot);
 		}
 		break;
 
@@ -1046,7 +1046,7 @@ do_3dplot(
 		if (draw_this_surface) {
 		    if (!hidden3d || this_plot->opt_out_of_hidden3d) {
 			plot3d_lines_pm3d(this_plot);
-			plot3d_points(this_plot, this_plot->lp_properties.p_type);
+			plot3d_points(this_plot);
 		    }
 		}
 		break;
@@ -1056,7 +1056,7 @@ do_3dplot(
 		    this_plot->lp_properties.p_type = -1;
 		    this_plot->lp_properties.pointflag = TRUE;
 		    if (!hidden3d || this_plot->opt_out_of_hidden3d)
-			plot3d_points(this_plot, -1);
+			plot3d_points(this_plot);
 		}
 		break;
 
@@ -1770,12 +1770,20 @@ plot3d_lines_pm3d(struct surface_points *plot)
  * Plot the surfaces in POINTSTYLE style
  */
 static void
-plot3d_points(struct surface_points *plot, int p_type)
+plot3d_points(struct surface_points *plot)
 {
     int i;
     int x, y;
     struct termentry *t = term;
     struct iso_curve *icrvs = plot->iso_crvs;
+
+    /* Set whatever we can that applies to every point in the loop */
+    if (plot->lp_properties.p_type == PT_CHARACTER) {
+	ignore_enhanced(TRUE);
+	if (plot->labels->font && plot->labels->font[0])
+	    (*t->set_font) (plot->labels->font);
+	(*t->justify_text) (CENTRE);
+    }
 
     while (icrvs) {
 	struct coordinate GPHUGE *point;
@@ -1799,12 +1807,28 @@ plot3d_points(struct surface_points *plot, int p_type)
 		    if ((plot->plot_style == POINTSTYLE || plot->plot_style == LINESPOINTS)
 		    &&  plot->lp_properties.p_size == PTSZ_VARIABLE)
 			(*t->pointsize)(pointsize * point->CRD_PTSIZE);
-		    (*t->point) (x, y, p_type);
+
+		    /* The normal case */
+		    if (plot->lp_properties.p_type >= 0)
+			(*t->point) (x, y, plot->lp_properties.p_type);
+
+		    /* Print special character rather than drawn symbol */
+		    else if (plot->lp_properties.p_type == PT_CHARACTER) {
+			apply_pm3dcolor(&(plot->labels->textcolor), t);
+			(*t->put_text)(x, y, (char *)(&(plot->lp_properties.p_char)));
+		    }
 		}
 	    }
 	}
 
 	icrvs = icrvs->next;
+    }
+
+    /* Return to initial state */
+    if (plot->lp_properties.p_type == PT_CHARACTER) {
+	if (plot->labels->font && plot->labels->font[0])
+	    (*t->set_font) ("");
+	ignore_enhanced(FALSE);
     }
 }
 
