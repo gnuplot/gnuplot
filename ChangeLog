@@ -1,3 +1,8 @@
+2014-05-29  Tatsuro MATSUOKA <tmacchant3@yahoo.co.jp>
+
+	* config/mingw/Makefile:  Support compilation of the qt terminal.
+	Patch #684
+
 2014-05-29  Karl Ratzsch  <ratzsch@uni-freiburg.de>
 
 	* docs/gnuplto.doc:  Improve documentation of `update` command.

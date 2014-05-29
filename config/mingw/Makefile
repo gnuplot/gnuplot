@@ -1,5 +1,5 @@
 # Hello, emacs: this is a -*- Makefile -*-
-# $Id: Makefile,v 1.40 2014/03/31 06:04:43 markisch Exp $
+# $Id: Makefile,v 1.41 2014/05/01 21:57:50 broeker Exp $
 #
 # GNUPLOT Makefile for MinGW/MSYS on Windows
 # This assumes usual installation of the MinGW32 toolkit, the free
@@ -78,6 +78,12 @@ MOUSE=1
 #WXT=1
 #CAIROLIBS=1
 
+# Build qt terminal?
+#QT = 1
+# specify QT installation directory
+#QT_DIR = /c/Qt/5.2.1/mingw48_32
+QT_DIR = /d/Source/Qt-5.2.1-mingw/5.2.1/mingw48_32
+
 # Uncomment the following line to select the lua/tikz terminal
 #LUA=lua
 
@@ -103,6 +109,9 @@ GNUPLOT_PS_DIR = share/PostScript
 # Similarly for javascript files for the canvas terminal:
 GNUPLOT_JS_DIR = share/js
 
+# Similarly for translation files for the qt terminal:
+GNUPLOT_QT_DIR = share/qt
+
 # Similarly for scripts used by the lua terminal
 GNUPLOT_LUA_DIR = share/lua
 
@@ -111,6 +120,7 @@ GNUPLOT_TEX_DIR = share/texmf/tex
 
 # gnuplot will look for gnuplotrc here:
 GNUPLOT_SHARE_DIR = share
+
 
 # Destination directory, used in 'make install':
 #DESTDIR = /local/opt/gnuplot-4.5
@@ -350,6 +360,36 @@ ifdef WXT
 	WX_OBJS = wxt_gui.$(O)
 endif
 
+ifdef QT
+	QT_LIBS = -lQt5Core -lQt5Gui -lQt5Network -lQt5Svg -lQt5Widgets -lQt5PrintSupport -lqtmain
+	QT_CXXFLAGS =  -I$(QT_DIR)/include -I$(QT_DIR)/include/Qt -I$(QT_DIR)/include/QtCore -I$(QT_DIR)/include/QtGui
+	QT_CXXFLAGS += -I$(QT_DIR)/include/QtWidgets -I$(QT_DIR)/include/QtNetwork
+	QT_CXXFLAGS += -I$(QT_DIR)/include/QtSvg -DQTGNUPLOT_DATA_DIR=\"$(GNUPLOT_QT_DIR)\"
+	QT_LDFLAGS = -L$(QT_DIR)/lib
+#
+	CFLAGS += -DQTTERM -DQT_NO_OPENGL
+	TERMLIBS += $(QT_LIBS)
+	CXXFLAGS += $(QT_CXXFLAGS)
+	LDFLAGS  += $(QT_LDFLAGS)
+	QT_OBJS = qt_term.$(O) 
+	GNUPLOTQTOBJS = gnuplot_qt.o QtGnuplotWindow.o \
+		QtGnuplotApplication.o QtGnuplotWidget.o \
+		QtGnuplotScene.o QtGnuplotItems.o \
+		QtGnuplotEvent.o \
+		moc_QtGnuplotWindow.o moc_QtGnuplotApplication.o \
+		moc_QtGnuplotWidget.o moc_QtGnuplotScene.o \
+		moc_QtGnuplotEvent.o qrc_QtGnuplotResource.o
+#
+	MOC = $(QT_DIR)/bin/moc
+	UIC = $(QT_DIR)/bin/uic
+	RCC = $(QT_DIR)/bin/rcc
+	LRELEASE = $(QT_DIR)/bin/lrelease
+	QT_FILES_TARGETS  = qrc_QtGnuplotResource.cpp ui_QtGnuplotSettings.h moc_QtGnuplotWindow.cpp moc_QtGnuplotApplication.cpp 
+	QT_FILES_TARGETS += moc_QtGnuplotWidget.cpp moc_QtGnuplotScene.cpp moc_QtGnuplotEvent.cpp
+	QT_TRANSLATION = qtgnuplot_fr.qm qtgnuplot_ja.qm
+	QT_TARGET = gnuplot_qt.exe
+endif
+
 ifdef LUA
 	CFLAGS += -DHAVE_LUA
 	TERMLIBS += -l$(LUA)
@@ -404,6 +444,7 @@ LONGVERSION := $(MAINVERSION).0
 endif
 FULLVERSION := $(MAINVERSION) patchlevel $(PATCHLEVEL)
 
+
 default: $(VERSIONING) $(TARGET) $(MENUFILE) support
 
 console: $(VERSIONING)
@@ -419,7 +460,7 @@ docs:
 	$(MAKE) TARGET=gnuplot.exe gnuplot.pdf gpcard.pdf tutorial.pdf \
 		ps_symbols.pdf ps_fontfile_doc.pdf ps_guide.pdf
 
-support: $(HELPFILE) $(M)bf_test.exe demo_plugin.dll $(LUATARGETS) $(HELPFILEJA)
+support: $(HELPFILE) $(M)bf_test.exe $(QT_TARGET) $(QT_TRANSLATION) demo_plugin.dll $(LUATARGETS) $(HELPFILEJA)
 
 ja: $(HELPFILEJA)
 
@@ -429,7 +470,7 @@ all: $(VERSIONING) console windows pipes support docs
 # include the 'core makefile template'
 include $(S)/makefile.all
 
-OBJS = $(COREOBJS) version.$(O) gpexecute.$(O) $(WX_OBJS) $(CAIRO_OBJS)
+OBJS = $(COREOBJS) version.$(O) gpexecute.$(O) $(WX_OBJS) $(CAIRO_OBJS) $(QT_OBJS)
 
 WINOBJS = winmain.$(O) wgnuplib.$(O) wgraph.$(O) wprinter.$(O) \
 	  wpause.$(O) wgdiplus.$(O)
@@ -503,6 +544,84 @@ wxt_gui.$(O): $(S)/wxterminal/wxt_gui.cpp $(S)/wxterminal/wxt_gui.h
 
 gp_cairo.$(O): $(S)/wxterminal/gp_cairo.c $(S)/wxterminal/gp_cairo.h
 	$(CC) -c $(CFLAGS) $(CFLAGSEXTRA) $(CXXFLAGS) $(PANGOCAIRO_CFLAGS) -MMD -MT '$*.$$(O)' -MF $*.d -o $@ $<
+
+qt_term.$(O): $(S)/qtterminal/qt_term.cpp $(S)/qtterminal/qt_term.h
+	$(CXX) -c $(CFLAGS) $(CFLAGSEXTRA) $(CXXFLAGS) -MMD -MT '$*.$$(O)' -MF $*.d -o $@ $<
+
+
+# Call the Qt resource compiler
+qrc_QtGnuplotResource.cpp: $(S)/qtterminal/QtGnuplotResource.qrc
+	$(RCC) -name QtGnuplotResource -o $@ $<
+
+# Call the Qt ui compiler
+ui_QtGnuplotSettings.h: $(S)/qtterminal/QtGnuplotSettings.ui
+	$(UIC) -o $@ $<
+
+# Call the Qt meta-object compiler
+moc_QtGnuplotWindow.cpp: $(S)/qtterminal/QtGnuplotWindow.h
+	$(MOC) -o $@ $<
+
+moc_QtGnuplotApplication.cpp: $(S)/qtterminal/QtGnuplotApplication.h
+	$(MOC) -o $@ $<
+
+moc_QtGnuplotWidget.cpp: $(S)/qtterminal/QtGnuplotWidget.h
+	$(MOC) -o $@ $<
+
+moc_QtGnuplotScene.cpp: $(S)/qtterminal/QtGnuplotScene.h
+	$(MOC) -o $@ $<
+
+moc_QtGnuplotEvent.cpp: $(S)/qtterminal/QtGnuplotEvent.h
+	$(MOC) -o $@ $<
+# end (Call the Qt ui compiler)
+
+# Translation files
+qtgnuplot_fr.qm: $(S)/qtterminal/po/qtgnuplot_fr.ts
+	$(LRELEASE) -qm $@ $<
+
+qtgnuplot_ja.qm: $(S)/qtterminal/po/qtgnuplot_ja.ts
+	$(LRELEASE) -qm $@ $<
+
+gnuplot_qt.o: $(S)/qtterminal/gnuplot_qt.cpp
+	$(CXX) -c $(CFLAGS) $(CFLAGSEXTRA) $(CXXFLAGS) -MMD -MT '$*.o' -MF $*.d -o $@ $<
+
+QtGnuplotWindow.o: $(S)/qtterminal/QtGnuplotWindow.cpp $(S)/qtterminal/QtGnuplotWindow.h
+	$(CXX) -c $(CFLAGS) $(CFLAGSEXTRA) $(CXXFLAGS) -MMD -MT '$*.o' -MF $*.d -o $@ $<
+
+QtGnuplotApplication.o: $(S)/qtterminal/QtGnuplotApplication.cpp $(S)/qtterminal/QtGnuplotApplication.h
+	$(CXX) -c $(CFLAGS) $(CFLAGSEXTRA) $(CXXFLAGS) -MMD -MT '$*.o' -MF $*.d -o $@ $<
+
+QtGnuplotWidget.o: $(S)/qtterminal/QtGnuplotWidget.cpp $(S)/qtterminal/QtGnuplotWidget.h
+	$(CXX) -c $(CFLAGS) $(CFLAGSEXTRA) $(CXXFLAGS) -MMD -MT '$*.o' -MF $*.d -o $@ $<
+
+QtGnuplotScene.o: $(S)/qtterminal/QtGnuplotScene.cpp $(S)/qtterminal/QtGnuplotScene.h
+	$(CXX) -c $(CFLAGS) $(CFLAGSEXTRA) $(CXXFLAGS) -MMD -MT '$*.o' -MF $*.d -o $@ $<
+
+QtGnuplotItems.o: $(S)/qtterminal/QtGnuplotItems.cpp $(S)/qtterminal/QtGnuplotItems.h
+	$(CXX) -c $(CFLAGS) $(CFLAGSEXTRA) $(CXXFLAGS) -MMD -MT '$*.o' -MF $*.d -o $@ $<
+
+QtGnuplotEvent.o: $(S)/qtterminal/QtGnuplotEvent.cpp $(S)/qtterminal/QtGnuplotEvent.h
+	$(CXX) -c $(CFLAGS) $(CFLAGSEXTRA) $(CXXFLAGS) -MMD -MT '$*.o' -MF $*.d -o $@ $<
+
+moc_QtGnuplotWindow.o: moc_QtGnuplotWindow.cpp
+	$(CXX) -c $(CFLAGS) $(CFLAGSEXTRA) $(CXXFLAGS) -MMD -MT '$*.o' -MF $*.d -o $@ $<
+
+moc_QtGnuplotApplication.o: moc_QtGnuplotApplication.cpp
+	$(CXX) -c $(CFLAGS) $(CFLAGSEXTRA) $(CXXFLAGS) -MMD -MT '$*.o' -MF $*.d -o $@ $<
+
+moc_QtGnuplotWidget.o: moc_QtGnuplotWidget.cpp
+	$(CXX) -c $(CFLAGS) $(CFLAGSEXTRA) $(CXXFLAGS) -MMD -MT '$*.o' -MF $*.d -o $@ $<
+
+moc_QtGnuplotScene.o: moc_QtGnuplotScene.cpp
+	$(CXX) -c $(CFLAGS) $(CFLAGSEXTRA) $(CXXFLAGS) -MMD -MT '$*.o' -MF $*.d -o $@ $<
+
+moc_QtGnuplotEvent.o: moc_QtGnuplotEvent.cpp
+	$(CXX) -c $(CFLAGS) $(CFLAGSEXTRA) $(CXXFLAGS) -MMD -MT '$*.o' -MF $*.d -o $@ $<
+
+qrc_QtGnuplotResource.o: qrc_QtGnuplotResource.cpp
+	$(CXX) -c $(CFLAGS) $(CFLAGSEXTRA) $(CXXFLAGS) -MMD -MT '$*.o' -MF $*.d -o $@ $<
+
+gnuplot_qt.exe: $(QT_FILES_TARGETS) $(GNUPLOTQTOBJS)
+	$(LDX) -Wl,-emainCRTStartup -Wl,--subsystem,windows $(LDFLAGS) -Wl,-Map=gnuplot_qt.map -o $@ $(GNUPLOTQTOBJS) $(QT_LIBS) -lshell32
 
 demo_plugin.dll: $(M)plugin/demo_plugin.c
 	$(CC) $(CFLAGS) -I$(M)plugin -shared -o $@ $<
@@ -752,6 +871,11 @@ endif
 	mkdir -p $(DESTDIR)/$(GNUPLOT_TEX_DIR)/context/gnuplot
 	cp -p $(TOP)/share/LaTeX/README $(DESTDIR)/$(GNUPLOT_TEX_DIR)/latex/gnuplot/
 	cp -p $(TOP)/share/LaTeX/gnuplot.cfg $(DESTDIR)/$(GNUPLOT_TEX_DIR)/latex/gnuplot/
+ifdef QT
+	mkdir -p $(DESTDIR)/$(GNUPLOT_QT_DIR)
+	cp -p gnuplot_qt.exe $(DESTDIR)/bin/
+	cp -p qtgnuplot_*.qm $(DESTDIR)/$(GNUPLOT_QT_DIR)/
+endif
 ifdef LUA
 	mkdir -p $(DESTDIR)/$(GNUPLOT_LUA_DIR)
 	cp -p $(TOP)/term/lua/README $(DESTDIR)/$(GNUPLOT_LUA_DIR)/
