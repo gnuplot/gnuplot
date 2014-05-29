@@ -1,4 +1,4 @@
-2014-05-29  Karl Ratzsch  <kf2402@users.sf.net>
+2014-05-29  Karl Ratzsch  <ratzsch@uni-freiburg.de>
 
 	* docs/gnuplto.doc:  Improve documentation of `update` command.
 	Patch #686
@@ -55,7 +55,7 @@
 	we must call XInitThreads before forking wxt threads.
 	Bug #1401
 
-2014-05-19  Karl Ratzsch  <kf2402@users.sf.net>
+2014-05-19  Karl Ratzsch  <ratzsch@uni-freiburg.de>
 
 	* term/emf.trm: Add point types pentagon (14) and filled pentagon (15)
 
@@ -82,7 +82,7 @@
 
 	* demo/dashtypes.dem:  Avoid irrelevant warning message.
 
-2014-05-14  Karl Ratzsch  <kf2402@users.sf.net>
+2014-05-14  Karl Ratzsch  <ratzsch@uni-freiburg.de>
 
 	* term/svg.trm src/wxterminal/gp_cairo.c:
 	Add point types pentagon (14) and filled pentagon (15)
