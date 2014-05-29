@@ -1,5 +1,5 @@
 # Hello, emacs: this is a -*- Makefile -*-
-# $Id: Makefile,v 1.41 2014/05/01 21:57:50 broeker Exp $
+# $Id: Makefile,v 1.42 2014/05/29 12:25:25 markisch Exp $
 #
 # GNUPLOT Makefile for MinGW/MSYS on Windows
 # This assumes usual installation of the MinGW32 toolkit, the free
@@ -621,7 +621,7 @@ qrc_QtGnuplotResource.o: qrc_QtGnuplotResource.cpp
 	$(CXX) -c $(CFLAGS) $(CFLAGSEXTRA) $(CXXFLAGS) -MMD -MT '$*.o' -MF $*.d -o $@ $<
 
 gnuplot_qt.exe: $(QT_FILES_TARGETS) $(GNUPLOTQTOBJS)
-	$(LDX) -Wl,-emainCRTStartup -Wl,--subsystem,windows $(LDFLAGS) -Wl,-Map=gnuplot_qt.map -o $@ $(GNUPLOTQTOBJS) $(QT_LIBS) -lshell32
+	$(LDX) -Wl,--subsystem,windows $(LDFLAGS) -Wl,-Map=gnuplot_qt.map -o $@ $(GNUPLOTQTOBJS) $(QT_LIBS) -lshell32
 
 demo_plugin.dll: $(M)plugin/demo_plugin.c
 	$(CC) $(CFLAGS) -I$(M)plugin -shared -o $@ $<
