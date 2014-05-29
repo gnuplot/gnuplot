@@ -1,7 +1,7 @@
 /*
  * GNUPLOT - caca.trm
  *
- * $Id: caca.trm,v 1.3 2014/02/23 10:42:03 markisch Exp $
+ * $Id: caca.trm,v 1.4 2014/03/30 17:49:07 markisch Exp $
  *
  * This file uses UTF8 encoding and a tab size of 4.
  *
@@ -192,6 +192,7 @@ static TBOOLEAN CACA_windowed = FALSE; /* graphics output in different window*/
 static TBOOLEAN CACA_exportonly = FALSE; /* no output to screen but to file */
 static TBOOLEAN CACA_processing_events = FALSE; /* flag processing of events in CACA_text() */
 static unsigned CACA_codepage = 0;
+static unsigned TMP_codepage;
 
 /* drawing */
 static char CACA_pen;		/* current character used to draw point symbols */
@@ -755,10 +756,12 @@ CACA_init_display(void)
 		}
 #ifdef WIN32
 		if (strcmp(CACA_driver, "win32") == 0) {
-			/* On Japanese Windows we change the codepage. Not sure why this
+			/* On CJK Windows we change the codepage. Not sure why this
 			   solves the display problems, but apparently it works. See bug #1361. */
-			if (GetConsoleOutputCP() == 932) {
-				CACA_codepage = GetConsoleOutputCP();
+			if ((TMP_codepage = GetConsoleOutputCP()) == 932
+				|| TMP_codepage == 936
+				|| TMP_codepage == 950) {
+				CACA_codepage = TMP_codepage;
 				SetConsoleOutputCP(437);
 			}
 		}

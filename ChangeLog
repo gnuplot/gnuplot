@@ -1,3 +1,7 @@
+2014-05-29  Akira Kakuto <kakuto@fuk.kindai.ac.jp>
+
+	* term/caca/trm:  Modify nominal codepage to accommodate CJK Windows.
+
 2014-05-29  Tatsuro MATSUOKA <tmacchant3@yahoo.co.jp>
 
 	* config/mingw/Makefile:  Support compilation of the qt terminal.
@@ -5,7 +9,7 @@
 
 2014-05-29  Karl Ratzsch  <ratzsch@uni-freiburg.de>
 
-	* docs/gnuplto.doc:  Improve documentation of `update` command.
+	* docs/gnuplot.doc:  Improve documentation of `update` command.
 	Patch #686
 
 	* src/win/wgdiplus.c src/win/wgraph.c:  Change order of pointtypes to
