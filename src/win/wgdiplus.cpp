@@ -1,5 +1,5 @@
 /*
- * $Id: wgdiplus.cpp,v 1.12 2014/03/15 04:23:28 markisch Exp $
+ * $Id: wgdiplus.cpp,v 1.13 2014/04/03 00:31:15 markisch Exp $
  */
 
 /*
@@ -1417,11 +1417,11 @@ drawgraph_gdiplus(LPGW lpgw, HDC hdc, LPRECT rect)
 				const float pointshapes[6][10] = {
 					{-1, -1, +1, -1, +1, +1, -1, +1, 0, 0}, /* box */
 					{0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, /* dummy, circle */
-					{ 0, +1, -1,  0,  0, -1, +1,  0, 0, 0}, /* diamond */
 					{ 0, -4./3, -4./3, 2./3,
 						4./3,  2./3, 0, 0}, /* triangle */
 					{ 0, 4./3, -4./3, -2./3,
 						4./3,  -2./3, 0, 0}, /* inverted triangle */
+					{ 0, +1, -1,  0,  0, -1, +1,  0, 0, 0}, /* diamond */
 					{ 0, 1, 0.95106, 0.30902, 0.58779, -0.80902,
 						-0.58779, -0.80902, -0.95106, 0.30902} /* pentagon */
 				};

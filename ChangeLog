@@ -3,6 +3,9 @@
 	* docs/gnuplto.doc:  Improve documentation of `update` command.
 	Patch #686
 
+	* src/win/wgdiplus.c src/win/wgraph.c:  Change order of pointtypes to
+	match the sequence in other terminals (cairo, postscript, gd, svg).
+
 2014-05-28  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graph3d.c (plot3d_points):  Handle pointtype PT_CHARACTER.
