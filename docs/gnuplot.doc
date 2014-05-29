@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.888 2014/05/10 17:20:42 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.889 2014/05/16 20:24:58 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -8403,9 +8403,9 @@ Ffigure_missing
                {{no}covariancevariables}
                {{no}errorscaling}
                {{no}prescale}
-               {maxiter <value>|none}
+               {maxiter <value>|default}
                {limit <epsilon>|default}
-               {limit_abs <epsilon_abs>   
+               {limit_abs <epsilon_abs>}   
                {start-lambda <value>|default}
                {lambda-factor <value>|default}
                {script {"<command>"|default}}
@@ -13866,10 +13866,14 @@ Ffigure_missing
 2 update
 ?commands update
 ?update
- This command writes the current values of the fit parameters into the given
- file, formatted as an initial-value file (as described in the `fit`section).
- This is useful for saving the current values for later use or for restarting
- a converged or stopped fit.
+ This command updates the current values of variables stored in the given
+ file, which has to be formatted as an initial-value file (as described in the
+ `fit` section).
+ 
+ If the file name does not exist, a new file is created containing all
+ currently defined user variables. All variables not used in the last fit
+ are marked as "#FIXED". This is useful for saving the current values of fit
+ variables for later use or for restarting a converged or stopped fit.
 
  Syntax:
        update <filename> {<filename>}
@@ -13880,10 +13884,9 @@ Ffigure_missing
  Otherwise, if the file already exists, `gnuplot` first renames it by
  appending `.old` and then opens a new file.  That is, "`update 'fred'`"
  behaves the same as "`!rename fred fred.old; update 'fred.old' 'fred'`".
- [On DOS and other systems that use the twelve-character "filename.ext"
- naming convention, "ext" will be "`old`" and "filename" will be related
- (hopefully recognizably) to the initial name.  Renaming is not done at all
- on VMS systems, since they use file-versioning.]
+ If renaming is not possible because that file already exists, update aborts
+ with an error message. [Renaming is not done at all on VMS systems, since
+ they use file-versioning.] 
 
  Please see `fit` for more information.
 2 While
