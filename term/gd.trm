@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: gd.trm,v 1.177 2013/12/11 19:38:40 sfeam Exp $
+ * $Id: gd.trm,v 1.178 2014/05/10 17:21:06 sfeam Exp $
  */
 
 /* GNUPLOT -- gd.trm */
@@ -1069,30 +1069,6 @@ PNG_options()
 	strcat(term_options, "enhanced ");
     }
 
-    if (png_state.ttffont) {
-	sprintf(term_options + strlen(term_options),
-		"font \"%s,%d\" ", png_state.ttffont, png_state.ttfsize);
-	sprintf(term_options + strlen(term_options),
-		"fontscale %.1f ", png_state.fontscale);
-    } else switch (term->h_char) {
-    case 5:
-	strcat(term_options,"tiny ");
-	break;
-    case 6:
-	strcat(term_options, "small ");
-	break;
-    case 7:
-    default:
-	strcat(term_options, "medium ");
-	break;
-    case 8:
-	strcat(term_options, "large ");
-	break;
-    case 9:
-	strcat(term_options,"giant ");
-	break;
-    }
-
     if (PNG_linewidth_factor != 1.0)
 	sprintf(term_options + strlen(term_options),
 	    "linewidth %3.1f ", PNG_linewidth_factor);
@@ -1119,6 +1095,32 @@ PNG_options()
     if (png_state.n_colors == 1)
 	sprintf(term_options + strlen(term_options),
 	    "background \"#%06x\" ", png_state.rgb_table[0]);
+
+    if (png_state.ttffont) {
+	if (png_state.fontscale != 1.0)
+	    sprintf(term_options + strlen(term_options),
+		"fontscale %.1f ", png_state.fontscale);
+	if (strlen(term_options) + strlen(png_state.ttffont) < sizeof(term_options) - 32)
+	    sprintf(term_options + strlen(term_options),
+		"font \"%s,%d\" ", png_state.ttffont, png_state.ttfsize);
+    } else switch (term->h_char) {
+    case 5:
+	strcat(term_options,"tiny ");
+	break;
+    case 6:
+	strcat(term_options, "small ");
+	break;
+    case 7:
+    default:
+	strcat(term_options, "medium ");
+	break;
+    case 8:
+	strcat(term_options, "large ");
+	break;
+    case 9:
+	strcat(term_options,"giant ");
+	break;
+    }
 
 }
 

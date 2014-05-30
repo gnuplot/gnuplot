@@ -6,6 +6,10 @@
 	term_options character array.
 	Bug #1413
 
+	* term/gd.trm:  Limit the stored length of the font so that term_options
+	cannot overflow.
+	Bug #1413
+
 2014-05-29  Akira Kakuto <kakuto@fuk.kindai.ac.jp>
 
 	* term/caca.trm:  Modify nominal codepage to accommodate CJK Windows.
