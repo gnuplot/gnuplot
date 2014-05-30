@@ -13,6 +13,8 @@
 	* Makefile.am RELEASE_NOTES:  Include Release Notes in the distribution
 	package.
 
+	* FAQ.PDF:  Update for version 5.
+
 	* src/gplt_x11.c:
 	Grey out key entries when corresponding plot is toggled off.
 
