@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.242 2014/04/30 04:49:45 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.243 2014/05/09 22:14:11 broeker Exp $"); }
 #endif
 
 #define MOUSE_ALL_WINDOWS 1
@@ -685,8 +685,11 @@ static const char stipple_pattern_bits[stipple_pattern_num][8] = {
    , { 0x11, 0x11, 0x22, 0x22, 0x44, 0x44, 0x88, 0x88 } /* diagonal stripes (6) */
    , { 0x88, 0x88, 0x44, 0x44, 0x22, 0x22, 0x11, 0x11 } /* diagonal stripes (7) */
 };
+static const char stipple_pattern_dots[8] =
+    { 0x80, 0x08, 0x20, 0x02, 0x40, 0x04, 0x10, 0x01 };
 
 static Pixmap stipple_pattern[stipple_pattern_num];
+static Pixmap stipple_dots;
 static int stipple_initialized = 0;
 
 static XPoint *polyline = NULL;
@@ -1104,6 +1107,7 @@ delete_plot(plot_struct *plot)
 	int i;
 	for (i = 0; i < stipple_pattern_num; i++)
 	    XFreePixmap(dpy, stipple_pattern[i]);
+	XFreePixmap(dpy, stipple_dots);
 	stipple_initialized = 0;
     }
 
@@ -2190,6 +2194,24 @@ exec_cmd(plot_struct *plot, char *command)
     &&  plot->x11_key_boxes[x11_cur_plotno].hidden
     )
 	    return;
+
+    if (x11_in_key_sample &&  *command == 'Y' /* Catches TERM_LAYER_END_KEYSAMPLE */
+    &&  x11_cur_plotno < plot->x11_max_key_boxes
+    &&  plot->x11_key_boxes[x11_cur_plotno].hidden
+    )
+	{
+	x11BoundingBox *box = &plot->x11_key_boxes[x11_cur_plotno];
+	    /* Grey out key box */
+	    if (!fill_gc)
+		fill_gc = XCreateGC(dpy, plot->window, 0, 0);
+	    XCopyGC(dpy, *current_gc, ~0, fill_gc);
+	    XSetForeground(dpy, fill_gc, plot->cmap->colors[1]);
+	    XSetStipple(dpy, fill_gc, stipple_dots);
+	    XSetFillStyle(dpy, fill_gc, FillStippled);
+	    XFillRectangle(dpy, plot->pixmap, fill_gc,
+		box->left, box->ybot,
+		box->right - box->left, box->ytop - box->ybot);
+	}
 
     /*   X11_vector(x, y) - draw vector  */
     if (*buffer == 'V') {
@@ -3486,6 +3508,8 @@ display(plot_struct *plot)
 	    stipple_pattern[i] =
 		XCreateBitmapFromData(dpy, plot->pixmap, stipple_pattern_bits[i],
 				stipple_pattern_width, stipple_pattern_height);
+	stipple_dots = XCreateBitmapFromData(dpy, plot->pixmap, stipple_pattern_dots,
+				stipple_pattern_width, stipple_pattern_height);
 	stipple_initialized = 1;
     }
 
@@ -4533,6 +4557,7 @@ process_configure_notify_event(XEvent *event, TBOOLEAN isRetry )
 		int i;
 		for (i = 0; i < stipple_pattern_num; i++)
 			XFreePixmap(dpy, stipple_pattern[i]);
+		XFreePixmap(dpy, stipple_dots);
 		stipple_initialized = 0;
 	    }
 

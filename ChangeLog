@@ -13,6 +13,9 @@
 	* Makefile.am RELEASE_NOTES:  Include Release Notes in the distribution
 	package.
 
+	* src/gplt_x11.c:
+	Grey out key entries when corresponding plot is toggled off.
+
 2014-05-29  Akira Kakuto <kakuto@fuk.kindai.ac.jp>
 
 	* term/caca.trm:  Modify nominal codepage to accommodate CJK Windows.
