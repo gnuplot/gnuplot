@@ -1,6 +1,14 @@
+2014-05-30  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/post.trm term/cairo.trm:  The "header" keyword for epslatex
+	and related terminals can introduce a string of arbitrary length.
+	Therefore it is not safe to try to store it in the fixed length 
+	term_options character array.
+	Bug #1413
+
 2014-05-29  Akira Kakuto <kakuto@fuk.kindai.ac.jp>
 
-	* term/caca/trm:  Modify nominal codepage to accommodate CJK Windows.
+	* term/caca.trm:  Modify nominal codepage to accommodate CJK Windows.
 
 2014-05-29  Tatsuro MATSUOKA <tmacchant3@yahoo.co.jp>
 

@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: cairo.trm,v 1.68 2014/04/18 04:12:47 sfeam Exp $
+ * $Id: cairo.trm,v 1.69 2014/05/05 22:19:21 sfeam Exp $
  */
 
 /* GNUPLOT - cairo.trm */
@@ -522,11 +522,6 @@ TERM_PUBLIC void cairotrm_options()
 		sprintf(tmp_term_options, " %s %s",
 		    cairo_params->pdf_output ? "pdf" : "eps",
 			ps_params->epslatex_standalone ? "standalone" : "input");
-		strcat(term_options, tmp_term_options);
-		if (epslatex_header)
-			sprintf(tmp_term_options, " header \"%s\"", epslatex_header);
-		else
-			sprintf(tmp_term_options, " noheader");
 		strcat(term_options, tmp_term_options);
 		sprintf(tmp_term_options, " %s", ps_params->blacktext ? "blacktext" : "colortext");
 		strcat(term_options, tmp_term_options);
