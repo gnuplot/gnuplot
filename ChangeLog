@@ -10,6 +10,9 @@
 	cannot overflow.
 	Bug #1413
 
+	* Makefile.am RELEASE_NOTES:  Include Release Notes in the distribution
+	package.
+
 2014-05-29  Akira Kakuto <kakuto@fuk.kindai.ac.jp>
 
 	* term/caca.trm:  Modify nominal codepage to accommodate CJK Windows.

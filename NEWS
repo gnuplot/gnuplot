@@ -7,7 +7,7 @@ Changes since 5.0.rc1
 * FIX width adjustment for long key title in multicolumn keys
 * FIX treat data value read as "NaN" the same as we would "1/0"
 * FIX handle pointtype PT_CHARACTER in 3D plots
-* FIX do not store epslatex_header string in terminal options array
+* FIX do not store long strings (e.g. epslatex_header) in terminal options array
 
 New features, changes and fixes in gnuplot version 5.0
 ======================================================
