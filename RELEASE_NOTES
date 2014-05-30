@@ -4,6 +4,7 @@
 We are happy to announce a release candidate for gnuplot version 5. 
 Version 5 will be a major release with significant new capabilities
 and enhancements compared to previous gnuplot versions.
+
 Release Notes date: 30 May 2014
 
 MAJOR NEW FEATURES
@@ -19,13 +20,10 @@ MAJOR NEW FEATURES
 * Command scripts may place in-line data in a named data block for
   repeated plotting.
 
-* RGB colors can include an alpha-channel for transparency.
-  Example:
-       #  ARGB color = (Alpha << 24) + (Red << 16) + (Green << 8) + Blue
-       SEETHRUBLU = (0xAA << 24) + (0xFF)
-       set linetype N linecolor rgb SEETHRUBLU
+* Bit shift operators << and >>
 
-* Bit shift operators << and >> (used in above example)
+* RGB colors can include an alpha-channel for transparency.
+       # ARGBcolor = (Alpha << 24) + (Red << 16) + (Green << 8) + Blue
 
 * Secondary axes (x2, y2) can be locked to the primary axis via a mapping
   function.  In the simplest case this guarantees that the primary and
@@ -64,12 +62,11 @@ A brief summary of potentially incompatible changes is given here.
 
 * Earlier versions of gnuplot used the keyword "linetype" to mean both
   the color and the solid/dot/dash pattern of a line.  Version 5 has
-  separate keywords "linecolor" and "dashtype".  You can assign any
-  desired color and a dash pattern to any linetype.  The program now
-  uses a default set of 8 linetypes, all solid.  You can change these
-  or add new linetypes as you please, or include the desired color or
-  dash pattern directly in a plot command.  You do not need to change
-  the current terminal or terminal mode in order to used dashed lines.
+  separate keywords "linecolor" and "dashtype".  You can use these keywords
+  directly in a plot command or assign any desired color and a dash pattern
+  to a linetype.  The program now provides a default set of 8 linetypes, all solid.
+  You can change these or add new linetypes as you please. You do not need
+  to change the current terminal or terminal mode in order to use dashed lines.
 
 * The handling of input data containing NaN, Inf, inconsistent number of
   data columns, or other unexpected content has changed. See documentation
@@ -109,6 +106,14 @@ A brief summary of potentially incompatible changes is given here.
 
 * "unset terminal" restores the original terminal of the current session.
 
+ONLINE DEMO PLOTS
+=================
+
+Demo plots illustrating new and old features are online at
+
+	http://gnuplot.sourceforge.net/demo_5.0/
+
+
 KNOWN ISSUES
 ============
 
@@ -123,6 +128,19 @@ KNOWN ISSUES
   Toggling plots drawn in hidden3d mode (hidden line removal) does not work.
 
 * Linking against wxWidgets 3.0 is not yet supported (wxt terminal).
+
+* Mac OSX ships with a terminal input library that appears to be GNU
+  libreadline, but isn't really.  The program tries to cope with this, but
+  you may get better results by configuring gnuplot to use either its own
+  built-in readline routines or the real GNU libreadline.
+
+* The gnuplot build system is not very good at figuring out where to find
+  or install LaTeX-related files.  This can affect use of the new lua/tikz
+  and ConTeXt terminals.
+
+* You can configure support for both wxt and qt into the same gnuplot
+  executable, but only one of these two output modes can be used in any
+  given gnuplot session.
 
 
 		 NOTES TO PACKAGERS AND TESTERS 
@@ -181,8 +199,9 @@ Options for output to files
 
 Of course the terminals (output modes) present in previous gnuplot versions
 are also still available. These include, among many more obscure options:
+
 - png/jpeg/gif output via libgd
-- PostScript
+- PostScript (*.ps or *.eps)
 - Many flavors of TeX/LaTeX output, including TikZ and ConTeXt
 - Bitmapped output to support many older devices (e.g. HP deskjet, epson,
   seiko printers, pbm bitmapped graphics files) is available if needed
@@ -197,16 +216,8 @@ Options for generating interactive plots for web display
   Both allow zooming, toggling plot elements on/off, and user-scriptable
   hot keys.
 
-Online demo plots
------------------
-
-Demo plots illustrating new and old features are online at
-
-	http://gnuplot.sourceforge.net/demo_5.0/
-
-
-		          OTHER NOTES
-		===============================
+			OTHER NOTES
+			===========
 
 Installation
 ------------
@@ -230,22 +241,6 @@ It may indicate that some output drivers have been omitted because the
 necessary support libraries were not found.  In general you need to have
 previously installed the "*-devel-*" versions of these libraries. 
 
-
-Known issues
-------------
-
-- Mac OSX ships with a terminal input library that appears to be GNU
-libreadline, but isn't really.  The program tries to cope with this, but
-you may get better results by configuring gnuplot to use either its own
-built-in readline routines or the real GNU libreadline.
-
-- The gnuplot build system is not very good at figuring out where to find
-or install LaTeX-related files.  This can affect use of the new lua/tikz
-and ConTeXt terminals.
-
-- You can configure support for both wxt and qt into the same gnuplot
-executable, but only one of these two output modes can be used in any
-given gnuplot session.
 
 
 Support
