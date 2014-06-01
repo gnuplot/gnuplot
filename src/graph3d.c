@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.305 2014/04/28 18:50:13 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.306 2014/05/28 23:21:07 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -67,13 +67,6 @@ static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.305 2014/04/28 18:50:13 
 #include "color.h"
 
 #include "plot.h"
-
-/* HBB NEW 20040311: PM3D did already split up grid drawing into two
- * parts, one before, the other after drawing the main surfaces, as a
- * poor-man's depth-sorting algorithm.  Make this independent of
- * PM3D. Turn the new option on by default. */
-#define USE_GRID_LAYERS 1
-
 
 static int p_height;
 static int p_width;		/* pointsize * t->h_tic */
@@ -742,18 +735,17 @@ do_3dplot(
     /* DRAW GRID AND BORDER */
     /* Original behaviour: draw entire grid in back, if 'set grid back': */
     /* HBB 20040331: but not if in hidden3d mode */
-    if (!hidden3d && grid_layer == LAYER_BACK)
-	draw_3d_graphbox(plots, pcount, ALLGRID, LAYER_BACK);
-    else if (splot_map && border_layer == LAYER_BACK)
+    if (splot_map && border_layer != LAYER_FRONT)
 	draw_3d_graphbox(plots, pcount, BORDERONLY, LAYER_BACK);
 
-#ifdef USE_GRID_LAYERS
-    if (!hidden3d && (grid_layer == LAYER_BEHIND))
+    else if (!hidden3d && (grid_layer == LAYER_BACK))
+	draw_3d_graphbox(plots, pcount, ALLGRID, LAYER_BACK);
+
+    else if (!hidden3d && (grid_layer == LAYER_BEHIND))
 	/* Default layering mode.  Draw the back part now, but not if
 	 * hidden3d is in use, because that relies on all isolated
 	 * lines being output after all surfaces have been defined. */
 	draw_3d_graphbox(plots, pcount, BACKGRID, LAYER_BACK);
-#endif /* USE_GRID_LAYERS */
 
     /* Clipping in 'set view map' mode should be like 2D clipping */
     if (splot_map) {
@@ -1318,12 +1310,6 @@ do_3dplot(
     }
 
     /* DRAW GRID AND BORDER */
-#ifndef USE_GRID_LAYERS
-    /* Old behaviour: draw entire grid now, unless it was requested to
-     * be in the back. */
-    if (grid_layer != 0)
-	draw_3d_graphbox(plots, pcount, ALLGRID, LAYER_FRONT);
-#else
     /* HBB NEW 20040311: do front part now, after surfaces have been
      * output. If "set grid front", or hidden3d is active, must output
      * the whole shebang now, otherwise only the front part. */
@@ -1331,9 +1317,11 @@ do_3dplot(
 	draw_3d_graphbox(plots, pcount, ALLGRID, LAYER_FRONT);
     else if (grid_layer == LAYER_BEHIND)
 	draw_3d_graphbox(plots, pcount, FRONTGRID, LAYER_FRONT);
+#if (0)
+    /* FIXME:  I think this is redundant with the 1st test above */
     if (splot_map && (border_layer == LAYER_FRONT))
 	draw_3d_graphbox(plots, pcount, BORDERONLY, LAYER_FRONT);
-#endif /* USE_GRID_LAYERS */
+#endif
 
     /* Go back and draw the legend in a separate pass if "key opaque" */
     if (key->visible && key->front && !key_pass) {
@@ -2106,10 +2094,7 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid,
 	map3d_xyz(right_x, right_y, base_z, &br);
 	map3d_xyz(front_x, front_y, base_z, &bf);
 
-#ifdef USE_GRID_LAYERS
-	if (BACKGRID != whichgrid)
-#endif
-	{
+	if (BACKGRID != whichgrid) {
 	    /* Draw front part of base grid, right to front corner: */
 	    if (draw_border & 4)
 		draw3d_line(&br, &bf, &border_lp);
@@ -2117,10 +2102,7 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid,
 	    if (draw_border & 1)
 		draw3d_line(&bl, &bf, &border_lp);
 	}
-#ifdef USE_GRID_LAYERS
-	if (FRONTGRID != whichgrid)
-#endif
-	{
+	if (FRONTGRID != whichgrid) {
 	    /* Draw back part of base grid: left to back corner: */
 	    if (draw_border & 2)
 		draw3d_line(&bl, &bb, &border_lp);
@@ -2150,21 +2132,18 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid,
 		/* all four verticals are drawn - save some time by
 		 * drawing them to the full height, regardless of
 		 * where the surface lies */
-#ifdef USE_GRID_LAYERS
 		if (FRONTGRID != whichgrid) {
-#endif
 		    /* Draw the back verticals floor-to-ceiling, left: */
 		    draw3d_line(&fl, &tl, &border_lp);
 		    /* ... back: */
 		    draw3d_line(&fb, &tb, &border_lp);
 		    /* ... and right */
 		    draw3d_line(&fr, &tr, &border_lp);
-#ifdef USE_GRID_LAYERS
 		}
-		if (BACKGRID != whichgrid)
-#endif
+		if (BACKGRID != whichgrid) {
 		    /* Draw the front vertical: floor-to-ceiling, front: */
 		    draw3d_line(&ff, &tf, &border_lp);
+		}
 	    } else {
 		/* find heights of surfaces at the corners of the xy
 		 * rectangle */
@@ -2218,9 +2197,7 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid,
 		    draw3d_line(&a, &b, &border_lp);		\
 		}
 
-#ifdef USE_GRID_LAYERS
 		if (FRONTGRID != whichgrid) {
-#endif
 		    /* Draw back verticals: floor-to-ceiling left: */
 		    VERTICAL(0x10, zaxis_x, zaxis_y, zaxis_i, zaxis_j, &fl, &tl);
 		    /* ... back: */
@@ -2228,24 +2205,17 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid,
 		    /* ... and right: */
 		    VERTICAL(0x40, right_x, right_y, 1 - zaxis_i, 1 - zaxis_j,
 			     &fr, &tr);
-#ifdef USE_GRID_LAYERS
 		}
 		if (BACKGRID != whichgrid) {
-#endif
 		    /* Draw front verticals: floor-to-ceiling front */
 		    VERTICAL(0x80, front_x, front_y, 1 - back_i, 1 - back_j,
 			     &ff, &tf);
-#ifdef USE_GRID_LAYERS
 		}
-#endif
 #undef VERTICAL
 	    } /* else (all 4 verticals drawn?) */
 
 	    /* now border lines on top */
-#ifdef USE_GRID_LAYERS
-	    if (FRONTGRID != whichgrid)
-#endif
-	    {
+	    if (FRONTGRID != whichgrid) {
 		/* Draw back part of top of box: top left to back corner: */
 		if (draw_border & 0x100)
 		    draw3d_line(&tl, &tb, &border_lp);
@@ -2253,10 +2223,7 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid,
 		if (draw_border & 0x200)
 		    draw3d_line(&tr, &tb, &border_lp);
 	    }
-#ifdef USE_GRID_LAYERS
-	    if (BACKGRID != whichgrid)
-#endif
-	    {
+	    if (BACKGRID != whichgrid) {
 		/* Draw front part of top of box: top left to front corner: */
 		if (draw_border & 0x400)
 		    draw3d_line(&tl, &tf, &border_lp);
@@ -2286,12 +2253,11 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid,
 	tic_unity = (v1.y - v0.y) / (double)yscaler;
 	tic_unitz = (v1.z - v0.z) / (double)yscaler;
 
-#ifdef USE_GRID_LAYERS
 	/* Don't output tics and grids if this is the front part of a
 	 * two-part grid drawing process: */
 	if ((surface_rot_x <= 90 && FRONTGRID != whichgrid) ||
 	    (surface_rot_x > 90 && BACKGRID != whichgrid))
-#endif
+
 	if (X_AXIS.ticmode)
 	    gen_tics(FIRST_X_AXIS, xtick_callback);
 
@@ -2299,11 +2265,11 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid,
 	    int angle = 0;
 
 	    /* label at xaxis_y + 1/4 of (xaxis_y-other_y) */
-#ifdef USE_GRID_LAYERS /* FIXME: still needed??? what for? */
+	    /* FIXME: still needed??? what for? */
 	    if ((surface_rot_x <= 90 && BACKGRID != whichgrid) ||
 		(surface_rot_x > 90 && FRONTGRID != whichgrid) ||
 		splot_map) {
-#endif
+
 	    unsigned int x1, y1;
 	    int tmpx, tmpy;
 
@@ -2367,9 +2333,7 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid,
 	    }
 	    reset_textcolor(&(X_AXIS.label.textcolor),t);
 	    ignore_enhanced(FALSE);
-#ifdef USE_GRID_LAYERS
 	    }
-#endif
 	}
 
 	if (splot_map && axis_array[SECOND_X_AXIS].ticmode)
@@ -2389,21 +2353,18 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid,
 	tic_unity = (v1.y - v0.y) / (double)xscaler;
 	tic_unitz = (v1.z - v0.z) / (double)xscaler;
 
-#ifdef USE_GRID_LAYERS
 	/* Don't output tics and grids if this is the front part of a
 	 * two-part grid drawing process: */
 	if ((surface_rot_x <= 90 && FRONTGRID != whichgrid) ||
 	    (surface_rot_x > 90 && BACKGRID != whichgrid))
-#endif
+
 	if (Y_AXIS.ticmode)
 	    gen_tics(FIRST_Y_AXIS, ytick_callback);
 
 	if (Y_AXIS.label.text) {
-#ifdef USE_GRID_LAYERS
 	    if ((surface_rot_x <= 90 && BACKGRID != whichgrid) ||
 		(surface_rot_x > 90 && FRONTGRID != whichgrid) ||
 		splot_map) {
-#endif
 		unsigned int x1, y1;
 		int tmpx, tmpy;
 		int h_just, v_just;
@@ -2501,9 +2462,7 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid,
 
 		reset_textcolor(&(Y_AXIS.label.textcolor),t);
 		ignore_enhanced(FALSE);
-#ifdef USE_GRID_LAYERS
 	    }
-#endif
 	}
 
 	if (splot_map && axis_array[SECOND_Y_AXIS].ticmode)
@@ -2512,11 +2471,9 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid,
 
     /* do z tics */
     if (Z_AXIS.ticmode
-#ifdef USE_GRID_LAYERS
 	/* Don't output tics and grids if this is the front part of a
 	 * two-part grid drawing process: */
 	&& (FRONTGRID != whichgrid)
-#endif
 	&& (splot_map == FALSE)
 	&& (draw_surface
 	    || (draw_contour & CONTOUR_SRF)
