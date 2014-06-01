@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.21 2014/03/31 06:04:43 markisch Exp $
+# $Id: Makefile,v 1.22 2014/05/26 06:40:19 markisch Exp $
 #
 # GNUPLOT Makefile Microsoft Visual C++ 2005 or newer
 
@@ -514,8 +514,8 @@ install:
 	if exist wgnuplot-ja.chm copy /Y wgnuplot-ja.chm $(DESTDIR)\bin
 	if exist wgnuplot.hlp copy /Y wgnuplot.hlp $(DESTDIR)\bin
 	copy /Y *.dll $(DESTDIR)\bin
-	if exist platform\ if not exist $(DESTDIR)\bin\platform mkdir $(DESTDIR)\bin\platform
-	if exist platform\ xcopy /Y /S platform $(DESTDIR)\bin\platform
+	if exist platform\ if not exist $(DESTDIR)\bin\platforms mkdir $(DESTDIR)\bin\platforms
+	if exist platform\ xcopy /Y /S platforms $(DESTDIR)\bin\platforms
 	if not exist $(DESTDIR)\$(GNUPLOT_PS_DIR) mkdir $(DESTDIR)\$(GNUPLOT_PS_DIR)
 	xcopy /Y $(T)PostScript\*.ps $(DESTDIR)\$(GNUPLOT_PS_DIR)
 	if not exist $(DESTDIR)\$(GNUPLOT_JS_DIR) mkdir $(DESTDIR)\$(GNUPLOT_JS_DIR)
@@ -544,4 +544,4 @@ install:
 
 zip:
 	$(MAKE) DESTDIR=.\gnuplot install
-	zip -mro9 gp470-msvc-win32.zip gnuplot
+	zip -mro9 gp500-msvc-win32.zip gnuplot
