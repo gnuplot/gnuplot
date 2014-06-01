@@ -1,5 +1,5 @@
 # Hello, emacs: this is a -*- Makefile -*-
-# $Id: Makefile,v 1.42 2014/05/29 12:25:25 markisch Exp $
+# $Id: Makefile,v 1.43 2014/05/29 12:51:16 markisch Exp $
 #
 # GNUPLOT Makefile for MinGW/MSYS on Windows
 # This assumes usual installation of the MinGW32 toolkit, the free
@@ -77,6 +77,12 @@ MOUSE=1
 # Uncomment the following lines to compile it.
 #WXT=1
 #CAIROLIBS=1
+
+# Build qt terminal?
+#QT = 1
+# specify QT installation directory
+#QT_DIR = /c/Qt/5.2.1/mingw48_32
+QT_DIR = /d/Source/Qt-5.2.1-mingw/5.2.1/mingw48_32
 
 # Build qt terminal?
 #QT = 1
@@ -815,7 +821,8 @@ ps_guide.pdf: $(D)psdoc/ps_guide.ps
 # clean up temporary files
 clean:
 	$(RM) config.h wgnuplot.map wgnuplot.res
-	$(RM) *.$(O) *.po *.o *.co *.d
+	$(RM) *.$(O) *.po *.o *.co *.d *.map
+	$(RM) moc_*.cpp ui_*.h qrc_*.cpp
 	$(RM) doc2*.exe $(W)/wgnuplib.res wgnuplib.map wgnuplot.lib
 	$(RM) $(M)bf_test.exe demo_plugin.dll allterm.h allterm.c
 	$(RM) *.aux *.log *.dvi *.toc
@@ -831,6 +838,7 @@ clean:
 realclean: veryclean
 veryclean: clean
 	$(RM) wgnuplot.exe wgnuplot_pipes.exe gnuplot.exe pgnuplot.exe
+	$(RM) gnuplot_qt.exe qtgnuplot_*.qm
 	$(RM) $(HELPFILE) $(HELPFILEJA) wgnuplot.chw wgnuplot.gid wgnuplot.mnu
 	$(RM) gnuplot.ps gnuplot.pdf
 	$(RM) gpcard.pdf tutorial.pdf
@@ -894,6 +902,7 @@ endif
 	cp -p $(TOP)/NEWS $(DESTDIR)/
 	cp -p $(TOP)/ChangeLog $(DESTDIR)/
 	cp -p $(TOP)/BUGS $(DESTDIR)/
+	cp -p $(TOP)/RELEASE_NOTES $(DESTDIR)/
 	cp -p $(TOP)/win/README-Windows.txt $(DESTDIR)/
 	cp -p $(TOP)/win/README-Windows-ja.txt $(DESTDIR)/
 	-cp -p $(TOP)/win/README-testing.txt $(DESTDIR)/
