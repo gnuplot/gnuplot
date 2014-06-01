@@ -1,5 +1,5 @@
 ﻿;
-; $Id: gnuplot.iss,v 1.7 2014/03/15 04:24:34 markisch Exp $
+; $Id: gnuplot.iss,v 1.8 2014/03/23 13:34:19 markisch Exp $
 ;
 ; GNUPLOT - gnuplot.iss
 ;
@@ -97,8 +97,9 @@ Name: de; MessagesFile: compiler:Languages\German.isl;
 [Tasks]
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 Name: "quicklaunchicon"; Description: "{cm:CreateQuickLaunchIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked; OnlyBelowVersion: 0,6.1
-Name: defaulttermwin; Description: windows; GroupDescription: {cm:defaultterm}; Flags: unchecked exclusive;
+Name: defaulttermwin; Description: "windows"; GroupDescription: {cm:defaultterm}; Flags: unchecked exclusive;
 Name: defaulttermwxt; Description: "wxt"; GroupDescription: {cm:defaultterm}; Flags: unchecked exclusive;
+Name: defaulttermqt; Description: "qt"; GroupDescription: {cm:defaultterm}; Flags: unchecked exclusive;
 Name: defaulttermpreserve; Description: {cm:termpreserve}; GroupDescription: {cm:defaultterm}; Flags: exclusive;
 Name: associate; Description: "{cm:setassociations}"; GroupDescription: "{cm:other}";
 Name: associate\plt; Description: {cm:AssocFileExtension,{#MyAppName},.plt}; GroupDescription: "{cm:other}";
@@ -111,8 +112,10 @@ Name: modifypath; Description: {cm:path}; GroupDescription: "{cm:other}"; Flags:
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 ; core files
 Source: "bin\wgnuplot.exe"; DestDir: "{app}\bin\"; Flags: ignoreversion; Components: core
-Source: bin\wgnuplot_pipes.exe; DestDir: {app}\bin\; Flags: ignoreversion skipifsourcedoesntexist; Components: core;
+Source: "bin\wgnuplot_pipes.exe"; DestDir: "{app}\bin\"; Flags: ignoreversion skipifsourcedoesntexist; Components: core;
 Source: "bin\gnuplot.exe"; DestDir: "{app}\bin\"; Flags: ignoreversion; Components: core
+; qt terminal
+Source: "bin\gnuplot_qt.exe"; DestDir: "{app}\bin\"; Flags: skipifsourcedoesntexist ignoreversion; Components: core
 ; core support files
 Source: "bin\*.dll"; DestDir: "{app}\bin\"; Flags: skipifsourcedoesntexist ignoreversion; Components: core
 Source: "bin\wgnuplot.mnu"; DestDir: {app}\bin\; Components: core
@@ -126,6 +129,7 @@ Source: "demo\*"; DestDir: {app}\demo\; Flags: recursesubdirs; Components: demo
 Source: "NEWS"; DestDir: {app}; Components: core
 Source: "README"; DestDir: {app}\docs\; Components: core
 Source: "README-Windows.txt"; DestDir: {app}; Components: core
+Source: "RELEASE_NOTES"; DestDir: {app}; Components: core
 Source: "README-testing.txt"; DestDir: {app}; Flags: skipifsourcedoesntexist; Components: core
 Source: "BUGS"; DestDir: {app}\docs\; Components: core
 Source: "ChangeLog"; DestDir: {app}\docs\; Components: core
@@ -174,8 +178,9 @@ Filename: "{app}\bin\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringC
 [Registry]
 ; set some environment variables
 ; set default terminal
-Root: HKLM; SubKey: "SYSTEM\CurrentControlSet\Control\Session Manager\Environment"; ValueType: string; ValueName: GNUTERM; ValueData: windows; Flags: NoError UninsDeleteValue; Tasks: defaulttermwin;
-Root: HKLM; SubKey: "SYSTEM\CurrentControlSet\Control\Session Manager\Environment"; ValueType: string; ValueName: GNUTERM; ValueData: wxt; Flags: NoError UninsDeleteValue; Tasks: defaulttermwxt;
+Root: HKLM; SubKey: "SYSTEM\CurrentControlSet\Control\Session Manager\Environment"; ValueType: string; ValueName: GNUTERM; ValueData: "windows"; Flags: NoError UninsDeleteValue; Tasks: defaulttermwin;
+Root: HKLM; SubKey: "SYSTEM\CurrentControlSet\Control\Session Manager\Environment"; ValueType: string; ValueName: GNUTERM; ValueData: "wxt"; Flags: NoError UninsDeleteValue; Tasks: defaulttermwxt;
+Root: HKLM; SubKey: "SYSTEM\CurrentControlSet\Control\Session Manager\Environment"; ValueType: string; ValueName: GNUTERM; ValueData: "qt"; Flags: NoError UninsDeleteValue; Tasks: defaulttermqt;
 ; include demo directory in gnuplot's search path
 Root: HKLM; SubKey: "SYSTEM\CurrentControlSet\Control\Session Manager\Environment"; ValueType: string; ValueName: GNUPLOT_LIB; ValueData: "{app}\demo;{app}\demo\games;{app}\share"; Flags: CreateValueIfDoesntExist NoError UninsDeleteValue; Components: demo;
 ; easy start in explorer's run dialog
