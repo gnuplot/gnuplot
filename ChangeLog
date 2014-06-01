@@ -1,3 +1,27 @@
+2014-06-01  Tatsuro MATSUOKA <tmacchant3@yahoo.co.jp>
+
+	* win/gnuplot.iss:  Include gnuplot_qt.exe in installer.
+	Patch #689
+
+	* src/qtterminal/gnuplot_qt.cpp:  Search for Qt translation files
+	in gnuplot's installation directory on Windows.
+	Patch #687
+
+2014-06-01  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/datafile.h:  Partial support for LFS on Windows. Currently 
+	mostly useful for 64 bit builds since integers on the the gnuplot
+	command line are limited to 31bits otherwise.
+	Patch #675
+
+2014-06-01  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* config/mingw/Makefile:  Target 'clean' and 'veryclean' include 
+	Qt files, see patch #688.
+
+	* config/mingw/Makefile win/gnuplot.iss:  Include RELEASE_NOTES.
+	Add "qt" as option as default terminal.
+
 2014-05-30  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/post.trm term/cairo.trm:  The "header" keyword for epslatex
@@ -34,6 +58,7 @@
 
 	* src/win/wgdiplus.c src/win/wgraph.c:  Change order of pointtypes to
 	match the sequence in other terminals (cairo, postscript, gd, svg).
+	Patch #681
 
 2014-05-28  Ethan A Merritt  <merritt@u.washington.edu>
 
