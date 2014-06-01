@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.183 2014/04/25 18:49:54 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.184 2014/05/05 06:13:05 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -1554,14 +1554,14 @@ arrow_parse(
 	    if (set_layer++)
 		break;
 	    c_token++;
-	    arrow->layer = 0;
+	    arrow->layer = LAYER_BACK;
 	    continue;
 	}
 	if (equals(c_token, "front")) {
 	    if (set_layer++)
 		break;
 	    c_token++;
-	    arrow->layer = 1;
+	    arrow->layer = LAYER_FRONT;
 	    continue;
 	}
 

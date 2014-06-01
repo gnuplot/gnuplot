@@ -1,3 +1,8 @@
+2014-06-01  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/axis.c src/gadgets.c src/misc.c src/set.c src/unset.c:
+	Replace magic numbers with LAYER_{BEHIND|BACK|FRONT}.
+
 2014-06-01  Tatsuro MATSUOKA <tmacchant3@yahoo.co.jp>
 
 	* win/gnuplot.iss:  Include gnuplot_qt.exe in installer.

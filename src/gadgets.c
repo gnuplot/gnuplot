@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gadgets.c,v 1.110 2014/04/05 06:17:09 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: gadgets.c,v 1.111 2014/04/27 19:08:59 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - gadgets.c */
@@ -135,7 +135,7 @@ double pointintervalbox = 1.0;
 /* set border */
 int draw_border = 31;	/* The current settings */
 int user_border = 31;	/* What the user last set explicitly */
-int border_layer = 1;
+int border_layer = LAYER_FRONT;
 # define DEFAULT_BORDER_LP { 0, LT_BLACK, 0, DASHTYPE_SOLID, 0, 1.0, 1.0, 0, BLACK_COLORSPEC, DEFAULT_DASHPATTERN }
 struct lp_style_type border_lp = DEFAULT_BORDER_LP;
 const struct lp_style_type default_border_lp = DEFAULT_BORDER_LP;
@@ -632,7 +632,7 @@ default_arrow_style(struct arrow_style_type *arrow)
     static const struct lp_style_type tmp_lp_style = DEFAULT_LP_STYLE_TYPE;
 
     arrow->tag = -1;
-    arrow->layer = 0;
+    arrow->layer = LAYER_BACK;
     arrow->lp_properties = tmp_lp_style;
     arrow->head = 1;
     arrow->head_length = 0.0;

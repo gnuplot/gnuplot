@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.132 2014/03/16 01:54:56 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.133 2014/03/16 22:03:04 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -144,7 +144,7 @@ const lp_style_type default_axis_zeroaxis = DEFAULT_AXIS_ZEROAXIS;
 const struct lp_style_type default_grid_lp = DEFAULT_GRID_LP;
 struct lp_style_type grid_lp   = DEFAULT_GRID_LP;
 struct lp_style_type mgrid_lp  = DEFAULT_GRID_LP;
-int grid_layer = -1;
+int grid_layer = LAYER_BEHIND;
 double polar_grid_angle = 0;	/* nonzero means a polar grid */
 TBOOLEAN raxis = TRUE;
 

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.450 2014/04/28 21:16:13 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.451 2014/05/05 06:13:05 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -943,16 +943,19 @@ set_border()
     c_token++;
     if(END_OF_COMMAND){
 	draw_border = 31;
-	border_layer = 1;
+	border_layer = LAYER_FRONT;
 	border_lp = default_border_lp;
     }
 
     while (!END_OF_COMMAND) {
 	if (equals(c_token,"front")) {
-	    border_layer = 1;
+	    border_layer = LAYER_FRONT;
 	    c_token++;
 	} else if (equals(c_token,"back")) {
-	    border_layer = 0;
+	    border_layer = LAYER_BACK;
+	    c_token++;
+	} else if (equals(c_token,"behind")) {
+	    border_layer = LAYER_BEHIND;
 	    c_token++;
 	} else {
 	    int save_token = c_token;
@@ -1961,13 +1964,14 @@ set_grid()
 	    polar_grid_angle = 0; /* not polar grid */
 	    c_token++;
 	} else if (equals(c_token,"back")) {
-	    grid_layer = 0;
+	    grid_layer = LAYER_BACK;
 	    c_token++;
 	} else if (equals(c_token,"front")) {
-	    grid_layer = 1;
+	    grid_layer = LAYER_FRONT;
 	    c_token++;
-	} else if (almost_equals(c_token,"layerd$efault")) {
-	    grid_layer = -1;
+	} else if (almost_equals(c_token,"layerd$efault")
+		|| equals(c_token, "behind")) {
+	    grid_layer = LAYER_BEHIND;
 	    c_token++;
 	} else { /* only remaining possibility is a line type */
 	    int save_token = c_token;
@@ -4183,15 +4187,15 @@ set_obj(int tag, int obj_type)
 	/* The rest of the options apply to any type of object */
 
 	if (equals(c_token,"front")) {
-	    this_object->layer = 1;
+	    this_object->layer = LAYER_FRONT;
 	    c_token++;
 	    continue;
 	} else if (equals(c_token,"back")) {
-	    this_object->layer = 0;
+	    this_object->layer = LAYER_BACK;
 	    c_token++;
 	    continue;
 	} else if (equals(c_token,"behind")) {
-	    this_object->layer = -1;
+	    this_object->layer = LAYER_BEHIND;
 	    c_token++;
 	    continue;
 	} else if (almost_equals(c_token,"def$ault")) {
@@ -4801,10 +4805,10 @@ set_tics()
 	    for (i = 0; i < AXIS_ARRAY_SIZE; ++i)
 		axis_array[i].ticdef.textcolor = lcolor;
 	} else if (equals(c_token,"front")) {
-	    grid_layer = 1;
+	    grid_layer = LAYER_FRONT;
 	    ++c_token;
 	} else if (equals(c_token,"back")) {
-	    grid_layer = 0;
+	    grid_layer = LAYER_BACK;
 	    ++c_token;
 	} else if (!END_OF_COMMAND) {
 	    int_error(c_token, "extraneous arguments in set tics");
@@ -5865,7 +5869,7 @@ parse_label_options( struct text_label *this_label, TBOOLEAN in_plot )
     TBOOLEAN set_position = FALSE, set_just = FALSE, set_point = FALSE,
 	set_rot = FALSE, set_font = FALSE, set_offset = FALSE,
 	set_layer = FALSE, set_textcolor = FALSE, set_hypertext = FALSE;
-    int layer = 0;
+    int layer = LAYER_BACK;
     TBOOLEAN axis_label = (this_label->tag == -2);
     TBOOLEAN hypertext = FALSE;
     struct position offset = default_offset;
@@ -5957,12 +5961,12 @@ parse_label_options( struct text_label *this_label, TBOOLEAN in_plot )
 	/* get front/back (added by JDP) */
 	if (!in_plot && !set_layer && !axis_label) {
 	    if (equals(c_token, "back")) {
-		layer = 0;
+		layer = LAYER_BACK;
 		c_token++;
 		set_layer = TRUE;
 		continue;
 	    } else if (equals(c_token, "front")) {
-		layer = 1;
+		layer = LAYER_FRONT;
 		c_token++;
 		set_layer = TRUE;
 		continue;
