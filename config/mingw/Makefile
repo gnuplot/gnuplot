@@ -1,5 +1,5 @@
 # Hello, emacs: this is a -*- Makefile -*-
-# $Id: Makefile,v 1.14.2.11 2013/04/05 16:17:46 markisch Exp $
+# $Id: Makefile,v 1.14.2.12 2013/04/12 16:33:14 markisch Exp $
 #
 # GNUPLOT Makefile for MinGW/MSYS on Windows
 # This assumes usual installation of the MinGW32 toolkit, the free
@@ -83,7 +83,7 @@ MOUSE=1
 #CAIROLIBS=1
 
 # Uncomment the following line to select the lua/tikz terminal
-#LUA=lua5.1
+#LUA=lua
 
 # Uncomment if you have libiconv
 ICONV=1
@@ -124,7 +124,7 @@ DESTDIR = "$(PROGRAMFILES)/gnuplot"
 
 # Do you want some special optimization?
 # -mpentium means optimise for Pentium processor
-# -mpentiumpro means optimize for Pentium II and Pro procesors
+# -mpentiumpro means optimize for Pentium II and Pro processors
 #CFLAGS +=
 
 ifdef HTML_HELP
@@ -133,7 +133,7 @@ ifdef HTML_HELP
 # It can be obtained here:
 # http://go.microsoft.com/fwlink/?LinkId=154968
 # We need to explicitly set the correct path here since we also need
-# adjust the include and linrary paths.
+# adjust the include and library paths.
 HHWPATH = "$(PROGRAMFILES)/HTML Help Workshop/"
 HHC = $(HHWPATH)hhc
 
@@ -151,7 +151,7 @@ HCWFLAG =
 
 endif
 
-# Choose which windres/rc do you want to use (GNU windres or MS RC):
+# Choose which resource compiler you want to use (GNU windres or MS rc):
 GNU_RC = 1
 ifndef GNU_RC
   # If uncommented GNU_RC above and rc.exe not in PATH, then set:
@@ -232,10 +232,10 @@ RM = rm -f
 CP = cp -p
 
 ifdef DEBUG
-  CFLAGS += -g -Wall
+  CFLAGS += -g -Wall -pipe
   LDFLAGS += -g
 else
-  CFLAGS += -O2
+  CFLAGS += -O2 -pipe
   LDFLAGS += -s
 endif
 
