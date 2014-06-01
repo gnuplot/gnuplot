@@ -44,10 +44,32 @@
 #include "QtGnuplotApplication.h"
 #include <QtCore>
 #include <signal.h>
+#ifdef _WIN32
+# include <windows.h>
+#endif
 
 int main(int argc, char* argv[])
 {
 	signal(SIGINT, SIG_IGN); // Do not listen to SIGINT signals anymore
+	const char * qt_gnuplot_data_dir = QTGNUPLOT_DATA_DIR;
+
+#if defined(_WIN32)
+	/* On Windows, QTGNUPLOT_DATA_DIR is relative to installation dir. */
+	char buf[MAX_PATH];
+	if (GetModuleFileNameA(NULL, (LPCH) buf, sizeof(buf))) {
+		char * p = strrchr(buf, '\\');
+		if (p != NULL) {
+			*p = '\0';
+			if ((strlen(buf) >= 4) && (strnicmp(&buf[strlen(buf) - 4], "\\bin", 4) == 0))
+				buf[strlen(buf) - 4] = '\0';
+			p = (char *) malloc(strlen(buf) + strlen(QTGNUPLOT_DATA_DIR) + 2);
+			strcpy(p, buf);
+			strcat(p, "\\");
+			strcat(p, QTGNUPLOT_DATA_DIR);
+			qt_gnuplot_data_dir = p;
+		}
+	}
+#endif
 
 #if QT_VERSION < 0x040700
 	/* 
@@ -71,7 +93,7 @@ int main(int argc, char* argv[])
 
 	// Load translations for the qt terminal
 	QTranslator translator;
-	translator.load("qtgnuplot_" + QLocale::system().name(), QTGNUPLOT_DATA_DIR);
+	translator.load("qtgnuplot_" + QLocale::system().name(), qt_gnuplot_data_dir);
 	application.installTranslator(&translator);
 
 	// Start
