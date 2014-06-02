@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: win.trm,v 1.123 2014/01/04 15:46:38 markisch Exp $
+ * $Id: win.trm,v 1.124 2014/04/03 00:33:39 markisch Exp $
  */
 
 /* GNUPLOT - win.trm */
@@ -312,7 +312,7 @@ WIN_options()
 				}
 				if (*s) {
 					set_font = TRUE;
-					strncpy(fontname, s, MAXFONTNAME);
+					safe_strncpy(fontname, s, MAXFONTNAME);
 					free(s);
 				}
 			} else {
@@ -380,13 +380,11 @@ WIN_options()
 	if (set_position) {
 		graphwin->Origin.x = win_x;
 		graphwin->Origin.y = win_y;
-		/* TODO: apply now */
 	}
 	if (set_title) {
 		free (graphwin->Title);
 		graphwin->Title = (title) ?  title : strdup(WINGRAPHTITLE);
 		GraphChangeTitle(graphwin);
-		/* TODO: apply now */
 	}
 	if (set_fontsize)
 		graphwin->deffontsize = graphwin->fontsize = fontsize;
@@ -405,6 +403,8 @@ WIN_options()
 	}
 
 	/* update graph window */
+	if ((set_position || set_size) && GraphHasWindow(graphwin))
+		GraphUpdateWindowPosSize(graphwin);
 	if (GraphHasWindow(graphwin) && IsIconic(graphwin->hWndGraph))
 		ShowWindow(graphwin->hWndGraph, SW_SHOWNORMAL);
 	GraphRedraw(graphwin);
@@ -829,8 +829,7 @@ WIN_set_font(const char *font)
 		} else {
 			/* full font information supplied */
 			char fontname[MAXFONTNAME];
-			strncpy(fontname, font, size - font);
-			fontname[size - font] = '\0';
+			safe_strncpy(fontname, font, size - font);
 			sscanf(size + 1, "%i", &fontsize);
 			GraphOp(graphwin, W_font, fontsize, 0, fontname);
 		}
@@ -865,8 +864,8 @@ TERM_PUBLIC void
 WIN_layer(t_termlayer syncpoint)
 {
 	/* ignore LAYER_RESET in multiplot mode */
-    if (((syncpoint == TERM_LAYER_RESET) || 
-	     (syncpoint == TERM_LAYER_RESET_PLOTNO)) && 
+    if (((syncpoint == TERM_LAYER_RESET) ||
+	     (syncpoint == TERM_LAYER_RESET_PLOTNO)) &&
 		multiplot)
 				return;
 	GraphOp(graphwin, W_layer, syncpoint, 0, NULL);
@@ -890,7 +889,7 @@ WIN_boxed_text(unsigned int x, unsigned int y, int option)
 #endif
 
 
-TERM_PUBLIC void 
+TERM_PUBLIC void
 WIN_modify_plots(unsigned int operations)
 {
 	GraphModifyPlots(graphwin, operations);
@@ -907,7 +906,7 @@ TERM_TABLE_START(win_driver)
     WIN_text, null_scale, WIN_graphics, WIN_move, WIN_vector,
     WIN_linetype, WIN_put_text, WIN_text_angle,
     WIN_justify_text, WIN_point, do_arrow, WIN_set_font,
-    WIN_set_pointsize, 
+    WIN_set_pointsize,
     TERM_CAN_MULTIPLOT|TERM_NO_OUTPUTFILE|TERM_ALPHA_CHANNEL|TERM_CAN_DASH
         |TERM_LINEWIDTH|TERM_FONTSCALE | TERM_ENHANCED_TEXT,
     WIN_text /* suspend */ , WIN_resume,
@@ -931,7 +930,7 @@ TERM_TABLE_START(win_driver)
 #ifdef EAM_BOXED_TEXT
     , WIN_boxed_text
 #endif
-	, WIN_modify_plots
+    , WIN_modify_plots
 TERM_TABLE_END(win_driver)
 
 #undef LAST_TERM

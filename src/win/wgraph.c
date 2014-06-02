@@ -1,5 +1,5 @@
 /*
- * $Id: wgraph.c,v 1.185 2014/05/29 11:21:24 markisch Exp $
+ * $Id: wgraph.c,v 1.186 2014/06/02 05:16:14 markisch Exp $
  */
 
 /* GNUPLOT - win/wgraph.c */
@@ -583,6 +583,13 @@ GraphInit(LPGW lpgw)
 #endif
 
 	ShowWindow(lpgw->hWndGraph, SW_SHOWNORMAL);
+}
+
+
+void WDPROC
+GraphUpdateWindowPosSize(LPGW lpgw)
+{
+	SetWindowPos(lpgw->hWndGraph, HWND_BOTTOM, lpgw->Origin.x, lpgw->Origin.y, lpgw->Size.x, lpgw->Size.y, SWP_NOACTIVATE | SWP_NOZORDER);
 }
 
 
