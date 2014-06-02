@@ -1,5 +1,5 @@
 /*
- * $Id: datafile.h,v 1.46 2014/04/14 19:15:00 sfeam Exp $
+ * $Id: datafile.h,v 1.47 2014/06/01 09:32:03 markisch Exp $
  */
 
 /* GNUPLOT - datafile.h */
@@ -63,16 +63,6 @@ enum DF_STATUS {
 #if defined(HAVE_FSEEKO) && defined(HAVE_OFF_T)
 #  define fseek(stream,pos,whence) fseeko(stream,pos,whence)
 #  define ftell(stream) ftello(stream)
-#elif defined(_MSC_VER)
-/* MSVC defines off_t as long, and uses _f{seek,tell}i64. */
-#  define off_t __int64;
-#  define fseek(stream,pos,whence) _fseeki64(stream,pos,whence)
-#  define ftell(stream) _ftelli64(stream)
-# elif defined(__MINGW32__)
-/* MinGW defines off_t as long and uses f{seek,tell}o64/off64_t for large files. */
-#  define off_t off64_t
-#  define fseek(stream,pos,whence) fseeko64(stream,pos,whence)
-#  define ftell(stream) ftello64(stream)
 #endif
 
 /* Variables of datafile.c needed by other modules: */
