@@ -1,5 +1,5 @@
 /*
- * $Id: wgdiplus.cpp,v 1.13 2014/04/03 00:31:15 markisch Exp $
+ * $Id: wgdiplus.cpp,v 1.14 2014/05/29 11:21:24 markisch Exp $
  */
 
 /*
@@ -653,6 +653,15 @@ drawgraph_gdiplus(LPGW lpgw, HDC hdc, LPRECT rect)
 					keysample = true;
 					break;
 				case TERM_LAYER_END_KEYSAMPLE:
+					/* grey out keysample if graph is hidden */
+					if ((plotno <= lpgw->maxhideplots) && lpgw->hideplot[plotno - 1]) {
+						ARGB argb = Color::MakeARGB(128, 192, 192, 192);
+						Color transparentgrey(argb);
+						SolidBrush greybrush(transparentgrey);
+						LPRECT bb = lpgw->keyboxes + plotno - 1;
+						graphics.FillRectangle(&greybrush, INT(bb->left), INT(bb->bottom),
+						                       bb->right - bb->left, bb->top - bb->bottom);
+					}
 					keysample = false;
 					break;
 				case TERM_LAYER_RESET:
@@ -1183,7 +1192,7 @@ drawgraph_gdiplus(LPGW lpgw, HDC hdc, LPRECT rect)
 			solid_pen.SetColor(pcolor);
 
 			/* invalidate point symbol cache */
-			if (last_color != color)					
+			if (last_color != color)
 				last_symbol = 0;
 
 			/* remember this color */

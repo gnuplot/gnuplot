@@ -1,5 +1,5 @@
 /*
- * $Id: wgraph.c,v 1.184 2014/05/09 22:14:12 broeker Exp $
+ * $Id: wgraph.c,v 1.185 2014/05/29 11:21:24 markisch Exp $
  */
 
 /* GNUPLOT - win/wgraph.c */
@@ -1466,6 +1466,36 @@ draw_update_keybox(LPGW lpgw, unsigned plotno, unsigned x, unsigned y)
 }
 
 
+static void
+draw_grey_out_key_box(LPGW lpgw, HDC hdc, int plotno)
+{
+	HDC memdc;
+	HBITMAP membmp, oldbmp;
+	BLENDFUNCTION ftn;
+	HBRUSH oldbrush;
+	LPRECT bb;
+	int width, height;
+
+	bb = lpgw->keyboxes + plotno - 1;
+	width = bb->right - bb->left + 1;
+	height = bb->top - bb->bottom + 1;
+	memdc = CreateCompatibleDC(hdc);
+	membmp = CreateCompatibleBitmap(hdc, width, height);
+	oldbmp = (HBITMAP) SelectObject(memdc, membmp);
+	oldbrush = SelectObject(memdc, (HBRUSH) GetStockObject(LTGRAY_BRUSH));
+	PatBlt(memdc, 0, 0, width, height, PATCOPY);
+	ftn.AlphaFormat = 0; /* no alpha channel in bitmap */
+	ftn.SourceConstantAlpha = (UCHAR)(128); /* global alpha */
+	ftn.BlendOp = AC_SRC_OVER;
+	ftn.BlendFlags = 0;
+	AlphaBlend(hdc, bb->left, bb->bottom, width, height,
+		   memdc, 0, 0, width, height, ftn);
+	SelectObject(memdc, oldbrush);
+	SelectObject(memdc, oldbmp);
+	DeleteObject(membmp);
+	DeleteDC(memdc);
+}
+
 
 void
 draw_image(LPGW lpgw, HDC hdc, char *image, POINT corners[4], unsigned int width, unsigned int height, int color_mode)
@@ -1802,6 +1832,9 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 					keysample = TRUE;
 					break;
 				case TERM_LAYER_END_KEYSAMPLE:
+					/* grey out keysample if graph is hidden */
+					if ((plotno <= lpgw->maxhideplots) && lpgw->hideplot[plotno - 1])
+						draw_grey_out_key_box(lpgw, hdc, plotno);
 					keysample = FALSE;
 					break;
 				case TERM_LAYER_RESET:
@@ -2411,7 +2444,7 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 			SetTextColor(hdc, color);
 
 			/* invalidate point symbol cache */
-			if (last_color != color)					
+			if (last_color != color)
 				last_symbol = 0;
 
 			/* remember this color */
@@ -3162,7 +3195,7 @@ WriteGraphIni(LPGW lpgw)
 }
 
 
-char * 
+char *
 GraphDefaultFont(void)
 {
 	if (GetACP() == 932) /* Japanese Shift-JIS */
@@ -4791,7 +4824,7 @@ UpdateToolbar(LPGW lpgw)
 /*
  * Toggle active plots
  */
-void WDPROC 
+void WDPROC
 GraphModifyPlots(LPGW lpgw, unsigned int ops)
 {
 	int i;
