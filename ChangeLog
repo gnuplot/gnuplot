@@ -1,3 +1,13 @@
+2014-06-03  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/graph3d.c src/show.c src/save.c docs/gnuplot.doc:
+	The hidden3d code processes the lines making up the plot border using
+	the same algorithm as it does for the plot elements.  This renders
+	partially occluded borders correctly for actual surfaces but fails to
+	recognize occlusion for, e.g., 3D histograms drawn with impulses.
+	New keyword option "set border behind" draws the border lines before
+	the plot elements even for hidden3d plots.
+
 2014-06-02  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/win/wgraph.c src/win/wgdiplus.cpp:

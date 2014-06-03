@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.322 2014/04/28 21:16:13 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.323 2014/05/01 18:19:46 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -1159,8 +1159,9 @@ show_border()
     if (!draw_border)
 	fprintf(stderr, "\tborder is not drawn\n");
     else {
-	fprintf(stderr, "\tborder %d is drawn in %s of the plot elements with\n\t ",
-	    draw_border, border_layer == LAYER_BACK ? "back" : "front");
+	fprintf(stderr, "\tborder %d is drawn in %s layer with\n\t ",
+	    draw_border, 
+	    border_layer == LAYER_BEHIND ? "behind" : border_layer == LAYER_BACK ? "back" : "front");
 	save_linetype(stderr, &border_lp, FALSE);
 	fputc('\n',stderr);
     }

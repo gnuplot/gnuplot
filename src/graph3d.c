@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.306 2014/05/28 23:21:07 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.307 2014/06/02 03:35:06 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -747,6 +747,9 @@ do_3dplot(
 	 * lines being output after all surfaces have been defined. */
 	draw_3d_graphbox(plots, pcount, BACKGRID, LAYER_BACK);
 
+    else if (hidden3d && border_layer == LAYER_BEHIND)
+	draw_3d_graphbox(plots, pcount, ALLGRID, LAYER_BACK);
+
     /* Clipping in 'set view map' mode should be like 2D clipping */
     if (splot_map) {
 	int map_x1, map_y1, map_x2, map_y2;
@@ -1309,19 +1312,20 @@ do_3dplot(
 	(term->layer)(TERM_LAYER_AFTER_PLOT);
     }
 
-    /* DRAW GRID AND BORDER */
-    /* HBB NEW 20040311: do front part now, after surfaces have been
-     * output. If "set grid front", or hidden3d is active, must output
-     * the whole shebang now, otherwise only the front part. */
-    if (hidden3d || grid_layer == LAYER_FRONT)
+    /* Draw grid and border.
+     * The 1st case allows "set border behind" to override hidden3d processing.
+     * The 2nd case either leaves everything to hidden3d or forces it to the front.
+     * The 3rd case is the non-hidden3d default - draw back pieces (done earlier),
+     * then the graph, and now the front pieces.
+     */
+    if (hidden3d && border_layer == LAYER_BEHIND)
+	draw_3d_graphbox(plots, pcount, FRONTGRID, LAYER_FRONT);
+
+    else if (hidden3d || grid_layer == LAYER_FRONT)
 	draw_3d_graphbox(plots, pcount, ALLGRID, LAYER_FRONT);
+
     else if (grid_layer == LAYER_BEHIND)
 	draw_3d_graphbox(plots, pcount, FRONTGRID, LAYER_FRONT);
-#if (0)
-    /* FIXME:  I think this is redundant with the 1st test above */
-    if (splot_map && (border_layer == LAYER_FRONT))
-	draw_3d_graphbox(plots, pcount, BORDERONLY, LAYER_FRONT);
-#endif
 
     /* Go back and draw the legend in a separate pass if "key opaque" */
     if (key->visible && key->front && !key_pass) {

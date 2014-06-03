@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.889 2014/05/16 20:24:58 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.890 2014/05/29 11:08:26 markisch Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -7431,7 +7431,8 @@ Ffigure_mapcontours
  `splot` they usually do not.
 
  Syntax:
-       set border {<integer>} {front | back} {linewidth | lw <line_width>}
+       set border {<integer>}
+                  {front | back | behind} {linewidth | lw <line_width>}
                   {{linestyle | ls <line_style>} | {linetype | lt <line_type>}}
        unset border
        show border
@@ -7527,6 +7528,10 @@ Ffigure_mapcontours
  In 2D plots the border is normally drawn on top of all plots elements
  (`front`). If you want the border to be drawn behind the plot elements,
  use `set border back`.
+
+ In hidden3d plots the lines making up the border are normally subject to the
+ same hidden3d processing as the plot elements. `set border behind` will
+ override this default.
 
  Using the optional <line_style>, <line_type> and <line_width> specifiers, the
  way the border lines are drawn can be influenced (limited by what the current

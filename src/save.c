@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.251 2014/04/28 18:50:13 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.252 2014/05/05 06:13:05 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -210,7 +210,8 @@ set bar %f %s\n",
 	    bar_size, (bar_layer == LAYER_BACK) ? "back" : "front");
 
     if (draw_border) {
-	fprintf(fp, "set border %d %s", draw_border, border_layer == LAYER_BACK ? "back" : "front");
+	fprintf(fp, "set border %d %s", draw_border,
+	    border_layer == LAYER_BEHIND ? "behind" : border_layer == LAYER_BACK ? "back" : "front");
 	save_linetype(fp, &border_lp, FALSE);
 	fprintf(fp, "\n");
     } else
