@@ -1,5 +1,5 @@
 /*
- * $Id: gp_cairo.c,v 1.82 2014/04/18 04:12:46 sfeam Exp $
+ * $Id: gp_cairo.c,v 1.83 2014/05/14 23:33:07 sfeam Exp $
  */
 
 /* GNUPLOT - gp_cairo.c */
@@ -909,6 +909,12 @@ void gp_cairo_draw_text(plot_struct *plot, int x1, int y1, const char* string,
 	PangoRectangle ink, logical;
 	pango_layout_get_pixel_extents (layout, &ink, &logical);
 
+	/* Auto-initialization */
+	if (bounding_box[0] < 0 && bounding_box[1] < 0) {
+	    bounding_box[0] = bounding_box[2] = x;
+	    bounding_box[1] = bounding_box[3] = y;
+	}
+
 	/* Would it look better to use logical bounds rather than ink? */
 	if (bounding_box[0] > x + ink.x)
 	    bounding_box[0] = x + ink.x;
@@ -1590,6 +1596,12 @@ void gp_cairo_enhanced_finish(plot_struct *plot, int x, int y)
 	/* Update bounding box for boxed label text */
 	pango_layout_get_pixel_extents (layout, &ink_rect, &logical_rect);
 
+	/* Auto-initialization */
+	if (bounding_box[0] < 0 && bounding_box[1] < 0) {
+	    bounding_box[0] = bounding_box[2] = x;
+	    bounding_box[1] = bounding_box[3] = y;
+	}
+
 	/* Would it look better to use logical bounds rather than ink_rect? */
 	if (bounding_box[0] > enh_x + ink_rect.x)
 	    bounding_box[0] = enh_x + ink_rect.x;
@@ -1678,6 +1690,7 @@ void gp_cairo_boxed_text(plot_struct *plot, int x, int y, int option)
 	case TEXTBOX_OUTLINE:
 		/* Stroke the outline of the bounding box for previous text */
 	case TEXTBOX_BACKGROUNDFILL:
+	case TEXTBOX_GREY:
 		/* Fill the bounding box with background color */
 		/* begin by stroking any open path */
 		gp_cairo_stroke(plot);
@@ -1686,6 +1699,8 @@ void gp_cairo_boxed_text(plot_struct *plot, int x, int y, int option)
 		cairo_save(plot->cr);
 		dx = 0.5 * bounding_xmargin * (float)(plot->fontsize * plot->oversampling_scale);
 		dy = 0.5 * bounding_ymargin * (float)(plot->fontsize * plot->oversampling_scale);
+		if (option == TEXTBOX_GREY)
+		    dy = 0;
 		gp_cairo_move(plot,   bounding_box[0]-dx, bounding_box[1]-dy); 
 		gp_cairo_vector(plot, bounding_box[0]-dx, bounding_box[3]+dy); 
 		gp_cairo_vector(plot, bounding_box[2]+dx, bounding_box[3]+dy); 
@@ -1696,6 +1711,9 @@ void gp_cairo_boxed_text(plot_struct *plot, int x, int y, int option)
 		    rgb_color *background = &gp_cairo_colorlist[0];
 		    cairo_set_source_rgb(plot->cr, background->r, background->g, background->b);
 		    cairo_fill(plot->cr);
+		} else if (option == TEXTBOX_GREY) {
+		    cairo_set_source_rgba(plot->cr, 0.75, 0.75, 0.75, 0.50);
+		    cairo_fill(plot->cr);
 		} else {
 		    cairo_set_line_width(plot->cr, 1.0*plot->oversampling_scale);
 		    cairo_set_source_rgb(plot->cr,
@@ -1705,7 +1723,7 @@ void gp_cairo_boxed_text(plot_struct *plot, int x, int y, int option)
 		cairo_restore(plot->cr);
 		break;
 
-	case 3: /* Change the margin between text and box */
+	case TEXTBOX_MARGINS: /* Change the margin between text and box */
 		bounding_xmargin = (double)x/100.;
 		bounding_ymargin = (double)y/100.;
 		break;

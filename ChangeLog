@@ -8,6 +8,11 @@
 	New keyword option "set border behind" draws the border lines before
 	the plot elements even for hidden3d plots.
 
+	* src/term_api.h src/wxterminal/gp_cairo.c src/wxterminal/wxt_gui.cpp:
+	Change the implementation of greying out inactive keybox entries in wxt
+	to use a textbox rather than the active area of the key entry.
+	Bug #1416
+
 2014-06-02  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/win/wgraph.c src/win/wgdiplus.cpp:
