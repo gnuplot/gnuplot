@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.97 2013/12/22 20:47:25 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.98 2014/05/09 22:14:11 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - hidden3d.c */
@@ -1632,9 +1632,15 @@ static void
 draw_vertex(p_vertex v)
 {
     unsigned int x, y;
+    int p_type;
+
+    if (v->lp_style == NULL)
+	return;
+    
+    p_type = v->lp_style->p_type;
 
     TERMCOORD(v, x, y);
-    if (v->lp_style && v->lp_style->p_type >= -1 && !clip_point(x,y)) {
+    if ((p_type >= -1 || p_type == PT_CHARACTER) && !clip_point(x,y)) {
 	struct t_colorspec *tc = &(v->lp_style->pm3d_color);
 
 	if (v->label)  {
@@ -1663,7 +1669,10 @@ draw_vertex(p_vertex v)
 	    (term->pointsize)(pointsize * v->original->CRD_PTSIZE);
 #endif
 
-	(term->point)(x,y, v->lp_style->p_type);
+	if (p_type == PT_CHARACTER)
+	    (term->put_text)(x, y, (char *)(&(v->lp_style->p_char)));
+	else
+	    (term->point)(x,y, p_type);
 
 	/* vertex has been drawn --> flag it as done */
 	v->lp_style = NULL;

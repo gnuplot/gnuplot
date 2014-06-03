@@ -13,6 +13,8 @@
 	to use a textbox rather than the active area of the key entry.
 	Bug #1416
 
+	* src/hidden3d.c (draw_vertex):  Handle p_type == PT_CHARACTER.
+
 2014-06-02  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/win/wgraph.c src/win/wgdiplus.cpp:
