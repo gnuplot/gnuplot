@@ -1,3 +1,10 @@
+	* src/plot.c:  Only if a wxt or windows terminal window is open, the 
+	-persist option is handled by keeping the main input loop running. 
+	This is unfortunate but maybe the best we can do since we are missing
+	a process fork or detach mechanism. This eliminates zombie process when
+	no plot windows are open in session.
+	Bugs #1308, #1335, #1343
+
 2014-06-01  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/fit.c:  'update' fails if parameter file does not exits yet.
