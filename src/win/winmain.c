@@ -1,5 +1,5 @@
 /*
- * $Id: winmain.c,v 1.74 2014/03/30 18:33:21 markisch Exp $
+ * $Id: winmain.c,v 1.75 2014/05/09 22:14:12 broeker Exp $
  */
 
 /* GNUPLOT - win/winmain.c */
@@ -81,6 +81,11 @@
 #endif
 #ifdef WXWIDGETS
 #include "wxterminal/wxt_term.h"
+#endif
+#ifdef HAVE_LIBCACA
+# define TERM_PUBLIC_PROTO
+# include "caca.trm"
+# undef TERM_PUBLIC_PROTO
 #endif
 
 
@@ -1098,7 +1103,7 @@ win_lower_terminal_group(void)
 
 
 /* returns true if there are any graph windows open (win terminal) */
-TBOOLEAN
+static TBOOLEAN
 WinWindowOpened(void)
 {
 	LPGW lpgw;
@@ -1113,15 +1118,26 @@ WinWindowOpened(void)
 }
 
 
-#ifndef WGP_CONSOLE
-void
-WinPersistTextClose(void)
+/* returns true if there are any graph windows open (wxt/caca/win terminals) */
+TBOOLEAN
+WinAnyWindowOpen(void)
 {
 	TBOOLEAN window_opened = WinWindowOpened();
 #ifdef WXWIDGETS
 	window_opened |= wxt_window_opened();
 #endif
-	if (!window_opened &&
+#ifdef HAVE_LIBCACA
+	window_opened |= CACA_window_opened();
+#endif
+	return window_opened;
+}
+
+
+#ifndef WGP_CONSOLE
+void
+WinPersistTextClose(void)
+{
+	if (!WinAnyWindowOpen() &&
 		(textwin.hWndParent != NULL) && !IsWindowVisible(textwin.hWndParent))
 		PostMessage(textwin.hWndParent, WM_CLOSE, 0, 0);
 }

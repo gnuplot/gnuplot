@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot.c,v 1.161 2014/03/22 23:09:06 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot.c,v 1.162 2014/03/30 18:33:21 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - plot.c */
@@ -655,12 +655,15 @@ RECOVER_FROM_ERROR_IN_DASH:
     }
 
 #ifdef _Windows
-    /* On Windows 'persist' is handled by keeping the main input loop running. */
+    /* On Windows, handle 'persist' by keeping the main input loop running (windows/wxt), */
+    /* but only if there are any windows open. Note that qt handles this properly. */
     if (persist_cl) {
-	interactive = TRUE;
-	while (!com_line())
-	    ctrlc_flag = FALSE; /* reset asynchronous Ctrl-C flag */
-	interactive = FALSE;
+	if (WinAnyWindowOpen()) {
+	    interactive = TRUE;
+	    while (!com_line())
+		ctrlc_flag = FALSE; /* reset asynchronous Ctrl-C flag */
+	    interactive = FALSE;
+	}
     } else
 #endif
     {

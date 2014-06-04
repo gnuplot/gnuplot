@@ -1,7 +1,7 @@
 /*
  * GNUPLOT - caca.trm
  *
- * $Id: caca.trm,v 1.4 2014/03/30 17:49:07 markisch Exp $
+ * $Id: caca.trm,v 1.5 2014/05/29 18:13:47 sfeam Exp $
  *
  * This file uses UTF8 encoding and a tab size of 4.
  *
@@ -89,6 +89,7 @@ TERM_PUBLIC void CACA_modify_plots(unsigned int operations);
 #if defined(TERM_PUBLIC_PROTO) || defined (TERM_BODY)
 
 extern TBOOLEAN CACA_process_events(void);
+extern TBOOLEAN CACA_window_opened(void);
 
 #endif /* TERM_PUBLIC_PROTO */
 
@@ -217,7 +218,7 @@ static char * CACA_status_text = NULL; /* current status line text */
 static int CACA_ruler_line = FALSE; /* status of ruler line */
 static CACA_POINT CACA_ruler = {-1, -1}; /* ruler position */
 static TBOOLEAN CACA_zooming = FALSE; /* mouse zooming */
-static CACA_POINT CACA_zoom_from; 
+static CACA_POINT CACA_zoom_from;
 static char * CACA_zoom_from_text = NULL;
 static CACA_POINT CACA_zoom_to;
 static char * CACA_zoom_to_text = NULL;
@@ -240,7 +241,7 @@ static CACA_HYPERTEXT * CACA_hypertext_list = NULL;
 static CACA_HYPERTEXT * CACA_last_hypertext = NULL;
 
 /* interactive hiding of plots */
-static int CACA_plotno = 0;  
+static int CACA_plotno = 0;
 static int CACA_maxhideplots = 0;
 static TBOOLEAN * CACA_hideplot = NULL;
 static int CACA_maxkeyboxes = 0;
@@ -695,7 +696,7 @@ CACA_check_resize()
 }
 
 
-void 
+void
 CACA_sigint_handler(int sig)
 {
 	if (!CACA_windowed)
@@ -830,7 +831,7 @@ CACA_graphics()
 
 	caca_set_color_ansi(CACA_cv, !CACA_inverted ? CACA_BLACK : CACA_WHITE, CACA_background);
 	caca_clear_canvas(CACA_cv);
-	if (CACA_dp) {
+	if (CACA_dp != NULL) {
 #ifdef USE_MOUSE
 		CACA_print_status();
 #endif
@@ -944,6 +945,9 @@ CACA_close_display(void)
 			if (CACA_codepage != 0)
 				SetConsoleOutputCP(CACA_codepage);
 		}
+#ifndef WGP_CONSOLE
+		WinPersistTextClose();
+#endif
 #endif
 		/* NOTE: The slang backend driver sets its own signal handler for SIGINT,
 		   but does not seem to restore the previous handler on exit.
@@ -1415,7 +1419,7 @@ CACA_init_angles(void)
 	int width = 6;
 	int height = 10;
 
-	if (CACA_dp) {
+	if (CACA_dp != NULL) {
 		height = caca_get_display_height(CACA_dp) / (CACA_ymax + CACA_status_height + 1);
 		width  = caca_get_display_width(CACA_dp)  / (CACA_xmax + 1);
 	}
@@ -1990,10 +1994,17 @@ CACA_process_events(void)
 }
 
 
+TBOOLEAN
+CACA_window_opened()
+{
+	return (CACA_dp != NULL);
+}
+
+
 static void
 CACA_discard_events(void)
 {
-	if (CACA_dp)
+	if (CACA_dp != NULL)
 		while (caca_get_event(CACA_dp, CACA_EVENT_ANY, NULL, 50) != 0);
 }
 
@@ -2082,7 +2093,7 @@ CACA_put_tmptext(int i, const char str[])
 			else
 				CACA_status_text = NULL;
 			CACA_print_status();
-			if (CACA_dp)
+			if (CACA_dp != NULL)
 				caca_refresh_display(CACA_dp);
 			break;
 		case 1: /* zooming from text */
@@ -2463,7 +2474,7 @@ CACA_boxed_text(unsigned int x, unsigned int y, int option)
 #endif
 
 
-TERM_PUBLIC void 
+TERM_PUBLIC void
 CACA_modify_plots(unsigned int operations)
 {
 	int i;

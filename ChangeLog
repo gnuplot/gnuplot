@@ -1,3 +1,14 @@
+2014-06-04  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/plot.c src/win/winmain.c|h term/caca.trm:  Only if a wxt, caca
+	or windows terminal window is open, the -persist option is handled by
+	keeping the main input loop running. This is unfortunate but maybe the
+	best we can do since we are missing a process fork or detach mechanism.
+	This eliminates zombie process when no plot windows are open in
+	session. For the qt terminal -persist works as on other platforms
+	since it uses a secondary process.
+	Bugs #1308, #1335, #1343
+
 2014-06-03  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graph3d.c src/show.c src/save.c docs/gnuplot.doc:
