@@ -5,13 +5,21 @@ We are happy to announce a release candidate for gnuplot version 5.
 Version 5 will be a major release with significant new capabilities
 and enhancements compared to previous gnuplot versions.
 
-Release Notes date: 30 May 2014
+Release Notes date: 06 June 2014
 
-MAJOR NEW FEATURES
-==================
+NOTABLE NEW FEATURES
+====================
 
 * The dot/dash pattern of a line can now be controlled independently
   from other properties using the keyword "dashtype".
+
+* The default color of individual line types can be changed using 
+  "set linetype" (introduced in 4.6). In version 5 a default overall color
+  sequence can be selected using "set colors {default|classic|podo}".
+  The "classic" sequence is red/green/blue/magenta/cyan/yellow as used by
+  older gnuplot versions.  The default and podo colors are chosen to be
+  more easily distinguished in print and in particular by people with color
+  vision problems.
 
 * Text markup now supports bold and italic font settings in addition to
   the subscript, superscript, font size and other options previously
