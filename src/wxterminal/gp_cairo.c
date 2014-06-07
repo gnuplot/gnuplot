@@ -1,5 +1,5 @@
 /*
- * $Id: gp_cairo.c,v 1.83 2014/05/14 23:33:07 sfeam Exp $
+ * $Id: gp_cairo.c,v 1.84 2014/06/03 17:58:20 sfeam Exp $
  */
 
 /* GNUPLOT - gp_cairo.c */
@@ -546,10 +546,12 @@ void gp_cairo_set_dashtype(plot_struct *plot, int type, t_dashtype *custom_dash_
 	if (type == DASHTYPE_CUSTOM && custom_dash_type) {
 		/* Convert to internal representation */
 		int i;
+		double empirical_scale = 0.55;
 		for (i=0; i<8; i++)
 			plot->current_dashpattern[i] = custom_dash_type->pattern[i]
 				* plot->dashlength
-				* plot->oversampling_scale;
+				* plot->oversampling_scale * empirical_scale
+				* plot->linewidth;
 		FPRINTF((stderr,"gp_cairo_set_dashtype: custom pattern\n"));
 		FPRINTF((stderr,"	%f %f %f %f %f %f %f %f\n",
 			plot->current_dashpattern[0], plot->current_dashpattern[1],
@@ -564,7 +566,8 @@ void gp_cairo_set_dashtype(plot_struct *plot, int type, t_dashtype *custom_dash_
 		for (i=0; i<8; i++)
 			plot->current_dashpattern[i] = dashpattern[lt-1][i]
 				* plot->dashlength
-				* plot->oversampling_scale;
+				* plot->oversampling_scale
+				* plot->linewidth;
 		plot->linestyle = GP_CAIRO_DASH;
 
 	} else {
@@ -596,8 +599,8 @@ void gp_cairo_stroke(plot_struct *plot)
 	else if (lt == LT_AXIS || plot->linestyle == GP_CAIRO_DOTS) {
 		/* Grid lines (lt 0) */
 		double dashes[2];
-		dashes[0] = 0.4 * plot->oversampling_scale * plot->dashlength;
-		dashes[1] = 4.0 * plot->oversampling_scale * plot->dashlength;
+		dashes[0] = 0.4 * plot->oversampling_scale * plot->dashlength * plot->linewidth;
+		dashes[1] = 4.0 * plot->oversampling_scale * plot->dashlength * plot->linewidth;
 		cairo_set_dash(plot->cr, dashes, 2 /*num_dashes*/, 0 /*offset*/);
 		lw *= 0.6;
 	}

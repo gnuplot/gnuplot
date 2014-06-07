@@ -1,3 +1,8 @@
+2014-06-07  Mojca Miklavec  <mojca.miklavec.lists@gmail.com>
+
+	* src/wxterminal/gp_cairo.c:  Scale dashlength with linewidth, similar
+	to what qt does.
+
 2014-06-04  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/plot.c src/win/winmain.c|h term/caca.trm:  Only if a wxt, caca
