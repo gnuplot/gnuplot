@@ -1,4 +1,4 @@
-# $Id: README-Windows-ja.txt,v 1.1 2011/12/23 13:19:11 markisch Exp $
+# $Id: README-Windows-ja.txt,v 1.2 2014/05/24 08:01:54 markisch Exp $
 # README.Windows (installer 付属) の訳
 
 gnuplot バージョン 5.0 パッチレベル 0 -- Windows 用バイナリ配付
@@ -27,7 +27,9 @@ gnuplot の新規ユーザは、gnuplot 起動後に `help` とタイプすることで表示
 る説明 (`help plot` と入力してください) を読んでください。gnuplot のマ
 ニュアル (オンラインヘルプに合う形式で書かれています) は、PDF ファイル
 としても置かれています (訳注: gnuplot には日本語の PDF マニュアルは付属
-していません。後述の日本語マニュアルサイトを参照してください)。
+していません。日本語の PDF マニュアルは、日本語マニュアルサイト
+  http://takeno.iee.niit.ac.jp/~foo/gp-jman/
+を参照してください)。
 
 'demo' ディレクトリには、たくさんのテスト用、サンプル用のスクリプトが置
 いてあります。`test` や `load "all.dem"` を実行するか、またはインターネ
@@ -51,15 +53,22 @@ FAQ を参照)。よって、gnuplot は GPL (GNU Public License) copyleft でカ
 gnuplot バイナリ配布物
 ----------------------
 
-* wgnuplot.exe: デフォルトの gnuplot 実行ファイル。
+* wgnuplot.exe:  GUI 版のデフォルトの gnuplot 実行ファイル。バージョン
+  5 現在ではパイプ機能をエミュレートします。
 
-* gnuplot.exe: テキスト (コンソール) モード版の gnuplot 実行ファイルで、
+* wgnuplot_pipes.exe:  パイプ機能を完全に実装した版 (コンソールウィンド
+  ウが追加されてしまうが)。
+
+* gnuplot.exe:  テキスト (コンソール) モード版の gnuplot 実行ファイルで
   他のプラットホームのものと共通な完全なパイプ機能を持ちます。
   wgnuplot.exe と比較すると、このプログラムは標準入力からのコマンドも受
   け付け、出力メッセージを標準出力にも出せます。これは pgnuplot.exe に
   代わるもので、例えば Octave (www.octave.org) のように、gnuplot をグラ
   フエンジンとして使用するような他のアプリケーションではこちらを使用す
   ることを推奨します。
+
+* pgnuplot.exe:  この補助プログラムは、もはやバイナリパッケージには含ま
+  れていません。代わりに gnuplot.exe を使用してください。
 
 * ランタイムライブラリファイル
   gnuplot が必要とするランタイムライブラリファイル (freetype6.dll 等)
@@ -197,7 +206,6 @@ gnuplot version 4.6 では、メニューとヘルプファイルの地域対応をサポート
 
 を参照してください。
 
-
 --------------------------------------------------------------------------------
 
-The gnuplot team, November 2011
+The gnuplot team, May 2014

@@ -191,4 +191,4 @@ for an up-to-date bug tracking system.
 
 --------------------------------------------------------------------------------
 
-The gnuplot team, Mai 2014
+The gnuplot team, May 2014

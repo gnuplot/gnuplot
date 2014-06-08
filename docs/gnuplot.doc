@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.890 2014/05/29 11:08:26 markisch Exp $
+C RCS $Id: gnuplot.doc,v 1.891 2014/06/03 15:24:19 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -264,7 +264,6 @@ C
 # set style textbox                        # text elements can be enclosed in a box
 # set view map {scale}                     # allows resizing a 3D projection plot
 # set multiplot {next|previous}            # navigate within the auto-layout grid
-# plot 'data' skip N ...                   # skip lines at start of ascii data file
 #end
 
 2 Changes in version 5
