@@ -1,6 +1,7 @@
 2014-06-08  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* docs/gnuplot.doc win/README-Windows.txt win/README-ja.txt
+	docs/gnuplot-ja.doc:  sync to docs version 1.891
 
 2014-06-07  Mojca Miklavec  <mojca.miklavec.lists@gmail.com>
 

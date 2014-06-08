@@ -1,5 +1,5 @@
-C RCS $Id: gnuplot-ja.doc,v 1.516 2014-05-09 12:36:00+09 shige Exp $
-C corresponding original gnuplot.doc revision: 1.887
+C RCS $Id: gnuplot-ja.doc,v 1.519 2014-06-05 18:09:35+09 shige Exp $
+C corresponding original gnuplot.doc revision: 1.891
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -297,15 +297,19 @@ C 行が長いのは、できればなんとかしたい
 
  * ビットシフト演算子 >> と <<。
 
- * 新しい描画スタイル `with parallelaxes`、および等高線のラベル付け。
+ * 新しい描画スタイル `with parallelaxes`、`with table`、および等高線の
+ ラベル付け。
+
+ * gnuplot のシェル呼び出しで gnuplot スクリプトにパラメータを渡せます。
+ gnuplot -c scriptfile.gp ARG1 ARG2 ARG3 ...
 
 3 新しいコマンド (New commands)
 #start
-# history !N                               # 以前のコマンドを番号で再実行
 # import f(x) from "plugin.so"             # 共有ライブラリから関数を読み込み
+# set history {quiet|numers} {full|trim}   # history コマンド出力の制御
+# history !N                               # 以前のコマンドを番号で再実行
 # plot <datafile> skip N                   # テキストデータ先頭数行をスキップ
 # plot ... smooth mcsplines                # データに沿う単調 3 次スプライン
-# plot ... with parallelaxes               # 新しい描画スタイル
 # reset session                            # 現在の作業の初期状態を復帰
 # set arrow <tag> from <start> length <len> angle <ang>
 # set colorsequence default|classic|podo   # 以後の描画要素で使用する色
@@ -315,6 +319,9 @@ C 行が長いのは、できればなんとかしたい
 # set multiplot next|previous              # 自動配置内の順序の変更
 # set contours; splot ... with labels      # 数値での等高線のラベル
 # set style textbox                        # 文字列要素に外枠をつける
+# set view map {scale}                     # 3D 射影描画のリサイズが可能に
+# set multiplot {next|previous}            # 自動レイアウト格子内での移動
+# plot 'data' skip N ...                   # テキストデータ先頭数行をスキップ
 #end
 
 C バージョン 5 での変更 (Changes in version 5)
@@ -7567,7 +7574,8 @@ Ffigure_mapcontours
  `plot` では大抵一致しますが、`splot` では大抵一致していません。
 
  書式:
-       set border {<integer>} {front | back} {linewidth | lw <line_width>}
+       set border {<integer>}
+                  {front | back | behind} {linewidth | lw <line_width>}
                   {{linestyle | ls <line_style>} | {linetype | lt <line_type>}}
        unset border
        show border
@@ -7662,6 +7670,10 @@ Ffigure_mapcontours
  2 次元描画では境界はすべての描画要素の一番上に描かれます (`front`)。
  もし境界を描画要素の下に描かせたい場合は、`set border back` としてくだ
  さい。
+
+ 3 次元隠線処理 (hidden3d) 描画では、通常は境界を構成する線も描画要素と
+ 同様に隠線処理の対象になります。`set border behind` とするとこのデフォ
+ ルトの挙動が変わります。
 
  <line_style>, <line_type>, <line_width> を指定して、枠線の描画にそれ
  らを反映させることができます (現在の出力装置がサポートするものに限定
@@ -8540,9 +8552,9 @@ Ffigure_missing
                {{no}covariancevariables}
                {{no}errorscaling}
                {{no}prescale}
-               {maxiter <value>|none}
+               {maxiter <value>|default}
                {limit <epsilon>|default}
-               {limit_abs <epsilon_abs>
+               {limit_abs <epsilon_abs>}
                {start-lambda <value>|default}
                {lambda-factor <value>|default}
                {script {"<command>"|default}}
@@ -14074,10 +14086,15 @@ C 度の記号は set encoding locale で出るようになると。
 2 update
 ?commands update
 ?update
- このコマンドは当てはめ (fit) のパラメータの現在の値を、初期値のファイ
- ルの形式で (`fit` の項で説明されている)、与えられたファイルに書き出し
- ます。これは、現在の値を、後で使うために、あるいは終了/中断した当ては
- めを再実行するために保存しておくのに有用です。
+ このコマンドは、与えられたファイルに保存されている変数を現在の値に更新
+ しますが、これらは (`fit` の項で説明されている) 初期値のファイルと同じ
+ 書式である必要があります。
+
+ その名前のファイルが存在しない場合、現在定義されているすべてのユーザ変
+ 数を含む新しいファイルを作成しますが、最後の fit 内で使用しなかった変
+ 数にはすべて "#FIXED" と印をつけています。これは、fit 変数の現在の値を
+ 後で使うために、あるいは終了/中断した当てはめを再実行するために保存し
+ ておくのに有用です。
 
  書式:
        update <filename> {<filename>}
@@ -14089,11 +14106,9 @@ C 度の記号は set encoding locale で出るようになると。
  名に `.old` をつけてファイル名を変更し、指定したファイル名のファイルを
  新たに開き直します。つまり、"`update 'fred'`" とすると、それは
  "`!rename fred fred.old; update 'fred.old' 'fred'`" としたことと同じこ
- とになります。["filename.ext" の 12 文字しか使えない MS-DOS や他のシス
- テムでは、"ext" が "`old`" になって "filename" は最初のファイルに関係
- するもの (多分どれかがすぐに分かるでしょう) が使われます。VMS では、フ
- ァイルのバージョン管理システムが使われるため、名前の変更は行なわれませ
- ん。]
+ とになります。ファイルが既に存在するために名前の変更ができない場合は、
+ update はエラーメッセージを出力して失敗します。[VMS では、ファイルのバ
+ ージョン管理システムが使われるため、名前の変更は行なわれません。]
 
  より詳しい情報に関しては、以下参照: `fit`。
 2 While
