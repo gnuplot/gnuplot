@@ -1,5 +1,5 @@
 /*
- * $Id: wgnuplib.h,v 1.63 2014/01/18 16:14:50 markisch Exp $
+ * $Id: wgnuplib.h,v 1.64 2014/06/02 05:21:39 markisch Exp $
  */
 
 /* GNUPLOT - win/wgnuplib.h */
@@ -305,6 +305,8 @@ struct GWOPBLK {			/* kept in local memory */
 #define W_text_encoding 47
 #define W_hypertext 48
 #define W_boxedtext 49
+#define W_dash_type 50
+
 
 typedef struct tagGW {
 	GP_LPPRINT	lpr;		/* must be first */

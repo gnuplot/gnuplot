@@ -1,5 +1,5 @@
 /*
- * $Id: wgdiplus.cpp,v 1.14 2014/05/29 11:21:24 markisch Exp $
+ * $Id: wgdiplus.cpp,v 1.15 2014/06/02 05:16:14 markisch Exp $
  */
 
 /*
@@ -688,7 +688,8 @@ drawgraph_gdiplus(LPGW lpgw, HDC hdc, LPRECT rect)
 		/* Hide this layer? Do not skip commands which could affect key samples: */
 		if (!(skipplot || (gridline && lpgw->hidegrid)) ||
 			keysample || (curptr->op == W_line_type) || (curptr->op == W_setcolor)
-			          || (curptr->op == W_pointsize) || (curptr->op == W_line_width)) {
+			          || (curptr->op == W_pointsize) || (curptr->op == W_line_width)
+			          || (curptr->op == W_dash_type)) {
 
 		/* special case hypertexts */
 		if ((hypertext != NULL) && (hypertype == TERM_HYPERTEXT_TOOLTIP)) {
@@ -780,6 +781,32 @@ drawgraph_gdiplus(LPGW lpgw, HDC hdc, LPRECT rect)
 			/* remember this color */
 			last_color = cur_penstruct.lopnColor;
 			alpha_c = 1.;
+			break;
+		}
+
+		case W_dash_type: {
+			int dt = static_cast<int>(curptr->x);
+
+			if (dt >= 0) {
+				dt %= WGNUMPENS;
+				dt += 2;
+				cur_penstruct.lopnStyle = lpgw->monopen[dt].lopnStyle;
+				pen.SetDashStyle(static_cast<DashStyle>(cur_penstruct.lopnStyle));
+			} else if (dt == DASHTYPE_SOLID) {
+				cur_penstruct.lopnStyle = PS_SOLID;
+				pen.SetDashStyle(static_cast<DashStyle>(cur_penstruct.lopnStyle));
+			} else if (dt == DASHTYPE_AXIS) {
+				dt = 1;
+				cur_penstruct.lopnStyle =
+					lpgw->dashed ? lpgw->monopen[dt].lopnStyle : lpgw->colorpen[dt].lopnStyle;
+				pen.SetDashStyle(static_cast<DashStyle>(cur_penstruct.lopnStyle));
+			} else if (dt == DASHTYPE_CUSTOM) {
+				t_dashtype * dash = static_cast<t_dashtype *>(LocalLock(curptr->htext));
+				INT count = 0;
+				while ((dash->pattern[count] != 0.) && (count < DASHPATTERN_LENGTH)) count++;
+				pen.SetDashPattern(dash->pattern, count);
+				LocalUnlock(curptr->htext);
+			}
 			break;
 		}
 

@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: win.trm,v 1.124 2014/04/03 00:33:39 markisch Exp $
+ * $Id: win.trm,v 1.125 2014/06/02 05:21:40 markisch Exp $
  */
 
 /* GNUPLOT - win.trm */
@@ -73,6 +73,7 @@ TERM_PUBLIC void WIN_graphics __PROTO((void));
 TERM_PUBLIC void WIN_move __PROTO((unsigned int x, unsigned int y));
 TERM_PUBLIC void WIN_vector __PROTO((unsigned int x, unsigned int y));
 TERM_PUBLIC void WIN_linetype __PROTO((int lt));
+TERM_PUBLIC void WIN_dashtype(int type, t_dashtype *custom_dash_pattern);
 TERM_PUBLIC void WIN_put_text __PROTO((unsigned int x, unsigned int y, const char *str));
 TERM_PUBLIC int WIN_justify_text __PROTO((enum JUSTIFY mode));
 TERM_PUBLIC int WIN_text_angle __PROTO((int ang));
@@ -521,6 +522,13 @@ WIN_linetype(int lt)
 
 
 TERM_PUBLIC void
+WIN_dashtype(int dt, t_dashtype *custom_dash_pattern)
+{
+	GraphOpSize(graphwin, W_dash_type, dt, 0, (char *) custom_dash_pattern, sizeof(t_dashtype));
+}
+
+
+TERM_PUBLIC void
 WIN_put_text(unsigned int x, unsigned int y, const char *str)
 {
 	if ((str == NULL) || !strlen(str)) return;
@@ -930,7 +938,7 @@ TERM_TABLE_START(win_driver)
 #ifdef EAM_BOXED_TEXT
     , WIN_boxed_text
 #endif
-    , WIN_modify_plots
+    , WIN_modify_plots, WIN_dashtype
 TERM_TABLE_END(win_driver)
 
 #undef LAST_TERM

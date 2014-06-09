@@ -1,5 +1,5 @@
 /*
- * $Id: wgraph.c,v 1.186 2014/06/02 05:16:14 markisch Exp $
+ * $Id: wgraph.c,v 1.187 2014/06/02 05:21:39 markisch Exp $
  */
 
 /* GNUPLOT - win/wgraph.c */
@@ -787,7 +787,7 @@ DestroyPens(LPGW lpgw)
 	DeleteObject(lpgw->hbrush);
 	DeleteObject(lpgw->hapen);
 	DeleteObject(lpgw->hsolid);
-	for (i=0; i<WGNUMPENS+2; i++)
+	for (i = 0; i < WGNUMPENS + 2; i++)
 		DeleteObject(lpgw->colorbrush[i]);
 	DeleteObject(lpgw->hnull);
 
@@ -1945,6 +1945,28 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 			last_color = cur_penstruct.lopnColor;
 			fill_color = last_color;
 			alpha_c = 1.;
+			break;
+		}
+
+		case W_dash_type: {
+			int dt = curptr->x;
+
+			if (dt >= 0) {
+				dt %= WGNUMPENS;
+				dt += 2;
+				cur_penstruct.lopnStyle = lpgw->monopen[dt].lopnStyle;
+				draw_new_pens(lpgw, hdc, cur_penstruct);
+			} else if (dt == DASHTYPE_SOLID) {
+				cur_penstruct.lopnStyle = PS_SOLID;
+				draw_new_pens(lpgw, hdc, cur_penstruct);
+			} else if (dt == DASHTYPE_AXIS) {
+				dt = 1;
+				cur_penstruct.lopnStyle =
+					lpgw->dashed ? lpgw->monopen[dt].lopnStyle : lpgw->colorpen[dt].lopnStyle;
+				draw_new_pens(lpgw, hdc, cur_penstruct);
+			} else if (dt == DASHTYPE_CUSTOM) {
+				; /* ignored */
+			}
 			break;
 		}
 
