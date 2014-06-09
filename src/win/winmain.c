@@ -1,5 +1,5 @@
 /*
- * $Id: winmain.c,v 1.75 2014/05/09 22:14:12 broeker Exp $
+ * $Id: winmain.c,v 1.76 2014/06/04 08:11:00 markisch Exp $
  */
 
 /* GNUPLOT - win/winmain.c */
@@ -69,6 +69,7 @@
 #endif
 #include <io.h>
 #include <sys/stat.h>
+#include "alloc.h"
 #include "plot.h"
 #include "setshow.h"
 #include "version.h"
@@ -402,10 +403,11 @@ ReadMainIni(LPSTR file, LPSTR section)
 
 
 #ifndef WGP_CONSOLE
-int PASCAL WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
-                   LPSTR lpszCmdLine, int nCmdShow)
+int CALLBACK
+WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszCmdLine, int nCmdShow)
 #else
-int main(int argc, char **argv)
+int
+main(int argc, char **argv)
 #endif
 {
 	LPSTR tail;
@@ -893,7 +895,7 @@ int fake_pclose(FILE *stream)
 	/* Finally, execute command with redirected stdin. */
 	if (pipe_type == 'w') {
 		char * cmd;
-		cmd = (char *) malloc(strlen(pipe_command) + strlen(pipe_filename) + 10);
+		cmd = (char *) gp_alloc(strlen(pipe_command) + strlen(pipe_filename) + 10, "fake_pclose");
 		/* FIXME: this won't work for binary data. We need a proper `cat` replacement. */
 		sprintf(cmd, "type %s | %s", pipe_filename, pipe_command);
 		rc = system(cmd);
@@ -1026,22 +1028,22 @@ static char win_prntmp[MAX_PRT_LEN+1];
 FILE *
 open_printer()
 {
-    char *temp;
+	char *temp;
 
-    if ((temp = getenv("TEMP")) == (char *)NULL)
-        *win_prntmp = '\0';
-    else  {
-        strncpy(win_prntmp, temp, MAX_PRT_LEN);
-        /* stop X's in path being converted by mktemp */
-        for (temp = win_prntmp; *temp; temp++)
-            *temp = tolower((unsigned char)*temp);
-        if ((strlen(win_prntmp) > 0) && (win_prntmp[strlen(win_prntmp) - 1] != '\\'))
-            strcat(win_prntmp,"\\");
-    }
-    strncat(win_prntmp, "_gptmp", MAX_PRT_LEN - strlen(win_prntmp));
-    strncat(win_prntmp, "XXXXXX", MAX_PRT_LEN - strlen(win_prntmp));
-    mktemp(win_prntmp);
-    return fopen(win_prntmp, "w");
+	if ((temp = getenv("TEMP")) == (char *)NULL)
+		*win_prntmp = '\0';
+	else  {
+		safe_strncpy(win_prntmp, temp, MAX_PRT_LEN);
+		/* stop X's in path being converted by mktemp */
+		for (temp = win_prntmp; *temp != NULL; temp++)
+			*temp = tolower((unsigned char)*temp);
+		if ((strlen(win_prntmp) > 0) && (win_prntmp[strlen(win_prntmp) - 1] != '\\'))
+			strcat(win_prntmp, "\\");
+	}
+	strncat(win_prntmp, "_gptmp", MAX_PRT_LEN - strlen(win_prntmp));
+	strncat(win_prntmp, "XXXXXX", MAX_PRT_LEN - strlen(win_prntmp));
+	mktemp(win_prntmp);
+	return fopen(win_prntmp, "w");
 }
 
 void
