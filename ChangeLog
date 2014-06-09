@@ -4,6 +4,10 @@
 	term/win.trm:
 	Version 5 dashtypes. Custom dashtypes supported by GDI+ driver.
 
+	* src/wxterminal/wxt_gui.cpp:  Also "restore" the window state on
+	"raise".
+	Bug #1389
+
 2014-06-08  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* docs/gnuplot.doc win/README-Windows.txt win/README-ja.txt
@@ -20,7 +24,7 @@
 	or windows terminal window is open, the -persist option is handled by
 	keeping the main input loop running. This is unfortunate but maybe the
 	best we can do since we are missing a process fork or detach mechanism.
-	This eliminates zombie process when no plot windows are open in
+	This avoids a zombie process when no plot windows are open in a
 	session. For the qt terminal -persist works as on other platforms
 	since it uses a secondary process.
 	Bugs #1308, #1335, #1343

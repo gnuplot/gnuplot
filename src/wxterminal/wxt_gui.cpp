@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.cpp,v 1.126 2014/05/27 20:32:16 sfeam Exp $
+ * $Id: wxt_gui.cpp,v 1.127 2014/06/03 17:58:21 sfeam Exp $
  */
 
 /* GNUPLOT - wxt_gui.cpp */
@@ -1928,9 +1928,9 @@ void wxt_text()
 
 	wxt_sigint_check();
 
-	/* raise the window, conditionnaly to the user choice */
+	/* raise the window, depending on the user's choice */
 	wxt_MutexGuiEnter();
-	wxt_raise_window(wxt_current_window,false);
+	wxt_raise_window(wxt_current_window, false);
 	wxt_MutexGuiLeave();
 
 	FPRINTF((stderr,"Text2 %d\n", sw.Time())); /*performance watch*/
@@ -3024,7 +3024,7 @@ void wxt_raise_window(wxt_window_t* window, bool force)
 
 	window->frame->Show(true);
 
-	if (wxt_raise != no||force) {
+	if (wxt_raise != no || force) {
 #ifdef USE_GTK
 		/* Raise() in wxGTK call wxTopLevelGTK::Raise()
 		 * which also gives the focus to the window.
@@ -3033,6 +3033,7 @@ void wxt_raise_window(wxt_window_t* window, bool force)
 		window->frame->panel->Refresh(false);
 		gdk_window_raise(window->frame->GetHandle()->window);
 #else
+		window->frame->Restore();
 		window->frame->Raise();
 #endif /*USE_GTK */
 	}
@@ -3062,9 +3063,8 @@ void wxt_raise_terminal_window(int number)
 
 	wxt_MutexGuiEnter();
 	if ((window = wxt_findwindowbyid(number))) {
-		FPRINTF((stderr,"wxt : raise window %d\n",number));
-		window->frame->Show(true);
-		wxt_raise_window(window,true);
+		FPRINTF((stderr,"wxt : raise window %d\n", number));
+		wxt_raise_window(window, true);
 	}
 	wxt_MutexGuiLeave();
 
@@ -3085,10 +3085,9 @@ void wxt_raise_terminal_group()
 
 	wxt_MutexGuiEnter();
 	for(wxt_iter = wxt_window_list.begin(); wxt_iter != wxt_window_list.end(); wxt_iter++) {
-		FPRINTF((stderr,"wxt : raise window %d\n",wxt_iter->id));
-		wxt_iter->frame->Show(true);
+		FPRINTF((stderr,"wxt : raise window %d\n", wxt_iter->id));
 		/* FIXME Why does wxt_iter not work directly? */
-		wxt_raise_window(&(*wxt_iter),true);
+		wxt_raise_window(&(*wxt_iter), true);
 	}
 	wxt_MutexGuiLeave();
 
