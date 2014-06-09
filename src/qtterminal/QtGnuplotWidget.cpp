@@ -154,20 +154,24 @@ void QtGnuplotWidget::processEvent(QtGnuplotEventType type, QDataStream& in)
 		qDebug() << " viewport size " << viewport->size();
 		qDebug() << " last size req." << m_lastSizeRequest;
 */
-		// Qt has no reliable mechanism to set the size of widget while having it resizable. So we heuristically use the
-		// resize function to set the size of the plotting area when the plot window is already displayed.
-		// When the window is not yet displayed, this does not work because the window messes up with its content sizes before
-		// showing up. In this case, we use the sizeHint mechanism to tell the window which size we prefer for the plotting area.
-		// On MacOS, it looks like QMainWindow forgets the status bar area when it layouts its contents
-		// This makes the plot area 14 pixels too small in the vertical direction when the plot window
-		// is first displayed.
+		// Qt has no reliable mechanism to set the size of widget while having
+		// it resizable. So we heuristically use the resize function to set the
+		// size of the plotting area when the plot window is already displayed.
+		// When the window is not yet displayed, this does not work because the
+		// window messes up with its content sizes before showing up. In this
+		// case, we use the sizeHint mechanism to tell the window which size we
+		// prefer for the plotting area. On MacOS, it looks like QMainWindow
+		// forgets the status bar area when it layouts its contents. This makes
+		// the plot area 14 pixels too small in the vertical direction when the
+		// plot window is first displayed.
 		QMainWindow* parent = dynamic_cast<QMainWindow*>(parentWidget());
 		if ((s != viewport->size()) || (parent && !parent->isVisible()))
 		{
 //			qDebug() << " -> resizing";
 			if (parent)
 			{
-				// The parent is not visible : resize via the sizeHint mechanism because the "resize" function is not active
+				// The parent is not visible : resize via the sizeHint mechanism
+				// because the "resize" function is not active
 				if (!parent->isVisible())
 				{
 					m_skipResize = true;
@@ -176,8 +180,7 @@ void QtGnuplotWidget::processEvent(QtGnuplotEventType type, QDataStream& in)
 					parent->show();
 					m_skipResize = false;
 				}
-				else
-					parent->resize(s + parent->size() - viewport->size());
+				parent->resize(s + parent->size() - viewport->size());
 			}
 			viewport->resize(s);
 		}
