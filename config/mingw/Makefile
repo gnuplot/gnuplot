@@ -1,5 +1,5 @@
 # Hello, emacs: this is a -*- Makefile -*-
-# $Id: Makefile,v 1.43 2014/05/29 12:51:16 markisch Exp $
+# $Id: Makefile,v 1.44 2014/06/01 09:29:54 markisch Exp $
 #
 # GNUPLOT Makefile for MinGW/MSYS on Windows
 # This assumes usual installation of the MinGW32 toolkit, the free
@@ -77,12 +77,6 @@ MOUSE=1
 # Uncomment the following lines to compile it.
 #WXT=1
 #CAIROLIBS=1
-
-# Build qt terminal?
-#QT = 1
-# specify QT installation directory
-#QT_DIR = /c/Qt/5.2.1/mingw48_32
-QT_DIR = /d/Source/Qt-5.2.1-mingw/5.2.1/mingw48_32
 
 # Build qt terminal?
 #QT = 1
