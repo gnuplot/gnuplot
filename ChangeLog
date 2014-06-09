@@ -8,6 +8,11 @@
 	"raise".
 	Bug #1389
 
+	* src/win/winmain.c (WinMain):  Change type from PASCAL to CALLBACK.
+
+	* src/fit.c:  Test if covariance matrix is available before saving
+	it to user variables.
+
 2014-06-08  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* docs/gnuplot.doc win/README-Windows.txt win/README-ja.txt

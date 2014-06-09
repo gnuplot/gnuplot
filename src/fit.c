@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: fit.c,v 1.141 2014/03/20 21:26:23 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: fit.c,v 1.142 2014/04/03 00:32:02 markisch Exp $"); }
 #endif
 
 /*  NOTICE: Change of Copyright Status
@@ -948,7 +948,7 @@ regress_finalize(int iter, double chisq, double last_chisq, double lambda, doubl
     }
 
     /* fill covariance variables if needed */
-    if (fit_covarvariables && !covar_invalid) {
+    if (fit_covarvariables && (covar != NULL) && !covar_invalid) {
 	double scale =
 	    (fit_errorscaling || (num_errors == 0)) ?
 	    (chisq / (num_data - num_params)) : 1.0;
