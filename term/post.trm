@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: post.trm,v 1.286 2014/05/13 19:26:14 sfeam Exp $
+ * $Id: post.trm,v 1.287 2014/05/30 04:59:32 sfeam Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -1619,11 +1619,11 @@ PS_common_init(
 %%\n\
 /vshift %d def\n\
 /dl1 {\n\
-  %.1f Dashlength mul mul\n\
+  %.1f Dashlength userlinewidth gnulinewidth div mul mul mul\n\
   Rounded { currentlinewidth 0.75 mul sub dup 0 le { pop 0.01 } if } if\n\
 } def\n\
 /dl2 {\n\
-  %.1f Dashlength mul mul\n\
+  %.1f Dashlength userlinewidth gnulinewidth div mul mul mul\n\
   Rounded { currentlinewidth 0.75 mul add } if\n\
 } def\n\
 /hpt_ %.1f def\n\
@@ -2011,6 +2011,7 @@ TERM_PUBLIC void
 PS_dashtype(int type, t_dashtype *custom_dash_type)
 {
     int i;
+    double empirical_scale = 0.50;
 
     switch (type) {
     case DASHTYPE_AXIS:
@@ -2025,7 +2026,8 @@ PS_dashtype(int type, t_dashtype *custom_dash_type)
 		PS_FLUSH_PATH;
 		fprintf(gppsfile, "[");
 		for (i = 0; custom_dash_type->pattern[i] > 0; i++)
-		    fprintf(gppsfile, "%.1f ", PS_SCF * custom_dash_type->pattern[i]);
+		    fprintf(gppsfile, "%.1f dl%d ", 
+			custom_dash_type->pattern[i] * empirical_scale, i%2 + 1);
 		fprintf(gppsfile, "] 0 setdash\n");
 		break;
     default:

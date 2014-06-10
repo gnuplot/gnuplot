@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: svg.trm,v 1.168 2014/05/14 23:33:07 sfeam Exp $
+ * $Id: svg.trm,v 1.169 2014/05/26 20:16:43 sfeam Exp $
  */
 
 /*------------------------------------------------------------------------------------------------------------------------------------
@@ -1250,6 +1250,9 @@ TERM_PUBLIC void
 SVG_dashtype (int type, t_dashtype *custom_dash_type)
 {
     int d, j;
+    double empirical_scale = 0.50;
+    /* The dash pattern should depend on the `linewidth` and the terminal options `dashlength` and `linewidth`. */
+    double dash_scale = SVG_pens[SVG_Pen_RealID (SVG_LineType)].width * SVG_linewidth_factor * SVG_dashlength * empirical_scale;
 
     SVG_dashpattern = NULL;	/* Assume solid line */
 
@@ -1268,7 +1271,7 @@ SVG_dashtype (int type, t_dashtype *custom_dash_type)
 		*SVG_dashpattern = '\0';
 		for (j = 0; j < 8 && custom_dash_type->pattern[j] > 0; j++) {
 		    char *p = &SVG_dashpattern[strlen(SVG_dashpattern)];
-		    snprintf(p, 8, "%.1f", custom_dash_type->pattern[j] * SVG_dashlength);
+		    snprintf(p, 8, "%.1f", custom_dash_type->pattern[j] * dash_scale);
 		    if (j < 7 && custom_dash_type->pattern[j+1])
 			strcat(p,",");
 		}
@@ -1282,17 +1285,17 @@ SVG_dashtype (int type, t_dashtype *custom_dash_type)
 		break;
 
 	    /* Default dash length and sequence */
-	    if (SVG_dashlength == 1.0)
+	    if (dash_scale == 1.0)
 		SVG_dashpattern = SVG_defaultdashpattern[d];
 
-	    /* Dash patterns scaled up by dashlength */
+	    /* Dash patterns scaled up by dashlength and linewidth */
 	    else {
 		SVG_dashpattern = SVG_custom_dash_pattern;
 		*SVG_dashpattern = '\0';
 		j = 0;
 		do {
 		    char *p = &SVG_dashpattern[strlen(SVG_dashpattern)];
-		    snprintf(p, 8, "%.1f", SVG_dasharray[d][j] * SVG_dashlength);
+		    snprintf(p, 8, "%.1f", SVG_dasharray[d][j] * dash_scale);
 		    if (SVG_dasharray[d][++j])
 			strcat(p,",");
 		} while (SVG_dasharray[d][j] > 0);

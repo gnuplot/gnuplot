@@ -3,6 +3,14 @@
 	* docs/gnuplot.doc:  Add a section explaining the "persist" option.
 	Bug #1418, #1419
 
+	* term/post.trm term/svg.trm src/qtterminal/qt_term.cpp:
+	Add an empirical scale factor to the dashlength*linewidth computation to
+	make the resulting patterns closer in total size to the built-in ones.
+
+2014-06-10  Christoph Bersch <usenet@bersch.net>
+
+	* term/post.trm term/svg.trm:  Scale dashlength with linewidth.
+
 2014-06-09  Daniel J Sebald <daniel.sebald@ieee.org>
 
 	* src/qtterminal/QtGnuplotWidget.cpp (processEvent):  Always "resize"

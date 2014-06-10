@@ -690,6 +690,8 @@ void qt_linetype(int lt)
 
 void qt_dashtype (int type, t_dashtype *custom_dash_type)
 {
+	double empirical_scale = 0.55;
+
 	switch (type) {
 	case DASHTYPE_SOLID:
 		qt->out << GEPenStyle << Qt::SolidLine;
@@ -701,8 +703,8 @@ void qt_dashtype (int type, t_dashtype *custom_dash_type)
 		if (custom_dash_type) {
 			QVector<qreal> dashpattern;
 			for (int j = 0; j < 8 && custom_dash_type->pattern[j] > 0; j++) {
-				dashpattern.append(
-					custom_dash_type->pattern[j] * qt_optionDashLength );
+				dashpattern.append( custom_dash_type->pattern[j]
+					* qt_optionDashLength * empirical_scale);
 			}
 			qt->out << GEDashPattern << dashpattern;
 			qt->out << GEPenStyle << Qt::CustomDashLine;
