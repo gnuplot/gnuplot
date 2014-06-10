@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.891 2014/06/03 15:24:19 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.892 2014/06/08 17:59:12 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -2623,7 +2623,26 @@ Ffigure_newsyntax
 
  Note that after a zoom by mouse, you can read the new ranges as GPVAL_X_MIN,
  GPVAL_X_MAX, GPVAL_Y_MIN, and GPVAL_Y_MAX, see `gnuplot-defined variables`.
+2 Persist
+?persist
+ Many gnuplot terminals (aqua, pm, qt, x11, windows, wxt, ...) open separate 
+ display windows on the screen into which plots are drawn.  The `persist` option 
+ tells gnuplot to leave these windows open when the main program exits.
+ It has no effect on non-interactive terminal output.
+ For example if you issue the command
 
+      gnuplot -persist -e 'plot [-5:5] sinh(x)'
+
+ gnuplot will open a display window, draw the plot into it, and then exit,
+ leaving the display window containing the plot on the screen.  Depending on
+ the terminal type, some mousing operations may still be possible in the
+ persistent window.  However operations like zoom/unzoom that require redrawing
+ the plot are generally not possible because the main program has already exited.
+
+ You can also specify `persist` or `nopersist` at the time you set a new terminal
+ type. For example
+
+      set term qt persist size 700,500
 
 2 Plotting
 ?plotting
