@@ -1,3 +1,11 @@
+2014-06-11  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/mouse.c (event_reset) src/qtterminal/QtGnuplotWindow.{h|cpp}:
+	Window close events from qt were not being passed through to the main
+	program, so "pause mouse close" did not work. Also a backgrounded 
+	instance could hang rather than exit when the last plot window closed.
+	Bug #1418
+
 2014-06-11  Mojca Miklavec  <mojca.miklavec.lists@gmail.com>
 
 	* term/aquaterm.trm:  Correctly support encoding CP1252.

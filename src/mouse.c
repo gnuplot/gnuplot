@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: mouse.c,v 1.163 2014/05/08 19:13:39 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: mouse.c,v 1.164 2014/05/10 18:55:19 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - mouse.c */
@@ -2196,7 +2196,9 @@ event_reset(struct gp_event_t *ge)
 	/* This hack is necessary on some systems in order to prevent one  */
 	/* character of input from being swallowed when the plot window is */
 	/* closed. But which systems, exactly?                             */
-	if (term && (!strncmp("x11",term->name,3) || !strncmp("wxt",term->name,3)))
+	if (term && (!strncmp("x11",term->name,3) 
+		 || !strncmp("wxt",term->name,3)
+		 || !strncmp("qt",term->name,2)))
 	    ungetc('\n',stdin);
     }
 

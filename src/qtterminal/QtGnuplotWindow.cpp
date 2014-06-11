@@ -254,6 +254,12 @@ void QtGnuplotWindow::settingsSelectBackgroundColor()
 	m_ui->sampleColorLabel->setPixmap(samplePixmap);
 }
 
+void QtGnuplotWindow::closeEvent(QCloseEvent *event)
+{
+	m_eventHandler->postTermEvent(GE_reset, 0, 0, 0, 0, m_widget);
+	event->accept();
+}
+
 void QtGnuplotWindow::processEvent(QtGnuplotEventType type, QDataStream& in)
 {
 	if (type == GETitle)
