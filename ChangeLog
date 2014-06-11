@@ -1,3 +1,11 @@
+2014-06-11  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/post.trm term/cairo.trm:  The "header" keyword for epslatex
+	and related terminals can introduce a string of arbitrary length.
+	Therefore it is not safe to try to store it in the fixed length 
+	term_options character array.
+	Bug #1413
+
 2014-06-04  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/plot.c:  Only if a wxt or windows terminal window is open, the 

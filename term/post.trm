@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: post.trm,v 1.267.2.3 2012/09/13 05:06:23 sfeam Exp $
+ * $Id: post.trm,v 1.267.2.4 2012/12/17 05:31:28 sfeam Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -1220,10 +1220,6 @@ PS_options()
     if (ps_params->terminal == PSTERM_EPSLATEX) {
 	sprintf(tmp_term_options, "%s ",
 		ps_params->epslatex_standalone ? "standalone" : "input");
-	if (epslatex_header)
-	    sprintf(tmp_term_options, "header \"%s\" ", epslatex_header);
-	else
-	    sprintf(tmp_term_options, "noheader ");
 	strcat(term_options,tmp_term_options);
     }
 #endif
