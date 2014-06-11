@@ -6,6 +6,10 @@
 	instance could hang rather than exit when the last plot window closed.
 	Bug #1418
 
+	* src/fit.c: Remove spurious test and error message for time data
+	with only 2 columns in the using spec.
+	Bug #1424
+
 2014-06-11  Mojca Miklavec  <mojca.miklavec.lists@gmail.com>
 
 	* term/aquaterm.trm:  Correctly support encoding CP1252.

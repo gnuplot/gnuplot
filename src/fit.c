@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: fit.c,v 1.142 2014/04/03 00:32:02 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: fit.c,v 1.143 2014/06/09 12:50:35 markisch Exp $"); }
 #endif
 
 /*  NOTICE: Change of Copyright Status
@@ -1922,14 +1922,10 @@ fit_command()
     free(file_name);
     if (columns == 1)
 	Eexc(c_token, "Need more than 1 input data column");
-    if (columns < 3) {
-	if (X_AXIS.datatype == DT_TIMEDATE || Y_AXIS.datatype == DT_TIMEDATE)
-	    Eexc(c_token, "Need full using spec for time data");
-    } else {
-	/* Allow time data only on first two dimensions (x and y) */
-	df_axis[0] = x_axis;
-	df_axis[1] = y_axis;
-    }
+
+    /* Allow time data only on first two dimensions (x and y) */
+    df_axis[0] = x_axis;
+    df_axis[1] = y_axis;
 
     /* BM: New options to distinguish fits with and without errors */
     /* reset error columns */
