@@ -1,3 +1,7 @@
+2014-06-11  Mojca Miklavec  <mojca.miklavec.lists@gmail.com>
+
+	* term/aquaterm.trm:  Correctly support encoding CP1252.
+
 2014-06-11  Tatsuro MATSUOKA <tmacchant3@yahoo.co.jp>
 
 	* win/gnuplot.iss:  Include Qt platform DLLs in distribution package.
