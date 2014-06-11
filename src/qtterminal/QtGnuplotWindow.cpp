@@ -123,6 +123,12 @@ void QtGnuplotWindow::on_keyAction()
 	m_eventHandler->postTermEvent(GE_keypress, 0, 0, action->data().toInt(), 0, m_id);
 }
 
+void QtGnuplotWindow::closeEvent(QCloseEvent *event)
+{
+	m_eventHandler->postTermEvent(GE_reset, 0, 0, 0, 0, m_id);
+	event->accept();
+}
+
 void QtGnuplotWindow::processEvent(QtGnuplotEventType type, QDataStream& in)
 {
 	if (type == GETitle)

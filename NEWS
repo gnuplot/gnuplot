@@ -12,12 +12,13 @@ New features, changes and fixes in gnuplot version 4.6.6
 * FIX get rid of O(N^2) memory allocation for string data in long input lines
 * FIX large integers in iteration spec could cause overflow end condition check
 * FIX object fillcolors should be consistent with the color of current linetypes
-* FIX LFS support on 64bit platforms (still not current on 32bit platforms)
+* FIX LFS support on 64bit platforms (not backported for 32bit platforms)
 * FIX timecolumn() applied to non-axis data reports an error rather than faulting
 * FIX clipping could fail on integer overflow
 * FIX segfault resulting from strcol(N) applied to empty field in a *.csv file
 * FIX adjustment of key size to accommodate long key title
 * FIX treat data value read as "NaN" the same as we would "1/0"
+* FIX handling of events triggered by closing the qt plot window
 
 
 New features, changes and fixes in gnuplot version 4.6.5

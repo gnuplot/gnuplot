@@ -68,6 +68,7 @@ public slots:
 
 private:
 	void createAction(const QString& name, int key, const QString& icon);
+	void closeEvent(QCloseEvent *event);
 
 private:
 	bool m_ctrl;

@@ -1,5 +1,11 @@
 2014-06-11  Ethan A Merritt  <merritt@u.washington.edu>
 
+	* src/mouse.c (event_reset) src/qtterminal/QtGnuplotWindow.{h|cpp}:
+	Window close events from qt were not being passed through to the main
+	program, so "pause mouse close" did not work. Also a backgrounded 
+	instance could hang rather than exit when the last plot window closed.
+	Bug #1418
+
 	* term/post.trm term/cairo.trm:  The "header" keyword for epslatex
 	and related terminals can introduce a string of arbitrary length.
 	Therefore it is not safe to try to store it in the fixed length 
