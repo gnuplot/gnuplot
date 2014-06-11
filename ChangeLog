@@ -10,6 +10,8 @@
 	with only 2 columns in the using spec.
 	Bug #1424
 
+	* man/gnuplot.1: update
+
 2014-06-11  Mojca Miklavec  <mojca.miklavec.lists@gmail.com>
 
 	* term/aquaterm.trm:  Correctly support encoding CP1252.

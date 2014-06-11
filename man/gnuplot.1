@@ -1,5 +1,5 @@
 .\" dummy line
-.TH GNUPLOT 1 " 7 September 2012"
+.TH GNUPLOT 1 " 11 June 2014"
 .UC 4
 .SH NAME
 gnuplot \- an interactive plotting program
@@ -12,12 +12,9 @@ gnuplot \- an interactive plotting program
 is a command-driven interactive plotting program.
 .PP
 If file names are given on the command line,
-gnuplot
-loads each file with the
-.B load
-command, in the order specified, and exits after the last file is
-processed.  If no files are given, \fBgnuplot\fP prompts for
-interactive commands.
+gnuplot loads and executes each file in the order specified,
+and exits after the last file is processed.
+If no files are given, \fBgnuplot\fP prompts for interactive commands.
 .PP
 Here are some of its features:
 .PP
@@ -60,15 +57,11 @@ Support for a huge variety of output devices and file formats.
 \fB\-V\fP show current version
 .SH X11 OPTIONS
 .B Gnuplot
-provides the \fIx11\fP terminal type for use
-with X servers. This terminal type is set automatically at startup if
-the \fBGNUTERM\fR environment variable is set to x11,
-or if the \fB\-display\fR command line option is used.
 For terminal type x11, \fIgnuplot\fP
 accepts the standard X Toolkit options and resources such as geometry, font,
 and background. See the X(1) man page for a description of common options.
 For additional X options specific to gnuplot, type \fIhelp x11\fP on the
-gnuplot command line.
+gnuplot command line. These options have no effect on other terminal types.
 .SH ENVIRONMENT
 A number of shell environment variables are understood by
 gnuplot.  None of these are required.
