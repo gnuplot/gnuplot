@@ -1,5 +1,5 @@
 ﻿;
-; $Id: gnuplot.iss,v 1.8 2014/03/23 13:34:19 markisch Exp $
+; $Id: gnuplot.iss,v 1.9 2014/06/01 09:28:57 markisch Exp $
 ;
 ; GNUPLOT - gnuplot.iss
 ;
@@ -116,6 +116,7 @@ Source: "bin\wgnuplot_pipes.exe"; DestDir: "{app}\bin\"; Flags: ignoreversion sk
 Source: "bin\gnuplot.exe"; DestDir: "{app}\bin\"; Flags: ignoreversion; Components: core
 ; qt terminal
 Source: "bin\gnuplot_qt.exe"; DestDir: "{app}\bin\"; Flags: skipifsourcedoesntexist ignoreversion; Components: core
+Source: "bin\platforms\*.dll"; DestDir: "{app}\bin\platforms\"; Flags: skipifsourcedoesntexist ignoreversion; Components: core
 ; core support files
 Source: "bin\*.dll"; DestDir: "{app}\bin\"; Flags: skipifsourcedoesntexist ignoreversion; Components: core
 Source: "bin\wgnuplot.mnu"; DestDir: {app}\bin\; Components: core

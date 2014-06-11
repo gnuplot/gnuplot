@@ -1,3 +1,7 @@
+2014-06-11  Tatsuro MATSUOKA <tmacchant3@yahoo.co.jp>
+
+	* win/gnuplot.iss:  Include Qt platform DLLs in distribution package.
+
 2014-06-10  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* docs/gnuplot.doc:  Add a section explaining the "persist" option.
