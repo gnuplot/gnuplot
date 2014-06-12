@@ -37,7 +37,7 @@
 
 
 
-  $Date: 2012/02/07 17:55:06 $
+  $Date: 2012/10/17 04:32:13 $
   $Author: sfeam $
   $Rev: 100 $
 
@@ -81,7 +81,7 @@ pgf.DEFAULT_FONT_V_CHAR = 308
 pgf.STYLE_FILE_BASENAME = "gnuplot-lua-tikz"  -- \usepackage{gnuplot-lua-tikz}
 
 pgf.REVISION = string.sub("$Rev: 100 $",7,-3)
-pgf.REVISION_DATE = string.gsub("$Date: 2012/02/07 17:55:06 $",
+pgf.REVISION_DATE = string.gsub("$Date: 2012/10/17 04:32:13 $",
                                 "$Date: ([0-9]+).([0-9]+).([0-9]+) .*","%1/%2/%3")
 
 pgf.styles = {}
@@ -128,14 +128,25 @@ pgf.styles.linetypes_axes = {
 }
 
 pgf.styles.linetypes = {
-  [1] = {"gp lt plot 0", "solid"},  -- first graph
-  [2] = {"gp lt plot 1", "dashed"}, -- second ...
-  [3] = {"gp lt plot 2", "dash pattern=on 1.5pt off 2.25pt"},
-  [4] = {"gp lt plot 3", "dash pattern=on \\pgflinewidth off 1.125"},
-  [5] = {"gp lt plot 4", "dash pattern=on 4.5pt off 1.5pt on \\pgflinewidth off 1.5pt"},
-  [6] = {"gp lt plot 5", "dash pattern=on 2.25pt off 2.25pt on \\pgflinewidth off 2.25pt"},
-  [7] = {"gp lt plot 6", "dash pattern=on 1.5pt off 1.5pt on 1.5pt off 4.5pt"},
-  [8] = {"gp lt plot 7", "dash pattern=on \\pgflinewidth off 1.5pt on 4.5pt off 1.5pt on \\pgflinewidth off 1.5pt"}
+  [1] = {"gp lt plot 0", ""},  -- first graph
+  [2] = {"gp lt plot 1", ""}, -- second ...
+  [3] = {"gp lt plot 2", ""},
+  [4] = {"gp lt plot 3", ""},
+  [5] = {"gp lt plot 4", ""},
+  [6] = {"gp lt plot 5", ""},
+  [7] = {"gp lt plot 6", ""},
+  [8] = {"gp lt plot 7", ""}
+}
+
+pgf.styles.dashtypes = {
+  [1] = {"gp dt 1", "solid"},
+  [2] = {"gp dt 2", "dash pattern=on 7.5*\\gpdashlength off 7.5*\\gpdashlength"},
+  [3] = {"gp dt 3", "dash pattern=on 3.75*\\gpdashlength off 5.625*\\gpdashlength"},
+  [4] = {"gp dt 4", "dash pattern=on 1*\\gpdashlength off 2.8125*\\gpdashlength"},
+  [5] = {"gp dt 5", "dash pattern=on 11.25*\\gpdashlength off 3.75*\\gpdashlength on 1*\\gpdashlength off 3.75*\\gpdashlength"},
+  [6] = {"gp dt 6", "dash pattern=on 5.625*\\gpdashlength off 5.625*\\gpdashlength on 1*\\gpdashlength off 5.625*\\gpdashlength"},
+  [7] = {"gp dt 7", "dash pattern=on 3.75*\\gpdashlength off 3.75*\\gpdashlength on 3.75*\\gpdashlength off 11.25*\\gpdashlength"},
+  [8] = {"gp dt 8", "dash pattern=on 1*\\gpdashlength off 3.75*\\gpdashlength on 11.25*\\gpdashlength off 3.75*\\gpdashlength on 1*\\gpdashlength off 3.75*\\gpdashlength"}
 }
 
 -- corresponds to pgf.styles.linetypes
@@ -261,14 +272,14 @@ pgf.write_graph_begin = function (font, noenv)
   if gfx.opt.fontscale ~= nil then
     gp.write(string.format("\\tikzset{every node/.append style={scale=%.2f}}\n", gfx.opt.fontscale))
   end
-  if not gfx.opt.lines_dashed then
-    gp.write("\\gpsolidlines\n")
-  end
   if not gfx.opt.lines_colored then
     gp.write("\\gpmonochromelines\n")
   end
   if gfx.opt.bgcolor ~= nil then
     gp.write(string.format("\\gpsetbgcolor{%.3f,%.3f,%.3f}\n", gfx.opt.bgcolor[1], gfx.opt.bgcolor[2], gfx.opt.bgcolor[3]))
+  end
+  if gfx.opt.dashlength ~= nil then
+    gp.write(string.format("\\def\\gpdashlength{%.2f\\pgflinewidth}\n", gfx.opt.dashlength))
   end
 end
 
@@ -360,6 +371,11 @@ end
 
 pgf.set_linetype = function(linetype)
   gp.write("\\gpsetlinetype{"..linetype.."}\n")
+end
+
+
+pgf.set_dashtype = function(dashtype)
+  gp.write("\\gpsetdashtype{"..dashtype.."}\n")
 end
 
 
@@ -784,6 +800,9 @@ f:write([[
 % short for changing the line type
 \def\gpsetlinetype#1{\tikzset{gp path/.style={#1,#1 add}}}
 
+% short for changing the dash pattern
+\def\gpsetdashtype#1{\tikzset{gp path/.append style={#1}}}
+
 % short for changing the point size
 \def\gpsetpointsize#1{\tikzset{gp point/.style={mark size=#1\gpbasems}}}
 
@@ -953,27 +972,28 @@ f:write([[
   for i = 1, #pgf.styles.linetypes do
     f:write("\\tikzset{"..pgf.styles.linetypes[i][1].." add/.style={}}\n")
   end
+  --[[ The line types. These don't do anything anymore, since we have the dash types. 
+     But they were use to hook in from TikZ and change the respective styles 
+     from the LaTeX script. We keep those definitions for backward compatibility. 
+  ]]--
+  for i = 1, #pgf.styles.linetypes do
+    f:write("\\tikzset{"..pgf.styles.linetypes[i][1].."/.style={"..pgf.styles.linetypes[i][2].."}}\n")
+  end
   f:write("\n% linestyle color settings\n")
   for i = 1, #pgf.styles.lt_colors_axes do
     f:write("\\colorlet{"..pgf.styles.lt_colors_axes[i][1].."}{"..pgf.styles.lt_colors_axes[i][2].."}\n")
   end
-  -- line styles for the plots
-  f:write("\n% command for switching to dashed lines\n")
-  f:write("\\def\\gpdashedlines{%\n")
-  for i = 1, #pgf.styles.linetypes do
-    f:write("  \\tikzset{"..pgf.styles.linetypes[i][1].."/.style={"..pgf.styles.linetypes[i][2].."}}\n")
+  -- dash styles for the plots
+  f:write("\n% dash type settings\n")
+  f:write("% Define this as a macro so that the dash patterns expand later with the current \\pgflinewidth.\n")
+  f:write("\\def\\gpdashlength{\\pgflinewidth}\n")
+  for i = 1, #pgf.styles.dashtypes do
+    f:write("\\tikzset{"..pgf.styles.dashtypes[i][1].."/.style={"..pgf.styles.dashtypes[i][2].."}}\n")
   end
-  f:write("}\n")
   f:write("\n% command for switching to colored lines\n")
   f:write("\\def\\gpcoloredlines{%\n")
   for i = 1, #pgf.styles.lt_colors do
     f:write("  \\colorlet{"..pgf.styles.lt_colors[i][1].."}{"..pgf.styles.lt_colors[i][2].."}%\n")
-  end
-  f:write("}\n")
-  f:write("\n% command for switching to solid lines\n")
-  f:write("\\def\\gpsolidlines{%\n")
-  for i = 1, #pgf.styles.linetypes do
-    f:write("  \\tikzset{"..pgf.styles.linetypes[i][1].."/.style=solid}%\n")
   end
   f:write("}\n")
   f:write("\n% command for switching to monochrome (black) lines\n")
@@ -986,9 +1006,8 @@ f:write([[
 %
 % some initialisations
 %
-% by default all lines will be colored and dashed
+% by default all lines will be colored
 \gpcoloredlines
-\gpdashedlines
 \gpsetpointsize{4}
 \gpsetlinetype{gp lt solid}
 \gpscalepointsfalse
@@ -1003,7 +1022,6 @@ pgf.print_help = function(fwrite)
   fwrite([[
       {latex | tex | context}
       {color | monochrome}
-      {dashed | solid}
       {nooriginreset | originreset}
       {nogparrows | gparrows}
       {nogppoints | gppoints}
@@ -1017,6 +1035,7 @@ pgf.print_help = function(fwrite)
       {charsize <x>{unit},<y>{unit}}
       {font "<fontdesc>"}
       {{fontscale | textscale} <scale>}
+      {dashlength | dl <DL>}
       {nofulldoc | nostandalone | fulldoc | standalone}
       {{preamble | header} "<preamble_string>"}
       {tikzplot <ltn>,...}
@@ -1036,8 +1055,6 @@ pgf.print_help = function(fwrite)
 
  'monochrome' disables line coloring and switches to grayscaled
  fills.
-
- 'solid' use only solid lines.
 
  'originreset' moves the origin of the TikZ picture to the lower
  left corner of the plot. It may be used to align several plots
@@ -1088,6 +1105,9 @@ pgf.print_help = function(fwrite)
 
  'fontscale' or 'textscale' expects a scaling factor as a parameter.
  All texts in the plot are scaled by this factor then.
+
+ 'dashlength' or 'dl' scales the length of dashed-line segments by <DL>,
+ which is a floating-point number greater than zero.
 
  The options 'tex', 'latex' and 'context' choose the TeX output
  format. LaTeX is the default. To load the style file put the
@@ -1179,6 +1199,8 @@ gfx.posy = nil
 
 gfx.linetype_idx = nil       -- current linetype intended for the plot
 gfx.linetype_idx_set = nil   -- current linetype set in the plot
+gfx.dashtype_idx = nil       -- current dashtype intended for the plot
+gfx.dashtype_idx_set = nil   -- current dashtype set in the plot
 gfx.linewidth = nil
 gfx.linewidth_set = nil
 
@@ -1209,7 +1231,6 @@ gfx.opt = {
   latex_preamble = '',
   default_font = '',
   default_fontsize = 10,
-  lines_dashed = true,
   lines_colored = true,
   -- use gnuplot arrows or points instead of TikZ?
   gp_arrows = false,
@@ -1253,7 +1274,8 @@ gfx.opt = {
   -- if true, the natural bounding box will be used and 'clip' is ignored
   tightboundingbox = false,
   -- fontscale
-  fontscale = nil
+  fontscale = nil,
+  dashlength = nil
 }
 
 -- Formats for the various TeX flavors 
@@ -1470,6 +1492,7 @@ gfx.check_in_path = function()
     -- check all line properties and draw current path
     gfx.check_color()
     gfx.check_linetype()
+    gfx.check_dashtype()
     gfx.check_linewidth()
       pgf.draw_path(gfx.path)
     -- remember last coordinates
@@ -1488,6 +1511,21 @@ gfx.check_linetype = function()
     end
     pgf.set_linetype(lt)
     gfx.linetype_idx_set = gfx.linetype_idx
+  end
+end
+
+-- did the dashtype change?
+gfx.check_dashtype = function()
+  if gfx.dashtype_idx ~= gfx.dashtype_idx_set then
+    -- if gfx.dashtype_idx is a string, it contains a custom dash pattern
+    if type(gfx.dashtype_idx) == type(1) then
+      if gfx.dashtype_idx > 0 then
+        pgf.set_dashtype(pgf.styles.dashtypes[(gfx.dashtype_idx % #pgf.styles.dashtypes)+1][1])
+      end
+    else
+       pgf.set_dashtype("dash pattern="..gfx.dashtype_idx)
+    end
+    gfx.dashtype_idx_set = gfx.dashtype_idx
   end
 end
 
@@ -1609,8 +1647,8 @@ term.options = function(opt_str, initial, t_count)
   local o_type = nil
   local s_start, s_end = 1, 1
   local term_opt = ""
-  local term_opt_font, term_opt_size, term_opt_background, term_opt_fontscale, term_opt_scale, term_opt_preamble = "", "", "", "", "", ""
-  local charsize_h, charsize_v, fontsize, fontscale = nil, nil, nil, nil
+  local term_opt_font, term_opt_size, term_opt_background, term_opt_fontscale, term_opt_dashlength, term_opt_scale, term_opt_preamble = "", "", "", "", "", ""
+  local charsize_h, charsize_v, fontsize, fontscale, dashlength = nil, nil, nil, nil, nil
   -- trim spaces
   opt_str = opt_str:gsub("^%s*(.-)%s*$", "%1")
   local opt_len = string.len(opt_str)
@@ -1739,15 +1777,9 @@ term.options = function(opt_str, initial, t_count)
     elseif almost_equals(o_next, "c$olor") or almost_equals(o_next, "c$olour") then
       -- colored lines
       gfx.opt.lines_colored = true
-    elseif almost_equals(o_next, "so$lid") then
-      -- no dashed and dotted etc. lines
-      gfx.opt.lines_dashed = false
     elseif almost_equals(o_next, "notime$stamp") then
       -- omit output of the timestamp
       gfx.opt.notimestamp = true
-    elseif almost_equals(o_next, "da$shed") then
-      -- dashed and dotted etc. lines
-      gfx.opt.lines_dashed = true
     elseif almost_equals(o_next, "gparr$ows") then
       -- use gnuplot arrows instead of TikZ
       gfx.opt.gp_arrows = true
@@ -1883,6 +1915,16 @@ term.options = function(opt_str, initial, t_count)
       else
         gp.int_error(t_count, string.format("error: number expected, got `%s'.", o_next))
       end
+    elseif almost_equals(o_next, "dashl$ength") or almost_equals(o_next, "dl") then
+      get_next_token()
+      if o_type == 'number' then
+        dashlength = tonumber(o_next)
+        if dashlength <= 0 then
+	  dashlength = 1.0
+	end
+      else
+        gp.int_error(t_count, string.format("error: number expected, got `%s'.", o_next))
+      end
     elseif almost_equals(o_next, "externalimages") then
       if term.external_images ~= nil then
         term.external_images = true;
@@ -1959,6 +2001,10 @@ term.options = function(opt_str, initial, t_count)
   term.h_char = math.floor(term_h_char + .5)
   term.v_char = math.floor(term_v_char + .5)
 
+  if dashlength ~= nil then
+    gfx.opt.dashlength = dashlength
+    term_opt_dashlength = string.format("dashlength %.1f", dashlength)
+  end 
 
   if print_help then
     pgf.print_help(gp.term_out)
@@ -1981,10 +2027,10 @@ term.options = function(opt_str, initial, t_count)
   tf(true, term_opt_size, nil)
   tf(true, term_opt_background, nil)
   tf(true, term_opt_fontscale, nil)
+  tf(true, term_opt_dashlength, nil)
   tf((#gfx.opt.latex_preamble>0), term_opt_preamble, 'nopreamble')
   tf(gfx.opt.lines_colored, 'color', 'monochrome')
   tf(gfx.opt.full_doc, 'standalone', 'nostandalone')
-  tf(gfx.opt.lines_dashed, 'dashed', 'solid')
   tf(gfx.opt.gp_arrows, 'gparrows', 'nogparrows')
   tf(gfx.opt.tikzarrows, 'tikzarrows', 'notikzarrows')
   tf(gfx.opt.gp_points, 'gppoints', 'nogppoints')
@@ -2014,6 +2060,7 @@ end
 term.graphics = function()
   -- reset some state variables
   gfx.linetype_idx_set = nil
+  gfx.dashtype_idx_set = nil
   gfx.linewidth_set = nil
   gfx.pointsize_set = nil
   gfx.color_set = nil
@@ -2069,6 +2116,28 @@ term.linetype = function(ltype)
   return 1
 end
 
+term.dashtype = function(dtype, pattern)
+   gfx.check_in_path()
+   
+   if dtype == -3 then -- DASHTYPE_CUSTOM
+       gfx.dashtype_idx = ''
+
+       for i = 1,#pattern do
+  	  if (i % 2) == 1 then
+              gfx.dashtype_idx = gfx.dashtype_idx .. 'on '
+          else
+	      gfx.dashtype_idx = gfx.dashtype_idx .. 'off '
+          end
+          gfx.dashtype_idx = gfx.dashtype_idx..string.format('%.2f*\\gpdashlength ', pattern[i])
+       end
+   else
+       gfx.dashtype_idx = dtype
+   end
+
+   return 1
+end
+
+
 term.point = function(x, y, num)
   if gfx.opt.gp_points then
     return 0
@@ -2112,6 +2181,7 @@ term.arrow = function(sx, sy, ex, ey, head, length, angle, backangle, filled)
     gfx.check_in_path()
     gfx.check_color()
     gfx.check_linetype()
+    gfx.check_dashtype()
     gfx.check_linewidth()
     pgf.draw_arrow({{sx,sy},{ex,ey}}, gfx.HEAD_STR[head+1], headstyle)
     return 1

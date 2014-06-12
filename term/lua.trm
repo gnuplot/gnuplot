@@ -1,6 +1,6 @@
 /*
- *  $Id: lua.trm,v 1.21 2012/10/17 04:32:13 sfeam Exp $
- *  $Date: 2012/10/17 04:32:13 $
+ *  $Id: lua.trm,v 1.22 2014/05/09 22:14:12 broeker Exp $
+ *  $Date: 2014/05/09 22:14:12 $
  *  $Rev: 99 $
  */
 
@@ -59,6 +59,7 @@ TERM_PUBLIC void LUA_graphics __PROTO((void));
 TERM_PUBLIC void LUA_move __PROTO((unsigned int x, unsigned int y));
 TERM_PUBLIC void LUA_vector __PROTO((unsigned int ux, unsigned int uy));
 TERM_PUBLIC void LUA_linetype __PROTO((int linetype));
+TERM_PUBLIC void LUA_dashtype __PROTO((int type, t_dashtype *custom_dash_type));
 TERM_PUBLIC void LUA_put_text __PROTO((unsigned int x, unsigned int y, const char str[]));
 TERM_PUBLIC int  LUA_text_angle __PROTO((int ang));
 TERM_PUBLIC int  LUA_justify_text __PROTO((enum JUSTIFY mode));
@@ -919,6 +920,30 @@ LUA_linetype(int linetype)
 }
 
 
+TERM_PUBLIC void
+LUA_dashtype(int type, t_dashtype *custom_dash_type)
+{
+    int i = 0;
+
+    if(LUA_init_luaterm_function("dashtype")) {
+	lua_pushinteger(L, type);
+	lua_newtable(L);
+	if (type == DASHTYPE_CUSTOM) {
+	    while (custom_dash_type->pattern[i] > 0) {
+		lua_pushnumber(L, custom_dash_type->pattern[i]);
+		i++;
+		lua_rawseti(L, -2, i);
+	    }
+	} else {
+	    lua_pushinteger(L, 0);
+	    lua_rawseti(L, -2, 1);
+	}
+	LUA_call_report(lua_pcall(L, 2, 1, tb));
+	lua_term_result = (int)lua_tointeger(L, -1);
+	lua_pop(L, 1);
+    }
+}
+
 
 TERM_PUBLIC void
 LUA_move(unsigned int x, unsigned int y)
@@ -1370,6 +1395,12 @@ TERM_TABLE_START(lua_driver)
    , LUA_layer
    , LUA_path
    , LUA_TSCALE
+    , NULL /* hypertext */
+#ifdef EAM_BOXED_TEXT
+    , NULL
+#endif
+    , NULL /* modify plots */
+    , LUA_dashtype
 TERM_TABLE_END(lua_driver)
 
 #undef LAST_TERM
@@ -1394,6 +1425,12 @@ TERM_TABLE_START(tikz_driver)
    , LUA_layer
    , LUA_path
    , LUA_TSCALE
+    , NULL /* hypertext */
+#ifdef EAM_BOXED_TEXT
+    , NULL
+#endif
+    , NULL /* modify plots */
+    , LUA_dashtype
 TERM_TABLE_END(tikz_driver)
 
 #undef LAST_TERM
