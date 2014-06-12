@@ -3,6 +3,7 @@ Changes since 5.0.rc1
 
 * NEW grey out key entries when corresponding plot is toggled off
 * CHANGE apply "set key {no}enhanced}" to the key title
+* CHANGE scale dashlenth with line width
 * FIX wxgtk3 requires initialization of Xthreads
 * FIX width adjustment for long key title in multicolumn keys
 * FIX treat data value read as "NaN" the same as we would "1/0"
