@@ -1095,8 +1095,8 @@ int qt_waitforinput(int options)
 #ifdef WGP_CONSOLE
 			if (!isatty(fd)) {
 				DWORD dw;
-				GetExitCodeThread(h, &dw);
-				CloseHandle(h);
+				GetExitCodeThread(h[0], &dw);
+				CloseHandle(h[0]);
 				c = dw;
 				quitLoop = true;
 			} else 
