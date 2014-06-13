@@ -19,6 +19,7 @@ New features, changes and fixes in gnuplot version 4.6.6
 * FIX adjustment of key size to accommodate long key title
 * FIX treat data value read as "NaN" the same as we would "1/0"
 * FIX handling of events triggered by closing the qt plot window
+* FIX iteration failure due to integer overflow
 
 
 New features, changes and fixes in gnuplot version 4.6.5
