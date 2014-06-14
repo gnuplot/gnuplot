@@ -1,5 +1,5 @@
 /*
- * $Id: boundary.c,v 1.13 2014/04/08 18:49:21 sfeam Exp $
+ * $Id: boundary.c,v 1.14 2014/05/24 04:29:04 sfeam Exp $
  */
 
 /* GNUPLOT - boundary.c */
@@ -411,7 +411,8 @@ boundary(struct curve_points *plots, int count)
 
     /* Adjust color axis limits if necessary. */
     if (is_plot_with_palette()) {
-	set_cbminmax();
+	/* June 2014 - moved outside do_plot so that it is not called during a refresh */
+	/* set_cbminmax(); */
 	axis_checked_extend_empty_range(COLOR_AXIS, "All points of color axis undefined.");
 	if (color_box.where != SMCOLOR_BOX_NO)
 	    setup_tics(COLOR_AXIS, 20);

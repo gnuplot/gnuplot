@@ -11,6 +11,8 @@ Changes since 5.0.rc1
 * FIX do not store long strings (e.g. epslatex_header) in terminal options array
 * FIX [maybe] extra resize of initial qt window may fix problems on OSX, Debian
 * FIX handling of events triggered by closing the qt plot window
+* FIX refresh of plot with log-scaled color box
+* FIX MSWin pipe issues
 
 New features, changes and fixes in gnuplot version 5.0
 ======================================================

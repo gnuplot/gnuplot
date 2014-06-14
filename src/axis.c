@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.133 2014/03/16 22:03:04 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.134 2014/06/02 02:45:38 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -1793,34 +1793,28 @@ some_grid_selected()
 }
 
 /*
-   Check and set the cb-range for use by pm3d or other palette using styles.
-   Return 0 on wrong range, otherwise 1.
+ * Range checks for the color axis.
  */
-int
+void
 set_cbminmax()
 {
     if (CB_AXIS.set_autoscale & AUTOSCALE_MIN) {
-	/* -VERYLARGE according to AXIS_INI3D */
 	if (CB_AXIS.min >= VERYLARGE)
 	    CB_AXIS.min = AXIS_DE_LOG_VALUE(FIRST_Z_AXIS,Z_AXIS.min);
     }
     CB_AXIS.min = axis_log_value_checked(COLOR_AXIS, CB_AXIS.min, "color axis");
 
     if (CB_AXIS.set_autoscale & AUTOSCALE_MAX) {
-	/* -VERYLARGE according to AXIS_INI3D */
 	if (CB_AXIS.max <= -VERYLARGE)
 	    CB_AXIS.max = AXIS_DE_LOG_VALUE(FIRST_Z_AXIS,Z_AXIS.max);
     }
     CB_AXIS.max = axis_log_value_checked(COLOR_AXIS, CB_AXIS.max, "color axis");
 
     if (CB_AXIS.min > CB_AXIS.max) {
-	/* exchange min and max values */
 	double tmp = CB_AXIS.max;
 	CB_AXIS.max = CB_AXIS.min;
 	CB_AXIS.min = tmp;
     }
-
-    return 1;
 }
 
 static void

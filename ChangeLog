@@ -1,3 +1,12 @@
+2014-06-14  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/axis.h src/axis.c src/boundary.c src/plot2d.c (eval_plots):
+	Unlike all other axes, log scaling was being applied to the color axis
+	(cb) in do_plot() rather than in the caller eval_plots().
+	This caused "refresh" (as opposed to "replot") to fail.  Move the
+	log-scale correction up to eval_plots() like the other axes.
+	Bug #1425
+
 2014-06-13  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/qtterminal/qt_term.cpp (qt_waitforinput):  Fix index error

@@ -1,5 +1,5 @@
 /*
- * $Id: axis.h,v 1.101 2014/03/16 22:03:04 sfeam Exp $
+ * $Id: axis.h,v 1.102 2014/05/08 17:35:42 sfeam Exp $
  *
  */
 
@@ -689,7 +689,7 @@ void clone_linked_axes __PROTO((AXIS_INDEX axis2, AXIS_INDEX axis1));
 int map_x __PROTO((double value));
 int map_y __PROTO((double value));
 
-int set_cbminmax __PROTO((void));
+void set_cbminmax __PROTO((void));
 
 #if (defined MAX_PARALLEL_AXES) && (MAX_PARALLEL_AXES > 0)
 char * axis_name __PROTO((AXIS_INDEX));

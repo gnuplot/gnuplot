@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.333 2014/05/11 16:05:50 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.334 2014/05/11 17:39:59 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -3288,6 +3288,12 @@ eval_plots()
 	if (axis_array[FIRST_Y_AXIS].autoscale & AUTOSCALE_MAX)
 	    axis_array[FIRST_Y_AXIS].max = axis_array[SECOND_Y_AXIS].max;
     }
+
+    /* June 2014 - This call was in boundary(), called from do_plot()
+     * but it caused problems if do_plot() itself was called for a refresh
+     * rather than for plot/replot.  So we call it here instead.
+     */
+    set_cbminmax();
 
     /* the following ~5 lines were moved from the end of the
      * function to here, as do_plot calles term->text, which
