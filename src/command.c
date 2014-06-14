@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.290 2014/05/09 22:14:11 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.291 2014/05/13 18:20:55 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -875,6 +875,12 @@ exit_command()
     /* If the command is "exit gnuplot" then do so */
     if (equals(c_token+1,"gnuplot"))
 	gp_exit(EXIT_SUCCESS);
+
+    /* exit error 'error message'  returns to the top command line */
+    if (equals(c_token+1,"error")) {
+	c_token += 2;
+	int_error(NO_CARET, try_to_get_string());
+    }
 
     /* else graphics will be tidied up in main */
     command_exit_status = 1;

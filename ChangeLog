@@ -16,6 +16,11 @@
 	* src/misc.c (prepare_call):  Allow parenthesized expressions as
 	call parameters.  The value is passed as a string.
 
+	* src/command.c (exit_command):  New option "exit error 'message'"
+	prints the message and return to the top command line, breaking out
+	of any loops or calls cleanly.  In non-interactive mode the program
+	then exits.
+
 2014-06-13  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/qtterminal/qt_term.cpp (qt_waitforinput):  Fix index error

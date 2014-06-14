@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.892 2014/06/08 17:59:12 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.893 2014/06/10 17:34:15 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -4315,17 +4315,20 @@ Ffigure_mapcontours
 ?exit
  The commands `exit` and `quit`, as well as the END-OF-FILE character (usually
  Ctrl-D) terminate input from the current input stream: terminal session, pipe,
- and file input (pipe).
-
- If input streams are nested (inherited `load` scripts), then reading will
- continue in the parent stream. When the top level stream is closed, the
- program itself will exit.
+ or file input (pipe).  If input streams are nested (inherited `load` scripts),
+ then reading will continue in the parent stream. When the top level stream is
+ closed, the program itself will exit.
 
  The command `exit gnuplot` will immediately and unconditionally cause gnuplot
  to exit even if the input stream is multiply nested.  In this case any open
  output files may not be completed cleanly. Example of use:
 
        bind "ctrl-x" "unset output; exit gnuplot"
+
+ The command `exit error "error message"` simulates a program error.
+ In interactive mode it prints the error message and returns to the command
+ line, breaking out of all nested loops or calls.  In non-interactive mode
+ the program will exit.
 
  See help for `batch/interactive` for more details.
 2 fit
