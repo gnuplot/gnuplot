@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.184 2014/05/05 06:13:05 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.185 2014/06/02 02:45:39 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -145,10 +145,38 @@ prepare_call(int calltype)
 	while (!END_OF_COMMAND && call_argc <= 9) {
 	    call_args[call_argc] = try_to_get_string();
 	    if (!call_args[call_argc]) {
-		/* DEPRECATED old style wrapping of bare tokens as strings */
+		int save_token = c_token;
+
+		/* This catches call "file" STRINGVAR (expression) */
+		if (type_udv(c_token) == STRING) {
+		    call_args[call_argc] = gp_strdup(add_udv(c_token)->udv_value.v.string_val);
+		    c_token++;
+
+		/* Evaluates a parenthesized expression and store the result in a string */
+		} else if (equals(c_token, "(")) {
+		    char val_as_string[32];
+		    struct value a;
+		    const_express(&a);
+		    switch(a.type) {
+			case CMPLX: /* FIXME: More precision? Some way to provide a format? */
+				sprintf(val_as_string, "%g", a.v.cmplx_val.real);
+				call_args[call_argc] = gp_strdup(val_as_string);
+				break;
+			default:
+				int_error(save_token, "Unrecognized argument type");
+				break;
+			case INTGR:	
+				sprintf(val_as_string, "%d", a.v.int_val);
+				call_args[call_argc] = gp_strdup(val_as_string);
+				break;
+		    } 
+
+		/* old (pre version 5) style wrapping of bare tokens as strings */
 		/* is still useful for passing unquoted numbers */
-		m_capture(&call_args[call_argc], c_token, c_token);
-		c_token++;
+		} else {
+		    m_capture(&call_args[call_argc], c_token, c_token);
+		    c_token++;
+		}
 	    }
 	    call_argc++;
 	}

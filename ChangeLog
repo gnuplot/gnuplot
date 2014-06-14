@@ -7,6 +7,9 @@
 	log-scale correction up to eval_plots() like the other axes.
 	Bug #1425
 
+	* src/misc.c (prepare_call):  Allow parenthesized expressions as
+	call parameters.  The value is passed as a string.
+
 2014-06-13  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/qtterminal/qt_term.cpp (qt_waitforinput):  Fix index error
