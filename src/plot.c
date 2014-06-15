@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot.c,v 1.162 2014/03/30 18:33:21 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot.c,v 1.163 2014/06/04 08:11:00 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - plot.c */
@@ -440,7 +440,7 @@ main(int argc, char **argv)
      * can be registered to be executed before the terminal is reset. */
     gp_atexit(term_reset);
 
-# if defined(_Windows) && ! defined(WGP_CONSOLE)
+# if defined(WIN32) && !defined(WGP_CONSOLE)
     interactive = TRUE;
 # else
     interactive = isatty(fileno(stdin));
@@ -654,24 +654,32 @@ RECOVER_FROM_ERROR_IN_DASH:
 	    }
     }
 
+    /* take commands from stdin */
+    if (noinputfiles)
+	while (!com_line())
+	    ctrlc_flag = FALSE; /* reset asynchronous Ctrl-C flag */
+
 #ifdef _Windows
     /* On Windows, handle 'persist' by keeping the main input loop running (windows/wxt), */
     /* but only if there are any windows open. Note that qt handles this properly. */
     if (persist_cl) {
 	if (WinAnyWindowOpen()) {
-	    interactive = TRUE;
-	    while (!com_line())
-		ctrlc_flag = FALSE; /* reset asynchronous Ctrl-C flag */
-	    interactive = FALSE;
-	}
-    } else
+#ifdef WGP_CONSOLE
+	    if (!interactive) {
+		/* no further input from pipe */
+		while (WinAnyWindowOpen())
+		win_sleep(100);
+	    } else
 #endif
-    {
-	/* take commands from stdin */
-	if (noinputfiles)
-	    while (!com_line())
-		ctrlc_flag = FALSE; /* reset asynchronous Ctrl-C flag */
+	    {
+		interactive = TRUE;
+		while (!com_line())
+		    ctrlc_flag = FALSE; /* reset asynchronous Ctrl-C flag */
+		interactive = FALSE;
+	    }
+	}
     }
+#endif
 
 #if (defined(HAVE_LIBREADLINE) || defined(HAVE_LIBEDITLINE)) && defined(GNUPLOT_HISTORY)
 #if !defined(HAVE_ATEXIT) && !defined(HAVE_ON_EXIT)

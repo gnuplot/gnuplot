@@ -1,6 +1,12 @@
+2014-06-15  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/plot.c (main):  Fix persist mode on Windows when reading
+	from a pipe.
+	See Bug #1322
+
 2014-06-15  Akira Kakuto <kakuto@fuk.kindai.ac.jp>
 
-	src/binary.c src/datafile.h src/syscfg.h:  LFS support on Windows
+	* src/binary.c src/datafile.h src/syscfg.h:  LFS support on Windows
 	for MSVC and MinGW.
 	See also Patch #675
 
