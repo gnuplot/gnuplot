@@ -1,3 +1,7 @@
+2014-06-15  Dmitri A. Sergatskov  <dasergatskov@gmail.com>
+
+	* configure.in: Add LRELEASE for Qt5 autoconfiguration
+
 2014-06-15  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/plot.c (main):  Fix persist mode on Windows when reading
