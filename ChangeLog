@@ -1,3 +1,9 @@
+2014-06-15  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/plot.c (main) src/win/winmain.c|h:
+	Fix persist mode on Windows when reading from a pipe.
+	See Bug #1322
+
 2014-06-11  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/mouse.c (event_reset) src/qtterminal/QtGnuplotWindow.{h|cpp}:

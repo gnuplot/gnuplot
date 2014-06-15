@@ -1,5 +1,5 @@
 /*
- * $Id: winmain.c,v 1.52.2.4 2014/01/11 08:37:28 markisch Exp $
+ * $Id: winmain.c,v 1.52.2.5 2014/01/11 16:22:14 markisch Exp $
  */
 
 /* GNUPLOT - win/winmain.c */
@@ -608,7 +608,7 @@ int main(int argc, char **argv)
 	gnu_main(argc, argv);
 
 	/* First chance to close help system for console gnuplot,
-	second for wgnuplot */
+	   second for wgnuplot */
 	WinCloseHelp();
 	return 0;
 }
@@ -846,6 +846,7 @@ MyFRead(void *ptr, size_t size, size_t n, FILE *file)
 
 #else /* WGP_CONSOLE */
 
+
 DWORD WINAPI stdin_pipe_reader(LPVOID param)
 {
 #if 0
@@ -862,6 +863,7 @@ DWORD WINAPI stdin_pipe_reader(LPVOID param)
     return EOF;
 #endif
 }
+
 
 int ConsoleGetch()
 {
@@ -1020,7 +1022,7 @@ win_lower_terminal_group(void)
 
 
 /* returns true if there are any graph windows open (win terminal) */
-TBOOLEAN
+static TBOOLEAN
 WinWindowOpened(void)
 {
 	LPGW lpgw;
@@ -1035,15 +1037,23 @@ WinWindowOpened(void)
 }
 
 
-#ifndef WGP_CONSOLE
-void
-WinPersistTextClose(void)
+/* returns true if there are any graph windows open (wxt/win terminals) */
+TBOOLEAN
+WinAnyWindowOpen(void)
 {
 	TBOOLEAN window_opened = WinWindowOpened();
 #ifdef WXWIDGETS
 	window_opened |= wxt_window_opened();
 #endif
-	if (!window_opened &&
+	return window_opened;
+}
+
+
+#ifndef WGP_CONSOLE
+void
+WinPersistTextClose(void)
+{
+	if (!WinAnyWindowOpen() &&
 		(textwin.hWndParent != NULL) && !IsWindowVisible(textwin.hWndParent))
 		PostMessage(textwin.hWndParent, WM_CLOSE, 0, 0);
 }

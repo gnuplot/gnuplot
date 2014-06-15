@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot.c,v 1.128.2.18 2013/10/23 18:31:53 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot.c,v 1.128.2.19 2014/06/04 08:14:39 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - plot.c */
@@ -690,26 +690,32 @@ RECOVER_FROM_ERROR_IN_DASH:
 	    }
     }
 
+    /* take commands from stdin */
+    if (noinputfiles)
+	while (!com_line())
+	    ctrlc_flag = FALSE; /* reset asynchronous Ctrl-C flag */
+
 #ifdef _Windows
-    /* On Windows, emulate 'persist' by keeping the main input loop running (windows/wxt), */
+    /* On Windows, handle 'persist' by keeping the main input loop running (windows/wxt), */
     /* but only if there are any windows open. Note that qt handles this properly. */
     if (persist_cl) {
-	TBOOLEAN window_opened = WinWindowOpened();
-#ifdef WXWIDGETS
-	window_opened |= wxt_window_opened();
+	if (WinAnyWindowOpen()) {
+#ifdef WGP_CONSOLE
+	    if (!interactive) {
+		/* no further input from pipe */
+		while (WinAnyWindowOpen())
+		win_sleep(100);
+	    } else
 #endif
-	if (window_opened) {
-	    interactive = TRUE;
-	    while (!com_line());
-	    interactive = FALSE;
+	    {
+		interactive = TRUE;
+		while (!com_line())
+		    ctrlc_flag = FALSE; /* reset asynchronous Ctrl-C flag */
+		interactive = FALSE;
+	    }
 	}
-    } else
-#endif
-    {
-	/* take commands from stdin */
-	if (noinputfiles)
-	    while (!com_line());
     }
+#endif
 
 #if (defined(HAVE_LIBREADLINE) || defined(HAVE_LIBEDITLINE)) && defined(GNUPLOT_HISTORY)
 #if !defined(HAVE_ATEXIT) && !defined(HAVE_ON_EXIT)
