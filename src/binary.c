@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: binary.c,v 1.14 2013/02/17 17:51:24 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: binary.c,v 1.15 2014/04/13 17:55:23 sfeam Exp $"); }
 #endif
 
 /*
@@ -19,7 +19,7 @@ static char *RCSid() { return RCSid("$Id: binary.c,v 1.14 2013/02/17 17:51:24 sf
  */
 
 #include "binary.h"
-
+#include "datafile.h"
 #include "alloc.h"
 #include "util.h"
 

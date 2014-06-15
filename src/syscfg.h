@@ -1,5 +1,5 @@
 /*
- * $Id: syscfg.h,v 1.53 2014/03/30 18:33:21 markisch Exp $
+ * $Id: syscfg.h,v 1.54 2014/04/13 17:55:24 sfeam Exp $
  */
 
 /* GNUPLOT - syscfg.h */
@@ -256,8 +256,17 @@
 #define GPFAR /* nothing */
 
 /* LFS support */
-#ifndef HAVE_OFF_T
-#define off_t long
+#if !defined(HAVE_FSEEKO) || !defined(HAVE_OFF_T)
+# if defined(HAVE_SYS_TYPES_H)
+#   include <sys/types.h>
+# endif
+# if defined(_MSC_VER)
+#   define off_t __int64
+# elif defined(__MINGW32__)
+#   define off_t off64_t
+# elif !defined(HAVE_OFF_T)
+#   define off_t long
+# endif
 #endif
 
 typedef double coordval;

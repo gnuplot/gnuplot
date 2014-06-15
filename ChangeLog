@@ -1,3 +1,9 @@
+2014-06-15  Akira Kakuto <kakuto@fuk.kindai.ac.jp>
+
+	src/binary.c src/datafile.h src/syscfg.h:  LFS support on Windows
+	for MSVC and MinGW.
+	See also Patch #675
+
 2014-06-14  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/axis.h src/axis.c src/boundary.c src/plot2d.c (eval_plots):

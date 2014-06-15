@@ -1,5 +1,5 @@
 /*
- * $Id: datafile.h,v 1.47 2014/06/01 09:32:03 markisch Exp $
+ * $Id: datafile.h,v 1.48 2014/06/02 05:14:15 markisch Exp $
  */
 
 /* GNUPLOT - datafile.h */
@@ -63,6 +63,12 @@ enum DF_STATUS {
 #if defined(HAVE_FSEEKO) && defined(HAVE_OFF_T)
 #  define fseek(stream,pos,whence) fseeko(stream,pos,whence)
 #  define ftell(stream) ftello(stream)
+#elif defined(_MSC_VER)
+#  define fseek(stream,pos,whence) _fseeki64(stream,pos,whence)
+#  define ftell(stream) _ftelli64(stream)
+#elif defined(__MINGW32__)
+#  define fseek(stream,pos,whence) fseeko64(stream,pos,whence)
+#  define ftell(stream) ftello64(stream)
 #endif
 
 /* Variables of datafile.c needed by other modules: */
