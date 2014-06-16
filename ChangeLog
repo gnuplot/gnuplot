@@ -1,3 +1,7 @@
+2014-06-16  Karl Ratzsch  <ratzsch@uni-freiburg.de>
+
+	* fit.c:  FIT_NITER holds number of iterations used by previous fit.
+
 2014-06-16  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* configure.in src/wxterminal/wxt_gui.h:  wxWidgets versions > 2.8 want

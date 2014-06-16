@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: fit.c,v 1.143 2014/06/09 12:50:35 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: fit.c,v 1.144 2014/06/11 23:24:12 sfeam Exp $"); }
 #endif
 
 /*  NOTICE: Change of Copyright Status
@@ -90,6 +90,9 @@ static char *RCSid() { return RCSid("$Id: fit.c,v 1.143 2014/06/09 12:50:35 mark
  *
  * Bastian Maerkisch, Feb 2014: Split regress() into several functions
  * in order to facilitate the inclusion of alternative fitting codes.
+ *
+ * Karl Ratzsch, May 2014: Add a result variable reporting the number of
+ * iterations
  *
  */
 
@@ -822,6 +825,7 @@ regress_finalize(int iter, double chisq, double last_chisq, double lambda, doubl
     int i, j;
     struct udvt_entry *v;	/* For exporting results to the user */
     int ndf;
+    int niter;
     double stdfit;
     double pvalue;
     double *dpar;
@@ -873,6 +877,7 @@ regress_finalize(int iter, double chisq, double last_chisq, double lambda, doubl
     ndf    = num_data - num_params;
     stdfit = sqrt(chisq / ndf);
     pvalue = 1. - chisq_cdf(ndf, chisq);
+    niter = iter;
 
     /* Export these to user-accessible variables */
     v = add_udv_by_name("FIT_NDF");
@@ -887,6 +892,9 @@ regress_finalize(int iter, double chisq, double last_chisq, double lambda, doubl
     v = add_udv_by_name("FIT_P");
     v->udv_undef = FALSE;
     Gcomplex(&v->udv_value, pvalue, 0);
+    v = add_udv_by_name("FIT_NITER");
+    v->udv_undef = FALSE;
+    Ginteger(&v->udv_value, niter);    
 
     /* Save final parameters. Depending on the backend and
        its internal state, the last call_gnuplot may not have been

@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.893 2014/06/10 17:34:15 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.894 2014/06/15 04:15:01 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -4557,7 +4557,7 @@ Ffigure_mapcontours
  and subsequently halted from the keyboard (see `fit`).  The user variable
  FIT_CONVERGED contains 1 if the previous fit command terminated due to
  convergence; it contains 0 if the previous fit terminated for any other
- reason.
+ reason. FIT_NITER contains the number of iterations that were done during the last fit.
 
  Often the function to be fitted will be based on a model (or theory) that
  attempts to describe or predict the behaviour of the data.  Then `fit` can
