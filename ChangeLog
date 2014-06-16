@@ -1,3 +1,9 @@
+2014-06-16  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/graphics.c (xtick2d_callback): Clip r axis tics and tic labels to 
+	the bounding box of the plot.
+	Bug #1290
+
 2014-06-15  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/plot.c (main) src/win/winmain.c|h:

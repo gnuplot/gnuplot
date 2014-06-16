@@ -20,6 +20,7 @@ New features, changes and fixes in gnuplot version 4.6.6
 * FIX treat data value read as "NaN" the same as we would "1/0"
 * FIX handling of events triggered by closing the qt plot window
 * FIX iteration failure due to integer overflow
+* FIX clip r axis tics to current plot boundary
 
 
 New features, changes and fixes in gnuplot version 4.6.5
