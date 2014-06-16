@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.455 2014/05/01 19:50:15 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.456 2014/05/05 06:13:05 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -3320,6 +3320,8 @@ xtick2d_callback(
 
 
     /* we precomputed tic posn and text posn in global vars */
+    if (x < clip_area->xleft || x > clip_area->xright)
+	return;
 
     (*t->move) (x, tic_start);
     (*t->vector) (x, tic_start + ticsize);
@@ -3328,6 +3330,7 @@ xtick2d_callback(
 	(*t->move) (x, tic_mirror);
 	(*t->vector) (x, tic_mirror - ticsize);
     }
+
     if (text) {
 	/* get offset */
 	double offsetx_d, offsety_d;

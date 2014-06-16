@@ -5,6 +5,10 @@
 	wxt-config.   So we force this ourselves.
 	Bug #1401
 
+	* src/graphics.c (xtick2d_callback): Clip r axis tics and tic labels to
+	the bounding box of the plot.
+	Bug #1290
+
 2014-06-15  Dmitri A. Sergatskov  <dasergatskov@gmail.com>
 
 	* configure.in: Add LRELEASE for Qt5 autoconfiguration
