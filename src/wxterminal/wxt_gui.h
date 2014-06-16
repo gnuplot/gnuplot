@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.h,v 1.44 2014/05/20 02:03:16 sfeam Exp $
+ * $Id: wxt_gui.h,v 1.45 2014/05/21 15:56:27 sfeam Exp $
  */
 
 /* GNUPLOT - wxt_gui.h */
@@ -209,7 +209,7 @@ extern "C" {
 
 #ifdef WXT_MULTITHREADED
 
-#if defined(X11)
+#if defined(WX_NEEDS_XINITTHREADS)
 #include <X11/Xlib.h>	/* Magic fix for linking against wxgtk3.0 */
 #endif
 
@@ -244,7 +244,7 @@ DEFINE_EVENT_TYPE(wxStatusTextEvent)
 class wxtApp : public wxApp
 {
 public:
-#if defined(WXT_MULTITHREADED) && defined(X11)
+#if defined(WXT_MULTITHREADED) && defined(WX_NEEDS_XINITTHREADS)
 	/* Magic fix needed by wxgtk3.0 */
         wxtApp() : wxApp() { XInitThreads(); } 
 #endif 

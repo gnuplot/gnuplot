@@ -1,3 +1,10 @@
+2014-06-16  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* configure.in src/wxterminal/wxt_gui.h:  wxWidgets versions > 2.8 want
+	the main program to call XInitThreads(), but fail to specify -lX11 in 
+	wxt-config.   So we force this ourselves.
+	Bug #1401
+
 2014-06-15  Dmitri A. Sergatskov  <dasergatskov@gmail.com>
 
 	* configure.in: Add LRELEASE for Qt5 autoconfiguration
