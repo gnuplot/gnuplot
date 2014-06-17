@@ -21,6 +21,7 @@ New features, changes and fixes in gnuplot version 4.6.6
 * FIX handling of events triggered by closing the qt plot window
 * FIX iteration failure due to integer overflow
 * FIX clip r axis tics to current plot boundary
+* FIX logscale cb axis with volatile data
 
 
 New features, changes and fixes in gnuplot version 4.6.5

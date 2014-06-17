@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.379.2.31 2014/05/27 17:30:52 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.379.2.32 2014/06/17 00:47:33 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -717,7 +717,7 @@ boundary(struct curve_points *plots, int count)
 
     /* Adjust color axis limits if necessary. */
     if (is_plot_with_palette()) {
-	set_cbminmax();
+	/* set_cbminmax(); */
 	axis_checked_extend_empty_range(COLOR_AXIS, "All points of color axis undefined.");
 	if (color_box.where != SMCOLOR_BOX_NO)
 	    setup_tics(COLOR_AXIS, 20);
