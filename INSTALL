@@ -82,7 +82,7 @@ several different ways:
 
  o at make time, eg.
    make HELPFILE='/gnuplot/docs/gnuplot.gih'
-   gnuplot will look for the online help file /gnuplot/docs/gnupot.gih.
+   gnuplot will look for the online help file /gnuplot/docs/gnuplot.gih.
 
  o at execution time by specifying the helpfile with the environment
    variable GNUHELP (see "Environment Variables" below).
