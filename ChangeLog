@@ -3,6 +3,10 @@
 	* configure.in src/wxterminal/wxt_gui.h:  The configuration test for
 	wxWidgets >= 2.8 had no effect on code generation. Remove this test.
 
+	* configure.in src/wxterminal/wxt_gui.h:  Revert the attemp to guess
+	whether -lX11 is required by wxt. As feared, this causes problems on OSX
+	and other platforms where wx is built on top of something other than X11.
+
 2014-06-16  Karl Ratzsch  <ratzsch@uni-freiburg.de>
 
 	* fit.c:  FIT_NITER holds number of iterations used by previous fit.
@@ -11,7 +15,7 @@
 
 	* configure.in src/wxterminal/wxt_gui.h:  wxWidgets versions > 2.8 want
 	the main program to call XInitThreads(), but fail to specify -lX11 in 
-	wxt-config.   So we force this ourselves.
+	wxt-config.   So we force this ourselves.   [=> reverted 2014-06-20]
 	Bug #1401
 
 	* src/graphics.c (xtick2d_callback): Clip r axis tics and tic labels to
