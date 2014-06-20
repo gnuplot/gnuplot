@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.h,v 1.45 2014/05/21 15:56:27 sfeam Exp $
+ * $Id: wxt_gui.h,v 1.46 2014/06/16 19:33:55 sfeam Exp $
  */
 
 /* GNUPLOT - wxt_gui.h */
@@ -129,10 +129,7 @@ extern "C" {
 #endif
 
 /* With wxGTK, we use a different cairo surface starting from gtk28 */
-#if defined(__WXGTK__)&&defined(HAVE_GTK28)
-# define GTK_SURFACE
-#endif
-#if defined(__WXGTK__)&&!defined(HAVE_GTK28)
+#if defined(__WXGTK__)
 # define IMAGE_SURFACE
 #endif
 
