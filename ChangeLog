@@ -1,3 +1,9 @@
+2014-06-24  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/set.c src/show.c src/tables.c docs/gnuplot.doc:
+	New command:  set margins <left>, <right>, <top>, <bottom>
+	acts just like four successive commands set lmargin <left>, ...
+
 2014-06-20  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* configure.in src/wxterminal/wxt_gui.h:  The configuration test for

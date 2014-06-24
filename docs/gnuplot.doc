@@ -9778,11 +9778,11 @@ Ffigure_missing
  world.dem: mapping demos.
 ^ </a>
 3 margin
-?commands set margin
-?commands show margin
-?set margin
-?show margin
-?margin
+?commands set margins
+?commands show margins
+?set margins
+?show margins
+?margins
  The `margin` is the distance between the plot border and the outer edge of the
  canvas. The size of the margin is chosen automatically, but can be overridden
  by the `set margin` commands.  `show margin` shows the current settings.
@@ -9790,10 +9790,11 @@ Ffigure_missing
  plot itself, see `set offsets`.
 
  Syntax:
-       set bmargin {{at screen} <margin>}
        set lmargin {{at screen} <margin>}
        set rmargin {{at screen} <margin>}
        set tmargin {{at screen} <margin>}
+       set bmargin {{at screen} <margin>}
+       set margins <left>, <right>, <top>, <bottom>
        show margin
 
  The default units of <margin> are character heights or widths, as appropriate.
