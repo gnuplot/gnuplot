@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.204 2014/04/05 06:17:09 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.205 2014/06/02 02:45:40 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -261,6 +261,12 @@ unset_command()
 	break;
     case S_MAPPING:
 	unset_mapping();
+	break;
+    case S_MARGIN:
+	unset_margin(&lmargin);
+	unset_margin(&rmargin);
+	unset_margin(&tmargin);
+	unset_margin(&bmargin);
 	break;
     case S_BMARGIN:
 	unset_margin(&bmargin);

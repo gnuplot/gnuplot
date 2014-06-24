@@ -4,6 +4,8 @@
 	New command:  set margins <left>, <right>, <top>, <bottom>
 	acts just like four successive commands set lmargin <left>, ...
 
+	* src/unset.c:  unset margins
+
 2014-06-20  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* configure.in src/wxterminal/wxt_gui.h:  The configuration test for
