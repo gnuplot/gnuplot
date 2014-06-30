@@ -1,3 +1,10 @@
+2014-06-30  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/qtterminal/QtGnuplotScene.cpp (mouseReleaseEvent):
+	Bugfix for timing problem with click+release of left mouse button.
+	The symptom was "sticky" 3D rotation.
+	Bugfix
+
 2014-06-17  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c src/plot2d.c (eval_plots): 
