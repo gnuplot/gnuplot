@@ -245,7 +245,7 @@ TERM_PUBLIC void cairotrm_options()
 	char *font_setting = NULL;
 	int sep;
 	TBOOLEAN duplication = FALSE;
-	TBOOLEAN set_enhanced = FALSE, set_font = FALSE, set_size = FALSE;
+	TBOOLEAN set_font = FALSE, set_size = FALSE;
 	TBOOLEAN set_capjoin = FALSE;
 	TBOOLEAN set_standalone = FALSE, set_header = FALSE;
 
@@ -309,8 +309,6 @@ TERM_PUBLIC void cairotrm_options()
 			c_token++;
 			cairo_params->enhanced = TRUE;
 			term->flags |= TERM_ENHANCED_TEXT;
-			if (set_enhanced) duplication=TRUE;
-			set_enhanced = TRUE;
 			break;
 		case CAIROTRM_NOENHANCED:
 			if (ISCAIROLATEX)
@@ -319,8 +317,6 @@ TERM_PUBLIC void cairotrm_options()
 			c_token++;
 			cairo_params->enhanced = FALSE;
 			term->flags &= ~TERM_ENHANCED_TEXT;
-			if (set_enhanced) duplication=TRUE;
-			set_enhanced = TRUE;
 			break;
 		case CAIROTRM_SIZE:
 			c_token++;
@@ -523,6 +519,11 @@ TERM_PUBLIC void cairotrm_options()
 		    cairo_params->pdf_output ? "pdf" : "eps",
 			ps_params->epslatex_standalone ? "standalone" : "input");
 		strcat(term_options, tmp_term_options);
+		if (epslatex_header)
+			sprintf(tmp_term_options, " header \"%s\"", epslatex_header);
+		else
+			sprintf(tmp_term_options, " noheader");
+		strcat(term_options, tmp_term_options);
 		sprintf(tmp_term_options, " %s", ps_params->blacktext ? "blacktext" : "colortext");
 		strcat(term_options, tmp_term_options);
 	}
@@ -543,8 +544,8 @@ TERM_PUBLIC void cairotrm_options()
 	if (cairo_params->crop)
 		strncat(term_options, " crop", sizeof(term_options)-strlen(term_options)-1);
 
-	if (set_enhanced)
-		strncat(term_options, " enhanced", sizeof(term_options)-strlen(term_options)-1);
+	strncat(term_options, cairo_params->enhanced ? " enhanced" : " noenhanced",
+		sizeof(term_options)-strlen(term_options)-1);
 
 	if (set_font) {
 		snprintf(tmp_term_options, sizeof(tmp_term_options), " font \"%s\"", font_setting);
