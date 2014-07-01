@@ -1,5 +1,5 @@
 /*
- * $Id: wxt.trm,v 1.39 2014/04/20 20:23:35 lodewyck Exp $
+ * $Id: wxt.trm,v 1.40 2014/05/05 22:19:22 sfeam Exp $
  */
 
 /* GNUPLOT - wxt.trm */
@@ -153,7 +153,7 @@ TERM_PUBLIC void wxt_options()
 	char *font_setting = NULL;
 	int sep;
 	TBOOLEAN duplication = FALSE;
-	TBOOLEAN set_enhanced = FALSE, set_font = FALSE;
+	TBOOLEAN set_font = FALSE;
 	TBOOLEAN set_persist = FALSE, set_number = FALSE;
 	TBOOLEAN set_raise = FALSE, set_ctrl = FALSE;
 	TBOOLEAN set_title = FALSE, set_close = FALSE;
@@ -200,15 +200,11 @@ TERM_PUBLIC void wxt_options()
 			c_token++;
 			wxt_enhanced_enabled = TRUE;
 			term->flags |= TERM_ENHANCED_TEXT;
-			if (set_enhanced) duplication=TRUE;
-			set_enhanced = TRUE;
 			break;
 		case WXT_NOENHANCED:
 			c_token++;
 			wxt_enhanced_enabled = FALSE;
 			term->flags &= ~TERM_ENHANCED_TEXT;
-			if (set_enhanced) duplication=TRUE;
-			set_enhanced = TRUE;
 			break;
 		case WXT_SIZE:
 			c_token++;
@@ -388,10 +384,9 @@ TERM_PUBLIC void wxt_options()
 		wxt_update_position(wxt_window_number);
 	}
 
-	if (set_enhanced)
-		strncat(term_options,
-			wxt_enhanced_enabled ? " enhanced" : " noenhanced",
-			sizeof(term_options)-strlen(term_options)-1);
+	strncat(term_options,
+		wxt_enhanced_enabled ? " enhanced" : " noenhanced",
+		sizeof(term_options)-strlen(term_options)-1);
 
 	if (set_font) {
 		strncat(term_options, " font \"", sizeof(term_options)-strlen(term_options)-1);

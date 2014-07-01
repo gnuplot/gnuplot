@@ -1,6 +1,7 @@
 2014-07-01  Ethan A Merritt  <merritt@u.washington.edu>
 
-	* term/cairo.trm: Always report {no}enhanced property in "show term".
+	* term/cairo.trm, term/wxt.trm:
+	Always report {no}enhanced property in "show term".
 
 2014-06-24  Ethan A Merritt  <merritt@u.washington.edu>
 
