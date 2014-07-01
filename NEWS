@@ -15,6 +15,7 @@ Changes since 5.0.rc1
 * FIX handling of events triggered by closing the qt plot window
 * FIX refresh of plot with log-scaled color box
 * FIX MSWin pipe issues
+* FIX if terminal is in "monochrome" mode, convert color requests to black
 
 New features, changes and fixes in gnuplot version 5.0
 ======================================================

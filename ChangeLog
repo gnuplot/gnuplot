@@ -3,6 +3,10 @@
 	* term/cairo.trm, term/wxt.trm:
 	Always report {no}enhanced property in "show term".
 
+	* src/color.c: If the current terminal has property "monochrome" then
+	convert all requests for constant color as "black".
+	Bug #1423
+
 2014-06-24  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/set.c src/show.c src/tables.c docs/gnuplot.doc:

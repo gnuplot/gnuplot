@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gadgets.c,v 1.111 2014/04/27 19:08:59 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gadgets.c,v 1.112 2014/06/02 02:45:39 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - gadgets.c */
@@ -600,8 +600,15 @@ apply_pm3dcolor(struct t_colorspec *tc, const struct termentry *t)
 	return;
     }
     if (tc->type == TC_RGB) {
+	/* FIXME: several plausible ways for monochrome terminals to handle color request
+	 * (1) Allow all color requests despite the label "monochrome"
+	 * (2) Choose any color you want so long as it is black
+	 * (3) Convert colors to gray scale (NTSC?)
+	 */
 	/* Monochrome terminals are still allowed to display rgb variable colors */
-	if (!monochrome_terminal || tc->value < 0)
+	if (monochrome_terminal && tc->value >= 0)
+	    (*t->linetype)(LT_BLACK);
+	else
 	    t->set_color(tc);
 	return;
     }
