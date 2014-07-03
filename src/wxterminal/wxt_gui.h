@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.h,v 1.36.2.3 2013/12/13 05:44:09 sfeam Exp $
+ * $Id: wxt_gui.h,v 1.36.2.4 2014/02/04 22:11:48 sfeam Exp $
  */
 
 /* GNUPLOT - wxt_gui.h */
@@ -168,7 +168,7 @@ extern "C" {
  * redefinition of fprintf, getch...
  * console window */
 # ifdef _Windows
-#  ifndef _WIN32_WINNT 
+#  ifndef _WIN32_WINNT
 #   define _WIN32_WINNT 0x0500
 #  endif
 #  include "Windows.h"
@@ -475,7 +475,7 @@ public:
 	void SendEvent( wxEvent &event);
 
 	/* destructor*/
-	~wxtFrame() {};
+	~wxtFrame();
 
 	wxtPanel * panel;
 	bool config_displayed;

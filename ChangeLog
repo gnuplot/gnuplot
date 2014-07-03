@@ -1,3 +1,10 @@
+2014-07-03  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/wxt/wxt_gui.c|h:  Automatically remove reference to frame from
+	window list when destroying it. Prevents segfault on program exit when
+	windows and wxt windows are open.
+	Bugfix
+
 2014-06-30  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/qtterminal/QtGnuplotScene.cpp (mouseReleaseEvent):
