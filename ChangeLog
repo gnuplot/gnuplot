@@ -1,3 +1,10 @@
+2014-07-04  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/win/wgraph.c:  'q' closes graph window.
+
+	* src/qtterminal/qt_term.cpp (qt_options) term/wxt.trm (wxt_options):
+	On Windows, the wxt and qt terminals can be used in the same session.
+
 2014-07-01  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/cairo.trm, term/wxt.trm:
