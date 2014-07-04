@@ -1095,6 +1095,7 @@ int qt_waitforinput(int options)
 #ifdef WGP_CONSOLE
 			if (!isatty(fd)) {
 				DWORD dw;
+
 				GetExitCodeThread(h[0], &dw);
 				CloseHandle(h[0]);
 				c = dw;
@@ -1267,10 +1268,12 @@ void qt_options()
 	bool set_dash = false;
 	bool set_dashlength = false;
 
+#ifndef WIN32
 	if (term_interlock != NULL && term_interlock != (void *)qt_init) {
 		term = NULL;
 		int_error(NO_CARET, "The qt terminal cannot be used in a wxt session");
 	}
+#endif
 
 #define SETCHECKDUP(x) { c_token++; if (x) duplication = true; x = true; }
 
