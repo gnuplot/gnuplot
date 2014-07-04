@@ -1,5 +1,5 @@
-C RCS $Id: gnuplot-ja.doc,v 1.519 2014-06-05 18:09:35+09 shige Exp $
-C corresponding original gnuplot.doc revision: 1.891
+C RCS $Id: gnuplot-ja.doc,v 1.525 2014-06-26 18:56:06+09 shige Exp $
+C corresponding original gnuplot.doc revision: 1.896
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -321,11 +321,9 @@ C 行が長いのは、できればなんとかしたい
 # set style textbox                        # 文字列要素に外枠をつける
 # set view map {scale}                     # 3D 射影描画のリサイズが可能に
 # set multiplot {next|previous}            # 自動レイアウト格子内での移動
-# plot 'data' skip N ...                   # テキストデータ先頭数行をスキップ
 #end
 
-C バージョン 5 での変更 (Changes in version 5)
-2 Changes in version 5
+2 バージョン 5 での変更 (Changes in version 5)
 ?changes
  バージョン 5 で導入された以下の変更は、前の版の gnuplot 用のスクリプト
  の挙動を変える可能性があります。
@@ -2483,7 +2481,7 @@ Ffigure_newsyntax
        rgb(r,g,b) = 65536 * int(r) + 256 * int(g) + int(b)
        splot "data" using 1:2:3:(rgb($1,$2,$3)) with points lc rgb variable
 
-3 dashtype
+3 点線/破線種 (dashtype)
 ?dashtype
 =dashtype
  gnuplot バージョン 5 で、`linecolor` や `linewidth` と同様に、点線/破
@@ -2540,7 +2538,7 @@ Ffigure_newsyntax
       set style line 5 lt rgb "cyan" lw 3 pt 6
       plot sin(x) with linespoints ls 5          # 定義スタイル 5 で
 
-2 layers
+2 レイヤー (layers)
 ?layers
 =behind
 =front
@@ -2703,7 +2701,27 @@ Ffigure_newsyntax
  マウスによる拡大の後の新しい描画範囲は、GPVAL_X_MIN, GPVAL_X_MAX,
  GPVAL_Y_MIN, GPVAL_Y_MAX で参照できることに注意してください。
  以下参照: `gnuplot-defined variables`。
+2 残留 (Persist)
+?persist
+ gnuplot の多くの出力形式 (aqua, pm, qt, x11, windows, wxt, ...) が、ス
+ クリーン上にグラフをその中に描いた表示用のウィンドウを別に開きます。オ
+ プション `persist` は、主たるプログラムが終了したときにも、それらのウ
+ ィンドウを残すよう gnuplot に指示します。
+ これは、非対話型出力形式出力では何もしません。
+ 例えば、以下のコマンドを実行すると
 
+      gnuplot -persist -e 'plot [-5:5] sinh(x)'
+
+ gnuplot は、表示ウィンドウを開き、その中にグラフを描き、そして終了し、
+ 表示ウィンドウはグラフをその中に持ったままスクリーンに残ります。出力形
+ 式によっては、その残ったウィンドウ上でも多少のマウス操作が可能な場合も
+ あります。しかし、グラフの再描画を要求するズーム (とその逆) のような操
+ 作は、既にプログラムが終了しているので一般的には無理です。
+
+ 新しい出力形式を設定するときにも `persist` や `nopersist` を指定できま
+ す。例:
+
+      set term qt persist size 700,500
 
 2 描画 (Plotting)
 ?plotting
@@ -4392,11 +4410,10 @@ Ffigure_mapcontours
 ?exit
  `exit` と `quit` の両コマンドは END-OF-FILE 文字 (通常 Ctrl-D) 同様、
  現在の入力ストリーム、すなわち端末の対話やパイプ入力、ファイル入力 (パ
- イプ) からの入力を終了させます。
-
- 入力ストリームが入れ子 (階層的な `load` のスクリプトで) になっている場
- 合、読み込みは親のストリームで継続されます。トップレベルのストリームが
- 閉じられると、プログラムはそれ自身終了します。
+ イプ) からの入力を終了させます。入力ストリームが入れ子 (階層的な
+ `load` のスクリプトで) になっている場合、読み込みは親のストリームで継
+ 続されます。トップレベルのストリームが閉じられると、プログラムはそれ自
+ 身終了します。
 
  コマンド `exit gnuplot` は、直ちに、無条件に、そして例え入力ストリーム
  が多段階にネストされていても、gnuplot を終了させます。その場合、開かれ
@@ -4404,6 +4421,11 @@ Ffigure_mapcontours
  ます。使用例:
 
        bind "ctrl-x" "unset output; exit gnuplot"
+
+ コマンド `exit error "error message"` は、疑似プログラムエラーを行いま
+ す。対話型モードでは、そのエラーメッセージを表示し、すべのネストされた
+ ループや call を中断してコマンドラインに帰ります。非対話型モードでは、
+ プログラムを終了します。
 
  詳細は、以下参照: `batch/interactive`。
 2 fit
@@ -4630,8 +4652,9 @@ Ffigure_mapcontours
  場合 (以下参照: `set fit maxiter`)、のいずれかを満たすまで続けられます。
  キーボードからその当てはめの反復は中断できますし、それに続いて中止する
  こともできます (以下参照: `fit`)。ユーザ変数 FIT_CONVERGED は、 直前の
- fit コマンドが収束により終了した場合は 1 を含み、それ以外の理由で中断
- した場合は 0 を含みます。
+ fit コマンドが収束により終了した場合は 1 を持ち、それ以外の理由で中断
+ した場合は 0 を持ちます。FIT_NITER は、直前の当てはめで行われた繰り返
+ しの回数を持ちます。
 
  当てはめに使われる関数はしばしばあるモデル (またはある理論) を元にして
  いて、それはデータの振舞を記述したり、あるいは予測しようとします。よっ
@@ -9904,11 +9927,11 @@ Ffigure_missing
  world.dem: mapping のデモ。
 ^ </a>
 3 margin
-?commands set margin
-?commands show margin
-?set margin
-?show margin
-?margin
+?commands set margins
+?commands show margins
+?set margins
+?show margins
+?margins
  `margin` (周囲の余白) とは、描画領域の境界からキャンバスの一番外側まで
  の間隔のことです。この余白の大きさは自動的にとられますが、コマンド
  `set margin` で変更することもできます。`show margin` は現在の設定を表
@@ -9916,10 +9939,11 @@ Ffigure_missing
  以下参照: `set offsets`。
 
  書式:
-       set bmargin {{at screen} <margin>}
        set lmargin {{at screen} <margin>}
        set rmargin {{at screen} <margin>}
        set tmargin {{at screen} <margin>}
+       set bmargin {{at screen} <margin>}
+       set margins <left>, <right>, <top>, <bottom>
        show margin
 
  <margin> のデフォルトの単位には、適切と思われる、文字の高さと幅が使わ

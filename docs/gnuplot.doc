@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.894 2014/06/15 04:15:01 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.896 2014/06/25 05:45:21 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -259,7 +259,6 @@ C
 # set dashtype <tag> <dash-spec>           # user-defined dash patterns
 # set link x2 via f(x) inverse g(x)        # allows non-linear axis scaling
 # set fit quiet|results|brief|verbose      # control the amount of fit output
-# set multiplot next|previous              # out-of-order plotting to an autolayout
 # set contours; splot ... with labels      # label contour lines with numeric values
 # set style textbox                        # text elements can be enclosed in a box
 # set view map {scale}                     # allows resizing a 3D projection plot

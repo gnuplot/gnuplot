@@ -1,9 +1,9 @@
 .\" dummy line
-.\" $Id: gnuplot-ja.1,v 1.6 2012-09-10 16:09:51+09 shige Exp $
+.\" $Id: gnuplot-ja.1,v 1.7 2014-06-17 17:31:59+09 shige Exp $
 .\" 日本語訳: Shigeharu TAKENO <shige@iee.niit.ac.jp>
 .\"
-.\" .TH GNUPLOT 1 " 7 September 2012"
-.TH GNUPLOT 1 " 2012 年 9 月 7 日"
+.\" .TH GNUPLOT 1 " 11 June 2014"
+.TH GNUPLOT 1 " 2014 年 6 月 11 日"
 .UC 4
 .\" .SH NAME
 .SH 名前
@@ -22,18 +22,14 @@ gnuplot \- 対話型グラフ描画プログラム
 は、コマンド入力方式の対話的な描画プログラムです。
 .PP
 .\" If file names are given on the command line,
-.\" gnuplot
-.\" loads each file with the
-.\" .B load
-.\" command, in the order specified, and exits after the last file is
-.\" processed.  If no files are given, \fBgnuplot\fP prompts for
-.\" interactive commands.
+.\" gnuplot loads and executes each file in the order specified,
+.\" and exits after the last file is processed.
+.\" If no files are given, \fBgnuplot\fP prompts for interactive commands.
 コマンドラインから複数のファイル名を与えると、
-gnuplot は各ファイルを指定した順番に
-.B load
-コマンドで読み込み、最後のファイルを実行した後に終了します。
+gnuplot は各ファイルを指定した順番に読み込み、実行し、
+そして最後のファイルを処理したら終了します。
 ファイルを指定しなかった場合は、
-\fBgnuplot\fP は対話型コマンドの入力を促します。
+\fBgnuplot\fP は対話型でコマンドの入力を促します。
 .PP
 .\" Here are some of its features:
 gnuplot は以下のような特徴を持ちます:
@@ -84,6 +80,16 @@ load と save。
 \fB\-p, \-\-persist\fP は、
 gnuplot プログラムが終了した後も描画ウィンドウを残します。
 .PP
+.\" \fB\-c scriptname ARG1 ARG2 ..., load script using gnuplot's "call" mechanism and pass it the remainder of the command line as arguments
+\fB\-c scriptname ARG1 ARG2 ... は、
+gnuplot の "call" の仕組みでスクリプト scriptname を読み込み、
+コマンドラインの残りはそれへの引数として渡します。
+.PP
+.\" \fB\-d, \-\-default\fP settings.  Do not read from gnuplotrc or ~/.gnuplot on entry.
+\fB\-d, \-\-default\fP は、
+デフォルトの設定で起動します。
+これは、gnuplotrc や ~/.gnuplot を起動時には読み込みません。
+.PP
 .\" \fB\-e "command list"\fP executes the requested commands before loading the next input file.
 \fB\-e "command list"\fP は、
 次の入力ファイルを読み込む前に指定したコマンドを実行します。
@@ -96,25 +102,18 @@ gnuplot プログラムが終了した後も描画ウィンドウを残します。
 .\" .SH X11 OPTIONS
 .SH X11 オプション
 .\" .B Gnuplot
-.\" provides the \fIx11\fP terminal type for use
-.\" with X servers. This terminal type is set automatically at startup if
-.\" the \fBGNUTERM\fR environment variable is set to x11,
-.\" or if the \fB\-display\fR command line option is used.
-.B gnuplot
-は、X サーバでの使用のために \fIx11\fP 出力形式を提供しています。
-\fBGNUTERM\fR 環境変数が x11 と設定されているか、
-コマンドラインオプション \fB\-display\fR を使用した場合は、
-起動時に自動的にこの出力形式が設定されます。
-.\" For terminal type Ix11, \fIgnuplot\fP
+.\" shige -> 不要 ?
+.\" For terminal type x11, \fIgnuplot\fP
 .\" accepts the standard X Toolkit options and resources such as geometry, font,
 .\" and background. See the X(1) man page for a description of common options.
 x11 出力形式に関しては、\fIgnuplot\fP は geometry やフォント、
 背景色などの通常の X Toolkit オプションやリソースの指定を受けつけます。
 それら通常のオプションについては、X(1) のマニュアルページを参照してください。
 .\" For additional X options specific to gnuplot, type \fIhelp x11\fP on the
-.\" gnuplot command line.
+.\" gnuplot command line. These options have no effect on other terminal types.
 gnuplot 特有の追加の X のオプションについては、
 gnuplot のコマンドライン上で \fIhelp x11\fP として確認してください。
+これらのオプションは、他の出力形式では何もしません。
 .\" .SH ENVIRONMENT
 .SH 環境変数
 .\" A number of shell environment variables are understood by
@@ -246,8 +245,5 @@ gnuplot バージョン 3.8 以降、ソース一式は、SourceForge 上で、
 .\" See the printed manual or the on-line help for details on specific commands.
 個々のコマンドの詳細については、印刷されたマニュアルやオンラインヘルプを参照。
 .br
-.\" Project web site at 
-プロジェクト Web サイト
-.\" /I http://gnuplot.info
-.I http://gnuplot.info
-を参照。
+.\" Project web site at http://gnuplot.info
+プロジェクト Web サイト: http://gnuplot.info
