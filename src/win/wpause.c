@@ -1,5 +1,5 @@
 /*
- * $Id: wpause.c,v 1.20.2.1 2011/12/11 11:38:53 markisch Exp $
+ * $Id: wpause.c,v 1.20.2.2 2014/07/04 07:45:44 markisch Exp $
  */
 
 /* GNUPLOT - win/wpause.c */
@@ -273,9 +273,9 @@ WndPauseProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 					8*cxChar, 7*cyChar/4,
 					hwnd, (HMENU)IDCANCEL,
 					((LPCREATESTRUCT) lParam)->hInstance, NULL);
-			lppw->lpfnOK = (WNDPROC) GetWindowLongPtr(lppw->hOK, GWL_WNDPROC);
+			lppw->lpfnOK = (WNDPROC) GetWindowLongPtr(lppw->hOK, GWLP_WNDPROC);
 			SetWindowLongPtr(lppw->hOK, GWL_WNDPROC, (LONG_PTR)PauseButtonProc);
-			lppw->lpfnCancel = (WNDPROC) GetWindowLongPtr(lppw->hCancel, GWL_WNDPROC);
+			lppw->lpfnCancel = (WNDPROC) GetWindowLongPtr(lppw->hCancel, GWLP_WNDPROC);
 			SetWindowLongPtr(lppw->hCancel, GWL_WNDPROC, (LONG_PTR)PauseButtonProc);
 			if (GetParent(hwnd))
 				EnableWindow(GetParent(hwnd),FALSE);
