@@ -1,5 +1,5 @@
 /*
- * $Id: wpause.c,v 1.20.2.2 2014/07/04 07:45:44 markisch Exp $
+ * $Id: wpause.c,v 1.20.2.3 2014/07/04 10:30:13 markisch Exp $
  */
 
 /* GNUPLOT - win/wpause.c */
@@ -274,9 +274,9 @@ WndPauseProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 					hwnd, (HMENU)IDCANCEL,
 					((LPCREATESTRUCT) lParam)->hInstance, NULL);
 			lppw->lpfnOK = (WNDPROC) GetWindowLongPtr(lppw->hOK, GWLP_WNDPROC);
-			SetWindowLongPtr(lppw->hOK, GWL_WNDPROC, (LONG_PTR)PauseButtonProc);
+			SetWindowLongPtr(lppw->hOK, GWLP_WNDPROC, (LONG_PTR)PauseButtonProc);
 			lppw->lpfnCancel = (WNDPROC) GetWindowLongPtr(lppw->hCancel, GWLP_WNDPROC);
-			SetWindowLongPtr(lppw->hCancel, GWL_WNDPROC, (LONG_PTR)PauseButtonProc);
+			SetWindowLongPtr(lppw->hCancel, GWLP_WNDPROC, (LONG_PTR)PauseButtonProc);
 			if (GetParent(hwnd))
 				EnableWindow(GetParent(hwnd),FALSE);
 #if 0 /* HBB 981203 */
@@ -307,7 +307,7 @@ LRESULT CALLBACK
 PauseButtonProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	LPPW lppw;
-	LONG n = GetWindowLongPtr(hwnd, GWL_ID);
+	LONG n = GetWindowLongPtr(hwnd, GWLP_ID);
 	lppw = (LPPW)GetWindowLongPtr(GetParent(hwnd), 0);
 	switch(message) {
 		case WM_KEYDOWN:
