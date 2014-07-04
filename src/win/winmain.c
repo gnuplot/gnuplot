@@ -1,5 +1,5 @@
 /*
- * $Id: winmain.c,v 1.52.2.6 2014/06/15 10:33:33 markisch Exp $
+ * $Id: winmain.c,v 1.52.2.7 2014/07/04 07:45:43 markisch Exp $
  */
 
 /* GNUPLOT - win/winmain.c */
@@ -557,7 +557,7 @@ int main(int argc, char **argv)
         if (TextInit(&textwin))
                 exit(1);
         textwin.hIcon = LoadIcon(hInstance, "TEXTICON");
-        SetClassLongPtr(textwin.hWndParent, GCL_HICON, (LONG_PTR)textwin.hIcon);
+        SetClassLongPtr(textwin.hWndParent, GCLP_HICON, (LONG_PTR)textwin.hIcon);
 	/* Note: we want to know whether this is an interactive session so that we can
 	 * decide whether or not to write status information to stderr.  The old test
 	 * for this was to see if (argc > 1) but the addition of optional command line

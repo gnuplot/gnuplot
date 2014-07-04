@@ -1,5 +1,5 @@
 /*
- * $Id: wgraph.c,v 1.144.2.10 2014/02/11 08:47:54 markisch Exp $
+ * $Id: wgraph.c,v 1.144.2.11 2014/07/04 07:45:43 markisch Exp $
  */
 
 /* GNUPLOT - win/wgraph.c */
@@ -437,8 +437,8 @@ GraphInit(LPGW lpgw)
 		NULL, NULL, lpgw->hInstance, lpgw);
 
 	if (lpgw->hWndGraph)
-		SetClassLongPtr(lpgw->hWndGraph, GCL_HICON,
-			(LONG) LoadIcon(lpgw->hInstance, "GRPICON"));
+		SetClassLongPtr(lpgw->hWndGraph, GCLP_HICON,
+			(LONG_PTR) LoadIcon(lpgw->hInstance, "GRPICON"));
 
 	lpgw->hStatusbar = CreateWindowEx(0, STATUSCLASSNAME, (LPSTR)NULL,
 				  WS_CHILD | SBARS_SIZEGRIP,
