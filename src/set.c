@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.452 2014/06/02 02:45:39 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.453 2014/06/25 05:45:21 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -5682,10 +5682,8 @@ static void
 load_tics(AXIS_INDEX axis)
 {
     if (equals(c_token, "(")) {	/* set : TIC_USER */
-	if (equals(++c_token, ")"))
-	    c_token++;
-	else
-	    load_tic_user(axis);
+	c_token++;
+	load_tic_user(axis);
     } else {			/* series : TIC_SERIES */
 	load_tic_series(axis);
     }
@@ -5708,7 +5706,12 @@ load_tic_user(AXIS_INDEX axis)
 	axis_array[axis].ticdef.def.user = NULL;
     }
 
-    while (!END_OF_COMMAND) {
+    /* Mark this axis as user-generated ticmarks only, unless the */
+    /* mix flag indicates that both user- and auto- tics are OK.  */
+    if (!axis_array[axis].ticdef.def.mix)
+	axis_array[axis].ticdef.type = TIC_USER;
+
+    while (!END_OF_COMMAND && !equals(c_token,")")) {
 	int ticlevel=0;
 	int save_token;
 	/* syntax is  (  {'format'} value {level} {, ...} )
