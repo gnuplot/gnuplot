@@ -1,3 +1,8 @@
+2014-07-06  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/set.c (load_tic_user):  "set Xtics ()" should clear the list
+	of user-specified tics rather than setting tic generation to auto.
+
 2013-07-04  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/internal.c src/win/wcommon.h src/win/wgraph.c src/win/winmain.c
