@@ -136,6 +136,9 @@ KNOWN ISSUES
   Toggling plots drawn in hidden3d mode (hidden line removal) does not work.
 
 * Linking against wxWidgets 3.0 is not yet supported (wxt terminal).
+  If you configure wxt without also configure X11, you may need to set the
+  environmental variable TERMLIBS before configuring:
+    TERMLIBS="-lX11"  ./configure
 
 * Mac OSX ships with a terminal input library that appears to be GNU
   libreadline, but isn't really.  The program tries to cope with this, but
