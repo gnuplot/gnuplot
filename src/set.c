@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.453 2014/06/25 05:45:21 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.454 2014/07/07 03:51:04 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -1541,12 +1541,15 @@ set_dummy()
     for (i=0; i<MAX_NUM_VAR; i++) {
 	if (END_OF_COMMAND)
 	    return;
-	if (!equals(c_token,","))
+	if (isalpha(gp_input_line[token[c_token].start_index]))
 	    copy_str(set_dummy_var[i],c_token++, MAX_ID_LEN);
-	c_token++;
+	if (equals(c_token,","))
+	    c_token++;
+	else
+	    break;
     }
     if (!END_OF_COMMAND)
-	int_error(c_token,"too many dummy variables");
+	int_error(c_token,"unrecognized syntax");
 }
 
 
