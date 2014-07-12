@@ -1,3 +1,10 @@
+2014-07-12 Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/parse.c (check_for_iteration):  Fix failure to detect some loop
+	[start:end:increment] combinations that should be executed only once
+	or not executed at all.
+	Bug #1441
+
 2014-07-10  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/set.c (set_dummy):  More sanity checks on "set dummy" syntax.
