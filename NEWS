@@ -24,6 +24,7 @@ New features, changes and fixes since gnuplot version 4.6.5
 * FIX logscale cb axis with volatile data
 * FIX qt terminal timing problem with mouse click+release
 * FIX qt terminal handle window close events
+* FIX incorrect processing of certain loop [start:end:incr] combinations
 
 
 New features, changes and fixes in gnuplot version 4.6.5

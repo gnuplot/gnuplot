@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: parse.c,v 1.66.2.5 2014/03/21 06:25:45 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: parse.c,v 1.66.2.6 2014/03/21 21:45:03 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - parse.c */
@@ -1021,7 +1021,7 @@ is_builtin_function(int t_num)
 t_iterator *
 check_for_iteration()
 {
-    char *errormsg = "Expecting iterator \tfor [<var> = <start> : <end>]\n\t\t\tor\tfor [<var> in \"string of words\"]";
+    char *errormsg = "Expecting iterator \tfor [<var> = <start> : <end> {: <incr>}]\n\t\t\tor\tfor [<var> in \"string of words\"]";
     int nesting_depth = 0;
     t_iterator *iter = NULL;
     t_iterator *this_iter = NULL;
@@ -1037,6 +1037,7 @@ check_for_iteration()
 	int iteration_current;
 	int iteration = 0;
 	TBOOLEAN empty_iteration;
+	TBOOLEAN just_once = FALSE;
 
 	c_token++;
 	if (!equals(c_token++, "[") || !isletter(c_token))
@@ -1052,6 +1053,8 @@ check_for_iteration()
 	    if (equals(c_token,":")) {
 	    	c_token++;
 	    	iteration_increment = int_expression();
+		if (iteration_increment == 0)
+		    int_error(c_token-1, errormsg);
 	    }
 	    if (!equals(c_token++, "]"))
 	    	int_error(c_token-1, errormsg);
@@ -1081,15 +1084,22 @@ check_for_iteration()
 	empty_iteration = FALSE;	
 	if ( (iteration_udv != NULL)
 	&&   ((iteration_end > iteration_start && iteration_increment < 0)
-	   || (iteration_end < iteration_start && iteration_increment > 0)))
+	   || (iteration_end < iteration_start && iteration_increment > 0))) {
 		empty_iteration = TRUE;
+		FPRINTF((stderr,"Empty iteration\n"));
+	}
 
-	/* allocating a node of the linked list and initializing its fields */
-	/* iterating just once is the same as not iterating at all, 
-	 * so we skip building the node in that case */
-	if (iteration_increment 
-	&& (iteration_start != iteration_end)
-	&& (abs(iteration_end - iteration_start) >= abs(iteration_increment))) {
+	/* Allocating a node of the linked list nested iterations. */
+	/* Iterating just once is the same as not iterating at all */
+	/* so we skip building the node in that case.		   */
+	if (iteration_start == iteration_end)
+	    just_once = TRUE;
+	if (iteration_start < iteration_end && iteration_end < iteration_start + iteration_increment)
+	    just_once = TRUE;
+	if (iteration_start > iteration_end && iteration_end > iteration_start + iteration_increment)
+	    just_once = TRUE;
+
+	if (!just_once) {
 	    this_iter = gp_alloc(sizeof(t_iterator), "iteration linked list");
 	    this_iter->iteration_udv = iteration_udv; 
 	    this_iter->iteration_string = iteration_string;
@@ -1100,7 +1110,7 @@ check_for_iteration()
 	    this_iter->iteration = iteration;
 	    this_iter->done = FALSE;
 	    this_iter->really_done = FALSE;
-	    this_iter->empty_iteration = FALSE;
+	    this_iter->empty_iteration = empty_iteration;
 	    this_iter->next = NULL;
 	    this_iter->prev = NULL;
 	    if (nesting_depth == 0) {
@@ -1114,7 +1124,7 @@ check_for_iteration()
 	    }
 	    iter->prev = this_iter; /* a shortcut: making the list circular */
 
-	    /* if one iteration in the chain is empty, the whole chain of iterations is empty, too */
+	    /* if one iteration in the chain is empty, the subchain of nested iterations is too */
 	    if (!iter->empty_iteration) 
 		iter->empty_iteration = empty_iteration;
 
