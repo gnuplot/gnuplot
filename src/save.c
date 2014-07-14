@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.252 2014/05/05 06:13:05 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.253 2014/06/03 15:24:19 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -522,7 +522,7 @@ set bar %f %s\n",
 	}
 	fprintf(fp, "\n");
     }
-#ifdef BACKWARDS_COMPATIBLE
+#if TRUE || defined(BACKWARDS_COMPATIBLE)
     fprintf(fp, "set style increment %s\n", prefer_line_styles ? "userstyles" : "default");
 #endif
     fputs("unset style line\n", fp);

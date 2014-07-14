@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.454 2014/07/07 03:51:04 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.455 2014/07/10 05:14:13 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -4506,7 +4506,7 @@ set_style()
 	break;
 #endif
     case SHOW_STYLE_INCREMENT:
-#ifdef BACKWARDS_COMPATIBLE
+#if TRUE || defined(BACKWARDS_COMPATIBLE)
 	c_token++;
 	if (END_OF_COMMAND || almost_equals(c_token,"def$ault"))
 	    prefer_line_styles = FALSE;

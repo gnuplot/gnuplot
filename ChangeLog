@@ -1,3 +1,10 @@
+2014-07-14 Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/gadgets.c src/save.c src/set.c src/gadgets.h:
+	Continue to recognize "set style increment user" even though it has
+	been deprecated in favor of "set linetype".
+	Bug #1411 (not really a bug)
+
 2014-07-12 Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/parse.c (check_for_iteration):  Fix failure to detect some loop

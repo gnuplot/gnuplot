@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gadgets.c,v 1.112 2014/06/02 02:45:39 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gadgets.c,v 1.113 2014/07/01 15:27:32 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - gadgets.c */
@@ -183,7 +183,7 @@ struct object default_ellipse = DEFAULT_ELLIPSE_STYLE;
 filledcurves_opts filledcurves_opts_data = EMPTY_FILLEDCURVES_OPTS;
 filledcurves_opts filledcurves_opts_func = EMPTY_FILLEDCURVES_OPTS;
 
-#ifdef BACKWARDS_COMPATIBLE
+#if TRUE || defined(BACKWARDS_COMPATIBLE)
 /* Prefer line styles over plain line types */
 TBOOLEAN prefer_line_styles = FALSE;
 #endif
