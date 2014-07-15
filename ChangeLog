@@ -1,3 +1,8 @@
+2014-07-15 Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/set.c (set_sep):  Revise parsing of "set datafile separator".
+	Allow string constants, keywords "tab" and "comma".
+
 2014-07-12 Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/parse.c (check_for_iteration):  Fix failure to detect some loop
