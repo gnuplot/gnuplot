@@ -1,3 +1,12 @@
+2014-07-18 Ethan A Merritt  <merritt@u.washington.edu>
+
+	* demo/Makefile.am.in: Do not create a symlink to GNUPLOT_X11 in the
+	build directory during "make check". This was probably intended to 
+	handle the rare case of ./configure --program-suffix=foo but it breaks
+	the more common case of configuring on a system without x11 support
+	and then running "make check" twice.
+	Bugfix
+
 2014-07-14 Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/gadgets.c src/save.c src/set.c src/gadgets.h:
