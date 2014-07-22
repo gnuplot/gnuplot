@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.456 2014/05/05 06:13:05 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.457 2014/06/17 00:47:45 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -939,6 +939,10 @@ plot_impulses(struct curve_points *plot, int yaxis_x, int xaxis_y)
 	    continue;
 
 	if (!polar && !inrange(plot->points[i].x, X_AXIS.min, X_AXIS.max))
+	    continue;
+
+	/* This catches points that are outside trange[theta_min:theta_max] */
+	if (polar && (plot->points[i].type == EXCLUDEDRANGE))
 	    continue;
 
 	x = map_x(plot->points[i].x);

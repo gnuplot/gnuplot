@@ -1,5 +1,5 @@
 /*
- * $Id: gp_types.h,v 1.61 2014/04/25 00:22:23 sfeam Exp $
+ * $Id: gp_types.h,v 1.62 2014/05/05 06:13:05 sfeam Exp $
  */
 
 /* GNUPLOT - gp_types.h */
@@ -153,7 +153,9 @@ typedef struct value {
 typedef enum coord_type {
     INRANGE,			/* inside plot boundary */
     OUTRANGE,			/* outside plot boundary, but defined */
-    UNDEFINED			/* not defined at all */
+    UNDEFINED,			/* not defined at all */
+    EXCLUDEDRANGE		/* would be inside plot, but excluded for other reasons */
+				/* e.g. in polar mode and outside of trange[tmin:tmax] */
 } coord_type;
 
 

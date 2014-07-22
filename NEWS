@@ -4,8 +4,9 @@ Changes since 5.0.rc1
 * NEW grey out key entries when corresponding plot is toggled off
 * NEW allow parenthesized expressions as call parameters
 * NEW set margins <left>, <right>, <top>, <bottom>
+* NEW set trange [theta_min:theta_max] filters input data in polar plots
 * CHANGE apply "set key {no}enhanced}" to the key title
-* CHANGE scale dashlenth with line width
+* CHANGE scale dashlength with line width
 * FIX wxgtk3 requires initialization of Xthreads
 * FIX width adjustment for long key title in multicolumn keys
 * FIX treat data value read as "NaN" the same as we would "1/0"

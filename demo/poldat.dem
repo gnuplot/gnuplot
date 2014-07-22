@@ -1,5 +1,5 @@
 #
-# $Id: poldat.dem,v 1.8 2010/11/08 20:31:18 sfeam Exp $
+# $Id: poldat.dem,v 1.9 2010/11/18 23:59:58 sfeam Exp $
 #
 #
 set size square
@@ -33,6 +33,7 @@ cu(t,.5),cv(t,.5),cu(t,.5),-cv(t,.5),\
 tu(t,0),tv(t,0)
 #cu(t,5),cv(t,5),cu(t,5),-cv(t,5)
 pause -1 "Hit return to continue"
+
 set angles degrees
 set polar
 set grid polar 15.
@@ -43,7 +44,7 @@ set xlabel "Azimuth"
 set ylabel "dBSM"
 set style data line
 set rrange [-200:60]
-set trange [-pi:pi]
+set trange [*:*]
 set xrange [-220:220]
 set yrange [-220:220]
 unset xtics

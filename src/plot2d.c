@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.334 2014/05/11 17:39:59 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.335 2014/06/14 15:32:58 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -1249,6 +1249,7 @@ store2d_point(
 {
     struct coordinate GPHUGE *cp = &(current_plot->points[i]);
     coord_type dummy_type = INRANGE;   /* sometimes we dont care about outranging */
+    TBOOLEAN excluded_range = FALSE;
 
 #ifdef BACKWARDS_COMPATIBLE
     /* jev -- pass data values thru user-defined function */
@@ -1277,7 +1278,26 @@ store2d_point(
 
     if (polar) {
 	double newx, newy;
+	double theta = x * ang2rad;
+	AXIS *theta_axis = &axis_array[T_AXIS];
 
+	/* "x" is really the polar angle theta,	so check it against trange. */
+	if (theta < theta_axis->data_min)
+	    theta_axis->data_min = theta;
+	if (theta > theta_axis->data_max)
+	    theta_axis->data_max = theta;
+	if ( theta < theta_axis->min
+	&&  (theta <= theta_axis->max || theta_axis->max == -VERYLARGE)) {
+	    if ((theta_axis->autoscale & AUTOSCALE_MAX) == 0)
+		excluded_range = TRUE;
+	}
+	if ( theta > theta_axis->max
+	&&  (theta >= theta_axis->min || theta_axis->min == VERYLARGE)) {
+	    if ((theta_axis->autoscale & AUTOSCALE_MIN) == 0)
+		excluded_range = TRUE;
+	}
+
+	/* "y" at this point is really "r", so check it against rrange.	*/
 	if (y < R_AXIS.data_min)
 	    R_AXIS.data_min = y;
 	if (y < R_AXIS.min) {
@@ -1470,6 +1490,11 @@ store2d_point(
 	COLOR_STORE_WITH_LOG_AND_UPDATE_RANGE(current_plot->varcolor[i],
 		current_plot->varcolor[i], dummy_type, 
 		COLOR_AXIS, current_plot->noautoscale, NOOP, NOOP);
+
+    /* July 2014 - Some points are excluded because they fall outside of trange	*/
+    /* even though they would be inside the plot if drawn.			*/
+    if (excluded_range)
+	cp->type = EXCLUDEDRANGE;
 
 }                               /* store2d_point */
 

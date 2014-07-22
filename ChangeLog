@@ -1,3 +1,19 @@
+2014-07-22 Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/gp_types.h src/plot2d.c (store2d_point):
+	INRANGE/OUTRANGE refer to points that are inside/outside the plot
+	boundaries as defined by xrange, yrange, etc.  They fail to handle
+	points that are outside theta range limits given for polar data.
+	That is, a point may be outside of trange [pi/2:pi] even though it
+	would lie well inside the plot boundaries if drawn.
+	Add a new category EXCLUDEDRANGE for such points. 
+
+	* src/graphics.c (plot_impulses):  Test for EXCLUDEDRANGE data points
+	so that set trange [theta_min:theta_max] actually does something.
+	Bug #1439
+
+	* demo/poldat.dem:  Make sure trange includes the whole plot.
+
 2014-07-18 Ethan A Merritt  <merritt@u.washington.edu>
 
 	* demo/Makefile.am.in: Do not create a symlink to GNUPLOT_X11 in the
