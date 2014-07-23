@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.324 2014/06/03 15:24:19 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.325 2014/06/25 05:45:21 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -3125,6 +3125,8 @@ show_mouse()
 	} else {
 	    fprintf(stderr, "\tButton 2 draws temporary labels\n");
 	}
+	fprintf(stderr, "\tzoom factors are x: %g   y: %g\n",
+		mouse_setting.xmzoom_factor, mouse_setting.ymzoom_factor);
 	fprintf(stderr, "\tzoomjump is %s\n",
 	    mouse_setting.warp_pointer ? "on" : "off");
 	fprintf(stderr, "\tcommunication commands will %sbe shown\n",

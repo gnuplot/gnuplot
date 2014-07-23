@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: mouse.c,v 1.164 2014/05/10 18:55:19 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: mouse.c,v 1.165 2014/06/11 19:59:00 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - mouse.c */
@@ -118,13 +118,6 @@ static int mouse_x = -1, mouse_y = -1;
  * system(s)
  */
 static double real_x, real_y, real_x2, real_y2;
-
-
-/* mouse_polar_distance is set to TRUE if user wants to see the
- * distance between the ruler and mouse pointer in polar coordinates
- * too (otherwise, distance in cartesian coordinates only is shown) */
-/* int mouse_polar_distance = FALSE; */
-/* moved to the struct mouse_setting_t (joze) */
 
 
 /* status of buttons; button i corresponds to bit (1<<i) of this variable
@@ -1661,11 +1654,14 @@ zoom_around_mouse(int zoom_key)
 	x2max = rescale(SECOND_X_AXIS, w2, w1);
       	y2max = rescale(SECOND_Y_AXIS, w2, w1);
     } else {
-	double scale = (zoom_key=='+') ? 0.75 : 1.25;
-	rescale_around_mouse(&xmin,  &xmax,  FIRST_X_AXIS,  real_x,  scale);
-	rescale_around_mouse(&ymin,  &ymax,  FIRST_Y_AXIS,  real_y,  scale);
-	rescale_around_mouse(&x2min, &x2max, SECOND_X_AXIS, real_x2, scale);
-	rescale_around_mouse(&y2min, &y2max, SECOND_Y_AXIS, real_y2, scale);
+	int zsign = (zoom_key=='+') ? -1 : 1;
+	double xscale = pow(1.25, zsign * mouse_setting.xmzoom_factor);
+	double yscale = pow(1.25, zsign * mouse_setting.ymzoom_factor);
+	/* {x,y}zoom_factor = 0: not zoom, = 1: 0.8/1.25 zoom */
+	rescale_around_mouse(&xmin,  &xmax,  FIRST_X_AXIS,  real_x,  xscale);
+	rescale_around_mouse(&ymin,  &ymax,  FIRST_Y_AXIS,  real_y,  yscale);
+	rescale_around_mouse(&x2min, &x2max, SECOND_X_AXIS, real_x2, xscale);
+	rescale_around_mouse(&y2min, &y2max, SECOND_Y_AXIS, real_y2, yscale);
     }
     do_zoom(xmin, ymin, x2min, y2min, xmax, ymax, x2max, y2max);
     if (display_ipc_commands())

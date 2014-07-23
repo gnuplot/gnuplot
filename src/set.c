@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.455 2014/07/10 05:14:13 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.456 2014/07/14 14:45:56 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -2885,6 +2885,18 @@ set_mouse()
 		map_position(&where, &x, &y, "ruler at");
 		set_ruler(TRUE, (int)x, (int)y);
 	    }
+	} else if (almost_equals(c_token, "zoomfac$tors")) {
+	    double x = 1.0, y = 1.0;
+	    c_token++;
+	    if (!END_OF_COMMAND) {
+		x = real_expression();
+		if (equals(c_token,",")) {
+		    c_token++;
+		    y = real_expression();
+		}
+	    }
+	    mouse_setting.xmzoom_factor = x;
+	    mouse_setting.ymzoom_factor = y;
 	} else {
 	    if (!END_OF_COMMAND)
     		int_error(c_token, "wrong option");

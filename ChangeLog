@@ -1,3 +1,8 @@
+2014-07-23  Shigeharu Takeno  <shige@iee.niit.ac.jp>
+
+	* src/mouse.c src/mouse.h src/set.c src/show.c docs/gnuplot.doc:
+	New command 'set mouse zoomfactors <xfactor>,<yfactor>'
+
 2014-07-22 Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/gp_types.h src/plot2d.c (store2d_point):
