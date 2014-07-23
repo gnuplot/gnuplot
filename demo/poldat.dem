@@ -1,5 +1,5 @@
 #
-# $Id: poldat.dem,v 1.9 2010/11/18 23:59:58 sfeam Exp $
+# $Id: poldat.dem,v 1.10 2014/07/22 23:11:16 sfeam Exp $
 #
 #
 set size square
@@ -523,7 +523,8 @@ set view equal xy
 set size square
 set noxtics
 set noytics
-set rrange [.5:19]
+set rrange [.5 : 19]
+set trange [pi/2 : 2*pi]
 set rtics axis scale 0.5,0 nomirror rotate by -270  offset 0, 0.7
 set rtics (2,5,10,15)
 set key opaque box samplen 0.75
