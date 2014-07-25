@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.243 2014/05/09 22:14:11 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.244 2014/05/30 20:10:55 sfeam Exp $"); }
 #endif
 
 #define MOUSE_ALL_WINDOWS 1
@@ -2528,6 +2528,7 @@ exec_cmd(plot_struct *plot, char *command)
 	sscanf(buffer, "D%8s", pattern);
 	for (len=0; isalpha((unsigned char)pattern[len]); len++) {
 	    pattern[len] = pattern[len] + 1 - 'A';
+	    pattern[len] *= plot->lwidth * 0.5;
 	}
 	pattern[len] = '\0';
 	XSetDashes(dpy, gc, 0, pattern, len);
@@ -2555,8 +2556,18 @@ exec_cmd(plot_struct *plot, char *command)
 
 	    if (((dashedlines == yes) && dashes[plot->lt][0])
 	    ||  (plot->lt == LT_AXIS+2 && dashes[LT_AXIS+2][0])) {
+		char pattern[DASHPATTERN_LENGTH+1];
+		int len = strlen(dashes[plot->lt]);
+		int i;
+
+		pattern[len] = '\0';
+		for (i=0; i<len; i++) {
+		    pattern[i] = dashes[plot->lt][i];
+		    pattern[i] *= plot->lwidth;
+		}
+
 		plot->type = LineOnOffDash;
-		XSetDashes(dpy, gc, 0, dashes[plot->lt], strlen(dashes[plot->lt]));
+		XSetDashes(dpy, gc, 0, pattern, len);
 	    } else {
 		plot->type = LineSolid;
 	    }

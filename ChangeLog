@@ -1,3 +1,7 @@
+2014-07-25 Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/gplt_x11.c: Scale x11 dashlength with linewidth.
+
 2014-07-23  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* src/mouse.c src/mouse.h src/set.c src/show.c docs/gnuplot.doc:
