@@ -1,5 +1,5 @@
 /*
- * $Id: gp_cairo.c,v 1.84 2014/06/03 17:58:20 sfeam Exp $
+ * $Id: gp_cairo.c,v 1.85 2014/06/07 03:42:27 sfeam Exp $
  */
 
 /* GNUPLOT - gp_cairo.c */
@@ -336,13 +336,15 @@ void gp_cairo_set_font(plot_struct *plot, const char *name, int fontsize)
 
 void gp_cairo_set_linewidth(plot_struct *plot, double linewidth)
 {
+	FPRINTF((stderr,"set_linewidth %lf\n",linewidth));
+
 	/*stroke any open path */
 	gp_cairo_stroke(plot);
 	/* draw any open polygon set */
 	gp_cairo_end_polygon(plot);
 
-	FPRINTF((stderr,"set_linewidth %lf\n",linewidth));
-
+	if (linewidth < 0.25)	/* Admittedly arbitrary */
+	    linewidth = 0.25;
 	plot->linewidth = linewidth;
 }
 
@@ -547,11 +549,13 @@ void gp_cairo_set_dashtype(plot_struct *plot, int type, t_dashtype *custom_dash_
 		/* Convert to internal representation */
 		int i;
 		double empirical_scale = 0.55;
+		if (plot->linewidth > 1)
+			empirical_scale *= plot->linewidth;
+
 		for (i=0; i<8; i++)
 			plot->current_dashpattern[i] = custom_dash_type->pattern[i]
 				* plot->dashlength
-				* plot->oversampling_scale * empirical_scale
-				* plot->linewidth;
+				* plot->oversampling_scale * empirical_scale;
 		FPRINTF((stderr,"gp_cairo_set_dashtype: custom pattern\n"));
 		FPRINTF((stderr,"	%f %f %f %f %f %f %f %f\n",
 			plot->current_dashpattern[0], plot->current_dashpattern[1],
@@ -563,11 +567,15 @@ void gp_cairo_set_dashtype(plot_struct *plot, int type, t_dashtype *custom_dash_
 	} else if (type > 0 && lt != 0) {
 		/* Use old (version 4) set of linetype patterns */
 		int i;
+		double empirical_scale = 1.;
+		if (plot->linewidth > 1)
+			empirical_scale *= plot->linewidth;
+
 		for (i=0; i<8; i++)
 			plot->current_dashpattern[i] = dashpattern[lt-1][i]
 				* plot->dashlength
 				* plot->oversampling_scale
-				* plot->linewidth;
+				* empirical_scale;
 		plot->linestyle = GP_CAIRO_DASH;
 
 	} else {
@@ -599,10 +607,12 @@ void gp_cairo_stroke(plot_struct *plot)
 	else if (lt == LT_AXIS || plot->linestyle == GP_CAIRO_DOTS) {
 		/* Grid lines (lt 0) */
 		double dashes[2];
-		dashes[0] = 0.4 * plot->oversampling_scale * plot->dashlength * plot->linewidth;
-		dashes[1] = 4.0 * plot->oversampling_scale * plot->dashlength * plot->linewidth;
+		double empirical_scale = 1.0;
+		if (plot->linewidth > 1)
+			empirical_scale *= plot->linewidth;
+		dashes[0] = 0.4 * plot->oversampling_scale * plot->dashlength * empirical_scale;
+		dashes[1] = 4.0 * plot->oversampling_scale * plot->dashlength * empirical_scale;
 		cairo_set_dash(plot->cr, dashes, 2 /*num_dashes*/, 0 /*offset*/);
-		lw *= 0.6;
 	}
 
 	else if (plot->linestyle == GP_CAIRO_DASH) {

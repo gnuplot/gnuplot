@@ -1,3 +1,9 @@
+2014-07-28 Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/wxterminal/gp_cairo.c:  Do not pass a linewidth of zero to the
+	cairo library.  The linewidth of LT_AXIS is now set in the core code,
+	do not further reduce it in gp_cairo_stroke().
+
 2014-07-25 Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/gplt_x11.c: Scale x11 dashlength with linewidth.
