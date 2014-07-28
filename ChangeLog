@@ -1,3 +1,7 @@
+2014-07-28 Allin Cottrell  <cottrell@wfu.edu>
+
+	* src/syscfg.h:  Report 32/64 bit Windows build in version string
+
 2014-07-28 Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/wxterminal/gp_cairo.c:  Do not pass a linewidth of zero to the
