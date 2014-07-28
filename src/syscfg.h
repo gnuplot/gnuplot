@@ -1,5 +1,5 @@
 /*
- * $Id: syscfg.h,v 1.47 2011/09/04 11:08:33 markisch Exp $
+ * $Id: syscfg.h,v 1.47.2.1 2011/12/11 11:41:03 markisch Exp $
  */
 
 /* GNUPLOT - syscfg.h */
@@ -99,11 +99,21 @@
 # endif  /* __DECC */
 #endif /* VMS */
 
-#if defined(_WINDOWS) || defined(_Windows)
+#if defined(_WINDOWS) || defined(_Windows) || defined(WIN32) || defined(_WIN32)
 # ifndef _Windows
 #  define _Windows
 # endif
-# define OS "MS-Windows 32 bit"
+# ifndef WIN32
+#  define WIN32
+# endif
+# ifndef _WIN32
+#  define _WIN32
+# endif
+# ifdef _WIN64
+#  define OS "MS-Windows 64 bit"
+# else
+#  define OS "MS-Windows 32 bit"
+# endif
 /* introduced by Pedro Mendes, prm@aber.ac.uk */
 #  define far
 /* Fix for broken compiler headers
@@ -117,6 +127,18 @@
 # define DIRSEP2 '/'
 # define PATHSEP ';'
 # define GNUPLOT_HISTORY_FILE "~\\gnuplot_history"
+/* Flags for windows.h:
+   Minimal required platform is Windows XP
+ */
+#ifndef WINVER
+# define WINVER 0x0501
+#endif
+#ifndef _WIN32_WINNT
+# define _WIN32_WINNT 0x0501
+#endif
+#ifndef _WIN32_IE
+# define _WIN32_IE 0x0501
+#endif
 #endif /* _WINDOWS */
 
 #if defined(MSDOS) && !defined(_Windows)
