@@ -1,3 +1,8 @@
+2014-07-30 Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/x11.trm:  Remove misleading mention of -noevents.  This is a
+	command line option for gnuplot_x11, not for gnuplot itself.
+
 2014-07-28 Allin Cottrell  <cottrell@wfu.edu>
 
 	* src/syscfg.h:  Report 32/64 bit Windows build in version string

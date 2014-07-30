@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: x11.trm,v 1.220 2014/04/30 04:49:45 sfeam Exp $
+ * $Id: x11.trm,v 1.221 2014/05/05 22:19:22 sfeam Exp $
  *
  */
 
@@ -2540,7 +2540,6 @@ START_HELP(x11)
 "  `-raise`    raises plot window after each plot",
 "  `-noraise`  does not raise plot window after each plot",
 #ifdef USE_MOUSE
-"  `-noevents` does not process mouse and key events",
 "  `-ctrlq   ` closes window on ctrl-q rather than q",
 #endif
 "  `-persist`  plot windows survive after main gnuplot program exits",
@@ -2555,9 +2554,6 @@ START_HELP(x11)
 "#            & of the virtual root. \\\\",
 "#`-raise`    & raises plot window after each plot. \\\\",
 "#`-noraise`  & does not raise plot window after each plot. \\\\",
-#ifdef USE_MOUSE
-"#`-noevents` & does not process mouse and key events. \\\\",
-#endif
 "#`-persist`  & plot windows survive after main gnuplot program exits. \\\\",
 "%c l .",
 "%`-mono`@forces monochrome rendering on color displays.",
@@ -2590,10 +2586,6 @@ START_HELP(x11)
 " than 0 and less than or equal to ten) used as a scaling factor for point",
 " sizes.  For example, `-pointsize 2` uses points twice the default size, and",
 " `-pointsize 0.5` uses points half the normal size.",
-"",
-" The `-noevents` switch disables all mouse and key event processing (except",
-" for `q` and `<space>` for closing the window). This is useful for programs",
-" which use the x11 driver independent of the gnuplot main program.",
 "",
 " The `-ctrlq` switch changes the hot-key that closes a plot window from `q`",
 " to `<ctrl>q`. This is useful is you are using the keystroke-capture feature",
