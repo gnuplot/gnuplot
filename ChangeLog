@@ -1,3 +1,9 @@
+2014-07-30 Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/eval.c (update_plot_bounds):  Provide a user-visible copy of
+	the current terminal scale (oversampling, etc) as GPVAL_TERM_SCALE.
+	Bug #1291
+
 2014-07-28 Allin Cottrell  <cottrell@wfu.edu>
 
 	* src/syscfg.h:  Report 32/64 bit Windows build in version string
