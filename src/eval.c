@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: eval.c,v 1.117 2014/03/30 19:05:46 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: eval.c,v 1.118 2014/05/09 22:14:11 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - eval.c */
@@ -892,6 +892,7 @@ update_plot_bounds(void)
     fill_gpval_integer("GPVAL_TERM_YMAX", axis_array[FIRST_Y_AXIS].term_upper / term->tscale);
     fill_gpval_integer("GPVAL_TERM_XSIZE", canvas.xright+1);
     fill_gpval_integer("GPVAL_TERM_YSIZE", canvas.ytop+1);
+    fill_gpval_integer("GPVAL_TERM_SCALE", term->tscale);
 }
 
 /*
