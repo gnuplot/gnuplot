@@ -3,6 +3,11 @@
 	* term/x11.trm:  Remove misleading mention of -noevents.  This is a
 	command line option for gnuplot_x11, not for gnuplot itself.
 
+	* src/datafile.c docs/gnuplot.doc demo/heatmaps.dem:
+	New text input matrix keywords `columnheaders` and `rowheaders`.
+	These handle reading matrix data from a csv file in which the first
+	row and/or column contains labels rather than data.
+
 2014-07-28 Allin Cottrell  <cottrell@wfu.edu>
 
 	* src/syscfg.h:  Report 32/64 bit Windows build in version string

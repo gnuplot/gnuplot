@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.898 2014/07/23 05:45:47 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.899 2014/07/23 05:49:53 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -13532,18 +13532,34 @@ Ffigure_missing
 4 matrix
 ?commands plot datafile matrix
 ?commands splot datafile matrix
-?plot datafile matrix binary
-?splot datafile matrix binary
-?plot binary matrix
-?splot binary matrix
-?plot matrix binary
-?splot matrix binary
-?matrix binary
+?plot datafile matrix
+?splot datafile matrix
 ?binary matrix
- Gnuplot can interpret matrix input in two different ways.
- The first of these assumes a uniform grid of x and y coordinates, and assigns
- each value in the input matrix to one element of this uniform grid.
+?matrix
+ Gnuplot can interpret matrix data input in two different ways.
+
+ The first of these assumes a uniform grid of x and y coordinates and assigns
+ each value in the input matrix to one element M[i,j] of this uniform grid.
+ The assigned x coordinates are the integers [0:NCOLS-1].
+ The assigned y coordinates are the integers [0:NROWS-1].
  This is the default for text data input, but not for binary input.
+ See `matrix uniform` for examples and additional keywords.
+
+ The second interpretation assumes a non-uniform grid with explicit x and y
+ coordinates. The first row of input data contains the y coordinates; 
+ the first column of input data contains the x coordinates.  For binary input
+ data, the first element of the first row must contain the number of columns.
+ This is the default for `binary matrix` input, but requires an additional
+ keyword `nonuniform` for test input data.
+ See `matrix nonuniform` for examples.
+
+5 uniform
+?commands plot datafile matrix uniform
+?commands splot datafile matrix uniform
+?datafile matrix uniform
+?datafile matrix uniform
+?matrix uniform
+?binary matrix uniform
  Example commands for plotting uniform matrix data:
       splot 'file' matrix using 1:2:3          # text input
       splot 'file' binary general using 1:2:3  # binary input
@@ -13554,17 +13570,31 @@ Ffigure_missing
      z31 z32 z33 z34 ...
  and so forth.
 
+ For text input, if the first row contains column labels rather than data,
+ use the additional keyword `columnheaders`.   Similarly if the first field
+ in each row contains a label rather than data, use the additional keyword
+ `rowheaders`.  Here is an example that uses both:
+     $DATA << EOD
+     xxx A   B   C   D
+     aa  z11 z12 z13 z14
+     bb  z21 z22 z23 z24
+     cc  z31 z32 z33 z34
+     EOD
+     plot $DATA matrix columnheaders rowheaders with image
+
  For text input, a blank line or comment line ends the matrix, and starts a new
  surface mesh.  You can select among the meshes inside a file by the `index`
  option to the `splot` command, as usual. 
-=nonuniform
-?nonuniform
- The second interpretation assumes a non-uniform grid with explicit x and y
- coordinates. The first row of input data contains the y coordinates; 
- the first column of input data contains the x coordinates.  For binary input
- data, the first element of the first row must contain the number of data
- columns. (This number is ignored for text input).  Both the coordinates and
- the data values in a binary input are treated as single precision floats.
+5 nonuniform
+?commands plot datafile matrix nonuniform
+?commands splot datafile matrix nonuniform
+?matrix nonuniform
+?binary matrix nonuniform
+ The first row of input data contains the y coordinates. 
+ The first column of input data contains the x coordinates.
+ For binary input data, the first field of the first row must contain the
+ number of columns. (This number is ignored for text input).
+
  Example commands for plotting non-uniform matrix data:
       splot 'file' nonuniform matrix using 1:2:3  # text input
       splot 'file' binary matrix using 1:2:3      # binary input
@@ -13589,7 +13619,13 @@ Ffigure_missing
 
  These triplets are then converted into `gnuplot` iso-curves and then
  `gnuplot` proceeds in the usual manner to do the rest of the plotting.
-
+5 examples
+?commands plot datafile matrix examples
+?commands splot datafile matrix examples
+?datafile matrix examples
+?datafile matrix examples
+?matrix examples
+?binary matrix examples
  A collection of matrix and vector manipulation routines (in C) is provided
  in `binary.c`.  The routine to write binary data is
 

@@ -1,5 +1,5 @@
 #
-# Two ways of generating a 2D heat map from ascii data
+# Various ways to create a 2D heat map from ascii data
 #
 
 set title "Heat Map generated from a file containing Z values only"
@@ -73,6 +73,23 @@ plot $map1 matrix using 1:2:3 with image, \
 
 pause -1 "Hit return to continue"
 
+set title "Heat map from csv data with column and row labels"
+
+$map3 << EOD
+,Apple,Bacon,Cream,Donut,Eclair
+Row 1, 5, 4, 3, 1, 0
+Row 2, 2, 2, 0, 0, 1
+Row 3, 0, 0, 0, 1, 0
+Row 4, 0, 0, 0, 2, 3
+Row 5, 0, 1, 2, 4, 3
+EOD
+
+set datafile separator comma
+plot '$map3' matrix rowheaders columnheaders using 1:2:3 with image
+set datafile separator
+
+pause -1
+
 # Some output modes (SVG, HTML5) allow smoothing of adjacent pixels,
 # which may not be desired. This is not normally an issue with PNG or PDF.
 # The `pixels` option forces pixel-by-pixel drawing with no smoothing.
@@ -135,5 +152,5 @@ splot '++' using 1:2:(Z($1,$2)):(color($1,$2)) with pm3d title "4 data columns x
 pause -1 "Hit return to continue"
 
 # Release datablocks used in this demo
-undefine $map1 $map2
+undefine $map1 $map2 $map3
 reset

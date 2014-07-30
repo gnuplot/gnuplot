@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.288 2014/06/13 06:17:41 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.289 2014/06/24 18:20:46 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -341,9 +341,12 @@ static char *df_key_title = NULL;     /* filled in from column header if request
  *
  * EAM May 2011 - Add a keyword "nonuniform matrix" to indicate ascii matrix data
  * in the same format as "binary matrix", i.e. with explicit x and y coordinates.
+ * EAM Jul 2014 - Add keywords "columnheaders" and "rowheaders" to indicate ascii
+ * matrix data in the uniform grid format containing labels in row 1 and column 1.
  */
 TBOOLEAN df_read_binary;
 TBOOLEAN df_nonuniform_matrix;
+TBOOLEAN df_matrix_columnheaders, df_matrix_rowheaders;
 int df_plot_mode;
 
 static int df_readascii __PROTO((double [], int));
@@ -894,8 +897,32 @@ df_read_matrix(int *rows, int *cols)
 	if (!c)
 	    return linearized_matrix;
 
+	/* If the first row of matrix data contains column headers */
+	if (!df_already_got_headers && df_matrix_columnheaders && *rows == 0) {
+	    int i;
+	    char *temp_string;
+	    df_already_got_headers = TRUE;
+
+	    for (i = (df_matrix_rowheaders ? 1 :0); i < c; i++) {
+		double xpos = df_matrix_rowheaders ? (i-1) : i;
+		if (use_spec[0].at) {
+		    struct value a;
+		    df_column[0].datum = xpos;
+		    df_column[0].good = DF_GOOD;
+		    evaluate_inside_using = TRUE;
+		    evaluate_at(use_spec[0].at, &a);
+		    evaluate_inside_using = FALSE;
+		    xpos = real(&a);
+		}
+		temp_string = df_parse_string_field(df_tokens[i]);
+		add_tic_user(FIRST_X_AXIS, temp_string, xpos, -1);
+		free(temp_string);
+	    }
+	    continue;
+	}
+
 	if (*cols && c != *cols) {
-	    /* its not regular */
+	    /* it's not regular */
 	    if (linearized_matrix)
 		free(linearized_matrix);
 	    int_error(NO_CARET, "Matrix does not represent a grid");
@@ -915,6 +942,28 @@ df_read_matrix(int *rows, int *cols)
 	    int i;
 	    
 	    for (i = 0; i < c; ++i) {
+
+		/* First column in "matrix rowheaders" is a ytic label */
+		if (df_matrix_rowheaders && i == 0) {
+		    char *temp_string;
+		    double ypos = *rows - 1;
+		    if (use_spec[1].at) {
+			/* The save/restore is to make sure 1:(f($2)):3 works */
+			struct value a;
+			double save = df_column[1].datum;
+			df_column[1].datum = ypos;
+			evaluate_inside_using = TRUE;
+			evaluate_at(use_spec[1].at, &a);
+			evaluate_inside_using = FALSE;
+			ypos = real(&a);
+			df_column[1].datum = save;
+		    }
+		    temp_string = df_parse_string_field(df_tokens[0]);
+		    add_tic_user(FIRST_Y_AXIS, temp_string, ypos, -1);
+		    free(temp_string);
+		    continue;
+		}
+
 		if (i < firstpoint && df_column[i].good != DF_GOOD) {
 		    /* It's going to be skipped anyhow, so... */
 		    linearized_matrix[index++] = 0;
@@ -1005,6 +1054,8 @@ df_open(const char *cmd_filename, int max_using, struct curve_points *plot)
     df_num_bin_records = 0;
     df_matrix = FALSE;
     df_nonuniform_matrix = FALSE;
+    df_matrix_columnheaders = FALSE;
+    df_matrix_rowheaders = FALSE;
     df_skip_at_front = 0;
 
     df_eof = 0;
@@ -1082,6 +1133,30 @@ df_open(const char *cmd_filename, int max_using, struct curve_points *plot)
 	    df_matrix_file = TRUE;
 	    df_nonuniform_matrix = TRUE;
 	    fast_columns = 0;
+	    if (df_matrix_rowheaders || df_matrix_columnheaders)
+		duplication = TRUE;
+	    continue;
+	}
+
+	/* Jul 2014 - "matrix columnheaders" indicates an ascii data file
+	 * in uniform grid format but with column labels in row 1 */
+	if (almost_equals(c_token, "columnhead$ers")) {
+	    c_token++;
+	    df_matrix_file = TRUE;
+	    df_matrix_columnheaders = TRUE;
+	    if (df_nonuniform_matrix || !set_matrix)
+		duplication = TRUE;
+	    continue;
+	}
+
+	/* Jul 2014 - "matrix rowheaders" indicates an ascii data file
+	 * in uniform grid format but with row labels in column 1 */
+	if (almost_equals(c_token, "rowhead$ers")) {
+	    c_token++;
+	    df_matrix_file = TRUE;
+	    df_matrix_rowheaders = TRUE;
+	    if (df_nonuniform_matrix || !set_matrix)
+		duplication = TRUE;
 	    continue;
 	}
 
@@ -2236,10 +2311,10 @@ df_determine_matrix_info(FILE *fin)
 		    nc--;
 		    nr--;
 		}
+		/* First column contains row labels, not data */
+		if (df_matrix_rowheaders)
+		    nc--;
 
-		/* *** Careful!  Could error out in next step.  "matrix" should
-		 * be static and test next time. ***
-		 */
 		df_add_binary_records(1, DF_CURRENT_RECORDS);
 		df_bin_record[index].memory_data = (char *) matrix;
 		matrix = NULL;

@@ -6,6 +6,7 @@ Changes since 5.0.rc1
 * NEW set margins <left>, <right>, <top>, <bottom>
 * NEW set trange [theta_min:theta_max] filters input data in polar plots
 * NEW "set mouse zoomfactors <xfact>,<yfact>"
+* NEW New matrix keywords for text data: "columnheaders" and "rowheaders"
 * CHANGE apply "set key {no}enhanced}" to the key title
 * CHANGE scale dashlength with line width
 * FIX wxgtk3 requires initialization of Xthreads
