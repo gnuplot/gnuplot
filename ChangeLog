@@ -1,3 +1,9 @@
+2014-07-31 Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/syscfg.h:  Revert most of the 2014-07-28 patch with the hope
+	of correcting a build problem for bf_test.  All that is left of the
+	original patch is the version info for 64-bit Windows.
+
 2014-07-30 Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/eval.c (update_plot_bounds):  Provide a user-visible copy of
