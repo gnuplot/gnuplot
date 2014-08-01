@@ -9,6 +9,7 @@ Changes since 5.0.rc1
 * NEW New matrix keywords for text data: "columnheaders" and "rowheaders"
 * CHANGE apply "set key {no}enhanced}" to the key title
 * CHANGE scale dashlength with line width
+* CHANGE respond to left mouse click on press rather than on release
 * FIX wxgtk3 requires initialization of Xthreads
 * FIX width adjustment for long key title in multicolumn keys
 * FIX treat data value read as "NaN" the same as we would "1/0"

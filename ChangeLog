@@ -1,3 +1,10 @@
+2014-08-01 Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/mouse.c (event_buttonpress):  Trap mouse button click on
+	press rather than on release so that "pause mouse {button1|any}"
+	takes precedence over a key binding to the mouse button.
+	Bugfix
+
 2014-07-30 Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/x11.trm:  Remove misleading mention of -noevents.  This is a
