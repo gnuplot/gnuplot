@@ -9,6 +9,7 @@ New features, changes and fixes since gnuplot version 4.6.5
 * CHANGE Accept "with image pixels" as a synonym for "with image failsafe"
 * CHANGE return NaN if a requested numerical data value fins a string instead
 * CHANGE Consume only one space following the font name in an enhanced test string
+* CHANGE respond to left mouse click on press rather than on release
 * FIX Faster recovery from outboard server gnuplot_qt being killed
 * FIX get rid of O(N^2) memory allocation for string data in long input lines
 * FIX large integers in iteration spec could cause overflow end condition check
