@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.253 2014/06/03 15:24:19 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.254 2014/07/14 14:45:56 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -1453,9 +1453,9 @@ void save_dashtype(FILE *fp, int d_type, const t_dashtype *dt)
 {
     fprintf(fp, " dashtype");
     if (d_type == DASHTYPE_CUSTOM) {
-	if (dt->str)
-	    fprintf(fp, " \"%s\"", dt->str);
-	if (fp == stderr || !dt->str) {
+	if (dt->dstring[0] != '\0')
+	    fprintf(fp, " \"%s\"", dt->dstring);
+	if (fp == stderr || dt->dstring[0] == '\0') {
 	    int i;
 	    fputs(" (", fp);
 	    for (i = 0; i < DASHPATTERN_LENGTH && dt->pattern[i] > 0; i++)

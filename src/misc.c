@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.186 2014/06/14 21:54:51 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.187 2014/08/03 01:02:25 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -960,7 +960,7 @@ parse_dashtype(struct t_dashtype *dt)
 	}
 	/* truncate dash_str if we ran out of space in the array representation */
 	dash_str[j] = '\0';
-	dt->str = gp_strdup(dash_str);
+	strncpy(dt->dstring, dash_str, sizeof(dt->dstring)-1);
 	free(dash_str);
 	res = DASHTYPE_CUSTOM;
 

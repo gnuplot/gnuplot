@@ -1,5 +1,5 @@
 /*
- * $Id: term_api.h,v 1.132 2014/04/18 04:07:19 sfeam Exp $
+ * $Id: term_api.h,v 1.133 2014/06/03 17:58:20 sfeam Exp $
  */
 
 /* GNUPLOT - term_api.h */
@@ -105,10 +105,11 @@ typedef enum t_linecap {
 
 typedef struct t_dashtype {
 	float pattern[DASHPATTERN_LENGTH];
-	char* str;
+	char dstring[8];
 } t_dashtype;
 
-#define DEFAULT_DASHPATTERN {{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f}, NULL}
+#define DEFAULT_DASHPATTERN {{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f}, \
+                             {0,0,0,0,0,0,0,0} }
 
 typedef struct lp_style_type {	/* contains all Line and Point properties */
     int     pointflag;		/* 0 if points not used, otherwise 1 */
