@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.457 2014/06/17 00:47:45 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.458 2014/07/22 23:11:16 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -358,6 +358,7 @@ place_objects(struct object *listhead, int layer, int dimensions)
 	else
 	    lpstyle = this_object->lp_properties;
 	
+	/* FIXME: I think this is redundant in V5 (done already in "set obj ...") */
 	if (lpstyle.pm3d_color.type == TC_LT) {
 	    lp_style_type temp;
 	    load_linetype(&temp, lpstyle.pm3d_color.lt + 1);

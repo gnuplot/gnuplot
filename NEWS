@@ -20,6 +20,7 @@ Changes since 5.0.rc1
 * FIX refresh of plot with log-scaled color box
 * FIX MSWin pipe issues
 * FIX if terminal is in "monochrome" mode, convert color requests to black
+* FIX apply user-defined line colors to text color also
 
 New features, changes and fixes in gnuplot version 5.0
 ======================================================

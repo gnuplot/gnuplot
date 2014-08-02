@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.185 2014/06/02 02:45:39 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.186 2014/06/14 21:54:51 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -1349,6 +1349,7 @@ parse_colorspec(struct t_colorspec *tc, int options)
 	tc->type = TC_LT;
 	tc->lt = LT_BLACK;
     } else if (equals(c_token,"lt")) {
+	struct lp_style_type lptemp;
 	c_token++;
 	if (END_OF_COMMAND)
 	    int_error(c_token, "expected linetype");
@@ -1358,6 +1359,15 @@ parse_colorspec(struct t_colorspec *tc, int options)
 	    tc->type = TC_DEFAULT;
 	    int_warn(c_token,"illegal linetype");
 	}
+
+	/*
+	 * July 2014 - translate linetype into user-defined linetype color.
+	 * This is a CHANGE!
+	 * FIXME: calling load_linetype here may obviate the need to call it
+	 * many places in the higher level code.  They could be removed.
+	 */
+	load_linetype(&lptemp, tc->lt + 1);
+	*tc = lptemp.pm3d_color;
     } else if (options <= TC_LT) {
 	tc->type = TC_DEFAULT;
 	int_error(c_token, "only tc lt <n> possible here");
