@@ -1,3 +1,7 @@
+2014-08-05 Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/mouse.c (event_buttonpress):  Remove extraneous event_reset.
+
 2014-08-02 Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/misc.c (parse_colorspec):  Apply user-defined line colors

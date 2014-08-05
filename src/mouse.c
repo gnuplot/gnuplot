@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: mouse.c,v 1.166 2014/07/23 05:45:48 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: mouse.c,v 1.167 2014/08/01 21:30:47 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - mouse.c */
@@ -1819,7 +1819,6 @@ event_buttonpress(struct gp_event_t *ge)
 	      /* "pause button1" or "pause any" takes precedence over key bindings */
 		if (paused_for_mouse & PAUSE_BUTTON1) {
 		    load_mouse_variables(mouse_x, mouse_y, TRUE, b);
-		    event_reset(ge);
 		    trap_release = TRUE;	/* Don't trigger on release also */
 		    return;
 		}
