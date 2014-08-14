@@ -1,3 +1,10 @@
+2014-08-14 Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/graphics.c (do_rectangle) src/graph3d.c (map3d_position_r):
+	Fix y extent and clipping of rectangles with negative y coord or
+	inverted axes.
+	Bug #1462
+
 2014-08-05 Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/mouse.c (event_buttonpress):  Remove extraneous event_reset.

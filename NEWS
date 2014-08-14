@@ -21,6 +21,8 @@ Changes since 5.0.rc1
 * FIX MSWin pipe issues
 * FIX if terminal is in "monochrome" mode, convert color requests to black
 * FIX apply user-defined line colors to text color also
+* FIX Fix y extent and clipping of rectangles with y<0 or inverted axes
+
 
 New features, changes and fixes in gnuplot version 5.0
 ======================================================
