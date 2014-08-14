@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.379.2.32 2014/06/17 00:47:33 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.379.2.33 2014/06/18 00:05:56 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -5902,8 +5902,8 @@ do_rectangle( int dimensions, t_object *this_object, int style )
 		int junkw, junkh;
 		map3d_position_double(&this_rect->center, &x1, &y1, "rect");
 		map3d_position_r(&this_rect->extent, &junkw, &junkh, "rect");
-		width = junkw;
-		height = junkh;
+		width = abs(junkw);
+		height = abs(junkh);
 	    } else
 		return;
 
@@ -5947,16 +5947,17 @@ do_rectangle( int dimensions, t_object *this_object, int style )
 	/* Clip to the graph boundaries, but only if the rectangle 	*/
 	/* itself was specified in plot coords.				*/
 	if (clip_area) {
-	    if (clip_x && x1 < clip_area->xleft)
-		x1 = clip_area->xleft;
-	    if (clip_x && x2 > clip_area->xright)
-		x2 = clip_area->xright;
-	    if (clip_y && y1 < clip_area->ybot)
-		y1 = clip_area->ybot;
-	    if (clip_y && y2 > clip_area->ytop)
-		y2 = clip_area->ytop;
-	    if (x1 > x2 || y1 > y2)
-		return;
+	    BoundingBox *clip_save = clip_area;
+	    clip_area = &plot_bounds;
+	    if (clip_x) {
+		cliptorange(x1, clip_area->xleft, clip_area->xright);
+		cliptorange(x2, clip_area->xleft, clip_area->xright);
+	    }
+	    if (clip_y) {
+		cliptorange(y1, clip_area->ybot, clip_area->ytop);
+		cliptorange(y2, clip_area->ybot, clip_area->ytop);
+	    }
+	    clip_area = clip_save;
 	}
 
 	w = x2 - x1;
