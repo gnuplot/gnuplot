@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.459 2014/08/03 01:02:24 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.460 2014/08/14 22:48:32 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -3932,8 +3932,6 @@ do_rectangle( int dimensions, t_object *this_object, fill_style_type *fillstyle 
 		cliptorange(y2, clip_area->ybot, clip_area->ytop);
 	    }
 	    clip_area = clip_save;
-	    if (x1 == x2 || y1 == y2)
-		return;
 	}
 
 	w = x2 - x1;
