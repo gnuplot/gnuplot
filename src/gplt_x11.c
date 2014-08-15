@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.244 2014/05/30 20:10:55 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.245 2014/07/25 20:25:59 sfeam Exp $"); }
 #endif
 
 #define MOUSE_ALL_WINDOWS 1
@@ -5833,11 +5833,19 @@ pr_encoding()
 struct used_font {
 	char *requested_name;	/* The name passed to pr_font() */
 	XFontStruct *font;	/* The font we ended up with for that request */
+#ifdef USE_X11_MULTIBYTE
+        XFontSet mbfont;
+        int ismbfont;
+#endif
 	int vchar;
 	int hchar;
 	struct used_font *next;	/* pointer to next font in list */
 } used_font;
+#ifndef USE_X11_MULTIBYTE
 static struct used_font fontlist = {NULL, NULL, 12, 8, NULL};
+#else
+static struct used_font fontlist = {NULL, NULL, NULL, 0, 12, 8, NULL};
+#endif
 
 /* Helper routine to clear the used font list */
 static void
@@ -5845,7 +5853,12 @@ clear_used_font_list() {
     struct used_font *f;
     while (fontlist.next) {
 	f = fontlist.next;
+#ifndef USE_X11_MULTIBYTE
 	gpXFreeFont(dpy, f->font);
+#else
+	if (f->font) XFreeFont(dpy, f->font);
+	if (f->mbfont) XFreeFontSet(dpy, f->mbfont);
+#endif
 	free(f->requested_name);
 	fontlist.next = f->next;
 	free(f);
@@ -5875,7 +5888,15 @@ char *fontname;
     if (!fontname || !(*fontname)) {
 	if ((fontname = pr_GetR(db, ".font"))) {
 	    strncpy(default_font, fontname, sizeof(default_font)-1);
+    /* shige: default_font may be clear for each plot command by 
+     * X11_set_default_font() in x11.trm, since the function is called
+     * in X11_graphics(). And then the font list will be cleared by the
+     * next line in the case the default font is defined in X11 Resources.
+     * But it may not be a desired behaviour.
+     */
+#if 0
 	    clear_used_font_list();
+#endif
 	}
     }
 
@@ -5900,10 +5921,24 @@ char *fontname;
     /* FIXME: This is probably the wrong thing to do for multibyte fonts.  */
     for (search = fontlist.next; search; search = search->next) {
 	if (!strcmp(fontname, search->requested_name)) {
+#ifndef USE_X11_MULTIBYTE
 	    font = search->font;
 	    vchar = search->vchar;
 	    hchar = search->hchar;
 	    return;
+#else
+	    if (!usemultibyte && !search->ismbfont) { 
+		font = search->font;
+		vchar = search->vchar;
+		hchar = search->hchar;
+		return;
+	    } else if (usemultibyte && search->ismbfont) {
+		mbfont = search->mbfont;
+		vchar = search->vchar;
+		hchar = search->hchar;
+		return;
+	    } else break;
+#endif
 	}
     }
     /* If we get here, the request doesn't match a previously used font.
@@ -6141,7 +6176,19 @@ char *fontname;
     search->next = malloc(sizeof(used_font));
     search = search->next;
     search->next = NULL;
+#ifndef USE_X11_MULTIBYTE
     search->font = font;
+#else
+    if (!usemultibyte) { 
+	search->ismbfont = 0;
+	search->font = font;
+	search->mbfont = NULL;
+    } else {
+	search->ismbfont = 1;
+	search->font = NULL;
+	search->mbfont = mbfont;
+    }
+#endif
     search->requested_name = requested_name;
     search->vchar = vchar;
     search->hchar = hchar;
