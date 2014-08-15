@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.457 2014/07/23 05:45:49 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.458 2014/08/03 21:52:50 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -4019,6 +4019,11 @@ set_obj(int tag, int obj_type)
 		prev_object->next = new_obj;
 	    new_obj->next = this_object;
 	    this_object = new_obj;
+	    /* V5 CHANGE: Apply default rectangle style now rather than later */
+	    if (obj_type == OBJ_RECTANGLE) {
+		this_object->fillstyle = default_rectangle.fillstyle;
+		this_object->lp_properties = default_rectangle.lp_properties;
+	    }
 	}
 
 	/* Over-write old object if the type has changed */

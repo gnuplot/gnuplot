@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.460 2014/08/14 22:48:32 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.461 2014/08/14 23:16:51 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -352,18 +352,22 @@ place_objects(struct object *listhead, int layer, int dimensions)
 	    continue;
 
 	/* Extract line and fill style, but don't apply it yet */
+#if (0)	/* V5: Inherit default rectangle properties at the time of "set obj", not now */
 	if (this_object->lp_properties.l_type == LT_DEFAULT
 	    && this_object->object_type == OBJ_RECTANGLE)
 	    lpstyle = default_rectangle.lp_properties;
 	else
+#endif
 	    lpstyle = this_object->lp_properties;
-	
+
+#if (0)
 	/* FIXME: I think this is redundant in V5 (done already in "set obj ...") */
 	if (lpstyle.pm3d_color.type == TC_LT) {
 	    lp_style_type temp;
 	    load_linetype(&temp, lpstyle.pm3d_color.lt + 1);
 	    lpstyle.pm3d_color = temp.pm3d_color;
 	}
+#endif
 
 	if (this_object->fillstyle.fillstyle == FS_DEFAULT
 	    && this_object->object_type == OBJ_RECTANGLE)

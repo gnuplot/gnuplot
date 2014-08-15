@@ -7,6 +7,13 @@
 	This makes binary.c and binary.h superfluous.
 	Bugs #1412 #1451
 
+	* src/graphics.c (place_objects) src/set.c (set_obj):
+	Apply default rectangle style at the time of a "set object rect"
+	command rather than waiting until the rectangle is drawn.  This prevents
+	the default style line/dash settings from overriding explicit rectangle
+	commands.
+	Bug #1460
+
 2014-08-15  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* src/gplt_x11.c:  For single byte fonts gnuplot_x11 uses a list of

@@ -11,6 +11,7 @@ Changes since 5.0.rc1
 * CHANGE scale dashlength with line width
 * CHANGE respond to left mouse click on press rather than on release
 * CHANGE remove bf_test dependence on all other gnuplot files and libraries
+* CHANGE apply default rectangle style during "set obj" rather than when drawn
 * FIX wxgtk3 requires initialization of Xthreads
 * FIX width adjustment for long key title in multicolumn keys
 * FIX treat data value read as "NaN" the same as we would "1/0"
