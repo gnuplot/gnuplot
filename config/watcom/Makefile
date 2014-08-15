@@ -1,5 +1,5 @@
 # Hello, emacs: this is a -*- Makefile -*-
-# $Id: Makefile,v 1.11 2013/06/24 13:45:12 markisch Exp $
+# $Id: Makefile,v 1.12 2013/07/06 08:09:20 markisch Exp $
 #
 # GNUPLOT Makefile OpenWatcom 1.3 on Win32
 
@@ -270,8 +270,8 @@ doc2gih.exe: $(D)doc2gih.c $(D)termdoc.c $(D)xref.c .AUTODEPEND
 
 #make binary demo files
 # WINDOWS_NO_GUI makes sure that wtext.h does not redefine fread() etc.
-bf_test.exe : bf_test.c dbinary.$(O) alloc.$(O) .AUTODEPEND
-        $(WCL) $(WCFLAGS) -w1 -DWINDOWS_NO_GUI -fe$^@ $(S)\bf_test.c dbinary.$(O) alloc.$(O)
+bf_test.exe : bf_test.c  .AUTODEPEND
+        $(WCL) $(WCFLAGS) -w1 -DWINDOWS_NO_GUI -fe$^@ $(S)\bf_test.c
 
 $(BINARYFILES): bf_test.exe
         .\bf_test

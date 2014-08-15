@@ -1,5 +1,5 @@
 # Hey, Emacs, this is a -*- Makefile -*- #
-# $Id: Makefile,v 1.8 2013/07/06 08:09:20 markisch Exp $
+# $Id: Makefile,v 1.9 2014/08/15 19:25:13 sfeam Exp $
 #
 #
 # GNUPLOT Makefile for Cygwin on WinNT and Win95/98/2000
@@ -328,7 +328,7 @@ wgnuplot.mnu: $(W)/wgnuplot.mnu
 
 
 #make binary demo files
-$(M)bf_test.exe : bf_test.c alloc.$(O)
+$(M)bf_test.exe : bf_test.c
 	$(LD) $(LDFLAGS) $(CFLAGS) -DWINDOWS_NO_GUI -o $@ $^
 	(cd $(M) ; ./bf_test.exe )
 

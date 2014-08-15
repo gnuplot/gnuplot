@@ -499,8 +499,8 @@ gplt_x11.$(O) : gplt_x11.c
 	run [-.src]bf_test.$(X)
 	set default [-.src]
 
-bf_test.$(X) : bf_test.$(O) binary.$(O) alloc.$(O)
-	link /executable=bf_test.$(X) bf_test.$(O),binary.$(O),alloc.$(O)
+bf_test.$(X) : bf_test.$(O)
+	link /executable=bf_test.$(X) bf_test.$(O)
 
 gnuplot.hlb : gnuplot.hlp
 	library/create/help gnuplot.hlb gnuplot.hlp
@@ -614,7 +614,7 @@ $WRITECOM_D2:
 $ WRITE MAKE "     version.obj,vms.obj'EXTRALIB' 'CTRL_SHARE'"
 $ WRITE MAKE "$ cc 'CFLAGS' bf_test.c"
 $ WRITE MAKE "$ link /executable=bf_test.exe -"
-$ WRITE MAKE "    bf_test.obj,binary.obj,alloc.obj'EXTRALIB' 'CTRL_SHARE'"
+$ WRITE MAKE "    bf_test.obj'EXTRALIB' 'CTRL_SHARE'"
 $ WRITE MAKE "$ cd [-.demo]"
 $ WRITE MAKE "$ run [-.src]bf_test.exe"
 $ WRITE MAKE "$ cd [-.src]"

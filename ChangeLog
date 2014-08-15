@@ -9,6 +9,8 @@
 
 	* src/makefile.all src/makefile.awc: Remove mention of binary.o
 
+	* config/*/Makefile: Remove alloc and binary from bf_test dependencies
+
 	* src/graphics.c (place_objects) src/set.c (set_obj):
 	Apply default rectangle style at the time of a "set object rect"
 	command rather than waiting until the rectangle is drawn.  This prevents
