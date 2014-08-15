@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.308 2014/06/03 15:24:19 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.309 2014/08/14 22:48:32 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -569,13 +569,19 @@ place_arrows3d(int layer)
     for (this_arrow = first_arrow; this_arrow != NULL;
 	 this_arrow = this_arrow->next) {
 	int sx, sy, ex, ey;
+	struct arrow_style_type as = this_arrow->arrow_properties;
 
-	if (this_arrow->arrow_properties.layer != layer)
+	if (as.layer != layer)
 	    continue;
 	if (get_arrow3d(this_arrow, &sx, &sy, &ex, &ey)) {
-	    term_apply_lp_properties(&(this_arrow->arrow_properties.lp_properties));
-	    apply_3dhead_properties(&(this_arrow->arrow_properties));
-	    draw_clip_arrow(sx, sy, ex, ey, this_arrow->arrow_properties.head);
+	    /* Draw arrow shaft */
+	    term_apply_lp_properties(&(as.lp_properties));
+	    draw_clip_arrow(sx, sy, ex, ey, NOHEAD);
+	    /* Draw arrow head, never use dashed lines */
+	    apply_3dhead_properties(&as);
+	    as.lp_properties.d_type = DASHTYPE_SOLID;
+	    term_apply_lp_properties(&(as.lp_properties));
+	    draw_clip_arrow(sx, sy, ex, ey, -as.head);
 	} else {
 	    FPRINTF((stderr,"place_arrows3d: skipping out-of-bounds arrow\n"));
 	}

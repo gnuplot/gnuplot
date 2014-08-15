@@ -21,6 +21,9 @@
 	calling term->linetype(LT_BLACK).  Call term->set_color(BLACK_COLORSPEC)
 	instead.
 
+	* src/graphics.c (place_arrows) src/graph3d.c (place_arrows3d):
+	Force solid lines for arrow heads.
+
 2014-08-15  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* src/gplt_x11.c:  For single byte fonts gnuplot_x11 uses a list of
