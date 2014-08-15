@@ -7,6 +7,8 @@
 	This makes binary.c and binary.h superfluous.
 	Bugs #1412 #1451
 
+	* src/makefile.all src/makefile.awc: Remove mention of binary.o
+
 	* src/graphics.c (place_objects) src/set.c (set_obj):
 	Apply default rectangle style at the time of a "set object rect"
 	command rather than waiting until the rectangle is drawn.  This prevents
