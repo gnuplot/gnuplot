@@ -24,6 +24,7 @@ Changes since 5.0.rc1
 * FIX if terminal is in "monochrome" mode, convert color requests to black
 * FIX apply user-defined line colors to text color also
 * FIX Fix y extent and clipping of rectangles with y<0 or inverted axes
+* FIX dashtype bugs in rectangles, arrows, and probably other things
 
 
 New features, changes and fixes in gnuplot version 5.0

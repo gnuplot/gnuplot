@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gadgets.c,v 1.113 2014/07/01 15:27:32 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gadgets.c,v 1.114 2014/07/14 14:45:56 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - gadgets.c */
@@ -582,6 +582,9 @@ clip_vector(unsigned int x, unsigned int y)
 void
 apply_pm3dcolor(struct t_colorspec *tc, const struct termentry *t)
 {
+    /* V5 - term->linetype(LT_BLACK) would clobber the current	*/
+    /* dashtype so instead we use term->set_color(black).	*/
+    static t_colorspec black = BLACK_COLORSPEC; 
 
     /* Replace colorspec with that of the requested line style */
     struct lp_style_type style;
@@ -591,7 +594,7 @@ apply_pm3dcolor(struct t_colorspec *tc, const struct termentry *t)
     }
 
     if (tc->type == TC_DEFAULT) {
-	(*t->linetype)(LT_BLACK);
+	t->set_color(&black);
 	return;
     }
     if (tc->type == TC_LT) {
@@ -607,13 +610,13 @@ apply_pm3dcolor(struct t_colorspec *tc, const struct termentry *t)
 	 */
 	/* Monochrome terminals are still allowed to display rgb variable colors */
 	if (monochrome_terminal && tc->value >= 0)
-	    (*t->linetype)(LT_BLACK);
+	    t->set_color(&black);
 	else
 	    t->set_color(tc);
 	return;
     }
     if (!is_plot_with_palette()) {
-	(*t->linetype)(LT_BLACK);
+	t->set_color(&black);
 	return;
     }
     switch (tc->type) {

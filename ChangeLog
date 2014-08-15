@@ -17,6 +17,10 @@
 	* src/save.c (save_linetype):  Bugfix - dashtype was being saved only if
 	there was also a point type.
 
+	* src/gadgets.c (apply_pm3dcolor):  Don't clobber current dashtype by
+	calling term->linetype(LT_BLACK).  Call term->set_color(BLACK_COLORSPEC)
+	instead.
+
 2014-08-15  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* src/gplt_x11.c:  For single byte fonts gnuplot_x11 uses a list of
