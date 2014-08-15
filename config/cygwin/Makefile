@@ -1,5 +1,5 @@
 # Hey, Emacs, this is a -*- Makefile -*- #
-# $Id: Makefile,v 1.7 2013/06/24 13:45:12 markisch Exp $
+# $Id: Makefile,v 1.8 2013/07/06 08:09:20 markisch Exp $
 #
 #
 # GNUPLOT Makefile for Cygwin on WinNT and Win95/98/2000
@@ -328,19 +328,15 @@ wgnuplot.mnu: $(W)/wgnuplot.mnu
 
 
 #make binary demo files
-$(M)bf_test.exe : bf_test.c dbinary.$(O) alloc.$(O)
+$(M)bf_test.exe : bf_test.c alloc.$(O)
 	$(LD) $(LDFLAGS) $(CFLAGS) -DWINDOWS_NO_GUI -o $@ $^
 	(cd $(M) ; ./bf_test.exe )
-
-# _Windows causes wtext.h to define fread() etc
-dbinary.$(O): binary.c
-	$(CC) -c $(CFLAGS) -DWINDOWS_NO_GUI -o $@ $<
 
 
 #
 # Create config.h
 #
-$(OBJS) $(WINOBJS) dbinary.$(O): config.h
+$(OBJS) $(WINOBJS): config.h
 config.h: $(TOP)/config/config.cyg
 	cp -p $< $@
 

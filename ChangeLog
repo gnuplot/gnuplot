@@ -1,3 +1,12 @@
+2014-08-15 Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/bf_test.c src/Makefile.am src/binary.* (removed)
+	config/makefile.os2 config/makefile.dj2 config/makefile.cyg
+	config/cygwin/Makefile config/mingw/Makefile config/msvc/Makefile:
+	Remove bf_test dependence on all other gnuplot files and libraries.
+	This makes binary.c and binary.h superfluous.
+	Bugs #1412 #1451
+
 2014-08-15  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* src/gplt_x11.c:  For single byte fonts gnuplot_x11 uses a list of

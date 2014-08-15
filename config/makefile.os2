@@ -1,5 +1,5 @@
 #
-# $Id: makefile.os2,v 1.53 2009/12/02 04:59:57 sfeam Exp $
+# $Id: makefile.os2,v 1.54 2012/03/02 22:16:14 mikulik Exp $
 #
 # GNUPLOT Makefile for use on OS/2 2.x (and above)
 # using emx 0.9 (and above) and GNU make
@@ -422,8 +422,8 @@ $(DOCDIR)\doc2ms.exe:   $(DOCDIR)\doc2ms.c $(DOCDIR)\termdoc.c $(OS2TERM)
 $(M)binary1 $(M)binary2 $(M)binary3: $(M)bf_test.exe
 	cd $(DEMODIR) && bf_test.exe
 
-$(M)bf_test.exe : bf_test.c binary.$(O) alloc.$(O)
-	$(CC) $(CFLAGS) -o $@ bf_test.c binary.$(O) alloc.$(O)
+$(M)bf_test.exe : bf_test.c alloc.$(O)
+	$(CC) $(CFLAGS) -o $@ bf_test.c alloc.$(O)
 
 #
 # Clean up
