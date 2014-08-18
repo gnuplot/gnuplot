@@ -1,3 +1,18 @@
+2014-08-18  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* config/mingw/Makefile (VPATH): Drop $W from VPATH.  Necessary to
+	avoid circular dependency on wgnuplot.mnu
+	(%.$(O)): Use pattern rule instead of VPATH to build Windows
+	source files.
+	(VERSIONING): Avoid inverted logic in makefile conditional.
+	(console, windows, pipes): Simplify by letting the default rule in
+	the sub-make handle things.
+	(default, all): Versioning is really needed by $(TARGET) rule,
+	so let that handle constructing it.
+	($(TARGET)): Do VERSIONING first, drop dependencies on icon files.
+	(%.o): Use pattern rules to build Qt source files.  Much simpler
+	than spelling it out long hand for every single source file.
+
 2014-08-15 Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/bf_test.c src/Makefile.am src/binary.* (removed)

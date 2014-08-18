@@ -1,5 +1,5 @@
 # Hello, emacs: this is a -*- Makefile -*-
-# $Id: Makefile,v 1.46 2014/08/15 19:25:13 sfeam Exp $
+# $Id: Makefile,v 1.47 2014/08/18 03:46:06 sfeam Exp $
 #
 # GNUPLOT Makefile for MinGW/MSYS on Windows
 # This assumes usual installation of the MinGW32 toolkit, the free
@@ -248,7 +248,7 @@ T=$(TOP)/term/
 D=$(TOP)/docs/
 M=$(TOP)/demo/
 
-VPATH = $(S):$(W):$(S)/wxterminal
+VPATH = $(S):$(S)/wxterminal
 
 TERMFLAGS = -DGNUPLOT_PS_DIR=\"$(GNUPLOT_PS_DIR)\" -DGNUPLOT_JS_DIR=\"$(GNUPLOT_JS_DIR)\"
 TERMFLAGS += -I$(TOP)/term
@@ -427,10 +427,10 @@ else
   RES2COFF = res2coff -i wgnuplot.res -o wgplt_res.$(O)
 endif
 
-ifndef RELEASE
-VERSIONING = timestamp.h
-else
+ifdef RELEASE
 VERSIONING = $(S)/version.c
+else
+VERSIONING = timestamp.h
 endif
 
 PATCHLEVEL := `cat $(TOP)/PATCHLEVEL`
@@ -445,16 +445,16 @@ endif
 FULLVERSION := $(MAINVERSION) patchlevel $(PATCHLEVEL)
 
 
-default: $(VERSIONING) $(TARGET) $(MENUFILE) support
+default: $(TARGET) $(MENUFILE) support
 
-console: $(VERSIONING)
-	$(MAKE) TARGET=gnuplot.exe gnuplot.exe
+console: 
+	$(MAKE) TARGET=gnuplot.exe default
 
-windows: $(MENUFILE) $(VERSIONING)
-	$(MAKE) TARGET=wgnuplot.exe wgnuplot.exe
+windows:
+	$(MAKE) TARGET=wgnuplot.exe default
 
-pipes: $(VERSIONING)
-	$(MAKE) TARGET=wgnuplot_pipes.exe wgnuplot_pipes.exe
+pipes:
+	$(MAKE) TARGET=wgnuplot_pipes.exe default
 
 docs:
 	$(MAKE) TARGET=gnuplot.exe gnuplot.pdf gpcard.pdf tutorial.pdf \
@@ -464,7 +464,7 @@ support: $(HELPFILE) $(M)bf_test.exe $(QT_TARGET) $(QT_TRANSLATION) demo_plugin.
 
 ja: $(HELPFILEJA)
 
-all: $(VERSIONING) console windows pipes support docs
+all: console windows pipes support docs
 
 
 # include the 'core makefile template'
@@ -483,11 +483,14 @@ endif
 .c.$(O):
 	$(CC) -c $(CFLAGS) $(CFLAGSEXTRA) -MMD -MT '$*.$$(O)' -MF $*.d -o $@ $<
 
+%.$(O): $W/%.c
+	$(CC) -c $(CFLAGS) $(CFLAGSEXTRA) -MMD -MT '$*.$$(O)' -MF $*.d -o $@ $<
+
 LDLIBS = -lkernel32 -lgdi32 -lwinspool -lcomdlg32 -lcomctl32 -ladvapi32 -lshell32 -lmsimg32 -lgdiplus
 LDLIBS += -lhtmlhelp
 LDFLAGS2 += -L$(HHWPATH)lib
 
-$(TARGET): $(OBJS) $(WINOBJS) wgplt_res.$(O) texticon.ico grpicon.ico Makefile
+$(TARGET): $(VERSIONING) $(OBJS) $(WINOBJS) wgplt_res.$(O) Makefile
 	$(LDX) $(LDFLAGS) $(LDFLAGS2) -o $@ $(OBJS) $(WINOBJS) wgplt_res.$(O) $(LDLIBS)\
 	$(TERMLIBS) $(WX_LIBS) $(PANGOCAIRO_LIBS)
 
@@ -581,43 +584,9 @@ qtgnuplot_fr.qm: $(S)/qtterminal/po/qtgnuplot_fr.ts
 qtgnuplot_ja.qm: $(S)/qtterminal/po/qtgnuplot_ja.ts
 	$(LRELEASE) -qm $@ $<
 
-gnuplot_qt.o: $(S)/qtterminal/gnuplot_qt.cpp
+%.o: $(S)/qtterminal/%.cpp
 	$(CXX) -c $(CFLAGS) $(CFLAGSEXTRA) $(CXXFLAGS) -MMD -MT '$*.o' -MF $*.d -o $@ $<
-
-QtGnuplotWindow.o: $(S)/qtterminal/QtGnuplotWindow.cpp $(S)/qtterminal/QtGnuplotWindow.h
-	$(CXX) -c $(CFLAGS) $(CFLAGSEXTRA) $(CXXFLAGS) -MMD -MT '$*.o' -MF $*.d -o $@ $<
-
-QtGnuplotApplication.o: $(S)/qtterminal/QtGnuplotApplication.cpp $(S)/qtterminal/QtGnuplotApplication.h
-	$(CXX) -c $(CFLAGS) $(CFLAGSEXTRA) $(CXXFLAGS) -MMD -MT '$*.o' -MF $*.d -o $@ $<
-
-QtGnuplotWidget.o: $(S)/qtterminal/QtGnuplotWidget.cpp $(S)/qtterminal/QtGnuplotWidget.h
-	$(CXX) -c $(CFLAGS) $(CFLAGSEXTRA) $(CXXFLAGS) -MMD -MT '$*.o' -MF $*.d -o $@ $<
-
-QtGnuplotScene.o: $(S)/qtterminal/QtGnuplotScene.cpp $(S)/qtterminal/QtGnuplotScene.h
-	$(CXX) -c $(CFLAGS) $(CFLAGSEXTRA) $(CXXFLAGS) -MMD -MT '$*.o' -MF $*.d -o $@ $<
-
-QtGnuplotItems.o: $(S)/qtterminal/QtGnuplotItems.cpp $(S)/qtterminal/QtGnuplotItems.h
-	$(CXX) -c $(CFLAGS) $(CFLAGSEXTRA) $(CXXFLAGS) -MMD -MT '$*.o' -MF $*.d -o $@ $<
-
-QtGnuplotEvent.o: $(S)/qtterminal/QtGnuplotEvent.cpp $(S)/qtterminal/QtGnuplotEvent.h
-	$(CXX) -c $(CFLAGS) $(CFLAGSEXTRA) $(CXXFLAGS) -MMD -MT '$*.o' -MF $*.d -o $@ $<
-
-moc_QtGnuplotWindow.o: moc_QtGnuplotWindow.cpp
-	$(CXX) -c $(CFLAGS) $(CFLAGSEXTRA) $(CXXFLAGS) -MMD -MT '$*.o' -MF $*.d -o $@ $<
-
-moc_QtGnuplotApplication.o: moc_QtGnuplotApplication.cpp
-	$(CXX) -c $(CFLAGS) $(CFLAGSEXTRA) $(CXXFLAGS) -MMD -MT '$*.o' -MF $*.d -o $@ $<
-
-moc_QtGnuplotWidget.o: moc_QtGnuplotWidget.cpp
-	$(CXX) -c $(CFLAGS) $(CFLAGSEXTRA) $(CXXFLAGS) -MMD -MT '$*.o' -MF $*.d -o $@ $<
-
-moc_QtGnuplotScene.o: moc_QtGnuplotScene.cpp
-	$(CXX) -c $(CFLAGS) $(CFLAGSEXTRA) $(CXXFLAGS) -MMD -MT '$*.o' -MF $*.d -o $@ $<
-
-moc_QtGnuplotEvent.o: moc_QtGnuplotEvent.cpp
-	$(CXX) -c $(CFLAGS) $(CFLAGSEXTRA) $(CXXFLAGS) -MMD -MT '$*.o' -MF $*.d -o $@ $<
-
-qrc_QtGnuplotResource.o: qrc_QtGnuplotResource.cpp
+%.o: %.cpp
 	$(CXX) -c $(CFLAGS) $(CFLAGSEXTRA) $(CXXFLAGS) -MMD -MT '$*.o' -MF $*.d -o $@ $<
 
 gnuplot_qt.exe: $(QT_FILES_TARGETS) $(GNUPLOTQTOBJS)
