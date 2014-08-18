@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.463 2014/08/17 06:38:54 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.464 2014/08/18 23:38:01 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -284,23 +284,14 @@ place_arrows(int layer)
 	 this_arrow != NULL;
 	 this_arrow = this_arrow->next) {
 	int sx, sy, ex, ey;
-	struct arrow_style_type as = this_arrow->arrow_properties;
 
-	if (as.layer != layer)
+	if (this_arrow->arrow_properties.layer != layer)
 	    continue;
 	get_arrow(this_arrow, &sx, &sy, &ex, &ey);
 
-	/* Draw arrow shaft */
-	term_apply_lp_properties(&(as.lp_properties));
-	draw_clip_arrow(sx, sy, ex, ey, NOHEAD);
-
-	/* Draw arrow head, never use dashed lines */
-	if (as.head != NOHEAD) {
-	    apply_head_properties(&as);
-	    as.lp_properties.d_type = DASHTYPE_SOLID;
-	    term_apply_lp_properties(&(as.lp_properties));
-	    draw_clip_arrow(sx, sy, ex, ey, -as.head);
-	}
+	term_apply_lp_properties(&(this_arrow->arrow_properties.lp_properties));
+	apply_head_properties(&(this_arrow->arrow_properties));
+	draw_clip_arrow(sx, sy, ex, ey, this_arrow->arrow_properties.head);
     }
     term_apply_lp_properties(&border_lp);
     clip_area = clip_save;

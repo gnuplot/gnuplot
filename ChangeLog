@@ -1,3 +1,10 @@
+2014-08-18 Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/graphics.c (place_arrows) src/graph3d.c (place_arrows3d):
+	Revert arrowhead patch of 2014-08-18.  Document that if you want a
+	dashed arrow shaft it is best to use "nofilled" for the arrow head.
+	Bugs #1460 #1476
+
 2014-09-03  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graph3d.c src/hidden3d.c:  "splot ... with dots" was not drawing

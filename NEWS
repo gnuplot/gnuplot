@@ -2,6 +2,7 @@ Changes since 5.0.rc2
 =====================
 
 * FIX "splot ... with dots" was not drawing the dots
+* FIX revert arrowhead changes introduced in -rc1
 
 Changes since 5.0.rc1
 =====================
