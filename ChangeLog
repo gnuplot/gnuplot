@@ -1,3 +1,8 @@
+2014-08-18 Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/graphics.c (place_arrows) src/graph3d.c (place_arrows3d):
+	Only invoke the arrowheads only code if there really is an arrowhead.
+
 2014-08-18  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* config/mingw/Makefile (VPATH): Drop $W from VPATH.  Necessary to
