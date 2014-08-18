@@ -1,5 +1,5 @@
 # Hello, emacs: this is a -*- Makefile -*-
-# $Id: Makefile,v 1.45 2014/06/09 07:25:58 markisch Exp $
+# $Id: Makefile,v 1.46 2014/08/15 19:25:13 sfeam Exp $
 #
 # GNUPLOT Makefile for MinGW/MSYS on Windows
 # This assumes usual installation of the MinGW32 toolkit, the free
@@ -683,7 +683,7 @@ doc2html-ja.exe: $(JASRC) $(D)windows/doc2html.c $(D)termdoc.c $(D)xref.c versio
 
 #make binary demo files
 # WINDOWS_NO_GUI makes sure that wtext.h does not redefine fread() etc.
-$(M)bf_test.exe : bf_test.c alloc.$(O)
+$(M)bf_test.exe : bf_test.c 
 	$(LD) $(LDFLAGS) $(CFLAGS) -DWINDOWS_NO_GUI -o $@ $^
 	(cd $(M) ; ./bf_test.exe )
 
