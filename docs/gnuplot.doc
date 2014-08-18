@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.900 2014/07/30 20:48:58 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.901 2014/07/31 00:11:56 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -2000,8 +2000,8 @@ C ... and restart the table:
       GRAPH_Y = (Y - GPVAL_Y_MIN) / (GPVAL_Y_MAX - GPVAL_Y_MIN)
       SCREEN_X = GPVAL_TERM_XMIN + GRAPH_X * (GPVAL_TERM_XMAX - GPVAL_TERM_XMIN) 
       SCREEN_Y = GPVAL_TERM_YMIN + GRAPH_Y * (GPVAL_TERM_YMAX - GPVAL_TERM_YMIN)
-      FRAC_X = SCREEN_X / GPVAL_TERM_XSIZE
-      FRAC_Y = SCREEN_Y / GPVAL_TERM_YSIZE
+      FRAC_X = SCREEN_X * GPVAL_TERM_SCALE / GPVAL_TERM_XSIZE
+      FRAC_Y = SCREEN_Y * GPVAL_TERM_SCALE / GPVAL_TERM_YSIZE
 
 =errors
 =error state
