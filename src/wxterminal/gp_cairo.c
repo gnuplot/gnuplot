@@ -1,5 +1,5 @@
 /*
- * $Id: gp_cairo.c,v 1.85 2014/06/07 03:42:27 sfeam Exp $
+ * $Id: gp_cairo.c,v 1.86 2014/07/28 21:23:35 sfeam Exp $
  */
 
 /* GNUPLOT - gp_cairo.c */
@@ -346,6 +346,10 @@ void gp_cairo_set_linewidth(plot_struct *plot, double linewidth)
 	if (linewidth < 0.25)	/* Admittedly arbitrary */
 	    linewidth = 0.25;
 	plot->linewidth = linewidth;
+
+	if (!strcmp(term->name,"pdfcairo"))
+		plot->linewidth *= 2;
+
 }
 
 
@@ -548,7 +552,13 @@ void gp_cairo_set_dashtype(plot_struct *plot, int type, t_dashtype *custom_dash_
 	if (type == DASHTYPE_CUSTOM && custom_dash_type) {
 		/* Convert to internal representation */
 		int i;
-		double empirical_scale = 0.55;
+		double empirical_scale;
+
+		if (!strcmp(term->name,"pngcairo"))
+			empirical_scale = 0.25;
+		else
+			empirical_scale = 0.55;
+
 		if (plot->linewidth > 1)
 			empirical_scale *= plot->linewidth;
 
@@ -1775,7 +1785,8 @@ void gp_cairo_fill_pattern(plot_struct *plot, int fillstyle, int fillpar)
 	    cairo_set_source_rgb( pattern_cr, 1.0, 1.0, 1.0);
 
 	cairo_paint(pattern_cr);
-	if (!strcmp(term->name,"pdfcairo")) /* Work-around for poor scaling in cairo <= 1.10 */
+
+	if (!strcmp(term->name,"pdfcairo")) /* Work-around for poor scaling in cairo */
 	    cairo_set_line_width(pattern_cr, PATTERN_SIZE/150.);
 	else
 	    cairo_set_line_width(pattern_cr, PATTERN_SIZE/50.);

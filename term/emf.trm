@@ -1,5 +1,5 @@
 /* Hey Emacs this is -*- C -*-
- * $Id: emf.trm,v 1.97 2014/05/09 22:14:12 broeker Exp $
+ * $Id: emf.trm,v 1.98 2014/05/19 19:33:05 sfeam Exp $
  */
 
 /* GNUPLOT - emf.trm */
@@ -1192,6 +1192,8 @@ TERM_PUBLIC void
 EMF_load_dashtype(int dashtype)
 {
     int i, j;
+    double empirical_scale = 0.50;
+
     /* Each group of 8 entries in dot_length[] defines a dash
        pattern.  Entries in each group are alternately length of
        line and length of whitespace, in units of 2/3 of the linewidth.
@@ -1215,8 +1217,9 @@ EMF_load_dashtype(int dashtype)
 
     if (dashtype == DASHTYPE_CUSTOM) {
 	dashtype = EMF_LINE_TYPES;	/* Point to placeholder array */
-	for (i = 0; i < 8; i += 2)
-	    dot_length[(EMF_LINE_TYPES-1)*8 + i] = emf_dashpattern[i];
+	for (i = 0; i < 8; i += 1)
+	    dot_length[(EMF_LINE_TYPES-1)*8 + i] =
+		emf_dashpattern[i] * ceil(emf_linewidth * empirical_scale/2.);
     }
 
     if (dashtype < 1 || !emf_dashed) {	/* solid mode */
@@ -1237,8 +1240,10 @@ EMF_load_dashtype(int dashtype)
 
 	/* set up dash dimensions */
 	j = (dashtype - 1) * 8;
-	for (i = 0; i < 8; i++, j++)
-	    emf_step_sizes[i] = dot_length[j] * emf_dashlength * EMF_PX2HM;
+	for (i = 0; i < 8; i++, j++) {
+	    emf_step_sizes[i] = dot_length[j] * emf_dashlength * EMF_PX2HM
+			      * emf_linewidth * empirical_scale;
+	}
 
 	/* first thing drawn will be a line */
 	emf_step = emf_step_sizes[0];

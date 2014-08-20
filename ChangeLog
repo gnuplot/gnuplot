@@ -1,3 +1,9 @@
+2014-08-20 Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/wxterminal/gp_cairo.c:  Distinct empirical scale factors for
+	dashlength used by pngcairo, pdfcairo, and wxt.
+	* term/emf.trm:  Scale dashlength with current linewidth.
+
 2014-08-18 Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c (place_arrows) src/graph3d.c (place_arrows3d):
