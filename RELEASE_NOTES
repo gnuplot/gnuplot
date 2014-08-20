@@ -5,6 +5,9 @@ We are happy to announce a second release candidate for gnuplot version 5.
 Version 5 will be a major release with significant new capabilities
 and enhancements compared to previous gnuplot versions.
 
+Please see the NEWS file for bugfixes and minor changes between version 5
+release candidates -rc1 and -rc2.
+
 Release Notes date: 20 August 2014
 
 NOTABLE NEW FEATURES
