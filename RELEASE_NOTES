@@ -1,11 +1,11 @@
-		GNUPLOT VERSION 5.0.rc1 RELEASE NOTES
+		GNUPLOT VERSION 5.0.rc2 RELEASE NOTES
 		=====================================
 
-We are happy to announce a release candidate for gnuplot version 5. 
+We are happy to announce a second release candidate for gnuplot version 5. 
 Version 5 will be a major release with significant new capabilities
 and enhancements compared to previous gnuplot versions.
 
-Release Notes date: 06 June 2014
+Release Notes date: 20 August 2014
 
 NOTABLE NEW FEATURES
 ====================
@@ -135,7 +135,7 @@ KNOWN ISSUES
   work correctly for multiplots, particular if the key box is opaque.
   Toggling plots drawn in hidden3d mode (hidden line removal) does not work.
 
-* Linking against wxWidgets 3.0 is not yet supported (wxt terminal).
+* Linking against wxWidgets 3.0 is not supported (wxt terminal).
   If you configure wxt without also configure X11, you may need to set the
   environmental variable TERMLIBS before configuring:
     TERMLIBS="-lX11"  ./configure
@@ -241,7 +241,7 @@ gnuplot development site on SourceForge.
 Installation instructions are available in the source itself; the short
 version for linux/unix-like systems is to unpack the tarball and then
 build it:
-		cd gnuplot-5.0.rc1 ; ./configure ; make
+		cd gnuplot-5.0.rc2 ; ./configure ; make
 test it:
 		make check
 install it:
@@ -269,6 +269,10 @@ There is also an gnuplot discussion forum on usenet group
 Development
 -----------
 Gnuplot development is quite active. The development branch on SourceForge
-contains preliminary implementations of many new features.  Following the
-release of gnuplot 5.0, the development branch will be identified as 
-version 5.1.  Feedback and contributions of code are very welcome.
+contains preliminary implementations of many new features.  As of 5.0.rc2
+the source for version 5.0 is held in a separate branch of the CVS repository
+branch-5-0-stable.  Development continues in the main branch using the
+version number 5.1 (odd minor number), for eventual release as stable version
+5.2 (even minor number).  Bugfixes to version 5.0 will appear in patchlevel
+releases 5.0.1, 5.0.2, etc., approximately twice a year or as needed to correct
+a serious problem.
