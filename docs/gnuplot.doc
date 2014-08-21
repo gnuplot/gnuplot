@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.902 2014/08/18 03:34:32 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.902.2.1 2014/08/21 15:08:58 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -4345,7 +4345,7 @@ Ffigure_mapcontours
  Syntax:
        fit {<ranges>} <expression>
            '<datafile>' {datafile-modifiers}
-           {noerrors | zerror | errors z}
+           {noerrors | zerror | xerror | yerror | xyerror}
            via '<parameter file>' | <var1>{,<var2>,...}
 
  Ranges may be specified to filter the data used in fitting.

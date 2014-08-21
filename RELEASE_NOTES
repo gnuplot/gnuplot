@@ -56,6 +56,8 @@ NOTABLE NEW FEATURES
 * Hypertext labels in the interactive terminals including web display
   using the HTML canvas or svg terminals.
 
+* The fit command can take into account errors on x as well as errors on y.
+  
 Many other additions are described in the "New Features" section of the
 documentation.
 
@@ -127,6 +129,8 @@ Demo plots illustrating new and old features are online at
 
 KNOWN ISSUES
 ============
+
+* There is no documentation for the new "fit" options xerror|xyerror|etc
 
 * It is tricky to build correctly functioning wxt and qt terminals under
   Windows.
