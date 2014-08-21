@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.458 2014/08/03 21:52:50 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.459 2014/08/15 23:38:12 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -4287,8 +4287,8 @@ set_obj(int tag, int obj_type)
 	    }
 	}
 
-	/* And line properties (will be used for the object boder if the fillstyle uses one */
-	/* LP_NOFILL means don't eat fillcolor here since that is set separately with "fc" */
+	/* Line properties (will be used for the object border if the fillstyle has one. */
+	/* LP_NOFILL means don't eat fillcolor here since at is set separately with "fc". */
 	if (!got_lt) {
 	    lp_style_type lptmp = this_object->lp_properties;
 	    lp_parse(&lptmp, LP_NOFILL, FALSE);
