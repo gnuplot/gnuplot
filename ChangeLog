@@ -1,5 +1,10 @@
 2014-08-21  Ethan A Merritt  <merritt@u.washington.edu>
 
+	* src/fit.c:  Handle columnheaders in input to "fit".
+	Bug #1467
+
+2014-08-21  Ethan A Merritt  <merritt@u.washington.edu>
+
 	* Branchpoint for 5.0 (cvs tag -b branch-5-0-stable)
 
 	The main (development) branch is now marked 5.1 and will eventually
