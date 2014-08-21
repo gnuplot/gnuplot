@@ -28,6 +28,7 @@ New features, changes and fixes since gnuplot version 4.6.5
 * FIX qt terminal handle window close events
 * FIX incorrect processing of certain loop [start:end:incr] combinations
 * FIX Fix y extent and clipping of rectangles with y coord < 0 or inverted axes
+* FIX handle columnheaders in input to fit
 
 
 New features, changes and fixes in gnuplot version 4.6.5
