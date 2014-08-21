@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.187 2014/08/03 01:02:25 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.188 2014/08/03 21:52:50 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -1005,6 +1005,16 @@ lp_parse(struct lp_style_type *lp, lp_class destination_class, TBOOLEAN allow_po
     } 
     
     while (!END_OF_COMMAND) {
+
+	/* This special case is to flag an attemp to "set object N lt <lt>",
+	 * which would otherwise be accepted but ignored, leading to confusion
+	 * FIXME:  Couldn't this be handled at a higher level?
+	 */
+	if ((destination_class == LP_NOFILL)
+	&&  (equals(c_token,"lt") || almost_equals(c_token,"linet$ype"))) {
+	    int_error(c_token, "object linecolor must be set using fillstyle border");
+	}
+
 	if (almost_equals(c_token, "linet$ype") || equals(c_token, "lt")) {
 	    if (set_lt++)
 		break;

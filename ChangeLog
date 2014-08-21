@@ -3,6 +3,12 @@
 	* src/fit.c:  Handle columnheaders in input to "fit".
 	Bug #1467
 
+	* src/misc.c (lp_parse):  Flag "set object N lt <lt>" as an error,
+	since currently this must be done be "set object N fs bo <lt>".
+	Probably we should figure out how to make this command work, but
+	better to issue an error than accept it and then ignore it.
+	Bug #1460
+
 2014-08-21  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* Branchpoint for 5.0 (cvs tag -b branch-5-0-stable)
