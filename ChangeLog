@@ -9,6 +9,9 @@
 	better to issue an error than accept it and then ignore it.
 	Bug #1460
 
+	* src/bf_test.c:  Use HAVE_STDLIB_H and HAVE_MALLOC_H to include proper
+	header file for calloc().  "Jun T." <takimoto-j@kba.biglobe.ne.jp>.
+
 2014-08-21  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* Branchpoint for 5.0 (cvs tag -b branch-5-0-stable)
