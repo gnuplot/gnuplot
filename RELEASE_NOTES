@@ -184,7 +184,7 @@ in addition to several platform-specific modes.
    The qt terminal supports interactive display with menu-driven
    output to png, svg or pdf.  The final 5.0 release may also support
    scripted output to these same file formats but this is not present
-   in rc1.  If either Qt4 or Qt5 is detected by the configure script,
+   in rc2.  If either Qt4 or Qt5 is detected by the configure script,
    this will be the default terminal.  It is now the fastest and most
    full-featured interactive terminal option.
    To disable this terminal:
@@ -236,7 +236,7 @@ Options for generating interactive plots for web display
 Installation
 ------------
 
-You can download a source tarball for gnuplot version 5.0.rc1 from the 
+You can download a source tarball for gnuplot version 5.0.rc2 from the 
 gnuplot development site on SourceForge.
 
 	http://sourceforge.net/project/showfiles.php?group_id=2055
@@ -271,7 +271,7 @@ There is also an gnuplot discussion forum on usenet group
 
 Development
 -----------
-Gnuplot development is quite active. The development branch on SourceForge
+Gnuplot development is ongoing. The development branch on SourceForge
 contains preliminary implementations of many new features.  As of 5.0.rc2
 the source for version 5.0 is held in a separate branch of the CVS repository
 branch-5-0-stable.  Development continues in the main branch using the
