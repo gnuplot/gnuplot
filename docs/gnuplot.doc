@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.901 2014/07/31 00:11:56 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.902 2014/08/18 03:34:32 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -6755,7 +6755,7 @@ Ffigure_mapcontours
       lines        dots       steps     errorbars     xerrorbar    xyerrorlines
       points       impulses   fsteps    errorlines    xerrorlines  yerrorbars
       linespoints  labels     histeps   financebars   xyerrorbars  yerrorlines
-      surface      vectors
+      surface      vectors    parallelaxes
  or
       boxes            boxplot        ellipses       image
       boxerrorbars     candlesticks   filledcurves   rgbimage
