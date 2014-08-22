@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.902 2014/08/18 03:34:32 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.903 2014/08/21 15:08:17 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -5163,7 +5163,7 @@ Ffigure_mapcontours
  Each plot element consists of a definition, a function, or a data source
  together with optional properties or modifiers:
        plot-element:
-            {sampling-range} {<iteration>}
+            {<iteration>} {sampling-range} 
             <definition> | <function> | <data source>
             {axes <axes>} {<title-spec>}
             {with <style>}
@@ -5176,6 +5176,9 @@ Ffigure_mapcontours
  was defined previously.  Multiple datafiles, data blocks, and/or functions may
  be plotted in a single plot command separated by commas.
  See `data`, `inline data`, `functions`.
+
+ A plot-element that contains the definition of a function or variable does not 
+ create any visible output, see third example below.
 
  Examples:
        plot sin(x)
