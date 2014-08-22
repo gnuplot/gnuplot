@@ -1,3 +1,8 @@
+2014-08-22  "Jun T." <takimoto-j@kba.biglobe.ne.jp>.
+
+	* src/bf_test.c:  Use HAVE_STDLIB_H and HAVE_MALLOC_H to determine
+	proper system header file for calloc().
+
 2014-08-21  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/fit.c:  Handle columnheaders in input to "fit".

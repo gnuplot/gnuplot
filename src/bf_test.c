@@ -1,18 +1,15 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: bf_test.c,v 1.11 2014/04/04 19:11:17 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: bf_test.c,v 1.12 2014/08/15 19:25:13 sfeam Exp $"); }
 #endif
 
 
 /*
- * Test routines for binary files
+ * This program creates some binary data files used by the demo
+ * binary.dem to exercise gnuplot's binary input routines.
+ * This code is not used by gnuplot itself.
  *
  * Copyright (c) 1992 Robert K. Cunningham, MIT Lincoln Laboratory
  *
- */
-
-/* Note that this file is not compiled into gnuplot, and so
- * its more-restrictive copyright need not apply to gnuplot
- * as a whole. (I think.)
  */
 
 /*
@@ -21,8 +18,19 @@ static char *RCSid() { return RCSid("$Id: bf_test.c,v 1.11 2014/04/04 19:11:17 s
  */
 #include <ctype.h>
 #include <stdio.h>
-#include <malloc.h>
 #include <math.h>
+
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
+#ifdef HAVE_STDLIB_H
+#  include <stdlib.h>
+#else
+#  ifdef HAVE_MALLOC_H
+#    include <malloc.h>
+#  endif
+#endif
 
 /* replaces __PROTO() */
 static float function (int p, double x, double y);
