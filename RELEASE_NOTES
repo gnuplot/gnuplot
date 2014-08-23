@@ -8,11 +8,21 @@ and enhancements compared to previous gnuplot versions.
 Please see the NEWS file for bugfixes and minor changes between version 5
 release candidates -rc1 and -rc2.
 
-Release Notes date: 20 August 2014
+Release Notes date: 23 August 2014
 
 NOTABLE NEW FEATURES
 ====================
 
+* New plot styles "with parallelaxes", labeled contours.
+
+* New coordinate system (Degrees, Minutes, Seconds) "set xdata geographic".
+
+* The "fit" command can now handle functions with up to 12 variables, and
+  can take into account errors on x as well as errors on dependent variables.
+  Final covariance terms are stored in user-accessible variables.
+  Fitting options are now controlled by the command "set fit ..." rather than
+  by environmental variables.
+  
 * The dot/dash pattern of a line can now be controlled independently
   from other properties using the keyword "dashtype".
 
@@ -43,21 +53,15 @@ NOTABLE NEW FEATURES
   for the special case of log scaling.
 
 * The "import" command attaches a user-defined function name to a 
-  function provided by an extenal shared object (i.e. a plugin).
+  function provided by an extenal shared object (i.e. a plugin library).
 
 * Previous commands in the history list of an interactive session can be
   reexecuted by number.  For example "history !5" will reexecute the 
   command numbered 5 in the list reported by "history".
 
-* New plot styles "with parallelaxes", labeled contours.
-
-* New coordinate system (Degrees, Minutes, Seconds) "set xdata geographic".
-
 * Hypertext labels in the interactive terminals including web display
   using the HTML canvas or svg terminals.
 
-* The fit command can take into account errors on x as well as errors on y.
-  
 Many other additions are described in the "New Features" section of the
 documentation.
 
@@ -100,9 +104,10 @@ A brief summary of potentially incompatible changes is given here.
 * Options to the "fit" command are now given by "set fit ..." rather than
   by setting environmental variables.  Fit can handle up to MAX_NUM_VAR
   independent variables (currently 12).  Variables other than the first
-  two (x, y) have been dissociated from axis names.
-  E.g. "set urange [U1:U2]" has no effect on fitting.  Use the command
-  "set dummy ..." to assign names to fit variables 3 ... 12.
+  two (x, y) have been dissociated from axis names.  This means, for example,
+  "set urange [U1:U2]" has no effect on fitting because "u" is not a fit
+  variable.  Use the command "set dummy ..." to assign names to fit variables
+  3 ... 12.
 
 * The function `timecolumn(N,"timeformat")` now has 2 parameters.
   Because the required second parameter is not associated with a particular
@@ -130,7 +135,9 @@ Demo plots illustrating new and old features are online at
 KNOWN ISSUES
 ============
 
-* There is no documentation for the new "fit" options xerror|xyerror|etc
+* There is no documentation for the new "fit" options xerror|xyerror|etc.
+  Running old fit scripts may require adding the new keyword "noerrors"
+  (this may change for the final 5.0 release).
 
 * It is tricky to build correctly functioning wxt and qt terminals under
   Windows.
