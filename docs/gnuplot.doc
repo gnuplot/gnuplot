@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.903 2014/08/21 15:08:17 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.904 2014/08/22 15:07:18 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -10606,8 +10606,6 @@ Ffigure_missing
  "colorbox", and refers to the indexing variable as lying on the colorbox axis.
  See `set colorbox`, `set cbrange`.
 
- 3. To use pm3d coloring to generate a two-dimensional plot rather than a 3D
- surface, use `set view map` or `set pm3d map`.
 4 position
 ?pm3d position
  Color surface can be drawn at the base or top (then it is a gray/color planar
@@ -10769,12 +10767,16 @@ Ffigure_missing
  Note: Currently color interpolation is always linear, even if corners2color
  is set to a nonlinear scheme such as the geometric mean.
 4 deprecated_options
+?set pm3d deprecated_options
 ?pm3d deprecated_options
+?set pm3d map
+?pm3d map
+?map
  There used to be an option {transparent|solid} to this command.  Now
  you get the same effect from `set grid {front|layerdefault}`, respectively.
 
- The command `set pm3d map` is equivalent to `set pm3d at b`; `set view map`;
- `set style data pm3d`; `set style func pm3d`;.
+ The old command `set pm3d map` is equivalent to `set pm3d at b;
+ set view map scale 1.0; set style data pm3d; set style func pm3d;`
 3 palette
 ?commands set palette
 ?commands show palette
