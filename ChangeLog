@@ -1,3 +1,7 @@
+2014-08-27  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* Prepare release notes for 5.0.rc2
+
 2014-08-22  "Jun T." <takimoto-j@kba.biglobe.ne.jp>.
 
 	* src/bf_test.c:  Use HAVE_STDLIB_H and HAVE_MALLOC_H to determine

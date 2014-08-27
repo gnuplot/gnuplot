@@ -1,4 +1,4 @@
-		GNUPLOT VERSION 5.0.rc2 RELEASE NOTES
+		GNUPLOT Version 5.0.rc2 Release Notes
 		=====================================
 
 We are happy to announce a second release candidate for gnuplot version 5. 
@@ -8,7 +8,7 @@ and enhancements compared to previous gnuplot versions.
 Please see the NEWS file for bugfixes and minor changes between version 5
 release candidates -rc1 and -rc2.
 
-Release Notes date: 23 August 2014
+Release Notes date: 27 August 2014
 
 NOTABLE NEW FEATURES
 ====================
@@ -128,8 +128,7 @@ ONLINE DEMO PLOTS
 =================
 
 Demo plots illustrating new and old features are online at
-
-	http://gnuplot.sourceforge.net/demo_5.0/
+  http://gnuplot.sourceforge.net/demo_5.0/
 
 
 KNOWN ISSUES
@@ -137,10 +136,9 @@ KNOWN ISSUES
 
 * There is no documentation for the new "fit" options xerror|xyerror|etc.
   Running old fit scripts may require adding the new keyword "noerrors"
-  (this may change for the final 5.0 release).
+  (these new options may change for the final 5.0 release).
 
-* It is tricky to build correctly functioning wxt and qt terminals under
-  Windows.
+* It is tricky to build the wxt and qt terminals under Windows.
 
 * Font initialization on OSX can be very slow, causing the qt terminal to
   issue warning or error messages for the first plot command.
@@ -180,7 +178,7 @@ so there is no longer a --with-lisp-files configuration option.
 
 The TeX tutorial produced by --with-tutorial is horribly out of date.
 
-./configure --enable-backwards-compatibility will allow use of [some]
+./configure --enable-backwards-compatibility will allow use of some
 deprecated syntax from old gnuplot versions.  However the result of
 using these deprecated commands may not match the old version output.
 
@@ -249,17 +247,18 @@ Installation
 
 You can download a source tarball for gnuplot version 5.0.rc2 from the 
 gnuplot development site on SourceForge.
-
 	http://sourceforge.net/project/showfiles.php?group_id=2055
 
 Installation instructions are available in the source itself; the short
 version for linux/unix-like systems is to unpack the tarball and then
+<PRE>
 build it:
-		cd gnuplot-5.0.rc2 ; ./configure ; make
+      cd gnuplot-5.0.rc2 ; ./configure ; make
 test it:
-		make check
+      make check
 install it:
-		make install
+      make install
+</PRE>
 
 Pay careful attention to the output of the ./configure script.
 It may indicate that some output drivers have been omitted because the
@@ -267,16 +266,13 @@ necessary support libraries were not found.  In general you need to have
 previously installed the "*-devel-*" versions of these libraries. 
 
 
-
 Support
 -------
 Please report all bugs and installation problems to the bug tracker
 on SourceForge:
-
 	http://sourceforge.net/tracker/?group_id=2055&atid=102055
 
 There is also an gnuplot discussion forum on usenet group
-
 	comp.graphics.apps.gnuplot
 
 
