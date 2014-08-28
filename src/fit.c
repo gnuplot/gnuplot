@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: fit.c,v 1.145 2014/06/17 05:39:30 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: fit.c,v 1.145.2.1 2014/08/21 19:34:00 sfeam Exp $"); }
 #endif
 
 /*  NOTICE: Change of Copyright Status
@@ -1946,6 +1946,7 @@ fit_command()
     } else if (almost_equals(c_token, "err$ors")) {
 	/* error column specs follow */
 	c_token++;
+	num_errors = 0;
 	do {
 	    char * err_spec = NULL;
 
