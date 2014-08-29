@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.245 2014/07/25 20:25:59 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.248 2014/08/29 21:34:38 mikulik Exp $"); }
 #endif
 
 #define MOUSE_ALL_WINDOWS 1
@@ -2404,6 +2404,7 @@ exec_cmd(plot_struct *plot, char *command)
 		    break;
 	}
 
+#ifdef USE_X11_MULTIBYTE
 	/* FIXME EAM DEBUG: We should not have gotten here without a valid font	*/
 	/* but apparently it can happen in the case of UTF-8.  The sanity check	*/
 	/* below must surely belong somewhere during font selection instead.	*/
@@ -2411,6 +2412,7 @@ exec_cmd(plot_struct *plot, char *command)
 	    usemultibyte = 0;
 	    fprintf(stderr,"gnuplot_x11: invalid multibyte font\n");
 	}
+#endif
 
 	sl = strlen(str) - 1;
 	sw = gpXTextWidth(font, str, sl);
@@ -4597,8 +4599,13 @@ process_configure_notify_event(XEvent *event, TBOOLEAN isRetry )
 		/* Don't replot if we're replotting-on-window-resizes, since replotting
 		   happens elsewhere in those cases. If the inboard driver is dead, and
 		   the window is still around with -persist, replot also. */
+#ifdef PIPE_IPC
 		if ((replot_on_resize != yes) || pipe_died)
 			display(plot);
+#else
+		if (replot_on_resize != yes)
+			display(plot);
+#endif
 
 #ifdef USE_MOUSE
 	    {
