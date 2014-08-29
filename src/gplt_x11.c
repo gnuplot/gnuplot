@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.246 2014/08/15 17:49:45 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.247 2014/08/29 21:25:30 mikulik Exp $"); }
 #endif
 
 #define MOUSE_ALL_WINDOWS 1
@@ -4596,11 +4596,14 @@ process_configure_notify_event(XEvent *event, TBOOLEAN isRetry )
 	    }
 #endif
 
-#ifdef PIPE_IPC
 		/* Don't replot if we're replotting-on-window-resizes, since replotting
 		   happens elsewhere in those cases. If the inboard driver is dead, and
 		   the window is still around with -persist, replot also. */
+#ifdef PIPE_IPC
 		if ((replot_on_resize != yes) || pipe_died)
+			display(plot);
+#else
+		if (replot_on_resize != yes)
 			display(plot);
 #endif
 
