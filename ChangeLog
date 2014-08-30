@@ -1,3 +1,7 @@
+2014-08-30  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* config/config.os2: Use _strtoll.
+
 2014-08-29  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/gplt_x11.c (exec_cmd process_configure_notify_event):

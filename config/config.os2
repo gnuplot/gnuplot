@@ -551,3 +551,5 @@
 #define PM_KEEP_OLD_ENHANCED_TEXT 1
 #endif
 
+#define strtoll _strtoll
+
