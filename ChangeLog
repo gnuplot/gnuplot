@@ -1,3 +1,11 @@
+2014-08-31  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/stats.c docs/gnuplot.doc:  Calculate and report sample standard
+	deviation (STATS_ssd) as well as the population standard deviation 
+	(STATS_stddev).  Provide formulae for the reported quantities in the
+	LaTeX documentation, and document the difference between
+	_ssd and _stddev in all documentation formats.
+
 2014-08-30  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* config/config.os2: Use _strtoll.

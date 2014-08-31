@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.902.2.4 2014/08/25 20:26:15 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.902.2.5 2014/08/25 20:46:19 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -2432,7 +2432,7 @@ Ffigure_newsyntax
                            # dot (.) hyphen (-) underscore(_) and space.
        dashtype (s1,e1,s2,e2,s3,e3,s4,e4)  # dash pattern specified by 1 to 4
                            # numerical pairs <solid length>, <emptyspace length> 
- 
+
  Example:
        # Two functions using linetype 1 but distinguished by dashtype
        plot f1(x) with lines lt 1 dt solid, f2(x) with lines lt 1 dt 3
@@ -3890,7 +3890,7 @@ Ffigure_points
  1 or 2 columns of basic input data are required in 2D plots; 1 or 3 columns are
  required in 3D plots.  See `style lines`.  Additional input columns may be used
  to provide information such as variable point size or variable point color.
- 
+
  The first 8 point types are shared by all terminals.  Individual terminals may
  provide a much larger number of distinct point types.  Use the `test` command
  to show what is provided by the current terminal.  Alternatively any single
@@ -10742,7 +10742,7 @@ Ffigure_missing
        set pm3d at s depthorder border lw 0.2 lt black
        unset hidden3d
        unset surf
-       splot x*x+y*y linecolor rgb "blue"	# otherwise it would be black
+       splot x*x+y*y linecolor rgb "blue"   # otherwise it would be black
 
  NB: The deprecated option `set pm3d hidden3d N` is still accepted. It is 
  equivalent to `set pm3d border ls N`.
@@ -13773,24 +13773,33 @@ Ffigure_missing
  In addition to printed output, the program stores the individual statistics
  into three sets of variables.
  The first set of variables reports how the data is laid out in the file:
-      STATS_records           # total number of in-range data records
+@start table
+      STATS_records           # total number of in-range data records (N)
       STATS_outofrange        # number of records filtered out by range limits
       STATS_invalid           # number of invalid/incomplete/missing records
       STATS_blank             # number of blank lines in the file
       STATS_blocks            # number of indexable datablocks in the file
       STATS_columns           # number of data columns in the first row of data
+#\begin{tabular}{|lcl|} \hline
+#\verb@STATS_records@    & $~~N~~$ &  total number of in-range data records  \\
+#\verb@STATS_outofrange@ & $~~~~~$  &  number of records filtered out by range limits  \\
+#\verb@STATS_invalid@    & $~~~~~$  &  number of invalid/incomplete/missing records  \\
+#\verb@STATS_blank@      & $~~~~~$  &  number of blank lines in the file  \\
+#\verb@STATS_blocks@     & $~~~~~$  &  number of indexable datablocks in the file  \\
+#\verb@STATS_columns@    & $~~~~~$  &  number of data columns in the first row of data  \\
+@end table
 
- The second set reports properties of the in-range data from a single
- column.  If the corresponding axis is autoscaled then no range limits
- are applied. If a single column is used, it is affected by the y-axis
- settings. Otherwise the x-axis settings apply to the first and the
- y-axis settings to the second column.
+ The second set reports properties of the in-range data from a single column.
+ This column is treated as y. If the y axis is autoscaled then no range limits
+ are applied. Otherwise only values in the range [ymin:ymax] are considered.
 
- If two columns are being analysed in a single `stats` command, the
- suffix "_x" or "_y" is appended to each variable name.
+ If two columns are analysed jointly by a single `stats` command, the suffix
+ "_x" or "_y" is appended to each variable name.
  I.e. STATS_min_x is the minimum value found in the first column, while
  STATS_min_y is the minimum value found in the second column.
+ In this case points are filtered by testing against both xrange and yrange.
 
+@start table
       STATS_min               # minimum value of in-range data points
       STATS_max               # maximum value of in-range data points
       STATS_index_min         # index i for which data[i] == STATS_min
@@ -13798,20 +13807,45 @@ Ffigure_missing
       STATS_lo_quartile       # value of the lower (1st) quartile boundary
       STATS_median            # median value
       STATS_up_quartile       # value of the upper (3rd) quartile boundary
-      STATS_mean              # mean value of in-range data points
-      STATS_stddev            # standard deviation of the in-range data points
-      STATS_skewness          # skewness of in-range data points
-      STATS_kurtosis          # excess kurtosis of in-range data points
-      STATS_adev              # mean absolute deviation of the data points
+      STATS_mean              # mean value of the in-range data points
+      STATS_ssd               # sample standard deviation of the in-range data
+                                   = sqrt( Sum[(y-ymean)^2] / (N-1) )
+      STATS_stddev            # population standard deviation of the in-range data
+                                   = sqrt( Sum[(y-ymean)^2] / N )
       STATS_sum               # sum
       STATS_sumsq             # sum of squares
+      STATS_skewness          # skewness of the in-range data points
+      STATS_kurtosis          # kurtosis of the in-range data points
+      STATS_adev              # mean absolute deviation of the in-range data points
       STATS_mean_err          # standard error of the mean value
       STATS_stddev_err        # standard error of the standard deviation
       STATS_skewness_err      # standard error of the skewness
-      STATS_kurtosis_err      # standard error of the excess kurtosis
+      STATS_kurtosis_err      # standard error of the kurtosis
+#\begin{tabular}{|lrll|} \hline
+#\verb@STATS_min@ && $min(y)$ &  minimum value of in-range data points \\
+#\verb@STATS_max@ && $max(y)$ &  maximum value of in-range data points \\
+#\verb@STATS_index_min@ && $i \mid y_i = min(y)$ &  index i for which data[i] == STATS\_min \\
+#\verb@STATS_index_max@ && $i \mid y_i = max(y)$ &  index i for which data[i] == STATS\_max \\
+#\verb@STATS_mean@ & $\bar{y}=$ & $\frac{1}{N}\sum{y}$ &  mean value of the in-range data points \\
+#\verb@STATS_stddev@ & $\sigma_y=$ & $\sqrt{\frac{1}{N}{\sum{{(y-\bar{y})}^2}}}$ &  population standard deviation of the in-range data \\
+#\verb@STATS_ssd@ & $s_y=$ & $\sqrt{\frac{1}{N-1}{\sum{{(y-\bar{y})}^2}}}$ &  sample standard deviation of the in-range data \\
+#\verb@STATS_lo_quartile@ && ~ &  value of the lower (1st) quartile boundary \\
+#\verb@STATS_median@ && ~ &  median value \\
+#\verb@STATS_up_quartile@ && ~ &  value of the upper (3rd) quartile boundary \\
+#\verb@STATS_sum@ && $\sum{y}$ &  sum \\
+#\verb@STATS_sumsq@ && $\sum{y^2}$ &  sum of squares \\
+#\verb@STATS_skewness@ && $\frac{1}{N\sigma^3}\sum{(y-\bar{y})^3}$ &  skewness of the in-range data points \\
+#\verb@STATS_kurtosis@ && $\frac{1}{N\sigma^4}\sum{(y-\bar{y})^4}$ &  kurtosis of the in-range data points \\
+#\verb@STATS_adev@ && $\frac{1}{N}\sum{|{y}-\bar{y}|}$ &  mean absolute deviation of the in-range data \\
+#\verb@STATS_mean_err@ && $\sigma_y / \sqrt{N}$ &  standard error of the mean value \\
+#\verb@STATS_stddev_err@ && $\sigma_y / \sqrt{2N}$ &  standard error of the standard deviation \\
+#\verb@STATS_skewness_err@ && $\sqrt{6/N}$ &  standard error of the skewness \\
+#\verb@STATS_kurtosis_err@ && $\sqrt{24/N}$ &  standard error of the kurtosis \\
+@end table
 
  The third set of variables is only relevant to analysis of two data columns.
-      STATS_correlation       # correlation coefficient between x and y values
+@start table
+      STATS_correlation       # sample correlation coefficient between x and y values
       STATS_slope             # A corresponding to a linear fit y = Ax + B
       STATS_slope_err         # uncertainty of A
       STATS_intercept         # B corresponding to a linear fit y = Ax + B
@@ -13819,6 +13853,16 @@ Ffigure_missing
       STATS_sumxy             # sum of x*y
       STATS_pos_min_y         # x coordinate of a point with minimum y value
       STATS_pos_max_y         # x coordinate of a point with maximum y value
+#\begin{tabular}{|lll|} \hline
+#\verb@STATS_correlation@ &   &  sample correlation coefficient between x and y values \\
+#\verb@STATS_slope@       &   &  A corresponding to a linear fit y = Ax + B \\
+#\verb@STATS_slope_err@   &   &  uncertainty of A \\
+#\verb@STATS_intercept@   &   &  B corresponding to a linear fit y = Ax + B \\
+#\verb@STATS_intercept_err@ &   &  uncertainty of B \\
+#\verb@STATS_sumxy@       &   &  sum of x*y \\
+#\verb@STATS_pos_min_y@   &   &  x coordinate of a point with minimum y value \\
+#\verb@STATS_pos_max_y@   &   &  x coordinate of a point with maximum y value \\
+@end table
 
  It may be convenient to track the statistics from more than one file at the
  same time. The `name` option causes the default prefix "STATS" to be replaced
@@ -13838,8 +13882,7 @@ Ffigure_missing
  mean value of points N/2 and (N+2)/2. Equivalent treatment is used for the
  quartile boundaries.
 
- For an example of using the `stats` command to help annotate a subsequent plot,
- see
+ For an example of using the `stats` command annotate a subsequent plot, see
 ^ <a href="http://www.gnuplot.info/demo/stats.html">
  stats.dem.
 ^ </a>
@@ -13937,7 +13980,7 @@ Ffigure_missing
  This command updates the current values of variables stored in the given
  file, which has to be formatted as an initial-value file (as described in the
  `fit` section).
- 
+
  If the file name does not exist, a new file is created containing all
  currently defined user variables. All variables not used in the last fit
  are marked as "#FIXED". This is useful for saving the current values of fit
