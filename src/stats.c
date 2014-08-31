@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: stats.c,v 1.13 2014/05/09 22:14:12 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: stats.c,v 1.14 2014/05/27 22:12:54 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - stats.c */
@@ -100,6 +100,7 @@ struct sgl_column_stats {
     double mean;
     double adev;
     double stddev;
+    double ssd;		/* sample standard deviation */
     double skewness;
     double kurtosis;
 
@@ -224,8 +225,9 @@ analyze_sgl_column( double *data, long n, long nr )
 	d3 += t*t*t;
 	d4 += t*t*t*t;
     }
-    /* two-pass algorithm for variance */
-    var = (d2 - d * d / n) / n;  /* population, not sample */
+
+    /* population (not sample) variance, stddev, skew, kurtosis */
+    var = (d2 - d * d / n) / n;
     res.stddev = sqrt(var);
     res.adev = ad / n;
     if (var != 0.0) {
@@ -239,6 +241,9 @@ analyze_sgl_column( double *data, long n, long nr )
     res.stddev_err = res.stddev / sqrt(2.0 * n);
     res.skewness_err = sqrt(6.0 / n);
     res.kurtosis_err = sqrt(24.0 / n);
+
+    /* sample standard deviation */
+    res.ssd = res.stddev * sqrt((double)(n) / (double)(n-1));
 
     for( i=0; i<n; i++ ) {
 	tmp[i].val = data[i];
@@ -400,6 +405,7 @@ sgl_column_output_nonformat( struct sgl_column_stats s, char *x )
 {
     fprintf( print_out, "%s%s\t%f\n", "mean",     x, s.mean );
     fprintf( print_out, "%s%s\t%f\n", "stddev",   x, s.stddev );
+    fprintf( print_out, "%s%s\t%f\n", "ssd",      x, s.ssd );
     fprintf( print_out, "%s%s\t%f\n", "skewness", x, s.skewness );
     fprintf( print_out, "%s%s\t%f\n", "kurtosis", x, s.kurtosis );
     fprintf( print_out, "%s%s\t%f\n", "adev",     x, s.adev);
@@ -462,6 +468,7 @@ sgl_column_output( struct sgl_column_stats s, long n )
 
     fprintf( print_out, "  Mean:          %s\n", fmt( buf, s.mean ) );
     fprintf( print_out, "  Std Dev:       %s\n", fmt( buf, s.stddev ) );
+    fprintf( print_out, "  Sample StdDev: %s\n", fmt( buf, s.ssd ) );
     fprintf( print_out, "  Skewness:      %s\n", fmt( buf, s.skewness ) );
     fprintf( print_out, "  Kurtosis:      %s\n", fmt( buf, s.kurtosis ) );
     fprintf( print_out, "  Avg Dev:       %s\n", fmt( buf, s.adev ) );
@@ -533,6 +540,7 @@ two_column_output( struct sgl_column_stats x,
     fprintf( print_out, "* COLUMNS:\n" );
     fprintf( print_out, "  Mean:          %s %s %s\n", fmt(bfx, x.mean),   blank, fmt(bfy, y.mean) );
     fprintf( print_out, "  Std Dev:       %s %s %s\n", fmt(bfx, x.stddev), blank, fmt(bfy, y.stddev ) );
+    fprintf( print_out, "  Sample StdDev: %s %s %s\n", fmt(bfx, x.ssd), blank, fmt(bfy, y.ssd ) );
     fprintf( print_out, "  Skewness:      %s %s %s\n", fmt(bfx, x.skewness), blank, fmt(bfy, y.skewness) );
     fprintf( print_out, "  Kurtosis:      %s %s %s\n", fmt(bfx, x.kurtosis), blank, fmt(bfy, y.kurtosis) );
     fprintf( print_out, "  Avg Dev:       %s %s %s\n", fmt(bfx, x.adev), blank, fmt(bfy, y.adev ) );
@@ -624,6 +632,7 @@ sgl_column_variables( struct sgl_column_stats s, char *prefix, char *suffix )
 {
     create_and_set_var( s.mean,     prefix, "mean",     suffix );
     create_and_set_var( s.stddev,   prefix, "stddev",   suffix );
+    create_and_set_var( s.ssd,      prefix, "ssd",      suffix );
     create_and_set_var( s.skewness, prefix, "skewness", suffix );
     create_and_set_var( s.kurtosis, prefix, "kurtosis", suffix );
     create_and_set_var( s.adev,     prefix, "adev",     suffix );
