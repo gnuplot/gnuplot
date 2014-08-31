@@ -6,6 +6,10 @@
 	LaTeX documentation, and document the difference between
 	_ssd and _stddev in all documentation formats.
 
+	* src/stats.c:  In version 5 when there is no using spec df_readline()
+	always returns at most the number of columns present on the first line.
+	Bug #1472
+
 2014-08-30  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* config/config.os2: Use _strtoll.

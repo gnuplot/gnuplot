@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: stats.c,v 1.14 2014/05/27 22:12:54 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: stats.c,v 1.14.2.1 2014/08/31 21:20:48 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - stats.c */
@@ -714,7 +714,6 @@ statsrequest(void)
 {
     int i;
     int columns;
-    int columnsread;
     double v[2];
     static char *file_name = NULL;
 
@@ -752,7 +751,6 @@ statsrequest(void)
     parse_range(FIRST_Y_AXIS);
 
     /* Initialize */
-    columnsread = 2;
     invalid = 0;          /* number of missing/invalid records */
     blanks = 0;           /* number of blank lines */
     doubleblanks = 0;     /* number of repeated blank lines */
@@ -819,7 +817,7 @@ statsrequest(void)
 	    int_error(NO_CARET, "Can't read data file");
 
 	if (columns > 2 )
-	    int_error(c_token, "Need 0 to 2 using specs for stats command");
+	    int_error(c_token, "stats command can handle only 2 columns of data");
 
 	/* If the user has set an explicit locale for numeric input, apply it
 	   here so that it affects data fields read from the input file. */
@@ -847,19 +845,13 @@ statsrequest(void)
 	   so that "columns" will be 0, 1, or 2 (no using, using 1, using 1:2)
 	 - readline always returns the same number of columns (for us: 1 or 2)
 	 - using 1:2 = return two columns, skipping lines w/ bad data
-	 - using 1   = return sgl column (supply zeros (0) for the second col)
-	 - no using  = return two columns (first two), fail on bad data
-
-	 We need to know how many columns to process. If columns==1 or ==2
-	 (that is, if there was a using spec), all is clear and we use the
-	 value of columns.
-	 But: if columns is 0, then we need to figure out the number of cols
-	 read from the return value of readline. If readline ever returns
-	 1, we take that; only if it always returns 2 do we assume two cols.
+	 - using 1   = return single column (supply zeros (0) for the second col)
+	 - no using (gnuplot version 5)
+		     = first two columns if both are present on the first line of data
+		       else first column only
 	 */
 
 	while( (i = df_readline(v, 2)) != DF_EOF ) {
-	    columnsread = ( i > columnsread ? i : columnsread );
 
 	    if ( n >= max_n ) {
 		max_n = (max_n * 3) / 2; /* increase max_n by factor of 1.5 */
@@ -900,6 +892,7 @@ statsrequest(void)
 	      } else {
 		out_of_range++;
 	      }
+	      columns = 1;
 	      break;
 
 	    case 2: /* Read two columns successfully  */
@@ -911,6 +904,7 @@ statsrequest(void)
 	      } else {
 		out_of_range++;
 	      }
+	      columns = 2;
 	      break;
 	    }
 	} /* end-while : done reading file */
@@ -919,10 +913,6 @@ statsrequest(void)
 	/* now resize fields to actual length: */
 	redim_vec(&data_x, n);
 	redim_vec(&data_y, n);
-
-	/* figure out how many columns where really read... */
-	if ( columns == 0 )
-	    columns = columnsread;
 
     }  /* end of case when the data file is not a matrix */
 
