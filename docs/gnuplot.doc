@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.906 2014/08/25 20:46:30 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.907 2014/08/31 21:21:00 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -13882,7 +13882,7 @@ Ffigure_missing
  mean value of points N/2 and (N+2)/2. Equivalent treatment is used for the
  quartile boundaries.
 
- For an example of using the `stats` command annotate a subsequent plot, see
+ For an example of using the `stats` command to annotate a subsequent plot, see
 ^ <a href="http://www.gnuplot.info/demo/stats.html">
  stats.dem.
 ^ </a>
