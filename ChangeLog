@@ -1,6 +1,7 @@
 2014-09-03  Ethan A Merritt  <merritt@u.washington.edu>
 
-	* src/graph3d.c:  "splot ... with dots" was not drawing the dots.
+	* src/graph3d.c src/hidden3d.c:  "splot ... with dots" was not drawing
+	the dots.
 	Bug #1474
 
 2014-08-31  Ethan A Merritt  <merritt@u.washington.edu>
