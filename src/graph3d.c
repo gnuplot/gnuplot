@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.310 2014/08/17 06:38:54 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.311 2014/08/18 23:38:01 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -1039,6 +1039,7 @@ do_3dplot(
 	    case ELLIPSES:
 #endif
 	    case POINTSTYLE:
+	    case DOTS:
 		if (draw_this_surface) {
 		    if (!hidden3d || this_plot->opt_out_of_hidden3d)
 			plot3d_points(this_plot);
@@ -1051,15 +1052,6 @@ do_3dplot(
 			plot3d_lines_pm3d(this_plot);
 			plot3d_points(this_plot);
 		    }
-		}
-		break;
-
-	    case DOTS:
-		if (draw_this_surface) {
-		    this_plot->lp_properties.p_type = -1;
-		    this_plot->lp_properties.pointflag = TRUE;
-		    if (!hidden3d || this_plot->opt_out_of_hidden3d)
-			plot3d_points(this_plot);
 		}
 		break;
 
@@ -1808,8 +1800,12 @@ plot3d_points(struct surface_points *plot)
 		    &&  plot->lp_properties.p_size == PTSZ_VARIABLE)
 			(*t->pointsize)(pointsize * point->CRD_PTSIZE);
 
+		    /* This code is also used for "splot ... with dots" */
+		    if (plot->plot_style == DOTS)
+			(*t->point) (x, y, -1);
+
 		    /* The normal case */
-		    if (plot->lp_properties.p_type >= 0)
+		    else if (plot->lp_properties.p_type >= 0)
 			(*t->point) (x, y, plot->lp_properties.p_type);
 
 		    /* Print special character rather than drawn symbol */
@@ -1817,6 +1813,7 @@ plot3d_points(struct surface_points *plot)
 			apply_pm3dcolor(&(plot->labels->textcolor), t);
 			(*t->put_text)(x, y, (char *)(&(plot->lp_properties.p_char)));
 		    }
+
 		}
 	    }
 	}
