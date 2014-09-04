@@ -86,7 +86,7 @@ struct TERMENTRY {
 #ifdef EAM_BOXED_TEXT
     void (*boxed_text)__PROTO((unsigned int x, unsigned int y, int option));
 #endif
-   void (*modify_plots) __PROTO((unsigned int));
+   void (*modify_plots) __PROTO((unsigned int operations, int plotno));
    
    void (*dashtype) __PROTO((int type, t_dashtype *custom_dash_pattern));
 };
@@ -479,9 +479,9 @@ _hypertext(int type, const char *text)
    triggered by mousing over the object. Possible future extensions
    include treating the text as a URL activated by mouse click.
 
-_modify_plots(unsigned int operations) - used for interactive terminals.
-   Apply operations to every plot in the graph. Operations are given
-   in the passed bitmask.  Possible values are given in term_api.h
+_modify_plots(unsigned int operations, int plotno) - used for interactive terminals.
+   Apply operations to a single plot or to every plot in the graph.
+   Bit definitions in the operations bitmask are given in term_api.h
    and include SET_VISIBLE and SET_INVISIBLE.
 
 _dashtype(int type, t_dashtype *custom_dash_pattern) - set dash/dot 

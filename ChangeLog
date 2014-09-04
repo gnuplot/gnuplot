@@ -1,4 +1,17 @@
-2014-08-18 Ethan A Merritt  <merritt@u.washington.edu>
+2014-09-04 Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/mouse.c src/term_api.h src/gplt_x11.c
+	src/qtterminal/QtGnuplotScene.cpp src/qtterminal/qt_term.*
+	src/wxterminal/wxt_gui.cpp src/wxterminal/wxt_term.h
+	term/caca.trm term/README term/win.trm term/x11.trm:
+
+	Add a 2nd parameter to the API term->modify_plots(operations, plotno).
+	All terminals for which this entry point is not NULL are updated
+	accordingly.  This patchset does not by itself add any new
+	functionality or change user-visible behavior.  It prepares for later
+	adding command-line equivalents to mouse operations like "toggle".
+
+2014-09-04 Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c (place_arrows) src/graph3d.c (place_arrows3d):
 	Revert arrowhead patch of 2014-08-18.  Document that if you want a

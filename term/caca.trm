@@ -1,7 +1,7 @@
 /*
  * GNUPLOT - caca.trm
  *
- * $Id: caca.trm,v 1.5 2014/05/29 18:13:47 sfeam Exp $
+ * $Id: caca.trm,v 1.6 2014/06/04 08:11:00 markisch Exp $
  *
  * This file uses UTF8 encoding and a tab size of 4.
  *
@@ -81,7 +81,7 @@ TERM_PUBLIC void CACA_hypertext(int type, const char *text);
 #ifdef EAM_BOXED_TEXT
 TERM_PUBLIC void CACA_boxed_text(unsigned int x, unsigned int y, int option);
 #endif
-TERM_PUBLIC void CACA_modify_plots(unsigned int operations);
+TERM_PUBLIC void CACA_modify_plots(unsigned int operations, int plotno);
 
 #endif /* TERM_PROTO */
 
@@ -2475,12 +2475,16 @@ CACA_boxed_text(unsigned int x, unsigned int y, int option)
 
 
 TERM_PUBLIC void
-CACA_modify_plots(unsigned int operations)
+CACA_modify_plots(unsigned int operations, int plotno)
 {
 	int i;
 	TBOOLEAN changed = FALSE;
 
 	for (i = 0; (i < CACA_plotno) && (i < CACA_maxkeyboxes) && (i < CACA_maxhideplots); i++) {
+
+		if (plotno >= 0 && i != plotno)
+			continue;
+
 		switch (operations) {
 		case MODPLOTS_INVERT_VISIBILITIES:
 			CACA_hideplot[i] = ! CACA_hideplot[i];
@@ -2500,6 +2504,7 @@ CACA_modify_plots(unsigned int operations)
 			break;
 		}
 	}
+
 	if (changed) {
 		/* Replot only if something changed. */
 		CACA_zoom_or_replot = TRUE;

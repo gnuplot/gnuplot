@@ -1486,14 +1486,16 @@ void qt_boxed_text(unsigned int x, unsigned int y, int option)
 }
 #endif
 
-void qt_modify_plots(unsigned int ops)
+void qt_modify_plots(unsigned int ops, int plotno)
 {
+	if (!qt)
+		return;
 	if ((ops & MODPLOTS_INVERT_VISIBILITIES) == MODPLOTS_INVERT_VISIBILITIES) {
-		qt->out << GEModPlots << QTMODPLOTS_INVERT_VISIBILITIES;
+		qt->out << GEModPlots << QTMODPLOTS_INVERT_VISIBILITIES << plotno;
 	} else if (ops & MODPLOTS_SET_VISIBLE) {
-		qt->out << GEModPlots << QTMODPLOTS_SET_VISIBLE;
+		qt->out << GEModPlots << QTMODPLOTS_SET_VISIBLE << plotno;
 	} else if (ops & MODPLOTS_SET_INVISIBLE) {
-		qt->out << GEModPlots << QTMODPLOTS_SET_INVISIBLE;
+		qt->out << GEModPlots << QTMODPLOTS_SET_INVISIBLE << plotno;
 	}
 	qt_flushOutBuffer();
 }
