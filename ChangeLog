@@ -1,4 +1,4 @@
-2014-08-18 Ethan A Merritt  <merritt@u.washington.edu>
+2014-09-04 Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c (place_arrows) src/graph3d.c (place_arrows3d):
 	Revert arrowhead patch of 2014-08-18.  Document that if you want a
