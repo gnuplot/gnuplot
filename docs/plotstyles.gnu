@@ -1,7 +1,9 @@
 #
-#  Generate a set of figures to illustrate the various plot styles
-#  EAM - July 2007
+#  Generate a set of figures to illustrate the various plot styles.
+#  These figures are imported into the pdf and html versions of the
+#  User Manual.
 #
+#  EAM - July 2007
 #
 
 if (strstrt(GPVAL_TERMINALS, " windows ") == 0) {
@@ -13,6 +15,7 @@ if (strstrt(GPVAL_TERMINALS, " windows ") == 0) {
 if (!exists("winhelp")) winhelp = 0
 if (winhelp == 0) {
     set term pdfcairo mono font fontspec size 3.5,2.0 dashlength 0.2
+# pdfs that need colour have their own terminal setting, check below
     out = "./"
 } else {
 #   prefer pngcairo over gd based png
@@ -81,6 +84,7 @@ plot demo . 'silver.dat' u 1:($2-10.):(symbol(1+int($0)%8)) \
 # Simple bar charts  (same data plotted)
 # ======================================
 #
+# (no reset, keep settings from previous example set)
 set output out . 'figure_boxes' . ext
 set xzeroaxis
 set boxwidth 0.8 relative
@@ -94,10 +98,12 @@ set output out . 'figure_impulses' . ext
 set bmargin at screen .2
 plot demo . 'silver.dat' u 1:($2-10.) with impulses title 'with impulses'
 set bmargin at screen .05
+
 #
 # Error bars and whisker plots
 # ============================
 #
+# (no reset, keep settings from previous example sets)
 set xrange [0:11]
 set yrange [0:10]
 set boxwidth 0.2
@@ -137,6 +143,7 @@ plot demo . 'candlesticks.dat' using 1:4:($1-sin($1)/2.):($1+sin($1)/2.) \
 set output out . 'figure_xerrorlines' . ext
 plot demo . 'candlesticks.dat' using 1:4:($1-sin($1)/2.):($1+sin($1)/2.) \
      with xerrorlines title 'with xerrorlines'
+     
 #
 # Boxplot
 # =======
@@ -154,6 +161,7 @@ unset key
 set style data boxplot
 plot demo . 'silver.dat' using (1):2:(.25) ps 0.3, \
      '' using (1.5):(5*$3):(.25) ps 0.3
+     
 #
 # Dots
 # ====
@@ -173,6 +181,7 @@ unset ytics
 set xrange [-3:3]
 set yrange [-4:4]
 splot invnorm(rand(0)),invnorm(rand(0)),invnorm(rand(0)) with dots notitle
+
 #
 # Histograms
 # ==========
@@ -213,11 +222,13 @@ plot newhistogram "Set A", \
     demo . 'histopt.dat' u 1 t col, '' u 2 t col fs empty
 #
 set output out . 'figure_histcols' . ext
-set style histogram columns
+set style histogram columnstacked
 set title "Columnstacked" offset 0,-1
 set boxwidth 0.8 rel
 set xtics
 
+if (winhelp !=0) {
+# greyscale rgb for png
 set linetype 11 lc rgb "gray0"
 set linetype 12 lc rgb "white"
 set linetype 13 lc rgb "gray40"
@@ -227,8 +238,16 @@ set style fill solid 1.0 border -1
 plot newhistogram lt 11, \
      'histopt.dat' using 1 title column, \
      '' using 2 title column
+} else {
+# patterned fill for pdf
+set style fill pattern
+plot 'histopt.dat' using 1 title column, \
+     '' using 2 title column
+}
+
 #
 # Circles
+# =======
 #
 reset
 set output out . 'figure_circles' . ext
@@ -241,8 +260,10 @@ set xtics font "Times,10" format "%.1f" scale 0.5
 set ytics font "Times,10" format "%.1f" scale 0.5
 plot demo . 'optimize.dat' with circles lc rgb "gray" fs transparent solid 0.2 nobo,\
      demo . 'optimize.dat' u 1:2 with linespoints lw 2 pt 7 ps 0.3 lc rgb "black"
+     
 #
 # Ellipses
+# ========
 #
 reset
 set output out . 'figure_ellipses' . ext
@@ -251,8 +272,10 @@ unset xtics; unset ytics
 plot demo . 'ellipses.dat' u 1:2:3:4:5 with ellipses units xy title "with ellipses",\
      '' u 1:2:3:4:5 with ellipses units xx notitle,\
      '' u 1:2:3:4:5 with ellipses units yy notitle
+     
 #
 # 2D heat map from an array of in-line data
+# =========================================
 #
 reset
 set output out . 'figure_heatmap' . ext
@@ -332,6 +355,10 @@ set style textbox opaque noborder margins 0.25,0.25
 set cntrlabel font ",8"
 splot sin(x) * cos(y), sin(x) * cos(y) with labels boxed
 
+#
+# RGB image mapping
+# =================
+#
 reset
 set output out . 'figure_rgb3D' . ext
 set title "RGB image mapped onto a plane in 3D" offset 0,1
@@ -348,6 +375,10 @@ unset key
 set format z "%.1f"
 splot demo . 'blutux.rgb' binary array=128x128 flip=y format='%uchar%uchar%uchar' with rgbimage
 
+#
+# Rescale image as plot element
+# =============================
+#
 reset
 set output out . 'figure_scaled_image' . ext
 set title "Rescaled image used as plot element"
@@ -370,8 +401,8 @@ plot demo . 'bldg.png' binary filetype=png origin=(0,0)  dx=0.5 dy=1.5 with rgbi
      demo . 'bldg.png' binary filetype=png origin=(110,0) dx=0.5 dy=0.35 with rgbimage notitle
 
 #
-#
 # Demonstrates how to pull font size from a data file column
+# ==========================================================
 #
 reset
 Scale(size) = 0.25*sqrt(sqrt(column(size)))
@@ -387,6 +418,9 @@ set size square
 set datafile separator "\t"
 plot demo . 'cities.dat' using 5:4:($3 < 5000 ? "-" : CityName(1,3)) with labels
 
+#
+# Polar plot
+# ==========
 #
 reset
 set output out . 'figure_polar' . ext
@@ -406,43 +440,67 @@ GPFUN_butterfly = "butterfly(x)=exp(cos(x))-2*cos(4*x)+sin(x/12)**5"
 plot 3.+sin(t)*cos(5*t) with filledcurve above r=2.5 notitle, \
      3.+sin(t)*cos(5*t) with line
 
-reset
 #
-# Parallel axis plot
+# Missing Datapoints
 # ==================
+# (This is not an actual demonstration of the effect, just produces a lookalike)
+# The pdf version of this is supplied seperately to better fit with the LaTeX document.
 #
-if (GPVAL_TERM eq "pdfcairo") \
-    set term pdfcairo color font fontspec size 3.5,2.0 dashlength 0.2
-set output out . 'figure_parallel' . ext
-unset border
-unset key
-set xrange [] noextend
-unset ytics
-set xtics 1 format "axis %g" scale 0,0
-set for [axis=1:4] paxis axis tics
-set paxis 2 range [0:30]
-set paxis 4 range [-1:15]
-set paxis 4 tics  auto 1 left offset 5
-
-plot 'silver.dat' using 2:3:1:($3/2):(int($0/25)) with parallel lt 1 lc variable
-
 reset
-#
-# Filled curves
-# =============
-#
-set output out . 'figure_filledcurves' . ext
-set style fill solid 0.75 border -1
-set xrange [250:500]
-set auto y
-set key box title "with filledcurves"
-plot demo . 'silver.dat' u 1:2:($3+$1/50.) w filledcurves above title 'above' lc rgb "honeydew", \
-               '' u 1:2:($3+$1/50.) w filledcurves below title 'below' lc rgb "dark-violet", \
-               '' u 1:2 w lines lt -1 lw 1 title 'curve 1', \
-               '' u 1:($3+$1/50.) w lines lt -1 lw 4 title 'curve 2'
+
+$data1<<EOD
+1 10
+2 20
+2 3
+4 40
+5 50
+EOD
+$data2<<EOD
+1 10
+2 20
+4 40
+5 50
+EOD
+$data3<<EOD
+1 10
+2 20
+
+4 40
+5 50
+EOD
+
+if (winhelp != 0) {
+set output out . 'figure_missing' . ext
+
+set xrange [0.1:5.9]
+set yrange [1:55]
+set xtics offset 0, graph .09
+
+set multiplot layout 2,4 columnsfirst margins 0.15,.98,0.1,.98 spacing 0.1
+set ylabel "Old"
+set label 1 at .5,45 "(a)"
+plot $data1 w lp pt 7 notitle
+set ylabel "New"
+plot $data2 w lp pt 7 notitle
+unset ylabel
+set label 1 at .5,45 "(b)"
+plot $data2 w lp pt 7 notitle
+plot $data2 w lp pt 7 notitle
+set label 1 at .5,45 "(c)"
+plot $data2 w lp pt 7 notitle
+plot $data3 w lp pt 7 notitle
+set label 1 at .5,45 "(d)"
+plot $data3 w lp pt 7 notitle
+plot $data3 w lp pt 7 notitle
+
+unset multiplot
+}
+
 #
 # New syntax features
+# ===================
 #
+reset
 set output out . 'figure_newsyntax' . ext
 
 unset xtics
@@ -458,6 +516,46 @@ do for [power = 0:3] {
 }
 unset multiplot
 
+
+#
+# Following example plots will be set in colour mode for pdf output
+#
+if (GPVAL_TERM eq "pdfcairo") \
+    set term pdfcairo color font fontspec size 3.5,2.0 dashlength 0.2
+
+
+#
+# Parallel axis plot
+# ==================
+#
+reset
+set output out . 'figure_parallel' . ext
+unset border
+unset key
+set xrange [] noextend
+unset ytics
+set xtics 1 format "axis %g" scale 0,0
+set for [axis=1:4] paxis axis tics
+set paxis 2 range [0:30]
+set paxis 4 range [-1:15]
+set paxis 4 tics  auto 1 left offset 5
+
+plot 'silver.dat' using 2:3:1:($3/2):(int($0/25)) with parallel lt 1 lc variable
+
+#
+# Filled curves
+# =============
+#
+reset
+set output out . 'figure_filledcurves' . ext
+set style fill solid 0.75 border -1
+set xrange [250:500]
+set auto y
+set key box title "with filledcurves"
+plot demo . 'silver.dat' u 1:2:($3+$1/50.) w filledcurves above title 'above' lc rgb "honeydew", \
+               '' u 1:2:($3+$1/50.) w filledcurves below title 'below' lc rgb "dark-violet", \
+               '' u 1:2 w lines lt -1 lw 1 title 'curve 1', \
+               '' u 1:($3+$1/50.) w lines lt -1 lw 4 title 'curve 2'
 
 # close last file
 unset outp

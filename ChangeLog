@@ -1,3 +1,8 @@
+2014-09-05  Karl Ratzsch  <ratzsch@uni-freiburg.de>
+
+	* docs/plotstyles.gnu:  Dummy up a version of the missing/NaN figure
+	for use with Windows documentation.
+
 2014-09-04 Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/mouse.c src/term_api.h src/gplt_x11.c
