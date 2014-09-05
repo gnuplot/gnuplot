@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.335 2014/06/14 15:32:58 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.336 2014/07/22 23:11:16 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -1873,7 +1873,7 @@ store_label(
 	tl->textcolor = lptmp.pm3d_color;
     }
 
-    if (listhead->lp_properties.pointflag > 0) {
+    if ((listhead->lp_properties.flags & LP_SHOW_POINTS)) {
 	/* Check for optional (point linecolor palette ...) */
 	if (tl->lp_properties.pm3d_color.type == TC_Z)
 	    tl->lp_properties.pm3d_color.value = colorval;
@@ -2585,7 +2585,7 @@ eval_plots()
 	    /* Some low-level routines expect to find the pointflag attribute */
 	    /* in lp_properties (they don't have access to the full header.   */
 	    if (this_plot->plot_style & PLOT_STYLE_HAS_POINT)
-		this_plot->lp_properties.pointflag = TRUE;
+		this_plot->lp_properties.flags |= LP_SHOW_POINTS;
 
 	    /* Rule out incompatible line/point/style options */
 	    if (this_plot->plot_type == FUNC) {
@@ -2650,7 +2650,7 @@ eval_plots()
 		/* We want to trigger the variable color mechanism even if 
 		 * there was no 'textcolor variable/palette/rgb var' , 
 		 * but there was a 'point linecolor variable/palette/rgb var'. */
-		if (this_plot->labels->lp_properties.pointflag > 0
+		if ((this_plot->labels->lp_properties.flags & LP_SHOW_POINTS)
 		&& this_plot->labels->textcolor.type != TC_Z
 		&& this_plot->labels->textcolor.type != TC_VARIABLE
 		&& (this_plot->labels->textcolor.type != TC_RGB 

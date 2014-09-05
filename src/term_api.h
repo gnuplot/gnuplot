@@ -1,5 +1,5 @@
 /*
- * $Id: term_api.h,v 1.134 2014/08/03 21:52:50 sfeam Exp $
+ * $Id: term_api.h,v 1.135 2014/09/04 20:33:14 sfeam Exp $
  */
 
 /* GNUPLOT - term_api.h */
@@ -57,7 +57,6 @@
 #define LT_UNDEFINED  (-5)
 #define LT_COLORFROMCOLUMN  (-6)	/* Used by hidden3d code */
 #define LT_DEFAULT    (-7)
-#define LT_SINGLECOLOR  (-8)		/* Used by hidden3d code */
 
 /* Pre-defined dash types */
 #define DASHTYPE_CUSTOM (-3)
@@ -112,7 +111,7 @@ typedef struct t_dashtype {
                              {0,0,0,0,0,0,0,0} }
 
 typedef struct lp_style_type {	/* contains all Line and Point properties */
-    int     pointflag;		/* 0 if points not used, otherwise 1 */
+    int     flags;		/* e.g. LP_SHOW_POINTS */
     int     l_type;
     int	    p_type;
     int     d_type;		/* Dashtype */
@@ -126,6 +125,11 @@ typedef struct lp_style_type {	/* contains all Line and Point properties */
 } lp_style_type;
 
 #define DEFAULT_LP_STYLE_TYPE {0, LT_BLACK, 0, DASHTYPE_SOLID, 0, 1.0, PTSZ_DEFAULT, 0, DEFAULT_COLORSPEC, DEFAULT_DASHPATTERN}
+
+/* Bit definitions for lp_style_type.flags */
+#define LP_SHOW_POINTS     (0x1) /* if not set, ignore the point properties of this line style */
+#define LP_NOT_INITIALIZED (0x2) /* internal flag used in set.c:parse_label_options */
+#define LP_EXPLICIT_COLOR  (0x4) /* set by lp_parse if the user provided a color spec */
 
 #define DEFAULT_COLOR_SEQUENCE { 0x9400d3, 0x009e73, 0x56b4e9, 0xe69f00, \
                                  0xf0e442, 0x0072b2, 0xe51e10, 0x000000 }

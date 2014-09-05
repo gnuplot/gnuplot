@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.230 2014/05/09 22:14:12 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.231 2014/05/28 23:21:07 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -1666,7 +1666,7 @@ eval_3dplots()
 
 		    lp.l_type = line_num;
 		    lp.p_type = line_num;
-			lp.d_type = line_num;
+		    lp.d_type = line_num;
 
 		    /* user may prefer explicit line styles */
 		    if (prefer_line_styles)
@@ -1787,7 +1787,7 @@ eval_3dplots()
 	    /* Some low-level routines expect to find the pointflag attribute */
 	    /* in lp_properties (they don't have access to the full header).  */
 	    if (this_plot->plot_style & PLOT_STYLE_HAS_POINT)
-		this_plot->lp_properties.pointflag = TRUE;
+		this_plot->lp_properties.flags |= LP_SHOW_POINTS;
 
 	    /* Rule out incompatible line/point/style options */
 	    if (this_plot->plot_type == FUNC3D) {
@@ -2360,6 +2360,6 @@ static void load_contour_label_options (struct text_label *contour_label)
     if (!contour_label->font)
 	contour_label->font = gp_strdup(clabel_font);
     lp->p_interval = clabel_interval;
-    lp->pointflag = TRUE;
+    lp->flags |= LP_SHOW_POINTS;
     lp_parse(lp, LP_ADHOC, TRUE);
 }

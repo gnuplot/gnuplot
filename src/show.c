@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.325 2014/06/25 05:45:21 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.326 2014/07/23 05:45:49 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -1749,7 +1749,7 @@ show_label(int tag)
 		save_textcolor(stderr, &this_label->textcolor);
 	    if (this_label->noenhanced)
 		fprintf(stderr, " noenhanced");
-	    if (this_label->lp_properties.pointflag == 0)
+	    if ((this_label->lp_properties.flags & LP_SHOW_POINTS) == 0)
 		fprintf(stderr, " nopoint");
 	    else {
 		fprintf(stderr, " point with color of");
