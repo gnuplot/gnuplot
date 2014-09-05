@@ -1,3 +1,16 @@
+2014-09-05 Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/term_src/api.h src/gadgets.c src/hidden3d.c src/misc.c
+	src/plot2d.c src/plot3d.c src/save.c src/set.c src/ show.c src/term.c:
+
+	The field lp_style_type.pointflag was variously used as a Boolean,
+	an integer, or a magic number indicating an uninitialized state.
+	Clean this up by replacing it with a bitfield lp_style_type.flags
+	with defined bits LP_SHOW_POINTS LP_NOT_INITIALIZED LP_EXPLICIT_COLOR.
+	This has the side effect of allowing a trivial fix for a regression
+	in 4.6.5 that caused "set hidden3d; splot ... lc <foo>" to ignore the
+	requested color.  See Bugs #1284 #1475
+
 2014-09-05  Karl Ratzsch  <ratzsch@uni-freiburg.de>
 
 	* docs/plotstyles.gnu:  Dummy up a version of the missing/NaN figure

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.99 2014/06/04 03:21:21 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.99.2.1 2014/09/03 21:16:56 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - hidden3d.c */
@@ -1117,7 +1117,7 @@ build_networks(struct surface_points *plots, int pcount)
 	    ne += nverts;
 	    break;
 	case DOTS:
-	    this_plot->lp_properties.pointflag = TRUE;
+	    this_plot->lp_properties.flags |= LP_SHOW_POINTS;
 	    this_plot->lp_properties.p_type = -1;
 	case POINTSTYLE:
 	default:
@@ -1174,8 +1174,8 @@ build_networks(struct surface_points *plots, int pcount)
 
 	/* This is a special flag indicating that the user specified an	*/
 	/* explicit surface color in the splot command.			*/
-	if (above == LT_SINGLECOLOR-1)
-	    above = below = LT_SINGLECOLOR;
+	if ((lp->flags & LP_EXPLICIT_COLOR))
+	    below = above;
 
 	/* We will not actually draw PM3D surfaces here, but their 	*/
 	/* edges can be used to calculate occlusion of lines, including */
@@ -1214,7 +1214,7 @@ build_networks(struct surface_points *plots, int pcount)
 		    long int thisvertex;
 		    struct coordinate labelpoint;
 
-		    lp->pointflag = 1; /* Labels can use the code for hidden points */
+		    lp->flags |= LP_SHOW_POINTS; /* Labels can use the code for hidden points */
 		    labelpoint.type = INRANGE;
 		    for (label = this_plot->labels->next; label != NULL; label = label->next) {
 			labelpoint.x = label->place.x;
@@ -1709,7 +1709,7 @@ draw_edge(p_edge e, p_vertex v1, p_vertex v2)
     } else
 
     /* This handles explicit 'lc rgb' in the plot command */
-    if (color.type == TC_RGB && e->style == LT_SINGLECOLOR) {
+    if (color.type == TC_RGB && (lptemp.flags & LP_EXPLICIT_COLOR)) {
 	recolor = TRUE;
     } else
 
@@ -1750,7 +1750,7 @@ draw_edge(p_edge e, p_vertex v1, p_vertex v2)
     }
 
     draw3d_line_unconditional(v1, v2, &lptemp, color);
-    if (e->lp->pointflag) {
+    if ((e->lp->flags & LP_SHOW_POINTS)) {
 	draw_vertex(v1);
 	draw_vertex(v2);
     }
@@ -2223,7 +2223,7 @@ draw_label_hidden(p_vertex v, struct lp_style_type *lp, int x, int y)
     vlist[thisvertex] = *v;
     vlist[thisvertex].lp_style = lp; /* Not sure this is necessary */
 
-    lp->pointflag = 1; /* Labels can use the code for hidden points */
+    lp->flags |= LP_SHOW_POINTS; /* Labels can use the code for hidden points */
 
     edgenum = make_edge(thisvertex, thisvertex, lp, lp->l_type, -1);
 

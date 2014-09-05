@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gadgets.c,v 1.114 2014/07/14 14:45:56 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gadgets.c,v 1.115 2014/08/16 04:47:04 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - gadgets.c */
@@ -703,7 +703,7 @@ get_offsets(
     struct termentry *t,
     int *htic, int *vtic)
 {
-    if (this_label->lp_properties.pointflag) {
+    if ((this_label->lp_properties.flags & LP_SHOW_POINTS)) {
 	*htic = (pointsize * t->h_tic * 0.5);
 	*vtic = (pointsize * t->v_tic * 0.5);
     } else {
@@ -796,7 +796,7 @@ write_label(unsigned int x, unsigned int y, struct text_label *this_label)
 
 	/* The associated point, if any */
 	/* write_multiline() clips text to on_page; do the same for any point */
-	if (this_label->lp_properties.pointflag && on_page(x,y)) {
+	if ((this_label->lp_properties.flags & LP_SHOW_POINTS) && on_page(x,y)) {
 	    term_apply_lp_properties(&this_label->lp_properties);
 	    (*term->point) (x, y, this_label->lp_properties.p_type);
 	    /* the default label color is that of border */

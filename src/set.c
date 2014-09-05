@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.459 2014/08/15 23:38:12 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.459.2.1 2014/08/21 23:06:55 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -5906,7 +5906,7 @@ parse_label_options( struct text_label *this_label, TBOOLEAN in_plot )
     struct position offset = default_offset;
     t_colorspec textcolor = {TC_DEFAULT,0,0.0};
     struct lp_style_type loc_lp = DEFAULT_LP_STYLE_TYPE;
-    loc_lp.pointflag = -2;
+    loc_lp.flags = LP_NOT_INITIALIZED;
 
    /* Now parse the label format and style options */
     while (!END_OF_COMMAND) {
@@ -6016,11 +6016,11 @@ parse_label_options( struct text_label *this_label, TBOOLEAN in_plot )
 	}
 #endif
 
-	if (!axis_label && (loc_lp.pointflag == -2 || set_hypertext)) {
+	if (!axis_label && (loc_lp.flags == LP_NOT_INITIALIZED || set_hypertext)) {
 	    if (almost_equals(c_token, "po$int")) {
 		int stored_token = ++c_token;
 		struct lp_style_type tmp_lp;
-		loc_lp.pointflag = 1;
+		loc_lp.flags = LP_SHOW_POINTS;
 		tmp_lp = loc_lp;
 		lp_parse(&tmp_lp, LP_ADHOC, TRUE);
 		if (stored_token != c_token)
@@ -6028,7 +6028,7 @@ parse_label_options( struct text_label *this_label, TBOOLEAN in_plot )
 		set_point = TRUE;
 		continue;
 	    } else if (almost_equals(c_token, "nopo$int")) {
-		loc_lp.pointflag = 0;
+		loc_lp.flags = 0;
 		c_token++;
 		continue;
 	    }
@@ -6086,7 +6086,7 @@ parse_label_options( struct text_label *this_label, TBOOLEAN in_plot )
 	    this_label->font = font;
 	if (set_textcolor)
 	    this_label->textcolor = textcolor;
-	if (loc_lp.pointflag >= 0)
+	if ((loc_lp.flags & LP_NOT_INITIALIZED) == 0)
 	    this_label->lp_properties = loc_lp;
 	if (set_offset)
 	    this_label->offset = offset;

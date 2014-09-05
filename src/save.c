@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.255 2014/08/03 21:52:50 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.256 2014/08/16 00:12:30 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -475,7 +475,7 @@ set bar %f %s\n",
 	if (this_label->noenhanced)
 	    fprintf(fp, " noenhanced");
 	save_textcolor(fp, &(this_label->textcolor));
-	if (this_label->lp_properties.pointflag == 0)
+	if ((this_label->lp_properties.flags & LP_SHOW_POINTS) == 0)
 	    fprintf(fp, " nopoint");
 	else {
 	    fprintf(fp, " point");

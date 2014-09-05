@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.295 2014/05/16 06:14:04 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.296 2014/08/03 21:52:50 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -616,7 +616,7 @@ term_apply_lp_properties(struct lp_style_type *lp)
     t_dashtype custom_dash_pattern = lp->custom_dash_pattern;
     t_colorspec colorspec = lp->pm3d_color;
 
-    if (lp->pointflag) {
+    if ((lp->flags & LP_SHOW_POINTS)) {
 	/* change points, too
 	 * Currently, there is no 'pointtype' function.  For points
 	 * there is a special function also dealing with (x,y) co-
@@ -2734,13 +2734,13 @@ lp_use_properties(struct lp_style_type *lp, int tag)
      */
 
     struct linestyle_def *this;
-    int save_pointflag = lp->pointflag;
+    int save_flags = lp->flags;
 
     this = first_linestyle;
     while (this != NULL) {
 	if (this->tag == tag) {
 	    *lp = this->lp_properties;
-	    lp->pointflag = save_pointflag;
+	    lp->flags = save_flags;
 	    return;
 	} else {
 	    this = this->next;
