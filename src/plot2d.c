@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.336 2014/07/22 23:11:16 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.336.2.1 2014/09/05 21:50:57 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -2629,6 +2629,15 @@ eval_plots()
 
 	    this_plot->x_axis = x_axis;
 	    this_plot->y_axis = y_axis;
+
+	    /* If we got this far without initializing the character font, do it now */
+	    if (this_plot->plot_style & PLOT_STYLE_HAS_POINT
+	    &&  this_plot->lp_properties.p_type == PT_CHARACTER) {
+		if (this_plot->labels == NULL) {
+		    this_plot->labels = new_text_label(-1);
+		    this_plot->labels->pos = CENTRE;
+		}
+	    }
 
 	    /* If we got this far without initializing the label list, do it now */
 	    if (this_plot->plot_style == LABELPOINTS) {
