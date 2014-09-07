@@ -1,3 +1,8 @@
+2014-09-07 Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/plot2d.c:  "set linetype 1 pt 'A'; plot x with lp" requires that
+	the plot->labels field be initialized before plotting.
+
 2014-09-05 Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/term_src/api.h src/gadgets.c src/hidden3d.c src/misc.c
