@@ -8,6 +8,12 @@
 
 	* configure.in:  New option --without-libcerf
 
+2014-09-08 Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/misc.c (lp_parse parse_colorspec):  Allow a quoted colorname to
+	immediately follow the keywords lc|linecolor|fc|fillcolor; i.e. in this
+	case the additional rgbcolor keyword is optional.
+
 2014-09-08  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* docs/gnuplot.doc docs/term-ja.diff docs/gnuplot-ja.doc
