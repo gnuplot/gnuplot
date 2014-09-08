@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.909 2014/09/04 19:48:41 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.910 2014/09/09 03:37:34 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -2329,7 +2329,7 @@ Ffigure_newsyntax
 
  Syntax:
 
-       ... {linecolor | lc} {<colorspec> | <n>}
+       ... {linecolor | lc} {"colorname" | <colorspec> | <n>}
        ... {textcolor | tc} {<colorspec> | {linetype | lt} <n>}
 
  where <colorspec> has one of the following forms:
@@ -7942,7 +7942,7 @@ Ffigure_mapcontours
  color to a particular linetype or linestyle. To see the list of known color
  names, use the command `show colornames`.   Example:
 
-       set style line 1 linecolor rgb "sea-green"
+       set style line 1 linecolor "sea-green"
 3 contour
 ?commands set contour
 ?commands unset contour
