@@ -1,10 +1,10 @@
-C RCS $Id: gnuplot-ja.doc,v 1.525 2014-06-26 18:56:06+09 shige Exp $
-C corresponding original gnuplot.doc revision: 1.896
+C RCS $Id: gnuplot-ja.doc,v 1.5 2014-09-04 20:17:15+09 shige Exp $
+C corresponding original gnuplot.doc revision: 1.902.2.5
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
 C Japanese translation: Hiroharu Tamaru (2.0, 3.2), MASUTANI Yasuhiro (3.5),
-C Shigeharu Takeno et al (3.7, 4.X)
+C Shigeharu Takeno et al (3.7, 4.X, 5.X)
 1 gnuplot
 ?gnuplot
 C 下の contributors の表のアクセント文字は、現在のオリジナルでは UTF-8
@@ -316,14 +316,14 @@ C 行が長いのは、できればなんとかしたい
 # set dashtype <tag> <dash-spec>           # ユーザ定義破線パターン
 # set link x2 via f(x) inverse g(x)        # 非線形軸スケールを可能に
 # set fit quiet|results|brief|verbose      # fit 出力量の制御
-# set multiplot next|previous              # 自動配置内の順序の変更
 # set contours; splot ... with labels      # 数値での等高線のラベル
 # set style textbox                        # 文字列要素に外枠をつける
 # set view map {scale}                     # 3D 射影描画のリサイズが可能に
 # set multiplot {next|previous}            # 自動レイアウト格子内での移動
 #end
 
-2 バージョン 5 での変更 (Changes in version 5)
+C バージョン 5 での変更 (Changes in version 5)
+2 Changes in version 5
 ?changes
  バージョン 5 で導入された以下の変更は、前の版の gnuplot 用のスクリプト
  の挙動を変える可能性があります。
@@ -1429,7 +1429,7 @@ C マーカを doc2html へのこのシグナルとして使用します。
 %VP(x,sigma,gamma) @ 実数 @ Voigt プロファイル \\
 #VP(x,$\sigma$,$\gamma$)&実数& Voigt プロファイル $ VP(x,\sigma,\gamma) = {\int^{\infty}_{-\infty}{G(x^\prime;\sigma) L(x-x^\prime;\gamma) dx^\prime }} $ \\
  `VP(x,sigma,gamma)` はガウス密度関数 G(x;sigma) とローレンツ密度関数
-  L(x;gamma) の畳み込みで定義される Voigt プロファイル (密度関数) に対
+ L(x;gamma) の畳み込みで定義される Voigt プロファイル (密度関数) に対
  応します。
 
 #\hline \end{longtable}
@@ -2045,8 +2045,8 @@ C ... and restart the table:
       GRAPH_Y = (Y - GPVAL_Y_MIN) / (GPVAL_Y_MAX - GPVAL_Y_MIN)
       SCREEN_X = GPVAL_TERM_XMIN + GRAPH_X * (GPVAL_TERM_XMAX - GPVAL_TERM_XMIN)
       SCREEN_Y = GPVAL_TERM_YMIN + GRAPH_Y * (GPVAL_TERM_YMAX - GPVAL_TERM_YMIN)
-      FRAC_X = SCREEN_X / GPVAL_TERM_XSIZE
-      FRAC_Y = SCREEN_Y / GPVAL_TERM_YSIZE
+      FRAC_X = SCREEN_X * GPVAL_TERM_SCALE / GPVAL_TERM_XSIZE
+      FRAC_Y = SCREEN_Y * GPVAL_TERM_SCALE / GPVAL_TERM_YSIZE
 
 =errors
 =error state
@@ -2396,7 +2396,6 @@ Ffigure_newsyntax
  "colorname" は gnuplot が内部に持っている色の名前のうちの一つを指定し
  ます。有効な名前の一覧に関しては、以下参照: `show colornames`。
 
-  (255 << 16) + (0 << 8) + (255).
  16 進定数は、引用符付きで "#RRGGBB" や "0xRRGGBB" の形で与えることがで
  きます。RRGGBB は、色の赤、緑、青の成分を意味し、それぞれ 00 から FF
  までの範囲内でなければいけません。例えば、マゼンタ (紫) は、最も明るい
@@ -2429,7 +2428,6 @@ Ffigure_newsyntax
 4 background color
 ?background
 ?bgnd
-  recognized as a color.
  多くの出力形式でグラフの背景色を明示的に設定できます。特別な線種
  (linetype) `bgnd` はその色で描画しますが、その `bgnd` は色としても認識
  されます。
@@ -4445,7 +4443,7 @@ Ffigure_mapcontours
  書式:
        fit {<ranges>} <expression>
            '<datafile>' {datafile-modifiers}
-           {noerrors | zerror | errors z}
+           {noerrors | zerror | xerror | yerror | xyerror}
            via '<parameter file>' | <var1>{,<var2>,...}
 
  範囲 (xrange, yrange 等) は、当てはめに使用するデータを制限する目的で
@@ -5256,8 +5254,8 @@ Ffigure_mapcontours
  ータ (data source) のいずれか 1 つに、オプションの属性、修正子などがつ
  いたものです:
        描画要素 (plot-element):
-            {sampling-range} {<iteration>}
-            <definition> | <function> | <data source>
+            {<iteration>}
+            <definition> | {sampling-range} <function> | <data source>
             {axes <axes>} {<title-spec>}
             {with <style>}
 
@@ -5270,6 +5268,9 @@ Ffigure_mapcontours
  れるもの、のいずれかです。コンマで区切ることで、複数のデータファイル、
  データブロック、関数などを 1 つの plot コマンドで描画できます。以下参
  照: `data`, `inline data`, `functions`。
+
+ 関数、変数の定義の描画要素は、画像出力を生成しません。下の 3 つ目の例
+ を参照してください。
 
  例:
        plot sin(x)
@@ -6886,7 +6887,7 @@ Ffigure_mapcontours
       lines        dots       steps     errorbars     xerrorbar    xyerrorlines
       points       impulses   fsteps    errorlines    xerrorlines  yerrorbars
       linespoints  labels     histeps   financebars   xyerrorbars  yerrorlines
-      surface      vectors
+      surface      vectors    parallelaxes
  または、
       boxes            boxplot        ellipses       image
       boxerrorbars     candlesticks   filledcurves   rgbimage
@@ -7264,7 +7265,7 @@ Ffigure_mapcontours
  `set` と `unset` コマンドには繰り返し節も利用できます。以下参照:
  `plot for`。
 
-3 angles
+3 角の単位 (angles)
 ?commands set angles
 ?commands show angles
 ?set angles
@@ -7308,7 +7309,7 @@ Ffigure_mapcontours
 ^ <a href="http://www.gnuplot.info/demo/poldat.html">
  poldat.dem: `set angles` を用いた極座標描画のデモ
 ^ </a>
-3 arrow
+3 矢印 (arrow)
 ?commands set arrow
 ?commands unset arrow
 ?commands show arrow
@@ -7405,7 +7406,7 @@ Ffigure_mapcontours
  矢印のデモ
 ^ </a>
 
-3 autoscale
+3 自動縮尺 (autoscale)
 ?commands set autoscale
 ?commands unset autoscale
 ?commands show autoscale
@@ -7549,7 +7550,7 @@ Ffigure_mapcontours
 ^ <a href="http://www.gnuplot.info/demo/poldat.html">
  極座標のデモ。
 ^ </a>
-3 bars
+3 飾り棒 (bars)
 ?commands set bars
 ?commands show bars
 ?set bars
@@ -7583,7 +7584,7 @@ Ffigure_mapcontours
 ?bmargin
  コマンド `set bmargin` は、下部の余白のサイズを設定します。詳細は
  以下参照: `set margin`。
-3 border
+3 グラフの枠線 (border)
 ?commands set border
 ?commands unset border
 ?commands show border
@@ -7730,7 +7731,7 @@ Ffigure_mapcontours
  けします:
        unset xtics; unset ytics; set x2tics; set y2tics; set border 12
 
-3 boxwidth
+3 棒グラフ幅 (boxwidth)
 ?commands set boxwidth
 ?commands show boxwidth
 ?set boxwidth
@@ -7777,7 +7778,7 @@ Ffigure_mapcontours
 
  棒の幅を絶対的な値 2 にするには
        set boxwidth 2 absolute
-3 colorsequence
+3 色巡回列 (colorsequence)
 ?commands set colorsequence
 ?set colorsequence
 ?colorsequence
@@ -7809,7 +7810,7 @@ Ffigure_mapcontours
  このコマンドは非推奨です。代わりに `set cntrlabel` を使用してください。
  `unset clabel` は `set cntrlabel onecolor` に、`set clabel "format"`
  は `set cntrlabel format "format"` に置き換わっています。
-3 clip
+3 クリッピング (clip)
 ?commands set clip
 ?commands unset clip
 ?commands show clip
@@ -7863,7 +7864,7 @@ Ffigure_mapcontours
 
  `set clip` は `set clip points` と同義です。`unset clip` は 3 種の
  クリップ型全てを無効にします。
-3 cntrlabel
+3 等高線ラベル (cntrlabel)
 ?commands set cntrlabel
 ?commands show cntrlabel
 ?set cntrlabel
@@ -7893,7 +7894,7 @@ Ffigure_mapcontours
  れに対する別々のラベルが現れます。コマンド `set cntrlabel onecolor` は
  すべての等高線を同じ線種で描画するので、凡例には一つのラベルのみを書き
  ます。このコマンドは、古いコマンド `unset clabel` を置き換えるものです。
-3 cntrparam
+3 等高線制御 (cntrparam)
 ?commands set cntrparam
 ?commands show cntrparam
 ?set cntrparam
@@ -8125,7 +8126,7 @@ Ffigure_mapcontours
 ^ <a href="http://www.gnuplot.info/demo/discrete.html">
  ユーザ定義レベルの等高線のデモ (discrete.dem).
 ^ </a>
-3 dashtype
+3 点線/破線設定 (dashtype)
 ?commands set dashtype
 ?commands show dashtype
 ?set dashtype
@@ -8306,7 +8307,7 @@ Ffigure_missing
 
 ?show datafile binary
        show datafile binary   # 現在の設定の一覧表示
-3 decimalsign
+3 小数点設定 (desimalsign)
 ?commands set decimalsign
 ?commands show decimalsign
 ?commands unset decimalsign
@@ -8364,7 +8365,7 @@ Ffigure_missing
  これは、現在のロケールに合ったどんな小数点でも、全ての入出力に対して使
  用するように設定しますが、gnuplot の内部関数 gprintf() を使って書式化
  する数値は明示的に指定された '.' になります (上書き)。
-3 dgrid3d
+3 格子状データ処理 (dgrid3d)
 ?commands set dgrid3d
 ?commands unset dgrid3d
 ?commands show dgrid3d
@@ -8468,7 +8469,7 @@ Ffigure_missing
  scatter.dem: dgrid3d のデモ
 ^ </a>
 
-3 dummy
+3 仮変数 (dummy)
 ?commands set dummy
 ?commands show dummy
 ?set dummy
@@ -8500,7 +8501,7 @@ Ffigure_missing
  には以下のようにしてください。
 
        unset dummy
-3 encoding
+3 文字エンコード (encoding)
 ?commands set encoding
 ?commands show encoding
 ?set encoding
@@ -8550,7 +8551,7 @@ Ffigure_missing
  一般に、エンコードの設定は出力形式の設定の前に行なう必要があります。こ
  のエンコードはどんな出力形式でもサポートされているとは限らず、そして出
  力形式は要求されたどんな非標準文字も生成できなければいけません。
-3 fit
+3 非線形関数回帰 (fit)
 ?commands set fit
 ?commands show fit
 ?set fit
@@ -8651,7 +8652,7 @@ Ffigure_missing
  散を保存する変数名は、"FIT_COV_" に最初のパラメータ名と "_" と 2 つ目
  のパラメータをつなげた名前になります。例えばパラメータ "a" と "b" に対
  しては、その共分散変数名は "FIT_COV_a_b" となります。
-3 fontpath
+3 フォントパス (fontpath)
 ?commands set fontpath
 ?commands show fontpath
 ?set fontpath
@@ -8692,7 +8693,7 @@ Ffigure_missing
 
  gd ライブラリを通じてファイル名でフォントにアクセスする出力ドライバに
  関しては、フォント検索パスは環境変数 GDFONTPATH で制御されます。
-3 format
+3 軸の刻み書式 (format)
 ?commands set format
 ?commands show format
 ?set format
@@ -9055,7 +9056,7 @@ Ffigure_missing
 ^ <a href="http://www.gnuplot.info/demo/airfoil.html">
  関数と複素変数を翼に使用 (airfoil.dem)。
 ^ </a>
-3 grid
+3 格子線 (grid)
 ?commands set grid
 ?commands unset grid
 ?commands show grid
@@ -9111,7 +9112,7 @@ Ffigure_missing
 
  z の格子線は描画の底面に描かれます。これは描画の周りに部分的な箱が描画
  されている場合にはいいでしょう。以下参照: `set border`。
-3 hidden3d
+3 隠線処理 (hidden3d)
 ?commands set hidden3d
 ?commands unset hidden3d
 ?commands show hidden3d
@@ -9243,7 +9244,7 @@ Ffigure_missing
  (非推奨)
  `set historysize N` は、`set history size N` と同じです。
  `unset historysize` は、`set history size -1` と同じです。
-3 history
+3 コマンド履歴 (history)
 ?commands set history
 ?set history
  書式:
@@ -9262,7 +9263,7 @@ Ffigure_missing
  以前では、これがデフォルトの挙動でした。
 
  デフォルトの設定: `set history size 500 numbers trim`
-3 isosamples
+3 孤立線サンプル数 (isosamples)
 ?commands set isosamples
 ?commands show isosamples
 ?set isosamples
@@ -9753,7 +9754,7 @@ Ffigure_missing
  コマンドの影響は受けません。`unset linetype cycle` はこの機能を無効に
  します。大きな線種番号の線の属性を明示的に定義した場合は、それは小さい
  番号の線種の属性の再利用よりも優先されます。
-3 link
+3 第 2 軸との対応 (link)
 ?commands set link
 ?set link
 ?link
@@ -9789,7 +9790,7 @@ Ffigure_missing
 ?lmargin
  コマンド `set lmargin` は左の余白のサイズをセットします。詳細は、以下
  参照: `set margin`。
-3 loadpath
+3 読み込み検索パス (loadpath)
 ?commands set loadpath
 ?commands show loadpath
 ?set loadpath
@@ -9814,7 +9815,7 @@ Ffigure_missing
  加されますが、`show loadpath` は、`set loadpath` と GNUPLOT_LIB の値を
  別々に表示しますし、`save`, `save set` コマンドは、GNUPLOT_LIB の値の
  方は無視します。
-3 locale
+3 ロケール (locale)
 ?commands set locale
 ?set locale
 ?locale
@@ -9831,7 +9832,7 @@ Ffigure_missing
  小数点に関する locale を変更したい場合は、以下参照: `set decimalsign`。
  文字エンコードを現在のロカールのものに変更したい場合は、以下参照:
  `set encoding`。
-3 logscale
+3 対数軸 (logscale)
 ?commands set logscale
 ?commands unset logscale
 ?commands show logscale
@@ -9866,7 +9867,7 @@ Ffigure_missing
 
  z 軸の対数目盛りを解除する:
         unset logscale z
-3 macros
+3 マクロ (macros)
 ?commands set macros
 ?commands show macros
 ?set macros
@@ -9879,7 +9880,7 @@ Ffigure_missing
  書式:
       set macros
 
-3 mapping
+3 3 次元座標系 (mapping)
 ?commands set mapping
 ?commands show mapping
 ?set mapping
@@ -9926,9 +9927,10 @@ Ffigure_missing
 ^ <a href="http://www.gnuplot.info/demo/world.html">
  world.dem: mapping のデモ。
 ^ </a>
-3 margin
+3 周囲の余白 (margin)
 ?commands set margins
 ?commands show margins
+?set margin
 ?set margins
 ?show margins
 ?margins
@@ -9964,7 +9966,7 @@ Ffigure_missing
  は含まれませんし、余白に書かれる他の文字列の位置の計算にも含まれません。
  これは、軸と境界が非常に近い場合、軸の見出しが他の文字列を上書きする可
  能性を示唆します。
-3 mouse
+3 マウス (mouse)
 ?commands set mouse
 ?commands unset mouse
 ?set mouse
@@ -9998,13 +10000,14 @@ Ffigure_missing
  です。
 
  書式:
-       set mouse {doubleclick <ms>} {nodoubleclick} \
-                 {{no}zoomcoordinates} \
-                 {noruler | ruler {at x,y}} \
-                 {polardistance{deg|tan} | nopolardistance} \
-                 {format <string>} \
-                 {mouseformat <int>/<string>} \
-                 {{no}labels {"labeloptions"}} \
+       set mouse {doubleclick <ms>} {nodoubleclick}
+                 {{no}zoomcoordinates}
+                 {zoomfactors <xmultiplier>, <ymultiplier>}
+                 {noruler | ruler {at x,y}}
+                 {polardistance{deg|tan} | nopolardistance}
+                 {format <string>}
+                 {mouseformat <int>/<string>}
+                 {{no}labels {"labeloptions"}}
                  {{no}zoomjump} {{no}verbose}
        unset mouse
 
@@ -10114,7 +10117,7 @@ Ffigure_missing
  は、ごく小さい (または空でさえある) 拡大範囲を選択してしまうことを避け
  るのに便利でしょう。デフォルトでは `zoomjump` は OFF です。
 
-3 multiplot
+3 多重描画モード (multiplot)
 ?commands set multiplot
 ?commands unset multiplot
 ?set multiplot
@@ -10244,7 +10247,7 @@ Ffigure_missing
 ?nomx2tics
  x2 (上) 軸の小目盛り刻みの印は `set mx2tics` で制御されます。以下参照:
  `set mxtics`。
-3 mxtics
+3 小目盛り刻み (mxtics)
 ?commands set mxtics
 ?commands unset mxtics
 ?commands show mxtics
@@ -10337,7 +10340,7 @@ Ffigure_missing
 ?nomztics
  z 軸の小目盛り刻みの印は `set mztics` で制御されます。以下参照:
  `set mxtics`。
-3 object
+3 図形オブジェクト (object)
 ?object
 ?commands set object
 ?commands show object
@@ -10382,7 +10385,7 @@ Ffigure_missing
  は、以下参照: `colorspec`, `fillstyle`。キーワード `default` を指定す
  ると、これらの属性は描画が実際に行われるときのデフォルトの設定を受け継
  ぎます。以下参照: `set style rectangle`。
-4 rectangle
+4 長方形 (rectangle)
 ?rectangle
 ?commands set object rectangle
 ?commands show object rectangle
@@ -10418,7 +10421,7 @@ Ffigure_missing
  えることも可能ですが、その他の場合は長方形はグラフ内に収まるようにクリ
  ッピングされます。
 
-4 ellipse
+4 楕円 (ellipse)
 ?ellipse
 ?commands set object ellipse
 ?commands show object ellipse
@@ -10457,7 +10460,7 @@ Ffigure_missing
  `set object` で指定した直径は同じ単位で計算されるので、楕円は正しいア
  スペクト比を持ち、描画をリサイズしてもそのアスペクト比は保持されます。
 
-4 circle
+4 円 (circle)
 ?circle
 ?commands set object circle
 ?commands show object circle
@@ -10484,7 +10487,7 @@ Ffigure_missing
 
  以下も参照: `set object ellipse`。
 
-4 polygon
+4 多角形 (polygon)
 ?polygon
 ?commands set object polygon
 ?commands show object polygon
@@ -10506,7 +10509,7 @@ Ffigure_missing
      set object 1 polygon from 0,0 to 1,1 to 2,0
      set object 1 fc rgb "cyan" fillstyle solid 1.0 border lt -1
 
-3 offsets
+3 グラフ位置の調整 (offsets)
 ?commands set offsets
 ?commands unset offsets
 ?commands show offsets
@@ -10543,7 +10546,7 @@ Ffigure_missing
  y の範囲は [-1:1] に自動縮尺されますが、垂直方向のオフセットがそれぞ
  れ 2 であるためです。x の範囲は [-11:10] になりますが、これはデフォ
  ルトが [-10:10] でその全範囲が左に 0.05 の割合だけ伸ばされるためです。
-3 origin
+3 グラフ位置の指定 (origin)
 ?commands set origin
 ?commands show origin
 ?set origin
@@ -10556,7 +10559,7 @@ Ffigure_missing
 
  書式:
        set origin <x-origin>,<y-origin>
-3 output
+3 出力先指定 (output)
 ?commands set output
 ?commands show output
 ?set output
@@ -10590,7 +10593,7 @@ Ffigure_missing
 
  MS-DOS では、`set output "PRN"` とすると標準のプリンタに出力されます。
  VMS では出力は任意のスプール可能なデバイスに送ることが出来ます。
-3 parametric
+3 媒介変数モード (parametric)
 ?commands set parametric
 ?commands unset parametric
 ?commands show parametric
@@ -10637,7 +10640,7 @@ Ffigure_missing
  によって直接指定することも、`plot` や `splot` で指定することもできます。
  現時点では、これらの媒介変数のデフォルトの変域は [-5:5] となっています。
  将来的にはこれらのデフォルト値をもっと有意なものに変更する予定です。
-3 paxis
+3 平行描画軸設定 (paxis)
 ?commands set paxis
 ?set paxis
 ?show paxis
@@ -10771,8 +10774,6 @@ Ffigure_missing
  その変数をカラーボックス軸の変数と呼びます。以下参照: `set colorbox`,
  `set cbrange`。
 
- 3. pm3d の色づけを 3 次元曲面ではなく 2 次元描画に使うには、
- `set view map` か `set pm3d map` を使用してください。
 4 pm3d の位置 (position)
 ?pm3d position
  色の曲面は底面か天井 (この場合は灰色/カラーの平面地図) か曲面上の点の
@@ -10936,14 +10937,19 @@ Ffigure_missing
  注意: corners2color で幾何平均 (geomean) のような非線形評価が設定され
  ていたとしても、現在の色の補間は常に線形補間で行われます。
 4 非推奨なオプション
+?set pm3d deprecated_options
 ?pm3d deprecated_options
+?set pm3d map
+?pm3d map
+?map
  このコマンドにはオプション {transparent|solid} も使われていました。現
  在は、同じ効果をそれぞれ `set grid {front|layerdefault}` によって得る
  ことができます。
 
- コマンド `set pm3d map` は以下の一連のものと同値です: `set pm3d at b`;
- `set view map`; `set style data pm3d`; `set style func pm3d`;。
-3 palette
+ 旧式のコマンド `set pm3d map` は以下の一連のものと同値です:
+ `set pm3d at b; set view map scale 1.0; set style data pm3d;
+ set style func pm3d;`
+3 パレット (palette)
 ?commands set palette
 ?commands show palette
 ?set palette
@@ -11310,7 +11316,7 @@ C 下記の以下参照: オプション `positive`, `negative`)。
      awk -f pm3dCompress.awk thefile.ps >smallerfile.ps
      awk -f pm3dConvertToImage.awk thefile.ps >smallerfile.ps
 
-3 pointintervalbox
+3 pointinterval の箱サイズ (pointintervalbox)
 ?commands set pointintervalbox
 ?set pointintervalbox
 ?pointintervalbox
@@ -11319,7 +11325,7 @@ C 下記の以下参照: オプション `positive`, `negative`)。
  そして各点の記号の後ろの箱 (実際には円) の部分を背景色で塗りつぶして消
  します。コマンド `set pointintervalbox` はその消す領域の大きさ (半径)
  を制御します。これはデフォルトの半径 (= pointsize) に対する倍率です。
-3 pointsize
+3 点サイズ (pointsize)
 ?commands set pointsize
 ?commands show pointsize
 ?set pointsize
@@ -11339,7 +11345,7 @@ C 下記の以下参照: オプション `positive`, `negative`)。
 
  ポイントサイズの設定は、必ずしも全ての出力形式でサポートされているわけ
  ではないことに注意してください。
-3 polar
+3 極座標モード (polar)
 ?commands set polar
 ?commands unset polar
 ?commands show polar
@@ -11394,7 +11400,7 @@ C 下記の以下参照: オプション `positive`, `negative`)。
 ^ <a href="http://www.gnuplot.info/demo/poldat.html">
  極座標データの描画 (poldat.dem)。
 ^ </a>
-3 print
+3 print コマンドの出力先 (print)
 ?commands set print
 ?commands show print
 ?set print
@@ -11417,7 +11423,7 @@ C 下記の以下参照: オプション `positive`, `negative`)。
 
  コマンド `print` の対象は名前付きデータブロックでも構いません。データ
  ブロック名は '$' で始まります。以下参照: `inline data`。
-3 psdir
+3 PostScript 定義ファイルパス (psdir)
 ?commands set psdir
 ?commands show psdir
 ?set psdir
@@ -11431,7 +11437,7 @@ C 下記の以下参照: オプション `positive`, `negative`)。
        2) 環境変数 GNUPLOT_PS_DIR で指定したディレクトリ
        3) 組み込まれたヘッダー、またはデフォルトのシステムディレクトリ
        4) `set loadpath` で指定したディレクトリ
-3 raxis
+3 極座標の動径軸 (raxis)
 ?commands set raxis
 ?raxis
  コマンド `set raxis` と `unset raxis` は、動径軸を格子線と x 軸から分
@@ -11469,7 +11475,7 @@ C 下記の以下参照: オプション `positive`, `negative`)。
  す。キーワード `mirror` は、それらを原点の左側にも描きます。その他のキ
  ーワードに関する話については以下参照: `polar`, `set xtics`,
  `set mxtics`。
-3 samples
+3 サンプル数 (samples)
 ?commands set samples
 ?commands show samples
 ?set samples
@@ -11496,7 +11502,7 @@ C 下記の以下参照: オプション `positive`, `negative`)。
  ル点を持ち、u-孤立線は <samples_2> 個のサンプル数を持ちます。<samples_1>
  のみ指定すると、<samples_2> の値は <samples_1> と同じ値に設定されます。
  以下も参照: `set isosamples`。
-3 size
+3 グラフ領域サイズ (size)
 ?commands set size
 ?commands show size
 ?set size
@@ -11569,7 +11575,7 @@ C 下記の以下参照: オプション `positive`, `negative`)。
  グラフの高さを横幅の 2 倍にします:
        set size ratio 2
 
-3 style
+3 描画スタイル設定 (style)
 ?set style
 ?show style
 ?unset style
@@ -11597,7 +11603,7 @@ C 下記の以下参照: オプション `positive`, `negative`)。
        set style rectangle <object options> <linestyle> <fillstyle>
        set style textbox {opaque|transparent} {{no}border}
 
-4 set style arrow
+4 矢印スタイル設定 (set style arrow)
 ?commands set style arrow
 ?commands unset style arrow
 ?commands show style arrow
@@ -11678,7 +11684,7 @@ C 下記の以下参照: オプション `positive`, `negative`)。
 
  その他の例については、以下参照: `set arrow`。
 
-4 boxplot
+4 boxplot スタイル指定 (boxplot)
 ?commands set style boxplot
 ?commands unset style boxplot
 ?commands show style boxplot
@@ -11744,7 +11750,7 @@ C 下記の以下参照: オプション `positive`, `negative`)。
 
  以下参照: `boxplot`, `candlesticks`, `financebars`。
 
-4 set style data
+4 データ描画スタイル指定 (set style data)
 ?commands set style data
 ?commands show style data
 ?set style data
@@ -11760,7 +11766,7 @@ C 下記の以下参照: オプション `positive`, `negative`)。
  選択項目については、以下参照: `plotting styles`。項目を指定しなかった
  場合、その一覧が表示されます。`show style data` は現在のデフォルトのデ
  ータ描画スタイルを表示します。
-4 set style fill
+4 塗り潰しスタイル指定 (set style fill)
 ?commands set style fill
 ?commands show style fill
 ?set style fill
@@ -11798,7 +11804,7 @@ C 下記の以下参照: オプション `positive`, `negative`)。
  デフォルトの `border` は、現在の線の種類の実線で箱の境界を描きます。
  `border <colorspec>` で境界の色を変更することができます。`noborder` は
  境界の線が描かれないようにします。
-5 set style fill transparent
+5 透明化 (set style fill transparent)
 ?commands set style fill transparent
 ?set style fill transparent
 ?fillstyle transparent
@@ -11877,7 +11883,7 @@ C 下記の以下参照: オプション `positive`, `negative`)。
  よってはそれを正しく表示できないこともありえます。実際に PostScript プ
  リンタでは問題はないのに、Ghostscript/gv ではパターン塗りつぶし領域を
  正しく表示できません。
-4 set style function
+4 関数描画スタイル指定 (set style function)
 ?commands set style function
 ?commands show style function
 ?set style function
@@ -11921,7 +11927,7 @@ C 下記の以下参照: オプション `positive`, `negative`)。
  応するデフォルトの線種が利用されます。例えば、上の例では、f3(x) はデフ
  ォルトの線種 3 で描画されます。
 
-4 set style line
+4 線スタイル指定 (set style line)
 ?commands set style line
 ?commands unset style line
 ?commands show style line
@@ -12033,7 +12039,7 @@ C 下記の以下参照: オプション `positive`, `negative`)。
  は、RGB カラーをサポートするすべての出力形式で、ラインスタイル 10 に実
  線の水色を割り当てます。
 
-4 set style circle
+4 円スタイル指定 (set style circle)
 ?commands set style circle
 ?commands unset style circle
 ?commands show style circle
@@ -12055,7 +12061,7 @@ C 下記の以下参照: オプション `positive`, `negative`)。
  `clip` は円を描画境界でクリッピングしますが、`noclip` はこれを無効にし
  ます。デフォルトは `clip` です。
 
-4 set style rectangle
+4 長方形スタイル指定 (set style rectangle)
 ?commands set style rectangle
 ?commands unset style rectangle
 ?commands show style rectangle
@@ -12079,7 +12085,7 @@ C 下記の以下参照: オプション `positive`, `negative`)。
 
  デフォルトの設定は、背景色での塗り潰しで、境界は黒になっています。
 
-4 set style ellipse
+4 楕円スタイル指定 (set style ellipse)
 ?commands set style ellipse
 ?commands show style ellipse
 ?set style ellipse
@@ -12121,7 +12127,7 @@ C 下記の以下参照: オプション `positive`, `negative`)。
 
  楕円の object の定義に関しては以下も参照: `set object ellipse`。2 次元
  の描画スタイルに関しては以下参照: `ellipses`。
-4 set style textbox
+4 文字列ボックススタイル指定 (set style textbox)
 ?commands set style textbox
 ?commands show style textbox
 ?set style textbox
@@ -12133,7 +12139,7 @@ C 下記の以下参照: オプション `positive`, `negative`)。
 
  このコマンドは、属性 `boxed` による label の表示を制御します。箱付き文
  字列をサポートしない出力形式はこのスタイルを無視します。
-3 surface
+3 曲面描画 (surface)
 ?commands set surface
 ?commands unset surface
 ?commands show surface
@@ -12164,7 +12170,7 @@ C 下記の以下参照: オプション `positive`, `negative`)。
  この機能を抑制し、入力ファイルの分離されたデータブロックで記述される孤
  立線のみを描画します。この場合でも、splot で明示的に `with surface` と
  すれば格子曲面が描画されます。
-3 table
+3 テーブルデータ出力 (table)
 ?commands set table
 ?set table
 ?table
@@ -12195,7 +12201,7 @@ C 下記の以下参照: オプション `positive`, `negative`)。
 
       set table
       plot <file> using 1:2:3:4:5:6:7:8:9:10 with table
-3 terminal
+3 出力形式 (terminal)
 ?commands set terminal
 ?commands show terminal
 ?set terminal
@@ -12246,7 +12252,7 @@ C 下記の以下参照: オプション `positive`, `negative`)。
 
  詳細は、以下参照: `complete list of terminals`。
 
-3 termoption
+3 出力形式へのオプション (termoption)
 ?commands set termoption
 ?set termoption
 ?termoption
@@ -12262,7 +12268,7 @@ C 下記の以下参照: オプション `positive`, `negative`)。
       set termoption {solid|dashed}
       set termoption {linewidth <lw>}{lw <lw>}
 
-3 tics
+3 全軸目盛り制御 (tics)
 ?commands set tics
 ?commands unset tics
 ?commands show tics
@@ -12359,7 +12365,7 @@ C 下記の以下参照: オプション `positive`, `negative`)。
 ?ticscale
  コマンド `set ticscale` は現在は推奨されていません。代わりに
  `set tics scale` を使ってください。
-3 timestamp
+3 タイムスタンプ (timestamp)
 ?commands set timestamp
 ?commands unset timestamp
 ?commands show timestamp
@@ -12392,7 +12398,7 @@ C 下記の以下参照: オプション `positive`, `negative`)。
        set timestamp "%d/%m/%y %H:%M" offset 80,-2 font "Helvetica"
 
  日付の書式文字列に関する詳しい情報については、以下参照: `set timefmt`。
-3 timefmt
+3 日時データ入力書式 (timefmt)
 ?commands set timefmt
 ?commands show timefmt
 ?set timefmt
@@ -12519,7 +12525,7 @@ C 下記の以下参照: オプション `positive`, `negative`)。
 ^ <a href="http://www.gnuplot.info/demo/timedat.html">
  時系列データ (time data) デモ。
 ^ </a>
-3 title
+3 グラフタイトル (title)
 ?commands set title
 ?commands show title
 ?set title
@@ -12605,7 +12611,7 @@ C 下記の以下参照: オプション `positive`, `negative`)。
  `long` オプションを与えると、さらにオペレーティングシステム、`gnuplot`
  インストール時のコンパイルオプション、ヘルプファイルの置き場所、そして
  (再び) 有用なメールアドレスを表示します。
-3 view
+3 視線方向 (view)
 ?commands set view
 ?commands show view
 ?set view
@@ -12740,7 +12746,7 @@ C 下記の以下参照: オプション `positive`, `negative`)。
 ?nox2zeroaxis
  コマンド `set x2zeroaxis` は、原点を通る x2 (上) 軸 (y2 = 0) を描きま
  す。詳細は、以下参照: `set zeroaxis`。
-3 xdata
+3 軸毎のデータ種類指定 (xdata)
 ?commands set xdata
 ?commands show xdata
 ?set xdata
@@ -12763,7 +12769,7 @@ C 下記の以下参照: オプション `positive`, `negative`)。
  伝えます。
 
  オプションなしの場合は、データの解釈方法を通常の形式に戻します。
-4 time
+4 日時データ (time)
 ?commands set xdata time
 ?set xdata time
  `set xdata time` は、x 座標がミリ秒精度の日時データであることを意味し
@@ -12783,7 +12789,7 @@ C 下記の以下参照: オプション `positive`, `negative`)。
  しの書式は、`set format x` を使ってカスタマイズすることもできます。特
  別な時間書式指定子に関しては、以下参照: `time_specifiers`。他の情報に
  ついては、以下も参照: `time/date`。
-4 geographic
+4 地理座標データ (geographic)
 ?commands set xdata geographic
 ?set xdata geographic
 ?geographic
@@ -12804,7 +12810,7 @@ C shige: 日本語ロケールの場合を訳注として書くべきか。
 C 度の記号は set encoding locale で出るようになると。
 
  書式指定を与えない場合は、座標は 10 進数の度で表示します。
-3 xdtics
+3 曜日軸目盛り (xdtics)
 ?commands set xdtics
 ?commands unset xdtics
 ?commands show xdtics
@@ -12827,7 +12833,7 @@ C 度の記号は set encoding locale で出るようになると。
  はまります。
 
  以下も参照: `set format`。
-3 xlabel
+3 軸ラベル (xlabel)
 ?commands set xlabel
 ?commands show xlabel
 ?set xlabel
@@ -12896,7 +12902,7 @@ C 度の記号は set encoding locale で出るようになると。
 
  バックスラッシュ文字列の作用、及び文字列を囲む単一引用符と二重引用符の
  違いに関するより詳しい情報については、以下参照: `syntax`。
-3 xmtics
+3 月軸目盛り (xmtics)
 ?commands set xmtics
 ?commands unset xmtics
 ?commands show xmtics
@@ -12919,7 +12925,7 @@ C 度の記号は set encoding locale で出るようになると。
  されます。
 
  以下も参照: コマンド `set format`。
-3 xrange
+3 軸範囲指定 (xrange)
 ?commands set xrange
 ?commands show xrange
 ?set xrange
@@ -13036,7 +13042,7 @@ C 度の記号は set encoding locale で出るようになると。
  x の最小値を -200 から 100 の間のどこかにします:
        set xrange [-200<*<100:]
 
-3 xtics
+3 軸主目盛り指定 (xtics)
 ?commands set xtics
 ?commands unset xtics
 ?commands show xtics
@@ -13250,7 +13256,7 @@ C 度の記号は set encoding locale で出るようになると。
        set yrange [0:10]
        set ytics nomirror rangelimited
        plot "file.dat"
-3 xyplane
+3 xy 平面位置 (xyplane)
 ?commands set xyplane
 ?commands show xyplane
 ?set xyplane
@@ -13480,7 +13486,7 @@ C 度の記号は set encoding locale で出るようになると。
 ?nocbdtics
  コマンド `cbdtics` はカラーボックス軸の目盛りの刻みを曜日に変換します。
  詳細は、以下参照: `set xdtics`。
-3 zero
+3 ゼロ閾値 (zero)
 ?commands set zero
 ?commands show zero
 ?set zero
@@ -13499,7 +13505,7 @@ C 度の記号は set encoding locale で出るようになると。
  値は 1e-8 です。1e-3 (= 典型的なビットマップディスプレイの解像度の逆数)
  より大きい `zero` の値は設定すべきではないでしょうが、`zero` を 0.0 と
  設定するのは意味のないことではありません。
-3 zeroaxis
+3 ゼロ軸 (zeroaxis)
 ?commands set zeroaxis
 ?commands unset zeroaxis
 ?commands show zeroaxis
@@ -13621,7 +13627,7 @@ C 度の記号は set encoding locale で出るようになると。
 ?nocbtics
  コマンド `set cbtics` はカラーボックス軸の (見出し付けされる) 大目盛り
  を制御します。詳細は、以下参照: `set xtics`。
-2 shell
+2 シェルコマンド (shell)
 ?commands shell
 ?shell
  `shell` コマンドは対話的なシェルを起動します。`gnuplot` に戻るには、
@@ -13741,19 +13747,34 @@ C 度の記号は set encoding locale で出るようになると。
 4 matrix
 ?commands plot datafile matrix
 ?commands splot datafile matrix
-?plot datafile matrix binary
-?splot datafile matrix binary
-?plot binary matrix
-?splot binary matrix
-?plot matrix binary
-?splot matrix binary
-?matrix binary
+?plot datafile matrix
+?splot datafile matrix
 ?binary matrix
- gnuplot は、matrix (配列) 形式のデータを、2 つの異なる形式で解釈するこ
- とができます。その 1 つは、x, y の座標が一様であると仮定して、その値を
- この一様な格子の matrix のそれぞれの要素に割り当てる方法です。これは、
- テキストデータに対してはデフォルトですが、バイナリデータに対してはそう
- ではありません。
+?matrix
+ gnuplot は、matrix (配列) 形式のデータ入力を、2 つの異なる形式で解釈す
+ ることができます。
+
+ その 1 つは、x, y の座標が一様であると仮定して、その値をこの一様な格子
+ の matrix のそれぞれの要素 M[i,j] に割り当てる方法です。
+ 割り当てられる x 座標は [0:NCOLS-1] の範囲の整数です。
+ 割り当てられる y 座標は [0:NROWS-1] の範囲の整数です。
+ これは、テキストデータに対してはデフォルトですが、バイナリデータに対し
+ てはそうではありません。
+ 例や追加キーワードについては以下参照: `matrix uniform`。
+
+ 2 つ目の形式は、非一様な格子で、x, y 座標は明示していると仮定するもの
+ で、入力データの最初の行を y 座標、最初の列を x 座標とみなします。
+ バイナリデータに対しては、1 行目の最初の要素は、列数でなければいけませ
+ ん。これは、`binary matrix` 入力ではデフォルトですが、テキスト入力デー
+ タに対しては追加キーワード `nonuniform` が必要になります。
+ 例に関しては以下参照: `matrix nonuniform`。
+
+5 uniform
+?commands plot datafile matrix uniform
+?commands splot datafile matrix uniform
+?datafile matrix uniform
+?matrix uniform
+?binary matrix uniform
  一様な matrix データを描画するコマンドの例:
       splot 'file' matrix using 1:2:3          # テキストデータ
       splot 'file' binary general using 1:2:3  # バイナリデータ
@@ -13765,16 +13786,32 @@ C 度の記号は set encoding locale で出るようになると。
      z31 z32 z33 z34 ...
  等。
 
+ テキストデータに対しては、1 行目がデータでなく列ラベルを持つ場合、追加
+ キーワード `columnheaders` を使ってください。同様に、各行の最初の要素
+ がデータでなくラベルである場合は、追加キーワード `rowheaders` を使用し
+ てください。以下は、その両方を使用する例です:
+     $DATA << EOD
+     xxx A   B   C   D
+     aa  z11 z12 z13 z14
+     bb  z21 z22 z23 z24
+     cc  z31 z32 z33 z34
+     EOD
+     plot $DATA matrix columnheaders rowheaders with image
+
  テキストデータでは、空行やコメント行は配列データを終了させ、新たな曲面
  の網 (mesh) を開始します。いつものことですが、`splot` コマンドの
  `index` オプションを使ってファイル内の網を自由に選択できます。
-=nonuniform
-?nonuniform
- 2 つ目の形式は、非一様な格子で、x, y 座標は明示していると仮定するもの
- で、入力データの最初の行を y 座標、最初の列を x 座標とみなします。
- バイナリデータに対しては、1 行目の最初の要素は、データ列数でなければい
- けません (テキストデータではその数は無視されます)。座標とデータ値は、
- バイナリデータでは単精度浮動小数値とみなされます。
+5 nonuniform
+?commands plot datafile matrix nonuniform
+?commands splot datafile matrix nonuniform
+?datafile matrix nonuniform
+?matrix nonuniform
+?binary matrix nonuniform
+ 入力データの最初の行は y 座標を持ちます。
+ 入力データの最初の列は x 座標を持ちます。
+ バイナリ入力データでは、1 行目の最初の要素は列数でなければいけません
+ (テキストデータではその番号は無視されます)。
+
  非一様な matrix データを描画するコマンドの例:
       splot 'file' nonuniform matrix using 1:2:3  # テキストデータ
       splot 'file' binary matrix using 1:2:3      # バイナリデータ
@@ -13800,7 +13837,12 @@ C 度の記号は set encoding locale で出るようになると。
 
  そして、これらの 3 つの数字の組は `gnuplot` の孤立線に変換され、その後
  `gnuplot` が通常の方法で描画の残りを行います。
-
+5 examples
+?commands plot datafile matrix examples
+?commands splot datafile matrix examples
+?datafile matrix examples
+?matrix examples
+?binary matrix examples
  行列やベクトルの操作のサブルーチン (C による) が `binary.c` に用意され
  ています。バイナリデータを書くルーチンは
 

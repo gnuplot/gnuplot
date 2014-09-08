@@ -1,3 +1,8 @@
+2014-09-08  Shigeharu Takeno  <shige@iee.niit.ac.jp>
+
+	* docs/gnuplot.doc docs/term-ja.diff docs/gnuplot-ja.doc
+	man/gnuplot-ja.1:  Sync Japanese documentation to 1.902.2.5
+
 2014-09-07 Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/plot2d.c:  "set linetype 1 pt 'A'; plot x with lp" requires that
