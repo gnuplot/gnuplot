@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.908 2014/09/01 16:44:45 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.909 2014/09/04 19:48:41 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -1467,16 +1467,12 @@ C marker below is used to signal this to doc2html:
  This can be used to import external functions into gnuplot scripts using
  'f(x) = real(system(sprintf("somecommand %f", x)))'.
 4 word
-?expressions functions word
-?word
 =word
 #word("string",n) & string, int & returns the nth word in "string" \\
 %word("string",n)@string, int@returns the nth word in "string"
  `word("string",n)` returns the nth word in string. For example,
  `word("one two three",2)` returns the string "two".
 4 words
-?expressions functions words
-?words
 =words
 #words("string") & string & returns the number of words in "string" \\
 %words("string")@string@returns the number of words in "string"
@@ -1673,6 +1669,32 @@ C marker below is used to signal this to doc2html:
  expression, value() returns the value of that expression.  If the argument is a
  string that does not correspond to a currently defined variable,
  value() returns NaN.
+
+4 Counting and extracting words
+?expressions functions word
+?expressions functions words
+?words
+?word
+ `word("string",n)` returns the nth word in string. For example,
+ `word("one two three",2)` returns the string "two".
+
+ `words("string")` returns the number of words in string. For example,
+ `words(" a b c d")` returns 4.
+
+ The `word` and `words` functions provide limited support for quoted strings, 
+ both single and double quotes can be used:
+       print words("\"double quotes\" or 'single quotes'")   # 3
+ A starting quote must either be preceeded by a white space, or start the 
+ string. This means that apostrophes in the middle or at the end of words are 
+ considered as parts of the respective word:
+       print words("Alexis' phone doesn't work") # 4
+ Escaping quote characters is not supported. If you want to keep certain quotes,
+ the respective section must be surrounded by the other kind of quotes:
+       s = "Keep \"'single quotes'\" or '\"double quotes\"'"
+       print word(s, 2) # 'single quotes'
+       print word(s, 4) # "double quotes"
+ Note, that in this last example the escaped quotes are necessary only for the 
+ string definition.
 
 3 Operators
 ?expressions operators

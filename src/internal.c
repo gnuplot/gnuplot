@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: internal.c,v 1.78 2014/03/30 19:05:46 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: internal.c,v 1.79 2014/05/09 22:14:11 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - internal.c */
@@ -1253,7 +1253,9 @@ f_word(union argument *arg)
 {
     struct value a, b, result;
     int nwords = 0;
+    int in_string = 0;
     int ntarget;
+    char q;
     char *s;
 
     (void) arg;
@@ -1271,14 +1273,23 @@ f_word(union argument *arg)
 	if (!*s)
 	    break;
 	nwords++;
+	if (*s == '"' || *s == '\'') {
+	    q = *s;
+	    s++;
+	    in_string = 1;
+	}
 	if (nwords == ntarget) { /* Found the one we wanted */
 	    Gstring(&result,s);
 	    s = result.v.string_val;
 	}
-	while (*s && !isspace((unsigned char)*s)) s++;
+	while (*s && ((!isspace((unsigned char)*s) && !in_string) || (in_string && *s != q))) s++;
 	if (nwords == ntarget) { /* Terminate this word cleanly */
 	    *s = '\0';
 	    break;
+	}
+	if (in_string && (*s == q)) {
+	    in_string = 0;
+	    s++;
 	}
     }
 
