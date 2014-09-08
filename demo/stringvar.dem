@@ -72,6 +72,30 @@ set yrange [0:1]
 plot 0
 
 pause -1 "Hit return to continue"
+set print "stringvar.tmp"
+print "Exercise word and words functions"
+print ""
+foo = "word and words can handle 'quoted string'"
+print "foo = ",foo
+print "words(foo) = ",words(foo)
+print "word(foo, 6) = ",word(foo,6)
+print ""
+foo = "\"double quotes\" or 'single quotes'"
+print "foo = ",foo
+print "words(foo) = ",words(foo)
+print ""
+foo = "Apostrophes inside words don't matter"
+print "foo = ",foo
+print "word(foo, 4) = ",word(foo, 4)
+
+unset print
+set label 1 system("cat stringvar.tmp") at graph 0.1, graph 0.9
+unset xtics
+unset ytics
+set yrange [0:1]
+plot 0
+
+pause -1 "Hit return to continue"
 reset
 #
 set xrange [300:400]

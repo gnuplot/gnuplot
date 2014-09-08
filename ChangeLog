@@ -1,3 +1,9 @@
+2014-09-08  Christoph Bersch <usenet@bersch.net>
+
+	* demo/stringvar.dem docs/gnuplot.doc src/internal.c (f_word f_words):
+	Modify the word() and words() functions to recognize quoted strings
+	inside the top level string as single entities.
+
 2014-09-08  Christoph Junghans <ottxor@users.sourceforge.net>
 
 	* configure.in:  New option --without-libcerf
