@@ -1,3 +1,7 @@
+2014-09-08  Christoph Bersch <usenet@bersch.net>
+
+	* configure.in:  New option --without-libcerf
+
 2014-09-07 Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/plot2d.c:  "set linetype 1 pt 'A'; plot x with lp" requires that
