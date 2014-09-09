@@ -1,3 +1,9 @@
+2014-09-09  Pieter-Tjerk de Boer <p.t.deboer@utwente.nl>
+
+	* docs/gnuplot.doc:  Update help on fit to new command syntax.
+
+	* src/fit.c:  Fix init of num_errors.
+
 2014-09-09  Akira Kakuto <kakuto@fuk.kindai.ac.jp>
 
 	* src/win/wpause.c (PauseBox):  Do not wait for further events after
