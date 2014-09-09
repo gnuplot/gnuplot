@@ -1,5 +1,5 @@
 /*
- * $Id: wpause.c,v 1.26 2014/01/18 16:14:50 markisch Exp $
+ * $Id: wpause.c,v 1.27 2014/02/15 08:02:46 markisch Exp $
  */
 
 /* GNUPLOT - win/wpause.c */
@@ -204,7 +204,8 @@ PauseBox(LPPW lppw)
 		if (term->waitforinput == NULL) {
 			/* Only handle message queue events */ 
 			WinMessageLoop();
-			WaitMessage();
+			if (lppw->bPause)
+				WaitMessage();
 		} else {
 			/* Call the non-blocking sleep function,
 			   which also handles console input (caca terminal)
