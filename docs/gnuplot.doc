@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.902.2.10 2014/09/09 03:44:15 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.902.2.11 2014/09/09 08:16:41 markisch Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -4411,21 +4411,22 @@ Ffigure_mapcontours
  be changed by using the `errors` keyword to read error estimates of one or
  more of the variables from the data file. These error estimates are
  interpreted as the standard deviation s of the corresponding variable value
- and used to compute a weight for the datum as 1/s**2. In case of error
- estimates of the independent variables, these weights are further 
- multiplied by fitting function derivatives, according to the 
- 'effective variance method'.
+ and used to compute a weight for the datum as 1/s**2.
 
- The `errors` keyword is to be followed by a comma-separated list of one
- or more variable names for which errors are to be input; the dependent
- variable z must always be among them, while independent variables are
- optional. For each variable in this list, an additional column will be
- read from the file, containing that variable's error estimate. Again,
- flexible interpretation is possible by providing the `using` qualifier.
- Note that the number of independent variables is thus implicitly given
- by the total number of columns in the `using` qualifier, minus 1 (for
- the dependent variable), minus the number of variables in the `errors`
- qualifier.
+ In case of error estimates of the independent variables, these weights are
+ further multiplied by fitting function derivatives according to the 
+ "effective variance method" (Jay Orear, Am. J. Phys., Vol. 50, 1982).
+
+ The `errors` keyword is to be followed by a comma-separated list of one or
+ more variable names for which errors are to be input; the dependent variable
+ z must always be among them, while independent variables are optional.
+ For each variable in this list, an additional column will be read from the
+ file, containing that variable's error estimate. Again, flexible
+ interpretation is possible by providing the `using` qualifier.
+ Note that the number of independent variables is thus implicitly given by the
+ total number of columns in the `using` qualifier, minus 1 (for the dependent
+ variable), minus the number of variables in the `errors` qualifier.
+
  As an example, if one has 2 independent variables, and errors for the
  first independent variable and the dependent variable, one uses
  the `errors x,z` qualifier, and a `using` qualifier with 5 columns,
@@ -4439,9 +4440,12 @@ Ffigure_mapcontours
  `zerrors` (for the general case) are all equivalent to `errors z`,
  indicating that there is a single extra column with errors of the
  dependent variable.
+
  `xyerrors`, for the case of 1 independent variable, indicates that there
  are two extra columns, with errors of both the independent and the
- dependent variable.
+ dependent variable.  In this case the errors on x and y are treated by
+ Orear's effective variance method.
+
  Note that `yerror` and `xyerror` are similar in both form and interpretation
  to the `yerrorlines` and `xyerrorlines` 2D plot styles.
 
@@ -4450,7 +4454,7 @@ Ffigure_mapcontours
  explicitly, there must be two more `using` qualifiers (z and s) than there are
  independent variables, unless there is only one variable.  `gnuplot` then uses
  the following formats, depending on the number of columns given in the `using`
- specifcation:
+ specification:
 
        z                           # 1 independent variable (line number)
        x:z                         # 1 independent variable (1st column)
