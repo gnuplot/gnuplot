@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.138.2.17 2014/04/02 19:41:39 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.138.2.18 2014/04/08 20:01:43 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -866,7 +866,7 @@ lp_parse(struct lp_style_type *lp, TBOOLEAN allow_ls, TBOOLEAN allow_point)
 		if (set_pal++)
 		    break;
 		c_token++;
-		if (almost_equals(c_token, "rgb$color")) {
+		if (almost_equals(c_token, "rgb$color") || isstring(c_token)) {
 		    c_token--;
 		    parse_colorspec(&(newlp.pm3d_color), TC_RGB);
 		} else if (almost_equals(c_token, "pal$ette")) {
@@ -1157,6 +1157,12 @@ parse_colorspec(struct t_colorspec *tc, int options)
     } else if (options >= TC_VARIABLE && almost_equals(c_token,"var$iable")) {
 	tc->type = TC_VARIABLE;
 	c_token++;
+
+    /* New: allow to skip the rgb keyword, as in  'plot $foo lc "blue"' */
+    } else if (isstring(c_token)) {
+	tc->type = TC_RGB;
+	tc->lt = parse_color_name();
+
     } else {
 	int_error(c_token, "colorspec option not recognized");
     }

@@ -1,3 +1,8 @@
+2014-09-09  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/misc.c (lp_parse parse_colorspec):  Add forward-compatibility
+	with v5 syntax that makes "rgb" optional in lc|fc {rgb} "colorname".
+
 2014-08-21  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/fit.c:  Handle columnheaders in input to "fit".
