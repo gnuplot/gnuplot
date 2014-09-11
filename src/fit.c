@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: fit.c,v 1.78.2.10 2014/06/01 08:39:23 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: fit.c,v 1.78.2.11 2014/08/21 19:45:55 sfeam Exp $"); }
 #endif
 
 /*  NOTICE: Change of Copyright Status
@@ -1062,9 +1062,6 @@ update(char *pfile, char *npfile)
     char ifilename[256], *ofilename;
     FILE *of, *nf;
     double pval;
-
-    if (!existfile(pfile))
-	Eex2("parameter file not found: %s", pfile);
 
     /* update pfile npfile:
        if npfile is a valid file name,

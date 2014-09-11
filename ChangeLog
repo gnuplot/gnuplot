@@ -1,3 +1,10 @@
+2014-09-11  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/fit.c (update):  Revert to same code as in 4.6.5.
+	Fixes regression that caused "update foo" to fail on linux if foo was
+	not in the current directory.
+	See bug #1385
+
 2014-09-10  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/pdf.trm: Backport two sanity checks from v5.
