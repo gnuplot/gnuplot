@@ -1,3 +1,9 @@
+2014-09-12  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	src/mouse.c (xDateTimeFormat):  gmtime() might return NULL for
+	invalid arguments.
+	Bug #1470
+
 2014-09-11  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/fit.c (update):  Revert to same code as in 4.6.5.

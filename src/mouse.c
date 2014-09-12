@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: mouse.c,v 1.133.2.7 2014/08/01 21:31:01 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: mouse.c,v 1.133.2.8 2014/08/05 17:14:03 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - mouse.c */
@@ -462,6 +462,12 @@ xDateTimeFormat(double x, char *b, int mode)
 # endif
     time_t xtime_position = SEC_OFFS_SYS + x;
     struct tm *pxtime_position = gmtime(&xtime_position);
+
+    if (pxtime_position == NULL) {
+	b[0] = NUL;
+	return b;
+    }
+
     switch (mode) {
     case MOUSE_COORDINATES_XDATE:
 	sprintf(b, "%d. %d. %04d", pxtime_position->tm_mday, (pxtime_position->tm_mon) + 1,
