@@ -1,3 +1,9 @@
+2014-09-12  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	src/mouse.c (xDateTimeFormat):  Use ggmtime() instead of gmtime() to
+	avoid platform specific restrictions.
+	Bug #1470
+
 2014-09-09  Pieter-Tjerk de Boer <p.t.deboer@utwente.nl>
 
 	* docs/gnuplot.doc:  Update help on fit to new command syntax.

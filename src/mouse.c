@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: mouse.c,v 1.168 2014/08/05 17:13:13 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: mouse.c,v 1.169 2014/09/04 20:33:13 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - mouse.c */
@@ -488,36 +488,21 @@ GetAnnotateString(char *s, double x, double y, int mode, char *fmt)
 static char *
 xDateTimeFormat(double x, char *b, int mode)
 {
-    time_t xtime_position = SEC_OFFS_SYS + x;
-    struct tm *pxtime_position = gmtime(&xtime_position);
+    struct tm tm;
 
-    if (pxtime_position == NULL) {
-	b[0] = NUL;
-	return b;
-    }
     switch (mode) {
     case MOUSE_COORDINATES_XDATE:
-	sprintf(b, "%d. %d. %04d", pxtime_position->tm_mday, (pxtime_position->tm_mon) + 1,
-# if 1
-		(pxtime_position->tm_year) + ((pxtime_position->tm_year <= 68) ? 2000 : 1900)
-# else
-		((pxtime_position->tm_year) < 100) ? (pxtime_position->tm_year) : (pxtime_position->tm_year) - 100
-		/*              (pxtime_position->tm_year)+1900 */
-# endif
-	    );
+	ggmtime(&tm, x);
+	sprintf(b, "%d. %d. %04d", tm.tm_mday, tm.tm_mon + 1, tm.tm_year);
 	break;
     case MOUSE_COORDINATES_XTIME:
-	sprintf(b, "%d:%02d", pxtime_position->tm_hour, pxtime_position->tm_min);
+	ggmtime(&tm, x);
+	sprintf(b, "%d:%02d", tm.tm_hour, tm.tm_min);
 	break;
     case MOUSE_COORDINATES_XDATETIME:
-	sprintf(b, "%d. %d. %04d %d:%02d", pxtime_position->tm_mday, (pxtime_position->tm_mon) + 1,
-# if 1
-		(pxtime_position->tm_year) + ((pxtime_position->tm_year <= 68) ? 2000 : 1900),
-# else
-		((pxtime_position->tm_year) < 100) ? (pxtime_position->tm_year) : (pxtime_position->tm_year) - 100,
-		/*              (pxtime_position->tm_year)+1900, */
-# endif
-		pxtime_position->tm_hour, pxtime_position->tm_min);
+	ggmtime(&tm, x);
+	sprintf(b, "%d. %d. %04d %d:%02d", tm.tm_mday, tm.tm_mon + 1, tm.tm_year,
+		tm.tm_hour, tm.tm_min);
 	break;
     case MOUSE_COORDINATES_TIMEFMT:
 	/* FIXME HBB 20000507: timefmt is for *reading* timedata, not
