@@ -1,6 +1,14 @@
+2014-09-14  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/mouse.c (xDateTimeFormat):  Use gnuplot's own ggmtime() instead
+	of gmtime() to avoid platform dependant restrictions. Revert last change
+	since it's now unnecessary. Fixes display of dates before 1970 and after
+	2038 in the status bar on Windows.
+	Bug #1470
+
 2014-09-12  Bastian Maerkisch  <bmaerkisch@web.de>
 
-	src/mouse.c (xDateTimeFormat):  gmtime() might return NULL for
+	* src/mouse.c (xDateTimeFormat):  gmtime() might return NULL for
 	invalid arguments.
 	Bug #1470
 
