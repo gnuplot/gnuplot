@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.912 2014/09/09 08:13:58 markisch Exp $
+C RCS $Id: gnuplot.doc,v 1.913 2014/09/09 20:57:32 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -13967,6 +13967,19 @@ Ffigure_missing
  RGB components of the current color `palette`. It also plots the apparent net
  intensity as calculated using NTSC coefficients to map RGB onto a grayscale.
  The profile values are also loaded into a datablock named $PALETTE.
+2 toggle
+?commands toggle
+?toggle
+ Syntax:
+       toggle {<plotno> | "plottitle" | all}
+
+ This command has the same effect as left-clicking on the key entry for a plot
+ currently displayed by an interactive terminal (qt, wxt, x11). If the plot is
+ showing, it is toggled off;  if it is currently hidden, it is toggled on.
+ `toggle all` acts on all active plots, equivalent to the hotkey "i".
+ `toggle "title"` requires an exact match to the plot title.  `toggle "ti*"`
+ acts on the first plot whose title matches the characters before the final '*'.
+ If the current terminal is not interactive, the toggle command has no effect.
 2 undefine
 ?commands undefine
 ?undefine

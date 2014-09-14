@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: tables.c,v 1.132 2014/05/13 18:20:55 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: tables.c,v 1.133 2014/06/25 05:45:21 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - tables.c */
@@ -88,6 +88,7 @@ const struct gen_ftable command_ftbl[] =
     { "st$ats", stats_command },
     { "sy$stem", system_command },
     { "test", test_command },
+    { "tog$gle", toggle_command },
     { "und$efine", undefine_command },
     { "uns$et", unset_command },
     { "up$date", update_command },

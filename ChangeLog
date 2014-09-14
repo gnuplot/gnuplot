@@ -1,3 +1,10 @@
+2014-09-14 Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/tables.c src/command.c src/command.h docs/gnuplot.doc:
+	New command `toggle {<plotno> | "plottitle" | all} has the same effect
+	as left-clicking on the key entry for a plot shown by an interactive
+	terminal (qt, wxt, x11).
+
 2014-09-12  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	src/mouse.c (xDateTimeFormat):  Use ggmtime() instead of gmtime() to
