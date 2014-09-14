@@ -1,3 +1,10 @@
+2014-09-14  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/mouse.c (xDateTimeFormat):  Use gnuplot's own ggmtime() instead
+	of gmtime() to avoid platform dependant restrictions. Fixes display of
+	dates before 1970 and after 2038 in the status bar on Windows.
+	Bug #1470
+
 2014-09-09  Pieter-Tjerk de Boer <p.t.deboer@utwente.nl>
 
 	* docs/gnuplot.doc:  Update help on fit to new command syntax.
