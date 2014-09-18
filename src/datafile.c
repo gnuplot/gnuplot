@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.289 2014/06/24 18:20:46 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.290 2014/07/30 20:48:58 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -1311,7 +1311,7 @@ df_open(const char *cmd_filename, int max_using, struct curve_points *plot)
 #endif /* HAVE_SYS_STAT_H */
 
 	if ((data_fp = loadpath_fopen(df_filename, df_binary_file ? "rb" : "r")) == NULL) {
-	    int_warn(NO_CARET, "Skipping unreadable file \"%s\"", df_filename);
+	    int_warn(NO_CARET, "Cannot find or open file \"%s\"", df_filename);
 	    df_eof = 1;
 	    return DF_EOF;
 	}
