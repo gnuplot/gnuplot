@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: win.trm,v 1.126 2014/06/09 07:24:31 markisch Exp $
+ * $Id: win.trm,v 1.127 2014/09/04 20:33:14 sfeam Exp $
  */
 
 /* GNUPLOT - win.trm */
@@ -900,10 +900,7 @@ WIN_boxed_text(unsigned int x, unsigned int y, int option)
 TERM_PUBLIC void
 WIN_modify_plots(unsigned int operations, int plotno)
 {
-	/* Not implemented yet */
-	if (plotno >= 0) return;
-
-	GraphModifyPlots(graphwin, operations);
+	GraphModifyPlots(graphwin, operations, plotno);
 }
 
 #endif /* TERM_BODY */
