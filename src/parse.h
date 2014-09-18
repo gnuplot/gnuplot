@@ -1,5 +1,5 @@
 /*
- * $Id: parse.h,v 1.28 2013/09/14 23:09:23 sfeam Exp $
+ * $Id: parse.h,v 1.29 2014/02/28 19:23:52 sfeam Exp $
  */
 
 /* GNUPLOT - parse.h */
@@ -50,6 +50,9 @@ extern TBOOLEAN scanning_range_in_progress;
 /* The choice of dummy variables, as set by 'set dummy', 'set polar'
  * and 'set parametric' */
 extern char set_dummy_var[MAX_NUM_VAR][MAX_ID_LEN+1];
+/* Dummy variables referenced by name in a fit command */
+/* Sep 2014 (DEBUG) used to deduce how many independent variables */
+extern int  fit_dummy_var[MAX_NUM_VAR];
 /* the currently used 'dummy' variables. Usually a copy of
  * set_dummy_var, but may be changed by the '(s)plot' command
  * containing an explicit range (--> 'plot [phi=0..pi]') */

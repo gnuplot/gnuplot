@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: fit.c,v 1.145.2.2 2014/08/28 18:04:58 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: fit.c,v 1.145.2.3 2014/09/09 08:16:42 markisch Exp $"); }
 #endif
 
 /*  NOTICE: Change of Copyright Status
@@ -1902,6 +1902,7 @@ fit_command()
 	fit_dummy_udvs[i] = add_udv_by_name(c_dummy_var[i]);
     }
 
+    memset(fit_dummy_var, 0, sizeof(fit_dummy_var));
     func.at = perm_at();	/* parse expression and save action table */
     dummy_func = NULL;
 

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: parse.c,v 1.87 2014/03/30 19:05:46 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: parse.c,v 1.88 2014/07/12 23:58:54 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - parse.c */
@@ -53,6 +53,7 @@ static int parse_recursion_level;
 /* Exported globals: the current 'dummy' variable names */
 char c_dummy_var[MAX_NUM_VAR][MAX_ID_LEN+1];
 char set_dummy_var[MAX_NUM_VAR][MAX_ID_LEN+1] = { "x", "y" };
+int  fit_dummy_var[MAX_NUM_VAR];
 TBOOLEAN scanning_range_in_progress = FALSE;
 
 /* This is used by plot_option_using() */
@@ -553,9 +554,11 @@ parse_primary_expression()
 	    if (equals(c_token, c_dummy_var[0])) {
 		c_token++;
 		add_action(PUSHD1)->udf_arg = dummy_func;
+		fit_dummy_var[0]++;
 	    } else if (equals(c_token, c_dummy_var[1])) {
 		c_token++;
 		add_action(PUSHD2)->udf_arg = dummy_func;
+		fit_dummy_var[1]++;
 	    } else {
 		int i, param = 0;
 
@@ -568,6 +571,7 @@ parse_primary_expression()
 			c_token++;
 			add_action(PUSHC)->v_arg = num_params;
 			add_action(PUSHD)->udf_arg = dummy_func;
+			fit_dummy_var[i]++;
 			break;
 		    }
 		}
