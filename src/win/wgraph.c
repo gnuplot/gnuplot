@@ -1,5 +1,5 @@
 /*
- * $Id: wgraph.c,v 1.189 2014/07/04 18:16:12 markisch Exp $
+ * $Id: wgraph.c,v 1.190 2014/09/18 06:45:27 markisch Exp $
  */
 
 /* GNUPLOT - win/wgraph.c */
@@ -4859,21 +4859,14 @@ UpdateToolbar(LPGW lpgw)
 void WDPROC
 GraphModifyPlots(LPGW lpgw, unsigned int ops, int plotno)
 {
-	int i, start, stop;
+	int i;
 	TBOOLEAN changed = FALSE;
 
-	if (plotno >= 0) {
-	    start = plotno;
-	    if (start > lpgw->numplots || start > lpgw->maxhideplots)
-		return;
-	    start = plotno;
-	    stop = plotno + 1;
-	} else {
-	    start = 0;
-	    stop = GPMIN(lpgw->numplots, lpgw->maxhideplots);
-	}
+	for (i = 0; i < GPMIN(lpgw->numplots, lpgw->maxhideplots); i++) {
 
-	for (i = start; i < stop; i++) {
+		if (plotno >= 0 && i != plotno)
+			continue;
+
 		switch (ops) {
 		case MODPLOTS_INVERT_VISIBILITIES:
 			lpgw->hideplot[i] = !lpgw->hideplot[i];
