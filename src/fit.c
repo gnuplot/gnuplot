@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: fit.c,v 1.146 2014/08/21 19:38:23 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: fit.c,v 1.147 2014/09/09 08:13:07 markisch Exp $"); }
 #endif
 
 /*  NOTICE: Change of Copyright Status
@@ -1902,8 +1902,17 @@ fit_command()
 	fit_dummy_udvs[i] = add_udv_by_name(c_dummy_var[i]);
     }
 
+    memset(fit_dummy_var, 0, sizeof(fit_dummy_var));
     func.at = perm_at();	/* parse expression and save action table */
     dummy_func = NULL;
+
+#if (0)	/* echo back how many times each dummy variable appeared in the fit function */
+fprintf(stderr, "\n====\n");
+for (i=0; i<MAX_NUM_VAR; i++)
+	if (c_dummy_var[i] && *c_dummy_var[i])
+		fprintf(stderr, "Dummy var %d: \"%s\"  %d\n", i, c_dummy_var[i], fit_dummy_var[i]);
+fprintf(stderr, "====\n\n");
+#endif
 
     token2 = c_token;
 

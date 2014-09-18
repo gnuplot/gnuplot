@@ -1,3 +1,15 @@
+2014-09-18 Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/fit.c src/parse.c src/parse.h (int fit_dummy_var[]):
+	Track the occurence of dummy variable names in a fit command. This lets
+	us count the independent variables so long as they are not obscured.
+	   fit f(x,y) 'data' using 1:2:3:4      # flags use of 'x' and 'y'
+	   fit x*y    'data' using 1:2:3:4      # flags use of 'x' and 'y'
+	   g(x) = x*y;
+	   fit g(x)   'data' using 1:2:3:4      # flags 'x', doesn't notice 'y'
+	In each case fit_dummy_var[0] is 1.  In the 3rd case fit_dummy_var[1]
+	is 0 but should be 1.  Fixing this would be quite hard.
+
 2014-09-18  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/win/wgnuplib.h src/wgraph.c term/win.trm:  windows terminal
