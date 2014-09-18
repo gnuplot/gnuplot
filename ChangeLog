@@ -1,3 +1,8 @@
+2014-09-18  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/win/wgnuplib.h src/wgraph.c term/win.trm:  windows terminal
+	supports the toggle command.
+
 2014-09-18 Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/datafile.c:  Revised error message for datafile open failure.
@@ -11,7 +16,7 @@
 
 2014-09-12  Bastian Maerkisch  <bmaerkisch@web.de>
 
-	src/mouse.c (xDateTimeFormat):  Use ggmtime() instead of gmtime() to
+	* src/mouse.c (xDateTimeFormat):  Use ggmtime() instead of gmtime() to
 	avoid platform specific restrictions.
 	Bug #1470
 
