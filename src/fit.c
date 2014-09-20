@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: fit.c,v 1.147 2014/09/09 08:13:07 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: fit.c,v 1.148 2014/09/18 22:51:30 sfeam Exp $"); }
 #endif
 
 /*  NOTICE: Change of Copyright Status
@@ -80,10 +80,10 @@ static char *RCSid() { return RCSid("$Id: fit.c,v 1.147 2014/09/09 08:13:07 mark
  *
  * Bastian Maerkisch, Feb 2014: New syntax to specify errors. The new
  * parameter 'errors' accepts a comma separated list of (dummy) variables
- * to specify which (in-)dependent variable has associated errors. 'z' always
- * denotes the indep. variable. 'noerrors' tells fit to use equal (1) weights
- * for the fit. The new syntax removes the ambiguity between x:y:z:(1)
- * and x:z:s. The old syntax is still accepted but deprecated.
+ * to specify which (in-)dependent variable has associated errors. 'z'
+ * always denotes the indep. variable. 'unitweights' tells fit to use equal
+ * (1) weights for the fit. The new syntax removes the ambiguity between
+ * x:y:z:(1) and x:z:s. The old syntax is still accepted but deprecated.
  *
  * Alexander Taeschner, Feb 2014: Optionally take errors of independent
  * variables into account.
@@ -192,6 +192,7 @@ TBOOLEAN fit_errorscaling = TRUE;
 TBOOLEAN fit_prescale = TRUE;
 char *fit_script = NULL;
 int fit_wrap = 0;
+TBOOLEAN fit_v4compatible = FALSE;
 
 /* names of user control variables */
 const char * FITLIMIT = "FIT_LIMIT";
@@ -1947,12 +1948,7 @@ fprintf(stderr, "====\n\n");
     /* BM: New options to distinguish fits with and without errors */
     /* reset error columns */
     memset(err_cols, FALSE, sizeof(err_cols));
-    if (almost_equals(c_token, "noerr$ors")) {
-	/* no error columns given */
-	c_token++;
-	num_indep = (columns == 0) ? 1 : columns - 1;
-	num_errors = 0;
-    } else if (almost_equals(c_token, "err$ors")) {
+    if (almost_equals(c_token, "err$ors")) {
 	/* error column specs follow */
 	c_token++;
 	num_errors = 0;
@@ -1996,7 +1992,8 @@ fprintf(stderr, "====\n\n");
 		num_indep = i + 1;
 	}
 
-	/* Check if there are enough columns.  Require # of indep. and dependent variables + # of errors */
+	/* Check if there are enough columns.
+	   Require # of indep. and dependent variables + # of errors */
 	if ((columns != 0) && (columns < num_indep + 1 + num_errors))
 	    Eexc2(c_token, "Not enough columns in using spec.  At least %i are required for this error spec.",
 		num_indep + 1 + num_errors);
@@ -2004,7 +2001,7 @@ fprintf(stderr, "====\n\n");
 	/* Success. */
 	if (columns > 0)
 	    num_indep = columns - num_errors - 1;
-    } else if (almost_equals(c_token, "zerr$or")) {
+    } else if (almost_equals(c_token, "zerr$ors")) {
 	/* convenience alias */
 	if (columns == 1)
 	    Eexc(c_token, "zerror requires at least 2 columns");
@@ -2012,15 +2009,7 @@ fprintf(stderr, "====\n\n");
 	num_errors = 1;
 	err_cols[iz] = TRUE;
 	c_token++;
-    } else if (almost_equals(c_token, "xerr$or")) {
-	/* convenience alias, z:sz (or x:sx) */
-	if ((columns != 0) && (columns != 2))
-	    Eexc(c_token, "xerror requires exactly 2 columns");
-	num_indep = 0;
-	num_errors = 1;
-	err_cols[iz] = TRUE;
-	c_token++;
-    } else if (almost_equals(c_token, "yerr$or")) {
+    } else if (almost_equals(c_token, "yerr$ors")) {
 	/* convenience alias, x:z:sz (or x:y:sy) */
 	if ((columns != 0) && (columns != 3))
 	    Eexc(c_token, "yerror requires exactly 3 columns");
@@ -2028,7 +2017,7 @@ fprintf(stderr, "====\n\n");
 	num_errors = 1;
 	err_cols[iz] = TRUE;
 	c_token++;
-    } else if (almost_equals(c_token, "xyerr$or")) {
+    } else if (almost_equals(c_token, "xyerr$ors")) {
 	/* convienience alias, x:z:sx:sz (or x:y:sx:sy) */
 	if ((columns != 0) && (columns != 4))
 	    Eexc(c_token, "xyerror requires exactly 4 columns");
@@ -2037,13 +2026,25 @@ fprintf(stderr, "====\n\n");
 	err_cols[0] = TRUE;
 	err_cols[iz] = TRUE;
 	c_token++;
+    } else if (almost_equals(c_token, "uni$tweights")) {
+	/* 'unitweights' are the default now. So basically this option is only useful in v4 compatibility mode.*/
+	/* no error columns given */
+	c_token++;
+	num_indep = (columns == 0) ? 1 : columns - 1;
+	num_errors = 0;
     } else {
-	/* no error keyword found, using old syntax */
-	num_indep = (columns < 3) ? 1 : columns - 2;
-	num_errors = (columns < 3) ? 0 : 1;
-	if (num_errors > 0)
-	    err_cols[iz] = TRUE;
-	printf("fit: Deprecated syntax. Consider using the '%serror' option, see `help fit`.\n", (num_errors > 0) ? "" : "no");
+	/* no error keyword found */
+	if (!fit_v4compatible) {
+	    /* default to unitweights */
+	    num_indep = (columns == 0) ? 1 : columns - 1;
+	    num_errors = 0;
+	} else {
+	    /* using old syntax */
+	    num_indep = (columns < 3) ? 1 : columns - 2;
+	    num_errors = (columns < 3) ? 0 : 1;
+	    if (num_errors > 0)
+		err_cols[iz] = TRUE;
+	} 
     }
 
     FPRINTF((stderr, "cmd=%s\n", gp_input_line));

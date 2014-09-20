@@ -1,5 +1,5 @@
 #
-# $Id: fit.dem,v 1.18 2014/02/27 07:57:50 markisch Exp $
+# $Id: fit.dem,v 1.19 2014/02/28 10:22:49 markisch Exp $
 #
 
 myencoding = GPVAL_ENCODING
@@ -113,11 +113,11 @@ r  = 0.5
 set title 'the scattered points, and the initial parameter'
 splot 'hemisphr.dat' using 1:2:3, h(x,y)
 print "  fit function: " . GPFUN_h
-print "  fit command : fit h(x,y) 'hemisphr.dat' using 1:2:3 noerr via r, x0, y0, z0"
+print "  fit command : fit h(x,y) 'hemisphr.dat' using 1:2:3 via r, x0, y0, z0"
 pause -1 "Press enter to start the fit."
 
 set fit results maxiter 50 errorscaling
-fit h(x,y) 'hemisphr.dat' using 1:2:3 noerr via r, x0, y0, z0
+fit h(x,y) 'hemisphr.dat' using 1:2:3 via r, x0, y0, z0
 set title 'the scattered points, fitted curve'
 splot 'hemisphr.dat' using 1:2:3, h(x,y)
 
@@ -133,7 +133,7 @@ print ''
 print "Another possibility is to prescale the variables (set fit prescale),"
 print "which may improve convergence."
 print "  fit settings: set fit maxiter 50 prescale"
-print "  fit command : fit h(x,y) 'hemisphr.dat' using 1:2:3 noerr via r, x0,y0,z0"
+print "  fit command : fit h(x,y) 'hemisphr.dat' using 1:2:3 via r, x0,y0,z0"
 #pause -1 "Press enter to start the fit."
 
 set fit maxiter 50 prescale
@@ -141,7 +141,7 @@ x0 = 0.1
 y0 = 0.2
 z0 = 0.3
 r  = 0.5
-#fit h(x,y) 'hemisphr.dat' using 1:2:3 noerr via r, x0, y0, z0
+#fit h(x,y) 'hemisphr.dat' using 1:2:3 via r, x0, y0, z0
 #replot
 set fit maxiter 0 noprescale brief
 pause -1 "Press enter to proceed with the next example."
@@ -162,11 +162,10 @@ print "  fit function: " . GPFUN_f
 print "                " . GPFUN_vlong
 print "                " . GPFUN_vtrans
 print "y will be the index of the dataset."
-print "  fit command: fit f(x,y) 'soundvel.dat' using 1:-2:2 noerr via 'sound.par'\n"
+print "  fit command: fit f(x,y) 'soundvel.dat' using 1:-2:2 via 'sound.par'\n"
 pause -1 "Press enter to start the fit."
 
-# Must provide 'noerr' for a 3d fit.
-fit f(x,y) 'soundvel.dat' using 1:-2:2 noerr via 'sound.par'
+fit f(x,y) 'soundvel.dat' using 1:-2:2 via 'sound.par'
 #create soundfit.par, reading from sound.par and updating values
 update 'sound.par' 'soundfit.par'
 set title 'pseudo-3d multi-branch fit to velocity data'
@@ -179,12 +178,12 @@ pause -1 "Press enter to proceed with the next example."
 
 print "Next we only use every fifth data point for fitting by using the 'every'"
 print "keyword. Note the faster fit and its result."
-print "  fit command: fit f(x,y) 'soundvel.dat' every 5 using 1:-2:2 noerr via 'sound.par'\n"
+print "  fit command: fit f(x,y) 'soundvel.dat' every 5 using 1:-2:2 via 'sound.par'\n"
 load 'sound.par'
 plot 'soundvel.dat', vlong(x), vtrans(x)
 pause -1 "Press enter to start the fit."
 
-fit f(x,y) 'soundvel.dat' every 5 using 1:-2:2 noerr via 'sound.par'
+fit f(x,y) 'soundvel.dat' every 5 using 1:-2:2 via 'sound.par'
 set title 'fitted only every 5th data point'
 plot 'soundvel.dat', vlong(x), vtrans(x)
 print ''
@@ -201,7 +200,7 @@ set title 'initial parameters'
 plot 'soundvel.dat', vlong(x), vtrans(x)
 pause -1 "Press enter to start the fit."
 
-fit f(x,y) 'soundvel.dat' using 1:-2:2 noerr via 'sound2.par'
+fit f(x,y) 'soundvel.dat' using 1:-2:2 via 'sound2.par'
 set title 'fit with c44 and c13 fixed'
 plot 'soundvel.dat', vlong(x), vtrans(x)
 print ''
@@ -270,13 +269,13 @@ print 'representing x:y:z:s (where s is the estimated error in the z value).'
 a0=1; a1=.1; a2=.1
 f1(x,y)=a0/(1+a1*x**2+a2*y**2)
 print "  fit function: ", GPFUN_f1
-print "  fit command : fit f1(x,y) 'fit3.dat' index 0 using 1:2:4 noerr via a0,a1,a2\n"
+print "  fit command : fit f1(x,y) 'fit3.dat' index 0 using 1:2:4 via a0,a1,a2\n"
 set title "data and initial parameters"
 splot f1(x,y), 'fit3.dat' in 0 u 1:2:4
 pause -1 "Press enter to start the fit."
 
 set fit errorscaling
-fit f1(x,y) 'fit3.dat' index 0 using 1:2:4 noerr via a0,a1,a2
+fit f1(x,y) 'fit3.dat' index 0 using 1:2:4 via a0,a1,a2
 set title "fit to data with t = -3"
 splot f1(x,y), 'fit3.dat' in 0 u 1:2:4
 pause -1 "Press enter to proceed with the next example."
@@ -285,29 +284,27 @@ print ''
 print "Here is the last set of data where t = 3."
 print "We fit the same function to this set."
 print "  fit function: ", GPFUN_f1
-print "  fit command : fit f1(x,y) 'fit3.dat' index 3 using 1:2:4 noerr via a0,a1,a2\n"
+print "  fit command : fit f1(x,y) 'fit3.dat' index 3 using 1:2:4 via a0,a1,a2\n"
 set title "fit to data with t = +3, initial parameters"
 splot f1(x,y), 'fit3.dat' in 3 u 1:2:4
 pause -1 "Press enter to start the fit."
 
-fit f1(x,y) 'fit3.dat' in 3 u 1:2:4 noerr via a0,a1,a2
+fit f1(x,y) 'fit3.dat' in 3 u 1:2:4 via a0,a1,a2
 set title "fit to data with t = +3"
 splot f1(x,y), 'fit3.dat' in 3 u 1:2:4
 pause -1 "Press enter to proceed with the next example."
 
 print ''
 print "We also have data for several intermediate values of t.  We will fit the"
-print "function f(x,y,t)=a0*t/(1+a1*x**2+a2*y**2) to all the data.  Since there are now"
-print "three independent variables, we need a using spec with four entries,"
-print "representing x:y:t:z and the keyword 'noerr'." 
+print "function f(x,y,t)=a0*t/(1+a1*x**2+a2*y**2) to all the data."
 f(x,y,t)=a0*t/(1+a1*x**2+a2*y**2)
 print "  fit function: ", GPFUN_f
-print "  fit command : fit f(x,y,t) 'fit3.dat' u 1:2:3:4 noerr via a0,a1,a2\n"
+print "  fit command : fit f(x,y,t) 'fit3.dat' u 1:2:3:4 via a0,a1,a2\n"
 set title "data for all indices t, initial parameters"
 splot f(x,y,1), 'fit3.dat' u 1:2:4
 pause -1 "Press enter to start the fit."
 
-fit f(x,y,t) 'fit3.dat' u 1:2:3:4 noerr via a0,a1,a2
+fit f(x,y,t) 'fit3.dat' u 1:2:3:4 via a0,a1,a2
 print ''
 print 'Here are all the data together.'
 set title "fit to all data"
@@ -322,7 +319,7 @@ print 'fit.  The first range corresponds to the first "using" entry, etc. For ex
 print 'we could have gotten the same fit like this:'
 print '   fit [lon=*:*][lat=*:*][time=*:*]        \'
 print '     a0*time/(1 + a1*lon**2 + a2*lat**2)   \'
-print '     "fit3.dat" u 1:2:3:4 noerror via a0,a1,a2'
+print '     "fit3.dat" u 1:2:3:4 via a0,a1,a2'
 pause -1 "Press enter to proceed with the next example."
 
 reset
@@ -355,23 +352,38 @@ set xrange [-1:9]
 set fit limit 1.0e-8 start_lambda 1 prescale noerrorscaling errorvariables
 
 # fit function and initial values
+f(x)  = a1 + a2*x
+a1 = 5.
+a2 = -0.5
 fy(x) = a1y + a2y*x
 a1y = 5.
 a2y = -0.5
 
-set title "Pearson's data and York's weights\ndata and the initial function"
+set title "Pearson's data and York's weights\noriginal data and the initial function"
 plot \
   $PearsonYork using 2:4:(sqrt(1./$3)):(sqrt(1./$5)) with xyerrorbars lt -1 title 'data', \
-  fy(x) lw 2 lt 1 title 'initial function'
+  f(x) lw 2 lt 1 title 'initial function'
   
+msg = "Press enter to fit the data using no error values"
+print "\n". msg . "\n"
+pause -1 msg
+
+# do the fit
+fit f(x) $PearsonYork using 2:4 via a1, a2
+
+set title "Pearson's data and York's weights\nfunction fit with no error terms"
+plot \
+  $PearsonYork using 2:4:(sqrt(1./$3)):(sqrt(1./$5)) lt -1 with xyerrorbars title 'data', \
+  f(x) lw 2 lt 1 title 'fit using no error terms'
+
 msg = "Press enter to fit the data using only the uncertainties of the y-values."
 print "\n". msg . "\n"
 pause -1 msg
 
 # do the fit
-fit fy(x) $PearsonYork using 2:4:(sqrt(1./$5)) yerror via a1y, a2y
+fit fy(x) $PearsonYork using 2:4:(sqrt(1./$5)) yerrors via a1y, a2y
 
-set title "Pearson's data and York's weights\ndata and the fitted function"
+set title "Pearson's data and York's weights\nfunction fit with yerror keyword"
 plot \
   $PearsonYork using 2:4:(sqrt(1./$3)):(sqrt(1./$5)) lt -1 with xyerrorbars title 'data', \
   fy(x) lw 2 lt 2 title 'fit using only dy'
@@ -389,11 +401,12 @@ a2xy = -0.5
 #a2xy = -0.481
 
 # do the fit
-fit fxy(x) $PearsonYork using 2:4:(sqrt(1./$3)):(sqrt(1./$5)) xyerr via a1xy, a2xy
+fit fxy(x) $PearsonYork using 2:4:(sqrt(1./$3)):(sqrt(1./$5)) xyerrors via a1xy, a2xy
 
-set title "Pearson's data and York's weights\ndata and the fitted functions"
+set title "Pearson's data and York's weights\nfunction fit with xyerror keyword"
 plot \
   $PearsonYork using 2:4:(sqrt(1./$3)):(sqrt(1./$5)) with xyerrorbars lt -1 title 'data', \
+  f(x) lw 2 lt 1 title 'fit with no errors', \
   fy(x) lw 2 lt 2 title 'fit using only dy', \
   fxy(x) lw 2 lt 3 title 'fit using dx and dy'
 

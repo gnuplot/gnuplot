@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.326 2014/07/23 05:45:49 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.327 2014/09/05 21:51:38 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -2640,6 +2640,10 @@ show_fit()
     if (d > 0.)
 	fprintf(stderr, "\tfit will change lambda by a factor of %g\n", d);
 
+    if (fit_v4compatible)
+	fprintf(stderr, "\tfit command syntax is backwards compatible to version 4\n");
+    else
+	fprintf(stderr, "\tfit will default to `unitweights` if no `error`keyword is given on the command line.\n");
     fprintf(stderr, "\tfit can run the following command when interrupted:\n\t\t'%s'\n", getfitscript());
     v = get_udv_by_name("GPVAL_LAST_FIT");
     if (v != NULL && !v->udv_undef)

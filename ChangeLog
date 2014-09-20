@@ -1,3 +1,16 @@
+2014-09-20  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/fit.c src/fit.h src/save.c src/set.c src/show.c src/unset.c
+	docs/gnuplot.doc demo/fit.dem:  Remove xerrors option (which requires 3
+	columns) since it is not like the xerrorbars plot style (which requires 4). 
+	Rename `noerrors` option to `unitweights`.  Let the fit command default
+	to `unitweights`, i.e. do not interpret the last column of the using
+	spec as z-errors.  Add a command `set fit v4|v5` to switch between
+	old-style command line syntax and the new one. Default to `v5`, but
+	`reset` does not change the current setting.
+
+	Note that this is a backward-incompatible change in behavior.
+
 2014-09-18 Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/fit.c src/parse.c src/parse.h (int fit_dummy_var[]):
