@@ -1,3 +1,23 @@
+2014-09-20  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/fit.c src/fit.h src/save.c src/set.c src/show.c src/unset.c
+	docs/gnuplot.doc demo/fit.dem:  Remove xerrors option (which requires 3
+	columns) since it is not like the xerrorbars plot style (which requires 4). 
+	Rename `noerrors` option to `unitweights`.  Let the fit command default
+	to `unitweights`, i.e. do not interpret the last column of the using
+	spec as z-errors.  Add a command `set fit v4|v5` to switch between
+	old-style command line syntax and the new one. Default to `v5`, but
+	`reset` does not change the current setting.
+
+	Note that this change is backward-incompatible with v5-rc1 and v5-rc2.
+	However it restores compatibility with v4, subject to the restriction
+	that v4 syntax is only recognized if all independent variables appear
+	in the "fit" command itself (see below).
+
+	* src/fit.c: Ethan A Merritt - use the tally of dummy variable names
+	to detect version 4 syntax in which the last column of a using spec
+	contains zerror but no "*error" keyword is provided.
+
 2014-09-18 Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/datafile.c:  Revised error message for datafile open failure.

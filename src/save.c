@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.256.2.1 2014/09/05 21:50:57 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.256.2.2 2014/09/07 18:10:58 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -1047,6 +1047,7 @@ set origin %g,%g\n",
 	fprintf(fp, " wrap %i", fit_wrap);
     else
 	fprintf(fp, " nowrap");
+    fprintf(fp, " v%i", fit_v4compatible ? 4 : 5);
     fputc('\n', fp);
 }
 

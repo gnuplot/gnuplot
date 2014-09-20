@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.902.2.12 2014/09/09 20:57:21 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.902.2.13 2014/09/18 00:26:49 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -4372,7 +4372,7 @@ Ffigure_mapcontours
  Syntax:
        fit {<ranges>} <expression>
            '<datafile>' {datafile-modifiers}
-           {norerror | {x|y|xy|z}error | errors <var1>{,<var2>,...}}
+           {{unitweights} | {y|xy|z}error | errors <var1>{,<var2>,...}}
            via '<parameter file>' | <var1>{,<var2>,...}
 
  Ranges may be specified to filter the data used in fitting.
@@ -4398,7 +4398,7 @@ Ffigure_mapcontours
  variable x as the sum of columns 2 and 3, while taking z from column 6 and 
  requesting equal weights:
 
-       fit ... noerrors using ($2+$3):6
+       fit ... using ($2+$3):6
 
  In the absence of a `using` specification, the fit implicitly assumes
  there is only a single independent variable. If the file itself, or the
@@ -4407,11 +4407,12 @@ Ffigure_mapcontours
  If a `using` specification is given, there can be up to 12 independent
  variables (and more if specially configured at compile time). 
 
- The `noerror` option causes all data points to be weighted equally. This can
- be changed by using the `errors` keyword to read error estimates of one or
- more of the variables from the data file. These error estimates are
- interpreted as the standard deviation s of the corresponding variable value
- and used to compute a weight for the datum as 1/s**2.
+ The `unitweights` option, which is the default, causes all data points to be
+ weighted equally. This can be changed by using the `errors` keyword to read
+ error estimates of one or more of the variables from the data file. These
+ error estimates are interpreted as the standard deviation s of the
+ corresponding variable value and used to compute a weight for the datum as
+ 1/s**2.
 
  In case of error estimates of the independent variables, these weights are
  further multiplied by fitting function derivatives according to the 
@@ -4435,7 +4436,6 @@ Ffigure_mapcontours
  deviations of x and z).
 
  A few shorthands for the `errors` qualifier are available:
- `xerrors` (for fits with line number as independent variable),
  `yerrors` (for fits with 1 column of independent variable), and
  `zerrors` (for the general case) are all equivalent to `errors z`,
  indicating that there is a single extra column with errors of the
@@ -4449,12 +4449,11 @@ Ffigure_mapcontours
  Note that `yerror` and `xyerror` are similar in both form and interpretation
  to the `yerrorlines` and `xyerrorlines` 2D plot styles.
 
- Note that for compatibility reasons with `gnuplot` versions prior to 5.0,
- the `error` keyword is not required.  If you do not specify the error columns
- explicitly, there must be two more `using` qualifiers (z and s) than there are
- independent variables, unless there is only one variable.  `gnuplot` then uses
- the following formats, depending on the number of columns given in the `using`
- specification:
+ With the command `set fit v4` the fit command syntax is compatible with
+ `gnuplot` version 4 and before.  Then there must be two more `using`
+ qualifiers (z and s) than there are independent variables, unless there is
+ only one variable.  `gnuplot` then uses the following formats, depending on
+ the number of columns given in the `using` specification:
 
        z                           # 1 independent variable (line number)
        x:z                         # 1 independent variable (1st column)
@@ -4463,10 +4462,9 @@ Ffigure_mapcontours
        x1:x2:x3:z:s                # 3 independent variables (5 columns total)
        x1:x2:x3:...:xN:z:s         # N independent variables (N+2 columns total)
 
- Please beware that this means that you always have to supply z-errors s in a
- fit with two independent variables x, y if you do not specify the `{no}error`
- keyword.  There must be two more `using` qualifiers (z and s) than there are
- independent variables, unless there is only one independent variable.
+ Please beware that this means that you have to supply z-errors s in a fit with
+ two or more independent variables. If you want unit weights you need to need
+ to supply them explicitly by using e.g. then format x:y:z:(1).
 
  The dummy variable names may be changed when specifying a range as noted above.
  The first range corresponds to the first `using` spec, and so on.  A range may
@@ -4488,16 +4486,16 @@ Ffigure_mapcontours
        fit f(x) 'measured.dat' via 'start.par'
        fit f(x) 'measured.dat' using 3:($7-5) via 'start.par'
        fit f(x) './data/trash.dat' using 1:2:3 yerror via a, b, c
-       fit g(x,y) 'surface.dat' using 1:2:3 noerror via a, b, c
+       fit g(x,y) 'surface.dat' using 1:2:3 via a, b, c
        fit a0 + a1*x/(1 + a2*x/(1 + a3*x)) 'measured.dat' via a0,a1,a2,a3
-       fit a*x + b*y 'surface.dat' using 1:2:3 noerror via a,b
-       fit [*:*][yaks=*:*] a*x+b*yaks 'surface.dat' u 1:2:3 noerror via a,b
+       fit a*x + b*y 'surface.dat' using 1:2:3 via a,b
+       fit [*:*][yaks=*:*] a*x+b*yaks 'surface.dat' u 1:2:3 via a,b
 
-       fit [][][t=*:*] a*x + b*y + c*t 'foo.dat' using 1:2:3:4 noerror via a,b,c
+       fit [][][t=*:*] a*x + b*y + c*t 'foo.dat' using 1:2:3:4 via a,b,c
 
        set dummy x1, x2, x3, x4, x5
        h(x1,x2,x3,x4,s5) = a*x1 + b*x2 + c*x3 + d*x4 + e*x5
-       fit h(x1,x2,x3,x4,x5) 'foo.dat' using 1:2:3:4:5:6 noerror via a,b,c,d,e
+       fit h(x1,x2,x3,x4,x5) 'foo.dat' using 1:2:3:4:5:6 via a,b,c,d,e
 
  After each iteration step, detailed information about the current state
  of the fit is written to the display.  The same information about the
@@ -8473,6 +8471,8 @@ Ffigure_missing
 ?set fit errorvariables
 ?set fit logfile
 ?set fit script
+?set fit v4
+?set fit v5
  The `set fit` command controls the options for the `fit` command.
 
  Syntax:
@@ -8488,6 +8488,7 @@ Ffigure_missing
                {start-lambda <value>|default}
                {lambda-factor <value>|default}
                {script {"<command>"|default}}
+               {v4 | v5}
        unset fit
        show fit
 
@@ -8559,6 +8560,10 @@ Ffigure_missing
  the name of the first parameter and combining the two parameter names by
  "_". For example given the parameters "a" and "b" the covariance variable is
  named "FIT_COV_a_b".
+
+ In version 5 the syntax of the fit command changed and it now defaults to
+ unitweights if no 'error' keyword is given.  The `v4` option restores the
+ default behavior of gnuplot version 4, see also `fit`.
 3 fontpath
 ?commands set fontpath
 ?commands show fontpath

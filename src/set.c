@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.459.2.1 2014/08/21 23:06:55 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.459.2.2 2014/09/05 21:50:57 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -1868,6 +1868,12 @@ set_fit()
 	} else if (equals(c_token, "nowrap")) {
 	    c_token++;
 	    fit_wrap = 0;
+	} else if (equals(c_token, "v4")) {
+	    c_token++;
+	    fit_v4compatible = TRUE;
+	} else if (equals(c_token, "v5")) {
+	    c_token++;
+	    fit_v4compatible = FALSE;
 	} else {
 	    int_error(c_token, "unrecognized option --- see `help set fit`");
 	}
