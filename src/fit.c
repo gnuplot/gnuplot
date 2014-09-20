@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: fit.c,v 1.148 2014/09/18 22:51:30 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: fit.c,v 1.149 2014/09/20 11:31:13 markisch Exp $"); }
 #endif
 
 /*  NOTICE: Change of Copyright Status
@@ -1907,14 +1907,6 @@ fit_command()
     func.at = perm_at();	/* parse expression and save action table */
     dummy_func = NULL;
 
-#if (0)	/* echo back how many times each dummy variable appeared in the fit function */
-fprintf(stderr, "\n====\n");
-for (i=0; i<MAX_NUM_VAR; i++)
-	if (c_dummy_var[i] && *c_dummy_var[i])
-		fprintf(stderr, "Dummy var %d: \"%s\"  %d\n", i, c_dummy_var[i], fit_dummy_var[i]);
-fprintf(stderr, "====\n\n");
-#endif
-
     token2 = c_token;
 
     /* get filename */
@@ -2034,16 +2026,24 @@ fprintf(stderr, "====\n\n");
 	num_errors = 0;
     } else {
 	/* no error keyword found */
-	if (!fit_v4compatible) {
-	    /* default to unitweights */
-	    num_indep = (columns == 0) ? 1 : columns - 1;
-	    num_errors = 0;
-	} else {
+	if (fit_v4compatible) {
 	    /* using old syntax */
 	    num_indep = (columns < 3) ? 1 : columns - 2;
 	    num_errors = (columns < 3) ? 0 : 1;
 	    if (num_errors > 0)
 		err_cols[iz] = TRUE;
+	} else if (columns >= 3 && fit_dummy_var[columns-2] == 0) {
+	    int_warn(NO_CARET,
+		"\n\t> Implied independent variable %s not found in fit function."
+		"\n\t> Assuming version 4 syntax with zerror in column %d but no zerror keyword.\n",
+		c_dummy_var[columns-2], columns);
+		num_indep = columns - 2;
+		num_errors = 1;
+		err_cols[iz] = TRUE;
+	} else {
+	    /* default to unitweights */
+	    num_indep = (columns == 0) ? 1 : columns - 1;
+	    num_errors = 0;
 	} 
     }
 

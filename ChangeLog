@@ -9,12 +9,19 @@
 	old-style command line syntax and the new one. Default to `v5`, but
 	`reset` does not change the current setting.
 
-	Note that this is a backward-incompatible change in behavior.
+	Note that this change is backward-incompatible with v5-rc1 and v5-rc2.
+	However it restores compatibility with v4, subject to the restriction
+	that all independent variables must appear in the "fit" command itself
+	(see below).
+
+	* src/fit.c: Ethan A Merritt - use the tally of dummy variable names
+	to detect version 4 syntax in which the last column of a using spec
+	contains zerror but no "*error" keyword is provided.
 
 2014-09-18 Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/fit.c src/parse.c src/parse.h (int fit_dummy_var[]):
-	Track the occurence of dummy variable names in a fit command. This lets
+	Track the occurrence of dummy variable names in a fit command. This lets
 	us count the independent variables so long as they are not obscured.
 	   fit f(x,y) 'data' using 1:2:3:4      # flags use of 'x' and 'y'
 	   fit x*y    'data' using 1:2:3:4      # flags use of 'x' and 'y'
