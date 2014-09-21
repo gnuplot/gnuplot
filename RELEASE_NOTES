@@ -1,14 +1,14 @@
-		GNUPLOT Version 5.0.rc2 Release Notes
+		GNUPLOT Version 5.0.rc3 Release Notes
 		=====================================
 
-We are happy to announce a second release candidate for gnuplot version 5. 
+We are happy to announce a third release candidate for gnuplot version 5. 
 Version 5 will be a major release with significant new capabilities
 and enhancements compared to previous gnuplot versions.
 
 Please see the NEWS file for bugfixes and minor changes between version 5
-release candidates -rc1 and -rc2.
+release candidates -rc1, -rc2, and -rc3.
 
-Release Notes date: 27 August 2014
+Release Notes date: 20 September 2014
 
 NOTABLE NEW FEATURES
 ====================
@@ -22,6 +22,10 @@ NOTABLE NEW FEATURES
   Final covariance terms are stored in user-accessible variables.
   Fitting options are now controlled by the command "set fit ..." rather than
   by environmental variables.
+
+* The interpretation of columns in a "fit" command depends on new keywords
+  "error", "xyerror", "zerror".  In most cases the program can also recognize
+  version 4 syntax (no error keyword but last column contains zerror).
   
 * The dot/dash pattern of a line can now be controlled independently
   from other properties using the keyword "dashtype".
@@ -133,10 +137,6 @@ Demo plots illustrating new and old features are online at
 
 KNOWN ISSUES
 ============
-
-* There is no documentation for the new "fit" options xerror|xyerror|etc.
-  Running old fit scripts may require adding the new keyword "noerrors"
-  (these new options may change for the final 5.0 release).
 
 * It is tricky to build the wxt and qt terminals under Windows.
 
