@@ -1,0 +1,177 @@
+		   GNUPLOT VERSION 4.6.6
+	    ===================================
+
+This is an incremental update of gnuplot version 4.6 containing bug fixes
+and some minor additions that increase forward compatibility with the
+next major gnuplot release (5.0).
+
+This is the last incremental update planned for gnuplot 4.6, as initial
+release candidates for gnuplot 5.0 are already available.  Version 5 will
+offer significant improvements over version 4, but some of these are not
+100% backwards compatible with scripts written for version 4.  Therefore
+anyone interested in long-term 100% compatibility with existing gnuplot
+scripts may want to install and continue to provide version 4.6.6 even
+after release of gnuplot version 5.
+
+A short list of changes since the previous patchlevel (version 4.6.5)
+is given below and in the NEWS file.  Detailed information is in ChangeLog.
+
+New features, changes and fixes since gnuplot version 4.6.5
+===========================================================
+
+* NEW linetype keyword "nodraw" can be used to draw only the points in "with lp"
+* NEW plot option to "skip N" lines at start of an ascii data file
+* NEW 'set fit prescale' normalized fit parameters before M-L refinement
+* NEW update svg terminal to grey out the key entry when a plot is toggled off
+* NEW allow keywords "comma" and "tab" for "set datafile separator"
+* CHANGE Accept "with image pixels" as a synonym for "with image failsafe"
+* CHANGE return NaN if a requested numerical data value finds a string instead
+* CHANGE Consume only one space following the font name in an enhanced test string
+* CHANGE respond to left mouse click on press rather than on release
+* FIX Faster recovery from outboard server gnuplot_qt being killed
+* FIX get rid of O(N^2) memory allocation for string data in long input lines
+* FIX large integers in iteration spec could cause overflow in end condition check
+* FIX object fillcolors should be consistent with the color of current linetypes
+* FIX LFS support on 64bit platforms (not backported for 32bit platforms)
+* FIX timecolumn() applied to non-axis data reports an error rather than faulting
+* FIX clipping could fail on integer overflow
+* FIX segfault resulting from strcol(N) applied to empty field in a *.csv file
+* FIX adjustment of key size to accommodate long key title
+* FIX treat data value read as "NaN" the same as we would "1/0"
+* FIX handling of events triggered by closing the qt plot window
+* FIX iteration failure due to integer overflow
+* FIX clip r axis tics to current plot boundary
+* FIX logscale cb axis with volatile data
+* FIX qt terminal timing problem with mouse click+release
+* FIX qt terminal handle window close events
+* FIX incorrect processing of certain loop [start:end:incr] combinations
+* FIX Fix y extent and clipping of rectangles with y coord < 0 or inverted axes
+* FIX handle columnheaders in input to fit
+* FIX add sanity check in pdf.trm to avoid strcpy(fontname,fontname)
+
+
+		 NOTES TO PACKAGERS AND TESTERS 
+		===============================
+
+Configuration options for interactive use
+-----------------------------------------
+
+The 4.6 source code supports three primary cross-platform output modes
+in addition to several platform-specific modes.
+
+1) Cairo/pango/wxWidgets
+   These terminals were introduced in version 4.4 and are now the most
+   stable and full-featured option.  This set of terminals includes
+   - pngcairo, pdfcairo, epscairo, and cairolatex for output to a file
+   - wxt for interactive display
+   This is the default configuration, but requires prior installation of
+   libcairo, libpango, libcairo, libwxgtk, and related support libraries
+   The wxt terminal (but not the others) requires wxWidgets.  Note that
+   wxWidgets 3.0 is not yet supported.
+
+   To disable all of these terminals:
+       ./configure --without-cairo --disable-wxt
+
+   To disable only wxt:
+       ./configure --with-cairo --disable-wxt
+
+2) Qt
+   The qt terminal supports interactive display with menu-driven
+   output to png, svg or pdf.
+   The gnuplot 4.6 autoconfigure and build system handles only Qt4.
+       ./configure --enable-qt
+
+3) X11 (the "classic" interactive interface)
+   This used to be the preferred interactive interface, but the newer
+   wxt and qt terminals offer nicer output and a wider range of features.
+
+
+Options for output to files
+---------------------------
+
+Of course the terminals (output modes) present in previous gnuplot versions
+are also still available. These include, among many more obscure options:
+- png/jpeg/gif output via libgd
+- PostScript
+- Many flavors of TeX/LaTeX output, including TikZ and ConTeXt (new)
+- Bitmapped output to support many older devices (e.g. HP deskjet, epson,
+  seiko printers, pbm bitmapped graphics files) is available if needed
+  but is no longer configured in by default.
+      ./configure --with-bitmap-terminals
+
+Options for generating interactive plots for web display
+--------------------------------------------------------
+
+- Mouseable output for display on the web can be created using either 
+  the canvas terminal (HTML5 2D canvas element) or the svg terminal.
+  Both allow zooming, toggling plot elements on/off, and user-scriptable
+  hot keys.
+
+Online demo plots
+-----------------
+
+Demo plots illustrating new and old features are online at
+
+	http://gnuplot.sourceforge.net/demo/
+
+
+		          OTHER NOTES
+		===============================
+
+Installation
+------------
+
+You can download a source tarball for gnuplot version 4.6.6 from the 
+gnuplot development site on SourceForge.
+
+	http://sourceforge.net/project/showfiles.php?group_id=2055
+
+Installation instructions are available in the source itself; the short
+version for linux/unix-like systems is to unpack the tarball and then
+build it:
+		cd gnuplot-4.6.6 ; ./configure ; make
+test it:
+		make check
+install it:
+		make install
+
+Pay careful attention to the output of the ./configure script.
+It may indicate that some output drivers have been omitted because the
+necessary support libraries were not found.  In general you need to have
+previously installed the "*-devel-*" versions of these libraries. 
+
+
+Known issues
+------------
+
+- Mac OSX ships with a terminal input library that appears to be GNU
+libreadline, but isn't really.  The program tries to cope with this, but
+you may get better results by configuring gnuplot to use either its own
+built-in readline routines or the real GNU libreadline.
+
+- The gnuplot build system is not very good at figuring out where to find
+or install LaTeX-related files.  This can affect use of the new lua/tikz
+and ConTeXt terminals.
+
+- You can configure support for both wxt and qt into the same gnuplot
+executable, but only one of these two output modes can be used in any
+given gnuplot session.
+
+
+Support
+-------
+Please report all bugs and installation problems to the bug tracker
+on SourceForge:
+
+	http://sourceforge.net/tracker/?group_id=2055&atid=102055
+
+There is also an gnuplot discussion forum on usenet group
+
+	comp.graphics.apps.gnuplot
+
+
+Development
+-----------
+Gnuplot development is quite active. The development branch on SourceForge
+contains many new features.  The current development branch is labeled 5.1.
+Feedback and contributions of code are very welcome.
