@@ -5,6 +5,7 @@ Changes in 5.0.rc3
 * CHANGE auto-detect and accept v4 "fit" syntax
 * FIX "splot ... with dots" was not drawing the dots
 * FIX revert arrowhead changes introduced in -rc1
+* FIX lua terminal support for LT_NODRAW, RGBA linecolors
 
 Changes in 5.0.rc2
 ==================
