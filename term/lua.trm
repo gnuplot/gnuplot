@@ -1,6 +1,6 @@
 /*
- *  $Id: lua.trm,v 1.22 2014/05/09 22:14:12 broeker Exp $
- *  $Date: 2014/05/09 22:14:12 $
+ *  $Id: lua.trm,v 1.23 2014/06/12 17:22:04 sfeam Exp $
+ *  $Date: 2014/06/12 17:22:04 $
  *  $Rev: 99 $
  */
 
@@ -723,8 +723,8 @@ LUA_get_colorstyle(int style) {
     case TC_LINESTYLE:/* Use the color of line style <n> (only for "internal" use or unsused?) */
       style_str = "LINESTYLE";
       break;
-    case TC_RGB:      /* Explicit RGB triple provided by user */
-      style_str = "RGB";
+    case TC_RGB:      /* Explicit RGBA values provided by user */
+      style_str = "RGBA";
       break;
     case TC_CB:       /* "palette cb <value>" (only for "internal" use or unsused?) */
       style_str = "CB";
@@ -1178,6 +1178,7 @@ LUA_set_color (t_colorspec *colorspec)
 
   double gray = colorspec->value;
   rgb_color color = {0.,0.,0.};
+  double opacity = 1.0;
 
   if(LUA_init_luaterm_function("set_color")) {
     if (colorspec->type == TC_FRAC) {
@@ -1186,6 +1187,7 @@ LUA_set_color (t_colorspec *colorspec)
               1 : floor(gray * sm_palette.colors) / sm_palette.colors;
       rgb1_from_gray( gray, &color );
     } else if (colorspec->type == TC_RGB) {
+      opacity = 1.0 - (double)(colorspec->lt >> 24 & 255) / 255.;
       color.r = (double)((colorspec->lt >> 16 ) & 255) / 255.;
       color.g = (double)((colorspec->lt >> 8 ) & 255) / 255.;
       color.b = (double)(colorspec->lt & 255) / 255.;
@@ -1198,10 +1200,11 @@ LUA_set_color (t_colorspec *colorspec)
     lua_pushstring(L, LUA_get_colorstyle(colorspec->type));
     lua_pushinteger(L, colorspec->lt);
     lua_pushnumber(L, colorspec->value);
+    lua_pushnumber(L, opacity);
     lua_pushnumber(L, color.r);
     lua_pushnumber(L, color.g);
     lua_pushnumber(L, color.b);
-    LUA_call_report(lua_pcall(L, 6, 1, tb));
+    LUA_call_report(lua_pcall(L, 7, 1, tb));
     lua_term_result = (int)lua_tointeger(L, -1);
     lua_pop(L, 1);
   }

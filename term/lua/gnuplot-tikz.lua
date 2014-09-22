@@ -37,7 +37,7 @@
 
 
 
-  $Date: 2012/10/17 04:32:13 $
+  $Date: 2014/06/12 17:22:04 $
   $Author: sfeam $
   $Rev: 100 $
 
@@ -81,7 +81,7 @@ pgf.DEFAULT_FONT_V_CHAR = 308
 pgf.STYLE_FILE_BASENAME = "gnuplot-lua-tikz"  -- \usepackage{gnuplot-lua-tikz}
 
 pgf.REVISION = string.sub("$Rev: 100 $",7,-3)
-pgf.REVISION_DATE = string.gsub("$Date: 2012/10/17 04:32:13 $",
+pgf.REVISION_DATE = string.gsub("$Date: 2014/06/12 17:22:04 $",
                                 "$Date: ([0-9]+).([0-9]+).([0-9]+) .*","%1/%2/%3")
 
 pgf.styles = {}
@@ -125,6 +125,8 @@ pgf.styles.plotstyles = {
 pgf.styles.linetypes_axes = {
   [1] = {"gp lt axes", "dotted"},  -- An lt of -1 is used for the X and Y axes.  
   [2] = {"gp lt border", "solid"}, -- An lt of -2 is used for the border of the plot.
+  [3] = {"gp lt nodraw", "solid"}, -- Although -3 mean don't draw, we still fill this up.
+  [4] = {"gp lt background", "solid"} -- lt bgnd
 }
 
 pgf.styles.linetypes = {
@@ -297,7 +299,6 @@ pgf.write_graph_end = function(noenv)
 end
 
 pgf.draw_path = function(t)
-
   local use_plot = false
   local c_str = '--'
 
@@ -312,7 +313,11 @@ pgf.draw_path = function(t)
     end
   end
 
-  gp.write("\\draw[gp path] ")
+  gp.write("\\draw[gp path")
+  if gfx.opacity < 1.0 then
+    gp.write(string.format(",opacity=%.3f", gfx.opacity))
+  end
+  gp.write("] ")
   if use_plot then
     gp.write("plot["..pgf.styles.plotstyles[((gfx.linetype_idx_set) % #pgf.styles.plotstyles)+1][1].."] coordinates {")
   end
@@ -342,11 +347,14 @@ end
 
 pgf.draw_arrow = function(t, direction, headstyle)
   gp.write("\\draw[gp path")
-  if direction ~= '' then
+  if direction ~= '' and direction ~= nil then
     gp.write(","..direction)
   end
   if headstyle > 0 then
     gp.write(",gp arrow "..headstyle)
+  end
+  if gfx.opacity < 1.0 then
+    gp.write(string.format(",opacity=%.3f", gfx.opacity))
   end
   gp.write("]")
   gp.write("("..pgf.format_coord(t[1][1], t[1][2])..")")
@@ -402,6 +410,9 @@ pgf.write_text_node = function(t, text, angle, justification, font)
   if font ~= '' then
     node_options = node_options .. ",font=" .. font
   end  
+  if gfx.opacity < 1.0 then
+    node_options = node_options .. string.format(",text opacity=%.3f", gfx.opacity)
+  end
   gp.write(string.format("\\node[%s] at (%s) {%s};\n", 
           node_options, pgf.format_coord(t[1], t[2]), text))
 end
@@ -1036,6 +1047,7 @@ pgf.print_help = function(fwrite)
       {font "<fontdesc>"}
       {{fontscale | textscale} <scale>}
       {dashlength | dl <DL>}
+      {linewidth | lw <LW>}
       {nofulldoc | nostandalone | fulldoc | standalone}
       {{preamble | header} "<preamble_string>"}
       {tikzplot <ltn>,...}
@@ -1107,7 +1119,8 @@ pgf.print_help = function(fwrite)
  All texts in the plot are scaled by this factor then.
 
  'dashlength' or 'dl' scales the length of dashed-line segments by <DL>,
- which is a floating-point number greater than zero.
+ which is a floating-point number greater than zero. 'linewidth' or 
+ 'lw' scales all linewidths by <LW>.
 
  The options 'tex', 'latex' and 'context' choose the TeX output
  format. LaTeX is the default. To load the style file put the
@@ -1203,6 +1216,7 @@ gfx.dashtype_idx = nil       -- current dashtype intended for the plot
 gfx.dashtype_idx_set = nil   -- current dashtype set in the plot
 gfx.linewidth = nil
 gfx.linewidth_set = nil
+gfx.opacity = 1.0
 
 -- internal calculated scaling factors
 gfx.scalex = 1
@@ -1275,7 +1289,8 @@ gfx.opt = {
   tightboundingbox = false,
   -- fontscale
   fontscale = nil,
-  dashlength = nil
+  dashlength = nil,
+  linewidth = 1.0
 }
 
 -- Formats for the various TeX flavors 
@@ -1488,13 +1503,13 @@ gfx.check_in_path = function()
   end
   
   -- ignore zero length paths
-    if #gfx.path > 1 then
+  if #gfx.path > 1 then
     -- check all line properties and draw current path
     gfx.check_color()
     gfx.check_linetype()
     gfx.check_dashtype()
     gfx.check_linewidth()
-      pgf.draw_path(gfx.path)
+    pgf.draw_path(gfx.path)
     -- remember last coordinates
     gfx.start_path(gfx.path[#gfx.path][1], gfx.path[#gfx.path][2])
   end
@@ -1572,13 +1587,16 @@ gfx.start_path = function(x, y)
   gfx.posy = y
 end
 
--- ctype  string  LT|RGB|GRAY
--- val   table   {name}|{r,g,b}
+-- ctype  string  LT|RGBA|GRAY
+-- val   table   {name}|{r,g,b,alpha}
+-- returns a properly formatted color parameter string, or nil if LT_NODRAW was used.
 gfx.format_color = function(ctype, val)
   local c
   if ctype == 'LT' then
     if val[1] < 0 then
-      if val[1] < -2 then --  LT_NODRAW, LT_BACKGROUND, LT_UNDEFINED
+      if val[1] == -3 then
+        c = nil
+      elseif val[1] < -2 then --  LT_NODRAW, LT_BACKGROUND, LT_UNDEFINED
         c = 'color=gpbgfillcolor'
       else
         c = 'color='..pgf.styles.lt_colors_axes[math.abs(val[1])][1]
@@ -1587,18 +1605,24 @@ gfx.format_color = function(ctype, val)
       c = 'color='..pgf.styles.lt_colors[(val[1] % #pgf.styles.lt_colors)+1][1]
     end
     -- c = pgf.styles.lt_colors[((val[1]+3) % #pgf.styles.lt_colors) + 1][1]
-  elseif ctype == 'RGB' then
-    c = string.format("rgb color={%.3f,%.3f,%.3f}", val[1], val[2], val[3])
   elseif ctype == 'RGBA' then
-      c = string.format("rgb color={%.3f,%.3f,%.3f},opacity=%.3f", val[1], val[2], val[3], val[4])
+    c = string.format("rgb color={%.3f,%.3f,%.3f}", val[1], val[2], val[3])
   elseif ctype == 'GRAY' then
     c = string.format("color=black!%i", 100*val[1]+0.5)
   end
   return c
 end
 
+gfx.set_opacity = function(ctype, val)
+  gfx.opacity = 1.0
+  if (ctype == 'RGBA') then
+     gfx.opacity = val[4]
+  end
+end
+
 gfx.set_color = function(ctype, val)
   gfx.color = gfx.format_color(ctype, val)
+  gfx.set_opacity(ctype, val)
 end
 
 
@@ -1647,7 +1671,7 @@ term.options = function(opt_str, initial, t_count)
   local o_type = nil
   local s_start, s_end = 1, 1
   local term_opt = ""
-  local term_opt_font, term_opt_size, term_opt_background, term_opt_fontscale, term_opt_dashlength, term_opt_scale, term_opt_preamble = "", "", "", "", "", ""
+  local term_opt_font, term_opt_size, term_opt_background, term_opt_fontscale, term_opt_dashlength, term_opt_linewidth, term_opt_scale, term_opt_preamble = "", "", "", "", "", ""
   local charsize_h, charsize_v, fontsize, fontscale, dashlength = nil, nil, nil, nil, nil
   -- trim spaces
   opt_str = opt_str:gsub("^%s*(.-)%s*$", "%1")
@@ -1925,6 +1949,17 @@ term.options = function(opt_str, initial, t_count)
       else
         gp.int_error(t_count, string.format("error: number expected, got `%s'.", o_next))
       end
+    elseif almost_equals(o_next, "linew$idth") or almost_equals(o_next, "lw") then
+      get_next_token()
+      if o_type == 'number' then
+        gfx.opt.linewidth = tonumber(o_next)
+        if gfx.opt.linewidth <= 0 then
+          gfx.opt.linewidth = 1.0
+        end
+	term_opt_linewidth = string.format("linewidth %.1f ", gfx.opt.linewidth)
+      else
+        gp.int_error(t_count, string.format("error: number expected, got `%s'.", o_next))
+      end
     elseif almost_equals(o_next, "externalimages") then
       if term.external_images ~= nil then
         term.external_images = true;
@@ -2028,6 +2063,7 @@ term.options = function(opt_str, initial, t_count)
   tf(true, term_opt_background, nil)
   tf(true, term_opt_fontscale, nil)
   tf(true, term_opt_dashlength, nil)
+  tf(true, term_opt_linewidth, nil)
   tf((#gfx.opt.latex_preamble>0), term_opt_preamble, 'nopreamble')
   tf(gfx.opt.lines_colored, 'color', 'monochrome')
   tf(gfx.opt.full_doc, 'standalone', 'nostandalone')
@@ -2083,21 +2119,25 @@ end
 
 
 term.vector = function(x, y)
-  if #gfx.path == 0 then
-    gfx.start_path(gfx.posx, gfx.posy)
-  elseif not gfx.check_coord(x, y) then
-    -- checked for zero path length and add the path coords to gfx.path
-    gfx.path[#gfx.path+1] = {x,y}
+  if gfx.linetype_idx ~= -3 then
+    if #gfx.path == 0 then
+      gfx.start_path(gfx.posx, gfx.posy)
+    elseif not gfx.check_coord(x, y) then
+      -- checked for zero path length and add the path coords to gfx.path
+      gfx.path[#gfx.path+1] = {x,y}
+    end
   end
   return 1
 end
 
 term.move = function(x, y)
-  -- only "move" if we change our latest position
-  if not gfx.check_coord(x, y) then
-    -- finish old path and start a new one
-    gfx.check_in_path()
-    gfx.start_path(x, y)
+  if gfx.linetype_idx ~= -3 then
+    -- only "move" if we change our latest position
+    if not gfx.check_coord(x, y) then
+      -- finish old path and start a new one
+      gfx.check_in_path()
+      gfx.start_path(x, y)
+    end
   end
   return 1
 end
@@ -2107,8 +2147,8 @@ term.linetype = function(ltype)
 
   gfx.set_color('LT', {ltype})
 
-  if (ltype < -2) then -- LT_NODRAW, LT_BACKGROUND, LT_UNDEFINED
-    ltype = -2
+  if (ltype < -4) then -- LT_NODRAW = -3, LT_BACKGROUND = -4
+    ltype = -3
   end
 
   gfx.linetype_idx = ltype
@@ -2171,6 +2211,9 @@ end
   int filled        /* arrow head filled or not */
 ]]
 term.arrow = function(sx, sy, ex, ey, head, length, angle, backangle, filled)
+  if gfx.linetype_idx == -3 then -- LT_NODRAW
+    return 1
+  end
   if gfx.opt.gp_arrows then
     return 0
   else
@@ -2217,6 +2260,7 @@ term.text_angle = function(ang)
 end
 
 term.linewidth = function(width)
+  width = width * gfx.opt.linewidth
   if gfx.linewidth ~= width then
     gfx.check_in_path()
     gfx.linewidth = width
@@ -2277,7 +2321,7 @@ term.filled_polygon = function(style, fillpar, t)
       pattern = ''
       color = gfx.color
       saturation = 100
-      opacity = 100
+      opacity = 100 * gfx.opacity
   elseif style == 'SOLID' then
       pattern = ''
       color = gfx.color
@@ -2318,7 +2362,7 @@ end
 -- points[row][column]
 -- m: #cols, n: #rows
 -- corners: clip box and draw box coordinates
--- ctype: "RGB" or "RGBA" or "PALETTE"
+-- ctype: "RGBA" or "PALETTE"
 term.image = function(m, n, points, corners, ctype, xfile)
   gfx.check_in_path()
   
@@ -2348,13 +2392,17 @@ term.image = function(m, n, points, corners, ctype, xfile)
     local w = (corners[2][1] - corners[1][1])/m
     local h = (corners[1][2] - corners[2][2])/n
 
-    local yy,yyy,xx,xxx
+    local yy,yyy,xx,xxx,color
     for cnt = 1,#points do
       xx = corners[1][1]+(cnt%m-1)*w
       yy = corners[1][2]-math.floor(cnt/m)*h
       yyy = yy-h
       xxx = xx+w
-      pgf.draw_fill({{xx, yy}, {xxx, yy}, {xxx, yyy}, {xx, yyy}}, '', gfx.format_color(ctype, points[cnt]) , 100, 100)
+      color = gfx.format_color(ctype, points[cnt])
+      gfx.set_opacity(ctype, points[cnt])
+      if color ~= nil then
+        pgf.draw_fill({{xx, yy}, {xxx, yy}, {xxx, yyy}, {xx, yyy}}, '', color, 100, 100*gfx.opacity)
+      end
     end
   end
   pgf.write_clipbox_end()
@@ -2369,7 +2417,7 @@ term.previous_palette = function()
   return 1
 end
 
-term.set_color = function(ctype, lt, value, r, g, b)
+term.set_color = function(ctype, lt, value, opacity, r, g, b)
   gfx.check_in_path()
   -- FIXME gryscale on monochrome?? ... or use xcolor?
 
@@ -2377,12 +2425,12 @@ term.set_color = function(ctype, lt, value, r, g, b)
     gfx.set_color('LT', {lt})
   elseif ctype == 'FRAC' then
     if gfx.opt.lines_colored then
-      gfx.set_color('RGB', {r, g , b})
+      gfx.set_color('RGBA', {r, g , b, 1.0})
     else
       gfx.set_color('GRAY', {value})
     end
-  elseif ctype == 'RGB' then
-    gfx.set_color('RGB', {r, g , b})
+  elseif ctype == 'RGBA' then
+    gfx.set_color('RGBA', {r, g , b, opacity})
   else
     gp.int_error(string.format("set color: unknown type (%s), lt (%i), value (%.3f)\n", ctype, lt, value))
   end

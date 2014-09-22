@@ -3,6 +3,9 @@
 	* src/misc.c (parse_fillstyle): Remove order dependence of keyword 
 	"transparent".
 
+	* term/lua.trm term/lua/gnuplot-tikz.lua:
+	Support RGBA linecolors and LT_NODRAW.  Add a linewidth terminal option.
+
 2014-09-20  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/fit.c src/fit.h src/save.c src/set.c src/show.c src/unset.c
