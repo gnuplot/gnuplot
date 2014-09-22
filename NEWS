@@ -1,11 +1,13 @@
-Changes since 5.0.rc2
+Changes in 5.0.rc3
 =====================
 
+* CHANGE revised v5 "fit" syntax does not match -rc1 and -rc2
+* CHANGE auto-detect and accept v4 "fit" syntax
 * FIX "splot ... with dots" was not drawing the dots
 * FIX revert arrowhead changes introduced in -rc1
 
-Changes since 5.0.rc1
-=====================
+Changes in 5.0.rc2
+==================
 
 * NEW grey out key entries when corresponding plot is toggled off
 * NEW allow parenthesized expressions as call parameters

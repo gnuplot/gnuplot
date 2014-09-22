@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.188.2.2 2014/09/05 21:50:56 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.188.2.3 2014/09/09 03:44:17 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -1279,11 +1279,11 @@ parse_fillstyle(struct fill_style_type *fs, int def_style, int def_density, int 
 	    fs->fillstyle = FS_EMPTY;
 	    c_token++;
 	} else if (almost_equals(c_token, "s$olid")) {
-	    fs->fillstyle = transparent ? FS_TRANSPARENT_SOLID : FS_SOLID;
+	    fs->fillstyle = FS_SOLID;
 	    set_fill = TRUE;
 	    c_token++;
 	} else if (almost_equals(c_token, "p$attern")) {
-	    fs->fillstyle = transparent ? FS_TRANSPARENT_PATTERN : FS_PATTERN;
+	    fs->fillstyle = FS_PATTERN;
 	    set_fill = TRUE;
 	    c_token++;
 	}
@@ -1317,7 +1317,7 @@ parse_fillstyle(struct fill_style_type *fs, int def_style, int def_density, int 
 	if (!(isanumber(c_token) || type_udv(c_token) == INTGR || type_udv(c_token) == CMPLX))
 	    break;
 
-	if (fs->fillstyle == FS_SOLID || fs->fillstyle == FS_TRANSPARENT_SOLID) {
+	if (fs->fillstyle == FS_SOLID) {
 	    /* user sets 0...1, but is stored as an integer 0..100 */
 	    fs->filldensity = 100.0 * real_expression() + 0.5;
 	    if (fs->filldensity < 0)
@@ -1325,12 +1325,18 @@ parse_fillstyle(struct fill_style_type *fs, int def_style, int def_density, int 
 	    if (fs->filldensity > 100)
 		fs->filldensity = 100;
 	    set_param = TRUE;
-	} else if (fs->fillstyle == FS_PATTERN || fs->fillstyle == FS_TRANSPARENT_PATTERN) {
+	} else if (fs->fillstyle == FS_PATTERN) {
 	    fs->fillpattern = int_expression();
 	    if (fs->fillpattern < 0)
 		fs->fillpattern = 0;
 	    set_param = TRUE;
 	}
+    }
+    if (transparent) {
+	if (fs->fillstyle == FS_SOLID)
+	    fs->fillstyle = FS_TRANSPARENT_SOLID;
+        else if (fs->fillstyle == FS_PATTERN)
+	    fs->fillstyle = FS_TRANSPARENT_PATTERN;
     }
 }
 
