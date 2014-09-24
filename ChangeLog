@@ -1,3 +1,15 @@
+2014-09-24 Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/aed.trm term/v384.trm
+	config/makefile.dj2 config/makefile.emx config/makefile.vms
+	configure.vms docs/doc2texi.el docs/Makefile.am src/makefile.all
+	src/makefile.awc src/term.h:
+
+	Remove obsolete terminals:
+	aed:  pre-1980 display device ($15,000) with 500x500 pixels, 256 colors
+	v384: Vectrix VX 384 mid 1980s graphics display terminal ($5000) with
+	      672x480 pixels, 512 colors
+
 2014-09-22  Christoph Bersch <usenet@bersch.net>
 
 	* src/misc.c (parse_fillstyle): Remove order dependence of keyword 

@@ -1,5 +1,5 @@
 #
-# $Id: makefile.vms,v 1.15 2013/02/23 01:57:59 sfeam Exp $
+# $Id: makefile.vms,v 1.16 2013/10/25 03:10:28 sfeam Exp $
 #
 # GNUPLOT Makefile for VMS
 #
@@ -73,15 +73,15 @@ CSOURCE1 = command.c set.c show.c variable.c
 CSOURCE2 = help.c graphics.c graph3d.c internal.c
 CSOURCE3 = misc.c eval.c parse.c plot.c plot2d.c plot3d.c scanner.c standard.c stdfn.c
 CSOURCE4 = bitmap.c term.c time.c util.c version.c interpol.c fit.c matrix.c stats.c
-CSOURCE5 = [-.term]aed.trm [-.term]dumb.trm [-.term]dxf.trm [-.term]dxy.trm \
+CSOURCE5 = [-.term]dumb.trm [-.term]dxf.trm [-.term]dxy.trm \
 	[-.term]eepic.trm [-.term]epson.trm [-.term]fig.trm [-.term]hp26.trm \
 	[-.term]hp2648.trm [-.term]hpgl.trm [-.term]hpljii.trm
 CSOURCE6 = [-.term]impcodes.h [-.term]imagen.trm [-.term]object.h \
 	[-.term]kyo.trm [-.term]latex.trm [-.term]pbm.trm  \
 	[-.term]pc.trm
-CSOURCE7 = [-.term]post.trm [-.term]qms.trm [-.term]regis.trm [-.term]sun.trm \
+CSOURCE7 = [-.term]post.trm [-.term]qms.trm [-.term]regis.trm \
 	[-.term]t410x.trm [-.term]tek.trm \
-	[-.term]v384.trm [-.term]x11.trm gplt_x11.c
+	[-.term]x11.trm gplt_x11.c
 CSOURCE8 = contour.c specfun.c interpol.c vms.c dynarray.c
 
 all :   gnuplot.$(X) gnuplot_x11.$(X) gnuplot.hlp gnuplot.hlb \

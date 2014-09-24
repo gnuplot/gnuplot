@@ -46,7 +46,7 @@ noinst_PROGRAMS = checkdoc doc2ipf doc2tex doc2gih doc2rnh doc2hlp \
 AM_CPPFLAGS = -I$(top_srcdir)/src -I$(top_srcdir)/term
 
 T = $(top_srcdir)/term/
-CORETERM = $(T)aed.trm $(T)ai.trm $(T)aquaterm.trm $(T)be.trm \
+CORETERM = $(T)ai.trm $(T)aquaterm.trm $(T)be.trm \
 $(T)cairo.trm $(T)canvas.trm $(T)cgm.trm $(T)context.trm \
 $(T)corel.trm $(T)debug.trm $(T)djsvga.trm $(T)dumb.trm $(T)dxf.trm \
 $(T)dxy.trm $(T)eepic.trm $(T)emf.trm $(T)emxvga.trm $(T)epson.trm \
@@ -58,7 +58,7 @@ $(T)metapost.trm $(T)mif.trm $(T)next.trm $(T)openstep.trm $(T)pbm.trm \
 $(T)pdf.trm $(T)pm.trm $(T)post.trm $(T)pslatex.trm \
 $(T)pstricks.trm $(T)qms.trm $(T)qt.trm $(T)regis.trm $(T)sun.trm \
 $(T)svg.trm $(T)t410x.trm $(T)tek.trm $(T)texdraw.trm $(T)tgif.trm \
-$(T)tkcanvas.trm $(T)tpic.trm $(T)v384.trm $(T)vgagl.trm \
+$(T)tkcanvas.trm $(T)tpic.trm $(T)vgagl.trm \
 $(T)vws.trm $(T)win.trm $(T)wxt.trm $(T)x11.trm $(T)xlib.trm 
 
 # DIST_COMMON = README
