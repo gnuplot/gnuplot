@@ -22,6 +22,10 @@
 	v384: Vectrix VX 384 mid 1980s graphics display terminal ($5000) with
 	      672x480 pixels, 512 colors
 
+	* src/interpol.c:  Force the number of intervals used for interpolating
+	monotonic cubic splines ("smooth mcsplines") to be at least twice the
+	number of data points.
+
 2014-09-22  Christoph Bersch <usenet@bersch.net>
 
 	* src/misc.c (parse_fillstyle): Remove order dependence of keyword 
