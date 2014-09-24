@@ -1,3 +1,11 @@
+2014-09-24  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/win/wgraph.c term/win.trm:  The windows terminal allowed users
+	to change linetypes via an ini file or with the help of a dialog.  This
+	has been superseeded by the more general `set linetyoe` mechanism.
+	The old code is still available but only active with WIN_CUSTOM_PENS
+	defined during compilation.
+
 2014-09-24 Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/aed.trm term/v384.trm
