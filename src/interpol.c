@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: interpol.c,v 1.45 2014/01/31 03:43:39 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: interpol.c,v 1.46 2014/05/09 22:14:11 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - interpol.c */
@@ -1358,14 +1358,16 @@ mcs_interp(struct curve_points *plot)
     int i;
 
     /* These will track the resulting smoothed curve */
-    struct coordinate *new_points = gp_alloc((samples_1+1) * sizeof(coordinate), "mcs");
+    /* V5: Try to ensure that the sampling is fine enough to pass through the original points */
+    int Nsamp = (samples_1 > 2*N) ? samples_1 : 2*N;
+    struct coordinate *new_points = gp_alloc((Nsamp+1) * sizeof(coordinate), "mcs");
     double sxmin = AXIS_LOG_VALUE(plot->x_axis, X_AXIS.min);
     double sxmax = AXIS_LOG_VALUE(plot->x_axis, X_AXIS.max);
     double xstart, xend, xstep;
 
     xstart = GPMAX(p[0].x, sxmin);
     xend = GPMIN(p[N-1].x, sxmax);
-    xstep = (xend - xstart) / (samples_1 - 1);
+    xstep = (xend - xstart) / (Nsamp - 1);
 
     /* Calculate spline coefficients */
 #define DX	xlow
@@ -1399,7 +1401,7 @@ mcs_interp(struct curve_points *plot)
     }
 
     /* Use the coefficients C1, C2, C3 to interpolate over the requested range */
-    for (i = 0; i < samples_1; i++) {
+    for (i = 0; i < Nsamp; i++) {
 	double x = xstart + i * xstep;
 	double y;
 	TBOOLEAN exact = FALSE;
@@ -1440,8 +1442,8 @@ mcs_interp(struct curve_points *plot)
     /* Replace original data with the interpolated curve */
     free(p);
     plot->points = new_points;
-    plot->p_count = samples_1;
-    plot->p_max = samples_1 + 1;
+    plot->p_count = Nsamp;
+    plot->p_max = Nsamp + 1;
 
 #undef DX
 #undef SLOPE

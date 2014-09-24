@@ -1,3 +1,9 @@
+2014-09-24 Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/interpol.c:  Force the number of intervals used for interpolating
+	monotonic cubic splines ("smooth mcsplines") to be at least twice the
+	number of data points.
+
 2014-09-22  Christoph Bersch <usenet@bersch.net>
 
 	* src/misc.c (parse_fillstyle): Remove order dependence of keyword 
