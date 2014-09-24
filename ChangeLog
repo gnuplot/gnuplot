@@ -6,6 +6,10 @@
 	The old code is still available but only active with WIN_CUSTOM_PENS
 	defined during compilation.
 
+	* src/win/wgraph.c src/win/wgidplus.c:  Accept zero point size.
+	Eliminates drawing of unwanted point symbols for labelled contours.
+	Bugfix
+
 2014-09-24 Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/aed.trm term/v384.trm
