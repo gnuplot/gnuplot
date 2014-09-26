@@ -2,6 +2,9 @@
 
 	* term/js/gnuplot_mouse.js:  Typo in logical test for hypertext.
 
+	* src/axis.h src/save.c src/set.c src/show.c src/unset.c src/graphics.c
+	src/graph3d.c:   set [*]tics {{no}enhanced}
+
 2014-09-24 Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/interpol.c:  Force the number of intervals used for interpolating

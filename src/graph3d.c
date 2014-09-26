@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.311.2.1 2014/09/03 18:33:01 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.311.2.2 2014/09/04 19:47:55 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -2693,8 +2693,10 @@ xtick_callback(
 	angle = axis_array[axis].tic_rotate;
 	if (!(splot_map && angle && term->text_angle(angle)))
 	    angle = 0;
+	ignore_enhanced(!axis_array[axis].ticdef.enhanced);
 	write_multiline(x2+offsetx, y2+offsety, text, just, JUST_TOP,
 			    angle, axis_array[axis].ticdef.font);
+	ignore_enhanced(FALSE);
 	term->text_angle(0);
 	term_apply_lp_properties(&border_lp);
     }
@@ -2814,8 +2816,10 @@ ytick_callback(
 	angle = axis_array[axis].tic_rotate;
 	if (!(splot_map && angle && term->text_angle(angle)))
 	    angle = 0;
+	ignore_enhanced(!axis_array[axis].ticdef.enhanced);
 	write_multiline(x2+offsetx, y2+offsety, text, just, JUST_TOP,
 			angle, axis_array[axis].ticdef.font);
+	ignore_enhanced(FALSE);
 	term->text_angle(0);
 	term_apply_lp_properties(&border_lp);
     }
@@ -2883,8 +2887,10 @@ ztick_callback(
 	    axis_array[axis].ticdef.textcolor.value = place;
 	if (axis_array[axis].ticdef.textcolor.type != TC_DEFAULT)
 	    apply_pm3dcolor(&(axis_array[axis].ticdef.textcolor), term);
+	ignore_enhanced(!axis_array[axis].ticdef.enhanced);
 	write_multiline(x1+offsetx, y1+offsety, text, RIGHT, JUST_CENTRE,
 			0, axis_array[axis].ticdef.font);
+	ignore_enhanced(FALSE);
 	term_apply_lp_properties(&border_lp);
     }
 

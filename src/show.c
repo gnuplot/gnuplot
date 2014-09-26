@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.326.2.1 2014/09/05 21:50:58 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.326.2.2 2014/09/21 04:54:33 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -3348,6 +3348,8 @@ show_ticdef(AXIS_INDEX axis)
     } else
         fputs("justified automatically, ", stderr);
     fprintf(stderr, "format \"%s\"", ticfmt);
+    if (axis_array[axis].ticdef.enhanced == FALSE)
+	fprintf(stderr,"  noenhanced");
     if (axis_array[axis].tic_rotate) {
 	fprintf(stderr," rotated");
 	fprintf(stderr," by %d",axis_array[axis].tic_rotate);
