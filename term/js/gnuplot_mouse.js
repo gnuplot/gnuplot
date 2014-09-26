@@ -1,5 +1,5 @@
 /*
- * $Id: gnuplot_mouse.js,v 1.21 2013/04/05 18:36:54 sfeam Exp $
+ * $Id: gnuplot_mouse.js,v 1.23 2014/09/26 01:50:11 sfeam Exp $
  */
     gnuplot.mouse_version = " 7 May 2013";
 
@@ -205,7 +205,7 @@ gnuplot.mouse_update = function(e)
   }
 
   // See if we are over a hypertext anchor point
-  if (typeof(gnuplot.hypertext_list != "unknown") && gnuplot.hypertext_list.length > 0) {
+  if (gnuplot.hypertext_list != "undefined" && gnuplot.hypertext_list.length > 0) {
     gnuplot.check_hypertext();
   }
 }
