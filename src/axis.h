@@ -1,5 +1,5 @@
 /*
- * $Id: axis.h,v 1.102 2014/05/08 17:35:42 sfeam Exp $
+ * $Id: axis.h,v 1.103 2014/06/14 15:32:58 sfeam Exp $
  *
  */
 
@@ -123,6 +123,7 @@ typedef struct ticdef {
     } def;
     struct position offset;
     TBOOLEAN rangelimited;		/* Limit tics to data range */
+    TBOOLEAN enhanced;			/* Use enhanced text mode or labels */
 } t_ticdef;
 
 /* we want two auto modes for minitics - default where minitics are
@@ -267,7 +268,7 @@ typedef struct axis {
     lp_style_type *zeroaxis;	/* usually points to default_axis_zeroaxis */
 } AXIS;
 
-#define DEFAULT_AXIS_TICDEF {TIC_COMPUTED, NULL, {TC_DEFAULT, 0, 0.0}, {NULL, {0.,0.,0.}, FALSE},  { character, character, character, 0., 0., 0. }, FALSE }
+#define DEFAULT_AXIS_TICDEF {TIC_COMPUTED, NULL, {TC_DEFAULT, 0, 0.0}, {NULL, {0.,0.,0.}, FALSE},  { character, character, character, 0., 0., 0. }, FALSE, TRUE }
 #define DEFAULT_AXIS_ZEROAXIS {0, LT_AXIS, 0, DASHTYPE_AXIS, 0, 1.0, PTSZ_DEFAULT, 0, BLACK_COLORSPEC, DEFAULT_DASHPATTERN}
 
 #define DEFAULT_AXIS_STRUCT {						    \

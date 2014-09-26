@@ -2,6 +2,9 @@
 
 	* term/js/gnuplot_mouse.js:  Typo in logical test for hypertext.
 
+	* src/axis.h src/save.c src/set.c src/show.c src/unset.c src/graphics.c
+	src/graph3d.c:   set [*]tics {{no}enhanced}
+
 2014-09-24  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/win/wgraph.c term/win.trm:  The windows terminal allowed users

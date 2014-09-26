@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.461 2014/09/05 21:51:38 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.462 2014/09/20 11:31:13 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -5409,6 +5409,12 @@ set_tic_prop(AXIS_INDEX axis)
 		    int_error(c_token,"expected format");
 		free(axis_array[axis].formatstring);
 		axis_array[axis].formatstring  = format;
+	    } else if (almost_equals(c_token, "enh$anced")) {
+		++c_token;
+		axis_array[axis].ticdef.enhanced = TRUE;
+	    } else if (almost_equals(c_token, "noenh$anced")) {
+		++c_token;
+		axis_array[axis].ticdef.enhanced = FALSE;
 	    } else if (equals(c_token,"tc") ||
 		       almost_equals(c_token,"text$color")) {
 		parse_colorspec(&axis_array[axis].ticdef.textcolor,
