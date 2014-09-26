@@ -1,3 +1,7 @@
+2014-09-26 Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/js/gnuplot_mouse.js:  Typo in logical test for hypertext.
+
 2014-09-24  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/win/wgraph.c term/win.trm:  The windows terminal allowed users
