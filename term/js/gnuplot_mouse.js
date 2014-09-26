@@ -1,7 +1,7 @@
 /*
- * $Id: gnuplot_mouse.js,v 1.22 2013/05/07 22:13:46 sfeam Exp $
+ * $Id: gnuplot_mouse.js,v 1.23 2014/09/26 01:50:11 sfeam Exp $
  */
-    gnuplot.mouse_version = " 7 May 2013";
+    gnuplot.mouse_version = " 26 September 2014";
 
 // Mousing code for use with gnuplot's 'canvas' terminal driver.
 // The functions defined here assume that the javascript plot produced by
