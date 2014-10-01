@@ -254,8 +254,7 @@ Major contributors (alphabetic order):
 
 (defvar d2t-terminal-list ())
 (setq d2t-terminal-list
-      '("aed"
-	"ai"
+      '("ai"
 	"aquaterm"
 	"be"
 	"cairo"
@@ -320,7 +319,6 @@ Major contributors (alphabetic order):
 	"tikz"
 	"tkcanvas"
 	"tpic"
-	"v384"
 	"vgagl"
 	"vws"
 	"win"

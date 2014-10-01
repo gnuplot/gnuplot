@@ -1,5 +1,5 @@
 /*
- * $Id: term.h,v 1.64 2014/01/18 16:14:50 markisch Exp $
+ * $Id: term.h,v 1.66 2014/03/19 23:36:07 sfeam Exp $
  */
 
 /* GNUPLOT - term.h */
@@ -196,9 +196,6 @@
 /* Terminals not relevant for MSDOS, MS-Windows */
 #if !(defined(MSDOS) || defined(_Windows))
 
-/* AED 512 and AED 767 graphics terminals */
-/* # include "aed.trm" */
-
 /* gpic for groff */
 #ifdef HAVE_GPIC
 # include "gpic.trm"
@@ -332,9 +329,6 @@
 
 /* tcl/tk with perl extensions */
 #include "tkcanvas.trm"
-
-/* Vectrix 384 printer, also Tandy colour */
-/* #include "v384.trm" */
 
 #ifndef NO_BITMAP_SUPPORT
 
