@@ -5,6 +5,9 @@
 	* src/hidden3d.c (draw_edge): When an arrow is split into segments by
 	hidden surface processing, only keep the arrowhead on the original tip.
 
+	* src/plot2d.c (get_data): Timedata for HISTOGRAMS requires a special
+	case.
+
 2014-09-26 Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/js/gnuplot_mouse.js:  Typo in logical test for hypertext.
