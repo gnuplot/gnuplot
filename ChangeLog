@@ -1,3 +1,7 @@
+2014-10-01  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/plot2d.c (get_data): Allow timedata for HISTOGRAMS.
+
 2014-09-24  correct time stamp for 4.6.6 in version.c
 
 2014-09-21  Release 4.6.6  (cvs tag Release_4_6_6)
