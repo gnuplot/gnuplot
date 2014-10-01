@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.99.2.1 2014/09/03 21:16:56 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.99.2.2 2014/09/05 21:50:56 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - hidden3d.c */
@@ -1747,6 +1747,20 @@ draw_edge(p_edge e, p_vertex v1, p_vertex v2)
 	lptemp.pm3d_color = color;
 	if (arrow)
 	    lptemp.p_type = e->style;
+    }
+
+    /* Only the original tip of an arrow should show an arrowhead */
+    /* FIXME:  Arrowhead lines are not themselves subject to hidden line removal */
+    if (arrow) {
+	if (e->v2 != v2-vlist && e->v1 != v1-vlist) {
+		lptemp.p_type = 0;
+	} else if (e->style == PT_BACKARROW) {
+	    if (e->v2 == v2-vlist && e->v1 != v1-vlist)
+		lptemp.p_type = 0;
+	} else {
+	    if (e->v1 == v1-vlist && e->v2 != v2-vlist)
+		lptemp.p_type = 0;
+	}
     }
 
     draw3d_line_unconditional(v1, v2, &lptemp, color);
