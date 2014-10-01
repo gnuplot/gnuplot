@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.902.2.13 2014/09/18 00:26:49 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.902.2.14 2014/09/21 04:54:32 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -12642,18 +12642,25 @@ Ffigure_missing
 ?commands set xdata time
 ?set xdata time
  `set xdata time` indicates that the x coordinate is to be interpreted as a
- date or time to millisecond precision.
+ date or time to millisecond precision. Equivalent commands exist for
+ `set ydata time` and so on.
 
- See `set timefmt` to tell gnuplot how to read date or time data from a file.
- The time/date is converted to seconds from start of the century.  There is
- currently only one timefmt, which implies that all the time/date columns must
- conform to this format.  Specification of ranges should be supplied as quoted
- strings according to this format to avoid interpretation of the time/date as
- an expression.
+ Two separate formats control interpretation of time data.
+ Input data is read from a file using the `timefmt` for that axis.
+ See `set timefmt`. 
+ Use quoted strings in this same `timefmt` to specify the axis range.
 
- By default the function 'strftime' (type "man strftime" on unix to look it up)
- is used to label axis tickmarks.  `gnuplot` tries to figure out a reasonable
- format for this.  You can customize the label format using `set format x`.
+ Example:
+
+      set xdata time
+      set timefmt x "%d-%b-%Y"
+      set xrange ["01-Jan-2013" : "31-Dec-2014"]
+
+ For output, i.e. tick labels along that axis or coordinates output by mousing,
+ the function 'strftime' (type "man strftime" on unix to look it up) is used to
+ convert from the internal time in seconds to a string representation of a date.
+ `gnuplot` tries to figure out a reasonable format for this.  You can customize
+ the format using `set format x`.
  See `time_specifiers` for a special set of time format specifiers.
  See also `time/date` for more information.
 4 geographic
