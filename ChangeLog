@@ -13,6 +13,8 @@
 	src/term.c:  Remove wasted parameter passed to apply_pm3dcolor(),
 	reset_textcolor(), and get_offsets().
 
+	* docs/gnuplot.doc:  Replace outdated section on `set xdata time`.
+
 2014-09-26 Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/js/gnuplot_mouse.js:  Typo in logical test for hypertext.
