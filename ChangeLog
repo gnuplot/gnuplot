@@ -8,6 +8,11 @@
 	* src/plot2d.c (get_data): Timedata for HISTOGRAMS requires a special
 	case.
 
+	* src/boundary.c src/color.c src/gadgets.c src/gadgets.h src/graph3d.c
+	src/graphics.c src/hidden3d.c src/misc.c src/mouse.c src/multiplot.c
+	src/term.c:  Remove wasted parameter passed to apply_pm3dcolor(),
+	reset_textcolor(), and get_offsets().
+
 2014-09-26 Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/js/gnuplot_mouse.js:  Typo in logical test for hypertext.

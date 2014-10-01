@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: multiplot.c,v 1.1 2014/03/29 05:12:51 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: multiplot.c,v 1.2 2014/03/31 03:27:00 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -410,10 +410,10 @@ multiplot_start()
 	y = term->ymax - term->v_char + tmpy;;
 
 	ignore_enhanced(mp_layout.title.noenhanced);
-	apply_pm3dcolor(&(mp_layout.title.textcolor), term);
+	apply_pm3dcolor(&(mp_layout.title.textcolor));
 	write_multiline(x, y, mp_layout.title.text,
 			CENTRE, JUST_TOP, 0, mp_layout.title.font);
-	reset_textcolor(&(mp_layout.title.textcolor), term);
+	reset_textcolor(&(mp_layout.title.textcolor));
 	ignore_enhanced(FALSE);
 
 	/* Calculate fractional height of title compared to entire page */

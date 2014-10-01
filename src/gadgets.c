@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gadgets.c,v 1.115 2014/08/16 04:47:04 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gadgets.c,v 1.116 2014/09/05 21:51:38 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - gadgets.c */
@@ -580,8 +580,10 @@ clip_vector(unsigned int x, unsigned int y)
 /* Common routines for setting text or line color from t_colorspec */
 
 void
-apply_pm3dcolor(struct t_colorspec *tc, const struct termentry *t)
+apply_pm3dcolor(struct t_colorspec *tc)
 {
+    struct termentry *t = term;
+
     /* V5 - term->linetype(LT_BLACK) would clobber the current	*/
     /* dashtype so instead we use term->set_color(black).	*/
     static t_colorspec black = BLACK_COLORSPEC; 
@@ -629,10 +631,10 @@ apply_pm3dcolor(struct t_colorspec *tc, const struct termentry *t)
 }
 
 void
-reset_textcolor(const struct t_colorspec *tc, const struct termentry *t)
+reset_textcolor(const struct t_colorspec *tc)
 {
     if (tc->type != TC_DEFAULT)
-	(*t->linetype)(LT_BLACK);
+	term->linetype(LT_BLACK);
 }
 
 
@@ -700,12 +702,11 @@ char *master_font = label->font;
 void
 get_offsets(
     struct text_label *this_label,
-    struct termentry *t,
     int *htic, int *vtic)
 {
     if ((this_label->lp_properties.flags & LP_SHOW_POINTS)) {
-	*htic = (pointsize * t->h_tic * 0.5);
-	*vtic = (pointsize * t->v_tic * 0.5);
+	*htic = (pointsize * term->h_tic * 0.5);
+	*vtic = (pointsize * term->v_tic * 0.5);
     } else {
 	*htic = 0;
 	*vtic = 0;
@@ -734,7 +735,7 @@ write_label(unsigned int x, unsigned int y, struct text_label *this_label)
 	int htic, vtic;
 	int justify = JUST_TOP;	/* This was the 2D default; 3D had CENTRE */
 
-	apply_pm3dcolor(&(this_label->textcolor),term);
+	apply_pm3dcolor(&(this_label->textcolor));
 	ignore_enhanced(this_label->noenhanced);
 
 	/* The text itself */
@@ -749,7 +750,7 @@ write_label(unsigned int x, unsigned int y, struct text_label *this_label)
 		term->set_font("");
 	} else {
 	    /* A normal label (always print text) */
-	    get_offsets(this_label, term, &htic, &vtic);
+	    get_offsets(this_label, &htic, &vtic);
 #ifdef EAM_BOXED_TEXT
 	    /* Initialize the bounding box accounting */
 	    if (this_label->boxed && term->boxed_text)

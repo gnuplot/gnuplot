@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.296 2014/08/03 21:52:50 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.297 2014/09/05 21:51:38 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -656,7 +656,7 @@ term_apply_lp_properties(struct lp_style_type *lp)
 	(*term->dashtype) (dt, NULL);
 
     /* Finally adjust the color of the line */
-    apply_pm3dcolor(&colorspec, term);
+    apply_pm3dcolor(&colorspec);
 }
 
 void

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: color.c,v 1.113 2014/04/02 21:35:46 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: color.c,v 1.114 2014/05/13 18:26:40 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - color.c */
@@ -190,7 +190,7 @@ set_rgbcolor_var(unsigned int rgbvalue)
     color.type = TC_RGB;
     *(unsigned int *)(&color.lt) = rgbvalue;
     color.value = -1;	/* -1 flags that this came from "rgb variable" */
-    apply_pm3dcolor(&color, term);
+    apply_pm3dcolor(&color);
 }
 
 void
@@ -200,7 +200,7 @@ set_rgbcolor_const(unsigned int rgbvalue)
     color.type = TC_RGB;
     *(unsigned int *)(&color.lt) = rgbvalue;
     color.value = 0;	/* 0 flags that this is a constant color */
-    apply_pm3dcolor(&color, term);
+    apply_pm3dcolor(&color);
 }
 
 void
@@ -493,7 +493,7 @@ cbtick_callback(
 			 &offsetx, &offsety, "cbtics");
 	/* User-specified different color for the tics text */
 	if (axis_array[axis].ticdef.textcolor.type != TC_DEFAULT)
-	    apply_pm3dcolor(&(axis_array[axis].ticdef.textcolor), term);
+	    apply_pm3dcolor(&(axis_array[axis].ticdef.textcolor));
 	if (color_box.rotation == 'h') {
 	    int y3 = color_box.bounds.ybot - (term->v_char);
 	    int hrotate = 0;
@@ -672,7 +672,7 @@ draw_color_smooth_box(int plot_mode)
     /* write the colour box label */
     if (CB_AXIS.label.text) {
 	int x, y;
-	apply_pm3dcolor(&(CB_AXIS.label.textcolor),term);
+	apply_pm3dcolor(&(CB_AXIS.label.textcolor));
 	if (color_box.rotation == 'h') {
 	    int len = CB_AXIS.ticscale * (CB_AXIS.tic_in ? 1 : -1) * 
 		(term->v_tic);
@@ -713,7 +713,7 @@ draw_color_smooth_box(int plot_mode)
 		write_multiline(x, y, CB_AXIS.label.text, LEFT, JUST_TOP, 0, CB_AXIS.label.font);
 	    }
 	}
-	reset_textcolor(&(CB_AXIS.label.textcolor),term);
+	reset_textcolor(&(CB_AXIS.label.textcolor));
     }
 
 }

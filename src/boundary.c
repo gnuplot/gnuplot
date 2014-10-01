@@ -1,5 +1,5 @@
 /*
- * $Id: boundary.c,v 1.14 2014/05/24 04:29:04 sfeam Exp $
+ * $Id: boundary.c,v 1.15 2014/06/14 15:32:58 sfeam Exp $
  */
 
 /* GNUPLOT - boundary.c */
@@ -1189,7 +1189,7 @@ do_key_sample(
 	;
     else if (key->textcolor.type != TC_DEFAULT)
 	/* Draw key text in same color as key title */
-	apply_pm3dcolor(&key->textcolor, t);
+	apply_pm3dcolor(&key->textcolor);
     else
 	/* Draw key text in black */
 	(*t->linetype)(LT_BLACK);
@@ -1338,10 +1338,10 @@ do_key_sample_point(
 	    (*t->pointsize)(pointsize);
 	if (on_page(xl + key_point_offset, yl)) {
 	    if (this_plot->lp_properties.p_type == PT_CHARACTER) {
-		apply_pm3dcolor(&(this_plot->labels->textcolor), t);
+		apply_pm3dcolor(&(this_plot->labels->textcolor));
 		(*t->put_text) (xl + key_point_offset, yl, 
 				(char *)(&this_plot->lp_properties.p_char));
-		apply_pm3dcolor(&(this_plot->lp_properties.pm3d_color), t);
+		apply_pm3dcolor(&(this_plot->lp_properties.pm3d_color));
 	    } else {
 		(*t->point) (xl + key_point_offset, yl, 
 				this_plot->lp_properties.p_type);
@@ -1376,9 +1376,9 @@ draw_key(legend_key *key, TBOOLEAN key_pass, int *xinkey, int *yinkey)
 	/* Only draw the title once */
 	if (key_pass || !key->front) {
 	    if (key->textcolor.type == TC_RGB && key->textcolor.value < 0)
-		apply_pm3dcolor(&(key->box.pm3d_color), t);
+		apply_pm3dcolor(&(key->box.pm3d_color));
 	    else
-		apply_pm3dcolor(&(key->textcolor), t);
+		apply_pm3dcolor(&(key->textcolor));
 	    ignore_enhanced(!key->enhanced);
 	    write_multiline(center, key->bounds.ytop - (key_title_extra + key_entry_height)/2,
 			key->title, CENTRE, JUST_TOP, 0, key->font);
@@ -1426,7 +1426,7 @@ draw_titles()
     /* YLABEL */
     if (axis_array[FIRST_Y_AXIS].label.text) {
 	ignore_enhanced(axis_array[FIRST_Y_AXIS].label.noenhanced);
-	apply_pm3dcolor(&(axis_array[FIRST_Y_AXIS].label.textcolor),t);
+	apply_pm3dcolor(&(axis_array[FIRST_Y_AXIS].label.textcolor));
 	/* we worked out x-posn in boundary() */
 	if ((*t->text_angle) (axis_array[FIRST_Y_AXIS].label.rotate)) {
 	    double tmpx, tmpy;
@@ -1451,14 +1451,14 @@ draw_titles()
 			    LEFT, JUST_TOP, 0,
 			    axis_array[FIRST_Y_AXIS].label.font);
 	}
-	reset_textcolor(&(axis_array[FIRST_Y_AXIS].label.textcolor),t);
+	reset_textcolor(&(axis_array[FIRST_Y_AXIS].label.textcolor));
 	ignore_enhanced(FALSE);
     }
 
     /* Y2LABEL */
     if (axis_array[SECOND_Y_AXIS].label.text) {
 	ignore_enhanced(axis_array[SECOND_Y_AXIS].label.noenhanced);
-	apply_pm3dcolor(&(axis_array[SECOND_Y_AXIS].label.textcolor),t);
+	apply_pm3dcolor(&(axis_array[SECOND_Y_AXIS].label.textcolor));
 	/* we worked out coordinates in boundary() */
 	if ((*t->text_angle) (axis_array[SECOND_Y_AXIS].label.rotate)) {
 	    double tmpx, tmpy;
@@ -1482,7 +1482,7 @@ draw_titles()
 			    RIGHT, JUST_TOP, 0,
 			    axis_array[SECOND_Y_AXIS].label.font);
 	}
-	reset_textcolor(&(axis_array[SECOND_Y_AXIS].label.textcolor),t);
+	reset_textcolor(&(axis_array[SECOND_Y_AXIS].label.textcolor));
 	ignore_enhanced(FALSE);
     }
 
@@ -1497,11 +1497,11 @@ draw_titles()
 	y = xlabel_y - t->v_char / 2;   /* HBB */
 
 	ignore_enhanced(axis_array[FIRST_X_AXIS].label.noenhanced);
-	apply_pm3dcolor(&(axis_array[FIRST_X_AXIS].label.textcolor), t);
+	apply_pm3dcolor(&(axis_array[FIRST_X_AXIS].label.textcolor));
 	write_multiline(x, y, axis_array[FIRST_X_AXIS].label.text,
 			CENTRE, JUST_TOP, 0,
 			axis_array[FIRST_X_AXIS].label.font);
-	reset_textcolor(&(axis_array[FIRST_X_AXIS].label.textcolor), t);
+	reset_textcolor(&(axis_array[FIRST_X_AXIS].label.textcolor));
 	ignore_enhanced(FALSE);
     }
 
@@ -1515,9 +1515,9 @@ draw_titles()
 	y = title_y - t->v_char / 2;
 
 	ignore_enhanced(title.noenhanced);
-	apply_pm3dcolor(&(title.textcolor), t);
+	apply_pm3dcolor(&(title.textcolor));
 	write_multiline(x, y, title.text, CENTRE, JUST_TOP, 0, title.font);
-	reset_textcolor(&(title.textcolor), t);
+	reset_textcolor(&(title.textcolor));
 	ignore_enhanced(FALSE);
     }
 
@@ -1531,10 +1531,10 @@ draw_titles()
 	x = (plot_bounds.xright + plot_bounds.xleft) / 2 + tmpx;
 	y = x2label_y - t->v_char / 2 - 1;
 	ignore_enhanced(axis_array[SECOND_X_AXIS].label.noenhanced);
-	apply_pm3dcolor(&(axis_array[SECOND_X_AXIS].label.textcolor),t);
+	apply_pm3dcolor(&(axis_array[SECOND_X_AXIS].label.textcolor));
 	write_multiline(x, y, axis_array[SECOND_X_AXIS].label.text, CENTRE,
 			JUST_TOP, 0, axis_array[SECOND_X_AXIS].label.font);
-	reset_textcolor(&(axis_array[SECOND_X_AXIS].label.textcolor),t);
+	reset_textcolor(&(axis_array[SECOND_X_AXIS].label.textcolor));
 	ignore_enhanced(FALSE);
     }
 
@@ -1551,7 +1551,7 @@ draw_titles()
 	str = gp_alloc(MAX_LINE_LEN + 1, "timelabel.text");
 	strftime(str, MAX_LINE_LEN, timelabel.text, localtime(&now));
 
-	apply_pm3dcolor(&(timelabel.textcolor), t);
+	apply_pm3dcolor(&(timelabel.textcolor));
 	if (timelabel_rotate && (*t->text_angle) (TEXT_VERTICAL)) {
 	    x += t->v_char / 2;	/* HBB */
 	    if (timelabel_bottom)

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.313 2014/09/04 19:48:41 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.314 2014/09/27 05:51:06 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -805,12 +805,12 @@ do_3dplot(
 	    y = (unsigned int) (plot_bounds.ytop + tmpy + titlelin * (t->h_char));
 	}
 	ignore_enhanced(title.noenhanced);
-	apply_pm3dcolor(&(title.textcolor),t);
+	apply_pm3dcolor(&(title.textcolor));
 	/* PM: why there is JUST_TOP and not JUST_BOT? We should draw above baseline!
 	 * But which terminal understands that? It seems vertical justification does
 	 * not work... */
 	write_multiline(x, y, title.text, CENTRE, JUST_TOP, 0, title.font);
-	reset_textcolor(&(title.textcolor),t);
+	reset_textcolor(&(title.textcolor));
 	ignore_enhanced(FALSE);
     }
 
@@ -912,9 +912,9 @@ do_3dplot(
 	    int center = (key->bounds.xright + key->bounds.xleft) / 2;
 
 	    if (key->textcolor.type == TC_RGB && key->textcolor.value < 0)
-		apply_pm3dcolor(&(key->box.pm3d_color), t);
+		apply_pm3dcolor(&(key->box.pm3d_color));
 	    else
-		apply_pm3dcolor(&(key->textcolor), t);
+		apply_pm3dcolor(&(key->textcolor));
 	    write_multiline(center, key->bounds.ytop - (key_title_extra + t->v_char)/2,
 			    key->title, CENTRE, JUST_TOP, 0, key->font);
 	    (*t->linetype)(LT_BLACK);
@@ -985,7 +985,7 @@ do_3dplot(
 	    if (lkey) {
 		if (key->textcolor.type != TC_DEFAULT)
 		    /* Draw key text in same color as key title */
-		    apply_pm3dcolor(&key->textcolor, t);
+		    apply_pm3dcolor(&key->textcolor);
 		else
 		    /* Draw key text in black */
 		    (*t->linetype)(LT_BLACK);
@@ -1496,7 +1496,7 @@ plot3d_lines(struct surface_points *plot)
 		set_rgbcolor_var((unsigned int)points[i].CRD_COLOR);
 	    else if (plot->lp_properties.pm3d_color.type == TC_LINESTYLE) {
 		plot->lp_properties.pm3d_color.lt = (int)(points[i].CRD_COLOR);
-		apply_pm3dcolor(&(plot->lp_properties.pm3d_color), term);
+		apply_pm3dcolor(&(plot->lp_properties.pm3d_color));
 	    }
 
 	    switch (points[i].type) {
@@ -1602,7 +1602,7 @@ plot3d_lines_pm3d(struct surface_points *plot)
 
     /* If plot really uses RGB rather than pm3d colors, let plot3d_lines take over */
     if (plot->lp_properties.pm3d_color.type == TC_RGB) {
-	apply_pm3dcolor(&(plot->lp_properties.pm3d_color), term);
+	apply_pm3dcolor(&(plot->lp_properties.pm3d_color));
 	plot3d_lines(plot);
 	return;
     } else if (plot->lp_properties.pm3d_color.type == TC_LT) {
@@ -1802,7 +1802,7 @@ plot3d_points(struct surface_points *plot)
 
 		    /* Print special character rather than drawn symbol */
 		    else if (plot->lp_properties.p_type == PT_CHARACTER) {
-			apply_pm3dcolor(&(plot->labels->textcolor), t);
+			apply_pm3dcolor(&(plot->labels->textcolor));
 			(*t->put_text)(x, y, (char *)(&(plot->lp_properties.p_char)));
 		    }
 
@@ -2323,7 +2323,7 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid,
 	    x1 += tmpx; /* user-defined label offset */
 	    y1 += tmpy;
 	    ignore_enhanced(X_AXIS.label.noenhanced);
-	    apply_pm3dcolor(&(X_AXIS.label.textcolor),t);
+	    apply_pm3dcolor(&(X_AXIS.label.textcolor));
 	    if (angle != 0 && (term->text_angle)(angle)) {
 		write_multiline(x1, y1, X_AXIS.label.text, CENTRE, JUST_TOP,
 			    angle, X_AXIS.label.font);
@@ -2332,7 +2332,7 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid,
 		write_multiline(x1, y1, X_AXIS.label.text, CENTRE, JUST_TOP,
 			    0, X_AXIS.label.font);
 	    }
-	    reset_textcolor(&(X_AXIS.label.textcolor),t);
+	    reset_textcolor(&(X_AXIS.label.textcolor));
 	    ignore_enhanced(FALSE);
 	    }
 	}
@@ -2450,7 +2450,7 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid,
 
 		/* write_multiline mods it */
 		ignore_enhanced(Y_AXIS.label.noenhanced);
-		apply_pm3dcolor(&(Y_AXIS.label.textcolor),t);
+		apply_pm3dcolor(&(Y_AXIS.label.textcolor));
 
 		if (angle != 0 && (term->text_angle)(angle)) {
 		    write_multiline(x1, y1, Y_AXIS.label.text, h_just, v_just,
@@ -2461,7 +2461,7 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid,
 				    0, Y_AXIS.label.font);
 		}
 
-		reset_textcolor(&(Y_AXIS.label.textcolor),t);
+		reset_textcolor(&(Y_AXIS.label.textcolor));
 		ignore_enhanced(FALSE);
 	    }
 	}
@@ -2554,7 +2554,7 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid,
 	y += tmpy;
 
 	ignore_enhanced(Z_AXIS.label.noenhanced);
-	apply_pm3dcolor(&(Z_AXIS.label.textcolor),t);
+	apply_pm3dcolor(&(Z_AXIS.label.textcolor));
 	if (Z_AXIS.label.tag == ROTATE_IN_3D_LABEL_TAG)
 	    Z_AXIS.label.rotate = TEXT_VERTICAL;
 	if (Z_AXIS.label.rotate != 0 &&  (term->text_angle)(Z_AXIS.label.rotate)) {
@@ -2565,7 +2565,7 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid,
 	    write_multiline(x, y, Z_AXIS.label.text,
 			    h_just, v_just, 0, Z_AXIS.label.font);
 	}
-	reset_textcolor(&(Z_AXIS.label.textcolor),t);
+	reset_textcolor(&(Z_AXIS.label.textcolor));
 	ignore_enhanced(FALSE);
     }
 
@@ -2689,7 +2689,7 @@ xtick_callback(
 
 	/* User-specified different color for the tics text */
 	if (axis_array[axis].ticdef.textcolor.type != TC_DEFAULT)
-	    apply_pm3dcolor(&(axis_array[axis].ticdef.textcolor), t);
+	    apply_pm3dcolor(&(axis_array[axis].ticdef.textcolor));
 	angle = axis_array[axis].tic_rotate;
 	if (!(splot_map && angle && term->text_angle(angle)))
 	    angle = 0;
@@ -2812,7 +2812,7 @@ ytick_callback(
 
 	/* User-specified different color for the tics text */
 	if (axis_array[axis].ticdef.textcolor.type != TC_DEFAULT)
-	    apply_pm3dcolor(&(axis_array[axis].ticdef.textcolor), t);
+	    apply_pm3dcolor(&(axis_array[axis].ticdef.textcolor));
 	angle = axis_array[axis].tic_rotate;
 	if (!(splot_map && angle && term->text_angle(angle)))
 	    angle = 0;
@@ -2886,7 +2886,7 @@ ztick_callback(
 	if (axis_array[axis].ticdef.textcolor.type == TC_Z)
 	    axis_array[axis].ticdef.textcolor.value = place;
 	if (axis_array[axis].ticdef.textcolor.type != TC_DEFAULT)
-	    apply_pm3dcolor(&(axis_array[axis].ticdef.textcolor), term);
+	    apply_pm3dcolor(&(axis_array[axis].ticdef.textcolor));
 	ignore_enhanced(!axis_array[axis].ticdef.enhanced);
 	write_multiline(x1+offsetx, y1+offsety, text, RIGHT, JUST_CENTRE,
 			0, axis_array[axis].ticdef.font);
@@ -3172,7 +3172,7 @@ key_sample_line_pm3d(struct surface_points *plot, int xl, int yl)
 	lp_style_type lptmp = plot->lp_properties;
 	if (plot->lp_properties.l_type == LT_COLORFROMCOLUMN)
 		lp_use_properties(&lptmp, (int)(plot->iso_crvs->points[0].CRD_COLOR));
-	apply_pm3dcolor(&lptmp.pm3d_color, term);
+	apply_pm3dcolor(&lptmp.pm3d_color);
 	key_sample_line(xl,yl);
 	return;
     }
@@ -3231,7 +3231,7 @@ key_sample_point_pm3d(
 	lp_style_type lptmp = plot->lp_properties;
 	if (plot->lp_properties.l_type == LT_COLORFROMCOLUMN)
 		lp_use_properties(&lptmp, (int)(plot->iso_crvs->points[0].CRD_COLOR));
-	apply_pm3dcolor(&lptmp.pm3d_color, term);
+	apply_pm3dcolor(&lptmp.pm3d_color);
 	key_sample_point(xl,yl,pointtype);
 	return;
     }
@@ -3327,7 +3327,7 @@ check_for_variable_color(struct surface_points *plot, struct coordinate *point)
 	break;
     case TC_LINESTYLE:	/* color from linestyle in data column */
 	plot->lp_properties.pm3d_color.lt = (int)(point->CRD_COLOR);
-	apply_pm3dcolor(&(plot->lp_properties.pm3d_color), term);
+	apply_pm3dcolor(&(plot->lp_properties.pm3d_color));
 	break;
     default:
 	/* The other cases were taken care of already */

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.465 2014/09/04 19:48:41 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.466 2014/09/27 05:51:06 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -1899,7 +1899,7 @@ plot_boxes(struct curve_points *plot, int xaxis_y)
 			    lp_use_properties(&ls, histogram_linetype);
 			else
 			    load_linetype(&ls, histogram_linetype);
-			apply_pm3dcolor(&ls.pm3d_color, term);
+			apply_pm3dcolor(&ls.pm3d_color);
 			plot->fill_properties.fillpattern = histogram_linetype;
 			/* Fall through */
 		    case HT_STACKED_IN_LAYERS: /* rowstacked */
@@ -2066,7 +2066,7 @@ plot_points(struct curve_points *plot)
 
 		/* Print special character rather than drawn symbol */
 		else if (plot->lp_properties.p_type == PT_CHARACTER) {
-		    apply_pm3dcolor(&(plot->labels->textcolor), t);
+		    apply_pm3dcolor(&(plot->labels->textcolor));
 		    (*t->put_text)(x, y, (char *)(&(plot->lp_properties.p_char)));
 		}
 	    }
@@ -3347,7 +3347,7 @@ xtick2d_callback(
 		       &offsetx_d, &offsety_d, "xtics");
 	/* User-specified different color for the tics text */
 	if (axis_array[axis].ticdef.textcolor.type != TC_DEFAULT)
-	    apply_pm3dcolor(&(axis_array[axis].ticdef.textcolor), t);
+	    apply_pm3dcolor(&(axis_array[axis].ticdef.textcolor));
 	ignore_enhanced(!axis_array[axis].ticdef.enhanced);
 	write_multiline(x+(int)offsetx_d, tic_text+(int)offsety_d, text,
 			tic_hjust, tic_vjust, rotate_tics,
@@ -3448,7 +3448,7 @@ ytick2d_callback(
 		       &offsetx_d, &offsety_d, "ytics");
 	/* User-specified different color for the tics text */
 	if (axis_array[axis].ticdef.textcolor.type != TC_DEFAULT)
-	    apply_pm3dcolor(&(axis_array[axis].ticdef.textcolor), t);
+	    apply_pm3dcolor(&(axis_array[axis].ticdef.textcolor));
 	ignore_enhanced(!axis_array[axis].ticdef.enhanced);
 	write_multiline(tic_text+(int)offsetx_d, y+(int)offsety_d, text,
 			tic_hjust, tic_vjust, rotate_tics,
@@ -3740,7 +3740,7 @@ place_histogram_titles()
 	    y += (int)yoffset_d + 0.25 * term->v_char;
 
 	    write_label(x, y, &(hist->title));
-	    reset_textcolor(&hist->title.textcolor,term);
+	    reset_textcolor(&hist->title.textcolor);
 	}
     }
 }
@@ -3853,7 +3853,7 @@ attach_title_to_plot(struct curve_points *this_plot, legend_key *key)
 	;
     else if (key->textcolor.type != TC_DEFAULT)
 	/* Draw key text in same color as key title */
-	apply_pm3dcolor(&key->textcolor, t);
+	apply_pm3dcolor(&key->textcolor);
     else
 	/* Draw key text in black */
 	(*t->linetype)(LT_BLACK);
@@ -4143,7 +4143,7 @@ check_for_variable_color(struct curve_points *plot, double *colorvalue)
 	    lp_use_properties(&lptmp, (int)(*colorvalue));
 	else
 	    load_linetype(&lptmp, (int)(*colorvalue));
-	apply_pm3dcolor(&(lptmp.pm3d_color), term);
+	apply_pm3dcolor(&(lptmp.pm3d_color));
 	return TRUE;
     } else
 	return FALSE;

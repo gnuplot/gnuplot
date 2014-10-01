@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.192 2014/09/22 23:55:33 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.193 2014/10/01 01:04:40 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -883,7 +883,7 @@ need_fill_border(struct fill_style_type *fillstyle)
 
     /* Wants a border in a new color */
     if (p.pm3d_color.type != TC_DEFAULT)
-	apply_pm3dcolor(&p.pm3d_color,term);
+	apply_pm3dcolor(&p.pm3d_color);
     
     return TRUE;
 }

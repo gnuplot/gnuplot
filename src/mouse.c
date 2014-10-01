@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: mouse.c,v 1.169 2014/09/04 20:33:13 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: mouse.c,v 1.170 2014/09/12 17:46:32 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - mouse.c */
@@ -251,7 +251,7 @@ static void bind_remove __PROTO((bind_t * b));
 static void bind_append __PROTO((char *lhs, char *rhs, char *(*builtin) (struct gp_event_t * ge)));
 static void recalc_ruler_pos __PROTO((void));
 static void turn_ruler_off __PROTO((void));
-static int nearest_label_tag __PROTO((int x, int y, struct termentry * t));
+static int nearest_label_tag __PROTO((int x, int y));
 static void remove_label __PROTO((int x, int y));
 static void put_label __PROTO((char *label, double x, double y));
 
@@ -2799,7 +2799,7 @@ turn_ruler_off()
 }
 
 static int
-nearest_label_tag(int xref, int yref, struct termentry *t)
+nearest_label_tag(int xref, int yref)
 {
     double min = -1;
     int min_tag = -1;
@@ -2825,7 +2825,7 @@ nearest_label_tag(int xref, int yref, struct termentry *t)
 	     * threshold around the label */
 	    double tic_diff_squared;
 	    int htic, vtic;
-	    get_offsets(this_label, t, &htic, &vtic);
+	    get_offsets(this_label, &htic, &vtic);
 	    tic_diff_squared = htic * htic + vtic * vtic;
 	    if (diff_squared < tic_diff_squared) {
 		min = diff_squared;
@@ -2840,7 +2840,7 @@ nearest_label_tag(int xref, int yref, struct termentry *t)
 static void
 remove_label(int x, int y)
 {
-    int tag = nearest_label_tag(x, y, term);
+    int tag = nearest_label_tag(x, y);
     if (-1 != tag) {
 	char cmd[0x40];
 	sprintf(cmd, "unset label %d", tag);

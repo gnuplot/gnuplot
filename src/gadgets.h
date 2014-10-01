@@ -533,8 +533,8 @@ void clip_move __PROTO((unsigned int x, unsigned int y));
 void clip_vector __PROTO((unsigned int x, unsigned int y));
 
 /* Common routines for setting line or text color from t_colorspec */
-void apply_pm3dcolor __PROTO((struct t_colorspec *tc, const struct termentry *t));
-void reset_textcolor __PROTO((const struct t_colorspec *tc, const struct termentry *t));
+void apply_pm3dcolor __PROTO((struct t_colorspec *tc));
+void reset_textcolor __PROTO((const struct t_colorspec *tc));
 
 extern fill_style_type default_fillstyle;
 
@@ -587,8 +587,7 @@ void apply_head_properties __PROTO((struct arrow_style_type *arrow_properties));
 
 void free_labels __PROTO((struct text_label *tl));
 
-void get_offsets __PROTO((struct text_label *this_label,
-	struct termentry *t, int *htic, int *vtic));
+void get_offsets __PROTO((struct text_label *this_label, int *htic, int *vtic));
 void write_label __PROTO((unsigned int x, unsigned int y, struct text_label *label));
 int label_width __PROTO((const char *, int *));
 
