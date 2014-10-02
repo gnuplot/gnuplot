@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.916 2014/09/20 11:31:13 markisch Exp $
+C RCS $Id: gnuplot.doc,v 1.917 2014/10/02 04:26:42 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -285,7 +285,8 @@ C
  * The function `timecolumn(N,"timeformat")` now has 2 parameters. Because the
  required second parameter is not associated with any particular data axis, this
  allows using the `timecolumn` function to read time data for reasons other than
- specifying the x or y coordinate.
+ specifying the x or y coordinate. This functionality replaces the command
+ sequence `set xdata time; set timefmt x "timeformat"`.
 
  * The `reverse` keyword of the `set [axis]range` command affects only
  autoscaling. It does not invert or otherwise alter the meaning of a command
@@ -12160,7 +12161,7 @@ Ffigure_missing
                 {in | out} {front | back}
                 {{no}rotate {by <ang>}} {offset <offset> | nooffset}
                 {left | right | center | autojustify}
-                { format "formatstring" } { font "name{,<size>}" }
+                {format "formatstring"} {font "name{,<size>}"} {{no}enhanced}
                 { textcolor <colorspec> }
        set tics scale {default | <major> {,<minor>}}
        unset tics
@@ -12937,7 +12938,7 @@ Ffigure_missing
                   | <incr>
                   | <start>, <incr> {,<end>}
                   | ({"<label>"} <pos> {<level>} {,{"<label>"}...) }
-                 { format "formatstring" } { font "name{,<size>}" }
+                 {format "formatstring"} {font "name{,<size>}"} {{no}enhanced}
                  { rangelimited }
                  { textcolor <colorspec> }
        unset xtics

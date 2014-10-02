@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.462 2014/09/20 11:31:13 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.463 2014/09/27 05:51:06 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -4822,6 +4822,14 @@ set_tics()
 		axis_array[i].ticdef.offset = default_offset;
 	} else if (almost_equals(c_token, "format")) {
 	    set_format();
+	} else if (almost_equals(c_token, "enh$anced")) {
+	    ++c_token;
+	    for (i = 0; i < AXIS_ARRAY_SIZE; ++i)
+		axis_array[i].ticdef.enhanced = TRUE;
+	} else if (almost_equals(c_token, "noenh$anced")) {
+	    ++c_token;
+	    for (i = 0; i < AXIS_ARRAY_SIZE; ++i)
+		axis_array[i].ticdef.enhanced = FALSE;
 	} else if (almost_equals(c_token, "f$ont")) {
 	    ++c_token;
 	    /* Make sure they've specified a font */
