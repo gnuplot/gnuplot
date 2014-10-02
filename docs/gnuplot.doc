@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.902.2.14 2014/09/21 04:54:32 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.902.2.15 2014/10/02 04:25:08 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -285,7 +285,8 @@ C
  * The function `timecolumn(N,"timeformat")` now has 2 parameters. Because the
  required second parameter is not associated with any particular data axis, this
  allows using the `timecolumn` function to read time data for reasons other than
- specifying the x or y coordinate.
+ specifying the x or y coordinate.  This functionality replaces the command
+ sequence `set xdata time; set timefmt x "timeformat"`.
 
  * The `reverse` keyword of the `set [axis]range` command affects only
  autoscaling. It does not invert or otherwise alter the meaning of a command

@@ -116,7 +116,9 @@ A brief summary of potentially incompatible changes is given here.
 * The function `timecolumn(N,"timeformat")` now has 2 parameters.
   Because the required second parameter is not associated with a particular
   data axis, this allows using the `timecolumn` function to read time data
-  for reasons other than specifying the x or y coordinate.
+  for reasons other than specifying the x or y coordinate.  Prior calls to
+  `set xdata time` or `set timefmt x` are unnecessary.
+  These older commands may be deprecated in the final 5.0 release.
 
 * The `call` command is implemented by providing a set of variables ARGC,
   ARG0, ..., ARG9. ARG0 holds the name of the script file being executed.
