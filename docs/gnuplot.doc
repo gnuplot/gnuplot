@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.902.2.15 2014/10/02 04:25:08 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.902.2.16 2014/10/02 19:34:50 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -12161,7 +12161,7 @@ Ffigure_missing
                 {in | out} {front | back}
                 {{no}rotate {by <ang>}} {offset <offset> | nooffset}
                 {left | right | center | autojustify}
-                { format "formatstring" } { font "name{,<size>}" }
+                {format "formatstring"} {font "name{,<size>}"} {{no}enhanced}
                 { textcolor <colorspec> }
        set tics scale {default | <major> {,<minor>}}
        unset tics
@@ -12938,7 +12938,7 @@ Ffigure_missing
                   | <incr>
                   | <start>, <incr> {,<end>}
                   | ({"<label>"} <pos> {<level>} {,{"<label>"}...) }
-                 { format "formatstring" } { font "name{,<size>}" }
+                 {format "formatstring"} {font "name{,<size>}"} {{no}enhanced}
                  { rangelimited }
                  { textcolor <colorspec> }
        unset xtics
