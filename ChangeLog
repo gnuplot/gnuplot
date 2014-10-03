@@ -1,3 +1,8 @@
+2014-10-03  Christoph Bersch <usenet@bersch.net>
+
+	* term/lua/gnuplot-tikz.lua:  linetype -1 must reset dashtype to solid.
+	Bug #1491
+
 2014-10-01 Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/misc.c (arrow_parse): Remove order dependence of "fixed" keyword.

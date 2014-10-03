@@ -37,7 +37,7 @@
 
 
 
-  $Date: 2014/06/12 17:22:04 $
+  $Date: 2014/09/23 03:55:25 $
   $Author: sfeam $
   $Rev: 100 $
 
@@ -81,7 +81,7 @@ pgf.DEFAULT_FONT_V_CHAR = 308
 pgf.STYLE_FILE_BASENAME = "gnuplot-lua-tikz"  -- \usepackage{gnuplot-lua-tikz}
 
 pgf.REVISION = string.sub("$Rev: 100 $",7,-3)
-pgf.REVISION_DATE = string.gsub("$Date: 2014/06/12 17:22:04 $",
+pgf.REVISION_DATE = string.gsub("$Date: 2014/09/23 03:55:25 $",
                                 "$Date: ([0-9]+).([0-9]+).([0-9]+) .*","%1/%2/%3")
 
 pgf.styles = {}
@@ -141,6 +141,7 @@ pgf.styles.linetypes = {
 }
 
 pgf.styles.dashtypes = {
+  [0] = {"gp dt 0", "solid"}, 
   [1] = {"gp dt 1", "solid"},
   [2] = {"gp dt 2", "dash pattern=on 7.5*\\gpdashlength off 7.5*\\gpdashlength"},
   [3] = {"gp dt 3", "dash pattern=on 3.75*\\gpdashlength off 5.625*\\gpdashlength"},
@@ -998,7 +999,7 @@ f:write([[
   f:write("\n% dash type settings\n")
   f:write("% Define this as a macro so that the dash patterns expand later with the current \\pgflinewidth.\n")
   f:write("\\def\\gpdashlength{\\pgflinewidth}\n")
-  for i = 1, #pgf.styles.dashtypes do
+  for i = 0, #pgf.styles.dashtypes do
     f:write("\\tikzset{"..pgf.styles.dashtypes[i][1].."/.style={"..pgf.styles.dashtypes[i][2].."}}\n")
   end
   f:write("\n% command for switching to colored lines\n")
@@ -1534,8 +1535,10 @@ gfx.check_dashtype = function()
   if gfx.dashtype_idx ~= gfx.dashtype_idx_set then
     -- if gfx.dashtype_idx is a string, it contains a custom dash pattern
     if type(gfx.dashtype_idx) == type(1) then
-      if gfx.dashtype_idx > 0 then
-        pgf.set_dashtype(pgf.styles.dashtypes[(gfx.dashtype_idx % #pgf.styles.dashtypes)+1][1])
+      if gfx.dashtype_idx == -1 then
+        pgf.set_dashtype(pgf.styles.dashtypes[0][1])
+      elseif gfx.dashtype_idx >= 0 then
+        pgf.set_dashtype(pgf.styles.dashtypes[(gfx.dashtype_idx % #pgf.styles.dashtypes) + 1][1])
       end
     else
        pgf.set_dashtype("dash pattern="..gfx.dashtype_idx)
