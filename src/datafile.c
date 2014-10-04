@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.291 2014/09/18 00:26:25 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.292 2014/10/04 22:22:27 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -2548,20 +2548,28 @@ f_timecolumn(union argument *arg)
     struct value a;
     struct value b;
     struct tm tm;
+    int num_param;
     int column;
     double usec = 0.0;
 
     (void) arg;                 /* avoid -Wunused warning */
+    (void) pop(&b);		/* this is the number of parameters */
+    num_param = b.v.int_val;
     (void) pop(&b);		/* this is the time format string */
 
-    if (more_on_stack()) {
+    switch (num_param) {
+    case 2:
 	column = (int) magnitude(pop(&a));
-    } else {
+	break;
+    case 1:
 	/* No format parameter passed (v4-style call) */
 	/* Only needed for backward compatibility */
 	column = magnitude(&b);
 	b.v.string_val = gp_strdup(timefmt);
 	b.type = STRING;
+	break;
+    default:
+	int_error(NO_CARET,"wrong number of parameters to timecolumn");
     }
 
     if (!evaluate_inside_using)

@@ -1,7 +1,7 @@
 2014-10-04 Ethan A Merritt  <merritt@u.washington.edu>
 
-	* src/axis.c src/axis.h src/datafile.c src/fit.c src/mouse.c src/save.c
-	src/set.c src/setshow.h src/show.c src/unset.c
+	* src/axis.c src/axis.h src/datafile.c src/fit.c src/mouse.c src/parse.c
+	src/save.c src/set.c src/setshow.h src/show.c src/unset.c
 	docs/gnuplot.doc demo/gantt.dem:
 
 	Timefmt revision part 1 of 4
@@ -10,7 +10,7 @@
 	  undocumented command:   set timefmt y "fmt-different-from-xaxis-fmt"
 	- Add a new flag axis->tictype to control interpretation of tic format.
 	  axis->datatype will continue to control input format interpretation. 
-	- If only a single parameter is seen for timecolumn() try to emulate
+	- If only a single parameter is passed to timecolumn() try to emulate
 	  the version 4 behavior (use global timefmt)
 
 	* src/save.c src/save.h src/setshow.h src/show.c:
