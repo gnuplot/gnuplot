@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.331 2014/10/04 22:30:50 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.332 2014/10/04 22:39:25 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -1439,8 +1439,11 @@ show_format()
 
     fprintf(stderr, "\ttic format is:\n");
 #define SHOW_FORMAT(_axis)						\
-    fprintf(stderr, "\t  %s-axis: \"%s\"\n", axis_name(_axis),	\
-	    conv_text(axis_array[_axis].formatstring));
+    fprintf(stderr, "\t  %s-axis: \"%s\"%s\n", axis_name(_axis),	\
+	    conv_text(axis_array[_axis].formatstring),			\
+	    axis_array[_axis].tictype == DT_DMS ? " geographic" :	\
+	    axis_array[_axis].tictype == DT_TIMEDATE ? " time" :	\
+	    "");
     SHOW_FORMAT(FIRST_X_AXIS );
     SHOW_FORMAT(FIRST_Y_AXIS );
     SHOW_FORMAT(SECOND_X_AXIS);
@@ -2894,8 +2897,6 @@ show_range(AXIS_INDEX axis)
     SHOW_ALL_NL;
     if (axis_array[axis].datatype == DT_TIMEDATE)
 	fprintf(stderr, "\tset %sdata time\n", axis_name(axis));
-    else if (axis_array[axis].datatype == DT_DMS)
-	fprintf(stderr, "\tset %sdata geographic\n", axis_name(axis));
     fprintf(stderr,"\t");
     save_range(stderr, axis);
 }
@@ -2955,7 +2956,7 @@ show_data_is_timedate(AXIS_INDEX axis)
     SHOW_ALL_NL;
     fprintf(stderr, "\t%s is set to %s\n", axis_name(axis),
 	    axis_array[axis].datatype == DT_TIMEDATE ? "time" :
-	    axis_array[axis].datatype == DT_DMS ? "geographic" :
+	    axis_array[axis].datatype == DT_DMS ? "geographic" :  /* obsolete */
 	    "numerical");
 }
 
@@ -3324,6 +3325,10 @@ show_ticdef(AXIS_INDEX axis)
     } else
         fputs("justified automatically, ", stderr);
     fprintf(stderr, "format \"%s\"", ticfmt);
+    fprintf(stderr, "%s", 
+	axis_array[axis].tictype == DT_DMS ? " geographic" :
+	axis_array[axis].tictype == DT_TIMEDATE ? " timedate" :
+	"");
     if (axis_array[axis].ticdef.enhanced == FALSE)
 	fprintf(stderr,"  noenhanced");
     if (axis_array[axis].tic_rotate) {

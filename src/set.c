@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.464 2014/10/02 20:13:14 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.465 2014/10/04 22:22:27 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -5133,6 +5133,9 @@ set_timedata(AXIS_INDEX axis)
 	axis_array[axis].datatype = DT_DMS;
 	c_token++;
     }
+    /* FIXME: this provides approximate backwards compatibility */
+    /*        but may be more trouble to explain than it's worth */
+    axis_array[axis].tictype = axis_array[axis].datatype;
 }
 
 
@@ -5252,43 +5255,6 @@ set_allzeroaxis()
     set_zeroaxis(FIRST_Z_AXIS);
 }
 
-/*********** Support functions for set_command ***********/
-
-/*
- * The set.c PROCESS_TIC_PROP macro has the following characteristics:
- *   (a) options must in the correct order
- *   (b) 'set xtics' (no option) resets only the interval (FREQ)
- *       {it will also negate NO_TICS, see (d)}
- *   (c) changing any property also resets the interval to automatic
- *   (d) set no[xy]tics; set [xy]tics changes border to nomirror, rather
- *       than to the default, mirror.
- *   (e) effect of 'set no[]tics; set []tics border ...' is compiler
- *       dependent;  if '!(TICS)' is evaluated first, 'border' is an
- *       undefined variable :-(
- *
- * This function replaces the macro, and introduces a new option
- * 'au$tofreq' to give somewhat different behaviour:
- *   (a) no change
- *   (b) 'set xtics' (no option) only affects NO_TICS;  'autofreq' resets
- *       the interval calulation to automatic
- *   (c) the interval mode is not affected by changing some other option
- *   (d) if NO_TICS, set []tics will restore defaults (borders, mirror
- *       where appropriate)
- *   (e) if (NO_TICS), border option is processed.
- *
- *  A 'default' option could easily be added to reset all options to
- *  the initial values - mostly book-keeping.
- *
- *  To retain tic properties after setting no[]tics may also be
- *  straightforward (save value as negative), but requires changes
- *  in other code ( e.g. for  'if (xtics)', use 'if (xtics > 0)'
- */
-
-/*    generates PROCESS_TIC_PROP strings from tic_side, e.g. "x2"
- *  STRING, NOSTRING, MONTH, NOMONTH, DAY, NODAY, MINISTRING, NOMINI
- *  "nox2t$ics"     "nox2m$tics"  "nox2d$tics"    "nomx2t$ics"
- */
-
 static int
 set_tic_prop(AXIS_INDEX axis)
 {
@@ -5396,6 +5362,15 @@ set_tic_prop(AXIS_INDEX axis)
 		    axis_array[axis].ticdef.font = NULL;
 		    axis_array[axis].ticdef.font = try_to_get_string();
 		}
+	    } else if (almost_equals(c_token,"geo$graphic")) {
+		++c_token;
+		axis_array[axis].tictype = DT_DMS;
+	    } else if (almost_equals(c_token,"time$date")) {
+		++c_token;
+		axis_array[axis].tictype = DT_TIMEDATE;
+	    } else if (almost_equals(c_token,"numeric")) {
+		++c_token;
+		axis_array[axis].tictype = DT_NORMAL;
 	    } else if (equals(c_token,"format")) {
 		char *format;
 		++c_token;

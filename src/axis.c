@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.135 2014/06/14 15:32:58 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.136 2014/10/04 22:22:27 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -503,7 +503,7 @@ copy_or_invent_formatstring(AXIS_INDEX axis)
 {
     struct tm t_min, t_max;
 
-    if (axis_array[axis].datatype != DT_TIMEDATE
+    if (axis_array[axis].tictype != DT_TIMEDATE
     ||  !looks_like_numeric(axis_array[axis].formatstring)) {
 	/* The simple case: formatstring is usable, so use it! */
 	strncpy(ticfmt[axis], axis_array[axis].formatstring, MAX_ID_LEN);
@@ -653,7 +653,7 @@ make_tics(AXIS_INDEX axis, int guide)
     if (axis_array[axis].log && tic < 1.0)
 	  tic = 1.0;
 
-    if (axis_array[axis].datatype == DT_TIMEDATE)
+    if (axis_array[axis].tictype == DT_TIMEDATE)
 	return quantize_time_tics(axis, tic, xr, guide);
     else
 	return tic;
@@ -780,7 +780,7 @@ round_outward(
 			   ? ceil(input / tic)
 			   : floor(input / tic));
 
-    if (axis_array[axis].datatype == DT_TIMEDATE) {
+    if (axis_array[axis].tictype == DT_TIMEDATE) {
 	double ontime = time_tic_just(timelevel[axis], result);
 
 	/* FIXME: how certain is it that we don't want to *always*
@@ -855,7 +855,7 @@ setup_tics(AXIS_INDEX axis, int max)
      * leading to strange misbehaviours of minor tics on time axes.
      * We used to call quantize_time_tics, but that also caused strangeness.
      */
-    if (this->datatype == DT_TIMEDATE && ticdef->type == TIC_SERIES) {
+    if (this->tictype == DT_TIMEDATE && ticdef->type == TIC_SERIES) {
 	if      (tic >= 365*24*60*60.) timelevel[axis] = TIMELEVEL_YEARS;
 	else if (tic >=  28*24*60*60.) timelevel[axis] = TIMELEVEL_MONTHS;
 	else if (tic >=   7*24*60*60.) timelevel[axis] = TIMELEVEL_WEEKS;
@@ -968,10 +968,10 @@ gen_tics(AXIS_INDEX axis, tic_callback callback)
 			mark->label ? mark->label : this->formatstring,
 			log10_base, mark->position);
 		ticlabel = label;
-	    } else if (this->datatype == DT_TIMEDATE) {
+	    } else if (this->tictype == DT_TIMEDATE) {
 		gstrftime(label, MAX_ID_LEN-1, mark->label ? mark->label : ticfmt[axis], mark->position);
 		ticlabel = label;
-	    } else if (this->datatype == DT_DMS) {
+	    } else if (this->tictype == DT_DMS) {
 		gstrdms(label, mark->label ? mark->label : ticfmt[axis], mark->position);
 		ticlabel = label;
 	    } else {
@@ -1142,7 +1142,7 @@ gen_tics(AXIS_INDEX axis, tic_callback callback)
 		    }
 		    /* }}} */
 		}
-	    } else if (this->datatype == DT_TIMEDATE) {
+	    } else if (this->tictype == DT_TIMEDATE) {
 		ministart = ministep =
 		    make_auto_time_minitics(timelevel[axis], step);
 		miniend = step * 0.9;
@@ -1210,7 +1210,7 @@ gen_tics(AXIS_INDEX axis, tic_callback callback)
 		/* Defer translation until after limit check */
 		internal = tic;
 	    } else if (!this->log) {
-		internal = (this->datatype == DT_TIMEDATE)
+		internal = (this->tictype == DT_TIMEDATE)
 		    ? time_tic_just(timelevel[axis], tic)
 		    : tic;
 		user = CheckZero(internal, step);
@@ -1243,10 +1243,10 @@ gen_tics(AXIS_INDEX axis, tic_callback callback)
 		    }
 		default:{	/* comp or series */
 			char label[MAX_ID_LEN]; /* Leave room for enhanced text markup */
-			if (this->datatype == DT_TIMEDATE) {
+			if (this->tictype == DT_TIMEDATE) {
 			    /* If they are doing polar time plot, good luck to them */
 			    gstrftime(label, MAX_ID_LEN-1, ticfmt[axis], (double) user);
-			} else if (this->datatype == DT_DMS) {
+			} else if (this->tictype == DT_DMS) {
 			    gstrdms(label, ticfmt[axis], (double)user);
 			} else if (polar) {
 			    double min = (R_AXIS.autoscale & AUTOSCALE_MIN) ? 0 : R_AXIS.min;
@@ -1291,7 +1291,7 @@ gen_tics(AXIS_INDEX axis, tic_callback callback)
 		/* {{{  process minitics */
 		double mplace, mtic, temptic;
 		for (mplace = ministart; mplace < miniend; mplace += ministep) {
-		    if (this->datatype == DT_TIMEDATE)
+		    if (this->tictype == DT_TIMEDATE)
 			mtic = time_tic_just(timelevel[axis] - 1,
 					     internal + mplace);
 		    else

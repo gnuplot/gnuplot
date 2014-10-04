@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.208 2014/09/27 05:51:06 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.209 2014/10/04 22:22:27 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -1580,6 +1580,7 @@ static void
 unset_timedata(AXIS_INDEX axis)
 {
     axis_array[axis].datatype = DT_NORMAL;
+    axis_array[axis].tictype = DT_NORMAL;
 }
 
 

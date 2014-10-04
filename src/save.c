@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.262 2014/10/04 22:30:50 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.263 2014/10/04 22:39:25 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -296,9 +296,12 @@ set bar %f %s\n",
     }
     fprintf(fp, "\n");
 
-#define SAVE_FORMAT(axis)						\
-    fprintf(fp, "set format %s \"%s\"\n", axis_name(axis),	\
-	    conv_text(axis_array[axis].formatstring));
+#define SAVE_FORMAT(axis)					\
+    fprintf(fp, "set format %s \"%s\" %s\n", axis_name(axis),	\
+	    conv_text(axis_array[axis].formatstring),		\
+	    axis_array[axis].tictype == DT_DMS ? "geographic" :	\
+	    axis_array[axis].tictype == DT_TIMEDATE ? "timedate" : \
+	    "");
     SAVE_FORMAT(FIRST_X_AXIS );
     SAVE_FORMAT(FIRST_Y_AXIS );
     SAVE_FORMAT(SECOND_X_AXIS);
