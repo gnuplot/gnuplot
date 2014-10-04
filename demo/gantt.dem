@@ -27,10 +27,11 @@ S     2014-01-31 2014-03-31
 T     2014-03-01 2014-04-28
 EOD
 
+set xdata time
 timeformat = "%Y-%m-%d"
 set format x "%b\n'%y"
+
 set yrange [-1:]
-set xdata time
 OneMonth = strptime("%m","2")
 set xtics OneMonth nomirror
 set xtics scale 2, 0.5
@@ -47,6 +48,12 @@ set style arrow 1 filled size screen 0.02, 15 fixed lt 3 lw 1.5
 
 plot $DATA using (T(2)) : ($0) : (T(3)-T(2)) : (0.0) : yticlabel(1) with vector as 1, \
      $DATA using (T(2)) : ($0) : 1 with labels right offset -2
+
+pause -1 "Hit return to check backwards compatibility with v4 syntax"
+
+set timefmt timeformat
+plot $DATA using (timecolumn(2)) : ($0) : (T(3)-T(2)) : (0.0) : yticlabel(1) with vector as 1, \
+     $DATA using 2 : ($0) : 1 with labels right offset -2
 
 pause -1 "Hit return to continue"
 reset

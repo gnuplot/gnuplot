@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.328 2014/09/20 11:31:13 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.329 2014/09/27 05:51:06 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -2973,24 +2973,9 @@ show_data_is_timedate(AXIS_INDEX axis)
 static void
 show_timefmt()
 {
-    int axis;
-
     SHOW_ALL_NL;
-
-    if ((axis = lookup_table(axisname_tbl, c_token)) >= 0) {
-	c_token++;
-	fprintf(stderr, "\tread format for time on %s axis is \"%s\"\n",
-		axis_name(axis),
-		conv_text(axis_array[axis].timefmt));
-    } else {
-        /* show all currently active time axes' formats: */
-	for (axis = 0; axis<AXIS_ARRAY_SIZE; axis++)
-	    if (axis_array[axis].datatype == DT_TIMEDATE)
-		fprintf(stderr,
-			"\tread format for time on %s axis is \"%s\"\n",
-			axis_name(axis),
-			conv_text(axis_array[axis].timefmt));
-    }
+    fprintf(stderr, "Default format for reading time data is \"%s\"\n",
+	timefmt);
 }
 
 /* process 'show link' command */

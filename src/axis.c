@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.134 2014/06/02 02:45:38 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.135 2014/06/14 15:32:58 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -131,6 +131,9 @@ const struct ticdef default_axis_ticdef = DEFAULT_AXIS_TICDEF;
 
 /* Tic scale for tics with level > 1.  0 means 'inherit minitics scale'  */
 double ticscale[MAX_TICLEVEL] = {1,0.5,1,1,1};
+
+/* global default time format */
+char *timefmt = NULL;
 
 /* axis labels */
 const text_label default_axis_label = EMPTY_LABELSTRUCT;
@@ -540,8 +543,8 @@ copy_or_invent_formatstring(AXIS_INDEX axis)
 	if (t_max.tm_year != t_min.tm_year) {
 	    /* different years, include year in ticlabel */
 	    /* check convention, day/month or month/day */
-	    if (strchr(axis_array[axis].timefmt, 'm')
-		< strchr(axis_array[axis].timefmt, 'd')) {
+	    if (strchr(timefmt, 'm')
+		< strchr(timefmt, 'd')) {
 		strcpy(ticfmt[axis], "%m/%d/%");
 	    } else {
 		strcpy(ticfmt[axis], "%d/%m/%");
@@ -554,8 +557,8 @@ copy_or_invent_formatstring(AXIS_INDEX axis)
 
 	} else {
 	    /* Copy day/month order over from input format */
-	    if (strchr(axis_array[axis].timefmt, 'm')
-		< strchr(axis_array[axis].timefmt, 'd')) {
+	    if (strchr(timefmt, 'm')
+		< strchr(timefmt, 'd')) {
 		strcpy(ticfmt[axis], "%m/%d");
 	    } else {
 		strcpy(ticfmt[axis], "%d/%m");

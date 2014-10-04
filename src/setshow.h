@@ -1,5 +1,5 @@
 /*
- * $Id: setshow.h,v 1.49 2014/03/22 23:09:06 sfeam Exp $
+ * $Id: setshow.h,v 1.50 2014/03/23 12:17:59 markisch Exp $
  */
 
 /* GNUPLOT - setshow.h */
@@ -46,13 +46,14 @@
 
 #define PROGRAM "G N U P L O T"  /* FIXME: move to show.c! */
 
+/* Used to write out axis ranges for DT_TIMEDATE input mode */
 #define SAVE_NUM_OR_TIME(fp, x, axis)				\
 do{								\
     if (axis_array[axis].datatype == DT_TIMEDATE) {		\
 	char s[80];						\
 								\
 	putc('"', fp);						\
-	gstrftime(s,80,axis_array[axis].timefmt,(double)(x));	\
+	gstrftime(s,80,timefmt,(double)(x));	\
 	fputs(conv_text(s), fp);				\
 	putc('"', fp);						\
     } else {							\

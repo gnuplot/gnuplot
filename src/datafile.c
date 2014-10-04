@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.290 2014/07/30 20:48:58 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.291 2014/09/18 00:26:25 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -2048,7 +2048,7 @@ df_readascii(double v[], int max)
 			timefield = TRUE;
 
 		    if (timefield && (a.type != STRING)
-		    && !strcmp(axis_array[df_axis[output]].timefmt,"%s")) {
+		    && !strcmp(timefmt,"%s")) {
 			/* Handle the case of timefmt "%s" which expects a string */
 			/* containing a number. If evaluate_at() above returned a */
 			/* bare number then we must convert it to a sting before  */
@@ -2078,8 +2078,7 @@ df_readascii(double v[], int max)
 			if (timefield) {
 			    struct tm tm;
 			    double usec = 0.0;
-			    if (gstrptime(a.v.string_val,
-					  axis_array[df_axis[output]].timefmt, &tm, &usec))
+			    if (gstrptime(a.v.string_val, timefmt, &tm, &usec))
 				v[output] = (double) gtimegm(&tm) + usec;
 			    else
 				return_value = DF_BAD;
@@ -2108,8 +2107,7 @@ df_readascii(double v[], int max)
 		    if (column > df_no_cols ||
 			df_column[column - 1].good == DF_MISSING ||
 			!df_column[column - 1].position ||
-			!gstrptime(df_column[column - 1].position,
-				   axis_array[df_axis[output]].timefmt, &tm, &usec)
+			!gstrptime(df_column[column - 1].position, timefmt, &tm, &usec)
 			) {
 			/* line bad only if user explicitly asked for this column */
 			if (df_no_use_specs)
@@ -2555,8 +2553,16 @@ f_timecolumn(union argument *arg)
 
     (void) arg;                 /* avoid -Wunused warning */
     (void) pop(&b);		/* this is the time format string */
-    
-    column = (int) magnitude(pop(&a));
+
+    if (more_on_stack()) {
+	column = (int) magnitude(pop(&a));
+    } else {
+	/* No format parameter passed (v4-style call) */
+	/* Only needed for backward compatibility */
+	column = magnitude(&b);
+	b.v.string_val = gp_strdup(timefmt);
+	b.type = STRING;
+    }
 
     if (!evaluate_inside_using)
 	int_error(c_token-1, "timecolumn() called from invalid context");

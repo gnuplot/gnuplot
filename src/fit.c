@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: fit.c,v 1.149 2014/09/20 11:31:13 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: fit.c,v 1.150 2014/09/21 02:54:54 sfeam Exp $"); }
 #endif
 
 /*  NOTICE: Change of Copyright Status
@@ -1718,7 +1718,7 @@ log_axis_restriction(FILE *log_f, int param, double min, double max, int autosca
 	putc('*', log_f);
     } else if (param < 2 && axis->datatype == DT_TIMEDATE) {
 	putc('"', log_f);
-	gstrftime(s, 80, axis->timefmt, min);
+	gstrftime(s, 80, timefmt, min);
 	fputs(s, log_f);
 	putc('"', log_f);
     } else {
@@ -1730,7 +1730,7 @@ log_axis_restriction(FILE *log_f, int param, double min, double max, int autosca
 	putc('*', log_f);
     } else if (param < 2 && axis->datatype == DT_TIMEDATE) {
 	putc('"', log_f);
-	gstrftime(s, 80, axis->timefmt, max);
+	gstrftime(s, 80, timefmt, max);
 	fputs(s, log_f);
 	putc('"', log_f);
     } else {

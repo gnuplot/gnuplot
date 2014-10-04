@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.463 2014/09/27 05:51:06 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.464 2014/10/02 20:13:14 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -4947,35 +4947,21 @@ set_xyplane()
 /* Process 'set timefmt' command */
 /* HBB 20000507: changed this to a per-axis setting. I.e. you can now
  * have separate timefmt parse strings, different axes */
+/* V5 Oct 2014: But that was never documented, and makes little sense since
+ * the input format is a property of the data file, not the graph axis.
+ * Revert to a single global default timefmt as documented.
+ * If the default is not sufficient, use timecolumn(N,"format") on input.
+ * Use "set {axis}tics format" to control the output format.
+ */
 static void
 set_timefmt()
 {
-    int axis;
-    char *newformat = NULL;
-
     c_token++;
-    if (END_OF_COMMAND) {
-	/* set all axes to default */
-	for (axis = 0; axis < AXIS_ARRAY_SIZE; axis++) {
-	    free(axis_array[axis].timefmt);
-	    axis_array[axis].timefmt = gp_strdup(TIMEFMT);
-	}
-    } else {
-	if ((axis = lookup_table(axisname_tbl, c_token)) >= 0) {
-	    c_token++;
-	    newformat = try_to_get_string();
-	    free(axis_array[axis].timefmt);
-	    axis_array[axis].timefmt = gp_strdup(newformat);
-	} else {
-	    newformat = try_to_get_string();
-	    for (axis = 0; axis < AXIS_ARRAY_SIZE; axis++) {
-		free(axis_array[axis].timefmt);
-		axis_array[axis].timefmt = gp_strdup(newformat);
-	    }
-	}
-	if (!newformat)
-	    int_error(c_token, "time format string expected");
-	free(newformat);
+    free(timefmt);
+    timefmt = try_to_get_string();
+    if (!timefmt) {
+	timefmt = gp_strdup(TIMEFMT);
+	int_error(c_token, "expecting form for timedata input");
     }
 }
 

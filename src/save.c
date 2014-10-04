@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.259 2014/09/20 11:31:13 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.260 2014/09/27 05:51:06 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -219,9 +219,6 @@ set bar %f %s\n",
 
     for (axis = FIRST_AXES; axis < LAST_REAL_AXIS; axis++) {
 	if (axis == SECOND_Z_AXIS) continue;
-	if (strlen(axis_array[axis].timefmt))
-	    fprintf(fp, "set timefmt %s \"%s\"\n", axis_name(axis),
-		conv_text(axis_array[axis].timefmt));
 	if (axis == COLOR_AXIS) continue;
 	fprintf(fp, "set %sdata %s\n", axis_name(axis),
 		axis_array[axis].datatype == DT_TIMEDATE ? "time" :
@@ -311,6 +308,8 @@ set bar %f %s\n",
     SAVE_FORMAT(COLOR_AXIS );
     SAVE_FORMAT(POLAR_AXIS );
 #undef SAVE_FORMAT
+
+    fprintf(fp, "set timefmt \"%s\"\n", timefmt);
 
     fprintf(fp, "set angles %s\n",
 	    (ang2rad == 1.0) ? "radians" : "degrees");

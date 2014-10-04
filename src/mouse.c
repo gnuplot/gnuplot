@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: mouse.c,v 1.170 2014/09/12 17:46:32 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: mouse.c,v 1.171 2014/10/01 04:40:53 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - mouse.c */
@@ -507,7 +507,7 @@ xDateTimeFormat(double x, char *b, int mode)
     case MOUSE_COORDINATES_TIMEFMT:
 	/* FIXME HBB 20000507: timefmt is for *reading* timedata, not
 	 * for writing them! */
-	gstrftime(b, 0xff, axis_array[FIRST_X_AXIS].timefmt, x);
+	gstrftime(b, 0xff, timefmt, x);
 	break;
     default:
 	sprintf(b, mouse_setting.fmt, x);

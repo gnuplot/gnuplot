@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.918 2014/10/02 20:13:14 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.919 2014/10/03 16:31:03 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -283,10 +283,11 @@ C
  millisecond precision.
 
  * The function `timecolumn(N,"timeformat")` now has 2 parameters. Because the
- required second parameter is not associated with any particular data axis, this
+ new second parameter is not associated with any particular data axis, this
  allows using the `timecolumn` function to read time data for reasons other than
  specifying the x or y coordinate. This functionality replaces the command
- sequence `set xdata time; set timefmt x "timeformat"`.
+ sequence `set xdata time; set timefmt "timeformat"`.  It allows combining time
+ data read from multiple files with different formats within a single plot.
 
  * The `reverse` keyword of the `set [axis]range` command affects only
  autoscaling. It does not invert or otherwise alter the meaning of a command
@@ -2959,12 +2960,13 @@ Ffigure_newsyntax
  etc.
 
  Internally all times and dates are converted to the number of seconds from
- the year 1970.  The command `set timefmt` defines the format for all inputs:
- data files, ranges, tics, label positions---in short, anything that accepts a
- data value must receive it in this format.  Since only one input format can
- be in force at a given time, all time/date quantities being input at the same
- time must be presented in the same format.  Thus if both x and y data in a
- file are time/date, they must be in the same format.
+ the year 1970.  The command `set timefmt` defines the default format for all
+ inputs: data files, ranges, tics, label positions -- anything that accepts a
+ time data value defaults to receiving it in this format.  Only one default
+ format can be in effect at a given time. Thus if both x and y data in a file
+ are time/date, by default they are interpreted in the same format. However
+ this default can be replaced when reading any particular file or column of
+ input using the `timecolumn` function in the corresponding `using` specifier.
 
  The conversion to and from seconds assumes Universal Time (which is the same
  as Greenwich Standard Time).  There is no provision for changing the time
@@ -2975,12 +2977,12 @@ Ffigure_newsyntax
 
  Commands like `show xrange` will re-interpret the integer according to
  `timefmt`.  If you change `timefmt`, and then `show` the quantity again, it
- will be displayed in the new `timefmt`.  For that matter, if you give the
- deactivation command (like `set xdata`), the quantity will be shown in its
- numerical form.
+ will be displayed in the new `timefmt`.  For that matter, if you reset the
+ data type flag for that axis (e.g. `set xdata`), the quantity will be shown
+ in its numerical form.
 
  The commands `set format` or `set tics format` define the format that will be
- used for tic labels, whether or not the specified axis is time/date.
+ used for tic labels, whether or not input for the specified axis is time/date.
 
  If time/date information is to be plotted from a file, the `using` option
  _must_ be used on the `plot` or `splot` command.  These commands simply use
@@ -7163,9 +7165,6 @@ Ffigure_mapcontours
  corresponding `unset` command.  See also the `reset` command, which returns
  all settable parameters to default values.
 
- If a variable contains time/date data, `show` will display it according to
- the format currently defined by `set timefmt`, even if that was not in effect
- when the variable was initially defined.
 =iteration
  The `set` and `unset` commands may optionally contain an iteration clause.
  See `plot for`.
@@ -12278,12 +12277,8 @@ Ffigure_missing
  It has no meaning unless the command `set *data time` is given also.
 
  Syntax:
-       set timefmt {<axis>} "<format string>"
+       set timefmt "<format string>"
        show timefmt
-
- The optional <axis> argument allows to specify different time input formats
- for individual axes.  If it is omitted, the format string is applied to all
- axes.
 
  The string argument tells `gnuplot` how to read timedata from the datafile.
  The valid formats are:
