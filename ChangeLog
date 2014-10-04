@@ -13,6 +13,12 @@
 	- If only a single parameter is seen for timecolumn() try to emulate
 	  the version 4 behavior (use global timefmt)
 
+	* src/save.c src/save.h src/setshow.h src/show.c:
+
+	Timefmt revision part 2 of 4
+	- Replace macro SAVE_NUM_OR_TIME with subroutine save_num_or_time_input().
+	  This routine uses _input_ data format, mostly for reporting axis range. 
+
 2014-10-03  Christoph Bersch <usenet@bersch.net>
 
 	* term/lua/gnuplot-tikz.lua:  linetype -1 must reset dashtype to solid.

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.260 2014/09/27 05:51:06 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.261 2014/10/04 22:22:27 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -1102,7 +1102,7 @@ save_tics(FILE *fp, AXIS_INDEX axis)
 	}
     case TIC_SERIES:
 	if (axis_array[axis].ticdef.def.series.start != -VERYLARGE) {
-	    SAVE_NUM_OR_TIME(fp,
+	    save_num_or_time_input(fp,
 			     (double) axis_array[axis].ticdef.def.series.start,
 			     axis);
 	    putc(',', fp);
@@ -1110,7 +1110,7 @@ save_tics(FILE *fp, AXIS_INDEX axis)
 	fprintf(fp, "%g", axis_array[axis].ticdef.def.series.incr);
 	if (axis_array[axis].ticdef.def.series.end != VERYLARGE) {
 	    putc(',', fp);
-	    SAVE_NUM_OR_TIME(fp,
+	    save_num_or_time_input(fp,
 			     (double) axis_array[axis].ticdef.def.series.end,
 			     axis);
 	}
@@ -1142,7 +1142,7 @@ save_tics(FILE *fp, AXIS_INDEX axis)
 		continue;
 	    if (t->label)
 		fprintf(fp, "\"%s\" ", conv_text(t->label));
-	    SAVE_NUM_OR_TIME(fp, (double) t->position, axis);
+	    save_num_or_time_input(fp, (double) t->position, axis);
 	    if (t->level)
 		fprintf(fp, " %d", t->level);
 	    if (t->next) {
@@ -1152,6 +1152,21 @@ save_tics(FILE *fp, AXIS_INDEX axis)
 	fputs(")\n", fp);
     }
 
+}
+
+void
+save_num_or_time_input(FILE *fp, double x, AXIS_INDEX axis)
+{
+    if (axis_array[axis].datatype == DT_TIMEDATE) {
+	char s[80];
+
+	putc('"', fp);
+	gstrftime(s,80,timefmt,(double)(x));
+	fputs(conv_text(s), fp);
+	putc('"', fp);
+    } else {
+	fprintf(fp,"%#g",x);
+    }
 }
 
 void
@@ -1200,30 +1215,30 @@ save_range(FILE *fp, AXIS_INDEX axis)
 	fprintf(fp, "set paxis %d range [ ", axis-PARALLEL_AXES+1);
     if (axis_array[axis].set_autoscale & AUTOSCALE_MIN) {
 	if (axis_array[axis].min_constraint & CONSTRAINT_LOWER ) {
-	    SAVE_NUM_OR_TIME(fp, axis_array[axis].min_lb, axis);
+	    save_num_or_time_input(fp, axis_array[axis].min_lb, axis);
 	    fputs(" < ", fp);
 	}
 	putc('*', fp);
 	if (axis_array[axis].min_constraint & CONSTRAINT_UPPER ) {
 	    fputs(" < ", fp);
-	    SAVE_NUM_OR_TIME(fp, axis_array[axis].min_ub, axis);
+	    save_num_or_time_input(fp, axis_array[axis].min_ub, axis);
 	}
     } else {
-	SAVE_NUM_OR_TIME(fp, axis_array[axis].set_min, axis);
+	save_num_or_time_input(fp, axis_array[axis].set_min, axis);
     }
     fputs(" : ", fp);
     if (axis_array[axis].set_autoscale & AUTOSCALE_MAX) {
 	if (axis_array[axis].max_constraint & CONSTRAINT_LOWER ) {
-	    SAVE_NUM_OR_TIME(fp, axis_array[axis].max_lb, axis);
+	    save_num_or_time_input(fp, axis_array[axis].max_lb, axis);
 	    fputs(" < ", fp);
 	}
 	putc('*', fp);
 	if (axis_array[axis].max_constraint & CONSTRAINT_UPPER ) {
 	    fputs(" < ", fp);
-	    SAVE_NUM_OR_TIME(fp, axis_array[axis].max_ub, axis);
+	    save_num_or_time_input(fp, axis_array[axis].max_ub, axis);
 	}
     } else {
-	SAVE_NUM_OR_TIME(fp, axis_array[axis].set_max, axis);
+	save_num_or_time_input(fp, axis_array[axis].set_max, axis);
     }
 
     fprintf(fp, " ] %sreverse %swriteback",
@@ -1237,11 +1252,11 @@ save_range(FILE *fp, AXIS_INDEX axis)
 	/* add current (hidden) range as comments */
 	fputs("  # (currently [", fp);
 	if (axis_array[axis].set_autoscale & AUTOSCALE_MIN) {
-	    SAVE_NUM_OR_TIME(fp, axis_array[axis].min, axis);
+	    save_num_or_time_input(fp, axis_array[axis].min, axis);
 	}
 	putc(':', fp);
 	if (axis_array[axis].set_autoscale & AUTOSCALE_MAX) {
-	    SAVE_NUM_OR_TIME(fp, axis_array[axis].max, axis);
+	    save_num_or_time_input(fp, axis_array[axis].max, axis);
 	}
 	fputs("] )\n", fp);
     } else
