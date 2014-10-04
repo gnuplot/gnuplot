@@ -19,6 +19,13 @@
 	- Replace macro SAVE_NUM_OR_TIME with subroutine save_num_or_time_input().
 	  This routine uses _input_ data format, mostly for reporting axis range. 
 
+	* src/save.c src/save.h src/show.c:
+
+	Timefmt revision part 3 of 4
+	- Show and save xyz positions using time-format coordinates when needed.
+	  Note that like axis ranges, these are meant to be read in again later
+	  so they are written using the input format not the output format.
+
 2014-10-03  Christoph Bersch <usenet@bersch.net>
 
 	* term/lua/gnuplot-tikz.lua:  linetype -1 must reset dashtype to solid.

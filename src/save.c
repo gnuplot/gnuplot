@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.261 2014/10/04 22:22:27 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.262 2014/10/04 22:30:50 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -57,7 +57,6 @@ static char *RCSid() { return RCSid("$Id: save.c,v 1.261 2014/10/04 22:22:27 sfe
 static void save_functions__sub __PROTO((FILE *));
 static void save_variables__sub __PROTO((FILE *));
 static void save_tics __PROTO((FILE *, AXIS_INDEX));
-static void save_position __PROTO((FILE *, struct position *, TBOOLEAN offset));
 static void save_zeroaxis __PROTO((FILE *,AXIS_INDEX));
 static void save_set_all __PROTO((FILE *));
 
@@ -1178,7 +1177,7 @@ save_style_parallel(FILE *fp)
     fprintf(fp, "\n");
 }
 
-static void
+void
 save_position(FILE *fp, struct position *pos, TBOOLEAN offset)
 {
     assert(first_axes == 0 && second_axes == 1 && graph == 2 && screen == 3 &&
@@ -1190,10 +1189,36 @@ save_position(FILE *fp, struct position *pos, TBOOLEAN offset)
 	fprintf(fp, " offset ");
     }
 
+    /* Save in time coordinates if appropriate */
+    if (pos->scalex == first_axes) {
+	save_num_or_time_input(fp, pos->x, FIRST_X_AXIS);
+	fprintf(fp, ", ");
+    } else {
+	fprintf(fp, "%s%g, ", coord_msg[pos->scalex], pos->x);
+    }
+
+    if (pos->scaley == first_axes) {
+	if (pos->scaley != pos->scalex) fprintf(fp, "first ");
+	save_num_or_time_input(fp, pos->y, FIRST_Y_AXIS);
+	fprintf(fp, ", ");
+    } else {
+	fprintf(fp, "%s%g, ", 
+	    pos->scaley == pos->scalex ? "" : coord_msg[pos->scaley], pos->y);
+    }
+
+    if (pos->scalez == first_axes) {
+	if (pos->scalez != pos->scaley) fprintf(fp, "first ");
+	save_num_or_time_input(fp, pos->z, FIRST_Z_AXIS);
+    } else {
+	fprintf(fp, "%s%g", 
+	    pos->scalez == pos->scaley ? "" : coord_msg[pos->scalez], pos->z);
+    }
+#if (0) /* v4 code */
     fprintf(fp, "%s%g, %s%g, %s%g",
 	    pos->scalex == first_axes ? "" : coord_msg[pos->scalex], pos->x,
 	    pos->scaley == pos->scalex ? "" : coord_msg[pos->scaley], pos->y,
 	    pos->scalez == pos->scaley ? "" : coord_msg[pos->scalez], pos->z);
+#endif
 }
 
 

@@ -1,5 +1,5 @@
 /*
- * $Id: save.h,v 1.18 2014/03/17 16:26:57 juhaszp Exp $
+ * $Id: save.h,v 1.19 2014/10/04 22:30:50 sfeam Exp $
  */
 
 /* GNUPLOT - save.h */
@@ -54,6 +54,7 @@ void save_variables __PROTO((FILE *fp));
 void save_set __PROTO((FILE *fp));
 void save_term __PROTO((FILE *fp));
 void save_all __PROTO((FILE *fp));
+void save_position __PROTO((FILE *, struct position *, TBOOLEAN));
 void save_range __PROTO((FILE *, AXIS_INDEX));
 void save_textcolor __PROTO((FILE *, const struct t_colorspec *));
 void save_pm3dcolor __PROTO((FILE *, const struct t_colorspec *));

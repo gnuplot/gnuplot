@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.330 2014/10/04 22:22:27 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.331 2014/10/04 22:30:50 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -1961,18 +1961,9 @@ show_key()
 void
 show_position(struct position *pos)
 {
-    static const char *msg[] = { "(first axes) ", "(second axes) ",
-				 "(graph units) ", "(screen units) ",
-				 "(character units) "};
-
-    assert(first_axes == 0 && second_axes == 1 && graph == 2 && screen == 3 &&
-	   character == 4);
-
-    fprintf(stderr, "(%s%g, %s%g, %s%g)",
-	    pos->scalex == first_axes ? "" : msg[pos->scalex], pos->x,
-	    pos->scaley == pos->scalex ? "" : msg[pos->scaley], pos->y,
-	    pos->scalez == pos->scaley ? "" : msg[pos->scalez], pos->z);
-
+    fprintf(stderr,"(");
+    save_position(stderr, pos, FALSE);
+    fprintf(stderr,")");
 }
 
 
