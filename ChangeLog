@@ -27,7 +27,7 @@
 	  so they are written using the input format not the output format.
 
 	* src/axis.c (get_tics copy_or_invent_formatstring)
-	src/set.c src/unset.c src/show.c src/save.c:
+	src/set.c src/unset.c src/show.c src/save.c docs/gnuplot.doc:
 
 	Timefmt revision part 4 of 4
 	- New command set {xyz}tics {time|geographic|numeric} sets axis->tictype
