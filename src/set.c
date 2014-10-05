@@ -1886,52 +1886,57 @@ void
 set_format()
 {
     TBOOLEAN set_for_axis[AXIS_ARRAY_SIZE] = AXIS_ARRAY_INITIALIZER(FALSE);
-    int axis;
+    AXIS_INDEX axis;
+    char *format;
+    td_type tictype = DT_UNINITIALIZED;
 
     c_token++;
     if ((axis = lookup_table(axisname_tbl, c_token)) >= 0) {
 	set_for_axis[axis] = TRUE;
 	c_token++;
     } else if (equals(c_token,"xy") || equals(c_token,"yx")) {
-	set_for_axis[FIRST_X_AXIS]
-	    = set_for_axis[FIRST_Y_AXIS]
-	    = TRUE;
+	set_for_axis[FIRST_X_AXIS] = set_for_axis[FIRST_Y_AXIS] = TRUE;
 	c_token++;
     } else {
-	/* Assume he wants all */
+	/* Set all of them */
 	for (axis = 0; axis < AXIS_ARRAY_SIZE; axis++)
 	    set_for_axis[axis] = TRUE;
     }
 
     if (END_OF_COMMAND) {
-	SET_DEFFORMAT(FIRST_X_AXIS , set_for_axis);
-	SET_DEFFORMAT(FIRST_Y_AXIS , set_for_axis);
-	SET_DEFFORMAT(FIRST_Z_AXIS , set_for_axis);
-	SET_DEFFORMAT(SECOND_X_AXIS, set_for_axis);
-	SET_DEFFORMAT(SECOND_Y_AXIS, set_for_axis);
-	SET_DEFFORMAT(COLOR_AXIS   , set_for_axis);
-	SET_DEFFORMAT(POLAR_AXIS   , set_for_axis);
-    } else {
-	char *format = try_to_get_string();
-	if (!format)
-	    int_error(c_token, "expecting format string");
-
-#define SET_FORMATSTRING(axis)							\
-	if (set_for_axis[axis]) {						\
-		free(axis_array[axis].formatstring);				\
-		axis_array[axis].formatstring = gp_strdup(format);		\
+	for (axis = FIRST_AXES; axis <= POLAR_AXIS; axis++) {
+	    if (set_for_axis[axis]) {
+		free(axis_array[axis].formatstring);
+		axis_array[axis].formatstring = gp_strdup(DEF_FORMAT);
+		axis_array[axis].tictype = DT_NORMAL;
+	    }
 	}
-	SET_FORMATSTRING(FIRST_X_AXIS);
-	SET_FORMATSTRING(FIRST_Y_AXIS);
-	SET_FORMATSTRING(FIRST_Z_AXIS);
-	SET_FORMATSTRING(SECOND_X_AXIS);
-	SET_FORMATSTRING(SECOND_Y_AXIS);
-	SET_FORMATSTRING(COLOR_AXIS);
-	SET_FORMATSTRING(POLAR_AXIS);
-#undef SET_FORMATSTRING
-
-	free(format);
+	return;
     }
+
+    if (!(format = try_to_get_string()))
+	int_error(c_token, "expecting format string");
+
+    if (almost_equals(c_token,"time$date")) {
+	tictype = DT_TIMEDATE;
+	c_token++;
+    } else if (almost_equals(c_token,"geo$graphic")) {
+	tictype = DT_DMS;
+	c_token++;
+    } else if (almost_equals(c_token,"num$eric")) {
+	tictype = DT_NORMAL;
+	c_token++;
+    }
+
+    for (axis = FIRST_AXES; axis <= POLAR_AXIS; axis++) {
+	if (set_for_axis[axis]) {
+	    free(axis_array[axis].formatstring);
+	    axis_array[axis].formatstring = gp_strdup(format);
+	    if (tictype != DT_UNINITIALIZED)
+		axis_array[axis].tictype = tictype;
+	}
+    }
+    free(format);
 }
 
 

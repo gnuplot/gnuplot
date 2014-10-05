@@ -1,5 +1,5 @@
 /*
- * $Id: axis.h,v 1.104 2014/09/27 05:51:06 sfeam Exp $
+ * $Id: axis.h,v 1.105 2014/10/04 22:22:27 sfeam Exp $
  *
  */
 
@@ -93,7 +93,8 @@ typedef enum en_ticseries_type {
 typedef enum {
     DT_NORMAL=0,		/* default; treat values as pure numeric */
     DT_TIMEDATE,		/* old datatype */
-    DT_DMS			/* degrees minutes seconds */
+    DT_DMS,			/* degrees minutes seconds */
+    DT_UNINITIALIZED
 } td_type;
 
 /* Defines one ticmark for TIC_USER style.
@@ -629,13 +630,6 @@ do {									  \
 #define AXIS_ARRAY_INITIALIZER(value) {			\
     value, value, value, value, value,			\
 	value, value, value, value, value, value }
-
-/* used by set.c */
-#define SET_DEFFORMAT(axis, flag_array)				\
-	if (flag_array[axis]) {					\
-	    free(axis_array[axis].formatstring);		\
-	    axis_array[axis].formatstring = gp_strdup(DEF_FORMAT);	\
-	}
 
 /* FIXME: replace by a subroutine? */
 #define clear_sample_range(axis) do {				\
