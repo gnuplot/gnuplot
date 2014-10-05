@@ -1,5 +1,5 @@
 #
-# $Id: world.dem,v 1.9 2004/09/28 06:06:10 sfeam Exp $
+# $Id: world.dem,v 1.10 2011/11/26 00:31:14 sfeam Exp $
 #
 #
 set title "Gnuplot Correspondences\ngeographic coordinate system"
@@ -7,10 +7,8 @@ unset key
 set xrange [-180:180]
 set yrange [-90:90]
 set yzeroaxis
-set xtics
-set ytics
-set xdata geographic
-set ydata geographic
+set xtics geographic
+set ytics geographic
 set format x "%D %E"
 set format y "%D %N"
 #

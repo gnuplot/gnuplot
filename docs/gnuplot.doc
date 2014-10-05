@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.919 2014/10/03 16:31:03 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.920 2014/10/04 22:22:27 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -203,7 +203,7 @@ C
  * Interactive terminals support hypertext labels that only appear when the
  mouse hovers over the label's anchor point.
 
- * New coordinate system (Degrees, Minutes, Seconds). See `set xdata geographic`.
+ * New coordinate system (Degrees, Minutes, Seconds). See `set xtics geographic`.
 
  * The default format for axis labels is "% h" ("$%h$" for LaTeX terminals).
  This format is like the C standard format %g except that the exponential term,
@@ -12622,16 +12622,13 @@ Ffigure_missing
  An analogous command acts on each of the other axes.
 
  Syntax:
-       set xdata {time | geographic}
+       set xdata time
        show xdata
 
  The same syntax applies to `ydata`, `zdata`, `x2data`, `y2data` and `cbdata`.
 
  The `time` option signals that data represents a time/date in seconds.
  The current version of gnuplot stores time to a millisecond precision.
-
- The `geographic` option signals that data represents a geographical coordinate
- measured in degrees/minutes/seconds.
 
  If no option is specified, the data interpretation reverts to normal.
 4 time
@@ -12656,30 +12653,9 @@ Ffigure_missing
  the function 'strftime' (type "man strftime" on unix to look it up) is used to
  convert from the internal time in seconds to a string representation of a date.
  `gnuplot` tries to figure out a reasonable format for this.  You can customize
- the format using `set format x`.
+ the format using either `set format x` or `set xtics format`.
  See `time_specifiers` for a special set of time format specifiers.
  See also `time/date` for more information.
-4 geographic
-?commands set xdata geographic
-?set xdata geographic
-?geographic
- `set xdata geographic` indicates that the x coordinate is to be interpreted as
- a geographic coordinate measured in degrees.  Use `set format x` to establish
- how the coordinate appears as an axis tick label.  The format specifiers for
- geographic data are as follows:
-        %D                   = integer degrees
-        %<width.precision>d  = floating point degrees
-        %M                   = integer minutes
-        %<width.precision>m  = floating point minutes
-        %S                   = integer seconds
-        %<width.precision>s  = floating point seconds
-        %E                   = label with E/W instead of +/-
-        %N                   = label with N/S instead of +/-
- For example, the command `set format x "%Ddeg %5.2mmin %E"` will cause 
- x coordinate -1.51 to be labeled as `" 1deg 30.60min W"`.
-
- If no special format is provided, the coordinate will be reported as a decimal
- number of degrees.
 3 xdtics
 ?commands set xdtics
 ?commands unset xdtics
@@ -12934,6 +12910,7 @@ Ffigure_missing
                   | <start>, <incr> {,<end>}
                   | ({"<label>"} <pos> {<level>} {,{"<label>"}...) }
                  {format "formatstring"} {font "name{,<size>}"} {{no}enhanced}
+                 { numeric | timedate | geographic }
                  { rangelimited }
                  { textcolor <colorspec> }
        unset xtics
@@ -13074,30 +13051,65 @@ Ffigure_missing
 
  Minor (unlabeled) tics can be added automatically by the `set mxtics`
  command, or at explicit positions by the `set xtics ("" <pos> 1, ...)` form.
-4 xtics time_data
-?set xtics time_axis tics
-?xtics time_axis tics
-?time_axis tics
- In case of timeseries data, axis tic position values must be given as quoted
- dates or times according to the format `timefmt`. If the <start>, <incr>, <end>
- form is used, <start> and <end> must be given according to `timefmt`, but
- <incr> must be in seconds.  Times will be written out according to the format
- given on `set format`, however.
+4 xtics timedata
+?set xtics timedata
+?xtics timedata tics
+?timedata tics
+ Times and dates are stored internally as a number of seconds.  Non-numeric
+ time and date values are converted to seconds on input using the format
+ specifiers in `timefmt`.  Axis tic position values and range limits also may be
+ given as quoted dates or times interpreted using `timefmt`.
+ If the <start>, <incr>, <end> form is used, <incr> must be in seconds.
+ Use of `timefmt` to interpret input data, range, and tic positions is triggered
+ by `set xdata time`.time
+ 
+ However axis tic labels are generated using a separate format specified either
+ by `set format` or `set xtics format`.  By default the usual numeric format
+ specifiers are expected (`set xtics numeric`).  Other options are geographic
+ coordinates (`set xtics geographic`), or time or dates (`set xtics time`).
+
+ Note: For backward compatibility with earlier gnuplot versions, the command
+ `set xdata time` will implicitly also act do `set xtics time`, and `set xdata`
+ or `unset xdata` will implicitly reset to `set xtics numeric`.  However you
+ can change this with a later call to `set xtics`.
 
  Examples:
-       set xdata time
-       set timefmt "%d/%m"
-       set xtics format "%b %d"
+       set xdata time           # controls interpretation of input data
+       set timefmt "%d/%m"      # format used to read input data
+       set xtics timedate       # controls interpretation of output format
+       set xtics format "%b %d" # format used for tic labels
        set xrange ["01/12":"06/12"]
        set xtics "01/12", 172800, "05/12"
 
        set xdata time
        set timefmt "%d/%m"
-       set xtics format "%b %d"
+       set xtics format "%b %d" time
        set xrange ["01/12":"06/12"]
        set xtics ("01/12", "" "03/12", "05/12")
  Both of these will produce tics "Dec 1", "Dec 3", and "Dec 5", but in the
  second example the tic at "Dec 3" will be unlabeled.
+4 geographic
+?commands set xtics geographic
+?set xtics geographic
+?geographic
+ `set xtics geographic` indicates that x-axis values are to be interpreted as
+ a geographic coordinate measured in degrees.  Use `set xtics format` or 
+ `set format x` to specify the appearance of the axis tick labels.
+ The format specifiers for geographic data are as follows:
+        %D                   = integer degrees
+        %<width.precision>d  = floating point degrees
+        %M                   = integer minutes
+        %<width.precision>m  = floating point minutes
+        %S                   = integer seconds
+        %<width.precision>s  = floating point seconds
+        %E                   = label with E/W instead of +/-
+        %N                   = label with N/S instead of +/-
+ For example, the command `set format x "%Ddeg %5.2mmin %E"` will cause 
+ x coordinate -1.51 to be labeled as `" 1deg 30.60min W"`.
+
+ If the xtics are left in the default state (`set xtics numeric`) the coordinate
+ will be reported as a decimal number of degrees, and `format` will be assumed
+ to contain normal numeric format specifiers rather than the special set above.
 4 xtics rangelimited
 ?set xtics rangelimited
 ?xtics rangelimited
