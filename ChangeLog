@@ -1,3 +1,11 @@
+2014-10-07 Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/misc.c (lf_push lf_pop):  If lf_push/lf_pop are invoked from
+	do_string_and_free to handle bracketed if{} or do{} expressions, they
+	should not touch the call arguments ARG1, ARG2, ...  Save/restore of the
+	call arguments is only needed if lf_push/lf_pop are invoked by "call".
+	Bug #1494
+
 2014-10-03  Christoph Bersch <usenet@bersch.net>
 
 	* term/lua/gnuplot-tikz.lua:  linetype -1 must reset dashtype to solid.
