@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.193 2014/10/01 01:04:40 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.194 2014/10/01 04:40:53 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -434,28 +434,31 @@ lf_pop()
     else
 	fclose(lf->fp);
 
-    for (argindex = 0; argindex < 10; argindex++) {
-	if (call_args[argindex])
-	    free(call_args[argindex]);
-	call_args[argindex] = lf->call_args[argindex];
-    }
-    call_argc = lf->call_argc;
+    /* call arguments are not relevant when invoked from do_string_and_free */
+    if (lf->cmdline == NULL) {
+	for (argindex = 0; argindex < 10; argindex++) {
+	    if (call_args[argindex])
+		free(call_args[argindex]);
+	    call_args[argindex] = lf->call_args[argindex];
+	}
+	call_argc = lf->call_argc;
 
-    /* Restore ARGC and ARG0 ... ARG9 */
-    if ((udv = get_udv_by_name("ARGC"))) {
-	Ginteger(&(udv->udv_value), call_argc);
-    }
-    if ((udv = get_udv_by_name("ARG0"))) {
-	gpfree_string(&(udv->udv_value));
-	Gstring(&(udv->udv_value),
-	    (lf->prev && lf->prev->name) ? gp_strdup(lf->prev->name) : gp_strdup(""));
-    }
-    for (argindex = 1; argindex <= 9; argindex++) {
-	if ((udv = get_udv_by_name(argname[argindex]))) {
+	/* Restore ARGC and ARG0 ... ARG9 */
+	if ((udv = get_udv_by_name("ARGC"))) {
+	    Ginteger(&(udv->udv_value), call_argc);
+	}
+	if ((udv = get_udv_by_name("ARG0"))) {
 	    gpfree_string(&(udv->udv_value));
-	    Gstring(&(udv->udv_value), gp_strdup(call_args[argindex-1]));
-	    if (!call_args[argindex-1])
-		udv->udv_undef = TRUE;
+	    Gstring(&(udv->udv_value),
+		(lf->prev && lf->prev->name) ? gp_strdup(lf->prev->name) : gp_strdup(""));
+	}
+	for (argindex = 1; argindex <= 9; argindex++) {
+	    if ((udv = get_udv_by_name(argname[argindex]))) {
+		gpfree_string(&(udv->udv_value));
+		Gstring(&(udv->udv_value), gp_strdup(call_args[argindex-1]));
+		if (!call_args[argindex-1])
+		    udv->udv_undef = TRUE;
+	    }
 	}
     }
 
@@ -487,9 +490,13 @@ lf_pop()
     return (TRUE);
 }
 
-/* push onto load_file state stack
-   essentially, we save information needed to undo the load_file changes
-   called by load_file */
+/* lf_push is called from two different contexts:
+ *    load_file passes fp and file name (3rd param NULL)
+ *    do_string_and_free passes cmdline (1st and 2nd params NULL)
+ * In either case the routines lf_push/lf_pop save and restore state
+ * information that may be changed by executing commands from a file
+ * or from the passed command line.
+ */
 void
 lf_push(FILE *fp, char *name, char *cmdline)
 {
@@ -509,9 +516,13 @@ lf_push(FILE *fp, char *name, char *cmdline)
     lf->interactive = interactive;	/* save current state */
     lf->inline_num = inline_num;	/* save current line number */
     lf->call_argc = call_argc;
-    for (argindex = 0; argindex < 10; argindex++) {
-	lf->call_args[argindex] = call_args[argindex];
-	call_args[argindex] = NULL;	/* initially no args */
+
+    /* Call arguments are irrelevant if invoked from do_string_and_free */
+    if (cmdline == NULL) {
+	for (argindex = 0; argindex < 10; argindex++) {
+	    lf->call_args[argindex] = call_args[argindex];
+	    call_args[argindex] = NULL;	/* initially no args */
+	}
     }
     lf->depth = lf_head ? lf_head->depth+1 : 0;	/* recursion depth */
     if (lf->depth > STACK_DEPTH)
