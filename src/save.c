@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.263 2014/10/04 22:39:25 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.264 2014/10/04 23:28:38 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -100,6 +100,8 @@ save_all(FILE *fp)
 	save_set_all(fp);
 	save_functions__sub(fp);
 	save_variables__sub(fp);
+	if (df_filename)
+	    fprintf(fp, "## Last datafile plotted: \"%s\"\n", df_filename);
 	fprintf(fp, "%s\n", replot_line);
 	if (wri_to_fil_last_fit_cmd(NULL)) {
 	    fputs("## ", fp);

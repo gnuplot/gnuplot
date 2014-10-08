@@ -1,3 +1,8 @@
+2014-10-08 Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/save.c (save_all): Write out the filename last used for plotting.
+	This makes a saved plot command referencing '' slightly more useful.
+
 2014-10-07 Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/misc.c (lf_push lf_pop):  If lf_push/lf_pop are invoked from
