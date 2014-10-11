@@ -37,7 +37,7 @@
 
 
 
-  $Date: 2014/09/23 03:54:40 $
+  $Date: 2014/10/03 22:11:00 $
   $Author: sfeam $
   $Rev: 100 $
 
@@ -81,7 +81,7 @@ pgf.DEFAULT_FONT_V_CHAR = 308
 pgf.STYLE_FILE_BASENAME = "gnuplot-lua-tikz"  -- \usepackage{gnuplot-lua-tikz}
 
 pgf.REVISION = string.sub("$Rev: 100 $",7,-3)
-pgf.REVISION_DATE = string.gsub("$Date: 2014/09/23 03:54:40 $",
+pgf.REVISION_DATE = string.gsub("$Date: 2014/10/03 22:11:00 $",
                                 "$Date: ([0-9]+).([0-9]+).([0-9]+) .*","%1/%2/%3")
 
 pgf.styles = {}
@@ -125,12 +125,10 @@ pgf.styles.plotstyles = {
 pgf.styles.linetypes_axes = {
   [1] = {"gp lt axes", "dotted"},  -- An lt of -1 is used for the X and Y axes.  
   [2] = {"gp lt border", "solid"}, -- An lt of -2 is used for the border of the plot.
-  [3] = {"gp lt nodraw", "solid"}, -- Although -3 mean don't draw, we still fill this up.
-  [4] = {"gp lt background", "solid"} -- lt bgnd
 }
 
 pgf.styles.linetypes = {
-  [1] = {"gp lt plot 0", ""},  -- first graph
+  [1] = {"gp lt plot 0", ""}, -- first graph
   [2] = {"gp lt plot 1", ""}, -- second ...
   [3] = {"gp lt plot 2", ""},
   [4] = {"gp lt plot 3", ""},
@@ -138,6 +136,11 @@ pgf.styles.linetypes = {
   [6] = {"gp lt plot 5", ""},
   [7] = {"gp lt plot 6", ""},
   [8] = {"gp lt plot 7", ""}
+}
+
+pgf.styles.dashtypes_axes = {
+  [1] = {"gp dt solid", "solid"},
+  [2] = {"gp dt axes", "dotted"}
 }
 
 pgf.styles.dashtypes = {
@@ -1002,6 +1005,10 @@ f:write([[
   for i = 0, #pgf.styles.dashtypes do
     f:write("\\tikzset{"..pgf.styles.dashtypes[i][1].."/.style={"..pgf.styles.dashtypes[i][2].."}}\n")
   end
+  for i = 1, #pgf.styles.dashtypes_axes do
+    f:write("\\tikzset{"..pgf.styles.dashtypes_axes[i][1].."/.style={"..pgf.styles.dashtypes_axes[i][2].."}}\n")
+  end
+
   f:write("\n% command for switching to colored lines\n")
   f:write("\\def\\gpcoloredlines{%\n")
   for i = 1, #pgf.styles.lt_colors do
@@ -1520,7 +1527,7 @@ end
 gfx.check_linetype = function()
   if gfx.linetype_idx ~= gfx.linetype_idx_set then
     local lt
-    if gfx.linetype_idx < 0 then
+    if gfx.linetype_idx == -1 or gfx.linetype_idx == -2 then
         lt = pgf.styles.linetypes_axes[math.abs(gfx.linetype_idx)][1]
     else
       lt = pgf.styles.linetypes[(gfx.linetype_idx % #pgf.styles.linetypes)+1][1]
@@ -1535,9 +1542,9 @@ gfx.check_dashtype = function()
   if gfx.dashtype_idx ~= gfx.dashtype_idx_set then
     -- if gfx.dashtype_idx is a string, it contains a custom dash pattern
     if type(gfx.dashtype_idx) == type(1) then
-      if gfx.dashtype_idx == -1 then
-        pgf.set_dashtype(pgf.styles.dashtypes[0][1])
-      elseif gfx.dashtype_idx >= 0 then
+      if gfx.dashtype_idx == -1 or gfx.dashtype_idx == -2 then
+        pgf.set_dashtype(pgf.styles.dashtypes_axes[math.abs(gfx.dashtype_idx)][1])
+      elseif gfx.dashtype_idx > 0 then
         pgf.set_dashtype(pgf.styles.dashtypes[(gfx.dashtype_idx % #pgf.styles.dashtypes) + 1][1])
       end
     else
@@ -2154,6 +2161,12 @@ term.linetype = function(ltype)
     ltype = -3
   end
 
+  if ltype == -1 then  -- LT_AXIS
+    gfx.dashtype_idx = -2
+  end
+  if ltype == -2 then  -- LT_SOLID
+    gfx.dashtype_idx = -1
+  end
   gfx.linetype_idx = ltype
 
   return 1
