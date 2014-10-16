@@ -1,5 +1,5 @@
 /*
- * $Id: wgnuplib.h,v 1.65 2014/06/09 07:24:31 markisch Exp $
+ * $Id: wgnuplib.h,v 1.66 2014/09/18 06:45:27 markisch Exp $
  */
 
 /* GNUPLOT - win/wgnuplib.h */
@@ -330,6 +330,8 @@ typedef struct tagGW {
 	HBITMAP	hBitmap;	/* bitmap of current graph */
 	BOOL	buffervalid;	/* indicates if hBitmap is valid */
 	BOOL	rotating;	/* are we currently rotating the graph? */
+	POINT	Canvas;		/* requested size of the canvas */
+	POINT	Decoration;	/* extent of the window decorations */
 
 	struct GWOPBLK *gwopblk_head;
 	struct GWOPBLK *gwopblk_tail;

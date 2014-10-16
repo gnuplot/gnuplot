@@ -1,3 +1,12 @@
+2014-10-16  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/win/wgnuplib.h src/win/wgraph.c term/win.trm:  The `size` option
+	now refers to the canvas size instead of the window size in order to be
+	consistent with the qt and wxt terminals.  The window size can still be
+	set with the new `wsize` option. Settings are now included in output of
+	`show term`.
+	Bug #1400
+
 2014-10-11  Christoph Bersch <usenet@bersch.net>
 
 	* term/lua/gnuplot-tikz.lua:  LT_AXIS and LT_SOLID imply specific
@@ -100,7 +109,7 @@
 
 	* src/win/wgraph.c term/win.trm:  The windows terminal allowed users
 	to change linetypes via an ini file or with the help of a dialog.  This
-	has been superseeded by the more general `set linetyoe` mechanism.
+	has been superseeded by the more general `set linetype` mechanism.
 	The old code is still available but only active with WIN_CUSTOM_PENS
 	defined during compilation.
 

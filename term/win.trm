@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: win.trm,v 1.128 2014/09/18 06:55:34 markisch Exp $
+ * $Id: win.trm,v 1.129 2014/09/24 07:13:22 markisch Exp $
  */
 
 /* GNUPLOT - win.trm */
@@ -122,7 +122,7 @@ TERM_PUBLIC void WIN_modify_plots __PROTO((unsigned int operations, int plotno))
 /* Interface routines - create list of actions for Windows */
 
 enum WIN_id { WIN_DEFAULT, WIN_MONOCHROME, WIN_COLOR, WIN_GTITLE,
-	      WIN_ENHANCED, WIN_NOENHANCED, WIN_FONT, WIN_SIZE,
+	      WIN_ENHANCED, WIN_NOENHANCED, WIN_FONT, WIN_SIZE, WIN_WSIZE,
 	      WIN_POSITION, WIN_CLOSE, WIN_BACKGROUND, WIN_FONTSCALE,
 	      WIN_LINEWIDTH, WIN_SOLID, WIN_DASHED, WIN_ROUND, WIN_BUTT,
 	      WIN_OTHER };
@@ -146,6 +146,7 @@ static struct gen_table WIN_opts[] =
     { "lw", WIN_LINEWIDTH },
     { "ti$tle", WIN_GTITLE },
     { "siz$e", WIN_SIZE },
+    { "ws$ize", WIN_WSIZE },
     { "pos$ition", WIN_POSITION },
     { "cl$ose", WIN_CLOSE },
     { NULL, WIN_OTHER }
@@ -166,7 +167,7 @@ WIN_options()
 	TBOOLEAN set_background = FALSE, set_fontscale = FALSE;
 	TBOOLEAN set_linewidth = FALSE, set_size = FALSE;
 	TBOOLEAN set_position = FALSE, set_number = FALSE;
-	TBOOLEAN set_rounded = FALSE;
+	TBOOLEAN set_wsize = FALSE, set_rounded = FALSE;
 	TBOOLEAN color, dashed, rounded;
 	COLORREF background;
 	double fontscale, linewidth;
@@ -260,6 +261,8 @@ WIN_options()
 			break;
 		case WIN_SIZE: {
 			c_token++;
+			if (set_wsize)
+				int_error(c_token, "conflicting size options");
 			if (END_OF_COMMAND)
 				int_error(c_token,"size requires 'width,heigth'");
 			win_width = real_expression();
@@ -269,6 +272,21 @@ WIN_options()
 			if (win_width < 1 || win_height < 1)
 				int_error(c_token, "size is out of range");
 			set_size = TRUE;
+			break;
+		}
+		case WIN_WSIZE: {
+			c_token++;
+			if (set_size)
+				int_error(c_token, "conflicting size options");
+			if (END_OF_COMMAND)
+				int_error(c_token,"windowsize requires 'width,heigth'");
+			win_width = real_expression();
+			if (!equals(c_token++,","))
+				int_error(c_token,"windowsize requires 'width,heigth'");
+			win_height = real_expression();
+			if (win_width < 1 || win_height < 1)
+				int_error(c_token, "windowsize canvas size is out of range");
+			set_wsize = TRUE;
 			break;
 		}
 		case WIN_POSITION: {
@@ -374,9 +392,17 @@ WIN_options()
 		graphwin->fontscale = fontscale;
 	if (set_linewidth)
 		graphwin->linewidth = linewidth;
-	if (set_size) {
+	if (set_size || set_wsize) {
 		graphwin->Size.x = win_width;
-		graphwin->Size.y = win_height + graphwin->StatusHeight;
+		graphwin->Size.y = win_height;
+	}
+	if (set_size) {
+		graphwin->Canvas.x = win_width;
+		graphwin->Canvas.y = win_height;
+	}
+	if (set_wsize) {
+		graphwin->Canvas.x = 0;
+		graphwin->Canvas.y = 0;
 	}
 	if (set_position) {
 		graphwin->Origin.x = win_x;
@@ -404,7 +430,7 @@ WIN_options()
 	}
 
 	/* update graph window */
-	if ((set_position || set_size) && GraphHasWindow(graphwin))
+	if ((set_position || set_size || set_wsize) && GraphHasWindow(graphwin))
 		GraphUpdateWindowPosSize(graphwin);
 	if (GraphHasWindow(graphwin) && IsIconic(graphwin->hWndGraph))
 		ShowWindow(graphwin->hWndGraph, SW_SHOWNORMAL);
@@ -450,6 +476,13 @@ WIN_update_options()
 	if (graphwin->linewidth != 1)
 		sprintf(&(term_options[strlen(term_options)]),
 			" linewidth %.1f", graphwin->linewidth);
+
+	if (graphwin->Canvas.x != 0)
+		sprintf(&(term_options[strlen(term_options)]),
+			" size %i,%i", graphwin->Canvas.x, graphwin->Canvas.y);
+	else
+		sprintf(&(term_options[strlen(term_options)]),
+			" wsize %i,%i", graphwin->Size.x, graphwin->Size.y);
 }
 
 
@@ -971,7 +1004,7 @@ START_HELP(windows)
 "                            {linewdith <scale>}",
 "                            {background <rgb color>}",
 "                            {title \"Plot Window Title\"}",
-"                            {size <width>,<height>}",
+"                            {{size | wsize} <width>,<height>}",
 "                            {position <x>,<y>}",
 "                            {close}",
 "",
@@ -994,7 +1027,8 @@ START_HELP(windows)
 " `linewidth` and `fontscale` can be used to scale the width of lines and",
 " the size of text.",
 " `title` changes the title of the graph window.",
-" `size` defines the width and height of the window in pixel and `position`",
+" `size` defines the width and height of the window's drawing area in pixel",
+" `wsize` defines the actual size of the window itself and `position` defines",
 " the origin of the window i.e. the position of the top left corner on the",
 " screen (again in pixel). These options override any default settings",
 " from the `wgnuplot.ini` file.",
