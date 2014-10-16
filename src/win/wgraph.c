@@ -1,5 +1,5 @@
 /*
- * $Id: wgraph.c,v 1.189.2.1 2014/10/16 06:32:57 markisch Exp $
+ * $Id: wgraph.c,v 1.189.2.2 2014/10/16 06:44:16 markisch Exp $
  */
 
 /* GNUPLOT - win/wgraph.c */
@@ -2316,6 +2316,7 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 				SelectObject(hdc, pattern_brush[pattern]);
 				break;
 			case FS_EMPTY:
+				/* FIXME: Instead of filling with background color, we should not fill at all in this case! */
 				/* fill with background color */
 				SelectObject(hdc, lpgw->hbrush);
 				fill_color = lpgw->background;
@@ -2447,10 +2448,12 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 		}
 
 		case W_pointsize:
-			if (curptr->x != 0) {
+			if (curptr->x > 0) {
 				double pointsize = curptr->x / 100.0;
 				htic = pointsize * MulDiv(lpgw->htic, rr-rl, lpgw->xmax) + 1;
 				vtic = pointsize * MulDiv(lpgw->vtic, rb-rt, lpgw->ymax) + 1;
+			} else {
+				htic = vtic = 0;
 			}
 			/* invalidate point symbol cache */
 			last_symbol = 0;

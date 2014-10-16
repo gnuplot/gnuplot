@@ -1,5 +1,5 @@
 /*
- * $Id: wgdiplus.cpp,v 1.15 2014/06/02 05:16:14 markisch Exp $
+ * $Id: wgdiplus.cpp,v 1.16 2014/06/09 07:24:30 markisch Exp $
  */
 
 /*
@@ -1085,6 +1085,7 @@ drawgraph_gdiplus(LPGW lpgw, HDC hdc, LPRECT rect)
 					break;
 				}
 				case FS_EMPTY:
+					/* FIXME: Instead of filling with background color, we should not fill at all in this case! */
 					/* fill with background color */
 					solid_fill_brush.SetColor(gdiplusCreateColor(lpgw->background, 1.));
 					fill_brush = &solid_fill_brush;
@@ -1162,13 +1163,15 @@ drawgraph_gdiplus(LPGW lpgw, HDC hdc, LPRECT rect)
 		}
 
 		case W_pointsize:
-			if (curptr->x != 0) {
+			if (curptr->x > 0) {
 				double pointsize = curptr->x / 100.0;
 				htic = pointsize * MulDiv(lpgw->htic, rr-rl, lpgw->xmax) + 1;
 				vtic = pointsize * MulDiv(lpgw->vtic, rb-rt, lpgw->ymax) + 1;
+			} else {
+				htic = vtic = 0;
+			}
 				/* invalidate point symbol cache */
 				last_symbol = 0;
-			}
 			break;
 
 		case W_line_width:

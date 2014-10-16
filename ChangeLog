@@ -1,5 +1,9 @@
 2014-10-16  Bastian Maerkisch  <bmaerkisch@web.de>
 
+	* src/win/wgraph.c src/win/wgidplus.c:  Accept zero point size.
+	Eliminates drawing of unwanted point symbols for labelled contours.
+	Bugfix
+
 	* src/win/wgnuplib.h src/win/wgraph.c term/win.trm:  The `size` option
 	now refers to the canvas size instead of the window size in order to be
 	consistent with the qt and wxt terminals.  The window size can still be
