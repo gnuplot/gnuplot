@@ -1,5 +1,5 @@
 /*
- * $Id: wgraph.c,v 1.189 2014/07/04 18:16:12 markisch Exp $
+ * $Id: wgraph.c,v 1.189.2.1 2014/10/16 06:32:57 markisch Exp $
  */
 
 /* GNUPLOT - win/wgraph.c */
@@ -598,6 +598,22 @@ GraphInit(LPGW lpgw)
 	}
 #endif
 
+	/* determine the size of the window decoration: border, toolbar, caption, statusbar etc. */
+	{
+		RECT rect;
+
+		GetClientRect(lpgw->hWndGraph, &rect);
+		lpgw->Decoration.x = lpgw->Size.x + rect.left - rect.right;
+		lpgw->Decoration.y = lpgw->Size.y + rect.top- rect.bottom + lpgw->ToolbarHeight + lpgw->StatusHeight;
+	}
+
+	/* resize to match requested canvas size */
+	if (lpgw->Canvas.x != 0) {
+		lpgw->Size.x = lpgw->Canvas.x + lpgw->Decoration.x;
+		lpgw->Size.y = lpgw->Canvas.y + lpgw->Decoration.y;
+		SetWindowPos(lpgw->hWndGraph, HWND_BOTTOM, lpgw->Origin.x, lpgw->Origin.y, lpgw->Size.x, lpgw->Size.y, SWP_NOACTIVATE | SWP_NOZORDER);
+	}
+
 	ShowWindow(lpgw->hWndGraph, SW_SHOWNORMAL);
 }
 
@@ -605,6 +621,11 @@ GraphInit(LPGW lpgw)
 void WDPROC
 GraphUpdateWindowPosSize(LPGW lpgw)
 {
+	/* resize to match requested canvas size */
+	if (lpgw->Canvas.x != 0) {
+		lpgw->Size.x = lpgw->Canvas.x + lpgw->Decoration.x;
+		lpgw->Size.y = lpgw->Canvas.y + lpgw->Decoration.y;
+	}
 	SetWindowPos(lpgw->hWndGraph, HWND_BOTTOM, lpgw->Origin.x, lpgw->Origin.y, lpgw->Size.x, lpgw->Size.y, SWP_NOACTIVATE | SWP_NOZORDER);
 }
 
@@ -3190,7 +3211,10 @@ WriteGraphIni(LPGW lpgw)
 	GetWindowRect(lpgw->hWndGraph, &rect);
 	wsprintf(profile, "%d %d", rect.left, rect.top);
 	WritePrivateProfileString(section, "GraphOrigin", profile, file);
-	wsprintf(profile, "%d %d", rect.right-rect.left, rect.bottom-rect.top);
+	if (lpgw->Canvas.x != 0) 
+		wsprintf(profile, "%d %d", lpgw->Canvas.x, lpgw->Canvas.y);
+	else
+		wsprintf(profile, "%d %d", lpgw->Size.x - lpgw->Decoration.x, lpgw->Size.y - lpgw->Decoration.y);
 	WritePrivateProfileString(section, "GraphSize", profile, file);
 	wsprintf(profile, "%s,%d", lpgw->deffontname, lpgw->deffontsize);
 	WritePrivateProfileString(section, "GraphFont", profile, file);
@@ -3284,6 +3308,10 @@ ReadGraphIni(LPGW lpgw)
 		lpgw->Size.x = CW_USEDEFAULT;
 	if ( (p = GetInt(p, (LPINT)&lpgw->Size.y)) == NULL)
 		lpgw->Size.y = CW_USEDEFAULT;
+	if ((lpgw->Size.x != CW_USEDEFAULT) && (lpgw->Size.y != CW_USEDEFAULT)) {
+		lpgw->Canvas.x = lpgw->Size.x;
+		lpgw->Canvas.y = lpgw->Size.y;
+	}
 
 	if (bOKINI)
 	  GetPrivateProfileString(section, "GraphFont", "", profile, 80, file);
