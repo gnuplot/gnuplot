@@ -7,6 +7,7 @@ Changes in 5.0.rc3
 * FIX "splot ... with dots" was not drawing the dots
 * FIX revert arrowhead changes introduced in -rc1
 * FIX lua terminal support for LT_NODRAW, RGBA linecolors
+* FIX stats code was confusing x- and y- dimensions of matrix data
 
 Changes in 5.0.rc2
 ==================

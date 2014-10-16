@@ -1,3 +1,10 @@
+2014-10-16  Christoph Bersch <usenet@bersch.net>
+
+	* src/stats.c:  The stats code was confusing the x and y dimensions of
+	matrix data.  E.g. it would report a 5X7 matrix as being 7X5, and 
+	mis-calculate the indices of the min/max values.
+	Bug #1501
+
 2014-10-16  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/win/wgraph.c src/win/wgidplus.c:  Accept zero point size.
