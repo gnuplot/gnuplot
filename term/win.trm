@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: win.trm,v 1.125 2014/06/02 05:21:40 markisch Exp $
+ * $Id: win.trm,v 1.126 2014/06/09 07:24:31 markisch Exp $
  */
 
 /* GNUPLOT - win.trm */
@@ -1062,11 +1062,13 @@ START_HELP(windows)
 "",
 " `Choose Font...` selects the font used in the graphics window.",
 "",
+#ifdef WIN_CUSTOM_PENS
 " `Line Styles...` allows customization of the line colors and styles.",
 "",
+#endif
 " `Update wgnuplot.ini` saves the current window locations, window sizes, text",
 " window font, text window font size, graph window font, graph window font",
-" size, background color and linestyles to the initialization file",
+" size, background color to the initialization file",
 " `wgnuplot.ini`.",
 "",
 "^<HR align=\"left\" width=\"100\">",
@@ -1185,6 +1187,7 @@ START_HELP(windows)
 "       GraphAntialiasing=1",
 "       GraphFastRotation=1",
 "       GraphBackground=255 255 255",
+#ifdef WIN_CUSTOM_PENS
 "       Border=0 0 0 0 0",
 "       Axis=192 192 192 2 2",
 "       Line1=0 0 255 0 0",
@@ -1192,6 +1195,7 @@ START_HELP(windows)
 "       Line3=255 0 0 0 2",
 "       Line4=255 0 255 0 3",
 "       Line5=0 0 128 0 4",
+#endif
 "",
 "^ <h3>Text window options</h3> ",
 "",
@@ -1213,6 +1217,7 @@ START_HELP(windows)
 "^ <h3>Graph window options</h3>",
 "",
 " The `GraphFont` entry specifies the font name and size in points.",
+#ifdef WIN_CUSTOM_PENS
 "",
 " The five",
 " numbers given in the `Border`, `Axis` and `Line` entries are the `Red`",
@@ -1223,6 +1228,7 @@ START_HELP(windows)
 " line width is 1 pixel.  If `Linestyle` is negative, it specifies the width of",
 " a SOLID line in pixels.  Line1 and any linestyle used with the `points` style",
 " must be SOLID with unit width.",
+#endif
 "",
 " See `graph-menu`."
 END_HELP(windows)

@@ -1,5 +1,5 @@
 /*
- * $Id: wgraph.c,v 1.188 2014/06/09 07:24:31 markisch Exp $
+ * $Id: wgraph.c,v 1.189 2014/07/04 18:16:12 markisch Exp $
  */
 
 /* GNUPLOT - win/wgraph.c */
@@ -234,9 +234,10 @@ static void	WriteGraphIni(LPGW lpgw);
 static void	ReadGraphIni(LPGW lpgw);
 static void	track_tooltip(LPGW lpgw, int x, int y);
 static COLORREF	GetColor(HWND hwnd, COLORREF ref);
+#ifdef WIN_CUSTOM_PENS
 static void	UpdateColorSample(HWND hdlg);
 static BOOL	LineStyle(LPGW lpgw);
-
+#endif
 
 /* ================================== */
 
@@ -364,6 +365,8 @@ void WDPROC
 GraphInitStruct(LPGW lpgw)
 {
 	if (!lpgw->initialized) {
+		int i;
+
 		lpgw->initialized = TRUE;
 		if (lpgw != listgraphs) {
 			char titlestr[100];
@@ -393,6 +396,17 @@ GraphInitStruct(LPGW lpgw)
 		lpgw->buffervalid = FALSE;
 		lpgw->maxhideplots = MAXPLOTSHIDE;
 		lpgw->hideplot = (BOOL *) calloc(MAXPLOTSHIDE, sizeof(BOOL));
+		/* init pens */
+#ifndef WIN_CUSTOM_PENS
+		StorePen(lpgw, 0, RGB(0, 0, 0), PS_SOLID, PS_SOLID);
+		StorePen(lpgw, 1, RGB(192, 192, 192), PS_DOT, PS_DOT);
+		for (i = 0; i < WGNUMPENS; i++) {
+			COLORREF ref = wginitcolor[i % WGDEFCOLOR];
+			int colorstyle = wginitstyle[(i / WGDEFCOLOR) % WGDEFSTYLE];
+			int monostyle  = wginitstyle[i % WGDEFSTYLE];
+			StorePen(lpgw, i + 2, ref, colorstyle, monostyle);
+		}
+#endif
 		ReadGraphIni(lpgw);
 	}
 }
@@ -561,7 +575,9 @@ GraphInit(LPGW lpgw)
 #endif
 	AppendMenu(lpgw->hPopMenu, MF_STRING, M_BACKGROUND, "&Background...");
 	AppendMenu(lpgw->hPopMenu, MF_STRING, M_CHOOSE_FONT, "&Font...");
+#ifdef WIN_CUSTOM_PENS
 	AppendMenu(lpgw->hPopMenu, MF_STRING, M_LINESTYLE, "&Line Styles...");
+#endif
 	/* save settings */
 	AppendMenu(lpgw->hPopMenu, MF_SEPARATOR, 0, NULL);
 	if (lpgw->IniFile != (LPSTR)NULL) {
@@ -620,7 +636,7 @@ GraphStart(LPGW lpgw, double pointsize)
 	lpgw->buffervalid = FALSE;
 	DestroyBlocks(lpgw);
 	lpgw->org_pointsize = pointsize;
-	if ( !lpgw->hWndGraph || !IsWindow(lpgw->hWndGraph) )
+	if (!lpgw->hWndGraph || !IsWindow(lpgw->hWndGraph))
 		GraphInit(lpgw);
 	if (IsIconic(lpgw->hWndGraph))
 		ShowWindow(lpgw->hWndGraph, SW_SHOWNORMAL);
@@ -758,21 +774,20 @@ MakePens(LPGW lpgw, HDC hdc)
 	lpgw->hnull = CreatePen(PS_NULL, 0, 0); /* border for filled areas */
 
 	/* build pattern brushes for filled boxes (ULIG) */
-	if( ! brushes_initialized ) {
+	if (!brushes_initialized) {
 		int i;
 
-		for(i=0; i < pattern_num; i++) {
+		for (i = 0; i < pattern_num; i++) {
 			pattern_bitdata[i].bmType       = 0;
 			pattern_bitdata[i].bmWidth      = 16;
 			pattern_bitdata[i].bmHeight     = 8;
 			pattern_bitdata[i].bmWidthBytes = 2;
 			pattern_bitdata[i].bmPlanes     = 1;
 			pattern_bitdata[i].bmBitsPixel  = 1;
-			pattern_bitdata[i].bmBits       = pattern_bitmaps[i];
+			pattern_bitdata[i].bmBits       = (char *) pattern_bitmaps[i];
 			pattern_bitmap[i] = CreateBitmapIndirect(&pattern_bitdata[i]);
 			pattern_brush[i] = CreatePatternBrush(pattern_bitmap[i]);
 		}
-
 		brushes_initialized = TRUE;
 	}
 }
@@ -3161,19 +3176,18 @@ static void
 WriteGraphIni(LPGW lpgw)
 {
 	RECT rect;
-	int i;
-	char entry[32];
-	LPLOGPEN pc;
-	LPLOGPEN pm;
 	LPSTR file = lpgw->IniFile;
 	LPSTR section = lpgw->IniSection;
 	char profile[80];
+#ifdef WIN_CUSTOM_PENS
+	int i;
+#endif
 
 	if ((file == (LPSTR)NULL) || (section == (LPSTR)NULL))
 		return;
 	if (IsIconic(lpgw->hWndGraph))
 		ShowWindow(lpgw->hWndGraph, SW_SHOWNORMAL);
-	GetWindowRect(lpgw->hWndGraph,&rect);
+	GetWindowRect(lpgw->hWndGraph, &rect);
 	wsprintf(profile, "%d %d", rect.left, rect.top);
 	WritePrivateProfileString(section, "GraphOrigin", profile, file);
 	wsprintf(profile, "%d %d", rect.right-rect.left, rect.bottom-rect.top);
@@ -3204,22 +3218,28 @@ WriteGraphIni(LPGW lpgw)
 			GetGValue(lpgw->background), GetBValue(lpgw->background));
 	WritePrivateProfileString(section, "GraphBackground", profile, file);
 
+#ifdef WIN_CUSTOM_PENS
 	/* now save pens */
-	for (i=0; i<WGNUMPENS+2; i++) {
-		if (i==0)
-			_fstrcpy(entry,"Border");
-		else if (i==1)
-			_fstrcpy(entry,"Axis");
+	for (i = 0; i < WGNUMPENS + 2; i++) {
+		char entry[32];
+		LPLOGPEN pc;
+		LPLOGPEN pm;
+
+		if (i == 0)
+			_fstrcpy(entry, "Border");
+		else if (i == 1)
+			_fstrcpy(entry, "Axis");
 		else
-			 wsprintf(entry,"Line%d",i-1);
+			 wsprintf(entry, "Line%d", i - 1);
 		pc = &lpgw->colorpen[i];
 		pm = &lpgw->monopen[i];
-		wsprintf(profile, "%d %d %d %d %d",GetRValue(pc->lopnColor),
+		wsprintf(profile, "%d %d %d %d %d", GetRValue(pc->lopnColor),
 			GetGValue(pc->lopnColor), GetBValue(pc->lopnColor),
 			(pc->lopnWidth.x != 1) ? -pc->lopnWidth.x : pc->lopnStyle,
 			(pm->lopnWidth.x != 1) ? -pm->lopnWidth.x : pm->lopnStyle);
 		WritePrivateProfileString(section, entry, profile, file);
 	}
+#endif
 	return;
 }
 
@@ -3240,11 +3260,13 @@ ReadGraphIni(LPGW lpgw)
 	LPSTR file = lpgw->IniFile;
 	LPSTR section = lpgw->IniSection;
 	char profile[81];
-	char entry[32];
 	LPSTR p;
-	int i,r,g,b,colorstyle,monostyle;
-	COLORREF ref;
+	int r, g, b;
 	BOOL bOKINI;
+#ifdef WIN_CUSTOM_PENS
+	int i;
+	int colorstyle, monostyle;
+#endif
 
 	bOKINI = (file != (LPSTR)NULL) && (section != (LPSTR)NULL);
 	if (!bOKINI)
@@ -3338,6 +3360,7 @@ ReadGraphIni(LPGW lpgw)
 	     ((p = GetInt(p, (LPINT)&b)) != NULL) )
 		lpgw->background = RGB(r,g,b);
 
+#ifdef WIN_CUSTOM_PENS
 	StorePen(lpgw, 0, RGB(0,0,0), PS_SOLID, PS_SOLID);
 	if (bOKINI)
 		GetPrivateProfileString(section, "Border", "", profile, 80, file);
@@ -3358,12 +3381,15 @@ ReadGraphIni(LPGW lpgw)
 	     ((p = GetInt(p, (LPINT)&monostyle)) != NULL) )
 		StorePen(lpgw, 1, RGB(r,g,b), colorstyle, monostyle);
 
-	for (i=0; i<WGNUMPENS; i++) {
-		ref = wginitcolor[ i%WGDEFCOLOR ];
-		colorstyle = wginitstyle[ (i/WGDEFCOLOR) % WGDEFSTYLE ];
-		monostyle  = wginitstyle[ i%WGDEFSTYLE ];
-		StorePen(lpgw, i+2, ref, colorstyle, monostyle);
-		wsprintf(entry,"Line%d",i+1);
+	for (i = 0; i < WGNUMPENS; i++) {
+		COLORREF ref;
+		char entry[32];
+
+		ref = wginitcolor[i % WGDEFCOLOR];
+		colorstyle = wginitstyle[(i / WGDEFCOLOR) % WGDEFSTYLE];
+		monostyle  = wginitstyle[i % WGDEFSTYLE];
+		StorePen(lpgw, i + 2, ref, colorstyle, monostyle);
+		wsprintf(entry, "Line%d", i + 1);
 		if (bOKINI)
 			GetPrivateProfileString(section, entry, "", profile, 80, file);
 		if ( ((p = GetInt(profile, (LPINT)&r)) != NULL) &&
@@ -3373,6 +3399,7 @@ ReadGraphIni(LPGW lpgw)
 		     ((p = GetInt(p, (LPINT)&monostyle)) != NULL) )
 			StorePen(lpgw, i + 2, RGB(r,g,b), colorstyle, monostyle);
 	}
+#endif
 }
 
 /* ================================== */
@@ -3468,6 +3495,8 @@ track_tooltip(LPGW lpgw, int x, int y)
 
 /* ================================== */
 
+#ifdef WIN_CUSTOM_PENS
+
 /* the "Line Styles..." dialog and its support functions */
 /* FIXME HBB 20010218: this might better be delegated to a separate source file */
 
@@ -3481,7 +3510,7 @@ typedef struct tagLS {
 	LOGPEN	monopen[WGNUMPENS+2];	/* logical mono pens */
 } LS;
 typedef LS *  LPLS;
-
+#endif
 
 static COLORREF
 GetColor(HWND hwnd, COLORREF ref)
@@ -3504,6 +3533,7 @@ GetColor(HWND hwnd, COLORREF ref)
 	return ref;
 }
 
+#ifdef WIN_CUSTOM_PENS
 
 /* force update of owner draw button */
 static void
@@ -3511,7 +3541,7 @@ UpdateColorSample(HWND hdlg)
 {
 	RECT rect;
 	POINT ptul, ptlr;
-	GetWindowRect( GetDlgItem(hdlg, LS_COLORSAMPLE), &rect);
+	GetWindowRect(GetDlgItem(hdlg, LS_COLORSAMPLE), &rect);
 	ptul.x = rect.left;
 	ptul.y = rect.top;
 	ptlr.x = rect.right;
@@ -3727,6 +3757,8 @@ LineStyle(LPGW lpgw)
 	SetWindowLong(lpgw->hWndGraph, 4, (LONG)(0L));
 	return status;
 }
+
+#endif /* WIN_CUSTOM_PENS */
 
 
 #ifdef USE_MOUSE
@@ -4178,10 +4210,12 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 				case M_SAVE_AS_EMF:
 					SaveAsEMF(lpgw);
 					return 0;
+#ifdef WIN_CUSTOM_PENS
 				case M_LINESTYLE:
 					if (LineStyle(lpgw))
 						SendMessage(hwnd,WM_COMMAND,M_REBUILDTOOLS,0L);
 					return 0;
+#endif
 				case M_BACKGROUND:
 					lpgw->background = GetColor(hwnd, lpgw->background);
 					SendMessage(hwnd,WM_COMMAND,M_REBUILDTOOLS,0L);
@@ -4385,7 +4419,7 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 				else
 					sampling = 1;
 
-				/* Has window resized? */
+				/* Was the window resized? */
 				GetWindowRect(hwnd, &wrect);
 				wwidth =  wrect.right - wrect.left;
 				wheight = wrect.bottom - wrect.top;
