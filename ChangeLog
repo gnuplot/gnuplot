@@ -1,3 +1,8 @@
+2014-10-16  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/axis.c (copy_or_invent_formatstring): Backport fix for axis
+	precision.
+
 2014-10-01  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/plot2d.c (get_data): Allow timedata for HISTOGRAMS.
