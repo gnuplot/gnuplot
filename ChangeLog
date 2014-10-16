@@ -5,6 +5,9 @@
 	mis-calculate the indices of the min/max values.
 	Bug #1501
 
+	* term/lua/gnuplot-tikz.lua:  Fix incorrect font test.
+	Bug (Feature Request) #409
+
 2014-10-16  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/win/wgraph.c src/win/wgidplus.c:  Accept zero point size.
