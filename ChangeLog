@@ -1,3 +1,8 @@
+2014-10-19  Christoph Bersch <usenet@bersch.net>
+
+	* term/lua/gnuplot-tikz.lua:  Missing initializations.
+	Bug #1503
+
 2014-10-16  Christoph Bersch <usenet@bersch.net>
 
 	* src/stats.c:  The stats code was confusing the x and y dimensions of
