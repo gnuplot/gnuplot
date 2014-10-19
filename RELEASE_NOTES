@@ -8,7 +8,7 @@ and enhancements compared to previous gnuplot versions.
 Please see the NEWS file for bugfixes and minor changes between version 5
 release candidates -rc1, -rc2, and -rc3.
 
-Release Notes date: 20 September 2014
+Release Notes date: 12 October 2014
 
 NOTABLE NEW FEATURES
 ====================
@@ -116,8 +116,10 @@ A brief summary of potentially incompatible changes is given here.
 * The function `timecolumn(N,"timeformat")` now has 2 parameters.
   Because the required second parameter is not associated with a particular
   data axis, this allows using the `timecolumn` function to read time data
-  for reasons other than specifying the x or y coordinate.  Prior calls to
-  `set xdata time` or `set timefmt x` are unnecessary.
+  for reasons other than specifying the x or y coordinate.  Use of time formats
+  to generate axis tick labels is now controlled by "set {xy]tics time" rather
+  than by "set {xy}data time".  Thus prior calls to `set xdata time` or
+  `set timefmt x` are unnecessary for either input or output.
   These older commands may be deprecated in the final 5.0 release.
 
 * The `call` command is implemented by providing a set of variables ARGC,

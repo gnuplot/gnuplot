@@ -37,7 +37,7 @@
 
 
 
-  $Date: 2014/10/12 03:02:30 $
+  $Date: 2014/10/16 22:38:44 $
   $Author: sfeam $
   $Rev: 100 $
 
@@ -81,7 +81,7 @@ pgf.DEFAULT_FONT_V_CHAR = 308
 pgf.STYLE_FILE_BASENAME = "gnuplot-lua-tikz"  -- \usepackage{gnuplot-lua-tikz}
 
 pgf.REVISION = string.sub("$Rev: 100 $",7,-3)
-pgf.REVISION_DATE = string.gsub("$Date: 2014/10/12 03:02:30 $",
+pgf.REVISION_DATE = string.gsub("$Date: 2014/10/16 22:38:44 $",
                                 "$Date: ([0-9]+).([0-9]+).([0-9]+) .*","%1/%2/%3")
 
 pgf.styles = {}
@@ -1681,7 +1681,7 @@ term.options = function(opt_str, initial, t_count)
   local o_type = nil
   local s_start, s_end = 1, 1
   local term_opt = ""
-  local term_opt_font, term_opt_size, term_opt_background, term_opt_fontscale, term_opt_dashlength, term_opt_linewidth, term_opt_scale, term_opt_preamble = "", "", "", "", "", ""
+  local term_opt_font, term_opt_size, term_opt_background, term_opt_fontscale, term_opt_dashlength, term_opt_linewidth, term_opt_scale, term_opt_preamble = "", "", "", "", "", "", "", ""
   local charsize_h, charsize_v, fontsize, fontscale, dashlength = nil, nil, nil, nil, nil
   -- trim spaces
   opt_str = opt_str:gsub("^%s*(.-)%s*$", "%1")
