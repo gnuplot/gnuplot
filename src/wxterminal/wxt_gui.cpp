@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.cpp,v 1.127 2014/06/03 17:58:21 sfeam Exp $
+ * $Id: wxt_gui.cpp,v 1.128 2014/06/09 12:17:31 markisch Exp $
  */
 
 /* GNUPLOT - wxt_gui.cpp */
@@ -608,10 +608,14 @@ void wxtFrame::OnClose( wxCloseEvent& event )
 
 /* when the window is resized,
  * resize the panel to fit in the frame.
- * Note : can't simply use "replot", as it doesn't work with multiplot mode */
+ * If the tool widget setting for "redraw on resize" is set, replot in new size.
+ * FIXME : Loses all but most recent component of a multiplot.
+ */
 void wxtFrame::OnSize( wxSizeEvent& event )
 {
 	FPRINTF((stderr,"frame OnSize\n"));
+	if (wxt_redraw && replot_line && replot_line[0] != '\0')
+		wxt_exec_event(GE_keypress, 0, 0, 'e' , 0, this->GetId());
 
 	/* Under Windows the frame receives an OnSize event before being completely initialized.
 	 * So we must check for the panel to be properly initialized before.*/
@@ -1475,6 +1479,7 @@ void wxtConfigDialog::OnButton( wxCommandEvent& event )
 		wxt_persist = persist_setting?yes:no;
 		wxt_ctrl = ctrl_setting?yes:no;
 		wxt_toggle = toggle_setting?yes:no;
+		wxt_redraw = redraw_setting?yes:no;
 
 		switch (rendering_setting) {
 		case 0 :
@@ -1505,6 +1510,8 @@ void wxtConfigDialog::OnButton( wxCommandEvent& event )
 			wxLogError(wxT("Cannot write ctrl"));
 		if (!pConfig->Write(wxT("toggle"), toggle_setting))
 			wxLogError(wxT("Cannot write toggle"));
+		if (!pConfig->Write(wxT("redraw"), redraw_setting))
+			wxLogError(wxT("Cannot write redraw_setting"));
 		if (!pConfig->Write(wxT("rendering"), rendering_setting))
 			wxLogError(wxT("Cannot write rendering_setting"));
 		if (!pConfig->Write(wxT("hinting"), hinting_setting))
@@ -1553,6 +1560,10 @@ wxtConfigDialog::wxtConfigDialog(wxWindow* parent)
 		wxT("Toggle plots on/off when key sample is clicked"),
 		wxDefaultPosition, wxDefaultSize, 0, wxGenericValidator(&toggle_setting));
 
+	wxCheckBox *check5 = new wxCheckBox (this, wxID_ANY,
+		wxT("Redraw continuously as plot is resized"),
+		wxDefaultPosition, wxDefaultSize, 0, wxGenericValidator(&redraw_setting));
+
 	wxString choices[3];
 	choices[0] = wxT("No antialiasing");
 	choices[1] = wxT("Antialiasing");
@@ -1598,6 +1609,7 @@ wxtConfigDialog::wxtConfigDialog(wxWindow* parent)
 	vsizer->Add(check2,wxSizerFlags().Align(0).Expand().Border(wxALL));
 	vsizer->Add(check3,wxSizerFlags().Align(0).Expand().Border(wxALL));
 	vsizer->Add(check4,wxSizerFlags().Align(0).Expand().Border(wxALL));
+	vsizer->Add(check5,wxSizerFlags().Align(0).Expand().Border(wxALL));
 	vsizer->Add(box_sizer2,wxSizerFlags().Align(0).Expand().Border(wxALL));
 	/*vsizer->Add(CreateButtonSizer(wxOK|wxCANCEL),wxSizerFlags().Align(0).Expand().Border(wxALL));*/
 	vsizer->Add(hsizer,wxSizerFlags().Align(0).Expand().Border(wxALL));
@@ -1744,6 +1756,7 @@ void wxt_init()
 	bool persist_setting;
 	bool ctrl_setting;
 	bool toggle_setting;
+	bool redraw_setting;
 	int rendering_setting;
 	int hinting_setting;
 
@@ -1774,6 +1787,13 @@ void wxt_init()
 	}
 	if (wxt_toggle==UNSET)
 		wxt_toggle = toggle_setting?yes:no;
+
+	if (!pConfig->Read(wxT("redraw"), &redraw_setting)) {
+		pConfig->Write(wxT("redraw"), false);
+		redraw_setting = false;
+	}
+	if (wxt_redraw==UNSET)
+		wxt_redraw = redraw_setting?yes:no;
 
 	if (!pConfig->Read(wxT("rendering"), &rendering_setting)) {
 		pConfig->Write(wxT("rendering"), 2);

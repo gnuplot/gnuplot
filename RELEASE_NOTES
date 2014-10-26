@@ -142,6 +142,10 @@ Demo plots illustrating new and old features are online at
 KNOWN ISSUES
 ============
 
+* The :Italic and :Bold attributes in enhanced text strings are a new feature
+  and are not fully implemented. In particular some terminals ignore them in
+  the "set terminal" command itself.
+
 * It is tricky to build the wxt and qt terminals under Windows.
 
 * Font initialization on OSX can be very slow, causing the qt terminal to

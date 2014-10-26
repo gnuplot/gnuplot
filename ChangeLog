@@ -1,3 +1,9 @@
+2014-10-26 Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/wxt.trm src/wxterminal/wxt_term.h src/wxterminal/wxt_gui.*:
+	Add a checkbox to the tool widget controlling whether or not the
+	plot is redrawn via "replot" as the terminal window is resized.
+
 2014-10-19  Christoph Bersch <usenet@bersch.net>
 
 	* term/lua/gnuplot-tikz.lua:  Missing initializations.
