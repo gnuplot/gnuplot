@@ -1,5 +1,5 @@
 /*
- * $Id: wxt.trm,v 1.41 2014/07/01 15:04:53 sfeam Exp $
+ * $Id: wxt.trm,v 1.42 2014/07/04 18:13:28 markisch Exp $
  */
 
 /* GNUPLOT - wxt.trm */
@@ -68,6 +68,7 @@ int wxt_persist = UNSET;
 int wxt_raise = UNSET;
 int wxt_ctrl = UNSET;
 int wxt_toggle = UNSET;
+int wxt_redraw = UNSET;
 t_linecap wxt_linecap = SQUARE;
 /* default text font family: */
 char wxt_set_fontname[MAX_ID_LEN + 1] = "";

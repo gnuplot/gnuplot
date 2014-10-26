@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.h,v 1.47 2014/06/20 17:41:48 sfeam Exp $
+ * $Id: wxt_gui.h,v 1.48 2014/06/20 22:58:46 sfeam Exp $
  */
 
 /* GNUPLOT - wxt_gui.h */
@@ -453,6 +453,7 @@ class wxtConfigDialog : public wxDialog
 	bool persist_setting;
 	bool ctrl_setting;
 	bool toggle_setting;
+	bool redraw_setting;
 	/* rendering_setting :
 	 * 0 = no antialiasing, no oversampling
 	 * 1 = antialiasing, no oversampling
