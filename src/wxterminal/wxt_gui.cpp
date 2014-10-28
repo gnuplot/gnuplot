@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.cpp,v 1.129 2014/09/04 20:33:14 sfeam Exp $
+ * $Id: wxt_gui.cpp,v 1.130 2014/10/26 21:19:21 sfeam Exp $
  */
 
 /* GNUPLOT - wxt_gui.cpp */
@@ -1543,6 +1543,7 @@ wxtConfigDialog::wxtConfigDialog(wxWindow* parent)
 	pConfig->Read(wxT("persist"),&persist_setting);
 	pConfig->Read(wxT("ctrl"),&ctrl_setting);
 	pConfig->Read(wxT("toggle"),&toggle_setting);
+	pConfig->Read(wxT("redraw"),&redraw_setting);
 	pConfig->Read(wxT("rendering"),&rendering_setting);
 	pConfig->Read(wxT("hinting"),&hinting_setting);
 
