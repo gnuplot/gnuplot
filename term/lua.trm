@@ -1,6 +1,6 @@
 /*
- *  $Id: lua.trm,v 1.23 2014/06/12 17:22:04 sfeam Exp $
- *  $Date: 2014/06/12 17:22:04 $
+ *  $Id: lua.trm,v 1.24 2014/09/23 03:55:25 sfeam Exp $
+ *  $Date: 2014/09/23 03:55:25 $
  *  $Rev: 99 $
  */
 
@@ -77,6 +77,9 @@ TERM_PUBLIC void LUA_set_color __PROTO((t_colorspec *));
 TERM_PUBLIC void LUA_filled_polygon __PROTO((int, gpiPoint *));
 TERM_PUBLIC void LUA_image __PROTO((unsigned, unsigned, coordval *, gpiPoint *, t_imagecolor));
 TERM_PUBLIC void LUA_path __PROTO((int p));
+#ifdef EAM_BOXED_TEXT
+TERM_PUBLIC void LUA_boxed_text __PROTO((unsigned int, unsigned int, int));
+#endif
 
 /* defaults */
 #define LUA_XMAX 10000.0
@@ -1373,6 +1376,40 @@ LUA_image (unsigned m, unsigned n, coordval *image, gpiPoint *corner, t_imagecol
   }
 }
 
+#ifdef EAM_BOXED_TEXT
+
+TERM_PUBLIC void
+LUA_boxed_text __PROTO((unsigned int x, unsigned int y, int option))
+{
+    const char *option_str = "UNKNOWN";
+    switch (option) {
+    case TEXTBOX_INIT:
+	option_str = "INIT";
+	break;
+    case TEXTBOX_OUTLINE:
+	option_str = "OUTLINE";
+	break;
+    case TEXTBOX_BACKGROUNDFILL:
+	option_str = "BACKGROUNDFILL";
+	break;
+    case TEXTBOX_MARGINS:
+	option_str = "MARGINS";
+	break;
+    default:
+	break;
+    }
+	    
+    if(LUA_init_luaterm_function("boxed_text")) {
+	lua_pushinteger(L, x);
+	lua_pushinteger(L, y);
+	lua_pushstring(L, option_str);
+	LUA_call_report(lua_pcall(L, 3, 1, tb));
+	lua_term_result = (int)lua_tointeger(L, -1);
+	lua_pop(L, 1);
+    }
+}
+
+#endif
 
 #endif /* TERM_BODY */
 
@@ -1400,7 +1437,7 @@ TERM_TABLE_START(lua_driver)
    , LUA_TSCALE
     , NULL /* hypertext */
 #ifdef EAM_BOXED_TEXT
-    , NULL
+    , LUA_boxed_text
 #endif
     , NULL /* modify plots */
     , LUA_dashtype
@@ -1430,7 +1467,7 @@ TERM_TABLE_START(tikz_driver)
    , LUA_TSCALE
     , NULL /* hypertext */
 #ifdef EAM_BOXED_TEXT
-    , NULL
+    , LUA_boxed_text
 #endif
     , NULL /* modify plots */
     , LUA_dashtype
