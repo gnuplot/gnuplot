@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: win.trm,v 1.129 2014/09/24 07:13:22 markisch Exp $
+ * $Id: win.trm,v 1.130 2014/10/16 06:54:56 markisch Exp $
  */
 
 /* GNUPLOT - win.trm */
@@ -1027,7 +1027,7 @@ START_HELP(windows)
 " `linewidth` and `fontscale` can be used to scale the width of lines and",
 " the size of text.",
 " `title` changes the title of the graph window.",
-" `size` defines the width and height of the window's drawing area in pixel",
+" `size` defines the width and height of the window's drawing area in pixels,",
 " `wsize` defines the actual size of the window itself and `position` defines",
 " the origin of the window i.e. the position of the top left corner on the",
 " screen (again in pixel). These options override any default settings",
@@ -1102,8 +1102,7 @@ START_HELP(windows)
 #endif
 " `Update wgnuplot.ini` saves the current window locations, window sizes, text",
 " window font, text window font size, graph window font, graph window font",
-" size, background color to the initialization file",
-" `wgnuplot.ini`.",
+" size, background color to the initialization file `wgnuplot.ini`.",
 "",
 "^<HR align=\"left\" width=\"100\">",
 " (*) Note that this menu is only available by pressing the right mouse button",
