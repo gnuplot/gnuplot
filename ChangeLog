@@ -1,3 +1,7 @@
+2014-10-29  Christoph Bersch <usenet@bersch.net>
+
+	* term/lua/gnuplot-tikz.lua term/luz.trm:  Boxed text support.
+
 2014-10-26 Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/wxt.trm src/wxterminal/wxt_term.h src/wxterminal/wxt_gui.*:

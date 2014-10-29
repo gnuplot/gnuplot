@@ -37,7 +37,7 @@
 
 
 
-  $Date: 2014/10/16 22:38:44 $
+  $Date: 2014/10/19 19:56:38 $
   $Author: sfeam $
   $Rev: 100 $
 
@@ -81,7 +81,7 @@ pgf.DEFAULT_FONT_V_CHAR = 308
 pgf.STYLE_FILE_BASENAME = "gnuplot-lua-tikz"  -- \usepackage{gnuplot-lua-tikz}
 
 pgf.REVISION = string.sub("$Rev: 100 $",7,-3)
-pgf.REVISION_DATE = string.gsub("$Date: 2014/10/16 22:38:44 $",
+pgf.REVISION_DATE = string.gsub("$Date: 2014/10/19 19:56:38 $",
                                 "$Date: ([0-9]+).([0-9]+).([0-9]+) .*","%1/%2/%3")
 
 pgf.styles = {}
@@ -414,11 +414,17 @@ pgf.write_text_node = function(t, text, angle, justification, font)
   if font ~= '' then
     node_options = node_options .. ",font=" .. font
   end  
+  node_name = ''
+  if gfx.boxed_text then
+     gfx.boxed_text_count = gfx.boxed_text_count + 1
+     node_options = node_options .. ",inner sep=0pt"
+     node_name = string.format("(gp boxed node %d)", gfx.boxed_text_count)
+  end
   if gfx.opacity < 1.0 then
     node_options = node_options .. string.format(",text opacity=%.3f", gfx.opacity)
   end
-  gp.write(string.format("\\node[%s] at (%s) {%s};\n", 
-          node_options, pgf.format_coord(t[1], t[2]), text))
+  gp.write(string.format("\\node[%s]%s at (%s) {%s};\n", 
+          node_options, node_name, pgf.format_coord(t[1], t[2]), text))
 end
 
 
@@ -579,7 +585,7 @@ f_latex:write("          ["..pgf.REVISION_DATE.." (rev. "..pgf.REVISION..") GNUP
 f_latex:write([[
 \RequirePackage{tikz}
 
-\usetikzlibrary{arrows,patterns,plotmarks,backgrounds}
+\usetikzlibrary{arrows,patterns,plotmarks,backgrounds,fit}
 ]])
 f_latex:write("\\input "..name_common.."\n")
 f_latex:write([[
@@ -1225,6 +1231,11 @@ gfx.dashtype_idx_set = nil   -- current dashtype set in the plot
 gfx.linewidth = nil
 gfx.linewidth_set = nil
 gfx.opacity = 1.0
+
+gfx.boxed_text = false
+gfx.boxed_text_count = 0    -- number of nodes inside the current box
+gfx.boxed_text_xmargin = 0
+gfx.boxed_text_ymargin = 0
 
 -- internal calculated scaling factors
 gfx.scalex = 1
@@ -2273,6 +2284,39 @@ end
 term.text_angle = function(ang)
   gfx.text_angle = ang
   return 1
+end
+
+term.boxed_text = function(x, y, option)
+   if (option == 'INIT') then
+      gfx.boxed_text = true
+      gfx.boxed_text_count = 0
+   elseif (option == 'MARGINS') then
+      gfx.boxed_text_xmargin = x / 100.0
+      gfx.boxed_text_ymargin = y / 100.0
+   elseif (option == 'BACKGROUNDFILL' or option == 'OUTLINE') then
+      gfx.check_color()
+      gfx.check_linetype()
+      gfx.check_dashtype()
+      gfx.check_linewidth()
+      if (gfx.boxed_text_count > 0) then
+	 gp.write('\\node[')
+	 if (option == 'BACKGROUNDFILL') then
+	    gp.write('fill = gpbgfillcolor,')
+	 else
+	    gfx.boxed_text = false
+	    gp.write('draw, gp path,')
+	 end
+	 gp.write(string.format('inner xsep=%.2f, inner ysep=%.2f,', gfx.boxed_text_xmargin, gfx.boxed_text_ymargin))
+	 gp.write('fit=')
+	 for i=1,gfx.boxed_text_count do
+	    gp.write(string.format('(gp boxed node %d)', i))
+	 end
+	 gp.write(']{};\n')
+      end
+   elseif (option == 'FINISH') then
+      gfx.boxed_text = false
+   end
+   return 1
 end
 
 term.linewidth = function(width)
