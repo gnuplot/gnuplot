@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.902.2.17 2014/10/02 20:13:29 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.902.2.18 2014/10/16 16:46:19 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -4464,8 +4464,8 @@ Ffigure_mapcontours
        x1:x2:x3:...:xN:z:s         # N independent variables (N+2 columns total)
 
  Please beware that this means that you have to supply z-errors s in a fit with
- two or more independent variables. If you want unit weights you need to need
- to supply them explicitly by using e.g. then format x:y:z:(1).
+ two or more independent variables. If you want unit weights you need to supply
+ them explicitly by using e.g. then format x:y:z:(1).
 
  The dummy variable names may be changed when specifying a range as noted above.
  The first range corresponds to the first `using` spec, and so on.  A range may
