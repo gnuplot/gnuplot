@@ -1,3 +1,8 @@
+2014-10-29  Shigeharu Takeno  <shige@iee.niit.ac.jp>
+
+	* docs/gnuplot.doc docs/term-ja.diff docs/gnuplot-ja.doc:
+	Fix typos. Sync Japanese documentation to 1.921
+
 2014-10-26 Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/wxt.trm src/wxterminal/wxt_term.h src/wxterminal/wxt_gui.*:
