@@ -1,3 +1,10 @@
+2014-10-30  Daniel J Sebald <daniel.sebald@ieee.org>
+
+	* src/wxterminal/wxt_gui.{cpp|h}: Replace the clipboard widget on the
+	wxt terminal toolbar with a widget to save current plot to a file.
+	EAM: Output to PNG via standard wxWidgets component
+	     Output to SVG or PDF by replaying cairo history for current plot.
+
 2014-10-29  Christoph Bersch <usenet@bersch.net>
 
 	* term/lua/gnuplot-tikz.lua term/luz.trm:  Boxed text support.

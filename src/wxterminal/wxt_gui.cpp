@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.cpp,v 1.130 2014/10/26 21:19:21 sfeam Exp $
+ * $Id: wxt_gui.cpp,v 1.131 2014/10/28 05:24:00 sfeam Exp $
  */
 
 /* GNUPLOT - wxt_gui.cpp */
@@ -117,6 +117,9 @@
 #include "bitmaps/png/config_png.h"
 #include "bitmaps/png/help_png.h"
 
+/* standard icon art from wx (used only for "Export to file" */
+#include <wx/artprov.h>
+
 /* Interactive toggle control variables
  */
 static int wxt_cur_plotno = 0;
@@ -173,7 +176,11 @@ END_EVENT_TABLE()
 BEGIN_EVENT_TABLE( wxtFrame, wxFrame )
 	EVT_CLOSE( wxtFrame::OnClose )
 	EVT_SIZE( wxtFrame::OnSize )
+	EVT_TOOL( Toolbar_ExportToFile, wxtFrame::OnExport )
+#if (0)
+	/* Clipboard widget (should consolidate this with Export to File) */
 	EVT_TOOL( Toolbar_CopyToClipboard, wxtFrame::OnCopy )
+#endif
 #ifdef USE_MOUSE
 	EVT_TOOL( Toolbar_Replot, wxtFrame::OnReplot )
 	EVT_TOOL( Toolbar_ToggleGrid, wxtFrame::OnToggleGrid )
@@ -416,10 +423,16 @@ wxtFrame::wxtFrame( const wxString& title, wxWindowID id )
 	/* set up the toolbar */
 	wxToolBar * toolbar = CreateToolBar();
 	/* With wxMSW, default toolbar size is only 16x15. */
-//	toolbar->SetToolBitmapSize(wxSize(16,16));
+	// toolbar->SetToolBitmapSize(wxSize(16,16));
 
+	toolbar->AddTool(Toolbar_ExportToFile, wxT("Export"),
+				wxArtProvider::GetBitmap(wxART_FILE_SAVE_AS, wxART_TOOLBAR),
+				wxT("Export plot to file"));
+#if (0)
+	/* FIXME: Consolidate this with Export */
 	toolbar->AddTool(Toolbar_CopyToClipboard, wxT("Copy"),
-				*(toolBarBitmaps[0]), wxT("Copy the plot to clipboard"));
+				*(toolBarBitmaps[0]), wxT("Copy plot to clipboard"));
+#endif
 #ifdef USE_MOUSE
 #ifdef __WXOSX_COCOA__
 	/* wx 2.9 Cocoa bug & crash workaround for Lion, which does not have toolbar separators anymore */
@@ -478,6 +491,95 @@ wxtFrame::~wxtFrame()
 	}
 }
 
+
+/* toolbar event : Export to file
+ * We will create a file dialog, using platform-independant wxWidgets functions
+ */
+void wxtFrame::OnExport( wxCommandEvent& WXUNUSED( event ) )
+{
+	wxFileDialog exportFileDialog (this, wxT("Exported File Format"),
+		wxGetCwd(), wxT(""),
+		wxT("PNG files (*.png)|*.png|PDF files (*.pdf)|*.pdf|SVG files (*.svg)|*.svg"),
+		wxFD_SAVE|wxFD_OVERWRITE_PROMPT);
+
+	if (exportFileDialog.ShowModal() == wxID_CANCEL)
+		return;
+
+	/* wxID_OK:  User wants to save to a file. */
+
+	wxString fullpathFilename = exportFileDialog.GetPath();
+	wxString fileExt = fullpathFilename.AfterLast ('.');
+
+	cairo_status_t ierr;
+	cairo_surface_t *surface;
+	cairo_t* save_cr;
+
+	switch (exportFileDialog.GetFilterIndex()) {
+	case 0 :
+		/* Save as PNG file. */
+		if (fileExt != wxT("png") && fileExt != wxT("PNG"))
+			fullpathFilename += wxT(".png");
+		surface = cairo_get_target(wxt_current_plot->cr);
+		ierr = cairo_surface_write_to_png(surface, fullpathFilename.mb_str(wxConvUTF8));
+		if (ierr != CAIRO_STATUS_SUCCESS)
+			fprintf(stderr,"error writing PNG file: %s\n", cairo_status_to_string(ierr));
+		break;
+
+	case 1 :
+		/* Save as PDF file. */
+		if (fileExt != wxT("pdf") && fileExt != wxT("PDF"))
+			fullpathFilename += wxT(".pdf");
+
+		save_cr = wxt_current_plot->cr;
+		cairo_save(save_cr);
+		surface = cairo_pdf_surface_create(
+			fullpathFilename.mb_str(wxConvUTF8),
+			wxt_current_plot->device_xmax, wxt_current_plot->device_ymax);
+		wxt_current_plot->cr = cairo_create(surface);
+		cairo_surface_destroy(surface);
+
+		cairo_scale(wxt_current_plot->cr,
+			1./(double)wxt_current_plot->oversampling_scale,
+			1./(double)wxt_current_plot->oversampling_scale);
+		wxt_current_panel->wxt_cairo_refresh();
+
+		cairo_surface_show_page(surface);
+		cairo_surface_finish(surface);
+		wxt_current_plot->cr = save_cr;
+		cairo_restore(wxt_current_plot->cr);
+		break;
+
+	case 2 :
+#ifdef CAIRO_HAS_SVG_SURFACE
+		/* Save as SVG file. */
+		if (fileExt != wxT("svg") && fileExt != wxT("SVG"))
+			fullpathFilename += wxT(".svg");
+
+		save_cr = wxt_current_plot->cr;
+		cairo_save(save_cr);
+		surface = cairo_svg_surface_create(
+			fullpathFilename.mb_str(wxConvUTF8),
+			wxt_current_plot->device_xmax, wxt_current_plot->device_ymax);
+		wxt_current_plot->cr = cairo_create(surface);
+		cairo_surface_destroy(surface);
+
+		cairo_scale(wxt_current_plot->cr,
+			1./(double)wxt_current_plot->oversampling_scale,
+			1./(double)wxt_current_plot->oversampling_scale);
+		wxt_current_panel->wxt_cairo_refresh();
+
+		cairo_surface_show_page(surface);
+		cairo_surface_finish(surface);
+		wxt_current_plot->cr = save_cr;
+		cairo_restore(wxt_current_plot->cr);
+		break;
+#endif
+
+	default :
+		fprintf(stderr, "Can't save in that file type.\n");
+		break;
+	}
+}
 
 /* toolbar event : Copy to clipboard
  * We will copy the panel to a bitmap, using platform-independant wxWidgets functions */
