@@ -1,3 +1,9 @@
+2014-10-31 Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/plot2d.c:  Issue a warning if someone tries to specify a
+	sampling range for a data plot.
+	Bug #1510
+
 2014-10-31  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/wxterminal/wxt_gui.cpp (wxtFrame::OnSize):  Only replot on
