@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.cpp,v 1.131 2014/10/28 05:24:00 sfeam Exp $
+ * $Id: wxt_gui.cpp,v 1.132 2014/10/30 23:54:15 sfeam Exp $
  */
 
 /* GNUPLOT - wxt_gui.cpp */
@@ -716,8 +716,6 @@ void wxtFrame::OnClose( wxCloseEvent& event )
 void wxtFrame::OnSize( wxSizeEvent& event )
 {
 	FPRINTF((stderr,"frame OnSize\n"));
-	if (wxt_redraw && replot_line && replot_line[0] != '\0')
-		wxt_exec_event(GE_keypress, 0, 0, 'e' , 0, this->GetId());
 
 	/* Under Windows the frame receives an OnSize event before being completely initialized.
 	 * So we must check for the panel to be properly initialized before.*/
@@ -727,6 +725,10 @@ void wxtFrame::OnSize( wxSizeEvent& event )
 	/* wx 2.9 Cocoa bug workaround, that does not adjust layout for status bar on resize */
 	PositionStatusBar();
 #endif
+
+	/* Note: On some platforms OnSize() might get called before the settings have been initialized in wxt_init(). */
+	if ((wxt_redraw == yes) && replot_line && replot_line[0] != '\0')
+		wxt_exec_event(GE_keypress, 0, 0, 'e' , 0, this->GetId());
 }
 
 /* wrapper for AddPendingEvent or ProcessEvent */

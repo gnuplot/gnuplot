@@ -1,3 +1,12 @@
+2014-10-31  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/wxterminal/wxt_gui.cpp (wxtFrame::OnSize):  Only replot on
+	resize if the wxt settings were properly initialized by wxt_init().
+	On Windows, this would otherwise cause many graph windows to be
+	opened when the first plot command is issued and gnuplot finally
+	hangs or crashes.
+	Bugfix.
+
 2014-10-30  Daniel J Sebald <daniel.sebald@ieee.org>
 
 	* src/wxterminal/wxt_gui.{cpp|h}: Replace the clipboard widget on the
