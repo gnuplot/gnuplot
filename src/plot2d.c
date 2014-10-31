@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.338 2014/09/07 16:53:38 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.339 2014/10/01 04:30:44 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -2115,6 +2115,8 @@ eval_plots()
 	    if (name_str) { /* data file to plot */
 		if (parametric && in_parametric)
 		    int_error(c_token, "previous parametric function not fully specified");
+		if (sample_range_token !=0 && *name_str != '+')
+		    int_warn(sample_range_token, "Ignoring sample range in non-sampled data plot");
 
 		if (*tp_ptr)
 		    this_plot = *tp_ptr;
