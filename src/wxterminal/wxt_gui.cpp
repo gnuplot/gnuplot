@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.cpp,v 1.132 2014/10/30 23:54:15 sfeam Exp $
+ * $Id: wxt_gui.cpp,v 1.133 2014/10/31 15:55:48 markisch Exp $
  */
 
 /* GNUPLOT - wxt_gui.cpp */
@@ -2190,10 +2190,11 @@ void wxt_put_text(unsigned int x, unsigned int y, const char * string)
 		* closing brace, but we don't really expect to find one.
 		* If the return value is not the nul-terminator of the
 		* string, that can only mean that we did find an unmatched
-		* closing brace in the string. We inplot->crement past it (else
+		* closing brace in the string. We increment past it (else
 		* we get stuck in an infinite loop) and try again. */
 
-		while (*(string = enhanced_recursion((char*)string, TRUE, wxt_current_plot->fontname,
+		while (*(string = enhanced_recursion((char*)string, TRUE,
+				wxt_set_fontname,
 				wxt_current_plot->fontsize * wxt_set_fontscale,
 				0.0, TRUE, TRUE, 0))) {
 			wxt_enhanced_flush();
