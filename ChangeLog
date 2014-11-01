@@ -1,3 +1,14 @@
+2014-11-01 Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/cairo.trm (cairotrm_put_text) src/wxterminal/wxt_gui.cpp
+	(wxt_put_text):  Start each top level enhanced text recursion  using
+	the full font name given in "set term font 'foo'", rather than the
+	most recent font stored in the plot (which is only the font family
+	name, not bold/italic/other).  This maintains bold or italic in the
+	original font name, but I am not entirely convinced that it cannot
+	overwrite an intentional change in font family.
+	Bug #1505
+
 2014-10-31 Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/plot2d.c:  Issue a warning if someone tries to specify a
