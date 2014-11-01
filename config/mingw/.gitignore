@@ -4,6 +4,7 @@ VERSION
 *.co
 *.po
 *.exe
+*.map
 *.mnu
 *.ico
 *.chw
@@ -24,6 +25,10 @@ VERSION
 dist
 ja
 share
+moc_*.cpp
+qrc_*.cpp
+*.qm
+platforms
 *.depend
 *.layout
 obj
