@@ -573,6 +573,7 @@
 #define GP_INLINE _inline
 
 #define popen _popen
+#define __STDC_WANT_LIB_EXT1__ 1
 #define strnlen strnlen_s
 
 /* gnuplot.gih is not used by wgnuplot */

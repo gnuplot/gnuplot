@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: bf_test.c,v 1.12 2014/08/15 19:25:13 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: bf_test.c,v 1.13 2014/08/22 04:12:18 sfeam Exp $"); }
 #endif
 
 
@@ -109,17 +109,24 @@ main(void)
     int xsize, ysize;
     char buf[256];
     FILE *fout;
-/*  Create a few standard test interfaces */
+
+    /*  Create a few standard test interfaces */
 
     for (plot = 0; plot < NUM_PLOTS; plot++) {
 	xsize = (TheRange[plot].xmax - TheRange[plot].xmin) * ISOSAMPLES + 1;
 	ysize = (TheRange[plot].ymax - TheRange[plot].ymin) * ISOSAMPLES + 1;
 
+	sprintf(buf, "binary%d", plot + 1);
+	if (!(fout = fopen(buf, "wb"))) {
+	    fprintf(stderr, "Could not open output file\n");
+	    return EXIT_FAILURE;
+	}
+
 	rt = calloc(xsize, sizeof(float));
 	ct = calloc(ysize, sizeof(float));
 	m = calloc(xsize, sizeof(m[0]));
 	for (im = 0; im < xsize; im++) {
-		m[im] = calloc(ysize, sizeof(m[0]));
+		m[im] = calloc(ysize, sizeof(m[0][0]));
 	}
 
 	for (y = TheRange[plot].ymin, j = 0; j < ysize; j++, y += 1.0 / (double) ISOSAMPLES) {
@@ -133,13 +140,8 @@ main(void)
 	    }
 	}
 
-	sprintf(buf, "binary%d", plot + 1);
-	if (!(fout = fopen(buf, "wb"))) {
-	    fprintf(stderr, "Could not open output file\n");
-	    return -1;
-	} else {
-	    fwrite_matrix(fout, m, xsize, ysize, rt, ct);
-	}
+	fwrite_matrix(fout, m, xsize, ysize, rt, ct);
+
 	free(rt);
 	free(ct);
 	for (im = 0; im < xsize; im++)
@@ -148,6 +150,13 @@ main(void)
     }
 
     /* Show that it's ok to vary sampling rate, as long as x1<x2, y1<y2... */
+
+    sprintf(buf, "binary%d", plot + 1);
+    if (!(fout = fopen(buf, "wb"))) {
+	fprintf(stderr, "Could not open output file\n");
+	return EXIT_FAILURE;
+    }
+
     xsize = (TheRange[plot].xmax - TheRange[plot].xmin) * ISOSAMPLES + 1;
     ysize = (TheRange[plot].ymax - TheRange[plot].ymin) * ISOSAMPLES + 1;
 
@@ -155,7 +164,7 @@ main(void)
     ct = calloc(ysize, sizeof(float));
     m = calloc(xsize, sizeof(m[0]));
     for (im = 0; im < xsize; im++) {
-	    m[im] = calloc(ysize, sizeof(m[0]));
+	    m[im] = calloc(ysize, sizeof(m[0][0]));
     }
 
     for (y = TheRange[plot].ymin, j = 0; j < ysize; j++, y += 1.0 / (double) ISOSAMPLES) {
@@ -168,13 +177,8 @@ main(void)
 	}
     }
 
-    sprintf(buf, "binary%d", plot + 1);
-    if (!(fout = fopen(buf, "wb"))) {
-	fprintf(stderr, "Could not open output file\n");
-	return -1;
-    } else {
-	fwrite_matrix(fout, m, xsize, ysize, rt, ct);
-    }
+    fwrite_matrix(fout, m, xsize, ysize, rt, ct);
+
     free(rt);
     free(ct);
     for (im = 0; im < xsize; im++)

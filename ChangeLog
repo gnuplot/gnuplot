@@ -1,3 +1,23 @@
+2014-11-02  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* config/config.oww: If we're going to use strnlen_s for strnlen,
+	must define according C99 library extension macro.
+
+	* src/set.c (set_dashtype): Command input following the 'default'
+	option would cause a crash by double-deleting from linked list.
+	(parse_histogramstyle): Option "title" is not protected against
+	multiple use.  This might cause double-free of font field.
+
+	* src/bf_test.c (main): Move file-open error handling further up,
+	to avoid (harmless) memory leak.  Use standard failure return
+	instead of magic constant.  Allocations were relying on
+	sizeof(float)==sizeof(float *).
+
+	* src/getcolor.c (GROW_GRADIENT): Query realloc()ed pointer for its
+	own type's size; safer than making assumptions about it.
+	(approximate_palette): Dito; and in this case the type was
+	actually wrong.
+
 2014-11-01 Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/cairo.trm (cairotrm_put_text) src/wxterminal/wxt_gui.cpp

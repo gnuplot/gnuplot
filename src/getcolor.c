@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: getcolor.c,v 1.35 2013/10/24 05:45:17 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: getcolor.c,v 1.36 2013/10/25 15:37:21 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - getcolor.c */
@@ -463,8 +463,7 @@ is_extremum(rgb_color left, rgb_color mid, rgb_color right)
 #define GROW_GRADIENT(n) do {						\
     if(cnt == gradient_size) {						\
 	gradient_size += (n);						\
-	gradient = (gradient_struct*)					\
-	    realloc(gradient, gradient_size * sizeof(gradient_struct));	\
+	gradient = realloc(gradient, gradient_size * sizeof(*gradient));\
     }									\
 } while(0)
 
@@ -522,8 +521,7 @@ approximate_palette(t_sm_palette *palette, int samples,
 	    gray = ((double) (i + j)) / samples;
 	    if (j == colors_size) {
 	        colors_size += 50;
-		colors = (rgb_color *)
-		    realloc(colors, colors_size*sizeof(gradient_struct));
+		colors = realloc(colors, colors_size*sizeof(*colors));
 	    }
 	    color_components_from_gray(gray, colors + j);
 
