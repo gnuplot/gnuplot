@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.256.2.4 2014/09/27 05:49:22 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.256.2.5 2014/10/08 22:55:10 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -1457,6 +1457,10 @@ save_data_func_style(FILE *fp, const char *which, enum PLOT_STYLE style)
 
 void save_dashtype(FILE *fp, int d_type, const t_dashtype *dt)
 {
+    /* this is indicated by LT_AXIS (lt 0) instead */
+    if (d_type == DASHTYPE_AXIS)
+	return;
+
     fprintf(fp, " dashtype");
     if (d_type == DASHTYPE_CUSTOM) {
 	if (dt->dstring[0] != '\0')

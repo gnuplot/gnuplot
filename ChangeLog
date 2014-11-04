@@ -12,6 +12,9 @@
 	NaN also.  Before this side_effect would have received some other,
 	incorrect, numerical value.
 
+	* src/save.c (save_dashtype):  dashtype -1 is an internal flag; do not
+	save it to an external file.
+
 2014-11-01 Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/cairo.trm (cairotrm_put_text) src/wxterminal/wxt_gui.cpp
