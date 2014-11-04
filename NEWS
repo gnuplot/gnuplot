@@ -9,6 +9,7 @@ Changes in 5.0.rc3
 * FIX lua terminal support for LT_NODRAW, RGBA linecolors
 * FIX stats code was confusing x- and y- dimensions of matrix data
 * FIX track :Italic and :Bold given in "set term" for cairo terminals
+* FIX if $2 is NaN, plot FOO using 1:(oops=f($2)) should set oops to NaN
 
 Changes in 5.0.rc2
 ==================
