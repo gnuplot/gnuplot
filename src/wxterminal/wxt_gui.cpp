@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.cpp,v 1.133 2014/10/31 15:55:48 markisch Exp $
+ * $Id: wxt_gui.cpp,v 1.134 2014/11/01 05:50:27 sfeam Exp $
  */
 
 /* GNUPLOT - wxt_gui.cpp */
@@ -177,10 +177,8 @@ BEGIN_EVENT_TABLE( wxtFrame, wxFrame )
 	EVT_CLOSE( wxtFrame::OnClose )
 	EVT_SIZE( wxtFrame::OnSize )
 	EVT_TOOL( Toolbar_ExportToFile, wxtFrame::OnExport )
-#if (0)
 	/* Clipboard widget (should consolidate this with Export to File) */
 	EVT_TOOL( Toolbar_CopyToClipboard, wxtFrame::OnCopy )
-#endif
 #ifdef USE_MOUSE
 	EVT_TOOL( Toolbar_Replot, wxtFrame::OnReplot )
 	EVT_TOOL( Toolbar_ToggleGrid, wxtFrame::OnToggleGrid )
@@ -425,14 +423,12 @@ wxtFrame::wxtFrame( const wxString& title, wxWindowID id )
 	/* With wxMSW, default toolbar size is only 16x15. */
 	// toolbar->SetToolBitmapSize(wxSize(16,16));
 
+	toolbar->AddTool(Toolbar_CopyToClipboard, wxT("Copy"),
+				wxArtProvider::GetBitmap(wxART_PASTE, wxART_TOOLBAR),
+				wxT("Copy plot to clipboard"));
 	toolbar->AddTool(Toolbar_ExportToFile, wxT("Export"),
 				wxArtProvider::GetBitmap(wxART_FILE_SAVE_AS, wxART_TOOLBAR),
 				wxT("Export plot to file"));
-#if (0)
-	/* FIXME: Consolidate this with Export */
-	toolbar->AddTool(Toolbar_CopyToClipboard, wxT("Copy"),
-				*(toolBarBitmaps[0]), wxT("Copy plot to clipboard"));
-#endif
 #ifdef USE_MOUSE
 #ifdef __WXOSX_COCOA__
 	/* wx 2.9 Cocoa bug & crash workaround for Lion, which does not have toolbar separators anymore */
@@ -497,10 +493,13 @@ wxtFrame::~wxtFrame()
  */
 void wxtFrame::OnExport( wxCommandEvent& WXUNUSED( event ) )
 {
+	static int userFilterIndex = 0;
+
 	wxFileDialog exportFileDialog (this, wxT("Exported File Format"),
 		wxGetCwd(), wxT(""),
 		wxT("PNG files (*.png)|*.png|PDF files (*.pdf)|*.pdf|SVG files (*.svg)|*.svg"),
-		wxFD_SAVE|wxFD_OVERWRITE_PROMPT);
+		wxFD_SAVE|wxFD_OVERWRITE_PROMPT|wxFD_CHANGE_DIR);
+	exportFileDialog.SetFilterIndex(userFilterIndex);
 
 	if (exportFileDialog.ShowModal() == wxID_CANCEL)
 		return;
@@ -579,6 +578,9 @@ void wxtFrame::OnExport( wxCommandEvent& WXUNUSED( event ) )
 		fprintf(stderr, "Can't save in that file type.\n");
 		break;
 	}
+
+	/* Save user environment selections. */
+	userFilterIndex = exportFileDialog.GetFilterIndex();
 }
 
 /* toolbar event : Copy to clipboard
