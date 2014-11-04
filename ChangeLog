@@ -17,6 +17,9 @@
 	NaN also.  Before this side_effect would have received some other,
 	incorrect, numerical value.
 
+	* src/save.c (save_dashtype):  dashtype -1 is an internal flag; do not
+	save it to an external file.
+
 2014-11-02  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* config/config.oww: If we're going to use strnlen_s for strnlen,
