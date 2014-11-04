@@ -2,13 +2,15 @@
 
 	* src/datafile.c (f_dollar f_column):  When a data field containing NaN
 	is encountered, df_readline returns DF_UNDEFINED to the caller.
-	This is sufficient for plotting that point per se, but if the value is
-	also used in evaluation of an expression with a side effect then this
-	undefined status flag is not available. For consistency we now pass NaN
-	to the expression evaluation code as well.  E.g.
+	This is sufficient to handle plotting that point per se, but if the
+	value is also used in evaluation of an arithmetic expression with a side
+	effect then this undefined status flag is not available. For consistency
+	we now pass NaN to the expression evaluation code as well.  E.g.
 		plot FOO using 1:(side_effect=f($2))
 	could leave some random (probably left-over) value in side_effect.
-	Now if $2 is NaN then side_effect becomes NaN also.
+	Now if $2 is NaN and for example f(x) = (x+foo) then side_effect becomes
+	NaN also.  Before this side_effect would have received some other,
+	incorrect, numerical value.
 
 2014-11-02  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
