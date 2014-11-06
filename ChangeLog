@@ -1,3 +1,15 @@
+2014-11-06 Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/time.c (gstrftime xstrftime) docs/gnuplotdoc demo/timedat.dem:
+	Introduce a new time format modifier 't', used to distinguish dates
+	from times.  This allows formatting time data as hours/minutes/seconds
+	relative to time=0 rather than as a calendar date.  Compare these
+	representations of the stored value -3672.50 seconds:
+	    default tic format     # "12/31/69 \n 22:58"
+	    format "%tH:%tM:%tS"   # "-01:01:12"
+	    format "%.2tH hours"   # "-1.02 hours"
+	    format "%tM:%.2tS"     # "-61:12.50"
+
 2014-11-04  Daniel J Sebald <daniel.sebald@ieee.org>
 
 	* src/wxterminal/wxt_gui.cpp: Restore Copy-to-Clipboard option in wxt

@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.922 2014/10/16 16:45:15 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.923 2014/10/29 03:11:51 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -8616,8 +8616,7 @@ Ffigure_missing
  or with the `set tics format` or individual `set {axis}tics format` commands.
 
  Syntax:
-       set format {<axes>} {"<format-string>"}
-       set format {<axes>} {'<format-string>'}
+       set format {<axes>} {"<format-string>"} {numeric|timedate|geographic}
        show format
 
  where <axes> is either `x`, `y`, `xy`, `x2`, `y2`, `z`, `cb` or nothing
@@ -8830,7 +8829,7 @@ Ffigure_missing
        %y           year, 0-68 for 2000-2068, 69-99 for 1969-1999
        %Y           year, 4-digit
 #\begin{tabular}{|cl|} \hline
-#\multicolumn{2}{|c|}{Tic-mark label Date/Time Format Specifiers}\\
+#\multicolumn{2}{|c|}{Date Specifiers}\\
 #\hline \hline
 #Format & Explanation \\ \hline
 #\verb@%a@ & abbreviated name of day of the week \\
@@ -8896,7 +8895,7 @@ Ffigure_missing
 ^  <col align="left">
 ^</colgroup>
 ^<thead>
-^<tr>    <th>Format</th>    <th>Explanation</th></tr>
+^<tr>    <th>Date Format</th>    <th>Explanation</th></tr>
 ^</thead>
 ^<tbody>
 ^<tr>    <td><tt>%a</tt></td>    <td>abbreviated name of day of the week</td></tr>
@@ -8927,23 +8926,80 @@ Ffigure_missing
 ^</tbody>
 ^</table>
 
- Except for the non-numerical formats, these may be preceded by a "0" ("zero",
- not "oh") to pad the field length with leading zeroes, and a positive digit,
- to define the minimum field width (which will be overridden if the specified
- width is not large enough to contain the number).  The %S format also accepts
- a precision specifier so that fractional seconds can be written.
- There is a 24-character limit to the length of the printed text;
- longer strings will be truncated.
+ Numerical formats may be preceded by a "0" ("zero") to pad the field with
+ leading zeroes, and preceded by a positive digit to define the minimum field
+ width.  The %S, and %t formats also accept a precision specifier so that
+ fractional hours/minutes/seconds can be written.
 
- Examples:
+@start table - first is interactive cleartext form
+       Format       Explanation
+       %tH          +/- hours relative to time=0 (does not wrap at 24)
+       %tM          +/- minutes relative to time=0
+       %tS          +/- seconds associated with previous tH or tM field
+#\begin{tabular}{|cl|} \hline
+#\multicolumn{2}{|c|}{Time Specifiers}\\
+#\hline \hline
+#Format & Explanation \\ \hline
+#\verb@%tH@ & +/- hours relative to time=0 (does not wrap at 24) \\
+#\verb@%tM@ & +/- minutes relative to time=0 \\
+#\verb@%tS@ & +/- seconds associated with previous tH or tM field \\
+%c l .
+%Format@Explanation
+%_
+%%tH@+/- hours relative to time=0 (does not wrap at 24)
+%%tM@+/- minutes relative to time=0
+%%tS@+/- seconds associated with previous tH or tM field
+%_
+@end table
 
- Suppose the text is "76/12/25 23:11:11".  Then
-       set format x                 # defaults to "12/25/76" \n "23:11"
+
+^<table align="center" border="1" rules="groups" frame="hsides" cellpadding="3">
+^<colgroup>
+^  <col align="center">
+^  <col align="left">
+^</colgroup>
+^<thead>
+^<tr>    <th>Time Format</th>    <th>Explanation</th></tr>
+^</thead>
+^<tbody>
+^<tr>    <td><tt>%tH</tt></td>    <td>+/- hours relative to time=0 (does not wrap at 24)</td></tr>
+^<tr>    <td><tt>%tM</tt></td>    <td>+/- minutes relative to time=0</td></tr>
+^<tr>    <td><tt>%tS</tt></td>    <td>+/- seconds associated with previous tH or tM field</td></tr>
+^</tbody>
+^</table>
+
+5 Examples
+?commands set format date_specifiers examples
+?commands set format time_specifiers examples
+?set format date_specifiers examples
+?set format time_specifiers examples
+?set date_specifiers examples
+?set time_specifiers examples
+?date_specifiers examples
+?time_specifiers examples
+
+ Examples of date format:
+
+ Suppose the x value in seconds corresponds a time slightly before midnight
+ on 25 Dec 1976. The text printed for a tic label at this position would be
+
+       set format x                 # defaults to "12/25/76 \n 23:11"
        set format x "%A, %d %b %Y"  # "Saturday, 25 Dec 1976"
        set format x "%r %D"         # "11:11:11 pm 12/25/76"
 
- Suppose the text is "98/07/06 05:04:03.123456".  Then
-       set format x "%1y/%2m/%3d %01H:%02M:%06.3S"  # "98/ 7/  6 5:04:03.123"
+ Examples of time format:
+
+ The date format specifiers encode a time in seconds as a clock time on a 
+ particular day.  So hours run only from 0-23, minutes from 0-59, and negative
+ values correspond to dates prior to the epoch (1-Jan-1970). In order to report
+ a time value in seconds as some number of hours/minutes/seconds relative to a
+ time 0, use time formats %tH %tM %tS.  To report a value of -3672.50 seconds
+
+       set format x                 # default date format "12/31/69 \n 22:58"
+       set format x "%tH:%tM:%tS"   # "-01:01:12"
+       set format x "%.2tH hours"   # "-1.02 hours"
+       set format x "%tM:%.2tS"     # "-61:12.50"
+
 3 function style
 ?set function style
  This form of the command is deprecated. Please see `set style function`.
@@ -13055,18 +13111,19 @@ Ffigure_missing
 ?set xtics timedata
 ?xtics timedata tics
 ?timedata tics
- Times and dates are stored internally as a number of seconds.  Non-numeric
- time and date values are converted to seconds on input using the format
- specifiers in `timefmt`.  Axis tic position values and range limits also may be
+ Times and dates are stored internally as a number of seconds.
+
+ Input: Non-numeric time and date values are converted to seconds on input using
+ the format specifier in `timefmt`.  Axis positions and range limits also may be
  given as quoted dates or times interpreted using `timefmt`.
  If the <start>, <incr>, <end> form is used, <incr> must be in seconds.
  Use of `timefmt` to interpret input data, range, and tic positions is triggered
  by `set xdata time`.
  
- However axis tic labels are generated using a separate format specified either
+ Output: Axis tic labels are generated using a separate format specified either
  by `set format` or `set xtics format`.  By default the usual numeric format
  specifiers are expected (`set xtics numeric`).  Other options are geographic
- coordinates (`set xtics geographic`), or time or dates (`set xtics time`).
+ coordinates (`set xtics geographic`), or times or dates (`set xtics time`).
 
  Note: For backward compatibility with earlier gnuplot versions, the command
  `set xdata time` will implicitly also act do `set xtics time`, and `set xdata`

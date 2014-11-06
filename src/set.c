@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.467 2014/10/06 04:44:05 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.468 2014/11/02 22:42:46 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -5261,6 +5261,7 @@ set_allzeroaxis()
     set_zeroaxis(FIRST_Z_AXIS);
 }
 
+/* Implements 'set tics' 'set xtics' 'set ytics' etc */
 static int
 set_tic_prop(AXIS_INDEX axis)
 {
@@ -5368,6 +5369,8 @@ set_tic_prop(AXIS_INDEX axis)
 		    axis_array[axis].ticdef.font = NULL;
 		    axis_array[axis].ticdef.font = try_to_get_string();
 		}
+
+	    /* The geographic/timedate/numeric options are new in version 5 */
 	    } else if (almost_equals(c_token,"geo$graphic")) {
 		++c_token;
 		axis_array[axis].tictype = DT_DMS;
@@ -5377,6 +5380,7 @@ set_tic_prop(AXIS_INDEX axis)
 	    } else if (almost_equals(c_token,"numeric")) {
 		++c_token;
 		axis_array[axis].tictype = DT_NORMAL;
+
 	    } else if (equals(c_token,"format")) {
 		char *format;
 		++c_token;

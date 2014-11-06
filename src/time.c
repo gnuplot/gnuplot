@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: time.c,v 1.27 2013/07/03 14:05:40 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: time.c,v 1.28 2014/01/27 21:53:16 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - time.c */
@@ -78,7 +78,7 @@ static int gdysize __PROTO((int yr));
 
 static int mndday[12] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
 
-static size_t xstrftime __PROTO((char *buf, size_t bufsz, const char *fmt, struct tm * tm, double usec));
+static size_t xstrftime __PROTO((char *buf, size_t bufsz, const char *fmt, struct tm * tm, double usec, double fulltime));
 
 /* days in year */
 static int
@@ -327,7 +327,7 @@ gstrftime(char *s, size_t bsz, const char *fmt, double l_clock)
 
     usec = l_clock - (double)floor(l_clock);
 
-    return xstrftime(s, bsz, fmt, &tm, usec);
+    return xstrftime(s, bsz, fmt, &tm, usec, l_clock);
 }
 
 
@@ -337,18 +337,20 @@ xstrftime(
     size_t bsz,			/* space available */
     const char *fmt,
     struct tm *tm,
-    double usec)
+    double usec,
+    double fulltime)
 {
     size_t l = 0;			/* chars written so far */
-
+    int incr = 0;			/* chars just written */
     char *s = str;
+    TBOOLEAN sign_printed = FALSE;
 
-    memset(s, '\0', bsz);
+    memset(str, '\0', bsz);
 
     while (*fmt != '\0') {
 	if (*fmt != '%') {
-	    if (l >= bsz)
-		return (0);
+	    if (l >= bsz-1)
+		return 0;
 	    *s++ = *fmt++;
 	    l++;
 	} else {
@@ -400,8 +402,8 @@ xstrftime(
 			if (!z)					\
 			    z=(dz);				\
 		    }						\
-		    CHECK_SPACE(w);				\
-		    sprintf(s, z ? "%0*d" : "%*d", w, (x));	\
+		    incr = snprintf(s, bsz-l-1, z ? "%0*d" : "%*d", w, (x));	\
+		    CHECK_SPACE(incr);				\
 		} while(0)
 
 	    case '%':
@@ -426,27 +428,18 @@ xstrftime(
 		COPY_STRING(full_month_names[tm->tm_mon]);
 		break;
 
-
-#if 0
-		/* %x not currently supported, so neither is c */
-	    case 'c':
-		if (!xstrftime(s, bsz - l, "%x %X", tm, 0.))
-		    return (0);
-		break;
-#endif
-
 	    case 'd':
 		FORMAT_STRING(1, 2, tm->tm_mday);	/* %02d */
 		break;
 
 	    case 'D':
-		if (!xstrftime(s, bsz - l, "%m/%d/%y", tm, 0.))
-		    return (0);
+		if (!xstrftime(s, bsz - l, "%m/%d/%y", tm, 0., fulltime))
+		    return 0;
 		break;
 
 	    case 'F':
-		if (!xstrftime(s, bsz - l, "%Y-%m-%d", tm, 0.))
-		    return (0);
+		if (!xstrftime(s, bsz - l, "%Y-%m-%d", tm, 0., fulltime))
+		    return 0;
 		break;
 
 	    case 'H':
@@ -484,13 +477,13 @@ xstrftime(
 		break;
 
 	    case 'r':
-		if (!xstrftime(s, bsz - l, "%I:%M:%S %p", tm, 0.))
-		    return (0);
+		if (!xstrftime(s, bsz - l, "%I:%M:%S %p", tm, 0., fulltime))
+		    return 0;
 		break;
 
 	    case 'R':
-		if (!xstrftime(s, bsz - l, "%H:%M", tm, 0.))
-		    return (0);
+		if (!xstrftime(s, bsz - l, "%H:%M", tm, 0., fulltime))
+		    return 0;
 		break;
 
 	    case 's':
@@ -512,9 +505,76 @@ xstrftime(
 		break;
 
 	    case 'T':
-		if (!xstrftime(s, bsz - l, "%H:%M:%S", tm, 0.))
-		    return (0);
+		if (!xstrftime(s, bsz - l, "%H:%M:%S", tm, 0., fulltime))
+		    return 0;
 		break;
+
+	    case 't':		/* Time (as opposed to Date) formats */
+		{
+		int tminute, tsecond;
+
+		    switch (*fmt++) {
+		    case 'H':
+			/* +/- fractional hours (not wrapped at 24h) */
+			if (p > 0) {
+			    incr = snprintf(s, bsz-l-1, "%*.*f", w, p, fulltime/3600.);
+			    CHECK_SPACE(incr);
+			    break;
+			}
+			/* Set flag in case minutes come next */
+			if (fulltime < 0) {
+			    CHECK_SPACE(1);	/* the minus sign */
+			    sign_printed = TRUE;
+			    *s++ = '-';
+			    l++;
+			}
+			/* +/- integral hour truncated toward zero */
+			sprintf(s, "%0*d", w, (int)floor(fabs(fulltime/3600.)));
+			break;
+		    case 'M':
+			/* +/- fractional minutes (not wrapped at 60m) */
+			if (p > 0) {
+			    incr = snprintf(s, bsz-l-1, "%*.*f", w, p,
+				    sign_printed ? fabs(fulltime)/60. : fulltime/60.);
+			    CHECK_SPACE(incr);
+			    break;
+			}
+			/* +/- integral minute truncated toward zero */
+			tminute = floor(60. * (fabs(fulltime/3600.) - floor(fabs(fulltime/3600.))));
+			if (fulltime < 0) {
+			    if (!sign_printed) {
+				sign_printed = TRUE;
+				*s++ = '-';
+				l++;
+			    }
+			}
+			FORMAT_STRING(1, 2, tminute);	/* %02d */
+			break;
+		    case 'S':
+			/* +/- fractional seconds */
+			tsecond = floor(60. * (fabs(fulltime/60.) - floor(fabs(fulltime/60.))));
+			if (fulltime < 0) {
+			    if (usec > 0)
+				usec = 1.0 - usec;
+			    if (!sign_printed) {
+				*s++ = '-';
+				l++;
+			    }
+			}
+			FORMAT_STRING(1, 2, tsecond);	/* %02d */
+			if (p > 0) {
+			    double base = pow(10., (double)p);
+			    int msec = floor(0.5 + base * usec);
+			    char *f = &s[strlen(s)];
+			    CHECK_SPACE(p+1);
+			    sprintf(f, ".%0*d", p, msec<(int)base?msec:(int)base-1);
+			}
+			break;
+		    default:
+			break;
+		    }
+		    break;
+		}
 
 	    case 'W':		/* mon 1 day of week */
 		{
@@ -580,11 +640,6 @@ xstrftime(
 		FORMAT_STRING(1, 4, tm->tm_year);	/* %04d */
 		break;
 
-#if 0
-	    case 'Z':
-		COPY_STRING(tm->tm_zone);
-		break;
-#endif
 	    }			/* switch */
 
 	    while (*s != '\0') {
