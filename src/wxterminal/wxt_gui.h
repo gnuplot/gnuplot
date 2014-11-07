@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.h,v 1.48 2014/06/20 22:58:46 sfeam Exp $
+ * $Id: wxt_gui.h,v 1.48.2.1 2014/10/26 21:19:32 sfeam Exp $
  */
 
 /* GNUPLOT - wxt_gui.h */
@@ -80,6 +80,9 @@
 /* clipboard functionnality */
 #include <wx/dataobj.h>
 #include <wx/clipbrd.h>
+
+/* Save File dialog */
+#include <wx/filedlg.h>
 
 /* wxImage facility */
 #include <wx/image.h>
@@ -175,6 +178,14 @@ extern "C" {
 
 /* for cairo_t */
 # include <cairo.h>
+
+#ifdef CAIRO_HAS_SVG_SURFACE
+#include <cairo/cairo-svg.h>
+#endif
+
+#ifdef CAIRO_HAS_PDF_SURFACE
+#include <cairo/cairo-pdf.h>
+#endif
 
 # ifdef USE_GTK
 #  include <gdk/gdk.h>
@@ -475,6 +486,7 @@ public:
 	void OnClose( wxCloseEvent& event );
 	void OnSize( wxSizeEvent& event );
 	void OnCopy( wxCommandEvent& event );
+	void OnExport( wxCommandEvent& event );
 #ifdef USE_MOUSE
 	void OnReplot( wxCommandEvent& event );
 	void OnToggleGrid( wxCommandEvent& event );
@@ -505,6 +517,7 @@ private:
 enum {
 /* start at wxID_HIGHEST to avoid collisions */
 Toolbar_CopyToClipboard = wxID_HIGHEST,
+Toolbar_ExportToFile,
 Toolbar_Replot,
 Toolbar_ToggleGrid,
 Toolbar_ZoomPrevious,

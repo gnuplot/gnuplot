@@ -1,6 +1,7 @@
 Changes in 5.0.rc3
 =====================
 
+* ADD export-to-file toolbar widget for wxt terminal
 * CHANGE revised v5 "fit" syntax does not match -rc1 and -rc2
 * CHANGE auto-detect and accept v4 "fit" syntax
 * CHANGE remove obsolete terminals aed and v384
