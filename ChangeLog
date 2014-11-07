@@ -1,3 +1,8 @@
+2014-11-07 Akira Kakuto <kakuto@fuk.kindai.ac.jp>
+
+	* term/luz/gnuplot-tikz.lua:  Use \message rather than \PackageError
+	because not all TeX variants provide the latter.
+
 2014-11-06 Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/time.c (gstrftime xstrftime) docs/gnuplotdoc demo/timedat.dem:

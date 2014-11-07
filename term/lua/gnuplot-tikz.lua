@@ -37,7 +37,7 @@
 
 
 
-  $Date: 2014/10/19 19:56:49 $
+  $Date: 2014/10/29 03:27:47 $
   $Author: sfeam $
   $Rev: 100 $
 
@@ -81,7 +81,7 @@ pgf.DEFAULT_FONT_V_CHAR = 308
 pgf.STYLE_FILE_BASENAME = "gnuplot-lua-tikz"  -- \usepackage{gnuplot-lua-tikz}
 
 pgf.REVISION = string.sub("$Rev: 100 $",7,-3)
-pgf.REVISION_DATE = string.gsub("$Date: 2014/10/19 19:56:49 $",
+pgf.REVISION_DATE = string.gsub("$Date: 2014/10/29 03:27:47 $",
                                 "$Date: ([0-9]+).([0-9]+).([0-9]+) .*","%1/%2/%3")
 
 pgf.styles = {}
@@ -663,7 +663,7 @@ f:write([[
 % check for the correct TikZ version
 \def\gpchecktikzversion#1.#2\relax{%
 \ifnum#1<2%
-  \PackageError{gnuplot-lua-tikz}{PGF/TikZ version >= 2.0 is required, but version \pgfversion\space was found}{}%
+  \message{PGF/TikZ version >= 2.0 is required,}
 \fi}
 \expandafter\gpchecktikzversion\pgfversion\relax
 
