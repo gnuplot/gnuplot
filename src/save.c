@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.256.2.5 2014/10/08 22:55:10 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.256.2.6 2014/11/05 05:00:42 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -57,7 +57,6 @@ static char *RCSid() { return RCSid("$Id: save.c,v 1.256.2.5 2014/10/08 22:55:10
 static void save_functions__sub __PROTO((FILE *));
 static void save_variables__sub __PROTO((FILE *));
 static void save_tics __PROTO((FILE *, AXIS_INDEX));
-static void save_position __PROTO((FILE *, struct position *, TBOOLEAN offset));
 static void save_zeroaxis __PROTO((FILE *,AXIS_INDEX));
 static void save_set_all __PROTO((FILE *));
 
@@ -221,9 +220,6 @@ set bar %f %s\n",
 
     for (axis = FIRST_AXES; axis < LAST_REAL_AXIS; axis++) {
 	if (axis == SECOND_Z_AXIS) continue;
-	if (strlen(axis_array[axis].timefmt))
-	    fprintf(fp, "set timefmt %s \"%s\"\n", axis_name(axis),
-		conv_text(axis_array[axis].timefmt));
 	if (axis == COLOR_AXIS) continue;
 	fprintf(fp, "set %sdata %s\n", axis_name(axis),
 		axis_array[axis].datatype == DT_TIMEDATE ? "time" :
@@ -302,9 +298,12 @@ set bar %f %s\n",
     }
     fprintf(fp, "\n");
 
-#define SAVE_FORMAT(axis)						\
-    fprintf(fp, "set format %s \"%s\"\n", axis_name(axis),	\
-	    conv_text(axis_array[axis].formatstring));
+#define SAVE_FORMAT(axis)					\
+    fprintf(fp, "set format %s \"%s\" %s\n", axis_name(axis),	\
+	    conv_text(axis_array[axis].formatstring),		\
+	    axis_array[axis].tictype == DT_DMS ? "geographic" :	\
+	    axis_array[axis].tictype == DT_TIMEDATE ? "timedate" : \
+	    "");
     SAVE_FORMAT(FIRST_X_AXIS );
     SAVE_FORMAT(FIRST_Y_AXIS );
     SAVE_FORMAT(SECOND_X_AXIS);
@@ -313,6 +312,8 @@ set bar %f %s\n",
     SAVE_FORMAT(COLOR_AXIS );
     SAVE_FORMAT(POLAR_AXIS );
 #undef SAVE_FORMAT
+
+    fprintf(fp, "set timefmt \"%s\"\n", timefmt);
 
     fprintf(fp, "set angles %s\n",
 	    (ang2rad == 1.0) ? "radians" : "degrees");
@@ -1105,7 +1106,7 @@ save_tics(FILE *fp, AXIS_INDEX axis)
 	}
     case TIC_SERIES:
 	if (axis_array[axis].ticdef.def.series.start != -VERYLARGE) {
-	    SAVE_NUM_OR_TIME(fp,
+	    save_num_or_time_input(fp,
 			     (double) axis_array[axis].ticdef.def.series.start,
 			     axis);
 	    putc(',', fp);
@@ -1113,7 +1114,7 @@ save_tics(FILE *fp, AXIS_INDEX axis)
 	fprintf(fp, "%g", axis_array[axis].ticdef.def.series.incr);
 	if (axis_array[axis].ticdef.def.series.end != VERYLARGE) {
 	    putc(',', fp);
-	    SAVE_NUM_OR_TIME(fp,
+	    save_num_or_time_input(fp,
 			     (double) axis_array[axis].ticdef.def.series.end,
 			     axis);
 	}
@@ -1145,7 +1146,7 @@ save_tics(FILE *fp, AXIS_INDEX axis)
 		continue;
 	    if (t->label)
 		fprintf(fp, "\"%s\" ", conv_text(t->label));
-	    SAVE_NUM_OR_TIME(fp, (double) t->position, axis);
+	    save_num_or_time_input(fp, (double) t->position, axis);
 	    if (t->level)
 		fprintf(fp, " %d", t->level);
 	    if (t->next) {
@@ -1158,6 +1159,21 @@ save_tics(FILE *fp, AXIS_INDEX axis)
 }
 
 void
+save_num_or_time_input(FILE *fp, double x, AXIS_INDEX axis)
+{
+    if (axis_array[axis].datatype == DT_TIMEDATE) {
+	char s[80];
+
+	putc('"', fp);
+	gstrftime(s,80,timefmt,(double)(x));
+	fputs(conv_text(s), fp);
+	putc('"', fp);
+    } else {
+	fprintf(fp,"%#g",x);
+    }
+}
+
+void
 save_style_parallel(FILE *fp)
 {
     fprintf(fp, "set style parallel %s ",
@@ -1166,7 +1182,7 @@ save_style_parallel(FILE *fp)
     fprintf(fp, "\n");
 }
 
-static void
+void
 save_position(FILE *fp, struct position *pos, TBOOLEAN offset)
 {
     assert(first_axes == 0 && second_axes == 1 && graph == 2 && screen == 3 &&
@@ -1178,10 +1194,36 @@ save_position(FILE *fp, struct position *pos, TBOOLEAN offset)
 	fprintf(fp, " offset ");
     }
 
+    /* Save in time coordinates if appropriate */
+    if (pos->scalex == first_axes) {
+	save_num_or_time_input(fp, pos->x, FIRST_X_AXIS);
+	fprintf(fp, ", ");
+    } else {
+	fprintf(fp, "%s%g, ", coord_msg[pos->scalex], pos->x);
+    }
+
+    if (pos->scaley == first_axes) {
+	if (pos->scaley != pos->scalex) fprintf(fp, "first ");
+	save_num_or_time_input(fp, pos->y, FIRST_Y_AXIS);
+	fprintf(fp, ", ");
+    } else {
+	fprintf(fp, "%s%g, ", 
+	    pos->scaley == pos->scalex ? "" : coord_msg[pos->scaley], pos->y);
+    }
+
+    if (pos->scalez == first_axes) {
+	if (pos->scalez != pos->scaley) fprintf(fp, "first ");
+	save_num_or_time_input(fp, pos->z, FIRST_Z_AXIS);
+    } else {
+	fprintf(fp, "%s%g", 
+	    pos->scalez == pos->scaley ? "" : coord_msg[pos->scalez], pos->z);
+    }
+#if (0) /* v4 code */
     fprintf(fp, "%s%g, %s%g, %s%g",
 	    pos->scalex == first_axes ? "" : coord_msg[pos->scalex], pos->x,
 	    pos->scaley == pos->scalex ? "" : coord_msg[pos->scaley], pos->y,
 	    pos->scalez == pos->scaley ? "" : coord_msg[pos->scalez], pos->z);
+#endif
 }
 
 
@@ -1203,30 +1245,30 @@ save_range(FILE *fp, AXIS_INDEX axis)
 	fprintf(fp, "set paxis %d range [ ", axis-PARALLEL_AXES+1);
     if (axis_array[axis].set_autoscale & AUTOSCALE_MIN) {
 	if (axis_array[axis].min_constraint & CONSTRAINT_LOWER ) {
-	    SAVE_NUM_OR_TIME(fp, axis_array[axis].min_lb, axis);
+	    save_num_or_time_input(fp, axis_array[axis].min_lb, axis);
 	    fputs(" < ", fp);
 	}
 	putc('*', fp);
 	if (axis_array[axis].min_constraint & CONSTRAINT_UPPER ) {
 	    fputs(" < ", fp);
-	    SAVE_NUM_OR_TIME(fp, axis_array[axis].min_ub, axis);
+	    save_num_or_time_input(fp, axis_array[axis].min_ub, axis);
 	}
     } else {
-	SAVE_NUM_OR_TIME(fp, axis_array[axis].set_min, axis);
+	save_num_or_time_input(fp, axis_array[axis].set_min, axis);
     }
     fputs(" : ", fp);
     if (axis_array[axis].set_autoscale & AUTOSCALE_MAX) {
 	if (axis_array[axis].max_constraint & CONSTRAINT_LOWER ) {
-	    SAVE_NUM_OR_TIME(fp, axis_array[axis].max_lb, axis);
+	    save_num_or_time_input(fp, axis_array[axis].max_lb, axis);
 	    fputs(" < ", fp);
 	}
 	putc('*', fp);
 	if (axis_array[axis].max_constraint & CONSTRAINT_UPPER ) {
 	    fputs(" < ", fp);
-	    SAVE_NUM_OR_TIME(fp, axis_array[axis].max_ub, axis);
+	    save_num_or_time_input(fp, axis_array[axis].max_ub, axis);
 	}
     } else {
-	SAVE_NUM_OR_TIME(fp, axis_array[axis].set_max, axis);
+	save_num_or_time_input(fp, axis_array[axis].set_max, axis);
     }
 
     fprintf(fp, " ] %sreverse %swriteback",
@@ -1240,11 +1282,11 @@ save_range(FILE *fp, AXIS_INDEX axis)
 	/* add current (hidden) range as comments */
 	fputs("  # (currently [", fp);
 	if (axis_array[axis].set_autoscale & AUTOSCALE_MIN) {
-	    SAVE_NUM_OR_TIME(fp, axis_array[axis].min, axis);
+	    save_num_or_time_input(fp, axis_array[axis].min, axis);
 	}
 	putc(':', fp);
 	if (axis_array[axis].set_autoscale & AUTOSCALE_MAX) {
-	    SAVE_NUM_OR_TIME(fp, axis_array[axis].max, axis);
+	    save_num_or_time_input(fp, axis_array[axis].max, axis);
 	}
 	fputs("] )\n", fp);
     } else

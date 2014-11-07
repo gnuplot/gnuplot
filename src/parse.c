@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: parse.c,v 1.88 2014/07/12 23:58:54 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: parse.c,v 1.88.2.1 2014/09/19 06:02:18 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - parse.c */
@@ -516,6 +516,10 @@ parse_primary_expression()
 		/* So far sprintf is the only built-in function */
 		/* with a variable number of arguments.         */
 		if (!strcmp(ft[whichfunc].f_name,"sprintf"))
+		    add_action(PUSHC)->v_arg = num_params;
+
+		/* v4 timecolumn only had 1 param; v5 has 2. Accept either */
+		if (!strcmp(ft[whichfunc].f_name,"timecolumn"))
 		    add_action(PUSHC)->v_arg = num_params;
 
 		/* The column() function has side effects requiring special handling */

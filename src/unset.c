@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.206.2.1 2014/09/21 04:54:33 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.206.2.2 2014/09/27 05:49:23 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -1539,22 +1539,8 @@ unset_ticslevel()
 static void
 unset_timefmt()
 {
-    int axis;
-
-    if (END_OF_COMMAND)
-	for (axis=0; axis < AXIS_ARRAY_SIZE; axis++) {
-	    free(axis_array[axis].timefmt);
-	    axis_array[axis].timefmt = gp_strdup(TIMEFMT);
-	}
-    else if ((axis=lookup_table(axisname_tbl, c_token)) >= 0) {
-	free(axis_array[axis].timefmt);
-	axis_array[axis].timefmt = gp_strdup(TIMEFMT);
-	c_token++;
-    }
-    else
-	/* int_error() from inside 'reset' would cause problems */
-	int_warn(c_token, "expected optional axis name");
-
+    free(timefmt);
+    timefmt = gp_strdup(TIMEFMT);
 }
 
 
@@ -1594,6 +1580,7 @@ static void
 unset_timedata(AXIS_INDEX axis)
 {
     axis_array[axis].datatype = DT_NORMAL;
+    axis_array[axis].tictype = DT_NORMAL;
 }
 
 
@@ -1750,7 +1737,6 @@ reset_command()
 
 	/* Free contents before overwriting with default values */
 	free(axis_array[axis].formatstring);
-	free(axis_array[axis].timefmt);
 	if (axis_array[axis].link_udf)
 	    free(axis_array[axis].link_udf->at);
 	free_marklist(axis_array[axis].ticdef.def.user);

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.459.2.4 2014/09/27 05:49:22 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.459.2.5 2014/10/02 20:13:30 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -1886,52 +1886,57 @@ void
 set_format()
 {
     TBOOLEAN set_for_axis[AXIS_ARRAY_SIZE] = AXIS_ARRAY_INITIALIZER(FALSE);
-    int axis;
+    AXIS_INDEX axis;
+    char *format;
+    td_type tictype = DT_UNINITIALIZED;
 
     c_token++;
     if ((axis = lookup_table(axisname_tbl, c_token)) >= 0) {
 	set_for_axis[axis] = TRUE;
 	c_token++;
     } else if (equals(c_token,"xy") || equals(c_token,"yx")) {
-	set_for_axis[FIRST_X_AXIS]
-	    = set_for_axis[FIRST_Y_AXIS]
-	    = TRUE;
+	set_for_axis[FIRST_X_AXIS] = set_for_axis[FIRST_Y_AXIS] = TRUE;
 	c_token++;
     } else {
-	/* Assume he wants all */
+	/* Set all of them */
 	for (axis = 0; axis < AXIS_ARRAY_SIZE; axis++)
 	    set_for_axis[axis] = TRUE;
     }
 
     if (END_OF_COMMAND) {
-	SET_DEFFORMAT(FIRST_X_AXIS , set_for_axis);
-	SET_DEFFORMAT(FIRST_Y_AXIS , set_for_axis);
-	SET_DEFFORMAT(FIRST_Z_AXIS , set_for_axis);
-	SET_DEFFORMAT(SECOND_X_AXIS, set_for_axis);
-	SET_DEFFORMAT(SECOND_Y_AXIS, set_for_axis);
-	SET_DEFFORMAT(COLOR_AXIS   , set_for_axis);
-	SET_DEFFORMAT(POLAR_AXIS   , set_for_axis);
-    } else {
-	char *format = try_to_get_string();
-	if (!format)
-	    int_error(c_token, "expecting format string");
-
-#define SET_FORMATSTRING(axis)							\
-	if (set_for_axis[axis]) {						\
-		free(axis_array[axis].formatstring);				\
-		axis_array[axis].formatstring = gp_strdup(format);		\
+	for (axis = FIRST_AXES; axis <= POLAR_AXIS; axis++) {
+	    if (set_for_axis[axis]) {
+		free(axis_array[axis].formatstring);
+		axis_array[axis].formatstring = gp_strdup(DEF_FORMAT);
+		axis_array[axis].tictype = DT_NORMAL;
+	    }
 	}
-	SET_FORMATSTRING(FIRST_X_AXIS);
-	SET_FORMATSTRING(FIRST_Y_AXIS);
-	SET_FORMATSTRING(FIRST_Z_AXIS);
-	SET_FORMATSTRING(SECOND_X_AXIS);
-	SET_FORMATSTRING(SECOND_Y_AXIS);
-	SET_FORMATSTRING(COLOR_AXIS);
-	SET_FORMATSTRING(POLAR_AXIS);
-#undef SET_FORMATSTRING
-
-	free(format);
+	return;
     }
+
+    if (!(format = try_to_get_string()))
+	int_error(c_token, "expecting format string");
+
+    if (almost_equals(c_token,"time$date")) {
+	tictype = DT_TIMEDATE;
+	c_token++;
+    } else if (almost_equals(c_token,"geo$graphic")) {
+	tictype = DT_DMS;
+	c_token++;
+    } else if (almost_equals(c_token,"num$eric")) {
+	tictype = DT_NORMAL;
+	c_token++;
+    }
+
+    for (axis = FIRST_AXES; axis <= POLAR_AXIS; axis++) {
+	if (set_for_axis[axis]) {
+	    free(axis_array[axis].formatstring);
+	    axis_array[axis].formatstring = gp_strdup(format);
+	    if (tictype != DT_UNINITIALIZED)
+		axis_array[axis].tictype = tictype;
+	}
+    }
+    free(format);
 }
 
 
@@ -4947,35 +4952,21 @@ set_xyplane()
 /* Process 'set timefmt' command */
 /* HBB 20000507: changed this to a per-axis setting. I.e. you can now
  * have separate timefmt parse strings, different axes */
+/* V5 Oct 2014: But that was never documented, and makes little sense since
+ * the input format is a property of the data file, not the graph axis.
+ * Revert to a single global default timefmt as documented.
+ * If the default is not sufficient, use timecolumn(N,"format") on input.
+ * Use "set {axis}tics format" to control the output format.
+ */
 static void
 set_timefmt()
 {
-    int axis;
-    char *newformat = NULL;
-
     c_token++;
-    if (END_OF_COMMAND) {
-	/* set all axes to default */
-	for (axis = 0; axis < AXIS_ARRAY_SIZE; axis++) {
-	    free(axis_array[axis].timefmt);
-	    axis_array[axis].timefmt = gp_strdup(TIMEFMT);
-	}
-    } else {
-	if ((axis = lookup_table(axisname_tbl, c_token)) >= 0) {
-	    c_token++;
-	    newformat = try_to_get_string();
-	    free(axis_array[axis].timefmt);
-	    axis_array[axis].timefmt = gp_strdup(newformat);
-	} else {
-	    newformat = try_to_get_string();
-	    for (axis = 0; axis < AXIS_ARRAY_SIZE; axis++) {
-		free(axis_array[axis].timefmt);
-		axis_array[axis].timefmt = gp_strdup(newformat);
-	    }
-	}
-	if (!newformat)
-	    int_error(c_token, "time format string expected");
-	free(newformat);
+    free(timefmt);
+    timefmt = try_to_get_string();
+    if (!timefmt) {
+	timefmt = gp_strdup(TIMEFMT);
+	int_error(c_token, "expecting form for timedata input");
     }
 }
 
@@ -5147,6 +5138,9 @@ set_timedata(AXIS_INDEX axis)
 	axis_array[axis].datatype = DT_DMS;
 	c_token++;
     }
+    /* FIXME: this provides approximate backwards compatibility */
+    /*        but may be more trouble to explain than it's worth */
+    axis_array[axis].tictype = axis_array[axis].datatype;
 }
 
 
@@ -5266,43 +5260,7 @@ set_allzeroaxis()
     set_zeroaxis(FIRST_Z_AXIS);
 }
 
-/*********** Support functions for set_command ***********/
-
-/*
- * The set.c PROCESS_TIC_PROP macro has the following characteristics:
- *   (a) options must in the correct order
- *   (b) 'set xtics' (no option) resets only the interval (FREQ)
- *       {it will also negate NO_TICS, see (d)}
- *   (c) changing any property also resets the interval to automatic
- *   (d) set no[xy]tics; set [xy]tics changes border to nomirror, rather
- *       than to the default, mirror.
- *   (e) effect of 'set no[]tics; set []tics border ...' is compiler
- *       dependent;  if '!(TICS)' is evaluated first, 'border' is an
- *       undefined variable :-(
- *
- * This function replaces the macro, and introduces a new option
- * 'au$tofreq' to give somewhat different behaviour:
- *   (a) no change
- *   (b) 'set xtics' (no option) only affects NO_TICS;  'autofreq' resets
- *       the interval calulation to automatic
- *   (c) the interval mode is not affected by changing some other option
- *   (d) if NO_TICS, set []tics will restore defaults (borders, mirror
- *       where appropriate)
- *   (e) if (NO_TICS), border option is processed.
- *
- *  A 'default' option could easily be added to reset all options to
- *  the initial values - mostly book-keeping.
- *
- *  To retain tic properties after setting no[]tics may also be
- *  straightforward (save value as negative), but requires changes
- *  in other code ( e.g. for  'if (xtics)', use 'if (xtics > 0)'
- */
-
-/*    generates PROCESS_TIC_PROP strings from tic_side, e.g. "x2"
- *  STRING, NOSTRING, MONTH, NOMONTH, DAY, NODAY, MINISTRING, NOMINI
- *  "nox2t$ics"     "nox2m$tics"  "nox2d$tics"    "nomx2t$ics"
- */
-
+/* Implements 'set tics' 'set xtics' 'set ytics' etc */
 static int
 set_tic_prop(AXIS_INDEX axis)
 {
@@ -5410,6 +5368,18 @@ set_tic_prop(AXIS_INDEX axis)
 		    axis_array[axis].ticdef.font = NULL;
 		    axis_array[axis].ticdef.font = try_to_get_string();
 		}
+
+	    /* The geographic/timedate/numeric options are new in version 5 */
+	    } else if (almost_equals(c_token,"geo$graphic")) {
+		++c_token;
+		axis_array[axis].tictype = DT_DMS;
+	    } else if (almost_equals(c_token,"time$date")) {
+		++c_token;
+		axis_array[axis].tictype = DT_TIMEDATE;
+	    } else if (almost_equals(c_token,"numeric")) {
+		++c_token;
+		axis_array[axis].tictype = DT_NORMAL;
+
 	    } else if (equals(c_token,"format")) {
 		char *format;
 		++c_token;

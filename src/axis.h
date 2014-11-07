@@ -1,5 +1,5 @@
 /*
- * $Id: axis.h,v 1.103 2014/06/14 15:32:58 sfeam Exp $
+ * $Id: axis.h,v 1.103.2.1 2014/09/27 05:49:21 sfeam Exp $
  *
  */
 
@@ -93,7 +93,8 @@ typedef enum en_ticseries_type {
 typedef enum {
     DT_NORMAL=0,		/* default; treat values as pure numeric */
     DT_TIMEDATE,		/* old datatype */
-    DT_DMS			/* degrees minutes seconds */
+    DT_DMS,			/* degrees minutes seconds */
+    DT_UNINITIALIZED
 } td_type;
 
 /* Defines one ticmark for TIC_USER style.
@@ -246,9 +247,9 @@ typedef struct axis {
     struct udft_entry *link_udf;
 
 /* time/date axis control */
-    td_type datatype;		/* DT_NORMAL | DT_TIMEDATE | DT_DMS */
+    td_type datatype;		/* {DT_NORMAL|DT_TIMEDATE} controls _input_ */
+    td_type tictype;		/* {DT_NORMAL|DT_TIMEDATE|DT_DMS} controls _output_ */
     char *formatstring;		/* the format string for output */
-    char *timefmt;		/* format string for time input */
 
 /* ticmark control variables */
     int ticmode;		/* tics on border/axis? mirrored? */
@@ -285,8 +286,8 @@ typedef struct axis {
 	0,        		/* zero axis position */		    \
 	FALSE, 0.0, 0.0,	/* log, base, log(base) */		    \
 	FALSE, NULL,		/* linked_to_primary, link function */      \
-	DT_NORMAL,		/* datatype */			            \
-	NULL, NULL,     	/* output format, timefmt */		    \
+	DT_NORMAL,		/* datatype for input */	            \
+	DT_NORMAL, NULL,      	/* tictype for output, output format, */    \
 	NO_TICS,		/* tic output positions (border, mirror) */ \
 	DEFAULT_AXIS_TICDEF,	/* tic series definition */		    \
 	0, FALSE, FALSE, 	/* tic_rotate, grid{major,minor} */	    \
@@ -327,6 +328,7 @@ extern const struct ticdef default_axis_ticdef;
 
 /* default parse timedata string */
 #define TIMEFMT "%d/%m/%y,%H:%M"
+extern char *timefmt;
 
 /* axis labels */
 extern const text_label default_axis_label;
@@ -491,7 +493,7 @@ do {									\
 	struct tm tm;							\
 	double usec;							\
 	char *ss = try_to_get_string();					\
-	if (gstrptime(ss,axis_array[axis].timefmt,&tm,&usec))		\
+	if (gstrptime(ss,timefmt,&tm,&usec))				\
 	    (store) = (double) gtimegm(&tm) + usec;			\
 	free(ss);							\
     } else {								\
@@ -628,13 +630,6 @@ do {									  \
 #define AXIS_ARRAY_INITIALIZER(value) {			\
     value, value, value, value, value,			\
 	value, value, value, value, value, value }
-
-/* used by set.c */
-#define SET_DEFFORMAT(axis, flag_array)				\
-	if (flag_array[axis]) {					\
-	    free(axis_array[axis].formatstring);		\
-	    axis_array[axis].formatstring = gp_strdup(DEF_FORMAT);	\
-	}
 
 /* FIXME: replace by a subroutine? */
 #define clear_sample_range(axis) do {				\

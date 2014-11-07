@@ -1,7 +1,13 @@
 Changes in 5.0.rc3
 =====================
 
-* ADD export-to-file toolbar widget for wxt terminal
+* NEW new command set {xyz}tics {timedate|geographic|numeric} sets axis->tictype
+* NEW add the tictype keywords to set format {axis} {time|geographic|numeric}
+* NEW format modifier 't' in timedate mode indicates a time rather than a date
+* NEW export-to-file toolbar widget for wxt terminal
+* CHANGE separate input format (axis->datatype) and output format (axis->tictype)
+* CHANGE report and save xyz position using time coordinates if appropriate
+* CHANGE emulate v4 syntax for timecolumn(<single-param>)
 * CHANGE revised v5 "fit" syntax does not match -rc1 and -rc2
 * CHANGE auto-detect and accept v4 "fit" syntax
 * CHANGE remove obsolete terminals aed and v384

@@ -1,3 +1,61 @@
+2014-11-07 Ethan A Merritt  <merritt@u.washington.edu>
+
+	Timefmt revision part 1 of 7
+	* src/axis.c src/axis.h src/datafile.c src/fit.c src/mouse.c src/parse.c
+	src/save.c src/set.c src/setshow.h src/show.c src/unset.c
+	docs/gnuplot.doc demo/gantt.dem:
+
+	- Remove axis->timefmt and replace it with a single global timefmt.
+	  This is what the documentation has always said, but it breaks the
+	  undocumented command:   set timefmt y "fmt-different-from-xaxis-fmt"
+	- Add a new flag axis->tictype to control interpretation of tic format.
+	  axis->datatype will continue to control input format interpretation. 
+
+	Timefmt revision part 2 of 7
+	* src/save.c src/save.h src/setshow.h src/show.c:
+
+	- Replace macro SAVE_NUM_OR_TIME with routine save_num_or_time_input().
+	  This routine uses _input_ data format, mostly for reporting axis range.
+
+	Timefmt revision part 3 of 7
+	* src/save.c src/save.h src/show.c:
+
+	- Show and save xyz positions using time-format coordinates when needed.
+	  Note that like axis ranges, these are meant to be read in again later.
+	  Thus they are written using the input format not the output format.
+
+	Timefmt revision part 4 of 7
+	* src/axis.c (get_tics copy_or_invent_formatstring) src/set.c
+	src/unset.c src/show.c src/save.c docs/gnuplot.doc demo/world.dem:
+
+	- New command set {xyz}tics {time|geographic|numeric} sets axis->tictype
+	- Output formats chosen based on axis->tictype rather than axis->datatype
+	- Report axis->tictype setting with axis->format in "show" and "save"
+
+	Timefmt revision part 5 of 7
+	* src/datafile.c src/parse.c:
+
+	- Track how many parameters were passed to timecolumn(), so that
+	  version 4 behavior can be emulated when only 1 parameter is passed.
+
+	Timefmt revision part 6 of 7
+	* src/axis.h src/set.c:
+
+	- Add the tictype keywords to set format {axis} {time|geographic|numeric}
+	- Reset to numeric on "unset format"
+
+	Timefmt revision part 7 of 7
+	* src/time.c (gstrftime xstrftime) docs/gnuplotdoc demo/timedat.dem:
+
+	Introduce a new time format modifier 't', used to distinguish dates
+	from times.  This allows formatting time data as hours/minutes/seconds
+	relative to time=0 rather than as a calendar date.  Compare these
+	representations of the stored value -3672.50 seconds:
+	    default date format    # "12/31/69 \n 22:58"
+	    format "%tH:%tM:%tS"   # "-01:01:12"
+	    format "%.2tH hours"   # "-1.02 hours"
+	    format "%tM:%.2tS"     # "-61:12.50"
+
 2014-11-07  Daniel J Sebald <daniel.sebald@ieee.org>
 
 	* src/wxterminal/wxt_gui.{cpp|h}:  Add a toolbar widget on the wxt

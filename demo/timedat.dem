@@ -1,5 +1,5 @@
 #
-# $Id: timedat.dem,v 1.10 2014/01/28 21:56:08 sfeam Exp $
+# $Id: timedat.dem,v 1.11 2014/05/12 04:11:32 sfeam Exp $
 #
 
 set title "Fsteps plot\nwith date and time as x-values"
@@ -39,6 +39,25 @@ plot '-' using 0:1:(fulltime(1)):xticlabels(2):yticlabels(parttime(1)) \
 1390852608.4	E
 1390852610.001	F
 e
+
+pause -1 "Hit return to continue"
+
+reset
+set title "Date format (top) vs Time format (bottom)" font "/:Bold,14"
+set xrange [-7000:3000]
+set link x2
+set tics font ",8"
+set x2tics format "%D\n%R" time offset 0,-1
+set xtics format "%tH:%tM:%tS" time
+set xlabel 'set xtics format "%tH:%tM:%.2tS"' font "/:Bold"
+set arrow 1 from 0, graph 0 to 0, graph 1 heads filled
+
+set yzeroaxis
+unset ytics
+set bmargin at screen .55
+set tmargin at screen .6
+
+plot x notitle
 
 pause -1 "Hit return to continue"
 

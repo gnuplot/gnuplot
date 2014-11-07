@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.290.2.1 2014/09/18 00:26:50 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.290.2.2 2014/11/04 04:47:59 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -2048,7 +2048,7 @@ df_readascii(double v[], int max)
 			timefield = TRUE;
 
 		    if (timefield && (a.type != STRING)
-		    && !strcmp(axis_array[df_axis[output]].timefmt,"%s")) {
+		    && !strcmp(timefmt,"%s")) {
 			/* Handle the case of timefmt "%s" which expects a string */
 			/* containing a number. If evaluate_at() above returned a */
 			/* bare number then we must convert it to a sting before  */
@@ -2078,8 +2078,7 @@ df_readascii(double v[], int max)
 			if (timefield) {
 			    struct tm tm;
 			    double usec = 0.0;
-			    if (gstrptime(a.v.string_val,
-					  axis_array[df_axis[output]].timefmt, &tm, &usec))
+			    if (gstrptime(a.v.string_val, timefmt, &tm, &usec))
 				v[output] = (double) gtimegm(&tm) + usec;
 			    else
 				return_value = DF_BAD;
@@ -2108,8 +2107,7 @@ df_readascii(double v[], int max)
 		    if (column > df_no_cols ||
 			df_column[column - 1].good == DF_MISSING ||
 			!df_column[column - 1].position ||
-			!gstrptime(df_column[column - 1].position,
-				   axis_array[df_axis[output]].timefmt, &tm, &usec)
+			!gstrptime(df_column[column - 1].position, timefmt, &tm, &usec)
 			) {
 			/* line bad only if user explicitly asked for this column */
 			if (df_no_use_specs)
@@ -2554,13 +2552,29 @@ f_timecolumn(union argument *arg)
     struct value a;
     struct value b;
     struct tm tm;
+    int num_param;
     int column;
     double usec = 0.0;
 
     (void) arg;                 /* avoid -Wunused warning */
+    (void) pop(&b);		/* this is the number of parameters */
+    num_param = b.v.int_val;
     (void) pop(&b);		/* this is the time format string */
-    
-    column = (int) magnitude(pop(&a));
+
+    switch (num_param) {
+    case 2:
+	column = (int) magnitude(pop(&a));
+	break;
+    case 1:
+	/* No format parameter passed (v4-style call) */
+	/* Only needed for backward compatibility */
+	column = magnitude(&b);
+	b.v.string_val = gp_strdup(timefmt);
+	b.type = STRING;
+	break;
+    default:
+	int_error(NO_CARET,"wrong number of parameters to timecolumn");
+    }
 
     if (!evaluate_inside_using)
 	int_error(c_token-1, "timecolumn() called from invalid context");

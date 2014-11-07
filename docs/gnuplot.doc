@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.902.2.18 2014/10/16 16:46:19 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.902.2.19 2014/10/29 03:14:35 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -203,7 +203,7 @@ C
  * Interactive terminals support hypertext labels that only appear when the
  mouse hovers over the label's anchor point.
 
- * New coordinate system (Degrees, Minutes, Seconds). See `set xdata geographic`.
+ * New coordinate system (Degrees, Minutes, Seconds). See `set xtics geographic`.
 
  * The default format for axis labels is "% h" ("$%h$" for LaTeX terminals).
  This format is like the C standard format %g except that the exponential term,
@@ -283,10 +283,11 @@ C
  millisecond precision.
 
  * The function `timecolumn(N,"timeformat")` now has 2 parameters. Because the
- required second parameter is not associated with any particular data axis, this
+ new second parameter is not associated with any particular data axis, this
  allows using the `timecolumn` function to read time data for reasons other than
  specifying the x or y coordinate.  This functionality replaces the command
- sequence `set xdata time; set timefmt x "timeformat"`.
+ sequence `set xdata time; set timefmt "timeformat"`.  It allows combining time
+ data read from multiple files with different formats within a single plot.
 
  * The `reverse` keyword of the `set [axis]range` command affects only
  autoscaling. It does not invert or otherwise alter the meaning of a command
@@ -2959,12 +2960,13 @@ Ffigure_newsyntax
  etc.
 
  Internally all times and dates are converted to the number of seconds from
- the year 1970.  The command `set timefmt` defines the format for all inputs:
- data files, ranges, tics, label positions---in short, anything that accepts a
- data value must receive it in this format.  Since only one input format can
- be in force at a given time, all time/date quantities being input at the same
- time must be presented in the same format.  Thus if both x and y data in a
- file are time/date, they must be in the same format.
+ the year 1970.  The command `set timefmt` defines the default format for all
+ inputs: data files, ranges, tics, label positions -- anything that accepts a
+ time data value defaults to receiving it in this format.  Only one default
+ format can be in effect at a given time. Thus if both x and y data in a file
+ are time/date, by default they are interpreted in the same format. However
+ this default can be replaced when reading any particular file or column of
+ input using the `timecolumn` function in the corresponding `using` specifier.
 
  The conversion to and from seconds assumes Universal Time (which is the same
  as Greenwich Standard Time).  There is no provision for changing the time
@@ -2975,12 +2977,12 @@ Ffigure_newsyntax
 
  Commands like `show xrange` will re-interpret the integer according to
  `timefmt`.  If you change `timefmt`, and then `show` the quantity again, it
- will be displayed in the new `timefmt`.  For that matter, if you give the
- deactivation command (like `set xdata`), the quantity will be shown in its
- numerical form.
+ will be displayed in the new `timefmt`.  For that matter, if you reset the
+ data type flag for that axis (e.g. `set xdata`), the quantity will be shown
+ in its numerical form.
 
  The commands `set format` or `set tics format` define the format that will be
- used for tic labels, whether or not the specified axis is time/date.
+ used for tic labels, whether or not input for the specified axis is time/date.
 
  If time/date information is to be plotted from a file, the `using` option
  _must_ be used on the `plot` or `splot` command.  These commands simply use
@@ -7163,9 +7165,6 @@ Ffigure_mapcontours
  corresponding `unset` command.  See also the `reset` command, which returns
  all settable parameters to default values.
 
- If a variable contains time/date data, `show` will display it according to
- the format currently defined by `set timefmt`, even if that was not in effect
- when the variable was initially defined.
 =iteration
  The `set` and `unset` commands may optionally contain an iteration clause.
  See `plot for`.
@@ -8617,8 +8616,7 @@ Ffigure_missing
  or with the `set tics format` or individual `set {axis}tics format` commands.
 
  Syntax:
-       set format {<axes>} {"<format-string>"}
-       set format {<axes>} {'<format-string>'}
+       set format {<axes>} {"<format-string>"} {numeric|timedate|geographic}
        show format
 
  where <axes> is either `x`, `y`, `xy`, `x2`, `y2`, `z`, `cb` or nothing
@@ -8831,7 +8829,7 @@ Ffigure_missing
        %y           year, 0-68 for 2000-2068, 69-99 for 1969-1999
        %Y           year, 4-digit
 #\begin{tabular}{|cl|} \hline
-#\multicolumn{2}{|c|}{Tic-mark label Date/Time Format Specifiers}\\
+#\multicolumn{2}{|c|}{Date Specifiers}\\
 #\hline \hline
 #Format & Explanation \\ \hline
 #\verb@%a@ & abbreviated name of day of the week \\
@@ -8897,7 +8895,7 @@ Ffigure_missing
 ^  <col align="left">
 ^</colgroup>
 ^<thead>
-^<tr>    <th>Format</th>    <th>Explanation</th></tr>
+^<tr>    <th>Date Format</th>    <th>Explanation</th></tr>
 ^</thead>
 ^<tbody>
 ^<tr>    <td><tt>%a</tt></td>    <td>abbreviated name of day of the week</td></tr>
@@ -8928,23 +8926,80 @@ Ffigure_missing
 ^</tbody>
 ^</table>
 
- Except for the non-numerical formats, these may be preceded by a "0" ("zero",
- not "oh") to pad the field length with leading zeroes, and a positive digit,
- to define the minimum field width (which will be overridden if the specified
- width is not large enough to contain the number).  The %S format also accepts
- a precision specifier so that fractional seconds can be written.
- There is a 24-character limit to the length of the printed text;
- longer strings will be truncated.
+ Numerical formats may be preceded by a "0" ("zero") to pad the field with
+ leading zeroes, and preceded by a positive digit to define the minimum field
+ width.  The %S, and %t formats also accept a precision specifier so that
+ fractional hours/minutes/seconds can be written.
 
- Examples:
+@start table - first is interactive cleartext form
+       Format       Explanation
+       %tH          +/- hours relative to time=0 (does not wrap at 24)
+       %tM          +/- minutes relative to time=0
+       %tS          +/- seconds associated with previous tH or tM field
+#\begin{tabular}{|cl|} \hline
+#\multicolumn{2}{|c|}{Time Specifiers}\\
+#\hline \hline
+#Format & Explanation \\ \hline
+#\verb@%tH@ & +/- hours relative to time=0 (does not wrap at 24) \\
+#\verb@%tM@ & +/- minutes relative to time=0 \\
+#\verb@%tS@ & +/- seconds associated with previous tH or tM field \\
+%c l .
+%Format@Explanation
+%_
+%%tH@+/- hours relative to time=0 (does not wrap at 24)
+%%tM@+/- minutes relative to time=0
+%%tS@+/- seconds associated with previous tH or tM field
+%_
+@end table
 
- Suppose the text is "76/12/25 23:11:11".  Then
-       set format x                 # defaults to "12/25/76" \n "23:11"
+
+^<table align="center" border="1" rules="groups" frame="hsides" cellpadding="3">
+^<colgroup>
+^  <col align="center">
+^  <col align="left">
+^</colgroup>
+^<thead>
+^<tr>    <th>Time Format</th>    <th>Explanation</th></tr>
+^</thead>
+^<tbody>
+^<tr>    <td><tt>%tH</tt></td>    <td>+/- hours relative to time=0 (does not wrap at 24)</td></tr>
+^<tr>    <td><tt>%tM</tt></td>    <td>+/- minutes relative to time=0</td></tr>
+^<tr>    <td><tt>%tS</tt></td>    <td>+/- seconds associated with previous tH or tM field</td></tr>
+^</tbody>
+^</table>
+
+5 Examples
+?commands set format date_specifiers examples
+?commands set format time_specifiers examples
+?set format date_specifiers examples
+?set format time_specifiers examples
+?set date_specifiers examples
+?set time_specifiers examples
+?date_specifiers examples
+?time_specifiers examples
+
+ Examples of date format:
+
+ Suppose the x value in seconds corresponds a time slightly before midnight
+ on 25 Dec 1976. The text printed for a tic label at this position would be
+
+       set format x                 # defaults to "12/25/76 \n 23:11"
        set format x "%A, %d %b %Y"  # "Saturday, 25 Dec 1976"
        set format x "%r %D"         # "11:11:11 pm 12/25/76"
 
- Suppose the text is "98/07/06 05:04:03.123456".  Then
-       set format x "%1y/%2m/%3d %01H:%02M:%06.3S"  # "98/ 7/  6 5:04:03.123"
+ Examples of time format:
+
+ The date format specifiers encode a time in seconds as a clock time on a 
+ particular day.  So hours run only from 0-23, minutes from 0-59, and negative
+ values correspond to dates prior to the epoch (1-Jan-1970). In order to report
+ a time value in seconds as some number of hours/minutes/seconds relative to a
+ time 0, use time formats %tH %tM %tS.  To report a value of -3672.50 seconds
+
+       set format x                 # default date format "12/31/69 \n 22:58"
+       set format x "%tH:%tM:%tS"   # "-01:01:12"
+       set format x "%.2tH hours"   # "-1.02 hours"
+       set format x "%tM:%.2tS"     # "-61:12.50"
+
 3 function style
 ?set function style
  This form of the command is deprecated. Please see `set style function`.
@@ -12278,12 +12333,8 @@ Ffigure_missing
  It has no meaning unless the command `set *data time` is given also.
 
  Syntax:
-       set timefmt {<axis>} "<format string>"
+       set timefmt "<format string>"
        show timefmt
-
- The optional <axis> argument allows to specify different time input formats
- for individual axes.  If it is omitted, the format string is applied to all
- axes.
 
  The string argument tells `gnuplot` how to read timedata from the datafile.
  The valid formats are:
@@ -12627,16 +12678,13 @@ Ffigure_missing
  An analogous command acts on each of the other axes.
 
  Syntax:
-       set xdata {time | geographic}
+       set xdata time
        show xdata
 
  The same syntax applies to `ydata`, `zdata`, `x2data`, `y2data` and `cbdata`.
 
  The `time` option signals that data represents a time/date in seconds.
  The current version of gnuplot stores time to a millisecond precision.
-
- The `geographic` option signals that data represents a geographical coordinate
- measured in degrees/minutes/seconds.
 
  If no option is specified, the data interpretation reverts to normal.
 4 time
@@ -12661,30 +12709,9 @@ Ffigure_missing
  the function 'strftime' (type "man strftime" on unix to look it up) is used to
  convert from the internal time in seconds to a string representation of a date.
  `gnuplot` tries to figure out a reasonable format for this.  You can customize
- the format using `set format x`.
+ the format using either `set format x` or `set xtics format`.
  See `time_specifiers` for a special set of time format specifiers.
  See also `time/date` for more information.
-4 geographic
-?commands set xdata geographic
-?set xdata geographic
-?geographic
- `set xdata geographic` indicates that the x coordinate is to be interpreted as
- a geographic coordinate measured in degrees.  Use `set format x` to establish
- how the coordinate appears as an axis tick label.  The format specifiers for
- geographic data are as follows:
-        %D                   = integer degrees
-        %<width.precision>d  = floating point degrees
-        %M                   = integer minutes
-        %<width.precision>m  = floating point minutes
-        %S                   = integer seconds
-        %<width.precision>s  = floating point seconds
-        %E                   = label with E/W instead of +/-
-        %N                   = label with N/S instead of +/-
- For example, the command `set format x "%Ddeg %5.2mmin %E"` will cause 
- x coordinate -1.51 to be labeled as `" 1deg 30.60min W"`.
-
- If no special format is provided, the coordinate will be reported as a decimal
- number of degrees.
 3 xdtics
 ?commands set xdtics
 ?commands unset xdtics
@@ -12939,6 +12966,7 @@ Ffigure_missing
                   | <start>, <incr> {,<end>}
                   | ({"<label>"} <pos> {<level>} {,{"<label>"}...) }
                  {format "formatstring"} {font "name{,<size>}"} {{no}enhanced}
+                 { numeric | timedate | geographic }
                  { rangelimited }
                  { textcolor <colorspec> }
        unset xtics
@@ -13079,30 +13107,66 @@ Ffigure_missing
 
  Minor (unlabeled) tics can be added automatically by the `set mxtics`
  command, or at explicit positions by the `set xtics ("" <pos> 1, ...)` form.
-4 xtics time_data
-?set xtics time_axis tics
-?xtics time_axis tics
-?time_axis tics
- In case of timeseries data, axis tic position values must be given as quoted
- dates or times according to the format `timefmt`. If the <start>, <incr>, <end>
- form is used, <start> and <end> must be given according to `timefmt`, but
- <incr> must be in seconds.  Times will be written out according to the format
- given on `set format`, however.
+4 xtics timedata
+?set xtics timedata
+?xtics timedata tics
+?timedata tics
+ Times and dates are stored internally as a number of seconds.
+
+ Input: Non-numeric time and date values are converted to seconds on input using
+ the format specifier in `timefmt`.  Axis positions and range limits also may be
+ given as quoted dates or times interpreted using `timefmt`.
+ If the <start>, <incr>, <end> form is used, <incr> must be in seconds.
+ Use of `timefmt` to interpret input data, range, and tic positions is triggered
+ by `set xdata time`.
+ 
+ Output: Axis tic labels are generated using a separate format specified either
+ by `set format` or `set xtics format`.  By default the usual numeric format
+ specifiers are expected (`set xtics numeric`).  Other options are geographic
+ coordinates (`set xtics geographic`), or times or dates (`set xtics time`).
+
+ Note: For backward compatibility with earlier gnuplot versions, the command
+ `set xdata time` will implicitly also act do `set xtics time`, and `set xdata`
+ or `unset xdata` will implicitly reset to `set xtics numeric`.  However you
+ can change this with a later call to `set xtics`.
 
  Examples:
-       set xdata time
-       set timefmt "%d/%m"
-       set xtics format "%b %d"
+       set xdata time           # controls interpretation of input data
+       set timefmt "%d/%m"      # format used to read input data
+       set xtics timedate       # controls interpretation of output format
+       set xtics format "%b %d" # format used for tic labels
        set xrange ["01/12":"06/12"]
        set xtics "01/12", 172800, "05/12"
 
        set xdata time
        set timefmt "%d/%m"
-       set xtics format "%b %d"
+       set xtics format "%b %d" time
        set xrange ["01/12":"06/12"]
        set xtics ("01/12", "" "03/12", "05/12")
  Both of these will produce tics "Dec 1", "Dec 3", and "Dec 5", but in the
  second example the tic at "Dec 3" will be unlabeled.
+4 geographic
+?commands set xtics geographic
+?set xtics geographic
+?geographic
+ `set xtics geographic` indicates that x-axis values are to be interpreted as
+ a geographic coordinate measured in degrees.  Use `set xtics format` or 
+ `set format x` to specify the appearance of the axis tick labels.
+ The format specifiers for geographic data are as follows:
+        %D                   = integer degrees
+        %<width.precision>d  = floating point degrees
+        %M                   = integer minutes
+        %<width.precision>m  = floating point minutes
+        %S                   = integer seconds
+        %<width.precision>s  = floating point seconds
+        %E                   = label with E/W instead of +/-
+        %N                   = label with N/S instead of +/-
+ For example, the command `set format x "%Ddeg %5.2mmin %E"` will cause 
+ x coordinate -1.51 to be labeled as `" 1deg 30.60min W"`.
+
+ If the xtics are left in the default state (`set xtics numeric`) the coordinate
+ will be reported as a decimal number of degrees, and `format` will be assumed
+ to contain normal numeric format specifiers rather than the special set above.
 4 xtics rangelimited
 ?set xtics rangelimited
 ?xtics rangelimited

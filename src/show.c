@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.326.2.2 2014/09/21 04:54:33 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.326.2.3 2014/09/27 05:49:23 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -176,11 +176,11 @@ static void show_functions __PROTO((void));
 
 static int var_show_all = 0;
 
-/* following code segment appears over and over again */
-
-#define SHOW_NUM_OR_TIME(x, axis) SAVE_NUM_OR_TIME(stderr, x, axis)
-
+/* following code segments appear over and over again */
+#define SHOW_NUM_OR_TIME(x, axis) save_num_or_time_input(stderr, x, axis)
 #define SHOW_ALL_NL { if (!var_show_all) (void) putc('\n',stderr); }
+
+#define PROGRAM "G N U P L O T"
 
 /******* The 'show' command *******/
 void
@@ -1439,8 +1439,11 @@ show_format()
 
     fprintf(stderr, "\ttic format is:\n");
 #define SHOW_FORMAT(_axis)						\
-    fprintf(stderr, "\t  %s-axis: \"%s\"\n", axis_name(_axis),	\
-	    conv_text(axis_array[_axis].formatstring));
+    fprintf(stderr, "\t  %s-axis: \"%s\"%s\n", axis_name(_axis),	\
+	    conv_text(axis_array[_axis].formatstring),			\
+	    axis_array[_axis].tictype == DT_DMS ? " geographic" :	\
+	    axis_array[_axis].tictype == DT_TIMEDATE ? " time" :	\
+	    "");
     SHOW_FORMAT(FIRST_X_AXIS );
     SHOW_FORMAT(FIRST_Y_AXIS );
     SHOW_FORMAT(SECOND_X_AXIS);
@@ -1961,18 +1964,9 @@ show_key()
 void
 show_position(struct position *pos)
 {
-    static const char *msg[] = { "(first axes) ", "(second axes) ",
-				 "(graph units) ", "(screen units) ",
-				 "(character units) "};
-
-    assert(first_axes == 0 && second_axes == 1 && graph == 2 && screen == 3 &&
-	   character == 4);
-
-    fprintf(stderr, "(%s%g, %s%g, %s%g)",
-	    pos->scalex == first_axes ? "" : msg[pos->scalex], pos->x,
-	    pos->scaley == pos->scalex ? "" : msg[pos->scaley], pos->y,
-	    pos->scalez == pos->scaley ? "" : msg[pos->scalez], pos->z);
-
+    fprintf(stderr,"(");
+    save_position(stderr, pos, FALSE);
+    fprintf(stderr,")");
 }
 
 
@@ -2903,8 +2897,6 @@ show_range(AXIS_INDEX axis)
     SHOW_ALL_NL;
     if (axis_array[axis].datatype == DT_TIMEDATE)
 	fprintf(stderr, "\tset %sdata time\n", axis_name(axis));
-    else if (axis_array[axis].datatype == DT_DMS)
-	fprintf(stderr, "\tset %sdata geographic\n", axis_name(axis));
     fprintf(stderr,"\t");
     save_range(stderr, axis);
 }
@@ -2964,7 +2956,7 @@ show_data_is_timedate(AXIS_INDEX axis)
     SHOW_ALL_NL;
     fprintf(stderr, "\t%s is set to %s\n", axis_name(axis),
 	    axis_array[axis].datatype == DT_TIMEDATE ? "time" :
-	    axis_array[axis].datatype == DT_DMS ? "geographic" :
+	    axis_array[axis].datatype == DT_DMS ? "geographic" :  /* obsolete */
 	    "numerical");
 }
 
@@ -2973,24 +2965,9 @@ show_data_is_timedate(AXIS_INDEX axis)
 static void
 show_timefmt()
 {
-    int axis;
-
     SHOW_ALL_NL;
-
-    if ((axis = lookup_table(axisname_tbl, c_token)) >= 0) {
-	c_token++;
-	fprintf(stderr, "\tread format for time on %s axis is \"%s\"\n",
-		axis_name(axis),
-		conv_text(axis_array[axis].timefmt));
-    } else {
-        /* show all currently active time axes' formats: */
-	for (axis = 0; axis<AXIS_ARRAY_SIZE; axis++)
-	    if (axis_array[axis].datatype == DT_TIMEDATE)
-		fprintf(stderr,
-			"\tread format for time on %s axis is \"%s\"\n",
-			axis_name(axis),
-			conv_text(axis_array[axis].timefmt));
-    }
+    fprintf(stderr, "Default format for reading time data is \"%s\"\n",
+	timefmt);
 }
 
 /* process 'show link' command */
@@ -3348,6 +3325,10 @@ show_ticdef(AXIS_INDEX axis)
     } else
         fputs("justified automatically, ", stderr);
     fprintf(stderr, "format \"%s\"", ticfmt);
+    fprintf(stderr, "%s", 
+	axis_array[axis].tictype == DT_DMS ? " geographic" :
+	axis_array[axis].tictype == DT_TIMEDATE ? " timedate" :
+	"");
     if (axis_array[axis].ticdef.enhanced == FALSE)
 	fprintf(stderr,"  noenhanced");
     if (axis_array[axis].tic_rotate) {
