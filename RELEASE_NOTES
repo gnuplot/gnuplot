@@ -8,7 +8,7 @@ and enhancements compared to previous gnuplot versions.
 Please see the NEWS file for bugfixes and minor changes between version 5
 release candidates -rc1, -rc2, and -rc3.
 
-Release Notes date: 12 October 2014
+Release Notes date: 08 November 2014
 
 NOTABLE NEW FEATURES
 ====================
@@ -114,9 +114,9 @@ A brief summary of potentially incompatible changes is given here.
   3 ... 12.
 
 * The function `timecolumn(N,"timeformat")` now has 2 parameters.
-  Because the required second parameter is not associated with a particular
-  data axis, this allows using the `timecolumn` function to read time data
-  for reasons other than specifying the x or y coordinate.  Use of time formats
+  Because the second parameter is not associated with any particular data axis,
+  this allows using the `timecolumn` function to read time data for reasons
+  other than specifying the x or y coordinate.  Use of time formats
   to generate axis tick labels is now controlled by "set {xy]tics time" rather
   than by "set {xy}data time".  Thus prior calls to `set xdata time` or
   `set timefmt x` are unnecessary for either input or output.
@@ -156,7 +156,7 @@ KNOWN ISSUES
   Toggling plots drawn in hidden3d mode (hidden line removal) does not work.
 
 * Linking against wxWidgets 3.0 is not supported (wxt terminal).
-  If you configure wxt without also configure X11, you may need to set the
+  If you configure wxt without also configuring X11, you may need to set the
   environmental variable TERMLIBS before configuring:
     TERMLIBS="-lX11"  ./configure
 
