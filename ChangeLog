@@ -1,3 +1,8 @@
+2014-11-12 Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/lua/gnuplot-tiz.help (remove from repository)
+	* term/Makefile.am.in: rebuild term/lua/gnuplot-tikz.help
+
 2014-11-07 Akira Kakuto <kakuto@fuk.kindai.ac.jp>
 
 	* term/luz/gnuplot-tikz.lua:  Use \errmessage rather than \PackageError
@@ -10,7 +15,7 @@
 	from times.  This allows formatting time data as hours/minutes/seconds
 	relative to time=0 rather than as a calendar date.  Compare these
 	representations of the stored value -3672.50 seconds:
-	    default tic format     # "12/31/69 \n 22:58"
+	    default date format    # "12/31/69 \n 22:58"
 	    format "%tH:%tM:%tS"   # "-01:01:12"
 	    format "%.2tH hours"   # "-1.02 hours"
 	    format "%tM:%.2tS"     # "-61:12.50"

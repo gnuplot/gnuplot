@@ -42,5 +42,5 @@ Makefile.am: Makefile.am.in
 all: lua/gnuplot-tikz.help
 
 $(srcdir)/lua/gnuplot-tikz.help: $(srcdir)/lua/gnuplot-tikz.lua
-	test -z "$(build_lua)" || (chmod u+w $@ && lua $< termhelp > $@)
+	test -z "$(build_lua)" || (lua $< termhelp > $@)
 
