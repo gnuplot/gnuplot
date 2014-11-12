@@ -1,3 +1,21 @@
+2014-11-12 Ethan A Merritt  <merritt@u.washington.edu>
+
+	* bump patchlevel identifier to -rc3
+
+2014-11-11 Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/term_api.h term/README:  Add a 2nd parameter to the interface for
+	term->modify_plots(operations, plotno). All terminals for which this
+	entry point is not NULL must be updated accordingly.  This patch does
+	not by itself add any new functionality or user-visible change.
+	Better to make this change now rather than after release of 5.0 since it
+	breaks compatibility between core code and outboard drivers.
+
+	* src/mouse.c src/gplt_x11.c term/caca.trm term/win.trm term/x11.trm
+	src/qtterminal/QtGnuplotScene.cpp src/qtterminal/qt_term.*
+	src/wxterminal/wxt_gui.cpp src/wxterminal/wxt_term.h:
+	Update term->modify_plots() entry in the terminals that provide it.
+
 2014-11-07 Akira Kakuto <kakuto@fuk.kindai.ac.jp>
 
 	* term/luz/gnuplot-tikz.lua:  Use \errmessage rather than \PackageError

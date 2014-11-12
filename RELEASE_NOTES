@@ -1,14 +1,14 @@
 		GNUPLOT Version 5.0.rc3 Release Notes
 		=====================================
 
-We are happy to announce a third release candidate for gnuplot version 5. 
-Version 5 will be a major release with significant new capabilities
-and enhancements compared to previous gnuplot versions.
+We are happy to announce the third (and final) release candidate for
+gnuplot version 5.  Version 5 will be a major release with significant
+new capabilities and enhancements compared to previous gnuplot versions.
 
 Please see the NEWS file for bugfixes and minor changes between version 5
 release candidates -rc1, -rc2, and -rc3.
 
-Release Notes date: 08 November 2014
+Release Notes date: 11 November 2014
 
 NOTABLE NEW FEATURES
 ====================
@@ -101,6 +101,15 @@ A brief summary of potentially incompatible changes is given here.
   determined using the command `print strftime("%F",0)`.
   Time is now stored to at least millisecond precision.
 
+* The function `timecolumn(N,"timeformat")` now has 2 parameters.
+  Because the second parameter is not associated with any particular data axis,
+  this allows using the `timecolumn` function to read time data for reasons
+  other than specifying the x or y coordinate.  Use of time formats
+  to generate axis tick labels is now controlled by "set {xy}tics time" rather
+  than by "set {xy}data time".  Thus prior calls to `set xdata time` or
+  `set timefmt x` are unnecessary for either input or output.
+  These older commands may be deprecated in the final 5.0 release.
+
 * The "reverse" keyword (e.g. "set xrange [*:*] reverse") now affects only
   autoscaling.  It has no effect on explicit ranges. 
   "set xrange [0:1] reverse" is _not_ the same as "set xrange [1:0]".
@@ -112,15 +121,6 @@ A brief summary of potentially incompatible changes is given here.
   "set urange [U1:U2]" has no effect on fitting because "u" is not a fit
   variable.  Use the command "set dummy ..." to assign names to fit variables
   3 ... 12.
-
-* The function `timecolumn(N,"timeformat")` now has 2 parameters.
-  Because the second parameter is not associated with any particular data axis,
-  this allows using the `timecolumn` function to read time data for reasons
-  other than specifying the x or y coordinate.  Use of time formats
-  to generate axis tick labels is now controlled by "set {xy]tics time" rather
-  than by "set {xy}data time".  Thus prior calls to `set xdata time` or
-  `set timefmt x` are unnecessary for either input or output.
-  These older commands may be deprecated in the final 5.0 release.
 
 * The `call` command is implemented by providing a set of variables ARGC,
   ARG0, ..., ARG9. ARG0 holds the name of the script file being executed.
@@ -142,12 +142,6 @@ Demo plots illustrating new and old features are online at
 KNOWN ISSUES
 ============
 
-* The :Italic and :Bold attributes in enhanced text strings are a new feature
-  and are not fully implemented. In particular some terminals ignore them in
-  the "set terminal" command itself.
-
-* It is tricky to build the wxt and qt terminals under Windows.
-
 * Font initialization on OSX can be very slow, causing the qt terminal to
   issue warning or error messages for the first plot command.
 
@@ -156,8 +150,8 @@ KNOWN ISSUES
   Toggling plots drawn in hidden3d mode (hidden line removal) does not work.
 
 * Linking against wxWidgets 3.0 is not supported (wxt terminal).
-  If you configure wxt without also configuring X11, you may need to set the
-  environmental variable TERMLIBS before configuring:
+  If you configure in the wxt terminal without also configuring in X11,
+  you may need to set the environmental variable TERMLIBS:
     TERMLIBS="-lX11"  ./configure
 
 * Mac OSX ships with a terminal input library that appears to be GNU
@@ -201,7 +195,7 @@ in addition to several platform-specific modes.
    The qt terminal supports interactive display with menu-driven
    output to png, svg or pdf.  The final 5.0 release may also support
    scripted output to these same file formats but this is not present
-   in rc2.  If either Qt4 or Qt5 is detected by the configure script,
+   in rc3.  If either Qt4 or Qt5 is detected by the configure script,
    this will be the default terminal.  It is now the fastest and most
    full-featured interactive terminal option.
    To disable this terminal:
@@ -234,7 +228,7 @@ are also still available. These include, among many more obscure options:
 - png/jpeg/gif output via libgd
 - PostScript (*.ps or *.eps)
 - Many flavors of TeX/LaTeX output, including TikZ and ConTeXt
-- Bitmapped output to support many older devices (e.g. HP deskjet, epson,
+- Bitmapped output to support older devices (e.g. HP deskjet, epson, and
   seiko printers, pbm bitmapped graphics files) is available if needed
   but is no longer configured in by default.
       ./configure --with-bitmap-terminals
@@ -253,7 +247,7 @@ Options for generating interactive plots for web display
 Installation
 ------------
 
-You can download a source tarball for gnuplot version 5.0.rc2 from the 
+You can download a source tarball for gnuplot version 5.0.rc3 from the 
 gnuplot development site on SourceForge.
 	http://sourceforge.net/project/showfiles.php?group_id=2055
 
@@ -261,7 +255,7 @@ Installation instructions are available in the source itself; the short
 version for linux/unix-like systems is to unpack the tarball and then
 <PRE>
 build it:
-      cd gnuplot-5.0.rc2 ; ./configure ; make
+      cd gnuplot-5.0.rc3 ; ./configure ; make
 test it:
       make check
 install it:
@@ -287,10 +281,10 @@ There is also an gnuplot discussion forum on usenet group
 Development
 -----------
 Gnuplot development is ongoing. The development branch on SourceForge
-contains preliminary implementations of many new features.  As of 5.0.rc2
-the source for version 5.0 is held in a separate branch of the CVS repository
-branch-5-0-stable.  Development continues in the main branch using the
-version number 5.1 (odd minor number), for eventual release as stable version
-5.2 (even minor number).  Bugfixes to version 5.0 will appear in patchlevel
-releases 5.0.1, 5.0.2, etc., approximately twice a year or as needed to correct
-a serious problem.
+contains preliminary implementations of new features.
+The source for version 5.0 is held in a separate branch of the CVS repository
+tagged as "branch-5-0-stable".  Development continues in the main branch using
+the version number 5.1 (odd minor number), for eventual release as stable
+version 5.2 (even minor number).  Bugfixes to version 5.0 will appear in
+patchlevel releases 5.0.1, 5.0.2, etc., approximately twice a year or
+as needed to correct a serious problem.
