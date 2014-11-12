@@ -1,7 +1,9 @@
+Changes not in 5.0
+==================
 * NEW new command `toggle {<plotno> | "plottitle" | all}`
 
-Changes in 5.1 but not (yet) in 5.0
-===================================
+Changes in 5.0.rc3
+==================
 
 * NEW new command set {xyz}tics {timedate|geographic|numeric} sets axis->tictype
 * NEW add the tictype keywords to set format {axis} {time|geographic|numeric}
@@ -9,10 +11,6 @@ Changes in 5.1 but not (yet) in 5.0
 * CHANGE separate input format (axis->datatype) and output format (axis->tictype)
 * CHANGE report and save xyz position using time coordinates if appropriate
 * CHANGE emulate v4 syntax for timecolumn(<single-param>)
-
-Changes since 5.0.rc2
-=====================
-
 * CHANGE revised v5 "fit" syntax does not match -rc1 and -rc2
 * CHANGE auto-detect and accept v4 "fit" syntax
 * CHANGE remove obsolete terminals aed and v384
