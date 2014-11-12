@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.cpp,v 1.128.2.4 2014/11/01 16:48:00 sfeam Exp $
+ * $Id: wxt_gui.cpp,v 1.128.2.5 2014/11/08 03:08:42 sfeam Exp $
  */
 
 /* GNUPLOT - wxt_gui.cpp */
@@ -2754,10 +2754,17 @@ void wxt_boxed_text(unsigned int x, unsigned int y, int option)
 }
 #endif
 
-void wxt_modify_plots(unsigned int ops)
+void wxt_modify_plots(unsigned int ops, int plotno)
 {
 	int i;
+	plotno++;
+
+	if (wxt_status == STATUS_UNINITIALIZED)
+		return;
+
 	for (i=1; i<=wxt_cur_plotno && i<wxt_max_key_boxes; i++) {
+		if (plotno > 0 && i != plotno)
+			continue;
 		if ((ops & MODPLOTS_INVERT_VISIBILITIES) == MODPLOTS_INVERT_VISIBILITIES) {
 			wxt_key_boxes[i].hidden = !wxt_key_boxes[i].hidden;
 		} else if (ops & MODPLOTS_SET_VISIBLE) {

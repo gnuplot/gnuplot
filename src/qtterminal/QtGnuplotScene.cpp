@@ -503,7 +503,9 @@ void QtGnuplotScene::processEvent(QtGnuplotEventType type, QDataStream& in)
 	{
 		int i = m_key_boxes.count();
 		unsigned int ops_i;
+		int plotno;
 		in >> ops_i;
+		in >> plotno;
 		enum QtGnuplotModPlots ops = (enum QtGnuplotModPlots) ops_i;
 
 		/* FIXME: This shouldn't happen, but it does. */
@@ -512,6 +514,10 @@ void QtGnuplotScene::processEvent(QtGnuplotEventType type, QDataStream& in)
 		    i = m_plot_group.count();
 
 		while (i-- > 0) {
+			/* Does operation only affect a single plot? */
+			if (plotno >= 0 && i != plotno)
+				continue;
+
 			bool isVisible = m_plot_group[i]->isVisible();
 
 			switch (ops) {

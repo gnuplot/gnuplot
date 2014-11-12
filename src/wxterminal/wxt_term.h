@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_term.h,v 1.25 2014/04/20 20:23:35 lodewyck Exp $
+ * $Id: wxt_term.h,v 1.25.2.1 2014/10/26 21:19:32 sfeam Exp $
  */
 
 /* GNUPLOT - wxt_term.h */
@@ -97,7 +97,7 @@ void wxt_hypertext(int type, const char *text);
 void wxt_boxed_text(unsigned int x, unsigned int y, int option);
 #endif
 
-void wxt_modify_plots(unsigned int);
+void wxt_modify_plots(unsigned int, int);
 
 void wxt_dashtype(int type, t_dashtype *custom_dash_pattern);
 

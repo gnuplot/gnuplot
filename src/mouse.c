@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: mouse.c,v 1.168.2.1 2014/09/14 08:35:24 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: mouse.c,v 1.168.2.2 2014/11/08 04:52:25 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - mouse.c */
@@ -984,7 +984,7 @@ builtin_set_plots_visible(struct gp_event_t *ge)
 	return "`builtin-set-plots-visible`";
     }
     if (term->modify_plots)
-	term->modify_plots(MODPLOTS_SET_VISIBLE);
+	term->modify_plots(MODPLOTS_SET_VISIBLE, -1);
     return (char *) 0;
 }
 
@@ -995,7 +995,7 @@ builtin_set_plots_invisible(struct gp_event_t *ge)
 	return "`builtin-set-plots-invisible`";
     }
     if (term->modify_plots)
-	term->modify_plots(MODPLOTS_SET_INVISIBLE);
+	term->modify_plots(MODPLOTS_SET_INVISIBLE, -1);
     return (char *) 0;
 }
 
@@ -1006,7 +1006,7 @@ builtin_invert_plot_visibilities(struct gp_event_t *ge)
 	return "`builtin-invert-plot-visibilities`";
     }
     if (term->modify_plots)
-	term->modify_plots(MODPLOTS_INVERT_VISIBILITIES);
+	term->modify_plots(MODPLOTS_INVERT_VISIBILITIES, -1);
     return (char *) 0;
 }
 

@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: x11.trm,v 1.221 2014/05/05 22:19:22 sfeam Exp $
+ * $Id: x11.trm,v 1.222 2014/07/30 20:43:41 sfeam Exp $
  *
  */
 
@@ -115,7 +115,7 @@ TERM_PUBLIC void ENHX11_FLUSH __PROTO((void));
 #ifdef EAM_BOXED_TEXT
 TERM_PUBLIC void ENHX11_boxed_text __PROTO((unsigned int, unsigned int, int));
 #endif
-TERM_PUBLIC void X11_modify_plots __PROTO((unsigned int));
+TERM_PUBLIC void X11_modify_plots __PROTO((unsigned int, int));
 
 /* These are the default terminal sizing parameters. These should match the
    sizes in gplt_x11.c, and both specify 640,450 */
@@ -1956,10 +1956,10 @@ ENHX11_boxed_text(unsigned int x, unsigned int y, int option)
 #endif
 
 TERM_PUBLIC void
-X11_modify_plots(unsigned int ops)
+X11_modify_plots(unsigned int ops, int plotno)
 {
     if (X11_ipc) {
-	PRINT1("O%u\n", ops);
+	PRINT2("O%u %d\n", ops, plotno);
 	FFLUSH();
     }
 }
