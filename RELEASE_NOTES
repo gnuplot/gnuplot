@@ -142,11 +142,8 @@ Demo plots illustrating new and old features are online at
 KNOWN ISSUES
 ============
 
-* Font initialization on OSX can be very slow, causing the qt terminal to
-  issue warning or error messages for the first plot command.
-
 * Using mouse clicks to toggle individual plots on/off does not always
-  work correctly for multiplots, particular if the key box is opaque.
+  work correctly for multiplots if the key box is opaque.
   Toggling plots drawn in hidden3d mode (hidden line removal) does not work.
 
 * Linking against wxWidgets 3.0 is not supported (wxt terminal).
@@ -154,13 +151,16 @@ KNOWN ISSUES
   you may need to set the environmental variable TERMLIBS:
     TERMLIBS="-lX11"  ./configure
 
+* Font initialization on OSX can be very slow, causing the qt terminal to
+  issue warning or error messages for the first plot command.
+
 * Mac OSX ships with a terminal input library that appears to be GNU
   libreadline, but isn't really.  The program tries to cope with this, but
   you may get better results by configuring gnuplot to use either its own
   built-in readline routines or the real GNU libreadline.
 
 * The gnuplot build system is not very good at figuring out where to find
-  or install LaTeX-related files.  This can affect use of the new lua/tikz
+  or install LaTeX-related files.  This can affect use of the lua/tikz
   and ConTeXt terminals.
 
 * You can configure support for both wxt and qt into the same gnuplot
