@@ -1,3 +1,8 @@
+2014-11-15  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* term/Makefile.am.in ($(srcdir)/lua/gnuplot-tikz.help): Test for
+	file existence is -f, not -x.
+
 2014-11-15 Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/Makefile.am.in: rebuild term/lua/gnuplot-tikz.help

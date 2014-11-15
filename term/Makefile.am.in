@@ -43,5 +43,5 @@ all: lua/gnuplot-tikz.help
 
 $(srcdir)/lua/gnuplot-tikz.help: $(srcdir)/lua/gnuplot-tikz.lua
 	test -z "$(build_lua)" || (lua $< termhelp > $@)
-	test -x $@ || touch $@
+	test -f $@ || touch $@
 
