@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.923 2014/10/29 03:11:51 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.924 2014/11/07 00:16:47 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -13119,7 +13119,7 @@ Ffigure_missing
  If the <start>, <incr>, <end> form is used, <incr> must be in seconds.
  Use of `timefmt` to interpret input data, range, and tic positions is triggered
  by `set xdata time`.
- 
+
  Output: Axis tic labels are generated using a separate format specified either
  by `set format` or `set xtics format`.  By default the usual numeric format
  specifiers are expected (`set xtics numeric`).  Other options are geographic
