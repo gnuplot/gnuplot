@@ -92,7 +92,15 @@ DISTFILES = $(DIST_COMMON) $(SOURCES) $(DOCHEADERS) $(EXTRA_DIST)
 
 BUILT_SOURCES = allterm.h
 
-allterm.h: $(CORETERM)
+if BUILD_LUA
+LUA_HELP = gnuplot-tikz.help
+$(LUA_HELP): $(top_srcdir)/term/lua/gnuplot-tikz.lua
+	lua $< termhelp > $@
+else
+LUA_HELP = 
+endif
+
+allterm.h: $(CORETERM) $(LUA_HELP)
 	@echo "Building allterm.h"
 	@for e in `egrep "^[ 	]*START_HELP" $(CORETERM) |\
 	     LC_ALL=C sort -f -t':' -k2` ; do \

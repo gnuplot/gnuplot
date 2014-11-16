@@ -1,3 +1,19 @@
+2014-11-16  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* term/Makefile.am.in (Makefile.am): Drop creation of conditional
+	definition of build_lua.
+	(all, $(srcdir)/lua/gnuplot-tikz.help): Drop rules for lua help
+	file fragment generation.
+
+	* docs/Makefile.am (LUA_HELP) [BUILD_LUA]: Define to name of lua
+	help file fragment.
+	($(LUA_HELP)) [BUILD_LUA]: Build lua help file fragment.
+	(allterm.h): Depend on $(LUA_HELP).
+
+	* term/lua.trm: Make inclusion of help file fragment depend on
+	HAVE_LUA.  Needed for doc builds that unconditionally include all
+	terminals' help. Remove "lua/" from include file name.
+
 2014-11-15  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* term/Makefile.am.in ($(srcdir)/lua/gnuplot-tikz.help): Test for

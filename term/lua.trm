@@ -1,6 +1,6 @@
 /*
- *  $Id: lua.trm,v 1.24 2014/09/23 03:55:25 sfeam Exp $
- *  $Date: 2014/09/23 03:55:25 $
+ *  $Id: lua.trm,v 1.25 2014/10/29 03:27:46 sfeam Exp $
+ *  $Date: 2014/10/29 03:27:46 $
  *  $Rev: 99 $
  */
 
@@ -1507,7 +1507,9 @@ START_HELP(lua)
 " All arguments will be provided to the selected script for further",
 " evaluation. E.g. 'set term lua tikz help' will cause the script itself",
 " to print additional help on options and choices for the script.",
-#include "lua/gnuplot-tikz.help"
+#ifdef HAVE_LUA
+#include "gnuplot-tikz.help"
+#endif
 ""
 END_HELP(lua)
 START_HELP(tikz)
