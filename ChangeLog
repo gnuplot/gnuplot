@@ -1,3 +1,10 @@
+2014-11-18 Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/wxterminal/wxt_gui.*: The toolbar widgets for replot/zoom/grid
+	require intervention by the core code in order to act.  This is not
+	possible when in -persist mode after the parent process has exited,
+	so disable the toolbar widgets.
+
 2014-11-16  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* term/Makefile.am.in (Makefile.am): Drop creation of conditional
