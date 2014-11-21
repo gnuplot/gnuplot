@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.265 2014/10/08 22:54:57 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.266 2014/11/05 05:00:18 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -779,6 +779,8 @@ set origin %g,%g\n",
     save_tics(fp, SECOND_Y_AXIS);
     save_tics(fp, COLOR_AXIS);
     save_tics(fp, POLAR_AXIS);
+    for (axis=0; axis<MAX_PARALLEL_AXES; axis++)
+	save_tics(fp, PARALLEL_AXES+axis);
 
 #define SAVE_AXISLABEL_OR_TITLE(name,suffix,lab)			 \
     {									 \
@@ -827,6 +829,10 @@ set origin %g,%g\n",
 
     SAVE_AXISLABEL(COLOR_AXIS);
     save_range(fp, COLOR_AXIS);
+
+    for (axis=0; axis<MAX_PARALLEL_AXES; axis++)
+	save_range(fp, PARALLEL_AXES+axis);
+
 #undef SAVE_AXISLABEL
 #undef SAVE_AXISLABEL_OR_TITLE
 
@@ -1059,7 +1065,7 @@ static void
 save_tics(FILE *fp, AXIS_INDEX axis)
 {
     if ((axis_array[axis].ticmode & TICS_MASK) == NO_TICS) {
-	fprintf(fp, "set no%stics\n", axis_name(axis));
+	fprintf(fp, "unset %stics\n", axis_name(axis));
 	return;
     }
     fprintf(fp, "set %stics %s %s scale %g,%g %smirror %s ",
@@ -1239,10 +1245,7 @@ save_range(FILE *fp, AXIS_INDEX axis)
 	fputs("\n\t", fp);
     }
 
-    if (axis < PARALLEL_AXES)
-	fprintf(fp, "set %srange [ ", axis_name(axis));
-    else
-	fprintf(fp, "set paxis %d range [ ", axis-PARALLEL_AXES+1);
+    fprintf(fp, "set %srange [ ", axis_name(axis));
     if (axis_array[axis].set_autoscale & AUTOSCALE_MIN) {
 	if (axis_array[axis].min_constraint & CONSTRAINT_LOWER ) {
 	    save_num_or_time_input(fp, axis_array[axis].min_lb, axis);
@@ -1275,8 +1278,10 @@ save_range(FILE *fp, AXIS_INDEX axis)
 	    ((axis_array[axis].range_flags & RANGE_IS_REVERSED)) ? "" : "no",
 	    axis_array[axis].range_flags & RANGE_WRITEBACK ? "" : "no");
 
-    if (axis >= PARALLEL_AXES)
+    if (axis >= PARALLEL_AXES) {
+	fprintf(fp, "\n");
 	return;
+    }
 
     if (axis_array[axis].set_autoscale && fp == stderr) {
 	/* add current (hidden) range as comments */
