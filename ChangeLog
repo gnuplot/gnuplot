@@ -16,6 +16,11 @@
 
 	* src/show.c: formatting typos (missing \t at beginning of line)
 
+	* src/graphics.c (map_position_r): If only the x coorinate delta is
+	requested, don't bother to calculate delta y, particularly because
+	delta y=0 will fail if y is log scale.
+	Bug #1512
+
 2014-11-12 Ethan A Merritt  <merritt@u.washington.edu>
 
 	* bump patchlevel identifier to -rc3
