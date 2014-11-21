@@ -1,3 +1,16 @@
+2014-11-21 Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/gd.trm:  Replace the dotted-line code in PNG_vector with an 
+	adaptation of the dash pattern code used by canvas.trm.
+
+	* src/term.c (term_apply_lp_properties):  Special linetype LT_AXIS is
+	intended to produce a dotted line if possible, even on terminals that
+	do not support the general dash pattern mechanism introduced in v5.
+	This means that when rendering lines with linetype LT_AXIS the 
+	dashtype code should not be called at all. This bug affected at least
+	the gd and qt terminals.
+	Bug #1516
+
 2014-11-12 Ethan A Merritt  <merritt@u.washington.edu>
 
 	* bump patchlevel identifier to -rc3
