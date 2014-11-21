@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: gd.trm,v 1.178 2014/05/10 17:21:06 sfeam Exp $
+ * $Id: gd.trm,v 1.179 2014/05/30 05:26:06 sfeam Exp $
  */
 
 /* GNUPLOT -- gd.trm */
@@ -1519,43 +1519,66 @@ PNG_vector(unsigned int x, unsigned int y)
 {
     int lw = png_state.linewidth;
 
-    /* Dashed line style; used only for the x/y grid */
-    if (png_state.linetype == -1) {
+    /* This terminal does not support dashed lines in general, but does   */
+    /* render LT_AXIS as a dotted line, used for zeroaxis and grid lines. */
+    /* Nov 2014 - rewritten using the algorithm from the canvas terminal. */
+    /* FIXME: should either fix this up the rest of the way to support    */
+    /* general dash patterns or simplify it back for dotted lines only.   */
+    if (png_state.linetype == LT_AXIS) {
 	static int last_lw = -1;
-	static double last_dl = -1;
 	static int last_color = -1;
-	static int *png_linetype_dotted = NULL;
-	static int ssize;
+	static double dashpattern[4] = {0.1, 0.5, 0.6, 1.0};
+	static double dashfraction = 0.0;	/* Where in the pattern we left off */
 
-	/* Adjust the style when linewidth or dashlength has changed. */
-	if (lw != last_lw || PNG_dashlength_factor != last_dl || last_color != png_state.color) {
-	    int i;
-	    int dashlength = 2 * PNG_dashlength_factor;
-	    int spacelength = 3 * PNG_dashlength_factor;
-	    int psize = lw*lw*dashlength;
-	    
-	    ssize = lw*lw*(spacelength + dashlength);
-	    png_linetype_dotted = gp_realloc( png_linetype_dotted, ssize*sizeof(int), "dashes");
+	int delx = (int)x - png_state.x;
+	int dely = (int)y - png_state.y;
+	double stride = sqrt(delx*delx + dely*dely) / (8. * PNG_dashlength_factor * lw);
 
-	    /* Fill style with with color then transparent.
-	     * The style is 2 on / 3 off and scales with linewidth and dashlength.
-	     */
-	    for(i = 0;i < psize; i++)
-		png_linetype_dotted[i] = png_state.color;
-	    for (;i < ssize; i++)
-		png_linetype_dotted[i] = gdTransparent;
+	int new_x, new_y, i;
+	double this_step;
+
+	/* Adjust the style when linewidth or color has changed. */
+	if (lw != last_lw || last_color != png_state.color) {
+	    PNG_init_brush(lw);
+	    gdImageSetBrush(png_state.image, PNG_brush[lw]->im);
 	    last_lw = lw;
-	    last_dl = PNG_dashlength_factor;
 	    last_color = png_state.color;
 	}
-	/* This driver does not in general use gd's built-in SetThickness command,
-	 * because it only works right for purely horizontal or vertical lines.
-	 * But that's OK for a 2D grid.
-	 */
-	gdImageSetStyle(png_state.image, png_linetype_dotted, ssize);
-	gdImageSetThickness(png_state.image,lw);
-	gdImageLine(png_state.image, png_state.x, Y(png_state.y), x, Y(y), gdStyled);
-	gdImageSetThickness(png_state.image,1);
+
+	while (stride > 0) {
+	    for (i=0; dashpattern[i] <= dashfraction; i++);
+	    this_step = dashpattern[i] - dashfraction;
+	    if (stride > this_step) {
+		new_x = png_state.x + (int)(0.5 + delx * this_step / stride);
+		new_y = png_state.y + (int)(0.5 + dely * this_step / stride);
+		stride -= this_step;
+		dashfraction = dashpattern[i];
+		delx = x - new_x;
+		dely = y - new_y;
+	    } else {
+		new_x = x;
+		new_y = y;
+		dashfraction += stride;
+		stride = 0;
+	    }
+	    if (i%2 == 0) {
+		/* dashes are fine for thin lines, but true dots look better */
+		/* when the line is thick.			             */
+		if (lw > 2) {
+		    if (dashfraction >= dashpattern[0])
+		    gdImageFilledArc(png_state.image, new_x, Y(new_y),
+				2 * lw, 2 * lw,
+			 	0, 360, png_state.color, gdArc);
+		} else {
+		    gdImageLine(png_state.image, png_state.x, Y(png_state.y),
+				new_x, Y(new_y), gdBrushed );
+		}
+	    }
+	    png_state.x = new_x;
+	    png_state.y = new_y;
+	    if (dashfraction >= 1.0)
+		dashfraction = 0.0;
+	}
 
     /* All other (not dashed) vectors */
     } else {
