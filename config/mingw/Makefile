@@ -1,5 +1,5 @@
 # Hello, emacs: this is a -*- Makefile -*-
-# $Id: Makefile,v 1.47 2014/08/18 03:46:06 sfeam Exp $
+# $Id: Makefile,v 1.48 2014/08/18 22:03:46 broeker Exp $
 #
 # GNUPLOT Makefile for MinGW/MSYS on Windows
 # This assumes usual installation of the MinGW32 toolkit, the free
@@ -395,6 +395,7 @@ ifdef LUA
 	TERMLIBS += -l$(LUA)
 	TERMFLAGS += -DGNUPLOT_LUA_DIR=\"$(GNUPLOT_LUA_DIR)\"
 	LUATARGETS += gnuplot-lua-tikz.sty
+	LUA_HELP = gnuplot-tikz.help
 endif
 
 ifdef CACA
@@ -465,7 +466,6 @@ support: $(HELPFILE) $(M)bf_test.exe $(QT_TARGET) $(QT_TRANSLATION) demo_plugin.
 ja: $(HELPFILEJA)
 
 all: console windows pipes support docs
-
 
 # include the 'core makefile template'
 include $(S)/makefile.all
@@ -644,10 +644,10 @@ wgnuplot-ja.chm: $(JASRC) doc2html-ja.exe \
 	-$(HHC) $(JADW)wgnuplot.hhp
 	cp $(JADW)wgnuplot.chm $(HELPFILEJA)
 
-doc2html.exe: $(D)windows/doc2html.c $(D)termdoc.c $(D)xref.c version.$(O)
-	$(LD) $(LDFLAGS) -o $@ -DWINDOWS_NO_GUI $(CFLAGS) -I. -I$(D:/=) -I$(T:/=) $^
+doc2html.exe: $(D)windows/doc2html.c $(D)termdoc.c $(D)xref.c version.$(O) $(LUA_HELP)
+	$(LD) $(LDFLAGS) -o $@ -DWINDOWS_NO_GUI $(CFLAGS) -I. -I$(D:/=) -I$(T:/=) $(D)windows/doc2html.c $(D)termdoc.c $(D)xref.c version.$(O)
 
-doc2html-ja.exe: $(JASRC) $(D)windows/doc2html.c $(D)termdoc.c $(D)xref.c version.$(O)
+doc2html-ja.exe: $(JASRC) $(D)windows/doc2html.c $(D)termdoc.c $(D)xref.c version.$(O) $(LUA_HELP)
 	$(LD) $(LDFLAGS) -o $@ -DWINDOWS_NO_GUI -DJAPANESE_DOC $(CFLAGS) -I. -I$(JAD) -I$(JA)/term $(D)windows/doc2html.c $(D)termdoc.c $(D)xref.c version.$(O)
 
 #make binary demo files
@@ -664,13 +664,15 @@ config.h: $(TOP)/config/config.mgw
 	cp -p $< $@
 
 
-# generate LUA TeX support files
+# generate LUA TeX support files and terminal help
 ifdef LUA
 gnuplot-lua-tikz.sty: $(T)/lua/gnuplot-tikz.lua
-	$(LUA) $(T)/lua/gnuplot-tikz.lua style
+	$(LUA) $< style
+$(LUA_HELP): $(T)/lua/gnuplot-tikz.lua
+	$(LUA) $< termhelp > $@
 endif
 
-
+allterm.h: $(CORETERM) $(LUA_HELP)
 # Create documentation in various formats
 #
 ALL_TERMINALS_DOC=1
@@ -689,19 +691,19 @@ allterm.h: $(CORETERM)
 	done >$@
 else
 # sequence of terminals according to "ls term/*.trm":
-allterm.h: $(CORETERM)
+allterm.h: $(CORETERM) $(LUA_HELP)
 	@echo "Building allterm.h"
 	@cat $(T)*.trm > allterm.c
 	$(CPP) $(CFLAGS) -I$(T) -DTERM_DRIVER_H -DTERM_HELP allterm.c | \
 	  sed '/^ *$$/d;/^#/d' > allterm.h
 	@rm -f allterm.c
 endif
-doc2tex.exe: $(D)doc2tex.c $(D)termdoc.c allterm.h $(CORETERM)
+doc2tex.exe: $(D)doc2tex.c $(D)termdoc.c allterm.h $(CORETERM) $(LUA_HELP)
 	$(LD) $(LDFLAGS) -o $@ -DWINDOWS_NO_GUI -DALL_TERM_DOC $(CFLAGS) \
 	  -I. -I$(D) -I$(T) $(D)doc2tex.c $(D)termdoc.c
 else
 # Old version: generate documentation with only currently used terminals:
-doc2tex.exe: $(D)doc2tex.c $(D)termdoc.c
+doc2tex.exe: $(D)doc2tex.c $(D)termdoc.c $(LUA_HELP)
 	$(LD) $(LDFLAGS) -o $@ -DWINDOWS_NO_GUI $(CFLAGS) -I. -I$(D) -I$(T) $^
 endif
 
