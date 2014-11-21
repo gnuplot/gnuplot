@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.466 2014/09/27 05:51:06 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.467 2014/10/01 04:40:53 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -184,13 +184,13 @@ get_arrow(
 	*ey = (int)(ey_d + sy_d);
     } else if (arrow->type == arrow_end_oriented) {
 	double aspect = (double)term->v_tic / (double)term->h_tic;
-	double radius, junk;
+	double radius;
 
 #ifdef WIN32
 	if (strcmp(term->name, "windows") == 0)
 	    aspect = 1.;
 #endif
-	map_position_r(&arrow->end, &radius, &junk, "arrow");
+	map_position_r(&arrow->end, &radius, NULL, "arrow");
 	*ex = *sx + cos(DEG2RAD * arrow->angle) * radius;
 	*ey = *sy + sin(DEG2RAD * arrow->angle) * radius * aspect;
     } else {
@@ -383,12 +383,12 @@ place_objects(struct object *listhead, int layer, int dimensions)
 	case OBJ_CIRCLE:
 	{
 	    t_circle *e = &this_object->o.circle;
-	    double radius, junk;
+	    double radius;
 	    BoundingBox *clip_save = clip_area;
 
 	    if (dimensions == 2 || e->center.scalex == screen) {
 		map_position_double(&e->center, &x1, &y1, "rect");
-		map_position_r(&e->extent, &radius, &junk, "rect");
+		map_position_r(&e->extent, &radius, NULL, "rect");
 	    } else if (splot_map) {
 		int junkw, junkh;
 		map3d_position_double(&e->center, &x1, &y1, "rect");
@@ -2108,10 +2108,8 @@ plot_circles(struct curve_points *plot)
 	    x = map_x(plot->points[i].x);
 	    y = map_y(plot->points[i].y);
 	    radius = x - map_x(plot->points[i].xlow);
-	    if (plot->points[i].z == DEFAULT_RADIUS) {
-		double junk;
-		map_position_r( &default_circle.o.circle.extent, &radius, &junk, "radius");
-	    }
+	    if (plot->points[i].z == DEFAULT_RADIUS)
+		map_position_r( &default_circle.o.circle.extent, &radius, NULL, "radius");
 
 	    arc_begin = plot->points[i].ylow;
 	    arc_end = plot->points[i].xhigh;
@@ -3594,6 +3592,11 @@ map_position_r(
 	    break;
 	}
     }
+
+    /* Maybe they only want one coordinate translated? */
+    if (y == NULL)
+	return;
+
     switch (pos->scaley) {
     case first_axes:
 	{
@@ -4025,9 +4028,9 @@ do_ellipse( int dimensions, t_ellipse *e, int style, TBOOLEAN do_own_mapping )
 	        map_position_r(&pos, &xoff, &yoff, "ellipse");
 		    break;
 	    case ELLIPSEAXES_XX:
-	        map_position_r(&pos, &xoff, &junkfoo, "ellipse");
+	        map_position_r(&pos, &xoff, NULL, "ellipse");
 	        pos.x = pos.y;
-		    map_position_r(&pos, &yoff, &junkfoo, "ellipse");
+		    map_position_r(&pos, &yoff, NULL, "ellipse");
 	        break;
 	    case ELLIPSEAXES_YY:
 	        map_position_r(&pos, &junkfoo, &yoff, "ellipse");
