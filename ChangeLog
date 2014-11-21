@@ -11,6 +11,11 @@
 	the gd and qt terminals.
 	Bug #1516
 
+	* src/axis.c (axis_name) src/save.c: paxis tics and range settings
+	were not being saved.
+
+	* src/show.c: formatting typos (missing \t at beginning of line)
+
 2014-11-12 Ethan A Merritt  <merritt@u.washington.edu>
 
 	* bump patchlevel identifier to -rc3
