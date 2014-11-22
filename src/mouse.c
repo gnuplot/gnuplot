@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: mouse.c,v 1.133.2.9 2014/09/12 15:12:47 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: mouse.c,v 1.133.2.10 2014/09/14 08:32:44 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - mouse.c */
@@ -1612,6 +1612,13 @@ event_buttonpress(struct gp_event_t *ge)
 		if (paused_for_mouse & PAUSE_BUTTON1) {
 		    load_mouse_variables(mouse_x, mouse_y, TRUE, b);
 		    trap_release = TRUE;	/* Don't trigger on release also */
+#ifdef WIN32
+		    if ((term != NULL) && (strcmp(term->name, "windows") == 0)) {
+			paused_for_mouse = 0;
+			kill_pending_Pause_dialog();
+			printf("end pause mouse\n");
+		    }
+#endif
 		    return;
 		}
 

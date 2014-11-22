@@ -1,3 +1,11 @@
+2014-11-22  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/mouse.c:  Pause mouse was broken on Windows as a side-effect
+	of the change on 2014-08-01.  The windows terminal expects the pause
+	mouse to be reset in the gnuplot core whereas other terminal drivers
+	(qt/wxt/x11) do that in the driver code.
+	Bugfix.
+
 2014-10-16  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/axis.c (copy_or_invent_formatstring): Backport fix for axis
