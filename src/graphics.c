@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.467 2014/10/01 04:40:53 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.468 2014/11/22 04:13:09 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -2166,39 +2166,39 @@ plot_ellipses(struct curve_points *plot)
 	    /* clumsy solution */
 	    switch (e->type) {
 	    case ELLIPSEAXES_XY:
-	        map_position_r(&e->extent, &tempx, &tempy, "ellipse");
-	        e->extent.x = tempx;
-	        e->extent.y = tempy;
-	        break;
+		map_position_r(&e->extent, &tempx, &tempy, "ellipse");
+		e->extent.x = tempx;
+		e->extent.y = tempy;
+		break;
 	    case ELLIPSEAXES_XX:
-	        map_position_r(&e->extent, &tempx, &tempy, "ellipse");
-	        tempfoo = tempx;
-	        e->extent.x = e->extent.y;
-	        map_position_r(&e->extent, &tempy, &tempx, "ellipse");
-	        e->extent.x = tempfoo;
-	        e->extent.y = tempy;
-	        break;
+		map_position_r(&e->extent, &tempx, &tempy, "ellipse");
+		tempfoo = tempx;
+		e->extent.x = e->extent.y;
+		map_position_r(&e->extent, &tempy, &tempx, "ellipse");
+		e->extent.x = tempfoo;
+		e->extent.y = tempy;
+		break;
 	    case ELLIPSEAXES_YY:
-	        map_position_r(&e->extent, &tempx, &tempy, "ellipse");
-	        tempfoo = tempy;
-	        e->extent.y = e->extent.x;
-	        map_position_r(&e->extent, &tempy, &tempx, "ellipse");
-	        e->extent.x = tempx;
-	        e->extent.y = tempfoo;
-	        break;
+		map_position_r(&e->extent, &tempx, &tempy, "ellipse");
+		tempfoo = tempy;
+		e->extent.y = e->extent.x;
+		map_position_r(&e->extent, &tempy, &tempx, "ellipse");
+		e->extent.x = tempx;
+		e->extent.y = tempfoo;
+		break;
 	    }
 
 	    if (plot->points[i].z <= DEFAULT_RADIUS) {
-	        /*memcpy(&(e->extent), &default_ellipse.o.ellipse.extent, sizeof(t_position));*/
-	        /*e->extent.x = default_ellipse.o.ellipse.extent.x;
-	        e->extent.y = default_ellipse.o.ellipse.extent.y;*/
-	        map_position_r(&default_ellipse.o.ellipse.extent, &e->extent.x, &e->extent.y, "ellipse");
+		/*memcpy(&(e->extent), &default_ellipse.o.ellipse.extent, sizeof(t_position));*/
+		/*e->extent.x = default_ellipse.o.ellipse.extent.x;
+		e->extent.y = default_ellipse.o.ellipse.extent.y;*/
+		map_position_r(&default_ellipse.o.ellipse.extent, &e->extent.x, &e->extent.y, "ellipse");
 	    }
 
 	    if (plot->points[i].z == DEFAULT_ELLIPSE)
-	        e->orientation = default_ellipse.o.ellipse.orientation;
+		e->orientation = default_ellipse.o.ellipse.orientation;
 	    else
-	        e->orientation = plot->points[i].ylow;
+		e->orientation = plot->points[i].ylow;
 
 	    /* rgb variable  -  color read from data column */
 	    if (!check_for_variable_color(plot, &plot->varcolor[i]) && withborder)
@@ -4021,51 +4021,53 @@ do_ellipse( int dimensions, t_ellipse *e, int style, TBOOLEAN do_own_mapping )
 	    if (!do_own_mapping) {
 	        xoff = pos.x;
 	        yoff = pos.y;
-	    }
-	    else if (dimensions == 2)
-	    switch (e->type) {
-	    case ELLIPSEAXES_XY:
-	        map_position_r(&pos, &xoff, &yoff, "ellipse");
+
+	    } else if (dimensions == 2) {
+		switch (e->type) {
+		case ELLIPSEAXES_XY:
+		    map_position_r(&pos, &xoff, &yoff, "ellipse");
 		    break;
-	    case ELLIPSEAXES_XX:
-	        map_position_r(&pos, &xoff, NULL, "ellipse");
-	        pos.x = pos.y;
+		case ELLIPSEAXES_XX:
+		    map_position_r(&pos, &xoff, NULL, "ellipse");
+		    pos.x = pos.y;
 		    map_position_r(&pos, &yoff, NULL, "ellipse");
-	        break;
-	    case ELLIPSEAXES_YY:
-	        map_position_r(&pos, &junkfoo, &yoff, "ellipse");
-	        pos.y = pos.x;
+		    break;
+		case ELLIPSEAXES_YY:
+		    map_position_r(&pos, &junkfoo, &yoff, "ellipse");
+		    pos.y = pos.x;
 		    map_position_r(&pos, &junkfoo, &xoff, "ellipse");
 		    break;
 		}
-	    else {
-	    switch (e->type) {
-	    case ELLIPSEAXES_XY:
-	        map3d_position_r(&pos, &junkw, &junkh, "ellipse");
-	        xoff = junkw;
-	        yoff = junkh;
+
+	    } else {
+		switch (e->type) {
+		case ELLIPSEAXES_XY:
+		    map3d_position_r(&pos, &junkw, &junkh, "ellipse");
+		    xoff = junkw;
+		    yoff = junkh;
 		    break;
-	    case ELLIPSEAXES_XX:
-	        map3d_position_r(&pos, &junkw, &junkh, "ellipse");
-	        xoff = junkw;
-	        pos.x = pos.y;
+		case ELLIPSEAXES_XX:
+		    map3d_position_r(&pos, &junkw, &junkh, "ellipse");
+		    xoff = junkw;
+		    pos.x = pos.y;
 		    map3d_position_r(&pos, &junkh, &junkw, "ellipse");
 		    yoff = junkh;
-	        break;
-	    case ELLIPSEAXES_YY:
-	        map3d_position_r(&pos, &junkw, &junkh, "ellipse");
-	        yoff = junkh;
-	        pos.y = pos.x;
+		    break;
+		case ELLIPSEAXES_YY:
+		    map3d_position_r(&pos, &junkw, &junkh, "ellipse");
+		    yoff = junkh;
+		    pos.y = pos.x;
 		    map3d_position_r(&pos, &junkh, &junkw, "ellipse");
 		    xoff = junkw;
 		    break;
 		}
 	    }
+
 	    vertex[i].x = cx + xoff;
 	    if (!do_own_mapping)
-	        vertex[i].y = cy + yoff * aspect;
+		vertex[i].y = cy + yoff * aspect;
 	    else
-	        vertex[i].y = cy + yoff;
+		vertex[i].y = cy + yoff;
     }
 
     if (style) {
