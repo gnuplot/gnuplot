@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.332 2014/10/04 22:39:25 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.333 2014/10/04 23:28:38 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -1674,7 +1674,7 @@ show_grid()
 static void
 show_raxis()
 {
-    fprintf(stderr,"raxis is %sdrawn\n",raxis ? "" : "not ");
+    fprintf(stderr,"\traxis is %sdrawn\n",raxis ? "" : "not ");
 }
 
 static void
@@ -2966,7 +2966,7 @@ static void
 show_timefmt()
 {
     SHOW_ALL_NL;
-    fprintf(stderr, "Default format for reading time data is \"%s\"\n",
+    fprintf(stderr, "\tDefault format for reading time data is \"%s\"\n",
 	timefmt);
 }
 
