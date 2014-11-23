@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.459.2.6 2014/11/08 04:52:25 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.459.2.7 2014/11/23 07:18:54 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -1369,6 +1369,7 @@ set_dashtype()
 
     if (almost_equals(c_token, "def$ault")) {
 	delete_dashtype(prev_dashtype, this_dashtype);
+	is_new = FALSE;
 	c_token++;
     } else {
 	/* FIXME: Maybe this should reject return values > 0 because */
@@ -6140,6 +6141,7 @@ parse_histogramstyle( histogram_style *hs,
 	    free(title_specs.text);
 	    title_specs.text = NULL;
 	    free(hs->title.font);
+	    hs->title.font = NULL;
 	    hs->title = title_specs;
 	} else if ((equals(c_token,"lw") || almost_equals(c_token,"linew$idth"))
 		  && (hs->type == HT_ERRORBARS)) {
