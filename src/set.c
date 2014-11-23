@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.459.2.5 2014/10/02 20:13:30 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.459.2.6 2014/11/08 04:52:25 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -5266,13 +5266,15 @@ set_tic_prop(AXIS_INDEX axis)
 {
     int match = 0;		/* flag, set by matching a tic command */
     char nocmd[12];		/* fill w/ "no"+axis_name+suffix */
-    char *cmdptr, *sfxptr;
+    char *cmdptr = NULL, *sfxptr = NULL;
 
-    (void) strcpy(nocmd, "no");
-    cmdptr = &nocmd[2];
-    (void) strcpy(cmdptr, axis_name(axis));
-    sfxptr = &nocmd[strlen(nocmd)];
-    (void) strcpy(sfxptr, "t$ics");	/* STRING */
+    if (axis < PARALLEL_AXES) {
+	(void) strcpy(nocmd, "no");
+	cmdptr = &nocmd[2];
+	(void) strcpy(cmdptr, axis_name(axis));
+	sfxptr = &nocmd[strlen(nocmd)];
+	(void) strcpy(sfxptr, "t$ics");	/* STRING */
+    }
 
     if (almost_equals(c_token, cmdptr) || axis >= PARALLEL_AXES) {
 	TBOOLEAN axisset = FALSE;
@@ -5426,11 +5428,16 @@ set_tic_prop(AXIS_INDEX axis)
 
     }
 
+    /* The remaining command options cannot work for parallel axes */
+    if (axis >= PARALLEL_AXES)
+	return match;
+
     if (almost_equals(c_token, nocmd)) {	/* NOSTRING */
 	axis_array[axis].ticmode &= ~TICS_MASK;
 	c_token++;
 	match = 1;
     }
+
 /* other options */
 
     (void) strcpy(sfxptr, "m$tics");	/* MONTH */

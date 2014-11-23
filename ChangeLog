@@ -1,3 +1,10 @@
+2014-11-23 Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/axis.c src/set.c: The full names of the parallel axes is too long
+	to fit in character arrays built to hold the simpler name "x2/cb/etc".
+	But the 'set' commands using these arrays do not apply to parallel axes,
+	so we avoid problems by never loading these arrays for parallel axes.
+
 2014-11-21 Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/gd.trm:  Replace the dotted-line code in PNG_vector with an 
