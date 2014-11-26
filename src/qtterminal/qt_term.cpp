@@ -715,9 +715,10 @@ void qt_dashtype (int type, t_dashtype *custom_dash_type)
 		if (type > 0) {
 			Qt::PenStyle style;
 			style =
-				(type%4 == 1) ? Qt::DashLine :
-				(type%4 == 2) ? Qt::DashDotLine :
-				(type%4 == 3) ? Qt::DashDotDotLine :
+				(type%5 == 1) ? Qt::DashLine :
+				(type%5 == 2) ? Qt::DotLine :
+				(type%5 == 3) ? Qt::DashDotLine :
+				(type%5 == 4) ? Qt::DashDotDotLine :
 					      Qt::SolidLine ;
 			qt->out << GEPenStyle << style;
 		} else {
