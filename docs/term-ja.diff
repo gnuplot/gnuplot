@@ -181,7 +181,7 @@ diff -rc docs/tex2ja.awk.ORG docs/tex2ja.awk
 *** 0 ****
 --- 1,54 ----
 + #
-+ # $Id: tex2ja.awk,v 1.5 2008-06-22 20:22:11+09 shige Exp $
++ # $Id: term-ja.diff,v 1.48.2.1 2014/09/08 17:24:50 sfeam Exp $
 + # doc2tex の出力の後処理スクリプト
 + # tex2ja.awk
 + # 06/20 2008
@@ -234,46 +234,6 @@ diff -rc docs/tex2ja.awk.ORG docs/tex2ja.awk
 +     printf "%s",s;
 + }
 + 
-diff -rc term/aed.trm.ORG term/aed.trm
-*** term/aed.trm.ORG	2014-08-29 19:35:10.000000000 +0900
---- term/aed.trm	2014-09-01 13:52:51.000000000 +0900
-***************
-*** 203,208 ****
---- 203,209 ----
-  
-  #ifdef TERM_HELP
-  START_HELP(aed767)
-+ #ifndef JAPANESE_DOC
-  "1 aed767",
-  "?commands set terminal aed767",
-  "?set terminal aed767",
-***************
-*** 220,224 ****
---- 221,244 ----
-  " The two drivers differ only in their horizontal ranges, which are 512 and",
-  " 768 pixels, respectively.  Their vertical range is 575 pixels.  There are",
-  " no options for these drivers."
-+ #else /* JAPANESE_DOC */
-+ "1 aed767",
-+ "?commands set terminal aed767",
-+ "?set terminal aed767",
-+ "?set term aed767",
-+ "?terminal aed767",
-+ "?term aed767",
-+ "?aed767",
-+ "?commands set terminal aed512",
-+ "?set terminal aed512",
-+ "?set term aed512",
-+ "?terminal aed512",
-+ "?term aed512",
-+ "?aed512",
-+ " 出力ドライバ `aed512` と `aed767` は AED グラフィック端末をサポートし",
-+ " ます。この 2 つのドライバは、水平方向の範囲のみが違っていて、それぞれ",
-+ " 512 ピクセルと 767 ピクセルです。垂直方向はいずれも 575 ピクセルです。",
-+ " これらのドライバにはオプションはありません。"
-+ #endif /* JAPANESE_DOC */
-  END_HELP(aed767)
-  #endif
 diff -rc term/ai.trm.ORG term/ai.trm
 *** term/ai.trm.ORG	2014-08-29 19:35:10.000000000 +0900
 --- term/ai.trm	2014-09-01 13:52:51.000000000 +0900
@@ -5957,38 +5917,6 @@ diff -rc term/tpic.trm.ORG term/tpic.trm
 + #endif /* JAPANESE_DOC */
   END_HELP(tpic)
   #endif /* TERM_TABLE */
-diff -rc term/v384.trm.ORG term/v384.trm
-*** term/v384.trm.ORG	2014-08-29 19:35:10.000000000 +0900
---- term/v384.trm	2014-09-01 13:52:51.000000000 +0900
-***************
-*** 194,199 ****
---- 194,200 ----
-  
-  #ifdef TERM_HELP
-  START_HELP(vx384)
-+ #ifndef JAPANESE_DOC
-  "1 vx384",
-  "?commands set terminal vx384",
-  "?set terminal vx384",
-***************
-*** 203,207 ****
---- 204,219 ----
-  "?vx384",
-  " The `vx384` terminal driver supports the Vectrix 384 and Tandy color",
-  " printers.  It has no options."
-+ #else /* JAPANESE_DOC */
-+ "1 vx384",
-+ "?commands set terminal vx384",
-+ "?set terminal vx384",
-+ "?set term vx384",
-+ "?terminal vx384",
-+ "?term vx384",
-+ "?vx384",
-+ " `vx384` ドライバは Vectrix 384 と Tandy カラープリンタをサポートしま",
-+ " す。オプションはありません。"
-+ #endif /* JAPANESE_DOC */
-  END_HELP(vx384)
-  #endif
 diff -rc term/vgagl.trm.ORG term/vgagl.trm
 *** term/vgagl.trm.ORG	2014-08-29 19:35:10.000000000 +0900
 --- term/vgagl.trm	2014-09-01 13:52:51.000000000 +0900
