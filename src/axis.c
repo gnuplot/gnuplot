@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.135.2.3 2014/11/22 00:24:52 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.135.2.4 2014/11/23 07:18:54 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -2140,10 +2140,13 @@ clone_linked_axes(AXIS_INDEX axis2, AXIS_INDEX axis1)
 	    int_warn(NO_CARET, "axis mapping function must return a real value");
 
     /* Confirm that the inverse mapping actually works */
+    /* FIXME:  Should we test values in between the endpoints also? */
 	testmin = eval_link_function(axis1, axis_array[axis2].set_min);
 	testmax = eval_link_function(axis1, axis_array[axis2].set_max);
-	if (fabs(testmin - axis_array[axis1].set_min) / testmin > 1.e-6
-	||  fabs(testmax - axis_array[axis1].set_max) / testmax > 1.e-6) {
+	if (fabs((testmin - axis_array[axis1].set_min) / testmin) < 1.e-6
+	&&  fabs((testmax - axis_array[axis1].set_max) / testmax) < 1.e-6) {
+	    /* OK */
+	} else {
 	    int_warn(NO_CARET, "could not confirm linked axis inverse mapping function");
 	    fprintf(stderr,"\tmin: %g inv(via(min)): %g", axis_array[axis1].set_min, testmin);
 	    fprintf(stderr,"  max: %g inv(via(max)): %g\n", axis_array[axis1].set_max, testmax);

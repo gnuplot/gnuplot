@@ -3,6 +3,7 @@ Changes in final release of 5.0
 * FIX lt 0 rendering by libgd and qt terminals
 * FIX paxis tic and range settings were not being saved
 * FIX ignore unwanted delta_y so that it doesn't cause problems for logscale y
+* FIX incorrect test for validity of linked axis inverse mapping
 
 Changes in 5.0.rc3
 =====================
