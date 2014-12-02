@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.902.2.19 2014/10/29 03:14:35 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.902.2.20 2014/11/08 04:52:24 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -10602,8 +10602,9 @@ Ffigure_missing
        show paxis <axisno> {range | tics}
  The `set paxis` command is equivalent to the `set xrange` and `set xtics`
  commands except that it acts on one of the axes p1, p2, ... used in parallel
- axis plots.  The normal options to these commands are accepted although not
- all options make sense for this kind of plot.  See `set xrange`, `set xtics`.
+ axis plots.  See `parallelaxes`, `set xrange`, and `set xtics`.
+ The normal options to the range and tics commands are accepted although not
+ all options make sense for parallel axis plots.
 3 plot
 ?commands show plot
 ?show plot
