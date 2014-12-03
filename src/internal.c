@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: internal.c,v 1.79 2014/05/09 22:14:11 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: internal.c,v 1.80 2014/09/09 03:37:34 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - internal.c */
@@ -72,8 +72,8 @@ GP_MATHERR( STRUCT_EXCEPTION_P_X )
 
 static enum DATA_TYPES sprintf_specifier __PROTO((const char *format));
 
-#define BAD_DEFAULT default: int_error(NO_CARET, "internal error : type neither INT or CMPLX"); return;
-#define BADINT_DEFAULT default: int_error(NO_CARET, "error: bit shift applied to non-INT"); return;
+#define BAD_DEFAULT int_error(NO_CARET, "internal error : type neither INT nor CMPLX");
+#define BADINT_DEFAULT int_error(NO_CARET, "error: bit shift applied to non-INT");
 
 static int recursion_depth = 0;
 void
@@ -376,7 +376,9 @@ f_uminus(union argument *arg)
 	a.v.cmplx_val.imag =
 	    -a.v.cmplx_val.imag;
 	break;
+    default:
 	BAD_DEFAULT
+	break;
     }
     push(&a);
 }
@@ -405,6 +407,7 @@ f_eq(union argument *arg)
 		      b.v.cmplx_val.real &&
 		      b.v.cmplx_val.imag == 0.0);
 	    break;
+	default:
 	    BAD_DEFAULT
 	}
 	break;
@@ -420,9 +423,11 @@ f_eq(union argument *arg)
 		      a.v.cmplx_val.imag ==
 		      b.v.cmplx_val.imag);
 	    break;
+	default:
 	    BAD_DEFAULT
 	}
 	break;
+    default:
 	BAD_DEFAULT
     }
     push(Ginteger(&a, result));
@@ -450,6 +455,7 @@ f_ne(union argument *arg)
 		      b.v.cmplx_val.real ||
 		      b.v.cmplx_val.imag != 0.0);
 	    break;
+	default:
 	    BAD_DEFAULT
 	}
 	break;
@@ -466,9 +472,11 @@ f_ne(union argument *arg)
 		      a.v.cmplx_val.imag !=
 		      b.v.cmplx_val.imag);
 	    break;
+	default:
 	    BAD_DEFAULT
 	}
 	break;
+    default:
 	BAD_DEFAULT
     }
     push(Ginteger(&a, result));
@@ -495,6 +503,7 @@ f_gt(union argument *arg)
 	    result = (a.v.int_val >
 		      b.v.cmplx_val.real);
 	    break;
+	default:
 	    BAD_DEFAULT
 	}
 	break;
@@ -508,9 +517,11 @@ f_gt(union argument *arg)
 	    result = (a.v.cmplx_val.real >
 		      b.v.cmplx_val.real);
 	    break;
+	default:
 	    BAD_DEFAULT
 	}
 	break;
+    default:
 	BAD_DEFAULT
     }
     push(Ginteger(&a, result));
@@ -537,6 +548,7 @@ f_lt(union argument *arg)
 	    result = (a.v.int_val <
 		      b.v.cmplx_val.real);
 	    break;
+	default:
 	    BAD_DEFAULT
 	}
 	break;
@@ -550,9 +562,11 @@ f_lt(union argument *arg)
 	    result = (a.v.cmplx_val.real <
 		      b.v.cmplx_val.real);
 	    break;
+	default:
 	    BAD_DEFAULT
 	}
 	break;
+    default:
 	BAD_DEFAULT
     }
     push(Ginteger(&a, result));
@@ -579,6 +593,7 @@ f_ge(union argument *arg)
 	    result = (a.v.int_val >=
 		      b.v.cmplx_val.real);
 	    break;
+	default:
 	    BAD_DEFAULT
 	}
 	break;
@@ -592,9 +607,11 @@ f_ge(union argument *arg)
 	    result = (a.v.cmplx_val.real >=
 		      b.v.cmplx_val.real);
 	    break;
+	default:
 	    BAD_DEFAULT
 	}
 	break;
+    default:
 	BAD_DEFAULT
     }
     push(Ginteger(&a, result));
@@ -621,6 +638,7 @@ f_le(union argument *arg)
 	    result = (a.v.int_val <=
 		      b.v.cmplx_val.real);
 	    break;
+	default:
 	    BAD_DEFAULT
 	}
 	break;
@@ -634,9 +652,11 @@ f_le(union argument *arg)
 	    result = (a.v.cmplx_val.real <=
 		      b.v.cmplx_val.real);
 	    break;
+	default:
 	    BAD_DEFAULT
 	}
 	break;
+    default:
 	BAD_DEFAULT
     }
     push(Ginteger(&a, result));
@@ -657,10 +677,12 @@ f_leftshift(union argument *arg)
 	case INTGR:
 	    (void) Ginteger(&result, (unsigned)(a.v.int_val) << b.v.int_val);
 	    break;
-	BADINT_DEFAULT
+	default:
+	    BADINT_DEFAULT
 	}
 	break;
-    BADINT_DEFAULT
+    default:
+	BADINT_DEFAULT
     }
     push(&result);
 }
@@ -681,10 +703,12 @@ f_rightshift(union argument *arg)
 	case INTGR:
 	    (void) Ginteger(&result, (unsigned)(a.v.int_val) >> b.v.int_val);
 	    break;
-	BADINT_DEFAULT
+	default:
+	    BADINT_DEFAULT
 	}
 	break;
-    BADINT_DEFAULT
+    default:
+	BADINT_DEFAULT
     }
     push(&result);
 }
@@ -711,6 +735,7 @@ f_plus(union argument *arg)
 			    b.v.cmplx_val.real,
 			    b.v.cmplx_val.imag);
 	    break;
+	default:
 	    BAD_DEFAULT
 	}
 	break;
@@ -727,9 +752,11 @@ f_plus(union argument *arg)
 			    a.v.cmplx_val.imag +
 			    b.v.cmplx_val.imag);
 	    break;
+	default:
 	    BAD_DEFAULT
 	}
 	break;
+    default:
 	BAD_DEFAULT
     }
     push(&result);
@@ -756,6 +783,7 @@ f_minus(union argument *arg)
 			    b.v.cmplx_val.real,
 			    -b.v.cmplx_val.imag);
 	    break;
+	default:
 	    BAD_DEFAULT
 	}
 	break;
@@ -772,9 +800,11 @@ f_minus(union argument *arg)
 			    a.v.cmplx_val.imag -
 			    b.v.cmplx_val.imag);
 	    break;
+	default:
 	    BAD_DEFAULT
 	}
 	break;
+    default:
 	BAD_DEFAULT
     }
     push(&result);
@@ -807,6 +837,7 @@ f_mult(union argument *arg)
 			    a.v.int_val *
 			    b.v.cmplx_val.imag);
 	    break;
+	default:
 	    BAD_DEFAULT
 	}
 	break;
@@ -828,9 +859,11 @@ f_mult(union argument *arg)
 			    a.v.cmplx_val.imag *
 			    b.v.cmplx_val.real);
 	    break;
+	default:
 	    BAD_DEFAULT
 	}
 	break;
+    default:
 	BAD_DEFAULT
     }
     push(&result);
@@ -874,6 +907,7 @@ f_div(union argument *arg)
 		undefined = TRUE;
 	    }
 	    break;
+	default:
 	    BAD_DEFAULT
 	}
 	break;
@@ -910,9 +944,11 @@ f_div(union argument *arg)
 		undefined = TRUE;
 	    }
 	    break;
+	default:
 	    BAD_DEFAULT
 	}
 	break;
+    default:
 	BAD_DEFAULT
     }
     push(&result);
@@ -995,6 +1031,7 @@ f_power(union argument *arg)
 				mag * sin(ang));
 	    }
 	    break;
+	default:
 	    BAD_DEFAULT
 	}
 	break;
@@ -1046,9 +1083,11 @@ f_power(union argument *arg)
 				mag * sin(ang));
 	    }
 	    break;
+	default:
 	    BAD_DEFAULT
 	}
 	break;
+    default:
 	BAD_DEFAULT
     }
     push(&result);
