@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: eval.c,v 1.118 2014/05/09 22:14:11 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: eval.c,v 1.119 2014/07/30 21:45:09 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - eval.c */
@@ -482,6 +482,12 @@ struct value *
 pop_or_convert_from_string(struct value *v)
 {
     (void) pop(v);
+
+    /* DEBUG Dec 2014 - Consolidate sanity check for variable type */
+    /* FIXME: Test for INVALID_VALUE? Other corner cases? */
+    if (v->type == INVALID_NAME)
+	int_error(NO_CARET, "invalid dummy variable name");
+
     if (v->type == STRING) {
 	char *eov;
 
@@ -1044,6 +1050,7 @@ eval_link_function(int axis, double raw_coord)
 	dummy_var = 1;
     else
 	dummy_var = 0;
+    link_udf->dummy_values[1-dummy_var].type = INVALID_NAME;
 
     Gcomplex(&link_udf->dummy_values[dummy_var], raw_coord, 0.0);
     evaluate_at(link_udf->at, &a);
