@@ -1,6 +1,7 @@
 Changes in final release of 5.0
 ===============================
 * CHANGE reorder PostScript dash types to match other terminals
+* CHANGE disable the wxt toolbar when the plot is left in -persist mode
 * FIX lt 0 rendering by libgd and qt terminals
 * FIX paxis tic and range settings were not being saved
 * FIX ignore unwanted delta_y so that it doesn't cause problems for logscale y

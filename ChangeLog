@@ -3,6 +3,11 @@
 	* term/PostScript/prologue.ps:  Re-order dash types to more closely
 	match the cairo and qt terminals.
 
+	* src/wxterminal/wxt_gui.*: The toolbar widgets for replot/zoom/grid
+	require intervention by the core code in order to act.  This is not
+	possible when in -persist mode after the parent process has exited,
+	so disable the toolbar widgets.
+
 2014-12-01 Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/axis.c (clone_linked_axes): Sanity check for linked axis via and

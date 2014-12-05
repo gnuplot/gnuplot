@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.cpp,v 1.128.2.5 2014/11/08 03:08:42 sfeam Exp $
+ * $Id: wxt_gui.cpp,v 1.128.2.6 2014/11/12 05:20:18 sfeam Exp $
  */
 
 /* GNUPLOT - wxt_gui.cpp */
@@ -419,7 +419,8 @@ wxtFrame::wxtFrame( const wxString& title, wxWindowID id )
 	SetStatusText( wxT("") );
 
 	/* set up the toolbar */
-	wxToolBar * toolbar = CreateToolBar();
+	toolbar = CreateToolBar();
+
 	/* With wxMSW, default toolbar size is only 16x15. */
 	// toolbar->SetToolBitmapSize(wxSize(16,16));
 
@@ -3990,10 +3991,17 @@ void wxt_atexit()
 	{
 		TBOOLEAN state = wxt_iter->frame->IsShown();
 		FPRINTF((stderr,"\tChecking window %d : %s shown\n", i, state?"":"not "));
-		if (state)
+		if (state) {
 			openwindows++;
-		else
+			/* Disable any toolbar widgets that would require parental help */
+			wxt_iter->frame->toolbar->EnableTool(Toolbar_Replot, false);
+			wxt_iter->frame->toolbar->EnableTool(Toolbar_ToggleGrid, false);
+			wxt_iter->frame->toolbar->EnableTool(Toolbar_ZoomPrevious, false);
+			wxt_iter->frame->toolbar->EnableTool(Toolbar_ZoomNext, false);
+			wxt_iter->frame->toolbar->EnableTool(Toolbar_Autoscale, false);
+		} else {
 			wxt_iter->frame->Destroy();
+		}
 	}
 
 # ifdef HAVE_WORKING_FORK
