@@ -8,6 +8,13 @@
 	possible when in -persist mode after the parent process has exited,
 	so disable the toolbar widgets.
 
+	* src/gp_types.h: New state flag INVALID_NAME for internal variables.
+	src/eval.c (pop_or_convert_from_string eval_link_function):
+	Consolidate initial tests for invalid internal variable type.
+	Test for the correct use of linked axis mapping function variables
+	(f(x) for x axis, f(y) for y axis, etc).
+	Bug #1519
+
 2014-12-01 Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/axis.c (clone_linked_axes): Sanity check for linked axis via and
