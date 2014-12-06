@@ -91,15 +91,15 @@
 /* #undef HAVE_EDITLINE_READLINE_H */
 
 /* Define to 1 if you have the `erf' function. */
-#  define HAVE_ERF 1
+#define HAVE_ERF 1
 
 /* Define to 1 if you have the `erfc' function. */
-#  define HAVE_ERFC 1
+#define HAVE_ERFC 1
 
 /* Define to 1 if you have the <errno.h> header file. */
 #define HAVE_ERRNO_H 1
 
-/* Define if external function plugins are to be supported.  */
+/* Define if external function plugins are to be supported. */
 #define HAVE_EXTERNAL_FUNCTIONS 1
 
 /* Define to 1 if you have the `fdopen' function. */
@@ -160,7 +160,7 @@
 /* #undef HAVE_INDEX */
 
 /* Define to 1 if you have the <inttypes.h> header file. */
-#  define HAVE_INTTYPES_H 1
+#define HAVE_INTTYPES_H 1
 
 /* Define if you want to use kpsexpand (TeX). */
 /* #undef HAVE_KPSEXPAND */
@@ -298,13 +298,13 @@
 /* #undef HAVE_SLEEP */
 
 /* Define to 1 if you have the `snprintf' function. */
-#  define HAVE_SNPRINTF 1
+#define HAVE_SNPRINTF 1
 
 /* Define to 1 if stdbool.h conforms to C99. */
 #define HAVE_STDBOOL_H 1
 
 /* Define to 1 if you have the <stdint.h> header file. */
-#  define HAVE_STDINT_H 1
+#define HAVE_STDINT_H 1
 
 /* Define to 1 if you have the <stdlib.h> header file. */
 #define HAVE_STDLIB_H 1
@@ -370,7 +370,7 @@
 /* #undef HAVE_SYS_IOCTL_H */
 
 /* Define to 1 if you have the <sys/param.h> header file. */
-#  define HAVE_SYS_PARAM_H 1
+#define HAVE_SYS_PARAM_H 1
 
 /* Define to 1 if you have the <sys/select.h> header file. */
 /* #undef HAVE_SYS_SELECT_H */
