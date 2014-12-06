@@ -1,7 +1,7 @@
 /* config.h for mingw/Makefile
  *
  * Prepared according to config.h from ./configure and by means of
- * config_strip.sh as of gnuplot 5.0 in April 2014.
+ * config_strip.sh as of gnuplot 5.0 in November 2014.
  */
 
 /* Define to allow use of certain deprecated syntax. */
@@ -11,7 +11,8 @@
 /* #undef COLUMN_HELP */
 
 /* Provide contact info for gnuplot develoment */
-#define DEVELOPMENT_VERSION 1
+/* #undef DEVELOPMENT_VERSION */
+/* Don't change it here -- this define is set in config/mingw/Makefile. */
 
 /* Define to treat spacebar like any other keystroke. */
 /* #undef DISABLE_SPACE_RAISES_CONSOLE */
@@ -90,20 +91,16 @@
 /* #undef HAVE_EDITLINE_READLINE_H */
 
 /* Define to 1 if you have the `erf' function. */
-#if __GNUC__ >= 3
-#  define HAVE_ERF 1
-#endif
+#define HAVE_ERF 1
 
 /* Define to 1 if you have the `erfc' function. */
-#if __GNUC__ >= 3
-#  define HAVE_ERFC 1
-#endif
+#define HAVE_ERFC 1
 
 /* Define to 1 if you have the <errno.h> header file. */
 #define HAVE_ERRNO_H 1
 
-/* Define if external function plugins are to be supported.  */
-/* #undef HAVE_EXTERNAL_FUNCTIONS */
+/* Define if external function plugins are to be supported. */
+#define HAVE_EXTERNAL_FUNCTIONS 1
 
 /* Define to 1 if you have the `fdopen' function. */
 #define HAVE_FDOPEN 1
@@ -158,9 +155,6 @@
 /* Define to use gtk/gdk tweaks */
 /* #undef HAVE_GTK */
 
-/* Define to use gtk+ functions to handle cairo */
-/* #undef HAVE_GTK28 */
-
 /* define if you have libiconv and iconv.h */
 /* #undef HAVE_ICONV */
 /* Don't change it here -- this define is set in config/mingw/Makefile. */
@@ -169,9 +163,7 @@
 /* #undef HAVE_INDEX */
 
 /* Define to 1 if you have the <inttypes.h> header file. */
-#if __GNUC__ >= 3
-#  define HAVE_INTTYPES_H 1
-#endif
+#define HAVE_INTTYPES_H 1
 
 /* Define if you want to use kpsexpand (TeX). */
 /* #undef HAVE_KPSEXPAND */
@@ -180,16 +172,16 @@
 /* #undef HAVE_LANGINFO_H */
 
 /* Define to 1 if you have the `lgamma' function. */
-#if __GNUC__ >= 3
 /* #define HAVE_LGAMMA 1 */
 /* Comment: lgamma() is available in MingW 3.4.4, but without signgam required by f_gamma() */
-#endif
 
 /* Define if you have the caca library. */
 /* #undef HAVE_LIBCACA */
+/* Don't change it here -- this define is set in config/mingw/Makefile. */
 
 /* define if you have libcerf */
 /* #undef HAVE_LIBCERF */
+/* Don't change it here -- this define is set in config/mingw/Makefile. */
 
 /* Define to 1 if you have the <libc.h> header file. */
 /* #undef HAVE_LIBC_H */
@@ -208,7 +200,7 @@
 /* #undef HAVE_LIBPDF */
 /* Don't change it here -- this define is set in config/mingw/Makefile. */
 
-/* Define if your pdf library is too old to use PDF_begin_document. */
+/* Define if your PDFlib is too old to use PDF_begin_document. */
 /* #undef HAVE_LIBPDF_OPEN_FILE */
 
 /* Define if you are using the GNU readline library. */
@@ -253,13 +245,13 @@
 /* Define to include support for mif terminal */
 /* #undef HAVE_MIF */
 
-/* Define if your pdf library doesn't support dash patterns. */
+/* Define if your PDFlib doesn't support dash patterns. */
 /* #undef HAVE_NODASH_LIBPDF */
 
 /* Define to 1 if the system has the type `off_t'. */
 #define HAVE_OFF_T 1
 
-/* Define if your pdf library is too old to support patterns. */
+/* Define if your PDFlib is too old to support patterns. */
 /* #undef HAVE_OLD_LIBPDF */
 
 /* Define to 1 if you have the `on_exit' function. */
@@ -309,17 +301,13 @@
 /* #undef HAVE_SLEEP */
 
 /* Define to 1 if you have the `snprintf' function. */
-#if __GNUC__ >= 3
-#  define HAVE_SNPRINTF 1
-#endif
+#define HAVE_SNPRINTF 1
 
 /* Define to 1 if stdbool.h conforms to C99. */
 #define HAVE_STDBOOL_H 1
 
 /* Define to 1 if you have the <stdint.h> header file. */
-#if __GNUC__ >= 3
-#  define HAVE_STDINT_H 1
-#endif
+#define HAVE_STDINT_H 1
 
 /* Define to 1 if you have the <stdlib.h> header file. */
 #define HAVE_STDLIB_H 1
@@ -385,9 +373,7 @@
 /* #undef HAVE_SYS_IOCTL_H */
 
 /* Define to 1 if you have the <sys/param.h> header file. */
-#if __GNUC__ >= 3
-#  define HAVE_SYS_PARAM_H 1
-#endif
+#define HAVE_SYS_PARAM_H 1
 
 /* Define to 1 if you have the <sys/select.h> header file. */
 /* #undef HAVE_SYS_SELECT_H */
@@ -493,9 +479,6 @@
 
 /* Define to disable terminals that depend on code in bitmap.c */
 #define NO_BITMAP_SUPPORT 1
-
-/* Define to 1 if your C compiler doesn't accept -c and -o together. */
-/* #undef NO_MINUS_C_MINUS_O */
 
 /* Name of package */
 #define PACKAGE "gnuplot"
@@ -610,6 +593,9 @@
 /* Define if you want the wxwidgets terminal. */
 /* #undef WXWIDGETS */
 /* Don't change it here -- this define is set in config/mingw/Makefile. */
+
+/* wxWidgets >= 2.9 wants calling program to invoke XInit() */
+/* #undef WX_NEEDS_XINITTHREADS */
 
 /* Define if you are using the X11 window system. */
 /* #undef X11 */
