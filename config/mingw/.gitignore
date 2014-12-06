@@ -21,6 +21,10 @@ VERSION
 *.log
 *.tmp
 *.zip
+*.qm
+*.map
+moc_*.cpp
+qrc_*.cpp
 dist
 ja
 share
