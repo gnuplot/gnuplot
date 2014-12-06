@@ -1,14 +1,12 @@
-		GNUPLOT Version 5.0.rc3 Release Notes
-		=====================================
+		GNUPLOT Version 5.0 Release Notes
+		=================================
 
-We are happy to announce the third (and final) release candidate for
-gnuplot version 5.  Version 5 will be a major release with significant
-new capabilities and enhancements compared to previous gnuplot versions.
+Gnuplot version 5 contains significant new capabilities and enhancements
+to earlier gnuplot versions.  The most recent previous release was 4.6.6.
+Please see the NEWS file for bugfixes and minor changes to version 5.0
+applied after feedback on release candidates -rc1, -rc2, and -rc3.
 
-Please see the NEWS file for bugfixes and minor changes between version 5
-release candidates -rc1, -rc2, and -rc3.
-
-Release Notes date: 11 November 2014
+Release Notes date: 5 December 2014
 
 NOTABLE NEW FEATURES
 ====================
@@ -28,7 +26,7 @@ NOTABLE NEW FEATURES
   version 4 syntax (no error keyword but last column contains zerror).
   
 * The dot/dash pattern of a line can now be controlled independently
-  from other properties using the keyword "dashtype".
+  from other line properties using the keyword "dashtype".
 
 * The default color of individual line types can be changed using 
   "set linetype" (introduced in 4.6). In version 5 a default overall color
@@ -76,7 +74,7 @@ CHANGES
 Gnuplot development assigns very high priority to backward compatibility
 with earlier versions.  For example any command script that worked in
 version 4.0 is expected to continue to work for all version 4 releases
-including the most recent one (4.6.5).  However changes introduced in
+including the most recent one (4.6.6).  However changes introduced in
 version 5 can affect the operation of some version 4 scripts. 
 
 A brief summary of potentially incompatible changes is given here.
@@ -89,7 +87,7 @@ A brief summary of potentially incompatible changes is given here.
   You can change these or add new linetypes as you please. You do not need
   to change the current terminal or terminal mode in order to use dashed lines.
 
-* The handling of input data containing NaN, Inf, inconsistent number of
+* The handling of input data containing NaN, Inf, an inconsistent number of
   data columns, or other unexpected content has changed. See documentation
   under "missing" for examples and figures. 
 
@@ -108,7 +106,7 @@ A brief summary of potentially incompatible changes is given here.
   to generate axis tick labels is now controlled by "set {xy}tics time" rather
   than by "set {xy}data time".  Thus prior calls to `set xdata time` or
   `set timefmt x` are unnecessary for either input or output.
-  These older commands may be deprecated in the final 5.0 release.
+  These older commands still work, but are deprecated.
 
 * The "reverse" keyword (e.g. "set xrange [*:*] reverse") now affects only
   autoscaling.  It has no effect on explicit ranges. 
@@ -247,7 +245,7 @@ Options for generating interactive plots for web display
 Installation
 ------------
 
-You can download a source tarball for gnuplot version 5.0.rc3 from the 
+You can download a source tarball for gnuplot version 5.0.0 from the 
 gnuplot development site on SourceForge.
 	http://sourceforge.net/project/showfiles.php?group_id=2055
 
@@ -255,7 +253,7 @@ Installation instructions are available in the source itself; the short
 version for linux/unix-like systems is to unpack the tarball and then
 <PRE>
 build it:
-      cd gnuplot-5.0.rc3 ; ./configure ; make
+      cd gnuplot-5.0.0 ; ./configure ; make
 test it:
       make check
 install it:
