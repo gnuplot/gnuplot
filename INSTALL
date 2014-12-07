@@ -177,8 +177,8 @@ $ ./configure --help
   --disable-macros        disable command line macros
   --disable-wxwidgets     wxWidgets terminal (default enabled)
   --enable-backwards-compatibility       enable deprecated syntax
-  --enable-bitmap-terminals
-			  enable support for HP deskjet era dot matrix printers
+
+  --with-bitmap-terminals enable support for HP deskjet era dot matrix printers
 			  and *.pbm files
   --with-readline={gnu|bsd|builtin}
 			  Override the automatic choice of terminal input modes.
