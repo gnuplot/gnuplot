@@ -1,3 +1,11 @@
+2014-12-07 Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/datafile.c (df_generate_pseudodata): The sampling variable in a
+	sampled plot is not necessarily x, so "set log x" should not affect it.
+	E.g.    set log x; set angle degrees;
+	        plot sample [a=1:360] '+' using (3+sin(a)):(cos(a)) with points
+	Bug #1495
+
 2014-12-05 Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/PostScript/prologue.ps:  Re-order dash types to more closely
