@@ -1,9 +1,16 @@
+2014-12-08 Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/axis.c (parse_range) src/datafile.c (df_generate_pseudodata):
+	Allow an optional sampling interval as part of the sampling range spec
+	for pseudofile '+' in a plot command:
+	    plot sample [a=0:360:10] '+' using (3+sin(a)):(cos(a)) with points
+
 2014-12-08  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/term.c (do_point):  Always use solid lines to draw point symbols.
 
 	* src/win/wgraph.c term/win.trm:  Make sure that the window size
-	variables are initialized if wgnuplot.ini does not exits yet.
+	variables are initialized if wgnuplot.ini does not exist yet.
 	Fixes a regression introduced on 2014-10-16.
 
 2014-12-07 Ethan A Merritt  <merritt@u.washington.edu>

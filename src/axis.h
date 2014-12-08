@@ -1,5 +1,5 @@
 /*
- * $Id: axis.h,v 1.105 2014/10/04 22:22:27 sfeam Exp $
+ * $Id: axis.h,v 1.106 2014/10/06 04:44:05 sfeam Exp $
  *
  */
 
@@ -80,6 +80,9 @@ typedef enum AXIS_INDEX {
 # define AXIS_ARRAY_SIZE (11 + MAX_PARALLEL_AXES)
 # define SAMPLE_AXIS SECOND_Z_AXIS
 # define LAST_REAL_AXIS  POLAR_AXIS
+
+/* sample axis doesn't need mtics, so use the slot to hold sample interval */
+# define SAMPLE_INTERVAL mtic_freq
 
 /* What kind of ticmarking is wanted? */
 typedef enum en_ticseries_type {

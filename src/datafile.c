@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.294 2014/11/04 04:48:16 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.295 2014/12/08 05:29:05 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -5152,13 +5152,12 @@ df_generate_pseudodata()
     /* This code copied from that in second pass through eval_plots() */
     if (df_pseudodata == 1) {
 	static double t, t_min, t_max, t_step;
-	if (df_pseudorecord >= samples_1)
-	    return NULL;
 	if (df_pseudorecord == 0) {
+	    t_step = 0;
 	    if ((axis_array[SAMPLE_AXIS].range_flags & RANGE_SAMPLED)) {
 		t_min = axis_array[SAMPLE_AXIS].min;
 		t_max = axis_array[SAMPLE_AXIS].max;
-		/* FIXME:  Do we need to handle log-scaled SAMPLE_AXIS? */
+		t_step = axis_array[SAMPLE_AXIS].SAMPLE_INTERVAL;
 	    } else if (parametric || polar) {
 		t_min = axis_array[T_AXIS].min;
 		t_max = axis_array[T_AXIS].max;
@@ -5171,12 +5170,24 @@ df_generate_pseudodata()
 		t_max = X_AXIS.max;
 		axis_unlog_interval(x_axis, &t_min, &t_max, 1);
 	    }
-	    t_step = (t_max - t_min) / (samples_1 - 1);
+	    if (t_step == 0)	/* always true unless explicit sample interval was given */
+		t_step = (t_max - t_min) / (samples_1 - 1);
 	}
 	t = t_min + df_pseudorecord * t_step;
-	/* FIXME:  Is it safe to assume SAMPLE_AXIS and x_axis are distinct? */
-	if (!parametric && !(axis_array[SAMPLE_AXIS].range_flags & RANGE_SAMPLED))
-	    t = AXIS_DE_LOG_VALUE(x_axis, t);
+
+	if ((axis_array[SAMPLE_AXIS].range_flags & RANGE_SAMPLED)) {
+	    /* This is the case of an explicit sampling range */
+	    /* FIXME: should allow for round-off error in floating point summation! */
+	    if (!inrange(t, t_min, t_max))
+		return NULL;
+	} else {
+	    /* This is the usual case */
+	    if (df_pseudorecord >= samples_1)
+		return NULL;
+	    if (!parametric)
+		t = AXIS_DE_LOG_VALUE(x_axis, t);
+	}
+
 	if (df_current_plot && df_current_plot->sample_var)
 	    Gcomplex(&(df_current_plot->sample_var->udv_value), t, 0.0);
 	sprintf(line,"%g",t);

@@ -1,6 +1,7 @@
 Changes not in 5.0
 ==================
 * NEW new command `toggle {<plotno> | "plottitle" | all}`
+* NEW Optional sampling interval in range specifier for pseudofile '+'
 
 Changes in 5.0.rc3
 ==================
