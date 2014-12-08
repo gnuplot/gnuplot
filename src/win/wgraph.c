@@ -1,5 +1,5 @@
 /*
- * $Id: wgraph.c,v 1.189.2.2 2014/10/16 06:44:16 markisch Exp $
+ * $Id: wgraph.c,v 1.189.2.3 2014/10/16 06:58:11 markisch Exp $
  */
 
 /* GNUPLOT - win/wgraph.c */
@@ -600,18 +600,20 @@ GraphInit(LPGW lpgw)
 
 	/* determine the size of the window decoration: border, toolbar, caption, statusbar etc. */
 	{
-		RECT rect;
+		RECT wrect, rect;
 
+		/* get real window size, not lpgw->Size */
+		GetWindowRect(lpgw->hWndGraph, &wrect);
 		GetClientRect(lpgw->hWndGraph, &rect);
-		lpgw->Decoration.x = lpgw->Size.x + rect.left - rect.right;
-		lpgw->Decoration.y = lpgw->Size.y + rect.top- rect.bottom + lpgw->ToolbarHeight + lpgw->StatusHeight;
+		lpgw->Decoration.x = wrect.right - wrect.left + rect.left - rect.right;
+		lpgw->Decoration.y = wrect.bottom - wrect.top + rect.top- rect.bottom + lpgw->ToolbarHeight + lpgw->StatusHeight;
 	}
 
 	/* resize to match requested canvas size */
 	if (lpgw->Canvas.x != 0) {
 		lpgw->Size.x = lpgw->Canvas.x + lpgw->Decoration.x;
 		lpgw->Size.y = lpgw->Canvas.y + lpgw->Decoration.y;
-		SetWindowPos(lpgw->hWndGraph, HWND_BOTTOM, lpgw->Origin.x, lpgw->Origin.y, lpgw->Size.x, lpgw->Size.y, SWP_NOACTIVATE | SWP_NOZORDER);
+		SetWindowPos(lpgw->hWndGraph, HWND_BOTTOM, lpgw->Origin.x, lpgw->Origin.y, lpgw->Size.x, lpgw->Size.y, SWP_NOACTIVATE | SWP_NOZORDER  | SWP_NOMOVE);
 	}
 
 	ShowWindow(lpgw->hWndGraph, SW_SHOWNORMAL);
@@ -938,10 +940,10 @@ MakeFonts(LPGW lpgw, LPRECT lprect, HDC hdc)
 	lpgw->hfontv = CreateFontIndirect(&(lpgw->lf));
 
 	/* save text size */
-	hfontold = SelectObject(hdc, lpgw->hfonth);
+	hfontold = (HFONT) SelectObject(hdc, lpgw->hfonth);
 	Wnd_GetTextSize(hdc, "0123456789", 10, &cx, &cy);
-	lpgw->vchar = MulDiv(cy,lpgw->ymax,lprect->bottom - lprect->top);
-	lpgw->hchar = MulDiv(cx/10,lpgw->xmax,lprect->right - lprect->left);
+	lpgw->vchar = MulDiv(cy, lpgw->ymax, lprect->bottom - lprect->top);
+	lpgw->hchar = MulDiv(cx/10, lpgw->xmax, lprect->right - lprect->left);
 
 	/* CMW: Base tick size on character size */
 	lpgw->htic = MulDiv(lpgw->hchar, 2, 5);
@@ -952,7 +954,7 @@ MakeFonts(LPGW lpgw, LPRECT lprect, HDC hdc)
 	result = GetDeviceCaps(hdc, TEXTCAPS);
 	if ((result & TC_CR_90) || (result & TC_CR_ANY))
 		lpgw->rotate = TRUE;
-	GetTextMetrics(hdc,(TEXTMETRIC *)&tm);
+	GetTextMetrics(hdc, (TEXTMETRIC *)&tm);
 	if (tm.tmPitchAndFamily & TMPF_VECTOR)
 		lpgw->rotate = TRUE;	/* vector fonts can all be rotated */
 	if (tm.tmPitchAndFamily & TMPF_TRUETYPE)
@@ -3214,11 +3216,13 @@ WriteGraphIni(LPGW lpgw)
 	GetWindowRect(lpgw->hWndGraph, &rect);
 	wsprintf(profile, "%d %d", rect.left, rect.top);
 	WritePrivateProfileString(section, "GraphOrigin", profile, file);
-	if (lpgw->Canvas.x != 0) 
+	if (lpgw->Canvas.x != 0) {
 		wsprintf(profile, "%d %d", lpgw->Canvas.x, lpgw->Canvas.y);
-	else
+		WritePrivateProfileString(section, "GraphSize", profile, file);
+	} else if (lpgw->Size.x != CW_USEDEFAULT) {
 		wsprintf(profile, "%d %d", lpgw->Size.x - lpgw->Decoration.x, lpgw->Size.y - lpgw->Decoration.y);
-	WritePrivateProfileString(section, "GraphSize", profile, file);
+		WritePrivateProfileString(section, "GraphSize", profile, file);
+	}
 	wsprintf(profile, "%s,%d", lpgw->deffontname, lpgw->deffontsize);
 	WritePrivateProfileString(section, "GraphFont", profile, file);
 	strcpy(WIN_inifontname, lpgw->deffontname);
@@ -4583,6 +4587,10 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 					InvalidateRect(hwnd, &rect, 1);
 					UpdateWindow(hwnd);
 				}
+			}
+			if (lpgw->Size.x == CW_USEDEFAULT) {
+			    lpgw->Size.x = LOWORD(lParam);
+			    lpgw->Size.y = HIWORD(lParam);
 			}
 			break;
 #ifndef WGP_CONSOLE
