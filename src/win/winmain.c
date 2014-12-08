@@ -1,5 +1,5 @@
 /*
- * $Id: winmain.c,v 1.76 2014/06/04 08:11:00 markisch Exp $
+ * $Id: winmain.c,v 1.77 2014/06/09 12:49:30 markisch Exp $
  */
 
 /* GNUPLOT - win/winmain.c */
@@ -1035,7 +1035,7 @@ open_printer()
 	else  {
 		safe_strncpy(win_prntmp, temp, MAX_PRT_LEN);
 		/* stop X's in path being converted by mktemp */
-		for (temp = win_prntmp; *temp != NULL; temp++)
+		for (temp = win_prntmp; *temp != NUL; temp++)
 			*temp = tolower((unsigned char)*temp);
 		if ((strlen(win_prntmp) > 0) && (win_prntmp[strlen(win_prntmp) - 1] != '\\'))
 			strcat(win_prntmp, "\\");
