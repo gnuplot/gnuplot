@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.296.2.1 2014/09/05 21:50:58 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.296.2.2 2014/11/21 21:41:09 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -813,6 +813,9 @@ do_point(unsigned int x, unsigned int y, int number)
 {
     int htic, vtic;
     struct termentry *t = term;
+
+    /* always use solid lines for point symbols */
+    term->dashtype(DASHTYPE_SOLID, NULL);
 
     if (number < 0) {           /* do dot */
 	(*t->move) (x, y);

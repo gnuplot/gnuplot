@@ -1,3 +1,11 @@
+2014-12-08  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/term.c (do_point):  Always use solid lines to draw point symbols.
+
+	* src/win/wgraph.c term/win.trm:  Make sure that the window size
+	variables are initialized if wgnuplot.ini does not exits yet.
+	Fixes a regression introduced on 2014-10-16.
+
 2014-12-05 Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/PostScript/prologue.ps:  Re-order dash types to more closely
