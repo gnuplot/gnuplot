@@ -1,5 +1,5 @@
 /*
- * $Id: gp_cairo.c,v 1.86 2014/07/28 21:23:35 sfeam Exp $
+ * $Id: gp_cairo.c,v 1.87 2014/08/20 04:42:44 sfeam Exp $
  */
 
 /* GNUPLOT - gp_cairo.c */
@@ -643,12 +643,15 @@ void gp_cairo_stroke(plot_struct *plot)
 
 void gp_cairo_move(plot_struct *plot, int x, int y)
 {
+	/* Dec 2014 - Do not let zero-length moves interrupt     */
+	/* the current line/polyline context, e.g. dash pattern. */
+	if (x == plot->current_x && y == plot->current_y)
+		return;
+
 	/* begin by stroking any open path */
 	gp_cairo_stroke(plot);
 	/* also draw any open polygon set */
 	gp_cairo_end_polygon(plot);
-
-	FPRINTF((stderr,"move\n"));
 
 	plot->current_x = x;
 	plot->current_y = y;

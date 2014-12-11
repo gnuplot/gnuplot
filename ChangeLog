@@ -1,3 +1,10 @@
+2014-12-11 Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/wxterminal/gp_cairo.c (gp_cairo_move):  Do not let zero-length
+	move iterrupt the current polyline context (dash pattern, end caps,
+	polygon closure).
+	Bug #1523
+
 2014-12-11  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/win/wgraph.c (drawgaph) src/win/wgdiplus.c (drawgraph_gdiplus):

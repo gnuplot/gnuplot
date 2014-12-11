@@ -6,6 +6,7 @@ Changes in final release of 5.0
 * FIX paxis tic and range settings were not being saved
 * FIX ignore unwanted delta_y so that it doesn't cause problems for logscale y
 * FIX more complete tests for validity of linked axis inverse mapping function
+* FIX cairo terminals dashed-line rendering in 3D plots
 
 Changes in 5.0.rc3
 =====================
