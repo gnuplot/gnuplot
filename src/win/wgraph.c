@@ -1,5 +1,5 @@
 /*
- * $Id: wgraph.c,v 1.194 2014/10/16 06:54:56 markisch Exp $
+ * $Id: wgraph.c,v 1.195 2014/12/08 19:17:26 markisch Exp $
  */
 
 /* GNUPLOT - win/wgraph.c */
@@ -1816,8 +1816,14 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 		xdash = MulDiv(curptr->x, rr-rl-1, lpgw->xmax) + rl;
 		ydash = MulDiv(curptr->y, rt-rb+1, lpgw->ymax) + rb - 1;
 
-		/* finish last polygon */
-		if ((lastop == W_vect) && (curptr->op != W_vect)) {
+		/* ignore superfluous moves - see bug #1523 */
+		/* FIXME: we should do this in win.trm, not here */
+		if ((lastop == W_vect) && (curptr->op == W_move) && (xdash == ppt[polyi -1].x) && (ydash == ppt[polyi -1].y)) {
+		    curptr->op = 0;
+		}
+
+		/* finish last polygon / polyline */
+		if ((lastop == W_vect) && (curptr->op != W_vect) && (curptr->op != 0)) {
 			if (polyi >= 2) {
 #ifdef HAVE_GDIPLUS
 				if (lpgw->antialiasing)

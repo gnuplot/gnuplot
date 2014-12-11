@@ -1,5 +1,5 @@
 /*
- * $Id: wgdiplus.cpp,v 1.16 2014/06/09 07:24:30 markisch Exp $
+ * $Id: wgdiplus.cpp,v 1.17 2014/09/24 07:19:23 markisch Exp $
  */
 
 /*
@@ -588,8 +588,14 @@ drawgraph_gdiplus(LPGW lpgw, HDC hdc, LPRECT rect)
 		xdash = MulDiv(curptr->x, rr-rl-1, lpgw->xmax) + rl;
 		ydash = MulDiv(curptr->y, rt-rb+1, lpgw->ymax) + rb - 1;
 
-		/* finish last polygon */
-		if ((lastop == W_vect) && (curptr->op != W_vect)) {
+		/* ignore superfluous moves - see bug #1523 */
+		/* FIXME: we should do this in win.trm, not here */
+		if ((lastop == W_vect) && (curptr->op == W_move) && (xdash == ppt[polyi -1].x) && (ydash == ppt[polyi -1].y)) {
+		    curptr->op = 0;
+		}
+
+		/* finish last polygon / polyline */
+		if ((lastop == W_vect) && (curptr->op != W_vect) && (curptr->op != 0)) {
 			if (polyi >= 2) {
 				gdiplusPolyline(graphics, pen, ppt, polyi);
 				/* move internal state to last point */
