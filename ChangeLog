@@ -8,6 +8,10 @@
 	* src/datafile.c (df_generate_pseudodata):  Prevent infinite loop if
 	sampling range is zero.
 
+	* src/plot2d.c (eval_plots):  Save/restore original dummy variable name
+	for 'x', so that a sampling range using a named variable does not
+	clobber it.
+
 2014-12-11  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/win/wgraph.c (drawgaph) src/win/wgdiplus.c (drawgraph_gdiplus):

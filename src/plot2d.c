@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.339 2014/10/01 04:30:44 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.340 2014/10/31 23:00:05 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -1965,6 +1965,7 @@ eval_plots()
     int begin_token = c_token;  /* so we can rewind for second pass */
     int start_token=0, end_token;
     legend_key *key = &keyT;
+    char orig_dummy_var[MAX_ID_LEN+1];
 
     double newhist_start = 0.0;
     int histogram_sequence = -1;
@@ -1995,7 +1996,7 @@ eval_plots()
     plot_num = 0;
     line_num = 0;               /* default line type */
     pattern_num = default_fillstyle.fillpattern;        /* default fill pattern */
-
+    strcpy(orig_dummy_var, c_dummy_var[0]);
     xtitle = NULL;
 
     /* Assume that the input data can be re-read later */
@@ -2107,6 +2108,8 @@ eval_plots()
 		copy_str(c_dummy_var[0], sample_range_token, MAX_ID_LEN);
 	    else if (sample_range_token < 0)
 		strcpy(c_dummy_var[0], set_dummy_var[0]);
+	    else
+		strcpy(c_dummy_var[0], orig_dummy_var);
 
 	    /* Should this be saved in "this_plot"? */
 	    name_str = string_or_express(NULL);
@@ -3036,6 +3039,8 @@ eval_plots()
 			copy_str(c_dummy_var[0], sample_range_token, MAX_ID_LEN);
 		    else if (sample_range_token < 0)
 			strcpy(c_dummy_var[0], set_dummy_var[0]);
+		    else
+			strcpy(c_dummy_var[0], orig_dummy_var);
 		    /* WARNING: do NOT free name_str */
 		    name_str = string_or_express(&at_ptr);
 		}
