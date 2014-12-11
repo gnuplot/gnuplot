@@ -1,3 +1,11 @@
+2014-12-11  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/win/wgraph.c (drawgaph) src/win/wgdiplus.c (drawgraph_gdiplus):
+	Ignore intermediate move commands in a polyline sequence. Fixes
+	custom dashpatterns for splots and improves drawing performance. Note
+	that custom dashpatterns are only available for the GDI+ variant.
+	Bug #1523
+
 2014-12-11  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* docs/gnuplot.doc docs/term-jp.diff:  sync to docs version 1.902.2.20
