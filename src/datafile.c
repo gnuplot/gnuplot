@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.295 2014/12/08 05:29:05 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.296 2014/12/09 03:32:25 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -5172,6 +5172,8 @@ df_generate_pseudodata()
 	    }
 	    if (t_step == 0)	/* always true unless explicit sample interval was given */
 		t_step = (t_max - t_min) / (samples_1 - 1);
+	    if (t_step == 0)	/* prevent infinite loop on zero range */
+		t_step = 1;
 	}
 	t = t_min + df_pseudorecord * t_step;
 

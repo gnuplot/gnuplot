@@ -5,6 +5,9 @@
 	polygon closure).
 	Bug #1523
 
+	* src/datafile.c (df_generate_pseudodata):  Prevent infinite loop if
+	sampling range is zero.
+
 2014-12-11  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/win/wgraph.c (drawgaph) src/win/wgdiplus.c (drawgraph_gdiplus):
