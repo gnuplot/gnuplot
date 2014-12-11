@@ -1,9 +1,13 @@
+2014-12-11  Shigeharu Takeno  <shige@iee.niit.ac.jp>
+
+	* docs/gnuplot.doc docs/term-jp.diff:  sync to docs version 1.902.2.20
+
 2014-12-08  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/term.c (do_point):  Always use solid lines to draw point symbols.
 
 	* src/win/wgraph.c term/win.trm:  Make sure that the window size
-	variables are initialized if wgnuplot.ini does not exits yet.
+	variables are initialized if wgnuplot.ini does not exist yet.
 	Fixes a regression introduced on 2014-10-16.
 
 2014-12-05 Ethan A Merritt  <merritt@u.washington.edu>
@@ -60,7 +64,7 @@
 
 	* src/show.c: formatting typos (missing \t at beginning of line)
 
-	* src/graphics.c (map_position_r): If only the x coorinate delta is
+	* src/graphics.c (map_position_r): If only the x coordinate delta is
 	requested, don't bother to calculate delta y, particularly because
 	delta y=0 will fail if y is log scale.
 	Bug #1512

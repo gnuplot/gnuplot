@@ -1,5 +1,5 @@
-C RCS $Id: gnuplot-ja.doc,v 1.5 2014-09-04 20:17:15+09 shige Exp $
-C corresponding original gnuplot.doc revision: 1.902.2.5
+C RCS $Id: gnuplot-ja.doc,v 1.7 2014-12-02 15:33:29+09 shige Exp $
+C corresponding original gnuplot.doc revision: 1.902.2.20
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -259,7 +259,7 @@ C 行が長いのは、できればなんとかしたい
  * 対話型出力形式は、ハイパーテキストラベルをサポートしていますが、これ
  はマウスがそのラベルのリンク点上にあるときにのみ現れるものです。
 
- * 新しい座標系 (度、分、秒)。以下参照: `set xdata geographic`。
+ * 新しい座標系 (度、分、秒)。以下参照: `set xtics geographic`。
 
  * 軸の見出しのデフォルト書式用の "% h" (LaTeX 系出力形式では "$%h$")。
  この書式は C の標準書式の %g に似ていますが、指数部分がある場合には、
@@ -322,8 +322,7 @@ C 行が長いのは、できればなんとかしたい
 # set multiplot {next|previous}            # 自動レイアウト格子内での移動
 #end
 
-C バージョン 5 での変更 (Changes in version 5)
-2 Changes in version 5
+2 バージョン 5 での変更 (Changes in version 5)
 ?changes
  バージョン 5 で導入された以下の変更は、前の版の gnuplot 用のスクリプト
  の挙動を変える可能性があります。
@@ -340,9 +339,12 @@ C バージョン 5 での変更 (Changes in version 5)
  間は少なくともミリ秒の精度で保存されます。
 
  * 関数 `timecolumn(N,"timeformat")` は、現在は 2 つの引数を持ちます。
- 2 つ目の必須な引数はどのデータ軸とも関連しておらず、よってこれにより、
+ 新しい 2 つ目の引数はどのデータ軸とも関連しておらず、よってこれにより
  関数 `timecolumn` を、x や y 軸に指定するのとは違う形式の日時データの
- 読み込みに使えるようになります。
+ 読み込みに使えるようになります。この機能は、次のコマンド列に取って変わ
+ ります: `set xdata time; set timefmt "timeformat"`。これは、複数のファ
+ イルから異なる書式の日時データを読んで、それらを組み合わせて 1 つのグ
+ ラフにすることを可能にします。
 
  * コマンド `set [axis]range` のキーワード `reverse` は、自動縮尺
  (autoscaling) にのみ影響し、`set xrange [0:1]` のようなコマンドの意味
@@ -1518,16 +1520,12 @@ C マーカを doc2html へのこのシグナルとして使用します。
  これは、'f(x) = real(system(sprintf("somecommand %f", x)))' のようにし
  て、外部関数の出力を gnuplot スクリプト内に取り込むのに利用できます。
 4 word
-?expressions functions word
-?word
 =word
 #word("string",n) & 文字列, 整数 & 文字列 "string" の n 番目の単語 \\
 %word("string",n)@文字列, 整数@文字列 "string" の n 番目の単語
  `word("string",n)` は文字列 string の n 番目の単語文字列を返します。例
  えば `word("one two three",2)` は文字列 "two" を返します。
 4 words
-?expressions functions words
-?words
 =words
 #words("string") & 文字列 & 文字列 "string" 中の単語数 \\
 %words("string")@文字列@文字列 "string" 中の単語数
@@ -1722,6 +1720,32 @@ C マーカを doc2html へのこのシグナルとして使用します。
  イルから読み取ることも可能にします。引数が数式である場合、value() はそ
  の数式の値を返します。引数が文字列で、定義されている変数に対応するもの
  がない場合、value() は NaN を返します。
+
+4 単語の取り出しと単語数 (word, words)
+?expressions functions word
+?expressions functions words
+?words
+?word
+ `word("string",n)` は、文字列 (string) の n 番目の単語を返します。例え
+ ば `word("one two three",2)` は文字列 "two" を返します。
+
+ `words("string")` は、文字列 (string) の単語数を返します。例えば、
+ `words(" a b c d")` は 4 を返します。
+
+ 関数 `word` と `words` は、単一引用符、二重引用符で囲まれた文字列も、
+ 限定的ですがサポートしています:
+       print words("\"double quotes\" or 'single quotes'")   # 3
+ 開始引用符の前は、スペースか、または文字列の先頭でなければいけません。
+ これは、単語内、あるいは単語終わりにつくアポストロフィー (') は、それ
+ ぞれの単語の要素であると見なされることを意味します:
+       print words("Alexis' phone doesn't work") # 4
+ 引用符文字のエスケープはサポートしていませんので、ある引用符を維持した
+ い場合は、それぞれを別の種類の引用符で囲まなければいけません:
+       s = "Keep \"'single quotes'\" or '\"double quotes\"'"
+       print word(s, 2) # 'single quotes'
+       print word(s, 4) # "double quotes"
+ 最後の例では、引用符のエスケープが文字列の定義時のみに必要であることに
+ 注意してください。
 
 3 演算子 (Operators)
 ?expressions operators
@@ -2371,7 +2395,7 @@ Ffigure_newsyntax
 
  書式:
 
-       ... {linecolor | lc} {<colorspec> | <n>}
+       ... {linecolor | lc} {"colorname" | <colorspec> | <n>}
        ... {textcolor | tc} {<colorspec> | {linetype | lt} <n>}
 
  <colorspec> は以下の形式のいずれかです:
@@ -3017,12 +3041,14 @@ Ffigure_newsyntax
  効になります。
 
  内部では全ての時間/日付は 1970 年からの秒数に変換されます。コマンド
- `set timefmt` は全ての入力書式を定義します。データファイル、範囲、軸の
- 目盛りの見出し、ラベルの位置。手短に言えば、データの値を受けとる全ての
- ものがこの書式にしたがって受けとらなければいけません。一時には一つの入
- 力書式のみが有効なので、同じときに入力される全ての時間/日付のデータは
- 同じ書式である必要があります。よって、ファイル内の x と y の両方が時間
- /日付データである場合は、それらは同じ書式でなければいけません。
+ `set timefmt` は全ての入力に対するデフォルトの書式を定義します。データ
+ ファイル、範囲、軸の目盛りの見出し、ラベルの位置と、日時データ値を受け
+ 入れるすべてのものへの入力の書式が、デフォルトでこれになります。一時に
+ は一つのデフォルト入力書式のみが有効です。よって、ファイル内の x と y
+ の両方が時間/日付データである場合は、デフォルトではそれは同じ書式と解
+ 釈されます。しかし、このデフォルトは、`using` 指定で関数 `timecolumn`
+ を用いて、それに対応する特定のファイルや列からデータを読みこむことによ
+ り、変えることが可能です。
 
  秒数へ (秒数から) の変換は国際標準時 (UT; グリニッジ標準時 (GMT) と同
  じ) が使われます。各国標準時や夏時間への変換の機能は何も持ち合わせてい
@@ -3033,13 +3059,14 @@ Ffigure_newsyntax
  べきでしょう。
 
  `show xrange` のようなコマンドは、その整数値を `timefmt` に従って解釈
- し直します。`timefmt` を変更してもう一度 `show` でその値を表示させると
- それは新しい `timefmt` に従って表示されます。このため、もし機能を停止
- させるコマンド (`set xdata` のような) を与えると、その値は整数値として
+ し直します。`timefmt` を変更してもう一度 `show` でその値を表示させると、
+ それは新しい `timefmt` に従って表示されます。このため、(`set xdata` な
+ どにより) その軸に対するデータ型をリセットすると、その値は整数値として
  表示されることになります。
 
- コマンド `set format` または `set tics format` は、指定された軸が時間/
- 日付であるなしに関わらず目盛りの見出しに使われる書式を定義します。
+ コマンド `set format` または `set tics format` は、指定された軸に対す
+ る入力が時間/日付であるなしに関わらず目盛りの見出しに使われる書式を定
+ 義します。
 
  時間/日付情報がファイルから描画される場合、`plot`, `splot` コマンドで
  は `using` オプションを「必ず」使う必要があります。`plot`, `splot` で
@@ -4431,19 +4458,22 @@ Ffigure_mapcontours
 ?fit
 ?least-squares
 ?Marquardt
- `fit` コマンドでは、(x,y) か (x,y,z) か (x1, x2, x3, ..., xN, z) の形
- 式のデータ点の集合に、ユーザが与える式を当てはめることができます。それ
- には、Marquardt-Levenberg 法による非線形最小自乗法  (NLLS) が用いられ
- ます。ここで、仮変数 x1, ..., xN の名前は、`set dummy` コマンドを使う
- か、または `fit` コマンドラインのインライン範囲指定を使うかのいずれか
- で割り当てる必要があります。数式は、実数値として評価されるものでなけれ
- ばいけません。当てはめの最中に変化しうるパラメータは、キーワード `via`
- で指定します。
+ コマンド `fit` は、Marquardt-Levenberg 法による非線形最小自乗法 (NLLS)
+ を用いて、データ点の集合にユーザが与える式を当てはめます。独立変数は
+ 12 まで許されていて、従属変数は常に 1 つで、任意個数のパラメータを当て
+ はめることができます。さらに追加で、データ点の重み付け用に誤差評価を入
+ 力することも可能です。
+
+ `fit` の最も基本的な使用法は、以下の単純な例が示しています:
+
+       f(x) = a + b*x + c*x**2
+       fit f(x) 'measured.dat' using 1:2 via a,b,c
+       plot 'measured.dat' u 1:2, f(x)
 
  書式:
        fit {<ranges>} <expression>
            '<datafile>' {datafile-modifiers}
-           {noerrors | zerror | xerror | yerror | xyerror}
+           {{unitweights} | {y|xy|z}error | errors <var1>{,<var2>,...}}
            via '<parameter file>' | <var1>{,<var2>,...}
 
  範囲 (xrange, yrange 等) は、当てはめに使用するデータを制限する目的で
@@ -4453,47 +4483,73 @@ Ffigure_mapcontours
  です。以下参照: `plot ranges`。
 
  <expression> は、通常はあらかじめユーザ定義された f(x) または f(x,y)
- の形の関数ですが、`gnuplot` で有効などんな数式でも指定できます。
+ の形の関数ですが、`gnuplot` で有効などんな数式でも指定できます。ただし
+ 実数値関数でなければいけません。
+ 独立変数の名前は、コマンド `set dummy` で設定するか、fit の範囲指定部
+ 分 (<rangse>) で設定します (以下を参照)。デフォルトでは、最初の 2 つは
+ x, y となります。
+ さらに、その数式は、当てはめの作業により決定する値を持つ 1 つ以上の変
+ 数 (パラメータ) に依存すべきです。
 
  <datafile> は `plot` コマンドと同様に扱われます。`plot datafile` の修
  飾子 (`using`, `every`,...) は、`smooth` を除いて、全て `fit` に使うこ
  とができます。以下参照:`plot datafile`。
 
- 当てはめ関数は、最大で 12 個 (指定してコンパイルされていればそれ以上)
- の独立変数を持つことができます。`using` 指定が足りない場合は、fit は独
- 立変数は 1 つだけだと暗黙で仮定します:
+ データファイルの内容は、plot コマンドに使用するのと同じ `using` 指定を
+ 使うことで柔軟に解釈させることができます。例えば、独立変数 x を2 列目
+ と 3 列目の和として生成し、z の値を 6 列目から取り、重みを 1 としたい
+ 場合は以下のようにします:
 
-       z                           # 独立変数は 1 つ (行番号)
-       x:z                         # 独立変数は 1 つ (第 1 列)
+       fit ... using ($2+$3):6
 
- `using` 指定の追加列については、以下のように解釈します:
+ `using` 指定がない場合、fit は暗黙に独立変数は 1 つだけと仮定します。
+ ファイル自身、または using 指定が 1 列だけのデータを持つ場合、その行番
+ 号を独立変数値として使用します。
+ `using` 指定を与えた場合、最大 12 個 (指定してコンパイルしていればさら
+ にそれ以上) の独立変数を利用できます。
 
-       z:s                         # 独立変数は 1 つ (行番号)
-       x:z{:s}                     # 独立変数は 1 つ
-       x:y:z{:s}                   # 独立変数は 2 つ
-       x1:x2:x3:z{:s}              # 独立変数は 3 つ
-       x1:x2:x3:...:xN:z{:s}       # 独立変数は N 個
+ オプション `unitweights` (これがデフォルト) は、すべてのデータ点が等し
+ い重みを持つとみなします。これは、キーワード `error` を使用することで
+ 変更でき、これはデータファイルから 1 つ以上の変数の誤差評価を読み込み、
+ その誤差評価を対応する変数値の標準偏差 s とみなし、各データに 1/s**2
+ の重みを計算するのに使用します。
 
- キーワード`errors` や `zerrors` を指定した場合、最後の列 `s` は対応す
- る z の値の標準偏差とみなし、そのデータに対する重み (1/s**2) を計算す
- するのに利用します。そうでない場合は、すべてのデータ点は、同じ重み (1)
- を持つとみなされます。`using` 指定を全く指定しなかった場合は、もしデー
- タファイルに 3 列目があったとしても、その z の誤差は読みこまれないこと
- に注意してください。
+ 独立変数の誤差評価において、その重みには、"有効分散法" (effective
+ variance method; Jay Orear, Am. J. Phys., Vol. 50, 1982) に従って、さ
+ らに当てはめ関数の微分係数をかけます。
 
- using 指定の数はあいまいなので、どの列が誤差に対応するかを キーワード
- `error` を使って指定する必要があります。`noerror` は、誤差 `s` を提供
- していないことを意味し、`zerror` は `errors z` と同じ意味です。また、
- 以下の場合に共通して `yerror` を使うことができます。なお、従属変数を z
- でなく y と書いています:
+ キーワード `errors` には、その後ろに、入力がどの変数の誤差であるのかを
+ 示すコンマ区切りの 1 つ以上の変数名のリストが付きます。従属変数 z は常
+ にその中になければいけませんが、独立変数は必須ではありません。
+ そのリストの各変数に対し、ファイルからその分の、各変数の誤差評価を持つ
+ 追加の列を読み込みます。繰り返しになりますが、`using` 指定により柔軟な
+ 解釈が可能になります。
+ よって、独立変数の数は暗黙に、`using` 指定内の列の数から 1 を引いて
+ (従属変数分)、さらに `errors` 指定内の変数の個数を引いた数になることに
+ 注意してください。
 
-       x:y:s     yerror    (`yerrorbars` 付きの `plot` と同様)
+ 例として、2 つの独立変数があり、そして 1 つ目の独立変数と従属変数の誤
+ 差データがある場合は、`errors x,z` 指定と 5 列の `using` 指定を使うこ
+ とになりますが、それは x:y:z:sx:sz のように解釈されます (x, y は独立変
+ 数、z が従属変数、sx, sz は x, z の標準偏差)。
 
- 5.0 より前の `gnuplot` との互換性の理由から、キーワード `error` は必須
- ではありません。誤差列を明示的に指定しなかった場合は、変数が 1 つしか
- ない場合でなければ、独立変数より 2 つ多い `using` 列 (z と s) が必要に
- なります。`gnuplot` は、`using` 指定で与えられた列の数によって、以下の
- 書式に従うことになります:
+ `errors` 指定のちょっとした略記法も 2,3 用意されています:
+ `yerrors` (独立変数が 1 列ある当てはめ用)、
+ `zerrors` (より一般の場合) は、いずれも `errors z` と同値で、1 列だけ
+ 追加の従属変数用の誤差列があることを意味しています。
+
+ `xyerrors` は、独立変数は 1 列で、その独立変数と従属変数の両方の 2 列
+ の誤差列が追加されることを意味します。この場合、x と y の誤差は Orear
+ の有効分散法 (effective variance method) で処理されます。
+
+ `yerror` と `xyerror` の形式および解釈は、それぞれ 2 次元描画スタイル
+ の `yerrorlines` と `xyerrorlines` に同等であることに注意してください。
+
+ コマンド `set fit v4` を使用すると、fit のコマンド書式は `gnuplot` バ
+ ージョン 4 以前と互換の書式になります。その場合、`using` には、独立変
+ 数が 2 つ以上ならば、独立変数の数より 2 つ (z と s) 多い指定が必要で、
+ `gnuplot` は、`using` 指定で与えられた列の数に応じて、以下の書式に従い
+ ます:
 
        z                           # 独立変数は 1 つ (行番号)
        x:z                         # 独立変数は 1 つ (第 1 列)
@@ -4502,18 +4558,10 @@ Ffigure_mapcontours
        x1:x2:x3:z:s                # 独立変数は 3 つ (全部で 5 列)
        x1:x2:x3:...:xN:z:s         # 独立変数は N 個 (全部で N+2 列)
 
- これは、2 つの独立変数 x, y で fit をする場合、キーワード `{no}error`
- を指定しなければ、あなたは常に z-誤差と s を与える必要があることを意味
- します。独立変数が 1 つ以外の場合は、その独立変数の個数よりも 2 つ多い
- `using` 指定 (z と s の分) をしなければいけません。
-
-
- データファイルの内容は、plot コマンドに使用するのと同じ `using` 指定を
- 使うことで柔軟に解釈させることができます。例えば、独立変数 x を2 列目
- と 3 列目の和として生成し、z の値を 6 列目から取り、重みを 1 としたい
- 場合は以下のようにします:
-
-       fit ... noerrors using ($2+$3):6
+ これは、2 つ以上の独立変数で fit をする場合、z-誤差 s を与える必要があ
+ ることを意味することに注意してください。重みを 1 にしたい場合は、それ
+ を、例えば x:y:z:(1) のような書式を using に指定することで明示的に与え
+ る必要があります。
 
  仮変数名は、下で紹介するように範囲指定で指定することで変更できます。最
  初の範囲は `using` 指定の最初のものに対応し、以下同様です。従属変数で
@@ -4535,16 +4583,16 @@ Ffigure_mapcontours
        fit f(x) 'measured.dat' via 'start.par'
        fit f(x) 'measured.dat' using 3:($7-5) via 'start.par'
        fit f(x) './data/trash.dat' using 1:2:3 yerror via a, b, c
-       fit g(x,y) 'surface.dat' using 1:2:3 noerror via a, b, c
+       fit g(x,y) 'surface.dat' using 1:2:3 via a, b, c
        fit a0 + a1*x/(1 + a2*x/(1 + a3*x)) 'measured.dat' via a0,a1,a2,a3
-       fit a*x + b*y 'surface.dat' using 1:2:3 noerror via a,b
-       fit [*:*][yaks=*:*] a*x+b*yaks 'surface.dat' u 1:2:3 noerror via a,b
+       fit a*x + b*y 'surface.dat' using 1:2:3 via a,b
+       fit [*:*][yaks=*:*] a*x+b*yaks 'surface.dat' u 1:2:3 via a,b
 
-       fit [][][t=*:*] a*x + b*y + c*t 'foo.dat' using 1:2:3:4 noerror via a,b,c
+       fit [][][t=*:*] a*x + b*y + c*t 'foo.dat' using 1:2:3:4 via a,b,c
 
        set dummy x1, x2, x3, x4, x5
        h(x1,x2,x3,x4,s5) = a*x1 + b*x2 + c*x3 + d*x4 + e*x5
-       fit h(x1,x2,x3,x4,x5) 'foo.dat' using 1:2:3:4:5:6 noerror via a,b,c,d,e
+       fit h(x1,x2,x3,x4,x5) 'foo.dat' using 1:2:3:4:5:6 via a,b,c,d,e
 
  反復の個々のステップの後で、当てはめの現在の状態についての詳細な情報が
  画面に表示されます。そし最初と最後の状態に関する同じ情報が "fit.log"
@@ -7258,9 +7306,6 @@ Ffigure_mapcontours
  ドを実行することでデフォルトの状態に戻すことができます。以下も参照:
  `reset`。これは全てのパラメータの設定をデフォルトの値に戻します。
 
- もし変数が日時のデータを含むならば、`show` は、`set timefmt` によって
- 現在設定されている書式に従って表示します。それは変数が最初に設定されて
- いてその書式が効果を持たなかったとしてもです。
 =iteration
  `set` と `unset` コマンドには繰り返し節も利用できます。以下参照:
  `plot for`。
@@ -8066,7 +8111,7 @@ Ffigure_mapcontours
  の持つ色名の一覧を見るには、コマンド `show colornames` を使用してくだ
  さい。例:
 
-       set style line 1 linecolor rgb "sea-green"
+       set style line 1 linecolor "sea-green"
 3 等高線 (contour)
 ?commands set contour
 ?commands unset contour
@@ -8567,6 +8612,8 @@ Ffigure_missing
 ?set fit errorvariables
 ?set fit logfile
 ?set fit script
+?set fit v4
+?set fit v5
  コマンド `set fit` は、`fit` コマンド用のオプションを制御します。
 
  書式:
@@ -8582,6 +8629,7 @@ Ffigure_missing
                {start-lambda <value>|default}
                {lambda-factor <value>|default}
                {script {"<command>"|default}}
+               {v4 | v5}
        unset fit
        show fit
 
@@ -8652,6 +8700,11 @@ Ffigure_missing
  散を保存する変数名は、"FIT_COV_" に最初のパラメータ名と "_" と 2 つ目
  のパラメータをつなげた名前になります。例えばパラメータ "a" と "b" に対
  しては、その共分散変数名は "FIT_COV_a_b" となります。
+
+ バージョン 5 では、コマンド fit の書式は変更され、キーワード `error`
+ が指定されていない場合は単位重み (`unitweights`) がデフォルトになりま
+ した。オプション `v4` で gnuplot バージョン 4 のデフォルトの挙動に戻り
+ ます。以下も参照: `fit`。
 3 フォントパス (fontpath)
 ?commands set fontpath
 ?commands show fontpath
@@ -8704,8 +8757,7 @@ Ffigure_missing
  または個別にコマンド `set {軸}tics format` で書式を設定できます。
 
  書式:
-       set format {<axes>} {"<format-string>"}
-       set format {<axes>} {'<format-string>'}
+       set format {<axes>} {"<format-string>"} {numeric|timedate|geographic}
        show format
 
  ここで、<axes> (軸) は `x`, `y`, `xy`, `x2`, `y2`, `z`, `cb`、または何
@@ -8919,7 +8971,7 @@ Ffigure_missing
        %y           西暦 (2000-2068 年は 0-68、1969-1999 年は 69-99)
        %Y           西暦 (4 桁)
 #\begin{tabular}{|cl|} \hline
-#\multicolumn{2}{|c|}{目盛りラベルの日時書式指定子}\\
+#\multicolumn{2}{|c|}{日付指定子}\\
 #\hline \hline
 #書式 & 説明 \\ \hline
 #\verb@%a@ & 曜日名の省略形 (Sun,Mon,...) \\
@@ -8985,7 +9037,7 @@ Ffigure_missing
 ^  <col align="left">
 ^</colgroup>
 ^<thead>
-^<tr>    <th>書式</th>    <th>説明</th></tr>
+^<tr>    <th>日付書式</th>    <th>説明</th></tr>
 ^</thead>
 ^<tbody>
 ^<tr>    <td><tt>%a</tt></td>    <td>曜日名の省略形 (Sun,Mon,...)</td></tr>
@@ -9016,23 +9068,81 @@ Ffigure_missing
 ^</tbody>
 ^</table>
 
- 数字を表す書式では、これらの指定子 (% の後ろ、指定子の前) に "0"
- ("オー" でなく "ゼロ") をつけることで、先頭に空白ができる場合に空白の
- 代わりに 0 で埋めることができ、また最小の出力幅を正の整数で指定するこ
- ともできます (出力される数字を表示するのに指定した幅が足りない場合は無
- 視されます)。書式 %S は実数指定も受けつけますので、小数秒も書けます。
- 表示する文字の長さは 24 文字まで、という制限があり、長すぎた部分は切り
- 捨てられます。
+ 数字を表す書式には、先頭に 0 を埋めるために "0" (ゼロ) を前につけるこ
+ とができ、また最小の出力幅を指定するために正の整数を前につけることもで
+ きます。書式 %S と %t は精度指定も受けつけるので、小数の時/分/秒を書く
+ こともできます。
 
- 例:
+@start table - first is interactive cleartext form
+       書式         説明
+       %tH          エポック時への相対的な正負の時 (24 での巻戻しなし)
+       %tM          エポック時への相対的な正負の分
+       %tS          直前の tH, tM 項目に対応する正負の秒数
+#\begin{tabular}{|cl|} \hline
+#\multicolumn{2}{|c|}{時刻指定子}\\
+#\hline \hline
+#書式 & 説明 \\ \hline
+#\verb@%tH@ & エポック時への相対的な正負の時 (24 での巻戻しなし) \\
+#\verb@%tM@ & エポック時への相対的な正負の分 \\
+#\verb@%tS@ & 直前の tH, tM 項目に対応する正負の秒数 \\
+%c l .
+%書式@説明
+%_
+%%tH@エポック時への相対的な正負の時 (24 での巻戻しなし)
+%%tM@エポック時への相対的な正負の分
+%%tS@直前の tH, tM 項目に対応する正負の秒数
+%_
+@end table
 
- 日時のデータが "76/12/25 23:11:11" の場合
-       set format x                 # デフォルトでは "12/25/76" \n "23:11"
+
+^<table align="center" border="1" rules="groups" frame="hsides" cellpadding="3">
+^<colgroup>
+^  <col align="center">
+^  <col align="left">
+^</colgroup>
+^<thead>
+^<tr>    <th>時刻書式</th>        <th>説明</th></tr>
+^</thead>
+^<tbody>
+^<tr>    <td><tt>%tH</tt></td>    <td>エポック時への相対的な正負の時 (24 での巻戻しなし)</td></tr>
+^<tr>    <td><tt>%tM</tt></td>    <td>エポック時への相対的な正負の分</td></tr>
+^<tr>    <td><tt>%tS</tt></td>    <td>直前の tH, tM 項目に対応する正負の秒数</td></tr>
+^</tbody>
+^</table>
+
+5 例 (Examples)
+?commands set format date_specifiers examples
+?commands set format time_specifiers examples
+?set format date_specifiers examples
+?set format time_specifiers examples
+?set date_specifiers examples
+?set time_specifiers examples
+?date_specifiers examples
+?time_specifiers examples
+
+ 日付書式の例:
+
+ x の値が、1976 年 12 月 25 日の深夜少し前の時刻に対応する秒数であると
+ 仮定します。この位置の軸の刻みラベル文字列は、以下のようになります:
+
+       set format x                 # デフォルトでは "12/25/76 \n 23:11"
        set format x "%A, %d %b %Y"  # "Saturday, 25 Dec 1976"
        set format x "%r %D"         # "11:11:11 pm 12/25/76"
 
- 日時のデータが "98/07/06 05:04:03.123456" の場合
-       set format x "%1y/%2m/%3d %01H:%02M:%06.3S"  # "98/ 7/  6 5:04:03.123"
+ 時刻書式の例:
+
+ 日付書式指定は、秒数での時間の値を、ある特定の日の時計の時刻にエンコー
+ ドします。よって、時は 0 から 23 まで、分は 0 から 59 までのみを動きま
+ すが、それらの負の値は、エポック (1970 年 1 月 1 日) より前の日付に対
+ 応します。秒数での時間の値を、時間 0 に対する相対的な時/分/秒の数値と
+ して出力させるには、時間書式 %tH %tM %tS を使用します。-3672.50 秒の値
+ は以下のように出力されます。
+
+       set format x                 # デフォルトでは "12/31/69 \n 22:58"
+       set format x "%tH:%tM:%tS"   # "-01:01:12"
+       set format x "%.2tH hours"   # "-1.02 hours"
+       set format x "%tM:%.2tS"     # "-61:12.50"
+
 3 function style
 ?set function style
  このコマンドの形式は現在は推奨されていません。以下参照:
@@ -9149,9 +9259,10 @@ Ffigure_missing
 
  gnuplot バージョン 4.6 では、グラフ上に曲面が一つもない状態でも、
  hidden3d は `points`, `labels`, `vectors`, `impulses` の 3 次元の描画
- スタイルに影響を与えます。グラフ内の各々の描画をこの処理から明示的に除
- 外したいときは、`with` 指定に特別のオプション `nohidden3d` を追加して
- ください。
+ スタイルに影響を与えます。`vectors` は、隠されない部分は線分 (矢先なし)
+ として表示されます。グラフ内の各々の描画をこの処理から明示的に除外した
+ いときは、`with` 指定に特別のオプション `nohidden3d` を追加してくださ
+ い。
 
  hidden3d は、pm3d モードで描画された、塗り潰された曲面には影響を与えま
  せん。pm3d の曲面に対して同様の効果を純粋に得たいならば、これの代わり
@@ -10152,8 +10263,8 @@ Ffigure_missing
  以外の全ての `set` で定義されるものも各描画すべてに適用されます。もし
  1 度の描画にだけ現われて欲しいものを作りたいなら、それが例えば日付
  (timestamp) だとしたら、`set multiplot` と `unset multiplot` で囲まれ
- たブロック内の `plot` (または `splot`, `replot`) 命令の一つを `set time`
- と `unset time` ではさんでください。
+ たブロック内の `plot` (または `splot`, `replot`) 命令の一つを
+ `set time` と `unset time` ではさんでください。
 
  multiplot のタイトルは、個々の描画タイトルがあったとしても、それとは別
  のもので、ページの上部にそのためのキャンバス全体の幅にわたるスペースが
@@ -10913,7 +11024,7 @@ Ffigure_missing
        set pm3d at s depthorder border lw 0.2 lt black
        unset hidden3d
        unset surf
-       splot x*x+y*y linecolor rgb "blue"      # こうしないと黒
+       splot x*x+y*y linecolor rgb "blue"   # こうしないと黒
 
  注: 非推奨のオプション `set pm3d hidden3d N` もまだ使えますが、これは
  `set pm3d border ls N` と同じです。
@@ -11655,13 +11766,12 @@ C 下記の以下参照: オプション `positive`, `negative`)。
  向、単位は度) になりますが、スタイルが `nofilled` の場合はこれを無視し
  ます。
 
- `filled` を指定すると、塗りつぶされた矢先を作ります (`heads` が使われ
- ている場合)。`noborder` を指定すると、塗りつぶされた矢先は描きますが、
- 矢先の回りの線 (境界線) は描きません。これは 2 つの効果を持ちます。一
- つは、矢先が少し小さくなることで、もう一つは矢先の先端がベクトルの終点
- ピッタリの場所に置かれることです。境界線を描くと、境界線の幅の何割分か
- だけ終点から少し先に矢先が伸びます。矢先の塗りつぶしは、すべての出力形
- 式がサポートしているとは限りません。
+ `filled` を指定すると、矢先の回りの線 (境界線) を描き、矢先を塗りつぶ
+ します。`noborder` を指定すると、矢先は塗りつぶしますが、境界線は描き
+ ません。この場合、矢先の先端がベクトルの終点ピッタリの場所に置かれ、そ
+ の矢先は全体として少し小さくなります。点線で矢を描く場合は、点線の境界
+ 線は汚いので、常に `noborder` を使うべきです。矢先の塗りつぶしは、すべ
+ ての出力形式がサポートしているとは限りません。
 
  線種はユーザの定義したラインスタイルのリストから選ぶこともできますし
  (以下参照: `set style line`)、用意されている `<line_type>` の値 (デフ
@@ -12288,7 +12398,7 @@ C 下記の以下参照: オプション `positive`, `negative`)。
                 {in | out} {front | back}
                 {{no}rotate {by <ang>}} {offset <offset> | nooffset}
                 {left | right | center | autojustify}
-                { format "formatstring" } { font "name{,<size>}" }
+                {format "formatstring"} {font "name{,<size>}"} {{no}enhanced}
                 { textcolor <colorspec> }
        set tics scale {default | <major> {,<minor>}}
        unset tics
@@ -12409,11 +12519,8 @@ C 下記の以下参照: オプション `positive`, `negative`)。
  味がありません。
 
  書式:
-       set timefmt {<axis>} "<format string>"
+       set timefmt "<format string>"
        show timefmt
-
- オプションの <axis> 引数は、軸毎に異なる時間入力書式を指定できるように
- します。それを省略した場合は、その書式をすべての軸に適用します。
 
  文字列引数 (<format string>) は `gnuplot` に日時データをデータファイル
  からどのように読むかを指示します。有効な書式は以下の通りです:
@@ -12756,7 +12863,7 @@ C 下記の以下参照: オプション `positive`, `negative`)。
  同様のコマンドが機能します。
 
  書式:
-       set xdata {time | geographic}
+       set xdata time
        show xdata
 
  `ydata`, `zdata`, `x2data`, `y2data`, `cbdata` にも同じ書式が当てはま
@@ -12765,51 +12872,34 @@ C 下記の以下参照: オプション `positive`, `negative`)。
  `time` オプションはデータが秒単位の日時データであることを伝えます。現
  在の gnuplot は時刻をミリ秒の精度保存します。
 
- オプション `geographic` は、データが度分秒の形式の地理座標であることを
- 伝えます。
-
  オプションなしの場合は、データの解釈方法を通常の形式に戻します。
 4 日時データ (time)
 ?commands set xdata time
 ?set xdata time
  `set xdata time` は、x 座標がミリ秒精度の日時データであることを意味し
+ ます。`set ydata time` のように、他の軸用のこれと同等のコマンドもあり
  ます。
 
- gnuplot にどのように日付、あるいはファイルの日時データを読みこませるか
- については、以下参照: `set timefmt`。日時データは今世紀の始まり (訳注:
- 厳密には 2000 年 1 月 1 日の始まり) からの秒数に変換されます。時間書式
- (timefmt) は現在はただ一つだけしか使えません。それは、全ての日時データ
- 項目がこの書式に一致しなければならないことを意味します。また、範囲の指
- 定は、日時指定が数式と解釈されるのを避けるために、その書式に従った文字
- 列を引用符で囲んで指定すべきです。
+ 日時データの解釈は、2 つの別の書式で制御しています。ファイルからの入力
+ データは、その軸に対する `timefmt` を使って読み込みます。以下参照:
+ `set timefmt`。
+ その軸の範囲を示す場合は、この同じ `timefmt` の書式で引用符に囲んで指
+ 定します。
 
- デフォルトでは、目盛り刻みの見出し (label) の表示には関数 'strftime'
- (unix でそれを調べるには "man strftime" とタイプしてください) を使いま
- す。`gnuplot` はこれを適当に意味のある書式で表示しようとしますが、見出
- しの書式は、`set format x` を使ってカスタマイズすることもできます。特
- 別な時間書式指定子に関しては、以下参照: `time_specifiers`。他の情報に
- ついては、以下も参照: `time/date`。
-4 地理座標データ (geographic)
-?commands set xdata geographic
-?set xdata geographic
-?geographic
- `set xdata geographic` は、x 座標が度の単位の地理座標であることを意味
- します。軸の刻みの見出しに座標をどう表示させるかは `set format x` を使
- います。地理座標データに関する書式指定子は以下の通り:
-        %D                   = 度の整数表示
-        %<width.precision>d  = 度の浮動小数表示
-        %M                   = 分の整数表示
-        %<width.precision>m  = 分の浮動小数表示
-        %S                   = 秒の整数表示
-        %<width.precision>s  = 秒の浮動小数表示
-        %E                   = +/- でなく E/W のラベル
-        %N                   = +/- でなく N/S のラベル
- 例えば、コマンド `set format x "%Ddeg %5.2mmin %E"` は、x 座標の -1.51
- という値を `" 1deg 30.60min W"` のように表示します。
-C shige: 日本語ロケールの場合を訳注として書くべきか。
-C 度の記号は set encoding locale で出るようになると。
+ 例:
 
- 書式指定を与えない場合は、座標は 10 進数の度で表示します。
+      set xdata time
+      set timefmt x "%d-%b-%Y"
+      set xrange ["01-Jan-2013" : "31-Dec-2014"]
+
+ 出力、すなわち軸に沿った目盛りのラベルや、マウス操作での座標出力につい
+ ては、デフォルトでは、秒での内部時刻から日時を表現する文字列への変換に
+ は、関数 'strftime' (unix でそれを調べるには "man strftime" とタイプし
+ てください) を使います。`gnuplot` はこれを適当に意味のある書式で表示し
+ ようとしますが、`set format x` か `set xtics format` のいずれかを使っ
+ てカスタマイズすることもできます。
+ 特別な時間書式指定子に関しては、以下参照: `time_specifiers`。他の情報
+ については、以下も参照: `time/date`。
 3 曜日軸目盛り (xdtics)
 ?commands set xdtics
 ?commands unset xdtics
@@ -13066,7 +13156,8 @@ C 度の記号は set encoding locale で出るようになると。
                   | <incr>
                   | <start>, <incr> {,<end>}
                   | ({"<label>"} <pos> {<level>} {,{"<label>"}...) }
-                 { format "formatstring" } { font "name{,<size>}" }
+                 {format "formatstring"} {font "name{,<size>}"} {{no}enhanced}
+                 { numeric | timedate | geographic }
                  { rangelimited }
                  { textcolor <colorspec> }
        unset xtics
@@ -13214,30 +13305,69 @@ C 度の記号は set encoding locale で出るようになると。
  (見出し付けされない) 小目盛りは、`set mxtics` コマンドで自動的に追加す
  るか、または位置を手動で `set xtics ("" <pos> 1, ...)` の形式で与える
  こともできます。
-4 xtics time_data
-?set xtics time_axis tics
-?xtics time_axis tics
-?time_axis tics
- 時系列データの場合、軸の目盛り位置の値は `timefmt` の書式にしたがった
- 日付、または時刻を引用符で囲んで与えなければいけません。<start>,
- <incr>, <end> 形式を使う場合、<start> と <end> は `timefmt` に従って与
- えますが、<incr> は秒単位で与える必要があります。その時刻は実際には
- `set format` で与えた書式に従って表示されます。
+4 xtics timedata
+?set xtics timedata
+?xtics timedata tics
+?timedata tics
+ 時間と日付は内部では秒数として保持されています。
+
+ 入力: 非数値の日時値は、入力時に `timefmt` で指定した書式を用いて秒数
+ に変換します。軸に対する位置や軸の範囲も `timefmt` で解釈される日時で、
+ 引用符で囲んで与えます。
+ <start>, <incr>, <end> 形式を使う場合、<incr> は秒単位で与えなければい
+ けません。入力データの解釈には `timefmt` を使ってください。軸の範囲と
+ 目盛りの位置は、`set xdata time` で変更されます。
+
+ 出力: 軸の目盛りラベルは、`set format` か `set xtics format` のいずれ
+ かで指定された、別の書式を使って生成します。デフォルトでは、それは通常
+ の数値書式指定であると認識しますが (`set xtics numeric`)、他に、地理座
+ 標 (`set xtics geographic`) や、日時データ (`set xtics time`) のオプシ
+ ョンがあります。
+
+ 注意: 以前の版の gnuplot との互換性のため、コマンド `set xdata time`
+ も暗黙に `set xtics time` を実行しますし、`set xdata` や `unset xdata`
+ は暗黙に `set xtics numeric` へリセットします。しかし、これはその後に
+ `set xtics` を呼び出すことで変更できます。
 
  例:
-       set xdata time
-       set timefmt "%d/%m"
-       set xtics format "%b %d"
+       set xdata time           # 入力データの解釈の制御
+       set timefmt "%d/%m"      # 入力データの読み込みの書式
+       set xtics timedate       # 出力書式の解釈の制御
+       set xtics format "%b %d" # 目盛りラベルで使う書式
        set xrange ["01/12":"06/12"]
        set xtics "01/12", 172800, "05/12"
 
        set xdata time
        set timefmt "%d/%m"
-       set xtics format "%b %d"
+       set xtics format "%b %d" time
        set xrange ["01/12":"06/12"]
        set xtics ("01/12", "" "03/12", "05/12")
  これらは両方とも "Dec 1", "Dec 3", "Dec 5", の目盛りを生成しますが、2
  番目の例 "Dec 3" の目盛りは見出し付けされません。
+4 geographic
+?commands set xtics geographic
+?set xtics geographic
+?geographic
+ `set xtics geographic` は、x 軸の値が度の単位の地理座標であることを意
+ 味します。その軸の刻みの見出しの表現の指定には、`set xtics format` か
+ `set format x` を使います。地理座標データに関する書式指定子は以下の通
+ り:
+        %D                   = 度の整数表示
+        %<width.precision>d  = 度の浮動小数表示
+        %M                   = 分の整数表示
+        %<width.precision>m  = 分の浮動小数表示
+        %S                   = 秒の整数表示
+        %<width.precision>s  = 秒の浮動小数表示
+        %E                   = +/- でなく E/W のラベル
+        %N                   = +/- でなく N/S のラベル
+ 例えば、コマンド `set format x "%Ddeg %5.2mmin %E"` は、x 座標の -1.51
+ という値を `" 1deg 30.60min W"` のように表示します。
+C shige: 日本語ロケールの場合を訳注として書くべきか。
+C 度の記号は set encoding locale で出るようになると。
+
+ xtics がデフォルトの状態のまま (`set xtics numeric`) の場合は、座標は
+ 10 進数の度で表示し、`format` も上の特別な記号ではなく、通常の数値書式
+ が使われているとみなされます。
 4 xtics rangelimited
 ?set xtics rangelimited
 ?xtics rangelimited
@@ -13979,7 +14109,8 @@ C 度の記号は set encoding locale で出るようになると。
 ?stats
 ?statistics
  書式:
-      stats {<ranges>} 'filename' {using N{:M}} {name 'prefix'} {{no}output}
+      stats {<ranges>} 'filename' {matrix | using N{:M}} {name 'prefix'}
+            {{no}output}
 
  このコマンドは、ファイルの 1 列、または 2 列のデータの簡単な統計情報を
  提供します。using 指定子は、plot コマンドと同じ形で解釈されますが、
@@ -13993,22 +14124,34 @@ C 度の記号は set encoding locale で出るようになると。
  画面出力に加え、gnuplot は個々の統計情報を 3 つの変数グループに保存し
  ます。
  1 番目の変数グループは、どんなデータが並んでいるかを示します:
-      STATS_records           # 範囲内のデータ行の総数
+@start table
+      STATS_records           # 範囲内のデータ行の総数 (N)
       STATS_outofrange        # 範囲外として除かれた行数
       STATS_invalid           # 無効/不完全/欠損データ行の総数
       STATS_blank             # 空行の総数
       STATS_blocks            # ファイル内の index データブロック数
       STATS_columns           # データ先頭行の列数
+#\begin{tabular}{|lcl|} \hline
+#\verb@STATS_records@    & $~~N~~$ &  範囲内のデータ行の総数 \\
+#\verb@STATS_outofrange@ & $~~~~~$  &  範囲外として除かれた行数 \\
+#\verb@STATS_invalid@    & $~~~~~$  &  無効/不完全/欠損データ行の総数 \\
+#\verb@STATS_blank@      & $~~~~~$  &  空行の総数 \\
+#\verb@STATS_blocks@     & $~~~~~$  &  ファイル内の index データブロック数 \\
+#\verb@STATS_columns@    & $~~~~~$  &  データ先頭行の列数 \\
+@end table
 
- 2 番目の変数グループは、1 つの列の、範囲内のデータの性質を示します。対
- 応する軸が自動縮尺の場合は、範囲に制限はありません。1 つの列を使用して
- いる場合はそれは y 軸の設定に支配され、その他の場合は最初の列に x 軸の
- 設定を、2 番目の列には y 軸の設定を適用します。
+ 2 番目の変数グループは、1 つの列の、範囲内のデータの性質を示します。こ
+ の列は y の値として扱われます。y 軸が自動縮尺の場合は、対象とする範囲
+ に限界はありませんが、そうでなければ範囲 [ymin:ymax] 内の値のみを対象
+ とします。
 
- 2 つの列を 1 回の `stats` コマンドで解析する場合は、各変数名には "_x",
- "_y" という接尾辞が追加されます。例えば STATS_min_x は、1 つ目の列のデ
- ータの最小値で、STATS_min_y は 2 つ目の列のデータの最小値を意味します。
+ 2 つの列を同時に 1 回の `stats` コマンドで解析する場合は、各変数名に
+ "_x", "_y" という接尾辞を追加します。例えば STATS_min_x は、1 つ目の列
+ のデータの最小値で、STATS_min_y は 2 つ目の列のデータの最小値を意味し
+ ます。この場合、点は xrange と yrange の両方で検査することでふるいにか
+ けます。
 
+@start table
       STATS_min               # 範囲内のデータ点の最小値
       STATS_max               # 範囲内のデータ点の最大値
       STATS_index_min         # data[i] == STATS_min となる添字 i
@@ -14017,19 +14160,44 @@ C 度の記号は set encoding locale で出るようになると。
       STATS_median            # メジアン値 (第二四分位境界値)
       STATS_up_quartile       # 第三 (上の) 四分位境界値
       STATS_mean              # 範囲内のデータ点の平均値
-      STATS_stddev            # 範囲内のデータ点の標準偏差
-      STATS_skewness          # 範囲内のデータ点の歪度
-      STATS_kurtosis          # 範囲内のデータ点の過剰尖度
-      STATS_adev              # データ点の平均絶対偏差
+      STATS_ssd               # 範囲内のデータ点の不偏標準偏差
+                                   = sqrt( Sum[(y-ymean)^2] / (N-1) )
+      STATS_stddev            # 範囲内のデータ点の標本標準偏差
+                                   = sqrt( Sum[(y-ymean)^2] / N )
       STATS_sum               # 和
       STATS_sumsq             # 平方和
+      STATS_skewness          # 範囲内のデータ点の歪度
+      STATS_kurtosis          # 範囲内のデータ点の尖度
+      STATS_adev              # 範囲内のデータ点の平均絶対偏差
       STATS_mean_err          # 平均値の標準誤差
       STATS_stddev_err        # 標準偏差の標準誤差
       STATS_skewness_err      # 歪度の標準誤差
-      STATS_kurtosis_err      # 過剰尖度の標準誤差
+      STATS_kurtosis_err      # 尖度の標準誤差
+#\begin{tabular}{|lrll|} \hline
+#\verb@STATS_min@ && $min(y)$ &  範囲内のデータ点の最小値 \\
+#\verb@STATS_max@ && $max(y)$ &  範囲内のデータ点の最大値 \\
+#\verb@STATS_index_min@ && $i \mid y_i = min(y)$ &  data[i] == STATS\_min となる添字 i \\
+#\verb@STATS_index_max@ && $i \mid y_i = max(y)$ &  data[i] == STATS\_max となる添字 i \\
+#\verb@STATS_mean@ & $\bar{y}=$ & $\frac{1}{N}\sum{y}$ &  範囲内のデータ点の平均値 \\
+#\verb@STATS_stddev@ & $\sigma_y=$ & $\sqrt{\frac{1}{N}{\sum{{(y-\bar{y})}^2}}}$ &  範囲内のデータ点の標本標準偏差 \\
+#\verb@STATS_ssd@ & $s_y=$ & $\sqrt{\frac{1}{N-1}{\sum{{(y-\bar{y})}^2}}}$ &  範囲内のデータ点の不偏標準偏差 \\
+#\verb@STATS_lo_quartile@ && ~ &  第一 (下の) 四分位境界値 \\
+#\verb@STATS_median@ && ~ &  メジアン値 (第二四分位境界値) \\
+#\verb@STATS_up_quartile@ && ~ &  第三 (上の) 四分位境界値 \\
+#\verb@STATS_sum@ && $\sum{y}$ &  和 \\
+#\verb@STATS_sumsq@ && $\sum{y^2}$ &  平方和 \\
+#\verb@STATS_skewness@ && $\frac{1}{N\sigma^3}\sum{(y-\bar{y})^3}$ &  範囲内のデータ点の歪度 \\
+#\verb@STATS_kurtosis@ && $\frac{1}{N\sigma^4}\sum{(y-\bar{y})^4}$ &  範囲内のデータ点の尖度 \\
+#\verb@STATS_adev@ && $\frac{1}{N}\sum{|{y}-\bar{y}|}$ &  範囲内のデータ点の平均絶対偏差 \\
+#\verb@STATS_mean_err@ && $\sigma_y / \sqrt{N}$ &  平均値の標準誤差 \\
+#\verb@STATS_stddev_err@ && $\sigma_y / \sqrt{2N}$ &  標準偏差の標準誤差 \\
+#\verb@STATS_skewness_err@ && $\sqrt{6/N}$ &  歪度の標準誤差 \\
+#\verb@STATS_kurtosis_err@ && $\sqrt{24/N}$ &  尖度の標準誤差 \\
+@end table
 
  3 番目の変数グループは、2 つの列のデータの解析専用です。
-      STATS_correlation       # x と y の相関係数
+@start table
+      STATS_correlation       # x と y の不偏相関係数
       STATS_slope             # 回帰直線 y = Ax + B の係数 A
       STATS_slope_err         # A の不確かさ
       STATS_intercept         # 回帰直線 y = Ax + B の係数 B
@@ -14037,6 +14205,20 @@ C 度の記号は set encoding locale で出るようになると。
       STATS_sumxy             # 積和 (x*y の和)
       STATS_pos_min_y         # y の最小値を与える x 座標
       STATS_pos_max_y         # y の最大値を与える x 座標
+#\begin{tabular}{|lll|} \hline
+#\verb@STATS_correlation@ &   &  x と y の不偏相関係数 \\
+#\verb@STATS_slope@       &   &  回帰直線 y = Ax + B の係数 A \\
+#\verb@STATS_slope_err@   &   &  A の不確かさ \\
+#\verb@STATS_intercept@   &   &  回帰直線 y = Ax + B の係数 B \\
+#\verb@STATS_intercept_err@ &   &  B の不確かさ \\
+#\verb@STATS_sumxy@       &   &  積和 (x*y の和) \\
+#\verb@STATS_pos_min_y@   &   &  y の最小値を与える x 座標 \\
+#\verb@STATS_pos_max_y@   &   &  y の最大値を与える x 座標 \\
+@end table
+
+ `matrix` が指定されていれば、`using` オプションは無視され、"z" 値のみ
+ が 1 次元のデータ集合として取り扱われます。その行列のサイズは、変数
+ STATS_size_x と STATS_size_y に保存します。
 
  同時に 2 つ以上のファイルからの統計情報を使うことができれば便利でしょ
  うから、変数のデフォルトの接頭辞である "STATS" をオプション `name` で
