@@ -1,5 +1,5 @@
 /*
- * $Id: gp_cairo.c,v 1.87 2014/08/20 04:42:44 sfeam Exp $
+ * $Id: gp_cairo.c,v 1.87.2.1 2014/12/11 22:56:18 sfeam Exp $
  */
 
 /* GNUPLOT - gp_cairo.c */
@@ -171,6 +171,8 @@ void gp_cairo_initialize_plot(plot_struct *plot)
 	plot->background.r = 1.0; plot->background.g = 1.0; plot->background.b = 1.0;
 
 	plot->opened_path = FALSE;
+
+	plot->current_x = -1; plot->current_y = -1;
 
 	strncpy(plot->fontname, "", sizeof(plot->fontname));
 	plot->fontsize = 1.0;

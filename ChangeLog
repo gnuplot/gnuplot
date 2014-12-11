@@ -22,9 +22,9 @@
 
 2014-12-11 Ethan A Merritt  <merritt@u.washington.edu>
 
-	* src/wxterminal/gp_cairo.c (gp_cairo_move):  Do not let zero-length
-	move iterrupt the current polyline context (dash pattern, end caps,
-	polygon closure).
+	* src/wxterminal/gp_cairo.c (gp_cairo_move gp_cairo_initialize_plot):
+	Do not let zero-length move iterrupt the current polyline context
+	(dash pattern, end caps, polygon closure).
 	Bug #1523
 
 	* src/plot2d.c (eval_plots):  Save/restore original dummy variable name
