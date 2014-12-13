@@ -144,7 +144,9 @@ KNOWN ISSUES
   work correctly for multiplots if the key box is opaque.
   Toggling plots drawn in hidden3d mode (hidden line removal) does not work.
 
-* Linking against wxWidgets 3.0 is not supported (wxt terminal).
+* Linking against wxWidgets 3.0 (rather than wxWidgets 2.8) caused the wxt
+  terminal to fail in the version 5 release candidates.  The 5.0 release
+  contains a fix for this but it has not been extensively tested.
   If you configure in the wxt terminal without also configuring in X11,
   you may need to set the environmental variable TERMLIBS:
     TERMLIBS="-lX11"  ./configure

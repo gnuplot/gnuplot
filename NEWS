@@ -7,6 +7,7 @@ Changes in final release of 5.0
 * FIX ignore unwanted delta_y so that it doesn't cause problems for logscale y
 * FIX more complete tests for validity of linked axis inverse mapping function
 * FIX cairo terminals dashed-line rendering in 3D plots
+* FIX wxt terminal (wxgtk3.0) assert/segfault failure on initialization
 
 Changes in 5.0.rc3
 =====================
