@@ -1,3 +1,25 @@
+2014-12-13 Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/wxterminal/wxt_gui.cpp (wxtPanel::wxt_cairo_refresh):
+	The wxt terminal has been failing when linked against wxgtk3.0.
+	The overt sympton is a library assert statement sometimes followed by a
+	segfault:
+	  ./src/gtk/dcclient.cpp(2043): assert "m_window" failed in DoGetSize():
+	  GetSize() doesn't work without window [in thread 7fb21f386700]
+	  Call stack:
+	  [00] wxOnAssert()
+	  [01] wxClientDCImpl::DoGetSize(int*, int*) const
+	  [02] wxBufferedDC::UnMask()
+	Both the assert and the segfault are due to the plot window not yet
+	having been rendered on the screen. The documented wxwidgets function
+	panel->IsShownOnScreen() fails to reliably detect this condition, so we
+	must use our own window id bookkeeping to skip any refresh commands
+	before the window appears.
+
+	Gnuplot Bug #1401
+	Debian Bug http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=750045
+	wxWidgets Bug  http://trac.wxwidgets.org/ticket/16034
+
 2014-12-11 Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/wxterminal/gp_cairo.c (gp_cairo_move):  Do not let zero-length

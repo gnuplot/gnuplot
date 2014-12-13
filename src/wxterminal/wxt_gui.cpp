@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.cpp,v 1.135 2014/11/04 21:12:49 sfeam Exp $
+ * $Id: wxt_gui.cpp,v 1.136 2014/11/19 01:33:43 sfeam Exp $
  */
 
 /* GNUPLOT - wxt_gui.cpp */
@@ -2797,6 +2797,20 @@ void wxt_command_push(gp_command command)
 /* refresh the plot by (re)processing the plot commands list */
 void wxtPanel::wxt_cairo_refresh()
 {
+	/* This check may prevent the assert+die behavior seen with wxgtk3.0 */
+	/* Symptom:
+	  ./src/gtk/dcclient.cpp(2043): assert "m_window" failed in DoGetSize(): GetSize() doesn't work without window [in thread 7fb21f386700]
+	  Call stack:
+	  [00] wxOnAssert(char const*, int, char const*, char const*, wchar_t const*)
+	  [01] wxClientDCImpl::DoGetSize(int*, int*) const
+	  [02] wxBufferedDC::UnMask()                  
+	  wxwidgets documentation to the contrary, panel->IsShownOnScreen() is unreliable
+	 */
+	if (!wxt_current_window) {
+		FPRINTF((stderr,"wxt_cairo_refresh called before window exists\n"));
+		return;
+	}
+
 	/* Clear background. */
 	gp_cairo_solid_background(&plot);
 
