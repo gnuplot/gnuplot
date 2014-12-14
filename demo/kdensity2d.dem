@@ -19,3 +19,6 @@ set dgrid3d 50,50 gauss kdensity 0.1
 set title "set dgrid3d 50,50 gauss kdensity 0.1"
 
 replot
+
+pause -1 "Hit return to continue"
+reset

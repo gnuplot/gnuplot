@@ -1,3 +1,7 @@
+2014-12-14  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* demo/kdensity.dem:  End demo with pause / reset
+
 2014-12-15 Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/mouse.c (do_event) src/gplt_x11.c src/wxterminal/wxt_gui.cpp
