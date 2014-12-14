@@ -1,7 +1,7 @@
 /*
  * GNUPLOT - caca.trm
  *
- * $Id: caca.trm,v 1.6 2014/06/04 08:11:00 markisch Exp $
+ * $Id: caca.trm,v 1.7 2014/09/04 20:33:14 sfeam Exp $
  *
  * This file uses UTF8 encoding and a tab size of 4.
  *
@@ -88,7 +88,9 @@ TERM_PUBLIC void CACA_modify_plots(unsigned int operations, int plotno);
 /* This is a new section for public interfaces. */
 #if defined(TERM_PUBLIC_PROTO) || defined (TERM_BODY)
 
-extern TBOOLEAN CACA_process_events(void);
+typedef enum CACA_result { CACA_quit, CACA_loop, CACA_endpause } CACA_result;
+
+extern CACA_result CACA_process_events(void);
 extern TBOOLEAN CACA_window_opened(void);
 
 #endif /* TERM_PUBLIC_PROTO */
@@ -141,7 +143,7 @@ static char const * CACA_get_color_name(uint8_t color); /* Find name of nearest 
 static char * CACA_encode_text(const char *str); /* map strings according to current encoding */
 
 #ifdef USE_MOUSE
-static void process_event(char type, int mx, int my, int par1, int par2, int winid); /* wrapper for do_event() */
+static TBOOLEAN process_event(char type, int mx, int my, int par1, int par2, int winid); /* wrapper for do_event() */
 #endif
 static int gp_kbhit(void); /* kbhit() implementation */
 
@@ -887,7 +889,7 @@ CACA_text()
 		   The vgagl terminal uses the very same trick. */
 		term_graphics = FALSE;
 		CACA_processing_events = TRUE;
-		while (CACA_process_events());
+		while (CACA_process_events() == CACA_loop);
 		/* Clean up remaining console events, as e.g. KEYUP events: */
 		CACA_discard_events();
 		CACA_processing_events = FALSE;
@@ -1738,6 +1740,7 @@ CACA_fillstyle(int style)
 			CACA_invertfill = FALSE;
 			break;
 		case FS_EMPTY:
+			/* FIXME: Instead of filling with background color, we should not fill at all in this case! */
 		default:
 			/* fill with background color */
 			fillchar = 0x2588; /* full block */
@@ -1839,10 +1842,10 @@ CACA_event_time(void)
 }
 
 
-TBOOLEAN
+CACA_result
 CACA_process_events(void)
 {
-	TBOOLEAN loop = TRUE;
+	CACA_result loop = CACA_loop;
 	caca_event_t ev;
 	const int event_mask =
 		CACA_EVENT_KEY_PRESS | CACA_EVENT_RESIZE |  CACA_EVENT_QUIT |
@@ -1890,7 +1893,8 @@ CACA_process_events(void)
 							}
 						}
 					}
-					process_event(GE_buttonpress, mx, my, button, 0, 0);
+					if (process_event(GE_buttonpress, mx, my, button, 0, 0))
+						loop = CACA_endpause;
 					FPRINTF((stderr, "CACA: mouse press: button = %i, pos = %i, %i\n", button, mx, my));
 					break;
 				}
@@ -1900,7 +1904,8 @@ CACA_process_events(void)
 					unsigned long event_time = CACA_event_time();
 					timestamp = event_time - last_event_time;
 					last_event_time = event_time;
-					process_event(GE_buttonrelease, mx, my, button, timestamp, 0);
+					if (process_event(GE_buttonrelease, mx, my, button, timestamp, 0))
+						loop = CACA_endpause;
 					FPRINTF((stderr, "CACA: mouse release: button = %i, pos = %i, %i time = %lu\n", button, mx, my, timestamp));
 					break;
 				}
@@ -1911,12 +1916,13 @@ CACA_process_events(void)
 						case 'Q':
 							/* preserve canvas, close window */
 							CACA_close_display();
-							loop = FALSE;
+							loop = CACA_quit;
 							break;
 						case ' ':
 							if (CACA_windowed) {
 #ifdef DISABLE_SPACE_RAISES_CONSOLE
-								process_event(GE_keypress, mx, my, key, 0, 0);
+								if (process_event(GE_keypress, mx, my, key, 0, 0))
+									loop = CACA_endpause;
 #else
 # ifdef WIN32
 								/* raise console */
@@ -1924,24 +1930,26 @@ CACA_process_events(void)
 # else
 								/* FIXME: raising terminal window not implemented */
 								/* gp_raise_console(); */
-								process_event(GE_keypress, mx, my, key, 0, 0);
+								if (process_event(GE_keypress, mx, my, key, 0, 0))
+									loop = CACA_endpause;
 # endif
 #endif
 							} else {
 								/* preserve canvas, close window */
 								CACA_close_display();
-								loop = FALSE;
+								loop = CACA_quit;
 							}
 							break;
 						case GP_Return:
 						case GP_Escape:
 						case GP_BackSpace:
 						case GP_Delete:
-							if (CACA_windowed)
-								process_event(GE_keypress, mx, my, key, 0, 0);
-							else {
+							if (CACA_windowed) {
+								if (process_event(GE_keypress, mx, my, key, 0, 0))
+									loop = CACA_endpause;
+							} else {
 								CACA_close_display();
-								loop = FALSE;
+								loop = CACA_quit;
 							}
 							break;
 						case CACA_KEY_CTRL_C:
@@ -1958,7 +1966,8 @@ CACA_process_events(void)
 							/* No equivalent special key available */
 							break;
 						default:
-							process_event(GE_keypress, mx, my, key, 0, 0);
+							if (process_event(GE_keypress, mx, my, key, 0, 0))
+								loop = CACA_endpause;
 					}
 					break;
 				}
@@ -1973,7 +1982,8 @@ CACA_process_events(void)
 					break;
 				}
 				case CACA_EVENT_QUIT:
-					loop = FALSE;
+					paused_for_mouse = 0;
+					loop = CACA_quit;
 					break;
 				case CACA_EVENT_NONE:
 				default:
@@ -1982,7 +1992,7 @@ CACA_process_events(void)
 		}
 	} else {
 		/* No display to process events for. Get out of here. */
-		loop = FALSE;
+		loop = CACA_quit;
 	}
 
 #ifdef WIN32
@@ -2012,10 +2022,10 @@ CACA_discard_events(void)
 TERM_PUBLIC int
 CACA_waitforinput(int options)
 {
-	TBOOLEAN loop = TRUE;
+	CACA_result loop = CACA_loop;
 
-    /* Not implemented: hotkeys during non-interactive input */
-    if (options == TERM_ONLY_CHECK_MOUSING)
+	/* Not implemented: hotkeys during non-interactive input */
+	if (options == TERM_ONLY_CHECK_MOUSING)
 		return NUL;
 
 	/* Redundant check since normally term->waitforinput should be NULL in
@@ -2023,7 +2033,7 @@ CACA_waitforinput(int options)
 	if (!CACA_windowed)
 		return getchar();
 
-	while (loop && (CACA_dp != NULL)) {
+	while (loop == CACA_loop && (CACA_dp != NULL)) {
 #ifdef WIN32
 		HANDLE h;
 		DWORD res;
@@ -2050,12 +2060,12 @@ CACA_waitforinput(int options)
 #else
 		loop = CACA_process_events();
 #endif
-		if (loop && gp_kbhit())
+		if (loop == CACA_loop && gp_kbhit())
 			return getchar();
 	}
 
 	/* We get here only if the window was closed, e.g. via pressing the 'q' key. */
-	if (CACA_windowed)
+	if (CACA_windowed && loop == CACA_quit)
 		return getchar();
 
 	return EOF;
@@ -2874,7 +2884,7 @@ CACA_draw_line(caca_canvas_t *cv, int x1, int y1, int x2, int y2, uint32_t ch)
 {
     int dx, dy;
     int xinc, yinc;
-	TBOOLEAN first = TRUE;
+    TBOOLEAN first = TRUE;
 
     dx = abs(x2 - x1);
     dy = abs(y2 - y1);
@@ -3080,11 +3090,11 @@ CACA_internal_draw_box(caca_canvas_t *cv, int x, int y, int w, int h,
     int x2 = x + w - 1;
     int y2 = y + h - 1;
 
-	uint32_t attr_bg = caca_get_attr(cv, x, y);
-	uint32_t attr_fg = caca_get_attr(cv, -1, -1);
-	caca_set_attr(cv,
-				(attr_fg & 0x0003ffff) | /* new foreground color (18 bits) */
-				(attr_bg & 0xfffc0000)); /* keep current background color (14 bit) */
+    uint32_t attr_bg = caca_get_attr(cv, x, y);
+    uint32_t attr_fg = caca_get_attr(cv, -1, -1);
+    caca_set_attr(cv,
+                  (attr_fg & 0x0003ffff) | /* new foreground color (18 bits) */
+                  (attr_bg & 0xfffc0000)); /* keep current background color (14 bit) */
 
     if(x > x2)
     {
@@ -3229,7 +3239,7 @@ CACA_get_color_name(uint8_t color)
 
 #ifdef USE_MOUSE
 /* convenience wrapper for do_event() */
-static void
+static TBOOLEAN
 process_event(char type, int mx, int my, int par1, int par2, int winid)
 {
     struct gp_event_t ge;
@@ -3241,6 +3251,21 @@ process_event(char type, int mx, int my, int par1, int par2, int winid)
     ge.par2 = par2;
     ge.winid = winid;
     do_event(&ge);
+
+    /* FIXME: IMHO changing paused_for_mouse in terminal code is bad design. */
+    /* end pause mouse? */
+    if ((type == GE_buttonrelease) && (paused_for_mouse & PAUSE_CLICK) &&
+	    (((par1 == 1) && (paused_for_mouse & PAUSE_BUTTON1)) ||
+	     ((par1 == 2) && (paused_for_mouse & PAUSE_BUTTON2)) ||
+	     ((par1 == 3) && (paused_for_mouse & PAUSE_BUTTON3)))) {
+	    paused_for_mouse = 0;
+	    return TRUE;
+    }
+    if ((type == GE_keypress) && (paused_for_mouse & PAUSE_KEYSTROKE) && (par1 != NUL)) {
+	    paused_for_mouse = 0;
+	    return TRUE;
+    }
+    return FALSE;
 }
 #endif
 
