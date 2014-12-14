@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: doc2html.c,v 1.5 2011/03/20 14:13:13 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: doc2html.c,v 1.6 2011/05/25 06:14:27 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - doc2html.c */
@@ -35,7 +35,7 @@ static char *RCSid() { return RCSid("$Id: doc2html.c,v 1.5 2011/03/20 14:13:13 m
 ]*/
 
 /*
- * doc2html.c  -- program to convert Gnuplot .DOC format to MS windows
+ * doc2html.c  -- program to convert Gnuplot .DOC format to MS Windows
  * HTML help (.html) format.
  *
  * Derived from doc2rtf and doc2html (version 3.7.3) by B. Maerkisch
@@ -53,7 +53,7 @@ static char *RCSid() { return RCSid("$Id: doc2html.c,v 1.5 2011/03/20 14:13:13 m
 
 #ifdef WXHELP
 /* The Microsoft help compiler splits topics and creates the index automatically.
-   To create help files for wxWidgets we need to do this manually. 
+   To create help files for wxWidgets we need to do this manually.
    Note that this might overwrite the stub index file from CVS. */
 #define SPLIT_FILES
 #define CREATE_INDEX
@@ -68,7 +68,7 @@ static char *RCSid() { return RCSid("$Id: doc2html.c,v 1.5 2011/03/20 14:13:13 m
 
 static TBOOLEAN debug = FALSE;
 static char path[PATH_MAX];
-static const char basename[] = "wgnuplot";
+static const char name[] = "wgnuplot";
 
 void convert __PROTO((FILE *, FILE *, FILE *, FILE *));
 void process_line __PROTO((char *, FILE *, FILE *, FILE *));
@@ -102,7 +102,7 @@ main (int argc, char **argv)
         *last_char = 0;
     }
     strcpy(filename, path);
-    strcat(filename, basename);
+    strcat(filename, name);
     strcat(filename, ".html");
     if ((outfile = fopen(filename, "w")) == (FILE *) NULL) {
 	fprintf(stderr, "%s: Can't open %s for writing\n",
@@ -111,7 +111,7 @@ main (int argc, char **argv)
 	exit(EXIT_FAILURE);
     }
     strcpy(filename, path);
-    strcat(filename, basename);
+    strcat(filename, name);
     strcat(filename, ".hhc");
     if ((contents = fopen(filename, "w")) == (FILE *) NULL) {
 	fprintf(stderr, "%s: Can't open %s for writing\n",
@@ -122,7 +122,7 @@ main (int argc, char **argv)
     }
 #ifdef CREATE_INDEX
     strcpy(filename, path);
-    strcat(filename, basename);
+    strcat(filename, name);
     strcat(filename, ".hhk");
     if ((index = fopen(filename, "w")) == (FILE *) NULL) {
 	fprintf(stderr, "%s: Can't open %s for writing\n",
@@ -169,7 +169,7 @@ convert(FILE *a, FILE *b, FILE *c, FILE *d)
 
     header(b, "gnuplot help");
     fprintf(b, "<h1 align=\"center\">gnuplot %s patchlevel %s</h1>\n", gnuplot_version, gnuplot_patchlevel);
-	
+
     header(c, "gnuplot help contents");
     fprintf(c, "<ul>\n");
 
@@ -277,7 +277,7 @@ process_line(char *line, FILE *b, FILE *c, FILE *d)
                     if ((klist->line) > 1)
                         sprintf(hyplink1, "<a href=\"loc%d.html\">", klist->line);
                     else
-                        sprintf(hyplink1, "<a href=\"%s.html\">", basename);
+                        sprintf(hyplink1, "<a href=\"%s.html\">", name);
                     if (debug)
                         fprintf(stderr, "hyper link \"%s\" - loc%d.html on line %d\n", topic, klist->line, line_count);
 #endif
@@ -412,7 +412,7 @@ process_line(char *line, FILE *b, FILE *c, FILE *d)
                     int numspaces = 0;
                     while (line2[numspaces+1] == ' ') numspaces++;
                     fprintf(b, "<tt>%s</tt>", line2+1+numspaces);
-                } else { 
+                } else {
                     if (!tabl) {
 		        if (para)
 			    fprintf(b, "</p>\n");
@@ -430,7 +430,7 @@ process_line(char *line, FILE *b, FILE *c, FILE *d)
                     if (tabl) {
         	        fprintf(b, "</pre>\n");
 		        tabl = 0;
-                    } 
+                    }
                     if (!para) {
 		        para = TRUE;	/* not in para so start one */
 		        tabl = FALSE;
@@ -461,14 +461,14 @@ process_line(char *line, FILE *b, FILE *c, FILE *d)
 
 		last_line = line_count;
 		fprintf(b, "\n");
-		
+
                 /* output unique ID */
                 if (!startpage)
                     sprintf(location, "loc%d", line_count);
                 else
-                    strcpy(location, basename);
+                    strcpy(location, name);
 
-#ifndef SPLIT_FILES		
+#ifndef SPLIT_FILES
                 /* let hhc auomatically split contents */
                 if (!startpage) {
                     fprintf(b, "<OBJECT type=\"application/x-oleobject\" classid=\"clsid:1e2a7bd0-dab9-11d0-b93a-00c04fc99f9e\">\n");
