@@ -1,5 +1,5 @@
 /*
- * $Id: wgraph.c,v 1.195 2014/12/08 19:17:26 markisch Exp $
+ * $Id: wgraph.c,v 1.196 2014/12/11 11:25:47 markisch Exp $
  */
 
 /* GNUPLOT - win/wgraph.c */
@@ -3804,25 +3804,55 @@ LineStyle(LPGW lpgw)
 
 #ifdef USE_MOUSE
 /* ================================== */
-/* HBB 20010207: new helper functions: wrapper around gp_exec_event
- * and DoZoombox. These may vanish again, as has the original idea I
- * invented them for... */
+/* helper functions: wrapper around gp_exec_event and DrawZoomBox. */
 
 static void
 Wnd_exec_event(LPGW lpgw, LPARAM lparam, char type, int par1)
 {
-	int mx, my;
 	static unsigned long lastTimestamp = 0;
 	unsigned long thisTimestamp = GetMessageTime();
-	int par2 = thisTimestamp - lastTimestamp;
+	int mx, my, par2;
+	TBOOLEAN old = FALSE;
 
-	if (lpgw == graphwin) {
-		if (type == GE_keypress)
-			par2 = 0;
+	if (type != GE_keypress) /* no timestamp for key events */
+		par2 = thisTimestamp - lastTimestamp;
+	else
+		par2 = 0;
 
+	/* map events from inactive graph windows */
+	if (lpgw != graphwin) {
+		switch (type) {
+		case GE_keypress:
+			type = GE_keypress_old;
+			old = TRUE;
+			break;
+		case GE_buttonpress:
+			type = GE_buttonpress_old;
+			old = TRUE;
+			break;
+		case GE_buttonrelease:
+			type = GE_buttonrelease_old;
+			old = TRUE;
+			break;
+		}
+	}
+
+	if ((term != NULL) && (strcmp(term->name, "windows") == 0) && ((lpgw == graphwin) || old)) {
 		GetMousePosViewport(lpgw, &mx, &my);
 		gp_exec_event(type, mx, my, par1, par2, 0);
 		lastTimestamp = thisTimestamp;
+	}
+
+	/* FIXME: IMHO changing paused_for_mouse in terminal code is bad design. */
+	/* end pause mouse? */
+	if ((type == GE_buttonrelease) && (paused_for_mouse & PAUSE_CLICK) &&
+		(((par1 == 1) && (paused_for_mouse & PAUSE_BUTTON1)) ||
+		 ((par1 == 2) && (paused_for_mouse & PAUSE_BUTTON2)) ||
+		 ((par1 == 3) && (paused_for_mouse & PAUSE_BUTTON3)))) {
+		paused_for_mouse = 0;
+	}
+	if ((type == GE_keypress) && (paused_for_mouse & PAUSE_KEYSTROKE) && (par1 != NUL)) {
+		paused_for_mouse = 0;
 	}
 }
 
@@ -4061,7 +4091,7 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 					| ((GetKeyState(VK_CONTROL) < 0) ? Mod_Ctrl : 0)
 					| ((GetKeyState(VK_MENU) < 0) ? Mod_Alt : 0);
 				if (modifier_mask != last_modifier_mask) {
-					Wnd_exec_event ( lpgw, lParam, GE_modifier, modifier_mask);
+					Wnd_exec_event(lpgw, lParam, GE_modifier, modifier_mask);
 					last_modifier_mask = modifier_mask;
 				}
 			}

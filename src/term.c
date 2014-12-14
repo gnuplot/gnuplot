@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.299 2014/11/21 21:41:56 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.300 2014/12/08 19:18:05 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -103,9 +103,11 @@ long mouse_mode = 0;
 char* mouse_alt_string = NULL;
 #endif
 
-#ifdef _Windows
+#ifdef WIN32
+/* FIXME: Prototypes are in win/wcommon.h */
 FILE *open_printer __PROTO((void));     /* in wprinter.c */
 void close_printer __PROTO((FILE * outfile));
+# include "win/winmain.h"
 # ifdef __MSC__
 #  include <malloc.h>
 #  include <io.h>
@@ -577,6 +579,9 @@ term_reset()
 #ifdef USE_MOUSE
     /* Make sure that ^C will break out of a wait for 'pause mouse' */
     paused_for_mouse = 0;
+#ifdef WIN32
+    kill_pending_Pause_dialog();
+#endif
 #endif
 
     if (!term_initialised)
@@ -1564,18 +1569,18 @@ init_terminal()
 
 #ifdef QTTERM
 	if (term_name == (char *) NULL)
-		term_name = "qt";
+	    term_name = "qt";
 #endif
 
 #ifdef WXWIDGETS
 	if (term_name == (char *) NULL)
-		term_name = "wxt";
+	    term_name = "wxt";
 #endif
 
 #ifdef _Windows
 	/* let the wxWidgets terminal be the default when available */
 	if (term_name == (char *) NULL)
-		term_name = "win";
+	    term_name = "win";
 #endif /* _Windows */
 
 #if defined(__APPLE__) && defined(__MACH__) && defined(HAVE_FRAMEWORK_AQUATERM)

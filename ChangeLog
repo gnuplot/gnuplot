@@ -1,3 +1,21 @@
+2014-12-14  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/command.c src/command.h src/mouse.c src/mousecmn.h src/plot.c
+	src/qtterminal/qt_term.cpp src/win/wgraph.c src/win/wpause.c
+	src/wxterminal/wxt_gui.cpp src/wxterminal/wxt_term.h:
+	Revise "pause mouse" handling on Windows to handle windows, wxt, qt
+	and caca terminals.  Test if the current terminal window is actually
+	open before waiting for mouse input. (Not yet implemented for qt.)
+	The windows terminal no longer expects the core code to reset the
+	paused_for_mouse flag (like the qt, wxt and x11 terminals).  The
+	code no longer opens an invisible window to handle "pause mouse" and
+	code to close this window when "pause mouse" mode ends can thus be
+	removed.  Interrupting pause mouse via Ctrl-C should now be possible.
+	Bug #1502
+
+	* term/caca.trm (waitforinput):  Support "pause mouse" if the graph is
+	shown in a window. Bugfix.
+
 2014-12-13 Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/wxterminal/wxt_gui.cpp (wxtPanel::wxt_cairo_refresh):

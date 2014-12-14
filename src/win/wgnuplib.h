@@ -1,5 +1,5 @@
 /*
- * $Id: wgnuplib.h,v 1.66 2014/09/18 06:45:27 markisch Exp $
+ * $Id: wgnuplib.h,v 1.67 2014/10/16 06:54:55 markisch Exp $
  */
 
 /* GNUPLOT - win/wgnuplib.h */
@@ -117,6 +117,7 @@ typedef struct tagPW
 } PW;
 typedef PW *  LPPW;
 
+TBOOLEAN MousableWindowOpened(void);
 int WDPROC PauseBox(LPPW lppw);
 
 /* ================================== */

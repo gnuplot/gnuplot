@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.292 2014/06/15 04:15:01 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.293 2014/09/14 18:21:12 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -933,7 +933,7 @@ history_command()
 	free(replace_history_entry(history_length-1, line_to_do, NULL)->line);
 #elif defined(READLINE)
 	free(history->line);
-	history->line = line_to_do;
+	history->line = (char *) line_to_do;
 #endif
 
 	printf("  Executing:\n\t%s\n", line_to_do);
@@ -1367,6 +1367,7 @@ timed_pause(double sleep_time)
 
 /* process the 'pause' command */
 #define EAT_INPUT_WITH(slurp) do {int junk=0; do {junk=slurp;} while (junk != EOF && junk != '\n');} while (0)
+
 void
 pause_command()
 {
@@ -1378,7 +1379,7 @@ pause_command()
 
 #ifdef USE_MOUSE
     paused_for_mouse = 0;
-    if (equals(c_token,"mouse")) {
+    if (equals(c_token, "mouse")) {
 	sleep_time = -1;
 	c_token++;
 
@@ -1390,24 +1391,24 @@ pause_command()
 	    int end_condition = 0;
 
 	    while (!(END_OF_COMMAND)) {
-		if (almost_equals(c_token,"key$press")) {
+		if (almost_equals(c_token, "key$press")) {
 		    end_condition |= PAUSE_KEYSTROKE;
 		    c_token++;
-		} else if (equals(c_token,",")) {
+		} else if (equals(c_token, ",")) {
 		    c_token++;
-		} else if (equals(c_token,"any")) {
+		} else if (equals(c_token, "any")) {
 		    end_condition |= PAUSE_ANY;
 		    c_token++;
-		} else if (equals(c_token,"button1")) {
+		} else if (equals(c_token, "button1")) {
 		    end_condition |= PAUSE_BUTTON1;
 		    c_token++;
-		} else if (equals(c_token,"button2")) {
+		} else if (equals(c_token, "button2")) {
 		    end_condition |= PAUSE_BUTTON2;
 		    c_token++;
-		} else if (equals(c_token,"button3")) {
+		} else if (equals(c_token, "button3")) {
 		    end_condition |= PAUSE_BUTTON3;
 		    c_token++;
-		} else if (equals(c_token,"close")) {
+		} else if (equals(c_token, "close")) {
 		    end_condition |= PAUSE_WINCLOSE;
 		    c_token++;
 		} else
@@ -1441,70 +1442,34 @@ pause_command()
 	if (!buf)
 	    int_error(c_token, "expecting string");
 	else {
-#ifdef _Windows
+#ifdef WIN32
 	    if (sleep_time >= 0)
 #elif defined(OS2)
-		if (strcmp(term->name, "pm") != 0 || sleep_time >= 0)
+	    if (strcmp(term->name, "pm") != 0 || sleep_time >= 0)
 #endif /* _Windows */
-			fputs(buf, stderr);
+		fputs(buf, stderr);
 	    text = 1;
 	}
     }
 
     if (sleep_time < 0) {
-#if defined(_Windows)
-# ifdef WXWIDGETS
-	if (!strcmp(term->name, "wxt")) {
-	    /* copy of the code below:  !(_Windows || OS2) */
-	    if (term && term->waitforinput && paused_for_mouse){
-		fprintf(stderr, "%s\n", buf);
-		term->waitforinput(0);
-	    } else {
-#  if defined(WGP_CONSOLE)
-		fprintf(stderr, "%s\n", buf);
-		if (term && term->waitforinput)
-		    while (term->waitforinput(0) != (int)'\r') {}; /* waiting for Enter*/
-#  else /* !WGP_CONSOLE */
-		if (!Pause(buf))
+#if defined(WIN32)
+	ctrlc_flag = FALSE;
+# if defined(WGP_CONSOLE) && defined(USE_MOUSE)
+	if (!paused_for_mouse || !MousableWindowOpened()) {
+	    int junk = 0;
+	    if (buf) fprintf(stderr, "%s\n", buf);
+	    /* cannot use EAT_INPUT_WITH here */
+	    do {
+		junk = getch();
+		if (ctrlc_flag)
 		    bail_to_command_line();
-#  endif
-	    }
-	} else
-# endif /* _Windows && WXWIDGETS */
+	    } while (junk != EOF && junk != '\n' && junk != '\r');
+	} else /* paused_for_mouse */
+# endif /* !WGP_CONSOLE */
 	{
-# ifdef USE_MOUSE
-	    if (paused_for_mouse && !GraphHasWindow(graphwin)) {
-		if (interactive) { /* cannot wait for Enter in a non-interactive session without the graph window */
-		    if (buf) fprintf(stderr, "%s\n", buf);
-		    EAT_INPUT_WITH(fgetc(stdin));
-		}
-	    } else { /* pausing via graphical windows */
-		if (!paused_for_mouse) {
-# endif
-#  if defined(WGP_CONSOLE)
-		    if (buf) fprintf(stderr,"%s\n", buf);
-		    if (term && term->waitforinput) {
-			while (term->waitforinput(0) != (int)'\r') {
-			    if (ctrlc_flag) {
-				ctrlc_flag = FALSE;
-				bail_to_command_line();
-			    }
-			}; /* waiting for Enter*/
-		    } else {
-			EAT_INPUT_WITH(fgetc(stdin));
-		    }
-#  else
-		    if (!Pause(buf))
-			bail_to_command_line();
-#  endif
-# ifdef USE_MOUSE
-		} else {
-		    if (buf) fprintf(stderr,"%s\n", buf);
-		    if (!Pause(buf) && !GraphHasWindow(graphwin))
-			bail_to_command_line();
-		}
-	    }
-# endif
+	    if (!Pause(buf)) /* returns false if Ctrl-C or Cancel was pressed */
+		bail_to_command_line();
 	}
 #elif defined(OS2)
 	if (strcmp(term->name, "pm") == 0 && sleep_time < 0) {
@@ -1521,7 +1486,7 @@ pause_command()
 		EAT_INPUT_WITH(fgetc(stdin));
 	    }
 	}
-#else /* !(_Windows || OS2) */
+#else /* !(WIN32 || OS2) */
 #ifdef USE_MOUSE
 	if (term && term->waitforinput) {
 	    /* It does _not_ work to do EAT_INPUT_WITH(term->waitforinput()) */
@@ -1530,7 +1495,7 @@ pause_command()
 #endif /* USE_MOUSE */
 	    EAT_INPUT_WITH(fgetc(stdin));
 
-#endif /* !(_Windows || OS2) */
+#endif /* !(WIN32 || OS2) */
     }
     if (sleep_time > 0)
 	timed_pause(sleep_time);
@@ -2765,7 +2730,7 @@ do_system(const char *cmd)
 	return;
     restrict_popen();
     winsystem(cmd);
-# else /* _Windows) */
+# else /* _Windows */
 /* (am, 19980929)
  * OS/2 related note: cmd.exe returns 255 if called w/o argument.
  * i.e. calling a shell by "!" will always end with an error message.
@@ -3121,11 +3086,6 @@ winsystem(const char *s)
 }
 # endif /* USE_OWN_WINSYSTEM_FUNCTION */
 
-void
-call_kill_pending_Pause_dialog()
-{
-    kill_pending_Pause_dialog();
-}
 #endif /* _Windows */
 
 /*

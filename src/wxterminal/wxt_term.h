@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_term.h,v 1.26 2014/09/04 20:33:14 sfeam Exp $
+ * $Id: wxt_term.h,v 1.27 2014/10/26 21:19:21 sfeam Exp $
  */
 
 /* GNUPLOT - wxt_term.h */
@@ -109,6 +109,7 @@ void wxt_close_terminal_window __PROTO((int number));
 void wxt_update_title __PROTO((int number));
 void wxt_update_size __PROTO((int number));
 void wxt_update_position __PROTO((int number));
+TBOOLEAN wxt_active_window_opened(void);
 TBOOLEAN wxt_window_opened(void);
 
 /* state variables shared between wxt.trm and wxt_gui.cpp */
