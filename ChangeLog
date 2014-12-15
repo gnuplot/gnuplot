@@ -1,3 +1,14 @@
+2014-12-15 Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/mouse.c (do_event) src/gplt_x11.c src/wxterminal/wxt_gui.cpp
+	src/qtterminal/QtGnuplotWidget.cpp:
+	Distinguish auto-generated replot events (e.g. replot-on-resize) from 
+	user-generated replot events ('e' hotkey or toolbar replot widget).
+	Use GE_replot for the former, GE_keypress('e') for the latter.
+	Reject auto-generated replot requests while multiplot is active.
+	(wxt was already doing this; now we extend it to qt and x11 also).
+	Bug #1521
+
 2014-12-14  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* docs/windows/doc2html.c:  Rename variable "basename" to "name" since

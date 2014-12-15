@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.cpp,v 1.128.2.7 2014/12/05 18:04:00 sfeam Exp $
+ * $Id: wxt_gui.cpp,v 1.128.2.8 2014/12/13 21:14:01 sfeam Exp $
  */
 
 /* GNUPLOT - wxt_gui.cpp */
@@ -730,8 +730,8 @@ void wxtFrame::OnSize( wxSizeEvent& event )
 #endif
 
 	/* Note: On some platforms OnSize() might get called before the settings have been initialized in wxt_init(). */
-	if ((wxt_redraw == yes) && replot_line && replot_line[0] != '\0')
-		wxt_exec_event(GE_keypress, 0, 0, 'e' , 0, this->GetId());
+	if (wxt_redraw == yes)
+		wxt_exec_event(GE_replot, 0, 0, 0 , 0, this->GetId());
 }
 
 /* wrapper for AddPendingEvent or ProcessEvent */
