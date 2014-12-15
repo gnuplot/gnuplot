@@ -9,6 +9,9 @@
 	(wxt was already doing this; now we extend it to qt and x11 also).
 	Bug #1521
 
+	* src/wxterminal/wxt_gui.cpp:  Do not change working directory in
+	file export widget.
+
 2014-12-14  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* docs/windows/doc2html.c:  Rename variable "basename" to "name" since
