@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.248 2014/08/29 21:34:38 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.249 2014/09/04 20:33:13 sfeam Exp $"); }
 #endif
 
 #define MOUSE_ALL_WINDOWS 1
@@ -4625,7 +4625,7 @@ process_configure_notify_event(XEvent *event, TBOOLEAN isRetry )
 			    scaled_hchar, scaled_vchar, 0);
 
 	      if (replot_on_resize == yes)
-		gp_exec_event(GE_keypress, 0, 0, 'e', 0, 0);
+		gp_exec_event(GE_replot, 0, 0, 0, 0, 0);
 	    }
 #endif
 	}
