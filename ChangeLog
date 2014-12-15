@@ -1,3 +1,11 @@
+2014-12-15  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* demo/kdensity.dem:  End demo with pause / reset
+
+	* config/mingw/Makefile:  Convert eol style of text files to CRLF
+	during install.
+	Bug #1520
+
 2014-12-15 Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/mouse.c (do_event) src/gplt_x11.c src/wxterminal/wxt_gui.cpp
@@ -30,8 +38,8 @@
 	* term/caca.trm (waitforinput):  Support "pause mouse" if the graph is
 	shown in a window. Bugfix.
 
-	* docs/windows/doc2html.c:  Rename variable "basename" to "name" since
-	due to name conflicts on some platforms.
+	* docs/windows/doc2html.c:  Rename variable "basename" to "name" to
+	avoid a name conflict on some platforms.
 
 2014-12-13 Ethan A Merritt  <merritt@u.washington.edu>
 

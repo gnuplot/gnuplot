@@ -1,5 +1,5 @@
 # Hello, emacs: this is a -*- Makefile -*-
-# $Id: Makefile,v 1.48 2014/08/18 22:03:46 broeker Exp $
+# $Id: Makefile,v 1.49 2014/11/21 19:51:32 markisch Exp $
 #
 # GNUPLOT Makefile for MinGW/MSYS on Windows
 # This assumes usual installation of the MinGW32 toolkit, the free
@@ -628,6 +628,8 @@ $(JASRC): $(D)gnuplot-ja.doc $(D)term-ja.diff $(CORETERM)
 wgnuplot-ja.chm: $(JASRC) doc2html-ja.exe \
                   $(D)windows/wgnuplot.hhp $(D)windows/wgnuplot.hhk \
                   $(D)windows/wgnuplot.stp $(D)plotstyles.gnu
+	# FIXME: some files always end up read-only...
+	chmod +w $(JADW)*
 	# Create Japanese html source in EUC-JP encoding
 	./doc2html-ja $(JAD)gnuplot-ja.doc $(JADW)
 	# Change character encoding from EUC-JP to SHIFT-JIS
@@ -868,6 +870,8 @@ endif
 	cp -p $(TOP)/win/README-Windows.txt $(DESTDIR)/
 	cp -p $(TOP)/win/README-Windows-ja.txt $(DESTDIR)/
 	-cp -p $(TOP)/win/README-testing.txt $(DESTDIR)/
+	-unix2dos $(DESTDIR)/*.txt $(DESTDIR)/README $(DESTDIR)/ChangeLog
+	-unix2dos $(DESTDIR)/Copyright $(DESTDIR)/NEWS $(DESTDIR)/BUGS $(DESTDIR)/RELEASE_NOTES
 # demo and contrib
 	mkdir -p $(DESTDIR)/demo
 	-cp -p $(M)* $(DESTDIR)/demo/
