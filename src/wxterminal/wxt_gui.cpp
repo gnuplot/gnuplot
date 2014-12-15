@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.cpp,v 1.138 2014/12/14 19:39:38 markisch Exp $
+ * $Id: wxt_gui.cpp,v 1.139 2014/12/15 04:20:35 sfeam Exp $
  */
 
 /* GNUPLOT - wxt_gui.cpp */
@@ -499,7 +499,7 @@ void wxtFrame::OnExport( wxCommandEvent& WXUNUSED( event ) )
 	wxFileDialog exportFileDialog (this, wxT("Exported File Format"),
 		wxGetCwd(), wxT(""),
 		wxT("PNG files (*.png)|*.png|PDF files (*.pdf)|*.pdf|SVG files (*.svg)|*.svg"),
-		wxFD_SAVE|wxFD_OVERWRITE_PROMPT|wxFD_CHANGE_DIR);
+		wxFD_SAVE|wxFD_OVERWRITE_PROMPT);
 	exportFileDialog.SetFilterIndex(userFilterIndex);
 
 	if (exportFileDialog.ShowModal() == wxID_CANCEL)
