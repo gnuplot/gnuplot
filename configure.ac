@@ -1,14 +1,14 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot on Unix.
 dnl
-dnl $Id: configure.in,v 1.371 2014/08/21 19:37:59 sfeam Exp $
+dnl $Id: configure.in,v 1.372 2014/09/09 03:11:49 sfeam Exp $
 dnl
 dnl this is actually major.minor ...
 dnl note that for a non-beta release, we need to disable DEVELOPMENT_RELEASE
 dnl
-AC_INIT(gnuplot, 5.1)
+AC_INIT([gnuplot],[5.1])
 AC_CONFIG_SRCDIR(src/graphics.c)
-AC_PREREQ(2.60)
+AC_PREREQ([2.69])
 AC_CONFIG_HEADERS(config.h:config.hin)
 AC_DEFINE(DEVELOPMENT_VERSION,1,[Provide contact info for gnuplot develoment])
 AM_INIT_AUTOMAKE(1.7.9)
@@ -25,7 +25,7 @@ dnl Check for the const and inline keywords and ANSI style stringification
 dnl automake 1.12 dropped support for AM_C_PROTOTYPES and ansi2knr
 dnl But our code still tests for #ifdef PROTOTYPES, so define it here
 AC_DEFINE(PROTOTYPES,1,[Automake 1.12 dropped support for building without prototypes])
-AC_GNU_SOURCE
+AC_USE_SYSTEM_EXTENSIONS
 AC_PROG_CC
 AC_PROG_CPP
 AC_PROG_OBJC
@@ -215,12 +215,9 @@ AC_HEADER_STDBOOL
 
 if test "$ac_cv_header_math_h" = yes ; then
   AC_MSG_CHECKING([for struct exception in math.h])
-  AC_TRY_LINK([#include <math.h>],
-    [struct exception *x; x->type; x->name;],
-    [AC_MSG_RESULT(yes)
+  AC_LINK_IFELSE([AC_LANG_PROGRAM([[#include <math.h>]], [[struct exception *x; x->type; x->name;]])],[AC_MSG_RESULT(yes)
      AC_DEFINE(HAVE_STRUCT_EXCEPTION_IN_MATH_H,1,
-               [ Define if math.h declares struct exception for matherr(). ])],
-    AC_MSG_RESULT(no))
+               [ Define if math.h declares struct exception for matherr(). ])],[AC_MSG_RESULT(no)])
 fi
 
 if test "$ac_cv_header_sys_stat_h" = yes; then
@@ -256,13 +253,10 @@ AC_EGREP_HEADER(execv, unistd.h,
 
 dnl check if errno.h header declares errno
 AC_MSG_CHECKING(if errno variable is declared)
-AC_TRY_COMPILE(
-[#include <stdio.h>
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <stdio.h>
 #ifdef HAVE_ERRNO_H
 #include <errno.h>
-#endif],
-  errno=0,AC_MSG_RESULT(yes),
-  [AC_DEFINE(EXTERN_ERRNO,1,[ Define if <errno.h> declares errno. ])
+#endif]], [[errno=0]])],[AC_MSG_RESULT(yes)],[AC_DEFINE(EXTERN_ERRNO,1,[ Define if <errno.h> declares errno. ])
    AC_MSG_RESULT(no)])
 
 
@@ -273,7 +267,6 @@ AC_EGREP_HEADER(time_t,time.h,
   [AC_MSG_RESULT(yes)
    AC_DEFINE(HAVE_TIME_T_IN_TIME_H,1,
              [ Define if time_t is declared in time.h. ])])
-AC_TYPE_SIGNAL
  
 
 dnl Functions. Standard first, then others
@@ -315,11 +308,9 @@ dnl a trivial AC_CHECK_FUNCS(sigsetjmp) won't do
 dnl because sigsetjmp() might be a macro declared
 dnl in <setjmp.h>. (joze)
 AC_MSG_CHECKING(for sigsetjmp)
-AC_TRY_LINK([#include <setjmp.h>], [jmp_buf env; sigsetjmp(env, 1);],
-  [AC_MSG_RESULT(yes)
+AC_LINK_IFELSE([AC_LANG_PROGRAM([[#include <setjmp.h>]], [[jmp_buf env; sigsetjmp(env, 1);]])],[AC_MSG_RESULT(yes)
    AC_DEFINE(HAVE_SIGSETJMP,1,
-             [ Define if we have sigsetjmp(). ])],
-  AC_MSG_RESULT(no))
+             [ Define if we have sigsetjmp(). ])],[AC_MSG_RESULT(no)])
 
 if test "$ac_cv_func_pclose" = yes -a "$ac_cv_func_popen" = yes ; then
   AC_DEFINE(PIPES,1,[ Define if you do have the popen and pclose functions. ])
@@ -1306,7 +1297,7 @@ AC_SUBST(TUTORIAL)
 AC_SUBST(X11_APPDEFAULTS_DIR)
 
 dnl Write Makefiles and configuration header
-AC_OUTPUT([Makefile
+AC_CONFIG_FILES([Makefile
            config/Makefile
            demo/Makefile
            demo/plugin/Makefile
@@ -1320,8 +1311,9 @@ AC_OUTPUT([Makefile
            src/wxterminal/Makefile
            src/qtterminal/Makefile
            term/Makefile
-           tutorial/Makefile],
-          [test -z "$CONFIG_HEADERS" || echo timestamp >stamp-h])
+           tutorial/Makefile])
+AC_CONFIG_COMMANDS([default],[test -z "$CONFIG_HEADERS" || echo timestamp >stamp-h],[])
+AC_OUTPUT
 
 dnl Report configuration
 dnl Rationale:

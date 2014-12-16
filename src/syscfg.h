@@ -1,5 +1,5 @@
 /*
- * $Id: syscfg.h,v 1.55 2014/06/14 23:22:56 markisch Exp $
+ * $Id: syscfg.h,v 1.56 2014/07/28 22:16:27 sfeam Exp $
  */
 
 /* GNUPLOT - syscfg.h */
@@ -292,8 +292,8 @@ typedef double coordval;
 # define is_system(c) ((c) == '!')
 #endif /* not VMS */
 
+/* HBB NOTE 2014-12-16: no longer defined by autoconf; hardwired here instead */
 #ifndef RETSIGTYPE
-/* assume ANSI definition by default */
 # define RETSIGTYPE void
 #endif
 

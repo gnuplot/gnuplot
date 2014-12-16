@@ -1,3 +1,16 @@
+2014-12-16  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* configure.ac: Added copy of former configure.in, updated to
+	preferences of autoconf-2.69, automake-1.14.
+
+	* configure.in: Dropped
+
+	* mkinstalldirs, missing, install-sh, depcomp: Update from recent
+	autoconf/automake.
+
+	* src/syscfg.h (RETSIGTYPE): Note that former fall-back definition is now
+	hardwired.
+
 2014-12-16  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* win/gnuplot.iss:  Change working directory of shortcuts to 
