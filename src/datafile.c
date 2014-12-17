@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.290.2.2 2014/11/04 04:47:59 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.290.2.3 2014/11/08 04:52:25 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -5174,7 +5174,8 @@ df_generate_pseudodata()
 	    t_step = (t_max - t_min) / (samples_1 - 1);
 	}
 	t = t_min + df_pseudorecord * t_step;
-	if (!parametric)
+	/* FIXME:  Is it safe to assume SAMPLE_AXIS and x_axis are distinct? */
+	if (!parametric && !(axis_array[SAMPLE_AXIS].range_flags & RANGE_SAMPLED))
 	    t = AXIS_DE_LOG_VALUE(x_axis, t);
 	if (df_current_plot && df_current_plot->sample_var)
 	    Gcomplex(&(df_current_plot->sample_var->udv_value), t, 0.0);
