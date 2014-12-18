@@ -8,6 +8,10 @@
 	Detect and warn if an input string field exceeds MAX_LINE_LEN.
 	Bug #1445 (also see Bug #1355)
 
+	* src/command.c (do_line):
+	Report error if a "load" file fails to close an open bracketed clause.
+	Bug #1522
+
 2014-12-18  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* term/win.trm (WIN_set_font): Revert incorrect change from

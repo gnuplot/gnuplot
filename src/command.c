@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.293 2014/09/14 18:21:12 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.294 2014/12/14 19:39:36 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -373,8 +373,16 @@ do_line()
      */
     if (curly_brace_count < 0)
 	int_error(NO_CARET,"Unexpected }");
+
     while (curly_brace_count > 0) {
-	if (interactive || noinputfiles) {
+	if (lf_head && lf_head->depth > 0) {
+	    /* This catches the case that we are inside a "load foo" operation
+	     * and therefore requesting interactive input is not an option.
+	     * FIXME: or is it?
+	     */
+	    int_error(NO_CARET, "Syntax error: missing block terminator }");
+	}
+	else if (interactive || noinputfiles) {
 	    /* If we are really in interactive mode and there are unterminated blocks,
 	     * then we want to display a "more>" prompt to get the rest of the block.
 	     * However, there are two more cases that must be dealt here:
