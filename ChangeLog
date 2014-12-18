@@ -1,3 +1,13 @@
+2014-12-18 Ethan A Merritt  <merritt@u.washington.edu>
+ 
+	* src/datafile.c (df_parse_string_field): If an input data file uses
+	Mac OS-9 format with \r as a line terminator, the entire file is
+	mis-recognized as one very long line.  If there are nevertheless
+	recognizable field separators, the code to split out string fields into
+	separate saved storage goes crazy, consuming huge amounts of memory.
+	Detect and warn if an input string field exceeds MAX_LINE_LEN.
+	Bug #1445 (also see Bug #1355)
+
 2014-12-18  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* term/win.trm (WIN_set_font): Revert incorrect change from

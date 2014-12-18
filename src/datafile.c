@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.296 2014/12/09 03:32:25 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.297 2014/12/12 03:53:25 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -2771,8 +2771,17 @@ df_parse_string_field(char *field)
 	length = strcspn(field, df_separators);
 	if (length > strcspn(field, "\""))	/* Why? */
 	    length = strcspn(field, "\"");
-   } else {
+    } else {
 	length = strcspn(field,"\t ");
+    }
+
+    /* If we are fed a file with unrecognized line termination then */
+    /* memory use can become excessive. Truncate and report error.  */
+    if (length > MAX_LINE_LEN) {
+	length = MAX_LINE_LEN;
+	int_warn(NO_CARET, "input file contains very long line with no separators, truncating");
+	if (strcspn(field, "\r") < MAX_LINE_LEN)
+	    int_error(NO_CARET, "      line contains embedded <CR>, wrong file format?");
     }
 
     temp_string = malloc(length+1);
