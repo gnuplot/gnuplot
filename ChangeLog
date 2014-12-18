@@ -1,3 +1,8 @@
+2014-12-18  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* term/win.trm (WIN_set_font): Revert incorrect change from
+	strncpy() to safe_strncpy().
+
 2014-12-16  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* configure.ac: Added copy of former configure.in, updated to
@@ -13,9 +18,9 @@
 
 2014-12-16  Bastian Maerkisch  <bmaerkisch@web.de>
 
-	* win/gnuplot.iss:  Change working directory of shortcuts to 
-	current users's document folder. Works on Vista and upwards.
-	Bug #1415
+	* win/gnuplot.iss: Change working directory of shortcuts to
+	current users's document folder. Works on Vista and upwards.  Bug
+	#1415
 
 2014-12-15  Bastian Maerkisch  <bmaerkisch@web.de>
 
