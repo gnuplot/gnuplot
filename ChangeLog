@@ -64,7 +64,7 @@
 
 	* src/wxterminal/wxt_gui.cpp (wxtPanel::wxt_cairo_refresh):
 	The wxt terminal has been failing when linked against wxgtk3.0.
-	The overt sympton is a library assert statement sometimes followed by a
+	The overt symptom is a library assert statement sometimes followed by a
 	segfault:
 	  ./src/gtk/dcclient.cpp(2043): assert "m_window" failed in DoGetSize():
 	  GetSize() doesn't work without window [in thread 7fb21f386700]
@@ -85,7 +85,7 @@
 2014-12-11 Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/wxterminal/gp_cairo.c (gp_cairo_move):  Do not let zero-length
-	move iterrupt the current polyline context (dash pattern, end caps,
+	move interrupt the current polyline context (dash pattern, end caps,
 	polygon closure).
 	Bug #1523
 
