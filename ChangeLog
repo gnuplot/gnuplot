@@ -1,3 +1,17 @@
+2014-12-19 Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/wxterminal/wxt_gui.cpp (wxtPanel::wxt_cairo_create_bitmap):
+	Another fix for the wxt terminal linked against wxWidgets 3.0.
+	wxWidgets + wxgtk version 2.8 were fine with the sequence
+	    delete cairo_bitmap;
+	    cairo_bitmap = new wxBitmap(*image);
+	but version 3.0 hits a use-after-free that can be attributed to a
+	UI-triggered event invoking OnPaint(), which tries to access the old
+	bitmap before the new one has been assigned.  Omitting the delete
+	"cures" this, but then there is a memory leak.  Empirical tests seem
+	to show that it suffices to defer the delete operation until after
+	the assignment operation.  A proper interlock might be better yet.
+ 
 2014-12-18 Ethan A Merritt  <merritt@u.washington.edu>
  
 	* src/datafile.c (df_parse_string_field): If an input data file uses

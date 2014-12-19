@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.cpp,v 1.139 2014/12/15 04:20:35 sfeam Exp $
+ * $Id: wxt_gui.cpp,v 1.140 2014/12/15 05:23:31 sfeam Exp $
  */
 
 /* GNUPLOT - wxt_gui.cpp */
@@ -3604,6 +3604,7 @@ void wxtPanel::wxt_cairo_create_bitmap()
 	int width, height;
 	unsigned char *data24;
 	wxImage *image;
+	wxBitmap *old_bitmap = NULL;
 
 	if (!data32)
 		return;
@@ -3616,7 +3617,7 @@ void wxtPanel::wxt_cairo_create_bitmap()
 	/* data32 is the cairo image buffer, upper bits are alpha, then r, g and b
 	 * Depends on endianess !
 	 * It is converted to RGBRGB... in data24 */
-	for(int i=0;i<width*height;++i) {
+	for (int i=0; i<width*height; ++i) {
 		*(data24+3*i)=*(data32+i)>>16;
 		*(data24+3*i+1)=*(data32+i)>>8;
 		*(data24+3*i+2)=*(data32+i);
@@ -3625,8 +3626,10 @@ void wxtPanel::wxt_cairo_create_bitmap()
 	/* create a wxImage from data24 */
 	image = new wxImage(width, height, data24, true);
 
-	if (cairo_bitmap)
-		delete cairo_bitmap;
+	/* In wxWidgets 2.8 it was fine to delete the old bitmap right here */
+	/* but in wxWidgets 3.0 this causes a use-after-free fault.	    */
+	/* So now we delay deletion until after a new bitmap is assigned.   */
+	old_bitmap = cairo_bitmap;
 
 	/* create a wxBitmap from the wxImage. */
 	cairo_bitmap = new wxBitmap( *image );
@@ -3634,15 +3637,20 @@ void wxtPanel::wxt_cairo_create_bitmap()
 	/* free memory */
 	delete image;
 	delete[] data24;
+	delete old_bitmap;
 }
 
 
 void wxtPanel::wxt_cairo_free_platform_context()
 {
-	if (data32)
+	if (data32) {
 		delete[] data32;
-	if (cairo_bitmap)
+		data32 = NULL;
+	}
+	if (cairo_bitmap) {
 		delete cairo_bitmap;
+		cairo_bitmap = NULL;
+	}
 }
 #endif /* IMAGE_SURFACE */
 
