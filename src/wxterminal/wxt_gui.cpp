@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.cpp,v 1.128.2.10 2014/12/15 05:22:58 sfeam Exp $
+ * $Id: wxt_gui.cpp,v 1.128.2.11 2014/12/20 00:06:29 sfeam Exp $
  */
 
 /* GNUPLOT - wxt_gui.cpp */
@@ -495,9 +495,13 @@ wxtFrame::~wxtFrame()
 void wxtFrame::OnExport( wxCommandEvent& WXUNUSED( event ) )
 {
 	static int userFilterIndex = 0;
+	static wxString saveDir;
+
+	if (saveDir.IsEmpty())
+		saveDir = wxGetCwd();
 
 	wxFileDialog exportFileDialog (this, wxT("Exported File Format"),
-		wxGetCwd(), wxT(""),
+		saveDir, wxT(""),
 		wxT("PNG files (*.png)|*.png|PDF files (*.pdf)|*.pdf|SVG files (*.svg)|*.svg"),
 		wxFD_SAVE|wxFD_OVERWRITE_PROMPT);
 	exportFileDialog.SetFilterIndex(userFilterIndex);
@@ -506,6 +510,8 @@ void wxtFrame::OnExport( wxCommandEvent& WXUNUSED( event ) )
 		return;
 
 	/* wxID_OK:  User wants to save to a file. */
+
+	saveDir = exportFileDialog.GetDirectory();
 
 	wxString fullpathFilename = exportFileDialog.GetPath();
 	wxString fileExt = fullpathFilename.AfterLast ('.');
@@ -517,8 +523,6 @@ void wxtFrame::OnExport( wxCommandEvent& WXUNUSED( event ) )
 	switch (exportFileDialog.GetFilterIndex()) {
 	case 0 :
 		/* Save as PNG file. */
-		if (fileExt != wxT("png") && fileExt != wxT("PNG"))
-			fullpathFilename += wxT(".png");
 		surface = cairo_get_target(wxt_current_plot->cr);
 		ierr = cairo_surface_write_to_png(surface, fullpathFilename.mb_str(wxConvUTF8));
 		if (ierr != CAIRO_STATUS_SUCCESS)
@@ -527,9 +531,6 @@ void wxtFrame::OnExport( wxCommandEvent& WXUNUSED( event ) )
 
 	case 1 :
 		/* Save as PDF file. */
-		if (fileExt != wxT("pdf") && fileExt != wxT("PDF"))
-			fullpathFilename += wxT(".pdf");
-
 		save_cr = wxt_current_plot->cr;
 		cairo_save(save_cr);
 		surface = cairo_pdf_surface_create(
@@ -552,9 +553,6 @@ void wxtFrame::OnExport( wxCommandEvent& WXUNUSED( event ) )
 	case 2 :
 #ifdef CAIRO_HAS_SVG_SURFACE
 		/* Save as SVG file. */
-		if (fileExt != wxT("svg") && fileExt != wxT("SVG"))
-			fullpathFilename += wxT(".svg");
-
 		save_cr = wxt_current_plot->cr;
 		cairo_save(save_cr);
 		surface = cairo_svg_surface_create(
