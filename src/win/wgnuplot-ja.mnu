@@ -4,7 +4,7 @@
 ; Modified for 4.0, John Bollinger, 31 Dec 2002
 ; translated by Masahito Yamaga (ma@yama-ga.com) (for 3.7.2)
 ; translated by Shigeharu TAKENO 03/25 2006 (for 4.1)
-; $Id: wgp410-sj.mnu,v 1.4 2011-03-30 14:57:09+09 shige Exp $
+; $Id: wgnuplot-ja.mnu,v 1.4 2014/12/23 12:25:24 broeker Exp $
 
 [Menu]
 ファイル(&F)
@@ -171,8 +171,8 @@
 	[EndMenu]
 	[Menu]
 	2 項演算子
-		指数演算子	**
-		**
+		累乗	**
+			**
 		積	*
 			*
 		商	/
@@ -182,7 +182,7 @@
 		差	-
 			-
 		--
-		モジュロ演算子	%
+		剰余	%
 			%
 	[EndMenu]
 	[Menu]
@@ -258,7 +258,7 @@
 		arc tan
 			atan([INPUT]Argument[EOS])
 		arc tan 2
-			atan2([INPUT]Argument[EOS])
+			atan2([INPUT]"y" argument[EOS],[INPUT]"x" argument[EOS])
 		--
 		cosh
 			cosh([INPUT]Argument[EOS])
@@ -293,16 +293,16 @@
 		不完全ベータ関数 (ibeta)
 			ibeta([INPUT]First argument[EOS],[INPUT]Second argument[EOS],[INPUT]Third argument[EOS])
 		--
-		第j0次ベッセル関数 (besj0)
+		J0 ベッセル関数 (besj0)
 			besj0([INPUT]Argument[EOS])
-		第j1次ベッセル関数 (besj1)
+		J1 ベッセル関数 (besj1)
 			besj1([INPUT]Argument[EOS])
-		第y0次ベッセル関数 (besy0)
+		Y0 ベッセル関数 (besy0)
 			besy0([INPUT]Argument[EOS])
-		第y1次ベッセル関数 (besy1)
+		Y1 ベッセル関数 (besy1)
 			besy1([INPUT]Argument[EOS])
 		--
-		ランベルト W 関数 (lanbertw)
+		ランベルト W 関数 (lambertw)
 			lambertw([INPUT]Argument[EOS])
 
 	[EndMenu]

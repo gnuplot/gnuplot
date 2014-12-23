@@ -255,7 +255,7 @@ Fu&nctions
 		arc tangent
 			atan([INPUT]Argument[EOS])
 		arc tangent 2
-			atan2([INPUT]Argument[EOS])
+			atan2([INPUT]"y" argument[EOS],[INPUT]"x" argument[EOS])
 		--
 		hyperbolic cosine
 			cosh([INPUT]Argument[EOS])

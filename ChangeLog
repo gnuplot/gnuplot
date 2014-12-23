@@ -1,3 +1,10 @@
+2014-12-23  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/win/wgnuplot.mnu: Parameter input for atan2() was wrong. SF
+	patch #1530 by Shigeharu Takeno.
+
+	* src/win/wgnuplot-ja.mnu: Dito.
+
 2014-12-21  Daniel J Sebald <daniel.sebald@ieee.org>
 
 	* src/wxterminal/wxt_gui.cpp:  Track the most recent directory used
