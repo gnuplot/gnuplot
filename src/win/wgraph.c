@@ -1,5 +1,5 @@
 /*
- * $Id: wgraph.c,v 1.196 2014/12/11 11:25:47 markisch Exp $
+ * $Id: wgraph.c,v 1.197 2014/12/14 19:39:38 markisch Exp $
  */
 
 /* GNUPLOT - win/wgraph.c */
@@ -1772,6 +1772,8 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 	htic = (lpgw->org_pointsize * MulDiv(lpgw->htic, rr - rl, lpgw->xmax) + 1);
 	vtic = (lpgw->org_pointsize * MulDiv(lpgw->vtic, rb - rt, lpgw->ymax) + 1);
 
+	/* (re-)init GDI fonts */
+	GraphChangeFont(lpgw, lpgw->deffontname, lpgw->deffontsize, hdc, *rect);
 	lpgw->angle = 0;
 	SetFont(lpgw, hdc);
 	lpgw->justify = LEFT;

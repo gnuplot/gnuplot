@@ -1,7 +1,13 @@
+2014-12-24  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/win/wgraph.c (drawgraph) src/win/wgdiplus (drawgraph_gdiplus):
+	Failure to re-initialize the font name and size for enhanced text.
+	Bug #1529 
+
 2014-12-24  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
-	* src/win/wgdiplus.cpp:  Font names may be given in current
-	encoding. Patch #712
+	* src/win/wgdiplus.cpp (SetFont_gdiplus):  Font names may be given in 
+	current encoding. Patch #712
 
 2014-12-23  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
