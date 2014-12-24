@@ -1,3 +1,8 @@
+2014-12-24  Shigeharu Takeno  <shige@iee.niit.ac.jp>
+
+	* src/win/wgdiplus.cpp:  Font names may be given in current
+	encoding. Patch #712
+
 2014-12-23  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/win/wgnuplot.mnu: Parameter input for atan2() was wrong. SF
@@ -59,8 +64,8 @@
 2014-12-16  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* win/gnuplot.iss: Change working directory of shortcuts to
-	current users's document folder. Works on Vista and upwards.  Bug
-	#1415
+	current users's document folder. Works on Vista and upwards.
+	Bug #1415
 
 2014-12-15  Bastian Maerkisch  <bmaerkisch@web.de>
 
