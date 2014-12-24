@@ -1,5 +1,5 @@
 /*
- * $Id: wgdiplus.cpp,v 1.16.2.1 2014/10/16 06:58:07 markisch Exp $
+ * $Id: wgdiplus.cpp,v 1.16.2.2 2014/12/11 11:27:57 markisch Exp $
  */
 
 /*
@@ -348,7 +348,7 @@ SetFont_gdiplus(Graphics &graphics, LPRECT rect, LPGW lpgw, char * fontname, int
 	if (bold) * bold = 0;
 	if (underline) * underline = 0;
 
-	LPWSTR family = UnicodeText(fontname, S_ENC_DEFAULT);
+	LPWSTR family = UnicodeText(fontname, lpgw->encoding);
 	free(fontname);
 	const FontFamily * fontFamily = new FontFamily(family);
 	free(family);
