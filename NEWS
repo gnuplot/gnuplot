@@ -9,6 +9,7 @@ Changes in final release of 5.0
 * FIX cairo terminals dashed-line rendering in 3D plots
 * FIX wxt terminal assert/segfault failures when linked against wxgtk3.0
 * FIX 'set log x' should not affect the sampling variable in a sampled plot 
+* FIX windows terminal font encoding issues
 
 Changes in 5.0.rc3
 =====================

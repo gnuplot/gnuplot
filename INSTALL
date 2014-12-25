@@ -142,7 +142,7 @@ $ make install
    If gcc is installed, it is used by default. A different compiler can be
 used by passing its name to configure:
 
-$ ./configure CC=c89
+$ ./configure CC=clang
  
    Any environment settings for CFLAGS are included into the Makefile,
 so please make sure that these are really needed.
@@ -200,9 +200,9 @@ Linux
 
 Ubuntu:
 	./configure fails to find lua support because Ubuntu packages it as
-	"lua5.1" rather than "lua".  You can fix this by adding a symlink
+	"lua5.2" rather than "lua".  You can fix this by adding a symlink
 	prior to running ./configure
-	    ln -s /usr/lib/pkgconfig/lua5.1.pc  /usr/lib/pkgconfig/lua.pc
+	    ln -s /usr/lib/pkgconfig/lua5.2.pc  /usr/lib/pkgconfig/lua.pc
 
 
 Mac OSX
@@ -251,11 +251,10 @@ wxt terminal:
 VMS
 ---
 
-   John Hasstedt <John.Hasstedt@sunysb.edu> has written configure.vms,
-a command file that creates the necessary make and option files to build
-gnuplot.  See the file for instructions on using it.  If you have problems
-with it, the old build files are still included; instructions for using
-them follow.
+   John Hasstedt <John.Hasstedt@sunysb.edu> wrote and contributed configure.vms,
+a command file that creates the necessary make and option files to build gnuplot
+version 4.  It has not been tested for gnuplot version 5. 
+See the file for instructions on using it.
 
    On VMS, you can use MMS, MMK, or another make utility, or you can
 use BUILDVMS.COM.  The supplied files work with Alpha/VMS V6.2 and
@@ -270,7 +269,7 @@ your system.
   To compile using MMS on Alpha:
      MMS/DESCRIPTION=MAKEFILE.VMS/MACRO=__ALPHA__=1
 
-  Alternatively, you can use MAKE_VMS.COM.  This command file will run
+   Alternatively, you can use MAKE_VMS.COM.  This command file will run
 MMK or MMS to build gnuplot.  If you don't have either one installed, it
 will use the command file.  The first parameter on the command line is
 the compiler you want to use (default DECC).
@@ -292,8 +291,8 @@ the compiler you want to use (default DECC).
 MS-Windows
 ----------
 
-In order to build the help file you require the "Microsoft HTML Help 1.4
-SDK", which is freely downloadable here:
+In order to build the help file you need the "Microsoft HTML Help 1.4 SDK",
+which is freely downloadable here:
 http://go.microsoft.com/fwlink/?LinkId=154968
 
 General install instructions:
