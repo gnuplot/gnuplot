@@ -1,17 +1,17 @@
 		GNUPLOT Version 5.0 Release Notes
 		=================================
 
-Gnuplot version 5 contains significant new capabilities and enhancements
-to earlier gnuplot versions.  The most recent previous release was 4.6.6.
+Gnuplot version 5 contains significant new capabilities and enhancements.
+The most recent previous release was 4.6 patchlevel 6 (4.6.6).
 Please see the NEWS file for bugfixes and minor changes to version 5.0
 applied after feedback on release candidates -rc1, -rc2, and -rc3.
 
-Release Notes date: 5 December 2014
+Release Notes date: 26 December 2014
 
 NOTABLE NEW FEATURES
 ====================
 
-* New plot styles "with parallelaxes", labeled contours.
+* New plot styles "with parallelaxes" and labeled contours.
 
 * New coordinate system (Degrees, Minutes, Seconds) "set xdata geographic".
 
