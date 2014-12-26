@@ -1,3 +1,9 @@
+2014-12-26  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/command.c (do_line):
+	Report error if a "load" file fails to close an open bracketed clause.
+	Bug #1522
+
 2014-12-26  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/qtterminal/qt_term.cpp:  Remove dead code. Avoid implicit
