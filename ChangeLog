@@ -6,6 +6,8 @@
 	
 	* src/wxterminal/wxt_gui.*: remove old debug code.
 
+	* FAQ.pdf: update for version 5 release
+
 2014-12-26  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/qtterminal/qt_term.cpp:  Remove dead code. Avoid implicit
