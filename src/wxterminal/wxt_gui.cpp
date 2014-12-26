@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.cpp,v 1.141 2014/12/20 00:02:53 sfeam Exp $
+ * $Id: wxt_gui.cpp,v 1.142 2014/12/22 00:21:47 sfeam Exp $
  */
 
 /* GNUPLOT - wxt_gui.cpp */
@@ -1955,11 +1955,6 @@ void wxt_graphics()
 	if (wxt_status != STATUS_OK)
 		return;
 
-#ifdef DEBUG
-	/* performance watch - to be removed */
-	sw.Start();
-#endif
-
 	/* The sequence of gnuplot commands is critical as it involves mutexes.
 	 * We replace the original interrupt handler with a custom one. */
 	wxt_sigint_init();
@@ -2866,101 +2861,12 @@ void wxtPanel::wxt_cairo_refresh()
 	if (wxt_display_hypertext)
 		wxt_cairo_draw_hypertext();
 
-/* the following is a test for a bug in cairo when drawing to a gdkpixmap */
-#if 0
-	cairo_set_source_rgb(plot.cr,1,1,1);
-	cairo_paint(plot.cr);
-
-	cairo_matrix_t matrix;
-	cairo_matrix_init(&matrix,
-			plot.xscale,
-			0,
-			0,
-			plot.yscale,
-			0,
-			0);
-	cairo_set_matrix(plot.cr, &matrix);
-
-	cairo_t *context;
-	cairo_surface_t *surface;
-	surface = cairo_surface_create_similar(cairo_get_target(plot.cr),
-                                             CAIRO_CONTENT_COLOR_ALPHA,
-                                             plot.device_xmax,
-                                             plot.device_ymax);
-	context = cairo_create(surface);
-	cairo_set_operator(context,CAIRO_OPERATOR_SATURATE);
-
-	cairo_move_to(context, 300, 200);
-	cairo_rel_line_to(context, 100, 0);
-	cairo_rel_line_to(context, 0, 100);
-	cairo_close_path(context);
-	cairo_set_source_rgb(context,0,0,0);
-	cairo_fill(context);
-
-	cairo_move_to(context, 250, 170);
-	cairo_rel_line_to(context, 100, 0);
-	cairo_rel_line_to(context, 0, 100);
-	cairo_close_path(context);
-	cairo_set_source_rgb(context,0,0,0.5);
-	cairo_fill(context);
-
-	cairo_move_to(context, 360, 200);
-	cairo_rel_line_to(context, 30, 0);
-	cairo_rel_line_to(context, 0, -40);
-	cairo_close_path(context);
-	cairo_set_source_rgb(context,1,0,0);
-	cairo_fill(context);
-
-	cairo_move_to(context, 400, 100);
-	cairo_rel_line_to(context, 100, 0);
-	cairo_rel_line_to(context, -100, 300);
-	cairo_close_path(context);
-	cairo_set_source_rgb(context,0,1,0);
-	cairo_fill(context);
-
-	cairo_move_to(context, 400, 300);
-	cairo_rel_line_to(context, -80, -80);
-	cairo_rel_line_to(context, 0, 100);
-	cairo_close_path(context);
-	cairo_set_source_rgb(context,0.6,0.4,0);
-	cairo_fill(context);
-
-	cairo_pattern_t *pattern = cairo_pattern_create_for_surface( surface );
-	cairo_destroy( context );
-
-	cairo_surface_destroy( surface );
-	cairo_set_source( plot.cr, pattern );
-	cairo_pattern_destroy( pattern );
-	cairo_paint(plot.cr);
-
-	cairo_matrix_init(&matrix,
-			plot.xscale/plot.oversampling_scale,
-			0,
-			0,
-			plot.yscale/plot.oversampling_scale,
-			0,
-			0);
-	cairo_set_matrix(plot.cr, &matrix);
-#endif
-
 #ifdef IMAGE_SURFACE
 	wxt_cairo_create_bitmap();
 #endif /* !have_gtkcairo */
 
 	/* draw the pixmap to the screen */
 	Draw();
-
-#if (0)	/* Just for DEBUG */
-	FPRINTF((stderr,"commands done, number of commands %d\n", command_list.size()));
-	int ibox;
-	for (ibox=1; ibox<=wxt_max_key_boxes; ibox++) {
-		if (ibox > wxt_cur_plotno) break;
-		fprintf(stderr, wxt_key_boxes[ibox].hidden ? "hidden " : "visible ");
-		fprintf(stderr,"box %d %8.8u %8.8u %8.8u %8.8u\n", ibox,
-		wxt_key_boxes[ibox].left,  wxt_key_boxes[ibox].ybot,
-		wxt_key_boxes[ibox].right, wxt_key_boxes[ibox].ytop);
-	}
-#endif
 }
 
 
