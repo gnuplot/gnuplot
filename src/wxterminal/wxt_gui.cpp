@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.cpp,v 1.128.2.12 2014/12/22 00:21:37 sfeam Exp $
+ * $Id: wxt_gui.cpp,v 1.128.2.13 2014/12/26 23:23:03 sfeam Exp $
  */
 
 /* GNUPLOT - wxt_gui.cpp */
@@ -544,7 +544,7 @@ void wxtFrame::OnExport( wxCommandEvent& WXUNUSED( event ) )
 			1./(double)wxt_current_plot->oversampling_scale);
 		wxt_current_panel->wxt_cairo_refresh();
 
-		cairo_surface_show_page(surface);
+		cairo_show_page(wxt_current_plot->cr);
 		cairo_surface_finish(surface);
 		wxt_current_plot->cr = save_cr;
 		cairo_restore(wxt_current_plot->cr);
@@ -566,7 +566,7 @@ void wxtFrame::OnExport( wxCommandEvent& WXUNUSED( event ) )
 			1./(double)wxt_current_plot->oversampling_scale);
 		wxt_current_panel->wxt_cairo_refresh();
 
-		cairo_surface_show_page(surface);
+		cairo_show_page(wxt_current_plot->cr);
 		cairo_surface_finish(surface);
 		wxt_current_plot->cr = save_cr;
 		cairo_restore(wxt_current_plot->cr);
