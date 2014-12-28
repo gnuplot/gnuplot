@@ -1,5 +1,5 @@
 /*
- * $Id: term_api.h,v 1.135 2014/09/04 20:33:14 sfeam Exp $
+ * $Id: term_api.h,v 1.136 2014/09/05 21:51:38 sfeam Exp $
  */
 
 /* GNUPLOT - term_api.h */
@@ -45,6 +45,9 @@
 
 #include "color.h"
 #include "tables.h"
+#ifdef OS2
+# include "mousecmn.h"
+#endif
 
 /* Constants that are interpreted by terminal driver routines */
 
