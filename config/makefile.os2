@@ -1,5 +1,5 @@
 #
-# $Id: makefile.os2,v 1.54 2012/03/02 22:16:14 mikulik Exp $
+# $Id: makefile.os2,v 1.55 2014/08/15 19:25:13 sfeam Exp $
 #
 # GNUPLOT Makefile for use on OS/2 2.x (and above)
 # using emx 0.9 (and above) and GNU make
@@ -64,15 +64,13 @@ PDF=1
 # requires GNU readline library (static or DLL; not part of gnuplot)
 # GNU_RL=1
 
-# saving of history (no longer requires GNU readline)
-HISTORY=1
-
 # DEBUGging support
 # creates binaries suitable for debugging. Some bugs may come and go
 # as opposed to a production build since we lower the optimization level
 # DEBUG=1
 
 # MOUSE support for PM and X11 terminals
+# NOTE: This cannot be disabled
 MOUSE=1
 
 #
@@ -220,11 +218,6 @@ endif
 ifdef GNU_RL
   CFLAGS  += -DHAVE_LIBREADLINE
   LIBS    += -lreadline -ltermcap
-endif
-
-# saving history (independent of GNU readline)
-ifdef HISTORY
-  CFLAGS  += -DGNUPLOT_HISTORY 
 endif
 
 

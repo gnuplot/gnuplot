@@ -7,61 +7,46 @@ An Interactive Plotting Program
 .AU
 Thomas Williams & Colin Kelley
 .br
-   Version 4.1 organized by: Hans-Bernhard Broeker
+   Version 5.1 organized by: Ethan A Merritt and many others
 .br
    Major contributors (alphabetic order):
 .br
-  Hans-Bernhard Broeker
+  Christoph Bersch,  Hans-Bernhard Bröker,
 .br
-  John Campbell
+  John Campbell,  Robert Cunningham,
 .br
-  Robert Cunningham
+  David Denholm,  Gershon Elber,
 .br
-  David Denholm
+  Roger Fearick,  Carsten Grammes,
 .br
-  Gershon Elber
+  Lucas Hart,  Lars Hecking,
 .br
-  Roger Fearick
+  Péter Juhász,  Thomas Koenig,
 .br
-  Carsten Grammes
+  David Kotz,  Ed Kubaitis,
 .br
-  Lucas Hart
+  Russell Lang,  Timothée Lecomte,
 .br
-  Lars Hecking
+  Alexander Lehmann,  Jérôme Lodewyck,
 .br
-  Thomas Koenig
+  Alexander Mai,  Bastian Märkisch,
 .br
-  David Kotz
+  Ethan A Merritt,  Petr Mikulík,
 .br
-  Ed Kubaitis
+  Carsten Steger,  Shigeharu Takeno,
 .br
-  Russell Lang
+  Tom Tkacik,  Jos Van der Woude,
 .br
-  Alexander Lehmann
-.br
-  Alexander Mai
-.br
-  Ethan Merritt
-.br
-  Petr Mikulik
-.br
-  Carsten Steger
-.br
-  Tom Tkacik
-.br
-  Jos Van der Woude
-.br
-  Alex Woo
-.br
-  James R. Van Zandt
-.br
-  Johannes Zellner
+  Alex Woo,  James R. Van Zandt,  Johannes Zellner
 .br
   Copyright (C) 1986 - 1993, 1998, 2004   Thomas Williams, Colin Kelley
+  Copyright (C) 2004 - 2014  various authors
 .AI
    Mailing list for comments: gnuplot-info@lists.sourceforge.net
 .br
    Mailing list for bug reports: gnuplot-bugs@lists.sourceforge.net
+.br
+  Web access (preferred): http://sourceforge.net/projects/gnuplot
 \*(DY
 .br
 
@@ -77,7 +62,7 @@ This manual was prepared by Dick Crawford.
 .LP
 .nr HM 1.2i
 .ds CH
-.ds LH GNUPLOT 4.1
+.ds LH GNUPLOT 5.1
 .ds RH %
 .\".nr PS 12
 .\".nr VS 13

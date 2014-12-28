@@ -1,3 +1,16 @@
+2014-12-28  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* docs/titlepag.ms:  Update to version 5.
+
+	* docs/gnuplot.doc:  groff tables for stats command. Several groff
+	syntax fixes and minor layout tweaks.
+
+	* config/mingw/Makefile:  New targets grops and gropdf.
+
+	* config/config.os2 config/makefile.os2:  Update to version 5.
+
+	* src/term_api.h src/os2/gclient.c:  Eliminate compiler warnings.
+
 2014-12-26  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/qtterminal/qt_term.cpp:  Remove dead code. Avoid implicit
