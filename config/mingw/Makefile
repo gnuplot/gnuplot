@@ -1,5 +1,5 @@
 # Hello, emacs: this is a -*- Makefile -*-
-# $Id: Makefile,v 1.49 2014/11/21 19:51:32 markisch Exp $
+# $Id: Makefile,v 1.50 2014/12/15 20:28:10 markisch Exp $
 #
 # GNUPLOT Makefile for MinGW/MSYS on Windows
 # This assumes usual installation of the MinGW32 toolkit, the free
@@ -652,6 +652,9 @@ doc2html.exe: $(D)windows/doc2html.c $(D)termdoc.c $(D)xref.c version.$(O) $(LUA
 doc2html-ja.exe: $(JASRC) $(D)windows/doc2html.c $(D)termdoc.c $(D)xref.c version.$(O) $(LUA_HELP)
 	$(LD) $(LDFLAGS) -o $@ -DWINDOWS_NO_GUI -DJAPANESE_DOC $(CFLAGS) -I. -I$(JAD) -I$(JA)/term $(D)windows/doc2html.c $(D)termdoc.c $(D)xref.c version.$(O)
 
+doc2ms.exe: $(D)doc2ms.c $(D)termdoc.c $(D)xref.c version.$(O) $(LUA_HELP)
+	$(LD) $(LDFLAGS) -o $@ -DWINDOWS_NO_GUI $(CFLAGS) -I. -I$(D:/=) -I$(T:/=) $(D)doc2ms.c $(D)termdoc.c $(D)xref.c version.$(O)
+
 #make binary demo files
 # WINDOWS_NO_GUI makes sure that wtext.h does not redefine fread() etc.
 $(M)bf_test.exe : bf_test.c 
@@ -742,6 +745,18 @@ gnuplot.pdf: gnuplot-figures.tex $(TOP)/VERSION $(D)toc_entr.sty $(D)titlepag.te
 	TEXINPUTS=.:$(TOP):$(D):${TEXINPUTS}: pdflatex gp_tex2.tex
 	mv gp_tex2.pdf gnuplot.pdf
 	rm -f gp_tex2.*
+
+gnuplot.ms: doc2ms.exe $(D)gnuplot.doc
+	doc2ms $(D)gnuplot.doc gnuplot.ms
+	dos2unix gnuplot.ms
+
+grops: $(D)titlepag.ms gnuplot.ms
+	sed "s,titlepag\.ms,$(D)titlepag\.ms," gnuplot.ms | \
+	groff -s -p -t -e -ms -k -K utf-8 -Tps > gnuplot.ps
+
+gropdf: $(D)titlepag.ms gnuplot.ms
+	sed "s,titlepag\.ms,$(D)titlepag\.ms," gnuplot.ms | \
+	groff -s -p -t -e -ms -k -K utf-8 -Tpdf > gnuplot.pdf
 
 TUT = $(TOP)/tutorial
 tutorial.pdf: $(TUT)/eg1.plt $(TUT)/eg2.plt $(TUT)/eg3.plt $(TUT)/eg4.plt \
