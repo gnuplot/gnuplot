@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.926 2014/12/02 01:29:54 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.927 2014/12/09 16:21:41 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -638,8 +638,10 @@ C
 #\verb| | & \verb|{/Times:Italic abc}| & {\it abc} & print abc in font Times with style italic\\
 #\verb| | & \verb|{/Arial:Bold=20 abc}| & \Large\textsf{\textbf{abc}} & print abc in boldface Arial font size 20\\
 %c c l .
-%.TE", /* ugly - doc2ms uses @ for column separator, but here we */
-%.TS", /* need @ in table, so end and restart the table ! */
+C ugly - doc2ms uses @ for column separator, but here we
+C  need @ in table, so end and restart the table !
+%.TE
+%.TS
 %center box tab ($) ;
 %c c l .
 %Control$Examples$Explanation
@@ -1072,15 +1074,15 @@ C marker below is used to signal this to doc2html:
  argument in radians.
 4 EllipticK
 #EllipticK(k) & real k $\in$ (-1:1) & $K(k)$ complete elliptic integral of the first kind \\
-%EllipticK(k)@real k in (-1:1)@$K k$ complete elliptic integral of the first kind
+%EllipticK(k)@real k in (-1:1)@$K ( k )$ complete elliptic integral of the first kind
  See `elliptic integrals`.
 4 EllipticE
 #EllipticE(k) & real k $\in$ [-1:1] & $E(k)$ complete elliptic integral of the second kind \\
-%EllipticE(k)@real k in [-1:1]@ $E k$ complete elliptic integral of the second kind
+%EllipticE(k)@real k in [-1:1]@ $E ( k )$ complete elliptic integral of the second kind
  See `elliptic integrals`.
 4 EllipticPi
 #EllipticPi(n,k) & real n$<$1, real k $\in$ (-1:1) & $\Pi(n,k)$ complete elliptic integral of the third kind \\
-%EllipticPi(n,k)@ real n<1, real k in (-1:1)@ $Pi n,k$ complete elliptic integral of the third kind
+%EllipticPi(n,k)@ real n<1, real k in (-1:1)@ $Pi ( n,k )$ complete elliptic integral of the third kind
  See `elliptic integrals`.
 4 besj0
 ?expressions functions besj0
@@ -1351,20 +1353,20 @@ C marker below is used to signal this to doc2html:
 ?expressions functions cerf
 ?cerf
 #cerf(z) & complex &  complex error function \\
-%cerf(z)@complex@complex error function \\
+%cerf(z)@complex@complex error function
  `cerf(z)` is the complex version of the error function erf(x)
 4 cdawson
 ?expressions functions cdawson
 ?cdawson
 =dawson
-%cdawson(z) @ complex @ complex Dawson's integral \\
+%cdawson(z)@complex@complex Dawson's integral
 #cdawson(z)&complex&complex extension of Dawson's integral $D(z)={\frac{\sqrt{\pi}}{2}e^{-z^2} erfi(z)} $ \\
  `cdawson(z)` returns Dawson's Integral evaluated for the complex argument z.
  cdawson(z) = sqrt(pi)/2 * exp(-z^2) * erfi(z)
 4 faddeeva
 ?expressions functions faddeeva
 ?faddeeva
-%faddeeva(z) @ complex @ rescaled complex error function w(z) = exp(-z^2) * erfc(-i*z) \\
+%faddeeva(z)@complex@rescaled complex error function w(z) = exp(-z^2) * erfc(-i*z)
 #faddeeva(z)&complex&rescaled complex error function $w(z) = e^{-z^2}~ erfc(-iz) $ \\
  `Faddeeva(z)` returns the rescaled complex error function 
   w(z) = exp(-z^2) * erfc(-i*z)
@@ -1372,13 +1374,13 @@ C marker below is used to signal this to doc2html:
 4 erfi
 ?expressions functions erfi
 ?erfi
-%erfi(x) @ real @ imaginary error function erfi(x) = -i * erf(ix) \\
+%erfi(x)@real@imaginary error function erfi(x) = -i * erf(ix)
 #erfi(x)&real&imaginary error function $erf(x) = -i * erf(ix)$ \\
  Imaginary error function erfi(x) = -i * erf(ix)
 4 Voigt Profile
 ?expressions functions VP
 ?VP
-%VP(x,sigma,gamma) @ real @ Voigt profile \\
+%VP(x,sigma,gamma)@real@Voigt profile
 #VP(x,$\sigma$,$\gamma$)&real& Voigt profile $ VP(x,\sigma,\gamma) = {\int^{\infty}_{-\infty}{G(x^\prime;\sigma) L(x-x^\prime;\gamma) dx^\prime }} $ \\
  `VP(x,sigma,gamma)` corresponds to the Voigt profile defined by convolution of
  a Gaussian G(x;sigma) with a Lorentzian L(x;gamma).
@@ -1494,7 +1496,7 @@ C marker below is used to signal this to doc2html:
 ?expressions functions column
 ?column
 #column(x) & int or string & column $x$ during datafile manipulation. \\
-%column(x)@int or string@ column $x$ during datafile manipulation.
+%column(x)@int or string@column $x$ during datafile manipulation.
  `column(x)` may be used only in expressions as part of `using` manipulations
  to fits or datafile plots.  It evaluates to the numerical value of the contents
  of column x. See `plot datafile using`.
@@ -1502,7 +1504,7 @@ C marker below is used to signal this to doc2html:
 ?expressions functions columnhead
 ?columnhead
 #columnhead(x) & int & string containing first entry of column $x$ in datafile. \\
-%columnhead(x)@int@ string containing first entry of column $x$ in datafile.
+%columnhead(x)@int@string containing first entry of column $x$ in datafile.
  `columnhead(x)` may only be used in expressions as part of `using` manipulations
  to fits or datafile plots.  It evaluates to a string containing the contents of
  column x in the first line of data. See `plot datafile using`.
@@ -1510,7 +1512,7 @@ C marker below is used to signal this to doc2html:
 ?expressions functions exists
 ?exists
 #exists("X") & string & returns 1 if a variable named X is defined, 0 otherwise. \\
-%exists("X")@string@ returns 1 if a variable named X is defined, 0 otherwise.
+%exists("X")@string@returns 1 if a variable named X is defined, 0 otherwise.
  The argument to exists() is a string constant or a string variable;
  if the string contains the name of a defined variable, the function returns 1.
  Otherwise the function returns 0.
@@ -1519,7 +1521,7 @@ C marker below is used to signal this to doc2html:
 ?hsv2rgb
 ?hsv
 #hsv2rgb(h,s,v) & h,s,v $\in$ [0:1] & 24bit RGB color value. \\
-%hsv2rgb(h,s,v)@h,s,v $\in$ [0:1]@ 24bit RGB color value.
+%hsv2rgb(h,s,v)@h,s,v in [0:1]@24bit RGB color value.
  The HSV (Hue/Saturation/Value) triplet is converted to an equivalent RGB value.
 4 stringcolumn
 ?expressions functions stringcolumn
@@ -1527,7 +1529,7 @@ C marker below is used to signal this to doc2html:
 ?expressions functions strcol
 ?strcol
 #stringcolumn(x) & int or string & content of column $x$ as a string. \\
-%stringcolumn(x)@int or string@ content column $x$ as a string.
+%stringcolumn(x)@int or string@content column $x$ as a string.
  `stringcolumn(x)` may be used only in expressions as part of `using` manipulations
  to fits or datafile plots.  It returns the content of column x as a string variable.
  See `plot datafile using`.
@@ -1535,7 +1537,7 @@ C marker below is used to signal this to doc2html:
 ?expressions functions timecolumn
 ?timecolumn
 #timecolumn(N,"timeformat") & int, string & time data from column $N$ during data input. \\
-%timecolumn(N,"timeformat")@int, string@ time data from column $N$ during data input.
+%timecolumn(N,"timeformat")@int, string@time data from column $N$ during data input.
  `timecolumn(N,"timeformat")` may be used only in expressions as part of `using`
  manipulations to fits or datafile plots.   See `plot datafile using`.
 
@@ -1619,12 +1621,12 @@ C marker below is used to signal this to doc2html:
 ?expressions functions valid
 ?valid
 #valid(x) & int & test validity of $\mbox{column}(x)$ during datafile manip.\\
-%valid(x)@int@ test validity of column($x$) during datafile manip.
+%valid(x)@int@test validity of column($x$) during datafile manip.
  `valid(x)` may be used only in expressions as part of `using` manipulations
  to fits or datafile plots.  See `plot datafile using`.
 
 #value("name") & string & returns the value of the named variable.\\
-%value("name")@string@ returns the current value of the named variable.
+%value("name")@string@returns the current value of the named variable.
 @end table
 
 4 elliptic integrals
@@ -1739,6 +1741,7 @@ C be able to print them. So we have to typeset this table without using
 C eqn (at least that's the only solution I found, without any real docs
 C on *roff and eqn
 C First, terminate the table doc2ms.c already started:
+%c c l .
 %.TE
 C ... then turn off eqn delimiters:
 %.EQ
@@ -1756,7 +1759,6 @@ C ... and restart the table:
 %!@!a@* logical negation
 %!@a!@* factorial
 %$@$3@* call arg/column during `using` manipulation
-%_
 @end table
 
 ^<table align="center" border="1" rules="groups" frame="hsides" cellpadding="3">
@@ -1870,7 +1872,7 @@ C ... and restart the table:
 %|@a|b@* bitwise inclusive OR
 %&&@a&&b@* logical AND
 %||@a||b@* logical OR
-%=@a = b@assignment
+%\&=@a = b@assignment
 %,@(a,b)@serial evaluation
 %.@a.b@string concatenation
 %eq@A eq B@string equality
@@ -1941,7 +1943,7 @@ C ... and restart the table:
 %c c l .
 %Symbol@Example@Explanation
 %_
-%?:@a?b:c@* ternary operation
+%?:@a?b:c@ternary operation
 
 @end table
 
@@ -8719,7 +8721,6 @@ Ffigure_missing
 %%b@mantissa of ISO/IEC 80000 notation (ki, Mi, Gi, Ti, Pi, Ei, Zi, Yi)
 %%B@prefix of ISO/IEC 80000 notation (ki, Mi, Gi, Ti, Pi, Ei, Zi, Yi)
 %%P@multiple of pi
-%_
 @end table
 
 ^<table align="center" border="1" rules="groups" frame="hsides" cellpadding="3">
@@ -8885,7 +8886,6 @@ Ffigure_missing
 %%W@week of the year (week starts on Monday)
 %%y@year, 0-99 in range 1969-2068
 %%Y@year, 4-digit
-%_
 @end table
 
 
@@ -8949,7 +8949,6 @@ Ffigure_missing
 %%tH@+/- hours relative to time=0 (does not wrap at 24)
 %%tM@+/- minutes relative to time=0
 %%tS@+/- seconds associated with previous tH or tM field
-%_
 @end table
 
 
@@ -11766,7 +11765,7 @@ Ffigure_missing
 #win        &     yes &     yes &     yes \\
 #wxt        &     yes &     yes &     yes \\
 #x11        &      no &     yes &      no \\
-%c l .
+%c c c c .
 %Terminal@solid@pattern@pm3d
 %_
 %gif@no@yes@no
@@ -11778,7 +11777,6 @@ Ffigure_missing
 %win@yes@yes@yes
 %wxt@yes@yes@yes
 %x11@no@yes@no
-%_
 @end table
 
 ^<table align="center" border="1" rules="groups" frame="hsides" cellpadding="3">
@@ -12378,7 +12376,6 @@ Ffigure_missing
 %%S@second, integer 0--60 on output, (double) on input
 %%b@three-character abbreviation of the name of the month
 %%B@name of the month
-%_
 @end table
 
 
@@ -13913,6 +13910,15 @@ Ffigure_missing
 #\verb@STATS_blank@      & $~~~~~$  &  number of blank lines in the file  \\
 #\verb@STATS_blocks@     & $~~~~~$  &  number of indexable datablocks in the file  \\
 #\verb@STATS_columns@    & $~~~~~$  &  number of data columns in the first row of data  \\
+%l l .
+%Variable@Description
+%_
+%STATS_records@total number of in-range data records
+%STATS_outofrange@number of records filtered out by range limits
+%STATS_invalid@number of invalid/incomplete/missing records
+%STATS_blank@number of blank lines in the file
+%STATS_blocks@number of indexable datablocks in the file
+%STATS_columns@number of data columns in the first row of data
 @end table
 
  The second set reports properties of the in-range data from a single column.
@@ -13948,10 +13954,10 @@ Ffigure_missing
       STATS_skewness_err      # standard error of the skewness
       STATS_kurtosis_err      # standard error of the kurtosis
 #\begin{tabular}{|lrll|} \hline
-#\verb@STATS_min@ && $min(y)$ &  minimum value of in-range data points \\
-#\verb@STATS_max@ && $max(y)$ &  maximum value of in-range data points \\
-#\verb@STATS_index_min@ && $i \mid y_i = min(y)$ &  index i for which data[i] == STATS\_min \\
-#\verb@STATS_index_max@ && $i \mid y_i = max(y)$ &  index i for which data[i] == STATS\_max \\
+#\verb@STATS_min@ && $\min(y)$ &  minimum value of in-range data points \\
+#\verb@STATS_max@ && $\max(y)$ &  maximum value of in-range data points \\
+#\verb@STATS_index_min@ && $i \mid y_i = \min(y)$ &  index i for which data[i] == STATS\_min \\
+#\verb@STATS_index_max@ && $i \mid y_i = \max(y)$ &  index i for which data[i] == STATS\_max \\
 #\verb@STATS_mean@ & $\bar{y}=$ & $\frac{1}{N}\sum{y}$ &  mean value of the in-range data points \\
 #\verb@STATS_stddev@ & $\sigma_y=$ & $\sqrt{\frac{1}{N}{\sum{{(y-\bar{y})}^2}}}$ &  population standard deviation of the in-range data \\
 #\verb@STATS_ssd@ & $s_y=$ & $\sqrt{\frac{1}{N-1}{\sum{{(y-\bar{y})}^2}}}$ &  sample standard deviation of the in-range data \\
@@ -13967,6 +13973,28 @@ Ffigure_missing
 #\verb@STATS_stddev_err@ && $\sigma_y / \sqrt{2N}$ &  standard error of the standard deviation \\
 #\verb@STATS_skewness_err@ && $\sqrt{6/N}$ &  standard error of the skewness \\
 #\verb@STATS_kurtosis_err@ && $\sqrt{24/N}$ &  standard error of the kurtosis \\
+%l c l .
+%Variable@ @Description
+%_
+%STATS_min@$min ( y )$@minimum value of in-range data points
+%STATS_max@$max ( y )$@maximum value of in-range data points
+%STATS_index_min@$i~|~y sub i = min ( y )$@index i for which data[i] == STATS_min
+%STATS_index_max@$i~|~y sub i = max ( y )$@index i for which data[i] == STATS_max
+%STATS_lo_quartile@ @value of the lower (1st) quartile boundary
+%STATS_median@ @median value
+%STATS_up_quartile@ @value of the upper (3rd) quartile boundary
+%STATS_mean@$y bar = 1 over N sum y$@mean value of the in-range data points
+%STATS_ssd@$sigma sub y = sqrt { 1 over { N - 1 } sum { ( y - y bar ) sup 2  } }$@sample standard deviation of the in-range data
+%STATS_stddev@$s sub y = sqrt { 1 over N sum { ( y - y bar ) sup 2 } }$@population standard deviation of the in-range data
+%STATS_sum@$sum y$@sum
+%STATS_sumsq@$sum y sup 2$@sum of squares
+%STATS_skewness@$1 over { N  sigma sup 3} sum { left ( y - y bar right ) sup 3}$@skewness of the in-range data points
+%STATS_kurtosis@$1 over { N  sigma sup 4} sum { left ( y - y bar right ) sup 4}$@kurtosis of the in-range data points
+%STATS_adev@$1 over N sum | y - y bar |$@mean absolute deviation of the in-range data points
+%STATS_mean_err@$sigma sub y / sqrt N$@standard error of the mean value
+%STATS_stddev_err@$sigma sub y / sqrt { 2 N }$ @standard error of the standard deviation
+%STATS_skewness_err@$sqrt { 6 / N }$@standard error of the skewness
+%STATS_kurtosis_err@$sqrt { 24 / N }$@standard error of the kurtosis
 @end table
 
  The third set of variables is only relevant to analysis of two data columns.
@@ -13988,6 +14016,17 @@ Ffigure_missing
 #\verb@STATS_sumxy@       &   &  sum of x*y \\
 #\verb@STATS_pos_min_y@   &   &  x coordinate of a point with minimum y value \\
 #\verb@STATS_pos_max_y@   &   &  x coordinate of a point with maximum y value \\
+%l l .
+%Variable@Description
+%_
+%STATS_correlation@sample correlation coefficient between x and y values
+%STATS_slope@A corresponding to a linear fit $y = A x + B$
+%STATS_slope_err@uncertainty of A
+%STATS_intercept@B corresponding to a linear fit $y = A x + B$
+%STATS_intercept_err@uncertainty of B
+%STATS_sumxy@sum of $x times y$,  $sum x~y$
+%STATS_pos_min_y@x coordinate of a point with minimum y value
+%STATS_pos_max_y@x coordinate of a point with maximum y value
 @end table
 
  When `matrix` is specified, the `using` option is ignored and the "z"-values 
