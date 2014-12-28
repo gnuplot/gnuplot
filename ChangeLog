@@ -15,6 +15,9 @@
 
 	* src/term_api.h src/os2/gclient.c:  Eliminate compiler warnings.
 
+	* src/wxterminal/wxt_gui.cpp:
+	Use cairo_show_page() rather than cairo_surface_show_page()
+
 2014-12-26  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/qtterminal/qt_term.cpp:  Remove dead code. Avoid implicit

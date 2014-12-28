@@ -544,7 +544,7 @@ void wxtFrame::OnExport( wxCommandEvent& WXUNUSED( event ) )
 			1./(double)wxt_current_plot->oversampling_scale);
 		wxt_current_panel->wxt_cairo_refresh();
 
-		cairo_surface_show_page(surface);
+		cairo_show_page(wxt_current_plot->cr);
 		cairo_surface_finish(surface);
 		wxt_current_plot->cr = save_cr;
 		cairo_restore(wxt_current_plot->cr);
@@ -566,7 +566,7 @@ void wxtFrame::OnExport( wxCommandEvent& WXUNUSED( event ) )
 			1./(double)wxt_current_plot->oversampling_scale);
 		wxt_current_panel->wxt_cairo_refresh();
 
-		cairo_surface_show_page(surface);
+		cairo_show_page(wxt_current_plot->cr);
 		cairo_surface_finish(surface);
 		wxt_current_plot->cr = save_cr;
 		cairo_restore(wxt_current_plot->cr);
