@@ -1,5 +1,5 @@
 # Hey, Emacs, this is a -*- Makefile -*- #
-# $Id: Makefile,v 1.9 2014/08/15 19:25:13 sfeam Exp $
+# $Id: Makefile,v 1.10 2014/08/18 03:49:06 sfeam Exp $
 #
 #
 # GNUPLOT Makefile for Cygwin on WinNT and Win95/98/2000
@@ -14,7 +14,7 @@
 #	 make install -C config/cygwin
 # - resource compiler used is windres.exe in Cygwin
 # - note pdf, png, and gif libraries if used have to be build for Cygwin
-#   with -mno-cygwin option
+#   with former -mno-cygwin option
 # - -static used for static linking to libz-w.a and libpng-w.a
 #
 
@@ -66,7 +66,8 @@ MOUSE=1
 # Below you can adapt paths according to your software setup:
 
 # Where to place gnuplot.gih helpfile:
-HELPFILE = wgnuplot.hlp
+HELPFILE = wgnuplot.chm
+BUILDHELPFILE = $(W)/$(HELPFILE)
 
 # Where to install the PostScript prologue files, relatively to the executable
 # wgnuplot.exe
@@ -90,7 +91,7 @@ DESTDIR = /cygdrive/c/Apps/gnuplot
 CFLAGS =
 
 
-# To compile the .hlp file you need hcw either out of Microsoft SDK or MS Help
+# To compile the .chm file you need hcw either out of Microsoft SDK or MS HTML Help
 # Workshop. The latter can be obtained at www.helpmaster.com/help/devaids.htm.
 # Put the path to hcw here unless it is already in PATH:
 HCWPATH = /cygdrive/c/Program\ Files/Help\ Workshop/
@@ -134,8 +135,7 @@ ifeq ($(TARGET),gnuplot.exe)
 	CONSOLE=1
 endif
 
-
-CC = $(GCCPATH)gcc-3
+CC = i686-pc-mingw32-gcc
 LD = $(CC)
 
 RM = rm -f
@@ -176,8 +176,8 @@ TERMFLAGS = -DGNUPLOT_PS_DIR=\"$(GNUPLOT_PS_DIR)\" -DGNUPLOT_JS_DIR=\"$(GNUPLOT_
 TERMFLAGS += -DGNUPLOT_LUA_DIR=\"$(GNUPLOT_LUA_DIR)\" -I$(TOP)/term
 TERMLIBS =
 
-CFLAGS += -I. -I$(S) -D_Windows -DCYGWIN -mno-cygwin -DHAVE_CONFIG_H\
-	$(OPTS)
+CFLAGS += -I. -I$(S) -D_Windows -DCYGWIN -DHAVE_CONFIG_H\
+	$(OPTS) $(EXTRA_CFLAGS)
 
 # -I/usr/local/include
 
@@ -244,7 +244,6 @@ else
   RES2COFF = res2coff -i wgnuplot.res -o wgplt_res.$(O)
 endif
 
-
 default: $(TARGET) $(HELPFILE) wgnuplot.mnu $(M)bf_test.exe
 
 all: default gnuplot.ps gnuplot.pdf
@@ -275,11 +274,11 @@ WINDOWS = makefile.win makefile.nt README.win $(W)/wcommon.h \
 LDLIBS = -L/usr/local/lib -lkernel32 -lgdi32 -lmsimg32 -lcomctl32
 
 $(TARGET): $(OBJS) $(WINOBJS) wgplt_res.$(O)
-	$(LD) $(LDFLAGS) $(LDFLAGS2) -mwindows -mno-cygwin -o $@ \
+	$(LD) $(LDFLAGS) $(LDFLAGS2) -mwindows -o $@ \
 		$(OBJS) $(WINOBJS) wgplt_res.$(O) $(LDLIBS) $(TERMLIBS)
 
 pgnuplot.exe: $(W)/pgnuplot.c version.$(O)
-	$(CC) -O2 -s -mno-cygwin -DWINDOWS_NO_GUI -DHAVE_STDBOOL_H -o $@ \
+	$(CC) -O2 -s -DWINDOWS_NO_GUI -DHAVE_STDBOOL_H -o $@ \
 		$(W)/pgnuplot.c version.$(O) -I$(W) -I$(S) -luser32
 
 
@@ -295,7 +294,22 @@ show.$(O): show.c plot.h setshow.h
 term.$(O): term.c term.h plot.h setshow.h bitmap.h $(CORETERM)
 	$(CC) -c $(CFLAGS) $(TERMFLAGS) $<
 
-version.$(O): version.c
+ifndef RELEASE
+VERSIONING = timestamp.h
+timestamp.h: $(TOP)/ChangeLog
+	@echo Creating $@
+	@echo "#ifndef GNUPLOT_TIMEBASE_H_INCLUDED" >$@t
+	@echo "#define GNUPLOT_TIMEBASE_H_INCLUDED" >>$@t
+	@head -1 $< | sed -e 's,\(^[0-9-]* \).*$$,const char gnuplot_date[] = "\1";,' >>$@t
+	@echo "#endif /* GNUPLOT_TIMEBASE_H_INCLUDED */" >> $@t
+	@if cmp -s $@ $@t; then rm -f $@t; else mv $@t $@; fi
+else
+VERSIONING = 
+$(S)/version.c: $(TOP)/VERSION $(TOP)/PATCHLEVEL $(TOP)/ChangeLog $(S)/Makefile.maint
+	$(MAKE) -C $(S) srcdir=. top_srcdir=.. -f Makefile.maint version.c
+endif
+
+version.$(O): version.c  $(VERSIONING)
 
 WINDEPS = $(W)/wgnuplib.h $(W)/wcommon.h $(W)/wresourc.h
 
@@ -374,7 +388,7 @@ doc2tex.exe: $(D)doc2tex.c $(D)termdoc.c
 endif
 
 gnuplot.tex: $(D)gnuplot.doc doc2tex.exe
-	doc2tex $(D)gnuplot.doc gnuplot.tex
+	./doc2tex $(D)gnuplot.doc gnuplot.tex
 
 # Call LaTeX three times to get the toc right.
 gnuplot.dvi: gnuplot.tex $(D)titlepag.tex
@@ -396,7 +410,7 @@ gnuplot.pdf: gnuplot.tex $(D)titlepag.tex
 
 # clean up temporary files
 clean:
-	$(RM) config.h *.$(O) wgnuplot.map wgnuplot.res $(W)/gnuplot.rtf
+	$(RM) config.h *.$(O) wgnuplot.map wgnuplot.res 
 	$(RM) $(W)/wgnuplib.res wgnuplib.map wgnuplot.lib
 	$(RM) $(M)bf_test.exe allterm.h allterm.c
 	$(RM) gnuplot.tex gnuplot.dvi gnuplot.ps gnuplot.pdf
@@ -404,17 +418,17 @@ clean:
 realclean: veryclean
 veryclean: clean
 	$(RM) wgnuplot.exe wgnuplot_pipes.exe gnuplot.exe
-	$(RM) wgnuplot.hlp wgnuplot.gid wgnuplot.mnu
+	$(RM) $(HELPFILE) wgnuplot.gid wgnuplot.mnu
 	$(RM) $(M)binary[123] $(M)fit.log $(M)soundfit.par
 
 # now move the whole stuff to its destination
 install: default
 	mkdir -p $(DESTDIR)
-	cp gnuplot.exe $(DESTDIR)/gnuplot.exe
-	cp wgnuplot.exe $(DESTDIR)/wgnuplot.exe
-	cp wgnuplot_pipes.exe $(DESTDIR)/wgnuplot_pipes.exe
-	cp $(W)/wgnuplot.mnu $(DESTDIR)/wgnuplot.mnu
-	cp wgnuplot.hlp $(DESTDIR)/wgnuplot.hlp
+	cp gnuplot.exe $(DESTDIR)
+	cp wgnuplot.exe $(DESTDIR)
+	cp wgnuplot_pipes.exe $(DESTDIR)
+	cp $(W)/wgnuplot.mnu $(DESTDIR)
+	cp $(HELPFILE) $(DESTDIR)
 	mkdir -p $(DESTDIR)/$(GNUPLOT_PS_DIR)
 	cp $(T)PostScript/*.ps $(DESTDIR)/$(GNUPLOT_PS_DIR)
 	mkdir -p $(DESTDIR)/$(GNUPLOT_LUA_DIR)
