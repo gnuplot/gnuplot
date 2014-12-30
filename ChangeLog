@@ -6,9 +6,13 @@
 	src/term.c:  Backport core pieces of version 5.1 fix for Windows bugs
 	#1432 and #1502.
 
-	* src/win/wgnuplib.h src/win/wgraph.c src/win/winmain.c src/win/wpause.c
+	* src/win/wgnuplib.h src/win/wgraph.c src/win/winmain.c src/win/wpause.c:
 	Backport win term pieces of version 5.1 fix for Windows bugs
 	#1432 and #1502.
+
+	* src/wxt/wxt_gui.cpp src/wxt/wxt_gui.h:
+	Backport wxt term piece (referenced from wpause.c) of version 5.1 fix
+	for Windows bugs #1432 and #1502
 
 2014-12-28  Bastian Maerkisch  <bmaerkisch@web.de>
 
