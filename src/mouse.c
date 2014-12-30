@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: mouse.c,v 1.168.2.3 2014/11/12 05:20:16 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: mouse.c,v 1.168.2.4 2014/12/15 04:24:07 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - mouse.c */
@@ -1357,11 +1357,6 @@ event_keypress(struct gp_event_t *ge, TBOOLEAN current)
      * which is a bad thing if you are in the  middle of a mousing operation.
      */
 
-#ifdef _Windows
-    if (paused_for_mouse & PAUSE_KEYSTROKE)
-	kill_pending_Pause_dialog();
-#endif
-    
     if ((paused_for_mouse & PAUSE_KEYSTROKE) && (c > '\0') && current) {
 	load_mouse_variables(x, y, FALSE, c);
 	return;
@@ -1800,13 +1795,12 @@ event_buttonpress(struct gp_event_t *ge)
     } else if (ALMOST2D) {
         if (!setting_zoom_region) {
 	    if (1 == b) {
-	      /* "pause button1" or "pause any" takes precedence over key bindings */
+		/* "pause button1" or "pause any" takes precedence over key bindings */
 		if (paused_for_mouse & PAUSE_BUTTON1) {
 		    load_mouse_variables(mouse_x, mouse_y, TRUE, b);
 		    trap_release = TRUE;	/* Don't trigger on release also */
 		    return;
 		}
-
 	    } else if (2 == b) {
 		/* not bound in 2d graphs */
 	    } else if (3 == b && 
@@ -2020,17 +2014,8 @@ event_buttonrelease(struct gp_event_t *ge)
 	event_keypress(ge, TRUE);
 	ge->par1 = save;	/* needed for "pause mouse" */
     }
-
-#ifdef _Windows
-    if (paused_for_mouse & PAUSE_CLICK) {
-	/* remove pause message box after 'pause mouse' */
-#ifndef WGP_CONSOLE
-	paused_for_mouse = 0;
-#endif
-	kill_pending_Pause_dialog();
-    }
-#endif
 }
+
 
 static void
 event_motion(struct gp_event_t *ge)
@@ -2175,8 +2160,8 @@ event_reset(struct gp_event_t *ge)
 
     if (paused_for_mouse) {
 	paused_for_mouse = 0;
-#ifdef _Windows
-	/* remove pause message box after 'pause mouse' */
+#ifdef WIN32
+	/* close pause message box */
 	kill_pending_Pause_dialog();
 #endif
 	/* This hack is necessary on some systems in order to prevent one  */

@@ -2,6 +2,10 @@
 
 	* src/qtterminal/qt_term.cpp (qt_atexit): Sanity check.
 
+	* src/command.c src/command.h src/mouse.c src/mousecmn.h src/plot.c
+	src/term.c:  Backport core pieces of version 5.1 fix for Windows bugs
+	#1432 and #1502.
+
 2014-12-28  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* docs/titlepag.ms:  Update to version 5.
