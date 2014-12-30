@@ -1165,6 +1165,9 @@ int qt_waitforinput(int options)
 
 void qt_atexit()
 {
+	if (!qt)
+		return;
+
 	if (qt_optionPersist || persist_cl)
 	{
 		qt->out << GEDesactivate;

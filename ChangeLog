@@ -1,3 +1,7 @@
+2014-12-30  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/qtterminal/qt_term.cpp (qt_atexit): Sanity check.
+
 2014-12-28  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* docs/titlepag.ms:  Update to version 5.

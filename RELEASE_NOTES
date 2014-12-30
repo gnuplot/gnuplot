@@ -170,6 +170,9 @@ KNOWN ISSUES
 * Mouse double-click to export terminal coordinates to the X11 clipboard
   no longer works reliably, and may be deprecated in the future.
 
+* The "update" command for use with "fit" does not work as documented, and 
+  in practice works differently on different platforms.  Use with caution.
+
 
 		 NOTES TO PACKAGERS AND TESTERS 
 		===============================
