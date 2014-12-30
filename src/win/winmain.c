@@ -1,5 +1,5 @@
 /*
- * $Id: winmain.c,v 1.77 2014/06/09 12:49:30 markisch Exp $
+ * $Id: winmain.c,v 1.77.2.1 2014/12/08 19:25:40 markisch Exp $
  */
 
 /* GNUPLOT - win/winmain.c */
@@ -139,6 +139,7 @@ CheckMemory(LPSTR str)
         }
 }
 
+
 int
 Pause(LPSTR str)
 {
@@ -146,15 +147,17 @@ Pause(LPSTR str)
         return (PauseBox(&pausewin) == IDOK);
 }
 
+
 void
 kill_pending_Pause_dialog ()
 {
-        if (pausewin.bPause == FALSE) /* no Pause dialog displayed */
+	if (!pausewin.bPause) /* no Pause dialog displayed */
             return;
         /* Pause dialog displayed, thus kill it */
         DestroyWindow(pausewin.hWndPause);
         pausewin.bPause = FALSE;
 }
+
 
 /* atexit procedure */
 void
@@ -403,7 +406,7 @@ ReadMainIni(LPSTR file, LPSTR section)
 
 
 #ifndef WGP_CONSOLE
-int CALLBACK
+int WINAPI
 WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszCmdLine, int nCmdShow)
 #else
 int
@@ -974,6 +977,8 @@ int ConsoleGetch()
 		} else
 			break;
 	} while (1);
+
+	return '\r';
 }
 
 #endif /* WGP_CONSOLE */
@@ -1121,6 +1126,8 @@ WinWindowOpened(void)
 
 
 /* returns true if there are any graph windows open (wxt/caca/win terminals) */
+/* Note: This routine is used to handle "persist". Do not test for qt windows here 
+         since they run in a separate process */
 TBOOLEAN
 WinAnyWindowOpen(void)
 {
