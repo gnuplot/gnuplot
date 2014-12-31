@@ -147,6 +147,9 @@ KNOWN ISSUES
   you may need to set the environmental variable TERMLIBS:
     TERMLIBS="-lX11"  ./configure
 
+* A last-minute change to fix handling of "pause mouse" commands under MSWindows
+  has also been only lightly tested.
+
 * Font initialization on OSX can be very slow, causing the qt terminal to
   issue warning or error messages for the first plot command.
 
@@ -172,6 +175,7 @@ KNOWN ISSUES
 
 * The "update" command for use with "fit" does not work as documented, and 
   in practice works differently on different platforms.  Use with caution.
+  This command will probably be revised for subsequent gnuplot releases.
 
 
 		 NOTES TO PACKAGERS AND TESTERS 
