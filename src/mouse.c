@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: mouse.c,v 1.168.2.4 2014/12/15 04:24:07 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: mouse.c,v 1.168.2.5 2014/12/31 04:32:09 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - mouse.c */
@@ -2506,8 +2506,7 @@ bind_display(char *lhs)
 	char fmt[] = " %-17s  %s\n";
 	fprintf(stderr, "\n");
 	/* mouse buttons */
-	fprintf(stderr, fmt, "2x<B1>",
-		"print coordinates to clipboard using `clipboardformat`\n                    (see keys '3', '4')");
+	fprintf(stderr, fmt, "<B1> doubleclick", "send mouse coordinates to clipboard (pm win wxt x11)");
 	fprintf(stderr, fmt, "<B2>", "annotate the graph using `mouseformat` (see keys '1', '2')");
 	fprintf(stderr, fmt, "", "or draw labels if `set mouse labels is on`");
 	fprintf(stderr, fmt, "<Ctrl-B2>", "remove label close to pointer if `set mouse labels` is on");

@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.902.2.23 2014/12/28 12:56:49 markisch Exp $
+C RCS $Id: gnuplot.doc,v 1.902.2.24 2014/12/29 19:30:16 broeker Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -10004,8 +10004,9 @@ Ffigure_missing
 ?set mouse doubleclick
 ?mouse doubleclick
  The doubleclick resolution is given in milliseconds and used for Button 1,
- which copies the current mouse position to the `clipboard`.  The default value
- is 300 ms.  Setting the value to 0 ms triggers the copy on a single click.
+ which copies the current mouse position to the `clipboard` on some terminals.
+ The default value is 300 ms.  Setting the value to 0 ms triggers the copy on
+ a single click.
 4 mouseformat
 ?set mouse format
 ?set mouse mouseformat
