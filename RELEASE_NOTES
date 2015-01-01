@@ -6,7 +6,7 @@ The most recent previous release was 4.6 patchlevel 6 (4.6.6).
 Please see the NEWS file for bugfixes and minor changes to version 5.0
 applied after feedback on release candidates -rc1, -rc2, and -rc3.
 
-Release Notes date: 29 December 2014
+Release Notes date: 31 December 2014
 
 NOTABLE NEW FEATURES
 ====================
@@ -186,7 +186,7 @@ Obsolete or deprecated components
 
 The "gnuplot mode" elisp and TeX files for use with emacs are now
 maintained as a separate project: https://github.com/rudi/gnuplot-el
-so there is no longer a --with-lisp-files configuration option.
+so there is no longer a configuration option --with-lisp-files.
 
 The TeX tutorial produced by --with-tutorial is horribly out of date.
 
@@ -203,13 +203,13 @@ in addition to several platform-specific modes.
 
 1) Qt
    The qt terminal supports interactive display with menu-driven
-   output to png, svg or pdf.  The final 5.0 release may also support
-   scripted output to these same file formats but this is not present
-   in rc3.  If either Qt4 or Qt5 is detected by the configure script,
-   this will be the default terminal.  It is now the fastest and most
-   full-featured interactive terminal option.
+   output to png, svg or pdf.  If either Qt4 or Qt5 is detected by the
+   configure script, this will be the default terminal.  It is now the
+   fastest and most full-featured interactive terminal option.
+
    To disable this terminal:
       ./configure --without-qt
+
    To force use of Qt4 even if Qt5 is present:
       ./configure --with-qt=qt4
 
@@ -259,7 +259,7 @@ Installation
 
 You can download a source tarball for gnuplot version 5.0.0 from the 
 gnuplot development site on SourceForge.
-	http://sourceforge.net/project/showfiles.php?group_id=2055
+	http://sourceforge.net/projects/gnuplot
 
 Installation instructions are available in the source itself; the short
 version for linux/unix-like systems is to unpack the tarball and then
@@ -282,7 +282,7 @@ Support
 -------
 Please report all bugs and installation problems to the bug tracker
 on SourceForge:
-	http://sourceforge.net/tracker/?group_id=2055&atid=102055
+	http://sourceforge.net/p/gnuplot/bugs/
 
 There is also an gnuplot discussion forum on usenet group
 	comp.graphics.apps.gnuplot
