@@ -1,3 +1,10 @@
+2015-01-01  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/term.c:  Default to wxt terminal instead of the newly suported
+	qt terminal on Windows.
+
+	* win/gnuplot.iss:  Display RELEASE_NOTES instead of NEWS file.
+
 2014-12-31  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* FAQ.pdf: Fix broken URLs.

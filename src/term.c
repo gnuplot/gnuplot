@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.301 2014/12/14 19:39:38 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.296.2.4 2014/12/31 04:32:09 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -1567,6 +1567,14 @@ init_terminal()
 	    term_name = "sun";
 #endif /* SUN */
 
+#ifdef WIN32
+#ifdef WXWIDGETS
+	/* let the wxWidgets terminal be the default when available */
+	if (term_name == (char *) NULL)
+	    term_name = "wxt";
+#endif
+#endif
+
 #ifdef QTTERM
 	if (term_name == (char *) NULL)
 	    term_name = "qt";
@@ -1578,7 +1586,6 @@ init_terminal()
 #endif
 
 #ifdef _Windows
-	/* let the wxWidgets terminal be the default when available */
 	if (term_name == (char *) NULL)
 	    term_name = "win";
 #endif /* _Windows */
