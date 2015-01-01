@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.314 2014/09/27 05:51:06 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.315 2014/10/01 04:40:53 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -356,6 +356,15 @@ boundary3d(struct surface_points *plots, int count)
 	    key_rows = key_cols = key_col_wth = 0;
 	}
     }
+
+    /* Sanity check top and bottom margins, in case the user got confused */
+    if (bmargin.scalex == screen && tmargin.scalex == screen)
+	if (bmargin.x > tmargin.x) {
+	    double tmp = bmargin.x;
+	    bmargin.x = tmargin.x;
+	    tmargin.x = tmp;
+	}
+
     /* this should also consider the view and number of lines in
      * xformat || yformat || xlabel || ylabel */
 

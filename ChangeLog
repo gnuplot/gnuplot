@@ -1,3 +1,10 @@
+2015-01-01  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/set.c src/boundary.c src/graph3d.c:  Add a sanity check to 
+	ensure that the top margin is above the bottom margin.  This corrects
+	for possible user confusion or error in specifying on one line
+	set margins <left>, <right>, <bottom>, <top>   # (wrong order)
+
 2014-12-30  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/qtterminal/qt_term.cpp (qt_atexit): Sanity check.

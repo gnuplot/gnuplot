@@ -1,5 +1,5 @@
 /*
- * $Id: boundary.c,v 1.15 2014/06/14 15:32:58 sfeam Exp $
+ * $Id: boundary.c,v 1.16 2014/10/01 04:40:52 sfeam Exp $
  */
 
 /* GNUPLOT - boundary.c */
@@ -262,9 +262,18 @@ boundary(struct curve_points *plots, int count)
 	y2label_textheight = 0;
 
     /* compute plot_bounds.ytop from the various components
-     *     unless tmargin is explicitly specified  */
+     *     unless tmargin is explicitly specified
+     */
 
     plot_bounds.ytop = (int) (0.5 + (ysize + yoffset) * (t->ymax-1));
+
+    /* Sanity check top and bottom margins, in case the user got confused */
+    if (bmargin.scalex == screen && tmargin.scalex == screen)
+	if (bmargin.x > tmargin.x) {
+	    double tmp = bmargin.x;
+	    bmargin.x = tmargin.x;
+	    tmargin.x = tmp;
+	}
 
     if (tmargin.scalex == screen) {
 	/* Specified as absolute position on the canvas */
