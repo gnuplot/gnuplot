@@ -1,3 +1,5 @@
+2015-01-01  Release 5.0
+
 2015-01-01  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/term.c:  Default to wxt terminal instead of the newly suported
