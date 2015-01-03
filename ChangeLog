@@ -1,3 +1,9 @@
+2015-01-03  Jouke Witteveen  <j.witteveen@gmail.com>
+
+	* src/plot2d.c (check_or_add_boxplot_factor):  Distinguish between
+	boxplot category labels where one is a leading substring of the other.
+	Bug #1532
+
 2015-01-01  Release 5.0
 
 2015-01-01  Bastian Maerkisch  <bmaerkisch@web.de>
