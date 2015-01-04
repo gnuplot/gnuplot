@@ -279,6 +279,8 @@ typedef enum en_boxplot_factor_labels {
 	BOXPLOT_FACTOR_LABELS_X2
 } t_boxplot_factor_labels;
 
+#define DEFAULT_BOXPLOT_FACTOR -1
+
 typedef struct boxplot_style {
     int limit_type;	/* 0 = multiple of interquartile 1 = fraction of points */
     double limit_value;

@@ -1,3 +1,15 @@
+2015-01-04  Jouke Witteveen  <j.witteveen@gmail.com>
+
+	* src/plot2d.c (check_or_add_boxplot_factor) src/gadgets.h:
+	When the requested "factor" column of boxplot data is missing or
+	empty, the y value was being stored instead.  Now we store
+	DEFAULT_BOXPLOT_FACTOR (-1) instead, since this can never be
+	mistaken for a label array index.
+	EAM: Store this factor index in z rather than ylow.  This prepares
+	for a later patch to get rid of repeated swapping of y and ylow
+	values rather than simply looking at the stored index directly.
+	Bug #1532
+
 2015-01-03  Jouke Witteveen  <j.witteveen@gmail.com>
 
 	* src/plot2d.c (check_or_add_boxplot_factor):  Distinguish between
