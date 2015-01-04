@@ -1,3 +1,7 @@
+Changes since 5.0 release
+=========================
+* FIX handling of missing or whitespace in 4th using spec of boxplot data
+
 Changes in final release of 5.0
 ===============================
 * CHANGE reorder PostScript dash types to match other terminals

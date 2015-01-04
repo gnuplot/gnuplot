@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.336.2.5 2014/12/12 22:43:09 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.336.2.6 2015/01/04 01:47:53 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -909,6 +909,9 @@ get_data(struct curve_points *current_plot)
 		v[0] = df_datum;
 		store2d_point(current_plot, i++, v[0], v[1], v[0], v[0],
 			      v[1] - v[2], v[1] + v[2], -1.0);
+	    } else if (current_plot->plot_style == BOXPLOT) {
+		store2d_point(current_plot, i++, v[0], v[1], v[0], v[0], v[1], v[1],
+				DEFAULT_BOXPLOT_FACTOR);
 	    } else {
 		double w;
 		if (current_plot->plot_style == CANDLESTICKS
@@ -1002,9 +1005,9 @@ get_data(struct curve_points *current_plot)
 				  v[1], v[1], v[2]);
 		    break;
 
-		case BOXPLOT:	/* x, y, width */
+		case BOXPLOT:	/* x, y, width expanded to xlow, xhigh */
 		    store2d_point(current_plot, i++, v[0], v[1], v[0]-v[2]/2., v[0]+v[2]/2.,
-		    		  v[1], v[1], v[2]);
+		    		  v[1], v[1], DEFAULT_BOXPLOT_FACTOR);
 		    break;
 
 #ifdef EAM_OBJECTS
@@ -1082,11 +1085,13 @@ get_data(struct curve_points *current_plot)
 	    case BOXPLOT:	/* x, y, width, factor */
 		/* Load the coords just as we would have for 3-argument boxplot, 
 		 * index of factor in ylow , yhigh is the same as y */
+		/* EAM FIXME DEBUG: Change to use factor stored in the final param, not in ylow */
+		{
+		int factor_index = check_or_add_boxplot_factor(current_plot, df_tokens[3], v[0]);
 		store2d_point(current_plot, i++, v[0], v[1], v[0]-v[2]/2., v[0]+v[2]/2.,
-		    		  check_or_add_boxplot_factor(current_plot, df_tokens[3], v[0]),
-		    		  v[1], v[2]);
+		    		  factor_index, v[1], factor_index);
+		}
 		break;
-
 
 	    case VECTOR:
 		/* x,y,dx,dy */
@@ -1414,9 +1419,8 @@ store2d_point(
 					current_plot->noautoscale, NOOP, cp->xhigh = -VERYLARGE);
 	break;
     case BOXPLOT:			/* auto-scale to xlow xhigh, yhigh = y needed for factors */
-	cp->ylow = ylow;
-	STORE_WITH_LOG_AND_UPDATE_RANGE(cp->yhigh, yhigh, dummy_type, current_plot->y_axis,
-					current_plot->noautoscale, NOOP, cp->yhigh = -VERYLARGE);
+	cp->ylow = ylow;		/* FIXME EAM DEBUG: we don't need these if factor_index in z */
+	cp->yhigh = yhigh;
 	STORE_WITH_LOG_AND_UPDATE_RANGE(cp->xlow, xlow, dummy_type, current_plot->x_axis, 
 					current_plot->noautoscale, NOOP, cp->xlow = -VERYLARGE);
 	STORE_WITH_LOG_AND_UPDATE_RANGE(cp->xhigh, xhigh, dummy_type, current_plot->x_axis,
@@ -1506,29 +1510,32 @@ static int
 check_or_add_boxplot_factor(struct curve_points *plot, char* string, double x)
 {
     char * trimmed_string;
-    /* We abuse the labels structure to store the factors in their string forms */
+    /* We abuse the labels structure to store the category labels ("factors") */
     struct text_label *label;
+    int index = DEFAULT_BOXPLOT_FACTOR;
 
-    /* This can happen if the user specifies a non-existent column:
-     * fall back to single-boxplot mode */
+    /* If there is no factor column (4th using spec) fall back to a single boxplot */
     if (!string)
-	return 0;
+	return index;
 
     /* Remove the trailing garbage, quotes etc. from the string */ 
     trimmed_string = df_parse_string_field(string);
-    for (label = plot->labels; label; label = label->next) {
-	/* check if string is the same as the i-th factor */
-	if (label->text && !strcmp(trimmed_string, label->text))
-		break;
+
+    if (strlen(trimmed_string) > 0) {
+	for (label = plot->labels; label; label = label->next) {
+	    /* check if string is the same as the i-th factor */
+	    if (label->text && !strcmp(trimmed_string, label->text))
+		    break;
+	}
+	/* not found, so we add it now */
+	if (!label)
+	    label = store_label(plot->labels, &(plot->points[0]), 
+		    plot->boxplot_factors++, trimmed_string, 0.0);
+	index = label->tag;
     }
 
-    /* not found, so we add it now */
-    if (!label)
-	label = store_label(plot->labels, &(plot->points[0]), 
-		plot->boxplot_factors++, trimmed_string, 0.0);
-
     free(trimmed_string);
-    return label->tag;
+    return index;
 }
 
 /* Add tic labels to the boxplots, 
