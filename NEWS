@@ -2,6 +2,8 @@ Changes not in 5.0
 ==================
 * NEW new command `toggle {<plotno> | "plottitle" | all}`
 * NEW Optional sampling interval in range specifier for pseudofile '+'
+* CHANGE Track font/enhanced for key title separately from the key entries
+* CHANGE order of margins in `set margins <left>, <right>, <bottom>, <top>`
 
 Changes in 5.0.rc3
 ==================
