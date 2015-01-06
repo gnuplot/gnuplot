@@ -1,5 +1,5 @@
 /*
- * $Id: boundary.c,v 1.16 2014/10/01 04:40:52 sfeam Exp $
+ * $Id: boundary.c,v 1.17 2015/01/02 06:12:02 sfeam Exp $
  */
 
 /* GNUPLOT - boundary.c */
@@ -997,12 +997,12 @@ do_key_layout(legend_key *key)
     /* Key title length and height */
     key_title_height = 0;
     key_title_extra = 0;
-    if (key->title) {
+    if (key->title.text) {
 	int ytheight;
-	(void) label_width(key->title, &ytheight);
+	(void) label_width(key->title.text, &ytheight);
 	key_title_height = ytheight * t->v_char;
-	if ((*key->title) && (t->flags & TERM_ENHANCED_TEXT)
-	&&  (strchr(key->title,'^') || strchr(key->title,'_')))
+	if ((*key->title.text) && (t->flags & TERM_ENHANCED_TEXT)
+	&&  (strchr(key->title.text,'^') || strchr(key->title.text,'_')))
 	    key_title_extra = t->v_char;
     }
 
@@ -1075,8 +1075,8 @@ do_key_layout(legend_key *key)
     }
 
     /* If the key title is wider than the contents, try to make room for it */
-    if (key->title) {
-	int ytlen = label_width(key->title, NULL) - key->swidth + 2;
+    if (key->title.text) {
+	int ytlen = label_width(key->title.text, NULL) - key->swidth + 2;
 	ytlen *= t->h_char;
 	if (ytlen > key_cols * key_col_wth)
 	    key_col_wth = ytlen / key_cols;
@@ -1379,18 +1379,21 @@ draw_key(legend_key *key, TBOOLEAN key_pass, int *xinkey, int *yinkey)
 		key_width, key_height);
     }
 
-    if (key->title) {
+    if (key->title.text) {
 	int center = (key->bounds.xleft + key->bounds.xright) / 2;
 
 	/* Only draw the title once */
 	if (key_pass || !key->front) {
+	    /* FIXME: Now that there is a full text_label structure for the key title */
+	    /*        maybe we should call write_label() to get the full processing?  */
 	    if (key->textcolor.type == TC_RGB && key->textcolor.value < 0)
 		apply_pm3dcolor(&(key->box.pm3d_color));
 	    else
 		apply_pm3dcolor(&(key->textcolor));
-	    ignore_enhanced(!key->enhanced);
+	    ignore_enhanced(key->title.noenhanced);
 	    write_multiline(center, key->bounds.ytop - (key_title_extra + key_entry_height)/2,
-			key->title, CENTRE, JUST_TOP, 0, key->font);
+			key->title.text, CENTRE, JUST_TOP, 0, 
+			key->title.font ? key->title.font : key->font);
 	    ignore_enhanced(FALSE);
 	    (*t->linetype)(LT_BLACK);
 	}
@@ -1410,7 +1413,7 @@ draw_key(legend_key *key, TBOOLEAN key_pass, int *xinkey, int *yinkey)
 	draw_clip_line(key->bounds.xright, key->bounds.ybot, key->bounds.xleft, key->bounds.ybot);
 	closepath();
 	/* draw a horizontal line between key title and first entry */
-	if (key->title)
+	if (key->title.text)
 	    draw_clip_line( key->bounds.xleft,
 	    		    key->bounds.ytop - (key_title_height + key_title_extra),
 			    key->bounds.xright,

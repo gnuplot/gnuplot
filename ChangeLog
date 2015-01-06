@@ -1,5 +1,12 @@
 2015-01-06  Ethan A Merritt  <merritt@u.washington.edu>
 
+	* src/boundary.c src/gadgets.h src/graph3d.c src/save.c src/set.c
+	src/show.c src/unset.c:  Track font and enhanced flag for the key title
+	separately from those for the key entries.
+	Bug #1525
+
+2015-01-06  Ethan A Merritt  <merritt@u.washington.edu>
+
 	* src/graphics.c src/graphics.h src/plot2d.c:  Simplify the boxplot
 	data handling. Collapse the separate filter_boxplot_factor() and
 	filter_boxplot() into a single routine with a single supporting

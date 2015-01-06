@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.266 2014/11/05 05:00:18 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.267 2014/11/22 00:25:17 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -358,11 +358,9 @@ set bar %f %s\n",
     /* Save parallel axis state */
     save_style_parallel(fp);
 
-    fprintf(fp, "set key title \"%s\"", conv_text(key->title));
-    if (key->font)
-	fprintf(fp, " font \"%s\"", key->font);
-    if (key->textcolor.type != TC_LT || key->textcolor.lt != LT_BLACK)
-	save_textcolor(fp, &key->textcolor);
+    fprintf(fp, "set key title \"%s\"", conv_text(key->title.text));
+    if (key->title.font)
+	fprintf(fp, " font \"%s\"", key->title.font);
     fputs("\n", fp);
 
     fputs("set key ", fp);
@@ -435,6 +433,12 @@ set bar %f %s\n",
 	save_linetype(fp, &(key->box), FALSE);
     } else
 	fputs("nobox", fp);
+
+    /* These are for the key entries, not the key title */
+    if (key->font)
+	fprintf(fp, " font \"%s\"", key->font);
+    if (key->textcolor.type != TC_LT || key->textcolor.lt != LT_BLACK)
+	save_textcolor(fp, &key->textcolor);
 
     /* Put less common options on separate lines */
     fprintf(fp, "\nset key %sinvert samplen %g spacing %g width %g height %g ",
@@ -1355,7 +1359,10 @@ save_textcolor(FILE *fp, const struct t_colorspec *tc)
 {
     if (tc->type) {
     	fprintf(fp, " textcolor");
-	save_pm3dcolor(fp, tc);
+	if (tc->type == 7)
+	    fprintf(fp, " variable");
+	else
+	    save_pm3dcolor(fp, tc);
     }
 }
 

@@ -342,12 +342,12 @@ typedef struct {
     TBOOLEAN invert;		/* key top to bottom */
     TBOOLEAN enhanced;		/* enable/disable enhanced text of key titles */
     struct lp_style_type box;	/* linetype of box around key:  */
-    char *title;		/* title line for the key as a whole */
     char *font;			/* Will be used for both key title and plot titles */
     struct t_colorspec textcolor;	/* Will be used for both key title and plot titles */
     BoundingBox bounds;
     int maxcols;		/* maximum no of columns for horizontal keys */
     int maxrows;		/* maximum no of rows for vertical keys */
+    text_label title;		/* holds title line for the key as a whole */
 } legend_key;
 
 extern legend_key keyT;
@@ -366,9 +366,9 @@ extern legend_key keyT;
 		FILENAME_KEYTITLES, \
 		FALSE, FALSE, FALSE, TRUE, \
 		DEFAULT_KEYBOX_LP, \
-		NULL, /* No title */ \
 		NULL, {TC_LT, LT_BLACK, 0.0}, \
-		{0,0,0,0}, 0, 0 }
+		{0,0,0,0}, 0, 0, \
+		EMPTY_LABELSTRUCT}
 
 
 /*
