@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.342 2015/01/04 01:48:09 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.343 2015/01/05 00:19:02 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -1082,14 +1082,11 @@ get_data(struct curve_points *current_plot)
 				  v[1] - v[2], v[1] + v[2], 0.0);
 		break;
 
-	    case BOXPLOT:	/* x, y, width, factor */
-		/* Load the coords just as we would have for 3-argument boxplot, 
-		 * index of factor in ylow , yhigh is the same as y */
-		/* EAM FIXME DEBUG: Change to use factor stored in the final param, not in ylow */
+	    case BOXPLOT:	/* x, y, factor */
 		{
 		int factor_index = check_or_add_boxplot_factor(current_plot, df_tokens[3], v[0]);
 		store2d_point(current_plot, i++, v[0], v[1], v[0]-v[2]/2., v[0]+v[2]/2.,
-		    		  factor_index, v[1], factor_index);
+		    		  v[1], v[1], factor_index);
 		}
 		break;
 
@@ -1418,8 +1415,8 @@ store2d_point(
 	STORE_WITH_LOG_AND_UPDATE_RANGE(cp->xhigh, xhigh, dummy_type, current_plot->x_axis,
 					current_plot->noautoscale, NOOP, cp->xhigh = -VERYLARGE);
 	break;
-    case BOXPLOT:			/* auto-scale to xlow xhigh, yhigh = y needed for factors */
-	cp->ylow = ylow;		/* FIXME EAM DEBUG: we don't need these if factor_index in z */
+    case BOXPLOT:			/* auto-scale to xlow xhigh, factor is already in z */
+	cp->ylow = ylow;		/* ylow yhigh not really needed but store them anyway */
 	cp->yhigh = yhigh;
 	STORE_WITH_LOG_AND_UPDATE_RANGE(cp->xlow, xlow, dummy_type, current_plot->x_axis, 
 					current_plot->noautoscale, NOOP, cp->xlow = -VERYLARGE);
@@ -1663,7 +1660,8 @@ boxplot_range_fiddling(struct curve_points *plot)
     double extra_width;
 
     /* Sort the points and removed any that are undefined */
-    int N = filter_boxplot(plot);
+    int N = filter_boxplot(plot, DEFAULT_BOXPLOT_FACTOR);
+    plot->p_count = N;
 
     if (plot->points[0].type == UNDEFINED)
 	int_error(NO_CARET,"boxplot has undefined x coordinate");

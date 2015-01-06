@@ -1,5 +1,5 @@
 /*
- * $Id: graphics.h,v 1.60 2013/10/19 04:31:04 sfeam Exp $
+ * $Id: graphics.h,v 1.61 2013/12/26 17:58:29 sfeam Exp $
  */
 
 /* GNUPLOT - graphics.h */
@@ -112,6 +112,6 @@ void do_polygon __PROTO((int dimensions, t_polygon *p, int style, t_clip_object 
 #define place_objects(listhead,layer,dimensions) /* void() */
 #endif
 
-int filter_boxplot __PROTO((struct curve_points *));
+int filter_boxplot __PROTO((struct curve_points *, int index));
 
 #endif /* GNUPLOT_GRAPHICS_H */
