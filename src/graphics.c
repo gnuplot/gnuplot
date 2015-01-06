@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.464.2.2 2014/09/27 05:49:22 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.464.2.3 2014/11/22 04:12:53 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -107,7 +107,6 @@ static void plot_f_bars __PROTO((struct curve_points * plot));
 static void plot_c_bars __PROTO((struct curve_points * plot));
 static int compare_ypoints __PROTO((SORTFUNC_ARGS arg1, SORTFUNC_ARGS arg2));
 static void plot_boxplot __PROTO((struct curve_points * plot));
-static int filter_boxplot_factor __PROTO((struct curve_points *plot, int level));
 
 static void place_labels __PROTO((struct text_label * listhead, int layer, TBOOLEAN clip));
 static void place_arrows __PROTO((int layer));
@@ -148,6 +147,12 @@ static void plot_parallel __PROTO((struct curve_points *plot));
  * half the width of error bar tic mark
  */
 #define ERRORBARTIC GPMAX((t->h_tic/2),1)
+
+/* used by compare_ypoints via q_sort from filter_boxplot */
+/* It would be cleaner to make this a thunk passed to qsort_r()
+ * but that is not be portable across linux/OSX/MSWin
+ */
+static double *boxplot_factor_p;
 
 /* For tracking exit and re-entry of bounding curves that extend out of plot */
 /* these must match the bit values returned by clip_point(). */
@@ -2642,22 +2647,6 @@ plot_c_bars(struct curve_points *plot)
     }
 }
 
-/*
- * Plot the curves in BOXPLOT style
- */
-static int
-compare_ypoints(SORTFUNC_ARGS arg1, SORTFUNC_ARGS arg2)
-{
-    struct coordinate const *p1 = arg1;
-    struct coordinate const *p2 = arg2;
-
-    if (p1->y > p2->y)
-	return (1);
-    if (p1->y < p2->y)
-	return (-1);
-    return (0);
-}
-
 static void
 plot_parallel(struct curve_points *plot)
 {
@@ -2682,59 +2671,62 @@ plot_parallel(struct curve_points *plot)
     }
 }
 
-int
-filter_boxplot(struct curve_points *plot)
-{
-    int i;
-    int N = plot->p_count;
-
-    /* Force any undefined points to the end of the list */
-    for (i=0; i<N; i++)
-	if (plot->points[i].type == UNDEFINED)
-	    plot->points[i].y = VERYLARGE;
-
-    /* Sort the points to find median and quartiles */
-    qsort(plot->points, N, sizeof(struct coordinate), compare_ypoints);
-
-    /* Remove any undefined points */
-    while (plot->points[N-1].type == UNDEFINED)
-	N--;
-    plot->p_count = N;
-
-    return N;
-}
+/*
+ * Plot the curves in BOXPLOT style
+ * helper functions: compare_ypoints, filter_boxplot
+ */
 
 static int
-filter_boxplot_factor(struct curve_points *plot, int level)
+compare_ypoints(SORTFUNC_ARGS arg1, SORTFUNC_ARGS arg2)
 {
-    int i, real_level;
+    struct coordinate const *p1 = arg1;
+    struct coordinate const *p2 = arg2;
+
+    if (boxplot_factor_p) {
+	/* Push points with the wrong index (a.k.a. "factor") to the back */
+	double *index = boxplot_factor_p;
+	if (p1->z != *index && p2->z == *index)
+	    return (1);
+	if (p1->z == *index && p2->z != *index)
+	    return (-1);
+    }
+
+    if (p1->y > p2->y)
+	return (1);
+    if (p1->y < p2->y)
+	return (-1);
+    return (0);
+}
+
+int
+filter_boxplot(struct curve_points *plot, int index)
+{
+    double real_index;
     int N = plot->p_count;
+    int i;
 
-    /* Do we have to show the boxplots in alphabetical order of factors? */
-    if (boxplot_opts.sort_factors && plot->boxplot_factor_order)
-	real_level = plot->boxplot_factor_order[level];
-    else
-	real_level = level;
-
-    /* If the factor doesn't match,
-     * change the point to undefined and force it to the end of the list */
-    for (i=0; i<N; i++) {
-	plot->points[i].y = plot->points[i].yhigh;
-	plot->points[i].type = INRANGE;
-	if (plot->points[i].ylow != real_level) {
-	    plot->points[i].type = UNDEFINED;
-	    plot->points[i].y = VERYLARGE;
-	    FPRINTF((stderr, "filter_boxplot_factor: rejecting point: level %d, factor %g, i %d\n", level, plot->points[i].ylow, i));
-	}
+    if (index == DEFAULT_BOXPLOT_FACTOR) {
+	/* Force any undefined points to the end of the list by y value */
+	for (i=0; i<N; i++)
+	    if (plot->points[i].type == UNDEFINED)
+		plot->points[i].y = VERYLARGE;
+	boxplot_factor_p = NULL;
+    } else if (boxplot_opts.sort_factors && plot->boxplot_factor_order) {
+	/* Do we have to show the boxplots in alphabetical order of factors? */
+	real_index = plot->boxplot_factor_order[index];
+	boxplot_factor_p = &real_index;
+    } else {
+	real_index = index;
+	boxplot_factor_p = &real_index;
     }
 
     /* Sort the points to find median and quartiles */
     qsort(plot->points, N, sizeof(struct coordinate), compare_ypoints);
 
-    /* Remove any undefined points */
-    while (plot->points[N-1].type == UNDEFINED)
+    /* Return a count of well-defined points with this index */
+    while (plot->points[N-1].type == UNDEFINED
+	|| (boxplot_factor_p != NULL && plot->points[N-1].z != *boxplot_factor_p))
 	N--;
-    plot->p_count = N;
 
     return N;
 }
@@ -2743,8 +2735,8 @@ static void
 plot_boxplot(struct curve_points *plot)
 {
     int N;
-    int saved_p_count;
     struct coordinate *save_points = plot->points;
+    int saved_p_count = plot->p_count;
     struct coordinate candle;
     double median, quartile1, quartile3;
     double whisker_top, whisker_bot;
@@ -2752,19 +2744,18 @@ plot_boxplot(struct curve_points *plot)
     int levels = plot->boxplot_factors;
     if (levels == 0)
 	levels = 1;
-    saved_p_count = plot->p_count;
+
+    /* The entire collection of points was already sorted on y and counted
+     * in boxplot_range_fiddling() via filter_boxplot(plot, DEFAULT_BOXPLOT_FACTOR)
+     * That's fine if all point are in the same boxplot, but if there are
+     * multiple plots each containing one category (a.k.a. "factor" a.k.a. "level")
+     * then we need to filter and resort points for each one separately.
+     */
+    N = plot->p_count;
 
     for (level=0; level<levels; level++) {
-	/* Sort the points and get rid of any that are undefined */
-	/* EAM Feb 2011:  Move this to boxplot_range_fiddling()  */
-	/* N = filter_boxplot(plot);                             */
-	/* but we need filtering to make factored boxplots work:        */
-	if (levels > 1) {
-	    plot->p_count = saved_p_count;
-	    N = filter_boxplot_factor(plot, level);
-	}
-	else
-	    N = plot->p_count;
+	if (levels > 1)
+	    N = filter_boxplot(plot, level);
 
 	/* Not enough points left to make a boxplot */
 	if (N < 4) {
@@ -2886,6 +2877,7 @@ plot_boxplot(struct curve_points *plot)
 		(term->point) (x, y, plot->lp_properties.p_type);
 	    }
 	}
+    plot->p_count = saved_p_count;
     }
 }
 
