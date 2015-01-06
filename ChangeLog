@@ -1,5 +1,12 @@
 2015-01-06  Ethan A Merritt  <merritt@u.washington.edu>
 
+	* src/set.c src/boundary.c src/graph3d.c:  Add a sanity check to 
+	ensure that the top margin is above the bottom margin.  This corrects
+	for possible user confusion or error in specifying on one line
+	set margins <left>, <right>, <bottom>, <top>   # (wrong order)
+
+2015-01-06  Ethan A Merritt  <merritt@u.washington.edu>
+
 	* src/graphics.c src/graphics.h src/plot2d.c:  Simplify the boxplot
 	data handling. Collapse the separate filter_boxplot_factor() and
 	filter_boxplot() into a single routine with a single supporting
