@@ -5,6 +5,8 @@
 	for possible user confusion or error in specifying on one line
 	set margins <left>, <right>, <bottom>, <top>   # (wrong order)
 
+	* src/save.c (save_textcolor):  TC_VARIABLE was not handled correctly.
+
 2015-01-06  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c src/graphics.h src/plot2d.c:  Simplify the boxplot
