@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.267 2014/11/22 00:25:17 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.268 2015/01/06 04:57:15 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -1081,23 +1081,23 @@ save_tics(FILE *fp, AXIS_INDEX axis)
 	    (axis_array[axis].ticmode & TICS_MIRROR) ? "" : "no",
 	    axis_array[axis].tic_rotate ? "rotate" : "norotate");
     if (axis_array[axis].tic_rotate)
-    	fprintf(fp,"by %d ",axis_array[axis].tic_rotate);
+	fprintf(fp,"by %d ",axis_array[axis].tic_rotate);
     save_position(fp, &axis_array[axis].ticdef.offset, TRUE);
     if (axis_array[axis].manual_justify) {
-    	switch (axis_array[axis].label.pos) {
-    	case LEFT:{
+	switch (axis_array[axis].label.pos) {
+	case LEFT:{
 		fputs(" left", fp);
 		break;
 	    }
-    	case RIGHT:{
+	case RIGHT:{
 		fputs(" right", fp);
 		break;
 	    }
-    	case CENTRE:{
+	case CENTRE:{
 		fputs(" center", fp);
 		break;
 	    }
-    	}
+	}
     } else
 	fputs(" autojustify", fp);
     fprintf(fp, "\nset %stics ", axis_name(axis));
@@ -1358,8 +1358,8 @@ void
 save_textcolor(FILE *fp, const struct t_colorspec *tc)
 {
     if (tc->type) {
-    	fprintf(fp, " textcolor");
-	if (tc->type == 7)
+	fprintf(fp, " textcolor");
+	if (tc->type == TC_VARIABLE)
 	    fprintf(fp, " variable");
 	else
 	    save_pm3dcolor(fp, tc);
@@ -1393,9 +1393,9 @@ save_pm3dcolor(FILE *fp, const struct t_colorspec *tc)
 		  	fprintf(fp," rgb variable ");
 		      else if (color)
 	    		fprintf(fp," rgb \"%s\" ", color);
-    		      else
+		      else
 	    		fprintf(fp," rgb \"#%6.6x\" ", tc->lt);
-    		      break;
+		      break;
 	    	      }
 	default:      break;
 	}
@@ -1548,11 +1548,11 @@ save_linetype(FILE *fp, lp_style_type *lp, TBOOLEAN show_point)
     else if (lp->pm3d_color.type != TC_DEFAULT) {
 	fprintf(fp, " linecolor");
 	if (lp->pm3d_color.type == TC_LT)
-    	    fprintf(fp, " %d", lp->pm3d_color.lt+1);
+	    fprintf(fp, " %d", lp->pm3d_color.lt+1);
 	else if (lp->pm3d_color.type == TC_LINESTYLE && lp->l_type == LT_COLORFROMCOLUMN)
 	    fprintf(fp, " variable");
 	else
-    	    save_pm3dcolor(fp,&(lp->pm3d_color));
+	    save_pm3dcolor(fp,&(lp->pm3d_color));
     }
     fprintf(fp, " linewidth %.3f", lp->l_width);
 
