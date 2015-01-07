@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot on Unix.
 dnl
-dnl $Id: configure.in,v 1.372 2014/09/09 03:11:49 sfeam Exp $
+dnl $Id: configure.ac,v 1.1 2014/12/16 22:49:33 broeker Exp $
 dnl
 dnl this is actually major.minor ...
 dnl note that for a non-beta release, we need to disable DEVELOPMENT_RELEASE
@@ -1192,7 +1192,7 @@ if test "${enable_qt}" = yes ; then
     PKG_CHECK_MODULES_NOFAIL(QT, [Qt5Core Qt5Gui Qt5Network Qt5Svg Qt5PrintSupport])
     if test $pkg_failed = no; then
       try_qt4=no
-      QT5LOC=`$PKG_CONFIG --variable=exec_prefix Qt5Core`
+      QT5LOC=`$PKG_CONFIG --variable=host_bins Qt5Core`
       UIC=${QT5LOC}/bin/uic
       MOC=${QT5LOC}/bin/moc
       RCC=${QT5LOC}/bin/rcc

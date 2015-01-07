@@ -1,3 +1,8 @@
+2015-01-07  Achim Gratz  <Stromeko@nexgo.de>
+
+	* configure.ac: Qt5 check via pkg-config should use --variable=host_bins 
+	rather than --variable=exec_prefix
+
 2015-01-06  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/boundary.c src/gadgets.h src/graph3d.c src/save.c src/set.c
@@ -11,7 +16,7 @@
 	but this order in non-intuitive and conflicts with the order in
 	other commands (e.g. set multiplot layout).  CHANGE this to
 	  set margin <left>, <right>, <bottom>, <top>
-	Note that the code now sanity checks that top > bottom, so this is
+	Note that the code now sanity checks that (top > bottom), so this change
 	will not be noticed for margins given in screen coordinates.
 
 2015-01-06  Ethan A Merritt  <merritt@u.washington.edu>
