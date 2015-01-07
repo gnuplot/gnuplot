@@ -1,6 +1,7 @@
 Changes since 5.0 release
 =========================
 * FIX handling of missing or whitespace in 4th using spec of boxplot data
+* FIX save_textcolor was not handling "tc variable"
 
 Changes in final release of 5.0
 ===============================
