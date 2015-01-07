@@ -1,6 +1,7 @@
 Changes since 5.0 release
 =========================
-* FIX handling of missing or whitespace in 4th using spec of boxplot data
+* CHANGE autoconfigure of Qt5 support now looks for --variable=host_bins
+* FIX improved handling of boxplot data with multiple factors (categories)
 * FIX save_textcolor was not handling "tc variable"
 
 Changes in final release of 5.0
