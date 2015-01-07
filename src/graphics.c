@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.469 2014/11/22 04:14:04 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.470 2015/01/05 22:17:05 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -149,10 +149,7 @@ static void plot_parallel __PROTO((struct curve_points *plot));
 #define ERRORBARTIC GPMAX((t->h_tic/2),1)
 
 /* used by compare_ypoints via q_sort from filter_boxplot */
-/* It would be cleaner to make this a thunk passed to qsort_r()
- * but that is not be portable across linux/OSX/MSWin
- */
-static double *boxplot_factor_p;
+static TBOOLEAN boxplot_factor_sort_required;
 
 /* For tracking exit and re-entry of bounding curves that extend out of plot */
 /* these must match the bit values returned by clip_point(). */
@@ -2682,12 +2679,11 @@ compare_ypoints(SORTFUNC_ARGS arg1, SORTFUNC_ARGS arg2)
     struct coordinate const *p1 = arg1;
     struct coordinate const *p2 = arg2;
 
-    if (boxplot_factor_p) {
-	/* Push points with the wrong index (a.k.a. "factor") to the back */
-	double *index = boxplot_factor_p;
-	if (p1->z != *index && p2->z == *index)
+    if (boxplot_factor_sort_required) {
+	/* Primary sort key is the "factor" */
+	if (p1->z > p2->z)
 	    return (1);
-	if (p1->z == *index && p2->z != *index)
+	if (p1->z < p2->z)
 	    return (-1);
     }
 
@@ -2699,33 +2695,24 @@ compare_ypoints(SORTFUNC_ARGS arg1, SORTFUNC_ARGS arg2)
 }
 
 int
-filter_boxplot(struct curve_points *plot, int index)
+filter_boxplot(struct curve_points *plot)
 {
-    double real_index;
     int N = plot->p_count;
     int i;
 
-    if (index == DEFAULT_BOXPLOT_FACTOR) {
-	/* Force any undefined points to the end of the list by y value */
-	for (i=0; i<N; i++)
-	    if (plot->points[i].type == UNDEFINED)
-		plot->points[i].y = VERYLARGE;
-	boxplot_factor_p = NULL;
-    } else if (boxplot_opts.sort_factors && plot->boxplot_factor_order) {
-	/* Do we have to show the boxplots in alphabetical order of factors? */
-	real_index = plot->boxplot_factor_order[index];
-	boxplot_factor_p = &real_index;
-    } else {
-	real_index = index;
-	boxplot_factor_p = &real_index;
-    }
+    /* Force any undefined points to the end of the list by y value */
+    for (i=0; i<N; i++)
+	if (plot->points[i].type == UNDEFINED)
+	    plot->points[i].y = plot->points[i].z = VERYLARGE;
 
     /* Sort the points to find median and quartiles */
+    if (plot->boxplot_factors > 1)
+	boxplot_factor_sort_required = TRUE;
     qsort(plot->points, N, sizeof(struct coordinate), compare_ypoints);
 
     /* Return a count of well-defined points with this index */
-    while (plot->points[N-1].type == UNDEFINED
-	|| (boxplot_factor_p != NULL && plot->points[N-1].z != *boxplot_factor_p))
+    /* FIXME: This could be moved into plot_boxplot() */
+    while (plot->points[N-1].type == UNDEFINED)
 	N--;
 
     return N;
@@ -2737,48 +2724,72 @@ plot_boxplot(struct curve_points *plot)
     int N;
     struct coordinate *save_points = plot->points;
     int saved_p_count = plot->p_count;
+
+    struct coordinate *subset_points;
+    int subset_count, true_count;
+    struct text_label *subset_label = plot->labels;
+
     struct coordinate candle;
     double median, quartile1, quartile3;
     double whisker_top, whisker_bot;
+
     int level;
     int levels = plot->boxplot_factors;
     if (levels == 0)
 	levels = 1;
 
-    /* The entire collection of points was already sorted on y and counted
-     * in boxplot_range_fiddling() via filter_boxplot(plot, DEFAULT_BOXPLOT_FACTOR)
-     * That's fine if all point are in the same boxplot, but if there are
-     * multiple plots each containing one category (a.k.a. "factor" a.k.a. "level")
-     * then we need to filter and resort points for each one separately.
+    /* The entire collection of points was already sorted in filter_boxplot()
+     * called from boxplot_range_fiddling().  That sort used the category
+     * (a.k.a. "factor" a.k.a. "level") as a primary key and the y value as
+     * a secondary key.  That is sufficient for describing all points in a
+     * single boxplot, but if we want a separate boxplot for each category
+     * then additional bookkeeping is required.
      */
-    N = plot->p_count;
-
     for (level=0; level<levels; level++) {
-	if (levels > 1)
-	    N = filter_boxplot(plot, level);
+	if (levels == 1) {
+	    subset_points = save_points;
+	    subset_count = saved_p_count;
+	} else {
+	    subset_label = subset_label->next;
+	    true_count = 0;
+	    /* advance to first point in subset */
+	    for (subset_points = save_points;
+		 subset_points->z != subset_label->tag;
+		 subset_points++, true_count++)
+		;
+	    /* count well-defined points in this subset */
+	    for (subset_count=0;
+		 true_count < saved_p_count
+		    && subset_points[subset_count].z == subset_label->tag;
+		 subset_count++, true_count++) {
+			if (subset_points[subset_count].type == UNDEFINED)
+			    break;
+		}
+	}
 
 	/* Not enough points left to make a boxplot */
+	N = subset_count;
 	if (N < 4) {
-	    candle.x = plot->points->x + boxplot_opts.separation * level;
+	    candle.x = subset_points->x + boxplot_opts.separation * level;
 	    candle.yhigh = -VERYLARGE;
 	    candle.ylow = VERYLARGE;
 	    goto outliers;
 	}
 
 	if ((N & 0x1) == 0)
-	    median = 0.5 * (plot->points[N/2 - 1].y + plot->points[N/2].y);
+	    median = 0.5 * (subset_points[N/2 - 1].y + subset_points[N/2].y);
 	else
-	    median = plot->points[(N-1)/2].y;
+	    median = subset_points[(N-1)/2].y;
 	if ((N & 0x3) == 0)
-	    quartile1 = 0.5 * (plot->points[N/4 - 1].y + plot->points[N/4].y);
+	    quartile1 = 0.5 * (subset_points[N/4 - 1].y + subset_points[N/4].y);
 	else
-	    quartile1 = plot->points[(N+3)/4 - 1].y;
+	    quartile1 = subset_points[(N+3)/4 - 1].y;
 	if ((N & 0x3) == 0)
-	    quartile3 = 0.5 * (plot->points[N - N/4].y + plot->points[N - N/4 - 1].y);
+	    quartile3 = 0.5 * (subset_points[N - N/4].y + subset_points[N - N/4 - 1].y);
 	else
-	    quartile3 = plot->points[N - (N+3)/4].y;
+	    quartile3 = subset_points[N - (N+3)/4].y;
 
-	    FPRINTF((stderr,"Boxplot: quartile boundaries for %d points: %g %g %g\n",
+	FPRINTF((stderr,"Boxplot: quartile boundaries for %d points: %g %g %g\n",
 			N, quartile1, median, quartile3));
 
 	/* Set the whisker limits based on the user-defined style */
@@ -2788,14 +2799,14 @@ plot_boxplot(struct curve_points *plot)
 	    int i;
 	    whisker_bot = quartile1 - whisker_len;
 	    for (i=0; i<N; i++)
-		if (plot->points[i].y >= whisker_bot) {
-		    whisker_bot = plot->points[i].y;
+		if (subset_points[i].y >= whisker_bot) {
+		    whisker_bot = subset_points[i].y;
 		    break;
 		}
 	    whisker_top = quartile3 + whisker_len;
 	    for (i=N-1; i>= 0; i--)
-		if (plot->points[i].y <= whisker_top) {
-		    whisker_top = plot->points[i].y;
+		if (subset_points[i].y <= whisker_top) {
+		    whisker_top = subset_points[i].y;
 		    break;
 		}
 
@@ -2806,16 +2817,16 @@ plot_boxplot(struct curve_points *plot)
 	    int top = N-1;
 	    int bot = 0;
 	    while ((double)(top-bot+1)/(double)(N) >= boxplot_opts.limit_value) {
-		whisker_top = plot->points[top].y;
-		whisker_bot = plot->points[bot].y;
+		whisker_top = subset_points[top].y;
+		whisker_bot = subset_points[bot].y;
 		if (whisker_top - median >= median - whisker_bot) {
 		    top--;
-		    while ((top > 0) && (plot->points[top].y == plot->points[top-1].y))
+		    while ((top > 0) && (subset_points[top].y == subset_points[top-1].y))
 			top--;
 		}
 		if (whisker_top - median <= median - whisker_bot) {
 		    bot++;
-		    while ((bot < top) && (plot->points[bot].y == plot->points[bot+1].y))
+		    while ((bot < top) && (subset_points[bot].y == subset_points[bot+1].y))
 			bot++;
 		}
 	    }
@@ -2824,14 +2835,14 @@ plot_boxplot(struct curve_points *plot)
 	/* Dummy up a single-point candlesticks plot using these limiting values */
 	candle.type = INRANGE;
 	if (plot->plot_type == FUNC)
-	    candle.x = (plot->points[0].x + plot->points[N-1].x) / 2.;
+	    candle.x = (subset_points[0].x + subset_points[N-1].x) / 2.;
 	else
-	    candle.x = plot->points->x + boxplot_opts.separation * level;
+	    candle.x = subset_points->x + boxplot_opts.separation * level;
 	candle.y = quartile1;
 	candle.z = quartile3;
 	candle.ylow  = whisker_bot;
 	candle.yhigh = whisker_top;
-	candle.xlow  = plot->points->xlow + boxplot_opts.separation * level;
+	candle.xlow  = subset_points->xlow + boxplot_opts.separation * level;
 	candle.xhigh = median;	/* Crazy order of candlestick parameters! */
 	plot->points = &candle;
 	plot->p_count = 1;
@@ -2841,26 +2852,23 @@ plot_boxplot(struct curve_points *plot)
 	else
 	    plot_c_bars( plot );
 
-	plot->points = save_points;
-	plot->p_count = N;
-
 	/* Now draw individual points for the outliers */
 	outliers:
 	if (boxplot_opts.outliers) {
 	    int i,j,x,y;
 	    p_width = plot->lp_properties.p_size * term->h_tic;
 
-	    for (i = 0; i < plot->p_count; i++) {
+	    for (i = 0; i < subset_count; i++) {
 
-		if (plot->points[i].y >= candle.ylow
-		&&  plot->points[i].y <= candle.yhigh)
+		if (subset_points[i].y >= candle.ylow
+		&&  subset_points[i].y <= candle.yhigh)
 		    continue;
 
-		if (plot->points[i].type != INRANGE)
+		if (subset_points[i].type != INRANGE)
 		    continue;
 
 		x = map_x(candle.x);
-		y = map_y(plot->points[i].y);
+		y = map_y(subset_points[i].y);
 		/* do clipping if necessary */
 		if (clip_points &&
 		    (x < plot_bounds.xleft + p_width
@@ -2871,12 +2879,15 @@ plot_boxplot(struct curve_points *plot)
 		}
 
 		/* Separate any duplicate outliers */
-		for (j=1; (i >= j) && (plot->points[i].y == plot->points[i-j].y); j++)
+		for (j=1; (i >= j) && (subset_points[i].y == subset_points[i-j].y); j++)
 		    x += p_width * ((j & 1) == 0 ? -j : j);;
 
 		(term->point) (x, y, plot->lp_properties.p_type);
 	    }
 	}
+
+    /* Restore original dataset points and size */
+    plot->points = save_points;
     plot->p_count = saved_p_count;
     }
 }
