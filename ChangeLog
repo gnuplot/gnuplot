@@ -1,3 +1,8 @@
+2015-01-07  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* configure.ac: Qt5 check via pkg-config --variable=host_bins seems
+	fragile; revise to work on two different test machines.
+
 2015-01-07  Achim Gratz  <Stromeko@nexgo.de>
 
 	* configure.ac: Qt5 check via pkg-config should use --variable=host_bins 
