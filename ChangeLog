@@ -1,3 +1,8 @@
+2015-01-07  Achim Gratz  <Stromeko@nexgo.de>
+
+	* configure.in: Qt5 check via pkg-config should use --variable=host_bins 
+	rather than --variable=exec_prefix
+
 2015-01-06  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/set.c src/boundary.c src/graph3d.c:  Add a sanity check to 
