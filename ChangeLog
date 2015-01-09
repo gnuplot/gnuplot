@@ -1,3 +1,9 @@
+2015-01-09  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/datafile.c (df_determine_matrix_info):  Apply numeric locale
+	when reading ascii matrix data.
+	Bug #1536
+
 2015-01-07  Achim Gratz  <Stromeko@nexgo.de>
 
 	* configure.in: Qt5 check via pkg-config should use --variable=host_bins 
