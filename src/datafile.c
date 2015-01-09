@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.212.2.38 2014/05/11 20:24:09 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.212.2.39 2014/05/27 22:22:00 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -2154,6 +2154,10 @@ df_determine_matrix_info(FILE *fin)
 	initialize_binary_vars();
 	clear_binary_records(DF_CURRENT_RECORDS);
 
+	/* If the user has set an explicit locale for numeric input, apply it */
+	/* here so that it affects data fields read from the input file.      */
+	set_numeric_locale();
+
 	/* Keep reading matrices until file is empty. */
 	while (1) {
 	    if ((matrix = df_read_matrix(&nr, &nc)) != NULL) {
@@ -2178,6 +2182,9 @@ df_determine_matrix_info(FILE *fin)
 	    } else
 		break;
 	}
+
+	/* We are finished reading user input; return to C locale for internal use */
+	reset_numeric_locale();
 
 	/* Data from file is now in memory.  Make the rest of gnuplot think
 	 * that the data stream has not yet reached the end of file.
