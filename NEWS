@@ -4,6 +4,7 @@ Changes not in 5.0
 * NEW Optional sampling interval in range specifier for pseudofile '+'
 * CHANGE Track font/enhanced for key title separately from the key entries
 * CHANGE order of margins in `set margins <left>, <right>, <bottom>, <top>`
+* FIX cairo.trm - reset terminal font after printing an enhanced text string
 
 Changes in 5.0.rc3
 ==================

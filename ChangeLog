@@ -4,6 +4,14 @@
 	could produce a illegal syntax in the save file.
 	Bug fix
 
+	* term/cairo.trm (cairotrm_put_text):  For some reason the bold/italic
+	flags become stuck after printing some text.  This patch fixes it by
+	restoring the original terminal font after printing any enhanced text
+	string, but I do not understand why this would be necessary for the
+	cairo terminals when other terminals do not require it.
+	Test case:  set key title "{/:Bold Hello}"; plot sin(x) title "World"
+	Bug fix
+
 2015-01-10  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/gd.trm:  Ensure that the brush used for drawing dotted lines 
