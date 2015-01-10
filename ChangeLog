@@ -1,3 +1,9 @@
+2015-01-10  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/gd.trm:  Ensure that the brush used for drawing dotted lines 
+	is reinitialized for each new line.
+	Bug #1516
+
 2015-01-10  Karl Ratzsch  <ratzsch@uni-freiburg.de>
 
 	* docs/gnuplot.doc:  Clarify sampling used by '+' special file.
