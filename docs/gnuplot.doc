@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.902.2.24 2014/12/29 19:30:16 broeker Exp $
+C RCS $Id: gnuplot.doc,v 1.902.2.25 2014/12/31 19:45:55 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -6087,19 +6087,25 @@ Ffigure_mapcontours
 
        plot 'filename' using 1:2, '' using 1:3
 
+ The filename can also be reused over subsequent plot commands, however `save`
+ then only records the name in a comment.        
+
  The special filenames '+' and '++' are a mechanism to allow the full range of
  `using` specifiers and plot styles with inline functions.  Normally a function
  plot can only have a single y (or z) value associated with each sampled point.
  The pseudo-file '+' treats the sampled points as column 1, and allows
  additional column values to be specified via a `using` specification, just as
- for a true input file.  The number of samples returned is controlled by
- `set samples`.  By default samples are generated over the full range on x, but
- an independent sampling range can be provided immediately before the '+'
- (see `plot sampling`).
- Example:
+ for a true input file. By default samples are generated over the full range as
+ set by `set xrange`, with the sampling controlled via `set samples`.
 
-       plot '+' using ($1):(sin($1)):(sin($1)**2) with filledcurves
-       plot $MYDATA, [sample=5:25] '+' using (sample):(f(sample)) with lines
+       plot '+' using ($1):(sin($1)):(sin($1)**2) with filledcurves 
+
+ An independent sampling range can be provided immediately before the '+'. Like
+ in normal function plots, a name can be assigned to the independent variable. 
+ If given for the first plot element, the sampling range specifier has to be 
+ preceeded by the `sample` keyword (see also `plot sampling`).
+
+       plot sample [beta=0:2*pi] '+' using (sin(beta)):(cos(beta)) with lines
 
  Similarly the pseudo-file '++' returns 2 columns of data forming a regular
  grid of [x,y] coordinates with the number of points along x controlled by
@@ -7090,7 +7096,7 @@ Ffigure_mapcontours
 
  The following are _not_ affected by `reset`.
       `set term` `set output` `set loadpath` `set fontpath` `set linetype`
-      `set encoding` `set decimalsign` `set locale` `set psdir`
+      `set encoding` `set decimalsign` `set locale` `set psdir` `set fit`
 
  Note that `reset` does not necessarily return settings to the state they
  were in at program entry, because the default values may have been altered by
