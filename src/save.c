@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.268 2015/01/06 04:57:15 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.269 2015/01/06 05:05:14 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -1101,6 +1101,9 @@ save_tics(FILE *fp, AXIS_INDEX axis)
     } else
 	fputs(" autojustify", fp);
     fprintf(fp, "\nset %stics ", axis_name(axis));
+
+    fprintf(fp, (axis_array[axis].ticdef.rangelimited)?" rangelimit ":" norangelimit ");
+
     switch (axis_array[axis].ticdef.type) {
     case TIC_COMPUTED:{
 	    fputs("autofreq ", fp);
@@ -1132,8 +1135,6 @@ save_tics(FILE *fp, AXIS_INDEX axis)
     case TIC_USER:
 	break;
     }
-
-    fprintf(fp, (axis_array[axis].ticdef.rangelimited)?" rangelimit":" norangelimit");
 
     if (axis_array[axis].ticdef.font && *axis_array[axis].ticdef.font)
 	fprintf(fp, " font \"%s\"", axis_array[axis].ticdef.font);
