@@ -1,3 +1,7 @@
+2015-01-10  Karl Ratzsch  <ratzsch@uni-freiburg.de>
+
+	* docs/gnuplot.doc:  Clarify sampling used by '+' special file.
+
 2015-01-10  Christoph Bersch <usenet@bersch.net>
 
 	* src/multiplot.c demo/heatmaps.dem demo/layout.dem docs/gnuplot.doc:
