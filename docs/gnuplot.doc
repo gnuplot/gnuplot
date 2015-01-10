@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.930 2014/12/31 19:53:19 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.931 2015/01/06 05:31:40 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -10081,6 +10081,7 @@ Ffigure_missing
 ?unset multiplot
 ?multiplot
 ?nomultiplot
+?layout
  The command `set multiplot` places `gnuplot` in the multiplot mode, in which
  several plots are placed on the same page, window, or screen.
 
@@ -10169,10 +10170,34 @@ Ffigure_missing
  left to right.  Each plot will have a horizontal size of 1.1/2 and a vertical
  size of 0.9/3.
 
- Another possibility is to set explicit margins for each plot with options
- `margins` and `spacing`. With `margins` you set the outer margins of the whole
- multiplot grid, given as fractions of the whole drawing area. This can be very
- useful if only some plots have labels but their sizes should all be equal.
+ Another possibility is to set uniform margins for all plots in the layout with
+ options `layout margins` and `spacing`, which must be used together. With
+ `margins` you set the outer margins of the whole multiplot grid. 
+
+ `spacing` gives the gap size between two adjacent subplots, and can also
+ be given in `character` or `screen` units. If a single value is given,
+ it is used for both x and y direction, otherwise two different values
+ can be selected.
+
+ If one value has no unit, the one of the preceding margin setting is used.
+
+ Example:
+       set multiplot layout 2,2 margins 0.1, 0.9, 0.1, 0.9 spacing 0.0
+
+ In this case the two left-most subplots will have left boundaries at screen
+ coordinate 0.1, the two right-most subplots will have right boundaries at
+ screen coordinate 0.9, and so on.  Because the spacing between subplots is
+ given as 0, their inner boundaries will superimpose.
+
+ Example:
+       set multiplot layout 2,2 margins char 5,1,1,2 spacing screen 0, char 2
+ 
+ This produces a layout in which the boundary of both left subplots is
+ 5 character widths from the left edge of the canvas, the right boundary of the
+ right subplots is 1 character width from the canvas edge.
+ The overall bottom margin is one character height and the overall top margin
+ is 2 character heights. There is no horizontal gap between the two columns of
+ subplots. The vertical gap between subplots is equal to 2 character heights.
 
  Example:
        set multiplot layout 2,2 columnsfirst margins 0.1,0.9,0.1,0.9 spacing 0.1

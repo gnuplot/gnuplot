@@ -1,3 +1,13 @@
+2015-01-10  Christoph Bersch <usenet@bersch.net>
+
+	* src/multiplot.c demo/heatmaps.dem demo/layout.dem docs/gnuplot.doc:
+	Fix inconsistencies in the margin and spacing options for
+	"set multiplot layout".  Allow using character or screen units.
+	Make the character/screen keyword sticky; i.e. it applies to all four
+	values in the command `set multiplot margins screen 0.1,0.9,0.9,0.1`
+	Issue appropriate errors or warnings if margins and spacing aren't set
+	together.  Update and expand the documentation.
+
 2015-01-09  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/datafile.c (df_determine_matrix_info):  Apply numeric locale
