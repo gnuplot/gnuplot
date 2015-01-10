@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: gd.trm,v 1.179 2014/05/30 05:26:06 sfeam Exp $
+ * $Id: gd.trm,v 1.179.2.1 2014/11/21 21:41:14 sfeam Exp $
  */
 
 /* GNUPLOT -- gd.trm */
@@ -221,6 +221,7 @@ static struct {
     int       default_ttfsize;
     double    fontscale;
     TBOOLEAN  TrueColor;
+    double    dashfraction;	/* Where in a dot-dash pattern we left off */
     /* Variables for animated gif support: */
     TBOOLEAN  animate;		/* Only gif supports animation */
     int       loop_count;	/* Number of times to repeat sequence */
@@ -1470,6 +1471,7 @@ PNG_graphics()
     png_state.charh = term->v_char;	/* png_state.font->h; */
     png_state.font = png_state.default_font;
     png_state.color = 0;
+    png_state.dashfraction = -1.0;
 
     for (i = 0; i < png_state.n_colors; i++) {
 	rgb = png_state.rgb_table[i];
@@ -1528,7 +1530,6 @@ PNG_vector(unsigned int x, unsigned int y)
 	static int last_lw = -1;
 	static int last_color = -1;
 	static double dashpattern[4] = {0.1, 0.5, 0.6, 1.0};
-	static double dashfraction = 0.0;	/* Where in the pattern we left off */
 
 	int delx = (int)x - png_state.x;
 	int dely = (int)y - png_state.y;
@@ -1538,34 +1539,35 @@ PNG_vector(unsigned int x, unsigned int y)
 	double this_step;
 
 	/* Adjust the style when linewidth or color has changed. */
-	if (lw != last_lw || last_color != png_state.color) {
+	if (png_state.dashfraction < 0 || lw != last_lw || last_color != png_state.color) {
 	    PNG_init_brush(lw);
 	    gdImageSetBrush(png_state.image, PNG_brush[lw]->im);
 	    last_lw = lw;
 	    last_color = png_state.color;
+	    png_state.dashfraction = 0.0;
 	}
 
 	while (stride > 0) {
-	    for (i=0; dashpattern[i] <= dashfraction; i++);
-	    this_step = dashpattern[i] - dashfraction;
+	    for (i=0; dashpattern[i] <= png_state.dashfraction; i++);
+	    this_step = dashpattern[i] - png_state.dashfraction;
 	    if (stride > this_step) {
 		new_x = png_state.x + (int)(0.5 + delx * this_step / stride);
 		new_y = png_state.y + (int)(0.5 + dely * this_step / stride);
 		stride -= this_step;
-		dashfraction = dashpattern[i];
+		png_state.dashfraction = dashpattern[i];
 		delx = x - new_x;
 		dely = y - new_y;
 	    } else {
 		new_x = x;
 		new_y = y;
-		dashfraction += stride;
+		png_state.dashfraction += stride;
 		stride = 0;
 	    }
 	    if (i%2 == 0) {
 		/* dashes are fine for thin lines, but true dots look better */
 		/* when the line is thick.			             */
 		if (lw > 2) {
-		    if (dashfraction >= dashpattern[0])
+		    if (png_state.dashfraction >= dashpattern[0])
 		    gdImageFilledArc(png_state.image, new_x, Y(new_y),
 				2 * lw, 2 * lw,
 			 	0, 360, png_state.color, gdArc);
@@ -1576,8 +1578,8 @@ PNG_vector(unsigned int x, unsigned int y)
 	    }
 	    png_state.x = new_x;
 	    png_state.y = new_y;
-	    if (dashfraction >= 1.0)
-		dashfraction = 0.0;
+	    if (png_state.dashfraction >= 1.0)
+		png_state.dashfraction = 0.0;
 	}
 
     /* All other (not dashed) vectors */
@@ -1630,6 +1632,9 @@ PNG_linetype(int type)
     png_state.color = png_state.color_table[type + 3];
     png_state.rgb = png_state.rgb_table[type + 3];
     png_state.linetype = type;
+
+    if (type == LT_AXIS)
+	png_state.dashfraction = -1.0;
 }
 
 /* Use the "brush" tools in the gd library to control line width.

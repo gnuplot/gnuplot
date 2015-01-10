@@ -4,6 +4,7 @@ Changes since 5.0 release
 * FIX improved handling of boxplot data with multiple factors (categories)
 * FIX save_textcolor was not handling "tc variable"
 * FIX apply numeric locale when reading ascii matrix data
+* FIX reinitialize brush used to draw dotted lines in gd terminal
 
 Changes in final release of 5.0
 ===============================
