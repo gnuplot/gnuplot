@@ -1,5 +1,11 @@
 2015-01-10  Ethan A Merritt  <merritt@u.washington.edu>
 
+	* src/save.c (save_tics):  The order in which tics options were saved
+	could produce a illegal syntax in the save file.
+	Bug fix
+
+2015-01-10  Ethan A Merritt  <merritt@u.washington.edu>
+
 	* term/gd.trm:  Ensure that the brush used for drawing dotted lines 
 	is reinitialized for each new line.
 	Bug #1516
