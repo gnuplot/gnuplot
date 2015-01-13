@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: stats.c,v 1.16 2014/09/01 16:44:45 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: stats.c,v 1.17 2014/10/16 16:45:15 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - stats.c */
@@ -734,10 +734,6 @@ statsrequest(void)
     struct sgl_column_stats res_x = {0}, res_y = {0};
     struct two_column_stats res_xy = {0};
 
-    float *matrix;            /* matrix data. This must be float. */
-    int nc, nr;               /* matrix dimensions. */
-    int index;
-
     /* Vars for variable handling */
     static char *prefix = NULL;       /* prefix for user-defined vars names */
 
@@ -758,8 +754,6 @@ statsrequest(void)
     doubleblanks = 0;     /* number of repeated blank lines */
     out_of_range = 0;     /* number pts rejected, because out of range */
     n = 0;                /* number of records retained */
-    nr = 0;               /* Matrix dimensions */
-    nc = 0;
     max_n = INITIAL_DATA_SIZE;
 
     free(data_x);
@@ -770,7 +764,7 @@ statsrequest(void)
     if ( !data_x || !data_y )
       int_error( NO_CARET, "Internal error: out of memory in stats" );
 
-    n = invalid = blanks = doubleblanks = out_of_range = nr = 0;
+    n = invalid = blanks = doubleblanks = out_of_range = 0;
 
     /* Get filename */
     free ( file_name );
@@ -781,59 +775,24 @@ statsrequest(void)
     else
 	int_error(i, "missing filename or datablock");
 
-    /* ===========================================================
-    v923z: insertion for treating matrices
-      EAM: only handles ascii matrix with uniform grid,
-           and fails to apply any input data transforms
-      =========================================================== */
-    if ( almost_equals(c_token, "mat$rix") ) {
-	df_open(file_name, 3, NULL);
-	index = df_num_bin_records - 1;
-
-	/* We take these values as set by df_determine_matrix_info
-	See line 1996 in datafile.c */
-	nc = df_bin_record[index].scan_dim[0];
-	nr = df_bin_record[index].scan_dim[1];
-	n = nc * nr;
-
-	matrix = (float *)df_bin_record[index].memory_data;
-
-	/* Fill up a vector, so that we can use the existing code. */
-	/* FIXME: matrix code does not actually use data_x         */
-	if ( !redim_vec(&data_x, n) || !redim_vec(&data_y, n)) {
-	    int_error( NO_CARET,
-		   "Out of memory in stats: too many datapoints (%d)?", n );
-	}
-	for( i=0; i < n; i++ ) {
-	    data_y[i] = (double)matrix[i];
-	}
-	/* We can close the file here, there is nothing else to do */
-	df_close();
-	/* We will invoke single column statistics for the matrix */
-	columns = 1;
-
-    } else { /* Not a matrix */
+    /* Jan 2015: We used to handle ascii matrix data as a special case but
+     * the code did not work correctly.  Since df_read_matrix() dummies up
+     * ascii matrix data to look as if had been presented as a binary blob,
+     * we should be able to proceed with no special attention other than
+     * to set the effective number of columns to 1.
+     */
+    if (TRUE) {
 	columns = df_open(file_name, 2, NULL); /* up to 2 using specs allowed */
 
 	if (columns < 0)
 	    int_error(NO_CARET, "Can't read data file");
 
-	if (columns > 2 )
-	    int_error(c_token, "stats command can handle only 2 columns of data");
-
-	/* If the user has set an explicit locale for numeric input, apply it
-	   here so that it affects data fields read from the input file. */
-	/* v923z: where exactly should this be? here or before the matrix case?
-	 * I think, we should move everything here to before trying to open the file.
-	 * There is no point in trying to read anything, if the axis is logarithmic, e.g.
-	 */
-	set_numeric_locale();
-
 	/* For all these below: we could save the state, switch off, then restore */
 	if ( axis_array[FIRST_X_AXIS].log || axis_array[FIRST_Y_AXIS].log )
 	    int_error( NO_CARET, "Stats command not available with logscale active");
 
-	if ( axis_array[FIRST_X_AXIS].datatype == DT_TIMEDATE || axis_array[FIRST_Y_AXIS].datatype == DT_TIMEDATE )
+	if (axis_array[FIRST_X_AXIS].datatype == DT_TIMEDATE
+	||  axis_array[FIRST_Y_AXIS].datatype == DT_TIMEDATE )
 	    int_error( NO_CARET, "Stats command not available in timedata mode");
 
 	if ( polar )
@@ -842,28 +801,29 @@ statsrequest(void)
 	if ( parametric )
 	    int_error( NO_CARET, "Stats command not available in parametric mode" );
 
+	/* If the user has set an explicit locale for numeric input, apply it */
+	/* here so that it affects data fields read from the input file. */
+	set_numeric_locale();
+
 	/* The way readline and friends work is as follows:
 	 - df_open will return the number of columns requested in the using spec
 	   so that "columns" will be 0, 1, or 2 (no using, using 1, using 1:2)
 	 - readline always returns the same number of columns (for us: 1 or 2)
-	 - using 1:2 = return two columns, skipping lines w/ bad data
-	 - using 1   = return single column (supply zeros (0) for the second col)
-	 - no using (gnuplot version 5)
-		     = first two columns if both are present on the first line of data
+	 - using n:m = return two columns, skipping lines w/ bad data
+	 - using n   = return single column (supply zeros (0) for the second col)
+	 - no using  = first two columns if both are present on the first line of data
 		       else first column only
 	 */
-
 	while( (i = df_readline(v, 2)) != DF_EOF ) {
 
 	    if ( n >= max_n ) {
 		max_n = (max_n * 3) / 2; /* increase max_n by factor of 1.5 */
 
 		/* Some of the reallocations went bad: */
-		if ( 0 || !redim_vec(&data_x, max_n) || !redim_vec(&data_y, max_n) ) {
+		if ( !redim_vec(&data_x, max_n) || !redim_vec(&data_y, max_n) ) {
 		    df_close();
 		    int_error( NO_CARET,
-		       "Out of memory in stats: too many datapoints (%d)?",
-		       max_n );
+		       "Out of memory in stats: too many datapoints (%d)?", max_n );
 		}
 	    } /* if (need to extend storage space) */
 
@@ -915,13 +875,10 @@ statsrequest(void)
 	/* now resize fields to actual length: */
 	redim_vec(&data_x, n);
 	redim_vec(&data_y, n);
-
-    }  /* end of case when the data file is not a matrix */
+    }
 
     /* Now finished reading user input; return to C locale for internal use*/
     reset_numeric_locale();
-
-    /* PKJ - TODO: similar for logscale, polar/parametric, timedata */
 
     /* No data! Try to explain why. */
     if ( n == 0 ) {
@@ -966,11 +923,17 @@ statsrequest(void)
 
     /* Do the actual analysis */
     res_file = analyze_file( n, out_of_range, invalid, blanks, doubleblanks );
-    if ( columns == 1 ) {
-	res_y = analyze_sgl_column( data_y, n, nc );
-    }
 
-    if ( columns == 2 ) {
+    /* Jan 2015: Revised detection and handling of matrix data */
+    if (df_matrix) {
+	int nc = df_bin_record[df_num_bin_records-1].scan_dim[0];
+	res_y = analyze_sgl_column( data_y, n, nc );
+	columns = 1;
+
+    } else if (columns == 1) {
+	res_y = analyze_sgl_column( data_y, n, 0 );
+
+    } else {
 	/* If there are two columns, then the data file is not a matrix */
 	res_x = analyze_sgl_column( data_x, n, 0 );
 	res_y = analyze_sgl_column( data_y, n, 0 );

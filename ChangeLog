@@ -5,6 +5,10 @@
 	subsequent data matrix) for nonuniform ascii matrix data.
 	Bug #1538
 
+	* src/stats.c:  The special code path to handle ascii matrix data was
+	not correct.  Fortunately the general case code works so long as the
+	data is recognized as matrix data.  This removes the broken code path.
+
 2015-01-10  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/save.c (save_tics):  The order in which tics options were saved
