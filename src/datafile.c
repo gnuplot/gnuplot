@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.298 2014/12/18 19:47:56 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.299 2015/01/09 19:18:30 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -879,15 +879,25 @@ df_read_matrix(int *rows, int *cols)
 	    return linearized_matrix;   
 	}
 
+	/* skip leading spaces */
 	while (isspace((unsigned char) *s) && NOTSEP)
 	    ++s;
 
+	/* skip blank lines and comments */
 	if (!*s || is_comment(*s)) {
+	    /* except that some comments hide an index name */
+	    if (indexname) {
+		while (is_comment(*s) || isspace((unsigned char)*s))
+		    ++s;
+		if (*s && !strncmp(s, indexname, strlen(indexname)))
+		    index_found = TRUE;
+	    }
 	    if (linearized_matrix)
 		return linearized_matrix;
 	    else
 		continue;
 	}
+
 	if (mixed_data_fp && is_EOF(*s)) {
 	    df_eof = 1;
 	    return linearized_matrix;
@@ -2324,6 +2334,18 @@ df_determine_matrix_info(FILE *fin)
 		df_bin_record[index].scan_dim[1] = nr;
 		df_bin_record[index].scan_dim[2] = 0;
 		df_bin_file_endianess = THIS_COMPILER_ENDIAN;
+
+		/* This matrix is the one (and only) requested by name.	*/
+		/* Dummy up index range and skip rest of file.		*/
+		if (indexname) {
+		    if (index_found) {
+			df_lower_index = df_upper_index = index;
+			break;
+			}
+		    else
+			df_lower_index = index+1;
+		}
+
 	    } else
 		break;
 	}
