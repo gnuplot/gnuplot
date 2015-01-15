@@ -6,6 +6,7 @@ Changes since 5.0 release
 * FIX apply numeric locale when reading ascii matrix data
 * FIX handling of ascii matrix data
 * FIX reinitialize brush used to draw dotted lines in gd terminal
+* FIX failure to clear bold/italic text attributes in cairo terminals
 
 Changes in final release of 5.0
 ===============================
