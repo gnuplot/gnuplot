@@ -1,3 +1,9 @@
+2015-01-15  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/graphics.c (plot_filledcurves):  Reevaluate variable fill color
+	for every polygon in the input stream to "with filledcurves".
+	Bug/Feature Request #411
+
 2015-01-13  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/datafile.c (df_read_matrix) demo/matrix_index.dem:
