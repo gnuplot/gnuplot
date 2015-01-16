@@ -1,3 +1,9 @@
+2015-01-16  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/tabulate.c:  Tabular output of time/date values should check the
+	new flag output flag (tictype) rather than the input flag (datatype),
+	and fall back to a generic time format if the axis doesn't have one.
+
 2015-01-15  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/cairo.trm (cairotrm_put_text):  The bold/italic flags can become
