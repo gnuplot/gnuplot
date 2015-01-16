@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: tabulate.c,v 1.21 2014/04/05 06:17:09 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: tabulate.c,v 1.22 2014/05/08 17:35:42 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - tabulate.c */
@@ -82,12 +82,15 @@ output_number(double coord, int axis, char *buffer) {
      * "%s" in combination with any other character is treated
      * like a normal time format specifier and handled in time.c
      */
-    } else if (axis_array[axis].datatype == DT_TIMEDATE &&
+    } else if (axis_array[axis].tictype == DT_TIMEDATE &&
 	strcmp(axis_array[axis].formatstring, "%s") == 0) {
 	gprintf(buffer, BUFFERSIZE, "%.0f", 1.0, coord);
-    } else if (axis_array[axis].datatype == DT_TIMEDATE) {
+    } else if (axis_array[axis].tictype == DT_TIMEDATE) {
 	buffer[0] = '"';
-	gstrftime(buffer+1, BUFFERSIZE-1, axis_array[axis].formatstring, coord);
+	if (!strcmp(axis_array[axis].formatstring,DEF_FORMAT))
+	    gstrftime(buffer+1, BUFFERSIZE-1, timefmt, coord);
+	else
+	    gstrftime(buffer+1, BUFFERSIZE-1, axis_array[axis].formatstring, coord);
 	while (strchr(buffer,'\n')) {*(strchr(buffer,'\n')) = ' ';}
 	strcat(buffer,"\"");
     } else if (axis_array[axis].log) {
