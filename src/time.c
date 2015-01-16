@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: time.c,v 1.28 2014/01/27 21:53:16 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: time.c,v 1.29 2014/11/07 00:16:50 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - time.c */
@@ -101,9 +101,9 @@ gdysize(int yr)
 char *
 gstrptime(char *s, char *fmt, struct tm *tm, double *usec)
 {
-    int yday, date;
+    int yday = 0;
+    TBOOLEAN sanity_check_date = FALSE;
 
-    date = yday = 0;
     tm->tm_mday = 1;
     tm->tm_mon = tm->tm_hour = tm->tm_min = tm->tm_sec = 0;
     /* make relative times work (user-defined tic step) */
@@ -117,8 +117,27 @@ gstrptime(char *s, char *fmt, struct tm *tm, double *usec)
     /* we do not yet calculate wday or yday, so make them illegal
      * [but yday will be read by %j]
      */
-
     tm->tm_yday = tm->tm_wday = -1;
+
+    /* If the format requests explicit day, month, or year, then we will
+     * do sanity checking to make sure the input makes sense.
+     * For backward compatibility with gnuplot versions through 4.6.6
+     * hour, minute, seconds default to zero with no error return
+     * if the corresponding field cannot be found or interpreted.
+     */ 
+    if (strstr(fmt,"%d")) {
+	tm->tm_mday = -1;
+	sanity_check_date = TRUE;
+    }
+    if (strstr(fmt,"%y") || strstr(fmt,"%Y")) {
+	tm->tm_year = -1;
+	sanity_check_date = TRUE;
+    }
+    if (strstr(fmt,"%m") || strstr(fmt,"%B") || strstr(fmt,"%b")) {
+	tm->tm_mon = -1;
+	sanity_check_date = TRUE;
+    }
+
 
     while (*fmt) {
 	if (*fmt != '%') {
@@ -176,12 +195,10 @@ gstrptime(char *s, char *fmt, struct tm *tm, double *usec)
 
 	case 'd':		/* read a day of month */
 	    s = read_int(s, 2, &tm->tm_mday);
-	    date++;
 	    break;
 
 	case 'm':		/* month number */
 	    s = read_int(s, 2, &tm->tm_mon);
-	    date++;
 	    --tm->tm_mon;
 	    break;
 
@@ -194,19 +211,17 @@ gstrptime(char *s, char *fmt, struct tm *tm, double *usec)
 	     */
 	    if (tm->tm_year <= 68)
 		tm->tm_year += 100;
-	    date++;
 	    tm->tm_year += 1900;
 	    break;
 
 	case 'Y':
 	    s = read_int(s, 4, &tm->tm_year);
-	    date++;
 	    break;
 
 	case 'j':
 	    s = read_int(s, 3, &tm->tm_yday);
 	    tm->tm_yday--;
-	    date++;
+	    sanity_check_date = TRUE;
 	    yday++;
 	    break;
 
@@ -249,7 +264,7 @@ gstrptime(char *s, char *fmt, struct tm *tm, double *usec)
 
     FPRINTF((stderr, "read date-time : %02d/%02d/%d:%02d:%02d:%02d\n", tm->tm_mday, tm->tm_mon + 1, tm->tm_year, tm->tm_hour, tm->tm_min, tm->tm_sec));
 
-    /* now check the date/time entered, normalising if necessary
+    /* now sanity check the date/time entered, normalising if necessary
      * read_int cannot read a -ve number, but can read %m=0 then decrement
      * it to -1
      */
@@ -278,11 +293,13 @@ gstrptime(char *s, char *fmt, struct tm *tm, double *usec)
 
     FPRINTF((stderr, "normalised time : %02d/%02d/%d:%02d:%02d:%02d\n", tm->tm_mday, tm->tm_mon + 1, tm->tm_year, tm->tm_hour, tm->tm_min, tm->tm_sec));
 
-    if (date) {
+    if (sanity_check_date) {
 	if (yday) {
 
-	    if (tm->tm_yday < 0)
-		int_error(DATAFILE, "Illegal day of year");
+	    if (tm->tm_yday < 0) {
+		// int_error(DATAFILE, "Illegal day of year");
+		return (NULL);
+	    }
 
 	    /* we just set month to jan, day to yday, and let the
 	     * normalising code do the work.
@@ -293,11 +310,11 @@ gstrptime(char *s, char *fmt, struct tm *tm, double *usec)
 	    tm->tm_mday = tm->tm_yday + 1;
 	}
 	if (tm->tm_mon < 0) {
-	    int_error(DATAFILE, "illegal month");
+	    // int_error(DATAFILE, "illegal month");
 	    return (NULL);
 	}
 	if (tm->tm_mday < 1) {
-	    int_error(DATAFILE, "illegal day of month");
+	    // int_error(DATAFILE, "illegal day of month");
 	    return (NULL);
 	}
 	if (tm->tm_mon > 11) {
