@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.464.2.3 2014/11/22 04:12:53 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.464.2.4 2015/01/05 22:16:45 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -760,9 +760,10 @@ do_plot(struct curve_points *plots, int pcount)
 		break;
 
 	    case FILLEDCURVES:
-		if (this_plot->filledcurves_options.closeto == FILLEDCURVES_BETWEEN) {
-		    plot_betweencurves(this_plot);
-		} else if (this_plot->filledcurves_options.closeto == FILLEDCURVES_ATR) {
+		if (this_plot->filledcurves_options.closeto == FILLEDCURVES_ATY1
+		||  this_plot->filledcurves_options.closeto == FILLEDCURVES_ATY2
+		||  this_plot->filledcurves_options.closeto == FILLEDCURVES_ATR
+		||  this_plot->filledcurves_options.closeto == FILLEDCURVES_BETWEEN) {
 		    plot_betweencurves(this_plot);
 		} else {
 		    plot_filledcurves(this_plot);
@@ -1102,17 +1103,6 @@ finish_filled_curve(
 		    side += corners[i].x - corners[points].x;
 		points += 2;
 		break;
-	case FILLEDCURVES_ATY1:
-	case FILLEDCURVES_ATY2:
-		corners[points].y   =
-		corners[points+1].y = map_y(filledcurves_options->at);
-		    /* should be mapping real y1/y2axis/graph/screen => screen */
-		corners[points].x   = corners[points-1].x;
-		corners[points+1].x = corners[0].x;
-		for (i=0; i<points; i++)
-		    side += corners[i].y - corners[points].y;
-		points += 2;
-		break;
 	case FILLEDCURVES_ATXY:
 		corners[points].x = map_x(filledcurves_options->at);
 		    /* should be mapping real x1axis/graph/screen => screen */
@@ -1122,6 +1112,8 @@ finish_filled_curve(
 		break;
 	case FILLEDCURVES_BETWEEN:
 	case FILLEDCURVES_ATR:
+	case FILLEDCURVES_ATY1:
+	case FILLEDCURVES_ATY2:
 		side = (corners[points].x > 0) ? 1 : -1;
 
 		/* Prevent 1-pixel overlap of component rectangles, which */

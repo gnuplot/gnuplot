@@ -10,6 +10,7 @@ Changes since 5.0 release
 * FIX reinitialize brush used to draw dotted lines in gd terminal
 * FIX failure to clear bold/italic text attributes in cairo terminals
 * FIX tabular output of time data when the axis format has not been set
+* FIX breakage in plot style filledcurves {above|below} y1=<yval> 
 
 Changes in final release of 5.0
 ===============================

@@ -16,6 +16,9 @@
 	* demo/timedat.dat: Add a line of headers to exercise the new sanity
 	checks in gstrptime.
 
+	* src/graphics.c src/plot2d.c:  Fix breakage in plot style 
+	filledcurves {above|below} y1=<yval> 
+
 2015-01-15  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/cairo.trm (cairotrm_put_text):  The bold/italic flags can become
