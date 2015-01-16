@@ -4,6 +4,18 @@
 	new flag output flag (tictype) rather than the input flag (datatype),
 	and fall back to a generic time format if the axis doesn't have one.
 
+	* src/time.c (gstrptime): If the time format explicitly includes day,
+	month, or year then always do sanity checking on the interpreted date.
+	Return NULL if the sanity check fails.  Previously the sanity check 
+	was only done if that field of the format was evaluated (i.e. it was
+	not done if input garbage caused parsing to terminate early), and
+	zeros were returned in the time structure with no indication of failure.
+	This "failure silently returns zero" behaviour is still kept for
+	hour, minute, and second input fields.
+
+	* demo/timedat.dat: Add a line of headers to exercise the new sanity
+	checks in gstrptime.
+
 2015-01-15  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/cairo.trm (cairotrm_put_text):  The bold/italic flags can become
