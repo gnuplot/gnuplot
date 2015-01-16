@@ -16,11 +16,19 @@
 	* demo/timedat.dat: Add a line of headers to exercise the new sanity
 	checks in gstrptime.
 
+	* src/graphics.c src/plot2d.c:  Fix breakage in plot style 
+	filledcurves {above|below} y1=<yval> 
+
 2015-01-15  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c (plot_filledcurves):  Reevaluate variable fill color
 	for every polygon in the input stream to "with filledcurves".
 	Bug/Feature Request #411
+
+	* src/gadgets.c (apply_pm3dcolor) src/term.c (load_linetype):
+	Remove special-cased test for monochrome terminals that can lead cause
+	a failure to update the linecolor in version 5 (e.g. background->black).
+	Bug fix 
 
 2015-01-13  Ethan A Merritt  <merritt@u.washington.edu>
 
