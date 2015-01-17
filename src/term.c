@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.300 2014/12/08 19:18:05 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.301 2014/12/14 19:39:38 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -2782,9 +2782,11 @@ recycle:
 	    lp->d_type = this->lp_properties.d_type;
 	    lp->custom_dash_pattern = this->lp_properties.custom_dash_pattern;
 
-	    /* FIXME:  Not sure this is correct for version 5 */
+#if (0)
+	    /* FIXME:  Removed in version 5.0.1 - but maybe there are cases it is needed? */
 	    if (term->flags & TERM_MONOCHROME)
 		lp->l_type = tag;
+#endif
 
 	    /* Do not recycle point properties. */
 	    /* FIXME: there should be a separate command "set pointtype cycle N" */
