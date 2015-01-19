@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.326.2.4 2014/11/08 04:52:26 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.326.2.5 2014/11/22 00:24:07 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -1834,14 +1834,9 @@ show_keytitle()
     legend_key *key = &keyT;
     SHOW_ALL_NL;
 
-    fprintf(stderr, "\tkey title is \"%s\"\n", conv_text(key->title));
-    if (key->font && *(key->font))
-	fprintf(stderr,"\t  font \"%s\"\n", key->font);
-    if (key->textcolor.type != TC_LT || key->textcolor.lt != LT_BLACK) {
-	fputs("\t ", stderr);
-	save_textcolor(stderr, &(key->textcolor));
-	fputs("\n", stderr);
-    }
+    fprintf(stderr, "\tkey title is \"%s\"\n", conv_text(key->title.text));
+    if (key->title.font && *(key->title.font))
+	fprintf(stderr,"\t  font \"%s\"\n", key->title.font);
 }
 
 
@@ -1956,6 +1951,13 @@ show_key()
 	fprintf(stderr, "%d for vertical alignment\n", key->maxrows);
     else
 	fputs("calculated automatically\n", stderr);
+    if (key->font && *(key->font))
+	fprintf(stderr,"\t  font \"%s\"\n", key->font);
+    if (key->textcolor.type != TC_LT || key->textcolor.lt != LT_BLACK) {
+	fputs("\t ", stderr);
+	save_textcolor(stderr, &(key->textcolor));
+	fputs("\n", stderr);
+    }
 
     show_keytitle();
 }

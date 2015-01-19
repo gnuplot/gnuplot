@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.311.2.3 2014/09/27 05:49:21 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.311.2.4 2015/01/06 04:24:41 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -310,7 +310,7 @@ boundary3d(struct surface_points *plots, int count)
     }
     /* count max_len key and number keys (plot-titles and contour labels) with len > 0 */
     max_ptitl_len = find_maxl_keys3d(plots, count, &ptitl_cnt);
-    ytlen = label_width(key->title, &i) - (key->swidth + 2);
+    ytlen = label_width(key->title.text, &i) - (key->swidth + 2);
     ktitle_lines = i;
     if (ytlen > max_ptitl_len)
 	max_ptitl_len = ytlen;
@@ -917,7 +917,7 @@ do_3dplot(
 			key->bounds.ytop - key_title_height - key_title_extra);
 	}
 
-	if (key->title) {
+	if (key->title.text) {
 	    int center = (key->bounds.xright + key->bounds.xleft) / 2;
 
 	    if (key->textcolor.type == TC_RGB && key->textcolor.value < 0)
@@ -925,7 +925,8 @@ do_3dplot(
 	    else
 		apply_pm3dcolor(&(key->textcolor), t);
 	    write_multiline(center, key->bounds.ytop - (key_title_extra + t->v_char)/2,
-			    key->title, CENTRE, JUST_TOP, 0, key->font);
+			    key->title.text, CENTRE, JUST_TOP, 0, 
+			    key->title.font ? key->title.font : key->font);
 	    (*t->linetype)(LT_BLACK);
 	}
     }
@@ -3370,8 +3371,8 @@ do_3dkey_layout(legend_key *key, int *xinkey, int *yinkey)
 
     key_title_height = ktitle_lines * t->v_char;
     key_title_extra = 0;
-    if ((key->title) && (t->flags & TERM_ENHANCED_TEXT)
-    &&  (strchr(key->title,'^') || strchr(key->title,'_')))
+    if ((key->title.text) && (t->flags & TERM_ENHANCED_TEXT)
+    &&  (strchr(key->title.text,'^') || strchr(key->title.text,'_')))
 	    key_title_extra = t->v_char;
 
     key_width = key_col_wth * (key_cols - 1) + key_size_right + key_size_left;

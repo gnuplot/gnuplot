@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.206.2.2 2014/09/27 05:49:23 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.206.2.3 2014/11/08 04:52:26 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -946,7 +946,8 @@ reset_key()
 {
     legend_key temp_key = DEFAULT_KEY_PROPS;
     free(keyT.font);
-    free(keyT.title);
+    free(keyT.title.text);
+    free(keyT.title.font);
     memcpy(&keyT, &temp_key, sizeof(keyT));
 }
 

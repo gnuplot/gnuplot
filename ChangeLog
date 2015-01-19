@@ -1,3 +1,10 @@
+2015-01-19  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/boundary.c src/gadgets.h src/graph3d.c src/save.c src/set.c
+	src/unset.c:  Track text properties (font, enhanced, justification) for
+	the key title separately from those for the key entries.
+	Bug #1525 #1542
+
 2015-01-16  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/tabulate.c:  Tabular output of time/date values should check the
