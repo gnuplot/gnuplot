@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: parse.c,v 1.89 2014/09/18 22:51:30 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: parse.c,v 1.90 2014/10/05 04:24:32 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - parse.c */
@@ -493,7 +493,10 @@ parse_primary_expression()
 		struct udvt_entry *udv = add_udv(c_token+2);
 		union argument *foo = add_action(PUSHC);
 		foo->v_arg.type = INTGR;
-		foo->v_arg.v.int_val = udv->udv_undef ? 0 : 1;
+		if (udv->udv_value.type == NOTDEFINED)
+		    foo->v_arg.v.int_val = 0;
+		else
+		    foo->v_arg.v.int_val = 1;
 		c_token += 4;  /* skip past "defined ( <foo> ) " */
 		return;
 	    }
@@ -1147,10 +1150,8 @@ check_for_iteration()
 	    }
 	    if (!equals(c_token++, "]"))
 	    	int_error(c_token-1, errormsg);
-	    if (iteration_udv->udv_undef == FALSE)
-		gpfree_string(&(iteration_udv->udv_value));
+	    gpfree_string(&(iteration_udv->udv_value));
 	    Ginteger(&(iteration_udv->udv_value), iteration_start);
-	    iteration_udv->udv_undef = FALSE;
 	}
 	else if (equals(c_token++, "in")) {
 	    iteration_string = try_to_get_string();
@@ -1160,10 +1161,8 @@ check_for_iteration()
 	    	int_error(c_token-1, errormsg);
 	    iteration_start = 1;
 	    iteration_end = gp_words(iteration_string);
-	    if (iteration_udv->udv_undef == FALSE)
-	    	gpfree_string(&(iteration_udv->udv_value));
+	    gpfree_string(&(iteration_udv->udv_value));
 	    Gstring(&(iteration_udv->udv_value), gp_word(iteration_string, 1));
-	    iteration_udv->udv_undef = FALSE;
 	}
 	else /* Neither [i=B:E] or [s in "foo"] */
 	    int_error(c_token-1, errormsg);

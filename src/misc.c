@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.194 2014/10/01 04:40:53 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.195 2014/10/07 21:23:08 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -202,17 +202,14 @@ prepare_call(int calltype)
     /* FIXME:  If we defined these on entry, we could use get_udv* here */
     udv = add_udv_by_name("ARGC");
     Ginteger(&(udv->udv_value), call_argc);
-    udv->udv_undef = FALSE;
     udv = add_udv_by_name("ARG0");
     gpfree_string(&(udv->udv_value));
     Gstring(&(udv->udv_value), gp_strdup(lf_head->name));
-    udv->udv_undef = FALSE;
     for (argindex = 1; argindex <= 9; argindex++) {
 	char *arg = gp_strdup(call_args[argindex-1]);
 	udv = add_udv_by_name(argname[argindex]);
 	gpfree_string(&(udv->udv_value));
 	Gstring(&(udv->udv_value), arg ? arg : gp_strdup(""));
-	udv->udv_undef = FALSE;
     }
 }
 
@@ -295,7 +292,6 @@ load_file(FILE *fp, char *name, int calltype)
     /* Provide a user-visible copy of the current line number in the input file */
     udvt_entry *gpval_lineno = add_udv_by_name("GPVAL_LINENO");
     Ginteger(&gpval_lineno->udv_value, 0);
-    gpval_lineno->udv_undef = FALSE;
 
     lf_push(fp, name, NULL); /* save state for errors and recursion */
 
@@ -455,9 +451,10 @@ lf_pop()
 	for (argindex = 1; argindex <= 9; argindex++) {
 	    if ((udv = get_udv_by_name(argname[argindex]))) {
 		gpfree_string(&(udv->udv_value));
-		Gstring(&(udv->udv_value), gp_strdup(call_args[argindex-1]));
 		if (!call_args[argindex-1])
-		    udv->udv_undef = TRUE;
+		    udv->udv_value.type = NOTDEFINED;
+		else
+		    Gstring(&(udv->udv_value), gp_strdup(call_args[argindex-1]));
 	    }
 	}
     }

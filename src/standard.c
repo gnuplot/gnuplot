@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: standard.c,v 1.31 2012/07/18 23:06:32 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: standard.c,v 1.32 2012/07/24 15:42:23 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - standard.c */
@@ -858,7 +858,7 @@ f_exists(union argument *arg)
     if (a.type == STRING) {
 	struct udvt_entry *udv = add_udv_by_name(a.v.string_val);
 	gpfree_string(&a);
-	push(Ginteger(&a, udv->udv_undef ? 0 : 1));
+	push(Ginteger(&a, udv->udv_value.type == NOTDEFINED ? 0 : 1));
     } else {
 	push(Ginteger(&a, 0));
     }

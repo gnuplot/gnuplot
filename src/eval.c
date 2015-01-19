@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: eval.c,v 1.119 2014/07/30 21:45:09 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: eval.c,v 1.120 2014/12/03 21:32:49 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - eval.c */
@@ -60,7 +60,7 @@ static char *RCSid() { return RCSid("$Id: eval.c,v 1.119 2014/07/30 21:45:09 sfe
 static RETSIGTYPE fpe __PROTO((int an_int));
 
 /* Global variables exported by this module */
-struct udvt_entry udv_pi = { NULL, "pi", FALSE, {INTGR, {0} } };
+struct udvt_entry udv_pi = { NULL, "pi", {INTGR, {0} } };
 struct udvt_entry *udv_NaN;
 /* first in linked list */
 struct udvt_entry *first_udv = &udv_pi;
@@ -408,15 +408,14 @@ Gstring(struct value *a, char *s)
 /* It is always safe to call gpfree_string with a->type is INTGR or CMPLX.
  * However it would be fatal to call it with a->type = STRING if a->string_val
  * was not obtained by a previous call to gp_alloc(), or has already been freed.
- * Thus 'a->type' is set to INTGR afterwards to make subsequent calls safe.
+ * Thus 'a->type' is set to NOTDEFINED afterwards to make subsequent calls safe.
  */
 struct value *
 gpfree_string(struct value *a)
 {
     if (a->type == STRING) {
 	free(a->v.string_val);
-	/* I would have set it to INVALID if such a type existed */
-	a->type = INTGR;
+	a->type = NOTDEFINED;
     }
     return a;
 }
@@ -729,8 +728,7 @@ add_udv_by_name(char *key)
 	gp_alloc(sizeof(struct udvt_entry), "value");
     (*udv_ptr)->next_udv = NULL;
     (*udv_ptr)->udv_name = gp_strdup(key);
-    (*udv_ptr)->udv_undef = TRUE;
-    (*udv_ptr)->udv_value.type = 0;
+    (*udv_ptr)->udv_value.type = NOTDEFINED;
     return (*udv_ptr);
 }
 
@@ -762,17 +760,17 @@ del_udv_by_name(char *key, TBOOLEAN wildcard)
 
  	/* exact match */
 	else if (!wildcard && !strcmp(key, udv_ptr->udv_name)) {
-	    udv_ptr->udv_undef = TRUE;
 	    gpfree_string(&(udv_ptr->udv_value));
 	    gpfree_datablock(&(udv_ptr->udv_value));
+	    udv_ptr->udv_value.type = NOTDEFINED;
 	    break;
 	}
 
 	/* wildcard match: prefix matches */
 	else if ( wildcard && !strncmp(key, udv_ptr->udv_name, strlen(key)) ) {
-	    udv_ptr->udv_undef = TRUE;
 	    gpfree_string(&(udv_ptr->udv_value));
 	    gpfree_datablock(&(udv_ptr->udv_value));
+	    udv_ptr->udv_value.type = NOTDEFINED;
 	    /* no break - keep looking! */
 	}
 
@@ -813,7 +811,6 @@ set_gpval_axis_sth_double(const char *prefix, AXIS_INDEX axis, const char *suffi
     v = add_udv_by_name(s);
     if (!v) 
 	return; /* should not happen */
-    v->udv_undef = FALSE;
     if (is_int)
 	Ginteger(&v->udv_value, (int)(value+0.5));
     else
@@ -846,10 +843,8 @@ fill_gpval_string(char *var, const char *stringvalue)
     struct udvt_entry *v = add_udv_by_name(var);
     if (!v)
 	return;
-    if (v->udv_undef == FALSE && !strcmp(v->udv_value.v.string_val, stringvalue))
+    if (v->udv_value.type == STRING && !strcmp(v->udv_value.v.string_val, stringvalue))
 	return;
-    if (v->udv_undef)
-	v->udv_undef = FALSE;
     else
 	gpfree_string(&v->udv_value);
     Gstring(&v->udv_value, gp_strdup(stringvalue));
@@ -861,7 +856,6 @@ fill_gpval_integer(char *var, int value)
     struct udvt_entry *v = add_udv_by_name(var);
     if (!v)
 	return;
-    v->udv_undef = FALSE;
     Ginteger(&v->udv_value, value);
 }
 
@@ -871,7 +865,6 @@ fill_gpval_float(char *var, double value)
     struct udvt_entry *v = add_udv_by_name(var);
     if (!v)
 	return;
-    v->udv_undef = FALSE;
     Gcomplex(&v->udv_value, value, 0);
 }
 
@@ -881,7 +874,6 @@ fill_gpval_complex(char *var, double areal, double aimag)
     struct udvt_entry *v = add_udv_by_name(var);
     if (!v)
 	return;
-    v->udv_undef = FALSE;
     Gcomplex(&v->udv_value, areal, aimag);
 }
 
@@ -963,15 +955,13 @@ update_gpval_variables(int context)
     if (context == 3) {
 	struct udvt_entry *v = add_udv_by_name("GPVAL_VERSION");
 	char *tmp;
-	if (v && v->udv_undef == TRUE) {
-	    v->udv_undef = FALSE;
+	if (v && v->udv_value.type == NOTDEFINED)
 	    Gcomplex(&v->udv_value, atof(gnuplot_version), 0);
-	}
 	v = add_udv_by_name("GPVAL_PATCHLEVEL");
-	if (v && v->udv_undef == TRUE)
+	if (v && v->udv_value.type == NOTDEFINED)
 	    fill_gpval_string("GPVAL_PATCHLEVEL", gnuplot_patchlevel);
 	v = add_udv_by_name("GPVAL_COMPILE_OPTIONS");
-	if (v && v->udv_undef == TRUE)
+	if (v && v->udv_value.type == NOTDEFINED)
 	    fill_gpval_string("GPVAL_COMPILE_OPTIONS", compile_options);
 
 	/* Start-up values */

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: stats.c,v 1.17 2014/10/16 16:45:15 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: stats.c,v 1.18 2015/01/14 04:24:46 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - stats.c */
@@ -610,7 +610,6 @@ create_and_set_var( double val, char *prefix, char *base, char *suffix )
      */
     udv_ptr = add_udv_by_name(varname);
     udv_ptr->udv_value = data;
-    udv_ptr->udv_undef = FALSE;
 
     free( varname );
 }

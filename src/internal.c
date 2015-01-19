@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: internal.c,v 1.80 2014/09/09 03:37:34 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: internal.c,v 1.81 2014/12/03 21:27:34 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - internal.c */
@@ -88,7 +88,7 @@ f_push(union argument *x)
     struct udvt_entry *udv;
 
     udv = x->udv_arg;
-    if (udv->udv_undef) {
+    if (udv->udv_value.type == NOTDEFINED) {
 	if (string_result_only)
 	/* We're only here to check whether this is a string. It isn't. */
 	    udv = udv_NaN;
@@ -246,7 +246,6 @@ f_sum(union argument *arg)
     udv = get_udv_by_name(varname.v.string_val);
     if (!udv)
         int_error(NO_CARET, "internal error: f_sum could not access iteration variable.");
-    udv->udv_undef = false;
 
     udf = arg->udf_arg;
     if (!udf)
@@ -1748,10 +1747,8 @@ f_system(union argument *arg)
     FPRINTF((stderr," f_system input = \"%s\"\n", val.v.string_val));
 
     ierr = do_system_func(val.v.string_val, &output);
-    if ((errno_var = add_udv_by_name("ERRNO"))) {
-	errno_var->udv_undef = FALSE;
+    if ((errno_var = add_udv_by_name("ERRNO")))
 	Ginteger(&errno_var->udv_value, ierr);
-    }
     output_len = strlen(output);
 
     /* chomp result */
@@ -1782,10 +1779,8 @@ f_assign(union argument *arg)
 	    int_error(NO_CARET,"Attempt to assign to a read-only variable");
 	udv = add_udv_by_name(a.v.string_val);
 	gpfree_string(&a);
-	if (!udv->udv_undef)
-	    gpfree_string(&(udv->udv_value));
+	gpfree_string(&(udv->udv_value));
 	udv->udv_value = b;
-	udv->udv_undef = FALSE;
 	push(&b);
     } else {
 	int_error(NO_CARET, "attempt to assign to something other than a named variable");
@@ -1816,7 +1811,7 @@ f_value(union argument *arg)
     while (p) {
 	if (!strcmp(p->udv_name, a.v.string_val)) {
 	    result = p->udv_value;
-	    if (p->udv_undef)
+	    if (p->udv_value.type == NOTDEFINED)
 		p = NULL;
 	    else if (result.type == STRING)
 		result.v.string_val = gp_strdup(result.v.string_val);

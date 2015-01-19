@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: util.c,v 1.127 2014/05/09 22:14:12 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: util.c,v 1.128 2014/05/11 17:39:59 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - util.c */
@@ -162,7 +162,7 @@ type_udv(int t_num)
 
     while (*udv_ptr) {
 	if (equals(t_num, (*udv_ptr)->udv_name)) {
-	    if ((*udv_ptr)->udv_undef)
+	    if ((*udv_ptr)->udv_value.type == NOTDEFINED)
 		return 0;
 	    else
 		return (*udv_ptr)->udv_value.type;

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: mouse.c,v 1.174 2014/12/15 04:20:35 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: mouse.c,v 1.175 2014/12/31 19:53:19 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - mouse.c */
@@ -1128,11 +1128,9 @@ builtin_toggle_ruler(struct gp_event_t *ge)
 	MousePosToGraphPosReal(ruler.px, ruler.py, &ruler.x, &ruler.y, &ruler.x2, &ruler.y2);
 	(*term->set_ruler) (ruler.px, ruler.py);
 	if ((u = add_udv_by_name("MOUSE_RULER_X"))) {
-	    u->udv_undef = FALSE;
 	    Gcomplex(&u->udv_value,ruler.x,0);
 	}
 	if ((u = add_udv_by_name("MOUSE_RULER_Y"))) {
-	    u->udv_undef = FALSE;
 	    Gcomplex(&u->udv_value,ruler.y,0);
 	}
 	if (display_ipc_commands()) {
@@ -1367,7 +1365,6 @@ event_keypress(struct gp_event_t *ge, TBOOLEAN current)
 	if (bind_matches(&keypress, ptr)) {
 	    struct udvt_entry *keywin;
 	    if ((keywin = add_udv_by_name("MOUSE_KEY_WINDOW"))) {
-		keywin->udv_undef = FALSE;
 		Ginteger(&keywin->udv_value, ge->winid);
 	    }
 	    /* Always honor keys set with "bind all" */
@@ -2778,9 +2775,9 @@ turn_ruler_off()
 	    (*term->set_ruler) (-1, -1);
 	}
 	if ((u = add_udv_by_name("MOUSE_RULER_X")))
-	    u->udv_undef = TRUE;
+	    u->udv_value.type = NOTDEFINED;
 	if ((u = add_udv_by_name("MOUSE_RULER_Y")))
-	    u->udv_undef = TRUE;
+	    u->udv_value.type = NOTDEFINED;
 	if (display_ipc_commands()) {
 	    fprintf(stderr, "turning ruler off.\n");
 	}
@@ -2879,48 +2876,39 @@ load_mouse_variables(double x, double y, TBOOLEAN button, int c)
     MousePosToGraphPosReal(x, y, &real_x, &real_y, &real_x2, &real_y2);
 
     if ((current = add_udv_by_name("MOUSE_BUTTON"))) {
-	current->udv_undef = !button;
 	Ginteger(&current->udv_value, button?c:-1);
+	if (button)
+	    current->udv_value.type = NOTDEFINED;
     }
     if ((current = add_udv_by_name("MOUSE_KEY"))) {
-	current->udv_undef = FALSE;
 	Ginteger(&current->udv_value,c);
     }
     if ((current = add_udv_by_name("MOUSE_CHAR"))) {
 	char *keychar = gp_alloc(2,"key_char");
 	keychar[0] = c;
 	keychar[1] = '\0';
-	if (!current->udv_undef)
-	    gpfree_string(&current->udv_value);
-	current->udv_undef = FALSE;
+	gpfree_string(&current->udv_value);
 	Gstring(&current->udv_value,keychar);
     }
     if ((current = add_udv_by_name("MOUSE_X"))) {
-	current->udv_undef = FALSE;
 	Gcomplex(&current->udv_value,real_x,0);
     }
     if ((current = add_udv_by_name("MOUSE_Y"))) {
-	current->udv_undef = FALSE;
 	Gcomplex(&current->udv_value,real_y,0);
     }
     if ((current = add_udv_by_name("MOUSE_X2"))) {
-	current->udv_undef = FALSE;
 	Gcomplex(&current->udv_value,real_x2,0);
     }
     if ((current = add_udv_by_name("MOUSE_Y2"))) {
-	current->udv_undef = FALSE;
 	Gcomplex(&current->udv_value,real_y2,0);
     }
     if ((current = add_udv_by_name("MOUSE_SHIFT"))) {
-	current->udv_undef = FALSE;
 	Ginteger(&current->udv_value, modifier_mask & Mod_Shift);
     }
     if ((current = add_udv_by_name("MOUSE_ALT"))) {
-	current->udv_undef = FALSE;
 	Ginteger(&current->udv_value, modifier_mask & Mod_Alt);
     }
     if ((current = add_udv_by_name("MOUSE_CTRL"))) {
-	current->udv_undef = FALSE;
 	Ginteger(&current->udv_value, modifier_mask & Mod_Ctrl);
     }
     return;

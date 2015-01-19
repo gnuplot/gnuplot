@@ -1,6 +1,6 @@
 /*
- *  $Id: lua.trm,v 1.25 2014/10/29 03:27:46 sfeam Exp $
- *  $Date: 2014/10/29 03:27:46 $
+ *  $Id: lua.trm,v 1.26 2014/11/16 01:09:32 broeker Exp $
+ *  $Date: 2014/11/16 01:09:32 $
  *  $Rev: 99 $
  */
 
@@ -375,7 +375,7 @@ LUA_GP_get_all_variables(lua_State *L) {
       continue;
     }
     lua_newtable(L);
-    if (udv->udv_undef) {
+    if (udv->udv_value.type == NOTDEFINED) {
       lua_pushnil(L);
       lua_rawseti(L, -2, 2);
     } else {

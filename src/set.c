@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.473 2015/01/06 05:31:40 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.474 2015/01/19 22:10:59 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -1781,7 +1781,6 @@ set_fit()
 		value = real_expression();
 	    if ((value > 0.) && (value < 1.)) {
 		v = add_udv_by_name((char *)FITLIMIT);
-		v->udv_undef = FALSE;
 		Gcomplex(&v->udv_value, value, 0);
 	    } else {
 		del_udv_by_name((char *)FITLIMIT, FALSE);
@@ -1804,7 +1803,6 @@ set_fit()
 		maxiter = int_expression();
 	    if (maxiter > 0) {
 		v = add_udv_by_name((char *)FITMAXITER);
-		v->udv_undef = FALSE;
 		Ginteger(&v->udv_value, maxiter);
 	    } else {
 		del_udv_by_name((char *)FITMAXITER, FALSE);
@@ -1822,7 +1820,6 @@ set_fit()
 		value = real_expression();
 	    if (value > 0.) {
 		v = add_udv_by_name((char *)FITSTARTLAMBDA);
-		v->udv_undef = FALSE;
 		Gcomplex(&v->udv_value, value, 0);
 	    } else {
 		del_udv_by_name((char *)FITSTARTLAMBDA, FALSE);
@@ -1840,7 +1837,6 @@ set_fit()
 		value = real_expression();
 	    if (value > 0.) {
 		v = add_udv_by_name((char *)FITLAMBDAFACTOR);
-		v->udv_undef = FALSE;
 		Gcomplex(&v->udv_value, value, 0);
 	    } else {
 		del_udv_by_name((char *)FITLAMBDAFACTOR, FALSE);
@@ -4589,13 +4585,10 @@ set_table()
     if (equals(c_token, "$") && isletter(c_token + 1)) { /* datablock */
 	/* NB: has to come first because try_to_get_string will choke on the datablock name */
 	table_var = add_udv_by_name(parse_datablock_name());
-	if (!table_var->udv_undef) {
-	    gpfree_string(&table_var->udv_value);
-	    gpfree_datablock(&table_var->udv_value);
-	}
+	gpfree_string(&table_var->udv_value);
+	gpfree_datablock(&table_var->udv_value);
 	table_var->udv_value.type = DATABLOCK;
 	table_var->udv_value.v.data_array = NULL;
-	table_var->udv_undef = FALSE;
 
     } else if ((tablefile = try_to_get_string())) {  /* file name */
 	/* 'set table "foo"' creates a new output file */

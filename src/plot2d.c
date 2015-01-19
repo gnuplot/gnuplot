@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.346 2015/01/17 05:36:29 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.347 2015/01/17 18:17:48 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -2099,17 +2099,14 @@ eval_plots()
 		/* Store a pointer to the named variable used for sampling */
 		if (sample_range_token > 0) {
 		    this_plot->sample_var = add_udv(sample_range_token);
-		    this_plot->sample_var->udv_undef = FALSE;
 		} else {
 		    /* FIXME: This has the side effect of creating a named variable x */
 		    /* or overwriting an existing variable x.  Maybe it should save   */
 		    /* and restore the pre-existing variable in this case?            */
 		    this_plot->sample_var = add_udv_by_name(c_dummy_var[0]);
-		    if (this_plot->sample_var->udv_undef) {
-			this_plot->sample_var->udv_undef = FALSE;
-			Gcomplex(&(this_plot->sample_var->udv_value), 0.0, 0.0);
-		    }
 		}
+		if (this_plot->sample_var->udv_value.type == NOTDEFINED)
+		    Gcomplex(&(this_plot->sample_var->udv_value), 0.0, 0.0);
 
 		/* include modifiers in default title */
 		this_plot->token = end_token = c_token - 1;

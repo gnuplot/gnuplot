@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.231 2014/05/28 23:21:07 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.232 2014/09/05 21:51:38 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -1424,17 +1424,14 @@ eval_3dplots()
 		/*             is not being loaded with the variable name.		*/
 		if (sample_range_token > 0) {
 		    this_plot->sample_var = add_udv(sample_range_token);
-		    this_plot->sample_var->udv_undef = FALSE;
 		} else {
 		    /* FIXME: This has the side effect of creating a named variable x */
 		    /* or overwriting an existing variable x.  Maybe it should save   */
 		    /* and restore the pre-existing variable in this case?            */
 		    this_plot->sample_var = add_udv_by_name(c_dummy_var[0]);
-		    if (this_plot->sample_var->udv_undef) {
-			this_plot->sample_var->udv_undef = FALSE;
-			Gcomplex(&(this_plot->sample_var->udv_value), 0.0, 0.0);
-		    }
 		}
+		if (this_plot->sample_var->udv_value.type == NOTDEFINED)
+		    Gcomplex(&(this_plot->sample_var->udv_value), 0.0, 0.0);
 
 		/* for capture to key */
 		this_plot->token = end_token = c_token - 1;

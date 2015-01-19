@@ -3,6 +3,17 @@
 	* src/boundary.c src/set.c src/save.c: set/save/apply text justification
 	to key title.
 
+	* src/command.c src/datablock.c src/eval.c src/eval.h src/fit.c
+	src/gp_types.h src/internal.c src/misc.c src/mouse.c src/parse.c
+	src/plot2d.c src/plot3d.c src/plot.c src/save.c src/set.c src/show.c
+	src/standard.c src/stats.c src/term.c src/util.c term/lua.trm:
+	Move the "undefined" status flag from udvt_entry->udv_undef into
+	the value itself (udvt_entry->udv_value.type == NOTDEFINED).
+	This prevents coding mistakes which would leave a data type in the
+	value even though the variable itself is marked undefined.
+	Also it allows tracking or setting the undefined status in routines
+	that are passed a pointer to a value rather than a udvt_entry.
+
 2015-01-16  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/tabulate.c:  Tabular output of time/date values should check the

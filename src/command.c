@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.294 2014/12/14 19:39:36 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.295 2014/12/19 06:34:11 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -569,10 +569,8 @@ define()
 	udv = add_udv(start_token);
 	(void) const_express(&result);
 	/* Prevents memory leak if the variable name is re-used */
-	if (!udv->udv_undef)
-	    gpfree_string(&udv->udv_value);
+	gpfree_string(&udv->udv_value);
 	udv->udv_value = result;
-	udv->udv_undef = FALSE;
     }
 }
 
@@ -1430,10 +1428,8 @@ pause_command()
 
 	    /* Set the pause mouse return codes to -1 */
 	    current = add_udv_by_name("MOUSE_KEY");
-	    current->udv_undef = FALSE;
 	    Ginteger(&current->udv_value,-1);
 	    current = add_udv_by_name("MOUSE_BUTTON");
-	    current->udv_undef = FALSE;
 	    Ginteger(&current->udv_value,-1);
 	} else
 	    int_warn(NO_CARET,"Mousing not active");
@@ -1524,14 +1520,14 @@ plot_command()
     SET_CURSOR_WAIT;
 #ifdef USE_MOUSE
     plot_mode(MODE_PLOT);
-    add_udv_by_name("MOUSE_X")->udv_undef = TRUE;
-    add_udv_by_name("MOUSE_Y")->udv_undef = TRUE;
-    add_udv_by_name("MOUSE_X2")->udv_undef = TRUE;
-    add_udv_by_name("MOUSE_Y2")->udv_undef = TRUE;
-    add_udv_by_name("MOUSE_BUTTON")->udv_undef = TRUE;
-    add_udv_by_name("MOUSE_SHIFT")->udv_undef = TRUE;
-    add_udv_by_name("MOUSE_ALT")->udv_undef = TRUE;
-    add_udv_by_name("MOUSE_CTRL")->udv_undef = TRUE;
+    add_udv_by_name("MOUSE_X")->udv_value.type = NOTDEFINED;
+    add_udv_by_name("MOUSE_Y")->udv_value.type = NOTDEFINED;
+    add_udv_by_name("MOUSE_X2")->udv_value.type = NOTDEFINED;
+    add_udv_by_name("MOUSE_Y2")->udv_value.type = NOTDEFINED;
+    add_udv_by_name("MOUSE_BUTTON")->udv_value.type = NOTDEFINED;
+    add_udv_by_name("MOUSE_SHIFT")->udv_value.type = NOTDEFINED;
+    add_udv_by_name("MOUSE_ALT")->udv_value.type = NOTDEFINED;
+    add_udv_by_name("MOUSE_CTRL")->udv_value.type = NOTDEFINED;
 #endif
     plotrequest();
     SET_CURSOR_ARROW;
@@ -1590,7 +1586,7 @@ print_set_output(char *name, TBOOLEAN datablock, TBOOLEAN append_p)
 	    fprintf(stderr, "Error allocating datablock \"%s\"\n", name);
 	    return;
 	}
-	if (!print_out_var->udv_undef) {
+	if (print_out_var->udv_value.type != NOTDEFINED) {
 	    gpfree_string(&print_out_var->udv_value);
 	    if (!append_p)
 		gpfree_datablock(&print_out_var->udv_value);
@@ -1600,7 +1596,6 @@ print_set_output(char *name, TBOOLEAN datablock, TBOOLEAN append_p)
 	    print_out_var->udv_value.v.data_array = NULL;
 	}
 	print_out_var->udv_value.type = DATABLOCK;
-	print_out_var->udv_undef = FALSE;
     }
 
     print_out_name = name;
@@ -1897,11 +1892,11 @@ splot_command()
     SET_CURSOR_WAIT;
 #ifdef USE_MOUSE
     plot_mode(MODE_SPLOT);
-    add_udv_by_name("MOUSE_X")->udv_undef = TRUE;
-    add_udv_by_name("MOUSE_Y")->udv_undef = TRUE;
-    add_udv_by_name("MOUSE_X2")->udv_undef = TRUE;
-    add_udv_by_name("MOUSE_Y2")->udv_undef = TRUE;
-    add_udv_by_name("MOUSE_BUTTON")->udv_undef = TRUE;
+    add_udv_by_name("MOUSE_X")->udv_value.type = NOTDEFINED;
+    add_udv_by_name("MOUSE_Y")->udv_value.type = NOTDEFINED;
+    add_udv_by_name("MOUSE_X2")->udv_value.type = NOTDEFINED;
+    add_udv_by_name("MOUSE_Y2")->udv_value.type = NOTDEFINED;
+    add_udv_by_name("MOUSE_BUTTON")->udv_value.type = NOTDEFINED;
 #endif
     plot3drequest();
     SET_CURSOR_ARROW;
@@ -1986,11 +1981,10 @@ $PALETTE u 1:2 t 'red' w l lt 1 lc rgb 'red',\
 
     /* Store R/G/B/Int curves in a datablock */
     datablock = add_udv_by_name("$PALETTE");
-    if (!datablock->udv_undef)
+    if (datablock->udv_value.type != NOTDEFINED)
 	gpfree_datablock(&datablock->udv_value);
     datablock->udv_value.type = DATABLOCK;
     datablock->udv_value.v.data_array = NULL;
-    datablock->udv_undef = FALSE;
 
     for (i = 0; i < test_palette_colors; i++) {
 	char dataline[64];
@@ -3148,7 +3142,7 @@ expand_1level_macros()
 		    temp_char = *c; *c = '\0';
 		    /* Look up the key and restore the original following char */
 		    udv = get_udv_by_name(m);
-		    if (udv && !udv->udv_undef && udv->udv_value.type == STRING) {
+		    if (udv && udv->udv_value.type == STRING) {
 			nfound++;
 			m = udv->udv_value.v.string_val;
 			FPRINTF((stderr,"Replacing @%s with \"%s\"\n",udv->udv_name,m));

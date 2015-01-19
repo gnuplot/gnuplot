@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.335 2015/01/06 04:57:15 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.336 2015/01/06 05:31:40 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -2612,7 +2612,7 @@ show_fit()
     }
 
     v = get_udv_by_name((char *)FITLIMIT);
-    d = ((v != NULL) && (!v->udv_undef)) ? real(&(v->udv_value)) : -1.0;
+    d = ((v != NULL) && (v->udv_value.type != NOTDEFINED)) ? real(&(v->udv_value)) : -1.0;
     fprintf(stderr, "\tfits will be considered to have converged if  delta chisq < chisq * %g",
 	((d > 0.) && (d < 1.)) ? d : DEF_FIT_LIMIT);
     if (epsilon_abs > 0.)
@@ -2620,19 +2620,19 @@ show_fit()
     fprintf(stderr, "\n");
 
     v = get_udv_by_name((char *)FITMAXITER);
-    if ((v != NULL) && (!v->udv_undef) && (real_int(&(v->udv_value)) > 0))
+    if ((v != NULL) && (v->udv_value.type != NOTDEFINED) && (real_int(&(v->udv_value)) > 0))
 	fprintf(stderr, "\tfit will stop after a maximum of %i iterations\n",
 	        real_int(&(v->udv_value)));
     else
 	fprintf(stderr, "\tfit has no limit in the number of iterations\n");
 
     v = get_udv_by_name((char *)FITSTARTLAMBDA);
-    d = ((v != NULL) && (!v->udv_undef)) ? real(&(v->udv_value)) : -1.0;
+    d = ((v != NULL) && (v->udv_value.type != NOTDEFINED)) ? real(&(v->udv_value)) : -1.0;
     if (d > 0.)
 	fprintf(stderr, "\tfit will start with lambda = %g\n", d);
 
     v = get_udv_by_name((char *)FITLAMBDAFACTOR);
-    d = ((v != NULL) && (!v->udv_undef)) ? real(&(v->udv_value)) : -1.0;
+    d = ((v != NULL) && (v->udv_value.type != NOTDEFINED)) ? real(&(v->udv_value)) : -1.0;
     if (d > 0.)
 	fprintf(stderr, "\tfit will change lambda by a factor of %g\n", d);
 
@@ -2642,7 +2642,7 @@ show_fit()
 	fprintf(stderr, "\tfit will default to `unitweights` if no `error`keyword is given on the command line.\n");
     fprintf(stderr, "\tfit can run the following command when interrupted:\n\t\t'%s'\n", getfitscript());
     v = get_udv_by_name("GPVAL_LAST_FIT");
-    if (v != NULL && !v->udv_undef)
+    if (v != NULL && v->udv_value.type != NOTDEFINED)
 	fprintf(stderr, "\tlast fit command was: %s\n", v->udv_value.v.string_val);
 }
 
@@ -3163,7 +3163,7 @@ show_variables()
 	    udv = udv->next_udv;
 	    continue;
 	}
-	if (udv->udv_undef) {
+	if (udv->udv_value.type == NOTDEFINED) {
 	    FPRINTF((stderr, "\t%-*s is undefined\n", len, udv->udv_name));
 	} else {
 	    fprintf(stderr, "\t%-*s ", len, udv->udv_name);

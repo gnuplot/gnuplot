@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: fit.c,v 1.150 2014/09/21 02:54:54 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: fit.c,v 1.151 2014/10/04 22:22:27 sfeam Exp $"); }
 #endif
 
 /*  NOTICE: Change of Copyright Status
@@ -649,7 +649,7 @@ call_gnuplot(const double *par, double *data)
 	    if (!udv)
 		int_error(NO_CARET, "Internal error: lost a dummy parameter!");
 	    Gcomplex(&func.dummy_values[j],
-	             udv->udv_undef ? 0 : real(&(udv->udv_value)),
+	             udv->udv_value.type == NOTDEFINED ? 0 : real(&(udv->udv_value)),
 	             0.0);
 	}
 	/* set actual dummy variables from file data */
@@ -806,7 +806,6 @@ regress_init(void)
 
     /* Reset flag describing fit result status */
     v = add_udv_by_name("FIT_CONVERGED");
-    v->udv_undef = FALSE;
     Ginteger(&v->udv_value, 0);
 
     /* Ctrl-C now serves as Hotkey */
@@ -870,7 +869,6 @@ regress_finalize(int iter, double chisq, double last_chisq, double lambda, doubl
     } else {
 	Dblf2("\nAfter %d iterations the fit converged.\n", iter);
 	v = add_udv_by_name("FIT_CONVERGED");
-	v->udv_undef = FALSE;
 	Ginteger(&v->udv_value, 1);
     }
 
@@ -882,19 +880,14 @@ regress_finalize(int iter, double chisq, double last_chisq, double lambda, doubl
 
     /* Export these to user-accessible variables */
     v = add_udv_by_name("FIT_NDF");
-    v->udv_undef = FALSE;
     Ginteger(&v->udv_value, ndf);
     v = add_udv_by_name("FIT_STDFIT");
-    v->udv_undef = FALSE;
     Gcomplex(&v->udv_value, stdfit, 0);
     v = add_udv_by_name("FIT_WSSR");
-    v->udv_undef = FALSE;
     Gcomplex(&v->udv_value, chisq, 0);
     v = add_udv_by_name("FIT_P");
-    v->udv_undef = FALSE;
     Gcomplex(&v->udv_value, pvalue, 0);
     v = add_udv_by_name("FIT_NITER");
-    v->udv_undef = FALSE;
     Ginteger(&v->udv_value, niter);    
 
     /* Save final parameters. Depending on the backend and
@@ -1427,7 +1420,7 @@ static int
 getivar(const char *varname)
 {
     struct udvt_entry * v = get_udv_by_name((char *)varname);
-    if ((v != NULL) && (!v->udv_undef))
+    if ((v != NULL) && (v->udv_value.type != NOTDEFINED))
 	return real_int(&(v->udv_value));
     else
 	return 0;
@@ -1441,7 +1434,7 @@ static double
 getdvar(const char *varname)
 {
     struct udvt_entry * v = get_udv_by_name((char *)varname);
-    if ((v != NULL) && (!v->udv_undef))
+    if ((v != NULL) && (v->udv_value.type != NOTDEFINED))
 	return real(&(v->udv_value));
     else
 	return 0;
@@ -1457,8 +1450,7 @@ static double
 createdvar(char *varname, double value)
 {
     struct udvt_entry *udv_ptr = add_udv_by_name((char *)varname);
-    if (udv_ptr->udv_undef) { /* new variable */
-	udv_ptr->udv_undef = FALSE;
+    if (udv_ptr->udv_value.type == NOTDEFINED) { /* new variable */
 	Gcomplex(&udv_ptr->udv_value, value, 0.0);
     } else if (udv_ptr->udv_value.type == INTGR) { /* convert to CMPLX */
 	Gcomplex(&udv_ptr->udv_value, (double) udv_ptr->udv_value.v.int_val, 0.0);
@@ -1543,8 +1535,7 @@ update(char *pfile, char *npfile)
 		udv = udv->next_udv;
 		continue;
 	    }
-	    if (!udv->udv_undef &&
-	        ((udv->udv_value.type == INTGR) || (udv->udv_value.type == CMPLX))) {
+	    if ((udv->udv_value.type == INTGR) || (udv->udv_value.type == CMPLX)) {
 		int k;
 
 		/* ignore indep. variables */

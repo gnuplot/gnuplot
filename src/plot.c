@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot.c,v 1.164 2014/06/15 09:14:15 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot.c,v 1.165 2014/12/14 19:39:38 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - plot.c */
@@ -725,7 +725,6 @@ init_constants()
     (void) Gcomplex(&udv_pi.udv_value, M_PI, 0.0);
     udv_NaN = get_udv_by_name("NaN");
     (void) Gcomplex(&(udv_NaN->udv_value), not_a_number(), 0.0);
-    udv_NaN->udv_undef = FALSE;
 }
 
 /*

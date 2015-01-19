@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.270 2015/01/12 04:02:43 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.271 2015/01/19 22:10:59 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -135,7 +135,7 @@ save_variables__sub(FILE *fp)
     struct udvt_entry *udv = first_udv->next_udv;
 
     while (udv) {
-	if (!udv->udv_undef) {
+	if (udv->udv_value.type != NOTDEFINED) {
 	    if (strncmp(udv->udv_name,"GPVAL_",6)
 	     && strncmp(udv->udv_name,"MOUSE_",6)
 	     && strncmp(udv->udv_name,"$",1)
@@ -1028,7 +1028,7 @@ set origin %g,%g\n",
 	int i;
 
 	v = get_udv_by_name((char *)FITLIMIT);
-	d = ((v != NULL) && (!v->udv_undef)) ? real(&(v->udv_value)) : -1.0;
+	d = ((v != NULL) && (v->udv_value.type != NOTDEFINED)) ? real(&(v->udv_value)) : -1.0;
 	if ((d > 0.) && (d < 1.))
 	    fprintf(fp, " limit %g", d);
 
@@ -1036,17 +1036,17 @@ set origin %g,%g\n",
 	    fprintf(fp, " limit_abs %g", epsilon_abs);
 
 	v = get_udv_by_name((char *)FITMAXITER);
-	i = ((v != NULL) && (!v->udv_undef)) ? real_int(&(v->udv_value)) : -1;
+	i = ((v != NULL) && (v->udv_value.type != NOTDEFINED)) ? real_int(&(v->udv_value)) : -1;
 	if (i > 0)
 	    fprintf(fp, " maxiter %i", i);
 
 	v = get_udv_by_name((char *)FITSTARTLAMBDA);
-	d = ((v != NULL) && (!v->udv_undef)) ? real(&(v->udv_value)) : -1.0;
+	d = ((v != NULL) && (v->udv_value.type != NOTDEFINED)) ? real(&(v->udv_value)) : -1.0;
 	if (d > 0.)
 	    fprintf(fp, " start_lambda %g", d);
 
 	v = get_udv_by_name((char *)FITLAMBDAFACTOR);
-	d = ((v != NULL) && (!v->udv_undef)) ? real(&(v->udv_value)) : -1.0;
+	d = ((v != NULL) && (v->udv_value.type != NOTDEFINED)) ? real(&(v->udv_value)) : -1.0;
 	if (d > 0.)
 	    fprintf(fp, " lambda_factor %g", d);
     }

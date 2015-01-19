@@ -1,5 +1,5 @@
 /*
- * $Id: datablock.c,v 1.4 2014/03/23 13:27:27 markisch Exp $
+ * $Id: datablock.c,v 1.5 2014/04/05 06:17:08 markisch Exp $
  */
 /* GNUPLOT - datablock.c */
 
@@ -102,9 +102,8 @@ datablock_command()
     name = parse_datablock_name();
     datablock = add_udv_by_name(name);
 
-    if (!datablock->udv_undef)
+    if (datablock->udv_value.type != NOTDEFINED)
 	gpfree_datablock(&datablock->udv_value);
-    datablock->udv_undef = FALSE;
     datablock->udv_value.type = DATABLOCK;
     datablock->udv_value.v.data_array = NULL;
 
@@ -174,7 +173,7 @@ get_datablock(char *name)
     struct udvt_entry *datablock;
 
     datablock = get_udv_by_name(name);
-    if (!datablock || datablock->udv_undef
+    if (!datablock || datablock->udv_value.type == NOTDEFINED
     ||  datablock->udv_value.v.data_array == NULL)
 	int_error(NO_CARET,"no datablock named %s",name);
 

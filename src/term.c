@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.301 2014/12/14 19:39:38 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.302 2015/01/17 05:29:46 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -1641,7 +1641,6 @@ init_terminal()
 	struct udvt_entry *name = add_udv_by_name("GNUTERM");
 
 	Gstring(&name->udv_value, gp_strdup(term_name));
-	name->udv_undef = FALSE;
 
 	if (strchr(term_name,' '))
 	    namelength = strchr(term_name,' ') - term_name;

@@ -1,5 +1,5 @@
 /*
- * $Id: eval.h,v 1.45 2014/02/28 00:24:20 sfeam Exp $
+ * $Id: eval.h,v 1.46 2014/03/10 01:28:37 sfeam Exp $
  */
 
 /* GNUPLOT - eval.h */
@@ -87,7 +87,6 @@ typedef struct udft_entry {
 typedef struct udvt_entry {
     struct udvt_entry *next_udv; /* pointer to next value in linked list */
     char *udv_name;		/* name of this value entry */
-    TBOOLEAN udv_undef;		/* true if not defined yet */
     t_value udv_value;		/* value it has */
 } udvt_entry;
 
