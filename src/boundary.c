@@ -1,5 +1,5 @@
 /*
- * $Id: boundary.c,v 1.17 2015/01/02 06:12:02 sfeam Exp $
+ * $Id: boundary.c,v 1.18 2015/01/06 04:57:15 sfeam Exp $
  */
 
 /* GNUPLOT - boundary.c */
@@ -1380,7 +1380,13 @@ draw_key(legend_key *key, TBOOLEAN key_pass, int *xinkey, int *yinkey)
     }
 
     if (key->title.text) {
-	int center = (key->bounds.xleft + key->bounds.xright) / 2;
+	int title_anchor;
+	if (key->title.pos == CENTRE)
+		title_anchor = (key->bounds.xleft + key->bounds.xright) / 2;
+	else if (key->title.pos == RIGHT)
+		title_anchor = key->bounds.xright - term->h_char;
+	else
+		title_anchor = key->bounds.xleft + term->h_char;
 
 	/* Only draw the title once */
 	if (key_pass || !key->front) {
@@ -1391,8 +1397,9 @@ draw_key(legend_key *key, TBOOLEAN key_pass, int *xinkey, int *yinkey)
 	    else
 		apply_pm3dcolor(&(key->textcolor));
 	    ignore_enhanced(key->title.noenhanced);
-	    write_multiline(center, key->bounds.ytop - (key_title_extra + key_entry_height)/2,
-			key->title.text, CENTRE, JUST_TOP, 0, 
+	    write_multiline(title_anchor, 
+			key->bounds.ytop - (key_title_extra + key_entry_height)/2,
+			key->title.text, key->title.pos, JUST_TOP, 0, 
 			key->title.font ? key->title.font : key->font);
 	    ignore_enhanced(FALSE);
 	    (*t->linetype)(LT_BLACK);

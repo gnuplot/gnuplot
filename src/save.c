@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.269 2015/01/06 05:05:14 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.270 2015/01/12 04:02:43 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -176,6 +176,21 @@ save_term(FILE *fp)
 	fputs("#    EOF\n", fp);
 }
 
+static void
+save_justification(int just, FILE *fp)
+{
+    switch (just) {
+	case RIGHT:
+	    fputs(" right", fp);
+	    break;
+	case LEFT:
+	    fputs(" left", fp);
+	    break;
+	case CENTRE:
+	    fputs(" center", fp);
+	    break;
+    }
+}
 
 static void
 save_set_all(FILE *fp)
@@ -360,7 +375,8 @@ set bar %f %s\n",
 
     fprintf(fp, "set key title \"%s\"", conv_text(key->title.text));
     if (key->title.font)
-	fprintf(fp, " font \"%s\"", key->title.font);
+	fprintf(fp, " font \"%s\" ", key->title.font);
+    save_justification(key->title.pos, fp);
     fputs("\n", fp);
 
     fputs("set key ", fp);
@@ -394,17 +410,7 @@ set bar %f %s\n",
     }
     if (!(key->region == GPKEY_AUTO_EXTERIOR_MARGIN
 	      && (key->margin == GPKEY_LMARGIN || key->margin == GPKEY_RMARGIN))) {
-	switch (key->hpos) {
-	    case RIGHT:
-		fputs(" right", fp);
-		break;
-	    case LEFT:
-		fputs(" left", fp);
-		break;
-	    case CENTRE:
-		fputs(" center", fp);
-		break;
-	}
+	save_justification(key->hpos, fp);
     }
     if (!(key->region == GPKEY_AUTO_EXTERIOR_MARGIN
 	      && (key->margin == GPKEY_TMARGIN || key->margin == GPKEY_BMARGIN))) {
@@ -461,17 +467,7 @@ set bar %f %s\n",
 	if (this_label->hypertext)
 	    fprintf(fp, " hypertext");
 
-	switch (this_label->pos) {
-	case LEFT:
-	    fputs(" left", fp);
-	    break;
-	case CENTRE:
-	    fputs(" centre", fp);
-	    break;
-	case RIGHT:
-	    fputs(" right", fp);
-	    break;
-	}
+	save_justification(this_label->pos, fp);
 	if (this_label->rotate)
 	    fprintf(fp, " rotate by %d", this_label->rotate);
 	else
@@ -1083,22 +1079,9 @@ save_tics(FILE *fp, AXIS_INDEX axis)
     if (axis_array[axis].tic_rotate)
 	fprintf(fp,"by %d ",axis_array[axis].tic_rotate);
     save_position(fp, &axis_array[axis].ticdef.offset, TRUE);
-    if (axis_array[axis].manual_justify) {
-	switch (axis_array[axis].label.pos) {
-	case LEFT:{
-		fputs(" left", fp);
-		break;
-	    }
-	case RIGHT:{
-		fputs(" right", fp);
-		break;
-	    }
-	case CENTRE:{
-		fputs(" center", fp);
-		break;
-	    }
-	}
-    } else
+    if (axis_array[axis].manual_justify)
+	save_justification(axis_array[axis].label.pos, fp);
+    else
 	fputs(" autojustify", fp);
     fprintf(fp, "\nset %stics ", axis_name(axis));
 
