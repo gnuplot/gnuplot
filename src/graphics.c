@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.472 2015/01/15 20:23:28 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.471 2015/01/08 05:10:07 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -1107,10 +1107,16 @@ finish_filled_curve(
 		    /* should be mapping real y1axis/graph/screen => screen */
 		points++;
 		break;
-	case FILLEDCURVES_BETWEEN:
-	case FILLEDCURVES_ATR:
 	case FILLEDCURVES_ATY1:
 	case FILLEDCURVES_ATY2:
+		corners[points].y = map_y(filledcurves_options->at);
+		corners[points+1].y = corners[points].y;
+		corners[points].x = corners[points-1].x;
+		corners[points+1].x = corners[0].x;
+		points += 2;
+		/* Fall through */
+	case FILLEDCURVES_BETWEEN:
+	case FILLEDCURVES_ATR:
 		side = (corners[points].x > 0) ? 1 : -1;
 
 		/* Prevent 1-pixel overlap of component rectangles, which */
