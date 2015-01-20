@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: interpol.c,v 1.46 2014/05/09 22:14:11 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: interpol.c,v 1.47 2014/09/25 00:55:40 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - interpol.c */
@@ -194,7 +194,7 @@ static spline_coeff *cp_approx_spline __PROTO((struct curve_points * plot, int f
 static spline_coeff *cp_tridiag __PROTO((struct curve_points * plot, int first_point, int num_points));
 static void do_cubic __PROTO((struct curve_points * plot, spline_coeff * sc, int first_point, int num_points, struct coordinate * dest));
 static void do_freq __PROTO((struct curve_points *plot,	int first_point, int num_points));
-int compare_points __PROTO((SORTFUNC_ARGS p1, SORTFUNC_ARGS p2));
+static int compare_points __PROTO((SORTFUNC_ARGS p1, SORTFUNC_ARGS p2));
 
 
 /*
@@ -1159,8 +1159,7 @@ gen_interp(struct curve_points *plot)
 /* HBB 20010720: To avoid undefined behaviour that would be caused by
  * casting functions pointers around, changed arguments to what
  * qsort() *really* wants */
-/* HBB 20010720: removed 'static' to avoid HP-sUX gcc bug */
-int
+static int
 compare_points(SORTFUNC_ARGS arg1, SORTFUNC_ARGS arg2)
 {
     struct coordinate const *p1 = arg1;

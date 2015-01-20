@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: parse.c,v 1.90 2014/10/05 04:24:32 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: parse.c,v 1.91 2015/01/20 02:10:42 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - parse.c */
@@ -471,10 +471,7 @@ parse_primary_expression()
 	}
 	add_action(DOLLARS)->v_arg = a;
     } else if (isanumber(c_token)) {
-	/* work around HP 9000S/300 HP-UX 9.10 cc limitation ... */
-	/* HBB 20010724: use this code for all platforms, then */
 	union argument *foo = add_action(PUSHC);
-
 	convert(&(foo->v_arg), c_token);
 	c_token++;
     } else if (isletter(c_token)) {

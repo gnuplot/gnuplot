@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.471 2015/01/08 05:10:07 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.474 2015/01/20 22:46:03 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -121,10 +121,9 @@ static void plot_histeps __PROTO((struct curve_points * plot));	/* CAC */
 static int edge_intersect __PROTO((struct coordinate GPHUGE * points, int i, double *ex, double *ey));
 static TBOOLEAN two_edge_intersect __PROTO((struct coordinate GPHUGE * points, int i, double *lx, double *ly));
 
-/* HBB 20010118: these should be static, but can't --- HP-UX assembler bug */
-void ytick2d_callback __PROTO((AXIS_INDEX, double place, char *text, int ticlevel, struct lp_style_type grid, struct ticmark *userlabels));
-void xtick2d_callback __PROTO((AXIS_INDEX, double place, char *text, int ticlevel, struct lp_style_type grid, struct ticmark *userlabels));
-int histeps_compare __PROTO((SORTFUNC_ARGS p1, SORTFUNC_ARGS p2));
+static void ytick2d_callback __PROTO((AXIS_INDEX, double place, char *text, int ticlevel, struct lp_style_type grid, struct ticmark *userlabels));
+static void xtick2d_callback __PROTO((AXIS_INDEX, double place, char *text, int ticlevel, struct lp_style_type grid, struct ticmark *userlabels));
+static int histeps_compare __PROTO((SORTFUNC_ARGS p1, SORTFUNC_ARGS p2));
 
 static void get_arrow __PROTO((struct arrow_def* arrow, int* sx, int* sy, int* ex, int* ey));
 static void map_position_double __PROTO((struct position* pos, double* x, double* y, const char* what));
@@ -1039,8 +1038,7 @@ plot_lines(struct curve_points *plot)
 }
 
 /* plot_filledcurves:
- * Plot FILLED curves.
- * pm 8.9.2001 (main routine); pm 5.1.2002 (full support for options)
+ *        {closed | {above | below} {x1 | x2 | y1 | y2 | r}[=<a>] | xy=<x>,<y>}
  */
 
 /* finalize and draw the filled curve */
@@ -1133,17 +1131,6 @@ finish_filled_curve(
 	default: /* the polygon is closed by default */
 		break;
     }
-
-#if 0
-    { /* for debugging purposes */
-    int i;
-    fprintf(stderr, "List of %i corners:\n", points);
-    for (i=0; i<points; i++)
-	fprintf(stderr, "%2i: %3i,%3i | ", i, corners[i].x, corners[i].y);
-    fprintf(stderr, " side = %ld",side);
-    fprintf(stderr, "\n");
-    }
-#endif
 
     /* Check for request to fill only on one side of a bounding line */
     if (filledcurves_options->oneside > 0 && side < 0)
@@ -1487,9 +1474,7 @@ plot_fsteps(struct curve_points *plot)
  * about the plotted dataset via this file scope variable: */
 static struct curve_points *histeps_current_plot;
 
-/* NOTE: I'd have made the comp.function 'static', but the HP-sUX gcc
- * bug seems to forbid that :-( */
-int
+static int
 histeps_compare(SORTFUNC_ARGS p1, SORTFUNC_ARGS p2)
 {
     double x1 = histeps_current_plot->points[*(int *)p1].x;
@@ -3248,13 +3233,9 @@ two_edge_intersect(
 }
 
 
-/* HBB 20010118: all the *_callback() functions made non-static. This
- * is necessary to work around a bug in HP's assembler shipped with
- * HP-UX 10 and higher, if GCC tries to use it */
-
 /* display a x-axis ticmark - called by gen_ticks */
 /* also uses global tic_start, tic_direction, tic_text and tic_just */
-void
+static void
 xtick2d_callback(
     AXIS_INDEX axis,
     double place,
@@ -3361,7 +3342,7 @@ xtick2d_callback(
 
 /* display a y-axis ticmark - called by gen_ticks */
 /* also uses global tic_start, tic_direction, tic_text and tic_just */
-void
+static void
 ytick2d_callback(
     AXIS_INDEX axis,
     double place,

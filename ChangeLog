@@ -3,6 +3,11 @@
 	* src/graphics.c:  Restore several lines of code that were inadvertantly
 	lost in the revision to filledcurve processing (2015-01-16).
 
+	* src/graphics.c src/help.c src/hidden3d.c src/interpol.c src/color.c
+	src/graph3d.c:  Back in 2001 some comparator functions passed to qsort
+	were made non-static to work around a bug in HPUX. The reason for that
+	is long gone, so make them static as they ought to be.
+
 2015-01-19  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/boundary.c src/set.c src/save.c: set/save/apply text justification

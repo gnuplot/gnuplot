@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: color.c,v 1.114 2014/05/13 18:26:40 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: color.c,v 1.115 2014/10/01 04:40:52 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - color.c */
@@ -51,7 +51,7 @@ static t_sm_palette prev_palette = {
 
 static void draw_inside_color_smooth_box_postscript __PROTO((void));
 static void draw_inside_color_smooth_box_bitmap __PROTO((void));
-void cbtick_callback __PROTO((AXIS_INDEX axis, double place, char *text, int ticlevel,
+static void cbtick_callback __PROTO((AXIS_INDEX axis, double place, char *text, int ticlevel,
 			struct lp_style_type grid, struct ticmark *userlabels));
 
 
@@ -426,9 +426,7 @@ draw_inside_color_smooth_box_bitmap()
     }
 }
 
-/* Notice HBB 20010720: would be static, but HP-UX gcc bug forbids
- * this, for now */
-void
+static void
 cbtick_callback(
     AXIS_INDEX axis,
     double place,

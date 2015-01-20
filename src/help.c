@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: help.c,v 1.28 2012/11/29 00:12:57 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: help.c,v 1.29 2014/01/16 18:30:34 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - help.c */
@@ -146,7 +146,7 @@ static KEY empty_key = {NULL, 0, NULL, 0};
 
 static int LoadHelp __PROTO((char *path));
 static void sortkeys __PROTO((void));
-int keycomp __PROTO((SORTFUNC_ARGS a, SORTFUNC_ARGS b));
+static int keycomp __PROTO((SORTFUNC_ARGS a, SORTFUNC_ARGS b));
 static LINEBUF *storeline __PROTO((char *text));
 static LINKEY *storekey __PROTO((char *key));
 static KEY *FindHelp __PROTO((char *keyword));
@@ -351,8 +351,7 @@ sortkeys()
 /* HBB 20010720: changed to make this match the prototype qsort()
  * really expects. Casting function pointers, as we did before, is
  * illegal! */
-/* HBB 20010720: removed 'static' to avoid HP-sUX gcc bug */
-int
+static int
 keycomp(SORTFUNC_ARGS arg1, SORTFUNC_ARGS arg2)
 {
     const KEY *a = arg1;

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.316 2015/01/02 06:12:02 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.317 2015/01/06 04:57:15 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -137,12 +137,12 @@ static void setup_3d_box_corners __PROTO((void));
 static void draw_3d_graphbox __PROTO((struct surface_points * plot,
 				      int plot_count,
 				      WHICHGRID whichgrid, int current_layer));
-/* HBB 20010118: these should be static, but can't --- HP-UX assembler bug */
-void xtick_callback __PROTO((AXIS_INDEX, double place, char *text, int ticlevel,
+
+static void xtick_callback __PROTO((AXIS_INDEX, double place, char *text, int ticlevel,
 			     struct lp_style_type grid, struct ticmark *userlabels));
-void ytick_callback __PROTO((AXIS_INDEX, double place, char *text, int ticlevel,
+static void ytick_callback __PROTO((AXIS_INDEX, double place, char *text, int ticlevel,
 			     struct lp_style_type grid, struct ticmark *userlabels));
-void ztick_callback __PROTO((AXIS_INDEX, double place, char *text, int ticlevel,
+static void ztick_callback __PROTO((AXIS_INDEX, double place, char *text, int ticlevel,
 			     struct lp_style_type grid, struct ticmark *userlabels));
 
 static int find_maxl_cntr __PROTO((struct gnuplot_contours * contours, int *count));
@@ -2582,11 +2582,7 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid,
     clip_area = clip_save;
 }
 
-/* HBB 20010118: all the *_callback() functions made non-static. This
- * is necessary to work around a bug in HP's assembler shipped with
- * HP-UX 10 and higher, if GCC tries to use it */
-
-void
+static void
 xtick_callback(
     AXIS_INDEX axis,
     double place,
@@ -2712,7 +2708,7 @@ xtick_callback(
     }
 }
 
-void
+static void
 ytick_callback(
     AXIS_INDEX axis,
     double place,
@@ -2835,7 +2831,7 @@ ytick_callback(
     }
 }
 
-void
+static void
 ztick_callback(
     AXIS_INDEX axis,
     double place,

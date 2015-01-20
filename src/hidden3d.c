@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.102 2014/10/01 01:05:20 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.103 2014/10/01 04:40:53 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - hidden3d.c */
@@ -303,8 +303,8 @@ static void color_edges __PROTO((long int new_edge, long int old_edge,
 				 int style_above, int style_below));
 static void build_networks __PROTO((struct surface_points * plots,
 				    int pcount));
-int compare_edges_by_zmin __PROTO((SORTFUNC_ARGS p1, SORTFUNC_ARGS p2));
-int compare_polys_by_zmax __PROTO((SORTFUNC_ARGS p1, SORTFUNC_ARGS p2));
+static int compare_edges_by_zmin __PROTO((SORTFUNC_ARGS p1, SORTFUNC_ARGS p2));
+static int compare_polys_by_zmax __PROTO((SORTFUNC_ARGS p1, SORTFUNC_ARGS p2));
 static void sort_edges_by_z __PROTO((void));
 static void sort_polys_by_z __PROTO((void));
 static TBOOLEAN get_plane __PROTO((p_polygon p, t_plane plane));
@@ -1510,8 +1510,7 @@ build_networks(struct surface_points *plots, int pcount)
 /* Sort the elist in order of growing zmax. Uses qsort on an array of
  * plist indices, and then fills in the 'next' fields in struct
  * polygon to store the resulting order inside the plist */
-/* HBB 20010720: removed 'static' to avoid HP-sUX gcc bug */
-int
+static int
 compare_edges_by_zmin(SORTFUNC_ARGS p1, SORTFUNC_ARGS p2)
 {
     return SIGN(vlist[elist[*(const long *) p1].v2].z
@@ -1549,8 +1548,7 @@ sort_edges_by_z()
     free(sortarray);
 }
 
-/* HBB 20010720: removed 'static' to avoid HP-sUX gcc bug */
-int
+static int
 compare_polys_by_zmax(SORTFUNC_ARGS p1, SORTFUNC_ARGS p2)
 {
     return (SIGN(plist[*(const long *) p1].zmax
