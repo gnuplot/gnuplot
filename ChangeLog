@@ -1,3 +1,8 @@
+2015-01-20  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/graphics.c:  Restore several lines of code that were inadvertantly
+	lost in the revision to filledcurve processing (2015-01-16).
+
 2015-01-19  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/boundary.c src/gadgets.h src/graph3d.c src/save.c src/set.c
