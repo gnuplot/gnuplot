@@ -22,42 +22,42 @@ circles.html: $(GNUPLOT_LIB)/hidden2.dem ./webify.pl
 	export DEMOTERM="pngcairo truecolor font 'arial,8' size 500,300"; ./webify.pl circles
 
 cities.html: $(GNUPLOT_LIB)/cities.dem ./webify.pl
-	export DEMOTERM="png font 'Times,8' fontscale 2.5 size 500,500"; ./webify.pl cities
+	export DEMOTERM="pngcairo font 'Times,8' fontscale 2.5 size 500,500"; ./webify.pl cities
 
 ellipse.html: random.html
 
 hidden2.html: $(GNUPLOT_LIB)/hidden2.dem ./webify.pl
-	export DEMOTERM="png truecolor font 'arial,8' size 450,320"; ./webify.pl hidden2
+	export DEMOTERM="pngcairo font 'arial,8' size 540,384"; ./webify.pl hidden2
 
 image.html: $(GNUPLOT_LIB)/image.dem ./webify.pl
-	export DEMOTERM="png truecolor font 'arial,8' size 450,320"; ./webify.pl image
+	export DEMOTERM="pngcairo font 'arial,8' size 540,384"; ./webify.pl image
 
 image2.html: $(GNUPLOT_LIB)/image2.dem ./webify.pl
-	export DEMOTERM="png truecolor font 'arial,8' size 450,320"; ./webify.pl image2
+	export DEMOTERM="pngcairo font 'arial,8' size 540,384"; ./webify.pl image2
 
 rgbalpha.html: $(GNUPLOT_LIB)/rgbalpha.dem ./webify.pl
-	export DEMOTERM="png truecolor font 'arial,8' size 450,300"; ./webify.pl rgbalpha
+	export DEMOTERM="pngcairo font 'arial,8' size 540,360"; ./webify.pl rgbalpha
 
 rgb_variable.html: $(GNUPLOT_LIB)/rgb_variable.dem ./webify.pl
-	export DEMOTERM="png truecolor font 'arial,8' size 450,300"; ./webify.pl rgb_variable
+	export DEMOTERM="pngcairo font 'arial,8' size 540,360"; ./webify.pl rgb_variable
 
 rugplot.html: random.html
 
 finance.html: $(GNUPLOT_LIB)/finance.dem ./webify.pl
-	export DEMOTERM="png enhanced transparent font 'arial,8' size 660,320"; ./webify.pl finance
+	export DEMOTERM="pngcairo transparent font 'arial,8' size 660,320"; ./webify.pl finance
 
 linkedaxes.html: $(GNUPLOT_LIB)/linkedaxes.dem ./webify.pl
 	export DEMOTERM="pngcairo enhanced font 'arial,9' size 610,320"; ./webify.pl linkedaxes 
 
 
 multiplt.html: $(GNUPLOT_LIB)/multiplt.dem ./webify.pl
-	export DEMOTERM="png enhanced transparent font 'arial,8' size 610,480"; ./webify.pl multiplt
+	export DEMOTERM="pngcairo transparent font 'arial,8' size 610,480"; ./webify.pl multiplt
 
 transparent.html: $(GNUPLOT_LIB)/transparent.dem ./webify.pl
-	export DEMOTERM="png enhanced transparent truecolor font 'arial,8' size 512,280"; ./webify.pl transparent
+	export DEMOTERM="pngcairo transparent truecolor font 'arial,8' size 512,280"; ./webify.pl transparent
 
 transparent_solids.html: $(GNUPLOT_LIB)/transparent_solids.dem ./webify.pl
-	export DEMOTERM="png enhanced truecolor font 'arial,9' size 512,384"; ./webify.pl transparent_solids
+	export DEMOTERM="pngcairo truecolor font 'arial,9' size 512,384"; ./webify.pl transparent_solids
 
 # The png terminal does not support dashed lines, so let's use pngcairo
 lines_arrows.html: $(GNUPLOT_LIB)/lines_arrows.dem ./webify.pl
