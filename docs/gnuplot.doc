@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.902.2.25 2014/12/31 19:45:55 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.902.2.26 2015/01/10 05:33:51 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -9363,8 +9363,7 @@ Ffigure_missing
        plot "datafile" using (($2+$3)/$4) title columnhead(3) with lines
 
  An overall title can be put on the key (`title "<text>"`)---see also `syntax`
- for the distinction between text in single- or double-quotes.  The key title
- uses the same justification as do the plot titles.
+ for the distinction between text in single- or double-quotes. 
 
  The defaults for `set key` are `on`, `right`, `top`, `vertical`, `Right`,
  `noreverse`, `noinvert`, `samplen 4`, `spacing 1.25`, `title ""`, and
