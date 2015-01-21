@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.933 2015/01/10 05:34:04 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.934 2015/01/19 20:36:23 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -9305,7 +9305,7 @@ Ffigure_missing
              {samplen <sample_length>} {spacing <vertical_spacing>}
              {width <width_increment>} {height <height_increment>}
              {{no}autotitle {columnheader}}
-             {title {"<text>"} {{no}enhanced}}
+             {title {"<text>"} {{no}enhanced} {center | left | right}}
              {font "<face>,<size>"} {textcolor <colorspec>}
              {{no}box {linestyle <style> | linetype <type> | linewidth <width>}}
              {maxcols {<max no. of columns> | auto}}
@@ -9372,7 +9372,9 @@ Ffigure_missing
        plot "datafile" using (($2+$3)/$4) title columnhead(3) with lines
 
  An overall title can be put on the key (`title "<text>"`)---see also `syntax`
- for the distinction between text in single- or double-quotes.
+ for the distinction between text in single- or double-quotes. The justification
+ of the title defaults to center and can be changed by the keywords `right` or
+ `left`
 
  The defaults for `set key` are `on`, `right`, `top`, `vertical`, `Right`,
  `noreverse`, `noinvert`, `samplen 4`, `spacing 1.25`, `title ""`, and
