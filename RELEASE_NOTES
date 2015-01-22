@@ -185,7 +185,7 @@ Obsolete or deprecated components
 ---------------------------------
 
 The "gnuplot mode" elisp and TeX files for use with emacs are now
-maintained as a separate project: https://github.com/rudi/gnuplot-el
+maintained as a separate project: https://github.com/bruceravel/gnuplot-mode
 so there is no longer a configuration option --with-lisp-files.
 
 The TeX tutorial produced by --with-tutorial is horribly out of date.
