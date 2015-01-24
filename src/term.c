@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.296.2.6 2015/01/16 05:53:06 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.296.2.7 2015/01/24 23:18:22 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -1737,7 +1737,7 @@ test_term()
     (*t->move) (x0, y0 + ymax_t / 2);
     (*t->vector) (x0 + xmax_t - 1, y0 + ymax_t / 2);
     /* test width and height of characters */
-    (*t->linetype) (3);
+    (*t->linetype) (LT_SOLID);
     newpath();
     (*t->move) (x0 + xmax_t / 2 - t->h_char * 10, y0 + ymax_t / 2 + t->v_char / 2);
     (*t->vector) (x0 + xmax_t / 2 + t->h_char * 10, y0 + ymax_t / 2 + t->v_char / 2);

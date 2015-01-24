@@ -8,6 +8,7 @@
 	Bug #1545
 
 	* src/term.c (term_test): Fix failure to save/restore arrow style.
+	Use LT_SOLID for box around central text.
 	Bug #1546
 
 2015-01-20  Ethan A Merritt  <merritt@u.washington.edu>
