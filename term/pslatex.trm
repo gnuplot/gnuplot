@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: pslatex.trm,v 1.89 2013/07/26 00:22:16 sfeam Exp $
+ * $Id: pslatex.trm,v 1.90 2014/03/20 20:50:10 markisch Exp $
  */
 
 /* GNUPLOT - pslatex.trm */
@@ -856,9 +856,11 @@ EPSLATEX_set_color(t_colorspec *colorspec)
 	    return;
 	else
 	    memcpy(&tex_previous_colorspec, colorspec, sizeof(t_colorspec));
+#if (0)	/* Not correct for version 5 */
         if (colorspec->type == TC_LT && !ps_params->color)
             PS_linetype(colorspec->lt);
         else
+#endif
             PS_set_color(colorspec);
     }
 
