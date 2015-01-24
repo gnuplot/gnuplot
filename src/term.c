@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.302 2015/01/17 05:29:46 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.303 2015/01/20 02:10:43 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -1849,13 +1849,14 @@ test_term()
     (*t->arrow) (x, y, x, y + yl, END_HEAD);
     curr_arrow_headfilled = AS_EMPTY;
     (*t->arrow) (x, y, x, y - yl, END_HEAD);
-    curr_arrow_headfilled = i;
+    curr_arrow_headfilled = AS_NOBORDER;
     xl = t->h_tic * 5;
     yl = t->v_tic * 5;
     (*t->arrow) (x - xl, y - yl, x + xl, y + yl, END_HEAD | BACKHEAD);
     (*t->arrow) (x - xl, y + yl, x, y, NOHEAD);
     curr_arrow_headfilled = AS_EMPTY;
     (*t->arrow) (x, y, x + xl, y - yl, BACKHEAD);
+    curr_arrow_headfilled = i;
 
     /* test line widths */
     (void) (*t->justify_text) (LEFT);

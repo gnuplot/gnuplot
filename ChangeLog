@@ -7,6 +7,9 @@
 	that set_color should not be turned into term->linetype.
 	Bug #1545
 
+	* src/term.c (term_test): Fix failure to save/restore arrow style.
+	Bug #1546
+
 2015-01-20  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c:  Restore several lines of code that were inadvertantly
