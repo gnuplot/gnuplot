@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.295 2014/12/19 06:34:11 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.296 2015/01/20 02:10:42 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -94,6 +94,7 @@ static char *RCSid() { return RCSid("$Id: command.c,v 1.295 2014/12/19 06:34:11 
 #include "tables.h"
 #include "term_api.h"
 #include "util.h"
+#include "variable.h"
 #include "external.h"
 
 #ifdef USE_MOUSE
@@ -1986,6 +1987,11 @@ $PALETTE u 1:2 t 'red' w l lt 1 lc rgb 'red',\
     datablock->udv_value.type = DATABLOCK;
     datablock->udv_value.v.data_array = NULL;
 
+    /* Part of the purpose for writing these values into a datablock */
+    /* is so that the user can read them back if desired.  But data  */
+    /* will be read back using the current numeric locale, so for    */
+    /* consistency we must also use the locale when creating it.     */
+    set_numeric_locale();
     for (i = 0; i < test_palette_colors; i++) {
 	char dataline[64];
 	rgb_color rgb;
@@ -1998,6 +2004,7 @@ $PALETTE u 1:2 t 'red' w l lt 1 lc rgb 'red',\
 		z, rgb.r, rgb.g, rgb.b, ntsc, '\0');
 	append_to_datablock(&datablock->udv_value, strdup(dataline));
     }
+    reset_numeric_locale();
 
     /* commands to setup the test palette plot */
     enable_reset_palette = 0;
