@@ -1,3 +1,8 @@
+2015-01-24  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/command.c (test_palette_subcommand):  Apply numeric locale to the
+	$PALETTE datablock created by the "test palette" command.
+
 2015-01-20  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c:  Restore several lines of code that were inadvertantly
