@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.326.2.5 2014/11/22 00:24:07 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.326.2.6 2015/01/20 01:26:47 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -1043,7 +1043,8 @@ show_version(FILE *fp)
     if (almost_equals(c_token, "l$ong")) {
 
 	c_token++;
-	fprintf(stderr, "Compile options:\n%s\n", compile_options);
+	fprintf(stderr, "Compile options:\n%s", compile_options);
+	fprintf(stderr, "MAX_PARALLEL_AXES=%d\n\n", MAX_PARALLEL_AXES);
 
 #ifdef X11
 	{
