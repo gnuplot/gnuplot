@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: util.c,v 1.128 2014/05/11 17:39:59 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: util.c,v 1.129 2015/01/20 02:10:43 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - util.c */
@@ -659,14 +659,25 @@ gprintf(
 				strcpy(&tmp2[j], "\\cdot");
 				j+= 5;
 			    }
-			} else if (encoding == S_ENC_UTF8) {
-			    strcpy(&tmp2[j], "\xc3\x97"); /* UTF character '×' */
-			    j+= 2;
-			} else if (encoding == S_ENC_CP1252) {
-			    tmp2[j++] = (*format=='h') ? 0xd7 : 0xb7;
-			} else {
-			    tmp2[j++] = (*format=='h') ? 'x' : '*';
+			} else switch (encoding) {
+			    case S_ENC_UTF8:
+				strcpy(&tmp2[j], "\xc3\x97"); /* UTF character '×' */
+				j+= 2;
+				break;
+			    case S_ENC_CP1252:
+				tmp2[j++] = (*format=='h') ? 0xd7 : 0xb7;
+				break;
+			    case S_ENC_ISO8859_1:
+			    case S_ENC_ISO8859_2:
+			    case S_ENC_ISO8859_9:
+			    case S_ENC_ISO8859_15:
+				tmp2[j++] = (*format=='h') ? 0xd7 : '*';
+				break;
+			    default:
+				tmp2[j++] = (*format=='h') ? 'x' : '*';
+				break;
 			}
+
 			strcpy(&tmp2[j], "10^{");
 			j += 4;
 			bracket_flag = TRUE;

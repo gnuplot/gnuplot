@@ -4,6 +4,10 @@
 	parallel axes in "show version long".  Enforce this limit when plotting.
 	Document the limitation.
 
+	* src/util.c (gprintf):  The "%h" format want a proper multiplication
+	sign rather than 'x' when possible.  We already do this for UTF8 and 
+	CP1252, now add support for iso_8859_* encodings.
+
 2015-01-24  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/command.c (test_palette_subcommand):  Apply numeric locale to the
