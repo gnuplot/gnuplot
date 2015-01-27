@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.256.2.10 2015/01/12 04:02:55 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.256.2.11 2015/01/20 01:26:45 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -737,7 +737,7 @@ set origin %g,%g\n",
     if (xyplane.absolute)
 	fprintf(fp, "set xyplane at %g\n", xyplane.z);
     else
-	fprintf(fp, "set ticslevel %g\n", xyplane.z);
+	fprintf(fp, "set xyplane relative %g\n", xyplane.z);
 
     {
     int i;

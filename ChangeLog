@@ -4,6 +4,9 @@
 	parallel axes in "show version long".  Enforce this limit when plotting.
 	Document the limitation.
 
+	* src/save.c: Use "set xyplane relative" rather than the deprecated
+	"set ticslevel".
+
 2015-01-24  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/command.c (test_palette_subcommand):  Apply numeric locale to the
