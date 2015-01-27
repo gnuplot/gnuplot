@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.347 2015/01/17 18:17:48 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.348 2015/01/20 02:10:43 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -560,6 +560,12 @@ get_data(struct curve_points *current_plot)
 	break;
 
     case PARALLELPLOT:
+	/* Maximum number of parallel axes is fixed at compile time */
+	if (current_plot->n_par_axes > MAX_PARALLEL_AXES) {
+	    int_error(NO_CARET,
+		"%d columns of data requested but maximum number of parallel axes is %d",
+		current_plot->n_par_axes, MAX_PARALLEL_AXES);
+	}
 	/* First N columns are data; one more is optional varcolor */
 	min_cols = current_plot->n_par_axes;
 	max_cols = current_plot->n_par_axes + 1;

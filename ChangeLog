@@ -1,10 +1,16 @@
+2015-01-27  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/plot2d.c src/show.c docs/gnuplot.doc:  Report maximum number of
+	parallel axes in "show version long".  Enforce this limit when plotting.
+	Document the limitation.
+
 2015-01-24  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/command.c (test_palette_subcommand):  Apply numeric locale to the
 	$PALETTE datablock created by the "test palette" command.
 
 	* term/pslatex.trm:  Separation of linetype/dashtype in version 5 means
-	that set_color should not be turned into term->linetype.
+	that term->set_color should not be turned into term->linetype.
 	Bug #1545
 
 	* src/term.c (term_test): Fix failure to save/restore arrow style.

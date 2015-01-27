@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.934 2015/01/19 20:36:23 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.935 2015/01/21 05:21:30 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -3910,6 +3910,9 @@ Ffigure_parallel
  By default gnuplot will automatically determine the range and scale of the
  individual axes from the input data, but the usual `set axis range` commands
  can be used to customize this.  See `set paxis`.
+
+ The maximum number of parallel axes is fixed at the time the program is built.
+ The maximum for this copy of gnuplot is reported by "show version long".
 2 points
 ?plotting styles points
 ?style points
