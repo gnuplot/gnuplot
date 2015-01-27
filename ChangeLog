@@ -8,6 +8,9 @@
 	sign rather than 'x' when possible.  We already do this for UTF8 and 
 	CP1252, now add support for iso_8859_* encodings.
 
+	* src/save.c:  Use "set xyplane relative" rather than the deprecated
+	"set ticslevel".
+
 2015-01-24  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/command.c (test_palette_subcommand):  Apply numeric locale to the
