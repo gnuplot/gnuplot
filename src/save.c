@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.256.2.11 2015/01/20 01:26:45 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.256.2.12 2015/01/28 05:47:17 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -1347,7 +1347,6 @@ save_textcolor(FILE *fp, const struct t_colorspec *tc)
 	   fprintf(fp, " variable");
 	else
 	   save_pm3dcolor(fp, tc);
-	save_pm3dcolor(fp, tc);
     }
 }
 
