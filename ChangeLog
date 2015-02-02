@@ -1,3 +1,16 @@
+2015-02-02  Shigeharu Takeno  <shige@iee.niit.ac.jp>
+
+	* docs/term-ja.diff docs/gnuplot-ja.doc:
+	Sync Japanese documentation to doc version 1.935
+
+2015-02-01  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/graphics.c (plot_betweencurves):  This routine now handles both
+	the 3-column variant of filledcurved ("between") and the y1=<yval> or
+	y2=<yval> variants. In order that various lower level routines do not
+	get confused, set the same options flag FILLEDCURVES_BETWEEN for all
+	of these.  (Bug fix)
+
 2015-01-27  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/plot2d.c src/show.c docs/gnuplot.doc:  Report maximum number of

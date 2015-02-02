@@ -1,5 +1,5 @@
-C RCS $Id: gnuplot-ja.doc,v 1.544 2014-10-09 13:41:00+09 shige Exp $
-C corresponding original gnuplot.doc revision: 1.921
+C RCS $Id: gnuplot-ja.doc,v 1.554 2015-01-22 17:38:03+09 shige Exp $
+C corresponding original gnuplot.doc revision: 1.935
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -7,7 +7,7 @@ C Japanese translation: Hiroharu Tamaru (2.0, 3.2), MASUTANI Yasuhiro (3.5),
 C Shigeharu Takeno et al (3.7, 4.X, 5.X)
 1 gnuplot
 ?gnuplot
-C 下の contributers の表のアクセント文字は、現在のオリジナルでは UTF-8
+C 下の contributors の表のアクセント文字は、現在のオリジナルでは UTF-8
 C で書かれているが、それを HTML 名前参照形式に変更している。
 ^<h2 align="center"> An Interactive Plotting Program </h2>
 ^<p align="center">  Thomas Williams & Colin Kelley</p>
@@ -219,14 +219,17 @@ C 行が長いのは、できればなんとかしたい
  gnuplot ユーザとしての手助けが必要なら、以下のニュースグループを利用し
  てください。
            comp.graphics.apps.gnuplot
- 私達はメーリングリストに参加するより、むしろニュースグループのメッセー
- ジを読むことを勧めます。メーリングリストも有効で、同じメッセージ列を配
- 送しています。メーリングリストに参加する方法に関しては、SouceForge に
- ある gnuplot の開発 Web サイト
+
+ gnuplot メーリングリストへの投稿の方法に関しては、SouceForge にある
+ gnuplot の開発 Web サイト
 ^ <a href="http://sourceforge.net/projects/gnuplot">
            http://sourceforge.net/projects/gnuplot
 ^ </a>
  を参照してください。
+
+ gnuplot メーリングリストにメールを書く前に、最初にそのメーリングリスト
+ に参加する必要があることに注意してください。これは、スパムの量を減らす
+ ことを維持するために必要です。
 
  メーリングリストメンバーへのメールアドレス:
            gnuplot-info@lists.sourceforge.net
@@ -699,8 +702,10 @@ C 行が長いのは、できればなんとかしたい
 #\verb| | & \verb|{/Times:Italic abc}| & {\it abc} & Times フォント、イタリック体で abc\\
 #\verb| | & \verb|{/Arial:Bold=20 abc}| & \Large\textsf{\textbf{abc}} & Arial フォント、太字、サイズ 20 で abc\\
 %c c l .
-%.TE", /* ugly - doc2ms uses @ for column separator, but here we */
-%.TS", /* need @ in table, so end and restart the table ! */
+C ugly - doc2ms uses @ for column separator, but here we
+C  need @ in table, so end and restart the table !
+%.TE
+%.TS
 %center box tab ($) ;
 %c c l .
 %制御記号$例$説明
@@ -1136,15 +1141,15 @@ C マーカを doc2html へのこのシグナルとして使用します。
  アンで返します。
 4 EllipticK
 #EllipticK(k) & 実数 k $\in$ (-1:1) & $K(k)$ 第 1 種完全楕円積分\\
-%EllipticK(k)@(-1:1) 内の実数 k@$K k$ 第 1 種完全楕円積分
+%EllipticK(k)@(-1:1) 内の実数 k@$K ( k )$ 第 1 種完全楕円積分
  以下参照: `elliptic integrals`。
 4 EllipticE
 #EllipticE(k) & 実数 k $\in$ [-1:1] & $E(k)$ 第 2 種完全楕円積分\\
-%EllipticE(k)@[-1:1] 内の実数 k@ $E k$ 第 2 種完全楕円積分
+%EllipticE(k)@[-1:1] 内の実数 k@ $E ( k )$ 第 2 種完全楕円積分
  以下参照: `elliptic integrals`。
 4 EllipticPi
 #EllipticPi(n,k) & 実数 n$<$1, 実数 k $\in$ (-1:1) & $\Pi(n,k)$ 第 3 種完全楕円積分\\
-%EllipticPi(n,k)@ 実数 n<1, (-1:1) 内の実数 k@ $Pi n,k$ 第 3 種完全楕円積分
+%EllipticPi(n,k)@ 実数 n<1, (-1:1) 内の実数 k@ $Pi ( n,k )$ 第 3 種完全楕円積分
  以下参照: `elliptic integrals`。
 4 besj0
 ?expressions functions besj0
@@ -1401,20 +1406,20 @@ C マーカを doc2html へのこのシグナルとして使用します。
 ?expressions functions cerf
 ?cerf
 #cerf(z) & 複素数 & 複素誤差関数 \\
-%cerf(z)@複素数@複素誤差関数 \\
+%cerf(z)@複素数@複素誤差関数
  `cerf(z)` は誤差関数 erf(x) の複素バージョンです。
 4 cdawson
 ?expressions functions cdawson
 ?cdawson
 =dawson
-%cdawson(z) @ 複素数 @ 複素 Dawson 積分 \\
+%cdawson(z)@複素数@複素 Dawson 積分
 #cdawson(z)&複素数&Dawson 積分 $D(z)={\frac{\sqrt{\pi}}{2}e^{-z^2} erfi(z)}$ の複素拡張 \\
  `cdawson(z)` は複素引数に対する Dawson 積分の値を返します。
  cdawson(z) = sqrt(pi)/2 * exp(-z^2) * erfi(z)
 4 faddeeva
 ?expressions functions faddeeva
 ?faddeeva
-%faddeeva(z) @ 複素数 @ 再スケール化複素誤差関数 w(z) = exp(-z^2) * erfc(-i*z) \\
+%faddeeva(z)@複素数@再スケール化複素誤差関数 w(z) = exp(-z^2) * erfc(-i*z)
 #faddeeva(z)&複素数&再スケール化複素誤差関数 $w(z) = e^{-z^2}~ erfc(-iz) $ \\
  `Faddeeva(z)` は再スケール化複素誤差関数です。
  w(z) = exp(-z^2) * erfc(-i*z)
@@ -1422,13 +1427,13 @@ C マーカを doc2html へのこのシグナルとして使用します。
 4 erfi
 ?expressions functions erfi
 ?erfi
-%erfi(x) @ 実数 @ 虚誤差関数 erfi(x) = -i * erf(ix) \\
+%erfi(x)@実数@虚誤差関数 erfi(x) = -i * erf(ix)
 #erfi(x)&実数&虚誤差関数 $erf(x) = -i * erf(ix)$ \\
  虚誤差関数 erfi(x) = -i * erf(ix)
 4 Voigt Profile
 ?expressions functions VP
 ?VP
-%VP(x,sigma,gamma) @ 実数 @ Voigt プロファイル \\
+%VP(x,sigma,gamma)@実数@Voigt プロファイル
 #VP(x,$\sigma$,$\gamma$)&実数& Voigt プロファイル $ VP(x,\sigma,\gamma) = {\int^{\infty}_{-\infty}{G(x^\prime;\sigma) L(x-x^\prime;\gamma) dx^\prime }} $ \\
  `VP(x,sigma,gamma)` はガウス密度関数 G(x;sigma) とローレンツ密度関数
  L(x;gamma) の畳み込みで定義される Voigt プロファイル (密度関数) に対
@@ -1544,10 +1549,8 @@ C マーカを doc2html へのこのシグナルとして使用します。
 4 column
 ?expressions functions column
 ?column
-#column(x) & 整数 & データファイル処理中の $x$ 列目 \\
-%column(x)@整数@ データファイル処理中の $x$ 列目
 #column(x) & 整数か文字列 & データファイル処理中の $x$ 列目 \\
-%column(x)@整数か文字列@ データファイル処理中の $x$ 列目
+%column(x)@整数か文字列@データファイル処理中の $x$ 列目
  `column(x)` は fit あるいはデータファイルプロットでの `using` の処理中
  の数式の一部としてのみ使われます。これは $x$ 列目の内容を数値として評
  価します。以下参照: `plot datafile using`。
@@ -1555,7 +1558,7 @@ C マーカを doc2html へのこのシグナルとして使用します。
 ?expressions functions columnhead
 ?columnhead
 #columnhead(x) & 整数 & データファイルの最初の $x$ 列目中の文字列 \\
-%columnhead(x)@整数@ データファイルの最初の $x$ 列目中の文字列
+%columnhead(x)@整数@データファイルの最初の $x$ 列目中の文字列
  `columnhead(x)` は、非線形のあてはめ (fit) の際の `using` 処理内の数式
  として、あるいはデータファイル描画でのいずれかのみで使えます。これは、
  データの最初の行の x 列目の内容を含む文字列と評価されます。以下参照:
@@ -1564,7 +1567,7 @@ C マーカを doc2html へのこのシグナルとして使用します。
 ?expressions functions exists
 ?exists
 #exists("X") & 文字列 & 変数名 X が定義されていれば 1, そうでなければ 0\\
-%exists("X")@文字列@ 変数名 X が定義されていれば 1, そうでなければ 0
+%exists("X")@文字列@変数名 X が定義されていれば 1, そうでなければ 0
  exists() の引数は文字列定数、または文字列変数です。その文字列が、定義
  されている変数名を持っていれば 1 を、そうでなければ 0 を返します。
 4 hsv2rgb
@@ -1572,7 +1575,7 @@ C マーカを doc2html へのこのシグナルとして使用します。
 ?hsv2rgb
 ?hsv
 #hsv2rgb(h,s,v) & h,s,v $\in$ [0:1] & 24 ビット RGB 色値 \\
-%hsv2rgb(h,s,v)@h,s,v $\in$ [0:1]@ 24 ビット RGB 色値
+%hsv2rgb(h,s,v)@[0:1] 内の h,s,v@24 ビット RGB 色値
  HSV (色相 (Hue)/彩度 (Saturation)/明度 (Value)) 3 つ組をそれと同等な
  RGB 値に変換します。
 4 stringcolumn
@@ -1581,7 +1584,7 @@ C マーカを doc2html へのこのシグナルとして使用します。
 ?expressions functions strcol
 ?strcol
 #stringcolumn(x) & 整数か文字列 & 文字列としての $x$ 列目の内容 \\
-%stringcolumn(x)@整数か文字列@ 文字列としての $x$ 列目の内容
+%stringcolumn(x)@整数か文字列@文字列としての $x$ 列目の内容
  `stringcolumn(x)` は fit あるいはデータファイルプロットでの `using` の
  操作の数式の一部としてのみ使われます。これは $x$ 列目の内容を文字列変
  数として返します。以下参照: `plot datafile using`。
@@ -1671,12 +1674,12 @@ C マーカを doc2html へのこのシグナルとして使用します。
 ?expressions functions valid
 ?valid
 #valid(x) & 整数 & データ中の $\mbox{column}(x)$ の正当性\\
-%valid(x)@整数@ データ中の column($x$) の正当性
+%valid(x)@整数@データ中の column($x$) の正当性
  `valid(x)` は、データ描画か fit における `using` の式の中でしか使われ
  ません。以下参照: `plot datafile using`。
 
 #value("name") & 文字列 & 名前 name の変数の現在の値\\
-%value("name")@文字列@ 名前 name の変数の現在の値
+%value("name")@文字列@名前 name の変数の現在の値
 @end table
 
 4 種々の楕円積分 (elliptic integrals)
@@ -1787,6 +1790,7 @@ C be able to print them. So we have to typeset this table without using
 C eqn (at least that's the only solution I found, without any real docs
 C on *roff and eqn
 C First, terminate the table doc2ms.c already started:
+%c c l .
 %.TE
 C ... then turn off eqn delimiters:
 %.EQ
@@ -1804,7 +1808,6 @@ C ... and restart the table:
 %!@!a@* 論理的否定
 %!@a!@* 階乗
 %$@$3@* `using` 内での引数/列指定
-%_
 @end table
 
 ^<table align="center" border="1" rules="groups" frame="hsides" cellpadding="3">
@@ -1917,7 +1920,7 @@ C ... and restart the table:
 %|@a|b@* ビット和 (OR)
 %&&@a&&b@* 論理的 AND
 %||@a||b@* 論理的 OR
-%=@a = b@代入
+%\&=@a = b@代入
 %,@(a,b)@累次評価
 %.@a.b@文字列の連結
 %eq@A eq B@文字列が等しい
@@ -1987,7 +1990,7 @@ C ... and restart the table:
 %c c l .
 %記号@例@説明
 %_
-%?:@a?b:c@* 三項演算子
+%?:@a?b:c@三項演算子
 
 @end table
 
@@ -3017,8 +3020,8 @@ Ffigure_newsyntax
  て書く必要があります。つまり、文字列 "d\" s' b\\" と、'd" s'' b\' は完
  全に同じものとなります。
 
- 1 つの複数行文字列に関する位置合わせは各行に同等に働きます。よって、中
- 央に位置合わせされた文字列
+ 1 つの複数行文字列に関する行揃えは各行に同等に働きます。よって、中央に
+ 行揃えされた文字列
        "This is the first line of text.\nThis is the second line."
  は次のように表示されます:
                         This is the first line of text.
@@ -6190,18 +6193,29 @@ Ffigure_mapcontours
 
        plot 'filename' using 1:2, '' using 1:3
 
+ この filename は、この後の plot コマンドでも '' で再利用できますが、
+ その場合に `save` すると、コメントとしてその名前を記録するのみです。
+
  '+' と '++' という特別なファイル名は、`using` 指定の全体と描画スタイル
  にインライン関数を使えるようにするための仕組みです。通常、関数描画はサ
  ンプル点毎に単一の y (または z) の値しか持てません。しかし疑似ファイル
  '+' はそれがあたかも実際の入力ファイルであるように、`using` 指定による
  1 列目の値を標本点として扱い、さらに追加の列の値を指定することも可能で
- す。返される標本点の数は、`set samples` で制御できます。標本点は、デフ
- ォルトでは x の範囲全体に渡って取られますが、'+' の直前にそれとは独立
- な標本範囲を指定することもできます。以下参照: `plot sampling`。
- 例:
+ す。標本点は、デフォルトでは `set xrange` で設定した範囲全体に渡り、
+ `set samples` で制御する標本化に従って取られます。
 
        plot '+' using ($1):(sin($1)):(sin($1)**2) with filledcurves
-       plot $MYDATA, [sample=5:25] '+' using (sample):(f(sample)) with lines
+
+ '+' の直前に、独立な標本範囲を指定することもできます。通常の関数描画の
+ ように、独立変数に名前を割り当てることもできます。plot の最初の要素に
+ 与える場合、標本範囲にはそれを明示するキーワード `sample` を前置する必
+ 要があります (以下も参照: `plot sampling`)。
+
+       plot sample [beta=0:2*pi] '+' using (sin(beta)):(cos(beta)) with lines
+
+ さらに、`+` の範囲指定には、標本増分を与えることもできます。
+
+       plot $MYDATA, [t=-3:25:1] '+' using (t):(f(t))
 
  同様に、疑似ファイル '++' は、x 方向は `set samples` で制御される点の
  数、y 方向は `set isosamples` で制御される点の数の、標準的な [x,y] 座
@@ -7219,7 +7233,7 @@ Ffigure_mapcontours
 
  以下のものは、`reset` の影響を受けません。
       `set term` `set output` `set loadpath` `set fontpath` `set linetype`
-      `set encoding` `set decimalsign` `set locale` `set psdir`
+      `set encoding` `set decimalsign` `set locale` `set psdir` `set fit`
 
  `reset` は、必ずしもプログラム立ち上がった初期状態には戻さないことに注
  意してください。それは、初期設定ファイル gnuplotrc や $HOME/.gnuplot
@@ -8757,8 +8771,7 @@ Ffigure_missing
  または個別にコマンド `set {軸}tics format` で書式を設定できます。
 
  書式:
-       set format {<axes>} {"<format-string>"}
-       set format {<axes>} {'<format-string>'}
+       set format {<axes>} {"<format-string>"} {numeric|timedate|geographic}
        show format
 
  ここで、<axes> (軸) は `x`, `y`, `xy`, `x2`, `y2`, `z`, `cb`、または何
@@ -8864,7 +8877,6 @@ Ffigure_missing
 %%b@ISO/IEC 80000 記法 (ki, Mi, Gi, Ti, Pi, Ei, Zi, Yi) の仮数部
 %%B@ISO/IEC 80000 記法 (ki, Mi, Gi, Ti, Pi, Ei, Zi, Yi) の接頭辞
 %%P@πの倍数
-%_
 @end table
 
 ^<table align="center" border="1" rules="groups" frame="hsides" cellpadding="3">
@@ -8972,7 +8984,7 @@ Ffigure_missing
        %y           西暦 (2000-2068 年は 0-68、1969-1999 年は 69-99)
        %Y           西暦 (4 桁)
 #\begin{tabular}{|cl|} \hline
-#\multicolumn{2}{|c|}{目盛りラベルの日時書式指定子}\\
+#\multicolumn{2}{|c|}{日付指定子}\\
 #\hline \hline
 #書式 & 説明 \\ \hline
 #\verb@%a@ & 曜日名の省略形 (Sun,Mon,...) \\
@@ -9028,7 +9040,6 @@ Ffigure_missing
 %%W@その年の通算週 (週は月曜日からと数える)
 %%y@西暦 (0-99、1969-2068 年の下 2 桁)
 %%Y@西暦 (4 桁)
-%_
 @end table
 
 
@@ -9038,7 +9049,7 @@ Ffigure_missing
 ^  <col align="left">
 ^</colgroup>
 ^<thead>
-^<tr>    <th>書式</th>    <th>説明</th></tr>
+^<tr>    <th>日付書式</th>    <th>説明</th></tr>
 ^</thead>
 ^<tbody>
 ^<tr>    <td><tt>%a</tt></td>    <td>曜日名の省略形 (Sun,Mon,...)</td></tr>
@@ -9069,23 +9080,80 @@ Ffigure_missing
 ^</tbody>
 ^</table>
 
- 数字を表す書式では、これらの指定子 (% の後ろ、指定子の前) に "0"
- ("オー" でなく "ゼロ") をつけることで、先頭に空白ができる場合に空白の
- 代わりに 0 で埋めることができ、また最小の出力幅を正の整数で指定するこ
- ともできます (出力される数字を表示するのに指定した幅が足りない場合は無
- 視されます)。書式 %S は実数指定も受けつけますので、小数秒も書けます。
- 表示する文字の長さは 24 文字まで、という制限があり、長すぎた部分は切り
- 捨てられます。
+ 数字を表す書式には、先頭に 0 を埋めるために "0" (ゼロ) を前につけるこ
+ とができ、また最小の出力幅を指定するために正の整数を前につけることもで
+ きます。書式 %S と %t は精度指定も受けつけるので、小数の時/分/秒を書く
+ こともできます。
 
- 例:
+@start table - first is interactive cleartext form
+       書式         説明
+       %tH          エポック時への相対的な正負の時 (24 での巻戻しなし)
+       %tM          エポック時への相対的な正負の分
+       %tS          直前の tH, tM 項目に対応する正負の秒数
+#\begin{tabular}{|cl|} \hline
+#\multicolumn{2}{|c|}{時刻指定子}\\
+#\hline \hline
+#書式 & 説明 \\ \hline
+#\verb@%tH@ & エポック時への相対的な正負の時 (24 での巻戻しなし) \\
+#\verb@%tM@ & エポック時への相対的な正負の分 \\
+#\verb@%tS@ & 直前の tH, tM 項目に対応する正負の秒数 \\
+%c l .
+%書式@説明
+%_
+%%tH@エポック時への相対的な正負の時 (24 での巻戻しなし)
+%%tM@エポック時への相対的な正負の分
+%%tS@直前の tH, tM 項目に対応する正負の秒数
+@end table
 
- 日時のデータが "76/12/25 23:11:11" の場合
-       set format x                 # デフォルトでは "12/25/76" \n "23:11"
+
+^<table align="center" border="1" rules="groups" frame="hsides" cellpadding="3">
+^<colgroup>
+^  <col align="center">
+^  <col align="left">
+^</colgroup>
+^<thead>
+^<tr>    <th>時刻書式</th>        <th>説明</th></tr>
+^</thead>
+^<tbody>
+^<tr>    <td><tt>%tH</tt></td>    <td>エポック時への相対的な正負の時 (24 での巻戻しなし)</td></tr>
+^<tr>    <td><tt>%tM</tt></td>    <td>エポック時への相対的な正負の分</td></tr>
+^<tr>    <td><tt>%tS</tt></td>    <td>直前の tH, tM 項目に対応する正負の秒数</td></tr>
+^</tbody>
+^</table>
+
+5 例 (Examples)
+?commands set format date_specifiers examples
+?commands set format time_specifiers examples
+?set format date_specifiers examples
+?set format time_specifiers examples
+?set date_specifiers examples
+?set time_specifiers examples
+?date_specifiers examples
+?time_specifiers examples
+
+ 日付書式の例:
+
+ x の値が、1976 年 12 月 25 日の深夜少し前の時刻に対応する秒数であると
+ 仮定します。この位置の軸の刻みラベル文字列は、以下のようになります:
+
+       set format x                 # デフォルトでは "12/25/76 \n 23:11"
        set format x "%A, %d %b %Y"  # "Saturday, 25 Dec 1976"
        set format x "%r %D"         # "11:11:11 pm 12/25/76"
 
- 日時のデータが "98/07/06 05:04:03.123456" の場合
-       set format x "%1y/%2m/%3d %01H:%02M:%06.3S"  # "98/ 7/  6 5:04:03.123"
+ 時刻書式の例:
+
+ 日付書式指定は、秒数での時間の値を、ある特定の日の時計の時刻にエンコー
+ ドします。よって、時は 0 から 23 まで、分は 0 から 59 までのみを動きま
+ すが、それらの負の値は、エポック (1970 年 1 月 1 日) より前の日付に対
+ 応します。秒数での時間の値を、時間 0 に対する相対的な時/分/秒の数値と
+ して出力させるには、時間書式 %tH %tM %tS を使用します。-3672.50 秒の値
+ は以下のように出力されます。
+
+       set format x                 # デフォルトでは "12/31/69 \n 22:58"
+       set format x "%tH:%tM:%tS"   # "-01:01:12"
+       set format x "%.2tH hours"   # "-1.02 hours"
+       set format x "%tM:%.2tS"     # "-61:12.50"
+
 3 function style
 ?set function style
  このコマンドの形式は現在は推奨されていません。以下参照:
@@ -9370,12 +9438,13 @@ Ffigure_missing
                | {at <position>}}
              {left | right | center} {top | bottom | center}
              {vertical | horizontal} {Left | Right}
+             {{no}enhanced}
              {{no}opaque}
              {{no}reverse} {{no}invert}
              {samplen <sample_length>} {spacing <vertical_spacing>}
              {width <width_increment>} {height <height_increment>}
              {{no}autotitle {columnheader}}
-             {title "<text>"} {{no}enhanced}
+             {title {"<text>"} {{no}enhanced} {center | left | right}}
              {font "<face>,<size>"} {textcolor <colorspec>}
              {{no}box {linestyle <style> | linetype <type> | linewidth <width>}}
              {maxcols {<max no. of columns> | auto}}
@@ -9383,12 +9452,12 @@ Ffigure_missing
        unset key
        show key
 
- キー内の各要素は `vertical` (縦) または `horizontal` (横) に従って重ね
- られます。`vertical` の場合、凡例は可能ならば 2,3 個の縦の列を使います。
- すなわち、各要素は垂直スペースがなくなるまでは 1 つの列に整列されます
- が、そこから新しい列が開始されます。垂直スペースは、`maxrows` を使って
- 制限できます。`horizontal` の場合は、凡例は横の行をできるだけ少なく使
- おうとします。水平方向のスペースは `maxcols` により制限できます。
+ 凡例 (key) は各要素を `vertical` (縦) か `horizontal` (横) の指定に従
+ って重ねます。`vertical` の場合、凡例は可能ならば 2,3 個の縦の列を使い
+ ます。すなわち、垂直方向の場所がある間は各要素を 1 つの列に並べますが、
+ その次は新しい列に並べ始めます。垂直方向の行数は、`maxrows` を使って制
+ 限できます。`horizontal` の場合は、凡例は横の行数をなるべく少なくしよ
+ うとします。水平方向の列数は `maxcols` で制限できます。
 
  デフォルトでは、凡例はグラフ領域の内側の右上の角に置かれます。キーワー
  ド `left`, `right`, `top`, `bottom`, `center`, `inside`, `outside`,
@@ -9399,11 +9468,15 @@ Ffigure_missing
  `center` が同様の基準点合わせの設定の目的で使われます。
  より詳しくは、以下参照: `key placement`。
 
- グラフのタイトルの行揃えは `Left`, `Right` (デフォルト) で指示し
- ます。ラベル文字列と曲線のサンプルは左右入れ替えることができます
- (`reverse`) し、 全体を枠で囲むこともできます (`box {...}`)。その枠の
- 線は、線種 (`linetype`), 線幅 (`linewidth`)、あるいは定義済のラインス
- タイル (`linestyle`) を指定することもできます。
+ グラフのタイトルの行揃えは `Left`, `Right` (デフォルト) で指示します。
+ ラベル文字列と曲線のサンプルは左右入れ替えることができます (`reverse`)
+ し、 全体を枠で囲むこともできます (`box {...}`)。その枠の線は、線種
+ (`linetype`), 線幅 (`linewidth`)、あるいは定義済のラインスタイル
+ (`linestyle`) を指定することもできます。
+
+ 凡例の文字列は、デフォルトで拡張文字列モード (`enhanced`) に設定されて
+ いますが、これはオプション `{no}enhanced` で変更でき、キーのタイトルだ
+ けや、個々のグラフ毎に変更することも可能です。
 
  デフォルトでは、凡例は一つのグラフと同時に作られます。すなわち、凡例の
  記号とタイトルは、それに対応するグラフと同時に描かれます。それは、新し
@@ -9440,8 +9513,8 @@ Ffigure_missing
 
  全体に渡るタイトルを凡例の上につけることもできます (`title "<text>"`)。
  単一引用符 (') と二重引用符 (") の違いについては、以下も参照: `syntax`。
- 凡例のタイトルの行揃えは、グラフのタイトルの行揃えと同じものが使われま
- す。
+ タイトルの行揃えはデフォルトでは中央合わせで、それはキーワード `right`
+ や `left` で変更することもできます。
 
  `set key` のデフォルトは、`on`,  `right`, `top`, `vertical`, `Right`,
  `noreverse`, `noinvert`, `samplen 4`, `spacing 1.25`, `title ""`,
@@ -9459,9 +9532,9 @@ Ffigure_missing
  します。
 
  TeX や、整形情報が文字列に埋め込まれる出力を使う場合は、`gnuplot` は凡
- 例の位置合わせのための文字列の幅を正しく評価することしかできません。よ
- って凡例を左に置く場合は `set key left Left reverse` という組合せを使
- うのがいいでしょう。
+ 例の位置決めのための文字列の幅を正しく評価することしかできません。よっ
+ て凡例を左に置く場合は `set key left Left reverse` という組合せを使う
+ のがいいでしょう。
 
  `splot` で等高線を書く場合、デフォルトでは凡例に等高線のラベルも表示し
  ます。その表示は `set cntrlabel format` で調整できます。
@@ -9547,9 +9620,9 @@ Ffigure_missing
  つのキーワード (`first`, `second`, `graph`, `screen`, `character`) を
  頭につけることもできます。詳細は、以下参照: `coordinates`。<position>
  が与えられた場合の `left`, `right`, `top`, `bottom`, `center` の効果は、
- label コマンドで配置される文字列の場合と同じように基準位置の位置合わせ
- に使用されます。すなわち、`left` は凡例が <position> の右に置かれて左
- 合わせで出力されます。他の場合も同様です。
+ label コマンドで配置される文字列の場合と同じように基準位置の位置揃えに
+ 使用されます。すなわち、`left` は凡例が <position> の右に置かれて左合
+ わせで出力されます。他の場合も同様です。
 4 凡例のサンプル (key samples)
 ?commands set key samples
 ?set key samples
@@ -9771,15 +9844,12 @@ Ffigure_missing
 
  `注意`: このコマンドは gnuplot バージョン 4.6 で新たに導入されたもので、
  以前のあいまいなコマンド "set style increment user" に置き換わるもので
- す。古いコマンドは現在は非推奨です。
+ 古いコマンドは現在は非推奨です。
 
  この仕組みは、gnuplot で使用する線種列に対する個人的な好みを設定するの
  にも使えます。それを行うには、実行時初期化ファイル ~/.gnuplot に、例え
  ば以下のようなそれ用のコマンド列を追加することをお勧めします:
 
-       if ((GPVAL_VERSION < 4.5) \
-       ||  (!strstrt(GPVAL_COMPILE_OPTIONS,"+USER_LINETYPES"))) \
-           exit
        set linetype 1 lc rgb "dark-violet" lw 2 pt 0
        set linetype 2 lc rgb "sea-green"   lw 2 pt 7
        set linetype 3 lc rgb "cyan"        lw 2 pt 6 pi -1
@@ -9999,7 +10069,7 @@ Ffigure_missing
        set rmargin {{at screen} <margin>}
        set tmargin {{at screen} <margin>}
        set bmargin {{at screen} <margin>}
-       set margins <left>, <right>, <top>, <bottom>
+       set margins <left>, <right>, <bottom>, <top>
        show margin
 
  <margin> のデフォルトの単位には、適切と思われる、文字の高さと幅が使わ
@@ -10101,8 +10171,8 @@ Ffigure_missing
 ?mouse doubleclick
  ダブルクリックの解像度はミリ秒 (ms) 単位で与えます。これは、ボタン 1
  用のもので、現在のマウス位置をクリップボード (`clipboard`) にコピーす
- るのに使います。デフォルトの値は 300 ms です。これを 0 ms に設定すると
- シングルクリックでそのコピーを行うようになります。
+ るのに使う出力形式があります。デフォルトの値は 300 ms です。これを 0
+ ms に設定するとシングルクリックでそのコピーを行うようになります。
 4 mouseformat
 ?set mouse format
 ?set mouse mouseformat
@@ -10178,6 +10248,7 @@ Ffigure_missing
 ?unset multiplot
 ?multiplot
 ?nomultiplot
+?layout
  コマンド `set multiplot` は `gnuplot` を多重描画モードにします。これ
  は複数の描画を同じページ、ウィンドウ、スクリーンに表示するものです。
 
@@ -10206,16 +10277,16 @@ Ffigure_missing
  以外の全ての `set` で定義されるものも各描画すべてに適用されます。もし
  1 度の描画にだけ現われて欲しいものを作りたいなら、それが例えば日付
  (timestamp) だとしたら、`set multiplot` と `unset multiplot` で囲まれ
- たブロック内の `plot` (または `splot`, `replot`) 命令の一つを `set time`
- と `unset time` ではさんでください。
+ たブロック内の `plot` (または `splot`, `replot`) 命令の一つを
+ `set time` と `unset time` ではさんでください。
 
  multiplot のタイトルは、個々の描画タイトルがあったとしても、それとは別
  のもので、ページの上部にそのためのキャンバス全体の幅にわたるスペースが
  確保されます。
 
- layout が指定されていない場合、あるいはより良い位置合わせをしたい場合
- は、コマンド `set origin` と `set size` 各描画で正しい位置に設定する必
- 要があります。詳細は、以下参照: `set origin`, `set size`。
+ layout が指定されていない場合、あるいはより良い位置決めをしたい場合は、
+ コマンド `set origin` と `set size` 各描画で正しい位置に設定する必要が
+ あります。詳細は、以下参照: `set origin`, `set size`。
 
  例:
        set multiplot
@@ -10267,11 +10338,33 @@ Ffigure_missing
  上の例では 6 つの描画が 2 列の中に上から下へ、左から右へと埋められて行
  きます。各描画は水平サイズが 1.1/2、垂直サイズが 0.9/3 となります。
 
- 他にも、個々のグラフに対する明示的なマージンを、オプション `margins`,
- `spacing` で設定できます。`margins` は、格子配置の複数グラフ全体の外側
- に対するマージンを、全体の描画領域に対する割合で設定します。これは、グ
- ラフのうちいくつかのものだけにラベルがあるけれど、すべてのグラフのサイ
- ズを等しいものにしたい場合にとても役に立ちます。
+ 他にも、そのレイアウト内のすべてのグラフに一様なマージンをオプション
+ `layout margins` と `spacing` で設定することができますが、これは一緒に
+ 使う必要があります。`margins` は、格子配置の複数グラフ全体の外側に対す
+ るマージンを設定します。
+
+ `spacing` は、隣接する部分グラフ間の隙間を与えますが、`character` か
+ `screen` 単位で指定することもできます。単一の値を指定すると、それは x,
+ y の両方の方向に使用されますが、2 つの異なる値を指定することもできます。
+
+ 一つの値に単位がなければ、直前のマージン設定のものを使用します。
+
+ 例:
+       set multiplot layout 2,2 margins 0.1, 0.9, 0.1, 0.9 spacing 0.0
+
+ この場合、左にあるグラフの左の境界は、スクリーン座標の 0.1 に置かれ、
+ 右にあるグラフの右の境界はスクリーン座標 0.9 の場所に置かれる、等とな
+ ります。各グラフの隙間は 0 に指定しているので、内側の境界線は重なりま
+ す。
+
+ 例:
+       set multiplot layout 2,2 margins char 5,1,1,2 spacing screen 0, char 2
+
+ これは、左のグラフの境界は、キャンバスの左端から 5 文字幅の場所に、右
+ のグラフの右の境界は、キャンバスの端から 1 文字幅の場所にあるようなレ
+ イアウトを生成します。下のマージンは 1 文字分の高さ、上のマージンは 2
+ 文字分の高さになります。グラフ間の水平方向の隙間はありませんが、縦方向
+ には 2 文字分の高さに等しい隙間があります。
 
  例:
        set multiplot layout 2,2 columnsfirst margins 0.1,0.9,0.1,0.9 spacing 0.1
@@ -10702,9 +10795,10 @@ Ffigure_missing
        set paxis <axisno> {range <range-options> | tics <tic-options>}
        show paxis <axisno> {range | tics}
  コマンド `set paxis` は、平行座標描画の p1, p2, ... 軸の一つに作用する
- こと以外は、`set xrange` や `set xtics` と同じです。これらのコマンドへ
- の通常のオプションは、この描画スタイルには意味のないものもありますが、
- 一応すべてを受けつけます。以下参照: `set xrange`, `set xtics`。
+ こと以外は、`set xrange` や `set xtics` と同じです。以下参照:
+ `parallelaxes`, `set xrange`, `set xtics`。range と tics コマンドへの
+ 通常のオプションは、平行座標描画スタイルには意味のないものもありますが、
+ 一応すべてを受けつけます。
 3 plot
 ?commands show plot
 ?show plot
@@ -11891,7 +11985,7 @@ C 下記の以下参照: オプション `positive`, `negative`)。
 #win        &     yes &     yes &     yes \\
 #wxt        &     yes &     yes &     yes \\
 #x11        &      no &     yes &      no \\
-%c l .
+%c c c c .
 %出力形式@solid@pattern@pm3d
 %_
 %gif@no@yes@no
@@ -11903,7 +11997,6 @@ C 下記の以下参照: オプション `positive`, `negative`)。
 %win@yes@yes@yes
 %wxt@yes@yes@yes
 %x11@no@yes@no
-%_
 @end table
 
 ^<table align="center" border="1" rules="groups" frame="hsides" cellpadding="3">
@@ -12393,8 +12486,8 @@ C 下記の以下参照: オプション `positive`, `negative`)。
  詳細は、以下参照: `coordinates`。`nooffset` は offset を OFF にします。
 
  デフォルトでは見出しラベルは、美しい結果を生むように、軸と回転角に依存
- した位置に自動的に位置合わせされます。それが気にいらなければ、明示的に
- `left`, `right`, `center` のキーワードにより位置合わせを変更できます。
+ した位置に自動的に揃えられますが、気にいらなければ、明示的に `left`,
+ `right`, `center` のキーワードにより位置揃えを変更できます。
  `autojustify` でデフォルトの挙動に復帰します。
 
  オプションなしの `set tics` は、第 1 軸に対する鏡映 (mirror) と内側向
@@ -12443,8 +12536,8 @@ C 下記の以下参照: オプション `positive`, `negative`)。
  て日付を左の余白の上に配置するか、下に配置するかを選択できます (デフォ
  ルトは下)。`rotate` は、もし出力形式がサポートしていればですが、日付を
  垂直方向の文字列にします。定数 <xoff>、<yoff> はずれ (offset) を意味し、
- これによってより適切な位置合わせが行えます。<font> は日付が書かれるフ
- ォントを指定します。
+ これによってより適切な位置決めが行えます。<font> は日付が書かれるフォ
+ ントを指定します。
 
  `timestamp` の代わりに省略名 `time` を使っても構いません。
 
@@ -12511,7 +12604,6 @@ C 下記の以下参照: オプション `positive`, `negative`)。
 %%S@何秒 (出力では 0--60 の整数、入力では実数)
 %%b@月名 (英語) の 3 文字省略形
 %%B@月名 (英語)
-%_
 @end table
 
 
@@ -13150,8 +13242,8 @@ C 下記の以下参照: オプション `positive`, `negative`)。
        set xtics offset 0,graph 0.05
 
  デフォルトでは見出しラベルは、美しい結果を生むように、軸と回転角に依存
- した位置に自動的に位置合わせされます。それが気にいらなければ、明示的に
- `left`, `right`, `center` のキーワードにより位置合わせを変更できます。
+ した位置に自動的に揃えられますが、気にいらなければ、明示的に `left`,
+ `right`, `center` のキーワードにより位置揃えを変更できます。
  `autojustify` でデフォルトの挙動に復帰します。
 
  オプションなしで `set xtics` を実行すると、目盛りが表示される状態であ
@@ -13253,18 +13345,20 @@ C 下記の以下参照: オプション `positive`, `negative`)。
 ?set xtics timedata
 ?xtics timedata tics
 ?timedata tics
- 時間と日付は内部では秒数として保持されています。非数値の日時値は、入力
- 時に `timefmt` で指定した書式を用いて秒数に変換します。軸の目盛り位置
- と軸の範囲も `timefmt` で解釈される日時で、引用符で囲んで与えます。
+ 時間と日付は内部では秒数として保持されています。
+
+ 入力: 非数値の日時値は、入力時に `timefmt` で指定した書式を用いて秒数
+ に変換します。軸に対する位置や軸の範囲も `timefmt` で解釈される日時で、
+ 引用符で囲んで与えます。
  <start>, <incr>, <end> 形式を使う場合、<incr> は秒単位で与えなければい
  けません。入力データの解釈には `timefmt` を使ってください。軸の範囲と
  目盛りの位置は、`set xdata time` で変更されます。
 
- しかし、軸の目盛りラベルは、`set format` か `set xtics format` のいず
- れかで指定された、別の書式を使って生成します。デフォルトでは、それは通
- 常の数値書式指定であると認識しますが (`set xtics numeric`)、他に、地理
- 座標 (`set xtics geographic`) や、日時データ (`set xtics time`) のオプ
- ションがあります。
+ 出力: 軸の目盛りラベルは、`set format` か `set xtics format` のいずれ
+ かで指定された、別の書式を使って生成します。デフォルトでは、それは通常
+ の数値書式指定であると認識しますが (`set xtics numeric`)、他に、地理座
+ 標 (`set xtics geographic`) や、日時データ (`set xtics time`) のオプシ
+ ョンがあります。
 
  注意: 以前の版の gnuplot との互換性のため、コマンド `set xdata time`
  も暗黙に `set xtics time` を実行しますし、`set xdata` や `unset xdata`
@@ -14051,7 +14145,8 @@ C 度の記号は set encoding locale で出るようになると。
 ?stats
 ?statistics
  書式:
-      stats {<ranges>} 'filename' {using N{:M}} {name 'prefix'} {{no}output}
+      stats {<ranges>} 'filename' {matrix | using N{:M}} {name 'prefix'}
+            {{no}output}
 
  このコマンドは、ファイルの 1 列、または 2 列のデータの簡単な統計情報を
  提供します。using 指定子は、plot コマンドと同じ形で解釈されますが、
@@ -14079,6 +14174,15 @@ C 度の記号は set encoding locale で出るようになると。
 #\verb@STATS_blank@      & $~~~~~$  &  空行の総数 \\
 #\verb@STATS_blocks@     & $~~~~~$  &  ファイル内の index データブロック数 \\
 #\verb@STATS_columns@    & $~~~~~$  &  データ先頭行の列数 \\
+%l l .
+%変数@説明
+%_
+%STATS_records@範囲内のデータ行の総数
+%STATS_outofrange@範囲外として除かれた行数
+%STATS_invalid@無効/不完全/欠損データ行の総数
+%STATS_blank@空行の総数
+%STATS_blocks@ファイル内の index データブロック数
+%STATS_columns@データ先頭行の列数
 @end table
 
  2 番目の変数グループは、1 つの列の、範囲内のデータの性質を示します。こ
@@ -14115,10 +14219,10 @@ C 度の記号は set encoding locale で出るようになると。
       STATS_skewness_err      # 歪度の標準誤差
       STATS_kurtosis_err      # 尖度の標準誤差
 #\begin{tabular}{|lrll|} \hline
-#\verb@STATS_min@ && $min(y)$ &  範囲内のデータ点の最小値 \\
-#\verb@STATS_max@ && $max(y)$ &  範囲内のデータ点の最大値 \\
-#\verb@STATS_index_min@ && $i \mid y_i = min(y)$ &  data[i] == STATS\_min となる添字 i \\
-#\verb@STATS_index_max@ && $i \mid y_i = max(y)$ &  data[i] == STATS\_max となる添字 i \\
+#\verb@STATS_min@ && $\min(y)$ &  範囲内のデータ点の最小値 \\
+#\verb@STATS_max@ && $\max(y)$ &  範囲内のデータ点の最大値 \\
+#\verb@STATS_index_min@ && $i \mid y_i = \min(y)$ &  data[i] == STATS\_min となる添字 i \\
+#\verb@STATS_index_max@ && $i \mid y_i = \max(y)$ &  data[i] == STATS\_max となる添字 i \\
 #\verb@STATS_mean@ & $\bar{y}=$ & $\frac{1}{N}\sum{y}$ &  範囲内のデータ点の平均値 \\
 #\verb@STATS_stddev@ & $\sigma_y=$ & $\sqrt{\frac{1}{N}{\sum{{(y-\bar{y})}^2}}}$ &  範囲内のデータ点の標本標準偏差 \\
 #\verb@STATS_ssd@ & $s_y=$ & $\sqrt{\frac{1}{N-1}{\sum{{(y-\bar{y})}^2}}}$ &  範囲内のデータ点の不偏標準偏差 \\
@@ -14134,6 +14238,28 @@ C 度の記号は set encoding locale で出るようになると。
 #\verb@STATS_stddev_err@ && $\sigma_y / \sqrt{2N}$ &  標準偏差の標準誤差 \\
 #\verb@STATS_skewness_err@ && $\sqrt{6/N}$ &  歪度の標準誤差 \\
 #\verb@STATS_kurtosis_err@ && $\sqrt{24/N}$ &  尖度の標準誤差 \\
+%l c l .
+%変数@ @説明
+%_
+%STATS_min@$min ( y )$@範囲内のデータ点の最小値
+%STATS_max@$max ( y )$@範囲内のデータ点の最大値
+%STATS_index_min@$i~|~y sub i = min ( y )$@data[i] == STATS_min となる添字 i
+%STATS_index_max@$i~|~y sub i = max ( y )$@data[i] == STATS_max となる添字 i
+%STATS_lo_quartile@ @第一 (下の) 四分位境界値
+%STATS_median@ @メジアン値 (第二四分位境界値)
+%STATS_up_quartile@ @第三 (上の) 四分位境界値
+%STATS_mean@$y bar = 1 over N sum y$@範囲内のデータ点の平均値
+%STATS_ssd@$sigma sub y = sqrt { 1 over { N - 1 } sum { ( y - y bar ) sup 2  } }$範囲内のデータ点の不偏標準偏差
+%STATS_stddev@$s sub y = sqrt { 1 over N sum { ( y - y bar ) sup 2 } }$@範囲内のデータ点の標本標準偏差
+%STATS_sum@$sum y$@和
+%STATS_sumsq@$sum y sup 2$@平方和
+%STATS_skewness@$1 over { N  sigma sup 3} sum { left ( y - y bar right ) sup 3}$@範囲内のデータ点の歪度
+%STATS_kurtosis@$1 over { N  sigma sup 4} sum { left ( y - y bar right ) sup 4}$@範囲内のデータ点の尖度
+%STATS_adev@$1 over N sum | y - y bar |$@範囲内のデータ点の平均絶対偏差
+%STATS_mean_err@$sigma sub y / sqrt N$@平均値の標準誤差
+%STATS_stddev_err@$sigma sub y / sqrt { 2 N }$ @標準偏差の標準誤差
+%STATS_skewness_err@$sqrt { 6 / N }$@歪度の標準誤差
+%STATS_kurtosis_err@$sqrt { 24 / N }$@尖度の標準誤差
 @end table
 
  3 番目の変数グループは、2 つの列のデータの解析専用です。
@@ -14155,7 +14281,22 @@ C 度の記号は set encoding locale で出るようになると。
 #\verb@STATS_sumxy@       &   &  積和 (x*y の和) \\
 #\verb@STATS_pos_min_y@   &   &  y の最小値を与える x 座標 \\
 #\verb@STATS_pos_max_y@   &   &  y の最大値を与える x 座標 \\
+%l l .
+%変数@説明
+%_
+%STATS_correlation@x と y の不偏相関係数
+%STATS_slope@回帰直線 $y = A x + B$ の係数 A
+%STATS_slope_err@A の不確かさ
+%STATS_intercept@回帰直線 $y = A x + B$ の係数 B
+%STATS_intercept_err@B の不確かさ
+%STATS_sumxy@積和 ($x times y$ の和),  $sum x~y$
+%STATS_pos_min_y@y の最小値を与える x 座標
+%STATS_pos_max_y@y の最大値を与える x 座標
 @end table
+
+ `matrix` が指定されていれば、`using` オプションは無視され、"z" 値のみ
+ が 1 次元のデータ集合として取り扱われます。その行列のサイズは、変数
+ STATS_size_x と STATS_size_y に保存します。
 
  同時に 2 つ以上のファイルからの統計情報を使うことができれば便利でしょ
  うから、変数のデフォルトの接頭辞である "STATS" をオプション `name` で
