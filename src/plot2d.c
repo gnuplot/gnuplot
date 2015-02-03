@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.348 2015/01/20 02:10:43 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.349 2015/01/27 07:12:01 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -2225,6 +2225,13 @@ eval_plots()
 			break;
 		    }
 		    set_axes = TRUE;
+		    continue;
+		}
+
+		/* Allow this plot not to affect autoscaling */
+		if (almost_equals(c_token, "noauto$scale")) {
+		    c_token++;
+		    this_plot->noautoscale = TRUE;
 		    continue;
 		}
 
