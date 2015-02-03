@@ -1,3 +1,13 @@
+2015-02-03  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/plot2d.c:  Allow "noautoscale" keyword to appear anywhere in
+	the plot command, not just immediately after the using specifier.
+
+	* src/interpol.c:  Rework "smooth kdensity" so that
+	1) it now handles logscale on y
+	2) it treats xrange as other plot styles do; in particular it no longer
+	limits the x range to that of the points making up the kernel.
+
 2015-02-02  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* docs/term-ja.diff docs/gnuplot-ja.doc:
