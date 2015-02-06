@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: interpol.c,v 1.48 2015/01/21 03:38:24 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: interpol.c,v 1.49 2015/02/03 23:58:43 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - interpol.c */
@@ -1302,6 +1302,12 @@ cp_implode(struct curve_points *cp)
 	    }
 	    j++;		/* next valid entry */
 	}
+
+	/* FIXME: Monotonic cubic splines support only a single curve per data set */
+	if (j < cp->p_count && cp->plot_smooth == SMOOTH_MONOTONE_CSPLINE) {
+	    break;
+	}
+
 	/* insert invalid point to separate curves */
 	if (j < cp->p_count) {
 	    cp->points[j].type = UNDEFINED;
