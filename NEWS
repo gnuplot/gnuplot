@@ -14,6 +14,7 @@ Changes since 5.0 release
 * FIX breakage in plot style filledcurves {above|below} y1=<yval> 
 * FIX dashtypes after "set term {e}pslatex mono"
 * FIX report and enforce maximum number of parallel axes without faulting
+* FIX smooth mcsplines for a curve containing multiple y values at a single x
 
 Changes in final release of 5.0
 ===============================

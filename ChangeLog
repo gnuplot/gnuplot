@@ -1,3 +1,11 @@
+2015-02-06  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/interpol.c (cp_implode):  The monotonic cubic spline code
+	does not expect or handle multiple curves in a single data set.
+	Thus cp_implode should not set the total number of averaged points
+	to more than the total corresponding to the first curve.
+	Bug #1548
+
 2015-02-01  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c (plot_betweencurves):  This routine now handles both
