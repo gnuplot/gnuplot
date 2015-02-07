@@ -153,6 +153,9 @@ KNOWN ISSUES
 * Font initialization on OSX can be very slow, causing the qt terminal to
   issue warning or error messages for the first plot command.
 
+* The antialiasing option produces artifacts in some versions of Qt.
+  In particular point types 1 and 2 appear unbalanced due to shading.
+
 * You can configure support for both wxt and qt into the same gnuplot
   executable, but only one of these two output modes can be used in any
   given gnuplot session.

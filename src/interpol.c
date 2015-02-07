@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: interpol.c,v 1.46.2.1 2014/09/24 20:14:27 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: interpol.c,v 1.46.2.2 2015/02/06 17:16:42 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - interpol.c */
@@ -179,9 +179,8 @@ typedef double five_diag[5];
 
 static int next_curve __PROTO((struct curve_points * plot, int *curve_start));
 static int num_curves __PROTO((struct curve_points * plot));
-static void eval_kdensity __PROTO((struct curve_points *cp, 
-				   int first_point, int num_points, double sr,
-				   coordval *px, coordval *py));
+static double eval_kdensity __PROTO((struct curve_points *cp, 
+				   int first_point, int num_points, double x));
 static void do_kdensity __PROTO((struct curve_points *cp, int first_point,
 				 int num_points, struct coordinate *dest));
 static double *cp_binomial __PROTO((int points));
@@ -254,37 +253,34 @@ num_curves(struct curve_points *plot)
 
    The implementation is based closely on the implementation for Bezier
    curves, except for the way the actual interpolation is generated.
+
+   EAM Feb 2015 - Revise to handle logscaled y axis and to 
+   pass in an actual x coordinate rather than a fraction of the min/max range.
+   NB: This code does not deal with logscaled x axis.
+   FIXME: It's silly to recalculate the mean/stddev/bandwidth every time.
 */
 
 /* eval_kdensity is a modification of eval_bezier */
-static void 
+static double
 eval_kdensity ( 
     struct curve_points *cp,
     int first_point,	/* where to start in plot->points (to find x-range) */
     int num_points,	/* to determine end in plot->points */
-    double sr,		/* position inside curve, range [0:1] */
-    coordval *px,	/* OUTPUT: x and y */
-    coordval *py ) {
+    double x		/* x value at which to calculate y */
+    ) {
 
     unsigned int i;
-    unsigned int n = num_points - 1;
     struct coordinate GPHUGE *this_points = (cp->points) + first_point;
   
-    double x, y, tmp;
+    double y, Z, ytmp;
     double avg, sigma;
-    double min =  DBL_MAX;
-    double max = -DBL_MAX;
     double bandwidth, default_bandwidth;
 
     avg = 0.0;
     sigma = 0.0;
-    for (i = 0; i <= n; i++) {
-      avg   += this_points[i].x;
-      sigma += this_points[i].x * this_points[i].x;
-
-      /* Find min and max of x-range. Necessary since points not sorted! */
-      min = this_points[i].x < min ? this_points[i].x : min;
-      max = this_points[i].x > max ? this_points[i].x : max;
+    for (i = 0; i < num_points; i++) {
+	avg   += this_points[i].x;
+	sigma += this_points[i].x * this_points[i].x;
     }
     avg /= (double)num_points;
     sigma = sqrt( sigma/(double)num_points - avg*avg ); /* Standard Deviation */
@@ -300,20 +296,19 @@ eval_kdensity (
     } else
 	bandwidth = cp->smooth_parameter;
 
-    x = min + sr*(max-min); /* The current x-value */
-
     y = 0;
-    for (i = 0; i <= n; i++) {
-      tmp = ( x - this_points[i].x )/bandwidth;
-      y += this_points[i].y * exp( - 0.5*tmp*tmp ) / bandwidth;
+    for (i = 0; i < num_points; i++) {
+	Z = ( x - this_points[i].x )/bandwidth;
+	ytmp = this_points[i].y;
+	y += AXIS_DE_LOG_VALUE(cp->y_axis,ytmp) * exp( -0.5*Z*Z ) / bandwidth;
     }
     y /= sqrt(2.0*M_PI);
 
-    *px = x;
-    *py = y;
+    return y;
 }
 
 /* do_kdensity is based on do_bezier, except for the call to eval_bezier */
+/* EAM Feb 2015: Don't touch xrange, but recalculate y limits  */
 static void 
 do_kdensity( 
     struct curve_points *cp,
@@ -322,56 +317,33 @@ do_kdensity(
     struct coordinate *dest)	/* where to put the interpolated data */
 {
     int i;
-    coordval x, y;
-
-    /* min and max in internal (eg logged) co-ordinates. We update
-     * these, then update the external extrema in user co-ordinates
-     * at the end.
-     */
-
-    double ixmin, ixmax, iymin, iymax;
-    double sxmin, sxmax, symin, symax;	/* starting values of above */
+    double x, y;
+    double sxmin, sxmax, step;
 
     x_axis = cp->x_axis;
     y_axis = cp->y_axis;
 
-    ixmin = sxmin = AXIS_LOG_VALUE(x_axis, X_AXIS.min);
-    ixmax = sxmax = AXIS_LOG_VALUE(x_axis, X_AXIS.max);
-    iymin = symin = AXIS_LOG_VALUE(y_axis, Y_AXIS.min);
-    iymax = symax = AXIS_LOG_VALUE(y_axis, Y_AXIS.max);
+    if (X_AXIS.log)
+	int_error(NO_CARET, "kdensity cannot handle logscale x axis");
+    sxmin = X_AXIS.min;
+    sxmax = X_AXIS.max;
+
+    step = (sxmax - sxmin) / (samples_1 - 1);
 
     for (i = 0; i < samples_1; i++) {
-        eval_kdensity( cp, first_point, num_points,
-		       (double) i / (double) (samples_1 - 1),
-		       &x, &y );
+	x = sxmin + i * step;
+        y = eval_kdensity( cp, first_point, num_points, x );
 
 	/* now we have to store the points and adjust the ranges */
 	dest[i].type = INRANGE;
-	STORE_AND_FIXUP_RANGE( dest[i].x, x, dest[i].type, ixmin, ixmax, 
-			       X_AXIS.autoscale, NOOP, continue);
-	STORE_AND_FIXUP_RANGE( dest[i].y, y, dest[i].type, iymin, iymax, 
-			       Y_AXIS.autoscale, NOOP, NOOP);
-
+	dest[i].x = x;
+	STORE_WITH_LOG_AND_UPDATE_RANGE( dest[i].y, y, dest[i].type, y_axis,
+				cp->noautoscale, NOOP, NOOP);
 	dest[i].xlow = dest[i].xhigh = dest[i].x;
 	dest[i].ylow = dest[i].yhigh = dest[i].y;
-
 	dest[i].z = -1;
     }
-
-    UPDATE_RANGE(ixmax > sxmax, X_AXIS.max, ixmax, x_axis);
-    UPDATE_RANGE(ixmin < sxmin, X_AXIS.min, ixmin, x_axis);
-    UPDATE_RANGE(iymax > symax, Y_AXIS.max, iymax, y_axis);
-    UPDATE_RANGE(iymin < symin, Y_AXIS.min, iymin, y_axis);
 }
-
-
-/*
- * build up a cntr_struct list from curve_points
- * this funtion is only used for the alternate entry point to
- * Gershon's code and thus commented out
- ***deleted***
- */
-
 
 /* HBB 990205: rewrote the 'bezier' interpolation routine,
  * to prevent numerical overflow and other undesirable things happening
@@ -1128,9 +1100,9 @@ gen_interp(struct curve_points *plot)
 	    free((char *) bc);
 	    break;
 	case SMOOTH_KDENSITY:
-	  do_kdensity( plot, first_point, num_points, 
+	    do_kdensity( plot, first_point, num_points, 
 		       new_points + i * (samples_1 + 1));
-	  break;
+	    break;
 	default:		/* keep gcc -Wall quiet */
 	    ;
 	}

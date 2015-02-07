@@ -4,6 +4,7 @@ Changes since 5.0 release
 * CHANGE reevaluate fill color for each polygon in data for "with filledcurves"
 * CHANGE gstrptime(): always check validity of %y %Y %d %B %b input fields
 * CHANGE track text properties for key title separately from key entries
+* CHANGE "smooth kdensity" now handles logscale y and explicit x range
 * FIX improved handling of boxplot data with multiple factors (categories)
 * FIX save_textcolor was not handling "tc variable"
 * FIX apply numeric locale when reading ascii matrix data

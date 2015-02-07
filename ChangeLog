@@ -1,3 +1,10 @@
+2015-02-07  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/interpol.c:  Rework "smooth kdensity" so that
+	1) it now handles logscale on y
+	2) it treats xrange as other plot styles do; in particular it no longer
+	limits the x range to that of the points making up the kernel.
+
 2015-02-06  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/interpol.c (cp_implode):  The monotonic cubic spline code
