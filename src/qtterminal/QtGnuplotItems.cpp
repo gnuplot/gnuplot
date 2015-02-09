@@ -154,7 +154,7 @@ void QtGnuplotPoint::paint(QPainter* painter, const QStyleOptionGraphicsItem* op
 
 void QtGnuplotPoint::drawPoint(QPainter* painter, const QPointF& origin, double size, int style)
 {
-	painter->drawPoint(origin);
+	// painter->drawPoint(origin);
 
 	if (style == -1)
 		return;

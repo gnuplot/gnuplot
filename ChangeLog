@@ -1,3 +1,8 @@
+2015-02-09  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/qtterminal/QtGnuplotIterms.cpp (drawPoint):
+	Don't draw an extra dot at the nominal origin of each point symbol.
+
 2015-02-07  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/interpol.c:  Rework "smooth kdensity" so that
