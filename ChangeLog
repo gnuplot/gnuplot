@@ -1,3 +1,10 @@
+2015-02-09  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/boundary.c (do_key_sample_point) src/graphics.c (do_plot)
+	src/graph3d.c (do_3dplot): Until now "with labels" plots could have
+	a point associated with each label but the point style was not 
+	indicated in the key.  Now it is.
+
 2015-02-06  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/interpol.c (cp_implode):  The monotonic cubic spline code

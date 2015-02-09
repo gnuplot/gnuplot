@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.317 2015/01/06 04:57:15 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.318 2015/01/21 03:38:24 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -1150,6 +1150,13 @@ do_3dplot(
 	    case POINTSTYLE:
 		if (draw_this_surface)
 		    key_sample_point_pm3d(this_plot, xl, yl, this_plot->lp_properties.p_type);
+		break;
+
+	    case LABELPOINTS:
+		if ((this_plot->labels->lp_properties.flags & LP_SHOW_POINTS)) {
+		    term_apply_lp_properties(&this_plot->labels->lp_properties);
+		    key_sample_point(xl, yl, this_plot->labels->lp_properties.p_type);
+		}
 		break;
 
 	    case LINESPOINTS:

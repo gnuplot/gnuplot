@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.475 2015/01/21 03:38:24 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.476 2015/02/02 04:52:20 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -834,6 +834,9 @@ do_plot(struct curve_points *plots, int pcount)
 	else if (localkey && this_plot->title && !this_plot->title_is_suppressed) {
 	    /* we deferred point sample until now */
 	    if (this_plot->plot_style & PLOT_STYLE_HAS_POINT)
+		do_key_sample_point(this_plot, key, xl, yl);
+
+	    if (this_plot->plot_style == LABELPOINTS)
 		do_key_sample_point(this_plot, key, xl, yl);
 
 	    if (key->invert)

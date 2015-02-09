@@ -1,5 +1,5 @@
 /*
- * $Id: boundary.c,v 1.18 2015/01/06 04:57:15 sfeam Exp $
+ * $Id: boundary.c,v 1.19 2015/01/19 22:10:59 sfeam Exp $
  */
 
 /* GNUPLOT - boundary.c */
@@ -1355,6 +1355,13 @@ do_key_sample_point(
 		(*t->point) (xl + key_point_offset, yl, 
 				this_plot->lp_properties.p_type);
 	    }
+	}
+
+    } else if (this_plot->plot_style == LABELPOINTS) {
+	struct text_label *label = this_plot->labels;
+	if (label->lp_properties.flags & LP_SHOW_POINTS) {
+	    term_apply_lp_properties(&label->lp_properties);
+	    (*t->point) (xl + key_point_offset, yl, label->lp_properties.p_type);
 	}
     }
 
