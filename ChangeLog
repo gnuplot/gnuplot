@@ -5,6 +5,9 @@
 	a point associated with each label but the point style was not 
 	indicated in the key.  Now it is.
 
+	* src/qtterminal/QtGnuplotIterms.cpp (drawPoint):
+	Don't draw an extra dot at the nominal origin of each point symbol.
+
 2015-02-06  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/interpol.c (cp_implode):  The monotonic cubic spline code
