@@ -1,3 +1,8 @@
+2015-02-11  Erik Olofsen <olofsen@sourceforge.net>
+
+	* configure.vms:  update compile-time variables to include HAVE_VFPRINTF
+	and MAX_PARALLEL_AXES
+
 2015-02-09  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/qtterminal/QtGnuplotIterms.cpp (drawPoint):
