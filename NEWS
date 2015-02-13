@@ -1,6 +1,7 @@
 New features, changes and fixes since gnuplot version 4.6.6
 ===========================================================
 * FIX apply numeric locale when reading ascii matrix data
+* FIX handle log-scaled color axis in colorspec "lc palette cb"
 
 
 New features, changes and fixes in gnuplot version 4.6.6
