@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gadgets.c,v 1.115.2.1 2014/09/05 21:50:56 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gadgets.c,v 1.115.2.2 2015/01/16 05:53:06 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - gadgets.c */
@@ -40,6 +40,7 @@ static char *RCSid() { return RCSid("$Id: gadgets.c,v 1.115.2.1 2014/09/05 21:50
 #include "graph3d.h" /* for map3d_position_r() */
 #include "graphics.h"
 #include "plot3d.h" /* For is_plot_with_palette() */
+#include "axis.h" /* For CB_AXIS */
 
 #include "pm3d.h"
 
@@ -585,6 +586,7 @@ apply_pm3dcolor(struct t_colorspec *tc, const struct termentry *t)
     /* V5 - term->linetype(LT_BLACK) would clobber the current	*/
     /* dashtype so instead we use term->set_color(black).	*/
     static t_colorspec black = BLACK_COLORSPEC; 
+    double cbval;
 
     /* Replace colorspec with that of the requested line style */
     struct lp_style_type style;
@@ -622,11 +624,19 @@ apply_pm3dcolor(struct t_colorspec *tc, const struct termentry *t)
 	return;
     }
     switch (tc->type) {
-	case TC_Z:    set_color(cb2gray(z2cb(tc->value))); break;
-	case TC_CB:   set_color(cb2gray(tc->value));       break;
-	case TC_FRAC: set_color(sm_palette.positive == SMPAL_POSITIVE ?
-				tc->value : 1-tc->value);
-		      break;
+	case TC_Z:
+		set_color(cb2gray(z2cb(tc->value)));
+		break;
+	case TC_CB:
+		if (CB_AXIS.log)
+		    cbval = (tc->value <= 0) ? CB_AXIS.min : (log(tc->value) / CB_AXIS.log_base);
+		else
+		    cbval = tc->value;
+		set_color(cb2gray(cbval));
+		break;
+	case TC_FRAC:
+		set_color(sm_palette.positive == SMPAL_POSITIVE ?  tc->value : 1-tc->value);
+		break;
     }
 }
 

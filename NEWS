@@ -16,6 +16,7 @@ Changes since 5.0 release
 * FIX dashtypes after "set term {e}pslatex mono"
 * FIX report and enforce maximum number of parallel axes without faulting
 * FIX smooth mcsplines for a curve containing multiple y values at a single x
+* FIX handle log-scaled color axis in colorspec "lc palette cb"
 
 Changes in final release of 5.0
 ===============================
