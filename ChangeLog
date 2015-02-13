@@ -4,6 +4,8 @@
 	failed to handle log-scaling of the color axis.
 	Bug #1560
 
+	* src/mouse.c (load_mouse_variables): MOUSE_BUTTON was not set correctly.
+
 2015-02-11  Erik Olofsen <olofsen@sourceforge.net>
 
 	* configure.vms:  update compile-time variables to include HAVE_VFPRINTF

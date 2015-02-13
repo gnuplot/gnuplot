@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: mouse.c,v 1.175 2014/12/31 19:53:19 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: mouse.c,v 1.176 2015/01/20 02:10:42 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - mouse.c */
@@ -2877,7 +2877,7 @@ load_mouse_variables(double x, double y, TBOOLEAN button, int c)
 
     if ((current = add_udv_by_name("MOUSE_BUTTON"))) {
 	Ginteger(&current->udv_value, button?c:-1);
-	if (button)
+	if (!button)
 	    current->udv_value.type = NOTDEFINED;
     }
     if ((current = add_udv_by_name("MOUSE_KEY"))) {
