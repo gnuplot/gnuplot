@@ -1,3 +1,11 @@
+2015-02-15  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/axis.h src/axis.c src/set.c:  Do away with 4 utility routines
+	{set|get}_writeback_{min|max} that did nothing but provide a
+	round-about way to access the next field in a structure that is
+	already active. E.g. axis->min = get_writeback_min(axis) becomes
+	axis->min = axis->writeback_min.
+
 2015-02-15  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/axis.h (AXIS_INDEX): Change value of NO_AXIS to -2.  Make

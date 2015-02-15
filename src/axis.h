@@ -1,5 +1,5 @@
 /*
- * $Id: axis.h,v 1.107 2014/12/09 03:32:25 sfeam Exp $
+ * $Id: axis.h,v 1.108 2015/02/15 16:39:20 broeker Exp $
  *
  */
 
@@ -675,11 +675,6 @@ void axis_set_graphical_range __PROTO((AXIS_INDEX, unsigned int lower, unsigned 
 void axis_draw_2d_zeroaxis __PROTO((AXIS_INDEX, AXIS_INDEX));
 TBOOLEAN some_grid_selected __PROTO((void));
 void add_tic_user __PROTO((AXIS_INDEX, char *, double, int));
-
-double get_writeback_min __PROTO((AXIS_INDEX));
-double get_writeback_max __PROTO((AXIS_INDEX));
-void set_writeback_min __PROTO((AXIS_INDEX));
-void set_writeback_max __PROTO((AXIS_INDEX));
 
 void save_writeback_all_axes __PROTO((void));
 int  parse_range __PROTO((AXIS_INDEX axis));

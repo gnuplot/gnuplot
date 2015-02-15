@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.142 2014/12/09 03:32:25 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.143 2015/02/15 16:39:20 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -1735,20 +1735,6 @@ widest_tic_callback(AXIS_INDEX axis, double place, char *text,
  * ULIG *
  */
 
-double
-get_writeback_min(AXIS_INDEX axis)
-{
-    /* printf("get min(%d)=%g\n",axis,axis_array[axis].writeback_min); */
-    return axis_array[axis].writeback_min;
-}
-
-double
-get_writeback_max(AXIS_INDEX axis)
-{
-    /* printf("get max(%d)=%g\n",axis,axis_array[axis].writeback_min); */
-    return axis_array[axis].writeback_max;
-}
-
 void
 set_writeback_min(AXIS_INDEX axis)
 {
@@ -1772,8 +1758,8 @@ save_writeback_all_axes()
 
     for (axis = 0; axis < AXIS_ARRAY_SIZE; axis++)
 	if (axis_array[axis].range_flags & RANGE_WRITEBACK) {
-	    set_writeback_min(axis);
-	    set_writeback_max(axis);
+	    axis_array[axis].writeback_min = AXIS_DE_LOG_VALUE(axis,axis_array[axis].min);
+	    axis_array[axis].writeback_max = AXIS_DE_LOG_VALUE(axis,axis_array[axis].max);
 	}
 }
 
