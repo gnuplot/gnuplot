@@ -1,5 +1,5 @@
 /*
- * $Id: boundary.c,v 1.19 2015/01/19 22:10:59 sfeam Exp $
+ * $Id: boundary.c,v 1.20 2015/02/10 01:07:59 sfeam Exp $
  */
 
 /* GNUPLOT - boundary.c */
@@ -455,7 +455,7 @@ boundary(struct curve_points *plots, int count)
 	     * the latter sets widest_tic_strlen to the length of the widest
 	     * one ought to consider tics on axis if axis near border...
 	     */
-	    gen_tics(FIRST_Y_AXIS, /* 0, */ widest_tic_callback);
+	    gen_tics(FIRST_Y_AXIS, widest_tic_callback);
 
 	    ytic_textwidth = (int) (t->h_char * (widest_tic_strlen + 2));
 	}
@@ -536,7 +536,7 @@ boundary(struct curve_points *plots, int count)
 	     * the latter sets widest_tic_strlen to the length of the widest
 	     * one ought to consider tics on axis if axis near border...
 	     */
-	    gen_tics(SECOND_Y_AXIS, /* 0, */ widest_tic_callback);
+	    gen_tics(SECOND_Y_AXIS, widest_tic_callback);
 
 	    y2tic_textwidth = (int) (t->h_char * (widest_tic_strlen + 2));
 	}
@@ -714,7 +714,7 @@ boundary(struct curve_points *plots, int count)
 	else if (axis_array[SECOND_X_AXIS].label.pos == CENTRE)
 	    projection = 0.5*fabs(projection);
 	widest_tic_strlen = 0;		/* reset the global variable ... */
-	gen_tics(SECOND_X_AXIS, /* 0, */ widest_tic_callback);
+	gen_tics(SECOND_X_AXIS, widest_tic_callback);
 	if (tmargin.x < 0) /* Undo original estimate */
 	    plot_bounds.ytop += x2tic_textheight;
 	/* Adjust spacing for rotation */
@@ -738,7 +738,7 @@ boundary(struct curve_points *plots, int count)
 	if (axis_array[FIRST_X_AXIS].label.pos == RIGHT)
 	    projection *= -1;
 	widest_tic_strlen = 0;		/* reset the global variable ... */
-	gen_tics(FIRST_X_AXIS, /* 0, */ widest_tic_callback);
+	gen_tics(FIRST_X_AXIS, widest_tic_callback);
 
 	if (bmargin.x < 0)
 	    plot_bounds.ybot -= xtic_textheight;

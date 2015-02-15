@@ -6,6 +6,9 @@
 	already active. E.g. axis->min = get_writeback_min(axis) becomes
 	axis->min = axis->writeback_min.
 
+	* src/boundary.c src/color.c:  Remove dead code (commented-out extra
+	parameter to gen_tics()).
+
 2015-02-15  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/axis.h (AXIS_INDEX): Change value of NO_AXIS to -2.  Make
