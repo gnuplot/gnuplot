@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: eval.c,v 1.120 2014/12/03 21:32:49 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: eval.c,v 1.121 2015/01/20 02:10:42 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - eval.c */
@@ -1030,7 +1030,7 @@ gp_word(char *string, int i)
 
 /* Evaluate the function linking secondary axis to primary axis */
 double
-eval_link_function(int axis, double raw_coord)
+eval_link_function(AXIS_INDEX axis, double raw_coord)
 {
     udft_entry *link_udf = axis_array[axis].link_udf;
     int dummy_var;

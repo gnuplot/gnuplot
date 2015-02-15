@@ -1,5 +1,5 @@
 /*
- * $Id: axis.h,v 1.106 2014/10/06 04:44:05 sfeam Exp $
+ * $Id: axis.h,v 1.107 2014/12/09 03:32:25 sfeam Exp $
  *
  */
 
@@ -55,7 +55,12 @@
  * SECOND_X_AXIS = FIRST_X_AXIS + SECOND_AXES
  * FIRST_X_AXIS & SECOND_AXES == 0
  */
+#ifndef MAX_PARALLEL_AXES
+# define MAX_PARALLEL_AXES MAX_NUM_VAR
+#endif
+
 typedef enum AXIS_INDEX {
+    NO_AXIS = -2,
     ALL_AXES = -1,
     FIRST_Z_AXIS = 0,
 #define FIRST_AXES FIRST_Z_AXIS
@@ -64,22 +69,26 @@ typedef enum AXIS_INDEX {
     COLOR_AXIS,			/* fill gap */
     SECOND_Z_AXIS,		/* not used, yet */
 #define SECOND_AXES SECOND_Z_AXIS
+    SAMPLE_AXIS=SECOND_Z_AXIS,
     SECOND_Y_AXIS,
     SECOND_X_AXIS,
     POLAR_AXIS,
+#define NUMBER_OF_MAIN_VISIBLE_AXES (POLAR_AXIS + 1)
     T_AXIS,
     U_AXIS,
     V_AXIS,
     PARALLEL_AXES,	/* The first of up to MAX_PARALLEL_AXES */
-    NO_AXIS = 99
+
+    AXIS_ARRAY_SIZE = PARALLEL_AXES + MAX_PARALLEL_AXES
 } AXIS_INDEX;
 
-#ifndef MAX_PARALLEL_AXES
-# define MAX_PARALLEL_AXES MAX_NUM_VAR
-#endif
-# define AXIS_ARRAY_SIZE (11 + MAX_PARALLEL_AXES)
-# define SAMPLE_AXIS SECOND_Z_AXIS
-# define LAST_REAL_AXIS  POLAR_AXIS
+
+/* HBB NOTE 2015-01-28: SECOND_Z_AXIS is not actually used */
+#define AXIS_IS_SECOND(AXIS) (((AXIS) >= SECOND_Y_AXIS) && ((AXIS) <= SECOND_X_AXIS))
+#define AXIS_IS_FIRST(AXIS)  (((AXIS) >=  FIRST_Z_AXIS) && ((AXIS) <=  FIRST_X_AXIS))
+
+#define AXIS_MAP_FROM_FIRST_TO_SECOND(AXIS) (SECOND_AXES + ((AXIS) - FIRST_AXES))
+#define AXIS_MAP_FROM_SECOND_TO_FIRST(AXIS) (FIRST_AXES + ((AXIS) - SECOND_AXES))
 
 /* sample axis doesn't need mtics, so use the slot to hold sample interval */
 # define SAMPLE_INTERVAL mtic_freq
@@ -246,7 +255,7 @@ typedef struct axis {
  * If linked_to_primary is TRUE, the primary axis info will be cloned into the
  * secondary axis only up to this point in the structure.
  */
-    TBOOLEAN linked_to_primary;
+    struct axis *linked_to_primary;
     struct udft_entry *link_udf;
 
 /* time/date axis control */
@@ -288,7 +297,7 @@ typedef struct axis {
 	0.,        		/* terminal scale */			    \
 	0,        		/* zero axis position */		    \
 	FALSE, 0.0, 0.0,	/* log, base, log(base) */		    \
-	FALSE, NULL,		/* linked_to_primary, link function */      \
+	NULL, NULL,		/* linked_to_primary, link function */      \
 	DT_NORMAL,		/* datatype for input */	            \
 	DT_NORMAL, NULL,      	/* tictype for output, output format, */    \
 	NO_TICS,		/* tic output positions (border, mirror) */ \
@@ -491,8 +500,10 @@ do {									\
  */
 #define GET_NUMBER_OR_TIME(store,axes,axis)				\
 do {									\
-    if (((axes) >= 0) && (axis_array[(axes)+(axis)].datatype == DT_TIMEDATE)	\
-	&& isstringvalue(c_token)) {					\
+    if (   ((axes) != NO_AXIS)						\
+        && (axis_array[(axes)+(axis)].datatype == DT_TIMEDATE)		\
+	&& isstringvalue(c_token)					\
+       ) {								\
 	struct tm tm;							\
 	double usec;							\
 	char *ss = try_to_get_string();					\
@@ -526,8 +537,8 @@ do {							\
 					       NOAUTOSCALE, OUT_ACTION,   \
 					       UNDEF_ACTION, is_cb_axis)  \
 do {									  \
-    struct axis *axis = &axis_array[AXIS];				  \
-    double curval = VALUE;						  \
+    struct axis *axis = axis_array + (AXIS);				  \
+    double curval = (VALUE);						  \
     if (AXIS == NO_AXIS)						  \
 	break;								  \
     /* Version 5: OK to store infinities or NaN */			  \
@@ -556,14 +567,15 @@ do {									  \
     if (TYPE != INRANGE)						  \
 	break;  /* don't set y range if x is outrange, for example */	  \
     if ((! is_cb_axis) && axis->linked_to_primary) {	  		  \
-	axis -= SECOND_AXES;						  \
+	axis = axis->linked_to_primary;					  \
 	if (axis->link_udf->at) 					  \
-	    curval = eval_link_function(AXIS - SECOND_AXES, curval);	  \
+	    curval = eval_link_function(axis - axis_array, curval);	  \
     } 									  \
     if ( curval < axis->data_min )					  \
 	axis->data_min = curval;					  \
-    if ( curval < axis->min						  \
-    &&  (curval <= axis->max || axis->max == -VERYLARGE)) {		  \
+    if (   (curval < axis->min)						  \
+        && ((curval <= axis->max) || (axis->max == -VERYLARGE))		  \
+       ) {								  \
 	if (axis->autoscale & AUTOSCALE_MIN)	{			  \
 	    if (axis->min_constraint & CONSTRAINT_LOWER) {		  \
 		if (axis->min_lb <= curval) {				  \
@@ -589,7 +601,7 @@ do {									  \
     &&  (curval >= axis->min || axis->min == VERYLARGE)) {		  \
 	if (axis->autoscale & AUTOSCALE_MAX)	{			  \
 	    if (axis->max_constraint & CONSTRAINT_UPPER) {		  \
-		if (axis->max_ub >= curval) {				  \
+		if (axis->max_ub >= curval) {		 		  \
 		    axis->max = curval;					  \
 		} else {						  \
 		    axis->max = axis->max_ub;				  \
@@ -683,7 +695,7 @@ void get_position_default __PROTO((struct position *pos, enum position_type defa
 
 void gstrdms __PROTO((char *label, char *format, double value));
 
-void clone_linked_axes __PROTO((AXIS_INDEX axis2, AXIS_INDEX axis1));
+void clone_linked_axes __PROTO((AXIS_INDEX axis1));
 
 int map_x __PROTO((double value));
 int map_y __PROTO((double value));

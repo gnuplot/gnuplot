@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: x11.trm,v 1.222 2014/07/30 20:43:41 sfeam Exp $
+ * $Id: x11.trm,v 1.223 2014/09/04 20:33:14 sfeam Exp $
  *
  */
 
@@ -1484,9 +1484,9 @@ X11_text()
 	{
 	/* Construct a mask showing which axes are active */
 	int axis_mask = 0;
-	int i;
+	AXIS_INDEX i;
 
-	for (i = FIRST_AXES; i < 2*SECOND_AXES; i++) {
+	for (i = (AXIS_INDEX)0; i < NUMBER_OF_MAIN_VISIBLE_AXES; i++) {
 	    if (axis_array[i].ticmode != NO_TICS)
 		axis_mask |= (1 << i);
 	}

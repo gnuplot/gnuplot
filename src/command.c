@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.296 2015/01/20 02:10:42 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.297 2015/01/24 17:24:10 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -1216,24 +1216,26 @@ while_command()
 void
 link_command()
 {
-    AXIS_INDEX primary_axis, secondary_axis;
-    TBOOLEAN linked = TRUE;
+    AXIS_INDEX primary_axis = NO_AXIS, secondary_axis = NO_AXIS;
+    struct axis *linked = NULL;
 
-    if (equals(c_token - 1,"unset"))
-	linked = FALSE;
-
-    /* Flag the axes as being linked, and copy the range settings */
-    /* from the primary axis into the linked secondary axis       */
-    c_token++;
-    if (almost_equals(c_token,"x$2")) {
-	primary_axis = FIRST_X_AXIS;
-	secondary_axis = SECOND_X_AXIS;
-    } else if (almost_equals(c_token,"y$2")) {
-	primary_axis = FIRST_Y_AXIS;
-	secondary_axis = SECOND_Y_AXIS;
-    } else {
-	int_error(c_token,"expecting x2 or y2");
+    if (! equals(c_token - 1,"unset")) {
+        /* Flag the axes as being linked, and copy the range settings */
+        /* from the primary axis into the linked secondary axis       */
+        c_token++;
+        if (almost_equals(c_token,"x$2")) {
+	    primary_axis = FIRST_X_AXIS;
+	    secondary_axis = SECOND_X_AXIS;
+        } else if (almost_equals(c_token,"y$2")) {
+    	    primary_axis = FIRST_Y_AXIS;
+	    secondary_axis = SECOND_Y_AXIS;
+    	} else {
+	    int_error(c_token,"expecting x2 or y2");
+        }
+	linked = axis_array + primary_axis;
     }
+
+
     axis_array[secondary_axis].linked_to_primary = linked;
     c_token++;
 
@@ -1253,13 +1255,13 @@ link_command()
 	    parse_link_via(axis_array[primary_axis].link_udf);
 	} else {
 	    int_warn(c_token,"inverse mapping function required");
-	    linked = FALSE;
+	    linked = NULL;
 	}
     }
 
     if (linked) {
 	/* Clone the range information */
-	clone_linked_axes(secondary_axis, primary_axis);
+	clone_linked_axes(primary_axis);
     } else {
 	free_at(axis_array[secondary_axis].link_udf->at);
 	axis_array[secondary_axis].link_udf->at = NULL;

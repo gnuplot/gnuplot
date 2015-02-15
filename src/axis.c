@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.141 2014/12/01 22:25:25 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.142 2014/12/09 03:32:25 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -173,7 +173,7 @@ static double round_outward __PROTO((AXIS_INDEX, TBOOLEAN, double));
 static TBOOLEAN axis_position_zeroaxis __PROTO((AXIS_INDEX));
 static void load_one_range __PROTO((AXIS_INDEX axis, double *a, t_autoscale *autoscale, t_autoscale which ));
 static double quantize_duodecimal_tics __PROTO((double, int));
-static void get_position_type __PROTO((enum position_type * type, int *axes));
+static void get_position_type __PROTO((enum position_type * type, AXIS_INDEX *axes));
 
 /* ---------------------- routines ----------------------- */
 
@@ -870,7 +870,7 @@ setup_tics(AXIS_INDEX axis, int max)
      * clone that rather than trying to reproduce it for the secondary axis.
      */
     if (this->linked_to_primary) {
-	clone_linked_axes(axis, axis - SECOND_AXES);
+	clone_linked_axes(this->linked_to_primary - axis_array);
 	autoextend_min = autoextend_max = FALSE;
     }
 
@@ -1377,13 +1377,13 @@ axis_output_tics(
      tic_callback callback)	/* tic-drawing callback function */
 {
     struct termentry *t = term;
-    TBOOLEAN axis_is_vertical = ((axis % SECOND_AXES) == FIRST_Y_AXIS);
-    TBOOLEAN axis_is_second = ((axis / SECOND_AXES) == 1);
+    TBOOLEAN axis_is_vertical = ((axis == FIRST_Y_AXIS) || (axis == SECOND_Y_AXIS));
+    TBOOLEAN axis_is_second = AXIS_IS_SECOND(axis);
     int axis_position;		/* 'non-running' coordinate */
     int mirror_position;	/* 'non-running' coordinate, 'other' side */
     double axis_coord = 0.0;	/* coordinate of this axis along non-running axis */
 
-    if (zeroaxis_basis / SECOND_AXES) {
+    if (AXIS_IS_SECOND(zeroaxis_basis)) {
 	axis_position = axis_array[zeroaxis_basis].term_upper;
 	mirror_position = axis_array[zeroaxis_basis].term_lower;
     } else {
@@ -1536,10 +1536,12 @@ axis_draw_2d_zeroaxis(AXIS_INDEX axis, AXIS_INDEX crossaxis)
 
     if (axis_position_zeroaxis(crossaxis) && this->zeroaxis) {
 	term_apply_lp_properties(this->zeroaxis);
-	if ((axis % SECOND_AXES) == FIRST_X_AXIS) {
+	if ((axis == FIRST_X_AXIS) || (axis == SECOND_X_AXIS)) {
+	    /* zeroaxis is horizontal, at y == 0 */
 	    (*term->move) (this->term_lower, axis_array[crossaxis].term_zero);
 	    (*term->vector) (this->term_upper, axis_array[crossaxis].term_zero);
-	} else {
+	} else if ((axis == FIRST_Y_AXIS) || (axis == SECOND_Y_AXIS)) {
+	    /* zeroaxis is vertical, at x == 0 */
 	    (*term->move) (axis_array[crossaxis].term_zero, this->term_lower);
 	    (*term->vector) (axis_array[crossaxis].term_zero, this->term_upper);
 	}
@@ -1790,7 +1792,7 @@ TBOOLEAN
 some_grid_selected()
 {
     AXIS_INDEX i;
-    for (i = 0; i <= LAST_REAL_AXIS; i++)
+    for (i = 0; i < NUMBER_OF_MAIN_VISIBLE_AXES; i++)
 	if (axis_array[i].gridmajor || axis_array[i].gridminor)
 	    return TRUE;
     return FALSE;
@@ -1822,15 +1824,21 @@ set_cbminmax()
 }
 
 static void
-get_position_type(enum position_type *type, int *axes)
+get_position_type(enum position_type *type, AXIS_INDEX *axes)
 {
     if (almost_equals(c_token, "fir$st")) {
 	++c_token;
 	*type = first_axes;
+	*axes = FIRST_AXES;
+	return;
     } else if (almost_equals(c_token, "sec$ond")) {
 	++c_token;
 	*type = second_axes;
-    } else if (almost_equals(c_token, "gr$aph")) {
+	*axes = SECOND_AXES;
+	return;
+    } 
+    
+    if (almost_equals(c_token, "gr$aph")) {
 	++c_token;
 	*type = graph;
     } else if (almost_equals(c_token, "sc$reen")) {
@@ -1840,25 +1848,14 @@ get_position_type(enum position_type *type, int *axes)
 	++c_token;
 	*type = character;
     }
-    switch (*type) {
-    case first_axes:
-	*axes = FIRST_AXES;
-	return;
-    case second_axes:
-	*axes = SECOND_AXES;
-	return;
-    default:
-	*axes = (-1);
-	return;
-    }
+    *axes = NO_AXIS;
 }
 
 /* get_position() - reads a position for label,arrow,key,... */
-
 void
 get_position(struct position *pos)
 {
-    get_position_default(pos,first_axes);
+    get_position_default(pos, first_axes);
 }
 
 /* get_position() - reads a position for label,arrow,key,...
@@ -1867,7 +1864,7 @@ get_position(struct position *pos)
 void
 get_position_default(struct position *pos, enum position_type default_type)
 {
-    int axes;
+    AXIS_INDEX axes;
     enum position_type type = default_type;
 
     memset(pos, 0, sizeof(struct position));
@@ -1894,6 +1891,11 @@ get_position_default(struct position *pos, enum position_type default_type)
        ) {
 	++c_token;
 	get_position_type(&type, &axes);
+	/* HBB 2015-01-28: no secondary Z axis, so patch up if it was selected */
+	if (type == second_axes) {
+	    type = first_axes;
+	    axes = FIRST_AXES;
+	}
 	pos->scalez = type;
 	GET_NUMBER_OR_TIME(pos->z, axes, FIRST_Z_AXIS);
     } else {
@@ -2131,11 +2133,18 @@ parse_skip_range()
  * this routine copies the relevant range/scale data
  */
 void
-clone_linked_axes(AXIS_INDEX axis2, AXIS_INDEX axis1)
+clone_linked_axes(AXIS_INDEX axis1)
 {
     double testmin, testmax;
+    AXIS_INDEX axis2 = AXIS_MAP_FROM_FIRST_TO_SECOND(axis1);
 
-    memcpy(&axis_array[axis2], &axis_array[axis1], AXIS_CLONE_SIZE);
+    if (   (! AXIS_IS_FIRST(axis1))
+	|| (! axis_array[axis2].linked_to_primary)
+       )
+	/* nothing to do here.  Done */
+	return;
+
+    memcpy(axis_array + axis2, axis_array + axis1, AXIS_CLONE_SIZE);
     if (axis_array[axis2].link_udf == NULL || axis_array[axis2].link_udf->at == NULL)
 	return;
 

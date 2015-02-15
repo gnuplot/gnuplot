@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.272 2015/01/20 02:10:43 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.273 2015/01/28 05:46:32 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -233,9 +233,10 @@ set bar %f %s\n",
     } else
 	fputs("unset border\n", fp);
 
-    for (axis = FIRST_AXES; axis < LAST_REAL_AXIS; axis++) {
+    for (axis = 0; axis < NUMBER_OF_MAIN_VISIBLE_AXES; axis++) {
 	if (axis == SECOND_Z_AXIS) continue;
 	if (axis == COLOR_AXIS) continue;
+	if (axis == POLAR_AXIS) continue;
 	fprintf(fp, "set %sdata %s\n", axis_name(axis),
 		axis_array[axis].datatype == DT_TIMEDATE ? "time" :
 		axis_array[axis].datatype == DT_DMS ? "geographic" :
@@ -1228,8 +1229,8 @@ save_range(FILE *fp, AXIS_INDEX axis)
 	fprintf(fp, "set link %c2 ", axis_name(axis)[0]);
 	if (axis_array[axis].link_udf->at)
 	    fprintf(fp, "via %s ", axis_array[axis].link_udf->definition);
-	if (axis_array[axis-SECOND_AXES].link_udf->at)
-	    fprintf(fp, "inverse %s ", axis_array[axis-SECOND_AXES].link_udf->definition);
+	if (axis_array[axis].linked_to_primary->link_udf->at)
+	    fprintf(fp, "inverse %s ", axis_array[axis].linked_to_primary->link_udf->definition);
 	fputs("\n\t", fp);
     }
 

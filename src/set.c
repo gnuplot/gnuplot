@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.474 2015/01/19 22:10:59 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.475 2015/01/20 02:10:43 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -1540,7 +1540,7 @@ set_dummy()
     for (i=0; i<MAX_NUM_VAR; i++) {
 	if (END_OF_COMMAND)
 	    return;
-	if (isalpha(gp_input_line[token[c_token].start_index]))
+	if (isalpha((unsigned char)gp_input_line[token[c_token].start_index]))
 	    copy_str(set_dummy_var[i],c_token++, MAX_ID_LEN);
 	if (equals(c_token,","))
 	    c_token++;
@@ -1687,6 +1687,8 @@ set_degreesign(char *locale)
 	}
 	return;
     }
+#else
+    (void)locale; /* -Wunused argument */
 #endif
 
     /* These are the internally-known encodings */
@@ -2635,13 +2637,13 @@ set_logscale()
     c_token++;
 
     if (END_OF_COMMAND) {
-	for (axis = 0; axis < LAST_REAL_AXIS; axis++)
+	for (axis = 0; axis < NUMBER_OF_MAIN_VISIBLE_AXES; axis++)
 	    set_for_axis[axis] = TRUE;
     } else {
 	/* do reverse search because of "x", "x1", "x2" sequence in axisname_tbl */
 	int i = 0;
 	while (i < token[c_token].length) {
-	    axis = lookup_table_nth_reverse(axisname_tbl, LAST_REAL_AXIS+1,
+	    axis = lookup_table_nth_reverse(axisname_tbl, NUMBER_OF_MAIN_VISIBLE_AXES,
 		       gp_input_line + token[c_token].start_index + i);
 	    if (axis < 0) {
 		token[c_token].start_index += i;
@@ -2660,7 +2662,7 @@ set_logscale()
 	}
     }
 
-    for (axis = 0; axis <= LAST_REAL_AXIS; axis++) {
+    for (axis = 0; axis < NUMBER_OF_MAIN_VISIBLE_AXES; axis++) {
 	if (set_for_axis[axis]) {
 	    axis_array[axis].log = TRUE;
 	    axis_array[axis].base = newbase;
@@ -5191,9 +5193,7 @@ set_range(AXIS_INDEX axis)
 
     /* If there is a secondary axis linked to this one, */
     /* replicate the new range information to it.       */
-    if ((axis == FIRST_X_AXIS || axis == FIRST_Y_AXIS)
-    &&  (axis_array[axis + SECOND_AXES].linked_to_primary))
-	    clone_linked_axes(axis + SECOND_AXES, axis);
+    clone_linked_axes(axis);
 }
 
 /*

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: doc2ms.c,v 1.18 2005/06/03 05:11:55 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: doc2ms.c,v 1.19 2007/10/24 00:47:51 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - doc2ms.c */
@@ -249,8 +249,8 @@ section( char *line, FILE *b)
 	while (--old > sh_i);
     }
     /* added by dfk to capitalize section headers */
-    if (islower((int)string[0]))
-	string[0] = toupper(string[0]);
+    if (islower((unsigned char)string[0]))
+	string[0] = toupper((unsigned char)string[0]);
 
     /* next 3 lines added by rjl */
     if (sh_i != 1)

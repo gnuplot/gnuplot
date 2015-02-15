@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.337 2015/01/20 02:10:43 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.338 2015/01/27 07:12:01 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -1704,10 +1704,10 @@ show_zeroaxis(AXIS_INDEX axis)
     } else
 	fprintf(stderr, "\t%szeroaxis is OFF\n", axis_name(axis));
 
-    if ((axis / SECOND_AXES) == 0) {
-	/* this is a 'first' axis. To output secondary axis, call self
-	 * recursively: */
-	show_zeroaxis(axis + SECOND_AXES);
+    /* If this is a 'first' axis. To output secondary axis, call self
+     * recursively: */
+    if (AXIS_IS_FIRST(axis)) {
+	show_zeroaxis(AXIS_MAP_FROM_FIRST_TO_SECOND(axis));
     }
 }
 

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.349 2015/01/27 07:12:01 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.350 2015/02/03 23:45:59 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -2903,7 +2903,7 @@ eval_plots()
 	axis_checked_extend_empty_range(FIRST_X_AXIS, "x range is invalid");
 
 	if (axis_array[SECOND_X_AXIS].linked_to_primary) {
-	    clone_linked_axes(SECOND_X_AXIS, FIRST_X_AXIS);
+	    clone_linked_axes(FIRST_X_AXIS);
 	    /* FIXME: This obsoletes OUTRANGE/INRANGE for secondary axis data */
 	} else if (uses_axis[SECOND_X_AXIS] & USES_AXIS_FOR_DATA) {
 	    /* check that x2min -> x2max is not too small */
@@ -3281,7 +3281,7 @@ eval_plots()
 	axis_revert_and_unlog_range(FIRST_Y_AXIS);
     }
     if (uses_axis[SECOND_Y_AXIS] && axis_array[SECOND_Y_AXIS].linked_to_primary) {
-	clone_linked_axes(SECOND_Y_AXIS, FIRST_Y_AXIS);
+	clone_linked_axes(FIRST_Y_AXIS);
     } else if (uses_axis[SECOND_Y_AXIS]) {
 	axis_checked_extend_empty_range(SECOND_Y_AXIS, "all points y2 value undefined!");
 	axis_revert_and_unlog_range(SECOND_Y_AXIS);

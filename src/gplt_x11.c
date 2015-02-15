@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.249 2014/09/04 20:33:13 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.250 2014/12/15 04:20:34 sfeam Exp $"); }
 #endif
 
 #define MOUSE_ALL_WINDOWS 1
@@ -306,7 +306,7 @@ typedef struct plot_struct {
      */
     int almost2d;
     int axis_mask;		/* Bits set to show which axes are active */
-    axis_scale_t axis_scale[2*SECOND_AXES];
+    axis_scale_t axis_scale[NUMBER_OF_MAIN_VISIBLE_AXES];
 #endif
     /* Last text position  - used by enhanced text mode */
     int xLast, yLast;
@@ -401,10 +401,12 @@ TBOOLEAN swap_endian = 0;  /* For binary data. */
 static inline void
 byteswap(char* data, int datalen)
 {
-    char tmp, *dest = data + datalen - 1;
-    if (datalen < 2) return;
+    char *dest = data + datalen - 1;
+
+    if (datalen < 2)
+	return;
     while (dest > data) {
-	tmp = *dest;
+	char tmp = *dest;
 	*dest-- = *data;
 	*data++ = tmp;
     }
@@ -2884,16 +2886,17 @@ exec_cmd(plot_struct *plot, char *command)
 	    }
 
 	    if (!i_remaining) {
-
 		int i;
+		/* points is defined as (XPoint *), but has been abused until this
+		 * point to hold raw integers.  Make a type-correct pointer to clarify this */
+		int *int_points = (int*)points;
 
 		transferring = 0;
 
 		/* If the byte order needs to be swapped, do so. */
 		if (swap_endian) {
-		    i = 2*npoints;
-		    for (i--; i >= 0; i--) {
-			byteswap((char *)&((int *)points)[i], sizeof(int));
+		    for (i = 2 * npoints - 1; i >= 0; i--) {
+			byteswap((char *)(int_points + i), sizeof(int));
 		    }
 		}
 
@@ -2901,8 +2904,8 @@ exec_cmd(plot_struct *plot, char *command)
 		 * on itself, but the XPoint x and y are smaller than an int.
 		 */
 		for (i=0; i < npoints; i++) {
-		    points[i].x = X( ((int *)points)[2*i] );
-		    points[i].y = Y( ((int *)points)[2*i+1] );
+		    points[i].x = X(int_points[2 * i    ]);
+		    points[i].y = Y(int_points[2 * i + 1]);
 		}
 
 		/* Load selected pattern or fill into a separate gc */
@@ -3405,7 +3408,7 @@ exec_cmd(plot_struct *plot, char *command)
 	    plot->almost2d = axis_mask;
 	} else if (axis < 0) {
 	    plot->axis_mask = axis_mask;
-	} else if (axis < 2*SECOND_AXES) {
+	} else if (axis < NUMBER_OF_MAIN_VISIBLE_AXES) {
 	    sscanf(&buffer[1], "%d %lg %d %lg %lg", &axis,
 		&(plot->axis_scale[axis].min), &(plot->axis_scale[axis].term_lower),
 		&(plot->axis_scale[axis].term_scale), &(plot->axis_scale[axis].logbase));

@@ -1,3 +1,72 @@
+2015-02-15  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/axis.h (AXIS_INDEX): Change value of NO_AXIS to -2.  Make
+	AXIS_ARRAY_SIZE an enum entry, again.
+	(NUMBER_OF_MAIN_VISIBLE_AXES): New name, to be used instead of
+	LAST_REAL_AXIS.
+	(LAST_REAL_AXIS): Removed.
+	(AXIS_IS_SECOND, AXIS_IS_FIRST): New macros to formalize checking
+	if an axis is among the second or first axes, respectively.
+	(AXIS_MAP_FROM_FIRST_TO_SECOND, AXIS_MAP_FROM_SECOND_TO_FIRST):
+	New macros to centrally define how to switch from a first axis to
+	its corresponding secondary axis, and vice versa.
+	(axis): Change type of linked_to_primary from bool to an actual
+	pointer to the linked axis struct.
+	(ACTUAL_STORE_WITH_LOG_AND_UPDATE_RANGE): Missing parentheses
+	around macro argument use.  Use linked_to_primary as a pointer.
+
+	* src/axis.c (setup_tics): Cloning takes only one argument now.
+	(axis_output_tics): Rely less on axis array layout.
+	(some_grid_selected): Use new axis range macro.
+	(get_position_type): Use correct type for axis index argument.
+	(get_position_default): Use correct type for localaxis index
+	variable.  Catch attempted use of z2 axis.
+	(clone_linked_axes): Use only one argument.  The other is implied
+	anyway.  Do some sanity checks first up.
+
+	* src/command.c (link_command): Initialize local variables.  Axis
+	link information is a pointer now. Concentrate knowledge about
+	links between axes more into axis methods.
+
+	* src/eval.c (eval_link_function): Use correct type for axis index
+	argument.
+
+	* src/gplt_x11.c (plot_struct): Use new axis range name.
+	(byteswap): Define variable more locally.
+	(exec_cmd): New local pointer to make code easier to understand.
+	Use new axis range name.
+
+	* src/graphics.c (adjust_offsets): Concentrate knowledge about
+	links between axes more into axis methods.
+
+	* src/plot2d.c (eval_plots): Concentrate knowledge about links
+	between axes more into axis methods.
+
+	* src/save.c (save_set_all): Use new axis range name.
+	(save_range): linked_to_primary is a pointer now.
+
+	* src/show.c (show_zeroaxis): Use new macro about distinction
+	between first and second axes.
+
+	* src/unset.c (unset_logscale): Use new axis range name.
+	(reset_command): linked_to_primary is a pointer now.
+
+	* term/x11.trm (X11_text): Loop over AXIS_INDEX should use that
+	type for the index variable.  Use new axis range name.
+
+	* docs/doc2tex.c (section, puttex): Correct use for <ctype.h> functions on
+	plain char requires a cast to unsigned char.
+
+	* docs/doc2ms.c (section): Correct use for <ctype.h> functions on
+	plain char requires a cast to unsigned char.
+
+	* src/set.c (set_dummy): Correct use for <ctype.h> functions on
+	plain char requires a cast to unsigned char.
+	(set_degreesign): Avoid -Wunused.
+	(set_logscale): Use modified axis range name.
+	(set_range): Concentrate knowledge about links between axes more
+	into axis methods.
+
 2015-02-13  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/gadgets.c (apply_pm3dcolor): Variable color specifier "palette cb"

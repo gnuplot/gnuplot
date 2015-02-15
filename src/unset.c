@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.210 2014/10/04 23:28:38 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.211 2015/01/06 04:57:15 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -1131,7 +1131,7 @@ unset_logscale()
 	/* do reverse search because of "x", "x1", "x2" sequence in
 	 * axisname_tbl */
 	while (i < token[c_token].length) {
-	    axis = lookup_table_nth_reverse(axisname_tbl, LAST_REAL_AXIS+1,
+	    axis = lookup_table_nth_reverse(axisname_tbl, NUMBER_OF_MAIN_VISIBLE_AXES,
 					    gp_input_line + token[c_token].start_index + i);
 	    if (axis < 0) {
 		token[c_token].start_index += i;
@@ -1763,7 +1763,7 @@ reset_command()
 	    axis_array[axis].set_autoscale |= AUTOSCALE_FIXMIN | AUTOSCALE_FIXMAX;
 	}
 
-	axis_array[axis].linked_to_primary = FALSE;
+	axis_array[axis].linked_to_primary = NULL;
 
 	reset_logscale(axis);
     }

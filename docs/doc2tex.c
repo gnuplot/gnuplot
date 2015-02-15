@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: doc2tex.c,v 1.25 2013/06/01 00:12:26 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: doc2tex.c,v 1.26 2014/03/22 19:35:21 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - doc2tex.c */
@@ -375,8 +375,8 @@ section(char *line, FILE *b)
         break;
 
     }
-    if (islower((int) string[0]))
-	string[0] = toupper(string[0]);
+    if (islower((unsigned char)string[0]))
+	string[0] = toupper((unsigned char)string[0]);
     puttex(string, b);
     (void) fprintf(b, "}\n");
 
@@ -502,9 +502,9 @@ puttex( char *str, FILE *file)
 	    }
 	    break;
 	case '_':		/* emphasised text ? */
-	    for (i = 0; isalpha((int) (*(str + i))); i++);
+	    for (i = 0; isalpha((unsigned char) str[i]); i++);
 	    if ((i > 0) && (*(str + i) == '_') &&
-		           isspace((int) (*(str + i + 1)))) {
+		           isspace((unsigned char) str[i + 1])) {
 		(void) fputs("{\\em ", file);
 		for (; *str != '_'; str++) {
 		    (void) fputc(*str, file);
@@ -518,7 +518,7 @@ puttex( char *str, FILE *file)
         case 's':    /* find backquote after 'see' {see `} */
         case 'S':
             (void) fputc(ch, file);
-	    if ( str[0] == 'e' && str[1] == 'e' && isspace(str[2])){
+	    if ( str[0] == 'e' && str[1] == 'e' && isspace((unsigned char)str[2])){
                 see = TRUE;
             }
             break;
