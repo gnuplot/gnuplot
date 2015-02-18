@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.304 2015/01/24 23:18:13 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.305 2015/01/24 23:54:32 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -234,6 +234,7 @@ static int null_justify_text __PROTO((enum JUSTIFY just));
 static int null_scale __PROTO((double x, double y));
 static void null_layer __PROTO((t_termlayer layer));
 static int null_set_font __PROTO((const char *font));
+static void null_set_color __PROTO((struct t_colorspec *colorspec));
 static void options_null __PROTO((void));
 static void graphics_null __PROTO((void));
 static void UNKNOWN_null __PROTO((void));
@@ -644,7 +645,10 @@ term_apply_lp_properties(struct lp_style_type *lp)
     /* and a dash pattern.  Now we have separate mechanisms for those. */ 
     if (LT_COLORFROMCOLUMN < lt && lt < 0)
 	(*term->linetype) (lt);
-    else /* All normal lines will be solid unless a dashtype is given */
+    else if (term->set_color == null_set_color) {
+	(*term->linetype) (lt-1);
+	return;
+    } else /* All normal lines will be solid unless a dashtype is given */
 	(*term->linetype) (LT_SOLID);
 
     /* Apply dashtype or user-specified dash pattern, which may override  */
@@ -819,8 +823,9 @@ do_point(unsigned int x, unsigned int y, int number)
     int htic, vtic;
     struct termentry *t = term;
 
-    /* always use solid lines for point symbols */
-    term->dashtype(DASHTYPE_SOLID, NULL);
+    /* use solid lines for point symbols */
+    if (term->dashtype != null_dashtype)
+	term->dashtype(DASHTYPE_SOLID, NULL);
 
     if (number < 0) {           /* do dot */
 	(*t->move) (x, y);
@@ -2782,11 +2787,10 @@ recycle:
 	    lp->d_type = this->lp_properties.d_type;
 	    lp->custom_dash_pattern = this->lp_properties.custom_dash_pattern;
 
-#if (0)
-	    /* FIXME:  Removed in version 5.0.1 - but maybe there are cases it is needed? */
-	    if (term->flags & TERM_MONOCHROME)
+	    /* Needed in version 5.0 to handle old terminals (pbm hpgl ...) */
+	    /* with no support for user-specified colors */
+	    if (term->set_color == null_set_color)
 		lp->l_type = tag;
-#endif
 
 	    /* Do not recycle point properties. */
 	    /* FIXME: there should be a separate command "set pointtype cycle N" */

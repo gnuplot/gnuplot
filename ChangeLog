@@ -1,3 +1,10 @@
+2015-02-18  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/term.c (term_apply_lp_properties do_point load_linetype):
+	Restore old (version 4) behavior of terminals such as hp pen plotter
+	and pbm that do not support user-selected colors.
+	Bug #1556
+
 2015-02-15  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/axis.h src/axis.c src/set.c:  Do away with 4 utility routines
