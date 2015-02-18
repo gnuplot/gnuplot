@@ -17,6 +17,7 @@ Changes since 5.0 release
 * FIX report and enforce maximum number of parallel axes without faulting
 * FIX smooth mcsplines for a curve containing multiple y values at a single x
 * FIX handle log-scaled color axis in colorspec "lc palette cb"
+* FIX regression in color support for pbm/sixel/hpgl terminals (no RGB color)
 
 Changes in final release of 5.0
 ===============================
