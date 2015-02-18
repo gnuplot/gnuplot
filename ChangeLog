@@ -1,3 +1,10 @@
+2015-02-18  Shigeharu Takeno  <shige@iee.niit.ac.jp>
+
+	* term/gd.trm (PNG_vector): Prevent accummulated round-off error in
+	dotted line emulation by using (double) variables to track incremental
+	coordinates.
+	Bug #1549
+
 2015-02-18  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/term.c (term_apply_lp_properties do_point load_linetype):
