@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.701.2.40 2014/05/02 16:37:45 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.701.2.41 2014/06/10 17:35:01 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -2530,9 +2530,8 @@ C ... and restart the table:
  `gnuplotrc`.  The location of this file is determined when the program is built
  and is reported by `show loadpath`.  The program then looks in the user's HOME
  directory for a file called `.gnuplot` on Unix-like systems or `GNUPLOT.INI` on
- other systems.  (Windows and OS/2 will look for it in the directory named in
- the environment variable `GNUPLOT`; Windows will use `USERPROFILE` if GNUPLOT
- is not defined).
+ other systems.  (OS/2 will look for it in the directory named in
+ the environment variable `GNUPLOT`; Windows will use `APPDATA`).
  Note: The program can be configured to look first in the current directory,
  but this is not recommended because it is bad security practice.
 2 String constants and string variables
