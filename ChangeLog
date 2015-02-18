@@ -1,3 +1,8 @@
+2015-02-18  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* PATCHLEVEL: bump to 4.6.7, which may or may not ever get a formal
+	release.
+
 2015-02-13  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/gadgets.c (apply_pm3dcolor): Variable color specifier "palette cb"
