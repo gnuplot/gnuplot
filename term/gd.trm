@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: gd.trm,v 1.180 2014/11/21 21:41:56 sfeam Exp $
+ * $Id: gd.trm,v 1.181 2015/01/11 05:20:50 sfeam Exp $
  */
 
 /* GNUPLOT -- gd.trm */
@@ -1531,11 +1531,13 @@ PNG_vector(unsigned int x, unsigned int y)
 	static int last_color = -1;
 	static double dashpattern[4] = {0.1, 0.5, 0.6, 1.0};
 
-	int delx = (int)x - png_state.x;
-	int dely = (int)y - png_state.y;
+	double delx = (int)x - (int)png_state.x;
+	double dely = (int)y - (int)png_state.y;
 	double stride = sqrt(delx*delx + dely*dely) / (8. * PNG_dashlength_factor * lw);
 
-	int new_x, new_y, i;
+	double new_x, new_y;
+	double last_x = (int)png_state.x, last_y = (int)png_state.y;
+	int i;
 	double this_step;
 
 	/* Adjust the style when linewidth or color has changed. */
@@ -1551,8 +1553,8 @@ PNG_vector(unsigned int x, unsigned int y)
 	    for (i=0; dashpattern[i] <= png_state.dashfraction; i++);
 	    this_step = dashpattern[i] - png_state.dashfraction;
 	    if (stride > this_step) {
-		new_x = png_state.x + (int)(0.5 + delx * this_step / stride);
-		new_y = png_state.y + (int)(0.5 + dely * this_step / stride);
+		new_x = last_x + delx * this_step / stride;
+		new_y = last_y + dely * this_step / stride;
 		stride -= this_step;
 		png_state.dashfraction = dashpattern[i];
 		delx = x - new_x;
@@ -1568,16 +1570,19 @@ PNG_vector(unsigned int x, unsigned int y)
 		/* when the line is thick.			             */
 		if (lw > 2) {
 		    if (png_state.dashfraction >= dashpattern[0])
-		    gdImageFilledArc(png_state.image, new_x, Y(new_y),
+		    gdImageFilledArc(png_state.image, 
+				     (int)(new_x + 0.5), Y((int)(new_y + 0.5)),
 				2 * lw, 2 * lw,
 			 	0, 360, png_state.color, gdArc);
 		} else {
-		    gdImageLine(png_state.image, png_state.x, Y(png_state.y),
-				new_x, Y(new_y), gdBrushed );
+		    gdImageLine(png_state.image, 
+				(int)(last_x + 0.5), Y((int)(last_y + 0.5)),
+				(int)(new_x + 0.5), Y((int)(new_y + 0.5)), 
+				    gdBrushed );
 		}
 	    }
-	    png_state.x = new_x;
-	    png_state.y = new_y;
+	    last_x = new_x;
+	    last_y = new_y;
 	    if (png_state.dashfraction >= 1.0)
 		png_state.dashfraction = 0.0;
 	}
