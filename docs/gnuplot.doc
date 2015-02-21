@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.936 2015/01/27 07:12:01 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.937 2015/02/18 19:20:54 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -8531,7 +8531,7 @@ Ffigure_missing
         set fit errorvariables
         fit f(x) 'datafile' using 1:2 via a, b
         print "error of a is:", a_err
-        set label 'a=%6.2f', a, '+/- %6.2f', a_err
+        set label 1 sprintf("a=%6.2f +/- %6.2f", a, a_err)
         plot 'datafile' using 1:2, f(x)
 
  If the `errorscaling` option is specified, which is the default, the
