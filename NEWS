@@ -19,6 +19,7 @@ Changes since 5.0 release
 * FIX handle log-scaled color axis in colorspec "lc palette cb"
 * FIX regression in color support for pbm/sixel/hpgl terminals (no RGB color)
 * FIX accummulated round-off error in dotted lines drawn by libgd terminals
+* FIX incorrect colorbox axis labels in polar plots
 
 Changes in final release of 5.0
 ===============================

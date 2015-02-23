@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.902.2.29 2015/02/18 19:20:29 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.902.2.30 2015/02/21 00:19:42 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -11381,6 +11381,8 @@ Ffigure_missing
 3 raxis
 ?commands set raxis
 ?raxis
+?set raxis
+?unset raxis
  The commands `set raxis` and `unset raxis` toggle whether the polar axis
  is drawn separately from grid lines and the x axis.  If the minimum of the
  current rrange is non-zero (and not autoscaled), then a white circle is drawn
