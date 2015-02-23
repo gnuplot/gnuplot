@@ -3,3 +3,12 @@ Please see and use
 	http://sourceforge.net/tracker/?atid=102055&group_id=2055&func=browse
 
 for an up-to-date bug tracking system.
+
+Known bugs fixed in 5.0 but still present in 4.6.6
+
+2014-10-16  Christoph Bersch <usenet@bersch.net>
+	* src/stats.c:  The stats code was confusing the x and y dimensions of
+	matrix data.  E.g. it would report a 5X7 matrix as being 7X5, and 
+	mis-calculate the indices of the min/max values.
+	Bug #1501
+
