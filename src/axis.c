@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.143 2015/02/15 16:39:20 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.144 2015/02/16 04:31:38 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -935,7 +935,7 @@ gen_tics(AXIS_INDEX axis, tic_callback callback)
 	/* polar labels always +ve, and if rmin has been set, they are
 	 * relative to rmin.
 	 */
-	if (polar) {
+	if (polar && axis == POLAR_AXIS) {
 	    if (!(R_AXIS.autoscale & AUTOSCALE_MIN))
 		polar_shift = R_AXIS.min;
 	    internal_min = X_AXIS.min - SIGNIF * uncertain;
@@ -1249,17 +1249,14 @@ gen_tics(AXIS_INDEX axis, tic_callback callback)
 			    gstrftime(label, MAX_ID_LEN-1, ticfmt[axis], (double) user);
 			} else if (this->tictype == DT_DMS) {
 			    gstrdms(label, ticfmt[axis], (double)user);
-			} else if (polar) {
+			} else if (polar && axis == POLAR_AXIS) {
 			    double min = (R_AXIS.autoscale & AUTOSCALE_MIN) ? 0 : R_AXIS.min;
 			    double r = fabs(user) + min;
 			    /* POLAR_AXIS is the only sane axis, where the actual value */
 			    /* is stored and we shift its position just before plotting.*/
-			    if (axis == POLAR_AXIS) {
-				internal = AXIS_LOG_VALUE(axis, tic)
-					 - AXIS_LOG_VALUE(axis, R_AXIS.min);
-				r = tic;
-			    }
-
+			    internal = AXIS_LOG_VALUE(axis, tic)
+				     - AXIS_LOG_VALUE(axis, R_AXIS.min);
+			    r = tic;
 			    gprintf(label, sizeof(label), ticfmt[axis], log10_base, r);
 			} else if (axis >= PARALLEL_AXES) {
 			    /* FIXME: needed because ticfmt array is not maintained for parallel axes */
@@ -1301,7 +1298,7 @@ gen_tics(AXIS_INDEX axis, tic_callback callback)
 			       ? AXIS_DO_LOG(axis,mplace)
 			       : mplace);
 		    temptic = mtic;
-		    if (polar) temptic += R_AXIS.min;
+		    if (polar && axis == POLAR_AXIS) temptic += R_AXIS.min;
 		    if (inrange(temptic, internal_min, internal_max)
 			&& inrange(temptic, start - step * SIGNIF, end + step * SIGNIF))
 			(*callback) (axis, mtic, NULL, 1, mgrd, NULL);
