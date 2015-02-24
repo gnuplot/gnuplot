@@ -1,3 +1,8 @@
+2015-02-24  Mojca Miklavec  <mojca.miklavec.lists@gmail.com>
+
+	* configure.ac m4/apple.m4 term/aquaterm.trm:
+	Correct "Aquaterm" to "AquaTerm" (framework name is case sensitive).
+
 2015-02-23  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* axis.c:  Special case code for axis tickmarks in polar plots was 

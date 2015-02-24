@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot on Unix.
 dnl
-dnl $Id: configure.in,v 1.370.2.6 2015/01/07 18:32:48 sfeam Exp $
+dnl $Id: configure.in,v 1.370.2.7 2015/01/07 23:02:48 sfeam Exp $
 dnl
 dnl this is actually major.minor ...
 dnl note that for a non-beta release, we need to disable DEVELOPMENT_RELEASE
@@ -1440,7 +1440,7 @@ else
   AC_MSG_RESULT([  caca terminal: no (requires libcaca >= 0.99.beta15)])
 fi
 
-if test "$gnuplot_framework_Aquaterm" = yes; then
+if test "$gnuplot_framework_AquaTerm" = yes; then
   AC_MSG_RESULT([  aqua terminal (OSX): yes])
 else
   AC_MSG_RESULT([  aqua terminal (OSX): no])

@@ -13,10 +13,10 @@ AC_DEFUN([GP_APPLE],[
     AC_MSG_RESULT([yes])
     is_apple=yes
     AC_ARG_WITH(aquaterm,
-                [  --with-aquaterm         include support for aquaterm on OSX],
+                [  --with-aquaterm         include support for AquaTerm on OSX],
                 [if test "$withval" == yes; then
-                    GP_HAVE_FRAMEWORK(Aquaterm,[#import <Aquaterm/AQTAdapter.h>],[],
-                                      [CFLAGS="$CFLAGS -ObjC"; LDFLAGS="$LDFLAGS -framework Foundation -framework Aquaterm"],[])
+                    GP_HAVE_FRAMEWORK(AquaTerm,[#import <AquaTerm/AQTAdapter.h>],[],
+                                      [CFLAGS="$CFLAGS -ObjC"; LDFLAGS="$LDFLAGS -framework Foundation -framework AquaTerm"],[])
                 fi])
   ],[
     AC_MSG_RESULT([no])

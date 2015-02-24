@@ -20,6 +20,7 @@ Changes since 5.0 release
 * FIX regression in color support for pbm/sixel/hpgl terminals (no RGB color)
 * FIX accummulated round-off error in dotted lines drawn by libgd terminals
 * FIX incorrect colorbox axis labels in polar plots
+* FIX AquaTerm framework name is case-sensitive
 
 Changes in final release of 5.0
 ===============================
