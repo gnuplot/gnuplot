@@ -1,5 +1,5 @@
 /* -*- objc -*-
- * $Id: aquaterm.trm,v 1.50 2014/03/20 20:50:10 markisch Exp $
+ * $Id: aquaterm.trm,v 1.51 2014/06/11 07:27:20 markisch Exp $
  *
  */
 
@@ -94,7 +94,7 @@ TERM_PUBLIC void ENHAQUA_writec __PROTO((int c));
 #ifndef TERM_PROTO_ONLY
 
 #ifdef TERM_BODY
-#import <aquaterm/AQTAdapter.h>
+#import <AquaTerm/AQTAdapter.h>
 
 #import <Foundation/NSAutoreleasePool.h>
 #import <Foundation/NSArray.h>
