@@ -1,3 +1,7 @@
+2015-02-26  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/fit.c src/fit.h src/set.c src/save.c src/show.c:  "set fit nolog"
+
 2015-02-24  Mojca Miklavec  <mojca.miklavec.lists@gmail.com>
 
 	* configure.ac m4/apple.m4 term/aquaterm.trm:
@@ -5,7 +9,7 @@
 
 2015-02-23  Ethan A Merritt  <merritt@u.washington.edu>
 
-	* axis.c:  Special case code for axis tickmarks in polar plots was 
+	* src/axis.c:  Special case code for axis tickmarks in polar plots was 
 	incorrectly being applied to all axes, not just the polar axis.
 	Bug #1569
 

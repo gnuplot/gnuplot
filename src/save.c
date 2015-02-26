@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.273 2015/01/28 05:46:32 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.274 2015/02/15 16:39:22 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -1000,7 +1000,9 @@ set origin %g,%g\n",
 	fprintf(fp, "set psdir\n");
 
     fprintf(fp, "set fit");
-    if (fitlogfile)
+    if (fit_suppress_log)
+	fprintf(fp, " nologfile");
+    else if (fitlogfile)
 	fprintf(fp, " logfile \'%s\'", fitlogfile);
     switch (fit_verbosity) {
 	case QUIET:

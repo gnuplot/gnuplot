@@ -1,5 +1,5 @@
 /*
- * $Id: fit.h,v 1.29 2014/04/03 00:37:50 markisch Exp $
+ * $Id: fit.h,v 1.30 2014/09/20 11:31:13 markisch Exp $
  */
 
 /* GNUPLOT - fit.h */
@@ -68,6 +68,7 @@ extern const char *FITLAMBDAFACTOR;
 extern const char *FITMAXITER;
 
 extern char *fitlogfile;
+extern TBOOLEAN fit_suppress_log;
 extern TBOOLEAN fit_errorvariables;
 extern TBOOLEAN fit_covarvariables;
 extern verbosity_level fit_verbosity;
