@@ -2,6 +2,14 @@
 
 	* src/fit.c src/fit.h src/set.c src/save.c src/show.c:  "set fit nolog"
 
+	* term/tek.trm: Remove SIXEL_set_color() terminal entry.  This function
+	does not perform the operation expected by the core code (change the
+	current color for lines/texts/points/etc). Instead it redefines one of
+	16 linetypes.  In gnuplot version 5 this causes most objects to be
+	drawn in black.  Removing the entry allows the sixel terminal to work
+	more or less like a fixed color 16-pen plotter.
+	Bug #1556
+
 2015-02-24  Mojca Miklavec  <mojca.miklavec.lists@gmail.com>
 
 	* configure.ac m4/apple.m4 term/aquaterm.trm:
