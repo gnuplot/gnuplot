@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.459.2.9 2015/01/06 04:24:42 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.459.2.10 2015/01/20 01:26:47 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -1715,6 +1715,7 @@ set_fit()
 	    char *tmp;
 
 	    c_token++;
+	    fit_suppress_log = FALSE;
 	    if (END_OF_COMMAND) {
 		free(fitlogfile);
 		fitlogfile = NULL;
@@ -1728,6 +1729,9 @@ set_fit()
 	    } else {
 		int_error(c_token, "expecting string");
 	    }
+	} else if (almost_equals(c_token, "nolog$file")) {
+	    fit_suppress_log = TRUE;
+	    c_token++;
 	} else if (almost_equals(c_token, "err$orvariables")) {
 	    fit_errorvariables = TRUE;
 	    c_token++;

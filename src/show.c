@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.326.2.6 2015/01/20 01:26:47 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.326.2.7 2015/01/27 07:11:45 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -2597,7 +2597,9 @@ show_fit()
             "\tfit will%s scale parameter errors with the reduced chi square\n",
             fit_errorscaling ? "" : " not");
 
-    if (fitlogfile != NULL) {
+    if (fit_suppress_log) {
+	fprintf(stderr,"\tfit will not create a log file\n");
+    } else if (fitlogfile != NULL) {
 	fprintf(stderr,
 	        "\tlog-file for fits was set by the user to \n\t'%s'\n",
 	        fitlogfile);

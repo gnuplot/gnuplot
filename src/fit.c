@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: fit.c,v 1.145.2.5 2014/09/21 04:54:32 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: fit.c,v 1.145.2.6 2014/11/08 04:52:25 sfeam Exp $"); }
 #endif
 
 /*  NOTICE: Change of Copyright Status
@@ -185,6 +185,7 @@ typedef enum marq_res marq_res_t;
 
 /* fit control */
 char *fitlogfile = NULL;
+TBOOLEAN fit_suppress_log = FALSE;
 TBOOLEAN fit_errorvariables = TRUE;
 TBOOLEAN fit_covarvariables = FALSE;
 verbosity_level fit_verbosity = BRIEF;
@@ -841,10 +842,12 @@ regress_finalize(int iter, double chisq, double last_chisq, double lambda, doubl
 	fit_show_brief(-2, chisq, chisq, a, lambda, STANDARD);
 
     /* tsm patchset 230: final progress report to log file */
-    if (fit_verbosity == VERBOSE)
-	fit_show(iter, chisq, last_chisq, a, lambda, log_f);
-    else
-	fit_show_brief(iter, chisq, last_chisq, a, lambda, log_f);
+    if (!fit_suppress_log) {
+	if (fit_verbosity == VERBOSE)
+	    fit_show(iter, chisq, last_chisq, a, lambda, log_f);
+	else
+	    fit_show_brief(iter, chisq, last_chisq, a, lambda, log_f);
+    }
 
     /* test covariance matrix */
     if (covar != NULL) {
@@ -1068,7 +1071,8 @@ regress(double a[])
 
     fit_show_lambda = TRUE;
     fit_progress(iter, chisq, chisq, a, lambda, STANDARD);
-    fit_progress(iter, chisq, chisq, a, lambda, log_f);
+    if (!fit_suppress_log)
+	fit_progress(iter, chisq, chisq, a, lambda, log_f);
 
     regress_init();
 
@@ -2066,11 +2070,10 @@ fit_command()
     token3 = c_token;
 
     /* open logfile before we use any Dblfn calls */
-    {
+    if (!fit_suppress_log) {
 	char *logfile = getfitlogfile();
 	if ((logfile != NULL) && !log_f && !(log_f = fopen(logfile, "a")))
 	    Eex2("could not open log-file %s", logfile);
-	FPRINTF((STANDARD, "log-file=%s\n", logfile));
 	free(logfile);
     }
 
@@ -2113,11 +2116,12 @@ fit_command()
     FPRINTF((STANDARD, "prescale=%i\n", fit_prescale));
     FPRINTF((STANDARD, "errorscaling=%i\n", fit_errorscaling));
 
-    fputs("\n\n*******************************************************************************\n", log_f);
     (void) time(&timer);
-    fprintf(log_f, "%s\n\n", ctime(&timer));
-    {
+    if (!fit_suppress_log) {
 	char *line = NULL;
+
+	fputs("\n\n*******************************************************************************\n", log_f);
+	fprintf(log_f, "%s\n\n", ctime(&timer));
 
 	m_capture(&line, token2, token3 - 1);
 	fprintf(log_f, "FIT:    data read from %s\n", line);
@@ -2133,12 +2137,14 @@ fit_command()
     }
 
     /* report all range specs, starting with Z */
-    i = iz;
-    if ((range_autoscale[i] & AUTOSCALE_BOTH) != AUTOSCALE_BOTH)
-	    log_axis_restriction(log_f, i, range_min[i], range_max[i], range_autoscale[i], "function");
-    for (i = 0; i < num_indep; i++) {
+    if (!fit_suppress_log) {
+	i = iz;
 	if ((range_autoscale[i] & AUTOSCALE_BOTH) != AUTOSCALE_BOTH)
-	    log_axis_restriction(log_f, i, range_min[i], range_max[i], range_autoscale[i], c_dummy_var[i]);
+		log_axis_restriction(log_f, i, range_min[i], range_max[i], range_autoscale[i], "function");
+	for (i = 0; i < num_indep; i++) {
+	    if ((range_autoscale[i] & AUTOSCALE_BOTH) != AUTOSCALE_BOTH)
+		log_axis_restriction(log_f, i, range_min[i], range_max[i], range_autoscale[i], c_dummy_var[i]);
+	}
     }
 
     /* start by allocting memory for MAX_DATA datapoints */
@@ -2322,14 +2328,12 @@ fit_command()
     redim_vec(&fit_z, num_data);
     redim_vec(&err_data, num_data * GPMAX(num_errors, 1));
 
-    fprintf(log_f, "        #datapoints = %d\n", num_data);
 
-    if (num_errors == 0)
-	fputs("        residuals are weighted equally (unit weight)\n\n", log_f);
-
-    {
+    if (!fit_suppress_log) {
 	char *line = NULL;
-
+	fprintf(log_f, "        #datapoints = %d\n", num_data);
+	if (num_errors == 0)
+	    fputs("        residuals are weighted equally (unit weight)\n\n", log_f);
 	m_capture(&line, token1, token2 - 1);
 	fprintf(log_f, "function used for fitting: %s\n", line);
 	print_function_definitions(func.at, log_f);
@@ -2358,7 +2362,8 @@ fit_command()
 	static char *viafile = NULL;
 	free(viafile);			/* Free previous name, if any */
 	viafile = try_to_get_string();	/* Cannot fail since isstringvalue succeeded */
-	fprintf(log_f, "fitted parameters and initial values from file: %s\n\n", viafile);
+	if (!fit_suppress_log)
+	    fprintf(log_f, "fitted parameters and initial values from file: %s\n\n", viafile);
 	if (!(f = loadpath_fopen(viafile, "r")))
 	    Eex2("could not read parameter-file \"%s\"", viafile);
 
@@ -2369,7 +2374,8 @@ fit_command()
 		break;
 	    if ((tmp = strstr(s, GP_FIXED)) != NULL) {	/* ignore fixed params */
 		*tmp = NUL;
-		fprintf(log_f, "FIXED:  %s\n", s);
+		if (!fit_suppress_log)
+		    fprintf(log_f, "FIXED:  %s\n", s);
 		fixed = TRUE;
 	    } else
 		fixed = FALSE;
@@ -2425,7 +2431,8 @@ fit_command()
     } else {
 	/* not a string after via: it's a variable listing */
 
-	fputs("fitted parameters initialized with current variable values\n\n", log_f);
+	if (!fit_suppress_log)
+	    fputs("fitted parameters initialized with current variable values\n\n", log_f);
 	do {
 	    if (!isletter(c_token))
 		Eex("no parameter specified");
@@ -2484,7 +2491,8 @@ fit_command()
     else
 	regress(a);	/* fit */
 
-    fclose(log_f);
+    if (log_f)
+	fclose(log_f);
     log_f = NULL;
     free(fit_x);
     free(fit_z);
@@ -2536,18 +2544,23 @@ Dblfn(const char *fmt, va_dcl)
     if (fit_verbosity != QUIET)
 	vfprintf(STANDARD, fmt, args);
     va_end(args);
-    VA_START(args, fmt);
-    vfprintf(log_f, fmt, args);
+    if (!fit_suppress_log) {
+	VA_START(args, fmt);
+	vfprintf(log_f, fmt, args);
+    }
 # else
     if (fit_verbosity != QUIET)
 	_doprnt(fmt, args, STANDARD);
-    _doprnt(fmt, args, log_f);
+    if (!fit_suppress_log) {
+	_doprnt(fmt, args, log_f);
+    }
 # endif
     va_end(args);
 #else
     if (fit_verbosity != QUIET)
 	fprintf(STANDARD, fmt, a1, a2, a3, a4, a5, a6, a7, a8);
-    fprintf(log_f, fmt, a1, a2, a3, a4, a5, a6, a7, a8);
+    if (!fit_suppress_log)
+	fprintf(log_f, fmt, a1, a2, a3, a4, a5, a6, a7, a8);
 #endif /* VA_START */
 }
 
