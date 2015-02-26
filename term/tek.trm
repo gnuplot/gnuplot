@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: tek.trm,v 1.22 2013/12/12 21:00:00 sfeam Exp $
+ * $Id: tek.trm,v 1.23 2013/12/22 20:47:25 sfeam Exp $
  *
  */
 
@@ -516,11 +516,6 @@ struct SIXEL_colorspec {
 #define SIXEL_NCOL (16)
 static struct SIXEL_colorspec SIXEL_palette[SIXEL_NCOL];
 
-/* Only needed for dubious backwards compatibility with 'set size'
- * in pre-4.2 versions that didn't support 'set term size'
- */
-static TBOOLEAN SIXEL_explicit_size = FALSE;
-
 enum SIXEL_id {
     SIXEL_SMALL, SIXEL_MEDIUM, SIXEL_LARGE,
     SIXEL_MONOCHROME, SIXEL_COLOR, SIXEL_SIZE,
@@ -579,7 +574,6 @@ SIXEL_options()
 	    if (END_OF_COMMAND) {
 		term->xmax = SIXEL_XMAX;
 		term->ymax = SIXEL_YMAX;
-		SIXEL_explicit_size = FALSE;
 	    } else {
 		xpixels = real(const_express(&a));
 		if (equals(c_token, ",")) {
@@ -587,7 +581,6 @@ SIXEL_options()
 		    ypixels = real(const_express(&a));
 		    ypixels = (ypixels/6)*6; /* multiple of six */
 		}
-		SIXEL_explicit_size = TRUE;
 	    }
 	    if (xpixels > 0)
 		term->xmax = xpixels;
@@ -632,9 +625,8 @@ SIXEL_options()
 	break;
     }
 
-    if (SIXEL_explicit_size)
-	sprintf(term_options + strlen(term_options), " size %d,%d",
-	    term->xmax, term->ymax);
+    sprintf(term_options + strlen(term_options), " size %d,%d",
+	term->xmax, term->ymax);
 }
 
 
@@ -644,14 +636,8 @@ SIXEL_init()
     unsigned int xpixels = term->xmax;
     unsigned int ypixels = term->ymax;
 
-    /* 'set size' should not affect the size of the canvas in pixels,
-     * but versions prior to 4.2 did not have a separate 'set term size'
-     */
-    if (!SIXEL_explicit_size) {
- 	xpixels *= xsize;
-	ypixels *= ysize;
-    }
-
+    /* FIXME: Why 5 planes?  16 predefined colors only require 4. */
+    /* A usable palette would require 7 or 8 (128 or 256 colors). */
     b_makebitmap(xpixels, ypixels, 5);
 
     if (SIXEL_mode != 0)
@@ -921,7 +907,14 @@ SIXEL_linewidth(double linewidth)
     SIXEL_lw = linewidth;
 }
 
-
+#if (0)
+/* This implementation is not correct. It only changes the contents of
+ * an indexed color slot, not the current drawing color.  Whatever color
+ * is left in that index slot at the term the bitmap is dumped to the
+ * screen will make all previous contents irrelevant.
+ * TODO: Implement palette color by adding SIXEL_make_palette().
+ *       Re-write SIXEL_set_color() accordingly.
+ */
 TERM_PUBLIC void
 SIXEL_set_color(t_colorspec *colorspec)
 {
@@ -958,6 +951,7 @@ SIXEL_set_color(t_colorspec *colorspec)
 
     b_setvalue(1+tp);
 }
+#endif
 
 
 TERM_PUBLIC void
@@ -1369,7 +1363,7 @@ TERM_TABLE_START(sixel_driver)
 #ifdef USE_MOUSE
     , NULL, NULL, NULL, NULL, NULL
 #endif
-    , 0, 0, SIXEL_set_color
+    , 0, 0, /* SIXEL_set_color */ 0
     , SIXEL_filled_polygon
 TERM_TABLE_END(sixel_driver)
 
