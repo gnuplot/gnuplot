@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.464.2.6 2015/01/20 22:46:46 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.464.2.7 2015/02/01 23:27:32 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -1200,12 +1200,9 @@ plot_filledcurves(struct curve_points *plot)
 			axis_array[SECOND_X_AXIS].min, axis_array[SECOND_X_AXIS].max);
 	    break;
 	case FILLEDCURVES_ATY1:
-	    cliptorange(plot->filledcurves_options.at,
-			axis_array[FIRST_Y_AXIS].min, axis_array[FIRST_Y_AXIS].max);
-	    break;
 	case FILLEDCURVES_ATY2:
 	    cliptorange(plot->filledcurves_options.at,
-			axis_array[SECOND_Y_AXIS].min, axis_array[SECOND_Y_AXIS].max);
+			axis_array[plot->y_axis].min, axis_array[plot->y_axis].max);
 	    break;
 	case FILLEDCURVES_ATXY:
 	    cliptorange(plot->filledcurves_options.at,
@@ -1264,10 +1261,9 @@ plot_betweencurves(struct curve_points *plot)
 	return;
     }
 
-    /* Jan 2015: We are now using the plot_between code to also handle
-     * options y1=atval and y2=atval, but the style option in the plot
-     * header does not reflect this.  Change it here so that the code
-     * in finish_filled_curve() doesn't get confused.
+    /* Jan 2015: We are now using the plot_between code to also handle option
+     * y=atval, but the style option in the plot header does not reflect this.
+     * Change it here so that finish_filled_curve() doesn't get confused.
      */
     plot->filledcurves_options.closeto = FILLEDCURVES_BETWEEN;
 
