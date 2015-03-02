@@ -1,3 +1,12 @@
+2015-03-02  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/tables.c src/graphics.c (plot_filledcurves) docs/gnuplot.doc:
+	The "y1=foo" and "y2=foo" options to the filledcurves style are 
+	confusing, as both operate on the current plot's y axis regardless
+	of whether it is y1 or y2.  Rename the option as "y=foo" and remove
+	mention of the older y1= and y2=.  All three are accepted on input.
+	Bug #1568 
+
 2015-02-26  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/fit.c src/fit.h src/set.c src/save.c src/show.c:  "set fit nolog"
