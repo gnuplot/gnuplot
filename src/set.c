@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.459.2.10 2015/01/20 01:26:47 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.459.2.11 2015/02/26 18:43:46 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -318,16 +318,17 @@ set_command()
 	    set_mapping();
 	    break;
 	case S_MARGIN:
+	    /* Jan 2015: CHANGE to order <left>,<right>,<bottom>,<top> */
 	    set_margin(&lmargin);
 	    if (!equals(c_token,","))
 		break;
 	    set_margin(&rmargin);
 	    if (!equals(c_token,","))
 		break;
-	    set_margin(&tmargin);
+	    set_margin(&bmargin);
 	    if (!equals(c_token,","))
 		break;
-	    set_margin(&bmargin);
+	    set_margin(&tmargin);
 	    break;
 	case S_BMARGIN:
 	    set_margin(&bmargin);

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: multiplot.c,v 1.1 2014/03/29 05:12:51 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: multiplot.c,v 1.2 2014/03/31 03:27:00 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -53,7 +53,7 @@ static char *RCSid() { return RCSid("$Id: multiplot.c,v 1.1 2014/03/29 05:12:51 
 
 static void mp_layout_size_and_offset __PROTO((void));
 static void mp_layout_margins_and_spacing __PROTO((void));
-static void mp_layout_set_margin __PROTO((t_position *));
+static void mp_layout_set_margin_or_spacing __PROTO((t_position *));
 
 enum set_multiplot_id {
     S_MULTIPLOT_LAYOUT,
@@ -93,7 +93,8 @@ static const struct gen_table set_multiplot_tbl[] =
     {screen, screen, screen, 0.9, -1, -1},  /* rmargin */ \
     {screen, screen, screen, 0.1, -1, -1},  /* bmargin */ \
     {screen, screen, screen, 0.9, -1, -1},  /* tmargin */ \
-    0.1, 0.1,	/* xspacing, yspacing */ \
+    {screen, screen, screen, 0.05, -1, -1}, /* xspacing */ \
+    {screen, screen, screen, 0.05, -1, -1}, /* yspacing */ \
     0,0,0,0,	/* prev_ sizes and offsets */ \
     DEFAULT_MARGIN_POSITION, \
     DEFAULT_MARGIN_POSITION, \
@@ -117,7 +118,7 @@ static struct {
     double yoffset;        /* horizontal shift */
     TBOOLEAN auto_layout_margins;
     t_position lmargin, rmargin, bmargin, tmargin;
-    double xspacing, yspacing;
+    t_position xspacing, yspacing;
     double prev_xsize, prev_ysize, prev_xoffset, prev_yoffset;
     t_position prev_lmargin, prev_rmargin, prev_tmargin, prev_bmargin;
 			   /* values before 'set multiplot layout' */
@@ -201,6 +202,9 @@ multiplot_current_panel()
 void
 multiplot_start()
 {
+    TBOOLEAN set_spacing = FALSE;
+    TBOOLEAN set_margins = FALSE;
+
     c_token++;
 
     /* Only a few options are possible if we are already in multiplot mode */
@@ -225,6 +229,7 @@ multiplot_start()
 
     /* FIXME: more options should be reset/initialized each time */
     mp_layout.auto_layout = FALSE;
+    mp_layout.auto_layout_margins = FALSE;
     mp_layout.current_panel = 0;
     mp_layout.title.noenhanced = FALSE;
     free(mp_layout.title.text);
@@ -287,8 +292,8 @@ multiplot_start()
 	    mp_layout.prev_yoffset = yoffset;
 	    mp_layout.prev_lmargin = lmargin;
 	    mp_layout.prev_rmargin = rmargin;
-	    mp_layout.prev_tmargin = tmargin;
 	    mp_layout.prev_bmargin = bmargin;
+	    mp_layout.prev_tmargin = tmargin;
 
 	    mp_layout.act_row = 0;
 	    mp_layout.act_col = 0;
@@ -345,49 +350,88 @@ multiplot_start()
 		c_token++;
 		if (END_OF_COMMAND)
 		    int_error(c_token,"expecting '<left>,<right>,<bottom>,<top>'");
-		mp_layout.auto_layout_margins = TRUE;
-		mp_layout_set_margin(&(mp_layout.lmargin));
+		
+		mp_layout.lmargin.scalex = screen;
+		mp_layout_set_margin_or_spacing(&(mp_layout.lmargin));
 		if (!END_OF_COMMAND && equals(c_token,",") ) {
 		    c_token++;
 		    if (END_OF_COMMAND)
 			int_error(c_token, "expecting <right>");
-		    mp_layout_set_margin(&(mp_layout.rmargin));
+
+		    mp_layout.rmargin.scalex = mp_layout.lmargin.scalex;
+		    mp_layout_set_margin_or_spacing(&(mp_layout.rmargin));
 		} else {
 		    int_error(c_token, "expecting <right>");
 		}
 		if (!END_OF_COMMAND && equals(c_token,",") ) {
 		    c_token++;
 		    if (END_OF_COMMAND)
-			int_error(c_token, "expecting <bottom>");
-		    mp_layout_set_margin(&(mp_layout.bmargin));
+			int_error(c_token, "expecting <top>");
+
+		    mp_layout.bmargin.scalex = mp_layout.rmargin.scalex;
+		    mp_layout_set_margin_or_spacing(&(mp_layout.bmargin));
 		} else {
 		    int_error(c_token, "expecting <bottom>");
 		}
 		if (!END_OF_COMMAND && equals(c_token,",") ) {
 		    c_token++;
 		    if (END_OF_COMMAND)
-			int_error(c_token, "expecting <top>");
-		    mp_layout_set_margin(&(mp_layout.tmargin));
+			int_error(c_token, "expecting <bottom>");
+
+		    mp_layout.tmargin.scalex = mp_layout.bmargin.scalex;
+		    mp_layout_set_margin_or_spacing(&(mp_layout.tmargin));
 		} else {
 		    int_error(c_token, "expection <top>");
 		}
+		set_margins = TRUE;
 		break;
 	    case S_MULTIPLOT_SPACING:
 		c_token++;
-		mp_layout.xspacing = real_expression();
-		mp_layout.auto_layout_margins = TRUE;
+		if (END_OF_COMMAND)
+		    int_error(c_token,"expecting '<xspacing>,<yspacing>'");
+		mp_layout.xspacing.scalex = screen;
+		mp_layout_set_margin_or_spacing(&(mp_layout.xspacing));
 		mp_layout.yspacing = mp_layout.xspacing;
+
 		if (!END_OF_COMMAND && equals(c_token, ",")) {
 		    c_token++;
 		    if (END_OF_COMMAND)
 			int_error(c_token, "expecting <yspacing>");
-		    mp_layout.yspacing = real_expression();
+		    mp_layout_set_margin_or_spacing(&(mp_layout.yspacing));
 		}
+		set_spacing = TRUE;
 		break;
 	    default:
 		int_error(c_token,"invalid or duplicate option");
 		break;
 	}
+    }
+
+    if (set_spacing || set_margins) {
+	if (set_spacing && set_margins) {
+	    if (mp_layout.lmargin.x >= 0 && mp_layout.rmargin.x >= 0 
+	    &&  mp_layout.tmargin.x >= 0 && mp_layout.bmargin.x >= 0 
+	    &&  mp_layout.xspacing.x >= 0 && mp_layout.yspacing.x >= 0)
+		mp_layout.auto_layout_margins = TRUE;
+	    else
+		int_error(NO_CARET, "must give positive margin and spacing values");
+	} else if (set_spacing) {
+	    int_warn(NO_CARET, "must give margins and spacing, continue with auto margins.");
+	} else if (set_margins) {
+	    mp_layout.auto_layout_margins = TRUE;
+	    mp_layout.xspacing.scalex = screen;
+	    mp_layout.xspacing.x = 0.05;
+	    mp_layout.yspacing.scalex = screen;
+	    mp_layout.yspacing.x = 0.05;
+	    int_warn(NO_CARET, "must give margins and spacing, continue with spacing of 0.05");
+	}
+	/* Sanity check that screen tmargin is > screen bmargin */
+	if (mp_layout.bmargin.scalex == screen && mp_layout.tmargin.scalex == screen)
+	    if (mp_layout.bmargin.x > mp_layout.tmargin.x) {
+		double tmp = mp_layout.bmargin.x;
+		mp_layout.bmargin.x = mp_layout.tmargin.x;
+		mp_layout.tmargin.x = tmp;
+	    }
     }
 
     /* If we reach here, then the command has been successfully parsed.
@@ -456,18 +500,19 @@ multiplot_end()
 
 	lmargin = mp_layout.prev_lmargin;
 	rmargin = mp_layout.prev_rmargin;
-	tmargin = mp_layout.prev_tmargin;
 	bmargin = mp_layout.prev_bmargin;
+	tmargin = mp_layout.prev_tmargin;
     }
     /* reset automatic multiplot layout */
     mp_layout.auto_layout = FALSE;
     mp_layout.auto_layout_margins = FALSE;
     mp_layout.xscale = mp_layout.yscale = 1.0;
     mp_layout.xoffset = mp_layout.yoffset = 0.0;
-    mp_layout.lmargin.scalex = mp_layout.rmargin.scalex = character;
-    mp_layout.bmargin.scalex = mp_layout.tmargin.scalex = character;
+    mp_layout.lmargin.scalex = mp_layout.rmargin.scalex = screen;
+    mp_layout.bmargin.scalex = mp_layout.tmargin.scalex = screen;
     mp_layout.lmargin.x = mp_layout.rmargin.x = mp_layout.bmargin.x = mp_layout.tmargin.x = -1;
-    mp_layout.xspacing = mp_layout.yspacing = 0.1;
+    mp_layout.xspacing.scalex = mp_layout.yspacing.scalex = screen;
+    mp_layout.xspacing.x = mp_layout.yspacing.x = -1;
 
     if (mp_layout.title.text) {
 	free(mp_layout.title.text);
@@ -516,24 +561,55 @@ mp_layout_margins_and_spacing(void)
 {
     /* width and height of a single sub plot. */
     double tmp_width, tmp_height;
+    double leftmargin, rightmargin, topmargin, bottommargin, xspacing, yspacing;
 
     if (!mp_layout.auto_layout_margins) return;
 
-    tmp_width = (mp_layout.rmargin.x - mp_layout.lmargin.x - (mp_layout.num_cols - 1) * mp_layout.xspacing) 
+    if (mp_layout.lmargin.scalex == screen)
+	leftmargin = mp_layout.lmargin.x;
+    else
+	leftmargin = (mp_layout.lmargin.x * term->h_char) / term->xmax;
+
+    if (mp_layout.rmargin.scalex == screen)
+	rightmargin = mp_layout.rmargin.x;
+    else
+	rightmargin = 1 - (mp_layout.rmargin.x * term->h_char) / term->xmax;
+
+    if (mp_layout.tmargin.scalex == screen)
+	topmargin = mp_layout.tmargin.x;
+    else
+	topmargin = 1 - (mp_layout.tmargin.x * term->v_char) / term->ymax;
+
+    if (mp_layout.bmargin.scalex == screen)
+	bottommargin = mp_layout.bmargin.x;
+    else
+	bottommargin = (mp_layout.bmargin.x * term->v_char) / term->ymax;
+
+    if (mp_layout.xspacing.scalex == screen)
+	xspacing = mp_layout.xspacing.x;
+    else
+	xspacing = (mp_layout.xspacing.x * term->h_char) / term->xmax;
+
+    if (mp_layout.yspacing.scalex == screen)
+	yspacing = mp_layout.yspacing.x;
+    else
+	yspacing = (mp_layout.yspacing.x * term->v_char) / term->ymax;
+
+    tmp_width = (rightmargin - leftmargin - (mp_layout.num_cols - 1) * xspacing) 
 	        / mp_layout.num_cols;
-    tmp_height = (mp_layout.tmargin.x - mp_layout.bmargin.x - (mp_layout.num_rows - 1) * mp_layout.yspacing) 
+    tmp_height = (topmargin - bottommargin - (mp_layout.num_rows - 1) * yspacing) 
 	        / mp_layout.num_rows;
 
-    lmargin.x = mp_layout.lmargin.x + mp_layout.act_col * (tmp_width + mp_layout.xspacing);
+    lmargin.x = leftmargin + mp_layout.act_col * (tmp_width + xspacing);
     lmargin.scalex = screen;
     rmargin.x = lmargin.x + tmp_width;
     rmargin.scalex = screen;
 
     if (mp_layout.downwards) {
-	bmargin.x = mp_layout.bmargin.x + (mp_layout.num_rows - mp_layout.act_row - 1) 
-	            * (tmp_height + mp_layout.yspacing);
+	bmargin.x = bottommargin + (mp_layout.num_rows - mp_layout.act_row - 1) 
+	            * (tmp_height + yspacing);
     } else {
-	bmargin.x = mp_layout.bmargin.x + mp_layout.act_row * (tmp_height + mp_layout.yspacing);
+	bmargin.x = bottommargin + mp_layout.act_row * (tmp_height + yspacing);
     }
     bmargin.scalex = screen;
     tmargin.x = bmargin.x + tmp_height;
@@ -541,15 +617,30 @@ mp_layout_margins_and_spacing(void)
 }
 
 static void
-mp_layout_set_margin(t_position *margin)
+mp_layout_set_margin_or_spacing(t_position *margin)
 {
-    margin->scalex = screen;
     margin->x = -1;
+
+    if (END_OF_COMMAND)
+	return;
+
+    if (almost_equals(c_token, "sc$reen")) {
+	margin->scalex = screen;
+	c_token++;
+    } else if (almost_equals(c_token, "char$acter")) {
+	margin->scalex = character;
+	c_token++;
+    }
 
     margin->x = real_expression();
     if (margin->x < 0)
-	margin->x = 0;
-    if (margin->x > 1)
-	margin->x = 1;
+	margin->x = -1;
+
+    if (margin->scalex == screen) {
+	if (margin->x < 0)
+	    margin->x = 0;
+	if (margin->x > 1)
+	    margin->x = 1;
+    }
 }
 

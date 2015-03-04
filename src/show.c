@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.326.2.7 2015/01/27 07:11:45 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.326.2.8 2015/02/26 18:43:47 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -2036,19 +2036,19 @@ show_margin()
     else
 	fputs("\trmargin is computed automatically\n", stderr);
 
-    if (tmargin.scalex == screen)
-	fprintf(stderr, "\ttmargin is set to screen %g\n", tmargin.x);
-    else if (tmargin.x >= 0)
-	fprintf(stderr, "\ttmargin is set to %g\n", tmargin.x);
-    else
-	fputs("\ttmargin is computed automatically\n", stderr);
-
     if (bmargin.scalex == screen)
 	fprintf(stderr, "\tbmargin is set to screen %g\n", bmargin.x);
     else if (bmargin.x >= 0)
 	fprintf(stderr, "\tbmargin is set to %g\n", bmargin.x);
     else
 	fputs("\tbmargin is computed automatically\n", stderr);
+
+    if (tmargin.scalex == screen)
+	fprintf(stderr, "\ttmargin is set to screen %g\n", tmargin.x);
+    else if (tmargin.x >= 0)
+	fprintf(stderr, "\ttmargin is set to %g\n", tmargin.x);
+    else
+	fputs("\ttmargin is computed automatically\n", stderr);
 }
 
 

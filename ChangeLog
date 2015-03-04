@@ -1,8 +1,27 @@
+2015-03-04  Christoph Bersch <usenet@bersch.net>
+
+        * src/multiplot.c demo/heatmaps.dem demo/layout.dem docs/gnuplot.doc:
+        Fix inconsistencies in the margin and spacing options for
+        "set multiplot layout".  Allow using character or screen units.
+        Make the character/screen keyword sticky; i.e. it applies to all four
+        values in the command `set multiplot margins screen 0.1,0.9,0.9,0.1`
+        Issue appropriate errors or warnings if margins and spacing aren't set
+        together.  Update and expand the documentation.
+
 2015-03-04  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/util.c (gprintf):  The "%h" format want a proper multiplication
 	sign rather than 'x' when possible.  We already do this for UTF8 and
 	CP1252, now add support for iso_8859_* encodings.
+
+        * docs/gnuplot.doc src/set.c src/show.c:
+        In 5.0.0 the set margin command interpreted 4 values in the order
+          set margin <left>, <right>, <top>, <bottom>
+        but this order in non-intuitive and conflicts with the order in
+        other commands (e.g. set multiplot layout).  CHANGE this to
+          set margin <left>, <right>, <bottom>, <top>
+        Note that the code now sanity checks that (top > bottom), so this change
+        will not be noticed for margins given in screen coordinates.
 
 2015-03-02  Ethan A Merritt  <merritt@u.washington.edu>
 

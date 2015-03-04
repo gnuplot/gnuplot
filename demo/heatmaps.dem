@@ -97,7 +97,7 @@ pause -1
 unset colorbox
 set format xy ""
 set multiplot layout 1,2 title "Compare 'image' and 'image pixels' modes" \
-    margin 0.05, 0.95, 0.10, 0.85 spacing 0.05
+    margin screen 0.05, 0.95, 0.10, 0.85 spacing screen 0.05
 set title "plot with image"
 plot $map1 matrix using 1:2:3 with image
 set title "plot with image pixels"
