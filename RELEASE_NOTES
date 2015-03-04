@@ -1,15 +1,39 @@
-		GNUPLOT Version 5.0 Release Notes
-		=================================
+		GNUPLOT Version 5.0.1 Release Notes
+		===================================
 
-Gnuplot version 5 contains significant new capabilities and enhancements.
-The most recent previous release was 4.6 patchlevel 6 (4.6.6).
-Please see the NEWS file for bugfixes and minor changes to version 5.0
-applied after feedback on release candidates -rc1, -rc2, and -rc3.
+Gnuplot version 5.0 was released in January 2015.
+Please see the NEWS file for bugfixes and minor changes accummulated since then.
 
-Release Notes date: 31 December 2014
+Release Notes date: 04-March-2015
 
-NOTABLE NEW FEATURES
-====================
+This patchlevel 5.0.1 incremental release includes
+==================================================
+
+* NEW "set fit nolog" suppresses output to log file
+* CHANGE autoconfigure of Qt5 support now looks for --variable=host_bins
+* CHANGE reevaluate fill color for each polygon in data for "with filledcurves"
+* CHANGE gstrptime(): always check validity of %y %Y %d %B %b input fields
+* CHANGE track text properties for key title separately from key entries
+* CHANGE "smooth kdensity" now handles logscale y and explicit x range
+* CHANGE order of margins in the "set margin" command to left, right, bottom, top
+* FIX improved handling of boxplot data with multiple factors (categories)
+* FIX save_textcolor was not handling "tc variable"
+* FIX apply numeric locale when reading ascii matrix data
+* FIX handling of ascii matrix data
+* FIX reinitialize brush used to draw dotted lines in gd terminal
+* FIX failure to clear bold/italic text attributes in cairo terminals
+* FIX tabular output of time data when the axis format has not been set
+* FIX breakage in plot style filledcurves {above|below} y1=<yval> 
+* FIX dashtypes after "set term {e}pslatex mono"
+* FIX report and enforce maximum number of parallel axes without faulting
+* FIX smooth mcsplines for a curve containing multiple y values at a single x
+* FIX handle log-scaled color axis in colorspec "lc palette cb"
+* FIX regression in color support for pbm/sixel/hpgl terminals (no RGB color)
+* FIX accummulated round-off error in dotted lines drawn by libgd terminals
+* FIX incorrect colorbox axis labels in polar plots
+
+NOTABLE NEW FEATURES IN VERSION 5.0
+===================================
 
 * New plot styles "with parallelaxes" and labeled contours.
 
