@@ -1,3 +1,9 @@
+2015-03-04  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/util.c (gprintf):  The "%h" format want a proper multiplication
+	sign rather than 'x' when possible.  We already do this for UTF8 and
+	CP1252, now add support for iso_8859_* encodings.
+
 2015-03-02  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/tables.c src/graphics.c (plot_filledcurves) docs/gnuplot.doc:
