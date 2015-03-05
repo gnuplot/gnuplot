@@ -1,3 +1,12 @@
+2015-03-05  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/term_api.h src/term.c src/graphics.c term/estimate.trm:
+	New routine estimate_plaintext(char *enhancedtext) returns a string
+	stripped of all enhanced text markup.  Use this to provide plain
+	text titles in output files even though the plot title itself contains
+	markup characters.
+	Bug #1573
+
 2015-03-04  Christoph Bersch <usenet@bersch.net>
 
         * src/multiplot.c demo/heatmaps.dem demo/layout.dem docs/gnuplot.doc:

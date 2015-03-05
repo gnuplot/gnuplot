@@ -23,6 +23,7 @@ Changes since 5.0 release
 * FIX accummulated round-off error in dotted lines drawn by libgd terminals
 * FIX incorrect colorbox axis labels in polar plots
 * FIX AquaTerm framework name is case-sensitive
+* FIX strip enhanced text markup from plot titles embedded in svg output
 
 Changes in final release of 5.0
 ===============================
