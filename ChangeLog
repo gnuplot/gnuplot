@@ -7,6 +7,9 @@
 	markup characters.
 	Bug #1573
 
+	* demo/hypertext.dem: Simplify output file (attach hypertext to only
+	one set of points).
+
 2015-03-02  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/tables.c src/graphics.c (plot_filledcurves) docs/gnuplot.doc:
