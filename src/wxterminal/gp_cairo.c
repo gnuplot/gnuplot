@@ -1,5 +1,5 @@
 /*
- * $Id: gp_cairo.c,v 1.88 2014/12/11 22:56:35 sfeam Exp $
+ * $Id: gp_cairo.c,v 1.89 2014/12/13 23:42:38 sfeam Exp $
  */
 
 /* GNUPLOT - gp_cairo.c */
@@ -747,7 +747,7 @@ static gchar * gp_cairo_convert(plot_struct *plot, const char* string)
 		if (error->code != G_CONVERT_ERROR_ILLEGAL_SEQUENCE) {
 			fprintf(stderr, "Unable to convert \"%s\": %s\n", string, error->message);
 			g_error_free (error);
-			return "";
+			return strdup("");
 		}
 		/* The sequence is invalid in the chosen charset.
 		 * we will try to fall back to iso_8859_1, and if it doesn't work,
