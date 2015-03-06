@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.296.2.8 2015/01/24 23:54:43 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.296.2.9 2015/02/18 19:14:40 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -2591,6 +2591,17 @@ int len;
 	len = strlen(text);
 
     return len;
+}
+
+/* 
+ * Use estimate.trm to mock up a non-enhanced approximation of the
+ * original string.
+ */
+char *
+estimate_plaintext(char *enhancedtext)
+{
+    estimate_strlen(enhancedtext);
+    return ENHest_plaintext;
 }
 
 void

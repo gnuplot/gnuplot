@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: estimate.trm,v 1.10 2010/07/28 20:43:59 sfeam Exp $
+ * $Id: estimate.trm,v 1.11 2012/05/06 00:31:36 sfeam Exp $
  *
  */
 
@@ -12,6 +12,7 @@
  *   On return from ENHest_put_text()
  *	(*term)->xmax = estimated string width
  *	(*term)->ymax = estimated string height (in tenths of a character height)
+ *	ENHest_plaintext = non-enhanced text approximation of original string
  *
  * AUTHORS
  *
@@ -36,6 +37,9 @@ static double ENHest_fragment_width;
 static double ENHest_fontsize;
 static double ENHest_min_height, ENHest_max_height;
 static double ENHest_total_width;
+static char *ENHest_plaintext = NULL;
+static int ENHest_plaintext_buflen = 0;
+static int ENHest_plaintext_pos = 0;
 
 static TBOOLEAN ENHest_opened_string;
 static TBOOLEAN ENHest_show = TRUE;
@@ -125,6 +129,14 @@ ENHest_put_text(unsigned int x, unsigned int y, const char *str)
     ENHest_total_width = 0.0;
     strncpy(enhanced_escape_format,".",sizeof(enhanced_escape_format));
 
+    /* buffer in which we will return plaintext version of enhanced text string */
+    while (ENHest_plaintext_buflen < strlen(str)) {
+	ENHest_plaintext_buflen += MAX_ID_LEN;
+	ENHest_plaintext = gp_realloc(ENHest_plaintext, ENHest_plaintext_buflen+1, "ENHest_plaintext");
+    }
+    ENHest_plaintext[0] = '\0';
+    ENHest_plaintext_pos = 0;
+
     /* If no enhanced text processing is needed, strlen() is sufficient */
     if (ignore_enhanced_text || !strpbrk(str, "{}^_@&~\n")) {
 	if (encoding == S_ENC_UTF8)
@@ -132,6 +144,7 @@ ENHest_put_text(unsigned int x, unsigned int y, const char *str)
 	else
 	    term->xmax = strlen(str);
 	term->ymax = 10;
+	strcpy(ENHest_plaintext, str);
 	return;
     }
 
@@ -148,6 +161,7 @@ ENHest_put_text(unsigned int x, unsigned int y, const char *str)
 	    break; /* end of string */
     }
 
+    ENHest_plaintext[ENHest_plaintext_pos] = '\0';
     if (ENHest_x > 0.0 && ENHest_x < 1.0)
 	ENHest_x = 1;
     term->xmax = ENHest_total_width;
@@ -176,6 +190,8 @@ ENHest_writec(int c)
 	}
     } else
 	ENHest_fragment_width += ENHest_fontsize;
+
+    ENHest_plaintext[ENHest_plaintext_pos++] = c;
 }
 
 /*
@@ -200,7 +216,7 @@ size_t strwidth_utf8(const char *s) {
 
 
 static struct termentry ENHest = {
-    "estimate", "estimate width of enhanced text string",
+    "estimate", NULL,
     1, 1, 1, 1, 1, 1,
     NULL, NULL, NULL,
     NULL, NULL, NULL, NULL, NULL,
