@@ -1,5 +1,5 @@
 /*
- * $Id: term_api.h,v 1.136 2014/09/05 21:51:38 sfeam Exp $
+ * $Id: term_api.h,v 1.137 2014/12/28 13:09:36 markisch Exp $
  */
 
 /* GNUPLOT - term_api.h */
@@ -467,6 +467,7 @@ struct termentry *change_term __PROTO((const char *name, int length));
 
 void write_multiline __PROTO((unsigned int, unsigned int, char *, JUSTIFY, VERT_JUSTIFY, int, const char *));
 int estimate_strlen __PROTO((char *));
+char *estimate_plaintext __PROTO((char *));
 void list_terms __PROTO((void));
 char* get_terminals_names __PROTO((void));
 struct termentry *set_term __PROTO((void));
