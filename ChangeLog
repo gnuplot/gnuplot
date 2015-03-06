@@ -1,3 +1,7 @@
+2015-03-06 Allin Cottrell  <cottrell@wfu.edu>
+
+	* src/wxterminal/gp_cairo.c:  Prevent free() of a string constant.
+
 2015-03-05  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/term_api.h src/term.c src/graphics.c term/estimate.trm:
