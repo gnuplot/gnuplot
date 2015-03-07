@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.296.2.9 2015/02/18 19:14:40 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.296.2.10 2015/03/06 00:55:44 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -2600,6 +2600,8 @@ int len;
 char *
 estimate_plaintext(char *enhancedtext)
 {
+    if (enhancedtext == NULL)
+	return NULL;
     estimate_strlen(enhancedtext);
     return ENHest_plaintext;
 }
