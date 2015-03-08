@@ -1,3 +1,9 @@
+2015-03-08  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/datafile.c: The code tracking matrix column/row headers tried
+	to extract the relevant string from the wrong internal array.
+	Bug #1575
+
 2015-03-06 Allin Cottrell  <cottrell@wfu.edu>
 
 	* src/wxterminal/gp_cairo.c:  Prevent free() of a string constant.

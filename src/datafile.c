@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.299 2015/01/09 19:18:30 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.300 2015/01/13 18:17:30 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -924,7 +924,7 @@ df_read_matrix(int *rows, int *cols)
 		    evaluate_inside_using = FALSE;
 		    xpos = real(&a);
 		}
-		temp_string = df_parse_string_field(df_tokens[i]);
+		temp_string = df_parse_string_field(df_column[i].position);
 		add_tic_user(FIRST_X_AXIS, temp_string, xpos, -1);
 		free(temp_string);
 	    }
@@ -968,7 +968,7 @@ df_read_matrix(int *rows, int *cols)
 			ypos = real(&a);
 			df_column[1].datum = save;
 		    }
-		    temp_string = df_parse_string_field(df_tokens[0]);
+		    temp_string = df_parse_string_field(df_column[0].position);
 		    add_tic_user(FIRST_Y_AXIS, temp_string, ypos, -1);
 		    free(temp_string);
 		    continue;
