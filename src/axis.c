@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.144 2015/02/16 04:31:38 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.145 2015/02/23 21:34:55 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -1731,22 +1731,6 @@ widest_tic_callback(AXIS_INDEX axis, double place, char *text,
  * get and set routines for range writeback
  * ULIG *
  */
-
-void
-set_writeback_min(AXIS_INDEX axis)
-{
-    double val = AXIS_DE_LOG_VALUE(axis,axis_array[axis].min);
-    /* printf("set min(%d)=%g\n",axis,val); */
-    axis_array[axis].writeback_min = val;
-}
-
-void
-set_writeback_max(AXIS_INDEX axis)
-{
-    double val = AXIS_DE_LOG_VALUE(axis,axis_array[axis].max);
-    /* printf("set max(%d)=%g\n",axis,val); */
-    axis_array[axis].writeback_max = val;
-}
 
 void
 save_writeback_all_axes()
