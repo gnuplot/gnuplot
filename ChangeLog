@@ -1,3 +1,16 @@
+2015-03-11  Ethan A Merritt  <merritt@u.washington.edu>
+
+	Gradually move all axis-related information into the axis structure
+	itself rather than leaving it spread out among multiple arrays indexed
+	in parallel.  The rationale is to allow routines that process this
+	information to operate from a pointer to (struct axis) rather than from
+	an array index.  This will allow dynamically allocated axis definitions.
+
+	* src/axis.c src/axis.h src/unset.c:  Part 1: Keep a copy of the axis
+	index (e.g. SECOND_Y_AXIS) in the axis structure.  This may eventually
+	go away again, but for now it allows calling a routine that wants the
+	axis index from a routine that works from an axis point.
+
 2015-03-08  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/datafile.c: The code tracking matrix column/row headers tried

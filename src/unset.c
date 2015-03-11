@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.211 2015/01/06 04:57:15 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.212 2015/02/15 16:39:23 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -1745,12 +1745,13 @@ reset_command()
 	unset_zeroaxis(axis);
 	unset_axislabel_or_title(&axis_array[axis].label);
 
+	/* Fill with generic values, then customize */
 	memcpy(axis_array+axis, &default_axis_state, sizeof(AXIS));
 
-	unset_axislabel(axis);
+	unset_axislabel(axis);	/* resets rotation on y */
+	unset_range(axis);	/* resets from axis_defaults */
 	axis_array[axis].formatstring = gp_strdup(DEF_FORMAT);
-	unset_timedata(axis);
-	unset_range(axis);
+	axis_array[axis].index = axis;
 
 	/* 'tics' default is on for some, off for the other axes: */
 	unset_tics(axis);

@@ -1,5 +1,5 @@
 /*
- * $Id: axis.h,v 1.108 2015/02/15 16:39:20 broeker Exp $
+ * $Id: axis.h,v 1.109 2015/02/16 04:31:39 sfeam Exp $
  *
  */
 
@@ -276,6 +276,7 @@ typedef struct axis {
     TBOOLEAN tic_in;		/* tics to be drawn inward?  */
 
 /* other miscellaneous fields */
+    int index;			/* reset when needed from axis_defaults */
     text_label label;		/* label string and position offsets */
     TBOOLEAN manual_justify;	/* override automatic justification */
     lp_style_type *zeroaxis;	/* usually points to default_axis_zeroaxis */
@@ -304,7 +305,8 @@ typedef struct axis {
 	DEFAULT_AXIS_TICDEF,	/* tic series definition */		    \
 	0, FALSE, FALSE, 	/* tic_rotate, grid{major,minor} */	    \
 	MINI_DEFAULT, 10.,	/* minitics, mtic_freq */		    \
-        1.0, 0.5, TRUE,		/* ticscale, miniticscale, tic_in */	    \
+	1.0, 0.5, TRUE,		/* ticscale, miniticscale, tic_in */	    \
+	0,			/* index (e.g.FIRST_Y_AXIS) */		    \
 	EMPTY_LABELSTRUCT,	/* axis label */			    \
 	FALSE,			/* override automatic justification */	    \
 	NULL			/* NULL means &default_axis_zeroaxis */	    \
