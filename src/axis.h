@@ -1,5 +1,5 @@
 /*
- * $Id: axis.h,v 1.111 2015/03/11 19:40:35 sfeam Exp $
+ * $Id: axis.h,v 1.112 2015/03/11 19:44:39 sfeam Exp $
  *
  */
 
@@ -343,7 +343,7 @@ extern const AXIS_DEFAULTS axis_defaults[AXIS_ARRAY_SIZE];
 
 /* A parsing table for mapping axis names into axis indices. For use
  * by the set/show machinery, mainly */
-extern const struct gen_table axisname_tbl[AXIS_ARRAY_SIZE+1];
+extern const struct gen_table axisname_tbl[];
 
 
 extern const struct ticdef default_axis_ticdef;

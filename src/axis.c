@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.148 2015/03/11 19:40:35 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.149 2015/03/11 19:44:39 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -77,7 +77,7 @@ const AXIS_DEFAULTS axis_defaults[AXIS_ARRAY_SIZE] = {
 
 /* HBB 20000506 new variable: parsing table for use with the table
  * module, to help generalizing set/show/unset/save, where possible */
-const struct gen_table axisname_tbl[AXIS_ARRAY_SIZE + 1] =
+const struct gen_table axisname_tbl[] =
 {
     { "z", FIRST_Z_AXIS},
     { "y", FIRST_Y_AXIS},

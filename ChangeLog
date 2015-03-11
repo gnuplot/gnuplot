@@ -19,6 +19,10 @@
 	array ticfmt[AXIS_ARRAY_SIZE][MAX_ID_LEN+1] with a dynamically 
 	maintained field axis->ticfmt.
 
+	* src/axis.c src/axis.h:  Part 4 - Reduce length of axisname_tbl[] to
+	contain only the axes that use it (e.g. no individual parallel axis
+	entries).
+
 2015-03-08  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/datafile.c: The code tracking matrix column/row headers tried
