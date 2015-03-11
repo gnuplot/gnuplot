@@ -1,5 +1,5 @@
 /*
- * $Id: axis.h,v 1.112 2015/03/11 19:44:39 sfeam Exp $
+ * $Id: axis.h,v 1.113 2015/03/11 19:48:02 sfeam Exp $
  *
  */
 
@@ -287,7 +287,7 @@ typedef struct axis {
     t_timelevel timelevel;	/* minimum time unit used to quantize ticks */
 
 /* other miscellaneous fields */
-    int index;			/* reset when needed from axis_defaults */
+    int index;			/* filled in by "reset" */
     text_label label;		/* label string and position offsets */
     TBOOLEAN manual_justify;	/* override automatic justification */
     lp_style_type *zeroaxis;	/* usually points to default_axis_zeroaxis */
@@ -410,6 +410,9 @@ extern AXIS_INDEX x_axis, y_axis, z_axis;
   (((double)(pos)-axis_array[axis].term_lower)/axis_array[axis].term_scale \
    + axis_array[axis].min)
 
+/* Same thing except that "axis" is a pointer, not an index */
+#define axis_map(axis, variable)		\
+    (int) ((axis)->term_lower + ((variable) - (axis)->min) * (axis)->term_scale + 0.5)
 
 #define AXIS_SETSCALE(axis, out_low, out_high)			\
     axis_array[axis].term_scale = ((out_high) - (out_low))	\
@@ -433,12 +436,18 @@ do {						\
  * coordinate*/
 #define AXIS_DO_LOG(axis,value) (log(value) / axis_array[axis].log_base)
 #define AXIS_UNDO_LOG(axis,value) exp((value) * axis_array[axis].log_base)
+#define axis_do_log(axis,value) (log(value) / axis->log_base)
+#define axis_undo_log(axis,value) exp((value) * axis->log_base)
 
 /* HBB 20000430: same, but these test if the axis is log, first: */
 #define AXIS_LOG_VALUE(axis,value)				\
     (axis_array[axis].log ? AXIS_DO_LOG(axis,value) : (value))
 #define AXIS_DE_LOG_VALUE(axis,coordinate)				  \
     (axis_array[axis].log ? AXIS_UNDO_LOG(axis,coordinate): (coordinate))
+#define axis_log_value(axis,value)				\
+    (axis->log ? axis_do_log(axis,value) : (value))
+#define axis_de_log_value(axis,coordinate)				  \
+    (axis->log ? axis_undo_log(axis,coordinate): (coordinate))
 
 
 /* copy scalar data to arrays. The difference between 3D and 2D
@@ -721,6 +730,13 @@ char * axis_name __PROTO((AXIS_INDEX));
 #define TIC_SCALE(ticlevel, axis) \
     (ticlevel <= 0 ? axis_array[axis].ticscale : \
      ticlevel == 1 ? axis_array[axis].miniticscale : \
+     ticlevel < MAX_TICLEVEL ? ticscale[ticlevel] : \
+     0)
+
+/* same thing using axis pointer rather than index */
+#define tic_scale(ticlevel, axis) \
+    (ticlevel <= 0 ? axis->ticscale : \
+     ticlevel == 1 ? axis->miniticscale : \
      ticlevel < MAX_TICLEVEL ? ticscale[ticlevel] : \
      0)
 
