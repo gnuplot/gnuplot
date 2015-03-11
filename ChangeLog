@@ -15,6 +15,10 @@
 	timelevel[] and ticstep[] by moving their respective contents into new
 	fields axis->timelevel and axis->ticstep.
 
+	* src/axis.c src src/axis.h src/unset.c:  Part 3 - Replace the static
+	array ticfmt[AXIS_ARRAY_SIZE][MAX_ID_LEN+1] with a dynamically 
+	maintained field axis->ticfmt.
+
 2015-03-08  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/datafile.c: The code tracking matrix column/row headers tried

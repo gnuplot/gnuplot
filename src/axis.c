@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.147 2015/03/11 19:35:54 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.148 2015/03/11 19:40:35 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -74,10 +74,6 @@ const AXIS_DEFAULTS axis_defaults[AXIS_ARRAY_SIZE] = {
     {   0,  1, "p" , NO_TICS,                      }, /* shared by all parallel axes */
 };
 
-
-/* either the 'set format <axis>' or an automatically invented time
- * format string */
-static char ticfmt[AXIS_ARRAY_SIZE][MAX_ID_LEN+1];
 
 /* HBB 20000506 new variable: parsing table for use with the table
  * module, to help generalizing set/show/unset/save, where possible */
@@ -478,7 +474,7 @@ looks_like_numeric(char *format)
 }
 
 
-/* Either copies the axis formatstring over to the ticfmt[] array, or
+/* Either copies axis->formatstring to axis->ticfmt, or
  * in case that's not applicable because the format hasn't been
  * specified correctly, invents a time/date output format by looking
  * at the range of values.  Considers time/date fields that don't
@@ -489,25 +485,29 @@ copy_or_invent_formatstring(AXIS_INDEX axis)
     struct tm t_min, t_max;
     struct axis *this_axis = &axis_array[axis];
 
+    char tempfmt[MAX_ID_LEN+1];
+    memset(tempfmt, 0, sizeof(tempfmt));
+
     if (this_axis->tictype != DT_TIMEDATE
     ||  !looks_like_numeric(this_axis->formatstring)) {
 	/* The simple case: formatstring is usable, so use it! */
-	strncpy(ticfmt[axis], this_axis->formatstring, MAX_ID_LEN);
+	strncpy(tempfmt, this_axis->formatstring, MAX_ID_LEN);
 	/* Ensure enough precision to distinguish tics */
-	if (!strcmp(ticfmt[axis], DEF_FORMAT)) {
+	if (!strcmp(tempfmt, DEF_FORMAT)) {
 	    double axmin = AXIS_DE_LOG_VALUE(axis,this_axis->min);
 	    double axmax = AXIS_DE_LOG_VALUE(axis,this_axis->max);
 	    int precision = ceil(-log10(GPMIN(fabs(axmax-axmin),fabs(axmin))));
 
 	    if ((axmin*axmax > 0) && precision > 4)
-		sprintf(ticfmt[axis],"%%.%df", (precision>14) ? 14 : precision);
+		sprintf(tempfmt,"%%.%df", (precision>14) ? 14 : precision);
 	}
 
-	return ticfmt[axis];
+	free(this_axis->ticfmt);
+	this_axis->ticfmt = strdup(tempfmt);
+	return this_axis->ticfmt;
     }
 
     /* Else, have to invent an output format string. */
-    *ticfmt[axis] = 0;		/* make sure we strcat to empty string */
 
     ggmtime(&t_min, time_tic_just(this_axis->timelevel, this_axis->min));
     ggmtime(&t_max, time_tic_just(this_axis->timelevel, this_axis->max));
@@ -516,48 +516,49 @@ copy_or_invent_formatstring(AXIS_INDEX axis)
 	&& t_max.tm_yday == t_min.tm_yday) {
 	/* same day, skip date */
 	if (t_max.tm_hour != t_min.tm_hour) {
-	    strcpy(ticfmt[axis], "%H");
+	    strcpy(tempfmt, "%H");
 	}
 	if (this_axis->timelevel < TIMELEVEL_DAYS) {
-	    if (ticfmt[axis][0])
-		strcat(ticfmt[axis], ":");
-	    strcat(ticfmt[axis], "%M");
+	    if (tempfmt[0])
+		strcat(tempfmt, ":");
+	    strcat(tempfmt, "%M");
 	}
 	if (this_axis->timelevel < TIMELEVEL_HOURS) {
-	    strcat(ticfmt[axis], ":%S");
+	    strcat(tempfmt, ":%S");
 	}
     } else {
 	if (t_max.tm_year != t_min.tm_year) {
 	    /* different years, include year in ticlabel */
 	    /* check convention, day/month or month/day */
-	    if (strchr(timefmt, 'm')
-		< strchr(timefmt, 'd')) {
-		strcpy(ticfmt[axis], "%m/%d/%");
+	    if (strchr(timefmt, 'm') < strchr(timefmt, 'd')) {
+		strcpy(tempfmt, "%m/%d/%");
 	    } else {
-		strcpy(ticfmt[axis], "%d/%m/%");
+		strcpy(tempfmt, "%d/%m/%");
 	    }
 	    if (((int) (t_max.tm_year / 100)) != ((int) (t_min.tm_year / 100))) {
-		strcat(ticfmt[axis], "Y");
+		strcat(tempfmt, "Y");
 	    } else {
-		strcat(ticfmt[axis], "y");
+		strcat(tempfmt, "y");
 	    }
 
 	} else {
 	    /* Copy day/month order over from input format */
-	    if (strchr(timefmt, 'm')
-		< strchr(timefmt, 'd')) {
-		strcpy(ticfmt[axis], "%m/%d");
+	    if (strchr(timefmt, 'm') < strchr(timefmt, 'd')) {
+		strcpy(tempfmt, "%m/%d");
 	    } else {
-		strcpy(ticfmt[axis], "%d/%m");
+		strcpy(tempfmt, "%d/%m");
 	    }
 	}
 	if (this_axis->timelevel < TIMELEVEL_WEEKS) {
 	    /* Note: seconds can't be useful if there's more than 1
 	     * day's worth of data... */
-	    strcat(ticfmt[axis], "\n%H:%M");
+	    strcat(tempfmt, "\n%H:%M");
 	}
     }
-    return ticfmt[axis];
+
+    free(this_axis->ticfmt);
+    this_axis->ticfmt = strdup(tempfmt);
+    return this_axis->ticfmt;
 }
 
 /* }}} */
@@ -870,16 +871,15 @@ setup_tics(AXIS_INDEX axis, int max)
 	    this->max = this->max_ub;
     }
 
-    /* Set up ticfmt[axis] correctly. If necessary (time axis, but not
-     * time/date output format), make up a formatstring that suits the
-     * range of data */
+    /* Set up ticfmt. If necessary (time axis, but not time/date output format),
+     * make up a formatstring that suits the range of data */
     copy_or_invent_formatstring(axis);
 }
 
 /* }}} */
 
 /* {{{  gen_tics */
-/* uses global arrays ticstep[], ticfmt[], axis_array[],
+/* uses global array axis_array[].
  * we use any of GRID_X/Y/X2/Y2 and  _MX/_MX2/etc - caller is expected
  * to clear the irrelevent fields from global grid bitmask
  * note this is also called from graph3d, so we need GRID_Z too
@@ -948,19 +948,19 @@ gen_tics(AXIS_INDEX axis, tic_callback callback)
 		/* string constant that contains no format keys */
 		ticlabel = mark->label;
 	    } else if (axis >= PARALLEL_AXES) {
-		/* FIXME: needed because ticfmt array is not maintained for parallel axes */
+		/* FIXME: needed because axis->ticfmt is not maintained for parallel axes */
 		gprintf(label, sizeof(label),
 			mark->label ? mark->label : this->formatstring,
 			log10_base, mark->position);
 		ticlabel = label;
 	    } else if (this->tictype == DT_TIMEDATE) {
-		gstrftime(label, MAX_ID_LEN-1, mark->label ? mark->label : ticfmt[axis], mark->position);
+		gstrftime(label, MAX_ID_LEN-1, mark->label ? mark->label : this->ticfmt, mark->position);
 		ticlabel = label;
 	    } else if (this->tictype == DT_DMS) {
-		gstrdms(label, mark->label ? mark->label : ticfmt[axis], mark->position);
+		gstrdms(label, mark->label ? mark->label : this->ticfmt, mark->position);
 		ticlabel = label;
 	    } else {
-		gprintf(label, sizeof(label), mark->label ? mark->label : ticfmt[axis], log10_base, mark->position);
+		gprintf(label, sizeof(label), mark->label ? mark->label : this->ticfmt, log10_base, mark->position);
 		ticlabel = label;
 	    }
 
@@ -1230,9 +1230,9 @@ gen_tics(AXIS_INDEX axis, tic_callback callback)
 			char label[MAX_ID_LEN]; /* Leave room for enhanced text markup */
 			if (this->tictype == DT_TIMEDATE) {
 			    /* If they are doing polar time plot, good luck to them */
-			    gstrftime(label, MAX_ID_LEN-1, ticfmt[axis], (double) user);
+			    gstrftime(label, MAX_ID_LEN-1, this->ticfmt, (double) user);
 			} else if (this->tictype == DT_DMS) {
-			    gstrdms(label, ticfmt[axis], (double)user);
+			    gstrdms(label, this->ticfmt, (double)user);
 			} else if (polar && axis == POLAR_AXIS) {
 			    double min = (R_AXIS.autoscale & AUTOSCALE_MIN) ? 0 : R_AXIS.min;
 			    double r = fabs(user) + min;
@@ -1241,13 +1241,13 @@ gen_tics(AXIS_INDEX axis, tic_callback callback)
 			    internal = AXIS_LOG_VALUE(axis, tic)
 				     - AXIS_LOG_VALUE(axis, R_AXIS.min);
 			    r = tic;
-			    gprintf(label, sizeof(label), ticfmt[axis], log10_base, r);
+			    gprintf(label, sizeof(label), this->ticfmt, log10_base, r);
 			} else if (axis >= PARALLEL_AXES) {
-			    /* FIXME: needed because ticfmt array is not maintained for parallel axes */
+			    /* FIXME: needed because ticfmt is not maintained for parallel axes */
 			    gprintf(label, sizeof(label), this->formatstring,
 				    log10_base, user);
 			} else {
-			    gprintf(label, sizeof(label), ticfmt[axis], log10_base, user);
+			    gprintf(label, sizeof(label), this->ticfmt, log10_base, user);
 			}
 
 			/* Range-limited tic placement */
