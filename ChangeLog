@@ -6,10 +6,14 @@
 	information to operate from a pointer to (struct axis) rather than from
 	an array index.  This will allow dynamically allocated axis definitions.
 
-	* src/axis.c src/axis.h src/unset.c:  Part 1: Keep a copy of the axis
+	* src/axis.c src/axis.h src/unset.c:  Part 1 - Keep a copy of the axis
 	index (e.g. SECOND_Y_AXIS) in the axis structure.  This may eventually
 	go away again, but for now it allows calling a routine that wants the
 	axis index from a routine that works from an axis point.
+
+	* src/axis.c src/axis.h:  Part 2 - Replace the separate arrays
+	timelevel[] and ticstep[] by moving their respective contents into new
+	fields axis->timelevel and axis->ticstep.
 
 2015-03-08  Ethan A Merritt  <merritt@u.washington.edu>
 

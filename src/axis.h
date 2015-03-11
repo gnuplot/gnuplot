@@ -1,5 +1,5 @@
 /*
- * $Id: axis.h,v 1.109 2015/02/16 04:31:39 sfeam Exp $
+ * $Id: axis.h,v 1.110 2015/03/11 19:35:54 sfeam Exp $
  *
  */
 
@@ -216,6 +216,14 @@ typedef enum e_constraint {
     CONSTRAINT_BOTH  = (1<<0 | 1<<1)
 } t_constraint;
 
+/* The unit the tics of a given time/date axis are to interpreted in */
+/* HBB 20040318: start at one, to avoid undershoot */
+typedef enum e_timelevel {
+    TIMELEVEL_SECONDS = 1, TIMELEVEL_MINUTES, TIMELEVEL_HOURS,
+    TIMELEVEL_DAYS, TIMELEVEL_WEEKS, TIMELEVEL_MONTHS,
+    TIMELEVEL_YEARS
+} t_timelevel;
+
 typedef struct axis {
 /* range of this axis */
     t_autoscale autoscale;	/* Which end(s) are autoscaled? */
@@ -262,6 +270,7 @@ typedef struct axis {
     td_type datatype;		/* {DT_NORMAL|DT_TIMEDATE} controls _input_ */
     td_type tictype;		/* {DT_NORMAL|DT_TIMEDATE|DT_DMS} controls _output_ */
     char *formatstring;		/* the format string for output */
+    t_timelevel timelevel;	/* minimum time unit used to quantize ticks */
 
 /* ticmark control variables */
     int ticmode;		/* tics on border/axis? mirrored? */
@@ -273,6 +282,7 @@ typedef struct axis {
     double mtic_freq;		/* minitic stepsize */
     double ticscale;		/* scale factor for tic marks (was (0..1])*/
     double miniticscale;	/* and for minitics */
+    double ticstep;		/* increment used to generate tic placement */
     TBOOLEAN tic_in;		/* tics to be drawn inward?  */
 
 /* other miscellaneous fields */
@@ -301,11 +311,12 @@ typedef struct axis {
 	NULL, NULL,		/* linked_to_primary, link function */      \
 	DT_NORMAL,		/* datatype for input */	            \
 	DT_NORMAL, NULL,      	/* tictype for output, output format, */    \
+	0,      /* timelevel */                             \
 	NO_TICS,		/* tic output positions (border, mirror) */ \
 	DEFAULT_AXIS_TICDEF,	/* tic series definition */		    \
 	0, FALSE, FALSE, 	/* tic_rotate, grid{major,minor} */	    \
 	MINI_DEFAULT, 10.,	/* minitics, mtic_freq */		    \
-	1.0, 0.5, TRUE,		/* ticscale, miniticscale, tic_in */	    \
+	1.0, 0.5, 0.0, TRUE,	/* ticscale, miniticscale, ticstep, tic_in */ \
 	0,			/* index (e.g.FIRST_Y_AXIS) */		    \
 	EMPTY_LABELSTRUCT,	/* axis label */			    \
 	FALSE,			/* override automatic justification */	    \
