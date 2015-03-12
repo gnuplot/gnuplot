@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.149 2015/03/11 19:44:39 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.150 2015/03/11 19:48:02 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -966,7 +966,7 @@ gen_tics(AXIS_INDEX axis, tic_callback callback)
 
 	    /* use NULL instead of label for minor tics with level 1,
 	     * however, allow labels for minor tics with levels > 1 */
-	    (*callback) (axis, internal,
+	    (*callback) (this, internal,
 	    		(mark->level==1)?NULL:ticlabel,
 	    		mark->level,
 	    		(mark->level>0)?mgrd:lgrd, NULL);
@@ -975,7 +975,7 @@ gen_tics(AXIS_INDEX axis, tic_callback callback)
 	    if (axis == POLAR_AXIS && (R_AXIS.ticmode & TICS_MIRROR)) {
 		int save_gridline = lgrd.l_type;
 		lgrd.l_type = LT_NODRAW;
-		(*callback) (axis, -internal,
+		(*callback) (this, -internal,
 			(mark->level==1)?NULL:ticlabel,
 			mark->level,
 	    		(mark->level>0)?mgrd:lgrd, NULL);
@@ -1214,7 +1214,7 @@ gen_tics(AXIS_INDEX axis, tic_callback callback)
 			int d = (long) floor(user + 0.5) % 7;
 			if (d < 0)
 			    d += 7;
-			(*callback) (axis, internal, abbrev_day_names[d], 0, lgrd,
+			(*callback) (this, internal, abbrev_day_names[d], 0, lgrd,
 					def->def.user);
 			break;
 		    }
@@ -1222,7 +1222,7 @@ gen_tics(AXIS_INDEX axis, tic_callback callback)
 			int m = (long) floor(user - 1) % 12;
 			if (m < 0)
 			    m += 12;
-			(*callback) (axis, internal, abbrev_month_names[m], 0, lgrd,
+			(*callback) (this, internal, abbrev_month_names[m], 0, lgrd,
 					def->def.user);
 			break;
 		    }
@@ -1255,13 +1255,13 @@ gen_tics(AXIS_INDEX axis, tic_callback callback)
 			&&  !inrange(internal,this->data_min,this->data_max))
 			    continue;
 
-			(*callback) (axis, internal, label, 0, lgrd, def->def.user);
+			(*callback) (this, internal, label, 0, lgrd, def->def.user);
 
 	 		/* Polar axis tics are mirrored across the origin */
 			if (axis == POLAR_AXIS && (R_AXIS.ticmode & TICS_MIRROR)) {
 			    int save_gridline = lgrd.l_type;
 			    lgrd.l_type = LT_NODRAW;
-			    (*callback) (axis, -internal, label, 0, lgrd, def->def.user);
+			    (*callback) (this, -internal, label, 0, lgrd, def->def.user);
 			    lgrd.l_type = save_gridline;
 			}
 		    }
@@ -1285,7 +1285,7 @@ gen_tics(AXIS_INDEX axis, tic_callback callback)
 		    if (polar && axis == POLAR_AXIS) temptic += R_AXIS.min;
 		    if (inrange(temptic, internal_min, internal_max)
 			&& inrange(temptic, start - step * SIGNIF, end + step * SIGNIF))
-			(*callback) (axis, mtic, NULL, 1, mgrd, NULL);
+			(*callback) (this, mtic, NULL, 1, mgrd, NULL);
 		}
 		/* }}} */
 	    }
@@ -1690,12 +1690,12 @@ load_range(AXIS_INDEX axis, double *a, double *b, t_autoscale autoscale)
  */
 
 void
-widest_tic_callback(AXIS_INDEX axis, double place, char *text,
+widest_tic_callback(struct axis *this_axis, double place, char *text,
     int ticlevel,
     struct lp_style_type grid,
     struct ticmark *userlabels)
 {
-    (void) axis;		/* avoid "unused parameter" warnings */
+    (void) this_axis;		/* avoid "unused parameter" warnings */
     (void) place;
     (void) grid;
     (void) userlabels;

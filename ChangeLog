@@ -1,3 +1,18 @@
+2015-03-12  Ethan A Merritt  <merritt@u.washington.edu>
+
+	Begin bottom-up revision of axis handling routines to use pointers
+	rather than array indices.
+
+	* src/axis.h: Modify the template for axis tic-generation callbacks from
+	  callback(AXIS_INDEX, ...) to callback(struct axis *, ...)
+	* src/axis.c (widest_tic_callback): Modify widest_tic_callback to match
+	  the new template, although it needs no axis information
+	* src/graphics.c (xtick2d_callback ytick2d_callback)
+	  src/graph3d.c (xtick_callback ytick_callback ztick_callback):
+	  Modify 2D and 3D axis callbacks.
+	* src/color.c (cbaxis_callback): Modify color axis callback.
+	* src/axis.c (gen_tics): Modify the call sites for all of these.
+
 2015-03-11  Ethan A Merritt  <merritt@u.washington.edu>
 
 	Gradually move all axis-related information into the axis structure
@@ -26,7 +41,7 @@
 	* src/axis.h:  New versions of axis data macros that use axis pointers.
 	New macro axis_{un}do_log(struct axis *,value) analogous to
 		  AXIS_{UN}DO_LOG(AXIS_INDEX,   vlaue)
-	New macro axis_map(struct axis*, variable) analogous to
+	New macro axis_map(struct axis *, variable) analogous to
 		  AXIS_MAP(AXIS_INDEX, variable)
 	New macro tic_scale(ticlevel, struct axis *) analogous to
 		  TIC_SCALE(ticlevel, AXIS_INDEX)

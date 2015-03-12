@@ -1,5 +1,5 @@
 /*
- * $Id: axis.h,v 1.113 2015/03/11 19:48:02 sfeam Exp $
+ * $Id: axis.h,v 1.114 2015/03/11 22:15:31 sfeam Exp $
  *
  */
 
@@ -151,12 +151,6 @@ typedef enum en_minitics_status {
     MINI_USER,
     MINI_AUTO
 } t_minitics_status;
-
-/* Function pointer type for callback functions doing operations for a
- * single ticmark */
-typedef void (*tic_callback) __PROTO((AXIS_INDEX, double, char *, int, 
-					struct lp_style_type,
-					struct ticmark *));
 
 /* Values to put in the axis_tics[] variables that decides where the
  * ticmarks should be drawn: not at all, on one or both plot borders,
@@ -682,6 +676,10 @@ do {									  \
 /* FIXME HBB 20000521: these seem not to be used much, anywhere... */
 #define CheckZero(x,tic) (fabs(x) < ((tic) * SIGNIF) ? 0.0 : (x))
 
+/* Function pointer type for callback functions to generate ticmarks */
+typedef void (*tic_callback) __PROTO((struct axis *, double, char *, int, 
+				struct lp_style_type, struct ticmark *));
+
 /* ------------ functions exported by axis.c */
 t_autoscale load_range __PROTO((AXIS_INDEX, double *, double *, t_autoscale));
 void axis_unlog_interval __PROTO((AXIS_INDEX, double *, double *, TBOOLEAN));
@@ -705,7 +703,7 @@ void parse_skip_range __PROTO((void));
 void check_axis_reversed __PROTO((AXIS_INDEX axis));
 
 /* set widest_tic_label: length of the longest tics label */
-void widest_tic_callback __PROTO((AXIS_INDEX, double place, char *text, int ticlevel,
+void widest_tic_callback __PROTO((struct axis *, double place, char *text, int ticlevel,
 			struct lp_style_type grid, struct ticmark *));
 
 void get_position __PROTO((struct position *pos));

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: color.c,v 1.116 2015/01/21 03:38:24 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: color.c,v 1.117 2015/02/16 04:40:05 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - color.c */
@@ -51,7 +51,7 @@ static t_sm_palette prev_palette = {
 
 static void draw_inside_color_smooth_box_postscript __PROTO((void));
 static void draw_inside_color_smooth_box_bitmap __PROTO((void));
-static void cbtick_callback __PROTO((AXIS_INDEX axis, double place, char *text, int ticlevel,
+static void cbtick_callback __PROTO((struct axis *, double place, char *text, int ticlevel,
 			struct lp_style_type grid, struct ticmark *userlabels));
 
 
@@ -428,16 +428,16 @@ draw_inside_color_smooth_box_bitmap()
 
 static void
 cbtick_callback(
-    AXIS_INDEX axis,
+    struct axis *this_axis,
     double place,
     char *text,
     int ticlevel,
     struct lp_style_type grid, /* linetype or -2 for no grid */
     struct ticmark *userlabels)
 {
-    int len = TIC_SCALE(ticlevel, COLOR_AXIS)
-	* (CB_AXIS.tic_in ? -1 : 1) * (term->h_tic);
-    double cb_place = (place - CB_AXIS.min) / (CB_AXIS.max - CB_AXIS.min);
+    int len = tic_scale(ticlevel, this_axis)
+	* (this_axis->tic_in ? -1 : 1) * (term->h_tic);
+    double cb_place = (place - this_axis->min) / (this_axis->max - this_axis->min);
 	/* relative z position along the colorbox axis */
     unsigned int x1, y1, x2, y2;
 
@@ -487,43 +487,43 @@ cbtick_callback(
 #	undef MINIMUM_SEPARATION
 
 	/* get offset */
-	map3d_position_r(&(axis_array[axis].ticdef.offset),
+	map3d_position_r(&(this_axis->ticdef.offset),
 			 &offsetx, &offsety, "cbtics");
 	/* User-specified different color for the tics text */
-	if (axis_array[axis].ticdef.textcolor.type != TC_DEFAULT)
-	    apply_pm3dcolor(&(axis_array[axis].ticdef.textcolor));
+	if (this_axis->ticdef.textcolor.type != TC_DEFAULT)
+	    apply_pm3dcolor(&(this_axis->ticdef.textcolor));
 	if (color_box.rotation == 'h') {
 	    int y3 = color_box.bounds.ybot - (term->v_char);
 	    int hrotate = 0;
 
-	    if (axis_array[axis].tic_rotate
-		&& (*term->text_angle)(axis_array[axis].tic_rotate))
-		    hrotate = axis_array[axis].tic_rotate;
+	    if (this_axis->tic_rotate
+		&& (*term->text_angle)(this_axis->tic_rotate))
+		    hrotate = this_axis->tic_rotate;
 	    if (len > 0) y3 -= len; /* add outer tics len */
 	    if (y3<0) y3 = 0;
 	    just = hrotate ? LEFT : CENTRE;
-	    if (axis_array[axis].manual_justify)
-		just = axis_array[axis].label.pos;
+	    if (this_axis->manual_justify)
+		just = this_axis->label.pos;
 	    write_multiline(x2+offsetx, y3+offsety, text,
 			    just, JUST_CENTRE, hrotate,
-			    axis_array[axis].ticdef.font);
+			    this_axis->ticdef.font);
 	    if (hrotate)
 		(*term->text_angle)(0);
 	} else {
 	    unsigned int x3 = color_box.bounds.xright + (term->h_char);
 	    if (len > 0) x3 += len; /* add outer tics len */
 	    just = LEFT;
-	    if (axis_array[axis].manual_justify)
-		just = axis_array[axis].label.pos;	    
+	    if (this_axis->manual_justify)
+		just = this_axis->label.pos;	    
 	    write_multiline(x3+offsetx, y2+offsety, text,
 			    just, JUST_CENTRE, 0.0,
-			    axis_array[axis].ticdef.font);
+			    this_axis->ticdef.font);
 	}
 	term_apply_lp_properties(&border_lp);	/* border linetype */
     }
 
     /* draw tic on the mirror side */
-    if (CB_AXIS.ticmode & TICS_MIRROR) {
+    if (this_axis->ticmode & TICS_MIRROR) {
 	if (color_box.rotation == 'h') {
 	    y1 = color_box.bounds.ytop;
 	    y2 = color_box.bounds.ytop + len;

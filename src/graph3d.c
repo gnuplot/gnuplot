@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.318 2015/01/21 03:38:24 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.319 2015/02/10 01:07:59 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -138,11 +138,11 @@ static void draw_3d_graphbox __PROTO((struct surface_points * plot,
 				      int plot_count,
 				      WHICHGRID whichgrid, int current_layer));
 
-static void xtick_callback __PROTO((AXIS_INDEX, double place, char *text, int ticlevel,
+static void xtick_callback __PROTO((struct axis *, double place, char *text, int ticlevel,
 			     struct lp_style_type grid, struct ticmark *userlabels));
-static void ytick_callback __PROTO((AXIS_INDEX, double place, char *text, int ticlevel,
+static void ytick_callback __PROTO((struct axis *, double place, char *text, int ticlevel,
 			     struct lp_style_type grid, struct ticmark *userlabels));
-static void ztick_callback __PROTO((AXIS_INDEX, double place, char *text, int ticlevel,
+static void ztick_callback __PROTO((struct axis *, double place, char *text, int ticlevel,
 			     struct lp_style_type grid, struct ticmark *userlabels));
 
 static int find_maxl_cntr __PROTO((struct gnuplot_contours * contours, int *count));
@@ -2591,17 +2591,17 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid,
 
 static void
 xtick_callback(
-    AXIS_INDEX axis,
+    struct axis *this_axis,
     double place,
     char *text,
     int ticlevel,
     struct lp_style_type grid,		/* linetype or -2 for none */
     struct ticmark *userlabels)	/* currently ignored in 3D plots */
 {
-    vertex v1, v2, v3, v4;
-    double scale = TIC_SCALE(ticlevel, axis) * (axis_array[axis].tic_in ? 1 : -1);
+    double scale = tic_scale(ticlevel, this_axis) * (this_axis->tic_in ? 1 : -1);
     double other_end = Y_AXIS.min + Y_AXIS.max - xaxis_y;
     struct termentry *t = term;
+    vertex v1, v2, v3, v4;
 
     /* Draw full-length grid line */
     map3d_xyz(place, xaxis_y, base_z, &v1);
@@ -2620,15 +2620,15 @@ xtick_callback(
     }
 
     /* NB: secondary axis must be linked to primary */
-    if (axis == SECOND_X_AXIS
-    &&  axis_array[SECOND_X_AXIS].linked_to_primary
-    &&  axis_array[SECOND_X_AXIS].link_udf->at != NULL) {
+    if (this_axis->index == SECOND_X_AXIS
+    &&  this_axis->linked_to_primary
+    &&  this_axis->link_udf->at != NULL) {
 	place = eval_link_function(FIRST_X_AXIS, place);
     }
 
     /* Draw bottom tic mark */
-    if ((axis == FIRST_X_AXIS)
-    ||  (axis == SECOND_X_AXIS && (axis_array[axis].ticmode & TICS_MIRROR))) {
+    if ((this_axis->index == FIRST_X_AXIS)
+    ||  (this_axis->index == SECOND_X_AXIS && (this_axis->ticmode & TICS_MIRROR))) {
 	v2.x = v1.x + tic_unitx * scale * t->v_tic ;
 	v2.y = v1.y + tic_unity * scale * t->v_tic ;
 	v2.z = v1.z + tic_unitz * scale * t->v_tic ;
@@ -2637,8 +2637,8 @@ xtick_callback(
     }
 
     /* Draw top tic mark */
-    if ((axis == SECOND_X_AXIS)
-    ||  (axis == FIRST_X_AXIS && (axis_array[axis].ticmode & TICS_MIRROR))) {
+    if ((this_axis->index == SECOND_X_AXIS)
+    ||  (this_axis->index == FIRST_X_AXIS && (this_axis->ticmode & TICS_MIRROR))) {
 	map3d_xyz(place, other_end, base_z, &v3);
 	v4.x = v3.x - tic_unitx * scale * t->v_tic;
 	v4.y = v3.y - tic_unity * scale * t->v_tic;
@@ -2669,12 +2669,11 @@ xtick_callback(
 #	undef MINIMUM_SEPARATION
 
 	/* get offset */
-	map3d_position_r(&(axis_array[axis].ticdef.offset),
-		       &offsetx, &offsety, "xtics");
+	map3d_position_r(&(this_axis->ticdef.offset), &offsetx, &offsety, "xtics");
 
 	/* allow manual justification of tick labels, but only for "set view map" */
-	if (splot_map && axis_array[axis].manual_justify)
-	    just = axis_array[axis].label.pos;
+	if (splot_map && this_axis->manual_justify)
+	    just = this_axis->label.pos;
 	else if (tic_unitx * xscaler < -0.9)
 	    just = LEFT;
 	else if (tic_unitx * xscaler < 0.9)
@@ -2682,33 +2681,33 @@ xtick_callback(
 	else
 	    just = RIGHT;
 
-	if (axis == SECOND_X_AXIS) {
+	if (this_axis->index == SECOND_X_AXIS) {
 	    v4.x = v3.x + tic_unitx * t->h_char * 1;
 	    v4.y = v3.y + tic_unity * t->v_char * 1;
-	    if (!axis_array[axis].tic_in) {
-		v4.x += tic_unitx * t->v_tic * axis_array[axis].ticscale;
-		v4.y += tic_unity * t->v_tic * axis_array[axis].ticscale;
+	    if (!this_axis->tic_in) {
+		v4.x += tic_unitx * t->v_tic * this_axis->ticscale;
+		v4.y += tic_unity * t->v_tic * this_axis->ticscale;
 	    }
 	    TERMCOORD(&v4, x2, y2);
 	} else {
 	    v2.x = v1.x - tic_unitx * t->h_char * 1;
 	    v2.y = v1.y - tic_unity * t->v_char * 1;
-	    if (!axis_array[axis].tic_in) {
-		v2.x -= tic_unitx * t->v_tic * axis_array[axis].ticscale;
-		v2.y -= tic_unity * t->v_tic * axis_array[axis].ticscale;
+	    if (!this_axis->tic_in) {
+		v2.x -= tic_unitx * t->v_tic * this_axis->ticscale;
+		v2.y -= tic_unity * t->v_tic * this_axis->ticscale;
 	    }
 	    TERMCOORD(&v2, x2, y2);
 	}
 
 	/* User-specified different color for the tics text */
-	if (axis_array[axis].ticdef.textcolor.type != TC_DEFAULT)
-	    apply_pm3dcolor(&(axis_array[axis].ticdef.textcolor));
-	angle = axis_array[axis].tic_rotate;
+	if (this_axis->ticdef.textcolor.type != TC_DEFAULT)
+	    apply_pm3dcolor(&(this_axis->ticdef.textcolor));
+	angle = this_axis->tic_rotate;
 	if (!(splot_map && angle && term->text_angle(angle)))
 	    angle = 0;
-	ignore_enhanced(!axis_array[axis].ticdef.enhanced);
+	ignore_enhanced(!this_axis->ticdef.enhanced);
 	write_multiline(x2+offsetx, y2+offsety, text, just, JUST_TOP,
-			    angle, axis_array[axis].ticdef.font);
+			    angle, this_axis->ticdef.font);
 	ignore_enhanced(FALSE);
 	term->text_angle(0);
 	term_apply_lp_properties(&border_lp);
@@ -2717,17 +2716,17 @@ xtick_callback(
 
 static void
 ytick_callback(
-    AXIS_INDEX axis,
+    struct axis *this_axis,
     double place,
     char *text,
     int ticlevel,
     struct lp_style_type grid,
     struct ticmark *userlabels)	/* currently ignored in 3D plots */
 {
-    vertex v1, v2, v3, v4;
-    double scale = TIC_SCALE(ticlevel, axis) * (axis_array[axis].tic_in ? 1 : -1);
+    double scale = tic_scale(ticlevel, this_axis) * (this_axis->tic_in ? 1 : -1);
     double other_end = X_AXIS.min + X_AXIS.max - yaxis_x;
     struct termentry *t = term;
+    vertex v1, v2, v3, v4;
 
     /* Draw full-length grid line */
     map3d_xyz(yaxis_x, place, base_z, &v1);
@@ -2745,15 +2744,15 @@ ytick_callback(
     }
 
     /* NB: secondary axis must be linked to primary */
-    if (axis == SECOND_Y_AXIS
-    &&  axis_array[SECOND_Y_AXIS].linked_to_primary
-    &&  axis_array[SECOND_Y_AXIS].link_udf->at != NULL) {
+    if (this_axis->index == SECOND_Y_AXIS
+    &&  this_axis->linked_to_primary
+    &&  this_axis->link_udf->at != NULL) {
 	place = eval_link_function(FIRST_Y_AXIS, place);
     }
 
     /* Draw left tic mark */
-    if ((axis == FIRST_Y_AXIS)
-    ||  (axis == SECOND_Y_AXIS && (axis_array[axis].ticmode & TICS_MIRROR))) {
+    if ((this_axis->index == FIRST_Y_AXIS)
+    ||  (this_axis->index == SECOND_Y_AXIS && (this_axis->ticmode & TICS_MIRROR))) {
 	v2.x = v1.x + tic_unitx * scale * t->h_tic;
 	v2.y = v1.y + tic_unity * scale * t->h_tic;
 	v2.z = v1.z + tic_unitz * scale * t->h_tic;
@@ -2762,8 +2761,8 @@ ytick_callback(
     }
 
     /* Draw right tic mark */
-    if ((axis == SECOND_Y_AXIS)
-    ||  (axis == FIRST_Y_AXIS && (axis_array[axis].ticmode & TICS_MIRROR))) {
+    if ((this_axis->index == SECOND_Y_AXIS)
+    ||  (this_axis->index == FIRST_Y_AXIS && (this_axis->ticmode & TICS_MIRROR))) {
 	map3d_xyz(other_end, place, base_z, &v3);
 	v4.x = v3.x - tic_unitx * scale * t->h_tic;
 	v4.y = v3.y - tic_unity * scale * t->h_tic;
@@ -2792,46 +2791,45 @@ ytick_callback(
 #	undef MINIMUM_SEPARATION
 
 	/* get offset */
-	map3d_position_r(&(axis_array[axis].ticdef.offset),
-		       &offsetx, &offsety, "ytics");
+	map3d_position_r(&(this_axis->ticdef.offset), &offsetx, &offsety, "ytics");
 
 	/* allow manual justification of tick labels, but only for "set view map" */
-	if (splot_map && axis_array[axis].manual_justify)
-	    just = axis_array[axis].label.pos;
+	if (splot_map && this_axis->manual_justify)
+	    just = this_axis->label.pos;
 	else if (tic_unitx * xscaler < -0.9)
-	    just = (axis == FIRST_Y_AXIS) ? LEFT : RIGHT;
+	    just = (this_axis->index == FIRST_Y_AXIS) ? LEFT : RIGHT;
 	else if (tic_unitx * xscaler < 0.9)
 	    just = CENTRE;
 	else
-	    just = (axis == FIRST_Y_AXIS) ? RIGHT : LEFT;
+	    just = (this_axis->index == FIRST_Y_AXIS) ? RIGHT : LEFT;
 
-	if (axis == SECOND_Y_AXIS) {
+	if (this_axis->index == SECOND_Y_AXIS) {
 	    v4.x = v3.x + tic_unitx * t->h_char * 1;
 	    v4.y = v3.y + tic_unity * t->v_char * 1;
-	    if (!axis_array[axis].tic_in) {
-		v4.x += tic_unitx * t->h_tic * axis_array[axis].ticscale;
-		v4.y += tic_unity * t->v_tic * axis_array[axis].ticscale;
+	    if (!this_axis->tic_in) {
+		v4.x += tic_unitx * t->h_tic * this_axis->ticscale;
+		v4.y += tic_unity * t->v_tic * this_axis->ticscale;
 	    }
 	    TERMCOORD(&v4, x2, y2);
 	} else {
 	    v2.x = v1.x - tic_unitx * t->h_char * 1;
 	    v2.y = v1.y - tic_unity * t->v_char * 1;
-	    if (!axis_array[axis].tic_in) {
-		v2.x -= tic_unitx * t->h_tic * axis_array[axis].ticscale;
-		v2.y -= tic_unity * t->v_tic * axis_array[axis].ticscale;
+	    if (!this_axis->tic_in) {
+		v2.x -= tic_unitx * t->h_tic * this_axis->ticscale;
+		v2.y -= tic_unity * t->v_tic * this_axis->ticscale;
 	    }
 	    TERMCOORD(&v2, x2, y2);
 	}
 
 	/* User-specified different color for the tics text */
-	if (axis_array[axis].ticdef.textcolor.type != TC_DEFAULT)
-	    apply_pm3dcolor(&(axis_array[axis].ticdef.textcolor));
-	angle = axis_array[axis].tic_rotate;
+	if (this_axis->ticdef.textcolor.type != TC_DEFAULT)
+	    apply_pm3dcolor(&(this_axis->ticdef.textcolor));
+	angle = this_axis->tic_rotate;
 	if (!(splot_map && angle && term->text_angle(angle)))
 	    angle = 0;
-	ignore_enhanced(!axis_array[axis].ticdef.enhanced);
+	ignore_enhanced(!this_axis->ticdef.enhanced);
 	write_multiline(x2+offsetx, y2+offsety, text, just, JUST_TOP,
-			angle, axis_array[axis].ticdef.font);
+			angle, this_axis->ticdef.font);
 	ignore_enhanced(FALSE);
 	term->text_angle(0);
 	term_apply_lp_properties(&border_lp);
@@ -2840,20 +2838,19 @@ ytick_callback(
 
 static void
 ztick_callback(
-    AXIS_INDEX axis,
+    struct axis *this_axis,
     double place,
     char *text,
     int ticlevel,
     struct lp_style_type grid,
     struct ticmark *userlabels)	/* currently ignored in 3D plots */
 {
-    /* HBB: inserted some ()'s to shut up gcc -Wall, here and below */
-    int len = TIC_SCALE(ticlevel, axis)
-	* (axis_array[axis].tic_in ? 1 : -1) * (term->h_tic);
-    vertex v1, v2, v3;
     struct termentry *t = term;
+    int len = tic_scale(ticlevel, this_axis)
+	* (this_axis->tic_in ? 1 : -1) * (term->h_tic);
+    vertex v1, v2, v3;
 
-    if (axis_array[axis].ticmode & TICS_ON_AXIS)
+    if (this_axis->ticmode & TICS_ON_AXIS)
 	map3d_xyz(0., 0., place, &v1);
     else
 	map3d_xyz(zaxis_x, zaxis_y, place, &v1);
@@ -2888,21 +2885,20 @@ ztick_callback(
 #	undef MINIMUM_SEPARATION
 
 	/* get offset */
-	map3d_position_r(&(axis_array[axis].ticdef.offset),
-		       &offsetx, &offsety, "ztics");
+	map3d_position_r(&(this_axis->ticdef.offset), &offsetx, &offsety, "ztics");
 
 	TERMCOORD(&v1, x1, y1);
 	x1 -= (term->h_tic) * 2;
-	if (!axis_array[axis].tic_in)
-	    x1 -= (term->h_tic) * axis_array[axis].ticscale;
+	if (!this_axis->tic_in)
+	    x1 -= (term->h_tic) * this_axis->ticscale;
 	/* User-specified different color for the tics text */
-	if (axis_array[axis].ticdef.textcolor.type == TC_Z)
-	    axis_array[axis].ticdef.textcolor.value = place;
-	if (axis_array[axis].ticdef.textcolor.type != TC_DEFAULT)
-	    apply_pm3dcolor(&(axis_array[axis].ticdef.textcolor));
-	ignore_enhanced(!axis_array[axis].ticdef.enhanced);
+	if (this_axis->ticdef.textcolor.type == TC_Z)
+	    this_axis->ticdef.textcolor.value = place;
+	if (this_axis->ticdef.textcolor.type != TC_DEFAULT)
+	    apply_pm3dcolor(&(this_axis->ticdef.textcolor));
+	ignore_enhanced(!this_axis->ticdef.enhanced);
 	write_multiline(x1+offsetx, y1+offsety, text, RIGHT, JUST_CENTRE,
-			0, axis_array[axis].ticdef.font);
+			0, this_axis->ticdef.font);
 	ignore_enhanced(FALSE);
 	term_apply_lp_properties(&border_lp);
     }

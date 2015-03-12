@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.479 2015/03/03 06:17:04 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.480 2015/03/06 00:56:35 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -121,8 +121,8 @@ static void plot_histeps __PROTO((struct curve_points * plot));	/* CAC */
 static int edge_intersect __PROTO((struct coordinate GPHUGE * points, int i, double *ex, double *ey));
 static TBOOLEAN two_edge_intersect __PROTO((struct coordinate GPHUGE * points, int i, double *lx, double *ly));
 
-static void ytick2d_callback __PROTO((AXIS_INDEX, double place, char *text, int ticlevel, struct lp_style_type grid, struct ticmark *userlabels));
-static void xtick2d_callback __PROTO((AXIS_INDEX, double place, char *text, int ticlevel, struct lp_style_type grid, struct ticmark *userlabels));
+static void ytick2d_callback __PROTO((struct axis *, double place, char *text, int ticlevel, struct lp_style_type grid, struct ticmark *userlabels));
+static void xtick2d_callback __PROTO((struct axis *, double place, char *text, int ticlevel, struct lp_style_type grid, struct ticmark *userlabels));
 static int histeps_compare __PROTO((SORTFUNC_ARGS p1, SORTFUNC_ARGS p2));
 
 static void get_arrow __PROTO((struct arrow_def* arrow, int* sx, int* sy, int* ex, int* ey));
@@ -3249,7 +3249,7 @@ two_edge_intersect(
 /* also uses global tic_start, tic_direction, tic_text and tic_just */
 static void
 xtick2d_callback(
-    AXIS_INDEX axis,
+    struct axis *this_axis,
     double place,
     char *text,
     int ticlevel,
@@ -3258,13 +3258,13 @@ xtick2d_callback(
 {
     struct termentry *t = term;
     /* minitick if text is NULL - beware - h_tic is unsigned */
-    int ticsize = tic_direction * (int) t->v_tic * TIC_SCALE(ticlevel, axis);
+    int ticsize = tic_direction * (int) t->v_tic * tic_scale(ticlevel, this_axis);
     int x = map_x(place);
 
     /* Skip label if we've already written a user-specified one here */
 #   define MINIMUM_SEPARATION 2
     while (userlabels) {
-	int here = map_x(AXIS_LOG_VALUE(axis,userlabels->position));
+	int here = map_x(axis_log_value(this_axis,userlabels->position));
 	if (abs(here-x) <= MINIMUM_SEPARATION) {
 	    text = NULL;
 	    break;
@@ -3338,15 +3338,15 @@ xtick2d_callback(
     if (text) {
 	/* get offset */
 	double offsetx_d, offsety_d;
-	map_position_r(&(axis_array[axis].ticdef.offset),
+	map_position_r(&(this_axis->ticdef.offset),
 		       &offsetx_d, &offsety_d, "xtics");
 	/* User-specified different color for the tics text */
-	if (axis_array[axis].ticdef.textcolor.type != TC_DEFAULT)
-	    apply_pm3dcolor(&(axis_array[axis].ticdef.textcolor));
-	ignore_enhanced(!axis_array[axis].ticdef.enhanced);
+	if (this_axis->ticdef.textcolor.type != TC_DEFAULT)
+	    apply_pm3dcolor(&(this_axis->ticdef.textcolor));
+	ignore_enhanced(!this_axis->ticdef.enhanced);
 	write_multiline(x+(int)offsetx_d, tic_text+(int)offsety_d, text,
 			tic_hjust, tic_vjust, rotate_tics,
-			axis_array[axis].ticdef.font);
+			this_axis->ticdef.font);
 	ignore_enhanced(FALSE);
 	term_apply_lp_properties(&border_lp);	/* reset to border linetype */
     }
@@ -3356,7 +3356,7 @@ xtick2d_callback(
 /* also uses global tic_start, tic_direction, tic_text and tic_just */
 static void
 ytick2d_callback(
-    AXIS_INDEX axis,
+    struct axis *this_axis,
     double place,
     char *text,
     int ticlevel,
@@ -3365,18 +3365,18 @@ ytick2d_callback(
 {
     struct termentry *t = term;
     /* minitick if text is NULL - v_tic is unsigned */
-    int ticsize = tic_direction * (int) t->h_tic * TIC_SCALE(ticlevel, axis);
+    int ticsize = tic_direction * (int) t->h_tic * tic_scale(ticlevel, this_axis);
     int y;
 
-    if (axis >= PARALLEL_AXES)
-	y = AXIS_MAP(axis, place);
+    if (this_axis->index >= PARALLEL_AXES)
+	y = axis_map(this_axis, place);
     else
 	y = map_y(place);
 
     /* Skip label if we've already written a user-specified one here */
 #   define MINIMUM_SEPARATION 2
     while (userlabels) {
-	int here = map_y(AXIS_LOG_VALUE(axis,userlabels->position));
+	int here = map_y(axis_log_value(this_axis,userlabels->position));
 	if (abs(here-y) <= MINIMUM_SEPARATION) {
 	    text = NULL;
 	    break;
@@ -3439,15 +3439,15 @@ ytick2d_callback(
     if (text) {
 	/* get offset */
 	double offsetx_d, offsety_d;
-	map_position_r(&(axis_array[axis].ticdef.offset),
+	map_position_r(&(this_axis->ticdef.offset),
 		       &offsetx_d, &offsety_d, "ytics");
 	/* User-specified different color for the tics text */
-	if (axis_array[axis].ticdef.textcolor.type != TC_DEFAULT)
-	    apply_pm3dcolor(&(axis_array[axis].ticdef.textcolor));
-	ignore_enhanced(!axis_array[axis].ticdef.enhanced);
+	if (this_axis->ticdef.textcolor.type != TC_DEFAULT)
+	    apply_pm3dcolor(&(this_axis->ticdef.textcolor));
+	ignore_enhanced(!this_axis->ticdef.enhanced);
 	write_multiline(tic_text+(int)offsetx_d, y+(int)offsety_d, text,
 			tic_hjust, tic_vjust, rotate_tics,
-			axis_array[axis].ticdef.font);
+			this_axis->ticdef.font);
 	ignore_enhanced(FALSE);
 	term_apply_lp_properties(&border_lp);	/* reset to border linetype */
     }
