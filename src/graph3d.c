@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.319 2015/02/10 01:07:59 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.320 2015/03/12 21:21:07 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -2277,7 +2277,7 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid,
 	    (surface_rot_x > 90 && BACKGRID != whichgrid))
 
 	if (X_AXIS.ticmode)
-	    gen_tics(FIRST_X_AXIS, xtick_callback);
+	    gen_tics(&axis_array[FIRST_X_AXIS], xtick_callback);
 
 	if (X_AXIS.label.text) {
 	    int angle = 0;
@@ -2355,7 +2355,7 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid,
 	}
 
 	if (splot_map && axis_array[SECOND_X_AXIS].ticmode)
-	    gen_tics(SECOND_X_AXIS, xtick_callback);
+	    gen_tics(&axis_array[SECOND_X_AXIS], xtick_callback);
     }
 
     /* y axis: */
@@ -2377,7 +2377,7 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid,
 	    (surface_rot_x > 90 && BACKGRID != whichgrid))
 
 	if (Y_AXIS.ticmode)
-	    gen_tics(FIRST_Y_AXIS, ytick_callback);
+	    gen_tics(&axis_array[FIRST_Y_AXIS], ytick_callback);
 
 	if (Y_AXIS.label.text) {
 	    if ((surface_rot_x <= 90 && BACKGRID != whichgrid) ||
@@ -2407,7 +2407,7 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid,
 		    widest_tic_strlen = 0;
 		    if (Y_AXIS.ticmode & TICS_ON_BORDER) {
 			widest_tic_strlen = 0; /* reset the global variable */
-			gen_tics(FIRST_Y_AXIS, widest_tic_callback);
+			gen_tics(&axis_array[FIRST_Y_AXIS], widest_tic_callback);
 		    }
 		    /* DEFAULT_Y_DISTANCE is with respect to baseline of tics labels */
 #define DEFAULT_X_DISTANCE 0.
@@ -2484,7 +2484,7 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid,
 	}
 
 	if (splot_map && axis_array[SECOND_Y_AXIS].ticmode)
-	    gen_tics(SECOND_Y_AXIS, ytick_callback);
+	    gen_tics(&axis_array[SECOND_Y_AXIS], ytick_callback);
     }
 
     /* do z tics */
@@ -2498,7 +2498,7 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid,
 	    || strchr(pm3d.where,'s') != NULL
 	    )
 	) {
-	gen_tics(FIRST_Z_AXIS, ztick_callback);
+	gen_tics(&axis_array[FIRST_Z_AXIS], ztick_callback);
     }
     if ((Y_AXIS.zeroaxis)
 	&& !X_AXIS.log

@@ -13,6 +13,13 @@
 	* src/color.c (cbaxis_callback): Modify color axis callback.
 	* src/axis.c (gen_tics): Modify the call sites for all of these.
 
+	Next level up: Modify gen_tics() and all the places that call it.
+	old: gen_tics(AXIS_INDEX axis, callback)
+	new: gen_tics(struct axis *this, callback)
+	
+	* src/axis.h src/axis.c (gen_tics):
+	* src/boundary.c src/color.c src/graph3d.c src/graphics.c: call sites
+
 2015-03-11  Ethan A Merritt  <merritt@u.washington.edu>
 
 	Gradually move all axis-related information into the axis structure

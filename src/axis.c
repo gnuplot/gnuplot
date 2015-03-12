@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.150 2015/03/11 19:48:02 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.151 2015/03/12 21:21:07 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -879,15 +879,13 @@ setup_tics(AXIS_INDEX axis, int max)
 /* }}} */
 
 /* {{{  gen_tics */
-/* uses global array axis_array[].
- * we use any of GRID_X/Y/X2/Y2 and  _MX/_MX2/etc - caller is expected
- * to clear the irrelevent fields from global grid bitmask
- * note this is also called from graph3d, so we need GRID_Z too
+/* We use any of GRID_X/Y/X2/Y2/Z and  _MX/_MX2/etc - caller is expected
+ * to clear the irrelevent fields from global grid bitmask.
+ * Mar 2015: Modified to take an axis pointer rather than an index into axis_array[].
  */
 void
-gen_tics(AXIS_INDEX axis, tic_callback callback)
+gen_tics(struct axis *this, tic_callback callback)
 {
-    AXIS *this = axis_array + axis;
     struct ticdef *def = & this->ticdef;
     t_minitics_status minitics = this->minitics; /* off/default/auto/explicit */
 
@@ -919,7 +917,7 @@ gen_tics(AXIS_INDEX axis, tic_callback callback)
 	/* polar labels always +ve, and if rmin has been set, they are
 	 * relative to rmin.
 	 */
-	if (polar && axis == POLAR_AXIS) {
+	if (polar && this->index == POLAR_AXIS) {
 	    if (!(R_AXIS.autoscale & AUTOSCALE_MIN))
 		polar_shift = R_AXIS.min;
 	    internal_min = X_AXIS.min - SIGNIF * uncertain;
@@ -932,11 +930,11 @@ gen_tics(AXIS_INDEX axis, tic_callback callback)
 	    double internal;
 
 	    /* This condition is only possible if we are in polar mode */
-	    if (axis == POLAR_AXIS)
-		internal = AXIS_LOG_VALUE(POLAR_AXIS,mark->position)
-			 - AXIS_LOG_VALUE(POLAR_AXIS,polar_shift);
+	    if (this->index == POLAR_AXIS)
+		internal = axis_log_value(this, mark->position)
+			 - axis_log_value(this, polar_shift);
 	    else
-		internal = AXIS_LOG_VALUE(axis,mark->position) - polar_shift;
+		internal = axis_log_value(this, mark->position) - polar_shift;
 
 	    if (!inrange(internal, internal_min, internal_max))
 		continue;
@@ -947,7 +945,7 @@ gen_tics(AXIS_INDEX axis, tic_callback callback)
 	    } else if (mark->label && !strchr(mark->label, '%')) {
 		/* string constant that contains no format keys */
 		ticlabel = mark->label;
-	    } else if (axis >= PARALLEL_AXES) {
+	    } else if (this->index >= PARALLEL_AXES) {
 		/* FIXME: needed because axis->ticfmt is not maintained for parallel axes */
 		gprintf(label, sizeof(label),
 			mark->label ? mark->label : this->formatstring,
@@ -972,7 +970,7 @@ gen_tics(AXIS_INDEX axis, tic_callback callback)
 	    		(mark->level>0)?mgrd:lgrd, NULL);
 
 	    /* Polar axis tics are mirrored across the origin */
-	    if (axis == POLAR_AXIS && (R_AXIS.ticmode & TICS_MIRROR)) {
+	    if (this->index == POLAR_AXIS && (this->ticmode & TICS_MIRROR)) {
 		int save_gridline = lgrd.l_type;
 		lgrd.l_type = LT_NODRAW;
 		(*callback) (this, -internal,
@@ -1024,19 +1022,19 @@ gen_tics(AXIS_INDEX axis, tic_callback callback)
 	/* {{{  choose start, step and end */
 	switch (def->type) {
 	case TIC_SERIES:
-	    if (this->log && axis != POLAR_AXIS) {
+	    if (this->log && this->index != POLAR_AXIS) {
 		/* we can tolerate start <= 0 if step and end > 0 */
 		if (def->def.series.end <= 0 || def->def.series.incr <= 0)
 		    return;	/* just quietly ignore */
-		step = AXIS_DO_LOG(axis, def->def.series.incr);
+		step = axis_do_log(this, def->def.series.incr);
 		if (def->def.series.start <= 0)	/* includes case 'undefined, i.e. -VERYLARGE */
 		    start = step * floor(lmin / step);
 		else
-		    start = AXIS_DO_LOG(axis, def->def.series.start);
+		    start = axis_do_log(this, def->def.series.start);
 		if (def->def.series.end == VERYLARGE)
 		    end = step * ceil(lmax / step);
 		else
-		    end = AXIS_DO_LOG(axis, def->def.series.end);
+		    end = axis_do_log(this, def->def.series.end);
 	    } else {
 		start = def->def.series.start;
 		step = def->def.series.incr;
@@ -1191,18 +1189,18 @@ gen_tics(AXIS_INDEX axis, tic_callback callback)
 	for (tic = start; nsteps > 0; tic += step, nsteps--) {
 
 	    /* {{{  calc internal and user co-ords */
-	    if (axis == POLAR_AXIS) {
+	    if (this->index == POLAR_AXIS) {
 		/* Defer translation until after limit check */
 		internal = tic;
 	    } else if (!this->log) {
 		internal = (this->tictype == DT_TIMEDATE)
-		    ? time_tic_just(axis_array[axis].timelevel, tic)
+		    ? time_tic_just(this->timelevel, tic)
 		    : tic;
 		user = CheckZero(internal, step);
 	    } else {
 		/* log scale => dont need to worry about zero ? */
 		internal = tic;
-		user = AXIS_UNDO_LOG(axis, internal);
+		user = axis_undo_log(this, internal);
 	    }
 	    /* }}} */
 	    if (internal > internal_max)
@@ -1233,16 +1231,16 @@ gen_tics(AXIS_INDEX axis, tic_callback callback)
 			    gstrftime(label, MAX_ID_LEN-1, this->ticfmt, (double) user);
 			} else if (this->tictype == DT_DMS) {
 			    gstrdms(label, this->ticfmt, (double)user);
-			} else if (polar && axis == POLAR_AXIS) {
+			} else if (polar && this->index == POLAR_AXIS) {
 			    double min = (R_AXIS.autoscale & AUTOSCALE_MIN) ? 0 : R_AXIS.min;
 			    double r = fabs(user) + min;
 			    /* POLAR_AXIS is the only sane axis, where the actual value */
 			    /* is stored and we shift its position just before plotting.*/
-			    internal = AXIS_LOG_VALUE(axis, tic)
-				     - AXIS_LOG_VALUE(axis, R_AXIS.min);
+			    internal = axis_log_value(this, tic)
+				     - axis_log_value(this, R_AXIS.min);
 			    r = tic;
 			    gprintf(label, sizeof(label), this->ticfmt, log10_base, r);
-			} else if (axis >= PARALLEL_AXES) {
+			} else if (this->index >= PARALLEL_AXES) {
 			    /* FIXME: needed because ticfmt is not maintained for parallel axes */
 			    gprintf(label, sizeof(label), this->formatstring,
 				    log10_base, user);
@@ -1258,7 +1256,7 @@ gen_tics(AXIS_INDEX axis, tic_callback callback)
 			(*callback) (this, internal, label, 0, lgrd, def->def.user);
 
 	 		/* Polar axis tics are mirrored across the origin */
-			if (axis == POLAR_AXIS && (R_AXIS.ticmode & TICS_MIRROR)) {
+			if (this->index == POLAR_AXIS && (this->ticmode & TICS_MIRROR)) {
 			    int save_gridline = lgrd.l_type;
 			    lgrd.l_type = LT_NODRAW;
 			    (*callback) (this, -internal, label, 0, lgrd, def->def.user);
@@ -1274,15 +1272,12 @@ gen_tics(AXIS_INDEX axis, tic_callback callback)
 		double mplace, mtic, temptic;
 		for (mplace = ministart; mplace < miniend; mplace += ministep) {
 		    if (this->tictype == DT_TIMEDATE)
-			mtic = time_tic_just(axis_array[axis].timelevel - 1,
-					     internal + mplace);
+			mtic = time_tic_just(this->timelevel - 1, internal + mplace);
 		    else
 			mtic = internal
-			    + (this->log && step <= 1.5
-			       ? AXIS_DO_LOG(axis,mplace)
-			       : mplace);
+			    + (this->log && step <= 1.5 ? axis_do_log(this,mplace) : mplace);
 		    temptic = mtic;
-		    if (polar && axis == POLAR_AXIS) temptic += R_AXIS.min;
+		    if (polar && this->index == POLAR_AXIS) temptic += R_AXIS.min;
 		    if (inrange(temptic, internal_min, internal_max)
 			&& inrange(temptic, start - step * SIGNIF, end + step * SIGNIF))
 			(*callback) (this, mtic, NULL, 1, mgrd, NULL);
@@ -1465,7 +1460,7 @@ axis_output_tics(
 	    tic_text = (*ticlabel_position);
 	}
 	/* go for it */
-	gen_tics(axis, callback);
+	gen_tics(&axis_array[axis], callback);
 	(*t->text_angle) (0);	/* reset rotation angle */
     }
 }
