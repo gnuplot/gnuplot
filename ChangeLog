@@ -1,3 +1,7 @@
+2015-03-13  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/unset.c: Fix memory leak (linked axis function) on reset
+
 2015-03-08  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/datafile.c: The code tracking matrix column/row headers tried
