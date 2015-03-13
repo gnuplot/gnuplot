@@ -4,7 +4,7 @@
 	Revise axis_unlog_interval() to use pointers rather than AXIS_INDEX.
 
 	* src/axis.c src/axis.h src/graphics.c:
-	Revise old routine axis_revert_range(AXIS_INDEX) a wrapper for a
+	Revise old routine axis_revert_range(AXIS_INDEX) to be a wrapper for a
 	new routine axis_invert_if_requested(struct axis *).
 
 	* src/axis.c:  Change many call sites to use the new macros and new
@@ -14,6 +14,8 @@
 	* src/axis.c src/axis.h src/boundary.c src/graphics.c src/mouse.c
 	src/plot3d.c:  Revise make_tics(), copy_or_invent_formatstring(), and
 	setupt_tics() to use axis pointers rather than AXIS_INDEX.
+
+	* src/unset.c: Fix memory leak (linked axis function) on reset.
 
 2015-03-12  Ethan A Merritt  <merritt@u.washington.edu>
 
