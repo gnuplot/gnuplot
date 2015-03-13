@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.350 2015/02/03 23:45:59 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.351 2015/02/15 16:39:22 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -3022,7 +3022,7 @@ eval_plots()
 			    t_max = X_AXIS.max;
 			}
 			/* FIXME: What if SAMPLE_AXIS is not x_axis? */
-			axis_unlog_interval(x_axis, &t_min, &t_max, 1);
+			axis_unlog_interval(&X_AXIS, &t_min, &t_max, 1);
 			t_step = (t_max - t_min) / (samples_1 - 1);
 		    }
 		    for (i = 0; i < samples_1; i++) {

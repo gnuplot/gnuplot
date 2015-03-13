@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.151 2015/03/12 21:21:07 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.152 2015/03/12 23:48:13 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -169,15 +169,15 @@ static void get_position_type __PROTO((enum position_type * type, AXIS_INDEX *ax
  * a given range if necessary. If checkrange is TRUE, will int_error() if
  * range is invalid */
 void
-axis_unlog_interval(AXIS_INDEX axis, double *min, double *max, TBOOLEAN checkrange)
+axis_unlog_interval(struct axis *axis, double *min, double *max, TBOOLEAN checkrange)
 {
-    if (axis_array[axis].log) {
+    if (axis->log) {
 	if (checkrange && (*min<= 0.0 || *max <= 0.0))
 	    int_error(NO_CARET,
 		      "%s range must be greater than 0 for log scale",
-		      axis_name(axis));
-	*min = (*min<=0) ? -VERYLARGE : AXIS_DO_LOG(axis,*min);
-	*max = (*max<=0) ? -VERYLARGE : AXIS_DO_LOG(axis,*max);
+		      axis_name(axis->index));
+	*min = (*min<=0) ? -VERYLARGE : axis_do_log(axis,*min);
+	*max = (*max<=0) ? -VERYLARGE : axis_do_log(axis,*max);
     }
 }
 
@@ -203,7 +203,7 @@ void
 axis_revert_and_unlog_range(AXIS_INDEX axis)
 {
   axis_revert_range( axis );
-  axis_unlog_interval(axis, &axis_array[axis].min, &axis_array[axis].max, 1);
+  axis_unlog_interval(&axis_array[axis], &axis_array[axis].min, &axis_array[axis].max, 1);
 }
 
 /* }}} */
