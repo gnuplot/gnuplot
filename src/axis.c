@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.152 2015/03/12 23:48:13 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.153 2015/03/13 17:28:50 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -183,18 +183,25 @@ axis_unlog_interval(struct axis *axis, double *min, double *max, TBOOLEAN checkr
 
 /* }}} */
 
+/* {{{ axis_invert_if_requested() */
+
+void
+axis_invert_if_requested(struct axis *axis)
+{
+    if (((axis->range_flags & RANGE_IS_REVERSED))
+    &&  (axis->autoscale != 0) &&  (axis->max > axis->min) ) {
+	double temp = axis->min;
+	axis->min = axis->max;
+	axis->max = temp;
+    }
+}
+
 /* {{{ axis_revert_range() */
 
 void
 axis_revert_range(AXIS_INDEX axis)
 {
-  if (((axis_array[axis].range_flags & RANGE_IS_REVERSED))
-  &&  (axis_array[axis].autoscale != 0)
-  &&  (axis_array[axis].max > axis_array[axis].min) ) {
-    double temp = axis_array[axis].min;
-    axis_array[axis].min = axis_array[axis].max;
-    axis_array[axis].max = temp;
-  }
+    axis_invert_if_requested( &axis_array[axis] );
 }
 
 /* {{{ axis_revert_and_unlog_range() */
@@ -202,8 +209,8 @@ axis_revert_range(AXIS_INDEX axis)
 void
 axis_revert_and_unlog_range(AXIS_INDEX axis)
 {
-  axis_revert_range( axis );
-  axis_unlog_interval(&axis_array[axis], &axis_array[axis].min, &axis_array[axis].max, 1);
+    axis_invert_if_requested(&axis_array[axis]);
+    axis_unlog_interval(&axis_array[axis], &axis_array[axis].min, &axis_array[axis].max, 1);
 }
 
 /* }}} */

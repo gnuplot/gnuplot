@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.481 2015/03/12 21:21:07 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.482 2015/03/12 23:48:13 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -3794,17 +3794,18 @@ place_parallel_axes(struct curve_points *first_plot, int pcount, int layer)
 
     /* Set up the vertical scales used by AXIS_MAP() */
     for (j = 0; j < axes_in_use; j++) {
-	axis_revert_range(PARALLEL_AXES+j);
-	axis_array[PARALLEL_AXES+j].term_lower = plot_bounds.ybot;
-	axis_array[PARALLEL_AXES+j].term_scale =
+	struct axis *this_axis = &axis_array[PARALLEL_AXES+j]; 
+	axis_invert_if_requested(this_axis);
+	this_axis->term_lower = plot_bounds.ybot;
+	this_axis->term_scale =
 	    (plot_bounds.ytop - plot_bounds.ybot)
-	    / (axis_array[PARALLEL_AXES+j].max - axis_array[PARALLEL_AXES+j].min);
+	    / (this_axis->max - this_axis->min);
 
 	FPRINTF((stderr,
 	    "axis p%d: min %g max %g set_min %g set_max %g autoscale %o set_autoscale %o\n",
-	    j, axis_array[PARALLEL_AXES+j].min, axis_array[PARALLEL_AXES+j].max,
-	    axis_array[PARALLEL_AXES+j].set_min, axis_array[PARALLEL_AXES+j].set_max,
-	    axis_array[PARALLEL_AXES+j].autoscale, axis_array[PARALLEL_AXES+j].set_autoscale));
+	    j, this_axis->min, this_axis->max,
+	    this_axis->set_min, this_axis->set_max,
+	    this_axis->autoscale, this_axis->set_autoscale));
 	setup_tics(PARALLEL_AXES+j, 20);
     }
 

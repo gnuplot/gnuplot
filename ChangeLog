@@ -1,7 +1,11 @@
 2015-03-13  Ethan A Merritt  <merritt@u.washington.edu>
 
-	src/axis.c (axis_unlog_interval) src/axis.h src/datafile.c src/plot2d.c:
+	* src/axis.c src/axis.h src/datafile.c src/plot2d.c:
 	Revise axis_unlog_interval() to use pointers rather than AXIS_INDEX.
+
+	* src/axis.c src/axis.h src/graphics.c:
+	Revise old routine axis_revert_range(AXIS_INDEX) a wrapper for a
+	new routine axis_invert_if_requested(struct axis *).
 
 2015-03-12  Ethan A Merritt  <merritt@u.washington.edu>
 
