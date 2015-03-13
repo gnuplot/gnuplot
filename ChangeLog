@@ -7,6 +7,10 @@
 	Revise old routine axis_revert_range(AXIS_INDEX) a wrapper for a
 	new routine axis_invert_if_requested(struct axis *).
 
+	* src/axis.c:  Change many call sites to use the new macros and new
+	routine variants taking an axis pointer rather than an AXIS_INDEX.
+	This set of changes is purely internal to code in axis.c.
+
 2015-03-12  Ethan A Merritt  <merritt@u.washington.edu>
 
 	Begin bottom-up revision of axis handling routines to use pointers
