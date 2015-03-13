@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: mouse.c,v 1.176 2015/01/20 02:10:42 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: mouse.c,v 1.177 2015/02/14 03:25:24 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - mouse.c */
@@ -524,7 +524,7 @@ xDateTimeFormat(double x, char *b, int mode)
 do {								\
     if (x >= VERYLARGE)	break;					\
     if (axis_array[axis].datatype == DT_TIMEDATE) {		\
-	char *format = copy_or_invent_formatstring(axis);	\
+	char *format = copy_or_invent_formatstring(&axis_array[axis]);	\
 	while (strchr(format,'\n'))				\
 	     *(strchr(format,'\n')) = ' ';			\
 	gstrftime(sp, 40, format, x);				\

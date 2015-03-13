@@ -11,6 +11,10 @@
 	routine variants taking an axis pointer rather than an AXIS_INDEX.
 	This set of changes is purely internal to code in axis.c.
 
+	* src/axis.c src/axis.h src/boundary.c src/graphics.c src/mouse.c
+	src/plot3d.c:  Revise make_tics(), copy_or_invent_formatstring(), and
+	setupt_tics() to use axis pointers rather than AXIS_INDEX.
+
 2015-03-12  Ethan A Merritt  <merritt@u.washington.edu>
 
 	Begin bottom-up revision of axis handling routines to use pointers

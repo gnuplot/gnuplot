@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.232 2014/09/05 21:51:38 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.233 2015/01/20 02:10:43 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -2157,19 +2157,19 @@ eval_3dplots()
 
     axis_revert_and_unlog_range(FIRST_Z_AXIS);
 
-    setup_tics(FIRST_X_AXIS, 20);
-    setup_tics(FIRST_Y_AXIS, 20);
-    setup_tics(FIRST_Z_AXIS, 20);
+    setup_tics(&axis_array[FIRST_X_AXIS], 20);
+    setup_tics(&axis_array[FIRST_Y_AXIS], 20);
+    setup_tics(&axis_array[FIRST_Z_AXIS], 20);
     if (splot_map) {
-	setup_tics(SECOND_X_AXIS, 20);
-	setup_tics(SECOND_Y_AXIS, 20);
+	setup_tics(&axis_array[SECOND_X_AXIS], 20);
+	setup_tics(&axis_array[SECOND_Y_AXIS], 20);
     }
 
     set_plot_with_palette(plot_num, MODE_SPLOT);
     if (is_plot_with_palette()) {
 	set_cbminmax();
 	axis_checked_extend_empty_range(COLOR_AXIS, "All points of colorbox value undefined");
-	setup_tics(COLOR_AXIS, 20);
+	setup_tics(&axis_array[COLOR_AXIS], 20);
 	/* axis_revert_and_unlog_range(COLOR_AXIS); */
 	/* fprintf(stderr,"plot3d.c: CB_AXIS.min=%g\tCB_AXIS.max=%g\n",CB_AXIS.min,CB_AXIS.max); */
     }

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.154 2015/03/13 17:31:38 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.155 2015/03/13 19:19:23 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -147,7 +147,7 @@ AXIS_INDEX z_axis = FIRST_Z_AXIS;
 
 /* --------- internal prototypes ------------------------- */
 static double make_auto_time_minitics __PROTO((t_timelevel, double));
-static double make_tics __PROTO((AXIS_INDEX, int));
+static double make_tics __PROTO((struct axis *, int));
 static double quantize_time_tics __PROTO((struct axis *, double, double, int));
 static double time_tic_just __PROTO((t_timelevel, double));
 static double round_outward __PROTO((struct axis *, TBOOLEAN, double));
@@ -490,10 +490,9 @@ looks_like_numeric(char *format)
  * at the range of values.  Considers time/date fields that don't
  * change across the range to be unimportant */
 char *
-copy_or_invent_formatstring(AXIS_INDEX axis)
+copy_or_invent_formatstring(struct axis *this_axis)
 {
     struct tm t_min, t_max;
-    struct axis *this_axis = &axis_array[axis];
 
     char tempfmt[MAX_ID_LEN+1];
     memset(tempfmt, 0, sizeof(tempfmt));
@@ -635,10 +634,9 @@ quantize_normal_tics(double arg, int guide)
  * ticking interval for the given axis. For the meaning of the guide
  * parameter, see the comment on quantize_normal_tics() */
 static double
-make_tics(AXIS_INDEX axis, int guide)
+make_tics(struct axis *this_axis, int guide)
 {
     double xr, tic;
-    struct axis *this_axis = &axis_array[axis];
 
     xr = fabs(this_axis->min - this_axis->max);
     if (xr == 0)
@@ -793,16 +791,15 @@ round_outward(
 /* }}} */
 
 /* {{{ setup_tics */
-/* setup_tics allows max number of tics to be specified but users dont
- * like it to change with size and font, so we use value of 20, which
- * is 3.5 behaviour.  Note also that if format is '', yticlin = 0, so
- * this gives division by zero.  */
+/* setup_tics allows max number of tics to be specified but users don't
+ * like it to change with size and font, so we always call with max=20.
+ * Note that if format is '', yticlin = 0, so this gives division by zero.
+ */
 
 void
-setup_tics(AXIS_INDEX axis, int max)
+setup_tics(struct axis *this, int max)
 {
     double tic = 0;
-    AXIS *this = axis_array + axis;
     struct ticdef *ticdef = &(this->ticdef);
 
     /* HBB 20010703: New: allow _not_ to autoextend the axis endpoints
@@ -842,7 +839,7 @@ setup_tics(AXIS_INDEX axis, int max)
 	autoextend_max = autoextend_max
 	                 && (ticdef->def.series.end == VERYLARGE);
     } else if (ticdef->type == TIC_COMPUTED) {
-	this->ticstep = tic = make_tics(axis, max);
+	this->ticstep = tic = make_tics(this, max);
     } else {
 	/* user-defined, day or month */
 	autoextend_min = autoextend_max = FALSE;
@@ -884,7 +881,7 @@ setup_tics(AXIS_INDEX axis, int max)
 
     /* Set up ticfmt. If necessary (time axis, but not time/date output format),
      * make up a formatstring that suits the range of data */
-    copy_or_invent_formatstring(axis);
+    copy_or_invent_formatstring(this);
 }
 
 /* }}} */

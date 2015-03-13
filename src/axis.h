@@ -1,5 +1,5 @@
 /*
- * $Id: axis.h,v 1.117 2015/03/13 17:28:50 sfeam Exp $
+ * $Id: axis.h,v 1.118 2015/03/13 17:31:39 sfeam Exp $
  *
  */
 
@@ -688,9 +688,9 @@ void axis_revert_range __PROTO((AXIS_INDEX));
 void axis_revert_and_unlog_range __PROTO((AXIS_INDEX));
 double axis_log_value_checked __PROTO((AXIS_INDEX, double, const char *));
 void axis_checked_extend_empty_range __PROTO((AXIS_INDEX, const char *mesg));
-char * copy_or_invent_formatstring __PROTO((AXIS_INDEX));
+char * copy_or_invent_formatstring __PROTO((struct axis *));
 double quantize_normal_tics __PROTO((double, int));
-void setup_tics __PROTO((AXIS_INDEX, int));
+void setup_tics __PROTO((struct axis *, int));
 void gen_tics __PROTO((struct axis *, tic_callback));
 void axis_output_tics __PROTO((AXIS_INDEX, int *, AXIS_INDEX, tic_callback));
 void axis_set_graphical_range __PROTO((AXIS_INDEX, unsigned int lower, unsigned int upper));

@@ -1,5 +1,5 @@
 /*
- * $Id: boundary.c,v 1.21 2015/02/16 04:40:05 sfeam Exp $
+ * $Id: boundary.c,v 1.22 2015/03/12 23:48:13 sfeam Exp $
  */
 
 /* GNUPLOT - boundary.c */
@@ -414,8 +414,8 @@ boundary(struct curve_points *plots, int count)
     }
 
     /*{{{  set up y and y2 tics */
-    setup_tics(FIRST_Y_AXIS, 20);
-    setup_tics(SECOND_Y_AXIS, 20);
+    setup_tics(&axis_array[FIRST_Y_AXIS], 20);
+    setup_tics(&axis_array[SECOND_Y_AXIS], 20);
     /*}}} */
 
     /* Adjust color axis limits if necessary. */
@@ -424,7 +424,7 @@ boundary(struct curve_points *plots, int count)
 	/* set_cbminmax(); */
 	axis_checked_extend_empty_range(COLOR_AXIS, "All points of color axis undefined.");
 	if (color_box.where != SMCOLOR_BOX_NO)
-	    setup_tics(COLOR_AXIS, 20);
+	    setup_tics(&axis_array[COLOR_AXIS], 20);
     }
 
     /*{{{  recompute plot_bounds.xleft based on widths of ytics, ylabel etc
@@ -646,11 +646,11 @@ boundary(struct curve_points *plots, int count)
      * applied: setup_tics may extend the ranges, which would distort
      * the aspect ratio */
 
-    setup_tics(FIRST_X_AXIS, 20);
-    setup_tics(SECOND_X_AXIS, 20);
+    setup_tics(&axis_array[FIRST_X_AXIS], 20);
+    setup_tics(&axis_array[SECOND_X_AXIS], 20);
 
     if (polar)
-	setup_tics(POLAR_AXIS, 10);
+	setup_tics(&axis_array[POLAR_AXIS], 10);
 
 
     /* Modify the bounding box to fit the aspect ratio, if any was

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.482 2015/03/12 23:48:13 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.483 2015/03/13 17:31:39 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -3806,7 +3806,7 @@ place_parallel_axes(struct curve_points *first_plot, int pcount, int layer)
 	    j, this_axis->min, this_axis->max,
 	    this_axis->set_min, this_axis->set_max,
 	    this_axis->autoscale, this_axis->set_autoscale));
-	setup_tics(PARALLEL_AXES+j, 20);
+	setup_tics(&axis_array[PARALLEL_AXES+j], 20);
     }
 
     if (parallel_axis_style.layer == LAYER_FRONT && layer == LAYER_BACK)
