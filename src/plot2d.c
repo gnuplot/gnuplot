@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.351 2015/02/15 16:39:22 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.352 2015/03/13 17:28:50 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -570,8 +570,10 @@ get_data(struct curve_points *current_plot)
 	min_cols = current_plot->n_par_axes;
 	max_cols = current_plot->n_par_axes + 1;
 	/* We have not yet read in any data, so we cannot do complete initialization */
-	for (j = 0; j < current_plot->n_par_axes; j++)
-	    AXIS_INIT2D(PARALLEL_AXES+j, 1);
+	for (j = 0; j < current_plot->n_par_axes; j++) {
+	    struct axis *this_axis = &axis_array[PARALLEL_AXES+j];
+	    axis_init2d(this_axis, 1);
+	}
 	break;
 
     case TABLESTYLE:
@@ -747,9 +749,10 @@ get_data(struct curve_points *current_plot)
 	    /* The parallel axis data is stored in separate arrays */
 	    for (iaxis = 0; iaxis < current_plot->n_par_axes; iaxis++) {
 		int dummy_type = INRANGE;
-		STORE_WITH_LOG_AND_UPDATE_RANGE( current_plot->z_n[iaxis][i],
-			v[iaxis], dummy_type, PARALLEL_AXES+iaxis,
-			current_plot->noautoscale, NOOP, NOOP );
+		ACTUAL_STORE_WITH_LOG_AND_UPDATE_RANGE( current_plot->z_n[iaxis][i],
+			v[iaxis], dummy_type,
+			&axis_array[PARALLEL_AXES+iaxis],
+			current_plot->noautoscale, NOOP, NOOP, 0 );
 	    }
 	    i++;
 
@@ -1484,11 +1487,11 @@ store2d_point(
 
     /* HBB 20010214: if z is not used for some actual value, just
      * store 'width' to that axis and be done with it */
-    if ((int)current_plot->z_axis != NO_AXIS)
+    if ((int)current_plot->z_axis == NO_AXIS)
+	cp->z = width;
+    else
 	STORE_WITH_LOG_AND_UPDATE_RANGE(cp->z, width, dummy_type, current_plot->z_axis, 
 					current_plot->noautoscale, NOOP, cp->z = -VERYLARGE);
-    else
-	cp->z = width;
 
     /* If we have variable color corresponding to a z-axis value, use it to autoscale */
     /* June 2010 - New mechanism for variable color */

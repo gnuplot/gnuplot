@@ -1,5 +1,5 @@
 /*
- * $Id: axis.h,v 1.118 2015/03/13 17:31:39 sfeam Exp $
+ * $Id: axis.h,v 1.119 2015/03/13 20:26:17 sfeam Exp $
  *
  */
 
@@ -475,10 +475,11 @@ do {									\
     this->data_max = -VERYLARGE;					\
 } while(0)
 
-#define AXIS_INIT2D(axis, infinite)					\
+#define AXIS_INIT2D(axis, infinite) \
+        axis_init2d((&axis_array[axis]), infinite)
+
+#define axis_init2d(this, infinite)					\
 do {									\
-    AXIS *this = axis_array + axis;					\
-									\
     this->autoscale = this->set_autoscale;				\
     this->min = (infinite && (this->set_autoscale & AUTOSCALE_MIN))	\
 	? VERYLARGE : this->set_min;					\
@@ -554,10 +555,8 @@ do {							\
 					       NOAUTOSCALE, OUT_ACTION,   \
 					       UNDEF_ACTION, is_cb_axis)  \
 do {									  \
-    struct axis *axis = axis_array + (AXIS);				  \
+    struct axis *axis = AXIS;						  \
     double curval = (VALUE);						  \
-    if (AXIS == NO_AXIS)						  \
-	break;								  \
     /* Version 5: OK to store infinities or NaN */			  \
     STORE = curval;							  \
     if (! (curval > -VERYLARGE && curval < VERYLARGE)) {		  \
@@ -638,7 +637,8 @@ do {									  \
 
 /* normal calls go though this macro, marked as not being a color axis */
 #define STORE_WITH_LOG_AND_UPDATE_RANGE(STORE, VALUE, TYPE, AXIS, NOAUTOSCALE, OUT_ACTION, UNDEF_ACTION)	 \
- ACTUAL_STORE_WITH_LOG_AND_UPDATE_RANGE(STORE, VALUE, TYPE, AXIS, NOAUTOSCALE, OUT_ACTION, UNDEF_ACTION, 0)
+ if (AXIS != NO_AXIS) \
+ ACTUAL_STORE_WITH_LOG_AND_UPDATE_RANGE(STORE, VALUE, TYPE, (&axis_array[AXIS]), NOAUTOSCALE, OUT_ACTION, UNDEF_ACTION, 0)
 
 /* Implementation of the above for the color axis. It should not change
  * the type of the point (out-of-range color is plotted with the color
@@ -648,7 +648,7 @@ do {									  \
 			       NOAUTOSCALE, OUT_ACTION, UNDEF_ACTION)	  \
 {									  \
     coord_type c_type_tmp = TYPE;					  \
-    ACTUAL_STORE_WITH_LOG_AND_UPDATE_RANGE(STORE, VALUE, c_type_tmp, AXIS,	  \
+    ACTUAL_STORE_WITH_LOG_AND_UPDATE_RANGE(STORE, VALUE, c_type_tmp, &axis_array[AXIS],	  \
 					   NOAUTOSCALE, OUT_ACTION, UNDEF_ACTION, 1); \
 }
 

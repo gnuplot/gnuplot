@@ -1,3 +1,9 @@
+2015-03-14  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/axis.h src/plot2d.c:  Revise macros AXIS_INIT2D and (the big one)
+	ACTUAL_STORE_WITH_LOG_AND_UPDATE_RANGE to use axis pointers rather than
+	AXIS_INDEX.  This is mostly invisible to the higher-level code.
+
 2015-03-13  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/axis.c src/axis.h src/datafile.c src/plot2d.c:
