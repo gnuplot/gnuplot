@@ -4,8 +4,11 @@
 	ACTUAL_STORE_WITH_LOG_AND_UPDATE_RANGE to use axis pointers rather than
 	AXIS_INDEX.  This is mostly invisible to the higher-level code.
 
-	* src/axis.h src/axis.c src/set.c:  Revise load_range() to use axis 
+	* src/axis.h src/axis.c src/set.c:  Revise load_range() to take axis 
 	pointers. Export get_num_or_time().
+
+	* src/axis.h src/axis.c src/plot2d.c src/set.c src/datafile.c:
+	Revise add_tic_user() to take axis pointer rather than AXIS_INDEX.
 
 2015-03-13  Ethan A Merritt  <merritt@u.washington.edu>
 

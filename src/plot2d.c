@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.352 2015/03/13 17:28:50 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.353 2015/03/14 20:53:50 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -1577,9 +1577,8 @@ add_tics_boxplot_factors(struct curve_points *plot)
 	x_axis;
     for (this_label = plot->labels->next; this_label;
 	 this_label = this_label->next) {
-	    add_tic_user( boxplot_labels_axis, this_label->text,
-		plot->points->x + i * boxplot_opts.separation,
-		-1);
+	    add_tic_user( &axis_array[boxplot_labels_axis], this_label->text,
+		plot->points->x + i * boxplot_opts.separation, -1);
 	    i++;
     }
 }

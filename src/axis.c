@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.156 2015/03/13 20:26:17 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.157 2015/03/15 04:19:50 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -1873,11 +1873,10 @@ get_position_default(struct position *pos, enum position_type default_type)
  *       called from datafile.c during `plot using ::xtic()` (level = -1)
  */
 void
-add_tic_user(AXIS_INDEX axis, char *label, double position, int level)
+add_tic_user(struct axis *this_axis, char *label, double position, int level)
 {
     struct ticmark *tic, *newtic;
     struct ticmark listhead;
-    struct axis *this_axis = &axis_array[axis];
 
     if (!label && level < 0)
 	return;

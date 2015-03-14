@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.301 2015/03/08 17:27:09 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.302 2015/03/13 17:28:50 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -925,7 +925,7 @@ df_read_matrix(int *rows, int *cols)
 		    xpos = real(&a);
 		}
 		temp_string = df_parse_string_field(df_column[i].position);
-		add_tic_user(FIRST_X_AXIS, temp_string, xpos, -1);
+		add_tic_user(&axis_array[FIRST_X_AXIS], temp_string, xpos, -1);
 		free(temp_string);
 	    }
 	    continue;
@@ -969,7 +969,7 @@ df_read_matrix(int *rows, int *cols)
 			df_column[1].datum = save;
 		    }
 		    temp_string = df_parse_string_field(df_column[0].position);
-		    add_tic_user(FIRST_Y_AXIS, temp_string, ypos, -1);
+		    add_tic_user(&axis_array[FIRST_Y_AXIS], temp_string, ypos, -1);
 		    free(temp_string);
 		    continue;
 		}
@@ -2016,19 +2016,19 @@ df_readascii(double v[], int max)
 			evaluate_at(use_spec[output].at, &a);
 			evaluate_inside_using = FALSE;
 			if (a.type == STRING) {
-			    add_tic_user(axis, a.v.string_val, xpos, -1);
+			    add_tic_user(&axis_array[axis], a.v.string_val, xpos, -1);
 			    gpfree_string(&a);
 			} else {
 			    /* Version 5: In this case do not generate a tic at all. */
 			    /* E.g. plot $FOO using 1:2:(filter(3) ? strcol(3) : NaN) */
 			    /*
-			    add_tic_user(axis, "", xpos, -1);
+			    add_tic_user(&axis_array[axis], "", xpos, -1);
 			    int_warn(NO_CARET,"Tic label does not evaluate as string!\n");
 			     */
 			}
 		    } else {
 			char *temp_string = df_parse_string_field(df_tokens[output]);
-			add_tic_user(axis, temp_string, xpos, -1);
+			add_tic_user(&axis_array[axis], temp_string, xpos, -1);
 			free(temp_string);
 		    }
 
@@ -2723,7 +2723,7 @@ df_set_key_title(struct curve_points *plot)
 	/* way, so we assume that it is supposed to be an xtic label.      */
 	/* FIXME EAM - This style should default to notitle!               */
 	double xpos = plot->histogram_sequence + plot->histogram->start;
-	add_tic_user(FIRST_X_AXIS, df_key_title, xpos, -1);
+	add_tic_user(&axis_array[FIRST_X_AXIS], df_key_title, xpos, -1);
 	free(df_key_title);
 	df_key_title = NULL;
 	return;
@@ -5152,7 +5152,7 @@ df_readbinary(double v[], int max)
 			break;
 		}
 		if (a.type == STRING) {
-		    add_tic_user(axis, a.v.string_val, v[axcol], -1);
+		    add_tic_user(&axis_array[axis], a.v.string_val, v[axcol], -1);
 		    gpfree_string(&a);
 		}
 	    }

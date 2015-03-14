@@ -1,5 +1,5 @@
 /*
- * $Id: axis.h,v 1.120 2015/03/14 20:53:50 sfeam Exp $
+ * $Id: axis.h,v 1.121 2015/03/15 04:19:50 sfeam Exp $
  *
  */
 
@@ -696,7 +696,7 @@ void axis_output_tics __PROTO((AXIS_INDEX, int *, AXIS_INDEX, tic_callback));
 void axis_set_graphical_range __PROTO((AXIS_INDEX, unsigned int lower, unsigned int upper));
 void axis_draw_2d_zeroaxis __PROTO((AXIS_INDEX, AXIS_INDEX));
 TBOOLEAN some_grid_selected __PROTO((void));
-void add_tic_user __PROTO((AXIS_INDEX, char *, double, int));
+void add_tic_user __PROTO((struct axis *, char *, double, int));
 double get_num_or_time __PROTO((struct axis *));
 
 void save_writeback_all_axes __PROTO((void));

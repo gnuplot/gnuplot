@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.478 2015/02/26 18:43:58 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.479 2015/03/15 04:19:50 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -5748,7 +5748,7 @@ load_tic_user(AXIS_INDEX axis)
 	}
 
 	/* add to list */
-	add_tic_user(axis, ticlabel, ticposition, ticlevel);
+	add_tic_user(&axis_array[axis], ticlabel, ticposition, ticlevel);
 	free(ticlabel);
 
 	/* expect "," or ")" here */
