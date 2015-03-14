@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.155 2015/03/13 19:19:23 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.156 2015/03/13 20:26:17 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -152,7 +152,6 @@ static double quantize_time_tics __PROTO((struct axis *, double, double, int));
 static double time_tic_just __PROTO((t_timelevel, double));
 static double round_outward __PROTO((struct axis *, TBOOLEAN, double));
 static TBOOLEAN axis_position_zeroaxis __PROTO((AXIS_INDEX));
-static double get_num_or_time __PROTO((struct axis *axis));
 static void load_one_range __PROTO((struct axis *axis, double *a, t_autoscale *autoscale, t_autoscale which ));
 static double quantize_duodecimal_tics __PROTO((double, int));
 static void get_position_type __PROTO((enum position_type * type, AXIS_INDEX *axes));
@@ -1533,7 +1532,7 @@ axis_draw_2d_zeroaxis(AXIS_INDEX axis, AXIS_INDEX crossaxis)
 }
 /* }}} */
 
-static double
+double
 get_num_or_time(struct axis *axis)
 {
     double value = 0;
@@ -1668,10 +1667,8 @@ load_one_range(struct axis *this_axis, double *a, t_autoscale *autoscale, t_auto
 /* loads a range specification from the input line into variables 'a'
  * and 'b' */
 t_autoscale
-load_range(AXIS_INDEX axis, double *a, double *b, t_autoscale autoscale)
+load_range(struct axis *this_axis, double *a, double *b, t_autoscale autoscale)
 {
-    struct axis *this_axis = &axis_array[axis];
-
     if (equals(c_token, "]")) {
 	this_axis->min_constraint = CONSTRAINT_NONE;
 	this_axis->max_constraint = CONSTRAINT_NONE;
@@ -2065,7 +2062,7 @@ parse_range(AXIS_INDEX axis)
 		c_token += 2;
 	}
 	this_axis->autoscale =
-		load_range(axis, &this_axis->min, &this_axis->max, this_axis->autoscale);
+		load_range(this_axis, &this_axis->min, &this_axis->max, this_axis->autoscale);
 
 	/* EXPERIMENTAL: optional sample interval */
 	if (axis == SAMPLE_AXIS) {

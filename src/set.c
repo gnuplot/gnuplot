@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.477 2015/02/16 04:31:40 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.478 2015/02/26 18:43:58 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -5165,7 +5165,7 @@ set_range(AXIS_INDEX axis)
 	    int_error(c_token, "expecting '[' or 'restore'");
 	c_token++;
 	axis_array[axis].set_autoscale =
-	    load_range(axis,
+	    load_range(&axis_array[axis],
 		       &axis_array[axis].set_min,&axis_array[axis].set_max,
 		       axis_array[axis].set_autoscale);
 	if (!equals(c_token,"]"))

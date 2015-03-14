@@ -1,5 +1,5 @@
 /*
- * $Id: axis.h,v 1.119 2015/03/13 20:26:17 sfeam Exp $
+ * $Id: axis.h,v 1.120 2015/03/14 20:53:50 sfeam Exp $
  *
  */
 
@@ -681,7 +681,7 @@ typedef void (*tic_callback) __PROTO((struct axis *, double, char *, int,
 				struct lp_style_type, struct ticmark *));
 
 /* ------------ functions exported by axis.c */
-t_autoscale load_range __PROTO((AXIS_INDEX, double *, double *, t_autoscale));
+t_autoscale load_range __PROTO((struct axis *, double *, double *, t_autoscale));
 void axis_unlog_interval __PROTO((struct axis *, double *, double *, TBOOLEAN));
 void axis_invert_if_requested __PROTO((struct axis *));
 void axis_revert_range __PROTO((AXIS_INDEX));
@@ -697,6 +697,7 @@ void axis_set_graphical_range __PROTO((AXIS_INDEX, unsigned int lower, unsigned 
 void axis_draw_2d_zeroaxis __PROTO((AXIS_INDEX, AXIS_INDEX));
 TBOOLEAN some_grid_selected __PROTO((void));
 void add_tic_user __PROTO((AXIS_INDEX, char *, double, int));
+double get_num_or_time __PROTO((struct axis *));
 
 void save_writeback_all_axes __PROTO((void));
 int  parse_range __PROTO((AXIS_INDEX axis));
