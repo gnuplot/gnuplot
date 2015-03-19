@@ -7,6 +7,7 @@ Changes since 5.0 release
 * CHANGE track text properties for key title separately from key entries
 * CHANGE "smooth kdensity" now handles logscale y and explicit x range
 * CHANGE order of margins in the "set margin" command to left, right, bottom, top
+* CHANGE guarantee color of key sample for "lc variable" plots matches 1st point
 * FIX improved handling of boxplot data with multiple factors (categories)
 * FIX save_textcolor was not handling "tc variable"
 * FIX apply numeric locale when reading ascii matrix data

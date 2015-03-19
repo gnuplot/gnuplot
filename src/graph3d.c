@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.311.2.4 2015/01/06 04:24:41 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.311.2.5 2015/01/20 01:26:45 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -156,7 +156,7 @@ static void key_sample_line_pm3d __PROTO((struct surface_points *plot, int xl, i
 static void key_sample_point_pm3d __PROTO((struct surface_points *plot, int xl, int yl, int pointtype));
 static TBOOLEAN can_pm3d = FALSE;
 static void key_text __PROTO((int xl, int yl, char *text));
-static void check_for_variable_color __PROTO((struct surface_points *plot, struct coordinate *point));
+static void check3d_for_variable_color __PROTO((struct surface_points *plot, struct coordinate *point));
 
 static TBOOLEAN get_arrow3d __PROTO((struct arrow_def*, int*, int*, int*, int*));
 static void place_arrows3d __PROTO((int));
@@ -1400,7 +1400,7 @@ plot3d_impulses(struct surface_points *plot)
 
 	for (i = 0; i < icrvs->p_count; i++) {
 
-	    check_for_variable_color(plot, &points[i]);
+	    check3d_for_variable_color(plot, &points[i]);
 
 	    switch (points[i].type) {
 	    case INRANGE:
@@ -1796,7 +1796,7 @@ plot3d_points(struct surface_points *plot)
 		map3d_xy(point->x, point->y, point->z, &x, &y);
 
 		if (!clip_point(x, y)) {
-		    check_for_variable_color(plot, point);
+		    check3d_for_variable_color(plot, point);
 
 		    if ((plot->plot_style == POINTSTYLE || plot->plot_style == LINESPOINTS)
 		    &&  plot->lp_properties.p_size == PTSZ_VARIABLE)
@@ -3305,7 +3305,7 @@ plot3d_vectors(struct surface_points *plot)
 	    term_apply_lp_properties(&ap.lp_properties);
 	    apply_head_properties(&ap);
 	} else {
-	    check_for_variable_color(plot, &heads[i]);
+	    check3d_for_variable_color(plot, &heads[i]);
 	}
 
 	if (heads[i].type == INRANGE && tails[i].type == INRANGE) {
@@ -3317,7 +3317,7 @@ plot3d_vectors(struct surface_points *plot)
 }
 
 static void
-check_for_variable_color(struct surface_points *plot, struct coordinate *point)
+check3d_for_variable_color(struct surface_points *plot, struct coordinate *point)
 {
     int colortype = plot->lp_properties.pm3d_color.type;
 

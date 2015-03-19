@@ -1,3 +1,12 @@
+2015-03-19  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/boundary.c (do_key_sample) src/graph3d.c src/graphics.c
+	src/graphics.h (check_for_variable_color):  The key sample for plots
+	with filled objects (boxes, circles, ellipses, etc) and "lc variable"
+	was drawn in some non-obvious color not necessarily present in the plot.
+	Now we guarantee that the key sample is drawn using the color of the
+	first point in the plot.
+
 2015-03-13  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/unset.c: Fix memory leak (linked axis function) on reset
