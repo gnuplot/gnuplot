@@ -1,5 +1,5 @@
 /*
- * $Id: graphics.h,v 1.62 2015/01/05 22:17:05 sfeam Exp $
+ * $Id: graphics.h,v 1.63 2015/01/08 05:10:07 sfeam Exp $
  */
 
 /* GNUPLOT - graphics.h */
@@ -102,6 +102,8 @@ void init_histogram __PROTO((struct histogram_style *hist, text_label *title));
 void free_histlist __PROTO((struct histogram_style *hist));
 
 void plot_image_or_update_axes __PROTO((void *plot, TBOOLEAN update_axes));
+TBOOLEAN check_for_variable_color __PROTO((struct curve_points *plot, double *colorvalue));
+
 
 #ifdef EAM_OBJECTS
 void place_objects __PROTO((struct object *listhead, int layer, int dimensions));

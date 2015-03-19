@@ -1,5 +1,5 @@
 /*
- * $Id: boundary.c,v 1.22 2015/03/12 23:48:13 sfeam Exp $
+ * $Id: boundary.c,v 1.23 2015/03/13 20:26:17 sfeam Exp $
  */
 
 /* GNUPLOT - boundary.c */
@@ -1217,8 +1217,10 @@ do_key_sample(
 	}
     }
 
-    /* Draw sample in same style and color as the corresponding plot */
-    term_apply_lp_properties(&this_plot->lp_properties);
+    /* Draw sample in same style and color as the corresponding plot  */
+    /* The variable color case uses the color of the first data point */
+    if (!check_for_variable_color(this_plot, &this_plot->varcolor[0]))
+	term_apply_lp_properties(&this_plot->lp_properties);
 
     /* draw sample depending on bits set in plot_style */
     if (this_plot->plot_style & PLOT_STYLE_HAS_FILL && t->fillbox) {

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.483 2015/03/13 17:31:39 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.484 2015/03/13 20:26:17 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -129,8 +129,6 @@ static void get_arrow __PROTO((struct arrow_def* arrow, int* sx, int* sy, int* e
 static void map_position_double __PROTO((struct position* pos, double* x, double* y, const char* what));
 
 static void attach_title_to_plot __PROTO((struct curve_points *this_plot, legend_key *key));
-
-static TBOOLEAN check_for_variable_color __PROTO((struct curve_points *plot, double *colorvalue));
 
 static void hyperplane_between_points __PROTO((double *p1, double *p2, double *w, double *b));
 
@@ -4125,7 +4123,7 @@ do_polygon( int dimensions, t_polygon *p, int style, t_clip_object clip )
 }
 #endif
 
-static TBOOLEAN
+TBOOLEAN
 check_for_variable_color(struct curve_points *plot, double *colorvalue)
 {
     if (!plot->varcolor)
