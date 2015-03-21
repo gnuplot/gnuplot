@@ -1,5 +1,11 @@
 2015-03-21  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
+	* demo/plugin/.cvsignore: Added.
+
+	* config/cygwin/.cvsignore: Added.
+
+	* config/watcom/.cvsignore: Ignore two more files.
+
 	* docs/Makefile.am (clean-local): $(LUA_HELP) file has to be
 	cleaned, too.
 

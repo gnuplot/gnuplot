@@ -4,6 +4,7 @@ doc2*.exe
 gnuplot.gih
 wgnuplot.hlp
 wgnuplot.chm
+wgnuplot.chw
 *.err
 *.obj
 *.cobj
@@ -16,3 +17,4 @@ TEXTICON.ico
 linkopt1.oww
 *.map
 wgnuplot.mnu
+fit.log
