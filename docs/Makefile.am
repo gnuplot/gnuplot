@@ -377,7 +377,7 @@ check-local: checkdoc$(EXEEXT)
 	fi
 
 clean-local:
-	@for f in figure*.pdf ; do \
+	@for f in figure*.pdf $(LUA_HELP); do \
 	   if [ "$$f" != "figure_missing.pdf" ]; then \
 	     rm -f $$f ; \
 	   else \

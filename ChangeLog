@@ -1,3 +1,8 @@
+2015-03-21  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* docs/Makefile.am (clean-local): $(LUA_HELP) file has to be
+	cleaned, too.
+
 2015-03-19  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/boundary.c (do_key_sample) src/graph3d.c src/graphics.c
