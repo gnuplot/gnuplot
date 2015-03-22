@@ -5,6 +5,9 @@
 	enhanced text mode.  This does not hurt plotting per se, but it 
 	causes the "test" command to emit a non-latex string.
 
+	* src/unset.c: Revise internal routines unset_tics() unset_minitics()
+	and unset_range() to use axis pointers rather than AXIS_INDEX.
+
 2015-03-21  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* demo/plugin/.cvsignore: Added.

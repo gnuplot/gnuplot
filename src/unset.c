@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.214 2015/03/11 19:44:39 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.215 2015/03/14 02:44:35 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -55,6 +55,7 @@ static char *RCSid() { return RCSid("$Id: unset.c,v 1.214 2015/03/11 19:44:39 sf
 #include "variable.h"
 #include "pm3d.h"
 
+static void unset_all_tics __PROTO((void));
 static void unset_angles __PROTO((void));
 static void unset_arrow __PROTO((void));
 static void unset_arrowstyles __PROTO((void));
@@ -108,7 +109,7 @@ static void unset_mouse __PROTO((void));
 #endif
 
 static void unset_month_day_tics __PROTO((AXIS_INDEX));
-static void unset_minitics __PROTO((AXIS_INDEX));
+static void unset_minitics __PROTO((struct axis *));
 
 static void unset_offsets __PROTO((void));
 static void unset_origin __PROTO((void));
@@ -129,14 +130,14 @@ static void unset_style __PROTO((void));
 static void unset_surface __PROTO((void));
 static void unset_table __PROTO((void));
 static void unset_terminal __PROTO((void));
-static void unset_tics __PROTO((AXIS_INDEX));
+static void unset_tics __PROTO((struct axis *));
 static void unset_ticslevel __PROTO((void));
 static void unset_timefmt __PROTO((void));
 static void unset_timestamp __PROTO((void));
 static void unset_view __PROTO((void));
 static void unset_zero __PROTO((void));
 static void unset_timedata __PROTO((AXIS_INDEX));
-static void unset_range __PROTO((AXIS_INDEX));
+static void unset_range __PROTO((struct axis *));
 static void unset_zeroaxis __PROTO((AXIS_INDEX));
 static void unset_all_zeroaxes __PROTO((void));
 
@@ -366,14 +367,14 @@ unset_command()
 	break;
 #endif
     case S_RTICS:
-	unset_tics(POLAR_AXIS);
+	unset_tics(&axis_array[POLAR_AXIS]);
 	break;
     case S_PAXIS:
 	i = int_expression();
 	if (i <= 0 || i > MAX_PARALLEL_AXES)
 	    int_error(c_token, "expecting parallel axis number");
 	if (almost_equals(c_token, "tic$s")) {
-	    unset_tics(PARALLEL_AXES+i-1);
+	    unset_tics(&axis_array[PARALLEL_AXES+i-1]);
 	    c_token++;
 	}
 	break;
@@ -396,7 +397,7 @@ unset_command()
 	unset_terminal();
 	break;
     case S_TICS:
-	unset_tics(ALL_AXES);
+	unset_all_tics();
 	break;
     case S_TICSCALE:
 	int_warn(c_token, "Deprecated syntax - use 'set tics scale default'");
@@ -422,67 +423,67 @@ unset_command()
 	break;
 /* FIXME - are the tics correct? */
     case S_MXTICS:
-	unset_minitics(FIRST_X_AXIS);
+	unset_minitics(&axis_array[FIRST_X_AXIS]);
 	break;
     case S_XTICS:
-	unset_tics(FIRST_X_AXIS);
+	unset_tics(&axis_array[FIRST_X_AXIS]);
 	break;
     case S_XDTICS:
     case S_XMTICS:
 	unset_month_day_tics(FIRST_X_AXIS);
 	break;
     case S_MYTICS:
-	unset_minitics(FIRST_Y_AXIS);
+	unset_minitics(&axis_array[FIRST_Y_AXIS]);
 	break;
     case S_YTICS:
-	unset_tics(FIRST_Y_AXIS);
+	unset_tics(&axis_array[FIRST_Y_AXIS]);
 	break;
     case S_YDTICS:
     case S_YMTICS:
 	unset_month_day_tics(FIRST_X_AXIS);
 	break;
     case S_MX2TICS:
-	unset_minitics(SECOND_X_AXIS);
+	unset_minitics(&axis_array[SECOND_X_AXIS]);
 	break;
     case S_X2TICS:
-	unset_tics(SECOND_X_AXIS);
+	unset_tics(&axis_array[SECOND_X_AXIS]);
 	break;
     case S_X2DTICS:
     case S_X2MTICS:
 	unset_month_day_tics(FIRST_X_AXIS);
 	break;
     case S_MY2TICS:
-	unset_minitics(SECOND_Y_AXIS);
+	unset_minitics(&axis_array[SECOND_Y_AXIS]);
 	break;
     case S_Y2TICS:
-	unset_tics(SECOND_Y_AXIS);
+	unset_tics(&axis_array[SECOND_Y_AXIS]);
 	break;
     case S_Y2DTICS:
     case S_Y2MTICS:
 	unset_month_day_tics(FIRST_X_AXIS);
 	break;
     case S_MZTICS:
-	unset_minitics(FIRST_Z_AXIS);
+	unset_minitics(&axis_array[FIRST_Z_AXIS]);
 	break;
     case S_ZTICS:
-	unset_tics(FIRST_Z_AXIS);
+	unset_tics(&axis_array[FIRST_Z_AXIS]);
 	break;
     case S_ZDTICS:
     case S_ZMTICS:
 	unset_month_day_tics(FIRST_X_AXIS);
 	break;
     case S_MCBTICS:
-	unset_minitics(COLOR_AXIS);
+	unset_minitics(&axis_array[COLOR_AXIS]);
 	break;
     case S_CBTICS:
-	unset_tics(COLOR_AXIS);
+	unset_tics(&axis_array[COLOR_AXIS]);
 	break;
     case S_CBDTICS:
     case S_CBMTICS:
 	unset_month_day_tics(FIRST_X_AXIS);
 	break;
     case S_MRTICS:
-	unset_minitics(POLAR_AXIS);
+	unset_minitics(&axis_array[POLAR_AXIS]);
 	break;
     case S_XDATA:
 	unset_timedata(FIRST_X_AXIS);
@@ -521,34 +522,34 @@ unset_command()
 	unset_axislabel(SECOND_Y_AXIS);
 	break;
     case S_XRANGE:
-	unset_range(FIRST_X_AXIS);
+	unset_range(&axis_array[FIRST_X_AXIS]);
 	break;
     case S_X2RANGE:
-	unset_range(SECOND_X_AXIS);
+	unset_range(&axis_array[SECOND_X_AXIS]);
 	break;
     case S_YRANGE:
-	unset_range(FIRST_Y_AXIS);
+	unset_range(&axis_array[FIRST_Y_AXIS]);
 	break;
     case S_Y2RANGE:
-	unset_range(SECOND_Y_AXIS);
+	unset_range(&axis_array[SECOND_Y_AXIS]);
 	break;
     case S_ZRANGE:
-	unset_range(FIRST_Z_AXIS);
+	unset_range(&axis_array[FIRST_Z_AXIS]);
 	break;
     case S_CBRANGE:
-	unset_range(COLOR_AXIS);
+	unset_range(&axis_array[COLOR_AXIS]);
 	break;
     case S_RRANGE:
-	unset_range(POLAR_AXIS);
+	unset_range(&axis_array[POLAR_AXIS]);
 	break;
     case S_TRANGE:
-	unset_range(T_AXIS);
+	unset_range(&axis_array[T_AXIS]);
 	break;
     case S_URANGE:
-	unset_range(U_AXIS);
+	unset_range(&axis_array[U_AXIS]);
 	break;
     case S_VRANGE:
-	unset_range(V_AXIS);
+	unset_range(&axis_array[V_AXIS]);
 	break;
     case S_RAXIS:
 	raxis = FALSE;
@@ -1187,49 +1188,49 @@ unset_mouse()
 
 /* process 'unset mxtics' command */
 static void
-unset_minitics(AXIS_INDEX axis)
+unset_minitics(struct axis *this_axis)
 {
-    axis_array[axis].minitics = MINI_OFF;
-    axis_array[axis].mtic_freq = 10.0;
+    this_axis->minitics = MINI_OFF;
+    this_axis->mtic_freq = 10.0;
 }
-
 
 /*process 'unset {x|y|x2|y2|z}tics' command */
 static void
-unset_tics(AXIS_INDEX axis)
+unset_all_tics()
+{
+    int i;
+    for (i = 0; i < AXIS_ARRAY_SIZE; i++)
+	unset_tics(&axis_array[i]);
+}
+
+static void
+unset_tics(struct axis *this_axis)
 {
     struct position tics_nooffset = { character, character, character, 0., 0., 0.};
-    unsigned int istart = 0;
-    unsigned int iend = AXIS_ARRAY_SIZE;
-    unsigned int i;
 
-    if (axis != ALL_AXES) {
-	istart = axis;
-	iend = axis + 1;
+    this_axis->ticmode = NO_TICS;
+
+    if (this_axis->ticdef.font) {
+	free(this_axis->ticdef.font);
+	this_axis->ticdef.font = NULL;
     }
+    this_axis->ticdef.textcolor.type = TC_DEFAULT;
+    this_axis->ticdef.textcolor.lt = 0;
+    this_axis->ticdef.textcolor.value = 0;
+    this_axis->ticdef.offset = tics_nooffset;
+    this_axis->ticdef.rangelimited = FALSE; 
+    this_axis->ticdef.enhanced = TRUE;
+    this_axis->tic_rotate = 0;
+    this_axis->ticscale = 1.0;
+    this_axis->miniticscale = 0.5;
+    this_axis->tic_in = TRUE;
+    this_axis->manual_justify = FALSE;
 
-    for (i = istart; i < iend; ++i) {
-	axis_array[i].ticmode = NO_TICS;
+    free_marklist(this_axis->ticdef.def.user);
+    this_axis->ticdef.def.user = NULL;
 
-	if (axis_array[i].ticdef.font) {
-	    free(axis_array[i].ticdef.font);
-	    axis_array[i].ticdef.font = NULL;
-	}
-	axis_array[i].ticdef.textcolor.type = TC_DEFAULT;
-	axis_array[i].ticdef.textcolor.lt = 0;
-	axis_array[i].ticdef.textcolor.value = 0;
-	axis_array[i].ticdef.offset = tics_nooffset;
-	axis_array[i].ticdef.rangelimited = (i >= PARALLEL_AXES) ? TRUE : FALSE;
-	axis_array[i].ticdef.enhanced = TRUE;
-	axis_array[i].tic_rotate = 0;
-	axis_array[i].ticscale = 1.0;
-	axis_array[i].miniticscale = 0.5;
-	axis_array[i].tic_in = TRUE;
-	axis_array[i].manual_justify = FALSE;
-
-	free_marklist(axis_array[i].ticdef.def.user);
-	axis_array[i].ticdef.def.user = NULL;
-    }
+    if (this_axis->index >= PARALLEL_AXES)
+	this_axis->ticdef.rangelimited = TRUE; 
 }
 
 static void
@@ -1587,16 +1588,16 @@ unset_timedata(AXIS_INDEX axis)
 
 /* process 'unset {x|y|z|x2|y2|t|u|v|r}range' command */
 static void
-unset_range(AXIS_INDEX axis)
+unset_range(struct axis *this_axis)
 {
-    axis_array[axis].set_autoscale = AUTOSCALE_BOTH;
-    axis_array[axis].writeback_min = axis_array[axis].set_min
-	= axis_defaults[GPMIN(axis,PARALLEL_AXES)].min;
-    axis_array[axis].writeback_max = axis_array[axis].set_max
-	= axis_defaults[GPMIN(axis,PARALLEL_AXES)].max;
-    axis_array[axis].min_constraint = CONSTRAINT_NONE;
-    axis_array[axis].max_constraint = CONSTRAINT_NONE;
-    axis_array[axis].range_flags = 0;
+    AXIS_INDEX axis = GPMIN(this_axis->index,PARALLEL_AXES);
+
+    this_axis->writeback_min = this_axis->set_min = axis_defaults[axis].min;
+    this_axis->writeback_max = this_axis->set_max = axis_defaults[axis].max;
+    this_axis->set_autoscale = AUTOSCALE_BOTH;
+    this_axis->min_constraint = CONSTRAINT_NONE;
+    this_axis->max_constraint = CONSTRAINT_NONE;
+    this_axis->range_flags = 0;
 }
 
 /* process 'unset {x|y|x2|y2|z}zeroaxis' command */
@@ -1735,40 +1736,43 @@ reset_command()
     for (axis=0; axis<AXIS_ARRAY_SIZE; axis++) {
 
 	AXIS default_axis_state = DEFAULT_AXIS_STRUCT;
+	struct axis *this_axis = &axis_array[axis];
 
 	/* Free contents before overwriting with default values */
-	free(axis_array[axis].formatstring);
-	free(axis_array[axis].ticfmt);
-	if (axis_array[axis].link_udf) {
-	    free(axis_array[axis].link_udf->at);
-	    free(axis_array[axis].link_udf->definition);
-	    free(axis_array[axis].link_udf);
+	free(this_axis->formatstring);
+	free(this_axis->ticfmt);
+	if (this_axis->link_udf) {
+	    free(this_axis->link_udf->at);
+	    free(this_axis->link_udf->definition);
+	    free(this_axis->link_udf);
 	}
-	free_marklist(axis_array[axis].ticdef.def.user);
-	free(axis_array[axis].ticdef.font);
+	free_marklist(this_axis->ticdef.def.user);
+	free(this_axis->ticdef.font);
 	unset_zeroaxis(axis);
-	unset_axislabel_or_title(&axis_array[axis].label);
+	unset_axislabel_or_title(&this_axis->label);
 
 	/* Fill with generic values, then customize */
-	memcpy(axis_array+axis, &default_axis_state, sizeof(AXIS));
+	memcpy(this_axis, &default_axis_state, sizeof(AXIS));
 
 	unset_axislabel(axis);	/* resets rotation on y */
-	unset_range(axis);	/* resets from axis_defaults */
-	axis_array[axis].formatstring = gp_strdup(DEF_FORMAT);
-	axis_array[axis].index = axis;
+	unset_range(this_axis);	/* resets from axis_defaults */
+	this_axis->formatstring = gp_strdup(DEF_FORMAT);
+	this_axis->index = axis;
 
 	/* 'tics' default is on for some, off for the other axes: */
-	unset_tics(axis);
-	axis_array[axis].ticmode = axis_defaults[GPMIN(axis,PARALLEL_AXES)].ticmode;
-	unset_minitics(axis);
-	axis_array[axis].ticdef = default_axis_ticdef;
-	axis_array[axis].minitics = MINI_DEFAULT;
+	unset_tics(this_axis);
+	unset_minitics(this_axis);
+	this_axis->ticdef = default_axis_ticdef;
+	this_axis->minitics = MINI_DEFAULT;
 	if (axis >= PARALLEL_AXES) {
-	    axis_array[axis].ticdef.rangelimited = TRUE;
-	    axis_array[axis].set_autoscale |= AUTOSCALE_FIXMIN | AUTOSCALE_FIXMAX;
+	    this_axis->ticmode = axis_defaults[PARALLEL_AXES].ticmode;
+	    this_axis->ticdef.rangelimited = TRUE;
+	    this_axis->set_autoscale |= AUTOSCALE_FIXMIN | AUTOSCALE_FIXMAX;
+	} else {
+	    this_axis->ticmode = axis_defaults[axis].ticmode;
 	}
 
-	axis_array[axis].linked_to_primary = NULL;
+	this_axis->linked_to_primary = NULL;
 
 	reset_logscale(axis);
     }
