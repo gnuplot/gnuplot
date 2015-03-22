@@ -1,3 +1,10 @@
+2015-03-22  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/cairo.trm:  The cairolatex terminal should not set the flag
+	TERM_ENHANCED_TEXT since latex markup is not the same as gnuplot's
+	enhanced text mode.  This does not hurt plotting per se, but it 
+	causes the "test" command to emit a non-latex string.
+
 2015-03-19  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/boundary.c (do_key_sample) src/graph3d.c src/graphics.c

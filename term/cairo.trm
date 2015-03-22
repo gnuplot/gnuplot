@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: cairo.trm,v 1.71.2.1 2014/11/01 16:48:01 sfeam Exp $
+ * $Id: cairo.trm,v 1.71.2.2 2015/01/15 17:46:08 sfeam Exp $
  */
 
 /* GNUPLOT - cairo.trm */
@@ -272,7 +272,7 @@ TERM_PUBLIC void cairotrm_options()
 	}
 
 	/* Default to enhanced text mode */
-	if (!almost_equals(c_token-1, "termopt$ion")) {
+	if (!almost_equals(c_token-1, "termopt$ion") && !ISCAIROLATEX) {
 		cairo_params->enhanced = TRUE;
 		term->flags |= TERM_ENHANCED_TEXT;
 	}
