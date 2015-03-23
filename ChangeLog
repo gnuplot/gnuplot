@@ -1,3 +1,8 @@
+2015-03-23  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/fig.trm:  Preload user-defined linetype colors and gnuplot's
+	set of named colors so that they are available in fig plots.
+
 2015-03-22  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/cairo.trm:  The cairolatex terminal should not set the flag
