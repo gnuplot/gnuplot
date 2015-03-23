@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: fig.trm,v 1.68 2011/09/27 23:18:02 sfeam Exp $
+ * $Id: fig.trm,v 1.69 2011/11/07 18:32:04 markisch Exp $
  */
 
 /* GNUPLOT - fig.trm */
@@ -63,6 +63,8 @@
  * Don't reset options when 'set term fig <new options>', Petr Mikulik, Aug 24 2002
  * Ethan A Merritt - May 2008:
  *   Bring into line with other terminals for point types, size syntax, font spec
+ * Ethan A Merritt - Mar 2015:
+ *   Load user-defined RGB linetype colors and gnuplot's set of named RGB colors
  */
 
 #include "driver.h"
@@ -176,6 +178,10 @@ static int FIG_poly_vec_max = 999;	/* JFS */
 
 static enum FIG_poly_stat FIG_polyvec_stat;
 
+/* up to 128 slots used for user-defined RGB colors gnuplot's named colors */
+/* 128 slots for a palette */
+static unsigned int FIG_RGB_colors[256];
+
 /* 5 inches wide by 3 inches high */
 #define FIG_XMAX(inch) ((inch) ? 5*FIG_IRES : 12*FIG_MRES)
 #define FIG_YMAX(inch) ((inch) ? 3*FIG_IRES :  8*FIG_MRES)
@@ -220,7 +226,8 @@ static char FIG_version[MAX_ID_LEN+1] = FIG_DEFAULTVERSION;  /* file format vers
 static int FIG_solid = FALSE;                   /* dashed lines or not */
 static int FIG_palette_set = FALSE;	/* PM3D Palette Set ? */
 static int FIG_palette_size = 128;	/* Number of colours in palette */
-static int FIG_palette_offst = 32;	/* Offset from zero for user colours */
+static int FIG_palette_offst = 32;	/* Offset from zero for palette colours */
+static int FIG_rgb_color_offset = 32;	/* First user-defined RGB color */
 static int FIG_fill_style = 20;		/* Full saturation */
 
 static void FIG_poly_clean __PROTO((enum FIG_poly_stat fig_stat));
@@ -308,6 +315,7 @@ const struct gen_table FIG_fonts[] =
 TERM_PUBLIC void
 FIG_options()
 {
+    int i;
     int parse_error = FALSE;
     long temp_max;
     unsigned int tmax_t;
@@ -659,9 +667,53 @@ FIG_init()
 TERM_PUBLIC void
 FIG_graphics()
 {
+    int i, ncolors;
+    struct linestyle_def *this;
+    extern struct gen_table default_color_names_tbl[];
+
     FIG_posx = FIG_posy = 0;
     FIG_polyvec_stat = FIG_poly_new;
-    /* there is no way to have separate pictures in a FIG file */
+
+    if (!FIG_use_color)
+	return;
+
+    /* Dump current set of user-defined RGB linetype colors */
+    ncolors = 0;
+    memset(FIG_RGB_colors, 0, sizeof(FIG_RGB_colors));
+    for (this = first_perm_linestyle; this != NULL; this = this->next) {
+	if (this->lp_properties.pm3d_color.type == TC_RGB) {
+	    /* Load color into FIG_RGB_colors */
+	    FIG_RGB_colors[ncolors] = this->lp_properties.pm3d_color.lt;
+	    FIG_RGB_colors[ncolors] &= 0xffffff;	/* No alpha channel */
+	    /* Write it to the output file */
+	    fprintf(gpoutfile, "%d %d #%2.2x%2.2x%2.2x\n",
+		    O_COLOR_DEF, FIG_rgb_color_offset + ncolors,
+		    (FIG_RGB_colors[ncolors] >> 16) & 0xff,
+		    (FIG_RGB_colors[ncolors] >> 8)  & 0xff,
+		    (FIG_RGB_colors[ncolors]) & 0xff );
+	    ncolors++;
+	}
+	if (ncolors >= 128)
+	    break;
+    }
+
+    /* Now dump gnuplot's set of named RGB colors */
+    for (i=0; i<96; i++) {
+	int colorval = default_color_names_tbl[i].value;
+	if (FIG_rgb_color_offset + ncolors >= 128)
+	    break;
+	fprintf(gpoutfile, "%d %d #%2.2x%2.2x%2.2x\n",
+		    O_COLOR_DEF, FIG_rgb_color_offset + ncolors,
+		    (colorval >> 16) & 0xff,
+		    (colorval >> 8)  & 0xff,
+		    (colorval) & 0xff );
+	FIG_RGB_colors[ncolors] = colorval;
+	ncolors++;
+    }
+
+    /* This should leave space in the header for a 128-entry color palette */
+    FIG_palette_offst = 32 + ncolors;
+
 }
 
 
@@ -1153,6 +1205,11 @@ TERM_PUBLIC int FIG_make_palette(t_sm_palette *palette)
 		(int)( palette->color[i].r * 255 + 0.5 ),
 		(int)( palette->color[i].g * 255 + 0.5 ),
 		(int)( palette->color[i].b * 255 + 0.5 ) );
+
+		FIG_RGB_colors[FIG_palette_offst - FIG_rgb_color_offset + i] =
+		    (int)( palette->color[i].r * 255 + 0.5 ) << 16 |
+		    (int)( palette->color[i].g * 255 + 0.5 ) << 8  |
+		    (int)( palette->color[i].b * 255 + 0.5 );
 	    }
 	}
     } else {
@@ -1170,23 +1227,43 @@ TERM_PUBLIC void FIG_previous_palette()
 TERM_PUBLIC void FIG_set_color(t_colorspec *colorspec)
 {
     double gray = colorspec->value;
-    int new_color;
+    int new_color = FIG_color;
+    int i;
+    unsigned rgbval;
 
-    if (colorspec->type == TC_LT) {
-    	FIG_linetype(colorspec->lt);
-	return;
+    switch (colorspec->type) {
+    case TC_LT:
+	    FIG_linetype(colorspec->lt);
+	    return;
+
+    case TC_FRAC:
+	    new_color = (gray <= 0) ? 0 : (int)(gray * sm_palette.colors);
+	    if (new_color >= FIG_palette_size)
+		new_color = FIG_palette_size - 1;
+	    if (FIG_palette_set == FALSE)
+		int_warn(NO_CARET,"fig: Palette used before set\n");
+	    new_color += FIG_palette_offst;
+	    break;
+
+    case TC_RGB:
+	    /* Look through all of user colors, named colors, and palette colors */
+	    rgbval = colorspec->lt & 0xffffff;
+	    if (rgbval == 0) {
+		new_color = BLACK;
+		break;
+	    }
+	    for (i = 0; i < 256; i++) {
+		if (rgbval == FIG_RGB_colors[i]) {
+		    new_color = FIG_rgb_color_offset + i;
+		    break;
+		}
+	    }
+	    break;
+
+    default:
+	    break;
     }
 
-    if (colorspec->type != TC_FRAC)
-	return;
-
-    new_color = (gray <= 0) ? 0 : (int)(gray * sm_palette.colors);
-    if (new_color >= FIG_palette_size)
-	new_color = FIG_palette_size - 1;
-    if (FIG_palette_set == FALSE) {
-	fprintf(stderr,"fig: Palette used before set\n"); /* Error condition */
-    }
-    new_color += FIG_palette_offst;
     if (FIG_color != new_color) {
 	FIG_poly_clean(FIG_polyvec_stat);
 	FIG_color = new_color;
