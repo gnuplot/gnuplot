@@ -1,3 +1,9 @@
+2015-03-24  Erik Olofsen <olofsen@sourceforge.net>
+
+	* term/tek.trm: RGB + palette support for sixel terminal.
+	The vt100/vt340 sixel emulator is limited to 16 distinct colors per
+	plot but other emulators may permit more.
+
 2015-03-24  <dcb314@users.sourceforge.net>
 
 	* src/mouse.c src/plot2d.c src/wxterminal/gp_cairo.c:
