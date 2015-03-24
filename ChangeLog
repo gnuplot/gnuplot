@@ -1,3 +1,7 @@
+2015-03-24  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/fig.trm term/epson.trm term/tek.trm:  Remove unused variables.
+
 2015-03-24  <dcb314@users.sourceforge.net>
 
 	* src/stats.c (analyze_sgl_column): Incorrect truncation of double to

@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: epson.trm,v 1.25 2008/05/31 20:23:44 sfeam Exp $
+ * $Id: epson.trm,v 1.26 2011/11/19 04:24:17 sfeam Exp $
  *
  */
 
@@ -742,9 +742,7 @@ okidata_dump()
     register unsigned int x;
     int j;
     char cur_char;
-    int prev_char;
 
-    prev_char = 0;
     /* set line spacing 16/144" = 8 dots, turn on single density
      * graphics mode: */
     fprintf(gpoutfile, "\033%c%c\020\033*eP:\003", '%', '9');

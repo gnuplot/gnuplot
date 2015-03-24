@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: tek.trm,v 1.23 2013/12/22 20:47:25 sfeam Exp $
+ * $Id: tek.trm,v 1.24 2015/02/26 19:54:46 sfeam Exp $
  *
  */
 
@@ -786,7 +786,7 @@ SIXEL_vector(unsigned int x, unsigned int y)
     int dx, dy;
     int xinc, yinc;
     unsigned int xplot, yplot;
-    unsigned int i, j, wh, wh2;
+    unsigned int i, wh, wh2;
 
     if (SIXEL_lw <= 1.) {
       b_vector(x,y);
