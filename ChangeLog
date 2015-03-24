@@ -1,3 +1,8 @@
+2015-03-24  Tatsuro MATSUOKA  <tmacchant3@yahoo.co.jp>
+
+	* src/command.c (pause_command): Work around a bug seen for 
+	mingw + SJIS encoding.
+
 2015-03-23  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/fig.trm:  Preload user-defined linetype colors and gnuplot's

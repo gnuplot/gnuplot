@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.292.2.2 2014/12/31 04:32:08 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.292.2.3 2015/01/24 17:23:59 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -1467,7 +1467,10 @@ pause_command()
 # if defined(WGP_CONSOLE) && defined(USE_MOUSE)
 	if (!paused_for_mouse || !MousableWindowOpened()) {
 	    int junk = 0;
-	    if (buf) fprintf(stderr, "%s\n", buf);
+	    if (buf) {
+		/* Use of fprintf() triggers a bug in MinGW + SJIS encoding */
+		fputs(buf,stderr); fputs("\n",stderr);
+	    }
 	    /* cannot use EAT_INPUT_WITH here */
 	    do {
 		junk = getch();
