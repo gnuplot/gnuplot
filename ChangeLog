@@ -1,3 +1,9 @@
+2015-03-24  <dcb314@users.sourceforge.net>
+
+	* src/stats.c (analyze_sgl_column): Incorrect truncation of double to
+	int while calculating absolute deviation.
+	Bug #1584
+
 2015-03-24  Tatsuro MATSUOKA  <tmacchant3@yahoo.co.jp>
 
 	* src/command.c (pause_command): Work around a bug seen for 
