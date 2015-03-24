@@ -60,24 +60,21 @@
  * Gnuplot should be configured with `--with-bitmap-terminals`.
  * The code was inserted here as XTerm now supports Tek and Sixel codes;
  * for this driver to work, the Xterm terminal type should be selected as
- * VT340, and `sixelScrolling` is best selected; this was tested with
- * XTerm version 2.9.7.
+ * VT340, and `sixelScrolling` is best selected. The driver was tested from
+ * XTerm version 2.9.7, and mlterm version 3.3.2.
  * Under VMS, the DECW$TERMINAL may be used (set to dark text and light
  * background).
  * The `set terminal` options are identical to that of the PBM driver,
  * but `grayscale` not available (albeit via rgb specifications).
- * `pm3d` palettes are not supported.
  * Filled polygons are supported; the code was inspired by public domain
  * code by Darel Rex Finley.
- * Line widths greater than one are plotted using filled squares.
- * RGB color specifications are supported and then override the
- * defaults; the linetype is then set as well and may be adjusted as e.g.:
- * `plot x with lines linetype 3 linecolor rgb 'cyan'`.
- * This works only with linewidth 1 and colors are stored in the slot at
- * the linetype index so therefore demo `dashcolor.dem` fails.
- * The default colors are according to the XTerm source:
+ * Line widths greater than one are plotted using filled squares, with
+ * solid line types only.
+ * RGB color specifications are supported and override the defaults,
+ * which are according to the XTerm source:
 
      * VT340:
+     *      mono    color
      *   0: 0%      0%              (bg for light on dark mode)
      *   1: 14%     blue
      *   2: 29%     red
@@ -94,6 +91,15 @@
      *  13: 71%     gray-cyan
      *  14: 86%     gray-yellow
      *  15: 100%    75%
+
+ * To get the default device colors as given above (with offset 1), use:
+
+   unset for [i=1:16] linetype i
+   set for [i=1:16] linetype i linecolor i
+
+   or for black dashed lines:
+
+   set for [i=1:16] linetype i dashtype i linecolor "black"
 */
 
 #define TEK
@@ -174,10 +180,12 @@ TERM_PUBLIC void SIXEL_graphics __PROTO((void));
 TERM_PUBLIC void SIXEL_move __PROTO((unsigned int x, unsigned int y));
 TERM_PUBLIC void SIXEL_vector __PROTO((unsigned int x, unsigned int y));
 TERM_PUBLIC void SIXEL_linetype __PROTO((int linetype));
+TERM_PUBLIC void SIXEL_dashtype __PROTO((int type, t_dashtype *custom_dash_type));
 TERM_PUBLIC void SIXEL_put_text __PROTO((unsigned int x, unsigned int y, const char str[]));
 TERM_PUBLIC int SIXEL_text_angle __PROTO((int));
 TERM_PUBLIC void SIXEL_fillbox __PROTO((int style, unsigned int x1, unsigned int y1, unsigned int width, unsigned int height));
 TERM_PUBLIC void SIXEL_linewidth __PROTO((double linewidth));
+TERM_PUBLIC int SIXEL_make_palette (t_sm_palette *);
 TERM_PUBLIC void SIXEL_set_color __PROTO((t_colorspec *colorspec));
 TERM_PUBLIC void SIXEL_filled_polygon __PROTO((int points, gpiPoint *corners));
 #endif
@@ -502,19 +510,80 @@ SEL_reset()
 #define SIXEL_VTIC  (FNT5X9_HBITS)
 #define SIXEL_HTIC  (FNT5X9_HBITS)
 
+#define SIXEL_COL_UNDEFINED 0
+#define SIXEL_COL_DEFINED 1
+#define SIXEL_COL_USED 2
+
 static int SIXEL_mode;
 static int SIXEL_font;
 static int SIXEL_lt;
+static int SIXEL_dt;
+static int SIXEL_fp, SIXEL_np;
 static double SIXEL_lw;
 static unsigned int SIXEL_xp, SIXEL_yp;
 
 struct SIXEL_colorspec {
-    int spcfd,    /* when overridden with `rgb` as line color */
-        r, g, b;
+    int state;		/* see definitions above */
+    int rgbval;
 };
+
+/* the palette may be used for pre-defined, user-defined, and Gnuplot palette colors.
+   set SIXEL_NCOL to 16 and the number of planes in SIXEL_init() to 5 for VT340 and
+   similar Sixel devices, or higher for more recent implementations */
 
 #define SIXEL_NCOL (16)
 static struct SIXEL_colorspec SIXEL_palette[SIXEL_NCOL];
+
+static int SIXEL_findslot(int rgbval)
+{
+    int i, iopt;
+    int d1, d2, dist, dopt;
+
+/* try to find a slot with a matching rgb value */
+
+    for (i=0; i<SIXEL_NCOL; i++) {
+      if (SIXEL_palette[i].rgbval == rgbval) {
+          SIXEL_palette[i].state = SIXEL_COL_USED;
+	  return i;
+      }
+    }
+
+/* if not found, try to find an undefined slot */
+
+    for (i=0; i<SIXEL_NCOL; i++) {
+      if (SIXEL_palette[i].state == SIXEL_COL_UNDEFINED) {
+        SIXEL_palette[i].state = SIXEL_COL_USED;
+	SIXEL_palette[i].rgbval = rgbval;
+	return i;
+      }
+    }
+
+/* if not found, try to find an unused slot */
+
+    dopt = 0x30000; /* max is 3 times 256 squared */
+
+    for (i=0; i<SIXEL_NCOL; i++) {
+      if (SIXEL_palette[i].state != SIXEL_COL_USED) {
+        SIXEL_palette[i].state = SIXEL_COL_USED;
+	SIXEL_palette[i].rgbval = rgbval;
+	return i;
+      }
+      d1 = (SIXEL_palette[i].rgbval & 0xff0000) >> 16;
+      d2 = (rgbval & 0xff0000) >> 16;
+      dist = (d1-d2)*(d1-d2);
+      d1 = (SIXEL_palette[i].rgbval & 0x00ff00) >> 8;
+      d2 = (rgbval & 0x00ff00) >> 8;
+      dist += (d1-d2)*(d1-d2);
+      d1 = (SIXEL_palette[i].rgbval & 0x0000ff) >> 16;
+      d2 = (rgbval & 0x0000ff);
+      dist += (d1-d2)*(d1-d2);
+      if (dist < dopt) { dopt=dist; iopt=i; }
+    }
+
+/* nothing available, use closest slot w.r.t. color */
+
+    return iopt;
+}
 
 enum SIXEL_id {
     SIXEL_SMALL, SIXEL_MEDIUM, SIXEL_LARGE,
@@ -591,7 +660,7 @@ SIXEL_options()
 	default:
 	    /* reset to default, since term is already set */
 	    SIXEL_font = 1;
-	    SIXEL_mode = 0;
+	    SIXEL_mode = 1;
 	    int_error(c_token, "expecting: {small, medium, large}, {monochrome, color}, and {size x,y}");
 	    break;
 	}
@@ -636,12 +705,12 @@ SIXEL_init()
     unsigned int xpixels = term->xmax;
     unsigned int ypixels = term->ymax;
 
-    /* FIXME: Why 5 planes?  16 predefined colors only require 4. */
+    /* Why 5 planes for VT340?  16 predefined colors only require 4. */
     /* A usable palette would require 7 or 8 (128 or 256 colors). */
-    b_makebitmap(xpixels, ypixels, 5);
+    /* A pixel is empty, or has any of the standard 16 colors, so there
+       are 17 possibilities, and 5 planes are needed... */
 
-    if (SIXEL_mode != 0)
-	b_setlinetype(0);	/* solid lines */
+    b_makebitmap(xpixels, ypixels, 5);
 
     SIXEL_setfont();
 }
@@ -665,12 +734,14 @@ SIXEL_text()
 
     fprintf(gpoutfile,"\033Pq\"1;1\n");
 
-/* output the specified rgb colors */
+/* output the actually used rgb colors */
 
     for (k=0; k<SIXEL_NCOL; k++)
-      if (SIXEL_palette[k].spcfd) 
+      if (SIXEL_palette[k].state == SIXEL_COL_USED) 
         fprintf(gpoutfile,"#%d;2;%d;%d;%d\n",k,
-                SIXEL_palette[k].r,SIXEL_palette[k].g,SIXEL_palette[k].b);
+	  (int) (((SIXEL_palette[k].rgbval & 0xff0000) >> 16) * 100./255.),
+          (int) (((SIXEL_palette[k].rgbval & 0x00ff00) >> 8) * 100./255.),
+          (int) (((SIXEL_palette[k].rgbval & 0x0000ff) * 100./255.)) );
 
     for (j=b_ysize-6; j>=0; j-=6) {
       for (k=1; k<=SIXEL_NCOL; k++) {
@@ -765,7 +836,22 @@ SIXEL_graphics()
     int i;
 
     b_boxfill(FS_EMPTY,0,0,b_xsize,b_ysize);
-    for (i=0; i<SIXEL_NCOL; i++) SIXEL_palette[i].spcfd = 0;
+    for (i=0; i<SIXEL_NCOL; i++) { 
+	struct linestyle_def *this;
+	SIXEL_palette[i].state = SIXEL_COL_UNDEFINED;
+	SIXEL_palette[i].rgbval = 0;
+	for (this = first_perm_linestyle; this != NULL; this = this->next) {
+	    if (i == this->tag-1) {
+		/* Load color into SIXEL_palette[i] */
+		if (this->lp_properties.pm3d_color.type == TC_RGB) {
+		    int rgbval = this->lp_properties.pm3d_color.lt;
+		    SIXEL_palette[i].state = SIXEL_COL_DEFINED;
+		    SIXEL_palette[i].rgbval = rgbval;
+		}
+		break;
+	    }
+	}
+    }
 }
 
 
@@ -858,24 +944,38 @@ SIXEL_vector(unsigned int x, unsigned int y)
 TERM_PUBLIC void
 SIXEL_linetype(int linetype)
 {
-    int tp;
-
-    tp = linetype;
+    int i;
 
     if (SIXEL_mode==0) {
       b_setlinetype(linetype);
     } else {
-      if (tp < 0) {
-        if (tp==-1) b_setlinetype(1);
-        b_setvalue(1);
+      if (linetype < 0) {
+        if (linetype==LT_AXIS) b_setlinetype(1);
+        i = SIXEL_findslot(0); /* find slot with black color */
+        b_setvalue(1+i);
+      } else if (linetype > 0) {
+        i = linetype % SIXEL_NCOL;
+        b_setvalue(1+i);
       } else {
-        tp = 1 + linetype%(SIXEL_NCOL-1);
-        b_setvalue(1+tp);
         b_setlinetype(0);
       }
     }
 
     SIXEL_lt = linetype;
+}
+
+
+TERM_PUBLIC void
+SIXEL_dashtype(int type, t_dashtype *custom_dash_type)
+{
+    if (type >= 0)
+      SIXEL_dt = type;
+    else if (type == DASHTYPE_AXIS)
+      SIXEL_dt = 1;
+    else
+      SIXEL_dt = 0; /* solid, also for custom dash types */
+
+    b_setlinetype(SIXEL_dt);
 }
 
 
@@ -897,6 +997,8 @@ SIXEL_text_angle(int ang)
 TERM_PUBLIC void
 SIXEL_fillbox(int style, unsigned int x1, unsigned int y1, unsigned int width, unsigned int height)
 {
+    if (SIXEL_lt==LT_BACKGROUND) return; /* opaque box! */
+
     b_boxfill(style,x1,y1,width,height);
 }
 
@@ -907,57 +1009,79 @@ SIXEL_linewidth(double linewidth)
     SIXEL_lw = linewidth;
 }
 
-#if (0)
-/* This implementation is not correct. It only changes the contents of
- * an indexed color slot, not the current drawing color.  Whatever color
- * is left in that index slot at the term the bitmap is dumped to the
- * screen will make all previous contents irrelevant.
- * TODO: Implement palette color by adding SIXEL_make_palette().
- *       Re-write SIXEL_set_color() accordingly.
+
+/* the palette defines all colors from the first undefined one;
+   this slot region will be contiguous */
+
+TERM_PUBLIC int SIXEL_make_palette (t_sm_palette *palette)
+{
+    int i, c;
+
+    if (palette == NULL) {
+      SIXEL_np = SIXEL_NCOL;
+      for (SIXEL_fp=0; SIXEL_fp<SIXEL_NCOL; SIXEL_fp++) {
+        if (SIXEL_palette[SIXEL_fp].state != SIXEL_COL_UNDEFINED)
+          SIXEL_np--;
+        else
+          break;
+      }
+      return SIXEL_np;
+    }
+
+    for (i = 0; i < sm_palette.colors; i++) {
+	 SIXEL_palette[SIXEL_fp+i].state = SIXEL_COL_DEFINED;
+	 SIXEL_palette[SIXEL_fp+i].rgbval = 0;
+         c = (int) (palette->color[i].r*256);
+         if (c>255) c = 255;
+	 SIXEL_palette[SIXEL_fp+i].rgbval |= c << 16;
+         c = (int) (palette->color[i].g*256);
+         if (c>255) c = 255;
+	 SIXEL_palette[SIXEL_fp+i].rgbval |= c << 8;
+         c = (int) (palette->color[i].b*256);
+         if (c>255) c = 255;
+	 SIXEL_palette[SIXEL_fp+i].rgbval |= c;
+    }
+
+    return 0;
+}
+
+
+/*
+ * This doesn't really set a color.  Instead it tries to match the color of
+ * a previously defined linetype. If no match is found but there is space in
+ * the palette for a new color, we add this one to the palette.
+ * If no more space is available - too bad.
  */
+
 TERM_PUBLIC void
 SIXEL_set_color(t_colorspec *colorspec)
 {
-    int tp;
-
-    b_setlinetype(0);
+    int i;
 
     switch (colorspec->type) {
-      case TC_LT  : tp = colorspec->lt; break;
-      case TC_RGB : tp = SIXEL_lt; break;
-      default     : return;
+    default:
+	return;
+    case TC_LT:
+	SIXEL_linetype(colorspec->lt);
+	return;
+    case TC_RGB:
+	i = SIXEL_findslot(colorspec->lt);
+        b_setvalue(1+i);
+	return;
+    case TC_FRAC:
+        i = SIXEL_fp + (int)(colorspec->value*SIXEL_np);
+        SIXEL_palette[i].state = SIXEL_COL_USED;
+        b_setvalue(1+i);
+	return;
     }
-
-
-    if (tp == -1) {
-      b_setlinetype(1);
-      b_setvalue(1);
-      return;
-    }
-
-    if (tp < 0) {
-      tp = colorspec->type==TC_RGB ? SIXEL_NCOL+1+tp : 0;
-    } else {
-      tp = 1 + tp%(SIXEL_NCOL-1);
-    }
-
-    if (colorspec->type == TC_RGB) {
-      SIXEL_palette[tp].spcfd = 1;
-      SIXEL_palette[tp].r = (int) (((colorspec->lt & 0xff0000) >> 16) * 100./255.);
-      SIXEL_palette[tp].g = (int) (((colorspec->lt & 0x00ff00) >> 8) * 100./255.);
-      SIXEL_palette[tp].b = (int) ((colorspec->lt & 0x0000ff) * 100./255.);
-      if (SIXEL_lt >= 0) b_setlinetype(SIXEL_lt); /* to have the possibility of both linetype and linecolor */
-    }
-
-    b_setvalue(1+tp);
 }
-#endif
-
 
 TERM_PUBLIC void
 SIXEL_filled_polygon(int points, gpiPoint *corners)
 {
     int nodes, *nodex, py, i, j, swap;
+
+    if (SIXEL_lt==LT_BACKGROUND) return; /* opaque polygon! */
 
     b_setlinetype(0);
 
@@ -1363,8 +1487,19 @@ TERM_TABLE_START(sixel_driver)
 #ifdef USE_MOUSE
     , NULL, NULL, NULL, NULL, NULL
 #endif
-    , 0, 0, /* SIXEL_set_color */ 0
+    , SIXEL_make_palette, NULL, SIXEL_set_color
     , SIXEL_filled_polygon
+    , NULL /* image */
+    , NULL, NULL, NULL
+    , NULL
+    , NULL
+    , 0.
+    , NULL
+#ifdef EAM_BOXED_TEXT
+    , NULL
+#endif 
+    , NULL
+    , SIXEL_dashtype
 TERM_TABLE_END(sixel_driver)
 
 #undef LAST_TERM
@@ -1442,13 +1577,13 @@ START_HELP(tek40)
 "?term sixel",
 "?sixel",
 " Syntax:",
-"    set terminal sixel {<fontsize>} {<mode>} {size <x>,<y>}",
+"    set terminal sixel {<fontsize>} {color|mono} {size <x>,<y>}",
 "",
 " The `sixel` output format was originally used by DEC terminals and printers.",
 " For use with xterm emulation, xterm must be compiled/configured with",
 " \"--enable-sixel-graphics\" and started with \"-ti 340\" on the command line.",
-" Furthermore, the menu option \"sixelScrolling\" should be checked;",
-" foreground black and background white.",
+" Menu option \"sixelScrolling\" should be selected. xterm/vt340 emulation",
+" limits plots to 16 simultaneous colors, but other emulators may permit more.",
 #endif
 #ifdef BITGRAPH
 "?commands set terminal bitgraph",
