@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.353 2015/03/14 20:53:50 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.354 2015/03/15 04:29:12 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -3414,12 +3414,12 @@ parametric_fixup(struct curve_points *start_plot, int *plot_num)
 
 		    /* Fill in the R_AXIS min/max if autoscaling */
 		    /* EAM FIXME: This was Bug #1323.  What about log scale? */
-		    if ((R_AXIS.autoscale & AUTOSCALE_MAX) && (abs(r) > R_AXIS.max)) {
+		    if ((R_AXIS.autoscale & AUTOSCALE_MAX) && (fabs(r) > R_AXIS.max)) {
 			if ((R_AXIS.max_constraint & CONSTRAINT_UPPER)
-			&&  (R_AXIS.max_ub < abs(r)))
+			&&  (R_AXIS.max_ub < fabs(r)))
 			    R_AXIS.max = R_AXIS.max_ub;
 			else
-			    R_AXIS.max = abs(r);
+			    R_AXIS.max = fabs(r);
 		    }
 		    if (R_AXIS.autoscale & AUTOSCALE_MIN) {
 			    R_AXIS.min = 0;

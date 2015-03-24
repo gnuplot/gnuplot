@@ -4,6 +4,9 @@
 
 2015-03-24  <dcb314@users.sourceforge.net>
 
+	* src/mouse.c src/plot2d.c src/wxterminal/gp_cairo.c:
+	Incorrect argument type to abs() or fabs().
+
 	* src/stats.c (analyze_sgl_column): Incorrect truncation of double to
 	int while calculating absolute deviation.
 	Bug #1584
