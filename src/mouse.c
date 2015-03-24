@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: mouse.c,v 1.168.2.5 2014/12/31 04:32:09 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: mouse.c,v 1.168.2.6 2014/12/31 19:45:55 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - mouse.c */
@@ -2048,8 +2048,8 @@ event_motion(struct gp_event_t *ge)
 	     * we compare the movement in x and y direction, and
 	     * change either scale or zscale */
 	    double relx, rely;
-	    relx = fabs(mouse_x - start_x) / term->h_tic;
-	    rely = fabs(mouse_y - start_y) / term->v_tic;
+	    relx = (double)abs(mouse_x - start_x) / (double)term->h_tic;
+	    rely = (double)abs(mouse_y - start_y) / (double)term->v_tic;
 
 	    if (modifier_mask & Mod_Shift) {
 		xyplane.z += (1 + fabs(xyplane.z))

@@ -1,5 +1,5 @@
 /*
- * $Id: gp_cairo.c,v 1.87.2.2 2014/12/13 23:42:53 sfeam Exp $
+ * $Id: gp_cairo.c,v 1.87.2.3 2015/03/06 17:48:33 sfeam Exp $
  */
 
 /* GNUPLOT - gp_cairo.c */
@@ -1153,8 +1153,8 @@ void gp_cairo_draw_image(plot_struct *plot, unsigned int * image, int x1, int y1
 	image_surface = cairo_image_surface_create_for_data((unsigned char*) image,
 				CAIRO_FORMAT_ARGB32, M, N, 4*M);
 
-	scale_x = (double)M/fabs( x2 - x1 );
-	scale_y = (double)N/fabs( y2 - y1 );
+	scale_x = (double)M/(double)abs( x2 - x1 );
+	scale_y = (double)N/(double)abs( y2 - y1 );
 
 	FPRINTF((stderr,"M %d N %d x1 %d y1 %d\n", M, N, x1, y1));
 	cairo_save( plot->cr );
