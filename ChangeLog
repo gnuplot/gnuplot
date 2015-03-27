@@ -1,4 +1,9 @@
-2015-03-24  Erik Olofsen <olofsen@sourceforge.net>
+2015-03-27  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/save.c src/save.h src.show.c:  Axis pointer conversion of
+	save_range, save_tics, save_num_or_time_input.
+
+2015-03-24  Erik Olofsen <olofsen@users.sf.net>
 
 	* term/tek.trm: RGB + palette support for sixel terminal.
 	The vt100/vt340 sixel emulator is limited to 16 distinct colors per
@@ -304,7 +309,7 @@
 
 	* src/mouse.c (load_mouse_variables): MOUSE_BUTTON was not set correctly.
 
-2015-02-11  Erik Olofsen <olofsen@sourceforge.net>
+2015-02-11  Erik Olofsen <olofsen@users.sf.net>
 
 	* configure.vms:  update compile-time variables to include HAVE_VFPRINTF
 	and MAX_PARALLEL_AXES

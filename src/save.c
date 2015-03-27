@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.274 2015/02/15 16:39:22 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.275 2015/02/26 18:43:58 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -57,6 +57,7 @@ static char *RCSid() { return RCSid("$Id: save.c,v 1.274 2015/02/15 16:39:22 bro
 static void save_functions__sub __PROTO((FILE *));
 static void save_variables__sub __PROTO((FILE *));
 static void save_tics __PROTO((FILE *, AXIS_INDEX));
+static void save_ptics __PROTO((FILE *, struct axis *));
 static void save_zeroaxis __PROTO((FILE *,AXIS_INDEX));
 static void save_set_all __PROTO((FILE *));
 
@@ -781,7 +782,7 @@ set origin %g,%g\n",
     save_tics(fp, COLOR_AXIS);
     save_tics(fp, POLAR_AXIS);
     for (axis=0; axis<MAX_PARALLEL_AXES; axis++)
-	save_tics(fp, PARALLEL_AXES+axis);
+	save_ptics(fp, &axis_array[PARALLEL_AXES+axis]);
 
 #define SAVE_AXISLABEL_OR_TITLE(name,suffix,lab)			 \
     {									 \
@@ -1065,85 +1066,85 @@ set origin %g,%g\n",
 
 
 static void
-save_tics(FILE *fp, AXIS_INDEX axis)
+save_ptics(FILE *fp, struct axis *this_axis)
 {
-    if ((axis_array[axis].ticmode & TICS_MASK) == NO_TICS) {
-	fprintf(fp, "unset %stics\n", axis_name(axis));
+    if ((this_axis->ticmode & TICS_MASK) == NO_TICS) {
+	fprintf(fp, "unset %stics\n", axis_name(this_axis->index));
 	return;
     }
     fprintf(fp, "set %stics %s %s scale %g,%g %smirror %s ",
-	    axis_name(axis),
-	    ((axis_array[axis].ticmode & TICS_MASK) == TICS_ON_AXIS)
+	    axis_name(this_axis->index),
+	    ((this_axis->ticmode & TICS_MASK) == TICS_ON_AXIS)
 	    ? "axis" : "border",
-	    (axis_array[axis].tic_in) ? "in" : "out",
-	    axis_array[axis].ticscale, axis_array[axis].miniticscale,
-	    (axis_array[axis].ticmode & TICS_MIRROR) ? "" : "no",
-	    axis_array[axis].tic_rotate ? "rotate" : "norotate");
-    if (axis_array[axis].tic_rotate)
-	fprintf(fp,"by %d ",axis_array[axis].tic_rotate);
-    save_position(fp, &axis_array[axis].ticdef.offset, TRUE);
-    if (axis_array[axis].manual_justify)
-	save_justification(axis_array[axis].label.pos, fp);
+	    (this_axis->tic_in) ? "in" : "out",
+	    this_axis->ticscale, this_axis->miniticscale,
+	    (this_axis->ticmode & TICS_MIRROR) ? "" : "no",
+	    this_axis->tic_rotate ? "rotate" : "norotate");
+    if (this_axis->tic_rotate)
+	fprintf(fp,"by %d ",this_axis->tic_rotate);
+    save_position(fp, &this_axis->ticdef.offset, TRUE);
+    if (this_axis->manual_justify)
+	save_justification(this_axis->label.pos, fp);
     else
 	fputs(" autojustify", fp);
-    fprintf(fp, "\nset %stics ", axis_name(axis));
+    fprintf(fp, "\nset %stics ", axis_name(this_axis->index));
 
-    fprintf(fp, (axis_array[axis].ticdef.rangelimited)?" rangelimit ":" norangelimit ");
+    fprintf(fp, (this_axis->ticdef.rangelimited)?" rangelimit ":" norangelimit ");
 
-    switch (axis_array[axis].ticdef.type) {
+    switch (this_axis->ticdef.type) {
     case TIC_COMPUTED:{
 	    fputs("autofreq ", fp);
 	    break;
 	}
     case TIC_MONTH:{
-	    fprintf(fp, "\nset %smtics", axis_name(axis));
+	    fprintf(fp, "\nset %smtics", axis_name(this_axis->index));
 	    break;
 	}
     case TIC_DAY:{
-	    fprintf(fp, "\nset %sdtics", axis_name(axis));
+	    fprintf(fp, "\nset %sdtics", axis_name(this_axis->index));
 	    break;
 	}
     case TIC_SERIES:
-	if (axis_array[axis].ticdef.def.series.start != -VERYLARGE) {
+	if (this_axis->ticdef.def.series.start != -VERYLARGE) {
 	    save_num_or_time_input(fp,
-			     (double) axis_array[axis].ticdef.def.series.start,
-			     axis);
+			     (double) this_axis->ticdef.def.series.start,
+			     this_axis);
 	    putc(',', fp);
 	}
-	fprintf(fp, "%g", axis_array[axis].ticdef.def.series.incr);
-	if (axis_array[axis].ticdef.def.series.end != VERYLARGE) {
+	fprintf(fp, "%g", this_axis->ticdef.def.series.incr);
+	if (this_axis->ticdef.def.series.end != VERYLARGE) {
 	    putc(',', fp);
 	    save_num_or_time_input(fp,
-			     (double) axis_array[axis].ticdef.def.series.end,
-			     axis);
+			     (double) this_axis->ticdef.def.series.end,
+			     this_axis);
 	}
 	break;
     case TIC_USER:
 	break;
     }
 
-    if (axis_array[axis].ticdef.font && *axis_array[axis].ticdef.font)
-	fprintf(fp, " font \"%s\"", axis_array[axis].ticdef.font);
+    if (this_axis->ticdef.font && *this_axis->ticdef.font)
+	fprintf(fp, " font \"%s\"", this_axis->ticdef.font);
 
-    if (axis_array[axis].ticdef.enhanced == FALSE)
+    if (this_axis->ticdef.enhanced == FALSE)
 	fprintf(fp, " noenhanced");
 
-    if (axis_array[axis].ticdef.textcolor.type != TC_DEFAULT)
-	save_textcolor(fp, &axis_array[axis].ticdef.textcolor);
+    if (this_axis->ticdef.textcolor.type != TC_DEFAULT)
+	save_textcolor(fp, &this_axis->ticdef.textcolor);
 
     putc('\n', fp);
 
-    if (axis_array[axis].ticdef.def.user) {
+    if (this_axis->ticdef.def.user) {
 	struct ticmark *t;
-	fprintf(fp, "set %stics %s ", axis_name(axis),
-		(axis_array[axis].ticdef.type == TIC_USER) ? "" : "add");
+	fprintf(fp, "set %stics %s ", axis_name(this_axis->index),
+		(this_axis->ticdef.type == TIC_USER) ? "" : "add");
 	fputs(" (", fp);
-	for (t = axis_array[axis].ticdef.def.user; t != NULL; t = t->next) {
+	for (t = this_axis->ticdef.def.user; t != NULL; t = t->next) {
 	    if (t->level < 0)	/* Don't save ticlabels read from data file */
 		continue;
 	    if (t->label)
 		fprintf(fp, "\"%s\" ", conv_text(t->label));
-	    save_num_or_time_input(fp, (double) t->position, axis);
+	    save_num_or_time_input(fp, (double) t->position, this_axis);
 	    if (t->level)
 		fprintf(fp, " %d", t->level);
 	    if (t->next) {
@@ -1155,10 +1156,16 @@ save_tics(FILE *fp, AXIS_INDEX axis)
 
 }
 
-void
-save_num_or_time_input(FILE *fp, double x, AXIS_INDEX axis)
+static void
+save_tics(FILE *fp, AXIS_INDEX axis)
 {
-    if (axis_array[axis].datatype == DT_TIMEDATE) {
+    save_ptics(fp, &axis_array[axis]);
+}
+
+void
+save_num_or_time_input(FILE *fp, double x, struct axis *this_axis)
+{
+    if (this_axis->datatype == DT_TIMEDATE) {
 	char s[80];
 
 	putc('"', fp);
@@ -1193,7 +1200,7 @@ save_position(FILE *fp, struct position *pos, TBOOLEAN offset)
 
     /* Save in time coordinates if appropriate */
     if (pos->scalex == first_axes) {
-	save_num_or_time_input(fp, pos->x, FIRST_X_AXIS);
+	save_num_or_time_input(fp, pos->x, &axis_array[FIRST_X_AXIS]);
 	fprintf(fp, ", ");
     } else {
 	fprintf(fp, "%s%g, ", coord_msg[pos->scalex], pos->x);
@@ -1201,7 +1208,7 @@ save_position(FILE *fp, struct position *pos, TBOOLEAN offset)
 
     if (pos->scaley == first_axes) {
 	if (pos->scaley != pos->scalex) fprintf(fp, "first ");
-	save_num_or_time_input(fp, pos->y, FIRST_Y_AXIS);
+	save_num_or_time_input(fp, pos->y, &axis_array[FIRST_Y_AXIS]);
 	fprintf(fp, ", ");
     } else {
 	fprintf(fp, "%s%g, ", 
@@ -1210,7 +1217,7 @@ save_position(FILE *fp, struct position *pos, TBOOLEAN offset)
 
     if (pos->scalez == first_axes) {
 	if (pos->scalez != pos->scaley) fprintf(fp, "first ");
-	save_num_or_time_input(fp, pos->z, FIRST_Z_AXIS);
+	save_num_or_time_input(fp, pos->z, &axis_array[FIRST_Z_AXIS]);
     } else {
 	fprintf(fp, "%s%g", 
 	    pos->scalez == pos->scaley ? "" : coord_msg[pos->scalez], pos->z);
@@ -1225,75 +1232,81 @@ save_position(FILE *fp, struct position *pos, TBOOLEAN offset)
 
 
 void
-save_range(FILE *fp, AXIS_INDEX axis)
+save_prange(FILE *fp, struct axis *this_axis)
 {
-    if (axis_array[axis].linked_to_primary) {
-	fprintf(fp, "set link %c2 ", axis_name(axis)[0]);
-	if (axis_array[axis].link_udf->at)
-	    fprintf(fp, "via %s ", axis_array[axis].link_udf->definition);
-	if (axis_array[axis].linked_to_primary->link_udf->at)
-	    fprintf(fp, "inverse %s ", axis_array[axis].linked_to_primary->link_udf->definition);
+    if (this_axis->linked_to_primary) {
+	fprintf(fp, "set link %c2 ", axis_name(this_axis->index)[0]);
+	if (this_axis->link_udf->at)
+	    fprintf(fp, "via %s ", this_axis->link_udf->definition);
+	if (this_axis->linked_to_primary->link_udf->at)
+	    fprintf(fp, "inverse %s ", this_axis->linked_to_primary->link_udf->definition);
 	fputs("\n\t", fp);
     }
 
-    fprintf(fp, "set %srange [ ", axis_name(axis));
-    if (axis_array[axis].set_autoscale & AUTOSCALE_MIN) {
-	if (axis_array[axis].min_constraint & CONSTRAINT_LOWER ) {
-	    save_num_or_time_input(fp, axis_array[axis].min_lb, axis);
+    fprintf(fp, "set %srange [ ", axis_name(this_axis->index));
+    if (this_axis->set_autoscale & AUTOSCALE_MIN) {
+	if (this_axis->min_constraint & CONSTRAINT_LOWER ) {
+	    save_num_or_time_input(fp, this_axis->min_lb, this_axis);
 	    fputs(" < ", fp);
 	}
 	putc('*', fp);
-	if (axis_array[axis].min_constraint & CONSTRAINT_UPPER ) {
+	if (this_axis->min_constraint & CONSTRAINT_UPPER ) {
 	    fputs(" < ", fp);
-	    save_num_or_time_input(fp, axis_array[axis].min_ub, axis);
+	    save_num_or_time_input(fp, this_axis->min_ub, this_axis);
 	}
     } else {
-	save_num_or_time_input(fp, axis_array[axis].set_min, axis);
+	save_num_or_time_input(fp, this_axis->set_min, this_axis);
     }
     fputs(" : ", fp);
-    if (axis_array[axis].set_autoscale & AUTOSCALE_MAX) {
-	if (axis_array[axis].max_constraint & CONSTRAINT_LOWER ) {
-	    save_num_or_time_input(fp, axis_array[axis].max_lb, axis);
+    if (this_axis->set_autoscale & AUTOSCALE_MAX) {
+	if (this_axis->max_constraint & CONSTRAINT_LOWER ) {
+	    save_num_or_time_input(fp, this_axis->max_lb, this_axis);
 	    fputs(" < ", fp);
 	}
 	putc('*', fp);
-	if (axis_array[axis].max_constraint & CONSTRAINT_UPPER ) {
+	if (this_axis->max_constraint & CONSTRAINT_UPPER ) {
 	    fputs(" < ", fp);
-	    save_num_or_time_input(fp, axis_array[axis].max_ub, axis);
+	    save_num_or_time_input(fp, this_axis->max_ub, this_axis);
 	}
     } else {
-	save_num_or_time_input(fp, axis_array[axis].set_max, axis);
+	save_num_or_time_input(fp, this_axis->set_max, this_axis);
     }
 
     fprintf(fp, " ] %sreverse %swriteback",
-	    ((axis_array[axis].range_flags & RANGE_IS_REVERSED)) ? "" : "no",
-	    axis_array[axis].range_flags & RANGE_WRITEBACK ? "" : "no");
+	    ((this_axis->range_flags & RANGE_IS_REVERSED)) ? "" : "no",
+	    this_axis->range_flags & RANGE_WRITEBACK ? "" : "no");
 
-    if (axis >= PARALLEL_AXES) {
+    if (this_axis->index >= PARALLEL_AXES) {
 	fprintf(fp, "\n");
 	return;
     }
 
-    if (axis_array[axis].set_autoscale && fp == stderr) {
+    if (this_axis->set_autoscale && fp == stderr) {
 	/* add current (hidden) range as comments */
 	fputs("  # (currently [", fp);
-	if (axis_array[axis].set_autoscale & AUTOSCALE_MIN) {
-	    save_num_or_time_input(fp, axis_array[axis].min, axis);
+	if (this_axis->set_autoscale & AUTOSCALE_MIN) {
+	    save_num_or_time_input(fp, this_axis->min, this_axis);
 	}
 	putc(':', fp);
-	if (axis_array[axis].set_autoscale & AUTOSCALE_MAX) {
-	    save_num_or_time_input(fp, axis_array[axis].max, axis);
+	if (this_axis->set_autoscale & AUTOSCALE_MAX) {
+	    save_num_or_time_input(fp, this_axis->max, this_axis);
 	}
 	fputs("] )\n", fp);
     } else
 	putc('\n', fp);
 
     if (fp != stderr) {
-	if (axis_array[axis].set_autoscale & (AUTOSCALE_FIXMIN))
-	    fprintf(fp, "set autoscale %sfixmin\n", axis_name(axis));
-	if (axis_array[axis].set_autoscale & AUTOSCALE_FIXMAX)
-	    fprintf(fp, "set autoscale %sfixmax\n", axis_name(axis));
+	if (this_axis->set_autoscale & (AUTOSCALE_FIXMIN))
+	    fprintf(fp, "set autoscale %sfixmin\n", axis_name(this_axis->index));
+	if (this_axis->set_autoscale & AUTOSCALE_FIXMAX)
+	    fprintf(fp, "set autoscale %sfixmax\n", axis_name(this_axis->index));
     }
+}
+
+void
+save_range(FILE *fp, AXIS_INDEX axis)
+{
+    save_prange(fp, &axis_array[axis]);
 }
 
 static void

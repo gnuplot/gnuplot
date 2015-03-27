@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.339 2015/02/15 16:39:22 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.340 2015/02/26 18:43:58 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -177,7 +177,7 @@ static void show_functions __PROTO((void));
 static int var_show_all = 0;
 
 /* following code segments appear over and over again */
-#define SHOW_NUM_OR_TIME(x, axis) save_num_or_time_input(stderr, x, axis)
+#define SHOW_NUM_OR_TIME(x, axis) save_num_or_time_input(stderr, x, &axis_array[axis])
 #define SHOW_ALL_NL { if (!var_show_all) (void) putc('\n',stderr); }
 
 #define PROGRAM "G N U P L O T"
