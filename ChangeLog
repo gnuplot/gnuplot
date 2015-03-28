@@ -1,3 +1,7 @@
+2015-03-28  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/fig.trm: unused variable
+
 2015-03-24  Erik Olofsen <olofsen@sourceforge.net>
 
 	* term/tek.trm: RGB + palette support for sixel terminal.

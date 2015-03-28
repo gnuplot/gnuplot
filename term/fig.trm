@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: fig.trm,v 1.69 2011/11/07 18:32:04 markisch Exp $
+ * $Id: fig.trm,v 1.69.4.1 2015/03/23 22:30:42 sfeam Exp $
  */
 
 /* GNUPLOT - fig.trm */
@@ -315,7 +315,6 @@ const struct gen_table FIG_fonts[] =
 TERM_PUBLIC void
 FIG_options()
 {
-    int i;
     int parse_error = FALSE;
     long temp_max;
     unsigned int tmax_t;
