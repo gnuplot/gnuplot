@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.459.2.12 2015/03/04 04:23:15 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.459.2.13 2015/03/29 18:08:05 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -2802,7 +2802,8 @@ set_monochrome()
     struct lp_style_type mono_default[] = DEFAULT_MONO_LINETYPES;
 
     monochrome = TRUE;
-    c_token++;
+    if (!END_OF_COMMAND)
+	c_token++;
 
     if (almost_equals(c_token, "def$ault")) {
 	c_token++;
