@@ -1,3 +1,22 @@
+2015-03-29  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/gadgets.c src/gadgets.h src/set.c src/setshow.h src/tables.c
+	src/tables.h src/term_api.h src/term.c src/unset.c term/x11.trm
+	src/show.c docs/gnuplot.doc:
+	New commands
+		[un}set monochrome {linetype N <line-properties>}
+		set color     (same as "unset mono")
+	Maintain a set of monochrome linetypes (all black with varying dot-
+	dash pattern and/or width) in parallel with the default set of 
+	color linetypes.  Switch between the two sets using "set mono" or
+	"set color".  Terminal types that used to provide a separate "mono"
+	keyword now trigger "set mono" as appropriate.  For example,
+	"set term pdf mono" is equivalent to "set term pdf; set mono".
+	Six default monochrome linetypes are pre-defined. These do not exactly
+	duplicate the idiosynchratic mono linetypes of various pre-version 5
+	terminals (be cairo cgm emf fig pdf post ...).  Some further adjustment
+	for individual terminals may be needed.
+
 2015-03-27  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/save.c src/save.h src.show.c:  Axis pointer conversion of

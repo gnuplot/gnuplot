@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: x11.trm,v 1.223 2014/09/04 20:33:14 sfeam Exp $
+ * $Id: x11.trm,v 1.224 2015/02/15 16:39:23 broeker Exp $
  *
  */
 
@@ -2592,17 +2592,6 @@ START_HELP(x11)
 " `pause mouse keystroke`, since it allows the character `q` to be captured",
 " just as all other alphanumeric characters. The `-ctrlq` switch similarly",
 " replaces the <space> hot-key with <ctrl><space> for the same reason.",
-"",
-"2 monochrome_options",
-"?commands set terminal x11 monochrome_options",
-"?set terminal x11 monochrome_options",
-"?set term x11 monochrome_options",
-"?x11 monochrome_options",
-"?monochrome_options",
-"=X resources",
-" For monochrome displays, `gnuplot` does not honor foreground or background",
-" colors.  The default is black-on-white.  `-rv` or `gnuplot*reverseVideo: on`",
-" requests white-on-black.",
 "",
 "2 color_resources",
 "?set terminal x11 color_resources",

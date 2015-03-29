@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.480 2015/03/15 04:29:12 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.481 2015/03/17 19:51:07 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -109,6 +109,7 @@ static void set_margin __PROTO((t_position *));
 static void set_missing __PROTO((void));
 static void set_separator __PROTO((void));
 static void set_datafile_commentschars __PROTO((void));
+static void set_monochrome __PROTO((void));
 #ifdef USE_MOUSE
 static void set_mouse __PROTO((void));
 #endif
@@ -232,6 +233,10 @@ set_command()
 	    break;
 	case S_CLIP:
 	    set_clip();
+	    break;
+	case S_COLOR:
+	    unset_monochrome();
+	    c_token++;
 	    break;
 	case S_COLORSEQUENCE:
 	    set_colorsequence(0);
@@ -371,6 +376,9 @@ set_command()
 	    set_mouse();
 	    break;
 #endif
+	case S_MONOCHROME:
+	    set_monochrome();
+	    break;
 	case S_MULTIPLOT:
 	    term_start_multiplot();
 	    break;
@@ -2784,6 +2792,43 @@ set_missing()
 	int_error(c_token, "expected missing-value string");
 }
 
+/* (version 5) 'set monochrome' command */
+static void
+set_monochrome()
+{
+    struct lp_style_type mono_default[] = DEFAULT_MONO_LINETYPES;
+
+    monochrome = TRUE;
+    c_token++;
+
+    if (almost_equals(c_token, "def$ault")) {
+	c_token++;
+	while (first_mono_linestyle)
+	    delete_linestyle(&first_mono_linestyle, first_mono_linestyle, first_mono_linestyle);
+    }
+
+    if (first_mono_linestyle == NULL) {
+	int i, n = sizeof(mono_default) / sizeof(struct lp_style_type);
+	struct linestyle_def *new;
+	/* copy default list into active list */
+	for (i=n; i>0; i--) {
+	    new = gp_alloc(sizeof(struct linestyle_def), NULL);
+	    new->next = first_mono_linestyle;
+	    new->lp_properties = mono_default[i-1];
+	    new->tag = i;
+	    first_mono_linestyle = new;
+	}
+    }
+
+    if (almost_equals(c_token, "linet$ype") || equals(c_token, "lt")) {
+	/* we can pass this off to the generic "set linetype" code */
+	set_linestyle(&first_mono_linestyle, LP_TYPE);
+    }
+
+    if (!END_OF_COMMAND)
+	int_error(c_token, "unrecognized option");
+}
+
 #ifdef USE_MOUSE
 static void
 set_mouse()
@@ -4652,6 +4697,8 @@ set_terminal()
 	(*term->options)();
     if (interactive && *term_options)
 	fprintf(stderr,"Options are '%s'\n",term_options);
+    if ((term->flags & TERM_MONOCHROME))
+	set_monochrome();
 }
 
 
@@ -5530,6 +5577,7 @@ set_xyzlabel(text_label *label)
  * Change or insert a new linestyle in a list of line styles.
  * Supports the old 'set linestyle' command (backwards-compatible)
  * and the new "set style line" and "set linetype" commands.
+ * destination_class is either LP_STYLE or LP_TYPE.
  */
 static void
 set_linestyle(struct linestyle_def **head, lp_class destination_class)

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.307 2015/03/06 00:52:44 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.308 2015/03/07 06:41:18 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -142,6 +142,9 @@ TBOOLEAN term_initialised;
 /* Whichever one is used first to plot, this locks out the other. */
 void *term_interlock = NULL;
 
+/* true if "set monochrome" */
+TBOOLEAN monochrome = FALSE;
+
 /* true if in multiplot mode */
 TBOOLEAN multiplot = FALSE;
 
@@ -198,6 +201,7 @@ TBOOLEAN ignore_enhanced_text = FALSE;
 
 /* Recycle count for user-defined linetypes */
 int linetype_recycle_count = 0;
+int mono_recycle_count = 4;
 
 
 /* Internal variables */
@@ -2790,6 +2794,25 @@ load_linetype(struct lp_style_type *lp, int tag)
     TBOOLEAN recycled = FALSE;
 
 recycle:
+
+    if (monochrome && tag > 0) {
+	for (this = first_mono_linestyle; this; this = this->next) {
+	    if (tag == this->tag) {
+		*lp = this->lp_properties;
+		return;
+	    }
+	}
+#if (0)
+	/* This linetype wasn't defined explicitly.		*/
+	/* Should we recycle one of the first N linetypes?	*/
+	if (tag > mono_recycle_count && mono_recycle_count > 0) {
+	    tag = (tag-1) % mono_recycle_count + 1;
+	    goto recycle;
+	}
+#endif
+	return;
+    }
+
     this = first_perm_linestyle;
     while (this != NULL) {
 	if (this->tag == tag) {

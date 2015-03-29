@@ -424,6 +424,7 @@ extern struct text_label *first_label;
 
 extern struct linestyle_def *first_linestyle;
 extern struct linestyle_def *first_perm_linestyle;
+extern struct linestyle_def *first_mono_linestyle;
 
 extern struct arrowstyle_def *first_arrowstyle;
 

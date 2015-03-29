@@ -1,5 +1,5 @@
 /*
- * $Id: term_api.h,v 1.137 2014/12/28 13:09:36 markisch Exp $
+ * $Id: term_api.h,v 1.138 2015/03/06 00:52:44 sfeam Exp $
  */
 
 /* GNUPLOT - term_api.h */
@@ -138,6 +138,15 @@ typedef struct lp_style_type {	/* contains all Line and Point properties */
                                  0xf0e442, 0x0072b2, 0xe51e10, 0x000000 }
 #define PODO_COLOR_SEQUENCE { 0x000000, 0xe69f00, 0x56b4e9, 0x009e73, \
                               0xf0e442, 0x0072b2, 0xd55e00, 0xcc79a7 }
+
+#define DEFAULT_MONO_LINETYPES { \
+	{0, LT_BLACK, 0, DASHTYPE_SOLID, 0, 1.0 /*linewidth*/, PTSZ_DEFAULT, 0, BLACK_COLORSPEC, DEFAULT_DASHPATTERN}, \
+	{0, LT_BLACK, 0, 1 /* dt 2 */, 0, 1.0 /*linewidth*/, PTSZ_DEFAULT, 0, BLACK_COLORSPEC, DEFAULT_DASHPATTERN}, \
+	{0, LT_BLACK, 0, 2 /* dt 3 */, 0, 1.0 /*linewidth*/, PTSZ_DEFAULT, 0, BLACK_COLORSPEC, DEFAULT_DASHPATTERN}, \
+	{0, LT_BLACK, 0, 3 /* dt 4 */, 0, 1.0 /*linewidth*/, PTSZ_DEFAULT, 0, BLACK_COLORSPEC, DEFAULT_DASHPATTERN}, \
+	{0, LT_BLACK, 0, 0 /* dt 1 */, 0, 2.0 /*linewidth*/, PTSZ_DEFAULT, 0, BLACK_COLORSPEC, DEFAULT_DASHPATTERN}, \
+	{0, LT_BLACK, 0, DASHTYPE_CUSTOM, 0, 1.2 /*linewidth*/, PTSZ_DEFAULT, 0, BLACK_COLORSPEC, {{16.,8.,2.,5.,2.,5.,2.,8.},{}}} \
+				}
 
 typedef enum e_arrow_head {
 	NOHEAD = 0,
@@ -409,6 +418,7 @@ extern TBOOLEAN curr_arrow_headfixedsize;
 
 /* Recycle count for user-defined linetypes */
 extern int linetype_recycle_count;
+extern int mono_recycle_count;
 
 /* Current 'output' file: name and open filehandle */
 extern char *outstr;
@@ -426,6 +436,7 @@ extern FILE *gpoutfile;
 extern FILE *gppsfile;
 extern char *PS_psdir;
 
+extern TBOOLEAN monochrome;
 extern TBOOLEAN multiplot;
 
 /* 'set encoding' support: index of current encoding ... */

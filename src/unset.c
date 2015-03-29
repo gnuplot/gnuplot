@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.215 2015/03/14 02:44:35 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.216 2015/03/22 06:11:52 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -316,6 +316,9 @@ unset_command()
 	free(df_commentschars);
 	df_commentschars = gp_strdup(DEFAULT_COMMENTS_CHARS);
 	df_unset_datafile_binary();
+	break;
+    case S_MONOCHROME:
+	unset_monochrome();
 	break;
 #ifdef USE_MOUSE
     case S_MOUSE:
@@ -1237,6 +1240,17 @@ static void
 unset_month_day_tics(AXIS_INDEX axis)
 {
     axis_array[axis].ticdef.type = TIC_COMPUTED;
+}
+
+void
+unset_monochrome()
+{
+    monochrome = FALSE;
+    if (equals(c_token,"lt") || almost_equals(c_token,"linet$ype")) {
+	c_token++;
+	if (!END_OF_COMMAND)
+	    unset_linestyle(&first_mono_linestyle);
+    }
 }
 
 /* process 'unset offsets' command */
