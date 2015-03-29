@@ -4,7 +4,7 @@
 	src/tables.h src/term_api.h src/term.c src/unset.c term/x11.trm
 	src/show.c docs/gnuplot.doc:
 	New commands
-		[un}set monochrome {linetype N <line-properties>}
+		{un}set monochrome {linetype N <line-properties>}
 		set color     (same as "unset mono")
 	Maintain a set of monochrome linetypes (all black with varying dot-
 	dash pattern and/or width) in parallel with the default set of 
@@ -14,8 +14,8 @@
 	"set term pdf mono" is equivalent to "set term pdf; set mono".
 	Six default monochrome linetypes are pre-defined. These do not exactly
 	duplicate the idiosynchratic mono linetypes of various pre-version 5
-	terminals (be cairo cgm emf fig pdf post ...).  Some further adjustment
-	for individual terminals may be needed.
+	terminals (be cairo cgm emf fig pdf post ...).
+	Some further adjustment for individual terminals may be needed.
 
 2015-03-27  Ethan A Merritt  <merritt@u.washington.edu>
 
