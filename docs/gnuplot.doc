@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.902.2.33 2015/03/03 06:17:20 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.902.2.34 2015/03/04 04:23:15 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -259,6 +259,7 @@ C
 # reset session                            # restore initial state of current session
 # set arrow <tag> from <start> length <len> angle <ang>
 # set colorsequence default|classic|podo   # colors used by successive plot elements
+# set monochrome                           # alternative set of linetypes
 # set dashtype <tag> <dash-spec>           # user-defined dash patterns
 # set link x2 via f(x) inverse g(x)        # allows non-linear axis scaling
 # set fit quiet|results|brief|verbose      # control the amount of fit output
@@ -2319,6 +2320,7 @@ Ffigure_newsyntax
       plot sin(x) lt palette frac 0.3   # fractional value along the palette
 
  See `colorspec`, `show colornames`, `hsv`, `set palette`, `cbrange`.
+ See also `set monochrome`.
 
  Linetypes also have an associated dot-dash pattern although not all terminal
  types are capable of using it. Gnuplot version 5 allows you to specify the
@@ -7695,6 +7697,15 @@ Ffigure_mapcontours
 
  To set the box width to an absolute value of 2 use
        set boxwidth 2 absolute
+3 color
+?commands set color
+?set color
+ Gnuplot supports two alternative sets of linetypes. The default set uses a
+ different color for each linetype, although it also allows you to draw dotted
+ or dashed lines in that color.  The alternative monochrome set uses only
+ dot/dash pattern or linewidth to distinguish linetypes. The `set color`
+ command selects the color linetypes.  See `set monochrome`, `set linetype`,
+ and `set colorsequence`.
 3 colorsequence
 ?commands set colorsequence
 ?set colorsequence
@@ -9936,6 +9947,31 @@ Ffigure_missing
  labels will be included in either the margin calculation or the calculation
  of the positions of other text to be written in the margin.  This can lead
  to tic labels overwriting other text if the axis is very close to the border.
+3 monochrome
+?commands set monochrome
+?set monochrome
+?monochrome
+ Syntax:
+      set monochrome {linetype N <linetype properties>}
+
+ The `set monochrome` command selects an alternative set of linetypes that
+ differ by dot/dash pattern or line width rather than by color.  This command
+ replaces the monochrome option offered by certain terminal types in earlier 
+ versions of gnuplot.  For backward compatibility these terminal types now
+ implicitly invoke "set monochrome" if their own "mono" option is present.
+ For example,
+      set terminal pdf mono
+ is equivalent to
+      set terminal pdf
+      set mono
+
+ Selecting monochrome mode does not prevent you from explicitly drawing lines
+ using RGB or palette colors, but see also `set palette grey`.
+ Six monochrome linetypes are defined by default.  You can change their
+ properties or add additional monochrome linetypes by using the full form of the
+ command.  Changes made to the monochrome linetypes do not affect the color
+ linetypes and vice versa.  To restore the usual set of color linetypes, use
+ either `unset monochrome` or `set color`.
 3 mouse
 ?commands set mouse
 ?commands unset mouse
@@ -14167,6 +14203,10 @@ Ffigure_missing
  Subsequent use of this linetype will use whatever characteristics and color
  that is native to the current terminal type (i.e. the default linetypes
  properties available in gnuplot versions prior to 4.6).
+3 monochrome
+?unset monochrome
+ Switches the active set of linetypes from monochrome to color.
+ Equivalent to `set color`.
 3 output
 ?unset output
  Because some terminal types allow multiple plots to be written into a single

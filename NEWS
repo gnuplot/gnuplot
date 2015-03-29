@@ -1,5 +1,6 @@
 Changes since 5.0 release
 =========================
+* NEW "set mono" (full command "set monochrome {linetype lt <line-properties>})
 * NEW "set fit nolog" suppresses output to log file
 * NEW sixel terminal supports RGB and palette colors, but only 16 at a time :-(
 * CHANGE autoconfigure of Qt5 support now looks for --variable=host_bins

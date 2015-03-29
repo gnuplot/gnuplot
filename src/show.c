@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.326.2.8 2015/02/26 18:43:47 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.326.2.9 2015/03/04 04:23:15 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -166,7 +166,7 @@ static void show_plot __PROTO((void));
 static void show_variables __PROTO((void));
 
 static void show_linestyle __PROTO((int tag));
-static void show_linetype __PROTO((int tag));
+static void show_linetype __PROTO((struct linestyle_def *listhead, int tag));
 static void show_arrowstyle __PROTO((int tag));
 static void show_arrow __PROTO((int tag));
 
@@ -307,7 +307,14 @@ show_command()
 	break;
     case S_LINETYPE:
 	CHECK_TAG_GT_ZERO;
-	show_linetype(tag);
+	show_linetype(first_perm_linestyle, tag);
+	break;
+    case S_MONOCHROME:
+	if (equals(c_token,"lt") || almost_equals(c_token,"linet$ype")) {
+	    c_token++;
+	    CHECK_TAG_GT_ZERO;
+	}
+	show_linetype(first_mono_linestyle, tag);
 	break;
     case S_DASHTYPE:
 	CHECK_TAG_GT_ZERO;
@@ -3201,12 +3208,12 @@ show_linestyle(int tag)
 
 /* Show linetype number <tag> (0 means show all) */
 static void
-show_linetype(int tag)
+show_linetype(struct linestyle_def *listhead, int tag)
 {
     struct linestyle_def *this_linestyle;
     TBOOLEAN showed = FALSE;
 
-    for (this_linestyle = first_perm_linestyle; this_linestyle != NULL;
+    for (this_linestyle = listhead; this_linestyle != NULL;
 	 this_linestyle = this_linestyle->next) {
 	if (tag == 0 || tag == this_linestyle->tag) {
 	    showed = TRUE;
@@ -3218,7 +3225,7 @@ show_linetype(int tag)
     if (tag > 0 && !showed)
 	int_error(c_token, "linetype not found");
 
-    if (tag == 0 && linetype_recycle_count != 0)
+    if (tag == 0 && linetype_recycle_count != 0 && listhead == first_perm_linestyle)
 	fprintf(stderr, "\tLinetypes repeat every %d unless explicitly defined\n",
 		linetype_recycle_count);
 }

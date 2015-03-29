@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: tables.c,v 1.133 2014/06/25 05:45:21 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: tables.c,v 1.133.2.1 2015/03/03 06:17:42 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - tables.c */
@@ -212,6 +212,7 @@ const struct gen_table set_tbl[] =
 #ifdef USE_MOUSE
     { "mo$use", S_MOUSE },
 #endif
+    { "mono$chrome", S_MONOCHROME },
     { "multi$plot", S_MULTIPLOT },
 
     { "mxt$ics", S_MXTICS },
@@ -234,6 +235,7 @@ const struct gen_table set_tbl[] =
     { "pa$rametric", S_PARAMETRIC },
     { "pm$3d", S_PM3D },
     { "pal$ette", S_PALETTE },
+    { "color", S_COLOR },
     { "colorb$ox", S_COLORBOX },
     { "colorn$ames", S_COLORNAMES },
     { "colors$equence", S_COLORSEQUENCE },
@@ -443,8 +445,8 @@ const struct gen_table set_palette_tbl[] =
 {
     { "pos$itive",	S_PALETTE_POSITIVE },
     { "neg$ative",	S_PALETTE_NEGATIVE },
-    { "gray",		S_PALETTE_GRAY },
-    { "grey",		S_PALETTE_GRAY },
+    { "gray$scale",	S_PALETTE_GRAY },
+    { "grey$scale",	S_PALETTE_GRAY },
     { "col$or",		S_PALETTE_COLOR },
     { "rgb$formulae",	S_PALETTE_RGBFORMULAE },
     { "def$ined",       S_PALETTE_DEFINED },
