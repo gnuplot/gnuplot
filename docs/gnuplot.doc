@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.941 2015/03/03 06:17:04 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.942 2015/03/29 17:26:00 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -794,6 +794,14 @@ C  need @ in table, so end and restart the table !
  Complex constants are expressed as {<real>,<imag>}, where <real> and <imag>
  must be numerical constants.  For example, {3,2} represents 3 + 2i; {0,1}
  represents 'i' itself.  The curly braces are explicitly required here.
+
+=octal
+=hexadecimal
+ Integer constants are interpreted via the C library routine strtoll().
+ This means that constants beginning with "0" are interpreted as octal,
+ and constants beginning with "0x" or "0X" are interpreted as hexadecimal.
+
+ Floating point constants are interpreted via the C library routin atof().
 
 =division
  Note that gnuplot uses both "real" and "integer" arithmetic, like FORTRAN and
