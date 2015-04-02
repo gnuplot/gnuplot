@@ -1,3 +1,14 @@
+2015-04-02  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* compile: Add script required by automake.
+
+	* demo/plugin/Makefile.am (demo_plugin_so_SOURCES): Add
+	gnuplot_plugin.h.
+	(EXTRA_DIST): Add plugin.dem.
+
+	* demo/Makefile.am.in (Makefile.am): Subdir 'plugin' has a
+	Makefile.am, so it should not be in EXTRA_DIST.
+
 2015-03-29  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/gadgets.c src/gadgets.h src/set.c src/setshow.h src/tables.c
@@ -7,7 +18,7 @@
 		{un}set monochrome {linetype N <line-properties>}
 		set color     (same as "unset mono")
 	Maintain a set of monochrome linetypes (all black with varying dot-
-	dash pattern and/or width) in parallel with the default set of 
+	dash pattern and/or width) in parallel with the default set of
 	color linetypes.  Switch between the two sets using "set mono" or
 	"set color".  Terminal types that used to provide a separate "mono"
 	keyword now trigger "set mono" as appropriate.  For example,
