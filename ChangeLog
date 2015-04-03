@@ -1,3 +1,14 @@
+2015-04-03  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/axis.h (ACTUAL_STORE_WITH_LOG_AND_UPDATE_RANGE):
+	If the value being stored to a log-scaled axis is negative, the stored
+	value should be NaN rather than the un-logged original value.
+
+	* src/plot2d.c (get_data): But even that doesn't help if UNDEF_ACTION
+	re-stores the orginal value, so don't do that.  Together these changes
+	fix the problem that negative values mapped onto a log-scaled cbaxis
+	produced a valid (but wrong) color rather than being treated as NaN.
+
 2015-04-02  Karl Ratzsch  <ratzsch@uni-freiburg.de>
 
 	* docs/gnuplot.doc:  Document the C library routines used to parse
