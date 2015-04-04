@@ -1,5 +1,5 @@
 /*
- * $Id: term_api.h,v 1.138 2015/03/06 00:52:44 sfeam Exp $
+ * $Id: term_api.h,v 1.139 2015/03/29 17:26:00 sfeam Exp $
  */
 
 /* GNUPLOT - term_api.h */
@@ -145,8 +145,8 @@ typedef struct lp_style_type {	/* contains all Line and Point properties */
 	{0, LT_BLACK, 0, 2 /* dt 3 */, 0, 1.0 /*linewidth*/, PTSZ_DEFAULT, 0, BLACK_COLORSPEC, DEFAULT_DASHPATTERN}, \
 	{0, LT_BLACK, 0, 3 /* dt 4 */, 0, 1.0 /*linewidth*/, PTSZ_DEFAULT, 0, BLACK_COLORSPEC, DEFAULT_DASHPATTERN}, \
 	{0, LT_BLACK, 0, 0 /* dt 1 */, 0, 2.0 /*linewidth*/, PTSZ_DEFAULT, 0, BLACK_COLORSPEC, DEFAULT_DASHPATTERN}, \
-	{0, LT_BLACK, 0, DASHTYPE_CUSTOM, 0, 1.2 /*linewidth*/, PTSZ_DEFAULT, 0, BLACK_COLORSPEC, {{16.,8.,2.,5.,2.,5.,2.,8.},{}}} \
-				}
+	{0, LT_BLACK, 0, DASHTYPE_CUSTOM, 0, 1.2 /*linewidth*/, PTSZ_DEFAULT, 0, BLACK_COLORSPEC, {{16.,8.,2.,5.,2.,5.,2.,8.},{0,0,0,0,0,0,0,0}}} \
+}
 
 typedef enum e_arrow_head {
 	NOHEAD = 0,
