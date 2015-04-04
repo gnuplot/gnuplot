@@ -1,3 +1,8 @@
+2015-04-04  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/term_api.h (DEFAULT_MONO_LINETYPES): Empty initializer is
+	not allowed.
+
 2015-04-03  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/axis.h (ACTUAL_STORE_WITH_LOG_AND_UPDATE_RANGE):
