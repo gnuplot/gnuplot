@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.942 2015/03/29 17:26:00 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.943 2015/04/02 20:49:16 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -9984,7 +9984,7 @@ Ffigure_missing
       set mono
 
  Selecting monochrome mode does not prevent you from explicitly drawing lines
- using RGB or palette colors, but see also `set palette grey`.
+ using RGB or palette colors, but see also `set palette gray`.
  Six monochrome linetypes are defined by default.  You can change their
  properties or add additional monochrome linetypes by using the full form of the
  command.  Changes made to the monochrome linetypes do not affect the color
