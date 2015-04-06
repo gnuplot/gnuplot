@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.296.2.11 2015/03/07 06:41:10 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.296.2.12 2015/03/29 18:08:07 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -663,7 +663,7 @@ term_apply_lp_properties(struct lp_style_type *lp)
 	(*term->dashtype) (dt, &custom_dash_pattern);
     else if (dt == DASHTYPE_SOLID)
 	(*term->dashtype) (dt, NULL);
-    else if (dt > 0)
+    else if (dt >= 0)
 	/* The null_dashtype() routine or a version 5 terminal's private  */
 	/* dashtype routine converts this into a call to term->linetype() */
 	/* yielding the same result as in version 4 except possibly for a */
