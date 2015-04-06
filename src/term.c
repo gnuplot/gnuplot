@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.309 2015/03/29 17:26:00 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.310 2015/04/07 05:21:43 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -1720,17 +1720,12 @@ test_term()
 	int_error(NO_CARET, "terminal type is unknown");
     else {
 	char tbuf[64];
-	strcpy(tbuf,term->name);
-	strcat(tbuf,"  terminal test");
 	(void) (*t->justify_text) (LEFT);
+	sprintf(tbuf,"%s  terminal test", term->name);
 	(*t->put_text) (x0 + t->h_char * 2, y0 + ymax_t - t->v_char, tbuf);
+	sprintf(tbuf, "gnuplot version %s.%s  ", gnuplot_version, gnuplot_patchlevel);
+	(*t->put_text) (x0 + t->h_char * 2, y0 + ymax_t - t->v_char * 2.25, tbuf);
     }
-
-#ifdef USE_MOUSE
-    if (t->set_ruler)
-	(*t->put_text) (x0 + t->h_char * 2, y0 + ymax_t - t->v_char * 2.5,
-			"Mouse and hotkeys are supported");
-#endif
 
     (*t->linetype) (LT_AXIS);
     (*t->move) (x0 + xmax_t / 2, y0);
@@ -1845,6 +1840,7 @@ test_term()
     /* test some arrows */
     (*t->linewidth) (1.0);
     (*t->linetype) (0);
+    (*t->dashtype) (DASHTYPE_SOLID, NULL);
     x = x0 + xmax_t * .375;
     y = y0 + ymax_t * .250;
     xl = t->h_tic * 7;
