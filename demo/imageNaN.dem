@@ -95,9 +95,21 @@ $DATA << EOD
 
 EOD
 
+unset xtics
+unset ytics
+unset key
+
 set title "image from non-matrix data"
-set termopt enhanced
-set label 1 at 3,2 "NaN pixel \nshould appear as\nbackground" front center
+set label 1 at 3,2 "NaN\nshould appear as\nbackground" front center
 plot $DATA with image 
-pause -1
+pause -1 "Hit return to continue"
+
+set title "negative values mapped to log-scale colorbar"
+set label 2 at 0,2.5 "Negative values become NaN\nwith a log-scale color mapping"
+set cbrange [0.1:10]
+set log cb
+plot $DATA with image, $DATA using 1:2:(sprintf("%g",$3)) with labels tc rgb "green"
+
+pause -1 "Hit return to continue"
+
 reset
