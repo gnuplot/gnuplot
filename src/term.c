@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.310 2015/04/07 05:21:43 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.311 2015/04/07 18:04:08 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -2791,7 +2791,7 @@ load_linetype(struct lp_style_type *lp, int tag)
 
 recycle:
 
-    if (monochrome && tag > 0) {
+    if ((tag > 0) && (monochrome || (term->flags & TERM_MONOCHROME))) {
 	for (this = first_mono_linestyle; this; this = this->next) {
 	    if (tag == this->tag) {
 		*lp = this->lp_properties;
