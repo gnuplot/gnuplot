@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.225.2.17 2013/12/31 16:01:19 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.225.2.18 2014/04/23 19:37:45 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -1933,13 +1933,10 @@ test_term()
 	strcat(tbuf,"  terminal test");
 	(void) (*t->justify_text) (LEFT);
 	(*t->put_text) (x0 + t->h_char * 2, y0 + ymax_t - t->v_char * 0.5, tbuf);
+	sprintf(tbuf, "gnuplot version %s.%s  ", gnuplot_version, gnuplot_patchlevel);
+	(*t->put_text) (x0 + t->h_char * 2, y0 + ymax_t - t->v_char * 2.0, tbuf);
     }
 
-#ifdef USE_MOUSE
-    if (t->set_ruler) {
-	(*t->put_text) (x0 + t->h_char * 5, y0 + ymax_t - t->v_char * 3, "Mouse and hotkeys are supported, hit: h r m 6");
-    }
-#endif
     (*t->linetype)(LT_BLACK);
     (*t->linetype) (LT_AXIS);
     (*t->move) (x0 + xmax_t / 2, y0);

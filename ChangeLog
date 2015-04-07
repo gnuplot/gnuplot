@@ -1,3 +1,7 @@
+2015-04-07  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term.c (test_term): print gnuplot version in "test" command.
+
 2015-02-23  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* axis.c:  Special case code for axis tickmarks in polar plots was 
