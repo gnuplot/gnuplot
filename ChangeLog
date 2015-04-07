@@ -1,7 +1,11 @@
-2015-04-06  Ethan A Merritt  <merritt@u.washington.edu>
+2015-04-07  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/term.c (termp_apply_lp_properties):  Fix incorrect assumption
 	that dashtype 1 is always solid and already set by default.
+	Bug #1588
+
+	* term/emf.trm (EMF_linetype):  Two linetypes (LT_SOLID LT_AXIS) have
+	an intrinsic dash pattern.
 	Bug #1588
 
 	* src/term.c (test_term):  Use same sequence of setting line properties

@@ -1,5 +1,5 @@
 /* Hey Emacs this is -*- C -*-
- * $Id: emf.trm,v 1.98 2014/05/19 19:33:05 sfeam Exp $
+ * $Id: emf.trm,v 1.99 2014/08/20 04:42:44 sfeam Exp $
  */
 
 /* GNUPLOT - emf.trm */
@@ -977,8 +977,13 @@ EMF_linetype(int linetype)
 	linetype = LT_BACKGROUND;
 	
     emf_linetype = linetype;
-
     EMF_linecolor(linetype);
+
+    if (linetype == LT_SOLID)
+	EMF_load_dashtype(0);
+	
+    if (linetype == LT_AXIS)
+	EMF_load_dashtype(2);
 }
 
 TERM_PUBLIC void
