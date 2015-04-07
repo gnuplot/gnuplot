@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.459.2.13 2015/03/29 18:08:05 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.459.2.14 2015/03/30 15:34:16 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -109,6 +109,7 @@ static void set_margin __PROTO((t_position *));
 static void set_missing __PROTO((void));
 static void set_separator __PROTO((void));
 static void set_datafile_commentschars __PROTO((void));
+static void init_monochrome __PROTO((void));
 static void set_monochrome __PROTO((void));
 #ifdef USE_MOUSE
 static void set_mouse __PROTO((void));
@@ -2797,19 +2798,9 @@ set_missing()
 
 /* (version 5) 'set monochrome' command */
 static void
-set_monochrome()
+init_monochrome()
 {
     struct lp_style_type mono_default[] = DEFAULT_MONO_LINETYPES;
-
-    monochrome = TRUE;
-    if (!END_OF_COMMAND)
-	c_token++;
-
-    if (almost_equals(c_token, "def$ault")) {
-	c_token++;
-	while (first_mono_linestyle)
-	    delete_linestyle(&first_mono_linestyle, first_mono_linestyle, first_mono_linestyle);
-    }
 
     if (first_mono_linestyle == NULL) {
 	int i, n = sizeof(mono_default) / sizeof(struct lp_style_type);
@@ -2823,6 +2814,22 @@ set_monochrome()
 	    first_mono_linestyle = new;
 	}
     }
+}
+
+static void
+set_monochrome()
+{
+    monochrome = TRUE;
+    if (!END_OF_COMMAND)
+	c_token++;
+
+    if (almost_equals(c_token, "def$ault")) {
+	c_token++;
+	while (first_mono_linestyle)
+	    delete_linestyle(&first_mono_linestyle, first_mono_linestyle, first_mono_linestyle);
+    }
+
+    init_monochrome();
 
     if (almost_equals(c_token, "linet$ype") || equals(c_token, "lt")) {
 	/* we can pass this off to the generic "set linetype" code */
@@ -4705,7 +4712,7 @@ set_terminal()
     if (interactive && *term_options)
 	fprintf(stderr,"Options are '%s'\n",term_options);
     if ((term->flags & TERM_MONOCHROME))
-	set_monochrome();
+	init_monochrome();
 }
 
 

@@ -11,6 +11,11 @@
 	* src/term.c (test_term):  Use same sequence of setting line properties
 	linewidth/linetype/dashtype in the "test" command as in the core code.
 
+	* src/set.c src/term.c:  Adjust the new "set mono" option so that 
+	"set term xxx mono" is not persistent. I.e., it doesn't leave "set mono"
+	in effect after the next terminal change.  This makes it more like the
+	version 4 mono terminal option.  "set mono" itself is still persistent.
+
 2015-04-04  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/term_api.h (DEFAULT_MONO_LINETYPES): Empty initializer is
