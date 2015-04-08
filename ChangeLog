@@ -1,3 +1,8 @@
+2015-04-08  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/fit.c (setvarcovar):  Allocated size of string for FIT_COV_*_*
+	variables was too small, corrupting the allocation heap.
+
 2015-04-07  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/term.c (termp_apply_lp_properties):  Fix incorrect assumption

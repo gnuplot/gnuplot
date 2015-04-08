@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: fit.c,v 1.152 2015/01/20 02:10:42 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: fit.c,v 1.153 2015/02/26 18:43:58 sfeam Exp $"); }
 #endif
 
 /*  NOTICE: Change of Copyright Status
@@ -1410,7 +1410,7 @@ static void
 setvarcovar(char *varname1, char *varname2, double value)
 {
     /* The name of the (new) covariance variable */
-    char * pCovValName = (char *) gp_alloc(strlen(varname1) + strlen(varname2) + 6, "setvarcovar");
+    char * pCovValName = (char *) gp_alloc(strlen(varname1) + strlen(varname2) + 10, "setvarcovar");
     sprintf(pCovValName, "FIT_COV_%s_%s", varname1, varname2);
     setvar(pCovValName, value);
     free(pCovValName);
