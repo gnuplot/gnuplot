@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: fit.c,v 1.153 2015/02/26 18:43:58 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: fit.c,v 1.154 2015/04/09 02:23:47 sfeam Exp $"); }
 #endif
 
 /*  NOTICE: Change of Copyright Status
@@ -967,9 +967,7 @@ regress_finalize(int iter, double chisq, double last_chisq, double lambda, doubl
 	}
     }
 
-    /* Report final results for VERBOSE, BRIEF, and RESULTS verbosity levels. */
-    if (fit_verbosity != QUIET)
-	show_results(chisq, last_chisq, a, dpar, corel);
+    show_results(chisq, last_chisq, a, dpar, corel);
 
     free(dpar);
     free_matr(corel);
