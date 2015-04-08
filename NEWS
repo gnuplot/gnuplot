@@ -30,6 +30,7 @@ Changes since 5.0 release
 * FIX strip enhanced text markup from plot titles embedded in svg output
 * FIX error in retrieving matrix column headers as strings
 * FIX error in calculating absolute deviation (stats command)
+* FIX allocation error from "set fit covariancevariables"
 
 Changes in final release of 5.0
 ===============================
