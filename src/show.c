@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.341 2015/03/27 17:38:14 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.342 2015/03/29 17:26:00 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -171,13 +171,13 @@ static void show_arrowstyle __PROTO((int tag));
 static void show_arrow __PROTO((int tag));
 
 static void show_ticdef __PROTO((AXIS_INDEX));
+static void show_ticdefp __PROTO((struct axis *));
        void show_position __PROTO((struct position * pos));
 static void show_functions __PROTO((void));
 
 static int var_show_all = 0;
 
 /* following code segments appear over and over again */
-#define SHOW_NUM_OR_TIME(x, axis) save_num_or_time_input(stderr, x, &axis_array[axis])
 #define SHOW_ALL_NL { if (!var_show_all) (void) putc('\n',stderr); }
 
 #define PROGRAM "G N U P L O T"
@@ -1691,10 +1691,11 @@ show_paxis()
     int p = int_expression();
     if (p <=0 || p > MAX_PARALLEL_AXES)
 	int_error(c_token, "expecting parallel axis number 1 - %d",MAX_PARALLEL_AXES);
+    fputs("\n\t", stderr);
     if (equals(c_token, "range"))
-	show_range(PARALLEL_AXES+p-1);
+	save_prange(stderr, &axis_array[PARALLEL_AXES+p-1]);
     else if (almost_equals(c_token, "tic$s"))
-	show_ticdef(PARALLEL_AXES+p-1);
+	show_ticdefp(&axis_array[PARALLEL_AXES+p-1]);
     c_token++;
 }
 
@@ -3287,40 +3288,40 @@ show_arrowstyle(int tag)
 
 /* called by show_tics */
 static void
-show_ticdef(AXIS_INDEX axis)
+show_ticdefp(struct axis *this_axis)
 {
     struct ticmark *t;
 
-    const char *ticfmt = conv_text(axis_array[axis].formatstring);
+    const char *ticfmt = conv_text(this_axis->formatstring);
 
     fprintf(stderr, "\t%s-axis tics are %s, \
 \tmajor ticscale is %g and minor ticscale is %g\n",
-	    axis_name(axis),
-	    (axis_array[axis].tic_in ? "IN" : "OUT"),
-	    axis_array[axis].ticscale, axis_array[axis].miniticscale);
+	    axis_name(this_axis->index),
+	    (this_axis->tic_in ? "IN" : "OUT"),
+	    this_axis->ticscale, this_axis->miniticscale);
 
-    fprintf(stderr, "\t%s-axis tics:\t", axis_name(axis));
-    switch (axis_array[axis].ticmode & TICS_MASK) {
+    fprintf(stderr, "\t%s-axis tics:\t", axis_name(this_axis->index));
+    switch (this_axis->ticmode & TICS_MASK) {
     case NO_TICS:
 	fputs("OFF\n", stderr);
 	return;
     case TICS_ON_AXIS:
 	fputs("on axis", stderr);
-	if (axis_array[axis].ticmode & TICS_MIRROR)
-	    fprintf(stderr, " and mirrored %s", (axis_array[axis].tic_in ? "OUT" : "IN"));
+	if (this_axis->ticmode & TICS_MIRROR)
+	    fprintf(stderr, " and mirrored %s", (this_axis->tic_in ? "OUT" : "IN"));
 	break;
     case TICS_ON_BORDER:
 	fputs("on border", stderr);
-	if (axis_array[axis].ticmode & TICS_MIRROR)
+	if (this_axis->ticmode & TICS_MIRROR)
 	    fputs(" and mirrored on opposite border", stderr);
 	break;
     }
 
-    if (axis_array[axis].ticdef.rangelimited)
+    if (this_axis->ticdef.rangelimited)
 	fprintf(stderr, "\n\t  tics are limited to data range");
     fputs("\n\t  labels are ", stderr);
-    if (axis_array[axis].manual_justify) {
-    	switch (axis_array[axis].label.pos) {
+    if (this_axis->manual_justify) {
+    	switch (this_axis->label.pos) {
     	case LEFT:{
 		fputs("left justified, ", stderr);
 		break;
@@ -3338,22 +3339,22 @@ show_ticdef(AXIS_INDEX axis)
         fputs("justified automatically, ", stderr);
     fprintf(stderr, "format \"%s\"", ticfmt);
     fprintf(stderr, "%s", 
-	axis_array[axis].tictype == DT_DMS ? " geographic" :
-	axis_array[axis].tictype == DT_TIMEDATE ? " timedate" :
+	this_axis->tictype == DT_DMS ? " geographic" :
+	this_axis->tictype == DT_TIMEDATE ? " timedate" :
 	"");
-    if (axis_array[axis].ticdef.enhanced == FALSE)
+    if (this_axis->ticdef.enhanced == FALSE)
 	fprintf(stderr,"  noenhanced");
-    if (axis_array[axis].tic_rotate) {
+    if (this_axis->tic_rotate) {
 	fprintf(stderr," rotated");
-	fprintf(stderr," by %d",axis_array[axis].tic_rotate);
+	fprintf(stderr," by %d",this_axis->tic_rotate);
 	fputs(" in 2D mode, terminal permitting,\n\t", stderr);
     } else
 	fputs(" and are not rotated,\n\t", stderr);
     fputs("    offset ",stderr);
-    show_position(&axis_array[axis].ticdef.offset);
+    show_position(&this_axis->ticdef.offset);
     fputs("\n\t",stderr);
 
-    switch (axis_array[axis].ticdef.type) {
+    switch (this_axis->ticdef.type) {
     case TIC_COMPUTED:{
 	    fputs("  intervals computed automatically\n", stderr);
 	    break;
@@ -3368,15 +3369,15 @@ show_ticdef(AXIS_INDEX axis)
 	}
     case TIC_SERIES:{
 	    fputs("  series", stderr);
-	    if (axis_array[axis].ticdef.def.series.start != -VERYLARGE) {
+	    if (this_axis->ticdef.def.series.start != -VERYLARGE) {
 		fputs(" from ", stderr);
-		SHOW_NUM_OR_TIME(axis_array[axis].ticdef.def.series.start, axis);
+		save_num_or_time_input(stderr, this_axis->ticdef.def.series.start, this_axis);
 	    }
-	    fprintf(stderr, " by %g%s", axis_array[axis].ticdef.def.series.incr,
-		    axis_array[axis].datatype == DT_TIMEDATE ? " secs" : "");
-	    if (axis_array[axis].ticdef.def.series.end != VERYLARGE) {
+	    fprintf(stderr, " by %g%s", this_axis->ticdef.def.series.incr,
+		    this_axis->datatype == DT_TIMEDATE ? " secs" : "");
+	    if (this_axis->ticdef.def.series.end != VERYLARGE) {
 		fputs(" until ", stderr);
-		SHOW_NUM_OR_TIME(axis_array[axis].ticdef.def.series.end, axis);
+		save_num_or_time_input(stderr, this_axis->ticdef.def.series.end, this_axis);
 	    }
 	    putc('\n', stderr);
 	    break;
@@ -3391,12 +3392,12 @@ show_ticdef(AXIS_INDEX axis)
 	}
     }
 
-    if (axis_array[axis].ticdef.def.user) {
+    if (this_axis->ticdef.def.user) {
 	fputs("\t  explicit list (", stderr);
-	for (t = axis_array[axis].ticdef.def.user; t != NULL; t = t->next) {
+	for (t = this_axis->ticdef.def.user; t != NULL; t = t->next) {
 	    if (t->label)
 		fprintf(stderr, "\"%s\" ", conv_text(t->label));
-	    SHOW_NUM_OR_TIME(t->position, axis);
+	    save_num_or_time_input(stderr, t->position, this_axis);
 	    if (t->level)
 		fprintf(stderr," %d",t->level);
 	    if (t->next)
@@ -3405,15 +3406,22 @@ show_ticdef(AXIS_INDEX axis)
 	fputs(")\n", stderr);
     }
 
-    if (axis_array[axis].ticdef.textcolor.type != TC_DEFAULT) {
+    if (this_axis->ticdef.textcolor.type != TC_DEFAULT) {
         fputs("\t ", stderr);
-	save_textcolor(stderr, &axis_array[axis].ticdef.textcolor);
+	save_textcolor(stderr, &this_axis->ticdef.textcolor);
         fputs("\n", stderr);
     }
 
-    if (axis_array[axis].ticdef.font && *axis_array[axis].ticdef.font) {
-        fprintf(stderr,"\t  font \"%s\"\n", axis_array[axis].ticdef.font);
+    if (this_axis->ticdef.font && *this_axis->ticdef.font) {
+        fprintf(stderr,"\t  font \"%s\"\n", this_axis->ticdef.font);
     }
+}
+
+/* called by show_tics */
+static void
+show_ticdef(AXIS_INDEX axis)
+{
+    show_ticdefp(&axis_array[axis]);
 }
 
 /* Display a value in human-readable form. */

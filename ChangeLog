@@ -1,10 +1,15 @@
+2015-04-09  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/show.c: Revise internal routines to use axis pointers rather
+	than AXIS_INDEX.
+
 2015-04-08  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/fit.c (setvarcovar):  Allocated size of string for FIT_COV_*_*
 	variables was too small, corrupting the allocation heap.
 
-	* src/fit.c (regress_finalize):  Show results regardless in log file
-	even if the "quiet" flag suppresses screen output.
+	* src/fit.c (regress_finalize):  Show results in the log file even if
+	the "quiet" option suppresses screen output.
 
 2015-04-07  Ethan A Merritt  <merritt@u.washington.edu>
 
