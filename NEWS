@@ -31,6 +31,7 @@ Changes since 5.0 release
 * FIX error in retrieving matrix column headers as strings
 * FIX error in calculating absolute deviation (stats command)
 * FIX allocation error from "set fit covariancevariables"
+* FIX tkcanvas terminal handling of blank (default) font family name
 
 Changes in final release of 5.0
 ===============================

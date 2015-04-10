@@ -1,10 +1,16 @@
+2015-04-10  Daniel J Sebald <daniel.sebald@ieee.org>
+
+	* term/tkcanvas.trm:  Fix problems handling an empty font family name
+	in a requested font string, as in   set term tkcanvas font ",15"
+	Bug #1591
+
 2015-04-08  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/fit.c (setvarcovar):  Allocated size of string for FIT_COV_*_*
 	variables was too small, corrupting the allocation heap.
 
-	* src/fit.c (regress_finalize):  Show results regardless in log file
-	even if the "quiet" flag suppresses screen output.
+	* src/fit.c (regress_finalize):  Show results in log file even if the
+	"quiet" flag suppresses screen output.
 
 2015-04-07  Ethan A Merritt  <merritt@u.washington.edu>
 
