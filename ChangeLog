@@ -1,3 +1,9 @@
+2015-04-10  Daniel J Sebald <daniel.sebald@ieee.org>
+
+	* term/tkcanvas.trm:  Fix problems handling an empty font family name
+	in a requested font string, as in   set term tkcanvas font ",15"
+	Bug #1591
+
 2015-04-09  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/show.c: Revise internal routines to use axis pointers rather

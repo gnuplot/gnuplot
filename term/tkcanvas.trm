@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: tkcanvas.trm,v 1.27 2006/07/21 02:35:48 sfeam Exp $
+ * $Id: tkcanvas.trm,v 1.28 2006/08/27 22:10:46 sfeam Exp $
  *
  */
 
@@ -455,9 +455,11 @@ TK_set_font(const char *font)
 	if (tk_perl)
 	    fputs("undef $font;\n", gpoutfile);
 	else
-	    fputs("catch {unset $font}\n", gpoutfile);
+	    fputs("catch {unset font}\n", gpoutfile);
     } else {
 	char *name;
+	char *c;
+	int empty_name = 1;
 	int size = 0;
 	size_t sep = strcspn(font, ",");
 
@@ -466,21 +468,39 @@ TK_set_font(const char *font)
 	    return FALSE;
 	strncpy(name, font, sep);
 	name[sep] = NUL;
+	c = name;
+	while (*c != '\0') {
+	    if (!isspace(*c++)) {
+		empty_name = 0;
+		break;
+	    }
+	}
 	if (sep < strlen(font))
 	    sscanf(&(font[sep + 1]), "%d", &size);
-	if (tk_perl) {
-	    fprintf(gpoutfile,"\
+	if (!empty_name || size) {
+	    if (tk_perl) {
+		fprintf(gpoutfile,"\
 if ($can->can('fontCreate')) {\n\
-$font = $can->fontCreate(-family => q{%s}",
-		    name);
-	    if (size)
-		fprintf(gpoutfile, ", -size => %d", size);
-	    fputs(");\n}\n", gpoutfile);
-	} else {
-	    fprintf(gpoutfile, "set font [font create -family %s", name);
-	    if (size)
-		fprintf(gpoutfile, " -size %d", size);
-	    fputs("]\n", gpoutfile);
+$font = $can->fontCreate(");
+		if (!empty_name) {
+		    fprintf(gpoutfile, "-family => q{%s}", name);
+                    if (size)
+			fprintf(gpoutfile, ", ");
+		}
+		if (size)
+		    fprintf(gpoutfile, "-size => %d", size);
+		fputs(");\n}\n", gpoutfile);
+	    } else {
+		fprintf(gpoutfile, "set font [font create ");
+		if (!empty_name) {
+		    fprintf(gpoutfile, "-family %s", name);
+                    if (size)
+			fprintf(gpoutfile, " ");
+		}
+		if (size)
+		    fprintf(gpoutfile, "-size %d", size);
+		fputs("]\n", gpoutfile);
+	    }
 	}
 	free(name);
     }
