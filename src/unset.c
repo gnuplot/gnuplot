@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.216 2015/03/22 06:11:52 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.217 2015/03/29 17:26:00 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -99,7 +99,7 @@ static void unset_style_ellipse __PROTO(());
 #endif
 static void unset_loadpath __PROTO((void));
 static void unset_locale __PROTO((void));
-static void reset_logscale __PROTO((AXIS_INDEX));
+static void reset_logscale __PROTO((struct axis *));
 static void unset_logscale __PROTO((void));
 static void unset_mapping __PROTO((void));
 static void unset_margin __PROTO((t_position *));
@@ -890,7 +890,7 @@ unset_grid()
     AXIS_INDEX i = 0;
 
     /* grid_selection = GRID_OFF; */
-    for (; i < AXIS_ARRAY_SIZE; i++) {
+    for (; i < NUMBER_OF_MAIN_VISIBLE_AXES; i++) {
 	axis_array[i].gridmajor = FALSE;
 	axis_array[i].gridminor = FALSE;
     }
@@ -1106,13 +1106,13 @@ unset_locale()
 }
 
 static void
-reset_logscale(AXIS_INDEX axis)
+reset_logscale(struct axis *this_axis)
 {
-    TBOOLEAN undo_rlog = (axis == POLAR_AXIS && R_AXIS.log);
-    axis_array[axis].log = FALSE;
+    TBOOLEAN undo_rlog = (this_axis->index == POLAR_AXIS && this_axis->log);
+    this_axis->log = FALSE;
     /* Do not zero the base because we can still use it for gprintf formats
      * %L and %l with linear axis scaling.
-    axis_array[axis].base = 0.0;
+    this_axis->base = 0.0;
      */
     if (undo_rlog)
 	rrange_to_xy();
@@ -1127,8 +1127,8 @@ unset_logscale()
     if (END_OF_COMMAND) {
 	/* clean all the islog flags. This will hit some currently
 	 * unused ones, too, but that's actually a good thing, IMHO */
-	for(axis = 0; axis < AXIS_ARRAY_SIZE; axis++)
-	    reset_logscale(axis);
+	for (axis = 0; axis < AXIS_ARRAY_SIZE; axis++)
+	    reset_logscale(&axis_array[axis]);
     } else {
 	int i = 0;
 
@@ -1141,7 +1141,7 @@ unset_logscale()
 		token[c_token].start_index += i;
 		int_error(c_token, "invalid axis");
 	    }
-	    reset_logscale(axisname_tbl[axis].value);
+	    reset_logscale(&axis_array[axisname_tbl[axis].value]);
 	    i += strlen(axisname_tbl[axis].key);
 	}
 	++c_token;
@@ -1202,7 +1202,7 @@ static void
 unset_all_tics()
 {
     int i;
-    for (i = 0; i < AXIS_ARRAY_SIZE; i++)
+    for (i = 0; i < NUMBER_OF_MAIN_VISIBLE_AXES; i++)
 	unset_tics(&axis_array[i]);
 }
 
@@ -1630,7 +1630,7 @@ unset_all_zeroaxes()
 {
     AXIS_INDEX axis;
 
-    for(axis = 0; axis < AXIS_ARRAY_SIZE; axis++)
+    for(axis = 0; axis < NUMBER_OF_MAIN_VISIBLE_AXES; axis++)
 	unset_zeroaxis(axis);
 }
 
@@ -1762,16 +1762,20 @@ reset_command()
 	}
 	free_marklist(this_axis->ticdef.def.user);
 	free(this_axis->ticdef.font);
-	unset_zeroaxis(axis);
 	unset_axislabel_or_title(&this_axis->label);
 
 	/* Fill with generic values, then customize */
 	memcpy(this_axis, &default_axis_state, sizeof(AXIS));
 
-	unset_axislabel(axis);	/* resets rotation on y */
 	unset_range(this_axis);	/* resets from axis_defaults */
 	this_axis->formatstring = gp_strdup(DEF_FORMAT);
 	this_axis->index = axis;
+
+	/* These do not apply to parallel axes */
+	if (axis < NUMBER_OF_MAIN_VISIBLE_AXES) {
+	    unset_zeroaxis(axis);
+	    unset_axislabel(axis); /* resets rotation on y */
+	}
 
 	/* 'tics' default is on for some, off for the other axes: */
 	unset_tics(this_axis);
@@ -1788,7 +1792,7 @@ reset_command()
 
 	this_axis->linked_to_primary = NULL;
 
-	reset_logscale(axis);
+	reset_logscale(this_axis);
     }
     raxis = TRUE;
     for (i=2; i<MAX_TICLEVEL; i++)

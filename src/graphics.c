@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.484 2015/03/13 20:26:17 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.485 2015/03/19 17:30:41 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -2647,15 +2647,17 @@ plot_parallel(struct curve_points *plot)
     int x0, y0, x1, y1;
 
     for (i = 0; i < plot->p_count; i++) {
+	struct axis *this_axis = &axis_array[PARALLEL_AXES+0];
 
 	/* rgb variable  -  color read from data column */
 	check_for_variable_color(plot, &plot->varcolor[i]);
 
 	x0 = map_x(1.0);
-	y0 = AXIS_MAP(PARALLEL_AXES+0, plot->z_n[0][i]);
+	y0 = axis_map(this_axis, plot->z_n[0][i]);
 	for (j = 1; j < plot->n_par_axes; j++) {
+	    this_axis = &axis_array[PARALLEL_AXES + j];
 	    x1 = map_x((double)(j+1));
-	    y1 = AXIS_MAP(PARALLEL_AXES+j, plot->z_n[j][i]);
+	    y1 = axis_map(this_axis, plot->z_n[j][i]);
 	    draw_clip_line(x0, y0, x1, y1);
 	    x0 = x1;
 	    y0 = y1;
@@ -3790,7 +3792,7 @@ place_parallel_axes(struct curve_points *first_plot, int pcount, int layer)
 	if (axes_in_use < plot->n_par_axes)
 	    axes_in_use = plot->n_par_axes;
 
-    /* Set up the vertical scales used by AXIS_MAP() */
+    /* Set up the vertical scales used by axis_map() */
     for (j = 0; j < axes_in_use; j++) {
 	struct axis *this_axis = &axis_array[PARALLEL_AXES+j]; 
 	axis_invert_if_requested(this_axis);
@@ -3804,7 +3806,7 @@ place_parallel_axes(struct curve_points *first_plot, int pcount, int layer)
 	    j, this_axis->min, this_axis->max,
 	    this_axis->set_min, this_axis->set_max,
 	    this_axis->autoscale, this_axis->set_autoscale));
-	setup_tics(&axis_array[PARALLEL_AXES+j], 20);
+	setup_tics(this_axis, 20);
     }
 
     if (parallel_axis_style.layer == LAYER_FRONT && layer == LAYER_BACK)
@@ -3813,15 +3815,38 @@ place_parallel_axes(struct curve_points *first_plot, int pcount, int layer)
     /* Draw the axis lines */
     term_apply_lp_properties(&parallel_axis_style.lp_properties);
     for (j = 0; j < axes_in_use; j++) {
-	int max = AXIS_MAP(PARALLEL_AXES+j, axis_array[PARALLEL_AXES+j].data_max);
-	int min = AXIS_MAP(PARALLEL_AXES+j, axis_array[PARALLEL_AXES+j].data_min);
+	struct axis *this_axis = &axis_array[PARALLEL_AXES+j];
+	int max = axis_map(this_axis, this_axis->data_max);
+	int min = axis_map(this_axis, this_axis->data_min);
 	int axis_x = map_x((double)(j+1));
 	draw_clip_line( axis_x, min, axis_x, max );
     }
 
-    /* Draw the axis tickmarks and labels */
-    for (j = 0; j < axes_in_use; j++)
-	axis_output_tics(PARALLEL_AXES+j, &xtic_y, FIRST_X_AXIS, ytick2d_callback);
+    /* Draw the axis tickmarks and labels.  Piggyback on ytick2d_callback */
+    /* but avoid a call to the full axis_output_tics(). 		  */
+    for (j = 0; j < axes_in_use; j++) {
+	struct axis *this_axis = &axis_array[PARALLEL_AXES+j];
+	double axis_coord = j+1;		/* paxis N is drawn at x=N */
+
+	if (this_axis->tic_rotate && term->text_angle(this_axis->tic_rotate)) {
+	    tic_hjust = LEFT;
+	    tic_vjust = CENTRE;
+	} else {
+	    tic_hjust = CENTRE;
+	    tic_vjust = JUST_TOP;
+	}
+	if (this_axis->manual_justify)
+	    tic_hjust = this_axis->label.pos;
+
+	tic_start = axis_map(&axis_array[FIRST_X_AXIS], axis_coord);
+	tic_mirror = tic_start; /* tic extends on both sides of axis */
+	tic_direction = -1;
+	tic_text = tic_start - this_axis->ticscale * term->v_tic;
+	tic_text -= term->v_char;
+	
+	gen_tics(this_axis, ytick2d_callback);
+	term->text_angle(0);
+    }
 }
 
 /*

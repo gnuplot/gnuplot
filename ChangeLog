@@ -1,3 +1,11 @@
+2015-04-15  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/graphics.c (plot_parallel place_parallel_axes): Revise to use
+	axis pointers rather than AXIS_INDEX.
+
+	* src/unset.c: Avoid using AXIS_INDEX where practical.
+	Limit initialization of grid/labels/etc to the axes that need it.
+	
 2015-04-10  Daniel J Sebald <daniel.sebald@ieee.org>
 
 	* term/tkcanvas.trm:  Fix problems handling an empty font family name
