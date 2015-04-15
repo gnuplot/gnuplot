@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.217 2015/03/29 17:26:00 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.218 2015/04/15 04:09:56 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -1764,18 +1764,18 @@ reset_command()
 	free(this_axis->ticdef.font);
 	unset_axislabel_or_title(&this_axis->label);
 
+	/* These do not apply to parallel axes */
+	if (axis < NUMBER_OF_MAIN_VISIBLE_AXES) {
+	    unset_zeroaxis(axis);
+	    unset_axislabel(axis); /* resets rotation on y */
+	}
+
 	/* Fill with generic values, then customize */
 	memcpy(this_axis, &default_axis_state, sizeof(AXIS));
 
 	unset_range(this_axis);	/* resets from axis_defaults */
 	this_axis->formatstring = gp_strdup(DEF_FORMAT);
 	this_axis->index = axis;
-
-	/* These do not apply to parallel axes */
-	if (axis < NUMBER_OF_MAIN_VISIBLE_AXES) {
-	    unset_zeroaxis(axis);
-	    unset_axislabel(axis); /* resets rotation on y */
-	}
 
 	/* 'tics' default is on for some, off for the other axes: */
 	unset_tics(this_axis);
