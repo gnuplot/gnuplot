@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.276 2015/03/27 17:38:14 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.277 2015/04/15 18:59:48 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -807,10 +807,10 @@ set origin %g,%g\n",
     fprintf(fp, "set timestamp %s \n", timelabel_bottom ? "bottom" : "top");
     SAVE_AXISLABEL_OR_TITLE("", "timestamp", timelabel);
 
-    save_range(fp, POLAR_AXIS);
-    save_range(fp, T_AXIS);
-    save_range(fp, U_AXIS);
-    save_range(fp, V_AXIS);
+    save_prange(fp, axis_array + POLAR_AXIS);
+    save_prange(fp, axis_array + T_AXIS);
+    save_prange(fp, axis_array + U_AXIS);
+    save_prange(fp, axis_array + V_AXIS);
 
 #define SAVE_AXISLABEL(axis)					\
     SAVE_AXISLABEL_OR_TITLE(axis_name(axis),"label",	\
@@ -818,22 +818,22 @@ set origin %g,%g\n",
 
     SAVE_AXISLABEL(FIRST_X_AXIS);
     SAVE_AXISLABEL(SECOND_X_AXIS);
-    save_range(fp, FIRST_X_AXIS);
-    save_range(fp, SECOND_X_AXIS);
+    save_prange(fp, axis_array + FIRST_X_AXIS);
+    save_prange(fp, axis_array + SECOND_X_AXIS);
 
     SAVE_AXISLABEL(FIRST_Y_AXIS);
     SAVE_AXISLABEL(SECOND_Y_AXIS);
-    save_range(fp, FIRST_Y_AXIS);
-    save_range(fp, SECOND_Y_AXIS);
+    save_prange(fp, axis_array + FIRST_Y_AXIS);
+    save_prange(fp, axis_array + SECOND_Y_AXIS);
 
     SAVE_AXISLABEL(FIRST_Z_AXIS);
-    save_range(fp, FIRST_Z_AXIS);
+    save_prange(fp, axis_array + FIRST_Z_AXIS);
 
     SAVE_AXISLABEL(COLOR_AXIS);
-    save_range(fp, COLOR_AXIS);
+    save_prange(fp, axis_array + COLOR_AXIS);
 
     for (axis=0; axis<MAX_PARALLEL_AXES; axis++)
-	save_prange(fp, &axis_array[PARALLEL_AXES+axis]);
+	save_prange(fp, axis_array + PARALLEL_AXES + axis);
 
 #undef SAVE_AXISLABEL
 #undef SAVE_AXISLABEL_OR_TITLE
@@ -1301,12 +1301,6 @@ save_prange(FILE *fp, struct axis *this_axis)
 	if (this_axis->set_autoscale & AUTOSCALE_FIXMAX)
 	    fprintf(fp, "set autoscale %sfixmax\n", axis_name(this_axis->index));
     }
-}
-
-void
-save_range(FILE *fp, AXIS_INDEX axis)
-{
-    save_prange(fp, &axis_array[axis]);
 }
 
 static void

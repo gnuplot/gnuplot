@@ -1,5 +1,5 @@
 /*
- * $Id: stdfn.h,v 1.48 2014/04/28 04:35:29 sfeam Exp $
+ * $Id: stdfn.h,v 1.49 2014/05/01 19:50:15 broeker Exp $
  */
 
 /* GNUPLOT - stdfn.h */
@@ -449,8 +449,8 @@ void          rewinddir __PROTO((DIR *));
 # define DEBUG_WHERE do { fprintf(stderr,"%s:%d ",__FILE__,__LINE__); } while (0)
 # define FPRINTF(a) do { DEBUG_WHERE; fprintf a; } while (0)
 #else
-# define DEBUG_WHERE     /* nought */
-# define FPRINTF(a)      /* nought */
+# define DEBUG_WHERE     do { /* nought */ } while(0)
+# define FPRINTF(a)      do { /* nought */ } while(0)
 #endif /* DEBUG */
 
 #include "syscfg.h"

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.342 2015/03/29 17:26:00 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.343 2015/04/09 20:32:09 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -1693,7 +1693,7 @@ show_paxis()
 	int_error(c_token, "expecting parallel axis number 1 - %d",MAX_PARALLEL_AXES);
     fputs("\n\t", stderr);
     if (equals(c_token, "range"))
-	save_prange(stderr, &axis_array[PARALLEL_AXES+p-1]);
+	save_prange(stderr, axis_array + PARALLEL_AXES + (p - 1));
     else if (almost_equals(c_token, "tic$s"))
 	show_ticdefp(&axis_array[PARALLEL_AXES+p-1]);
     c_token++;
@@ -2911,7 +2911,7 @@ show_range(AXIS_INDEX axis)
     if (axis_array[axis].datatype == DT_TIMEDATE)
 	fprintf(stderr, "\tset %sdata time\n", axis_name(axis));
     fprintf(stderr,"\t");
-    save_range(stderr, axis);
+    save_prange(stderr, axis_array + axis);
 }
 
 
@@ -2989,10 +2989,10 @@ show_link()
 {
     if (END_OF_COMMAND || almost_equals(c_token,"x$2"))
 	if (axis_array[SECOND_X_AXIS].linked_to_primary)
-	    save_range(stderr, SECOND_X_AXIS);
+	    save_prange(stderr, axis_array + SECOND_X_AXIS);
     if (END_OF_COMMAND || almost_equals(c_token,"y$2"))
 	if (axis_array[SECOND_Y_AXIS].linked_to_primary)
-	    save_range(stderr, SECOND_Y_AXIS);
+	    save_prange(stderr, axis_array + SECOND_Y_AXIS);
     if (!END_OF_COMMAND)
 	c_token++;
 }

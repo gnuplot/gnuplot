@@ -1,3 +1,19 @@
+2015-04-15  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/show.c (show_paxis): Simplify call to save_prange();
+	(show_range, show_link): Call save_prange() instead of deprecated
+	save_range().
+
+	* src/save.c (save_range): No longer called. Removed.
+	(save_set_all): Replace calls to save_range() by equivalent ones
+	to save_prange().
+
+	* src/stdfn.h (FPRINTF, DEBUG_WHERE): Make inactive definitions
+	more similar to active ones, for the benefit of people who don't
+	like to use {} around their if() bodies.
+
+	* src/save.h: Remove prototype for save_range.
+
 2015-04-15  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c (plot_parallel place_parallel_axes): Revise to use
@@ -9,7 +25,7 @@
 	* demo/fit.dem:  Exercise "set fit covariancevariables" in the demo.
 
 	* src/save.c: Avoid using AXIS_INDEX where practical.
-	
+
 2015-04-10  Daniel J Sebald <daniel.sebald@ieee.org>
 
 	* term/tkcanvas.trm:  Fix problems handling an empty font family name
