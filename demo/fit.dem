@@ -1,5 +1,5 @@
 #
-# $Id: fit.dem,v 1.19 2014/02/28 10:22:49 markisch Exp $
+# $Id: fit.dem,v 1.20 2014/09/20 11:31:12 markisch Exp $
 #
 
 myencoding = GPVAL_ENCODING
@@ -47,9 +47,11 @@ print "  fit command : fit l(x) 'lcdemo.dat' using 1:2:5 yerr via y0, m\n"
 pause -1 "Press enter to start the fit."
 
 set fit errorscaling
+set fit covariancevariables
 fit l(x) 'lcdemo.dat' using 1:2:5 yerr via y0, m
 set title 'fit weighted by experimental weights'
 plot 'lcdemo.dat' using 1:2:5 with errorbars, l(x)
+set fit nocovariancevariables
 pause -1 "Press enter to proceed with the next example."
 
 load 'density.fnc'

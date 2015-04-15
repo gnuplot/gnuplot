@@ -5,6 +5,8 @@
 
 	* src/unset.c: Avoid using AXIS_INDEX where practical.
 	Limit initialization of grid/labels/etc to the axes that need it.
+
+	* demo/fit.dem:  Exercise "set fit covariancevariables" in the demo.
 	
 2015-04-10  Daniel J Sebald <daniel.sebald@ieee.org>
 
