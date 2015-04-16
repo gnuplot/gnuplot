@@ -1,3 +1,13 @@
+2015-04-16  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/color.c (set_color):  Some terminals (pdfcairo, post) produced 
+	invalid output if given NaN as a gray value in term->set_color().
+	Others variously ignored it, replaced it with black, or gray=0.
+	Now we trap NaN in the core code and substitute a request for background
+	color.  Note:  I'd substitute with a fully transparent color,
+	but not all terminals handle transparency.
+	Bug #1595
+
 2015-04-10  Daniel J Sebald <daniel.sebald@ieee.org>
 
 	* term/tkcanvas.trm:  Fix problems handling an empty font family name
