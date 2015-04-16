@@ -1,3 +1,13 @@
+2015-04-16  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/color.c (set_color):  Some terminals (pdfcairo, post) produced 
+	invalid output if given NaN as a gray value in term->set_color().
+	Others variously ignored it, replaced it with black, or gray=0.
+	Now we trap NaN in the core code and substitute a request for background
+	color.  Note:  I'd rather substitute with a fully transparent color,
+	but not all terminals handle transparency.
+	Bug #1595
+
 2015-04-15  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/show.c (show_paxis): Simplify call to save_prange();

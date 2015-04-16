@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: color.c,v 1.118 2015/03/12 21:21:07 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: color.c,v 1.119 2015/03/12 23:48:13 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - color.c */
@@ -170,16 +170,17 @@ invalidate_palette()
 
 /*
    Set the colour on the terminal
-   Currently, each terminal takes care of remembering the current colour,
+   Each terminal takes care of remembering the current colour,
    so there is not much to do here.
+   FIXME: NaN could alternatively map to LT_NODRAW or TC_RGB full transparency
  */
 void
 set_color(double gray)
 {
     t_colorspec color;
-    color.type = TC_FRAC;
     color.value = gray;
-    color.lt = 0;
+    color.lt = LT_BACKGROUND;
+    color.type = (isnan(gray)) ? TC_LT : TC_FRAC;
     term->set_color(&color);
 }
 
