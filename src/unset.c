@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.219 2015/04/15 21:05:15 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.220 2015/04/16 06:15:18 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -1660,6 +1660,27 @@ unset_axislabel(AXIS_INDEX axis)
 	axis_array[axis].label.rotate = TEXT_VERTICAL;
 }
 
+/*
+ * Free dynamic fields in an axis structure so that it can be safely deleted
+ * or reinitialized.  Doesn't free the axis structure itself.
+ */
+static void
+free_axis_struct(struct axis *this_axis)
+{
+	free(this_axis->formatstring);
+	free(this_axis->ticfmt);
+	if (this_axis->link_udf) {
+	    free(this_axis->link_udf->at);
+	    free(this_axis->link_udf->definition);
+	    free(this_axis->link_udf);
+	}
+	free_marklist(this_axis->ticdef.def.user);
+	free(this_axis->ticdef.font);
+	unset_axislabel_or_title(&this_axis->label);
+	if (this_axis->zeroaxis != &default_axis_zeroaxis)
+	    free(this_axis->zeroaxis);
+}
+
 /******** The 'reset' command ********/
 /* HBB 20000506: I moved this here, from set.c, because 'reset' really
  * is more like a big lot of 'unset' commands, rather than a bunch of
@@ -1753,22 +1774,7 @@ reset_command()
 	struct axis *this_axis = &axis_array[axis];
 
 	/* Free contents before overwriting with default values */
-	free(this_axis->formatstring);
-	free(this_axis->ticfmt);
-	if (this_axis->link_udf) {
-	    free(this_axis->link_udf->at);
-	    free(this_axis->link_udf->definition);
-	    free(this_axis->link_udf);
-	}
-	free_marklist(this_axis->ticdef.def.user);
-	free(this_axis->ticdef.font);
-	unset_axislabel_or_title(&this_axis->label);
-
-	/* These do not apply to parallel axes */
-	if (axis < NUMBER_OF_MAIN_VISIBLE_AXES) {
-	    unset_zeroaxis(axis);
-	    unset_axislabel(axis); /* resets rotation on y */
-	}
+	free_axis_struct(this_axis);
 
 	/* Fill with generic values, then customize */
 	memcpy(this_axis, &default_axis_state, sizeof(AXIS));
@@ -1776,6 +1782,10 @@ reset_command()
 	unset_range(this_axis);	/* resets from axis_defaults */
 	this_axis->formatstring = gp_strdup(DEF_FORMAT);
 	this_axis->index = axis;
+
+	/* sets vertical label for y/y2/cb, otherwise redundant */
+	if (axis < PARALLEL_AXES)
+	    unset_axislabel(axis);
 
 	/* 'tics' default is on for some, off for the other axes: */
 	unset_tics(this_axis);

@@ -23,6 +23,9 @@
 	Index or point to parallel axis structures relative to parallel_axis[]
 	rather than relative to axis_array[].
 
+	* src/unset.c (free_axis_struct):  New routine to free fields in an
+	axis structure that is about to be reinitialized or deleted.
+
 2015-04-15  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/show.c (show_paxis): Simplify call to save_prange();
