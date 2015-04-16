@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.485 2015/03/19 17:30:41 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.486 2015/04/15 04:09:56 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -2647,7 +2647,7 @@ plot_parallel(struct curve_points *plot)
     int x0, y0, x1, y1;
 
     for (i = 0; i < plot->p_count; i++) {
-	struct axis *this_axis = &axis_array[PARALLEL_AXES+0];
+	struct axis *this_axis = &parallel_axis[0];
 
 	/* rgb variable  -  color read from data column */
 	check_for_variable_color(plot, &plot->varcolor[i]);
@@ -2655,7 +2655,7 @@ plot_parallel(struct curve_points *plot)
 	x0 = map_x(1.0);
 	y0 = axis_map(this_axis, plot->z_n[0][i]);
 	for (j = 1; j < plot->n_par_axes; j++) {
-	    this_axis = &axis_array[PARALLEL_AXES + j];
+	    this_axis = &parallel_axis[j];
 	    x1 = map_x((double)(j+1));
 	    y1 = axis_map(this_axis, plot->z_n[j][i]);
 	    draw_clip_line(x0, y0, x1, y1);
@@ -3794,7 +3794,7 @@ place_parallel_axes(struct curve_points *first_plot, int pcount, int layer)
 
     /* Set up the vertical scales used by axis_map() */
     for (j = 0; j < axes_in_use; j++) {
-	struct axis *this_axis = &axis_array[PARALLEL_AXES+j]; 
+	struct axis *this_axis = &parallel_axis[j]; 
 	axis_invert_if_requested(this_axis);
 	this_axis->term_lower = plot_bounds.ybot;
 	this_axis->term_scale =
@@ -3815,7 +3815,7 @@ place_parallel_axes(struct curve_points *first_plot, int pcount, int layer)
     /* Draw the axis lines */
     term_apply_lp_properties(&parallel_axis_style.lp_properties);
     for (j = 0; j < axes_in_use; j++) {
-	struct axis *this_axis = &axis_array[PARALLEL_AXES+j];
+	struct axis *this_axis = &parallel_axis[j];
 	int max = axis_map(this_axis, this_axis->data_max);
 	int min = axis_map(this_axis, this_axis->data_min);
 	int axis_x = map_x((double)(j+1));
@@ -3825,7 +3825,7 @@ place_parallel_axes(struct curve_points *first_plot, int pcount, int layer)
     /* Draw the axis tickmarks and labels.  Piggyback on ytick2d_callback */
     /* but avoid a call to the full axis_output_tics(). 		  */
     for (j = 0; j < axes_in_use; j++) {
-	struct axis *this_axis = &axis_array[PARALLEL_AXES+j];
+	struct axis *this_axis = &parallel_axis[j];
 	double axis_coord = j+1;		/* paxis N is drawn at x=N */
 
 	if (this_axis->tic_rotate && term->text_angle(this_axis->tic_rotate)) {

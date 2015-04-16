@@ -8,6 +8,21 @@
 	but not all terminals handle transparency.
 	Bug #1595
 
+	* src/axis.c src/axis.h:  Initial stage of moving parallel axis support
+	into dynamically allocated storage.  Here we introduce a new global
+	    AXIS *parallel_axis = &axis_array[PARALLEL_AXES]
+	For now it points to the existing storage. Later it will become dynamic.
+
+	* src/graphics.c (plot_parallel place_parallel_axes)
+	src/set.c (set_paxis) src/show.c (show_paxis):
+	Index or point to parallel axis structures relative to parallel_axis[]
+	rather than relative to axis_array[].
+
+	* src/plot2d.c (get_data) src/save.c (save_set_all)
+	src/unset.c (unset_command):
+	Index or point to parallel axis structures relative to parallel_axis[]
+	rather than relative to axis_array[].
+
 2015-04-15  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/show.c (show_paxis): Simplify call to save_prange();

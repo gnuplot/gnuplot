@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.355 2015/03/24 21:35:13 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.356 2015/04/04 01:08:43 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -571,7 +571,7 @@ get_data(struct curve_points *current_plot)
 	max_cols = current_plot->n_par_axes + 1;
 	/* We have not yet read in any data, so we cannot do complete initialization */
 	for (j = 0; j < current_plot->n_par_axes; j++) {
-	    struct axis *this_axis = &axis_array[PARALLEL_AXES+j];
+	    struct axis *this_axis = &parallel_axis[j];
 	    axis_init2d(this_axis, 1);
 	}
 	break;
@@ -751,7 +751,7 @@ get_data(struct curve_points *current_plot)
 		int dummy_type = INRANGE;
 		ACTUAL_STORE_WITH_LOG_AND_UPDATE_RANGE( current_plot->z_n[iaxis][i],
 			v[iaxis], dummy_type,
-			&axis_array[PARALLEL_AXES+iaxis],
+			&parallel_axis[iaxis],
 			current_plot->noautoscale, NOOP, NOOP, 0 );
 	    }
 	    i++;

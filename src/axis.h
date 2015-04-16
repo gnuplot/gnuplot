@@ -1,5 +1,5 @@
 /*
- * $Id: axis.h,v 1.122 2015/03/15 04:29:12 sfeam Exp $
+ * $Id: axis.h,v 1.123 2015/04/04 01:08:43 sfeam Exp $
  *
  */
 
@@ -334,6 +334,11 @@ typedef struct axis_defaults {
 
 extern AXIS axis_array[AXIS_ARRAY_SIZE];
 extern const AXIS_DEFAULTS axis_defaults[AXIS_ARRAY_SIZE];
+
+/* EAM DEBUG - Intermediate step towards dynamic allocation of parallel axes. */
+/* For now we keep the parallel axis structures at the back of axis_array but */
+/* create a pointer to them that we can pretend points to dynamic space.      */
+extern AXIS *parallel_axis;
 
 /* A parsing table for mapping axis names into axis indices. For use
  * by the set/show machinery, mainly */

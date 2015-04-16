@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.218 2015/04/15 04:09:56 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.219 2015/04/15 21:05:15 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -377,7 +377,7 @@ unset_command()
 	if (i <= 0 || i > MAX_PARALLEL_AXES)
 	    int_error(c_token, "expecting parallel axis number");
 	if (almost_equals(c_token, "tic$s")) {
-	    unset_tics(&axis_array[PARALLEL_AXES+i-1]);
+	    unset_tics(&parallel_axis[i-1]);
 	    c_token++;
 	}
 	break;
