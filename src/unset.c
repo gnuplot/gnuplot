@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.220 2015/04/16 06:15:18 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.221 2015/04/16 23:19:59 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -137,7 +137,7 @@ static void unset_timestamp __PROTO((void));
 static void unset_view __PROTO((void));
 static void unset_zero __PROTO((void));
 static void unset_timedata __PROTO((AXIS_INDEX));
-static void unset_range __PROTO((struct axis *));
+static void unset_range __PROTO((AXIS_INDEX));
 static void unset_zeroaxis __PROTO((AXIS_INDEX));
 static void unset_all_zeroaxes __PROTO((void));
 
@@ -525,34 +525,34 @@ unset_command()
 	unset_axislabel(SECOND_Y_AXIS);
 	break;
     case S_XRANGE:
-	unset_range(&axis_array[FIRST_X_AXIS]);
+	unset_range(FIRST_X_AXIS);
 	break;
     case S_X2RANGE:
-	unset_range(&axis_array[SECOND_X_AXIS]);
+	unset_range(SECOND_X_AXIS);
 	break;
     case S_YRANGE:
-	unset_range(&axis_array[FIRST_Y_AXIS]);
+	unset_range(FIRST_Y_AXIS);
 	break;
     case S_Y2RANGE:
-	unset_range(&axis_array[SECOND_Y_AXIS]);
+	unset_range(SECOND_Y_AXIS);
 	break;
     case S_ZRANGE:
-	unset_range(&axis_array[FIRST_Z_AXIS]);
+	unset_range(FIRST_Z_AXIS);
 	break;
     case S_CBRANGE:
-	unset_range(&axis_array[COLOR_AXIS]);
+	unset_range(COLOR_AXIS);
 	break;
     case S_RRANGE:
-	unset_range(&axis_array[POLAR_AXIS]);
+	unset_range(POLAR_AXIS);
 	break;
     case S_TRANGE:
-	unset_range(&axis_array[T_AXIS]);
+	unset_range(T_AXIS);
 	break;
     case S_URANGE:
-	unset_range(&axis_array[U_AXIS]);
+	unset_range(U_AXIS);
 	break;
     case S_VRANGE:
-	unset_range(&axis_array[V_AXIS]);
+	unset_range(V_AXIS);
 	break;
     case S_RAXIS:
 	raxis = FALSE;
@@ -673,6 +673,8 @@ unset_autoscale()
 	int axis;
 	for (axis=0; axis<AXIS_ARRAY_SIZE; axis++)
 	    axis_array[axis].set_autoscale = FALSE;
+	for (axis=0; axis<num_parallel_axes; axis++)
+	    parallel_axis[axis].set_autoscale = FALSE;
     } else if (equals(c_token, "xy") || equals(c_token, "tyx")) {
 	axis_array[FIRST_X_AXIS].set_autoscale
 	    = axis_array[FIRST_Y_AXIS].set_autoscale = AUTOSCALE_NONE;
@@ -1129,6 +1131,8 @@ unset_logscale()
 	 * unused ones, too, but that's actually a good thing, IMHO */
 	for (axis = 0; axis < AXIS_ARRAY_SIZE; axis++)
 	    reset_logscale(&axis_array[axis]);
+	for (axis = 0; axis < num_parallel_axes; axis++)
+	    reset_logscale(&parallel_axis[axis]);
     } else {
 	int i = 0;
 
@@ -1602,9 +1606,9 @@ unset_timedata(AXIS_INDEX axis)
 
 /* process 'unset {x|y|z|x2|y2|t|u|v|r}range' command */
 static void
-unset_range(struct axis *this_axis)
+unset_range(AXIS_INDEX axis)
 {
-    AXIS_INDEX axis = GPMIN(this_axis->index,PARALLEL_AXES);
+    struct axis *this_axis = &axis_array[axis];
 
     this_axis->writeback_min = this_axis->set_min = axis_defaults[axis].min;
     this_axis->writeback_max = this_axis->set_max = axis_defaults[axis].max;
@@ -1779,31 +1783,42 @@ reset_command()
 	/* Fill with generic values, then customize */
 	memcpy(this_axis, &default_axis_state, sizeof(AXIS));
 
-	unset_range(this_axis);	/* resets from axis_defaults */
 	this_axis->formatstring = gp_strdup(DEF_FORMAT);
 	this_axis->index = axis;
-
-	/* sets vertical label for y/y2/cb, otherwise redundant */
-	if (axis < PARALLEL_AXES)
-	    unset_axislabel(axis);
+	unset_axislabel(axis);	/* sets vertical label for y/y2/cb */
+	unset_range(axis);	/* copies min/max from axis_defaults */
 
 	/* 'tics' default is on for some, off for the other axes: */
 	unset_tics(this_axis);
 	unset_minitics(this_axis);
 	this_axis->ticdef = default_axis_ticdef;
 	this_axis->minitics = MINI_DEFAULT;
-	if (axis >= PARALLEL_AXES) {
-	    this_axis->ticmode = axis_defaults[PARALLEL_AXES].ticmode;
-	    this_axis->ticdef.rangelimited = TRUE;
-	    this_axis->set_autoscale |= AUTOSCALE_FIXMIN | AUTOSCALE_FIXMAX;
-	} else {
-	    this_axis->ticmode = axis_defaults[axis].ticmode;
-	}
+	this_axis->ticmode = axis_defaults[axis].ticmode;
 
 	this_axis->linked_to_primary = NULL;
 
 	reset_logscale(this_axis);
     }
+
+    /* EAM DEBUG - temporary code to duplicate old reset behaviour for parallel axes */
+    /* EAM DEBUG - The switch to dynamic allocation will free them here */
+    for (axis=0; axis<num_parallel_axes; axis++) {
+	AXIS default_axis_state = DEFAULT_AXIS_STRUCT;
+	struct axis *this_axis = &parallel_axis[axis];
+
+	/* Free contents before overwriting with default values */
+	free_axis_struct(this_axis);
+
+	/* Fill with generic values, then customize */
+	memcpy(this_axis, &default_axis_state, sizeof(AXIS));
+
+	this_axis->formatstring = gp_strdup(DEF_FORMAT);
+	this_axis->index = axis + PARALLEL_AXES;
+	this_axis->ticmode = axis_defaults[PARALLEL_AXES].ticmode;
+	this_axis->ticdef.rangelimited = TRUE;
+	this_axis->set_autoscale |= AUTOSCALE_FIXMIN | AUTOSCALE_FIXMAX;
+    }
+
     raxis = TRUE;
     for (i=2; i<MAX_TICLEVEL; i++)
 	ticscale[i] = 1;

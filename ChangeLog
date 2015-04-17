@@ -1,3 +1,19 @@
+2015-04-17  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/axis.c src/axis.h: Second stage of moving parallel axis support
+	into dynamically allocated storage.  Move the parallel axis structures
+	into a separate array and shrink the main axis_array[] accordingly.
+
+	* src/save.c src/set.c src/unset.c:  Split various loops over the full
+	set of axes into two separate loops
+	    for (axis=0; axis<AXIS_ARRAY_SIZE; axis++) ... axis_array[axis]
+	    for (axis=0; axis<num_parallel_axes; axis++) ... parallel_axis[axis]
+
+	* src/unset.c (unset_range reset_command):  Simplify code sections that
+	only have to handle the regular axes (not called for parallel axes).
+	Add temporary code to handle "reset" of parallel axes; this can go away
+	again when "reset" is changed to deallocate the parallel axes altogether.
+
 2015-04-16  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/color.c (set_color):  Some terminals (pdfcairo, post) produced 

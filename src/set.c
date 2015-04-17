@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.484 2015/04/08 05:19:07 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.485 2015/04/16 06:15:18 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -875,11 +875,14 @@ set_autoscale_axis(struct axis *this)
 static void
 set_autoscale()
 {
+    int axis;
+
     c_token++;
     if (END_OF_COMMAND) {
-	int axis;
 	for (axis=0; axis<AXIS_ARRAY_SIZE; axis++)
 	    axis_array[axis].set_autoscale = AUTOSCALE_BOTH;
+	for (axis=0; axis<num_parallel_axes; axis++)
+	    parallel_axis[axis].set_autoscale = AUTOSCALE_BOTH;
 	return;
     } else if (equals(c_token, "xy") || equals(c_token, "yx")) {
 	axis_array[FIRST_X_AXIS].set_autoscale =
@@ -891,17 +894,17 @@ set_autoscale()
 	c_token++;
 	return;
     } else if (equals(c_token, "fix") || almost_equals(c_token, "noext$end")) {
-	int a = 0;
-	while (a < AXIS_ARRAY_SIZE) {
-	    axis_array[a].set_autoscale |= AUTOSCALE_FIXMIN | AUTOSCALE_FIXMAX;
-	    a++;
-	}
+	for (axis=0; axis<AXIS_ARRAY_SIZE; axis++)
+	    axis_array[axis].set_autoscale |= AUTOSCALE_FIXMIN | AUTOSCALE_FIXMAX;
+	for (axis=0; axis<num_parallel_axes; axis++)
+	    parallel_axis[axis].set_autoscale |= AUTOSCALE_FIXMIN | AUTOSCALE_FIXMAX;
 	c_token++;
 	return;
     } else if (almost_equals(c_token, "ke$epfix")) {
-	int a = 0;
-	while (a < AXIS_ARRAY_SIZE)
-	    axis_array[a++].set_autoscale |= AUTOSCALE_BOTH;
+	for (axis=0; axis<AXIS_ARRAY_SIZE; axis++)
+	    axis_array[axis].set_autoscale |= AUTOSCALE_BOTH;
+	for (axis=0; axis<num_parallel_axes; axis++)
+	    parallel_axis[axis].set_autoscale |= AUTOSCALE_BOTH;
 	c_token++;
 	return;
     }

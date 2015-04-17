@@ -1,5 +1,5 @@
 /*
- * $Id: axis.h,v 1.123 2015/04/04 01:08:43 sfeam Exp $
+ * $Id: axis.h,v 1.124 2015/04/16 06:15:18 sfeam Exp $
  *
  */
 
@@ -79,7 +79,7 @@ typedef enum AXIS_INDEX {
     V_AXIS,
     PARALLEL_AXES,	/* The first of up to MAX_PARALLEL_AXES */
 
-    AXIS_ARRAY_SIZE = PARALLEL_AXES + MAX_PARALLEL_AXES
+    AXIS_ARRAY_SIZE = PARALLEL_AXES
 } AXIS_INDEX;
 
 
@@ -333,12 +333,13 @@ typedef struct axis_defaults {
 /* global variables in axis.c */
 
 extern AXIS axis_array[AXIS_ARRAY_SIZE];
-extern const AXIS_DEFAULTS axis_defaults[AXIS_ARRAY_SIZE];
+extern const AXIS_DEFAULTS axis_defaults[AXIS_ARRAY_SIZE+1];
 
 /* EAM DEBUG - Intermediate step towards dynamic allocation of parallel axes. */
 /* For now we keep the parallel axis structures at the back of axis_array but */
 /* create a pointer to them that we can pretend points to dynamic space.      */
 extern AXIS *parallel_axis;
+extern int num_parallel_axes;
 
 /* A parsing table for mapping axis names into axis indices. For use
  * by the set/show machinery, mainly */
