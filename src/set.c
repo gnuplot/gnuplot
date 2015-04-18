@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.485 2015/04/16 06:15:18 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.486 2015/04/17 22:02:45 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -5323,7 +5323,7 @@ set_tic_prop(struct axis *this_axis)
     char *cmdptr = NULL, *sfxptr = NULL;
     AXIS_INDEX axis = this_axis->index;
 
-    if (axis < PARALLEL_AXES) {
+    if (axis < NUMBER_OF_MAIN_VISIBLE_AXES) {
 	(void) strcpy(nocmd, "no");
 	cmdptr = &nocmd[2];
 	(void) strcpy(cmdptr, axis_name(axis));
@@ -5482,8 +5482,8 @@ set_tic_prop(struct axis *this_axis)
 
     }
 
-    /* The remaining command options cannot work for parallel axes */
-    if (axis >= PARALLEL_AXES)
+    /* The remaining command options cannot work for parametric or parallel axes */
+    if (axis >= NUMBER_OF_MAIN_VISIBLE_AXES)
 	return match;
 
     if (almost_equals(c_token, nocmd)) {	/* NOSTRING */

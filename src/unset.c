@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.221 2015/04/16 23:19:59 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.222 2015/04/17 22:02:45 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -374,10 +374,9 @@ unset_command()
 	break;
     case S_PAXIS:
 	i = int_expression();
-	if (i <= 0 || i > MAX_PARALLEL_AXES)
-	    int_error(c_token, "expecting parallel axis number");
 	if (almost_equals(c_token, "tic$s")) {
-	    unset_tics(&parallel_axis[i-1]);
+	    if (i > 0 && i <= num_parallel_axes)
+		unset_tics(&parallel_axis[i-1]);
 	    c_token++;
 	}
 	break;
@@ -1814,7 +1813,7 @@ reset_command()
 
 	this_axis->formatstring = gp_strdup(DEF_FORMAT);
 	this_axis->index = axis + PARALLEL_AXES;
-	this_axis->ticmode = axis_defaults[PARALLEL_AXES].ticmode;
+	this_axis->ticmode = NO_TICS;
 	this_axis->ticdef.rangelimited = TRUE;
 	this_axis->set_autoscale |= AUTOSCALE_FIXMIN | AUTOSCALE_FIXMAX;
     }
