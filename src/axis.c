@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.160 2015/04/17 22:02:45 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.161 2015/04/18 18:01:50 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -236,7 +236,6 @@ axis_log_value_checked(AXIS_INDEX axis, double coord, const char *what)
 
 /* }}} */
 
-#if (defined MAX_PARALLEL_AXES) && (MAX_PARALLEL_AXES > 0)
 char *
 axis_name(AXIS_INDEX axis)
 {
@@ -245,9 +244,8 @@ axis_name(AXIS_INDEX axis)
 	sprintf(name, "paxis %d ", axis-PARALLEL_AXES+1);
 	return name;
     }
-    return (char *)axis_defaults[axis_array[axis].index].name;
+    return (char *) axis_defaults[axis].name;
 }
-#endif
 
 /* {{{ axis_checked_extend_empty_range() */
 /*

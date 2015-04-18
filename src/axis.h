@@ -1,5 +1,5 @@
 /*
- * $Id: axis.h,v 1.125 2015/04/17 22:02:45 sfeam Exp $
+ * $Id: axis.h,v 1.126 2015/04/18 18:01:23 sfeam Exp $
  *
  */
 
@@ -727,11 +727,7 @@ int map_y __PROTO((double value));
 
 void set_cbminmax __PROTO((void));
 
-#if (defined MAX_PARALLEL_AXES) && (MAX_PARALLEL_AXES > 0)
 char * axis_name __PROTO((AXIS_INDEX));
-#else
-#define axis_name(axis) axis_defaults[axis].name
-#endif
 
 /* macro for tic scale, used in all tic_callback functions */
 #define TIC_SCALE(ticlevel, axis) \
