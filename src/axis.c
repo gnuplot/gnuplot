@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.159 2015/04/16 06:15:18 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.160 2015/04/17 22:02:45 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -59,7 +59,7 @@ AXIS axis_array[AXIS_ARRAY_SIZE];
 
 /* Keep defaults varying by axis in their own array, to ease initialization
  * of the main array */
-const AXIS_DEFAULTS axis_defaults[AXIS_ARRAY_SIZE+1] = {
+const AXIS_DEFAULTS axis_defaults[AXIS_ARRAY_SIZE] = {
     { -10, 10, "z" , TICS_ON_BORDER,               },
     { -10, 10, "y" , TICS_ON_BORDER | TICS_MIRROR, },
     { -10, 10, "x" , TICS_ON_BORDER | TICS_MIRROR, },
@@ -70,14 +70,13 @@ const AXIS_DEFAULTS axis_defaults[AXIS_ARRAY_SIZE+1] = {
     { - 0, 10, "r" , TICS_ON_AXIS,                 },
     { - 5,  5, "t" , NO_TICS,                      },
     { - 5,  5, "u" , NO_TICS,                      },
-    { - 5,  5, "v" , NO_TICS,                      },
-    {   0,  1, "p" , NO_TICS,                      }, /* shared by all parallel axes */
+    { - 5,  5, "v" , NO_TICS,                      }
 };
 
 /* EAM DEBUG - Intermediate step towards dynamic allocation of parallel axes. */
 /* For now we keep the parallel axis structures in a separate array but       */
 /* create a pointer to them that we can pretend points to dynamic space.      */
-static AXIS parallel_axis_array[MAX_PARALLEL_AXES];
+AXIS parallel_axis_array[MAX_PARALLEL_AXES];
 AXIS *parallel_axis = &parallel_axis_array[0];
 int num_parallel_axes = MAX_PARALLEL_AXES;
 
