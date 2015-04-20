@@ -1,3 +1,8 @@
+2015-04-20  Karl Ratzsch  <ratzsch@uni-freiburg.de>
+
+	* src/term.c (test_term):  Show terminal's native dashtype support in
+	the `test` command output.
+
 2015-04-16  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/color.c (set_color):  Some terminals (pdfcairo, post) produced 
