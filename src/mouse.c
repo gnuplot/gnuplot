@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: mouse.c,v 1.178 2015/03/13 20:26:17 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: mouse.c,v 1.179 2015/03/24 21:35:13 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - mouse.c */
@@ -672,6 +672,7 @@ apply_zoom(struct t_zoom *z)
     /* EAM Jun 2007 - The autoscale save/restore was too complicated, and broke
      * refresh. Just save/restore the complete axis state and have done with it.
      * Well, not _quite_ the complete state.  The labels are maintained dynamically.
+     * Apr 2015 - The same is now true (dynamic storage) for ticfmt, formatstring.
      */
     if (zoom_now == zoom_head) {
 	int i;
@@ -679,6 +680,8 @@ apply_zoom(struct t_zoom *z)
 	    axis_array_copy[i].label = axis_array[i].label;
 	    axis_array_copy[i].ticdef.def.user = axis_array[i].ticdef.def.user;
 	    axis_array_copy[i].ticdef.font = axis_array[i].ticdef.font;
+	    axis_array_copy[i].ticfmt = axis_array[i].ticfmt;
+	    axis_array_copy[i].formatstring = axis_array[i].formatstring;
 	}
 	memcpy(axis_array, axis_array_copy, sizeof(axis_array));
 	s[0] = '\0';	/* FIXME:  Is this better than calling replotrequest()? */

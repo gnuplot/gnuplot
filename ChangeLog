@@ -1,3 +1,8 @@
+2015-04-20  Jun Takimoto <takimoto-j@kba.biglobe.ne.jp>.
+
+	* src/mouse.c (apply_zoom):  axis->formatstring and axis->ticfmt are
+	now dynamically allocated and must be saved and restored when zooming.
+
 2015-04-18  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/axis.c src/axis.h:  axis_defaults[PARALLEL_AXES] no longer needed.
