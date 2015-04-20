@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.311 2015/04/07 18:04:08 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.312 2015/04/08 05:19:08 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -1684,6 +1684,7 @@ test_term()
     int key_entry_height;
     int p_width;
     TBOOLEAN already_in_enhanced_text_mode;
+    static t_colorspec black = BLACK_COLORSPEC;
 
     already_in_enhanced_text_mode = t->flags & TERM_ENHANCED_TEXT;
     if (!already_in_enhanced_text_mode)
@@ -1841,8 +1842,8 @@ test_term()
     (*t->linewidth) (1.0);
     (*t->linetype) (0);
     (*t->dashtype) (DASHTYPE_SOLID, NULL);
-    x = x0 + xmax_t * .375;
-    y = y0 + ymax_t * .250;
+    x = x0 + xmax_t * .28;
+    y = y0 + ymax_t * .5;
     xl = t->h_tic * 7;
     yl = t->v_tic * 7;
     i = curr_arrow_headfilled;
@@ -1878,6 +1879,25 @@ test_term()
 	y += yl;
     }
     (*t->put_text) (x, y, "linewidth");
+
+    /* test native dashtypes (_not_ the 'set mono' sequence) */
+    (void) (*t->justify_text) (LEFT);
+    xl = xmax_t / 10;
+    yl = ymax_t / 25;
+    x = x0 + xmax_t * .3;
+    y = y0 + yl;
+    
+    for (i=0; i<5; i++) {
+ 	(*t->linewidth) (1.0);
+	(*t->linetype) (LT_SOLID);
+	(*t->dashtype) (i, NULL); 
+	(*t->set_color)(&black);
+	(*t->move) (x, y); (*t->vector) (x+xl, y);
+	sprintf(label,"  dt %1d%c",i,0);
+	(*t->put_text) (x+xl, y, label);
+	y += yl;
+    }
+    (*t->put_text) (x, y, "dashtype");
 
     /* test fill patterns */
     x = x0 + xmax_t * 0.5;
