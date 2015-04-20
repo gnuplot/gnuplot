@@ -6,19 +6,19 @@ plot 'ellipses.dat' u 1:2 with ellipses
 
 pause -1 'Hit <cr> to continue'
 
-set title "Three-column form: x  y  major_diameter  (minor diameter is the same)"
+set title "Three-column form: x  y  major_diameter  (minor diameter is the same)" noenh
 
 plot 'ellipses.dat' u 1:2:3 with ellipses
 
 pause -1 'Hit <cr> to continue'
 
-set title "Four-column form: x  y  major_diameter  minor_diameter"
+set title "Four-column form: x  y  major_diameter  minor_diameter" noenh
 
 plot 'ellipses.dat' u 1:2:3:4 with ellipses
 
 pause -1 'Hit <cr> to continue'
 
-set title "Five-column form: x  y  major_diameter  minor_diameter angle"
+set title "Five-column form: x  y  major_diameter  minor_diameter angle" noenh
 
 plot 'ellipses.dat' u 1:2:3:4:5 with ellipses
 
