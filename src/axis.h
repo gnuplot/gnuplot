@@ -1,5 +1,5 @@
 /*
- * $Id: axis.h,v 1.126 2015/04/18 18:01:23 sfeam Exp $
+ * $Id: axis.h,v 1.127 2015/04/18 18:05:00 sfeam Exp $
  *
  */
 
@@ -56,7 +56,7 @@
  * FIRST_X_AXIS & SECOND_AXES == 0
  */
 #ifndef MAX_PARALLEL_AXES
-# define MAX_PARALLEL_AXES MAX_NUM_VAR
+# define MAX_PARALLEL_AXES MAXDATACOLS-1
 #endif
 
 typedef enum AXIS_INDEX {
@@ -76,8 +76,8 @@ typedef enum AXIS_INDEX {
 #define NUMBER_OF_MAIN_VISIBLE_AXES (POLAR_AXIS + 1)
     T_AXIS,
     U_AXIS,
-    V_AXIS,
-    PARALLEL_AXES,	/* The first of up to MAX_PARALLEL_AXES */
+    V_AXIS,		/* Last index into axis_array[] */
+    PARALLEL_AXES,	/* Parallel axis data is allocated dynamically */
 
     AXIS_ARRAY_SIZE = PARALLEL_AXES
 } AXIS_INDEX;
@@ -334,10 +334,9 @@ typedef struct axis_defaults {
 
 extern AXIS axis_array[AXIS_ARRAY_SIZE];
 extern const AXIS_DEFAULTS axis_defaults[AXIS_ARRAY_SIZE];
+extern const AXIS default_axis_state;
 
-/* EAM DEBUG - Intermediate step towards dynamic allocation of parallel axes. */
-/* For now we keep the parallel axis structures at the back of axis_array but */
-/* create a pointer to them that we can pretend points to dynamic space.      */
+/* EAM DEBUG - Dynamic allocation of parallel axes. */
 extern AXIS *parallel_axis;
 extern int num_parallel_axes;
 
@@ -728,6 +727,8 @@ int map_y __PROTO((double value));
 void set_cbminmax __PROTO((void));
 
 char * axis_name __PROTO((AXIS_INDEX));
+void init_parallel_axis __PROTO((AXIS *, AXIS_INDEX));
+AXIS * extend_parallel_axis __PROTO((int ));
 
 /* macro for tic scale, used in all tic_callback functions */
 #define TIC_SCALE(ticlevel, axis) \

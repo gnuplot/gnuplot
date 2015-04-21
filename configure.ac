@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot on Unix.
 dnl
-dnl $Id: configure.ac,v 1.4 2015/01/07 23:01:40 sfeam Exp $
+dnl $Id: configure.ac,v 1.5 2015/02/25 00:23:14 sfeam Exp $
 dnl
 dnl this is actually major.minor ...
 dnl note that for a non-beta release, we need to disable DEVELOPMENT_RELEASE
@@ -1282,9 +1282,6 @@ AC_ARG_VAR(DIST_CONTACT,[Contact address for modified and binary distributed gnu
 if test -n "${DIST_CONTACT}"; then
   AC_DEFINE_UNQUOTED([DIST_CONTACT],["$DIST_CONTACT"],[Contact address for modified and binary distributed gnuplot versions])
 fi
-
-dnl No configuration option for this one yet
-AC_DEFINE(MAX_PARALLEL_AXES,7, [Maximum number of parallel axes supported])
 
 dnl Substitute variables
 AC_SUBST(PACKAGE)

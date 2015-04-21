@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.222 2015/04/17 22:02:45 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.223 2015/04/18 18:02:20 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -1773,7 +1773,6 @@ reset_command()
 
     for (axis=0; axis<AXIS_ARRAY_SIZE; axis++) {
 
-	AXIS default_axis_state = DEFAULT_AXIS_STRUCT;
 	struct axis *this_axis = &axis_array[axis];
 
 	/* Free contents before overwriting with default values */
@@ -1799,24 +1798,14 @@ reset_command()
 	reset_logscale(this_axis);
     }
 
-    /* EAM DEBUG - temporary code to duplicate old reset behaviour for parallel axes */
-    /* EAM DEBUG - The switch to dynamic allocation will free them here */
+    /* Free all previously allocated parallel axis structures */
     for (axis=0; axis<num_parallel_axes; axis++) {
-	AXIS default_axis_state = DEFAULT_AXIS_STRUCT;
 	struct axis *this_axis = &parallel_axis[axis];
-
-	/* Free contents before overwriting with default values */
 	free_axis_struct(this_axis);
-
-	/* Fill with generic values, then customize */
-	memcpy(this_axis, &default_axis_state, sizeof(AXIS));
-
-	this_axis->formatstring = gp_strdup(DEF_FORMAT);
-	this_axis->index = axis + PARALLEL_AXES;
-	this_axis->ticmode = NO_TICS;
-	this_axis->ticdef.rangelimited = TRUE;
-	this_axis->set_autoscale |= AUTOSCALE_FIXMIN | AUTOSCALE_FIXMAX;
     }
+    free(parallel_axis);
+    parallel_axis = NULL;
+    num_parallel_axes = 0;
 
     raxis = TRUE;
     for (i=2; i<MAX_TICLEVEL; i++)

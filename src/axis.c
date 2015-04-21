@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.161 2015/04/18 18:01:50 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.162 2015/04/18 18:05:00 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -73,12 +73,11 @@ const AXIS_DEFAULTS axis_defaults[AXIS_ARRAY_SIZE] = {
     { - 5,  5, "v" , NO_TICS,                      }
 };
 
-/* EAM DEBUG - Intermediate step towards dynamic allocation of parallel axes. */
-/* For now we keep the parallel axis structures in a separate array but       */
-/* create a pointer to them that we can pretend points to dynamic space.      */
-AXIS parallel_axis_array[MAX_PARALLEL_AXES];
-AXIS *parallel_axis = &parallel_axis_array[0];
-int num_parallel_axes = MAX_PARALLEL_AXES;
+const AXIS default_axis_state = DEFAULT_AXIS_STRUCT;
+
+/* EAM DEBUG - Dynamic allocation of parallel axes. */
+AXIS *parallel_axis = NULL;
+int num_parallel_axes = 0;
 
 /* HBB 20000506 new variable: parsing table for use with the table
  * module, to help generalizing set/show/unset/save, where possible */
@@ -245,6 +244,37 @@ axis_name(AXIS_INDEX axis)
 	return name;
     }
     return (char *) axis_defaults[axis].name;
+}
+
+/* 
+ * Fill in the starting values for a just-allocated  parallel axis structure
+ */
+void
+init_parallel_axis(AXIS *this_axis, AXIS_INDEX index)
+{
+    memcpy(this_axis, &default_axis_state, sizeof(AXIS));
+    this_axis->formatstring = gp_strdup(DEF_FORMAT);
+    this_axis->index = index + PARALLEL_AXES;
+    this_axis->ticdef.rangelimited = TRUE;
+    this_axis->set_autoscale |= AUTOSCALE_FIXMIN | AUTOSCALE_FIXMAX;
+}
+/*
+ * If we encounter a parallel axis index higher than any used so far,
+ * extend parallel_axis[] to hold the corresponding data.
+ * Returns pointer to the new axis.
+ */
+AXIS *
+extend_parallel_axis(int paxis)
+{
+    int i;
+    if (paxis > num_parallel_axes) {
+	parallel_axis = gp_realloc(parallel_axis, paxis * sizeof(AXIS), "extend parallel_axes");
+	for (i = num_parallel_axes; i < paxis; i++)
+	    init_parallel_axis( &parallel_axis[i], i );
+	num_parallel_axes = paxis;
+    }
+    fprintf(stderr,"Extending parallel_axis[] to hold max paxis %d\n", num_parallel_axes);
+    return &parallel_axis[paxis-1];
 }
 
 /* {{{ axis_checked_extend_empty_range() */

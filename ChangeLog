@@ -1,3 +1,13 @@
+2015-04-21  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* configure.ac src/axis.c src/axis.h src/plot2d.c src/set.c src/unset.c:
+	Switch to dynamic allocation of parallel axis structures.  The count of
+	currently allocated structures is kept in global num_parallel_axes.
+	All storage is released by "reset".
+	At this stage there still remains a limit on how many parallel axes you
+	can use in practice because each one consumes a slot in the `using` 
+	specifier (limited by MAXDATACOLS).
+
 2015-04-20  Karl Ratzsch  <ratzsch@uni-freiburg.de>
 
 	* src/term.c (test_term):  Show terminal's native dashtype support in

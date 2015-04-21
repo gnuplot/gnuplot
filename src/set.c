@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.486 2015/04/17 22:02:45 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.487 2015/04/18 18:02:20 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -5268,7 +5268,9 @@ set_paxis()
     p = int_expression();
 
     if (p <= 0 || p > MAX_PARALLEL_AXES)
-	int_error(c_token-1, "expecting parallel axis number 1 - %d",MAX_PARALLEL_AXES);
+	int_error(c_token-1, "illegal paxis");
+    if (p > num_parallel_axes)
+	extend_parallel_axis(p);
 
     if (equals(c_token, "range"))
 	set_range( &parallel_axis[p-1] );
