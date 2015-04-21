@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.944 2015/04/05 05:45:07 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.945 2015/04/09 20:32:09 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -11600,7 +11600,7 @@ Ffigure_missing
  Default plotting styles are chosen with the `set style data` and
  `set style function` commands.  See `plot with` for information about how to
  override the default plotting style for individual functions and data sets.
- See `plotting styles` for a complete list of styles.
+ See `plotting styles` or `plot with` for a complete list of styles.
 
  Syntax:
        set style function <style>
@@ -11783,8 +11783,8 @@ Ffigure_missing
        set style data <plotting-style>
        show style data
 
- See `plotting styles` for the choices.  If no choice is given, the choices are
- listed.  `show style data` shows the current default data plotting style.
+ See `plotting styles` for the choices.
+ `show style data` shows the current default data plotting style.
 4 set style fill
 ?commands set style fill
 ?commands show style fill
