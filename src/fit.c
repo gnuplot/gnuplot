@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: fit.c,v 1.154 2015/04/09 02:23:47 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: fit.c,v 1.155 2015/04/09 03:07:13 sfeam Exp $"); }
 #endif
 
 /*  NOTICE: Change of Copyright Status
@@ -1821,7 +1821,7 @@ fit_command()
     static const int iz = MAX_NUM_VAR;
 
     int i, j;
-    double v[MAXDATACOLS];
+    double v[MAX_NUM_VAR+2];
     double tmpd;
     time_t timer;
     int token1, token2, token3;
@@ -1919,7 +1919,7 @@ fit_command()
     /* the limit on parameters passed to a user-defined function.		*/
     /* I.e. we expect that MAXDATACOLS >= MAX_NUM_VAR + 2			*/
 
-    columns = df_open(file_name, MAXDATACOLS, NULL);
+    columns = df_open(file_name, MAX_NUM_VAR+2, NULL);
     if (columns < 0)
 	Eexc2(token2, "Can't read data from", file_name);
     free(file_name);
