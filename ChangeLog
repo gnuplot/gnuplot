@@ -1,3 +1,11 @@
+2015-04-22  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/datafile.c (f_stringcolumn f_columnhead df_set_key_title):
+	columnhead(FOO) could return strange results for FOO > 999 or
+	undefined or otherwise invalid.  Now we extend the range of valid
+	column number to 9999 and return 0 for invalid or out of range FOO.
+	Bug #1596
+
 2015-04-21  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* configure.ac src/axis.c src/axis.h src/plot2d.c src/set.c src/unset.c:
