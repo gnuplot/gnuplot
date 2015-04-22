@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.290.2.7 2015/01/13 18:17:20 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.290.2.8 2015/03/08 17:29:10 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -2538,7 +2538,7 @@ f_stringcolumn(union argument *arg)
 void
 f_columnhead(union argument *arg)
 {
-    static char placeholder[] = "@COLUMNHEAD00@";
+    static char placeholder[] = "@COLUMNHEAD0000@";
     struct value a;
 
     if (!evaluate_inside_using)
@@ -2547,7 +2547,9 @@ f_columnhead(union argument *arg)
     (void) arg;                 /* avoid -Wunused warning */
     (void) pop(&a);
     column_for_key_title = (int) real(&a);
-    snprintf(placeholder+11, 4, "%02d@", column_for_key_title);
+    if (column_for_key_title < 0 || column_for_key_title > 9999)
+	column_for_key_title = 0;
+    snprintf(placeholder+11, 6, "%4d@", column_for_key_title);
     push(Gstring(&a, placeholder));
 }
 
@@ -2736,12 +2738,13 @@ df_set_key_title(struct curve_points *plot)
 
 	while (placeholder) {
 	    char *newtitle = gp_alloc(strlen(plot->title) + df_longest_columnhead, "plot title");
-	    columnhead = atoi(placeholder+11);
+	    char *trailer = NULL;
+	    columnhead = strtol(placeholder+11, &trailer, 0);
 	    *placeholder = '\0';
 	    sprintf(newtitle, "%s%s%s", plot->title, 
 		    (columnhead <= 0) ? df_key_title :
 		    (columnhead <= df_no_cols) ? df_column[columnhead-1].header : "",
-		    placeholder+14);
+		    trailer ? trailer : "");
 	    free(plot->title);
 	    plot->title = newtitle;
 	    placeholder = strstr(newtitle, "@COLUMNHEAD");
