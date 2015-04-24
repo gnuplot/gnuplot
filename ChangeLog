@@ -1,3 +1,9 @@
+2015-04-24  Daniel J Sebald <daniel.sebald@ieee.org>
+
+	* src/misc.c (parse_fillstyle):  Additional sanity checks when parsing
+	fillstyle options.
+	Bug #1597
+
 2015-04-22  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/datafile.c (f_stringcolumn f_columnhead df_set_key_title):

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.195 2014/10/07 21:23:08 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.196 2015/01/20 02:10:42 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -1257,12 +1257,19 @@ lp_parse(struct lp_style_type *lp, lp_class destination_class, TBOOLEAN allow_po
 }
 
 /* <fillstyle> = {empty | solid {<density>} | pattern {<n>}} {noborder | border {<lt>}} */
+const struct gen_table fs_opt_tbl[] = {
+    {"e$mpty", FS_EMPTY},
+    {"s$olid", FS_SOLID},
+    {"p$attern", FS_PATTERN},
+    {NULL, -1}
+};
+
 void
 parse_fillstyle(struct fill_style_type *fs, int def_style, int def_density, int def_pattern, 
 		t_colorspec def_bordertype)
 {
     TBOOLEAN set_fill = FALSE;
-    TBOOLEAN set_param = FALSE;
+    TBOOLEAN set_border = FALSE;
     TBOOLEAN transparent = FALSE;
 
     /* Set defaults */
@@ -1278,29 +1285,59 @@ parse_fillstyle(struct fill_style_type *fs, int def_style, int def_density, int 
     c_token++;
 
     while (!END_OF_COMMAND) {
+	int i;
+
 	if (almost_equals(c_token, "trans$parent")) {
 	    transparent = TRUE;
 	    c_token++;
-	}
-
-	if (almost_equals(c_token, "e$mpty")) {
-	    fs->fillstyle = FS_EMPTY;
-	    c_token++;
-	} else if (almost_equals(c_token, "s$olid")) {
-	    fs->fillstyle = FS_SOLID;
-	    set_fill = TRUE;
-	    c_token++;
-	} else if (almost_equals(c_token, "p$attern")) {
-	    fs->fillstyle = FS_PATTERN;
-	    set_fill = TRUE;
-	    c_token++;
-	}
-
-	if (END_OF_COMMAND)
 	    continue;
-	else if (almost_equals(c_token, "bo$rder")) {
+	}
+
+	i = lookup_table(fs_opt_tbl, c_token);
+	switch (i) {
+	    default:
+		 break;
+
+	    case FS_EMPTY:
+	    case FS_SOLID:
+	    case FS_PATTERN:
+
+		if (set_fill)
+		    int_error(c_token, "conflicting option");
+		fs->fillstyle = i;
+		set_fill = TRUE;
+		c_token++;
+		
+		if (isanumber(c_token) || type_udv(c_token) == INTGR || type_udv(c_token) == CMPLX) {
+		    if (fs->fillstyle == FS_SOLID) {
+			/* user sets 0...1, but is stored as an integer 0..100 */
+			fs->filldensity = 100.0 * real_expression() + 0.5;
+			if (fs->filldensity < 0)
+			    fs->filldensity = 0;
+			if (fs->filldensity > 100)
+			    fs->filldensity = 100;
+		    } else if (fs->fillstyle == FS_PATTERN) {
+			fs->fillpattern = int_expression();
+			if (fs->fillpattern < 0)
+			    fs->fillpattern = 0;
+		    } else
+			int_error(c_token, "this fill style does not have a parameter");
+		}
+		continue;
+	}
+
+	if (almost_equals(c_token, "bo$rder")) {
+	    if (set_border) {
+		if (fs->border_color.lt == LT_NODRAW)
+		    int_error(c_token, "conflicting option");
+		else
+		    int_warn(c_token, "duplicate option");
+	    }
 	    fs->border_color.type = TC_DEFAULT;
+	    set_border = TRUE;
 	    c_token++;
+	    if (END_OF_COMMAND)
+		continue;
 	    if (equals(c_token,"-") || isanumber(c_token)) {
 		fs->border_color.type = TC_LT;
 		fs->border_color.lt = int_expression() - 1;
@@ -1313,32 +1350,21 @@ parse_fillstyle(struct fill_style_type *fs, int def_style, int def_density, int 
 	    }
 	    continue;
 	} else if (almost_equals(c_token, "nobo$rder")) {
+	    if (set_border) {
+		if (fs->border_color.lt == LT_NODRAW)
+		    int_warn(c_token, "duplicate option");
+		else
+		    int_error(c_token, "conflicting option");
+	    }
 	    fs->border_color.type = TC_LT;
 	    fs->border_color.lt = LT_NODRAW;
+	    set_border = TRUE;
 	    c_token++;
 	    continue;
 	}
 
-	/* We hit something unexpected */
-	if (!set_fill || set_param)
-	    break;
-	if (!(isanumber(c_token) || type_udv(c_token) == INTGR || type_udv(c_token) == CMPLX))
-	    break;
-
-	if (fs->fillstyle == FS_SOLID) {
-	    /* user sets 0...1, but is stored as an integer 0..100 */
-	    fs->filldensity = 100.0 * real_expression() + 0.5;
-	    if (fs->filldensity < 0)
-		fs->filldensity = 0;
-	    if (fs->filldensity > 100)
-		fs->filldensity = 100;
-	    set_param = TRUE;
-	} else if (fs->fillstyle == FS_PATTERN) {
-	    fs->fillpattern = int_expression();
-	    if (fs->fillpattern < 0)
-		fs->fillpattern = 0;
-	    set_param = TRUE;
-	}
+	/* Keyword must belong to someone else */
+	break;
     }
     if (transparent) {
 	if (fs->fillstyle == FS_SOLID)
