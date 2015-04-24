@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.902.2.36 2015/04/02 20:48:34 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.902.2.37 2015/04/06 01:10:51 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -11773,8 +11773,8 @@ Ffigure_missing
        set style data <plotting-style>
        show style data
 
- See `plotting styles` for the choices.  If no choice is given, the choices are
- listed.  `show style data` shows the current default data plotting style.
+ See `plotting styles` for the choices. `show style data` shows the current 
+ default data plotting style.
 4 set style fill
 ?commands set style fill
 ?commands show style fill
