@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.196 2015/01/20 02:10:42 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.197 2015/04/24 21:43:17 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -1302,7 +1302,7 @@ parse_fillstyle(struct fill_style_type *fs, int def_style, int def_density, int 
 	    case FS_SOLID:
 	    case FS_PATTERN:
 
-		if (set_fill)
+		if (set_fill && fs->fillstyle != i)
 		    int_error(c_token, "conflicting option");
 		fs->fillstyle = i;
 		set_fill = TRUE;
@@ -1327,12 +1327,8 @@ parse_fillstyle(struct fill_style_type *fs, int def_style, int def_density, int 
 	}
 
 	if (almost_equals(c_token, "bo$rder")) {
-	    if (set_border) {
-		if (fs->border_color.lt == LT_NODRAW)
-		    int_error(c_token, "conflicting option");
-		else
-		    int_warn(c_token, "duplicate option");
-	    }
+	    if (set_border && fs->border_color.lt == LT_NODRAW)
+		int_error(c_token, "conflicting option");
 	    fs->border_color.type = TC_DEFAULT;
 	    set_border = TRUE;
 	    c_token++;
@@ -1350,12 +1346,8 @@ parse_fillstyle(struct fill_style_type *fs, int def_style, int def_density, int 
 	    }
 	    continue;
 	} else if (almost_equals(c_token, "nobo$rder")) {
-	    if (set_border) {
-		if (fs->border_color.lt == LT_NODRAW)
-		    int_warn(c_token, "duplicate option");
-		else
-		    int_error(c_token, "conflicting option");
-	    }
+	    if (set_border && fs->border_color.lt != LT_NODRAW)
+		int_error(c_token, "conflicting option");
 	    fs->border_color.type = TC_LT;
 	    fs->border_color.lt = LT_NODRAW;
 	    set_border = TRUE;
