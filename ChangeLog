@@ -4,6 +4,12 @@
 	one error in assigning color to contours levels.
 	Bug #1603
 
+	* src/command.c (do_line):  If an input line starts with a shell escape
+	(e.g. '!' for linux) bypass first stage processing (df_tokenise) of the
+	remainder of the line.  NB: This means that text following a comment
+	character is now passed to the shell rather than being stripped.
+	Bug #1517
+
 2015-04-24  Daniel J Sebald <daniel.sebald@ieee.org>
 
 	* src/misc.c (parse_fillstyle):  Additional sanity checks when parsing
