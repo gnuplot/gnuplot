@@ -4,6 +4,8 @@
 	one error in assigning color to contours levels. (introduced in 4.6.5)
 	Bug #1603
 
+	* configure.in src/version.c:  Bump patchlevel to 4.6.7
+
 2015-04-07  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term.c (test_term): print gnuplot version in "test" command.
