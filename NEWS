@@ -33,6 +33,7 @@ Changes since 5.0 release
 * FIX error in calculating absolute deviation (stats command)
 * FIX allocation error from "set fit covariancevariables"
 * FIX tkcanvas terminal handling of blank (default) font family name
+* FIX off-by-one-error in color of contours when hidden3d is active
 
 Changes in final release of 5.0
 ===============================

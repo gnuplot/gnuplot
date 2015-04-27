@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.311.2.5 2015/01/20 01:26:45 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.311.2.6 2015/03/19 17:35:39 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -1188,7 +1188,9 @@ do_3dplot(
 		int ic = 1;	/* ic will index the contour linetypes */
 
 		thiscontour_lp_properties = this_plot->lp_properties;
-		thiscontour_lp_properties.l_type += (hidden3d ? 1 : 0);
+		/* EAM April 2015 - Disabled this, but I'm not really sure */
+		/* Maybe this is now a dashtype correction?                */
+		/* thiscontour_lp_properties.l_type += (hidden3d ? 1 : 0); */
 
 		term_apply_lp_properties(&(thiscontour_lp_properties));
 
@@ -1211,8 +1213,10 @@ do_3dplot(
 				lp_use_properties(&ls, this_plot->hidden3d_top_linetype + ic);
 			    } else {
 				/* The linetype itself is passed to hidden3d processing */
+				/* EAM Apr 2015 - not sure why this is "ic -1" but otherwise */
+				/* hidden3d contours are colored off by one (Bug #1603).     */
 				thiscontour_lp_properties.l_type = 
-					this_plot->hidden3d_top_linetype + ic;
+					this_plot->hidden3d_top_linetype + ic -1;
 				/* otherwise the following would be sufficient */
 				load_linetype(&ls, this_plot->hidden3d_top_linetype + ic);
 			    }
