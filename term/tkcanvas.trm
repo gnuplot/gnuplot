@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: tkcanvas.trm,v 1.27 2006/07/21 02:35:48 sfeam Exp $
+ * $Id: tkcanvas.trm,v 1.28 2006/08/27 22:10:46 sfeam Exp $
  *
  */
 
@@ -455,7 +455,7 @@ TK_set_font(const char *font)
 	if (tk_perl)
 	    fputs("undef $font;\n", gpoutfile);
 	else
-	    fputs("catch {unset $font}\n", gpoutfile);
+	    fputs("catch {unset font}\n", gpoutfile);
     } else {
 	char *name;
 	int size = 0;
