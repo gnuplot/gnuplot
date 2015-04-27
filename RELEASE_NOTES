@@ -14,6 +14,7 @@ Fixes since gnuplot version 4.6.6
 * FIX handle log-scaled color axis in colorspec "lc palette cb"
 * FIX incorrect colorbox axis labels in polar plots
 * FIX off-by-one error in color of contours when hidden3d is active
+* FIX stats code was confusing the x and y dimensions of matrix data
 
 
 		 NOTES TO PACKAGERS AND TESTERS 

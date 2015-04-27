@@ -6,6 +6,13 @@
 
 	* configure.in src/version.c:  Bump patchlevel to 4.6.7
 
+2015-04-27  Christoph Bersch <usenet@bersch.net>
+
+	* src/stats.c:  The stats code was confusing the x and y dimensions of
+	matrix data.  E.g. it would report a 5X7 matrix as being 7X5, and
+	mis-calculate the indices of the min/max values.
+	Bug #1501
+
 2015-04-07  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term.c (test_term): print gnuplot version in "test" command.

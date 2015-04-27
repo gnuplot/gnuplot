@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: stats.c,v 1.3.2.3 2012/04/09 04:25:37 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: stats.c,v 1.3.2.4 2013/04/12 17:21:57 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - stats.c */
@@ -167,7 +167,7 @@ analyze_file( long n, int outofrange, int invalid, int blank, int dblblank )
 }
 
 static struct sgl_column_stats 
-analyze_sgl_column( double *data, long n, long nr )
+analyze_sgl_column( double *data, long n, long nc )
 {
     struct sgl_column_stats res;
 
@@ -181,9 +181,9 @@ analyze_sgl_column( double *data, long n, long nr )
     struct pair *tmp = (struct pair *)gp_alloc( n*sizeof(struct pair),
 					      "analyze_sgl_column" );
      
-    if ( nr > 0 ) {
-	res.sx = nr;
-	res.sy = n / nr;
+    if ( nc > 0 ) {
+	res.sx = nc;
+	res.sy = n / nc;
     } else {
 	res.sx = 0;
 	res.sy = n;
@@ -193,7 +193,7 @@ analyze_sgl_column( double *data, long n, long nr )
     for( i=0; i<n; i++ ) {
 	s  += data[i];
 	s2 += data[i]*data[i];
-	if ( nr > 0 ) {
+	if ( nc > 0 ) {
 	    cx += data[i]*(i % res.sx);
 	    cy += data[i]*(i / res.sx);
 	}
@@ -347,10 +347,10 @@ sgl_column_output_nonformat( struct sgl_column_stats s, char *x )
 
     /* If data set is matrix */
     if ( s.sx > 0 ) {
-	fprintf( print_out, "%s%s\t%ld\n","index_min_x",  x, (s.min.index) / s.sx );
-	fprintf( print_out, "%s%s\t%ld\n","index_min_y",  x, (s.min.index) % s.sx );
-	fprintf( print_out, "%s%s\t%ld\n","index_max_x",  x, (s.max.index) / s.sx );
-	fprintf( print_out, "%s%s\t%ld\n","index_max_y",  x, (s.max.index) % s.sx );
+	fprintf( print_out, "%s%s\t%ld\n","index_min_x",  x, (s.min.index) % s.sx );
+	fprintf( print_out, "%s%s\t%ld\n","index_min_y",  x, (s.min.index) / s.sx );
+	fprintf( print_out, "%s%s\t%ld\n","index_max_x",  x, (s.max.index) % s.sx );
+	fprintf( print_out, "%s%s\t%ld\n","index_max_y",  x, (s.max.index) / s.sx );
 	fprintf( print_out, "%s%s\t%f\n","cog_x",  x, s.cog_x );
 	fprintf( print_out, "%s%s\t%f\n","cog_y",  x, s.cog_y );
     } else {
@@ -395,9 +395,9 @@ sgl_column_output( struct sgl_column_stats s, long n )
     /* For matrices, the quartiles and the median do not make too much sense */
     if ( s.sx > 0 ) {
 	fprintf( print_out, "  Minimum:  %s [%*ld %ld ]\n", fmt(buf, s.min.val), width, 
-	     (s.min.index) / s.sx, (s.min.index) % s.sx);
+	     (s.min.index) % s.sx, (s.min.index) / s.sx);
 	fprintf( print_out, "  Maximum:  %s [%*ld %ld ]\n", fmt(buf, s.max.val), width, 
-	     (s.max.index) / s.sx, (s.max.index) % s.sx);
+	     (s.max.index) % s.sx, (s.max.index) / s.sx);
 	fprintf( print_out, "  COG:      %s %s\n", fmt(buf, s.cog_x), fmt(buf2, s.cog_y) );
     } else {
 	/* FIXME:  The "position" are randomly selected from a non-unique set. Bad! */
@@ -533,10 +533,12 @@ sgl_column_variables( struct sgl_column_stats s, char *prefix, char *suffix )
   
     /* If data set is matrix */
     if ( s.sx > 0 ) {
-	create_and_set_var( (s.min.index) / s.sx, prefix, "index_min_x", suffix );
-	create_and_set_var( (s.min.index) % s.sx, prefix, "index_min_y", suffix );
-	create_and_set_var( (s.max.index) / s.sx, prefix, "index_max_x", suffix );
-	create_and_set_var( (s.max.index) % s.sx, prefix, "index_max_y", suffix );
+	create_and_set_var( (s.min.index) % s.sx, prefix, "index_min_x", suffix );
+	create_and_set_var( (s.min.index) / s.sx, prefix, "index_min_y", suffix );
+	create_and_set_var( (s.max.index) % s.sx, prefix, "index_max_x", suffix );
+	create_and_set_var( (s.max.index) / s.sx, prefix, "index_max_y", suffix );
+	create_and_set_var( s.sx, prefix, "size_x", suffix );
+	create_and_set_var( s.sy, prefix, "size_y", suffix );
     } else {
 	create_and_set_var( s.median,         prefix, "median",      suffix );
 	create_and_set_var( s.lower_quartile, prefix, "lo_quartile", suffix );
@@ -859,7 +861,7 @@ statsrequest(void)
     /* Do the actual analysis */
     res_file = analyze_file( n, out_of_range, invalid, blanks, doubleblanks );
     if ( columns == 1 ) {
-	res_y = analyze_sgl_column( data_y, n, nr );
+	res_y = analyze_sgl_column( data_y, n, nc );
     }
 
     if ( columns == 2 ) {
