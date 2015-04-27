@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.298 2015/02/15 16:39:20 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.299 2015/03/24 16:41:44 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -340,6 +340,14 @@ do_line()
     while (isspace((unsigned char) *inlptr))
 	inlptr++;
 
+    /* Leading '!' indicates a shell command that bypasses normal gnuplot
+     * tokenization and parsing.  This doesn't work inside a bracketed clause.
+     */
+    if (is_system(*inlptr)) {
+	do_system(inlptr + 1);
+	return (0);
+    }
+
     /* Strip off trailing comment */
     FPRINTF((stderr,"doline( \"%s\" )\n", gp_input_line));
     if (strchr(inlptr, '#')) {
@@ -357,12 +365,6 @@ do_line()
 	gp_input_line[strlen(inlptr)] = NUL;
     }
     FPRINTF((stderr, "  echo: \"%s\"\n", gp_input_line));
-
-    /* EAM May 2011 - This will not work in a bracketed clause. Should it? */
-    if (is_system(gp_input_line[0])) {
-	do_system(gp_input_line + 1);
-	return (0);
-    }
 
     if_depth = 0;
     num_tokens = scanner(&gp_input_line, &gp_input_line_len);
