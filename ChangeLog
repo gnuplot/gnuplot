@@ -1,3 +1,9 @@
+2015-04-27  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/graph3d.c (do_3dplot):  Turning on "hidden3d" caused an off by
+	one error in assigning color to contours levels. (introduced in 4.6.5)
+	Bug #1603
+
 2015-04-07  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term.c (test_term): print gnuplot version in "test" command.

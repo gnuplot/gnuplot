@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.253.2.16 2013/12/11 22:16:05 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.253.2.17 2014/08/14 22:53:40 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -1284,7 +1284,7 @@ do_3dplot(
 			    if (prefer_line_styles && label_contours)
 				lp_use_properties(&ls, this_plot->hidden3d_top_linetype + ic);
 			    else {
-				thiscontour_lp_properties.l_type = this_plot->hidden3d_top_linetype + ic;
+				thiscontour_lp_properties.l_type = this_plot->hidden3d_top_linetype + ic - 1;
 				thiscontour_lp_properties.use_palette = TRUE;
 				load_linetype(&ls, this_plot->hidden3d_top_linetype + ic);
 			    }
