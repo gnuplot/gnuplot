@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.902.2.37 2015/04/06 01:10:51 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.902.2.38 2015/04/24 18:57:56 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -11217,7 +11217,14 @@ Ffigure_missing
        gamma = 2.2
        color(gray) = gray**(1./gamma)
        set palette model RGB functions color(gray), color(gray), color(gray)
-
+4 gray
+?commands set palette gray
+?set palette gray
+?set palette grey
+?palette gray
+ `set palette gray` switches to a grayscale palette shading from 0.0 = black
+ to 1.0 = white.  `set palette color` is an easy way to switch back from the
+ gray palette to the last color mapping.
 4 cubehelix
 ?commands set palette cubehelix
 ?set palette cubehelix
