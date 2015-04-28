@@ -1,53 +1,19 @@
-		   GNUPLOT VERSION 4.6.6
+		   GNUPLOT VERSION 4.6.7
 	    ===================================
 
-This is an incremental update of gnuplot version 4.6 containing bug fixes
-and some minor additions that increase forward compatibility with the
-next major gnuplot release (5.0).
+This is an incremental update of gnuplot version 4.6 containing a handful of
+bug fixes found since release of gnuplot 5.  
 
-This is the last incremental update planned for gnuplot 4.6, as initial
-release candidates for gnuplot 5.0 are already available.  Version 5 will
-offer significant improvements over version 4, but some of these are not
-100% backwards compatible with scripts written for version 4.  Therefore
-anyone interested in long-term 100% compatibility with existing gnuplot
-scripts may want to install and continue to provide version 4.6.6 even
-after release of gnuplot version 5.
+Version 4.6.7 is intended as a source-only release of interest only to those
+who for whatever reason choose to continue using the 4.6 series rather than
+moving to version 5.
 
-A short list of changes since the previous patchlevel (version 4.6.5)
-is given below and in the NEWS file.  Detailed information is in ChangeLog.
-
-New features, changes and fixes since gnuplot version 4.6.5
-===========================================================
-
-* NEW linetype keyword "nodraw" can be used to draw only the points in "with lp"
-* NEW plot option to "skip N" lines at start of an ascii data file
-* NEW 'set fit prescale' normalized fit parameters before M-L refinement
-* NEW update svg terminal to grey out the key entry when a plot is toggled off
-* NEW allow keywords "comma" and "tab" for "set datafile separator"
-* CHANGE Accept "with image pixels" as a synonym for "with image failsafe"
-* CHANGE return NaN if a requested numerical data value finds a string instead
-* CHANGE Consume only one space following the font name in an enhanced test string
-* CHANGE respond to left mouse click on press rather than on release
-* FIX Faster recovery from outboard server gnuplot_qt being killed
-* FIX get rid of O(N^2) memory allocation for string data in long input lines
-* FIX large integers in iteration spec could cause overflow in end condition check
-* FIX object fillcolors should be consistent with the color of current linetypes
-* FIX LFS support on 64bit platforms (not backported for 32bit platforms)
-* FIX timecolumn() applied to non-axis data reports an error rather than faulting
-* FIX clipping could fail on integer overflow
-* FIX segfault resulting from strcol(N) applied to empty field in a *.csv file
-* FIX adjustment of key size to accommodate long key title
-* FIX treat data value read as "NaN" the same as we would "1/0"
-* FIX handling of events triggered by closing the qt plot window
-* FIX iteration failure due to integer overflow
-* FIX clip r axis tics to current plot boundary
-* FIX logscale cb axis with volatile data
-* FIX qt terminal timing problem with mouse click+release
-* FIX qt terminal handle window close events
-* FIX incorrect processing of certain loop [start:end:incr] combinations
-* FIX Fix y extent and clipping of rectangles with y coord < 0 or inverted axes
-* FIX handle columnheaders in input to fit
-* FIX add sanity check in pdf.trm to avoid strcpy(fontname,fontname)
+Fixes since gnuplot version 4.6.6
+=================================
+* FIX apply numeric locale when reading ascii matrix data
+* FIX handle log-scaled color axis in colorspec "lc palette cb"
+* FIX incorrect colorbox axis labels in polar plots
+* FIX off-by-one error in color of contours when hidden3d is active
 
 
 		 NOTES TO PACKAGERS AND TESTERS 
@@ -121,15 +87,15 @@ Demo plots illustrating new and old features are online at
 Installation
 ------------
 
-You can download a source tarball for gnuplot version 4.6.6 from the 
+You can download a source tarball for gnuplot version 4.6.7 from the 
 gnuplot development site on SourceForge.
 
-	http://sourceforge.net/project/showfiles.php?group_id=2055
+	http://sourceforge.net/projects/gnuplot
 
 Installation instructions are available in the source itself; the short
 version for linux/unix-like systems is to unpack the tarball and then
 build it:
-		cd gnuplot-4.6.6 ; ./configure ; make
+		cd gnuplot-4.6.7 ; ./configure ; make
 test it:
 		make check
 install it:
@@ -163,7 +129,7 @@ Support
 Please report all bugs and installation problems to the bug tracker
 on SourceForge:
 
-	http://sourceforge.net/tracker/?group_id=2055&atid=102055
+	http://sourceforge.net/p/gnuplot/bugs/
 
 There is also an gnuplot discussion forum on usenet group
 
@@ -172,6 +138,7 @@ There is also an gnuplot discussion forum on usenet group
 
 Development
 -----------
-Gnuplot development is quite active. The development branch on SourceForge
-contains many new features.  The current development branch is labeled 5.1.
-Feedback and contributions of code are very welcome.
+The development branch of gnuplot contains many new features.
+The current development branch is labeled 5.1.
+Feedback and contributions of code are very welcome, but please realize
+that development is now based on version 5 rather than version 4.
