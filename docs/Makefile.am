@@ -84,7 +84,7 @@ doc2gih gnuplot.gih doc2hlp gnuplot.hlp gnuplot.idx gnuplot.ilg		\
 gnuplot.ind gnuplot.info* gnuplot.out doc2ipf gnuplot.ipf doc2ms	\
 gnuplot.ms doc2rnh gnuplot.rnh doc2rtf gnuplot.rtf gnuplot.nroff	\
 checkdoc gnuplot.txt gnuplot.tmp VERSION gnuplot.4tc gnuplot.4ct	\
-gnuplot.idv gnuplot.xref gnuplot.lg figures pdffigures.*		\
+gnuplot.idv gnuplot.xref gnuplot.lg figures pdffigures.aux		\
 wxhelp/*.html wxhelp/wgnuplot.htc windows/wgnuplot.htk gnuplot.pdf	\
 gnuplot.htb gnuplot.texi gnuplot-eldoc.el $(ELCS)
 
@@ -180,8 +180,10 @@ pdffigures: pdffigures.tex $(top_srcdir)/src/gnuplot $(top_srcdir)/docs/plotstyl
 	rm -f figures
 
 pdffigures.tex:	figures
-	echo "\usepackage{graphicx}" > pdffigures.tex ; \
-	echo "\usepackage{picins}" >> pdffigures.tex
+	@if [ -z pdffigures.tex ] ; then \
+	  echo "\usepackage{graphicx}" > pdffigures.tex ; \
+	  echo "\usepackage{picins}" >> pdffigures.tex ; \
+	fi
 
 figures: allterm.h doc2tex$(EXEEXT) $(srcdir)/gnuplot.doc
 	@if [ -a $(top_srcdir)/src/gnuplot ] ; then \
@@ -225,8 +227,8 @@ gnuplot.tex: allterm.h doc2tex$(EXEEXT) $(srcdir)/gnuplot.doc
 doc2tex_SOURCES = doc2tex.c termdoc.c
 doc2tex_CPPFLAGS = -DALL_TERM_DOC $(AM_CPPFLAGS)
 
-# this is how to make DVI files
-dvi: gnuplot.dvi gpcard.dvi
+# This is to default the automatic invocation of "make dvi" by distcheck
+dvi:
 
 gnuplot.dvi: gnuplot.tex titlepag.tex toc_entr.sty
 	@if test $(LATEX) != no ; then \

@@ -1,3 +1,10 @@
+2015-04-29  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* Makefile.maint docs/pdffigures.tex docs/Makefile.am:
+	Try to reduce churn during "make check" "make pdf" etc by removing
+	dvi as an auto-generated target and defaulting to documentation with
+	figures.
+
 2015-04-27  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graph3d.c (do_3dplot):  Turning on "hidden3d" caused an off by
