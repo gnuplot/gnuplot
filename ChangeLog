@@ -1,3 +1,10 @@
+2015-04-30  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/hidden3d.c:  If a hidden3d plot included a "with image" component,
+	the hidden3d processing was tracking individual pixels as points.  This
+	slowed everything down without accomplishing anything useful.  Now we
+	ignore image plots altogether in the hidden3d code.
+
 2015-04-27  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graph3d.c (do_3dplot):  Turning on "hidden3d" caused an off by
