@@ -1,5 +1,5 @@
 /*
- * $Id: axis.h,v 1.127 2015/04/18 18:05:00 sfeam Exp $
+ * $Id: axis.h,v 1.128 2015/04/21 18:43:08 sfeam Exp $
  *
  */
 
@@ -449,50 +449,14 @@ do {						\
     (axis->log ? axis_undo_log(axis,coordinate): (coordinate))
 
 
-/* copy scalar data to arrays. The difference between 3D and 2D
- * versions is: dont know we have to support ranges [10:-10] - lets
- * reverse it for now, then fix it at the end.  */
-/* FIXME HBB 20000426: unknown if this distinction makes any sense... */
-#define AXIS_INIT3D(axis, islog_override, infinite)			\
-do {									\
-    AXIS *this = axis_array + axis;					\
-									\
-    this->autoscale = this->set_autoscale;				\
-    if ((this->autoscale & AUTOSCALE_BOTH) == AUTOSCALE_NONE		\
-	&& this->set_max < this->set_min) {				\
-	this->min = this->set_max;					\
-	this->max = this->set_min;					\
-        /* we will fix later */						\
-    } else {								\
-	this->min = (infinite && (this->set_autoscale & AUTOSCALE_MIN))	\
-	    ? VERYLARGE : this->set_min;				\
-	this->max = (infinite && (this->set_autoscale & AUTOSCALE_MAX))	\
-	    ? -VERYLARGE : this->set_max;				\
-    }									\
-    if (islog_override) {						\
-	this->log = 0;							\
-	this->base = 1;							\
-	this->log_base = 0;						\
-    } else {								\
-	this->log_base = this->log ? log(this->base) : 0;		\
-    }									\
-    this->data_min = VERYLARGE;						\
-    this->data_max = -VERYLARGE;					\
-} while(0)
+/* April 2015:  I'm not 100% sure, but I believe there is no longer
+ * any need to treat 2D and 3D axis initialization differently
+ */
+#define AXIS_INIT3D(axis, islog_override, infinite) \
+        axis_init((&axis_array[axis]), infinite)
 
 #define AXIS_INIT2D(axis, infinite) \
-        axis_init2d((&axis_array[axis]), infinite)
-
-#define axis_init2d(this, infinite)					\
-do {									\
-    this->autoscale = this->set_autoscale;				\
-    this->min = (infinite && (this->set_autoscale & AUTOSCALE_MIN))	\
-	? VERYLARGE : this->set_min;					\
-    this->max = (infinite && (this->set_autoscale & AUTOSCALE_MAX))	\
-	? -VERYLARGE : this->set_max;					\
-    this->data_min = VERYLARGE;						\
-    this->data_max = -VERYLARGE;					\
-} while(0)
+        axis_init((&axis_array[axis]), infinite)
 
 /* AXIS_INIT2D_REFRESH and AXIS_UPDATE2D_REFRESH(axis) are for volatile data */
 #define AXIS_INIT2D_REFRESH(axis, infinite)				\
@@ -692,6 +656,7 @@ void axis_unlog_interval __PROTO((struct axis *, double *, double *, TBOOLEAN));
 void axis_invert_if_requested __PROTO((struct axis *));
 void axis_revert_range __PROTO((AXIS_INDEX));
 void axis_revert_and_unlog_range __PROTO((AXIS_INDEX));
+void axis_init __PROTO((AXIS *this_axis, TBOOLEAN infinite));
 double axis_log_value_checked __PROTO((AXIS_INDEX, double, const char *));
 void axis_checked_extend_empty_range __PROTO((AXIS_INDEX, const char *mesg));
 char * copy_or_invent_formatstring __PROTO((struct axis *));

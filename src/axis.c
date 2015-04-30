@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.162 2015/04/18 18:05:00 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.163 2015/04/21 18:43:08 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -200,6 +200,19 @@ axis_invert_if_requested(struct axis *axis)
     }
 }
 
+
+void
+axis_init(AXIS *this_axis, TBOOLEAN infinite)
+{
+    this_axis->autoscale = this_axis->set_autoscale;
+    this_axis->min = (infinite && (this_axis->set_autoscale & AUTOSCALE_MIN))
+	? VERYLARGE : this_axis->set_min;
+    this_axis->max = (infinite && (this_axis->set_autoscale & AUTOSCALE_MAX))
+	? -VERYLARGE : this_axis->set_max;
+    this_axis->data_min = VERYLARGE;
+    this_axis->data_max = -VERYLARGE;
+}
+
 /* {{{ axis_revert_range() */
 
 void
@@ -273,7 +286,6 @@ extend_parallel_axis(int paxis)
 	    init_parallel_axis( &parallel_axis[i], i );
 	num_parallel_axes = paxis;
     }
-    fprintf(stderr,"Extending parallel_axis[] to hold max paxis %d\n", num_parallel_axes);
     return &parallel_axis[paxis-1];
 }
 

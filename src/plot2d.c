@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.357 2015/04/16 06:15:18 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.358 2015/04/21 18:43:08 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -570,7 +570,7 @@ get_data(struct curve_points *current_plot)
 	/* We have not yet read in any data, so we cannot do complete initialization */
 	for (j = 0; j < current_plot->n_par_axes; j++) {
 	    struct axis *this_axis = &parallel_axis[j];
-	    axis_init2d(this_axis, 1);
+	    axis_init(this_axis, 1);
 	}
 	break;
 

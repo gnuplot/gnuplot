@@ -9,6 +9,11 @@
 	plots.  It doesn't actually work at this point, but is useful as a test
 	case for new code.
 
+	* src/axis.c (axis_init) src/axis.h src/plot2d.c:  Funnel existing
+	macros AXIS_INIT2D and AXIS_INIT3D into a single routine axis_init().
+	Whatever reason there was originally to distinguish the 2D and 3D cases
+	is no longer applicable in version 5.
+
 2015-04-29  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* Makefile.maint docs/pdffigures.tex docs/Makefile.am:
