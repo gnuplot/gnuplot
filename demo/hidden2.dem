@@ -26,6 +26,25 @@ pause -1 "Hit return to continue"
 reset
 
 #
+# Image surfaces are similiarly overlooked in the calculation of hidden line removal.
+# I.e. this demo doesn't actually work yet.  It's here for testing.
+#
+set isosamples 25,25
+set xyplane at 0
+unset key
+
+set cbrange [0:255]
+set palette cubehelix
+
+set title "Mixing image surface with hidden-line plots"
+
+set hidden3d front
+splot 'blutux.rgb' binary array=(128,128) flip=y format='%uchar%uchar%uchar' origin=(-10,-10,0) dx=0.156 dy=0.156 using ($1+$2+$3)/3 with image, \
+x*x-y*y with lines lc rgb "black"
+
+pause -1 "Hit return to continue"
+reset
+#
 # Another example of pm3d hidden surface removal,
 # this time using pm3d depth-ordering
 #

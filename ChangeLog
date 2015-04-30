@@ -5,6 +5,10 @@
 	slowed everything down without accomplishing anything useful.  Now we
 	ignore image plots altogether in the hidden3d code.
 
+	* demo/hidden2.dem:  Add a demo/test for hidden3d processing of image
+	plots.  It doesn't actually work at this point, but is useful as a test
+	case for new code.
+
 2015-04-29  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* Makefile.maint docs/pdffigures.tex docs/Makefile.am:
