@@ -12,6 +12,7 @@ Changes since 5.0 release
 * CHANGE guarantee color of key sample for "lc variable" plots matches 1st point
 * CHANGE "set term fig color" can use predefined linetype colors and named colors
 * CHANGE skip all preprocessing for input lines beginning with shell escape char
+* CHANGE build system to suppress dvi as an automake-generated target
 * FIX replace palette color value NaN with background color
 * FIX improved handling of boxplot data with multiple factors (categories)
 * FIX save_textcolor was not handling "tc variable"
