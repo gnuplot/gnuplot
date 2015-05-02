@@ -1,3 +1,23 @@
+2015-05-02  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/Makefile.am (getcolor_x11.o): Use Automake macros to
+	control whether tool calls are echoed or not.
+
+	* docs/Makefile.am (LUA_HELP, allterm.h, troff, gnuplot.nroff)
+	(grotxt, grodvi, grops, gnuplot.ms, htmldocs/gnuplot.html)
+	(pdffigures.tex, figures, nofigures, gnuplot.pdf, gnuplot.tex)
+	(gnuplot.dvi, gpcard.dvi, gnuplot.ps, gpcard.ps, gnuplot.hlp)
+	(gnuplot.gih, allgih, gnuplot.htb, wxhelp/wgnuplot.html)
+	(wxhelp/doc2html.o, wxhelp/doc2html$): Use Automake macros to
+	control whether tool calls are echoed or not.
+	(gnuplot.texi gnuplot-eldoc.el): Move compilation of ELisp out of
+	here.  There was already a separate rule for it.
+	(${ELCS}, gnuplot.info, install-info, gnuplot.ipf, gnuplot.rtf)
+	(gnuplot.rnh, check-local, clean-local, install-vms): Use Automake
+	macros to control whether tool calls are echoed or not.
+
+	* docs/gnuplot.doc: Blank-only line fixed.
+
 2015-04-30  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/hidden3d.c:  If a hidden3d plot included a "with image" component,

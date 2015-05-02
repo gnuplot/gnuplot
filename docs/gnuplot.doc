@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.946 2015/04/21 06:28:21 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.947 2015/04/28 03:47:04 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -10252,7 +10252,7 @@ Ffigure_missing
 
  Example:
        set multiplot layout 2,2 margins char 5,1,1,2 spacing screen 0, char 2
- 
+
  This produces a layout in which the boundary of both left subplots is
  5 character widths from the left edge of the canvas, the right boundary of the
  right subplots is 1 character width from the canvas edge.

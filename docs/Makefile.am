@@ -95,14 +95,13 @@ BUILT_SOURCES = allterm.h
 if BUILD_LUA
 LUA_HELP = gnuplot-tikz.help
 $(LUA_HELP): $(top_srcdir)/term/lua/gnuplot-tikz.lua
-	lua $< termhelp > $@
+	$(AM_V_GEN)lua $< termhelp > $@
 else
 LUA_HELP = 
 endif
 
 allterm.h: $(CORETERM) $(LUA_HELP)
-	@echo "Building allterm.h"
-	@for e in `egrep "^[ 	]*START_HELP" $(CORETERM) |\
+	$(AM_V_GEN) for e in `egrep "^[ 	]*START_HELP" $(CORETERM) |\
 	     LC_ALL=C sort -f -t':' -k2` ; do \
 	  f=`echo $$e |cut -d\: -f1` ; s=`echo $$e | cut -d\: -f2` ;\
 	  sed -n "/^[ 	]*$$s/,/^[ 	]*END_HELP/p" $$f ; \
@@ -113,7 +112,7 @@ alldoc: check dvi gih hlp html info ipf ms nroff pdf ps rnh rtf htb
 
 ### [tn]roff documentation
 troff: gnuplot.ms titlepag.ms
-	@if [ "$(srcdir)" = "$(top_builddir)" ] ; then \
+	$(AM_V_GEN) if [ "$(srcdir)" = "$(top_builddir)" ] ; then \
 	    tbl gnuplot.ms | eqn | $(TROFF) -ms ; \
 	else \
 	    < gnuplot.ms sed "s,titlepag\.ms,$(srcdir)/titlepag\.ms," |\
@@ -123,7 +122,7 @@ troff: gnuplot.ms titlepag.ms
 nroff: gnuplot.nroff
 
 gnuplot.nroff: gnuplot.ms titlepag.ms
-	@if [ "$(srcdir)" = "$(top_builddir)" ] ; then \
+	$(AM_V_GEN) if [ "$(srcdir)" = "$(top_builddir)" ] ; then \
 	    tbl gnuplot.ms | neqn | nroff -ms | col > gnuplot.nroff ; \
 	else \
 	    < gnuplot.ms sed "s,titlepag\.ms,$(srcdir)/titlepag\.ms," |\
@@ -135,7 +134,7 @@ gnuplot.nroff: gnuplot.ms titlepag.ms
 groff: grotxt grodvi grops
 
 grotxt: gnuplot.ms titlepag.ms
-	@if [ "$(srcdir)" = "$(top_builddir)" ] ; then \
+	$(AM_V_GEN) if [ "$(srcdir)" = "$(top_builddir)" ] ; then \
 	    groff -s -p -t -e -ms -Tlatin1 gnuplot.ms > gnuplot.txt ; \
 	else \
 	    sed "s,titlepag\.ms,$(srcdir)/titlepag\.ms," gnuplot.ms |\
@@ -143,7 +142,7 @@ grotxt: gnuplot.ms titlepag.ms
 	fi
 
 grodvi: gnuplot.ms titlepag.ms
-	@if [ "$(srcdir)" = "$(top_builddir)" ] ; then \
+	$(AM_V_GEN) if [ "$(srcdir)" = "$(top_builddir)" ] ; then \
 	    groff -s -p -t -e -ms -Tdvi gnuplot.ms > gnuplot.dvi ; \
 	else \
 	    sed "s,titlepag\.ms,$(srcdir)/titlepag\.ms," gnuplot.ms |\
@@ -151,7 +150,7 @@ grodvi: gnuplot.ms titlepag.ms
 	fi
 
 grops: gnuplot.ms titlepag.ms
-	@if [ "$(srcdir)" = "$(top_builddir)" ] ; then \
+	$(AM_V_GEN) if [ "$(srcdir)" = "$(top_builddir)" ] ; then \
 	    groff -s -p -t -e -ms -Tps gnuplot.ms > gnuplot.ps ; \
 	else \
 	    sed "s,titlepag\.ms,$(srcdir)/titlepag\.ms," gnuplot.ms |\
@@ -162,31 +161,30 @@ grops: gnuplot.ms titlepag.ms
 ms: gnuplot.ms
 
 gnuplot.ms: doc2ms$(EXEEXT) $(srcdir)/gnuplot.doc
-	./doc2ms$(EXEEXT) $(srcdir)/gnuplot.doc gnuplot.ms
+	$(AM_V_GEN) ./doc2ms$(EXEEXT) $(srcdir)/gnuplot.doc gnuplot.ms
 
 doc2ms_SOURCES = doc2ms.c termdoc.c
 doc2ms_CPPFLAGS = -DALL_TERM_DOC $(AM_CPPFLAGS)
-	$(COMPILE) -DALL_TERM_DOC -c $(srcdir)/doc2ms.c
 
 ### html
 html: htmldocs/gnuplot.html
 
 htmldocs/gnuplot.html: gnuplot.tex
-	mkdir -p htmldocs
-	latex2html -dir htmldocs -local_icons gnuplot
+	$(AM_V_at)mkdir -p htmldocs
+	$(AM_V_GEN)latex2html -dir htmldocs -local_icons gnuplot
 
 ### PDF documentation
 pdffigures: pdffigures.tex $(top_srcdir)/src/gnuplot $(top_srcdir)/docs/plotstyles.gnu
 	rm -f figures
 
 pdffigures.tex:	figures
-	@if [ -z pdffigures.tex ] ; then \
+	$(AM_V_GEN) if [ -z pdffigures.tex ] ; then \
 	  echo "\usepackage{graphicx}" > pdffigures.tex ; \
 	  echo "\usepackage{picins}" >> pdffigures.tex ; \
 	fi
 
 figures: allterm.h doc2tex$(EXEEXT) $(srcdir)/gnuplot.doc
-	@if [ -a $(top_srcdir)/src/gnuplot ] ; then \
+	$(AM_V_GEN) if [ -a $(top_srcdir)/src/gnuplot ] ; then \
 	  GNUPLOT_LIB=$(top_srcdir)/demo ../src/gnuplot $(srcdir)/plotstyles.gnu ; \
 	  ./doc2tex$(EXEEXT) -figures $(srcdir)/gnuplot.doc gnuplot.tex ; \
 	else \
@@ -194,9 +192,9 @@ figures: allterm.h doc2tex$(EXEEXT) $(srcdir)/gnuplot.doc
 	fi
 
 nofigures:
-	echo "" > pdffigures.tex
-	touch figures
-	@if [ -a $(top_srcdir)/src/gnuplot ] ; then \
+	$(AM_V_at)echo "" > pdffigures.tex
+	$(AM_V_at)touch figures
+	$(AM_V_GEN) if [ -a $(top_srcdir)/src/gnuplot ] ; then \
 	  GNUPLOT_LIB=$(top_srcdir)/demo ../src/gnuplot $(srcdir)/plotstyles.gnu ; \
 	  ./doc2tex$(EXEEXT) $(srcdir)/gnuplot.doc gnuplot.tex ; \
 	else \
@@ -206,7 +204,7 @@ nofigures:
 pdf: pdffigures.tex gnuplot.pdf
 
 gnuplot.pdf: gnuplot.tex
-	@if test $(PDFLATEX) != no ; then \
+	$(AM_V_GEN)if test $(PDFLATEX) != no ; then \
 	  rm -f gnuplot.idx ; \
 	  touch gnuplot.idx ; \
 	  TEXINPUTS=.:$(srcdir):$(top_srcdir):${TEXINPUTS}: $(PDFLATEX) gnuplot ; \
@@ -222,7 +220,7 @@ gnuplot.pdf: gnuplot.tex
 tex: gnuplot.tex
 
 gnuplot.tex: allterm.h doc2tex$(EXEEXT) $(srcdir)/gnuplot.doc
-	./doc2tex$(EXEEXT) $(srcdir)/gnuplot.doc gnuplot.tex
+	$(AM_V_GEN)./doc2tex$(EXEEXT) $(srcdir)/gnuplot.doc gnuplot.tex
 
 doc2tex_SOURCES = doc2tex.c termdoc.c
 doc2tex_CPPFLAGS = -DALL_TERM_DOC $(AM_CPPFLAGS)
@@ -231,7 +229,7 @@ doc2tex_CPPFLAGS = -DALL_TERM_DOC $(AM_CPPFLAGS)
 dvi:
 
 gnuplot.dvi: gnuplot.tex titlepag.tex toc_entr.sty
-	@if test $(LATEX) != no ; then \
+	$(AM_V_GEN)if test $(LATEX) != no ; then \
 	  rm -f gnuplot.idx ; \
 	  touch gnuplot.idx ; \
 	  TEXINPUTS=.:$(srcdir):$(top_srcdir):${TEXINPUTS}: $(LATEX) gnuplot ; \
@@ -244,7 +242,7 @@ gnuplot.dvi: gnuplot.tex titlepag.tex toc_entr.sty
 	fi
 
 gpcard.dvi: gpcard.tex
-	@if test $(PLAINTEX) != no ; then \
+	$(AM_V_GEN)if test $(PLAINTEX) != no ; then \
               TEXINPUTS=.:$(srcdir):$(top_srcdir): tex gpcard ; \
 	else \
 	  echo "plaintex not found - cannot build dvi file" ; \
@@ -255,14 +253,14 @@ gpcard.dvi: gpcard.tex
 ps: gnuplot.ps gpcard.ps
 
 gnuplot.ps: gnuplot.dvi
-	@if test $(DVIPS) != no ; then \
+	$(AM_V_GEN)if test $(DVIPS) != no ; then \
 	   $(DVIPS) gnuplot.dvi -o gnuplot.ps ; \
 	else \
 	   echo "dvips not found - cannot build PS file" ; \
 	fi
 
 gpcard.ps: gpcard.dvi
-	@if test $(DVIPS) != no ; then \
+	$(AM_V_GEN)if test $(DVIPS) != no ; then \
             $(DVIPS) gpcard.dvi -o gpcard.ps ; \
 	else \
 	   echo "dvips not found - cannot build PS file" ; \
@@ -273,7 +271,7 @@ gpcard.ps: gpcard.dvi
 hlp: gnuplot.hlp
 
 gnuplot.hlp: doc2hlp$(EXEEXT) $(srcdir)/gnuplot.doc
-	./doc2hlp$(EXEEXT) $(srcdir)/gnuplot.doc gnuplot.hlp
+	$(AM_V_GEN)./doc2hlp$(EXEEXT) $(srcdir)/gnuplot.doc gnuplot.hlp
 
 doc2hlp_SOURCES = doc2hlp.c termdoc.c
 
@@ -281,13 +279,14 @@ doc2hlp_SOURCES = doc2hlp.c termdoc.c
 gih: gnuplot.gih
 
 gnuplot.gih: doc2gih$(EXEEXT) $(srcdir)/gnuplot.doc
-	./doc2gih$(EXEEXT) $(srcdir)/gnuplot.doc gnuplot.gih
+	$(AM_V_GEN)./doc2gih$(EXEEXT) $(srcdir)/gnuplot.doc gnuplot.gih
 
 doc2gih_SOURCES = doc2gih.c termdoc.c
 
 # To include all terminals in the .gih file
 allgih: alldoc2gih$(EXEEXT) $(srcdir)/gnuplot.doc
-	./alldoc2gih$(EXEEXT) $(srcdir)/gnuplot.doc gnuplot.gih
+	@echo "generate gnuplot.gih with all terminals"
+	$(AM_V_at)./alldoc2gih$(EXEEXT) $(srcdir)/gnuplot.doc gnuplot.gih
 
 alldoc2gih_SOURCES = doc2gih.c termdoc.c
 alldoc2gih_CPPFLAGS = -DALL_TERM_DOC $(AM_CPPFLAGS)
@@ -296,60 +295,56 @@ alldoc2gih_CPPFLAGS = -DALL_TERM_DOC $(AM_CPPFLAGS)
 htb: gnuplot.htb
 
 gnuplot.htb: wxhelp/wgnuplot.html
-	GNUPLOT_LIB=$(srcdir)/../demo ../src/gnuplot -e "winhelp=1;" $(srcdir)/plotstyles.gnu
-	zip -j9 gnuplot.htb windows/wgnuplot.hhp wxhelp/wgnuplot.hhc wxhelp/wgnuplot.hhk wxhelp/*.html windows/*.png
+	$(AM_V_at) GNUPLOT_LIB=$(srcdir)/../demo ../src/gnuplot -e "winhelp=1;" $(srcdir)/plotstyles.gnu
+	$(AM_V_GEN) zip -j9 gnuplot.htb windows/wgnuplot.hhp wxhelp/wgnuplot.hhc wxhelp/wgnuplot.hhk wxhelp/*.html windows/*.png
 
 wxhelp/wgnuplot.html: wxhelp/doc2html$(EXEEXT) $(srcdir)/gnuplot.doc 
-	./wxhelp/doc2html$(EXEEXT) $(srcdir)/gnuplot.doc wxhelp/
+	$(AM_V_GEN) ./wxhelp/doc2html$(EXEEXT) $(srcdir)/gnuplot.doc wxhelp/
 
 wxhelp/doc2html.o: $(srcdir)/windows/doc2html.c $(BUILT_SOURCES)
-	[ -d wxhelp ] || mkdir wxhelp
-	$(COMPILE) -c -o $@ -I.. -DALL_TERM_DOC -DWXHELP $<
+	$(AM_V_at) [ -d wxhelp ] || mkdir wxhelp
+	$(AM_V_CC)$(COMPILE) -c -o $@ -I.. -DALL_TERM_DOC -DWXHELP $<
 
-wxhelp/doc2html: wxhelp/doc2html.o termdoc.o xref.o ../src/version.o
-	$(LINK) $^
+wxhelp/doc2html$(EXEEXT): wxhelp/doc2html.o termdoc.o xref.o ../src/version.o
+	$(AM_V_CCLD)$(LINK) $^
 
 ### GNU info format
 info: gnuplot.info
 
 # Thanks to Bruce Ravel for doc2texi.el!
 gnuplot.texi gnuplot-eldoc.el: $(srcdir)/doc2texi.el $(srcdir)/gnuplot.doc
-	@echo "Creating texinfo and eldoc strings file"
-	@if test "$(EMACS)" != no; then \
+	$(AM_V_GEN) if test "$(EMACS)" != no; then \
 	   test "$(top_srcdir)" = "$(top_builddir)" || cp $(srcdir)/gnuplot.doc . ; \
-	   $(EMACS) -batch -q --no-site-file -l $(srcdir)/doc2texi.el -f d2t-doc-to-texi ; \
-	   echo "Compiling gnuplot-eldoc.el" ; \
-	   $(EMACS) -batch -q --no-site-file -f batch-byte-compile gnuplot-eldoc.el ; \
+	   $(EMACS) -batch -q --no-site-file -l $< -f d2t-doc-to-texi ; \
 	   test "$(top_srcdir)" = "$(top_builddir)" || rm -f ./gnuplot.doc ; \
 	else \
 	   echo "No emacs found - cannot create texinfo file" ; \
 	fi
 
 ${ELCS}: gnuplot-eldoc.el
-	@if test "$(EMACS)" != no; then \
+	$(AM_V_GEN) if test "$(EMACS)" != no; then \
 	   echo "Compiling gnuplot-eldoc.el" ; \
-	   $(EMACS) -batch -q --no-site-file -f batch-byte-compile gnuplot-eldoc.el ; \
+	   $(EMACS) -batch -q --no-site-file -f batch-byte-compile $* ; \
 	else \
 	   echo "No emacs found - cannot create gnuplot-eldoc.elc file" ; \
 	fi
 
 gnuplot.info: gnuplot.texi
-	$(MAKEINFO) -I$(srcdir) $(srcdir)/gnuplot.texi --no-split --output=$@
+	$(AM_V_GEN) $(MAKEINFO) -I$(srcdir) $< --no-split --output=$@
 
 install-info: gnuplot.info
-	$(top_srcdir)/mkinstalldirs $(DESTDIR)$(infodir)
-	$(INSTALL_DATA) gnuplot.info $(DESTDIR)$(infodir)/gnuplot.info
-	@if (install-info --version && \
+	$(AM_V_at) $(top_srcdir)/mkinstalldirs $(DESTDIR)$(infodir)
+	$(AM_V_at) $(INSTALL_DATA) gnuplot.info $(DESTDIR)$(infodir)/gnuplot.info
+	$(AM_V_at) if (install-info --version && \
 	     install-info --version | fgrep -i -v debian) >/dev/null 2>&1; then \
-	  echo "install-info --info-dir=$(DESTDIR)$(infodir) $(DESTDIR)$(infodir)/gnuplot.info";\
-	  install-info --info-dir=$(DESTDIR)$(infodir) $(DESTDIR)$(infodir)/gnuplot.info || :;\
+	  install-info --info-dir=$(DESTDIR)$(infodir) $(DESTDIR)$(infodir)/gnuplot.info || : ;\
 	else : ; fi
 
 # this is how to make OS/2 ipfc documentation
 ipf: gnuplot.ipf
 
 gnuplot.ipf: doc2ipf$(EXEEXT) $(srcdir)/gnuplot.doc
-	./doc2ipf$(EXEEXT) $(srcdir)/gnuplot.doc gnuplot.ipf
+	$(AM_V_GEN) ./doc2ipf$(EXEEXT) $(srcdir)/gnuplot.doc gnuplot.ipf
 
 doc2ipf_SOURCES = doc2ipf.c termdoc.c xref.c
 
@@ -357,7 +352,7 @@ doc2ipf_SOURCES = doc2ipf.c termdoc.c xref.c
 rtf: gnuplot.rtf
 
 gnuplot.rtf: doc2rtf$(EXEEXT) $(srcdir)/gnuplot.doc
-	./doc2rtf$(EXEEXT) $(srcdir)/gnuplot.doc gnuplot.rtf
+	$(AM_V_GEN) ./doc2rtf$(EXEEXT) $(srcdir)/gnuplot.doc gnuplot.rtf
 
 doc2rtf_SOURCES = doc2rtf.c termdoc.c xref.c
 
@@ -365,13 +360,13 @@ doc2rtf_SOURCES = doc2rtf.c termdoc.c xref.c
 rnh: gnuplot.rnh
 
 gnuplot.rnh: doc2rnh$(EXEEXT) $(srcdir)/gnuplot.doc
-	./doc2rnh$(EXEEXT) $(srcdir)/gnuplot.doc gnuplot.rnh
+	$(AM_V_GEN) ./doc2rnh$(EXEEXT) $(srcdir)/gnuplot.doc gnuplot.rnh
 
 doc2rnh_SOURCES = doc2rnh.c termdoc.c
 
 # this is how to check the gnuplot.doc file
 check-local: checkdoc$(EXEEXT)
-	@./checkdoc$(EXEEXT) < $(srcdir)/gnuplot.doc; \
+	$(AM_V_at)./checkdoc$(EXEEXT) < $(srcdir)/gnuplot.doc; \
 	if test $$? -eq 0; then \
 	  echo "PASS: gnuplot.doc"; \
 	else \
@@ -379,7 +374,7 @@ check-local: checkdoc$(EXEEXT)
 	fi
 
 clean-local:
-	@for f in figure*.pdf $(LUA_HELP); do \
+	$(AM_V_at)for f in figure*.pdf $(LUA_HELP); do \
 	   if [ "$$f" != "figure_missing.pdf" ]; then \
 	     rm -f $$f ; \
 	   else \
@@ -391,6 +386,6 @@ checkdoc_SOURCES = checkdoc.c termdoc.c gnuplot.doc
 
 # for VMS only
 install-vms: gnuplot.hlp
-	$(INSTALL_DATA) gnuplot.hlp $(datadir)/gnuplot.hlp
+	$(AM_V_at)$(INSTALL_DATA) gnuplot.hlp $(datadir)/gnuplot.hlp
 
 #the end

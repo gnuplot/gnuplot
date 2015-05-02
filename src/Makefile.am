@@ -70,7 +70,7 @@ gnuplot_x11_LDADD = getcolor_x11.o $(XLIBS)
 endif
 
 getcolor_x11.o: getcolor.c
-	$(COMPILE) -c -DGPLT_X11_MODE -o getcolor_x11.o $(srcdir)/getcolor.c
+	$(AM_V_CC)$(COMPILE) -c -DGPLT_X11_MODE -o getcolor_x11.o $(srcdir)/getcolor.c
 
 bf_test_SOURCES = bf_test.c
 bf_test_LIBS = -lm
