@@ -1,7 +1,7 @@
 /*
  * GNUPLOT - caca.trm
  *
- * $Id: caca.trm,v 1.6 2014/06/04 08:11:00 markisch Exp $
+ * $Id: caca.trm,v 1.6.2.1 2014/11/12 05:20:18 sfeam Exp $
  *
  * This file uses UTF8 encoding and a tab size of 4.
  *
@@ -103,6 +103,9 @@ extern TBOOLEAN CACA_window_opened(void);
 #  define _WIN32_WINNT 0x0501
 # endif
 # include <windows.h>
+#endif
+#ifdef HAVE_SYS_SELECT_H
+# include <sys/select.h>
 #endif
 
 /* Internal Functions */

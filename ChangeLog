@@ -1,3 +1,11 @@
+2015-05-03  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* term/caca.trm: Insert missing include of <sys/select.h>.
+
+	* src/wxterminal/wxt_gui.cpp: Insert missing include of
+	<sys/select.h>.
+	(wxt_waitforinput): Add note about missing check for HAVE_SELECT.
+
 2015-05-02  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* Makefile.maint docs/pdffigures.tex docs/Makefile.am:
