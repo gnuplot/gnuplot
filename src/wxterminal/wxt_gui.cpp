@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.cpp,v 1.142 2014/12/22 00:21:47 sfeam Exp $
+ * $Id: wxt_gui.cpp,v 1.144 2014/12/30 19:45:29 sfeam Exp $
  */
 
 /* GNUPLOT - wxt_gui.cpp */
@@ -119,6 +119,15 @@
 
 /* standard icon art from wx (used only for "Export to file" */
 #include <wx/artprov.h>
+
+extern "C" {
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
+#ifdef HAVE_SYS_SELECT_H
+# include <sys/select.h>
+#endif
+}
 
 /* Interactive toggle control variables
  */
@@ -3704,6 +3713,7 @@ int wxt_waitforinput(int options)
 			one_msec.tv_usec = TERM_EVENT_POLL_TIMEOUT;
 		}
 
+		/* HBB FIXME 2015-05-03: why no test for autoconf HAVE_SELECT here ? */
 		int n_changed_fds = select(wxt_event_fd+1, &read_fds,
 					      NULL /* not watching for write-ready */,
 					      NULL /* not watching for exceptions */,
