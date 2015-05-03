@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.cpp,v 1.91.2.16 2013/12/13 05:44:09 sfeam Exp $
+ * $Id: wxt_gui.cpp,v 1.91.2.17 2014/07/03 21:47:18 markisch Exp $
  */
 
 /* GNUPLOT - wxt_gui.cpp */
@@ -115,6 +115,15 @@
 #include "bitmaps/png/autoscale_png.h"
 #include "bitmaps/png/config_png.h"
 #include "bitmaps/png/help_png.h"
+
+extern "C" {
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
+#ifdef HAVE_SYS_SELECT_H
+# include <sys/select.h>
+#endif
+}
 
 /* Interactive toggle control variables
  */
@@ -3400,6 +3409,7 @@ int wxt_waitforinput()
 		if (!paused_for_mouse)
 			FD_SET(stdin_fd, &read_fds);
 
+		/* HBB FIXME 2015-05-03: why no test for autoconf HAVE_SELECT here ? */
 		int n_changed_fds = select(wxt_event_fd+1, &read_fds,
 					      NULL /* not watching for write-ready */,
 					      NULL /* not watching for exceptions */,

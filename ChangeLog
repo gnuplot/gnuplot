@@ -1,3 +1,9 @@
+2015-05-03  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/wxterminal/wxt_gui.cpp: Insert missing include of
+	<sys/select.h>.
+	(wxt_waitforinput): Add note about missing check for HAVE_SELECT.
+
 2015-04-27  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graph3d.c (do_3dplot):  Turning on "hidden3d" caused an off by
