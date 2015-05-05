@@ -1,3 +1,13 @@
+2015-05-05  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/hidden3d.c (build_networks):  In hidden3d mode do not draw
+	the surface if the keyword 'nosurface' is present (set the linetype
+	internally to LT_NODRAW).  Normally this keyword would mean "draw only
+	the data lines, not the isosampled grid lines", but that makes little
+	sense for a hidden3d surface.  This provides a way to draw only the
+	contours of a contour plot.
+	See Bug #1603
+
 2015-05-03  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* term/caca.trm: Insert missing include of <sys/select.h>.

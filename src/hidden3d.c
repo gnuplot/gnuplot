@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.99.2.3 2014/10/01 01:05:33 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.99.2.4 2015/04/30 05:38:08 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - hidden3d.c */
@@ -1176,6 +1176,11 @@ build_networks(struct surface_points *plots, int pcount)
 	/* assigned by "set linetype ..."                                      */
 	above = this_plot->hidden3d_top_linetype;
 	below = above + hiddenBacksideLinetypeOffset;
+
+	/* The "nosurface" flag is interpreted by hidden3d mode to mean */
+	/* "don't draw this surface".  I.e. draw only the contours.	*/
+	if (this_plot->opt_out_of_surface)
+	    above = below = LT_NODRAW;
 
 	/* This is a special flag indicating that the user specified an	*/
 	/* explicit surface color in the splot command.			*/
