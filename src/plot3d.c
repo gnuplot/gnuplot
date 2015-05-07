@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.233 2015/01/20 02:10:43 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.234 2015/03/13 20:26:17 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -340,7 +340,7 @@ refresh_3dbounds(struct surface_points *first_plot, int nplots)
 	||  this_plot->plot_style == RGBIMAGE
 	||  this_plot->plot_style == RGBA_IMAGE) {
 	    if (x_axis->set_autoscale)
-		plot_image_or_update_axes(this_plot,TRUE);
+		process_image(this_plot, IMG_UPDATE_AXES);
 	    continue;
 	}
 
@@ -1087,8 +1087,8 @@ get_3ddata(struct surface_points *this_plot)
 		/* EAM Sep 2008 - Otherwise z=Nan or z=Inf or DF_MISSING fails	*/
 		/* to set CRD_COLOR at all, since the z test bails to a goto. 	*/
 		if (this_plot->plot_style == IMAGE) {
-			cp->CRD_COLOR = (pm3d_color_from_column) ? color : z;
-	        }
+		    cp->CRD_COLOR = (pm3d_color_from_column) ? color : z;
+		}
 
 		/* Version 5: cp->z=0 in the UNDEF_ACTION recovers what	version 4 did */
 		STORE_WITH_LOG_AND_UPDATE_RANGE(cp->z, z, cp->type, z_axis,
@@ -2221,6 +2221,48 @@ eval_3dplots()
 	    }
 	}
     }				/* draw_contour */
+
+    /* Images don't fit the grid model.  (The image data correspond
+     * to pixel centers.)  To make image work in hidden 3D, add
+     * another non-visible phantom surface of only four points
+     * outlining the image.  Opt out of hidden3d for the {RGB}IMAGE
+     * to avoid processing large amounts of data.
+     */
+    if (plot_num) {
+	struct surface_points *this_plot = first_3dplot;
+	do {
+	    if ((this_plot->plot_style == IMAGE || this_plot->plot_style == RGBIMAGE)
+	    && !(this_plot->opt_out_of_hidden3d)) {
+
+		struct surface_points *new_plot = sp_alloc(2, 0, 0, 2);
+
+		/* Construct valid 2 x 2 parallelogram. */
+		new_plot->num_iso_read = 2;
+		new_plot->iso_crvs->p_count = 2;
+		new_plot->iso_crvs->next->p_count = 2;
+		new_plot->next_sp = this_plot->next_sp;
+		this_plot->next_sp = new_plot;
+
+		/* Set up hidden3d behavior, no visible lines but
+		 * opaque to items behind the parallelogram. */
+		new_plot->plot_style = SURFACEGRID;
+		new_plot->opt_out_of_surface = TRUE;
+		new_plot->opt_out_of_contours = TRUE;
+		new_plot->has_grid_topology = TRUE;
+		new_plot->hidden3d_top_linetype = LT_NODRAW;
+		new_plot->plot_type = DATA3D;
+		new_plot->opt_out_of_hidden3d = FALSE;
+
+		/* Compute the geometry of the phantom */
+		process_image(this_plot, IMG_UPDATE_CORNERS);
+
+		/* Advance over the phantom */
+		++plot_num;
+		this_plot = this_plot->next_sp;
+	    }
+	    this_plot = this_plot->next_sp;
+	} while (this_plot);
+    }
 
     /* the following ~9 lines were moved from the end of the
      * function to here, as do_3dplot calles term->text, which

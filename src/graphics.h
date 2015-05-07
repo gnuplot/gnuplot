@@ -1,5 +1,5 @@
 /*
- * $Id: graphics.h,v 1.63 2015/01/08 05:10:07 sfeam Exp $
+ * $Id: graphics.h,v 1.64 2015/03/19 17:30:41 sfeam Exp $
  */
 
 /* GNUPLOT - graphics.h */
@@ -101,7 +101,13 @@ void map_position_r __PROTO((struct position* pos, double* x, double* y,
 void init_histogram __PROTO((struct histogram_style *hist, text_label *title));
 void free_histlist __PROTO((struct histogram_style *hist));
 
-void plot_image_or_update_axes __PROTO((void *plot, TBOOLEAN update_axes));
+typedef enum en_procimg_action {
+    IMG_PLOT,
+    IMG_UPDATE_AXES,
+    IMG_UPDATE_CORNERS
+} t_procimg_action;
+
+void process_image __PROTO((void *plot, t_procimg_action action));
 TBOOLEAN check_for_variable_color __PROTO((struct curve_points *plot, double *colorvalue));
 
 

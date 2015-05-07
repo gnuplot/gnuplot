@@ -1,3 +1,16 @@
+2015-05-07  Daniel J Sebald <daniel.sebald@ieee.org>
+
+	* src/graph3d.c src/graph3d.h src/graphics.c src/graphics.h
+	src/plot2d.c src/hidden3d.c:
+	Replace plot_image_or_update_axes(*plot, TBOOLEAN), which handled
+	2 options, with new routine process_image(*plot, t_procimg_action).
+
+	* src/plot3d.c (eval_3dplots):  Accommodate images in hidden3d 
+	plots in a way analogous to the current handling of pm3d surfaces.
+	A phantom surface is constructed consisting of a single rectangle
+	that overlays the image, and that phantom is included as surface
+	in the hidden3d sort/divide/occlude processing.
+
 2015-05-05  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/hidden3d.c (build_networks):  In hidden3d mode do not draw

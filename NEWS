@@ -1,5 +1,6 @@
 Changes not in 5.0
 ==================
+* NEW hidden3d now observes 'image' and 'rgbimage' as hiding objects
 * NEW new command `toggle {<plotno> | "plottitle" | all}`
 * NEW Optional sampling interval in range specifier for pseudofile '+'
 * NEW point style associated with "plot with labels" is shown in the key

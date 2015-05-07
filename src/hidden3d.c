@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.105 2015/04/30 05:37:57 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.106 2015/05/05 19:01:25 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - hidden3d.c */
@@ -1068,14 +1068,14 @@ build_networks(struct surface_points *plots, int pcount)
 
 	/* count 'curves' (i.e. isolines) and vertices in this plot */
 	nverts = 0;
-	if(this_plot->plot_type == FUNC3D) {
+	if (this_plot->plot_type == FUNC3D) {
 	    ncrvs = 0;
-	    for(icrvs = this_plot->iso_crvs;
+	    for (icrvs = this_plot->iso_crvs;
 		icrvs; icrvs = icrvs->next) {
 		ncrvs++;
 	    }
 	    nverts += ncrvs * crvlen;
-	} else if(this_plot->plot_type == DATA3D) {
+	} else if (this_plot->plot_type == DATA3D) {
 	    ncrvs = this_plot->num_iso_read;
 	    if (this_plot->has_grid_topology)
 		nverts += ncrvs * crvlen;

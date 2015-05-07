@@ -1,5 +1,5 @@
 /*
- * $Id: graph3d.h,v 1.46 2013/05/15 20:52:45 sfeam Exp $
+ * $Id: graph3d.h,v 1.47 2014/04/22 20:49:28 sfeam Exp $
  */
 
 /* GNUPLOT - graph3d.h */
@@ -106,7 +106,7 @@ typedef struct surface_points {
     struct arrow_style_type arrow_properties;
     struct fill_style_type fill_properties;	/* FIXME: ignored in 3D */
     struct text_label *labels;	/* Only used if plot_style == LABELPOINTS */
-    struct t_image image_properties;	/* only used if plot_style is IMAGE or RGB_IMAGE */
+    struct t_image image_properties;	/* only used if plot_style is IMAGE, RGBIMAGE or RGBA_IMAGE */
     struct udvt_entry *sample_var;	/* Only used if plot has private sampling range */
 
     /* 2D and 3D plot structure fields overlay only to this point */

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.486 2015/04/15 04:09:56 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.487 2015/04/16 06:15:18 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -797,17 +797,17 @@ do_plot(struct curve_points *plots, int pcount)
 
 	    case IMAGE:
 		this_plot->image_properties.type = IC_PALETTE;
-		plot_image_or_update_axes(this_plot, FALSE);
+		process_image(this_plot, IMG_PLOT);
 		break;
 
 	    case RGBIMAGE:
 		this_plot->image_properties.type = IC_RGB;
-		plot_image_or_update_axes(this_plot, FALSE);
+		process_image(this_plot, IMG_PLOT);
 		break;
 
 	    case RGBA_IMAGE:
 		this_plot->image_properties.type = IC_RGBA;
-		plot_image_or_update_axes(this_plot, FALSE);
+		process_image(this_plot, IMG_PLOT);
 		break;
 
 #ifdef EAM_OBJECTS
@@ -4196,19 +4196,24 @@ hyperplane_between_points(double *p1, double *p2, double *w, double *b)
     *b = -(w[0]*p1[0] + w[1]*p1[1]);
 }
 
-/* plot_image_or_update_axes:
- * Plot the coordinates similar to the points option except use
- *  pixels.  Check if the data forms a valid image array, i.e.,
- *  one for which points are spaced equidistant along two non-
- *  coincidence vectors.  If the two directions are orthogonal
- *  within some tolerance and they are aligned with the view
- *  box x and y directions, then use the image feature of the
- *  terminal if it has one.  Otherwise, use parallelograms via
- *  the polynomial function.  If it is only necessary to update
- *  the axis ranges for `set autoscale`, do so and then return.
+/* process_image:
+ *
+ * IMG_PLOT - Plot the coordinates similar to the points option except
+ *  use pixels.  Check if the data forms a valid image array, i.e., one
+ *  for which points are spaced equidistant along two non-coincidence
+ *  vectors.  If the two directions are orthogonal within some tolerance
+ *  and they are aligned with the view box x and y directions, then use
+ *  the image feature of the terminal if it has one.  Otherwise, use
+ *  parallelograms via the polynomial function to represent pixels.
+ *
+ * IMG_UPDATE_AXES - Update the axis ranges for `set autoscale` and then
+ *  return.
+ *
+ * IMG_UPDATE_CORNERS - Update the corners of the outlining phantom
+ *  parallelogram for `set hidden3d` and then return.
  */
 void
-plot_image_or_update_axes(void *plot, TBOOLEAN update_axes)
+process_image(void *plot, t_procimg_action action)
 {
 
     struct coordinate GPHUGE *points;
@@ -4338,25 +4343,8 @@ plot_image_or_update_axes(void *plot, TBOOLEAN update_axes)
     grid_corner[1] = K-1;
     grid_corner[3] = p_count - 1;
     grid_corner[2] = p_count - K;
-    if (project_points) {
-	map3d_xy_double(points[K-1].x, points[K-1].y, points[K-1].z, &p_mid_corner[0], &p_mid_corner[1]);
-    } else if (X_AXIS.log || Y_AXIS.log) {
-	p_mid_corner[0] = GRIDX(K-1);
-	p_mid_corner[1] = GRIDY(K-1);
 
-    } else {
-	p_mid_corner[0] = points[K-1].x;
-	p_mid_corner[1] = points[K-1].y;
-    }
-
-    /* The grid spacing in one direction. */
-    delta_x_grid[0] = (p_mid_corner[0] - p_start_corner[0])/(K-1);
-    delta_y_grid[0] = (p_mid_corner[1] - p_start_corner[1])/(K-1);
-    /* The grid spacing in the second direction. */
-    delta_x_grid[1] = (p_end_corner[0] - p_mid_corner[0])/(L-1);
-    delta_y_grid[1] = (p_end_corner[1] - p_mid_corner[1])/(L-1);
-
-    if (update_axes) {
+    if (action == IMG_UPDATE_AXES) {
 	for (i=0; i < 4; i++) {
 	    coord_type dummy_type;
 	    double x,y;
@@ -4388,6 +4376,56 @@ plot_image_or_update_axes(void *plot, TBOOLEAN update_axes)
 	}
 	return;
     }
+
+    if (action == IMG_UPDATE_CORNERS) {
+
+	/* Shortcut pointer to phantom parallelogram. */
+	struct iso_curve *iso_crvs = ((struct surface_points *)plot)->next_sp->iso_crvs;
+
+	/* Set the phantom parallelogram as an outline of the image.  Use
+	 * corner point 0 as a reference point.  Imagine vectors along the
+	 * generally non-orthogonal directions of the two nearby corners. */
+
+	double delta_x_1 = (points[grid_corner[1]].x - points[grid_corner[0]].x)/(2*(K-1));
+	double delta_y_1 = (points[grid_corner[1]].y - points[grid_corner[0]].y)/(2*(K-1));
+	double delta_z_1 = (points[grid_corner[1]].z - points[grid_corner[0]].z)/(2*(K-1));
+	double delta_x_2 = (points[grid_corner[2]].x - points[grid_corner[0]].x)/(2*(L-1));
+	double delta_y_2 = (points[grid_corner[2]].y - points[grid_corner[0]].y)/(2*(L-1));
+	double delta_z_2 = (points[grid_corner[2]].z - points[grid_corner[0]].z)/(2*(L-1));
+
+	iso_crvs->points[0].x = points[grid_corner[0]].x - delta_x_1 - delta_x_2;
+	iso_crvs->points[0].y = points[grid_corner[0]].y - delta_y_1 - delta_y_2;
+	iso_crvs->points[0].z = points[grid_corner[0]].z - delta_z_1 - delta_z_2;
+	iso_crvs->next->points[0].x = points[grid_corner[2]].x - delta_x_1 + delta_x_2;
+	iso_crvs->next->points[0].y = points[grid_corner[2]].y - delta_y_1 + delta_y_2;
+	iso_crvs->next->points[0].z = points[grid_corner[2]].z - delta_z_1 + delta_z_2;
+	iso_crvs->points[1].x = points[grid_corner[1]].x + delta_x_1 - delta_x_2;
+	iso_crvs->points[1].y = points[grid_corner[1]].y + delta_y_1 - delta_y_2;
+	iso_crvs->points[1].z = points[grid_corner[1]].z + delta_z_1 - delta_z_2;
+	iso_crvs->next->points[1].x = points[grid_corner[3]].x + delta_x_1 + delta_x_2;
+	iso_crvs->next->points[1].y = points[grid_corner[3]].y + delta_y_1 + delta_y_2;
+	iso_crvs->next->points[1].z = points[grid_corner[3]].z + delta_z_1 + delta_z_2;
+
+	return;
+    }
+
+    if (project_points) {
+	map3d_xy_double(points[K-1].x, points[K-1].y, points[K-1].z, &p_mid_corner[0], &p_mid_corner[1]);
+    } else if (X_AXIS.log || Y_AXIS.log) {
+	p_mid_corner[0] = GRIDX(K-1);
+	p_mid_corner[1] = GRIDY(K-1);
+
+    } else {
+	p_mid_corner[0] = points[K-1].x;
+	p_mid_corner[1] = points[K-1].y;
+    }
+
+    /* The grid spacing in one direction. */
+    delta_x_grid[0] = (p_mid_corner[0] - p_start_corner[0])/(K-1);
+    delta_y_grid[0] = (p_mid_corner[1] - p_start_corner[1])/(K-1);
+    /* The grid spacing in the second direction. */
+    delta_x_grid[1] = (p_end_corner[0] - p_mid_corner[0])/(L-1);
+    delta_y_grid[1] = (p_end_corner[1] - p_mid_corner[1])/(L-1);
 
     /* Check if the pixel grid is orthogonal and oriented with axes.
      * If so, then can use efficient terminal image routines.
