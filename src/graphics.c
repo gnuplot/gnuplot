@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.487 2015/04/16 06:15:18 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.488 2015/05/08 00:29:07 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -1901,7 +1901,7 @@ plot_boxes(struct curve_points *plot, int xaxis_y)
 			plot->fill_properties.fillpattern = histogram_linetype;
 			/* Fall through */
 		    case HT_STACKED_IN_LAYERS: /* rowstacked */
-			if( plot->points[i].y >= 0 ){
+			if (plot->points[i].y >= 0){
 			    dyb = stackheight[stack].yhigh;
 			    dyt += stackheight[stack].yhigh;
 			    stackheight[stack].yhigh += plot->points[i].y;
@@ -1962,11 +1962,11 @@ plot_boxes(struct curve_points *plot, int xaxis_y)
 		    w = xr - xl + 1;
 		    h = yt - yb + 1;
 		    /* avoid negative width/height */
-		    if( w <= 0 ) {
+		    if (w <= 0) {
 			x = xr;
 			w = xl - xr + 1;
 		    }
-		    if( h <= 0 ) {
+		    if (h <= 0) {
 			y = yt;
 			h = yb - yt + 1;
 		    }
@@ -1985,7 +1985,7 @@ plot_boxes(struct curve_points *plot, int xaxis_y)
 		(*t->vector) (xl, yb);
 		closepath();
 
-		if( t->fillbox && plot->fill_properties.border_color.type != TC_DEFAULT) {
+		if (t->fillbox && plot->fill_properties.border_color.type != TC_DEFAULT) {
 		    term_apply_lp_properties(&plot->lp_properties);
 		}
 

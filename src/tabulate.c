@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: tabulate.c,v 1.22 2014/05/08 17:35:42 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: tabulate.c,v 1.23 2015/01/16 18:48:05 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - tabulate.c */
@@ -445,10 +445,10 @@ print_3dtable(int pcount)
 			    ? 'o' : 'u');
 		    strappend(&line, &size, len, buffer);
 		    print_line(line);
-		} /* for(point) */
-	    } /* for(icrvs) */
+		} /* for (point) */
+	    } /* for (icrvs) */
 	    print_line("");
-	} /* if(draw_surface) */
+	} /* if (draw_surface) */
 
 	if (draw_contour) {
 	    int number = 0;

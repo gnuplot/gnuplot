@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.345 2015/04/16 06:15:18 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.346 2015/04/18 18:02:20 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -1373,13 +1373,13 @@ show_dgrid3d()
     SHOW_ALL_NL;
 
     if (dgrid3d)
-      if( dgrid3d_mode == DGRID3D_QNORM ) {
+      if (dgrid3d_mode == DGRID3D_QNORM) {
 	fprintf(stderr,
 		"\tdata grid3d is enabled for mesh of size %dx%d, norm=%d\n",
 		dgrid3d_row_fineness,
 		dgrid3d_col_fineness,
 		dgrid3d_norm_value );
-      } else if( dgrid3d_mode == DGRID3D_SPLINES ){
+      } else if (dgrid3d_mode == DGRID3D_SPLINES) {
 	fprintf(stderr,
 		"\tdata grid3d is enabled for mesh of size %dx%d, splines\n",
 		dgrid3d_row_fineness,

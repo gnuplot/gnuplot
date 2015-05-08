@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: contour.c,v 1.32 2014/02/28 19:23:52 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: contour.c,v 1.33 2014/04/02 22:43:39 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - contour.c */
@@ -1459,7 +1459,7 @@ eval_bspline(
 static double
 fetch_knot(TBOOLEAN contr_isclosed, int num_of_points, int order, int i)
 {
-    if(! contr_isclosed) {
+    if (!contr_isclosed) {
 	if (i <= order)
 	    return 0.0;
 	else if (i <= num_of_points)

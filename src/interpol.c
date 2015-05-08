@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: interpol.c,v 1.49 2015/02/03 23:58:43 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: interpol.c,v 1.50 2015/02/06 17:16:55 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - interpol.c */
@@ -1019,7 +1019,7 @@ gen_interp_frequency(struct curve_points *plot)
         /* If cumulative, replace the current y-value with the
            sum of all previous y-values. This assumes that the
            data has already been sorted by x-values. */
-        if( plot->plot_smooth == SMOOTH_CUMULATIVE ) {
+        if (plot->plot_smooth == SMOOTH_CUMULATIVE) {
             y = 0;
             for (j = first_point; j < first_point + num_points; j++) {
                 if (plot->points[j].type == UNDEFINED) 
@@ -1253,7 +1253,7 @@ cp_implode(struct curve_points *cp)
 			cp->points[j].type = OUTRANGE;
 		is_outrange:
 		    ;
-		} /* if(! all inrange) */
+		} /* if (! all inrange) */
 
 		j++;		/* next valid entry */
 		k = 0;		/* to read */

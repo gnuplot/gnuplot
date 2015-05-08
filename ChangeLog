@@ -1,3 +1,9 @@
+2015-05-08  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/contour.c src/graphics.c src/internal.c src/interpol.c
+	src/plot3d.c src/save.c src/set.c src/show.c src/tabulate.c:
+	Whitespace/codestyle cleanup "if (FOO)" rather than "if( FOO )"
+
 2015-05-07  Daniel J Sebald <daniel.sebald@ieee.org>
 
 	* src/graph3d.c src/graph3d.h src/graphics.c src/graphics.h

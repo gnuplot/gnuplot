@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.487 2015/04/18 18:02:20 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.488 2015/04/21 18:43:08 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -965,7 +965,7 @@ static void
 set_border()
 {
     c_token++;
-    if(END_OF_COMMAND){
+    if (END_OF_COMMAND){
 	draw_border = 31;
 	border_layer = LAYER_FRONT;
 	border_lp = default_border_lp;
@@ -1178,7 +1178,7 @@ set_cntrparam()
 	if (almost_equals(c_token, "di$screte")) {
 	    contour_levels_kind = LEVELS_DISCRETE;
 	    c_token++;
-	    if(END_OF_COMMAND)
+	    if (END_OF_COMMAND)
 		int_error(c_token, "expecting discrete level");
 	    else
 		*(double *)nextfrom_dynarray(&dyn_contour_levels_list) =
@@ -1203,9 +1203,9 @@ set_cntrparam()
 		int_error(c_token,
 			  "expecting comma to separate start,incr levels");
 	    c_token++;
-	    if((contour_levels_list[i++] = real_expression()) == 0)
+	    if ((contour_levels_list[i++] = real_expression()) == 0)
 		int_error(c_token, "increment cannot be 0");
-	    if(!END_OF_COMMAND) {
+	    if (!END_OF_COMMAND) {
 		if (!equals(c_token, ","))
 		    int_error(c_token,
 			      "expecting comma to separate incr,stop levels");
@@ -1219,10 +1219,10 @@ set_cntrparam()
 	} else if (almost_equals(c_token, "au$to")) {
 	    contour_levels_kind = LEVELS_AUTO;
 	    c_token++;
-	    if(!END_OF_COMMAND)
+	    if (!END_OF_COMMAND)
 		contour_levels = int_expression();
 	} else {
-	    if(contour_levels_kind == LEVELS_DISCRETE)
+	    if (contour_levels_kind == LEVELS_DISCRETE)
 		int_error(c_token, "Levels type is discrete, ignoring new number of contour levels");
 	    contour_levels = int_expression();
 	}
@@ -1466,12 +1466,12 @@ set_dgrid3d()
 			if  ( equals( c_token, "," )) {
 				c_token++;
 				token_cnt++;
-			} else if( token_cnt == 0) {
+			} else if (token_cnt == 0) {
 				gridx = int_expression();
 				gridy = gridx; /* gridy defaults to gridx, unless overridden below */
-			} else if( token_cnt == 1) {
+			} else if (token_cnt == 1) {
 				gridy = int_expression();
-			} else if( token_cnt == 2) {
+			} else if (token_cnt == 2) {
 				normval = int_expression();
 			} else
 				int_error(c_token,"Unrecognized keyword or unexpected value");
@@ -1481,15 +1481,15 @@ set_dgrid3d()
     }
 
     /* we could warn here about floating point values being truncated... */
-    if( gridx < 2 || gridx > 1000 || gridy < 2 || gridy > 1000 )
+    if (gridx < 2 || gridx > 1000 || gridy < 2 || gridy > 1000)
 	int_error( NO_CARET,
 		   "Number of grid points must be in [2:1000] - not changed!");
 
     /* no mode token found: classic format */
-    if( dgrid3d_mode == DGRID3D_DEFAULT )
+    if (dgrid3d_mode == DGRID3D_DEFAULT)
 	dgrid3d_mode = DGRID3D_QNORM;
 
-    if( scalex < 0.0 || scaley < 0.0 )
+    if (scalex < 0.0 || scaley < 0.0)
 	int_error( NO_CARET,
 		   "Scale factors must be greater than zero - not changed!" );
 

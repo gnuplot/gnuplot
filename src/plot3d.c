@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.234 2015/03/13 20:26:17 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.235 2015/05/08 00:29:07 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -544,8 +544,8 @@ pythag( double dx, double dy )
     x = fabs(dx);
     y = fabs(dy);
     
-    if( x > y  ) { return x*sqrt(1.0 + (y*y)/(x*x)); }
-    if( y==0.0 ) { return 0.0; }
+    if (x > y) { return x*sqrt(1.0 + (y*y)/(x*x)); }
+    if (y==0.0) { return 0.0; }
     return y*sqrt(1.0 + (x*x)/(y*y));
 }
 
@@ -600,7 +600,7 @@ grid_nongrid_data(struct surface_points *this_plot)
     this_plot->num_iso_read = dgrid3d_col_fineness;
     this_plot->has_grid_topology = TRUE;
     
-    if( dgrid3d_mode == DGRID3D_SPLINES ) {
+    if (dgrid3d_mode == DGRID3D_SPLINES) {
         thin_plate_splines_setup( old_iso_crvs, &xx, &numpoints );
         yy = xx + numpoints;
         zz = yy + numpoints;
@@ -623,7 +623,7 @@ grid_nongrid_data(struct surface_points *this_plot)
 	     * two inner loops! */
 	    points->type = INRANGE;
 
-	    if( dgrid3d_mode == DGRID3D_SPLINES ) {
+	    if (dgrid3d_mode == DGRID3D_SPLINES) {
                 z = b[numpoints];
                 for (k = 0; k < numpoints; k++) {
                     double dx = xx[k] - x, dy = yy[k] - y;
@@ -635,12 +635,12 @@ grid_nongrid_data(struct surface_points *this_plot)
                     struct coordinate GPHUGE *opoints = oicrv->points;
                     for (k = 0; k < oicrv->p_count; k++, opoints++) {
                         
-                        if( dgrid3d_mode == DGRID3D_QNORM ) {
+                        if (dgrid3d_mode == DGRID3D_QNORM) {
                             double dist = qnorm( fabs(opoints->x - x),
                                                  fabs(opoints->y - y),
                                                  dgrid3d_norm_value );
 
-                            if( dist == 0.0 ) {
+                            if (dist == 0.0) {
                                 /* HBB 981209: revised flagging as undefined */
                                 /* Supporting all those infinities on various
                                  * platforms becomes tiresome, 
@@ -662,16 +662,16 @@ grid_nongrid_data(struct surface_points *this_plot)
                             double dist=pythag((opoints->x-x)/dgrid3d_x_scale, 
                                                (opoints->y-y)/dgrid3d_y_scale);
 
-                            if( dgrid3d_mode == DGRID3D_GAUSS ) {
+                            if (dgrid3d_mode == DGRID3D_GAUSS) {
                                 weight = exp( -dist*dist );
-                            } else if( dgrid3d_mode == DGRID3D_CAUCHY ) {
+                            } else if (dgrid3d_mode == DGRID3D_CAUCHY) {
                                 weight = 1.0/(1.0 + dist*dist );
-                            } else if( dgrid3d_mode == DGRID3D_EXP ) {
+                            } else if (dgrid3d_mode == DGRID3D_EXP) {
                                 weight = exp( -dist );
-                            } else if( dgrid3d_mode == DGRID3D_BOX ) {
+                            } else if (dgrid3d_mode == DGRID3D_BOX) {
                                 weight = (dist<1.0) ? 1.0 : 0.0;
-                            } else if( dgrid3d_mode == DGRID3D_HANN ) {
-                                if( dist < 1.0 ) {
+                            } else if (dgrid3d_mode == DGRID3D_HANN) {
+                                if (dist < 1.0) {
                                     weight = 0.5*(1-cos(2.0*M_PI*dist));
                                 }
                             }

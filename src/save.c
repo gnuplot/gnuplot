@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.279 2015/04/16 06:15:18 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.280 2015/04/17 22:02:45 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -287,12 +287,12 @@ set bar %f %s\n",
 #endif
 
     if (dgrid3d) {
-      if( dgrid3d_mode == DGRID3D_QNORM ) {
+      if (dgrid3d_mode == DGRID3D_QNORM) {
 	fprintf(fp, "set dgrid3d %d,%d, %d\n",
 	  	dgrid3d_row_fineness,
 	  	dgrid3d_col_fineness,
 	  	dgrid3d_norm_value);
-      } else if( dgrid3d_mode == DGRID3D_SPLINES ) {
+      } else if (dgrid3d_mode == DGRID3D_SPLINES) {
 	fprintf(fp, "set dgrid3d %d,%d splines\n",
 	  	dgrid3d_row_fineness, dgrid3d_col_fineness );
       } else {
