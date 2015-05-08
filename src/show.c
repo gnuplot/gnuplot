@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.346 2015/04/18 18:02:20 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.347 2015/05/08 18:17:09 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -2280,7 +2280,7 @@ show_palette_gradient()
 	return;
     }
 
-    for( i=0; i<sm_palette.gradient_num; ++i ) {
+    for (i=0; i<sm_palette.gradient_num; i++) {
         gray = sm_palette.gradient[i].pos;
         r = sm_palette.gradient[i].col.r;
         g = sm_palette.gradient[i].col.g;

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: getcolor.c,v 1.36 2013/10/25 15:37:21 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: getcolor.c,v 1.37 2014/11/02 22:42:46 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - getcolor.c */
@@ -90,7 +90,7 @@ palettes_differ(t_sm_palette *p1, t_sm_palette *p2)
 
 	if (p1->gradient_num != p2->gradient_num)
 	    return 1;
-	for(i=0; i<p1->gradient_num; ++i) {
+	for (i=0; i<p1->gradient_num; ++i) {
 	    if (p1->gradient[i].pos != p2->gradient[i].pos)
 		return 1;
 	    if (p1->gradient[i].col.r != p2->gradient[i].col.r)
@@ -414,7 +414,7 @@ get_max_dev(rgb_color *colors, int j, double limit)
     double sg = (colors[j].g - g) / j;
     double sb = (colors[j].b - b) / j;
 
-    for(i=1; i<j; ++i) {
+    for (i=1; i<j; ++i) {
 	double dx = i;
 
 	rdev = fabs(sr*dx + r - colors[i].r);
@@ -516,8 +516,8 @@ approximate_palette(t_sm_palette *palette, int samples,
     ++cnt;
     color_components_from_gray(1.0 / samples, colors + 1);
 
-    for(i = 0; i < samples; ++i) {
-	for(j = 2; i + j <= samples; ++j) {
+    for (i = 0; i < samples; ++i) {
+	for (j = 2; i + j <= samples; ++j) {
 	    gray = ((double) (i + j)) / samples;
 	    if (j == colors_size) {
 	        colors_size += 50;

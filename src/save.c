@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.280 2015/04/17 22:02:45 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.281 2015/05/08 18:17:08 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -924,7 +924,7 @@ set origin %g,%g\n",
       case SMPAL_COLOR_MODE_GRADIENT: {
 	int i=0;
 	fprintf( fp, "defined (" );
-	for( i=0; i<sm_palette.gradient_num; ++i ) {
+	for (i=0; i<sm_palette.gradient_num; i++) {
 	  fprintf( fp, " %.4g %.4g %.4g %.4g", sm_palette.gradient[i].pos,
 		   sm_palette.gradient[i].col.r, sm_palette.gradient[i].col.g,
 		   sm_palette.gradient[i].col.b );

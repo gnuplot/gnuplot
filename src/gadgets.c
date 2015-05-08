@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gadgets.c,v 1.119 2015/02/13 04:24:17 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gadgets.c,v 1.120 2015/03/29 17:26:00 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - gadgets.c */
@@ -554,7 +554,7 @@ clip_polygon(gpiPoint *in, gpiPoint *out, int in_length, int *out_length)
     clip_boundary[4] = clip_boundary[0];
 
     memcpy(tmp_corners, in, in_length * sizeof(gpiPoint));
-    for(i = 0; i < 4; i++) {
+    for (i = 0; i < 4; i++) {
 	clip_polygon_to_boundary(tmp_corners, out, in_length, out_length, clip_boundary+i);
 	memcpy(tmp_corners, out, *out_length * sizeof(gpiPoint));
 	in_length = *out_length;

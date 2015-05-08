@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.223 2015/04/18 18:02:20 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.224 2015/04/21 18:43:08 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -1633,7 +1633,7 @@ unset_all_zeroaxes()
 {
     AXIS_INDEX axis;
 
-    for(axis = 0; axis < NUMBER_OF_MAIN_VISIBLE_AXES; axis++)
+    for (axis = 0; axis < NUMBER_OF_MAIN_VISIBLE_AXES; axis++)
 	unset_zeroaxis(axis);
 }
 

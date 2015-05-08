@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.235 2015/05/08 00:29:07 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.236 2015/05/08 18:17:08 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -616,7 +616,7 @@ grid_nongrid_data(struct surface_points *this_plot)
 	this_plot->iso_crvs = icrv;
 	points = icrv->points;
 
-	for(j=0, y=ymin; j<dgrid3d_row_fineness; j++, y+=dy, points++) {
+	for (j=0, y=ymin; j<dgrid3d_row_fineness; j++, y+=dy, points++) {
 	    z = w = 0.0;
 
 	    /* as soon as ->type is changed to UNDEFINED, break out of
@@ -631,7 +631,7 @@ grid_nongrid_data(struct surface_points *this_plot)
                 }
                 z = z + b[numpoints + 1] * x + b[numpoints + 2] * y;
 	    } else { /* everything, except splines */
-                for(oicrv = old_iso_crvs; oicrv != NULL; oicrv = oicrv->next) {
+                for (oicrv = old_iso_crvs; oicrv != NULL; oicrv = oicrv->next) {
                     struct coordinate GPHUGE *opoints = oicrv->points;
                     for (k = 0; k < oicrv->p_count; k++, opoints++) {
                         

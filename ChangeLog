@@ -4,6 +4,10 @@
 	src/plot3d.c src/save.c src/set.c src/show.c src/tabulate.c:
 	Whitespace/codestyle cleanup "if (FOO)" rather than "if( FOO )"
 
+	* src/bitmap.c src/eval.c src/gadgets.c src/getcolor.c src/hidden3d.c
+	src/plot3d.c src/save.c src/set.c src/show.c src/stats.c src/unset.c:
+	Whitespace/codestyle "for (...) {" rather than "for( ... ){"
+
 2015-05-07  Daniel J Sebald <daniel.sebald@ieee.org>
 
 	* src/graph3d.c src/graph3d.h src/graphics.c src/graphics.h

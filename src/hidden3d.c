@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.106 2015/05/05 19:01:25 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.107 2015/05/08 00:29:07 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - hidden3d.c */
@@ -1951,8 +1951,8 @@ in_front(
     grid_y_low = coord_to_treecell(ymin);
     grid_y_high = coord_to_treecell(ymax);
 
-    for (grid_x = grid_x_low; grid_x <= grid_x_high; grid_x ++)
-	for (grid_y = grid_y_low; grid_y <= grid_y_high; grid_y ++)
+    for (grid_x = grid_x_low; grid_x <= grid_x_high; grid_x++)
+	for (grid_y = grid_y_low; grid_y <= grid_y_high; grid_y++)
 	    for (listhead = quadtree[grid_x][grid_y];
 		 listhead >= 0;
 		 listhead = qlist[listhead].next)

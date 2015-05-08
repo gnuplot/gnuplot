@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: bitmap.c,v 1.27 2012/06/30 06:41:33 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: bitmap.c,v 1.28 2013/12/15 06:18:55 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - bitmap.c */
@@ -1184,11 +1184,11 @@ b_boxfill(
     /* will implement a more efficient solution */
 
     bitoffs=0;
-    for( iy = y; iy < y+h; iy ++ ) { /* box height */
+    for (iy = y; iy < y+h; iy++) { /* box height */
 	pat = fillbitmap[bitoffs % fill_bitmap_width];
 	bitoffs++;
 	mask = 1 << (fill_bitmap_width - 1);
-	for(ix = x; ix < x+w; ix ++) { /* box width */
+	for (ix = x; ix < x+w; ix++) { /* box width */
 	    /* actual pixel = 0 or color, according to pattern */
 	    actpix = (pat & mask) ? pixcolor : 0;
 	    mask >>= 1;

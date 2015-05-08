@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: stats.c,v 1.19 2015/01/20 02:10:43 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: stats.c,v 1.20 2015/03/24 17:27:14 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - stats.c */
@@ -203,7 +203,7 @@ analyze_sgl_column( double *data, long n, long nc )
     }
 
     /* Mean and centre of gravity */
-    for( i=0; i<n; i++ ) {
+    for (i=0; i<n; i++) {
 	s  += data[i];
 	s2 += data[i]*data[i];
 	if ( nc > 0 ) {
@@ -217,7 +217,7 @@ analyze_sgl_column( double *data, long n, long nc )
     res.sum_sq = s2;
 
     /* Standard deviation, mean absolute deviation, skewness, and kurtosis */
-    for( i=0; i<n; i++ ) {
+    for (i=0; i<n; i++) {
 	double t = data[i] - res.mean;
 	ad += fabs(t);
 	d  += t;
@@ -245,7 +245,7 @@ analyze_sgl_column( double *data, long n, long nc )
     /* sample standard deviation */
     res.ssd = res.stddev * sqrt((double)(n) / (double)(n-1));
 
-    for( i=0; i<n; i++ ) {
+    for (i=0; i<n; i++) {
 	tmp[i].val = data[i];
 	tmp[i].index = i;
     }
@@ -296,7 +296,7 @@ analyze_two_columns( double *x, double *y,
     double s = 0;
     double ssyy, ssxx, ssxy;
 
-    for( i=0; i<n; i++ ) {
+    for (i=0; i<n; i++) {
 	s += x[i] * y[i];
     }
     res.sum_xy = s;

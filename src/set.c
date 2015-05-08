@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.488 2015/04/21 18:43:08 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.489 2015/05/08 18:17:08 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -3195,7 +3195,7 @@ set_palette_defined()
 			    {0.5, 1, 1, 0}, {0.7, 1, 0, 0},
 			    {0.9, 0.6, 0.6, 0.6}, {1.0, 0.95, 0.95, 0.95} };
 	int i;
-	for( i=0; i<8; ++i ) {
+	for (i=0; i<8; i++) {
 	    sm_palette.gradient[i].pos = pal[i][0];
 	    sm_palette.gradient[i].col.r = pal[i][1];
 	    sm_palette.gradient[i].col.g = pal[i][2];
