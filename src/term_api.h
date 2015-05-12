@@ -1,5 +1,5 @@
 /*
- * $Id: term_api.h,v 1.139 2015/03/29 17:26:00 sfeam Exp $
+ * $Id: term_api.h,v 1.140 2015/04/04 19:27:33 broeker Exp $
  */
 
 /* GNUPLOT - term_api.h */
@@ -235,11 +235,6 @@ typedef enum t_fillstyle { FS_EMPTY, FS_SOLID, FS_PATTERN, FS_DEFAULT,
 /* Color construction for an image, palette lookup or rgb components. */
 typedef enum t_imagecolor { IC_PALETTE, IC_RGB, IC_RGBA }
 	     t_imagecolor;
-/* Holder for various image properties */
-typedef struct t_image {
-    t_imagecolor type; /* See above */
-    TBOOLEAN fallback; /* true == don't use terminal-specific code */
-} t_image;
 
 /* Operations possible with term->modify_plots() */
 #define MODPLOTS_SET_VISIBLE         (1<<0)

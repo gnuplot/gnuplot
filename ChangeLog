@@ -1,3 +1,8 @@
+2015-05-12  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/term_api.h src/gadgets.h:  Move definition of struct t_image
+	from term_api.h (no terminals use it) to gadgets.h (2D and 3D plots).
+
 2015-05-08  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/contour.c src/graphics.c src/internal.c src/interpol.c
@@ -28,7 +33,7 @@
 	internally to LT_NODRAW).  Normally this keyword would mean "draw only
 	the data lines, not the isosampled grid lines", but that makes little
 	sense for a hidden3d surface.  This provides a way to draw only the
-	contours of a contour plot.
+	contours of a hidden3d contour plot.
 	See Bug #1603
 
 2015-05-03  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
