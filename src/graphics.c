@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.488 2015/05/08 00:29:07 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.489 2015/05/08 18:17:08 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -129,8 +129,6 @@ static void get_arrow __PROTO((struct arrow_def* arrow, int* sx, int* sy, int* e
 static void map_position_double __PROTO((struct position* pos, double* x, double* y, const char* what));
 
 static void attach_title_to_plot __PROTO((struct curve_points *this_plot, legend_key *key));
-
-static void hyperplane_between_points __PROTO((double *p1, double *p2, double *w, double *b));
 
 #ifdef EAM_OBJECTS
 static void plot_circles __PROTO((struct curve_points *plot));
@@ -4184,18 +4182,6 @@ check_for_variable_color(struct curve_points *plot, double *colorvalue)
  */
 #include "util3d.h"
 
-/* hyperplane_between_points:
- * Compute the hyperplane representation of a line passing
- *  between two points.
- */
-static void
-hyperplane_between_points(double *p1, double *p2, double *w, double *b)
-{
-    w[0] = p1[1] - p2[1];
-    w[1] = p2[0] - p1[0];
-    *b = -(w[0]*p1[0] + w[1]*p1[1]);
-}
-
 /* process_image:
  *
  * IMG_PLOT - Plot the coordinates similar to the points option except
@@ -4219,9 +4205,9 @@ process_image(void *plot, t_procimg_action action)
     struct coordinate GPHUGE *points;
     int p_count;
     int i;
-    double w_hyp[2], b_hyp;                    /* Hyperlane vector and constant */
     double p_start_corner[2], p_end_corner[2]; /* Points used for computing hyperplane. */
     int K = 0, L = 0;                          /* Dimensions of image grid. K = <scan line length>, L = <number of scan lines>. */
+    unsigned int ncols, nrows;		        /* EAM DEBUG - intended to replace K and L above */
     double p_mid_corner[2];                    /* Point representing first corner found, i.e. p(K-1) */
     double delta_x_grid[2] = {0, 0};           /* Spacings between points, two non-orthogonal directions. */
     double delta_y_grid[2] = {0, 0};
@@ -4240,10 +4226,14 @@ process_image(void *plot, t_procimg_action action)
 	points = ((struct surface_points *)plot)->iso_crvs->points;
 	p_count = ((struct surface_points *)plot)->iso_crvs->p_count;
 	pixel_planes = ((struct surface_points *)plot)->image_properties.type;
+	ncols = ((struct surface_points *)plot)->image_properties.ncols;
+	nrows = ((struct surface_points *)plot)->image_properties.nrows;
     } else {
 	points = ((struct curve_points *)plot)->points;
 	p_count = ((struct curve_points *)plot)->p_count;
 	pixel_planes = ((struct curve_points *)plot)->image_properties.type;
+	ncols = ((struct curve_points *)plot)->image_properties.ncols;
+	nrows = ((struct curve_points *)plot)->image_properties.nrows;
     }
 
     if (p_count < 1) {
@@ -4272,11 +4262,6 @@ process_image(void *plot, t_procimg_action action)
 #define GRIDY(Y) AXIS_DE_LOG_VALUE(((struct curve_points *)plot)->y_axis,points[Y].y)
 #define GRIDZ(Z) AXIS_DE_LOG_VALUE(((struct curve_points *)plot)->z_axis,points[Z].z)
 
-
-    /* Compute the hyperplane representation of the cross diagonal from
-     * the very first point of the scan to the very last point of the
-     * scan.
-     */
     if (project_points) {
 	map3d_xy_double(points[0].x, points[0].y, points[0].z, &p_start_corner[0], &p_start_corner[1]);
 	map3d_xy_double(points[p_count-1].x, points[p_count-1].y, points[p_count-1].z, &p_end_corner[0], &p_end_corner[1]);
@@ -4294,51 +4279,30 @@ process_image(void *plot, t_procimg_action action)
 	p_end_corner[1] = points[p_count-1].y;
     }
 
-    hyperplane_between_points(p_start_corner, p_end_corner, w_hyp, &b_hyp);
+    /* This is a vestige of older code that calculated K and L on the fly	*/
+    /* rather than keeping track of matrix/array/image dimensions on input	*/
+    K = ncols;
+    L = nrows;
 
-    for (K = p_count, i=1; i < p_count; i++) {
-	double p[2];
-	if (project_points) {
-	    map3d_xy_double(points[i].x, points[i].y, points[i].z, &p[0], &p[1]);
-	} else if (X_AXIS.log || Y_AXIS.log) {
-	    p[0] = GRIDX(i);
-	    p[1] = GRIDY(i);
+    /* FIXME: We don't track the dimensions of image data provided as x/y/value	*/
+    /* with individual coords rather than via array, matrix, or image format.	*/
+    /* This might better be done when the data is entered rather than here.	*/
+    if (L == 0 || K == 0) {
+	if (points[0].y == points[1].y) {
+	    for (K = 0; points[K].y == points[0].y; K++)
+		    if (K >= p_count)
+			    break;
+	    L = p_count / K;
 	} else {
-	    p[0] = points[i].x;
-	    p[1] = points[i].y;
+	    for (L = 0; points[L].x == points[0].x; L++)
+		    if (L >= p_count)
+			    break;
+	    K = p_count / L;
 	}
-	if (i == 1) {
-	    /* Determine what side (sign) of the hyperplane the second point is on.
-	     * If the second point is on the negative side of the plane, change
-	     * the sign of hyperplane variables.  Then any remaining points on the
-	     * first line will test positive in the hyperplane formula.  The first
-	     * point on the second line will test negative.
-	     */
-	    if ((w_hyp[0]*p[0] + w_hyp[1]*p[1] + b_hyp) < 0) {
-		w_hyp[0] = -w_hyp[0];
-		w_hyp[1] = -w_hyp[1];
-		b_hyp = -b_hyp;
-	    }
-	} else {
-	    /* The first point on the opposite side of the hyperplane is the
-	     * candidate for the first point of the second scan line.
-	     */
-	    if ((w_hyp[0]*p[0] + w_hyp[1]*p[1] + b_hyp) < 0) {
-		K = i;
-		break;
-	    }
-	}
+	FPRINTF((stderr, "No dimension information for %d pixels total. Try %d x %d",
+		p_count, L, K));
     }
 
-    if (K == p_count) {
-	int_warn(NO_CARET, "Image grid must be at least 2 x 2.\n\n");
-	/* return; */
-    }
-    L = p_count/K;
-    if (((double)L) != ((double)p_count/K)) {
-	int_warn(NO_CARET, "Number of pixels cannot be factored into integers matching grid. N = %d  K = %d", p_count, K);
-	return;
-    }
     grid_corner[0] = 0;
     grid_corner[1] = K-1;
     grid_corner[3] = p_count - 1;
