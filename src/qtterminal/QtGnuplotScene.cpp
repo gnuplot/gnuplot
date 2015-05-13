@@ -656,6 +656,9 @@ void QtGnuplotScene::resetItems()
 	m_hypertextList.append(addRect(QRect(), QPen(QColor(0, 0, 0, 100)), QBrush(QColor(225, 225, 225, 200))));
 	m_hypertextList[0]->setVisible(false);
 
+	m_hyperimage = addPixmap(QPixmap());
+	m_hyperimage->setVisible(false);
+
 	m_plot_group.clear();	// Memory leak?  Destroy groups first?
 }
 
@@ -813,8 +816,22 @@ void QtGnuplotScene::mouseMoveEvent(QGraphicsSceneMouseEvent* event)
 			((QGraphicsRectItem *)m_hypertextList[0])->setRect(m_hypertextList[i]->boundingRect());
 			m_hypertextList[0]->setPos(m_hypertextList[i]->pos());
 			m_hypertextList[0]->setZValue(m_hypertextList[i]->zValue()-1);
+
+			// Special hypertext "image{(xsize,ysize)}:filename" 
+			QString current_text = ((QGraphicsTextItem *)(m_hypertextList[i]))->toPlainText();
+			if (current_text.startsWith("image")) {
+				int sep = current_text.indexOf(":");
+				QString imagename = current_text.mid(sep+1);
+				sep = imagename.indexOf("\n");
+				if (sep > 0)
+					imagename.truncate(sep);
+				m_hyperimage->setPixmap(QPixmap(imagename));
+				m_hyperimage->setVisible(true);
+				break;
+			}
 		} else {
 			m_hypertextList[i]->setVisible(false);
+			m_hyperimage->setVisible(false);
 		}
 	}
 	m_hypertextList[0]->setVisible(hit);

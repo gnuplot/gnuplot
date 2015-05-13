@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: svg.trm,v 1.169 2014/05/26 20:16:43 sfeam Exp $
+ * $Id: svg.trm,v 1.170 2014/06/10 19:55:18 sfeam Exp $
  */
 
 /*------------------------------------------------------------------------------------------------------------------------------------
@@ -1197,7 +1197,7 @@ SVG_text ()
 	fprintf(gpoutfile,"  visibility=\"hidden\"> </text>\n");
     }
 
-    /* And a box and a text element to hold mouseover hypertext */
+    /* Add a box and a text element to hold mouseover hypertext */
     if (SVG_mouseable) {
 	fprintf(gpoutfile,"\n  <rect id=\"hypertextbox\" class=\"hypertextbox\" pointer-events=\"none\"\n");
 	fprintf(gpoutfile,"  fill=\"white\" stroke=\"black\" opacity=\"0.8\"\n");
@@ -1205,6 +1205,13 @@ SVG_text ()
 	fprintf(gpoutfile,"\n  <text id=\"hypertext\" class=\"hypertext\" pointer-events=\"none\"\n");
 	fprintf(gpoutfile,"  font-size=\"12\" font-family=\"Arial\"\n");
 	fprintf(gpoutfile,"  visibility=\"hidden\"> </text>\n");
+    }
+
+    /* Add a placeholder for an image linked to mouseover hypertext */
+    if (SVG_mouseable) {
+	fprintf(gpoutfile,"\n  <image id=\"hyperimage\" class=\"hyperimage\" pointer-events=\"none\"\n");
+	fprintf(gpoutfile,"  fill=\"white\" stroke=\"black\" opacity=\"0.8\"\n");
+	fprintf(gpoutfile,"  height=\"200\" width=\"300\" visibility=\"hidden\" />\n");
     }
 
     /* If there were any grid lines in this plot, add a button to toggle them */

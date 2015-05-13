@@ -1,3 +1,11 @@
+2015-05-13  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/qtterminal/QtGnuplotScene.* src/wxterminal/wxt_gui.*
+	term/svg.trm term/js/gnuplot_svg.js docs/gnuplot.doc:
+	EXPERIMENTAL support for a variant of hypertext that allows you to pop
+	up an image on mouse-over.  The initial implementation looks for a
+	hypertext string of the form "image{{xsize},{ysize}}:filename".
+
 2015-05-13  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* src/command.c (pause_command): The windows "pause" command is

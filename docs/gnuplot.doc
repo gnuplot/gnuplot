@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.947 2015/04/28 03:47:04 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.948 2015/05/02 11:45:07 broeker Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -9698,6 +9698,15 @@ Ffigure_missing
        plot 'data' using 1:2:0 with labels hypertext point pt 7 \
             title 'mouse over point to see its order in data set'
 
+ EXPERIMENTAL (implementation details may change):
+ Text of the form "image{<xsize>,<ysize>}:<filename>{\n<caption text>}" will
+ trigger display of the image file in a pop-up box. The optional size overrides
+ a default box size 300x200.  The types of image file recognized may vary by
+ terminal type, but *.png should always work. Any additional text lines
+ following the image filename are displayed as usual for hypertext.
+ Example:
+       set label 7 "image:../figures/Fig7_inset.png\nFigure 7 caption..."
+       set label 7 at 10,100 hypertext point pt 7
 3 linetype
 ?commands set linetype
 ?commands show linetype

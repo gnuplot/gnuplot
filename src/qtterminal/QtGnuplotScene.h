@@ -127,6 +127,7 @@ private:
 	QList<QtGnuplotKeybox> m_key_boxes;
 	QString m_currentHypertext;
 	QList<QGraphicsItem*> m_hypertextList;
+	QGraphicsPixmapItem* m_hyperimage;
 
 	// Axis scales
 	bool   m_axisValid[4];

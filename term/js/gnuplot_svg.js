@@ -1,12 +1,9 @@
-/*
- * $Id: gnuplot_svg.js,v 1.16 2014/05/26 20:16:43 sfeam Exp $
- */
 // Javascript routines for interaction with SVG documents produced by 
 // gnuplot's SVG terminal driver.
 
 var gnuplot_svg = { };
 
-gnuplot_svg.version = "26 May 2014";
+gnuplot_svg.version = "13 May 2015";
 
 gnuplot_svg.SVGDoc = null;
 gnuplot_svg.SVGRoot = null;
@@ -165,6 +162,17 @@ gnuplot_svg.toggleGrid = function() {
 
 gnuplot_svg.showHypertext = function(evt, mouseovertext)
 {
+    var lines = mouseovertext.split('\n');
+
+    // If text starts with "image:" process it as an xlinked bitmap
+    if (lines[0].substring(0,5) == "image") {
+	var nameindex = lines[0].indexOf(":");
+	if (nameindex > 0) {
+	    gnuplot_svg.showHyperimage(evt, lines[0]);
+	    lines[0] = lines[0].slice(nameindex+1);
+	}
+    }
+
     var anchor_x = evt.clientX;
     var anchor_y = evt.clientY;
     // Allow for scrollbar position (Firefox, others?)
@@ -181,7 +189,6 @@ gnuplot_svg.showHypertext = function(evt, mouseovertext)
     hypertext.setAttributeNS(null,"y",anchor_y+18);
     hypertext.setAttributeNS(null,"visibility","visible");
 
-    var lines = mouseovertext.split('\n');
     var height = 2+16*lines.length;
     hypertextbox.setAttributeNS(null,"height",height);
     var length = hypertext.getComputedTextLength();
@@ -233,7 +240,8 @@ gnuplot_svg.showHypertext = function(evt, mouseovertext)
     // left-justify multiline text
     var tspan_element = hypertext.firstChild;
     while (tspan_element) {
-	tspan_element.setAttributeNS(null,"x",anchor_x+14);
+        if (typeof tspan_element == 'tspan')
+	    tspan_element.setAttributeNS(null,"x",anchor_x+14);
 	tspan_element = tspan_element.nextElementSibling;
     }
 
@@ -243,8 +251,47 @@ gnuplot_svg.hideHypertext = function ()
 {
     var hypertextbox = document.getElementById("hypertextbox")
     var hypertext = document.getElementById("hypertext")
+    var hyperimage = document.getElementById("hyperimage")
     hypertextbox.setAttributeNS(null,"visibility","hidden");
     hypertext.setAttributeNS(null,"visibility","hidden");
+    hyperimage.setAttributeNS(null,"visibility","hidden");
+}
+
+gnuplot_svg.showHyperimage = function(evt, linktext)
+{
+    var anchor_x = evt.clientX;
+    var anchor_y = evt.clientY;
+    // Allow for scrollbar position (Firefox, others?)
+    if (typeof evt.pageX != 'undefined') {
+        anchor_x = evt.pageX; anchor_y = evt.pageY; 
+    }
+
+    var hyperimage = document.getElementById("hyperimage")
+    hyperimage.setAttributeNS(null,"x",anchor_x);
+    hyperimage.setAttributeNS(null,"y",anchor_y);
+    hyperimage.setAttributeNS(null,"visibility","visible");
+
+    // Pick up height and width from "image(width,height):name"
+    var width = hyperimage.getAttributeNS(null,"width");
+    var height = hyperimage.getAttributeNS(null,"height");
+    if (linktext.charAt(5) == "(") {
+	width = parseInt(linktext.slice(6));
+	height = parseInt(linktext.slice(linktext.indexOf(",") + 1));
+	hyperimage.setAttributeNS(null,"width",width);
+	hyperimage.setAttributeNS(null,"height",height);
+	hyperimage.setAttributeNS(null,"preserveAspectRatio","none");
+    }
+
+    // bounce off frame bottom and right
+    if (anchor_y > gnuplot_svg.plot_ybot + 50 - height)
+	hyperimage.setAttributeNS(null,"y",20 + anchor_y-height);
+    if (anchor_x > gnuplot_svg.plot_xmax + 150 - width)
+	hyperimage.setAttributeNS(null,"x",10 + anchor_x-width);
+
+    // attach image URL as a link
+    linktext = linktext.slice(linktext.indexOf(":") + 1);
+    var xlinkns = "http://www.w3.org/1999/xlink";
+    hyperimage.setAttributeNS(xlinkns,"xlink:href",linktext);
 }
 
 // Convert from svg panel mouse coordinates to the coordinate

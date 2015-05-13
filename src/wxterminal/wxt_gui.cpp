@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.cpp,v 1.144 2014/12/30 19:45:29 sfeam Exp $
+ * $Id: wxt_gui.cpp,v 1.145 2015/05/03 12:32:31 broeker Exp $
  */
 
 /* GNUPLOT - wxt_gui.cpp */
@@ -3047,11 +3047,21 @@ void wxtPanel::wxt_cairo_draw_hypertext()
 	int width = 0;
 	int height = 0;
 
+	/* Text beginning "image(options):foo" is a request to pop-up foo */
+	const char *display_text = wxt_display_hypertext;
+	if (!strncmp("image", wxt_display_hypertext, 5)) {
+		const char *imagefile = strchr(wxt_display_hypertext, ':');
+		if (imagefile) {
+		    wxt_cairo_draw_hyperimage();
+		    display_text = imagefile+1;
+		}
+	}
+
 	plot.justify_mode = LEFT;
 	gp_cairo_draw_text(&plot,
 		wxt_display_anchor.x + term->h_char,
 		wxt_display_anchor.y + term->v_char / 2,
-		wxt_display_hypertext, &width, &height);
+		display_text, &width, &height);
 
 	gp_cairo_set_color(&plot, grey, 0.3);
 	gp_cairo_draw_fillbox(&plot,
@@ -3063,8 +3073,71 @@ void wxtPanel::wxt_cairo_draw_hypertext()
 	gp_cairo_draw_text(&plot,
 		wxt_display_anchor.x + term->h_char,
 		wxt_display_anchor.y + term->v_char / 2,
-		wxt_display_hypertext, NULL, NULL);
+		display_text, NULL, NULL);
 }
+
+void wxtPanel::wxt_cairo_draw_hyperimage()
+{
+	unsigned int width=0, height=0;
+	double scale_x, scale_y;
+	double anchor_x, anchor_y;
+	char *imagefile;
+	cairo_surface_t *image;
+	cairo_pattern_t *pattern;
+	cairo_matrix_t matrix;
+
+	/* Optional width and height from hypertext string */
+	if (wxt_display_hypertext[5] == '(')
+	    sscanf( &wxt_display_hypertext[6], "%5u,%5u", &width, &height );
+	if (width == 0) width = 300;
+	if (height == 0) height = 200;
+
+	/* Extract file name from string of form image(options):filename */
+	imagefile = (char *)strchr(wxt_display_hypertext, ':');
+	if (!imagefile)
+	    return;
+	else do { imagefile++; }
+	    while (*imagefile == ' ');
+
+	/* Open png file */
+	imagefile = strdup(imagefile);
+	if (strchr(imagefile,'\n'))
+	    *strchr(imagefile,'\n') = '\0';
+	image = cairo_image_surface_create_from_png(imagefile);
+	free(imagefile);
+	if (cairo_surface_status(image) != CAIRO_STATUS_SUCCESS) {
+	    cairo_surface_destroy(image);
+	    return;
+	}
+
+	/* Rescale image to allocated size on screen */
+	scale_x = (double)cairo_image_surface_get_width(image) / (double)(width);
+	scale_y = (double)cairo_image_surface_get_height(image) / (double)(height);
+	scale_x /= (double)GP_CAIRO_SCALE;
+	scale_y /= (double)GP_CAIRO_SCALE;
+
+	/* Bounce off right and bottom edges of frame */
+	anchor_x = wxt_display_anchor.x;
+	anchor_y = wxt_display_anchor.y;
+	if (anchor_x + width*GP_CAIRO_SCALE > term->xmax)
+	    anchor_x -= width*GP_CAIRO_SCALE;
+	if (anchor_y + height*GP_CAIRO_SCALE > term->ymax)
+	    anchor_y -= height*GP_CAIRO_SCALE;
+
+	cairo_save(plot.cr);
+	pattern = cairo_pattern_create_for_surface(image);
+	cairo_pattern_set_filter( pattern, CAIRO_FILTER_BEST );
+	cairo_matrix_init_scale( &matrix, scale_x, scale_y );
+	cairo_matrix_translate( &matrix, -anchor_x, -anchor_y );
+	cairo_pattern_set_matrix( pattern, &matrix );
+	cairo_set_source( plot.cr, pattern );
+
+	cairo_paint(plot.cr);
+	cairo_restore(plot.cr);
+	cairo_pattern_destroy(pattern);
+	cairo_surface_destroy(image);
+}
+
 
 /* given a plot number (id), return the associated plot structure */
 wxt_window_t* wxt_findwindowbyid(wxWindowID id)

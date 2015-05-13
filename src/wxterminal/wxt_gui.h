@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.h,v 1.51 2014/11/19 01:33:43 sfeam Exp $
+ * $Id: wxt_gui.h,v 1.52 2014/12/26 23:21:48 sfeam Exp $
  */
 
 /* GNUPLOT - wxt_gui.h */
@@ -401,6 +401,7 @@ public :
 	void wxt_cairo_refresh();
 	void wxt_cairo_exec_command(gp_command command);
 	void wxt_cairo_draw_hypertext();
+	void wxt_cairo_draw_hyperimage();
 
 	/* the plot structure, defined in gp_cairo.h */
 	plot_struct plot;
