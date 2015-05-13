@@ -6,19 +6,26 @@ Please see the NEWS and ChangeLog files for a complete list of bug fixes
 and minor changes accummulated since then.
 
 These release notes are for version 5.0 patchlevel 1 (5.0.1).
-Release Notes date: 29-March-2015
+Release Notes date: 08-May-2015
 
 This patchlevel 5.0.1 incremental release includes
 ==================================================
 
 * NEW command "set mono" (see description below)
 * NEW command "set fit nolog" suppresses output to log file
+* NEW sixel terminal supports RGB and palette colors, but only 16 at a time :-(
 * CHANGE autoconfigure of Qt5 support now looks for --variable=host_bins
 * CHANGE reevaluate fill color for each polygon in data for "with filledcurves"
 * CHANGE gstrptime(): always check validity of %y %Y %d %B %b input fields
 * CHANGE track text properties for key title separately from key entries
 * CHANGE "smooth kdensity" now handles logscale y and explicit x range
 * CHANGE order of margins in the "set margin" command to left, right, bottom, top
+* CHANGE guarantee color of key sample for "lc variable" plots matches 1st point
+* CHANGE "set term fig color" can use predefined linetype colors and named colors
+* CHANGE skip all preprocessing for input lines beginning with shell escape char
+* CHANGE build system to suppress dvi as an automake-generated target
+* CHANGE in hidden3d mode, the 'nosurface' suppresses both surface grid directions
+* FIX replace palette color value NaN with background color
 * FIX improved handling of boxplot data with multiple factors (categories)
 * FIX save_textcolor was not handling "tc variable"
 * FIX apply numeric locale when reading ascii matrix data
@@ -34,6 +41,14 @@ This patchlevel 5.0.1 incremental release includes
 * FIX regression in color support for pbm/sixel/hpgl terminals (no RGB color)
 * FIX accummulated round-off error in dotted lines drawn by libgd terminals
 * FIX incorrect colorbox axis labels in polar plots
+* FIX AquaTerm framework name is case-sensitive
+* FIX strip enhanced text markup from plot titles embedded in svg output
+* FIX error in retrieving matrix column headers as strings
+* FIX error in calculating absolute deviation (stats command)
+* FIX allocation error from "set fit covariancevariables"
+* FIX tkcanvas terminal handling of blank (default) font family name
+* FIX off-by-one-error in color of contours when hidden3d is active
+
 
 NOTABLE NEW FEATURES IN VERSION 5.0.1
 =====================================
@@ -184,15 +199,9 @@ Demo plots illustrating new and old features are online at
 KNOWN ISSUES
 ============
 
-* Linking against version 3.0 of wxWidgets + wxgtk (rather than version 2.8)
-  caused the wxt terminal to fail in the version 5 release candidates.
-  The 5.0 release contains a fix for this but it has not been extensively tested.
-  If you configure in the wxt terminal without also configuring in X11,
+* If you configure in the wxt terminal without also configuring in X11,
   you may need to set the environmental variable TERMLIBS:
     TERMLIBS="-lX11"  ./configure
-
-* A last-minute change to fix handling of "pause mouse" commands under MSWindows
-  has also been only lightly tested.
 
 * Font initialization on OSX can be very slow, causing the qt terminal to
   issue warning or error messages for the first plot command.
@@ -304,7 +313,7 @@ Options for generating interactive plots for web display
 Installation
 ------------
 
-You can download a source tarball for gnuplot version 5.0.0 from the 
+You can download a source tarball for gnuplot version 5.0.1 from the 
 gnuplot development site on SourceForge.
 	http://sourceforge.net/projects/gnuplot
 
@@ -312,7 +321,7 @@ Installation instructions are available in the source itself; the short
 version for linux/unix-like systems is to unpack the tarball and then
 <PRE>
 build it:
-      cd gnuplot-5.0.0 ; ./configure ; make
+      cd gnuplot-5.0.1 ; ./configure ; make
 test it:
       make check
 install it:

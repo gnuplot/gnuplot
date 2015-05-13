@@ -37,6 +37,7 @@ Changes since 5.0 release
 * FIX allocation error from "set fit covariancevariables"
 * FIX tkcanvas terminal handling of blank (default) font family name
 * FIX off-by-one-error in color of contours when hidden3d is active
+* FIX adjust WIN32 encoding used by text output from "pause" command
 
 Changes in final release of 5.0
 ===============================

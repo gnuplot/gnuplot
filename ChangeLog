@@ -1,3 +1,16 @@
+2015-05-13  Shigeharu Takeno  <shige@iee.niit.ac.jp>
+
+	* src/command.c (pause_command): The windows "pause" command is
+	sensitive to the locale encoding. Keep a translation table to convert
+	between gnuplot's idea of the encoding and WIN32 encoding states so that
+	strings output by "pause" are not corrupted.
+	Bug #1580, Feature Request #415
+
+2015-05-08  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* PATCHLEVEL RELEASE_NOTES configure.in src/version.c:
+	Update in preparation for June(?) release of patchlevel 5.0.1
+
 2015-05-05  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/hidden3d.c (build_networks):  In hidden3d mode do not draw
