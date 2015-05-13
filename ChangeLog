@@ -1,3 +1,11 @@
+2015-05-13  Shigeharu Takeno  <shige@iee.niit.ac.jp>
+
+	* src/command.c (pause_command): The windows "pause" command is
+	sensitive to the locale encoding. Keep a translation table to convert
+	between gnuplot's idea of the encoding and WIN32 encoding states so that
+	strings output by "pause" are not corrupted.
+	Bug #1580, Feature Request #415
+
 2015-05-12  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/term_api.h src/gadgets.h:  Move definition of struct t_image
@@ -6,7 +14,7 @@
 	* src/datafile.c src/graphics.c (process_image):  Remove old code that
 	tried to empirically determine grid size of an image based on 3D coords.
 	Replace it with new bookkeeping in plot->image_properties.{ncols,nrows}
-	gets loaded when the image data is read in.
+	that is initialized when the image data is read in.
 	Bug #1607
 
 2015-05-08  Ethan A Merritt  <merritt@u.washington.edu>
