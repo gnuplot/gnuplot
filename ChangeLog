@@ -3,7 +3,7 @@
 	* term/tek.trm (SIXEL_fillbox): Handle FS_DEFAULT
 
 	* term/tek.trm (SIXEL_make_palette): A second call to make_palette()
-	was failed to reset the state, leading to loss of all palette info.
+	failed to reset the state, leading to loss of all palette info.
 	Now it overwrites any previous palette.
 	Bugfix (e.g. heatmaps demo)
 

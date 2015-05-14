@@ -1,7 +1,7 @@
 /*
  * GNUPLOT - caca.trm
  *
- * $Id: caca.trm,v 1.6.2.1 2014/11/12 05:20:18 sfeam Exp $
+ * $Id: caca.trm,v 1.6.2.2 2015/05/03 12:43:09 broeker Exp $
  *
  * This file uses UTF8 encoding and a tab size of 4.
  *
@@ -3407,6 +3407,9 @@ START_HELP(caca)
 "?caca limitations",
 "?caca bugs",
 " The `caca` terminal has some known bugs and limitations:",
+"",
+" Closing the terminal window by clicking the \"X\" on the title line",
+" does not work correctly. Press \"q\" to close the window.",
 "",
 " Unicode support depends on the driver and the terminal.",
 " Bright background colors may cause blinking.",
