@@ -1,3 +1,12 @@
+2015-05-14  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/tek.trm (SIXEL_fillbox): Handle FS_DEFAULT
+
+	* term/tek.trm (SIXEL_make_palette): A second call to make_palette()
+	was failed to reset the state, leading to loss of all palette info.
+	Now it overwrites any previous palette.
+	Bugfix (e.g. heatmaps demo)
+
 2015-05-13  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* src/command.c (pause_command): The windows "pause" command is
