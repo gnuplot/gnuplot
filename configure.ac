@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot on Unix.
 dnl
-dnl $Id: configure.ac,v 1.5 2015/02/25 00:23:14 sfeam Exp $
+dnl $Id: configure.ac,v 1.6 2015/04/21 18:43:08 sfeam Exp $
 dnl
 dnl this is actually major.minor ...
 dnl note that for a non-beta release, we need to disable DEVELOPMENT_RELEASE
@@ -1501,8 +1501,6 @@ if test "$enable_raise_console" = yes; then
 else
   AC_MSG_RESULT([  Treat <space> in plot window like any other key: yes])
 fi
-
-AC_MSG_RESULT([  Maximum number of parallel axes: 5 ])
 
 if test "$enable_objects" = yes; then
   AC_MSG_RESULT([  Placement of rectangles and other objects: yes ])
