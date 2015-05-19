@@ -1,5 +1,5 @@
 /*
- * $Id: axis.h,v 1.128 2015/04/21 18:43:08 sfeam Exp $
+ * $Id: axis.h,v 1.129 2015/04/30 18:11:06 sfeam Exp $
  *
  */
 
@@ -484,33 +484,14 @@ do {									\
  *    [coords] x, [coords] y {,[coords] z}
  * where coords is one of first,second.graph,screen,character
  * if first or second, we need to take axis.datatype into account
+ * FIXME: Cannot handle parallel axes
  */
 #define GET_NUMBER_OR_TIME(store,axes,axis)				\
 do {									\
-    if (   ((axes) != NO_AXIS)						\
-        && (axis_array[(axes)+(axis)].datatype == DT_TIMEDATE)		\
-	&& isstringvalue(c_token)					\
-       ) {								\
-	struct tm tm;							\
-	double usec;							\
-	char *ss = try_to_get_string();					\
-	if (gstrptime(ss,timefmt,&tm,&usec))				\
-	    (store) = (double) gtimegm(&tm) + usec;			\
-	free(ss);							\
-    } else {								\
-	(store) = real_expression();					\
-    }									\
+    AXIS *this_axis = (axes == NO_AXIS) ? NULL				\
+			    : &(axis_array[(axes)+(axis)]);		\
+    (store) = get_num_or_time(this_axis);				\
 } while(0)
-
-/* This is one is very similar to GET_NUMBER_OR_TIME, but has slightly
- * different usage: it writes out '0' in case of inparsable time data,
- * and it's used when the target axis is fixed without a 'first' or
- * 'second' keyword in front of it. */
-#define GET_NUM_OR_TIME(store,axis)			\
-do {							\
-    (store) = 0;					\
-    GET_NUMBER_OR_TIME(store, FIRST_AXES, axis);	\
-} while (0);
 
 /* store VALUE or log(VALUE) in STORE, set TYPE as appropriate
  * Do OUT_ACTION or UNDEF_ACTION as appropriate

@@ -1,3 +1,9 @@
+2015-05-19  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/axis.c src/axis.h:  Update routines that were missed in the
+	axis pointer revision.  Remove GET_NUM_OR_TIME (no callers remain).
+	Reorganize GET_NUMBER_OR_TIME, get_num_or_time to handle parallel axes.
+
 2015-05-14  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/tek.trm (SIXEL_fillbox): Handle FS_DEFAULT
