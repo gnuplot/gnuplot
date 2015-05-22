@@ -1,3 +1,10 @@
+2015-05-22  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/command.c src/command.h src/tables.c docs/gnuplot.doc:
+	New command `printerr` works exactly as `print` except that output is
+	always to stderr even if normal print output has been redirected using
+	`set print`.
+
 2015-05-19  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/axis.c src/axis.h:  Update routines that were missed in the
