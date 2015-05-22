@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.292.2.5 2015/04/27 21:18:42 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.292.2.6 2015/05/13 18:53:08 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -1689,6 +1689,16 @@ print_show_output()
     return print_out_name;
 }
 
+/* 'printerr' is the same as 'print' except that output is always to stderr */
+void
+printerr_command()
+{
+    FILE *save_print_out = print_out;
+
+    print_out = stderr;
+    print_command();
+    print_out = save_print_out;
+}
 
 /* process the 'print' command */
 void

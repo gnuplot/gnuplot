@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.902.2.38 2015/04/24 18:57:56 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.902.2.39 2015/04/28 03:48:13 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -6964,6 +6964,12 @@ Ffigure_mapcontours
        print <expression> {, <expression>, ...}
 
  See `expressions`.  The output file can be set with `set print`.
+ See also `printerr`.
+2 printerr
+?command printerr
+?printerr
+ `printerr` is the same as print except that output is always sent to stderr
+ even if a prior `set print` command remains in effect.
 2 pwd
 ?commands pwd
 ?pwd
@@ -11431,7 +11437,7 @@ Ffigure_missing
        set print "|<shell_command>"
        set print $datablock [append]
 
- Without "<filename>", the output file is restored to <STDERR>.  The <filename>
+ `set print` with no parameters restores output to <STDERR>.  The <filename>
  "-" means <STDOUT>. The `append` flag causes the file to be opened in append
  mode.  A <filename> starting with "|" is opened as a pipe to the
  <shell_command> on platforms that support piping.

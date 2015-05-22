@@ -3,6 +3,7 @@ Changes since 5.0 release
 * NEW "set mono" (full command "set monochrome {linetype lt <line-properties>})
 * NEW "set fit nolog" suppresses output to log file
 * NEW sixel terminal supports RGB and palette colors, but only 16 at a time :-(
+* NEW command "printerr" acts exactly like "print" but always outputs via stderr
 * CHANGE autoconfigure of Qt5 support now looks for --variable=host_bins
 * CHANGE reevaluate fill color for each polygon in data for "with filledcurves"
 * CHANGE gstrptime(): always check validity of %y %Y %d %B %b input fields
