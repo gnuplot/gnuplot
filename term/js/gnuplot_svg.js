@@ -3,7 +3,7 @@
 
 var gnuplot_svg = { };
 
-gnuplot_svg.version = "13 May 2015";
+gnuplot_svg.version = "30 May 2015";
 
 gnuplot_svg.SVGDoc = null;
 gnuplot_svg.SVGRoot = null;
@@ -240,7 +240,7 @@ gnuplot_svg.showHypertext = function(evt, mouseovertext)
     // left-justify multiline text
     var tspan_element = hypertext.firstChild;
     while (tspan_element) {
-        if (typeof tspan_element == 'tspan')
+        // if (typeof tspan_element == 'tspan') // Broken
 	    tspan_element.setAttributeNS(null,"x",anchor_x+14);
 	tspan_element = tspan_element.nextElementSibling;
     }

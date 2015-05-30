@@ -1,3 +1,9 @@
+2015-05-30  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/js/gnuplot_svg.js:  The test (typeof tspan_element == 'tspan')
+	is now failing in multiple browsers.  Comment it out for now.
+	Bug #1340
+
 2015-05-22  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/command.c src/command.h src/tables.c docs/gnuplot.doc:
