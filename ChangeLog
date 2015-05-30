@@ -1,3 +1,11 @@
+2015-05-30  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/qtterminal/QtGnuplotEvent.cpp src/qtterminal/QtGnuplotScene.cpp:
+	Always respond to mouse button release event, even if the graph widget
+	is busy or the mouse has left the window area. This prevents the event
+	from being lost, causing the rotate-on-mouse-motion mode to get stuck.
+	Bug #1602
+
 2015-05-30  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* docs/Makefile.am (noinst_PROGRAMS): Add doc2wxhtml.

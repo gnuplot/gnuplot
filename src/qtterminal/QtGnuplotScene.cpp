@@ -854,7 +854,7 @@ void QtGnuplotScene::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
 	// fast double-click then the program errors out during event processing.
 	// Unfortunately I have not been able to reliably filter out these spurious events
 	// by setting a minimum time window.  Maybe an explicit interlock would work?
-	qint64 time = 0;
+	qint64 time = 301;
 	if (m_watches[button].isValid())
 		time = m_watches[button].elapsed();
 	if (time > 300) {
