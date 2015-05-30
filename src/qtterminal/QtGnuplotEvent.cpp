@@ -137,9 +137,18 @@ void QtGnuplotEventHandler::readEvent()
 
 bool QtGnuplotEventHandler::postTermEvent(int type, int mx, int my, int par1, int par2, QtGnuplotWidget* widget)
 {
-	if ((m_socket == 0) || (m_socket->state() != QLocalSocket::ConnectedState) || (widget && !widget->isActive()))
+	if ((m_socket == 0) || (m_socket->state() != QLocalSocket::ConnectedState))
 		return false;
-
+		
+	if (widget && !widget->isActive()) {
+		if (type == GE_buttonrelease) {
+			// qDebug() << "Rescued buttonrelease event with widget inactive";
+		} else {
+			// qDebug() << "Event lost because widget is not active";
+			return false;
+		}
+	}
+		
 	gp_event_t event;
 	event.type = type;
 	event.mx = mx;

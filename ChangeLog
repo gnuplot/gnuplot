@@ -1,3 +1,11 @@
+2015-05-30  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/qtterminal/QtGnuplotEvent.cpp src/qtterminal/QtGnuplotScene.cpp:
+	Always respond to mouse button release event, even if the graph widget
+	is busy or the mouse has left the window area. This prevents the event
+	from being lost, causing the rotate-on-mouse-motion mode to get stuck.
+	Bug #1602
+
 2015-05-22  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/command.c src/command.h src/tables.c docs/gnuplot.doc:
@@ -34,7 +42,7 @@
 	internally to LT_NODRAW).  Normally this keyword would mean "draw only
 	the data lines, not the isosampled grid lines", but that makes little
 	sense for a hidden3d surface.  This provides a way to draw only the
-	contours of a contour plot.
+	contours of a hidden3d contour plot.
 	See Bug #1603
 
 2015-05-03  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
