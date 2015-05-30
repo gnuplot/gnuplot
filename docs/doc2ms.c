@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: doc2ms.c,v 1.20 2015/02/15 16:39:20 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: doc2ms.c,v 1.21 2015/05/30 12:21:08 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - doc2ms.c */
@@ -81,11 +81,11 @@ static TBOOLEAN intable = FALSE;
 int
 main (int argc, char **argv)
 {
+    char *titlepage_filename = "titlepag.ms";
     FILE *infile;
     FILE *outfile;
     infile = stdin;
     outfile = stdout;
-    char *titlepage_filename = "titlepag.ms";
     
     if (argc > 4) {
 	fprintf(stderr, "Usage: %s [infile [outfile [titlefile]]]\n", argv[0]);

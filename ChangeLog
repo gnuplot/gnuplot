@@ -6,6 +6,9 @@
 	from being lost, causing the rotate-on-mouse-motion mode to get stuck.
 	Bug #1602
 
+	* docs/doc2ms.c docs/windows/doc2html.c: Avoid finicky C90 compiler
+	warnings.
+
 2015-05-30  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* docs/Makefile.am (noinst_PROGRAMS): Add doc2wxhtml.
