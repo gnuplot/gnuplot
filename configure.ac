@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot on Unix.
 dnl
-dnl $Id: configure.ac,v 1.6 2015/04/21 18:43:08 sfeam Exp $
+dnl $Id: configure.ac,v 1.7 2015/05/19 20:17:13 sfeam Exp $
 dnl
 dnl this is actually major.minor ...
 dnl note that for a non-beta release, we need to disable DEVELOPMENT_RELEASE
@@ -11,7 +11,7 @@ AC_CONFIG_SRCDIR(src/graphics.c)
 AC_PREREQ([2.69])
 AC_CONFIG_HEADERS(config.h:config.hin)
 AC_DEFINE(DEVELOPMENT_VERSION,1,[Provide contact info for gnuplot develoment])
-AM_INIT_AUTOMAKE(1.7.9)
+AM_INIT_AUTOMAKE([1.10 subdir-objects])
 
 AM_MAINTAINER_MODE
 

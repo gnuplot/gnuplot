@@ -1,3 +1,45 @@
+2015-05-30  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* docs/Makefile.am (noinst_PROGRAMS): Add doc2wxhtml.
+	(MOSTLYCLEANFILES, CLEANFILES): Split up into two lists, updated.
+	(GNUPLOT_EXE): New variable, points to freshly built gnuplot
+	executable.
+	($(GNUPLOT_EXE)): Build executable, if not already present.
+	(grotxt, grodvi, grops): Turn into proper phony targets: depend on
+	the file actually built, do nothing themselves.
+	(troff, gnuplot.nroff, gnuplot.txt, gnuplot-groff.dvi)
+	(gnuplot-groff.ps): Must depend on titlepag.ms in srcdir, not
+	builddir.  Use automatic make variables to simplify. Changed build
+	of gnuplot.ms allows to remove complications for out-of-tree
+	builds.
+	(gnuplot.ms): Call doc2ms with new argument to ease out-of-tree
+	builds.
+	(gnuplot.tex, pdffigures, figures, nofigures, pdffigures.tex):
+	Rules removed. Having different rules produce files of the same
+	name, but with different content depending on the order of make
+	targets built, cannot possibly work.
+	(figures.tex, nofigures.tex): Keep two different versions of
+	gnuplot.tex in different-named files.
+	(pdf_figures, wxhelp_figures): New targets to handle generation of
+	figures for use.
+	(gnuplot.tex): Now just a link to (or copy of) nofigures.tex.
+	(gnuplot.pdf, nofigures.pdf): Create pdffigures.tex on-the-fly,
+	because its content cannot be assumed correct any other way.
+	(dvi): Re-enabled.
+	(gnuplot.dvi, gnuplot.pdf, nofigures.pdf, gpcard.dvi): Must depend
+	on titlepag.tex and toc_entry.sty in srcdir, not builddir.
+	(gnuplot.htb): Add necessary dependencies, some of them in srcdir.
+	(doc2wxhtml_SOURCES, doc2wxhtml_CPPFLAGS): Use automake to build
+	wxhtml, instead of spelling out compile rules ourselfs.
+
+	* configure.ac (AM_INIT_AUTOMAKE): Up version requirement a bit,
+	enable option subdir-objects.
+
+	* docs/doc2ms.c (main, init): Add optional argument giving the
+	location of titlepag.ms to be put into the file.  This way the
+	file can be processed by roff tools as-is, without having to patch
+	it on-the-fly.
+
 2015-05-30  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/js/gnuplot_svg.js:  The test (typeof tspan_element == 'tspan')
