@@ -1,3 +1,9 @@
+2015-05-31  Jun-ichi Takimoto  <jtakimoto@users.sf.net>
+
+	* src/qtterminal/qt_term.cpp:  Mouse coordinates must be passed to the
+	clipboard as a QString.
+	Bug #1602 (and earlier bugs)
+
 2015-05-30  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/qtterminal/QtGnuplotEvent.cpp src/qtterminal/QtGnuplotScene.cpp:
