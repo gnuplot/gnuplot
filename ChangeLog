@@ -4,6 +4,10 @@
 	clipboard as a QString.
 	Bug #1602 (and earlier bugs)
 
+	* src/qtterminal/QtGnuplotScene.cpp (mouseReleaseEvent): With the above
+	fix in place, it is not necessary to lock out events during the 
+	doubleclick interval.
+
 2015-05-30  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/qtterminal/QtGnuplotEvent.cpp src/qtterminal/QtGnuplotScene.cpp:
