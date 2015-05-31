@@ -833,18 +833,8 @@ void QtGnuplotScene::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
 	else if (event->button()== Qt::MidButton)   button = 2;
 	else if (event->button()== Qt::RightButton) button = 3;
 
-	// FIXME: If the press/release events get out of order or if we see a very
-	// fast double-click then the program errors out during event processing.
-	// Unfortunately I have not been able to reliably filter out these spurious events
-	// by setting a minimum time window.  Maybe an explicit interlock would work?
-	qint64 time = 301;
-	if (m_watches[button].isValid())
-		time = m_watches[button].elapsed();
-	if (time > 300) {
-		m_eventHandler->postTermEvent(GE_buttonrelease,
-			int(event->scenePos().x()), int(event->scenePos().y()), button, time, m_widget);
-	}
-	m_watches[button].start();
+	m_eventHandler->postTermEvent(GE_buttonrelease,
+		int(event->scenePos().x()), int(event->scenePos().y()), button, 0, m_widget);
 
 	/* Check for click in one of the keysample boxes */
 	int n = m_key_boxes.count();
