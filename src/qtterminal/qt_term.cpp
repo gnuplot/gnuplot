@@ -914,7 +914,7 @@ void qt_set_clipboard(const char s[])
 {
 	if (!qt)
 		return;
-	qt->out << GECopyClipboard << s;
+	qt->out << GECopyClipboard << QString(s);
 	qt_flushOutBuffer();
 }
 #endif // USE_MOUSE
