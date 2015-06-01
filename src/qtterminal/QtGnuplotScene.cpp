@@ -833,8 +833,12 @@ void QtGnuplotScene::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
 	else if (event->button()== Qt::MidButton)   button = 2;
 	else if (event->button()== Qt::RightButton) button = 3;
 
+	qint64 time = 301;	/* Only used the first time in, when timer not yet running */
+	if (m_watches[button].isValid())
+		time = m_watches[button].elapsed();
 	m_eventHandler->postTermEvent(GE_buttonrelease,
-		int(event->scenePos().x()), int(event->scenePos().y()), button, 0, m_widget);
+		int(event->scenePos().x()), int(event->scenePos().y()), button, time, m_widget);
+	m_watches[button].start();
 
 	/* Check for click in one of the keysample boxes */
 	int n = m_key_boxes.count();
