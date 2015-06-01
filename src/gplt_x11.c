@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.250 2014/12/15 04:20:34 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.251 2015/02/15 16:39:21 broeker Exp $"); }
 #endif
 
 #define MOUSE_ALL_WINDOWS 1
@@ -474,7 +474,7 @@ static void DrawRotated __PROTO((plot_struct *, Display *, GC,
 static int DrawRotatedErrorHandler __PROTO((Display *, XErrorEvent *));
 static void exec_cmd __PROTO((plot_struct *, char *));
 
-static void reset_cursor __PROTO((void));
+static void reset_cursor __PROTO((Window));
 
 static void preset __PROTO((int, char **));
 static char *pr_GetR __PROTO((XrmDatabase, char *));
@@ -1183,7 +1183,7 @@ prepare_plot(plot_struct *plot)
      * window
      */
     plot->angle = 0;		/* default is horizontal */
-    reset_cursor();
+    reset_cursor(plot->window);	/* to avoid flash, don't reset cursor of active window */
     XDefineCursor(dpy, plot->window, cursor);
 }
 
@@ -1602,7 +1602,7 @@ record()
 #endif
 	    return 1;
 	case 'R':		/* leave x11 mode */
-	    reset_cursor();
+	    reset_cursor(0);
 	    return 0;
 
 	case X11_GR_MAKE_PALETTE:
@@ -1958,7 +1958,7 @@ record()
 	break;
     case 'R':			/* exit x11 mode */
 	FPRINTF((stderr, "received R - sending ClientMessage\n"));
-	reset_cursor();
+	reset_cursor(0);
 	sys$cancel(STDIINchannel);
 	/* this is ridiculous - cook up an event to ourselves,
 	 * in order to get the mainloop() out of the XNextEvent() call
@@ -4446,12 +4446,12 @@ getMultiTabConsoleSwitchCommand(unsigned long *newGnuplotXID)
  *---------------------------------------------------------------------------*/
 
 static void
-reset_cursor()
+reset_cursor(Window skip_window)
 {
     plot_struct *plot = plot_list_start;
 
     while (plot) {
-	if (plot->window) {
+	if (plot->window && (plot->window != skip_window)) {
 	    FPRINTF((stderr, "Window for plot %d exists\n", plot->plot_number));
 	    XUndefineCursor(dpy, plot->window);
 	}

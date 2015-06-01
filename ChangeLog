@@ -4,6 +4,11 @@
 	icon to display during mouse interaction.
 	Bug #1617
 
+	* src/gplt_x11.c (reset_cursor):  Do not reset the cursor of the 
+	currently active plot to default just before setting it to the correct
+	cursor icon.  Prevents flicker due to transient change of icons.
+	Bug #1618
+
 2015-05-31  Jun-ichi Takimoto  <jtakimoto@users.sf.net>
 
 	* src/qtterminal/qt_term.cpp:  Mouse coordinates must be passed to the
