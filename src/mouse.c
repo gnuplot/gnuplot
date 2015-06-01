@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: mouse.c,v 1.179 2015/03/24 21:35:13 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: mouse.c,v 1.180 2015/04/20 18:29:54 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - mouse.c */
@@ -2000,7 +2000,8 @@ event_buttonrelease(struct gp_event_t *ge)
 	    do_save_3dplot(first_3dplot, plot3d_num, 0);
 	}
 	if (term->set_cursor)
-	    term->set_cursor(0, 0, 0);
+	    term->set_cursor((button & (1 << 1)) ? 1 : (button & (1 << 2)) ? 2 : 0,
+				0, 0);
     }
 
     /* Export current mouse coords to user-accessible variables also */

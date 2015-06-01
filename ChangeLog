@@ -1,3 +1,9 @@
+2015-06-01  Daniel J Sebald <daniel.sebald@ieee.org>
+
+	* src/mouse.c (event_buttonrelease): Improved bookkeeping for which
+	icon to display during mouse interaction.
+	Bug #1617
+
 2015-05-31  Jun-ichi Takimoto  <jtakimoto@users.sf.net>
 
 	* src/qtterminal/qt_term.cpp:  Mouse coordinates must be passed to the
