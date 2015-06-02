@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.323 2015/04/27 19:08:14 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.324 2015/05/08 00:29:07 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -675,6 +675,7 @@ do_3dplot(
 	graph_error("z_min3d should not equal z_max3d!");
 
     term_start_plot();
+    (term->layer)(TERM_LAYER_3DPLOT);
 
     screen_ok = FALSE;
 
