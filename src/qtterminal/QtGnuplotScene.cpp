@@ -470,6 +470,7 @@ void QtGnuplotScene::processEvent(QtGnuplotEventType type, QDataStream& in)
 	{
 		for (int i = 0; i < 4; i++)
 			in >> m_axisValid[i] >> m_axisMin[i] >> m_axisLower[i] >> m_axisScale[i] >> m_axisLog[i];
+		in >> m_axisValid[4];
 	}
 	else if (type == GEAfterPlot) 
 	{
@@ -776,21 +777,25 @@ void QtGnuplotScene::mouseMoveEvent(QGraphicsSceneMouseEvent* event)
 	// Mousing for inactive widgets
 	if (!m_widget->isActive())
 	{
-		m_lineTo->hide();
-		QString status;
-		if (m_axisValid[0])
-			status += QString("x = ")
-			+ QString::number(sceneToGraph(0,event->scenePos().x()));
-		if (m_axisValid[1])
-			status += QString(" y = ")
-			+ QString::number(sceneToGraph(1,event->scenePos().y()));
-		if (m_axisValid[2])
-			status += QString(" x2 = ")
-			+ QString::number(sceneToGraph(2,event->scenePos().x()));
-		if (m_axisValid[3])
-			status += QString(" y2 = ")
-			+ QString::number(sceneToGraph(3,event->scenePos().y()));
-		m_widget->setStatusText(status);
+		if (m_axisValid[4])	{
+			; // 3D plot - no mouse coordinate update
+		} else {
+			m_lineTo->hide();
+			QString status;
+			if (m_axisValid[0])
+				status += QString("x = ")
+				+ QString::number(sceneToGraph(0,event->scenePos().x()));
+			if (m_axisValid[1])
+				status += QString(" y = ")
+				+ QString::number(sceneToGraph(1,event->scenePos().y()));
+			if (m_axisValid[2])
+				status += QString(" x2 = ")
+				+ QString::number(sceneToGraph(2,event->scenePos().x()));
+			if (m_axisValid[3])
+				status += QString(" y2 = ")
+				+ QString::number(sceneToGraph(3,event->scenePos().y()));
+			m_widget->setStatusText(status);
+		}
 		QGraphicsScene::mouseMoveEvent(event);
 		return;
 	}

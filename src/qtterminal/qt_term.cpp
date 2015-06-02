@@ -188,6 +188,7 @@ static bool qt_setPosition = false;
 static bool qt_setSize   = true;
 static int  qt_setWidth  = qt_optionWidth;
 static int  qt_setHeight = qt_optionHeight;
+static bool qt_is_3Dplot = false;
 
 /* ------------------------------------------------------
  * Helpers
@@ -537,7 +538,7 @@ void qt_text_wrapper()
 	if (!qt)
 		return;
 
-	// Remember scale to update the status bar while the plot is inactive
+	// Remember scale so that we can update the status bar while the plot is inactive
 	qt->out << GEScale;
 
 	const int axis_order[4] = {FIRST_X_AXIS, FIRST_Y_AXIS, SECOND_X_AXIS, SECOND_Y_AXIS};
@@ -557,6 +558,9 @@ void qt_text_wrapper()
 		qt->out << lower/qt_oversamplingF << scale/qt_oversamplingF;
 		qt->out << (axis_array[axis_order[i]].log ? axis_array[axis_order[i]].log_base : 0.);
 	}
+	// Flag whether this was a 3D plot (not mousable in 'persist' mode)
+	qt->out << qt_is_3Dplot;
+	qt_is_3Dplot = false;
 
 	qt_text();
 }
@@ -1451,6 +1455,8 @@ void qt_layer( t_termlayer syncpoint )
 		qt->out << GELayer << QTLAYER_END_KEYSAMPLE; break;
 	case TERM_LAYER_BEFORE_ZOOM:
 		qt->out << GELayer << QTLAYER_BEFORE_ZOOM; break;
+	case TERM_LAYER_3DPLOT:
+		qt_is_3Dplot = true; break;
     	default:
 		break;
     }

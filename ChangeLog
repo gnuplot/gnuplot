@@ -2,6 +2,14 @@
 
 	* src/show.c:  Clarify the current "set clip" settings in "show clip".
 
+	* src/term_api.h src/graph3d.c:  Send TERM_LAYER_3DPLOT to the terminal
+	at the start of an splot.
+
+	* src/qtterminal/QtGnuplotScene.{cpp|h} src/qtterminal/qt_term.cpp:
+	If the current plot is 3D, do not update the status dispplay of x/y
+	coordinates in response to a mouse move event.
+	Bug #1605
+
 2015-06-01  Daniel J Sebald <daniel.sebald@ieee.org>
 
 	* src/mouse.c (event_buttonrelease): Improved bookkeeping for which
