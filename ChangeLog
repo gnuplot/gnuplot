@@ -1,3 +1,10 @@
+2015-06-03  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/util3d.c (draw3d_line_unconditional polyline3d_next):
+	Do not reset line properties for each component line segment in a 
+	contour line.  This improves the dash-pattern rendering for contours.
+	Bug #1612
+
 2015-05-31  Jun-ichi Takimoto  <jtakimoto@users.sf.net>
 
 	* src/qtterminal/qt_term.cpp:  Mouse coordinates must be passed to the

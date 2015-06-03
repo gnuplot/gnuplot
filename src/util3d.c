@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: util3d.c,v 1.47 2012/04/17 22:42:53 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: util3d.c,v 1.48 2013/09/26 22:45:33 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - util3d.c */
@@ -938,13 +938,17 @@ draw3d_line_unconditional(
     TERMCOORD(v2, x2, y2);
 
     /* Replace original color with the one passed in */
-	ls.pm3d_color = color;
+    ls.pm3d_color = color;
 
     /* Color by Z value */
     if (ls.pm3d_color.type == TC_Z)
 	    ls.pm3d_color.value = (v1->real_z + v2->real_z) * 0.5;
 
-    term_apply_lp_properties(&ls);
+    /* This interrupts the polyline, messing up dash patterns. */
+    /* Skip it if the caller indicates that the line properties are */
+    /* already set by passing in color.type = TC_DEFAULT */
+    if (color.type != TC_DEFAULT)
+	term_apply_lp_properties(&ls);
 
     /* Support for hidden3d VECTOR mode with arrowheads */
     if (lp->p_type == PT_ARROWHEAD)
@@ -1008,16 +1012,15 @@ polyline3d_start(p_vertex v1)
 void
 polyline3d_next(p_vertex v2, struct lp_style_type *lp)
 {
-    /* FIXME HBB 20031218: hidden3d mode will still create isolated edges! */
+    /* v5: Indicate that line properties are already set so that draw3d_* */
+    /*     routines do not mess up dash patterns by resetting them        */
+    t_colorspec nochange = DEFAULT_COLORSPEC;
+
     if (hidden3d && draw_surface)
 	draw_line_hidden(&polyline3d_previous_vertex, v2, lp);
     else
 	draw3d_line_unconditional(&polyline3d_previous_vertex, v2,
-				  lp, lp->pm3d_color);
-    /* NB: There used to be a 3rd case for lines drawn with no palette colors.	*/
-    /*     That case perhaps was originally intended to mean "without pm3d",	*/
-    /*     but if so it was incorrectly written.  Anyhow it became effectively	*/
-    /*     dead code in version 4.6 so I removed it.				*/
+				  lp, nochange);
 
     polyline3d_previous_vertex = *v2;
 }
