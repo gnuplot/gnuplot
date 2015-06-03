@@ -5,6 +5,9 @@
 	contour line.  This improves the dash-pattern rendering for contours.
 	Bug #1612
 
+	* src/parse.c (add_udv):  Warn if too-long variable name is truncated.
+	Bug #1526
+
 2015-06-02  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/show.c:  Clarify the current "set clip" settings in "show clip".

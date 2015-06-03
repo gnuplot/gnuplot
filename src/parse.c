@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: parse.c,v 1.91 2015/01/20 02:10:42 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: parse.c,v 1.92 2015/01/21 03:38:24 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - parse.c */
@@ -1050,6 +1050,8 @@ add_udv(int t_num)
 {
     char varname[MAX_ID_LEN+1];
     copy_str(varname, t_num, MAX_ID_LEN);
+    if (token[t_num].length > MAX_ID_LEN-1)
+	int_warn(t_num, "truncating variable name that is too long");
     return add_udv_by_name(varname);
 }
 
