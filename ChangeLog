@@ -1,3 +1,9 @@
+2015-06-04  <pudh4418@users.sf.net>
+
+	* configure.ac:  Qt5 as build for Arch linux apparently requires
+	compilation with -fPIC rather than -fPIE.
+	Bug #1616
+
 2015-06-03  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/util3d.c (draw3d_line_unconditional polyline3d_next):

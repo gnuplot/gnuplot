@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot on Unix.
 dnl
-dnl $Id: configure.ac,v 1.7 2015/05/19 20:17:13 sfeam Exp $
+dnl $Id: configure.ac,v 1.8 2015/05/30 12:21:08 broeker Exp $
 dnl
 dnl this is actually major.minor ...
 dnl note that for a non-beta release, we need to disable DEVELOPMENT_RELEASE
@@ -1199,7 +1199,7 @@ if test "${enable_qt}" = yes ; then
         RCC=${QT5LOC}/rcc
         LRELEASE=${QT5LOC}/lrelease
       fi
-      CXXFLAGS="$CXXFLAGS -fPIE"
+      CXXFLAGS="$CXXFLAGS -fPIC"
     fi 
   fi
 
