@@ -6,14 +6,15 @@ Please see the NEWS and ChangeLog files for a complete list of bug fixes
 and minor changes accummulated since then.
 
 These release notes are for version 5.0 patchlevel 1 (5.0.1).
-Release Notes date: 08-May-2015
+Release Notes date: 04-Jun-2015
 
 This patchlevel 5.0.1 incremental release includes
 ==================================================
 
-* NEW command "set mono" (see description below)
-* NEW command "set fit nolog" suppresses output to log file
+* NEW "set mono" (full command "set monochrome {linetype lt <line-properties>})
+* NEW "set fit nolog" suppresses output to log file
 * NEW sixel terminal supports RGB and palette colors, but only 16 at a time :-(
+* NEW command "printerr" acts exactly like "print" but always outputs via stderr
 * CHANGE autoconfigure of Qt5 support now looks for --variable=host_bins
 * CHANGE reevaluate fill color for each polygon in data for "with filledcurves"
 * CHANGE gstrptime(): always check validity of %y %Y %d %B %b input fields
@@ -37,7 +38,7 @@ This patchlevel 5.0.1 incremental release includes
 * FIX dashtypes after "set term {e}pslatex mono"
 * FIX report and enforce maximum number of parallel axes without faulting
 * FIX smooth mcsplines for a curve containing multiple y values at a single x
-* FIX handle log-scaled color axis in colorspec "lc palette cb"
+* FIX several bugs evident for log-scaled color axis 
 * FIX regression in color support for pbm/sixel/hpgl terminals (no RGB color)
 * FIX accummulated round-off error in dotted lines drawn by libgd terminals
 * FIX incorrect colorbox axis labels in polar plots
@@ -48,20 +49,23 @@ This patchlevel 5.0.1 incremental release includes
 * FIX allocation error from "set fit covariancevariables"
 * FIX tkcanvas terminal handling of blank (default) font family name
 * FIX off-by-one-error in color of contours when hidden3d is active
+* FIX adjust WIN32 encoding used by text output from "pause" command
+* FIX qt terminal 3D rotation mode tendency to get stuck "on"
+* FIX dash pattern rendering in contour lines
 
 
 NOTABLE NEW FEATURES IN VERSION 5.0.1
 =====================================
 
-Incremental releases 5.0.1, 5.0.2, are primarily intended to provide bug fixes,
-but 5.0.1 also contains several adjustments resulting from feedback on changes
-and new features in version 5.  The most notable is addition of a new command
-"set monochrome" that allows emulation of the terminal-specific "mono" option
-that was lost in version 5.  The new commands "set mono" and "set color"
-between two parallel sets of default linetypes.  Six monochrome linetypes 
-are pre-defined; these can be altered or new one added using the command
-"set monochrome linetype N <line-properties>".  Although these do not exactly
-duplicate those of any particular pre-version 5 terminal, approximate
+Incremental releases 5.0.1, 5.0.2, etc are primarily intended to provide bug
+fixes, but 5.0.1 also contains several adjustments resulting from feedback on
+changes and new features in version 5.  The most notable is addition of a new
+command "set monochrome" that allows emulation of the terminal-specific "mono"
+option that was lost in version 5.  The new commands "set mono" and "set color"
+switch between two parallel sets of default linetypes.  Six monochrome
+linetypes are pre-defined; these can be altered or new ones added using the
+command "set monochrome linetype N <line-properties>".  Although these do not
+exactly duplicate those of any particular pre-version 5 terminal, approximate
 backwards compatibility is provided by automatically switching to the
 monochrome linetypes if the "mono" keyword is present in "set term".
 I.e., "set term pdf mono" is equivalent to "set term pdf; set mono".
