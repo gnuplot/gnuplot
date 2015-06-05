@@ -1,3 +1,10 @@
+2015-06-05  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/fit.c (fit_command): If there's exactly one more range in a
+	'fit' command than there are independent variables, that last
+	range has to be applied to the dependent variable
+	(a.k.a. "function").
+
 2015-06-04  <pudh4418@users.sf.net>
 
 	* configure.ac:  Qt5 as build for Arch linux apparently requires
