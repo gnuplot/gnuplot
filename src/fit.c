@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: fit.c,v 1.145.2.8 2015/04/09 02:23:37 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: fit.c,v 1.145.2.9 2015/04/09 03:07:04 sfeam Exp $"); }
 #endif
 
 /*  NOTICE: Change of Copyright Status
@@ -1866,24 +1866,23 @@ fit_command()
 	range_max[i] = -VERYLARGE;
 	range_autoscale[i] = AUTOSCALE_BOTH;
     }
-    range_min[MAX_NUM_VAR] = axis_array[z_axis].min;
-    range_max[MAX_NUM_VAR] = axis_array[z_axis].max;
-    range_autoscale[MAX_NUM_VAR] = axis_array[z_axis].autoscale;
+    range_min[iz] = axis_array[z_axis].min;
+    range_max[iz] = axis_array[z_axis].max;
+    range_autoscale[iz] = axis_array[z_axis].autoscale;
 
-    i = 0;
+    num_ranges = 0;
     while (equals(c_token, "[")) {
 	if (i > MAX_NUM_VAR)
 	    Eexc(c_token, "too many range specifiers");
 	/* NB: This has nothing really to do with the Z axis, we're */
 	/* just using that slot of the axis array as scratch space. */
 	AXIS_INIT3D(SECOND_Z_AXIS, 0, 1);
-	dummy_token[i] = parse_range(SECOND_Z_AXIS);
-	range_min[i] = axis_array[SECOND_Z_AXIS].min;
-	range_max[i] = axis_array[SECOND_Z_AXIS].max;
-	range_autoscale[i] = axis_array[SECOND_Z_AXIS].autoscale;
-	i++;
+	dummy_token[num_ranges] = parse_range(SECOND_Z_AXIS);
+	range_min[num_ranges] = axis_array[SECOND_Z_AXIS].min;
+	range_max[num_ranges] = axis_array[SECOND_Z_AXIS].max;
+	range_autoscale[num_ranges] = axis_array[SECOND_Z_AXIS].autoscale;
+	num_ranges++;
     }
-    num_ranges = i;
 
     /* now compile the function */
     token1 = c_token;
@@ -2062,6 +2061,12 @@ fit_command()
      * spec may be for the Z axis */
     if (num_ranges > num_indep+1)
 	Eexc2(dummy_token[num_ranges-1], "Too many range-specs for a %d-variable fit", num_indep);
+    if (num_ranges == (num_indep + 1)) {
+	/* last range was actually for the independen variable */
+	range_min[iz] = range_min[num_indep];
+	range_max[iz] = range_max[num_indep];
+	range_autoscale[iz] = range_autoscale[num_indep];
+    }
 
     /* defer actually reading the data until we have parsed the rest
      * of the line */
@@ -2136,9 +2141,8 @@ fit_command()
 
     /* report all range specs, starting with Z */
     if (!fit_suppress_log) {
-	i = iz;
-	if ((range_autoscale[i] & AUTOSCALE_BOTH) != AUTOSCALE_BOTH)
-		log_axis_restriction(log_f, i, range_min[i], range_max[i], range_autoscale[i], "function");
+	if ((range_autoscale[iz] & AUTOSCALE_BOTH) != AUTOSCALE_BOTH)
+	    log_axis_restriction(log_f, iz, range_min[iz], range_max[iz], range_autoscale[iz], "function");
 	for (i = 0; i < num_indep; i++) {
 	    if ((range_autoscale[i] & AUTOSCALE_BOTH) != AUTOSCALE_BOTH)
 		log_axis_restriction(log_f, i, range_min[i], range_max[i], range_autoscale[i], c_dummy_var[i]);
