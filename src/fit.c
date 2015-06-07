@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: fit.c,v 1.145.2.9 2015/04/09 03:07:04 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: fit.c,v 1.145.2.10 2015/06/05 20:58:18 broeker Exp $"); }
 #endif
 
 /*  NOTICE: Change of Copyright Status
@@ -2062,7 +2062,7 @@ fit_command()
     if (num_ranges > num_indep+1)
 	Eexc2(dummy_token[num_ranges-1], "Too many range-specs for a %d-variable fit", num_indep);
     if (num_ranges == (num_indep + 1)) {
-	/* last range was actually for the independen variable */
+	/* last range was actually for the dependent variable */
 	range_min[iz] = range_min[num_indep];
 	range_max[iz] = range_max[num_indep];
 	range_autoscale[iz] = range_autoscale[num_indep];
