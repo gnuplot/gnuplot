@@ -88,7 +88,7 @@ RGB(R,G,B) =  int(255.*R) * 2**16 + int(255.*G) * 2**8  + int(255.*B)
 
 set xr [0.01:1]
 set yr [0.01:1]
-set zr [0:1]
+set zr [0:1.065]
 set xtics ("R=1" 1)
 set ytics ("G=1" 1)
 set ztics ("0" 0, "B=1" 1)
@@ -119,6 +119,14 @@ set ylabel "S"
 
 splot '++' using 1:2:(f($1,$2)):(hsv2rgb($1,$2,1.0)) \
        with pm3d lc rgb variable
+
+pause -1 "Hit return to continue"
+
+set title "Explicit borders for pm3d tiling"
+set pm3d border lt black hidden3d
+set sample 10
+set isosample 10
+replot
 
 pause -1 "Hit return to continue"
 
