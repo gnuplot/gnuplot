@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.312 2015/04/08 05:19:08 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.313 2015/04/20 21:37:24 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -1874,7 +1874,7 @@ test_term()
     for (i=1; i<7; i++) {
 	(*t->linewidth) ((float)(i)); (*t->linetype)(LT_BLACK);
 	(*t->move) (x, y); (*t->vector) (x+xl, y);
-	sprintf(label,"  lw %1d%c",i,0);
+	sprintf(label,"  lw %1d", i);
 	(*t->put_text) (x+xl, y, label);
 	y += yl;
     }
@@ -1893,7 +1893,7 @@ test_term()
 	(*t->dashtype) (i, NULL); 
 	(*t->set_color)(&black);
 	(*t->move) (x, y); (*t->vector) (x+xl, y);
-	sprintf(label,"  dt %1d%c",i,0);
+	sprintf(label,"  dt %1d", i+1);
 	(*t->put_text) (x+xl, y, label);
 	y += yl;
     }
@@ -1919,7 +1919,7 @@ test_term()
 	(*t->vector)(x+xl,y);
 	(*t->vector)(x,y);
 	closepath();
-	sprintf(label,"%2d",i);
+	sprintf(label, "%2d", i);
 	(*t->put_text)(x+xl/2, y+yl+t->v_char*0.5, label);
 	x += xl * 1.5;
     }
