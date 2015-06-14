@@ -6,7 +6,7 @@ Please see the NEWS and ChangeLog files for a complete list of bug fixes
 and minor changes accummulated since then.
 
 These release notes are for version 5.0 patchlevel 1 (5.0.1).
-Release Notes date: 04-Jun-2015
+Release Notes date: 07-Jun-2015
 
 This patchlevel 5.0.1 incremental release includes
 ==================================================
@@ -52,6 +52,7 @@ This patchlevel 5.0.1 incremental release includes
 * FIX adjust WIN32 encoding used by text output from "pause" command
 * FIX qt terminal 3D rotation mode tendency to get stuck "on"
 * FIX dash pattern rendering in contour lines
+* FIX 'fit [][min:max] f(x)' was incorrectly ignoring min:max
 
 
 NOTABLE NEW FEATURES IN VERSION 5.0.1

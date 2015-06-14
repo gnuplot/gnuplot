@@ -1,5 +1,9 @@
-Changes since 5.0 release
-=========================
+Changes since 5.0.1
+===================
+* FIX dashtype labels in 'test' command were off by one
+
+Changes in 5.0.1
+================
 * NEW "set mono" (full command "set monochrome {linetype lt <line-properties>})
 * NEW "set fit nolog" suppresses output to log file
 * NEW sixel terminal supports RGB and palette colors, but only 16 at a time :-(
@@ -41,6 +45,7 @@ Changes since 5.0 release
 * FIX adjust WIN32 encoding used by text output from "pause" command
 * FIX qt terminal 3D rotation mode tendency to get stuck "on"
 * FIX dash pattern rendering in contour lines
+* FIX 'fit [][min:max] f(x)' was incorrectly ignoring min:max
 
 Changes in final release of 5.0
 ===============================
