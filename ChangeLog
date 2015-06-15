@@ -1,3 +1,9 @@
+2015-06-15  Daniel J Sebald <daniel.sebald@ieee.org>
+
+	* src/term.c (test_term):  Use of unsigned terminal coordinates could
+	cause overflow and jam up display of very small plots in x11 terminal.
+	Bug #1626
+
 2015-06-15  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c (plot_boxes):  Autocalculation of box widths was bad
