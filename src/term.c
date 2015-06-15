@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.313 2015/04/20 21:37:24 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.314 2015/06/14 18:06:59 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -1679,7 +1679,7 @@ test_term()
     struct termentry *t = term;
     const char *str;
     int x, y, xl, yl, i;
-    unsigned int xmax_t, ymax_t, x0, y0;
+    int xmax_t, ymax_t, x0, y0;
     char label[MAX_ID_LEN];
     int key_entry_height;
     int p_width;
@@ -1692,10 +1692,10 @@ test_term()
 
     term_start_plot();
     screen_ok = FALSE;
-    xmax_t = (unsigned int) (t->xmax * xsize);
-    ymax_t = (unsigned int) (t->ymax * ysize);
-    x0 = (unsigned int) (xoffset * t->xmax);
-    y0 = (unsigned int) (yoffset * t->ymax);
+    xmax_t = (t->xmax * xsize);
+    ymax_t = (t->ymax * ysize);
+    x0 = (xoffset * t->xmax);
+    y0 = (yoffset * t->ymax);
 
     p_width = pointsize * t->h_tic;
     key_entry_height = pointsize * t->v_tic * 1.25;
