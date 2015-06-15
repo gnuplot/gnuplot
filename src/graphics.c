@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.464.2.9 2015/03/06 00:56:22 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.464.2.10 2015/03/19 17:35:39 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -1782,6 +1782,7 @@ plot_boxes(struct curve_points *plot, int xaxis_y)
     double dxl, dxr, dyt;
     struct termentry *t = term;
     enum coord_type prev = UNDEFINED;	/* type of previous point */
+    int lastdef = 0;			/* most recent point that was not UNDEFINED */
     double dyb = 0.0;
 
     /* The stackheight[] array contains the y coord of the top   */
@@ -1820,36 +1821,33 @@ plot_boxes(struct curve_points *plot, int xaxis_y)
 	case INRANGE:{
 		if (plot->points[i].z < 0.0) {
 		    /* need to auto-calc width */
-		    if (prev != UNDEFINED) {
-			if (boxwidth < 0)
-			    dxl = (plot->points[i-1].x - plot->points[i].x) / 2.0;
-			else if (! boxwidth_is_absolute)
-			    dxl = (plot->points[i-1].x - plot->points[i].x) * boxwidth / 2.0;
-			else /* Hits here on 3 column BOXERRORBARS */
-			    dxl = -boxwidth / 2.0;
-		    } else {
-			if (boxwidth > 0 && boxwidth_is_absolute)
-			    dxl = -boxwidth / 2.0;
-			else
-			    dxl = 0.0;
-		    }
+		    if (boxwidth < 0)
+			dxl = (plot->points[lastdef].x - plot->points[i].x) / 2.0;
+		    else if (!boxwidth_is_absolute)
+			dxl = (plot->points[lastdef].x - plot->points[i].x) * boxwidth / 2.0;
+		    else
+			dxl = -boxwidth / 2.0;
 
 		    if (i < plot->p_count - 1) {
-			if (plot->points[i + 1].type != UNDEFINED) {
-			    if (boxwidth < 0)
-				dxr = (plot->points[i+1].x - plot->points[i].x) / 2.0;
-			    else if (! boxwidth_is_absolute)
-				dxr = (plot->points[i+1].x - plot->points[i].x) * boxwidth / 2.0;
-			    else /* Hits here on 3 column BOXERRORBARS */
-				dxr = boxwidth / 2.0;
-			} else {
+			int nextdef;
+			for (nextdef = i+1; nextdef < plot->p_count; nextdef++)
+			    if (plot->points[nextdef].type != UNDEFINED)
+				break;
+			if (boxwidth < 0)
+			    dxr = (plot->points[nextdef].x - plot->points[i].x) / 2.0;
+			else if (!boxwidth_is_absolute)
+			    dxr = (plot->points[nextdef].x - plot->points[i].x) * boxwidth / 2.0;
+			else /* Hits here on 3 column BOXERRORBARS */
+			    dxr = boxwidth / 2.0;
+
+			if (plot->points[nextdef].type == UNDEFINED)
 			    dxr = -dxl;
-			}
+
 		    } else {
 			dxr = -dxl;
 		    }
 
-		    if (prev == UNDEFINED)
+		    if (prev == UNDEFINED && lastdef == 0)
 			dxl = -dxr;
 
 		    dxl = plot->points[i].x + dxl;
@@ -2012,7 +2010,8 @@ plot_boxes(struct curve_points *plot, int xaxis_y)
 	}			/* switch point-type */
 
 	prev = plot->points[i].type;
-
+	if (prev != UNDEFINED)
+	    lastdef = i;
     }				/*loop */
 }
 
