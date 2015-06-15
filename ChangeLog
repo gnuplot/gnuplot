@@ -1,3 +1,10 @@
+2015-06-15  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/graphics.c (plot_boxes):  Autocalculation of box widths was bad
+	whenever a NaN data value was encountered.  Now such data points are
+	ignored, as they were in version 4.
+	Bug #1623
+
 2015-06-14  Daniel J Sebald <daniel.sebald@ieee.org>
 
 	* src/term.c (test_term):  Dashtype sample labels displayed by `test`
