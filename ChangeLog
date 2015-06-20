@@ -1,3 +1,9 @@
+2015-06-20  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/util.c (gprintf): 'L' had broken if-else since 2010; 'B' was
+	missing handling for power zero; 'B' had problem with excess
+	precision.
+
 2015-06-15  Daniel J Sebald <daniel.sebald@ieee.org>
 
 	* src/term.c (test_term):  Use of unsigned terminal coordinates could
