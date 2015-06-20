@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: util.c,v 1.129 2015/01/20 02:10:43 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: util.c,v 1.130 2015/01/28 05:26:18 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - util.c */
@@ -555,6 +555,10 @@ gprintf(
 
     char *dest  = &tempdest[0];
     char *limit = &tempdest[MAX_LINE_LEN];
+    static double log10_of_1024; /* to avoid excess precision comparison in check of connection %b -- %B */
+    
+    log10_of_1024 = log10(1024);
+    
 #define remaining_space (size_t)(limit-dest)
 
     *dest = '\0';
@@ -757,7 +761,7 @@ gprintf(
 
 		t[0] = 'f';
 		t[1] = 0;
-		stored_power_base = log10(1024);
+		stored_power_base = log10_of_1024;
 		mant_exp(stored_power_base, x, FALSE, &mantissa,
 				&stored_power, temp);
 		seen_mantissa = TRUE;
@@ -772,14 +776,16 @@ gprintf(
 
 		t[0] = 'd';
 		t[1] = 0;
-		if (seen_mantissa)
-		    if (stored_power_base == log10_base)
+		if (seen_mantissa) {
+		    if (stored_power_base == log10_base) {
 			power = stored_power;
-		    else
+		    } else {
 			int_error(NO_CARET, "Format character mismatch: %%L is only valid with %%l");
-		else
+		    }
+		} else {
 		    stored_power_base = log10_base;
 		    mant_exp(log10_base, x, FALSE, NULL, &power, "%.0f");
+		}
 		snprintf(dest, remaining_space, temp, power);
 		break;
 	    }
@@ -791,13 +797,15 @@ gprintf(
 
 		t[0] = 'd';
 		t[1] = 0;
-		if (seen_mantissa)
-		    if (stored_power_base == 1.0)
+		if (seen_mantissa) {
+		    if (stored_power_base == 1.0) {
 			power = stored_power;
-		    else
+		    } else {
 			int_error(NO_CARET, "Format character mismatch: %%T is only valid with %%t");
-		else
+		    }
+		} else {
 		    mant_exp(1.0, x, FALSE, NULL, &power, "%.0f");
+		}
 		snprintf(dest, remaining_space, temp, power);
 		break;
 	    }
@@ -809,13 +817,15 @@ gprintf(
 
 		t[0] = 'd';
 		t[1] = 0;
-		if (seen_mantissa)
-		    if (stored_power_base == 1.0)
+		if (seen_mantissa) {
+		    if (stored_power_base == 1.0) {
 			power = stored_power;
-		    else
+		    } else {
 			int_error(NO_CARET, "Format character mismatch: %%S is only valid with %%s");
-		else
+		    }
+		} else {
 		    mant_exp(1.0, x, TRUE, NULL, &power, "%.0f");
+		}
 		snprintf(dest, remaining_space, temp, power);
 		break;
 	    }
@@ -827,21 +837,17 @@ gprintf(
 
 		t[0] = 'c';
 		t[1] = 0;
-		if (seen_mantissa)
-		    if (stored_power_base == 1.0)
+		if (seen_mantissa) {
+		    if (stored_power_base == 1.0) {
 			power = stored_power;
-		    else
+		    } else {
 			int_error(NO_CARET, "Format character mismatch: %%c is only valid with %%s");
-		else
+		    }
+		} else {
 		    mant_exp(1.0, x, TRUE, NULL, &power, "%.0f");
+		}
 
 		if (power >= -24 && power <= 24) {
-		    /* -18 -> 0, 0 -> 6, +18 -> 12, ... */
-		    /* HBB 20010121: avoid division of -ve ints! */
-		    power = (power + 24) / 3;
-		    snprintf(dest, remaining_space, temp, "yzafpnum kMGTPEZY"[power]);
-		} else {
-		    /* please extend the range ! */
 		    /* name  power   name  power
 		       -------------------------
 		       yocto  -24    yotta  24
@@ -852,7 +858,12 @@ gprintf(
 		       nano    -9    Giga    9
 		       micro   -6    Mega    6
 		       milli   -3    kilo    3   */
-
+		    /* -18 -> 0, 0 -> 6, +18 -> 12, ... */
+		    /* HBB 20010121: avoid division of -ve ints! */
+		    power = (power + 24) / 3;
+		    snprintf(dest, remaining_space, temp, "yzafpnum kMGTPEZY"[power]);
+		} else {
+		    /* please extend the range ! */
 		    /* fall back to simple exponential */
 		    snprintf(dest, remaining_space, "e%+02d", power);
 		}
@@ -866,14 +877,16 @@ gprintf(
 
 		t[0] = 'c';
 		t[1] = 'i';
-		t[2] = 0;
-		if (seen_mantissa)
-		    if (stored_power_base == log10(1024))
+		t[2] = '\0';
+		if (seen_mantissa) {
+		    if (stored_power_base == log10_of_1024) {
 			power = stored_power;
-		    else
+		    } else {
 			int_error(NO_CARET, "Format character mismatch: %%B is only valid with %%b");
-		else
-			mant_exp(log10(1024), x, FALSE, NULL, &power, "%.0f");
+		    }
+		} else {
+			mant_exp(log10_of_1024, x, FALSE, NULL, &power, "%.0f");
+		}
 
 		if (power > 0 && power <= 8) {
 		    /* name  power
@@ -892,7 +905,9 @@ gprintf(
 		    snprintf(dest, remaining_space, "x2^{%d}Yi", power-8);
 		} else if (power < 0) {
 		    snprintf(dest, remaining_space, "x2^{%d}", power*10);
-		}
+		} else {
+                    snprintf(dest, remaining_space, "  ");
+                }
 
 		break;
 	    }
