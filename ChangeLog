@@ -1,3 +1,9 @@
+2015-06-20  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/util.c (gprintf): 'L' had broken if-else since 2010; 'B' was
+	missing handling for power zero; 'B' had problem with excess
+	precision.
+
 2015-05-03  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/wxterminal/wxt_gui.cpp: Insert missing include of
