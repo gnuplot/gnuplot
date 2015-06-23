@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.301 2015/05/13 18:51:34 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.302 2015/05/22 23:13:36 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -2374,12 +2374,13 @@ replotrequest()
 
     screen_ok = FALSE;
     num_tokens = scanner(&gp_input_line, &gp_input_line_len);
-    c_token = 1;		/* skip the 'plot' part */
+    c_token = 1;	/* Skip the "plot" token */
 
-    if (almost_equals(0,"s$plot"))
-	plot3drequest();
-    else if (almost_equals(0,"test"))
+    if (almost_equals(0,"test")) {
+    	c_token = 0;
 	test_command();
+    } else if (almost_equals(0,"s$plot"))
+	plot3drequest();
     else
 	plotrequest();
 }
