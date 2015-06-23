@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: mouse.c,v 1.168.2.6 2014/12/31 19:45:55 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: mouse.c,v 1.168.2.7 2015/03/24 21:34:58 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - mouse.c */
@@ -2234,6 +2234,8 @@ do_event(struct gp_event_t *ge)
 	/* auto-generated replot (e.g. from replot-on-resize) */
 	/* FIXME: more terminals should use this! */
 	if (replot_line == NULL || replot_line[0] == '\0')
+	    break;
+	if (!strncmp(replot_line,"test",4))
 	    break;
 	if (multiplot)
 	    break;
