@@ -1,5 +1,5 @@
 /*
- * $Id: interpol.h,v 1.8 2013/12/26 00:58:47 sfeam Exp $
+ * $Id: interpol.h,v 1.9 2014/01/31 03:43:40 sfeam Exp $
  */
 
 /* GNUPLOT - interpol.h */
@@ -53,5 +53,6 @@ void gen_interp_frequency __PROTO((struct curve_points *plot));
 void mcs_interp __PROTO((struct curve_points *plot));
 void sort_points __PROTO((struct curve_points *plot));
 void cp_implode __PROTO((struct curve_points *cp));
+void make_bins __PROTO((struct curve_points *plot, int nbins, double binlow, double binhigh));
 
 #endif /* GNUPLOT_INTERPOL_H */

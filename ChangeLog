@@ -3,6 +3,16 @@
 	* src/qtterminal/QtGnuplotItems.dpp (drawPoint):
 	The "dots" style was inadvertantly made a no-op by change on 2015-02-15.
 
+	* configure.ac demo/bins.dem docs/gnuplot.doc src/gp_types.h
+	src/plot2d.c src/interpol.c src/interpol.h demo/random.dem:
+
+	New data filter "bins" sorts the original data into equal width bins
+	on x and then plots a single value per bin. The default number of bins
+	is controlled by `set samples`, but this can be changed by giving an
+	explicit number bins=N in the plot command.  The new feature is marked
+	EXPERIMENTAL in the documentation because we may decide to change the
+	syntax to "smooth bins" or "filter bins" or something else.
+
 2015-06-23  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/mouse.c (do_event) src/command.c (replotrequest):

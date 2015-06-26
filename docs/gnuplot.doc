@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.949 2015/05/13 19:15:57 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.950 2015/05/22 23:13:36 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -5939,6 +5939,35 @@ Ffigure_mapcontours
 ?bezier
  The `bezier` option approximates the data with a Bezier curve of degree n
  (the number of data points) that connects the endpoints.
+5 bins
+?commands plot datafile bins
+?plot datafile bins
+?plot bins
+?data-file bins
+?datafile bins
+?bins
+ This option is EXPERIMENTAL (implementation details may change).
+ Syntax:
+      plot 'DATA' using <XCOL> {:<YCOL>} bins{=<NBINS>}
+           {binrange [<LOW>:<HIGH>]}
+ The `bins` option to a `plot` command first sorts the original data into
+ equal width bins on x and then plots a single value per bin.  The default
+ number of bins is controlled by `set samples`, but this can be changed by
+ giving an explicit number of bins in the command.
+
+ If no binrange is given, the range is taken from the current x axis range.
+ Any data points outside this range will be ignored.
+
+ If only a single column is given in the using clause then each data point
+ contributes a count of 1 to the accumulation of total counts in the bin for
+ that x coordinate value.  If a second column is given then the value in that
+ column is added to the accumulation for the bin.  Thus the following two plot
+ commnad are equivalent:
+      plot 'DATA" using N bins=20
+      set samples 20
+      plot 'DATA' using (column(N)):(1)
+
+ For related plotting styles see `smooth frequency` and `smooth kdensity`.
 5 csplines
 ?commands plot datafile smooth csplines
 ?plot datafile smooth csplines

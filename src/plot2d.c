@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.359 2015/04/30 18:11:06 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.360 2015/05/08 00:29:07 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -832,7 +832,10 @@ get_data(struct curve_points *current_plot)
 	    }
 
 	case 1:
-	    {                   /* only one number */
+	    /* only one number */
+	    if (current_plot->plot_smooth == SMOOTH_BINS) {
+		v[1] = 1.0;
+	    } else {
 		/* x is index, assign number to y */
 		v[1] = v[0];
 		v[0] = df_datum;
@@ -1933,6 +1936,11 @@ eval_plots()
     legend_key *key = &keyT;
     char orig_dummy_var[MAX_ID_LEN+1];
 
+#ifdef SMOOTH_BINS_OPTION
+    int nbins = 0;
+    double binlow, binhigh;
+#endif
+
     double newhist_start = 0.0;
     int histogram_sequence = -1;
     int newhist_color = 1;
@@ -2143,6 +2151,34 @@ eval_plots()
 
 	    /* pm 25.11.2001 allow any order of options */
 	    while (!END_OF_COMMAND) {
+
+#ifdef SMOOTH_BINS_OPTION
+		/* bin the data if requested */
+		if (equals(c_token, "bins")) {
+		    if (set_smooth) {
+			duplication=TRUE;
+			break;
+		    }
+		    c_token++;
+		    this_plot->plot_smooth = SMOOTH_BINS;
+		    nbins = samples_1;
+		    if (equals(c_token, "=")) {
+			c_token++;
+			nbins = int_expression();
+			if (nbins <= 0)
+			    nbins = samples_1;
+		    }
+		    binlow = binhigh = 0.0;
+		    if (equals(c_token, "binrange")) {
+			c_token++;
+			if (!parse_range(SAMPLE_AXIS))
+			    int_error(c_token, "incomplete bin range");
+			binlow = axis_array[SAMPLE_AXIS].min;
+			binhigh = axis_array[SAMPLE_AXIS].max;
+		    }
+		    continue;
+		}
+#endif
 
 		/*  deal with smooth */
 		if (almost_equals(c_token, "s$mooth")) {
@@ -2755,6 +2791,13 @@ eval_plots()
 		    this_plot->plot_type = NODATA;
 		    goto SKIPPED_EMPTY_FILE;
 		}
+
+#ifdef SMOOTH_BINS_OPTION
+		/* If we are to bin the data, do that first */
+		if (this_plot->plot_smooth == SMOOTH_BINS) {
+		    make_bins(this_plot, nbins, binlow, binhigh);
+		}
+#endif
 
 		/* Fiddle the auto-scaling data for specific plot styles */
 		if (this_plot->plot_style == HISTOGRAMS)

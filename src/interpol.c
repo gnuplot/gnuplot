@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: interpol.c,v 1.50 2015/02/06 17:16:55 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: interpol.c,v 1.51 2015/05/08 18:17:08 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - interpol.c */
@@ -1428,3 +1428,99 @@ mcs_interp(struct curve_points *plot)
 #undef C2
 #undef C3
 }
+
+#ifdef SMOOTH_BINS_OPTION
+/*
+ * Binned histogram of input values.
+ *   plot FOO using N:(1) bins{=<nbins>} {binrange=[binlow:binhigh]} with boxes
+ * If no binrange is given, the range is taken from the x axis range.
+ * In the latter case "set xrange" may exclude some data points,
+ * while "set auto x" will include all data points.
+ */
+void
+make_bins(struct curve_points *plot, int nbins, double binlow, double binhigh)
+{
+    int i, binno;
+    double *bin;
+    double bottom, top, binwidth, range;
+    struct axis *xaxis = &axis_array[plot->x_axis];
+    struct axis *yaxis = &axis_array[plot->y_axis];
+    double ymax = 0;
+    int N = plot->p_count;
+
+    /* Divide the range on X into the requested number of bins.
+     * NB: This range is independent of the values of the points.
+     */
+    if (binlow == 0 && binhigh == 0) {
+	bottom = xaxis->data_min;
+	top = xaxis->data_max;
+    } else {
+	bottom = binlow;
+	top = binhigh;
+    }
+    bottom = axis_log_value(xaxis, bottom);
+    top = axis_log_value(xaxis, top);
+    binwidth = (top - bottom) / (nbins - 1);
+    bottom -= binwidth/2.;
+    top += binwidth/2.;
+    range = top - bottom;
+
+    bin = gp_alloc(nbins*sizeof(double), "bins");
+    for (i=0; i<nbins; i++)
+ 	bin[i] = 0;
+    for (i=0; i<N; i++) {
+	if (plot->points[i].type == UNDEFINED)
+	    continue;
+	binno = floor(nbins * (plot->points[i].x - bottom) / range);
+        /* FIXME: Should outrange points be dumped in the first/last bin? */
+	if (0 <= binno && binno < nbins)
+	    bin[binno] += axis_de_log_value(yaxis, plot->points[i].y);
+    }
+
+    if (xaxis->autoscale & AUTOSCALE_MIN) {
+	if (xaxis->min > bottom)
+	    xaxis->min = bottom;
+    }
+    if (xaxis->autoscale & AUTOSCALE_MAX) {
+	if (xaxis->max < top)
+	    xaxis->max = top;
+    }
+
+    /* Replace the original data with one entry per bin.
+     * new x = midpoint of bin
+     * new y = number of points in the bin
+     */
+    plot->p_count = nbins;
+    plot->points = gp_realloc( plot->points, nbins * sizeof(struct coordinate), "curve_points");
+    for (i=0; i<nbins; i++) {
+	double bincent = bottom + (0.5 + (double)i) * binwidth;
+	plot->points[i].type = INRANGE;
+	plot->points[i].x     = bincent;
+	plot->points[i].xlow  = bincent - binwidth/2.;
+	plot->points[i].xhigh = bincent + binwidth/2.;
+	plot->points[i].y     = axis_log_value(yaxis, bin[i]);
+	plot->points[i].ylow  = plot->points[i].y;
+	plot->points[i].yhigh = plot->points[i].y;
+	plot->points[i].z = 0;	/* FIXME: leave it alone? */
+	if (inrange(axis_de_log_value(xaxis, bincent), xaxis->min, xaxis->max)) {
+	    if (ymax < bin[i])
+		ymax = bin[i];
+	} else {
+	    plot->points[i].type = OUTRANGE;
+	}
+	FPRINTF((stderr, "bin[%d] %g %g\n", i, plot->points[i].x, plot->points[i].y));
+    }
+
+    if (yaxis->autoscale & AUTOSCALE_MIN) {
+	if (yaxis->min > 0)
+	    yaxis->min = 0;
+    }
+    if (yaxis->autoscale & AUTOSCALE_MAX) {
+	if (yaxis->max < ymax)
+	    yaxis->max = ymax;
+    }
+
+    /* Clean up */
+    free(bin);
+}
+#endif
