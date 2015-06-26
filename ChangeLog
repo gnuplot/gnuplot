@@ -1,3 +1,8 @@
+2015-06-26  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/qtterminal/QtGnuplotItems.dpp (drawPoint):
+	The "dots" style was inadvertantly made a no-op by change on 2015-02-15.
+
 2015-06-23  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/mouse.c (do_event) src/command.c (replotrequest):
