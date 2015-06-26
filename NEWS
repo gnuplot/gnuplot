@@ -2,6 +2,7 @@ Changes since 5.0.1
 ===================
 * FIX dashtype labels in 'test' command were off by one
 * FIX autocalculation of box widths in the presence of NaN data values
+* FIX qt terminals dots were invisible
 
 Changes in 5.0.1
 ================
