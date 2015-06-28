@@ -123,7 +123,7 @@ allterm.h: $(CORETERM) $(LUA_HELP)
 	done >$@
 
 # for debugging
-alldoc: check dvi gih hlp html info ipf ms nroff pdf ps rnh rtf htb
+alldoc: check dvi gih hlp html info ipf nroff pdf ps rnh rtf htb
 
 ### [tn]roff documentation
 troff: gnuplot.ms $(srcdir)/titlepag.ms
@@ -159,8 +159,12 @@ doc2ms_CPPFLAGS = -DALL_TERM_DOC $(AM_CPPFLAGS)
 ### html
 html: htmldocs/gnuplot.html
 htmldocs/gnuplot.html: figures.tex wxhelp_figures pdf_figures
-	$(AM_V_at)mkdir -p htmldocs
-	$(AM_V_GEN)latex2html -dir htmldocs -local_icons $<
+	$(AM_V_GEN)if test $(LATEX2HTML) != no ; then \
+	  mkdir -p htmldocs ; \
+	  $(LATEX2HTML) -dir htmldocs -local_icons $< ; \
+	else \
+	  echo latex2html not found - cannot build html file ; \
+	fi
 
 ### PDF documentation
 pdf_figures: $(GNUPLOT_EXE) $(srcdir)/plotstyles.gnu

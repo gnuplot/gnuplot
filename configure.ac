@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot on Unix.
 dnl
-dnl $Id: configure.ac,v 1.9 2015/06/04 17:39:04 sfeam Exp $
+dnl $Id: configure.ac,v 1.10 2015/06/26 20:51:18 sfeam Exp $
 dnl
 dnl this is actually major.minor ...
 dnl note that for a non-beta release, we need to disable DEVELOPMENT_RELEASE
@@ -120,6 +120,7 @@ fi
 AM_CONDITIONAL(HAVE_LATEX, test "$with_latex" != no)
 AC_CHECK_PROGS(DVIPS, dvips, no)
 AC_CHECK_PROGS(TROFF, troff, no)
+AC_CHECK_PROGS(LATEX2HTML, latex2html, no)
 
 AC_ARG_WITH(texdir,dnl
   [--with-texdir=DIR       where to install latex style files

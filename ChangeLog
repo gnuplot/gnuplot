@@ -1,3 +1,11 @@
+2015-06-28  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* configure.ac: Check for existence of latex2html.
+	* docs/Makefile.am (htmldocs/gnuplot.html): Do not try to build if
+	latex2html was not found.
+	(alldoc): Target 'ms' no longer exists.  Test actual outputs made
+	from gnuplot.ms instead.
+
 2015-06-26  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/qtterminal/QtGnuplotItems.dpp (drawPoint):
