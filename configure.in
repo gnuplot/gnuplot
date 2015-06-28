@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot on Unix.
 dnl
-dnl $Id: configure.in,v 1.370.2.8 2015/02/25 00:23:03 sfeam Exp $
+dnl $Id: configure.in,v 1.370.2.9 2015/05/13 18:53:08 sfeam Exp $
 dnl
 dnl this is actually major.minor ...
 dnl note that for a non-beta release, we need to disable DEVELOPMENT_RELEASE
@@ -111,6 +111,7 @@ if test "$with_latex" = yes; then
   AC_CHECK_PROGS(PLAINTEX, tex, no)
   AC_CHECK_PROGS(LATEX, latex latex2e, no)
   AC_CHECK_PROGS(PDFLATEX, pdflatex, no)
+  AC_CHECK_PROGS(LATEX2HTML, latex2html, no)
   test "$PLAINTEX" = "no" -o "$LATEX" = no -o "$PDFLATEX" = "no" && with_latex="no"
 else
     PLAINTEX="no"

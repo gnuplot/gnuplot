@@ -64,13 +64,11 @@ pkglibexec_PROGRAMS =
 
 if BUILD_GNUPLOT_X11
 pkglibexec_PROGRAMS += gnuplot_x11
-gnuplot_x11_SOURCES = gplt_x11.c gplt_x11.h gpexecute.c gpexecute.h mousecmn.h version.c version.h
+gnuplot_x11_SOURCES = gplt_x11.c gplt_x11.h gpexecute.c getcolor.c getcolor.h gpexecute.h mousecmn.h version.c version.h
+gnuplot_x11_CPPFLAGS = -DGPLT_X11_MODE $(AM_CPPFLAGS)
 XLIBS = @LIBRARIES_FOR_X@
-gnuplot_x11_LDADD = getcolor_x11.o $(XLIBS)
+gnuplot_x11_LDADD = $(XLIBS)
 endif
-
-getcolor_x11.o: getcolor.c
-	$(COMPILE) -c -DGPLT_X11_MODE -o getcolor_x11.o $(srcdir)/getcolor.c
 
 bf_test_SOURCES = bf_test.c
 bf_test_LIBS = -lm

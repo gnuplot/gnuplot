@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: doc2ms.c,v 1.18 2005/06/03 05:11:55 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: doc2ms.c,v 1.19 2007/10/24 00:47:51 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - doc2ms.c */
@@ -68,7 +68,7 @@ static char *RCSid() { return RCSid("$Id: doc2ms.c,v 1.18 2005/06/03 05:11:55 sf
 
 #define LINE_SKIP		3
 
-void init __PROTO((FILE *));
+void init __PROTO((FILE *, char *));
 void convert __PROTO((FILE *, FILE *));
 void process_line __PROTO((char *, FILE *));
 void section __PROTO((char *, FILE *));
@@ -81,12 +81,14 @@ static TBOOLEAN intable = FALSE;
 int
 main (int argc, char **argv)
 {
+    char *titlepage_filename = "titlepag.ms";
     FILE *infile;
     FILE *outfile;
     infile = stdin;
     outfile = stdout;
-    if (argc > 3) {
-	fprintf(stderr, "Usage: %s [infile [outfile]]\n", argv[0]);
+    
+    if (argc > 4) {
+	fprintf(stderr, "Usage: %s [infile [outfile [titlefile]]]\n", argv[0]);
 	exit(EXIT_FAILURE);
     }
     if (argc >= 2) {
@@ -96,14 +98,24 @@ main (int argc, char **argv)
 	    exit(EXIT_FAILURE);
 	}
     }
-    if (argc == 3) {
+    if (argc >= 3) {
 	if ((outfile = fopen(argv[2], "w")) == (FILE *) NULL) {
 	    fprintf(stderr, "%s: Can't open %s for writing\n",
 		    argv[0], argv[2]);
 	    exit(EXIT_FAILURE);
 	}
     }
-    init(outfile);
+    if (argc == 4) {
+	FILE *check_titlepage;
+	if (! (check_titlepage = fopen(argv[3], "r"))) {
+	    fprintf(stderr, "%s: Can't open %s for reading\n",
+		    argv[0], argv[3]);
+	    exit(EXIT_FAILURE);
+	}
+	titlepage_filename = argv[3];
+	fclose(check_titlepage);
+    }
+    init(outfile, titlepage_filename);
     convert(infile, outfile);
     finish(outfile);
     return EXIT_SUCCESS;
@@ -111,16 +123,17 @@ main (int argc, char **argv)
 
 
 void
-init(FILE *b)
+init(FILE *b, char *t)
 {
     /* in nroff, increase line length by 8 and don't adjust lines */
-    (void) fputs(".if n \\{.nr LL +8m\n.na \\}\n\
+    (void) fprintf(b, "\
+.if n \\{.nr LL +8m\n.na \\}\n\
 .nr PO +0.3i\n\
-.so titlepag.ms\n\
+.so %s\n\
 .pn 1\n\
 .bp\n\
 .ta 1.5i 3.0i 4.5i 6.0i 7.5i\n\
-\\&\n.sp 3\n.PP\n", b);
+\\&\n.sp 3\n.PP\n", t);
 
     /* following line commented out by rjl
        (void) fputs(".so intro\n",b);
