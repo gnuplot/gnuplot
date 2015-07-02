@@ -7,6 +7,8 @@
 	sufficient to cause the observed problem.
 	Bug #1644
 
+	* demo/html/webify.pl:  Default to pngcairo terminal rather than png.
+
 2015-06-28  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/Makefile.am (gnuplot_x11_SOURCES): Add getcolor.c/.h to
