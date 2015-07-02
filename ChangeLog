@@ -1,3 +1,12 @@
+2015-07-02  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/graph3d.c:  An incorrect test for variable color was used for
+	splots with impulses or points.  Replace it with a shared correct test
+	in check3d_for_variable_color.  Note: Binary plots can still set an
+	incorrect flag plot->pm3d_color_from_column but this flag is no longer
+	sufficient to cause the observed problem.
+	Bug #1644
+
 2015-06-28  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* configure.ac: Check for existence of latex2html.
