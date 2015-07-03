@@ -56,7 +56,7 @@ use HTML::Entities;
 	if ((defined $ENV{DEMOTERM}) && $DEMOTERM ne "") {
 	    print GNUPLOT "set term $DEMOTERM\n";
 	} else {
-	    print GNUPLOT "set term png enhanced font 'arial,8' transparent size 450,320\n";
+	    print GNUPLOT "set term pngcairo font 'arial,10' transparent size 600,400\n";
 	}
 	print GNUPLOT "set output \"$ARGV[0].$plot.png\"\n";
 

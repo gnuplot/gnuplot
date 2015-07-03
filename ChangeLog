@@ -4,6 +4,8 @@
 	into plot2d.h, since configure.ac is not seen by the build system on
 	MSWin.
 
+	* demo/html/webify.pl:  Default to pngcairo terminal rather than png.
+
 2015-07-02  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graph3d.c:  An incorrect test for variable color was used for
