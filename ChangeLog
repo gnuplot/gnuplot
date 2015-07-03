@@ -1,3 +1,9 @@
+2015-07-03  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* configure.ac src/plot2d.h:  Move the definition of SMOOTH_BINS_OPTION
+	into plot2d.h, since configure.ac is not seen by the build system on
+	MSWin.
+
 2015-07-02  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graph3d.c:  An incorrect test for variable color was used for
