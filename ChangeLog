@@ -1,3 +1,8 @@
+2015-07-05  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/wxterminal/gp_cairo.c (gp_cairo_set_dashtype):  If the dashtype
+	is changed then the current path must be stroked and reopened.
+
 2015-07-03  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* configure.ac src/plot2d.h:  Move the definition of SMOOTH_BINS_OPTION

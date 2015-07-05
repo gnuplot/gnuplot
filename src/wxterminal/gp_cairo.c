@@ -1,5 +1,5 @@
 /*
- * $Id: gp_cairo.c,v 1.90 2015/03/06 17:48:44 sfeam Exp $
+ * $Id: gp_cairo.c,v 1.91 2015/03/24 21:35:13 sfeam Exp $
  */
 
 /* GNUPLOT - gp_cairo.c */
@@ -549,8 +549,6 @@ void gp_cairo_set_dashtype(plot_struct *plot, int type, t_dashtype *custom_dash_
 	};
 	int lt = (type) % 5;
 
-	FPRINTF((stderr,"set_dashtype %d\n", type));
-
 	if (type == DASHTYPE_CUSTOM && custom_dash_type) {
 		/* Convert to internal representation */
 		int i;
@@ -568,13 +566,7 @@ void gp_cairo_set_dashtype(plot_struct *plot, int type, t_dashtype *custom_dash_
 			plot->current_dashpattern[i] = custom_dash_type->pattern[i]
 				* plot->dashlength
 				* plot->oversampling_scale * empirical_scale;
-		FPRINTF((stderr,"gp_cairo_set_dashtype: custom pattern\n"));
-		FPRINTF((stderr,"	%f %f %f %f %f %f %f %f\n",
-			plot->current_dashpattern[0], plot->current_dashpattern[1],
-			plot->current_dashpattern[2], plot->current_dashpattern[3],
-			plot->current_dashpattern[4], plot->current_dashpattern[5],
-			plot->current_dashpattern[6], plot->current_dashpattern[7]));
-		plot->linestyle = GP_CAIRO_DASH;
+		gp_cairo_set_linestyle(plot, GP_CAIRO_DASH);
 
 	} else if (type > 0 && lt != 0) {
 		/* Use old (version 4) set of linetype patterns */
@@ -588,13 +580,12 @@ void gp_cairo_set_dashtype(plot_struct *plot, int type, t_dashtype *custom_dash_
 				* plot->dashlength
 				* plot->oversampling_scale
 				* empirical_scale;
-		plot->linestyle = GP_CAIRO_DASH;
+		gp_cairo_set_linestyle(plot, GP_CAIRO_DASH);
 
 	} else {
 		/* Every 5th pattern in the old set is solid */
-		plot->linestyle = GP_CAIRO_SOLID;
+		gp_cairo_set_linestyle(plot, GP_CAIRO_SOLID);
 	}
-
 }
 
 void gp_cairo_stroke(plot_struct *plot)
@@ -613,10 +604,10 @@ void gp_cairo_stroke(plot_struct *plot)
 
 	cairo_save(plot->cr);
 
-	if (plot->linetype == LT_NODRAW)
+	if (plot->linetype == LT_NODRAW) {
 		cairo_set_operator(plot->cr, CAIRO_OPERATOR_XOR);
 
-	else if (lt == LT_AXIS || plot->linestyle == GP_CAIRO_DOTS) {
+	} else if (lt == LT_AXIS || plot->linestyle == GP_CAIRO_DOTS) {
 		/* Grid lines (lt 0) */
 		double dashes[2];
 		double empirical_scale = 1.0;
