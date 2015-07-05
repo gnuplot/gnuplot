@@ -1,3 +1,8 @@
+2015-07-05  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/wxterminal/gp_cairo.c (gp_cairo_set_dashtype):  If the dashtype
+	is changed then the current path must be stroked and reopened.
+
 2015-07-02  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graph3d.c:  An incorrect test for variable color was used for
