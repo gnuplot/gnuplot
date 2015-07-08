@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.489 2015/05/08 18:17:08 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.490 2015/05/08 18:32:12 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -1628,11 +1628,11 @@ set_encoding()
 #endif
     } else {
 	int temp = lookup_table(&set_encoding_tbl[0],c_token);
+	char *senc;
 
 	/* allow string variables as parameter */
-	if ((temp == S_ENC_INVALID) && isstringvalue(c_token)) {
+	if ((temp == S_ENC_INVALID) && isstringvalue(c_token) && (senc = try_to_get_string())) {
 	    int i;
-	    char *senc = try_to_get_string();
 	    for (i = 0; encoding_names[i] != NULL; i++)
 		if (strcmp(encoding_names[i], senc) == 0)
 		    temp = i;

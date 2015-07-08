@@ -1,5 +1,5 @@
 /* Hey Emacs this is -*- C -*-
- * $Id: cgm.trm,v 1.98 2012/11/25 22:01:22 sfeam Exp $
+ * $Id: cgm.trm,v 1.99 2012/12/21 23:05:17 sfeam Exp $
  */
 
 /* GNUPLOT - cgm.trm */
@@ -457,12 +457,12 @@ CGM_options()
 		cgm_user_color_count++;
 		++c_token;
 	    } else {
+		char *s = NULL;
 		if (equals(c_token,"font"))
 		    c_token++;
-		if (isstringvalue(c_token)) {
+		if (isstringvalue(c_token) && (s = try_to_get_string())) {
 		    double relwidth;
 		    int font_index;
-		    char *s = try_to_get_string();
 		    char *comma = strchr(s,',');
 		    if (comma && (1 == sscanf(comma+1,"%d",&cgm_fontsize)))
 			   *comma = '\0';

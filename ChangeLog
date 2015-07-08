@@ -1,3 +1,17 @@
+2015-07-08  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/estimate.trm:  Initialization of enhanced text string buffer.
+	Bug #1648
+
+	* src/set.c src/fit.c src/term.c src/parse.c term/cgm.trm term/gd.trm
+	term/x11.trm:  Fuzz-testing found a recurring pattern of fragile code:
+	if (isstringvalue(c_token))
+	     foo = try_to_get_string();	/* cannot fail */
+	Unfortunately it _can_ fail if an expression begins with a quoted string
+	but is coerced into returning a numerical value. All of these sites
+	require a specific for (foo != NULL).
+	Bug #1649
+
 2015-07-05  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/wxterminal/gp_cairo.c (gp_cairo_set_dashtype):  If the dashtype

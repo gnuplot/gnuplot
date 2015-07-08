@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: x11.trm,v 1.224 2015/02/15 16:39:23 broeker Exp $
+ * $Id: x11.trm,v 1.225 2015/03/29 17:26:00 sfeam Exp $
  *
  */
 
@@ -453,6 +453,7 @@ X11_options()
     unsigned long existing_X11_window_id = 0;
     TBOOLEAN set_window = FALSE;
 #endif
+    char *s;
 
     do_raise = ctrlq = UNSET;
     dashedlines = yes;
@@ -537,8 +538,7 @@ X11_options()
 	    c_token++;
 	    if (END_OF_COMMAND)
 		int_error(c_token, "expecting font name");
-	    if (isstringvalue(c_token)) {
-		char *s = try_to_get_string();
+	    if (isstringvalue(c_token) && (s = try_to_get_string())) {
 		strncpy(X11_default_font, s, sizeof(X11_default_font));
 		free(s);
 	    } else {
@@ -719,8 +719,7 @@ X11_options()
 	c_token = c_title_token;
 	strncat(term_options, " title \"", sizeof(term_options)-strlen(term_options)-1);
 	title = term_options + strlen(term_options);
-	if (isstringvalue(c_title_token)) {
-	    char *s = try_to_get_string();
+	if (isstringvalue(c_title_token) && (s = try_to_get_string())) {
 	    strncat(term_options, s, sizeof(term_options)-strlen(term_options)-1);
 	    free(s);
 	} else
