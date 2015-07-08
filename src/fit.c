@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: fit.c,v 1.145.2.10 2015/06/05 20:58:18 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: fit.c,v 1.145.2.11 2015/06/07 15:19:59 sfeam Exp $"); }
 #endif
 
 /*  NOTICE: Change of Copyright Status
@@ -2363,11 +2363,11 @@ fit_command()
 
 	static char *viafile = NULL;
 	free(viafile);			/* Free previous name, if any */
-	viafile = try_to_get_string();	/* Cannot fail since isstringvalue succeeded */
+	viafile = try_to_get_string();
+	if (!viafile || !(f = loadpath_fopen(viafile, "r")))
+	    Eex2("could not read parameter-file \"%s\"", viafile);
 	if (!fit_suppress_log)
 	    fprintf(log_f, "fitted parameters and initial values from file: %s\n\n", viafile);
-	if (!(f = loadpath_fopen(viafile, "r")))
-	    Eex2("could not read parameter-file \"%s\"", viafile);
 
 	/* get parameters and values out of file and ignore fixed ones */
 

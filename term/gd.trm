@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: gd.trm,v 1.179.2.2 2015/01/11 05:20:38 sfeam Exp $
+ * $Id: gd.trm,v 1.179.2.3 2015/02/18 20:37:15 sfeam Exp $
  */
 
 /* GNUPLOT -- gd.trm */
@@ -770,9 +770,9 @@ PNG_options()
 	    } else {
 		int brect[8];
 		char *err;
+		char *s;
 
-		if (isstringvalue(c_token)) {
-		    char *s = try_to_get_string();
+		if (isstringvalue(c_token) && (s = try_to_get_string())) {
 		    char *comma = strrchr(s,',');
 		    double fontsize;
 		    if (comma && (1 == sscanf(comma+1,"%lf",&fontsize))) {

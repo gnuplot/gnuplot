@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: parse.c,v 1.88.2.1 2014/09/19 06:02:18 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: parse.c,v 1.88.2.2 2014/11/08 04:52:25 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - parse.c */
@@ -200,10 +200,8 @@ string_or_express(struct at_type **atptr)
     if (equals(c_token,"$"))
 	return parse_datablock_name();
 
-    if (isstring(c_token)) {
-	str = try_to_get_string();
+    if (isstring(c_token) && (str = try_to_get_string()))
 	return str;
-    }
 
     /* parse expression */
     temp_at();
