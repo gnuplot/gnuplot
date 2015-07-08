@@ -9,7 +9,12 @@
 	     foo = try_to_get_string();	/* cannot fail */
 	Unfortunately it _can_ fail if an expression begins with a quoted string
 	but is coerced into returning a numerical value. All of these sites
-	require a specific for (foo != NULL).
+	require a specific check for (foo != NULL).
+	Bug #1649
+
+	* src/eval.c (pop_or_convert_from_string): Some of the cases of bad
+	syntax can also be caught inside try_to_get_string() itself. It doesn't
+	hurt to add the check at this level also (belt+suspenders approach).
 	Bug #1649
 
 2015-07-05  Ethan A Merritt  <merritt@u.washington.edu>

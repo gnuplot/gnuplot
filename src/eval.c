@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: eval.c,v 1.122 2015/02/15 16:39:21 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: eval.c,v 1.123 2015/05/08 18:32:12 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - eval.c */
@@ -490,7 +490,8 @@ pop_or_convert_from_string(struct value *v)
     if (v->type == STRING) {
 	char *eov;
 
-	if (strspn(v->v.string_val,"0123456789 ") == strlen(v->v.string_val)) {
+	if (*(v->v.string_val)
+	&&  strspn(v->v.string_val,"0123456789 ") == strlen(v->v.string_val)) {
 	    int i = atoi(v->v.string_val);
 	    gpfree_string(v);
 	    Ginteger(v, i);
@@ -499,6 +500,7 @@ pop_or_convert_from_string(struct value *v)
 	    if (v->v.string_val == eov) {
 		gpfree_string(v);
 		int_error(NO_CARET,"Non-numeric string found where a numeric expression was expected");
+		/* Note: This also catches syntax errors like "set term ''*0 " */
 	    }
 	    gpfree_string(v);
 	    Gcomplex(v, d, 0.);
