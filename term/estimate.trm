@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: estimate.trm,v 1.11 2012/05/06 00:31:36 sfeam Exp $
+ * $Id: estimate.trm,v 1.11.2.1 2015/03/06 00:55:44 sfeam Exp $
  *
  */
 
@@ -130,7 +130,7 @@ ENHest_put_text(unsigned int x, unsigned int y, const char *str)
     strncpy(enhanced_escape_format,".",sizeof(enhanced_escape_format));
 
     /* buffer in which we will return plaintext version of enhanced text string */
-    while (ENHest_plaintext_buflen < strlen(str)) {
+    while (ENHest_plaintext_buflen <= strlen(str)) {
 	ENHest_plaintext_buflen += MAX_ID_LEN;
 	ENHest_plaintext = gp_realloc(ENHest_plaintext, ENHest_plaintext_buflen+1, "ENHest_plaintext");
     }
