@@ -20,7 +20,7 @@ set yrange [-0.5:5.5]
 
 set datafile missing "?"
 set ytics ("-Inf" 5, "Inf" 4, "NaN" 3, "Junk" 2, "?" 1, "0" 0)
-set xtics 0
+set xtics 1
 
 # Define the test data as a named data block
 $matrixdata << EOD
