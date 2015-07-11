@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.103 2014/05/09 22:14:12 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.104 2014/05/13 18:26:40 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - pm3d.c */
@@ -515,6 +515,9 @@ pm3d_plot(struct surface_points *this_plot, int at_which_z)
 		max_scans++;
 	    }
 	}
+
+	if (max_scan_pts == 0 || max_scans == 0)
+	    int_error(NO_CARET, "all scans empty");
 
 	if (interp_i <= 0) {
 	    ii = (interp_i == 0) ? DEFAULT_OPTIMAL_NB_POINTS : -interp_i;

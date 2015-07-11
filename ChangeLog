@@ -12,7 +12,7 @@
 	"set xtics 0" to be accepted rather than rejected.  This could lead
 	to various bad outcomes (as found by fuzz-testing).
 
-	* src/stat.c: More fuzz-testing.
+	* src/stats.c: More fuzz-testing.
 	Possible double free if string_or_express returns via int_error().
 
 	* src/set.c: More fuzz-testing.  Fix various places where failure to
@@ -29,6 +29,10 @@
 	If GNUTERM is defined but empty, or if a "set term <garbage>" command
 	fails during parsing, then the current terminal could be left as NULL.
 	Now (I hope) we guarantee that at worst it is "unknown".
+
+	* src/pm3d.c (pm3d_plot): More fuzz-testing.
+	If no interpretable pm3d scan lines are found in a file the program
+	could die on a divide-by-zero error before noticing the real problem.
 
 2015-07-08  Ethan A Merritt  <merritt@u.washington.edu>
 
