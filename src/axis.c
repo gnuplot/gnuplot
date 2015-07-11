@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.164 2015/04/30 18:11:06 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.165 2015/05/19 23:53:43 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -1646,7 +1646,7 @@ load_one_range(struct axis *this_axis, double *a, t_autoscale *autoscale, t_auto
 		}
 		c_token++;
 	    } else {
-		int_error(c_token, "malformed range with constarint");
+		int_error(c_token, "malformed range with constraint");
             }
         } else if (equals(c_token, ">")) {
 	    int_error(c_token, "malformed range with constraint (use '<' only)");
@@ -1745,6 +1745,12 @@ load_range(struct axis *this_axis, double *a, double *b, t_autoscale autoscale)
     if (!equals(c_token, "]")) {
 	load_one_range(this_axis, b, &autoscale, AUTOSCALE_MAX );
     }
+
+    /* Not all the code can deal nicely with +/- infinity */
+    if (*a < -VERYLARGE)
+	*a = -VERYLARGE;
+    if (*b > VERYLARGE)
+	*b = VERYLARGE;
 
     return (autoscale);
 }
