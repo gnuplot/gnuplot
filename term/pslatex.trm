@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: pslatex.trm,v 1.90 2014/03/20 20:50:10 markisch Exp $
+ * $Id: pslatex.trm,v 1.90.2.1 2015/01/24 22:01:28 sfeam Exp $
  */
 
 /* GNUPLOT - pslatex.trm */
@@ -1067,6 +1067,8 @@ TERM_TABLE_START(epslatex_driver)
     0.0,	/* scale */
     0,		/* hypertext */
     EPSLATEX_boxed_text
+    , NULL
+    , PS_dashtype
 TERM_TABLE_END(epslatex_driver)
 #undef LAST_TERM
 #define LAST_TERM epslatex_driver
