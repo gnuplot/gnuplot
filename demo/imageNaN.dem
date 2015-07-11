@@ -20,7 +20,7 @@ set yrange [-0.5:5.5]
 
 set datafile missing "?"
 set ytics ("-Inf" 5, "Inf" 4, "NaN" 3, "Junk" 2, "?" 1, "0" 0)
-set xtics 1
+unset xtics
 
 # Define the test data as a named data block
 $matrixdata << EOD
@@ -32,7 +32,7 @@ Inf  3 2 0 2 3
 -Inf 0 1 2 4 3
 EOD
 
-set xlabel "First column contains various odd values" offset 0,1
+set xlabel "First column contains various odd values"
 
 set view map
 plot $matrixdata matrix with image 
