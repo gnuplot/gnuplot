@@ -24,7 +24,8 @@
 	but other places in the code do not handle this cleanly.
 	Limit the range to +/- VERYLARGE
 
-	* src/set.c (set_terminal) src/unset.c (unset_terminal):
+	* src/set.c (set_terminal) src/unset.c (unset_terminal)
+	src/eval.c (del_udv_by_name):  More fuzz-testing.
 	If GNUTERM is defined but empty, or if a "set term <garbage>" command
 	fails during parsing, then the current terminal could be left as NULL.
 	Now (I hope) we guarantee that at worst it is "unknown".
