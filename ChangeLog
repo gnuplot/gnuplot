@@ -1,3 +1,9 @@
+2015-07-11  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/set.c (load_tic_series): Incorrect nesting of brackets caused
+	"set xtics 0" to be accepted rather than rejected.  This could lead
+	to various bad outcomes (as found by fuzz-testing).
+
 2015-07-08  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/estimate.trm:  Initialization of enhanced text string buffer.

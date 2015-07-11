@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.459.2.15 2015/04/08 05:19:25 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.459.2.16 2015/07/09 01:40:44 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -5896,19 +5896,19 @@ load_tic_series(AXIS_INDEX axis)
 	    c_token++;
 	    GET_NUM_OR_TIME(end, axis);
 	}
+    }
 
-	if (start < end && incr <= 0)
-	    int_error(incr_token, "increment must be positive");
-	if (start > end && incr >= 0)
-	    int_error(incr_token, "increment must be negative");
-	if (start > end) {
-	    /* put in order */
-	    double numtics = floor((end * (1 + SIGNIF) - start) / incr);
+    if (start < end && incr <= 0)
+	int_error(incr_token, "increment must be positive");
+    if (start > end && incr >= 0)
+	int_error(incr_token, "increment must be negative");
+    if (start > end) {
+	/* put in order */
+	double numtics = floor((end * (1 + SIGNIF) - start) / incr);
 
-	    end = start;
-	    start = end + numtics * incr;
-	    incr = -incr;
-	}
+	end = start;
+	start = end + numtics * incr;
+	incr = -incr;
     }
 
     if (!tdef->def.mix) { /* remove old list */
