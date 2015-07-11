@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.224 2015/04/21 18:43:08 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.225 2015/05/08 18:32:12 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -1537,7 +1537,7 @@ unset_terminal()
 
     term_reset();
 
-    if (original_terminal) {
+    if (original_terminal && original_terminal->udv_value.type != NOTDEFINED) {
 	char *termname = original_terminal->udv_value.v.string_val;
 	term = change_term(termname, strlen(termname));
     }

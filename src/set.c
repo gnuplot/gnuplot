@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.492 2015/07/11 05:34:43 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.493 2015/07/11 20:05:30 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -4702,15 +4702,15 @@ set_terminal()
     } /* set term pop */
 
     /* `set term <normal terminal>' */
-    term = 0; /* in case set_term() fails */
+    /* NB: if set_term() exits via int_error() then term will not be changed */
     term = set_term();
+
     /* get optional mode parameters
      * not all drivers reset the option string before
      * strcat-ing to it, so we reset it for them
      */
     *term_options = 0;
-    if (term)
-	(*term->options)();
+    term->options();
     if (interactive && *term_options)
 	fprintf(stderr,"Options are '%s'\n",term_options);
     if ((term->flags & TERM_MONOCHROME))

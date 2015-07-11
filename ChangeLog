@@ -24,6 +24,11 @@
 	but other places in the code do not handle this cleanly.
 	Limit the range to +/- VERYLARGE
 
+	* src/set.c (set_terminal) src/unset.c (unset_terminal):
+	If GNUTERM is defined but empty, or if a "set term <garbage>" command
+	fails during parsing, then the current terminal could be left as NULL.
+	Now (I hope) we guarantee that at worst it is "unknown".
+
 2015-07-08  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/estimate.trm:  Initialization of enhanced text string buffer.
