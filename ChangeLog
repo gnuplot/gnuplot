@@ -34,6 +34,9 @@
 	If no interpretable pm3d scan lines are found in a file the program
 	could die on a divide-by-zero error before noticing the real problem.
 
+	* src/set.c (set_style) src/show.c: "set style func parallelaxes"
+	is not supported.  "set style data parallelaxes" was not saved.
+
 2015-07-08  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/estimate.trm:  Initialization of enhanced text string buffer.

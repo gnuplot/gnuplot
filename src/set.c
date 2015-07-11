@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.493 2015/07/11 20:05:30 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.494 2015/07/12 05:06:54 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -4469,7 +4469,8 @@ set_style()
 	    enum PLOT_STYLE temp_style = get_style();
 
 	    if ((temp_style & PLOT_STYLE_HAS_ERRORBAR)
-	    ||  (temp_style == LABELPOINTS) || (temp_style == HISTOGRAMS))
+	    ||  (temp_style == LABELPOINTS) || (temp_style == HISTOGRAMS)
+	    ||  (temp_style == PARALLELPLOT))
 		int_error(c_token, "style not usable for function plots, left unchanged");
 	    else
 		func_style = temp_style;
