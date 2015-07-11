@@ -8,6 +8,9 @@
 	"set xtics 0" to be accepted rather than rejected.  This could lead
 	to various bad outcomes (as found by fuzz-testing).
 
+	* src/stat.c: More fuzz-testing.
+	Possible double free if string_or_express returns via int_error().
+
 2015-07-08  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/estimate.trm:  Initialization of enhanced text string buffer.
