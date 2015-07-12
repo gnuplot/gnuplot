@@ -1,5 +1,10 @@
 2015-07-12  Ethan A Merritt  <merritt@u.washington.edu>
 
+	* src/command.c (bind_command) src/mouse.c (bind_fmt):
+	Very old bug (pre v4.0) in parsing the bind command, such that
+		bind X" some longish command"
+	would corrupt memory.  The output format was bad also.
+
 	Remove ancient files from active repository: lineproc.mac header.mac
 	According to Changelog.4 this was done in 2013, but apparently not.
 

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: mouse.c,v 1.181 2015/06/01 21:35:21 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: mouse.c,v 1.182 2015/06/23 22:37:22 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - mouse.c */
@@ -2446,7 +2446,7 @@ bind_fmt_lhs(const bind_t * in)
 	sprintf(out, "Ctrl-");
     }
     if (in->modifier & Mod_Alt) {
-	strcat(out, "%sAlt-");
+	strcat(out, "Alt-");
     }
     if (in->key > GP_FIRST_KEY && in->key < GP_LAST_KEY) {
 	strcat(out,special_keys[in->key - GP_FIRST_KEY]);
@@ -2487,7 +2487,7 @@ bind_display_one(bind_t * ptr)
     fprintf(stderr, " %-12s ", bind_fmt_lhs(ptr));
     fprintf(stderr, "%c ", ptr->allwindows ? '*' : ' ');
     if (ptr->command) {
-	fprintf(stderr, "`%s'\n", ptr->command);
+	fprintf(stderr, "`%s`\n", ptr->command);
     } else if (ptr->builtin) {
 	fprintf(stderr, "%s\n", ptr->builtin(0));
     } else {
