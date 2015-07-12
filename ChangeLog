@@ -1,3 +1,8 @@
+2015-07-12  Ethan A Merritt  <merritt@u.washington.edu>
+
+	Remove ancient files from active repository: lineproc.mac header.mac
+	According to Changelog.4 this was done in 2013, but apparently not.
+
 2015-07-11  Christoph Bersch <usenet@bersch.net>
 
 	* term/epslatex.trm:  enable dashtype processing
