@@ -4,6 +4,8 @@
 	Change fixed-length fontname storage to dynamic (cairo + wxt terminals)
 	to prevent crashes found by fuzzing.
 
+	* term/hpgl.trm (set_font):  Prevent same crash in hpgl/pcl5 terminal.
+
 	* src/datablock.c:  The storage in a zero-length datablock was not
 	initialized.
 
