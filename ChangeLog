@@ -1,3 +1,9 @@
+2015-07-13  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/wxterminal/wxt_gui.cpp term/cairo.trm term/wxt.trm:
+	Change fixed-length fontname storage to dynamic (cairo + wxt terminals)
+	to prevent crashes found by fuzzing.
+
 2015-07-12  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/command.c (bind_command) src/mouse.c (bind_fmt):

@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: cairo.trm,v 1.73 2015/01/12 06:47:10 sfeam Exp $
+ * $Id: cairo.trm,v 1.74 2015/03/22 05:58:05 sfeam Exp $
  */
 
 /* GNUPLOT - cairo.trm */
@@ -1068,29 +1068,25 @@ void cairotrm_linetype(int lt)
  * - _set_font("") restores the terminal's default font.*/
 int cairotrm_set_font (const char *font)
 {
-	char fontname[MAX_ID_LEN + 1] = "";
+	char *fontname = NULL;
 	int fontsize = 0;
 
-	if (!font || !(*font)) {
-		strncpy(fontname, "", sizeof(fontname));
-		fontsize = 0;
-	} else {
-		int sep;
-
-		sep = strcspn(font,",");
+	if (font && (*font)) {
+		int sep = strcspn(font,",");
 		if (sep > 0) {
-			strncpy(fontname, font, sep);
+			fontname = gp_strdup(font);
 			fontname[sep] = '\0';
 		}
 		if (font[sep] == ',')
 			sscanf(&(font[sep+1]), "%d", &fontsize);
 	}
 
-	if ( strlen(fontname) == 0 ) {
+	if (!fontname || !(*fontname)) {
+		free(fontname);
 		if ( strlen(cairo_params->fontname) == 0 )
-			strncpy(fontname, CAIROTRM_DEFAULT_FONTNAME, sizeof(fontname));
+			fontname = gp_strdup(CAIROTRM_DEFAULT_FONTNAME);
 		else
-			strncpy(fontname, cairo_params->fontname, sizeof(fontname));
+			fontname = gp_strdup(cairo_params->fontname);
 	}
 
 	if ( fontsize == 0 ) {
@@ -1103,8 +1099,9 @@ int cairotrm_set_font (const char *font)
 	/* Reset the term variables (hchar, vchar, h_tic, v_tic).
 	 * They may be taken into account in next plot commands */
 	gp_cairo_set_font(&plot, fontname, fontsize * cairo_params->fontscale);
-	gp_cairo_set_termvar(&plot, &(term->v_char),
-				    &(term->h_char));
+	gp_cairo_set_termvar(&plot, &(term->v_char), &(term->h_char));
+
+	free(fontname);
 
 	/* the returned int is not used anywhere */
 	return 1;
