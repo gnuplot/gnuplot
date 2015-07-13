@@ -1,5 +1,5 @@
 /*
- * $Id: wxt.trm,v 1.42 2014/07/04 18:13:28 markisch Exp $
+ * $Id: wxt.trm,v 1.42.2.1 2014/10/26 21:19:33 sfeam Exp $
  */
 
 /* GNUPLOT - wxt.trm */
@@ -71,7 +71,7 @@ int wxt_toggle = UNSET;
 int wxt_redraw = UNSET;
 t_linecap wxt_linecap = SQUARE;
 /* default text font family: */
-char wxt_set_fontname[MAX_ID_LEN + 1] = "";
+char *wxt_set_fontname = NULL;
 /* default text size*/
 int wxt_set_fontsize = 0;
 double wxt_set_fontscale = 1.0;
@@ -169,26 +169,23 @@ TERM_PUBLIC void wxt_options()
 #endif
 
 	while (!END_OF_COMMAND) {
-		FPRINTF((stderr, "processing token\n"));
 		switch (lookup_table(&wxt_opts[0], c_token)) {
 		case WXT_FONT:
 			c_token++;
 			if (!(s = try_to_get_string()))
 				int_error(c_token,"font: expecting string");
-			if (!(*s)) {
-				strcpy (wxt_set_fontname, "");
-				wxt_set_fontsize = 0;
-			} else {
+			if (*s) {
+				font_setting = gp_strdup(s);
 				sep = strcspn(s,",");
 				if (sep > 0) {
-					strncpy(wxt_set_fontname, s, sep);
-					wxt_set_fontname[sep] = '\0';
-				}
-				if (s[sep] == ',')
+					s[sep] = '\0';
 					sscanf(&(s[sep+1]), "%d", &wxt_set_fontsize);
+				}
+				free(wxt_set_fontname);
+				wxt_set_fontname = gp_strdup(s);
+			} else {
+				font_setting = gp_strdup("");
 			}
-			font_setting = (char*) gp_alloc(strlen(s) + 1,"wxt font");
-			strcpy(font_setting,s);
 			free(s);
 			if (set_font) duplication=TRUE;
 			set_font = TRUE;
@@ -397,6 +394,9 @@ TERM_PUBLIC void wxt_options()
 		strncat(term_options, "\"", sizeof(term_options)-strlen(term_options)-1);
 		free(font_setting);
 	}
+
+	if (!wxt_set_fontname)
+		wxt_set_fontname = gp_strdup("");
 
 	if (wxt_set_fontscale != 1.0) {
 		char tmp_term_options[MAX_LINE_LEN+1] = "";

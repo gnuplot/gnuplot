@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_term.h,v 1.25.2.2 2014/11/12 05:20:18 sfeam Exp $
+ * $Id: wxt_term.h,v 1.25.2.3 2014/12/31 07:36:56 markisch Exp $
  */
 
 /* GNUPLOT - wxt_term.h */
@@ -124,7 +124,7 @@ extern int wxt_raise;
 extern int wxt_ctrl;
 extern int wxt_toggle;
 extern int wxt_redraw;
-extern char wxt_set_fontname[MAX_ID_LEN + 1];
+extern char *wxt_set_fontname;
 extern int wxt_set_fontsize;
 extern double wxt_set_fontscale;
 extern t_linecap wxt_linecap;

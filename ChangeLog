@@ -1,3 +1,9 @@
+2015-07-13  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/wxterminal/wxt_gui.cpp term/cairo.trm term/wxt.trm:
+	Change fixed-length fontname storage to dynamic (cairo + wxt terminals)
+	to prevent crashes found by fuzzing.
+
 2015-07-12  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/command.c (bind_command) src/mouse.c (bind_fmt):
@@ -30,7 +36,7 @@
 	     foo = try_to_get_string();	/* cannot fail */
 	Unfortunately it _can_ fail if an expression begins with a quoted string
 	but is coerced into returning a numerical value. All of these sites
-	require a specific for (foo != NULL).
+	require a specific check for (foo != NULL).
 	Bug #1649
 
 2015-07-05  Ethan A Merritt  <merritt@u.washington.edu>

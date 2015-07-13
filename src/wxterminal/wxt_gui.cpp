@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.cpp,v 1.128.2.15 2014/12/31 07:36:56 markisch Exp $
+ * $Id: wxt_gui.cpp,v 1.128.2.16 2015/05/03 12:43:09 broeker Exp $
  */
 
 /* GNUPLOT - wxt_gui.cpp */
@@ -2280,35 +2280,33 @@ int wxt_set_font (const char *font)
 	if (wxt_status != STATUS_OK)
 		return 1;
 
-	char fontname[MAX_ID_LEN + 1] = "";
+	char *fontname = strdup("");
 	gp_command temp_command;
 	int fontsize = 0;
 
 	temp_command.command = command_set_font;
 
-	if (!font || !(*font)) {
-		strncpy(fontname, "", sizeof(fontname));
-		fontsize = 0;
-	} else {
-		int sep;
-
-		sep = strcspn(font,",");
-		if (sep > 0) {
-			strncpy(fontname, font, sep);
-			fontname[sep] = '\0';
-		}
+	if (font && (*font)) {
+		int sep = strcspn(font,",");
 		if (font[sep] == ',')
 			sscanf(&(font[sep+1]), "%d", &fontsize);
+		if (sep > 0) {
+			fontname = strdup(font);
+			fontname[sep] = '\0';
+		}
 	}
 
 	wxt_sigint_init();
 	wxt_MutexGuiEnter();
 
 	if ( strlen(fontname) == 0 ) {
-		if ( strlen(wxt_set_fontname) == 0 )
-			strncpy(fontname, gp_cairo_default_font(), sizeof(fontname));
-		else
-			strncpy(fontname, wxt_set_fontname, sizeof(fontname));
+		if ( !wxt_set_fontname || strlen(wxt_set_fontname) == 0 ) {
+			free(fontname);
+			fontname = strdup(gp_cairo_default_font());
+		} else {
+			free(fontname);
+			fontname = strdup(wxt_set_fontname);
+		}
 	}
 
 	if ( fontsize == 0 ) {
