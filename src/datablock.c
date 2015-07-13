@@ -1,5 +1,5 @@
 /*
- * $Id: datablock.c,v 1.5 2014/04/05 06:17:08 markisch Exp $
+ * $Id: datablock.c,v 1.6 2015/01/20 02:10:42 sfeam Exp $
  */
 /* GNUPLOT - datablock.c */
 
@@ -218,9 +218,11 @@ enlarge_datablock(struct value *datablock_value, int extra)
     nsize = ((nlines+1 + extra + blocksize-1) / blocksize) * blocksize;
 
     /* only resize if necessary */
-    if ((osize != nsize) || (extra == 0) || (nlines == 0))
+    if ((osize != nsize) || (extra == 0) || (nlines == 0)) {
 	datablock_value->v.data_array =
 	    (char **) gp_realloc(datablock_value->v.data_array,  nsize * sizeof(char *), "resize_datablock");
+	datablock_value->v.data_array[nlines] = NULL;
+    }
 
     return nlines;
 }
