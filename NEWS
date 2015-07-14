@@ -5,6 +5,7 @@ Changes since 5.0.1
 * FIX qt terminals dots were invisible
 * FIX point and impulse colors in 3D binary plots
 * FIX enable dashtype processing for epslatex terminal
+* FIX clean handling of unexpected input commands or data found by fuzz-testing
 
 Changes in 5.0.1
 ================
