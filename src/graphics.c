@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.490 2015/05/13 02:55:33 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.491 2015/06/15 22:28:48 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -4566,6 +4566,13 @@ process_image(void *plot, t_procimg_action action)
 			    int_warn(NO_CARET, "Visible pixel grid has a scan line longer than previous scan lines.");
 			    return;
 			}
+		    }
+
+		    /* This can happen if the data supplied for a matrix does not */
+		    /* match the matrix dimensions found when the file was opened */
+		    if (i_sub_image >= array_size) {
+			int_warn(NO_CARET,"image data corruption");
+			break;
 		    }
 
 		    pixel_M_N = i_image;

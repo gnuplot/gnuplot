@@ -3,6 +3,10 @@
 	* src/datafile.c (df_open):  Bookkeeping for matrix dimensions in plot
 	structure must not be applied inside a stats command.
 
+	* src/graphics.c (process_image):  Sanity check that input image data
+	does not overflow the space allocated for it based on dimensions 
+	calculated when the input file was first opened.
+
 2015-07-13  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/wxterminal/wxt_gui.cpp term/cairo.trm term/wxt.trm:
