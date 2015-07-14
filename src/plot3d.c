@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.236 2015/05/08 18:17:08 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.237 2015/05/08 18:32:12 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -1832,10 +1832,18 @@ eval_3dplots()
 	    assert(this_plot == *tp_3d_ptr);
 
 	    if (this_plot->plot_type == DATA3D) {
+
 		/*{{{  read data */
 		/* pointer to the plot of the first dataset (surface) in the file */
 		struct surface_points *first_dataset = this_plot;
 		int this_token = this_plot->token;
+
+		/* Error check to handle missing or unreadable file */
+		if (specs == DF_EOF) {
+		    /* FIXME: plot2d does ++line_num here; needed in 3D also? */
+		    this_plot->plot_type = NODATA;
+		    goto SKIPPED_EMPTY_FILE;
+		}
 
 		do {
 		    this_plot = *tp_3d_ptr;
@@ -1917,6 +1925,7 @@ eval_3dplots()
 		this_plot->iteration = plot_iterator ? plot_iterator->iteration : 0;
 	    }
 
+	    SKIPPED_EMPTY_FILE:
 	    if (empty_iteration(plot_iterator))
 		this_plot->plot_type = NODATA;
 
