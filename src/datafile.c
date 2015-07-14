@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.305 2015/05/13 02:55:33 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.306 2015/07/14 18:16:07 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -1331,10 +1331,9 @@ df_open(const char *cmd_filename, int max_using, struct curve_points *plot)
 	if (!data_fp)
 	    data_fp = stdin;
 	mixed_data_fp = TRUE;   /* don't close command file */
-    } else if (df_filename[0] == '+') {
-	if (strlen(df_filename) == 1)
+    } else if (!strcmp(df_filename,"+")) {
 	    df_pseudodata = 1;
-	else if (df_filename[1] == '+' && strlen(df_filename) == 2)
+    } else if (!strcmp(df_filename,"++")) {
 	    df_pseudodata = 2;
     } else if (df_filename[0] == '$') {
 	df_datablock = TRUE;
