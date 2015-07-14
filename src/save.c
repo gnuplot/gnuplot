@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.256.2.13 2015/02/01 23:26:05 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.256.2.14 2015/02/26 18:43:46 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -1488,6 +1488,9 @@ save_data_func_style(FILE *fp, const char *which, enum PLOT_STYLE style)
 #endif
     case SURFACEGRID:
 	fputs("surfaces\n", fp);
+	break;
+    case PARALLELPLOT:
+	fputs("parallelaxes\n", fp);
 	break;
     case PLOT_STYLE_NONE:
     default:

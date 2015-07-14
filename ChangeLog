@@ -1,16 +1,19 @@
 2015-07-14  Ethan A Merritt  <merritt@u.washington.edu>
 
+	Handle various cases of unexpected input commands or data that caused
+	crashes in fuzz-testing.
+
 	* src/datafile.c (df_open):  Filename of the form "+file.dat" must not
 	be mistaken for special file '+'.
 
-2015-07-13  Ethan A Merritt  <merritt@u.washington.edu>
-
 	* src/wxterminal/wxt_gui.cpp term/cairo.trm term/wxt.trm:
-	Change fixed-length fontname storage to dynamic (cairo + wxt terminals)
-	to prevent crashes found by fuzzing.
+	Change fixed-length fontname storage to dynamic (cairo + wxt terminals).
 
 	* src/datablock.c:  The storage in a zero-length datablock was not
 	initialized.
+
+	* src/set.c (set_style) src/save.c (save_data_func_style):
+	Do not allow "set style func parallelaxes"
 
 2015-07-12  Ethan A Merritt  <merritt@u.washington.edu>
 
