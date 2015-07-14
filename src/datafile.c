@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.304 2015/04/22 22:25:15 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.305 2015/05/13 02:55:33 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -1372,7 +1372,8 @@ df_open(const char *cmd_filename, int max_using, struct curve_points *plot)
 	df_determine_matrix_info(data_fp);
 
 	/* Image size bookkeeping for ascii uniform matrices */
-	if (!df_binary_file) {
+	/* NB: If we're inside a 'stats' command there is no plot */
+	if (!df_binary_file && plot) {
 	    plot->image_properties.ncols = df_xpixels;
 	    plot->image_properties.nrows = df_ypixels;
 	    FPRINTF((stderr,"datafile.c:%d  ascii uniform matrix dimensions %d x %d \n",
