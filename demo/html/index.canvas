@@ -2,25 +2,24 @@
 <html>
 <head>
 <meta charset="UTF-8"> 
-<title>Gnuplot 5.0 demo scripts run through the HTML canvas terminal</title>
+<title>Gnuplot 5.1 demo scripts run through the HTML canvas terminal</title>
 <link type="text/css" href="gnuplot_demo.css" rel="stylesheet">
 <link type="text/css" href="gnuplot_mouse.css" rel="stylesheet">
 </head>
 
 <body oncontextmenu="return false;">
 
-<h2 align=center>Gnuplot 5.0 demo scripts run through the HTML canvas terminal<br>
+<h2 align=center>Gnuplot 5.1 demo scripts run through the HTML canvas terminal<br>
     See also the demo output for the
-    <a href="http://gnuplot.sourceforge.net/demo_5.0/">PNG</a> and
-    <a href="http://gnuplot.sourceforge.net/demo_svg_5.0/">SVG</a> terminals.
+    <a href="http://gnuplot.sourceforge.net/demo_5.1/">PNG</a> and
+    <a href="http://gnuplot.sourceforge.net/demo_svg_5.1/">SVG</a> terminals.
 </h2>
 <canvas id="warning" width=1 height=1>
     <div class='box'><h2>Your browser may not support the HTML 5 canvas element</h2></div>
 </canvas>
 
 <p>
-The canvas driver for gnuplot was contributed by Bruce Lueckenhoff and extended by Ethan Merritt (sfeam).
-To view the results you need a browser that supports the HTML5 'canvas' element.
+To view these plots you need a browser that supports the HTML5 'canvas' element.
 </p>
 
 
@@ -144,10 +143,6 @@ To view the results you need a browser that supports the HTML5 'canvas' element.
     <li><a href="transparent_solids.html">transparent solids</a></li>
     </ul>
 
-    <h4>Animation</h4>
-    <ul>
-    <li><font color=gray>not supported</font></li>
-    </ul>
 </td>
 
 <td></td>
@@ -210,7 +205,7 @@ To view the results you need a browser that supports the HTML5 'canvas' element.
 <tbody><tr valign="top">
 
     <td>
-    <i>This page created by Ethan Merritt<br>April 2014</i>
+    <i>This page created by Ethan Merritt<br>July 2015</i>
     </td>
 
     <td>
