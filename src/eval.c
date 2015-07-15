@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: eval.c,v 1.124 2015/07/09 21:05:58 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: eval.c,v 1.125 2015/07/12 06:02:06 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - eval.c */
@@ -802,6 +802,7 @@ clear_udf_list()
 
 static void update_plot_bounds __PROTO((void));
 static void fill_gpval_axis __PROTO((AXIS_INDEX axis));
+static void fill_gpval_sysinfo __PROTO((void));
 static void set_gpval_axis_sth_double __PROTO((const char *prefix, AXIS_INDEX axis, const char *suffix, double value, int is_int));
 
 static void
@@ -982,6 +983,9 @@ update_gpval_variables(int context)
 	/* Permanent copy of user-clobberable variables pi and NaN */
 	fill_gpval_float("GPVAL_pi", M_PI);
 	fill_gpval_float("GPVAL_NaN", not_a_number());
+
+	/* System information */
+	fill_gpval_sysinfo();
     }
 
     if (context == 3 || context == 4) {
@@ -1002,6 +1006,50 @@ update_gpval_variables(int context)
     if (context == 6) {
 	fill_gpval_integer("GPVAL_TERM_WINDOWID", current_x11_windowid);
     }
+}
+
+/* System information */
+void
+fill_gpval_sysinfo()
+{
+#ifdef HAVE_UNAME
+#include <sys/utsname.h>
+    struct utsname uts;
+    if (uname(&uts) < 0)
+	return;
+    fill_gpval_string("GPVAL_SYSNAME", uts.sysname);
+    fill_gpval_string("GPVAL_MACHINE", uts.machine);
+#elif defined(_Windows)
+#include <windows.h>
+#ifdef HAVE_FINDVERSION_H
+/* external header file findverion.h to find windows version from windows 2000 to 8.1*/
+#include "findversion.h"
+    OSVERSIONINFOEX ret;
+    int exitCode = GetVersionExEx(&ret);
+    char s[30];
+    snprintf(s, 30, "Windows_NT-%d.%d", ret.dwMajorVersion, ret.dwMinorVersion);
+    fill_gpval_string("GPVAL_SYSNAME", s);
+#else
+    fill_gpval_string("GPVAL_SYSNAME", "Windows");
+#endif
+    SYSTEM_INFO stInfo;
+    GetSystemInfo( &stInfo );
+    switch( stInfo.wProcessorArchitecture )
+    {
+    case PROCESSOR_ARCHITECTURE_INTEL:
+        fill_gpval_string("GPVAL_MACHINE", "x86");
+        break;
+    case PROCESSOR_ARCHITECTURE_IA64:
+        fill_gpval_string("GPVAL_MACHINE", "ia64");
+       break;
+    case PROCESSOR_ARCHITECTURE_AMD64:
+        fill_gpval_string("GPVAL_MACHINE", "x86_64");
+        break;
+    default:
+        fill_gpval_string("GPVAL_MACHINE", "unknown");
+    }
+#endif
+    fill_gpval_integer("GPVAL_BITS", 8*sizeof(void *));
 }
 
 /* Callable wrapper for the words() internal function */

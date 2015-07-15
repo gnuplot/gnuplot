@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot on Unix.
 dnl
-dnl $Id: configure.ac,v 1.11 2015/06/28 19:57:20 broeker Exp $
+dnl $Id: configure.ac,v 1.12 2015/07/03 17:20:31 sfeam Exp $
 dnl
 dnl this is actually major.minor ...
 dnl note that for a non-beta release, we need to disable DEVELOPMENT_RELEASE
@@ -284,7 +284,7 @@ AC_CHECK_FUNCS(atexit memcpy memmove memset \
   erf erfc gamma lgamma \
   getcwd poll pclose popen fdopen select sleep stpcpy \
   strcspn strdup strndup strnlen strcasecmp stricmp strncasecmp strnicmp \
-  sysinfo tcgetattr vfprintf doprnt usleep
+  sysinfo tcgetattr vfprintf doprnt uname usleep
 )
 
 AC_CHECK_FUNCS(snprintf, ,
