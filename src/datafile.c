@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.306 2015/07/14 18:16:07 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.307 2015/07/14 18:38:00 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -2379,8 +2379,8 @@ df_determine_matrix_info(FILE *fin)
 		df_bin_file_endianess = THIS_COMPILER_ENDIAN;
 
 		/* Save matrix dimensions in case it contains an image */
-		df_xpixels = nr;
-		df_ypixels = nc;
+		df_xpixels = nc;
+		df_ypixels = nr;
 
 		/* This matrix is the one (and only) requested by name.	*/
 		/* Dummy up index range and skip rest of file.		*/
