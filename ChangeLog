@@ -6,6 +6,9 @@
 	    GPVAL_SYSNAME         e.g. linux, Windows
 	    GPVAL_BITS            number of bits in a pointer
 
+	* src/eval.c: Re-order code to support Windows non-C89 compilers
+	(e.g. Visual Studio 2010)  (thanks to Akira Kakuto).
+
 2015-07-14  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/datafile.c (df_open):  Bookkeeping for matrix dimensions in plot

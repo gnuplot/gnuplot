@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: eval.c,v 1.125 2015/07/12 06:02:06 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: eval.c,v 1.126 2015/07/15 05:11:44 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - eval.c */
@@ -1008,22 +1008,34 @@ update_gpval_variables(int context)
     }
 }
 
-/* System information */
+/* System information is stored in GPVAL_BITS GPVAL_MACHINE GPVAL_SYSNAME */
+#ifdef HAVE_UNAME
+#include <sys/utsname.h>
+    struct utsname uts;
+#elif defined(_Windows)
+#include <windows.h>
+/* external header file findverion.h to find windows version from windows 2000 to 8.1*/
+#ifdef HAVE_FINDVERSION_H
+#include <findversion.h>
+#endif
+#endif
+
 void
 fill_gpval_sysinfo()
 {
+/* For linux/posix systems with uname */
 #ifdef HAVE_UNAME
-#include <sys/utsname.h>
     struct utsname uts;
     if (uname(&uts) < 0)
 	return;
     fill_gpval_string("GPVAL_SYSNAME", uts.sysname);
     fill_gpval_string("GPVAL_MACHINE", uts.machine);
+
+/* For Windows systems */
 #elif defined(_Windows)
-#include <windows.h>
+    SYSTEM_INFO stInfo;
+
 #ifdef HAVE_FINDVERSION_H
-/* external header file findverion.h to find windows version from windows 2000 to 8.1*/
-#include "findversion.h"
     OSVERSIONINFOEX ret;
     int exitCode = GetVersionExEx(&ret);
     char s[30];
@@ -1032,7 +1044,7 @@ fill_gpval_sysinfo()
 #else
     fill_gpval_string("GPVAL_SYSNAME", "Windows");
 #endif
-    SYSTEM_INFO stInfo;
+
     GetSystemInfo( &stInfo );
     switch( stInfo.wProcessorArchitecture )
     {
@@ -1049,6 +1061,8 @@ fill_gpval_sysinfo()
         fill_gpval_string("GPVAL_MACHINE", "unknown");
     }
 #endif
+
+/* For all systems */
     fill_gpval_integer("GPVAL_BITS", 8*sizeof(void *));
 }
 
