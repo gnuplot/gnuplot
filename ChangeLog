@@ -6,6 +6,9 @@
 	    plot $asciidata matrix with image
 	Bug #1654
 
+	* demo/imageNaN.dem:  Revise the demo to use non-square matrices
+	so that it acts as a unit test for errors like the above.
+
 2015-07-15  Tatsuro MATSUOKA  <tmacchant3@yahoo.co.jp>
 
 	* src/eval.c (update_gpval_variables):  Windows variant of linux/posix

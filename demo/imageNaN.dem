@@ -15,7 +15,7 @@ set cbrange [-2:7]
 set cblabel "Score"
 set cbtics 0,1,5
 
-set xrange [-0.5:5.5]
+set xrange [-0.5:4.5]
 set yrange [-0.5:5.5]
 
 set datafile missing "?"
@@ -24,12 +24,12 @@ unset xtics
 
 # Define the test data as a named data block
 $matrixdata << EOD
-0    5 4 3 1 0
-?    2 2 0 0 1
-Junk 1 2 3 4 5
-NaN  0 0 3 1 0
-Inf  3 2 0 2 3
--Inf 0 1 2 4 3
+0    5 4 3  0
+?    2 2 0  1
+Junk 1 2 3  5
+NaN  0 0 3  0
+Inf  3 2 0  3
+-Inf 0 1 2  3
 EOD
 
 set xlabel "First column contains various odd values"
