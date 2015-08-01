@@ -36,6 +36,10 @@
 	make [one] plot.   After this fix the code executes define+plot
 	three separate times.
 
+	* src/graphics.c (place_parallel_axes): Ignore plots containing no data
+	and hence no initialization information for parallel axis structures.
+	Example of bug:     plot 'foo' using 1:2:3:4:5 with parallel, 0
+
 2015-07-31  Ethan A Merritt  <merritt@u.washington.edu>
 
 	Sync restored repository on SourceForge to in-progress commit tree

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.491 2015/06/15 22:28:48 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.492 2015/07/14 18:21:56 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -3785,9 +3785,11 @@ place_parallel_axes(struct curve_points *first_plot, int pcount, int layer)
     struct curve_points *plot = first_plot;
 
     /* Check for use of parallel axes */
-    for (j = 0; j < pcount; j++, plot = plot->next)
-	if (axes_in_use < plot->n_par_axes)
-	    axes_in_use = plot->n_par_axes;
+    for (j = 0; j < pcount; j++, plot = plot->next) {
+    	if (plot->plot_type == DATA && plot->plot_style == PARALLELPLOT && plot->p_count > 0)
+	    if (axes_in_use < plot->n_par_axes)
+		axes_in_use = plot->n_par_axes;
+    }
 
     /* Set up the vertical scales used by axis_map() */
     for (j = 0; j < axes_in_use; j++) {
