@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: parse.c,v 1.88.2.2 2014/11/08 04:52:25 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: parse.c,v 1.88.2.3 2015/07/09 01:40:44 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - parse.c */
@@ -1248,8 +1248,10 @@ next_iteration(t_iterator *iter)
 	    gpfree_string(&(this_iter->iteration_udv->udv_value));
 	    Gstring(&(this_iter->iteration_udv->udv_value), 
 		    gp_word(this_iter->iteration_string, this_iter->iteration_current));
-    } else
-	    this_iter->iteration_udv->udv_value.v.int_val = this_iter->iteration_current;	
+	} else {
+	    gpfree_string(&(this_iter->iteration_udv->udv_value));
+	    Ginteger(&(this_iter->iteration_udv->udv_value), this_iter->iteration_current);	
+	}
 	
 	this_iter = this_iter->prev;
     }
@@ -1266,8 +1268,11 @@ next_iteration(t_iterator *iter)
 	gpfree_string(&(this_iter->iteration_udv->udv_value));
 	Gstring(&(this_iter->iteration_udv->udv_value), 
 		gp_word(this_iter->iteration_string, this_iter->iteration_current));
-    } else
-	this_iter->iteration_udv->udv_value.v.int_val = this_iter->iteration_current;
+    } else {
+	/* This traps fatal user error of reassigning iteration variable to a string */
+	gpfree_string(&(this_iter->iteration_udv->udv_value));
+	Ginteger(&(this_iter->iteration_udv->udv_value), this_iter->iteration_current);	
+    }
     
     /* Mar 2014 revised to avoid integer overflow */
     if (this_iter->iteration_increment > 0

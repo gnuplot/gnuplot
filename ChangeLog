@@ -5,6 +5,11 @@
 	int_error() and hence never resetting the value of foo. If executed
 	again this leads to a double-free error.
 
+	* src/parse.c (next_iteration): protect against user corrupting
+	iteration variable.  E.g. either of these used to segfault
+		plot for [n=1:2] x lw n='foo'
+		do for [n=1:2] { n="foo" }
+
 2015-07-14  Ethan A Merritt  <merritt@u.washington.edu>
 
 	Handle various cases of unexpected input commands or data that caused
