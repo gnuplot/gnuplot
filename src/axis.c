@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.165 2015/05/19 23:53:43 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.166 2015/07/11 23:47:59 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -1853,16 +1853,10 @@ get_position_type(enum position_type *type, AXIS_INDEX *axes)
     if (almost_equals(c_token, "fir$st")) {
 	++c_token;
 	*type = first_axes;
-	*axes = FIRST_AXES;
-	return;
     } else if (almost_equals(c_token, "sec$ond")) {
 	++c_token;
 	*type = second_axes;
-	*axes = SECOND_AXES;
-	return;
-    } 
-    
-    if (almost_equals(c_token, "gr$aph")) {
+    } else if (almost_equals(c_token, "gr$aph")) {
 	++c_token;
 	*type = graph;
     } else if (almost_equals(c_token, "sc$reen")) {
@@ -1872,7 +1866,17 @@ get_position_type(enum position_type *type, AXIS_INDEX *axes)
 	++c_token;
 	*type = character;
     }
-    *axes = NO_AXIS;
+    switch (*type) {
+    case first_axes:
+	*axes = FIRST_AXES;
+	return;
+    case second_axes:
+	*axes = SECOND_AXES;
+	return;
+    default:
+	*axes = NO_AXIS;
+	return;
+    }
 }
 
 /* get_position() - reads a position for label,arrow,key,... */

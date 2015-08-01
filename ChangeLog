@@ -21,6 +21,10 @@
 	* src/plot3d.c (eval_3dplots): 2015-05-07 code to accommodate images in
 	hidden3d plots was being invoked even if hidden3d was not active.
 
+	* src/axis.c (get_position_type): Revert recoding of get_position_type
+	(2015-02-15). Fixes failure to keep axis setting if already known.
+	Bug #1658
+
 2015-07-31  Ethan A Merritt  <merritt@u.washington.edu>
 
 	Sync restored repository on SourceForge to in-progress commit tree
