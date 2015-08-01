@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.304 2015/07/13 04:08:24 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.305 2015/08/01 04:16:41 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -1488,20 +1488,27 @@ pause_command()
 	free(buf); /* remove the previous message */
 	buf = gp_strdup("paused"); /* default message, used in Windows GUI pause dialog */
     } else {
-	free(buf);
-	buf = try_to_get_string();
-	if (!buf)
+	char *tmp = try_to_get_string();
+	if (!tmp)
 	    int_error(c_token, "expecting string");
 	else {
 #ifdef WIN32
-		char * nbuf = translate_string_encoding(buf, 0, encoding);
-		free(buf);
-		buf = nbuf;
+	    char * nbuf = translate_string_encoding(tmp, 0, encoding);
+	    free(tmp);
+	    free(buf);
+	    buf = nbuf;
 	    if (sleep_time >= 0)
-#elif defined(OS2)
-	    if (strcmp(term->name, "pm") != 0 || sleep_time >= 0)
-#endif /* _Windows */
 		fputs(buf, stderr);
+#elif defined(OS2)
+	    free(buf);
+	    buf = tmp;
+	    if (strcmp(term->name, "pm") != 0 || sleep_time >= 0)
+		fputs(buf, stderr);
+#else /* Not WIN32 or OS2 */
+	    free(buf);
+	    buf = tmp;
+	    fputs(buf, stderr);
+#endif
 	    text = 1;
 	}
     }
