@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.307 2015/08/01 04:20:04 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.308 2015/08/01 04:29:59 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -2173,11 +2173,12 @@ toggle_command()
 	else
 	    plot = NULL;
 	for (plotno = 0; plot != NULL; plot = plot->next, plotno++) {
-	    if (!strcmp(plot->title, plottitle)
-	    ||  (plottitle[length-1] == '*' && !strncmp(plot->title, plottitle, length-1))) {
-		foundit = TRUE;
-		break;
-	    }
+	    if (plot->title)
+		if (!strcmp(plot->title, plottitle)
+		||  (plottitle[length-1] == '*' && !strncmp(plot->title, plottitle, length-1))) {
+		    foundit = TRUE;
+		    break;
+		}
 	}
 	free(plottitle);
 	if (!foundit) {
