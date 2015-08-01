@@ -1,6 +1,6 @@
 2015-08-01  Ethan A Merritt  <merritt@u.washington.edu>
 
-	* src/ command.c (history_command): protect against try_to_get_string
+	* src/command.c (history_command): protect against try_to_get_string
 	failure in history commands.
 
 	* src/parse.c (next_iteration): protect against user corrupting
@@ -20,6 +20,8 @@
 
 	* src/plot3d.c (eval_3dplots): 2015-05-07 code to accommodate images in
 	hidden3d plots was being invoked even if hidden3d was not active.
+
+	* src/set.c (set_key): protect against try_to_get_string failure.
 
 	* src/axis.c (get_position_type): Revert recoding of get_position_type
 	(2015-02-15). Fixes failure to keep axis setting if already known.
