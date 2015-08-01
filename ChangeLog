@@ -1,3 +1,9 @@
+2015-08-01  <pudh4418@users.sf.net>
+
+	* configure.in:  latest Qt5 requires compilation with -fPIC rather
+	than -fPIE.
+	Bug #1616
+
 2015-08-01  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/stats.c src/set.c src/eval.c:
