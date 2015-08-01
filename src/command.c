@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.306 2015/08/01 04:19:00 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.307 2015/08/01 04:20:04 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -983,11 +983,22 @@ do {                                                                        \
 } while (0)
 #endif
 
+/* Make a copy of an input line substring delimited by { and } */
+static char *
+new_clause(int clause_start, int clause_end)
+{
+    char *clause = gp_alloc(clause_end - clause_start, "clause");
+    memcpy(clause, &gp_input_line[clause_start+1], clause_end - clause_start);
+    clause[clause_end - clause_start - 1] = '\0';
+    return clause;
+}
+
 /* process the 'if' command */
 void
 if_command()
 {
     double exprval;
+    int end_token;
 
     if (!equals(++c_token, "("))	/* no expression */
 	int_error(c_token, "expecting (expression)");
@@ -1011,6 +1022,7 @@ if_command()
 		int_error(c_token,"expected {else-clause}");
 	    c_token = find_clause(&else_start, &else_end);
 	}
+	end_token = c_token;
 
 	if (exprval != 0) {
 	    clause_start = if_start;
@@ -1023,18 +1035,14 @@ if_command()
 	}
 	if_open_for_else = (else_start) ? FALSE : TRUE;
 
-	clause_depth++;
 	if (if_condition || else_start != 0) {
-	    /* Make a clean copy without the opening and closing braces */
-	    clause = gp_alloc(clause_end - clause_start, "clause");
-	    memcpy(clause, &gp_input_line[clause_start+1], clause_end - clause_start);
-	    clause[clause_end - clause_start - 1] = '\0';
-	    FPRINTF((stderr,"%s CLAUSE: \"{%s}\"\n",
-		    (exprval != 0.0) ? "IF" : "ELSE", clause));
+	    clause = new_clause(clause_start, clause_end);
+	    begin_clause();
 	    do_string_and_free(clause);
+	    end_clause();
 	}
 
-	c_token--; 	/* Let the parser see the closing curly brace */
+	c_token = end_token;
 	return;
     }
 
@@ -1078,6 +1086,7 @@ if_command()
 void
 else_command()
 {
+    int end_token;
    /*
     * EAM May 2011
     * New if/else syntax permits else clause to appear on a new line
@@ -1092,16 +1101,16 @@ else_command()
 	    int_error(c_token,"Invalid {else-clause}");
 
 	c_token++;	/* Advance to the opening curly brace */
-	c_token = find_clause(&clause_start, &clause_end);
-	c_token--;	/* Let the parser eventually see the closing curly brace */
+	end_token = find_clause(&clause_start, &clause_end);
 
-	clause_depth++;
 	if (!if_condition) {
-	    clause = gp_alloc(clause_end - clause_start, "clause");
-	    memcpy(clause, &gp_input_line[clause_start+1], clause_end - clause_start);
-	    clause[clause_end - clause_start - 1] = '\0';
+	    clause = new_clause(clause_start, clause_end);
+	    begin_clause();
 	    do_string_and_free(clause);
+	    end_clause();
 	}
+
+	c_token = end_token;
 	return;
     }
 
@@ -1132,6 +1141,7 @@ do_command()
 {
     t_iterator *do_iterator;
     int do_start, do_end;
+    int end_token;
     char *clause;
 
     c_token++;
@@ -1139,14 +1149,10 @@ do_command()
 
     if (!equals(c_token,"{"))
 	int_error(c_token,"expecting {do-clause}");
-    c_token = find_clause(&do_start, &do_end);
+    end_token = find_clause(&do_start, &do_end);
 
-    clause_depth++;
-    c_token--;	 /* Let the parser see the closing curly brace */
-
-    clause = gp_alloc(do_end - do_start + 2, "clause");
-    memcpy(clause, &gp_input_line[do_start+1], do_end - do_start);
-    clause[do_end - do_start - 1] = '\0';
+    clause = new_clause(do_start, do_end);
+    begin_clause();
 
     if (empty_iteration(do_iterator))
 	strcpy(clause, ";");
@@ -1156,10 +1162,15 @@ do_command()
     } while (next_iteration(do_iterator));
 
     free(clause);
+    end_clause();
+    c_token = end_token;
     do_iterator = cleanup_iteration(do_iterator);
 }
 
 /* process commands of the form 'while (foo) {...}' */
+/* FIXME:  For consistency there should be an iterator associated 
+ * with this statement.
+ */
 void
 while_command()
 {
@@ -1176,10 +1187,8 @@ while_command()
 	int_error(c_token,"expecting {while-clause}");
     end_token = find_clause(&do_start, &do_end);
 
-    clause = gp_alloc(do_end - do_start, "clause");
-    memcpy(clause, &gp_input_line[do_start+1], do_end - do_start);
-    clause[do_end - do_start - 1] = '\0';
-    clause_depth++;
+    clause = new_clause(do_start, do_end);
+    begin_clause();
 
     while (exprval != 0) {
 	do_string(clause);
@@ -1187,6 +1196,7 @@ while_command()
 	exprval = real_expression();
     };
 
+    end_clause();
     free(clause);
     c_token = end_token;
 }
@@ -1291,6 +1301,7 @@ null_command()
 /* Find the start and end character positions within gp_input_line
  * bounding a clause delimited by {...}.
  * Assumes that c_token indexes the opening left curly brace.
+ * Returns the index of the first token after the closing curly brace.
  */
 int
 find_clause(int *clause_start, int *clause_end)

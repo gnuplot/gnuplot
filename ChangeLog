@@ -25,6 +25,9 @@
 	(2015-02-15). Fixes failure to keep axis setting if already known.
 	Bug #1658
 
+	* src/command.c (new_clause {if|else|while|do}_command):
+	Better bookkeeping for the depth of nesting in bracketed clauses.
+
 2015-07-31  Ethan A Merritt  <merritt@u.washington.edu>
 
 	Sync restored repository on SourceForge to in-progress commit tree
