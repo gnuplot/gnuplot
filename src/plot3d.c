@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.238 2015/07/14 18:32:50 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.239 2015/08/01 04:18:28 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -2242,10 +2242,11 @@ eval_3dplots()
      * outlining the image.  Opt out of hidden3d for the {RGB}IMAGE
      * to avoid processing large amounts of data.
      */
-    if (plot_num) {
+    if (hidden3d && plot_num) {
 	struct surface_points *this_plot = first_3dplot;
 	do {
 	    if ((this_plot->plot_style == IMAGE || this_plot->plot_style == RGBIMAGE)
+	    && (this_plot->image_properties.nrows > 0 && this_plot->image_properties.ncols > 0)
 	    && !(this_plot->opt_out_of_hidden3d)) {
 
 		struct surface_points *new_plot = sp_alloc(2, 0, 0, 2);
