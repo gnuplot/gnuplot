@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.303 2015/06/23 22:37:22 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.304 2015/07/13 04:08:24 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -929,6 +929,7 @@ history_command()
 
     } else {
 	int n = 0;		   /* print only <last> entries */
+	char *tmp;
 	TBOOLEAN append = FALSE;   /* rewrite output file or append it */
 	static char *name = NULL;  /* name of the output file; NULL for stdout */
 
@@ -942,8 +943,9 @@ history_command()
 	if (!END_OF_COMMAND && isanumber(c_token)) {
 	    n = int_expression();
 	}
-	free(name);
-	if ((name = try_to_get_string())) {
+	if ((tmp = try_to_get_string())) {
+	    free(name);
+	    name = tmp;
 	    if (!END_OF_COMMAND && almost_equals(c_token, "ap$pend")) {
 		append = TRUE;
 		c_token++;
