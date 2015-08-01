@@ -28,6 +28,12 @@
 	* src/command.c (new_clause {if|else|while|do}_command):
 	Better bookkeeping for the depth of nesting in bracketed clauses.
 
+	* src/plot2d.c (eval_plots) src/plot3d.c (eval_3dplots):
+	Example of bug:     plot for [i=1:3] T=sprintf("%d",i),i title T
+	previous code evaluated the definition three times and only then
+	make [one] plot.   After this fix the code executes define+plot
+	three separate times.
+
 2015-07-31  Ethan A Merritt  <merritt@u.washington.edu>
 
 	Sync restored repository on SourceForge to in-progress commit tree
