@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.292.2.8 2015/06/25 21:31:42 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.292.2.9 2015/07/13 04:08:34 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -1570,6 +1570,7 @@ plot_command()
 {
     plot_token = c_token++;
     plotted_data_from_stdin = FALSE;
+    refresh_nplots = 0;
     SET_CURSOR_WAIT;
 #ifdef USE_MOUSE
     plot_mode(MODE_PLOT);
@@ -1784,6 +1785,7 @@ refresh_request()
 
     if (   ((first_plot == NULL) && (refresh_ok == E_REFRESH_OK_2D))
         || ((first_3dplot == NULL) && (refresh_ok == E_REFRESH_OK_3D))
+	|| (!*replot_line && (refresh_ok == E_REFRESH_NOT_OK))
        )
 	int_error(NO_CARET, "no active plot; cannot refresh");
 
@@ -1961,6 +1963,7 @@ splot_command()
 {
     plot_token = c_token++;
     plotted_data_from_stdin = FALSE;
+    refresh_nplots = 0;
     SET_CURSOR_WAIT;
 #ifdef USE_MOUSE
     plot_mode(MODE_SPLOT);

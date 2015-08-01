@@ -19,6 +19,10 @@
 	make [one] plot.   After this fix the code executes define+plot
 	three separate times.
 
+	* src/command.c (plot_command splot_command):  Fuzz-testing found
+	cases where 'refresh' triggered program failure if there was not an
+	active refreshable plot.
+
 2015-07-14  Ethan A Merritt  <merritt@u.washington.edu>
 
 	Handle various cases of unexpected input commands or data that caused
