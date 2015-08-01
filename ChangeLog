@@ -1,3 +1,26 @@
+2015-08-01  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/ command.c (history_command): protect against try_to_get_string
+	failure in history commands.
+
+	* src/parse.c (next_iteration): protect against user corrupting
+	iteration variable.  E.g. either of these used to segfault
+		plot for [n=1:2] x lw n='foo'
+		do for [n=1:2] { n="foo" }
+
+	* src/plot2d.c src/plot3d.c src/set.c:  Do not allow function plots
+	to specifc an image style (with image/rgbimage/rgbalpha).
+
+	* src/command.c (pause_command):  protect try_to_get_string failure in
+	'pause' command.  linux/windows/os2 code fixes are distinct.
+
+	* src/command.c (plot_command splot_command):  Fuzz-testing found
+	cases where 'refresh' triggered program failure if there was not an
+	active refreshable plot.
+
+	* src/plot3d.c (eval_3dplots): 2015-05-07 code to accommodate images in
+	hidden3d plots was being invoked even if hidden3d was not active.
+
 2015-07-31  Ethan A Merritt  <merritt@u.washington.edu>
 
 	Sync restored repository on SourceForge to in-progress commit tree
