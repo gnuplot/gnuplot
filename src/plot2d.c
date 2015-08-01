@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.336.2.12 2015/03/24 21:34:58 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.336.2.13 2015/04/04 01:08:32 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -2355,8 +2355,12 @@ eval_plots()
 
 		    if (this_plot->plot_style == IMAGE
 		    ||  this_plot->plot_style == RGBIMAGE
-		    ||  this_plot->plot_style == RGBA_IMAGE)
-			get_image_options(&this_plot->image_properties);
+		    ||  this_plot->plot_style == RGBA_IMAGE) {
+			if (this_plot->plot_type == FUNC)
+			    int_error(c_token, "This plot style is only for data files");
+			else
+			    get_image_options(&this_plot->image_properties);
+		    }
 
 		    if ((this_plot->plot_type == FUNC) &&
 			((this_plot->plot_style & PLOT_STYLE_HAS_ERRORBAR)

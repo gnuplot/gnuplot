@@ -10,6 +10,9 @@
 		plot for [n=1:2] x lw n='foo'
 		do for [n=1:2] { n="foo" }
 
+	* src/plot2d.c src/plot3d.c src/set.c:  Do not allow function plots
+	to specifc an image style (with image/rgbimage/rgbalpha).
+
 2015-07-14  Ethan A Merritt  <merritt@u.washington.edu>
 
 	Handle various cases of unexpected input commands or data that caused

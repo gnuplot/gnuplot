@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.231 2014/05/28 23:21:07 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.231.2.1 2014/09/05 21:50:57 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -1577,8 +1577,15 @@ eval_3dplots()
 			this_plot->plot_style = POINTSTYLE;
 			this_plot->plot_type = NODATA;
 		    }
-		    if (this_plot->plot_style == TABLESTYLE)
-			int_error(NO_CARET, "use `plot with table` rather than `splot with table`"); 
+
+		    if (this_plot->plot_style == IMAGE
+		    ||  this_plot->plot_style == RGBA_IMAGE
+		    ||  this_plot->plot_style == RGBIMAGE) {
+			if (this_plot->plot_type == FUNC3D)
+			    int_error(c_token-1, "a function cannot be plotted as an image");
+			else
+			    get_image_options(&this_plot->image_properties);
+		    }
 
 		    if ((this_plot->plot_style | data_style) & PM3DSURFACE) {
 			if (equals(c_token, "at")) {
@@ -1589,10 +1596,8 @@ eval_3dplots()
 			}
 		    }
 
-		    if (this_plot->plot_style == IMAGE
-		    ||  this_plot->plot_style == RGBA_IMAGE
-		    ||  this_plot->plot_style == RGBIMAGE)
-			get_image_options(&this_plot->image_properties);
+		    if (this_plot->plot_style == TABLESTYLE)
+			int_error(NO_CARET, "use `plot with table` rather than `splot with table`"); 
 
 		    set_with = TRUE;
 		    continue;
