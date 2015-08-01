@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.231.2.1 2014/09/05 21:50:57 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.231.2.2 2015/08/01 05:11:08 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -1353,10 +1353,10 @@ eval_3dplots()
 
 	if (is_definition(c_token)) {
 	    define();
-	    if (!equals(c_token,",")) {
-		was_definition = TRUE;
-		continue;
-	    }
+	    if (equals(c_token, ","))
+		c_token++;
+	    was_definition = TRUE;
+	    continue;
 
 	} else {
 	    int specs = -1;
@@ -2045,10 +2045,10 @@ eval_3dplots()
 
 	    if (is_definition(c_token)) {
 		define();
-		if (!equals(c_token,",")) {
-		    was_definition = TRUE;
-		    continue;
-		}
+		if (equals(c_token,","))
+		    c_token++;
+		was_definition = TRUE;
+		continue;
 
 	    } else {
 		struct at_type *at_ptr;

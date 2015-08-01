@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.336.2.13 2015/04/04 01:08:32 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.336.2.14 2015/08/01 05:11:07 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -2080,10 +2080,10 @@ eval_plots()
 
 	if (is_definition(c_token)) {
 	    define();
-	    if (!equals(c_token,",")) {
-		was_definition = TRUE;
-		continue;
-	    }
+	    if (equals(c_token,","))
+		c_token++;
+	    was_definition = TRUE;
+	    continue;
 
 	} else {
 	    int specs = 0;
@@ -3014,10 +3014,10 @@ eval_plots()
 
 	    if (is_definition(c_token)) {
 		define();
-		if (!equals(c_token,",")) {
-		    was_definition = TRUE;
-		    continue;
-		}
+		if (equals(c_token, ","))
+		    c_token++;
+		was_definition = TRUE;
+		continue;
 
 	    } else {
 		struct at_type *at_ptr;
