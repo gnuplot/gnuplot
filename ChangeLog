@@ -1,3 +1,10 @@
+2015-08-01  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/stats.c src/set.c src/eval.c:
+	Protect against 'free(foo); foo = try_to_get_string()' returning via
+	int_error() and hence never resetting the value of foo. If executed
+	again this leads to a double-free error.
+
 2015-07-14  Ethan A Merritt  <merritt@u.washington.edu>
 
 	Handle various cases of unexpected input commands or data that caused

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.459.2.17 2015/07/11 05:34:29 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.459.2.18 2015/07/14 18:54:19 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -1253,9 +1253,12 @@ set_cntrlabel()
 		strncpy(contour_format,new,sizeof(contour_format));
 	    free(new);
 	} else if (equals(c_token, "font")) {
+	    char *ctmp;
 	    c_token++;
-	    free(clabel_font);
-	    clabel_font = try_to_get_string();
+	    if ((ctmp = try_to_get_string())) {
+		free(clabel_font);
+		clabel_font = ctmp;
+	    }
 	} else if (almost_equals(c_token, "one$color")) {
 	    c_token++;
 	    clabel_onecolor = TRUE;
@@ -1869,7 +1872,7 @@ set_fit()
 		c_token++;
 		free(fit_script);
 		fit_script = NULL;
-	    } else if ((tmp = try_to_get_string()) != NULL) {
+	    } else if ((tmp = try_to_get_string())) {
 		free(fit_script);
 		fit_script = tmp;
 	    } else {
@@ -2387,8 +2390,11 @@ set_key()
 	    if (!isstringvalue(c_token))
 		int_error(c_token,"expected font");
 	    else {
-		free(key->font);
-		key->font = try_to_get_string();
+		char *tmp = try_to_get_string();
+		if (tmp) {
+		    free(key->font);
+		    key->font = tmp;
+		}
 		c_token--;
 	    }
 	    break;
@@ -2844,6 +2850,8 @@ set_monochrome()
 static void
 set_mouse()
 {
+    char *ctmp;
+
     c_token++;
     mouse_setting.on = 1;
 
@@ -2878,9 +2886,9 @@ set_mouse()
 	    mouse_setting.label = 1;
 	    ++c_token;
 	    /* check if the optional argument "<label options>" is present */
-	    if (isstringvalue(c_token)) {
+	    if (isstringvalue(c_token) && (ctmp = try_to_get_string())) {
 		free(mouse_setting.labelopts);
-		mouse_setting.labelopts = try_to_get_string();
+		mouse_setting.labelopts = ctmp;
 	    }
 	} else if (almost_equals(c_token, "nola$bels")) {
 	    mouse_setting.label = 0;
@@ -2899,17 +2907,17 @@ set_mouse()
 	    ++c_token;
 	} else if (almost_equals(c_token, "fo$rmat")) {
 	    ++c_token;
-	    if (isstringvalue(c_token)) {
+	    if (isstringvalue(c_token) && (ctmp = try_to_get_string())) {
 		if (mouse_setting.fmt != mouse_fmt_default)
 		    free(mouse_setting.fmt);
-		mouse_setting.fmt = try_to_get_string();
+		mouse_setting.fmt = ctmp;
 	    } else
 		mouse_setting.fmt = mouse_fmt_default;
 	} else if (almost_equals(c_token, "mo$useformat")) {
 	    ++c_token;
-	    if (isstringvalue(c_token)) {
+	    if (isstringvalue(c_token) && (ctmp = try_to_get_string())) {
 		free(mouse_alt_string);
-		mouse_alt_string = try_to_get_string();
+		mouse_alt_string = ctmp;
 		if (!strlen(mouse_alt_string)) {
 		    free(mouse_alt_string);
 		    mouse_alt_string = NULL;
@@ -4701,15 +4709,15 @@ set_terminal()
     } /* set term pop */
 
     /* `set term <normal terminal>' */
-    term = 0; /* in case set_term() fails */
+    /* NB: if set_term() exits via int_error() then term will not be changed */
     term = set_term();
+
     /* get optional mode parameters
      * not all drivers reset the option string before
      * strcat-ing to it, so we reset it for them
      */
     *term_options = 0;
-    if (term)
-	(*term->options)();
+    term->options();
     if (interactive && *term_options)
 	fprintf(stderr,"Options are '%s'\n",term_options);
     if ((term->flags & TERM_MONOCHROME))
@@ -5021,12 +5029,15 @@ set_xyplane()
 static void
 set_timefmt()
 {
+    char *ctmp;
     c_token++;
-    free(timefmt);
-    timefmt = try_to_get_string();
-    if (!timefmt) {
+
+    if ((ctmp = try_to_get_string())) {
+	free(timefmt);
+	timefmt = ctmp;
+    } else {
+	free(timefmt);
 	timefmt = gp_strdup(TIMEFMT);
-	int_error(c_token, "expecting form for timedata input");
     }
 }
 

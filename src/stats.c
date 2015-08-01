@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: stats.c,v 1.14.2.4 2015/01/14 04:24:27 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: stats.c,v 1.14.2.5 2015/03/24 17:27:01 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - stats.c */
@@ -718,6 +718,7 @@ statsrequest(void)
     int columns;
     double v[2];
     static char *file_name = NULL;
+    char *temp_name;
 
     /* Vars to hold data and results */
     long n;                /* number of records retained */
@@ -767,12 +768,12 @@ statsrequest(void)
     n = invalid = blanks = doubleblanks = out_of_range = 0;
 
     /* Get filename */
-    free ( file_name );
     i = c_token;
-    file_name = string_or_express(NULL);
-    if (file_name )
-	file_name = gp_strdup(file_name);
-    else
+    temp_name = string_or_express(NULL);
+    if (temp_name) {
+	free(file_name);
+	file_name = gp_strdup(temp_name);
+    } else
 	int_error(i, "missing filename or datablock");
 
     /* Jan 2015: We used to handle ascii matrix data as a special case but
