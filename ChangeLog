@@ -1,3 +1,8 @@
+2015-08-02 Akira Kakuto <kakuto@fuk.kindai.ac.jp>
+
+	* src/qtterminal/qt_term.cpp: Fix #ifdef block syntax, modify
+	string concatenation to make it acceptable in VS2010.
+
 2015-08-02  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/Makefile.am (GNUPLOT_QT) [BUILD_QT]: New variable to
