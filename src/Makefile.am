@@ -115,6 +115,10 @@ timestamp.h: $(top_srcdir)/ChangeLog Makefile
 
 if BUILD_QT
 
+GNUPLOT_QT = `echo gnuplot_qt | sed '$(transform)'`$(EXEEXT)
+
+AM_CPPFLAGS += -DGNUPLOT_QT=\"$(GNUPLOT_QT)\"
+
 # Call the moc preprocessor
 qtterminal/moc_%.cpp : qtterminal/%.h
 	$(MOC) -o $@ $<
@@ -147,9 +151,10 @@ endif # HAVE_LRELEASE
 clean-qt-extra:
 	rm -vf qtterminal/moc_*.cpp qtterminal/qrc_*.cpp qtterminal/qrc_*.o ui_*.h qtgnuplot*.qm
 
-# Clean transform gnuplot_x11 for demo
+
+# Clean transform gnuplot_qt for demo
 clean-demo:
-	rm -f $(GNUPLOT_X11)
+	rm -f $(GNUPLOT_QT)
 
 clean-local: clean-qt-extra clean-demo
 
