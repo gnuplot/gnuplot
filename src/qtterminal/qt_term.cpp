@@ -215,7 +215,7 @@ QPoint qt_gnuplotCoord(int x, int y)
 #ifndef GNUPLOT_QT
 # ifdef WIN32
 #  define GNUPLOT_QT "gnuplot_qt.exe"
-# endif
+# else
 #  define GNUPLOT_QT "gnuplot_qt"
 # endif
 #endif
@@ -235,7 +235,8 @@ void execGnuplotQt()
 #endif
 	}
 
-	filename += "/" + GNUPLOT_QT;
+	filename += "/";
+	filename += GNUPLOT_QT;
 
 	qint64 pid;
 	qt->gnuplot_qtStarted = QProcess::startDetached(filename, QStringList(), QString(), &pid);
