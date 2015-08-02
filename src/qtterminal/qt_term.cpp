@@ -211,6 +211,14 @@ QPoint qt_gnuplotCoord(int x, int y)
 	return QPoint(x*qt_oversampling, int(term->ymax) - y*qt_oversampling);
 }
 
+#ifndef GNUPLOT_QT
+# ifdef WIN32
+#  define GNUPLOT_QT "gnuplot_qt.exe"
+# endif
+#  define GNUPLOT_QT "gnuplot_qt"
+# endif
+#endif
+
 // Start the GUI application
 void execGnuplotQt()
 {
@@ -218,15 +226,15 @@ void execGnuplotQt()
 	char* path = getenv("GNUPLOT_DRIVER_DIR");
 	if (path)
 		filename = QString(path);
+	if (filename.isEmpty()) {
 #ifdef WIN32
-	if (filename.isEmpty())
 		filename = QCoreApplication::applicationDirPath();
-	filename += "/gnuplot_qt.exe";
 #else
-	if (filename.isEmpty())
 		filename = QT_DRIVER_DIR;
-	filename += "/gnuplot_qt";
 #endif
+	}
+
+	filename += "/" + GNUPLOT_QT;
 
 	qint64 pid;
 	qt->gnuplot_qtStarted = QProcess::startDetached(filename, QStringList(), QString(), &pid);

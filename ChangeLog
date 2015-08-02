@@ -1,3 +1,22 @@
+2015-08-02  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/Makefile.am (GNUPLOT_QT) [BUILD_QT]: New variable to
+	communicate optionally transformed name of gnuplot_qt into main to
+	main executable.
+	(AM_CPPFLAGS) [BUILD_QT]: Pass GNUPLOT_QT to the preprocessor.
+	(clean-demo) [BUILD_QT]: Fix copy-paste-edit oversight.
+
+	* src/qtterminal/qt_term.cpp (GNUPLOT_QT): If not defined from
+	outside, provide fall-back definition equal to previously
+	hardcoded value.
+	(execGnuplotQt): Untangle the conditionals a bit. Use new macro
+	GNUPLOT_QT for the name of the outboard driver executable (fixes
+	SF bug #1652)
+
+	* term/pslatex.trm [!EAM_BOXED_TEXT]: Remove empty fallback
+	definition for new entry function.  Remove extraneous optional
+	terminal API entry.
+
 2015-08-01  <pudh4418@users.sf.net>
 
 	* configure.in:  latest Qt5 requires compilation with -fPIC rather

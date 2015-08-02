@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: pslatex.trm,v 1.90.2.1 2015/01/24 22:01:28 sfeam Exp $
+ * $Id: pslatex.trm,v 1.90.2.2 2015/07/11 22:03:10 sfeam Exp $
  */
 
 /* GNUPLOT - pslatex.trm */
@@ -1031,8 +1031,6 @@ EPSLATEX_boxed_text(unsigned int x, unsigned int y, int option)
 	break;
     }
 }
-#else
-#define EPSLATEX_boxed_text
 #endif
 
 #endif /* TERM_BODY */
@@ -1066,9 +1064,11 @@ TERM_TABLE_START(epslatex_driver)
     PS_path,
     0.0,	/* scale */
     0,		/* hypertext */
-    EPSLATEX_boxed_text
-    , NULL
-    , PS_dashtype
+#ifdef EAM_BOXED_TEXT
+    EPSLATEX_boxed_text,
+#endif
+    NULL,
+    PS_dashtype
 TERM_TABLE_END(epslatex_driver)
 #undef LAST_TERM
 #define LAST_TERM epslatex_driver
