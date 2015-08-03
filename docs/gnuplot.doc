@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.902.2.39 2015/04/28 03:48:13 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.902.2.40 2015/05/22 23:34:05 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -6738,7 +6738,7 @@ Ffigure_mapcontours
        list = "new stuff"
        replot
 
- This is example does exactly the same thing as the previous example, but uses
+ This example does exactly the same thing as the previous example, but uses
  the string iterator form of the command rather than an integer iterator.
 
 3 title
