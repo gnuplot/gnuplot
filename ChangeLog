@@ -1,3 +1,14 @@
+2015-08-03  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/boundary.c src/graphics.c src/graphics.h src/save.c src/save.h
+	src/set.c src/setshow.h src/show.c src/unset.c src/tables.c
+	docs/gnuplot.doc demo/varcolor.dem:
+
+	Support a separate set of line properties for errorbars.
+	New command "set errorbars" is an expansion of "set bars" to include
+	line characteristics.  Save errorbars style (previously not saved).
+	E.g.   set errorbars lc "black" lw 0.75
+
 2015-08-02 Akira Kakuto <kakuto@fuk.kindai.ac.jp>
 
 	* src/qtterminal/qt_term.cpp: Fix #ifdef block syntax, modify

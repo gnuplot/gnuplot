@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.492 2015/07/14 18:21:56 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.493 2015/08/01 18:27:13 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -68,6 +68,7 @@ t_position boff = {first_axes, first_axes, first_axes, 0.0, 0.0, 0.0};
 /* set bars */
 double bar_size = 1.0;
 int    bar_layer = LAYER_FRONT;
+struct lp_style_type bar_lp;
 
 /* key placement is calculated in boundary, so we need file-wide variables
  * To simplify adjustments to the key, we set all these once [depends on
@@ -1591,8 +1592,6 @@ plot_bars(struct curve_points *plot)
     int tic = ERRORBARTIC;
     double halfwidth = 0;	/* Used to calculate full box width */
 
-    /* Limitation: no boxes with x errorbars */
-
     if ((plot->plot_style == YERRORBARS)
 	|| (plot->plot_style == XYERRORBARS)
 	|| (plot->plot_style == BOXERROR)
@@ -1663,17 +1662,23 @@ plot_bars(struct curve_points *plot)
 		check_for_variable_color(plot, &plot->varcolor[i]);
 	    }
 
+	    /* Error bars can now have a separate line style */
+	    if (bar_lp.l_type != LT_DEFAULT)
+		term_apply_lp_properties(&bar_lp);
 	    /* Error bars should be drawn in the border color for filled boxes
 	     * but only if there *is* a border color. */
-	    if ((plot->plot_style == BOXERROR) && t->fillbox)
-		(void) need_fill_border(&plot->fill_properties);
+	    else if ((plot->plot_style == BOXERROR) && t->fillbox)
+		need_fill_border(&plot->fill_properties);
 
-	    /* by here everything has been mapped */
-	    /* EAM Sep 2013 - use draw_clip_line rather than calculating it here */
+	    /* By here everything has been mapped */
+	    /* First draw the main part of the error bar */
+	    draw_clip_line(xM, ylowM, xM, yhighM);
+
+	    /* Even if error bars are dotted, the end lines are always solid */
+	    if (bar_lp.l_type != LT_DEFAULT)
+		term->dashtype(DASHTYPE_SOLID,NULL);
+
 	    if (!polar) {
-		/* draw the main bar */
-		draw_clip_line(xM, ylowM, xM, yhighM);
-
 		if (bar_size < 0.0) {
 		    /* draw the bottom tic same width as box */
 		    draw_clip_line(xlowM, ylowM, xhighM, ylowM);
@@ -1688,31 +1693,28 @@ plot_bars(struct curve_points *plot)
 				   (int)(xM + bar_size * tic), yhighM);
 		}
 	    } else { /* Polar error bars */
-		/* Draw the main bar */
-		draw_clip_line(xlowM, ylowM, xhighM, yhighM);
+	    /* Draw the whiskers perpendicular to the main bar */
+		if (bar_size > 0.0) {
+		    int x1, y1, x2, y2;
+		    double slope;
 
-		/* Draw the whiskers perpendicular to the main bar */
-		    if (bar_size > 0.0) {
-			int x1, y1, x2, y2;
-			double slope;
+		    slope = atan2((double)(yhighM - ylowM), (double)(xhighM - xlowM));
+		    x1 = xlowM - (bar_size * tic * sin(slope));
+		    x2 = xlowM + (bar_size * tic * sin(slope));
+		    y1 = ylowM + (bar_size * tic * cos(slope));
+		    y2 = ylowM - (bar_size * tic * cos(slope));
 
-			slope = atan2((double)(yhighM - ylowM), (double)(xhighM - xlowM));
-			x1 = xlowM - (bar_size * tic * sin(slope));
-			x2 = xlowM + (bar_size * tic * sin(slope));
-			y1 = ylowM + (bar_size * tic * cos(slope));
-			y2 = ylowM - (bar_size * tic * cos(slope));
+		    /* draw the bottom tic */
+		    draw_clip_line(x1, y1, x2, y2);
 
-			/* draw the bottom tic */
-			draw_clip_line(x1, y1, x2, y2);
-
-			x1 += xhighM - xlowM;
-			x2 += xhighM - xlowM;
-			y1 += yhighM - ylowM;
-			y2 += yhighM - ylowM;
-			/* draw the top tic */
-			draw_clip_line(x1, y1, x2, y2);
-		    }
+		    x1 += xhighM - xlowM;
+		    x2 += xhighM - xlowM;
+		    y1 += yhighM - ylowM;
+		    y2 += yhighM - ylowM;
+		    /* draw the top tic */
+		    draw_clip_line(x1, y1, x2, y2);
 		}
+	    }
 	}	/* for loop */
     }		/* if yerrorbars OR xyerrorbars OR yerrorlines OR xyerrorlines */
 
@@ -1745,8 +1747,17 @@ plot_bars(struct curve_points *plot)
 	    /* Check for variable color - June 2010 */
 	    check_for_variable_color(plot, &plot->varcolor[i]);
 
+	    /* Error bars can now have their own line style */
+	    if (bar_lp.l_type != LT_DEFAULT)
+		term_apply_lp_properties(&bar_lp);
+
 	    /* by here everything has been mapped */
 	    draw_clip_line(xlowM, yM, xhighM, yM);
+
+	    /* Even if error bars are dotted, the end lines are always solid */
+	    if (bar_lp.l_type != LT_DEFAULT)
+		term->dashtype(DASHTYPE_SOLID,NULL);
+
 	    if (bar_size > 0.0) {
 		draw_clip_line( xlowM, (int)(yM - bar_size * tic),
 				xlowM, (int)(yM + bar_size * tic));

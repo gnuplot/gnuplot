@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.496 2015/08/01 04:18:28 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.497 2015/08/01 04:39:47 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -930,10 +930,30 @@ set_autoscale()
 static void
 set_bars()
 {
+    int save_token;
 
-    int save_token = ++c_token;
+    c_token++;
+
+    if (END_OF_COMMAND)
+	reset_bars();
 
     while (!END_OF_COMMAND) {
+
+	if (equals(c_token,"default")) {
+	    reset_bars();
+	    ++c_token;
+	    return;
+	}
+
+	/* Jul 2015 - allow a separate line type for error bars */
+	save_token = c_token;
+	lp_parse(&bar_lp, LP_ADHOC, FALSE);
+	if (c_token != save_token) {
+	    if (bar_lp.l_type == LT_DEFAULT)
+		bar_lp.l_type = LT_SOLID;
+	    continue;
+	}
+
 	if (almost_equals(c_token,"s$mall")) {
 	    bar_size = 0.0;
 	    ++c_token;
@@ -953,10 +973,6 @@ set_bars()
 	    bar_size = real_expression();
 	}
     }
-
-    if (save_token == c_token)
-	bar_size = 1.0;
-
 }
 
 

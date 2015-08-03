@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.282 2015/05/08 18:32:12 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.283 2015/07/12 20:43:24 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -219,12 +219,13 @@ save_set_all(FILE *fp)
     fprintf(fp, "\
 %sset clip points\n\
 %sset clip one\n\
-%sset clip two\n\
-set bar %f %s\n",
+%sset clip two\n",
 	    (clip_points) ? "" : "un",
 	    (clip_lines1) ? "" : "un",
-	    (clip_lines2) ? "" : "un",
-	    bar_size, (bar_layer == LAYER_BACK) ? "back" : "front");
+	    (clip_lines2) ? "" : "un"
+	    );
+
+    save_bars(fp);
 
     if (draw_border) {
 	fprintf(fp, "set border %d %s", draw_border,
@@ -1580,6 +1581,23 @@ save_offsets(FILE *fp, char *lead)
 	roff.scalex == graph ? "graph " : "", roff.x,
 	toff.scaley == graph ? "graph " : "", toff.y,
 	boff.scaley == graph ? "graph " : "", boff.y);
+}
+
+void
+save_bars(FILE *fp)
+{
+    if (bar_size == 0.0) {
+	fprintf(fp, "unset errorbars\n");
+	return;
+    }
+    fprintf(fp, "set errorbars %s", (bar_layer == LAYER_BACK) ? "back" : "front");
+    if (bar_size > 0.0)
+	fprintf(fp, " %f ", bar_size);
+    else
+	fprintf(fp," fullwidth ");
+    if (bar_lp.l_type != LT_DEFAULT)
+	save_linetype(fp, &bar_lp, FALSE);
+    fputs("\n",fp);
 }
 
 void 

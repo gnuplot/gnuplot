@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.225 2015/05/08 18:32:12 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.226 2015/07/12 05:06:54 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -697,6 +697,17 @@ unset_bars()
     bar_size = 0.0;
 }
 
+/* reset is different from unset */
+/* This gets called from 'set bars default' also */
+void
+reset_bars()
+{
+    struct lp_style_type def = DEFAULT_LP_STYLE_TYPE;
+    bar_lp = def;
+    bar_lp.l_type = LT_DEFAULT;
+    bar_size = 1.0;
+    bar_layer = LAYER_FRONT;
+}
 
 /* process 'unset border' command */
 static void
@@ -1832,9 +1843,6 @@ reset_command()
     filledcurves_opts_data.closeto = FILLEDCURVES_CLOSED;
     filledcurves_opts_func.closeto = FILLEDCURVES_CLOSED;
 
-    bar_size = 1.0;
-    bar_layer = LAYER_FRONT;
-
     unset_grid();
     grid_lp = default_grid_lp;
     mgrid_lp = default_grid_lp;
@@ -1847,6 +1855,7 @@ reset_command()
     hidden3d = FALSE;
 
     unset_angles();
+    reset_bars();
     unset_mapping();
 
     unset_size();

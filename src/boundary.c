@@ -1,5 +1,5 @@
 /*
- * $Id: boundary.c,v 1.23 2015/03/13 20:26:17 sfeam Exp $
+ * $Id: boundary.c,v 1.24 2015/03/19 17:30:41 sfeam Exp $
  */
 
 /* GNUPLOT - boundary.c */
@@ -1283,17 +1283,25 @@ do_key_sample(
 	}
 
     } else if (this_plot->plot_style == VECTOR && t->arrow) {
-	    apply_head_properties(&(this_plot->arrow_properties));
-	    curr_arrow_headlength = -1;
-	    draw_clip_arrow(xl + key_sample_left, yl, xl + key_sample_right, yl,
-			this_plot->arrow_properties.head);
+	apply_head_properties(&(this_plot->arrow_properties));
+	curr_arrow_headlength = -1;
+	draw_clip_arrow(xl + key_sample_left, yl, xl + key_sample_right, yl,
+		    this_plot->arrow_properties.head);
 
-    } else if ((this_plot->plot_style & PLOT_STYLE_HAS_LINE)
-		   || ((this_plot->plot_style & PLOT_STYLE_HAS_ERRORBAR)
-		       && this_plot->plot_type == DATA)) {
-	if (this_plot->lp_properties.l_type != LT_NODRAW)
-	    /* errors for data plots only */
-	    draw_clip_line(xl + key_sample_left, yl, xl + key_sample_right, yl);
+    } else if (this_plot->lp_properties.l_type == LT_NODRAW) {
+	;
+
+    } else if ((this_plot->plot_style & PLOT_STYLE_HAS_ERRORBAR) &&  this_plot->plot_type == DATA) {
+	/* errors for data plots only */
+	if (bar_lp.l_type != LT_DEFAULT)
+	    term_apply_lp_properties(&bar_lp);
+	draw_clip_line(xl + key_sample_left, yl, xl + key_sample_right, yl);
+	/* Even if error bars are dotted, the end lines are always solid */
+	if (bar_lp.l_type != LT_DEFAULT)
+	    term->dashtype(DASHTYPE_SOLID,NULL);
+
+    } else if ((this_plot->plot_style & PLOT_STYLE_HAS_LINE)) {
+	draw_clip_line(xl + key_sample_left, yl, xl + key_sample_right, yl);
     }
 
     if ((this_plot->plot_type == DATA)

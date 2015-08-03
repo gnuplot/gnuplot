@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.951 2015/06/26 20:51:18 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.952 2015/08/01 02:30:31 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -3190,7 +3190,7 @@ Ffigure_boxplot
  By default the whiskers extend from the ends of the box to the most distant
  point whose y value lies within 1.5 times the interquartile range. By default
  outliers are drawn as circles (point type 7).  The width of the bars at the
- end of the whiskers may be controlled using `set bars`.
+ end of the whiskers may be controlled using `set bars` or `set errorbars`.
 
  These default properties may be changed using the `set style boxplot` command.
  See `set style boxplot`, `bars`, `boxwidth`, `fillstyle`, `candlesticks`.
@@ -3241,7 +3241,7 @@ Ffigure_candlesticks
  The width of the rectangle can be controlled by the `set boxwidth` command.
  For backwards compatibility with earlier gnuplot versions, when the
  boxwidth parameter has not been set then the width of the candlestick
- rectangle is controlled by `set bars <width>`.
+ rectangle is controlled by `set errorbars <width>`.
 
  Alternatively, an explicit width for each box-and-whiskers grouping may be
  specified in an optional 6th column of data.  The width must be given in the
@@ -3262,7 +3262,7 @@ Ffigure_candlesticks
  will get if the current fillstyle is set to "empty". See `fillstyle`.
  If you set the fillstyle to solid or pattern, then this will be used for
  all boxes independent of open and close values.
- See also `set bars` and `financebars`.  See also the
+ See also `set errorbars` and `financebars`.  See also the
 ^ <a href="http://www.gnuplot.info/demo/candlesticks.html">
  candlestick
 ^ </a>
@@ -3276,7 +3276,7 @@ Ffigure_candlesticks
  box-and-whisker plot requires additional plot commands as in this example:
 
    # Data columns:X Min 1stQuartile Median 3rdQuartile Max
-   set bars 4.0
+   set errorbars 4.0
    set style fill empty
    plot 'stat.dat' using 1:3:2:6:5 with candlesticks title 'Quartiles', \
         ''         using 1:4:4:4:4 with candlesticks lt -1 notitle
@@ -3284,7 +3284,7 @@ Ffigure_candlesticks
    # Plot with crossbars on the whiskers, crossbars are 50% of full width
    plot 'stat.dat' using 1:3:2:6:5 with candlesticks whiskerbars 0.5
 
- See `set boxwidth`, `set bars`, `set style fill`, and `boxplot`.
+ See `set boxwidth`, `set errorbars`, `set style fill`, and `boxplot`.
 2 circles
 ?plotting styles circles
 ?style circles
@@ -3473,9 +3473,9 @@ Ffigure_financebars
  The symbol is a vertical line segment, located horizontally at the x
  coordinate and limited vertically by the high and low prices.  A horizontal
  tic on the left marks the opening price and one on the right marks the
- closing price.  The length of these tics may be changed by `set bars`.  The
- symbol will be unchanged if the high and low prices are interchanged.
- See `set bars` and `candlesticks`, and also the
+ closing price.  The length of these tics may be changed by `set errorbars`.
+ The symbol will be unchanged if the high and low prices are interchanged.
+ See `set errorbars` and `candlesticks`, and also the
 ^ <a href="http://www.gnuplot.info/demo/finance.html">
  finance demo.
 ^ </a>
@@ -3560,7 +3560,7 @@ Ffigure_histeps
       2 columns:        y yerr          bar extends from y-yerr to y+err
       3 columns:        y ymin ymax     bar extends from ymin to ymax
  The appearance of the error bars is controlled by the current value of
- `set bars` and by the optional <linewidth> specification.
+ `set errorbars` and by the optional <linewidth> specification.
 
  Two styles of stacked histogram are supported, chosen by the command
  `set style histogram {rowstacked|columnstacked}`.  In these styles the data
@@ -3619,7 +3619,7 @@ Ffigure_histerrorbar
  ends drawn the same width as the box itself. The error bars and bar ends are
  drawn with linewidth 2, using the border linetype from the current fill style.
 
-       set bars fullwidth
+       set errorbars fullwidth
        set style fill solid 1 border lt -1
        set style histogram errorbars gap 2 lw 2
        plot for [COL=2:4:2] 'file.dat' using COL:COL+1
@@ -4015,9 +4015,9 @@ Ffigure_xerrorbars
  The `xerrorbars` style is only relevant to 2D data plots.  `xerrorbars` is
  like `points`, except that a horizontal error bar is also drawn.  At each point
  (x,y), a line is drawn from (xlow,y) to (xhigh,y) or from (x-xdelta,y) to
- (x+xdelta,y), depending on how many data columns are provided.  A tic mark
- is placed at the ends of the error bar (unless `set bars` is used---see
- `set bars` for details).  The basic style requires either 3 or 4 columns:
+ (x+xdelta,y), depending on how many data columns are provided.  The appearance
+ of the tic mark at the ends of the bar is controlled by `set errorbars`.
+ The basic style requires either 3 or 4 columns:
 
       3 columns:  x  y  xdelta
       4 columns:  x  y  xlow  xhigh
@@ -4034,9 +4034,9 @@ Ffigure_xyerrorbars
  like `points`, except that horizontal and vertical error bars are also drawn.
  At each point (x,y), lines are drawn from (x,y-ydelta) to (x,y+ydelta) and
  from (x-xdelta,y) to (x+xdelta,y) or from (x,ylow) to (x,yhigh) and from
- (xlow,y) to (xhigh,y), depending upon the number of data columns provided.  A
- tic mark is placed at the ends of the error bar (unless `set bars` is
- used---see `set bars` for details).  Either 4 or 6 input columns are required.
+ (xlow,y) to (xhigh,y), depending upon the number of data columns provided.
+ The appearance of the tic mark at the ends of the bar is controlled by
+ `set errorbars`.  Either 4 or 6 input columns are required.
 
       4 columns:  x  y  xdelta  ydelta
       6 columns:  x  y  xlow  xhigh  ylow  yhigh
@@ -4061,8 +4061,8 @@ Ffigure_yerrorbars
  `yerrorbars` is like `points`, except that a vertical error bar is also drawn.
  At each point (x,y), a line is drawn from (x,y-ydelta) to (x,y+ydelta) or
  from (x,ylow) to (x,yhigh), depending on how many data columns are provided.
- A tic mark is placed at the ends of the error bar (unless `set bars` is
- used---see `set bars` for details).
+ The appearance of the tic mark at the ends of the bar is controlled by
+ `set errorbars`.
 
       2 columns:  [implicit x] y ydelta
       3 columns:  x  y  ydelta
@@ -4081,12 +4081,11 @@ Ffigure_yerrorbars
 ?xerrorlines
 Ffigure_xerrorlines
  The `xerrorlines` style is only relevant to 2D data plots.
- `xerrorlines` is like `linespoints`, except that a horizontal error
- line is also drawn. At each point (x,y), a line is drawn from (xlow,y)
- to (xhigh,y) or from (x-xdelta,y) to (x+xdelta,y), depending on how
- many data columns are provided. A tic mark is placed at the ends of
- the error bar (unless `set bars` is used---see `set bars` for details).
- The basic style requires either 3 or 4 columns:
+ `xerrorlines` is like `linespoints`, except that a horizontal error line is
+ also drawn. At each point (x,y), a line is drawn from (xlow,y) to (xhigh,y)
+ or from (x-xdelta,y) to (x+xdelta,y), depending on how many data columns are
+ provided.  The appearance of the tic mark at the ends of the bar is controlled
+ by `set errorbars`.  The basic style requires either 3 or 4 columns:
 
       3 columns:  x  y  xdelta
       4 columns:  x  y  xlow  xhigh
@@ -4100,13 +4099,13 @@ Ffigure_xerrorlines
 ?xyerrorlines
 Ffigure_xyerrorlines
  The `xyerrorlines` style is only relevant to 2D data plots.
- `xyerrorlines` is like `linespoints`, except that horizontal and
- vertical error bars are also drawn. At each point (x,y), lines are
- drawn from (x,y-ydelta) to (x,y+ydelta) and from (x-xdelta,y) to
- (x+xdelta,y) or from (x,ylow) to (x,yhigh) and from (xlow,y) to
- (xhigh,y), depending upon the number of data columns provided. A tic
- mark is placed at the ends of the error bar (unless `set bars` is
- used---see `set bars` for details).  Either 4 or 6 input columns are required.
+ `xyerrorlines` is like `linespoints`, except that horizontal and vertical
+ error bars are also drawn. At each point (x,y), lines are drawn from
+ (x,y-ydelta) to (x,y+ydelta) and from (x-xdelta,y) to (x+xdelta,y) or from
+ (x,ylow) to (x,yhigh) and from (xlow,y) to (xhigh,y), depending upon the
+ number of data columns provided.  The appearance of the tic mark at the ends
+ of the bar is controlled by `set errorbars`.
+ Either 4 or 6 input columns are required.
 
       4 columns:  x  y  xdelta  ydelta
       6 columns:  x  y  xlow  xhigh  ylow  yhigh
@@ -4128,12 +4127,11 @@ Ffigure_xyerrorlines
 ?yerrorlines
 Ffigure_yerrorlines
  The `yerrorlines` (or `errorlines`) style is only relevant to 2D data
- plots. `yerrorlines` is like `linespoints`, except that a vertical
- error line is also drawn. At each point (x,y), a line is drawn from
- (x,y-ydelta) to (x,y+ydelta) or from (x,ylow) to (x,yhigh), depending
- on how many data columns are provided. A tic mark is placed at the
- ends of the error bar (see `set bars` for details).
- Either 3 or 4 input columns are required.
+ plots. `yerrorlines` is like `linespoints`, except that a vertical error line
+ is also drawn. At each point (x,y), a line is drawn from (x,y-ydelta) to
+ (x,y+ydelta) or from (x,ylow) to (x,yhigh), depending on how many data columns
+ are provided.  The appearance of the tic mark at the ends of the bar is
+ controlled by `set errorbars`.  Either 3 or 4 input columns are required.
 
       3 columns:  x  y  ydelta
       4 columns:  x  y  ylow  yhigh
@@ -6475,7 +6473,7 @@ Ffigure_mapcontours
 ?commands splot errorbars
 ?plot errorbars
 ?splot errorbars
-?errorbars
+=errorbars
  Error bars are supported for 2D data file plots by reading one to four
  additional columns (or `using` entries); these additional values are used in
  different ways by the various errorbar styles.
@@ -6512,8 +6510,7 @@ Ffigure_mapcontours
  option on one to avoid two entries in the key). Alternately, use the
  errorlines command (see `errorlines`).
 
- The error bars have crossbars at each end unless `set bars` is used
- (see `set bars` for details).
+ The tic marks at the ends of the bar are controlled by `set errorbars`.
 
  If autoscaling is on, the ranges will be adjusted to include the error bars.
 
@@ -6561,8 +6558,7 @@ Ffigure_mapcontours
  numbers on the record, yhigh and ylow are both set to y. The x error
  bar is a horizontal line computed in the same fashion.
 
- The error bars have crossbars at each end unless `set bars` is used
- (see `set bars` for details).
+ The tic marks at the ends of the bar are controlled by `set errorbars`.
 
  If autoscaling is on, the ranges will be adjusted to include the error bars.
 
@@ -7515,29 +7511,6 @@ Ffigure_mapcontours
 ^ <a href="http://www.gnuplot.info/demo/poldat.html">
  polar demos.
 ^ </a>
-3 bars
-?commands set bars
-?commands show bars
-?set bars
-?show bars
-?bars
- The `set bars` command controls the tics at the ends of error bars,
- and also at the end of the whiskers belonging to a boxplot.
-
- Syntax:
-       set bars {small | large | fullwidth | <size>} {front | back}
-       unset bars
-       show bars
-
- `small` is a synonym for 0.0, and `large` for 1.0.
- The default is 1.0 if no size is given.
-
- The keyword `fullwidth` is relevant only to boxplots and to histograms with
- errorbars.  It sets the width of the errorbar ends to be the same as the width
- of the associated box.  It does not change the width of the box itself.
-
- The `front` and `back` keywords are relevant only to errorbars attached
- to filled rectangles (boxes, candlesticks, histograms).
 3 bind
 ?commands show bind
 ?show bind
@@ -8525,6 +8498,41 @@ Ffigure_missing
  Generally you must set the encoding before setting the terminal type.
  Note that encoding is not supported by all terminal drivers and that
  the device must be able to produce the desired non-standard characters.
+3 errorbars
+?commands set errorbars
+?commands show errorbars
+?set errorbars
+?show errorbars
+?errorbars
+?commands set bars
+?commands show bars
+?set bars
+?show bars
+?bars
+ The `set errorbars` command controls the tics at the ends of error bars,
+ and also at the end of the whiskers belonging to a boxplot.
+
+ Syntax:
+       set errorbars {small | large | fullwidth | <size>} {front | back}
+                     {line-properties}
+       unset errorbars
+       show errorbars
+
+ `small` is a synonym for 0.0 (no crossbar), and `large` for 1.0.
+ The default is 1.0 if no size is given.
+
+ The keyword `fullwidth` is relevant only to boxplots and to histograms with
+ errorbars.  It sets the width of the errorbar ends to be the same as the width
+ of the associated box.  It does not change the width of the box itself.
+
+ The `front` and `back` keywords are relevant only to errorbars attached
+ to filled rectangles (boxes, candlesticks, histograms).
+
+ Error bars are by default drawn using the same line properties as the border
+ of the associated box. You can change this by providing a separate set of
+ line properties for the error bars.
+
+      set errorbars linecolor black linewidth 0.5 dashtype '.'
 3 fit
 ?commands set fit
 ?commands show fit

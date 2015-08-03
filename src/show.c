@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.348 2015/05/08 18:32:12 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.349 2015/06/02 22:30:18 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -82,7 +82,6 @@ static void show_at __PROTO((void));
 static void disp_at __PROTO((struct at_type *, int));
 static void show_all __PROTO((void));
 static void show_autoscale __PROTO((void));
-static void show_bars __PROTO((void));
 static void show_border __PROTO((void));
 static void show_boxwidth __PROTO((void));
 static void show_boxplot __PROTO((void));
@@ -212,7 +211,7 @@ show_command()
 	show_autoscale();
 	break;
     case S_BARS:
-	show_bars();
+	save_bars(stderr);
 	break;
     case S_BIND:
 	while (!END_OF_COMMAND) c_token++;
@@ -727,7 +726,7 @@ show_all()
 
     show_version(stderr);
     show_autoscale();
-    show_bars();
+    save_bars(stderr);
     show_border();
     show_boxwidth();
     show_clip();
@@ -1140,21 +1139,6 @@ show_autoscale()
     SHOW_AUTOSCALE(COLOR_AXIS);
 #undef SHOW_AUTOSCALE
 
-}
-
-
-/* process 'show bars' command */
-static void
-show_bars()
-{
-    SHOW_ALL_NL;
-
-    /* I really like this: "terrorbars" ;-) */
-    if (bar_size > 0.0)
-	fprintf(stderr, "\terrorbars are plotted in %s with bars of size %f\n",
-		(bar_layer == LAYER_BACK) ? "back" : "front", bar_size);
-    else
-	fputs("\terrors are plotted without bars\n", stderr);
 }
 
 

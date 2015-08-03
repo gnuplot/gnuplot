@@ -1,5 +1,5 @@
 /*
- * $Id: save.h,v 1.21 2015/03/27 17:38:14 sfeam Exp $
+ * $Id: save.h,v 1.22 2015/04/15 20:31:05 broeker Exp $
  */
 
 /* GNUPLOT - save.h */
@@ -69,5 +69,6 @@ void save_data_func_style __PROTO((FILE *, const char *, enum PLOT_STYLE));
 void save_linetype __PROTO((FILE *, lp_style_type *, TBOOLEAN));
 void save_dashtype __PROTO((FILE *, int, const t_dashtype *));
 void save_num_or_time_input __PROTO((FILE *, double x, struct axis *));
+void save_bars __PROTO((FILE *));
 
 #endif /* GNUPLOT_SAVE_H */
