@@ -9,6 +9,8 @@
 	line characteristics.  Save errorbars style (previously not saved).
 	E.g.   set errorbars lc "black" lw 0.75
 
+	* src/util.c (streq): Avoid buffer underrun on empty string.
+
 2015-08-02 Akira Kakuto <kakuto@fuk.kindai.ac.jp>
 
 	* src/qtterminal/qt_term.cpp: Fix #ifdef block syntax, modify
