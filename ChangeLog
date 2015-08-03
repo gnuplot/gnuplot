@@ -1,6 +1,11 @@
 2015-08-03  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/util.c (streq): Avoid buffer underrun on empty string.
+	
+	* src/axis.c (load_range):  "set [xyz]range" per se does not care if the
+	range limits are extremely large, e.g.  xrange [ -inf.0 : inf.0 ]
+	but other places in the code do not handle this cleanly.
+	Limit the range to +/- VERYLARGE
 
 2015-08-02 Akira Kakuto <kakuto@fuk.kindai.ac.jp>
 
