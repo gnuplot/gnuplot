@@ -1,3 +1,13 @@
+2015-08-05  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/parse.c (string_or_express): Prevent an empty string variable or
+	expression from being interpreted as the magic names '' or "".
+	E.g.
+	    file1 = 'real-file'
+	    file2 = ''          # or some expression that evaluates to ''
+	    plot file1,file2    # plots file1 twice, no error message
+	Bug #1660
+
 2015-08-03  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/util.c (streq): Avoid buffer underrun on empty string.

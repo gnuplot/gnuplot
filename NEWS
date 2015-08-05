@@ -1,5 +1,6 @@
 Changes since 5.0.1
 ===================
+* CHANGE distinguish between empty string variable and string constant ""
 * FIX dashtype labels in 'test' command were off by one
 * FIX autocalculation of box widths in the presence of NaN data values
 * FIX qt terminals dots were invisible
