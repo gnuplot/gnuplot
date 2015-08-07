@@ -1,5 +1,5 @@
 /* -*- objc -*-
- * $Id: aquaterm.trm,v 1.51 2014/06/11 07:27:20 markisch Exp $
+ * $Id: aquaterm.trm,v 1.52 2015/02/25 00:23:14 sfeam Exp $
  *
  */
 
@@ -387,7 +387,7 @@ AQUA_init()
    * Set up the basic indexed colormap for gnuplot
    */
   /*  Special colors */
-  [adapter setColormapEntry:0 red:0.1 green:0.1 blue:0.1]; /* linetype -4 */
+  [adapter setColormapEntry:0 red:1.0 green:1.0 blue:1.0]; /* linetype -4 */
   [adapter setColormapEntry:1 red:0.9 green:0.9 blue:0.9]; /* linetype -3 (xor;interactive) light gray */
   [adapter setColormapEntry:2 red:0.0 green:0.0 blue:0.0]; /* linetype -2 (border) black */
   [adapter setColormapEntry:3 red:0.8 green:0.8 blue:0.8]; /* linetype -1 (gridlines) light grey */
@@ -737,6 +737,12 @@ AQUA_filled_polygon(int pc, gpiPoint *corners)
     [adapter addEdgeToVertexPoint:NSMakePoint(corners[i].x/AQUA_RESOLUTION,
 					      corners[i].y/AQUA_RESOLUTION)];
   }
+
+  /* Restore color */
+  if (AQUA_hasAlphaSupport)
+    [adapter setColorRed:r green:g blue:b alpha:a];
+  else
+    [adapter setColorRed:r green:g blue:b];
 }
 
 TERM_PUBLIC void
