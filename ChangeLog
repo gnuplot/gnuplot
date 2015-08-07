@@ -1,3 +1,9 @@
+2015-08-07  "Jun T." <takimoto-j@kba.biglobe.ne.jp>
+
+	* term/aquaterm.trm: Failure to save+restore original color was causing
+	successive fill areas to become more and more transparent.
+	Alsi, make background color pure white.
+
 2015-08-05  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/parse.c (string_or_express): Prevent an empty string variable or
