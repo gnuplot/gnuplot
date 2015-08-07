@@ -4,7 +4,7 @@
 	expression from being interpreted as the magic names '' or "".
 	E.g.
 	    file1 = 'real-file'
-	    file2 = ''          # or some expression that evaluates to ''
+	    file2 = "abc"[3:0]  # any expression that evaluates to ''
 	    plot file1,file2    # plots file1 twice, no error message
 	Bug #1660
 
