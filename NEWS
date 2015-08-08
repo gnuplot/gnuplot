@@ -1,7 +1,8 @@
 Changes not in 5.0
 ==================
+* NEW commands `break` and `continue`
 * NEW data filter "bins" sorts input into equal width bins on x
-* NEW hidden3d now observes 'image' and 'rgbimage' as hiding objects
+* NEW hidden3d now observes 'image' and 'rgbimage' as occluding objects
 * NEW new command `toggle {<plotno> | "plottitle" | all}`
 * NEW Optional sampling interval in range specifier for pseudofile '+'
 * NEW point style associated with "plot with labels" is shown in the key
