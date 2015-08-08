@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.197 2015/04/24 21:43:17 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.198 2015/04/25 05:05:23 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -389,6 +389,10 @@ load_file(FILE *fp, char *name, int calltype)
 
 	    }
 	}
+	
+	/* If we hit a 'break' or 'continue' statement in the lines just processed */
+	if (iteration_early_exit())
+	    continue;
 
 	/* process line */
 	if (strlen(gp_input_line) > 0) {

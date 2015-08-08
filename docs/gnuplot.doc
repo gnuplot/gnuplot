@@ -4181,6 +4181,13 @@ Ffigure_mapcontours
 
  In the syntax descriptions, braces ({}) denote optional arguments and a
  vertical bar (|) separates mutually exclusive choices.
+2 Break
+?commands break
+?break
+ The `break` command is only meaningful inside the bracketed iteration clause
+ of a `do` or `while` statement.  It causes the remaining statements inside the
+ bracketed clause to be skipped and iteration is terminated.  Execution resumes
+ at the statement following the closing bracket.  See also `continue`.
 2 cd
 ?commands cd
 ?cd
@@ -4308,6 +4315,13 @@ Ffigure_mapcontours
 
  Please see `set multiplot`, `set size`, and `set origin` for details of these
  commands.
+2 Continue
+?commands continue
+?continue
+ The `continue` command is only meaningful inside the bracketed iteration clause
+ of a `do` or `while` statement.  It causes the remaining statements inside the
+ bracketed clause to be skipped.  Execution resumes at the start of the next
+ iteration (if any remain in the loop condition).  See also `break`.
 2 Do
 ?commands do
 ?do
@@ -4328,6 +4342,7 @@ Ffigure_mapcontours
            plot filename title name
        }
        unset multiplot
+ See also `while`, `continue`, `break`.
 2 evaluate
 ?commands evaluate
 ?evaluate
@@ -14346,7 +14361,7 @@ Ffigure_missing
        }
  Execute a block of commands repeatedly so long as <expr> evaluates to 
  a non-zero value.  This command cannot be mixed with old-style (un-bracketed)
- if/else statements.  See `if`.
+ if/else statements.  See also `do`, `continue`, `break`.
 1 Terminal types
 ^ <h2> Terminal Types </h2>
 2 complete list of terminals

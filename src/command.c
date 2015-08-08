@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.308 2015/08/01 04:29:59 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.309 2015/08/01 18:57:09 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -186,6 +186,11 @@ TBOOLEAN if_condition = FALSE;
 TBOOLEAN if_open_for_else = FALSE;
 
 static int clause_depth = 0;
+
+/* support for 'break' and 'continue' commands */
+static int iteration_depth = 0;
+static TBOOLEAN requested_break = FALSE;
+static TBOOLEAN requested_continue = FALSE;
 
 static int command_exit_status = 0;
 
@@ -418,6 +423,10 @@ do_line()
     c_token = 0;
     while (c_token < num_tokens) {
 	command();
+	if (iteration_early_exit()) {
+	    c_token = num_tokens;
+	    break;
+	}
 	if (command_exit_status) {
 	    command_exit_status = 0;
 	    return 1;
@@ -778,6 +787,40 @@ bind_command()
 }
 #endif /* USE_MOUSE */
 
+/*
+ * 'break' and 'continue' commands act as in the C language.
+ * Skip to the end of current loop iteration and (for break)
+ * do not iterate further
+ */
+void
+break_command()
+{
+    c_token++;
+    if (iteration_depth == 0)
+	return;
+    /* Skip to end of current iteration */
+    c_token = num_tokens;
+    /* request that subsequent iterations should be skipped also */
+    requested_break = TRUE;
+}
+
+void
+continue_command()
+{
+    c_token++;
+    if (iteration_depth == 0)
+	return;
+    /* Skip to end of current clause */
+    c_token = num_tokens;
+    /* request that remainder of this iteration be skipped also */
+    requested_continue = TRUE;
+}
+
+TBOOLEAN
+iteration_early_exit()
+{
+    return (requested_continue || requested_break);
+}
 
 /*
  * Command parser functions
@@ -1042,7 +1085,11 @@ if_command()
 	    end_clause();
 	}
 
-	c_token = end_token;
+	if (iteration_early_exit())
+	    c_token = num_tokens;
+	else
+	    c_token = end_token;
+
 	return;
     }
 
@@ -1110,7 +1157,11 @@ else_command()
 	    end_clause();
 	}
 
-	c_token = end_token;
+	if (iteration_early_exit())
+	    c_token = num_tokens;
+	else
+	    c_token = end_token;
+
 	return;
     }
 
@@ -1154,17 +1205,24 @@ do_command()
     clause = new_clause(do_start, do_end);
     begin_clause();
 
+    iteration_depth++;
     if (empty_iteration(do_iterator))
 	strcpy(clause, ";");
 
     do {
+	requested_continue = FALSE;
 	do_string(clause);
+	if (requested_break)
+	    break;
     } while (next_iteration(do_iterator));
+    iteration_depth--;
 
     free(clause);
     end_clause();
     c_token = end_token;
     do_iterator = cleanup_iteration(do_iterator);
+    requested_break = FALSE;
+    requested_continue = FALSE;
 }
 
 /* process commands of the form 'while (foo) {...}' */
@@ -1190,15 +1248,22 @@ while_command()
     clause = new_clause(do_start, do_end);
     begin_clause();
 
+    iteration_depth++;
     while (exprval != 0) {
+	requested_continue = FALSE;
 	do_string(clause);
+	if (requested_break)
+	    break;
 	c_token = save_token;
 	exprval = real_expression();
     };
+    iteration_depth--;
 
     end_clause();
     free(clause);
     c_token = end_token;
+    requested_break = FALSE;
+    requested_continue = FALSE;
 }
 
 /*
@@ -1347,6 +1412,7 @@ clause_reset_after_error()
     if (clause_depth)
 	FPRINTF((stderr,"CLAUSE RESET after error at depth %d\n",clause_depth));
     clause_depth = 0;
+    iteration_depth = 0;
 }
 
 /* helper routine to multiplex mouse event handling with a timed pause command */

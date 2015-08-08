@@ -1,0 +1,24 @@
+#
+# Unit test for `break` and `continue` commands
+# Two different entry actions:
+# "load breaktest.dem" executes the main loop
+# "call breaktest.dem foo" executes the inner clause
+#
+if (ARGC == 0) {
+
+do for [i=1:6] {
+    print "start ", i;
+    call 'breaktest.dem' sub1
+    if (i > 4) { print ">>> ERROR <<<" }
+    print "end ", i
+}
+print "done with for loop"
+
+} else {
+
+print "   continue if i == 3, break if i > 4"
+if (i > 4) { break; }
+if (i == 3) { continue; print ">>> ERROR <<<" }
+print "      still in load file"
+
+}
