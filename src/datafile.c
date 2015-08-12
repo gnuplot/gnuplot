@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.290.2.9 2015/04/22 22:25:26 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.290.2.10 2015/07/14 18:37:44 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -288,6 +288,8 @@ static int df_skip_at_front = 0;
 static int df_pseudodata = 0;
 static int df_pseudorecord = 0;
 static int df_pseudospan = 0;
+static double df_pseudovalue_0 = 0;
+static double df_pseudovalue_1 = 0;
 
 /* for datablocks */
 static TBOOLEAN df_datablock = FALSE;
@@ -1891,6 +1893,15 @@ df_readascii(double v[], int max)
 	    /*}}} */
 	} else
 	    df_tokenise(s);
+
+	/* df_tokenise already processed everything, but in the case of pseudodata
+	 * '+' or '++' the value itself was passed as an ascii string formatted by
+	 * "%g".  We can do better than this by substituting in the binary value.
+	 */
+	if (df_pseudodata > 0)
+	    df_column[0].datum = df_pseudovalue_0;
+	if (df_pseudodata > 1)
+	    df_column[1].datum = df_pseudovalue_1;
 
 	/* Always save the contents of the first row in case it is needed for
 	 * later access via column("header").  However, unless we know for certain that
@@ -5219,6 +5230,7 @@ df_generate_pseudodata()
 	    t = AXIS_DE_LOG_VALUE(x_axis, t);
 	if (df_current_plot && df_current_plot->sample_var)
 	    Gcomplex(&(df_current_plot->sample_var->udv_value), t, 0.0);
+	df_pseudovalue_0 = t;
 	sprintf(line,"%g",t);
 	++df_pseudorecord;
     }
@@ -5271,10 +5283,14 @@ df_generate_pseudodata()
 	/* Duplicate algorithm from calculate_set_of_isolines() */
 	u = u_min + df_pseudorecord * u_step;
 	v = v_max - df_pseudospan * v_isostep;
-	if (parametric) 
-	    sprintf(line,"%g %g", u, v);
-	else
-	    sprintf(line,"%g %g", AXIS_DE_LOG_VALUE(u_axis,u), AXIS_DE_LOG_VALUE(v_axis,v));
+	if (parametric) {
+	    df_pseudovalue_0 = u;
+	    df_pseudovalue_1 = v;
+	} else {
+	    df_pseudovalue_0 = AXIS_DE_LOG_VALUE(u_axis,u);
+	    df_pseudovalue_1 = AXIS_DE_LOG_VALUE(v_axis,v);
+	}
+	sprintf(line,"%g %g", df_pseudovalue_0, df_pseudovalue_1);
 	++df_pseudorecord;
     }
 
