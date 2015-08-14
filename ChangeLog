@@ -1,8 +1,8 @@
 2015-08-14  Ethan A Merritt  <merritt@u.washington.edu>
 
-	* term/dumb.trm:  Handle UTF-8 encoding so long as each printed glyph
-	occupies only one character cell.  The code is specific to UTF-8;
-	i.e. it does not handle other multi-byte encodings.
+	* term/dumb.trm src/stdfn.h:  Handle UTF-8 encoding so long as each
+	printed glyph occupies only one character cell.  The code is specific
+	to UTF-8; i.e. it does not handle other multi-byte encodings.
 	Bug #1477
 
 2015-08-12  Ethan A Merritt  <merritt@u.washington.edu>
