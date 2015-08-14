@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: dumb.trm,v 1.32 2011/04/18 19:56:53 broeker Exp $
+ * $Id: dumb.trm,v 1.33 2013/04/22 20:14:24 markisch Exp $
  *
  */
 
@@ -100,8 +100,16 @@ TERM_PUBLIC void ENHdumb_FLUSH __PROTO((void));
 #define DUMB_AXIS_CONST '\1'
 #define DUMB_BORDER_CONST '\2'
 
+/* UTF-8 support */
+#ifdef HAVE_STDLIB_H
+#define DUMB_UTF8
+ typedef int32_t charcell;
+#else
+ typedef char charcell;
+#endif
+
 /* matrix of characters */
-static char *dumb_matrix = NULL;
+static charcell *dumb_matrix = NULL;
 /* matrix of priority at each position */
 static char *dumb_priority = NULL;
 /* current character used to draw */
@@ -200,11 +208,16 @@ DUMB_options()
 static void
 dumb_set_pixel(int x, int y, int v, int p)
 {
+    char *charpixel;
+
     if ((unsigned int) x <= dumb_xmax &&	/* ie x>=0 && x<=dumb_xmax */
 	(unsigned int) y <= dumb_ymax &&
 	p > dumb_priority[dumb_xmax * y + x]) {
-	dumb_matrix[dumb_xmax * y + x] = v;
-	dumb_priority[dumb_xmax * y + x] = p;
+	    dumb_priority[dumb_xmax * y + x] = p;
+	    charpixel = (char *)(&dumb_matrix[dumb_xmax * y + x]);
+	    /* null-terminate single ascii character (needed for UTF-8) */
+	    dumb_matrix[dumb_xmax * y + x] = 0;
+	    *charpixel = v;
     }
 }
 
@@ -212,12 +225,10 @@ dumb_set_pixel(int x, int y, int v, int p)
 TERM_PUBLIC void
 DUMB_init()
 {
-    if (dumb_matrix)
-	free(dumb_matrix);
+    int size = (dumb_xmax+1) * (dumb_ymax+1);
 
-    dumb_matrix = gp_alloc((dumb_xmax+1) * (dumb_ymax+1) * 2, "dumb terminal");
-
-    dumb_priority = dumb_matrix + dumb_xmax * dumb_ymax;
+    dumb_matrix = gp_realloc(dumb_matrix, size*sizeof(charcell), "dumb terminal");
+    dumb_priority = gp_realloc(dumb_priority, size*sizeof(char), "dumb terminal");
 }
 
 
@@ -225,11 +236,15 @@ TERM_PUBLIC void
 DUMB_graphics()
 {
     int i;
-    char *pm = dumb_matrix, *pp = dumb_priority;
+    int size = (dumb_xmax+1) * (dumb_ymax+1);
+    charcell *pm = dumb_matrix;
 
-    for (i = dumb_xmax * dumb_ymax; i > 0; i--) {
-	*pm++ = ' ';
-	*pp++ = 0;
+    memset(dumb_matrix, 0, size * sizeof(charcell));
+    memset(dumb_priority, 0, size * sizeof(char));
+
+    for (i=0; i<size; i++) {
+	char *c = (char *)pm++;
+	*c = ' ';
     }
 }
 
@@ -237,13 +252,18 @@ DUMB_graphics()
 TERM_PUBLIC void
 DUMB_text()
 {
-    int x, y, l;
+    int x, y;
 
     putc('\f', gpoutfile);
     for (y = dumb_ymax - 1; y >= 0; y--) {
-	for (l = dumb_xmax; l > 0 && DUMB_PIXEL(l - 1, y) == ' '; l--);
-	for (x = 0; x < l; x++)
-	    putc(DUMB_PIXEL(x, y), gpoutfile);
+	for (x = 0; x < dumb_xmax; x++) {
+#ifdef DUMB_UTF8
+	    char *c = (char *)(&dumb_matrix[dumb_xmax*y + x]);
+	    fputs(c, gpoutfile);
+#else
+	    fputc(DUMB_PIXEL(x, y), gpoutfile);
+#endif
+	}
 	if (dumb_feed || y > 0)
 	    putc('\n', gpoutfile);
     }
@@ -254,9 +274,10 @@ DUMB_text()
 TERM_PUBLIC void
 DUMB_reset()
 {
-    if (dumb_matrix)
-	free(dumb_matrix);
+    free(dumb_matrix);
+    free(dumb_priority);
     dumb_matrix = NULL;
+    dumb_priority = NULL;
 }
 
 
@@ -384,18 +405,36 @@ DUMB_vector(unsigned int arg_x, unsigned int arg_y)
     dumb_y = y;
 }
 
+static void
+utf8_copy_one(char *dest, char *orig)
+{
+    *((charcell *)dest) = 0;	/* zero-fill */
+    *dest = *orig;		/* first char */
+    if (encoding != S_ENC_UTF8)
+	return;
+    if ((*dest & 0x80) == 0)	/* ascii char */
+	return;
+    orig++; dest++;
+    while ((*orig & 0xc0) == 0x80)
+	*dest++ = *orig++;
+}
 
 TERM_PUBLIC void
 DUMB_put_text(unsigned int x, unsigned int y, const char *str)
 {
-    int length;
+    int i, length;
 
-    length = strlen(str);
+    length = gp_strlen(str);
     if (x + length > dumb_xmax)
 	x = GPMAX(0, dumb_xmax - length);
 
+#ifdef DUMB_UTF8
+    for (i = 0; i < length; i++, x++)
+	utf8_copy_one( (char *)(&DUMB_PIXEL(x, y)), gp_strchrn(str,i));
+#else
     for (; x < dumb_xmax && *str; x++, str++)
 	dumb_set_pixel(x, y, *str, 5);
+#endif
 }
 
 
@@ -483,17 +522,24 @@ ENHdumb_FLUSH()
 {
     char *str = enhanced_text;	/* The fragment to print */
     int x = dumb_x;		/* The current position  */
-    int len;
+    int y = dumb_y + (int)ENHdumb_base;
+    int i, len;
 
     if (ENHdumb_opened_string) {
 	*enhanced_cur_text = '\0';
-	len = strlen(str);
+	len = gp_strlen(str);
 
 	/* print the string fragment, perhaps invisibly */
 	/* NB: base expresses offset from current y pos */
-	for (; x < dumb_xmax && *str; x++, str++)
-	    if (ENHdumb_show)
-        	dumb_set_pixel(x, dumb_y+ENHdumb_base, *str, 5);
+	if (ENHdumb_show) {
+#ifdef DUMB_UTF8
+	    for (i = 0; i < len && x < dumb_xmax; i++, x++)
+		utf8_copy_one( (char *)(&DUMB_PIXEL(x, y)), gp_strchrn(str,i));
+#else
+	    for (; x < dumb_xmax && *str; x++, str++)
+		dumb_set_pixel(x, y, *str, 5);
+#endif
+	}
 
 	if (!ENHdumb_widthflag)
 	    /* don't update position */
