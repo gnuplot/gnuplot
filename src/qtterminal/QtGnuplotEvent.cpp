@@ -125,7 +125,7 @@ void QtGnuplotEventHandler::readEvent()
 			// FIXME EAM - At this point the program cannot recover and
 			// if we try to continue it will eventually become a zombie.
 			// Better to just exit explicitly right now.
-				qDebug() << "############### WRONG readEvent " << type << m_socket->bytesAvailable();
+				qDebug() << "qt_gnuplot exiting on read error";
 				exit(0);
 				// return;
 			}
