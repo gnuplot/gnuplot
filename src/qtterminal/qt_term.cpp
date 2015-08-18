@@ -975,7 +975,7 @@ int qt_waitforinput(int options)
 		{
 			if (!(qt->socket.waitForReadyRead(-1))) {
 				// Must be a socket error; we need to restart qt_gnuplot
-				qDebug() << "Error: gnuplot_qt socket not responding";
+				qDebug() << "Error: plot window (gnuplot_qt) not responding - will restart";
 				qt->gnuplot_qtStarted = false;
 				return '\0';
 			}
