@@ -243,7 +243,7 @@ void execGnuplotQt()
 	if (qt->gnuplot_qtStarted)
 		qt->localServerName = "qtgnuplot" + QString::number(pid);
 	else
-		qDebug() << "Could not start gnuplot_qt with path" << filename;
+		fprintf(stderr, "Could not start gnuplot_qt with path %s\n", filename.toUtf8().data());
 }
 
 /*-------------------------------------------------------
@@ -300,14 +300,14 @@ void qt_connectToServer(const QString& server, bool retry = true)
 		// The widget could not be reached: start a gnuplot_qt program which will create a QtGnuplotApplication
 		if (connectToWidget)
 		{
-			qDebug() << "Could not connect to widget" << qt_option->Widget << ". Starting a QtGnuplotApplication";
+			fprintf(stderr, "Could not connect to existing qt widget. Starting a new one.\n");
 			qt_option->Widget = QString();
 			qt_connectToServer(qt->localServerName);
 		}
 		// The gnuplot_qt program could not be reached: try to start a new one
 		else
 		{
-			qDebug() << "Could not connect to gnuplot_qt" << server << ". Starting a new one";
+			fprintf(stderr, "Could not connect to existing gnuplot_qt. Starting a new one.\n");
 			execGnuplotQt();
 			qt_connectToServer(qt->localServerName, false);
 		}
@@ -359,7 +359,7 @@ bool qt_processTermEvent(gp_event_t* event)
 		// This is an answer to a font metric request. We don't send it back to gnuplot
 		if ((event->par1 > 0) && (event->par2 > 0))
 		{
-			qDebug() << "qt_processTermEvent received a GE_fontprops event. This should not have happened";
+			fprintf(stderr, "qt_processTermEvent received a GE_fontprops event. This should not have happened\n");
 			return false;
 		}
 		// This is a resize event
@@ -979,7 +979,7 @@ int qt_waitforinput(int options)
 		{
 			if (!(qt->socket.waitForReadyRead(-1))) {
 				// Must be a socket error; we need to restart qt_gnuplot
-				qDebug() << "Error: plot window (gnuplot_qt) not responding - will restart";
+				fprintf(stderr, "Error: plot window (gnuplot_qt) not responding - will restart\n");
 				qt->gnuplot_qtStarted = false;
 				return '\0';
 			}
@@ -989,7 +989,7 @@ int qt_waitforinput(int options)
 			gp_event_t tempEvent;
 			tempEvent.type = -1;
 			if (qt->socket.bytesAvailable() < (int)sizeof(gp_event_t)) {
-				qDebug() << "Error: short read from gnuplot_qt socket";
+				fprintf(stderr, "Error: short read from gnuplot_qt socket\n");
 				return '\0';
 			}
 			while (qt->socket.bytesAvailable() >= (int)sizeof(gp_event_t))
