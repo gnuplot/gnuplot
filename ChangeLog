@@ -4,6 +4,11 @@
 	Make the error messages from a broken connection to gnuplot_qt less
 	alarming.  No change in functionality.  See Bug #1554
 
+	* src/qtterminal/qt_term.cpp:  Use fprintf(stderr, ...) instead of
+	qDebug() << ... for the inboard driver.  This allows allows Windows
+	to catch error messages by the redefinition of fprintf in wtext.h.
+	See Bug #1554
+
 2015-08-14  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/dumb.trm src/stdfn.h:  Handle UTF-8 encoding so long as each
