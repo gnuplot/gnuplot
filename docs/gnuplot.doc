@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.954 2015/08/08 18:32:17 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.955 2015/08/19 16:41:19 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -6783,6 +6783,13 @@ Ffigure_mapcontours
 
  This example does exactly the same thing as the previous example, but uses
  the string iterator form of the command rather than an integer iterator.
+
+ If an iteration is to continue until all available data is consumed, use the
+ symbol * instead of an integer <end>.
+
+ Examples:
+       splot for [i=0:*] 'datafile' index i using 1:2:3 with lines 
+       plot for [i=2:*] 'datafile' using 1:i with histogram
 
 3 title
 ?commands plot title

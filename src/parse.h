@@ -1,5 +1,5 @@
 /*
- * $Id: parse.h,v 1.29 2014/02/28 19:23:52 sfeam Exp $
+ * $Id: parse.h,v 1.30 2014/09/18 22:51:30 sfeam Exp $
  */
 
 /* GNUPLOT - parse.h */
@@ -109,6 +109,7 @@ extern t_iterator * set_iterator;		/* Used by set/unset commands */
 t_iterator * check_for_iteration __PROTO((void));
 TBOOLEAN next_iteration  __PROTO((t_iterator *));
 TBOOLEAN empty_iteration  __PROTO((t_iterator *));
+TBOOLEAN forever_iteration  __PROTO((t_iterator *));
 t_iterator * cleanup_iteration __PROTO((t_iterator *));
 
 void parse_link_via __PROTO((struct udft_entry *));

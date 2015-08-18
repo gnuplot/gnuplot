@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: parse.c,v 1.95 2015/08/01 04:17:48 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: parse.c,v 1.96 2015/08/05 15:50:39 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - parse.c */
@@ -1145,7 +1145,11 @@ check_for_iteration()
 	    iteration_start = int_expression();
 	    if (!equals(c_token++, ":"))
 	    	int_error(c_token-1, errormsg);
-	    iteration_end = int_expression();
+	    if (equals(c_token,"*")) {
+		iteration_end = INT_MAX;
+		c_token++;
+	    } else
+		iteration_end = int_expression();
 	    if (equals(c_token,":")) {
 	    	c_token++;
 	    	iteration_increment = int_expression();
@@ -1324,6 +1328,15 @@ cleanup_iteration(t_iterator *iter)
 	iter = next;
     }
     return NULL;
+}
+
+TBOOLEAN
+forever_iteration(t_iterator *iter)
+{
+    if (!iter)
+	return FALSE;
+    else
+	return (iter->iteration_end == INT_MAX);
 }
 
 /* The column() function requires special handling because

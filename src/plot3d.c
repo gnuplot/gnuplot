@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.240 2015/08/01 04:20:37 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.241 2015/08/01 04:35:44 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -1295,6 +1295,8 @@ eval_3dplots()
     int i;
     struct surface_points **tp_3d_ptr;
     int start_token=0, end_token;
+    int highest_iteration = 0;	/* last index reached in iteration [i=start:*] */
+    TBOOLEAN eof_during_iteration = FALSE;  /* set when for [n=start:*] hits NODATA */
     int begin_token;
     TBOOLEAN some_data_files = FALSE, some_functions = FALSE;
     TBOOLEAN was_definition = FALSE;
@@ -1413,6 +1415,7 @@ eval_3dplots()
 
 		this_plot->plot_type = DATA3D;
 		this_plot->plot_style = data_style;
+		eof_during_iteration = FALSE;
 
 		df_set_plot_mode(MODE_SPLOT);
 		specs = df_open(name_str, MAXDATACOLS, (struct curve_points *)this_plot);
@@ -1933,6 +1936,13 @@ eval_3dplots()
 	    SKIPPED_EMPTY_FILE:
 	    if (empty_iteration(plot_iterator))
 		this_plot->plot_type = NODATA;
+	    if (forever_iteration(plot_iterator) && (this_plot->plot_type == NODATA)) {
+		highest_iteration = plot_iterator->iteration_current;
+		eof_during_iteration = TRUE;
+	    }
+	    if (forever_iteration(plot_iterator) && (this_plot->plot_type == FUNC3D)) {
+		int_error(NO_CARET, "unbounded iteration in function plot");
+	    }
 
 	}			/* !is_definition() : end of scope of this_plot */
 
@@ -1945,8 +1955,11 @@ eval_3dplots()
 	}
 
 	/* Iterate-over-plot mechanisms */
-	if (next_iteration(plot_iterator)) {
+	if (eof_during_iteration) {
+	    /* Nothing to do */ ;
+	} else if (next_iteration(plot_iterator)) {
 	    c_token = start_token;
+	    highest_iteration = plot_iterator->iteration_current;
 	    continue;
 	}
 
@@ -2129,8 +2142,10 @@ eval_3dplots()
 
 	    /* Iterate-over-plot mechanism */
 	    if (crnt_param == 0 && next_iteration(plot_iterator)) {
-		c_token = start_token;
-		continue;
+		if (plot_iterator->iteration_current <= highest_iteration) {
+		    c_token = start_token;
+		    continue;
+		}
 	    }
 
 	    if (crnt_param == 0)

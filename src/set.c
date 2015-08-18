@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.497 2015/08/01 04:39:47 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.498 2015/08/03 04:16:38 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -199,13 +199,17 @@ set_command()
 	unset_command();
     } else {
 
-	int save_token;
+	int save_token = c_token;
 	set_iterator = check_for_iteration();
 	if (empty_iteration(set_iterator)) {
 	    /* Skip iteration [i=start:end] where start > end */
 	    while (!END_OF_COMMAND) c_token++;
-	    cleanup_iteration(set_iterator);
+	    set_iterator = cleanup_iteration(set_iterator);
 	    return;
+	}
+	if (forever_iteration(set_iterator)) {
+	    set_iterator = cleanup_iteration(set_iterator);
+	    int_error(save_token, "unbounded iteration");
 	}
 	save_token = c_token;
 	ITERATE:
