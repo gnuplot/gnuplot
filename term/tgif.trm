@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*- */
-/* $Id: tgif.trm,v 1.54 2013/08/09 02:54:16 sfeam Exp $ */
+/* $Id: tgif.trm,v 1.55 2014/01/30 05:50:53 sfeam Exp $ */
 
 /* GNUPLOT - tgif.trm */
 
@@ -634,44 +634,6 @@ TGIF_vector(unsigned int ux, unsigned int uy)
     }
 }				/* TGIF_vector */
 /*}}}  */
-#if (0) /* Not used any more */
-/***************************************************************************/
-TERM_PUBLIC void
-TGIF_arrow(
-    unsigned int sx, unsigned int sy,
-    unsigned int ex, unsigned int ey,
-    int head)
-{
-
-    TGIF_flush_poly();
-
-    sx = sx + uXshift;
-    ex = ex + uXshift;
-    sy = uYshift - sy;
-    ey = uYshift - ey;
-
-
-    if (head) {
-	fprintf(gpoutfile, "\
-poly('%s',%d,[\n\
-\t%u,%u,%u,%u],1,%u,1,%u,0,0,%u,0,8,3,0,[\n]).\n",
-		sActColor, 2, sx, sy, ex, ey, uActThick, uActNr, uActStyle);
-    } else {
-	fprintf(gpoutfile, "\
-poly('%s',%d,[\n\
-\t%u,%u,%u,%u],1,%u,1,%u,0,0,%u,0,8,3,0,[\n]).\n",
-		sActColor, 2, sx, sy, ex, ey, uActThick, uActNr, uActStyle);
-    }
-
-    uActNr++;
-
-
-
-    uLastTgifX = ex;
-    uLastTgifY = ey;
-
-}				/* TGIF_arrow */
-#endif
 
 /*}}}  */
 /***************************************************************************/

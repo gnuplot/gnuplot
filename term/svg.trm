@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: svg.trm,v 1.170 2014/06/10 19:55:18 sfeam Exp $
+ * $Id: svg.trm,v 1.171 2015/05/13 19:15:58 sfeam Exp $
  */
 
 /*------------------------------------------------------------------------------------------------------------------------------------
@@ -1881,17 +1881,6 @@ ENHsvg_OPEN(
 
 	/* Start a new textspan fragment */
 	fputs("<tspan", gpoutfile);
-#if (0)
-	if (strcmp(SVG_fontNameCur, fontname)) {
-	    free(SVG_fontNameCur);
-	    SVG_fontNameCur = gp_strdup(fontname);
-	    fprintf(gpoutfile, " font-family=\"%s\" ", SVG_fontNameCur);
-	}
-	if (SVG_fontWeightCur && strcmp(SVG_fontWeightCur,"normal"))
-	    fprintf(gpoutfile, " font-weight=\"%s\" ", SVG_fontWeightCur);
-	if (SVG_fontStyleCur && strcmp(SVG_fontStyleCur,"normal"))
-	    fprintf(gpoutfile, " font-style=\"%s\" ", SVG_fontStyleCur);
-#else
 	if (!fontname)
 	    fprintf(stderr,"ENHsvg_OPEN: null fontname\n");
 	else {
@@ -1911,7 +1900,6 @@ ENHsvg_OPEN(
 	    if (strstr(fontname,":Italic"))
 		fprintf(gpoutfile, " font-style=\"italic\" ");
 	}
-#endif
 	if (SVG_fontSizeCur != fontsize) {
 	    SVG_fontSizeCur = fontsize;
 	    fprintf(gpoutfile, " font-size=\"%.1f\"", SVG_fontSizeCur * SVG_fontscale);

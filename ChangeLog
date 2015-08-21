@@ -13,6 +13,10 @@
 	axes.  3D offsets are still a sore point.
 	Bug #1662
 
+	* src/datafile.c src/eval.c src/gp_types.h src/graphics.c sec/plot3d.c
+	src/save.c term/svg.trm term/tgif.trm:
+	Remove dead code.
+
 2015-08-18  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/parse.c src/parse.h src/plot2d.c src/plot3d.c src/set.c

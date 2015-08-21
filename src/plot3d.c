@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.241 2015/08/01 04:35:44 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.242 2015/08/19 18:06:09 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -61,21 +61,6 @@ static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.241 2015/08/01 04:35:44 s
 # include "help.h"
 #endif
 
-/* Sep 2013 - moved from axis.h in the process of doing away with it altogether */
-#if (1)	/* FIXME:  I'm 99% sure TRUE is fine, i.e. NEED_PALETTE is unnecessary. */
-	/* In any event, the alternative breaks splot with rgb variable */
-#define NEED_PALETTE(plot) TRUE
-#else
-#define NEED_PALETTE(plot) \
-    (  (pm3d.implicit == PM3D_IMPLICIT) \
-    || ((plot)->plot_style == PM3DSURFACE) \
-    || ((plot)->plot_style == IMAGE) \
-    || (plot)->lp_properties.pm3d_color.type == TC_CB \
-    || (plot)->lp_properties.pm3d_color.type == TC_FRAC \
-    || (plot)->lp_properties.pm3d_color.type == TC_Z \
-    )
-#endif
-
 /* global variables exported by this module */
 
 t_data_mapping mapping3d = MAP3D_CARTESIAN;
@@ -93,8 +78,8 @@ TBOOLEAN dgrid3d_kdensity = FALSE;
 
 static void calculate_set_of_isolines __PROTO((AXIS_INDEX value_axis, TBOOLEAN cross, struct iso_curve **this_iso,
 					       AXIS_INDEX iso_axis, double iso_min, double iso_step, int num_iso_to_use,
-					       AXIS_INDEX sam_axis, double sam_min, double sam_step, int num_sam_to_use,
-					       TBOOLEAN need_palette));
+					       AXIS_INDEX sam_axis, double sam_min, double sam_step, int num_sam_to_use
+					       ));
 static int get_3ddata __PROTO((struct surface_points * this_plot));
 static void eval_3dplots __PROTO((void));
 static void grid_nongrid_data __PROTO((struct surface_points * this_plot));
@@ -1101,12 +1086,10 @@ get_3ddata(struct surface_points *this_plot)
 		if (this_plot->lp_properties.l_type == LT_COLORFROMCOLUMN)
 		    cp->CRD_COLOR = color;
 
-		if (NEED_PALETTE(this_plot)) {
-		    if (pm3d_color_from_column) {
-			COLOR_STORE_WITH_LOG_AND_UPDATE_RANGE(cp->CRD_COLOR, color, cp->type, COLOR_AXIS, this_plot->noautoscale, NOOP, goto come_here_if_undefined);
-		    } else {
-			COLOR_STORE_WITH_LOG_AND_UPDATE_RANGE(cp->CRD_COLOR, z, cp->type, COLOR_AXIS, this_plot->noautoscale, NOOP, goto come_here_if_undefined);
-		    }
+		if (pm3d_color_from_column) {
+		    COLOR_STORE_WITH_LOG_AND_UPDATE_RANGE(cp->CRD_COLOR, color, cp->type, COLOR_AXIS, this_plot->noautoscale, NOOP, goto come_here_if_undefined);
+		} else {
+		    COLOR_STORE_WITH_LOG_AND_UPDATE_RANGE(cp->CRD_COLOR, z, cp->type, COLOR_AXIS, this_plot->noautoscale, NOOP, goto come_here_if_undefined);
 		}
 	    }
 
@@ -1225,12 +1208,11 @@ calculate_set_of_isolines(
     int num_iso_to_use,
     AXIS_INDEX sam_axis,
     double sam_min, double sam_step,
-    int num_sam_to_use,
-    TBOOLEAN need_palette)
+    int num_sam_to_use)
 {
     int i, j;
     struct coordinate GPHUGE *points = (*this_iso)->points;
-    int do_update_color = need_palette && (!parametric || (parametric && value_axis == FIRST_Z_AXIS));
+    int do_update_color = (!parametric || (parametric && value_axis == FIRST_Z_AXIS));
 
     for (j = 0; j < num_iso_to_use; j++) {
 	double iso = iso_min + j * iso_step;
@@ -2110,8 +2092,7 @@ eval_3dplots()
 					      v_axis, v_min, v_isostep,
 					      num_iso_to_use,
 					      u_axis, u_min, u_step,
-					      num_sam_to_use,
-					      NEED_PALETTE(this_plot));
+					      num_sam_to_use);
 
 		    if (!hidden3d) {
 			num_iso_to_use = iso_samples_1;
@@ -2121,8 +2102,7 @@ eval_3dplots()
 						  u_axis, u_min, u_isostep,
 						  num_iso_to_use,
 						  v_axis, v_min, v_step,
-						  num_sam_to_use,
-						  NEED_PALETTE(this_plot));
+						  num_sam_to_use);
 		    }
 		    /*}}} */
 		}		/* end of ITS A FUNCTION TO PLOT */

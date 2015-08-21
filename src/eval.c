@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: eval.c,v 1.126 2015/07/15 05:11:44 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: eval.c,v 1.127 2015/07/15 18:30:16 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - eval.c */
@@ -628,9 +628,8 @@ execute_at(struct at_type *at_ptr)
     jump_offset = saved_jump_offset;
 }
 
-/* May 2013: Old hackery #ifdef'ed out so that input of Inf/NaN */
-/* values through evaluation is treated equivalently to direct  */
-/* input of a formated value.  See revised imageNaN demo.       */
+/* As of May 2013 input of Inf/NaN values through evaluation is treated */
+/* equivalently to direct input of a formated value.  See imageNaN.dem. */
 void
 evaluate_at(struct at_type *at_ptr, struct value *val_ptr)
 {
@@ -651,36 +650,10 @@ evaluate_at(struct at_type *at_ptr, struct value *val_ptr)
 
     if (errno == EDOM || errno == ERANGE)
 	undefined = TRUE;
-#if (1)	/* New code */
     else if (!undefined) {
 	(void) pop(val_ptr);
 	check_stack();
     }
-
-#else /* Old hackery */
-    else if (!undefined) { /* undefined (but not errno) may have been set by matherr */
-	(void) pop(val_ptr);
-	check_stack();
-	/* At least one machine (ATT 3b1) computes Inf without a SIGFPE */
-	if (val_ptr->type != STRING) {
-	    double temp = real(val_ptr);
-	    if (temp > VERYLARGE || temp < -VERYLARGE)
-		undefined = TRUE;
-	}
-    }
-#if defined(NeXT) || defined(ultrix)
-    /*
-     * linux was able to fit curves which NeXT gave up on -- traced it to
-     * silently returning NaN for the undefined cases and plowing ahead
-     * I can force that behavior this way.  (0.0/0.0 generates NaN)
-     */
-    if (undefined && (errno == EDOM || errno == ERANGE)) {	/* corey@cac */
-	undefined = FALSE;
-	errno = 0;
-	Gcomplex(val_ptr, 0.0 / 0.0, 0.0 / 0.0);
-    }
-#endif /* NeXT || ultrix */
-#endif /* old hackery */
 }
 
 void

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.283 2015/07/12 20:43:24 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.284 2015/08/03 04:16:38 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -1223,12 +1223,6 @@ save_position(FILE *fp, struct position *pos, TBOOLEAN offset)
 	fprintf(fp, "%s%g", 
 	    pos->scalez == pos->scaley ? "" : coord_msg[pos->scalez], pos->z);
     }
-#if (0) /* v4 code */
-    fprintf(fp, "%s%g, %s%g, %s%g",
-	    pos->scalex == first_axes ? "" : coord_msg[pos->scalex], pos->x,
-	    pos->scaley == pos->scalex ? "" : coord_msg[pos->scaley], pos->y,
-	    pos->scalez == pos->scaley ? "" : coord_msg[pos->scalez], pos->z);
-#endif
 }
 
 
