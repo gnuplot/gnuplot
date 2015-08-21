@@ -1,3 +1,9 @@
+2015-08-21  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* docs/doc2tex.c (process_line): Improve passing of hyperlinks to
+	pdftex.  Allow both multi-line and single line format, for both
+	external and internal hrefs.
+
 2015-08-21  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c (map_position_r):  There is no way to indicate

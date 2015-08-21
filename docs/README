@@ -40,7 +40,7 @@ gnuplot interactive help facility to the system facility, this can be
 easily changed by not defining NO_GIH.
 
 The PDF and HTML versions of the gnuplot manual can include hyperlinks to
-demonstration plots.  There is a special makefile target "make pdffigures"
+demonstration plots.  There is a special makefile target "make pdf"
 to generate and include sample plots directly in the manual itself.
 
 Under EMACS, interactive help uses the file "gnuplot.info" ('make info').

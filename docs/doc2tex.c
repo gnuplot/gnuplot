@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: doc2tex.c,v 1.26 2014/03/22 19:35:21 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: doc2tex.c,v 1.27 2015/02/15 16:39:20 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - doc2tex.c */
@@ -215,30 +215,51 @@ process_line( char *line, FILE *b)
 	}
     case '^':{			/* external link escape */
                                 /* internal link escape */
-             /* convert '^ <a href="xxx">yyy</a>' to '\href{xxx}{yyy}' */
-	     /* convert '^ <a href="#xxx"></a> to '\ref{xxx}' */
-	     /* convert '^ <a name="xxx"></a> to '\label{xxx}' */
+            /* convert '^ <a href="xxx">yyy</a>' to '\href{xxx}{yyy}' */
+            /* convert '^ <a href="xxx">yyy to '\href{xxx}{yyy' */
+	    /* convert '^ </a>' after above to '}' */
+	    /* convert '^ <a href="#xxx">yyy</a> to 'yyy (\pageref{xxx})' */
+	    /* convert '^ <a href="#xxx"> to '{' (and save 'xxx') */
+	    /* convert '^ </a>' after above to '(\pageref(xxx)}' from saved 'xxx' */
+	    /* convert '^ <a name="xxx"></a> to '\label{xxx}' */
+	    /* HBB NOTE 2015-08-21: the program expects the above formats to match input
+	     * exactly, i.e. no extra whitespace anywhere! */
+
+	    static TBOOLEAN in_internal_href = FALSE;
+	    static char internal_href_string[MAX_LINE_LEN + 1];
+
             switch (line[3]) {
             case 'a':{
                     switch (line[5]) {
                     case 'h':{
+			    /* distinguish between external (full URL) and internal(#name) hrefs */
 	                    if (line[11] == '#') {
                                 fputs("{\\bf ",b);
                                 parsed = 0;
 		                for (i = 12; (c = line[i]) != '"'; i++) {
-                                    string[i-12] = c;
+                                    string[i - 12] = c;
                                 }
-                                string[i-12]= NUL;
-                                i++;i++;
-                                for ( ; i < initlen-5; i++) {
-                                     fputc(line[i],b);
-                                }
-                                fputs(" (p.~\\pageref{",b);
-                                fputs(string,b);
-                                fputs("})}} ",b);
-                                inhref = FALSE;
+                                string[i - 12]= NUL;
+                                i += 2; /* skip closing "> */
+				if ((i >= (initlen - 5)) || !strstr(line, "</a>")) {
+				    /* HBB CODEME 2015-08-21: no yyy text, or no closing </a>.
+				    ** treat this as a multiline href, and just output the entry TeX for now: */
+				    inhref = TRUE;
+				    in_internal_href = TRUE;
+				    strcpy(internal_href_string, string);
+				} else {
+				    for ( ; i < (initlen - 5); i++) {
+				         fputc(line[i],b);
+				    }
+				    fputs(" (p.~\\pageref{",b);
+				    fputs(string,b);
+				    fputs("})} ",b);
+				    inhref = FALSE;
+				    in_internal_href = FALSE;
+				}
                             } else {
 	                        inhref = TRUE;
+				in_internal_href = FALSE;
                                 if (strstr(line,"</a>") == NULL){
                                    fputs("\\par\\hskip2.7em\\href{",b);
                                 } else {
@@ -280,9 +301,15 @@ process_line( char *line, FILE *b)
                     break;
     	       }
             case '/':
-		    if ( line[4] == 'a') {
-		        fputs("}\n\n",b);
-                        inhref = FALSE;
+		    if ((line[4] == 'a') && inhref) {
+			if (in_internal_href) {
+			    fputs(" (p.~\\pageref{",b);
+			    fputs(internal_href_string,b);
+			    fputs("})} ",b);
+		        } else {
+		            fputs("}\n\n",b);
+                            inhref = FALSE;
+			}
                     }
 		    break;
             default:
