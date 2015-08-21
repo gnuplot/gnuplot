@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.464.2.10 2015/03/19 17:35:39 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.464.2.11 2015/06/15 22:29:00 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -3557,6 +3557,11 @@ map_position_r(
     double *x, double *y,
     const char *what)
 {
+    /* Catches the case of "first" or "second" coords on a log-scaled axis */
+    if (pos->x == 0)
+	*x = 0;
+    else
+
     switch (pos->scalex) {
     case first_axes:
 	{
@@ -3592,6 +3597,11 @@ map_position_r(
     /* Maybe they only want one coordinate translated? */
     if (y == NULL)
 	return;
+
+    /* Catches the case of "first" or "second" coords on a log-scaled axis */
+    if (pos->y == 0)
+	*y = 0;
+    else
 
     switch (pos->scaley) {
     case first_axes:

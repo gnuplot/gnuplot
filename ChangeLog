@@ -1,3 +1,12 @@
+2015-08-21  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/graphics.c (map_position_r):  There is no way to indicate
+	"no offset" as opposed to "offset 0", which was causing problems
+	if "offset 0" was applied as axis coordinates on a log-scaled axis.
+	Now in 2D "offset 0" is interpreted as no offset even for log-scaled
+	axes.  3D offsets are still a sore point.
+	Bug #1662
+
 2015-08-18  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/qtterminal/QtGnuplotEvent.cpp src/qtterminal/qt_term.cpp:

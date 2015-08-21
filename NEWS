@@ -12,6 +12,7 @@ Changes since 5.0.1
 * FIX clean handling of unexpected input commands or data found by fuzz-testing
 * FIX many places where corrupt input commands or data could trigger a crash
 * FIX aquaterm fill area with transparency
+* FIX "offset 0" means "no offset" even in the case of log-scaled axes
 
 Changes in 5.0.1
 ================
