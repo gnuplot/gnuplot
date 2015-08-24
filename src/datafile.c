@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.290.2.11 2015/08/12 20:03:38 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.290.2.12 2015/08/24 17:35:47 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -1878,7 +1878,7 @@ df_readascii(double v[], int max)
 	    if (df_max_cols < 7)
 		expand_df_column(7);
 
-	    df_no_cols = sscanf(line, df_format,
+	    df_no_cols = sscanf(s, df_format,
 				&df_column[0].datum,
 				&df_column[1].datum,
 				&df_column[2].datum,

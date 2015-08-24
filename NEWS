@@ -13,6 +13,7 @@ Changes since 5.0.1
 * FIX many places where corrupt input commands or data could trigger a crash
 * FIX aquaterm fill area with transparency
 * FIX "offset 0" means "no offset" even in the case of log-scaled axes
+* FIX handle formatted read from a datablock
 
 Changes in 5.0.1
 ================
