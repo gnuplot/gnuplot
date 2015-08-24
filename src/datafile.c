@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.309 2015/08/12 20:03:26 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.310 2015/08/21 20:45:02 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -1313,6 +1313,11 @@ df_open(const char *cmd_filename, int max_using, struct curve_points *plot)
 	    int_error(name_token, "cannot plot from stdin/stdout/stderr");
 	else if ((data_fp = fdopen(data_fd, "r")) == (FILE *) NULL)
 	    int_error(name_token, "cannot open file descriptor for reading data");
+
+	/* if this stream isn't seekable, set it to volatile */
+        if (fseek(data_fp, 0, SEEK_CUR) < 0)
+	    volatile_data = TRUE;
+
     } else
 #endif /* HAVE_FDOPEN */
 #if defined(PIPES)
