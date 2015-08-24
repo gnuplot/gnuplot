@@ -1,3 +1,11 @@
+2015-08-24  Dima Kogan  <dima@secretsauce.net>
+
+	* src/datafile.c (df_open): 
+	Syntax  "<&N"  plots data read from an arbitrary file descriptor, but
+	that descriptor may be a pipe (non-seekable) rather than a true file
+	(seekable). If the fd is not seekable, mark it a "volatile" so that
+	gnuplot doesn't try to reread it on "replot".
+
 2015-08-21  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c (map_position_r):  There is no way to indicate
