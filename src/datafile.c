@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.311 2015/08/24 17:35:36 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.312 2015/08/24 20:11:59 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -1543,6 +1543,8 @@ plot_option_index()
 
     /* Numerical index list */
     df_lower_index = int_expression();
+    if (df_lower_index < 0)
+	int_error(c_token, "index must be non-negative");
     if (equals(c_token, ":")) {
 	++c_token;
 	if (equals(c_token, ":")) {
@@ -1558,8 +1560,9 @@ plot_option_index()
 	    if (df_index_step < 1)
 		int_error(c_token, "Index step must be positive");
 	}
-    } else
+    } else {
 	df_upper_index = df_lower_index;
+    }
 }
 
 #ifdef BACKWARDS_COMPATIBLE
