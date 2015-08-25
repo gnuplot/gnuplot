@@ -2,6 +2,10 @@
 
 	* src/datafile.c (plot_option_index):  Sanity check that index >= 0.
 
+	* src/datafile.c (df_determine_matrix_info):  "skip" option applies to
+	records at the start of ascii matrix data as it does for normal ascii
+	files.
+
 2015-08-24  Ethan A Merritt  <merritt@u.washington.edu>
 	
 	* src/datafile.c (df_readascii):  The code supporting an input format
