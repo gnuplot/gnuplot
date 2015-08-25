@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.290.2.12 2015/08/24 17:35:47 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.290.2.13 2015/08/24 20:11:25 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -1499,6 +1499,8 @@ plot_option_index()
 
     /* Numerical index list */
     df_lower_index = int_expression();
+    if (df_lower_index < 0)
+	int_error(c_token,"index must be non-negative");
     if (equals(c_token, ":")) {
 	++c_token;
 	if (equals(c_token, ":")) {
