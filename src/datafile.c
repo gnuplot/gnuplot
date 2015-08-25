@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.312 2015/08/24 20:11:59 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.313 2015/08/26 04:26:17 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -2374,6 +2374,12 @@ df_determine_matrix_info(FILE *fin)
 	/* If the user has set an explicit locale for numeric input, apply it */
 	/* here so that it affects data fields read from the input file.      */
 	set_numeric_locale();
+
+	/* "skip" option to skip lines at start of ascii file */
+	while (df_skip_at_front > 0) {
+	    df_gets();
+	    df_skip_at_front--;
+	}
 
 	/* Keep reading matrices until file is empty. */
 	while (1) {
