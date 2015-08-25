@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.314 2015/08/26 04:32:23 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.315 2015/08/26 04:37:24 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -351,10 +351,10 @@ static char *df_key_title = NULL;     /* filled in from column header if request
  * EAM Jul 2014 - Add keywords "columnheaders" and "rowheaders" to indicate ascii
  * matrix data in the uniform grid format containing labels in row 1 and column 1.
  */
-TBOOLEAN df_read_binary;
-TBOOLEAN df_nonuniform_matrix;
-TBOOLEAN df_matrix_columnheaders, df_matrix_rowheaders;
-int df_plot_mode;
+static TBOOLEAN df_read_binary;
+static TBOOLEAN df_nonuniform_matrix;
+static TBOOLEAN df_matrix_columnheaders, df_matrix_rowheaders;
+static int df_plot_mode;
 
 static int df_readascii __PROTO((double [], int));
 static int df_readbinary __PROTO((double [], int));
@@ -427,9 +427,9 @@ static df_byte_read_order_type byte_read_order __PROTO((df_endianess_type));
 TBOOLEAN df_binary_file;
 TBOOLEAN df_matrix_file;
 
-int df_M_count;
-int df_N_count;
-int df_O_count;
+static int df_M_count;
+static int df_N_count;
+static int df_O_count;
 
 /* Initially set to default and then possibly altered by command line. */
 df_binary_file_record_struct *df_bin_record = 0;
@@ -488,14 +488,15 @@ struct gen_ftable df_bin_filetype_table[] = {
 #define RAW_FILETYPE 1
 
 /* Initially set to default and then possibly altered by command line. */
-int df_bin_filetype;
-df_endianess_type df_bin_file_endianess;
+static int df_bin_filetype;
 /* Default setting. */
-int df_bin_filetype_default;
-df_endianess_type df_bin_file_endianess_default;
+static int df_bin_filetype_default;
+static df_endianess_type df_bin_file_endianess_default;
 /* Setting that is transferred to default upon reset. */
-int df_bin_filetype_reset = -1;
+static int df_bin_filetype_reset = -1;
 #define DF_BIN_FILE_ENDIANESS_RESET THIS_COMPILER_ENDIAN
+/* This one is needed by breaders.c */
+df_endianess_type df_bin_file_endianess;
 
 typedef struct df_bin_scan_table_2D_struct {
     char *string;
@@ -3831,15 +3832,9 @@ df_add_binary_records(int num_records_to_add, df_records_type records_type)
     new_number = *num_bin_records + num_records_to_add;
 
     if (new_number > *max_num_bin_records) {
-	*bin_record
-	    = gp_realloc(*bin_record,
+	*bin_record = gp_realloc(*bin_record,
 			 new_number * sizeof(df_binary_file_record_struct),
 			 "binary file data records");
-	if (!*bin_record) {
-	    *max_num_bin_records = 0;
-	    int_error(c_token,
-		      "Error assigning memory for binary file data records");
-	}
 	*max_num_bin_records = new_number;
     }
 
@@ -4981,12 +4976,9 @@ df_readbinary(double v[], int max)
 		/* Read reset of first row? */
 		if (!df_M_count && !df_N_count && !df_O_count
 		    && first_matrix_row_col_count < scan_size[0]) {
-		    if (!first_matrix_row_col_count
-			&& ! (scanned_matrix_row =
-			      gp_realloc(scanned_matrix_row,
-					 scan_size[0]*sizeof(float),
-					 "gpbinary matrix row")))
-			int_error(NO_CARET, "not enough memory to create vector");
+		    if (!first_matrix_row_col_count)
+			scanned_matrix_row = gp_realloc(scanned_matrix_row,
+					 scan_size[0]*sizeof(float), "gpbinary matrix row");
 		    scanned_matrix_row[first_matrix_row_col_count] = df_column[i].datum;
 		    first_matrix_row_col_count++;
 		    if (first_matrix_row_col_count == scan_size[0]) {
