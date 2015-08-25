@@ -5,7 +5,13 @@
 	* src/datafile.c (df_determine_matrix_info):  "skip" option applies to
 	records at the start of ascii matrix data as it does for normal ascii
 	files.
-	
+
+	* src/datafile.c (initialize_plot_style):
+	Some binary file options need to know what style of plot is involved.
+	This lookup was being done as part of adjust_binary_use_spec(), but
+	not all plots need to call that routine for anything else.
+	Move the plot style lookup into a separate routine.
+
 2015-08-24  Ethan A Merritt  <merritt@u.washington.edu>
 	
 	* src/datafile.c (df_readascii):  The code supporting an input format

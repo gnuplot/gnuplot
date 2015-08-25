@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.313 2015/08/26 04:26:17 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.314 2015/08/26 04:32:23 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -360,10 +360,11 @@ static int df_readascii __PROTO((double [], int));
 static int df_readbinary __PROTO((double [], int));
 
 static void initialize_use_spec __PROTO((void));
+static void initialize_plot_style __PROTO((struct curve_points *));
 
 static void initialize_binary_vars __PROTO((void));
 static void df_insert_scanned_use_spec __PROTO((int));
-static void adjust_binary_use_spec __PROTO((void));
+static void adjust_binary_use_spec __PROTO((struct curve_points *));
 static void clear_binary_records __PROTO((df_records_type));
 static void plot_option_binary_format __PROTO((char *));
 static void plot_option_binary __PROTO((TBOOLEAN, TBOOLEAN));
@@ -1015,6 +1016,21 @@ initialize_use_spec()
     }
 }
 
+static void
+initialize_plot_style(struct curve_points *plot)
+{
+    int save_token = c_token;
+
+    if (!plot)
+	return;
+
+    for ( ; !END_OF_COMMAND; c_token++)
+	if (almost_equals(c_token, "w$ith")) {
+	    plot->plot_style = get_style();
+	    break;
+	}
+    c_token = save_token;
+}
 
 /*{{{  int df_open(char *file_name, int max_using, plot_header *plot) */
 
@@ -1368,6 +1384,10 @@ df_open(const char *cmd_filename, int max_using, struct curve_points *plot)
     }
 /*}}} */
 
+    /* Binary file options are handled differently depending on the plot style. */
+    /* Peek ahead in the command line to see if there is a "with <style>" later.*/
+    if (df_binary_file || df_matrix_file)
+	initialize_plot_style(plot);
 
     /* If the data is in binary matrix form, read in some values
      * to determine the nubmer of columns and rows.  If data is in
@@ -1392,9 +1412,10 @@ df_open(const char *cmd_filename, int max_using, struct curve_points *plot)
      */
     if (df_binary_file || df_matrix_file) {
 	df_read_binary = TRUE;
-	adjust_binary_use_spec();
-    } else
+	adjust_binary_use_spec(plot);
+    } else {
 	df_read_binary = FALSE;
+    }
 
     /* Make information about whether the data forms a grid or not
      * available to the outside world.  */
@@ -3221,13 +3242,11 @@ df_bin_default_columns default_style_cols[] = {
  */
 
 static void
-adjust_binary_use_spec()
+adjust_binary_use_spec(struct curve_points *plot)
 {
-
     char *nothing_known = "No default columns known for that plot style";
-    enum PLOT_STYLE plot_style;
     unsigned int ps_index;
-    int c_token_copy;
+    enum PLOT_STYLE plot_style = plot ? plot->plot_style : LINES;
 
     /* The default binary matrix format is nonuniform, i.e. 
      * it has an extra row and column for sample coordinates.
@@ -3235,24 +3254,13 @@ adjust_binary_use_spec()
     if (df_matrix_file && df_binary_file)
 	df_nonuniform_matrix = TRUE;
 
-    c_token_copy = c_token;
- 
-    for ( ; !END_OF_COMMAND; c_token++)
-	if (almost_equals(c_token, "w$ith"))
-	    break;
-    if (!END_OF_COMMAND)
-	plot_style = get_style();
-    else
-	plot_style = LINES;
-    c_token = c_token_copy;
-
     /* Determine index. */
     for (ps_index = 0; ps_index < sizeof(default_style_cols)/sizeof(default_style_cols[0]); ps_index++) {
 	if (default_style_cols[ps_index].plot_style == plot_style)
 	    break;
     }
     if (ps_index == sizeof(default_style_cols)/sizeof(default_style_cols[0]))
-	int_error(c_token_copy, nothing_known);
+	int_error(NO_CARET, nothing_known);
 
     /* Matrix format is interpretted as always having three columns. */
     if (df_matrix_file) {
@@ -3270,7 +3278,7 @@ adjust_binary_use_spec()
 
 	    int no_cols = default_style_cols[ps_index].excluding_gen_coords;
 	    if (!no_cols)
-		int_error(c_token_copy, nothing_known);
+		int_error(NO_CARET, nothing_known);
 
 	    /* If coordinates are generated, make sure this plot style allows it.
 	     * Otherwise, add in the number of generated coordinates and add an
@@ -3278,7 +3286,7 @@ adjust_binary_use_spec()
 	     */
 	    if (df_num_bin_records && df_bin_record[0].scan_generate_coord) {
 		if (default_style_cols[ps_index].dimen_in_2d == 0)
-		    int_error(c_token_copy, "Cannot generate coords for that plot style");
+		    int_error(NO_CARET, "Cannot generate coords for that plot style");
 	    } else {
 		/* If there aren't generated coordinates, then add the
 		 * amount of columns that would be generated.
