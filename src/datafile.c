@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.315 2015/08/26 04:37:24 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.316 2015/08/26 18:59:43 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -741,11 +741,11 @@ df_tokenise(char *s)
 				    && (use_spec[2].column == dfncp1
 				|| (df_no_use_specs > 3
 				    && (use_spec[3].column == dfncp1
-				        || (df_no_use_specs > 4
-				            && (use_spec[4].column == dfncp1
-				                || df_no_use_specs > 5)
-				            )
-				        )
+					|| (df_no_use_specs > 4
+					    && (use_spec[4].column == dfncp1
+						|| df_no_use_specs > 5)
+					    )
+					)
 				    )
 				)
 				    )
@@ -885,7 +885,7 @@ df_read_matrix(int *rows, int *cols)
 	if (!(s = df_gets())) {
 	    df_eof = 1;
 	    /* NULL if we have not read anything yet */
-	    return linearized_matrix;   
+	    return linearized_matrix;
 	}
 
 	/* skip leading spaces */
@@ -959,7 +959,7 @@ df_read_matrix(int *rows, int *cols)
 	/* store data */
 	{
 	    int i;
-	    
+
 	    for (i = 0; i < c; ++i) {
 
 		/* First column in "matrix rowheaders" is a ytic label */
@@ -1004,7 +1004,7 @@ static void
 initialize_use_spec()
 {
     int i;
-    
+
     df_no_use_specs = 0;
     for (i = 0; i < MAXDATACOLS; ++i) {
 	use_spec[i].column = i + 1; /* default column */
@@ -1293,7 +1293,7 @@ df_open(const char *cmd_filename, int max_using, struct curve_points *plot)
 		df_xpixels, df_ypixels));
 
 	if (set_every) {
-	    plot->image_properties.ncols = 1 + 
+	    plot->image_properties.ncols = 1 +
 		    ((int)(GPMIN(lastpoint,df_xpixels-1)) - firstpoint) / everypoint;
 	    plot->image_properties.nrows = 1 +
 		    ((int)(GPMIN(lastline,df_ypixels-1)) - firstline) / everyline;
@@ -1332,7 +1332,7 @@ df_open(const char *cmd_filename, int max_using, struct curve_points *plot)
 	    int_error(name_token, "cannot open file descriptor for reading data");
 
 	/* if this stream isn't seekable, set it to volatile */
-        if (fseek(data_fp, 0, SEEK_CUR) < 0)
+	if (fseek(data_fp, 0, SEEK_CUR) < 0)
 	    volatile_data = TRUE;
 
     } else
@@ -1398,15 +1398,15 @@ df_open(const char *cmd_filename, int max_using, struct curve_points *plot)
     if (df_matrix_file) {
 	df_determine_matrix_info(data_fp);
 
-	/* Image size bookkeeping for ascii uniform matrices */
 	/* NB: If we're inside a 'stats' command there is no plot */
-	if (!df_binary_file && plot) {
-	    plot->image_properties.ncols = df_xpixels;
-	    plot->image_properties.nrows = df_ypixels;
-	    FPRINTF((stderr,"datafile.c:%d  ascii uniform matrix dimensions %d x %d \n",
-		    __LINE__, df_xpixels, df_ypixels));
+	if (plot) {
+	    /* Image size bookkeeping for ascii uniform matrices */
+	    if (!df_binary_file) {
+		plot->image_properties.ncols = df_xpixels;
+		plot->image_properties.nrows = df_ypixels;
+	    }
 	}
-    }    
+    }
 
     /* General binary, matrix binary and ASCII matrix all use the
      * df_readbinary() routine.
@@ -1421,7 +1421,7 @@ df_open(const char *cmd_filename, int max_using, struct curve_points *plot)
     /* Make information about whether the data forms a grid or not
      * available to the outside world.  */
     df_matrix = (df_matrix_file
-		 || ((df_num_bin_records == 1) 
+		 || ((df_num_bin_records == 1)
 		     && ((df_bin_record[0].cart_dim[1] > 0)
 			 || (df_bin_record[0].scan_dim[1] > 0))));
 
@@ -1725,7 +1725,7 @@ static void
 plot_ticlabel_using(int axis)
 {
     int col = 0;
-    
+
     c_token ++;
     if (!equals(c_token,"("))
 	int_error(c_token, "missing '('");
@@ -1761,13 +1761,12 @@ df_readline(double v[], int max)
     if (!data_fp && !df_pseudodata && !df_datablock)
 	return DF_EOF;
 
-    if (df_read_binary)
-	/* General binary, matrix binary or matrix ascii
-	 * that's been converted to binary.
-	 */
+    if (df_read_binary) {
+	/* General binary, matrix binary or matrix ascii converted to binary */
 	return df_readbinary(v, max);
-    else
+    } else {
 	return df_readascii(v, max);
+    }
 }
 /*}}} */
 
@@ -1979,7 +1978,7 @@ df_readascii(double v[], int max)
 
 	/* Always save the contents of the first row in case it is needed for
 	 * later access via column("header").  However, unless we know for certain that
-	 * it contains headers only, e.g. via parse_1st_row_as_headers or 
+	 * it contains headers only, e.g. via parse_1st_row_as_headers or
 	 * (column_for_key_title > 0), also treat it as a data row.
 	 */
 	if (df_datum == 0 && !df_already_got_headers) {
@@ -1998,7 +1997,7 @@ df_readascii(double v[], int max)
 	    /* Restrict the column number to possible values */
 	    if (column_for_key_title > df_no_cols)
 		column_for_key_title = df_no_cols;
-	    if (column_for_key_title == -3)	/* last column in file */ 
+	    if (column_for_key_title == -3)	/* last column in file */
 		column_for_key_title = df_no_cols;
 
 	    if (column_for_key_title > 0) {
@@ -2028,7 +2027,7 @@ df_readascii(double v[], int max)
 	    int limit = (df_no_use_specs
 			 ? df_no_use_specs + df_no_tic_specs
 			 : MAXDATACOLS);
-	    
+
 	    if (limit > max + df_no_tic_specs)
 		limit = max + df_no_tic_specs;
 
@@ -2044,7 +2043,7 @@ df_readascii(double v[], int max)
 		if (use_spec[output].expected_type >= CT_XTICLABEL) {
 		    int axis, axcol;
 		    double xpos;
-		   
+
 		    /* EAM FIXME - skip columnstacked histograms also */
 		    if (df_current_plot) {
 			if (df_current_plot->plot_style == BOXPLOT)
@@ -2245,7 +2244,7 @@ df_readascii(double v[], int max)
 		if (use_spec[output].expected_type == CT_STRING
 		    && (!(use_spec[output].at) || !df_tokens[output])
 		    && (column == -2 || column == -1 || column == 0)) {
-		    char *s = gp_alloc(32*sizeof(char), 
+		    char *s = gp_alloc(32*sizeof(char),
 			"temp string for label hack");
 		    sprintf(s, "%d", (int)v[output]);
 		    free(df_stringexpression[output]);
@@ -2667,7 +2666,7 @@ f_valid(union argument *arg)
 /*}}} */
 
 /*{{{  void f_timecolumn() */
-/* Version 5 - replace the old and very broken timecolumn(N) with 
+/* Version 5 - replace the old and very broken timecolumn(N) with
  * a 2-parameter version that requires an explicit time format
  * timecolumn(N, "format").
  */
@@ -2792,14 +2791,14 @@ expect_string(const char column)
     use_spec[column-1].expected_type = CT_STRING;
     /* Nasty hack to make 'plot "file" using "A":"B":"C" with labels' work.
      * The case of named columns is handled by create_call_column_at(),
-     * which fakes an action table as if '(column("string"))' was written 
+     * which fakes an action table as if '(column("string"))' was written
      * in the using spec instead of simply "string". In this specific case, however,
-     * we need the values as strings - so we change the action table to call 
+     * we need the values as strings - so we change the action table to call
      * f_stringcolumn() instead of f_column. */
-    if (use_spec[column-1].at 
+    if (use_spec[column-1].at
     && (use_spec[column-1].at->a_count == 2)
     && (use_spec[column-1].at->actions[1].index == COLUMN))
-        use_spec[column-1].at->actions[1].index = STRINGCOLUMN;
+	use_spec[column-1].at->actions[1].index = STRINGCOLUMN;
     return(use_spec[column-1].column);
 }
 
@@ -2835,7 +2834,7 @@ df_set_key_title(struct curve_points *plot)
 	    char *trailer = NULL;
 	    columnhead = strtol(placeholder+11, &trailer, 0);
 	    *placeholder = '\0';
-	    sprintf(newtitle, "%s%s%s", plot->title, 
+	    sprintf(newtitle, "%s%s%s", plot->title,
 		    (columnhead <= 0) ? df_key_title :
 		    (columnhead <= df_no_cols) ? df_column[columnhead-1].header : "",
 		    trailer ? trailer : "");
@@ -3075,7 +3074,7 @@ raw_filetype_function(void)
 void
 avs_filetype_function(void)
 {
-    /* A very simple file format: 
+    /* A very simple file format:
      * 8 byte header (width and height, 4 bytes each), unknown endian
      * followed by 4 bytes per pixel (alpha, red, green, blue).
      */
@@ -3107,14 +3106,14 @@ avs_filetype_function(void)
     df_bin_record[0].scan_skip[0] = 8;
     df_bin_record[0].scan_dim[0] = M;
     df_bin_record[0].scan_dim[1] = N;
- 
+
     df_bin_record[0].scan_dir[0] = 1;
     df_bin_record[0].scan_dir[1] = -1;
     df_bin_record[0].scan_generate_coord = TRUE;
     df_bin_record[0].cart_scan[0] = DF_SCAN_POINT;
     df_bin_record[0].cart_scan[1] = DF_SCAN_LINE;
 
-    /* The four components are 1 byte each. Permute ARGB to RGBA */ 
+    /* The four components are 1 byte each. Permute ARGB to RGBA */
     df_extend_binary_columns(4);
     df_set_read_type(1, DF_UCHAR);
     df_set_read_type(2, DF_UCHAR);
@@ -3249,7 +3248,7 @@ adjust_binary_use_spec(struct curve_points *plot)
     unsigned int ps_index;
     enum PLOT_STYLE plot_style = plot ? plot->plot_style : LINES;
 
-    /* The default binary matrix format is nonuniform, i.e. 
+    /* The default binary matrix format is nonuniform, i.e.
      * it has an extra row and column for sample coordinates.
      */
     if (df_matrix_file && df_binary_file)
@@ -3453,7 +3452,7 @@ plot_option_binary(TBOOLEAN set_matrix, TBOOLEAN set_default)
 		c_token++;
 	    }
 
-	    if (df_plot_mode != MODE_QUERY  
+	    if (df_plot_mode != MODE_QUERY
 	    && !strcmp("auto", df_bin_filetype_table[df_bin_filetype].key)) {
 		int i;
 		char *file_ext = strrchr(df_filename, '.');
@@ -3872,7 +3871,7 @@ clear_binary_records(df_records_type records_type)
 }
 
 
-/* 
+/*
  * Syntax is:   array=(xdim,ydim):(xdim,ydim):CONST:(xdim) etc
  */
 static void
@@ -4280,10 +4279,10 @@ plot_option_binary_format(char *format_string)
 
 	if (*substr == '%') {
 	    int ignore, field_repeat, j=0, k=0, m=0, breakout;
-	    
+
 	    substr++;
 	    ignore = (*substr == '*');
-	    if(ignore)
+	    if (ignore)
 		substr++;
 
 	    /* Check for field repeat number. */
@@ -4412,7 +4411,7 @@ df_show_binary(FILE *fp)
 	if (bin_record[i].scan_generate_coord) {
 	    int j;
 	    TBOOLEAN no_flip = TRUE;
-	    
+
 	    fprintf(fp, "\n\t    Direction: ");
 	    if (bin_record[i].cart_dir[0] == -1) {
 		fprintf(fp, "flip x");
@@ -4522,7 +4521,7 @@ void
 df_show_filetypes(FILE *fp)
 {
     int i = 0;
-    
+
     fprintf(fp,"\tThis version of gnuplot understands the following binary file types:\n");
     while (df_bin_filetype_table[i].key)
 	fprintf(fp, "\t  %s", df_bin_filetype_table[i++].key);
@@ -4533,7 +4532,7 @@ df_show_filetypes(FILE *fp)
 void
 df_swap_bytes_by_endianess(char *data, int read_order, int read_size)
 {
-    if ((read_order == DF_3210) 
+    if ((read_order == DF_3210)
 #if SUPPORT_MIDDLE_ENDIAN
 	|| (read_order == DF_2301)
 #endif
@@ -4543,19 +4542,19 @@ df_swap_bytes_by_endianess(char *data, int read_order, int read_size)
 	
 	for (; j < k; j++, k--) {
 	    char temp = data[j];
-	    
+
 	    data[j] = data[k];
 	    data[k] = temp;
 	}
     }
-    
+
 #if SUPPORT_MIDDLE_ENDIAN
     if ((read_order == DF_1032) || (read_order == DF_2301)) {
 	int j= read_size - 1;
 	
 	for (; j > 0; j -= 2) {
 	    char temp = data[j-1];
-	    
+
 	    data[j-1] = data[j];
 	    data[j] = temp;
 	}
@@ -4706,7 +4705,7 @@ df_readbinary(double v[], int max)
 	    first_matrix_row_col_count = 0;
 	} else { /* general binary */
 
-	  
+
 	    for (i = 0; i < 3; i++) {
 		int map;
 		
@@ -4791,11 +4790,11 @@ df_readbinary(double v[], int max)
 
 	    /* Accumulate total number of bytes in this tuple */
 	    for (i=0; i<df_no_bin_cols; i++)
-		bytes_per_point +=  
+		bytes_per_point +=
 		  df_column_bininfo[i].skip_bytes +
 		  df_column_bininfo[i].column.read_size;
 	    bytes_per_point += df_column_bininfo[df_no_bin_cols].skip_bytes;
-	  
+
 	    bytes_per_line  = bytes_per_point
 			    * (  (scan_size[0] > 0) ? scan_size[0] : 1 );
 	    bytes_per_plane = bytes_per_line
@@ -4807,12 +4806,12 @@ df_readbinary(double v[], int max)
 	    /* Allocate a chunk of memory and stuff it */
 	    /* EAM FIXME: Is this a leak if the plot errors out? */
 	    memory_data = gp_alloc(bytes_total, "df_readbinary slurper");
-	    this_record->memory_data = memory_data; 
-	 
+	    this_record->memory_data = memory_data;
+
 	    FPRINTF((stderr,"Fast matrix code:\n"));
 	    FPRINTF((stderr,"\t\t skip %d bytes, read %ld bytes as %d x %d array\n",
 		    record_skip, bytes_total, scan_size[0], scan_size[1]));
- 
+
 	    /* Do the actual slurping */
 	    fread_ret = fread(memory_data, 1, bytes_total, data_fp);
 	    if (fread_ret != bytes_total) {
@@ -5017,7 +5016,7 @@ df_readbinary(double v[], int max)
 	    df_datum = point_count + 1;
 	    if (i != df_no_bin_cols) {
 		if (feof(data_fp)) {
-		    if (i != 0) 
+		    if (i != 0)
 			int_error(NO_CARET, "Last point in the binary file did not match the specified `using` columns");
 		    df_eof = 1;
 		    return DF_EOF;
@@ -5099,7 +5098,7 @@ df_readbinary(double v[], int max)
 		    evaluate_at(use_spec[output].at, &a);
 		    evaluate_inside_using = FALSE;
 		    if (undefined)
-			return DF_UNDEFINED; 
+			return DF_UNDEFINED;
 
 		    if (a.type == STRING) {
 			if (use_spec[output].expected_type == CT_STRING) {
@@ -5127,7 +5126,7 @@ df_readbinary(double v[], int max)
 		     * planar objects like 2D images.
 		     * Now I set Z to be the pixel value, which allows you
 		     * to draw surfaces described by a 2D binary array.
-		     */ 
+		     */
 		    else
 			v[output] = df_column[0].datum;
 		} else if (column == DF_SCAN_LINE) {

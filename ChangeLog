@@ -16,6 +16,8 @@
 	Remove dead code (error checks that can never be reached).
 	Make some internal bookkeeping variables df_* static.
 
+	* src/datafile.c: whitespace cleanup
+
 2015-08-24  Ethan A Merritt  <merritt@u.washington.edu>
 	
 	* src/datafile.c (df_readascii):  The code supporting an input format
