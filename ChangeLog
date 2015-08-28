@@ -1,3 +1,16 @@
+2015-08-28  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/wxterminal/wxt_gui.cpp (wxt_waitforinput):
+	The single-threaded code path used by OSX and Windows (and optionally
+	linux) was not honoring "pause mouse ..." commands, including "pause
+	mouse close".
+
+	* src/wxterminal/wxt_gui.cpp (wxt_exec_event):
+	The single-threaded code path could lose an input character that arrived
+	during a "pause mouse" interval.  Use ungetc to push a character back 
+	onto the input queue in this case.  (Not applied for Windows but maybe
+	it should be?)
+
 2015-08-25  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/datafile.c (plot_option_index):  Sanity check that index >= 0.

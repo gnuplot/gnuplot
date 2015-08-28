@@ -14,6 +14,7 @@ Changes since 5.0.1
 * FIX aquaterm fill area with transparency
 * FIX "offset 0" means "no offset" even in the case of log-scaled axes
 * FIX handle formatted read from a datablock
+* FIX "pause mouse" for wxt terminal (OSX, other single-threaded platforms)
 
 Changes in 5.0.1
 ================

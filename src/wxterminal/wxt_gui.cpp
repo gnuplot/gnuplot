@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.cpp,v 1.128.2.16 2015/05/03 12:43:09 broeker Exp $
+ * $Id: wxt_gui.cpp,v 1.128.2.17 2015/07/13 18:20:02 sfeam Exp $
  */
 
 /* GNUPLOT - wxt_gui.cpp */
@@ -3642,8 +3642,12 @@ bool wxt_exec_event(int type, int mx, int my, int par1, int par2, wxWindowID id)
 	event.par2 = par2;
 	event.winid = id;
 
-#if defined(WXT_MONOTHREADED) || defined(_Windows)
+#if defined(_Windows)
 	wxt_process_one_event(&event);
+	return true;
+#elif defined(WXT_MONOTHREADED)
+	if (wxt_process_one_event(&event))
+	    ungetc('\n',stdin);
 	return true;
 #else
 	if (!wxt_handling_persist)
@@ -3665,7 +3669,7 @@ bool wxt_exec_event(int type, int mx, int my, int par1, int par2, wxWindowID id)
 	}
 
 	return true;
-#endif /* ! _Windows */
+#endif /* Windows or single-threaded or default */
 }
 
 #ifdef WXT_MULTITHREADED
@@ -3807,6 +3811,7 @@ int wxt_waitforinput(int options)
 	  FD_ZERO(&read_fd);
 	  FD_SET(0, &read_fd);
 	  if (select(1, &read_fd, NULL, NULL, &tv) != -1 && FD_ISSET(0, &read_fd))
+	    if (!paused_for_mouse)
 		break;
 	}
 	return getchar();
