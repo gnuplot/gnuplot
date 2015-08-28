@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.955 2015/08/19 16:41:19 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.956 2015/08/19 18:06:08 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -6785,11 +6785,14 @@ Ffigure_mapcontours
  the string iterator form of the command rather than an integer iterator.
 
  If an iteration is to continue until all available data is consumed, use the
- symbol * instead of an integer <end>.
+ symbol * instead of an integer <end>.  This can be used to process all columns
+ in a line,  all datasets (separated by 2 blank lines) in a file,  or all files
+ matching a template.
 
  Examples:
-       splot for [i=0:*] 'datafile' index i using 1:2:3 with lines 
        plot for [i=2:*] 'datafile' using 1:i with histogram
+       splot for [i=0:*] 'datafile' index i using 1:2:3 with lines 
+       plot for [i=1:*] file=sprintf("File_%03d.dat",i) file using 2 title file
 
 3 title
 ?commands plot title
