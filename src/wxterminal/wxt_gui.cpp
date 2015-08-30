@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.cpp,v 1.128.2.17 2015/07/13 18:20:02 sfeam Exp $
+ * $Id: wxt_gui.cpp,v 1.128.2.18 2015/08/28 20:42:27 sfeam Exp $
  */
 
 /* GNUPLOT - wxt_gui.cpp */
@@ -2023,8 +2023,8 @@ void wxt_graphics()
 	wxt_sigint_check();
 	wxt_sigint_restore();
 
-	FPRINTF((stderr,"Graphics time %d xmax %d ymax %d v_char %d h_char %d\n",
-		sw.Time(), term->xmax, term->ymax, term->v_char, term->h_char));
+	FPRINTF((stderr,"Graphics xmax %d ymax %d v_char %d h_char %d\n",
+		term->xmax, term->ymax, term->v_char, term->h_char));
 }
 
 void wxt_text()
@@ -2049,8 +2049,6 @@ void wxt_text()
 
 	wxt_sigint_init();
 
-	FPRINTF((stderr,"Text0 %d\n", sw.Time())); /*performance watch*/
-
 	/* translates the command list to a bitmap */
 	wxt_MutexGuiEnter();
 	wxt_current_panel->wxt_cairo_refresh();
@@ -2063,8 +2061,6 @@ void wxt_text()
 	wxt_raise_window(wxt_current_window, false);
 	wxt_MutexGuiLeave();
 
-	FPRINTF((stderr,"Text2 %d\n", sw.Time())); /*performance watch*/
-
 #ifdef USE_MOUSE
 	/* Inform gnuplot that we have finished plotting */
 	wxt_exec_event(GE_plotdone, 0, 0, 0, 0, wxt_window_number );
@@ -2072,8 +2068,6 @@ void wxt_text()
 
 	wxt_sigint_check();
 	wxt_sigint_restore();
-
-	FPRINTF((stderr,"Text finished %d\n", sw.Time())); /*performance watch*/
 }
 
 void wxt_reset()
