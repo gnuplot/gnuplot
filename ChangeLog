@@ -1,3 +1,8 @@
+2015-08-31  Jun Takimoto <takimoto-j@kba.biglobe.ne.jp>
+
+	* src/wxterminal/wxt_gui.cpp:  Reset "yield" interlock on ctrl-C.
+	Prevents endless futile loop with single-threaded wxt terminal.
+
 2015-08-30  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/wxterminal/wxt_gui.cpp:  Remove FPRINTF statements referring

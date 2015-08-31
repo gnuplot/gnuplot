@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.cpp,v 1.128.2.18 2015/08/28 20:42:27 sfeam Exp $
+ * $Id: wxt_gui.cpp,v 1.128.2.19 2015/08/31 01:47:09 sfeam Exp $
  */
 
 /* GNUPLOT - wxt_gui.cpp */
@@ -162,6 +162,10 @@ wxtAnchorPoint wxt_display_anchor = {0,0,0};
 #else
 #define wxt_update_key_box(x,y)
 #define wxt_update_anchors(x,y,size)
+#endif
+
+#if defined(WXT_MONOTHREADED) && !defined(_Windows)
+static int yield = 0;	/* used in wxt_waitforinput() */
 #endif
 
 #ifdef __WXMAC__
@@ -2075,6 +2079,8 @@ void wxt_reset()
 	/* sent when gnuplot exits and when the terminal or the output change.*/
 	FPRINTF((stderr,"wxt_reset\n"));
 
+	yield = 0;
+
 	if (wxt_status == STATUS_UNINITIALIZED)
 		return;
 
@@ -3775,7 +3781,6 @@ int wxt_waitforinput(int options)
 #else /* !_Windows */
 	/* Generic hybrid GUI & console message loop */
 	/* (used mainly on MacOSX - still single threaded) */
-	static int yield = 0;
 	if (yield)
 		return '\0';
 
