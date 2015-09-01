@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.cpp,v 1.128.2.19 2015/08/31 01:47:09 sfeam Exp $
+ * $Id: wxt_gui.cpp,v 1.128.2.20 2015/08/31 17:34:54 sfeam Exp $
  */
 
 /* GNUPLOT - wxt_gui.cpp */
@@ -2079,7 +2079,9 @@ void wxt_reset()
 	/* sent when gnuplot exits and when the terminal or the output change.*/
 	FPRINTF((stderr,"wxt_reset\n"));
 
+#if defined(WXT_MONOTHREADED) && !defined(_Windows)
 	yield = 0;
+#endif
 
 	if (wxt_status == STATUS_UNINITIALIZED)
 		return;
