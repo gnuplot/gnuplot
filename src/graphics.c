@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.496 2015/08/21 20:45:03 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.497 2015/09/04 06:04:58 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -1098,6 +1098,9 @@ finish_filled_curve(
 		break;
 	case FILLEDCURVES_ATY1:
 	case FILLEDCURVES_ATY2:
+		/* FIXME:  pretty sure this code can never be reached since we	*/
+		/*         now replace these options with FILLEDCURVES_BETWEEN	*/
+		/*         in plot_betweencurves().				*/
 		corners[points].y = map_y(filledcurves_options->at);
 		corners[points+1].y = corners[points].y;
 		corners[points].x = corners[points-1].x;
