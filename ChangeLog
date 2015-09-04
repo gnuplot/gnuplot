@@ -4,6 +4,10 @@
 	y=<value> as if it were provided in the 3rd data column.
 	Bug #1568
 
+	* src/graphics.c (plot_boxes): Prevent array overrun if there are 
+	undefined points are at the end of a data set, as in the first plot
+	of smooth.dem.
+
 2015-08-31  Jun Takimoto <takimoto-j@kba.biglobe.ne.jp>
 
 	* src/wxterminal/wxt_gui.cpp:  Reset "yield" interlock on ctrl-C.
