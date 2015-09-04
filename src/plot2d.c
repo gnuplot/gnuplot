@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.336.2.14 2015/08/01 05:11:07 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.336.2.15 2015/08/01 05:15:52 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -918,6 +918,10 @@ get_data(struct curve_points *current_plot)
 	    } else if (current_plot->plot_style == BOXPLOT) {
 		store2d_point(current_plot, i++, v[0], v[1], v[0], v[0], v[1], v[1],
 				DEFAULT_BOXPLOT_FACTOR);
+	    } else if (current_plot->plot_style == FILLEDCURVES) {
+		v[2] = current_plot->filledcurves_options.at;
+		store2d_point(current_plot, i++, v[0], v[1], v[0], v[0],
+				  v[1], v[2], -1.0);
 	    } else {
 		double w;
 		if (current_plot->plot_style == CANDLESTICKS

@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.902.2.41 2015/08/03 18:33:01 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.902.2.42 2015/08/19 16:41:03 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -3443,13 +3443,14 @@ Ffigure_filledcurves
      plot 'data' using 1:2:3 with filledcurves
 
  The `above` and `below` options apply both to commands of the form
-     ... filledcurves above {x1|x2|y1|y2|r}=<val>
+     ... filledcurves above {x1|x2|y|r}=<val>
  and to commands of the form
      ... using 1:2:3 with filledcurves below
  In either case the option limits the filled area to one side of the bounding
  line or curve.
 
- Note: Not all terminal types support this plotting mode.
+ Notes: Not all terminal types support this plotting mode.
+        The x= and y= keywords are ignored for 3 columns data plots
 
  Zooming a filled curve drawn from a datafile may produce empty or incorrect
  areas because gnuplot is clipping points and lines, and not areas.
