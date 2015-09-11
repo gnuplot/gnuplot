@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: help.c,v 1.29 2014/01/16 18:30:34 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: help.c,v 1.30 2015/01/21 03:38:24 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - help.c */
@@ -697,9 +697,15 @@ OutLine(const char *line)
     /* leave room for prompt line */
     if (pagelines >= screensize - 2) {
 	fputs("Press return for more: ", stderr);
+#if defined(_WIN32)
+	do
+	    c = getchar();
+	while (c != EOF && c != '\n' && c != '\r');
+#else
 	do
 	    c = getchar();
 	while (c != EOF && c != '\n');
+#endif
 	pagelines = 0;
     }
     fputs(line, stderr);
@@ -727,9 +733,15 @@ OutLine_InternalPager(const char *line)
     /* leave room for prompt line */
     if (pagelines >= screensize - 2) {
 	fputs("Press return for more: ", stderr);
+#if defined(_WIN32)
+	do
+	    c = getchar();
+	while (c != EOF && c != '\n' && c != '\r');
+#else
 	do
 	    c = getchar();
 	while (c != EOF && c != '\n');
+#endif
 	pagelines = 0;
     }
     fputs(line, stderr);

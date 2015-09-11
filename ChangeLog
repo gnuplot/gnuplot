@@ -1,3 +1,8 @@
+2015-09-11 Akira Kakuto <kakuto@fuk.kindai.ac.jp>
+
+	* src/help.c term/lua.trm:  #ifdef _WIN32
+	'\r' is accepted as a terminator after a prompt.
+
 2015-09-04  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/plot2d.c: For 2-column data plots with filledcurves, treat
