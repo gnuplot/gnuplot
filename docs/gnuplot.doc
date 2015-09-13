@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.958 2015/09/04 05:59:53 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.959 2015/09/12 18:35:17 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -4176,6 +4176,18 @@ Ffigure_polar
  Many, but not all, of the 2D plotting styles work in polar mode.
  The figure shows a combination of plot styles `lines` and `filledcurves`.
  See `set polar`, `set rrange`, `set size square`.
+2 Bee swarm plots
+?beeswarm
+?bee swarm
+=jitter
+Ffigure_jitter
+ "Bee swarm" plots result from applying jitter to separate overlapping points.
+ A typical use is to compare the distribution of y values exhibited by two or
+ more categories of points, where the category determinines the x coordinate.
+ See the `set jitter` command for how to control the overlap criteria and the
+ displacement pattern used for jittering.  The plots in the figure were created
+ by the same plot command but different jitter settings.
+      `plot $data using 1:2:1 lc variable`
 
 1 Commands
 ?commands
@@ -9371,6 +9383,41 @@ Ffigure_missing
  assumes that a function sample occurs at each isoline intersection, so
  change in `samples` as well as `isosamples` may be desired when changing
  the resolution of a function surface/contour.
+3 jitter
+?commands set jitter
+?set jitter
+?jitter
+=beeswarm
+ Syntax:
+       set jitter {overlap <yposition>} {spread <factor>} {wrap <limit>}
+                  {swarm|square}
+ Examples:
+       set jitter                    # jitter points within 1 character width
+       set jitter overlap 1.5        # jitter points within 1.5 character width
+       set jitter over 1.5 spread 0.5  # same but half the displacement on x
+
+ When one or both coordinates of a data set are restricted to discrete values
+ then many points may lie exactly on top of each other.  Jittering introduces an
+ offset to the coordinates of these superimposed points that spreads them into a
+ cluster.  The threshhold value for treating the points as being overlapped may
+ be specified in  character widths or any of the usual coordinate options.
+ See `coordinates`.
+
+ The default jittering operation displaces points only along x.
+ This produces a distinctive pattern sometimes called a "bee swarm plot".
+ The optional keyword `square` adjusts the y coordinate of displaced points
+ in addition to their x coordinate so that the points lie in distinct layers
+ separated by at least the `overlap` distance.
+
+ The maximum displacement (in character units) can be limited using the `wrap`
+ keyword.
+
+ Note that both the overlap criterion and the magnitude of jitter default to
+ one character unit.  Thus the plot appearance will change with the terminal
+ font size, canvas size, or zoom factor.  To avoid this you can specify the
+ overlap criterion in the y axis coordinate system (the `first` keyword) and
+ adjust the point size and spread multiplier as appropriate.
+ See `coordinates`, `pointsize`, `jitter`.
 3 key
 ?commands set key
 ?commands unset key

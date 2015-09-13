@@ -1,5 +1,5 @@
 /*
- * $Id: save.h,v 1.22 2015/04/15 20:31:05 broeker Exp $
+ * $Id: save.h,v 1.23 2015/08/03 04:16:38 sfeam Exp $
  */
 
 /* GNUPLOT - save.h */
@@ -47,6 +47,7 @@
 /* Type definitions */
 
 /* Variables of save.c needed by other modules: */
+extern const char *coord_msg[];
 
 /* Prototypes of functions exported by save.c */
 void save_functions __PROTO((FILE *fp));

@@ -2,14 +2,14 @@
 <html>
 <head>
 <meta charset="UTF-8"> 
-<title>Gnuplot 5.1 demo scripts run through the HTML canvas terminal</title>
+<title>Gnuplot 5.1 demos (HTML canvas terminal)</title>
 <link type="text/css" href="gnuplot_demo.css" rel="stylesheet">
 <link type="text/css" href="gnuplot_mouse.css" rel="stylesheet">
 </head>
 
 <body oncontextmenu="return false;">
 
-<h2 align=center>Gnuplot 5.1 demo scripts run through the HTML canvas terminal<br>
+<h2 align=center>Gnuplot 5.1 demos (HTML canvas terminal)<br>
     See also the demo output for the
     <a href="http://gnuplot.sourceforge.net/demo_5.1/">PNG</a> and
     <a href="http://gnuplot.sourceforge.net/demo_svg_5.1/">SVG</a> terminals.
@@ -17,11 +17,6 @@
 <canvas id="warning" width=1 height=1>
     <div class='box'><h2>Your browser may not support the HTML 5 canvas element</h2></div>
 </canvas>
-
-<p>
-To view these plots you need a browser that supports the HTML5 'canvas' element.
-</p>
-
 
 <table width="100%">
 <tbody><tr valign="top">
@@ -46,6 +41,7 @@ To view these plots you need a browser that supports the HTML5 'canvas' element.
     <li><a href="circles.html">circles</a></li>
     <li><a href="boxplot.html">boxplots</a></li>
     <li><a href="rugplot.html">rug plot</a></li>
+    <li><a href="jitter.html">jitter (bee&nbsp;swarm)</a></li>
     </ul>
 
     <h4>Math functions</h4>
@@ -205,7 +201,7 @@ To view these plots you need a browser that supports the HTML5 'canvas' element.
 <tbody><tr valign="top">
 
     <td>
-    <i>This page created by Ethan Merritt<br>July 2015</i>
+    <i>This page created by Ethan Merritt<br>September 2015</i>
     </td>
 
     <td>

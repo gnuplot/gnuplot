@@ -557,6 +557,33 @@ plot demo . 'silver.dat' u 1:2:($3+$1/50.) w filledcurves above title 'above' lc
                '' u 1:2 w lines lt -1 lw 1 title 'curve 1', \
                '' u 1:($3+$1/50.) w lines lt -1 lw 4 title 'curve 2'
 
+#
+# Bee swarm plots
+#
+reset
+set output out . 'figure_jitter' . ext
+npts = 60
+set print $data
+do for [i=1:npts] {
+    print sprintf("%d %8.5g", (i%5) ? 3 : 4, 25.+10.*invnorm(rand(0)))
+}
+unset print
+set xrange [2.5:4.5]
+set xtics ("A" 3, "B" 4)
+set border 2
+set xtics nomirror scale 0
+set ytics nomirror rangelimited scale 0
+unset key
+
+set multiplot layout 1, 2 
+set jitter over 0.5 spread 1.9
+set title "swarm (default)"
+plot $data using 1:2:1 with points pt 6 lc variable
+set jitter over 0.5 spread 1.9 square
+set title "square"
+replot
+unset multiplot
+
 # close last file
 unset outp
 

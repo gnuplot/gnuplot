@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.227 2015/08/03 04:16:38 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.228 2015/08/19 18:06:09 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -43,6 +43,7 @@ static char *RCSid() { return RCSid("$Id: unset.c,v 1.227 2015/08/03 04:16:38 sf
 #include "fit.h"
 #include "gp_hist.h"
 #include "hidden3d.h"
+#include "jitter.h"
 #include "misc.h"
 #include "parse.h"
 #include "plot.h"
@@ -245,6 +246,9 @@ unset_command()
 	break;
     case S_ISOSAMPLES:
 	unset_isosamples();
+	break;
+    case S_JITTER:
+	unset_jitter();
 	break;
     case S_KEY:
 	unset_key();
@@ -1761,6 +1765,8 @@ reset_command()
 
     unset_samples();
     unset_isosamples();
+
+    unset_jitter();
 
     /* delete arrows */
     while (first_arrow != NULL)

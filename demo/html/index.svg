@@ -1,6 +1,6 @@
 <!DOCTYPE HTML>
 <html>
-<head><title>Gnuplot Version 5.1 SVG terminal demos</title>
+<head><title>Demos for gnuplot Version 5.1 (SVG terminal)</title>
 <link type="text/css" href="gnuplot_demo.css" rel="stylesheet">
 <meta charset="UTF-8">
 </head>
@@ -8,7 +8,7 @@
 <body>
 
 <h2 align=center>
-    Gnuplot Version 5.1 SVG terminal demos<br>
+    Gnuplot Version 5.1 demos (SVG terminal)<br>
     See also the demo output for the 
        <a href="../demo_5.1/">PNG</a> and
        <a href="../demo_canvas_5.1/">canvas</a> terminals.
@@ -45,6 +45,7 @@ on mouse-coordinate tracking.
     <li><a href="circles.html">circles</a></li>
     <li><a href="boxplot.html">boxplot</a></li>
     <li><a href="rugplot.html">rug plot</a></li>
+    <li><a href="jitter.html">jitter (bee&nbsp;swarm)</a></li>
     </ul>
 
     <h4>Math functions</h4>
@@ -175,7 +176,7 @@ on mouse-coordinate tracking.
 <tbody><tr valign="top">
 
     <td>
-    <i>This page created by Ethan Merritt<br>July 2015</i>
+    <i>This page created by Ethan Merritt<br>September 2015</i>
     </td>
 
     <td>

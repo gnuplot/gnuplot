@@ -1,3 +1,24 @@
+2015-09-13  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/graphics.c src/jitter.c src/jitter.h src/makefile.all
+	src/Makefile.am src/save.c src/save.h src/set.c src/show.c
+	src/tables.c src/tables.h src/unset.c:  New plot capability.
+
+	Syntax:
+	    set jitter {overlap <yposition>} {spread <factor>} {wrap <limit>}
+	               {swarm|square}
+	When the x coordinates of a data set are restricted to discrete values
+	then many points may lie exactly on top of each other.  Jittering
+	introduces an offset to the coordinates of these superimposed points
+	that spreads them into a cluster.  This type of plot is called a 
+	"bee swarm" plot in R and other packages.
+
+	* demo/all.dem demo/html/index.canvas demo/html/index.save
+	demo/html/index.svg demo/html/Makefile demo/html/Makefile.canvas
+	demo/html/Makefile.svg demo/jitter.dem docs/gnuplot.doc
+	docs/plotstyles.gnu:  Documentation and demos for jitter settings and
+	bee swarm plots.
+
 2015-09-12  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* docs/gnuplot.doc:  Reorganize the section containing plot style

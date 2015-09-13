@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.349 2015/06/02 22:30:18 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.350 2015/08/03 04:16:38 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -52,6 +52,7 @@ static char *RCSid() { return RCSid("$Id: show.c,v 1.349 2015/06/02 22:30:18 sfe
 #include "gp_time.h"
 #include "graphics.h"
 #include "hidden3d.h"
+#include "jitter.h"
 #include "misc.h"
 #include "gp_hist.h"
 #include "plot2d.h"
@@ -403,6 +404,9 @@ show_command()
 	break;
     case S_ISOSAMPLES:
 	show_isosamples();
+	break;
+    case S_JITTER:
+	show_jitter();
 	break;
     case S_VIEW:
 	show_view();
@@ -792,6 +796,7 @@ show_all()
     show_range(SECOND_X_AXIS);
     show_range(SECOND_Y_AXIS);
     show_range(FIRST_Z_AXIS);
+    show_jitter();
     show_title();
     show_axislabel(FIRST_X_AXIS );
     show_axislabel(FIRST_Y_AXIS );

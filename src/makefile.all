@@ -4,7 +4,7 @@
 COREOBJS = eval.$(O) getcolor.$(O) stats.$(O) unset.$(O) breaders.$(O) \
 specfun.$(O) term.$(O) graph3d.$(O) dynarray.$(O) show.$(O) axis.$(O) \
 stdfn.$(O) util.$(O) save.$(O) util3d.$(O) tabulate.$(O) readline.$(O) \
-internal.$(O) libcerf.$(O) bitmap.$(O) hidden3d.$(O) plot3d.$(O) \
+internal.$(O) jitter.$(O) libcerf.$(O) bitmap.$(O) hidden3d.$(O) plot3d.$(O) \
 color.$(O) contour.$(O) command.$(O) multiplot.$(O) plot.$(O) scanner.$(O) \
 gadgets.$(O) plot2d.$(O) tables.$(O) time.$(O) pm3d.$(O) matrix.$(O) \
 boundary.$(O) fit.$(O) misc.$(O) alloc.$(O) external.$(O) help.$(O) \

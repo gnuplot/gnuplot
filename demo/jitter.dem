@@ -1,0 +1,90 @@
+#
+# jitter.dem
+#
+
+# Generate a reusable set of N random data points.
+nsamp = 160
+set print $random
+do for [i=1:nsamp] {
+    print sprintf("%8.5g %8.5g", invnorm(rand(0)), 100.*invnorm(rand(0)))
+}
+unset print
+#
+
+set border 2
+set xrange [-1.5:1.4]
+set xtics ("A" -1, "B" 0, "C" 1)
+set xtics nomirror scale 0
+set ytics nomirror rangelimited
+
+set multiplot layout 1,2
+unset jitter
+set title "no jitter"
+set style data point
+plot $random using (int($1)%20):2 notitle  pt 6 ps 1.5 lc "gray"
+set jitter 
+set title "jitter"
+plot $random using (int($1)%20):2 notitle  pt 6 ps 1.5 lc "gray"
+unset multiplot
+
+pause -1 'Hit <cr> to continue'
+
+set linetype  9 lc "#80bb33bb"
+set linetype 10 lc "#8033bbbb"
+set linetype 11 lc "#80bbaa44"
+
+set multiplot layout 1,3 title "First parameter is vertical overlap criterion"
+set style data point
+set jitter overlap 0.5
+set title "jitter overlap 0.5"
+plot $random using (int($1)%20):2:(10+int($1)) notitle  pt 7 ps 1 lc var
+set jitter overlap 1
+set title "jitter overlap 1.0"
+plot $random using (int($1)%20):2:(10+int($1)) notitle  pt 7 ps 1 lc var
+set jitter overlap 1.5
+set title "jitter overlap 1.5"
+plot $random using (int($1)%20):2:(10+int($1)) notitle  pt 7 ps 1 lc var
+unset multiplot
+
+pause -1 'Hit <cr> to continue'
+
+set multiplot layout 1,3 title "Second parameter scales horizontal point scatter"
+set style data point
+set jitter overlap 1 spread 0.4
+set title "jitter spread 0.4"
+plot $random using (int($1)%20):2:(10+int($1)) notitle  pt 7 ps 1 lc var
+set jitter overlap 1 spread 0.7
+set title "jitter spread 0.7"
+plot $random using (int($1)%20):2:(10+int($1)) notitle  pt 7 ps 1 lc var
+set jitter overlap 1 spread 1.0
+set title "jitter spread 1.0"
+plot $random using (int($1)%20):2:(10+int($1)) notitle  pt 7 ps 1 lc var
+unset multiplot
+
+pause -1 'Hit <cr> to continue'
+
+set multiplot layout 1,3 title "Plot appearances is also affected by point size"
+set style data point
+set jitter overlap 0.4 spread 1
+set title "pointsize 0.5"
+plot $random using (int($1)%20):2:(10+int($1)) notitle  pt 7 ps 0.5 lc var
+set title "pointsize 1.0"
+plot $random using (int($1)%20):2:(10+int($1)) notitle  pt 7 ps 1 lc var
+set title "pointsize 2.0"
+plot $random using (int($1)%20):2:(10+int($1)) notitle  pt 7 ps 2 lc var
+unset multiplot
+
+pause -1 'Hit <cr> to continue'
+
+set multiplot layout 1,2 title "Jitter style options"
+set jitter over 0.5 swarm
+set title "swarm (default)"
+plot $random using (int($1)%20):2:(10+int($1)) notitle  pt 7 ps 1 lc var
+set jitter over 0.5 square
+set title "square"
+plot $random using (int($1)%20):2:(10+int($1)) notitle  pt 7 ps 1 lc var
+unset multiplot
+
+pause -1 'Hit <cr> to continue'
+reset
+

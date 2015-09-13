@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.498 2015/08/03 04:16:38 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.499 2015/08/19 18:06:09 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -52,6 +52,7 @@ static char *RCSid() { return RCSid("$Id: set.c,v 1.498 2015/08/03 04:16:38 sfea
 #include "gp_hist.h"
 #include "gp_time.h"
 #include "hidden3d.h"
+#include "jitter.h"
 #include "misc.h"
 #include "plot.h"
 #include "plot2d.h"
@@ -291,6 +292,9 @@ set_command()
 	    break;
 	case S_ISOSAMPLES:
 	    set_isosamples();
+	    break;
+	case S_JITTER:
+	    set_jitter();
 	    break;
 	case S_KEY:
 	    set_key();

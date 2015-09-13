@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.497 2015/09/04 06:04:58 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.498 2015/09/04 17:35:49 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -51,6 +51,7 @@ static char *RCSid() { return RCSid("$Id: graphics.c,v 1.497 2015/09/04 06:04:58
 #include "misc.h"
 #include "gp_time.h"
 #include "gadgets.h"
+#include "jitter.h"
 #include "plot2d.h"		/* for boxwidth */
 #include "term_api.h"
 #include "util.h"
@@ -2023,6 +2024,12 @@ plot_points(struct curve_points *plot)
 	(*t->justify_text) (CENTRE);
     }
 
+    /* Displace overlapping points if "set jitter" is in effect	*/
+    /* This operation leaves x and y untouched, but loads the	*/
+    /* jitter offsets into xhigh and yhigh.			*/
+    if (jitter.spread > 0)
+	jitter_points(plot);
+
     for (i = 0; i < plot->p_count; i++) {
 	if ((plot->plot_style == LINESPOINTS) && (interval) && (i % interval)) {
 	    continue;
@@ -2030,6 +2037,15 @@ plot_points(struct curve_points *plot)
 	if (plot->points[i].type == INRANGE) {
 	    x = map_x(plot->points[i].x);
 	    y = map_y(plot->points[i].y);
+
+	    /* Apply jitter offsets.                                    */
+	    /* The jitter x offset is a multiple of character width.    */
+	    /* The jitter y offset is in the original coordinate system.*/
+	    if (jitter.spread > 0) {
+		x += plot->points[i].xhigh * 0.7 * t->h_char;
+		y = map_y(plot->points[i].y + plot->points[i].yhigh);
+	    }
+
 	    /* do clipping if necessary */
 	    if (!clip_points
 		|| (x >= plot_bounds.xleft + p_width
