@@ -1,3 +1,8 @@
+2015-09-15  Mojca Miklavec  <mojca.miklavec.lists@gmail.com>
+
+	* term/lua.trm:  lua 5.3 deprecates luaL_checkint()
+	Bug #1672
+
 2015-09-11 Akira Kakuto <kakuto@fuk.kindai.ac.jp>
 
 	* src/help.c term/lua.trm:  #ifdef _WIN32
