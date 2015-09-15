@@ -1,3 +1,8 @@
+2015-09-15  Mojca Miklavec  <mojca.miklavec.lists@gmail.com>
+
+	* term/lua.trm:  lua 5.3 deprecates luaL_checkint()
+	Bug #1672
+
 2015-09-13  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c src/jitter.c src/jitter.h src/makefile.all
