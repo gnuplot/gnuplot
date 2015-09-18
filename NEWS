@@ -17,7 +17,7 @@ Changes since 5.0.1
 * FIX handle formatted read from a datablock
 * FIX "pause mouse" for wxt terminal (OSX, other single-threaded platforms)
 * FIX 2-column data plots "with filledcurve y=<value>"
-* FIX outliers in boxplot with categories (i.e. level in column 4)
+* FIX handling outliers in boxplot with categories (i.e. level in column 4)
 
 Changes in 5.0.1
 ================

@@ -1,7 +1,8 @@
 2015-09-18  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c (plot_boxplot):  Fix overrun if no valid points are
-	found for some boxplot category (a.k.a. "level").
+	found for some boxplot category (a.k.a. "level").  Fix incorrect 
+	clipping of outliers in zoomed boxplot.
 
 2015-09-15  Mojca Miklavec  <mojca.miklavec.lists@gmail.com>
 
