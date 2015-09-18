@@ -1,3 +1,8 @@
+2015-09-18  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/graphics.c (plot_boxplot):  Fix overrun if no valid points are
+	found for some boxplot category (a.k.a. "level").
+
 2015-09-15  Mojca Miklavec  <mojca.miklavec.lists@gmail.com>
 
 	* term/lua.trm:  lua 5.3 deprecates luaL_checkint()
