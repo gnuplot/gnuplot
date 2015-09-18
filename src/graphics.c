@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.464.2.11 2015/06/15 22:29:00 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.464.2.12 2015/08/21 17:04:16 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -2729,8 +2729,10 @@ filter_boxplot(struct curve_points *plot, int index)
 
     /* Return a count of well-defined points with this index */
     while (plot->points[N-1].type == UNDEFINED
-	|| (boxplot_factor_p != NULL && plot->points[N-1].z != *boxplot_factor_p))
-	N--;
+	|| (boxplot_factor_p != NULL && plot->points[N-1].z != *boxplot_factor_p)) {
+	    N--;
+	    if (N == 0) break;
+	}
 
     return N;
 }
@@ -2766,6 +2768,7 @@ plot_boxplot(struct curve_points *plot)
 	    candle.x = plot->points->x + boxplot_opts.separation * level;
 	    candle.yhigh = -VERYLARGE;
 	    candle.ylow = VERYLARGE;
+	    plot->p_count = N;
 	    goto outliers;
 	}
 
