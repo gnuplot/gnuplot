@@ -1,5 +1,5 @@
 /*
- * $Id: boundary.c,v 1.15.2.2 2015/01/20 01:26:45 sfeam Exp $
+ * $Id: boundary.c,v 1.15.2.3 2015/03/19 17:35:39 sfeam Exp $
  */
 
 /* GNUPLOT - boundary.c */
@@ -1284,7 +1284,6 @@ do_key_sample(
 
     } else if (this_plot->plot_style == VECTOR && t->arrow) {
 	    apply_head_properties(&(this_plot->arrow_properties));
-	    curr_arrow_headlength = -1;
 	    draw_clip_arrow(xl + key_sample_left, yl, xl + key_sample_right, yl,
 			this_plot->arrow_properties.head);
 
