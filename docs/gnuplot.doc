@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.959 2015/09/12 18:35:17 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.960 2015/09/14 03:28:46 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -609,6 +609,8 @@ C
 ?enhanced
 ?text_markup
 ?markup
+?bold
+?italic
  Many terminal types support an enhanced text mode in which additional
  formatting information is embedded in the text string.  For example, "x^2"
  will write x-squared as we are used to seeing it, with a superscript 2.
