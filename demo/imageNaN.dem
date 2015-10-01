@@ -40,15 +40,15 @@ plot $matrixdata matrix with image
 pause -1 "Hit return to continue"
 #
 #
-set title "Same thing in failsafe mode (2D)"
+set title "Same thing in 'pixels' mode (2D)"
 
-plot $matrixdata matrix with image failsafe
+plot $matrixdata matrix with image pixels
 
 pause -1 "Hit return to continue"
 
 set title "Same thing passing data value through 'using 1:2:($3)'"
 
-plot $matrixdata matrix using 1:2:($3) with image failsafe
+plot $matrixdata matrix using 1:2:($3) with image pixels
 
 pause -1 "Hit return to continue"
 
@@ -58,9 +58,9 @@ splot $matrixdata matrix with image
 
 pause -1 "Hit return to continue"
 
-set title "Same thing in failsafe mode (3D)"
+set title "Same thing in 'pixels' mode (3D)"
 
-splot $matrixdata matrix with image failsafe
+splot $matrixdata matrix with image pixels
 
 pause -1 "Hit return to continue"
 
