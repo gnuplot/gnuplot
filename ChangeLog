@@ -1,3 +1,13 @@
+2015-10-01  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/datafile.c (df_readascii): The test intended to check whether the
+	user requested more than 7 columns of formatted input has always been
+	incorrect for 'splot'.  It tested against MAXDATACOLS rather than the 
+	actual number of requested columns.  The test worked but was redundant
+	for 'plot' since requesting more than 7 columns will trigger another
+	error message "too many columns for requested style".  Remove the test.
+	Bug #1675
+
 2015-09-25  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/boundary.c (do_key_sample):  Use the same arrowhead style in the

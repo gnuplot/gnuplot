@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.290.2.14 2015/08/26 04:26:05 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.290.2.15 2015/08/26 04:32:56 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -1870,11 +1870,6 @@ df_readascii(double v[], int max)
 	if (df_format) {
 	    /*{{{  do a sscanf */
 	    int i;
-
-	    /* plot commands never request more than 7 columns */
-	    /* "fit" can use more, but we only handle 7 in the format */
-	    if (max > 7)
-		int_error(NO_CARET,"Formatted input can only handle 7 data columns");
 
 	    /* check we have room for at least 7 columns */
 	    if (df_max_cols < 7)

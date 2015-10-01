@@ -19,6 +19,7 @@ Changes since 5.0.1
 * FIX "pause mouse" for wxt terminal (OSX, other single-threaded platforms)
 * FIX 2-column data plots "with filledcurve y=<value>"
 * FIX handling outliers in boxplot with categories (i.e. level in column 4)
+* FIX inline input format in `splot` command
 
 Changes in 5.0.1
 ================
