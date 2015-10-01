@@ -8,6 +8,14 @@
 	error message "too many columns for requested style".  Remove the test.
 	Bug #1675
 
+	* src/axis.c src/axis.h src/boundary.c src/gadgets.c src/gadgets.h
+	src/graph3d.c src/graphics.c src/hidden3d.c src/misc.c src/save.c
+	src/set.c src/term_api.h src/term.c:
+	#define and use DEFAULT_P_CHAR for all initializers.
+	Change lp_style_type.p_char from an unsigned long to char [8].
+	This suffices to hold the UTF-8 encoding of all unicode code points.
+	Bug #1676
+
 2015-09-25  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/boundary.c (do_key_sample):  Use the same arrowhead style in the

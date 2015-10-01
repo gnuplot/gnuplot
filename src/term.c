@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.315 2015/06/15 23:24:35 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.316 2015/07/09 01:40:56 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -2848,8 +2848,8 @@ recycle:
 	    if (!recycled) {
 	    	lp->p_type = this->lp_properties.p_type;
 	    	lp->p_interval = this->lp_properties.p_interval;
-	    	lp->p_char = this->lp_properties.p_char;
 	    	lp->p_size = this->lp_properties.p_size;
+	    	memcpy(lp->p_char, this->lp_properties.p_char, sizeof(lp->p_char));
 	    }
 	    return;
 	} else {

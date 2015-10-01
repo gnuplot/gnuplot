@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.198 2015/04/25 05:05:23 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.199 2015/08/08 18:32:17 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -1158,12 +1158,12 @@ lp_parse(struct lp_style_type *lp, lp_class destination_class, TBOOLEAN allow_po
 		    /* An alternative mechanism would be to use
 		     * utf8toulong(&newlp.p_char, symbol);
 		     */
-		    strncpy((char *)(&newlp.p_char), symbol, 3);
+		    strncpy(newlp.p_char, symbol, sizeof(newlp.p_char)-1);
 		    /* Truncate ascii text to single character */
-		    if ((((char *)&newlp.p_char)[0] & 0x80) == 0)
-			((char *)&newlp.p_char)[1] = '\0';
-		    /* UTF-8 characters may use up to 3 bytes */
-		    ((char *)&newlp.p_char)[3] = '\0';
+		    if ((newlp.p_char[0] & 0x80) == 0)
+			newlp.p_char[1] = '\0';
+		    /* strncpy does not guarantee null-termination */
+		    newlp.p_char[sizeof(newlp.p_char)-1] = '\0';
 		    free(symbol);
 		} else {
 		    newlp.p_type = int_expression() - 1;
@@ -1243,7 +1243,7 @@ lp_parse(struct lp_style_type *lp, lp_class destination_class, TBOOLEAN allow_po
 	lp->l_width = newlp.l_width;
     if (set_pt) {
 	lp->p_type = newlp.p_type;
-	lp->p_char = newlp.p_char;
+	memcpy(lp->p_char, newlp.p_char, sizeof(newlp.p_char));
     }
     if (set_ps)
 	lp->p_size = newlp.p_size;

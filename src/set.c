@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.499 2015/08/19 18:06:09 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.500 2015/09/14 03:28:47 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -180,7 +180,7 @@ static const struct position default_offset
 	= {character, character, character, 0., 0., 0.};
 
 static lp_style_type default_hypertext_point_style
-	= {1, LT_BLACK, 4, DASHTYPE_SOLID, 0, 1.0, PTSZ_DEFAULT, 0, {TC_RGB, 0x000000, 0.0}, DEFAULT_DASHPATTERN};
+	= {1, LT_BLACK, 4, DASHTYPE_SOLID, 0, 1.0, PTSZ_DEFAULT, DEFAULT_P_CHAR, {TC_RGB, 0x000000, 0.0}, DEFAULT_DASHPATTERN};
 
 /******** The 'set' command ********/
 void
