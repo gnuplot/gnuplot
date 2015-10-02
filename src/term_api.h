@@ -1,5 +1,5 @@
 /*
- * $Id: term_api.h,v 1.142 2015/06/02 23:32:28 sfeam Exp $
+ * $Id: term_api.h,v 1.143 2015/10/01 04:04:59 sfeam Exp $
  */
 
 /* GNUPLOT - term_api.h */
@@ -134,6 +134,7 @@ typedef struct lp_style_type {	/* contains all Line and Point properties */
 #define LP_SHOW_POINTS     (0x1) /* if not set, ignore the point properties of this line style */
 #define LP_NOT_INITIALIZED (0x2) /* internal flag used in set.c:parse_label_options */
 #define LP_EXPLICIT_COLOR  (0x4) /* set by lp_parse if the user provided a color spec */
+#define LP_ERRORBAR_SET    (0x8) /* set by "set errorbars <lineprops> */
 
 #define DEFAULT_COLOR_SEQUENCE { 0x9400d3, 0x009e73, 0x56b4e9, 0xe69f00, \
                                  0xf0e442, 0x0072b2, 0xe51e10, 0x000000 }

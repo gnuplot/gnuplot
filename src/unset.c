@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.228 2015/08/19 18:06:09 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.229 2015/09/14 03:28:48 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -720,6 +720,7 @@ reset_bars()
     struct lp_style_type def = DEFAULT_LP_STYLE_TYPE;
     bar_lp = def;
     bar_lp.l_type = LT_DEFAULT;
+    bar_lp.pm3d_color.type = TC_VARIABLE;
     bar_size = 1.0;
     bar_layer = LAYER_FRONT;
 }

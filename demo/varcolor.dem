@@ -45,6 +45,7 @@ plot 'candlesticks.dat' using 1:(1):1 with points pt 11 lc pal z, \
 
 pause -1 'Hit <cr> to continue'
 
+set errorbars
 plot 'candlesticks.dat' \
         using 1:5:2:6:(.2):1 with boxerror lc pal z fs solid 0.5, \
      '' using 1:(1):1 with points pt 11 lc pal z, \
@@ -57,7 +58,6 @@ plot 'candlesticks.dat' \
 pause -1 'Hit <cr> to continue'
 
 set title "variable color using 'lc rgb variable'"
-set errorbars
 plot 'candlesticks.dat' using 1:(1):(rgbfudge($1)) with points pt 11 lc rgb var, \
      '' using 1:2:(.1):(rgbfudge($1)) with circles lc rgb var, \
      '' using 1:3:2:6:5:(rgbfudge($1)) with candlesticks lc rgb var, \

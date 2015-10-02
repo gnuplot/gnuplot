@@ -1,5 +1,5 @@
 /*
- * $Id: boundary.c,v 1.26 2015/09/25 16:58:37 sfeam Exp $
+ * $Id: boundary.c,v 1.27 2015/10/01 04:04:57 sfeam Exp $
  */
 
 /* GNUPLOT - boundary.c */
@@ -1292,11 +1292,11 @@ do_key_sample(
 
     } else if ((this_plot->plot_style & PLOT_STYLE_HAS_ERRORBAR) &&  this_plot->plot_type == DATA) {
 	/* errors for data plots only */
-	if (bar_lp.l_type != LT_DEFAULT)
+	if ((bar_lp.flags & LP_ERRORBAR_SET) != 0)
 	    term_apply_lp_properties(&bar_lp);
 	draw_clip_line(xl + key_sample_left, yl, xl + key_sample_right, yl);
 	/* Even if error bars are dotted, the end lines are always solid */
-	if (bar_lp.l_type != LT_DEFAULT)
+	if ((bar_lp.flags & LP_ERRORBAR_SET) != 0)
 	    term->dashtype(DASHTYPE_SOLID,NULL);
 
     } else if ((this_plot->plot_style & PLOT_STYLE_HAS_LINE)) {

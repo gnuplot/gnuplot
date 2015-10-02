@@ -1,3 +1,21 @@
+2015-10-02  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/boundary.c src/graphics.c src/save.c src/set.c src/term_api.h
+	src/unset.c demo/varcolor.dem:
+	Clean up implementation of "set errorbars <line properties>".
+	Apply errorbars line properties also to candlesticks and boxplots.
+
+	Add explicit handling for two line property settings that to the best
+	of my knowledge were not used intentionally by other code paths.
+
+	* src/term.c (term_apply_lp_properties); Treat LT_DEFAULT as "do not 
+	change current setting" rather than pass it to term->linetype(), which
+	could produce unpredictable behaviour (not all terminals act the same).
+
+	* src/gadgets.c (apply_pm3dcolor): Treat TC_VARIABLE as "do not change
+	current setting".  Previously it would have resulted in setting the
+	color to black, but that was unintentional.
+
 2015-10-01  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/datafile.c (df_readascii): The test intended to check whether the

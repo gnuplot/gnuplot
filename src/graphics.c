@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.501 2015/09/19 17:28:49 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.502 2015/10/01 04:04:58 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -1652,7 +1652,7 @@ plot_bars(struct curve_points *plot)
 	    }
 
 	    /* Error bars can now have a separate line style */
-	    if (bar_lp.l_type != LT_DEFAULT)
+	    if ((bar_lp.flags & LP_ERRORBAR_SET) != 0)
 		term_apply_lp_properties(&bar_lp);
 	    /* Error bars should be drawn in the border color for filled boxes
 	     * but only if there *is* a border color. */
@@ -1664,7 +1664,7 @@ plot_bars(struct curve_points *plot)
 	    draw_clip_line(xM, ylowM, xM, yhighM);
 
 	    /* Even if error bars are dotted, the end lines are always solid */
-	    if (bar_lp.l_type != LT_DEFAULT)
+	    if ((bar_lp.flags & LP_ERRORBAR_SET) != 0)
 		term->dashtype(DASHTYPE_SOLID,NULL);
 
 	    if (!polar) {
@@ -1737,14 +1737,14 @@ plot_bars(struct curve_points *plot)
 	    check_for_variable_color(plot, &plot->varcolor[i]);
 
 	    /* Error bars can now have their own line style */
-	    if (bar_lp.l_type != LT_DEFAULT)
+	    if ((bar_lp.flags & LP_ERRORBAR_SET) != 0)
 		term_apply_lp_properties(&bar_lp);
 
 	    /* by here everything has been mapped */
 	    draw_clip_line(xlowM, yM, xhighM, yM);
 
 	    /* Even if error bars are dotted, the end lines are always solid */
-	    if (bar_lp.l_type != LT_DEFAULT)
+	    if ((bar_lp.flags & LP_ERRORBAR_SET) != 0)
 		term->dashtype(DASHTYPE_SOLID,NULL);
 
 	    if (bar_size > 0.0) {
@@ -2568,6 +2568,10 @@ plot_c_bars(struct curve_points *plot)
 	      plot->fill_properties.border_color.lt == LT_NODRAW)) {
 		term_apply_lp_properties(&plot->lp_properties);
 	}
+	/* Reset also if we changed it for the errorbars */
+	else if ((bar_lp.flags & LP_ERRORBAR_SET) != 0) {
+		term_apply_lp_properties(&plot->lp_properties);
+	}
 
 	/* variable color read from extra data column. June 2010 */
 	check_for_variable_color(plot, &plot->varcolor[i]);
@@ -2591,21 +2595,46 @@ plot_c_bars(struct curve_points *plot)
 	    }
 	}
 
-	/* Draw whiskers and an open box */
-	    (*t->move)   (xM, ylowM);
-	    (*t->vector) (xM, ymin);
-	    (*t->move)   (xM, ymax);
-	    (*t->vector) (xM, yhighM);
+	/* Draw open box */
+	if (!skip_box) {
+	    newpath();
+	    (*t->move)   (xlowM, map_y(yopen));
+	    (*t->vector) (xhighM, map_y(yopen));
+	    (*t->vector) (xhighM, map_y(yclose));
+	    (*t->vector) (xlowM, map_y(yclose));
+	    (*t->vector) (xlowM, map_y(yopen));
+	    closepath();
+	}
 
-	    if (!skip_box) {
-		newpath();
-		(*t->move)   (xlowM, map_y(yopen));
-		(*t->vector) (xhighM, map_y(yopen));
-		(*t->vector) (xhighM, map_y(yclose));
-		(*t->vector) (xlowM, map_y(yclose));
-		(*t->vector) (xlowM, map_y(yopen));
-		closepath();
-	    }
+	/* BOXPLOT wants a median line also, which is stored in xhigh */
+	if (plot->plot_style == BOXPLOT) {
+	    int ymedianM = map_y(plot->points[i].xhigh);
+	    (*t->move)   (xlowM,  ymedianM);
+	    (*t->vector) (xhighM, ymedianM);
+	}
+
+	/* Through 4.2 gnuplot would indicate (open > close) by drawing     */
+	/* three vertical bars.  Now we use solid fill.  But if the current */
+	/* terminal does not support filled boxes, fall back to the old way */
+	if ((yopen > yclose) && !(term->fillbox)) {
+	    (*t->move)   (xM, ymin);
+	    (*t->vector) (xM, ymax);
+	    (*t->move)   ( (xM + xlowM) / 2, ymin);
+	    (*t->vector) ( (xM + xlowM) / 2, ymax);
+	    (*t->move)   ( (xM + xhighM) / 2, ymin);
+	    (*t->vector) ( (xM + xhighM) / 2, ymax);
+	}
+
+	/* Error bars can now have their own line style */
+	if ((bar_lp.flags & LP_ERRORBAR_SET) != 0) {
+	    term_apply_lp_properties(&bar_lp);
+	}
+
+	/* Draw whiskers */
+	(*t->move)   (xM, ylowM);
+	(*t->vector) (xM, ymin);
+	(*t->move)   (xM, ymax);
+	(*t->vector) (xM, yhighM);
 
 	/* Some users prefer bars at the end of the whiskers */
 	if (plot->plot_style == BOXPLOT
@@ -2629,25 +2658,6 @@ plot_c_bars(struct curve_points *plot)
 		(*t->move)   (xlowM+d, ylowM);
 		(*t->vector) (xhighM-d, ylowM);
 	    }
-	}
-
-	/* BOXPLOT wants a median line also, which is stored in xhigh */
-	if (plot->plot_style == BOXPLOT) {
-	    int ymedianM = map_y(plot->points[i].xhigh);
-	    (*t->move)   (xlowM,  ymedianM);
-	    (*t->vector) (xhighM, ymedianM);
-	}
-
-	/* Through 4.2 gnuplot would indicate (open > close) by drawing     */
-	/* three vertical bars.  Now we use solid fill.  But if the current */
-	/* terminal does not support filled boxes, fall back to the old way */
-	if ((yopen > yclose) && !(term->fillbox)) {
-	    (*t->move)   (xM, ymin);
-	    (*t->vector) (xM, ymax);
-	    (*t->move)   ( (xM + xlowM) / 2, ymin);
-	    (*t->vector) ( (xM + xlowM) / 2, ymax);
-	    (*t->move)   ( (xM + xhighM) / 2, ymin);
-	    (*t->vector) ( (xM + xhighM) / 2, ymax);
 	}
 
 	prev = plot->points[i].type;

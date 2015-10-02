@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.286 2015/09/14 03:28:47 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.287 2015/10/01 04:04:59 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -1592,7 +1592,7 @@ save_bars(FILE *fp)
 	fprintf(fp, " %f ", bar_size);
     else
 	fprintf(fp," fullwidth ");
-    if (bar_lp.l_type != LT_DEFAULT)
+    if ((bar_lp.flags & LP_ERRORBAR_SET) != 0)
 	save_linetype(fp, &bar_lp, FALSE);
     fputs("\n",fp);
 }
