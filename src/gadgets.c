@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gadgets.c,v 1.121 2015/05/08 18:32:12 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gadgets.c,v 1.122 2015/10/01 04:04:57 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - gadgets.c */
@@ -622,10 +622,15 @@ apply_pm3dcolor(struct t_colorspec *tc)
 	    t->set_color(tc);
 	return;
     }
+    /* Leave unchanged. (used only by "set errorbars"??) */
+    if (tc->type == TC_VARIABLE)
+	return;
+
     if (!is_plot_with_palette()) {
 	t->set_color(&black);
 	return;
     }
+
     switch (tc->type) {
 	case TC_Z:
 		set_color(cb2gray(z2cb(tc->value)));
