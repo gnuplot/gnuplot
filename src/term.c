@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.316 2015/07/09 01:40:56 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.317 2015/10/01 04:04:59 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -641,6 +641,12 @@ term_apply_lp_properties(struct lp_style_type *lp)
      *  The linetype might depend on the linewidth in some terminals.
      */
     (*term->linewidth) (lp->l_width);
+
+    /* LT_DEFAULT (used only by "set errorbars"?) means don't change it */
+    /* FIXME: If this causes problems, test also for LP_ERRORBAR_SET    */
+    if (lt == LT_DEFAULT)
+	;
+    else
 
     /* The paradigm for handling linetype and dashtype in version 5 is */
     /* linetype < 0 (e.g. LT_BACKGROUND, LT_NODRAW) means some special */
