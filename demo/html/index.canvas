@@ -109,6 +109,7 @@
     <li><a href="smooth.html">binning/histograms</a></li>
     <li><a href="gantt.html">Gantt chart</a></li>
     <li><a href="heatmaps.html">2D and 3D heat maps</a></li>
+    <li><a href="violinplot.html">Violin plot</a></li>
     </ul>
 
     <h4>Text options</h4>
