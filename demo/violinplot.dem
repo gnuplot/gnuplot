@@ -92,3 +92,6 @@ plot $kdensity2 using (1 + $2/20.):1 with filledcurve x=1 lt 10, \
      '' using (1 - $2/20.):1 with filledcurve x=1 lt 10, \
      $kdensity1 using (3 + $2/20.):1 with filledcurve x=3 lt 9, \
      '' using (3 - $2/20.):1 with filledcurve x=3 lt 9
+
+pause -1 "Hit <cr> to continue"
+reset
