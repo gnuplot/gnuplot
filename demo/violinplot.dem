@@ -36,7 +36,7 @@ unset key
 
 set jitter overlap first 2
 set title font ",15"
-set title "swarm jitter with a large number of points\n produces a violin plot"
+set title "swarm jitter with a large number of points\n approximates a violin plot"
 set style data points
 
 set linetype  9 lc "#80bbaa44" ps 0.5 pt 5
@@ -55,13 +55,6 @@ plot $viol1 using ($1 + J*invnorm(rand(0))):2 lt 9, \
 
 pause -1 "Hit <cr> to continue"
 
-set title "uniform random jitter"
-J = 0.5
-plot $viol1 using ($1 - 0.25 + J*rand(0)):2 lt 9, \
-     $viol2 using ($1 - 0.25 + J*rand(0)):2 lt 10
-
-pause -1 "Hit <cr> to continue"
-
 set title "Same data - kernel density"
 set style data filledcurves below
 set auto x
@@ -71,8 +64,31 @@ set border 3
 set margins screen .15, screen .85, screen .15, screen .85
 set key
 
-plot $viol1 using 2:(1) smooth kdensity with filledcurves above y lt 9 title 'B', \
-     $viol2 using 2:(1) smooth kdensity with filledcurves above y lt 10 title 'A'
+plot $viol1 using 2:(1) smooth kdensity bandwidth 10. with filledcurves above y lt 9 title 'B', \
+     $viol2 using 2:(1) smooth kdensity bandwidth 10. with filledcurves above y lt 10 title 'A'
 
 pause -1 "Hit <cr> to continue"
 
+#
+# Save each kernel density plot to a data block 
+# Then replot, mirrored, along the vertical axis
+#
+
+set title "kdensity mirrored sideways to give a violin plot"
+
+set table $kdensity1
+plot $viol1 using 2:(1) smooth kdensity bandwidth 10. with filledcurves above y lt 9 title 'B'
+set table $kdensity2
+plot $viol2 using 2:(1) smooth kdensity bandwidth 10. with filledcurves above y lt 10 title 'A'
+unset table
+unset key
+
+set border 2
+unset xtics
+set ytics nomirror rangelimited
+
+set xrange [-1:5]
+plot $kdensity2 using (1 + $2/20.):1 with filledcurve x=1 lt 10, \
+     '' using (1 - $2/20.):1 with filledcurve x=1 lt 10, \
+     $kdensity1 using (3 + $2/20.):1 with filledcurve x=3 lt 9, \
+     '' using (3 - $2/20.):1 with filledcurve x=3 lt 9
