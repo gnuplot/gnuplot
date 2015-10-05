@@ -84,6 +84,7 @@ unset table
 unset key
 
 set border 2
+unset margins
 unset xtics
 set ytics nomirror rangelimited
 
