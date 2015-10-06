@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.459.2.19 2015/08/01 05:07:24 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.459.2.20 2015/08/01 05:11:08 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -4249,36 +4249,40 @@ set_obj(int tag, int obj_type)
 		    get_position(&this_polygon->vertex[0]);
 		    this_polygon->type = 1;
 		    got_origin = TRUE;
+		    continue;
 		}
-		while (equals(c_token,"to") || equals(c_token,"rto")) {
-		    if (!got_origin)
-			goto polygon_error;
-		    this_polygon->vertex = gp_realloc(this_polygon->vertex,
-					(this_polygon->type+1) * sizeof(struct position),
-					"polygon vertex");
-		    if (equals(c_token++,"to")) {
-			get_position(&this_polygon->vertex[this_polygon->type]);
-		    } else /* "rto" */ {
-			int v = this_polygon->type;
-			get_position_default(&this_polygon->vertex[v],
-					      this_polygon->vertex->scalex);
-			if (this_polygon->vertex[v].scalex != this_polygon->vertex[v-1].scalex
-			||  this_polygon->vertex[v].scaley != this_polygon->vertex[v-1].scaley)
-			    int_error(c_token,"relative coordinates must match in type");
-			this_polygon->vertex[v].x += this_polygon->vertex[v-1].x;
-			this_polygon->vertex[v].y += this_polygon->vertex[v-1].y;
+		if (!got_corners && (equals(c_token,"to") || equals(c_token,"rto"))) {
+		    while (equals(c_token,"to") || equals(c_token,"rto")) {
+			if (!got_origin)
+			    goto polygon_error;
+			this_polygon->vertex = gp_realloc(this_polygon->vertex,
+					    (this_polygon->type+1) * sizeof(struct position),
+					    "polygon vertex");
+			if (equals(c_token++,"to")) {
+			    get_position(&this_polygon->vertex[this_polygon->type]);
+			} else /* "rto" */ {
+			    int v = this_polygon->type;
+			    get_position_default(&this_polygon->vertex[v],
+						  this_polygon->vertex->scalex);
+			    if (this_polygon->vertex[v].scalex != this_polygon->vertex[v-1].scalex
+			    ||  this_polygon->vertex[v].scaley != this_polygon->vertex[v-1].scaley)
+				int_error(c_token,"relative coordinates must match in type");
+			    this_polygon->vertex[v].x += this_polygon->vertex[v-1].x;
+			    this_polygon->vertex[v].y += this_polygon->vertex[v-1].y;
+			}
+			this_polygon->type++;
+			got_corners = TRUE;
 		    }
-		    this_polygon->type++;
-		    got_corners = TRUE;
-		}
-		if (got_corners && memcmp(&this_polygon->vertex[this_polygon->type-1],
-					  &this_polygon->vertex[0],sizeof(struct position))) {
-		    fprintf(stderr,"Polygon is not closed - adding extra vertex\n");
-		    this_polygon->vertex = gp_realloc(this_polygon->vertex,
-					(this_polygon->type+1) * sizeof(struct position),
-					"polygon vertex");
-		    this_polygon->vertex[this_polygon->type] = this_polygon->vertex[0];
-		    this_polygon->type++;
+		    if (got_corners && memcmp(&this_polygon->vertex[this_polygon->type-1],
+					      &this_polygon->vertex[0],sizeof(struct position))) {
+			fprintf(stderr,"Polygon is not closed - adding extra vertex\n");
+			this_polygon->vertex = gp_realloc(this_polygon->vertex,
+					    (this_polygon->type+1) * sizeof(struct position),
+					    "polygon vertex");
+			this_polygon->vertex[this_polygon->type] = this_polygon->vertex[0];
+			this_polygon->type++;
+		    }
+		    continue;
 		}
 		break;
 		polygon_error:
@@ -4286,6 +4290,7 @@ set_obj(int tag, int obj_type)
 			this_polygon->vertex = NULL;
 			this_polygon->type = 0;
 			int_error(c_token, "Unrecognized polygon syntax");
+		/* End of polygon options */
 
 	default:
 		int_error(c_token, "unrecognized object type");
