@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.242 2015/08/19 18:06:09 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.243 2015/08/21 20:45:03 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -2148,8 +2148,7 @@ eval_3dplots()
     }				/* some functions */
 
     /* if first_3dplot is NULL, we have no functions or data at all.
-       * This can happen, if you type "splot x=5", since x=5 is a
-       * variable assignment
+     * This can happen if you type "splot x=5", since x=5 is a variable assignment.
      */
     if (plot_num == 0 || first_3dplot == NULL) {
 	int_error(c_token, "no functions or data to plot");
