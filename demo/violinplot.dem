@@ -95,4 +95,16 @@ plot $kdensity2 using (1 + $2/20.):1 with filledcurve x=1 lt 10, \
      '' using (3 - $2/20.):1 with filledcurve x=3 lt 9
 
 pause -1 "Hit <cr> to continue"
+
+set title 'Superimposed violin plot and box plot'
+
+set style fill solid bo -1
+set boxwidth 0.075
+set errorbars lt black lw 1
+
+replot $viol2 using (1):2 with boxplot fc "white" lw 2, \
+       $viol1 using (3):2 with boxplot fc "white" lw 2
+
+pause -1 "Hit <cr> to continue"
+
 reset
