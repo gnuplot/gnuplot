@@ -1,8 +1,22 @@
+2015-10-08  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/plot2d.h src/plot2d.c docs/gnuplot.doc:  Until now,
+	"plot foo using N smooth freq" and "plot foo using N smooth kdensity"
+	were interpreted as if the using clause was "using 0:N".  This is
+	almost certainly not what the user expected.  Change it so that the
+	interpretation is "using N:(1.0)", i.e. unit weight for each data point.
+	This was always the recommended use in the docs; now it is the default
+	interpretation as well.
+
 2015-10-06  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/set.c (set_obj):  "set obj N polygon ..." failed to consume all
 	possible options and keywords.	
 	Bug #1680
+
+	* src/plot2d.c (get_data):  "plot $foo using N smooth kdensity" is now
+	interpreted as "using N:(1)".  Before it was interpreted as "using 0:N"
+	which makes little sense.
 
 2015-10-02  Ethan A Merritt  <merritt@u.washington.edu>
 
@@ -14,7 +28,7 @@
 	Add explicit handling for two line property settings that to the best
 	of my knowledge were not used intentionally by other code paths.
 
-	* src/term.c (term_apply_lp_properties); Treat LT_DEFAULT as "do not 
+	* src/term.c (term_apply_lp_properties): Treat LT_DEFAULT as "do not 
 	change current setting" rather than pass it to term->linetype(), which
 	could produce unpredictable behaviour (not all terminals act the same).
 
