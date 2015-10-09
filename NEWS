@@ -20,6 +20,7 @@ Changes since 5.0.1
 * FIX 2-column data plots "with filledcurve y=<value>"
 * FIX handling outliers in boxplot with categories (i.e. level in column 4)
 * FIX inline input format in `splot` command
+* FIX order-dependence of optional keywords for "set key" and "set obj polygon"
 
 Changes in 5.0.1
 ================

@@ -1,3 +1,10 @@
+2015-10-09  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/set.c (parse_label_options):  Only the full word "boxed" is 
+	acceptable as a label option.  Allowing the shorthand "box" causes 
+	confusion in other commands with a "box" option.
+	Bug #1681
+
 2015-10-06  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/set.c (set_obj):  "set obj N polygon ..." failed to consume all
