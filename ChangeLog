@@ -5,6 +5,9 @@
 	confusion in other commands with a "box" option.
 	Bug #1681
 
+	* src/interpol.c (cp_implode): Fix bug in "smooth cnorm" that has been
+	there since the option was first introduced.
+
 2015-10-08  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/plot2d.h src/plot2d.c docs/gnuplot.doc:  Until now,
