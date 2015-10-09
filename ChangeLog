@@ -5,6 +5,9 @@
 	confusion in other commands with a "box" option.
 	Bug #1681
 
+	* src/interpol.c (cp_implode): Fix bug in "smooth cnorm" that has been
+	there since the option was first introduced.
+
 2015-10-06  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/set.c (set_obj):  "set obj N polygon ..." failed to consume all
