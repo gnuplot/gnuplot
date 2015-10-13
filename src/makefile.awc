@@ -9,7 +9,7 @@ color.$(O) contour.$(O) command.$(O) multiplot.$(O) plot.$(O) scanner.$(O) &
 gadgets.$(O) plot2d.$(O) tables.$(O) time.$(O) pm3d.$(O) matrix.$(O) &
 boundary.$(O) fit.$(O) misc.$(O) alloc.$(O) external.$(O) help.$(O) &
 interpol.$(O) datafile.$(O) parse.$(O) standard.$(O) variable.$(O) &
-datablock.$(O) graphics.$(O) mouse.$(O) set.$(O) history.$(O)
+datablock.$(O) graphics.$(O) mouse.$(O) set.$(O) history.$(O) jitter.$(O)
 
 # List of terminal driver sources
 CORETERM = $(T)ai.trm $(T)aquaterm.trm $(T)be.trm $(T)caca.trm &
