@@ -37,7 +37,7 @@
 
 
 
-  $Date: 2014/11/08 05:32:32 $
+  $Date: 2014/11/09 00:47:20 $
   $Author: sfeam $
   $Rev: 100 $
 
@@ -81,7 +81,7 @@ pgf.DEFAULT_FONT_V_CHAR = 308
 pgf.STYLE_FILE_BASENAME = "gnuplot-lua-tikz"  -- \usepackage{gnuplot-lua-tikz}
 
 pgf.REVISION = string.sub("$Rev: 100 $",7,-3)
-pgf.REVISION_DATE = string.gsub("$Date: 2014/11/08 05:32:32 $",
+pgf.REVISION_DATE = string.gsub("$Date: 2014/11/09 00:47:20 $",
                                 "$Date: ([0-9]+).([0-9]+).([0-9]+) .*","%1/%2/%3")
 
 pgf.styles = {}
@@ -2340,8 +2340,8 @@ term.set_font = function(font)
   local fontsize = nil
   gfx.text_font, fontsize = gfx.parse_font_string(font)
   if fontsize then
-    term.h_char = pgf.DEFAULT_FONT_H_CHAR * (fontsize/10) * (pgf.DEFAULT_RESOLUTION/1000)
-    term.v_char = pgf.DEFAULT_FONT_V_CHAR * (fontsize/10) * (pgf.DEFAULT_RESOLUTION/1000)
+    term.h_char = math.floor(pgf.DEFAULT_FONT_H_CHAR * (fontsize/10) * (pgf.DEFAULT_RESOLUTION/1000) + 0.5)
+    term.v_char = math.floor(pgf.DEFAULT_FONT_V_CHAR * (fontsize/10) * (pgf.DEFAULT_RESOLUTION/1000) + 0.5)
   end
   return 1
 end
