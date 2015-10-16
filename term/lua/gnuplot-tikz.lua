@@ -37,7 +37,7 @@
 
 
 
-  $Date: 2014/11/09 00:47:20 $
+  $Date: 2015/10/17 05:22:36 $
   $Author: sfeam $
   $Rev: 100 $
 
@@ -81,7 +81,7 @@ pgf.DEFAULT_FONT_V_CHAR = 308
 pgf.STYLE_FILE_BASENAME = "gnuplot-lua-tikz"  -- \usepackage{gnuplot-lua-tikz}
 
 pgf.REVISION = string.sub("$Rev: 100 $",7,-3)
-pgf.REVISION_DATE = string.gsub("$Date: 2014/11/09 00:47:20 $",
+pgf.REVISION_DATE = string.gsub("$Date: 2015/10/17 05:22:36 $",
                                 "$Date: ([0-9]+).([0-9]+).([0-9]+) .*","%1/%2/%3")
 
 pgf.styles = {}
@@ -1753,8 +1753,9 @@ term.options = function(opt_str, initial, t_count)
       if s_end then
         o_next = string.sub(opt_str, s_start+1, s_end-1)
         if next_char == '"' then
-          -- Wow! this is to resolve all string escapes, kind of "unescape string"
-          o_next = assert(loadstring("return(\""..o_next.."\")"))()
+          -- this is to resolve all string escapes, kind of "unescape string"
+          -- lua 5.2 deprecated loadstring in favor of load
+          o_next = assert(load("return(\""..o_next.."\")"))()
         end
         o_type = "string"
       else
