@@ -22,6 +22,9 @@ Changes since 5.0.1
 * FIX inline input format in `splot` command
 * FIX order-dependence of optional keywords for "set key" and "set obj polygon"
 * FIX lua/tikz text placement errors on OSX 10.10.2 with lua5.3
+* FIX B and L formats in gprintf()
+* FIX bug parsing time input with format "%s" (extra fractional second)
+* FIX incorrect average value in final bin of "smooth cnorm" calculation
 
 Changes in 5.0.1
 ================
