@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.902.2.42 2015/08/19 16:41:03 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.902.2.43 2015/09/04 05:59:05 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -13215,7 +13215,7 @@ Ffigure_missing
  coordinates (`set xtics geographic`), or times or dates (`set xtics time`).
 
  Note: For backward compatibility with earlier gnuplot versions, the command
- `set xdata time` will implicitly also act do `set xtics time`, and `set xdata`
+ `set xdata time` will implicitly also do `set xtics time`, and `set xdata`
  or `unset xdata` will implicitly reset to `set xtics numeric`.  However you
  can change this with a later call to `set xtics`.
 
