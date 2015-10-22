@@ -1,3 +1,12 @@
+2015-10-22  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/time.c (gstrptime): Fixes a bug in processing time input using
+	format "%s".  Because time input can cross whitespace between fields,
+	the string being parsed for one field may continue on into the next
+	field.  The "%s" code looked for the first decimal point in the string,
+	but would read beyond the current field to find it, causing an erroneous
+	fractional second to be added to the input time value.
+
 2015-10-09  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/interpol.c (cp_implode): Fix bug in "smooth cnorm" that has been

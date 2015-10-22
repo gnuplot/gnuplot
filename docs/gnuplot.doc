@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.701.2.41 2014/06/10 17:35:01 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.701.2.42 2015/02/18 19:21:15 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -11704,7 +11704,7 @@ Ffigure_mapcontours
        %j           day of the year, 1--365
        %H           hour, 0--24
        %M           minute, 0--60
-       %s           seconds since the Unix epoch (1970-01-01, 00:00 UTC)
+       %s           seconds since the Unix epoch (2000-01-01, 00:00 UTC)
        %S           second, integer 0--60 on output, (double) on input
        %b           three-character abbreviation of the name of the month
        %B           name of the month
@@ -11719,7 +11719,7 @@ Ffigure_mapcontours
 #\verb@%j@ & day of the year, 1--365 \\
 #\verb@%H@ & hour, 0--24 \\
 #\verb@%M@ & minute, 0--60 \\
-#\verb@%s@ & seconds since the Unix epoch (1970-01-01 00:00 UTC) \\
+#\verb@%s@ & seconds since the Unix epoch (2000-01-01 00:00 UTC) \\
 #\verb@%S@ & second, integer 0--60 on output, (double) on input \\
 #\verb@%b@ & three-character abbreviation of the name of the month \\
 #\verb@%B@ & name of the month \\
@@ -11733,7 +11733,7 @@ Ffigure_mapcontours
 %%j@day of the year, 1--365
 %%H@hour, 0--24
 %%M@minute, 0--60
-%%s@seconds since the Unix epoch (1970-01-01 00:00 UTC)
+%%s@seconds since the Unix epoch (2000-01-01 00:00 UTC)
 %%S@second, integer 0--60 on output, (double) on input
 %%b@three-character abbreviation of the name of the month
 %%B@name of the month
@@ -11757,7 +11757,7 @@ Ffigure_mapcontours
 ^<tr>    <td><tt>%j</tt></td>    <td>day of the year, 1&ndash;365</td></tr>
 ^<tr>    <td><tt>%H</tt></td>    <td>hour, 0&ndash;24</td></tr>
 ^<tr>    <td><tt>%M</tt></td>    <td>minute, 0&ndash;60</td></tr>
-^<tr>    <td><tt>%s</tt></td>    <td>seconds since the Unix epoch (1970-01-01 00:00 UTC)</td></tr>
+^<tr>    <td><tt>%s</tt></td>    <td>seconds since the Unix epoch (2000-01-01 00:00 UTC)</td></tr>
 ^<tr>    <td><tt>%S</tt></td>    <td>second, integer 0&ndash;60 on output, (double) on input</td></tr>
 ^<tr>    <td><tt>%b</tt></td>    <td>three-character abbreviation of the name of the month</td></tr>
 ^<tr>    <td><tt>%B</tt></td>    <td>name of the month</td></tr>

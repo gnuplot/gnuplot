@@ -5,6 +5,9 @@ New features, changes and fixes since gnuplot version 4.6.6
 * FIX incorrect colorbox axis labels in polar plots
 * FIX off-by-one error in color of contours when hidden3d is active
 * FIX stats code was confusing the x and y dimensions of matrix data
+* FIX B and L formats in gprintf()
+* FIX bug parsing time input with format "%s" (extra fractional second)
+* FIX incorrect average value in final bin of "smooth cnorm" calculation
 
 
 New features, changes and fixes in gnuplot version 4.6.6
