@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: post.trm,v 1.288 2014/06/10 19:55:18 sfeam Exp $
+ * $Id: post.trm,v 1.289 2015/10/22 20:36:23 sfeam Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -1807,8 +1807,6 @@ end\n\
 	    free(outstr2);
     }
 
-    fputs("end\n", gppsfile);
-
 #ifdef EAM_BOXED_TEXT
     /* Define macros supporting boxed text */
     fprintf(gppsfile, psi4);
@@ -1816,6 +1814,7 @@ end\n\
     fputs("/textshow { Gshow } def\n",gppsfile);
 #endif
 
+    fputs("end\n", gppsfile);
     fputs("%%EndProlog\n", gppsfile);
 }
 

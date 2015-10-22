@@ -7,6 +7,8 @@
 	but would read beyond the current field to find it, causing an erroneous
 	fractional second to be added to the input time value.
 
+	* term/post.trm:  Fix scope of dictionary in prologue
+
 	* src/term_api.h term/post.trm src/graphics.c (plot_border)
 	term/PostScript/prologue.ps term/PostScript/prologues.h:
 
