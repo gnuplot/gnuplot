@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: time.c,v 1.29 2014/11/07 00:16:50 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: time.c,v 1.30 2015/01/16 21:59:43 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - time.c */
@@ -249,7 +249,7 @@ gstrptime(char *s, char *fmt, struct tm *tm, double *usec)
 		double ufraction = 0;
 		double when = strtod (s, &s) - SEC_OFFS_SYS;
 		ggmtime(tm, when);
-		if (fraction)
+		if (fraction && fraction < s)
 		    ufraction = atof(fraction);
 		if (ufraction < 1.)		/* Filter out e.g. 123.456e7 */
 		    *usec = ufraction;
