@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.502 2015/10/01 04:04:58 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.503 2015/10/02 22:28:42 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -3671,6 +3671,7 @@ plot_border()
 {
     int min, max;
 
+	(*term->layer) (TERM_LAYER_BEGIN_BORDER);
 	term_apply_lp_properties(&border_lp);	/* border linetype */
 	if (border_complete)
 	    newpath();
@@ -3726,6 +3727,7 @@ plot_border()
 
 	if (border_complete)
 	    closepath();
+	(*term->layer) (TERM_LAYER_END_BORDER);
 }
 
 
