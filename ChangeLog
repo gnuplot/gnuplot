@@ -7,6 +7,24 @@
 	but would read beyond the current field to find it, causing an erroneous
 	fractional second to be added to the input time value.
 
+	* src/term_api.h term/post.trm src/graphics.c (plot_border)
+	term/PostScript/prologue.ps term/PostScript/prologues.h:
+
+	This change addresses a backward-compatibility issue with the postscript
+	terminal in version 5.  The long ago original postscript terminal used a
+	double-width line for the plot border. This was what you got when you
+	specified "lt -1" in a gnuplot command.  All terminals agree that lt -1
+	is black and solid, but postscript is anomalous in thinking that it has
+	double width.  Furthermore postscript is anomalous in applying the
+	current line width to draw dots (pointtype 0).  This meant that dots
+	drawn with lt -1 were twice as big as dots drawn with other linetypes.
+	We could just get rid of the double-width anomaly, but then new plots
+	would have a thinner border than old plots produced with the same
+	script.  This patch instead adds a layer flag TERM_LAYER_BEGIN_BORDER
+	so that the postscript terminal can temporarily use new style LTB
+	rather than LTb.  All other terminals will ignore it.
+	Bug #1689 and others
+
 2015-10-16  Abhijin Adiga  <abhijin@users.sf.net>
 
 	* term/lua/gnuplot-tikz.lua:  Truncate term->h_char using math.floor().

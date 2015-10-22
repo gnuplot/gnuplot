@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: post.trm,v 1.287 2014/05/30 04:59:32 sfeam Exp $
+ * $Id: post.trm,v 1.288 2014/06/10 19:55:18 sfeam Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -292,6 +292,8 @@ static TBOOLEAN ps_explicit_size = FALSE;
 static size_units ps_explicit_units = INCHES;
 static int eps_explicit_x = 0;
 static int eps_explicit_y = 0;
+
+static TBOOLEAN PS_border = FALSE;
 
 #define DOTS_PER_INCH (300)    /* resolution of printer we expect to use */
 
@@ -1805,8 +1807,6 @@ end\n\
 	    free(outstr2);
     }
 
-    fputs("end\n", gppsfile);
-
 #ifdef EAM_BOXED_TEXT
     /* Define macros supporting boxed text */
     fprintf(gppsfile, psi4);
@@ -1814,6 +1814,13 @@ end\n\
     fputs("/textshow { Gshow } def\n",gppsfile);
 #endif
 
+    /* version 5.0.2:  These revised definitions are now in prologue.ps but we */
+    /* add them here also so that updating to 5.0.2 does not break previous    */
+    /* local customizations of the original version 5.0 prologue.ps. */
+    fputs("% redundant definitions for compatibility with prologue.ps older than 5.0.2\n", gppsfile);
+    fputs("/LTB {BL [] LCb DL} def\n/LTb {PL [] LCb DL} def\n", gppsfile);
+
+    fputs("end\n", gppsfile);
     fputs("%%EndProlog\n", gppsfile);
 }
 
@@ -2003,7 +2010,10 @@ PS_linetype(int linetype)
 
     PS_linetype_last = linetype;
     PS_linewidth_last = PS_linewidth_current;
-    fprintf(gppsfile, "LT%c\n", "wba012345678"[linetype]);
+    if (PS_border && linetype == 1)
+	fprintf(gppsfile, "LTB\n");
+    else
+	fprintf(gppsfile, "LT%c\n", "wba012345678"[linetype]);
     ps_path_count = 0;
 }
 
@@ -4285,6 +4295,14 @@ PS_layer(t_termlayer syncpoint)
 	
 	case TERM_LAYER_END_PM3D_MAP:
 		fprintf(gppsfile, "%%pm3d_map_end\n");
+		break;
+
+	case TERM_LAYER_BEGIN_BORDER:
+		PS_border = TRUE;
+		break;
+	
+	case TERM_LAYER_END_BORDER:
+		PS_border = FALSE;
 		break;
 	
 	case TERM_LAYER_RESET:
