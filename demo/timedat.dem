@@ -1,5 +1,5 @@
 #
-# $Id: timedat.dem,v 1.11 2014/05/12 04:11:32 sfeam Exp $
+# $Id: timedat.dem,v 1.11.2.1 2014/11/08 04:52:24 sfeam Exp $
 #
 
 set title "Fsteps plot\nwith date and time as x-values"
@@ -49,7 +49,7 @@ set link x2
 set tics font ",8"
 set x2tics format "%D\n%R" time offset 0,-1
 set xtics format "%tH:%tM:%tS" time
-set xlabel 'set xtics format "%tH:%tM:%.2tS"' font "/:Bold"
+set xlabel 'set xtics format "%tH:%tM:%.2tS"'
 set arrow 1 from 0, graph 0 to 0, graph 1 heads filled
 
 set yzeroaxis
