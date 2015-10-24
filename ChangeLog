@@ -1,3 +1,11 @@
+2015-10-24  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/axis.c ( save_autoscaled_ranges restore_autoscaled_ranges)
+	src/axis.h src/plot2d.c:  Auto-scaled axis ranges are extended as data
+	is read in, but this is counterproductive for some processing modes
+	(e.g. the y values contributing to 'smooth cnorm'). The new save/restore
+	routines allow these plot modes to undo the effect of range extension.
+
 2015-10-22  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/time.c (gstrptime): Fixes a bug in processing time input using

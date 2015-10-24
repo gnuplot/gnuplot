@@ -1,5 +1,5 @@
 /*
- * $Id: axis.h,v 1.130 2015/05/19 23:53:43 sfeam Exp $
+ * $Id: axis.h,v 1.131 2015/10/01 04:04:57 sfeam Exp $
  *
  */
 
@@ -671,6 +671,9 @@ int map_x __PROTO((double value));
 int map_y __PROTO((double value));
 
 void set_cbminmax __PROTO((void));
+
+void save_autoscaled_ranges __PROTO((AXIS *, AXIS *));
+void restore_autoscaled_ranges __PROTO((AXIS *, AXIS *));
 
 char * axis_name __PROTO((AXIS_INDEX));
 void init_parallel_axis __PROTO((AXIS *, AXIS_INDEX));

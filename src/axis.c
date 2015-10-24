@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.167 2015/08/01 04:25:56 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.168 2015/10/01 04:04:57 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -148,6 +148,12 @@ TBOOLEAN inside_zoom;
 AXIS_INDEX x_axis = FIRST_X_AXIS;
 AXIS_INDEX y_axis = FIRST_Y_AXIS;
 AXIS_INDEX z_axis = FIRST_Z_AXIS;
+
+/* Only accessed by save_autoscaled_ranges() and restore_autoscaled_ranges() */
+static double save_autoscaled_xmin;
+static double save_autoscaled_xmax;
+static double save_autoscaled_ymin;
+static double save_autoscaled_ymax;
 
 /* --------- internal prototypes ------------------------- */
 static double make_auto_time_minitics __PROTO((t_timelevel, double));
@@ -1844,6 +1850,32 @@ set_cbminmax()
 	double tmp = CB_AXIS.max;
 	CB_AXIS.max = CB_AXIS.min;
 	CB_AXIS.min = tmp;
+    }
+}
+
+void
+save_autoscaled_ranges(AXIS *x_axis, AXIS *y_axis)
+{
+    if (x_axis) {
+	save_autoscaled_xmin = x_axis->min;
+	save_autoscaled_xmax = x_axis->max;
+    }
+    if (y_axis) {
+	save_autoscaled_ymin = y_axis->min;
+	save_autoscaled_ymax = y_axis->max;
+    }
+}
+
+void
+restore_autoscaled_ranges(AXIS *x_axis, AXIS *y_axis)
+{
+    if (x_axis) {
+	x_axis->min = save_autoscaled_xmin;
+	x_axis->max = save_autoscaled_xmax;
+    }
+    if (y_axis) {
+	y_axis->min = save_autoscaled_ymin;
+	y_axis->max = save_autoscaled_ymax;
     }
 }
 

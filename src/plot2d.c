@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.366 2015/10/08 15:32:09 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.367 2015/10/08 20:01:17 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -2794,6 +2794,14 @@ eval_plots()
 		++line_num;
 	    }
 	    if (this_plot->plot_type == DATA) {
+
+		/* get_data() will update the ranges of autoscaled axes, but some */
+		/* plot modes, e.g. 'smooth cnorm' and 'boxplot' with nooutliers, */
+		/* do not want all the points included in autoscaling.  Save the  */
+		/* current autoscaled ranges here so we can restore them later.   */
+		save_autoscaled_ranges(&axis_array[this_plot->x_axis], 
+					&axis_array[this_plot->y_axis]);
+
 		/* actually get the data now */
 		if (get_data(this_plot) == 0) {
 		    if (!forever_iteration(plot_iterator))
@@ -2859,7 +2867,10 @@ eval_plots()
 		    break;
 		case SMOOTH_FREQUENCY:
 		case SMOOTH_CUMULATIVE:
+		    gen_interp_frequency(this_plot);
+		    break;
 		case SMOOTH_CUMULATIVE_NORMALISED:
+		    restore_autoscaled_ranges(NULL, &axis_array[this_plot->y_axis]);
 		    gen_interp_frequency(this_plot);
 		    break;
 		case SMOOTH_CSPLINES:
