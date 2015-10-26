@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: util.c,v 1.132 2015/07/09 21:05:58 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: util.c,v 1.133 2015/08/03 18:32:51 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - util.c */
@@ -42,7 +42,6 @@ static char *RCSid() { return RCSid("$Id: util.c,v 1.132 2015/07/09 21:05:58 sfe
 #include "internal.h"		/* for eval_reset_after_error */
 #include "misc.h"
 #include "plot.h"
-#include "term_api.h"		/* for term_end_plot() used by graph_error(), also to detect enhanced mode */
 #include "variable.h"		/* For locale handling */
 #include "setshow.h"		/* for conv_text() */
 #include "tabulate.h"		/* for table_mode */
@@ -1189,47 +1188,6 @@ int_warn(int t_num, const char str[], va_dcl)
     fprintf(stderr, str, a1, a2, a3, a4, a5, a6, a7, a8);
 #endif /* VA_START */
     putc('\n', stderr);
-}
-
-/*{{{  graph_error() */
-/* handle errors during graph-plot in a consistent way */
-/* HBB 20000430: move here, from graphics.c */
-#if defined(VA_START) && defined(STDC_HEADERS)
-void
-graph_error(const char *fmt, ...)
-#else
-void
-graph_error(const char *fmt, va_dcl)
-#endif
-{
-#ifdef VA_START
-    va_list args;
-#endif
-
-    multiplot = FALSE;
-    term_end_plot();
-
-#ifdef VA_START
-    VA_START(args, fmt);
-    /* HBB 20001120: instead, copy the core code from int_error() to
-     * here: */
-    PRINT_SPACES_UNDER_PROMPT;
-    PRINT_FILE_AND_LINE;
-
-# if defined(HAVE_VFPRINTF) || _LIBC
-    vfprintf(stderr, fmt, args);
-# else
-    _doprnt(fmt, args, stderr);
-# endif
-    va_end(args);
-    fputs("\n\n", stderr);
-
-    bail_to_command_line();
-    va_end(args);
-#else
-    int_error(NO_CARET, fmt, a1, a2, a3, a4, a5, a6, a7, a8);
-#endif
-
 }
 
 /*}}} */

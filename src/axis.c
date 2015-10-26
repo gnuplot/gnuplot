@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.168 2015/10/01 04:04:57 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.169 2015/10/24 23:55:46 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -171,7 +171,6 @@ static void get_position_type __PROTO((enum position_type * type, AXIS_INDEX *ax
 /* check range and take logs of min and max if logscale
  * this also restores min and max for ranges like [10:-10]
  */
-#define LOG_MSG(x) x " range must be greater than 0 for scale"
 
 /* {{{ axis_unlog_interval() */
 
@@ -244,7 +243,7 @@ axis_log_value_checked(AXIS_INDEX axis, double coord, const char *what)
 {
     if (axis_array[axis].log) {
 	if (coord <= 0.0) {
-	    graph_error("%s has %s coord of %g; must be above 0 for log scale!",
+	    int_error(NO_CARET, "%s has %s coord of %g; must be above 0 for log scale!",
 			what, axis_name(axis), coord);
 	} else
 	    return (AXIS_DO_LOG(axis,coord));
@@ -1066,11 +1065,8 @@ gen_tics(struct axis *this, tic_callback callback)
 	double ministart = 0, ministep = 1, miniend = 1;	/* internal or user - depends on step */
 
 	/* gprintf uses log10() of base - log_base_array is log() */
-#if 0
-	double log10_base = this->log ? log10(this->base) : 1.0;
-#else	/* This allows gprintf formats %L %l to work even when log scaling is off */
 	double log10_base = this->base > 0.0 ? log10(this->base) : 1.0;
-#endif
+
 	if (lmax < lmin) {
 	    /* hmm - they have set reversed range for some reason */
 	    double temp = lmin;
@@ -1124,7 +1120,7 @@ gen_tics(struct axis *this, tic_callback callback)
 		step = 1;
 	    break;
 	default:
-	    graph_error("Internal error : unknown tic type");
+	    int_error(NO_CARET,"Internal error : unknown tic type");
 	    return;		/* avoid gcc -Wall warning about start */
 	}
 	/* }}} */

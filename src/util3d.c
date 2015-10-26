@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: util3d.c,v 1.48 2013/09/26 22:45:33 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: util3d.c,v 1.49 2015/06/03 17:32:45 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - util3d.c */
@@ -228,7 +228,7 @@ edge3d_intersect(
 	    else if (inrange(AXIS_ACTUAL_MIN(FIRST_Z_AXIS), iz, oz))
 		*ez = AXIS_ACTUAL_MIN(FIRST_Z_AXIS);
 	    else {
-		graph_error("error in edge3d_intersect");
+		int_error(NO_CARET,"error in edge3d_intersect");
 	    }
 
 	    return;
@@ -245,7 +245,7 @@ edge3d_intersect(
 	    else if (inrange(AXIS_ACTUAL_MIN(FIRST_Y_AXIS), iy, oy))
 		*ey = AXIS_ACTUAL_MIN(FIRST_Y_AXIS);
 	    else {
-		graph_error("error in edge3d_intersect");
+		int_error(NO_CARET,"error in edge3d_intersect");
 	    }
 
 	    return;
@@ -295,7 +295,7 @@ edge3d_intersect(
 	    else if (inrange(AXIS_ACTUAL_MIN(FIRST_X_AXIS), ix, ox))
 		*ex = AXIS_ACTUAL_MIN(FIRST_X_AXIS);
 	    else {
-		graph_error("error in edge3d_intersect");
+		int_error(NO_CARET,"error in edge3d_intersect");
 	    }
 
 	    return;

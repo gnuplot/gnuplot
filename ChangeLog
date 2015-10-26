@@ -1,6 +1,16 @@
+2015-10-26  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/graph3d.c src/axis.c src/util.c src/util.h src/mouse.c
+	src/dynarray.c src/util3d.c src/hidden3d.c:  Get rid of graph_error().
+	The routine graph_error() was originally intended as a special case of
+	int_error() to be called "while graphics active".  We have long since
+	gone to calling int_error() everywhere.  Replace the remaining instances
+	of graph_error() and remove it.  Comment out one call site in mouse.c
+	that can no longer be reached since the error is trapped elsewhere.
+
 2015-10-24  Ethan A Merritt  <merritt@u.washington.edu>
 
-	* src/axis.c ( save_autoscaled_ranges restore_autoscaled_ranges)
+	* src/axis.c (save_autoscaled_ranges restore_autoscaled_ranges)
 	src/axis.h src/plot2d.c:  Auto-scaled axis ranges are extended as data
 	is read in, but this is counterproductive for some processing modes
 	(e.g. the y values contributing to 'smooth cnorm'). The new save/restore
@@ -15,7 +25,7 @@
 	but would read beyond the current field to find it, causing an erroneous
 	fractional second to be added to the input time value.
 
-	* term/post.trm:  Fix scope of dictionary in prologue
+	* term/post.trm:  Fix scope of dictionary in Prolog
 
 	* src/term_api.h term/post.trm src/graphics.c (plot_border)
 	term/PostScript/prologue.ps term/PostScript/prologues.h:
@@ -31,7 +41,7 @@
 	We could just get rid of the double-width anomaly, but then new plots
 	would have a thinner border than old plots produced with the same
 	script.  This patch instead adds a layer flag TERM_LAYER_BEGIN_BORDER
-	so that the postscript terminal can temporarily user new style LTB
+	so that the postscript terminal can temporarily use a new line type LTB
 	rather than LTb.  All other terminals will ignore it.
 	Bug #1689 and others
 

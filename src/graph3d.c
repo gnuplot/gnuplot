@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.326 2015/07/03 01:07:33 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.327 2015/10/01 04:04:57 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -636,14 +636,7 @@ do_3dplot(
      */
 
     if (polar)
-	graph_error("Cannot splot in polar coordinate system.");
-
-    /* done in plot3d.c
-     *    if (z_min3d == VERYLARGE || z_max3d == -VERYLARGE ||
-     *      x_min3d == VERYLARGE || x_max3d == -VERYLARGE ||
-     *      y_min3d == VERYLARGE || y_max3d == -VERYLARGE)
-     *      graph_error("all points undefined!");
-     */
+	int_error(NO_CARET,"Cannot splot in polar coordinate system.");
 
     /* absolute or relative placement of xyplane along z */
     if (xyplane.absolute)
@@ -665,14 +658,12 @@ do_3dplot(
 	ceiling_z = Z_AXIS.max;
     }
 
-    /*  see comment accompanying similar tests of x_min/x_max and y_min/y_max
-     *  in graphics.c:do_plot(), for history/rationale of these tests */
     if (X_AXIS.min == X_AXIS.max)
-	graph_error("x_min3d should not equal x_max3d!");
+	int_error(NO_CARET,"x_min3d should not equal x_max3d!");
     if (Y_AXIS.min == Y_AXIS.max)
-	graph_error("y_min3d should not equal y_max3d!");
+	int_error(NO_CARET,"y_min3d should not equal y_max3d!");
     if (Z_AXIS.min == Z_AXIS.max)
-	graph_error("z_min3d should not equal z_max3d!");
+	int_error(NO_CARET,"z_min3d should not equal z_max3d!");
 
     term_start_plot();
     (term->layer)(TERM_LAYER_3DPLOT);
@@ -1585,7 +1576,7 @@ plot3d_lines(struct surface_points *plot)
 		    break;
 		}
 	    default:
-		    graph_error("Unknown point type in plot3d_lines");
+		    int_warn(NO_CARET,"Unknown point type in plot3d_lines");
 	    }
 
 	    prev = points[i].type;
@@ -1752,7 +1743,7 @@ plot3d_lines_pm3d(struct surface_points *plot)
 		    case UNDEFINED:
 			break;
 		    default:
-			graph_error("Unknown point type in plot3d_lines");
+			int_warn(NO_CARET,"Unknown point type in plot3d_lines");
 		}
 
 		prev = points[i].type;
@@ -2984,7 +2975,7 @@ map3d_getposition(
     }
 
     if (plot_coords && (screen_coords || char_coords))
-	graph_error("Cannot mix screen or character coords with plot coords");
+	int_error(NO_CARET,"Cannot mix screen or character coords with plot coords");
 
     return (screen_coords || char_coords);
 }

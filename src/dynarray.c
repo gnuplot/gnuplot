@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: dynarray.c,v 1.11 2004/07/01 17:10:04 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: dynarray.c,v 1.12 2015/04/23 20:10:02 sfeam Exp $"); }
 #endif
 
 /*[
@@ -43,7 +43,10 @@ static char *RCSid() { return RCSid("$Id: dynarray.c,v 1.11 2004/07/01 17:10:04 
 #include "dynarray.h"
 
 #include "alloc.h"
-#include "util.h"		/* for graph_error() */
+#include "util.h"	/* for int_error() */
+
+static char *init_failure_msg = "dynarray wasn't initialized";
+
 
 /* The 'constructor' of a dynarray object: initializes all the
  * variables to well-defined startup values */
@@ -74,7 +77,7 @@ void
 resize_dynarray(dynarray *this, long newsize)
 {
     if (!this->v)
-	graph_error("resize_dynarray: dynarray wasn't initialized!");
+	int_error(NO_CARET, init_failure_msg);
 
     if (newsize == 0)
 	free_dynarray(this);
@@ -98,7 +101,7 @@ void GPHUGE *
 nextfrom_dynarray(dynarray *this)
 {
     if (!this->v)
-	graph_error("nextfrom_dynarray: dynarray wasn't initialized!");
+	int_error(NO_CARET, init_failure_msg);
 
     if (this->end >= this->size)
 	extend_dynarray(this, this->increment);
@@ -111,7 +114,7 @@ void
 droplast_dynarray(dynarray *this)
 {
     if (!this->v)
-	graph_error("droplast_dynarray: dynarray wasn't initialized!");
+	int_error(NO_CARET, init_failure_msg);
 
     if (this->end)
 	this->end--;

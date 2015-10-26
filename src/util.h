@@ -1,5 +1,5 @@
 /*
- * $Id: util.h,v 1.43 2014/04/03 00:32:57 markisch Exp $
+ * $Id: util.h,v 1.44 2014/04/05 06:17:09 markisch Exp $
  */
 
 /* GNUPLOT - util.h */
@@ -96,22 +96,18 @@ void gprintf __PROTO((char *, size_t, char *, double, double));
 #  if defined(__GNUC__)
     void os_error __PROTO((int, const char *, ...)) __attribute__((noreturn));
     void int_error __PROTO((int, const char *, ...)) __attribute__((noreturn));
-    void graph_error __PROTO((const char *, ...)) __attribute__((noreturn));
 #  elif defined(_MSC_VER)
     __declspec(noreturn) void os_error(int, const char *, ...);
     __declspec(noreturn) void int_error(int, const char *, ...);
-    __declspec(noreturn) void graph_error(const char *, ...);
 #  else
     void os_error __PROTO((int, const char *, ...));
     void int_error __PROTO((int, const char *, ...));
-    void graph_error __PROTO((const char *, ...));
 #  endif
 void int_warn __PROTO((int, const char *, ...));
 #else
 void os_error __PROTO(());
 void int_error __PROTO(());
 void int_warn __PROTO(());
-void graph_error __PROTO(());
 #endif
 
 /* FIXME HBB 20010726: should be moved to where help_comamnd() is, and

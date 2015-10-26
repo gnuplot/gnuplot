@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: mouse.c,v 1.182 2015/06/23 22:37:22 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: mouse.c,v 1.183 2015/07/13 04:08:24 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - mouse.c */
@@ -2301,9 +2301,11 @@ do_event(struct gp_event_t *ge)
 static void
 do_save_3dplot(struct surface_points *plots, int pcount, int quick)
 {
+#if (0)
 #define M_TEST_AXIS(A) \
      (A.log && ((!(A.set_autoscale & AUTOSCALE_MIN) && A.set_min <= 0) || \
 		(!(A.set_autoscale & AUTOSCALE_MAX) && A.set_max <= 0)))
+#endif
 
     if (!plots || (E_REFRESH_NOT_OK == refresh_ok)) {
 	/* !plots might happen after the `reset' command for example
@@ -2313,12 +2315,14 @@ do_save_3dplot(struct surface_points *plots, int pcount, int quick)
 	 */
 	replotrequest();
     } else {
+#if (0)	/* Dead code.  This error is now trapped elsewhere */
 	if (M_TEST_AXIS(X_AXIS) || M_TEST_AXIS(Y_AXIS) || M_TEST_AXIS(Z_AXIS)
 	    || M_TEST_AXIS(CB_AXIS)
 	    ) {
-		graph_error("axis ranges must be above 0 for log scale!");
+		int_error(NO_CARET, "axis ranges must be above 0 for log scale!");
 		return;
 	}
+#endif
 	do_3dplot(plots, pcount, quick);
     }
 

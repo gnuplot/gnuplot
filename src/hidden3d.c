@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.108 2015/05/08 18:32:12 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.109 2015/10/01 04:04:58 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - hidden3d.c */
@@ -1087,7 +1087,7 @@ build_networks(struct surface_points *plots, int pcount)
 		    nverts += icrvs->p_count;
 	    }
 	} else {
-	    graph_error("Plot type is neither function nor data");
+	    /* Cannot happen */
 	    return;
 	}
 
@@ -2278,7 +2278,7 @@ plot3d_hidden(struct surface_points *plots, int pcount)
     if (! edges.end) {
 	/* No drawable edges found. Free all storage and bail out. */
 	term_hidden_line_removal();
-	graph_error("*All* edges undefined or out of range, thus no plot.");
+	int_error(NO_CARET, "*All* edges undefined or out of range, thus no plot.");
     }
 
     if (! polygons.end) {
