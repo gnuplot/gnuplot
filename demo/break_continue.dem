@@ -20,5 +20,6 @@ print "   continue if i == 3, break if i > 4"
 if (i > 4) { break; }
 if (i == 3) { continue; print ">>> ERROR <<<" }
 print "      still in load file"
-
+exit	# exits only from this level of the call stack
+print ">>> failed to exit <<<"
 }

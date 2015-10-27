@@ -111,14 +111,14 @@ set style arrow 8 heads size screen 0.008,90 ls 2
 print ' We have defined the following arrowstyles:'
 show style arrow
 
-set arrow from -500,-100 to 500,-100 as 1
-set arrow from -500,-110 to 500,-110 as 2
-set arrow from -500,-120 to 500,-120 as 3
-set arrow from -500,-130 to 500,-130 as 4
-set arrow from -500,-140 to 500,-140 as 5
-set arrow from -500,-150 to 500,-150 as 6
-set arrow from -500,-160 to 500,-160 as 7
-set arrow from -500,-170 to 500,-170 as 8
+set arrow from -500,-100 rto 1000, 0  as 1
+set arrow from -500,-110 rto 1000, 0  as 2
+set arrow from -500,-120 rto 1000, 0  as 3
+set arrow from -500,-130 rto 1000, 0  as 4
+set arrow from -500,-140 rto 1000, 0  as 5
+set arrow from -500,-150 rto 1000, 0  as 6
+set arrow from -500,-160 rto 1000, 0  as 7
+set arrow from -500,-170 rto 1000, 0  as 8
 
 set label 'arrowstyle 1:' at -520,-100 right
 set label 'arrowstyle 2:' at -520,-110 right

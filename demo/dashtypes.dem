@@ -33,12 +33,19 @@ y = y - 0.05
     new = "..- "
     set label at screen 0.15, screen y 'dt "'.new.'"'
     set arrow 14 from screen 0.25, screen y to screen 0.8, screen y nohead lw 1.5 lt 3 dt new
+y = y - 0.05
+    set arrow 15 from screen 0.25, screen y to screen 0.8, screen y nohead lw 1.5 lc "blue'
+    set arrow 15 dt (50,6,2,6)
+    set label at screen 0.10, screen y 'dt (50,6,2,6)'
+
 
 plot 0 with lines lt nodraw
 
 pause -1 "Hit return to continue"
 
 # Now test effect of linewidth
+unset arrow 15
+unset label 15
 
 set for [i=1:14] arrow i lw 1+(i-1)%5
 

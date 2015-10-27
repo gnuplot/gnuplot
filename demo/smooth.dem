@@ -1,45 +1,61 @@
+#
+# Find number of points
+#
+stats 'random-points' nooutput
+N = STATS_records
+
 bin(x, s) = s*int(x/s)
 
 set zeroaxis
 set style data points
+set key box top left
 
 # Uniform
 set title "Uniform Distribution"
-set key top right
 set boxwidth 0.05
-plot [-0.1:1.1][-0.4:1.5] "random-points" u 1:(0.25*rand(0)-.35) t '', \
-     "" u (bin($1,0.05)):(20/300.) smooth freq t 'smooth frequency' w boxes, \
-     "" u 1:(1/300.) smooth cumulative t 'smooth cumulative'
+set xrange [-0.1 : 1.1] noextend
+set yrange [-0.4 : 1.6]
+plot "random-points" u 1:(0.25*rand(0)-.35) t '', \
+     "" u (bin($1,0.05)):(20/N) smooth freq t 'smooth frequency' w boxes, \
+     "" u 1:(1.) smooth cnorm t 'smooth cnorm'
 pause -1 "Hit enter to continue"
 
 
 # Normal
 set title "Normal Distribution"
-set key top left
 set boxwidth 0.05
+set xrange [* : *] noextend
+set yrange [-0.4 : 1.1]
+set ytics 0,.2
+
 plot "random-points" u 2:(0.25*rand(0)-.35) t '', \
-     "" u (bin($2,0.05)):(20/300.) smooth freq t 'smooth frequency' w boxes, \
-     "" u 2:(1/300.) smooth cumulative t 'smooth cumulative'
+     "" u (bin($2,0.05)):(20/N) smooth freq t 'smooth frequency' w boxes, \
+     "" u 2:(1.) smooth cnorm t 'smooth cnorm'
 pause -1 "Hit enter to continue"
 
 
 # Lognormal
 set title "Lognormal Distribution"
-set key top right
 set boxwidth 0.1
-plot [0:] "random-points" u 3:(0.25*rand(0)-.35) t '', \
-    "" u (bin($3,0.1)):(10/300.) smooth freq t 'smooth frequency' w boxes, \
-    "" u 3:(1/300.) smooth cumul t 'smooth cumulative'
+set xrange [0 : *] noextend
+plot "random-points" u 3:(0.25*rand(0)-.35) t '', \
+    "" u (bin($3,0.1)):(10/N) smooth freq t 'smooth frequency' w boxes, \
+    "" u 3:(1.) smooth cnorm t 'smooth cnorm'
 pause -1 "Hit enter to continue"
 
 
 # Mixed
 set title "Mixed Distribution (Lognormal with shifted Gaussian)"
-set key top right
 set boxwidth 0.1
+set xrange [* : *] noextend
+set link y2 via y*N inverse y/N
+set ytics nomirror  0,.2
+set y2tics nomirror tc "red" 0,50
+
 plot "random-points" u 4:(0.25*rand(0)-.35) t '', \
-     "" u (bin($4,0.1)):(10/300.) smooth freq t 'smooth frequency' w boxes, \
-     "" u 4:(1/300.) smooth cumul t 'smooth cumulative'
+     "" u (bin($4,0.1)):(10/N) smooth freq t 'smooth frequency' w boxes, \
+     "" u 4:(1.) smooth cnorm t 'smooth cnorm' lc "#88eeff" lw 5, \
+     "" u 4:(1.) axes x1y2 smooth cumulative t 'smooth cumulative' lc "red"
 pause -1 "Hit enter to continue"
 
 

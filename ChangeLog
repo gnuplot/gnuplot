@@ -1,3 +1,17 @@
+2015-10-27  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* Modify demos to increase coverage of gnuplot features.
+	line_arrows:	illustrate 'set arrow from ... rto ...'
+	rgba_lines:	illustrate 'set arrow from ... length ... angle ...'
+	smooth: 	illustrate both smooth cumulative and smooth cnorm
+	dashtypes:	illustrate numerical dashtype definition
+	break_continue:	exercise "exit" command from inside "call <foo>"
+	volatile:	exercise 'skip', 'volatile', 'refresh'
+	boxplot:	illustrate 'nooutliers'
+
+	* demo/all.dem: Call additional demos to increase code coverage.
+	rgba_lines fitmulti break_continue volatile
+
 2015-10-26  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graph3d.c src/axis.c src/util.c src/util.h src/mouse.c

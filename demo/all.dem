@@ -1,5 +1,5 @@
 #
-# $Id: all.dem,v 1.62 2015/09/14 03:28:45 sfeam Exp $
+# $Id: all.dem,v 1.63 2015/10/03 20:26:22 sfeam Exp $
 #
 # Executes all demos (OK, MOST demos) in this directory.
 # This serves as a series of unit tests for non-interactive capabilities.
@@ -45,6 +45,8 @@ reset
 print "******************** file fit.dem ********************"
 set fit quiet
 load "fit.dem"
+reset
+load "fitmulti.dem"
 reset
 
 print "******************** file named_var.dem ********************"
@@ -182,6 +184,10 @@ print "********************** file rgb_variable.dem *********************"
 load "rgb_variable.dem"
 reset
 
+print "********************** file rgba_lines.dem *********************"
+load "rgba_lines.dem"
+reset
+
 print "********************** file varcolor.dem *********************"
 load "varcolor.dem"
 reset
@@ -246,8 +252,16 @@ print "********************** file tics.dem *********************"
 load "tics.dem"
 reset
 
+print "********************** file break_continue.dem *********************"
+load "break_continue.dem"
+reset
+
 print "********************** file callargs.dem *********************"
 load "callargs.dem"
+reset
+
+print "********************** file volatile.dem *********************"
+load "volatile.dem"
 reset
 
 print "********************** file datastrings.dem *********************"

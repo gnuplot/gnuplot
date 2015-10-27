@@ -47,16 +47,20 @@ pause -1 'Hit <cr> to continue: The same, with iteration and manual filtering'
 # e.g. the order of the boxplots, their colors, the tic labels
 # The previous form is intended for interactive usage while the latter form is better suited
 # to creating publication-ready graphs.
+# Note: we turn off autoscaling for the last two categories so that outliers do not
+# expand the range on y even though they are not shown.
 
 factors = "Coal Gas Hydroelectric Nuclear Oil Renewable"
-n_f = words(factors)
+NF = words(factors)
 set xtic ("" 1)
-set for [i=1:n_f] xtics add (word(factors,i) i) 
+set for [i=1:NF] xtics add (word(factors,i) i) 
+set style boxplot nooutliers
 
 t(x) = x/1.e6
 filter(col, factor_col, level) = (strcol(factor_col) eq word(factors, level)) ? t(column(col)) : 1/0
 
-plot for [i=1:n_f] 'energy_circles.dat' using (i):(filter(8, 4, i)) 
+plot for [i=1:NF-2]  'energy_circles.dat' using (i):(filter(8, 4, i)), \
+     for [i=NF-1:NF] 'energy_circles.dat' using (i):(filter(8, 4, i)) noauto
 
 pause -1 'Hit <cr> to continue: boxplot demo finished'
 

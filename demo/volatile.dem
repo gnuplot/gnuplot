@@ -1,0 +1,7 @@
+#
+# Unit test for "volatile" "skip" "refresh"
+#
+splot "whale.dat" skip 5 volatile
+refresh
+pause -1 "Hit <cr> to continue"
+reset

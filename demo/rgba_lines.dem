@@ -11,9 +11,9 @@ set style arrow 1 size screen 0.03,15,90 filled
 if (GPVAL_TERM eq "png") LW = 1; else LW = 3
 
 do for [i = 5 : 360 : 5] {
-    set arrow i from 0,0 to cos(i),sin(i) filled
+    set arrow i from 0,0 length 1.0 angle i filled
     color = (int(255.*i/360.) << 24) + 0xFF0000
-    print sprintf("%x",color)
+#   print sprintf("%x",color)
     set arrow i as 1 lw LW lc rgb color
 }
 set obj  1 rect from -.5,-.5 to -.3,0   fs solid fc rgb "#00bbbbbb" front
