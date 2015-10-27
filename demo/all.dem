@@ -1,5 +1,5 @@
 #
-# $Id: all.dem,v 1.63 2015/10/03 20:26:22 sfeam Exp $
+# $Id: all.dem,v 1.64 2015/10/27 22:02:47 sfeam Exp $
 #
 # Executes all demos (OK, MOST demos) in this directory.
 # This serves as a series of unit tests for non-interactive capabilities.
@@ -129,6 +129,10 @@ reset
 
 print "******************** file spline.dem ********************"
 load "spline.dem"
+reset
+
+print "******************** file monotonic_spline.dem **********"
+load "monotonic_spline.dem"
 reset
 
 print "******************** file binary.dem ********************"

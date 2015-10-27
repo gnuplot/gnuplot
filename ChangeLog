@@ -10,12 +10,13 @@
 	rgba_lines:	illustrate 'set arrow from ... length ... angle ...'
 	smooth: 	illustrate both smooth cumulative and smooth cnorm
 	dashtypes:	illustrate numerical dashtype definition
+	monotonic_spline: smooth mcs 
 	break_continue:	exercise "exit" command from inside "call <foo>"
 	volatile:	exercise 'skip', 'volatile', 'refresh'
 	boxplot:	illustrate 'nooutliers'
 
 	* demo/all.dem: Call additional demos to increase code coverage.
-	rgba_lines fitmulti break_continue volatile
+	rgba_lines fitmulti break_continue monotonic_spline volatile
 
 2015-10-26  Ethan A Merritt  <merritt@u.washington.edu>
 

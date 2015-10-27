@@ -1,0 +1,19 @@
+set title "Monotonic cubic splines"
+
+set style data lines
+set xrange [ 233. : 388. ]
+set yrange [ 1.75 : 32.0 ]
+
+plot 'silver.dat' using 1:2 with points pt 7 ps 2 lc "grey" title 'raw data', \
+               '' using 1:2 smooth csplines lt 1 title 'smooth cspline', \
+               '' using 1:2 smooth mcs lt 3 title 'smooth mcs'
+
+pause -1 "Hit <cr> to continue"
+
+set title "Monotonic cubic splines (log-scale data)"
+set log y
+set ytics (1,2,3,4,5,10,20)
+refresh
+
+pause -1 "Hit <cr> to continue"
+reset
