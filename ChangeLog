@@ -3,6 +3,10 @@
 	* src/interpol.c (mcs_interp): Handle log-scaled y axis when using
 	monotonic cubic splines ('smooth mcs'). 
 
+	* src/plot2d.c (boxplot_range_fiddling) src/graphics.c (plot_boxplot):
+	Fix autoscaling of x axis if there are multiple boxplots with factors.
+	Bug #1696
+
 2015-10-27  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* Modify demos to increase coverage of gnuplot features.

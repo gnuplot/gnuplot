@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.367 2015/10/08 20:01:17 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.368 2015/10/24 23:55:46 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -1649,13 +1649,12 @@ boxplot_range_fiddling(struct curve_points *plot)
 	    axis_array[plot->x_axis].min -= 1 * extra_width;
     }
     if (axis_array[plot->x_axis].autoscale & AUTOSCALE_MAX) {
-	if (axis_array[plot->x_axis].max <= plot->points[N-1].x)
-	    axis_array[plot->x_axis].max += 1.5 * extra_width;
-	else if (axis_array[plot->x_axis].max <= plot->points[N-1].x + extra_width)
-	    axis_array[plot->x_axis].max += 1 * extra_width;
-	if (plot->boxplot_factors > 1) {
-	    axis_array[plot->x_axis].max += (plot->boxplot_factors - 1) * boxplot_opts.separation;
-	}
+	double nfactors = GPMAX( 0, plot->boxplot_factors - 1 );
+	double plot_max = plot->points[0].x + nfactors * boxplot_opts.separation;
+	if (axis_array[plot->x_axis].max <= plot_max)
+	    axis_array[plot->x_axis].max = plot_max + 1.5 * extra_width;
+	else if (axis_array[plot->x_axis].max <= plot_max + extra_width)
+	    axis_array[plot->x_axis].max += extra_width;
     }
 }
 

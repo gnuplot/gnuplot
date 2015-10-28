@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.503 2015/10/02 22:28:42 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.504 2015/10/22 20:36:23 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -2777,13 +2777,12 @@ plot_boxplot(struct curve_points *plot)
 	    /* advance to first point in subset */
 	    for (subset_points = save_points;
 		 subset_points->z != subset_label->tag;
-		 subset_points++, true_count++)
-		    if (true_count >= saved_p_count) {
-			int_warn(NO_CARET,"Warning: No points found for boxplot factor %s",
-				subset_label->text);
+		 subset_points++, true_count++) {
+		    /* No points found for this boxplot factor */
+		    if (true_count >= saved_p_count)
 			break;
-		    }
-		;
+	    }
+
 	    /* count well-defined points in this subset */
 	    for (subset_count=0;
 		 true_count < saved_p_count
