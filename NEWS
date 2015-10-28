@@ -26,6 +26,7 @@ Changes since 5.0.1
 * FIX B and L formats in gprintf()
 * FIX bug parsing time input with format "%s" (extra fractional second)
 * FIX incorrect average value in final bin of "smooth cnorm" calculation
+* FIX handle log-scale y values when calculating monotonic cubic spline fit
 
 Changes in 5.0.1
 ================
