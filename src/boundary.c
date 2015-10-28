@@ -1,5 +1,5 @@
 /*
- * $Id: boundary.c,v 1.27 2015/10/01 04:04:57 sfeam Exp $
+ * $Id: boundary.c,v 1.28 2015/10/02 22:28:42 sfeam Exp $
  */
 
 /* GNUPLOT - boundary.c */
@@ -68,7 +68,7 @@ static int title_y;
 /*
  * These quantities are needed in do_plot() e.g. for histogtram title layout
  */
-int key_entry_height;		/* bigger of t->v_char, pointsize*t->v_tick */
+int key_entry_height;		/* bigger of t->v_char, t->v_tic */
 int key_point_offset;		/* offset from x for point sample */
 int key_col_wth, yl_ref;
 int ylabel_x, y2label_x, xlabel_y, x2label_y;
@@ -981,13 +981,12 @@ do_key_layout(legend_key *key)
     key_xleft = 0;
 
     if (key->swidth >= 0) {
-	int p_width = pointsize * t->h_tic;
-	key_sample_width = key->swidth * t->h_char + p_width;
+	key_sample_width = key->swidth * t->h_char + t->h_tic;
     } else {
 	key_sample_width = 0;
     }
 
-    key_entry_height = pointsize * t->v_tic * 1.25 * key->vert_factor;
+    key_entry_height = t->v_tic * 1.25 * key->vert_factor;
     if (key_entry_height < t->v_char)
 	key_entry_height = t->v_char * key->vert_factor;
     /* HBB 20020122: safeguard to prevent division by zero later */

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.350 2015/08/03 04:16:38 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.351 2015/09/14 03:28:47 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -1253,11 +1253,11 @@ show_clip()
 
     fprintf(stderr, "\tpoint clip is %s\n", (clip_points) ? "ON" : "OFF");
 
-    fprintf(stderr, "\t%sdrawing and clipping lines with one end out of range (clip one)\n",
-	clip_lines1 ? "" : "not ");
+    fprintf(stderr, "\t%s lines with one end out of range (clip one)\n",
+	clip_lines1 ? "clipping" : "not drawing");
 
-    fprintf(stderr, "\t%sdrawing and clipping lines with both ends out of range (clip two)\n",
-	clip_lines2 ? "" : "not ");
+    fprintf(stderr, "\t%s lines with both ends out of range (clip two)\n",
+	clip_lines2 ? "clipping" : "not drawing");
 }
 
 

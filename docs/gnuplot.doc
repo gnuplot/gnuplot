@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.964 2015/10/09 04:11:08 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.965 2015/10/22 17:51:31 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -7815,51 +7815,41 @@ Ffigure_jitter
 ?unset clip
 ?show clip
 ?clip
-?noclip
- `gnuplot` can clip data points and lines that are near the boundaries of a
- graph.
-
  Syntax:
-       set clip <clip-type>
-       unset clip <clip-type>
+       set clip {points|one|two}
+       unset clip {points|one|two}
        show clip
 
- Three clip types for points and lines are supported by `gnuplot`: `points`,
- `one`, and `two`. One, two, or all three clip types may be active for a
- single graph.
- Note that clipping of color filled quadrangles drawn by `pm3d` maps and
- surfaces is not controlled by this command, but by `set pm3d clip1in` and
- `set pm3d clip4in`.
+ Default state:
+       unset clip points
+       set clip one
+       unset clip two
 
- The `points` clip type forces `gnuplot` to clip (actually, not plot at all)
- data points that fall within but too close to the boundaries.  This is done
- so that large symbols used for points will not extend outside the boundary
- lines.  Without clipping points near the boundaries, the plot may look bad.
- Adjusting the x and y ranges may give similar results.
+ Data points whose center lies inside the plot boundaries are normally drawn
+ even if the finite size of the point symbol causes it to extend past a boundary
+ line.  `set clip points` causes such points to be clipped (i.e. not drawn) even
+ though the point center is inside the boundaries of a 2D plot.
+ Data points whose center lies outside the plot boundaries are never drawn.
 
- Setting the `one` clip type causes `gnuplot` to draw a line segment which has
- only one of its two endpoints within the graph.  Only the in-range portion of
- the line is drawn.  The alternative is to not draw any portion of the line
- segment.
+ Normally a line segment in a plot is not drawn if either end of the segment
+ lies outside the plot boundaries (i.e. xrange and yrange).
+ `set clip one` causes `gnuplot` to draw also the in-range portion of line
+ segments with one endpoint out of range.
+ `set clip two` causes `gnuplot` to draw also the in-range portion of line
+ segments with both endpoints out of range.
+ Line segments that lie entirely outside the plot boundaries are never drawn.
 
- Some lines may have both endpoints out of range, but pass through the graph.
- Setting the `two` clip-type allows the visible portion of these lines to be
- drawn.
+ Notes:
 
- In no case is a line drawn outside the graph.
+ * `set clip` affects points and lines produced by 2D plot styles `lines`,
+ `linespoints`, `points`, `vectors`, and 3D plot style `lines`.
 
- The defaults are `noclip points`, `clip one`, and `noclip two`.
+ * Clipping of colored quadrangles drawn for `pm3d` maps and surfaces is
+ controlled `set pm3d clip1in` and `set pm3d clip4in`.
 
- To check the state of all forms of clipping, use
-       show clip
+ * Object clipping is controlled by the `{clip|noclip}` property of the
+ individual object.
 
- For backward compatibility with older versions, the following forms are also
- permitted:
-       set clip
-       unset clip
-
- `set clip` is synonymous with `set clip points`; `unset clip` turns off all
- three types of clipping.
 3 cntrlabel
 ?commands set cntrlabel
 ?commands show cntrlabel

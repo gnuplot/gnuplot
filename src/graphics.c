@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.504 2015/10/22 20:36:23 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.505 2015/10/29 04:43:34 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -79,8 +79,6 @@ struct lp_style_type bar_lp;
 /* set by tic_callback - how large to draw polar radii */
 static double largest_polar_circle;
 
-static int p_width, p_height;	/* pointsize * { t->h_tic | t->v_tic } */
-
 /* used for filled points */
 static t_colorspec background_fill = BACKGROUND_COLORSPEC;
 
@@ -154,8 +152,6 @@ static TBOOLEAN boxplot_factor_sort_required;
 #define RIGHT_EDGE	2
 #define BOTTOM_EDGE	4
 #define TOP_EDGE	8
-
-#define clip_fill	((plot->filledcurves_options.closeto == FILLEDCURVES_CLOSED) || clip_lines2)
 
 #define f_max(a,b) GPMAX((a),(b))
 #define f_min(a,b) GPMIN((a),(b))
@@ -2013,6 +2009,7 @@ plot_points(struct curve_points *plot)
 {
     int i;
     int x, y;
+    int p_width, p_height;
     int interval = plot->lp_properties.p_interval;
     struct termentry *t = term;
 
@@ -2022,6 +2019,10 @@ plot_points(struct curve_points *plot)
 	if (plot->labels->font && plot->labels->font[0])
 	    (*t->set_font) (plot->labels->font);
 	(*t->justify_text) (CENTRE);
+    }
+    if (clip_points) {
+	p_width = t->h_tic * plot->lp_properties.p_size;
+	p_height = t->v_tic * plot->lp_properties.p_size;
     }
 
     /* Displace overlapping points if "set jitter" is in effect	*/
@@ -2882,7 +2883,8 @@ plot_boxplot(struct curve_points *plot)
 	outliers:
 	if (boxplot_opts.outliers) {
 	    int i,j,x,y;
-	    p_width = plot->lp_properties.p_size * term->h_tic;
+	    int p_width = term->h_tic * plot->lp_properties.p_size;
+	    int p_height = term->v_tic * plot->lp_properties.p_size;
 
 	    for (i = 0; i < subset_count; i++) {
 

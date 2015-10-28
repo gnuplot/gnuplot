@@ -7,6 +7,15 @@
 	Fix autoscaling of x axis if there are multiple boxplots with factors.
 	Bug #1696
 
+	* src/graphics.c (plot_points plot_boxplot): Declare and initialize
+	p_height and p_width locally (no code was updating the global copy).
+	This fixes nonfunctional "set clip points" command in version 5.
+
+	* src/boundary.c (do_key_layout) src/graph3d.c (boundary3d):
+	Remove reference to p_height, p_width, which were not being initialized.
+
+	* src/show.c (show_clip) docs/gnuplot.doc: Clarify effect of "set clip".
+
 2015-10-27  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* Modify demos to increase coverage of gnuplot features.

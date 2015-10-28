@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.327 2015/10/01 04:04:57 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.328 2015/10/26 21:43:00 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -68,8 +68,6 @@ static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.327 2015/10/01 04:04:57 
 
 #include "plot.h"
 
-static int p_height;
-static int p_width;		/* pointsize * t->h_tic */
 static int key_entry_height;	/* bigger of t->v_char, pointsize*t->v_tick */
 static int key_title_height;
 static int key_title_extra;	/* allow room for subscript/superscript */
@@ -297,13 +295,11 @@ boundary3d(struct surface_points *plots, int count)
 
     titlelin = 0;
 
-    p_height = pointsize * t->v_tic;
-    p_width = pointsize * t->h_tic;
     if (key->swidth >= 0)
-	key_sample_width = key->swidth * t->h_char + pointsize * t->h_tic;
+	key_sample_width = key->swidth * t->h_char + t->h_tic;
     else
 	key_sample_width = 0;
-    key_entry_height = pointsize * t->v_tic * 1.25 * key->vert_factor;
+    key_entry_height = t->v_tic * 1.25 * key->vert_factor;
     if (key_entry_height < t->v_char) {
 	/* is this reasonable ? */
 	key_entry_height = t->v_char * key->vert_factor;
