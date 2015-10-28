@@ -3,6 +3,10 @@
 	* src/interpol.c (mcs_interp): Handle log-scaled y axis when using
 	monotonic cubic splines ('smooth mcs'). 
 
+	* src/plot2d.c (boxplot_range_fiddling):  Fix autoscaling of x axis if
+	there are multiple boxplots with factors.
+	Bug #1696
+
 2015-10-22  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/time.c (gstrptime): Fixes a bug in processing time input using
