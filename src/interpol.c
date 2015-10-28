@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: interpol.c,v 1.52 2015/06/26 20:51:18 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: interpol.c,v 1.53 2015/10/09 21:50:54 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - interpol.c */
@@ -1352,6 +1352,10 @@ mcs_interp(struct curve_points *plot)
 #define C1	ylow
 #define C2	yhigh
 #define C3	z
+
+    /* Work with the un-logged y values */
+    for (i = 0; i < N-1; i++)
+	p[i].y = AXIS_DE_LOG_VALUE(plot->y_axis, p[i].y);
 
     for (i = 0; i < N-1; i++) {
 	p[i].DX = p[i+1].x - p[i].x;

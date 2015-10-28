@@ -1,3 +1,8 @@
+2015-10-28  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/interpol.c (mcs_interp): Handle log-scaled y axis when using
+	monotonic cubic splines ('smooth mcs'). 
+
 2015-10-27  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* Modify demos to increase coverage of gnuplot features.
