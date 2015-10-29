@@ -1,5 +1,5 @@
 /*
- * $Id: jitter.c,v 1.1 2015/09/14 03:28:47 sfeam Exp $
+ * $Id: jitter.c,v 1.2 2015/10/13 21:47:34 broeker Exp $
  */
 /*
  * This file contains routines used to support the "set jitter" option.
@@ -133,8 +133,8 @@ jitter_points(struct curve_points *plot)
     /* If so, displace them in a fixed pattern */
     i = 0;
     while (i < plot->p_count - 1) {
-	for (j = 1; jdist(&plot->points[i], &plot->points[i+j]) < ygap; j++) {
-	    if (i+j >= plot->p_count)
+	for (j = 1; i+j < plot->p_count; j++) {
+	    if (jdist(&plot->points[i], &plot->points[i+j]) >= ygap)
 		break;
 
 	    /* Displace point purely on x */
