@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.902.2.44 2015/10/22 17:52:11 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.902.2.45 2015/10/29 23:25:46 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -7786,8 +7786,8 @@ Ffigure_mapcontours
 
  Notes:
 
- * `set clip` affects points and lines produced by 2D plot styles `lines`,
- `linespoints`, `points`, `vectors`, and 3D plot style `lines`.
+ * `set clip` affects only points and lines produced by plot styles `lines`,
+ `linespoints`, `points`, and `vectors`.
 
  * Clipping of colored quadrangles drawn for `pm3d` maps and surfaces is
  controlled `set pm3d clip1in` and `set pm3d clip4in`.

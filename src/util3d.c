@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: util3d.c,v 1.48 2013/09/26 22:45:33 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: util3d.c,v 1.48.2.1 2015/06/03 17:32:55 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - util3d.c */
@@ -145,20 +145,19 @@ mat_mult(
  */
 void
 edge3d_intersect(
-    struct coordinate GPHUGE *points,	/* the points array */
-    int i0, int i1,
+    coordinate *p1, coordinate *p2,
     double *ex, double *ey, double *ez)	/* the point where it crosses an edge */
 {
     int count;
-    double ix = points[i0].x;
-    double iy = points[i0].y;
-    double iz = points[i0].z;
-    double ox = points[i1].x;
-    double oy = points[i1].y;
-    double oz = points[i1].z;
+    double ix = p1->x;
+    double iy = p1->y;
+    double iz = p1->z;
+    double ox = p2->x;
+    double oy = p2->y;
+    double oz = p2->z;
     double x, y, z;		/* possible intersection point */
 
-    if (points[i0].type == INRANGE) {
+    if (p1->type == INRANGE) {
 	/* swap points around so that ix/ix/iz are INRANGE and ox/oy/oz are OUTRANGE */
 	x = ix;
 	ix = ox;
@@ -402,18 +401,17 @@ edge3d_intersect(
  */
 TBOOLEAN			/* any intersection? */
 two_edge3d_intersect(
-    struct coordinate GPHUGE *points,	/* the points array */
-    int i0, int i1,
+    coordinate *p0, coordinate *p1,
     double *lx, double *ly, double *lz)	/* lx[2], ly[2], lz[2]: points where it crosses edges */
 {
     int count;
     /* global axis_array[FIRST_{X,Y,Z}_AXIS].{min,max} */
-    double ix = points[i0].x;
-    double iy = points[i0].y;
-    double iz = points[i0].z;
-    double ox = points[i1].x;
-    double oy = points[i1].y;
-    double oz = points[i1].z;
+    double ix = p0->x;
+    double iy = p0->y;
+    double iz = p0->z;
+    double ox = p1->x;
+    double oy = p1->y;
+    double oz = p1->z;
     double t[6];
     double swap;
     double x, y, z;		/* possible intersection point */
