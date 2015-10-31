@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: doc2html.c,v 1.6 2011/05/25 06:14:27 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: doc2html.c,v 1.6.4.1 2014/12/14 22:02:39 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - doc2html.c */
@@ -273,6 +273,7 @@ process_line(char *line, FILE *b, FILE *c, FILE *d)
                     if (debug)
                         fprintf(stderr, "hyper link \"%s\" - %s on line %d\n", topic, id, line_count);
 #else
+		    (void)klink;	/* Otherwise compiler warning about unused variable */
                     /* explicit links */
                     if ((klist->line) > 1)
                         sprintf(hyplink1, "<a href=\"loc%d.html\">", klist->line);

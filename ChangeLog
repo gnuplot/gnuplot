@@ -8,6 +8,10 @@
 	* src/graph3d.c src/plot3d.c:  Support "set clip {one|two}" for 3D
 	vector plots.
 
+	* src/datafile.c (df_set_key_title):  Use of columnheader(N) could 
+	sometimes leave an extraneous character '@' in the plot title.
+	This was introduced in 5.0.1 as a sideeffect to the fix for Bug #1596.
+
 2015-10-28  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/interpol.c (mcs_interp): Handle log-scaled y axis when using

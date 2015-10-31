@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.290.2.15 2015/08/26 04:32:56 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.290.2.16 2015/10/01 03:38:34 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -2759,7 +2759,9 @@ df_set_key_title(struct curve_points *plot)
 	    char *trailer = NULL;
 	    columnhead = strtol(placeholder+11, &trailer, 0);
 	    *placeholder = '\0';
-	    sprintf(newtitle, "%s%s%s", plot->title, 
+	    if (trailer && *trailer == '@')
+		trailer++;
+	    sprintf(newtitle, "%s%s%s", plot->title,
 		    (columnhead <= 0) ? df_key_title :
 		    (columnhead <= df_no_cols) ? df_column[columnhead-1].header : "",
 		    trailer ? trailer : "");
