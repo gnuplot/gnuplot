@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.243 2015/08/21 20:45:03 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.244 2015/10/08 15:32:09 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -779,7 +779,7 @@ get_3ddata(struct surface_points *this_plot)
 	/*{{{  read surface from text file */
 	struct iso_curve *local_this_iso = iso_alloc(samples_1);
 	struct coordinate GPHUGE *cp;
-	struct coordinate GPHUGE *cptail = NULL; /* Only for VECTOR plots */
+	struct coordinate GPHUGE *cphead = NULL; /* Only for VECTOR plots */
 	double x, y, z;
 	double xtail, ytail, ztail;
 	double color = VERYLARGE;
@@ -884,7 +884,7 @@ get_3ddata(struct surface_points *this_plot)
 		    cp->type = UNDEFINED;
 		    continue;
 		}
-		cptail = local_this_iso->next->points + xdatum;
+		cphead = local_this_iso->next->points + xdatum;
 	    }
 
 	    if (j == DF_UNDEFINED || j == DF_MISSING) {
@@ -1054,9 +1054,9 @@ get_3ddata(struct surface_points *this_plot)
 	    STORE_WITH_LOG_AND_UPDATE_RANGE(cp->x, x, cp->type, x_axis, this_plot->noautoscale, NOOP, goto come_here_if_undefined);
 	    STORE_WITH_LOG_AND_UPDATE_RANGE(cp->y, y, cp->type, y_axis, this_plot->noautoscale, NOOP, goto come_here_if_undefined);
 	    if (this_plot->plot_style == VECTOR) {
-		cptail->type = INRANGE;
-		STORE_WITH_LOG_AND_UPDATE_RANGE(cptail->x, xtail, cp->type, x_axis, this_plot->noautoscale, NOOP, goto come_here_if_undefined);
-		STORE_WITH_LOG_AND_UPDATE_RANGE(cptail->y, ytail, cp->type, y_axis, this_plot->noautoscale, NOOP, goto come_here_if_undefined);
+		cphead->type = INRANGE;
+		STORE_WITH_LOG_AND_UPDATE_RANGE(cphead->x, xtail, cphead->type, x_axis, this_plot->noautoscale, NOOP, goto come_here_if_undefined);
+		STORE_WITH_LOG_AND_UPDATE_RANGE(cphead->y, ytail, cphead->type, y_axis, this_plot->noautoscale, NOOP, goto come_here_if_undefined);
 	    }
 
 	    if (dgrid3d) {
@@ -1066,7 +1066,7 @@ get_3ddata(struct surface_points *this_plot)
 		 * created created grid more easily. */
 		cp->z = z;
 		if (this_plot->plot_style == VECTOR)
-		    cptail->z = ztail;
+		    cphead->z = ztail;
 	    } else {
 
 		/* EAM Sep 2008 - Otherwise z=Nan or z=Inf or DF_MISSING fails	*/
@@ -1081,7 +1081,7 @@ get_3ddata(struct surface_points *this_plot)
 				cp->z=0;goto come_here_if_undefined);
 
 		if (this_plot->plot_style == VECTOR)
-		    STORE_WITH_LOG_AND_UPDATE_RANGE(cptail->z, ztail, cp->type, z_axis, this_plot->noautoscale, NOOP, goto come_here_if_undefined);
+		    STORE_WITH_LOG_AND_UPDATE_RANGE(cphead->z, ztail, cphead->type, z_axis, this_plot->noautoscale, NOOP, goto come_here_if_undefined);
 
 		if (this_plot->lp_properties.l_type == LT_COLORFROMCOLUMN)
 		    cp->CRD_COLOR = color;

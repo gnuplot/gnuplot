@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.328 2015/10/26 21:43:00 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.329 2015/10/29 23:26:32 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -1478,7 +1478,6 @@ plot3d_lines(struct surface_points *plot)
     double clip_x, clip_y, clip_z;
     struct iso_curve *icrvs = plot->iso_crvs;
     struct coordinate GPHUGE *points;
-    double lx[2], ly[2], lz[2];	/* two edge points */
     TBOOLEAN rgb_from_column;
 
     /* These are handled elsewhere.  */
@@ -1521,7 +1520,7 @@ plot3d_lines(struct surface_points *plot)
 				 * Calculate intersection point and draw
 				 * vector from there
 				 */
-				edge3d_intersect(points, i-1, i, &clip_x, &clip_y, &clip_z);
+				edge3d_intersect(&points[i-1], &points[i], &clip_x, &clip_y, &clip_z);
 
 				map3d_xy(clip_x, clip_y, clip_z, &xx0, &yy0);
 
@@ -1543,7 +1542,7 @@ plot3d_lines(struct surface_points *plot)
 			     * Calculate intersection point and draw
 			     * vector to it
 			     */
-			    edge3d_intersect(points, i-1, i, &clip_x, &clip_y, &clip_z);
+			    edge3d_intersect(&points[i-1], &points[i], &clip_x, &clip_y, &clip_z);
 
 			    map3d_xy(clip_x, clip_y, clip_z, &xx0, &yy0);
 
@@ -1552,15 +1551,13 @@ plot3d_lines(struct surface_points *plot)
 		    } else if (prev == OUTRANGE) {
 			/* from outrange to outrange */
 			if (clip_lines2) {
+			    double lx[2], ly[2], lz[2];	/* two edge points */
 			    /*
-			     * Calculate the two 3D intersection points
-			     * if present
+			     * Calculate the two 3D intersection points if present
 			     */
-			    if (two_edge3d_intersect(points, i-1, i, lx, ly, lz)) {
-
+			    if (two_edge3d_intersect(&points[i-1], &points[i], lx, ly, lz)) {
 				map3d_xy(lx[0], ly[0], lz[0], &x, &y);
 				map3d_xy(lx[1], ly[1], lz[1], &xx0, &yy0);
-
 				clip_move(x, y);
 				clip_vector(xx0, yy0);
 			    }
@@ -1600,7 +1597,6 @@ plot3d_lines_pm3d(struct surface_points *plot)
     double clip_x, clip_y, clip_z;
     struct coordinate GPHUGE *points;
     enum coord_type prev = UNDEFINED;
-    double lx[2], ly[2], lz[2];	/* two edge points */
     double z;
 
     /* just a shortcut */
@@ -1674,7 +1670,7 @@ plot3d_lines_pm3d(struct surface_points *plot)
 				     * Calculate intersection point and draw
 				     * vector from there
 				     */
-				    edge3d_intersect(points, i-step, i, &clip_x, &clip_y, &clip_z);
+				    edge3d_intersect(&points[i-step], &points[i], &clip_x, &clip_y, &clip_z);
 
 				    map3d_xy(clip_x, clip_y, clip_z, &xx0, &yy0);
 
@@ -1701,7 +1697,7 @@ plot3d_lines_pm3d(struct surface_points *plot)
 				 * vector to it
 				 */
 
-				edge3d_intersect(points, i-step, i, &clip_x, &clip_y, &clip_z);
+				edge3d_intersect(&points[i-step], &points[i], &clip_x, &clip_y, &clip_z);
 
 				map3d_xy(clip_x, clip_y, clip_z, &xx0, &yy0);
 
@@ -1716,13 +1712,11 @@ plot3d_lines_pm3d(struct surface_points *plot)
 			    /* from outrange to outrange */
 			    if (clip_lines2) {
 				/*
-				 * Calculate the two 3D intersection points
-				 * if present
+				 * Calculate the two 3D intersection points if present
 				 */
-				if (two_edge3d_intersect(points, i-step, i, lx, ly, lz)) {
-
+				double lx[2], ly[2], lz[2];
+				if (two_edge3d_intersect(&points[i-step], &points[i], lx, ly, lz)) {
 				    map3d_xy(lx[0], ly[0], lz[0], &x, &y);
-
 				    map3d_xy(lx[1], ly[1], lz[1], &xx0, &yy0);
 
 				    clip_move(x, y);
@@ -3270,8 +3264,8 @@ plot3d_vectors(struct surface_points *plot)
     int i;
     double x1, y1, x2, y2;
     arrow_style_type ap;
-    struct coordinate GPHUGE *heads = plot->iso_crvs->points;
-    struct coordinate GPHUGE *tails = plot->iso_crvs->next->points;
+    struct coordinate GPHUGE *tails = plot->iso_crvs->points;
+    struct coordinate GPHUGE *heads = plot->iso_crvs->next->points;
 
     /* Only necessary once, unless variable arrow style */
     ap = plot->arrow_properties;
@@ -3293,9 +3287,33 @@ plot3d_vectors(struct surface_points *plot)
 	    check3d_for_variable_color(plot, &heads[i]);
 	}
 
+	/* The normal case: both ends in range */
 	if (heads[i].type == INRANGE && tails[i].type == INRANGE) {
-	    map3d_xy_double(heads[i].x, heads[i].y, heads[i].z, &x1, &y1);
-	    map3d_xy_double(tails[i].x, tails[i].y, tails[i].z, &x2, &y2);
+	    map3d_xy_double(tails[i].x, tails[i].y, tails[i].z, &x1, &y1);
+	    map3d_xy_double(heads[i].x, heads[i].y, heads[i].z, &x2, &y2);
+	    draw_clip_arrow((int)x1, (int)y1, (int)x2, (int)y2, ap.head);
+
+	/* "set clip two" - both ends out of range */
+	} else if (heads[i].type != INRANGE && tails[i].type != INRANGE) {
+	    double lx[2], ly[2], lz[2];
+	    if (!clip_lines2)
+		continue;
+	    two_edge3d_intersect(&tails[i], &heads[i], lx, ly, lz);
+	    map3d_xy_double(lx[0], ly[0], lz[0], &x1, &y1);
+	    map3d_xy_double(lx[1], ly[1], lz[1], &x2, &y2);
+	    draw_clip_arrow((int)x1, (int)y1, (int)x2, (int)y2, ap.head);
+
+	/* "set clip one" - one end out of range */
+	} else if (clip_lines1) {
+	    double clip_x, clip_y, clip_z;
+	    edge3d_intersect(&heads[i], &tails[i], &clip_x, &clip_y, &clip_z);
+	    if (tails[i].type == INRANGE) {
+		map3d_xy_double(tails[i].x, tails[i].y, tails[i].z, &x1, &y1);
+		map3d_xy_double(clip_x, clip_y, clip_z, &x2, &y2);
+	    } else {
+		map3d_xy_double(clip_x, clip_y, clip_z, &x1, &y1);
+		map3d_xy_double(heads[i].x, heads[i].y, heads[i].z, &x2, &y2);
+	    }
 	    draw_clip_arrow((int)x1, (int)y1, (int)x2, (int)y2, ap.head);
 	}
     }
