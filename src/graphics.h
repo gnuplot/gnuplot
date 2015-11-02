@@ -1,5 +1,5 @@
 /*
- * $Id: graphics.h,v 1.65 2015/05/08 00:29:07 sfeam Exp $
+ * $Id: graphics.h,v 1.66 2015/08/03 04:16:38 sfeam Exp $
  */
 
 /* GNUPLOT - graphics.h */
@@ -65,6 +65,8 @@ typedef struct curve_points {
 
     /* 2D and 3D plot structure fields overlay only to this point */
     filledcurves_opts filledcurves_options;
+    int base_linetype;		/* before any calls to load_linetype(), lc variable */
+				/* analogous to hidden3d_top_linetype in graph3d.h  */
     int ellipseaxes_units;              /* Only used if plot_style == ELLIPSES */    
     struct histogram_style *histogram;	/* Only used if plot_style == HISTOGRAM */
     int histogram_sequence;	/* Ordering of this dataset within the histogram */

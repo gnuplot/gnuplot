@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.368 2015/10/24 23:55:46 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.369 2015/10/29 04:43:34 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -2467,10 +2467,12 @@ eval_plots()
 		if (this_plot->plot_style != LABELPOINTS) {
 		    int stored_token = c_token;
 		    struct lp_style_type lp = DEFAULT_LP_STYLE_TYPE;
+		    int new_lt = 0;
 
 		    lp.l_type = line_num;
 		    lp.p_type = line_num;
 		    lp.d_type = line_num;
+		    this_plot->base_linetype = line_num;
 
 		    /* user may prefer explicit line styles */
 		    if (prefer_line_styles)
@@ -2481,8 +2483,8 @@ eval_plots()
 		    if (this_plot->plot_style == BOXPLOT)
 			lp.p_type = boxplot_opts.pointtype;
 
-		    lp_parse(&lp, LP_ADHOC,
-			     this_plot->plot_style & PLOT_STYLE_HAS_POINT);
+		    new_lt = lp_parse(&lp, LP_ADHOC,
+				     this_plot->plot_style & PLOT_STYLE_HAS_POINT);
 		    if (stored_token != c_token) {
 			if (set_lpstyle) {
 			    duplication=TRUE;
@@ -2490,6 +2492,8 @@ eval_plots()
 			} else {
 			    this_plot->lp_properties = lp;
 			    set_lpstyle = TRUE;
+			    if (new_lt)
+				this_plot->base_linetype = new_lt - 1;
 			    if (this_plot->lp_properties.p_type != PT_CHARACTER)
 				continue;
 			}

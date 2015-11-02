@@ -1,3 +1,13 @@
+2015-11-02  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/graphics.h src/plot2d.c: Add a new field to (struct curve_points).
+	plot->base_linetype holds the original linetype index for this 2D plot,
+	prior to applying variable color, linetypes defined in terms of other
+	linetypes, etc. This allows assigning successive colors or other
+	properties to elements of a 2D plot (e.g. histogram components, boxplot
+	factors).  An analogous field splot->hidden3d_top_linetype is already 
+	maintained in (struct surface_points) for use by 3D plots.
+
 2015-10-31  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/util3d.c src/util3d.h (edge3d_intersect two_edge3d_intersect)
@@ -10,7 +20,7 @@
 
 	* src/datafile.c (df_set_key_title):  Use of columnheader(N) could 
 	sometimes leave an extraneous character '@' in the plot title.
-	This was introduced in 5.0.1 as a sideeffect to the fix for Bug #1596.
+	This was introduced in 5.0.1 as a side effect to the fix for Bug #1596.
 
 2015-10-28  Ethan A Merritt  <merritt@u.washington.edu>
 
