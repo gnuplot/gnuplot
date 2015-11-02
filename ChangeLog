@@ -8,6 +8,10 @@
 	factors).  An analogous field splot->hidden3d_top_linetype is already 
 	maintained in (struct surface_points) for use by 3D plots.
 
+	* src/graphics.c src/plot2d.c: In boxplots with multiple component
+	factors, interpret "lc variable" as requesting a new color for each
+	factor.
+
 2015-10-31  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/util3d.c src/util3d.h (edge3d_intersect two_edge3d_intersect)

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.505 2015/10/29 04:43:34 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.506 2015/10/29 23:26:32 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -2873,6 +2873,10 @@ plot_boxplot(struct curve_points *plot)
 	candle.xhigh = median;	/* Crazy order of candlestick parameters! */
 	plot->points = &candle;
 	plot->p_count = 1;
+
+	/* for boxplots "lc variable" means color by factor index */ 
+	if (plot->varcolor)
+	    plot->varcolor[0] = plot->base_linetype + level + 1;
 
 	if (boxplot_opts.plotstyle == FINANCEBARS)
 	    plot_f_bars( plot );
