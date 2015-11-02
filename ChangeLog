@@ -1,3 +1,10 @@
+2015-11-02  Shigeharu Takeno  <shige@iee.niit.ac.jp>
+
+	* docs/term-ja.diff docs/gnuplot-ja.doc:
+	Sync Japanese documentation to doc version 1.967
+
+	* docs/gnuplot.doc: typos
+
 2015-11-02  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.h src/plot2d.c: Add a new field to (struct curve_points).

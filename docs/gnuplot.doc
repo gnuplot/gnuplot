@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.966 2015/10/29 23:26:32 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.967 2015/10/31 04:36:56 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -803,7 +803,7 @@ C  need @ in table, so end and restart the table !
  This means that constants beginning with "0" are interpreted as octal,
  and constants beginning with "0x" or "0X" are interpreted as hexadecimal.
 
- Floating point constants are interpreted via the C library routin atof().
+ Floating point constants are interpreted via the C library routine atof().
 
 =division
  Note that gnuplot uses both "real" and "integer" arithmetic, like FORTRAN and
@@ -3924,7 +3924,7 @@ Ffigure_parallel
  can be used to customize this.  See `set paxis`.
 
  The maximum number of parallel axes is fixed at the time the program is built.
- The maximum for this copy of gnuplot is reported by "show version long".
+ The maximum for this copy of gnuplot is reported by `show version long`.
 2 points
 ?plotting styles points
 ?style points
@@ -4185,7 +4185,7 @@ Ffigure_polar
 Ffigure_jitter
  "Bee swarm" plots result from applying jitter to separate overlapping points.
  A typical use is to compare the distribution of y values exhibited by two or
- more categories of points, where the category determinines the x coordinate.
+ more categories of points, where the category determines the x coordinate.
  See the `set jitter` command for how to control the overlap criteria and the
  displacement pattern used for jittering.  The plots in the figure were created
  by the same plot command but different jitter settings.
@@ -7044,7 +7044,7 @@ Ffigure_jitter
  See `expressions`.  The output file can be set with `set print`.
  See also `printerr`.
 2 printerr
-?command printerr
+?commands printerr
 ?printerr
  `printerr` is the same as print except that output is always sent to stderr
  even if a prior `set print` command remains in effect.
@@ -7342,6 +7342,7 @@ Ffigure_jitter
                        {front | back}
                        {linestyle <line_style>}
                        {linetype <line_type>} {linewidth <line_width>}
+                       {linecolor <colorspec>} {dashtype <dashtype>}
 
        unset arrow {<tag>}
        show arrow {<tag>}
@@ -9393,7 +9394,7 @@ Ffigure_missing
  When one or both coordinates of a data set are restricted to discrete values
  then many points may lie exactly on top of each other.  Jittering introduces an
  offset to the coordinates of these superimposed points that spreads them into a
- cluster.  The threshhold value for treating the points as being overlapped may
+ cluster.  The threshold value for treating the points as being overlapped may
  be specified in  character widths or any of the usual coordinate options.
  See `coordinates`.
 
@@ -11775,7 +11776,9 @@ Ffigure_missing
                                {front | back}
                                { {linestyle | ls <line_style>}
                                  | {linetype | lt <line_type>}
-                                   {linewidth | lw <line_width} }
+                                   {linewidth | lw <line_width}
+                                   {linecolor | lc <colorspec>}
+                                   {dashtype | dt <dashtype>} }
        unset style arrow
        show style arrow
 
