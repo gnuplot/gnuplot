@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.902.2.45 2015/10/29 23:25:46 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.902.2.46 2015/10/31 04:39:18 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -801,7 +801,7 @@ C  need @ in table, so end and restart the table !
  This means that constants beginning with "0" are interpreted as octal,
  and constants beginning with "0x" or "0X" are interpreted as hexadecimal.
 
- Floating point constants are interpreted via the C library routin atof().
+ Floating point constants are interpreted via the C library routine atof().
 
 =division
  Note that gnuplot uses both "real" and "integer" arithmetic, like FORTRAN and
@@ -3921,7 +3921,7 @@ Ffigure_parallel
  can be used to customize this.  See `set paxis`.
 
  The maximum number of parallel axes is fixed at the time the program is built.
- The maximum for this copy of gnuplot is reported by "show version long".
+ The maximum for this copy of gnuplot is reported by `show version long`.
 2 points
 ?plotting styles points
 ?style points
@@ -6966,7 +6966,7 @@ Ffigure_mapcontours
  See `expressions`.  The output file can be set with `set print`.
  See also `printerr`.
 2 printerr
-?command printerr
+?commands printerr
 ?printerr
  `printerr` is the same as print except that output is always sent to stderr
  even if a prior `set print` command remains in effect.
@@ -7264,6 +7264,7 @@ Ffigure_mapcontours
                        {front | back}
                        {linestyle <line_style>}
                        {linetype <line_type>} {linewidth <line_width>}
+                       {linecolor <colorspec>} {dashtype <dashtype>}
 
        unset arrow {<tag>}
        show arrow {<tag>}
@@ -11635,7 +11636,9 @@ Ffigure_missing
                                {front | back}
                                { {linestyle | ls <line_style>}
                                  | {linetype | lt <line_type>}
-                                   {linewidth | lw <line_width} }
+                                   {linewidth | lw <line_width}
+                                   {linecolor | lc <colorspec>}
+                                   {dashtype | dt <dashtype>} }
        unset style arrow
        show style arrow
 
