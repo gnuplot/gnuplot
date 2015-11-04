@@ -5,7 +5,7 @@ reset
 
 print "*** Boxplot demo ***"
 
-set style fill solid 0.25 border -1
+set style fill solid 0.5 border -1
 set style boxplot outliers pointtype 7
 set style data boxplot
 set boxwidth  0.5
@@ -31,13 +31,29 @@ set ylabel "Billion Tons of Oil Equivalent"
 
 plot 'energy_circles.dat' using (1):($8/1.e6):(0):4
 
+pause -1 'Hit <cr> to continue: Assign selected colors to each factor'
+
+set linetype 51 lc "dark-red"
+set linetype 52 lc "dark-red"
+set linetype 53 lc "dark-red"
+set linetype 54 lc "midnight-blue"
+set linetype 55 lc "sea-green"
+set linetype 56 lc "sea-green"
+set linetype 57 lc "sea-green"
+
+set title "Distribution of energy usage of the continents, grouped by type of energy source,\n assign individual colors (linetypes) to the factors taken from column 4\n"
+
+plot 'energy_circles.dat' using (1):($8/1.e6):(0):4 lt 51 lc variable
+
 pause -1 'Hit <cr> to continue: Sort factors alphabetically'
 
 # Sort factors alphabetically
 
 set style boxplot sorted
 
-replot
+set title "Distribution of energy usage of the continents, sorted by name of energy source\n"
+
+plot 'energy_circles.dat' using (1):($8/1.e6):(0):4 lc rgb "gold"
 
 pause -1 'Hit <cr> to continue: The same, with iteration and manual filtering'
 
@@ -50,7 +66,7 @@ pause -1 'Hit <cr> to continue: The same, with iteration and manual filtering'
 # Note: we turn off autoscaling for the last two categories so that outliers do not
 # expand the range on y even though they are not shown.
 
-factors = "Coal Gas Hydroelectric Nuclear Oil Renewable"
+factors = "Nuclear Coal Gas Oil Hydroelectric Renewable"
 NF = words(factors)
 set xtic ("" 1)
 set for [i=1:NF] xtics add (word(factors,i) i) 
@@ -58,6 +74,8 @@ set style boxplot nooutliers
 
 t(x) = x/1.e6
 filter(col, factor_col, level) = (strcol(factor_col) eq word(factors, level)) ? t(column(col)) : 1/0
+
+set title "Distribution of energy usage explicitly ordered by name of energy source\n"
 
 plot for [i=1:NF-2]  'energy_circles.dat' using (i):(filter(8, 4, i)), \
      for [i=NF-1:NF] 'energy_circles.dat' using (i):(filter(8, 4, i)) noauto
