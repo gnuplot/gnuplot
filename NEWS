@@ -8,6 +8,7 @@ New features, changes and fixes since gnuplot version 4.6.6
 * FIX B and L formats in gprintf()
 * FIX bug parsing time input with format "%s" (extra fractional second)
 * FIX incorrect average value in final bin of "smooth cnorm" calculation
+* FIX vertical alignment of enhanced text fragments in cairo terminals
 
 
 New features, changes and fixes in gnuplot version 4.6.6
