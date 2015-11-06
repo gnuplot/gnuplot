@@ -190,6 +190,9 @@ static int  qt_setWidth  = qt_optionWidth;
 static int  qt_setHeight = qt_optionHeight;
 static bool qt_is_3Dplot = false;
 
+static double qt_max_pos_base = 0.0;
+static double qt_max_neg_base = 0.0;
+
 /* ------------------------------------------------------
  * Helpers
  * ------------------------------------------------------*/
@@ -615,6 +618,12 @@ void qt_enhanced_open(char* fontname, double fontsize, double base, TBOOLEAN wid
 	qt->enhancedShowFlag  = showflag;
 	qt->enhancedOverprint = overprint;
 
+	// Baseline correction.  Surely Qt itself provides this somehow?
+	if (qt_max_pos_base < base)
+	    qt_max_pos_base = base;
+	if (qt_max_neg_base > base)
+	    qt_max_neg_base = base;
+
 	// strip Bold or Italic property out of font name
 	QString tempname = fontname;
 	if (tempname.contains(":italic", Qt::CaseInsensitive))
@@ -663,6 +672,9 @@ void qt_put_text(unsigned int x, unsigned int y, const char* string)
 	enhanced_fontscale = 1.0;
 	strncpy(enhanced_escape_format, "%c", sizeof(enhanced_escape_format));
 
+	// Baseline correction
+	qt_max_pos_base = qt_max_neg_base = 0.0;
+
 	// Set the recursion going. We say to keep going until a closing brace, but
 	// we don't really expect to find one.  If the return value is not the nul-
 	// terminator of the string, that can only mean that we did find an unmatched
@@ -677,6 +689,10 @@ void qt_put_text(unsigned int x, unsigned int y, const char* string)
 			break; // end of string
 		// else carry on and process the rest of the string
 	}
+
+	// Baseline correction
+	y += qt_max_pos_base * 5;
+	y += qt_max_neg_base * 5;
 
 	qt->out << GEEnhancedFinish << qt_termCoord(x, y);
 }

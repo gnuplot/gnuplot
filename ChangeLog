@@ -1,3 +1,8 @@
+2015-11-06  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/qtterminal/qt_term.cpp: Improved vertical alignment of Qt text
+	fragments (analogous to Jun's cairo patch).
+
 2015-11-06  Jun Takimoto <takimoto-j@kba.biglobe.ne.jp>
 
 	* src/wxterminal/gp_cairo.c: Fix longstanding bug in vertical alignment
