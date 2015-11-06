@@ -6,6 +6,14 @@
 	This is corrected by a query to pango_layout_get_baseline().
 	Bugs #1319 #1586, probably others
 
+2015-11-06  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/internal.c (f_word f_words):  The implementation of word(string,N)
+	returned the total number of words for any N<0.  This was used internally
+	to implement words(string) and word(string,-1) but meant that any N<0
+	returned an unexpected value to the user.  Limit the special case to 
+	a single magic value and let all other N<0 return "" as expected.
+
 2015-11-02  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* docs/term-ja.diff docs/gnuplot-ja.doc:
