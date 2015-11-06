@@ -1,3 +1,11 @@
+2015-11-06  Jun Takimoto <takimoto-j@kba.biglobe.ne.jp>
+
+	* src/wxterminal/gp_cairo.c: Fix longstanding bug in vertical alignment
+	of text fragments in cairo terminals (including wxt).  Text containing
+	superscripts was placed too low; text with subscripts too high.
+	This is corrected by a query to pango_layout_get_baseline().
+	Bugs #1319 #1586, probably others
+
 2015-10-31  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/util3d.c src/util3d.h (edge3d_intersect two_edge3d_intersect)

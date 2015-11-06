@@ -30,6 +30,7 @@ Changes since 5.0.1
 * FIX handle log-scale y values when calculating monotonic cubic spline fit
 * FIX "set clip points" was non-functional in version 5.0
 * FIX regression in 5.0.1 that left extraneous '@' in title columnhead(N)
+* FIX vertical placement of text fragments by cairo terminals
 
 Changes in 5.0.1
 ================
