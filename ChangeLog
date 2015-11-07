@@ -8,10 +8,10 @@
 
 2015-10-31  Ethan A Merritt  <merritt@u.washington.edu>
 
-	* src/util3d.c src/util3d.h (edge3d_intersect two_edge3d_intersect)
+	* src/util3d.c src/util3d.h (edge3d_intersect two_edge3d_intersect):
 	Change parameters to (coordinate *) rather than (array, index) so that
 	the same routines can handle clipping 3D vectors that are not stored as
-	successive entries in the same array.
+	successive entries an array.
 
 	* src/graph3d.c src/plot3d.c:  Support "set clip {one|two}" for 3D
 	vector plots.
