@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.503 2015/10/07 00:31:12 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.504 2015/10/09 20:04:23 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -4949,10 +4949,10 @@ set_tics()
 	    for (i = 0; i < AXIS_ARRAY_SIZE; ++i)
 		axis_array[i].ticdef.textcolor = lcolor;
 	} else if (equals(c_token,"front")) {
-	    grid_layer = LAYER_FRONT;
+	    grid_tics_in_front = TRUE;
 	    ++c_token;
 	} else if (equals(c_token,"back")) {
-	    grid_layer = LAYER_BACK;
+	    grid_tics_in_front = FALSE;
 	    ++c_token;
 	} else if (!END_OF_COMMAND) {
 	    int_error(c_token, "extraneous arguments in set tics");

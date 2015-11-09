@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.967 2015/10/31 04:36:56 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.968 2015/11/02 21:04:09 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -12449,7 +12449,7 @@ Ffigure_missing
        set xtics rotate by -90
        unset cbtics
 
- Set tics `front` or `back` applies to all axes at once, but only for 2D plots
+ Set tics `back` or `front` applies to all axes at once, but only for 2D plots
  (not splot).  It controls whether the tics are placed behind or in front of
  the plot elements, in the case that there is overlap.
 
