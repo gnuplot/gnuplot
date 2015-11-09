@@ -10,6 +10,10 @@
 	what it is documented to do.
 	Bug #1704
 
+	* src/axis.c (gen_tics):  "set {*}tics rangelimit" applies to minor
+	tics as well as major tics.
+	Bug #1705
+
 2015-11-06  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/qtterminal/qt_term.cpp: Improved vertical alignment of Qt text

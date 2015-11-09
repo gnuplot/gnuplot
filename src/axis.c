@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.170 2015/10/26 21:43:00 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.171 2015/11/10 02:50:39 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -1305,7 +1305,7 @@ gen_tics(struct axis *this, tic_callback callback)
 
 			/* Range-limited tic placement */
 			if (def->rangelimited
-			&&  !inrange(internal,this->data_min,this->data_max))
+			&&  !inrange(internal, this->data_min, this->data_max))
 			    continue;
 
 			(*callback) (this, internal, label, 0, lgrd, def->def.user);
@@ -1332,7 +1332,14 @@ gen_tics(struct axis *this, tic_callback callback)
 			mtic = internal
 			    + (this->log && step <= 1.5 ? axis_do_log(this,mplace) : mplace);
 		    temptic = mtic;
-		    if (polar && this->index == POLAR_AXIS) temptic += R_AXIS.min;
+		    if (polar && this->index == POLAR_AXIS)
+			temptic += R_AXIS.min;
+
+		    /* Range-limited tic placement */
+		    if (def->rangelimited
+		    &&  !inrange(temptic, this->data_min, this->data_max))
+			continue;
+
 		    if (inrange(temptic, internal_min, internal_max)
 			&& inrange(temptic, start - step * SIGNIF, end + step * SIGNIF))
 			(*callback) (this, mtic, NULL, 1, mgrd, NULL);
