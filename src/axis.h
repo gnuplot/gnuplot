@@ -1,5 +1,5 @@
 /*
- * $Id: axis.h,v 1.103.2.2 2014/11/08 04:52:25 sfeam Exp $
+ * $Id: axis.h,v 1.103.2.3 2015/04/04 01:08:32 sfeam Exp $
  *
  */
 
@@ -339,8 +339,11 @@ extern const lp_style_type default_axis_zeroaxis;
 /* default grid linetype, to be used by 'unset grid' and 'reset' */
 extern const struct lp_style_type default_grid_lp;
 
-/* grid layer: -1 default, 0 back, 1 front */
+/* grid layer: LAYER_BEHIND LAYER_BACK LAYER_FRONT */
 extern int grid_layer;
+
+/* Whether to draw the axis tic labels and tic marks in front of everything else */
+extern TBOOLEAN grid_tics_in_front;
 
 /* Whether or not to draw a separate polar axis in polar mode */
 extern TBOOLEAN raxis;

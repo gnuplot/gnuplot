@@ -1,3 +1,15 @@
+2015-11-09  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/axis.c src/axis.h src/graphics.c src/save.c src/set.c src/show.c
+	src/unset.c:  The documentation says that "set tics `front` or `back`
+	controls whether the tics are placed behind or in front of the plot
+	elements".  This was sort of true but it did this by moving the entire
+	grid along with the tics, so you could not entirely place the tics
+	and tic labels in front of the grid lines.
+	Decouple these two operations so that `set tics {front|back}` does only
+	what it is documented to do.
+	Bug #1704
+
 2015-11-06  Jun Takimoto <takimoto-j@kba.biglobe.ne.jp>
 
 	* src/wxterminal/gp_cairo.c: Fix longstanding bug in vertical alignment

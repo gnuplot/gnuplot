@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.206.2.5 2015/03/14 02:47:05 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.206.2.6 2015/03/29 18:08:08 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -1817,6 +1817,7 @@ reset_command()
     mgrid_lp = default_grid_lp;
     polar_grid_angle = 0;
     grid_layer = LAYER_BEHIND;
+    grid_tics_in_front = FALSE;
 
     SET_REFRESH_OK(E_REFRESH_NOT_OK, 0);
 

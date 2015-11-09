@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.464.2.15 2015/10/22 22:16:56 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.464.2.16 2015/10/29 23:25:48 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -108,7 +108,7 @@ static void plot_boxplot __PROTO((struct curve_points * plot));
 
 static void place_labels __PROTO((struct text_label * listhead, int layer, TBOOLEAN clip));
 static void place_arrows __PROTO((int layer));
-static void place_grid __PROTO((void));
+static void place_grid __PROTO((int layer));
 static void place_raxis __PROTO((void));
 static void place_parallel_axes __PROTO((struct curve_points *plots, int pcount, int layer));
 
@@ -200,33 +200,38 @@ get_arrow(
 }
 
 static void
-place_grid()
+place_grid(int layer)
 {
     struct termentry *t = term;
+    int save_lgrid = grid_lp.l_type;
+    int save_mgrid = mgrid_lp.l_type;
 
     term_apply_lp_properties(&border_lp);	/* border linetype */
     largest_polar_circle = 0;
+
+    /* We used to go through this process only once, drawing both the grid lines
+     * and the axis tic labels.  Now we allow for a separate pass that redraws only
+     * the labels if the user has chosen "set tics front".
+     * This guarantees that the axis tic labels lie on top of all grid lines.
+     */
+    if (layer == LAYER_FOREGROUND) 
+	grid_lp.l_type = mgrid_lp.l_type = LT_NODRAW;
 
     /* select first mapping */
     x_axis = FIRST_X_AXIS;
     y_axis = FIRST_Y_AXIS;
 
     /* label first y axis tics */
-    axis_output_tics(FIRST_Y_AXIS, &ytic_x, FIRST_X_AXIS,
-		     /* (GRID_Y | GRID_MY), */ ytick2d_callback);
+    axis_output_tics(FIRST_Y_AXIS, &ytic_x, FIRST_X_AXIS, ytick2d_callback);
     /* label first x axis tics */
-    axis_output_tics(FIRST_X_AXIS, &xtic_y, FIRST_Y_AXIS,
-		     /* (GRID_X | GRID_MX), */ xtick2d_callback);
+    axis_output_tics(FIRST_X_AXIS, &xtic_y, FIRST_Y_AXIS, xtick2d_callback);
 
     /* select second mapping */
     x_axis = SECOND_X_AXIS;
     y_axis = SECOND_Y_AXIS;
 
-    axis_output_tics(SECOND_Y_AXIS, &y2tic_x, SECOND_X_AXIS,
-		     /* (GRID_Y2 | GRID_MY2), */ ytick2d_callback);
-    axis_output_tics(SECOND_X_AXIS, &x2tic_y, SECOND_Y_AXIS,
-		     /* (GRID_X2 | GRID_MX2), */ xtick2d_callback);
-
+    axis_output_tics(SECOND_Y_AXIS, &y2tic_x, SECOND_X_AXIS, ytick2d_callback);
+    axis_output_tics(SECOND_X_AXIS, &x2tic_y, SECOND_Y_AXIS, xtick2d_callback);
 
     /* select first mapping */
     x_axis = FIRST_X_AXIS;
@@ -265,6 +270,9 @@ place_grid()
 	draw_clip_line(ox, oy, map_x(largest_polar_circle * cos(theta)), map_y(largest_polar_circle * sin(theta)));
     }
 
+    /* Restore the grid line types if we had turned them off to draw labels only */
+    grid_lp.l_type = save_lgrid;
+    mgrid_lp.l_type = save_mgrid;
 }
 
 static void
@@ -546,7 +554,7 @@ do_plot(struct curve_points *plots, int pcount)
 
     /* DRAW TICS AND GRID */
     if (grid_layer == LAYER_BACK || grid_layer == LAYER_BEHIND)
-	place_grid();
+	place_grid(grid_layer);
 
     /* DRAW ZERO AXES and update axis->term_zero */
     axis_draw_2d_zeroaxis(FIRST_X_AXIS,FIRST_Y_AXIS);
@@ -869,9 +877,13 @@ do_plot(struct curve_points *plots, int pcount)
 
     /* DRAW TICS AND GRID */
     if (grid_layer == LAYER_FRONT)
-	place_grid();
+	place_grid(grid_layer);
     if (polar && raxis)
 	place_raxis();
+
+    /* Redraw the axis tic labels and tic marks if "set tics front" */
+    if (grid_tics_in_front)
+	place_grid(LAYER_FOREGROUND);
 
     /* DRAW ZERO AXES */
     /* redraw after grid so that axes linetypes are on top */

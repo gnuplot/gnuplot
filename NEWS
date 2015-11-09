@@ -8,6 +8,7 @@ Changes since 5.0.1
 * CHANGE "plot for [i=1:n] foo=i, x*foo" generate n plots (comma is ignored)
 * CHANGE accept '\r' as a terminator after console prompt (Windows only)
 * CHANGE use the same arrowhead style in the key sample as in the plot itself
+* CHANGE the command "set tics {front|back}" no longer affects grid lines also
 * FIX dashtype labels in 'test' command were off by one
 * FIX autocalculation of box widths in the presence of NaN data values
 * FIX qt terminals dots were invisible
