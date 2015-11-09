@@ -32,6 +32,7 @@ Changes since 5.0.1
 * FIX "set clip points" was non-functional in version 5.0
 * FIX regression in 5.0.1 that left extraneous '@' in title columnhead(N)
 * FIX vertical placement of text fragments by cairo terminals
+* FIX "set [*]axis rangelimited" applies to minor as well as major tics
 
 Changes in 5.0.1
 ================

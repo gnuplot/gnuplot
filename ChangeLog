@@ -10,6 +10,10 @@
 	what it is documented to do.
 	Bug #1704
 
+	* src/axis.c (gen_tics):  "set {*}tics rangelimit" applies to minor
+	tics as well as to major tics.
+	Bug #1705
+
 2015-11-06  Jun Takimoto <takimoto-j@kba.biglobe.ne.jp>
 
 	* src/wxterminal/gp_cairo.c: Fix longstanding bug in vertical alignment
