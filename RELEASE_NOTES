@@ -194,6 +194,8 @@ A brief summary of potentially incompatible changes is given here.
 
 * "unset terminal" restores the original terminal of the current session.
 
+* Macro substitution is always enabled. I.e. "set/unset macros" has no effect.
+
 ONLINE DEMO PLOTS
 =================
 
