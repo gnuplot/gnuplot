@@ -1,5 +1,5 @@
 /*
- * $Id: pm3d.h,v 1.30 2012/11/04 00:18:04 sfeam Exp $
+ * $Id: pm3d.h,v 1.31 2014/04/02 21:35:46 sfeam Exp $
  */
 
 /* GNUPLOT - pm3d.h */
@@ -92,9 +92,10 @@ typedef enum {
     PM3D_WHICHCORNER_GEOMEAN = 5, /* geometrical mean of 4 corners */
     PM3D_WHICHCORNER_HARMEAN = 6, /* harmonic mean of 4 corners */
     PM3D_WHICHCORNER_MEDIAN  = 7, /* median of 4 corners */
-    PM3D_WHICHCORNER_RMS	 = 8,  /* root mean square of 4 corners*/
+    PM3D_WHICHCORNER_RMS     = 8, /* root mean square of 4 corners*/
     PM3D_WHICHCORNER_MIN     = 9, /* minimum of 4 corners */
-    PM3D_WHICHCORNER_MAX     = 10,  /* maximum of 4 corners */
+    PM3D_WHICHCORNER_MAX     = 10,/* maximum of 4 corners */
+    PM3D_COLOR_BY_NORMAL     = 11 /* derive color from surface normal (not currently used) */
 } PM3D_WHICH_CORNERS2COLOR;
 
 /*
@@ -118,6 +119,18 @@ typedef struct {
 } pm3d_struct;
 
 extern pm3d_struct pm3d;
+
+typedef struct lighting_model {
+  double strength;	/* 0 = no lighting model; 1 = full shading */
+  double spec;		/* specular component 0-1 */
+  double ambient;	/* ambient component 0-1 */
+  double Phong;		/* Phong exponent */
+  int rot_z;		/* illumination angle */
+  int rot_x;		/* illumination angle */
+  TBOOLEAN fixed;	/* TRUE means the light does not rotate */
+} lighting_model;
+
+extern lighting_model pm3d_shade;
 
 /* Used to initialize `set pm3d border` */
 extern struct lp_style_type default_pm3d_border;

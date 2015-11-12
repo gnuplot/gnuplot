@@ -1,5 +1,5 @@
 #
-# $Id: all.dem,v 1.64 2015/10/27 22:02:47 sfeam Exp $
+# $Id: all.dem,v 1.65 2015/10/28 20:40:22 sfeam Exp $
 #
 # Executes all demos (OK, MOST demos) in this directory.
 # This serves as a series of unit tests for non-interactive capabilities.
@@ -355,5 +355,8 @@ reset
 
 print "********************** file transparent_solids.dem *********************"
 load "transparent_solids.dem"
+
+print "********************** file pm3d_lighting.dem *********************"
+load "pm3d_lighting.dem"
 pause 5
 reset

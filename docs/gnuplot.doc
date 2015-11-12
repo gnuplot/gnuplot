@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.969 2015/11/10 02:50:39 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.970 2015/11/11 19:35:19 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -10839,6 +10839,7 @@ Ffigure_missing
                   { corners2color
                     { mean|geomean|harmean|rms|median|min|max|c1|c2|c3|c4 }
                   }
+                  { {no}lighting {primary <fraction>} {specular <fraction>}}
                   { hidden3d {<linestyle>} | nohidden3d }
                   { implicit | explicit }
                   { map }
@@ -10922,7 +10923,19 @@ Ffigure_missing
  rectangle next to the main plot. This documentation refers to this as a
  "colorbox", and refers to the indexing variable as lying on the colorbox axis.
  See `set colorbox`, `set cbrange`.
-
+4 lighting
+?lighting
+?pm3d lighting
+?pm3d nolighting
+ By default the colors assigned to pm3d objects are not dependent on orientation
+ or viewing angle. This state corresponds to `set pm3d nolighting`.
+ The command `set pm3d lighting` selects a simple lighting model consisting of a
+ single fixed source of illumination contributing 50% of the overall lighting.
+ The strength of this light relative to the ambient illumination can be adjusted
+ by `set pm3d lighting primary <fraction>`.  Inclusion of specular highlighting
+ can be adjusted by setting a fractional contribution:
+      set pm3d lighting primary 0.50 specular 0.0   # no highlights
+      set pm3d lighting primary 0.50 specular 0.6   # strong highlights
 4 position
 ?pm3d position
  Color surface can be drawn at the base or top (then it is a gray/color planar

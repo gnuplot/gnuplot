@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.505 2015/11/10 02:50:39 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.506 2015/11/12 21:37:21 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -173,6 +173,7 @@ static void set_palette_function __PROTO((void));
 static void parse_histogramstyle __PROTO((histogram_style *hs,
 		t_histogram_type def_type, int def_gap));
 static void set_style_parallel __PROTO((void));
+static void parse_lighting_options __PROTO((void));
 
 static const struct position default_position
 	= {first_axes, first_axes, first_axes, 0., 0., 0.};
@@ -3354,7 +3355,6 @@ set_palette_file()
 
     i = 0;
 
-#define VCONSTRAIN(x) ( (x)<0 ? 0 : ( (x)>1 ? 1: (x) ) )
     /* values are simply clipped to [0,1] without notice */
     while ((j = df_readline(v, 4)) != DF_EOF) {
 	if (i >= actual_size) {
@@ -3366,15 +3366,15 @@ set_palette_file()
 	}
 	switch (j) {
 	    case 3:
-		sm_palette.gradient[i].col.r = VCONSTRAIN(v[0]);
-		sm_palette.gradient[i].col.g = VCONSTRAIN(v[1]);
-		sm_palette.gradient[i].col.b = VCONSTRAIN(v[2]);
+		sm_palette.gradient[i].col.r = clip_to_01(v[0]);
+		sm_palette.gradient[i].col.g = clip_to_01(v[1]);
+		sm_palette.gradient[i].col.b = clip_to_01(v[2]);
 		sm_palette.gradient[i].pos = i ;
 		break;
 	    case 4:
-		sm_palette.gradient[i].col.r = VCONSTRAIN(v[1]);
-		sm_palette.gradient[i].col.g = VCONSTRAIN(v[2]);
-		sm_palette.gradient[i].col.b = VCONSTRAIN(v[3]);
+		sm_palette.gradient[i].col.r = clip_to_01(v[1]);
+		sm_palette.gradient[i].col.g = clip_to_01(v[2]);
+		sm_palette.gradient[i].col.b = clip_to_01(v[3]);
 		sm_palette.gradient[i].pos = v[0];
 		break;
 	    default:
@@ -3384,7 +3384,6 @@ set_palette_file()
 	}
 	++i;
     }
-#undef VCONSTRAIN
     df_close();
     if (i==0)
 	int_error( c_token, "No valid palette found" );
@@ -3889,6 +3888,7 @@ set_pm3d()
 	    case S_PM3D_EXPLICIT: /* "e$xplicit" */
 		pm3d.implicit = PM3D_EXPLICIT;
 		continue;
+
 	    case S_PM3D_WHICH_CORNER: /* "corners2color" */
 		c_token++;
 		if (equals(c_token, "mean"))
@@ -3916,6 +3916,15 @@ set_pm3d()
 		else
 		    int_error(c_token,"expecting 'mean', 'geomean', 'harmean', 'median', 'min', 'max', 'c1', 'c2', 'c3' or 'c4'");
 		continue;
+
+	    case S_PM3D_NOLIGHTING_MODEL:
+		pm3d_shade.strength = 0.0;
+		continue;
+
+	    case S_PM3D_LIGHTING_MODEL:
+		parse_lighting_options();
+		continue;
+
 	    } /* switch over pm3d lookup table */
 	    int_error(c_token,"invalid pm3d option");
 	} /* end of while !end of command over pm3d options */
@@ -6251,6 +6260,46 @@ parse_histogramstyle( histogram_style *hs,
 	    /* We hit something unexpected */
 	    break;
     }
+}
+
+/*
+ * set pm3d lighting {primary <fraction>} {specular <fraction>}
+ */
+static void
+parse_lighting_options()
+{
+    c_token++;
+
+    /* TODO: Add separate "set" commands for these */
+    pm3d_shade.ambient = 1.0;
+    pm3d_shade.Phong = 5.0;	/* Phong exponent */
+    pm3d_shade.rot_x = 45;	/* illumination angle */
+    pm3d_shade.rot_z = -45;	/* illumination angle */
+    pm3d_shade.fixed = TRUE;	/* TRUE means the light does not rotate */
+
+    /* This is what you get from simply "set pm3d lighting" */
+    pm3d_shade.strength = 0.5;	/* contribution of primary light source */
+    pm3d_shade.spec = 0.2;	/* contribution of specular highlights */
+
+    while (!END_OF_COMMAND) {
+	if (almost_equals(c_token,"primary")) {
+	    c_token++;
+	    pm3d_shade.strength = real_expression();
+	    pm3d_shade.strength = clip_to_01(pm3d_shade.strength);
+	    continue;
+	}
+	
+	if (almost_equals(c_token,"spec$ular")) {
+	    c_token++;
+	    pm3d_shade.spec = real_expression();
+	    pm3d_shade.spec = clip_to_01(pm3d_shade.spec);
+	    continue;
+	}
+
+	break;
+    }
+
+    c_token--;
 }
 
 /* process 'set style parallelaxis' command */

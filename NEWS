@@ -1,5 +1,6 @@
 Changes not in 5.0
 ==================
+* NEW `set pm3d lighting` pm3d lighting model with specular highlighting
 * NEW `set jitter` allows creation of bee swarm plots
 * NEW commands `break` and `continue`
 * NEW data filter "bins" sorts input into equal width bins on x

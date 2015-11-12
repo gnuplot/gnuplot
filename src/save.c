@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.288 2015/10/02 22:28:42 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.289 2015/11/10 02:50:39 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -853,6 +853,7 @@ set origin %g,%g\n",
 
     fprintf(fp, "set locale \"%s\"\n", get_time_locale());
 
+    /* pm3d options */
     fputs("set pm3d ", fp);
     fputs((PM3D_IMPLICIT == pm3d.implicit ? "implicit" : "explicit"), fp);
     fprintf(fp, " at %s\n", pm3d.where);
@@ -892,6 +893,11 @@ set origin %g,%g\n",
 	     fprintf(fp, "c%i", pm3d.which_corner_color - PM3D_WHICHCORNER_C1 + 1);
     }
     fputs("\n", fp);
+
+    if (pm3d_shade.strength <= 0)
+	fputs("set pm3d nolighting\n",fp);
+    else
+	fprintf(fp, "set pm3d lighting primary %g specular %g\n", pm3d_shade.strength, pm3d_shade.spec);
 
     /*
      *  Save palette information

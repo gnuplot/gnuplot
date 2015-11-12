@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.353 2015/11/10 02:50:39 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.354 2015/11/12 00:27:34 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -2484,7 +2484,10 @@ show_pm3d()
 	save_linetype(stderr, &(pm3d.border), FALSE);
 	fprintf(stderr,"\n");
     }
-
+    if (pm3d_shade.strength > 0) {
+	fprintf(stderr,"\tlighting primary component %g specular component %g\n",
+		pm3d_shade.strength, pm3d_shade.spec);
+    }
     fprintf(stderr,"\tsteps for bilinear interpolation: %d,%d\n",
 	 pm3d.interp_i, pm3d.interp_j);
     fprintf(stderr,"\tquadrangle color according to ");

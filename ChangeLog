@@ -1,3 +1,31 @@
+2015-11-12  Douglas Mason  <douglasmason1@users.sf.net>
+	    Lukas Jirkovsky  <stativ@users.sf.net>
+	    Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/pm3d.c (apply_lighting_model) src/pm3d.h src/save.c src/set.c
+	src/show.c src/stdfn.h src/tables.c src/tables.h docs/gnuplot.doc:
+
+	Add a simple lighting model to pm3d rendering. 
+	Syntax:
+	    set pm3d nolighting    # default state
+	    set pm3d lighting {primary <fraction>} {specular <fraction>}
+
+	The command `set pm3d lighting` selects a simple lighting model in which
+	a single fixed light contributes 50% of the overall illumination.
+	The strength of this light relative to the ambient illumination can be
+	adjusted by `set pm3d lighting primary <fraction>`.  Specular highlights
+	are calculated using a Phong model with fixed exponent.  The fractional
+	contribution of specular highlighting can be adjusted.  Model parameters
+	controlling the illumination angle and Phong exponent are not exported
+	to the user in this version, but easily could be if requested.
+
+	Original patch by Douglas Mason. See Feature Request #323 (Mar 2012).
+	Revised for gnuplot version 4.6 by Lukas Jirkovsky.  Revised by EAM for
+	version 5.1 and modified to coexist with pm3d settings for depthorder,
+	interpolation, and projection to the bottom or top of the view box.
+
+	* demo/pm3d_lighting.dem:  New demo
+
 2015-11-09  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/axis.c src/axis.h src/graphics.c src/save.c src/set.c src/show.c
