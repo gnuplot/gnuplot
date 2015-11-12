@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.326.2.10 2015/03/29 18:08:05 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.326.2.11 2015/11/10 03:51:21 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -2836,8 +2836,7 @@ show_tics(
     else
 	fprintf(stderr, "\txyplane ticslevel is %g\n", xyplane.z);
 
-    if (grid_layer >= 0)
-        fprintf(stderr, "tics are in %s of plot\n", (grid_tics_in_front) ? "front" : "back");
+    fprintf(stderr, "\ttics are in %s of plot\n", (grid_tics_in_front) ? "front" : "back");
 
     if (showx)
 	show_ticdef(FIRST_X_AXIS);
