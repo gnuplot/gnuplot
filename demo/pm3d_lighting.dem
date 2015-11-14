@@ -23,10 +23,11 @@ set pm3d implicit at s hidden3d depth noborder
 slice(x,y) = (x**2+y**2 < 10.0) ? 1.0 : (x**2+y**2 > 300.0) ? NaN : sin(abs(atan2(x,y)))
 sinc2(x,y) = sin(sqrt(x**2+y**2))/sqrt(x**2+y**2)
 flatten(x,y) = sqrt(x**2+y**2)/5.
+F(x,y) =  sinc2(x,y) * slice(x,y) * flatten(x,y)
 
 set title "pm3d lighting model with specular highlighting"
-set pm3d lighting primary 0.6 specular 0.3
-splot sinc2(x,y) * slice(x,y) * flatten(x,y)  nosurface
+set pm3d lighting primary 0.5 specular 0.2
+splot '++' using 1:2:(F($1,$2)):(0xAAEEEE) nosurface lc rgb variable
 
 pause -1 "Hit <return> to continue"
 reset
