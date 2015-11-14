@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.970 2015/11/11 19:35:19 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.971 2015/11/13 04:03:56 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -10927,6 +10927,7 @@ Ffigure_missing
 ?lighting
 ?pm3d lighting
 ?pm3d nolighting
+?set pm3d lighting
  By default the colors assigned to pm3d objects are not dependent on orientation
  or viewing angle. This state corresponds to `set pm3d nolighting`.
  The command `set pm3d lighting` selects a simple lighting model consisting of a
@@ -10938,6 +10939,7 @@ Ffigure_missing
       set pm3d lighting primary 0.50 specular 0.6   # strong highlights
 4 position
 ?pm3d position
+?set pm3d position
  Color surface can be drawn at the base or top (then it is a gray/color planar
  map) or at z-coordinates of surface points (gray/color surface).  This is
  defined by the `at` option with a string of up to 6 combinations of `b`, `t`
@@ -10958,6 +10960,10 @@ Ffigure_missing
 ?pm3d depthorder
 ?pm3d flush
 ?pm3d ftriangles
+?set pm3d scanorder
+?set pm3d depthorder
+?set pm3d flush
+?set pm3d ftriangles
 ?depthorder
 =flush
 =scansforward
@@ -10992,6 +10998,7 @@ Ffigure_missing
 
 4 clipping
 ?pm3d clipping
+?set pm3d clipping
  Clipping with respect to x, y coordinates of quadrangles can be done in two
  ways.  `clip1in`: all 4 points of each quadrangle must be defined and at least
  1 point of the quadrangle must lie in the x and y ranges.  `clip4in`: all 4
@@ -11032,6 +11039,7 @@ Ffigure_missing
  `set colorbox`.
 4 corners2color
 ?pm3d corners2color
+?set pm3d corners2color
 ?corners2color
 =mean
 =geomean
