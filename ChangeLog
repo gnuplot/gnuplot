@@ -1,3 +1,9 @@
+2015-11-29 Allin Cottrell  <cottrell@wfu.edu>
+
+	* term/metapost.trm: Set terminal flag TERM_IS_LATEX unless the
+	"notex" option is active.  This causes axis tic labels to use the
+	same default format "$%h$" as other TeX terminal types.
+
 2015-11-12  Douglas Mason  <douglasmason1@users.sf.net>
 	    Lukas Jirkovsky  <stativ@users.sf.net>
 	    Ethan A Merritt  <merritt@u.washington.edu>

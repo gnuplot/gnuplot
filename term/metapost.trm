@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: metapost.trm,v 1.45 2011/09/27 23:49:32 sfeam Exp $
+ * $Id: metapost.trm,v 1.46 2012/11/25 22:01:22 sfeam Exp $
  */
 
 /* GNUPLOT - metapost.trm */
@@ -227,6 +227,7 @@ MP_options()
 	MP_textmag = 1.0;
 	MP_prologues = -1;
 	strcpy(MP_fontname, "cmr10");
+	term->flags |= TERM_IS_LATEX;
     }
 
     while (!END_OF_COMMAND) {
@@ -251,6 +252,7 @@ MP_options()
 	case MP_OPT_NOTEX:
 	    MP_tex = MP_NO_TEX;
 	    strcpy(MP_fontname, "pcrr8r");
+	    term->flags &= ~TERM_IS_LATEX;
 	    c_token++;
 	    break;
 	case MP_OPT_TEX:
@@ -715,7 +717,6 @@ MP_put_text(unsigned int x, unsigned int y, const char str[])
     if (!str || !*str)
 	return;
 
-    /* F***. why do drivers need to modify string args? */
     text = gp_strdup(str);
 
     if (MP_inline)
@@ -975,7 +976,7 @@ TERM_TABLE_START(mp_driver)
     MP_text, null_scale, MP_graphics, MP_move, MP_vector,
     MP_linetype, MP_put_text, MP_text_angle,
     MP_justify_text, MP_point, MP_arrow, MP_set_font, MP_pointsize,
-    TERM_BINARY|TERM_CAN_CLIP|TERM_CAN_DASH,	/*flags*/ 
+    TERM_BINARY|TERM_CAN_CLIP|TERM_CAN_DASH|TERM_IS_LATEX,	/*flags*/ 
     0, 0, MP_boxfill, MP_linewidth
 #ifdef USE_MOUSE
     , 0, 0, 0, 0, 0		/* no mouse support for metapost */
