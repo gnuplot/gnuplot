@@ -3,6 +3,12 @@
 	* src/qtterminal/qt_conversion.cpp (qt_imageToQImage): Do not call
 	C++ isnan() without a namespace specifier.
 
+	EAM:  Reverting this change.  We may need a fix, but this isn't it.
+	qtterminal/qt_conversion.cpp:
+	In function ‘QImage qt_imageToQImage(int, int, coordval*, t_imagecolor)’:
+	qtterminal/qt_conversion.cpp:129:14:
+	error: expected unqualified-id before ‘(’ token if (std::isnan(*image))
+
 2015-11-29 Allin Cottrell  <cottrell@wfu.edu>
 
 	* term/metapost.trm: Set terminal flag TERM_IS_LATEX unless the
