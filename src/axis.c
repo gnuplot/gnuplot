@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.171 2015/11/10 02:50:39 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.172 2015/11/10 18:25:15 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -556,9 +556,10 @@ copy_or_invent_formatstring(struct axis *this_axis)
 	    double axmin = axis_de_log_value(this_axis,this_axis->min);
 	    double axmax = axis_de_log_value(this_axis,this_axis->max);
 	    int precision = ceil(-log10(GPMIN(fabs(axmax-axmin),fabs(axmin))));
-
-	    if ((axmin*axmax > 0) && precision > 4)
-		sprintf(tempfmt,"%%.%df", (precision>14) ? 14 : precision);
+	    /* FIXME: Does horrible things for large value of precision */
+	    /* FIXME: Didn't I have a better patch for this? */
+	    if ((axmin*axmax > 0) && 4 < precision && precision < 10)
+		sprintf(tempfmt, "%%.%df", precision);
 	}
 
 	free(this_axis->ticfmt);
@@ -1972,7 +1973,7 @@ get_position_default(struct position *pos, enum position_type default_type)
  * Add a single tic mark, with label, to the list for this axis.
  * To avoid duplications and overprints, sort the list and allow
  * only one label per position.
- * EAM - called from set.c during `set xtics` (level = 0 or 1)
+ * EAM - called from set.c during `set xtics` (level >= 0)
  *       called from datafile.c during `plot using ::xtic()` (level = -1)
  */
 void
