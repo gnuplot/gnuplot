@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: internal.c,v 1.83 2015/05/08 18:17:08 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: internal.c,v 1.84 2015/11/06 19:33:45 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - internal.c */
@@ -1529,14 +1529,6 @@ f_gprintf(union argument *arg)
     (void) arg;
     pop(&val);
     pop(&fmt);
-
-#ifdef DEBUG
-    fprintf(stderr,"----------\nGot gprintf parameters\nfmt: ");
-	disp_value(stderr, &fmt, TRUE);
-    fprintf(stderr,"\nval: ");
-	disp_value(stderr, &val, TRUE);
-    fprintf(stderr,"\n----------\n");
-#endif
 
     /* Make sure parameters are of the correct type */
     if (fmt.type != STRING)
