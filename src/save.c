@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.289 2015/11/10 02:50:39 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.290 2015/11/13 04:03:57 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -141,6 +141,7 @@ save_variables__sub(FILE *fp)
 	    if (strncmp(udv->udv_name,"GPVAL_",6)
 	     && strncmp(udv->udv_name,"MOUSE_",6)
 	     && strncmp(udv->udv_name,"$",1)
+	     && (strncmp(udv->udv_name,"ARG",3) || (strlen(udv->udv_name) != 4))
 	     && strncmp(udv->udv_name,"NaN",4)) {
 		fprintf(fp, "%s = ", udv->udv_name);
 		disp_value(fp, &(udv->udv_value), TRUE);
