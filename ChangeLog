@@ -1,3 +1,8 @@
+2015-12-18  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/save.c (save_variables__sub):  Do not write ARGn variables to
+	save file.
+
 2015-12-01  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/plot2d.c:  Allow "noautoscale" keyword for 2D function plots.
