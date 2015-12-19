@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.172 2015/11/10 18:25:15 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.173 2015/12/17 06:09:42 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -1920,14 +1920,16 @@ get_position_type(enum position_type *type, AXIS_INDEX *axes)
 void
 get_position(struct position *pos)
 {
-    get_position_default(pos, first_axes);
+    get_position_default(pos, first_axes, 3);
 }
 
 /* get_position() - reads a position for label,arrow,key,...
  * with given default coordinate system
+ * ndim = 2 only reads x,y
+ * otherwise it reads x,y,z
  */
 void
-get_position_default(struct position *pos, enum position_type default_type)
+get_position_default(struct position *pos, enum position_type default_type, int ndim)
 {
     AXIS_INDEX axes;
     enum position_type type = default_type;
@@ -1948,12 +1950,8 @@ get_position_default(struct position *pos, enum position_type default_type)
 	pos->scaley = type;
     }
 
-    /* z is not really allowed for a screen co-ordinate, but keep it simple ! */
-    if (equals(c_token, ",")
-       /* Partial fix for ambiguous syntax when trailing comma ends a plot command */
-	&& !(isstringvalue(c_token+1)) && !(almost_equals(c_token+1,"newhist$ogram"))
-	&& !(almost_equals(c_token+1,"for"))
-       ) {
+    /* Resolves ambiguous syntax when trailing comma ends a plot command */
+    if (ndim != 2 && equals(c_token, ",")) {
 	++c_token;
 	get_position_type(&type, &axes);
 	/* HBB 2015-01-28: no secondary Z axis, so patch up if it was selected */

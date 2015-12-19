@@ -1,5 +1,5 @@
 /*
- * $Id: axis.h,v 1.132 2015/10/24 23:55:46 sfeam Exp $
+ * $Id: axis.h,v 1.133 2015/11/10 02:50:39 sfeam Exp $
  *
  */
 
@@ -664,7 +664,7 @@ void widest_tic_callback __PROTO((struct axis *, double place, char *text, int t
 			struct lp_style_type grid, struct ticmark *));
 
 void get_position __PROTO((struct position *pos));
-void get_position_default __PROTO((struct position *pos, enum position_type default_type));
+void get_position_default __PROTO((struct position *pos, enum position_type default_type, int ndim));
 
 void gstrdms __PROTO((char *label, char *format, double value));
 

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.371 2015/11/02 20:38:10 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.372 2015/11/03 19:57:15 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -2034,7 +2034,7 @@ eval_plots()
 		    histogram_title.pos = histogram_opts.title.pos;
 		    histogram_title.text = try_to_get_string();
 		    histogram_title.font = gp_strdup(histogram_opts.title.font);
-		    parse_label_options(&histogram_title, TRUE);
+		    parse_label_options(&histogram_title, 2);
 		}
 
 		/* Allow explicit starting color or pattern for this histogram */
@@ -2517,7 +2517,7 @@ eval_plots()
 			this_plot->labels->pos = CENTRE;
 			this_plot->labels->layer = LAYER_PLOTLABELS;
 		    }
-		    parse_label_options(this_plot->labels, TRUE);
+		    parse_label_options(this_plot->labels, 2);
 		    if (stored_token != c_token) {
 			if (set_labelstyle) {
 			    duplication = TRUE;

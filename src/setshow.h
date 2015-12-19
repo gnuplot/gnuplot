@@ -1,5 +1,5 @@
 /*
- * $Id: setshow.h,v 1.53 2015/03/29 17:26:00 sfeam Exp $
+ * $Id: setshow.h,v 1.54 2015/08/03 04:16:38 sfeam Exp $
  */
 
 /* GNUPLOT - setshow.h */
@@ -66,7 +66,7 @@ void rrange_to_xy __PROTO((void));
 void unset_monochrome __PROTO((void));
 
 /* Called from set_label(), plot2d.c and plot3d.c */
-extern void parse_label_options __PROTO((struct text_label *this_label, TBOOLEAN));
+extern void parse_label_options __PROTO((struct text_label *, int ndim));
 extern struct text_label * new_text_label __PROTO((int tag));
 extern void disp_value __PROTO((FILE *, struct value *, TBOOLEAN));
 extern struct ticmark * prune_dataticks __PROTO((struct ticmark *list));

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.506 2015/11/12 21:37:21 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.507 2015/11/13 04:03:57 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -2548,7 +2548,7 @@ set_label()
 
     if (!END_OF_COMMAND) {
 	char* text;
-	parse_label_options( this_label, FALSE );
+	parse_label_options(this_label, 0);
 	text = try_to_get_string();
 	if (text) {
 	    free(this_label->text);
@@ -2558,7 +2558,7 @@ set_label()
     }
 
     /* Now parse the label format and style options */
-    parse_label_options( this_label, FALSE );
+    parse_label_options(this_label, 0);
 }
 
 
@@ -3747,7 +3747,8 @@ set_colorbox()
 		if (END_OF_COMMAND) {
 		    int_error(c_token, "expecting screen value [0 - 1]");
 		} else {
-		    get_position_default(&color_box.origin, screen);
+		    /* FIXME: should be 2 but old save files may have 3 */
+		    get_position_default(&color_box.origin, screen, 3);
 		}
 		c_token--;
 		continue;
@@ -3757,7 +3758,8 @@ set_colorbox()
 		if (END_OF_COMMAND) {
 		    int_error(c_token, "expecting screen value [0 - 1]");
 		} else {
-		    get_position_default(&color_box.size, screen);
+		    /* FIXME: should be 2 but old save files may have 3 */
+		    get_position_default(&color_box.size, screen, 3);
 		}
 		c_token--;
 		continue;
@@ -4162,7 +4164,7 @@ set_obj(int tag, int obj_type)
 			get_position(&this_rect->tr);
 		    } else if (equals(c_token,"rto")) {
 			c_token++;
-			get_position_default(&this_rect->tr,this_rect->bl.scalex);
+			get_position_default(&this_rect->tr, this_rect->bl.scalex, 2);
 			if (this_rect->bl.scalex != this_rect->tr.scalex
 			||  this_rect->bl.scaley != this_rect->tr.scaley)
 			    int_error(c_token,"relative coordinates must match in type");
@@ -4295,7 +4297,7 @@ set_obj(int tag, int obj_type)
 			} else /* "rto" */ {
 			    int v = this_polygon->type;
 			    get_position_default(&this_polygon->vertex[v],
-						  this_polygon->vertex->scalex);
+						  this_polygon->vertex->scalex, 2);
 			    if (this_polygon->vertex[v].scalex != this_polygon->vertex[v-1].scalex
 			    ||  this_polygon->vertex[v].scaley != this_polygon->vertex[v-1].scaley)
 				int_error(c_token,"relative coordinates must match in type");
@@ -4921,7 +4923,7 @@ set_tics()
 	} else if (almost_equals(c_token, "off$set")) {
 	    struct position lpos;
 	    ++c_token;
-	    get_position_default(&lpos, character);
+	    get_position_default(&lpos, character, 3);
 	    for (i = 0; i < AXIS_ARRAY_SIZE; ++i)
 		axis_array[i].ticdef.offset = lpos;
 	} else if (almost_equals(c_token, "nooff$set")) {
@@ -5110,7 +5112,7 @@ set_timestamp()
 
 	if (almost_equals(c_token,"off$set")) {
 	    c_token++;
-	    get_position_default(&(timelabel.offset),character);
+	    get_position_default(&(timelabel.offset), character, 3);
 	    continue;
 	}
 
@@ -5440,7 +5442,7 @@ set_tic_prop(struct axis *this_axis)
 	    } else if (almost_equals(c_token, "off$set")) {
 		++c_token;
 		get_position_default(&this_axis->ticdef.offset,
-				     character);
+				     character, 3);
 	    } else if (almost_equals(c_token, "nooff$set")) {
 		++c_token;
 		this_axis->ticdef.offset = default_offset;
@@ -5621,7 +5623,7 @@ set_xyzlabel(text_label *label)
 	return;
     }
 
-    parse_label_options(label, FALSE);
+    parse_label_options(label, 0);
 
     if (!END_OF_COMMAND) {
 	text = try_to_get_string();
@@ -5631,7 +5633,7 @@ set_xyzlabel(text_label *label)
 	}
     }
 
-    parse_label_options(label, FALSE);
+    parse_label_options(label, 0);
 
 }
 
@@ -5992,9 +5994,12 @@ new_text_label(int tag)
  * Parse the sub-options for label style and placement.
  * This is called from set_label, and from plot2d and plot3d
  * to handle options for 'plot with labels'
+ * Note: ndim = 2 means we are inside a plot command,
+ *       ndim = 3 means we are inside an splot command
+ *       ndim = 0 in a set command
  */
 void
-parse_label_options( struct text_label *this_label, TBOOLEAN in_plot )
+parse_label_options( struct text_label *this_label, int ndim)
 {
     struct position pos;
     char *font = NULL;
@@ -6014,7 +6019,7 @@ parse_label_options( struct text_label *this_label, TBOOLEAN in_plot )
    /* Now parse the label format and style options */
     while (!END_OF_COMMAND) {
 	/* get position */
-	if (!in_plot && !set_position && equals(c_token, "at") && !axis_label) {
+	if ((ndim == 0) && !set_position && equals(c_token, "at") && !axis_label) {
 	    c_token++;
 	    get_position(&pos);
 	    set_position = TRUE;
@@ -6093,7 +6098,7 @@ parse_label_options( struct text_label *this_label, TBOOLEAN in_plot )
 	}
 
 	/* get front/back (added by JDP) */
-	if (!in_plot && !set_layer && !axis_label) {
+	if ((ndim == 0) && !set_layer && !axis_label) {
 	    if (equals(c_token, "back")) {
 		layer = LAYER_BACK;
 		c_token++;
@@ -6139,7 +6144,7 @@ parse_label_options( struct text_label *this_label, TBOOLEAN in_plot )
 
 	if (! set_offset && almost_equals(c_token, "of$fset")) {
 	    c_token++;
-	    get_position_default(&offset,character);
+	    get_position_default(&offset, character, ndim);
 	    set_offset = TRUE;
 	    continue;
 	}

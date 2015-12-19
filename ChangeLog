@@ -1,3 +1,18 @@
+2015-12-19  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/axis.h src/axis.c (get_position_default) 
+	src/setshow.h src/show.c (show_position) src/set.c (parse_label_options)
+	src/save.h src/save.c (save_position)
+	src/jitter.c src/plot2d.c src/plot3d.c:
+
+	Distinguish internally between 1D positions (single coordinate),
+	2D positions (only x,y) and 3D positions (x,y,z).
+	This removes the ambiguity from commands like
+	    plot foo with labels point offset 1,1,  func(x)
+	Is func(x) a z offset (probably not) or is it a 2nd plot?
+	Previously the get_position() code ate it as a z offset, but now the
+	parsing is unambigously a 2D offset followed by a separate plot element.
+
 2015-12-18  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/save.c (save_variables__sub):  Do not write ARGn variables to

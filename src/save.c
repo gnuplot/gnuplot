@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.290 2015/11/13 04:03:57 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.291 2015/12/18 19:47:21 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -268,12 +268,12 @@ save_set_all(FILE *fp)
 
     /* Default circle properties */
     fprintf(fp, "set style circle radius ");
-    save_position(fp, &default_circle.o.circle.extent, FALSE);
+    save_position(fp, &default_circle.o.circle.extent, 1, FALSE);
     fputs(" \n", fp);
 
     /* Default ellipse properties */
     fprintf(fp, "set style ellipse size ");
-    save_position(fp, &default_ellipse.o.ellipse.extent, FALSE);
+    save_position(fp, &default_ellipse.o.ellipse.extent, 2, FALSE);
     fprintf(fp, " angle %g ", default_ellipse.o.ellipse.orientation);
     fputs("units ", fp);
     switch (default_ellipse.o.ellipse.type) {
@@ -408,7 +408,7 @@ save_set_all(FILE *fp)
 	    break;
 	case GPKEY_USER_PLACEMENT:
 	    fputs("at ", fp);
-	    save_position(fp, &key->user_pos, FALSE);
+	    save_position(fp, &key->user_pos, 2, FALSE);
 	    break;
     }
     if (!(key->region == GPKEY_AUTO_EXTERIOR_MARGIN
@@ -466,7 +466,7 @@ save_set_all(FILE *fp)
 	fprintf(fp, "set label %d \"%s\" at ",
 		this_label->tag,
 		conv_text(this_label->text));
-	save_position(fp, &this_label->place, FALSE);
+	save_position(fp, &this_label->place, 3, FALSE);
 	if (this_label->hypertext)
 	    fprintf(fp, " hypertext");
 
@@ -487,7 +487,7 @@ save_set_all(FILE *fp)
 	    fprintf(fp, " point");
 	    save_linetype(fp, &(this_label->lp_properties), TRUE);
 	}
-	save_position(fp, &this_label->offset, TRUE);
+	save_position(fp, &this_label->offset, 3, TRUE);
 #ifdef EAM_BOXED_TEXT
 	if (this_label->boxed)
 	    fprintf(fp," boxed ");
@@ -498,13 +498,13 @@ save_set_all(FILE *fp)
     for (this_arrow = first_arrow; this_arrow != NULL;
 	 this_arrow = this_arrow->next) {
 	fprintf(fp, "set arrow %d from ", this_arrow->tag);
-	save_position(fp, &this_arrow->start, FALSE);
+	save_position(fp, &this_arrow->start, 3, FALSE);
 	if (this_arrow->type == arrow_end_absolute) {
 	    fputs(" to ", fp);
-	    save_position(fp, &this_arrow->end, FALSE);
+	    save_position(fp, &this_arrow->end, 3, FALSE);
 	} else if (this_arrow->type == arrow_end_absolute) {
 	    fputs(" rto ", fp);
-	    save_position(fp, &this_arrow->end, FALSE);
+	    save_position(fp, &this_arrow->end, 3, FALSE);
 	} else { /* type arrow_end_oriented */
 	    struct position *e = &this_arrow->end;
 	    fputs(" length ", fp);
@@ -790,7 +790,7 @@ set origin %g,%g\n",
 	fprintf(fp, "set %s%s \"%s\" ",					 \
 		name, suffix, lab.text ? conv_text(lab.text) : "");	 \
 	fprintf(fp, "\nset %s%s ", name, suffix);			 \
-	save_position(fp, &(lab.offset), TRUE);				 \
+	save_position(fp, &(lab.offset), 3, TRUE);				 \
 	fprintf(fp, " font \"%s\"", lab.font ? conv_text(lab.font) : "");\
 	save_textcolor(fp, &(lab.textcolor));				 \
 	if (lab.tag == ROTATE_IN_3D_LABEL_TAG)				 \
@@ -966,9 +966,9 @@ set origin %g,%g\n",
     if (color_box.where != SMCOLOR_BOX_NO)
 	fprintf(fp,"set colorbox %s\n", color_box.where==SMCOLOR_BOX_DEFAULT ? "default" : "user");
     fprintf(fp, "set colorbox %sal origin ", color_box.rotation ==  'v' ? "vertic" : "horizont");
-    save_position(fp, &color_box.origin, FALSE);
+    save_position(fp, &color_box.origin, 2, FALSE);
     fputs(" size ", fp);
-    save_position(fp, &color_box.size, FALSE);
+    save_position(fp, &color_box.size, 2, FALSE);
     fprintf(fp, " %s ", color_box.layer ==  LAYER_FRONT ? "front" : "back");
     if (color_box.border == 0) fputs("noborder", fp);
 	else if (color_box.border_lt_tag < 0) fputs("bdefault", fp);
@@ -1091,7 +1091,7 @@ save_ptics(FILE *fp, struct axis *this_axis)
 	    this_axis->tic_rotate ? "rotate" : "norotate");
     if (this_axis->tic_rotate)
 	fprintf(fp,"by %d ",this_axis->tic_rotate);
-    save_position(fp, &this_axis->ticdef.offset, TRUE);
+    save_position(fp, &this_axis->ticdef.offset, 3, TRUE);
     if (this_axis->manual_justify)
 	save_justification(this_axis->label.pos, fp);
     else
@@ -1196,7 +1196,7 @@ save_style_parallel(FILE *fp)
 }
 
 void
-save_position(FILE *fp, struct position *pos, TBOOLEAN offset)
+save_position(FILE *fp, struct position *pos, int ndim, TBOOLEAN offset)
 {
     assert(first_axes == 0 && second_axes == 1 && graph == 2 && screen == 3 &&
 	   character == 4);
@@ -1210,19 +1210,27 @@ save_position(FILE *fp, struct position *pos, TBOOLEAN offset)
     /* Save in time coordinates if appropriate */
     if (pos->scalex == first_axes) {
 	save_num_or_time_input(fp, pos->x, &axis_array[FIRST_X_AXIS]);
-	fprintf(fp, ", ");
     } else {
-	fprintf(fp, "%s%g, ", coord_msg[pos->scalex], pos->x);
+	fprintf(fp, "%s%g", coord_msg[pos->scalex], pos->x);
     }
+
+    if (ndim == 1)
+	return;
+    else
+	fprintf(fp, ", ");
 
     if (pos->scaley == first_axes) {
 	if (pos->scaley != pos->scalex) fprintf(fp, "first ");
 	save_num_or_time_input(fp, pos->y, &axis_array[FIRST_Y_AXIS]);
-	fprintf(fp, ", ");
     } else {
-	fprintf(fp, "%s%g, ", 
+	fprintf(fp, "%s%g", 
 	    pos->scaley == pos->scalex ? "" : coord_msg[pos->scaley], pos->y);
     }
+
+    if (ndim == 2)
+	return;
+    else
+	fprintf(fp, ", ");
 
     if (pos->scalez == first_axes) {
 	if (pos->scalez != pos->scaley) fprintf(fp, "first ");
@@ -1622,7 +1630,7 @@ save_histogram_opts (FILE *fp)
     save_textcolor(fp, &histogram_opts.title.textcolor);
     if (histogram_opts.title.font)
 	fprintf(fp, " font \"%s\" ", histogram_opts.title.font);
-    save_position(fp, &histogram_opts.title.offset, TRUE);
+    save_position(fp, &histogram_opts.title.offset, 2, TRUE);
     fprintf(fp, "\n");
 }
 
@@ -1647,14 +1655,14 @@ save_object(FILE *fp, int tag)
 
 	    if (this_rect->type == 1) {
 		fprintf(fp, "center ");
-		save_position(fp, &this_rect->center, FALSE);
+		save_position(fp, &this_rect->center, 2, FALSE);
 		fprintf(fp, " size ");
-		save_position(fp, &this_rect->extent, FALSE);
+		save_position(fp, &this_rect->extent, 2, FALSE);
 	    } else {
 		fprintf(fp, "from ");
-		save_position(fp, &this_rect->bl, FALSE);
+		save_position(fp, &this_rect->bl, 2, FALSE);
 		fprintf(fp, " to ");
-		save_position(fp, &this_rect->tr, FALSE);
+		save_position(fp, &this_rect->tr, 2, FALSE);
 	    }
 	}
 
@@ -1666,7 +1674,7 @@ save_object(FILE *fp, int tag)
 	    fprintf(fp, "%sobject %2d circle ", (fp==stderr) ? "\t" : "set ",this_object->tag);
 
 	    fprintf(fp, "center ");
-	    save_position(fp, &this_circle->center, FALSE);
+	    save_position(fp, &this_circle->center, 3, FALSE);
 	    fprintf(fp, " size ");
 	    fprintf(fp, "%s%g", e->scalex == first_axes ? "" : coord_msg[e->scalex], e->x);
 	    fprintf(fp, " arc [%g:%g] ", this_circle->arc_begin, this_circle->arc_end);
@@ -1680,7 +1688,7 @@ save_object(FILE *fp, int tag)
 	    showed = TRUE;
 	    fprintf(fp, "%sobject %2d ellipse ", (fp==stderr) ? "\t" : "set ",this_object->tag);
 	    fprintf(fp, "center ");
-	    save_position(fp, &this_ellipse->center, FALSE);
+	    save_position(fp, &this_ellipse->center, 3, FALSE);
 	    fprintf(fp, " size ");
 	    fprintf(fp, "%s%g", e->scalex == first_axes ? "" : coord_msg[e->scalex], e->x);
 	    fprintf(fp, ", %s%g", e->scaley == e->scalex ? "" : coord_msg[e->scaley], e->y);
@@ -1707,11 +1715,11 @@ save_object(FILE *fp, int tag)
 	    fprintf(fp, "%sobject %2d polygon ", (fp==stderr) ? "\t" : "set ",this_object->tag);
 	    if (this_polygon->vertex) {
 		fprintf(fp, "from ");
-		save_position(fp, &this_polygon->vertex[0], FALSE);
+		save_position(fp, &this_polygon->vertex[0], 3, FALSE);
 	    }
 	    for (nv=1; nv < this_polygon->type; nv++) {
 		fprintf(fp, (fp==stderr) ? "\n\t\t\t    to " : " to ");
-		save_position(fp, &this_polygon->vertex[nv], FALSE);
+		save_position(fp, &this_polygon->vertex[nv], 3, FALSE);
 	    }
 	}
 

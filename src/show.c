@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.354 2015/11/12 00:27:34 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.355 2015/11/13 04:03:57 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -172,7 +172,7 @@ static void show_arrow __PROTO((int tag));
 
 static void show_ticdef __PROTO((AXIS_INDEX));
 static void show_ticdefp __PROTO((struct axis *));
-       void show_position __PROTO((struct position * pos));
+       void show_position __PROTO((struct position * pos, int ndim));
 static void show_functions __PROTO((void));
 
 static int var_show_all = 0;
@@ -1567,7 +1567,7 @@ show_style_circle()
 {
     SHOW_ALL_NL;
     fprintf(stderr, "\tCircle style has default radius ");
-    show_position(&default_circle.o.circle.extent);
+    show_position(&default_circle.o.circle.extent, 1);
     fprintf(stderr, " [%s]", default_circle.o.circle.wedge ? "wedge" : "nowedge");
     fputs("\n", stderr);
 }
@@ -1577,7 +1577,7 @@ show_style_ellipse()
 {
     SHOW_ALL_NL;
     fprintf(stderr, "\tEllipse style has default size ");
-    show_position(&default_ellipse.o.ellipse.extent);
+    show_position(&default_ellipse.o.ellipse.extent, 2);
     fprintf(stderr, ", default angle is %.1f degrees", default_ellipse.o.ellipse.orientation);
 
     switch (default_ellipse.o.ellipse.type) {
@@ -1718,7 +1718,7 @@ show_label(int tag)
 	    fprintf(stderr, "\tlabel %d \"%s\" at ",
 		    this_label->tag,
 		    (this_label->text==NULL) ? "" : conv_text(this_label->text));
-	    show_position(&this_label->place);
+	    show_position(&this_label->place, 3);
 	    if (this_label->hypertext)
 		fprintf(stderr, " hypertext");
 	    switch (this_label->pos) {
@@ -1752,7 +1752,7 @@ show_label(int tag)
 		fprintf(stderr, " point with color of");
 		save_linetype(stderr, &(this_label->lp_properties), TRUE);
 		fprintf(stderr, " offset ");
-		show_position(&this_label->offset);
+		show_position(&this_label->offset, 3);
 	    }
 
 #ifdef EAM_BOXED_TEXT
@@ -1790,16 +1790,16 @@ show_arrow(int tag)
 		    this_arrow->arrow_properties.layer ? "front" : "back");
 	    save_linetype(stderr, &(this_arrow->arrow_properties.lp_properties), FALSE);
 	    fprintf(stderr, "\n\t  from ");
-	    show_position(&this_arrow->start);
+	    show_position(&this_arrow->start, 3);
 	    if (this_arrow->type == arrow_end_absolute) {
 		fputs(" to ", stderr);
-		show_position(&this_arrow->end);
+		show_position(&this_arrow->end, 3);
 	    } else if (this_arrow->type == arrow_end_relative) {
 		fputs(" rto ", stderr);
-		show_position(&this_arrow->end);
+		show_position(&this_arrow->end, 3);
 	    } else { /* arrow_end_oriented */
 		fputs(" length ", stderr);
-		show_position(&this_arrow->end);
+		show_position(&this_arrow->end, 3);
 		fprintf(stderr," angle %g deg",this_arrow->angle);
 	    }
 	    if (this_arrow->arrow_properties.head_length > 0) {
@@ -1899,7 +1899,7 @@ show_key()
     }
     case GPKEY_USER_PLACEMENT:
 	fputs("\tkey is at ", stderr);
-	show_position(&key->user_pos);
+	show_position(&key->user_pos, 2);
 	putc('\n', stderr);
 	break;
     }
@@ -1958,10 +1958,10 @@ show_key()
 
 
 void
-show_position(struct position *pos)
+show_position(struct position *pos, int ndim)
 {
     fprintf(stderr,"(");
-    save_position(stderr, pos, FALSE);
+    save_position(stderr, pos, ndim, FALSE);
     fprintf(stderr,")");
 }
 
@@ -2428,9 +2428,9 @@ show_colorbox()
 	    break;
 	case SMCOLOR_BOX_USER:
 	    fputs("at USER origin: ", stderr);
-	    show_position(&color_box.origin);
+	    show_position(&color_box.origin, 2);
 	    fputs("\n\t          size: ", stderr);
-	    show_position(&color_box.size);
+	    show_position(&color_box.size, 2);
 	    fputs("\n", stderr);
 	    break;
 	default: /* should *never* happen */
@@ -2909,7 +2909,7 @@ show_xyzlabel(const char *name, const char *suffix, text_label *label)
     if (label) {
 	fprintf(stderr, "\t%s%s is \"%s\", offset at ", name, suffix,
 	    label->text ? conv_text(label->text) : "");
-	show_position(&label->offset);
+	show_position(&label->offset, 3);
     } else
 	return;
 
@@ -3338,7 +3338,7 @@ show_ticdefp(struct axis *this_axis)
     } else
 	fputs(" and are not rotated,\n\t", stderr);
     fputs("    offset ",stderr);
-    show_position(&this_axis->ticdef.offset);
+    show_position(&this_axis->ticdef.offset, 3);
     fputs("\n\t",stderr);
 
     switch (this_axis->ticdef.type) {
