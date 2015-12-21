@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gadgets.c,v 1.122 2015/10/01 04:04:57 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gadgets.c,v 1.123 2015/10/02 22:27:29 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - gadgets.c */
@@ -161,6 +161,7 @@ enum PLOT_STYLE data_style = POINTSTYLE;
 enum PLOT_STYLE func_style = LINES;
 
 TBOOLEAN parametric = FALSE;
+TBOOLEAN in_parametric = FALSE;
 
 /* If last plot was a 3d one. */
 TBOOLEAN is_3d_plot = FALSE;

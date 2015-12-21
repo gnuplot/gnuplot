@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.971 2015/11/13 04:03:56 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.972 2015/11/14 00:38:05 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -6828,7 +6828,7 @@ Ffigure_jitter
  Syntax:
        title <text> | notitle [<ignored text>]
        title columnheader | title columnheader(N)
-             {at {beginning|end}}
+             {at {beginning|end}} {{no}enhanced}
 
  where <text> is a quoted string or an expression that evaluates to a string.
  The quotes will not be shown in the key.

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.372 2015/11/03 19:57:15 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.373 2015/12/19 21:45:35 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -1934,7 +1934,6 @@ eval_plots()
     t_uses_axis uses_axis[AXIS_ARRAY_SIZE];
     int some_functions = 0;
     int plot_num, line_num;
-    TBOOLEAN in_parametric = FALSE;
     TBOOLEAN was_definition = FALSE;
     int pattern_num;
     char *xtitle = NULL;
@@ -1979,6 +1978,7 @@ eval_plots()
     line_num = 0;               /* default line type */
     pattern_num = default_fillstyle.fillpattern;        /* default fill pattern */
     strcpy(orig_dummy_var, c_dummy_var[0]);
+    in_parametric = FALSE;
     xtitle = NULL;
 
     /* Assume that the input data can be re-read later */
@@ -2159,6 +2159,7 @@ eval_plots()
 
 	    /* pm 25.11.2001 allow any order of options */
 	    while (!END_OF_COMMAND) {
+		int save_token = c_token;
 
 #ifdef SMOOTH_BINS_OPTION
 		/* bin the data if requested */
@@ -2280,69 +2281,9 @@ eval_plots()
 		}
 
 		/* deal with title */
-		if (almost_equals(c_token, "t$itle") || almost_equals(c_token, "not$itle")) {
-		    if (set_title) {
-			duplication=TRUE;
-			break;
-		    }
-		    set_title = TRUE;
-
-		    if (almost_equals(c_token++, "not$itle")) {
-			this_plot->title_is_suppressed = TRUE;
-			if (xtitle != NULL)
-			    xtitle[0] = '\0';
-			if (equals(c_token,","))
-			    continue;
-		    }
-
-		    this_plot->title_no_enhanced = !key->enhanced;
-			/* title can be enhanced if not explicitly disabled */
-		    if (parametric) {
-			if (in_parametric)
-			    int_error(c_token, "\"title\" allowed only after parametric function fully specified");
-			else if (xtitle != NULL)
-			    xtitle[0] = '\0';       /* Remove default title . */
-		    }
-
-		    /* This ugliness is because columnheader can be either a keyword */
-		    /* or a function name.  Yes, the design could have been better. */
-		    if (almost_equals(c_token,"col$umnheader")
-		    && !(equals(c_token,"columnhead") && equals(c_token+1,"(")) ) {
-			df_set_key_title_columnhead(this_plot);
-		    } else if (equals(c_token,"at")) {
-			set_title = FALSE;
-		    } else {
-			char *temp;
-			evaluate_inside_using = TRUE;
-			temp = try_to_get_string();
-			evaluate_inside_using = FALSE; 
-			if (!this_plot->title_is_suppressed) {
-			    if (!(this_plot->title = temp))
-				int_error(c_token, "expecting \"title\" for plot");
-			}
-		    }
-		    if (equals(c_token,"at")) {
-			c_token++;
-			if (equals(c_token,"end"))
-			    this_plot->title_position = 1;
-			else if (almost_equals(c_token,"beg$inning"))
-			    this_plot->title_position = -1;
-			else
-			    int_error(c_token, "expecting \"at beginning\" or \"at end\"");
-			c_token++;
-		    }
+		parse_plot_title(this_plot, xtitle, NULL, &set_title);
+		if (save_token != c_token)
 		    continue;
-		}
-
-		if (almost_equals(c_token, "enh$anced")) {
-		    c_token++;
-		    this_plot->title_no_enhanced = FALSE;
-		    continue;
-		} else if (almost_equals(c_token, "noenh$anced")) {
-		    c_token++;
-		    this_plot->title_no_enhanced = TRUE;
-		    continue;
-		}
 
 		/* deal with style */
 		if (almost_equals(c_token, "w$ith")) {
@@ -3561,4 +3502,71 @@ parametric_fixup(struct curve_points *start_plot, int *plot_num)
 
     /* Ok, stick the free list at the end of the curve_points plot list. */
     *last_pointer = free_list;
+}
+
+/*
+ * Shared by plot and splot
+ */
+void
+parse_plot_title(struct curve_points *this_plot, char *xtitle, char *ytitle, TBOOLEAN *set_title)
+{
+    legend_key *key = &keyT;
+
+    if (almost_equals(c_token, "t$itle") || almost_equals(c_token, "not$itle")) {
+	if (*set_title)
+	    int_error(c_token, "duplicate title");
+	*set_title = TRUE;
+
+	/* title can be enhanced if not explicitly disabled */
+	this_plot->title_no_enhanced = !key->enhanced;
+
+	if (almost_equals(c_token++, "not$itle"))
+	    this_plot->title_is_suppressed = TRUE;
+
+	if (parametric || this_plot->title_is_suppressed) {
+	    if (in_parametric)
+		int_error(c_token, "title allowed only after parametric function fully specified");
+	    if (xtitle != NULL)
+		xtitle[0] = '\0';       /* Remove default title . */
+	    if (ytitle != NULL)
+		ytitle[0] = '\0';       /* Remove default title . */
+	    if (equals(c_token,","))
+		return;
+	}
+
+	/* This ugliness is because columnheader can be either a keyword */
+	/* or a function name.  Yes, the design could have been better. */
+	if (almost_equals(c_token,"col$umnheader")
+	&& !(equals(c_token,"columnhead") && equals(c_token+1,"(")) ) {
+	    df_set_key_title_columnhead(this_plot);
+	} else if (equals(c_token,"at")) {
+	    *set_title = FALSE;
+	} else {
+	    char *temp;
+	    evaluate_inside_using = TRUE;
+	    temp = try_to_get_string();
+	    evaluate_inside_using = FALSE;
+	    if (!this_plot->title_is_suppressed && !(this_plot->title = temp))
+		    int_error(c_token, "expecting \"title\" for plot");
+	}
+	if (equals(c_token,"at")) {
+	    c_token++;
+	    if (equals(c_token,"end"))
+		this_plot->title_position = 1;
+	    else if (almost_equals(c_token,"beg$inning"))
+		this_plot->title_position = -1;
+	    else
+		int_error(c_token, "expecting \"at beginning\" or \"at end\"");
+	    c_token++;
+	}
+    }
+
+    if (almost_equals(c_token, "enh$anced")) {
+	c_token++;
+	this_plot->title_no_enhanced = FALSE;
+    } else if (almost_equals(c_token, "noenh$anced")) {
+	c_token++;
+	this_plot->title_no_enhanced = TRUE;
+    }
+
 }

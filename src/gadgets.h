@@ -490,6 +490,7 @@ extern enum PLOT_STYLE data_style;
 extern enum PLOT_STYLE func_style;
 
 extern TBOOLEAN parametric;
+extern TBOOLEAN in_parametric;
 
 /* If last plot was a 3d one. */
 extern TBOOLEAN is_3d_plot;

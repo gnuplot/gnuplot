@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.245 2015/10/31 04:36:56 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.246 2015/12/19 21:45:35 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -1499,50 +1499,12 @@ eval_3dplots()
 
 	    /* pm 25.11.2001 allow any order of options */
 	    while (!END_OF_COMMAND || !checked_once) {
+		int save_token = c_token;
 
 		/* deal with title */
-		if (almost_equals(c_token, "t$itle") || almost_equals(c_token, "not$itle")) {
-		    if (set_title) {
-			duplication=TRUE;
-			break;
-		    }
-		    set_title = TRUE;
-		    if (almost_equals(c_token++, "not$itle")) {
-			this_plot->title_is_suppressed = TRUE;
-			if (equals(c_token,","))
-			    continue;
-		    }
-
-		    if (parametric || this_plot->title_is_suppressed) {
-			if (xtitle != NULL)
-			    xtitle[0] = NUL;	/* Remove default title . */
-			if (ytitle != NULL)
-			    ytitle[0] = NUL;	/* Remove default title . */
-		    }
-
-		    /* title can be enhanced if not explicitly disabled */
-		    this_plot->title_no_enhanced = !key->enhanced;
-
-		    if (almost_equals(c_token,"col$umnheader")) {
-			df_set_key_title_columnhead((struct curve_points *)this_plot);
-		    } else {
-			char *temp;
-			temp = try_to_get_string();
-			if (!this_plot->title_is_suppressed && !(this_plot->title = temp))
-			    int_error(c_token, "expecting \"title\" for plot");
-		    }
+		parse_plot_title((struct curve_points *)this_plot, xtitle, ytitle, &set_title);
+		if (save_token != c_token)
 		    continue;
-		}
-
-		if (almost_equals(c_token, "enh$anced")) {
-		    c_token++;
-		    this_plot->title_no_enhanced = FALSE;
-		    continue;
-		} else if (almost_equals(c_token, "noenh$anced")) {
-		    c_token++;
-		    this_plot->title_no_enhanced = TRUE;
-		    continue;
-		}
 
 		/* deal with style */
 		if (almost_equals(c_token, "w$ith")) {
