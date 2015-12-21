@@ -1,7 +1,8 @@
 #
 # Unit test for "volatile" "skip" "refresh"
 #
+set style data lines
 splot "whale.dat" skip 5 volatile
 refresh
-pause -1 "Hit <cr> to continue"
+save "/tmp/foo"
 reset
