@@ -1,3 +1,7 @@
+2015-12-23  Ethan A Merritt  <merritt@u.washington.edu>
+
+	Bump PATCHLEVEL 2 in preparation for incremental release 5.0.2
+
 2015-12-18  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/save.c (save_variables__sub):  Do not write ARGn variables to
