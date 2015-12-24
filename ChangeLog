@@ -1,3 +1,8 @@
+2015-12-24  Jun Takimoto <takimoto-j@kba.biglobe.ne.jp>
+
+	* src/qtterminal/QtGnuplotScene.cpp: On Mac OS X, the Qt::KeypadModifier
+	bit of event->modifiers() is *always* set when an arrow key is pressed.
+
 2015-12-21  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/plot2d.h src/plot2d.c (parse_plot_title) src/plot3d.c

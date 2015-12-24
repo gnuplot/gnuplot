@@ -919,12 +919,19 @@ void QtGnuplotScene::keyPressEvent(QKeyEvent* event)
 			case Qt::Key_F4       : key = GP_KP_F4       ; break;
 			case Qt::Key_Insert   : key = GP_KP_Insert   ; break;
 			case Qt::Key_End      : key = GP_KP_End      ; break;
+			case Qt::Key_Home     : key = GP_KP_Home     ; break;
+#ifdef __APPLE__
+			case Qt::Key_Down     : key = GP_Down        ; break;
+			case Qt::Key_Left     : key = GP_Left        ; break;
+			case Qt::Key_Right    : key = GP_Right       ; break;
+			case Qt::Key_Up       : key = GP_Up          ; break;
+#else
 			case Qt::Key_Down     : key = GP_KP_Down     ; break;
-			case Qt::Key_PageDown : key = GP_KP_Page_Down; break;
 			case Qt::Key_Left     : key = GP_KP_Left     ; break;
 			case Qt::Key_Right    : key = GP_KP_Right    ; break;
-			case Qt::Key_Home     : key = GP_KP_Home     ; break;
 			case Qt::Key_Up       : key = GP_KP_Up       ; break;
+#endif
+			case Qt::Key_PageDown : key = GP_KP_Page_Down; break;
 			case Qt::Key_PageUp   : key = GP_KP_Page_Up  ; break;
 			case Qt::Key_Delete   : key = GP_KP_Delete   ; break;
 			case Qt::Key_Equal    : key = GP_KP_Equal    ; break;
