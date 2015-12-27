@@ -1,3 +1,12 @@
+2015-12-27  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/qtterminal/qt_term.cpp (qt_waitforinput):  This routine is called
+	to receive both external (e.g. mouse) events and input from stdin.
+	In cases where we only care about events we must not perturb the state
+	of stdin.  One such case was missed, leading to a character being 
+	dropped from the stdin stream depending on event timing.
+	Bug #1559
+
 2015-12-24  Jun Takimoto <takimoto-j@kba.biglobe.ne.jp>
 
 	* src/qtterminal/QtGnuplotScene.cpp: On Mac OS X, the Qt::KeypadModifier

@@ -958,8 +958,12 @@ int qt_waitforinput(int options)
 	int stdin_fd  = fileno(stdin);
 	int socket_fd = qt ? qt->socket.socketDescriptor() : -1;
 
-	if (!qt || (socket_fd < 0) || (qt->socket.state() != QLocalSocket::ConnectedState))
-		return (options == TERM_ONLY_CHECK_MOUSING) ? '\0' : getchar();
+	if (!qt || (socket_fd < 0) || (qt->socket.state() != QLocalSocket::ConnectedState)) {
+		if (options == TERM_ONLY_CHECK_MOUSING)
+			return '\0';
+		else
+			return getchar();
+	}
 
 	// Gnuplot event loop
 	do
@@ -982,8 +986,12 @@ int qt_waitforinput(int options)
 		}
 
 		// Wait for input
-		if (select(socket_fd+1, &read_fds, NULL, NULL, timeout) < 0)
-		{
+		int n_changed_fds = select(socket_fd+1, &read_fds,
+						NULL,	// not watching for write-only
+						NULL,	// not watching for exceptions
+						timeout );
+
+		if (n_changed_fds < 0) {
 			// Display the error message except when Ctrl + C is pressed
 			if (errno != 4)
 				fprintf(stderr, "Qt terminal communication error: select() error %i %s\n", errno, strerror(errno));
@@ -1036,7 +1044,12 @@ int qt_waitforinput(int options)
 			return '\0';
 		}
 	} while (paused_for_mouse || !FD_ISSET(stdin_fd, &read_fds));
-		return getchar();
+
+	if (options == TERM_ONLY_CHECK_MOUSING)
+		return '\0';
+
+	return getchar();
+
 #else // Windows console and wgnuplot
 #ifdef WGP_CONSOLE
 	int fd = fileno(stdin);
