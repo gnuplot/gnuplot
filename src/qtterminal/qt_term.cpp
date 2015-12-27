@@ -938,8 +938,12 @@ int qt_waitforinput(int options)
 	int stdin_fd  = fileno(stdin);
 	int socket_fd = qt ? qt->socket.socketDescriptor() : -1;
 
-	if (!qt || (socket_fd < 0) || (qt->socket.state() != QLocalSocket::ConnectedState))
-		return (options == TERM_ONLY_CHECK_MOUSING) ? '\0' : getchar();
+	if (!qt || (socket_fd < 0) || (qt->socket.state() != QLocalSocket::ConnectedState)) {
+		if (options == TERM_ONLY_CHECK_MOUSING)
+			return '\0';
+		else
+			return getchar();
+	}
 
 	// Gnuplot event loop
 	do
@@ -1016,7 +1020,12 @@ int qt_waitforinput(int options)
 			return '\0';
 		}
 	} while (paused_for_mouse || !FD_ISSET(stdin_fd, &read_fds));
+
+	if (options == TERM_ONLY_CHECK_MOUSING)
+		return '\0';
+	else
 		return getchar();
+
 #else // Windows console and wgnuplot
 #ifdef WGP_CONSOLE
 	int fd = fileno(stdin);
