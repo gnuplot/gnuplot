@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.199 2015/08/08 18:32:17 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.200 2015/10/01 04:04:59 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -980,9 +980,13 @@ parse_dashtype(struct t_dashtype *dt)
     /* FIXME: Is the index enough or should we copy its contents into this one? */
     /* FIXME: What happens if there is a recursive definition? */
     } else {
-	res = int_expression() - 1;
+	res = int_expression();
 	if (res < 0)
-	    int_error(c_token - 1, "tag must be > 0");
+	    int_error(c_token - 1, "dashtype must be non-negative");
+	if (res == 0)
+	    res = DASHTYPE_AXIS;
+	else
+	    res = res - 1;
     }
 
     return res;
@@ -1218,6 +1222,8 @@ lp_parse(struct lp_style_type *lp, lp_class destination_class, TBOOLEAN allow_po
 	    tmp = parse_dashtype(&newlp.custom_dash_pattern);
 	    /* Pull the dashtype from the list of already defined dashtypes, */
 	    /* but only if it we didn't get an explicit one back from parse_dashtype */ 
+	    if (tmp == DASHTYPE_AXIS)
+		lp->l_type = LT_AXIS;
 	    if (tmp >= 0)
 		tmp = load_dashtype(&newlp.custom_dash_pattern, tmp + 1);
 	    newlp.d_type = tmp;
