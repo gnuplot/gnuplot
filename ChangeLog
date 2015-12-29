@@ -14,6 +14,15 @@
 	syntax ("dashtype N") rather than version 4 syntax ("linetype N").
 	Bug #1724
 
+	* term/lua/gnuplot-tikz.lua term/lua.trm (LUA_get_term_vars): 
+	When the tikz terminal is invoked as "set term tikz mono", set
+	term->flags != TERM_MONOCHROME so that the core code knows about it.
+	This contravenes a previous code comment that said 
+	"Setting `term.TERM_MONOCHROME' would internally disable colors for all
+	drawings", which is not true now and may never have been true.
+	The result is that "set term tikz mono" is equivalent to the commands
+	"set term tikz; set mono", similar to the postscript terminal.
+
 2015-12-27  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/qtterminal/qt_term.cpp (qt_waitforinput):  This routine is called
