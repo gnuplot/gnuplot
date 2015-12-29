@@ -4,6 +4,10 @@
 	recognized, issue a warning rather than exiting early from terminal
 	initialization. Incomplete initialization can cause segfaults later.
 
+	* src/show.c: Show current state of "set monochrome" option.
+
+	* src/unset.c (unset_monochrome): Clear monochrome flag in current term.
+
 2015-12-27  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/qtterminal/qt_term.cpp (qt_waitforinput):  This routine is called
