@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.326.2.11 2015/11/10 03:51:21 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.326.2.12 2015/11/12 00:27:44 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -310,6 +310,7 @@ show_command()
 	show_linetype(first_perm_linestyle, tag);
 	break;
     case S_MONOCHROME:
+	fprintf(stderr,"monochrome mode is %s\n", monochrome ? "active" : "not active");
 	if (equals(c_token,"lt") || almost_equals(c_token,"linet$ype")) {
 	    c_token++;
 	    CHECK_TAG_GT_ZERO;
