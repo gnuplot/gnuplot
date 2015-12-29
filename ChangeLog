@@ -4,6 +4,12 @@
 
 	* src/unset.c (unset_monochrome): Clear monochrome flag in current term.
 
+	* src/misc.c (parse_dashtype lp_parse) docs/psdoc/ps_symbols.gpi:
+	Allow "dashtype 0", which is treated as LT_AXIS.
+	Modify ps_symbols demo script to select dashed lines using version 5
+	syntax ("dashtype N") rather than version 4 syntax ("linetype N").
+	Bug #1724
+
 2015-12-27  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/qtterminal/qt_term.cpp (qt_waitforinput):  This routine is called
