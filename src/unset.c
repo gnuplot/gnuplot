@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.206.2.6 2015/03/29 18:08:08 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.206.2.7 2015/11/10 03:51:22 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -1250,6 +1250,7 @@ unset_monochrome()
 	if (!END_OF_COMMAND)
 	    unset_linestyle(&first_mono_linestyle);
     }
+    term->flags &= ~TERM_MONOCHROME;
 }
 
 /* process 'unset offsets' command */

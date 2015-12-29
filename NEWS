@@ -10,6 +10,7 @@ Changes since 5.0.1
 * CHANGE use the same arrowhead style in the key sample as in the plot itself
 * CHANGE the command "set tics {front|back}" no longer affects grid lines also
 * CHANGE allow "noautoscale" keyword for 2D function plots
+* CHANGE "unset mono" clears current terminal setting as well as future behavior
 * FIX dashtype labels in 'test' command were off by one
 * FIX autocalculation of box widths in the presence of NaN data values
 * FIX qt terminals dots were invisible
