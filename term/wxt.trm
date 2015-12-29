@@ -1,5 +1,5 @@
 /*
- * $Id: wxt.trm,v 1.43 2014/10/26 21:19:21 sfeam Exp $
+ * $Id: wxt.trm,v 1.44 2015/07/13 17:54:44 sfeam Exp $
  */
 
 /* GNUPLOT - wxt.trm */
@@ -328,15 +328,20 @@ TERM_PUBLIC void wxt_options()
 			}
 		case WXT_OTHER:
 		default:
-			wxt_window_number = int_expression();
-			if (set_number) duplication=TRUE;
-			set_number = TRUE;
-			/*int_error(c_token, "unrecognized terminal option");*/
+			if (isanumber(c_token) || type_udv(c_token) == INTGR) {
+				wxt_window_number = int_expression();
+				if (set_number) duplication=TRUE;
+				set_number = TRUE;
+			} else {
+				int_warn(c_token++, "unrecognized terminal option");
+			}
 			break;
 		}
 
-		if (duplication)
-			int_error(c_token-1, "Duplicated or contradicting arguments in wxt term options.");
+		if (duplication) {
+			int_warn(c_token-1, "Duplicated or contradicting arguments in wxt term options.");
+			duplication = FALSE;
+		}
 	}
 
 	/* Save options back into options string in normalized format */
