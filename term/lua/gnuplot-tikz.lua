@@ -1809,8 +1809,6 @@ term.options = function(opt_str, initial, t_count)
   
   local print_help = false
 
-  term.flags = term_default_flags
-
   while true do
     get_next_token()
     if not o_type then break end
@@ -1818,7 +1816,7 @@ term.options = function(opt_str, initial, t_count)
       print_help = true
     elseif almost_equals(o_next, "mono$chrome") then
       -- no colored lines
-      -- `term.TERM_MONOCHROME' is set later to notify the core code.
+      -- Setting `term.TERM_MONOCHROME' would internally disable colors for all drawings.
       -- We do it the `soft' way by redefining all colors via a TeX command.
       -- Maybe an additional terminal option is useful here...
       gfx.opt.lines_colored = false
@@ -2016,8 +2014,11 @@ term.options = function(opt_str, initial, t_count)
       gfx.opt.tex_format = "latex"
     elseif almost_equals(o_next, "clip") then
       gfx.opt.clip = true
+      term.flags = term_default_flags
+      term.flags = term_default_flags + term.TERM_CAN_CLIP
     elseif almost_equals(o_next, "noclip") then
       gfx.opt.clip = false
+      term.flags = term_default_flags
     elseif almost_equals(o_next, "tight$boundingbox") then
       gfx.opt.tightboundingbox = true
     elseif almost_equals(o_next, "notight$boundingbox") then
@@ -2025,12 +2026,6 @@ term.options = function(opt_str, initial, t_count)
     else
       gp.int_warn(t_count, string.format("unknown option `%s'.", o_next))
     end
-  end
-  if not gfx.opt.lines_colored then 
-    term.flags = term.flags + term.TERM_MONOCHROME
-  end
-  if gfx.opt.clip then
-      term.flags = term.flags + term.TERM_CAN_CLIP
   end
 
   -- determine "internal" font size

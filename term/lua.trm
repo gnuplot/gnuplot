@@ -528,7 +528,7 @@ LUA_get_term_vars(void) {
   lua_pop(L, 1);
   
   lua_getfield(L, luaterm, "flags");
-  term->flags = (lua_isnumber(L, -1)) ? (int)lua_tointeger(L, -1) : TERM_BINARY;
+  term->flags |= (lua_isnumber(L, -1)) ? (int)lua_tointeger(L, -1) : TERM_BINARY;
   lua_pop(L, 1);
 
   lua_getfield(L, luaterm, "tscale");
