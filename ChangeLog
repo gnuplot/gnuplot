@@ -6,6 +6,10 @@
 	* term/lua.trm: Treat "set term tikz monochrome" as
 	"set term tikz; set monochrome".
 
+	* term/lua/gnuplot-tikz.lua:  Add \SetUnicodeOption{mathletters}
+	to document produced by "set term tikz standalone".  This handles 
+	utf-8 encoded greek letters in gnuplot labels and titles.
+
 2015-12-29  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/wxt.trm (wxt_options): If a terminal setting option is not
