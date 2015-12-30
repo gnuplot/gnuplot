@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.507 2015/11/13 04:03:57 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.508 2015/12/19 21:45:35 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -110,7 +110,6 @@ static void set_margin __PROTO((t_position *));
 static void set_missing __PROTO((void));
 static void set_separator __PROTO((void));
 static void set_datafile_commentschars __PROTO((void));
-static void init_monochrome __PROTO((void));
 static void set_monochrome __PROTO((void));
 #ifdef USE_MOUSE
 static void set_mouse __PROTO((void));
@@ -2827,25 +2826,6 @@ set_missing()
 }
 
 /* (version 5) 'set monochrome' command */
-static void
-init_monochrome()
-{
-    struct lp_style_type mono_default[] = DEFAULT_MONO_LINETYPES;
-
-    if (first_mono_linestyle == NULL) {
-	int i, n = sizeof(mono_default) / sizeof(struct lp_style_type);
-	struct linestyle_def *new;
-	/* copy default list into active list */
-	for (i=n; i>0; i--) {
-	    new = gp_alloc(sizeof(struct linestyle_def), NULL);
-	    new->next = first_mono_linestyle;
-	    new->lp_properties = mono_default[i-1];
-	    new->tag = i;
-	    first_mono_linestyle = new;
-	}
-    }
-}
-
 static void
 set_monochrome()
 {

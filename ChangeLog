@@ -1,3 +1,11 @@
+2015-12-30  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/term_api.h src/term.c src/set.c (init_monochrome):
+	Move this routine from set.c to term.c
+
+	* term/lua.trm: Treat "set term tikz monochrome" as
+	"set term tikz; set monochrome".
+
 2015-12-29  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/wxt.trm (wxt_options): If a terminal setting option is not
@@ -13,9 +21,6 @@
 	Modify ps_symbols demo script to select dashed lines using version 5
 	syntax ("dashtype N") rather than version 4 syntax ("linetype N").
 	Bug #1724
-
-	* term/lua/gnuplot-tikz.lua:  Change to action of "set term tikz mono"
-	commited accidentally and reverted immediately.
 
 2015-12-27  Ethan A Merritt  <merritt@u.washington.edu>
 
