@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.296.2.18 2015/06/15 23:24:20 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.296.2.19 2015/07/09 01:40:45 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -2880,6 +2880,29 @@ recycle:
     lp->pm3d_color.lt = lp->l_type;
     lp->d_type = DASHTYPE_SOLID;
     lp->p_type = (tag <= 0) ? -1 : tag - 1;
+}
+
+/*
+ * Version 5 maintains a parallel set of linetypes for "set monochrome" mode.
+ * This routine allocates space and initializes the default set.
+ */
+void
+init_monochrome()
+{
+    struct lp_style_type mono_default[] = DEFAULT_MONO_LINETYPES;
+
+    if (first_mono_linestyle == NULL) {
+	int i, n = sizeof(mono_default) / sizeof(struct lp_style_type);
+	struct linestyle_def *new;
+	/* copy default list into active list */
+	for (i=n; i>0; i--) {
+	    new = gp_alloc(sizeof(struct linestyle_def), NULL);
+	    new->next = first_mono_linestyle;
+	    new->lp_properties = mono_default[i-1];
+	    new->tag = i;
+	    first_mono_linestyle = new;
+	}
+    }
 }
 
 /*
