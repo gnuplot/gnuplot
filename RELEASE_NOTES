@@ -6,7 +6,7 @@ Please see the NEWS and ChangeLog files for a complete list of bug fixes
 and minor changes accummulated since then.
 
 These release notes are for version 5.0 patchlevel 2 (5.0.2).
-Release Notes date: 24-Dec-2015
+Release Notes date: 30-Dec-2015
 
 This patchlevel 5.0.2 incremental release includes
 ==================================================
@@ -303,7 +303,7 @@ Options for generating interactive plots for web display
 Installation
 ------------
 
-You can download a source tarball for gnuplot version 5.0.1 from the 
+You can download a source tarball for gnuplot version 5.0.2 from the 
 gnuplot development site on SourceForge.
 	http://sourceforge.net/projects/gnuplot
 
@@ -311,7 +311,7 @@ Installation instructions are available in the source itself; the short
 version for linux/unix-like systems is to unpack the tarball and then
 <PRE>
 build it:
-      cd gnuplot-5.0.1 ; ./configure ; make
+      cd gnuplot-5.0.2 ; ./configure ; make
 test it:
       make check
 install it:
