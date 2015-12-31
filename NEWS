@@ -36,6 +36,7 @@ Changes since 5.0.1
 * FIX vertical placement of text fragments by cairo terminals
 * FIX "set [*]axis rangelimited" applies to minor as well as major tics
 * FIX qt terminal could drop chars from stdin depending on external event timing
+* FIX overlong custom dash pattern could generate a corrupt postscript file
 
 Changes in 5.0.1
 ================

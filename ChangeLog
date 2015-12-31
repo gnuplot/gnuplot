@@ -1,3 +1,9 @@
+2015-12-31  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/post.trm (PS_dashtype): Prevent overflow of the custom 
+	dash pattern array, leading to possible corruption of the output 
+	postscipt file.
+
 2015-12-30  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/term_api.h src/term.c src/set.c (init_monochrome):
