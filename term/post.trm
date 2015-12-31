@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: post.trm,v 1.289 2015/10/22 20:36:23 sfeam Exp $
+ * $Id: post.trm,v 1.290 2015/10/22 21:59:27 sfeam Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -2029,9 +2029,10 @@ PS_dashtype(int type, t_dashtype *custom_dash_type)
     case DASHTYPE_CUSTOM:
 		PS_FLUSH_PATH;
 		fprintf(gppsfile, "[");
-		for (i = 0; custom_dash_type->pattern[i] > 0; i++)
+		for (i = 0; i < DASHPATTERN_LENGTH && custom_dash_type->pattern[i] > 0; i++) {
 		    fprintf(gppsfile, "%.1f dl%d ", 
 			custom_dash_type->pattern[i] * empirical_scale, i%2 + 1);
+		}
 		fprintf(gppsfile, "] 0 setdash\n");
 		break;
     default:
