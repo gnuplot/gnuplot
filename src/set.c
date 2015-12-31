@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.508 2015/12/19 21:45:35 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.509 2015/12/30 18:30:56 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -2843,7 +2843,11 @@ set_monochrome()
 
     if (almost_equals(c_token, "linet$ype") || equals(c_token, "lt")) {
 	/* we can pass this off to the generic "set linetype" code */
-	set_linestyle(&first_mono_linestyle, LP_TYPE);
+	if (equals(c_token+1,"cycle")) {
+	    c_token += 2;
+	    mono_recycle_count = int_expression();
+	} else
+	    set_linestyle(&first_mono_linestyle, LP_TYPE);
     }
 
     if (!END_OF_COMMAND)

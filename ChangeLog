@@ -4,6 +4,12 @@
 	dash pattern array, leading to possible corruption of the output 
 	postscipt file.
 
+	* src/set.c src/show.c src/term.c:
+	New command "set mono linetype cycle N" acts analogously to
+	"set linetype cycle N".  If a monochrome linetype N is requested
+	where N is larger than any defined monochrome linetype, then
+	substitute a corresponding linetype in the range [1:cycle].
+
 2015-12-30  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/term_api.h src/term.c src/set.c (init_monochrome):
