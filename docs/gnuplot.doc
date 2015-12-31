@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.902.2.47 2015/11/02 21:07:04 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.902.2.48 2015/11/11 19:35:08 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -12763,20 +12763,23 @@ Ffigure_missing
 4 time
 ?commands set xdata time
 ?set xdata time
- `set xdata time` indicates that the x coordinate is to be interpreted as a
- date or time to millisecond precision. Equivalent commands exist for
- `set ydata time` and so on.
+ `set xdata time` indicates that the x coordinate represents a date or time to
+ millisecond precision.  There is an analogous command `set ydata time`.
 
- Two separate formats control interpretation of time data.
- Input data is read from a file using the `timefmt` for that axis.
- See `set timefmt`. 
- Use quoted strings in this same `timefmt` to specify the axis range.
+ There are separate format mechanisms for interpretation of time data on input
+ and output.  Input data is read from a file either by using the global 
+ `timefmt` or by using the function timecolumn() as part of the plot command.
+ These input mechanisms also apply to using time values to set an axis range.
+ See `set timefmt`, `timecolumn`.
 
  Example:
 
       set xdata time
-      set timefmt x "%d-%b-%Y"
+      set timefmt "%d-%b-%Y"
       set xrange ["01-Jan-2013" : "31-Dec-2014"]
+      plot DATA using 1:2
+ or
+      plot DATA using (timecolumn(1,"%d-%b-%Y")):2
 
  For output, i.e. tick labels along that axis or coordinates output by mousing,
  the function 'strftime' (type "man strftime" on unix to look it up) is used to
