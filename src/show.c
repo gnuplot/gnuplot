@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.326.2.12 2015/11/12 00:27:44 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.326.2.13 2015/12/29 19:12:43 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -3212,6 +3212,7 @@ show_linetype(struct linestyle_def *listhead, int tag)
 {
     struct linestyle_def *this_linestyle;
     TBOOLEAN showed = FALSE;
+    int recycle_count = 0;
 
     for (this_linestyle = listhead; this_linestyle != NULL;
 	 this_linestyle = this_linestyle->next) {
@@ -3225,9 +3226,14 @@ show_linetype(struct linestyle_def *listhead, int tag)
     if (tag > 0 && !showed)
 	int_error(c_token, "linetype not found");
 
-    if (tag == 0 && linetype_recycle_count != 0 && listhead == first_perm_linestyle)
+    if (listhead == first_perm_linestyle)
+	recycle_count = linetype_recycle_count;
+    else if (listhead == first_mono_linestyle)
+	recycle_count = mono_recycle_count;
+
+    if (tag == 0 && recycle_count > 0)
 	fprintf(stderr, "\tLinetypes repeat every %d unless explicitly defined\n",
-		linetype_recycle_count);
+		recycle_count);
 }
 
 

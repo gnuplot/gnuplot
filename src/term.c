@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.296.2.19 2015/07/09 01:40:45 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.296.2.20 2015/12/30 18:48:01 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -201,7 +201,7 @@ TBOOLEAN ignore_enhanced_text = FALSE;
 
 /* Recycle count for user-defined linetypes */
 int linetype_recycle_count = 0;
-int mono_recycle_count = 4;
+int mono_recycle_count = 0;
 
 
 /* Internal variables */
@@ -2825,14 +2825,14 @@ recycle:
 		return;
 	    }
 	}
-#if (0)
+
 	/* This linetype wasn't defined explicitly.		*/
 	/* Should we recycle one of the first N linetypes?	*/
 	if (tag > mono_recycle_count && mono_recycle_count > 0) {
 	    tag = (tag-1) % mono_recycle_count + 1;
 	    goto recycle;
 	}
-#endif
+
 	return;
     }
 
