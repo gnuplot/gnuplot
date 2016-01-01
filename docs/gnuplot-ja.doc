@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot-ja.doc,v 1.7 2014-12-02 15:33:29+09 shige Exp $
+C RCS $Id: gnuplot-ja.doc,v 1.54.2.2 2014/12/10 23:48:59 sfeam Exp $
 C corresponding original gnuplot.doc revision: 1.902.2.20
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
@@ -12889,7 +12889,7 @@ C 下記の以下参照: オプション `positive`, `negative`)。
  例:
 
       set xdata time
-      set timefmt x "%d-%b-%Y"
+      set timefmt "%d-%b-%Y"
       set xrange ["01-Jan-2013" : "31-Dec-2014"]
 
  出力、すなわち軸に沿った目盛りのラベルや、マウス操作での座標出力につい
