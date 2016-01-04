@@ -1,3 +1,12 @@
+2016-01-04  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/wxterminal/wxt_gui.cpp:  Several components of the gtk2 API have
+	been deprecated, which prevents compiling thw wxt terminal using wxt3
+	or indeed recent versions of gtk2.
+	1) Replace handle->window with gtk_widget_get_window(handle).
+	2) gdk_window_foreign_new() (used only by --enable-raise-console) no
+	longer exists. Make this code conditional on (GTK_MAJOR_VERSION == 2).
+
 2015-12-31  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/post.trm (PS_dashtype): Prevent overflow of the custom 
