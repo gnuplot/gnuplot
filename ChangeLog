@@ -4,6 +4,11 @@
 	to contain column headers.  Previously this sequence would fail:
 	   set key autotitle columnhead;  fit ...
 
+	* src/stats.c:  Make data errors in stats command non-fatal,
+	i.e. int_warn() rather than int_error().
+
+	* src/internal.c:  Store return value from system("") in GPVAL_ERRNO.
+
 2016-01-04  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/wxterminal/wxt_gui.cpp:  Several components of the gtk2 API have
