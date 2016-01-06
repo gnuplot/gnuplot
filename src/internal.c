@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: internal.c,v 1.84 2015/11/06 19:33:45 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: internal.c,v 1.85 2015/12/18 18:14:58 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - internal.c */
@@ -1729,7 +1729,6 @@ void
 f_system(union argument *arg)
 {
     struct value val, result;
-    struct udvt_entry *errno_var;
     char *output;
     int output_len, ierr;
 
@@ -1744,8 +1743,7 @@ f_system(union argument *arg)
     FPRINTF((stderr," f_system input = \"%s\"\n", val.v.string_val));
 
     ierr = do_system_func(val.v.string_val, &output);
-    if ((errno_var = add_udv_by_name("ERRNO")))
-	Ginteger(&errno_var->udv_value, ierr);
+    fill_gpval_integer("GPVAL_ERRNO", ierr); 
     output_len = strlen(output);
 
     /* chomp result */
