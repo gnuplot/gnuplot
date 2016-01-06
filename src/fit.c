@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: fit.c,v 1.145.2.11 2015/06/07 15:19:59 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: fit.c,v 1.145.2.12 2015/07/09 01:40:44 sfeam Exp $"); }
 #endif
 
 /*  NOTICE: Change of Copyright Status
@@ -2204,6 +2204,8 @@ fit_command()
 	case DF_SECOND_BLANK:
 	    continue;
 	case DF_COLUMN_HEADERS:
+	    continue;
+	case DF_FOUND_KEY_TITLE:
 	    continue;
 	case 0:
 	    Eex2("bad data on line %d of datafile", df_line_number);
