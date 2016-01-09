@@ -10,6 +10,9 @@
 	* configure.ac: Do not assume that wxwidgets uses the gtk2 toolkit
 	(it might use gtk3 or on OSX it might use cocoa). 
 
+	* src/pm3d.c: Account for interpolated quadrangles when applying a pm3d
+	lighting model.
+
 2016-01-05  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/fit.c:  The fit command should gracefully accept data files known

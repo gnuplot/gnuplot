@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.105 2015/07/12 17:08:38 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.106 2015/11/13 04:03:56 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - pm3d.c */
@@ -685,10 +685,8 @@ pm3d_plot(struct surface_points *this_plot, int at_which_z)
 		    continue;
 	    }
 
-	    if ((interp_i <= 1 && interp_j <= 1) || pm3d.direction == PM3D_DEPTH
-	    ||  (pm3d_shade.strength > 0) /* FIXME only needed because interpolation */
-	                                  /* code doesn't handle lighting itself.    */
-		) {
+	    if ((interp_i <= 1 && interp_j <= 1) || pm3d.direction == PM3D_DEPTH) {
+
 #ifdef EXTENDED_COLOR_SPECS
 	      if ((term->flags & TERM_EXTENDED_COLOR) == 0)
 #endif
@@ -926,6 +924,7 @@ pm3d_plot(struct surface_points *this_plot, int at_which_z)
 			    cb4 = z2cb(corners[3].z);
 			}
 			switch (pm3d.which_corner_color) {
+			    default:
 			    case PM3D_WHICHCORNER_MEAN: avgC = (cb1 + cb2 + cb3 + cb4) * 0.25; break;
 			    case PM3D_WHICHCORNER_GEOMEAN: avgC = geomean4(cb1, cb2, cb3, cb4); break;
 			    case PM3D_WHICHCORNER_HARMEAN: avgC = harmean4(cb1, cb2, cb3, cb4); break;
@@ -937,16 +936,38 @@ pm3d_plot(struct surface_points *this_plot, int at_which_z)
 			    case PM3D_WHICHCORNER_C2: avgC = cb2; break;
 			    case PM3D_WHICHCORNER_C3: avgC = cb3; break;
 			    case PM3D_WHICHCORNER_C4: avgC = cb4; break;
-			    default: int_error(NO_CARET, "cannot be here"); avgC = 0;
 			}
 
-			if (pm3d_shade.strength > 0) /* FIXME no interpolation */
-				gray = gray;
-			else if (color_from_rgbvar) /* we were given an explicit color */
+			if (color_from_rgbvar) /* we were given an explicit color */
 				gray = avgC;
 			else /* transform z value to gray, i.e. to interval [0,1] */
 				gray = cb2gray(avgC);
 
+			/* apply lighting model */
+			if (pm3d_shade.strength > 0) {
+			    /* FIXME: coordinate->quadrangle->coordinate seems crazy */
+			    coordinate corcorners[4];
+			    int i;
+			    for (i=0; i<4; i++) {
+				corcorners[i].x = corners[i].x;
+				corcorners[i].y = corners[i].y;
+				corcorners[i].z = corners[i].z;
+			    }
+
+			    if (at_which_z == PM3D_AT_SURFACE)
+				gray = apply_lighting_model( &corcorners[0], &corcorners[1],
+						&corcorners[2], &corcorners[3], gray);
+			    /* Don't apply lighting model to TOP/BOTTOM projections  */
+			    /* but convert from floating point 0<gray<1 to RGB color */
+			    /* since that is what would have been returned from the  */
+			    /* lighting code.					     */
+			    else if (!color_from_rgbvar) {
+				rgb255_color temp;
+				rgb255maxcolors_from_gray(gray, &temp);
+				gray = (long)((temp.r << 16) + (temp.g << 8) + (temp.b));
+			    }
+			}
+	
 			if (pm3d.direction == PM3D_DEPTH) {
 			    /* copy quadrangle */
 			    quadrangle* qp = quadrangles + current_quadrangle;
