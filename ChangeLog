@@ -4,8 +4,11 @@
 	incorrectly changing the title of the previous plot window in addition
 	to that of the new plot window.
 
-	* src/internal.c:  Error messages should distinguish between improper
-	variable type and a proper type but uninitialized variable.
+	* src/internal.c:  Error messages should distinguish between an 
+	uninitialized variable and an improper variable type.
+
+	* configure.ac: Do not assume that wxwidgets uses the gtk2 toolkit
+	(it might use gtk3 or on OSX it might use cocoa). 
 
 2016-01-05  Ethan A Merritt  <merritt@u.washington.edu>
 

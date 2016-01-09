@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot on Unix.
 dnl
-dnl $Id: configure.ac,v 1.12 2015/07/03 17:20:31 sfeam Exp $
+dnl $Id: configure.ac,v 1.13 2015/07/15 05:11:44 sfeam Exp $
 dnl
 dnl this is actually major.minor ...
 dnl note that for a non-beta release, we need to disable DEVELOPMENT_RELEASE
@@ -1067,10 +1067,17 @@ if test "${enable_wxwidgets_ok}" = yes ; then
   dnl Check for fork(), used for the 'persist' effect
   AC_FUNC_FORK
 
-  dnl Check for gtk (raise/lower tweaks)
-  PKG_CHECK_MODULES(GTK, [gtk+-2.0], have_gtk=yes, have_gtk=no)
+  dnl Check if wxWidgets uses gtk on this platform
+  WX_TOOLKIT="`$WX_CONFIG --query-toolkit`"
+  if test "${WX_TOOLKIT}" = gtk2 ; then
+    PKG_CHECK_MODULES(GTK, [gtk+-2.0], have_gtk=yes, have_gtk=no)
+    want_gtk=yes
+  elif test "${WX_TOOLKIT}" = gtk3 ; then
+    PKG_CHECK_MODULES(GTK, [gtk+-3.0], have_gtk=yes, have_gtk=no)
+    want_gtk=yes
+  fi
   if  test "${have_gtk}" = yes ; then
-    AC_DEFINE(HAVE_GTK, 1, [Define to use gtk/gdk tweaks])
+    AC_DEFINE(HAVE_GTK, 1, [define if your wxWidgets uses the gtk toolkit])
     WX_CXXFLAGS="$WX_CXXFLAGS $GTK_CFLAGS"
     WX_LIBS="$WX_LIBS $GTK_LIBS"
   fi
