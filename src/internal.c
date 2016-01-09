@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: internal.c,v 1.85 2015/12/18 18:14:58 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: internal.c,v 1.86 2016/01/06 23:46:40 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - internal.c */
@@ -72,8 +72,8 @@ GP_MATHERR( STRUCT_EXCEPTION_P_X )
 
 static enum DATA_TYPES sprintf_specifier __PROTO((const char *format));
 
-#define BAD_DEFAULT int_error(NO_CARET, "internal error : type neither INT nor CMPLX");
 #define BADINT_DEFAULT int_error(NO_CARET, "error: bit shift applied to non-INT");
+#define BAD_TYPE(type) int_error(NO_CARET, (type==NOTDEFINED) ? "uninitialized user variable" : "internal error : type neither INT nor CMPLX");
 
 static int recursion_depth = 0;
 void
@@ -376,7 +376,7 @@ f_uminus(union argument *arg)
 	    -a.v.cmplx_val.imag;
 	break;
     default:
-	BAD_DEFAULT
+	BAD_TYPE(a.type)
 	break;
     }
     push(&a);
@@ -407,7 +407,7 @@ f_eq(union argument *arg)
 		      b.v.cmplx_val.imag == 0.0);
 	    break;
 	default:
-	    BAD_DEFAULT
+	    BAD_TYPE(b.type)
 	}
 	break;
     case CMPLX:
@@ -423,11 +423,11 @@ f_eq(union argument *arg)
 		      b.v.cmplx_val.imag);
 	    break;
 	default:
-	    BAD_DEFAULT
+	    BAD_TYPE(b.type)
 	}
 	break;
     default:
-	BAD_DEFAULT
+	BAD_TYPE(a.type)
     }
     push(Ginteger(&a, result));
 }
@@ -455,7 +455,7 @@ f_ne(union argument *arg)
 		      b.v.cmplx_val.imag != 0.0);
 	    break;
 	default:
-	    BAD_DEFAULT
+	    BAD_TYPE(b.type)
 	}
 	break;
     case CMPLX:
@@ -472,11 +472,11 @@ f_ne(union argument *arg)
 		      b.v.cmplx_val.imag);
 	    break;
 	default:
-	    BAD_DEFAULT
+	    BAD_TYPE(b.type)
 	}
 	break;
     default:
-	BAD_DEFAULT
+	BAD_TYPE(a.type)
     }
     push(Ginteger(&a, result));
 }
@@ -503,7 +503,7 @@ f_gt(union argument *arg)
 		      b.v.cmplx_val.real);
 	    break;
 	default:
-	    BAD_DEFAULT
+	    BAD_TYPE(b.type)
 	}
 	break;
     case CMPLX:
@@ -517,11 +517,11 @@ f_gt(union argument *arg)
 		      b.v.cmplx_val.real);
 	    break;
 	default:
-	    BAD_DEFAULT
+	    BAD_TYPE(b.type)
 	}
 	break;
     default:
-	BAD_DEFAULT
+	BAD_TYPE(a.type)
     }
     push(Ginteger(&a, result));
 }
@@ -548,7 +548,7 @@ f_lt(union argument *arg)
 		      b.v.cmplx_val.real);
 	    break;
 	default:
-	    BAD_DEFAULT
+	    BAD_TYPE(b.type)
 	}
 	break;
     case CMPLX:
@@ -562,11 +562,11 @@ f_lt(union argument *arg)
 		      b.v.cmplx_val.real);
 	    break;
 	default:
-	    BAD_DEFAULT
+	    BAD_TYPE(b.type)
 	}
 	break;
     default:
-	BAD_DEFAULT
+	BAD_TYPE(a.type)
     }
     push(Ginteger(&a, result));
 }
@@ -593,7 +593,7 @@ f_ge(union argument *arg)
 		      b.v.cmplx_val.real);
 	    break;
 	default:
-	    BAD_DEFAULT
+	    BAD_TYPE(b.type)
 	}
 	break;
     case CMPLX:
@@ -607,11 +607,11 @@ f_ge(union argument *arg)
 		      b.v.cmplx_val.real);
 	    break;
 	default:
-	    BAD_DEFAULT
+	    BAD_TYPE(b.type)
 	}
 	break;
     default:
-	BAD_DEFAULT
+	BAD_TYPE(a.type)
     }
     push(Ginteger(&a, result));
 }
@@ -638,7 +638,7 @@ f_le(union argument *arg)
 		      b.v.cmplx_val.real);
 	    break;
 	default:
-	    BAD_DEFAULT
+	    BAD_TYPE(b.type)
 	}
 	break;
     case CMPLX:
@@ -652,11 +652,11 @@ f_le(union argument *arg)
 		      b.v.cmplx_val.real);
 	    break;
 	default:
-	    BAD_DEFAULT
+	    BAD_TYPE(b.type)
 	}
 	break;
     default:
-	BAD_DEFAULT
+	BAD_TYPE(a.type)
     }
     push(Ginteger(&a, result));
 }
@@ -735,7 +735,7 @@ f_plus(union argument *arg)
 			    b.v.cmplx_val.imag);
 	    break;
 	default:
-	    BAD_DEFAULT
+	    BAD_TYPE(b.type)
 	}
 	break;
     case CMPLX:
@@ -752,11 +752,11 @@ f_plus(union argument *arg)
 			    b.v.cmplx_val.imag);
 	    break;
 	default:
-	    BAD_DEFAULT
+	    BAD_TYPE(b.type)
 	}
 	break;
     default:
-	BAD_DEFAULT
+	BAD_TYPE(a.type)
     }
     push(&result);
 }
@@ -783,7 +783,7 @@ f_minus(union argument *arg)
 			    -b.v.cmplx_val.imag);
 	    break;
 	default:
-	    BAD_DEFAULT
+	    BAD_TYPE(b.type)
 	}
 	break;
     case CMPLX:
@@ -800,11 +800,11 @@ f_minus(union argument *arg)
 			    b.v.cmplx_val.imag);
 	    break;
 	default:
-	    BAD_DEFAULT
+	    BAD_TYPE(b.type)
 	}
 	break;
     default:
-	BAD_DEFAULT
+	BAD_TYPE(a.type)
     }
     push(&result);
 }
@@ -837,7 +837,7 @@ f_mult(union argument *arg)
 			    b.v.cmplx_val.imag);
 	    break;
 	default:
-	    BAD_DEFAULT
+	    BAD_TYPE(b.type)
 	}
 	break;
     case CMPLX:
@@ -859,11 +859,11 @@ f_mult(union argument *arg)
 			    b.v.cmplx_val.real);
 	    break;
 	default:
-	    BAD_DEFAULT
+	    BAD_TYPE(b.type)
 	}
 	break;
     default:
-	BAD_DEFAULT
+	BAD_TYPE(a.type)
     }
     push(&result);
 }
@@ -907,7 +907,7 @@ f_div(union argument *arg)
 	    }
 	    break;
 	default:
-	    BAD_DEFAULT
+	    BAD_TYPE(b.type)
 	}
 	break;
     case CMPLX:
@@ -944,11 +944,11 @@ f_div(union argument *arg)
 	    }
 	    break;
 	default:
-	    BAD_DEFAULT
+	    BAD_TYPE(b.type)
 	}
 	break;
     default:
-	BAD_DEFAULT
+	BAD_TYPE(a.type)
     }
     push(&result);
 }
@@ -1031,7 +1031,7 @@ f_power(union argument *arg)
 	    }
 	    break;
 	default:
-	    BAD_DEFAULT
+	    BAD_TYPE(b.type)
 	}
 	break;
     case CMPLX:
@@ -1083,11 +1083,11 @@ f_power(union argument *arg)
 	    }
 	    break;
 	default:
-	    BAD_DEFAULT
+	    BAD_TYPE(b.type)
 	}
 	break;
     default:
-	BAD_DEFAULT
+	BAD_TYPE(a.type)
     }
     push(&result);
 }
