@@ -1,3 +1,12 @@
+2016-01-09  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/qtterminal/qt_term.cpp: "set term qt <num> title 'foo'" was 
+	incorrectly changing the title of the previous plot window in addition
+	to that of the new plot window.
+
+	* src/internal.c:  Error messages should distinguish between improper
+	variable type and a proper type but uninitialized variable.
+
 2016-01-05  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/fit.c:  The fit command should gracefully accept data files known

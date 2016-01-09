@@ -1430,8 +1430,6 @@ void qt_options()
 	if (set_title)
 	{
 		termOptions += " title \"" + qt_option->Title + '"';
-		if (qt)
-			qt->out << GETitle << qt_option->Title;
 	}
 
 	if (set_size)

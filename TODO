@@ -26,8 +26,6 @@ PLATFORMS:
  -- autoconf handling of TBOOLEAN on Solaris also remains problematic.
     The definition apparently needs to be different for C and C++.
 
- -- update wgnuplot menus for Windows
-
 GNUPLOT TOOLS LIBRARY:
 ======================
 
@@ -48,8 +46,6 @@ Or put them to gnuplot web page?
 INSTALLATION --- LINUX:
 =======================
 
--- add .spec file and a 'make' target to create RPM file?
-   [HBB: no.]
 -- the installation paths for TeX-related files are a mess
 
 
@@ -63,11 +59,6 @@ Note: use
 
 
 Projects, in no particular order:
-
-- revise border command to use keywords
-- put minor tics into demo file
-
-longer term
 
 - break it into four layers:
   : low level graphics  (some of term.c)
@@ -94,40 +85,29 @@ Lars' list
   floating-point equality?) and symbolic constants from standard header files.
   LOADS of errors throughout the code, especially in graphics.c
 - autogenerate term.h from config file in text format and/or configure?
-- write or organise a portable version of snprintf(3) with a copyright
-  compatible with the gnuplot copyright (ie. no GPL) (Apache?)
 - add more maintainer checks (eg. file permissions)
 - better documentation format; get rid of the doc2xxx utils
   [SGML. SGML. SGML]
 - tilde and variable expansion to be done by 
   gp_fopen() - to be implemented
-- fix bug which prints "DI,1DI,0" in the upper left corner of the plot when
-  in pcl5 mode and printing to an HP Laserjet 4+ (J. Breeding, bug-gnuplot)
-  [HBB: reason known, but proper workaround path unclear]
 
 HBB:
 
 [Optional:] See if 16-bit compilations can be made to work again.
 
-Ethan's List (2012):
+Ethan's List (2016):
 
-- the qt terminal should support OpenGL as a back-end rendering path
 - rewrite javascript support files for the canvas terminal to use
   browser's font support.  Maintain more per-plot context, e.g. zoom state.
 - isosurfaces (3D contour of 4D data)
-- more demos and more comprehensible descriptions in the user manual
-- support mousing in multiplot output, at least for selected terminals
+- support mousing in multiplot output
 - add additional tic levels, possibly to appear only when zoomed
-- violin plots
-- enhanced text mode support for italic, boldface
+- configuration/build options to create
+	javascript/emscripten executable
+	qt only support for pdf, svg, png, etc (Lodewick patches)
+- better tracking of wrapped input lines by the builtin readline code
 
-- Changes for 5.0 (syntax or behavior is not 100% backward compatible)
-  + revise the keywords for matrix handling so that the binary and ascii
-    versions are consistent
-  + apply in-line plot ranges only to the immediately following plot clause
-
-Remove obsolete files.  But are they truly obsolete?
-  term/pc.trm src/*.asm src/corplot.c
-  term/openstep.trm term/next.trm src/OpenStep/ src/NeXT/
-  config/makefile.emx config/makefile.unx 
+- Remove obsolete files.  But are they truly obsolete?
+   term/pc.trm config/makefile.emx
+   term/openstep.trm term/next.trm src/OpenStep/ src/NeXT/
 
