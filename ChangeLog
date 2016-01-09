@@ -1,5 +1,18 @@
 2016-01-09  Ethan A Merritt  <merritt@u.washington.edu>
 
+	* src/parse.c src/parse.h src/plot2d.c src/plot3d.c src/set.c
+	src/unset.c demo/iterate.dem docs/gnuplot.doc:
+	New special case of iteration in a plot command:
+		plot for [i=<start> : *] datafile ...
+	This will iterate over all available data without generating an error
+	message when the data is exhausted and without generating empty plots.
+	It can be used to iterate over an unknown number of columns (e.g. for
+	histograms), an unknown number of datafiles where the file name is
+	generated from the iteration variable, or an unknown number of data
+	blocks (e.g. plot for [i=0:*] datafile index i).
+
+2016-01-09  Ethan A Merritt  <merritt@u.washington.edu>
+
 	* src/qtterminal/qt_term.cpp: "set term qt <num> title 'foo'" was 
 	incorrectly changing the title of the previous plot window in addition
 	to that of the new plot window.

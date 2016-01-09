@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.336.2.17 2015/10/29 04:53:19 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.336.2.18 2015/12/01 12:52:26 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -1976,6 +1976,7 @@ eval_plots()
     char *xtitle = NULL;
     int begin_token = c_token;  /* so we can rewind for second pass */
     int start_token=0, end_token;
+    int highest_iteration = 0;	/* last index reached in iteration [i=start:*] */
     legend_key *key = &keyT;
     char orig_dummy_var[MAX_ID_LEN+1];
 
@@ -2804,7 +2805,8 @@ eval_plots()
 	    if (this_plot->plot_type == DATA) {
 		/* actually get the data now */
 		if (get_data(this_plot) == 0) {
-		    int_warn(NO_CARET,"Skipping data file with no valid points");
+		    if (!forever_iteration(plot_iterator))
+			int_warn(NO_CARET,"Skipping data file with no valid points");
 		    this_plot->plot_type = NODATA;
 		    goto SKIPPED_EMPTY_FILE;
 		}
@@ -2921,8 +2923,13 @@ eval_plots()
 	/* Iterate-over-plot mechanism */
 	if (empty_iteration(plot_iterator) && this_plot) {
 	    this_plot->plot_type = NODATA;
+	} else if (forever_iteration(plot_iterator) && (this_plot->plot_type == NODATA)) {
+	    highest_iteration = plot_iterator->iteration_current;
+	} else if (forever_iteration(plot_iterator) && (this_plot->plot_type == FUNC)) {
+	    int_error(NO_CARET,"unbounded iteration in function plot");
 	} else if (next_iteration(plot_iterator)) {
 	    c_token = start_token;
+	    highest_iteration = plot_iterator->iteration_current;
 	    continue;
 	}
 
@@ -3264,8 +3271,10 @@ eval_plots()
 
 	    /* Iterate-over-plot mechanism */
 	    if (next_iteration(plot_iterator)) {
-		c_token = start_token;
-		continue;
+		if (plot_iterator->iteration_current <= highest_iteration) {
+		    c_token = start_token;
+		    continue;
+		}
 	    }
 
 	    plot_iterator = cleanup_iteration(plot_iterator);

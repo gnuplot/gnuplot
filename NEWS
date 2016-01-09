@@ -1,5 +1,9 @@
-Changes since 5.0.1
+Changes since 5.0.2
 ===================
+* NEW open-ended iteration over data:  plot for [i=1:*] datafile index i
+
+Changes in 5.0.2
+================
 * NEW support "set clip {one|two}" in 3D vector plots (splot ... with vectors)
 * CHANGE post.trm treats lt -1 as double width only when drawing the plot border
 * CHANGE distinguish between empty string variable and string constant ""

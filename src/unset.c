@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.206.2.7 2015/11/10 03:51:22 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.206.2.8 2015/12/29 19:11:04 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -152,8 +152,19 @@ unset_command()
     int i;
 
     c_token++;
+    save_token = c_token;
 
     set_iterator = check_for_iteration();
+    if (empty_iteration(set_iterator)) {
+	/* Skip iteration [i=start:end] where start > end */
+	while (!END_OF_COMMAND) c_token++;
+	set_iterator = cleanup_iteration(set_iterator);
+	return;
+    }
+    if (forever_iteration(set_iterator)) {
+	set_iterator = cleanup_iteration(set_iterator);
+	int_error(save_token, "unbounded iteration");
+    }
 
     found_token = lookup_table(&set_tbl[0],c_token);
 
