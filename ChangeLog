@@ -13,6 +13,18 @@
 	* src/pm3d.c: Account for interpolated quadrangles when applying a pm3d
 	lighting model.
 
+	The NeXT and OpenStep platforms per se are 15-20 yrs dead and gone.
+	Aquaterm is the evolutionary successor of openstep.
+
+	* src/NeXT src/OpenStep term/next.trm term/openstep.trm configure.ac
+	m4/next.m4: Remove the drivers proper.
+
+	* src/Makefile.am src/axis.h src/makefile.all src/makefile.awc
+	src/stdfn.h src/syscfg.h src/term.c src/term.h src/util.c
+	src/variable.c term/cgm.trm term/driver.h docs/Makefile.am
+	docs/doc2texi.el: Remove references to the next and openstep terminals
+	and remove code conditional on NEXT.
+
 2016-01-05  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/fit.c:  The fit command should gracefully accept data files known
