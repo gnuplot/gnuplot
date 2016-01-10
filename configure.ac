@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot on Unix.
 dnl
-dnl $Id: configure.ac,v 1.13 2015/07/15 05:11:44 sfeam Exp $
+dnl $Id: configure.ac,v 1.14 2016/01/09 19:13:23 sfeam Exp $
 dnl
 dnl this is actually major.minor ...
 dnl note that for a non-beta release, we need to disable DEVELOPMENT_RELEASE
@@ -184,15 +184,13 @@ AC_ARG_WITH(x-app-defaultdir,dnl
 dnl Operating systems.
 dnl FIXME AC_DEFINE(ISC22)
 dnl FIXME AC_DEFINE(KSR)
-dnl Check for MSDOS and djgpp, NeXT, Apple MacOsX (NeXT like), BeOS
+dnl Check for MSDOS and djgpp, Apple MacOsX, BeOS
 GP_MSDOS
-GP_NEXT
 GP_APPLE
 GP_BEOS
 GP_ALPHA
 AM_CONDITIONAL(BUILD_SRC_BEOS_SUBDIR, test x$build_beos_subdir = xyes)
 
-dnl Apparently, -lNeXT_s is needed on NeXT
 dnl _instead_ of -lm ...
 AC_CHECK_FUNC(sin,,[AC_CHECK_LIB(m,sin)])
 
@@ -245,8 +243,7 @@ if test "$enable_plugins" != no; then
 fi
 AM_CONDITIONAL(BUILD_PLUGIN, test "$have_external_functions" = yes)
 
-dnl check if unistd actually declares anything. On NeXT 3.2 unistd is
-dnl conditionalized for _POSIX_SOURCE
+dnl check if unistd actually declares anything.
 AC_MSG_CHECKING(for unistd.h)
 AC_EGREP_HEADER(execv, unistd.h,
   [AC_DEFINE(HAVE_UNISTD_H) AC_MSG_RESULT(yes)],

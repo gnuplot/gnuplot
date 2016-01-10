@@ -1,4 +1,4 @@
-/* $Id: driver.h,v 1.21 2004/08/21 20:57:54 sfeam Exp $ */
+/* $Id: driver.h,v 1.22 2006/10/08 21:11:08 sfeam Exp $ */
 
 /* GNUPLOT - driver.h */
 
@@ -56,15 +56,7 @@ extern FILE *gpoutfile;
 extern struct termentry *term;
 
 /* for use by all drivers */
-#ifndef NEXT
 #define sign(x) ((x) >= 0 ? 1 : -1)
-#else
-/* it seems that sign as macro causes some conflict with precompiled headers */
-static int sign(int x)
-{
-    return x >= 0 ? 1 : -1;
-}
-#endif /* NEXT */
 
 /* abs as macro is now uppercase, there are conflicts with a few C compilers
    that have abs as macro, even though ANSI defines abs as function
