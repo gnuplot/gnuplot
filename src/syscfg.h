@@ -1,5 +1,5 @@
 /*
- * $Id: syscfg.h,v 1.56 2014/07/28 22:16:27 sfeam Exp $
+ * $Id: syscfg.h,v 1.57 2014/12/16 22:49:34 broeker Exp $
  */
 
 /* GNUPLOT - syscfg.h */
@@ -60,12 +60,6 @@
  * PATHSEP:  [':'] Character which separates path names
  *
  */
-
-#if defined(__NeXT__) || defined(NEXT)
-# ifndef NEXT
-#  define NEXT
-# endif
-#endif /* NeXT */
 
 #ifdef OS2
 # define OS       "OS/2"

@@ -1,5 +1,5 @@
 /*
- * $Id: term.h,v 1.66 2014/03/19 23:36:07 sfeam Exp $
+ * $Id: term.h,v 1.67 2014/09/23 22:09:17 sfeam Exp $
  */
 
 /* GNUPLOT - term.h */
@@ -132,23 +132,6 @@
 # endif				/* _Windows */
 #endif /* MSDOS || _Windows */
 /****************************************************************************/
-
-
-/* NeXT */
-#ifdef NEXT
-# include "next.trm"
-#endif
-
-/* Apple Mac OS X Server 1.0 (Openstep Unix) */
-/* Apparently, Openstep code won't work on newer versions of
- * MacOS X. If someone can fix this, and provide a proper
- * configure test, let us know.
- */
-/*
- * #if defined(__APPLE__) && defined(__MACH__)
- * # include "openstep.trm"
- * #endif
-*/
 
 /* Apple Mac OS X */
 #ifdef HAVE_FRAMEWORK_AQUATERM

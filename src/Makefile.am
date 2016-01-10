@@ -83,7 +83,7 @@ SUBDIRS = $(d_beos) wxterminal qtterminal
 
 EXTRA_gnuplot_SOURCES = strftime.c vms.c
 
-EXTRA_DIST = GNUmakefile Makefile.maint NeXT OpenStep \
+EXTRA_DIST = GNUmakefile Makefile.maint \
 genopt.com gnuplot.opt x11.opt linkopt.vms \
 makefile.all makefile.awc os2 win \
 $(EXTRA_gnuplot_SOURCES)

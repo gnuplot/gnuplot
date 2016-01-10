@@ -298,8 +298,6 @@ Major contributors (alphabetic order):
 	"metapost"
 	"mgr"
 	"mif"
-	"next"
-	"openstep"
 	"pbm"
 	"pc"
 	"pdf"
@@ -451,11 +449,10 @@ particular conversion chore."
   '(("linux" "linux")
     ("canvas" "canvas")
     ("lua" "lua" "tikz")
-    ("mac" "mac" "openstep")
+    ("mac" "mac")
     ("beos" "be")
     ("dos" "emxvga" "djsvga" "fg" "pc")
     ("windows" "win")
-    ("next" "next")
     ("os2" "pm" "emxvga")
     ("sun" "sun")
     ("vms" "vws"))

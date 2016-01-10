@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: util.c,v 1.133 2015/08/03 18:32:51 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: util.c,v 1.134 2015/10/26 21:43:00 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - util.c */
@@ -253,42 +253,6 @@ token_len(int t_num)
 {
     return (size_t)(token[t_num].length);
 }
-
-#ifdef NEXT
-/*
- * quote_str() no longer has any callers in the core code.
- * However, it is called by the next/openstep terminal.
- */
-
-/*
- * quote_str() does the same thing as copy_str, except it ignores the
- *   quotes at both ends.  This seems redundant, but is done for
- *   efficency.
- */
-void
-quote_str(char *str, int t_num, int max)
-{
-    int i = 0;
-    int start = token[t_num].start_index + 1;
-    int count;
-
-    if ((count = token[t_num].length - 2) >= max) {
-	count = max - 1;
-	FPRINTF((stderr, "str buffer overflow in quote_str"));
-    }
-    if (count > 0) {
-	do {
-	    str[i++] = gp_input_line[start++];
-	} while (i != count);
-    }
-    str[i] = NUL;
-    /* convert \t and \nnn (octal) to char if in double quotes */
-    if (gp_input_line[token[t_num].start_index] == '"')
-	parse_esc(str);
-    else
-	parse_sq(str);
-}
-#endif
 
 /*
  * capture() copies into str[] the part of gp_input_line[] which lies between

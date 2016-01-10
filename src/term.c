@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.319 2015/12/30 18:30:56 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.320 2016/01/01 00:51:23 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -1542,7 +1542,7 @@ void
 init_terminal()
 {
     char *term_name = DEFAULTTERM;
-#if (defined(MSDOS) && !defined(_Windows)) || defined(NEXT) || defined(SUN) || defined(X11)
+#if (defined(MSDOS) && !defined(_Windows)) || defined(SUN) || defined(X11)
     char *env_term = NULL;      /* from TERM environment var */
 #endif
 #ifdef X11
@@ -1559,13 +1559,6 @@ init_terminal()
 #ifdef VMS
 	term_name = vms_init();
 #endif /* VMS */
-
-#ifdef NEXT
-	env_term = getenv("TERM");
-	if (term_name == (char *) NULL
-	    && env_term != (char *) NULL && strcmp(env_term, "next") == 0)
-	    term_name = "next";
-#endif /* NeXT */
 
 #ifdef __BEOS__
 	env_term = getenv("TERM");

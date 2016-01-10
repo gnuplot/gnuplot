@@ -1,5 +1,5 @@
 /*
- * $Id: axis.h,v 1.133 2015/11/10 02:50:39 sfeam Exp $
+ * $Id: axis.h,v 1.134 2015/12/19 21:45:35 sfeam Exp $
  *
  */
 
@@ -606,9 +606,7 @@ do {									  \
 					   NOAUTOSCALE, OUT_ACTION, UNDEF_ACTION, 1); \
 }
 
-/* Empty macro arguments triggered NeXT cpp bug       */
 /* #define NOOP (0) caused many warnings from gcc 3.2 */
-/* Now trying ((void)0) */
 #define NOOP ((void)0)
 
 /* HBB 20000506: new macro to automatically build initializer lists
