@@ -1,5 +1,5 @@
 #
-# $Id: makefile.os2,v 1.55 2014/08/15 19:25:13 sfeam Exp $
+# $Id: makefile.os2,v 1.56 2014/12/28 13:10:42 markisch Exp $
 #
 # GNUPLOT Makefile for use on OS/2 2.x (and above)
 # using emx 0.9 (and above) and GNU make
@@ -369,11 +369,6 @@ $(DOCDIR)\gnuplot.ms:   $(DOCDIR)\gnuplot.doc $(DOCDIR)\doc2ms.exe
 $(DOCDIR)\gnuplot.ipf:  $(DOCDIR)\gnuplot.doc $(DOCDIR)\doc2ipf.exe
 	$(DOCDIR)\doc2ipf.exe $(DOCDIR)\gnuplot.doc $@
 # Assume we need A4 format
-$(DOCDIR)\gpcard.ps: $(DOCDIR)\gpcard.dvi
-	cd $(DOCDIR) && $(DVIPS) -o gpcard_letter.ps $< 
-	cd $(DOCDIR) && psresize -pletter -Pa4 gpcard_letter.ps $@
-$(DOCDIR)\gpcard.dvi: $(DOCDIR)\gpcard.tex
-	cd $(DOCDIR) && $(PLAINTEX) gpcard.tex && $(PLAINTEX) gpcard.tex
 
 #
 # Tools for converting the documentation from docs\gnuplot.doc
@@ -451,7 +446,6 @@ veryclean: clean
 	if exist $(DOCDIR)\gnuplot.pdf     del $(DOCDIR)\gnuplot.pdf
 	if exist $(DOCDIR)\gnuplot.rtf     del $(DOCDIR)\gnuplot.rtf
 	if exist $(DOCDIR)\gnuplot.tex     del $(DOCDIR)\gnuplot.tex
-	if exist $(DOCDIR)\gpcard*.ps      del $(DOCDIR)\gpcard*.ps
 	if exist $(DOCDIR)\*.dvi           del $(DOCDIR)\*.dvi
 	if exist $(DOCDIR)\*.log           del $(DOCDIR)\*.log
 	if exist $(DOCDIR)\*.aux           del $(DOCDIR)\*.aux

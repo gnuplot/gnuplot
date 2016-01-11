@@ -1,5 +1,5 @@
 # Hello, emacs: this is a -*- Makefile -*-
-# $Id: Makefile,v 1.50 2014/12/15 20:28:10 markisch Exp $
+# $Id: Makefile,v 1.51 2014/12/28 13:10:06 markisch Exp $
 #
 # GNUPLOT Makefile for MinGW/MSYS on Windows
 # This assumes usual installation of the MinGW32 toolkit, the free
@@ -458,7 +458,7 @@ pipes:
 	$(MAKE) TARGET=wgnuplot_pipes.exe default
 
 docs:
-	$(MAKE) TARGET=gnuplot.exe gnuplot.pdf gpcard.pdf tutorial.pdf \
+	$(MAKE) TARGET=gnuplot.exe gnuplot.pdf tutorial.pdf \
 		ps_symbols.pdf ps_fontfile_doc.pdf ps_guide.pdf
 
 support: $(HELPFILE) $(M)bf_test.exe $(QT_TARGET) $(QT_TRANSLATION) demo_plugin.dll $(LUATARGETS) $(HELPFILEJA)
@@ -777,10 +777,6 @@ tutorial.pdf: $(TUT)/eg1.plt $(TUT)/eg2.plt $(TUT)/eg3.plt $(TUT)/eg4.plt \
 	TEXINPUTS=.:$(TUT) latex tutorial.tex
 	dvipdfm tutorial.dvi
 
-gpcard.pdf: $(D)gpcard.tex
-	TEXINPUTS=$(TOP):$(D):${TEXINPUTS}: tex gpcard.tex
-	dvipdfm gpcard.dvi
-
 ps_symbols.pdf: $(D)psdoc/ps_symbols.gpi
 	GNUPLOT_LIB=$(D)psdoc GNUPLOT_PS_DIR=$(T)PostScript $(TARGET) ps_symbols.gpi
 	ps2pdf ps_symbols.ps
@@ -820,7 +816,7 @@ veryclean: clean
 	$(RM) gnuplot_qt.exe qtgnuplot_*.qm
 	$(RM) $(HELPFILE) $(HELPFILEJA) wgnuplot.chw wgnuplot.gid wgnuplot.mnu
 	$(RM) gnuplot.ps gnuplot.pdf
-	$(RM) gpcard.pdf tutorial.pdf
+	$(RM) tutorial.pdf
 	$(RM) ps_fontfile_doc.pdf ps_fontfile_doc.ps ps_guide.pdf
 	$(RM) ps_symbols.ps ps_symbols.pdf
 	$(RM) $(M)binary[123] $(M)fit.log $(M)soundfit.par
@@ -898,7 +894,6 @@ endif
 	mkdir -p $(DESTDIR)/docs
 	-cp -p gnuplot.pdf $(DESTDIR)/docs/
 	cp -p $(TOP)/FAQ.pdf $(DESTDIR)/docs/
-	-cp -p gpcard.pdf $(DESTDIR)/docs/
 	-cp -p tutorial.pdf $(DESTDIR)/docs/
 	mkdir -p $(DESTDIR)/docs/psdoc
 	cp -p $(D)psdoc/ps_file.doc $(DESTDIR)/docs/psdoc/ps_file_doc.txt

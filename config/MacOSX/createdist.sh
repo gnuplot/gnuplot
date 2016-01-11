@@ -89,10 +89,6 @@ else
     (
 	cd $SRC_DIR/docs
 	make pdf
-	make gpcard.ps
-	dvipdfm -p a4 -x 1.25in gpcard.dvi
-        # cd psdocs
-        # make pdf
     )
     (
 	cd $SRC_DIR/tutorial
@@ -100,7 +96,7 @@ else
     )
 
     echo "Copying docs to $DMGROOT/Docs"
-    cp $SRC_DIR/docs/{gnuplot,gpcard}.pdf $DMG_ROOT/Docs/.
+    cp $SRC_DIR/docs/gnuplot.pdf $DMG_ROOT/Docs/.
     cp $SRC_DIR/tutorial/tutorial.pdf $DMG_ROOT/Docs/gnuplot_LateX_tutorial.pdf
     cp $SRC_DIR/{FAQ,README,Copyright} $DMG_ROOT/Docs/.
 fi ## skip build
