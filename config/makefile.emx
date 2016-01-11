@@ -1,5 +1,5 @@
 #
-# $Id: makefile.emx,v 1.10 2013/10/25 03:10:27 sfeam Exp $
+# $Id: makefile.emx,v 1.11 2014/09/23 22:09:16 sfeam Exp $
 #
 # GNUPLOT Makefile for use with emx-0.8f/gcc and ndmake 4.5 on MS-DOS
 #
@@ -34,7 +34,7 @@ CSOURCE5 = term/dumb.trm term/dxf.trm term\dxy.trm \
 	term\hp2648.trm term\hpgl.trm term\hpljii.trm 
 CSOURCE6 = term\impcodes.h term\imagen.trm term\object.h \
 	term\kyo.trm term\latex.trm term/pbm.trm term\pm.trm 
-CSOURCE7 = term\post.trm term\qms.trm term\regis.trm term\sun.trm \
+CSOURCE7 = term\post.trm term\qms.trm term\regis.trm \
 	term\t410x.trm term\tek.trm term\x11.trm term\emxvga.trm
 CSOURCE8 = contour.c
 

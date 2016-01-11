@@ -1,5 +1,5 @@
 /*
- * $Id: term.h,v 1.67 2014/09/23 22:09:17 sfeam Exp $
+ * $Id: term.h,v 1.68 2016/01/10 00:41:13 sfeam Exp $
  */
 
 /* GNUPLOT - term.h */
@@ -39,8 +39,7 @@
  *   Edit this file depending on the set of terminals you wish to support.
  * Comment out the terminal types that you don't want or don't have, and
  * uncomment those that you want included. Be aware that some terminal
- * types (eg, SUN) will require changes in the makefile
- * LIBS definition.
+ * types will require changes in the makefile LIBS definition.
  */
 
 /*
@@ -163,11 +162,6 @@
 #  include "vgagl.trm"
 # endif
 #endif /* LINUXVGA */
-
-/* SunView */
-#ifdef SUN
-# include "sun.trm"
-#endif
 
 
 /* VAX Windowing System requires UIS libraries */

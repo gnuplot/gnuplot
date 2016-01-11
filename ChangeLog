@@ -1,3 +1,13 @@
+2016-01-11  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/sun.trm: The SunView windowing system was phased out after
+	Solaris 2.2 (end of life 1999). Remove the corresponding terminal
+	from the gnuplot distribution.
+	
+	* configure.ac configure.vms config/makefile.dj2 config/makefile.emx
+	docs/doc2texi.el docs/Makefile.am PORTING src/makefile.all
+	src/makefile.awc src/term.c src/term.h:  Remove references to sun.trm.
+
 2016-01-09  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/qtterminal/qt_term.cpp: "set term qt <num> title 'foo'" was 

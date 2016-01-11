@@ -143,7 +143,6 @@ of devices that may be selected/deselected by editing term.h.
    MF          Metafont Format
    MIF         FrameMaker MIF 3.00 Format
    NEC         NEC CP6 pinwriter printer
-   NEXT        NeXTStep Window System (only grey scale)
    OS2PM       OS/2 Presentation Manager
    PBM         PBMPLUS pbm, pgm, ppm formats
    PCL         HP PCL5 (actually  HPGL/2)
@@ -154,7 +153,6 @@ of devices that may be selected/deselected by editing term.h.
    QMS         QMS/QUIC laserprinter (Talaris 1200 and others)
    REGIS       ReGis graphics (vt125, vt220, vt240, Gigis...)
    SELANAR     Selanar
-   SUN         Sun Microsystems Workstation
    T410X       Tektronix 4106, 4107, 4109 and 420x terminals
    TABLE       Text output
    TANDY60     Tandy DMP-130 series 60-dot per inch graphics

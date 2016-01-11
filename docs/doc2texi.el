@@ -307,7 +307,6 @@ Major contributors (alphabetic order):
 	"pstricks"
 	"qms"
 	"regis"
-	"sun"
 	"svg"
 	"t410x"
 	"table"
@@ -454,7 +453,6 @@ particular conversion chore."
     ("dos" "emxvga" "djsvga" "fg" "pc")
     ("windows" "win")
     ("os2" "pm" "emxvga")
-    ("sun" "sun")
     ("vms" "vws"))
 
   "Additional terminals to add to the converted gnuplot.info file.

@@ -22,7 +22,7 @@ $(T)hppj.trm $(T)imagen.trm $(T)kyo.trm $(T)latex.trm $(T)linux.trm &
 $(T)lua.trm $(T)metafont.trm $(T)metapost.trm $(T)mif.trm &
 $(T)pbm.trm $(T)pc.trm $(T)pdf.trm $(T)pm.trm &
 $(T)post.trm $(T)pslatex.trm $(T)pstricks.trm $(T)qms.trm $(T)qt.trm &
-$(T)regis.trm $(T)sun.trm $(T)svg.trm $(T)t410x.trm $(T)tek.trm &
+$(T)regis.trm $(T)svg.trm $(T)t410x.trm $(T)tek.trm &
 $(T)texdraw.trm $(T)tgif.trm $(T)tkcanvas.trm $(T)tpic.trm &
 $(T)vgagl.trm $(T)vws.trm $(T)win.trm $(T)wxt.trm $(T)x11.trm $(T)xlib.trm
 

@@ -328,7 +328,6 @@ $ ! READLINE = 0    ! READLINE is defined above
 $ HAVE_LIBGD = 0
 $ HAVE_LIBPNG = 0
 $ CGI = 0
-$ SUN = 0
 $ NOCWDRC = 0
 $ THIN_PLATE_SPLINES_GRID = 0
 $ COLUMN_HELP = 0

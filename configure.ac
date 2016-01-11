@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot on Unix.
 dnl
-dnl $Id: configure.ac,v 1.14 2016/01/09 19:13:23 sfeam Exp $
+dnl $Id: configure.ac,v 1.15 2016/01/10 00:42:32 sfeam Exp $
 dnl
 dnl this is actually major.minor ...
 dnl note that for a non-beta release, we need to disable DEVELOPMENT_RELEASE
@@ -783,18 +783,6 @@ if test "$with_caca" != no; then
 fi
 dnl end caca
 
-dnl Sun sunview
-AC_EGREP_CPP(yes,
-[#ifdef sun
-yes
-#endif
-],[AC_CHECK_LIB(suntool, window_create,
-     [AC_CHECK_HEADER(suntool/sunview.h,
-        [AC_DEFINE(SUN,1,
-                   [ Define if you want to use the sunview terminal (sun). ])
-         TERMLIBS="-lsuntool -lsunwindow -lpixrect $TERMLIBS"])],,
-    [-lsunwindow -lpixrect])])
-
 dnl Process rest of with and enable options
 
 dnl Use .gnuplot file in current directory
@@ -1489,7 +1477,7 @@ AC_MSG_RESULT([])
 AC_MSG_RESULT([  Additional platform-specific or older terminals omitted by default:])
 AC_MSG_RESULT([   gpic, mif (FrameMaker 3), hp2623a, hp2648, imagen, kyocera ])
 AC_MSG_RESULT([   pm (makefile.os2), be (BeOS), svga (MSDOS/djgpp)])
-AC_MSG_RESULT([   sun, windows (several options)])
+AC_MSG_RESULT([   windows (several options)])
 
 AC_MSG_RESULT([])
 AC_MSG_RESULT([gnuplot will be compiled with the following configurable features:])
