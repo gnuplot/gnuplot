@@ -76,7 +76,7 @@ TERM_H = $(top_srcdir)/src/term.h
 DOCHEADERS = doc2x.h xref.h
 
 EXTRA_DIST = Makefile.in doc2texi.el figure_missing.pdf gnuplot.doc \
-gpcard.tex makefile.dst titlepag.ipf titlepag.ms titlepag.tex	\
+titlepag.ipf titlepag.ms titlepag.tex	\
 toc_entr.sty psdoc faq-ja.tex gnuplot-ja.doc README.ja	\
 term-ja.diff plotstyles.gnu gnuplot.pdf windows
 
@@ -86,10 +86,10 @@ MOSTLYCLEANFILES = gnuplot.aux gnuplot.ind gnuplot.log gnuplot.out	\
 gnuplot.toc figures.aux figures.log figures.toc figures.idx		\
 figures.ilg figures.ind figures.out nofigures.aux nofigures.log		\
 nofigures.toc nofigures.idx nofigures.ilg nofigures.ind nofigures.out	\
-gpcard.log pdffigures.tex pdffigures.aux wxhelp/doc2html.o
+pdffigures.tex pdffigures.aux wxhelp/doc2html.o
 
 CLEANFILES = allterm.h gnuplot.dvi figures.tex nofigures.tex		\
-gnuplot.tex gnuplot.idx gnuplot.ilg gnuplot.ps gpcard.dvi gpcard.ps	\
+gnuplot.tex gnuplot.idx gnuplot.ilg gnuplot.ps 	\
 gnuplot.gih gnuplot.hlp gnuplot.info* gnuplot.ipf gnuplot.ms		\
 gnuplot.rnh gnuplot.rtf gnuplot.nroff gnuplot.txt gnuplot-groff.dvi	\
 gnuplot-groff.ps gnuplot.tmp VERSION gnuplot.4tc gnuplot.4ct		\
@@ -240,16 +240,9 @@ gnuplot.dvi: gnuplot.tex $(srcdir)/titlepag.tex $(srcdir)/toc_entr.sty
 	  echo "latex not found - cannot build dvi file" ; \
 	fi
 
-gpcard.dvi: $(srcdir)/gpcard.tex
-	$(AM_V_GEN)if test $(PLAINTEX) != no ; then \
-              TEXINPUTS=.:$(srcdir):$(top_srcdir): tex gpcard ; \
-	else \
-	  echo "plaintex not found - cannot build dvi file" ; \
-	fi
-
 ### Postscript format
 # if pslatex has been installed, add "times" to titlepage.tex
-ps: gnuplot.ps gpcard.ps
+ps: gnuplot.ps
 
 gnuplot.ps: gnuplot.dvi
 	$(AM_V_GEN)if test $(DVIPS) != no ; then \
@@ -257,14 +250,6 @@ gnuplot.ps: gnuplot.dvi
 	else \
 	   echo "dvips not found - cannot build PS file" ; \
 	fi
-
-gpcard.ps: gpcard.dvi
-	$(AM_V_GEN)if test $(DVIPS) != no ; then \
-            $(DVIPS) gpcard.dvi -o gpcard.ps ; \
-	else \
-	   echo "dvips not found - cannot build PS file" ; \
-	fi
-
 
 # this is how to make gnuplot.hlp
 hlp: gnuplot.hlp

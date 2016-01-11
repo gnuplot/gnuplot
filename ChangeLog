@@ -8,6 +8,11 @@
 	docs/doc2texi.el docs/Makefile.am PORTING src/makefile.all
 	src/makefile.awc src/term.c src/term.h:  Remove references to sun.trm.
 
+	* docs/gpcard.tex (move to subdirectory docs/old/) Makefile.am:
+	gpcard is horribly out of date to the point of holding only historical
+	interest.  Remove it from the build rules.  Also remove makefile.dst
+	which was superseded by autotools + Makefile.am 15 years ago.
+
 2016-01-09  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/qtterminal/qt_term.cpp: "set term qt <num> title 'foo'" was 
