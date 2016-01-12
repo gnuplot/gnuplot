@@ -1,5 +1,5 @@
 /* -*- objc -*-
- * $Id: aquaterm.trm,v 1.52 2015/02/25 00:23:14 sfeam Exp $
+ * $Id: aquaterm.trm,v 1.53 2015/08/07 23:55:19 sfeam Exp $
  *
  */
 
@@ -49,6 +49,7 @@ TERM_PUBLIC void AQUA_graphics __PROTO((void));
 TERM_PUBLIC void AQUA_move __PROTO((unsigned int x, unsigned int y));
 TERM_PUBLIC void AQUA_vector __PROTO((unsigned int x, unsigned int y));
 TERM_PUBLIC void AQUA_linetype __PROTO((int linetype));
+TERM_PUBLIC void AQUA_dashtype(int type, t_dashtype *custom_dash_type);
 TERM_PUBLIC void AQUA_put_text __PROTO((unsigned int x, unsigned int y,const char *str));
 /* Optional entries */
 TERM_PUBLIC int AQUA_text_angle __PROTO((int));
@@ -471,6 +472,44 @@ AQUA_linetype(int linetype)
 	      dash[i] = AQUA_dashPatterns[style][i] * AQUA_dashlength_factor;
 	   }
        [adapter setLinestylePattern:dash count:AQUA_dashPatternLengths[style] phase:0.0];
+    }
+  }
+}
+
+TERM_PUBLIC void
+AQUA_dashtype(int type, t_dashtype *custom_dash_type)
+{
+  float dash[DASHPATTERN_LENGTH];
+  int i;
+  LOG(@"AQUA_dashtype(%d)", type);
+
+  if(!AQUA_dashedlines) {
+    return;
+  }
+  switch(type) {
+  case DASHTYPE_SOLID:
+    [adapter setLinestyleSolid];
+    break;
+  case DASHTYPE_AXIS:
+    break;
+  case DASHTYPE_CUSTOM:
+    if (custom_dash_type) {
+      for(i = 0; i < DASHPATTERN_LENGTH && custom_dash_type->pattern[i] > 0; i++) {
+	dash[i] = custom_dash_type->pattern[i] * AQUA_dashlength_factor;
+      }
+      [adapter setLinestylePattern:dash count:i phase:0.0];
+    }
+    break;
+  default:
+    if(type > 0) {
+      type %= AQUA_DASH_PATTERNS;
+      for(i = 0; i<AQUA_dashPatternLengths[type]; i++) {
+	dash[i] = AQUA_dashPatterns[type][i] * AQUA_dashlength_factor;
+      }
+      [adapter setLinestylePattern:dash count:AQUA_dashPatternLengths[type] phase:0.0];
+    }
+    else {
+      [adapter setLinestyleSolid];
     }
   }
 }
@@ -928,7 +967,10 @@ TERM_TABLE_START(aqua_driver)
   AQUA_set_color,
   AQUA_filled_polygon,
   AQUA_image,
-  ENHAQUA_open, ENHAQUA_flush, ENHAQUA_writec
+  ENHAQUA_open, ENHAQUA_flush, ENHAQUA_writec,
+  0 /* layer */ , 0 /* path */ , 0.0 /* tscale */ , 0 /* hypertext */,
+  0 /* boxed_text */ , 0 /* modify_plots */,
+  AQUA_dashtype
 TERM_TABLE_END(aqua_driver)
 
 #undef LAST_TERM

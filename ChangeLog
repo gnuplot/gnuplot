@@ -1,3 +1,7 @@
+2016-01-12  Jun Takimoto <takimoto-j@kba.biglobe.ne.jp>
+
+	* term/aquaterm.trm: Add support for version 5 custom dashtypes.
+
 2016-01-11  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/sun.trm: The SunView windowing system was phased out after
