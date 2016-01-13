@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.973 2015/12/21 20:08:40 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.974 2015/12/31 04:26:32 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -12439,8 +12439,7 @@ Ffigure_missing
 ?unset tics
 ?show tics
 ?tics
- Control of the labeled tics on all axes at once is possible with the
- `set tics` command.
+ The `set tics` command controls the tic marks and labels on all axes at once.
 
  The tics may be turned off with the `unset tics` command, and may be turned on
  (the default state) with `set tics`.  Fine control of tics on individual axes
@@ -12460,6 +12459,9 @@ Ffigure_missing
  The options can be applied to a single axis (x, y, z, x2, y2, cb), e.g.
        set xtics rotate by -90
        unset cbtics
+
+ All tic marks are drawn using the same line properties as the plot border
+ (see `set border`).
 
  Set tics `back` or `front` applies to all axes at once, but only for 2D plots
  (not splot).  It controls whether the tics are placed behind or in front of
