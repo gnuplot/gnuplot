@@ -1,3 +1,11 @@
+2016-01-14  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/eval.c (real) src/standard.c (f_int):  Special case handling of
+	NaN or undefined values during expression evaluation was lost if the
+	expression passed through an intermediate integer value. For example
+	int(NaN) evaluated to "-2147483648" rather than "NaN" or "undefined".
+	Add special case checks to the integer evaluation path.
+
 2016-01-12  Jun Takimoto <takimoto-j@kba.biglobe.ne.jp>
 
 	* term/aquaterm.trm: Add support for version 5 custom dashtypes.

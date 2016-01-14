@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: standard.c,v 1.32 2012/07/24 15:42:23 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: standard.c,v 1.33 2015/01/20 02:10:43 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - standard.c */
@@ -692,9 +692,14 @@ void
 f_int(union argument *arg)
 {
     struct value a;
-
+    double foo = real(pop(&a));
     (void) arg;			/* avoid -Wunused warning */
-    push(Ginteger(&a, (int) real(pop(&a))));
+
+    if (a.type == NOTDEFINED || isnan(foo)) {
+	push(Gcomplex(&a, not_a_number(), 0.0));
+	undefined = TRUE;
+    } else
+	push(Ginteger(&a, (int)foo));
 }
 
 #define BAD_DEFAULT default: int_error(NO_CARET, "internal error : argument neither INT or CMPLX")

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: eval.c,v 1.127 2015/07/15 18:30:16 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: eval.c,v 1.128 2015/08/21 20:45:03 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - eval.c */
@@ -266,6 +266,8 @@ real(struct value *val)
 	return (val->v.cmplx_val.real);
     case STRING:              /* is this ever used? */
 	return (atof(val->v.string_val));
+    case NOTDEFINED:
+	return not_a_number();
     default:
 	int_error(NO_CARET, "unknown type in real()");
     }
