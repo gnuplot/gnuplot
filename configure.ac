@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot on Unix.
 dnl
-dnl $Id: configure.ac,v 1.15 2016/01/10 00:42:32 sfeam Exp $
+dnl $Id: configure.ac,v 1.16 2016/01/11 18:51:38 sfeam Exp $
 dnl
 dnl this is actually major.minor ...
 dnl note that for a non-beta release, we need to disable DEVELOPMENT_RELEASE
@@ -17,6 +17,8 @@ AM_MAINTAINER_MODE
 
 VERSION_MAJOR="`cat $srcdir/VERSION`"
 PATCHLEVEL="`cat $srcdir/PATCHLEVEL`"
+AC_DEFINE_UNQUOTED(VERSION_MAJOR,["$VERSION_MAJOR"],[The main version number])
+AC_DEFINE_UNQUOTED(PATCHLEVEL,["$PATCHLEVEL"],[The patch level, a.k.a. micro version number])
 
 dnl configure.in body
 
@@ -1280,6 +1282,7 @@ dnl Substitute variables
 AC_SUBST(PACKAGE)
 AC_SUBST(VERSION_MAJOR)
 AC_SUBST(VERSION)
+AC_SUBST(PATCHLEVEL)
 AC_SUBST(GIHDIR)
 AC_SUBST(TEXDIR)
 AC_SUBST(LINUXSUID)

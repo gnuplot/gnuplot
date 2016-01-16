@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: doc2html.c,v 1.7 2014/12/14 22:00:41 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: doc2html.c,v 1.8 2015/05/31 03:43:49 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - doc2html.c */
@@ -168,7 +168,7 @@ convert(FILE *a, FILE *b, FILE *c, FILE *d)
     static char line[MAX_LINE_LEN+1];
 
     header(b, "gnuplot help");
-    fprintf(b, "<h1 align=\"center\">gnuplot %s patchlevel %s</h1>\n", gnuplot_version, gnuplot_patchlevel);
+    fprintf(b, "<h1 align=\"center\">gnuplot %s patchlevel %s</h1>\n", VERSION_MAJOR, PATCHLEVEL);
 
     header(c, "gnuplot help contents");
     fprintf(c, "<ul>\n");

@@ -1,3 +1,20 @@
+2016-01-16  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	Fix "make distclean" problems caused by a bug in automake, which
+	in turn is triggered by docs/doc2wxhtml requring src/version.c.
+
+	* configure.ac (VERSION_MAJOR, PATCHLEVEL): Export these from
+	shell scripts to config.h.
+	(PATCHLEVEL): Export to configure script.
+
+	* docs/windows/doc2html.c (convert): Replace references to
+	version.c constants by macros in config.h.
+
+	* docs/Makefile.am (doc2wxhtml_SOURCES): Remove use of version.c.
+
+	* term/djsvga.trm (DJSVGA_set_font): Somebody overlooked this call
+	of graph_error.
+
 2016-01-14  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/eval.c (real) src/standard.c (f_int):  Special case handling of
