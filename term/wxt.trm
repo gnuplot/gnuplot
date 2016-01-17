@@ -1,5 +1,5 @@
 /*
- * $Id: wxt.trm,v 1.44 2015/07/13 17:54:44 sfeam Exp $
+ * $Id: wxt.trm,v 1.45 2015/12/29 19:03:33 sfeam Exp $
  */
 
 /* GNUPLOT - wxt.trm */
@@ -179,8 +179,9 @@ TERM_PUBLIC void wxt_options()
 				sep = strcspn(s,",");
 				if (sep > 0) {
 					s[sep] = '\0';
-					sscanf(&(s[sep+1]), "%d", &wxt_set_fontsize);
 				}
+				if (s[sep] == ',')
+					sscanf(&(s[sep+1]), "%d", &wxt_set_fontsize);
 				free(wxt_set_fontname);
 				wxt_set_fontname = gp_strdup(s);
 			} else {

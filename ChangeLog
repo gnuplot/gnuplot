@@ -5,6 +5,10 @@
 	(in this case plot->x_axis and friends). 
 	Bug #1718
 
+	* term/wxt.trm (wxt_options):  Fix regression, fontsize ignored if it
+	is the only thing in the requested font string (e.g. font ",12").
+	Bug #1731
+
 2016-01-16  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	Fix "make distclean" problems caused by a bug in automake, which
