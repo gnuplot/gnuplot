@@ -1,3 +1,9 @@
+2016-01-17  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/wxt.trm (wxt_options):  Fix regression, fontsize ignored if it
+	is the only thing in the requested font string (e.g. font ",12").
+	Bug #1731
+
 2016-01-12  Jun Takimoto <takimoto-j@kba.biglobe.ne.jp>
 
 	* term/aquaterm.trm: Add support for version 5 custom dashtypes.
