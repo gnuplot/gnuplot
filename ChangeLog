@@ -1,3 +1,10 @@
+2016-01-17  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/graphics.c (process_image): This routine handles both 2D and 3D
+	images so it must not try to access fields only present in the 2D case
+	(in this case plot->x_axis and friends). 
+	Bug #1718
+
 2016-01-16  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	Fix "make distclean" problems caused by a bug in automake, which
@@ -84,7 +91,7 @@
 2016-01-04  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/wxterminal/wxt_gui.cpp:  Several components of the gtk2 API have
-	been deprecated, which prevents compiling thw wxt terminal using wxt3
+	been deprecated, which prevents compiling the wxt terminal using wxt3
 	or indeed recent versions of gtk2.
 	1) Replace handle->window with gtk_widget_get_window(handle).
 	2) gdk_window_foreign_new() (used only by --enable-raise-console) no

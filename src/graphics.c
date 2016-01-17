@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.507 2015/11/02 20:38:10 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.508 2015/11/10 02:50:39 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -4277,7 +4277,10 @@ process_image(void *plot, t_procimg_action action)
     double view_port_y[2];
     double view_port_z[2] = {0,0};
     t_imagecolor pixel_planes;
+
+    /* Detours necessary to handle 3D plots */
     TBOOLEAN project_points = FALSE;		/* True if 3D plot */
+    int image_x_axis, image_y_axis, image_z_axis;
 
     if ((((struct surface_points *)plot)->plot_type == DATA3D)
     ||  (((struct surface_points *)plot)->plot_type == FUNC3D))
@@ -4289,12 +4292,18 @@ process_image(void *plot, t_procimg_action action)
 	pixel_planes = ((struct surface_points *)plot)->image_properties.type;
 	ncols = ((struct surface_points *)plot)->image_properties.ncols;
 	nrows = ((struct surface_points *)plot)->image_properties.nrows;
+	image_x_axis = FIRST_X_AXIS;
+	image_y_axis = FIRST_Y_AXIS;
+	image_z_axis = FIRST_Z_AXIS;	/* FIXME:  Not sure this is correct */
     } else {
 	points = ((struct curve_points *)plot)->points;
 	p_count = ((struct curve_points *)plot)->p_count;
 	pixel_planes = ((struct curve_points *)plot)->image_properties.type;
 	ncols = ((struct curve_points *)plot)->image_properties.ncols;
 	nrows = ((struct curve_points *)plot)->image_properties.nrows;
+	image_x_axis = ((struct curve_points *)plot)->x_axis;
+	image_y_axis = ((struct curve_points *)plot)->y_axis;
+	image_z_axis = ((struct curve_points *)plot)->z_axis;
     }
 
     if (p_count < 1) {
@@ -4319,9 +4328,9 @@ process_image(void *plot, t_procimg_action action)
      * function for images will be used.  Otherwise, the terminal function for
      * filled polygons are used to construct parallelograms for the pixel elements.
      */
-#define GRIDX(X) AXIS_DE_LOG_VALUE(((struct curve_points *)plot)->x_axis,points[X].x)
-#define GRIDY(Y) AXIS_DE_LOG_VALUE(((struct curve_points *)plot)->y_axis,points[Y].y)
-#define GRIDZ(Z) AXIS_DE_LOG_VALUE(((struct curve_points *)plot)->z_axis,points[Z].z)
+#define GRIDX(X) AXIS_DE_LOG_VALUE(image_x_axis,points[X].x)
+#define GRIDY(Y) AXIS_DE_LOG_VALUE(image_y_axis,points[Y].y)
+#define GRIDZ(Z) AXIS_DE_LOG_VALUE(image_z_axis,points[Z].z)
 
     if (project_points) {
 	map3d_xy_double(points[0].x, points[0].y, points[0].z, &p_start_corner[0], &p_start_corner[1]);
@@ -4393,10 +4402,10 @@ process_image(void *plot, t_procimg_action action)
 
 	    /* Update range and store value back into itself. */
 	    dummy_type = INRANGE;
-	    STORE_WITH_LOG_AND_UPDATE_RANGE(x, x, dummy_type, ((struct curve_points *)plot)->x_axis,
+	    STORE_WITH_LOG_AND_UPDATE_RANGE(x, x, dummy_type, image_x_axis,
 				((struct curve_points *)plot)->noautoscale, NOOP, x = -VERYLARGE);
 	    dummy_type = INRANGE;
-	    STORE_WITH_LOG_AND_UPDATE_RANGE(y, y, dummy_type, ((struct curve_points *)plot)->y_axis,
+	    STORE_WITH_LOG_AND_UPDATE_RANGE(y, y, dummy_type, image_y_axis,
 				((struct curve_points *)plot)->noautoscale, NOOP, y = -VERYLARGE);
 	}
 	return;
