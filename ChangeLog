@@ -1,3 +1,11 @@
+2016-01-18  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/plot2d.c (refresh_bounds):  The intent of this routine is to keep
+	the previous axis range if the user has not changed autoscale settings.
+	It wasn't working.  I'm not sure the revised code is doing quite the
+	right thing either, but at least it correcly handles the test case in
+	Bug #1709.
+
 2016-01-17  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c (process_image): This routine handles both 2D and 3D
