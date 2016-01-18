@@ -1,3 +1,22 @@
+2016-01-18  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/term_api.h src/gadgets.h:  Move definition of struct t_image
+	from term_api.h (no terminals use it) to gadgets.h (2D and 3D plots).
+
+	* src/datafile.c src/graphics.c (plot_image_or_update_axes):
+	Remove old code that tried to empirically determine the grid size of
+	an image based on 3D coords.  Backport v5.1 bookkeeping that stores
+	dimensions in plot->image_properties.{ncols,nrows} when image data is
+	read in.
+
+	* src/plot2d.c (refresh_bounds): The intent of this routine is to keep
+	the previous axis range if the user has not changed autoscale settings.
+	It wasn't working.  I'm not sure the revised code is doing quite the
+	right thing either, but at least it correcly handles Bug #1709.
+
+	These changes are back-ported from version 5.1 to address
+	Bugs #1607 #1703 #1709 #1718
+
 2016-01-17  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/wxt.trm (wxt_options):  Fix regression, fontsize ignored if it

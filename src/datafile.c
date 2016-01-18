@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.290.2.16 2015/10/01 03:38:34 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.290.2.17 2015/10/31 23:38:32 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -294,6 +294,11 @@ static double df_pseudovalue_1 = 0;
 /* for datablocks */
 static TBOOLEAN df_datablock = FALSE;
 static char **df_datablock_line = NULL;
+
+/* track dimensions of input matrix/array/image */
+static unsigned int df_xpixels;
+static unsigned int df_ypixels;
+static TBOOLEAN df_transpose;
 
 /* parsing stuff */
 struct use_spec_s use_spec[MAXDATACOLS];
@@ -1070,6 +1075,10 @@ df_open(const char *cmd_filename, int max_using, struct curve_points *plot)
     df_matrix_rowheaders = FALSE;
     df_skip_at_front = 0;
 
+    df_xpixels = 0;
+    df_ypixels = 0;
+    df_transpose = FALSE;
+
     df_eof = 0;
 
     /* Save for use by df_readline(). */
@@ -1258,6 +1267,31 @@ df_open(const char *cmd_filename, int max_using, struct curve_points *plot)
     df_datablock = FALSE;
     df_datablock_line = NULL;
 
+    if (plot) {
+
+	/* Save the matrix/array/image dimensions for binary image plot styles	*/
+	plot->image_properties.ncols = df_xpixels;
+	plot->image_properties.nrows = df_ypixels;
+	FPRINTF((stderr,"datafile.c:%d (ncols,nrows) set to (%d,%d)\n", __LINE__,
+		df_xpixels, df_ypixels));
+
+	if (set_every) {
+	    plot->image_properties.ncols = 1 + 
+		    ((int)(GPMIN(lastpoint,df_xpixels-1)) - firstpoint) / everypoint;
+	    plot->image_properties.nrows = 1 +
+		    ((int)(GPMIN(lastline,df_ypixels-1)) - firstline) / everyline;
+	    FPRINTF((stderr,"datafile.c:%d  adjusting to (%d, %d)\n", __LINE__,
+		    plot->image_properties.ncols, plot->image_properties.nrows));
+	}
+	if (df_transpose) {
+	    unsigned int temp = plot->image_properties.ncols;
+	    plot->image_properties.ncols = plot->image_properties.nrows;
+	    plot->image_properties.nrows = temp;
+	    FPRINTF((stderr,"datafile.c:%d  adjusting to (%d, %d)\n", __LINE__,
+		    plot->image_properties.ncols, plot->image_properties.nrows));
+	}
+    }
+
     /* here so it's not done for every line in df_readline */
     if (max_line_len < DATA_LINE_BUFSIZ) {
 	max_line_len = DATA_LINE_BUFSIZ;
@@ -1340,8 +1374,18 @@ df_open(const char *cmd_filename, int max_using, struct curve_points *plot)
      * ASCII matrix form, read in all the data to memory in preparation
      * for using df_readbinary() routine.
      */
-    if (df_matrix_file)
+    if (df_matrix_file) {
 	df_determine_matrix_info(data_fp);
+
+	/* Image size bookkeeping for ascii uniform matrices */
+	/* NB: If we're inside a 'stats' command there is no plot */
+	if (!df_binary_file && plot) {
+	    plot->image_properties.ncols = df_xpixels;
+	    plot->image_properties.nrows = df_ypixels;
+	    FPRINTF((stderr,"datafile.c:%d  ascii uniform matrix dimensions %d x %d \n",
+		    __LINE__, df_xpixels, df_ypixels));
+	}
+    }    
 
     /* General binary, matrix binary and ASCII matrix all use the
      * df_readbinary() routine.
@@ -2352,6 +2396,10 @@ df_determine_matrix_info(FILE *fin)
 		df_bin_record[index].scan_dim[1] = nr;
 		df_bin_record[index].scan_dim[2] = 0;
 		df_bin_file_endianess = THIS_COMPILER_ENDIAN;
+
+		/* Save matrix dimensions in case it contains an image */
+		df_xpixels = nc;
+		df_ypixels = nr;
 
 		/* This matrix is the one (and only) requested by name.	*/
 		/* Dummy up index range and skip rest of file.		*/
@@ -3406,8 +3454,13 @@ plot_option_binary(TBOOLEAN set_matrix, TBOOLEAN set_default)
 	    }
 
 	    /* Unless only querying settings, call the routine to prep binary data parameters. */
-	    if (df_plot_mode != MODE_QUERY)
+	    if (df_plot_mode != MODE_QUERY) {
 		(*binary_input_function)();
+		df_xpixels = df_bin_record[0].scan_dim[0];
+		df_ypixels = df_bin_record[0].scan_dim[1];
+		FPRINTF((stderr,"datafile.c:%d  image dimensions %d x %d\n", __LINE__,
+			df_xpixels, df_ypixels));
+	    }
 
 	    /* Now, at this point anything that was filled in for "scan" should
 	     * override the "cart" variables.
@@ -3446,11 +3499,16 @@ plot_option_binary(TBOOLEAN set_matrix, TBOOLEAN set_default)
 	    df_matrix_file = FALSE;
 	    plot_option_array();
 	    set_record = TRUE;
+	    df_xpixels = df_bin_record[df_num_bin_records - 1].cart_dim[1];
+	    df_ypixels = df_bin_record[df_num_bin_records - 1].cart_dim[0];
+	    FPRINTF((stderr,"datafile.c:%d  record dimensions %d x %d\n", __LINE__,
+		df_xpixels, df_ypixels));
 	    continue;
 	}
 
 	/* look for array */
 	if (almost_equals(c_token, "arr$ay")) {
+	    int i;
 	    if (set_array) { duplication=TRUE; break; }
 	    c_token++;
 	    /* Above keyword not part of pre-existing binary definition.  So use general binary. */
@@ -3458,11 +3516,15 @@ plot_option_binary(TBOOLEAN set_matrix, TBOOLEAN set_default)
 		int_error(c_token, matrix_general_binary_conflict_msg);
 	    df_matrix_file = FALSE;
 	    plot_option_array();
-	    {int i;
-	    for (i = 0; i < df_num_bin_records; i++)
-		df_bin_record[i].scan_generate_coord = TRUE;  /* Indicate that coordinate info should be generated by gnuplot code. */
+	    for (i = 0; i < df_num_bin_records; i++) {
+		/* Indicate that coordinate info should be generated internally */
+		df_bin_record[i].scan_generate_coord = TRUE;
 	    }
 	    set_array = TRUE;
+	    df_xpixels = df_bin_record[df_num_bin_records - 1].cart_dim[0];
+	    df_ypixels = df_bin_record[df_num_bin_records - 1].cart_dim[1];
+	    FPRINTF((stderr,"datafile.c:%d  array dimensions %d x %d\n", __LINE__,
+		df_xpixels, df_ypixels));
 	    continue;
 	}
 
@@ -3584,6 +3646,8 @@ plot_option_binary(TBOOLEAN set_matrix, TBOOLEAN set_default)
 	if (equals(c_token, "scan")) {
 	    if (set_scan) { duplication=TRUE; break; }
 	    c_token++;
+	    if (almost_equals(c_token+1, "yx$z"))
+		df_transpose = TRUE;
 	    plot_option_multivalued(DF_SCAN, 0);
 	    set_scan = TRUE;
 	    continue;
@@ -3597,6 +3661,7 @@ plot_option_binary(TBOOLEAN set_matrix, TBOOLEAN set_default)
 	    for (i=0; i < df_num_bin_records; i++)
 		memcpy(df_bin_record[i].cart_scan, df_bin_scan_table_2D[TRANSPOSE_INDEX].scan, sizeof(df_bin_record[0].cart_scan));
 	    set_scan = TRUE;
+	    df_transpose = TRUE;
 	    continue;
 	}
 
@@ -4591,6 +4656,11 @@ df_readbinary(double v[], int max)
 	    /* Dimensions */
 	    scan_size[0] = this_record->scan_dim[0];
 	    scan_size[1] = this_record->scan_dim[1];
+
+	    FPRINTF((stderr,"datafile.c:%d matrix dimensions %d x %d\n",
+			__LINE__, scan_size[1], scan_size[0]));
+	    df_xpixels = scan_size[1];
+	    df_ypixels = scan_size[0];
 
 	    if (scan_size[0] == 0)
 		int_error(NO_CARET, "Scan size of matrix is zero");

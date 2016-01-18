@@ -400,6 +400,13 @@ typedef struct {
 extern color_box_struct color_box;
 extern color_box_struct default_color_box;
 
+/* Holder for various image properties */
+typedef struct t_image {
+    t_imagecolor type; /* See above */
+    TBOOLEAN fallback; /* true == don't use terminal-specific code */
+    unsigned int ncols, nrows; /* image dimensions */
+} t_image;
+
 extern BoundingBox plot_bounds;	/* Plot Boundary */
 extern BoundingBox canvas; 	/* Writable area on terminal */
 extern BoundingBox *clip_area;	/* Current clipping box */

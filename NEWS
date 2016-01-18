@@ -2,6 +2,7 @@ Changes since 5.0.2
 ===================
 * NEW open-ended iteration over data:  plot for [i=1:*] datafile index i
 * NEW aquaterm support for version 5 custom dashtypes
+* CHANGE backport new image bookkeeping from 5.1 to fix bugs #1607 #1703 #1709
 * FIX wxt ignored fontsize if fontname was empty (regression since 5.0.1)
 
 Changes in 5.0.2
