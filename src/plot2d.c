@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.336.2.18 2015/12/01 12:52:26 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.336.2.19 2016/01/11 23:32:50 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -293,13 +293,24 @@ refresh_bounds(struct curve_points *first_plot, int nplots)
 	struct axis *x_axis = &axis_array[this_plot->x_axis];
 	struct axis *y_axis = &axis_array[this_plot->y_axis];
 
-	/* IMAGE clipping is done elsewhere, so we don't need INRANGE/OUTRANGE
-	 * checks.  
-	 */
+	/* IMAGE clipping is done elsewhere, so we don't need INRANGE/OUTRANGE checks */
 	if (this_plot->plot_style == IMAGE || this_plot->plot_style == RGBIMAGE) {
 	    if (x_axis->set_autoscale || y_axis->set_autoscale)
 		plot_image_or_update_axes(this_plot,TRUE);
 	    continue;
+	}
+
+	/* FIXME: I'm not entirely convinced this test does what the comment says. */
+	/*
+	 * If the state has been set to autoscale since the last plot,
+	 * mark everything INRANGE and re-evaluate the axis limits now.
+	 * Otherwise test INRANGE/OUTRANGE against previous data limits.
+	 */
+	if (!this_plot->noautoscale) {
+	    if (x_axis->set_autoscale & AUTOSCALE_MIN && x_axis->data_min < x_axis->min)
+		x_axis->min = x_axis->data_min;
+	    if (x_axis->set_autoscale & AUTOSCALE_MAX && x_axis->data_max > x_axis->max)
+		x_axis->max = x_axis->data_max;
 	}
 
 	for (i=0; i<this_plot->p_count; i++) {
@@ -309,11 +320,6 @@ refresh_bounds(struct curve_points *first_plot, int nplots)
 		continue;
 	    else
 		point->type = INRANGE;
-
-	    /* If the state has been set to autoscale since the last plot,
-	     * mark everything INRANGE and re-evaluate the axis limits now.
-	     * Otherwise test INRANGE/OUTRANGE against previous axis limits.
-	     */
 
 	    /* This autoscaling logic is identical to that in
 	     * refresh_3dbounds() in plot3d.c
