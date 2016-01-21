@@ -1,2 +1,6 @@
 Makefile
 Makefile.in
+gnuplot-lua-tikz-common.tex
+gnuplot-lua-tikz.sty
+gnuplot-lua-tikz.tex
+t-gnuplot-lua-tikz.tex

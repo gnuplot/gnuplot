@@ -2,8 +2,11 @@
 Makefile
 Makefile.in
 gnuplot
+gnuplot_qt
 gnuplot_x11
 bf_test
 html
 timestamp.h
 *.o
+ui_*.h
+*.qm

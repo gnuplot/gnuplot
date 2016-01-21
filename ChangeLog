@@ -1,3 +1,8 @@
+2016-01-21  Jun Takimoto <takimoto-j@kba.biglobe.ne.jp>
+
+	* .../.cvsignore:  Include more of the auto-generated files in the lists
+	of things for CVS to ignore during update/diff/status/commit/etc
+
 2016-01-18  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/plot2d.c (refresh_bounds):  The intent of this routine is to keep
