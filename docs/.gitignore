@@ -33,6 +33,7 @@ gnuplot.pg
 gnuplot.cm
 gnuplot.op
 gnuplot.tm
+pdffigures.tex
 *.aux
 *.dvi
 *.log
