@@ -553,7 +553,9 @@ void QtGnuplotScene::processEvent(QtGnuplotEventType type, QDataStream& in)
 			// Draw an invisible grey rectangle in the key box.
 			// It will be set to visible if the plot is toggled off.
 			QtGnuplotKeybox *keybox = &m_key_boxes[m_currentPlotNumber-1];
-			QGraphicsRectItem *statusBox = addRect(*keybox, Qt::NoPen, Qt::Dense4Pattern);
+			m_currentBrush.setColor(Qt::lightGray);
+			m_currentBrush.setStyle(Qt::Dense4Pattern);
+			QGraphicsRectItem *statusBox = addRect(*keybox, Qt::NoPen, m_currentBrush);
 			statusBox->setZValue(m_currentZ-1);
 			keybox->showStatus(statusBox);
 		}

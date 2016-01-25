@@ -8,6 +8,9 @@
 	* src/qtterminal/QtGnuplotScene.cpp:  Only toggle plots on left-click
 	(not center- or right-click).
 
+	* src/qtterminal/QtGnuplotScene.cpp:  Use explicit color Qt::lightGray
+	to gray out toggled key entries.
+
 2016-01-18  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/term_api.h src/gadgets.h:  Move definition of struct t_image
