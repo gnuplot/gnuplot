@@ -862,19 +862,21 @@ void QtGnuplotScene::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
 		int(event->scenePos().x()), int(event->scenePos().y()), button, time, m_widget);
 	m_watches[button].start();
 
-	/* Check for click in one of the keysample boxes */
-	int n = m_key_boxes.count();
-	for (int i = 0; i < n; i++) {
-		if (m_key_boxes[i].contains(m_lastMousePos)) {
-			if (m_plot_group[i]->isVisible()) {
-				m_plot_group[i]->setVisible(false);
-				m_key_boxes[i].setHidden(true);
-			} else {
-				m_plot_group[i]->setVisible(true);
-				m_key_boxes[i].setHidden(false);
-			}
-			break;
-		}
+	/* Check for left click in one of the keysample boxes */
+	if (button == 1) {
+	    int n = m_key_boxes.count();
+	    for (int i = 0; i < n; i++) {
+		    if (m_key_boxes[i].contains(m_lastMousePos)) {
+			    if (m_plot_group[i]->isVisible()) {
+				    m_plot_group[i]->setVisible(false);
+				    m_key_boxes[i].setHidden(true);
+			    } else {
+				    m_plot_group[i]->setVisible(true);
+				    m_key_boxes[i].setHidden(false);
+			    }
+			    break;
+		    }
+	    }
 	}
 
 	QGraphicsScene::mouseReleaseEvent(event);
