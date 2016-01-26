@@ -1,3 +1,8 @@
+2016-01-26  Jun Takimoto <takimoto-j@kba.biglobe.ne.jp>
+
+	* term/wxt.trm: Previous fix for parsing font "name,size" was incorrect.
+	Bug #1731
+
 2016-01-25  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/qtterminal/QtGnuplotScene.cpp:  Only toggle plots on left-click

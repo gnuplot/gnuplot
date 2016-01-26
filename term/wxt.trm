@@ -1,5 +1,5 @@
 /*
- * $Id: wxt.trm,v 1.45 2015/12/29 19:03:33 sfeam Exp $
+ * $Id: wxt.trm,v 1.46 2016/01/18 02:03:37 sfeam Exp $
  */
 
 /* GNUPLOT - wxt.trm */
@@ -152,7 +152,6 @@ TERM_PUBLIC void wxt_options()
 {
 	char *s = NULL;
 	char *font_setting = NULL;
-	int sep;
 	TBOOLEAN duplication = FALSE;
 	TBOOLEAN set_font = FALSE;
 	TBOOLEAN set_persist = FALSE, set_number = FALSE;
@@ -174,18 +173,15 @@ TERM_PUBLIC void wxt_options()
 			c_token++;
 			if (!(s = try_to_get_string()))
 				int_error(c_token,"font: expecting string");
+			font_setting = gp_strdup(s);
 			if (*s) {
-				font_setting = gp_strdup(s);
-				sep = strcspn(s,",");
-				if (sep > 0) {
-					s[sep] = '\0';
+				char *sep = strchr(s,',');
+				if (sep) {
+					sscanf(sep+1, "%d", &wxt_set_fontsize);
+					*sep = '\0';
 				}
-				if (s[sep] == ',')
-					sscanf(&(s[sep+1]), "%d", &wxt_set_fontsize);
 				free(wxt_set_fontname);
 				wxt_set_fontname = gp_strdup(s);
-			} else {
-				font_setting = gp_strdup("");
 			}
 			free(s);
 			if (set_font) duplication=TRUE;
