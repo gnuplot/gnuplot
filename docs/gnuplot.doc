@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.974 2015/12/31 04:26:32 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.975 2016/01/13 01:04:09 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -6851,10 +6851,16 @@ Ffigure_jitter
  The layout of the key itself (position, title justification, etc.) can be
  controlled by `set key`.  Please see `set key` for details.
 
- If you want the title of a plotted line to be placed immediately before or
- after that line in the graph itself, use `at {beginning|end}`.  This option
- may be useful when plotting `with lines` but makes little sense for some
- other plot styles.
+ The `at` keyword allows you to place the plot title somewhere outside the
+ auto-generated key box. The title can be placed immediately before or after the
+ line in the graph itself by using `at {beginning|end}`.  This option may be
+ useful when plotting `with lines` but makes little sense for most other styles.
+
+ To place the plot title at an arbitrary location on the page, use the form
+ `at <x-position>,<y-position>`.  By default the position is interpreted in
+ screen coordinates; e.g. `at 0.5, 0.5` is always the middle of the screen 
+ regardless of plot axis scales or borders.  The format of titles placed in
+ this way is still affected by key options.  See `set key`.
 
  Examples:
 
@@ -6865,15 +6871,19 @@ Ffigure_jitter
  "measured data":
        plot x**2 title "x^2", 'data.1' t "measured data"
 
- This puts an untitled circular border around a polar graph:
-       set polar; plot my_function(t), 1 notitle
-
  Plot multiple columns of data, each of which contains its own title on the
  first line of the file.  Place the titles after the corresponding lines rather
  than in a separate key:
        unset key
        set offset 0, graph 0.1
        plot for [i=1:4] 'data' using i with lines title columnhead at end 
+
+ Create a single key area for two separate plots:
+       set key Left reverse
+       set multiplot layout 2,2
+       plot sin(x) with points pt 6 title "Left plot is sin(x)" at 0.5, 0.30
+       plot cos(x) with points pt 7 title "Right plot is cos(x)" at 0.5, 0.27
+       unset multiplot
 
 3 with
 ?commands plot with

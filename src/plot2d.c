@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.374 2015/12/21 20:08:40 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.375 2016/01/18 20:03:36 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -178,6 +178,8 @@ cp_free(struct curve_points *cp)
 
 	free(cp->title);
 	cp->title = NULL;
+	free(cp->title_position);
+	cp->title_position = NULL;
 	free(cp->points);
 	cp->points = NULL;
 	free(cp->varcolor);
@@ -3556,14 +3558,21 @@ parse_plot_title(struct curve_points *this_plot, char *xtitle, char *ytitle, TBO
 		    int_error(c_token, "expecting \"title\" for plot");
 	}
 	if (equals(c_token,"at")) {
-	    c_token++;
-	    if (equals(c_token,"end"))
-		this_plot->title_position = 1;
-	    else if (almost_equals(c_token,"beg$inning"))
-		this_plot->title_position = -1;
-	    else
-		int_error(c_token, "expecting \"at beginning\" or \"at end\"");
-	    c_token++;
+	    int save_token = ++c_token;
+	    this_plot->title_position = gp_alloc(sizeof(t_position), NULL);
+	    if (equals(c_token,"end")) {
+		this_plot->title_position->scalex = character;
+		this_plot->title_position->x = 1;
+		c_token++;
+	    } else if (almost_equals(c_token,"beg$inning")) {
+		this_plot->title_position->scalex = character;
+		this_plot->title_position->x = -1;
+		c_token++;
+	    } else {
+		get_position_default(this_plot->title_position, screen, 2);
+	    }
+	    if (save_token == c_token)
+		int_error(c_token, "expecting \"at {beginning|end|<xpos>,<ypos>}\"");
 	}
     }
 

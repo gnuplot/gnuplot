@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.508 2015/11/10 02:50:39 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.509 2016/01/18 00:43:59 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -661,9 +661,11 @@ do_plot(struct curve_points *plots, int pcount)
 	    ignore_enhanced(this_plot->title_no_enhanced);
 		/* don't write filename or function enhanced */
 	    if (localkey && this_plot->title && !this_plot->title_is_suppressed) {
-		key_count++;
-		if (key->invert)
-		    yl = key->bounds.ybot + yl_ref + key_entry_height/2 - yl;
+		if (!this_plot->title_position) {
+		    key_count++;
+		    if (key->invert)
+			yl = key->bounds.ybot + yl_ref + key_entry_height/2 - yl;
+		}
 		do_key_sample(this_plot, key, this_plot->title, xl, yl);
 	    }
 	    ignore_enhanced(FALSE);
@@ -832,18 +834,20 @@ do_plot(struct curve_points *plots, int pcount)
 	    if (this_plot->plot_style == LABELPOINTS)
 		do_key_sample_point(this_plot, key, xl, yl);
 
-	    if (key->invert)
-		yl = key->bounds.ybot + yl_ref + key_entry_height/2 - yl;
-	    if (key_count >= key_rows) {
-		yl = yl_ref;
-		xl += key_col_wth;
-		key_count = 0;
-	    } else
-		yl = yl - key_entry_height;
+	    if (!this_plot->title_position) {
+		if (key->invert)
+		    yl = key->bounds.ybot + yl_ref + key_entry_height/2 - yl;
+		if (key_count >= key_rows) {
+		    yl = yl_ref;
+		    xl += key_col_wth;
+		    key_count = 0;
+		} else
+		    yl = yl - key_entry_height;
+	    }
 	}
 
 	/* Option to label the end of the curve on the plot itself */
-	if (this_plot->title_position)
+	if (this_plot->title_position && this_plot->title_position->scalex == character)
 	    attach_title_to_plot(this_plot, key);
 
 	/* Sync point for end of this curve (used by svg, post, ...) */
@@ -3919,7 +3923,8 @@ attach_title_to_plot(struct curve_points *this_plot, legend_key *key)
     struct termentry *t = term;
     int index, x, y;
 
-    if (this_plot->title_position > 0) {
+    /* beginning or end of plot trace */
+    if (this_plot->title_position->x > 0) {
 	for (index=this_plot->p_count-1; index > 0; index--)
 	    if (this_plot->points[index].type == INRANGE)
 		break;
@@ -3942,7 +3947,8 @@ attach_title_to_plot(struct curve_points *this_plot, legend_key *key)
 	(*t->linetype)(LT_BLACK);
 
     write_multiline(x, y, this_plot->title,
-    	(this_plot->title_position > 0) ? LEFT : RIGHT, JUST_TOP, 0, key->font);
+    	(this_plot->title_position->x > 0) ? LEFT : RIGHT,
+	JUST_TOP, 0, key->font);
 }
 
 #ifdef EAM_OBJECTS

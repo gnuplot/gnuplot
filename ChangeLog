@@ -1,7 +1,15 @@
 2016-01-28  Ethan A Merritt  <merritt@u.washington.edu>
 
-	* src/set.c (set_missing): Remove minor memory leak if "set missing '*'"
-	is called repeatedly.
+	* src/set.c (set_missing): Remove minor memory leak if
+	"set datafile missing '*'" is called repeatedly.
+
+	* src/boundary.c src/graph3d.c src/graph3d.h src/graphics.c
+	src/graphics.h src/plot2d.c src/plot3d.c:
+	    {s}plot ... title "foo" at <xpos,ypos>
+	New option for customized placement of individual key entries.
+
+	* docs/gnuplot.doc demo/custom_key.dem:
+	Documentation and demo for customized placement of key entries.
 
 2016-01-26  Jun Takimoto <takimoto-j@kba.biglobe.ne.jp>
 

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.246 2015/12/19 21:45:35 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.247 2015/12/21 20:08:40 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -188,8 +188,9 @@ sp_free(struct surface_points *sp)
 {
     while (sp) {
 	struct surface_points *next = sp->next_sp;
-	if (sp->title)
-	    free(sp->title);
+	free(sp->title);
+	free(sp->title_position);
+	sp->title_position = NULL;
 
 	while (sp->contours) {
 	    struct gnuplot_contours *next_cntrs = sp->contours->next;
@@ -1692,7 +1693,6 @@ eval_3dplots()
 			xtitle[0] = '\0';
 		    if (ytitle != NULL)
 			ytitle[0] = '\0';
-		    /*   this_plot->title = NULL;   */
 		}
 	    }
 

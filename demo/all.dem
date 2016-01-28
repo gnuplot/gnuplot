@@ -1,5 +1,5 @@
 #
-# $Id: all.dem,v 1.65 2015/10/28 20:40:22 sfeam Exp $
+# $Id: all.dem,v 1.66 2015/11/13 04:03:55 sfeam Exp $
 #
 # Executes all demos (OK, MOST demos) in this directory.
 # This serves as a series of unit tests for non-interactive capabilities.
@@ -321,7 +321,8 @@ print "********************** file key.dem *********************"
 load "key.dem"
 reset
 
-print "********************** file nokey.dem *********************"
+print "********************** file custom_key.dem *********************"
+load "custom_key.dem"
 load "nokey.dem"
 reset
 

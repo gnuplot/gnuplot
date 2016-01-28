@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.329 2015/10/29 23:26:32 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.330 2015/10/31 04:36:56 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -241,7 +241,8 @@ find_maxl_keys3d(struct surface_points *plots, int count, int *kcnt)
 	/* we draw a main entry if there is one, and we are
 	 * drawing either surface, or unlabeled contours
 	 */
-	if (this_plot->title && *this_plot->title && !this_plot->title_is_suppressed) {
+	if (this_plot->title && *this_plot->title
+	&& !this_plot->title_is_suppressed && !this_plot->title_position) {
 	    ++cnt;
 	    len = estimate_strlen(this_plot->title);
 	    if (len > mlen)
@@ -610,7 +611,7 @@ do_3dplot(
     int surface;
     struct surface_points *this_plot = NULL;
     int xl, yl;
-    int xl_save, yl_save;
+    int xl_save, yl_save, xl_prev, yl_prev;
     transform_matrix mat;
     int key_count;
     TBOOLEAN key_pass = FALSE;
@@ -980,6 +981,14 @@ do_3dplot(
 				 && !this_plot->title_is_suppressed);
 	    draw_this_surface = (draw_surface && !this_plot->opt_out_of_surface);
 
+	    /* User-specified key locations can use the 2D code */
+	    if (this_plot->title_position && this_plot->title_position->scalex != character) {
+		xl_prev = xl;
+		yl_prev = yl;
+		map3d_position(this_plot->title_position, &xl, &yl, "key sample");
+		xl -=  (key->just == GPKEY_LEFT) ? key_text_left : key_text_right;
+	    }
+
 	    if (lkey) {
 		if (key->textcolor.type != TC_DEFAULT)
 		    /* Draw key text in same color as key title */
@@ -1171,9 +1180,15 @@ do_3dplot(
 
 	    }			/* switch(plot-style) key sample */
 
-	    /* move down one line in the key */
+	    /* move down one line in the key... */
 	    if (lkey)
 		NEXT_KEY_LINE();
+
+	    /* but not if the plot title was drawn somewhere else */
+	    if (this_plot->title_position && this_plot->title_position->scalex != character) {
+		xl = xl_prev;
+		yl = yl_prev;
+	    }
 
 	    /* Draw contours for previous surface */
 	    if (draw_contour && this_plot->contours != NULL) {

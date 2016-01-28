@@ -1,5 +1,5 @@
 /*
- * $Id: boundary.c,v 1.28 2015/10/02 22:28:42 sfeam Exp $
+ * $Id: boundary.c,v 1.29 2015/10/29 23:26:32 sfeam Exp $
  */
 
 /* GNUPLOT - boundary.c */
@@ -1134,7 +1134,7 @@ find_maxl_keys(struct curve_points *plots, int count, int *kcnt)
     mlen = cnt = 0;
     this_plot = plots;
     for (curve = 0; curve < count; this_plot = this_plot->next, curve++) {
-	if (this_plot->title && !this_plot->title_is_suppressed) {
+	if (this_plot->title && !this_plot->title_is_suppressed && !this_plot->title_position) {
 	    ignore_enhanced(this_plot->title_no_enhanced);
 	    len = estimate_strlen(this_plot->title);
 	    if (len != 0) {
@@ -1189,6 +1189,13 @@ do_key_sample(
 	clip_area = NULL;
     else
 	clip_area = &canvas;
+
+    /* If the plot this title belongs to specified a non-standard place */
+    /* for the key sample to appear, use that to override xl, yl.       */
+    if (this_plot->title_position && this_plot->title_position->scalex != character) {
+	map_position(this_plot->title_position, &xl, &yl, "key sample");
+	xl -=  (key->just == GPKEY_LEFT) ? key_text_left : key_text_right;
+    }
 
     (*t->layer)(TERM_LAYER_BEGIN_KEYSAMPLE);
 
@@ -1331,6 +1338,13 @@ do_key_sample_point(
     int xl, int yl)
 {
     struct termentry *t = term;
+
+    /* If the plot this title belongs to specified a non-standard place */
+    /* for the key sample to appear, use that to override xl, yl.       */
+    if (this_plot->title_position && this_plot->title_position->scalex != character) {
+	map_position(this_plot->title_position, &xl, &yl, "key sample");
+	xl -=  (key->just == GPKEY_LEFT) ? key_text_left : key_text_right;
+    }
 
     (t->layer)(TERM_LAYER_BEGIN_KEYSAMPLE);
 
