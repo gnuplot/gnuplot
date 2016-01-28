@@ -1,3 +1,8 @@
+2016-01-28  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/set.c (set_missing): Remove minor memory leak if "set missing '*'"
+	is called repeatedly.
+
 2016-01-26  Jun Takimoto <takimoto-j@kba.biglobe.ne.jp>
 
 	* term/wxt.trm: Previous fix for parsing font "name,size" was incorrect.

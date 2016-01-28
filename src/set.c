@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.509 2015/12/30 18:30:56 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.510 2016/01/01 00:51:23 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -2813,15 +2813,14 @@ set_datafile_commentschars()
 	int_error(c_token, "expected string with comments chars");
 }
 
-/* process 'set missing' command */
+/* process 'set datafile missing' command */
 static void
 set_missing()
 {
     c_token++;
-    if (END_OF_COMMAND) {
-	free(missing_val);
-	missing_val = NULL;
-    } else if (!(missing_val = try_to_get_string()))
+    free(missing_val);
+    missing_val = NULL;
+    if (!END_OF_COMMAND && !(missing_val = try_to_get_string()))
 	int_error(c_token, "expected missing-value string");
 }
 
