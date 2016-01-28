@@ -1,3 +1,11 @@
+2016-01-28  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/graphics.c (plot_filledcurves):  Reevaluate variable fill color
+	for every polygon in the input stream to "with filledcurves".
+	This change was noted in the ChangeLog for 15-Jan-2015 but apparently
+	was not actually applied to the code.
+	Bug/Feature Request #411
+
 2016-01-26  Jun Takimoto <takimoto-j@kba.biglobe.ne.jp>
 
 	* term/wxt.trm: Previous fix for parsing font "name,size" was incorrect.

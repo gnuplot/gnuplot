@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.464.2.17 2015/11/10 03:51:20 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.464.2.18 2016/01/18 23:51:59 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -1233,7 +1233,10 @@ plot_filledcurves(struct curve_points *plot)
 		x = map_x(plot->points[i].x);
 		y = map_y(plot->points[i].y);
 		corners[points].x = x;
-		corners[points++].y = y;
+		corners[points].y = y;
+		if (points == 0)
+		    check_for_variable_color(plot, &plot->varcolor[i]);
+		points++;
 		break;
 	case UNDEFINED:
 		/* UNDEFINED flags a blank line in the input file.
