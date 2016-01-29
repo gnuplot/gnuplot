@@ -26,4 +26,6 @@ plot 'immigration.dat' using 0:($6+$12+$13+$14):xtic(strcol(1)[6:]) with linespo
                                    lt black pt 7 title "total"
 
 unset multi
+pause -1 "Hit return to continue"
+
 reset
