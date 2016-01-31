@@ -1,3 +1,10 @@
+2016-01-31  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/wxterminal/wxt_gui.cpp:  Another pair of fixes for wxt font
+	processing.  Prevent a memory leak from temporary storage of the
+	fontname.  Initial font used by enhanced text processing should be the
+	most recently set font, not the original one from "set term".
+
 2016-01-28  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c (plot_filledcurves):  Reevaluate variable fill color

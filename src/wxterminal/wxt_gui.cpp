@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.cpp,v 1.128.2.20 2015/08/31 17:34:54 sfeam Exp $
+ * $Id: wxt_gui.cpp,v 1.128.2.21 2015/09/01 00:02:53 sfeam Exp $
  */
 
 /* GNUPLOT - wxt_gui.cpp */
@@ -167,6 +167,8 @@ wxtAnchorPoint wxt_display_anchor = {0,0,0};
 #if defined(WXT_MONOTHREADED) && !defined(_Windows)
 static int yield = 0;	/* used in wxt_waitforinput() */
 #endif
+
+char *wxt_enhanced_fontname = NULL;
 
 #ifdef __WXMAC__
 #include <ApplicationServices/ApplicationServices.h>
@@ -2201,7 +2203,7 @@ void wxt_put_text(unsigned int x, unsigned int y, const char * string)
 		* we get stuck in an infinite loop) and try again. */
 
 		while (*(string = enhanced_recursion((char*)string, TRUE,
-				wxt_set_fontname,
+				wxt_enhanced_fontname,
 				wxt_current_plot->fontsize * wxt_set_fontscale,
 				0.0, TRUE, TRUE, 0))) {
 			wxt_enhanced_flush();
@@ -2282,7 +2284,7 @@ int wxt_set_font (const char *font)
 	if (wxt_status != STATUS_OK)
 		return 1;
 
-	char *fontname = strdup("");
+	char *fontname = NULL;
 	gp_command temp_command;
 	int fontsize = 0;
 
@@ -2290,12 +2292,13 @@ int wxt_set_font (const char *font)
 
 	if (font && (*font)) {
 		int sep = strcspn(font,",");
-		if (font[sep] == ',')
+		fontname = strdup(font);
+		if (font[sep] == ',') {
 			sscanf(&(font[sep+1]), "%d", &fontsize);
-		if (sep > 0) {
-			fontname = strdup(font);
 			fontname[sep] = '\0';
 		}
+	} else {
+		fontname = strdup("");
 	}
 
 	wxt_sigint_init();
@@ -2335,6 +2338,14 @@ int wxt_set_font (const char *font)
 	temp_command.integer_value = fontsize * wxt_set_fontscale;
 
 	wxt_command_push(temp_command);
+
+	/* Enhanced text processing needs to know the new font also */
+	if (*fontname) {
+		free(wxt_enhanced_fontname);
+		wxt_enhanced_fontname = strdup(fontname);
+	}
+	free(fontname);
+
 	/* the returned int is not used anywhere */
 	return 1;
 }

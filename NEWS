@@ -5,7 +5,7 @@ Changes in 5.0.3
 * CHANGE backport new image bookkeeping from 5.1 to fix bugs #1607 #1703 #1709
 * CHANGE qt terminal: toggle plots on/off only on left-click
 * FIX reevaluate fill color for each polygon in data for "with filledcurves"
-* FIX wxt ignored fontsize if fontname was empty (regression since 5.0.1)
+* FIX multiple wxt terminal font problems
 
 Changes in 5.0.2
 ================
