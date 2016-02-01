@@ -151,8 +151,8 @@ fmt = "%d/%m/%y\t%H%M"
 print "read_time(fmt, c) =" \
       . " strptime(fmt, stringcolumn(c).' '.stringcolumn(c+1))"
 read_time(fmt, c) = strptime(fmt, stringcolumn(c).' '.stringcolumn(c+1))
-plot 'timedat.dat' using (read_time(fmt,1)):3 with histeps, \
-     'timedat.dat' using (read_time(fmt,1)):($3-0.01):2 with labels title ''
+plot 'timedat.dat' skip 1 using (read_time(fmt,1)):3 with histeps, \
+     'timedat.dat' skip 1 using (read_time(fmt,1)):($3-0.01):2 with labels title ''
 #
 print ""
 pause -1 "Hit return to continue"
