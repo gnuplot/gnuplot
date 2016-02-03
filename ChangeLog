@@ -1,3 +1,9 @@
+2016-02-03  Daniel J Sebald <daniel.sebald@ieee.org>
+
+	* src/help.c:  Be less aggressive about suppressing help index entries
+	that might share a leading substring.
+	Bug #1734
+	
 2016-02-03  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/stats.c (create_and_set_int_var):  Some of the user-accessible

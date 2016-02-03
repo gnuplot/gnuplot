@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: help.c,v 1.30 2015/01/21 03:38:24 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: help.c,v 1.31 2015/09/11 19:48:02 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - help.c */
@@ -457,7 +457,7 @@ Ambiguous(KEY *key, size_t len)
 	     * But is it different enough from the previous one
 	     * to bother printing it as a separate choice?
 	     */
-	    sublen = strcspn(prev + len, " ");
+	    sublen = strcspn(key->key + len, " ");
 	    if (strncmp(key->key, prev, len + sublen) != 0) {
 		/* yup, this is different up to the next space */
 		if (!status) {
