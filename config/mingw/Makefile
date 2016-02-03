@@ -1,5 +1,5 @@
 # Hello, emacs: this is a -*- Makefile -*-
-# $Id: Makefile,v 1.51 2014/12/28 13:10:06 markisch Exp $
+# $Id: Makefile,v 1.52 2016/01/12 01:17:58 sfeam Exp $
 #
 # GNUPLOT Makefile for MinGW/MSYS on Windows
 # This assumes usual installation of the MinGW32 toolkit, the free
@@ -647,10 +647,16 @@ wgnuplot-ja.chm: $(JASRC) doc2html-ja.exe \
 	cp $(JADW)wgnuplot.chm $(HELPFILEJA)
 
 doc2html.exe: $(D)windows/doc2html.c $(D)termdoc.c $(D)xref.c version.$(O) $(LUA_HELP)
-	$(LD) $(LDFLAGS) -o $@ -DWINDOWS_NO_GUI $(CFLAGS) -I. -I$(D:/=) -I$(T:/=) $(D)windows/doc2html.c $(D)termdoc.c $(D)xref.c version.$(O)
+	$(LD) $(LDFLAGS) -o $@ -DWINDOWS_NO_GUI \
+	    -DVERSION_MAJOR='"$(MAINVERSION)"' -DPATCHLEVEL='"$(PATCHLEVEL)"' \
+	    $(CFLAGS) -I. -I$(D:/=) -I$(T:/=) \
+	    $(D)windows/doc2html.c $(D)termdoc.c $(D)xref.c
 
 doc2html-ja.exe: $(JASRC) $(D)windows/doc2html.c $(D)termdoc.c $(D)xref.c version.$(O) $(LUA_HELP)
-	$(LD) $(LDFLAGS) -o $@ -DWINDOWS_NO_GUI -DJAPANESE_DOC $(CFLAGS) -I. -I$(JAD) -I$(JA)/term $(D)windows/doc2html.c $(D)termdoc.c $(D)xref.c version.$(O)
+	$(LD) $(LDFLAGS) -o $@ -DWINDOWS_NO_GUI \
+	    -DVERSION_MAJOR='"$(MAINVERSION)"' -DPATCHLEVEL='"$(PATCHLEVEL)"' \
+	    -DJAPANESE_DOC $(CFLAGS) -I. -I$(JAD) -I$(JA)/term \
+	    $(D)windows/doc2html.c $(D)termdoc.c $(D)xref.c
 
 doc2ms.exe: $(D)doc2ms.c $(D)termdoc.c $(D)xref.c version.$(O) $(LUA_HELP)
 	$(LD) $(LDFLAGS) -o $@ -DWINDOWS_NO_GUI $(CFLAGS) -I. -I$(D:/=) -I$(T:/=) $(D)doc2ms.c $(D)termdoc.c $(D)xref.c version.$(O)

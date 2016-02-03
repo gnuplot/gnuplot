@@ -1,3 +1,8 @@
+2016-02-03  Jun Takimoto <takimoto-j@kba.biglobe.ne.jp>
+
+	* config/mingw/Makefile:  Pass through MAINVERSION and PATCHLEVEL
+	into the MinGW build process.
+
 2016-02-03  Daniel J Sebald <daniel.sebald@ieee.org>
 
 	* src/help.c:  Be less aggressive about suppressing help index entries
