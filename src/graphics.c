@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.464.2.18 2016/01/18 23:51:59 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.464.2.19 2016/01/28 18:31:37 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -1129,9 +1129,11 @@ finish_filled_curve(
 		points += 2;
 		/* Fall through */
 	case FILLEDCURVES_BETWEEN:
+		/* fill_between() allocated an extra point for the above/below flag */
+		if (filledcurves_options->closeto == FILLEDCURVES_BETWEEN)
+		    side = (corners[points].x > 0) ? 1 : -1;
+		/* Fall through */
 	case FILLEDCURVES_ATR:
-		side = (corners[points].x > 0) ? 1 : -1;
-
 		/* Prevent 1-pixel overlap of component rectangles, which */
 		/* causes vertical stripe artifacts for transparent fill  */
 		if (plot->fill_properties.fillstyle == FS_TRANSPARENT_SOLID) {
