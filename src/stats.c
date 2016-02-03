@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: stats.c,v 1.22 2015/07/11 20:04:00 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: stats.c,v 1.23 2016/01/07 00:16:29 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - stats.c */
@@ -66,6 +66,10 @@ static void two_column_output __PROTO(( struct sgl_column_stats x,
 					struct two_column_stats xy, long n));
 
 static void create_and_set_var __PROTO(( double val, char *prefix,
+					 char *base, char *suffix ));
+static void create_and_set_int_var __PROTO(( int ival, char *prefix,
+					 char *base, char *suffix ));
+static void create_and_store_var __PROTO(( t_value *data, char *prefix,
 					 char *base, char *suffix ));
 
 static void sgl_column_variables __PROTO(( struct sgl_column_stats res,
@@ -589,12 +593,25 @@ two_column_output( struct sgl_column_stats x,
 static void
 create_and_set_var( double val, char *prefix, char *base, char *suffix )
 {
+    t_value data;
+    Gcomplex( &data, val, 0.0 ); /* data is complex, real=val, imag=0.0 */
+    create_and_store_var( &data, prefix, base, suffix );
+}
+
+static void
+create_and_set_int_var( int ival, char *prefix, char *base, char *suffix )
+{
+    t_value data;
+    Ginteger( &data, ival );
+    create_and_store_var( &data, prefix, base, suffix );
+}
+
+static void
+create_and_store_var( t_value *data, char *prefix, char *base, char *suffix )
+{
     int len;
     char *varname;
     struct udvt_entry *udv_ptr;
-
-    t_value data;
-    Gcomplex( &data, val, 0.0 ); /* data is complex, real=val, imag=0.0 */
 
     /* In case prefix (or suffix) is NULL - make them empty strings */
     prefix = prefix ? prefix : "";
@@ -609,7 +626,7 @@ create_and_set_var( double val, char *prefix, char *base, char *suffix )
      * its own copy of the varname.
      */
     udv_ptr = add_udv_by_name(varname);
-    udv_ptr->udv_value = data;
+    udv_ptr->udv_value = *data;
 
     free( varname );
 }
@@ -618,12 +635,12 @@ static void
 file_variables( struct file_stats s, char *prefix )
 {
     /* Suffix does not make sense here! */
-    create_and_set_var( s.records, prefix, "records", "" );
-    create_and_set_var( s.invalid, prefix, "invalid", "" );
-    create_and_set_var( s.blanks,  prefix, "blank",   "" );
-    create_and_set_var( s.blocks,  prefix, "blocks",  "" );
-    create_and_set_var( s.outofrange, prefix, "outofrange", "" );
-    create_and_set_var( df_last_col, prefix, "columns", "" );
+    create_and_set_int_var( s.records, prefix, "records", "" );
+    create_and_set_int_var( s.invalid, prefix, "invalid", "" );
+    create_and_set_int_var( s.blanks,  prefix, "blank",   "" );
+    create_and_set_int_var( s.blocks,  prefix, "blocks",  "" );
+    create_and_set_int_var( s.outofrange, prefix, "outofrange", "" );
+    create_and_set_int_var( df_last_col, prefix, "columns", "" );
 }
 
 static void
@@ -649,18 +666,18 @@ sgl_column_variables( struct sgl_column_stats s, char *prefix, char *suffix )
 
     /* If data set is matrix */
     if ( s.sx > 0 ) {
-	create_and_set_var( (s.min.index) % s.sx, prefix, "index_min_x", suffix );
-	create_and_set_var( (s.min.index) / s.sx, prefix, "index_min_y", suffix );
-	create_and_set_var( (s.max.index) % s.sx, prefix, "index_max_x", suffix );
-	create_and_set_var( (s.max.index) / s.sx, prefix, "index_max_y", suffix );
-	create_and_set_var( s.sx, prefix, "size_x", suffix );
-	create_and_set_var( s.sy, prefix, "size_y", suffix );
+	create_and_set_int_var( (s.min.index) % s.sx, prefix, "index_min_x", suffix );
+	create_and_set_int_var( (s.min.index) / s.sx, prefix, "index_min_y", suffix );
+	create_and_set_int_var( (s.max.index) % s.sx, prefix, "index_max_x", suffix );
+	create_and_set_int_var( (s.max.index) / s.sx, prefix, "index_max_y", suffix );
+	create_and_set_int_var( s.sx, prefix, "size_x", suffix );
+	create_and_set_int_var( s.sy, prefix, "size_y", suffix );
     } else {
 	create_and_set_var( s.median,         prefix, "median",      suffix );
 	create_and_set_var( s.lower_quartile, prefix, "lo_quartile", suffix );
 	create_and_set_var( s.upper_quartile, prefix, "up_quartile", suffix );
-	create_and_set_var( s.min.index, prefix, "index_min", suffix );
-	create_and_set_var( s.max.index, prefix, "index_max", suffix );
+	create_and_set_int_var( s.min.index, prefix, "index_min", suffix );
+	create_and_set_int_var( s.max.index, prefix, "index_max", suffix );
     }
 }
 

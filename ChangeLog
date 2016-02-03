@@ -1,3 +1,10 @@
+2016-02-03  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/stats.c (create_and_set_int_var):  Some of the user-accessible
+	variables created by the stats command are necessarily integral (e.g.
+	STATS_records, STATS_columns).  Create these using Ginteger() rather
+	than Gcomplex().
+
 2016-01-31  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/wxterminal/wxt_gui.cpp:  Another pair of fixes for wxt font
