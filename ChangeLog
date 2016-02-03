@@ -5,6 +5,11 @@
 	STATS_records, STATS_columns).  Create these using Ginteger() rather
 	than Gcomplex().
 
+	* src/graphics.c (finish_filled_curve):  The routine fill_between() 
+	passes in an extra-long array whose last element stores above/below
+	flag.  We must not try to test this flag on other processing paths
+	because for them it is an out-of-bounds access (found by valgrind).
+
 2016-01-31  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/wxterminal/wxt_gui.cpp:  Another pair of fixes for wxt font

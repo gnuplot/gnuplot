@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.509 2016/01/18 00:43:59 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.510 2016/01/28 23:54:13 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -1111,9 +1111,6 @@ finish_filled_curve(
 		break;
 	case FILLEDCURVES_ATY1:
 	case FILLEDCURVES_ATY2:
-		/* FIXME:  pretty sure this code can never be reached since we	*/
-		/*         now replace these options with FILLEDCURVES_BETWEEN	*/
-		/*         in plot_betweencurves().				*/
 		corners[points].y = map_y(filledcurves_options->at);
 		corners[points+1].y = corners[points].y;
 		corners[points].x = corners[points-1].x;
@@ -1121,9 +1118,11 @@ finish_filled_curve(
 		points += 2;
 		/* Fall through */
 	case FILLEDCURVES_BETWEEN:
+		/* fill_between() allocated an extra point for the above/below flag */
+		if (filledcurves_options->closeto == FILLEDCURVES_BETWEEN)
+		    side = (corners[points].x > 0) ? 1 : -1;
+		/* Fall through */
 	case FILLEDCURVES_ATR:
-		side = (corners[points].x > 0) ? 1 : -1;
-
 		/* Prevent 1-pixel overlap of component rectangles, which */
 		/* causes vertical stripe artifacts for transparent fill  */
 		if (plot->fill_properties.fillstyle == FS_TRANSPARENT_SOLID) {
