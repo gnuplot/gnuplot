@@ -1,8 +1,8 @@
 #
 # Unit test for "volatile" "skip" "refresh"
 #
+set title "Nothing interesting here, just a unit test for volatile, skip, and refresh"
 set style data lines
 splot "whale.dat" skip 5 volatile
 refresh
-save "/tmp/foo"
 reset
