@@ -1,3 +1,9 @@
+2016-02-04  <gbmiquel@users.sf.net>
+
+	* src/gadgets.c (clip_line):  Use (double) rather than (int) for 
+	intermediate coordinates used in line clipping.
+	Bug #1614
+
 2016-02-04  Joachim Wuttke  <jwuttke@users.sourceforge.net>
 
 	* term/tkcanvs.trm:  Replace old (pre-1999) tkcanvas.trm with a 

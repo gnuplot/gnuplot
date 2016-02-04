@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gadgets.c,v 1.123 2015/10/02 22:27:29 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gadgets.c,v 1.124 2015/12/21 20:08:40 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - gadgets.c */
@@ -339,9 +339,9 @@ clip_line(int *x1, int *y1, int *x2, int *y2)
      * This is now addressed by making dx and dy (double) rather than (int)
      * but it might be better to hard-code the sign tests.
      */
-    double dx, dy;
+    double dx, dy, x, y;
 
-    int x, y, x_intr[4], y_intr[4], count, pos1, pos2;
+    int x_intr[4], y_intr[4], count, pos1, pos2;
     int x_max, x_min, y_max, y_min;
     pos1 = clip_point(*x1, *y1);
     pos2 = clip_point(*x2, *y2);
