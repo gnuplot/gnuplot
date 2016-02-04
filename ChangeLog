@@ -1,3 +1,8 @@
+2016-02-04  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/version.c PATCHLEVEL configure.in docs/titlepag.tex:
+	Update patchlevel to 5.0.3
+
 2016-02-04  Joachim Wuttke  <jwuttke@users.sourceforge.net>
 
 	* term/tkcanvs.trm:  Replace old (pre-1999) tkcanvas.trm with a 

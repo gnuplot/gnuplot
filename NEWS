@@ -1,9 +1,10 @@
 Changes in 5.0.3
 ================
 * NEW open-ended iteration over data:  plot for [i=1:*] datafile index i
-* NEW aquaterm support for version 5 custom dashtypes
+* CHANGE aquaterm support for version 5 custom dashtypes
 * CHANGE backport new image bookkeeping from 5.1 to fix bugs #1607 #1703 #1709
 * CHANGE qt terminal: toggle plots on/off only on left-click
+* CHANGE wholesale upgrade of old tkcanvas terminal (version 3.7 -> version 5.0)
 * FIX reevaluate fill color for each polygon in data for "with filledcurves"
 * FIX multiple wxt terminal font problems
 
