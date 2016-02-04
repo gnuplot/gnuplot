@@ -1,3 +1,13 @@
+2016-02-04  Joachim Wuttke  <jwuttke@users.sourceforge.net>
+
+	* term/tkcanvs.trm:  Replace old (pre-1999) tkcanvas.trm with a 
+	rewrite from Joachim Wuttke  <jwuttke@users.sourceforge.net>
+	and Bastian Maerkisch  <bmaerkisch@web.de>
+
+	This new driver has only partial support for scripting languages other
+	than tcl and has incomplete support for image data, but it is strictly
+	better than the 1999 terminal.
+
 2016-02-03  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c (finish_filled_curve):  The routine fill_between() 
