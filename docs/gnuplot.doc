@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.975 2016/01/13 01:04:09 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.976 2016/01/28 23:54:13 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -7347,9 +7347,11 @@ Ffigure_jitter
                        {size <headlength>,<headangle>{,<backangle>}}
                        {filled | empty | nofilled | noborder}
                        {front | back}
-                       {linestyle <line_style>}
-                       {linetype <line_type>} {linewidth <line_width>}
-                       {linecolor <colorspec>} {dashtype <dashtype>}
+                       {linestyle | ls <line_style>}
+                       {linetype | lt <line_type>}
+                       {linewidth | lw <line_width>}
+                       {linecolor | lc <colorspec>}
+                       {dashtype | dt <dashtype>}
 
        unset arrow {<tag>}
        show arrow {<tag>}
@@ -7595,8 +7597,10 @@ Ffigure_jitter
 
  Syntax:
        set border {<integer>}
-                  {front | back | behind} {linewidth | lw <line_width>}
-                  {{linestyle | ls <line_style>} | {linetype | lt <line_type>}}
+                  {front | back | behind}
+                  {linestyle | ls <line_style>}
+                  {linetype | lt <line_type>} {linewidth | lw <line_width>}
+                  {linecolor | lc <colorspec>} {dashtype | dt <dashtype>}
        unset border
        show border
 
@@ -7696,9 +7700,11 @@ Ffigure_jitter
  same hidden3d processing as the plot elements. `set border behind` will
  override this default.
 
- Using the optional <line_style>, <line_type> and <line_width> specifiers, the
- way the border lines are drawn can be influenced (limited by what the current
- terminal driver supports).
+ Using the optional <linestyle>, <linetype>, <linewidth>, <linecolor>, and
+ <dashtype> specifiers, the way the border lines are drawn can be influenced
+ (limited by what the current terminal driver supports).
+ Besides the border itself, this line style is used for the tics, independent
+ of whether they are plotted on the border or on the axes (see `set xtics`).
 
  For `plot`, tics may be drawn on edges other than bottom and left by enabling
  the second axes -- see `set xtics` for details.
@@ -9161,19 +9167,23 @@ Ffigure_missing
                 {{no}{m}cbtics}
                 {polar {<angle>}}
                 {layerdefault | front | back}
-                { {linestyle <major_linestyle>}
+                { {linestyle | ls <major_linestyle>}
                   | {linetype | lt <major_linetype>}
                     {linewidth | lw <major_linewidth>}
+                    {linecolor | lc <major_colorspec>}
+                    {dashtype | dt <major_dashtype>}
                   { , {linestyle | ls <minor_linestyle>}
                       | {linetype | lt <minor_linetype>}
-                        {linewidth | lw <minor_linewidth>} } }
+                        {linewidth | lw <minor_linewidth>}
+                        {linecolor | lc <minor_colorspec>}
+                        {dashtype | dt <minor_dashtype>} } }
        unset grid
        show grid
 
  The grid can be enabled and disabled for the major and/or minor tic
  marks on any axis, and the linetype and linewidth can be specified
  for major and minor grid lines, also via a predefined linestyle, as
- far as the active terminal driver supports this.
+ far as the active terminal driver supports this (see `set style line`).
 
  Additionally, a polar grid can be selected for 2D plots---circles are drawn
  to intersect the selected tics, and radial lines are drawn at definable
@@ -13358,6 +13368,9 @@ Ffigure_missing
 
  Minor (unlabeled) tics can be added automatically by the `set mxtics`
  command, or at explicit positions by the `set xtics ("" <pos> 1, ...)` form.
+
+ The apparence of the tics (line style, line width etc.) is determined by the
+ border line (see `set border`), even if the tics are drawn at the axes.
 4 xtics timedata
 ?set xtics timedata
 ?xtics timedata tics
@@ -13697,16 +13710,18 @@ Ffigure_missing
 
  Syntax:
        set {x|x2|y|y2|z}zeroaxis { {linestyle | ls <line_style>}
-                                  | { linetype | lt <line_type>}
-                                    { linewidth | lw <line_width>}}
+                                  | {linetype | lt <line_type>}
+                                    {linewidth | lw <line_width>}
+                                    {linecolor | lc <colorspec>}
+                                    {dashtype | dt <dashtype>} }
        unset {x|x2|y|y2|z}zeroaxis
        show {x|y|z}zeroaxis
 
 
  By default, these options are off.  The selected zero axis is drawn
- with a line of type <line_type> and width <line_width> (if supported
- by the terminal driver currently in use), or a user-defined style
- <line_style>.
+ with a line of type <line_type>, width <line_width>, color <colorspec>, and
+ dash type <dashtype> (if supported by the terminal driver currently in use),
+ or a user-defined style <line_style> (see `set style line`).
 
  If no linetype is specified, any zero axes selected will be drawn
  using the axis linetype (linetype 0).
