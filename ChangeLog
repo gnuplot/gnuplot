@@ -8,9 +8,9 @@
 	An array must be declared before its entries can be accessed.
 	Each entry A[i] acts as a normal gnuplot user variable (integer, string,
 	complex).  Variables held in an array need not be of the same type.
-	    array A[3] = [ 2, "apples", "oranges" ]
-	    set title sprintf("Comparing %s and %s",A[2],A[3])
-	    plot for [n = 1:A[1]] A[n] title A[n]
+	    array A[2] = [ "apples", "oranges" ]
+	    set title sprintf("Comparing %s and %s",A[1],A[2])
+	    plot for [n = 1:2] A[n] title A[n]
 
 	* docs/gnuplot.doc demo/array.dem demo/all.dem demo/html/*:
 	Documentation and demo for basic use of arrays.
