@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.291 2015/12/18 19:47:21 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.292 2015/12/19 21:45:35 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -137,7 +137,8 @@ save_variables__sub(FILE *fp)
     struct udvt_entry *udv = first_udv->next_udv;
 
     while (udv) {
-	if (udv->udv_value.type != NOTDEFINED) {
+	if (udv->udv_value.type != NOTDEFINED)
+	if (udv->udv_value.type != ARRAY) {
 	    if (strncmp(udv->udv_name,"GPVAL_",6)
 	     && strncmp(udv->udv_name,"MOUSE_",6)
 	     && strncmp(udv->udv_name,"$",1)

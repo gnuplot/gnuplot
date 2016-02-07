@@ -1,3 +1,20 @@
+2016-02-07  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/command.c src/command.h src/eval.c src/eval.h src/gp_types.h
+	src/internal.c src/internal.h src/parse.c src/tables.c src/util.c
+	src/save.c:  Basic support of arrays.
+
+	Introduce support for arrays as an indexed list of variables.
+	An array must be declared before its entries can be accessed.
+	Each entry A[i] acts as a normal gnuplot user variable (integer, string,
+	complex).  Variables held in an array need not be of the same type.
+	    array A[3] = [ 2, "apples", "oranges" ]
+	    set title sprintf("Comparing %s and %s",A[2],A[3])
+	    plot for [n = 1:A[1]] A[n] title A[n]
+
+	* docs/gnuplot.doc demo/array.dem demo/all.dem demo/html/*:
+	Documentation and demo for basic use of arrays.
+
 2016-02-04  <gbmiquel@users.sf.net>
 
 	* src/gadgets.c (clip_line):  Use (double) rather than (int) for 

@@ -1,5 +1,5 @@
 /*
- * $Id: eval.h,v 1.46 2014/03/10 01:28:37 sfeam Exp $
+ * $Id: eval.h,v 1.47 2015/01/20 02:10:42 sfeam Exp $
  */
 
 /* GNUPLOT - eval.h */
@@ -56,7 +56,7 @@ enum operators {
     LEFTSHIFT, RIGHTSHIFT, PLUS, MINUS,
     MULT, DIV, MOD, POWER, FACTORIAL, BOOLE,
     DOLLARS,
-    CONCATENATE, EQS, NES, RANGE,
+    CONCATENATE, EQS, NES, RANGE, INDEX,
     ASSIGN,
     /* only jump operators go between jump and sf_start, for is_jump() */
     JUMP, JUMPZ, JUMPNZ, JTERN, SF_START,
@@ -150,6 +150,7 @@ struct value * Ginteger __PROTO((struct value *, int));
 struct value * Gstring __PROTO((struct value *, char *));
 struct value * pop_or_convert_from_string __PROTO((struct value *));
 struct value * gpfree_string __PROTO((struct value *a));
+void gpfree_array __PROTO((struct value *a));
 
 void reset_stack __PROTO((void));
 void check_stack __PROTO((void));

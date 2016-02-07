@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: internal.c,v 1.86 2016/01/06 23:46:40 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: internal.c,v 1.87 2016/01/09 06:56:02 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - internal.c */
@@ -1276,6 +1276,34 @@ f_range(union argument *arg)
     gpfree_string(&full);
 }
 
+
+/*
+ * f_index() extracts the value of a single element from an array.
+ */
+void
+f_index(union argument *arg)
+{
+    struct value array, index;
+    int i = -1;
+
+    (void) arg;			/* avoid -Wunused warning */
+    (void) pop(&index);
+    (void) pop(&array);
+
+    if (array.type != ARRAY)
+	int_error(NO_CARET, "internal error: attempt to index non-array variable");
+
+    if (index.type == INTGR)
+	i = index.v.int_val;
+    else if (index.type == CMPLX)
+	i = floor(index.v.cmplx_val.real);
+
+    if (i <= 0 || i > array.v.value_array[0].v.int_val) 
+	int_error(NO_CARET, "array index out of range");
+
+    push( &array.v.value_array[i] );
+}
+
 /* Magic number! */
 #define RETURN_WORD_COUNT (-17*23*61)
 
@@ -1763,23 +1791,33 @@ f_system(union argument *arg)
 void
 f_assign(union argument *arg)
 {
-    struct value a, b;
+    struct udvt_entry *udv;
+    struct value a, b, index;
     (void) arg;
     (void) pop(&b);	/* new value */
+    (void) pop(&index);	/* index (only used if this is an array assignment) */
     (void) pop(&a);	/* name of variable */
     
-    if (a.type == STRING) {
-	struct udvt_entry *udv;
-	if (!strncmp(a.v.string_val,"GPVAL_",6) || !strncmp(a.v.string_val,"MOUSE_",6))
-	    int_error(NO_CARET,"Attempt to assign to a read-only variable");
-	udv = add_udv_by_name(a.v.string_val);
-	gpfree_string(&a);
+    if (a.type != STRING)
+	int_error(NO_CARET, "attempt to assign to something other than a named variable");
+    if (!strncmp(a.v.string_val,"GPVAL_",6) || !strncmp(a.v.string_val,"MOUSE_",6))
+	int_error(NO_CARET,"Attempt to assign to a read-only variable");
+
+    udv = add_udv_by_name(a.v.string_val);
+    gpfree_string(&a);
+
+    if (udv->udv_value.type == ARRAY) {
+	int i = index.v.int_val;
+	if (i < 0 || i > udv->udv_value.v.value_array[0].v.int_val)
+	    int_error(c_token, "array index out of range");
+	gpfree_string(&udv->udv_value.v.value_array[i]);
+	udv->udv_value.v.value_array[i] = b;
+    } else {
 	gpfree_string(&(udv->udv_value));
 	udv->udv_value = b;
-	push(&b);
-    } else {
-	int_error(NO_CARET, "attempt to assign to something other than a named variable");
     }
+
+    push(&b);
 }
 
 /*

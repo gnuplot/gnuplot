@@ -1,5 +1,5 @@
 #
-# $Id: all.dem,v 1.66 2015/11/13 04:03:55 sfeam Exp $
+# $Id: all.dem,v 1.67 2016/01/28 23:54:13 sfeam Exp $
 #
 # Executes all demos (OK, MOST demos) in this directory.
 # This serves as a series of unit tests for non-interactive capabilities.
@@ -287,6 +287,10 @@ reset
 print "********************** file histograms.dem *********************"
 load "histograms.dem"
 load "histograms2.dem"
+reset
+
+print "********************** file array.dem *********************"
+load "array.dem"
 reset
 
 print "**********************    Image formats    *********************"

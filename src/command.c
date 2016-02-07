@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.309 2015/08/01 18:57:09 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.310 2015/08/08 18:32:17 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -727,6 +727,107 @@ lower_command(void)
 {
     raise_lower_command(1);
 }
+
+
+/*
+ * Arrays are declared using the syntax
+ *    array A[size]
+ * where size is an integer and space is reserved for elements A[1] through A[size]
+ * The size itself is stored in A[0].v.int_val.
+ *
+ * Elements in an existing array can be accessed like any other gnuplot variable.
+ * Each element can be one of INTGR, CMPLX, STRING.
+ * When the array is declared all elements are set to NOTDEFINED.
+ */
+void
+array_command()
+{
+    int nsize = 0;
+    struct udvt_entry *array;
+    struct value *A;
+    int i;
+
+    /* Create or recycle a udv containing an array with the requested name */
+    array = add_udv(++c_token);
+    gpfree_string(&array->udv_value);
+
+    if (!equals(++c_token,"["))
+	int_error(c_token, "expecting array[size]");
+    c_token++;
+    nsize = int_expression();
+    if (!equals(c_token++,"]") || nsize <= 0)
+	int_error(c_token-1, "expecting array[size>0]");
+
+    array->udv_value.v.value_array = gp_alloc((nsize+1) * sizeof(t_value), "array_command");
+    array->udv_value.type = ARRAY;
+
+    /* Element zero of the new array is not visible but contains the size */
+    A = array->udv_value.v.value_array;
+    A[0].v.int_val = nsize;
+    for (i = 0; i <= nsize; i++) {
+	A[i].type = NOTDEFINED;
+    }
+
+    /* Initializer syntax:   array A[10] = [x,y,z,,"foo",] */
+    if (equals(c_token, "=")) {
+	if (!equals(++c_token, "["))
+	    int_error(c_token, "expecting Array[size] = [x,y,...]");
+	c_token++;
+	for (i = 1; i <= nsize; i++) {
+	    if (equals(c_token, "]"))
+		break;
+	    if (equals(c_token, ",")) {
+		c_token++;
+		continue;
+	    }
+	    const_express(&A[i]);
+	    if (equals(c_token, "]"))
+		break;
+	    if (equals(c_token, ","))
+		c_token++;
+	    else
+		int_error(c_token, "expecting Array[size] = [x,y,...]");
+	}
+	c_token++;
+    }
+
+    return;
+}
+
+/*
+ * Check for command line beginning with
+ *    Array[<expr>] = <expr>
+ * This routine is modeled on command.c:define()
+ */
+TBOOLEAN
+is_array_assignment()
+{
+    udvt_entry *udv = add_udv(c_token);
+    struct value newvalue;
+    int index;
+
+    if (!isletter(c_token) || !equals(c_token+1, "["))
+	return FALSE;
+
+    if (udv->udv_value.type != ARRAY)
+	int_error(c_token, "Not a known array");
+
+    /* Evaluate index */
+    c_token += 2;
+    index = int_expression();
+    if (index <= 0 || index > udv->udv_value.v.value_array[0].v.int_val)
+	int_error(c_token, "array index out of range");
+    if (!equals(c_token, "]") || !equals(c_token+1, "="))
+	int_error(c_token, "Expecting Arrayname[<expr>] = <expr>");
+
+    /* Evaluate right side of assignment */
+    c_token += 2;
+    (void) const_express(&newvalue);
+    udv->udv_value.v.value_array[index] = newvalue;
+
+    return TRUE;
+}
+
 
 
 #ifdef USE_MOUSE
@@ -2349,6 +2450,17 @@ invalid_command()
       }
     }
 #endif
+
+    /*
+     * We got here because the start of an input line was not recognized as
+     * a command. But maybe it is an array assignment?
+     * NB: We check for this _after_ looking for known commands because
+     *    plot [] FOO
+     * looks vaguely like an array reference
+     */
+    if (is_array_assignment())
+	return;
+
     /* Skip the rest of the command; otherwise we're left pointing to */
     /* the middle of a command we already know is not valid.          */
     while (!END_OF_COMMAND)

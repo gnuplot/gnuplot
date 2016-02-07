@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: util.c,v 1.134 2015/10/26 21:43:00 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: util.c,v 1.135 2016/01/10 00:41:13 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - util.c */
@@ -1548,6 +1548,16 @@ value_to_str(struct value *val, TBOOLEAN need_quotes)
 		nlines++;
 	}
 	sprintf(s[j], "<%d line data block>", nlines);
+	break;
+	}
+    case ARRAY:
+	{
+	sprintf(s[j], "<%d element array>", val->v.value_array->v.int_val);
+	break;
+	}
+    case NOTDEFINED:
+	{
+	sprintf(s[j], "<undefined>");
 	break;
 	}
     default:

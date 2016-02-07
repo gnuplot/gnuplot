@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: eval.c,v 1.128 2015/08/21 20:45:03 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: eval.c,v 1.129 2016/01/15 05:06:51 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - eval.c */
@@ -120,6 +120,7 @@ const struct ft_entry GPFAR ft[] =
     {"eqs",  f_eqs},			/* for string variables only */
     {"nes",  f_nes},			/* for string variables only */
     {"[]",  f_range},			/* for string variables only */
+    {"[]",  f_index},			/* for array variables only */
     {"assign", f_assign},		/* assignment operator '=' */
     {"jump",  f_jump},
     {"jumpz",  f_jumpz},
@@ -419,7 +420,24 @@ gpfree_string(struct value *a)
 	free(a->v.string_val);
 	a->type = NOTDEFINED;
     }
+
+    else if (a->type == ARRAY) {
+	gpfree_array(a);
+	a->type = NOTDEFINED;
+    }
+
     return a;
+}
+
+void
+gpfree_array(struct value *a)
+{
+    int i;
+    int size = a->v.value_array[0].v.int_val;
+
+    for (i=1; i<=size; i++)
+	gpfree_string(&(a->v.value_array[i]));
+    free(a->v.value_array);
 }
 
 /* some machines have trouble with exp(-x) for large x

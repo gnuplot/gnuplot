@@ -1,5 +1,5 @@
 /*
- * $Id: command.h,v 1.69 2015/05/22 23:13:36 sfeam Exp $
+ * $Id: command.h,v 1.70 2015/08/08 18:32:17 sfeam Exp $
  */
 
 /* GNUPLOT - command.h */
@@ -142,6 +142,7 @@ void restore_prompt __PROTO((void));
 #else
 #define bind_command()
 #endif
+void array_command __PROTO((void));
 void break_command __PROTO((void));
 void call_command __PROTO((void));
 void changedir_command __PROTO((void));
