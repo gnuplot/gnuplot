@@ -1,0 +1,62 @@
+#
+# Use an array to hold the sum of values in each column
+#
+array Sum[20]
+do for [i=5:13] { 
+  stats 'immigration.dat' skip 2 using (column(i)) nooutput
+  Sum[i] = STATS_sum
+  print sprintf("Sum[%2d] = %d",i,Sum[i])
+}
+#
+# Use the stored sum to normalize values in each colum
+#
+set style fill transparent solid 0.2 border -1
+set style data filledcurve y=0
+set tics scale 0
+set xrange [] noextend
+set xlabel "Decade"
+set title "Use of an array to aid normalization and to plot summed values"
+
+set multiplot
+plot for [i=5:13] 'immigration.dat' using 1:(column(i)/Sum[i]) title columnhead
+
+#
+# Plot the array values themselves in a separate inset
+#
+
+set size 0.3, 0.3
+set origin 0.10, 0.60
+
+unset xtics
+unset ytics
+set border 0
+set xlabel "Total"
+set yrange [0:*]
+unset title
+
+plot sample [i=5:13:1] '+' using (int(i)):(Sum[i]):(i-4) with boxes lc var notitle
+
+unset multiplot
+
+pause -1 "<cr> to continue"
+reset
+
+set title "Fit function to values stored in an array"
+set xtics nomirror
+
+array A[100]
+do for [i=1:100] { A[i] = sin(2*pi*i/100.) + 0.1*rand(0) }
+a = b = c = 0.01
+set key title "before fit"
+plot A with points title "Array A", c+cos(a+b*x) with lines
+
+pause -1 "<cr> to fit function to array values"
+
+set fit nolog
+fit c+cos(a+b*x) A using 1:2 via a,b,c
+
+set key title "after fit"
+plot A with points title "Array A", c+cos(a+b*x) with lines
+
+pause -1 "<cr> to continue"
+reset
