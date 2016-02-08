@@ -97,6 +97,11 @@ Here are samples of PNG output from some of the demos.
     <li><a href="pm3dcolors.html">pm3d colors</a></li>
     <li><a href="pm3dgamma.html">pm3d gamma</a></li>
     </ul>
+
+    <h4>Animation</h4>
+    <ul>
+    <li><a href="animate2.html">animated gif</a></li>
+    </ul>
 </td>
 
 <td rowspan=2>
@@ -146,11 +151,6 @@ Here are samples of PNG output from some of the demos.
     <li><a href="transparent.html">transparency</a></li>
     <li><a href="transparent_solids.html">transparent solids</a></li>
     </ul>
-
-    <h4>Animation</h4>
-    <ul>
-    <li><a href="animate2.html">animated gif</a></li>
-    </ul>
 </td>
 
 <!---
@@ -177,7 +177,7 @@ Here are samples of PNG output from some of the demos.
 <tbody><tr valign="top">
 
     <td>
-    <i>This page generated November 2015</i>
+    <i>This page generated February 2016</i>
     </td>
 
     <td>
