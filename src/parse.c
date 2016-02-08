@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: parse.c,v 1.97 2015/08/19 18:06:08 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: parse.c,v 1.98 2016/02/07 22:15:36 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - parse.c */
@@ -61,6 +61,9 @@ int at_highest_column_used = -1;
 
 /* This is checked by df_readascii() */
 TBOOLEAN parse_1st_row_as_headers = FALSE;
+
+/* This is used by df_open() and df_readascii() */
+udvt_entry *df_array = NULL;
 
 /* Iteration structures used for bookkeeping */
 /* Iteration can be nested so long as different iterators are used */
@@ -187,9 +190,11 @@ string_or_express(struct at_type **atptr)
     int i;
     TBOOLEAN has_dummies;
 
+    static char *array_placeholder = "@@";
     static char* str = NULL;
     free(str);
     str = NULL;
+    df_array = NULL;
 
     if (atptr)
 	*atptr = NULL;
@@ -204,8 +209,13 @@ string_or_express(struct at_type **atptr)
     if (isstring(c_token) && (str = try_to_get_string()))
 	return str;
 
-    if (!equals(c_token+1, "[") && (type_udv(c_token) == ARRAY))
-	int_error(c_token, "Array name not allowed here");
+    /* If this is a bare array name for an existing array, store a pointer */
+    /* for df_open() to use.  "@@" is a magic pseudo-filename passed to    */
+    /* df_open() that tells it to use the stored pointer.                  */
+    if (type_udv(c_token) == ARRAY && !equals(c_token+1, "[")) {
+	df_array = add_udv(c_token++);
+	return array_placeholder;
+    }
 
     /* parse expression */
     temp_at();

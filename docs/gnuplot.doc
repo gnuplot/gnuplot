@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.977 2016/02/06 22:50:34 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.978 2016/02/07 22:15:36 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -2162,9 +2162,18 @@ C ... and restart the table:
           <undefined> <undefined>
           8.0 8.0
 
- Notes: Arrays and variables share the same namespace.  For example, assignment
+ Note: Arrays and variables share the same namespace.  For example, assignment
  of a string variable named FOO will destroy any previously created array with
  name FOO.
+
+ The name of an array can be used in a `plot`, `splot`, `fit`, or `stats`
+ command.  This is equivalent to providing a file in which column 1 holds the
+ array index (from 1 to size) and column 2 holds the value of A[i].
+
+ Example:
+      array A[200]
+      do for [i=1:200] { A[i] = sin(i * pi/100.) }
+      plot A title "sin(x) in centiradians"
 2 Fonts
 ?fonts
  Gnuplot does not provide any fonts of its own. It relies on external font

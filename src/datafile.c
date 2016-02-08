@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.318 2015/10/01 03:38:43 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.319 2015/10/31 23:38:49 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -184,6 +184,7 @@ static TBOOLEAN valid_format __PROTO((const char *));
 static void plot_ticlabel_using __PROTO((int));
 static void add_key_entry __PROTO((char *temp_string, int df_datum));
 static char * df_generate_pseudodata __PROTO((void));
+static char * df_generate_ascii_array_entry __PROTO((void));
 static int df_skip_bytes __PROTO((off_t nbytes));
 
 #ifdef BACKWARDS_COMPATIBLE
@@ -294,6 +295,9 @@ static double df_pseudovalue_1 = 0;
 /* for datablocks */
 static TBOOLEAN df_datablock = FALSE;
 static char **df_datablock_line = NULL;
+
+/* for arrays */
+static int df_array_index = 0;
 
 /* track dimensions of input matrix/array/image */
 static unsigned int df_xpixels;
@@ -634,6 +638,9 @@ df_gets()
 
     if (df_datablock)
 	return *(df_datablock_line++);
+
+    if (df_array)
+	return df_generate_ascii_array_entry();
 
     if (!fgets(line, max_line_len, data_fp))
 	return NULL;
@@ -1362,6 +1369,9 @@ df_open(const char *cmd_filename, int max_using, struct curve_points *plot)
     } else if (df_filename[0] == '$') {
 	df_datablock = TRUE;
 	df_datablock_line = get_datablock(df_filename);
+    } else if (!strcmp(df_filename, "@@") && df_array) {
+	/* df_array was set in string_or_express() */
+	df_array_index = 0;
     } else {
 
 	/* filename cannot be static array! */
@@ -1758,7 +1768,7 @@ plot_ticlabel_using(int axis)
 int
 df_readline(double v[], int max)
 {
-    if (!data_fp && !df_pseudodata && !df_datablock)
+    if (!data_fp && !df_pseudodata && !df_datablock && !df_array)
 	return DF_EOF;
 
     if (df_read_binary) {
@@ -1795,7 +1805,7 @@ df_readascii(double v[], int max)
     if (df_eof)
 	return DF_EOF;
 
-	/*{{{  process line */
+    /*{{{  process line */
     while ((s = df_gets()) != NULL) {
 	int line_okay = 1;
 	int output = 0;         /* how many numbers written to v[] */
@@ -1970,6 +1980,11 @@ df_readascii(double v[], int max)
 	    df_column[0].datum = df_pseudovalue_0;
 	if (df_pseudodata > 1)
 	    df_column[1].datum = df_pseudovalue_1;
+
+	/* Similar to above, we can go back to the original numerical value of A[i] */
+	if (df_array && df_array->udv_value.v.value_array[df_array_index].type == CMPLX)
+	    df_column[1].datum =
+		df_array->udv_value.v.value_array[df_array_index].v.cmplx_val.real;
 
 	/* Always save the contents of the first row in case it is needed for
 	 * later access via column("header").  However, unless we know for certain that
@@ -5407,4 +5422,25 @@ clear_df_column_headers()
 	df_column[i].header = NULL;
     }
     df_longest_columnhead = 0;
+}
+
+/* The main loop in df_readascii wants a string to process. */
+/* We generate one from the current array entry containing  */
+/* the array index in column 1 and the value in column 2.   */
+static char *
+df_generate_ascii_array_entry()
+{
+    struct value *entry;
+
+    df_array_index++;
+    if (df_array_index > df_array->udv_value.v.value_array[0].v.int_val)
+	return NULL;
+
+    entry = &(df_array->udv_value.v.value_array[df_array_index]);
+    if (entry->type == STRING)
+	sprintf(line, "%d \"%s\"", df_array_index, entry->v.string_val);
+    else
+	sprintf(line, "%d %g", df_array_index, real(entry)); 
+	
+    return line;
 }

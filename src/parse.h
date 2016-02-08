@@ -1,5 +1,5 @@
 /*
- * $Id: parse.h,v 1.30 2014/09/18 22:51:30 sfeam Exp $
+ * $Id: parse.h,v 1.31 2015/08/19 18:06:08 sfeam Exp $
  */
 
 /* GNUPLOT - parse.h */
@@ -63,6 +63,9 @@ extern int at_highest_column_used;
 
 /* This is checked by df_readascii() */
 extern TBOOLEAN parse_1st_row_as_headers;
+
+/* This is used by df_open() and df_readascii() */
+extern udvt_entry *df_array;
 
 /* Protection mechanism for trying to parse a string followed by a + or - sign.
  * Also suppresses an undefined variable message if an unrecognized token
