@@ -11,6 +11,10 @@
 	*  demo/array.dem docs/gnuplot.doc:
 	Documentation and demo for use of arrays in 'fit' and 'plot'.
 
+	* src/command.c src/save.h src/save.c (save_array_content):
+	Dump content of arrays in a "print" or "save" statement, analogous to
+	printing/saving content of user-declared variables.
+
 2016-02-07  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/command.c src/command.h src/eval.c src/eval.h src/gp_types.h

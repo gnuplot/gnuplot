@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.292 2015/12/19 21:45:35 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.293 2016/02/07 22:15:36 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -137,20 +137,38 @@ save_variables__sub(FILE *fp)
     struct udvt_entry *udv = first_udv->next_udv;
 
     while (udv) {
-	if (udv->udv_value.type != NOTDEFINED)
-	if (udv->udv_value.type != ARRAY) {
-	    if (strncmp(udv->udv_name,"GPVAL_",6)
-	     && strncmp(udv->udv_name,"MOUSE_",6)
-	     && strncmp(udv->udv_name,"$",1)
-	     && (strncmp(udv->udv_name,"ARG",3) || (strlen(udv->udv_name) != 4))
-	     && strncmp(udv->udv_name,"NaN",4)) {
-		fprintf(fp, "%s = ", udv->udv_name);
-		disp_value(fp, &(udv->udv_value), TRUE);
-		(void) putc('\n', fp);
+	if (udv->udv_value.type != NOTDEFINED) {
+	    if (udv->udv_value.type == ARRAY) {
+		fprintf(fp,"array %s[%d] = ", udv->udv_name,
+			udv->udv_value.v.value_array[0].v.int_val);
+		save_array_content(fp, udv->udv_value.v.value_array);
+	    } else if (strncmp(udv->udv_name,"GPVAL_",6)
+		 && strncmp(udv->udv_name,"MOUSE_",6)
+		 && strncmp(udv->udv_name,"$",1)
+		 && (strncmp(udv->udv_name,"ARG",3) || (strlen(udv->udv_name) != 4))
+		 && strncmp(udv->udv_name,"NaN",4)) {
+		    fprintf(fp, "%s = ", udv->udv_name);
+		    disp_value(fp, &(udv->udv_value), TRUE);
+		    (void) putc('\n', fp);
 	    }
 	}
 	udv = udv->next_udv;
     }
+}
+
+void
+save_array_content(FILE *fp, struct value *array)
+{
+    int i;
+    int size = array[0].v.int_val;
+    fprintf(fp, "[");
+    for (i=1; i<=size; i++) {
+	if (array[i].type != NOTDEFINED)
+	    disp_value(fp, &(array[i]), TRUE);
+	if (i < size)
+	    fprintf(fp, ",");
+    }
+    fprintf(fp, "]\n");
 }
 
 /* HBB 19990823: new function 'save term'. This will be mainly useful
