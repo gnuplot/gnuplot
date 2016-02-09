@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.902.2.50 2016/01/11 23:32:49 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.902.2.51 2016/01/13 01:03:52 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -14123,9 +14123,8 @@ Ffigure_missing
 %STATS_pos_max_y@x coordinate of a point with maximum y value
 @end table
 
- When `matrix` is specified, the `using` option is ignored and the "z"-values 
- are treated as one-dimensional data set. The matrix dimensions are saved in the
- variables STATS_size_x and STATS_size_y.
+ When `matrix` is specified, all matrix entries are included in the analysis.
+ The matrix dimensions are saved in the variables STATS_size_x and STATS_size_y.
 
  It may be convenient to track the statistics from more than one file at the
  same time. The `name` option causes the default prefix "STATS" to be replaced
