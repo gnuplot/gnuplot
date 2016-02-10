@@ -1,3 +1,10 @@
+2016-02-10  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/stats.c: Reset data input mode to 2D at start of stats command.
+	This produces consistent results for "stats FOO matrix", even if the
+	previous command was "splot".
+	Bug #1739
+
 2016-02-04  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/version.c PATCHLEVEL configure.in docs/titlepag.tex:
