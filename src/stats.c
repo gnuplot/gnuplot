@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: stats.c,v 1.23 2016/01/07 00:16:29 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: stats.c,v 1.24 2016/02/03 21:42:06 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - stats.c */
@@ -799,7 +799,8 @@ statsrequest(void)
      * to set the effective number of columns to 1.
      */
     if (TRUE) {
-	columns = df_open(file_name, 2, NULL); /* up to 2 using specs allowed */
+	df_set_plot_mode(MODE_PLOT);		/* Used for matrix datafiles */
+	columns = df_open(file_name, 2, NULL);	/* up to 2 using specs allowed */
 
 	if (columns < 0) {
 	    int_warn(NO_CARET, "Can't read data file");
@@ -889,6 +890,7 @@ statsrequest(void)
 	      }
 	      columns = 2;
 	      break;
+
 	    }
 	} /* end-while : done reading file */
 	df_close();

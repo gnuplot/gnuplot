@@ -3,6 +3,11 @@
 	* src/command.c (print_command):  Do not allow printing a datablock into
 	itself, which could cause infinite recursion. 
 
+	* src/stats.c: Reset data input mode to 2D at start of stats command.
+	This produces consistent results for "stats FOO matrix", even if the
+	previous command was "splot".
+	Bug #1739
+
 2016-02-08  Anton Gladky <gladk@debian.org>
 
 	* term/tkcanvas.trm:  Replace statements of the form 
