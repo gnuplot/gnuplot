@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot on Unix.
 dnl
-dnl $Id: configure.ac,v 1.16 2016/01/11 18:51:38 sfeam Exp $
+dnl $Id: configure.ac,v 1.17 2016/01/16 12:33:43 broeker Exp $
 dnl
 dnl this is actually major.minor ...
 dnl note that for a non-beta release, we need to disable DEVELOPMENT_RELEASE
@@ -1031,20 +1031,11 @@ if test "${enable_wxwidgets}" = yes ; then
   fi
 
   dnl Check for Cairo
-  PKG_CHECK_MODULES_NOFAIL(CAIROPANGO, [cairo >= 0.9.0 pango >= 1.10 pangocairo >= 1.10])
+  PKG_CHECK_MODULES_NOFAIL(CAIROPANGO, [cairo >= 0.9.0 pango >= 1.22 pangocairo >= 1.10])
   if test $pkg_failed != no; then
     AC_MSG_WARN([The wxWidgets terminal will not be compiled.])
     enable_wxwidgets_ok=no
   fi
-
-  dnl Check for buggy Pango 1.10.2
-  PKG_CHECK_MODULES(PANGO_1_10_2, [pango = 1.10.2],
-    [AC_MSG_WARN(dnl
-[Pango 1.10.2 has been found. This version has a bug which gives unexpected
-results in the wxWidgets terminal. If you want to use this terminal, please
-install a different version of Pango.])
-    enable_wxwidgets_ok=no],
-    [HAVE_PANGO_1_10_2=0])
 fi
 
 if test "${enable_wxwidgets_ok}" = yes ; then
@@ -1114,7 +1105,7 @@ AC_ARG_WITH(cairo,dnl
 if test "${with_cairo}" = yes ; then
   dnl cairo terminals
   PKG_CHECK_MODULES_NOFAIL(CAIROPDF,dnl
-       [cairo >= 1.2 cairo-pdf >= 1.2 pango >= 1.10 pangocairo >= 1.10 glib-2.0])
+       [cairo >= 1.2 cairo-pdf >= 1.2 pango >= 1.22 pangocairo >= 1.10 glib-2.0])
   if test $pkg_failed != no; then
     AC_MSG_WARN([The cairo terminals will not be compiled.])
     with_cairo=no
@@ -1446,7 +1437,7 @@ fi
 if test "$with_cairo" = yes; then
   AC_MSG_RESULT([  cairo-based pdf and png terminals: yes ])
 else
-  AC_MSG_RESULT([  cairo-based terminals: no (requires cairo>1.2, pango>1.10)])
+  AC_MSG_RESULT([  cairo-based terminals: no (requires cairo>1.2, pango>1.22)])
 fi
 
 if test "$with_lua" = yes; then
@@ -1462,7 +1453,7 @@ if test "$enable_wxwidgets_ok" = yes; then
     AC_MSG_RESULT([  wxt terminal: yes ])
   fi
 else
-  AC_MSG_RESULT([  wxt terminal: no (requires C++, wxWidgets>2.6, cairo>0.9, pango>1.10)])
+  AC_MSG_RESULT([  wxt terminal: no (requires C++, wxWidgets>2.6, cairo>0.9, pango>1.22)])
 fi
 
 if test "$enable_qt_ok" = yes; then
