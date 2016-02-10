@@ -1,18 +1,19 @@
 /* config.h for msvc/Makefile
  *
  * Prepared according to config.h from ./configure and by means of
- * config_strip.sh as of gnuplot 4.7 in July 2012.
+ * config_strip.sh as of gnuplot 5.1 in February 2016.
  */
 
 
-/* Define if you want to use the CGI terminal under SCO. */
-/* #undef CGI */
+/* Define to allow use of certain deprecated syntax. */
+/* #undef BACKWARDS_COMPATIBLE */
 
 /* Define if you want online help and subtopic tables sorted by column. */
 /* #undef COLUMN_HELP */
 
 /* Provide contact info for gnuplot develoment */
 /* #undef DEVELOPMENT_VERSION */
+/* Don't change it here -- this define is set in config/msvc/Makefile. */
 
 /* Define to treat spacebar like any other keystroke. */
 /* #undef DISABLE_SPACE_RAISES_CONSOLE */
@@ -26,9 +27,14 @@
 /* Define if this system uses a 32-bit DOS extender (djgpp/emx). */
 /* #undef DOS32 */
 
+/* Define to support boxed labels */
+#define EAM_BOXED_TEXT 1
+
 /* Define to allow placement of rectangles and other objects */
 /* Warning: Uses union initializers which VC++ does not like */
 /* undef EAM_OBJECTS */
+#define EAM_OBJECTS 1
+#define WITH_C89
 
 /* Define if color information should be passed for each vertex. */
 /* #undef EXTENDED_COLOR_SPECS */
@@ -45,9 +51,6 @@
 
 /* Define if you want to use a gnuplot history file. */
 #define GNUPLOT_HISTORY 1
-
-/* Define to allow command line macros. */
-#define GP_MACROS 1
 
 /* Define if you want to use a newer version of libgrx under MSDOS/djgpp. */
 /* #undef GRX21 */
@@ -79,6 +82,12 @@
 /* Define to 1 if you have the <dirent.h> header file. */
 /* #undef HAVE_DIRENT_H */
 
+/* Define to 1 if you have the <dlfcn.h> header file. */
+/* undef HAVE_DLFCN_H */
+
+/* Define to 1 if you have the <dl.h> header file. */
+/* #undef HAVE_DL_H */
+
 /* Define to 1 if you have the `doprnt' function. */
 /* #undef HAVE_DOPRNT */
 
@@ -97,11 +106,19 @@
 /* Define if external function plugins are to be supported.  */
 #define HAVE_EXTERNAL_FUNCTIONS 1
 
+/* Define to 1 if you have the `fdopen' function. */
+/* #undef HAVE_FDOPEN */
+/* MSVC actually has fdopen, but it probably doesn't make sense on Windows
+   to support that functionality in df_open(). */
+
 /* Define to 1 if you have the <float.h> header file. */
 #define HAVE_FLOAT_H 1
 
 /* Define to 1 if you have the `fork' function. */
 /* #undef HAVE_FORK */
+
+/* Define to 1 if fseeko (and presumably ftello) exists and is declared. */
+/* #undef HAVE_FSEEKO */
 
 /* Define to 1 if you have the `gamma' function. */
 /* #undef HAVE_GAMMA */
@@ -135,11 +152,11 @@
 /* Define to 1 if you have the <ggi/xmi.h> header file. */
 /* #undef HAVE_GGI_XMI_H */
 
-/* Define to use gtk/gdk tweaks */
-/* #undef HAVE_GTK */
+/* Define to include support for gpic terminal */
+/* #undef HAVE_GPIC */
 
-/* Define to use gtk+ functions to handle cairo */
-/* #undef HAVE_GTK28 */
+/* define if your wxWidgets uses the gtk toolkit */
+/* #undef HAVE_GTK */
 
 /* define if you have libiconv and iconv.h */
 /* #undef HAVE_ICONV */
@@ -160,8 +177,13 @@
 /* Define to 1 if you have the `lgamma' function. */
 /* #undef HAVE_LGAMMA */
 
-/* Define to 1 if you're using the aquaterm library on Mac OS X */
-/* #undef HAVE_LIBAQUATERM */
+/* Define if you have the caca library. */
+/* #undef HAVE_LIBCACA */
+/* Don't change it here -- this define is set in config/msvc/Makefile. */
+
+/* define if you have libcerf */
+/* #undef HAVE_LIBCERF */
+/* Don't change it here -- this define is set in config/msvc/Makefile. */
 
 /* Define to 1 if you have the <libc.h> header file. */
 /* #undef HAVE_LIBC_H */
@@ -180,7 +202,7 @@
 /* #undef HAVE_LIBPDF */
 /* Don't change it here -- this define is set in config/msvc/Makefile. */
 
-/* Define if your pdf library is too old to use PDF_begin_document. */
+/* Define if your PDFlib is too old to use PDF_begin_document. */
 /* #undef HAVE_LIBPDF_OPEN_FILE */
 
 /* Define if you are using the GNU readline library. */
@@ -222,10 +244,16 @@
 /* Define to 1 if you have the `memset' function. */
 #define HAVE_MEMSET 1
 
-/* Define if your pdf library doesn't support dash patterns. */
+/* Define to include support for mif terminal */
+/* #undef HAVE_MIF */
+
+/* Define if your PDFlib doesn't support dash patterns. */
 /* #undef HAVE_NODASH_LIBPDF */
 
-/* Define if your pdf library is too old to support patterns. */
+/* Define to 1 if the system has the type `off_t'. */
+/* #undef HAVE_OFF_T */
+
+/* Define if your PDFlib is too old to support patterns. */
 /* #undef HAVE_OLD_LIBPDF */
 
 /* Define to 1 if you have the `on_exit' function. */
@@ -282,7 +310,7 @@
 /* #undef HAVE_STDBOOL_H */
 
 /* Define to 1 if you have the <stdint.h> header file. */
-/* #undef HAVE_STDINT_H */
+#define HAVE_STDINT_H 1
 
 /* Define to 1 if you have the <stdlib.h> header file. */
 #define HAVE_STDLIB_H 1
@@ -386,6 +414,9 @@
 /* Define if time_t is declared in time.h. */
 #define HAVE_TIME_T_IN_TIME_H 1
 
+/* Define to 1 if you have the `uname' function. */
+/* #undef HAVE_UNAME */
+
 /* Define to 1 if you have the <unistd.h> header file. */
 /* #undef HAVE_UNISTD_H */
 
@@ -473,6 +504,9 @@
 /* Define to the version of this package. */
 /* #undef PACKAGE_VERSION */
 
+/* The patch level, a.k.a. micro version number */
+/* #undef PATCHLEVEL */
+
 /* Define if you do have the popen and pclose functions. */
 /* #undef PIPES */
 /* Don't change it here -- this define is set in config/msvc/Makefile. */
@@ -489,9 +523,6 @@
 /* Define if you want to use the included readline function. */
 #define READLINE 1
 
-/* Define as the return type of signal handlers (`int' or `void'). */
-#define RETSIGTYPE void
-
 /* Define to the type of arg 1 for `select'. */
 /* #undef SELECT_TYPE_ARG1 */
 
@@ -507,17 +538,12 @@
 /* Define to 1 if you have the ANSI C header files. */
 #define STDC_HEADERS 1
 
-/* Define if you want to use the sunview terminal (sun). */
-/* #undef SUN */
-
-/* Define to support boxed labels. */
-#define EAM_BOXED_TEXT 1
-
-/* Define to use thin plate spines. */
-/* #undef THIN_PLATE_SPLINES_GRID */
-
 /* Define if the 3dkit libray is present. */
 /* #undef THREEDKIT */
+
+/* Define if your libcaca does not have caca_export_canvas_to_memory but the
+   old caca_export_memory */
+/* #undef USE_CACA_EXPORT_MEMORY */
 
 /* Define if you want to read .gnuplot from current directory (SECURITY
    RISK!). */
@@ -526,7 +552,7 @@
 /* Define if you want to use the experimental ggi driver. */
 /* #undef USE_GGI_DRIVER */
 
-/* Define if you want to have mouse support in interactive terminals. */
+/* Define if you have interactive terminals that use mouse support. */
 /* #undef USE_MOUSE */
 /* Don't change it here -- this define is set in config/msvc/Makefile. */
 
@@ -539,11 +565,11 @@
 /* Version number of package */
 /* #undef VERSION */
 
+/* The main version number */
+/* #undef VERSION_MAJOR */
+
 /* Define if the vgagl libray is present. */
 /* #undef VGAGL */
-
-/* Define to allow zooming or refresh of volatile data. */
-#define VOLATILE_REFRESH 1
 
 /* Define if you want the wxwidgets terminal. */
 /* #undef WXWIDGETS */
@@ -554,6 +580,15 @@
 
 /* Define to 1 if the X Window System is missing or not being used. */
 /* #undef X_DISPLAY_MISSING */
+
+/* Number of bits in a file offset, on hosts where this is settable. */
+/* #undef _FILE_OFFSET_BITS */
+
+/* Define to 1 to make fseeko visible on some hosts (e.g. glibc 2.2). */
+/* #undef _LARGEFILE_SOURCE */
+
+/* Define for large files, on AIX-style hosts. */
+/* #undef _LARGE_FILES */
 
 /* Define to empty if `const' does not conform to ANSI C. */
 /* #undef const */
