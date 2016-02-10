@@ -1,3 +1,8 @@
+2016-02-10  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/command.c (print_command):  Do not allow printing a datablock into
+	itself, which could cause infinite recursion. 
+
 2016-02-08  Anton Gladky <gladk@debian.org>
 
 	* term/tkcanvas.trm:  Replace statements of the form 

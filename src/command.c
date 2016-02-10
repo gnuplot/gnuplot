@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.311 2016/02/07 22:15:36 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.312 2016/02/08 21:46:21 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -1884,7 +1884,13 @@ print_command()
     do {
 	++c_token;
 	if (equals(c_token, "$") && isletter(c_token+1)) {
-	    char **line = get_datablock(parse_datablock_name());
+	    char *datablock_name = parse_datablock_name();
+	    char **line = get_datablock(datablock_name);
+
+	    /* Printing a datablock into itself would cause infinite recursion */
+	    if (print_out_var && !strcmp(datablock_name, print_out_name))
+		continue;
+
 	    while (line && *line) {
 		if (print_out_var != NULL)
 		    append_to_datablock(&print_out_var->udv_value, strdup(*line));
