@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: fit.c,v 1.145.2.12 2015/07/09 01:40:44 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: fit.c,v 1.145.2.13 2016/01/06 05:19:56 sfeam Exp $"); }
 #endif
 
 /*  NOTICE: Change of Copyright Status
@@ -2132,11 +2132,15 @@ fit_command()
 	free(line);
 	for (i = 0; (i < num_indep) && (i < columns - 1); i++)
 	    fprintf(log_f, "%s:", c_dummy_var[i]);
-	if (num_errors > 0)
+	fprintf(log_f, "z");
+	if (num_errors > 0) {
 	    for (i = 0; (i < num_indep) && (i < columns - 1); i++)
 		if (err_cols[i])
-		    fprintf(log_f, "s%s:", c_dummy_var[i]);
-	fprintf(log_f, (num_errors == 0) ? "z\n" : "z:s\n");
+		    fprintf(log_f, ":s%s", c_dummy_var[i]);
+	    fprintf(log_f, ":s\n");
+	} else {
+	    fprintf(log_f, "\n");
+	}
     }
 
     /* report all range specs, starting with Z */

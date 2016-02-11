@@ -1,3 +1,8 @@
+2016-02-11  Bastian Maerkisch  <bmaerkisch@web.de>
+
+  * src/fit.c:  Fix order of using specs printed to log-file.
+  Bug #1657
+
 2016-02-10  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/stats.c: Reset data input mode to 2D at start of stats command.
