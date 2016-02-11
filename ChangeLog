@@ -6,6 +6,10 @@
 
 2016-02-11  Bastian Maerkisch  <bmaerkisch@web.de>
 
+	* term/wxterminal/wxt_gui.cpp (wxt_raise_window):  On Windows, only
+	Restore() the window if it is iconized.  Fixes accidental resize of
+	maximized windows.
+
 	* term/tkcanvas.trm (TK_vector):  Fix for vector commands without
 	preceeding move as e.g. in "with line lc variable".
 
