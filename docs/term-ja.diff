@@ -181,7 +181,7 @@ diff -rc docs/tex2ja.awk.ORG docs/tex2ja.awk
 *** 0 ****
 --- 1,54 ----
 + #
-+ # $Id: tex2ja.awk,v 1.5 2008-06-22 20:22:11+09 shige Exp $
++ # $Id: term-ja.diff,v 1.51 2015/11/02 21:04:09 sfeam Exp $
 + # doc2tex の出力の後処理スクリプト
 + # tex2ja.awk
 + # 06/20 2008
@@ -3543,7 +3543,7 @@ diff -rc term/lua/gnuplot-tikz-ja.help.ORG term/lua/gnuplot-tikz-ja.help
 ***************
 *** 0 ****
 --- 1,173 ----
-+ /* $Id: gnuplot-tikz-ja.help,v 1.1 2014-12-12 13:26:57+09 shige Exp $ */
++ /* $Id: term-ja.diff,v 1.51 2015/11/02 21:04:09 sfeam Exp $ */
 + #ifdef JAPANESE_DOC
 + "2 lua tikz",
 + "?set terminal lua tikz",
@@ -4189,123 +4189,6 @@ diff -rc term/mif.trm.ORG term/mif.trm
 + #endif /* JAPANESE_DOC */
   END_HELP(mif)
   #endif /* TERM_HELP */
-diff -rc term/next.trm.ORG term/next.trm
-*** term/next.trm	2013-01-26.ORG 17:11:08.000000000 +0900
---- term/next.trm	2015-11-02 13:03:45.356764000 +0900
-***************
-*** 1501,1506 ****
---- 1501,1507 ----
-  
-  #ifdef TERM_HELP
-  START_HELP(next)
-+ #ifndef JAPANESE_DOC
-  "1 next",
-  "?commands set terminal next",
-  "?set terminal next",
-***************
-*** 1532,1537 ****
---- 1533,1571 ----
-  "       set term next old",
-  "",
-  " Pointsizes may be changed with `set linestyle`."
-+ #else /* JAPANESE_DOC */
-+ "1 next",
-+ "?commands set terminal next",
-+ "?set terminal next",
-+ "?set term next",
-+ "?terminal next",
-+ "?term next",
-+ "?next",
-+ "?NeXT",
-+ " `next` ドライバには設定のためのいくつかのオプションがあります。",
-+ "",
-+ " 書式:",
-+ "       set terminal next {<mode>} {<type> } {<color>} {<dashed>}",
-+ "                  {\"<fontname>\"} {<fontsize>} title {\"<newtitle>\"}",
-+ "",
-+ " <mode> は `default` のみ指定でき、その場合全てのオプションがデフォルト",
-+ " になります。<type> は `new` か `old` で、`old` は古い単一ウィンドウを",
-+ " 要求します。<color> は `color` (カラー) か `monochrome` (白黒)、",
-+ " <dashed> は `solid` (実線のみ) か `dashed` (点線が有効)、\"<fontname>\"",
-+ " は有効な PostScript フォントの名前を、<fontsize> は PostScript ポイン",
-+ " ト単位でのフォントのサイズを、<title> は GnuTerm ウィンドウのタイトル",
-+ " をそれぞれ設定します。デフォルトは `new`, `monochrome`, `dashed`,",
-+ " \"Helvetica\", 14pt です。",
-+ "",
-+ " 例:",
-+ "       set term next default",
-+ "       set term next 22",
-+ "       set term next color \"Times-Roman\" 14",
-+ "       set term next color \"Helvetica\" 12 title \"MyPlot\"",
-+ "       set term next old",
-+ "",
-+ " 点の大きさは `set linestyle` で変更できます。"
-+ #endif /* JAPANESE_DOC */
-  END_HELP(next)
-  #endif /* TERM_HELP */
-  
-diff -rc term/openstep.trm.ORG term/openstep.trm
-*** term/openstep.trm	2013-01-26.ORG 17:11:08.000000000 +0900
---- term/openstep.trm	2015-11-02 13:03:45.358370000 +0900
-***************
-*** 1373,1378 ****
---- 1373,1379 ----
-  
-  #ifdef TERM_HELP
-  START_HELP(openstep)
-+ #ifndef JAPANESE_DOC
-  "1 Openstep (next)",
-  #ifndef TERM_HELP_OPENSTEP
-  "?commands set terminal openstep",
-***************
-*** 1411,1416 ****
---- 1412,1457 ----
-  "       set term openstep old",
-  "",
-  " Pointsizes may be changed with `set linestyle`."
-+ #else /* JAPANESE_DOC */
-+ "1 Openstep (next)",
-+ #ifndef TERM_HELP_OPENSTEP
-+ "?commands set terminal openstep",
-+ "?set terminal openstep",
-+ "?set term openstep",
-+ "?terminal openstep",
-+ "?term openstep",
-+ "?openstep",
-+ "?OpenStep",
-+ "?Openstep",
-+ /*
-+ "?next",
-+ "?NeXT",
-+ */
-+ #endif
-+ " openstep (next) ドライバには設定のためのいくつかのオプションがあります。",
-+ "",
-+ " 書式:",
-+ "       set terminal openstep {<mode>} {<type> } {<color>} {<dashed>}",
-+ "                  {\"<fontname>\"} {<fontsize>} title {\"<newtitle>\"}",
-+ "",
-+ " <mode> は `default` のみ指定でき、その場合全てのオプションがデフォルト",
-+ " になります。<type> は `new` か `old` で、`old` は古い単一ウィンドウを",
-+ " 要求します。<color> は `color` (カラー) か `monochrome` (白黒)、",
-+ " <dashed> は `solid` (実線のみ) か `dashed` (点線が有効)、\"<fontname>\"",
-+ " は有効な PostScript フォントの名前を、<fontsize> は PostScript ポイン",
-+ " ト単位でのフォントのサイズを、<title> は GnuTerm ウィンドウのタイトル",
-+ " をそれぞれ設定します。デフォルトは `new`, `monochrome`, `dashed`,",
-+ " \"Helvetica\", 14pt です。",
-+ "",
-+ " 例:",
-+ "       set term openstep default",
-+ "       set term openstep 22",
-+ "       set term openstep color \"Times-Roman\" 14",
-+ "       set term openstep color \"Helvetica\" 12 title \"MyPlot\"",
-+ "       set term openstep old",
-+ "",
-+ " 点の大きさは `set linestyle` で変更できます。"
-+ #endif /* JAPANESE_DOC */
-  END_HELP(openstep)
-  #endif /* TERM_HELP */
-  
 diff -rc term/pbm.trm.ORG term/pbm.trm
 *** term/pbm.trm	2009-06-08.ORG 13:37:29.000000000 +0900
 --- term/pbm.trm	2015-11-02 13:03:45.359901000 +0900
@@ -5398,38 +5281,6 @@ diff -rc term/regis.trm.ORG term/regis.trm
 + "       set terminal regis {4 | 16}"
 + #endif /* JAPANESE_DOC */
   END_HELP(regis)
-  #endif
-diff -rc term/sun.trm.ORG term/sun.trm
-*** term/sun.trm	2008-04-19.ORG 13:07:51.000000000 +0900
---- term/sun.trm	2015-11-02 13:03:45.379791000 +0900
-***************
-*** 360,365 ****
---- 360,366 ----
-  
-  #ifdef TERM_HELP
-  START_HELP(sun)
-+ #ifndef JAPANESE_DOC
-  "1 sun",
-  "?commands set terminal sun",
-  "?set terminal sun",
-***************
-*** 369,373 ****
---- 370,385 ----
-  "?sun",
-  " The `sun` terminal driver supports the SunView window system.  It has no",
-  " options."
-+ #else /* JAPANESE_DOC */
-+ "1 sun",
-+ "?commands set terminal sun",
-+ "?set terminal sun",
-+ "?set term sun",
-+ "?terminal sun",
-+ "?term sun",
-+ "?sun",
-+ " `sun` ドライバは SunView ウィンドウシステムをサポートしています。オプ",
-+ " ションはありません。"
-+ #endif /* JAPANESE_DOC */
-  END_HELP(sun)
   #endif
 diff -rc term/svg.trm.ORG term/svg.trm
 *** term/svg.trm	2015-08-27.ORG 21:26:12.000000000 +0900
