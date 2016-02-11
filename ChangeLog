@@ -1,3 +1,11 @@
+2016-02-11  Bastian Maerkisch  <bmaerkisch@web.de>
+
+  * src/fit.c:  Fix order of using specs printed to log-file.
+  Bug #1657
+
+  * docs/term-ja.diff:  Remove japanese documentation for sun, next, and
+  openstep terminals which were removed on 2016-01-11.
+
 2016-02-11  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/term.c src/axis.h src/plot3d.c: Remove dead code and old comments.
