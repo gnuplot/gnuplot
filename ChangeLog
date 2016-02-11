@@ -1,12 +1,19 @@
-2016-02-20  Bastian Maerkisch  <bmaerkisch@web.de>
+2016-02-11  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/term.c src/axis.h src/plot3d.c: Remove dead code and old comments.
+	Comment out the call to AXIS_WRITEBACK that appears to be a vestige from
+	a code reorganization in the version 3.8 era. There are no other users 
+	of this macro.
+
+2016-02-10  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* term/dumb.trm:  Include stdint.h to make sure that uint32_t is defined
 	(MSVC).
 
 	* config/config.nt config/config.nt:  Sync with output of configure.
 
-	* config/mingw/Makefile:  Use gnuplot's default settings to generate plots
-	for the documentation.
+	* config/mingw/Makefile:  Use gnuplot's default settings to generate
+	plots for the documentation.
 
 	* configure.ac:  Cairo terminals require pango 1.22 
 	(pango_layout_get_baseline) now.  Consequently they do no longer build

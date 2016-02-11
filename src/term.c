@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.321 2016/01/10 00:41:12 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.322 2016/01/11 18:51:38 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -1229,15 +1229,15 @@ null_justify_text(enum JUSTIFY just)
 }
 
 
-/* Change scale of plot.
- * Parameters are x,y scaling factors for this plot.
- * Some terminals (eg latex) need to do scaling themselves.
+/* 
+ * Deprecated terminal function (pre-version 3)
  */
 static int
 null_scale(double x, double y)
 {
     (void) x;                   /* avoid -Wunused warning */
     (void) y;
+    int_error(NO_CARET, "Attempt to call deprecated terminal function");
     return FALSE;               /* can't be done */
 }
 
@@ -1488,9 +1488,6 @@ change_term(const char *origname, int length)
 
     term = t;
     term_initialised = FALSE;
-
-    if (term->scale != null_scale)
-	fputs("Warning: scale interface is not null_scale - may not work with multiplot\n", stderr);
 
     /* check that optional fields are initialised to something */
     if (term->text_angle == 0)

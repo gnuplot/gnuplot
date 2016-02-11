@@ -38,7 +38,7 @@ struct TERMENTRY {
     void (*init) __PROTO((void));
     void (*reset) __PROTO((void));
     void (*text) __PROTO((void));
-    int (*scale) __PROTO((double, double));
+    int (*scale) __PROTO((double, double));	/* DEPRECATED */
     void (*graphics) __PROTO((void));
     void (*move) __PROTO((unsigned int, unsigned int));
     void (*vector) __PROTO((unsigned int, unsigned int));
@@ -196,12 +196,7 @@ _reset()  Called when gnuplot is exited, the output device changed or
 the terminal type changed.  This procedure should reset the device, 
 possibly flushing a buffer somewhere or generating a form feed.
 
-_scale(xs,ys) Called just before _graphics(). This takes the x and y
-scaling factors as information. If the terminal would like to do its
-own scaling, it returns TRUE. Otherwise, it can ignore the information
-and return FALSE: do_plot will do the scaling for you. null_scale is
-provided to do just this, so most drivers can ignore this function.
-PLEASE DO NOT USE THIS INTERFACE - IT IS NOT COMPATIBLE WITH MULTIPLOT.
+_scale(xs,ys) Deprecated.  PLEASE DO NOT USE THIS INTERFACE.
 
 _graphics()  Called just before a plot is going to be displayed.  This
 procedure should set the device into graphics mode.  Devices which can't
@@ -502,7 +497,6 @@ routines are made:
  _options()
   _waitforinput()	/* If present, may be called before init() */
   _init()
-    _scale(xs,ys)
     _graphics()
       _linewidth(lw)
       _linetype(lt)

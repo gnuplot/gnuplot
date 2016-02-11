@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.247 2015/12/21 20:08:40 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.248 2016/01/28 23:54:13 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -2140,11 +2140,15 @@ eval_3dplots()
 	set_cbminmax();
 	axis_checked_extend_empty_range(COLOR_AXIS, "All points of colorbox value undefined");
 	setup_tics(&axis_array[COLOR_AXIS], 20);
-	/* axis_revert_and_unlog_range(COLOR_AXIS); */
-	/* fprintf(stderr,"plot3d.c: CB_AXIS.min=%g\tCB_AXIS.max=%g\n",CB_AXIS.min,CB_AXIS.max); */
     }
 
+#if (0)
+    /* This call was left here back in 3.8e when all the other writeback calls were moved. */
+    /* Feb 2016:  I am hazarding a guess that this has been useless for 15 years.	   */
+    /*            Comment it out for now; remove as dead code if no one reports a problem. */
+    /*            NB: This is the only invocation of AXIS_WRITEBACK, so it can go also.    */
     AXIS_WRITEBACK(FIRST_X_AXIS);
+#endif
 
     if (plot_num == 0 || first_3dplot == NULL) {
 	int_error(c_token, "no functions or data to plot");

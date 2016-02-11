@@ -1,5 +1,5 @@
 /*
- * $Id: axis.h,v 1.134 2015/12/19 21:45:35 sfeam Exp $
+ * $Id: axis.h,v 1.135 2016/01/10 00:41:12 sfeam Exp $
  *
  */
 
@@ -681,13 +681,6 @@ void init_parallel_axis __PROTO((AXIS *, AXIS_INDEX));
 AXIS * extend_parallel_axis __PROTO((int ));
 
 /* macro for tic scale, used in all tic_callback functions */
-#define TIC_SCALE(ticlevel, axis) \
-    (ticlevel <= 0 ? axis_array[axis].ticscale : \
-     ticlevel == 1 ? axis_array[axis].miniticscale : \
-     ticlevel < MAX_TICLEVEL ? ticscale[ticlevel] : \
-     0)
-
-/* same thing using axis pointer rather than index */
 #define tic_scale(ticlevel, axis) \
     (ticlevel <= 0 ? axis->ticscale : \
      ticlevel == 1 ? axis->miniticscale : \
