@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: tkcanvas.trm,v 1.30 2016/02/04 07:16:31 sfeam Exp $
+ * $Id: tkcanvas.trm,v 1.31 2016/02/09 01:14:24 sfeam Exp $
  *
  */
 
@@ -151,8 +151,8 @@ TERM_PUBLIC void TK_boxed_text(unsigned int x, unsigned int y, int option);
 #ifdef TERM_BODY
 
 /* FIXME HBB 20000725: This needs to be fixed.  As is, this driver causes
- * the terminal layer to depend on several other core modules. Th is a 
- * design bug. "term" is supposed a 'frontier' layer: it should not be 
+ * the terminal layer to depend on several other core modules. This is a 
+ * design bug. "term" is supposed as 'frontier' layer: it should not be 
  * dependent on any other code inside gnuplot */
 
 #include "axis.h" /* axis_array */
@@ -921,8 +921,12 @@ static char *tk_nobind[TK_LANG_MAX] = {
 TERM_PUBLIC void
 TK_vector(unsigned int x, unsigned int y)
 {
-    if ((x != tk_lastx) || (TK_YMAX - y != tk_lasty))
+    if ((x != tk_lastx) || (TK_YMAX - y != tk_lasty)) {
+	/* vector without preceeding move as e.g. in "with line lc variable" */
+	if (tk_polygon_points == 0)
+	    TK_add_path_point(tk_lastx, tk_lasty);
 	TK_add_path_point(x, TK_YMAX - y);
+    }
     tk_lastx = x;
     tk_lasty = TK_YMAX - y;
     return;
@@ -954,14 +958,14 @@ TK_flush_line(void)
 	fputs(tk_bind_init[tk_script_language], gpoutfile);
 
     /* draw a line segment */
-    fprintf(gpoutfile,  "%s", tk_line_segment_start[tk_script_language]);
+    fputs(tk_line_segment_start[tk_script_language], gpoutfile);
     for (i = 0; i < tk_polygon_points; i++)
 	fprintf(gpoutfile, tk_poly_point[tk_script_language], tk_path_x[i], tk_path_y[i]);
     fprintf(gpoutfile, tk_line_segment_opt[tk_script_language], tk_color, tk_linewidth,
 	tk_rounded ? "round" : "butt", tk_rounded ? "round" : "miter");
     if (tk_dashpattern[0] != NUL)
 	fprintf(gpoutfile, tk_line_segment_dash[tk_script_language], tk_dashpattern);
-    fprintf(gpoutfile,  "%s", tk_line_segment_end[tk_script_language]);
+    fputs(tk_line_segment_end[tk_script_language], gpoutfile);
 
     /* finish the binding mechanism
 	* (which calls 'gnuplot_xy' for the line segment pointed to by
@@ -1864,6 +1868,7 @@ static char *tk_rectangle[TK_LANG_MAX] = {
     "$cmx*%d/1000, $cmy*%d/1000, $cmx*%d/1000, $cmy*%d/1000,\n"
     "    -fill => q{%s}, -outline => q{}, -stipple => q{%s});\n"
 };
+
 
 static void
 TK_rectangle(int x1, int y1, int x2, int y2, char * color, char * stipple)
