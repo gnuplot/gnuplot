@@ -1,7 +1,16 @@
+2016-02-11  Anton Gladky <gladk@debian.org>
+
+	* term/tkcanvas.trm:  Replace statements of the form 
+	fprintf(gpoutfile, string) because they trigger a compiler warning/error
+	with  -Werror=format-security.
+
 2016-02-11  Bastian Maerkisch  <bmaerkisch@web.de>
 
-  * src/fit.c:  Fix order of using specs printed to log-file.
-  Bug #1657
+	* term/tkcanvas.trm (TK_vector):  Fix for vector commands without
+	preceeding move as e.g. in "with line lc variable".
+
+	* src/fit.c:  Fix order of using specs printed to log-file.
+	Bug #1657
 
 2016-02-10  Ethan A Merritt  <merritt@u.washington.edu>
 

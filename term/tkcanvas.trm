@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: tkcanvas.trm,v 1.28.8.2 2016/02/04 07:16:46 sfeam Exp $
+ * $Id: tkcanvas.trm,v 1.28.8.3 2016/02/11 09:23:54 markisch Exp $
  *
  */
 
@@ -921,8 +921,12 @@ static char *tk_nobind[TK_LANG_MAX] = {
 TERM_PUBLIC void
 TK_vector(unsigned int x, unsigned int y)
 {
-    if ((x != tk_lastx) || (TK_YMAX - y != tk_lasty))
+    if ((x != tk_lastx) || (TK_YMAX - y != tk_lasty)) {
+	/* vector without preceeding move as e.g. in "with line lc variable" */
+	if (tk_polygon_points == 0)
+	    TK_add_path_point(tk_lastx, tk_lasty);
 	TK_add_path_point(x, TK_YMAX - y);
+    }
     tk_lastx = x;
     tk_lasty = TK_YMAX - y;
     return;
