@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: tkcanvas.trm,v 1.28 2006/08/27 22:10:46 sfeam Exp $
+ * $Id: tkcanvas.trm,v 1.28.8.2 2016/02/04 07:16:46 sfeam Exp $
  *
  */
 
@@ -151,8 +151,8 @@ TERM_PUBLIC void TK_boxed_text(unsigned int x, unsigned int y, int option);
 #ifdef TERM_BODY
 
 /* FIXME HBB 20000725: This needs to be fixed.  As is, this driver causes
- * the terminal layer to depend on several other core modules. Th is a 
- * design bug. "term" is supposed a 'frontier' layer: it should not be 
+ * the terminal layer to depend on several other core modules. This is a 
+ * design bug. "term" is supposed as 'frontier' layer: it should not be 
  * dependent on any other code inside gnuplot */
 
 #include "axis.h" /* axis_array */
@@ -951,17 +951,17 @@ TK_flush_line(void)
     */
     /* prepare the binding mechanism */
     if (tk_interactive && !is_3d_plot)
-	fprintf(gpoutfile, tk_bind_init[tk_script_language]);
+	fputs(tk_bind_init[tk_script_language], gpoutfile);
 
     /* draw a line segment */
-    fprintf(gpoutfile, tk_line_segment_start[tk_script_language]);
+    fputs(tk_line_segment_start[tk_script_language], gpoutfile);
     for (i = 0; i < tk_polygon_points; i++)
 	fprintf(gpoutfile, tk_poly_point[tk_script_language], tk_path_x[i], tk_path_y[i]);
     fprintf(gpoutfile, tk_line_segment_opt[tk_script_language], tk_color, tk_linewidth,
 	tk_rounded ? "round" : "butt", tk_rounded ? "round" : "miter");
     if (tk_dashpattern[0] != NUL)
 	fprintf(gpoutfile, tk_line_segment_dash[tk_script_language], tk_dashpattern);
-    fprintf(gpoutfile, tk_line_segment_end[tk_script_language]);
+    fputs(tk_line_segment_end[tk_script_language], gpoutfile);
 
     /* finish the binding mechanism
 	* (which calls 'gnuplot_xy' for the line segment pointed to by
@@ -984,28 +984,28 @@ TK_flush_line(void)
 			TK_REAL_VALUE(TK_X_VALUE(0.5 * (x + tk_lastx)),
 			FIRST_X_AXIS));
 	    else
-		fprintf(gpoutfile, tk_bind_nil[tk_script_language]);
+		fputs(tk_bind_nil[tk_script_language], gpoutfile);
 	    if (axis_array[FIRST_Y_AXIS].log)
 		fprintf(gpoutfile, tk_bind_f[tk_script_language],
 		    TK_REAL_VALUE(TK_Y_VALUE(0.5 * (y + tk_lasty)),
 		    FIRST_Y_AXIS));
 	    else
-		fprintf(gpoutfile, tk_bind_nil[tk_script_language]);
+		fputs(tk_bind_nil[tk_script_language], gpoutfile);
 	    if (axis_array[SECOND_X_AXIS].log)
 		fprintf(gpoutfile, tk_bind_f[tk_script_language],
 		    TK_REAL_VALUE(TK_X_VALUE(0.5 * (x + tk_lastx)),
 		    SECOND_X_AXIS));
 	    else
-		fprintf(gpoutfile, tk_bind_nil[tk_script_language]);
+		fputs(tk_bind_nil[tk_script_language], gpoutfile);
 	    if (axis_array[SECOND_Y_AXIS].log)
 		fprintf(gpoutfile, tk_bind_f[tk_script_language],
 		    TK_REAL_VALUE(TK_Y_VALUE(0.5 * (y + tk_lasty)),
 		    SECOND_Y_AXIS));
 	    else
-		fprintf(gpoutfile, tk_bind_nil[tk_script_language]);
-	    fprintf(gpoutfile, tk_bind_end[tk_script_language]);
+		fputs(tk_bind_nil[tk_script_language], gpoutfile);
+	    fputs(tk_bind_end[tk_script_language], gpoutfile);
     } else {
-	fprintf(gpoutfile, tk_nobind[tk_script_language]);
+	fputs(tk_nobind[tk_script_language], gpoutfile);
     }
     tk_polygon_points = 0;
     tk_in_path = FALSE;
@@ -1157,14 +1157,14 @@ TK_put_noenhanced_text(unsigned int x, unsigned int y, const char *str)
     fprintf(gpoutfile, tk_create_text_begin[tk_script_language],
 	    x, y, quoted_str, tk_color, tk_anchor);
     if (tk_next_text_use_font) {
-	fprintf(gpoutfile, tk_create_text_font[tk_script_language]);
+	fputs(tk_create_text_font[tk_script_language], gpoutfile);
 	tk_next_text_use_font = FALSE;
     }
     if (tk_angle != 0)
 	fprintf(gpoutfile, tk_create_text_angle[tk_script_language], tk_angle);
     if (tk_boxed)
 	fprintf(gpoutfile, tk_tag[tk_script_language], "boxedtext");
-    fprintf(gpoutfile, tk_create_text_end[tk_script_language]);
+    fputs(tk_create_text_end[tk_script_language], gpoutfile);
 
     if (quoted_str != str)
 	free(quoted_str);
@@ -1294,9 +1294,9 @@ TK_set_font(const char *font)
 	if (size > 0)
 	    fprintf(gpoutfile, tk_set_fsize[tk_script_language], size);
 	if (isbold)
-	    fprintf(gpoutfile, tk_set_fbold[tk_script_language]);
+	    fputs(tk_set_fbold[tk_script_language], gpoutfile);
 	if (isitalic)
-	    fprintf(gpoutfile, tk_set_fitalic[tk_script_language]);
+	    fputs(tk_set_fitalic[tk_script_language], gpoutfile);
 	fputs(tk_font_end[tk_script_language], gpoutfile);
 	tk_next_text_use_font = TRUE;
 
@@ -1344,9 +1344,9 @@ TK_enhanced_open(char *fontname, double fontsize, double base,
 	if (fontsize > 0)
 	    fprintf(gpoutfile, tk_set_fsize[tk_script_language], (int) (fontsize));
 	if (isbold)
-	    fprintf(gpoutfile, tk_set_fbold[tk_script_language]);
+	    fputs(tk_set_fbold[tk_script_language], gpoutfile);
 	if (isitalic)
-	    fprintf(gpoutfile, tk_set_fitalic[tk_script_language]);
+	    fputs(tk_set_fitalic[tk_script_language], gpoutfile);
 	fputs(tk_font_end[tk_script_language], gpoutfile);
 	tk_next_text_use_font = TRUE;
 	free(family);
@@ -1408,14 +1408,14 @@ TK_enhanced_flush()
     fprintf(gpoutfile, tk_enhanced_text_begin[tk_script_language],
 			"xenh", "yenh", str, tk_color, tk_anchor);
     if (tk_next_text_use_font) {
-	fprintf(gpoutfile, tk_create_text_font[tk_script_language]);
+	fputs(tk_create_text_font[tk_script_language], gpoutfile);
 	tk_next_text_use_font = FALSE;
     }
     if (!tk_boxed)
 	fprintf(gpoutfile, tk_tag[tk_script_language], "enhancedtext");
     else
 	fprintf(gpoutfile, tk_tag[tk_script_language], "boxedtext");
-    fprintf(gpoutfile, tk_enhanced_text_end[tk_script_language]);
+    fputs(tk_enhanced_text_end[tk_script_language], gpoutfile);
 
     if (!tk_enhanced_widthflag)
 	/* don't update position */
@@ -1594,7 +1594,7 @@ void TK_arrow(unsigned int usx, unsigned int usy, unsigned int uex, unsigned int
     if (curr_arrow_headfilled >= AS_FILLED) { /* AS_FILLED, AS_NOBORDER */
 	assert(abs(head) <= BOTH_HEADS);
 
-	fprintf(gpoutfile, tk_line_segment_start[tk_script_language]);
+	fputs(tk_line_segment_start[tk_script_language], gpoutfile);
 	fprintf(gpoutfile, tk_poly_point[tk_script_language], sx, TK_YMAX - sy);
 	fprintf(gpoutfile, tk_poly_point[tk_script_language], ex, TK_YMAX - ey);
 	fprintf(gpoutfile, tk_line_segment_opt[tk_script_language], tk_color, tk_linewidth,
@@ -1629,8 +1629,8 @@ void TK_arrow(unsigned int usx, unsigned int usy, unsigned int uex, unsigned int
 	}
 	if (tk_dashpattern[0] != NUL)
 	    fprintf(gpoutfile, tk_line_segment_dash[tk_script_language], tk_dashpattern);
-	fprintf(gpoutfile, tk_line_segment_end[tk_script_language]);
-	fprintf(gpoutfile, tk_nobind[tk_script_language]);
+	fputs(tk_line_segment_end[tk_script_language], gpoutfile);
+	fputs(tk_nobind[tk_script_language], gpoutfile);
     } else { /* AS_NOFILL, AS_EMPTY */
 	/* fall back to internal routine since we cannot do non-filled arrows */
 	do_arrow(sx, sy, ex, ey, head);
@@ -1822,7 +1822,7 @@ TK_text()
     */
 
     TK_flush_line();
-    fprintf(gpoutfile, tk_endblock[tk_script_language]);
+    fputs(tk_endblock[tk_script_language], gpoutfile);
     if (!is_3d_plot)
         fprintf(gpoutfile, tk_info_procs[tk_script_language],
                 plot_bounds.xleft, plot_bounds.xright, TK_YMAX - plot_bounds.ytop, TK_YMAX - plot_bounds.ybot,
@@ -1864,6 +1864,7 @@ static char *tk_rectangle[TK_LANG_MAX] = {
     "$cmx*%d/1000, $cmy*%d/1000, $cmx*%d/1000, $cmy*%d/1000,\n"
     "    -fill => q{%s}, -outline => q{}, -stipple => q{%s});\n"
 };
+
 
 static void
 TK_rectangle(int x1, int y1, int x2, int y2, char * color, char * stipple)
@@ -1957,7 +1958,7 @@ TK_filled_polygon(int points, gpiPoint *corners)
     if ((points > 2) && (corners[0].x == corners[points-1].x)  && (corners[0].y == corners[points-1].y))
 	points--;
 
-    fprintf(gpoutfile, tk_poly_begin[tk_script_language]); 
+    fputs(tk_poly_begin[tk_script_language], gpoutfile); 
     for (i = 0; i < points; i++)
 	fprintf(gpoutfile, tk_poly_point[tk_script_language], corners[i].x, TK_YMAX - corners[i].y); 
     fprintf(gpoutfile, tk_poly_end[tk_script_language], tk_color); 
@@ -1977,15 +1978,15 @@ TK_path(int p)
 
 	FPRINTF((stderr, "tkcanvas: closepath: %i points\n", tk_polygon_points));
 	if (tk_polygon_points > 1) {
-	    fprintf(gpoutfile, tk_line_segment_start[tk_script_language]);
+	    fputs(tk_line_segment_start[tk_script_language], gpoutfile);
 	    for (i = 0; i < tk_polygon_points; i++)
 		fprintf(gpoutfile, tk_poly_point[tk_script_language], tk_path_x[i], tk_path_y[i]);
 	    fprintf(gpoutfile, tk_line_segment_opt[tk_script_language], tk_color, tk_linewidth,
 		tk_rounded ? "round" : "butt", tk_rounded ? "round" : "miter");
 	    if (tk_dashpattern[0] != NUL)
 		fprintf(gpoutfile, tk_line_segment_dash[tk_script_language], tk_dashpattern);
-	    fprintf(gpoutfile, tk_line_segment_end[tk_script_language]);
-	    fprintf(gpoutfile, tk_nobind[tk_script_language]);
+	    fputs(tk_line_segment_end[tk_script_language], gpoutfile);
+	    fputs(tk_nobind[tk_script_language], gpoutfile);
 	}
 	tk_in_path = FALSE;
 	tk_polygon_points = 0;
@@ -2088,7 +2089,7 @@ TK_boxed_text(unsigned int x, unsigned int y, int option)
 	fprintf(gpoutfile, tk_box[tk_script_language], "", "black");
 	/* fall through, this also ends text box mode */
     case TEXTBOX_FINISH:
-	fprintf(gpoutfile, tk_box_finish[tk_script_language]);
+	fputs(tk_box_finish[tk_script_language], gpoutfile);
 	tk_boxed = FALSE;
 	break;
     case TEXTBOX_MARGINS:
