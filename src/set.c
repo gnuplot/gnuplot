@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.510 2016/01/01 00:51:23 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.511 2016/01/28 23:44:51 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -781,8 +781,7 @@ set_arrow()
 	    if (set_end) { duplication = TRUE; break; }
 	    this_arrow->type = arrow_end_oriented;
 	    c_token++;
-	    /* FIXME: we really only want one coordinate (length), not 3 */
-	    get_position(&this_arrow->end);
+	    get_position_default(&this_arrow->end, first_axes, 1);
 	    set_end = TRUE;
 	    continue;
 	}

@@ -1,3 +1,7 @@
+2016-02-12  Jun Takimoto <takimoto-j@kba.biglobe.ne.jp>
+
+	* term/tkcanvas.trm:  More fixes suggested by clang warning messages.
+	
 2016-02-11  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* term/wxterminal/wxt_gui.cpp (wxt_raise_window):  On Windows, only
@@ -19,6 +23,9 @@
 	Comment out the call to AXIS_WRITEBACK that appears to be a vestige from
 	a code reorganization in the version 3.8 era. There are no other users 
 	of this macro.
+
+	* src/set.c src/show.c:  set/show arrow length wants only a single 
+	coordinate, not three.  (See patch of 2015-12-19).
 
 2016-02-10  Bastian Maerkisch  <bmaerkisch@web.de>
 
