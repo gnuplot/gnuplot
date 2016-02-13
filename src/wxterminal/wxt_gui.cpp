@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.cpp,v 1.128.2.22 2016/01/31 17:51:18 sfeam Exp $
+ * $Id: wxt_gui.cpp,v 1.128.2.23 2016/02/11 14:03:17 markisch Exp $
  */
 
 /* GNUPLOT - wxt_gui.cpp */
@@ -923,6 +923,8 @@ void wxtPanel::DrawToDC(wxDC &dc, wxRegion &region)
 		++upd;
 	}
 #elif defined(__WXMSW__)
+	// Need to flush to make sure the bitmap is fully drawn.
+	cairo_surface_flush(cairo_get_target(plot.cr));
 	BitBlt((HDC) dc.GetHDC(), 0, 0, plot.device_xmax, plot.device_ymax, hdc, 0, 0, SRCCOPY);
 #else
 	dc.DrawBitmap(*cairo_bitmap, 0, 0, false);
@@ -1772,6 +1774,13 @@ void wxt_init()
 
 	if ( wxt_status == STATUS_UNINITIALIZED ) {
 		FPRINTF((stderr,"First Init\n"));
+
+#if !defined(DEVELOPMENT_VERSION) && wxCHECK_VERSION(2, 9, 0)
+		// disable all assert()s
+		// affects in particular the strcmp(setlocale(LC_ALL, NULL), "C") == 0
+		// assertion in wxLocale::GetInfo
+		wxSetAssertHandler(NULL);
+#endif
 
 #ifdef __WXMSW__
 		/* the following is done in wxEntry() with wxMSW only */
@@ -3437,7 +3446,6 @@ int wxtPanel::wxt_cairo_create_platform_context()
 
 	if ( !GDK_IS_DRAWABLE(dc.GetWindow()) )
 		return 1;
-
 
 	gdkpixmap = gdk_pixmap_new(dc.GetWindow(), plot.device_xmax, plot.device_ymax, -1);
 
