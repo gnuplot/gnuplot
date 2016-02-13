@@ -51,6 +51,7 @@
 #include <QtCore>
 #include <QtGui>
 #include <QtNetwork>
+#include <cmath>		   // for isnan()
 
 extern "C" {
 	#include "plot.h"      // for interactive

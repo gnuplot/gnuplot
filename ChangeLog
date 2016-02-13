@@ -1,5 +1,11 @@
 2016-02-13  Bastian Maerkisch  <bmaerkisch@web.de>
 
+	* src/qtterminal/qt_term.h src/qtterminal/qt_conversion.cpp:  isnan()
+	is in namespace std.
+
+	* src/win/wtext.h:  Avoid warnings about the re-definition of
+	popen/pclose with fake pipe support using MSYS2/Mingw-w64.
+
 	* src/wxterminal/wxt_gui.cpp|h:  Fixes to make the wxt terminal work
 	with wxWidgets 3 on Windows:
 	1) Disable wxWidgets debug assertions in release builds. This does 
