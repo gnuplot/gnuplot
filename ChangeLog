@@ -5,7 +5,8 @@
 	printf etc. which are C99 compliant.
 
 	* src/qtterminal/qt_term.h src/qtterminal/qt_conversion.cpp:  isnan()
-	is in namespace std.
+	is in namespace std.  -- Reverted since not all relevant compilers
+	follow the C++11 standard just yet.
 
 	* src/win/wtext.h:  Avoid warnings about the re-definition of
 	popen/pclose with fake pipe support using MSYS2/Mingw-w64.
