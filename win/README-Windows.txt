@@ -185,10 +185,10 @@ Known bugs
 
 Please see and use
 
-    http://sourceforge.net/tracker/?atid=102055&group_id=2055&func=browse
+    http://sourceforge.net/p/gnuplot/bugs/
 
 for an up-to-date bug tracking system.
 
 --------------------------------------------------------------------------------
 
-The gnuplot team, May 2014
+The gnuplot team, February 2015
