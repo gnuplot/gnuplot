@@ -1,7 +1,12 @@
+2016-02-13  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* term/tkcanvas.trm (TK_init):  TK_image requires WRITE_PNG_IMAGE to be
+	defined.
+
 2016-02-12  Jun Takimoto <takimoto-j@kba.biglobe.ne.jp>
 
 	* term/tkcanvas.trm:  More fixes suggested by clang warning messages.
-	
+
 2016-02-11  Anton Gladky <gladk@debian.org>
 
 	* term/tkcanvas.trm:  Replace statements of the form 
@@ -40,7 +45,7 @@
 
 2016-02-04  Joachim Wuttke  <jwuttke@users.sourceforge.net>
 
-	* term/tkcanvs.trm:  Replace old (pre-1999) tkcanvas.trm with a 
+	* term/tkcanvas.trm:  Replace old (pre-1999) tkcanvas.trm with a 
 	rewrite from Joachim Wuttke  <jwuttke@users.sourceforge.net>
 	and Bastian Maerkisch  <bmaerkisch@web.de>
 
