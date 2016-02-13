@@ -4,3 +4,4 @@ Makefile.in
 binary?
 *.manifest
 .tmp
+*.exe

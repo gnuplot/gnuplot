@@ -17,3 +17,4 @@ ui_*.h
 gdwin32
 lua
 share
+demo_plugin.*

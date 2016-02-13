@@ -1,9 +1,11 @@
 VERSION
 *.d
 *.h
+*.o
 *.co
 *.po
 *.exe
+*.dll
 *.mnu
 *.ico
 *.chw
