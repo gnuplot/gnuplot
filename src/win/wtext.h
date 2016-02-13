@@ -1,5 +1,5 @@
 /*
- * $Id: wtext.h,v 1.16 2013/06/02 13:59:26 markisch Exp $
+ * $Id: wtext.h,v 1.17 2014/03/20 00:58:37 markisch Exp $
  */
 
 /* GNUPLOT - win/wtext.h */
@@ -94,7 +94,11 @@ extern "C" {
 #define cscanf dontuse_cscanf
 #define ungetch dontuse_ungetch
 
+/* Windows pipe emulation by using temporary files */
 #ifdef USE_FAKEPIPES
+/* Mingw64 might define these already. */
+# undef popen
+# undef pclose
 # define popen fake_popen
 # define pclose fake_pclose
 #endif
