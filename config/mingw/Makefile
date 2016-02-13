@@ -1,5 +1,5 @@
 # Hello, emacs: this is a -*- Makefile -*-
-# $Id: Makefile,v 1.48.2.1 2014/12/15 20:30:51 markisch Exp $
+# $Id: Makefile,v 1.48.2.2 2014/12/28 12:55:59 markisch Exp $
 #
 # GNUPLOT Makefile for MinGW/MSYS on Windows
 # This assumes usual installation of the MinGW32 toolkit, the free
@@ -255,7 +255,7 @@ TERMFLAGS += -I$(TOP)/term
 
 TERMLIBS =
 
-CFLAGS += -I. -I$(S) -I$(T) -D_Windows -DHAVE_CONFIG_H $(OPTS)
+CFLAGS += -I. -I$(S) -I$(T) -D_Windows -DHAVE_CONFIG_H -D__USE_MINGW_ANSI_STDIO=1 $(OPTS)
 CFLAGS += -DGNUPLOT_SHARE_DIR=\"$(GNUPLOT_SHARE_DIR)\"
 
 ifndef RELEASE
@@ -599,7 +599,7 @@ demo_plugin.dll: $(M)plugin/demo_plugin.c
 $(BUILDHELPFILE): doc2html.exe $(D)gnuplot.doc $(D)windows/wgnuplot.hhp $(D)windows/wgnuplot.hhk \
                   $(D)windows/wgnuplot.stp $(D)plotstyles.gnu $(CORETERM)
 	./doc2html $(D)gnuplot.doc $(D)windows/
-	-$(TARGET) -e "winhelp=1; cd '$(D)'" plotstyles.gnu
+	-$(TARGET) -d -e "winhelp=1; cd '$(D)'" plotstyles.gnu
 	-$(HHC) $(D)windows/wgnuplot.hhp
 
 $(HELPFILE): $(BUILDHELPFILE)
@@ -642,7 +642,7 @@ wgnuplot-ja.chm: $(JASRC) doc2html-ja.exe \
 	sed -i -e "s/charset=utf-8/charset=shift-jis/" $(JADW)wgnuplot.hhc
 	sed -i -e "s/Language=0x409 Englisch (USA)/Language=0x411 Japanisch (Japan)/" $(JADW)/wgnuplot.hhp
 	# Build help file
-	-$(TARGET) -e "winhelp=1; cd '$(JAD)'" plotstyles.gnu
+	-$(TARGET) -d -e "winhelp=1; cd '$(JAD)'" plotstyles.gnu
 	-$(HHC) $(JADW)wgnuplot.hhp
 	cp $(JADW)wgnuplot.chm $(HELPFILEJA)
 
@@ -714,7 +714,7 @@ gnuplot.tex: $(D)gnuplot.doc doc2tex.exe
 	doc2tex $(D)gnuplot.doc gnuplot.tex
 
 gnuplot-figures.tex: $(D)gnuplot.doc doc2tex.exe
-	GNUPLOT_LIB=$(M) $(TARGET) $(D)plotstyles.gnu
+	GNUPLOT_LIB=$(M) $(TARGET) -d $(D)plotstyles.gnu
 	doc2tex -figures $(D)gnuplot.doc gnuplot-figures.tex
 
 gnuplot.dvi: gnuplot.tex $(TOP)/VERSION $(D)toc_entr.sty $(D)titlepag.tex
@@ -780,7 +780,7 @@ gpcard.pdf: $(D)gpcard.tex
 	dvipdfm gpcard.dvi
 
 ps_symbols.pdf: $(D)psdoc/ps_symbols.gpi
-	GNUPLOT_LIB=$(D)psdoc GNUPLOT_PS_DIR=$(T)PostScript $(TARGET) ps_symbols.gpi
+	GNUPLOT_LIB=$(D)psdoc GNUPLOT_PS_DIR=$(T)PostScript $(TARGET) -d ps_symbols.gpi
 	ps2pdf ps_symbols.ps
 
 ps_fontfile_doc.ps: $(D)psdoc/ps_fontfile_doc.tex

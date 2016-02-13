@@ -1,5 +1,9 @@
 2016-02-13  Bastian Maerkisch  <bmaerkisch@web.de>
 
+	* config/mingw/Makefile:  Use gnuplot's default settings to generate
+	plots for the documentation.  Use MinGW's own implementations of
+	printf etc. which are C99 compliant.
+
 	* src/qtterminal/qt_term.h src/qtterminal/qt_conversion.cpp:  isnan()
 	is in namespace std.
 
