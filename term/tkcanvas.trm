@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: tkcanvas.trm,v 1.32 2016/02/11 09:22:06 markisch Exp $
+ * $Id: tkcanvas.trm,v 1.33 2016/02/12 19:53:16 sfeam Exp $
  *
  */
 
@@ -351,7 +351,9 @@ TK_options()
 	case TK_INLINEIMAGES:
 	case TK_EXTERNALIMAGES:
 	    c_token++;
+#ifdef WRITE_PNG_IMAGE
 	    term->image = TK_image;
+#endif
 	    break;
 	case TK_OTHER:
 	default:
