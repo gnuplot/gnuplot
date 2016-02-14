@@ -1,3 +1,24 @@
+2016-02-14  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* config/mingw/Makefile:  Use MinGW's own implementations of
+	printf etc. which are C99 compliant.
+
+s	* src/win/wtext.h:  Avoid warnings about the re-definition of
+	popen/pclose with fake pipe support using MSYS2/Mingw-w64.
+
+	* src/wxterminal/wxt_gui.cpp|h:  Fixes to make the wxt terminal work
+	with wxWidgets 3 on Windows:
+	1) Disable wxWidgets debug assertions in release builds. This does 
+	not solve the problem with a setlocale(LC_ALL, NULL) == "C" test in 
+	wxLocale, but at least gets rid of the warning.
+	2) Flush the cairo surface before blitting the internal bitmap to
+	screen.
+
+	* src/win/wgraph.c:  Include direct.h for _chdir().
+
+s	* term/tkcanvas.trm (TK_init):  TK_image requires WRITE_PNG_IMAGE to be
+	defined.
+
 2016-02-12  Jun Takimoto <takimoto-j@kba.biglobe.ne.jp>
 
 	* term/tkcanvas.trm:  More fixes suggested by clang warning messages.

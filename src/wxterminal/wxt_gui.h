@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.h,v 1.52 2014/12/26 23:21:48 sfeam Exp $
+ * $Id: wxt_gui.h,v 1.53 2015/05/13 19:15:58 sfeam Exp $
  */
 
 /* GNUPLOT - wxt_gui.h */
@@ -101,6 +101,9 @@
 
 /* wxMemoryInputStream, for the embedded PNG icons */
 #include <wx/mstream.h>
+
+/* Debugging support, required to turn off asserts */
+#include <wx/debug.h>
 
 /* c++ vectors and lists, used to store gnuplot commands */
 #include <vector>
