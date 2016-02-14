@@ -1,5 +1,5 @@
 # Hello, emacs: this is a -*- Makefile -*-
-# $Id: Makefile,v 1.53 2016/02/04 06:26:18 sfeam Exp $
+# $Id: Makefile,v 1.54 2016/02/10 10:51:21 markisch Exp $
 #
 # GNUPLOT Makefile for MinGW/MSYS on Windows
 # This assumes usual installation of the MinGW32 toolkit, the free
@@ -255,7 +255,7 @@ TERMFLAGS += -I$(TOP)/term
 
 TERMLIBS =
 
-CFLAGS += -I. -I$(S) -I$(T) -D_Windows -DHAVE_CONFIG_H $(OPTS)
+CFLAGS += -I. -I$(S) -I$(T) -D_Windows -DHAVE_CONFIG_H -D__USE_MINGW_ANSI_STDIO=1 $(OPTS)
 CFLAGS += -DGNUPLOT_SHARE_DIR=\"$(GNUPLOT_SHARE_DIR)\"
 
 ifndef RELEASE
