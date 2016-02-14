@@ -1,5 +1,8 @@
 2016-02-14  Bastian Maerkisch  <bmaerkisch@web.de>
 
+	* src/wxterminal/wxt_gui.h:  Use local events to avoid warnings about
+	incompatible linkage on Windows.
+
 	* config/mingw/Makefile:  Use MinGW's own implementations of
 	printf etc. which are C99 compliant.
 
