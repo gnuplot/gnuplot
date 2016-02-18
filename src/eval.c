@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: eval.c,v 1.129 2016/01/15 05:06:51 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: eval.c,v 1.130 2016/02/07 22:15:36 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - eval.c */
@@ -536,9 +536,16 @@ push(struct value *x)
     if (s_p == STACK_DEPTH - 1)
 	int_error(NO_CARET, "stack overflow");
     stack[++s_p] = *x;
+
     /* WARNING - This is a memory leak if the string is not later freed */
     if (x->type == STRING && x->v.string_val)
 	stack[s_p].v.string_val = gp_strdup(x->v.string_val);
+
+    /* FIXME: pushing a copy of an array onto the stack would not be hard */
+    /* but lifetime rules for the array contents are tricky.  Imperfect   */
+    /* tracking of STRING elements leads to memory leak or double-free.   */
+    if (x->type == ARRAY)
+	int_error(NO_CARET, "Unsupported array operation");
 }
 
 

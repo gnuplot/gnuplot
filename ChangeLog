@@ -1,3 +1,12 @@
+2016-02-18  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/command.c src/eval.c (push):  Evaluation of expressions that 
+	contain a bare array name is not yet implemented.  Treat this as an
+	error "unsupported array operation".  This can later be replaced by
+	code to duplicate the array on push() and free it after pop() if
+	approriate (this is the tricky part, particularly if the array 
+	contains STRING elements).
+
 2016-02-14  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/wxterminal/wxt_gui.h:  Use local events to avoid warnings about
