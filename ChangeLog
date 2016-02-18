@@ -1,11 +1,13 @@
 2016-02-18  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/command.c src/eval.c (push):  Evaluation of expressions that 
-	contain a bare array name is not yet implemented.  Treat this as an
-	error "unsupported array operation".  This can later be replaced by
-	code to duplicate the array on push() and free it after pop() if
-	approriate (this is the tricky part, particularly if the array 
-	contains STRING elements).
+	contain a bare array name is problematic because any attempt to access
+	the actual array contents during or after evaluation requires that they
+	be duplicated on push() and freed later. Freeing is the tricky part,
+	particularly if the array contains STRING elements.  This patch seems
+	OK in preliminary testing, but at this point the only only possible
+	operations are indexing and assignment. If other operations are added
+	later they may reveal inadequacies in the alloc/free tracking.
 
 2016-02-14  Bastian Maerkisch  <bmaerkisch@web.de>
 

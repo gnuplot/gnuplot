@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: eval.c,v 1.130 2016/02/07 22:15:36 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: eval.c,v 1.131 2016/02/18 18:05:35 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - eval.c */
@@ -541,11 +541,18 @@ push(struct value *x)
     if (x->type == STRING && x->v.string_val)
 	stack[s_p].v.string_val = gp_strdup(x->v.string_val);
 
-    /* FIXME: pushing a copy of an array onto the stack would not be hard */
-    /* but lifetime rules for the array contents are tricky.  Imperfect   */
-    /* tracking of STRING elements leads to memory leak or double-free.   */
-    if (x->type == ARRAY)
-	int_error(NO_CARET, "Unsupported array operation");
+    /* WARNING - This is a memory leak if the array is not later freed */
+    if (x->type == ARRAY) {
+	int i;
+	int array_size = x->v.value_array[0].v.int_val;
+	stack[s_p].v.value_array = gp_alloc((array_size+1) * sizeof(struct value), "push array");
+	memcpy(stack[s_p].v.value_array, x->v.value_array, (array_size+1)*sizeof(struct value));
+	for (i=1; i<=array_size; i++) 
+	    if (stack[s_p].v.value_array[i].type == STRING) {
+		stack[s_p].v.value_array[i].v.string_val
+		= strdup(stack[s_p].v.value_array[i].v.string_val);
+	    }
+    }
 }
 
 
