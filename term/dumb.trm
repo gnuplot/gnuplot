@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: dumb.trm,v 1.33 2013/04/22 20:14:24 markisch Exp $
+ * $Id: dumb.trm,v 1.34 2015/08/14 22:28:02 sfeam Exp $
  *
  */
 
@@ -99,6 +99,10 @@ TERM_PUBLIC void ENHdumb_FLUSH __PROTO((void));
 
 #define DUMB_AXIS_CONST '\1'
 #define DUMB_BORDER_CONST '\2'
+
+#ifdef HAVE_STDINT_H
+#include <stdint.h>
+#endif
 
 /* UTF-8 support */
 #ifdef HAVE_STDLIB_H

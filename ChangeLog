@@ -1,3 +1,17 @@
+2016-02-20  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* term/dumb.trm:  Include stdint.h to make sure that uint32_t is defined
+	(MSVC).
+
+	* config/config.nt config/config.nt:  Sync with output of configure.
+
+	* config/mingw/Makefile:  Use gnuplot's default settings to generate plots
+	for the documentation.
+
+	* configure.ac:  Cairo terminals require pango 1.22 
+	(pango_layout_get_baseline) now.  Consequently they do no longer build
+	on RH5 etc.
+
 2016-02-10  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/command.c (print_command):  Do not allow printing a datablock into
