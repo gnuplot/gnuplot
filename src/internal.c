@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: internal.c,v 1.87 2016/01/09 06:56:02 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: internal.c,v 1.88 2016/02/07 22:15:36 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - internal.c */
@@ -116,7 +116,12 @@ f_pop(union argument *x)
 {
     struct value dummy;
     pop(&dummy);
-    gpfree_string(&dummy);
+    if (dummy.type == STRING)
+	gpfree_string(&dummy);
+#ifdef ARRAY_COPY_ON_REFERENCE
+    if (dummy.type == ARRAY)
+	gpfree_string(&dummy);
+#endif
 }
 
 void
@@ -155,6 +160,9 @@ f_call(union argument *x)
 
     save_dummy = udf->dummy_values[0];
     (void) pop(&(udf->dummy_values[0]));
+
+    if (udf->dummy_values[0].type == ARRAY)
+	int_error(NO_CARET, "f_call: unsupported array operation");
 
     if (udf->dummy_num != 1)
 	int_error(NO_CARET, "function %s requires %d variables", udf->udf_name, udf->dummy_num);
@@ -207,8 +215,11 @@ f_calln(union argument *x)
     }
 
     /* pop parameters we can use */
-    for (i = num_pop - 1; i >= 0; i--)
+    for (i = num_pop - 1; i >= 0; i--) {
 	(void) pop(&(udf->dummy_values[i]));
+	if (udf->dummy_values[i].type == ARRAY)
+	    int_error(NO_CARET, "f_calln: unsupported array operation");
+    }
 
     if (recursion_depth++ > STACK_DEPTH)
 	int_error(NO_CARET, "recursion depth limit exceeded");
@@ -1801,15 +1812,19 @@ f_assign(union argument *arg)
     if (a.type != STRING)
 	int_error(NO_CARET, "attempt to assign to something other than a named variable");
     if (!strncmp(a.v.string_val,"GPVAL_",6) || !strncmp(a.v.string_val,"MOUSE_",6))
-	int_error(NO_CARET,"Attempt to assign to a read-only variable");
+	int_error(NO_CARET, "attempt to assign to a read-only variable");
+    if (b.type == ARRAY)
+	int_error(NO_CARET, "unsupported array operation");
 
     udv = add_udv_by_name(a.v.string_val);
     gpfree_string(&a);
 
     if (udv->udv_value.type == ARRAY) {
 	int i = index.v.int_val;
+	if (index.type != INTGR)
+	    int_error(NO_CARET, "unsupported array operation");
 	if (i < 0 || i > udv->udv_value.v.value_array[0].v.int_val)
-	    int_error(c_token, "array index out of range");
+	    int_error(NO_CARET, "array index out of range");
 	gpfree_string(&udv->udv_value.v.value_array[i]);
 	udv->udv_value.v.value_array[i] = b;
     } else {

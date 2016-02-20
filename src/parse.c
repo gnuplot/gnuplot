@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: parse.c,v 1.100 2016/02/20 06:44:10 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: parse.c,v 1.101 2016/02/20 20:59:27 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - parse.c */
@@ -172,6 +172,13 @@ const_express(struct value *valptr)
     if (undefined) {
 	int_error(tkn, "undefined value");
     }
+
+    if (valptr->type == ARRAY) {
+	/* Make sure no one tries to free it later */
+	valptr->type = NOTDEFINED;
+	int_error(NO_CARET, "const_express: unsupported array operation");
+    }
+
     return (valptr);
 }
 

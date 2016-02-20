@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.313 2016/02/10 05:24:15 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.314 2016/02/18 18:05:35 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -1916,9 +1916,10 @@ print_command()
 			gpfree_string(&a);
 			fputs(nbuf, print_out);
 			free(nbuf);
-		} else
+	    } else
 #endif
 		fputs(a.v.string_val, print_out);
+	    gpfree_string(&a);
 	    need_space = FALSE;
 	} else {
 	    if (need_space) {
@@ -1932,9 +1933,11 @@ print_command()
 	    else
 		disp_value(print_out, &a, FALSE);
 	    need_space = TRUE;
+#ifdef ARRAY_COPY_ON_REFERENCE
+	    /* Prevents memory leakage for ARRAY variables */
+	    gpfree_string(&a);
+#endif
 	}
-	/* Prevents memory leakage for STRING or ARRAY variables */
-	gpfree_string(&a);
 
     } while (!END_OF_COMMAND && equals(c_token, ","));
 

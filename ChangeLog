@@ -8,6 +8,15 @@
 	fail even though they don't really care about this dummy slot.
 	Now we initialize it to report that a NOTDEFINED variable was pushed.
 
+	* src/command.c src/eval.c (push) src/internal.c src/parse.c:
+	Back off to the original idea that bare array names are not legal for
+	expression evaluation.  The previous work-around of copying the entire
+	array on every reference imposed a huge overhead for accessing the value
+	of an individual entry. The previous code is left in place via
+	#ifdef ARRAY_COPY_ON_REFERENCE to serve as a model for later expansion
+	to support some subset of operations requiring a copy (e.g. simple
+	assigment B=A or concatenation C = A.B).
+
 2016-02-18  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/command.c src/eval.c (push):  Evaluation of expressions that 
