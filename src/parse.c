@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: parse.c,v 1.99 2016/02/08 00:51:11 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: parse.c,v 1.100 2016/02/20 06:44:10 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - parse.c */
@@ -443,7 +443,7 @@ parse_assignment_expression()
 
 	/* push a dummy variable that would be the index if this were an array */
 	/* FIXME: It would be nice to hide this from "show at" */
-	(void)add_action(PUSHC);
+	foo = add_action(PUSHC);
 	foo->v_arg.type = NOTDEFINED;
 
 	/* push the expression whose value it will get */

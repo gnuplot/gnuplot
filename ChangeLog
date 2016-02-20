@@ -1,3 +1,13 @@
+2016-02-20  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/parse.c (parse_assignment_expression):  In order to support
+	assignment to an array element (e.g. A[i] = foo) a slot for the array
+	index is always pushed onto the evaluation stack even if no array is
+	involved.  However this slot was not being initialized to a valid 
+	PUSHC descriptor, so "show at" and certain other operations could 
+	fail even though they don't really care about this dummy slot.
+	Now we initialize it to report that a NOTDEFINED variable was pushed.
+
 2016-02-18  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/command.c src/eval.c (push):  Evaluation of expressions that 
