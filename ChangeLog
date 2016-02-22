@@ -1,3 +1,5 @@
+2016-02-22  Release 5.0.3
+
 2016-02-13  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* config/mingw/Makefile:  Use gnuplot's default settings to generate

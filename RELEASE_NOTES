@@ -7,9 +7,9 @@ and minor changes accummulated since then.
 
 These release notes are for version 5.0 patchlevel 3 (5.0.3).
 This release is primarily to update four terminals (qt, aqua, wxt, tkcanvas)
-with bugs or missing features in the previous release 5.0.2.
+that had bugs or missing features in the previous release 5.0.2.
 
-Release Notes date: 03-Feb-2016
+Release Notes date: 21-Feb-2016
 
 This patchlevel 5.0.3 incremental release includes
 ==================================================
