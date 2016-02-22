@@ -278,7 +278,7 @@ Options for generating interactive plots for web display
 Installation
 ------------
 
-You can download a source tarball for gnuplot version 5.0.2 from the 
+You can download a source tarball for gnuplot version 5.0.3 from the 
 gnuplot development site on SourceForge.
 	http://sourceforge.net/projects/gnuplot
 
@@ -286,7 +286,7 @@ Installation instructions are available in the source itself; the short
 version for linux/unix-like systems is to unpack the tarball and then
 <PRE>
 build it:
-      cd gnuplot-5.0.2 ; ./configure ; make
+      cd gnuplot-5.0.3 ; ./configure ; make
 test it:
       make check
 install it:
