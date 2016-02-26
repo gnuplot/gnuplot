@@ -624,16 +624,26 @@ Fu&nctions
 	--
 	[Menu]
 	Line Style
+	Reset Line Style to its default
+		set style line [INPUT]Line Style Number?[EOS] default{ENTER}
+	Line Style ...
+		set style line [INPUT]Line Style Number?[EOS] [EOS]
 	Line Type
-		set style linetype [INPUT]Line Type?{ENTER}
+		lt [INPUT]Line Type?[EOS] [EOS]
+	Dash Pattern
+		dt [INPUT]Dash Pattern?[EOS] [EOS]
+	Line Color
+		lc [INPUT]Line Color?[EOS] [EOS]
 	Line Width
-		set style linewidth [INPUT]Line Width?{ENTER}
+		lw [INPUT]Line Width?[EOS] [EOS]
 	Point Type
-		set style pointtype [INPUT]Point Type?{ENTER}
+		pt [INPUT]Point Type?[EOS] [EOS]
 	Point Size
-		set style pointsize [INPUT]Point Size?{ENTER}
-;	Palette
-;		set style line{ENTER}
+		ps [INPUT]Point Size?[EOS] [EOS]
+	Point Intervel
+		pointinterval [INPUT]Interval?[EOS] [EOS]
+	Palette (for 3D plots)
+		palette [EOS]
 	[EndMenu]
 	Show Line Style
 		show style line{ENTER}

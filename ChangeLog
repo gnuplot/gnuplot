@@ -1,32 +1,40 @@
+2016-02-26  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/win/wgnuplot.mnu: Update the Windows GUI menu definitions a
+	bit.
+
 2016-02-20  Ethan A Merritt  <merritt@u.washington.edu>
 
-	* src/parse.c (parse_assignment_expression):  In order to support
-	assignment to an array element (e.g. A[i] = foo) a slot for the array
-	index is always pushed onto the evaluation stack even if no array is
-	involved.  However this slot was not being initialized to a valid 
-	PUSHC descriptor, so "show at" and certain other operations could 
-	fail even though they don't really care about this dummy slot.
-	Now we initialize it to report that a NOTDEFINED variable was pushed.
+	* src/parse.c (parse_assignment_expression): In order to support
+	assignment to an array element (e.g. A[i] = foo) a slot for the
+	array index is always pushed onto the evaluation stack even if no
+	array is involved.  However this slot was not being initialized to
+	a valid PUSHC descriptor, so "show at" and certain other
+	operations could fail even though they don't really care about
+	this dummy slot.  Now we initialize it to report that a NOTDEFINED
+	variable was pushed.
 
-	* src/command.c src/eval.c (push) src/internal.c src/parse.c:
-	Back off to the original idea that bare array names are not legal for
-	expression evaluation.  The previous work-around of copying the entire
-	array on every reference imposed a huge overhead for accessing the value
-	of an individual entry. The previous code is left in place via
-	#ifdef ARRAY_COPY_ON_REFERENCE to serve as a model for later expansion
-	to support some subset of operations requiring a copy (e.g. simple
-	assigment B=A or concatenation C = A.B).
+	* src/command.c src/eval.c (push) src/internal.c src/parse.c: Back
+	off to the original idea that bare array names are not legal for
+	expression evaluation.  The previous work-around of copying the
+	entire array on every reference imposed a huge overhead for
+	accessing the value of an individual entry. The previous code is
+	left in place via #ifdef ARRAY_COPY_ON_REFERENCE to serve as a
+	model for later expansion to support some subset of operations
+	requiring a copy (e.g. simple assigment B=A or concatenation C =
+	A.B).
 
 2016-02-18  Ethan A Merritt  <merritt@u.washington.edu>
 
-	* src/command.c src/eval.c (push):  Evaluation of expressions that 
-	contain a bare array name is problematic because any attempt to access
-	the actual array contents during or after evaluation requires that they
-	be duplicated on push() and freed later. Freeing is the tricky part,
-	particularly if the array contains STRING elements.  This patch seems
-	OK in preliminary testing, but at this point the only only possible
-	operations are indexing and assignment. If other operations are added
-	later they may reveal inadequacies in the alloc/free tracking.
+	* src/command.c src/eval.c (push): Evaluation of expressions that
+	contain a bare array name is problematic because any attempt to
+	access the actual array contents during or after evaluation
+	requires that they be duplicated on push() and freed
+	later. Freeing is the tricky part, particularly if the array
+	contains STRING elements.  This patch seems OK in preliminary
+	testing, but at this point the only only possible operations are
+	indexing and assignment. If other operations are added later they
+	may reveal inadequacies in the alloc/free tracking.
 
 2016-02-14  Bastian Maerkisch  <bmaerkisch@web.de>
 
