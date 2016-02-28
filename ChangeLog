@@ -1,3 +1,11 @@
+2016-02-28  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/util.h src/util.c (common_error_exit):  Move the code that resets
+	various gnuplot state variables after an error from int_error() to a new
+	common path routine common_error_exit() shared with os_error().  Ensure
+	that GPVAL_ERRNO and GPVAL_ERRMSG are set in both cases.
+	Bug #1741
+
 2016-02-26  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/win/wgnuplot.mnu: Update the Windows GUI menu definitions a

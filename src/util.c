@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: util.c,v 1.135 2016/01/10 00:41:13 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: util.c,v 1.136 2016/02/07 22:15:36 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - util.c */
@@ -990,6 +990,9 @@ if (!interactive) {							\
  */
 TBOOLEAN screen_ok;
 
+/*
+ * os_error() is just like int_error() except that it calls perror().
+ */
 #if defined(VA_START) && defined(STDC_HEADERS)
 void
 os_error(int t_num, const char *str,...)
@@ -1038,15 +1041,13 @@ os_error(int t_num, const char *str, va_dcl)
 #ifdef VMS
     status[1] = vaxc$errno;
     sys$putmsg(status);
-    (void) putc('\n', stderr);
 #else /* VMS */
-    perror("util.c");
-    putc('\n', stderr);
+    perror("system error");
 #endif /* VMS */
 
-    scanning_range_in_progress = FALSE;
-
-    bail_to_command_line();
+    putc('\n', stderr);
+    fill_gpval_string("GPVAL_ERRMSG", strerror(errno));
+    common_error_exit();
 }
 
 
@@ -1094,7 +1095,14 @@ int_error(int t_num, const char str[], va_dcl)
 #endif
 
     fputs("\n\n", stderr);
+    fill_gpval_string("GPVAL_ERRMSG", error_message);
+    common_error_exit();
+}
 
+
+void
+common_error_exit()
+{
     /* We are bailing out of nested context without ever reaching */
     /* the normal cleanup code. Reset any flags before bailing.   */
     df_reset_after_error();
@@ -1106,7 +1114,6 @@ int_error(int t_num, const char str[], va_dcl)
 
     /* Load error state variables */
     update_gpval_variables(2);
-    fill_gpval_string("GPVAL_ERRMSG", error_message);
 
     bail_to_command_line();
 }
