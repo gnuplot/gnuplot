@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: stats.c,v 1.24 2016/02/03 21:42:06 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: stats.c,v 1.25 2016/02/10 06:01:07 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - stats.c */
@@ -756,6 +756,7 @@ statsrequest(void)
 
     /* Vars that control output */
     TBOOLEAN do_output = TRUE;     /* Generate formatted output */
+    TBOOLEAN array_data = FALSE;
 
     c_token++;
 
@@ -808,6 +809,9 @@ statsrequest(void)
 		c_token++;
 	    goto stats_cleanup;
 	}
+
+	if (df_array && columns == 0)
+	    array_data = TRUE;
 
 	/* For all these below: we could save the state, switch off, then restore */
 	if ( axis_array[FIRST_X_AXIS].log || axis_array[FIRST_Y_AXIS].log )
@@ -951,6 +955,9 @@ statsrequest(void)
     res_file = analyze_file( n, out_of_range, invalid, blanks, doubleblanks );
 
     /* Jan 2015: Revised detection and handling of matrix data */
+    if (array_data)
+	columns = 1;
+
     if (df_matrix) {
 	int nc = df_bin_record[df_num_bin_records-1].scan_dim[0];
 	res_y = analyze_sgl_column( data_y, n, nc );

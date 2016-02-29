@@ -10,6 +10,10 @@
 	Only numerical point types are possible; if you want a character 
 	pointtype use "with labels" instead.
 
+	* src/stats.c:  "array A[n];  stats A" should default to single-column
+	analysis (equivalent to stats A using 2) since the properties of the
+	index are uninteresting.
+
 2016-02-28  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/util.h src/util.c (common_error_exit):  Move the code that resets
