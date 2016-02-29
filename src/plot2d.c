@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.375 2016/01/18 20:03:36 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.376 2016/01/28 23:54:13 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -561,10 +561,11 @@ get_data(struct curve_points *current_plot)
 
     case POINTSTYLE:
     case LINESPOINTS:
-	/* Allow 3rd column because of 'pointsize variable' */
-	/* Allow 4th column because of 'lc rgb variable' */
+	/* Allow 1 extra column because of 'pointsize variable' */
+	/* Allow 1 extra column because of 'pointtype variable' */
+	/* Allow 1 extra column because of 'lc rgb variable'    */
 	min_cols = 1;
-	max_cols = 4;
+	max_cols = 5;
 	break;
 
     case PARALLELPLOT:
@@ -1018,12 +1019,12 @@ get_data(struct curve_points *current_plot)
 		    i++;
 		    break;
 
-		case POINTSTYLE: /* x, y, variable point size */
+		case POINTSTYLE: /* x, y, variable point size or type */
 		case LINESPOINTS:
 		case IMPULSES:
 		case LINES:
 		case DOTS:
-		    store2d_point(current_plot, i++, v[0], v[1], v[0], v[0],
+		    store2d_point(current_plot, i++, v[0], v[1], v[0], v[2],
 				  v[1], v[1], v[2]);
 		    break;
 
@@ -1135,10 +1136,10 @@ get_data(struct curve_points *current_plot)
 
 	    case POINTSTYLE:
 	    case LINESPOINTS:
-		/* These are here only to catch the case where no using spec */
-		/* is given and there are more than 3 columns in the data file */
+		/* Either there is no using spec and more than 3 columns in the data file */
+		/* or this is x:y:variable_size:variable_type */
 		store2d_point(current_plot, i++, v[0], v[1], 
-				v[0], v[0], v[1], v[1], v[2]);
+				v[0], v[3], v[1], v[1], v[2]);
 		break;
 
 

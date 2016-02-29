@@ -1,5 +1,5 @@
 /*
- * $Id: term_api.h,v 1.145 2015/10/22 20:36:23 sfeam Exp $
+ * $Id: term_api.h,v 1.146 2015/12/30 18:30:56 sfeam Exp $
  */
 
 /* GNUPLOT - term_api.h */
@@ -69,6 +69,8 @@
 
 /* magic point type that indicates a character rather than a predefined symbol */
 #define PT_CHARACTER  (-9)
+/* magic point type that indicates true point type comes from a data column */
+#define PT_VARIABLE   (-8)
 
 /* Constant value passed to (term->text_angle)(ang) to generate vertical
  * text corresponding to old keyword "rotate", which produced the equivalent

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.510 2016/01/28 23:54:13 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.511 2016/02/04 04:42:35 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -2025,6 +2025,7 @@ plot_points(struct curve_points *plot)
     int i;
     int x, y;
     int p_width, p_height;
+    int pointtype;
     int interval = plot->lp_properties.p_interval;
     struct termentry *t = term;
 
@@ -2073,6 +2074,14 @@ plot_points(struct curve_points *plot)
 		&&  plot->lp_properties.p_size == PTSZ_VARIABLE)
 		    (*t->pointsize)(pointsize * plot->points[i].z);
 
+		/* Feb 2016: variable point type */
+		if ((plot->plot_style == POINTSTYLE || plot->plot_style == LINESPOINTS)
+		&&  plot->lp_properties.p_type == PT_VARIABLE) {
+		    pointtype = plot->points[i].CRD_PTTYPE;
+		} else {
+		    pointtype = plot->lp_properties.p_type;
+		}
+
 		/* A negative interval indicates we should try to blank out the */
 		/* area behind the point symbol. This could be done better by   */
 		/* implementing a special point type, but that would require    */
@@ -2088,15 +2097,15 @@ plot_points(struct curve_points *plot)
 		/* rgb variable  -  color read from data column */
 		check_for_variable_color(plot, &plot->varcolor[i]);
 
-		/* The normal case */
-		if (plot->lp_properties.p_type >= 0)
-		    (*t->point) (x, y, plot->lp_properties.p_type);
-
 		/* Print special character rather than drawn symbol */
-		else if (plot->lp_properties.p_type == PT_CHARACTER) {
+		if (pointtype == PT_CHARACTER) {
 		    apply_pm3dcolor(&(plot->labels->textcolor));
 		    (*t->put_text)(x, y, plot->lp_properties.p_char);
 		}
+
+		/* The normal case */
+		else if (pointtype >= 0)
+		    (*t->point) (x, y, pointtype);
 	    }
 	}
     }

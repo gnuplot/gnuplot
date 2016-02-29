@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.330 2015/10/31 04:36:56 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.331 2016/01/28 23:54:13 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -1808,15 +1808,20 @@ plot3d_points(struct surface_points *plot)
 		    if (plot->plot_style == DOTS)
 			(*t->point) (x, y, -1);
 
-		    /* The normal case */
-		    else if (plot->lp_properties.p_type >= 0)
-			(*t->point) (x, y, plot->lp_properties.p_type);
-
 		    /* Print special character rather than drawn symbol */
-		    else if (plot->lp_properties.p_type == PT_CHARACTER) {
+		    if (plot->lp_properties.p_type == PT_CHARACTER) {
 			apply_pm3dcolor(&(plot->labels->textcolor));
 			(*t->put_text)(x, y, plot->lp_properties.p_char);
 		    }
+
+		    /* variable point type */
+		    if (plot->lp_properties.p_type == PT_VARIABLE) {
+			(*t->point) (x, y, (int)(point->CRD_PTTYPE));
+		    }
+
+		    /* The normal case */
+		    else if (plot->lp_properties.p_type >= 0)
+			(*t->point) (x, y, plot->lp_properties.p_type);
 
 		}
 	    }

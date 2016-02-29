@@ -1,5 +1,5 @@
 /*
- * $Id: gp_types.h,v 1.68 2015/10/08 20:01:17 sfeam Exp $
+ * $Id: gp_types.h,v 1.69 2016/02/07 22:15:36 sfeam Exp $
  */
 
 /* GNUPLOT - gp_types.h */
@@ -164,16 +164,18 @@ typedef enum coord_type {
 } coord_type;
 
 
-/* These fields of 'struct coordinate' used for storing the color of 3D data points */
-#define CRD_COLOR yhigh
+/* These fields of 'struct coordinate' hold extra properties of 3D data points */
+/* Used by splot styles RGBIMAGE and RGBA_IMAGE */
 #define CRD_R yhigh
 #define CRD_G xlow
 #define CRD_B xhigh
 #define CRD_A ylow
-/* The field of 'struct coordinate' used for storing the point size in plot
- * style POINTSTYLE with variable point size
- */
+/* Used by all splot style with variable line/point color */
+#define CRD_COLOR yhigh
+/* Used by splot styles POINTSTYLE and LINESPOINTS with variable point size */
 #define CRD_PTSIZE xlow
+/* Used by splot styles POINTSTYLE and LINESPOINTS with variable point type */
+#define CRD_PTTYPE xhigh
 
 
 typedef struct coordinate {

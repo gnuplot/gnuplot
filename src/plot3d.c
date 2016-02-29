@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.248 2016/01/28 23:54:13 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.249 2016/02/11 05:15:53 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -992,57 +992,55 @@ get_3ddata(struct surface_points *this_plot)
 
 	    /* After the first three columns it gets messy because */
 	    /* different plot styles assume different contents in the columns */
-	    if (j >= 4) {
-		if (( this_plot->plot_style == POINTSTYLE
-		   || this_plot->plot_style == LINESPOINTS)
-		&&  this_plot->lp_properties.p_size == PTSZ_VARIABLE) {
-		    cp->CRD_PTSIZE = v[3];
+
+	    if (( this_plot->plot_style == POINTSTYLE || this_plot->plot_style == LINESPOINTS)) {
+		int varcol = 3;
+		if (this_plot->lp_properties.p_size == PTSZ_VARIABLE)
+		    cp->CRD_PTSIZE = v[varcol++];
+		if (this_plot->lp_properties.p_type == PT_VARIABLE)
+		    cp->CRD_PTTYPE = v[varcol++];
+		if (j < varcol)
+		    int_error(NO_CARET, "Not enough input columns");
+		else if (j == varcol) {
 		    color = z;
 		    color_from_column(FALSE);
+		} else {
+		    color = v[varcol];
+		    color_from_column(TRUE);
 		}
 
-		else if (this_plot->plot_style == LABELPOINTS) {
-		/* 4th column holds label text rather than color */
-		/* text = df_tokens[3]; */
+	    } else if (this_plot->plot_style == LABELPOINTS) {
+		if (j == 4) {
+		    /* 4th column holds label text rather than color */
 		    color = z;
 		    color_from_column(FALSE);
+		} else {
+		    color = v[4];
+		    color_from_column(TRUE);
 		}
 
-		else {
+	    } else if (this_plot->plot_style == VECTOR) {
+		if (j == 6) {
+			xtail = x + v[3];
+			ytail = y + v[4];
+			ztail = z + v[5];
+			color = z;
+			color_from_column(FALSE);
+		} else if (j >= 7) {
+		    color = v[6];
+		    color_from_column(TRUE);
+		} else {
 		    color = v[3];
 		    color_from_column(TRUE);
 		}
-	    }
 
-	    if (j >= 5) {
-		if ((this_plot->plot_style == POINTSTYLE
-		   || this_plot->plot_style == LINESPOINTS)
-		&&  this_plot->lp_properties.p_size == PTSZ_VARIABLE) {
-		    color = v[4];
+	    } else {	/* all other plot styles */
+
+		if (j >= 4) {
+		    color = v[3];
 		    color_from_column(TRUE);
 		}
 
-		if (this_plot->plot_style == LABELPOINTS) {
-		    /* take color from an explicitly given 5th column */
-		    color = v[4];
-		    color_from_column(TRUE);
-		}
-
-	    }
-
-	    if (j >= 6) {
-		if (this_plot->plot_style == VECTOR) {
-		    xtail = x + v[3];
-		    ytail = y + v[4];
-		    ztail = z + v[5];
-		    if (j >= 7) {
-			color = v[6];
-			color_from_column(TRUE);
-		    } else {
-			color = z;
-			color_from_column(FALSE);
-		    }
-		}
 	    }
 #undef color_from_column
 

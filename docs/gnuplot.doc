@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.980 2016/02/09 21:44:54 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.981 2016/02/13 05:24:47 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -2496,6 +2496,7 @@ Ffigure_newsyntax
 ?lc variable
 ?textcolor variable
 ?tc variable
+?variable linecolor
  `lc variable` tells the program to use the value read from one column of the
  input data as a linetype index, and use the color belonging to that linetype.
  This requires a corresponding additional column in the `using` specifier.
@@ -2516,6 +2517,7 @@ Ffigure_newsyntax
 ?rgbcolor variable
 ?lc rgbcolor variable
 ?tc rgbcolor variable
+?variable rgbcolor
  You can assign a separate color for each data point, line segment, or label in
  your plot.  `lc rgbcolor variable` tells the program to read RGB color
  information for each line in the data file. This requires a corresponding
@@ -3950,10 +3952,10 @@ Ffigure_lines
  Additional input columns may be used to provide information such as
  variable line color (see `rgbcolor variable`).
 
- 2D form
+ 2D form (no "using" spec)
       1 column:   y       # implicit x from row number
       2 columns:  x  y
- 3D form
+ 3D form (no "using" spec)
       1 column:   z       # implicit x from row, y from index
       3 columns:  x  y  z
 
@@ -4004,20 +4006,42 @@ Ffigure_parallel
 ?plotting styles points
 ?style points
 ?points
+?point type
+?pointtype
 Ffigure_points
- The `points` style displays a small symbol at each point.  The command `set
- pointsize` may be used to change the default size of the points.
- 1 or 2 columns of basic input data are required in 2D plots; 1 or 3 columns are
- required in 3D plots.  See `style lines`.  Additional input columns may be used
- to provide information such as variable point size or variable point color.
+ The `points` style displays a small symbol at each point. The command `set
+ pointsize` may be used to change the default size of the points. The point type
+ defaults to that of the linetype. See `linetype`.  If no `using` spec is found
+ in the plot command, input data columns are interpreted implicitly.
+ See `style lines`.
+ 
+ The first 8 point types are shared by all terminals. Individual terminals may
+ provide a much larger number of distinct point types. Use the `test` command
+ to show what is provided by the current terminal settings. Alternatively any
+ single printable character may be given instead of a numerical point type,
+ as in the example below.  Longer strings may be plotted using the plot style
+ `labels` rather than `points`.
 
- The first 8 point types are shared by all terminals.  Individual terminals may
- provide a much larger number of distinct point types.  Use the `test` command
- to show what is provided by the current terminal.  Alternatively any single
- printable character may be given instead of a point type, as in the example
- below.  Longer strings may be plotted using the plot style `labels` rather than
- `points`.
+=variable
+?variable
+?variable pointtype
+?variable pointsize
+?pointtype variable
+?pointsize variable
+ When using the keywords `pointtype`, `pointsize`, or `linecolor` in a plot
+ command, the additional keyword `variable` may be given instead of a number.
+ In this case the corresponding properties of each point are assigned by
+ additional columns of input data. Variable pointsize is always taken from the
+ first additional column provided in a `using` spec.  Variable color is always
+ taken from the last additional column.  When plotting with style `linespoints`
+ it is not currently possible to specify separate colors for the lines and the
+ points.  If all three properties are specified for each point, the order of
+ input data columns is thus
 
+      plot DATA using x:y:pointsize:pointtype:color \
+           with points lc variable pt variable ps variable
+
+ Note: for information on user-defined program variables, see `variables`.
 2 steps
 ?plotting styles steps
 ?style steps

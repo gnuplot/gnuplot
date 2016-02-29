@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.200 2015/10/01 04:04:59 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.201 2015/12/29 20:31:42 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -1169,6 +1169,9 @@ lp_parse(struct lp_style_type *lp, lp_class destination_class, TBOOLEAN allow_po
 		    /* strncpy does not guarantee null-termination */
 		    newlp.p_char[sizeof(newlp.p_char)-1] = '\0';
 		    free(symbol);
+		} else if (almost_equals(c_token, "var$iable") && (destination_class == LP_ADHOC)) {
+		    newlp.p_type = PT_VARIABLE;
+		    c_token++;
 		} else {
 		    newlp.p_type = int_expression() - 1;
 		}

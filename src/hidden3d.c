@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.109 2015/10/01 04:04:58 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.110 2015/10/26 21:43:00 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - hidden3d.c */
@@ -528,7 +528,7 @@ store_vertex (
 
 #ifdef HIDDEN3D_VAR_PTSIZE
     /* Store pointer back to original point */
-    /* Needed to support variable pointsize */
+    /* Needed to support variable pointsize or pointtype */
     thisvert->original = point;
 #endif
 	
@@ -1657,7 +1657,7 @@ draw_vertex(p_vertex v)
     p_type = v->lp_style->p_type;
 
     TERMCOORD(v, x, y);
-    if ((p_type >= -1 || p_type == PT_CHARACTER) && !clip_point(x,y)) {
+    if ((p_type >= -1 || p_type == PT_CHARACTER || p_type == PT_VARIABLE) && !clip_point(x,y)) {
 	struct t_colorspec *tc = &(v->lp_style->pm3d_color);
 
 	if (v->label)  {
@@ -1688,8 +1688,12 @@ draw_vertex(p_vertex v)
 
 	if (p_type == PT_CHARACTER)
 	    (term->put_text)(x, y, v->lp_style->p_char);
+#ifdef HIDDEN3D_VAR_PTSIZE
+	else if (p_type == PT_VARIABLE)
+	    (term->point)(x, y, (int)(v->original->CRD_PTTYPE));
+#endif
 	else
-	    (term->point)(x,y, p_type);
+	    (term->point)(x, y, p_type);
 
 	/* vertex has been drawn --> flag it as done */
 	v->lp_style = NULL;

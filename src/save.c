@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.293 2016/02/07 22:15:36 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.294 2016/02/08 21:46:21 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -1588,6 +1588,8 @@ save_linetype(FILE *fp, lp_style_type *lp, TBOOLEAN show_point)
     if (show_point) {
 	if (lp->p_type == PT_CHARACTER)
 	    fprintf(fp, " pointtype \"%s\"", lp->p_char);
+	else if (lp->p_type == PT_VARIABLE)
+	    fprintf(fp, " pointtype variable");
 	else
 	    fprintf(fp, " pointtype %d", lp->p_type + 1);
 	if (lp->p_size == PTSZ_VARIABLE)
