@@ -1,5 +1,5 @@
 /*
- * $Id: util.h,v 1.45 2015/10/26 21:43:00 sfeam Exp $
+ * $Id: util.h,v 1.46 2016/02/29 02:51:10 sfeam Exp $
  */
 
 /* GNUPLOT - util.h */
@@ -104,7 +104,7 @@ void gprintf __PROTO((char *, size_t, char *, double, double));
 #  else
     void os_error __PROTO((int, const char *, ...));
     void int_error __PROTO((int, const char *, ...));
-    void common_error_ext __PROTO((void));
+    void common_error_exit __PROTO((void));
 #  endif
 void int_warn __PROTO((int, const char *, ...));
 #else
