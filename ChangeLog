@@ -1,3 +1,11 @@
+2016-03-01  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* graphics.c (map_position_double): Fix stupid typo that tried to map a
+	linked y axis through the x mapping function. This always mis-placed
+	objects and labels whose position is given in terms of y2 whenever y2 is
+	linked to y1. Furthermore placement on either x2 or y2 could be wrong if
+	the most recent plot did not use that same linked axis.
+
 2016-02-22  Release 5.0.3
 
 2016-02-13  Bastian Maerkisch  <bmaerkisch@web.de>
