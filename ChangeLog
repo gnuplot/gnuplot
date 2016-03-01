@@ -3,6 +3,12 @@
 	* src/internal.c (f_assign): Sanity check for array index that 
 	is found to be zero during expression evaluation.
 
+	* graphics.c (map_position_double): Fix stupid typo that tried to map a
+	linked y axis through the x mapping function. This always mis-placed
+	objects and labels whose position is given in terms of y2 whenever y2 is
+	linked to y1. Furthermore placement on either x2 or y2 could be wrong if
+	the most recent plot did not use that same linked axis.
+
 2016-02-29  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/gp_types.h src/graph3d.c src/graphics.c src/misc.c src/plot2d.c

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.511 2016/02/04 04:42:35 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.512 2016/02/29 07:07:15 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -3541,9 +3541,12 @@ map_position_double(
 	}
     case second_axes:
 	{
-	    if (axis_array[SECOND_X_AXIS].linked_to_primary)
+	    if (axis_array[SECOND_X_AXIS].linked_to_primary) {
+		AXIS_INDEX save = x_axis;
+		x_axis = SECOND_X_AXIS;
 		*x = (double)map_x(pos->x);
-	    else {
+		x_axis = save;
+	    } else {
 		double xx = axis_log_value_checked(SECOND_X_AXIS, pos->x, what);
 		*x = AXIS_MAP(SECOND_X_AXIS, xx);
 	    }
@@ -3576,9 +3579,12 @@ map_position_double(
 	}
     case second_axes:
 	{
-	    if (axis_array[SECOND_Y_AXIS].linked_to_primary)
-		*y = (double)map_x(pos->y);
-	    else {
+	    if (axis_array[SECOND_Y_AXIS].linked_to_primary) {
+		AXIS_INDEX save = y_axis;
+		y_axis = SECOND_Y_AXIS;
+		*y = (double)map_y(pos->y);
+		y_axis = save;
+	    } else {
 		double yy = axis_log_value_checked(SECOND_Y_AXIS, pos->y, what);
 		*y = AXIS_MAP(SECOND_Y_AXIS, yy);
 	    }
