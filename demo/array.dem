@@ -60,3 +60,32 @@ plot A with points title "Array A", c+cos(a+b*x) with lines
 
 pause -1 "<cr> to continue"
 reset
+
+#
+# Illustrate loading an array from a data file
+# This could be done using a preliminary 'plot' command, perhaps together
+# with 'set table' if you don't actually want generate a plot, but here
+# we use 'stats'. The first run is just to pick up the array size needed.
+# The second run stores one value into each array element.
+#
+set title "Illustrate loading an array from a column in a data file\n".\
+          "Note that first data point in the file is 'line 0'\n".\
+          "but it goes into array element Data[1]"
+
+set yrange [0:20]
+set border 3
+set tics nomirror
+set key box
+
+FILE = 'orbital_elements.dat'
+
+stats FILE index 2 using 2 prefix "A"
+array Data[A_records]
+
+stats FILE index 2 using (Data[int($0+1)] = $2) prefix "B"
+
+plot FILE index 2 using 2 title "Data from file" with lines lw 2, \
+     Data using 0:2:(sprintf("Data[%d]",$1)) with labels point pt 6 ps 2 center offset 0,1 title "Data[i]"
+
+pause -1 "<cr> to continue"
+reset
