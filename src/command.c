@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.314 2016/02/18 18:05:35 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.315 2016/02/21 00:56:21 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -403,7 +403,7 @@ do_line()
 	    strcat(gp_input_line,";");
 	    retval = read_line("more> ", strlen(gp_input_line));
 	    if (retval)
-	 	int_error(NO_CARET, "Syntax error: missing block terminator }");
+		int_error(NO_CARET, "Syntax error: missing block terminator }");
 	    /* Expand any string variables in the current input line */
 	    string_expand_macros();
 
@@ -1376,23 +1376,23 @@ link_command()
 {
     AXIS_INDEX primary_axis = NO_AXIS, secondary_axis = NO_AXIS;
     struct axis *linked = NULL;
+    int command_token = c_token-1;
 
-    if (! equals(c_token - 1,"unset")) {
-        /* Flag the axes as being linked, and copy the range settings */
-        /* from the primary axis into the linked secondary axis       */
-        c_token++;
-        if (almost_equals(c_token,"x$2")) {
-	    primary_axis = FIRST_X_AXIS;
-	    secondary_axis = SECOND_X_AXIS;
-        } else if (almost_equals(c_token,"y$2")) {
-    	    primary_axis = FIRST_Y_AXIS;
-	    secondary_axis = SECOND_Y_AXIS;
-    	} else {
-	    int_error(c_token,"expecting x2 or y2");
-        }
-	linked = axis_array + primary_axis;
+    /* Flag the axes as being linked, and copy the range settings */
+    /* from the primary axis into the linked secondary axis       */
+    c_token++;
+    if (almost_equals(c_token,"x$2")) {
+	primary_axis = FIRST_X_AXIS;
+	secondary_axis = SECOND_X_AXIS;
+    } else if (almost_equals(c_token,"y$2")) {
+	primary_axis = FIRST_Y_AXIS;
+	secondary_axis = SECOND_Y_AXIS;
+    } else {
+	int_error(c_token,"expecting x2 or y2");
     }
 
+    if (!equals(command_token,"unset"))
+	linked = axis_array + primary_axis;
 
     axis_array[secondary_axis].linked_to_primary = linked;
     c_token++;
@@ -2573,7 +2573,7 @@ replotrequest()
     c_token = 1;	/* Skip the "plot" token */
 
     if (almost_equals(0,"test")) {
-    	c_token = 0;
+	c_token = 0;
 	test_command();
     } else if (almost_equals(0,"s$plot"))
 	plot3drequest();
