@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: mouse.c,v 1.183 2015/07/13 04:08:24 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: mouse.c,v 1.184 2015/10/26 21:43:00 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - mouse.c */
@@ -378,10 +378,10 @@ MousePosToGraphPosReal(int xx, int yy, double *x, double *y, double *x2, double 
     if (!is_3d_plot) {
 	if (axis_array[SECOND_X_AXIS].linked_to_primary
 	&&  axis_array[SECOND_X_AXIS].link_udf->at)
-	    *x2 = eval_link_function(SECOND_X_AXIS, *x);
+	    *x2 = eval_link_function(&axis_array[SECOND_X_AXIS], *x);
 	if (axis_array[SECOND_Y_AXIS].linked_to_primary
 	&&  axis_array[SECOND_Y_AXIS].link_udf->at)
-	    *y2 = eval_link_function(SECOND_Y_AXIS, *y);
+	    *y2 = eval_link_function(&axis_array[SECOND_Y_AXIS], *y);
     }
 }
 

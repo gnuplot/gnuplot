@@ -1,5 +1,5 @@
 /*
- * $Id: axis.h,v 1.135 2016/01/10 00:41:12 sfeam Exp $
+ * $Id: axis.h,v 1.136 2016/02/11 05:15:53 sfeam Exp $
  *
  */
 
@@ -254,10 +254,10 @@ typedef struct axis {
     double log_base;		/* ln(base), for easier computations */
 
 /* linked axis information (used only by x2, y2)
- * If linked_to_primary is TRUE, the primary axis info will be cloned into the
+ * If axes are linked, the primary axis info will be cloned into the
  * secondary axis only up to this point in the structure.
  */
-    struct axis *linked_to_primary;
+    struct axis *linked_to_primary;	/* Set only in the secondary axis */
     struct udft_entry *link_udf;
 
 /* ticmark control variables */
@@ -539,7 +539,7 @@ do {									  \
     if ((! is_cb_axis) && axis->linked_to_primary) {	  		  \
 	axis = axis->linked_to_primary;					  \
 	if (axis->link_udf->at) 					  \
-	    curval = eval_link_function(axis - axis_array, curval);	  \
+	    curval = eval_link_function(axis, curval);			  \
     } 									  \
     if ( curval < axis->data_min )					  \
 	axis->data_min = curval;					  \
@@ -666,7 +666,7 @@ void get_position_default __PROTO((struct position *pos, enum position_type defa
 
 void gstrdms __PROTO((char *label, char *format, double value));
 
-void clone_linked_axes __PROTO((AXIS_INDEX axis1));
+void clone_linked_axes __PROTO((AXIS *axis1, AXIS *axis2));
 
 int map_x __PROTO((double value));
 int map_y __PROTO((double value));
@@ -679,6 +679,9 @@ void restore_autoscaled_ranges __PROTO((AXIS *, AXIS *));
 char * axis_name __PROTO((AXIS_INDEX));
 void init_parallel_axis __PROTO((AXIS *, AXIS_INDEX));
 AXIS * extend_parallel_axis __PROTO((int ));
+
+/* Evaluate the function linking a secondary axis to its primary axis */
+double eval_link_function __PROTO((AXIS *, double));
 
 /* macro for tic scale, used in all tic_callback functions */
 #define tic_scale(ticlevel, axis) \

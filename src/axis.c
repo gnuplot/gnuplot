@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.173 2015/12/17 06:09:42 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.174 2015/12/19 21:45:35 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -914,7 +914,7 @@ setup_tics(struct axis *this, int max)
      * clone that rather than trying to reproduce it for the secondary axis.
      */
     if (this->linked_to_primary) {
-	clone_linked_axes(this->linked_to_primary - axis_array);
+	clone_linked_axes(this->linked_to_primary, this);
 	autoextend_min = autoextend_max = FALSE;
     }
 
@@ -2193,47 +2193,74 @@ parse_skip_range()
 }
 
 /*
- * When a secondary axis is linked to the corresponding primary axis,
- * this routine copies the relevant range/scale data
+ * When a secondary axis (axis2) is linked to the corresponding primary
+ * axis (axis1), this routine copies the relevant range/scale data
  */
 void
-clone_linked_axes(AXIS_INDEX axis1)
+clone_linked_axes(AXIS *axis1, AXIS *axis2)
 {
     double testmin, testmax;
-    AXIS_INDEX axis2 = AXIS_MAP_FROM_FIRST_TO_SECOND(axis1);
 
-    if (   (! AXIS_IS_FIRST(axis1))
-	|| (! axis_array[axis2].linked_to_primary)
-       )
-	/* nothing to do here.  Done */
+    /* These sanity checks are primarily for debugging */
+    if (axis1->index != FIRST_X_AXIS && axis1->index != FIRST_Y_AXIS) {
+	int_warn(NO_CARET, "Unsupported axis linkage");
 	return;
+    }
 
-    memcpy(axis_array + axis2, axis_array + axis1, AXIS_CLONE_SIZE);
-    if (axis_array[axis2].link_udf == NULL || axis_array[axis2].link_udf->at == NULL)
+    if (axis1 != axis2->linked_to_primary) {
+	/* No linkage, so nothing to do here */
+	return;
+    }
+
+    memcpy(axis2, axis1, AXIS_CLONE_SIZE);
+    if (axis2->link_udf == NULL || axis2->link_udf->at == NULL)
 	return;
 
     /* Transform the min/max limits of linked secondary axis */
-	axis_array[axis2].set_min = eval_link_function(axis2, axis_array[axis1].set_min);
-	axis_array[axis2].set_max = eval_link_function(axis2, axis_array[axis1].set_max);
-	axis_array[axis2].min = eval_link_function(axis2, axis_array[axis1].min);
-	axis_array[axis2].max = eval_link_function(axis2, axis_array[axis1].max);
+	axis2->set_min = eval_link_function(axis2, axis1->set_min);
+	axis2->set_max = eval_link_function(axis2, axis1->set_max);
+	axis2->min = eval_link_function(axis2, axis1->min);
+	axis2->max = eval_link_function(axis2, axis1->max);
 
-	if (isnan(axis_array[axis2].min) || isnan(axis_array[axis2].set_min)
-	||  isnan(axis_array[axis2].max) || isnan(axis_array[axis2].set_max))
+	if (isnan(axis2->min) || isnan(axis2->set_min)
+	||  isnan(axis2->max) || isnan(axis2->set_max))
 	    int_warn(NO_CARET, "axis mapping function must return a real value");
 
     /* Confirm that the inverse mapping actually works */
     /* FIXME:  Should we test values in between the endpoints also? */
-	testmin = eval_link_function(axis1, axis_array[axis2].set_min);
-	testmax = eval_link_function(axis1, axis_array[axis2].set_max);
-	if (fabs((testmin - axis_array[axis1].set_min) / testmin) < 1.e-6
-	&&  fabs((testmax - axis_array[axis1].set_max) / testmax) < 1.e-6) {
+	testmin = eval_link_function(axis1, axis2->set_min);
+	testmax = eval_link_function(axis1, axis2->set_max);
+	if (fabs((testmin - axis1->set_min) / testmin) < 1.e-6
+	&&  fabs((testmax - axis1->set_max) / testmax) < 1.e-6) {
 	    /* OK */
 	} else {
 	    int_warn(NO_CARET, "could not confirm linked axis inverse mapping function");
-	    fprintf(stderr,"\tmin: %g inv(via(min)): %g", axis_array[axis1].set_min, testmin);
-	    fprintf(stderr,"  max: %g inv(via(max)): %g\n", axis_array[axis1].set_max, testmax);
+	    fprintf(stderr,"\tmin: %g inv(via(min)): %g", axis1->set_min, testmin);
+	    fprintf(stderr,"  max: %g inv(via(max)): %g\n", axis1->set_max, testmax);
 	}
+}
+
+/* Evaluate the function linking secondary axis to primary axis */
+double
+eval_link_function(struct axis *axis, double raw_coord)
+{
+    udft_entry *link_udf = axis->link_udf;
+    int dummy_var;
+    struct value a;
+
+    if (axis->index == FIRST_Y_AXIS || axis->index == SECOND_Y_AXIS)
+	dummy_var = 1;
+    else
+	dummy_var = 0;
+    link_udf->dummy_values[1-dummy_var].type = INVALID_NAME;
+
+    Gcomplex(&link_udf->dummy_values[dummy_var], raw_coord, 0.0);
+    evaluate_at(link_udf->at, &a);
+
+    if (a.type != CMPLX)
+	a = udv_NaN->udv_value;
+
+    return a.v.cmplx_val.real;
 }
 
 /*
@@ -2251,7 +2278,7 @@ map_x(double value)
     &&  axis_array[SECOND_X_AXIS].link_udf->at != NULL) {
 	if (axis_array[FIRST_X_AXIS].link_udf->at == NULL)
 	    int_error(NO_CARET, "No inverse mapping function available for x2 data");
-	value = eval_link_function(FIRST_X_AXIS, value);
+	value = eval_link_function(&axis_array[FIRST_X_AXIS], value);
 	return AXIS_MAP(FIRST_X_AXIS, value);
     }
     return AXIS_MAP(x_axis, value);
@@ -2265,7 +2292,7 @@ map_y(double value)
     &&  axis_array[SECOND_Y_AXIS].link_udf->at != NULL) {
 	if (axis_array[FIRST_Y_AXIS].link_udf->at == NULL)
 	    int_error(NO_CARET, "No inverse mapping function available for y2 data");
-	value = eval_link_function(FIRST_Y_AXIS, value);
+	value = eval_link_function(&axis_array[FIRST_Y_AXIS], value);
 	return AXIS_MAP(FIRST_Y_AXIS, value);
     }
     return AXIS_MAP(y_axis, value);

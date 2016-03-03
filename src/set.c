@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.511 2016/01/28 23:44:51 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.512 2016/02/12 19:53:15 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -5288,7 +5288,11 @@ set_range(struct axis *this_axis)
 
     /* If there is a secondary axis linked to this one, */
     /* replicate the new range information to it.       */
-    clone_linked_axes(this_axis->index);
+    /* FIXME: clean this up. New field axis->linked_to_secondary? */
+    if (this_axis->index == FIRST_X_AXIS)
+	clone_linked_axes(&axis_array[FIRST_X_AXIS], &axis_array[SECOND_X_AXIS]);
+    if (this_axis->index == FIRST_Y_AXIS)
+	clone_linked_axes(&axis_array[FIRST_Y_AXIS], &axis_array[SECOND_Y_AXIS]);
 }
 
 /*

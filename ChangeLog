@@ -7,6 +7,14 @@
 	extra columns gracefully. 
 	Bugfix
 
+	* src/axis.c src/axis.h src/eval.c src/eval.h:
+	Move eval_link_function() from eval.c to axis.c
+
+	* src/axis.c src/axis.h src/eval.c src/eval.h src/command.c
+	src/graph3d.c src/graphics.c src/mouse.c src/plot2d.c src/set.c:
+	Revise clone_linked_axes() and eval_link_function() to use
+	(AXIS *) pointers rather than AXIS_INDEX.
+
 2016-03-02  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/command.c (link_command): Accept "unset link <specific axis>"

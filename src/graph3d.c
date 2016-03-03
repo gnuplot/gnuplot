@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.331 2016/01/28 23:54:13 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.332 2016/02/29 07:07:15 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -2623,7 +2623,7 @@ xtick_callback(
     if (this_axis->index == SECOND_X_AXIS
     &&  this_axis->linked_to_primary
     &&  this_axis->link_udf->at != NULL) {
-	place = eval_link_function(FIRST_X_AXIS, place);
+	place = eval_link_function(&axis_array[FIRST_X_AXIS], place);
     }
 
     /* Draw bottom tic mark */
@@ -2747,7 +2747,7 @@ ytick_callback(
     if (this_axis->index == SECOND_Y_AXIS
     &&  this_axis->linked_to_primary
     &&  this_axis->link_udf->at != NULL) {
-	place = eval_link_function(FIRST_Y_AXIS, place);
+	place = eval_link_function(&axis_array[FIRST_Y_AXIS], place);
     }
 
     /* Draw left tic mark */

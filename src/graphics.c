@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.512 2016/02/29 07:07:15 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.513 2016/03/02 01:41:00 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -481,9 +481,9 @@ adjust_offsets()
 	int_error(NO_CARET, "y_min should not equal y_max!");
 
     if (axis_array[SECOND_X_AXIS].linked_to_primary)
-	clone_linked_axes(FIRST_X_AXIS);
+	clone_linked_axes(&axis_array[FIRST_X_AXIS], &axis_array[SECOND_X_AXIS]);
     if (axis_array[SECOND_Y_AXIS].linked_to_primary)
-	clone_linked_axes(FIRST_Y_AXIS);
+	clone_linked_axes(&axis_array[FIRST_Y_AXIS], &axis_array[SECOND_Y_AXIS]);
 }
 
 void

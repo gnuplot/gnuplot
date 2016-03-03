@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.315 2016/02/21 00:56:21 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.316 2016/03/02 23:56:59 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -1374,57 +1374,63 @@ while_command()
 void
 link_command()
 {
-    AXIS_INDEX primary_axis = NO_AXIS, secondary_axis = NO_AXIS;
-    struct axis *linked = NULL;
+    AXIS *primary_axis = NULL;
+    AXIS *secondary_axis = NULL;
+    TBOOLEAN linked = FALSE;
     int command_token = c_token-1;
 
     /* Flag the axes as being linked, and copy the range settings */
     /* from the primary axis into the linked secondary axis       */
     c_token++;
     if (almost_equals(c_token,"x$2")) {
-	primary_axis = FIRST_X_AXIS;
-	secondary_axis = SECOND_X_AXIS;
+	primary_axis = &axis_array[FIRST_X_AXIS];
+	secondary_axis = &axis_array[SECOND_X_AXIS];
+	c_token++;
     } else if (almost_equals(c_token,"y$2")) {
-	primary_axis = FIRST_Y_AXIS;
-	secondary_axis = SECOND_Y_AXIS;
+	primary_axis = &axis_array[FIRST_Y_AXIS];
+	secondary_axis = &axis_array[SECOND_Y_AXIS];
+	c_token++;
     } else {
 	int_error(c_token,"expecting x2 or y2");
     }
 
-    if (!equals(command_token,"unset"))
-	linked = axis_array + primary_axis;
-
-    axis_array[secondary_axis].linked_to_primary = linked;
-    c_token++;
+    /* "unset link {x|y}" command */
+    if (equals(command_token,"unset")) {
+	secondary_axis->linked_to_primary = NULL;
+	linked = FALSE;
+    } else {
+	secondary_axis->linked_to_primary = primary_axis;
+	linked = TRUE;
+    }
 
     /* Initialize the action tables for the mapping function[s] */
-    if (!axis_array[primary_axis].link_udf) {
-	axis_array[primary_axis].link_udf = gp_alloc(sizeof(udft_entry),"link_at");
-	memset(axis_array[primary_axis].link_udf, 0, sizeof(udft_entry));
+    if (!primary_axis->link_udf) {
+	primary_axis->link_udf = gp_alloc(sizeof(udft_entry),"link_at");
+	memset(primary_axis->link_udf, 0, sizeof(udft_entry));
     }
-    if (!axis_array[secondary_axis].link_udf) {
-	axis_array[secondary_axis].link_udf = gp_alloc(sizeof(udft_entry),"link_at");
-	memset(axis_array[secondary_axis].link_udf, 0, sizeof(udft_entry));
+    if (!secondary_axis->link_udf) {
+	secondary_axis->link_udf = gp_alloc(sizeof(udft_entry),"link_at");
+	memset(secondary_axis->link_udf, 0, sizeof(udft_entry));
     }
 
     if (equals(c_token,"via")) {
-	parse_link_via(axis_array[secondary_axis].link_udf);
+	parse_link_via(secondary_axis->link_udf);
 	if (almost_equals(c_token,"inv$erse")) {
-	    parse_link_via(axis_array[primary_axis].link_udf);
+	    parse_link_via(primary_axis->link_udf);
 	} else {
 	    int_warn(c_token,"inverse mapping function required");
-	    linked = NULL;
+	    linked = FALSE;
 	}
     }
 
+    /* Clone the range information */
     if (linked) {
-	/* Clone the range information */
-	clone_linked_axes(primary_axis);
+	clone_linked_axes(primary_axis, secondary_axis);
     } else {
-	free_at(axis_array[secondary_axis].link_udf->at);
-	axis_array[secondary_axis].link_udf->at = NULL;
-	free_at(axis_array[primary_axis].link_udf->at);
-	axis_array[primary_axis].link_udf->at = NULL;
+	free_at(secondary_axis->link_udf->at);
+	secondary_axis->link_udf->at = NULL;
+	free_at(primary_axis->link_udf->at);
+	primary_axis->link_udf->at = NULL;
     }
 }
 
