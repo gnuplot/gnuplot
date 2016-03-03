@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: cairo.trm,v 1.71.2.3 2015/03/22 05:58:17 sfeam Exp $
+ * $Id: cairo.trm,v 1.71.2.4 2015/07/13 18:20:03 sfeam Exp $
  */
 
 /* GNUPLOT - cairo.trm */
@@ -1591,7 +1591,7 @@ START_HELP(pdfcairo)
 " gnuplot terminal types. See `enhanced` for more details.",
 "",
 " The width of all lines in the plot can be modified by the factor <lw>",
-" specified in `linewidth`. The default linewidth is 0.25 points.",
+" specified in `linewidth`. The default linewidth is 0.5 points.",
 " (1 \"PostScript\" point = 1/72 inch = 0.353 mm)",
 "",
 " `rounded` sets line caps and line joins to be rounded;",
