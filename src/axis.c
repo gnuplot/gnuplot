@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.174 2015/12/19 21:45:35 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.175 2016/03/04 04:58:02 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -2215,6 +2215,12 @@ clone_linked_axes(AXIS *axis1, AXIS *axis2)
     memcpy(axis2, axis1, AXIS_CLONE_SIZE);
     if (axis2->link_udf == NULL || axis2->link_udf->at == NULL)
 	return;
+
+    /* FIXME: In order to handle logscale axes, the code below would have to unlog the	*/
+    /* axis1 min/max; apply and check the mappings; then re-log and store the values	*/
+    /* for axis2. And after that the tics would still come out wrong.  		*/
+	if (axis2->log && axis2->link_udf)
+	    int_warn(NO_CARET,"cannot handle via/inverse linked log-scale axes");
 
     /* Transform the min/max limits of linked secondary axis */
 	axis2->set_min = eval_link_function(axis2, axis1->set_min);

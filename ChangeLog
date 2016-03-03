@@ -15,6 +15,10 @@
 	Revise clone_linked_axes() and eval_link_function() to use
 	(AXIS *) pointers rather than AXIS_INDEX.
 
+	* src/axis.c (clone_linked_axes): Warn that the program cannot 
+	currently handle via/inverse mapping of linked logscale axes.
+	Bug #1736
+
 2016-03-02  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/command.c (link_command): Accept "unset link <specific axis>"
