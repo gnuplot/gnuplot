@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.376 2016/01/28 23:54:13 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.377 2016/02/29 07:07:15 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -561,6 +561,8 @@ get_data(struct curve_points *current_plot)
 
     case POINTSTYLE:
     case LINESPOINTS:
+	/* 1 column: y coordinate only */
+	/* 2 columns x and y coordinates */
 	/* Allow 1 extra column because of 'pointsize variable' */
 	/* Allow 1 extra column because of 'pointtype variable' */
 	/* Allow 1 extra column because of 'lc rgb variable'    */
@@ -1196,6 +1198,14 @@ get_data(struct curve_points *current_plot)
 
 		case RGBIMAGE:  /* x_center y_center r_value g_value b_value (rgb) */
 		    goto images;
+
+		case POINTSTYLE:
+		case LINESPOINTS:
+		    /* If there is no using spec and more than 4 columns in the data file */
+		    /* then use only the first 4 columns  x:y:variable_size:variable_type */
+		    store2d_point(current_plot, i++, v[0], v[1], 
+				    v[0], v[3], v[1], v[1], v[2]);
+		    break;
 
 		}               /* inner switch */
 

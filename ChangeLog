@@ -1,3 +1,12 @@
+2016-03-03  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/plot2d.c (get_data):  Introduction of "pt variable" increased the
+	maximum number of data columns for "with points" to 5.  If the plot 
+	command really does consume 5 columns, fine.  But if get_data returns
+	5 columns for a simple 'plot with points' command, we have to ignore the
+	extra columns gracefully. 
+	Bugfix
+
 2016-03-02  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/command.c (link_command): Accept "unset link <specific axis>"
@@ -23,8 +32,8 @@
 	using spec is 
 		[s]plot DATA using x:y:z:pointsize:pointtype:color
 	"pointtype variable" is only allowed with "points" or "linespoints".
-	Only numerical point types are possible; if you want a character 
-	pointtype use "with labels" instead.
+	Only numerical point types are possible; if you want variable character
+	pointtypes use "with labels" instead.
 
 	* src/stats.c:  "array A[n];  stats A" should default to single-column
 	analysis (equivalent to stats A using 2) since the properties of the
