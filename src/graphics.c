@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.513 2016/03/02 01:41:00 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.514 2016/03/04 04:58:03 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -3541,13 +3541,13 @@ map_position_double(
 	}
     case second_axes:
 	{
-	    if (axis_array[SECOND_X_AXIS].linked_to_primary) {
-		AXIS_INDEX save = x_axis;
-		x_axis = SECOND_X_AXIS;
-		*x = (double)map_x(pos->x);
-		x_axis = save;
+	    double xx;
+	    AXIS *primary = axis_array[SECOND_X_AXIS].linked_to_primary;
+	    if (primary && primary->link_udf->at) {
+		xx = eval_link_function(primary, pos->x);
+		*x = AXIS_MAP(primary->index, xx);
 	    } else {
-		double xx = axis_log_value_checked(SECOND_X_AXIS, pos->x, what);
+		xx = axis_log_value_checked(SECOND_X_AXIS, pos->x, what);
 		*x = AXIS_MAP(SECOND_X_AXIS, xx);
 	    }
 	    break;
@@ -3579,13 +3579,13 @@ map_position_double(
 	}
     case second_axes:
 	{
-	    if (axis_array[SECOND_Y_AXIS].linked_to_primary) {
-		AXIS_INDEX save = y_axis;
-		y_axis = SECOND_Y_AXIS;
-		*y = (double)map_y(pos->y);
-		y_axis = save;
+	    double yy;
+	    AXIS *primary = axis_array[SECOND_Y_AXIS].linked_to_primary;
+	    if (primary && primary->link_udf->at) {
+		yy = eval_link_function(primary, pos->y);
+		*y = AXIS_MAP(primary->index, yy);
 	    } else {
-		double yy = axis_log_value_checked(SECOND_Y_AXIS, pos->y, what);
+		yy = axis_log_value_checked(SECOND_Y_AXIS, pos->y, what);
 		*y = AXIS_MAP(SECOND_Y_AXIS, yy);
 	    }
 	    break;

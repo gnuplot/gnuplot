@@ -4,6 +4,8 @@
 	minimum linewidth supported by pdfcairo to match the other cairo 
 	terminals.  Reduce all of them to 0.20 pts (was 0.25 or 0.50).
 
+	* src/axis.c src/graphics.c:  More cleanup of linked axis code.
+
 2016-03-03  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/plot2d.c (get_data):  Introduction of "pt variable" increased the

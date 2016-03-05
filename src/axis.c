@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.175 2016/03/04 04:58:02 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.176 2016/03/04 05:02:10 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -2279,13 +2279,12 @@ eval_link_function(struct axis *axis, double raw_coord)
 int
 map_x(double value)
 {
-    if ((x_axis == SECOND_X_AXIS) 
-    &&  axis_array[SECOND_X_AXIS].linked_to_primary
-    &&  axis_array[SECOND_X_AXIS].link_udf->at != NULL) {
-	if (axis_array[FIRST_X_AXIS].link_udf->at == NULL)
-	    int_error(NO_CARET, "No inverse mapping function available for x2 data");
-	value = eval_link_function(&axis_array[FIRST_X_AXIS], value);
-	return AXIS_MAP(FIRST_X_AXIS, value);
+    if (axis_array[x_axis].linked_to_primary) {
+	AXIS *primary = axis_array[x_axis].linked_to_primary;
+	if (primary->link_udf->at) {
+	    value = eval_link_function(primary, value);
+	    return AXIS_MAP(primary->index, value);
+	}
     }
     return AXIS_MAP(x_axis, value);
 }
@@ -2293,13 +2292,12 @@ map_x(double value)
 int
 map_y(double value)
 {
-    if ((y_axis == SECOND_Y_AXIS)
-    &&  axis_array[SECOND_Y_AXIS].linked_to_primary
-    &&  axis_array[SECOND_Y_AXIS].link_udf->at != NULL) {
-	if (axis_array[FIRST_Y_AXIS].link_udf->at == NULL)
-	    int_error(NO_CARET, "No inverse mapping function available for y2 data");
-	value = eval_link_function(&axis_array[FIRST_Y_AXIS], value);
-	return AXIS_MAP(FIRST_Y_AXIS, value);
+    if (axis_array[y_axis].linked_to_primary) {
+	AXIS *primary = axis_array[y_axis].linked_to_primary;
+	if (primary->link_udf->at) {
+	    value = eval_link_function(primary, value);
+	    return AXIS_MAP(primary->index, value);
+	}
     }
     return AXIS_MAP(y_axis, value);
 }
