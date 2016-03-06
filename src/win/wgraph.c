@@ -1,5 +1,5 @@
 /*
- * $Id: wgraph.c,v 1.199 2016/02/14 08:49:52 markisch Exp $
+ * $Id: wgraph.c,v 1.200 2016/03/06 19:25:15 markisch Exp $
  */
 
 /* GNUPLOT - win/wgraph.c */
@@ -899,6 +899,39 @@ GetPlotRectInMM(LPGW lpgw, LPRECT rect, HDC hdc)
 }
 
 
+static TBOOLEAN
+TryCreateFont(LPGW lpgw, char * fontface, HDC hdc)
+{
+	if (fontface != NULL)
+		strncpy(lpgw->lf.lfFaceName, fontface, LF_FACESIZE);
+
+	lpgw->hfonth = CreateFontIndirect((LOGFONT *)&(lpgw->lf));
+
+	if (lpgw->hfonth != 0) {
+		/* Test if we actually got the requested font. Note that this also seems to work
+			with GDI's magic font substitutions (e.g. Helvetica->Arial, Times->Times New Roman) */
+		HFONT hfontold = (HFONT) SelectObject(hdc, lpgw->hfonth);
+		if (hfontold != NULL) {
+			char fontname[MAXFONTNAME];
+			GetTextFace(hdc, sizeof(fontname), fontname);
+			SelectObject(hdc, hfontold);
+			if (strcmp(fontname, lpgw->lf.lfFaceName) == 0) {
+				return TRUE;
+			} else {
+				FPRINTF((stderr, "Warning: GDI would have substituted \"%s\" for \"%s\"\n", fontname, lpgw->lf.lfFaceName));
+				DeleteObject(lpgw->hfonth);
+				lpgw->hfonth = 0;
+				return FALSE;
+			}
+		}
+		return TRUE;
+	} else {
+		return FALSE;
+	}
+	return FALSE;
+}
+
+
 static void
 MakeFonts(LPGW lpgw, LPRECT lprect, HDC hdc)
 {
@@ -909,8 +942,8 @@ MakeFonts(LPGW lpgw, LPRECT lprect, HDC hdc)
 	int cx, cy;
 
 	lpgw->rotate = FALSE;
-	_fmemset(&(lpgw->lf), 0, sizeof(LOGFONT));
-	_fstrncpy(lpgw->lf.lfFaceName,lpgw->fontname,LF_FACESIZE);
+	memset(&(lpgw->lf), 0, sizeof(LOGFONT));
+	strncpy(lpgw->lf.lfFaceName, lpgw->fontname, LF_FACESIZE);
 	lpgw->lf.lfHeight = -MulDiv(lpgw->fontsize * lpgw->fontscale, GetDeviceCaps(hdc, LOGPIXELSY), 72) * lpgw->sampling;
 	lpgw->lf.lfCharSet = DEFAULT_CHARSET;
 	if (((p = strstr(lpgw->fontname," Italic")) != NULL) ||
@@ -929,8 +962,29 @@ MakeFonts(LPGW lpgw, LPRECT lprect, HDC hdc)
 	lpgw->lf.lfQuality =
 		IsWindowsXPorLater() && lpgw->antialiasing ? CLEARTYPE_QUALITY : PROOF_QUALITY;
 
-	if (lpgw->hfonth == 0) {
-		lpgw->hfonth = CreateFontIndirect((LOGFONT *)&(lpgw->lf));
+	if (!TryCreateFont(lpgw, NULL, hdc)) {
+		if (strcmp(lpgw->fontname, lpgw->deffontname) != 0) {
+			fprintf(stderr, "Warning:  font \"%s\" not available, trying \"%s\" instead.\n", lpgw->fontname, lpgw->deffontname);
+			if (!TryCreateFont(lpgw, lpgw->deffontname, hdc)) {
+				if (strcmp(lpgw->deffontname, GraphDefaultFont()) != 0) {
+					fprintf(stderr, "Warning:  font \"%s\" not available, trying \"%s\" instead.\n", lpgw->deffontname, GraphDefaultFont());
+					if (!TryCreateFont(lpgw, GraphDefaultFont(), hdc)) {
+						fprintf(stderr, "Error:  could not substitute another font. Giving up.\n");
+					}
+				} else {
+					fprintf(stderr, "Error:  could not substitute another font. Giving up.\n");
+				}
+			}
+		} else {
+			if (strcmp(lpgw->fontname, GraphDefaultFont()) != 0) {
+				fprintf(stderr, "Warning:  font \"%s\" not available, trying \"%s\" instead.\n", lpgw->fontname, GraphDefaultFont());
+				if (!TryCreateFont(lpgw, GraphDefaultFont(), hdc)) {
+					fprintf(stderr, "Error:  could not substitute another font. Giving up.\n");
+				}
+			} else {
+				fprintf(stderr, "Error:  font \"%s\" not available, but don't know which font to substitute.\n", lpgw->fontname);
+			}
+		}
 	}
 
 	/* we do need a 90 degree font */

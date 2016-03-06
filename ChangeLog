@@ -14,6 +14,12 @@
 	characters causing an infinite loop for the input "0x".
 	Bug #1745
 
+	* src/win/wgraph.c (MakeFonts, TryCreateFont):  Do not rely on GDI
+	supplying a sensible substitute when a requested font is not
+	available.  Instead, fall back to the user-supplied default font or
+	the terminal's default font if the former is not available.
+	Bug #1669
+
 2016-03-05  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/wxterminal/gp_cairo.c (gp_cairo_set_linewidth):  Change the 
