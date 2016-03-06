@@ -1,5 +1,5 @@
 ﻿;
-; $Id: gnuplot.iss,v 1.10 2014/06/11 07:02:02 markisch Exp $
+; $Id: gnuplot.iss,v 1.11 2014/12/16 09:14:38 markisch Exp $
 ;
 ; GNUPLOT - gnuplot.iss
 ;
@@ -88,6 +88,8 @@ OutputDir=.
 UninstallLogMode=append
 AlwaysShowDirOnReadyPage=true
 ChangesAssociations=true
+ArchitecturesAllowed=
+ArchitecturesInstallIn64BitMode=
 
 [Languages]
 Name: "en"; MessagesFile: "compiler:Default.isl"
@@ -174,6 +176,8 @@ Name: "ja";  Description: "{cm:japanese}";
 ; view README
 Filename: {win}\notepad.exe; Description: {cm:view,README-Windows.txt}; Flags: nowait postinstall skipifsilent Unchecked RunAsOriginalUser ShellExec SkipIfDoesntExist; Parameters: {app}\README-Windows.txt; Languages: en de;
 Filename: {win}\notepad.exe; Description: "{cm:view,README-Windows-ja.txt}"; Flags: nowait postinstall skipifsilent Unchecked RunAsOriginalUser ShellExec SkipIfDoesntExist; Parameters: {app}\README-Windows-ja.txt; Languages: ja;
+; view RELEASE-NOTES
+Filename: {win}\notepad.exe; Description: {cm:view,RELEASE_NOTES}; Flags: nowait postinstall skipifsilent Unchecked RunAsOriginalUser ShellExec SkipIfDoesntExist; Parameters: {app}\RELEASE_NOTES; Languages: en de ja;
 ; launch gnuplot
 Filename: "{app}\bin\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, "&", "&&")}}"; Flags: nowait postinstall skipifsilent Unchecked RunAsOriginalUser; WorkingDir: {#MyDocuments};
 
