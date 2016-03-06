@@ -175,20 +175,16 @@ on Windows 7.
   GNUPLOT_LIB are appended to the `loadpath` variable, but not saved with the
   `save` and `save set` commands. See 'help loadpath' for more details.
 
-* Variable GNUFITLOG holds the name of a file that saves fit results. The
-  default it is fit.log. If the name ends with a "/" or "\", it is treated as a
-  directory name, and "fit.log" will be created as a file in that directory.
-
 
 Known bugs
 ----------
 
 Please see and use
 
-    http://sourceforge.net/tracker/?atid=102055&group_id=2055&func=browse
+    http://sourceforge.net/p/gnuplot/bugs/
 
 for an up-to-date bug tracking system.
 
 --------------------------------------------------------------------------------
 
-The gnuplot team, May 2014
+The gnuplot team, February 2015
