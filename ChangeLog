@@ -10,6 +10,10 @@
 	src/win/wgraph.c:  Fix several issues found by clang, with the most
 	important being wrong delete's in wgdiplus.cpp.
 
+	* scanner.c (get_num):  strtoll() on Windows may consume zero
+	characters causing an infinite loop for the input "0x".
+	Bug #1745
+
 2016-03-05  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/wxterminal/gp_cairo.c (gp_cairo_set_linewidth):  Change the 
