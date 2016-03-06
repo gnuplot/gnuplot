@@ -1,5 +1,5 @@
 /*
- * $Id: wcommon.h,v 1.18 2014/01/04 15:46:38 markisch Exp $
+ * $Id: wcommon.h,v 1.19 2014/03/23 14:09:02 markisch Exp $
  */
 
 /* GNUPLOT - wcommon.h */
@@ -110,7 +110,7 @@ void GraphChangeFont(LPGW lpgw, LPCSTR font, int fontsize, HDC hdc, RECT rect);
 LPWSTR UnicodeText(const char *str, enum set_encoding_id encoding);
 
 #ifdef __cplusplus
-};
+}
 #endif
 
 #endif /* GNUPLOT_WCOMMON_H */
