@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: tkcanvas.trm,v 1.28.8.5 2016/02/12 19:54:34 sfeam Exp $
+ * $Id: tkcanvas.trm,v 1.28.8.6 2016/02/13 16:10:29 markisch Exp $
  *
  */
 
@@ -2248,7 +2248,7 @@ START_HELP(tkcanvas)
 " You can create self-contained, minimal scripts using the `standalone`",
 " option.  The default is `input` which creates scripts which have to be",
 " source'd (or loaded or called or whatever the adequate term is for the",
-" language selected.",
+" language selected).",
 "",
 " If the `interactive` option is specified, mouse clicking on a line segment",
 " will print the coordinates of its midpoint to stdout.",
@@ -2260,7 +2260,7 @@ START_HELP(tkcanvas)
 " coordinates of the midpoint are only filled for logarithmic axes.",
 "",
 " By default the canvas is `transparent`, but an explicit background color",
-" can be set with the `background `option.",
+" can be set with the `background` option.",
 "",
 " `rounded` sets line caps and line joins to be rounded;",
 " `butt` is the default:  butt caps and mitered joins.",
