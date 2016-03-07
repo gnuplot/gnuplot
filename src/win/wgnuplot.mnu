@@ -640,7 +640,7 @@ Fu&nctions
 		pt [INPUT]Point Type?[EOS] [EOS]
 	Point Size
 		ps [INPUT]Point Size?[EOS] [EOS]
-	Point Intervel
+	Point Interval
 		pointinterval [INPUT]Interval?[EOS] [EOS]
 	Palette (for 3D plots)
 		palette [EOS]
