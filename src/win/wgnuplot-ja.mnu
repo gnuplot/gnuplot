@@ -4,7 +4,7 @@
 ; Modified for 4.0, John Bollinger, 31 Dec 2002
 ; translated by Masahito Yamaga (ma@yama-ga.com) (for 3.7.2)
 ; translated by Shigeharu TAKENO 03/25 2006 (for 4.1)
-; $Id: wgnuplot-ja.mnu,v 1.3 2011/11/12 11:58:05 markisch Exp $
+; $Id: wgp410-sj.mnu,v 1.5 2016-03-01 14:11:33+09 shige Exp $
 
 [Menu]
 ƒtƒ@ƒCƒ‹(&F)
@@ -17,79 +17,79 @@
 	--
 	ƒfƒBƒŒƒNƒgƒŠ‚ÌˆÚ“®(&C) ...
 		cd '[DIRECTORY]New directory?[EOS]'{ENTER}
-	Œ»İ‚ÌƒfƒBƒŒƒNƒgƒŠ(&D)
+	Œ»?İ‚ÌƒfƒBƒŒƒNƒgƒŠ(&D)
 		pwd{ENTER}
 	--
-	o—Íæ‚Ìİ’è(&U) ...
+	?o—Í?æ‚Ì?İ’è(&U) ...
 		set output "[INPUT]Output filename?[EOS]"{ENTER}
 	ƒvƒŠƒ“ƒ^‚Ö(&P)
 		set output "PRN"{ENTER}
 	ƒEƒBƒ“ƒhƒE•\¦(&W)
 		set output{ENTER}set terminal win{ENTER} 
-	Œ»İ‚Ìo—Íæ
+	Œ»?İ‚Ì?o—Í?æ
 		show output{ENTER}
-	o—ÍƒfƒoƒCƒX‚Ìİ’è(&T) ...
+	?o—ÍƒfƒoƒCƒX‚Ì?İ’è(&T) ...
 		set terminal [INPUT]Terminal type?{ENTER}
-	o—ÍƒfƒoƒCƒX‚Ì•\¦
+	?o—ÍƒfƒoƒCƒX‚Ì•\¦
 		set terminal{ENTER}show terminal{ENTER}
 	--
 	[Menu]
-	s•ÒW
-		‘O‚ÉÀs‚µ‚½ƒRƒ}ƒ“ƒh	^P
+	?s•Ò?W
+		‘O‚ÉÀ?s‚µ‚½ƒRƒ}ƒ“ƒh	^P
 			{^P}
-		Ÿ‚ÉÀs‚µ‚½ƒRƒ}ƒ“ƒh	^N
+		Ÿ‚ÉÀ?s‚µ‚½ƒRƒ}ƒ“ƒh	^N
 			{^N}
 		--
 		ˆê•¶š–ß‚é	^B
 			{^B}
-		ˆê•¶ši‚Ş	^F
+		ˆê•¶š?i‚Ş	^F
 			{^F}
 		--
-		s“ª‚ÖˆÚ“®	^A
+		?s“ª‚ÖˆÚ“®	^A
 			{^A}
-		s––‚ÖˆÚ“®	^E
+		?s––‚ÖˆÚ“®	^E
 			{^E}
 		--
-		ƒJ[ƒ\ƒ‹‚Ì‘O‚Ìˆê•¶š‚ğíœ	^H
+		ƒJ?[ƒ\ƒ‹‚Ì‘O‚Ìˆê•¶š‚ğ?í?œ	^H
 			{^H}
-		ƒJ[ƒ\ƒ‹ã‚Ìˆê•¶šíœ	^D
+		ƒJ?[ƒ\ƒ‹?ã‚Ìˆê•¶š?í?œ	^D
 			{^D}
-		ƒJ[ƒ\ƒ‹‚Ì‘O‚ÌˆêŒê‚ğíœ	^W
+		ƒJ?[ƒ\ƒ‹‚Ì‘O‚ÌˆêŒê‚ğ?í?œ	^W
 			{^W}
-		ƒJ[ƒ\ƒ‹ˆÈ~‚ğ‚·‚×‚Äíœ	^K
+		ƒJ?[ƒ\ƒ‹ˆÈ?~‚ğ‚·‚×‚Ä?í?œ	^K
 			{^K}
-		s‚ğ‚·‚×‚Äíœ	^U
+		?s‚ğ‚·‚×‚Ä?í?œ	^U
 			{^U}
 		--
-		s‚ğÄ•\¦	^L
+		?s‚ğ?Ä•\¦	^L
 			{^L}
 		[EndMenu]
 		DOS ‘‹‚ğŠJ‚­
 			shell{ENTER}
-		DOS ‚ÌƒRƒ}ƒ“ƒh‚ğÀs ...
+		DOS ‚ÌƒRƒ}ƒ“ƒh‚ğÀ?s ...
 			![INPUT]DOS command?{ENTER}
 		--
-		I—¹(&X)
+		?I—¹(&X)
 		quit{ENTER}
 [EndMenu]
 
 [Menu]
-ƒvƒƒbƒg(&P)
-	ƒvƒƒbƒg (plot)
+ƒvƒ?ƒbƒg(&P)
+	ƒvƒ?ƒbƒg (plot)
 		plot 
-	3ŸŒ³ƒvƒƒbƒg (splot)
+	3ŸŒ³ƒvƒ?ƒbƒg (splot)
 		splot 
-	Äƒvƒƒbƒg (replot)
+	?Äƒvƒ?ƒbƒg (replot)
 		replot{ENTER}
 	ƒfƒoƒCƒX‚ğƒNƒŠƒA (clear)
 		clear{ENTER}
 	--
 	”ÍˆÍw’è
 		[[INPUT]Lower bound?[EOS]:[INPUT]Upper bound?[EOS]] [EOS]
-	“Á’è‚Ì•Ï”‚Ì”ÍˆÍw’è
+	“Á’è‚Ì•Ï?”‚Ì”ÍˆÍw’è
 		[[INPUT]Variable name?[EOS]=[INPUT]Lower bound?[EOS]:[INPUT]Upper bound?[EOS]] [EOS]
 	--
-	ƒf[ƒ^ƒtƒ@ƒCƒ‹–¼ ...
+	ƒf?[ƒ^ƒtƒ@ƒCƒ‹–¼ ...
 		'[OPEN]Open[EOS]*.dat[EOS]' [EOS]
 	x,y ‚Æ‚µ‚Äg‚¤—ñ
 		using [INPUT]X column?[EOS]:[INPUT]Y column?[EOS] [EOS]
@@ -100,50 +100,50 @@
 	--
 	[Menu]
 	ƒXƒ^ƒCƒ‹ (’Pˆê)
-		ü (Lines)
+		?ü (Lines)
 			with lines
 		ƒ|ƒCƒ“ƒg (Points)
 			with points
-		ü‚Æƒ|ƒCƒ“ƒg (Lines and Points)
+		?ü‚Æƒ|ƒCƒ“ƒg (Lines and Points)
 			with linespoints
-		‚ü (Impulses)
+		?‚?ü (Impulses)
 			with impulses
 		ƒhƒbƒg (Dots)
 			with dots
 		ƒXƒeƒbƒv (Steps)
 			with steps
-		Ÿ‚Ì‚‚³‚ÌƒXƒeƒbƒv (Fsteps)
+		Ÿ‚Ì?‚‚³‚ÌƒXƒeƒbƒv (Fsteps)
 			with fsteps
 		ƒqƒXƒgƒOƒ‰ƒ€ƒXƒeƒbƒv (Histeps)
 			with histeps
 	[EndMenu]
 	[Menu]
-	ƒXƒ^ƒCƒ‹ (•¡‡)
-		ƒGƒ‰[ƒo[ (Error Bars)
+	ƒXƒ^ƒCƒ‹ (•¡?‡)
+		ƒGƒ‰?[ƒo?[ (Error Bars)
 			with errorbars
-		X ƒGƒ‰[ƒo[
+		X ƒGƒ‰?[ƒo?[
 			with xerrorbars
-		Y ƒGƒ‰[ƒo[
+		Y ƒGƒ‰?[ƒo?[
 			with yerrorbars
-		XY ƒGƒ‰[ƒo[
+		XY ƒGƒ‰?[ƒo?[
 			with xyerrorbars
-		ƒGƒ‰[ƒ‰ƒCƒ“ (Error Lines)
+		ƒGƒ‰?[ƒ‰ƒCƒ“ (Error Lines)
 			with errorlines
-		X ƒGƒ‰[ƒ‰ƒCƒ“
+		X ƒGƒ‰?[ƒ‰ƒCƒ“
 			with xerrorlines
-		Y ƒGƒ‰[ƒ‰ƒCƒ“
+		Y ƒGƒ‰?[ƒ‰ƒCƒ“
 			with yerrorlines
-		XY ƒGƒ‰[ƒ‰ƒCƒ“
+		XY ƒGƒ‰?[ƒ‰ƒCƒ“
 			with xyerrorlines
 		‹éŒ` (Boxes)
 			with boxes
 		—Ìˆæ“h‚è‚Â‚Ô‚µ (Filled Curves)
 			with filledcurves
-		‹éŒ`‚ÆƒGƒ‰[ƒo[ (Box Error Bars)
+		‹éŒ`‚ÆƒGƒ‰?[ƒo?[ (Box Error Bars)
 			with boxerrorbars
-		‹éŒ`‚Æ XY ƒGƒ‰[ƒo[
+		‹éŒ`‚Æ XY ƒGƒ‰?[ƒo?[
 			with boxxyerrorbars
-		‹à—Zƒf[ƒ^Œ`® (Finance Bars)
+		‹à—Zƒf?[ƒ^Œ`® (Finance Bars)
 			with financebars
 		“•‘äŒ`® (Candlesticks)
 			with candlesticks
@@ -152,53 +152,53 @@
 
 [Menu]
 •\Œ»(&E)
-	•Ï”
+	•Ï?”
 		print 
-	•¡‘f” ...
+	•¡‘f?” ...
 		{[INPUT]Real part?[EOS],[INPUT]Imaginary part?[EOS]}
 	[Menu]
-	’P€‰‰Zq
-		•‰•„†	-a
+	’P?€‰‰Zq
+		•‰•„?†	-a
 			-[INPUT]Arg
-		³•„†	+a
+		?³•„?†	+a
 			+[INPUT]Arg
-		•â”	~a
+		•â?”	~a
 			~[INPUT]Arg
-		˜_—”Û’è	!a
+		˜_—?”Û’è	!a
 			![INPUT]Arg
-		ŠKæ	a!
+		ŠK?æ	a!
 			[INPUT]Arg[EOS]!
 	[EndMenu]
 	[Menu]
-	2 €‰‰Zq
-		—İæ	**
-			**
-		Ï	*
+	2 ?€‰‰Zq
+		w?”‰‰Zq	**
+		**
+		?Ï	*
 			*
-		¤	/
+		?¤	/
 			/
 		˜a	+
 			+
-		·	-
+		?·	-
 			-
 		--
-		è—]	%
+		ƒ‚ƒWƒ…ƒ?‰‰Zq	%
 			%
 	[EndMenu]
 	[Menu]
-	˜_—‰‰Zq
+	˜_—?‰‰Zq
 		“™‚µ‚¢	==
 			==
 		“™‚µ‚­‚È‚¢	!=
 			!=
 		--
-		‚æ‚è¬‚³‚¢	<
+		‚æ‚è?¬‚³‚¢	<
 			<
 		ˆÈ‰º	<=
 			<=
 		‚æ‚è‘å‚«‚¢	>
 			>
-		ˆÈã	>=
+		ˆÈ?ã	>=
 			>=
 		--
 		ƒrƒbƒg‚²‚Æ‚Ì AND	&
@@ -208,40 +208,40 @@
 		ƒrƒbƒg‚²‚Æ‚Ì OR	|
 			|
 		--
-		˜_—“I AND	&&
+		˜_—?“I AND	&&
 			&&
-		˜_—“I OR	||
+		˜_—?“I OR	||
 			||
 		--
-		3 €‰‰Zq	a?b:c
+		3 ?€‰‰Zq	a?b:c
 			[INPUT]First arg[EOS]?[INPUT]Second arg[EOS]:[INPUT]Third arg[EOS]
 	[EndMenu]
 [EndMenu]
 [Menu]
-ŠÖ”(&N)
+ŠÖ?”(&N)
 	[Menu]
-	‰“™ŠÖ”
-		—”
+	?‰“™ŠÖ?”
+		—??”
 			rand([INPUT]Argument[EOS])
-		â‘Î’l (abs)
+		?â‘Î’l (abs)
 			abs([INPUT]Argument[EOS])
-		•„† (sgn)
+		•„?† (sgn)
 			sgn([INPUT]Argument[EOS])
 		--
-		ˆø”‚æ‚è¬‚³‚­‚È‚¢Å¬‚Ì®” (ceil)
+		ˆø?”‚æ‚è?¬‚³‚­‚È‚¢?Å?¬‚Ì?®?” (ceil)
 			ceil([INPUT]Argument[EOS])
-		ˆø”‚æ‚è‘å‚«‚­‚È‚¢Å‘å‚Ì®” (floor)
+		ˆø?”‚æ‚è‘å‚«‚­‚È‚¢?Å‘å‚Ì?®?” (floor)
 			floor([INPUT]Argument[EOS])
-		®” (int)
+		?®?” (int)
 			int([INPUT]Argument[EOS])
 		--
-		•½•ûª (sqrt)
+		•½•û?ª (sqrt)
 			sqrt([INPUT]Argument[EOS])
-		w” (exp)
+		w?” (exp)
 			exp([INPUT]Argument[EOS])
-		©‘R‘Î” (log)
+		©‘R‘Î?” (log)
 			log([INPUT]Argument[EOS])
-		í—p‘Î” (log10)
+		?í—p‘Î?” (log10)
 			log10([INPUT]Argument[EOS])
 		--
 		cos
@@ -275,60 +275,60 @@
 			arg([INPUT]Argument[EOS])
 	[EndMenu]
 	[Menu]
-	“ÁêŠÖ”
-		Œë·ŠÖ” (erf)
+	“ÁêŠÖ?”
+		Œë?·ŠÖ?” (erf)
 			erf([INPUT]Argument[EOS])
-		Œë·•âŠÖ” (erfc)
+		Œë?·•âŠÖ?” (erfc)
 			erfc([INPUT]Argument[EOS])
-		‹tŒë·ŠÖ” (inverf)
+		‹tŒë?·ŠÖ?” (inverf)
 			inverf([INPUT]Argument[EOS])
 		--
-		ƒKƒ“ƒ}ŠÖ” (gamma)
+		ƒKƒ“ƒ}ŠÖ?” (gamma)
 			gamma([INPUT]Argument[EOS])
-		•sŠ®‘SƒKƒ“ƒ}ŠÖ” (igamma)
+		•sŠ®‘SƒKƒ“ƒ}ŠÖ?” (igamma)
 			igamma([INPUT]First argument[EOS],[INPUT]Second argument[EOS])
-		‘Î”ƒKƒ“ƒ}ŠÖ” (lgamma)
+		‘Î?”ƒKƒ“ƒ}ŠÖ?” (lgamma)
 			lgamma([INPUT]Argument[EOS])
 		--
-		•sŠ®‘Sƒx[ƒ^ŠÖ” (ibeta)
+		•sŠ®‘Sƒx?[ƒ^ŠÖ?” (ibeta)
 			ibeta([INPUT]First argument[EOS],[INPUT]Second argument[EOS],[INPUT]Third argument[EOS])
 		--
-		J0 ƒxƒbƒZƒ‹ŠÖ” (besj0)
+		‘æj0ŸƒxƒbƒZƒ‹ŠÖ?” (besj0)
 			besj0([INPUT]Argument[EOS])
-		J1 ƒxƒbƒZƒ‹ŠÖ” (besj1)
+		‘æj1ŸƒxƒbƒZƒ‹ŠÖ?” (besj1)
 			besj1([INPUT]Argument[EOS])
-		Y0 ƒxƒbƒZƒ‹ŠÖ” (besy0)
+		‘æy0ŸƒxƒbƒZƒ‹ŠÖ?” (besy0)
 			besy0([INPUT]Argument[EOS])
-		Y1 ƒxƒbƒZƒ‹ŠÖ” (besy1)
+		‘æy1ŸƒxƒbƒZƒ‹ŠÖ?” (besy1)
 			besy1([INPUT]Argument[EOS])
 		--
-		ƒ‰ƒ“ƒxƒ‹ƒg W ŠÖ” (lambertw)
+		ƒ‰ƒ“ƒxƒ‹ƒg W ŠÖ?” (lanbertw)
 			lambertw([INPUT]Argument[EOS])
 
 	[EndMenu]
 	[Menu]
-	“ŒvŠwŠÖ”
-		³‹K•ª•zŠÖ” (norm)
+	“?ŒvŠwŠÖ?”
+		?³‹K•ª•zŠÖ?” (norm)
 			norm([INPUT]Argument[EOS])
-		‹t³‹K•ª•zŠÖ” (invnrom)
+		‹t?³‹K•ª•zŠÖ?” (invnrom)
 			invnorm([INPUT]Argument[EOS])
 	[EndMenu]
 	--
-	ŠÖ”‚ğ’è‹` ...
+	ŠÖ?”‚ğ’è‹` ...
 		[INPUT]Name for function?[EOS][INPUT]Variable/s, eg. (a,b) ?[EOS]=
-	’è‹`‚µ‚½ŠÖ”‚ğ•\¦
+	’è‹`‚µ‚½ŠÖ?”‚ğ•\¦
 		show functions{ENTER}
 	--
-	•Ï”‚ğ’è‹` ...
+	•Ï?”‚ğ’è‹` ...
 		[INPUT]Name for variable?[EOS]=[INPUT]Value, eg. 9.81 ?{ENTER}
-	’è‹`‚µ‚½•Ï”‚ğ•\¦
+	’è‹`‚µ‚½•Ï?”‚ğ•\¦
 		show variables{ENTER}
 	--
-	x ƒ_ƒ~[•Ï”
+	x ƒ_ƒ~?[•Ï?”
 		set dummy [INPUT]Variable name?{ENTER}
-	x,y ƒ_ƒ~[•Ï”
+	x,y ƒ_ƒ~?[•Ï?”
 		set dummy [INPUT]Variable names (eg. u,v)?{ENTER}
-	ƒ_ƒ~[•Ï”‚ğ•\¦
+	ƒ_ƒ~?[•Ï?”‚ğ•\¦
 		show dummy{ENTER}
 [EndMenu]
 
@@ -338,26 +338,26 @@
 		set border{ENTER}
 	˜g‚ğ‚Â‚¯‚È‚¢
 		unset border{ENTER}
-	˜g‚Ìó‘Ô‚ğ•\¦
+	˜g‚Ì?ó‘Ô‚ğ•\¦
 		show border{ENTER}
 	--
-	‹éŒ`‚Ì•‚ğİ’è
+	‹éŒ`‚Ì•?‚ğ?İ’è
 		set boxwidth [INPUT]Box Width?{ENTER}
-	‹éŒ`‚Ì•‚ğ©“®İ’è
+	‹éŒ`‚Ì•?‚ğ©“®?İ’è
 		set boxwidth{ENTER}
-	‹éŒ`‚Ì•‚ğ•\¦
+	‹éŒ`‚Ì•?‚ğ•\¦
 		show boxwidth{ENTER}
 	--
-	üí‚Ì•\¦
+	?üí‚Ì•\¦
 		test{ENTER}
 	--
 	[Menu]
-	”}‰î•Ï”
-		”}‰î•Ï”•\¦‚É‚·‚é
+	”}‰î•Ï?”
+		”}‰î•Ï?”•\¦‚É‚·‚é
 			set parametric{ENTER}
-		”}‰î•Ï”•\¦‚ğ‚µ‚È‚¢
+		”}‰î•Ï?”•\¦‚ğ‚µ‚È‚¢
 			unset parametric{ENTER}
-		”}‰î•Ï”•\¦‚Ìó‘Ô‚ğ•\¦
+		”}‰î•Ï?”•\¦‚Ì?ó‘Ô‚ğ•\¦
 			show parametric{ENTER}
 		--
 		t ‚Ì”ÍˆÍ
@@ -369,26 +369,26 @@
 	[EndMenu]
 	--
 	[Menu]
-	Ø‚è”²‚«
-	‹«ŠE‚É‹ß‚¢“_‚ğí‚é
+	?Ø‚è”²‚«
+	‹«ŠE‚É‹ß‚¢“_‚ğ?í‚é
 		set clip points{ENTER}
-	ˆê•û‚Ì’[‚¾‚¯Ø‚èæ‚é
+	ˆê•û‚Ì’[‚¾‚¯?Ø‚èæ‚é
 		set clip one{ENTER}
-	—¼’[‚ğØ‚èæ‚é
+	—¼’[‚ğ?Ø‚èæ‚é
 		set clip two{ENTER}
-	Ø‚èæ‚ç‚È‚¢
+	?Ø‚èæ‚ç‚È‚¢
 		unset clip{ENTER}
-	Ø‚è”²‚«•û‚Ìó‘Ô‚ğ•\¦
+	?Ø‚è”²‚«•û‚Ì?ó‘Ô‚ğ•\¦
 		show clip{ENTER}
 	[EndMenu]
 	--
 	[Menu]
-	‹ÉÀ•W
-	‹ÉÀ•WŒn‚É•ÏX
+	‹É?À•W
+	‹É?À•WŒn‚É•Ï?X
 		set polar{ENTER}
-	’¼ŒğÀ•W‚É•ÏX
+	’¼Œğ?À•W‚É•Ï?X
 		unset polar{ENTER}
-	‹ÉÀ•WŒn‚©‚Ç‚¤‚©‚ğ•\¦
+	‹É?À•WŒn‚©‚Ç‚¤‚©‚ğ•\¦
 		show polar{ENTER}
 	“®Œa•ûŒü‚Ì”ÍˆÍw’è
 		set rrange [[INPUT]Lower bound?[EOS]:[INPUT]Upper bound?[EOS]]{ENTER}
@@ -400,58 +400,58 @@
 		show angles{ENTER}
 	[EndMenu]
 	--
-	kÚ‚ğİ’è
+	?kÚ‚ğ?İ’è
 		set size [INPUT]Xscale?[EOS],[INPUT]Yscale?{ENTER}
-	kÚ‚ğ•\¦
+	?kÚ‚ğ•\¦
 		show size{ENTER}
 	--
-	ŠÖ”‚ÌƒTƒ“ƒvƒŠƒ“ƒO”‚ğw’è
+	ŠÖ?”‚ÌƒTƒ“ƒvƒŠƒ“ƒO?”‚ğw’è
 		set sample [INPUT]Sampling rate (default=100)?{ENTER}
-	ŠÖ”‚ÌƒTƒ“ƒvƒŠƒ“ƒO”‚ğ•\¦
+	ŠÖ?”‚ÌƒTƒ“ƒvƒŠƒ“ƒO?”‚ğ•\¦
 		show sample{ENTER}
 [EndMenu]
 
 [Menu]
 ²(&A)
-	©“®kÚ‚ğg‚¤
+	©“®?kÚ‚ğg‚¤
 		set autoscale [INPUT]Which axes (eg. xy)?{ENTER}
-	©“®kÚ‚ğg‚í‚È‚¢
+	©“®?kÚ‚ğg‚í‚È‚¢
 		unset autoscale [INPUT]Which axes (eg. xy)?{ENTER}
-	©“®kÚ‚Ìó‘Ô‚ğ•\¦
+	©“®?kÚ‚Ì?ó‘Ô‚ğ•\¦
 		show autoscale{ENTER}
 	--
-	‘Î”²‚ğg‚¤
+	‘Î?”²‚ğg‚¤
 		set logscale [INPUT]Which axes (eg. xy)?{ENTER}
-	‘Î”²‚ğg‚í‚È‚¢
+	‘Î?”²‚ğg‚í‚È‚¢
 		unset logscale [INPUT]Which axes (eg. xy)?{ENTER}
-	‘Î”²‚Ìó‘Ô‚ğ•\¦
+	‘Î?”²‚Ì?ó‘Ô‚ğ•\¦
 		show logscale{ENTER}
 	--
 	[Menu]
-	–Ú·
-		–Ú·Œ©o‚µ‚Ì‘®‚ğw’è
+	–Ú?·
+		–Ú?·Œ©?o‚µ‚Ì?‘®‚ğw’è
 			set format [INPUT]Axes?[EOS] "[INPUT]Format string?[EOS]"{ENTER}
-		–Ú·Œ©o‚µ‚Ì‘®‚ğ•\¦
+		–Ú?·Œ©?o‚µ‚Ì?‘®‚ğ•\¦
 			show format{ENTER}
 		--
-		–Ú·‚ğ“à‘¤‚É (ƒfƒtƒHƒ‹ƒg)
+		–Ú?·‚ğ“à‘¤‚É (ƒfƒtƒHƒ‹ƒg)
 			set tics in{ENTER}
-		–Ú·‚ğŠO‘¤‚É
+		–Ú?·‚ğŠO‘¤‚É
 			set tics out{ENTER}
-		–Ú·‚Ìİ’è‚ğ•\¦
+		–Ú?·‚Ì?İ’è‚ğ•\¦
 			show tics{ENTER}
 		--
-		z²‚Ì‚‚³‚Ìw’è
+		z²‚Ì?‚‚³‚Ìw’è
 			set ticslevel [INPUT]Level (default=0.5)?{ENTER}
 		--
-		–Ú·‚ÌŠÔŠu‚Ìw’è
+		–Ú?·‚ÌŠÔŠu‚Ìw’è
 			set [INPUT]Axis: x, y or z ?[EOS]tics [INPUT]Start, Increment, End (eg. 0,0.5,10) ?{ENTER}
 		--
-		–Ú·‚Ìİ’èŠJn
+		–Ú?·‚Ì?İ’èŠJn
 			set [INPUT]Axis: x, y or z ?[EOS]tics ("[INPUT]Label text?[EOS]" [INPUT]Position?[EOS]
-		–Ú·‚Ìƒ‰ƒxƒ‹‚ÆˆÊ’u‚Ìw’è
+		–Ú?·‚Ìƒ‰ƒxƒ‹‚ÆˆÊ’u‚Ìw’è
 			,"[INPUT]Label text?[EOS]" [INPUT]Position?[EOS]
-		–Ú·‚Ìİ’èI—¹
+		–Ú?·‚Ì?İ’è?I—¹
 			){ENTER}
 	[EndMenu]
 	--
@@ -477,39 +477,39 @@
 		unset yzeroaxis{ENTER}
 	X,Y —¼²‚ğ‚Ğ‚­
 		set zeroaxis{ENTER}
-	²‚Ìó‘Ô‚ğ•\¦
+	²‚Ì?ó‘Ô‚ğ•\¦
 		show zeroaxis{ENTER}
 [EndMenu]
 
 [Menu]
-ƒ`ƒƒ[ƒg(&C)
+ƒ`ƒƒ?[ƒg(&C)
 	ƒOƒŠƒbƒh‚ğ•\¦‚·‚é
 		set grid{ENTER}
 	ƒOƒŠƒbƒh‚ğ•\¦‚µ‚È‚¢
 		unset grid{ENTER}
-	ƒOƒŠƒbƒh‚Ìó‘Ô‚ğ•\¦
+	ƒOƒŠƒbƒh‚Ì?ó‘Ô‚ğ•\¦
 		show grid{ENTER}
 	--
 	–îˆó‚ğ’Ç‰Á
 		set arrow [INPUT]Tag (1-99)?[EOS] from [INPUT]From coordinate?[EOS] to [INPUT]To coordinate?{ENTER}
-	–îˆó‚ğíœ
+	–îˆó‚ğ?í?œ
 		unset arrow [INPUT]Tag (1-99)?{ENTER}
-	–îˆó‚Ìó‘Ô‚ğ•\¦
+	–îˆó‚Ì?ó‘Ô‚ğ•\¦
 		show arrow{ENTER}
 	--
 	ƒ‰ƒxƒ‹‚ğ’Ç‰Á
 		set label [INPUT]Tag?[EOS] "[INPUT]Label?[EOS]" at [INPUT]Coordinate?[EOS] [INPUT]Justification (l,c,r)?{ENTER}
-	ƒ‰ƒxƒ‹‚ğíœ
+	ƒ‰ƒxƒ‹‚ğ?í?œ
 		unset label [INPUT]Tag?{ENTER}
-	ƒ‰ƒxƒ‹‚Ìó‘Ô‚ğ•\¦
+	ƒ‰ƒxƒ‹‚Ì?ó‘Ô‚ğ•\¦
 		show label{ENTER}
 	--
-	ƒ^ƒCƒgƒ‹‚ğİ’è
+	ƒ^ƒCƒgƒ‹‚ğ?İ’è
 		set title "[INPUT]Title text?[EOS]" [INPUT]X position, Y position (eg. 2,4)?{ENTER}
 	ƒ^ƒCƒgƒ‹‚ğ•\¦
 		show title{ENTER}
 	--
-	–}—á‚ÌˆÊ’u‚ğİ’è
+	–}—á‚ÌˆÊ’u‚ğ?İ’è
 		set key [INPUT]Key position?{ENTER}
 	–}—á‚ÌˆÊ’u‚ğƒfƒtƒHƒ‹ƒg‚É
 		set key{ENTER}
@@ -518,93 +518,93 @@
 	–}—á‚ÌˆÊ’u‚ğ•\¦
 		show key{ENTER}
 	--
-	ƒIƒtƒZƒbƒg‚ğİ’è
+	ƒIƒtƒZƒbƒg‚ğ?İ’è
 		set offsets [INPUT]Offsets left,right,top,bottom ?{ENTER}
 	ƒIƒtƒZƒbƒg‚ğ•\¦
 		show offsets{ENTER}
 	--
-	‚Ì•\¦ˆÊ’u‚ğİ’è
+	??‚Ì•\¦ˆÊ’u‚ğ?İ’è
 		set time [INPUT]Location (eg. 1,1)?{ENTER}
-	‚ğ•\¦‚µ‚È‚¢
+	??‚ğ•\¦‚µ‚È‚¢
 		unset time{ENTER}
-	‚Ì•\¦ˆÊ’u‚ğ•\¦
+	??‚Ì•\¦ˆÊ’u‚ğ•\¦
 		show time{ENTER}
 [EndMenu]
 
 [Menu]
 ƒXƒ^ƒCƒ‹(&S)
 	[Menu]
-	ƒf[ƒ^‚Ì•\¦ƒXƒ^ƒCƒ‹
-	ü (Lines)
+	ƒf?[ƒ^‚Ì•\¦ƒXƒ^ƒCƒ‹
+	?ü (Lines)
 		set style data lines{ENTER}
 	ƒ|ƒCƒ“ƒg (Points)
 		set style data points{ENTER}
-	ü‚Æƒ|ƒCƒ“ƒg (Lines + Points)
+	?ü‚Æƒ|ƒCƒ“ƒg (Lines + Points)
 		set style data linespoints{ENTER}
 	ƒhƒbƒg (Dots)
 		set style data dots{ENTER}
-	‚ü (Impulses)
+	?‚?ü (Impulses)
 		set style data impulses{ENTER}
 	--
-	ƒGƒ‰[ƒo[ (Error Bars)
+	ƒGƒ‰?[ƒo?[ (Error Bars)
 		set style data errorbars{ENTER}
 	‹éŒ` (Boxes)
 		set style data boxes{ENTER}
-	‹éŒ`‚ÆƒGƒ‰[ƒo[ (Box Error Bars)
+	‹éŒ`‚ÆƒGƒ‰?[ƒo?[ (Box Error Bars)
 		set style data boxerrorbars{ENTER}
 	--
 	“•‘äŒ`® (Candlesticks)
 		set style data candlesticks{ENTER}
-	‹à—Zƒf[ƒ^Œ`® (Finance Bars)
+	‹à—Zƒf?[ƒ^Œ`® (Finance Bars)
 		set style data financebars{ENTER}
 	[EndMenu]
-	ƒf[ƒ^‚ÌƒXƒ^ƒCƒ‹‚ğ•\¦
+	ƒf?[ƒ^‚ÌƒXƒ^ƒCƒ‹‚ğ•\¦
 		show style data{ENTER}
-	ƒf[ƒ^‚ÌƒXƒ^ƒCƒ‹‚ğ‰Šú‰»
+	ƒf?[ƒ^‚ÌƒXƒ^ƒCƒ‹‚ğ?‰Šú‰»
 		unset style data{ENTER}
 	--
 	[Menu]
-	ŠÖ”‚Ì•\¦ƒXƒ^ƒCƒ‹
-	ü (Lines)
+	ŠÖ?”‚Ì•\¦ƒXƒ^ƒCƒ‹
+	?ü (Lines)
 		set style function lines{ENTER}
 	ƒ|ƒCƒ“ƒg (Points)
 		set style function points{ENTER}
-	ü‚Æƒ|ƒCƒ“ƒg (Lines + Points)
+	?ü‚Æƒ|ƒCƒ“ƒg (Lines + Points)
 		set style function linespoints{ENTER}
 	ƒhƒbƒg (Dots)
 		set style function dots{ENTER}
-	‚ü (Impulses)
+	?‚?ü (Impulses)
 		set style function impulses{ENTER}
 	--
-	ƒGƒ‰[ƒo[ (Error Bars)
+	ƒGƒ‰?[ƒo?[ (Error Bars)
 		set style function errorbars{ENTER}
 	‹éŒ` (Boxes)
 		set style function boxes{ENTER}
-	‹éŒ`‚ÆƒGƒ‰[ƒo[ (Box Error Bars)
+	‹éŒ`‚ÆƒGƒ‰?[ƒo?[ (Box Error Bars)
 		set style function boxerrorbars{ENTER}
 	--
 	“•‘äŒ`® (Candlesticks)
 		set style function candlesticks{ENTER}
-	‹à—Zƒf[ƒ^Œ`® (Finance Bars)
+	‹à—Zƒf?[ƒ^Œ`® (Finance Bars)
 		set style function financebars{ENTER}
 	[EndMenu]
-	ŠÖ”‚ÌƒXƒ^ƒCƒ‹‚ğ•\¦
+	ŠÖ?”‚ÌƒXƒ^ƒCƒ‹‚ğ•\¦
 		show style function{ENTER}
-	ŠÖ”‚ÌƒXƒ^ƒCƒ‹‚ğ‰Šú‰»
+	ŠÖ?”‚ÌƒXƒ^ƒCƒ‹‚ğ?‰Šú‰»
 		unset style function{ENTER}
 	--
 	[Menu]
 	–î‚Ì•\¦ƒXƒ^ƒCƒ‹
-	–îæ (Head)
+	–î?æ (Head)
 		set style arrow [INPUT]Arrow number?[EOS] head{ENTER}
-	—¼–îæ (Heads)
+	—¼–î?æ (Heads)
 		set style arrow [INPUT]Arrow number?[EOS] heads{ENTER}
-	–îæ‚È‚µ (No Heads)
+	–î?æ‚È‚µ (No Heads)
 		set style arrow [INPUT]Arrow number?[EOS] nohead{ENTER}
 	[EndMenu]
 	–î‚ÌƒXƒ^ƒCƒ‹‚ğ•\¦
 		show style arrow [INPUT]Arrow number? {ENTER}
-	–î‚ÌƒXƒ^ƒCƒ‹‚ğ‰Šú‰»
+	–î‚ÌƒXƒ^ƒCƒ‹‚ğ?‰Šú‰»
 		unset style arrow [INPUT]Arrow number? {ENTER}
 	--
 	[Menu]
@@ -613,7 +613,7 @@
 		set style fill empty{ENTER}
 	ƒxƒ^“h‚è (Solid)
 		set style fill solid [INPUT]Density?{ENTER}
-	ƒpƒ^[ƒ““h‚è (Pattern)
+	ƒpƒ^?[ƒ““h‚è (Pattern)
 		set style fill pattern [INPUT]Pattern number?{ENTER}
 	‹«ŠE (Border)
 		set style fill border [INPUT]Line Type?{ENTER}
@@ -622,86 +622,96 @@
 	[EndMenu]
 	“h‚è‚Â‚Ô‚µƒXƒ^ƒCƒ‹‚Ì•\¦
 		show style fill{ENTER}
-	“h‚è‚Â‚Ô‚µƒXƒ^ƒCƒ‹‚Ì‰Šú‰»
+	“h‚è‚Â‚Ô‚µƒXƒ^ƒCƒ‹‚Ì?‰Šú‰»
 		unset style fill{ENTER}
 	--
 	[Menu]
-	üA“_‚Ì•\¦ƒXƒ^ƒCƒ‹
-	ü‚Ìí—Ş (Line Type)
-		set style linetype [INPUT]Line Type?{ENTER}
-	ü‚Ì• (Line Width)
-		set style linewidth [INPUT]Line Width?{ENTER}
+	?ü?A“_‚Ì•\¦ƒXƒ^ƒCƒ‹
+	ƒ‰ƒCƒXƒ^ƒCƒ‹‚ğƒfƒtƒHƒ‹ƒg‚ÖƒŠƒZƒbƒg
+		set style line [INPUT]Line Style Number?[EOS] default{ENTER}
+	ƒ‰ƒCƒ“ƒXƒ^ƒCƒ‹ ...
+		set style line [INPUT]Line Style Number?[EOS] [EOS]
+	?ü‚Ìí—Ş (Line Type)
+		lt [INPUT]Line Type?[EOS] [EOS]
+	“_?ü/”j?üƒpƒ^?[ƒ“ (Dash Pattern)
+		dt [INPUT]Dash Pattern?[EOS] [EOS]
+	?ü‚Ì?F (Line Color)
+		lc [INPUT]Line Color?[EOS] [EOS]
+	?ü‚Ì•? (Line Width)
+		lw [INPUT]Line Width?[EOS] [EOS]
 	“_‚Ìí—Ş (Point Type)
-		set style pointtype [INPUT]Point Type?{ENTER}
+		pt [INPUT]Point Type?[EOS] [EOS]
 	“_‚Ì‘å‚«‚³ (Point Size)
-		set style pointsize [INPUT]Point Size?{ENTER}
-;	F (Palette)
-;		set style line{ENTER}
+		ps [INPUT]Point Size?[EOS] [EOS]
+	“_“¯m‚ÌŠÔŠu
+		pointinterval [INPUT]Interval?[EOS] [EOS]
+	3 ŸŒ³•`‰æ—p‚Ì?F (Palette)
+		palette [EOS]
 	[EndMenu]
-	üA“_‚ÌƒXƒ^ƒCƒ‹‚Ì•\¦
+	?ü?A“_‚ÌƒXƒ^ƒCƒ‹‚Ì•\¦
 		show style line{ENTER}
-	üA“_‚ÌƒXƒ^ƒCƒ‹‚Ì‰Šú‰»
+	?ü?A“_‚ÌƒXƒ^ƒCƒ‹‚Ì?‰Šú‰»
 		unset style line{ENTER}
 [EndMenu]
 
 [Menu]
 &3ŸŒ³
 	[Menu]
-	“™‚ü
-		’¼ü‚Å•`‰æ
+	“™?‚?ü
+		’¼?ü‚Å•`‰æ
 			set cntrparam linear{ENTER}
-		‹Èü‚Å•`‰æ
+		‹È?ü‚Å•`‰æ
 			set cntrparam cubicspline{ENTER}
 		B-spline •âŠÔ‚Å•`‰æ
 			set cntrparam bspline{ENTER}
-		“™‚ü‚Ì”
+		“™?‚?ü‚Ì?”
 			set cntrparam levels [INPUT]How many contours?{ENTER}
-		•âŠÔ‚·‚é“_‚Ì”
+		•âŠÔ‚·‚é“_‚Ì?”
 			set cntrparam points [INPUT]How many points for the contours?{ENTER}
-		B-spline •âŠÔ‚ÌŸ”
+		B-spline •âŠÔ‚ÌŸ?”
 			set cntrparam order [INPUT]Order of B-splines (2-10)?{ENTER}
 		--
-		°‚É“™‚ü‚ğ•\¦‚·‚é
+		?°‚É“™?‚?ü‚ğ•\¦‚·‚é
 			set contour base{ENTER}
-		•\–Ê‚É“™‚ü‚ğ•\¦‚·‚é
+		•\–Ê‚É“™?‚?ü‚ğ•\¦‚·‚é
 			set contour surface{ENTER}
-		°‚Æ•\–Ê‚Ì—¼•û‚É“™‚ü‚ğ•\¦
+		?°‚Æ•\–Ê‚Ì—¼•û‚É“™?‚?ü‚ğ•\¦
 			set contour both{ENTER}
-		“™‚ü‚ğ•\¦‚µ‚È‚¢
+		“™?‚?ü‚ğ•\¦‚µ‚È‚¢
 			unset contour{ENTER}
-		“™‚ü‚Ìó‘Ô‚ğ•\¦
+		“™?‚?ü‚Ì?ó‘Ô‚ğ•\¦
 			show contour{ENTER}
 		--
-		–Ê•`‰æ‚Ég‚¤ü‚Ì”‚ğw’è
+		–Ê•`‰æ‚Ég‚¤?ü‚Ì?”‚ğw’è
 			set isosamples [INPUT]Number of isosamples?{ENTER}
-		–Ê•`‰æ‚Ég‚¤ü‚Ì”‚ğ•\¦
+		–Ê•`‰æ‚Ég‚¤?ü‚Ì?”‚ğ•\¦
 			show isosamples{ENTER}
 	[EndMenu]
 	--
-	’¼ŒğÀ•WŒn
+	’¼Œğ?À•WŒn
 		set mapping cartesian{ENTER}
-	‹…À•WŒn
+	‹…?À•WŒn
 		set mapping spherical{ENTER}
-	‰~“›À•WŒn
+	‰~“›?À•WŒn
 		set mapping cylindrical{ENTER}
-	Ê‘œ‚Ìİ’è‚ğ•\¦
+	Ê‘œ‚Ì?İ’è‚ğ•\¦
 		show mapping{ENTER}
 	--
-	‰Aüˆ—‚ğ‚·‚é
+	‰A?ü?ˆ—?‚ğ‚·‚é
 		set hidden3d{ENTER}
-	‰Aüˆ—‚ğ‚µ‚È‚¢
+	‰A?ü?ˆ—?‚ğ‚µ‚È‚¢
 		unset hidden3d{ENTER}
-	‰Aüˆ—‚Ìó‘Ô‚ğ•\¦
+	‰A?ü?ˆ—?‚Ì?ó‘Ô‚ğ•\¦
 		show hidden3d{ENTER}
 	--
 	•\–Ê‚ğ–Ô‚Å•\¦‚·‚é
 		set surface{ENTER}
 	•\–Ê‚ğ–Ô‚Å•\¦‚µ‚È‚¢
 		unset surface{ENTER}
-	•\–Ê‚Ì•\¦ó‘Ô‚ğ•\¦
+	•\–Ê‚Ì•\¦?ó‘Ô‚ğ•\¦
 		show surface{ENTER}
 	--
-	‹Šp‚ğİ’è
+	‹Šp‚ğ?İ’è
 		set view [INPUT]X rotation (degrees)?[EOS],[INPUT]Z rotation?[EOS],[INPUT]Scale?[EOS],[INPUT]Z scale?{ENTER}
 	‹Šp‚ğ•\¦
 		show view{ENTER}
@@ -711,7 +721,7 @@
 ƒwƒ‹ƒv(&H)
 	–ÚŸ(&I)
 		help{ENTER}
-	ƒCƒ“ƒgƒƒ_ƒNƒVƒ‡ƒ“
+	ƒCƒ“ƒgƒ?ƒ_ƒNƒVƒ‡ƒ“
 		help introduction{ENTER}
 	ƒgƒsƒbƒN(&T)
 		help [INPUT]Help Topic?{ENTER}
@@ -723,11 +733,11 @@
 [EndMenu]
 
 ; ƒ{ƒ^ƒ“‚ğ‚¢‚­‚Â‚©
-;   ƒ^ƒCƒgƒ‹•¶š—ñ“à‚ÌƒZƒ~ƒRƒƒ“‚ÌŸ‚Ì”š‚ÍƒAƒCƒRƒ“‚ÌƒCƒ“ƒfƒbƒNƒXB
-;   MSDN ‚ÌˆÈ‰ºQÆ: "Toolbar Standard Button Image Index Values"
+;   ƒ^ƒCƒgƒ‹•¶š—ñ“à‚ÌƒZƒ~ƒRƒ?ƒ“‚ÌŸ‚Ì?”š‚ÍƒAƒCƒRƒ“‚ÌƒCƒ“ƒfƒbƒNƒX?B
+;   MSDN ‚ÌˆÈ‰ºQ?Æ: "Toolbar Standard Button Image Index Values"
 ;   http://msdn.microsoft.com/en-us/library/bb760433%28v=vs.85%29.aspx
 [Button]
-	Ä•\¦;4
+	?Ä•\¦;4
 		replot{ENTER}
 [Button]
 	ŠJ‚­;7
@@ -739,7 +749,7 @@
 	ˆÚ“®;31
 		cd '[DIRECTORY]New directory?[EOS]'{ENTER}
 [Button]
-	ˆóü;14
+	ˆó?ü;14
 		set terminal [INPUT]Terminal type?{ENTER}set output "PRN"{ENTER}replot{ENTER}set terminal win{ENTER}set output{ENTER}
 [Button]
 	ƒ_ƒ“ƒv;14

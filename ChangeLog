@@ -1,3 +1,11 @@
+2016-03-07  Shigeharu Takeno  <shige@iee.niit.ac.jp>
+
+	* term/tkcanvas.trm src/win/wgnuplot.mnu:  Typos.
+
+	* docs/term-ja.diff docs/gnuplot-ja.doc
+	src/win/wgnuplot-ja.mnu win/README-Windows-ja.txt:
+	Sync Japanese documentation to doc version 1.982
+
 2016-03-06  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* config/mingw/Makefile win/gnuplot.iss:  Support MSYS2/Mingw-w64 as

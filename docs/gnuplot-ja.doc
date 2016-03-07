@@ -1,5 +1,5 @@
-C RCS $Id: gnuplot-ja.doc,v 1.581 2015-10-31 14:14:08+09 shige Exp $
-C corresponding original gnuplot.doc revision: 1.967
+C RCS $Id: gnuplot-ja.doc,v 1.590 2016-03-01 13:56:28+09 shige Exp $
+C corresponding original gnuplot.doc revision: 1.982
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -250,6 +250,19 @@ C 行が長いのは、できればなんとかしたい
 
 2 バージョン 5 での新しい機能 (New features in version 5)
 ?new-features
+3 バージョン 5.1
+ これは、現在の開発版です。ここで導入される新しい機能は、一般には、バー
+ ジョン 5.2 までの正式版に現れることはありませんが、真っ当な理由があれ
+ ばバージョン 5.0 系列にも導入される可能性はあります。
+
+ * 新規コマンド `set jitter` でビースウォームグラフが作れます (以下参照:
+ `beeswarm`)。
+
+ * 新規コマンド `break`, `continue` でより複雑なループが作れます。
+
+ * 配列変数のサポート (以下参照: `arrays`)。
+
+3 バージョン 5.0
 
  * 線の点線/破線パターンは、現在は線の他の属性と独立に指定できます。以
  下参照: `dashtype`, `set dashtype`, `set linetype`。
@@ -326,10 +339,11 @@ C 行が長いのは、できればなんとかしたい
 # set multiplot {next|previous}            # 自動レイアウト格子内での移動
 #end
 
-2 バージョン 5 での変更 (Changes in version 5)
+2 バージョン 4 との違い (Differences from version 4)
 ?changes
- バージョン 5 で導入された以下の変更は、前の版の gnuplot 用のスクリプト
- の挙動を変える可能性があります。
+?differences
+ バージョン 5 で導入されたいくつかの変更は、前の版の gnuplot 用のスクリ
+ プトの挙動を変える可能性があります。
 
  * NaN や、正しくないデータ列数、または他の予期しないものを含む入力デー
  タの処理の改良。例 (や図) については、以下参照: `missing`。
@@ -2170,6 +2184,44 @@ C ... and restart the table:
 
  以下参照: `show functions`, `functions`, `gnuplot-defined variables`,
  `macros`, `value`。
+3 配列 (Arrays)
+?arrays
+ 配列は、ユーザ変数の添字付きリストとして実装されています。一つの配列の
+ 要素は、一つの変数型には限定されていません。配列は、参照する前に明示的
+ に作られていなければいけません。配列を作成した後で、そのサイズを変更す
+ ることはできません。すべての要素は、最初は未定義 (undefined) です。ほ
+ とんどの場面で、名前付きユーザ変数の代わりに配列要素を利用できます。
+
+ 例:
+      array A[6]
+      A[1] = 1
+      A[2] = 2.0
+      A[3] = {3.0, 3.0}
+      A[4] = "four"
+      A[6] = A[2]**3
+      array B[6] = [ 1, 2.0, A[3], "four", , B[2]**3 ]
+
+      do for [i=1:6] { print A[i], B[i] }
+          1 1
+          2.0 2.0
+          {3.0, 3.0} {3.0, 3.0}
+          four four
+          <undefined> <undefined>
+          8.0 8.0
+
+ 注意: 配列と変数は、同じ名前空間を共有します。例えば、あらかじめ FOO
+ という名前の配列がある場合、FOO という名前の文字列変数を使うと、配列
+ を破壊します。
+
+ 配列の名前を `plot`, `splot`, `fit`, `stats` コマンドに与えることもで
+ きます。その場合、配列の添字がファイルの 1 列目の値で (1 から size ま
+ で)、その値 A[i] がファイルの 2 列目であるようなデータファイルを与えた
+ ことと同等になります。
+
+ 例:
+      array A[200]
+      do for [i=1:200] { A[i] = sin(i * pi/100.) }
+      plot A title "sin(x) in centiradians"
 2 フォント
 ?fonts
  gnuplot それ自身にはどんなフォントも含まれてはおらず、外部フォント処理
@@ -2330,6 +2382,35 @@ C ... and restart the table:
  (訳注: この日本語訳の中ではここに書かれているような用語の統一は考慮さ
  れてはおらず、よって混乱を引き起こす可能性があります。厳密には原文を参
  照すべきでしょう。)
+2 インラインデータとデータブロック (inline data and datablocks)
+?inline data
+?inline
+?datablocks
+ gnuplot のコマンド入力の中にデータを埋め込む仕組みは 2 種類用意されて
+ います。まず、特殊ファイル名 '-' が plot コマンド中に与えると、その
+ plot コマンド以下に続く行がインラインデータと解釈されます。以下参照:
+ `special-filenames`。この方法で提供されるデータは、その plot コマンド
+ で一度しか使用できません。
+
+ もう一つは、ヒアドキュメントとして名前付きのデータブロックを定義する方
+ 法です。その名前付きのデータは残るので、複数の plot コマンドで参照でき
+ ます。例:
+      $Mydata << EOD
+      11 22 33 first line of data
+      44 55 66 second line of data
+      # データファイル同様コメントも機能する
+      77 88 99
+      EOD
+      stats $Mydata using 1:3
+      plot $Mydata using 1:3 with points, $Mydata using 1:2 with impulses
+
+ データブロック名は、他の変数と区別するために、最初の文字を $ にする必
+ 要があります。データの終わりの区切り (上の例では EOD) は、任意のアルフ
+ ァベット、数字からなる文字列で構いません。
+
+ コマンド `undefine` を使えば、保存した名前付きデータブロックを削除でき
+ ます。`undefine $*` は、すべての名前付きデータブロックを一度に削除しま
+ す。
 2 繰り返し (iteration)
 ?iteration
 ?iterate
@@ -2481,6 +2562,7 @@ Ffigure_newsyntax
 ?lc variable
 ?textcolor variable
 ?tc variable
+?variable linecolor
  `lc variable` は、入力データの一つの列から読んだ値を線種 (linetype) の
  番号として使い、その線種に属する色を使うようプログラムに指示します。よ
  ってこれは、`using` 指定子へ対応する列の指定の追加を必要とします。文字
@@ -2502,6 +2584,7 @@ Ffigure_newsyntax
 ?rgbcolor variable
 ?lc rgbcolor variable
 ?tc rgbcolor variable
+?variable rgbcolor
  グラフの各データ点、各線分、または各ラベルにそれぞれ異なる色を割り当て
  ることができます。`lc rgbcolor variable` は、データファイルの各行から
  RGB 色の情報を読み込むようプログラムに指示します。よってこれは、
@@ -2891,16 +2974,13 @@ Ffigure_newsyntax
 ?substitution macros
 ?macros
 =exists
- コマンドラインのマクロ置換はデフォルトでは無効になっていますが、
- `set macros` で有効にできます。マクロ置換が有効である場合、文字 @ は、
- コマンドライン上でその文字列変数の値への置換を行なうのに使われます。文
- 字列変数の値としての文は、複数の単語からなることも可能です。これにより
- 文字列変数をコマンドラインマクロとして使うことが可能になります。この機
- 能により展開できるのは文字列定数のみで、文字列を値に取る数式を使うこと
- はできません。
+ 文字 @ は、コマンドライン上でその文字列変数の値への置換を行なうのに使
+ われます。文字列変数の値としての文は、複数の単語からなることも可能です。
+ これにより文字列変数をコマンドラインマクロとして使うことが可能になりま
+ す。この機能により展開できるのは文字列定数のみで、文字列を値に取る数式
+ を使うことはできません。
  例:
 
-       set macros
        style1 = "lines lt 4 lw 2"
        style2 = "points lt 3 pt 5 ps 2"
        range1 = "using 1:3"
@@ -3963,10 +4043,10 @@ Ffigure_lines
  余分な入力列は、線の色の変更などの情報が提供されたものとして使用されま
  す (以下参照: `rgbcolor variable`)。
 
- 2 次元の場合
+ 2 次元 ("using" 指定なし) の場合
       1 列:  y       # 行番号による暗黙の x
       2 列:  x  y
- 3 次元の場合
+ 3 次元 ("using" 指定なし) の場合
       1 列:  z       # x は暗黙の行番号、y は index から
       3 列:  x  y  z
 
@@ -4015,21 +4095,42 @@ Ffigure_parallel
 ?plotting styles points
 ?style points
 ?points
+?point type
+?pointtype
 Ffigure_points
  `points` スタイルは各点に小さな記号を表示します。その記号のデフォルト
- の大きさを変更するにはコマンド `set pointsize` が使えます。
- 基本的に 2 次元描画では 1 列、または 2 列の入力データが必要で、3 次元
- 描画では 1 列、または 3 列のデータが必要です。以下参照: `style lines`。
- 余分な入力列は、点のサイズや点色の変更などの情報が提供されたものとして
- 使用されます。
+ の大きさを変更するにはコマンド `set pointsize` が使えます。デフォルト
+ の点種は、線種と同じものになります。以下参照: `linetype`。plot コマン
+ ドに `using` 指定がない場合は、入力データ列は仮定された方法で解釈され
+ ます。以下参照: `style lines`。
 
  最初の 8 つの点種は、すべての出力形式で共通ですが、より多くの点種を個
- 別にサポートする出力形式もあります。現在の出力形式がどのような点種を持
- っているかを見るには、コマンド `test` を使用してください。また、以下の
- 例のようにして、任意の印字可能文字を点種の代わりに使用することもできま
- す。より長い文字列は、描画スタイル `points` ではなく `labels` を使えば
- 出力できます。
+ 別にサポートする出力形式もあります。現在の出力形式の設定でどのような点
+ 種が用意されているかを見るには、コマンド `test` を使用してください。ま
+ た、下の例のようにして、任意の印字可能文字を点種番号の代わりに使用する
+ こともできます。より長い文字列は、描画スタイル `points` ではなく
+ `labels` を使えば出力できます。
 
+=variable
+?variable
+?variable pointtype
+?variable pointsize
+?pointtype variable
+?pointsize variable
+ plot コマンド上でキーワード `pointtype`, `pointsize`, `linecolor` を使
+ う際、番号の代わりにキーワード `variable` を追加することができます。こ
+ の場合、各点の対応する属性値を入力データの追加列から取得します。可変
+ (variable) pointsize 値は、常に `using` 指定で与えられる最初の追加列か
+ ら取り、可変 color 値は、常に最後の追加列から取ります。今のところは、
+ スタイル `linespoints` の描画で線と点の色を別々に指定することはできま
+ せん。各点に対して 3 つの属性をすべて指定する場合は、入力データ列指定
+ の順番は以下のようになります。
+  
+      plot DATA using x:y:pointsize:pointtype:color \
+           with points lc variable pt variable ps variable
+
+ 注意: 「ユーザ定義変数」の方の variable に関する情報については、以下参
+ 照: `variables`。
 2 steps
 ?plotting styles steps
 ?style steps
@@ -5956,35 +6057,6 @@ Ffigure_jitter
 ^ <a href="http://www.gnuplot.info/demo/multimsh.html">
 ^ index を使った splot のデモ
 ^ </a></p>
-4 インラインデータ (inline data)
-?inline data
-?inline
-?datablocks
- gnuplot のコマンド入力の中にデータを埋め込む仕組みは 2 種類用意されて
- います。まず、特殊ファイル名 '-' が plot コマンド中に与えると、その
- plot コマンド以下に続く行がインラインデータと解釈されます。以下参照:
- `special-filenames`。この方法で提供されるデータは、その plot コマンド
- で一度しか使用できません。
-
- もう一つは、ヒアドキュメントとして名前付きのデータブロックを定義する方
- 法です。その名前付きのデータは残るので、複数の plot コマンドで参照でき
- ます。例:
-      $Mydata << EOD
-      11 22 33 first line of data
-      44 55 66 second line of data
-      # データファイル同様コメントも機能する
-      77 88 99
-      EOD
-      stats $Mydata using 1:3
-      plot $Mydata using 1:3 with points, $Mydata using 1:2 with impulses
-
- データブロック名は、他の変数と区別するために、最初の文字を $ にする必
- 要があります。データの終わりの区切り (上の例では EOD) は、任意のアルフ
- ァベット、数字からなる文字列で構いません。
-
- コマンド `undefine` を使えば、保存した名前付きデータブロックを削除でき
- ます。`undefine $*` は、すべての名前付きデータブロックを一度に削除しま
- す。
 4 skip
 ?plot datafile skip
 ?data-file skip
@@ -6956,7 +7028,7 @@ Ffigure_jitter
  書式:
        title <text> | notitle [<ignored text>]
        title columnheader | title columnheader(N)
-             {at {beginning|end}}
+             {at {beginning|end}} {{no}enhanced}
 
  ここで <text> は、引用符で囲まれた文字列か、文字列と評価される式のいず
  れかです。引用符はキーには表示されません。
@@ -6980,10 +7052,18 @@ Ffigure_jitter
  位置やタイトルの位置揃えなどの凡例のレイアウトは、`set key` で制御でき
  ます。詳細は、以下参照: `set key`。
 
- 描画する曲線のタイトルを、グラフの曲線自身の直前、あるいは直後に置くに
- は、`at {beginning|end}` を使用します。このオプションは、`with lines`
- で描画する場合は有用ですが、他の描画スタイルでは意味がない場合もありま
- す。
+ キーワード `at` により、曲線のタイトルを、自動的に作られる key の箱の
+ 外にでも置くことができるようになります。`at {beginning|end}` を使用し
+ た場合は、曲線のタイトルをグラフの曲線自身の直前、あるいは直後に置きま
+ す。このオプションは、`with lines` で描画する場合は有用ですが、他の描
+ 画スタイルでは無意味です。
+
+ `at <x-position>,<y-position>` の形式を使用すれば、曲線のタイトルをペ
+ ージ内の任意の位置に置くことができます。デフォルトでは、その位置指定は
+ スクリーン座標と解釈します。例えば `at 0.5, 0.5` は、グラフの軸に縮尺
+ や境界には関係なく、常にスクリーンのど真ん中を意味します。この方法で配
+ 置するタイトルの書式は、key のオプション指定の影響を受けます。以下参照:
+ `set key`。
 
  例:
 
@@ -6994,14 +7074,18 @@ Ffigure_jitter
  "measured data" で表示します:
        plot x**2 title "x^2", 'data.1' t "measured data"
 
- 以下は、極座標グラフの周りに円形の境界を書き、タイトルなしで表示します:
-       set polar; plot my_function(t), 1 notitle
-
  以下は、ファイルの先頭行の各列にタイトルを含む複数列のデータを描画しま
  す。各タイトルは、独立した凡例ではなく、対応する曲線の後ろに置きます:
        unset key
        set offset 0, graph 0.1
        plot for [i=1:4] 'data' using i with lines title columnhead at end
+
+ 以下は、2 つの別々のグラフの key の場所を 1 箇所にします:
+       set key Left reverse
+       set multiplot layout 2,2
+       plot sin(x) with points pt 6 title "Left plot is sin(x)" at 0.5, 0.30
+       plot cos(x) with points pt 7 title "Right plot is cos(x)" at 0.5, 0.27
+       unset multiplot
 
 3 with
 ?commands plot with
@@ -7040,11 +7124,15 @@ Ffigure_jitter
       boxes            boxplot        ellipses       image
       boxerrorbars     candlesticks   filledcurves   rgbimage
       boxxyerrorbars   circles        histograms     rgbalpha   pm3d
+ または
+      table
 
  最初のグループのスタイルは、線、点、文字の属性を持ち、第 2 のグループ
  のスタイルは、さらに塗り潰し属性も持っています。以下参照: `fillstyle`。
  さらにサブスタイルを持つスタイルもあります。個々のスタイルの詳細につい
  ては、以下参照: `plotting styles`。
+ スタイル `table` は、グラフの代わりに表形式の出力を生成します。以下参
+ 照: `set table`。
 
  デフォルトのスタイルは、`set style function` と `set style data` で選
  択できます。
@@ -7482,8 +7570,11 @@ Ffigure_jitter
                        {size <headlength>,<headangle>{,<backangle>}}
                        {filled | empty | nofilled | noborder}
                        {front | back}
-                       {linestyle <line_style>}
-                       {linetype <line_type>} {linewidth <line_width>}
+                       {linestyle | ls <line_style>}
+                       {linetype | lt <line_type>}
+                       {linewidth | lw <line_width>}
+                       {linecolor | lc <colorspec>}
+                       {dashtype | dt <dashtype>}
 
        unset arrow {<tag>}
        show arrow {<tag>}
@@ -7728,8 +7819,10 @@ Ffigure_jitter
 
  書式:
        set border {<integer>}
-                  {front | back | behind} {linewidth | lw <line_width>}
-                  {{linestyle | ls <line_style>} | {linetype | lt <line_type>}}
+                  {front | back | behind}
+                  {linestyle | ls <line_style>}
+                  {linetype | lt <line_type>} {linewidth | lw <line_width>}
+                  {linecolor | lc <colorspec>} {dashtype | dt <dashtype>}
        unset border
        show border
 
@@ -7828,9 +7921,11 @@ Ffigure_jitter
  同様に隠線処理の対象になります。`set border behind` とするとこのデフォ
  ルトの挙動が変わります。
 
- <line_style>, <line_type>, <line_width> を指定して、枠線の描画にそれ
- らを反映させることができます (現在の出力装置がサポートするものに限定
- されます)。
+ <linestyle>, <linetype>, <linewidth>, <linecolor>, <dashtype> を指定し
+ て、枠線の描画にそれらを反映させることができます (現在の出力装置がサポ
+ ートするものに限定されます)。
+ さらに、軸の刻み (tics) を描画する際も、それらを境界線上で描画するか、
+ 軸上で描画するかに関わらず、このラインスタイルを使用します。
 
  `plot` では、第 2 軸を有効にすることで、下と左以外の境界に目盛りを描く
  ことができます。詳細は、以下参照: `xtics`。
@@ -9295,18 +9390,23 @@ Ffigure_missing
                 {{no}{m}cbtics}
                 {polar {<angle>}}
                 {layerdefault | front | back}
-                { {linestyle <major_linestyle>}
+                { {linestyle | ls <major_linestyle>}
                   | {linetype | lt <major_linetype>}
                     {linewidth | lw <major_linewidth>}
+                    {linecolor | lc <major_colorspec>}
+                    {dashtype | dt <major_dashtype>}
                   { , {linestyle | ls <minor_linestyle>}
                       | {linetype | lt <minor_linetype>}
-                        {linewidth | lw <minor_linewidth>} } }
+                        {linewidth | lw <minor_linewidth>}
+                        {linecolor | lc <minor_colorspec>}
+                        {dashtype | dt <minor_dashtype>} } }
        unset grid
        show grid
 
  格子線は任意の軸の任意の大目盛り/小目盛りに対して有効/無効にでき、その
  大目盛りと小目盛りに対する線種、線幅も指定でき、現在の出力装置がサポー
- トする範囲で、あらかじめ定義したラインスタイルを使用することもできます。
+ トする範囲で、あらかじめ定義したラインスタイルを使用することもできます
+ (以下参照: `set style line`)。
 
  さらに、2 次元の描画では極座標格子も使うことができます。定義可能な区間
  に対して、選択された目盛りを通る同心円と中心からの放射状の線が描かれま
@@ -10133,17 +10233,11 @@ Ffigure_missing
         unset logscale z
 3 マクロ (macros)
 ?commands set macros
-?commands show macros
 ?set macros
-?show macros
- これによりコマンドラインのマクロ置換機能を有効にすると、コマンドライン
- 内の @<stringvariablename> の形式の部分文字列は、文字列変数
+ 現在のバージョンの gnuplot では、マクロ置換は常に有効です。コマンドラ
+ イン内の @<stringvariablename> の形式の部分文字列は、文字列変数
  <stringvariablename> に含まれるテキスト文字列に置き換えられます。以下
  参照: `substitution`。
-
- 書式:
-      set macros
-
 3 3 次元座標系 (mapping)
 ?commands set mapping
 ?commands show mapping
@@ -11000,6 +11094,7 @@ Ffigure_missing
                   { corners2color
                     { mean|geomean|harmean|rms|median|min|max|c1|c2|c3|c4 }
                   }
+                  { {no}lighting {primary <fraction>} {specular <fraction>}}
                   { hidden3d {<linestyle>} | nohidden3d }
                   { implicit | explicit }
                   { map }
@@ -11088,9 +11183,22 @@ Ffigure_missing
  表示されます。この文書ではそれを "カラーボックス (colorbox)" と呼び、
  その変数をカラーボックス軸の変数と呼びます。以下参照: `set colorbox`,
  `set cbrange`。
-
+4 光源モデル (lighting)
+?lighting
+?pm3d lighting
+?pm3d nolighting
+?set pm3d lighting
+ デフォルトでは、pm3d の色の割り当ては、向きや視方位には依存しません。
+ その状態は `set pm3d nolighting` に対応します。
+ 一方、コマンド `set pm3d lighting` は、一点の点光源からの照明からの
+ 50% の光による単純な光源モデルを選択します。周囲の明るさに対するその光
+ 源の強度は `set pm3d lighting primary <fraction>` で調整できます。反射
+ 光 (specular) を含ませる度合いは、その比率の設定ができます:
+      set pm3d lighting primary 0.50 specular 0.0   # ハイライトなし
+      set pm3d lighting primary 0.50 specular 0.6   # 強いハイライト
 4 pm3d の位置 (position)
 ?pm3d position
+?set pm3d position
  色の曲面は底面か天井 (この場合は灰色/カラーの平面地図) か曲面上の点の
  z 座標 (灰色/カラー曲面) に描くことができます。その選択は、オプション
  `at` に、`b`, `t`, `s` の 6 つまでの組合せの文字列をつけて指定すること
@@ -11113,6 +11221,10 @@ Ffigure_missing
 ?pm3d depthorder
 ?pm3d flush
 ?pm3d ftriangles
+?set pm3d scanorder
+?set pm3d depthorder
+?set pm3d flush
+?set pm3d ftriangles
 ?depthorder
 =flush
 =scansforward
@@ -11147,6 +11259,7 @@ Ffigure_missing
 
 4 クリッピング (clipping)
 ?pm3d clipping
+?set pm3d clipping
  四角形の x,y 座標に関するクリッピングは 2 つの方法で行われます。
  `clip1in`: 各四角形の全ての 4 点が定義されていなければならず、少なくと
  もそのうちの 1 点が x, y の範囲におさまっていなければなりません。
@@ -11188,6 +11301,7 @@ Ffigure_missing
  `set colorbox`。
 4 corners2color
 ?pm3d corners2color
+?set pm3d corners2color
 ?corners2color
 =mean
 =geomean
@@ -11948,7 +12062,9 @@ C 下記の以下参照: オプション `positive`, `negative`)。
                                {front | back}
                                { {linestyle | ls <line_style>}
                                  | {linetype | lt <line_type>}
-                                   {linewidth | lw <line_width} }
+                                   {linewidth | lw <line_width}
+                                   {linecolor | lc <colorspec>}
+                                   {dashtype | dt <dashtype>} }
        unset style arrow
        show style arrow
 
@@ -12597,8 +12713,8 @@ C 下記の以下参照: オプション `positive`, `negative`)。
 ?unset tics
 ?show tics
 ?tics
- コマンド `set tics` を使えば、全ての軸の見出しのつく目盛りの制御を一度
- に行うことができます。
+ コマンド `set tics` は、全ての軸の目盛りの刻みとラベルを一度に制御しま
+ す。
 
  目盛りは `unset tics` で消え、`set tics` で目盛りがつきます (デフォル
  ト)。個々の軸の目盛りは、これとは別のコマンド `set xtics`, `set ztics`
@@ -12619,7 +12735,10 @@ C 下記の以下参照: オプション `positive`, `negative`)。
        set xtics rotate by -90
        unset cbtics
 
- tics の `front` または `back` の設定は、2D 描画 (splot は不可) にのみ
+ 軸の刻みの線属性は、すべてグラフの境界 (以下参照: `set border`) と同じ
+ ものを使って描かれます。
+
+ tics の `back` または `front` の設定は、2D 描画 (splot は不可) にのみ
  すべての軸に 1 度適用されます。これは、目盛りと描画要素が重なった場合
  に目盛りを描画要素の前面に出すか、奥に置くかを制御します。
 
@@ -13090,20 +13209,22 @@ C 下記の以下参照: オプション `positive`, `negative`)。
 ?commands set xdata time
 ?set xdata time
  `set xdata time` は、x 座標がミリ秒精度の日時データであることを意味し
- ます。`set ydata time` のように、他の軸用のこれと同等のコマンドもあり
- ます。
+ ます。`set ydata time` という同様のコマンドもあります。
 
- 日時データの解釈は、2 つの別の書式で制御しています。ファイルからの入力
- データは、その軸に対する `timefmt` を使って読み込みます。以下参照:
- `set timefmt`。
- その軸の範囲を示す場合は、この同じ `timefmt` の書式で引用符に囲んで指
- 定します。
+ 日時データの入力と出力の解釈には、別々の書式機構があります。ファイルか
+ らの入力データは、全体に通用する `timefmt` を使うか、または plot コマ
+ ンド内で timecolumn() 関数を使って読み込みます。この入力機構は、軸の範
+ 囲 (range) を設定するときに時間の値を使用する際にも適用されます。以下
+ 参照: `set timefmt`, `timecolumn`。
 
  例:
 
       set xdata time
-      set timefmt x "%d-%b-%Y"
+      set timefmt "%d-%b-%Y"
       set xrange ["01-Jan-2013" : "31-Dec-2014"]
+      plot DATA using 1:2
+ または
+      plot DATA using (timecolumn(1,"%d-%b-%Y")):2
 
  出力、すなわち軸に沿った目盛りのラベルや、マウス操作での座標出力につい
  ては、デフォルトでは、秒での内部時刻から日時を表現する文字列への変換に
@@ -13518,6 +13639,9 @@ C 下記の以下参照: オプション `positive`, `negative`)。
  (見出し付けされない) 小目盛りは、`set mxtics` コマンドで自動的に追加す
  るか、または位置を手動で `set xtics ("" <pos> 1, ...)` の形式で与える
  こともできます。
+
+ 刻みの見た目 (線種、幅等) は、それを軸の上に描く場合であっても、境界線
+ によって決定されます (以下参照: `set border`)。
 4 xtics timedata
 ?set xtics timedata
 ?xtics timedata tics
@@ -13862,16 +13986,19 @@ C 度の記号は set encoding locale で出るようになると。
 
  書式:
        set {x|x2|y|y2|z}zeroaxis { {linestyle | ls <line_style>}
-                                  | { linetype | lt <line_type>}
-                                    { linewidth | lw <line_width>}}
+                                  | {linetype | lt <line_type>}
+                                    {linewidth | lw <line_width>}
+                                    {linecolor | lc <colorspec>}
+                                    {dashtype | dt <dashtype>} }
        unset {x|x2|y|y2|z}zeroaxis
        show {x|y|z}zeroaxis
 
 
  デフォルトでは、これらのオプションはオフになっています。選択された 0
- の軸は <line_type> の線の型と<line_width> の線の幅 (現在使用している
- 出力形式がサポートしていれば) で、あるいはあらかじめ定義された
- <line_style> のスタイルで描かれます。
+ の軸は <line_type> の線の型、<line_width> の線の幅、<colorspec> の色、
+ <dashtype> の点線/破線パターンで (いずれも現在使用している出力形式が
+ サポートしていれば)、あるいはあらかじめ定義された <line_style> のスタ
+ イルで描かれます。以下参照: `set style line`。
 
  線の型を指定しなければ、軸は通常の軸の線の型 (型 0) で描かれます。
 
@@ -14471,9 +14598,8 @@ C 度の記号は set encoding locale で出るようになると。
 %STATS_pos_max_y@y の最大値を与える x 座標
 @end table
 
- `matrix` が指定されていれば、`using` オプションは無視され、"z" 値のみ
- が 1 次元のデータ集合として取り扱われます。その行列のサイズは、変数
- STATS_size_x と STATS_size_y に保存します。
+ `matrix` が指定されると、全ての行列要素がその解析の対象になります。そ
+ の行列のサイズは、変数 STATS_size_x と STATS_size_y に保存されます。
 
  同時に 2 つ以上のファイルからの統計情報を使うことができれば便利でしょ
  うから、変数のデフォルトの接頭辞である "STATS" をオプション `name` で
