@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.332 2016/02/29 07:07:15 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.333 2016/03/04 04:58:03 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -673,9 +673,9 @@ do_3dplot(
     /* now compute boundary for plot */
     boundary3d(plots, pcount);
 
-    axis_set_graphical_range(FIRST_X_AXIS, plot_bounds.xleft, plot_bounds.xright);
-    axis_set_graphical_range(FIRST_Y_AXIS, plot_bounds.ybot, plot_bounds.ytop);
-    axis_set_graphical_range(FIRST_Z_AXIS, floor_z, ceiling_z);
+    axis_set_scale_and_range(&axis_array[FIRST_X_AXIS], plot_bounds.xleft, plot_bounds.xright);
+    axis_set_scale_and_range(&axis_array[FIRST_Y_AXIS], plot_bounds.ybot, plot_bounds.ytop);
+    axis_set_scale_and_range(&axis_array[FIRST_Z_AXIS], floor_z, ceiling_z);
 
     /* SCALE FACTORS */
     zscale3d = 2.0 / (ceiling_z - floor_z) * surface_zscale;
@@ -710,10 +710,8 @@ do_3dplot(
 	int xl, xr, yb, yt;
 	map3d_xy(X->min, Y->min, 0.0, &xl, &yb);
 	map3d_xy(X->max, Y->max, 0.0, &xr, &yt);
-	AXIS_SETSCALE(FIRST_X_AXIS, xl, xr);
-	AXIS_SETSCALE(FIRST_Y_AXIS, yb, yt);
-	axis_set_graphical_range(FIRST_X_AXIS, xl, xr);
-	axis_set_graphical_range(FIRST_Y_AXIS, yb, yt);
+	axis_set_scale_and_range(&axis_array[FIRST_X_AXIS], xl, xr);
+	axis_set_scale_and_range(&axis_array[FIRST_Y_AXIS], yb, yt);
     }
 
     /* Initialize palette */

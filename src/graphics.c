@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.514 2016/03/04 04:58:03 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.515 2016/03/05 04:42:23 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -4548,7 +4548,7 @@ process_image(void *plot, t_procimg_action action)
 	    xsts = (axis_array[x_axis].term_scale > 0 ? +1 : -1);
 	    ysts = (axis_array[y_axis].term_scale > 0 ? +1 : -1);
 	} else {
-	    /* 3D plots do not use the term_scale mechanism AXIS_SETSCALE(). */
+	    /* 3D plots do not use the term_scale mechanism */
 	    xsts = 1;
 	    ysts = 1;
 	}

@@ -1,5 +1,5 @@
 /*
- * $Id: axis.h,v 1.137 2016/03/04 04:58:02 sfeam Exp $
+ * $Id: axis.h,v 1.138 2016/03/08 00:27:43 sfeam Exp $
  *
  */
 
@@ -418,10 +418,6 @@ extern AXIS_INDEX x_axis, y_axis, z_axis;
 #define axis_map(axis, variable)		\
     (int) ((axis)->term_lower + ((variable) - (axis)->min) * (axis)->term_scale + 0.5)
 
-#define AXIS_SETSCALE(axis, out_low, out_high)			\
-    axis_array[axis].term_scale = ((out_high) - (out_low))	\
-        / (axis_array[axis].max - axis_array[axis].min)
-
 /* write current min/max_array contents into the set/show status
  * variables */
 #define AXIS_WRITEBACK(axis)			\
@@ -648,7 +644,7 @@ double quantize_normal_tics __PROTO((double, int));
 void setup_tics __PROTO((struct axis *, int));
 void gen_tics __PROTO((struct axis *, tic_callback));
 void axis_output_tics __PROTO((AXIS_INDEX, int *, AXIS_INDEX, tic_callback));
-void axis_set_graphical_range __PROTO((AXIS_INDEX, unsigned int lower, unsigned int upper));
+void axis_set_scale_and_range __PROTO((struct axis *axis, unsigned int lower, unsigned int upper));
 void axis_draw_2d_zeroaxis __PROTO((AXIS_INDEX, AXIS_INDEX));
 TBOOLEAN some_grid_selected __PROTO((void));
 void add_tic_user __PROTO((struct axis *, char *, double, int));

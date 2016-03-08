@@ -1,5 +1,5 @@
 /*
- * $Id: boundary.c,v 1.29 2015/10/29 23:26:32 sfeam Exp $
+ * $Id: boundary.c,v 1.30 2016/01/28 23:54:13 sfeam Exp $
  */
 
 /* GNUPLOT - boundary.c */
@@ -554,8 +554,7 @@ boundary(struct curve_points *plots, int count)
 	int maxrightlabel = plot_bounds.xright;
 
 	/* We don't really know the plot layout yet, but try for an estimate */
-	AXIS_SETSCALE(FIRST_X_AXIS, plot_bounds.xleft, plot_bounds.xright);
-	axis_set_graphical_range(FIRST_X_AXIS, plot_bounds.xleft, plot_bounds.xright);
+	axis_set_scale_and_range(&axis_array[FIRST_X_AXIS], plot_bounds.xleft, plot_bounds.xright);
 
 	while (tic) {
 	    if (tic->label) {
@@ -827,16 +826,10 @@ boundary(struct curve_points *plots, int count)
     (void) (*t->text_angle) (0);
 
     /* needed for map_position() below */
-    AXIS_SETSCALE(FIRST_Y_AXIS, plot_bounds.ybot, plot_bounds.ytop);
-    AXIS_SETSCALE(SECOND_Y_AXIS, plot_bounds.ybot, plot_bounds.ytop);
-    AXIS_SETSCALE(FIRST_X_AXIS, plot_bounds.xleft, plot_bounds.xright);
-    AXIS_SETSCALE(SECOND_X_AXIS, plot_bounds.xleft, plot_bounds.xright);
-    /* HBB 20020122: moved here from do_plot, because map_position
-     * needs these, too */
-    axis_set_graphical_range(FIRST_X_AXIS, plot_bounds.xleft, plot_bounds.xright);
-    axis_set_graphical_range(FIRST_Y_AXIS, plot_bounds.ybot, plot_bounds.ytop);
-    axis_set_graphical_range(SECOND_X_AXIS, plot_bounds.xleft, plot_bounds.xright);
-    axis_set_graphical_range(SECOND_Y_AXIS, plot_bounds.ybot, plot_bounds.ytop);
+    axis_set_scale_and_range(&axis_array[FIRST_X_AXIS], plot_bounds.xleft, plot_bounds.xright);
+    axis_set_scale_and_range(&axis_array[SECOND_X_AXIS], plot_bounds.xleft, plot_bounds.xright);
+    axis_set_scale_and_range(&axis_array[FIRST_Y_AXIS], plot_bounds.ybot, plot_bounds.ytop);
+    axis_set_scale_and_range(&axis_array[SECOND_Y_AXIS], plot_bounds.ybot, plot_bounds.ytop);
 
     /* Calculate limiting bounds of the key */
     do_key_bounds(key);
