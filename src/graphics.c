@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.515 2016/03/05 04:42:23 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.516 2016/03/09 04:40:01 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -3534,21 +3534,18 @@ map_position_double(
 {
     switch (pos->scalex) {
     case first_axes:
-	{
-	    double xx = axis_log_value_checked(FIRST_X_AXIS, pos->x, what);
-	    *x = AXIS_MAP(FIRST_X_AXIS, xx);
-	    break;
-	}
     case second_axes:
 	{
+	    AXIS_INDEX index = (pos->scalex == first_axes) ? FIRST_X_AXIS : SECOND_X_AXIS;
+	    AXIS *this_axis = &axis_array[index];
+	    AXIS *primary = this_axis->linked_to_primary;
 	    double xx;
-	    AXIS *primary = axis_array[SECOND_X_AXIS].linked_to_primary;
 	    if (primary && primary->link_udf->at) {
 		xx = eval_link_function(primary, pos->x);
-		*x = AXIS_MAP(primary->index, xx);
+		*x = axis_map(primary, xx);
 	    } else {
-		xx = axis_log_value_checked(SECOND_X_AXIS, pos->x, what);
-		*x = AXIS_MAP(SECOND_X_AXIS, xx);
+		xx = axis_log_value_checked(index, pos->x, what);
+		*x = AXIS_MAP(index, xx);
 	    }
 	    break;
 	}
@@ -3572,21 +3569,18 @@ map_position_double(
     }
     switch (pos->scaley) {
     case first_axes:
-	{
-	    double yy = axis_log_value_checked(FIRST_Y_AXIS, pos->y, what);
-	    *y = AXIS_MAP(FIRST_Y_AXIS, yy);
-	    break;
-	}
     case second_axes:
 	{
+	    AXIS_INDEX index = (pos->scaley == first_axes) ? FIRST_Y_AXIS : SECOND_Y_AXIS;
+	    AXIS *this_axis = &axis_array[index];
+	    AXIS *primary = this_axis->linked_to_primary;
 	    double yy;
-	    AXIS *primary = axis_array[SECOND_Y_AXIS].linked_to_primary;
 	    if (primary && primary->link_udf->at) {
 		yy = eval_link_function(primary, pos->y);
-		*y = AXIS_MAP(primary->index, yy);
+		*y = axis_map(primary, yy);
 	    } else {
-		yy = axis_log_value_checked(SECOND_Y_AXIS, pos->y, what);
-		*y = AXIS_MAP(SECOND_Y_AXIS, yy);
+		yy = axis_log_value_checked(index, pos->y, what);
+		*y = AXIS_MAP(index, yy);
 	    }
 	    break;
 	}

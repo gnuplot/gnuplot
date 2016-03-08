@@ -10,6 +10,9 @@
 	AXIS_SETSCALE(AXIS_INDEX, ) and axis_set_graphical_range(AXIS_INDEX, )
 	with a single combined routine axis_set_scale_and_range(AXIS *, ).
 
+	* src/axis.c src/graphics.c:  More cleanup and generalization of linked
+	axis code.
+
 2016-03-07  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* term/tkcanvas.trm src/win/wgnuplot.mnu:  Typos.
