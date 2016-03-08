@@ -1,3 +1,11 @@
+2016-03-08  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/axis.h src/axis.c src/command.c src/unset.c src/set.c:
+	Add a new field axis->linked_to_secondary so that the handling of linked
+	axes is more symmetric.  Now you can do "set [*]range" on either end of
+	the linkage and the min/max/etc for the other end of the linkage will be
+	recalculated automatically.
+
 2016-03-07  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* term/tkcanvas.trm src/win/wgnuplot.mnu:  Typos.

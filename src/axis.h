@@ -1,5 +1,5 @@
 /*
- * $Id: axis.h,v 1.136 2016/02/11 05:15:53 sfeam Exp $
+ * $Id: axis.h,v 1.137 2016/03/04 04:58:02 sfeam Exp $
  *
  */
 
@@ -257,7 +257,8 @@ typedef struct axis {
  * If axes are linked, the primary axis info will be cloned into the
  * secondary axis only up to this point in the structure.
  */
-    struct axis *linked_to_primary;	/* Set only in the secondary axis */
+    struct axis *linked_to_primary;	/* Set only in a secondary axis */
+    struct axis *linked_to_secondary;	/* Set only in a primary axis */
     struct udft_entry *link_udf;
 
 /* ticmark control variables */
@@ -303,7 +304,8 @@ typedef struct axis {
 	0.,        		/* terminal scale */			    \
 	0,        		/* zero axis position */		    \
 	FALSE, 0.0, 0.0,	/* log, base, log(base) */		    \
-	NULL, NULL,		/* linked_to_primary, link function */      \
+	NULL, NULL,		/* linked_to_primary, linked_to_secondary */\
+	NULL,      		/* link function */                         \
 	NO_TICS,		/* tic output positions (border, mirror) */ \
 	DEFAULT_AXIS_TICDEF,	/* tic series definition */		    \
 	0, FALSE, FALSE, 	/* tic_rotate, grid{major,minor} */	    \

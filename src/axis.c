@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.176 2016/03/04 05:02:10 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.177 2016/03/05 04:42:23 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -853,13 +853,14 @@ setup_tics(struct axis *this, int max)
     double tic = 0;
     struct ticdef *ticdef = &(this->ticdef);
 
-    /* HBB 20010703: New: allow _not_ to autoextend the axis endpoints
-     * to an integer multiple of the ticstep, for autoscaled axes with
-     * automatic tics */
+    /* Do we or do we not extend the axis range to the	*/
+    /* next integer multiple of the ticstep?		*/
     TBOOLEAN autoextend_min = (this->autoscale & AUTOSCALE_MIN)
 	&& ! (this->autoscale & AUTOSCALE_FIXMIN);
     TBOOLEAN autoextend_max = (this->autoscale & AUTOSCALE_MAX)
 	&& ! (this->autoscale & AUTOSCALE_FIXMAX);
+    if (this->linked_to_primary || this->linked_to_secondary)
+	autoextend_min = autoextend_max = FALSE;
 
     /*  Apply constraints on autoscaled axis if requested:
      *  The range is _expanded_ here only.  Limiting the range is done
@@ -908,14 +909,6 @@ setup_tics(struct axis *this, int max)
 	else if (tic >=        60*60.) this->timelevel = TIMELEVEL_HOURS;
 	else if (tic >=           60.) this->timelevel = TIMELEVEL_MINUTES;
 	else                           this->timelevel = TIMELEVEL_SECONDS;
-    }
-
-    /* Note: setup_tics is always called on the primary axis first, so we can
-     * clone that rather than trying to reproduce it for the secondary axis.
-     */
-    if (this->linked_to_primary) {
-	clone_linked_axes(this->linked_to_primary, this);
-	autoextend_min = autoextend_max = FALSE;
     }
 
     if (autoextend_min) {
@@ -2201,13 +2194,9 @@ clone_linked_axes(AXIS *axis1, AXIS *axis2)
 {
     double testmin, testmax;
 
-    /* These sanity checks are primarily for debugging */
-    if (axis1->index != FIRST_X_AXIS && axis1->index != FIRST_Y_AXIS) {
-	int_warn(NO_CARET, "Unsupported axis linkage");
-	return;
-    }
-
-    if (axis1 != axis2->linked_to_primary) {
+    /* DEBUG: This sanity check is only here for debugging */
+    if (axis1 != axis2->linked_to_primary && axis1 != axis2->linked_to_secondary) {
+	fprintf(stderr, "clone_linked_axes called for axes that are not linked\n");
 	/* No linkage, so nothing to do here */
 	return;
     }
@@ -2218,7 +2207,7 @@ clone_linked_axes(AXIS *axis1, AXIS *axis2)
 
     /* FIXME: In order to handle logscale axes, the code below would have to unlog the	*/
     /* axis1 min/max; apply and check the mappings; then re-log and store the values	*/
-    /* for axis2. And after that the tics would still come out wrong.  		*/
+    /* for axis2. And after that the tics still come out wrong.    			*/
 	if (axis2->log && axis2->link_udf)
 	    int_warn(NO_CARET,"cannot handle via/inverse linked log-scale axes");
 

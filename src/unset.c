@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.231 2015/11/10 02:50:39 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.232 2015/12/29 19:11:53 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -1824,6 +1824,7 @@ reset_command()
 	this_axis->ticmode = axis_defaults[axis].ticmode;
 
 	this_axis->linked_to_primary = NULL;
+	this_axis->linked_to_secondary = NULL;
 
 	reset_logscale(this_axis);
     }

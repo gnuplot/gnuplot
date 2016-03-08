@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.512 2016/02/12 19:53:15 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.513 2016/03/04 04:58:03 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -5239,13 +5239,6 @@ set_range(struct axis *this_axis)
 {
     c_token++;
 
-    /* If this is a secondary axis linked to the primary, ignore the command */
-    if (this_axis->linked_to_primary) {
-	while (!END_OF_COMMAND)
-	    c_token++;
-	return;
-    }
-
     if (almost_equals(c_token,"re$store")) {
 	c_token++;
 	this_axis->set_min = this_axis->writeback_min;
@@ -5286,13 +5279,12 @@ set_range(struct axis *this_axis)
 	}
     }
 
-    /* If there is a secondary axis linked to this one, */
-    /* replicate the new range information to it.       */
-    /* FIXME: clean this up. New field axis->linked_to_secondary? */
-    if (this_axis->index == FIRST_X_AXIS)
-	clone_linked_axes(&axis_array[FIRST_X_AXIS], &axis_array[SECOND_X_AXIS]);
-    if (this_axis->index == FIRST_Y_AXIS)
-	clone_linked_axes(&axis_array[FIRST_Y_AXIS], &axis_array[SECOND_Y_AXIS]);
+    /* If this is one end of a linked axis pair, replicate the new range to the	*/
+    /* linked axis, possibly via a mapping function. 				*/
+    if (this_axis->linked_to_secondary)
+	clone_linked_axes(this_axis, this_axis->linked_to_secondary);
+    else if (this_axis->linked_to_primary)
+	clone_linked_axes(this_axis, this_axis->linked_to_primary);
 }
 
 /*
