@@ -1,3 +1,9 @@
+2016-03-09 Allin Cottrell  <cottrell@wfu.edu>
+
+	* configure.in:  Backport configuration tweak for wxt on OSX.
+	Do not assume that wxwidgets uses the gtk2 toolkit.
+	It might use gtk3 or on OSX it might use cocoa.
+
 2016-03-05  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/wxterminal/gp_cairo.c (gp_cairo_set_linewidth):  Change the 
