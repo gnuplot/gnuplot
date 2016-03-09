@@ -1,5 +1,5 @@
 /* -*- objc -*-
- * $Id: aquaterm.trm,v 1.51.2.2 2015/08/07 23:55:10 sfeam Exp $
+ * $Id: aquaterm.trm,v 1.51.2.3 2016/01/12 22:08:18 sfeam Exp $
  *
  */
 
@@ -898,12 +898,12 @@ ENHAQUA_open(char * fontname, double fontsize,
   attributes = [[NSMutableDictionary alloc] initWithCapacity:16]; 
   [attributes setObject:AQUA_convert_using_encoding(fontname) forKey:@"AQTFontname"];
 
-  if (abs(base)>0.01) { 
+  if (fabs(base)>0.01) { 
     /* consider this as super/subscript, and compute subscript level */
     int n = (int)round(log(fontsize/AQUA_fontSizeCur)/log(0.8)); 
     [attributes setObject:[NSNumber numberWithInt:(base > 0)?n:-n] 
 		   forKey:@"NSSuperScript"];
-  } else if (abs(fontsize - AQUA_fontSizeCur)>0.01) {
+  } else if (fabs(fontsize - AQUA_fontSizeCur)>0.01) {
     /* Fontsize was set explicitly */
     [attributes setObject:[NSNumber numberWithFloat:fontsize] forKey:@"AQTFontsize"];
   }
