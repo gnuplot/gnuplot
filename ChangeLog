@@ -1,3 +1,7 @@
+2016-03-09 Allin Cottrell  <cottrell@wfu.edu>
+
+	* term/aquaterm.trm: Incorrect argument type to abs() or fabs().
+
 2016-03-08  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/axis.h src/axis.c src/command.c src/unset.c src/set.c:
