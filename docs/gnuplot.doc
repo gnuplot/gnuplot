@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.981 2016/02/13 05:24:47 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.982 2016/02/29 07:07:15 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -9988,12 +9988,12 @@ Ffigure_missing
 
  Examples:
 
-       set link x
+       set link x2
 
  This is the simplest form of the command. It forces the x2 axis to have
  identically the same range, scale, and direction as the x axis.
- Commands `set xrange`, `set auto x`, etc will affect both the x and x2 axes.
- Commands `set x2range`, etc, will be ignored while the linkage is in effect.
+ Commands `set xrange`, `set x2range`, `set auto x`, etc will affect both the
+ x and x2 axes.
 
        set link x2 via x**2 inverse sqrt(x)
        plot "sqrt_data" using 1:2 axes x2y1, "linear_data" using 1:2 axes x1y1
@@ -12979,8 +12979,7 @@ Ffigure_missing
 ?x2range
  The `set x2range` command sets the horizontal range that will be displayed on
  the x2 (top) axis.  See `set xrange` for the full set of command options.
- This command is ignored if the x2 axis range is explicitly linked to the
- x axis.  See `set link`.
+ See also `set link`.
 3 x2tics
 ?commands set x2tics
 ?commands unset x2tics
@@ -13615,8 +13614,7 @@ Ffigure_missing
 ?y2range
  The `set y2range` command sets the vertical range that will be displayed on
  the y2 (right) axis.  See `set xrange` for the full set of command options.
- This command is ignored if the y2 axis range is explicitly linked to the
- y axis.  See `set link`.
+ See also `set link`.
 3 y2tics
 ?commands set y2tics
 ?commands unset y2tics
