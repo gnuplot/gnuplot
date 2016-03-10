@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.294 2016/02/08 21:46:21 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.295 2016/02/29 07:07:15 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -827,6 +827,12 @@ set origin %g,%g\n",
     fprintf(fp, "set timestamp %s \n", timelabel_bottom ? "bottom" : "top");
     SAVE_AXISLABEL_OR_TITLE("", "timestamp", timelabel);
 
+    
+    if (axis_array[SECOND_X_AXIS].linked_to_primary)
+	save_link(fp, axis_array + SECOND_X_AXIS);
+    if (axis_array[SECOND_Y_AXIS].linked_to_primary)
+	save_link(fp, axis_array + SECOND_Y_AXIS);
+
     save_prange(fp, axis_array + POLAR_AXIS);
     save_prange(fp, axis_array + T_AXIS);
     save_prange(fp, axis_array + U_AXIS);
@@ -1264,15 +1270,6 @@ save_position(FILE *fp, struct position *pos, int ndim, TBOOLEAN offset)
 void
 save_prange(FILE *fp, struct axis *this_axis)
 {
-    if (this_axis->linked_to_primary) {
-	fprintf(fp, "set link %c2 ", axis_name(this_axis->index)[0]);
-	if (this_axis->link_udf->at)
-	    fprintf(fp, "via %s ", this_axis->link_udf->definition);
-	if (this_axis->linked_to_primary->link_udf->at)
-	    fprintf(fp, "inverse %s ", this_axis->linked_to_primary->link_udf->definition);
-	fputs("\n\t", fp);
-    }
-
     fprintf(fp, "set %srange [ ", axis_name(this_axis->index));
     if (this_axis->set_autoscale & AUTOSCALE_MIN) {
 	if (this_axis->min_constraint & CONSTRAINT_LOWER ) {
@@ -1330,6 +1327,19 @@ save_prange(FILE *fp, struct axis *this_axis)
 	    fprintf(fp, "set autoscale %sfixmin\n", axis_name(this_axis->index));
 	if (this_axis->set_autoscale & AUTOSCALE_FIXMAX)
 	    fprintf(fp, "set autoscale %sfixmax\n", axis_name(this_axis->index));
+    }
+}
+
+void
+save_link(FILE *fp, struct axis *this_axis)
+{
+    if (this_axis->linked_to_primary) {
+	fprintf(fp, "set link %s ", axis_name(this_axis->index));
+	if (this_axis->link_udf->at)
+	    fprintf(fp, "via %s ", this_axis->link_udf->definition);
+	if (this_axis->linked_to_primary->link_udf->at)
+	    fprintf(fp, "inverse %s ", this_axis->linked_to_primary->link_udf->definition);
+	fputs("\n\t", fp);
     }
 }
 

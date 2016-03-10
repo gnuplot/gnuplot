@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.358 2016/01/01 00:51:23 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.359 2016/02/12 19:53:15 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -2977,10 +2977,10 @@ show_link()
 {
     if (END_OF_COMMAND || almost_equals(c_token,"x$2"))
 	if (axis_array[SECOND_X_AXIS].linked_to_primary)
-	    save_prange(stderr, axis_array + SECOND_X_AXIS);
+	    save_link(stderr, axis_array + SECOND_X_AXIS);
     if (END_OF_COMMAND || almost_equals(c_token,"y$2"))
 	if (axis_array[SECOND_Y_AXIS].linked_to_primary)
-	    save_prange(stderr, axis_array + SECOND_Y_AXIS);
+	    save_link(stderr, axis_array + SECOND_Y_AXIS);
     if (!END_OF_COMMAND)
 	c_token++;
 }
