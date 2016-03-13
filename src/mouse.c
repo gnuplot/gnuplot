@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: mouse.c,v 1.184 2015/10/26 21:43:00 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: mouse.c,v 1.185 2016/03/04 04:58:03 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - mouse.c */
@@ -373,15 +373,14 @@ MousePosToGraphPosReal(int xx, int yy, double *x, double *y, double *x2, double 
 	*y2 = AXIS_DE_LOG_VALUE(SECOND_Y_AXIS, *y2);
     }
 
-    /* If x2 is linked to x via a mapping function, apply it now */
-    /* Similarly for y/y2 */
+    /* If x2 or y2 is linked to a primary axis via mapping function, apply it now */
     if (!is_3d_plot) {
-	if (axis_array[SECOND_X_AXIS].linked_to_primary
-	&&  axis_array[SECOND_X_AXIS].link_udf->at)
-	    *x2 = eval_link_function(&axis_array[SECOND_X_AXIS], *x);
-	if (axis_array[SECOND_Y_AXIS].linked_to_primary
-	&&  axis_array[SECOND_Y_AXIS].link_udf->at)
-	    *y2 = eval_link_function(&axis_array[SECOND_Y_AXIS], *y);
+	AXIS *secondary = &axis_array[SECOND_X_AXIS];
+	if (secondary->linked_to_primary && secondary->link_udf->at)
+	    *x2 = eval_link_function(secondary, *x);
+	secondary = &axis_array[SECOND_Y_AXIS];
+	if (secondary->linked_to_primary && secondary->link_udf->at)
+	    *y2 = eval_link_function(secondary, *y);
     }
 }
 

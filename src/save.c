@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.295 2016/02/29 07:07:15 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.296 2016/03/10 22:59:50 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -827,11 +827,9 @@ set origin %g,%g\n",
     fprintf(fp, "set timestamp %s \n", timelabel_bottom ? "bottom" : "top");
     SAVE_AXISLABEL_OR_TITLE("", "timestamp", timelabel);
 
-    
-    if (axis_array[SECOND_X_AXIS].linked_to_primary)
-	save_link(fp, axis_array + SECOND_X_AXIS);
-    if (axis_array[SECOND_Y_AXIS].linked_to_primary)
-	save_link(fp, axis_array + SECOND_Y_AXIS);
+    /* These will only print something if the axis is, in fact, linked */    
+    save_link(fp, axis_array + SECOND_X_AXIS);
+    save_link(fp, axis_array + SECOND_Y_AXIS);
 
     save_prange(fp, axis_array + POLAR_AXIS);
     save_prange(fp, axis_array + T_AXIS);

@@ -1,3 +1,7 @@
+2016-03-13  Ethan A Merritt  <merritt@u.washington.edu>
+
+	src/axis.h src/mouse.c src/save.c: Minor code cleanup for linked axes.
+
 2016-03-10  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/save.c (save_link) src/save.h src/show.c:  New routine so that

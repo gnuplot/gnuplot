@@ -1,5 +1,5 @@
 /*
- * $Id: axis.h,v 1.138 2016/03/08 00:27:43 sfeam Exp $
+ * $Id: axis.h,v 1.139 2016/03/09 04:40:01 sfeam Exp $
  *
  */
 
@@ -417,6 +417,8 @@ extern AXIS_INDEX x_axis, y_axis, z_axis;
 /* Same thing except that "axis" is a pointer, not an index */
 #define axis_map(axis, variable)		\
     (int) ((axis)->term_lower + ((variable) - (axis)->min) * (axis)->term_scale + 0.5)
+#define axis_mapback(axis, pos) \
+    (((double)(pos) - axis->term_lower)/axis->term_scale + axis->min)
 
 /* write current min/max_array contents into the set/show status
  * variables */
