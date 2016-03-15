@@ -254,7 +254,7 @@ void qt_flushOutBuffer()
 	if (!qt || !qt->socket.isValid())
 		return;
 
-	// Write the block size at the beginning of the bock
+	// Write the block size at the beginning of the block
 	QDataStream sizeStream(&qt->socket);
 	sizeStream << (quint32)(qt->outBuffer.size());
 	// Write the block to the QLocalSocket
@@ -1268,6 +1268,7 @@ void qt_options()
 	bool set_widget = false;
 	bool set_dash = false;
 	bool set_dashlength = false;
+	int previous_WindowId = qt_optionWindowId;
 
 #ifndef WIN32
 	if (term_interlock != NULL && term_interlock != (void *)qt_init) {
@@ -1397,6 +1398,14 @@ void qt_options()
 			int_error(c_token-1, "Duplicated or contradicting arguments in qt term options.");
 	}
 
+	// We want this to happen immediately, hence the flush command.
+	// We don't want it to change the _current_ window, just close an old one.
+	if (set_close && qt) {
+		qt->out << GECloseWindow << qt_optionWindowId;
+		qt_flushOutBuffer();
+		qt_optionWindowId = previous_WindowId;
+	}
+
 	// Save options back into options string in normalized format
 	QString termOptions = QString::number(qt_optionWindowId);
 
@@ -1431,8 +1440,6 @@ void qt_options()
 	if (set_persist)  termOptions += qt_optionPersist ? " persist" : " nopersist";
 	if (set_raise)    termOptions += qt_optionRaise ? " raise" : " noraise";
 	if (set_ctrl)     termOptions += qt_optionCtrl ? " ctrl" : " noctrl";
-
-	if (set_close && qt) qt->out << GECloseWindow << qt_optionWindowId;
 
 	/// @bug change Utf8 to local encoding
 	strncpy(term_options, termOptions.toUtf8().data(), MAX_LINE_LEN);
