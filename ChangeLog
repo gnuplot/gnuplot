@@ -1,3 +1,10 @@
+2016-03-15  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/qtterminal/qt_term.cpp:  Revise "set term qt <N> close" so that
+	1) It closes window with id N but leaves the current window id unchanged
+	2) It executes the command immediately rather than queueing it
+	Bug #1753
+
 2016-03-13  Ethan A Merritt  <merritt@u.washington.edu>
 
 	src/axis.h src/mouse.c src/save.c: Minor code cleanup for linked axes.
