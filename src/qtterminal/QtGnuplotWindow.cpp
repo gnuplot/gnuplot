@@ -57,8 +57,11 @@ QtGnuplotWindow::QtGnuplotWindow(int id, QtGnuplotEventHandler* eventHandler, QW
 	m_ctrl = false;
 	m_eventHandler = eventHandler;
 	m_id = id;
-	setAttribute(Qt::WA_DeleteOnClose);
 	setWindowIcon(QIcon(":/images/gnuplot"));
+
+//	Setting this attribute causes an error to be reported to the user if a plot
+//	command is received after a plot command is closed.  Is this good or bad?
+//		setAttribute(Qt::WA_DeleteOnClose);
 
 	// Register as the main event receiver if not already created
 	if (m_eventHandler == 0)

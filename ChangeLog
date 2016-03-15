@@ -5,6 +5,11 @@
 	2) It executes the command immediately rather than queueing it
 	Bug #1753
 
+	* src/qtterminal/QtGnuplotWindow.cpp:  Do not set the DeleteOnClose
+	attribute of plot windows.  This avoids an error message if you send a
+	new plot after explicitly closing the current plot window.
+	Bug #1753
+
 2016-03-13  Ethan A Merritt  <merritt@u.washington.edu>
 
 	src/axis.h src/mouse.c src/save.c: Minor code cleanup for linked axes.
