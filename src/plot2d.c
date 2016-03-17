@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.378 2016/03/04 04:06:56 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.379 2016/03/04 04:58:03 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -2626,6 +2626,7 @@ eval_plots()
 		if (this_plot->labels == NULL) {
 		    this_plot->labels = new_text_label(-1);
 		    this_plot->labels->pos = CENTRE;
+		    parse_label_options(this_plot->labels, 2);
 		}
 	    }
 
