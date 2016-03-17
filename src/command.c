@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.318 2016/03/08 00:27:43 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.319 2016/03/10 23:25:31 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -581,6 +581,7 @@ define()
 	udv = add_udv(start_token);
 	(void) const_express(&result);
 	/* Prevents memory leak if the variable name is re-used */
+	gpfree_array(&udv->udv_value);
 	gpfree_string(&udv->udv_value);
 	udv->udv_value = result;
     }
@@ -749,6 +750,7 @@ array_command()
 
     /* Create or recycle a udv containing an array with the requested name */
     array = add_udv(++c_token);
+    gpfree_array(&array->udv_value);
     gpfree_string(&array->udv_value);
 
     if (!equals(++c_token,"["))

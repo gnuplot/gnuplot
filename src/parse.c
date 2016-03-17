@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: parse.c,v 1.101 2016/02/20 20:59:27 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: parse.c,v 1.102 2016/02/21 00:56:21 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - parse.c */
@@ -1270,6 +1270,7 @@ check_for_iteration()
 	    }
 	    if (!equals(c_token++, "]"))
 	    	int_error(c_token-1, errormsg);
+	    gpfree_array(&(iteration_udv->udv_value));
 	    gpfree_string(&(iteration_udv->udv_value));
 	    Ginteger(&(iteration_udv->udv_value), iteration_start);
 	}
@@ -1281,6 +1282,7 @@ check_for_iteration()
 	    	int_error(c_token-1, errormsg);
 	    iteration_start = 1;
 	    iteration_end = gp_words(iteration_string);
+	    gpfree_array(&(iteration_udv->udv_value));
 	    gpfree_string(&(iteration_udv->udv_value));
 	    Gstring(&(iteration_udv->udv_value), gp_word(iteration_string, 1));
 	}

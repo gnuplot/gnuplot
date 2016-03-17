@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: eval.c,v 1.133 2016/02/21 00:56:21 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: eval.c,v 1.134 2016/03/04 04:58:02 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - eval.c */
@@ -422,7 +422,9 @@ gpfree_string(struct value *a)
     }
 
     else if (a->type == ARRAY) {
-	gpfree_array(a);
+	/* gpfree_array() is now a separate routine. This is to help find */
+	/* any remaining callers who expect gpfree_string to handle it.   */
+	FPRINTF((stderr,"eval.c:%d hit array in gpfree_string()", __LINE__));
 	a->type = NOTDEFINED;
     }
 
@@ -433,11 +435,15 @@ void
 gpfree_array(struct value *a)
 {
     int i;
-    int size = a->v.value_array[0].v.int_val;
+    int size;
 
-    for (i=1; i<=size; i++)
-	gpfree_string(&(a->v.value_array[i]));
-    free(a->v.value_array);
+    if (a->type == ARRAY) {
+	size = a->v.value_array[0].v.int_val;
+	for (i=1; i<=size; i++)
+	    gpfree_string(&(a->v.value_array[i]));
+	free(a->v.value_array);
+	a->type = NOTDEFINED;
+    }
 }
 
 /* some machines have trouble with exp(-x) for large x
@@ -790,6 +796,7 @@ del_udv_by_name(char *key, TBOOLEAN wildcard)
 
  	/* exact match */
 	else if (!wildcard && !strcmp(key, udv_ptr->udv_name)) {
+	    gpfree_array(&(udv_ptr->udv_value));
 	    gpfree_string(&(udv_ptr->udv_value));
 	    gpfree_datablock(&(udv_ptr->udv_value));
 	    udv_ptr->udv_value.type = NOTDEFINED;
@@ -798,6 +805,7 @@ del_udv_by_name(char *key, TBOOLEAN wildcard)
 
 	/* wildcard match: prefix matches */
 	else if ( wildcard && !strncmp(key, udv_ptr->udv_name, strlen(key)) ) {
+	    gpfree_array(&(udv_ptr->udv_value));
 	    gpfree_string(&(udv_ptr->udv_value));
 	    gpfree_datablock(&(udv_ptr->udv_value));
 	    udv_ptr->udv_value.type = NOTDEFINED;

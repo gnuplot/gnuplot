@@ -3,6 +3,9 @@
 	* src/plot2d.c:  If pointtype PT_CHARACTER is the default for a plot
 	then allow text options like "tc rgb 'foo'" in the plot command.
 
+	* src/command.c src/eval.c src/parse.c:  Disentangle gpfree_string() and
+	gpfree_array().  Most callers should avoid the latter.
+
 2016-03-15  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/qtterminal/qt_term.cpp:  Revise "set term qt <N> close" so that
