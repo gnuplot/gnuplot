@@ -1,3 +1,8 @@
+2016-03-17  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/plot2d.c:  If pointtype PT_CHARACTER is the default for a plot
+	then allow text options like "tc rgb 'foo'" in the plot command.
+
 2016-03-15  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/qtterminal/qt_term.cpp:  Revise "set term qt <N> close" so that
@@ -8,7 +13,7 @@
 	* src/qtterminal/QtGnuplotWindow.cpp:  Do not set the DeleteOnClose
 	attribute of plot windows.  This avoids an error message if you send a
 	new plot after explicitly closing the current plot window.
-	Bug #1753
+	Bug #1753 #1554
 
 2016-03-09 Allin Cottrell  <cottrell@wfu.edu>
 
