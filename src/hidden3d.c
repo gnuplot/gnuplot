@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.110 2015/10/26 21:43:00 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.111 2016/02/29 07:07:15 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - hidden3d.c */
@@ -1690,7 +1690,7 @@ draw_vertex(p_vertex v)
 	    (term->put_text)(x, y, v->lp_style->p_char);
 #ifdef HIDDEN3D_VAR_PTSIZE
 	else if (p_type == PT_VARIABLE)
-	    (term->point)(x, y, (int)(v->original->CRD_PTTYPE));
+	    (term->point)(x, y, (int)(v->original->CRD_PTTYPE) - 1);
 #endif
 	else
 	    (term->point)(x, y, p_type);

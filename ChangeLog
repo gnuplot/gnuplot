@@ -6,6 +6,10 @@
 	* src/command.c src/eval.c src/parse.c:  Disentangle gpfree_string() and
 	gpfree_array().  Most callers should avoid the latter.
 
+	* src/graph3d.c src/graphics.c src/hidden3d.c:  "pt variable" point
+	types were off-by-1 on output.
+	Bug #1754
+
 2016-03-15  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/qtterminal/qt_term.cpp:  Revise "set term qt <N> close" so that

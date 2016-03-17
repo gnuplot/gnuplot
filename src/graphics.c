@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.516 2016/03/09 04:40:01 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.517 2016/03/09 04:41:45 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -2077,7 +2077,7 @@ plot_points(struct curve_points *plot)
 		/* Feb 2016: variable point type */
 		if ((plot->plot_style == POINTSTYLE || plot->plot_style == LINESPOINTS)
 		&&  plot->lp_properties.p_type == PT_VARIABLE) {
-		    pointtype = plot->points[i].CRD_PTTYPE;
+		    pointtype = plot->points[i].CRD_PTTYPE - 1;
 		} else {
 		    pointtype = plot->lp_properties.p_type;
 		}
