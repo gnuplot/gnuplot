@@ -1,5 +1,5 @@
 /*
- * $Id: datafile.h,v 1.48 2014/06/02 05:14:15 markisch Exp $
+ * $Id: datafile.h,v 1.49 2014/06/14 23:22:56 markisch Exp $
  */
 
 /* GNUPLOT - datafile.h */
@@ -136,6 +136,7 @@ extern TBOOLEAN df_warn_on_missing_columnheader;
 int df_open __PROTO((const char *, int, struct curve_points *));
 int df_readline __PROTO((double [], int));
 void df_close __PROTO((void));
+char * df_fgets __PROTO((FILE *));
 void df_showdata __PROTO((void));
 int df_2dbinary __PROTO((struct curve_points *));
 int df_3dmatrix __PROTO((struct surface_points *, int));

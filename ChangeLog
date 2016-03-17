@@ -10,6 +10,13 @@
 	types were off-by-1 on output.
 	Bug #1754
 
+	* src/datafile.c src/datafile.h src/datablock.c:
+	There was already a routine df_gets() in datafile.c that safely reads in
+	an arbitrary length line of data.  Split this into a public function
+	df_fgets() and a private wrapper df_gets().  Share the public function
+	with data input in datablock.c:datablock_command.  This removes the
+	limit of 1024 characters per line read in to a datablock.
+
 2016-03-15  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/qtterminal/qt_term.cpp:  Revise "set term qt <N> close" so that

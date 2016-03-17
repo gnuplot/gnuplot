@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.319 2015/10/31 23:38:49 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.320 2016/02/08 00:51:11 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -623,12 +623,7 @@ static const char *matrix_general_binary_conflict_msg
 static char *
 df_gets()
 {
-    int len = 0;
-
     /* HBB 20000526: prompt user for inline data, if in interactive mode */
-    /* EAM 08mar2008: we'd like to call readline(), but this only works
-     * if isatty(stdin). Do all platforms have an equivalent to isatty()?
-     */
     if (mixed_data_fp && interactive)
 	fputs("input data ('e' ends) > ", stderr);
 
@@ -642,7 +637,27 @@ df_gets()
     if (df_array)
 	return df_generate_ascii_array_entry();
 
-    if (!fgets(line, max_line_len, data_fp))
+    return df_fgets(data_fp);
+}
+
+/*}}} */
+
+/*{{{  char *df_gets() */
+/* 
+ * This one is shared by df_gets() and by datablock.c:datablock_command
+ */
+char *
+df_fgets( FILE *fin )
+{
+    int len = 0;
+
+    /* here so that initialization happens in all paths */
+    if (max_line_len < DATA_LINE_BUFSIZ) {
+	max_line_len = DATA_LINE_BUFSIZ;
+	line = gp_alloc(max_line_len, "datafile line buffer");
+    }
+
+    if (!fgets(line, max_line_len, fin))
 	return NULL;
 
     if (mixed_data_fp)
@@ -658,16 +673,11 @@ df_gets()
 	    line[len - 1] = 0;
 	    return line;
 	}
-	/* buffer we provided may not be full - dont grab extra
-	 * memory un-necessarily. This may trap a problem with last
-	 * line in file not being properly terminated - each time
-	 * through a replot loop, it was doubling buffer size
-	 */
 
 	if ((max_line_len - len) < 32)
 	    line = gp_realloc(line, max_line_len *= 2, "datafile line buffer");
 
-	if (!fgets(line + len, max_line_len - len, data_fp))
+	if (!fgets(line + len, max_line_len - len, fin))
 	    return line;        /* unexpected end of file, but we have something to do */
     }
 
@@ -1316,11 +1326,6 @@ df_open(const char *cmd_filename, int max_using, struct curve_points *plot)
 	}
     }
 
-    /* here so it's not done for every line in df_readline */
-    if (max_line_len < DATA_LINE_BUFSIZ) {
-	max_line_len = DATA_LINE_BUFSIZ;
-	line = gp_alloc(max_line_len, "datafile line buffer");
-    }
     /*}}} */
 
     /*{{{  open file */
