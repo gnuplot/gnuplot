@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.464.2.20 2016/02/04 04:44:03 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.464.2.21 2016/03/02 01:40:46 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -1844,6 +1844,8 @@ plot_boxes(struct curve_points *plot, int xaxis_y)
 			for (nextdef = i+1; nextdef < plot->p_count; nextdef++)
 			    if (plot->points[nextdef].type != UNDEFINED)
 				break;
+			if (nextdef == plot->p_count)	/* i is the last non-UNDEFINED point */
+			    nextdef = i;
 			if (boxwidth < 0)
 			    dxr = (plot->points[nextdef].x - plot->points[i].x) / 2.0;
 			else if (!boxwidth_is_absolute)
