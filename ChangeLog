@@ -3,6 +3,14 @@
 	* src/graphics.c (plot_boxes): Backport fix to prevents array overrun if
 	there are undefined points are at the end of a data set.
 
+	* src/datafile.c src/datafile.h src/datablock.c:
+	There was already a routine df_gets() in datafile.c that safely reads in
+	an arbitrary length line of data.  Split this into a public function
+	df_fgets() and a private wrapper df_gets().  Share the public function
+	with data input in datablock.c:datablock_command.  This removes the
+	limit of 1024 characters per line read in to a datablock.
+	Bug #1757
+
 2016-03-17  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/plot2d.c:  If pointtype PT_CHARACTER is the default for a plot

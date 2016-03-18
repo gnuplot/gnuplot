@@ -1,5 +1,5 @@
 /*
- * $Id: datablock.c,v 1.5 2014/04/05 06:17:08 markisch Exp $
+ * $Id: datablock.c,v 1.5.2.1 2015/07/13 19:30:40 sfeam Exp $
  */
 /* GNUPLOT - datablock.c */
 
@@ -65,6 +65,7 @@
 #include "alloc.h"
 #include "command.h"
 #include "datablock.h"
+#include "datafile.h"
 #include "eval.h"
 #include "misc.h"
 #include "util.h"
@@ -93,7 +94,7 @@ datablock_command()
     int nlines;
     int nsize = 4;
     struct udvt_entry *datablock;
-    char dataline[MAX_LINE_LEN+1];
+    char *dataline = NULL;
 
     if (!isletter(c_token+1))
 	int_error(c_token, "illegal datablock name");
@@ -119,7 +120,7 @@ datablock_command()
     fin = (lf_head == NULL) ? stdin : lf_head->fp;
     if (!fin)
 	int_error(NO_CARET,"attempt to define data block from invalid context");
-    for (nlines = 0; fgets(dataline, MAX_LINE_LEN, fin); nlines++) {
+    for (nlines = 0; (dataline = df_fgets(fin)); nlines++) {
 	int n;
 
 	if (!strncmp(eod, dataline, strlen(eod)))
