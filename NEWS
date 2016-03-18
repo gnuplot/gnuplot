@@ -1,8 +1,8 @@
 Changes in 5.0.4
 ================
+* CHANGE minimum linewidth of all cairo terminals is now 0.2 pt
 * FIX placement of objects and labels using linked secondary axis coordinates
 * FIX 'set term qt <N> close' acts immediately rather than after next mouse event
-* CHANGE minimum linewidth of all cairo terminals is now 0.2 pt
 
 Changes in 5.0.3
 ================
