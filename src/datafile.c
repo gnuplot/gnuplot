@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.320 2016/02/08 00:51:11 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.322 2016/03/19 17:17:55 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -42,32 +42,11 @@ static char *RCSid() { return RCSid("$Id: datafile.c,v 1.320 2016/02/08 00:51:11
  */
 
 /*{{{  notes */
-/* couldn't decide how to implement 'thru' only for 2d and 'index'
- * for only 3d, so I did them for both - I can see a use for
- * index in 2d, especially for fit.
- *
- * I keep thru for backwards compatibility, and extend it to allow
- * more natural plot 'data' thru f(y) - I (personally) prefer
- * my syntax, but then I'm biased...
- *
- * - because I needed it, I have added a range of indexes...
- * (s)plot 'data' [index i[:j]]
- *
- * also every a:b:c:d:e:f  - plot every a'th point from c to e,
+/*
+ * every a:b:c:d:e:f  - plot every a'th point from c to e,
  * in every b lines from d to f
  * ie for (line=d; line<=f; line+=b)
  *     for (point=c; point >=e; point+=a)
- *
- *
- * I dont like mixing this with the time series hack... I am
- * very into modular code, so I would prefer to not have to
- * have _anything_ to do with time series... for example,
- * we just look at columns in file, and that is independent
- * of 2d/3d. I really dont want to have to pass a flag to
- * this is plot or splot.
- *
- * Now that df_2dbinary() and df_3dbinary() are here, I am seriously
- * tempted to move get_data() and get_3ddata() in here too
  *
  * public variables declared in this file.
  *    int df_no_use_specs - number of columns specified with 'using'
@@ -114,27 +93,10 @@ static char *RCSid() { return RCSid("$Id: datafile.c,v 1.320 2016/02/08 00:51:11
  *    void f_valid()
  *
  *
- * line parsing slightly differently from previous versions of gnuplot...
+ * Line parsing is slightly differently from previous versions of gnuplot...
  * given a line containing fewer columns than asked for, gnuplot used to make
- * up values... I say that if I have explicitly said 'using 1:2:3', then if
+ * up values... Now if I have explicitly said 'using 1:2:3', then if
  * column 3 doesn't exist, I dont want this point...
- *
- * a column number of 0 means generate a value... as before, this value
- * is useful in 2d as an x value, and is reset at blank lines.
- * a column number of -1 means the (data) line number (not the file line
- * number).  splot 'file' using 1  is equivalent to
- * splot 'file' using 0:-1:1
- * column number -2 is the index. It was put in to kludge multi-branch
- * fitting.
- *
- * 20/5/95 : accept 1.23d4 in place of e (but not in scanf string)
- *         : autoextend data line buffer and MAX_COLS
- *
- * 11/8/96 : add 'columns' -1 for suggested y value, and -2 for
- *           current index.
- *           using 1:-1:-2  and  column(-1)  are supported.
- *           $-1 and $-2 are not yet supported, because of the
- *           way the parser works
  *
  */
 /*}}} */
@@ -5029,7 +4991,7 @@ df_readbinary(double v[], int max)
 		    df_column[j].position = NULL;
 		}
 	    }
-	} else { /* Not matrix file, general binray. */
+	} else { /* Not matrix file, general binary. */
 	    df_datum = point_count + 1;
 	    if (i != df_no_bin_cols) {
 		if (feof(data_fp)) {
@@ -5445,7 +5407,7 @@ df_generate_ascii_array_entry()
     if (entry->type == STRING)
 	sprintf(line, "%d \"%s\"", df_array_index, entry->v.string_val);
     else
-	sprintf(line, "%d %g", df_array_index, real(entry)); 
+	sprintf(line, "%d %g", df_array_index, real(entry));
 	
     return line;
 }
