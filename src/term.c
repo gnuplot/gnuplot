@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.322 2016/01/11 18:51:38 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.323 2016/02/11 05:15:53 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -343,12 +343,6 @@ term_close_output()
     gppsfile = NULL;
 }
 
-#ifdef OS2
-# define POPEN_MODE ("wb")
-#else
-# define POPEN_MODE ("w")
-#endif
-
 /* assigns dest to outstr, so it must be allocated or NULL
  * and it must not be outstr itself !
  */
@@ -377,7 +371,11 @@ term_set_output(char *dest)
 #if defined(PIPES)
 	if (*dest == '|') {
 	    restrict_popen();
-	    if ((f = popen(dest + 1, POPEN_MODE)) == (FILE *) NULL)
+	    if (term && (term->flags & TERM_BINARY))
+		f = popen(dest + 1, "wb");
+	    else
+		f = popen(dest + 1, "w");
+	    if (f == (FILE *) NULL)
 		os_error(c_token, "cannot create pipe; output not changed");
 	    else
 		output_pipe_open = TRUE;

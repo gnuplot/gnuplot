@@ -1,3 +1,9 @@
+2016-03-20  Matthew Halverson <mhalver@users.sf.net>
+
+	* src/term.c (term_set_output):  Open pipes in binary mode if the
+	terminal has the TERM_BINARY flag set.
+	Bug #1756
+
 2016-03-17  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/plot2d.c:  If pointtype PT_CHARACTER is the default for a plot
