@@ -11,6 +11,14 @@
 	exactly zero, the forward/reverse link check would complain because of a
 	spurious divide-by-zero.  Now we test for this case separately.
 
+	* src/graphics.c (do_plot plot_points):  The "dots" plot style is
+	implemented internally as pointtype 0, although this was never stated in
+	the documentation. Apparently some users discovered and used pointtype 0
+	routinely and were unhappy that it stopped working in version 5. 
+	Neither the original behavior nor its removal was intentional, but it is
+	easy enough to restore the pre-version 5 behaviour so we do it now.
+	Bug #1733
+
 2016-03-20  Matthew Halverson <mhalver@users.sf.net>
 
 	* src/term.c (term_set_output):  Open pipes in binary mode if the

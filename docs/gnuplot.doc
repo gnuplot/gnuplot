@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.982 2016/02/29 07:07:15 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.983 2016/03/10 22:59:10 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -9947,7 +9947,7 @@ Ffigure_missing
  sequence of lines used in gnuplot.  The recommended way to do this is to add
  to the run-time initialization file ~/.gnuplot a sequence of commands like
 
-       set linetype 1 lc rgb "dark-violet" lw 2 pt 0
+       set linetype 1 lc rgb "dark-violet" lw 2 pt 1
        set linetype 2 lc rgb "sea-green"   lw 2 pt 7
        set linetype 3 lc rgb "cyan"        lw 2 pt 6 pi -1
        set linetype 4 lc rgb "dark-red"    lw 2 pt 5 pi -1

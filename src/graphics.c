@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.517 2016/03/09 04:41:45 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.518 2016/03/17 21:29:43 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -832,6 +832,9 @@ do_plot(struct curve_points *plots, int pcount)
 		do_key_sample_point(this_plot, key, xl, yl);
 
 	    if (this_plot->plot_style == LABELPOINTS)
+		do_key_sample_point(this_plot, key, xl, yl);
+
+	    if (this_plot->plot_style == DOTS)
 		do_key_sample_point(this_plot, key, xl, yl);
 
 	    if (!this_plot->title_position) {
@@ -2104,7 +2107,7 @@ plot_points(struct curve_points *plot)
 		}
 
 		/* The normal case */
-		else if (pointtype >= 0)
+		else if (pointtype >= -1)
 		    (*t->point) (x, y, pointtype);
 	    }
 	}
