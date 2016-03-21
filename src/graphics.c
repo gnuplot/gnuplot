@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.464.2.21 2016/03/02 01:40:46 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.464.2.22 2016/03/18 22:15:48 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -2088,7 +2088,7 @@ plot_points(struct curve_points *plot)
 		check_for_variable_color(plot, &plot->varcolor[i]);
 
 		/* The normal case */
-		if (plot->lp_properties.p_type >= 0)
+		if (plot->lp_properties.p_type >= -1)
 		    (*t->point) (x, y, plot->lp_properties.p_type);
 
 		/* Print special character rather than drawn symbol */

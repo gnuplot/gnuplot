@@ -8,6 +8,14 @@
 	called once on program entry.
 	Bug #1758
 
+	* src/graphics.c (do_plot plot_points):  The "dots" plot style is
+	implemented internally as pointtype 0, although this was never stated in
+	the documentation. Apparently some users discovered and used pointtype 0
+	routinely and were unhappy that it stopped working in version 5. 
+	Neither the original behavior nor its removal was intentional, but it is
+	easy enough to restore the pre-version 5 behaviour so here we do so.
+	Bug #1733
+
 2016-03-18  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c (plot_boxes): Backport fix to prevents array overrun if
