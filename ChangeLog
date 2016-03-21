@@ -7,6 +7,10 @@
 	reset_command() on program entry.
 	Bug #1758
 
+	* src/axis.c (clone_linked_axes): If an endpoint of a linked axis was
+	exactly zero, the forward/reverse link check would complain because of a
+	spurious divide-by-zero.  Now we test for this case separately.
+
 2016-03-20  Matthew Halverson <mhalver@users.sf.net>
 
 	* src/term.c (term_set_output):  Open pipes in binary mode if the
