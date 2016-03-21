@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.290.2.18 2016/01/18 23:51:58 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.290.2.19 2016/03/19 04:06:17 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -235,10 +235,10 @@ TBOOLEAN df_nofpe_trap = FALSE;
 
 /* private variables */
 
-/* in order to allow arbitrary data line length, we need to use the heap
- * might consider free-ing it in df_close, especially for small systems
+/* Bookkeeping for df_fgets() and df_gets().
+ * Must be initialized before any callers to either function.
  */
-static char *line = NULL;
+static char *df_line = NULL;
 static size_t max_line_len = 0;
 #define DATA_LINE_BUFSIZ 160
 
@@ -617,6 +617,12 @@ static const char *matrix_general_binary_conflict_msg
 static char *
 df_gets()
 {
+    /* Initialization must happen in all paths */
+    if (max_line_len < DATA_LINE_BUFSIZ) {
+	max_line_len = DATA_LINE_BUFSIZ;
+	df_line = gp_alloc(max_line_len, "datafile line buffer");
+    }
+
     /* HBB 20000526: prompt user for inline data, if in interactive mode */
     if (mixed_data_fp && interactive)
 	fputs("input data ('e' ends) > ", stderr);
@@ -642,34 +648,34 @@ df_fgets( FILE *fin )
 {
     int len = 0;
 
-    /* here so that initialization happens in all paths */
+    /* Initialization must happen in all paths */
     if (max_line_len < DATA_LINE_BUFSIZ) {
 	max_line_len = DATA_LINE_BUFSIZ;
-	line = gp_alloc(max_line_len, "datafile line buffer");
+	df_line = gp_alloc(max_line_len, "datafile line buffer");
     }
 
-    if (!fgets(line, max_line_len, fin))
+    if (!fgets(df_line, max_line_len, fin))
 	return NULL;
 
     if (mixed_data_fp)
 	++inline_num;
 
     for (;;) {
-	len += strlen(line + len);
+	len += strlen(df_line + len);
 
-	if (len > 0 && line[len - 1] == '\n') {
+	if (len > 0 && df_line[len - 1] == '\n') {
 	    /* we have read an entire text-file line.
 	     * Strip the trailing linefeed and return
 	     */
-	    line[len - 1] = 0;
-	    return line;
+	    df_line[len - 1] = 0;
+	    return df_line;
 	}
 
 	if ((max_line_len - len) < 32)
-	    line = gp_realloc(line, max_line_len *= 2, "datafile line buffer");
+	    df_line = gp_realloc(df_line, max_line_len *= 2, "datafile line buffer");
 
-	if (!fgets(line + len, max_line_len - len, fin))
-	    return line;        /* unexpected end of file, but we have something to do */
+	if (!fgets(df_line + len, max_line_len - len, fin))
+	    return df_line;        /* unexpected end of file, but we have something to do */
     }
 
     /* NOTREACHED */
@@ -1476,10 +1482,10 @@ df_close()
 void
 df_showdata()
 {
-  if (data_fp && df_filename && line) {
+  if (data_fp && df_filename && df_line) {
     /* display no more than 77 characters */
-    fprintf(stderr, "%.77s%s\n%s:%d:", line,
-	    (strlen(line) > 77) ? "..." : "",
+    fprintf(stderr, "%.77s%s\n%s:%d:", df_line,
+	    (strlen(df_line) > 77) ? "..." : "",
 	    df_filename, df_line_number);
   }
 }
@@ -5316,7 +5322,7 @@ df_generate_pseudodata()
 	if (df_current_plot && df_current_plot->sample_var)
 	    Gcomplex(&(df_current_plot->sample_var->udv_value), t, 0.0);
 	df_pseudovalue_0 = t;
-	sprintf(line,"%g",t);
+	sprintf(df_line,"%g",t);
 	++df_pseudorecord;
     }
 
@@ -5375,11 +5381,11 @@ df_generate_pseudodata()
 	    df_pseudovalue_0 = AXIS_DE_LOG_VALUE(u_axis,u);
 	    df_pseudovalue_1 = AXIS_DE_LOG_VALUE(v_axis,v);
 	}
-	sprintf(line,"%g %g", df_pseudovalue_0, df_pseudovalue_1);
+	sprintf(df_line,"%g %g", df_pseudovalue_0, df_pseudovalue_1);
 	++df_pseudorecord;
     }
 
-    return line;
+    return df_line;
 }
 
 /* Allocate space for more data columns as needed */
