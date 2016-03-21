@@ -1,11 +1,10 @@
 2016-03-21  Ethan A Merritt  <merritt@u.washington.edu>
 
-	* src/datafile.c: df_fgets() change from 4 days ago caused a regression 
-	because input buffer initialization was missed in some paths.
-	Replicate the initialization in both df_gets() and df_fgets()
-	Rename the shared line buffer df_line to make it more obvious.
-	It would be better to have a single initialization routine df_init()
-	called once on program entry.
+	* src/datafile.c src/datafile.h src/unset.c: The df_fgets() change 
+	4 days ago caused a regression because input buffer initialization was
+	missed in some paths.  Rename the shared buffer to df_line.
+	Move the initialization into a new routine df_init() called via
+	reset_command() on program entry.
 	Bug #1758
 
 2016-03-20  Matthew Halverson <mhalver@users.sf.net>

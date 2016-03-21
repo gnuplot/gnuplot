@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.323 2016/03/19 17:19:19 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.324 2016/03/21 18:48:36 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -199,7 +199,7 @@ TBOOLEAN df_nofpe_trap = FALSE;
 /* private variables */
 
 /* Bookkeeping for df_fgets() and df_gets().
- * Must be initialized before any callers to either function.
+ * Must be initialized before any calls to either function.
  */
 static char *df_line = NULL;
 static size_t max_line_len = 0;
@@ -581,16 +581,21 @@ static const char *matrix_general_binary_conflict_msg
 /*}}} */
 
 
-/*{{{  static char *df_gets() */
-static char *
-df_gets()
+/* Initialize input buffer used by df_gets and df_fgets. */
+/* Called via reset_command() on program entry.		 */
+void
+df_init()
 {
-    /* Initialization must happen in all paths */
     if (max_line_len < DATA_LINE_BUFSIZ) {
 	max_line_len = DATA_LINE_BUFSIZ;
 	df_line = gp_alloc(max_line_len, "datafile line buffer");
     }
+}
 
+/*{{{  static char *df_gets() */
+static char *
+df_gets()
+{
     /* HBB 20000526: prompt user for inline data, if in interactive mode */
     if (mixed_data_fp && interactive)
 	fputs("input data ('e' ends) > ", stderr);
@@ -618,12 +623,6 @@ char *
 df_fgets( FILE *fin )
 {
     int len = 0;
-
-    /* Initialization must happen in all paths */
-    if (max_line_len < DATA_LINE_BUFSIZ) {
-	max_line_len = DATA_LINE_BUFSIZ;
-	df_line = gp_alloc(max_line_len, "datafile line buffer");
-    }
 
     if (!fgets(df_line, max_line_len, fin))
 	return NULL;
