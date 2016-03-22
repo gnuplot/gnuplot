@@ -1,5 +1,5 @@
 ﻿;
-; $Id: gnuplot.iss,v 1.10.2.1 2014/12/16 09:12:12 markisch Exp $
+; $Id: gnuplot.iss,v 1.10.2.2 2015/01/01 13:13:12 markisch Exp $
 ;
 ; GNUPLOT - gnuplot.iss
 ;
@@ -88,6 +88,8 @@ OutputDir=.
 UninstallLogMode=append
 AlwaysShowDirOnReadyPage=true
 ChangesAssociations=true
+ArchitecturesAllowed=
+ArchitecturesInstallIn64BitMode=
 
 [Languages]
 Name: "en"; MessagesFile: "compiler:Default.isl"
