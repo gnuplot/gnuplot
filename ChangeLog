@@ -1,3 +1,28 @@
+2016-03-22  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* config/mingw/Makefile win/gnuplot.iss:  Support MSYS2/Mingw-w64 as
+	well as MSYS/MinGW and compilation using clang.  Ability to build
+	64bit or 32bit zip package and installer.  New make flags MINGW64,
+	CLANG, COLOR-GCC, and M32.  Default to 64bit builds when using
+	Mingw-w64, use M32 flag to select 32bit builds.
+
+	* src/win/wcommon.h src/win/wgdiplus.cpp src/win/wgnuplib.h
+	src/win/wgraph.c:  Fix several issues found by clang, with the most
+	important being wrong delete's in wgdiplus.cpp.
+
+	* scanner.c (get_num):  strtoll() on Windows may consume zero
+	characters causing an infinite loop for the input "0x".
+	Bug #1745
+
+	* src/win/wgraph.c (MakeFonts, TryCreateFont):  Do not rely on GDI
+	supplying a sensible substitute when a requested font is not
+	available.  Instead, fall back to the user-supplied default font or
+	the terminal's default font if the former is not available.
+	Bug #1669
+
+	* src/wxterminal/wxt_gui.h:  Use local events to avoid warnings about
+	incompatible linkage on Windows.
+
 2016-03-21  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/datafile.c: df_fgets() change from 4 days ago caused a regression 
