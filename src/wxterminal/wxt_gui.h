@@ -1,5 +1,5 @@
 /*
- * $Id: wxt_gui.h,v 1.48.2.4 2014/12/26 23:23:03 sfeam Exp $
+ * $Id: wxt_gui.h,v 1.48.2.5 2016/02/13 16:30:57 markisch Exp $
  */
 
 /* GNUPLOT - wxt_gui.h */
@@ -240,15 +240,15 @@ public:
 static wxtThread * thread;
 #endif /* WXT_MULTITHREADED */
 
-DECLARE_EVENT_TYPE(wxExitLoopEvent, -1)
-DEFINE_EVENT_TYPE(wxExitLoopEvent)
+DECLARE_LOCAL_EVENT_TYPE(wxExitLoopEvent, -1)
+DEFINE_LOCAL_EVENT_TYPE(wxExitLoopEvent)
 
-DECLARE_EVENT_TYPE(wxCreateWindowEvent, -1)
-DEFINE_EVENT_TYPE(wxCreateWindowEvent)
+DECLARE_LOCAL_EVENT_TYPE(wxCreateWindowEvent, -1)
+DEFINE_LOCAL_EVENT_TYPE(wxCreateWindowEvent)
 
 #ifdef USE_MOUSE
-DECLARE_EVENT_TYPE(wxStatusTextEvent, -1)
-DEFINE_EVENT_TYPE(wxStatusTextEvent)
+DECLARE_LOCAL_EVENT_TYPE(wxStatusTextEvent, -1)
+DEFINE_LOCAL_EVENT_TYPE(wxStatusTextEvent)
 #endif /* USE_MOUSE */
 
 /* Define a new application type, each gui should derive a class from wxApp */
