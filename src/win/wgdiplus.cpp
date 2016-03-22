@@ -1,5 +1,5 @@
 /*
- * $Id: wgdiplus.cpp,v 1.16.2.3 2014/12/24 08:52:09 markisch Exp $
+ * $Id: wgdiplus.cpp,v 1.16.2.4 2014/12/24 17:38:38 markisch Exp $
  */
 
 /*
@@ -65,7 +65,7 @@ gdiplusInit(void)
 		GdiplusStartupInput gdiplusStartupInput;
 		GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, NULL);
 	}
-};
+}
 
 
 void
@@ -75,7 +75,7 @@ gdiplusCleanup(void)
 		gdiplusInitialized = false;
 		GdiplusShutdown(gdiplusToken);
 	}
-};
+}
 
 
 static Color
@@ -127,7 +127,7 @@ gdiplusLineEx(HDC hdc, POINT x, POINT y, UINT style, float width, COLORREF color
 
 	Pen * pen = gdiplusCreatePen(style, width, color, alpha);
 	graphics.DrawLine(pen, (INT)x.x, (INT)x.y, (INT)y.x, (INT)y.y);
-	delete(pen);
+	delete pen;
 }
 
 
@@ -159,8 +159,8 @@ gdiplusPolylineEx(HDC hdc, POINT *ppt, int polyi, UINT style, float width, COLOR
 		graphics.DrawLines(pen, points, polyi);
 	else
 		graphics.DrawPolygon(pen, points, polyi - 1);
-	delete(pen);
-	delete(points);
+	delete pen;
+	delete [] points;
 }
 
 
@@ -180,7 +180,7 @@ gdiplusSolidFilledPolygonEx(HDC hdc, POINT *ppt, int polyi, COLORREF color, doub
 	}
 	SolidBrush brush(gdipColor);
 	graphics.FillPolygon(&brush, points, polyi);
-	delete points;
+	delete [] points;
 }
 
 
@@ -215,8 +215,8 @@ gdiplusPatternFilledPolygonEx(HDC hdc, POINT *ppt, int polyi, COLORREF color, do
 		points[i].Y = ppt[i].y;
 	}
 	graphics.FillPolygon(brush, points, polyi);
-	delete(points);
-	delete(brush);
+	delete [] points;
+	delete brush;
 }
 
 
@@ -229,7 +229,7 @@ gdiplusCircleEx(HDC hdc, POINT * p, int radius, UINT style, float width, COLORRE
 
 	Pen * pen = gdiplusCreatePen(style, width, color, alpha);
 	graphics.DrawEllipse(pen, p->x - radius, p->y - radius, 2*radius, 2*radius);
-	delete(pen);
+	delete pen;
 }
 
 
@@ -254,7 +254,7 @@ gdiplusPolyline(Graphics &graphics, Pen &pen, POINT *ppt, int polyi)
 		graphics.DrawLines(&pen, points, polyi);
 	else
 		graphics.DrawPolygon(&pen, points, polyi - 1);
-	delete(points);
+	delete [] points;
 
 	/* restore */
 	if (mode != SmoothingModeNone)
@@ -273,7 +273,7 @@ gdiplusFilledPolygon(Graphics &graphics, Brush &brush, POINT *ppt, int polyi)
 	graphics.SetCompositingQuality(CompositingQualityGammaCorrected);
 	graphics.FillPolygon(&brush, points, polyi);
 	graphics.SetCompositingQuality(CompositingQualityDefault);
-	delete points;
+	delete [] points;
 }
 
 
@@ -356,10 +356,10 @@ SetFont_gdiplus(Graphics &graphics, LPRECT rect, LPGW lpgw, char * fontname, int
 	int fontHeight;
 	if (fontFamily->GetLastStatus() != Ok) {
 		delete fontFamily;
-#ifndef __MINGW32__
+#if defined(__MINGW32__) && !defined(__MINGW64_VERSION_MAJOR)
+		// MinGW 4.8.1 does not have this
 		fontFamily = FontFamily::GenericSansSerif();
 #else
-		// FIXME: MinGW 4.8.1 gives an unresolved external error for the above
 		family = UnicodeText(GraphDefaultFont(), S_ENC_DEFAULT); // should always be available
 		fontFamily = new FontFamily(family);
 		free(family);
@@ -1039,6 +1039,8 @@ drawgraph_gdiplus(LPGW lpgw, HDC hdc, LPRECT rect)
 				boxedtext.margin.x = MulDiv(curptr->y, (rr - rl) * lpgw->hchar, 100 * lpgw->xmax);
 				boxedtext.margin.y = MulDiv(curptr->y, (rb - rt) * lpgw->vchar, 400 * lpgw->ymax);
 				break;
+			default:
+				break;
 			}
 			break;
 #endif
@@ -1535,11 +1537,11 @@ drawgraph_gdiplus(LPGW lpgw, HDC hdc, LPRECT rect)
 				/* If exact multiple of GWOPMAX entries are queued,
 				 * next will be NULL. Only the next GraphOp() call would
 				 * have allocated a new block */
-				return;
+				break;
 			if (!blkptr->gwop)
 				blkptr->gwop = (struct GWOP *)GlobalLock(blkptr->hblk);
 			if (!blkptr->gwop)
-				return;
+				break;
 			curptr = (struct GWOP *)blkptr->gwop;
 		}
 	}

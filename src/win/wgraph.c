@@ -1,5 +1,5 @@
 /*
- * $Id: wgraph.c,v 1.189.2.7 2014/12/31 04:38:44 sfeam Exp $
+ * $Id: wgraph.c,v 1.189.2.8 2016/02/13 16:21:12 markisch Exp $
  */
 
 /* GNUPLOT - win/wgraph.c */
@@ -2250,6 +2250,8 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 				boxedtext.margin.x = MulDiv(curptr->y, (rr - rl) * lpgw->hchar, 100 * lpgw->xmax);
 				boxedtext.margin.y = MulDiv(curptr->y, (rb - rt) * lpgw->vchar, 400 * lpgw->ymax);
 				break;
+			default:
+				break;
 			}
 			break;
 #endif
@@ -3291,7 +3293,7 @@ GraphDefaultFont(void)
 		return WINJPFONT;
 	else
 		return WINFONT;
-};
+}
 
 
 static void
