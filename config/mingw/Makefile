@@ -1,5 +1,5 @@
 # Hello, emacs: this is a -*- Makefile -*-
-# $Id: Makefile,v 1.55 2016/02/14 08:51:10 markisch Exp $
+# $Id: Makefile,v 1.56 2016/03/06 19:23:42 markisch Exp $
 #
 # GNUPLOT Makefile for MinGW/MSYS or MinGW-w64/MSYS2 on Windows 
 # This assumes a typical installation of the MinGW toolkit, the free
@@ -501,9 +501,9 @@ else
 VERSIONING = timestamp.h
 endif
 
-PATCHLEVEL := `cat $(TOP)/PATCHLEVEL`
-MAINVERSION := `cat $(TOP)/VERSION`
-SHORTVERSION := `cut -b 2 --complement $(TOP)/VERSION`$(PATCHLEVEL)
+PATCHLEVEL := $(shell cat $(TOP)/PATCHLEVEL)
+MAINVERSION := $(shell cat $(TOP)/VERSION)
+SHORTVERSION := $(shell cut -b 2 --complement $(TOP)/VERSION)$(PATCHLEVEL)
 NUMBERS := 0 1 2 3 4 5 6 7 8 9
 ifeq ($(strip $(filter-out $(NUMBERS),$(PATCHLEVEL))),)
 LONGVERSION := $(MAINVERSION).$(PATCHLEVEL)
