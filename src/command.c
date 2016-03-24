@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.319 2016/03/10 23:25:31 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.320 2016/03/17 05:53:47 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -145,6 +145,7 @@ int vms_ktid;			/* key table id, for translating keystrokes */
 
 /* static prototypes */
 static void command __PROTO((void));
+static TBOOLEAN is_array_assignment __PROTO((void));
 static int changedir __PROTO((char *path));
 static char* fgets_ipc __PROTO((char* dest, int len));
 static char* gp_get_string __PROTO((char *, size_t, const char *));
@@ -629,6 +630,8 @@ command()
 
     if (is_definition(c_token))
 	define();
+    else if (is_array_assignment())
+	;
     else
 	(*lookup_ftable(&command_ftbl[0],c_token))();
 
@@ -749,7 +752,9 @@ array_command()
     int i;
 
     /* Create or recycle a udv containing an array with the requested name */
-    array = add_udv(++c_token);
+    if (!isletter(++c_token))
+	int_error(c_token, "illegal variable name");
+    array = add_udv(c_token);
     gpfree_array(&array->udv_value);
     gpfree_string(&array->udv_value);
 
@@ -807,8 +812,31 @@ is_array_assignment()
     udvt_entry *udv = add_udv(c_token);
     struct value newvalue;
     int index;
+    TBOOLEAN looks_OK = FALSE;
+    int brackets;
 
     if (!isletter(c_token) || !equals(c_token+1, "["))
+	return FALSE;
+
+    /* There are other legal commands where the 2nd token is [
+     * e.g.  "plot [min:max] foo"
+     * so we check that the closing ] is immediately followed by =.
+     */
+    for (index=c_token+2, brackets=1; index < num_tokens; index++) {
+	if (equals(index,";"))
+	    return FALSE;
+	if (equals(index,"["))
+	    brackets++;
+	if (equals(index,"]"))
+	    brackets--;
+	if (brackets == 0) {
+	    if (!equals(index+1,"="))
+		return FALSE;
+	    looks_OK = TRUE;
+	    break;
+	}
+    }
+    if (!looks_OK)
 	return FALSE;
 
     if (udv->udv_value.type != ARRAY)
@@ -2476,16 +2504,6 @@ invalid_command()
       }
     }
 #endif
-
-    /*
-     * We got here because the start of an input line was not recognized as
-     * a command. But maybe it is an array assignment?
-     * NB: We check for this _after_ looking for known commands because
-     *    plot [] FOO
-     * looks vaguely like an array reference
-     */
-    if (is_array_assignment())
-	return;
 
     /* Skip the rest of the command; otherwise we're left pointing to */
     /* the middle of a command we already know is not valid.          */

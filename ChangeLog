@@ -1,3 +1,15 @@
+2016-03-24  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/command.c (array_command):
+	Sanity check: array name must start with a letter.
+
+	* src/command.c (command is_array_assignment):
+	Change the order of parsing: check for array assignment before trying
+	to interpret the first input token as a command keyword.  E.g.
+	"array q[2]; q[1] = 1" must not interpret the initial 'q' as shorthand
+	for 'quit'.
+	Bug #1762
+
 2016-03-24  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* config/mingw/Makefile:  The proper way to invoke shell commands in
