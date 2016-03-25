@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.518 2016/03/17 21:29:43 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.519 2016/03/22 04:34:02 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -996,8 +996,20 @@ plot_lines(struct curve_points *plot)
 
 	switch (plot->points[i].type) {
 	case INRANGE:{
+
+		/* map_x or map_y can hit NaN during eval_link_function(), in which */
+		/* case the coordinate value is garbage and undefined is TRUE.      */
+		undefined = FALSE;
+
 		x = map_x(plot->points[i].x);
+		if (undefined)
+		    plot->points[i].type = UNDEFINED;
 		y = map_y(plot->points[i].y);
+		if (undefined)
+		    plot->points[i].type = UNDEFINED;
+
+		if (plot->points[i].type == UNDEFINED)
+		    break;
 
 		if (prev == INRANGE) {
 		    (*t->vector) (x, y);
