@@ -6,6 +6,11 @@
 	flag is TRUE.  Check this flag to avoid drawing spurious line segments 
 	in plot with lines.
 
+	* src/axis.c src/axis.h src/plot2d.c:  New routine init_sample_range().
+	Always use SAMPLE_AXIS to hold bookkeeping values for function sampling,
+	rather than sometimes using a real axis, sometimes a parametrics axis,
+	and sometimes SAMPLE_AXIS.
+
 2016-03-24  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/command.c (array_command):

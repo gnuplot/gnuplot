@@ -1,5 +1,5 @@
 /*
- * $Id: axis.h,v 1.139 2016/03/09 04:40:01 sfeam Exp $
+ * $Id: axis.h,v 1.140 2016/03/13 23:28:55 sfeam Exp $
  *
  */
 
@@ -615,13 +615,6 @@ do {									  \
     value, value, value, value, value,			\
 	value, value, value, value, value, value }
 
-/* FIXME: replace by a subroutine? */
-#define clear_sample_range(axis) do {				\
-	axis_array[SAMPLE_AXIS].range_flags = 0;		\
-	axis_array[SAMPLE_AXIS].min = axis_array[axis].min;	\
-	axis_array[SAMPLE_AXIS].max = axis_array[axis].max;	\
-	} while (0)
-
 /* 'roundoff' check tolerance: less than one hundredth of a tic mark */
 #define SIGNIF (0.01)
 /* (DFK) Watch for cancellation error near zero on axes labels */
@@ -677,6 +670,7 @@ void save_autoscaled_ranges __PROTO((AXIS *, AXIS *));
 void restore_autoscaled_ranges __PROTO((AXIS *, AXIS *));
 
 char * axis_name __PROTO((AXIS_INDEX));
+void init_sample_range __PROTO((AXIS *axis));
 void init_parallel_axis __PROTO((AXIS *, AXIS_INDEX));
 AXIS * extend_parallel_axis __PROTO((int ));
 

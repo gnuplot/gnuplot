@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.181 2016/03/21 23:42:58 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.182 2016/03/25 20:58:01 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -263,6 +263,14 @@ axis_name(AXIS_INDEX axis)
 	return name;
     }
     return (char *) axis_defaults[axis].name;
+}
+
+void
+init_sample_range(AXIS *axis)
+{
+    axis_array[SAMPLE_AXIS].range_flags = 0;
+    axis_array[SAMPLE_AXIS].min = axis->min;
+    axis_array[SAMPLE_AXIS].max = axis->max;
 }
 
 /* 
@@ -699,7 +707,7 @@ make_tics(struct axis *this_axis, int guide)
     /* FIXME HBB 20010831: disabling this might allow short log axis
      * to receive better ticking... */
     if (this_axis->log && tic < 1.0)
-	  tic = 1.0;
+	tic = 1.0;
 
     if (this_axis->tictype == DT_TIMEDATE)
 	return quantize_time_tics(this_axis, tic, xr, guide);

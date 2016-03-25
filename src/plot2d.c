@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.379 2016/03/04 04:58:03 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.380 2016/03/17 04:23:01 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -2096,7 +2096,7 @@ eval_plots()
 	    plot_num++;
 
 	    /* Check for a sampling range. */
-	    clear_sample_range(FIRST_X_AXIS);
+	    init_sample_range(axis_array + FIRST_X_AXIS);
 	    sample_range_token = parse_range(SAMPLE_AXIS);
 	    if (sample_range_token != 0)
 		axis_array[SAMPLE_AXIS].range_flags |= RANGE_SAMPLED;
@@ -3025,7 +3025,7 @@ eval_plots()
 
 		/* Check for a sampling range. */
 		/* Only relevant to function plots, and only needed in second pass. */
-		clear_sample_range(x_axis);
+		init_sample_range(axis_array + x_axis);
 		sample_range_token = parse_range(SAMPLE_AXIS);
 		dummy_func = &plot_func;
 
@@ -3051,15 +3051,12 @@ eval_plots()
 		    plot_func.at = at_ptr;
 
 		    if (!parametric && !polar) {
-			if (sample_range_token != 0) {
-			    t_min = axis_array[SAMPLE_AXIS].min;
-			    t_max = axis_array[SAMPLE_AXIS].max;
-			} else {
-			    t_min = X_AXIS.min;
-			    t_max = X_AXIS.max;
-			}
+			t_min = axis_array[SAMPLE_AXIS].min;
+			t_max = axis_array[SAMPLE_AXIS].max;
+
 			/* FIXME: What if SAMPLE_AXIS is not x_axis? */
 			axis_unlog_interval(&X_AXIS, &t_min, &t_max, 1);
+
 			t_step = (t_max - t_min) / (samples_1 - 1);
 		    }
 		    for (i = 0; i < samples_1; i++) {
