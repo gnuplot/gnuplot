@@ -126,7 +126,7 @@ QImage qt_imageToQImage(int M, int N, coordval* image, t_imagecolor color_mode)
 			QRgb* line = (QRgb*)(qimage.scanLine(n));
 			for (int m = 0; m < M; m++)
 			{
-				if (isnan(*image))
+				if (*image != *image)
 				{
 					image++;
 					*line++ = 0x00000000;
