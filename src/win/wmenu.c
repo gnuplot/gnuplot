@@ -1,5 +1,5 @@
 /*
- * $Id: wmenu.c,v 1.26 2013/12/27 19:51:22 markisch Exp $Id: wmenu.c,v 1.26 2013/12/27 19:51:22 markisch Exp $
+ * $Id: wmenu.c,v 1.27 2014/04/03 00:36:17 markisch Exp $Id: wmenu.c,v 1.27 2014/04/03 00:36:17 markisch Exp $
  */
 
 /* GNUPLOT - win/wmenu.c */
@@ -59,11 +59,6 @@
 #include "stdfn.h"
 #include "wcommon.h"
 
-/* Choose between the directory dialog of the windows shell and
-   a modified version of the "file open" dialog */
-#define SHELL_DIR_DIALOG
-
-INT_PTR CALLBACK InputBoxDlgProc(HWND, UINT, WPARAM, LPARAM);
 
 /* limits */
 #define MAXSTR 255
@@ -117,16 +112,8 @@ static int GetLine(char * buffer, int len, GFILE *gfile);
 static void LeftJustify(char *d, char *s);
 static BYTE MacroCommand(LPTW lptw, UINT m);
 static void TranslateMacro(char *string);
-
-
-#ifdef SHELL_DIR_DIALOG
-
+INT_PTR CALLBACK InputBoxDlgProc(HWND, UINT, WPARAM, LPARAM);
 INT CALLBACK BrowseCallbackProc(HWND hwnd, UINT uMsg, LPARAM lp, LPARAM pData);
-
-/* This is missing in MingW 2.95 */
-#ifndef BIF_EDITBOX
-# define BIF_EDITBOX 0x0010
-#endif
 
 /* Note: this code has been bluntly copied from MSDN article KB179378
          "How To Browse for Folders from the Current Directory"
@@ -154,187 +141,6 @@ BrowseCallbackProc(HWND hwnd, UINT uMsg, LPARAM lp, LPARAM pData)
 	}
 	return 0;
 }
-
-#else /* SHELL_DIR_DIALOG */
-
-/* Yes, you can use Windows shell functions even without C++ !
-   These functions are not defined in shlobj.h, so we do it ourselves:
-*/
-#ifndef IShellFolder_BindToObject
-#define IShellFolder_BindToObject(This,pidl,pbcReserved,riid,ppvOut) \
-		(This)->lpVtbl -> BindToObject(This,pidl,pbcReserved,riid,ppvOut)
-#endif
-#ifndef IShellFolder_GetDisplayNameOf
-#define IShellFolder_GetDisplayNameOf(This,pidl,uFlags,lpName) \
-		(This)->lpVtbl -> GetDisplayNameOf(This,pidl,uFlags,lpName)
-#endif
-
-/* My windows header files do not define these: */
-#ifndef WC_NO_BEST_FIT_CHARS
-#define WC_NO_BEST_FIT_CHARS      0x00000400  /* do not use best fit chars */
-#endif
-
-/* We really need this struct which is used by newer Windows versions */
-typedef struct tagOFN {
-  DWORD         lStructSize;
-  HWND          hwndOwner;
-  HINSTANCE     hInstance;
-  LPCTSTR       lpstrFilter;
-  LPTSTR        lpstrCustomFilter;
-  DWORD         nMaxCustFilter;
-  DWORD         nFilterIndex;
-  LPTSTR        lpstrFile;
-  DWORD         nMaxFile;
-  LPTSTR        lpstrFileTitle;
-  DWORD         nMaxFileTitle;
-  LPCTSTR       lpstrInitialDir;
-  LPCTSTR       lpstrTitle;
-  DWORD         Flags;
-  WORD          nFileOffset;
-  WORD          nFileExtension;
-  LPCTSTR       lpstrDefExt;
-  LPARAM        lCustData;
-  LPOFNHOOKPROC lpfnHook;
-  LPCTSTR       lpTemplateName;
-/* #if (_WIN32_WINNT >= 0x0500) */
-  void *        pvReserved;
-  DWORD         dwReserved;
-  DWORD         FlagsEx;
-/* #endif // (_WIN32_WINNT >= 0x0500) */
-} NEW_OPENFILENAME, *NEW_LPOPENFILENAME;
-
-
-UINT_PTR CALLBACK OFNHookProc(HWND hdlg, UINT uiMsg, WPARAM wParam, LPARAM lParam)
-{
-	switch(uiMsg) {
-	case WM_INITDIALOG: {
-		HWND parent;
-		parent = GetParent(hdlg);
-		/* Hint: The control codes for this can be found on MSDN */
-		/* Hide "file type" display */
-		CommDlg_OpenSave_HideControl(parent, stc2);
-		CommDlg_OpenSave_HideControl(parent, cmb1);
-		/* Hide "current file" display */
-		CommDlg_OpenSave_HideControl(parent, stc3);
-		CommDlg_OpenSave_HideControl(parent, cmb13);
-		break;
-		}
-
-	case WM_NOTIFY: {
-		LPOFNOTIFY lpOfNotify = (LPOFNOTIFY) lParam;
-		switch(lpOfNotify->hdr.code) {
-#if 0
-		/* Well, this event is not called for ordinary files (sigh) */
-		case CDN_INCLUDEITEM:
-			return 0;
-			break;
-#endif
-		/* But there's a solution which can be found here:
-			http://msdn.microsoft.com/msdnmag/issues/03/10/CQA/default.aspx
-			http://msdn.microsoft.com/msdnmag/issues/03/09/CQA/
-		   It's C++ though (sigh again), so here is its analogue in plain C:
-		*/
-		/* case CDN_SELCHANGE: */
-		case CDN_FOLDERCHANGE: {
-			HWND parent, hlst2, list;
-			LPCITEMIDLIST pidlFolder;
-			LPMALLOC pMalloc;
-			signed int count, i;
-			unsigned len;
-
-			/* find listbox control */
-			parent = GetParent(hdlg);
-			hlst2 = GetDlgItem(parent, lst2);
-			list = GetDlgItem(hlst2, 1);
-
-			SHGetMalloc(&pMalloc);
-
-			/* First, get PIDL of current folder by sending CDM_GETFOLDERIDLIST
-			   get length first, then allocate. */
-			len = CommDlg_OpenSave_GetFolderIDList(parent, 0, 0);
-			if (len>0) {
-				LPSHELLFOLDER ishDesk;
-				LPSHELLFOLDER ishFolder;
-				HRESULT hr;
-				STRRET str;
-
-				pidlFolder = IMalloc_Alloc(pMalloc, len+1);
-				CommDlg_OpenSave_GetFolderIDList(parent, (WPARAM)(void*)pidlFolder, len);
-
-				/* Now get IShellFolder for pidlFolder */
-				SHGetDesktopFolder(&ishDesk);
-				hr = IShellFolder_BindToObject(ishDesk, pidlFolder, NULL, &IID_IShellFolder, &ishFolder);
-				if (!SUCCEEDED(hr)) {
-					ishFolder = ishDesk;
-				}
-
-				/* Enumerate listview items */
-				count = ListView_GetItemCount(list);
-				for (i = count-1; i >= 0; i--)
-				{
-					const ULONG flags = SHGDN_NORMAL | SHGDN_FORPARSING;
-					LVITEM lvitem;
-					LPCITEMIDLIST pidl;
-#if 0
-					/* The normal code to retrieve the item's text is
-					   not very useful since user may select "hide common
-					   extensions" */
-					path = (char *)malloc(MAX_PATH+1);
-					ListView_GetItemText(list, i, 0, path, MAX_PATH );
-#endif
-					/* The following code retrieves the real path of every
-					   item in any case */
-					/* Retrieve PIDL of current item */
-					ZeroMemory(&lvitem,sizeof(lvitem));
-					lvitem.iItem = i;
-					lvitem.mask = LVIF_PARAM;
-					ListView_GetItem(list, &lvitem);
-					pidl = (LPCITEMIDLIST)lvitem.lParam;
-
-					/* Finally, get the path name from pidlFolder */
-					str.uType = STRRET_WSTR;
-					hr = IShellFolder_GetDisplayNameOf(ishFolder, pidl, flags, &str);
-					if (SUCCEEDED(hr)) {
-						struct _stat itemStat;
-						char path[MAX_PATH+1];
-
-						/* (sigh) conversion would have been so easy...
-						   hr = StrRetToBuf( str, pidl, path, MAX_PATH); */
-						if (str.uType == STRRET_WSTR) {
-							unsigned wlen = wcslen(str.pOleStr);
-							wlen = WideCharToMultiByte(CP_ACP, WC_NO_BEST_FIT_CHARS,
-														str.pOleStr, wlen+1, path, MAX_PATH,
-														NULL, NULL);
-							_wstat(str.pOleStr, &itemStat);
-							/* Must free memory allocated by shell using shell's IMalloc  */
-							IMalloc_Free(pMalloc, (LPVOID)str.pOleStr);
-						} else if (str.uType == STRRET_CSTR) {
-							strncpy(path, str.cStr, MAX_PATH);
-							_stat(str.cStr, &itemStat);
-						} else {
-							/* this shouldn't happen */
-							path[0] = '\0';
-						}
-
-						/* discard all non-directories from list */
-						if ((itemStat.st_mode & _S_IFDIR) == 0) {
-							ListView_DeleteItem(list, i);
-						}
-					}
-				}  /* Enumerate listview items */
-				IMalloc_Free(pMalloc, (void*)pidlFolder);
-			}
-			IMalloc_Release(pMalloc);
-			break;
-			} /* CDN_FOLDERCHANGE */
-		} /* switch(hdr.code) */
-		break;
-		} /* WM_NOTIFY */
-	}; /* switch(uiMsg) */
-	return 0;
-}
-
-#endif /* !SHELL_DIR_DIALOG */
 
 
 BYTE
@@ -461,12 +267,8 @@ char *szFilter;
 
 			case DIRECTORY: /* [DIRECTORY] - show standard directory dialog */
 				{
-#ifdef SHELL_DIR_DIALOG
 					BROWSEINFO bi;
 					LPITEMIDLIST pidl;
-#else
-					NEW_OPENFILENAME ofn;
-#endif
 					/* allocate some space */
 					if ( (szTitle = LocalAllocPtr(LHND, MAXSTR+1)) == (char *)NULL )
 						return;
@@ -479,9 +281,7 @@ char *szFilter;
 
 					flag = 0;
 
-#ifdef SHELL_DIR_DIALOG
-					/* Option 1:
-							use the Shell's internal directory chooser
+					/* The Shell's internal directory chooser:
 					*/
 					/* Note: This code does not work NT 3.51 and Win32s
 							 Windows 95 has shell32.dll version 4.0, but does not
@@ -528,54 +328,7 @@ char *szFilter;
 							/* Free our task allocator */
 							IMalloc_Release( pMalloc );
 						}
-					}
-#else /* SHELL_DIR_DIALOG */
-					/* Option 2:
-							use (abuse ?) standard "file open" dialog and discard the filename
-							from result, have all non-directory items removed.
-					*/
-					/* Note: This code does not work NT 3.51 and Win32s
-							 Windows 95 has shell32.dll version 4.0, but does not
-					         have a version number, so this will return FALSE.
-					*/
-					/* Make sure that the installed shell version supports this approach */
-					if (GetDllVersion(TEXT("shell32.dll")) >= PACKVERSION(4,0)) {
-						/* copy current working directory to szFile */
-						if ( (szFile = LocalAllocPtr(LHND, MAX_PATH+1)) == (char *)NULL )
-							return;
-						GP_GETCWD( szFile, MAX_PATH );
-						strcat( szFile, "\\*.*" );
-
-						ZeroMemory(&ofn,sizeof(ofn));
-						ofn.lStructSize = sizeof(ofn);
-						ofn.hwndOwner = lptw->hWndParent;
-						ofn.lpstrFilter = (LPSTR)NULL;
-						ofn.nFilterIndex = 0;
-						ofn.lpstrFile = szFile;
-						ofn.nMaxFile = MAX_PATH;
-						ofn.lpstrFileTitle = szFile;
-						ofn.nMaxFileTitle = MAXSTR;
-						ofn.lpstrTitle = szTitle;
-						ofn.lpstrInitialDir = (LPSTR)NULL;
-						ofn.Flags = OFN_PATHMUSTEXIST | OFN_NOVALIDATE |
-									OFN_HIDEREADONLY | OFN_ENABLESIZING |
-									OFN_EXPLORER | OFN_ENABLEHOOK;
-						ofn.lpfnHook = OFNHookProc;
-						flag = GetOpenFileName((LPOPENFILENAME)&ofn);
-
-						if ((flag) && (ofn.nFileOffset >0)) {
-							unsigned int len;
-
-							/* strip filename from result */
-							len = ofn.nFileOffset - 1;
-							ofn.lpstrFile[len] = '\0';
-							for (i=0; i<len; i++)
-								*d++ = ofn.lpstrFile[i];
-						}
-						LocalFreePtr((void NEAR *)szFile);
-					}
-#endif /* !SHELL_DIR_DIALOG */
-					else {
+					} else {
 						strcpy(lpmw->szPrompt, szTitle);
 						flag = DialogBox( hdllInstance, "InputDlgBox", lptw->hWndParent, InputBoxDlgProc);
 						if( flag ) {

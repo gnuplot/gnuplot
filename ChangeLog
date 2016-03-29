@@ -1,5 +1,9 @@
 2016-03-29  Bastian Maerkisch  <bmaerkisch@web.de>
 
+	* src/win/wmenu.c:  Remove the alternative code which would use a
+	modified file-open-dialog to select a directory.  This wasn't working
+	since Vista anyway and was never included in any official binary.
+
 	* src/command.c:  The Windows specific winsystem() has been deactivated
 	for a long time. Remove it.
 
