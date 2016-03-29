@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.320 2016/03/17 05:53:47 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.321 2016/03/25 03:22:46 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -119,10 +119,6 @@ int thread_rl_RetCode = -1; /* return code from readline in a thread */
 
 #ifndef _Windows
 # include "help.h"
-#else
-# ifdef USE_OWN_WINSYSTEM_FUNCTION
-static int winsystem __PROTO((const char *));
-# endif
 #endif /* _Windows */
 
 #ifdef _Windows
@@ -2541,7 +2537,7 @@ changedir(char *path)
 
     return 0;			/* should report error with setdrive also */
 
-#elif defined(WIN32)
+#elif defined(_WIN32)
     return !(SetCurrentDirectory(path));
 #elif defined(__EMX__) && defined(OS2)
     return _chdir2(path);
@@ -3049,12 +3045,6 @@ help_command()
 static void
 do_system(const char *cmd)
 {
-# if defined(_Windows) && defined(USE_OWN_WINSYSTEM_FUNCTION)
-    if (!cmd)
-	return;
-    restrict_popen();
-    winsystem(cmd);
-# else /* _Windows */
 /* (am, 19980929)
  * OS/2 related note: cmd.exe returns 255 if called w/o argument.
  * i.e. calling a shell by "!" will always end with an error message.
@@ -3065,7 +3055,6 @@ do_system(const char *cmd)
 	return;
     restrict_popen();
     system(cmd);
-# endif /* !(_Windows) */
 }
 
 
@@ -3365,52 +3354,6 @@ read_line(const char *prompt, int start)
 
 #endif /* !VMS */
 
-#if defined(_Windows)
-# if defined(USE_OWN_WINSYSTEM_FUNCTION)
-/* there is a system like call on MS Windows but it is a bit difficult to
-   use, so we will invoke the command interpreter and use it to execute the
-   commands */
-static int
-winsystem(const char *s)
-{
-    LPSTR comspec;
-    LPSTR execstr;
-    LPCSTR p;
-
-    /* get COMSPEC environment variable */
-    char envbuf[81];
-    GetEnvironmentVariable("COMSPEC", envbuf, 80);
-    if (*envbuf == NUL)
-	comspec = "\\command.com";
-    else
-	comspec = envbuf;
-    /* if the command is blank we must use command.com */
-    p = s;
-    while ((*p == ' ') || (*p == '\n') || (*p == '\r'))
-	p++;
-    if (*p == NUL) {
-	WinExec(comspec, SW_SHOWNORMAL);
-    } else {
-	/* attempt to run the windows/dos program via windows */
-	if (WinExec(s, SW_SHOWNORMAL) <= 32) {
-	    /* attempt to run it as a dos program from command line */
-	    execstr = gp_alloc(strlen(s) + strlen(comspec) + 6,
-			       "winsystem cmdline");
-	    strcpy(execstr, comspec);
-	    strcat(execstr, " /c ");
-	    strcat(execstr, s);
-	    WinExec(execstr, SW_SHOWNORMAL);
-	    free(execstr);
-	}
-    }
-
-    /* regardless of the reality return OK - the consequences of */
-    /* failure include shutting down Windows */
-    return (0);			/* success */
-}
-# endif /* USE_OWN_WINSYSTEM_FUNCTION */
-
-#endif /* _Windows */
 
 /*
  * Walk through the input line looking for string variables preceded by @.

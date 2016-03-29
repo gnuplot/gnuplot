@@ -1,5 +1,8 @@
 2016-03-29  Bastian Maerkisch  <bmaerkisch@web.de>
 
+	* src/command.c:  The Windows specific winsystem() has been deactivated
+	for a long time. Remove it.
+
 	* src/readline.c:  The return value of the *_getch() functions should
 	be int, not char, in order to avoid confusion between EOF (-1) and 
 	(char)0xff.
