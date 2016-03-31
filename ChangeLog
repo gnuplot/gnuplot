@@ -1,3 +1,9 @@
+2016-03-31  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/command.c (rlgets) docs/gnuplot.doc:  Do not add lines to 
+	command line history which start with a history command.
+	Bug #1763
+
 2016-03-31  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/history.c (add_history):  The documentation states that 

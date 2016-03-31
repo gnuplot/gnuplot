@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.321 2016/03/25 03:22:46 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.322 2016/03/29 18:49:10 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -3057,6 +3057,43 @@ do_system(const char *cmd)
     system(cmd);
 }
 
+/* is_history_command:
+   Test if line starts with an (abbreviated) history command.
+   Modified copy of almost_equals() (util.c).
+*/
+static TBOOLEAN
+is_history_command(const char *line)
+{
+    int i;
+    int start = 0;
+    int length = 0;
+    int after = 0;
+    const char str[] = "hi$story";
+
+    /* skip leading whitespace */
+    while (isblank((unsigned char) line[start]))
+	start++;
+
+    /* find end of "token" */
+    while ((line[start + length] != NUL) && !isblank((unsigned char) line[start + length]))
+	length++;
+
+    for (i = 0; i < length + after; i++) {
+	if (str[i] != line[start + i]) {
+	    if (str[i] != '$')
+		return FALSE;
+	    else {
+		after = 1;
+		start--;	/* back up token ptr */
+	    }
+	}
+    }
+
+    /* i now beyond end of token string */
+
+    return (after || str[i] == '$' || str[i] == NUL);
+}
+
 
 # if defined(READLINE) || defined(HAVE_LIBREADLINE) || defined(HAVE_LIBEDITLINE)
 /* keep some compilers happy */
@@ -3088,31 +3125,36 @@ rlgets(char *s, size_t n, const char *prompt)
 	    /* search in the history for entries containing line.
 	     * They may have other tokens before and after line, hence
 	     * the check on strcmp below. */
-	    if (!history_full) {
-		found = history_search(line, -1);
-		if (found != -1 && !strcmp(current_history()->line,line)) {
-		    /* this line is already in the history, remove the earlier entry */
-		    HIST_ENTRY *removed = remove_history(where_history());
-		    /* according to history docs we are supposed to free the stuff */
-		    if (removed) {
-			free(removed->line);
-			free(removed->data);
-			free(removed);
+	    if (!is_history_command(line)) {
+		if (!history_full) {
+		    found = history_search(line, -1);
+		    if (found != -1 && !strcmp(current_history()->line,line)) {
+			/* this line is already in the history, remove the earlier entry */
+			HIST_ENTRY *removed = remove_history(where_history());
+			/* according to history docs we are supposed to free the stuff */
+			if (removed) {
+			    free(removed->line);
+			    free(removed->data);
+			    free(removed);
+			}
 		    }
 		}
+		add_history(line);
 	    }
-	    add_history(line);
 #  elif defined(HAVE_LIBEDITLINE)
-	    /* deleting history entries does not work, so suppress adjacent duplicates only */
-	    int found = 0;
-	    using_history();
+	    if (!is_history_command(line)) {
+		/* deleting history entries does not work, so suppress adjacent duplicates only */
+		int found = 0;
+		using_history();
 
-	    if (!history_full)
-		found = history_search(line, -1);
-	    if (found <= 0)
-               add_history(line);
+		if (!history_full)
+		    found = history_search(line, -1);
+		if (found <= 0)
+		    add_history(line);
+	    }
 #  else /* builtin readline */
-	    add_history(line);
+	    if (!is_history_command(line))
+		add_history(line);
 #  endif
 	}
     }

@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.983 2016/03/10 22:59:10 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.984 2016/03/22 04:34:26 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -5129,10 +5129,13 @@ Ffigure_jitter
 2 history
 ?commands history
 ?history
- The `history` command print or saves previous commands in the history list,
- or reexecutes an previous entry in the list.  To modify the behavior of this
+ The `history` command prints or saves previous commands in the history list,
+ or reexecutes a previous entry in the list.  To modify the behavior of this
  command, see `set history`.
 
+ Input lines with `history` as their first command are not stored in the
+ command history.
+ 
  Examples:
 
        history               # show the complete history
