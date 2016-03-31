@@ -1,3 +1,14 @@
+2016-03-31  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/history.c (add_history):  The documentation states that 
+	"set history N" will save N lines on history to a file on program exit.
+	This is true in practice for both the readline-based history code and
+	the built-in history code.  However the builtin code also truncates and
+	renumbers the active history list in the current session.  This makes
+	the numbers essentially useless once the list reaches N entries.
+	Remove this unwanted secondary effect in the built-in version.
+	Bug #1763.
+
 2016-03-30  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* config/mingw/Makefile:  Use local version of gnuplot to generate
