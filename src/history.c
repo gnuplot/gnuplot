@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: history.c,v 1.30 2013/12/15 01:46:10 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: history.c,v 1.31 2013/12/17 00:49:52 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - history.c */
@@ -95,7 +95,11 @@ add_history(char *line)
 	entry = entry->prev;
     }				/* end of not-storing duplicated entries */
 
-#ifdef GNUPLOT_HISTORY
+#if (0)
+    /* This code block breaks "history !<number>" because it renumbers the  */
+    /* entries before retrieving the requested number.  Also it potentially */
+    /* truncates the list on every command contrary to the documentattion.  */
+
     /* limit size of history list to "gnuplot_history_size" */
     if (gnuplot_history_size != -1) {
 	while ((hist_count >= gnuplot_history_size) && (first_entry != NULL)) {
