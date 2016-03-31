@@ -15,6 +15,9 @@
 	Remove this unwanted secondary effect in the built-in version.
 	Bug #1763.
 
+	* src/axis.c (gen_tics):  Promote logscale base from 0 to 10 on entry
+	rather than later having to test for nonzero each time.
+
 2016-03-30  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* config/mingw/Makefile:  Use local version of gnuplot to generate
