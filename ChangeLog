@@ -1,3 +1,12 @@
+2016-04-01  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/term_api.h src/graphics.c term/qt.trm:  The qt terminal output
+	for "with image pixels" suffers from bad inter-pixel artifacts. This
+	seems due to use of term->fillbox() rather than term->filled_polygon().
+	the qt fillbox routine is probably fixable but for now we add a 
+	terminal flag TERM_POLYGON_PIXELS that tells the image code to use
+	polygons instead.
+
 2016-03-31  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/command.c (rlgets) docs/gnuplot.doc:  Do not add lines to 

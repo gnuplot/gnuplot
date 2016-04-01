@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.519 2016/03/22 04:34:02 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.520 2016/03/25 20:58:02 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -4751,7 +4751,7 @@ process_image(void *plot, t_procimg_action action)
 	    return;
 	}
 
-    } else {	/* no term->image  or "with image failsafe" */
+    } else {	/* no term->image  or "with image pixels" */
 
 	/* Use sum of vectors to compute the pixel corners with respect to its center. */
 	struct {double x; double y; double z;} delta_grid[2], delta_pixel[2];
@@ -4918,7 +4918,8 @@ process_image(void *plot, t_procimg_action action)
 				corners[0].style = FS_TRANSPARENT_SOLID + (alpha<<4);
 			}
 
-			if (rectangular_image && term->fillbox) {
+			if (rectangular_image && term->fillbox
+			&&  !(term->flags & TERM_POLYGON_PIXELS)) {
 			    /* Some terminals (canvas) can do filled rectangles */
 			    /* more efficiently than filled polygons. */
 			    (*term->fillbox)( corners[0].style,

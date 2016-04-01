@@ -1,5 +1,5 @@
 /*
- * $Id: term_api.h,v 1.146 2015/12/30 18:30:56 sfeam Exp $
+ * $Id: term_api.h,v 1.147 2016/02/29 07:07:15 sfeam Exp $
  */
 
 /* GNUPLOT - term_api.h */
@@ -266,6 +266,7 @@ typedef enum t_imagecolor { IC_PALETTE, IC_RGB, IC_RGBA }
 #define TERM_IS_LATEX        (1<<13)	/* text uses TeX markup            */
 #define TERM_EXTENDED_COLOR  (1<<14)	/* uses EXTENDED_COLOR_SPECS       */
 #define TERM_NULL_SET_COLOR  (1<<15)	/* no support for RGB color        */
+#define TERM_POLYGON_PIXELS  (1<<16)	/* filledpolygon rather than fillbox */
 
 /* The terminal interface structure --- heart of the terminal layer.
  *
