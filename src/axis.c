@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.184 2016/03/31 18:38:41 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.185 2016/04/02 17:38:45 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -2262,7 +2262,7 @@ eval_link_function(struct axis *axis, double raw_coord)
     Gcomplex(&link_udf->dummy_values[dummy_var], raw_coord, 0.0);
     evaluate_at(link_udf->at, &a);
 
-    if (a.type != CMPLX) {
+    if (undefined || a.type != CMPLX) {
 	FPRINTF((stderr, "eval_link_function(%g) returned %s\n",
 		raw_coord, undefined ? "undefined" : "unexpected type"));
 	a = udv_NaN->udv_value;
