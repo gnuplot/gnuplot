@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.183 2016/03/25 21:06:43 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.184 2016/03/31 18:38:41 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -952,6 +952,12 @@ gen_tics(struct axis *this, tic_callback callback)
     struct lp_style_type lgrd = grid_lp;
     struct lp_style_type mgrd = mgrid_lp;
 
+    /* gprintf uses log10() of base */
+    double log10_base;
+    if (this->base == 0.0)
+	this->base = 10.0;
+    log10_base = log10(this->base);
+
     if (! this->gridmajor)
 	lgrd.l_type = LT_NODRAW;
     if (! this->gridminor)
@@ -968,8 +974,6 @@ gen_tics(struct axis *this, tic_callback callback)
 	double internal_min = this->min - SIGNIF * uncertain;
 	double internal_max = this->max + SIGNIF * uncertain;
 	double polar_shift = 0;
-	/* This allows gprintf formats %L %l to work even when log scaling is off */
-	double log10_base = this->base > 0.0 ? log10(this->base) : 1.0;
 
 	/* polar labels always +ve, and if rmin has been set, they are
 	 * relative to rmin.
@@ -1063,13 +1067,6 @@ gen_tics(struct axis *this, tic_callback callback)
 	double lmin = this->min, lmax = this->max;
 	double internal_min, internal_max;	/* to allow for rounding errors */
 	double ministart = 0, ministep = 1, miniend = 1;	/* internal or user - depends on step */
-
-	/* gprintf uses log10() of base */
-	double log10_base;
-
-	if (this->base == 0.0)
-	    this->base = 10.0;
-	log10_base = log10(this->base);
 
 	if (lmax < lmin) {
 	    /* hmm - they have set reversed range for some reason */
