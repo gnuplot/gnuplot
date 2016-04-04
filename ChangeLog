@@ -1,3 +1,12 @@
+2016-04-04  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/graphics.c (process_image):  There is not currently a fool-proof
+	mechanism for inferring image dimension from a set of x/y/z coords read
+	as ascii data.  But we can do better than transposing the row/column
+	count by mistake.  Note that this same transposition was previously 
+	fixed for the case of ascii matrix data input (Bug #1654)
+	Bug #1767
+
 2016-04-02  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/axis.c (eval_link_function):  Test for "undefined" status on
@@ -8,7 +17,7 @@
 	* src/term_api.h src/graphics.c term/qt.trm:  The qt terminal output
 	for "with image pixels" suffers from bad inter-pixel artifacts. This
 	seems due to use of term->fillbox() rather than term->filled_polygon().
-	the qt fillbox routine is probably fixable but for now we add a 
+	The qt fillbox routine is probably fixable but for now we add a 
 	terminal flag TERM_POLYGON_PIXELS that tells the image code to use
 	polygons instead.
 
