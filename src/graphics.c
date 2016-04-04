@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.464.2.22 2016/03/18 22:15:48 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.464.2.23 2016/03/22 04:40:27 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -4306,18 +4306,18 @@ plot_image_or_update_axes(void *plot, TBOOLEAN update_axes)
     /* with individual coords rather than via array, matrix, or image format.	*/
     /* This might better be done when the data is entered rather than here.	*/
     if (L == 0 || K == 0) {
-	if (points[0].y == points[1].y) {
-	    for (K = 0; points[K].y == points[0].y; K++)
+	if (points[0].x == points[1].x) {
+	    for (K = 0; points[K].x == points[0].x; K++)
 		    if (K >= p_count)
 			    break;
 	    L = p_count / K;
 	} else {
-	    for (L = 0; points[L].x == points[0].x; L++)
+	    for (L = 0; points[L].y == points[0].y; L++)
 		    if (L >= p_count)
 			    break;
 	    K = p_count / L;
 	}
-	FPRINTF((stderr, "No dimension information for %d pixels total. Try %d x %d",
+	FPRINTF((stderr, "No dimension information for %d pixels total. Try %d x %d\n",
 		p_count, L, K));
     }
 

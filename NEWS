@@ -5,6 +5,7 @@ Changes in 5.0.4
 * CHANGE do not truncate or renumber history items in the active session
 * FIX placement of objects and labels using linked secondary axis coordinates
 * FIX 'set term qt <N> close' acts immediately rather than after next mouse event
+* FIX transposition of row/column count in plotting ascii x/y/z data "with image"
 
 Changes in 5.0.3
 ================
