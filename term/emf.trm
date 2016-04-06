@@ -1,5 +1,5 @@
 /* Hey Emacs this is -*- C -*-
- * $Id: emf.trm,v 1.99 2014/08/20 04:42:44 sfeam Exp $
+ * $Id: emf.trm,v 1.100 2015/04/07 18:14:46 sfeam Exp $
  */
 
 /* GNUPLOT - emf.trm */
@@ -1915,7 +1915,9 @@ ENHemf_put_text(unsigned int x, unsigned int y, const char *str)
     }
 
     /* Restore everything we messed with */
-    EMF_setfont(); /* Necessary? */
+    EMF_setfont();
+    free(emf_last_fontname);	/* invalidate any previous font */
+    emf_last_fontname = NULL;
     ENHemf_base = 0;
 }
 

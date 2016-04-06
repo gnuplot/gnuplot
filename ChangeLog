@@ -1,3 +1,12 @@
+2016-04-06  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/emf.trm:  Enhanced text mode was over-zealously skipping new
+	set_font requests if successive writes requested the same font+property.
+	This caused it to lose italic/bold/etc properties.
+	Prevent this by clearing the font history at the end of each enhanced
+	text write.
+	Bug #1772
+
 2016-04-04  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c (process_image):  There is not currently a fool-proof
