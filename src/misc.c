@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.201 2015/12/29 20:31:42 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.202 2016/02/29 07:07:15 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -54,8 +54,11 @@ static char *RCSid() { return RCSid("$Id: misc.c,v 1.201 2015/12/29 20:31:42 sfe
 #if defined(HAVE_DIRENT_H)
 # include <sys/types.h>
 # include <dirent.h>
-#elif defined(_Windows)
-# include <windows.h>
+#elif defined(_WIN32)
+/* Windows version of opendir() and friends in stdfn.c */
+# ifdef __WATCOM
+#  include <direct.h>
+# endif
 #endif
 
 static char *recursivefullname __PROTO((const char *path, const char *filename, TBOOLEAN recursive));
@@ -594,20 +597,17 @@ loadpath_fopen(const char *filename, const char *mode)
 
 	if (fullname)
 	    free(fullname);
-
     }
 
-#ifdef _Windows
+#ifdef _WIN32
     if (fp != NULL)
-	setmode(fileno(fp), _O_BINARY);
+	_setmode(_fileno(fp), _O_BINARY);
 #endif
     return fp;
 }
 
 
 /* Harald Harders <h.harders@tu-bs.de> */
-/* Thanks to John Bollinger <jab@bollingerbands.com> who has tested the
-   windows part */
 static char *
 recursivefullname(const char *path, const char *filename, TBOOLEAN recursive)
 {
@@ -629,7 +629,7 @@ recursivefullname(const char *path, const char *filename, TBOOLEAN recursive)
     }
 
     if (recursive) {
-#ifdef HAVE_DIRENT_H
+#if defined HAVE_DIRENT_H || defined(_WIN32)
 	DIR *dir;
 	struct dirent *direntry;
 	struct stat buf;
@@ -637,7 +637,7 @@ recursivefullname(const char *path, const char *filename, TBOOLEAN recursive)
 	dir = opendir(path);
 	if (dir) {
 	    while ((direntry = readdir(dir)) != NULL) {
-		char *fulldir = gp_alloc(strlen(path) + 1 + strlen(direntry->d_name) + 1,
+		char *fulldir = (char *) gp_alloc(strlen(path) + 1 + strlen(direntry->d_name) + 1,
 					 "fontpath_fullname");
 		strcpy(fulldir, path);
 #  if defined(VMS)
@@ -661,34 +661,6 @@ recursivefullname(const char *path, const char *filename, TBOOLEAN recursive)
 	    }
 	    closedir(dir);
 	}
-#elif defined(_Windows)
-	HANDLE filehandle;
-	WIN32_FIND_DATA finddata;
-	char *pathwildcard = gp_alloc(strlen(path) + 2, "fontpath_fullname");
-
-	strcpy(pathwildcard, path);
-	PATH_CONCAT(pathwildcard, "*");
-
-	filehandle = FindFirstFile(pathwildcard, &finddata);
-	free(pathwildcard);
-	if (filehandle != INVALID_HANDLE_VALUE)
-	    do {
-		if ((finddata.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) &&
-		    (strcmp(finddata.cFileName, ".") != 0) &&
-		    (strcmp(finddata.cFileName, "..") != 0)) {
-		    char *fulldir = gp_alloc(strlen(path) + 1 + strlen(finddata.cFileName) + 1,
-					     "fontpath_fullname");
-		    strcpy(fulldir, path);
-		    PATH_CONCAT(fulldir, finddata.cFileName);
-
-		    fullname = recursivefullname(fulldir, filename, TRUE);
-		    free(fulldir);
-		    if (fullname != NULL)
-			break;
-		}
-	    } while (FindNextFile(filehandle, &finddata) != 0);
-	FindClose(filehandle);
-
 #else
 	int_warn(NO_CARET, "Recursive directory search not supported\n\t('%s!')", path);
 #endif
@@ -728,7 +700,6 @@ fontpath_fullname(const char *filename)
 	    }
 	    free(path);
 	}
-
     } else
 	fullname = gp_strdup(filename);
 

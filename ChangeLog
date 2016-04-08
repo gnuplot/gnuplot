@@ -1,3 +1,9 @@
+2016-04-08  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/util.c (existdir) src/misc.c (recursivefullname):  Use Windows
+	implementations of getdir() and friends in stdfn.c instead of platform
+	specific code (or the ones provided by OpenWatcom).
+
 2016-04-06  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/emf.trm:  Enhanced text mode was over-zealously skipping new

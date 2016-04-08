@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: util.c,v 1.136 2016/02/07 22:15:36 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: util.c,v 1.137 2016/02/29 02:51:10 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - util.c */
@@ -49,11 +49,12 @@ static char *RCSid() { return RCSid("$Id: util.c,v 1.136 2016/02/07 22:15:36 sfe
 #if defined(HAVE_DIRENT_H)
 # include <sys/types.h>
 # include <dirent.h>
-#elif defined(_Windows)
+#elif defined(_WIN32)
 # include <windows.h>
 #endif
 #if defined(__MSC__) || defined (__WATCOMC__)
 # include <io.h>
+# include <direct.h>
 #endif
 
 /* Exported (set-table) variables */
@@ -1264,25 +1265,15 @@ parse_esc(char *instr)
 /* FIXME HH 20020915: This function does nothing if dirent.h and windows.h
  * not available. */
 TBOOLEAN
-existdir (const char *name)
+existdir(const char *name)
 {
-#ifdef HAVE_DIRENT_H
+#if defined(HAVE_DIRENT_H ) || defined(_WIN32)
     DIR *dp;
-    if (! (dp = opendir(name) ) )
+    if ((dp = opendir(name)) == NULL)
 	return FALSE;
 
     closedir(dp);
     return TRUE;
-#elif defined(_Windows)
-    HANDLE FileHandle;
-    WIN32_FIND_DATA finddata;
-
-    FileHandle = FindFirstFile(name, &finddata);
-    if (FileHandle != INVALID_HANDLE_VALUE) {
-	if (finddata.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
-	    return TRUE;
-    }
-    return FALSE;
 #elif defined(VMS)
     return FALSE;
 #else
