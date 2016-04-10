@@ -1,3 +1,8 @@
+2016-04-10  Tatsuro MATSUOKA  <tmacchant3@yahoo.co.jp>
+
+	* win/gnuplot.iss: Remove <BOM> marker from start of file, since this
+	makes autoconfigure fail on MinGW.
+
 2016-04-08  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/util.c (existdir) src/misc.c (recursivefullname):  Use Windows
