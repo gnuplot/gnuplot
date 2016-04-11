@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.380 2016/03/17 04:23:01 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.381 2016/03/25 21:06:43 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -306,9 +306,9 @@ refresh_bounds(struct curve_points *first_plot, int nplots)
 	 */
 	if (!this_plot->noautoscale) {
 	    if (x_axis->set_autoscale & AUTOSCALE_MIN && x_axis->data_min < x_axis->min)
-		 x_axis->min = x_axis->data_min;
+		 x_axis->min = axis_log_value(x_axis, x_axis->data_min);
 	    if (x_axis->set_autoscale & AUTOSCALE_MAX && x_axis->data_max > x_axis->max)
-		 x_axis->max = x_axis->data_max;
+		 x_axis->max = axis_log_value(x_axis, x_axis->data_max);
 	}
 
 	for (i=0; i<this_plot->p_count; i++) {
