@@ -1,3 +1,11 @@
+2016-04-11  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/plot2d.c (refresh_bounds):  Patch from 2016-01-18 to fix bug 
+	#1709 introduced a regression.   Minimal example:
+		'set log x; plot '-'; replot' 
+	failed to delog/log the updated min/max axis limits.
+	Bug #1774	
+
 2016-04-06  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/emf.trm:  Enhanced text mode was over-zealously skipping new
