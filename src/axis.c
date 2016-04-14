@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.135.2.8 2015/11/10 03:51:19 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.135.2.9 2015/11/10 18:24:58 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -2135,6 +2135,7 @@ void
 clone_linked_axes(AXIS_INDEX axis2, AXIS_INDEX axis1)
 {
     double testmin, testmax;
+    TBOOLEAN suspect = FALSE;
 
     memcpy(&axis_array[axis2], &axis_array[axis1], AXIS_CLONE_SIZE);
     if (axis_array[axis2].link_udf == NULL || axis_array[axis2].link_udf->at == NULL)
@@ -2150,14 +2151,18 @@ clone_linked_axes(AXIS_INDEX axis2, AXIS_INDEX axis1)
 	||  isnan(axis_array[axis2].max) || isnan(axis_array[axis2].set_max))
 	    int_warn(NO_CARET, "axis mapping function must return a real value");
 
-    /* Confirm that the inverse mapping actually works */
+    /* Confirm that the inverse mapping actually works, at least at the endpoints */
     /* FIXME:  Should we test values in between the endpoints also? */
 	testmin = eval_link_function(axis1, axis_array[axis2].set_min);
 	testmax = eval_link_function(axis1, axis_array[axis2].set_max);
-	if (fabs((testmin - axis_array[axis1].set_min) / testmin) < 1.e-6
-	&&  fabs((testmax - axis_array[axis1].set_max) / testmax) < 1.e-6) {
-	    /* OK */
-	} else {
+	if (fabs(testmin - axis_array[axis1].set_min) != 0
+	&&  fabs((testmin - axis_array[axis1].set_min) / testmin) > 1.e-6)
+	    suspect = TRUE;
+	if (fabs(testmax - axis_array[axis1].set_max) != 0
+	&&  fabs((testmax - axis_array[axis1].set_max) / testmax) > 1.e-6)
+	    suspect = TRUE;
+
+	if (suspect) {
 	    int_warn(NO_CARET, "could not confirm linked axis inverse mapping function");
 	    fprintf(stderr,"\tmin: %g inv(via(min)): %g", axis_array[axis1].set_min, testmin);
 	    fprintf(stderr,"  max: %g inv(via(max)): %g\n", axis_array[axis1].set_max, testmax);
