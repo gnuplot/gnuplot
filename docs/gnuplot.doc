@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.984 2016/03/22 04:34:26 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.985 2016/03/31 09:48:11 markisch Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -2569,8 +2569,10 @@ Ffigure_newsyntax
       plot f(x) dt 11           # plot using our new dashtype
 
  If you specify a dash pattern using a string the program will convert this to
- a sequence of <solid>,<empty> pairs.  The command `show dashtype` will show both
- the original string and the converted numerical sequence.
+ a sequence of <solid>,<empty> pairs. Dot "." becomes (2,5), dash "-" becomes
+ (10,10), underscore "_" becomes (20,10), and each space character " " adds 10
+ to the previous <empty> value.  The command `show dashtype` will show both the
+ original string and the converted numerical sequence.
 
 3 linestyles vs linetypes
 ?linestyles vs linetypes
@@ -4022,6 +4024,9 @@ Ffigure_points
  as in the example below.  Longer strings may be plotted using the plot style
  `labels` rather than `points`.
 
+      plot sin(x) with points pt "#"
+
+ You may use any utf-8 character as the pointtype.  See `set encoding utf8`.
 =variable
 ?variable
 ?variable pointtype
@@ -9251,12 +9256,10 @@ Ffigure_missing
                   | {linetype | lt <major_linetype>}
                     {linewidth | lw <major_linewidth>}
                     {linecolor | lc <major_colorspec>}
-                    {dashtype | dt <major_dashtype>}
                   { , {linestyle | ls <minor_linestyle>}
                       | {linetype | lt <minor_linetype>}
                         {linewidth | lw <minor_linewidth>}
-                        {linecolor | lc <minor_colorspec>}
-                        {dashtype | dt <minor_dashtype>} } }
+                        {linecolor | lc <minor_colorspec>} }
        unset grid
        show grid
 
