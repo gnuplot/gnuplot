@@ -2,6 +2,10 @@
 
 	* docs/gnuplot.doc:  Edits to description of dashtype and pt <char>.
 
+	* src/term.c:  Windows requires mode "wb" for pipe output, BSD requires
+	"w" (no "b" character), linux will accept either.
+	Bug #1756
+
 2016-04-11  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/plot2d.c (refresh_bounds):  Patch from 2016-01-18 to fix bug 
