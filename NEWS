@@ -3,6 +3,7 @@ Changes in 5.0.4
 * CHANGE minimum linewidth of all cairo terminals is now 0.2 pt
 * CHANGE in-line datablock lines are not limited to 1024 characters
 * CHANGE do not truncate or renumber history items in the active session
+* CHANGE (Windows only) open piped output using mode "wb" rather than "w"
 * FIX placement of objects and labels using linked secondary axis coordinates
 * FIX 'set term qt <N> close' acts immediately rather than after next mouse event
 * FIX transposition of row/column count in plotting ascii x/y/z data "with image"

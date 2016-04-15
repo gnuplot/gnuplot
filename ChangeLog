@@ -1,3 +1,9 @@
+2016-04-15  Shigeharu Takeno  <shige@iee.niit.ac.jp>
+
+	* src/term.c:  Windows requires mode "wb" for pipe output, BSD requires
+	"w" (no "b" character), linux will accept either.
+	Bug #1756
+
 2016-04-14  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c (clone_linked_axes):  Backport cleanup of tests for
