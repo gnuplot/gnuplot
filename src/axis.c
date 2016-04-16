@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.185 2016/04/02 17:38:45 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.186 2016/04/02 18:14:53 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -64,7 +64,7 @@ const AXIS_DEFAULTS axis_defaults[AXIS_ARRAY_SIZE] = {
     { -10, 10, "y" , TICS_ON_BORDER | TICS_MIRROR, },
     { -10, 10, "x" , TICS_ON_BORDER | TICS_MIRROR, },
     { -10, 10, "cb", TICS_ON_BORDER | TICS_MIRROR, },
-    { -10, 10, "z2", NO_TICS,                      },
+    { -10, 10, " z2", NO_TICS,                     },
     { -10, 10, "y2", NO_TICS,                      },
     { -10, 10, "x2", NO_TICS,                      },
     { - 0, 10, "r" , TICS_ON_AXIS,                 },
@@ -87,7 +87,7 @@ const struct gen_table axisname_tbl[] =
     { "y", FIRST_Y_AXIS},
     { "x", FIRST_X_AXIS},
     { "cb",COLOR_AXIS},
-    { "z2",SECOND_Z_AXIS},
+    { " z2",SECOND_Z_AXIS},
     { "y2",SECOND_Y_AXIS},
     { "x2",SECOND_X_AXIS},
     { "r", POLAR_AXIS},

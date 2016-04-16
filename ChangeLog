@@ -13,6 +13,8 @@
 
 	* src/fit.c (fit_command): Avoid using globals x_axis/y_axis/z_axis.
 
+	* src/axis.c:  Disallow commands affecting z2, e.g. "set log z2" 
+
 2016-04-15  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* docs/gnuplot.doc:  Edits to description of dashtype and pt <char>.
