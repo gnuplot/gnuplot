@@ -1827,9 +1827,14 @@ fit_command()
     int token1, token2, token3;
     char *tmp, *file_name;
     TBOOLEAN zero_initial_value;
-    AXIS *x_axis = &axis_array[FIRST_X_AXIS];
-    AXIS *y_axis = &axis_array[FIRST_Y_AXIS];
-    AXIS *z_axis = &axis_array[FIRST_Z_AXIS];
+    AXIS *fit_xaxis, *fit_yaxis, *fit_zaxis;
+
+    x_axis = FIRST_X_AXIS;
+    y_axis = FIRST_Y_AXIS;
+    z_axis = FIRST_Z_AXIS;
+    fit_xaxis = &axis_array[FIRST_X_AXIS];
+    fit_yaxis = &axis_array[FIRST_Y_AXIS];
+    fit_zaxis = &axis_array[FIRST_Z_AXIS];
 
     c_token++;
 
@@ -1839,25 +1844,25 @@ fit_command()
      * Historically variables 3-5 inherited the current range of t, u, and v
      * but no longer.  NB: THIS IS A CHANGE
      */
-    axis_init(x_axis, 0);
-    axis_init(y_axis, 0);
-    axis_init(z_axis, 1);
+    axis_init(fit_xaxis, 0);
+    axis_init(fit_yaxis, 0);
+    axis_init(fit_zaxis, 1);
     for (i = 0; i < MAX_NUM_VAR+1; i++)
 	dummy_token[i] = -1;
-    range_min[0] = x_axis->min;
-    range_max[0] = x_axis->max;
-    range_autoscale[0] = x_axis->autoscale;
-    range_min[1] = y_axis->min;
-    range_max[1] = y_axis->max;
-    range_autoscale[1] = y_axis->autoscale;
+    range_min[0] = fit_xaxis->min;
+    range_max[0] = fit_xaxis->max;
+    range_autoscale[0] = fit_xaxis->autoscale;
+    range_min[1] = fit_yaxis->min;
+    range_max[1] = fit_yaxis->max;
+    range_autoscale[1] = fit_yaxis->autoscale;
     for (i = 2; i < MAX_NUM_VAR; i++) {
 	range_min[i] = VERYLARGE;
 	range_max[i] = -VERYLARGE;
 	range_autoscale[i] = AUTOSCALE_BOTH;
     }
-    range_min[iz] = z_axis->min;
-    range_max[iz] = z_axis->max;
-    range_autoscale[iz] = z_axis->autoscale;
+    range_min[iz] = fit_zaxis->min;
+    range_max[iz] = fit_zaxis->max;
+    range_autoscale[iz] = fit_zaxis->autoscale;
 
     num_ranges = 0;
     while (equals(c_token, "[")) {
