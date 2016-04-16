@@ -15,6 +15,9 @@
 
 	* src/axis.c:  Disallow commands affecting z2, e.g. "set log z2" 
 
+	* src/graphics.c (attach_title_to_plot): Bad things happen if you try
+	to attach a title to the end point of a plot with no points (NODATA).
+
 2016-04-15  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* docs/gnuplot.doc:  Edits to description of dashtype and pt <char>.

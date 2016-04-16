@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.521 2016/04/01 16:19:41 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.522 2016/04/04 23:34:48 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -3946,6 +3946,9 @@ attach_title_to_plot(struct curve_points *this_plot, legend_key *key)
     struct termentry *t = term;
     int index, x, y;
 
+    if (this_plot->plot_type == NODATA)
+	return;
+
     /* beginning or end of plot trace */
     if (this_plot->title_position->x > 0) {
 	for (index=this_plot->p_count-1; index > 0; index--)
@@ -3956,6 +3959,8 @@ attach_title_to_plot(struct curve_points *this_plot, legend_key *key)
 	    if (this_plot->points[index].type == INRANGE)
 		break;
     }
+    if (this_plot->points[index].type != INRANGE)
+	return;
     x = map_x(this_plot->points[index].x);
     y = map_y(this_plot->points[index].y);
 
