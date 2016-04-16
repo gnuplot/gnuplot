@@ -1827,13 +1827,11 @@ fit_command()
     int token1, token2, token3;
     char *tmp, *file_name;
     TBOOLEAN zero_initial_value;
+    AXIS *x_axis = &axis_array[FIRST_X_AXIS];
+    AXIS *y_axis = &axis_array[FIRST_Y_AXIS];
+    AXIS *z_axis = &axis_array[FIRST_Z_AXIS];
 
     c_token++;
-
-    /* FIXME EAM - I don't understand what these are needed for. */
-    x_axis = FIRST_X_AXIS;
-    y_axis = FIRST_Y_AXIS;
-    z_axis = FIRST_Z_AXIS;
 
     /* First look for a restricted fit range... */
     /* Start with the current range limits on variable 1 ("x"),
@@ -1841,25 +1839,25 @@ fit_command()
      * Historically variables 3-5 inherited the current range of t, u, and v
      * but no longer.  NB: THIS IS A CHANGE
      */
-    AXIS_INIT3D(x_axis, 0, 0);
-    AXIS_INIT3D(y_axis, 0, 0);
-    AXIS_INIT3D(z_axis, 0, 1);
+    axis_init(x_axis, 0);
+    axis_init(y_axis, 0);
+    axis_init(z_axis, 1);
     for (i = 0; i < MAX_NUM_VAR+1; i++)
 	dummy_token[i] = -1;
-    range_min[0] = axis_array[x_axis].min;
-    range_max[0] = axis_array[x_axis].max;
-    range_autoscale[0] = axis_array[x_axis].autoscale;
-    range_min[1] = axis_array[y_axis].min;
-    range_max[1] = axis_array[y_axis].max;
-    range_autoscale[1] = axis_array[y_axis].autoscale;
+    range_min[0] = x_axis->min;
+    range_max[0] = x_axis->max;
+    range_autoscale[0] = x_axis->autoscale;
+    range_min[1] = y_axis->min;
+    range_max[1] = y_axis->max;
+    range_autoscale[1] = y_axis->autoscale;
     for (i = 2; i < MAX_NUM_VAR; i++) {
 	range_min[i] = VERYLARGE;
 	range_max[i] = -VERYLARGE;
 	range_autoscale[i] = AUTOSCALE_BOTH;
     }
-    range_min[iz] = axis_array[z_axis].min;
-    range_max[iz] = axis_array[z_axis].max;
-    range_autoscale[iz] = axis_array[z_axis].autoscale;
+    range_min[iz] = z_axis->min;
+    range_max[iz] = z_axis->max;
+    range_autoscale[iz] = z_axis->autoscale;
 
     num_ranges = 0;
     while (equals(c_token, "[")) {
@@ -1925,8 +1923,8 @@ fit_command()
 	Eexc(c_token, "Need more than 1 input data column");
 
     /* Allow time data only on first two dimensions (x and y) */
-    df_axis[0] = x_axis;
-    df_axis[1] = y_axis;
+    df_axis[0] = FIRST_X_AXIS;
+    df_axis[1] = FIRST_Y_AXIS;
 
     /* BM: New options to distinguish fits with and without errors */
     /* reset error columns */
