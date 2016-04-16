@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.335 2016/03/17 21:29:43 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.336 2016/04/16 04:01:06 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -507,7 +507,7 @@ get_arrow3d(
 	map3d_position_r(&(arrow->end), ex, ey, "arrow");
 	*ex += *sx;
 	*ey += *sy;
-    } if (arrow->type == arrow_end_oriented) {
+    } else if (arrow->type == arrow_end_oriented) {
 	double aspect = (double)term->v_tic / (double)term->h_tic;
 	double radius;
 	int junkw, junkh;
