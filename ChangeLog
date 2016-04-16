@@ -1,3 +1,11 @@
+2016-04-16  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/util3d.c (apply_3dhead_properties) src/util3d.h src/hidden3d.c
+	src/graph3d.c:  After consolidation of 2D and 3D axis initialization
+	into axis_set_scale_and_range() (3-Mar-2016) there is no longer any
+	reason to have separate 2D and 3D versions of apply_head_properties
+	for arrows.
+
 2016-04-15  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* docs/gnuplot.doc:  Edits to description of dashtype and pt <char>.

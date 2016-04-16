@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.111 2016/02/29 07:07:15 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.112 2016/03/17 21:29:43 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - hidden3d.c */
@@ -1204,7 +1204,7 @@ build_networks(struct surface_points *plots, int pcount)
 		this_plot->arrow_properties.head_length= 1;
 		this_plot->arrow_properties.head_angle = 0;
 	    }
-	    apply_3dhead_properties(&(this_plot->arrow_properties));
+	    apply_head_properties(&(this_plot->arrow_properties));
 	}
 
 	/* HBB 20000715: new initialization code block for non-grid
