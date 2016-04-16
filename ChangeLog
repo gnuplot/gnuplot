@@ -1,3 +1,8 @@
+2016-04-16  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/graph3d.c (get_arrow3d):  Fix typo introduced in 5.0 that caused
+	arrows defined by "from ... rto ..." to be mangled in 3D plots.
+
 2016-04-15  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* src/term.c:  Windows requires mode "wb" for pipe output, BSD requires
