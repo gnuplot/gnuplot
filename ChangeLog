@@ -9,6 +9,8 @@
 	* src/graph3d.c (get_arrow3d):  Fix typo introduced in 5.0 that caused
 	arrows defined by "from ... rto ..." to be mangled in 3D plots.
 
+	* src/fit.c (fit_command): Replace misleading use of SECOND_Z_AXIS.
+
 2016-04-15  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* docs/gnuplot.doc:  Edits to description of dashtype and pt <char>.

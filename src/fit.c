@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: fit.c,v 1.159 2016/01/06 05:21:57 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: fit.c,v 1.160 2016/02/11 08:34:06 markisch Exp $"); }
 #endif
 
 /*  NOTICE: Change of Copyright Status
@@ -1863,15 +1863,14 @@ fit_command()
 
     num_ranges = 0;
     while (equals(c_token, "[")) {
+	AXIS *scratch_axis = &axis_array[SAMPLE_AXIS];
 	if (i > MAX_NUM_VAR)
 	    Eexc(c_token, "too many range specifiers");
-	/* NB: This has nothing really to do with the Z axis, we're */
-	/* just using that slot of the axis array as scratch space. */
-	AXIS_INIT3D(SECOND_Z_AXIS, 0, 1);
-	dummy_token[num_ranges] = parse_range(SECOND_Z_AXIS);
-	range_min[num_ranges] = axis_array[SECOND_Z_AXIS].min;
-	range_max[num_ranges] = axis_array[SECOND_Z_AXIS].max;
-	range_autoscale[num_ranges] = axis_array[SECOND_Z_AXIS].autoscale;
+	axis_init(scratch_axis, 1);
+	dummy_token[num_ranges] = parse_range(scratch_axis->index);
+	range_min[num_ranges] = scratch_axis->min;
+	range_max[num_ranges] = scratch_axis->max;
+	range_autoscale[num_ranges] = scratch_axis->autoscale;
 	num_ranges++;
     }
 
