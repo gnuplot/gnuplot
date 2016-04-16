@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.296 2016/03/10 22:59:50 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.297 2016/03/13 23:28:55 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -257,7 +257,7 @@ save_set_all(FILE *fp)
 	fputs("unset border\n", fp);
 
     for (axis = 0; axis < NUMBER_OF_MAIN_VISIBLE_AXES; axis++) {
-	if (axis == SECOND_Z_AXIS) continue;
+	if (axis == SAMPLE_AXIS) continue;
 	if (axis == COLOR_AXIS) continue;
 	if (axis == POLAR_AXIS) continue;
 	fprintf(fp, "set %sdata %s\n", axis_name(axis),
