@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.464.2.24 2016/04/04 23:34:32 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.464.2.25 2016/04/17 17:44:41 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -4313,18 +4313,20 @@ plot_image_or_update_axes(void *plot, TBOOLEAN update_axes)
     /* This might better be done when the data is entered rather than here.	*/
     if (L == 0 || K == 0) {
 	if (points[0].x == points[1].x) {
+	    /* y coord varies fastest */
 	    for (K = 0; points[K].x == points[0].x; K++)
 		    if (K >= p_count)
 			    break;
 	    L = p_count / K;
 	} else {
-	    for (L = 0; points[L].y == points[0].y; L++)
-		    if (L >= p_count)
+	    /* x coord varies fastest */
+	    for (K = 0; points[K].y == points[0].y; K++)
+		    if (K >= p_count)
 			    break;
-	    K = p_count / L;
+	    L = p_count / K;
 	}
-	FPRINTF((stderr, "No dimension information for %d pixels total. Try %d x %d\n",
-		p_count, L, K));
+	fprintf(stderr, "No dimension information for %d pixels total. Try %d x %d\n",
+		p_count, L, K);
     }
 
     grid_corner[0] = 0;

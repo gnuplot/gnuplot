@@ -1,3 +1,12 @@
+2016-04-20  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/graphics.c (process_image):  There are two paths through the
+	code that extracts image data from an ascii input stream, depending
+	on whether the x or y coordinate varies fastest.  The fix for Bug #1767
+	corrected one path but broke the other.  Now we fix the broken path so
+	that both are working, at least on test data.
+	Bug #1782
+
 2016-04-16  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graph3d.c (get_arrow3d):  Fix typo introduced in 5.0 that caused
