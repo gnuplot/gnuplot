@@ -1,5 +1,5 @@
-;
-; $Id: gnuplot.iss,v 1.12 2016/03/06 19:23:41 markisch Exp $
+﻿;
+; $Id: gnuplot.iss,v 1.13 2016/04/11 03:16:32 sfeam Exp $
 ;
 ; GNUPLOT - gnuplot.iss
 ;
