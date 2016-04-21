@@ -1,3 +1,12 @@
+2016-04-21  Tatsuro MATSUOKA  <tmacchant3@yahoo.co.jp>
+
+	* win/gnuplot.iss: Restore <BOM> to indicate utf-8 enconding.
+	Reverts change 2016-04-10
+
+	* config/mingw/Makefile:  Add warning that it is required to use the
+	unicode version of Inno Setup Compiler rather than the standard version
+	because gnuplot.iss is now encoded utf-8 with BOM.
+
 2016-04-20  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c (process_image):  There are two paths through the
@@ -46,7 +55,7 @@
 2016-04-10  Tatsuro MATSUOKA  <tmacchant3@yahoo.co.jp>
 
 	* win/gnuplot.iss: Remove <BOM> marker from start of file, since this
-	makes autoconfigure fail on MinGW.
+	makes autoconfigure fail on MinGW. >>> NB: Reverted 2016-04-21
 
 2016-04-08  Bastian Maerkisch  <bmaerkisch@web.de>
 

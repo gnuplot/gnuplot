@@ -1,5 +1,5 @@
 # Hello, emacs: this is a -*- Makefile -*-
-# $Id: Makefile,v 1.58 2016/03/30 09:53:39 markisch Exp $
+# $Id: Makefile,v 1.59 2016/03/30 09:59:45 markisch Exp $
 #
 # GNUPLOT Makefile for MinGW/MSYS or MinGW-w64/MSYS2 on Windows 
 # This assumes a typical installation of the MinGW toolkit, the free
@@ -185,6 +185,8 @@ GNUSORT = /bin/sort
 
 # Inno Setup Compiler
 # get it from: http://www.jrsoftware.org/isdl.php
+# Use unicode version of Inno Setup Compiler but not Standard version
+# because the setup file of gnuplot installer is now encoded utf-8 with BOM.
 ISCC = $(PROGRAMFILES32)/Inno\ Setup\ 5/iscc
 
 # Directory that might contain extra files to be shipped with the installer.
