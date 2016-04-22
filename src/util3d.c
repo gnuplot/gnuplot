@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: util3d.c,v 1.51 2015/10/31 04:36:56 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: util3d.c,v 1.52 2016/04/16 04:01:06 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - util3d.c */
@@ -59,6 +59,11 @@ static char *RCSid() { return RCSid("$Id: util3d.c,v 1.51 2015/10/31 04:36:56 sf
 /* Prototypes for local functions */
 static void mat_unit __PROTO((transform_matrix mat));
 static GP_INLINE void draw3d_point_unconditional __PROTO((p_vertex, struct lp_style_type *));
+
+/* Function macros to map from user 3D space into normalized -1..1 */
+#define map_x3d(x) ((x-X_AXIS.min)*xscale3d + xcenter3d - 1.0)
+#define map_y3d(y) ((y-Y_AXIS.min)*yscale3d + ycenter3d - 1.0)
+#define map_z3d(z) ((z-floor_z)*zscale3d + zcenter3d - 1.0)
 
 static void
 mat_unit(transform_matrix mat)

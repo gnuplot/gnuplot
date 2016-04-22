@@ -1,5 +1,5 @@
 /*
- * $Id: graph3d.h,v 1.48 2015/05/08 00:29:07 sfeam Exp $
+ * $Id: graph3d.h,v 1.49 2016/01/28 23:54:13 sfeam Exp $
  */
 
 /* GNUPLOT - graph3d.h */
@@ -44,11 +44,6 @@
 
 #include "gadgets.h"
 #include "term_api.h"
-
-/* Function macros to map from user 3D space into normalized -1..1 */
-#define map_x3d(x) ((x-X_AXIS.min)*xscale3d + xcenter3d -1.0)
-#define map_y3d(y) ((y-Y_AXIS.min)*yscale3d + ycenter3d -1.0)
-#define map_z3d(z) ((z-floor_z)*zscale3d + zcenter3d -1.0)
 
 /* Type definitions */
 

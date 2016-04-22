@@ -1,3 +1,8 @@
+2016-04-22  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/graph3d.h src/util3d.c:  Move macro map_x3d() and friends from 
+	a shared header to the only file where they are used.
+
 2016-04-21  Tatsuro MATSUOKA  <tmacchant3@yahoo.co.jp>
 
 	* win/gnuplot.iss: Restore <BOM> to indicate utf-8 enconding.
