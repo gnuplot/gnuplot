@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.186 2016/04/02 18:14:53 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.187 2016/04/16 20:39:23 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -56,6 +56,7 @@ static char *RCSid() { return RCSid("$Id: axis.c,v 1.186 2016/04/02 18:14:53 sfe
  * Note: This array is now initialized in reset_command().
  */
 AXIS axis_array[AXIS_ARRAY_SIZE];
+AXIS *shadow_axis_array;		/* Only if nonlinear axes are in use */
 
 /* Keep defaults varying by axis in their own array, to ease initialization
  * of the main array */
@@ -1536,6 +1537,14 @@ axis_set_scale_and_range(struct axis *axis, unsigned int lower, unsigned int upp
     axis->term_scale = (upper - lower) / (axis->max - axis->min);
     axis->term_lower = lower;
     axis->term_upper = upper;
+#ifdef NONLINEAR_AXES
+    if (axis->linked_to_primary && axis->linked_to_primary->index <= 0) {
+	axis = axis->linked_to_primary;
+	axis->term_scale = (upper - lower) / (axis->max - axis->min);
+	axis->term_lower = lower;
+	axis->term_upper = upper;
+    }
+#endif
 }
 /* }}} */
 
@@ -2253,7 +2262,7 @@ eval_link_function(struct axis *axis, double raw_coord)
     int dummy_var;
     struct value a;
 
-    if (axis->index == FIRST_Y_AXIS || axis->index == SECOND_Y_AXIS)
+    if (abs(axis->index) == FIRST_Y_AXIS || abs(axis->index) == SECOND_Y_AXIS)
 	dummy_var = 1;
     else
 	dummy_var = 0;
@@ -2272,6 +2281,39 @@ eval_link_function(struct axis *axis, double raw_coord)
 
     return a.v.cmplx_val.real;
 }
+
+#ifdef NONLINEAR_AXES
+/*
+ * Obtain and initialize a shadow axis.
+ * The details are hidden from the rest of the code (dynamic/static allocation, etc).
+ */
+AXIS *
+get_shadow_axis(AXIS *axis)
+{
+    AXIS *primary = NULL;
+    AXIS *secondary = axis;
+
+    /* This implementation uses a dynamically allocated array of shadow axis	*/
+    /* structures that is allocated on first use and reused after that. 	*/
+    if (!shadow_axis_array) {
+	shadow_axis_array = gp_alloc( 2 * sizeof(AXIS), NULL);
+	memcpy(&shadow_axis_array[0], &default_axis_state, sizeof(AXIS));
+	memcpy(&shadow_axis_array[1], &default_axis_state, sizeof(AXIS));
+    }
+
+    if (axis->index == FIRST_X_AXIS)
+	primary = &shadow_axis_array[0];
+    else if (axis->index == FIRST_Y_AXIS)
+	primary = &shadow_axis_array[1];
+    else
+	int_error(NO_CARET, "invalid shadow axis");
+
+    primary->index = -secondary->index;
+
+    return primary;
+}
+#endif
+
 
 /*
  * Check for linked-axis coordinate transformation given by command

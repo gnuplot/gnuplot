@@ -1,12 +1,19 @@
 2016-04-23  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* configure.ac src/axis.h:  Preparation for nonlinear axis code.
+	Nonlinear axes part 1
 	New configuration option --without-nonlinear-axes will allow to disable
 	code that depends on #ifdef NONLINEAR_AXES.
 
 	* src/graphics.c (adjust_offsets) src/plot2d.c (eval_plots):
 	Revise tests for linked axes to distinguish between "set nonlinear"
 	and "set link".
+
+	* src/axis.c src/axis.h src/command.c src/mouse.c src/plot2d.c src/save.c
+	src/save.h src/set.c src/show.c src/tables.c src/tables.h src/unset.c:
+	Nonlinear axes part 2
+	New command "set nonlinear <axis> via f(axis) inverse g(axis)"
+	At this stage only the x and y axes are supported.
 
 2016-04-22  Ethan A Merritt  <merritt@u.washington.edu>
 

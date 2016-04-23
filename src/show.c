@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.359 2016/02/12 19:53:15 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.360 2016/03/10 22:59:50 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -149,6 +149,7 @@ static void show_mtics __PROTO((AXIS_INDEX));
 static void show_timestamp __PROTO((void));
 static void show_range __PROTO((AXIS_INDEX axis));
 static void show_link __PROTO((void));
+static void show_nonlinear __PROTO((void));
 static void show_xyzlabel __PROTO((const char *name, const char *suffix, text_label * label));
 static void show_title __PROTO((void));
 static void show_axislabel __PROTO((AXIS_INDEX));
@@ -323,6 +324,9 @@ show_command()
 	break;
     case S_LINK:
 	show_link();
+	break;
+    case S_NONLINEAR:
+	show_nonlinear();
 	break;
     case S_KEY:
 	show_key();
@@ -2976,13 +2980,20 @@ static void
 show_link()
 {
     if (END_OF_COMMAND || almost_equals(c_token,"x$2"))
-	if (axis_array[SECOND_X_AXIS].linked_to_primary)
 	    save_link(stderr, axis_array + SECOND_X_AXIS);
     if (END_OF_COMMAND || almost_equals(c_token,"y$2"))
-	if (axis_array[SECOND_Y_AXIS].linked_to_primary)
 	    save_link(stderr, axis_array + SECOND_Y_AXIS);
     if (!END_OF_COMMAND)
 	c_token++;
+}
+
+/* process 'show link' command */
+static void
+show_nonlinear()
+{
+    int axis;
+    for (axis = 0; axis < NUMBER_OF_MAIN_VISIBLE_AXES; axis++)
+	save_nonlinear(stderr, &axis_array[axis]);
 }
 
 /* process 'show locale' command */

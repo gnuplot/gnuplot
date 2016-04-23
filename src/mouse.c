@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: mouse.c,v 1.185 2016/03/04 04:58:03 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: mouse.c,v 1.186 2016/03/13 23:28:55 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - mouse.c */
@@ -382,6 +382,24 @@ MousePosToGraphPosReal(int xx, int yy, double *x, double *y, double *x2, double 
 	if (secondary->linked_to_primary && secondary->link_udf->at)
 	    *y2 = eval_link_function(secondary, *y);
     }
+
+#ifdef NONLINEAR_AXES
+    /* If x or y is linked to a (hidden) primary axis, it's a bit more complicated */
+    if (!is_3d_plot) {
+	AXIS *secondary;
+	secondary = &axis_array[FIRST_X_AXIS];
+	if (secondary->linked_to_primary && secondary->link_udf->at) {
+	    *x = axis_mapback(secondary->linked_to_primary, xx);
+	    *x = eval_link_function(secondary, *x);
+	}
+	secondary = &axis_array[FIRST_Y_AXIS];
+	if (secondary->linked_to_primary && secondary->link_udf->at) {
+	    *y = axis_mapback(secondary->linked_to_primary, yy);
+	    *y = eval_link_function(secondary, *y);
+	}
+    }
+#endif
+
 }
 
 static char *
@@ -684,6 +702,16 @@ apply_zoom(struct t_zoom *z)
 	}
 	memcpy(axis_array, axis_array_copy, sizeof(axis_array));
 	s[0] = '\0';	/* FIXME:  Is this better than calling replotrequest()? */
+
+#ifdef NONLINEAR_AXES
+	/* The shadowed primary axis, if any, is not restored by the memcpy.	*/
+	/* We choose to recalculate the limits, but alternatively we could find	*/
+	/* some place to save/restore the unzoomed limits.			*/
+	if (axis_array[FIRST_X_AXIS].linked_to_primary)
+	    clone_linked_axes(&axis_array[FIRST_X_AXIS], axis_array[FIRST_X_AXIS].linked_to_primary);
+	if (axis_array[FIRST_Y_AXIS].linked_to_primary)
+	    clone_linked_axes(&axis_array[FIRST_Y_AXIS], axis_array[FIRST_Y_AXIS].linked_to_primary);
+#endif
 
 	/* Falling through to do_string_replot() does not work! */
 	if (volatile_data) {

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.382 2016/04/11 05:52:28 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.383 2016/04/23 19:18:27 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -233,6 +233,22 @@ plotrequest()
     AXIS_INIT2D(T_AXIS, 0);
     AXIS_INIT2D(POLAR_AXIS, 1);
     AXIS_INIT2D(COLOR_AXIS, 1);
+
+#ifdef NONLINEAR_AXES
+    /* Nonlinear mapping of x or y via linkage to a hidden primary axis */
+    if (axis_array[FIRST_X_AXIS].linked_to_primary) {
+	AXIS *secondary = &axis_array[FIRST_X_AXIS];
+	AXIS *primary = secondary->linked_to_primary;
+	primary->set_autoscale = secondary->set_autoscale;
+	axis_init(primary, 1);
+    }
+    if (axis_array[FIRST_Y_AXIS].linked_to_primary) {
+	AXIS *secondary = &axis_array[FIRST_Y_AXIS];
+	AXIS *primary = secondary->linked_to_primary;
+	primary->set_autoscale = secondary->set_autoscale;
+	axis_init(primary, 1);
+    }
+#endif
 
     /* If we are called from a mouse zoom operation we should ignore	*/
     /* any range limits because otherwise the zoom won't zoom.		*/
@@ -2924,6 +2940,18 @@ eval_plots()
 
     /* parametric or polar fns can still affect x ranges */
     if (!parametric && !polar) {
+
+#ifdef NONLINEAR_AXES
+	/* Autoscaling on x used the primary axis, so we must transform */
+	/* the range that was found back onto the visible X axis.	*/
+	/* If we were _not_ autoscaling, well I guess it doesn't hurt.	*/
+	/* NB: clone_linked_axes() is overkill.				*/
+	if (axis_array[FIRST_X_AXIS].linked_to_primary) {
+	    clone_linked_axes(axis_array[FIRST_X_AXIS].linked_to_primary,
+				&axis_array[FIRST_X_AXIS]);
+	}
+#endif
+
 	/* If we were expecting to autoscale on X but found no usable
 	 * points in the data files, then the axis limits are still sitting
 	 * at +/- VERYLARGE.  The default range for bare functions is [-10:10].
@@ -3312,7 +3340,11 @@ eval_plots()
 	    axis_array[FIRST_X_AXIS].max = axis_array[SECOND_X_AXIS].max;
     }
 
-
+#ifdef NONLINEAR_AXES
+    if (uses_axis[FIRST_Y_AXIS] && axis_array[FIRST_Y_AXIS].linked_to_primary) {
+	clone_linked_axes(axis_array[FIRST_Y_AXIS].linked_to_primary, &axis_array[FIRST_Y_AXIS]);
+    } else 
+#endif
     if (uses_axis[FIRST_Y_AXIS]) {
 	axis_checked_extend_empty_range(FIRST_Y_AXIS, "all points y value undefined!");
 	axis_revert_and_unlog_range(FIRST_Y_AXIS);

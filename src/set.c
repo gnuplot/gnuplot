@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.513 2016/03/04 04:58:03 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.514 2016/03/08 00:27:43 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -191,7 +191,8 @@ set_command()
     /* Mild form of backwards compatibility */
 	/* Allow "set no{foo}" rather than "unset foo" */
     if (gp_input_line[token[c_token].start_index] == 'n' &&
-	       gp_input_line[token[c_token].start_index+1] == 'o') {
+	       gp_input_line[token[c_token].start_index+1] == 'o' &&
+	       gp_input_line[token[c_token].start_index+2] != 'n') {
 	if (interactive)
 	    int_warn(c_token, "deprecated syntax, use \"unset\"");
 	token[c_token].start_index += 2;
@@ -313,6 +314,7 @@ set_command()
 	    set_label();
 	    break;
 	case S_LINK:
+	case S_NONLINEAR:
 	    link_command();
 	    break;
 	case S_LOADPATH:

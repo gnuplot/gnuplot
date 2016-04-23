@@ -1,5 +1,5 @@
 /*
- * $Id: axis.h,v 1.141 2016/03/25 21:06:43 sfeam Exp $
+ * $Id: axis.h,v 1.142 2016/04/23 19:18:27 sfeam Exp $
  *
  */
 
@@ -286,7 +286,9 @@ typedef struct axis {
     t_timelevel timelevel;	/* minimum time unit used to quantize ticks */
 
 /* other miscellaneous fields */
-    int index;			/* filled in by "reset" */
+    int index;			/* if this is a permanent axis, this indexes axis_array[] */
+				/* (index >= PARALLEL_AXES) indexes parallel axes */
+				/* (index < 0) indicates a dynamically allocated structure */
     text_label label;		/* label string and position offsets */
     TBOOLEAN manual_justify;	/* override automatic justification */
     lp_style_type *zeroaxis;	/* usually points to default_axis_zeroaxis */
@@ -339,6 +341,7 @@ typedef struct axis_defaults {
 /* global variables in axis.c */
 
 extern AXIS axis_array[AXIS_ARRAY_SIZE];
+extern AXIS *shadow_axis_array;
 extern const AXIS_DEFAULTS axis_defaults[AXIS_ARRAY_SIZE];
 extern const AXIS default_axis_state;
 
@@ -664,6 +667,7 @@ void get_position_default __PROTO((struct position *pos, enum position_type defa
 void gstrdms __PROTO((char *label, char *format, double value));
 
 void clone_linked_axes __PROTO((AXIS *axis1, AXIS *axis2));
+AXIS *get_shadow_axis __PROTO((AXIS *axis));
 
 int map_x __PROTO((double value));
 int map_y __PROTO((double value));

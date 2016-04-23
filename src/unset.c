@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.233 2016/03/08 00:27:43 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.234 2016/03/21 23:13:47 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -260,6 +260,7 @@ unset_command()
 	unset_linetype();
 	break;
     case S_LINK:
+    case S_NONLINEAR:
 	c_token--;
 	link_command();
 	break;
@@ -1823,9 +1824,6 @@ reset_command()
 	this_axis->minitics = MINI_DEFAULT;
 	this_axis->ticmode = axis_defaults[axis].ticmode;
 
-	this_axis->linked_to_primary = NULL;
-	this_axis->linked_to_secondary = NULL;
-
 	reset_logscale(this_axis);
     }
 
@@ -1837,6 +1835,15 @@ reset_command()
     free(parallel_axis);
     parallel_axis = NULL;
     num_parallel_axes = 0;
+
+#ifdef NONLINEAR_AXES
+    if (shadow_axis_array) {
+	for (i=0; i<2; i++)
+	    free_axis_struct(&shadow_axis_array[i]);
+	free(shadow_axis_array);
+	shadow_axis_array = NULL;
+    }
+#endif
 
     raxis = TRUE;
     for (i=2; i<MAX_TICLEVEL; i++)

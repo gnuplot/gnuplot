@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.322 2016/03/29 18:49:10 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.323 2016/03/31 09:48:11 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -1403,7 +1403,7 @@ link_command()
     AXIS *primary_axis = NULL;
     AXIS *secondary_axis = NULL;
     TBOOLEAN linked = FALSE;
-    int command_token = c_token-1;
+    int command_token = c_token;	/* points to "link" or "nonlinear" */
 
     /* Flag the axes as being linked, and copy the range settings */
     /* from the primary axis into the linked secondary axis       */
@@ -1420,10 +1420,20 @@ link_command()
 	int_error(c_token,"expecting x2 or y2");
     }
 
+    if (equals(command_token,"nonlinear")) {
+#ifdef NONLINEAR_AXES
+	secondary_axis = primary_axis;	/* x or y as found above */
+	primary_axis = get_shadow_axis(secondary_axis);
+#else
+	int_error(command_token, "This copy of gnuplot does not support nonlinear axes");
+#endif
+    }
+
     /* "unset link {x|y}" command */
-    if (equals(command_token,"unset")) {
+    if (equals(command_token-1,"unset")) {
 	secondary_axis->linked_to_primary = NULL;
 	primary_axis->linked_to_secondary = NULL;
+	/* FIXME: could return here except for the need to free link_udf->at */
 	linked = FALSE;
     } else {
 	secondary_axis->linked_to_primary = primary_axis;
@@ -1450,6 +1460,21 @@ link_command()
 	    linked = FALSE;
 	}
     }
+
+#ifdef NONLINEAR_AXES
+    else if (equals(command_token,"nonlinear") && linked) {
+	int_warn(c_token,"via mapping function required");
+	linked = FALSE;
+    }
+
+    if (equals(command_token,"nonlinear") && linked) {
+	/* Save current user-visible axis range (note reversed order!) */
+	struct udft_entry *temp = primary_axis->link_udf;
+	primary_axis->link_udf = secondary_axis->link_udf;
+	secondary_axis->link_udf = temp;
+	clone_linked_axes(secondary_axis, primary_axis);
+    } else 
+#endif
 
     /* Clone the range information */
     if (linked) {
@@ -2042,6 +2067,20 @@ refresh_request()
 
     AXIS_UPDATE2D_REFRESH(FIRST_Z_AXIS);
     AXIS_UPDATE2D_REFRESH(COLOR_AXIS);
+
+#ifdef NONLINEAR_AXES
+    /* Nonlinear mapping of x or y via linkage to a hidden primary axis */
+    if (axis_array[FIRST_X_AXIS].linked_to_primary) {
+	AXIS *primary = axis_array[FIRST_X_AXIS].linked_to_primary;
+	primary->min = primary->set_min;
+	primary->max = primary->set_max;
+    }
+    if (axis_array[FIRST_Y_AXIS].linked_to_primary) {
+	AXIS *primary = axis_array[FIRST_Y_AXIS].linked_to_primary;
+	primary->min = primary->set_min;
+	primary->max = primary->set_max;
+    }
+#endif
 
     if (refresh_ok == E_REFRESH_OK_2D) {
 	refresh_bounds(first_plot, refresh_nplots); 

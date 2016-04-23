@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.297 2016/03/13 23:28:55 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.298 2016/04/16 20:53:33 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -830,6 +830,8 @@ set origin %g,%g\n",
     /* These will only print something if the axis is, in fact, linked */    
     save_link(fp, axis_array + SECOND_X_AXIS);
     save_link(fp, axis_array + SECOND_Y_AXIS);
+    save_nonlinear(fp, axis_array + FIRST_X_AXIS);
+    save_nonlinear(fp, axis_array + FIRST_Y_AXIS);
 
     save_prange(fp, axis_array + POLAR_AXIS);
     save_prange(fp, axis_array + T_AXIS);
@@ -1329,7 +1331,7 @@ save_prange(FILE *fp, struct axis *this_axis)
 }
 
 void
-save_link(FILE *fp, struct axis *this_axis)
+save_link(FILE *fp, AXIS *this_axis)
 {
     if (this_axis->linked_to_primary) {
 	fprintf(fp, "set link %s ", axis_name(this_axis->index));
@@ -1337,8 +1339,24 @@ save_link(FILE *fp, struct axis *this_axis)
 	    fprintf(fp, "via %s ", this_axis->link_udf->definition);
 	if (this_axis->linked_to_primary->link_udf->at)
 	    fprintf(fp, "inverse %s ", this_axis->linked_to_primary->link_udf->definition);
-	fputs("\n\t", fp);
+	fputs("\n", fp);
     }
+}
+
+void
+save_nonlinear(FILE *fp, AXIS *this_axis)
+{
+#ifdef NONLINEAR_AXES
+    if (this_axis->linked_to_primary
+    &&  this_axis->index == -this_axis->linked_to_primary->index) {
+	fprintf(fp, "set nonlinear %s ", axis_name(this_axis->index));
+	if (this_axis->linked_to_primary->link_udf->at)
+	    fprintf(fp, "via %s ", this_axis->linked_to_primary->link_udf->definition);
+	if (this_axis->link_udf->at)
+	    fprintf(fp, "inverse %s ", this_axis->link_udf->definition);
+	fputs("\n", fp);
+    }
+#endif
 }
 
 static void

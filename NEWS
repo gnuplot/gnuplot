@@ -1,5 +1,6 @@
 Changes not in 5.0
 ==================
+* NEW command "set nonlinear <axis> via f(axis) inverse g(axis)"
 * NEW array data type
 * NEW styles points and linespoints accept `pointtype variable`
 * NEW `set pm3d lighting` pm3d lighting model with specular highlighting
