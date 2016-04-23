@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.187 2016/04/16 20:39:23 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.188 2016/04/23 22:59:31 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -272,6 +272,7 @@ init_sample_range(AXIS *axis)
     axis_array[SAMPLE_AXIS].range_flags = 0;
     axis_array[SAMPLE_AXIS].min = axis->min;
     axis_array[SAMPLE_AXIS].max = axis->max;
+    axis_array[SAMPLE_AXIS].linked_to_primary = axis->linked_to_primary;
 }
 
 /* 

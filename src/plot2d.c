@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.383 2016/04/23 19:18:27 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.384 2016/04/23 22:59:31 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -3081,7 +3081,14 @@ eval_plots()
 		    if (!parametric && !polar) {
 			t_min = axis_array[SAMPLE_AXIS].min;
 			t_max = axis_array[SAMPLE_AXIS].max;
-
+#ifdef NONLINEAR_AXES
+			if (axis_array[SAMPLE_AXIS].linked_to_primary) {
+			    AXIS *primary = axis_array[SAMPLE_AXIS].linked_to_primary;
+			    t_min = eval_link_function(primary, t_min);
+			    t_max = eval_link_function(primary, t_max);
+			    FPRINTF((stderr,"sample range on primary axis: %g %g\n", t_min, t_max));
+			} else
+#endif
 			/* FIXME: What if SAMPLE_AXIS is not x_axis? */
 			axis_unlog_interval(&X_AXIS, &t_min, &t_max, 1);
 
@@ -3091,6 +3098,13 @@ eval_plots()
 			double x, temp;
 			struct value a;
 			double t = t_min + i * t_step;
+#ifdef NONLINEAR_AXES
+			if (axis_array[SAMPLE_AXIS].linked_to_primary) {
+			    AXIS *vis = axis_array[SAMPLE_AXIS].linked_to_primary->linked_to_secondary;
+			    t = eval_link_function(vis, t_min + i * t_step);
+			} else
+#endif
+			    t = t_min + i * t_step;
 
 			/* Zero is often a special point in a function domain.	*/
 			/* Make sure we don't miss it due to round-off error.	*/

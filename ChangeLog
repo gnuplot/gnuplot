@@ -15,6 +15,11 @@
 	New command "set nonlinear <axis> via f(axis) inverse g(axis)"
 	At this stage only the x and y axes are supported.
 
+	* src/axis.c src/plot2d.c:
+	Nonlinear axes part 3
+	When plotting functions on a nonlinear axis, choose the samples evenly
+	along the linear axis it is linked to.
+
 2016-04-22  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graph3d.h src/util3d.c:  Move macro map_x3d() and friends from 
