@@ -1,5 +1,5 @@
 /*
- * $Id: axis.h,v 1.140 2016/03/13 23:28:55 sfeam Exp $
+ * $Id: axis.h,v 1.141 2016/03/25 21:06:43 sfeam Exp $
  *
  */
 
@@ -35,6 +35,10 @@
 
 #ifndef GNUPLOT_AXIS_H
 #define GNUPLOT_AXIS_H
+
+#ifndef DISABLE_NONLINEAR_AXES
+#define NONLINEAR_AXES
+#endif
 
 #include <stddef.h>		/* for offsetof() */
 #include "gp_types.h"		/* for TBOOLEAN */

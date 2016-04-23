@@ -1,3 +1,13 @@
+2016-04-23  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* configure.ac src/axis.h:  Preparation for nonlinear axis code.
+	New configuration option --without-nonlinear-axes will allow to disable
+	code that depends on #ifdef NONLINEAR_AXES.
+
+	* src/graphics.c (adjust_offsets) src/plot2d.c (eval_plots):
+	Revise tests for linked axes to distinguish between "set nonlinear"
+	and "set link".
+
 2016-04-22  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graph3d.h src/util3d.c:  Move macro map_x3d() and friends from 
