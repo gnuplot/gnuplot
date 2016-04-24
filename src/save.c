@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.298 2016/04/16 20:53:33 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.299 2016/04/23 22:59:31 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -827,12 +827,6 @@ set origin %g,%g\n",
     fprintf(fp, "set timestamp %s \n", timelabel_bottom ? "bottom" : "top");
     SAVE_AXISLABEL_OR_TITLE("", "timestamp", timelabel);
 
-    /* These will only print something if the axis is, in fact, linked */    
-    save_link(fp, axis_array + SECOND_X_AXIS);
-    save_link(fp, axis_array + SECOND_Y_AXIS);
-    save_nonlinear(fp, axis_array + FIRST_X_AXIS);
-    save_nonlinear(fp, axis_array + FIRST_Y_AXIS);
-
     save_prange(fp, axis_array + POLAR_AXIS);
     save_prange(fp, axis_array + T_AXIS);
     save_prange(fp, axis_array + U_AXIS);
@@ -860,6 +854,12 @@ set origin %g,%g\n",
 
     for (axis=0; axis<num_parallel_axes; axis++)
 	save_prange(fp, &parallel_axis[axis]);
+
+    /* These will only print something if the axis is, in fact, linked */    
+    save_link(fp, axis_array + SECOND_X_AXIS);
+    save_link(fp, axis_array + SECOND_Y_AXIS);
+    save_nonlinear(fp, axis_array + FIRST_X_AXIS);
+    save_nonlinear(fp, axis_array + FIRST_Y_AXIS);
 
 #undef SAVE_AXISLABEL
 #undef SAVE_AXISLABEL_OR_TITLE
@@ -1124,6 +1124,9 @@ save_ptics(FILE *fp, struct axis *this_axis)
     fprintf(fp, "\nset %stics ", axis_name(this_axis->index));
 
     fprintf(fp, (this_axis->ticdef.rangelimited)?" rangelimit ":" norangelimit ");
+
+    if (this_axis->ticdef.logscaling)
+	fputs("logscale ", fp);
 
     switch (this_axis->ticdef.type) {
     case TIC_COMPUTED:{

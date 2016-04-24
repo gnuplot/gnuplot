@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.514 2016/03/08 00:27:43 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.515 2016/04/23 22:59:31 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -5495,6 +5495,14 @@ set_tic_prop(struct axis *this_axis)
 		    this_axis->ticdef.def.user = NULL;
 		}
 		this_axis->ticdef.type = TIC_COMPUTED;
+#ifdef NONLINEAR_AXES
+	    } else if (almost_equals(c_token, "log$scale")) {
+		++c_token;
+		this_axis->ticdef.logscaling = TRUE;
+	    } else if (almost_equals(c_token, "nolog$scale")) {
+		++c_token;
+		this_axis->ticdef.logscaling = FALSE;
+#endif
 	    } else if (equals(c_token,"add")) {
 		++c_token;
 		this_axis->ticdef.def.mix = TRUE;

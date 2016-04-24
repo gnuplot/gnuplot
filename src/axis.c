@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.188 2016/04/23 22:59:31 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.189 2016/04/24 00:44:09 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -1103,6 +1103,16 @@ gen_tics(struct axis *this, tic_callback callback)
 	    }
 	    break;
 	case TIC_COMPUTED:
+#ifdef NONLINEAR_AXES
+	    if (this->linked_to_primary && this->ticdef.logscaling) {
+		this->ticstep = make_tics(this->linked_to_primary, 20);
+		lmin = this->linked_to_primary->min;
+		lmax = this->linked_to_primary->max;
+		/* It may be that we _always_ want ticstep = 1.0 */
+		if (this->ticstep < 1.0)
+		    this->ticstep = 1.0;
+	    }
+#endif
 	    /* round to multiple of step */
 	    start = this->ticstep * floor(lmin / this->ticstep);
 	    step = this->ticstep;
@@ -1139,14 +1149,14 @@ gen_tics(struct axis *this, tic_callback callback)
 	/* }}} */
 
 	if ((minitics != MINI_OFF) && (this->miniticscale != 0)) {
-	    FPRINTF((stderr,"axis.c: %d  start = %g end = %g step = %g\n", 
-			__LINE__, start, end, step));
+	    FPRINTF((stderr,"axis.c: %d  start = %g end = %g step = %g base = %g\n", 
+			__LINE__, start, end, step, this->base));
 	    /* {{{  figure out ministart, ministep, miniend */
 	    if (minitics == MINI_USER) {
 		/* they have said what they want */
 		if (this->mtic_freq <= 0)
 		    minitics = MINI_OFF;
- 		else if (this->log) {
+ 		else if (this->log || (this->linked_to_primary && def->logscaling)) {
  		    ministart = ministep = step / this->mtic_freq * this->base;
  		    miniend = step * this->base;
 		    /* Suppress minitics that would lie on top of major tic */
@@ -1156,7 +1166,7 @@ gen_tics(struct axis *this, tic_callback callback)
 		    ministart = ministep = step / this->mtic_freq;
 		    miniend = step;
  		}
-	    } else if (this->log) {
+	    } else if (this->log || (this->linked_to_primary && def->logscaling)) {
 		if (step > 1.5) {	/* beware rounding errors */
 		    /* {{{  10,100,1000 case */
 		    /* no more than five minitics */
@@ -1249,15 +1259,21 @@ gen_tics(struct axis *this, tic_callback callback)
 	    if (this->index == POLAR_AXIS) {
 		/* Defer translation until after limit check */
 		internal = tic;
-	    } else if (!this->log) {
+	    } else if (this->log) {
+		/* log scale => dont need to worry about zero ? */
+		internal = tic;
+		user = axis_undo_log(this, internal);
+#ifdef NONLINEAR_AXES
+	    } else if (this->linked_to_primary && def->type == TIC_COMPUTED && def->logscaling) {
+		internal = tic;
+		user = eval_link_function(this->linked_to_primary->linked_to_secondary, tic);
+#endif
+	    } else {
+		/* Normal case (no log, no link) */
 		internal = (this->tictype == DT_TIMEDATE)
 		    ? time_tic_just(this->timelevel, tic)
 		    : tic;
 		user = CheckZero(internal, step);
-	    } else {
-		/* log scale => dont need to worry about zero ? */
-		internal = tic;
-		user = axis_undo_log(this, internal);
 	    }
 	    /* }}} */
 	    if (internal > internal_max)
@@ -1283,6 +1299,8 @@ gen_tics(struct axis *this, tic_callback callback)
 		    }
 		default:{	/* comp or series */
 			char label[MAX_ID_LEN]; /* Leave room for enhanced text markup */
+			double position = 0;
+
 			if (this->tictype == DT_TIMEDATE) {
 			    /* If they are doing polar time plot, good luck to them */
 			    gstrftime(label, MAX_ID_LEN-1, this->ticfmt, (double) user);
@@ -1305,18 +1323,26 @@ gen_tics(struct axis *this, tic_callback callback)
 			    gprintf(label, sizeof(label), this->ticfmt, log10_base, user);
 			}
 
+			/* This is where we finally decided to put the tic mark */
+#ifdef NONLINEAR_AXES
+			if (this->linked_to_primary && def->type == TIC_COMPUTED && def->logscaling)
+			    position = user;
+			else
+#endif
+			    position = internal;
+
 			/* Range-limited tic placement */
 			if (def->rangelimited
-			&&  !inrange(internal, this->data_min, this->data_max))
+			&&  !inrange(position, this->data_min, this->data_max))
 			    continue;
 
-			(*callback) (this, internal, label, 0, lgrd, def->def.user);
+			(*callback) (this, position, label, 0, lgrd, def->def.user);
 
 	 		/* Polar axis tics are mirrored across the origin */
 			if (this->index == POLAR_AXIS && (this->ticmode & TICS_MIRROR)) {
 			    int save_gridline = lgrd.l_type;
 			    lgrd.l_type = LT_NODRAW;
-			    (*callback) (this, -internal, label, 0, lgrd, def->def.user);
+			    (*callback) (this, -position, label, 0, lgrd, def->def.user);
 			    lgrd.l_type = save_gridline;
 			}
 		    }
@@ -1328,12 +1354,21 @@ gen_tics(struct axis *this, tic_callback callback)
 		/* {{{  process minitics */
 		double mplace, mtic, temptic;
 		for (mplace = ministart; mplace < miniend; mplace += ministep) {
-		    if (this->tictype == DT_TIMEDATE)
+		    if (this->tictype == DT_TIMEDATE) {
 			mtic = time_tic_just(this->timelevel - 1, internal + mplace);
-		    else
+			temptic = mtic;
+#ifdef NONLINEAR_AXES
+		    } else if (this->linked_to_primary && def->logscaling) {
+			mtic = user * mplace;
+			temptic = internal + eval_link_function(this->linked_to_primary, mplace);
+			FPRINTF((stderr,"minitic internal %g user %g mplace %g step %g temptic %g -> mtic %g\n",
+				internal, user, mplace, step, temptic, mtic));
+#endif
+		    } else {
 			mtic = internal
 			    + (this->log && step <= 1.5 ? axis_do_log(this,mplace) : mplace);
-		    temptic = mtic;
+			temptic = mtic;
+		    }
 		    if (polar && this->index == POLAR_AXIS)
 			temptic += R_AXIS.min;
 

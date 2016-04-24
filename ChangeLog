@@ -1,3 +1,13 @@
+2016-04-24  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/axis.c src/axis.h src/set.c src/save.c:
+	Nonlinear axes part 4
+	New command "set tics logscale" lets the new nonlinear axis code use
+	the old logscale tic placement code.  Thus the effect of the old command
+	"set log x" can be replicated by
+	    set nonlinear x via log10(x) inverse 10**x
+	    set xtics logscale
+
 2016-04-23  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* configure.ac src/axis.h:  Preparation for nonlinear axis code.
