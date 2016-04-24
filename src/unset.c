@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.234 2016/03/21 23:13:47 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.235 2016/04/23 22:59:31 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -1838,7 +1838,7 @@ reset_command()
 
 #ifdef NONLINEAR_AXES
     if (shadow_axis_array) {
-	for (i=0; i<2; i++)
+	for (i=0; i<NUMBER_OF_MAIN_VISIBLE_AXES; i++)
 	    free_axis_struct(&shadow_axis_array[i]);
 	free(shadow_axis_array);
 	shadow_axis_array = NULL;

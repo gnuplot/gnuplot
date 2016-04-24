@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.189 2016/04/24 00:44:09 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.190 2016/04/24 17:41:18 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -1900,6 +1900,10 @@ set_cbminmax()
 	CB_AXIS.max = CB_AXIS.min;
 	CB_AXIS.min = tmp;
     }
+#ifdef NONLINEAR_AXES
+    if (CB_AXIS.linked_to_primary)
+	clone_linked_axes(&CB_AXIS, CB_AXIS.linked_to_primary);
+#endif
 }
 
 void
@@ -2328,19 +2332,18 @@ get_shadow_axis(AXIS *axis)
 {
     AXIS *primary = NULL;
     AXIS *secondary = axis;
+    int i;
 
     /* This implementation uses a dynamically allocated array of shadow axis	*/
     /* structures that is allocated on first use and reused after that. 	*/
     if (!shadow_axis_array) {
-	shadow_axis_array = gp_alloc( 2 * sizeof(AXIS), NULL);
-	memcpy(&shadow_axis_array[0], &default_axis_state, sizeof(AXIS));
-	memcpy(&shadow_axis_array[1], &default_axis_state, sizeof(AXIS));
+	shadow_axis_array = gp_alloc( NUMBER_OF_MAIN_VISIBLE_AXES * sizeof(AXIS), NULL);
+	for (i=0; i<NUMBER_OF_MAIN_VISIBLE_AXES; i++)
+	    memcpy(&shadow_axis_array[i], &default_axis_state, sizeof(AXIS));
     }
 
-    if (axis->index == FIRST_X_AXIS)
-	primary = &shadow_axis_array[0];
-    else if (axis->index == FIRST_Y_AXIS)
-	primary = &shadow_axis_array[1];
+    if (axis->index != SAMPLE_AXIS && axis->index < NUMBER_OF_MAIN_VISIBLE_AXES)
+	primary = &shadow_axis_array[axis->index];
     else
 	int_error(NO_CARET, "invalid shadow axis");
 

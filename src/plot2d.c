@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.384 2016/04/23 22:59:31 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.385 2016/04/24 00:44:09 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -210,7 +210,7 @@ void
 plotrequest()
 {
     int dummy_token = 0;
-    int t_axis;
+    AXIS_INDEX t_axis;
 
     if (!term)                  /* unknown */
 	int_error(c_token, "use 'set term' to set terminal type first");
@@ -235,18 +235,18 @@ plotrequest()
     AXIS_INIT2D(COLOR_AXIS, 1);
 
 #ifdef NONLINEAR_AXES
-    /* Nonlinear mapping of x or y via linkage to a hidden primary axis */
-    if (axis_array[FIRST_X_AXIS].linked_to_primary) {
-	AXIS *secondary = &axis_array[FIRST_X_AXIS];
-	AXIS *primary = secondary->linked_to_primary;
-	primary->set_autoscale = secondary->set_autoscale;
-	axis_init(primary, 1);
-    }
-    if (axis_array[FIRST_Y_AXIS].linked_to_primary) {
-	AXIS *secondary = &axis_array[FIRST_Y_AXIS];
-	AXIS *primary = secondary->linked_to_primary;
-	primary->set_autoscale = secondary->set_autoscale;
-	axis_init(primary, 1);
+    /* Nonlinear mapping of x or y via linkage to a hidden primary axis. */
+    /* The user set autoscale for the visible axis; apply it also to the hidden axis. */
+    for (t_axis = 0; t_axis < NUMBER_OF_MAIN_VISIBLE_AXES; t_axis++) {
+	if (t_axis == SAMPLE_AXIS)
+	    continue;
+	if (axis_array[t_axis].linked_to_primary
+	&&  axis_array[t_axis].linked_to_primary->index == -t_axis) {
+	    AXIS *secondary = &axis_array[t_axis];
+	    AXIS *primary = secondary->linked_to_primary;
+	    primary->set_autoscale = secondary->set_autoscale;
+	    axis_init(primary, 1);
+	}
     }
 #endif
 

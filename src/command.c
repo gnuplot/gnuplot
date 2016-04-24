@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.323 2016/03/31 09:48:11 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.324 2016/04/23 22:59:31 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -1395,7 +1395,9 @@ while_command()
 
 /*
  * set link [x2|y2] {via <expression1> {inverse <expression2>}}
+ * set nonlinear <axis> via <expression1> inverse <expression2>
  * unset link [x2|y2]
+ * unset nonlinear <axis>
  */
 void
 link_command()
@@ -1405,29 +1407,56 @@ link_command()
     TBOOLEAN linked = FALSE;
     int command_token = c_token;	/* points to "link" or "nonlinear" */
 
-    /* Flag the axes as being linked, and copy the range settings */
-    /* from the primary axis into the linked secondary axis       */
     c_token++;
-    if (almost_equals(c_token,"x$2")) {
-	primary_axis = &axis_array[FIRST_X_AXIS];
-	secondary_axis = &axis_array[SECOND_X_AXIS];
-	c_token++;
-    } else if (almost_equals(c_token,"y$2")) {
-	primary_axis = &axis_array[FIRST_Y_AXIS];
-	secondary_axis = &axis_array[SECOND_Y_AXIS];
-	c_token++;
-    } else {
-	int_error(c_token,"expecting x2 or y2");
-    }
 
+    /* Set variable name accepatable for the via/inverse functions */
+	strcpy(c_dummy_var[0], "x");
+	strcpy(c_dummy_var[1], "y");
+	if (equals(c_token, "z") || equals(c_token, "cb"))
+	    strcpy(c_dummy_var[0], "z");
+
+    /*
+     * "set nonlinear" will eventually apply to any visible axis
+     * but for now we support x y x2 y2 cb in 2D plots; cb in 3D plots
+     */
     if (equals(command_token,"nonlinear")) {
 #ifdef NONLINEAR_AXES
-	secondary_axis = primary_axis;	/* x or y as found above */
+	if (equals(c_token, "x"))
+	    secondary_axis = &axis_array[FIRST_X_AXIS];
+	else if (equals(c_token, "y"))
+	    secondary_axis = &axis_array[FIRST_Y_AXIS];
+	else if (equals(c_token, "x2"))
+	    secondary_axis = &axis_array[SECOND_X_AXIS];
+	else if (equals(c_token, "y2"))
+	    secondary_axis = &axis_array[SECOND_Y_AXIS];
+	else if (equals(c_token, "z"))
+	    secondary_axis = &axis_array[FIRST_Z_AXIS];
+	else if (equals(c_token, "cb"))
+	    secondary_axis = &axis_array[COLOR_AXIS];
+	else
+	    int_error(c_token,"not a valid nonlinear axis");
 	primary_axis = get_shadow_axis(secondary_axis);
 #else
 	int_error(command_token, "This copy of gnuplot does not support nonlinear axes");
 #endif
+
+    /*
+     * "set link" applies to either x|x2 or y|y2
+     * Flag the axes as being linked, and copy the range settings
+     * from the primary axis into the linked secondary axis
+     */
+    } else {
+	if (almost_equals(c_token,"x$2")) {
+	    primary_axis = &axis_array[FIRST_X_AXIS];
+	    secondary_axis = &axis_array[SECOND_X_AXIS];
+	} else if (almost_equals(c_token,"y$2")) {
+	    primary_axis = &axis_array[FIRST_Y_AXIS];
+	    secondary_axis = &axis_array[SECOND_Y_AXIS];
+	} else {
+	    int_error(c_token,"expecting x2 or y2");
+	}
     }
+    c_token++;
 
     /* "unset link {x|y}" command */
     if (equals(command_token-1,"unset")) {

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: mouse.c,v 1.186 2016/03/13 23:28:55 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: mouse.c,v 1.187 2016/04/23 22:59:31 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - mouse.c */
@@ -388,14 +388,28 @@ MousePosToGraphPosReal(int xx, int yy, double *x, double *y, double *x2, double 
     if (!is_3d_plot) {
 	AXIS *secondary;
 	secondary = &axis_array[FIRST_X_AXIS];
-	if (secondary->linked_to_primary && secondary->link_udf->at) {
+	if (secondary->linked_to_primary
+	&&  secondary->linked_to_primary->index == -FIRST_X_AXIS) {
 	    *x = axis_mapback(secondary->linked_to_primary, xx);
 	    *x = eval_link_function(secondary, *x);
 	}
 	secondary = &axis_array[FIRST_Y_AXIS];
-	if (secondary->linked_to_primary && secondary->link_udf->at) {
+	if (secondary->linked_to_primary
+	&&  secondary->linked_to_primary->index == -FIRST_Y_AXIS) {
 	    *y = axis_mapback(secondary->linked_to_primary, yy);
 	    *y = eval_link_function(secondary, *y);
+	}
+	secondary = &axis_array[SECOND_X_AXIS];
+	if (secondary->linked_to_primary
+	&&  secondary->linked_to_primary->index == -SECOND_X_AXIS) {
+	    *x2 = axis_mapback(secondary->linked_to_primary, xx);
+	    *x2 = eval_link_function(secondary, *x2);
+	}
+	secondary = &axis_array[SECOND_Y_AXIS];
+	if (secondary->linked_to_primary
+	&&  secondary->linked_to_primary->index == -SECOND_Y_AXIS) {
+	    *y2 = axis_mapback(secondary->linked_to_primary, yy);
+	    *y2 = eval_link_function(secondary, *y2);
 	}
     }
 #endif

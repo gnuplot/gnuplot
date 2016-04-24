@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: color.c,v 1.119 2015/03/12 23:48:13 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: color.c,v 1.120 2015/04/16 05:11:01 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - color.c */
@@ -438,9 +438,18 @@ cbtick_callback(
 {
     int len = tic_scale(ticlevel, this_axis)
 	* (this_axis->tic_in ? -1 : 1) * (term->h_tic);
-    double cb_place = (place - this_axis->min) / (this_axis->max - this_axis->min);
-	/* relative z position along the colorbox axis */
     unsigned int x1, y1, x2, y2;
+    double cb_place;
+
+    /* position of tic as a fraction of the full palette range */
+#ifdef NONLINEAR_AXES
+    if (this_axis->linked_to_primary) {
+	AXIS * primary = this_axis->linked_to_primary;
+	place = eval_link_function(primary, place);
+	cb_place = (place - primary->min) / (primary->max - primary->min);
+    } else 
+#endif
+    cb_place = (place - this_axis->min) / (this_axis->max - this_axis->min);
 
     /* calculate tic position */
     if (color_box.rotation == 'h') {

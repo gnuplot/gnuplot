@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: parse.c,v 1.102 2016/02/21 00:56:21 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: parse.c,v 1.103 2016/03/17 05:53:47 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - parse.c */
@@ -1067,8 +1067,6 @@ parse_link_via( struct udft_entry *udf )
 	int_error(c_token,"Missing expression");
 
     /* Save action table for the linkage mapping */
-    strcpy(c_dummy_var[0], "x");
-    strcpy(c_dummy_var[1], "y");
     dummy_func = udf;
     free_at(udf->at);
     udf->at = perm_at();

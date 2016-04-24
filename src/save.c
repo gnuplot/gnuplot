@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.299 2016/04/23 22:59:31 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.300 2016/04/24 17:41:18 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -858,8 +858,8 @@ set origin %g,%g\n",
     /* These will only print something if the axis is, in fact, linked */    
     save_link(fp, axis_array + SECOND_X_AXIS);
     save_link(fp, axis_array + SECOND_Y_AXIS);
-    save_nonlinear(fp, axis_array + FIRST_X_AXIS);
-    save_nonlinear(fp, axis_array + FIRST_Y_AXIS);
+    for (axis=0; axis<NUMBER_OF_MAIN_VISIBLE_AXES; axis++)
+	save_nonlinear(fp, &axis_array[axis]);
 
 #undef SAVE_AXISLABEL
 #undef SAVE_AXISLABEL_OR_TITLE
@@ -1336,7 +1336,8 @@ save_prange(FILE *fp, struct axis *this_axis)
 void
 save_link(FILE *fp, AXIS *this_axis)
 {
-    if (this_axis->linked_to_primary) {
+    if (this_axis->linked_to_primary
+    &&  this_axis->index != -this_axis->linked_to_primary->index) {
 	fprintf(fp, "set link %s ", axis_name(this_axis->index));
 	if (this_axis->link_udf->at)
 	    fprintf(fp, "via %s ", this_axis->link_udf->definition);

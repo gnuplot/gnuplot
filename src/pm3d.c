@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.106 2015/11/13 04:03:56 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.107 2016/01/09 19:27:24 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - pm3d.c */
@@ -194,12 +194,21 @@ z2cb(double z)
 double
 cb2gray(double cb)
 {
-    if (cb <= CB_AXIS.min)
+    AXIS *cbaxis = &CB_AXIS;
+
+    if (cb <= cbaxis->min)
 	return (sm_palette.positive == SMPAL_POSITIVE) ? 0 : 1;
-    if (cb >= CB_AXIS.max)
+    if (cb >= cbaxis->max)
 	return (sm_palette.positive == SMPAL_POSITIVE) ? 1 : 0;
-    cb = (cb - CB_AXIS.min)
-      / (CB_AXIS.max - CB_AXIS.min);
+
+#ifdef NONLINEAR_AXES
+    if (cbaxis->linked_to_primary) {
+	cbaxis = cbaxis->linked_to_primary;
+	cb = eval_link_function(cbaxis, cb);
+    }
+#endif
+
+    cb = (cb - cbaxis->min) / (cbaxis->max - cbaxis->min);
     return (sm_palette.positive == SMPAL_POSITIVE) ? cb : 1-cb;
 }
 
