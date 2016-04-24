@@ -10,6 +10,10 @@
 
 	* docs/gnuplot.doc:  Nonlinear axes part 5 (documentation).
 
+	* demo/all.dem demo/probably_tux.demo
+	demo/nonlinear1.dem demo/nonlinear2.dem demo/nonlinear3.dem:
+	Nonlinear axes part 6 (demos)
+
 2016-04-23  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* configure.ac src/axis.h:  Preparation for nonlinear axis code.

@@ -1,0 +1,37 @@
+#
+# Distortion of an image by plotting against probability scaled axes.
+# Each pixel is re-scaled based on distance from the center, where
+# the scale factor treats that distance as a Z score.
+#
+#set title "Probability axes:  Scale image pixels by distance from center treated as a Z-score"
+set label 1 "Tux (probably)" font "Times:Bold" 
+set label 1 at graph 0.5, 0.4 center front 
+
+set xrange [-6:134]
+set yrange [-6:134]
+unset key
+
+if (!exists("sigma")) sigma = 20.
+center = 64.	# because the image is 128x128
+
+if (!exists("ticinterval")) ticinterval = 1
+
+f(x) = norm((x-center)/sigma)
+g(x) = sigma*invnorm(x)+center
+tic(x) = center + sigma * x 
+
+set xtics ("" 64)
+do for [i=-3:3:ticinterval] {
+    set xtics add (sprintf("%dσ",i) tic(real(i)), "" tic(real(i)+.5) 1)
+}
+set ytics ("" 64)
+do for [i=-3:3:ticinterval] {
+    set ytics add (sprintf("%dσ",i) tic(real(i)), "" tic(real(i)+.5) 1)
+}
+set tics out nomirror
+
+set nonlinear x via f(x) inverse g(x)
+set nonlinear y via f(y) inverse g(y)
+
+plot 'blutux.rgb' binary array=(128,128) flipy format='%uchar' with rgbimage pixels
+
