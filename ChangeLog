@@ -8,6 +8,8 @@
 	    set nonlinear x via log10(x) inverse 10**x
 	    set xtics logscale
 
+	* docs/gnuplot.doc:  Nonlinear axes part 5 (documentation).
+
 2016-04-23  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* configure.ac src/axis.h:  Preparation for nonlinear axis code.

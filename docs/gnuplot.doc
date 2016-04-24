@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.985 2016/03/31 09:48:11 markisch Exp $
+C RCS $Id: gnuplot.doc,v 1.986 2016/04/15 17:31:11 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -206,6 +206,8 @@ C
 
  * Support for array variables (see `arrays`).
 
+ * Support for nonlinear axes (see `set nonlinear`).
+
 3 Version 5.0
 
  * The dot-dash pattern of a line can now be specified independent of other
@@ -273,7 +275,8 @@ C
 # set colorsequence default|classic|podo   # colors used by successive plot elements
 # set monochrome                           # alternative set of linetypes
 # set dashtype <tag> <dash-spec>           # user-defined dash patterns
-# set link x2 via f(x) inverse g(x)        # allows non-linear axis scaling
+# set nonlinear x via f(x) inverse g(x)    # non-linear visible axis
+# set link x2 via f(x) inverse g(x)        # links visible x axes or y axes
 # set fit quiet|results|brief|verbose      # control the amount of fit output
 # set contours; splot ... with labels      # label contour lines with numeric values
 # set style textbox                        # text elements can be enclosed in a box
@@ -4026,7 +4029,7 @@ Ffigure_points
 
       plot sin(x) with points pt "#"
 
- You may use any utf-8 character as the pointtype.  See `set encoding utf8`.
+ You may use any utf-8 character as the pointtype. See `utf8`.
 =variable
 ?variable
 ?variable pointtype
@@ -8593,6 +8596,8 @@ Ffigure_missing
 ?show encoding
 ?encoding
 ?encodings
+?utf8
+?sjis
 =UTF-8
 =SJIS
  The `set encoding` command selects a character encoding.
@@ -10600,6 +10605,66 @@ Ffigure_missing
 ?nomztics
  Minor tic marks along the z axis are controlled by `set mztics`.  Please
  see `set mxtics`.
+3 nonlinear
+?commands set nonlinear
+?set nonlinear
+?nonlinear
+ Syntax:
+       set nonlinear <axis> via f(axis) inverse g(axis)
+       unset nonlinear <axis>
+
+ This option is EXPERIMENTAL (implementation details may change before appearing
+ in a stable gnuplot release).
+ This command is similar to the `set link` command except that only one of the
+ two linked axes is visible.  The hidden axis remains linear. Coordinates along
+ the visible axis are mapped by applying g(x) to hidden axis coordinates.
+ f(x) maps the visible axis coordinates back onto the hidden linear axis.
+
+ Example:
+
+       set xrange [1:1000]
+       set nonlinear x via log10(x) inverse 10**x
+
+ This example establishes a log-scaled x axis. It is an alternative way of
+ achieving the effect of `set log x`.  The hidden axis in this case has range
+ [0:3], obtained by calculating [log10(xmin):log10(xmax)].  You must provide
+ both the forward and inverse expressions.
+
+ Example:
+
+       set xrange [-3:3]
+       set nonlinear x via norm(x) inverse invnorm(x)
+
+ This example establishes a probability-scaled ("probit") x axis, such that
+ plotting the cumulative normal function Phi(x) produces a straight line plot
+ against a linear y axis.
+
+=logit
+ Example:
+
+       logit(p) = log(p/(1-p))
+       logistic(a) = 1. / (1. + exp(-a))
+       set xrange [.001 : .999]
+       set nonlinear y via logit(y) inverse logistic(y)
+       plot logit(x)
+
+ This example establishes a logit-scaled y axis such that plotting logit(x)
+ on a linear x axis produces a straight line plot.
+
+=broken axis
+ Example:
+
+       f(x) = (x <= 100) ? x : (x < 500) ? NaN : x-390
+       g(x) = (x <= 100) ? x : x+390
+       set xrange [0:1000] noextend
+       set nonlinear x via f(x) inverse g(x)
+       set xtics add (100,500)
+       plot sample [x=1:100] x, [x=500:1000] x
+
+ This example creates a "broken axis". X coordinates 0-100 are at the left,
+ X coordinates 500-1000 are at the right, there is a small gap (10 units)
+ between them.  So long as no data points with (100 < x < 500) are plotted,
+ this works as expected.
 3 object
 ?object
 ?commands set object
