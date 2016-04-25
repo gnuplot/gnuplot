@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.986 2016/04/15 17:31:11 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.987 2016/04/24 19:01:32 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -4019,7 +4019,7 @@ Ffigure_points
  defaults to that of the linetype. See `linetype`.  If no `using` spec is found
  in the plot command, input data columns are interpreted implicitly.
  See `style lines`.
- 
+
  The first 8 point types are shared by all terminals. Individual terminals may
  provide a much larger number of distinct point types. Use the `test` command
  to show what is provided by the current terminal settings. Alternatively any
@@ -5143,7 +5143,7 @@ Ffigure_jitter
 
  Input lines with `history` as their first command are not stored in the
  command history.
- 
+
  Examples:
 
        history               # show the complete history
