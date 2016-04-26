@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.385 2016/04/24 00:44:09 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.386 2016/04/25 18:36:21 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -1378,9 +1378,12 @@ store2d_point(
 	    if (R_AXIS.min <= 0 || R_AXIS.autoscale & AUTOSCALE_MIN)
 		int_error(NO_CARET,"In log mode rrange must not include 0");
 	    y = AXIS_DO_LOG(POLAR_AXIS,y) - AXIS_DO_LOG(POLAR_AXIS,R_AXIS.min);
-	} else
-
-	if (!(R_AXIS.autoscale & AUTOSCALE_MIN)) {
+#ifdef NONLINEAR_AXES
+	} else if (R_AXIS.linked_to_primary) {
+	    AXIS *shadow = R_AXIS.linked_to_primary;
+	    y = eval_link_function(shadow, y) - shadow->min;
+#endif
+	} else if (!(R_AXIS.autoscale & AUTOSCALE_MIN)) {
 	    /* we store internally as if plotting r(t)-rmin */
 		y -= R_AXIS.min;
 	}
@@ -1405,8 +1408,12 @@ store2d_point(
 	    if (R_AXIS.log) {
 		yhigh = AXIS_DO_LOG(POLAR_AXIS,yhigh)
 			- AXIS_DO_LOG(POLAR_AXIS,R_AXIS.min);
-	    } else
-	    if (!(R_AXIS.autoscale & AUTOSCALE_MIN)) {
+#ifdef NONLINEAR_AXES
+	    } else if (R_AXIS.linked_to_primary) {
+		AXIS *shadow = R_AXIS.linked_to_primary;
+		yhigh = eval_link_function(shadow, yhigh) - shadow->min;
+#endif
+	    } else if (!(R_AXIS.autoscale & AUTOSCALE_MIN)) {
 		/* we store internally as if plotting r(t)-rmin */
 		yhigh -= R_AXIS.min;
 	    }
@@ -1422,8 +1429,12 @@ store2d_point(
 	    if (R_AXIS.log) {
 		ylow = AXIS_DO_LOG(POLAR_AXIS,ylow)
 		     - AXIS_DO_LOG(POLAR_AXIS,R_AXIS.min);
-	    } else
-	    if (!(R_AXIS.autoscale & AUTOSCALE_MIN)) {
+#ifdef NONLINEAR_AXES
+	    } else if (R_AXIS.linked_to_primary) {
+		AXIS *shadow = R_AXIS.linked_to_primary;
+		ylow = eval_link_function(shadow, ylow) - shadow->min;
+#endif
+	    } else if (!(R_AXIS.autoscale & AUTOSCALE_MIN)) {
 		/* we store internally as if plotting r(t)-rmin */
 		ylow -= R_AXIS.min;
 	    }
@@ -3089,8 +3100,8 @@ eval_plots()
 			    FPRINTF((stderr,"sample range on primary axis: %g %g\n", t_min, t_max));
 			} else
 #endif
-			/* FIXME: What if SAMPLE_AXIS is not x_axis? */
-			axis_unlog_interval(&X_AXIS, &t_min, &t_max, 1);
+			    /* FIXME: What if SAMPLE_AXIS is not x_axis? */
+			    axis_unlog_interval(&X_AXIS, &t_min, &t_max, 1);
 
 			t_step = (t_max - t_min) / (samples_1 - 1);
 		    }
@@ -3162,12 +3173,16 @@ eval_plots()
 			    if (R_AXIS.log) {
 				temp = AXIS_DO_LOG(POLAR_AXIS,temp)
 				     - AXIS_DO_LOG(POLAR_AXIS,R_AXIS.min);
-			    } else
-			    if (!(R_AXIS.autoscale & AUTOSCALE_MIN))
+#ifdef NONLINEAR_AXES
+			    } else if (R_AXIS.linked_to_primary) {
+				AXIS *shadow = R_AXIS.linked_to_primary;
+				temp = eval_link_function(shadow, temp) - shadow->min;
+#endif
+			    } else if (!(R_AXIS.autoscale & AUTOSCALE_MIN))
 				temp -= R_AXIS.min;
+
 			    y = temp * sin(phi * ang2rad);
 			    x = temp * cos(phi * ang2rad);
-
 
 			    if ((this_plot->plot_style == FILLEDCURVES) 
 			    &&  (this_plot->filledcurves_options.closeto == FILLEDCURVES_ATR)) {

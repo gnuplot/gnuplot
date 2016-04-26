@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.190 2016/04/24 17:41:18 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.191 2016/04/25 18:36:21 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -993,11 +993,18 @@ gen_tics(struct axis *this, tic_callback callback)
 	    double internal;
 
 	    /* This condition is only possible if we are in polar mode */
-	    if (this->index == POLAR_AXIS)
-		internal = axis_log_value(this, mark->position)
-			 - axis_log_value(this, polar_shift);
-	    else
+	    if (this->index == POLAR_AXIS) {
+#ifdef NONLINEAR_AXES
+		if (this->linked_to_primary)
+		    internal = eval_link_function(this->linked_to_primary, mark->position)
+			     - eval_link_function(this->linked_to_primary, polar_shift);
+		else
+#endif
+		    internal = axis_log_value(this, mark->position)
+			     - axis_log_value(this, polar_shift);
+	    } else {
 		internal = axis_log_value(this, mark->position) - polar_shift;
+	    }
 
 	    if (!inrange(internal, internal_min, internal_max))
 		continue;

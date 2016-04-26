@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.324 2016/04/23 22:59:31 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.325 2016/04/25 18:36:21 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -1414,6 +1414,8 @@ link_command()
 	strcpy(c_dummy_var[1], "y");
 	if (equals(c_token, "z") || equals(c_token, "cb"))
 	    strcpy(c_dummy_var[0], "z");
+	if (equals(c_token, "r"))
+	    strcpy(c_dummy_var[0], "r");
 
     /*
      * "set nonlinear" will eventually apply to any visible axis
@@ -1421,18 +1423,9 @@ link_command()
      */
     if (equals(command_token,"nonlinear")) {
 #ifdef NONLINEAR_AXES
-	if (equals(c_token, "x"))
-	    secondary_axis = &axis_array[FIRST_X_AXIS];
-	else if (equals(c_token, "y"))
-	    secondary_axis = &axis_array[FIRST_Y_AXIS];
-	else if (equals(c_token, "x2"))
-	    secondary_axis = &axis_array[SECOND_X_AXIS];
-	else if (equals(c_token, "y2"))
-	    secondary_axis = &axis_array[SECOND_Y_AXIS];
-	else if (equals(c_token, "z"))
-	    secondary_axis = &axis_array[FIRST_Z_AXIS];
-	else if (equals(c_token, "cb"))
-	    secondary_axis = &axis_array[COLOR_AXIS];
+	AXIS_INDEX axis;
+	if ((axis = lookup_table(axisname_tbl, c_token)) >= 0)
+	    secondary_axis = &axis_array[axis];
 	else
 	    int_error(c_token,"not a valid nonlinear axis");
 	primary_axis = get_shadow_axis(secondary_axis);
@@ -1514,6 +1507,9 @@ link_command()
 	free_at(primary_axis->link_udf->at);
 	primary_axis->link_udf->at = NULL;
     }
+
+    if (secondary_axis->index == POLAR_AXIS)
+	rrange_to_xy();
 }
 
 /* process the 'load' command */

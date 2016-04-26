@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.515 2016/04/23 22:59:31 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.516 2016/04/24 17:41:18 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -6333,6 +6333,11 @@ rrange_to_xy()
 	if (R_AXIS.log)
 	    X_AXIS.set_max =  AXIS_DO_LOG(POLAR_AXIS, R_AXIS.set_max)
 			    - AXIS_DO_LOG(POLAR_AXIS, min);
+#ifdef NONLINEAR_AXES
+	else if (R_AXIS.linked_to_primary)
+	    X_AXIS.set_max = eval_link_function(R_AXIS.linked_to_primary, R_AXIS.set_max)
+			   - R_AXIS.linked_to_primary->min;
+#endif
 	else
 	    X_AXIS.set_max = R_AXIS.set_max - min;
 	Y_AXIS.set_max = X_AXIS.set_max;
