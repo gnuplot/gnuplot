@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: internal.c,v 1.89 2016/02/21 00:56:21 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: internal.c,v 1.90 2016/03/01 20:02:28 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - internal.c */
@@ -1820,9 +1820,13 @@ f_assign(union argument *arg)
     gpfree_string(&a);
 
     if (udv->udv_value.type == ARRAY) {
-	int i = index.v.int_val;
-	if (index.type != INTGR)
-	    int_error(NO_CARET, "non-integer array index");
+	int i;
+	if (index.type == INTGR)
+	    i = index.v.int_val;
+	else if (index.type == CMPLX)
+	    i = floor(index.v.cmplx_val.real);
+	else
+	    int_error(NO_CARET, "non-numeric array index");
 	if (i <= 0 || i > udv->udv_value.v.value_array[0].v.int_val)
 	    int_error(NO_CARET, "array index out of range");
 	gpfree_string(&udv->udv_value.v.value_array[i]);

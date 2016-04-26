@@ -4,6 +4,10 @@
 	Nonlinear axes part 9.
 	Handle nonlinear polar axis r.  This completes support for 2D axes.
 
+	* src/internal.c (f_assign):  In most places any numerical array index
+	is accepted, but inside an assignment non-integral indexes caused an
+	error.  Now the index is taken as floor(value) as it is elsewhere.
+
 2016-04-25  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/axis.c src/color.c src/command.c src/mouse.c src/parse.c 
