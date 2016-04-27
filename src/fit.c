@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: fit.c,v 1.160 2016/02/11 08:34:06 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: fit.c,v 1.163 2016/04/16 17:04:07 sfeam Exp $"); }
 #endif
 
 /*  NOTICE: Change of Copyright Status
@@ -400,6 +400,12 @@ error_ex(int t_num, const char *str, ...)
     /* restore original SIGINT function */
     interrupt_setup();
 
+    /* FIXME: It would be nice to exit the "fit" command non-fatally, */
+    /* so that the script who called it can recover and continue.     */
+    /* int_error() makes that impossible.  But if we use int_warn()   */
+    /* instead the program tries to continue _inside_ the fit, which  */
+    /* generally then dies on some more serious error.                */
+
     /* exit via int_error() so that it can clean up state variables */
     int_error(t_num, buf);
 }
@@ -659,8 +665,7 @@ call_gnuplot(const double *par, double *data)
 	             fit_x[i * num_indep + j], 0.0);
 	evaluate_at(func.at, &v);
 
-	data[i] = real(&v);
-	if (undefined || isnan(data[i])) {
+	if (undefined || isnan(real(&v))) {
 	    /* Print useful info on undefined-function error. */
 	    Dblf("\nCurrent data point\n");
 	    Dblf("=========================\n");
@@ -679,6 +684,8 @@ call_gnuplot(const double *par, double *data)
 		Eex("Function evaluation yields NaN (\"not a number\")");
 	    }
 	}
+
+	data[i] = real(&v);
     }
 }
 

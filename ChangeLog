@@ -1,3 +1,8 @@
+2016-04-27  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/fit.c (call_gnuplot):  More robust handling of undefined value
+	returned by function being fit.
+
 2016-04-26  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/command.c src/plot2d.c src/set.c src/axis.c:
