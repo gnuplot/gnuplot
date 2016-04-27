@@ -6,10 +6,10 @@ Changes in 5.0.4
 * CHANGE (Windows only) open piped output using mode "wb" rather than "w"
 * FIX placement of objects and labels using linked secondary axis coordinates
 * FIX 'set term qt <N> close' acts immediately rather than after next mouse event
-* FIX transposition of row/column count in plotting ascii x/y/z data "with image"
 * FIX emf terminal could lose track of bold/italic/etc font properties
 * FIX regression that caused "set log x; plot '-'; replot" to mess up autoscaling
 * FIX regression in v5 that mangled 3D arrows defined by "from ... rto ..."
+* FIX transposition of row/column count in plotting ascii x/y/z data "with image"
 
 Changes in 5.0.3
 ================

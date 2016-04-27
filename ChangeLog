@@ -1,3 +1,8 @@
+2016-04-27  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/fit.c (call_gnuplot):  More robust handling of undefined value
+	returned by function being fit.
+
 2016-04-20  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c (process_image):  There are two paths through the
