@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.325 2016/04/25 18:36:21 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.326 2016/04/26 06:09:03 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -1453,8 +1453,12 @@ link_command()
 
     /* "unset link {x|y}" command */
     if (equals(command_token-1,"unset")) {
-	secondary_axis->linked_to_primary = NULL;
 	primary_axis->linked_to_secondary = NULL;
+	if (secondary_axis->linked_to_primary == NULL)
+	    /* It wasn't linked anyhow */
+	    return;
+	else
+	    secondary_axis->linked_to_primary = NULL;
 	/* FIXME: could return here except for the need to free link_udf->at */
 	linked = FALSE;
     } else {
