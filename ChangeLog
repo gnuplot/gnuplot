@@ -1,3 +1,7 @@
+2016-05-01  Matthew Halverson  <mhalver@users.sf.net>
+
+	* term/svg.trm: Do not flag svg terminal as TERM_BINARY.
+
 2016-04-27  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/fit.c (call_gnuplot):  More robust handling of undefined value
