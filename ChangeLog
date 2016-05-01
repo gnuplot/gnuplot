@@ -7,6 +7,9 @@
 	* src/command.c (link_command): Do not recalculate axis ranges after
 	"unset link" for an axis that was not linked anyhow.
 
+	* src/axis.c (parse_range):  The in-line range for a nonlinear axis
+	must be transferred to its corresponding primary axis.
+
 2016-04-27  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/fit.c (call_gnuplot):  More robust handling of undefined value

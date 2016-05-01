@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.191 2016/04/25 18:36:21 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.192 2016/04/26 06:09:03 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -2219,6 +2219,13 @@ parse_range(AXIS_INDEX axis)
 	}
 	this_axis->autoscale =
 		load_range(this_axis, &this_axis->min, &this_axis->max, this_axis->autoscale);
+#ifdef NONLINEAR_AXES
+	if (this_axis->linked_to_primary) {
+	    AXIS *primary = this_axis->linked_to_primary;
+	    primary->min = eval_link_function(primary, this_axis->min);
+	    primary->max = eval_link_function(primary, this_axis->max);
+	}
+#endif
 
 	/* EXPERIMENTAL: optional sample interval */
 	if (axis == SAMPLE_AXIS) {
