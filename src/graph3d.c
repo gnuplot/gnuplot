@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.336 2016/04/16 04:01:06 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.337 2016/04/16 05:07:02 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -176,6 +176,7 @@ static int map3d_getposition __PROTO((struct position* pos, const char* what, do
  */
 
 int xmiddle, ymiddle, xscaler, yscaler;
+double xyscaler;
 static int ptitl_cnt;
 static int max_ptitl_len;
 static int titlelin;
@@ -485,6 +486,9 @@ boundary3d(struct surface_points *plots, int count)
 		xscaler = yscaler / required;
 	}
     }
+
+    /* For anything that really wants to be the same on x and y */
+    xyscaler = sqrt(xscaler*yscaler);
 
     /* Set default clipping */
     if (splot_map)
@@ -2256,7 +2260,9 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid,
     if (whichgrid == BORDERONLY)
 	return;
 
-    /* Draw ticlabels and axis labels. x axis, first:*/
+    /* Draw ticlabels and axis labels */
+
+    /* x axis */
     if (X_AXIS.ticmode || X_AXIS.label.text) {
 	vertex v0, v1;
 	double other_end = Y_AXIS.min + Y_AXIS.max - xaxis_y;
@@ -2265,9 +2271,9 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid,
 	map3d_xyz(mid_x, xaxis_y, base_z, &v0);
 	map3d_xyz(mid_x, other_end, base_z, &v1);
 
-	tic_unitx = (v1.x - v0.x) / (double)yscaler;
-	tic_unity = (v1.y - v0.y) / (double)yscaler;
-	tic_unitz = (v1.z - v0.z) / (double)yscaler;
+	tic_unitx = (v1.x - v0.x) / xyscaler;
+	tic_unity = (v1.y - v0.y) / xyscaler;
+	tic_unitz = (v1.z - v0.z) / xyscaler;
 
 	/* Don't output tics and grids if this is the front part of a
 	 * two-part grid drawing process: */
@@ -2278,58 +2284,59 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid,
 	    gen_tics(&axis_array[FIRST_X_AXIS], xtick_callback);
 
 	if (X_AXIS.label.text) {
-	    int angle = 0;
 
-	    /* label at xaxis_y + 1/4 of (xaxis_y-other_y) */
-	    /* FIXME: still needed??? what for? */
 	    if ((surface_rot_x <= 90 && BACKGRID != whichgrid) ||
 		(surface_rot_x > 90 && FRONTGRID != whichgrid) ||
 		splot_map) {
 
 	    unsigned int x1, y1;
 	    int tmpx, tmpy;
+	    int angle = 0;
 
 	    if (splot_map) { /* case 'set view map' */
 		/* copied from xtick_callback(): baseline of tics labels */
 		vertex v1, v2;
 		map3d_xyz(mid_x, xaxis_y, base_z, &v1);
 		v2.x = v1.x;
-		v2.y = v1.y - tic_unity * t->v_char * 1;
-		if (!X_AXIS.tic_in) {
-		    /* FIXME
-		     * This code and its source in xtick_callback() is wrong --- tics
-		     * can be "in" but ticscale <0 ! To be corrected in both places!
-		     */
+		v2.y = v1.y - tic_unity * t->v_char;
+		if (!X_AXIS.tic_in)
 		    v2.y -= tic_unity * t->v_tic * X_AXIS.ticscale;
-		}
 		TERMCOORD(&v2, x1, y1);
-		/* DEFAULT_Y_DISTANCE is with respect to baseline of tics labels */
-#define DEFAULT_Y_DISTANCE 0.5
-		y1 -= (unsigned int) ((1 + DEFAULT_Y_DISTANCE) * t->v_char);
-#undef DEFAULT_Y_DISTANCE
+		/* Default displacement with respect to baseline of tics labels */
+		y1 -= (unsigned int) ((1.5) * t->v_char);
 		angle = X_AXIS.label.rotate;
 	    } else { /* usual 3d set view ... */
-		double step = (xaxis_y - other_end) / 4;
+		double offset = 0.0;
 		/* The only angle that makes sense is running parallel to the axis */
 		if (X_AXIS.label.tag == ROTATE_IN_3D_LABEL_TAG) {
 		    double ang, angx0, angx1, angy0, angy1;
 		    map3d_xy_double(X_AXIS.min, xaxis_y, base_z, &angx0, &angy0);
 		    map3d_xy_double(X_AXIS.max, xaxis_y, base_z, &angx1, &angy1);
 		    ang = atan2(angy1-angy0, angx1-angx0) / DEG2RAD;
+		    if (ang < -90) ang += 180;
+		    if (ang > 90) ang -= 180;
 		    angle = (ang > 0) ? floor(ang + 0.5) : floor(ang - 0.5);
-		    if (angle < -90) angle += 180;
-		    if (angle > 90) angle -= 180;
-		    step /= 2;
 		}
 
 		if (X_AXIS.ticmode & TICS_ON_AXIS) {
-		    map3d_xyz(mid_x, (X_AXIS.tic_in ? step : -step)/2., base_z, &v1);
+		    map3d_xyz(mid_x, 0.0, base_z, &v1);
 		} else {
-		    map3d_xyz(mid_x, xaxis_y + step, base_z, &v1);
+		    map3d_xyz(mid_x, xaxis_y, base_z, &v1);
 		}
+
+		/* DEBUG Replace old offset "step" with fraction of unit vector */
+		offset = X_AXIS.ticscale * t->h_tic;
+		if (X_AXIS.ticmode & TICS_ON_AXIS) {
+		    v1.x += 2. * offset * ((X_AXIS.tic_in) ? 1.0 : -1.0) * tic_unitx;
+		    v1.y += 2. * offset * ((X_AXIS.tic_in) ? 1.0 : -1.0) * tic_unity;
+		} else {
+		    v1.x -= 10. * offset * tic_unitx;
+		    v1.y -= 10. * offset * tic_unity;
+		}
+
 		if (!X_AXIS.tic_in) {
-		    v1.x -= tic_unitx * X_AXIS.ticscale * t->v_tic;
-		    v1.y -= tic_unity * X_AXIS.ticscale * t->v_tic;
+		    v1.x -= tic_unitx * X_AXIS.ticscale * t->h_tic;
+		    v1.y -= tic_unity * X_AXIS.ticscale * t->h_tic;
 		}
 		TERMCOORD(&v1, x1, y1);
 	    }
@@ -2337,16 +2344,13 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid,
 	    map3d_position_r(&(X_AXIS.label.offset), &tmpx, &tmpy, "graphbox");
 	    x1 += tmpx; /* user-defined label offset */
 	    y1 += tmpy;
+
 	    ignore_enhanced(X_AXIS.label.noenhanced);
 	    apply_pm3dcolor(&(X_AXIS.label.textcolor));
-	    if (angle != 0 && (term->text_angle)(angle)) {
-		write_multiline(x1, y1, X_AXIS.label.text, CENTRE, JUST_TOP,
+	    term->text_angle(angle);
+	    write_multiline(x1, y1, X_AXIS.label.text, CENTRE, JUST_TOP,
 			    angle, X_AXIS.label.font);
-		(term->text_angle)(0);
-	    } else {
-		write_multiline(x1, y1, X_AXIS.label.text, CENTRE, JUST_TOP,
-			    0, X_AXIS.label.font);
-	    }
+	    term->text_angle(0);
 	    reset_textcolor(&(X_AXIS.label.textcolor));
 	    ignore_enhanced(FALSE);
 	    }
@@ -2356,7 +2360,7 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid,
 	    gen_tics(&axis_array[SECOND_X_AXIS], xtick_callback);
     }
 
-    /* y axis: */
+    /* y axis */
     if (Y_AXIS.ticmode || Y_AXIS.label.text) {
 	vertex v0, v1;
 	double other_end = X_AXIS.min + X_AXIS.max - yaxis_x;
@@ -2365,9 +2369,9 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid,
 	map3d_xyz(yaxis_x, mid_y, base_z, &v0);
 	map3d_xyz(other_end, mid_y, base_z, &v1);
 
-	tic_unitx = (v1.x - v0.x) / (double)xscaler;
-	tic_unity = (v1.y - v0.y) / (double)xscaler;
-	tic_unitz = (v1.z - v0.z) / (double)xscaler;
+	tic_unitx = (v1.x - v0.x) / xyscaler;
+	tic_unity = (v1.y - v0.y) / xyscaler;
+	tic_unitz = (v1.z - v0.z) / xyscaler;
 
 	/* Don't output tics and grids if this is the front part of a
 	 * two-part grid drawing process: */
@@ -2407,52 +2411,43 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid,
 			widest_tic_strlen = 0; /* reset the global variable */
 			gen_tics(&axis_array[FIRST_Y_AXIS], widest_tic_callback);
 		    }
-		    /* DEFAULT_Y_DISTANCE is with respect to baseline of tics labels */
-#define DEFAULT_X_DISTANCE 0.
-		    x1 -= (unsigned int) ((DEFAULT_X_DISTANCE + 0.5 + widest_tic_strlen) * t->h_char);
-#undef DEFAULT_X_DISTANCE
-#if 0
-		    /* another method ... but not compatible */
-		    unsigned int map_y1, map_x2, map_y2;
-		    int tics_len = 0;
-		    if (Y_AXIS.ticmode) {
-			tics_len = (int)(X_AXIS.ticscale * (X_AXIS.tic_in ? 1 : -1) * (term->v_tic));
-			if (tics_len > 0) tics_len = 0; /* take care only about left tics */
-		    }
-		    map3d_xy(X_AXIS.min, Y_AXIS.min, base_z, &x1, &map_y1);
-		    map3d_xy(X_AXIS.max, Y_AXIS.max, base_z, &map_x2, &map_y2);
-		    y1 = (unsigned int)((map_y1 + map_y2) * 0.5);
-		    /* Distance between the title base line and graph top line or the upper part of
-		       tics is as given by character height: */
-#define DEFAULT_X_DISTANCE 0
-		    x1 += (unsigned int) (tics_len + (-0.5 + Y_AXIS.label.xoffset) * t->h_char);
-		    y1 += (unsigned int) ((DEFAULT_X_DISTANCE + Y_AXIS.label.yoffset) * t->v_char);
-#undef DEFAULT_X_DISTANCE
-#endif
+		    /* Default displacement with respect to baseline of tics labels */
+		    x1 -= (unsigned int) ((0.5 + widest_tic_strlen) * t->h_char);
 		    h_just = CENTRE; /* vertical justification for rotated text */
 		    v_just = JUST_BOT; /* horizontal -- does not work for rotated text? */
 		    angle = Y_AXIS.label.rotate;
 		} else { /* usual 3d set view ... */
-		    double step = (other_end - yaxis_x) / 4;
+		    double offset = 0.0;
 		    /* The only angle that makes sense is running parallel to the axis */
 		    if (Y_AXIS.label.tag == ROTATE_IN_3D_LABEL_TAG) {
 			double ang, angx0, angx1, angy0, angy1;
 			map3d_xy_double(yaxis_x, Y_AXIS.min, base_z, &angx0, &angy0);
 			map3d_xy_double(yaxis_x, Y_AXIS.max, base_z, &angx1, &angy1);
 			ang = atan2(angy1-angy0, angx1-angx0) / DEG2RAD;
+			if (ang < -90) ang += 180;
+			if (ang > 90) ang -= 180;
 			angle = (ang > 0) ? floor(ang + 0.5) : floor(ang - 0.5);
-			if (angle < -90) angle += 180;
-			if (angle > 90) angle -= 180;
-			step /= 2;
 		    }
+
 		    if (Y_AXIS.ticmode & TICS_ON_AXIS) {
-			map3d_xyz((X_AXIS.tic_in ? -step : step)/2., mid_y, base_z, &v1);
+			map3d_xyz(0.0, mid_y, base_z, &v1);
 		    } else {
-			map3d_xyz(yaxis_x - step, mid_y, base_z, &v1);
+			map3d_xyz(yaxis_x, mid_y, base_z, &v1);
 		    }
-		    if (!X_AXIS.tic_in) {
-			v1.x -= tic_unitx * X_AXIS.ticscale * t->h_tic;
-			v1.y -= tic_unity * X_AXIS.ticscale * t->h_tic;
+
+		    /* DEBUG Replace old offset "step" with fraction of unit vector */
+		    offset = X_AXIS.ticscale * t->h_tic;
+		    if (Y_AXIS.ticmode & TICS_ON_AXIS) {
+			v1.x += 2. * offset * ((Y_AXIS.tic_in) ? 1.0 : -1.0) * tic_unitx;
+			v1.y += 2. * offset * ((Y_AXIS.tic_in) ? 1.0 : -1.0) * tic_unity;
+		    } else {
+			v1.x -= 10. * offset * tic_unitx;
+			v1.y -= 10. * offset * tic_unity;
+		    }
+		
+		    if (!Y_AXIS.tic_in) {
+			v1.x -= tic_unitx * Y_AXIS.ticscale * t->v_tic;
+			v1.y -= tic_unity * Y_AXIS.ticscale * t->v_tic;
 		    }
 		    TERMCOORD(&v1, x1, y1);
 		    h_just = CENTRE;
@@ -2463,18 +2458,13 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid,
 		x1 += tmpx; /* user-defined label offset */
 		y1 += tmpy;
 
-		/* write_multiline mods it */
 		ignore_enhanced(Y_AXIS.label.noenhanced);
 		apply_pm3dcolor(&(Y_AXIS.label.textcolor));
 
-		if (angle != 0 && (term->text_angle)(angle)) {
-		    write_multiline(x1, y1, Y_AXIS.label.text, h_just, v_just,
-				    angle, Y_AXIS.label.font);
-		    (term->text_angle)(0);
-		} else {
-		    write_multiline(x1, y1, Y_AXIS.label.text, h_just, v_just,
-				    0, Y_AXIS.label.font);
-		}
+		term->text_angle(angle);
+		write_multiline(x1, y1, Y_AXIS.label.text, h_just, v_just,
+				angle, Y_AXIS.label.font);
+		term->text_angle(0);
 
 		reset_textcolor(&(Y_AXIS.label.textcolor));
 		ignore_enhanced(FALSE);
@@ -2552,12 +2542,6 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid,
 	    x -= 5 * t->h_char;
 	    h_just = RIGHT;
 	} else {
-	    /* December 2011 - This caused the separation between the axis and the
-	     * label to vary as the view angle changes (Bug #2879916).   Why???
-	     * double other_end = X_AXIS.min + X_AXIS.max - zaxis_x;
-	     * map3d_xyz(zaxis_x - (other_end - zaxis_x) / 4., zaxis_y, mid_z, &v1);
-	     * It seems better to use a constant default separation.
-	     */
 	    map3d_xyz(zaxis_x, zaxis_y, mid_z, &v1);
 	    TERMCOORD(&v1, x, y);
 	    x -= 7 * t->h_char;
@@ -2570,16 +2554,14 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid,
 
 	ignore_enhanced(Z_AXIS.label.noenhanced);
 	apply_pm3dcolor(&(Z_AXIS.label.textcolor));
+
 	if (Z_AXIS.label.tag == ROTATE_IN_3D_LABEL_TAG)
 	    Z_AXIS.label.rotate = TEXT_VERTICAL;
-	if (Z_AXIS.label.rotate != 0 &&  (term->text_angle)(Z_AXIS.label.rotate)) {
-	    write_multiline(x, y, Z_AXIS.label.text,
-			    h_just, v_just, Z_AXIS.label.rotate, Z_AXIS.label.font);
-	    (term->text_angle)(0);
-	} else {
-	    write_multiline(x, y, Z_AXIS.label.text,
-			    h_just, v_just, 0, Z_AXIS.label.font);
-	}
+	term->text_angle(Z_AXIS.label.rotate);
+	write_multiline(x, y, Z_AXIS.label.text,
+			h_just, v_just, Z_AXIS.label.rotate, Z_AXIS.label.font);
+	term->text_angle(0);
+
 	reset_textcolor(&(Z_AXIS.label.textcolor));
 	ignore_enhanced(FALSE);
     }
@@ -2644,8 +2626,6 @@ xtick_callback(
 	v4.real_z = v3.real_z;
 	draw3d_line(&v3, &v4, &border_lp);
     }
-
-    // term_apply_lp_properties(&border_lp);
 
     /* Draw tic label */
     if (text) {

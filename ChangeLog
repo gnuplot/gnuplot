@@ -2,6 +2,11 @@
 
 	* src/save.c:  "rotate parallel" was not being saved correctly.
 
+	* src/graph3d.c:  Revise placement of axis labels in 3D plots.
+	Remove dead code.  Use same axis-to-label gap on both x and y.
+	Fix inconsistent use of h_tic or v_tic to define gap size.
+	Bug #1781
+
 2016-05-01  Matthew Halverson  <mhalver@users.sf.net>
 
 	* term/svg.trm: Do not flag svg terminal as TERM_BINARY.

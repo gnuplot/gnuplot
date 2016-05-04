@@ -11,6 +11,7 @@ Changes not in 5.0
 * NEW new command `toggle {<plotno> | "plottitle" | all}`
 * NEW Optional sampling interval in range specifier for pseudofile '+'
 * NEW point style associated with "plot with labels" is shown in the key
+* CHANGE Revise placement of axis labels in 3D plots
 * CHANGE Track font/enhanced for key title separately from the key entries
 * CHANGE order of margins in `set margins <left>, <right>, <bottom>, <top>`
 * CHANGE Store and reuse x,y dimensions from the time image data is read in
