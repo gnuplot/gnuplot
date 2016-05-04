@@ -1,3 +1,7 @@
+2016-05-04  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/save.c:  "rotate parallel" was not being saved correctly.
+
 2016-05-01  Matthew Halverson  <mhalver@users.sf.net>
 
 	* term/svg.trm: Do not flag svg terminal as TERM_BINARY.
@@ -12,8 +16,9 @@
 	* src/graphics.c (process_image):  There are two paths through the
 	code that extracts image data from an ascii input stream, depending
 	on whether the x or y coordinate varies fastest.  The fix for Bug #1767
-	corrected one path but broke the other.  Now we fix the broken path so
-	that both are working, at least on test data.
+	corrected one path but broke the other.  I.e. none of version 5.0
+	patchlevels 0-3 worked correctly on all image input.  Now we fix the
+	broken path so that all cases are working, at least on test data.
 	Bug #1782
 
 2016-04-16  Ethan A Merritt  <merritt@u.washington.edu>
