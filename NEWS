@@ -18,6 +18,7 @@ Changes not in 5.0
 * CHANGE Some STATS_* variables are of type integer rather than real (complex) 
 * FIX cairo.trm - reset terminal font after printing an enhanced text string
 * FIX autoscaling of data with "smooth cnorm"
+* FIX Built-in readline handles S-JIS encoding
 
 Changes in 5.0.rc3
 ==================

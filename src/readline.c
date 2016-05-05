@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: readline.c,v 1.62 2014/05/09 22:14:12 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: readline.c,v 1.63 2016/03/29 18:08:22 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - readline.c */
@@ -150,7 +150,7 @@ readline_ipc(const char* prompt)
 # endif
 #endif /* not HAVE_TERMIOS_H && HAVE_TCGETATTR */
 
-#if !defined(MSDOS) && !defined(_Windows)
+#if !defined(MSDOS) && !defined(_WIN32)
 
 /*
  * Set up structures using the proper include file
@@ -238,9 +238,9 @@ static int term_set = 0;	/* =1 if rl_termio set */
 static int ansi_getc __PROTO((void));
 #define DEL_ERASES_CURRENT_CHAR
 
-#else /* MSDOS or _Windows */
+#else /* MSDOS or _WIN32 */
 
-# ifdef _Windows
+# ifdef _WIN32
 #  include <windows.h>
 #  include "win/wtext.h"
 #  include "win/winmain.h"
@@ -254,7 +254,7 @@ static int win_getch(void);
 #  endif /* WGP_CONSOLE */
 static int msdos_getch(void);
 #  define DEL_ERASES_CURRENT_CHAR
-# endif				/* _Windows */
+# endif				/* _WIN32 */
 
 # if defined(MSDOS)
 /* MSDOS specific stuff */
@@ -269,7 +269,7 @@ static int msdos_getch();
 #  define DEL_ERASES_CURRENT_CHAR
 # endif				/* MSDOS */
 
-#endif /* MSDOS or _Windows */
+#endif /* MSDOS or _WIN32 */
 
 #ifdef OS2
 # if defined( special_getc )
@@ -311,7 +311,7 @@ static void step_forward __PROTO((void));
 static void delete_forward __PROTO((void));
 static void delete_backward __PROTO((void));
 static int char_seqlen __PROTO((void));
-#if defined(HAVE_DIRENT_H) || defined(WIN32)
+#if defined(HAVE_DIRENT_H) || defined(_WIN32)
 static char *fn_completion(size_t anchor_pos, int direction);
 static void tab_completion(TBOOLEAN forward);
 #endif
@@ -325,16 +325,12 @@ static int
 user_putc(int ch)
 {
     int rv;
-#ifdef _Windows
-#ifndef WGP_CONSOLE
+#if defined(_WIN32) && !defined(WGP_CONSOLE)
     TextAttr(&textwin, TEXTUSER);
 #endif
-#endif
     rv = fputc(ch, stderr);
-#ifdef _Windows
-#ifndef WGP_CONSOLE
+#if defined(_WIN32) && !defined(WGP_CONSOLE)
     TextAttr(&textwin, TEXTGNUPLOT);
-#endif
 #endif
     return rv;
 }
@@ -343,16 +339,12 @@ static int
 user_puts(char *str)
 {
     int rv;
-#ifdef _Windows
-#ifndef WGP_CONSOLE
+#if defined(_WIN32) && !defined(WGP_CONSOLE)
     TextAttr(&textwin, TEXTUSER);
 #endif
-#endif
     rv = fputs(str, stderr);
-#ifdef _Windows
-#ifndef WGP_CONSOLE
+#if defined(_WIN32) && !defined(WGP_CONSOLE)
     TextAttr(&textwin, TEXTGNUPLOT);
-#endif
 #endif
     return rv;
 }
@@ -381,8 +373,14 @@ mbwidth(char *c)
 	return ((unsigned char)(*c) >= 0xe3 ? 2 : 1);
 #endif
     }
+
+    case S_ENC_SJIS: {
+	/* Assume all double-byte characters have double-width. */
+	return is_sjis_lead_byte(*c) ? 2 : 1;
+    }
+
     default:
-        return 1;
+	return 1;
     }
 }
 
@@ -390,7 +388,12 @@ mbwidth(char *c)
 static int
 isdoublewidth(size_t pos)
 {
+#if defined(_WIN32) && !defined(WGP_CONSOLE)
+    /* double width characters are handled in the backend */
+    return FALSE;
+#else
     return mbwidth(cur_line + pos) > 1;
+#endif
 }
 
 
@@ -400,31 +403,36 @@ isdoublewidth(size_t pos)
 static int
 char_seqlen()
 {
-    int i;
+    switch (encoding) {
 
-    if (S_ENC_UTF8 == encoding) {
-	i = cur_pos;
+    case S_ENC_UTF8: {
+	int i = cur_pos;
 	do {i++;}
 	while (((cur_line[i] & 0xc0) != 0xc0)
 	       && ((cur_line[i] & 0x80) != 0)
 	       && (i < max_pos));
 	return (i - cur_pos);
-    } else {
+    }
+
+    case S_ENC_SJIS:
+	return is_sjis_lead_byte(cur_line[cur_pos]) ? 2 : 1;
+
+    default:
 	return 1;
     }
 }
 
 /*
- * Back up over one multi-byte UTF-8 character sequence immediately preceding
+ * Back up over one multi-byte character sequence immediately preceding
  * the current position.  Non-destructive.  Affects both cur_pos and screen cursor.
  */
 static int
 backspace()
 {
-    int seqlen;
+    switch (encoding) {
 
-    if (S_ENC_UTF8 == encoding) {
-	seqlen = 0;
+    case S_ENC_UTF8: {
+	int seqlen = 0;
 	do {
 	    cur_pos--;
 	    seqlen++;
@@ -440,7 +448,27 @@ backspace()
 	if (isdoublewidth(cur_pos))
 	    user_putc(BACKSPACE);
 	return seqlen;
-    } else {
+    }
+
+    case S_ENC_SJIS: {
+	/* With S-JIS you cannot always determine if a byte is a single byte or part
+	   of a double-byte sequence by looking of an arbitrary byte in a string.
+	   Always test from the start of the string instead.
+	*/
+	int i;
+        int seqlen = 1;
+
+	for (i = 0; i < cur_pos; i += seqlen) {
+	    seqlen = is_sjis_lead_byte(cur_line[i]) ? 2 : 1;
+	}
+	cur_pos -= seqlen;
+	user_putc(BACKSPACE);
+	if (isdoublewidth(cur_pos))
+	    user_putc(BACKSPACE);
+	return seqlen;
+    }
+
+    default:
 	cur_pos--;
 	user_putc(BACKSPACE);
 	return 1;
@@ -460,8 +488,9 @@ step_forward()
     switch (encoding) {
 
     case S_ENC_UTF8:
+    case S_ENC_SJIS:
 	seqlen = char_seqlen();
-	for (i=0; i<seqlen; i++)
+	for (i = 0; i < seqlen; i++)
 	    user_putc(cur_line[cur_pos++]);
 	break;
 
@@ -511,7 +540,7 @@ extend_cur_line()
     char *new_line;
 
     /* extent input line length */
-    new_line = gp_realloc(cur_line, line_len + MAXBUF, NULL);
+    new_line = (char *) gp_realloc(cur_line, line_len + MAXBUF, NULL);
     if (!new_line) {
 	reset_termio();
 	int_error(NO_CARET, "Can't extend readline length");
@@ -522,7 +551,7 @@ extend_cur_line()
 }
 
 
-#if defined(HAVE_DIRENT_H) || defined(WIN32)
+#if defined(HAVE_DIRENT_H) || defined(_WIN32)
 static char *
 fn_completion(size_t anchor_pos, int direction)
 {
@@ -703,7 +732,7 @@ tab_completion(TBOOLEAN forward)
     last_completion_len = completion_len;
 }
 
-#endif /* HAVE_DIRENT_H || WIN32 */
+#endif /* HAVE_DIRENT_H || _WIN32 */
 
 
 char *
@@ -740,9 +769,9 @@ readline(const char *prompt)
 	 * and all leading 8bit characters.
 	 */
 	if ((isprint(cur_char)
-	     || (((cur_char & 0x80) != 0) && (cur_char != EOF)))
-	    && (cur_char != '\t') /* TAB is a printable character in some locales */
-	   ) {
+	      || (((cur_char & 0x80) != 0) && (cur_char != EOF))
+	    ) && (cur_char != '\t') /* TAB is a printable character in some locales */
+	    ) {
 	    size_t i;
 
 	    if (max_pos + 1 >= line_len) {
@@ -773,6 +802,25 @@ readline(const char *prompt)
 			fix_line();
 		    }
 		    break;
+
+		case S_ENC_SJIS: {
+		    /* S-JIS requires a state variable */
+		    static int mbwait = 0;
+
+		    if (mbwait == 0) {
+		        if (!is_sjis_lead_byte(cur_char))
+			    /* single-byte character */
+			    fix_line();
+			else
+			    /* first byte of a double-byte sequence */
+			    ;
+		    } else {
+			/* second byte of a double-byte sequence */
+			mbwait = 0;
+			fix_line();
+		    }
+		}
+
 		default:
 		    fix_line();
 		    break;
@@ -842,7 +890,7 @@ readline(const char *prompt)
 		    step_forward();
 		}
 		break;
-#if defined(HAVE_DIRENT_H) || defined(WIN32)
+#if defined(HAVE_DIRENT_H) || defined(_WIN32)
 	    case 011:		/* ^I / TAB */
 		tab_completion(TRUE); /* next tab completion */
 		break;
@@ -1077,7 +1125,7 @@ copy_line(char *line)
     cur_pos = max_pos = strlen(cur_line);
 }
 
-#if !defined(MSDOS) && !defined(_Windows)
+#if !defined(MSDOS) && !defined(_WIN32)
 /* Convert ANSI arrow keys to control characters */
 static int
 ansi_getc()
@@ -1127,7 +1175,7 @@ ansi_getc()
 }
 #endif
 
-#if defined(MSDOS) || defined(_Windows) || defined(OS2)
+#if defined(MSDOS) || defined(_WIN32) || defined(OS2)
 
 #ifdef WGP_CONSOLE
 static int
@@ -1144,7 +1192,7 @@ win_getch()
 static int
 msdos_getch()
 {
-	int c;
+    int c;
 
 #ifdef DJGPP
     int ch = getkey();
@@ -1208,7 +1256,7 @@ msdos_getch()
     return c;
 }
 
-#endif /* MSDOS || _Windows || OS2 */
+#endif /* MSDOS || _WIN32 || OS2 */
 
 #ifdef OS2
 /* We need to call different procedures, dependent on the
@@ -1237,7 +1285,7 @@ os2_getch() {
 static void
 set_termio()
 {
-#if !defined(MSDOS) && !defined(_Windows)
+#if !defined(MSDOS) && !defined(_WIN32)
 /* set termio so we can do our own input processing */
 /* and save the old terminal modes so we can reset them later */
     if (term_set == 0) {
@@ -1341,13 +1389,13 @@ set_termio()
 #  endif			/* not SGTTY */
 	term_set = 1;
     }
-#endif /* not MSDOS && not _Windows */
+#endif /* not MSDOS && not _WIN32 */
 }
 
 static void
 reset_termio()
 {
-#if !defined(MSDOS) && !defined(_Windows)
+#if !defined(MSDOS) && !defined(_WIN32)
 /* reset saved terminal modes */
     if (term_set == 1) {
 #  ifdef SGTTY
@@ -1370,7 +1418,7 @@ reset_termio()
 #  endif			/* not SGTTY */
 	term_set = 0;
     }
-#endif /* not MSDOS && not _Windows */
+#endif /* not MSDOS && not _WIN32 */
 }
 
 #endif /* READLINE && !(HAVE_LIBREADLINE || HAVE_LIBEDITLINE) */

@@ -1,5 +1,5 @@
 /*
- * $Id: util.h,v 1.46 2016/02/29 02:51:10 sfeam Exp $
+ * $Id: util.h,v 1.47 2016/02/29 23:12:43 sfeam Exp $
  */
 
 /* GNUPLOT - util.h */
@@ -114,7 +114,7 @@ void int_warn __PROTO(());
 void common_error_exit __PROTO(());
 #endif
 
-/* FIXME HBB 20010726: should be moved to where help_comamnd() is, and
+/* FIXME HBB 20010726: should be moved to where help_command() is, and
  * made static. Currently, that's command.c, but it should probably
  * move to help.c, instead.
  */
@@ -127,7 +127,9 @@ char *getusername __PROTO((void));
 
 TBOOLEAN contains8bit __PROTO((const char *s));
 TBOOLEAN utf8toulong __PROTO((unsigned long * wch, const char ** str));
+TBOOLEAN is_sjis_lead_byte(char c);
 size_t strlen_utf8 __PROTO((const char *s));
+size_t strlen_sjis(const char *s);
 size_t gp_strlen __PROTO((const char *s));
 char * gp_strchrn __PROTO((const char *s, int N));
 TBOOLEAN streq __PROTO((const char *a, const char *b));

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: util.c,v 1.137 2016/02/29 02:51:10 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: util.c,v 1.138 2016/04/08 07:05:33 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - util.c */
@@ -1403,6 +1403,28 @@ strlen_utf8(const char *s)
     }
     return j;
 }
+
+
+TBOOLEAN
+is_sjis_lead_byte(char c)
+{
+    unsigned int ch = (unsigned char) c;
+    return ((ch >= 0x81) && (ch <= 0x9f)) || ((ch >= 0xe1) && (ch <= 0xee));
+}
+
+
+size_t
+strlen_sjis(const char *s)
+{
+    int i = 0, j = 0;
+    while (s[i]) {
+	if (is_sjis_lead_byte(s[i])) i++; /* skip */
+	j++;
+	i++;
+    }
+    return j;
+}
+
 
 size_t
 gp_strlen(const char *s)
