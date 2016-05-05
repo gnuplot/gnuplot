@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: util.c,v 1.138 2016/04/08 07:05:33 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: util.c,v 1.139 2016/05/05 15:23:03 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - util.c */
@@ -1431,6 +1431,8 @@ gp_strlen(const char *s)
 {
     if (encoding == S_ENC_UTF8)
 	return strlen_utf8(s);
+    else if (encoding == S_ENC_SJIS)
+	return strlen_sjis(s);
     else
 	return strlen(s);
 }
