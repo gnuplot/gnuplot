@@ -1,3 +1,10 @@
+2016-05-05  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/readline.c src/util.c|h:  The internal readline already
+	handles UTF-8 multi-byte sequences. Extend that mechanism
+	to S-JIS. Likely most useful on Windows.
+	Patch #729
+
 2016-05-04  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/save.c:  "rotate parallel" was not being saved correctly.
