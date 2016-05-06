@@ -1,5 +1,5 @@
 /*
- * $Id: winmain.c,v 1.79 2014/12/14 19:39:38 markisch Exp $
+ * $Id: winmain.c,v 1.80 2016/05/06 10:22:54 markisch Exp $
  */
 
 /* GNUPLOT - win/winmain.c */
@@ -459,7 +459,7 @@ main(int argc, char **argv)
         textwin.hInstance = hInstance;
         textwin.hPrevInstance = hPrevInstance;
         textwin.nCmdShow = nCmdShow;
-        textwin.Title = "gnuplot";
+        textwin.Title = L"gnuplot";
 #endif
 
 		/* create structure of first graph window */

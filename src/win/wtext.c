@@ -1,5 +1,5 @@
 /*
- * $Id: wtext.c,v 1.51 2014/05/09 22:14:12 broeker Exp $
+ * $Id: wtext.c,v 1.52 2016/05/06 12:36:48 markisch Exp $
  */
 
 /* GNUPLOT - win/wtext.c */
@@ -1097,7 +1097,7 @@ WndParentProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
     {
 	TEXTMETRIC tm;
 
-	lptw = ((CREATESTRUCT *)lParam)->lpCreateParams;
+	lptw = (LPTW) ((CREATESTRUCT *)lParam)->lpCreateParams;
 	SetWindowLongPtr(hwnd, 0, (LONG_PTR)lptw);
 	lptw->hWndParent = hwnd;
 	/* get character size */
@@ -1129,7 +1129,7 @@ WndParentProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 	break;
     } /* switch() */
 
-    return DefWindowProc(hwnd, message, wParam, lParam);
+    return DefWindowProcW(hwnd, message, wParam, lParam);
 }
 
 
@@ -1882,7 +1882,7 @@ WndTextProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 	return 0;
     }
     case WM_CREATE:
-	lptw = ((CREATESTRUCT *)lParam)->lpCreateParams;
+	lptw = (LPTW) ((CREATESTRUCT *)lParam)->lpCreateParams;
 	SetWindowLongPtr(hwnd, 0, (LONG_PTR)lptw);
 	lptw->hWndText = hwnd;
 	break;
@@ -1890,7 +1890,7 @@ WndTextProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 	DeleteObject(lptw->hbrBackground);
 	break;
     } /* switch(message) */
-    return DefWindowProc(hwnd, message, wParam, lParam);
+    return DefWindowProcW(hwnd, message, wParam, lParam);
 }
 
 

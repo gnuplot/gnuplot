@@ -1,5 +1,5 @@
 /*
- * $Id: wgnuplib.h,v 1.68 2014/12/14 19:39:38 markisch Exp $
+ * $Id: wgnuplib.h,v 1.69 2016/03/06 19:25:15 markisch Exp $
  */
 
 /* GNUPLOT - win/wgnuplib.h */
@@ -151,7 +151,7 @@ typedef struct tagTW
 	GP_LPPRINT	lpr;			/* must be first */
 	HINSTANCE hInstance;		/* required */
 	HINSTANCE hPrevInstance;	/* required */
-	LPSTR	Title;			/* required */
+	LPWSTR	Title;			/* required */
 	LPMW	lpmw;			/* optional */
 	POINT	ScreenSize;		/* optional */  /* size of the visible screen in characters */
 	unsigned int KeyBufSize;	/* optional */
