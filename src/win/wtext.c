@@ -1,5 +1,5 @@
 /*
- * $Id: wtext.c,v 1.50 2014/02/12 20:49:09 markisch Exp $
+ * $Id: wtext.c,v 1.51 2014/05/09 22:14:12 broeker Exp $
  */
 
 /* GNUPLOT - win/wtext.c */
@@ -131,14 +131,17 @@ static const COLORREF TextColorTable[16] = {
 void WDPROC
 TextMessage()
 {
-	WinMessageLoop();
+    WinMessageLoop();
 }
 
 
 void
 CreateTextClass(LPTW lptw)
 {
-    WNDCLASS wndclass;
+    /* We deliberately call the "W" API variant in order to
+       to receive UTF16 WM_CHAR messages. */
+
+    WNDCLASSW wndclass;
 
     hdllInstance = lptw->hInstance;	/* not using a DLL */
     wndclass.style = CS_HREDRAW | CS_VREDRAW;
@@ -153,7 +156,7 @@ CreateTextClass(LPTW lptw)
 					   GetSysColor(COLOR_WINDOW) : RGB(0,0,0));
     wndclass.lpszMenuName = NULL;
     wndclass.lpszClassName = szTextClass;
-    RegisterClass(&wndclass);
+    RegisterClassW(&wndclass);
 
     wndclass.style = CS_HREDRAW | CS_VREDRAW;
     wndclass.lpfnWndProc = WndParentProc;
@@ -168,7 +171,7 @@ CreateTextClass(LPTW lptw)
     wndclass.hbrBackground = (HBRUSH) GetStockObject(WHITE_BRUSH);
     wndclass.lpszMenuName = NULL;
     wndclass.lpszClassName = szParentClass;
-    RegisterClass(&wndclass);
+    RegisterClassW(&wndclass);
 }
 
 
@@ -220,7 +223,7 @@ TextInit(LPTW lptw)
     }
     lptw->KeyBufIn = lptw->KeyBufOut = lptw->KeyBuf;
 
-    lptw->hWndParent = CreateWindow(szParentClass, lptw->Title,
+    lptw->hWndParent = CreateWindowW(szParentClass, lptw->Title,
 				    WS_OVERLAPPEDWINDOW,
 				    lptw->Origin.x, lptw->Origin.y,
 				    lptw->Size.x, lptw->Size.y,
@@ -231,7 +234,7 @@ TextInit(LPTW lptw)
     }
     GetClientRect(lptw->hWndParent, &rect);
 
-    lptw->hWndText = CreateWindow(szTextClass, lptw->Title,
+    lptw->hWndText = CreateWindowW(szTextClass, lptw->Title,
 				  WS_CHILD | WS_VSCROLL | WS_HSCROLL,
 				  0, lptw->ButtonHeight,
 				  rect.right, rect.bottom - lptw->ButtonHeight,
@@ -241,7 +244,7 @@ TextInit(LPTW lptw)
 	return(1);
     }
 
-    lptw->hStatusbar = CreateWindowEx(0, STATUSCLASSNAME, (LPSTR)NULL,
+    lptw->hStatusbar = CreateWindowEx(0, STATUSCLASSNAME, NULL,
 				  WS_CHILD | SBARS_SIZEGRIP,
 				  0, 0, 0, 0,
 				  lptw->hWndParent, (HMENU)ID_TEXTSTATUS,
@@ -1416,7 +1419,7 @@ WndTextProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			lptw->KeyBufIn = lptw->KeyBuf;	/* wrap around */
 		}
 	    }
-		break;
+	    break;
 	    case VK_CANCEL:
 		ctrlc_flag = TRUE;
 		break;
@@ -1584,28 +1587,42 @@ WndTextProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 	}
 	break;
     case WM_CHAR: {
-	/* store key in circular buffer */
-	long count = lptw->KeyBufIn - lptw->KeyBufOut;
+	long count;
+	char char_mb[8];
+	int count_mb;
+	WCHAR char_utf16[2];
 	WPARAM key = wParam;
 
-	/* Remap Shift-Tab to FS */
-	if ((GetKeyState(VK_SHIFT) < 0) && (key == 0x09))
-		key = 034;
+	/* handle only UCS-2, not full UTF16 */
+	if ((key >= 0xd800) && (key < 0xE000))
+	    return 0;
 
+	/* remap Shift-Tab to FS */
+	if ((GetKeyState(VK_SHIFT) < 0) && (key == VK_TAB))
+	    key = 034;
+
+	/* convert UTF16 code to current encoding which may be a multi-byte encoding like utf8 or sjis */
+	char_utf16[0] = key;
+	char_utf16[1] = 0;
+	count_mb = WideCharToMultiByte(WinGetCodepage(encoding), 0, char_utf16, 1, char_mb, sizeof(char_mb), NULL, NULL);
+
+	/* store sequence in circular buffer */
+	count  = lptw->KeyBufIn - lptw->KeyBufOut;
 	if (count < 0)
 	    count += lptw->KeyBufSize;
-	if (count == lptw->KeyBufSize-1) {
-	    /* PM 20011218: Keyboard buffer is full, thus reallocate
-	     * larger one.  (Up to now: forthcoming characters were
-	     * silently ignored.)
-	     */
-	    if ( ReallocateKeyBuf(lptw) )
+	if (count == lptw->KeyBufSize - count_mb) {
+	    /* Keyboard buffer is full, so reallocate larger one. */
+	    if (ReallocateKeyBuf(lptw))
 		return 0; /* not enough memory */
 	}
-	if (count < lptw->KeyBufSize-1) {
-	    *lptw->KeyBufIn++ = key;
-	    if (lptw->KeyBufIn - lptw->KeyBuf >= lptw->KeyBufSize)
-		lptw->KeyBufIn = lptw->KeyBuf;	/* wrap around */
+	if (count < lptw->KeyBufSize-count_mb) {
+	    int index;
+
+	    for (index = 0; index < count_mb; index++) {
+		*lptw->KeyBufIn++ = char_mb[index];
+		if (lptw->KeyBufIn - lptw->KeyBuf >= lptw->KeyBufSize)
+		    lptw->KeyBufIn = lptw->KeyBuf;    /* wrap around */
+	    }
 	}
 	return 0;
     }
@@ -1752,7 +1769,7 @@ WndTextProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		WriteTextIni(lptw);
 		return 0;
 	    case M_ABOUT:
-		AboutBox(hwnd,lptw->AboutText);
+		AboutBox(hwnd, lptw->AboutText);
 		return 0;
 	    } /* switch(loword(wparam)) */
 	return(0);

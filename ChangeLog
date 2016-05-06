@@ -1,5 +1,15 @@
 2016-05-06  Bastian Maerkisch  <bmaerkisch@web.de>
 
+	Unicode text input for wgnuplot (not console mode gnuplot)
+	Part 1 - Input. 
+	Patch #727
+
+	* src/text.c (WM_CHAR) src/wcommon.h src/wgnuplib.c:  Use "W"
+	API variant to create text window to receive UTF16 codes in
+	WM_CHAR messages.  Convert them to the `encoding` set by the
+	user for internal storage.  Handles basic multilangual plane
+	(BMP) only.
+
 	* src/misc.c|h (encoding_from_locale init_encoding) src/plot.c
 	src/set.c:  When using the built-in readline, initialize the 
 	`encoding` according to current locale.  This is required since
