@@ -7,6 +7,7 @@ Changes in 5.0.4
 * FIX placement of objects and labels using linked secondary axis coordinates
 * FIX 'set term qt <N> close' acts immediately rather than after next mouse event
 * FIX emf terminal could lose track of bold/italic/etc font properties
+* FIX emf terminal text placement of UTF-8 strings
 * FIX regression that caused "set log x; plot '-'; replot" to mess up autoscaling
 * FIX regression in v5 that mangled 3D arrows defined by "from ... rto ..."
 * FIX transposition of row/column count in plotting ascii x/y/z data "with image"
