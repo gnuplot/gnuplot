@@ -1,5 +1,5 @@
 /*
- * $Id: winmain.h,v 1.14 2014/02/12 21:39:38 markisch Exp $
+ * $Id: winmain.h,v 1.15 2014/06/04 08:11:00 markisch Exp $
  */
 
 /* GNUPLOT - win/winmain.h */
@@ -46,7 +46,12 @@
 #ifndef GNUPLOT_WINMAIN_H
 #define GNUPLOT_WINMAIN_H
 
+#include <wchar.h>
 #include "wgnuplib.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 extern TW textwin;
 extern LPGW graphwin;
@@ -68,8 +73,16 @@ TBOOLEAN WinAnyWindowOpen(void);
 void WinPersistTextClose(void);
 void WinMessageLoop(void);
 void WinRaiseConsole(void);
+UINT WinGetCodepage(enum set_encoding_id encoding);
+enum set_encoding_id WinGetEncoding(UINT cp);
+LPWSTR UnicodeText(LPCSTR str, enum set_encoding_id encoding);
+LPSTR AnsiText(LPCWSTR strw,  enum set_encoding_id encoding);
 
 int ConsoleReadCh();
 DWORD WINAPI stdin_pipe_reader(LPVOID param);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* GNUPLOT_WINMAIN_H */

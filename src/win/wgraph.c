@@ -1,5 +1,5 @@
 /*
- * $Id: wgraph.c,v 1.200 2016/03/06 19:25:15 markisch Exp $
+ * $Id: wgraph.c,v 1.201 2016/03/06 19:42:19 markisch Exp $
  */
 
 /* GNUPLOT - win/wgraph.c */
@@ -1097,49 +1097,6 @@ SelFont(LPGW lpgw)
 		lpgw->deffontsize = lpgw->fontsize;
 		SendMessage(lpgw->hWndGraph,WM_COMMAND,M_REBUILDTOOLS,0L);
 	}
-}
-
-
-LPWSTR
-UnicodeText(const char *str, enum set_encoding_id encoding)
-{
-    UINT codepage;
-    LPWSTR textw = NULL;
-
-    /* For a list of code page identifiers see
-       http://msdn.microsoft.com/en-us/library/dd317756%28v=vs.85%29.aspx
-    */
-    switch (encoding) {
-        case S_ENC_DEFAULT:    codepage = CP_ACP; break;
-        case S_ENC_ISO8859_1:  codepage = 28591; break;
-        case S_ENC_ISO8859_2:  codepage = 28592; break;
-        case S_ENC_ISO8859_9:  codepage = 28599; break;
-        case S_ENC_ISO8859_15: codepage = 28605; break;
-        case S_ENC_CP437:      codepage =   437; break;
-        case S_ENC_CP850:      codepage =   850; break;
-        case S_ENC_CP852:      codepage =   852; break;
-        case S_ENC_CP950:      codepage =   950; break;
-        case S_ENC_CP1250:     codepage =  1250; break;
-        case S_ENC_CP1251:     codepage =  1251; break;
-        case S_ENC_CP1252:     codepage =  1252; break;
-        case S_ENC_CP1254:     codepage =  1254; break;
-        case S_ENC_KOI8_R:     codepage = 20866; break;
-        case S_ENC_KOI8_U:     codepage = 21866; break;
-        case S_ENC_SJIS:       codepage =   932; break;
-        case S_ENC_UTF8:       codepage = CP_UTF8; break;
-        default:               codepage = 0xffffffff;
-    }
-    if (codepage != 0xffffffff) {
-        int length;
-
-        /* get length of converted string */
-        length = MultiByteToWideChar(codepage, 0, str, -1, NULL, 0);
-        textw = (LPWSTR) malloc(sizeof(WCHAR) * length);
-
-        /* convert string to UTF-16 */
-        length = MultiByteToWideChar(codepage, 0, str, -1, textw, length);
-    }
-    return textw;
 }
 
 

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.326 2016/04/26 06:09:03 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.327 2016/05/02 03:56:02 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -1625,31 +1625,7 @@ timed_pause(double sleep_time)
 /* process the 'pause' command */
 #define EAT_INPUT_WITH(slurp) do {int junk=0; do {junk=slurp;} while (junk != EOF && junk != '\n');} while (0)
 
-#ifdef WIN32
-unsigned int
-enctocodepage(enum set_encoding_id enc)
-{
-    switch (enc) {
-    case S_ENC_CP437:  return 437;
-    case S_ENC_CP850:  return 850;
-    case S_ENC_CP852:  return 852;
-    case S_ENC_SJIS:   return 932;
-    case S_ENC_CP950:  return 950;
-    case S_ENC_CP1250: return 1250;
-    case S_ENC_CP1251: return 1251;
-    case S_ENC_CP1252: return 1252;
-    case S_ENC_CP1254: return 1254;
-    case S_ENC_KOI8_R: return 20866;
-    case S_ENC_KOI8_U: return 21866;
-    case S_ENC_ISO8859_1:  return 28591;
-    case S_ENC_ISO8859_2:  return 28592;
-    case S_ENC_ISO8859_9:  return 28599;
-    case S_ENC_ISO8859_15: return 28605;
-    case S_ENC_UTF8: return 65001;
-    default: return 0;
-    }
-}
-
+#if defined(_WIN32)
 /* mode == 0: => enc -> current locale (for output)
  * mode == !0: => current locale -> enc (for input)
  */
@@ -1663,17 +1639,25 @@ translate_string_encoding(char *str, int mode, enum set_encoding_id enc)
 
     if (enc == S_ENC_DEFAULT) return gp_strdup(str);
 #ifdef WGP_CONSOLE
-    if (mode == 0) loccp = GetConsoleOutputCP(); /* output codepage */
-    else loccp = GetConsoleCP(); /* input code page */
+    if (mode == 0)
+	loccp = GetConsoleOutputCP(); /* output codepage */
+    else
+	loccp = GetConsoleCP(); /* input code page */
 #else
-	locale = setlocale(LC_CTYPE, "");
-    if (!(lenc = strchr(locale, '.')) || !sscanf(++lenc, "%i", &loccp)) 
-      return gp_strdup(str);
+    locale = setlocale(LC_CTYPE, "");
+    if (!(lenc = strchr(locale, '.')) || !sscanf(++lenc, "%i", &loccp))
+	return gp_strdup(str);
 #endif
-    enccp = enctocodepage(enc);
-    if (enccp == loccp) return gp_strdup(str);
-    if (mode == 0) { fromcp = enccp; tocp = loccp; }
-    else { fromcp = loccp; tocp = enccp; }
+    enccp = WinGetCodepage(enc);
+    if (enccp == loccp)
+	return gp_strdup(str);
+    if (mode == 0) {
+	fromcp = enccp; 
+	tocp = loccp;
+    } else {
+	fromcp = loccp;
+	tocp = enccp;
+    }
 
     length = MultiByteToWideChar(fromcp, 0, str, -1, NULL, 0);
     textw = (LPWSTR) malloc(sizeof(WCHAR) * length);

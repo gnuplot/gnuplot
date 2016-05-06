@@ -1,5 +1,5 @@
 /*
- * $Id: winmain.c,v 1.78 2014/11/21 19:50:52 markisch Exp $
+ * $Id: winmain.c,v 1.79 2014/12/14 19:39:38 markisch Exp $
  */
 
 /* GNUPLOT - win/winmain.c */
@@ -1180,5 +1180,117 @@ WinRaiseConsole(void)
 	if (console != NULL) {
 		ShowWindow(console, SW_SHOWNORMAL);
 		BringWindowToTop(console);
+    }
+}
+
+
+/* WinGetCodepage:
+    Map gnuplot's internal character encoding to Windows codepage codes.
+*/
+UINT
+WinGetCodepage(enum set_encoding_id encoding)
+{
+    UINT codepage;
+
+    /* For a list of code page identifiers see
+	http://msdn.microsoft.com/en-us/library/dd317756%28v=vs.85%29.aspx
+    */
+    switch (encoding) {
+	case S_ENC_DEFAULT:    codepage = CP_ACP; break;
+	case S_ENC_ISO8859_1:  codepage = 28591; break;
+	case S_ENC_ISO8859_2:  codepage = 28592; break;
+	case S_ENC_ISO8859_9:  codepage = 28599; break;
+	case S_ENC_ISO8859_15: codepage = 28605; break;
+	case S_ENC_CP437:      codepage =   437; break;
+	case S_ENC_CP850:      codepage =   850; break;
+	case S_ENC_CP852:      codepage =   852; break;
+	case S_ENC_CP950:      codepage =   950; break;
+	case S_ENC_CP1250:     codepage =  1250; break;
+	case S_ENC_CP1251:     codepage =  1251; break;
+	case S_ENC_CP1252:     codepage =  1252; break;
+	case S_ENC_CP1254:     codepage =  1254; break;
+	case S_ENC_KOI8_R:     codepage = 20866; break;
+	case S_ENC_KOI8_U:     codepage = 21866; break;
+	case S_ENC_SJIS:       codepage =   932; break;
+	case S_ENC_UTF8:       codepage = CP_UTF8; break;
+	default: {
+	    /* unknown encoding, fall back to default "ANSI" codepage */
+	    codepage = CP_ACP;
+	    FPRINTF((stderr, "unknown encoding: %i\n", encoding));
 	}
+    }
+    return codepage;
+}
+
+
+enum set_encoding_id
+WinGetEncoding(UINT cp)
+{
+    enum set_encoding_id encoding;
+
+    /* The code below is the inverse to the code found in UnicodeText().
+	For a list of code page identifiers see
+	http://msdn.microsoft.com/en-us/library/dd317756%28v=vs.85%29.aspx
+    */
+    switch (cp) {
+    case 437:   encoding = S_ENC_CP437; break;
+    case 850:   encoding = S_ENC_CP850; break;
+    case 852:   encoding = S_ENC_CP852; break;
+    case 932:   encoding = S_ENC_SJIS; break;
+    case 950:   encoding = S_ENC_CP950; break;
+    case 1250:  encoding = S_ENC_CP1250; break;
+    case 1251:  encoding = S_ENC_CP1251; break;
+    case 1252:  encoding = S_ENC_CP1252; break;
+    case 1254:  encoding = S_ENC_CP1254; break;
+    case 20866: encoding = S_ENC_KOI8_R; break;
+    case 21866: encoding = S_ENC_KOI8_U; break;
+    case 28591: encoding = S_ENC_ISO8859_1; break;
+    case 28592: encoding = S_ENC_ISO8859_2; break;
+    case 28599: encoding = S_ENC_ISO8859_9; break;
+    case 28605: encoding = S_ENC_ISO8859_15; break;
+    case 65001: encoding = S_ENC_UTF8; break;
+    default:
+	encoding = S_ENC_DEFAULT;
+    }
+    return encoding;
+}
+
+
+LPWSTR
+UnicodeText(LPCSTR str, enum set_encoding_id encoding)
+{
+    LPWSTR strw = NULL;
+    UINT codepage = WinGetCodepage(encoding);
+    int length;
+
+    /* sanity check */
+    if (str == NULL)
+	return NULL;
+
+    /* get length of converted string */
+    length = MultiByteToWideChar(codepage, 0, str, -1, NULL, 0);
+    strw = (LPWSTR) malloc(sizeof(WCHAR) * length);
+
+    /* convert string to UTF-16 */
+    length = MultiByteToWideChar(codepage, 0, str, -1, strw, length);
+
+    return strw;
+}
+
+
+LPSTR
+AnsiText(LPCWSTR strw,  enum set_encoding_id encoding)
+{
+    LPSTR str = NULL;
+    UINT codepage = WinGetCodepage(encoding);
+    int length;
+
+    /* get length of converted string */
+    length = WideCharToMultiByte(codepage, 0, strw, -1, NULL, 0, NULL, 0);
+    str = (LPSTR) malloc(sizeof(char) * length);
+
+    /* convert string to "Ansi" */
+    length = WideCharToMultiByte(codepage, 0, strw, -1, str, length, NULL, 0);
+
+    return str;
 }

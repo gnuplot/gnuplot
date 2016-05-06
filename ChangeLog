@@ -1,3 +1,14 @@
+2016-05-06  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/win/winmain.c|h (UnicodeText AnsiText WinGetCodePage
+	WinGetEncoding) src/command.c src/win/wcommon.h src/win/wgraph
+	src/win/wgdiplus.cpp:  Move code to convert a text from a given
+	encoding to UTF16 (UnicodeText) from wgraph.c to winmain.c.
+	Extract mapping of gnuplot's encoding values to a Windows
+	codepage (WinGetCodePage).  Move the inverse code from command.c
+	to WinGetEncoding in winmain.c. Implement AnsiText to convert
+	from UTF16 to a byte encoded string.
+
 2016-05-05  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/readline.c src/util.c|h:  The internal readline already

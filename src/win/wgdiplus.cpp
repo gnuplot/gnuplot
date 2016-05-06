@@ -1,5 +1,5 @@
 /*
- * $Id: wgdiplus.cpp,v 1.20 2014/12/24 17:39:07 markisch Exp $
+ * $Id: wgdiplus.cpp,v 1.21 2016/03/06 19:25:15 markisch Exp $
  */
 
 /*
@@ -35,8 +35,10 @@ extern "C" {
 #define GDIPVER 0x0110
 #include <gdiplus.h>
 
+#include <wchar.h>
 #include "wgdiplus.h"
 #include "wgnuplib.h"
+#include "winmain.h"
 #include "wcommon.h"
 using namespace Gdiplus;
 
