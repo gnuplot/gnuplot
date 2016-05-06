@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.202 2016/02/29 07:07:15 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.203 2016/04/08 07:05:33 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -59,6 +59,9 @@ static char *RCSid() { return RCSid("$Id: misc.c,v 1.202 2016/02/29 07:07:15 sfe
 # ifdef __WATCOM
 #  include <direct.h>
 # endif
+#endif
+#ifdef _WIN32
+# include "win/winmain.h"
 #endif
 
 static char *recursivefullname __PROTO((const char *path, const char *filename, TBOOLEAN recursive));
@@ -1664,4 +1667,48 @@ get_image_options(t_image *image)
 	image->fallback = TRUE;
     }
 
+}
+
+
+enum set_encoding_id
+encoding_from_locale(void)
+{
+    char *l = NULL;
+    enum set_encoding_id encoding = S_ENC_INVALID;
+
+#ifdef _WIN32
+    char * cp_str;
+
+    l = setlocale(LC_CTYPE, "");
+    /* preserve locale string, skip language information */
+    cp_str = strchr(l, '.');
+    if (cp_str) {
+	unsigned cp;
+
+	cp_str++; /* Step past the dot in, e.g., German_Germany.1252 */
+	cp = strtoul(cp_str, NULL, 10);
+
+	if (cp != 0) {
+	    enum set_encoding_id newenc = WinGetEncoding(cp);
+	    encoding = newenc;
+	}
+    }
+#else
+    l = setlocale(LC_CTYPE, "");
+    if (l && (strstr(l, "utf") || strstr(l, "UTF")))
+	encoding = S_ENC_UTF8;
+    if (l && (strstr(l, "sjis") || strstr(l, "SJIS") || strstr(l, "932")))
+	encoding = S_ENC_SJIS;
+    /* FIXME: "set encoding locale" supports only sjis and utf8 on non-Windows systems */
+#endif
+    return encoding;
+}
+
+
+void
+init_encoding(void)
+{
+    encoding = encoding_from_locale();
+    if (encoding == S_ENC_INVALID)
+	encoding = S_ENC_DEFAULT;
 }

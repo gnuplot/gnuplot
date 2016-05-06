@@ -1,18 +1,25 @@
 2016-05-06  Bastian Maerkisch  <bmaerkisch@web.de>
 
+	* src/misc.c|h (encoding_from_locale init_encoding) src/plot.c
+	src/set.c:  When using the built-in readline, initialize the 
+	`encoding` according to current locale.  This is required since
+	the behaviour of the built-in readline depends on `encoding` for
+	utf8 and sjis.  Do this by extracting the code which handles
+	`set encoding locale` to new functions in misc.c.
+
 	* src/win/winmain.c|h (UnicodeText AnsiText WinGetCodePage
 	WinGetEncoding) src/command.c src/win/wcommon.h src/win/wgraph
 	src/win/wgdiplus.cpp:  Move code to convert a text from a given
 	encoding to UTF16 (UnicodeText) from wgraph.c to winmain.c.
 	Extract mapping of gnuplot's encoding values to a Windows
 	codepage (WinGetCodePage).  Move the inverse code from command.c
-	to WinGetEncoding in winmain.c. Implement AnsiText to convert
+	to WinGetEncoding in winmain.c.  Implement AnsiText to convert
 	from UTF16 to a byte encoded string.
 
 2016-05-05  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/readline.c src/util.c|h:  The internal readline already
-	handles UTF-8 multi-byte sequences. Extend that mechanism
+	handles UTF-8 multi-byte sequences.  Extend that mechanism
 	to S-JIS. Likely most useful on Windows.
 	Patch #729
 
