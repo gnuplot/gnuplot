@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.337 2016/04/16 05:07:02 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.338 2016/05/05 03:50:36 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -2306,7 +2306,6 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid,
 		y1 -= (unsigned int) ((1.5) * t->v_char);
 		angle = X_AXIS.label.rotate;
 	    } else { /* usual 3d set view ... */
-		double offset = 0.0;
 		/* The only angle that makes sense is running parallel to the axis */
 		if (X_AXIS.label.tag == ROTATE_IN_3D_LABEL_TAG) {
 		    double ang, angx0, angx1, angy0, angy1;
@@ -2325,13 +2324,12 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid,
 		}
 
 		/* DEBUG Replace old offset "step" with fraction of unit vector */
-		offset = X_AXIS.ticscale * t->h_tic;
 		if (X_AXIS.ticmode & TICS_ON_AXIS) {
-		    v1.x += 2. * offset * ((X_AXIS.tic_in) ? 1.0 : -1.0) * tic_unitx;
-		    v1.y += 2. * offset * ((X_AXIS.tic_in) ? 1.0 : -1.0) * tic_unity;
+		    v1.x += 2. * t->h_tic * ((X_AXIS.tic_in) ? 1.0 : -1.0) * tic_unitx;
+		    v1.y += 2. * t->h_tic * ((X_AXIS.tic_in) ? 1.0 : -1.0) * tic_unity;
 		} else {
-		    v1.x -= 10. * offset * tic_unitx;
-		    v1.y -= 10. * offset * tic_unity;
+		    v1.x -= 10. * t->h_tic * tic_unitx;
+		    v1.y -= 10. * t->h_tic * tic_unity;
 		}
 
 		if (!X_AXIS.tic_in) {
@@ -2417,7 +2415,6 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid,
 		    v_just = JUST_BOT; /* horizontal -- does not work for rotated text? */
 		    angle = Y_AXIS.label.rotate;
 		} else { /* usual 3d set view ... */
-		    double offset = 0.0;
 		    /* The only angle that makes sense is running parallel to the axis */
 		    if (Y_AXIS.label.tag == ROTATE_IN_3D_LABEL_TAG) {
 			double ang, angx0, angx1, angy0, angy1;
@@ -2436,13 +2433,12 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid,
 		    }
 
 		    /* DEBUG Replace old offset "step" with fraction of unit vector */
-		    offset = X_AXIS.ticscale * t->h_tic;
 		    if (Y_AXIS.ticmode & TICS_ON_AXIS) {
-			v1.x += 2. * offset * ((Y_AXIS.tic_in) ? 1.0 : -1.0) * tic_unitx;
-			v1.y += 2. * offset * ((Y_AXIS.tic_in) ? 1.0 : -1.0) * tic_unity;
+			v1.x += 2. * t->h_tic * ((Y_AXIS.tic_in) ? 1.0 : -1.0) * tic_unitx;
+			v1.y += 2. * t->h_tic * ((Y_AXIS.tic_in) ? 1.0 : -1.0) * tic_unity;
 		    } else {
-			v1.x -= 10. * offset * tic_unitx;
-			v1.y -= 10. * offset * tic_unity;
+			v1.x -= 10. * t->h_tic * tic_unitx;
+			v1.y -= 10. * t->h_tic * tic_unity;
 		    }
 		
 		    if (!Y_AXIS.tic_in) {

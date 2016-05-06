@@ -12,6 +12,10 @@
 	Use existing macros axis_do_log() and friends rather than doing
 	hard-coded calculations with axis->log_base.
 
+	* src/graph3d.c (draw_3d_graphbox): Fix think-o in revision to 3D axis
+	label placement - should not multiply the constant offset by tic scale.
+	Bug #1790
+
 2016-05-06  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	Let wgnuplot handle Unicode (not console mode gnuplot)
