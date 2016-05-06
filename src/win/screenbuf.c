@@ -1,6 +1,6 @@
-#ifndef lint
-static char *RCSid() { return RCSid("$Id: screenbuf.c,v 1.1 2011/03/07 21:41:36 markisch Exp $"); }
-#endif
+/*
+ * $Id: screenbuf.c,v 1.2 2014/03/30 18:33:49 markisch Exp $
+ */
 
 /* GNUPLOT - screenbuf.c 
 
@@ -11,7 +11,7 @@ static char *RCSid() { return RCSid("$Id: screenbuf.c,v 1.1 2011/03/07 21:41:36 
 */
 
 /*
-Copyright (c) 2011 Bastian Maerkisch. All rights reserved.
+Copyright (c) 2011,2016 Bastian Maerkisch. All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are
 permitted provided that the following conditions are met:
@@ -34,15 +34,17 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVE
 ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifdef _Windows
+#ifdef _WIN32
 # include <windows.h>
 #else
 typedef unsigned char BYTE;
 #endif
-#include <memory.h>
 #include <assert.h>
+#include <memory.h>
+#include <wchar.h>
 #include "stdfn.h"
 #include "screenbuf.h"
+#include "winmain.h"
 
 static uint sb_internal_length(LPSB sb);
 static LPLB sb_internal_get(LPSB sb, uint index);
@@ -114,7 +116,7 @@ lb_length(LPLB lb)
  *  fill gaps with spaces
  */
 void 
-lb_insert_char(LPLB lb, uint pos, char ch)
+lb_insert_char(LPLB lb, uint pos, WCHAR ch)
 {
     lb_insert_str(lb, pos, &ch, 1);
 }
@@ -127,15 +129,15 @@ lb_insert_char(LPLB lb, uint pos, char ch)
  *  fill gaps with spaces
  */
 void 
-lb_insert_str(LPLB lb, uint pos, char *s, uint count)
+lb_insert_str(LPLB lb, uint pos, LPCWSTR s, uint count)
 {
     assert(lb != NULL);
 
     /* enlarge string buffer if necessary */
-    if (lb->size <= pos + count) {
-	char * newstr;
-	uint newsize = ((pos + count + 8) / 8) * 8 + 32;
-	newstr = (char *) realloc(lb->str, newsize);
+    if (lb->size <= (pos + count)) {
+	LPWSTR newstr;
+	uint newsize = (((pos + count + 8) / 8) * 8 + 32);
+	newstr = (LPWSTR) realloc(lb->str, newsize  * sizeof(WCHAR));
 	if (newstr) {
 	    lb->str = newstr;
 	    lb->size = newsize;
@@ -150,12 +152,12 @@ lb_insert_str(LPLB lb, uint pos, char *s, uint count)
     
     /* fill up with spaces */
     if (pos > lb->len)
-	memset(lb->str + lb->len, ' ', pos - lb->len);
+	wmemset(lb->str + lb->len, L' ', pos - lb->len);
 
     /* copy characters */
-    memcpy(lb->str + pos, s, count);
+    wmemcpy(lb->str + pos, s, count);
     lb->len = GPMAX(pos + count, lb->len);
-    lb->str[lb->len] = '\0';
+    lb->str[lb->len] = NUL;
 }
 
 
@@ -163,33 +165,32 @@ lb_insert_str(LPLB lb, uint pos, char *s, uint count)
  *  get a substring from the line buffer, 
  *  this string has to bee free'd afterwards!
  */
-char * 
+LPWSTR
 lb_substr(LPLB lb, uint offset, uint count)
 {
     uint len;
-    char * retval;
+    LPWSTR retval;
 
     len = (lb != NULL) ? lb->len : 0;
 
     /* allocate return string */
-    retval = (char *) malloc(count + 1);
+    retval = (LPWSTR) malloc((count + 1) * sizeof(WCHAR));
     if (retval == NULL)
 	return NULL;
 
     if (offset >= len) {
-	memset(retval, ' ', count);
+	wmemset(retval, L' ', count);
     } else {
 	if (len >= (count + offset)) {
-	    memcpy(retval, lb->str + offset, count);    
+	    wmemcpy(retval, lb->str + offset, count);    
 	} else {
-	    memcpy(retval, lb->str + offset, len - offset);
-	    memset(retval + len - offset, ' ', count + offset - len);
+	    wmemcpy(retval, lb->str + offset, len - offset);
+	    wmemset(retval + len - offset, L' ', count + offset - len);
 	}
     }
-    retval[count] = '\0';
+    retval[count] = NUL;
     return retval;
 }
-
 
 
 /* ------------------------------------ */
@@ -561,7 +562,7 @@ sb_wrap(LPSB sb, uint wrap_at)
  *  adjust total number of lines accordingly
  */
 void
-sb_last_insert_str(LPSB sb, uint pos, char *s, uint count)
+sb_last_insert_str(LPSB sb, uint pos, LPCWSTR s, uint count)
 {
     LPLB lb;
     uint len;

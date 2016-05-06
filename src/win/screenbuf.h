@@ -1,11 +1,11 @@
 /*
- * $Id: screenbuf.h,v 1.1 2011/03/07 21:41:36 markisch Exp $
+ * $Id: screenbuf.h,v 1.2 2011/09/04 12:01:37 markisch Exp $
  */
 
 /* GNUPLOT - screenbuf.h */
 
 /*
-Copyright (c) 2011 Bastian Maerkisch. All rights reserved.
+Copyright (c) 2011,2016 Bastian Maerkisch. All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are
 permitted provided that the following conditions are met:
@@ -35,10 +35,10 @@ typedef unsigned int uint;
 
 typedef struct typLB
 {
-    uint size;	/* actual size of the memory buffer */
-    uint len;	/* length of the string */
-    char *str;
-    BYTE *attr;
+    uint   size;	/* actual size of the memory buffer */
+    uint   len;		/* length of the string */
+    LPWSTR str;
+    BYTE  *attr;
 } LB;
 typedef LB * LPLB;
 
@@ -73,7 +73,7 @@ uint sb_lines(LPSB sb, LPLB lb);
 uint sb_max_line_length(LPSB sb);
 void sb_find_new_pos(LPSB sb, uint x, uint y, uint new_wrap_at, uint * new_x, uint * new_y);
 void sb_wrap(LPSB sb, uint wrap_at);
-void sb_last_insert_str(LPSB sb, uint pos, char *s, uint count);
+void sb_last_insert_str(LPSB sb, uint pos, LPCWSTR s, uint count);
 
 
 /* ------------------------------------ */
@@ -81,9 +81,9 @@ void sb_last_insert_str(LPSB sb, uint pos, char *s, uint count);
 
 void lb_init(LPLB lb);
 uint lb_length(LPLB lb);
-void lb_insert_char(LPLB lb, uint pos, char ch);
-void lb_insert_str(LPLB lb, uint pos, char *s, uint count);
-char * lb_substr(LPLB lb, uint offset, uint count);
+void lb_insert_char(LPLB lb, uint pos, WCHAR ch);
+void lb_insert_str(LPLB lb, uint pos, LPCWSTR s, uint count);
+LPWSTR lb_substr(LPLB lb, uint offset, uint count);
 
 
 #endif

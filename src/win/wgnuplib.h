@@ -1,5 +1,5 @@
 /*
- * $Id: wgnuplib.h,v 1.69 2016/03/06 19:25:15 markisch Exp $
+ * $Id: wgnuplib.h,v 1.70 2016/05/06 13:04:04 markisch Exp $
  */
 
 /* GNUPLOT - win/wgnuplib.h */
@@ -210,6 +210,7 @@ int WDPROC TextGetCh(LPTW);
 int WDPROC TextGetChE(LPTW);
 LPSTR WDPROC TextGetS(LPTW lptw, LPSTR str, unsigned int size);
 int WDPROC TextPutCh(LPTW, BYTE);
+int TextPutChW(LPTW lptw, WCHAR ch);
 int WDPROC TextPutS(LPTW lptw, LPSTR str);
 void TextStartEditing(LPTW lptw);
 void TextStopEditing(LPTW lptw);

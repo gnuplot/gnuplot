@@ -1,5 +1,5 @@
 /*
- * $Id: wtext.c,v 1.52 2016/05/06 12:36:48 markisch Exp $
+ * $Id: wtext.c,v 1.53 2016/05/06 13:04:04 markisch Exp $
  */
 
 /* GNUPLOT - win/wtext.c */
@@ -57,6 +57,9 @@
 #include <windowsx.h>
 #include <commdlg.h>
 #include <commctrl.h>
+#include <dos.h>
+#include <tchar.h>
+#include <wchar.h>
 
 #include "wgnuplib.h"
 #include "winmain.h"
@@ -64,6 +67,7 @@
 #include "wcommon.h"
 #include "stdfn.h"
 #include "plot.h"
+#include "util.h"
 
 /* font stuff */
 #define TEXTFONTSIZE 9
@@ -500,7 +504,7 @@ UpdateText(LPTW lptw, int count)
 	lb = sb_get_last(&(lptw->ScreenBuffer));
 	xpos = lptw->CursorPos.x * lptw->CharSize.x - lptw->ScrollPos.x;
 	ypos = lptw->CursorPos.y * lptw->CharSize.y - lptw->ScrollPos.y;
-	TextOut(hdc, xpos, ypos, lb->str + lptw->CursorPos.x, count);
+	TextOutW(hdc, xpos, ypos, lb->str + lptw->CursorPos.x, count);
     }
     lptw->CursorPos.x += count;
     ReleaseDC(lptw->hWndText, hdc);
@@ -510,7 +514,92 @@ UpdateText(LPTW lptw, int count)
 int WDPROC
 TextPutCh(LPTW lptw, BYTE ch)
 {
-    switch(ch) {
+    static char mbstr[4] = "";
+    static int mbwait = 0;
+    static int mbcount = 0;
+    WCHAR w[2];
+    int count = 0;
+
+    /* try to re-sync on control characters */
+    /* works for utf8 and sjis */
+    if (ch < 32) {
+	mbwait = mbcount = 0;
+	mbstr[0] = NUL;
+    }
+
+    if (encoding == S_ENC_UTF8) { /* combine UTF8 byte sequences */
+	if (mbwait == 0) {
+	    /* first byte */
+	    mbcount = 0;
+	    mbstr[mbcount] = ch;
+	    if ((ch & 0xE0) == 0xC0) {
+		// expect one more byte
+		mbwait = 1;
+	    } else if ((ch & 0xF0) == 0xE0) {
+		// expect two more bytes
+		mbwait = 2;
+	    } else if ((ch & 0xF8) == 0xF0) {
+		// expect three more bytes
+		mbwait = 3;
+	    }
+	} else {
+	    /* subsequent byte */
+	    /*assert((ch & 0xC0) == 0x80);*/
+	    if ((ch & 0xC0) == 0x80) {
+		mbcount++;
+		mbwait--;
+	    } else {
+		/* invalid sequence */
+		mbcount = 0;
+		mbwait = 0;
+	    }
+	    mbstr[mbcount] = ch;
+	}
+	if (mbwait == 0) {
+	    count = MultiByteToWideChar(WinGetCodepage(encoding), 0, mbstr, mbcount + 1, w, 2);
+	}
+    } else if (encoding == S_ENC_SJIS) { /* combine S-JIS sequences */
+	if (mbwait == 0) {
+	    /* first or single byte */
+	    mbcount = 0;
+	    mbstr[mbcount] = ch;
+	    if (is_sjis_lead_byte(ch)) {
+		/* first byte */
+		mbwait = 1;
+	    }
+	} else {
+	    if ((ch >= 0x40) && (ch <= 0xfc)) {
+		/* valid */
+		mbcount++;
+	    } else {
+		/* invalid */
+		mbcount = 0;
+	    }
+	    mbwait = 0; /* max. double byte sequences */
+	    mbstr[mbcount] = ch;
+	}
+	if (mbwait == 0) {
+	    count = MultiByteToWideChar(WinGetCodepage(encoding), 0, mbstr, mbcount + 1, w, 2);
+	}
+    } else {
+	mbcount = 0;
+	mbwait = 0;
+	mbstr[0] = (char) ch;
+	count = MultiByteToWideChar(WinGetCodepage(encoding), 0, mbstr, mbcount + 1, w, 2);
+    }
+
+    if (count == 1) { 
+	/* FIXME: we only handle UCS-2: one double-byte only */
+	TextPutChW(lptw, w[0]);
+    }
+    return ch;
+}
+
+
+int
+TextPutChW(LPTW lptw, WCHAR ch)
+{
+    switch (ch) {
 	case '\r':
 	    lptw->CursorPos.x = 0;
 	    if (lptw->CursorFlag)
@@ -526,7 +615,7 @@ TextPutCh(LPTW lptw, BYTE ch)
 	    break;
 	case '\t': {
 	    uint tab = 8 - (lptw->CursorPos.x  % 8);
-	    sb_last_insert_str(&(lptw->ScreenBuffer), lptw->CursorPos.x, "        ", tab);
+	    sb_last_insert_str(&(lptw->ScreenBuffer), lptw->CursorPos.x, L"        ", tab);
 	    UpdateText(lptw, tab);
 	    UpdateScrollBars(lptw);
 	    TextToCursor(lptw);
@@ -542,16 +631,13 @@ TextPutCh(LPTW lptw, BYTE ch)
 	    if (lptw->CursorPos.y < 0)
 		lptw->CursorPos.y = 0;
 	    break;
-	default: {
-	    char c = (char)ch;
-
-	    sb_last_insert_str(&(lptw->ScreenBuffer), lptw->CursorPos.x, &c, 1);
+	default:
+	    sb_last_insert_str(&(lptw->ScreenBuffer), lptw->CursorPos.x, &ch, 1);
 	    /* TODO: add attribute support */
 	    UpdateText(lptw, 1);
 	    /* maximum line size may have changed, so update scroll bars */
 	    UpdateScrollBars(lptw);
 	    TextToCursor(lptw);
-	}
     }
     return ch;
 }
@@ -563,38 +649,42 @@ TextPutStr(LPTW lptw, LPSTR str)
     int count;
     uint n;
     uint idx;
+    LPWSTR w, w_save;
 
-    while (*str) {
+    w_save = w = UnicodeText(str, encoding);
+    while (*w != NUL) {
 	idx = lptw->CursorPos.x;
-	for (count = 0, n = 0; *str && (isprint((unsigned char)*str) || (*str == '\t')); str++) {
-	    if (*str == '\t') {
+	for (count = 0, n = 0; (*w != NUL) && (iswprint(*w) || (*w == L'\t')); w++) {
+	    if (*w == L'\t') {
 		uint tab;
 
 		tab = 8 - ((lptw->CursorPos.x + count + n) % 8);
-		sb_last_insert_str(&(lptw->ScreenBuffer), idx, str - n, n);
-		sb_last_insert_str(&(lptw->ScreenBuffer), idx + n, "        ", tab);
+		sb_last_insert_str(&(lptw->ScreenBuffer), idx, w - n, n);
+		sb_last_insert_str(&(lptw->ScreenBuffer), idx + n, L"        ", tab);
 		/* TODO: add attribute support (lptw->Attr) */
 		idx += n + tab;
 		count += n + tab;
 		n = 0;
-	    } else
+	    } else {
 		n++;
+	    }
 	}
 	if (n != 0) {
-	    sb_last_insert_str(&(lptw->ScreenBuffer), idx, str - n, n);
+	    sb_last_insert_str(&(lptw->ScreenBuffer), idx, w - n, n);
 	    count += n;
 	}
 
 	if (count > 0)
 	    UpdateText(lptw, count);
-	if (*str == '\n') {
+	if (*w == L'\n') {
 	    NewLine(lptw);
-	    str++;
+	    w++;
 	    n = 0;
-	} else if (*str && !isprint((unsigned char)*str) && (*str != '\t')) {
-	    TextPutCh(lptw, *str++);
+	} else if (*w && !iswprint(*w) && (*w != L'\t')) {
+	    TextPutChW(lptw, *w++);
 	}
     }
+    free(w_save);
 }
 
 
@@ -675,19 +765,19 @@ static void
 DoLine(LPTW lptw, HDC hdc, int xpos, int ypos, int x, int y, int count)
 {
     int idx, num;
-    char *outp;
     LPLB lb;
+    LPWSTR w;
 
     idx = 0;
     num = count;
     if (y <= sb_length(&(lptw->ScreenBuffer))) {
 	lb = sb_get(&(lptw->ScreenBuffer), y);
-	outp = lb_substr(lb, x + idx, count - idx);
+	w = lb_substr(lb, x + idx, count - idx);
     } else {
 	/* FIXME: actually, we could just do nothing in this case */
-	outp = (char *) malloc(sizeof(char) * (count + 1));
-	memset(outp, ' ', count);
-	outp[count] = 0;
+	w = (LPWSTR) malloc(sizeof(WCHAR) * (count + 1));
+	wmemset(w, L' ', count);
+	w[count] = NUL;
     }
 
     /* TODO: add attribute support */
@@ -700,9 +790,8 @@ DoLine(LPTW lptw, HDC hdc, int xpos, int ypos, int x, int y, int count)
 	SetTextColor(hdc, TextFore(0xf0));
 	SetBkColor(hdc, TextBack(0xf0));
     }
-
-    TextOut(hdc, xpos, ypos, outp, count - idx);
-    free(outp);
+    TextOutW(hdc, xpos, ypos, w, count - idx);
+    free(w);
 #else
     while (num > 0) {
 	num = 0;
@@ -753,13 +842,10 @@ DoMark(LPTW lptw, POINT pt, POINT end, BOOL mark)
 	ypos = pt.y * lptw->CharSize.y - lptw->ScrollPos.y;
 	count = max(lptw->ScreenSize.x - pt.x, 0);
 	if (mark) {
-	    char *s;
-	    LPLB lb;
-
-	    lb = sb_get(&(lptw->ScreenBuffer), pt.y);
-	    s = lb_substr(lb, pt.x, count);
-	    TextOut(hdc, xpos, ypos, s, count);
-	    free(s);
+	    LPLB lb = sb_get(&(lptw->ScreenBuffer), pt.y);
+	    LPWSTR w = lb_substr(lb, pt.x, count);
+	    TextOutW(hdc, xpos, ypos, w, count);
+	    free(w);
 	} else {
 	    DoLine(lptw, hdc, xpos, ypos, pt.x, pt.y, count);
 
@@ -781,13 +867,10 @@ DoMark(LPTW lptw, POINT pt, POINT end, BOOL mark)
     count = end.x - pt.x;
     if (count > 0) {
 	if (mark) {
-	    LPLB lb;
-	    char *s;
-
-	    lb = sb_get(&(lptw->ScreenBuffer), pt.y);
-	    s = lb_substr(lb, pt.x, count);
-	    TextOut(hdc, xpos, ypos, s, count);
-	    free(s);
+	    LPLB lb = sb_get(&(lptw->ScreenBuffer), pt.y);
+	    LPWSTR w = lb_substr(lb, pt.x, count);
+	    TextOutW(hdc, xpos, ypos, w, count);
+	    free(w);
 	} else {
 	    DoLine(lptw, hdc, xpos, ypos, pt.x, pt.y, count);
 	}
@@ -1174,14 +1257,37 @@ ReallocateKeyBuf(LPTW lptw)
 static void
 UpdateCaretPos(LPTW lptw)
 {
-    if (lptw->bWrap)
-	SetCaretPos((lptw->CursorPos.x % lptw->ScreenBuffer.wrap_at) * lptw->CharSize.x - lptw->ScrollPos.x,
+    HDC hdc;
+    LPLB line = sb_get_last(&lptw->ScreenBuffer);
+    SIZE size;
+    int len, start;
+
+    if (lptw->bWrap) {
+	start = (lptw->CursorPos.x / lptw->ScreenBuffer.wrap_at) * lptw->ScreenBuffer.wrap_at;
+	len = (lptw->CursorPos.x % lptw->ScreenBuffer.wrap_at);
+    } else {
+	start = 0;
+	len = lptw->CursorPos.x;
+    }
+
+    if (encoding == S_ENC_UTF8 || encoding == S_ENC_SJIS) {
+	/* determine actual text size */
+	hdc = GetDC(lptw->hWndText);
+	SelectObject(hdc, lptw->hfont);
+	GetTextExtentPoint32W(hdc, line->str + start, len, &size);
+    } else {
+	size.cx = len * lptw->CharSize.x;
+    }
+
+    if (lptw->bWrap) {
+	SetCaretPos(size.cx - lptw->ScrollPos.x,
 		    (lptw->CursorPos.y + (lptw->CursorPos.x / lptw->ScreenBuffer.wrap_at)) * lptw->CharSize.y + lptw->CharAscent
 		    - lptw->CaretHeight - lptw->ScrollPos.y);
-    else
-	SetCaretPos(lptw->CursorPos.x * lptw->CharSize.x - lptw->ScrollPos.x,
+    } else {
+	SetCaretPos(size.cx - lptw->ScrollPos.x,
 		    lptw->CursorPos.y * lptw->CharSize.y + lptw->CharAscent
 		    - lptw->CaretHeight - lptw->ScrollPos.y);
+    }
 }
 
 
@@ -1850,7 +1956,7 @@ WndTextProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		count = end - start;
 		if ((count > 0) && (offset < width.x)){
 		    LPLB lb;
-		    char *s;
+		    LPWSTR w;
 
 		    if (lptw->bSysColors) {
 			SetTextColor(hdc, GetSysColor(COLOR_HIGHLIGHTTEXT));
@@ -1861,9 +1967,9 @@ WndTextProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		    }
 
 		    lb = sb_get(&(lptw->ScreenBuffer), source.y);
-		    s = lb_substr(lb, source.x + offset, count);
-		    TextOut(hdc, dest.x + lptw->CharSize.x * offset, dest.y, s, count);
-		    free(s);
+		    w = lb_substr(lb, source.x + offset, count);
+		    TextOutW(hdc, dest.x + lptw->CharSize.x * offset, dest.y, w, count);
+		    free(w);
 		}
 		/* then stuff after marked text */
 		offset += count;
@@ -1933,7 +2039,7 @@ TextGetCh(LPTW lptw)
     int ch;
 
     TextStartEditing(lptw);
-	while (!TextKBHit(lptw)) {
+    while (!TextKBHit(lptw)) {
 	/* CMW: can't use TextMessage here as it does not idle properly */
 	MSG msg;
 	GetMessage(&msg, 0, 0, 0);
@@ -1941,13 +2047,14 @@ TextGetCh(LPTW lptw)
 	DispatchMessage(&msg);
     }
     ch = *lptw->KeyBufOut++;
-    if (ch=='\r')
+    if (ch == '\r')
 	ch = '\n';
     if (lptw->KeyBufOut - lptw->KeyBuf >= lptw->KeyBufSize)
 	lptw->KeyBufOut = lptw->KeyBuf;	/* wrap around */
-	TextStopEditing(lptw);
+    TextStopEditing(lptw);
     return ch;
 }
+
 
 /* get character from keyboard, with echo */
 int WDPROC
@@ -1966,7 +2073,7 @@ TextGetS(LPTW lptw, LPSTR str, unsigned int size)
 {
     LPSTR next = str;
 
-    while (--size>0) {
+    while (--size > 0) {
 	switch(*next = TextGetChE(lptw)) {
 	case EOF:
 	    *next = 0;
@@ -1994,7 +2101,7 @@ int WDPROC
 TextPutS(LPTW lptw, LPSTR str)
 {
     TextPutStr(lptw, str);
-    return str[_fstrlen(str)-1];
+    return str[strlen(str) - 1];
 }
 
 
