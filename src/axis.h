@@ -1,5 +1,5 @@
 /*
- * $Id: axis.h,v 1.143 2016/04/23 22:59:31 sfeam Exp $
+ * $Id: axis.h,v 1.144 2016/04/24 17:41:18 sfeam Exp $
  *
  */
 
@@ -537,7 +537,7 @@ do {									  \
 	    OUT_ACTION;							  \
 	    break;							  \
 	} else {							  \
-	    STORE = log(curval) / axis->log_base; /* AXIS_DO_LOG() */	  \
+	    STORE = axis_do_log(axis, curval);				  \
 	}								  \
     }									  \
     if (NOAUTOSCALE)							  \

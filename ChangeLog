@@ -8,6 +8,10 @@
 	* src/term.h:  The above change means that estimate.trm must be 
 	included earlier in term.h than emf.trm.  Bump it to the top.
 
+	* src/axis.h src/gadgets.c (apply_pm3dcolor) src/pm3d.c (z2cb):
+	Use existing macros axis_do_log() and friends rather than doing
+	hard-coded calculations with axis->log_base.
+
 2016-05-06  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	Let wgnuplot handle Unicode (not console mode gnuplot)
