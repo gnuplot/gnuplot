@@ -1,5 +1,5 @@
 /* Hey Emacs this is -*- C -*-
- * $Id: emf.trm,v 1.100 2015/04/07 18:14:46 sfeam Exp $
+ * $Id: emf.trm,v 1.101 2016/04/07 03:21:05 sfeam Exp $
  */
 
 /* GNUPLOT - emf.trm */
@@ -1789,16 +1789,26 @@ ENHemf_FLUSH()
 	    if (ENHemf_show && !ENHemf_sizeonly)
 		EMF_put_text(x-x_offset, y+y_offset, str);
 
-
-	    strl = strlen(str);
+	    if (encoding == S_ENC_UTF8) {
+		/* The strwidth_utf8() function approximates the space occupied */
+		/* by a UTF8 string, taking into account that CJK characters    */
+		/* are rougnly twice as wide as a typical ascii character.      */
+		strl = strwidth_utf8(str);
+	    
+	    } else {
+	 	/* Otherwise we assume 1 equal-width character per byte.        */
+		strl = strlen(str);
+	    }
 
 	    if (emf_tweak) {
 		/* Tweak estimated length of rendered string by counting "thin" */
-		/* characters. In principle EMF will accept an array of char    */
-		/* widths. But EMF viewers don't implement this option (ETO_PDY */
-		{
+		/* characters and "wide" characters.                            */
+		/* In principle EMF will accept an array of char widths, but    */
+		/* most EMF viewers don't implement this option (ETO_PDY).      */
 		int thin = 0, wide = 0;
-		for (i=0; i<strlen(str); i++) {
+		for (i = 0; i < strlen(str); i++) {
+		    if ((encoding == S_ENC_UTF8) && ((str[i] & 0x100)))
+			continue;
 		    if (strchr(" ijl.,;:|!()[]I-'",str[i]))
 			thin++;
 		    if (('A' <= str[i] && str[i] <= 'Z') || strchr("mw<>",str[i]))
@@ -1806,14 +1816,11 @@ ENHemf_FLUSH()
 		    if (strchr(" i.,;:|!'",str[i]))  /* really thin */
 			thin++;
 		}
-		incr_x = (strl * EMF_AVG_WID 
-			+ (double)(wide) * 0.3
-			+ (double)(-thin) * 0.2)
-			* term->h_char;
-		}
-	    } else {
-		incr_x = strl * EMF_AVG_WID * term->h_char;
+		strl += 0.30 * wide;
+		strl -= 0.15 * thin;
 	    }
+
+	    incr_x = strl * EMF_AVG_WID * term->h_char;
 
 	    /* Attempt to handle slanted text. Not entirely successful */
 	    emf_posx = x + incr_x * cos(emf_vert_text * EMF_10THDEG2RAD);

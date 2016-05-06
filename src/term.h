@@ -1,5 +1,5 @@
 /*
- * $Id: term.h,v 1.68 2016/01/10 00:41:13 sfeam Exp $
+ * $Id: term.h,v 1.69 2016/01/11 18:51:38 sfeam Exp $
  */
 
 /* GNUPLOT - term.h */
@@ -53,6 +53,9 @@
  * pslatex and epslatex support is now provided by the combination of
  * post.trm and pslatex.trm.  You cannot build pslatex without post.
  * Both drivers are selected by default, but you can disable them below.
+ * 
+ * Enhanced text support is pretty much required for all terminals now.
+ * If you build without GP_ENH_EST text layout will be degraded.
  */
 #define GP_ENH_EST 1		/* estimate string length of enhanced text */
 #define POSTSCRIPT_DRIVER 1	/* include post.trm */
@@ -62,6 +65,10 @@
 #define POSTSCRIPT_DRIVER
 #endif
 
+# ifdef GP_ENH_EST
+#  include "estimate.trm"	/* used for enhanced text processing */
+# endif
+
 
 /* Define SHORT_TERMLIST to select a few terminals. It is easier
  * to define the macro and list desired terminals in this section.
@@ -69,10 +76,6 @@
  */
 #ifdef SHORT_TERMLIST
 # include "dumb.trm"		/* dumb terminal */
-
-# ifdef GP_ENH_EST
-#  include "estimate.trm"	/* used for enhanced text processing */
-# endif
 
 # ifdef POSTSCRIPT_DRIVER
 #  ifdef  PSLATEX_DRIVER
@@ -372,10 +375,6 @@
 
 #ifdef USE_GGI_DRIVER
 # include "ggi.trm"
-#endif
-
-#ifdef GP_ENH_EST
-#include "estimate.trm"
 #endif
 
 /* WXWIDGETS */
