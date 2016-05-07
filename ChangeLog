@@ -16,6 +16,9 @@
 	* src/axis.h:  New macro nonlinear(AXIS *) becomes a noop if configured
 	without support for nonlinear axes.
 
+	* src/save.c:  "save" command can use a loop to save the log status of
+	all axes rather than running through them in-line one by one.
+
 2016-05-07  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	Let wgnuplot handle Unicode (not console mode gnuplot)

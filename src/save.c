@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.301 2016/04/25 18:36:21 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.302 2016/05/04 21:55:59 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -599,20 +599,6 @@ save_set_all(FILE *fp)
 	    textbox_opts.noborder ? "noborder" : "border");
 #endif
 
-    fputs("unset logscale\n", fp);
-#define SAVE_LOG(axis)							\
-    if (axis_array[axis].log)						\
-	fprintf(fp, "set logscale %s %g\n", axis_name(axis),	\
-		axis_array[axis].base);
-    SAVE_LOG(FIRST_X_AXIS );
-    SAVE_LOG(FIRST_Y_AXIS );
-    SAVE_LOG(SECOND_X_AXIS);
-    SAVE_LOG(SECOND_Y_AXIS);
-    SAVE_LOG(FIRST_Z_AXIS );
-    SAVE_LOG(COLOR_AXIS );
-    SAVE_LOG(POLAR_AXIS );
-#undef SAVE_LOG
-
     save_offsets(fp, "set offsets");
 
     /* FIXME */
@@ -855,14 +841,21 @@ set origin %g,%g\n",
     for (axis=0; axis<num_parallel_axes; axis++)
 	save_prange(fp, &parallel_axis[axis]);
 
+#undef SAVE_AXISLABEL
+#undef SAVE_AXISLABEL_OR_TITLE
+
+    fputs("unset logscale\n", fp);
+    for (axis = 0; axis < NUMBER_OF_MAIN_VISIBLE_AXES; axis++) {
+	if (axis_array[axis].log)
+	    fprintf(fp, "set logscale %s %g\n", axis_name(axis),
+		axis_array[axis].base);
+    }
+
     /* These will only print something if the axis is, in fact, linked */    
     save_link(fp, axis_array + SECOND_X_AXIS);
     save_link(fp, axis_array + SECOND_Y_AXIS);
     for (axis=0; axis<NUMBER_OF_MAIN_VISIBLE_AXES; axis++)
 	save_nonlinear(fp, &axis_array[axis]);
-
-#undef SAVE_AXISLABEL
-#undef SAVE_AXISLABEL_OR_TITLE
 
     save_jitter(fp);
 
