@@ -13,8 +13,15 @@
 	are stored internally in UTF16 format, use Unicode to copy to
 	clipboard, too.
 
-	src/win/wgnuplib.h src/win/wgraph.c src/win/winmain.c src/win/wtext.c:
-	Drag'n drop handles Unicode encoded file and directory names.
+	* src/win/wgnuplib.h src/win/wgraph.c src/win/winmain.c src/win/wtext.c:
+	Drag'n'drop handles Unicode encoded file and directory names.
+
+	* src/win/winmain.c (Pause) src/win/wpause.c src/win/wcommon.h
+	src/win/wgnuplib.c|h: Create pause dialog box as Unicode window.
+	Pause() will do the text conversion according to current encoding.
+
+	* src/command.c (pause_command):  Converting the string encoding
+	is now only required for console mode gnuplot.
 
 	* src/win/wmenu.c:  Temporary fix of string type of argument for
 	MessageBox.

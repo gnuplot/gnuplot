@@ -1,5 +1,5 @@
 /*
- * $Id: wgnuplib.h,v 1.73 2016/05/07 09:26:36 markisch Exp $
+ * $Id: wgnuplib.h,v 1.74 2016/05/07 11:48:57 markisch Exp $
  */
 
 /* GNUPLOT - win/wgnuplib.h */
@@ -83,10 +83,10 @@ typedef GP_PRINT *  GP_LPPRINT;
 /* wpause.c - pause window structure */
 typedef struct tagPW
 {
-	HINSTANCE	hInstance;		/* required */
+	HINSTANCE	hInstance;	/* required */
 	HINSTANCE	hPrevInstance;	/* required */
-	LPSTR	Title;			/* required */
-	LPSTR	Message;		/* required */
+	LPWSTR	Title;			/* required */
+	LPWSTR	Message;		/* required */
 	POINT	Origin;			/* optional */
 	HWND	hWndParent;		/* optional */
 	HWND	hWndPause;

@@ -1,5 +1,5 @@
 /*
- * $Id: wpause.c,v 1.31 2014/12/14 19:39:38 markisch Exp $
+ * $Id: wpause.c,v 1.32 2016/05/07 09:26:36 markisch Exp $
  */
 
 /* GNUPLOT - win/wpause.c */
@@ -52,6 +52,7 @@
 #include <windows.h>
 #include <windowsx.h>
 #include <string.h>
+#include <tchar.h>
 #include "wgnuplib.h"
 #include "wresourc.h"
 #include "wcommon.h"
@@ -135,54 +136,54 @@ win_sleep(DWORD dwMilliSeconds)
 static void
 CreatePauseClass(LPPW lppw)
 {
-	WNDCLASS wndclass;
+    WNDCLASSW wndclass;
 
-	wndclass.style = 0;
-	wndclass.lpfnWndProc = (WNDPROC)WndPauseProc;
-	wndclass.cbClsExtra = 0;
-	wndclass.cbWndExtra = sizeof(void *);
-	wndclass.hInstance = lppw->hInstance;
-	wndclass.hIcon = NULL;
-	wndclass.hCursor = LoadCursor(NULL, IDC_ARROW);
-	wndclass.hbrBackground = (HBRUSH)(COLOR_BTNFACE + 1);
-	wndclass.lpszMenuName = NULL;
-	wndclass.lpszClassName = szPauseClass;
-	RegisterClass(&wndclass);
+    wndclass.style = 0;
+    wndclass.lpfnWndProc = (WNDPROC)WndPauseProc;
+    wndclass.cbClsExtra = 0;
+    wndclass.cbWndExtra = sizeof(void *);
+    wndclass.hInstance = lppw->hInstance;
+    wndclass.hIcon = NULL;
+    wndclass.hCursor = LoadCursor(NULL, IDC_ARROW);
+    wndclass.hbrBackground = (HBRUSH)(COLOR_BTNFACE + 1);
+    wndclass.lpszMenuName = NULL;
+    wndclass.lpszClassName = szPauseClass;
+    RegisterClassW(&wndclass);
 }
 
 
 TBOOLEAN
 MousableWindowOpened(void)
 {
-	TBOOLEAN result = FALSE;
+    TBOOLEAN result = FALSE;
 
 #ifdef USE_MOUSE
-	/* only pause-for-mouse when a window is open */
-	/* FIXME: we might want to have a terminal entry for that */
-	if (term != NULL) {
-		if ((strcmp(term->name, "windows") == 0) && GraphHasWindow(graphwin))
-			result = TRUE;
+    /* only pause-for-mouse when a window is open */
+    /* FIXME: we might want to have a terminal entry for that */
+    if (term != NULL) {
+	if ((strcmp(term->name, "windows") == 0) && GraphHasWindow(graphwin))
+	    result = TRUE;
 #ifdef WXWIDGETS
-		/* FIXME: this does not test if the current window is open */
-		else if ((strcmp(term->name, "wxt") == 0) && wxt_active_window_opened())
-			result = TRUE;
+	/* FIXME: this does not test if the current window is open */
+	else if ((strcmp(term->name, "wxt") == 0) && wxt_active_window_opened())
+	    result = TRUE;
 #endif
 #ifdef HAVE_LIBCACA
-		else if ((strcmp(term->name, "caca") == 0) && CACA_window_opened())
-			result = TRUE;
+	else if ((strcmp(term->name, "caca") == 0) && CACA_window_opened())
+	    result = TRUE;
 #endif
 #ifdef QTTERM
 # if 0 /* FIXME: qt_window_opened() not yet implemented */
-		if ((strcmp(term->name, "qt") == 0) && !qt_active_window_opened())
+	if ((strcmp(term->name, "qt") == 0) && !qt_active_window_opened())
 #else
-		if ((strcmp(term->name, "qt") == 0))
+	if ((strcmp(term->name, "qt") == 0))
 # endif
-			result = TRUE;
+	    result = TRUE;
 #endif
-	}
+    }
 #endif
 
-	return result;
+    return result;
 }
 
 
@@ -190,92 +191,91 @@ MousableWindowOpened(void)
 int
 PauseBox(LPPW lppw)
 {
-	HDC hdc;
-	int width, height;
-	TEXTMETRIC tm;
-	RECT rect;
-	char *current_pause_title = lppw->Title;
+    HDC hdc;
+    int width, height;
+    TEXTMETRIC tm;
+    RECT rect;
 
 #ifdef USE_MOUSE
-	/* Do not try to wait for mouse events when there's no graph window open. */
-	if (paused_for_mouse && !MousableWindowOpened())
-		paused_for_mouse = 0;
+    /* Do not try to wait for mouse events when there's no graph window open. */
+    if (paused_for_mouse && !MousableWindowOpened())
+	    paused_for_mouse = 0;
 
-	if (!paused_for_mouse)
+    if (!paused_for_mouse)
 #endif
-	{
-		if (!lppw->hPrevInstance)
-			CreatePauseClass(lppw);
-		GetWindowRect(GetDesktopWindow(), &rect);
-		if ((lppw->Origin.x == CW_USEDEFAULT) || (lppw->Origin.x == 0))
-		     lppw->Origin.x = (rect.right + rect.left) / 2;
-		if ((lppw->Origin.y == CW_USEDEFAULT) || (lppw->Origin.y == 0))
-		    lppw->Origin.y = (rect.bottom + rect.top) / 2;
+    {
+	if (!lppw->hPrevInstance)
+	    CreatePauseClass(lppw);
+	GetWindowRect(GetDesktopWindow(), &rect);
+	if ((lppw->Origin.x == CW_USEDEFAULT) || (lppw->Origin.x == 0))
+	    lppw->Origin.x = (rect.right + rect.left) / 2;
+	if ((lppw->Origin.y == CW_USEDEFAULT) || (lppw->Origin.y == 0))
+	    lppw->Origin.y = (rect.bottom + rect.top) / 2;
 
-		hdc = GetDC(NULL);
-		SelectObject(hdc, GetStockObject(SYSTEM_FONT));
-		GetTextMetrics(hdc, &tm);
-		width  = max(24, 4 + strlen(lppw->Message)) * tm.tmAveCharWidth;
-		width = min(width, rect.right-rect.left);
-		height = 28 * (tm.tmHeight + tm.tmExternalLeading) / 4;
-		ReleaseDC(NULL,hdc);
+	hdc = GetDC(NULL);
+	SelectObject(hdc, GetStockObject(SYSTEM_FONT));
+	GetTextMetrics(hdc, &tm);
+	width = max(24, 4 + wcslen(lppw->Message)) * tm.tmAveCharWidth;
+	width = min(width, rect.right - rect.left);
+	height = 28 * (tm.tmHeight + tm.tmExternalLeading) / 4;
+	ReleaseDC(NULL,hdc);
 
-		lppw->hWndPause = CreateWindowEx(
-		    WS_EX_DLGMODALFRAME | WS_EX_APPWINDOW,
-		    szPauseClass, current_pause_title,
-		    /* HBB 981202: WS_POPUPWINDOW would have WS_SYSMENU in it, but we don't
-		     * want, nor need, a System menu in our Pause windows. */
-		    WS_POPUP | WS_BORDER | WS_CAPTION,
-		    lppw->Origin.x - width/2, lppw->Origin.y - height/2,
-		    width, height,
-		    lppw->hWndParent, NULL, lppw->hInstance, lppw);
-		ShowWindow(lppw->hWndPause, SW_SHOWNORMAL);
-		BringWindowToTop(lppw->hWndPause);
-		UpdateWindow(lppw->hWndPause);
+	lppw->hWndPause = CreateWindowExW(
+			    WS_EX_DLGMODALFRAME | WS_EX_APPWINDOW,
+			    szPauseClass, lppw->Title,
+			    /* HBB 981202: WS_POPUPWINDOW would have WS_SYSMENU in it, but we don't
+				* want, nor need, a System menu in our Pause windows. */
+			    WS_POPUP | WS_BORDER | WS_CAPTION,
+			    lppw->Origin.x - width/2, lppw->Origin.y - height/2,
+			    width, height,
+			    lppw->hWndParent, NULL, lppw->hInstance, lppw);
+	ShowWindow(lppw->hWndPause, SW_SHOWNORMAL);
+	BringWindowToTop(lppw->hWndPause);
+	UpdateWindow(lppw->hWndPause);
 
-		lppw->bPause = TRUE;
-		lppw->bPauseCancel = IDCANCEL;
+	lppw->bPause = TRUE;
+	lppw->bPauseCancel = IDCANCEL;
 
-		while (lppw->bPause && !ctrlc_flag) {
-			if (term->waitforinput == NULL) {
-				/* Only handle message queue events */ 
-				WinMessageLoop();
-				if (lppw->bPause && !ctrlc_flag)
-					WaitMessage();
-			} else {
-				/* Call the non-blocking sleep function,
-				   which also handles console input (caca terminal)
-				   and mousing of the current terminal (e.g. qt) */
-				win_sleep(50);
-			}
-		}
-
-		DestroyWindow(lppw->hWndPause);
-		return lppw->bPauseCancel;
+	while (lppw->bPause && !ctrlc_flag) {
+	    if (term->waitforinput == NULL) {
+		/* Only handle message queue events */ 
+		WinMessageLoop();
+		if (lppw->bPause && !ctrlc_flag)
+		    WaitMessage();
+	    } else {
+		/* Call the non-blocking sleep function,
+		    which also handles console input (caca terminal)
+		    and mousing of the current terminal (e.g. qt) */
+		win_sleep(50);
+	    }
 	}
+
+	DestroyWindow(lppw->hWndPause);
+	return lppw->bPauseCancel;
+    }
 #ifdef USE_MOUSE
-	else {
-		/* Don't show the pause "OK CANCEL" dialog for "pause mouse ..."
-		   Note: maybe gnuplot should display a message like
-		     "gnuplot pausing (waiting for mouse click)"
-		   in the window status or title bar or somewhere else. 
-		*/
+    else {
+	/* Don't show the pause "OK CANCEL" dialog for "pause mouse ..."
+	    Note: maybe gnuplot should display a message like
+		"gnuplot pausing (waiting for mouse click)"
+	    in the window status or title bar or somewhere else. 
+	*/
 
-		while (paused_for_mouse && !ctrlc_flag) {
-			if (term->waitforinput == NULL) {
-				/* Only handle message queue events */ 
-				WinMessageLoop();
-				if (paused_for_mouse && !ctrlc_flag)
-					WaitMessage();
-			} else {
-				/* Call the non-blocking sleep function,
-				   which also handles console input (caca terminal)
-				   and mousing of the current terminal (e.g. qt) */
-				win_sleep(50);
-			}
-		}
-		return !ctrlc_flag;
+	while (paused_for_mouse && !ctrlc_flag) {
+	    if (term->waitforinput == NULL) {
+		/* Only handle message queue events */ 
+		WinMessageLoop();
+		if (paused_for_mouse && !ctrlc_flag)
+		    WaitMessage();
+	    } else {
+		/* Call the non-blocking sleep function,
+		    which also handles console input (caca terminal)
+		    and mousing of the current terminal (e.g. qt) */
+		win_sleep(50);
+	    }
 	}
+	return !ctrlc_flag;
+    }
 #endif
 }
 
@@ -315,8 +315,8 @@ WndPauseProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			SetTextAlign(hdc, TA_CENTER);
 			GetClientRect(hwnd, &rect);
 			SetBkMode(hdc,TRANSPARENT);
-			TextOut(hdc, (rect.right + rect.left) / 2, (rect.bottom + rect.top) / 6,
-				lppw->Message, strlen(lppw->Message));
+			TextOutW(hdc, (rect.right + rect.left) / 2, (rect.bottom + rect.top) / 6,
+				lppw->Message, wcslen(lppw->Message));
 			EndPaint(hwnd, &ps);
 			return 0;
 		}
@@ -337,14 +337,14 @@ WndPauseProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			cyChar = tm.tmHeight + tm.tmExternalLeading;
 			ReleaseDC(hwnd, hdc);
 			middle = ((LPCREATESTRUCT) lParam)->cx / 2;
-			lppw->hOK = CreateWindow((LPSTR)"button", (LPSTR)"OK",
+			lppw->hOK = CreateWindow(TEXT("button"), TEXT("OK"),
 					ws_opts | BS_DEFPUSHBUTTON,
 					middle - 10 * cxChar, 3 * cyChar,
 					8 * cxChar, 7 * cyChar / 4,
 					hwnd, (HMENU)IDOK,
 					((LPCREATESTRUCT) lParam)->hInstance, NULL);
 			lppw->bDefOK = TRUE;
-			lppw->hCancel = CreateWindow((LPSTR)"button", (LPSTR)"Cancel",
+			lppw->hCancel = CreateWindow(TEXT("button"), TEXT("Cancel"),
 					ws_opts | BS_PUSHBUTTON,
 					middle + 2 * cxChar, 3 * cyChar,
 					8 * cxChar, 7 * cyChar / 4,

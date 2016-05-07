@@ -1,5 +1,5 @@
 /*
- * $Id: wcommon.h,v 1.21 2016/05/06 10:22:54 markisch Exp $
+ * $Id: wcommon.h,v 1.22 2016/05/06 13:04:04 markisch Exp $
  */
 
 /* GNUPLOT - wcommon.h */
@@ -70,7 +70,7 @@ extern UINT cp_output;
 extern HINSTANCE hdllInstance;
 extern LPWSTR szParentClass;
 extern LPWSTR szTextClass;
-extern LPSTR szPauseClass;
+extern LPWSTR szPauseClass;
 extern LPSTR szGraphClass;
 extern LPSTR szAboutClass;
 
