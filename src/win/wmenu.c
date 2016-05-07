@@ -1,5 +1,5 @@
 /*
- * $Id: wmenu.c,v 1.27 2014/04/03 00:36:17 markisch Exp $Id: wmenu.c,v 1.27 2014/04/03 00:36:17 markisch Exp $
+ * $Id: wmenu.c,v 1.28 2016/03/29 19:01:29 markisch Exp $Id: wmenu.c,v 1.28 2016/03/29 19:01:29 markisch Exp $
  */
 
 /* GNUPLOT - win/wmenu.c */
@@ -59,6 +59,8 @@
 #include "stdfn.h"
 #include "wcommon.h"
 
+/* title of error messages */
+#define MBOXTITLE "gnuplot"
 
 /* limits */
 #define MAXSTR 255
@@ -565,7 +567,7 @@ int ButtonIcon[BUTTONMAX];
 		if (!(nInc = GetLine(buf,MAXSTR,menufile))) {
 			nLine += nInc;
 			wsprintf(buf, "Problem on line %d of %s\n", nLine, lpmw->szMenuName);
-			MessageBox(lptw->hWndParent, (LPSTR) buf, lptw->Title, MB_ICONEXCLAMATION);
+			MessageBox(lptw->hWndParent, (LPSTR) buf, MBOXTITLE, MB_ICONEXCLAMATION);
 			goto errorcleanup;
 		}
 		LeftJustify(buf,buf);
@@ -573,7 +575,7 @@ int ButtonIcon[BUTTONMAX];
 			nMenuLevel++;
 		else {
 			wsprintf(buf, "Menu is too deep at line %d of %s\n", nLine, lpmw->szMenuName);
-			MessageBox(lptw->hWndParent, (LPSTR) buf, lptw->Title, MB_ICONEXCLAMATION);
+			MessageBox(lptw->hWndParent, (LPSTR) buf, MBOXTITLE, MB_ICONEXCLAMATION);
 			goto errorcleanup;
 		}
 		hMenu[nMenuLevel] = CreateMenu();
@@ -589,13 +591,13 @@ int ButtonIcon[BUTTONMAX];
 		char *icon;
 		if (lpmw->nButton >= BUTTONMAX) {
 			wsprintf(buf, "Too many buttons at line %d of %s\n", nLine, lpmw->szMenuName);
-			MessageBox(lptw->hWndParent, (LPSTR) buf, lptw->Title, MB_ICONEXCLAMATION);
+			MessageBox(lptw->hWndParent, (LPSTR) buf, MBOXTITLE, MB_ICONEXCLAMATION);
 			goto errorcleanup;
 		}
 		if (!(nInc = GetLine(buf,MAXSTR,menufile))) {
 			nLine += nInc;
 			wsprintf(buf, "Problem on line %d of %s\n", nLine, lpmw->szMenuName);
-			MessageBox(lptw->hWndParent, (LPSTR) buf, lptw->Title, MB_ICONEXCLAMATION);
+			MessageBox(lptw->hWndParent, (LPSTR) buf, MBOXTITLE, MB_ICONEXCLAMATION);
 			goto errorcleanup;
 		}
 		LeftJustify(buf,buf);
@@ -603,7 +605,7 @@ int ButtonIcon[BUTTONMAX];
 			lstrcpy((char *)macroptr,buf);
 		else {
 			wsprintf(buf,"Out of space for storing menu macros\n at line %d of %s\n", nLine, lpmw->szMenuName);
-			MessageBox(lptw->hWndParent, (LPSTR) buf, lptw->Title, MB_ICONEXCLAMATION);
+			MessageBox(lptw->hWndParent, (LPSTR) buf, MBOXTITLE, MB_ICONEXCLAMATION);
 			goto errorcleanup;
 		}
 		ButtonText[lpmw->nButton] = (char *)macroptr;
@@ -617,7 +619,7 @@ int ButtonIcon[BUTTONMAX];
 		if (!(nInc = GetLine(buf,MAXSTR,menufile))) {
 			nLine += nInc;
 			wsprintf(buf, "Problem on line %d of %s\n", nLine, lpmw->szMenuName);
-			MessageBox(lptw->hWndParent,(LPSTR) buf, lptw->Title, MB_ICONEXCLAMATION);
+			MessageBox(lptw->hWndParent,(LPSTR) buf, MBOXTITLE, MB_ICONEXCLAMATION);
 			goto errorcleanup;
 		}
 		LeftJustify(buf,buf);
@@ -626,7 +628,7 @@ int ButtonIcon[BUTTONMAX];
 			lstrcpy((char *)macroptr,buf);
 		else {
 			wsprintf(buf,"Out of space for storing menu macros\n at line %d of %s \n", nLine, lpmw->szMenuName);
-			MessageBox(lptw->hWndParent, (LPSTR) buf, lptw->Title, MB_ICONEXCLAMATION);
+			MessageBox(lptw->hWndParent, (LPSTR) buf, MBOXTITLE, MB_ICONEXCLAMATION);
 			goto errorcleanup;
 		}
 		lpmw->hButtonID[lpmw->nButton] = lpmw->nCountMenu;
@@ -640,7 +642,7 @@ int ButtonIcon[BUTTONMAX];
 		/* menu item */
 		if (lpmw->nCountMenu>=NUMMENU) {
 			wsprintf(buf, "Too many menu items at line %d of %s\n", nLine, lpmw->szMenuName);
-			MessageBox(lptw->hWndParent, (LPSTR) buf, lptw->Title, MB_ICONEXCLAMATION);
+			MessageBox(lptw->hWndParent, (LPSTR) buf, MBOXTITLE, MB_ICONEXCLAMATION);
 			goto errorcleanup;
 		}
 		LeftJustify(buf,buf);
@@ -662,7 +664,7 @@ int ButtonIcon[BUTTONMAX];
 			if (!(nInc = GetLine(buf,MAXSTR,menufile))) {
 				nLine += nInc;
 				wsprintf(buf, "Problem on line %d of %s\n", nLine, lpmw->szMenuName);
-				MessageBox(lptw->hWndParent, (LPSTR) buf, lptw->Title, MB_ICONEXCLAMATION);
+				MessageBox(lptw->hWndParent, (LPSTR) buf, MBOXTITLE, MB_ICONEXCLAMATION);
 				goto errorcleanup;
 			}
 			LeftJustify(buf,buf);
@@ -671,7 +673,7 @@ int ButtonIcon[BUTTONMAX];
 				lstrcpy((char *)macroptr,buf);
 			else {
 				wsprintf(buf, "Out of space for storing menu macros\n at line %d of %s\n", nLine, lpmw->szMenuName);
-				MessageBox(lptw->hWndParent, (LPSTR) buf, lptw->Title, MB_ICONEXCLAMATION);
+				MessageBox(lptw->hWndParent, (LPSTR) buf, MBOXTITLE, MB_ICONEXCLAMATION);
 				goto errorcleanup;
 			}
 			lpmw->macro[lpmw->nCountMenu] = macroptr;
@@ -739,7 +741,7 @@ int ButtonIcon[BUTTONMAX];
 
 
 nomemory:
-	MessageBox(lptw->hWndParent, "Out of memory", lptw->Title, MB_ICONEXCLAMATION);
+	MessageBox(lptw->hWndParent, "Out of memory", MBOXTITLE, MB_ICONEXCLAMATION);
 errorcleanup:
 	if (hmacro) {
 		GlobalUnlock(hmacro);
