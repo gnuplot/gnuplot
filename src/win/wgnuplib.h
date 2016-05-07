@@ -1,5 +1,5 @@
 /*
- * $Id: wgnuplib.h,v 1.70 2016/05/06 13:04:04 markisch Exp $
+ * $Id: wgnuplib.h,v 1.71 2016/05/06 13:17:24 markisch Exp $
  */
 
 /* GNUPLOT - win/wgnuplib.h */
@@ -65,18 +65,6 @@ extern "C" {
 /* For WIN32 API's */
 /* #define DEFAULT_CHARSET ANSI_CHARSET */
 # define MoveTo(hdc,x,y) MoveToEx(hdc,x,y,(LPPOINT)NULL);
-
-#if defined(__MINGW32__) && (__GNUC__ < 3) && !defined(CYGWIN)
-/* windowsx.h in MinGW32 2.x doesn't define some of the more traditional
- * things gnuplot expects in every Windows C compiler, it seems: */
-#define _fstrstr(s1,s2) (strstr(s1,s2))
-#define _fstrchr(s,c) (strchr(s,c))
-#define _fstrrchr(s,c) (strrchr(s,c))
-#define _fstrlen(s) (strlen(s))
-#define _fstrcpy(d,s) (strcpy(d,s))
-#define _fstrncpy(d,s,n) (strncpy(d,s,n))
-#define _fstrcat(s1,s2) (strcat(s1,s2))
-#endif /* __MINGW32__ */
 
 /* ================================== */
 /* wprinter.c - windows printer routines */

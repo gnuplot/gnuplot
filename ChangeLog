@@ -1,3 +1,16 @@
+2016-05-07  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/win/wmenu.c:  Temporary fix of string tyoe of argument for
+	MessageBox.
+
+	* config/watcom/Makefile:  Fix compilation by adding definitions
+	of version and patchlevel to flags.
+
+	* config/config.oww:  Add some more defines for function names.
+
+	* src/win/wgnuplib.h src/win/winmain.c:  Remove old compiler
+	specific checks which are no longer required.
+
 2016-05-06  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/emf.trm:  Better (though still not perfect) estimation of the

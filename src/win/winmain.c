@@ -1,5 +1,5 @@
 /*
- * $Id: winmain.c,v 1.80 2016/05/06 10:22:54 markisch Exp $
+ * $Id: winmain.c,v 1.81 2016/05/06 13:04:04 markisch Exp $
  */
 
 /* GNUPLOT - win/winmain.c */
@@ -64,9 +64,6 @@
 #include <stdarg.h>
 #include <ctype.h>
 #include <fcntl.h>
-#ifdef __WATCOMC__
-# define mktemp _mktemp
-#endif
 #include <io.h>
 #include <sys/stat.h>
 #include "alloc.h"
@@ -170,9 +167,7 @@ WinExit(void)
 
     term_reset();
 
-#ifndef __MINGW32__ /* HBB 980809: FIXME: doesn't exist for MinGW32. So...? */
-    fcloseall();
-#endif
+    _fcloseall();
 
 	/* Close all graph windows */
 	for (lpgw = listgraphs; lpgw != NULL; lpgw = lpgw->next) {
