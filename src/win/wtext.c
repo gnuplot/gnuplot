@@ -1,5 +1,5 @@
 /*
- * $Id: wtext.c,v 1.56 2016/05/07 11:33:33 markisch Exp $
+ * $Id: wtext.c,v 1.57 2016/05/07 11:36:49 markisch Exp $
  */
 
 /* GNUPLOT - win/wtext.c */
@@ -74,10 +74,6 @@
 
 
 #ifndef WGP_CONSOLE
-
-#ifndef EOF /* HBB 980809: for MinGW32 */
-# define EOF -1		/* instead of using <stdio.h> */
-#endif
 
 /* limits */
 static POINT ScreenMinSize = {16,4};
@@ -1183,17 +1179,15 @@ WndParentProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 	lptw->CharAscent = tm.tmAscent;
 	ReleaseDC(hwnd,hdc);
 
-	if ( (lptw->DragPre!=(LPSTR)NULL) && (lptw->DragPost!=(LPSTR)NULL) )
+	if ((lptw->DragPre != NULL) && (lptw->DragPost != NULL))
 	    DragAcceptFiles(hwnd, TRUE);
     }
     break;
-
     case WM_DESTROY:
 	DragAcceptFiles(hwnd, FALSE);
 	DeleteObject(lptw->hfont);
 	lptw->hfont = 0;
 	break;
-
     case WM_CLOSE:
 	if (lptw->shutdown) {
 	    FARPROC lpShutDown = lptw->shutdown;
@@ -2102,27 +2096,29 @@ void
 DragFunc(LPTW lptw, HDROP hdrop)
 {
     int i, cFiles;
-    LPSTR p;
-    struct stat buf;
+    LPWSTR p;
+    LPWSTR w;
+    struct _stat buf;
 
-    if ((lptw->DragPre==(LPSTR)NULL) || (lptw->DragPost==(LPSTR)NULL))
+    if ((lptw->DragPre == NULL) || (lptw->DragPost == NULL))
 	return;
-    cFiles = DragQueryFile(hdrop, (UINT) -1, (LPSTR)NULL, 0);
-    for (i=0; i<cFiles; i++) {
-	char szFile[MAX_PATH];
+    cFiles = DragQueryFileW(hdrop, (UINT) -1, NULL, 0);
+    for (i = 0; i < cFiles; i++) {
+	WCHAR szFile[MAX_PATH];
 
-	DragQueryFile(hdrop, i, szFile, MAX_PATH);
-	stat(szFile, &buf);
-	if (buf.st_mode & S_IFDIR)
-	    for (p="cd '"; *p; p++)
-		SendMessage(lptw->hWndText,WM_CHAR,*p,1L);
-	else
-	    for (p=lptw->DragPre; *p; p++)
-		SendMessage(lptw->hWndText,WM_CHAR,*p,1L);
-	for (p=szFile; *p; p++)
-	    SendMessage(lptw->hWndText,WM_CHAR,*p,1L);
-	for (p=lptw->DragPost; *p; p++)
-	    SendMessage(lptw->hWndText,WM_CHAR,*p,1L);
+	DragQueryFileW(hdrop, i, szFile, MAX_PATH);
+	_wstat(szFile, &buf);
+	if (buf.st_mode & S_IFDIR) {
+	    for (p = L"cd '"; *p; p++)
+		SendMessage(lptw->hWndText, WM_CHAR, *p, 1L);
+	} else {
+	    for (p = lptw->DragPre; *p; p++)
+		SendMessage(lptw->hWndText, WM_CHAR, *p, 1L);
+	}
+	for (w = szFile; *w; w++)
+	    SendMessage(lptw->hWndText, WM_CHAR, *w, 1L);
+	for (p = lptw->DragPost; *p; p++)
+	    SendMessage(lptw->hWndText, WM_CHAR, *p, 1L);
     }
     DragFinish(hdrop);
 }

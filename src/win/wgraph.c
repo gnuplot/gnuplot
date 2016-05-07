@@ -1,5 +1,5 @@
 /*
- * $Id: wgraph.c,v 1.202 2016/05/06 10:22:53 markisch Exp $
+ * $Id: wgraph.c,v 1.203 2016/05/07 09:26:36 markisch Exp $
  */
 
 /* GNUPLOT - win/wgraph.c */
@@ -4466,7 +4466,7 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			}
 			return FALSE;
 		case WM_CREATE:
-			lpgw = ((CREATESTRUCT *)lParam)->lpCreateParams;
+			lpgw = (LPGW) ((CREATESTRUCT *)lParam)->lpCreateParams;
 			SetWindowLongPtr(hwnd, 0, (LONG_PTR)lpgw);
 			lpgw->hWndGraph = hwnd;
 			hdc = GetDC(hwnd);
@@ -4477,7 +4477,7 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			GetPlotRect(lpgw, &rect);
 			MakeFonts(lpgw, (LPRECT)&rect, hdc);
 			ReleaseDC(hwnd, hdc);
-			if ( lpgw->lptw && (lpgw->lptw->DragPre!=(LPSTR)NULL) && (lpgw->lptw->DragPost!=(LPSTR)NULL) )
+			if (lpgw->lptw && (lpgw->lptw->DragPre != NULL) && (lpgw->lptw->DragPost != NULL))
 			    DragAcceptFiles(hwnd, TRUE);
 			return(0);
 

@@ -1,5 +1,5 @@
 /*
- * $Id: wgnuplib.h,v 1.72 2016/05/07 09:21:35 markisch Exp $
+ * $Id: wgnuplib.h,v 1.73 2016/05/07 09:26:36 markisch Exp $
  */
 
 /* GNUPLOT - win/wgnuplib.h */
@@ -141,8 +141,8 @@ typedef struct tagTW
 	unsigned int KeyBufSize;	/* optional */
 	LPSTR	IniFile;		/* optional */
 	LPSTR	IniSection;		/* optional */
-	LPSTR	DragPre;		/* optional */
-	LPSTR	DragPost;		/* optional */
+	LPWSTR	DragPre;		/* optional */
+	LPWSTR	DragPost;		/* optional */
 	int	nCmdShow;		/* optional */
 	FARPROC shutdown;		/* optional */
 	HICON	hIcon;			/* optional */

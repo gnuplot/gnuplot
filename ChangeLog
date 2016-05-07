@@ -13,6 +13,9 @@
 	are stored internally in UTF16 format, use Unicode to copy to
 	clipboard, too.
 
+	src/win/wgnuplib.h src/win/wgraph.c src/win/winmain.c src/win/wtext.c:
+	Drag'n drop handles Unicode encoded file and directory names.
+
 	* src/win/wmenu.c:  Temporary fix of string type of argument for
 	MessageBox.
 
