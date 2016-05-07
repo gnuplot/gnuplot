@@ -1,11 +1,15 @@
+2016-05-07 Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/term.h: Move estimate.trm further up, so emf.trm can see it.
+
 2016-05-06  Ethan A Merritt  <merritt@u.washington.edu>
 
-	* term/emf.trm:  Better (though still not perfect) estimation of the
-	space occupied by a UTF-8 string. Till now each byte in a multi-byte 
-	character was being counted as occupying space.
-	Bug #1787
+	* term/emf.trm: Better (though still not perfect) estimation of
+	the space occupied by a UTF-8 string. Till now each byte in a
+	multi-byte character was being counted as occupying space.  Bug
+	#1787
 
-	* src/term.h:  The above change means that estimate.trm must be 
+	* src/term.h: The above change means that estimate.trm must be
 	included earlier in term.h than emf.trm.  Bump it to the top.
 
 2016-05-04  Ethan A Merritt  <merritt@u.washington.edu>

@@ -1,5 +1,5 @@
 /*
- * $Id: term.h,v 1.66 2014/03/19 23:36:07 sfeam Exp $
+ * $Id: term.h,v 1.66.2.1 2014/10/01 02:40:29 sfeam Exp $
  */
 
 /* GNUPLOT - term.h */
@@ -216,6 +216,10 @@
 #endif /* !MSDOS && !_Windows */
 /****************************************************************************/
 
+#ifdef GP_ENH_EST
+#include "estimate.trm"
+#endif
+
 
 /****************************************************************************/
 /* These terminals can be used on any system */
@@ -395,10 +399,6 @@
 
 #ifdef USE_GGI_DRIVER
 # include "ggi.trm"
-#endif
-
-#ifdef GP_ENH_EST
-#include "estimate.trm"
 #endif
 
 /* WXWIDGETS */
