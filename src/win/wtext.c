@@ -1,5 +1,5 @@
 /*
- * $Id: wtext.c,v 1.55 2016/05/07 09:26:36 markisch Exp $
+ * $Id: wtext.c,v 1.56 2016/05/07 11:33:33 markisch Exp $
  */
 
 /* GNUPLOT - win/wtext.c */
@@ -926,11 +926,9 @@ TextCopyClip(LPTW lptw)
 {
     int size, count;
     HGLOBAL hGMem;
-    LPSTR cbuf, cp;
+    LPWSTR cbuf, cp;
     POINT pt, end;
-    TEXTMETRIC tm;
     UINT type;
-    HDC hdc;
     LPLB lb;
 
     if ((lptw->MarkBegin.x == lptw->MarkEnd.x) &&
@@ -947,9 +945,9 @@ TextCopyClip(LPTW lptw)
 	size += 2;
     }
 
-    hGMem = GlobalAlloc(GMEM_MOVEABLE, (DWORD)size);
-    cbuf = cp = (LPSTR)GlobalLock(hGMem);
-    if (cp == (LPSTR)NULL)
+    hGMem = GlobalAlloc(GMEM_MOVEABLE, size * sizeof(WCHAR));
+    cbuf = cp = (LPWSTR)GlobalLock(hGMem);
+    if (cp == NULL)
 	return;
 
     pt.x = lptw->MarkBegin.x;
@@ -962,11 +960,11 @@ TextCopyClip(LPTW lptw)
 	lb = sb_get(&(lptw->ScreenBuffer), pt.y);
 	count = lb_length(lb) - pt.x;
 	if (count > 0) {
-	    memcpy(cp, lb->str + pt.x, count);
+	    wmemcpy(cp, lb->str + pt.x, count);
 	    cp += count;
 	}
-	*(cp++) = '\r';
-	*(cp++) = '\n';
+	*(cp++) = L'\r';
+	*(cp++) = L'\n';
 	pt.y++;
 	pt.x = 0;
     }
@@ -977,24 +975,16 @@ TextCopyClip(LPTW lptw)
 	if (lb->len > pt.x) {
 	    if (end.x > lb->len)
 		count = lb->len - pt.x;
-	    memcpy(cp, lb->str + pt.x, count);
+	    wmemcpy(cp, lb->str + pt.x, count);
 	    cp += count;
 	}
     }
-    *cp = '\0';
+    *cp = NUL;
 
-    size = _fstrlen(cbuf) + 1;
+    size = (wcslen(cbuf) + 1) * sizeof(WCHAR);
     GlobalUnlock(hGMem);
-    hGMem = GlobalReAlloc(hGMem, (DWORD)size, GMEM_MOVEABLE);
-    /* find out what type to put into clipboard */
-    hdc = GetDC(lptw->hWndText);
-    SelectObject(hdc, lptw->hfont);
-    GetTextMetrics(hdc,(TEXTMETRIC *)&tm);
-    if (tm.tmCharSet == OEM_CHARSET)
-	type = CF_OEMTEXT;
-    else
-	type = CF_TEXT;
-    ReleaseDC(lptw->hWndText, hdc);
+    hGMem = GlobalReAlloc(hGMem, size, GMEM_MOVEABLE);
+    type = CF_UNICODETEXT;
     /* give buffer to clipboard */
     OpenClipboard(lptw->hWndParent);
     EmptyClipboard();

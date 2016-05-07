@@ -5,9 +5,13 @@
 
 	Part 3 - GUI. 
 
-	* src/win/wtext (M_PASTE):  Always ask the clipboard for UTF16
+	* src/win/wtext.c (M_PASTE):  Always ask the clipboard for UTF16
 	encoded text.  This is always possible since Windows will convert
 	other encodings (OEM/ANSI) for us.
+
+	* src/win/wtext.c (TextCopyClip):  Now that strings for display
+	are stored internally in UTF16 format, use Unicode to copy to
+	clipboard, too.
 
 	* src/win/wmenu.c:  Temporary fix of string type of argument for
 	MessageBox.
