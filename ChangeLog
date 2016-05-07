@@ -1,3 +1,18 @@
+2016-05-07  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/gp_types.h (intNaN) src/axis.h (invalid_coordinate):
+	If an expression returns "undefined" or NaN inside a function returning
+	a real then the return value itself can be set to NaN. Inside a function
+	returning an int, as for example the terminal coordinate mapping 
+	functions, this does not work. Now we define an integer equivalent
+	intNaN with leading bit 1 and all trailing bits 0 (max negative value in
+	two's complement representation).  Most callers can test via a generic
+	macro:  if (invalid_coordinate(x,y)) ...
+
+	* src/graphics.c:  Filter out invalid coordinates produced by axis 
+	mapping functions.  As an example this fixes bad postscript output
+	produced by nonlinear1.dem.
+
 2016-05-07  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	Let wgnuplot handle Unicode (not console mode gnuplot)

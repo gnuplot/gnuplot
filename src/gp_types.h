@@ -1,5 +1,5 @@
 /*
- * $Id: gp_types.h,v 1.69 2016/02/07 22:15:36 sfeam Exp $
+ * $Id: gp_types.h,v 1.70 2016/02/29 07:07:15 sfeam Exp $
  */
 
 /* GNUPLOT - gp_types.h */
@@ -191,5 +191,13 @@ typedef enum lp_class {
 	LP_ADHOC  = 2,	/* lp_style_type used for single purpose */
 	LP_NOFILL = 3	/* special treatment of fillcolor */
 } lp_class;
+
+/*
+ * Introduction of nonlinear axes makes it possible for an axis-mapping function
+ * to return "undefined" or NaN. These cannot be encoded as an integer coordinate.
+ * So we introduce an integer equivalent to NaN and provide a macro to test for
+ * whether a coordinate mapping returned it.
+ */
+#define intNaN (~((unsigned int)(~0)>>1))
 
 #endif /* GNUPLOT_GPTYPES_H */

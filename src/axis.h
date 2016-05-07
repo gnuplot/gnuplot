@@ -1,5 +1,5 @@
 /*
- * $Id: axis.h,v 1.144 2016/04/24 17:41:18 sfeam Exp $
+ * $Id: axis.h,v 1.145 2016/05/06 18:32:12 sfeam Exp $
  *
  */
 
@@ -36,8 +36,14 @@
 #ifndef GNUPLOT_AXIS_H
 #define GNUPLOT_AXIS_H
 
-#ifndef DISABLE_NONLINEAR_AXES
-#define NONLINEAR_AXES
+#ifdef DISABLE_NONLINEAR_AXES
+# define nonlinear(axis) FALSE
+# define invalid_coordinate(x,y) FALSE
+#else
+
+# define NONLINEAR_AXES
+# define nonlinear(axis) ((axis)->linked_to_primary != NULL)
+# define invalid_coordinate(x,y) ((unsigned)(x)==intNaN || (unsigned)(y)==intNaN)
 #endif
 
 #include <stddef.h>		/* for offsetof() */

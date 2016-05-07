@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.524 2016/04/21 00:34:56 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.525 2016/04/23 19:18:27 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -318,6 +318,10 @@ place_labels(struct text_label *listhead, int layer, TBOOLEAN clip)
 	    y = map_y(this_label->place.y);
 	} else
 	    map_position(&this_label->place, &x, &y, "label");
+
+	/* Trap undefined values from e.g. nonlinear axis mapping */
+	if (invalid_coordinate(x,y))
+	    continue;
 
 	if (clip) {
 	    if (this_label->place.scalex == first_axes)
@@ -962,6 +966,9 @@ plot_impulses(struct curve_points *plot, int yaxis_x, int xaxis_y)
 	x = map_x(plot->points[i].x);
 	y = map_y(plot->points[i].y);
 
+	if (invalid_coordinate(x,y))
+	    continue;
+
 	check_for_variable_color(plot, &plot->varcolor[i]);
 
 	if (polar)
@@ -997,17 +1004,13 @@ plot_lines(struct curve_points *plot)
 	switch (plot->points[i].type) {
 	case INRANGE:{
 
+		x = map_x(plot->points[i].x);
+		y = map_y(plot->points[i].y);
+
 		/* map_x or map_y can hit NaN during eval_link_function(), in which */
 		/* case the coordinate value is garbage and undefined is TRUE.      */
-		undefined = FALSE;
-
-		x = map_x(plot->points[i].x);
-		if (undefined)
+		if (invalid_coordinate(x,y))
 		    plot->points[i].type = UNDEFINED;
-		y = map_y(plot->points[i].y);
-		if (undefined)
-		    plot->points[i].type = UNDEFINED;
-
 		if (plot->points[i].type == UNDEFINED)
 		    break;
 
@@ -1420,7 +1423,7 @@ plot_steps(struct curve_points *plot)
 		x = map_x(plot->points[i].x);
 		y = map_y(plot->points[i].y);
 
-		if (prev == UNDEFINED)
+		if (prev == UNDEFINED || invalid_coordinate(x,y))
 		    break;
 		if (style) {
 		    /* We don't yet have a generalized draw_clip_rectangle routine */
@@ -1475,13 +1478,15 @@ plot_fsteps(struct curve_points *plot)
 		x = map_x(plot->points[i].x);
 		y = map_y(plot->points[i].y);
 
+		if (prev == UNDEFINED || invalid_coordinate(x,y))
+		    break;
 		if (prev == INRANGE) {
 		    draw_clip_line(xprev, yprev, xprev, y);
 		    draw_clip_line(xprev, y, x, y);
 		} else if (prev == OUTRANGE) {
 		    draw_clip_line(xprev, yprev, xprev, y);
 		    draw_clip_line(xprev, y, x, y);
-		} /* remaining case (prev == UNDEFINED) do nothing */
+		}
 
 		break;
 
@@ -2067,8 +2072,16 @@ plot_points(struct curve_points *plot)
 	    continue;
 	}
 	if (plot->points[i].type == INRANGE) {
+
 	    x = map_x(plot->points[i].x);
 	    y = map_y(plot->points[i].y);
+
+	    /* map_x or map_y can hit NaN during eval_link_function(), in which */
+	    /* case the coordinate value is garbage and undefined is TRUE.      */
+	    if (invalid_coordinate(x,y))
+		plot->points[i].type = UNDEFINED;
+	    if (plot->points[i].type == UNDEFINED)
+		continue;
 
 	    /* Apply jitter offsets.                                    */
 	    /* The jitter x offset is a multiple of character width.    */
@@ -2159,6 +2172,8 @@ plot_circles(struct curve_points *plot)
 	if (plot->points[i].type == INRANGE) {
 	    x = map_x(plot->points[i].x);
 	    y = map_y(plot->points[i].y);
+	    if (invalid_coordinate(x,y))
+		continue;
 	    radius = x - map_x(plot->points[i].xlow);
 	    if (plot->points[i].z == DEFAULT_RADIUS)
 		map_position_r( &default_circle.o.circle.extent, &radius, NULL, "radius");
@@ -2209,6 +2224,8 @@ plot_ellipses(struct curve_points *plot)
 	if (plot->points[i].type == INRANGE) {
 	    e->center.x = map_x(plot->points[i].x);
 	    e->center.y = map_y(plot->points[i].y);
+	    if (invalid_coordinate(e->center.x, e->center.y))
+		continue;
 
 	    e->extent.x = plot->points[i].xlow; /* major axis */
 	    e->extent.y = plot->points[i].xhigh; /* minor axis */
@@ -2281,6 +2298,8 @@ plot_dots(struct curve_points *plot)
 	if (plot->points[i].type == INRANGE) {
 	    x = map_x(plot->points[i].x);
 	    y = map_y(plot->points[i].y);
+	    if (invalid_coordinate(x,y))
+		continue;
 	    /* rgb variable  -  color read from data column */
 	    check_for_variable_color(plot, &plot->varcolor[i]);
 	    /* point type -1 is a dot */

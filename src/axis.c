@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.192 2016/04/26 06:09:03 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.193 2016/05/03 05:19:01 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -2382,6 +2382,8 @@ map_x(double value)
 	AXIS *primary = axis_array[x_axis].linked_to_primary;
 	if (primary->link_udf->at) {
 	    value = eval_link_function(primary, value);
+	    if (undefined)
+		return intNaN;
 	    return axis_map(primary, value);
 	}
     }
@@ -2395,6 +2397,8 @@ map_y(double value)
 	AXIS *primary = axis_array[y_axis].linked_to_primary;
 	if (primary->link_udf->at) {
 	    value = eval_link_function(primary, value);
+	    if (undefined)
+		return intNaN;
 	    return axis_map(primary, value);
 	}
     }
