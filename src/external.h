@@ -1,5 +1,5 @@
 /*
- * $Id: external.h,v 1.0 Exp $
+ * $Id: external.h,v 1.1 2014/02/28 00:24:20 sfeam Exp $
  */
 /* GNUPLOT - external.h */
 
@@ -77,7 +77,7 @@ void f_calle __PROTO((union argument *x));
 struct at_type *external_at __PROTO((const char *));
 void external_free __PROTO((struct at_type *));
 
-#if defined(WIN32)
+#if defined(_WIN32)
 
 # include <windows.h>
 # include <stdio.h>
@@ -85,7 +85,11 @@ typedef void *gp_dll_t;
 
 # define DLL_PATHSEP "\\"
 # define DLL_EXT  ".dll"
-# define DLL_OPEN(f) ((void *)LoadLibrary((f)));
+# ifndef WGP_CONSOLE
+#  define DLL_OPEN(f) dll_open_w(f);
+# else
+#  define DLL_OPEN(f) ((void *)LoadLibrary((f)));
+# endif
 # define DLL_CLOSE(dl) ((void)FreeLibrary((HINSTANCE)dl))
 # define DLL_SYM(dl, sym) ((void *)GetProcAddress((HINSTANCE)dl, (sym)))
 # define DLL_ERROR(dl) "dynamic library error"

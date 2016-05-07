@@ -12,6 +12,19 @@
 	* src/win/winmain.c (win_fopen) src/syscfg.h:  Wrap calls to fopen()
 	in a new routine win_fopen() on Windows which uses _wfopen().
 
+	* src/win/command.c (do_system): Use _wsystem() instead of system().
+
+	* src/win/winmain.c (fake_popen, fake_pclose):  Handle encodings by
+	using _wsystem().
+
+	* src/stdfn.c (opendir, closedir, readdir, rewinddir):  Handle
+	encodings by using UTF-16 internally.  Convert search results to a
+	byte encoded format according to `encoding`.  This most notably brings
+	encoding/unicode support for tab-completion on the command line.
+
+	* src/external.c|h (DLL_OPEN):  Handle encodings for the file name of
+	external libraries.
+
 2016-05-07  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/gp_types.h (intNaN) src/axis.h (invalid_coordinate):

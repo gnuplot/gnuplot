@@ -1,5 +1,5 @@
 /*
- * $Id: external.c,v 1.0 Exp $
+ * $Id: external.c,v 1.1 2014/02/28 00:24:20 sfeam Exp $
  */
 /* GNUPLOT - external.c */
 
@@ -69,6 +69,9 @@
 #include "command.h"	/* for c_token and dummy_func */
 #include "util.h"	/* for int_warn, int_error */
 #include "plot.h"	/* for gp_expand_tilde */
+#ifdef _WIN32
+# include "win/winmain.h"
+#endif
 
 #include <string.h>
 
@@ -84,7 +87,7 @@ struct exft_entry {
 };
 
 void
-f_calle (union argument *x)
+f_calle(union argument *x)
 {
     struct value r = x->exf_arg->exfn (x->exf_arg->args->dummy_num,
 				       x->exf_arg->args->dummy_values,
@@ -94,6 +97,19 @@ f_calle (union argument *x)
     push(&r);
 }
 
+
+#if defined(_WIN32) && !defined(WGP_CONSOLE)
+static void *
+dll_open_w(const char *f)
+{
+    LPWSTR w = UnicodeText((f), encoding); 
+    void * dl = (void *)LoadLibraryW(w); 
+    free(w);
+    return dl;
+}
+#endif
+
+
 /*
   Parse the sring argument for a dll filename and function.  Create a
   one-item action list that calls a plugin function.  Call the _init,
@@ -102,7 +118,7 @@ f_calle (union argument *x)
 */
 
 struct at_type *
-external_at (const char *func_name)
+external_at(const char *func_name)
 {
     char *file = NULL;
     char *func;
