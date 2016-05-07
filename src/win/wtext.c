@@ -1,5 +1,5 @@
 /*
- * $Id: wtext.c,v 1.54 2016/05/06 13:17:24 markisch Exp $
+ * $Id: wtext.c,v 1.55 2016/05/07 09:26:36 markisch Exp $
  */
 
 /* GNUPLOT - win/wtext.c */
@@ -1743,27 +1743,21 @@ WndTextProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 	    case M_PASTE:
 	    {
 		HGLOBAL hGMem;
-		BYTE *cbuf;
-		TEXTMETRIC tm;
+		LPWSTR cbuf;
 		UINT type;
 
-		/* find out what type to get from clipboard */
-		hdc = GetDC(hwnd);
-		SelectObject(hdc, lptw->hfont);
-		GetTextMetrics(hdc,(TEXTMETRIC *)&tm);
-		if (tm.tmCharSet == OEM_CHARSET)
-		    type = CF_OEMTEXT;
-		else
-		    type = CF_TEXT;
-		ReleaseDC(lptw->hWndText, hdc);
+		type = CF_UNICODETEXT;
 		/* now get it from clipboard */
 		OpenClipboard(hwnd);
 		hGMem = GetClipboardData(type);
 		if (hGMem) {
-		    cbuf = (BYTE *) GlobalLock(hGMem);
+		    cbuf = (LPWSTR) GlobalLock(hGMem);
 		    while (*cbuf) {
-			if (*cbuf != '\n')
-			    SendMessage(lptw->hWndText, WM_CHAR, *cbuf, 1L);
+			WCHAR c = *cbuf;
+			if (c == 011) /* convert 'tab' to 'space' */
+			    c = L' ';
+			if (*cbuf != L'\n')
+			    SendMessage(lptw->hWndText, WM_CHAR, c, 1L);
 			cbuf++;
 		    }
 		    GlobalUnlock(hGMem);
