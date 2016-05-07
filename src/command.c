@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.327 2016/05/02 03:56:02 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.328 2016/05/06 10:22:53 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -1742,13 +1742,17 @@ pause_command()
 	if (!tmp)
 	    int_error(c_token, "expecting string");
 	else {
-#ifdef WIN32
-	    char * nbuf = translate_string_encoding(tmp, 0, encoding);
-	    free(tmp);
+#ifdef _WIN32
 	    free(buf);
-	    buf = nbuf;
-	    if (sleep_time >= 0)
+	    buf = tmp;
+	    if (sleep_time >= 0) {
+#ifdef WGP_CONSOLE
+		char * nbuf = translate_string_encoding(buf, 0, encoding);
+		free(buf);
+		buf = nbuf;
+#endif
 		fputs(buf, stderr);
+	    }
 #elif defined(OS2)
 	    free(buf);
 	    buf = tmp;
@@ -1764,14 +1768,14 @@ pause_command()
     }
 
     if (sleep_time < 0) {
-#if defined(WIN32)
+#if defined(_WIN32)
 	ctrlc_flag = FALSE;
 # if defined(WGP_CONSOLE) && defined(USE_MOUSE)
 	if (!paused_for_mouse || !MousableWindowOpened()) {
 	    int junk = 0;
 	    if (buf) {
 		/* Use of fprintf() triggers a bug in MinGW + SJIS encoding */
-		fputs(buf,stderr); fputs("\n",stderr);
+		fputs(buf, stderr); fputs("\n",stderr);
 	    }
 	    /* cannot use EAT_INPUT_WITH here */
 	    do {
@@ -3253,7 +3257,6 @@ do_shell()
     if (user_shell) {
 	if (system(user_shell) == -1)
 	    os_error(NO_CARET, "system() failed");
-
     }
     (void) putc('\n', stderr);
 }
