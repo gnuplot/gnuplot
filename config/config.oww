@@ -575,6 +575,9 @@
 #define popen _popen
 #define __STDC_WANT_LIB_EXT1__ 1
 #define strnlen strnlen_s
+#define ftruncate _chsize
+#define _fcloseall fcloseall
+#define mktemp _mktemp
 
 /* gnuplot.gih is not used by wgnuplot */
 #define NO_GIH 1
