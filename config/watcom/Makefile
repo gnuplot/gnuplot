@@ -1,5 +1,5 @@
 # Hello, emacs: this is a -*- Makefile -*-
-# $Id: Makefile,v 1.12 2013/07/06 08:09:20 markisch Exp $
+# $Id: Makefile,v 1.13 2014/08/18 03:49:06 sfeam Exp $
 #
 # GNUPLOT Makefile OpenWatcom 1.3 on Win32
 
@@ -71,6 +71,7 @@ BINARYFILES=$(M)binary1 $(M)binary2 $(M)binary3
 # Defines
 
 CPPFLAGS =  -DHAVE_CONFIG_H -D_Windows -DHAVE_CONFIG_H -DUSE_MOUSE -DEAM_OBJECTS
+CPPFLAGS += -DVERSION_MAJOR="5.1" -DPATCHLEVEL="0"
 # library-dependent ones may have to be added, like:
 # -DHAVE_LIBPNG -DHAVE_LIBPDF 
 
