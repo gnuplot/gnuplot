@@ -11,6 +11,10 @@
 	* src/win/wgnuplib.h src/win/winmain.c:  Remove old compiler
 	specific checks which are no longer required.
 
+	* src/win/wgnuplib.h src/win/wgraph.c src/win/wpause.c
+	src/win/wprinter.c src/win/wtext.c:  No need to have functions use
+	WINAPI (stdcall) calling convention.  Remove define WDPROC.
+
 2016-05-06  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/emf.trm:  Better (though still not perfect) estimation of the

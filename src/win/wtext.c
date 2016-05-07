@@ -1,5 +1,5 @@
 /*
- * $Id: wtext.c,v 1.53 2016/05/06 13:04:04 markisch Exp $
+ * $Id: wtext.c,v 1.54 2016/05/06 13:17:24 markisch Exp $
  */
 
 /* GNUPLOT - win/wtext.c */
@@ -132,7 +132,7 @@ static const COLORREF TextColorTable[16] = {
 
 
 
-void WDPROC
+void
 TextMessage()
 {
     WinMessageLoop();
@@ -180,7 +180,7 @@ CreateTextClass(LPTW lptw)
 
 
 /* make text window */
-int WDPROC
+int
 TextInit(LPTW lptw)
 {
     RECT rect;
@@ -302,7 +302,7 @@ TextInit(LPTW lptw)
 
 
 /* close a text window */
-void WDPROC
+void
 TextClose(LPTW lptw)
 {
     HGLOBAL hglobal;
@@ -511,7 +511,7 @@ UpdateText(LPTW lptw, int count)
 }
 
 
-int WDPROC
+int
 TextPutCh(LPTW lptw, BYTE ch)
 {
     static char mbstr[4] = "";
@@ -2024,7 +2024,7 @@ TextStopEditing(LPTW lptw)
 /* replacement stdio routines */
 
 /* TRUE if key hit, FALSE if no key */
-int WDPROC
+int
 TextKBHit(LPTW lptw)
 {
     return (lptw->KeyBufIn != lptw->KeyBufOut);
@@ -2033,7 +2033,7 @@ TextKBHit(LPTW lptw)
 
 /* get character from keyboard, no echo */
 /* need to add extended codes */
-int WDPROC
+int
 TextGetCh(LPTW lptw)
 {
     int ch;
@@ -2057,7 +2057,7 @@ TextGetCh(LPTW lptw)
 
 
 /* get character from keyboard, with echo */
-int WDPROC
+int
 TextGetChE(LPTW lptw)
 {
     int ch;
@@ -2068,7 +2068,7 @@ TextGetChE(LPTW lptw)
 }
 
 
-LPSTR WDPROC
+LPSTR
 TextGetS(LPTW lptw, LPSTR str, unsigned int size)
 {
     LPSTR next = str;
@@ -2097,7 +2097,7 @@ TextGetS(LPTW lptw, LPSTR str, unsigned int size)
 }
 
 
-int WDPROC
+int
 TextPutS(LPTW lptw, LPSTR str)
 {
     TextPutStr(lptw, str);
@@ -2105,7 +2105,7 @@ TextPutS(LPTW lptw, LPSTR str)
 }
 
 
-void WDPROC
+void
 TextAttr(LPTW lptw, BYTE attr)
 {
     lptw->Attr = attr;
@@ -2308,7 +2308,7 @@ AboutDlgProc(HWND hDlg, UINT wMsg, WPARAM wParam, LPARAM lParam)
 }
 
 
-void WDPROC
+void
 AboutBox(HWND hwnd, LPSTR str)
 {
     DialogBoxParam(hdllInstance, "AboutDlgBox", hwnd,

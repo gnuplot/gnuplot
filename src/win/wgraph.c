@@ -1,5 +1,5 @@
 /*
- * $Id: wgraph.c,v 1.201 2016/03/06 19:42:19 markisch Exp $
+ * $Id: wgraph.c,v 1.202 2016/05/06 10:22:53 markisch Exp $
  */
 
 /* GNUPLOT - win/wgraph.c */
@@ -224,7 +224,7 @@ static void	MakeFonts(LPGW lpgw, LPRECT lprect, HDC hdc);
 static void	DestroyFonts(LPGW lpgw);
 static void	SelFont(LPGW lpgw);
 static void	dot(HDC hdc, int xdash, int ydash);
-static unsigned int WDPROC GraphGetTextLength(LPGW lpgw, HDC hdc, LPCSTR text);
+static unsigned int GraphGetTextLength(LPGW lpgw, HDC hdc, LPCSTR text);
 static void	draw_text_justify(HDC hdc, int justify);
 static void	draw_put_text(LPGW lpgw, HDC hdc, int x, int y, char * str);
 static void	drawgraph(LPGW lpgw, HDC hdc, LPRECT rect);
@@ -316,7 +316,7 @@ AddBlock(LPGW lpgw)
 }
 
 
-void WDPROC
+void
 GraphOp(LPGW lpgw, UINT op, UINT x, UINT y, LPCSTR str)
 {
 	if (str)
@@ -326,7 +326,7 @@ GraphOp(LPGW lpgw, UINT op, UINT x, UINT y, LPCSTR str)
 }
 
 
-void WDPROC
+void
 GraphOpSize(LPGW lpgw, UINT op, UINT x, UINT y, LPCSTR str, DWORD size)
 {
 	struct GWOPBLK *this;
@@ -362,7 +362,7 @@ GraphOpSize(LPGW lpgw, UINT op, UINT x, UINT y, LPCSTR str, DWORD size)
 
 /* Initialize the LPGW struct:
  * set default values and read options from ini file */
-void WDPROC
+void
 GraphInitStruct(LPGW lpgw)
 {
 	if (!lpgw->initialized) {
@@ -415,7 +415,7 @@ GraphInitStruct(LPGW lpgw)
 
 /* Prepare Graph window for being displayed by windows, update
  * the window's menus and show it */
-void WDPROC
+void
 GraphInit(LPGW lpgw)
 {
 	HMENU sysmenu;
@@ -621,7 +621,7 @@ GraphInit(LPGW lpgw)
 }
 
 
-void WDPROC
+void
 GraphUpdateWindowPosSize(LPGW lpgw)
 {
 	/* resize to match requested canvas size */
@@ -634,7 +634,7 @@ GraphUpdateWindowPosSize(LPGW lpgw)
 
 
 /* close a graph window */
-void WDPROC
+void
 GraphClose(LPGW lpgw)
 {
 #ifdef USE_MOUSE
@@ -653,7 +653,7 @@ GraphClose(LPGW lpgw)
 }
 
 
-void WDPROC
+void
 GraphStart(LPGW lpgw, double pointsize)
 {
 	lpgw->locked = TRUE;
@@ -680,7 +680,7 @@ GraphStart(LPGW lpgw, double pointsize)
 }
 
 
-void WDPROC
+void
 GraphEnd(LPGW lpgw)
 {
 	RECT rect;
@@ -697,7 +697,7 @@ GraphEnd(LPGW lpgw)
 
 
 /* shige */
-void WDPROC
+void
 GraphChangeTitle(LPGW lpgw)
 {
 	if (GraphHasWindow(lpgw))
@@ -705,14 +705,14 @@ GraphChangeTitle(LPGW lpgw)
 }
 
 
-void WDPROC
+void
 GraphResume(LPGW lpgw)
 {
 	lpgw->locked = TRUE;
 }
 
 
-void WDPROC
+void
 GraphPrint(LPGW lpgw)
 {
 	if (GraphHasWindow(lpgw))
@@ -720,7 +720,7 @@ GraphPrint(LPGW lpgw)
 }
 
 
-void WDPROC
+void
 GraphRedraw(LPGW lpgw)
 {
 	lpgw->buffervalid = FALSE;
@@ -1145,7 +1145,7 @@ luma_from_color(unsigned red, unsigned green, unsigned blue)
 }
 
 
-static unsigned int WDPROC
+static unsigned int
 GraphGetTextLength(LPGW lpgw, HDC hdc, LPCSTR text)
 {
     SIZE size;
@@ -1162,7 +1162,7 @@ GraphGetTextLength(LPGW lpgw, HDC hdc, LPCSTR text)
 }
 
 
-void WDPROC
+void
 GraphEnhancedOpen(char *fontname, double fontsize, double base,
     BOOL widthflag, BOOL showflag, int overprint)
 {
@@ -1214,7 +1214,7 @@ GraphEnhancedOpen(char *fontname, double fontsize, double base,
 }
 
 
-void WDPROC
+void
 GraphEnhancedFlush(void)
 {
 	int width, height;
@@ -4702,7 +4702,7 @@ GraphChangeFont(LPGW lpgw, LPCSTR font, int fontsize, HDC hdc, RECT rect)
 
 
 /* close the terminal window */
-void WDPROC
+void
 win_close_terminal_window(LPGW lpgw)
 {
 	if (GraphHasWindow(lpgw))
@@ -4723,7 +4723,7 @@ win_close_terminal_window(LPGW lpgw)
  * 'this' pointer, sort of: it stores all the status information of the graph
  * window that we need, in a single large structure. */
 
-void WDPROC
+void
 Graph_set_cursor(LPGW lpgw, int c, int x, int y)
 {
 	switch (c) {
@@ -4787,7 +4787,7 @@ Graph_set_cursor(LPGW lpgw, int c, int x, int y)
 }
 
 /* set_ruler(int x, int y) term API: x<0 switches ruler off. */
-void WDPROC
+void
 Graph_set_ruler (LPGW lpgw, int x, int y )
 {
 	DrawRuler(lpgw); /* remove previous drawing, if any */
@@ -4806,7 +4806,7 @@ Graph_set_ruler (LPGW lpgw, int x, int y )
  * 	i: 0..at statusline
  *	1, 2: at corners of zoom box with \r separating text
  */
-void WDPROC
+void
 Graph_put_tmptext (LPGW lpgw, int where, LPCSTR text )
 {
     /* Position of the annotation string (mouse movement) or zoom box
@@ -4838,7 +4838,7 @@ Graph_put_tmptext (LPGW lpgw, int where, LPCSTR text )
 }
 
 
-void WDPROC
+void
 Graph_set_clipboard (LPGW lpgw, LPCSTR s)
 {
 	size_t length;
@@ -4982,7 +4982,7 @@ UpdateToolbar(LPGW lpgw)
 /*
  * Toggle active plots
  */
-void WDPROC
+void
 GraphModifyPlots(LPGW lpgw, unsigned int ops, int plotno)
 {
 	int i;
