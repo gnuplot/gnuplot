@@ -1,5 +1,5 @@
 /*
- * $Id: syscfg.h,v 1.57 2014/12/16 22:49:34 broeker Exp $
+ * $Id: syscfg.h,v 1.58 2016/01/10 00:41:12 sfeam Exp $
  */
 
 /* GNUPLOT - syscfg.h */
@@ -132,6 +132,15 @@
 #endif
 #ifndef _WIN32_IE
 # define _WIN32_IE 0x0501
+#endif
+
+/* The unicode/encoding support requires translation of file names */
+#if !defined(WGP_CONSOLE) && !defined(WINDOWS_NO_GUI)
+/* Need to include definition of fopen before re-defining */
+#include <stdlib.h>
+#include <stdio.h>
+FILE * win_fopen(const char *filename, const char *mode);
+#define fopen win_fopen
 #endif
 #endif /* _WINDOWS */
 

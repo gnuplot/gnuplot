@@ -1,5 +1,5 @@
 /*
- * $Id: winmain.c,v 1.83 2016/05/07 11:48:57 markisch Exp $
+ * $Id: winmain.c,v 1.84 2016/05/07 12:13:03 markisch Exp $
  */
 
 /* GNUPLOT - win/winmain.c */
@@ -1293,3 +1293,19 @@ AnsiText(LPCWSTR strw,  enum set_encoding_id encoding)
 
     return str;
 }
+
+
+#if !defined(WGP_CONSOLE)
+FILE * 
+win_fopen(const char *filename, const char *mode)
+{
+    FILE * file;
+    LPWSTR wfilename = UnicodeText(filename, encoding);
+    LPWSTR wmode = UnicodeText(mode, encoding);
+    file = _wfopen(wfilename, wmode);
+    free(wfilename);
+    free(wmode);
+    return file;
+    return fopen(filename, mode);
+}
+#endif
