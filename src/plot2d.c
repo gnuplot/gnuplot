@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.386 2016/04/25 18:36:21 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.387 2016/04/26 06:09:03 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -1378,11 +1378,9 @@ store2d_point(
 	    if (R_AXIS.min <= 0 || R_AXIS.autoscale & AUTOSCALE_MIN)
 		int_error(NO_CARET,"In log mode rrange must not include 0");
 	    y = AXIS_DO_LOG(POLAR_AXIS,y) - AXIS_DO_LOG(POLAR_AXIS,R_AXIS.min);
-#ifdef NONLINEAR_AXES
-	} else if (R_AXIS.linked_to_primary) {
+	} else if (nonlinear(&R_AXIS)) {
 	    AXIS *shadow = R_AXIS.linked_to_primary;
 	    y = eval_link_function(shadow, y) - shadow->min;
-#endif
 	} else if (!(R_AXIS.autoscale & AUTOSCALE_MIN)) {
 	    /* we store internally as if plotting r(t)-rmin */
 		y -= R_AXIS.min;
@@ -1408,11 +1406,9 @@ store2d_point(
 	    if (R_AXIS.log) {
 		yhigh = AXIS_DO_LOG(POLAR_AXIS,yhigh)
 			- AXIS_DO_LOG(POLAR_AXIS,R_AXIS.min);
-#ifdef NONLINEAR_AXES
-	    } else if (R_AXIS.linked_to_primary) {
+	    } else if (nonlinear(&R_AXIS)) {
 		AXIS *shadow = R_AXIS.linked_to_primary;
 		yhigh = eval_link_function(shadow, yhigh) - shadow->min;
-#endif
 	    } else if (!(R_AXIS.autoscale & AUTOSCALE_MIN)) {
 		/* we store internally as if plotting r(t)-rmin */
 		yhigh -= R_AXIS.min;
@@ -1429,11 +1425,9 @@ store2d_point(
 	    if (R_AXIS.log) {
 		ylow = AXIS_DO_LOG(POLAR_AXIS,ylow)
 		     - AXIS_DO_LOG(POLAR_AXIS,R_AXIS.min);
-#ifdef NONLINEAR_AXES
-	    } else if (R_AXIS.linked_to_primary) {
+	    } else if (nonlinear(&R_AXIS)) {
 		AXIS *shadow = R_AXIS.linked_to_primary;
 		ylow = eval_link_function(shadow, ylow) - shadow->min;
-#endif
 	    } else if (!(R_AXIS.autoscale & AUTOSCALE_MIN)) {
 		/* we store internally as if plotting r(t)-rmin */
 		ylow -= R_AXIS.min;
@@ -2952,16 +2946,14 @@ eval_plots()
     /* parametric or polar fns can still affect x ranges */
     if (!parametric && !polar) {
 
-#ifdef NONLINEAR_AXES
 	/* Autoscaling on x used the primary axis, so we must transform */
 	/* the range that was found back onto the visible X axis.	*/
 	/* If we were _not_ autoscaling, well I guess it doesn't hurt.	*/
 	/* NB: clone_linked_axes() is overkill.				*/
-	if (axis_array[FIRST_X_AXIS].linked_to_primary) {
+	if (nonlinear(&axis_array[FIRST_X_AXIS])) {
 	    clone_linked_axes(axis_array[FIRST_X_AXIS].linked_to_primary,
 				&axis_array[FIRST_X_AXIS]);
 	}
-#endif
 
 	/* If we were expecting to autoscale on X but found no usable
 	 * points in the data files, then the axis limits are still sitting
@@ -3092,16 +3084,15 @@ eval_plots()
 		    if (!parametric && !polar) {
 			t_min = axis_array[SAMPLE_AXIS].min;
 			t_max = axis_array[SAMPLE_AXIS].max;
-#ifdef NONLINEAR_AXES
-			if (axis_array[SAMPLE_AXIS].linked_to_primary) {
+			if (nonlinear(&axis_array[SAMPLE_AXIS])) {
 			    AXIS *primary = axis_array[SAMPLE_AXIS].linked_to_primary;
 			    t_min = eval_link_function(primary, t_min);
 			    t_max = eval_link_function(primary, t_max);
 			    FPRINTF((stderr,"sample range on primary axis: %g %g\n", t_min, t_max));
-			} else
-#endif
+			} else {
 			    /* FIXME: What if SAMPLE_AXIS is not x_axis? */
 			    axis_unlog_interval(&X_AXIS, &t_min, &t_max, 1);
+			}
 
 			t_step = (t_max - t_min) / (samples_1 - 1);
 		    }
@@ -3109,12 +3100,10 @@ eval_plots()
 			double x, temp;
 			struct value a;
 			double t = t_min + i * t_step;
-#ifdef NONLINEAR_AXES
-			if (axis_array[SAMPLE_AXIS].linked_to_primary) {
+			if (nonlinear(&axis_array[SAMPLE_AXIS])) {
 			    AXIS *vis = axis_array[SAMPLE_AXIS].linked_to_primary->linked_to_secondary;
 			    t = eval_link_function(vis, t_min + i * t_step);
 			} else
-#endif
 			    t = t_min + i * t_step;
 
 			/* Zero is often a special point in a function domain.	*/
@@ -3173,11 +3162,9 @@ eval_plots()
 			    if (R_AXIS.log) {
 				temp = AXIS_DO_LOG(POLAR_AXIS,temp)
 				     - AXIS_DO_LOG(POLAR_AXIS,R_AXIS.min);
-#ifdef NONLINEAR_AXES
-			    } else if (R_AXIS.linked_to_primary) {
+			    } else if (nonlinear(&R_AXIS)) {
 				AXIS *shadow = R_AXIS.linked_to_primary;
 				temp = eval_link_function(shadow, temp) - shadow->min;
-#endif
 			    } else if (!(R_AXIS.autoscale & AUTOSCALE_MIN))
 				temp -= R_AXIS.min;
 
@@ -3369,12 +3356,9 @@ eval_plots()
 	    axis_array[FIRST_X_AXIS].max = axis_array[SECOND_X_AXIS].max;
     }
 
-#ifdef NONLINEAR_AXES
-    if (uses_axis[FIRST_Y_AXIS] && axis_array[FIRST_Y_AXIS].linked_to_primary) {
+    if (uses_axis[FIRST_Y_AXIS] && nonlinear(&axis_array[FIRST_Y_AXIS])) {
 	clone_linked_axes(axis_array[FIRST_Y_AXIS].linked_to_primary, &axis_array[FIRST_Y_AXIS]);
-    } else 
-#endif
-    if (uses_axis[FIRST_Y_AXIS]) {
+    } else if (uses_axis[FIRST_Y_AXIS]) {
 	axis_checked_extend_empty_range(FIRST_Y_AXIS, "all points y value undefined!");
 	axis_revert_and_unlog_range(FIRST_Y_AXIS);
     }

@@ -1,3 +1,8 @@
+2016-05-08  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/pm3d.c src/command.c src/mouse.c src/plot2d.c: Where possible,
+	use macro nonlinear(AXIS *) rather than #ifdef NONLINEAR_AXES.
+
 2016-05-07  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	Let wgnuplot handle Unicode (not console mode gnuplot)

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: mouse.c,v 1.187 2016/04/23 22:59:31 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: mouse.c,v 1.188 2016/04/25 18:36:21 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - mouse.c */
@@ -717,15 +717,13 @@ apply_zoom(struct t_zoom *z)
 	memcpy(axis_array, axis_array_copy, sizeof(axis_array));
 	s[0] = '\0';	/* FIXME:  Is this better than calling replotrequest()? */
 
-#ifdef NONLINEAR_AXES
 	/* The shadowed primary axis, if any, is not restored by the memcpy.	*/
 	/* We choose to recalculate the limits, but alternatively we could find	*/
 	/* some place to save/restore the unzoomed limits.			*/
-	if (axis_array[FIRST_X_AXIS].linked_to_primary)
+	if (nonlinear(&axis_array[FIRST_X_AXIS]))
 	    clone_linked_axes(&axis_array[FIRST_X_AXIS], axis_array[FIRST_X_AXIS].linked_to_primary);
-	if (axis_array[FIRST_Y_AXIS].linked_to_primary)
+	if (nonlinear(&axis_array[FIRST_Y_AXIS]))
 	    clone_linked_axes(&axis_array[FIRST_Y_AXIS], axis_array[FIRST_Y_AXIS].linked_to_primary);
-#endif
 
 	/* Falling through to do_string_replot() does not work! */
 	if (volatile_data) {

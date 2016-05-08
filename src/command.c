@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.329 2016/05/07 12:11:32 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.330 2016/05/08 12:52:30 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -2085,19 +2085,17 @@ refresh_request()
     AXIS_UPDATE2D_REFRESH(FIRST_Z_AXIS);
     AXIS_UPDATE2D_REFRESH(COLOR_AXIS);
 
-#ifdef NONLINEAR_AXES
     /* Nonlinear mapping of x or y via linkage to a hidden primary axis */
-    if (axis_array[FIRST_X_AXIS].linked_to_primary) {
+    if (nonlinear(&axis_array[FIRST_X_AXIS])) {
 	AXIS *primary = axis_array[FIRST_X_AXIS].linked_to_primary;
 	primary->min = primary->set_min;
 	primary->max = primary->set_max;
     }
-    if (axis_array[FIRST_Y_AXIS].linked_to_primary) {
+    if (nonlinear(&axis_array[FIRST_Y_AXIS])) {
 	AXIS *primary = axis_array[FIRST_Y_AXIS].linked_to_primary;
 	primary->min = primary->set_min;
 	primary->max = primary->set_max;
     }
-#endif
 
     if (refresh_ok == E_REFRESH_OK_2D) {
 	refresh_bounds(first_plot, refresh_nplots); 

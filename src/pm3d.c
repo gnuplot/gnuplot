@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.108 2016/04/25 18:36:21 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.109 2016/05/06 18:32:12 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - pm3d.c */
@@ -201,12 +201,10 @@ cb2gray(double cb)
     if (cb >= cbaxis->max)
 	return (sm_palette.positive == SMPAL_POSITIVE) ? 1 : 0;
 
-#ifdef NONLINEAR_AXES
-    if (cbaxis->linked_to_primary) {
+    if (nonlinear(cbaxis)) {
 	cbaxis = cbaxis->linked_to_primary;
 	cb = eval_link_function(cbaxis, cb);
     }
-#endif
 
     cb = (cb - cbaxis->min) / (cbaxis->max - cbaxis->min);
     return (sm_palette.positive == SMPAL_POSITIVE) ? cb : 1-cb;
