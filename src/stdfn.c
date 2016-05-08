@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: stdfn.c,v 1.29 2013/12/28 05:44:43 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: stdfn.c,v 1.30 2014/03/20 00:58:35 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - stdfn.c */
@@ -43,9 +43,11 @@ static char *RCSid() { return RCSid("$Id: stdfn.c,v 1.29 2013/12/28 05:44:43 mar
 
 #include "stdfn.h"
 
-#ifdef WIN32
+#ifdef _WIN32
 /* the WIN32 API has a Sleep function that does not consume CPU cycles */
 #include <windows.h>
+#include "term_api.h"
+#include "win/winmain.h"
 #ifndef HAVE_DIRENT_H
 #include <io.h> /* _findfirst and _findnext set errno iff they return -1 */
 #endif
@@ -186,7 +188,7 @@ sleep(unsigned int delay)
     while (time(NULL) < time_is_up)
 	/* wait */ ;
 # endif
-#elif defined(WIN32)
+#elif defined(_WIN32)
     Sleep((DWORD) delay * 1000);
 #endif /* MSDOS ... */
 
@@ -486,7 +488,8 @@ void gp_exit(int status)
     exit(status);
 }
 
-#if !defined(HAVE_DIRENT_H) && defined(WIN32)  && (!defined(__WATCOMC__))
+
+#if !defined(HAVE_DIRENT_H) && defined(_WIN32) && (!defined(__WATCOMC__))
 /* BM: OpenWatcom has dirent functions in direct.h!*/
 /*
 
@@ -500,88 +503,105 @@ void gp_exit(int status)
 
 struct DIR
 {
-    long                handle; /* -1 for failed rewind */
-    struct _finddata_t  info;
+    intptr_t            handle; /* -1 for failed rewind */
+    struct _wfinddata_t info;
     struct dirent       result; /* d_name null iff first time */
-    char                *name;  /* null-terminated char string */
+    WCHAR               *name;  /* null-terminated string */
+    char                info_mbname[4*260];
 };
 
-DIR *opendir(const char *name)
+
+DIR *
+opendir(const char *name)
 {
     DIR *dir = 0;
+    char *mbname;
 
     if (name && name[0]) {
-        size_t base_length = strlen(name);
-         /* search pattern must end with suitable wildcard */
-        const char *all = strchr("/\\", name[base_length - 1]) ? "*" : "/*";
+	size_t base_length = strlen(name);
+	    /* search pattern must end with suitable wildcard */
+	const char *all = strchr("/\\", name[base_length - 1]) ? "*" : "/*";
 
-        if ((dir = (DIR *) malloc(sizeof *dir)) != 0 &&
-           (dir->name = (char *) malloc(base_length + strlen(all) + 1)) != 0) {
-            strcat(strcpy(dir->name, name), all);
+	if ((dir = (DIR *) malloc(sizeof *dir)) != NULL &&
+	    (mbname = (char *) malloc(base_length + strlen(all) + 1)) != NULL) {
+	    strcat(strcpy(mbname, name), all);
+	    dir->name = UnicodeText(mbname, encoding);
+	    free(mbname);
 
-            if ((dir->handle = (long) _findfirst(dir->name, &dir->info)) != -1) {
-                dir->result.d_name = 0;
-            } else { /* rollback */
-                free(dir->name);
-                free(dir);
-                dir = 0;
-            }
-        } else { /* rollback */
-            free(dir);
-            dir   = 0;
-            errno = ENOMEM;
-        }
+	    if ((dir->name != NULL) && 
+		((dir->handle = (long) _wfindfirst(dir->name, &dir->info)) != -1)) {
+		dir->result.d_name = NULL;
+	    } else { /* rollback */
+		free(dir->name);
+		free(dir);
+		dir = NULL;
+	    }
+	} else { /* rollback */
+	    free(dir);
+	    dir   = NULL;
+	    errno = ENOMEM;
+	}
     } else {
-        errno = EINVAL;
+	errno = EINVAL;
     }
 
     return dir;
 }
 
-int closedir(DIR *dir)
+
+int
+closedir(DIR *dir)
 {
     int result = -1;
 
     if (dir) {
-        if(dir->handle != -1) {
-            result = _findclose(dir->handle);
-        }
-        free(dir->name);
-        free(dir);
+	if (dir->handle != -1) {
+	    result = _findclose(dir->handle);
+	}
+	free(dir->name);
+	free(dir);
     }
 
     if (result == -1) { /* map all errors to EBADF */
-        errno = EBADF;
+	errno = EBADF;
     }
 
     return result;
 }
 
-struct dirent *readdir(DIR *dir)
+
+struct dirent *
+readdir(DIR *dir)
 {
     struct dirent *result = 0;
 
     if (dir && dir->handle != -1) {
-        if (!dir->result.d_name || _findnext(dir->handle, &dir->info) != -1) {
-            result         = &dir->result;
-            result->d_name = dir->info.name;
-        }
+	if (!dir->result.d_name || _wfindnext(dir->handle, &dir->info) != -1) {
+	    result         = &dir->result;
+	    WideCharToMultiByte(WinGetCodepage(encoding), 0, 
+				dir->info.name, sizeof(dir->info.name) / sizeof(wchar_t),
+				dir->info_mbname, sizeof(dir->info_mbname) / sizeof(char),
+				NUL, 0);
+	    result->d_name = dir->info_mbname;
+	}
     } else {
-        errno = EBADF;
+	errno = EBADF;
     }
 
     return result;
 }
 
-void rewinddir(DIR *dir)
+
+void
+rewinddir(DIR *dir)
 {
     if (dir && dir->handle != -1) {
-        _findclose(dir->handle);
-        dir->handle = (long) _findfirst(dir->name, &dir->info);
-        dir->result.d_name = 0;
+	_findclose(dir->handle);
+	dir->handle = (long) _wfindfirst(dir->name, &dir->info);
+	dir->result.d_name = NULL;
     }
     else {
-        errno = EBADF;
+	errno = EBADF;
     }
 }
 
@@ -593,10 +613,10 @@ void rewinddir(DIR *dir)
     documentation for any purpose is hereby granted without fee, provided
     that this copyright and permissions notice appear in all copies and
     derivatives.
-    
+
     This software is supplied "as is" without express or implied warranty.
 
     But that said, if there are any problems please get in touch.
 
 */
-#endif /* !HAVE_DIRENT_H && WIN32 */
+#endif /* !HAVE_DIRENT_H && _WIN32 */
