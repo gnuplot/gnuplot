@@ -13,6 +13,9 @@
 	mapping functions.  As an example this fixes bad postscript output
 	produced by nonlinear1.dem.
 
+	* src/axis.h:  New macro nonlinear(AXIS *) becomes a noop if configured
+	without support for nonlinear axes.
+
 2016-05-07  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	Let wgnuplot handle Unicode (not console mode gnuplot)
