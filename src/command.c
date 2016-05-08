@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.328 2016/05/06 10:22:53 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.329 2016/05/07 12:11:32 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -3110,7 +3110,15 @@ do_system(const char *cmd)
     if (!cmd)
 	return;
     restrict_popen();
+#if defined(_WIN32) && !defined(WGP_CONSOLE)
+    {
+	LPWSTR wcmd = UnicodeText(cmd, encoding);
+	_wsystem(wcmd);
+	free(wcmd);
+    }
+#else
     system(cmd);
+#endif
 }
 
 /* is_history_command:
