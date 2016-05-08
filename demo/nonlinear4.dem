@@ -49,4 +49,4 @@ replot
 unset multiplot
 
 pause -1 "<cr> to continue"
-
+reset

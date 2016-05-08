@@ -1,5 +1,5 @@
 /*
- * $Id: boundary.c,v 1.30 2016/01/28 23:54:13 sfeam Exp $
+ * $Id: boundary.c,v 1.31 2016/03/09 04:40:01 sfeam Exp $
  */
 
 /* GNUPLOT - boundary.c */
@@ -413,10 +413,13 @@ boundary(struct curve_points *plots, int count)
 	do_key_layout(key);
     }
 
-    /*{{{  set up y and y2 tics */
+    /* Adjust range of dependent axes y and y2 */
+    if (nonlinear(&axis_array[FIRST_Y_AXIS]))
+	extend_primary_ticrange(&axis_array[FIRST_Y_AXIS]);
+    if (nonlinear(&axis_array[SECOND_Y_AXIS]))
+	extend_primary_ticrange(&axis_array[SECOND_Y_AXIS]);
     setup_tics(&axis_array[FIRST_Y_AXIS], 20);
     setup_tics(&axis_array[SECOND_Y_AXIS], 20);
-    /*}}} */
 
     /* Adjust color axis limits if necessary. */
     if (is_plot_with_palette()) {

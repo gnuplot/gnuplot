@@ -1,5 +1,5 @@
 /*
- * $Id: graph3d.h,v 1.49 2016/01/28 23:54:13 sfeam Exp $
+ * $Id: graph3d.h,v 1.50 2016/04/23 00:36:22 sfeam Exp $
  */
 
 /* GNUPLOT - graph3d.h */
@@ -126,7 +126,7 @@ typedef struct surface_points {
 /* Variables of graph3d.c needed by other modules: */
 
 extern int xmiddle, ymiddle, xscaler, yscaler;
-extern double floor_z;
+extern double floor_z, floor_z1;
 extern double ceiling_z, base_z; /* made exportable for PM3D */
 extern transform_matrix trans_mat;
 extern double xscale3d, yscale3d, zscale3d;

@@ -1,5 +1,5 @@
 #
-# $Id: all.dem,v 1.69 2016/04/24 22:03:05 sfeam Exp $
+# $Id: all.dem,v 1.70 2016/04/25 18:36:21 sfeam Exp $
 #
 # Executes all demos (OK, MOST demos) in this directory.
 # This serves as a series of unit tests for non-interactive capabilities.
@@ -359,6 +359,7 @@ load "nonlinear1.dem"
 load "nonlinear2.dem"
 load "nonlinear3.dem"
 load "nonlinear4.dem"
+load "nonlinear5.dem"
 reset
 
 print "********************** file transparent.dem *********************"

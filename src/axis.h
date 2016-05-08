@@ -1,5 +1,5 @@
 /*
- * $Id: axis.h,v 1.145 2016/05/06 18:32:12 sfeam Exp $
+ * $Id: axis.h,v 1.146 2016/05/08 04:17:25 sfeam Exp $
  *
  */
 
@@ -675,6 +675,7 @@ void gstrdms __PROTO((char *label, char *format, double value));
 
 void clone_linked_axes __PROTO((AXIS *axis1, AXIS *axis2));
 AXIS *get_shadow_axis __PROTO((AXIS *axis));
+void extend_primary_ticrange __PROTO((AXIS *axis));
 
 int map_x __PROTO((double value));
 int map_y __PROTO((double value));

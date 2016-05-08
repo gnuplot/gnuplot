@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.249 2016/02/11 05:15:53 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.250 2016/02/29 07:07:15 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -228,7 +228,7 @@ plot3drequest()
  */
 {
     int dummy_token0 = -1, dummy_token1 = -1;
-    AXIS_INDEX u_axis, v_axis;
+    AXIS_INDEX axis, u_axis, v_axis;
 
     is_3d_plot = TRUE;
 
@@ -244,6 +244,22 @@ plot3drequest()
     AXIS_INIT3D(U_AXIS, 1, 0);
     AXIS_INIT3D(V_AXIS, 1, 0);
     AXIS_INIT3D(COLOR_AXIS, 0, 1);
+
+#ifdef NONLINEAR_AXES
+    /* Nonlinear mapping of x or y via linkage to a hidden primary axis. */
+    /* The user set autoscale for the visible axis; apply it also to the hidden axis. */
+    for (axis = 0; axis < NUMBER_OF_MAIN_VISIBLE_AXES; axis++) {
+	AXIS *secondary = &axis_array[axis];
+	if (axis == SAMPLE_AXIS)
+	    continue;
+	if (secondary->linked_to_primary
+ 	&&  secondary->linked_to_primary->index == -secondary->index) {
+	    AXIS *primary = secondary->linked_to_primary;
+	    primary->set_autoscale = secondary->set_autoscale;
+	    axis_init(primary, 1);
+	}
+    }
+#endif
 
     if (!term)			/* unknown */
 	int_error(c_token, "use 'set term' to set terminal type first");
@@ -268,8 +284,8 @@ plot3drequest()
 	c_token++;
 
     /* Clear out any tick labels read from data files in previous plot */
-    for (u_axis=0; u_axis<AXIS_ARRAY_SIZE; u_axis++) {
-	struct ticdef *ticdef = &axis_array[u_axis].ticdef;
+    for (axis=0; axis<AXIS_ARRAY_SIZE; axis++) {
+	struct ticdef *ticdef = &axis_array[axis].ticdef;
 	if (ticdef->def.user)
 	    ticdef->def.user = prune_dataticks(ticdef->def.user);
 	if (!ticdef->def.user && ticdef->type == TIC_USER)
@@ -1146,10 +1162,8 @@ get_3ddata(struct surface_points *this_plot)
 
     /* This check used to be done in graph3d */
     if (X_AXIS.min == VERYLARGE || X_AXIS.max == -VERYLARGE ||
-	Y_AXIS.min == VERYLARGE || Y_AXIS.max == -VERYLARGE ||
-	Z_AXIS.min == VERYLARGE || Z_AXIS.max == -VERYLARGE) {
+	Y_AXIS.min == VERYLARGE || Y_AXIS.max == -VERYLARGE) {
 	    /* FIXME: Should we set plot type to NODATA? */
-	    /* But in the case of 'set view map' we may not care about Z */
 	    int_warn(NO_CARET,
 		"No usable data in this plot to auto-scale axis range");
 	    }
@@ -1215,19 +1229,26 @@ calculate_set_of_isolines(
 
     for (j = 0; j < num_iso_to_use; j++) {
 	double iso = iso_min + j * iso_step;
-	/* HBB 20000501: with the new code, it should
-	 * be safe to rely on the actual 'v' axis not
-	 * to be improperly logscaled... */
-	(void) Gcomplex(&plot_func.dummy_values[cross ? 0 : 1],
-			AXIS_DE_LOG_VALUE(iso_axis, iso), 0.0);
+	double isotemp;
+
+	if (nonlinear(&axis_array[iso_axis]))
+	    isotemp = iso = eval_link_function(&axis_array[iso_axis], iso);
+	else
+	    isotemp = AXIS_DE_LOG_VALUE(iso_axis, iso);
+
+	(void) Gcomplex(&plot_func.dummy_values[cross ? 0 : 1], isotemp, 0.0);
 
 	for (i = 0; i < num_sam_to_use; i++) {
 	    double sam = sam_min + i * sam_step;
 	    struct value a;
 	    double temp;
 
-	    (void) Gcomplex(&plot_func.dummy_values[cross ? 1 : 0],
-			    AXIS_DE_LOG_VALUE(sam_axis, sam), 0.0);
+	    if (nonlinear(&axis_array[sam_axis]))
+		temp = sam = eval_link_function(&axis_array[sam_axis], sam);
+	    else
+		temp = AXIS_DE_LOG_VALUE(sam_axis, sam);
+
+	    (void) Gcomplex(&plot_func.dummy_values[cross ? 1 : 0], temp, 0.0);
 
 	    if (cross) {
 		points[i].x = iso;
@@ -1944,19 +1965,24 @@ eval_3dplots()
 	v_axis = parametric ? V_AXIS : FIRST_Y_AXIS;
 
 	if (!parametric) {
-	    /*{{{  check ranges */
-	    /* give error if xrange badly set from missing datafile error
-	     * parametric fn can still set ranges
-	     * if there are no fns, we'll report it later as 'nothing to plot'
-	     */
+	    /* Autoscaling tracked the visible axis coordinates.	*/
+	    /* For nonlinear axes we must transform the limits back to the primary axis */
+	    if (nonlinear(&axis_array[FIRST_X_AXIS]))
+		clone_linked_axes(axis_array[FIRST_X_AXIS].linked_to_primary,
+			&axis_array[FIRST_X_AXIS]);
+	    if (nonlinear(&axis_array[FIRST_Y_AXIS]))
+		clone_linked_axes(axis_array[FIRST_Y_AXIS].linked_to_primary,
+			&axis_array[FIRST_Y_AXIS]);
 
-	    /* check that xmin -> xmax is not too small */
+	    /* Check that xmin -> xmax is not too small.
+	     * Give error if xrange badly set from missing datafile error.
+	     * Parametric fn can still set ranges.
+	     * If there are no fns, we'll report it later as 'nothing to plot'.
+	     */
 	    axis_checked_extend_empty_range(FIRST_X_AXIS, "x range is invalid");
 	    axis_checked_extend_empty_range(FIRST_Y_AXIS, "y range is invalid");
-	    /*}}} */
 	}
 	if (parametric && !some_data_files) {
-	    /*{{{  set ranges */
 	    /* parametric fn can still change x/y range */
 	    if (axis_array[FIRST_X_AXIS].autoscale & AUTOSCALE_MIN)
 		axis_array[FIRST_X_AXIS].min = VERYLARGE;
@@ -1966,16 +1992,24 @@ eval_3dplots()
 		axis_array[FIRST_Y_AXIS].min = VERYLARGE;
 	    if (axis_array[FIRST_Y_AXIS].autoscale & AUTOSCALE_MAX)
 		axis_array[FIRST_Y_AXIS].max = -VERYLARGE;
-	    /*}}} */
 	}
 
 	/*{{{  figure ranges, taking logs etc into account */
-	u_min = axis_log_value_checked(u_axis, axis_array[u_axis].min, "x range");
-	u_max = axis_log_value_checked(u_axis, axis_array[u_axis].max, "x range");
-	v_min = axis_log_value_checked(v_axis, axis_array[v_axis].min, "y range");
-	v_max = axis_log_value_checked(v_axis, axis_array[v_axis].max, "y range");
+	if (nonlinear(&axis_array[u_axis])) {
+	    u_min = axis_array[u_axis].linked_to_primary->min;
+	    u_max = axis_array[u_axis].linked_to_primary->max;
+	} else {
+	    u_min = axis_log_value_checked(u_axis, axis_array[u_axis].min, "x range");
+	    u_max = axis_log_value_checked(u_axis, axis_array[u_axis].max, "x range");
+	}
+	if (nonlinear(&axis_array[v_axis])) {
+	    v_min = axis_array[v_axis].linked_to_primary->min;
+	    v_max = axis_array[v_axis].linked_to_primary->max;
+	} else {
+	    v_min = axis_log_value_checked(v_axis, axis_array[v_axis].min, "y range");
+	    v_max = axis_log_value_checked(v_axis, axis_array[v_axis].max, "y range");
+	}
 	/*}}} */
-
 
 	if (samples_1 < 2 || samples_2 < 2 || iso_samples_1 < 2 ||
 	    iso_samples_2 < 2) {
@@ -2114,16 +2148,28 @@ eval_3dplots()
 	int_error(c_token, "no functions or data to plot");
     }
 
-    axis_checked_extend_empty_range(FIRST_X_AXIS, "All points x value undefined");
-    axis_revert_and_unlog_range(FIRST_X_AXIS);
-    axis_checked_extend_empty_range(FIRST_Y_AXIS, "All points y value undefined");
-    axis_revert_and_unlog_range(FIRST_Y_AXIS);
-    if (splot_map)
-	axis_checked_extend_empty_range(FIRST_Z_AXIS, NULL); /* Suppress warning message */
-    else
-	axis_checked_extend_empty_range(FIRST_Z_AXIS, "All points z value undefined");
-
-    axis_revert_and_unlog_range(FIRST_Z_AXIS);
+    /* Only relevant for NONLINEAR_AXES (include logscale) */
+    /* Transfer observed data or function ranges back to primary axes */
+    if (nonlinear(&axis_array[FIRST_X_AXIS])) {
+	clone_linked_axes(axis_array[FIRST_X_AXIS].linked_to_primary, &axis_array[FIRST_X_AXIS]);
+    } else {
+	axis_checked_extend_empty_range(FIRST_X_AXIS, "All points x value undefined");
+	axis_revert_and_unlog_range(FIRST_X_AXIS);
+    }
+    if (nonlinear(&axis_array[FIRST_Y_AXIS])) {
+	clone_linked_axes(axis_array[FIRST_Y_AXIS].linked_to_primary, &axis_array[FIRST_Y_AXIS]);
+    } else {
+	axis_checked_extend_empty_range(FIRST_Y_AXIS, "All points y value undefined");
+	axis_revert_and_unlog_range(FIRST_Y_AXIS);
+    }
+    if (nonlinear(&axis_array[FIRST_Z_AXIS])) {
+	AXIS *primary = axis_array[FIRST_Z_AXIS].linked_to_primary;
+	extend_primary_ticrange(&axis_array[FIRST_Z_AXIS]);
+	clone_linked_axes(primary, &axis_array[FIRST_Z_AXIS]);
+    } else {
+	axis_checked_extend_empty_range(FIRST_Z_AXIS, splot_map ? NULL : "All points y value undefined");
+	axis_revert_and_unlog_range(FIRST_Z_AXIS);
+    }
 
     setup_tics(&axis_array[FIRST_X_AXIS], 20);
     setup_tics(&axis_array[FIRST_Y_AXIS], 20);

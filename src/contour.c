@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: contour.c,v 1.33 2014/04/02 22:43:39 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: contour.c,v 1.34 2015/05/08 18:17:08 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - contour.c */
@@ -201,7 +201,8 @@ contour(int num_isolines, struct iso_curve *iso_lines)
     int num_of_z_levels;	/* # Z contour levels. */
     poly_struct *p_polys, *p_poly;
     edge_struct *p_edges, *p_edge;
-    double z = 0, dz = 0;
+    double z = 0;
+    double z0, dz;
     struct gnuplot_contours *save_contour_list;
 
     /* HBB FIXME 20050804: The number of contour_levels as set by 'set
@@ -225,6 +226,10 @@ contour(int num_isolines, struct iso_curve *iso_lines)
     crnt_cntr_pt_index = 0;
 
     if (contour_levels_kind == LEVELS_AUTO) {
+	if (nonlinear(&Z_AXIS)) {
+	    z_max = eval_link_function(Z_AXIS.linked_to_primary, z_max);
+	    z_min = eval_link_function(Z_AXIS.linked_to_primary, z_min);
+	}
 	dz = fabs(z_max - z_min);
 	if (dz == 0)
 	    return NULL;	/* empty z range ? */
@@ -232,14 +237,16 @@ contour(int num_isolines, struct iso_curve *iso_lines)
 	 * desired number of contour levels. The "* 2" is historical.
 	 * */
 	dz = quantize_normal_tics(dz, ((int) contour_levels + 1) * 2);
-	z = floor(z_min / dz) * dz;
-	num_of_z_levels = (int) floor((z_max - z) / dz);
+	z0 = floor(z_min / dz) * dz;
+	num_of_z_levels = (int) floor((z_max - z0) / dz);
     }
     for (i = 0; i < num_of_z_levels; i++) {
 	switch (contour_levels_kind) {
 	case LEVELS_AUTO:
-	    z += dz;
+	    z = z0 + (i+1) * dz;
 	    z = CheckZero(z,dz);
+	    if (nonlinear(&Z_AXIS))
+		z = eval_link_function((&Z_AXIS), z);
 	    break;
 	case LEVELS_INCREMENTAL:
 	    z = AXIS_LOG_VALUE(FIRST_Z_AXIS, contour_levels_list[0]) +

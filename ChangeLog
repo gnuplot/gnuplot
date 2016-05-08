@@ -3,6 +3,11 @@
 	* src/pm3d.c src/command.c src/mouse.c src/plot2d.c: Where possible,
 	use macro nonlinear(AXIS *) rather than #ifdef NONLINEAR_AXES.
 
+	* src/axis.h src/contour.c src/datafile.c src/graph3d.c src/graph3d.h
+	src/plot3d.c src/util3d.c src/axis.c src/boundary.c:
+	Nonlinear axes part 11.  3D plot axes x, y, z, countours.
+
+
 2016-05-07  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	Let wgnuplot handle Unicode (not console mode gnuplot)

@@ -1,0 +1,33 @@
+#
+# Use of "set nonlinear" to produce a log-scale z axis and contours.
+#
+set border 15 front lt black
+set key at screen 1, 0.9 right top vertical Right
+set style textbox opaque margins  0.5,  0.5 noborder
+set view 22, 341, 1, 1.1
+set isosamples 60, 60
+unset surface 
+set contour base
+set cntrlabel  format '%8.3g' font ',7' start 2 interval 20
+set hidden3d back offset 1 trianglepattern 3 undefined 1 altdiagonal bentover
+set cntrparam order 8
+set style data lines
+set xyplane relative 0
+set nomztics
+unset ztics
+set title "Rosenbrock Function" 
+set xlabel "x" 
+set ylabel "y" 
+Rosenbrock(x,y) = (1-x)**2 + 100*(y - x**2)**2
+u = 0.0
+x = 0.0
+GPFUN_Rosenbrock = "Rosenbrock(x,y) = (1-x)**2 + 100*(y - x**2)**2"
+
+# Achieves same effect as
+#    set log z
+set nonlinear z via log10(z) inverse 10**z 
+
+splot [-1.5:1.5] [-0.5:1.5] Rosenbrock(x,y)
+
+pause -1 "<cr> to continue"
+reset

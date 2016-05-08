@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: util3d.c,v 1.52 2016/04/16 04:01:06 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: util3d.c,v 1.53 2016/04/23 00:36:22 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - util3d.c */
@@ -60,10 +60,16 @@ static char *RCSid() { return RCSid("$Id: util3d.c,v 1.52 2016/04/16 04:01:06 sf
 static void mat_unit __PROTO((transform_matrix mat));
 static GP_INLINE void draw3d_point_unconditional __PROTO((p_vertex, struct lp_style_type *));
 
+#ifdef NONLINEAR_AXES
+static double map_x3d __PROTO((double));
+static double map_y3d __PROTO((double));
+static double map_z3d __PROTO((double));
+#else
 /* Function macros to map from user 3D space into normalized -1..1 */
 #define map_x3d(x) ((x-X_AXIS.min)*xscale3d + xcenter3d - 1.0)
 #define map_y3d(y) ((y-Y_AXIS.min)*yscale3d + ycenter3d - 1.0)
 #define map_z3d(z) ((z-floor_z)*zscale3d + zcenter3d - 1.0)
+#endif
 
 static void
 mat_unit(transform_matrix mat)
@@ -1028,3 +1034,43 @@ polyline3d_next(p_vertex v2, struct lp_style_type *lp)
     polyline3d_previous_vertex = *v2;
 }
 
+#ifdef NONLINEAR_AXES
+static double
+map_x3d(double x)
+{
+    AXIS *xaxis = &axis_array[FIRST_X_AXIS];
+
+    if (xaxis->linked_to_primary) {
+	xaxis = xaxis->linked_to_primary;
+	x = eval_link_function(xaxis, x);
+    }
+
+    return ((x - xaxis->min)*xscale3d + xcenter3d - 1.0);
+}
+
+static double
+map_y3d(double y)
+{
+    AXIS *yaxis = &axis_array[FIRST_Y_AXIS];
+
+    if (yaxis->linked_to_primary) {
+	yaxis = yaxis->linked_to_primary;
+	y = eval_link_function(yaxis, y);
+    }
+
+    return ((y - yaxis->min)*yscale3d + ycenter3d - 1.0);
+}
+
+static double
+map_z3d(double z)
+{
+    AXIS *zaxis = &axis_array[FIRST_Z_AXIS];
+
+    if (zaxis->linked_to_primary) {
+	zaxis = zaxis->linked_to_primary;
+	z = eval_link_function(zaxis, z);
+    }
+
+    return ((z - floor_z1)*zscale3d + zcenter3d - 1.0);
+}
+#endif

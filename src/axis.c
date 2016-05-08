@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.193 2016/05/03 05:19:01 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.194 2016/05/08 04:17:25 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -2364,6 +2364,24 @@ get_shadow_axis(AXIS *axis)
     primary->index = -secondary->index;
 
     return primary;
+}
+
+/*
+ * This is necessary if we are to reproduce the old logscaling.
+ * Extend the tic range on an independent log-scaled axis to the
+ * nearest power of 10.
+ */
+void
+extend_primary_ticrange(AXIS *axis)
+{
+    AXIS *primary = axis->linked_to_primary;
+
+    if (axis->ticdef.logscaling) {
+	if (primary->autoscale & AUTOSCALE_MIN)
+	    primary->min = floor(primary->min);
+	if (primary->autoscale & AUTOSCALE_MAX)
+	    primary->max = ceil(primary->max);
+    }
 }
 #endif
 

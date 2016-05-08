@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.338 2016/05/05 03:50:36 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.339 2016/05/07 00:12:45 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -186,8 +186,9 @@ static double ktitle_lines = 0;
 
 /* Boundary and scale factors, in user coordinates */
 
-/* There are several z's to take into account - I hope I get these
- * right !
+/* These positions assume a single linear scale encompassing the
+ * zrange plus extra space below for the baseplane.  This was messy but
+ * correct before the introduction of nonlinear axes. Now - not so much.
  *
  * ceiling_z is the highest z in use
  * floor_z   is the lowest z in use
@@ -199,9 +200,14 @@ static double ktitle_lines = 0;
  * There should be no part of graph drawn outside
  * min3d_z:max3d_z  - apart from arrows, perhaps
  */
-
 double floor_z;
 double ceiling_z, base_z;	/* made exportable for PM3D */
+
+/* To handle a non-linear z axis we need to calculate these values on
+ * the other end of the linked linear:nonlinear axis pair.
+ */
+double floor_z1;	/* Used also by map_z3d() */
+static double ceiling_z1, base_z1;
 
 transform_matrix trans_mat;
 
@@ -621,6 +627,7 @@ do_3dplot(
     TBOOLEAN key_pass = FALSE;
     legend_key *key = &keyT;
     TBOOLEAN pm3d_order_depth = 0;
+    AXIS *primary_z;
 
     /* Initiate transformation matrix using the global view variables. */
     if (splot_map)
@@ -639,24 +646,44 @@ do_3dplot(
     if (polar)
 	int_error(NO_CARET,"Cannot splot in polar coordinate system.");
 
+    /* In the case of a nonlinear z axis this points to the linear version */
+    /* that shadows it.  Otherwise it just points to FIRST_Z_AXIS.         */
+    primary_z = (nonlinear(&Z_AXIS)) ? Z_AXIS.linked_to_primary : &Z_AXIS; 
+
     /* absolute or relative placement of xyplane along z */
-    if (xyplane.absolute)
-	base_z = AXIS_LOG_VALUE(0, xyplane.z);
-    else
-	base_z = Z_AXIS.min - (Z_AXIS.max - Z_AXIS.min) * xyplane.z;
+    if (nonlinear(&Z_AXIS)) {
+	if (xyplane.absolute)
+	    base_z1 = eval_link_function(primary_z, xyplane.z);
+	else
+	    base_z1 = primary_z->min - (primary_z->max - primary_z->min) * xyplane.z;
+	base_z = eval_link_function(&Z_AXIS, base_z1);
+    } else {
+	if (xyplane.absolute)
+	    base_z1 = AXIS_LOG_VALUE(0, xyplane.z);
+	else
+	    base_z1 = primary_z->min - (primary_z->max - primary_z->min) * xyplane.z;
+	base_z = base_z1;
+    }
 
     /* If we are to draw the bottom grid make sure zmin is updated properly. */
     if (X_AXIS.ticmode || Y_AXIS.ticmode || some_grid_selected()) {
-	if (Z_AXIS.min > Z_AXIS.max) {
-	    floor_z = GPMAX(Z_AXIS.min, base_z);
-	    ceiling_z = GPMIN(Z_AXIS.max, base_z);
+	if (primary_z->min > primary_z->max) {
+	    floor_z1 = GPMAX(primary_z->min, base_z1);
+	    ceiling_z1 = GPMIN(primary_z->max, base_z1);
 	} else {
-	    floor_z = GPMIN(Z_AXIS.min, base_z);
-	    ceiling_z = GPMAX(Z_AXIS.max, base_z);
+	    floor_z1 = GPMIN(primary_z->min, base_z1);
+	    ceiling_z1 = GPMAX(primary_z->max, base_z1);
 	}
     } else {
-	floor_z = Z_AXIS.min;
-	ceiling_z = Z_AXIS.max;
+	floor_z1 = primary_z->min;
+	ceiling_z1 = primary_z->max;
+    }
+    if (nonlinear(&Z_AXIS)) {
+	floor_z = eval_link_function(&Z_AXIS, floor_z1);
+	ceiling_z = eval_link_function(&Z_AXIS, ceiling_z1);
+    } else {
+	floor_z = floor_z1;
+	ceiling_z = ceiling_z1;
     }
 
     if (X_AXIS.min == X_AXIS.max)
@@ -685,6 +712,12 @@ do_3dplot(
     zscale3d = 2.0 / (ceiling_z - floor_z) * surface_zscale;
     yscale3d = 2.0 / (Y_AXIS.max - Y_AXIS.min);
     xscale3d = 2.0 / (X_AXIS.max - X_AXIS.min);
+    if (nonlinear(&X_AXIS))
+	xscale3d = 2.0 / (X_AXIS.linked_to_primary->max - X_AXIS.linked_to_primary->min);
+    if (nonlinear(&Y_AXIS))
+	yscale3d = 2.0 / (Y_AXIS.linked_to_primary->max - Y_AXIS.linked_to_primary->min);
+    if (nonlinear(&Z_AXIS))
+	zscale3d = 2.0 / (ceiling_z1 - floor_z1) * surface_zscale;
 
     /* Allow 'set view equal xy' to adjust rendered length of the X and/or Y axes. */
     /* FIXME EAM - This only works correctly if the coordinate system of the       */
@@ -703,6 +736,10 @@ do_3dplot(
 	    zscale3d = xscale3d;
     }
 
+    /* FIXME: I do not understand why this is correct */
+    if (nonlinear(&Z_AXIS))
+	zcenter3d = 0.0;
+    else
     /* Without this the rotation center would be located at */
     /* the bottom of the plot. This places it in the middle.*/
     zcenter3d =  -(ceiling_z - floor_z) / 2.0 * zscale3d + 1;
@@ -2266,7 +2303,15 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid,
     if (X_AXIS.ticmode || X_AXIS.label.text) {
 	vertex v0, v1;
 	double other_end = Y_AXIS.min + Y_AXIS.max - xaxis_y;
-	double mid_x     = (X_AXIS.max + X_AXIS.min) / 2;
+	double mid_x;
+
+	if (nonlinear(&X_AXIS)) {
+	    AXIS *primary = X_AXIS.linked_to_primary;
+	    mid_x = (primary->max + primary->min) / 2.;
+	    mid_x = eval_link_function(&X_AXIS, mid_x);
+	} else {
+	    mid_x = (X_AXIS.max + X_AXIS.min) / 2.;
+	}
 
 	map3d_xyz(mid_x, xaxis_y, base_z, &v0);
 	map3d_xyz(mid_x, other_end, base_z, &v1);
@@ -2362,7 +2407,15 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid,
     if (Y_AXIS.ticmode || Y_AXIS.label.text) {
 	vertex v0, v1;
 	double other_end = X_AXIS.min + X_AXIS.max - yaxis_x;
-	double mid_y = (Y_AXIS.max + Y_AXIS.min) / 2;
+	double mid_y;
+
+	if (nonlinear(&Y_AXIS)) {
+	    AXIS *primary = Y_AXIS.linked_to_primary;
+	    mid_y = (primary->max + primary->min) / 2.;
+	    mid_y = eval_link_function(&Y_AXIS, mid_y);
+	} else {
+	    mid_y = (Y_AXIS.max + Y_AXIS.min) / 2.;
+	}
 
 	map3d_xyz(yaxis_x, mid_y, base_z, &v0);
 	map3d_xyz(other_end, mid_y, base_z, &v1);
@@ -2530,7 +2583,13 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid,
 	vertex v1;
 	int h_just = CENTRE;
 	int v_just = JUST_TOP;
-	double mid_z = (Z_AXIS.max + Z_AXIS.min) / 2.;
+	double mid_z;
+
+	if (nonlinear(&Z_AXIS)) {
+	    mid_z = (Z_AXIS.linked_to_primary->max + Z_AXIS.linked_to_primary->min) / 2.;
+	    mid_z = eval_link_function(&Z_AXIS, mid_z);
+	} else
+	    mid_z = (Z_AXIS.max + Z_AXIS.min) / 2.;
 
 	if (Z_AXIS.ticmode & TICS_ON_AXIS) {
 	    map3d_xyz(0, 0, mid_z, &v1);

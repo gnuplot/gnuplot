@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.325 2016/03/21 23:13:47 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.326 2016/04/28 05:50:46 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -5349,10 +5349,20 @@ df_generate_pseudodata()
 	    } else {
 		axis_checked_extend_empty_range(FIRST_X_AXIS, "x range is invalid");
 		axis_checked_extend_empty_range(FIRST_Y_AXIS, "y range is invalid");
-		u_min = axis_log_value_checked(u_axis, axis_array[u_axis].min, "x range");
-		u_max = axis_log_value_checked(u_axis, axis_array[u_axis].max, "x range");
-		v_min = axis_log_value_checked(v_axis, axis_array[v_axis].min, "y range");
-		v_max = axis_log_value_checked(v_axis, axis_array[v_axis].max, "y range");
+		if (nonlinear(&(axis_array[u_axis]))) {
+		    u_min = axis_array[u_axis].linked_to_primary->min;
+		    u_max = axis_array[u_axis].linked_to_primary->max;
+		} else {
+		    u_min = axis_log_value_checked(u_axis, axis_array[u_axis].min, "x range");
+		    u_max = axis_log_value_checked(u_axis, axis_array[u_axis].max, "x range");
+		}
+		if (nonlinear(&axis_array[v_axis])) {
+		    v_min = axis_array[v_axis].linked_to_primary->min;
+		    v_max = axis_array[v_axis].linked_to_primary->max;
+		} else {
+		    v_min = axis_log_value_checked(v_axis, axis_array[v_axis].min, "y range");
+		    v_max = axis_log_value_checked(v_axis, axis_array[v_axis].max, "y range");
+		}
 	    }
 
 	    if (hidden3d) {
@@ -5373,8 +5383,14 @@ df_generate_pseudodata()
 	    df_pseudovalue_0 = u;
 	    df_pseudovalue_1 = v;
 	} else {
-	    df_pseudovalue_0 = AXIS_DE_LOG_VALUE(u_axis,u);
-	    df_pseudovalue_1 = AXIS_DE_LOG_VALUE(v_axis,v);
+	    if (nonlinear(&axis_array[u_axis]))
+		df_pseudovalue_0 = eval_link_function(&axis_array[u_axis], u);
+	    else
+		df_pseudovalue_0 = AXIS_DE_LOG_VALUE(u_axis,u);
+	    if (nonlinear(&axis_array[v_axis]))
+		df_pseudovalue_1 = eval_link_function(&axis_array[v_axis], v);
+	    else
+		df_pseudovalue_1 = AXIS_DE_LOG_VALUE(v_axis,v);
 	}
 	sprintf(df_line,"%g %g", df_pseudovalue_0, df_pseudovalue_1);
 	++df_pseudorecord;
