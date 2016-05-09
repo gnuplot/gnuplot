@@ -1,3 +1,8 @@
+2016-05-09  Shigeharu Takeno  <shige@iee.niit.ac.jp>
+
+	* docs/term-ja.diff docs/gnuplot-ja.doc:
+	Sync Japanese documentation to doc version 1.988
+
 2016-05-08  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/pm3d.c src/command.c src/mouse.c src/plot2d.c: Where possible,
@@ -7,6 +12,7 @@
 	src/plot3d.c src/util3d.c src/axis.c src/boundary.c:
 	Nonlinear axes part 11.  3D plot axes x, y, z, countours.
 
+	* demo/all.dem demo/nonlinear5.dem:  logscale z with contours
 
 2016-05-07  Bastian Maerkisch  <bmaerkisch@web.de>
 

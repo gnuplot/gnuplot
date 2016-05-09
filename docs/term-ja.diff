@@ -236,7 +236,7 @@ diff -rc docs/tex2ja.awk.ORG docs/tex2ja.awk
 + 
 diff -rc term/ai.trm.ORG term/ai.trm
 *** term/ai.trm	2013-01-26.ORG 17:11:08.000000000 +0900
---- term/ai.trm	2016-02-12 18:36:18.885319000 +0900
+--- term/ai.trm	2016-05-09 16:01:46.875143000 +0900
 ***************
 *** 529,534 ****
 --- 529,535 ----
@@ -273,8 +273,8 @@ diff -rc term/ai.trm.ORG term/ai.trm
   END_HELP(ai)
   #endif /* TERM_HELP */
 diff -rc term/aquaterm.trm.ORG term/aquaterm.trm
-*** term/aquaterm.trm	2016-01-14.ORG 13:28:42.000000000 +0900
---- term/aquaterm.trm	2016-02-12 18:36:18.887578000 +0900
+*** term/aquaterm.trm	2016-03-17.ORG 11:50:20.000000000 +0900
+--- term/aquaterm.trm	2016-05-09 16:01:46.877683000 +0900
 ***************
 *** 981,986 ****
 --- 981,987 ----
@@ -329,7 +329,7 @@ diff -rc term/aquaterm.trm.ORG term/aquaterm.trm
   
 diff -rc term/be.trm.ORG term/be.trm
 *** term/be.trm	2013-10-26.ORG 14:58:37.000000000 +0900
---- term/be.trm	2016-02-12 18:36:18.890337000 +0900
+--- term/be.trm	2016-05-09 16:01:46.880091000 +0900
 ***************
 *** 390,395 ****
 --- 390,396 ----
@@ -646,7 +646,7 @@ diff -rc term/be.trm.ORG term/be.trm
   #endif /* TERM_HELP */
 diff -rc term/caca.trm.ORG term/caca.trm
 *** term/caca.trm	2015-05-19.ORG 15:49:28.000000000 +0900
---- term/caca.trm	2016-02-12 18:36:18.893287000 +0900
+--- term/caca.trm	2016-05-09 16:01:46.883292000 +0900
 ***************
 *** 1209,1215 ****
   	if (CACA_charset == CACA_ASCII)
@@ -854,8 +854,8 @@ diff -rc term/caca.trm.ORG term/caca.trm
   #endif /* TERM_HELP */
   
 diff -rc term/cairo.trm.ORG term/cairo.trm
-*** term/cairo.trm	2015-07-14.ORG 10:32:35.000000000 +0900
---- term/cairo.trm	2016-02-12 18:36:18.898179000 +0900
+*** term/cairo.trm	2016-03-07.ORG 13:14:25.000000000 +0900
+--- term/cairo.trm	2016-05-09 16:01:46.888304000 +0900
 ***************
 *** 1389,1394 ****
 --- 1389,1395 ----
@@ -1102,7 +1102,7 @@ diff -rc term/cairo.trm.ORG term/cairo.trm
 + " 力形式と共通です。詳細は、以下参照: `enhanced`。",
 + "",
 + " 描画における全ての線の幅は、`linewidth` で指定する因子 <lw> で変更でき",
-+ " ます。デフォルトの線幅は 0.25 ポイントです。(1 \"PostScript\" ポイント",
++ " ます。デフォルトの線幅は 0.5 ポイントです。(1 \"PostScript\" ポイント",
 + " = 1/72 インチ = 0.353 mm)",
 + "",
 + " `rounded` は、線の端や接合部を丸くします。",
@@ -1268,7 +1268,7 @@ diff -rc term/cairo.trm.ORG term/cairo.trm
   
 diff -rc term/canvas.trm.ORG term/canvas.trm
 *** term/canvas.trm	2014-05-07.ORG 17:27:30.000000000 +0900
---- term/canvas.trm	2016-02-12 18:36:18.900659000 +0900
+--- term/canvas.trm	2016-05-09 16:01:46.890468000 +0900
 ***************
 *** 1643,1648 ****
 --- 1643,1649 ----
@@ -1368,7 +1368,7 @@ diff -rc term/canvas.trm.ORG term/canvas.trm
   #endif /* TERM_HELP */
 diff -rc term/cgm.trm.ORG term/cgm.trm
 *** term/cgm.trm	2016-01-11.ORG 16:26:14.000000000 +0900
---- term/cgm.trm	2016-02-12 18:36:18.902985000 +0900
+--- term/cgm.trm	2016-05-09 16:01:46.892889000 +0900
 ***************
 *** 1739,1744 ****
 --- 1739,1745 ----
@@ -1666,7 +1666,7 @@ diff -rc term/cgm.trm.ORG term/cgm.trm
   #endif /* TERM_HELP */
 diff -rc term/context.trm.ORG term/context.trm
 *** term/context.trm	2014-01-31.ORG 16:12:30.000000000 +0900
---- term/context.trm	2016-02-12 18:36:18.907921000 +0900
+--- term/context.trm	2016-05-09 16:01:46.897748000 +0900
 ***************
 *** 1974,1979 ****
 --- 1974,1980 ----
@@ -1840,7 +1840,7 @@ diff -rc term/context.trm.ORG term/context.trm
   
 diff -rc term/corel.trm.ORG term/corel.trm
 *** term/corel.trm	2013-01-26.ORG 17:11:08.000000000 +0900
---- term/corel.trm	2016-02-12 18:36:18.909003000 +0900
+--- term/corel.trm	2016-05-09 16:01:46.898822000 +0900
 ***************
 *** 431,436 ****
 --- 431,437 ----
@@ -1881,7 +1881,7 @@ diff -rc term/corel.trm.ORG term/corel.trm
   #endif /* TERM_HELP */
 diff -rc term/debug.trm.ORG term/debug.trm
 *** term/debug.trm	2012-10-30.ORG 13:13:32.000000000 +0900
---- term/debug.trm	2016-02-12 18:36:18.909944000 +0900
+--- term/debug.trm	2016-05-09 16:01:46.899947000 +0900
 ***************
 *** 375,380 ****
 --- 375,381 ----
@@ -1913,7 +1913,7 @@ diff -rc term/debug.trm.ORG term/debug.trm
   #endif
 diff -rc term/djsvga.trm.ORG term/djsvga.trm
 *** term/djsvga.trm	2016-01-19.ORG 19:22:02.000000000 +0900
---- term/djsvga.trm	2016-02-12 18:36:18.910955000 +0900
+--- term/djsvga.trm	2016-05-09 16:01:46.900995000 +0900
 ***************
 *** 473,478 ****
 --- 473,479 ----
@@ -1949,7 +1949,7 @@ diff -rc term/djsvga.trm.ORG term/djsvga.trm
   #endif /* TERM_HELP */
 diff -rc term/dumb.trm.ORG term/dumb.trm
 *** term/dumb.trm	2016-02-10.ORG 19:56:57.000000000 +0900
---- term/dumb.trm	2016-02-12 18:36:18.912136000 +0900
+--- term/dumb.trm	2016-05-09 16:01:46.902184000 +0900
 ***************
 *** 630,635 ****
 --- 630,636 ----
@@ -2015,7 +2015,7 @@ diff -rc term/dumb.trm.ORG term/dumb.trm
   #endif /* TERM_HELP */
 diff -rc term/dxf.trm.ORG term/dxf.trm
 *** term/dxf.trm	2006-07-21.ORG 11:35:45.000000000 +0900
---- term/dxf.trm	2016-02-12 18:36:18.913674000 +0900
+--- term/dxf.trm	2016-05-09 16:01:46.903704000 +0900
 ***************
 *** 404,409 ****
 --- 404,410 ----
@@ -2053,7 +2053,7 @@ diff -rc term/dxf.trm.ORG term/dxf.trm
   #endif /* TERM_HELP */
 diff -rc term/dxy.trm.ORG term/dxy.trm
 *** term/dxy.trm	2006-07-21.ORG 11:35:45.000000000 +0900
---- term/dxy.trm	2016-02-12 18:36:18.914865000 +0900
+--- term/dxy.trm	2016-05-09 16:01:46.904932000 +0900
 ***************
 *** 191,196 ****
 --- 191,197 ----
@@ -2085,7 +2085,7 @@ diff -rc term/dxy.trm.ORG term/dxy.trm
   #endif
 diff -rc term/eepic.trm.ORG term/eepic.trm
 *** term/eepic.trm	2014-01-31.ORG 16:12:30.000000000 +0900
---- term/eepic.trm	2016-02-12 18:36:18.916151000 +0900
+--- term/eepic.trm	2016-05-09 16:01:46.906222000 +0900
 ***************
 *** 577,582 ****
 --- 577,583 ----
@@ -2193,11 +2193,11 @@ diff -rc term/eepic.trm.ORG term/eepic.trm
   END_HELP(eepic)
   #endif /* TERM_HELP */
 diff -rc term/emf.trm.ORG term/emf.trm
-*** term/emf.trm	2015-04-10.ORG 15:48:01.000000000 +0900
---- term/emf.trm	2016-02-12 18:36:18.918274000 +0900
+*** term/emf.trm	2016-05-09.ORG 15:50:33.000000000 +0900
+--- term/emf.trm	2016-05-09 16:01:46.908382000 +0900
 ***************
-*** 1962,1967 ****
---- 1962,1968 ----
+*** 1971,1976 ****
+--- 1971,1977 ----
   
   #ifdef TERM_HELP
   START_HELP(emf)
@@ -2206,8 +2206,8 @@ diff -rc term/emf.trm.ORG term/emf.trm
   "?commands set terminal emf",
   "?set terminal emf",
 ***************
-*** 1999,2003 ****
---- 2000,2045 ----
+*** 2008,2012 ****
+--- 2009,2054 ----
   "",
   " Examples:",
   "       set terminal emf 'Times Roman Italic, 12'"
@@ -2256,7 +2256,7 @@ diff -rc term/emf.trm.ORG term/emf.trm
   #endif /* TERM_HELP */
 diff -rc term/emxvga.trm.ORG term/emxvga.trm
 *** term/emxvga.trm	2006-07-21.ORG 11:35:46.000000000 +0900
---- term/emxvga.trm	2016-02-12 18:36:18.920094000 +0900
+--- term/emxvga.trm	2016-05-09 16:01:46.910217000 +0900
 ***************
 *** 475,480 ****
 --- 475,481 ----
@@ -2312,7 +2312,7 @@ diff -rc term/emxvga.trm.ORG term/emxvga.trm
   #endif /* TERM_HELP */
 diff -rc term/epson.trm.ORG term/epson.trm
 *** term/epson.trm	2015-03-25.ORG 10:45:09.000000000 +0900
---- term/epson.trm	2016-02-12 18:36:18.922357000 +0900
+--- term/epson.trm	2016-05-09 16:01:46.912513000 +0900
 ***************
 *** 1088,1093 ****
 --- 1088,1094 ----
@@ -2426,7 +2426,7 @@ diff -rc term/epson.trm.ORG term/epson.trm
   #endif /* TERM_HELP */
 diff -rc term/excl.trm.ORG term/excl.trm
 *** term/excl.trm	2006-07-21.ORG 11:35:46.000000000 +0900
---- term/excl.trm	2016-02-12 18:36:18.924598000 +0900
+--- term/excl.trm	2016-05-09 16:01:46.914871000 +0900
 ***************
 *** 273,278 ****
 --- 273,279 ----
@@ -2458,7 +2458,7 @@ diff -rc term/excl.trm.ORG term/excl.trm
   #endif
 diff -rc term/fig.trm.ORG term/fig.trm
 *** term/fig.trm	2015-03-25.ORG 10:45:09.000000000 +0900
---- term/fig.trm	2016-02-12 18:36:18.927109000 +0900
+--- term/fig.trm	2016-05-09 16:01:46.917456000 +0900
 ***************
 *** 1366,1371 ****
 --- 1366,1372 ----
@@ -2575,7 +2575,7 @@ diff -rc term/fig.trm.ORG term/fig.trm
   
 diff -rc term/gd.trm.ORG term/gd.trm
 *** term/gd.trm	2015-07-12.ORG 11:23:40.000000000 +0900
---- term/gd.trm	2016-02-12 18:36:18.932507000 +0900
+--- term/gd.trm	2016-05-09 16:01:46.922760000 +0900
 ***************
 *** 2449,2454 ****
 --- 2449,2455 ----
@@ -2871,7 +2871,7 @@ diff -rc term/gd.trm.ORG term/gd.trm
   #endif /* HAVE_GD_GIF */
 diff -rc term/ggi.trm.ORG term/ggi.trm
 *** term/ggi.trm	2013-08-24.ORG 19:28:06.000000000 +0900
---- term/ggi.trm	2016-02-12 18:36:18.934478000 +0900
+--- term/ggi.trm	2016-05-09 16:01:46.924727000 +0900
 ***************
 *** 1510,1515 ****
 --- 1510,1516 ----
@@ -2928,7 +2928,7 @@ diff -rc term/ggi.trm.ORG term/ggi.trm
   #endif
 diff -rc term/gpic.trm.ORG term/gpic.trm
 *** term/gpic.trm	2014-03-20.ORG 11:02:16.000000000 +0900
---- term/gpic.trm	2016-02-12 18:36:18.935466000 +0900
+--- term/gpic.trm	2016-05-09 16:01:46.925728000 +0900
 ***************
 *** 294,299 ****
 --- 294,300 ----
@@ -3009,7 +3009,7 @@ diff -rc term/gpic.trm.ORG term/gpic.trm
   #endif /* TERM_HELP */
 diff -rc term/grass.trm.ORG term/grass.trm
 *** term/grass.trm	2006-07-21.ORG 11:35:46.000000000 +0900
---- term/grass.trm	2016-02-12 18:36:18.936764000 +0900
+--- term/grass.trm	2016-05-09 16:01:46.927013000 +0900
 ***************
 *** 624,629 ****
 --- 624,630 ----
@@ -3043,7 +3043,7 @@ diff -rc term/grass.trm.ORG term/grass.trm
   #endif
 diff -rc term/hp26.trm.ORG term/hp26.trm
 *** term/hp26.trm	2007-01-17.ORG 08:11:55.000000000 +0900
---- term/hp26.trm	2016-02-12 18:36:18.938141000 +0900
+--- term/hp26.trm	2016-05-09 16:01:46.928370000 +0900
 ***************
 *** 691,696 ****
 --- 691,697 ----
@@ -3075,7 +3075,7 @@ diff -rc term/hp26.trm.ORG term/hp26.trm
   #endif
 diff -rc term/hp2648.trm.ORG term/hp2648.trm
 *** term/hp2648.trm	2006-07-21.ORG 11:35:47.000000000 +0900
---- term/hp2648.trm	2016-02-12 18:36:18.939501000 +0900
+--- term/hp2648.trm	2016-05-09 16:01:46.929645000 +0900
 ***************
 *** 188,193 ****
 --- 188,194 ----
@@ -3107,7 +3107,7 @@ diff -rc term/hp2648.trm.ORG term/hp2648.trm
   #endif
 diff -rc term/hp500c.trm.ORG term/hp500c.trm
 *** term/hp500c.trm	2006-07-21.ORG 11:35:47.000000000 +0900
---- term/hp500c.trm	2016-02-12 18:36:18.940937000 +0900
+--- term/hp500c.trm	2016-05-09 16:01:46.931114000 +0900
 ***************
 *** 527,532 ****
 --- 527,533 ----
@@ -3148,7 +3148,7 @@ diff -rc term/hp500c.trm.ORG term/hp500c.trm
   #endif /* TERM_HELP */
 diff -rc term/hpgl.trm.ORG term/hpgl.trm
 *** term/hpgl.trm	2015-07-14.ORG 10:32:35.000000000 +0900
---- term/hpgl.trm	2016-02-12 18:36:18.945785000 +0900
+--- term/hpgl.trm	2016-05-09 16:01:46.935402000 +0900
 ***************
 *** 2611,2616 ****
 --- 2611,2617 ----
@@ -3250,7 +3250,7 @@ diff -rc term/hpgl.trm.ORG term/hpgl.trm
   #endif /* TERM_HELP */
 diff -rc term/hpljii.trm.ORG term/hpljii.trm
 *** term/hpljii.trm	2006-07-21.ORG 11:35:47.000000000 +0900
---- term/hpljii.trm	2016-02-12 18:36:18.947381000 +0900
+--- term/hpljii.trm	2016-05-09 16:01:46.936964000 +0900
 ***************
 *** 401,406 ****
 --- 401,407 ----
@@ -3299,7 +3299,7 @@ diff -rc term/hpljii.trm.ORG term/hpljii.trm
   #endif /* TERM_HELP */
 diff -rc term/hppj.trm.ORG term/hppj.trm
 *** term/hppj.trm	2006-07-21.ORG 11:35:47.000000000 +0900
---- term/hppj.trm	2016-02-12 18:36:18.948701000 +0900
+--- term/hppj.trm	2016-05-09 16:01:46.938396000 +0900
 ***************
 *** 273,278 ****
 --- 273,279 ----
@@ -3336,7 +3336,7 @@ diff -rc term/hppj.trm.ORG term/hppj.trm
   #endif
 diff -rc term/imagen.trm.ORG term/imagen.trm
 *** term/imagen.trm	2006-07-21.ORG 11:35:47.000000000 +0900
---- term/imagen.trm	2016-02-12 18:36:18.949927000 +0900
+--- term/imagen.trm	2016-05-09 16:01:46.939665000 +0900
 ***************
 *** 886,891 ****
 --- 886,892 ----
@@ -3382,7 +3382,7 @@ diff -rc term/imagen.trm.ORG term/imagen.trm
   #endif
 diff -rc term/kyo.trm.ORG term/kyo.trm
 *** term/kyo.trm	2006-07-21.ORG 11:35:47.000000000 +0900
---- term/kyo.trm	2016-02-12 18:36:18.950825000 +0900
+--- term/kyo.trm	2016-05-09 16:01:46.940581000 +0900
 ***************
 *** 204,209 ****
 --- 204,210 ----
@@ -3422,7 +3422,7 @@ diff -rc term/kyo.trm.ORG term/kyo.trm
   #endif
 diff -rc term/latex.trm.ORG term/latex.trm
 *** term/latex.trm	2010-09-16.ORG 08:46:20.000000000 +0900
---- term/latex.trm	2016-02-12 18:36:18.953609000 +0900
+--- term/latex.trm	2016-05-09 16:01:46.943371000 +0900
 ***************
 *** 950,955 ****
 --- 950,956 ----
@@ -3505,7 +3505,7 @@ diff -rc term/latex.trm.ORG term/latex.trm
   #endif /* TERM_TABLE */
 diff -rc term/linux.trm.ORG term/linux.trm
 *** term/linux.trm	2012-01-31.ORG 04:31:01.000000000 +0900
---- term/linux.trm	2016-02-12 18:36:18.955436000 +0900
+--- term/linux.trm	2016-05-09 16:01:46.945279000 +0900
 ***************
 *** 451,456 ****
 --- 451,457 ----
@@ -3538,8 +3538,8 @@ diff -rc term/linux.trm.ORG term/linux.trm
   END_HELP(linux)
   #endif
 diff -rc term/lua/gnuplot-tikz-ja.help.ORG term/lua/gnuplot-tikz-ja.help
-*** term/lua/gnuplot-tikz-ja.help	2016-02-12.ORG 18:36:19.079374000 +0900
---- term/lua/gnuplot-tikz-ja.help	2016-02-12 18:36:19.049136000 +0900
+*** term/lua/gnuplot-tikz-ja.help	2016-05-09.ORG 16:01:47.065097000 +0900
+--- term/lua/gnuplot-tikz-ja.help	2016-05-09 16:01:47.029973000 +0900
 ***************
 *** 0 ****
 --- 1,173 ----
@@ -3718,7 +3718,7 @@ diff -rc term/lua/gnuplot-tikz-ja.help.ORG term/lua/gnuplot-tikz-ja.help
 + #endif /* JAPANESE_DOC */
 diff -rc term/lua.trm.ORG term/lua.trm
 *** term/lua.trm	2016-01-04.ORG 16:50:42.000000000 +0900
---- term/lua.trm	2016-02-12 18:36:18.957705000 +0900
+--- term/lua.trm	2016-05-09 16:01:46.946918000 +0900
 ***************
 *** 1491,1496 ****
 --- 1491,1497 ----
@@ -3801,7 +3801,7 @@ diff -rc term/lua.trm.ORG term/lua.trm
   #endif /* TERM_HELP */
 diff -rc term/metafont.trm.ORG term/metafont.trm
 *** term/metafont.trm	2006-07-21.ORG 11:35:47.000000000 +0900
---- term/metafont.trm	2016-02-12 18:36:18.959030000 +0900
+--- term/metafont.trm	2016-05-09 16:01:46.948288000 +0900
 ***************
 *** 540,545 ****
 --- 540,546 ----
@@ -3920,7 +3920,7 @@ diff -rc term/metafont.trm.ORG term/metafont.trm
   #endif /* TERM_HELP */
 diff -rc term/metapost.trm.ORG term/metapost.trm
 *** term/metapost.trm	2015-12-02.ORG 20:33:35.000000000 +0900
---- term/metapost.trm	2016-02-12 18:36:18.960781000 +0900
+--- term/metapost.trm	2016-05-09 16:01:46.950271000 +0900
 ***************
 *** 994,999 ****
 --- 994,1000 ----
@@ -4136,7 +4136,7 @@ diff -rc term/metapost.trm.ORG term/metapost.trm
   #endif				/* TERM_HELP */
 diff -rc term/mif.trm.ORG term/mif.trm
 *** term/mif.trm	2006-07-21.ORG 11:35:47.000000000 +0900
---- term/mif.trm	2016-02-12 18:36:18.962188000 +0900
+--- term/mif.trm	2016-05-09 16:01:46.951734000 +0900
 ***************
 *** 965,970 ****
 --- 965,971 ----
@@ -4191,7 +4191,7 @@ diff -rc term/mif.trm.ORG term/mif.trm
   #endif /* TERM_HELP */
 diff -rc term/pbm.trm.ORG term/pbm.trm
 *** term/pbm.trm	2009-06-08.ORG 13:37:29.000000000 +0900
---- term/pbm.trm	2016-02-12 18:36:18.963709000 +0900
+--- term/pbm.trm	2016-05-09 16:01:46.953274000 +0900
 ***************
 *** 483,488 ****
 --- 483,489 ----
@@ -4245,7 +4245,7 @@ diff -rc term/pbm.trm.ORG term/pbm.trm
   #endif /* TERM_HELP */
 diff -rc term/pc.trm.ORG term/pc.trm
 *** term/pc.trm	2006-07-21.ORG 11:35:47.000000000 +0900
---- term/pc.trm	2016-02-12 18:36:18.964807000 +0900
+--- term/pc.trm	2016-05-09 16:01:46.954329000 +0900
 ***************
 *** 546,551 ****
 --- 546,552 ----
@@ -4278,7 +4278,7 @@ diff -rc term/pc.trm.ORG term/pc.trm
   #endif /* TERM_HELP */
 diff -rc term/pdf.trm.ORG term/pdf.trm
 *** term/pdf.trm	2014-05-07.ORG 17:27:30.000000000 +0900
---- term/pdf.trm	2016-02-12 18:36:18.967163000 +0900
+--- term/pdf.trm	2016-05-09 16:01:46.956766000 +0900
 ***************
 *** 1718,1723 ****
 --- 1718,1724 ----
@@ -4344,7 +4344,7 @@ diff -rc term/pdf.trm.ORG term/pdf.trm
   #endif
 diff -rc term/pm.trm.ORG term/pm.trm
 *** term/pm.trm	2010-03-15.ORG 07:44:38.000000000 +0900
---- term/pm.trm	2016-02-12 18:36:18.968881000 +0900
+--- term/pm.trm	2016-05-09 16:01:46.958896000 +0900
 ***************
 *** 1247,1252 ****
 --- 1247,1253 ----
@@ -4401,7 +4401,7 @@ diff -rc term/pm.trm.ORG term/pm.trm
   #endif /* TERM_HELP */
 diff -rc term/post.trm.ORG term/post.trm
 *** term/post.trm	2016-01-04.ORG 16:50:42.000000000 +0900
---- term/post.trm	2016-02-12 18:36:19.199850000 +0900
+--- term/post.trm	2016-05-09 16:01:47.172164000 +0900
 ***************
 *** 4359,4364 ****
 --- 4359,4365 ----
@@ -5051,7 +5051,7 @@ diff -rc term/post.trm.ORG term/post.trm
   #endif /* TERM_HELP */
 diff -rc term/pstricks.trm.ORG term/pstricks.trm
 *** term/pstricks.trm	2013-10-10.ORG 08:38:18.000000000 +0900
---- term/pstricks.trm	2016-02-12 18:36:18.977778000 +0900
+--- term/pstricks.trm	2016-05-09 16:01:46.967859000 +0900
 ***************
 *** 674,679 ****
 --- 674,680 ----
@@ -5096,7 +5096,7 @@ diff -rc term/pstricks.trm.ORG term/pstricks.trm
   #endif /* TERM_HELP */
 diff -rc term/qms.trm.ORG term/qms.trm
 *** term/qms.trm	2006-07-21.ORG 11:35:48.000000000 +0900
---- term/qms.trm	2016-02-12 18:36:18.978985000 +0900
+--- term/qms.trm	2016-05-09 16:01:46.969107000 +0900
 ***************
 *** 225,230 ****
 --- 225,231 ----
@@ -5127,8 +5127,8 @@ diff -rc term/qms.trm.ORG term/qms.trm
   END_HELP(qms)
   #endif
 diff -rc term/qt.trm.ORG term/qt.trm
-*** term/qt.trm	2014-04-21.ORG 09:41:26.000000000 +0900
---- term/qt.trm	2016-02-12 18:36:18.980493000 +0900
+*** term/qt.trm	2016-04-02.ORG 13:46:09.000000000 +0900
+--- term/qt.trm	2016-05-09 16:01:46.970684000 +0900
 ***************
 *** 80,85 ****
 --- 80,86 ----
@@ -5248,7 +5248,7 @@ diff -rc term/qt.trm.ORG term/qt.trm
   #endif /* TERM_HELP */
 diff -rc term/regis.trm.ORG term/regis.trm
 *** term/regis.trm	2006-07-21.ORG 11:35:48.000000000 +0900
---- term/regis.trm	2016-02-12 18:36:18.981364000 +0900
+--- term/regis.trm	2016-05-09 16:01:46.971593000 +0900
 ***************
 *** 258,263 ****
 --- 258,264 ----
@@ -5283,8 +5283,8 @@ diff -rc term/regis.trm.ORG term/regis.trm
   END_HELP(regis)
   #endif
 diff -rc term/svg.trm.ORG term/svg.trm
-*** term/svg.trm	2015-08-27.ORG 21:26:12.000000000 +0900
---- term/svg.trm	2016-02-12 18:36:18.983979000 +0900
+*** term/svg.trm	2016-05-09.ORG 15:50:33.000000000 +0900
+--- term/svg.trm	2016-05-09 16:01:46.973966000 +0900
 ***************
 *** 2199,2204 ****
 --- 2199,2205 ----
@@ -5370,7 +5370,7 @@ diff -rc term/svg.trm.ORG term/svg.trm
   #endif
 diff -rc term/t410x.trm.ORG term/t410x.trm
 *** term/t410x.trm	2006-07-21.ORG 11:35:48.000000000 +0900
---- term/t410x.trm	2016-02-12 18:36:18.985391000 +0900
+--- term/t410x.trm	2016-05-09 16:01:46.975482000 +0900
 ***************
 *** 315,320 ****
 --- 315,321 ----
@@ -5402,7 +5402,7 @@ diff -rc term/t410x.trm.ORG term/t410x.trm
   #endif
 diff -rc term/tek.trm.ORG term/tek.trm
 *** term/tek.trm	2015-05-15.ORG 20:39:12.000000000 +0900
---- term/tek.trm	2016-02-12 18:36:18.987155000 +0900
+--- term/tek.trm	2016-05-09 16:01:46.977290000 +0900
 ***************
 *** 1539,1544 ****
 --- 1539,1545 ----
@@ -5501,7 +5501,7 @@ diff -rc term/tek.trm.ORG term/tek.trm
   #endif /* TERM_HELP */
 diff -rc term/texdraw.trm.ORG term/texdraw.trm
 *** term/texdraw.trm	2006-07-21.ORG 11:35:48.000000000 +0900
---- term/texdraw.trm	2016-02-12 18:36:18.988145000 +0900
+--- term/texdraw.trm	2016-05-09 16:01:46.978291000 +0900
 ***************
 *** 368,373 ****
 --- 368,374 ----
@@ -5542,7 +5542,7 @@ diff -rc term/texdraw.trm.ORG term/texdraw.trm
   #endif /* TERM_HELP */
 diff -rc term/tgif.trm.ORG term/tgif.trm
 *** term/tgif.trm	2015-08-27.ORG 21:26:12.000000000 +0900
---- term/tgif.trm	2016-02-12 18:36:19.291845000 +0900
+--- term/tgif.trm	2016-05-09 16:01:47.264313000 +0900
 ***************
 *** 1678,1683 ****
 --- 1678,1684 ----
@@ -5634,8 +5634,8 @@ diff -rc term/tgif.trm.ORG term/tgif.trm
   #endif
   /*{{{}}}*/
 diff -rc term/tkcanvas.trm.ORG term/tkcanvas.trm
-*** term/tkcanvas.trm	2016-02-12.ORG 15:10:34.000000000 +0900
---- term/tkcanvas.trm	2016-02-12 18:36:18.994326000 +0900
+*** term/tkcanvas.trm	2016-03-09.ORG 10:58:07.000000000 +0900
+--- term/tkcanvas.trm	2016-05-09 16:01:46.982808000 +0900
 ***************
 *** 2142,2147 ****
 --- 2142,2148 ----
@@ -5803,7 +5803,7 @@ diff -rc term/tkcanvas.trm.ORG term/tkcanvas.trm
   
 diff -rc term/tpic.trm.ORG term/tpic.trm
 *** term/tpic.trm	2006-07-21.ORG 11:35:48.000000000 +0900
---- term/tpic.trm	2016-02-12 18:36:18.995816000 +0900
+--- term/tpic.trm	2016-05-09 16:01:46.984284000 +0900
 ***************
 *** 928,933 ****
 --- 928,934 ----
@@ -5863,7 +5863,7 @@ diff -rc term/tpic.trm.ORG term/tpic.trm
   #endif /* TERM_TABLE */
 diff -rc term/vgagl.trm.ORG term/vgagl.trm
 *** term/vgagl.trm	2013-08-24.ORG 19:28:06.000000000 +0900
---- term/vgagl.trm	2016-02-12 18:36:18.997578000 +0900
+--- term/vgagl.trm	2016-05-09 16:01:46.986044000 +0900
 ***************
 *** 1543,1548 ****
 --- 1543,1549 ----
@@ -5943,7 +5943,7 @@ diff -rc term/vgagl.trm.ORG term/vgagl.trm
   #endif /* defined(USE_MOUSE) */
 diff -rc term/vws.trm.ORG term/vws.trm
 *** term/vws.trm	2007-10-17.ORG 06:19:45.000000000 +0900
---- term/vws.trm	2016-02-12 18:36:18.998668000 +0900
+--- term/vws.trm	2016-05-09 16:01:46.987167000 +0900
 ***************
 *** 477,482 ****
 --- 477,483 ----
@@ -5976,7 +5976,7 @@ diff -rc term/vws.trm.ORG term/vws.trm
   #endif /* TERM_HELP */
 diff -rc term/win.trm.ORG term/win.trm
 *** term/win.trm	2014-12-23.ORG 18:01:46.000000000 +0900
---- term/win.trm	2016-02-12 18:36:19.012387000 +0900
+--- term/win.trm	2016-05-09 16:01:46.990729000 +0900
 ***************
 *** 983,988 ****
 --- 983,989 ----
@@ -6278,7 +6278,7 @@ diff -rc term/win.trm.ORG term/win.trm
   #endif /* TERM_HELP */
 diff -rc term/wxt.trm.ORG term/wxt.trm
 *** term/wxt.trm	2016-01-27.ORG 10:35:49.000000000 +0900
---- term/wxt.trm	2016-02-12 18:36:19.014159000 +0900
+--- term/wxt.trm	2016-05-09 16:01:46.992289000 +0900
 ***************
 *** 502,507 ****
 --- 502,508 ----
@@ -6424,7 +6424,7 @@ diff -rc term/wxt.trm.ORG term/wxt.trm
   #endif /* TERM_HELP */
 diff -rc term/x11.trm.ORG term/x11.trm
 *** term/x11.trm	2015-07-12.ORG 11:23:40.000000000 +0900
---- term/x11.trm	2016-02-12 18:36:19.017171000 +0900
+--- term/x11.trm	2016-05-09 16:01:46.995306000 +0900
 ***************
 *** 2349,2354 ****
 --- 2349,2355 ----
@@ -6991,7 +6991,7 @@ diff -rc term/x11.trm.ORG term/x11.trm
   #endif				/* TERM_HELP */
 diff -rc term/xlib.trm.ORG term/xlib.trm
 *** term/xlib.trm	2014-05-02.ORG 12:08:03.000000000 +0900
---- term/xlib.trm	2016-02-12 18:36:19.018074000 +0900
+--- term/xlib.trm	2016-05-09 16:01:46.996305000 +0900
 ***************
 *** 100,105 ****
 --- 100,106 ----

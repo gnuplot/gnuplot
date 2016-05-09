@@ -1,5 +1,5 @@
-C RCS $Id: gnuplot-ja.doc,v 1.590 2016-03-01 13:56:28+09 shige Exp $
-C corresponding original gnuplot.doc revision: 1.982
+C RCS $Id: gnuplot-ja.doc,v 1.594 2016-04-26 18:19:41+09 shige Exp $
+C corresponding original gnuplot.doc revision: 1.988
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -262,6 +262,8 @@ C 行が長いのは、できればなんとかしたい
 
  * 配列変数のサポート (以下参照: `arrays`)。
 
+ * 非線形軸のサポート (以下参照: `set nonlinear`)。
+
 3 バージョン 5.0
 
  * 線の点線/破線パターンは、現在は線の他の属性と独立に指定できます。以
@@ -331,7 +333,8 @@ C 行が長いのは、できればなんとかしたい
 # set colorsequence default|classic|podo   # 以後の描画要素で使用する色
 # set monochrome                           # 線種の別な設定法
 # set dashtype <tag> <dash-spec>           # ユーザ定義破線パターン
-# set link x2 via f(x) inverse g(x)        # 非線形軸スケールを可能に
+# set nonlinear x via f(x) inverse g(x)    # 表示軸を非線形軸に
+# set link x2 via f(x) inverse g(x)        # 表示する x 軸か y 軸をリンク
 # set fit quiet|results|brief|verbose      # fit 出力量の制御
 # set contours; splot ... with labels      # 数値での等高線のラベル
 # set style textbox                        # 文字列要素に外枠をつける
@@ -2637,8 +2640,10 @@ Ffigure_newsyntax
       plot f(x) dt 11           # 新パターンを使って描画
 
  点線/破線パターンを文字列で指定した場合、gnuplot はそれを <実線長>,
- <空白長> の組の列に変換します。その場合、コマンド `show dashtype` は、
- 元の文字列と変換後の数値の列の両方を表示します。
+ <空白長> の組の列に変換します。ドット "." は (2,5) に、ダッシュ "-" は
+ (10,10) に、下線 "_" は (20,10) に、また空白 " " は直前の <空白長> の
+ 値に 10 を追加します。その場合、コマンド `show dashtype` は、元の文字
+ 列と変換後の数値の列の両方を表示します。
 
 3 linestyles と linetypes
 ?linestyles vs linetypes
@@ -4111,6 +4116,9 @@ Ffigure_points
  こともできます。より長い文字列は、描画スタイル `points` ではなく
  `labels` を使えば出力できます。
 
+      plot sin(x) with points pt "#"
+
+ 点種として、任意の UTF-8 文字を使用できます。以下参照: `utf8`。
 =variable
 ?variable
 ?variable pointtype
@@ -5211,6 +5219,8 @@ Ffigure_jitter
  コマンド `history` は、コマンド履歴の一覧を表示したり、保存したり、一
  覧の中のコマンドを再実行したりします。このコマンドの挙動を変えるには、
  以下参照: `set history`。
+
+ `history` コマンドで始まる入力行は、コマンド履歴には保存しません。
 
  例:
 
@@ -8729,6 +8739,8 @@ Ffigure_missing
 ?show encoding
 ?encoding
 ?encodings
+?utf8
+?sjis
 =UTF-8
 =SJIS
  コマンド `set encoding` は文字のエンコード (encoding) を選択します。
@@ -9394,12 +9406,10 @@ Ffigure_missing
                   | {linetype | lt <major_linetype>}
                     {linewidth | lw <major_linewidth>}
                     {linecolor | lc <major_colorspec>}
-                    {dashtype | dt <major_dashtype>}
                   { , {linestyle | ls <minor_linestyle>}
                       | {linetype | lt <minor_linetype>}
                         {linewidth | lw <minor_linewidth>}
-                        {linecolor | lc <minor_colorspec>}
-                        {dashtype | dt <minor_dashtype>} } }
+                        {linecolor | lc <minor_colorspec>} }
        unset grid
        show grid
 
@@ -10090,7 +10100,7 @@ Ffigure_missing
  にも使えます。それを行うには、実行時初期化ファイル ~/.gnuplot に、例え
  ば以下のようなそれ用のコマンド列を追加することをお勧めします:
 
-       set linetype 1 lc rgb "dark-violet" lw 2 pt 0
+       set linetype 1 lc rgb "dark-violet" lw 2 pt 1
        set linetype 2 lc rgb "sea-green"   lw 2 pt 7
        set linetype 3 lc rgb "cyan"        lw 2 pt 6 pi -1
        set linetype 4 lc rgb "dark-red"    lw 2 pt 5 pi -1
@@ -10132,12 +10142,12 @@ Ffigure_missing
 
  例:
 
-       set link x
+       set link x2
 
  これは、このコマンドの最も単純な形式で、x2 軸を範囲 (range) も伸縮
- (scale) も方向も x 軸と全く同じにします。`set xrange` や `set auto x`
- などのコマンドは、この場合 x 軸にも x2 軸にも作用します。`set x2range`
- などのコマンドは、このリンクが有効な間は無視されます。
+ (scale) も方向も x 軸と全く同じにします。`set xrange`, `set x2range`
+ や `set auto x` などのコマンドは、この場合 x 軸にも x2 軸にも作用しま
+ す。
 
        set link x2 via x**2 inverse sqrt(x)
        plot "sqrt_data" using 1:2 axes x2y1, "linear_data" using 1:2 axes x1y1
@@ -10748,6 +10758,64 @@ Ffigure_missing
 ?nomztics
  z 軸の小目盛り刻みの印は `set mztics` で制御されます。以下参照:
  `set mxtics`。
+3 nonlinear
+?commands set nonlinear
+?set nonlinear
+?nonlinear
+ 書式:
+       set nonlinear <axis> via f(axis) inverse g(axis)
+       unset nonlinear <axis>
+
+ このオプションは試験段階です (gnuplot の安定版リリースの前に細かい仕様
+ は変わるかもしれません)。
+ このコマンドはコマンド `set link` に似ていますが、2 つのリンクされた軸
+ の一方のみを表示する点が違います。隠される軸は線形軸のままです。表示す
+ る軸に沿う座標は、g(x) を適用して隠れている軸の座標から割り当てられ、
+ f(x) は表示する軸の座標を隠れている線形軸に対応させます。
+ 
+ 例:
+
+       set xrange [1:1000]
+       set nonlinear x via log10(x) inverse 10**x
+
+ この例は対数軸を作成していて、`set log x` と同じ効果を生むもう一つの方
+ 法です。この場合隠れている軸は、[log10(xmin):log10(xmax)] を計算するこ
+ とで [0:3] という範囲を持ちます。変換式と逆変換式は、その両方を指定す
+ る必要があります。
+
+ 例:
+
+       set xrange [-3:3]
+       set nonlinear x via norm(x) inverse invnorm(x)
+
+ この例は確率スケール ("プロビット") の x 軸を作成し、累積正規分布関数
+ Phi(x) のグラフが線形の y 軸に対して直線となります。
+
+=logit
+ 例:
+
+       logit(p) = log(p/(1-p))
+       logistic(a) = 1. / (1. + exp(-a))
+       set xrange [.001 : .999]
+       set nonlinear y via logit(y) inverse logistic(y)
+       plot logit(x)
+
+ この例はロジットスケールの y 軸を作成し、線形の x 軸に対する logit(x)
+ のグラフが直線になります。
+
+=broken axis
+ 例:
+
+       f(x) = (x <= 100) ? x : (x < 500) ? NaN : x-390
+       g(x) = (x <= 100) ? x : x+390
+       set xrange [0:1000] noextend
+       set nonlinear x via f(x) inverse g(x)
+       set xtics add (100,500)
+       plot sample [x=1:100] x, [x=500:1000] x
+
+ この例は "切断軸" を作成します。x 座標は左に 0 から 100、右に 500 から
+ 1000 が並び、その間に 10 幅の小さな隙間ができます。100 < x < 500 の間
+ のデータは描画されず、これは期待通りの動作をします。
 3 図形オブジェクト (object)
 ?object
 ?commands set object
@@ -13160,9 +13228,8 @@ C 下記の以下参照: オプション `positive`, `negative`)。
 ?show x2range
 ?x2range
  コマンド `set x2range` は x2 (上) 軸の表示される水平範囲を設定します。
- コマンドオプションのすべての説明については、以下参照: `set xrange`。こ
- のコマンドは、x2 軸が明示的に x 軸にリンク (link) されている場合は無視
- されます。以下参照: `set link`。
+ コマンドオプションのすべての説明については、以下参照: `set xrange`。以
+ 下も参照: `set link`。
 3 x2tics
 ?commands set x2tics
 ?commands unset x2tics
@@ -13811,9 +13878,8 @@ C 度の記号は set encoding locale で出るようになると。
 ?show y2range
 ?y2range
  コマンド `set y2range` は y2 (右) 軸の表示される垂直範囲を設定します。
- コマンドオプションのすべての説明については、以下参照: `set xrange`。こ
- のコマンドは、y2 軸が明示的に y 軸にリンク (link) されている場合は無視
- されます。以下参照: `set link`。
+ コマンドオプションのすべての説明については、以下参照: `set xrange`。以
+ 下も参照: `set link`。
 3 y2tics
 ?commands set y2tics
 ?commands unset y2tics
