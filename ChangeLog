@@ -6,6 +6,18 @@
 	was documented as appearing in 5.0.1, but appently was never applied.
 	Bug #1769
 
+	* src/graphics.h src/plot2d.c: Add a new field to (struct curve_points).
+	plot->base_linetype holds the original linetype index for this 2D plot,
+	prior to applying variable color, linetypes defined in terms of other
+	linetypes, etc. This allows assigning successive colors or other
+	properties to elements of a 2D plot (e.g. histogram components, boxplot
+	factors).  An analogous field splot->hidden3d_top_linetype is already 
+	maintained in (struct surface_points) for use by 3D plots.
+
+	* src/graphics.c src/plot2d.c: In boxplots with multiple component
+	factors, interpret "lc variable" as requesting a new color for each
+	factor.
+
 2016-05-07 Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/term.h: Move estimate.trm further up, so emf.trm can see it.
