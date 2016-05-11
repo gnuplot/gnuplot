@@ -2,8 +2,9 @@
 
 	* src/graphics.c src/graphics.h src/plot2d.c:  Improved handling of
 	boxplot data with multiple "factors" (i.e. category labels). The data
-	is now sorted only once, rather than once per factor.  This patchset
+	is now sorted only once, rather than once per factor.  This change
 	was documented as appearing in 5.0.1, but appently was never applied.
+	Bug #1769
 
 2016-05-07 Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
