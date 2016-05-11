@@ -1,5 +1,5 @@
 /*
- * $Id: graphics.h,v 1.61.2.1 2015/01/05 22:16:45 sfeam Exp $
+ * $Id: graphics.h,v 1.61.2.2 2015/03/19 17:35:40 sfeam Exp $
  */
 
 /* GNUPLOT - graphics.h */
@@ -71,7 +71,6 @@ typedef struct curve_points {
     enum PLOT_SMOOTH plot_smooth; /* which "smooth" method to be used? */
     double smooth_parameter;	/* e.g. optional bandwidth for smooth kdensity */
     int boxplot_factors;	/* Only used if plot_style == BOXPLOT */
-    int *boxplot_factor_order;	/* Only used if plot_style == BOXPLOT */
     int p_max;			/* how many points are allocated */
     int p_count;		/* count of points in points */
     int x_axis;			/* FIRST_X_AXIS or SECOND_X_AXIS */
@@ -114,6 +113,6 @@ void do_polygon __PROTO((int dimensions, t_polygon *p, int style, t_clip_object 
 #define place_objects(listhead,layer,dimensions) /* void() */
 #endif
 
-int filter_boxplot __PROTO((struct curve_points *, int index));
+int filter_boxplot __PROTO((struct curve_points *));
 
 #endif /* GNUPLOT_GRAPHICS_H */

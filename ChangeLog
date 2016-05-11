@@ -1,3 +1,10 @@
+2016-05-11  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/graphics.c src/graphics.h src/plot2d.c:  Improved handling of
+	boxplot data with multiple "factors" (i.e. category labels). The data
+	is now sorted only once, rather than once per factor.  This patchset
+	was documented as appearing in 5.0.1, but appently was never applied.
+
 2016-05-07 Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/term.h: Move estimate.trm further up, so emf.trm can see it.
@@ -1381,10 +1388,6 @@
 
 	* configure.in: Qt5 check via pkg-config should use --variable=host_bins 
 	rather than --variable=exec_prefix
-
-	* src/graphics.c src/graphics.h src/plot2d.c:  Improved handling of
-	boxplot data with multiple "factors" (i.e. category labels). The data
-	is now sorted only once, rather than once per factor.
 
 2015-01-06  Ethan A Merritt  <merritt@u.washington.edu>
 

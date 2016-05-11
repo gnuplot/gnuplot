@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.336.2.22 2016/04/11 05:52:15 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.336.2.23 2016/04/11 05:58:16 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -75,8 +75,6 @@ static void histogram_range_fiddling __PROTO((struct curve_points *plot));
 static void impulse_range_fiddling __PROTO((struct curve_points *plot));
 static int check_or_add_boxplot_factor __PROTO((struct curve_points *plot, char* string, double x));
 static void add_tics_boxplot_factors __PROTO((struct curve_points *plot));
-static void sort_boxplot_factors __PROTO((struct curve_points *plot));
-static int compare_boxplot_factors __PROTO((SORTFUNC_ARGS arg1, SORTFUNC_ARGS arg2));
 
 /* internal and external variables */
 
@@ -187,8 +185,6 @@ cp_free(struct curve_points *cp)
 	if (cp->labels)
 	    free_labels(cp->labels);
 	cp->labels = NULL;
-	free(cp->boxplot_factor_order);
-	cp->boxplot_factor_order = NULL;
 	if (cp->z_n) {
 	    int i;
 	    for (i = 0; i < cp->n_par_axes; i++)
@@ -1518,13 +1514,16 @@ store2d_point(
 
 }                               /* store2d_point */
 
-/* Check if <string> is already among the known factors, if not, add it to the list */
+
+/*
+ * We abuse the labels structure to store a list of boxplot labels ("factors").
+ * Check if <string> is already among the known factors, if not, add it to the list.
+ */
 static int
 check_or_add_boxplot_factor(struct curve_points *plot, char* string, double x)
 {
     char * trimmed_string;
-    /* We abuse the labels structure to store the category labels ("factors") */
-    struct text_label *label;
+    struct text_label *label, *prev_label, *new_label;
     int index = DEFAULT_BOXPLOT_FACTOR;
 
     /* If there is no factor column (4th using spec) fall back to a single boxplot */
@@ -1535,15 +1534,34 @@ check_or_add_boxplot_factor(struct curve_points *plot, char* string, double x)
     trimmed_string = df_parse_string_field(string);
 
     if (strlen(trimmed_string) > 0) {
-	for (label = plot->labels; label; label = label->next) {
-	    /* check if string is the same as the i-th factor */
-	    if (label->text && !strcmp(trimmed_string, label->text))
+	TBOOLEAN new = FALSE;
+	prev_label = plot->labels;
+	if (!prev_label)
+	    int_error(NO_CARET, "boxplot labels not initialized");
+	for (label = prev_label->next; label; label = label->next, prev_label = prev_label->next) {
+	    /* check if string is already stored */
+	    if (!strcmp(trimmed_string, label->text))
+		break;
+	    /* If we are keeping a sorted list, test against current entry */
+	    /* (insertion sort).					   */
+	    if (boxplot_opts.sort_factors) {
+		if (strcmp(trimmed_string, label->text) < 0) {
+		    new = TRUE;
 		    break;
+		}
+	    }
 	}
 	/* not found, so we add it now */
-	if (!label)
-	    label = store_label(plot->labels, &(plot->points[0]), 
-		    plot->boxplot_factors++, trimmed_string, 0.0);
+	if (!label || new) {
+	    new_label = gp_alloc(sizeof(text_label),"boxplot label");
+	    memcpy(new_label,plot->labels,sizeof(text_label));
+	    new_label->next = label;
+	    new_label->tag = plot->boxplot_factors++;
+	    new_label->text = gp_strdup(trimmed_string);
+	    new_label->place.x = plot->points[0].x;
+	    prev_label->next = new_label;
+	    label = new_label;
+	}
 	index = label->tag;
     }
 
@@ -1564,81 +1582,13 @@ add_tics_boxplot_factors(struct curve_points *plot)
 	boxplot_opts.labels == BOXPLOT_FACTOR_LABELS_X  ? FIRST_X_AXIS  :
 	boxplot_opts.labels == BOXPLOT_FACTOR_LABELS_X2 ? SECOND_X_AXIS : 
 	x_axis;
-    this_label = plot->labels->next;
-    if (!this_label)
-	return;
-    while (this_label) {
-	add_tic_user(
-	    boxplot_labels_axis,
-	    this_label->text,
-	    plot->points->x + i * boxplot_opts.separation,
-	    -1);
-	i++;
-	this_label = this_label->next;
+    for (this_label = plot->labels->next; this_label;
+	 this_label = this_label->next) {
+	    add_tic_user( boxplot_labels_axis, this_label->text,
+		plot->points->x + i * boxplot_opts.separation,
+		-1);
+	    i++;
     }
-}
-
-/* Comparison function for alphabetical sorting of boxplot string factors below */
-static int
-compare_boxplot_factors(SORTFUNC_ARGS arg1, SORTFUNC_ARGS arg2)
-{
-    struct text_label * const *p1 = arg1;
-    struct text_label * const *p2 = arg2;
-
-    /* magic number alert: why 64? */
-    return strncmp((*p1)->text, (*p2)->text, 64); 
-}
-
-/* Sort boxplot factors */
-/* This is tricky. The discrete levels of the factor variable were assigned integers 
- * in the order they were found in the file, and these numbers were written into the
- * plot->points structure. To change the order in which they will be plotted, 
- * we have to sort the factor strings (which are stored in plot->labels), then 
- * fill plot->boxplot_factor_order with the order we've found. This is essentially 
- * a permutation of the sequence 0:N-1 where N is the number of levels the factor 
- * variable has (plot->boxplot_factors). */
-static void
-sort_boxplot_factors(struct curve_points *plot)
-{
-    /* temporary array that holds the pointers for the nodes of the labels list */
-    text_label **temp_labels, *this_label;
-    /* array that will hold the permutation of the levels */
-    int *permutation;
-    int i;
-    
-    if (plot->boxplot_factors < 2 || !plot->labels || !plot->labels->next)
-	return;
-    
-    temp_labels =  gp_alloc(plot->boxplot_factors * sizeof(temp_labels), "boxplot labels array");
-    permutation = gp_alloc(plot->boxplot_factors * sizeof(int), "boxplot permutations array");
-
-    /* fill pointer array by walking the linked list */
-    /* the list should have exactly plot->boxplot_factors nodes,
-     * plus the listhead which we leave alone. */
-    this_label = plot->labels->next;
-    for (i=0; i<plot->boxplot_factors; i++) {
-	temp_labels[i] = this_label;
-	this_label = this_label->next;
-    }
-    /* sort pointer array */
-    qsort(temp_labels, plot->boxplot_factors, sizeof(text_label *), compare_boxplot_factors);
-    
-    /* read out the tags from the text_labels from the - now sorted - pointer array, 
-     * and write them into the permutation array in order */
-    for (i=0; i<plot->boxplot_factors; i++) {
-	permutation[i] = temp_labels[i]->tag;
-    }
-
-    /* and also re-link the list in sorted order for the tics */
-    this_label = plot->labels->next = temp_labels[0];
-    for (i=0; i<plot->boxplot_factors-1; i++) {
-	this_label->next = temp_labels[i+1];
-	this_label = this_label->next;
-    }
-    this_label->next = NULL;
-    
-    free(temp_labels);
-    plot->boxplot_factor_order = permutation;
 }
 
 /* Autoscaling of box plots cuts off half of the box on each end. */
@@ -1674,9 +1624,16 @@ static void
 boxplot_range_fiddling(struct curve_points *plot)
 {
     double extra_width;
+    int N;
+
+    /* Create a tic label for each boxplot category */
+    if (plot->boxplot_factors > 0) {
+	if (boxplot_opts.labels != BOXPLOT_FACTOR_LABELS_OFF)
+	    add_tics_boxplot_factors(plot);
+    }
 
     /* Sort the points and removed any that are undefined */
-    int N = filter_boxplot(plot, DEFAULT_BOXPLOT_FACTOR);
+    N = filter_boxplot(plot);
     plot->p_count = N;
 
     if (plot->points[0].type == UNDEFINED)
@@ -2839,14 +2796,6 @@ eval_plots()
 		}
 		if (polar) {
 		    polar_range_fiddling(this_plot);
-		}
-
-		/* if needed, sort boxplot factors and assign tic labels to them */
-		if (this_plot->plot_style == BOXPLOT && this_plot->boxplot_factors > 0) {
-		     if (boxplot_opts.sort_factors)
-			sort_boxplot_factors(this_plot);
-		     if (boxplot_opts.labels != BOXPLOT_FACTOR_LABELS_OFF)
-			add_tics_boxplot_factors(this_plot);
 		}
 
 		/* sort */
