@@ -1,3 +1,9 @@
+2016-05-11  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/axis.c (extend_primary_ticrange): Snap logscale range to nearest
+	even power if it is already closer than epsilon (a.k.a. "set zero").
+	Bug #1590
+
 2016-05-09  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* docs/term-ja.diff docs/gnuplot-ja.doc:

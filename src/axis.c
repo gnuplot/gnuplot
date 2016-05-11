@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.194 2016/05/08 04:17:25 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.195 2016/05/09 03:32:27 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -2377,9 +2377,12 @@ extend_primary_ticrange(AXIS *axis)
     AXIS *primary = axis->linked_to_primary;
 
     if (axis->ticdef.logscaling) {
-	if (primary->autoscale & AUTOSCALE_MIN)
+	/* NB: "zero" is the minimum non-zero value from "set zero" */
+	if ((primary->autoscale & AUTOSCALE_MIN)
+	||  fabs(primary->min - floor(primary->min)) < zero)
 	    primary->min = floor(primary->min);
-	if (primary->autoscale & AUTOSCALE_MAX)
+	if ((primary->autoscale & AUTOSCALE_MAX)
+	||  fabs(primary->max - ceil(primary->max)) < zero)
 	    primary->max = ceil(primary->max);
     }
 }
