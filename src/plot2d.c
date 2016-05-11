@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.336.2.24 2016/05/11 17:38:11 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.336.2.25 2016/05/11 18:38:52 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -695,6 +695,10 @@ get_data(struct curve_points *current_plot)
 				break;
 		case PARALLELPLOT:
 				if (j < 4) int_error(NO_CARET,errmsg);
+				break;
+		case BOXPLOT:
+				/* Only the key sample uses this value */
+				v[j++] = current_plot->base_linetype + 1;
 				break;
 		default:
 		    break;
