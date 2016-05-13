@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: fit.c,v 1.145.2.14 2016/02/11 08:36:40 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: fit.c,v 1.145.2.15 2016/04/28 04:00:29 sfeam Exp $"); }
 #endif
 
 /*  NOTICE: Change of Copyright Status
@@ -2179,19 +2179,12 @@ fit_command()
 
     while ((i = df_readline(v, num_indep + num_errors + 1)) != DF_EOF) {
         if (num_data >= max_data) {
-	    /* increase max_data by factor of 1.5 */
-	    max_data = (max_data * 3) / 2;
-	    if (0
-		|| !redim_vec(&fit_x, max_data * num_indep)
-		|| !redim_vec(&fit_z, max_data)
-		|| !redim_vec(&err_data, max_data * GPMAX(num_errors, 1))
-		) {
+	    max_data *= 2;
+	    if (!redim_vec(&fit_x, max_data * num_indep) ||
+		!redim_vec(&fit_z, max_data) ||
+		!redim_vec(&err_data, max_data * GPMAX(num_errors, 1))) {
 		/* Some of the reallocations went bad: */
 		Eex2("Out of memory in fit: too many datapoints (%d)?", max_data);
-	    } else {
-		/* Just so we know that the routine is at work: */
-		fprintf(STANDARD, "Max. number of data points scaled up to: %d\n",
-			max_data);
 	    }
 	} /* if (need to extend storage space) */
 

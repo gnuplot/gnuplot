@@ -1,3 +1,10 @@
+2016-05-13  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/fit.c (fit_command):  Since memory requirements are linear in the
+	number of datapoints, double max_data if we need to enlarge the 
+	internal buffers.  Remove the associated message.
+	Feature Request #444.
+
 2016-05-11  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c src/graphics.h src/plot2d.c:  Improved handling of
