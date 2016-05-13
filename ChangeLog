@@ -5,8 +5,15 @@
 	MSVC, so re-enable it there also for 64bit builds.
 	Bug #1791
 
-	* src/config/mingw/Makefile:  Add default path for QT in Mingw64 32bit 
+	* src/config/mingw/Makefile:  Add default path for QT in Mingw64 32bit
 	builds.
+
+2016-05-13  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/fit.c (fit_command):  Since memory requirements are linear in the
+	number of datapoints, double max_data if we need to enlarge the 
+	internal buffers.  Remove the associated message.
+	Feature Request #444.
 
 2016-05-11  Ethan A Merritt  <merritt@u.washington.edu>
 
