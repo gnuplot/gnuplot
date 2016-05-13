@@ -1,5 +1,5 @@
 # Hello, emacs: this is a -*- Makefile -*-
-# $Id: Makefile,v 1.59 2016/03/30 09:59:45 markisch Exp $
+# $Id: Makefile,v 1.60 2016/04/21 23:42:14 sfeam Exp $
 #
 # GNUPLOT Makefile for MinGW/MSYS or MinGW-w64/MSYS2 on Windows 
 # This assumes a typical installation of the MinGW toolkit, the free
@@ -109,7 +109,11 @@ MOUSE=1
 ifndef MINGW64
 QT_DIR = /d/Source/Qt-5.2.1-mingw/5.2.1/mingw48_32
 else
+ifdef M32
+QT_DIR = /mingw32
+else
 QT_DIR = /mingw64
+endif
 endif
 
 # Uncomment the following line to select the lua/tikz terminal
