@@ -1,3 +1,13 @@
+2016-05-13  Tatsuro MATSUOKA  <tmacchant3@yahoo.co.jp>
+
+	* src/internal.c (GP_MATHERR):  The matherr mechanism is not supported
+	by Mingw64 in both 32bit and 64bit mode.  BM: But it is available with
+	MSVC, so re-enable it there also for 64bit builds.
+	Bug #1791
+
+	* src/config/mingw/Makefile:  Add default path for QT in Mingw64 32bit 
+	builds.
+
 2016-05-11  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/axis.c (extend_primary_ticrange): Snap logscale range to nearest
