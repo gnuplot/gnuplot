@@ -1,3 +1,7 @@
+2016-05-15  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* term/post.trm: Do not read beyond the end of a font spec.
+
 2016-05-13  Tatsuro MATSUOKA  <tmacchant3@yahoo.co.jp>
 
 	* src/internal.c (GP_MATHERR):  The matherr mechanism is not supported
