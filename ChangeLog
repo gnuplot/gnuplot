@@ -1,3 +1,12 @@
+2016-05-16  <ceprio@users.sf.net>
+
+	* term/js/gnuplot_svg.js: Apply screen transform to mouse coordinates,
+	so that browser-mediated changes of scale and origin are accounted for.
+	In particular this handles the case where the size of an svg image is
+	not the same as the object it is embedded in.
+	Note:  Old code claiming to handle scrollbars is left in place but may
+	now be counterproductive.
+
 2016-05-13  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/fit.c (fit_command):  Since memory requirements are linear in the
