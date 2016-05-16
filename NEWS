@@ -4,6 +4,7 @@ Changes in 5.0.4
 * CHANGE in-line datablock lines are not limited to 1024 characters
 * CHANGE do not truncate or renumber history items in the active session
 * CHANGE (Windows only) open piped output using mode "wb" rather than "w"
+* CHANGE gnuplot_svg.js now remaps coords for svg image embedded in larger object
 * FIX placement of objects and labels using linked secondary axis coordinates
 * FIX 'set term qt <N> close' acts immediately rather than after next mouse event
 * FIX emf terminal could lose track of bold/italic/etc font properties
