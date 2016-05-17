@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.250 2016/02/29 07:07:15 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.251 2016/05/09 03:32:27 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -1036,18 +1036,16 @@ get_3ddata(struct surface_points *this_plot)
 		}
 
 	    } else if (this_plot->plot_style == VECTOR) {
-		if (j == 6) {
-			xtail = x + v[3];
-			ytail = y + v[4];
-			ztail = z + v[5];
-			color = z;
-			color_from_column(FALSE);
-		} else if (j >= 7) {
+		/* We already enforced that j >= 6 */
+		xtail = x + v[3];
+		ytail = y + v[4];
+		ztail = z + v[5];
+		if (j >= 7) {
 		    color = v[6];
 		    color_from_column(TRUE);
 		} else {
-		    color = v[3];
-		    color_from_column(TRUE);
+		    color = z;
+		    color_from_column(FALSE);
 		}
 
 	    } else {	/* all other plot styles */
@@ -1103,6 +1101,8 @@ get_3ddata(struct surface_points *this_plot)
 
 		if (pm3d_color_from_column) {
 		    COLOR_STORE_WITH_LOG_AND_UPDATE_RANGE(cp->CRD_COLOR, color, cp->type, COLOR_AXIS, this_plot->noautoscale, NOOP, goto come_here_if_undefined);
+		    if (this_plot->plot_style == VECTOR)
+			cphead->CRD_COLOR = color;
 		} else {
 		    COLOR_STORE_WITH_LOG_AND_UPDATE_RANGE(cp->CRD_COLOR, z, cp->type, COLOR_AXIS, this_plot->noautoscale, NOOP, goto come_here_if_undefined);
 		}

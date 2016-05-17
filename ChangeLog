@@ -1,3 +1,10 @@
+2016-05-17  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/plot3d.c (get_3ddata):  The 7-column input case of "with vectors"
+	was broken by code refactoring (2016-02-29). Clean this up and store
+	color information in both head and tail of vector.
+	Bug #1793
+
 2016-05-15  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* term/post.trm: Do not read beyond the end of a font spec.
