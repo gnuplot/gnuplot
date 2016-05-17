@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.231.2.4 2015/10/31 04:39:20 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.231.2.5 2016/01/11 23:32:51 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -1104,6 +1104,8 @@ get_3ddata(struct surface_points *this_plot)
 		if (NEED_PALETTE(this_plot)) {
 		    if (pm3d_color_from_column) {
 			COLOR_STORE_WITH_LOG_AND_UPDATE_RANGE(cp->CRD_COLOR, color, cp->type, COLOR_AXIS, this_plot->noautoscale, NOOP, goto come_here_if_undefined);
+			if (this_plot->plot_style == VECTOR)
+			    cphead->CRD_COLOR = color;
 		    } else {
 			COLOR_STORE_WITH_LOG_AND_UPDATE_RANGE(cp->CRD_COLOR, z, cp->type, COLOR_AXIS, this_plot->noautoscale, NOOP, goto come_here_if_undefined);
 		    }

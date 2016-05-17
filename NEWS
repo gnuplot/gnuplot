@@ -12,6 +12,7 @@ Changes in 5.0.4
 * FIX regression that caused "set log x; plot '-'; replot" to mess up autoscaling
 * FIX regression in v5 that mangled 3D arrows defined by "from ... rto ..."
 * FIX transposition of row/column count in plotting ascii x/y/z data "with image"
+* FIX 7-column input to "splot ... with vectors"
 
 Changes in 5.0.3
 ================
