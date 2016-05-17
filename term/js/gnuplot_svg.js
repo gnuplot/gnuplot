@@ -1,9 +1,21 @@
 // Javascript routines for interaction with SVG documents produced by 
 // gnuplot's SVG terminal driver.
 
+// Find your root SVG element
+var svg = document.querySelector('svg');
+
+// Create an SVGPoint for future math
+var pt = svg.createSVGPoint();
+
+// Get point in global SVG space
+function cursorPoint(evt){
+  pt.x = evt.clientX; pt.y = evt.clientY;
+  return pt.matrixTransform(svg.getScreenCTM().inverse());
+}
+
 var gnuplot_svg = { };
 
-gnuplot_svg.version = "30 May 2015";
+gnuplot_svg.version = "17 May 2016";
 
 gnuplot_svg.SVGDoc = null;
 gnuplot_svg.SVGRoot = null;
@@ -56,8 +68,9 @@ gnuplot_svg.updateCoordBox = function(t, evt) {
      */
     var m = document.documentElement.getScreenCTM();
     var p = document.documentElement.createSVGPoint(); 
-    p.x = evt.clientX; p.y = evt.clientY; 
-    p = p.matrixTransform(m.inverse()); 
+    var loc = cursorPoint(evt);
+    p.x = loc.x;
+    p.y = loc.y;
     var label_x, label_y;
 
     // Allow for scrollbar position (Firefox, others?)
@@ -173,12 +186,10 @@ gnuplot_svg.showHypertext = function(evt, mouseovertext)
 	}
     }
 
-    var anchor_x = evt.clientX;
-    var anchor_y = evt.clientY;
-    // Allow for scrollbar position (Firefox, others?)
-    if (typeof evt.pageX != 'undefined') {
-        anchor_x = evt.pageX; anchor_y = evt.pageY; 
-    }
+    var loc = cursorPoint(evt);
+    var anchor_x = loc.x;
+    var anchor_y = loc.y;
+	
     var hypertextbox = document.getElementById("hypertextbox")
     hypertextbox.setAttributeNS(null,"x",anchor_x+10);
     hypertextbox.setAttributeNS(null,"y",anchor_y+4);
@@ -259,8 +270,9 @@ gnuplot_svg.hideHypertext = function ()
 
 gnuplot_svg.showHyperimage = function(evt, linktext)
 {
-    var anchor_x = evt.clientX;
-    var anchor_y = evt.clientY;
+    var loc = cursorPoint(evt);
+    var anchor_x = loc.x;
+    var anchor_y = loc.y;
     // Allow for scrollbar position (Firefox, others?)
     if (typeof evt.pageX != 'undefined') {
         anchor_x = evt.pageX; anchor_y = evt.pageY; 
