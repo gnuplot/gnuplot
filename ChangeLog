@@ -1,3 +1,11 @@
+2016-05-18  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/win/wpause.c:  Use default GUI font (not the archaic system font).
+	Match the size of the dialog box to the actual length of the message.
+
+	* src/win/wtext.c (DragFunc, M_PASTE) src/win/wpause.c:  Make sure to
+	use wide character APIs for Unicode windows. Bug fix.
+
 2016-05-17  <ceprio@users.sf.net>
 
 	* term/js/gnuplot_svg.js: Apply screen transform to mouse coordinates,
