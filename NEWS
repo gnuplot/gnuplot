@@ -11,6 +11,8 @@ Changes not in 5.0
 * NEW new command `toggle {<plotno> | "plottitle" | all}`
 * NEW Optional sampling interval in range specifier for pseudofile '+'
 * NEW point style associated with "plot with labels" is shown in the key
+* NEW wgnuplot handles Unicode (BMP) input and converts it according to
+      current `set encoding`, including UTF-8.
 * CHANGE Revise placement of axis labels in 3D plots
 * CHANGE Track font/enhanced for key title separately from the key entries
 * CHANGE order of margins in `set margins <left>, <right>, <bottom>, <top>`
