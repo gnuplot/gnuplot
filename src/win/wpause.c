@@ -1,5 +1,5 @@
 /*
- * $Id: wpause.c,v 1.32 2016/05/07 09:26:36 markisch Exp $
+ * $Id: wpause.c,v 1.33 2016/05/07 12:13:03 markisch Exp $
  */
 
 /* GNUPLOT - win/wpause.c */
@@ -290,7 +290,7 @@ WndPauseProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 	LPPW lppw;
 	int cxChar, cyChar, middle;
 
-	lppw = (LPPW)GetWindowLongPtr(hwnd, 0);
+	lppw = (LPPW)GetWindowLongPtrW(hwnd, 0);
 
 	switch(message) {
 		case WM_KEYDOWN:
@@ -328,7 +328,7 @@ WndPauseProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 				ws_opts |= WS_VISIBLE;
 #endif
 			lppw = (LPPW) ((CREATESTRUCT *)lParam)->lpCreateParams;
-			SetWindowLongPtr(hwnd, 0, (LONG_PTR)lppw);
+			SetWindowLongPtrW(hwnd, 0, (LONG_PTR)lppw);
 			lppw->hWndPause = hwnd;
 			hdc = GetDC(hwnd);
 			SelectObject(hdc, GetStockObject(SYSTEM_FONT));
@@ -367,7 +367,7 @@ WndPauseProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 				EnableWindow(GetParent(hwnd), TRUE);
 			break;
 	}
-	return DefWindowProc(hwnd, message, wParam, lParam);
+	return DefWindowProcW(hwnd, message, wParam, lParam);
 }
 
 
@@ -376,7 +376,7 @@ PauseButtonProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	LPPW lppw;
 	LONG n = GetWindowLong(hwnd, GWL_ID);
-	lppw = (LPPW)GetWindowLongPtr(GetParent(hwnd), 0);
+	lppw = (LPPW)GetWindowLongPtrW(GetParent(hwnd), 0);
 	switch (message) {
 		case WM_KEYDOWN:
 			switch (wParam) {

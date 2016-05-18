@@ -1,5 +1,5 @@
 /*
- * $Id: wtext.c,v 1.57 2016/05/07 11:36:49 markisch Exp $
+ * $Id: wtext.c,v 1.58 2016/05/07 11:48:57 markisch Exp $
  */
 
 /* GNUPLOT - win/wtext.c */
@@ -1089,7 +1089,7 @@ WndParentProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
     HDC hdc;
     LPTW lptw;
 
-    lptw = (LPTW)GetWindowLongPtr(hwnd, 0);
+    lptw = (LPTW)GetWindowLongPtrW(hwnd, 0);
 
     switch(message) {
     case WM_SYSCOMMAND:
@@ -1167,7 +1167,7 @@ WndParentProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 	TEXTMETRIC tm;
 
 	lptw = (LPTW) ((CREATESTRUCT *)lParam)->lpCreateParams;
-	SetWindowLongPtr(hwnd, 0, (LONG_PTR)lptw);
+	SetWindowLongPtrW(hwnd, 0, (LONG_PTR)lptw);
 	lptw->hWndParent = hwnd;
 	/* get character size */
 	TextMakeFont(lptw);
@@ -1285,7 +1285,7 @@ WndTextProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
     int nYinc, nXinc;
     LPTW lptw;
 
-    lptw = (LPTW)GetWindowLongPtr(hwnd, 0);
+    lptw = (LPTW)GetWindowLongPtrW(hwnd, 0);
 
     switch(message) {
     case WM_SETFOCUS:
@@ -1741,7 +1741,7 @@ WndTextProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			if (c == 011) /* convert 'tab' to 'space' */
 			    c = L' ';
 			if (*cbuf != L'\n')
-			    SendMessage(lptw->hWndText, WM_CHAR, c, 1L);
+			    SendMessageW(lptw->hWndText, WM_CHAR, c, 1L);
 			cbuf++;
 		    }
 		    GlobalUnlock(hGMem);
@@ -1967,7 +1967,7 @@ WndTextProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
     }
     case WM_CREATE:
 	lptw = (LPTW) ((CREATESTRUCT *)lParam)->lpCreateParams;
-	SetWindowLongPtr(hwnd, 0, (LONG_PTR)lptw);
+	SetWindowLongPtrW(hwnd, 0, (LONG_PTR)lptw);
 	lptw->hWndText = hwnd;
 	break;
     case WM_DESTROY:
@@ -2110,15 +2110,15 @@ DragFunc(LPTW lptw, HDROP hdrop)
 	_wstat(szFile, &buf);
 	if (buf.st_mode & S_IFDIR) {
 	    for (p = L"cd '"; *p; p++)
-		SendMessage(lptw->hWndText, WM_CHAR, *p, 1L);
+		SendMessageW(lptw->hWndText, WM_CHAR, *p, 1L);
 	} else {
 	    for (p = lptw->DragPre; *p; p++)
-		SendMessage(lptw->hWndText, WM_CHAR, *p, 1L);
+		SendMessageW(lptw->hWndText, WM_CHAR, *p, 1L);
 	}
 	for (w = szFile; *w; w++)
-	    SendMessage(lptw->hWndText, WM_CHAR, *w, 1L);
+	    SendMessageW(lptw->hWndText, WM_CHAR, *w, 1L);
 	for (p = lptw->DragPost; *p; p++)
-	    SendMessage(lptw->hWndText, WM_CHAR, *p, 1L);
+	    SendMessageW(lptw->hWndText, WM_CHAR, *p, 1L);
     }
     DragFinish(hdrop);
 }
