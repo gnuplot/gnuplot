@@ -1,5 +1,8 @@
 2016-05-18  Bastian Maerkisch  <bmaerkisch@web.de>
 
+	* src/win/wtext.c src/win/wpause.c src/win/wcommon.h:  Show current
+	encoding in the status bar the text window.
+
 	* src/win/wpause.c:  Use default GUI font (not the archaic system font).
 	Match the size of the dialog box to the actual length of the message.
 

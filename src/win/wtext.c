@@ -1,5 +1,5 @@
 /*
- * $Id: wtext.c,v 1.58 2016/05/07 11:48:57 markisch Exp $
+ * $Id: wtext.c,v 1.59 2016/05/18 08:13:02 markisch Exp $
  */
 
 /* GNUPLOT - win/wtext.c */
@@ -813,6 +813,7 @@ DoLine(LPTW lptw, HDC hdc, int xpos, int ypos, int x, int y, int count)
 	idx = count-num;
     }
 #endif
+    TextUpdateStatus(lptw);
 }
 
 
@@ -920,7 +921,7 @@ UpdateMark(LPTW lptw, POINT pt)
 static void
 TextCopyClip(LPTW lptw)
 {
-    int size, count;
+    size_t size, count;
     HGLOBAL hGMem;
     LPWSTR cbuf, cp;
     POINT pt, end;
@@ -1078,6 +1079,23 @@ TextSelectFont(LPTW lptw) {
 	GetClientRect(lptw->hWndText, (LPRECT) &rect);
 	InvalidateRect(lptw->hWndText, (LPRECT) &rect, 1);
 	UpdateWindow(lptw->hWndText);
+    }
+}
+
+
+/*
+ * Update the status bar
+ */
+void
+TextUpdateStatus(LPTW lptw)
+{
+    static enum set_encoding_id enc = S_ENC_INVALID;
+    if (enc != encoding) {  /* only update when changed */
+	WCHAR buf[256];
+
+	enc = encoding;
+	swprintf(buf, sizeof(buf)/sizeof(WCHAR), L"encoding: %S", encoding_names[enc]);
+	SendMessageW(lptw->hStatusbar, WM_SETTEXT, (WPARAM)0, (LPARAM)buf);
     }
 }
 

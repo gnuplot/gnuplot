@@ -1,5 +1,5 @@
 /*
- * $Id: wpause.c,v 1.34 2016/05/18 08:13:02 markisch Exp $
+ * $Id: wpause.c,v 1.35 2016/05/18 08:15:01 markisch Exp $
  */
 
 /* GNUPLOT - win/wpause.c */
@@ -197,6 +197,9 @@ PauseBox(LPPW lppw)
     RECT rect;
     SIZE size;
 
+#ifndef WGP_CONSOLE
+    TextUpdateStatus(&textwin);
+#endif
 #ifdef USE_MOUSE
     /* Do not try to wait for mouse events when there's no graph window open. */
     if (paused_for_mouse && !MousableWindowOpened())
