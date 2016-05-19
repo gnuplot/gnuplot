@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot on Unix.
 dnl
-dnl $Id: configure.ac,v 1.18 2016/02/10 10:51:04 markisch Exp $
+dnl $Id: configure.ac,v 1.19 2016/04/23 19:18:27 sfeam Exp $
 dnl
 dnl this is actually major.minor ...
 dnl note that for a non-beta release, we need to disable DEVELOPMENT_RELEASE
@@ -797,7 +797,7 @@ if test "$with_cwdrc" = yes; then
 fi
 
 dnl Disable experimental support for nonlinear axes
-AC_ARG_WITH(nonlinear,dnl
+AC_ARG_WITH(nonlinear-axes,dnl
 [  --without-nonlinear-axes     disable EXPERIMENTAL support for nonlinear axes])
 if test "$with_nonlinear_axes" = no; then
     AC_DEFINE(DISABLE_NONLINEAR_AXES, 1,

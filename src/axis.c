@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.195 2016/05/09 03:32:27 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.196 2016/05/11 21:08:01 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -2275,33 +2275,37 @@ clone_linked_axes(AXIS *axis1, AXIS *axis2)
     if (axis2->link_udf == NULL || axis2->link_udf->at == NULL)
 	return;
 
-    /* FIXME: In order to handle logscale axes, the code below would have to unlog the	*/
-    /* axis1 min/max; apply and check the mappings; then re-log and store the values	*/
-    /* for axis2. And after that the tics still come out wrong.    			*/
-	if (axis2->log && axis2->link_udf)
-	    int_warn(NO_CARET,"cannot handle via/inverse linked log-scale axes");
+    /* FIXME: Not sure how to allow generic linkage of nonlinear x/x2 or y/y2 */
+    if (axis2->log && axis2->link_udf)
+	int_warn(NO_CARET,"cannot handle via/inverse linked log-scale axes");
 
     /* Transform the min/max limits of linked secondary axis */
+    inverse_function_sanity_check:
 	axis2->set_min = eval_link_function(axis2, axis1->set_min);
 	axis2->set_max = eval_link_function(axis2, axis1->set_max);
 	axis2->min = eval_link_function(axis2, axis1->min);
 	axis2->max = eval_link_function(axis2, axis1->max);
 
-	if (isnan(axis2->min) || isnan(axis2->set_min)
-	||  isnan(axis2->max) || isnan(axis2->set_max))
-	    int_warn(NO_CARET, "axis mapping function must return a real value");
-
     /* Confirm that the inverse mapping actually works, at least at the endpoints */
-    /* FIXME:  Should we test values in between the endpoints also? */
+	if (isnan(axis2->set_min) || isnan(axis2->set_max))
+	    suspect = TRUE;
 	testmin = eval_link_function(axis1, axis2->set_min);
 	testmax = eval_link_function(axis1, axis2->set_max);
 	if (fabs(testmin - axis1->set_min) != 0
 	&&  fabs((testmin - axis1->set_min) / testmin) > 1.e-6)
-		suspect = TRUE;
+	    suspect = TRUE;
 	if (fabs(testmax - axis1->set_max) != 0
 	&&  fabs((testmax - axis1->set_max) / testmax) > 1.e-6)
-		suspect = TRUE;
+	    suspect = TRUE;
+
 	if (suspect) {
+	    /* Give it one chance to ignore a bad default range [-10:10] */
+	    if (((axis1->autoscale & AUTOSCALE_MIN) == AUTOSCALE_MIN)
+	    &&  axis1->set_min <= 0 && axis1->set_max > 0.1) {
+		axis1->set_min = 0.1;
+		suspect = FALSE;
+		goto inverse_function_sanity_check;
+	    }
 	    int_warn(NO_CARET, "could not confirm linked axis inverse mapping function");
 	    fprintf(stderr,"\tmin: %g inv(via(min)): %g", axis1->set_min, testmin);
 	    fprintf(stderr,"  max: %g inv(via(max)): %g\n", axis1->set_max, testmax);
