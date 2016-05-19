@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.330 2016/05/08 12:52:30 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.331 2016/05/08 18:43:11 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -1418,8 +1418,7 @@ link_command()
 	    strcpy(c_dummy_var[0], "r");
 
     /*
-     * "set nonlinear" will eventually apply to any visible axis
-     * but for now we support x y x2 y2 cb in 2D plots; cb in 3D plots
+     * "set nonlinear" currently supports axes x x2 y y2 z r cb
      */
     if (equals(command_token,"nonlinear")) {
 #ifdef NONLINEAR_AXES
@@ -1429,6 +1428,12 @@ link_command()
 	else
 	    int_error(c_token,"not a valid nonlinear axis");
 	primary_axis = get_shadow_axis(secondary_axis);
+	/* Trap attempt to set an already-linked axis to nonlinear */
+	/* This catches the sequence "set link y; set nonlinear y2" */
+	if (secondary_axis->linked_to_primary && secondary_axis->linked_to_primary->index > 0)
+	    int_error(NO_CARET,"must unlink axis before setting it to nonlinear");
+	if (secondary_axis->linked_to_secondary && secondary_axis->linked_to_secondary->index > 0)
+	    int_error(NO_CARET,"must unlink axis before setting it to nonlinear");
 #else
 	int_error(command_token, "This copy of gnuplot does not support nonlinear axes");
 #endif
@@ -1448,6 +1453,12 @@ link_command()
 	} else {
 	    int_error(c_token,"expecting x2 or y2");
 	}
+	/* This catches the sequence "set nonlinear x; set link x2" */
+	if (primary_axis->linked_to_primary)
+	    int_error(NO_CARET, "You must clear nonlinear x or y before linking it");
+	/* This catches the sequence "set nonlinear x2; set link x2" */
+	if (secondary_axis->linked_to_primary && secondary_axis->linked_to_primary->index <= 0)
+	    int_error(NO_CARET, "You must clear nonlinear x2 or y2 before linking it");
     }
     c_token++;
 

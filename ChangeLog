@@ -7,6 +7,11 @@
 	axis mappings at the current extrema (axis->set_m[in|ax]) if it is a
 	dependent autoscaled axis.
 
+	* src/command.c (link_command): Nonlinear axes part 12.
+	As it stands, bad things happen if an axis ends up linked to another
+	visible axis ("set link") and also to a shadow axis ("set nonlinear").
+	This patch adds checks to both commands to prevent this from happening.
+
 2016-05-18  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/win/wtext.c src/win/wpause.c src/win/wcommon.h:  Show current
