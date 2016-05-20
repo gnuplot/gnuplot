@@ -1,5 +1,5 @@
 /*
- * $Id: wtext.c,v 1.59 2016/05/18 08:13:02 markisch Exp $
+ * $Id: wtext.c,v 1.60 2016/05/18 08:22:30 markisch Exp $
  */
 
 /* GNUPLOT - win/wtext.c */
@@ -1094,7 +1094,7 @@ TextUpdateStatus(LPTW lptw)
 	WCHAR buf[256];
 
 	enc = encoding;
-	swprintf(buf, sizeof(buf)/sizeof(WCHAR), L"encoding: %S", encoding_names[enc]);
+	swprintf_s(buf, sizeof(buf)/sizeof(WCHAR), L"encoding: %hs", encoding_names[enc]);
 	SendMessageW(lptw->hStatusbar, WM_SETTEXT, (WPARAM)0, (LPARAM)buf);
     }
 }
