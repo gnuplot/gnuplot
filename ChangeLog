@@ -1,3 +1,13 @@
+2016-05-21  Daniel J Sebald <daniel.sebald@ieee.org>
+
+	* term/write_png_image.c:  Add utility routines to encode the png
+	image in Base64 for in-line inclusion.
+
+	* term/svg.trm:  If the "standalone" terminal option is chosen, images
+	will be embedded as a Base64 byte stream object rather than saved as an
+	external *.png file and included by reference.
+	Bug tracker item #1135
+
 2016-05-21  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/win/wtext.c:  Use standard file API instead of _lopen and

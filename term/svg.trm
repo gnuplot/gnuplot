@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: svg.trm,v 1.172 2015/08/21 20:45:03 sfeam Exp $
+ * $Id: svg.trm,v 1.173 2016/05/02 03:58:27 sfeam Exp $
  */
 
 /*------------------------------------------------------------------------------------------------------------------------------------
@@ -53,6 +53,9 @@
  *
  * Revised font sizing Oct 2012
  *   specify font-size without "pt" units.
+ *
+ * Inline image data in Base64 encoding
+ *   Daniel Sebald May 2016
  */
 
 /*
@@ -1807,21 +1810,36 @@ SVG_layer(t_termlayer syncpoint)
 TERM_PUBLIC void
 SVG_image (unsigned m, unsigned n, coordval *image, gpiPoint *corner, t_imagecolor color_mode) 
 {
-    char *image_file;
-    char *base_name = SVG_name ? SVG_name : "gp";
-   
-    /* Write the image to a png file */
-    image_file = gp_alloc(strlen(base_name)+16, "SVG_image");
-    sprintf(image_file, "%s_image_%02d.png", base_name, ++SVG_imageno);
-    write_png_image (m, n, image, color_mode, image_file);
-
-    /* Map it onto the terminals coordinate system. */
+    /* Map image onto the terminal's coordinate system. */
     fprintf(gpoutfile, "<image x='%.*f' y='%.*f' width='%.*f' height='%.*f' preserveAspectRatio='none' ",
-	PREC, X(corner[0].x), PREC, Y(corner[0].y), 
-	PREC, X(corner[1].x) - X(corner[0].x), PREC, Y(corner[1].y) - Y(corner[0].y));
+	    PREC, X(corner[0].x), PREC, Y(corner[0].y), 
+	    PREC, X(corner[1].x) - X(corner[0].x), PREC, Y(corner[1].y) - Y(corner[0].y));
 
-    fprintf(gpoutfile, "xlink:href='%s_image_%02d.png'/>;\n",
-	base_name, SVG_imageno);
+    if (!SVG_standalone) {
+	char *image_file;
+        char *base_name = SVG_name ? SVG_name : "gp";
+	int wpiresult;
+   
+        /* Write the image to a png file */
+        image_file = gp_alloc(strlen(base_name)+16, "SVG_image");
+        sprintf(image_file, "%s_image_%02d.png", base_name, ++SVG_imageno);
+        wpiresult = write_png_image(m, n, image, color_mode, image_file);
+
+	/* Reference the png image file */
+	fprintf(gpoutfile, "xlink:href='%s_image_%02d.png'/>\n",
+		base_name, SVG_imageno);
+	
+	free(image_file);
+
+	if (wpiresult != 0)
+	    os_error(NO_CARET, "SVG_image: could not write to PNG reference file.");
+    } else {
+	/* Embed the PNG file in SVG by converting to base64 */
+	fprintf(gpoutfile, "xlink:href='data:image/png;base64,");
+	if (write_png_base64_image(m, n, image, color_mode, gpoutfile))
+	    os_error(NO_CARET, "SVG_image: could not write to gnuplot output file.");
+	fprintf(gpoutfile, "'/>\n");
+    }
 
 }
 #endif
@@ -2242,8 +2260,9 @@ START_HELP(svg)
 " You can change this by using the `jsdir` option to specify either a",
 " different local directory or a general URL. The latter is usually",
 " appropriate if you are embedding the svg into a web page.",
-" Alternatively, the `standalone` option embeds the mousing code in the",
-" svg document itself rather than linking to an external resource.",
+" Alternatively, the `standalone` option embeds the mousing code and any",
+" images in the svg document itself rather than linking to an external",
+" resource.",
 "",
 " When an SVG file will be used in conjunction with external files,",
 " e.g. if it embeds a PNG image or is referenced by javascript code",
