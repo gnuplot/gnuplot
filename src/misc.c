@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.203 2016/04/08 07:05:33 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.204 2016/05/06 12:12:52 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -1676,7 +1676,8 @@ encoding_from_locale(void)
     char *l = NULL;
     enum set_encoding_id encoding = S_ENC_INVALID;
 
-#ifdef _WIN32
+#if defined(_WIN32)
+#ifdef HAVE_LOCALE_H
     char * cp_str;
 
     l = setlocale(LC_CTYPE, "");
@@ -1693,7 +1694,16 @@ encoding_from_locale(void)
 	    encoding = newenc;
 	}
     }
+#endif
+    /* get encoding from currently active codepage */
+    if (encoding == S_ENC_INVALID) {
+#ifndef WGP_CONSOLE
+	encoding = WinGetEncoding(GetACP());
 #else
+	encoding = WinGetEncoding(GetConsoleCP());
+#endif
+    }
+#elif defined(HAVE_LOCALE_H)
     l = setlocale(LC_CTYPE, "");
     if (l && (strstr(l, "utf") || strstr(l, "UTF")))
 	encoding = S_ENC_UTF8;

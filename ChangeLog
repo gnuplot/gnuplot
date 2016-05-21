@@ -1,5 +1,10 @@
 2016-05-21  Bastian Maerkisch  <bmaerkisch@web.de>
 
+	* src/misc.c (encoding_from_locale):  On Windows, if the current
+	encoding cannot be determined from the locale, fall back to deduce
+	it from the currently active codepage.  Avoids an error with
+	OpenWatcom, which only handles the C locale.
+
 	* src/readline.c src/win/wtext.c src/win/wcommon.h src/win/wgnuplib.h:
 	Screen updates during line-editing in wgnuplot are really slow since
 	it needs to redraw the line for every character which is printed.  This
