@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: readline.c,v 1.63 2016/03/29 18:08:22 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: readline.c,v 1.64 2016/05/05 15:23:03 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - readline.c */
@@ -242,14 +242,19 @@ static int ansi_getc __PROTO((void));
 
 # ifdef _WIN32
 #  include <windows.h>
-#  include "win/wtext.h"
 #  include "win/winmain.h"
+#  include "win/wcommon.h"
 #  define TEXTUSER 0xf1
 #  define TEXTGNUPLOT 0xf0
 #  ifdef WGP_CONSOLE
 #   define special_getc() win_getch()
 static int win_getch(void);
 #  else
+    /* The wgnuplot text window will suppress intermediate
+       screen updates in 'suspend' mode and only redraw the 
+       input line after 'resume'. */
+#   define SUSPENDOUTPUT TextSuspend(&textwin)
+#   define RESUMEOUTPUT TextResume(&textwin)
 #   define special_getc() msdos_getch()
 #  endif /* WGP_CONSOLE */
 static int msdos_getch(void);
@@ -289,6 +294,11 @@ static int os2_getch(void);
 #define NEWLINE	'\n'
 
 #define MAX_COMPLETIONS 50
+
+#ifndef SUSPENDOUTPUT
+#define SUSPENDOUTPUT
+#define RESUMEOUTPUT
+#endif
 
 static char *cur_line;		/* current contents of the line */
 static size_t line_len = 0;
@@ -539,7 +549,7 @@ extend_cur_line()
 {
     char *new_line;
 
-    /* extent input line length */
+    /* extend input line length */
     new_line = (char *) gp_realloc(cur_line, line_len + MAXBUF, NULL);
     if (!new_line) {
 	reset_termio();
@@ -698,6 +708,7 @@ tab_completion(TBOOLEAN forward)
 	while (max_pos + completion_len - last_completion_len + 1 > line_len)
 	    extend_cur_line();
 
+    SUSPENDOUTPUT;
     /* erase from last_tab_pos to eol */
     while (cur_pos > last_tab_pos)
 	backspace();
@@ -726,6 +737,7 @@ tab_completion(TBOOLEAN forward)
 	user_putc(cur_line[last_tab_pos+i]);
     cur_pos += completion_len;
     fix_line();
+    RESUMEOUTPUT;
 
     /* remember this completion */
     last_tab_pos  = cur_pos - completion_len;
@@ -996,6 +1008,7 @@ fix_line()
 {
     size_t i;
 
+    SUSPENDOUTPUT;
     /* write tail of string */
     for (i = cur_pos; i < max_pos; i++)
 	user_putc(cur_line[i]);
@@ -1013,6 +1026,7 @@ fix_line()
     i = cur_pos;
     for (cur_pos = max_pos; cur_pos > i; )
 	backspace();
+    RESUMEOUTPUT;
 }
 
 /* redraw the entire line, putting the cursor where it belongs */
@@ -1021,6 +1035,7 @@ redraw_line(const char *prompt)
 {
     size_t i;
 
+    SUSPENDOUTPUT;
     fputs(prompt, stderr);
     user_puts(cur_line);
 
@@ -1028,12 +1043,14 @@ redraw_line(const char *prompt)
     i = cur_pos;
     for (cur_pos = max_pos; cur_pos > i; )
 	backspace();
+    RESUMEOUTPUT;
 }
 
 /* clear cur_line and the screen line */
 static void
 clear_line(const char *prompt)
 {
+    SUSPENDOUTPUT;
     putc('\r', stderr);
     fputs(prompt, stderr);
     cur_pos = 0;
@@ -1050,6 +1067,7 @@ clear_line(const char *prompt)
     putc('\r', stderr);
     fputs(prompt, stderr);
     cur_pos = 0;
+    RESUMEOUTPUT;
 }
 
 /* clear to end of line and the screen end of line */
@@ -1058,6 +1076,7 @@ clear_eoline(const char *prompt)
 {
     size_t save_pos = cur_pos;
 
+    SUSPENDOUTPUT;
     while (cur_pos < max_pos) {
 	user_putc(SPACE);
 	if (isdoublewidth(cur_line[cur_pos]))
@@ -1071,6 +1090,7 @@ clear_eoline(const char *prompt)
     putc('\r', stderr);
     fputs(prompt, stderr);
     user_puts(cur_line);
+    RESUMEOUTPUT;
 }
 
 /* delete the full or partial word immediately before cursor position */
@@ -1078,6 +1098,8 @@ static void
 delete_previous_word()
 {
     size_t save_pos = cur_pos;
+
+    SUSPENDOUTPUT;
     /* skip whitespace */
     while ((cur_pos > 0) &&
 	   (cur_line[cur_pos - 1] == SPACE)) {
@@ -1111,6 +1133,7 @@ delete_previous_word()
 	max_pos = cur_pos + m;
 	fix_line();
     }
+    RESUMEOUTPUT;
 }
 
 /* copy line to cur_line, draw it and set cur_pos and max_pos */

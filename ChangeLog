@@ -1,7 +1,22 @@
+2016-05-21  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/readline.c src/win/wtext.c src/win/wcommon.h src/win/wgnuplib.h:
+	Screen updates during line-editing in wgnuplot are really slow since
+	it needs to redraw the line for every character which is printed.  This
+	is even more noticeable now that it needs to determine the on-screen
+	width of text in order to take care of wide Unicode characters.
+
+	This change improves the speed of screen output by eliminating 
+	unnecessary intermediate redraws by adding suspend/resume calls to 
+	several readline functions, which need to print and 'erase' (i.e.
+	overwrite) multiple characters.  Screen output is temporarily 
+	disabled and changes are only saved to wgnuplot's buffers.  Only when
+	the operation is finished, the current input line is redrawn.
+
 2016-05-20  Bastian Maerkisch  <bmaerkisch@web.de>
 
-	* src/win/text.c (TextUpdateStatus):  Mingw64 seems to have a problem
-	with %S format.  Use swprintf_s and format %hs instead.
+	* src/win/text.c (TextUpdateStatus):  Mingw64's swprintf seems to have
+	a problem with the %S format.  Use swprintf_s and format %hs instead.
 	Bug #1794
 
 	* config/config.mgw:  Add a work-around for the missing swprintf_s
@@ -23,8 +38,8 @@
 
 2016-05-18  Bastian Maerkisch  <bmaerkisch@web.de>
 
-	* src/win/wtext.c src/win/wpause.c src/win/wcommon.h:  Show current
-	encoding in the status bar the text window.
+	* src/win/wtext.c src/win/wpause.c src/win/wcommon.h:  Show the current
+	encoding in the status bar of the text window.
 
 	* src/win/wpause.c:  Use default GUI font (not the archaic system font).
 	Match the size of the dialog box to the actual length of the message.

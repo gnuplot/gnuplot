@@ -1,5 +1,5 @@
 /*
- * $Id: wcommon.h,v 1.23 2016/05/07 12:13:03 markisch Exp $
+ * $Id: wcommon.h,v 1.24 2016/05/18 08:22:30 markisch Exp $
  */
 
 /* GNUPLOT - wcommon.h */
@@ -44,6 +44,8 @@
 #ifndef GNUPLOT_WCOMMON_H
 #define GNUPLOT_WCOMMON_H
 
+#include "winmain.h"
+
 #ifndef CLEARTYPE_QUALITY
 #define CLEARTYPE_QUALITY       5
 #endif
@@ -85,6 +87,8 @@ void ReadTextIni(LPTW lptw);
 void DragFunc(LPTW lptw, HDROP hdrop);
 void TextShow(LPTW lptw);
 void TextUpdateStatus(LPTW lptw);
+void TextSuspend(LPTW lptw);
+void TextResume(LPTW lptw);
 
 /* wmenu.c - Menu */
 void SendMacro(LPTW lptw, UINT m);

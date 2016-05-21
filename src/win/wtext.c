@@ -1,5 +1,5 @@
 /*
- * $Id: wtext.c,v 1.60 2016/05/18 08:22:30 markisch Exp $
+ * $Id: wtext.c,v 1.61 2016/05/20 11:52:28 markisch Exp $
  */
 
 /* GNUPLOT - win/wtext.c */
@@ -463,8 +463,15 @@ static void
 UpdateText(LPTW lptw, int count)
 {
     HDC hdc;
-    int xpos, ypos;
-    LPLB lb;
+
+    if (lptw->bSuspend > 0) {
+	/* track cursor position only */
+	lptw->CursorPos.x += count;
+	/* track maximum cursor position */
+	if (lptw->CursorPos.x > lptw->MaxCursorPos)
+	    lptw->MaxCursorPos = lptw->CursorPos.x;
+	return;
+    }
 
     if (lptw->CursorPos.x + count > lptw->ScreenSize.x)
 	UpdateScrollBars(lptw);
@@ -483,27 +490,66 @@ UpdateText(LPTW lptw, int count)
     SelectObject(hdc, lptw->hfont);
 
     if (lptw->bWrap) {
-	int n, yofs;
-	uint width = lptw->ScreenBuffer.wrap_at;
+	int n, ypos, yofs, width;
 	uint x = lptw->CursorPos.x;
 	uint y = lptw->CursorPos.y;
 
 	/* Always draw complete lines to avoid character overlap
 	   when using Cleartype. */
-	yofs = x / width; /* first line to draw */
-	n    = (x + count - 1) / width + 1 - yofs; /* number of lines */
+	/* When we do not need to draw everything because we use suspend/resume,
+	   we only would need to (re)draw the last one or two lines.
+	 */
+	width = lptw->ScreenBuffer.wrap_at;
+	if (count == 0) { /* redraw all */
+	    yofs = 0;
+	    n = x / width + 1;
+	} else {
+	    yofs = x / width;
+	    n    = (x + count - 1) / width + 1 - yofs; /* number of lines */
+	}
 	for (; n > 0; y++, n--) {
 	    ypos = (y + yofs) * lptw->CharSize.y - lptw->ScrollPos.y;
 	    DoLine(lptw, hdc, 0, ypos, 0, y + yofs, width);
 	}
     } else {
+	LPLB   lb;
+	LPWSTR wstr;
+	int width, ypos;
+
 	lb = sb_get_last(&(lptw->ScreenBuffer));
-	xpos = lptw->CursorPos.x * lptw->CharSize.x - lptw->ScrollPos.x;
+	width = lptw->ScreenSize.x + 1;
+	wstr = lb_substr(lb, lptw->ScrollPos.x / lptw->CharSize.x, width);
 	ypos = lptw->CursorPos.y * lptw->CharSize.y - lptw->ScrollPos.y;
-	TextOutW(hdc, xpos, ypos, lb->str + lptw->CursorPos.x, count);
+	if (ypos > 0)
+	    TextOutW(hdc, 0, ypos, wstr, width);
+	free(wstr);
     }
     lptw->CursorPos.x += count;
     ReleaseDC(lptw->hWndText, hdc);
+}
+
+
+void
+TextSuspend(LPTW lptw)
+{
+    lptw->bSuspend++;
+}
+
+
+void
+TextResume(LPTW lptw)
+{
+    lptw->bSuspend--;
+
+    if (lptw->bSuspend == 0) {
+	int cursor = lptw->CursorPos.x;
+	lptw->CursorPos.x = lptw->MaxCursorPos;
+	UpdateText(lptw, 0);
+	lptw->CursorPos.x = cursor;
+	UpdateScrollBars(lptw);
+	TextToCursor(lptw);
+	lptw->MaxCursorPos = 0;
+    }
 }
 
 
@@ -613,8 +659,10 @@ TextPutChW(LPTW lptw, WCHAR ch)
 	    uint tab = 8 - (lptw->CursorPos.x  % 8);
 	    sb_last_insert_str(&(lptw->ScreenBuffer), lptw->CursorPos.x, L"        ", tab);
 	    UpdateText(lptw, tab);
-	    UpdateScrollBars(lptw);
-	    TextToCursor(lptw);
+	    if (lptw->bSuspend == 0) {
+		UpdateScrollBars(lptw);
+		TextToCursor(lptw);
+	    }
 	    break;
 	}
 	case 0x08:
@@ -631,9 +679,11 @@ TextPutChW(LPTW lptw, WCHAR ch)
 	    sb_last_insert_str(&(lptw->ScreenBuffer), lptw->CursorPos.x, &ch, 1);
 	    /* TODO: add attribute support */
 	    UpdateText(lptw, 1);
-	    /* maximum line size may have changed, so update scroll bars */
-	    UpdateScrollBars(lptw);
-	    TextToCursor(lptw);
+	    if (lptw->bSuspend == 0) {
+		/* maximum line size may have changed, so update scroll bars */
+		UpdateScrollBars(lptw);
+		TextToCursor(lptw);
+	    }
     }
     return ch;
 }
@@ -681,6 +731,7 @@ TextPutStr(LPTW lptw, LPSTR str)
 	}
     }
     free(w_save);
+    TextUpdateStatus(lptw);
 }
 
 
