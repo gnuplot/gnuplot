@@ -1,5 +1,5 @@
 /*
- * $Id: wmenu.c,v 1.28 2016/03/29 19:01:29 markisch Exp $Id: wmenu.c,v 1.28 2016/03/29 19:01:29 markisch Exp $
+ * $Id: wmenu.c,v 1.29 2016/05/07 09:04:55 markisch Exp $Id: wmenu.c,v 1.29 2016/05/07 09:04:55 markisch Exp $
  */
 
 /* GNUPLOT - win/wmenu.c */
@@ -54,6 +54,7 @@
 #include <string.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <tchar.h>
 #include "wgnuplib.h"
 #include "wresourc.h"
 #include "stdfn.h"
@@ -100,14 +101,14 @@ BYTE keyeq[] = {
 
 #define GBUFSIZE 512
 typedef struct tagGFILE {
-	HFILE	hfile;
-	char 	getbuf[GBUFSIZE];
-	int	getnext;
-	int	getleft;
+    FILE *	hfile;
+    char 	getbuf[GBUFSIZE];
+    int	getnext;
+    int	getleft;
 } GFILE;
 
 
-static GFILE * Gfopen(LPSTR lpszFileName, int fnOpenMode);
+static GFILE * Gfopen(LPCTSTR FileName, LPCTSTR Mode);
 static void Gfclose(GFILE * gfile);
 static int Gfgets(LPSTR lp, int size, GFILE *gfile);
 static int GetLine(char * buffer, int len, GFILE *gfile);
@@ -392,22 +393,22 @@ char *szFilter;
 
 
 static GFILE *
-Gfopen(LPSTR lpszFileName, int fnOpenMode)
+Gfopen(LPCTSTR FileName, LPCTSTR Mode)
 {
-GFILE *gfile;
+    GFILE *gfile;
 
-	gfile = (GFILE *)LocalAllocPtr(LHND, sizeof(GFILE));
-	if (!gfile)
-		return NULL;
+    gfile = (GFILE *) malloc(sizeof(GFILE));
+    if (!gfile)
+	return NULL;
 
-	gfile->hfile = _lopen(lpszFileName, fnOpenMode);
-	if (gfile->hfile == HFILE_ERROR) {
-		LocalFreePtr((void NEAR *)gfile);
-		return NULL;
-	}
-	gfile->getleft = 0;
-	gfile->getnext = 0;
-	return gfile;
+    gfile->hfile = _tfopen(FileName, Mode);
+    if (gfile->hfile == NULL) {
+	free(gfile);
+	return NULL;
+    }
+    gfile->getleft = 0;
+    gfile->getnext = 0;
+    return gfile;
 }
 
 
@@ -415,9 +416,9 @@ static void
 Gfclose(GFILE * gfile)
 {
 
-	_lclose(gfile->hfile);
-	LocalFreePtr((void NEAR *)gfile);
-	return;
+    fclose(gfile->hfile);
+    free(gfile);
+    return;
 }
 
 
@@ -425,28 +426,28 @@ Gfclose(GFILE * gfile)
 static int
 Gfgets(LPSTR lp, int size, GFILE *gfile)
 {
-int i;
-int ch;
-	for (i=0; i<size; i++) {
-		if (gfile->getleft <= 0) {
-			if ( (gfile->getleft = _lread(gfile->hfile, gfile->getbuf, GBUFSIZE)) == 0)
-				break;
-			gfile->getnext = 0;
-		}
-		ch = *lp++ = gfile->getbuf[gfile->getnext++];
-		gfile->getleft --;
-		if (ch == '\r') {
-			i--;
-			lp--;
-		}
-		if (ch == '\n') {
-			i++;
-			break;
-		}
+    int i;
+    int ch;
+    for (i = 0; i < size; i++) {
+	if (gfile->getleft <= 0) {
+	    if ((gfile->getleft = fread(gfile->getbuf, 1, GBUFSIZE, gfile->hfile)) == 0)
+		break;
+	    gfile->getnext = 0;
 	}
-	if (i<size)
-		*lp++ = '\0';
-	return i;
+	ch = *lp++ = gfile->getbuf[gfile->getnext++];
+	gfile->getleft --;
+	if (ch == '\r') {
+	    i--;
+	    lp--;
+	}
+	if (ch == '\n') {
+	    i++;
+	    break;
+	}
+    }
+    if (i < size)
+	*lp++ = NUL;
+    return i;
 }
 
 /* Get a line from the menu file */
@@ -533,7 +534,7 @@ int ButtonIcon[BUTTONMAX];
 	menufile = (GFILE *)NULL;
 
 	/* open menu file */
-	if ((menufile=Gfopen(lpmw->szMenuName,OF_READ)) == (GFILE *)NULL)
+	if ((menufile = Gfopen(lpmw->szMenuName, "r")) == NULL)
 		goto errorcleanup;
 
 	/* allocate buffers */

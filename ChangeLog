@@ -1,5 +1,8 @@
 2016-05-21  Bastian Maerkisch  <bmaerkisch@web.de>
 
+	* src/win/wtext.c:  Use standard file API instead of _lopen and
+	friends.
+
 	* src/misc.c (encoding_from_locale):  On Windows, if the current
 	encoding cannot be determined from the locale, fall back to deduce
 	it from the currently active codepage.  Avoids an error with
