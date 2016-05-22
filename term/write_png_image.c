@@ -254,6 +254,7 @@ write_png_base64_image (unsigned M, unsigned N, coordval *image, t_imagecolor co
   gdImagePtr im;
   void *pngdata;
   int pngsize;
+  int retval = 0;
 
   im = construct_gd_image (M, N, image, color_mode);
   if (!im)
@@ -263,15 +264,13 @@ write_png_base64_image (unsigned M, unsigned N, coordval *image, t_imagecolor co
     gdImageDestroy(im);
     return 1;
   }
-  if (write_base64_data (pngdata, pngsize, out) != 0) {
-    gdFree(pngdata);
-    return 1;
-  }
+
+  retval = write_base64_data (pngdata, pngsize, out);
 
   gdFree(pngdata);
   gdImageDestroy(im);
 
-  return 0;
+  return retval;
 }
 #endif
 #endif

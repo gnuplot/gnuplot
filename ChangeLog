@@ -1,3 +1,8 @@
+2016-05-22  Daniel J Sebald <daniel.sebald@ieee.org>
+
+	* term/write_png_image.c:  gdImageDestroy() needed on code paths for
+	both error and success.
+
 2016-05-21  Daniel J Sebald <daniel.sebald@ieee.org>
 
 	* term/write_png_image.c:  Add utility routines to encode the png
