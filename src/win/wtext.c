@@ -1,5 +1,5 @@
 /*
- * $Id: wtext.c,v 1.61 2016/05/20 11:52:28 markisch Exp $
+ * $Id: wtext.c,v 1.62 2016/05/21 05:29:31 markisch Exp $
  */
 
 /* GNUPLOT - win/wtext.c */
@@ -1770,7 +1770,7 @@ WndTextProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 	if (count < 0)
 	    count += lptw->KeyBufSize;
 	if (count == lptw->KeyBufSize - count_mb) {
-	    /* Keyboard buffer is full, so reallocate larger one. */
+	    /* Keyboard buffer is full, so reallocate a larger one. */
 	    if (ReallocateKeyBuf(lptw))
 		return 0; /* not enough memory */
 	}
@@ -1807,8 +1807,8 @@ WndTextProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		    cbuf = (LPWSTR) GlobalLock(hGMem);
 		    while (*cbuf) {
 			WCHAR c = *cbuf;
-			if (c == 011) /* convert 'tab' to 'space' */
-			    c = L' ';
+			if (c == 011) /* escape tab characters by sending ^V */
+			    SendMessageW(lptw->hWndText, WM_CHAR, 026, 1L);
 			if (*cbuf != L'\n')
 			    SendMessageW(lptw->hWndText, WM_CHAR, c, 1L);
 			cbuf++;

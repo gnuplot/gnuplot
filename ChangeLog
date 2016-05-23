@@ -1,5 +1,9 @@
 2016-05-23  Bastian Maerkisch  <bmaerkisch@web.de>
 
+	* src/win/wtext.c:  When pasting, escape tab characters by ^V instead
+	of replacing them by space.
+	Bug #1444
+
 	* src/readline.c docs/gnuplot.c:  Ctrl-V disables the interpretation
 	of the following key as editing command.  Hence, tabs can now be
 	inserted again by pressing ^V TAB.  On Windows, Ctrl-V is not passed
@@ -10,6 +14,7 @@
 	input).  It is still assumed that wgnuplot.mnu is encoded using the
 	ANSI codepage.  Reformat source while at it.
 	Part 5 of wgnuplot Unicode support.
+	Patch #727
 
 2016-05-22  Daniel J Sebald <daniel.sebald@ieee.org>
 
