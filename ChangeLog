@@ -6,6 +6,9 @@
 
 2016-05-23  Bastian Maerkisch  <bmaerkisch@web.de>
 
+	* configure.ac:  Auto-detect if --with-readline=DIR refers to GNU
+	readline or NetBSD editline.
+
 	* src/win/wtext.c:  When pasting, escape tab characters by ^V instead
 	of replacing them by space.
 	Bug #1444

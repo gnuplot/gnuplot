@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot on Unix.
 dnl
-dnl $Id: configure.ac,v 1.19 2016/04/23 19:18:27 sfeam Exp $
+dnl $Id: configure.ac,v 1.20 2016/05/18 21:19:21 sfeam Exp $
 dnl
 dnl this is actually major.minor ...
 dnl note that for a non-beta release, we need to disable DEVELOPMENT_RELEASE
@@ -409,7 +409,7 @@ AC_ARG_WITH(readline,dnl
 [  --with-readline=builtin  use the built-in readline
   --with-readline=gnu      use the GNU readline library (default if present)
   --with-readline=bsd      use the NetBSD editline library (NB: does not handle UTF-8!)
-  --with-readline=DIR      specify the location of GNU readline
+  --with-readline=DIR      specify the location of readline/editline
   --without-readline       do not use any readline function], ,
   test -z "$with_readline" && with_readline=gnu)
 
@@ -423,15 +423,39 @@ if test "$with_readline" != no; then
   _libs="$LIBS"
   if test "$with_readline" != builtin; then
 
+    dnl check for terminal library
+    dnl this is a very cool solution from octave's configure.in
+    gp_tcap=""
+    for termlib in ncurses curses termcap terminfo termlib; do
+      AC_CHECK_LIB(${termlib}, tputs, [gp_tcap="$gp_tcap -l$termlib"])
+      case "$gp_tcap" in
+        *-l${termlib}*)
+          break
+        ;;
+      esac
+    done
+
+    dnl explicit path to readline/editline
+    if test "$with_readline" != gnu -a "$with_readline" != bsd; then
+      if test -d $with_readline/include; then
+        CPPFLAGS="$CPPFLAGS -I$with_readline/include"
+      fi
+      if test -d $with_readline/lib; then
+        LDFLAGS="$LDFLAGS -L$with_readline/lib"
+      fi
+      dnl Could be either libedit or readline!
+      AC_CHECK_HEADERS(editline/readline.h,[with_readline=bsd],,)
+      if test "$with_readline" = bsd; then
+        AC_MSG_WARN([Path contains libedit, not readline!])
+      fi  
+    fi
+
     if test "$with_readline" = bsd; then
 
       AC_CHECK_LIB(edit, readline,
         [TERMLIBS="-ledit $TERMLIBS"],
 	 [AC_MSG_WARN([Could not find BSD editline library ])
 	  with_readline=builtin],)
-
-      AC_CHECK_LIB(curses, tputs,
-        [TERMLIBS="-lcurses $TERMLIBS"],,)
 
       if test "$ac_cv_lib_edit_readline" = yes; then
         AC_DEFINE(HAVE_LIBEDITLINE,1,
@@ -447,41 +471,15 @@ if test "$with_readline" != no; then
 
     else # !bsd
 
-    dnl check for terminal library
-    dnl this is a very cool solution from octave's configure.in
-    gp_tcap=""
-    for termlib in ncurses curses termcap terminfo termlib; do
-      AC_CHECK_LIB(${termlib}, tputs, [gp_tcap="$gp_tcap -l$termlib"])
-      case "$gp_tcap" in
-        *-l${termlib}*)
-          break
-        ;;
-      esac
-    done
-
-    if test "$with_readline" = gnu; then
-      AC_CHECK_LIB(readline, remove_history,
-        [TERMLIBS="-lreadline $gp_tcap $TERMLIBS"],, [${gp_tcap}])
-    else
-      if test -d $with_readline/include; then
-        CPPFLAGS="$CPPFLAGS -I$with_readline/include"
-      fi
-      if test -d $with_readline/lib; then
-        LDFLAGS="$LDFLAGS -L$with_readline/lib"
-      fi
-
-      AC_CHECK_LIB(readline, remove_history,
-        [TERMLIBS="-lreadline $gp_tcap $TERMLIBS"],,[${gp_tcap}])
-
-    fi
-
+    AC_CHECK_LIB(readline, remove_history,
+      [TERMLIBS="-lreadline $gp_tcap $TERMLIBS"],,[${gp_tcap}])
     if test "$ac_cv_lib_readline_remove_history" = no; then
       dnl OSX keeps history functions in a separate library
       AC_CHECK_LIB(history, remove_history,
-        TERMLIBS="-lreadline -lhistory $gp_tcap $TERMLIBS",
-	[ AC_MSG_WARN([GNU readline not found - falling back to builtin readline])
+        [TERMLIBS="-lreadline -lhistory $gp_tcap $TERMLIBS"],
+        [ AC_MSG_WARN([GNU readline not found - falling back to builtin readline])
           with_readline=builtin ]
-	,[${gp_tcap}])
+        ,[${gp_tcap}])
     fi
 
     dnl Work around some functions missing from the OSX readline library.
