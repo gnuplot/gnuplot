@@ -4,6 +4,7 @@ Changes in 5.0.4
 * CHANGE in-line datablock lines are not limited to 1024 characters
 * CHANGE do not truncate or renumber history items in the active session
 * CHANGE (Windows only) open piped output using mode "wb" rather than "w"
+* CHANGE backport 5.1 use of "lc variable" to color boxplot factors
 * CHANGE gnuplot_svg.js now remaps coords for svg image embedded in larger object
 * FIX placement of objects and labels using linked secondary axis coordinates
 * FIX 'set term qt <N> close' acts immediately rather than after next mouse event
@@ -13,6 +14,7 @@ Changes in 5.0.4
 * FIX regression in v5 that mangled 3D arrows defined by "from ... rto ..."
 * FIX transposition of row/column count in plotting ascii x/y/z data "with image"
 * FIX 7-column input to "splot ... with vectors"
+* FIX ignore incomplete "every" spec for image plots
 
 Changes in 5.0.3
 ================
