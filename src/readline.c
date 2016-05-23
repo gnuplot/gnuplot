@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: readline.c,v 1.64 2016/05/05 15:23:03 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: readline.c,v 1.65 2016/05/21 05:29:31 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - readline.c */
@@ -129,8 +129,10 @@ readline_ipc(const char* prompt)
  * ^L/^R redraw line in case it gets trashed
  * ^U kills the entire line
  * ^W deletes previous full or partial word
+ * ^V disables interpretation of the following key
  * LF and CR return the entire line regardless of the cursor postition
  * DEL deletes previous or current character (configuration dependent)
+ * TAB will perform filename completion
  * EOF with an empty line returns (char *)NULL
  *
  * all other characters are ignored
@@ -752,6 +754,7 @@ readline(const char *prompt)
 {
     int cur_char;
     char *new_line;
+    TBOOLEAN next_verbatim = FALSE;
 
 
     /* start with a string of MAXBUF chars */
@@ -780,9 +783,10 @@ readline(const char *prompt)
 	/* Accumulate ascii (7bit) printable characters
 	 * and all leading 8bit characters.
 	 */
-	if ((isprint(cur_char)
+	if (((isprint(cur_char)
 	      || (((cur_char & 0x80) != 0) && (cur_char != EOF))
-	    ) && (cur_char != '\t') /* TAB is a printable character in some locales */
+	     ) && (cur_char != '\t')) /* TAB is a printable character in some locales */
+	    || next_verbatim
 	    ) {
 	    size_t i;
 
@@ -802,15 +806,17 @@ readline(const char *prompt)
 	    if (cur_pos < max_pos) {
 		switch (encoding) {
 		case S_ENC_UTF8:
-		    if ((cur_char & 0xc0) == 0)
+		    if ((cur_char & 0xc0) == 0) {
+			next_verbatim = FALSE;
 			fix_line(); /* Normal ascii character */
-		    else if ((cur_char & 0xc0) == 0xc0)
+		    } else if ((cur_char & 0xc0) == 0xc0) {
 			; /* start of a multibyte sequence. */
-		    else if (((cur_char & 0xc0) == 0x80) &&
-			 ((unsigned char)(cur_line[cur_pos-2]) >= 0xe0))
+		    } else if (((cur_char & 0xc0) == 0x80) &&
+			 ((unsigned char)(cur_line[cur_pos-2]) >= 0xe0)) {
 			; /* second byte of a >2 byte sequence */
-		    else {
+		    } else {
 			/* Last char of multi-byte sequence */
+			next_verbatim = FALSE;
 			fix_line();
 		    }
 		    break;
@@ -820,23 +826,29 @@ readline(const char *prompt)
 		    static int mbwait = 0;
 
 		    if (mbwait == 0) {
-		        if (!is_sjis_lead_byte(cur_char))
+		        if (!is_sjis_lead_byte(cur_char)) {
 			    /* single-byte character */
+			    next_verbatim = FALSE;
 			    fix_line();
-			else
+			} else {
 			    /* first byte of a double-byte sequence */
 			    ;
+			}
 		    } else {
 			/* second byte of a double-byte sequence */
 			mbwait = 0;
+			next_verbatim = FALSE;
 			fix_line();
 		    }
 		}
 
 		default:
+		    next_verbatim = FALSE;
 		    fix_line();
 		    break;
 		}
+	    } else {
+		next_verbatim = FALSE;
 	    }
 
 	/* else interpret unix terminal driver characters */
@@ -963,6 +975,9 @@ readline(const char *prompt)
 		break;
 	    case 025:		/* ^U */
 		clear_line(prompt);
+		break;
+	    case 026:		/* ^V */
+		next_verbatim = TRUE;
 		break;
 	    case 027:		/* ^W */
 		delete_previous_word();

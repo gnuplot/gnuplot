@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.987 2016/04/24 19:01:32 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.988 2016/04/25 17:37:39 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -456,6 +456,8 @@ C
        ^L,^R redraws line in case it gets trashed.
        ^U    deletes the entire line.
        ^W    deletes previous word.
+       ^V    inhibits the interpretation of the following key as editing command. 
+       TAB   performs filename-completion.
 
        `History`:
 
@@ -475,7 +477,9 @@ C
 #\verb~^K~ & delete from current position to the end of line.\\
 #\verb~^L, ^R~ & redraw line in case it gets trashed.\\
 #\verb~^U~ & delete the entire line. \\
-#\verb~^W~ & delete previous word. \\ \hline
+#\verb~^W~ & delete previous word. \\
+#\verb~^V~ & inhibits the interpretation of the following key as editing command. \\ 
+#\verb~TAB~ & performs filename-completion. \\ \hline
 # & \multicolumn{1}{|c|}{History} \\ \cline{2-2}
 #\verb~^P~ & move back through history.\\
 #\verb~^N~ & move forward through history.\\
@@ -494,6 +498,9 @@ C
 %^L, ^R@redraw line in case it gets trashed.
 %^U@delete the entire line.
 %^W@delete previous word.
+%_
+%^V@inhibits the interpretation of the following key as editing command.
+%TAB@performs filename-completion.
 %_
 %@History
 %^P@move back through history.
@@ -521,6 +528,8 @@ C
 ^<tr>    <td><tt>^L, ^R</tt></td>    <td>redraw line in case it gets trashed.</td></tr>
 ^<tr>    <td><tt>^U</tt></td>    <td>delete the entire line.</td></tr>
 ^<tr>    <td><tt>^W</tt></td>    <td>delete previous word.</td></tr>
+^<tr>    <td><tt>^V</tt></td>    <td>inhibits the interpretation of the following key as editing command.</td></tr>
+^<tr>    <td><tt>TAB</tt></td>    <td>performs filename-completion.</td></tr>
 ^</tbody>
 ^<tbody>
 ^<tr>    <th></th>                <th>History</th></tr>

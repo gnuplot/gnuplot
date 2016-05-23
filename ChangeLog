@@ -1,5 +1,10 @@
 2016-05-23  Bastian Maerkisch  <bmaerkisch@web.de>
 
+	* src/readline.c docs/gnuplot.c:  Ctrl-V disables the interpretation
+	of the following key as editing command.  Hence, tabs can now be
+	inserted again by pressing ^V TAB.  On Windows, Ctrl-V is not passed
+	on to the built-in readline, though, but interpreted as "paste".
+
 	* src/win/wmenu.c src/win/wgnuplib.h:  Use UTF16 "W" APIs to handle
 	Unicode.  This affects all menu dialog boxes (open/save, directory,
 	input).  It is still assumed that wgnuplot.mnu is encoded using the
