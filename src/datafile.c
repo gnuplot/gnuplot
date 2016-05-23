@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.326 2016/04/28 05:50:46 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.327 2016/05/09 03:32:27 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -1275,15 +1275,6 @@ df_open(const char *cmd_filename, int max_using, struct curve_points *plot)
 	plot->image_properties.nrows = df_ypixels;
 	FPRINTF((stderr,"datafile.c:%d (ncols,nrows) set to (%d,%d)\n", __LINE__,
 		df_xpixels, df_ypixels));
-
-	if (set_every) {
-	    plot->image_properties.ncols = 1 +
-		    ((int)(GPMIN(lastpoint,df_xpixels-1)) - firstpoint) / everypoint;
-	    plot->image_properties.nrows = 1 +
-		    ((int)(GPMIN(lastline,df_ypixels-1)) - firstline) / everyline;
-	    FPRINTF((stderr,"datafile.c:%d  adjusting to (%d, %d)\n", __LINE__,
-		    plot->image_properties.ncols, plot->image_properties.nrows));
-	}
 	if (df_transpose) {
 	    unsigned int temp = plot->image_properties.ncols;
 	    plot->image_properties.ncols = plot->image_properties.nrows;
