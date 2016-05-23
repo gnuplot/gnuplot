@@ -1,7 +1,7 @@
 2016-05-23  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/datafile.c:  partial "every" specifiers are not compatible with
-	image plots.  Ignore them.
+	image plots.  Ignore them when figuring out image dimensions.
 	Bug #1796
 
 2016-05-17  Ethan A Merritt  <merritt@u.washington.edu>
