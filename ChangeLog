@@ -1,3 +1,11 @@
+2016-05-23  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/win/wmenu.c src/win/wgnuplib.h:  Use UTF16 "W" APIs to handle
+	Unicode.  This affects all menu dialog boxes (open/save, directory,
+	input).  It is still assumed that wgnuplot.mnu is encoded using the
+	ANSI codepage.  Reformat source while at it.
+	Part 5 of wgnuplot Unicode support.
+
 2016-05-22  Daniel J Sebald <daniel.sebald@ieee.org>
 
 	* term/write_png_image.c:  gdImageDestroy() needed on code paths for
@@ -15,7 +23,7 @@
 
 2016-05-21  Bastian Maerkisch  <bmaerkisch@web.de>
 
-	* src/win/wtext.c:  Use standard file API instead of _lopen and
+	* src/win/wmenu.c:  Use standard file API instead of _lopen and
 	friends.
 
 	* src/misc.c (encoding_from_locale):  On Windows, if the current

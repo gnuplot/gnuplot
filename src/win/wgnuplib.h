@@ -1,5 +1,5 @@
 /*
- * $Id: wgnuplib.h,v 1.75 2016/05/07 12:13:03 markisch Exp $
+ * $Id: wgnuplib.h,v 1.76 2016/05/21 05:29:31 markisch Exp $
  */
 
 /* GNUPLOT - win/wgnuplib.h */
@@ -109,14 +109,14 @@ int PauseBox(LPPW lppw);
 #define BUTTONMAX 10
 typedef struct tagMW
 {
-	LPSTR	szMenuName;		/* required */
+	LPTSTR	szMenuName;		/* required */
 	HMENU	hMenu;
 	BYTE	**macro;
 	BYTE	*macrobuf;
 	int		nCountMenu;
 	DLGPROC	lpProcInput;
-	char	*szPrompt;
-	char	*szAnswer;
+	LPWSTR	szPrompt;
+	LPWSTR	szAnswer;
 	int		nChar;
 	int		nButton;
 	HWND	hToolbar;
