@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: win.trm,v 1.132 2014/12/08 19:17:26 markisch Exp $
+ * $Id: win.trm,v 1.133 2014/12/18 14:35:40 broeker Exp $
  */
 
 /* GNUPLOT - win.trm */
@@ -479,10 +479,10 @@ WIN_update_options()
 
 	if (graphwin->Canvas.x != 0)
 		sprintf(&(term_options[strlen(term_options)]),
-			" size %i,%i", graphwin->Canvas.x, graphwin->Canvas.y);
+			" size %li,%li", graphwin->Canvas.x, graphwin->Canvas.y);
 	else if (graphwin->Size.x != CW_USEDEFAULT)
 		sprintf(&(term_options[strlen(term_options)]),
-			" wsize %i,%i", graphwin->Size.x, graphwin->Size.y);
+			" wsize %li,%li", graphwin->Size.x, graphwin->Size.y);
 }
 
 

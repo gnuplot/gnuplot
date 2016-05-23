@@ -6,6 +6,9 @@
 
 2016-05-23  Bastian Maerkisch  <bmaerkisch@web.de>
 
+	* term/win.trm:  Fix a few format specifiers for POINT members which
+	are of type long int.
+
 	* configure.ac:  Auto-detect if --with-readline=DIR refers to GNU
 	readline or NetBSD editline.
 
