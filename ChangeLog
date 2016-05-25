@@ -1,5 +1,10 @@
 2016-05-25  Bastian Maerkisch  <bmaerkisch@web.de>
 
+	* src/gp_hist.h src/history.c:  Add functions similar to the GNU
+	history library.  These will eventually be used to merge codepaths
+	which use GNU readline/history and the built-in readline to ensure
+	consistent behaviour.
+
 	* src/command.c (history_command):  The `history !` command replaced
 	the last command in the history list by the search result.  That used
 	to be the history command itself, but since 2016-03-31 history

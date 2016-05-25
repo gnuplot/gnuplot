@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: history.c,v 1.32 2016/03/31 03:49:21 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: history.c,v 1.33 2016/05/25 15:02:28 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - history.c */
@@ -42,6 +42,8 @@ static char *RCSid() { return RCSid("$Id: history.c,v 1.32 2016/03/31 03:49:21 s
 #include "plot.h"
 #include "util.h"
 
+/* Public variables */
+
 int gnuplot_history_size = HISTORY_SIZE;
 TBOOLEAN history_quiet = FALSE;
 TBOOLEAN history_full = FALSE;
@@ -53,8 +55,11 @@ TBOOLEAN history_full = FALSE;
 
 struct hist *history = NULL;	/* last entry in the history list, no history yet */
 struct hist *cur_entry = NULL;
+int history_length = 0;		/* number of entries in history list */
+int history_base = 1;
 
-/* add line to the history */
+
+/* add line to the history, suppress duplicates */
 void
 add_history(char *line)
 {
@@ -144,6 +149,334 @@ add_history(char *line)
 }
 
 
+/* add line to the history */
+void
+gp_add_history(char *line)
+{
+    struct hist *entry;
+
+    entry = (struct hist *) gp_alloc(sizeof(struct hist), "history");
+    entry->line = gp_strdup(line);
+    entry->data = NULL;
+
+    entry->prev = history;
+    entry->next = NULL;
+    if (history != NULL)
+	history->next = entry;
+    else
+	cur_entry = entry;
+    history = entry;
+    history_length++;
+}
+
+
+/* write history to a file
+ */
+int
+write_history(char *filename)
+{
+    write_history_n(0, filename, "w");
+    return 0;
+}
+
+
+/* routine to read history entries from a file
+ */
+void
+read_history(char *filename)
+{
+    gp_read_history(filename);
+}
+
+
+void
+using_history(void)
+{
+    /* Nothing to do. */
+}
+
+
+void
+clear_history(void)
+{
+    HIST_ENTRY * entry = history;
+
+    while (entry != NULL) {
+	HIST_ENTRY * prev = entry->prev;
+	free(entry->line);
+	free(entry);
+	entry = prev;
+    }
+
+    history_length = 0;
+    cur_entry = NULL;
+    history = NULL;
+}
+
+
+int
+where_history(void)
+{
+    struct hist *entry = history;  /* last_entry */
+    int hist_index = history_length;
+
+    if (entry == NULL)
+	return 0;		/* no history yet */
+
+    if (cur_entry == NULL)
+	return history_length;
+
+    /* find the current history entry and count backwards */
+    while ((entry->prev != NULL) && (entry != cur_entry)) {
+	entry = entry->prev;
+	hist_index--;
+    }
+
+    if (hist_index > 0)
+	hist_index--;
+
+    return hist_index;
+}
+
+
+int
+history_set_pos(int offset)
+{
+    struct hist *entry = history;  /* last_entry */
+    int hist_index = history_length - 1;
+
+    if ((offset < 0) || (offset > history_length) || (history == NULL))
+	return 0;
+
+    if (offset == history_length) {
+	cur_entry = NULL;
+	return 1;
+    }
+
+    /* seek backwards */
+    while (entry != NULL) {
+	if (hist_index == offset) {
+	    cur_entry = entry;
+	    return 1;
+	}
+	entry = entry->prev;
+	hist_index--;
+    }
+    return 0;
+}
+
+
+HIST_ENTRY *
+history_get(int offset)
+{
+    struct hist *entry = history;  /* last_entry */
+    int hist_index = history_length - 1;
+    int hist_ofs = offset - history_base;
+
+   if ((hist_ofs < 0) || (hist_ofs >= history_length) || (history == NULL))
+	return NULL;
+
+    /* find the current history entry and count backwards */
+    /* seek backwards */
+    while (entry != NULL) {
+	if (hist_index == hist_ofs)
+	    return entry;
+	entry = entry->prev;
+	hist_index--;
+    }
+
+    return NULL;
+}
+
+
+HIST_ENTRY *
+current_history(void)
+{
+    return cur_entry;
+}
+
+
+HIST_ENTRY *
+previous_history(void)
+{
+    if (cur_entry == NULL)
+	return (cur_entry = history);
+    if ((cur_entry != NULL) && (cur_entry->prev != NULL))
+	return (cur_entry = cur_entry->prev);
+    else
+	return NULL;
+}
+
+
+HIST_ENTRY *
+next_history(void)
+{
+    if (cur_entry != NULL)
+	return (cur_entry = cur_entry->next);
+    else
+	return NULL;
+}
+
+
+HIST_ENTRY *
+replace_history_entry(int which, const char *line, histdata_t data)
+{
+    HIST_ENTRY * entry = history_get(which + 1);
+    HIST_ENTRY * prev_entry;
+
+    if (entry == NULL)
+	return NULL;
+
+    /* save contents: allocate new entry */
+    prev_entry = (HIST_ENTRY *) malloc(sizeof(HIST_ENTRY));
+    if (entry != NULL) {
+	memset(prev_entry, 0, sizeof(HIST_ENTRY));
+	prev_entry->line = entry->line;
+	prev_entry->data = entry->data;
+    }
+
+    /* set new value */
+    entry->line = gp_strdup(line);
+    entry->data = data;
+
+    return prev_entry;
+}
+
+
+HIST_ENTRY *
+remove_history(int which)
+{
+    HIST_ENTRY * entry = history_get(which + 1);
+    if (entry == NULL)
+	return NULL;
+    /* remove entry from chain */
+    if (entry->prev != NULL)
+	entry->prev->next = entry->next;
+    if (entry->next != NULL)
+	entry->next->prev = entry->prev;
+    else
+	history = entry->prev; /* last entry */
+
+    /* adjust length */
+    history_length--;
+
+    return entry;
+}
+#endif
+
+
+#if defined(READLINE) || defined(HAVE_LIBEDITLINE)
+//  FIXME: Feature test in configure
+histdata_t 
+free_history_entry(HIST_ENTRY *histent)
+{
+    histdata_t data;
+
+    if (histent == NULL)
+	return NULL;
+
+    data = histent->data;
+    free((void *)(histent->line));
+    free(histent);
+    return data;
+}
+#endif
+
+
+#if defined(READLINE) || defined(HAVE_WINEDITLINE)
+int
+history_search(const char *string, int direction)
+{
+    int start;
+    HIST_ENTRY *entry;
+    /* Work-around for WinEditLine: */
+    int once = 1; /* ensure that we try seeking at least one position */
+    char * pos;
+
+    start = where_history();
+    entry = current_history();
+    while (((entry != NULL) && entry->line != NULL) || once) {
+	if ((entry != NULL) && (entry->line != NULL) && ((pos = strstr(entry->line, string)) != NULL))
+	    return (pos - entry->line);
+	if (direction < 0) 
+	    entry = previous_history(); 
+	else
+	    entry = next_history();
+	once = 0;
+    }
+    /* not found */
+    history_set_pos(start);
+    return -1;
+}
+
+
+int
+history_search_prefix(const char *string, int direction)
+{
+    int start;
+    HIST_ENTRY * entry;
+    /* Work-around for WinEditLine: */
+    int once = 1; /* ensure that we try seeking at least one position */
+    size_t len = strlen(string);
+
+    start = where_history();
+    entry = current_history();
+    while (((entry != NULL) && entry->line != NULL) || once) {
+	if ((entry != NULL) && (entry->line != NULL) && (strncmp(entry->line, string, len) == 0))
+	    return 0;
+	if (direction < 0) 
+	    entry = previous_history(); 
+	else
+	    entry = next_history();
+	once = 0;
+    }
+    /* not found */
+    history_set_pos(start);
+    return -1;
+}
+#endif
+
+
+/* routine to read history entries from a file,
+ * this complements write_history and is necessary for
+ * saving of history when we are not using libreadline
+ */
+int
+gp_read_history(const char *filename)
+{
+    FILE *hist_file;
+    if ((hist_file = fopen( filename, "r" ))) {
+    	while (!feof(hist_file)) {
+	    char line[MAX_LINE_LEN + 1];
+	    char *pline;
+
+	    pline = fgets(line, MAX_LINE_LEN, hist_file);
+	    if (pline != NULL) {
+		/* remove trailing linefeed */
+		if ((pline = strrchr(line, '\n')))
+		    *pline = '\0';
+		if ((pline = strrchr(line, '\r')))
+		    *pline = '\0';
+
+		/* skip leading whitespace */
+		pline = line;
+		while (isspace((unsigned int) *pline))
+		    pline++;
+
+		/* avoid adding empty lines */
+		if (*pline)
+		    add_history(pline);
+	    }
+	}
+	fclose(hist_file);
+	return 0;
+    } else {
+	return errno;
+    }
+}
+
+
+#ifdef READLINE
 /*
  * New functions for browsing the history. They are called from command.c
  * when the user runs the 'history' command
@@ -219,43 +552,6 @@ write_history_n(const int n, const char *filename, const char *mode)
     }
 }
 
-
-/* obviously the same routine as in GNU readline, according to code from
- * plot.c:#if defined(HAVE_LIBREADLINE) && defined(GNUPLOT_HISTORY)
- */
-void
-write_history(char *filename)
-{
-    write_history_n(0, filename, "w");
-}
-
-
-/* routine to read history entries from a file,
- * this complements write_history and is necessary for
- * saving of history when we are not using libreadline
- */
-void
-read_history(char *filename)
-{
-    FILE *hist_file;
-    
-    if ((hist_file = fopen( filename, "r" ))) {
-    	while (!feof(hist_file)) {
-	    char *pline, line[MAX_LINE_LEN+1];
-	    pline = fgets(line, MAX_LINE_LEN, hist_file);
-	    if (pline) {
-		/* remove trailing linefeed */
-		if ((pline = strrchr(line, '\n')))
-		    *pline = '\0';
-		if ((pline = strrchr(line, '\r')))
-		    *pline = '\0';
-
-	    	add_history(line);
-	    }
-	}
-	fclose(hist_file);
-    }
-}
 
 /* finds and returns a command from the history list by number */
 const char *

@@ -1,5 +1,5 @@
 /*
- * $Id: gp_hist.h,v 1.13 2013/12/17 00:49:52 sfeam Exp $
+ * $Id: gp_hist.h,v 1.14 2016/05/25 15:02:28 markisch Exp $
  */
 
 /* GNUPLOT - gp_hist.h */
@@ -64,18 +64,37 @@ extern TBOOLEAN history_full;
 /* gnuplot's built-in replacement history functions
 */
 
-extern struct hist *history;
-extern struct hist *cur_entry;
+typedef void * histdata_t;
 
 typedef struct hist {
     char *line;
+    histdata_t data;
     struct hist *prev;
     struct hist *next;
 } HIST_ENTRY;
 
+extern int history_length;
+extern int history_base;
+extern struct hist *history;
+extern struct hist *cur_entry;
+
+void using_history(void);
+void clear_history(void);
 void add_history(char *line);
+void gp_add_history(char *line);
 void read_history(char *);
-void write_history(char *);
+int write_history(char *);
+int where_history(void);
+int history_set_pos(int offset);
+HIST_ENTRY * history_get(int offset);
+HIST_ENTRY * current_history(void);
+HIST_ENTRY * previous_history(void);
+HIST_ENTRY * next_history(void);
+HIST_ENTRY * replace_history_entry(int which, const char *line, histdata_t data);
+HIST_ENTRY * remove_history(int which);
+histdata_t free_history_entry(HIST_ENTRY *histent);
+int history_search(const char *string, int direction);
+int history_search_prefix(const char *string, int direction);
 #endif
 
 
@@ -83,6 +102,7 @@ void write_history(char *);
 
 /* extra functions provided by history.c */
 
+int gp_read_history(const char *filename);
 void write_history_n(const int, const char *, const char *);
 const char *history_find(char *);
 const char *history_find_by_number(int);
