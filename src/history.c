@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: history.c,v 1.33 2016/05/25 15:02:28 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: history.c,v 1.34 2016/05/25 20:58:57 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - history.c */
@@ -346,9 +346,12 @@ replace_history_entry(int which, const char *line, histdata_t data)
 HIST_ENTRY *
 remove_history(int which)
 {
-    HIST_ENTRY * entry = history_get(which + 1);
+    HIST_ENTRY * entry;
+
+    entry = history_get(which + history_base);
     if (entry == NULL)
 	return NULL;
+
     /* remove entry from chain */
     if (entry->prev != NULL)
 	entry->prev->next = entry->next;
@@ -356,6 +359,9 @@ remove_history(int which)
 	entry->next->prev = entry->prev;
     else
 	history = entry->prev; /* last entry */
+
+    if (cur_entry == entry)
+	cur_entry = entry->prev;
 
     /* adjust length */
     history_length--;
@@ -445,6 +451,7 @@ int
 gp_read_history(const char *filename)
 {
     FILE *hist_file;
+
     if ((hist_file = fopen( filename, "r" ))) {
     	while (!feof(hist_file)) {
 	    char line[MAX_LINE_LEN + 1];
