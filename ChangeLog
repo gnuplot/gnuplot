@@ -1,5 +1,11 @@
 2016-05-25  Bastian Maerkisch  <bmaerkisch@web.de>
 
+	* src/command.c (history_command):  The `history !` command replaced
+	the last command in the history list by the search result.  That used
+	to be the history command itself, but since 2016-03-31 history
+	commands are no longer stored in the history.  Now simply re-add
+	the search result to the history.  Bug fix.
+
 	* src/syscfg.h src/command.c src/gp_hist.h src/history.c src/show.c:
 	New define USE_READLINE instead of a growing list of checks for 
 	(more or less) GNU readline compatible libraries.  Prepares for
