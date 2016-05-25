@@ -1,3 +1,10 @@
+2016-05-25  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/plot.c (main) src/command.c (rlgets) 
+	src/readline.c|h (readline_ipc):  Move initialisation of 
+	rl_getc_wrapper from readline_ipc() to main() also for GNU readline.
+	Remove the wrapper function readline_ipc.
+
 2016-05-23  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/datafile.c:  partial "every" specifiers are not compatible with

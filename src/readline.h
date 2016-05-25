@@ -1,5 +1,5 @@
 /*
- * $Id: readline.h,v 1.10 2008/03/30 03:27:54 sfeam Exp $
+ * $Id: readline.h,v 1.11 2008/12/12 21:06:13 sfeam Exp $
  */
 
 /* GNUPLOT - readline.h */
@@ -49,23 +49,16 @@
 #if defined(HAVE_LIBREADLINE)
 # include "stdfn.h"	/* <readline/readline.h> needs stdio.h... */
 # include <readline/readline.h>
-#endif
-#if defined(HAVE_LIBEDITLINE)
+
+#elif defined(HAVE_LIBEDITLINE)
 # include <editline/readline.h>
 #endif
 
-#if defined(HAVE_LIBEDITLINE)
-int getc_wrapper __PROTO((FILE* fp));
-#endif
+#if defined(READLINE)
+char *readline(const char *);
 
-#if defined(READLINE) && !defined(HAVE_LIBREADLINE) && !defined(HAVE_LIBEDITLINE)
-char *readline __PROTO((const char *));
+#elif defined(HAVE_LIBREADLINE) || defined(HAVE_LIBEDITLINE)
+int getc_wrapper(FILE* fp);
 #endif
-
-/*
- * The following 'readline_ipc' routine is usual 'readline' for OS2_IPC,
- * and a special one for IPC communication.
- */
-char *readline_ipc __PROTO((const char*));
 
 #endif /* GNUPLOT_READLINE_H */
