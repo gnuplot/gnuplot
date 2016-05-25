@@ -1,5 +1,8 @@
 2016-05-25  Bastian Maerkisch  <bmaerkisch@web.de>
 
+	* src/command.c src/gp_hist.h src/history.c:  Use the new add_history
+	function to add items to history.  Remove the old one.
+
 	* src/gp_hist.h src/history.c:  Add functions similar to the GNU
 	history library.  These will eventually be used to merge codepaths
 	which use GNU readline/history and the built-in readline to ensure

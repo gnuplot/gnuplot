@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.334 2016/05/25 15:02:28 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.335 2016/05/25 15:47:35 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -3185,7 +3185,7 @@ rlgets(char *s, size_t n, const char *prompt)
 	leftover = 0;
 	/* If it's not an EOF */
 	if (line && *line) {
-#  if defined(HAVE_LIBREADLINE)
+#  if defined(READLINE) || defined(HAVE_LIBREADLINE)
 	    int found;
 	    /* Initialize readline history functions */
 	    using_history();
@@ -3220,9 +3220,6 @@ rlgets(char *s, size_t n, const char *prompt)
 		if (found <= 0)
 		    add_history(line);
 	    }
-#  else /* builtin readline */
-	    if (!is_history_command(line))
-		add_history(line);
 #  endif
 	}
     }

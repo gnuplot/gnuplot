@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: history.c,v 1.34 2016/05/25 20:58:57 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: history.c,v 1.35 2016/05/25 21:21:42 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - history.c */
@@ -59,99 +59,9 @@ int history_length = 0;		/* number of entries in history list */
 int history_base = 1;
 
 
-/* add line to the history, suppress duplicates */
-void
-add_history(char *line)
-{
-    static struct hist *first_entry = NULL; 
-	/* this points to first entry in history list, 
-	    whereas "history" points to last entry     */
-    static long int hist_count = 0;
-	/* number of entries in history list */
-    struct hist *entry;
-
-    entry = history;
-    if (!history_full)
-    while (entry != NULL) {
-	/* Don't store duplicate entries */
-	if (!strcmp(entry->line, line)) {
-	    /* cmd lines are equal, relink entry that was found last */
-	    if (entry->next == NULL) {
-		/* previous command repeated, no change */
-		return;
-	    }
-	    if (entry->prev == NULL) {
-		/* current cmd line equals the first in the history */
-		(entry->next)->prev = NULL;
-		first_entry = entry->next;
-		history->next = entry;
-		entry->prev = history;
-		entry->next = NULL;
-		history = entry;
-		return;
-	    }
-	    /* bridge over entry's vacancy, then move it to the end */
-	    (entry->prev)->next = entry->next;
-	    (entry->next)->prev = entry->prev;
-	    entry->prev = history;
-	    history->next = entry;
-	    entry->next = NULL;
-	    history = entry;
-	    return;
-	}
-	entry = entry->prev;
-    }				/* end of not-storing duplicated entries */
-
-#if (0)
-    /* This code block breaks "history !<number>" because it renumbers the  */
-    /* entries before retrieving the requested number.  Also it potentially */
-    /* truncates the list on every command contrary to the documentattion.  */
-
-    /* limit size of history list to "gnuplot_history_size" */
-    if (gnuplot_history_size != -1) {
-	while ((hist_count >= gnuplot_history_size) && (first_entry != NULL)) {
-    
-	    entry = first_entry;
-
-	    /* remove first entry from chain */
-	    first_entry = first_entry->next;
-	    if (first_entry) {
-	        first_entry->prev = NULL;
-            } 
-	    hist_count--;
-
-	    /* remove references */
-	    if (cur_entry == entry)
-		cur_entry = first_entry;
-	    if (history == entry) {
-		cur_entry = history = NULL;
-		hist_count = 0;
-	    }
-
-	    free( entry->line );
-	    free( entry );           
-	}
-    }
-#endif
-
-    entry = (struct hist *) gp_alloc(sizeof(struct hist), "history");
-    entry->line = gp_strdup(line);
-
-    entry->prev = history;
-    entry->next = NULL;
-    if (history != NULL) {
-	history->next = entry;
-    } else {
-	first_entry = entry;
-    } 
-    history = entry;
-    hist_count++;
-}
-
-
 /* add line to the history */
 void
-gp_add_history(char *line)
+add_history(char *line)
 {
     struct hist *entry;
 

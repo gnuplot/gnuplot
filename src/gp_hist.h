@@ -1,5 +1,5 @@
 /*
- * $Id: gp_hist.h,v 1.14 2016/05/25 15:02:28 markisch Exp $
+ * $Id: gp_hist.h,v 1.15 2016/05/25 20:58:57 markisch Exp $
  */
 
 /* GNUPLOT - gp_hist.h */
@@ -81,7 +81,6 @@ extern struct hist *cur_entry;
 void using_history(void);
 void clear_history(void);
 void add_history(char *line);
-void gp_add_history(char *line);
 void read_history(char *);
 int write_history(char *);
 int where_history(void);
