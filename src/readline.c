@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: readline.c,v 1.67 2016/05/25 14:20:47 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: readline.c,v 1.68 2016/05/25 15:21:23 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - readline.c */
@@ -754,7 +754,9 @@ readline(const char *prompt)
     cur_line[0] = '\0';
     cur_pos = 0;
     max_pos = 0;
-    cur_entry = NULL;
+
+    /* move to end of history */
+    while (next_history());
 
     /* get characters */
     for (;;) {
@@ -908,26 +910,17 @@ readline(const char *prompt)
 		max_pos = cur_pos;
 		break;
 	    case 020:		/* ^P */
-		if (history != NULL) {
-		    if (cur_entry == NULL) {
-			cur_entry = history;
-			clear_line(prompt);
-			copy_line(cur_entry->line);
-		    } else if (cur_entry->prev != NULL) {
-			cur_entry = cur_entry->prev;
-			clear_line(prompt);
-			copy_line(cur_entry->line);
-		    }
+		if (previous_history() != NULL) {
+		    clear_line(prompt);
+		    copy_line(current_history()->line);
 		}
 		break;
 	    case 016:		/* ^N */
-		if (cur_entry != NULL) {
-		    cur_entry = cur_entry->next;
-		    clear_line(prompt);
-		    if (cur_entry != NULL)
-			copy_line(cur_entry->line);
-		    else
-			cur_pos = max_pos = 0;
+		clear_line(prompt);
+		if (next_history() != NULL) {
+		    copy_line(current_history()->line);
+		} else {
+		    cur_pos = max_pos = 0;
 		}
 		break;
 	    case 014:		/* ^L */
