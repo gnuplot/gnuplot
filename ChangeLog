@@ -1,5 +1,10 @@
 2016-05-25  Bastian Maerkisch  <bmaerkisch@web.de>
 
+	* src/syscfg.h src/command.c src/gp_hist.h src/history.c src/show.c:
+	New define USE_READLINE instead of a growing list of checks for 
+	(more or less) GNU readline compatible libraries.  Prepares for
+	using WinEditLine on Windows.
+
 	* src/plot.c (main) src/command.c (rlgets) 
 	src/readline.c|h (readline_ipc):  Move initialisation of 
 	rl_getc_wrapper from readline_ipc() to main() also for GNU readline.

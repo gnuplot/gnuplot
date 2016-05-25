@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.332 2016/05/19 05:15:40 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.333 2016/05/25 14:20:47 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -1054,7 +1054,7 @@ exit_command()
 void
 history_command()
 {
-#if defined(READLINE) || defined(HAVE_LIBREADLINE) || defined(HAVE_LIBEDITLINE)
+#ifdef USE_READLINE
     c_token++;
 
     if (!END_OF_COMMAND && equals(c_token,"?")) {
@@ -1127,7 +1127,7 @@ history_command()
 #else
     c_token++;
     int_warn(NO_CARET, "This copy of gnuplot was built without support for command history.");
-#endif /* defined(READLINE) || defined(HAVE_LIBREADLINE) || defined(HAVE_LIBEDITLINE) */
+#endif /* defined(USE_READLINE) */
 }
 
 #define REPLACE_ELSE(tok)             \
@@ -3168,7 +3168,7 @@ is_history_command(const char *line)
 }
 
 
-# if defined(READLINE) || defined(HAVE_LIBREADLINE) || defined(HAVE_LIBEDITLINE)
+# ifdef USE_READLINE
 /* keep some compilers happy */
 static char *rlgets __PROTO((char *s, size_t n, const char *prompt));
 
@@ -3241,7 +3241,7 @@ rlgets(char *s, size_t n, const char *prompt)
     }
     return NULL;
 }
-# endif				/* READLINE || HAVE_LIBREADLINE || HAVE_LIBEDITLINE */
+# endif				/* USE_READLINE */
 
 
 # if defined(MSDOS) || defined(_Windows)
@@ -3303,7 +3303,7 @@ do_shell()
 
 /* read from stdin, everything except VMS */
 
-# if !defined(READLINE) && !defined(HAVE_LIBREADLINE) && !defined(HAVE_LIBEDITLINE)
+# ifndef USE_READLINE
 #  if defined(MSDOS) && !defined(_Windows) && !defined(__EMX__) && !defined(DJGPP)
 
 /* if interactive use console IO so CED will work */
@@ -3337,7 +3337,7 @@ cgets_emu(char *str, int len)
 #   define GET_STRING(s,l) fgets(s, l, stdin)
 
 #  endif			/* !plain DOS */
-# endif				/* !READLINE && !HAVE_LIBREADLINE && !HAVE_LIBEDITLINE */
+# endif				/* !USE_READLINE */
 
 /* this function is called for non-interactive operation. Its usage is
  * like fgets(), but additionally it checks for ipc events from the
@@ -3384,7 +3384,7 @@ fgets_ipc(
 static char*
 gp_get_string(char * buffer, size_t len, const char * prompt)
 {
-# if defined(READLINE) || defined(HAVE_LIBREADLINE) || defined(HAVE_LIBEDITLINE)
+# ifdef USE_READLINE
     if (interactive)
 	return rlgets(buffer, len, prompt);
     else

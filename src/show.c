@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.360 2016/03/10 22:59:50 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.361 2016/04/23 22:59:31 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -562,7 +562,7 @@ show_command()
 #endif
     case S_PLOT:
 	show_plot();
-#if defined(READLINE) || defined(HAVE_LIBREADLINE) || defined(HAVE_LIBEDITLINE)
+#if defined(USE_READLINE)
 	if (!END_OF_COMMAND) {
 	    if (almost_equals(c_token, "a$dd2history")) {
 		c_token++;

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: history.c,v 1.31 2013/12/17 00:49:52 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: history.c,v 1.32 2016/03/31 03:49:21 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - history.c */
@@ -47,9 +47,11 @@ TBOOLEAN history_quiet = FALSE;
 TBOOLEAN history_full = FALSE;
 
 
-#if defined(READLINE) && !defined(HAVE_LIBREADLINE) && !defined(HAVE_LIBEDITLINE)
+#if defined(READLINE)
 
-struct hist *history = NULL;     /* no history yet */
+/* Built-in readline */
+
+struct hist *history = NULL;	/* last entry in the history list, no history yet */
 struct hist *cur_entry = NULL;
 
 /* add line to the history */
@@ -526,4 +528,4 @@ history_find_all(char *cmd)
     return number;
 }
 
-#endif /* READLINE && !HAVE_LIBREADLINE && !HAVE_LIBEDITLINE */
+#endif /* READLINE */

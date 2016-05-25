@@ -1,5 +1,5 @@
 /*
- * $Id: syscfg.h,v 1.58 2016/01/10 00:41:12 sfeam Exp $
+ * $Id: syscfg.h,v 1.59 2016/05/08 12:48:21 markisch Exp $
  */
 
 /* GNUPLOT - syscfg.h */
@@ -397,5 +397,11 @@ typedef unsigned char _Bool;
 #define FALSE false
 
 #define TBOOLEAN bool
+
+#if defined(READLINE) || defined(HAVE_LIBREADLINE) || defined(HAVE_LIBEDITLINE) || defined(HAVE_WINEDITLINE)
+# ifndef USE_READLINE
+#  define USE_READLINE
+# endif
+#endif
 
 #endif /* !SYSCFG_H */
