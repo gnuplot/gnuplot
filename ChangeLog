@@ -1,5 +1,10 @@
 2016-05-25  Bastian Maerkisch  <bmaerkisch@web.de>
 
+	* src/gp_hist.h:  Make (now) internal variables static.
+
+	* src/readline.c:  Use the new readline-compatible functions to access
+	the history.
+
 	* src/command.c src/gp_hist.h src/history.c:  Use the new add_history
 	function to add items to history.  Remove the old one.
 

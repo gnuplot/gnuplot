@@ -1,5 +1,5 @@
 /*
- * $Id: gp_hist.h,v 1.15 2016/05/25 20:58:57 markisch Exp $
+ * $Id: gp_hist.h,v 1.16 2016/05/25 21:28:39 markisch Exp $
  */
 
 /* GNUPLOT - gp_hist.h */
@@ -75,8 +75,6 @@ typedef struct hist {
 
 extern int history_length;
 extern int history_base;
-extern struct hist *history;
-extern struct hist *cur_entry;
 
 void using_history(void);
 void clear_history(void);
