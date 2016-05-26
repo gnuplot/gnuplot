@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.517 2016/04/26 06:09:03 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.518 2016/05/06 12:12:52 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -2641,7 +2641,7 @@ set_logscale()
     c_token++;
 
     if (END_OF_COMMAND) {
-	for (axis = 0; axis < NUMBER_OF_MAIN_VISIBLE_AXES; axis++)
+	for (axis = 0; axis < POLAR_AXIS; axis++)
 	    set_for_axis[axis] = TRUE;
     } else {
 	/* do reverse search because of "x", "x1", "x2" sequence in axisname_tbl */
@@ -2666,6 +2666,45 @@ set_logscale()
 	}
     }
 
+#if defined(NONLINEAR_AXES) && (NONLINEAR_AXES > 0)
+    for (axis = 0; axis < NUMBER_OF_MAIN_VISIBLE_AXES; axis++) {
+	if (set_for_axis[axis]) {
+	    static char command[128];
+	    char *dummy;
+	    if (!isalpha(axis_name(axis)[0]))
+		continue;
+	    switch (axis) {
+	    case FIRST_Y_AXIS:
+	    case SECOND_Y_AXIS:
+		dummy = "y"; break;
+	    case FIRST_Z_AXIS:
+	    case COLOR_AXIS:
+		dummy = "z"; break;
+	    case POLAR_AXIS:
+		dummy = "r"; break;
+	    default:
+		dummy = "x"; break;
+	    }
+
+	    /* Avoid a warning message trigger by default axis range [-10:10] */
+	    if (axis_array[axis].set_min <= 0 && axis_array[axis].set_max > 0)
+		axis_array[axis].set_min = 0.1;
+
+	    if (newbase == 10.) {
+		sprintf(command, "set nonlinear %s via log10(%s) inv 10**%s",
+			axis_name(axis), dummy, dummy);
+	    } else {
+		sprintf(command, "set nonlinear %s via log(%s)/log(%g) inv (%g)**%s",
+			axis_name(axis), dummy, newbase, newbase, dummy);
+	    }
+	    do_string(command); 
+	    axis_array[axis].ticdef.logscaling = TRUE;
+	    axis_array[axis].base = newbase;
+	    axis_array[axis].log_base = log(newbase);
+	}
+    }
+
+#else
     for (axis = 0; axis < NUMBER_OF_MAIN_VISIBLE_AXES; axis++) {
 	if (set_for_axis[axis]) {
 	    axis_array[axis].log = TRUE;
@@ -2679,6 +2718,8 @@ set_logscale()
     /* Because the log scaling is applied during data input, a quick refresh */
     /* using existing stored data will not work if the log setting changes.  */
     SET_REFRESH_OK(E_REFRESH_NOT_OK, 0);
+#endif
+
 }
 
 /* process 'set mapping3d' command */

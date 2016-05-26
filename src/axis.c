@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.196 2016/05/11 21:08:01 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.197 2016/05/18 21:19:21 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -1110,16 +1110,14 @@ gen_tics(struct axis *this, tic_callback callback)
 	    }
 	    break;
 	case TIC_COMPUTED:
-#ifdef NONLINEAR_AXES
-	    if (this->linked_to_primary && this->ticdef.logscaling) {
-		this->ticstep = make_tics(this->linked_to_primary, 20);
+	    if (nonlinear(this) && this->ticdef.logscaling) {
 		lmin = this->linked_to_primary->min;
 		lmax = this->linked_to_primary->max;
+		this->ticstep = make_tics(this->linked_to_primary, 20);
 		/* It may be that we _always_ want ticstep = 1.0 */
 		if (this->ticstep < 1.0)
 		    this->ticstep = 1.0;
 	    }
-#endif
 	    /* round to multiple of step */
 	    start = this->ticstep * floor(lmin / this->ticstep);
 	    step = this->ticstep;
@@ -1161,13 +1159,17 @@ gen_tics(struct axis *this, tic_callback callback)
 	    /* {{{  figure out ministart, ministep, miniend */
 	    if (minitics == MINI_USER) {
 		/* they have said what they want */
-		if (this->mtic_freq <= 0)
+		if (this->mtic_freq <= 0) {
 		    minitics = MINI_OFF;
- 		else if (this->log || (this->linked_to_primary && def->logscaling)) {
+ 		} else if (nonlinear(this)) {
+		    ministart = ministep = step / this->mtic_freq;
+		    miniend = step;
+ 		} else if (this->log || (this->linked_to_primary && def->logscaling)) {
+		    /* NB: Can't get here if "set log" is implemented as nonlinear */
  		    ministart = ministep = step / this->mtic_freq * this->base;
  		    miniend = step * this->base;
 		    /* Suppress minitics that would lie on top of major tic */
-		    while (ministart <= 1)
+		    while (ministart <= 1 && ministep > 0)
 			ministart += ministep;
  		} else {
 		    ministart = ministep = step / this->mtic_freq;
@@ -1266,15 +1268,18 @@ gen_tics(struct axis *this, tic_callback callback)
 	    if (this->index == POLAR_AXIS) {
 		/* Defer translation until after limit check */
 		internal = tic;
+#ifdef NONLINEAR_AXES
+	    } else if (this->linked_to_primary && (def->type == TIC_COMPUTED) && def->logscaling) {
+		internal = tic;
+		user = eval_link_function(this->linked_to_primary->linked_to_secondary, tic);
+	    } else if (nonlinear(this) && def->type == TIC_SERIES) {
+		user = tic;
+		internal = tic;	/* But it isn't really, so this is confusing! */
+#endif
 	    } else if (this->log) {
 		/* log scale => dont need to worry about zero ? */
 		internal = tic;
 		user = axis_undo_log(this, internal);
-#ifdef NONLINEAR_AXES
-	    } else if (this->linked_to_primary && def->type == TIC_COMPUTED && def->logscaling) {
-		internal = tic;
-		user = eval_link_function(this->linked_to_primary->linked_to_secondary, tic);
-#endif
 	    } else {
 		/* Normal case (no log, no link) */
 		internal = (this->tictype == DT_TIMEDATE)
@@ -1332,7 +1337,7 @@ gen_tics(struct axis *this, tic_callback callback)
 
 			/* This is where we finally decided to put the tic mark */
 #ifdef NONLINEAR_AXES
-			if (this->linked_to_primary && def->type == TIC_COMPUTED && def->logscaling)
+			if (this->linked_to_primary && (def->type == TIC_COMPUTED || def->type == TIC_SERIES) && def->logscaling)
 			    position = user;
 			else
 #endif
@@ -1360,11 +1365,18 @@ gen_tics(struct axis *this, tic_callback callback)
 	    if ((minitics != MINI_OFF) && (this->miniticscale != 0)) {
 		/* {{{  process minitics */
 		double mplace, mtic, temptic;
+		FPRINTF((stderr,"minitics start end step %g %g %g\n", ministart, miniend, ministep));
 		for (mplace = ministart; mplace < miniend; mplace += ministep) {
 		    if (this->tictype == DT_TIMEDATE) {
 			mtic = time_tic_just(this->timelevel - 1, internal + mplace);
 			temptic = mtic;
 #ifdef NONLINEAR_AXES
+		    } else if (nonlinear(this) && this->minitics == MINI_USER) {
+			temptic = internal + mplace;
+			if (this->ticdef.type == TIC_COMPUTED)
+			    mtic = eval_link_function(this, temptic);
+			else
+			    mtic =temptic;
 		    } else if (this->linked_to_primary && def->logscaling) {
 			mtic = user * mplace;
 			temptic = internal + eval_link_function(this->linked_to_primary, mplace);
@@ -2274,10 +2286,6 @@ clone_linked_axes(AXIS *axis1, AXIS *axis2)
     memcpy(axis2, axis1, AXIS_CLONE_SIZE);
     if (axis2->link_udf == NULL || axis2->link_udf->at == NULL)
 	return;
-
-    /* FIXME: Not sure how to allow generic linkage of nonlinear x/x2 or y/y2 */
-    if (axis2->log && axis2->link_udf)
-	int_warn(NO_CARET,"cannot handle via/inverse linked log-scale axes");
 
     /* Transform the min/max limits of linked secondary axis */
     inverse_function_sanity_check:

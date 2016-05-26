@@ -1,5 +1,5 @@
 /*
- * $Id: axis.h,v 1.146 2016/05/08 04:17:25 sfeam Exp $
+ * $Id: axis.h,v 1.147 2016/05/09 03:32:27 sfeam Exp $
  *
  */
 
@@ -41,7 +41,7 @@
 # define invalid_coordinate(x,y) FALSE
 #else
 
-# define NONLINEAR_AXES
+# define NONLINEAR_AXES 1
 # define nonlinear(axis) ((axis)->linked_to_primary != NULL)
 # define invalid_coordinate(x,y) ((unsigned)(x)==intNaN || (unsigned)(y)==intNaN)
 #endif
@@ -316,7 +316,7 @@ typedef struct axis {
 	0, 0,   		/* terminal lower and upper coords */	    \
 	0.,        		/* terminal scale */			    \
 	0,        		/* zero axis position */		    \
-	FALSE, 0.0, 0.0,	/* log, base, log(base) */		    \
+	FALSE, 10.0, 0.0,	/* log, base, log(base) */		    \
 	NULL, NULL,		/* linked_to_primary, linked_to_secondary */\
 	NULL,      		/* link function */                         \
 	NO_TICS,		/* tic output positions (border, mirror) */ \

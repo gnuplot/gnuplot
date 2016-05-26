@@ -3,6 +3,22 @@
 	* src/pm3d.c src/pm3d.h:  Make z2cb() a macro that calls the original
 	routine.  This will allow us to replace it cleanly with a no-op later.
 
+	* src/set.c src/unset.c src/axis.h src/command.c src/axis.c:
+	Nonlinear axes part 13.
+	Re-implement the "set log <axis>" command internally as the pair of
+	commands "set nonlinear <axis> via log10(x) inv 10**x; set xtics log".
+	Similarly for an explicit base "set log <axis> <base>" and for
+	"unset log".  The new code is selected by #define NONLINEAR_AXES 1
+	The orignial code is still in place and can be selected either by
+	1) ./configure --without-nonlinear-axes
+	   (equivalent to #undef NONLINEAR_AXES)
+	2) #define NONLINEAR_AXES 0
+	   nonlinear axis support selected but "set log" command doesn't use it. 
+
+	Note: at this stage the "show" and "save" commands report logscaled
+	axes as nonlinear but do not recognize that this is from "set log".
+	The next patch set will repair this.
+
 2016-05-26  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/readline.c (fn_completion):  Allow filename completion for system

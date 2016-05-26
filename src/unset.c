@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.235 2016/04/23 22:59:31 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.236 2016/04/25 18:36:21 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -1151,36 +1151,51 @@ reset_logscale(struct axis *this_axis)
 static void
 unset_logscale()
 {
+    TBOOLEAN set_for_axis[AXIS_ARRAY_SIZE] = AXIS_ARRAY_INITIALIZER(FALSE);
     int axis;
 
     if (END_OF_COMMAND) {
-	/* clean all the islog flags. This will hit some currently
-	 * unused ones, too, but that's actually a good thing, IMHO */
-	for (axis = 0; axis < AXIS_ARRAY_SIZE; axis++)
-	    reset_logscale(&axis_array[axis]);
-	for (axis = 0; axis < num_parallel_axes; axis++)
-	    reset_logscale(&parallel_axis[axis]);
+	for (axis = 0; axis < NUMBER_OF_MAIN_VISIBLE_AXES; axis++)
+	    set_for_axis[axis] = TRUE;
     } else {
+	/* do reverse search because of "x", "x1", "x2" sequence in axisname_tbl */
 	int i = 0;
-
-	/* do reverse search because of "x", "x1", "x2" sequence in
-	 * axisname_tbl */
 	while (i < token[c_token].length) {
 	    axis = lookup_table_nth_reverse(axisname_tbl, NUMBER_OF_MAIN_VISIBLE_AXES,
-					    gp_input_line + token[c_token].start_index + i);
+		       gp_input_line + token[c_token].start_index + i);
 	    if (axis < 0) {
 		token[c_token].start_index += i;
 		int_error(c_token, "invalid axis");
 	    }
-	    reset_logscale(&axis_array[axisname_tbl[axis].value]);
+	    set_for_axis[axisname_tbl[axis].value] = TRUE;
 	    i += strlen(axisname_tbl[axis].key);
 	}
-	++c_token;
+	c_token++;
+    }
+
+#if defined(NONLINEAR_AXES) && (NONLINEAR_AXES > 0)
+    for (axis = 0; axis < NUMBER_OF_MAIN_VISIBLE_AXES; axis++) {
+	if (set_for_axis[axis]) {
+	    static char command[64];
+	    if (!isalpha(axis_name(axis)[0]))
+		continue;
+	    sprintf(command, "unset nonlinear %s", axis_name(axis));
+	    do_string(command); 
+	}
+    }
+
+#else
+    for (axis = 0; axis < NUMBER_OF_MAIN_VISIBLE_AXES; axis++) {
+	if (set_for_axis[axis]) {
+	    reset_logscale(&axis_array[axis]);
+	}
     }
 
     /* Because the log scaling is applied during data input, a quick refresh */
     /* using existing stored data will not work if the log setting changes.  */
     SET_REFRESH_OK(E_REFRESH_NOT_OK, 0);
+#endif
+
 }
 
 /* process 'unset mapping3d' command */
