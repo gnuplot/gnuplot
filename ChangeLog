@@ -1,3 +1,9 @@
+2016-05-26  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/readline.c (fn_completion):  Allow filename completion for system
+	commands '!' and after pipe symbols '<', '|'.
+	Bug #1747
+
 2016-05-25  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/gp_hist.h:  Make (now) internal variables static.

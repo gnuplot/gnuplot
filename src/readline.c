@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: readline.c,v 1.68 2016/05/25 15:21:23 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: readline.c,v 1.69 2016/05/25 21:43:41 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - readline.c */
@@ -574,21 +574,26 @@ fn_completion(size_t anchor_pos, int direction)
 	start = cur_line + anchor_pos;
 	if (anchor_pos > 0) {
 	    /* first, look for a quote to start the string */
-	    for ( ; start > cur_line; start--) {
+	    for ( ; start >= cur_line; start--) {
 	        if ((*start == '"') || (*start == '\'')) {
 		    start++;
+		    /* handle pipe commands */
+		    if ((*start == '<') || (*start == '|'))
+			start++;
 		    break;
 		}
 	    }
-	    /* if not found, search for a space instead */
-	    if (start == cur_line) {
-		for (start = cur_line + anchor_pos ; start > cur_line; start--) {
+	    /* if not found, search for a space or a system command '!' instead */
+	    if (start <= cur_line) {
+		for (start = cur_line + anchor_pos; start >= cur_line; start--) {
 		    if ((*start == ' ') || (*start == '!')) {
 			start++;
 			break;
 		    }
 		}
 	    }
+	    if (start < cur_line)
+		start = cur_line;
 
 	    path = strndup(start, cur_line - start + anchor_pos);
 	    gp_expand_tilde(&path);
