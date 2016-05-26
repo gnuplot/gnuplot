@@ -1,5 +1,5 @@
 /*
- * $Id: pm3d.h,v 1.31 2014/04/02 21:35:46 sfeam Exp $
+ * $Id: pm3d.h,v 1.32 2015/11/13 04:03:57 sfeam Exp $
  */
 
 /* GNUPLOT - pm3d.h */
@@ -138,6 +138,8 @@ extern struct lp_style_type default_pm3d_border;
 /* Used by routine filled_quadrangle() in color.c */
 extern struct lp_style_type pm3d_border_lp;	/* FIXME: Needed anymore? */
 
+/* The original routine, with log/unlog dance steps */
+#define z2cb(z) z2cb_with_logs(z)
 
 
 /****
@@ -149,7 +151,7 @@ void pm3d_depth_queue_clear __PROTO((void));
 void pm3d_depth_queue_flush __PROTO((void));
 void pm3d_reset __PROTO((void));
 void pm3d_draw_one __PROTO((struct surface_points* plots));
-double z2cb __PROTO((double z));
+double z2cb_with_logs __PROTO((double z));
 double cb2gray __PROTO((double cb));
 void
 pm3d_rearrange_scan_array __PROTO((struct surface_points* this_plot,

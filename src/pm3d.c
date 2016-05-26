@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.109 2016/05/06 18:32:12 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.110 2016/05/08 18:43:11 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - pm3d.c */
@@ -171,7 +171,7 @@ rms4 (double x1, double x2, double x3, double x4)
  * same base, other it has to un-log z and subsequently log it again.
  */
 double
-z2cb(double z)
+z2cb_with_logs(double z)
 {
     if (!Z_AXIS.log && !CB_AXIS.log) /* both are linear */
 	return z;
