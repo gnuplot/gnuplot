@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.110 2016/05/08 18:43:11 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.111 2016/05/26 20:09:50 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - pm3d.c */
@@ -170,6 +170,9 @@ rms4 (double x1, double x2, double x3, double x4)
  * Rescale z to cb values. Nothing to do if both z and cb are linear or log of the
  * same base, other it has to un-log z and subsequently log it again.
  */
+#if defined(NONLINEAR_AXES) && (NONLINEAR_AXES > 0)
+    /* z2cb is a no-op */
+#else
 double
 z2cb_with_logs(double z)
 {
@@ -184,7 +187,7 @@ z2cb_with_logs(double z)
 	return z;
     return z * Z_AXIS.log_base / CB_AXIS.log_base; /* log_cb(unlog_z(z)) */
 }
-
+#endif
 
 /*
  * Rescale cb (color) value into the interval of grays [0,1], taking care

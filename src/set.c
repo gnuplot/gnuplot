@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.518 2016/05/06 12:12:52 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.519 2016/05/26 20:53:49 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -2701,6 +2701,12 @@ set_logscale()
 	    axis_array[axis].ticdef.logscaling = TRUE;
 	    axis_array[axis].base = newbase;
 	    axis_array[axis].log_base = log(newbase);
+	    axis_array[axis].linked_to_primary->base = newbase;
+	    axis_array[axis].linked_to_primary->log_base = log(newbase);
+
+	    /* do_string("set nonlinear") cleared the log flags */
+	    axis_array[axis].log = TRUE;
+	    axis_array[axis].linked_to_primary->log = TRUE;
 	}
     }
 

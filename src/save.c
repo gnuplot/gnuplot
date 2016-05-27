@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.302 2016/05/04 21:55:59 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.303 2016/05/08 04:22:46 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -849,13 +849,13 @@ set origin %g,%g\n",
 	if (axis_array[axis].log)
 	    fprintf(fp, "set logscale %s %g\n", axis_name(axis),
 		axis_array[axis].base);
+	else
+	    save_nonlinear(fp, &axis_array[axis]);
     }
 
     /* These will only print something if the axis is, in fact, linked */    
     save_link(fp, axis_array + SECOND_X_AXIS);
     save_link(fp, axis_array + SECOND_Y_AXIS);
-    for (axis=0; axis<NUMBER_OF_MAIN_VISIBLE_AXES; axis++)
-	save_nonlinear(fp, &axis_array[axis]);
 
     save_jitter(fp);
 

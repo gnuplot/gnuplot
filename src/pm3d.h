@@ -1,5 +1,5 @@
 /*
- * $Id: pm3d.h,v 1.32 2015/11/13 04:03:57 sfeam Exp $
+ * $Id: pm3d.h,v 1.33 2016/05/26 20:09:50 sfeam Exp $
  */
 
 /* GNUPLOT - pm3d.h */
@@ -26,7 +26,8 @@
 #ifndef PM3D_H
 #define PM3D_H
 
-#include "graph3d.h" /* struct surface_points */
+#include "axis.h"	/* only for NONLINEAR_AXES */
+#include "graph3d.h"	/* struct surface_points */
 
 
 
@@ -138,8 +139,12 @@ extern struct lp_style_type default_pm3d_border;
 /* Used by routine filled_quadrangle() in color.c */
 extern struct lp_style_type pm3d_border_lp;	/* FIXME: Needed anymore? */
 
-/* The original routine, with log/unlog dance steps */
-#define z2cb(z) z2cb_with_logs(z)
+#if defined(NONLINEAR_AXES) && (NONLINEAR_AXES > 0)
+#   define z2cb(z) (z)
+#else
+    /* The original routine, with log/unlog dance steps */
+#   define z2cb(z) z2cb_with_logs(z)
+#endif
 
 
 /****

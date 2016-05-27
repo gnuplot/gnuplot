@@ -1,5 +1,5 @@
 /*
- * $Id: axis.h,v 1.147 2016/05/09 03:32:27 sfeam Exp $
+ * $Id: axis.h,v 1.148 2016/05/26 20:53:49 sfeam Exp $
  *
  */
 
@@ -448,14 +448,27 @@ do {						\
     }						\
 } while(0)
 
-/* HBB 20000430: New macros, logarithmize a value into a stored
- * coordinate*/
+#if defined(NONLINEAR_AXES) && (NONLINEAR_AXES > 0)
+
+/* These become no-ops because the nonlinear axis code stores untransformed values */
+#define AXIS_DO_LOG(axis,value) (value)
+#define AXIS_UNDO_LOG(axis,value) (value)
+#define axis_do_log(axis,value) (value)
+#define axis_undo_log(axis,value) (value)
+#define AXIS_LOG_VALUE(axis,value) (value)
+#define AXIS_DE_LOG_VALUE(axis,coordinate) (coordinate)
+#define axis_log_value(axis,value) (value)
+#define axis_de_log_value(axis,coordinate) (coordinate)
+
+#else /* !(NONLINEAR_AXES > 0) */
+
+/* Macros to deal with logscale axis values being stored as log */
 #define AXIS_DO_LOG(axis,value) (log(value) / axis_array[axis].log_base)
 #define AXIS_UNDO_LOG(axis,value) exp((value) * axis_array[axis].log_base)
 #define axis_do_log(axis,value) (log(value) / axis->log_base)
 #define axis_undo_log(axis,value) exp((value) * axis->log_base)
 
-/* HBB 20000430: same, but these test if the axis is log, first: */
+/* Same, but these test if the axis is log, first: */
 #define AXIS_LOG_VALUE(axis,value)				\
     (axis_array[axis].log ? AXIS_DO_LOG(axis,value) : (value))
 #define AXIS_DE_LOG_VALUE(axis,coordinate)				  \
@@ -465,6 +478,7 @@ do {						\
 #define axis_de_log_value(axis,coordinate)				  \
     (axis->log ? axis_undo_log(axis,coordinate): (coordinate))
 
+#endif /* (NONLINEAR_AXES > 0) */
 
 /* April 2015:  I'm not 100% sure, but I believe there is no longer
  * any need to treat 2D and 3D axis initialization differently

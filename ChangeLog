@@ -1,3 +1,41 @@
+2016-05-27  Ethan A Merritt  <merritt@u.washington.edu>
+
+	Nonlinear axes part 14.
+
+	* src/axis.h src/save.c src/set.c src/unset.c src/pm3d.c src/pm3d.h:
+
+	- Turn all the log/delog macros into no-ops, including z2cb.
+	This reduces the size of the gnuplot executable by 1-2% and removes
+	any behavioral dependence on the axis->log flag.
+
+	- Repurpose the axis->log flag to special-case nonlinear axes that
+	were set up using the "set log" command.  This makes the save and show
+	commands report axes as log-scaled if they were set up by "set log"
+	but not if they were manually defined using "set nonlinear" even though
+	the result is otherwise the same.  It also allows mousing of logscaled
+	axes in the svg and canvas terminals.
+
+	The implementation of "set log" has now been almost entirely replaced.
+	This should be transparent to users.  I know of only a few exceptions.
+
+	- In some cases the range limits chosen for autoscaled log axes come
+	out slightly different with the new implementation.  In most cases this
+	is an improvement, but it is possible there are other cases where the
+	new autoscaled range is less satisfactory.
+	Bug #1590
+
+	- Log scaling proper and choice of log-scale axis tics are now
+	separable. This addresses several long-standing bugs, including
+	Bug #10 filed back in 2000!  I.e. even if the axis is log-scaled,
+	you can still user "set tics <inc>" or "set tics nolog".
+	Bug #10 Bug #1250 
+
+	- Minor axis tics now work as expected over all logscale axis ranges.
+	Bug #1749
+
+	- The new code is slightly slower.  Speed will be recovered in a
+	separate patch.
+
 2016-05-26  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/pm3d.c src/pm3d.h:  Make z2cb() a macro that calls the original
