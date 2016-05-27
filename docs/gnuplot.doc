@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.988 2016/04/25 17:37:39 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.989 2016/05/23 14:54:41 markisch Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -453,7 +453,7 @@ C
        DEL   deletes the current character.
        ^D    deletes current character, sends EOF if the line is empty.
        ^K    deletes from current position to the end of line.
-       ^L,^R redraws line in case it gets trashed.
+       ^L    redraws line in case it gets trashed.
        ^U    deletes the entire line.
        ^W    deletes previous word.
        ^V    inhibits the interpretation of the following key as editing command. 
@@ -463,6 +463,8 @@ C
 
        ^P    moves back through history.
        ^N    moves forward through history.
+       ^R    starts a backward-search.
+
 #\begin{tabular}{|cl|} \hline
 #\multicolumn{2}{|c|}{Command-line Editing Commands} \\ \hline \hline
 #Character & Function \\ \hline
@@ -475,7 +477,7 @@ C
 #\verb~DEL~ & delete the current character.\\
 #\verb~^D~ & delete current character. EOF if line is empty.\\
 #\verb~^K~ & delete from current position to the end of line.\\
-#\verb~^L, ^R~ & redraw line in case it gets trashed.\\
+#\verb~^L~ & redraw line in case it gets trashed.\\
 #\verb~^U~ & delete the entire line. \\
 #\verb~^W~ & delete previous word. \\
 #\verb~^V~ & inhibits the interpretation of the following key as editing command. \\ 
@@ -483,6 +485,7 @@ C
 # & \multicolumn{1}{|c|}{History} \\ \cline{2-2}
 #\verb~^P~ & move back through history.\\
 #\verb~^N~ & move forward through history.\\
+#\verb~^R~ & starts a backward-search.\\
 %c l .
 %Character@Function
 %_
@@ -495,7 +498,7 @@ C
 %DEL@delete the current character.
 %^D@delete current character. EOF if line is empty.
 %^K@delete from current position to the end of line.
-%^L, ^R@redraw line in case it gets trashed.
+%^L@redraw line in case it gets trashed.
 %^U@delete the entire line.
 %^W@delete previous word.
 %_
@@ -505,6 +508,7 @@ C
 %@History
 %^P@move back through history.
 %^N@move forward through history.
+%^R@starts a backward-search.
 @end table
 
 ^<table align="center" border="1" rules="groups" frame="hsides" cellpadding="3">
@@ -525,7 +529,7 @@ C
 ^<tr>    <td><tt>DEL</tt></td>    <td>delete the current character.</td></tr>
 ^<tr>    <td><tt>^D</tt></td>    <td>delete current character. EOF if line is empty</td></tr>
 ^<tr>    <td><tt>^K</tt></td>    <td>delete from current position to the end of line.</td></tr>
-^<tr>    <td><tt>^L, ^R</tt></td>    <td>redraw line in case it gets trashed.</td></tr>
+^<tr>    <td><tt>^L</tt></td>    <td>redraw line in case it gets trashed.</td></tr>
 ^<tr>    <td><tt>^U</tt></td>    <td>delete the entire line.</td></tr>
 ^<tr>    <td><tt>^W</tt></td>    <td>delete previous word.</td></tr>
 ^<tr>    <td><tt>^V</tt></td>    <td>inhibits the interpretation of the following key as editing command.</td></tr>
@@ -535,6 +539,7 @@ C
 ^<tr>    <th></th>                <th>History</th></tr>
 ^<tr>    <td><tt>^P</tt></td>    <td>move back through history.</td></tr>
 ^<tr>    <td><tt>^N</tt></td>    <td>move forward through history.</td></tr>
+^<tr>    <td><tt>^R</tt></td>    <td>starts a backward-search.</td></tr>
 ^</tbody>
 ^</table>
 2 Comments

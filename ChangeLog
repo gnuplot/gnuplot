@@ -1,3 +1,9 @@
+2016-05-27  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/readline.c src/gnuplot.doc:  ^R starts a backward-search through
+	the history.  Searches the command history as you type.  Use ^R/^S to
+	find the next/previous match.
+
 2016-05-27  Ethan A Merritt  <merritt@u.washington.edu>
 
 	Nonlinear axes part 14.
