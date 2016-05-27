@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: history.c,v 1.35 2016/05/25 21:21:42 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: history.c,v 1.36 2016/05/25 21:28:39 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - history.c */
@@ -468,118 +468,10 @@ write_history_n(const int n, const char *filename, const char *mode)
 	}
     }
 }
+#endif
 
 
-/* finds and returns a command from the history list by number */
-const char *
-history_find_by_number(int n)
-{
-    struct hist *entry = history;
-    int hist_entries = 0;
-    int index;
-
-    if (history == NULL || n <= 0)
-	return NULL;	/* no history yet */
-
-    /* count number of entries */
-    for (entry = history; entry->prev != NULL; entry = entry->prev)
-	hist_entries++;
-
-    if (n > hist_entries)
-	return NULL;
-
-    /* step backwards to the requested entry */
-    for (entry = history->prev, index = hist_entries; --index > 0; entry = entry->prev)
-	if (index + 1 == n)
-	    return entry->line;
-
-    return NULL;	/* should not happen */
-}
-
-
-/* finds and returns a command from the history which starts with <cmd>
- * (ignores leading spaces in <cmd>)
- * Returns NULL if nothing found
- */
-const char *
-history_find(char *cmd)
-{
-    struct hist *entry = history;
-    size_t len;
-    char *line;
-
-    if (entry == NULL)
-	return NULL;		/* no history yet */
-    if (*cmd == '"')
-	cmd++;			/* remove surrounding quotes */
-    if (!*cmd)
-	return NULL;
-
-    len = strlen(cmd);
-
-    if (cmd[len - 1] == '"')
-	cmd[--len] = 0;
-    if (!*cmd)
-	return NULL;
-
-    /* search through the history */
-    while (entry != NULL) {
-	line = entry->line;
-	while (isspace((unsigned char) *line))
-	    line++;		/* skip leading spaces */
-	if (!strncmp(cmd, line, len))	/* entry found */
-	    return line;
-	entry = entry->prev;
-    }
-    return NULL;
-}
-
-
-/* finds and print all occurencies of commands from the history which
- * start with <cmd>
- * (ignores leading spaces in <cmd>)
- * Returns 1 on success, 0 if no such entry exists
- */
-int
-history_find_all(char *cmd)
-{
-    struct hist *entry = history;
-    int hist_index = 1;
-    char res = 0;
-    int len;
-    char *line;
-
-    if (entry == NULL)
-	return 0;		/* no history yet */
-    if (*cmd == '"')
-	cmd++;			/* remove surrounding quotes */
-    if (!*cmd)
-	return 0;
-    len = strlen(cmd);
-    if (cmd[len - 1] == '"')
-	cmd[--len] = 0;
-    if (!*cmd)
-	return 0;
-    /* find the beginning of the history */
-    while (entry->prev != NULL)
-	entry = entry->prev;
-    /* search through the history */
-    while (entry != NULL) {
-	line = entry->line;
-	while (isspace((unsigned char) *line))
-	    line++;		/* skip leading spaces */
-	if (!strncmp(cmd, line, len)) {	/* entry found */
-	    printf("%5i  %s\n", hist_index, line);
-	    res = 1;
-	}
-	entry = entry->next;
-	hist_index++;
-    }
-    return res;
-}
-
-#elif defined(HAVE_LIBREADLINE) || defined(HAVE_LIBEDITLINE)
-
+#if defined(HAVE_LIBREADLINE) || defined(HAVE_LIBEDITLINE)
 /* Save history to file, or write to stdout or pipe.
  * For pipes, only "|" works, pipes starting with ">" get a strange 
  * filename like in the non-readline version.
@@ -648,6 +540,10 @@ write_history_n(const int n, const char *filename, const char *mode)
 {
     write_history_list(n, filename, mode);
 }
+#endif
+
+
+#ifdef USE_READLINE
 
 /* finds and returns a command from the history list by number */
 const char *
@@ -659,6 +555,7 @@ history_find_by_number(int n)
 	return NULL;
 }
 
+
 /* finds and returns a command from the history which starts with <cmd>
  * Returns NULL if nothing found
  *
@@ -669,19 +566,31 @@ history_find(char *cmd)
 {
     int len;
 
-    /* quote removal, copied from non-readline version */
-    if (*cmd == '"') cmd++;
-    if (!*cmd) return 0;
+    /* remove quotes */
+    if (*cmd == '"')
+	cmd++;
+    if (!*cmd)
+	return NULL;
     len = strlen(cmd);
-    if (cmd[len - 1] == '"') cmd[--len] = 0;
-    if (!*cmd) return 0;
-    /* printf ("searching for '%s'\n", cmd); */
+    if (cmd[len - 1] == '"')
+	cmd[--len] = NUL;
+    if (!*cmd)
+	return NULL;
+
+    /* Start at latest entry */
+#if !defined(HAVE_LIBEDITLINE)
+    history_set_pos(history_length);
+#else
+    while (previous_history());
+#endif
 
     /* Anchored backward search for prefix */
+    /* FIXME: the built-in readline version used to ignore leading spaces */
     if (history_search_prefix(cmd, -1) == 0)
-        return current_history()->line;
+	return current_history()->line;
     return NULL;
 }
+
 
 /* finds and print all occurencies of commands from the history which
  * start with <cmd>
@@ -695,47 +604,52 @@ history_find_all(char *cmd)
 {
     int len;
     int found;
-    int number = 0; /* each found entry increases this */
+    int ret;
+    int number = 0; /* each entry found increases this */
 
-    /* quote removal, copied from non-readline version */
-    if (*cmd == '"') cmd++;
-    if (!*cmd) return 0;
+    /* remove quotes */
+    if (*cmd == '"')
+	cmd++;
+    if (!*cmd)
+	return 0;
     len = strlen(cmd);
-    if (cmd[len - 1] == '"') cmd[--len] = 0;
-    if (!*cmd) return 0;
-    /* printf ("searching for all occurrences of '%s'\n", cmd); */
+    if (cmd[len - 1] == '"')
+	cmd[--len] = 0;
+    if (!*cmd)
+	return 0;
 
     /* Output matching history entries in chronological order (not backwards
      * so we have to start at the beginning of the history list.
      */
-#if defined(HAVE_LIBREADLINE)
-    found = history_set_pos(0);
-    if (found == -1) {
-        fprintf(stderr, "ERROR (history_find_all): could not rewind history\n");
-        return 0;
+#if !defined(HAVE_LIBEDITLINE)
+    ret = history_set_pos(0);
+    if (ret == 0) {
+	fprintf(stderr, "ERROR (history_find_all): could not rewind history\n");
+	return 0;
     }
 #else /* HAVE_LIBEDITLINE */
     /* libedit's history_set_pos() does not work properly,
-       so we manually go to oldest entry */
+       so we manually go to the oldest entry. Note that directions
+       are reversed. */
     while (next_history());
 #endif
     do {
-        found = history_search_prefix(cmd, 1); /* Anchored backward search for prefix */
-        if (found == 0) {
-            number++;
-#if defined(HAVE_LIBREADLINE)
-            printf("%5i  %s\n", where_history() + history_base, current_history()->line);
-            /* go one step back or you find always the same entry. */
-            if (!history_set_pos(where_history() + 1))
-                break; /* finished if stepping didn't work */
+	found = history_search_prefix(cmd, 1); /* Anchored backward search for prefix */
+	if (found == 0) {
+	    number++;
+#if !defined(HAVE_LIBEDITLINE)
+	    printf("%5i  %s\n", where_history() + history_base, current_history()->line);
+	    /* Advance one step or we find always the same entry. */
+	    if (next_history() == NULL)
+		break; /* finished if stepping didn't work */
 #else /* HAVE_LIBEDITLINE */
-            /* libedit's history indices are reversed wrt GNU readline */
-            printf("%5i  %s\n", history_length - where_history() + history_base, current_history()->line);
-            /* go one step back or you find always the same entry. */
-            if (!previous_history())
-                break; /* finished if stepping didn't work */
+	    /* libedit's history indices are reversed wrt GNU readline */
+	    printf("%5i  %s\n", history_length - where_history() + history_base, current_history()->line);
+	    /* Advance one step or we find always the same entry. */
+	    if (!previous_history())
+		break; /* finished if stepping didn't work */
 #endif
-        } /* (found == 0) */
+	} /* (found == 0) */
     } while (found > -1);
 
     return number;

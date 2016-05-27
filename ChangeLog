@@ -4,6 +4,10 @@
 	the history.  Searches the command history as you type.  Use ^R/^S to
 	find the next/previous match.
 
+	* src/history.c (history_find_by_number, history_find, 
+	history_find_all):  Share the functions for GNU readline and the
+	built-in code.  Remove the old specialised code.
+
 2016-05-27  Ethan A Merritt  <merritt@u.washington.edu>
 
 	Nonlinear axes part 14.
