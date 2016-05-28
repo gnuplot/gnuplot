@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: readline.c,v 1.70 2016/05/26 12:28:29 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: readline.c,v 1.71 2016/05/27 14:01:45 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - readline.c */
@@ -811,6 +811,9 @@ readline(const char *prompt)
     /* move to end of history */
     while (next_history());
 
+    /* init global variables */
+    search_mode = FALSE;
+
     /* get characters */
     for (;;) {
 
@@ -935,8 +938,10 @@ readline(const char *prompt)
 #endif /* VWERASE */
 #ifdef VREPRINT
 	} else if (cur_char == term_chars[VREPRINT]) {	/* ^R? */
+#if 0 /* conflict with reverse-search */
 	    putc(NEWLINE, stderr);	/* go to a fresh line */
 	    redraw_line(prompt);
+#endif
 #endif /* VREPRINT */
 #ifdef VSUSP
 	} else if (cur_char == term_chars[VSUSP]) {
@@ -1073,6 +1078,13 @@ readline(const char *prompt)
 	} 
 
 	} else {  /* search-mode */
+#ifdef VERASE
+	    if (cur_char == term_chars[VERASE]) {	/* ^H */
+		delete_backward();
+		do_search(-1);
+	    } else 
+#endif /* VERASE */
+	    {
 	    switch (cur_char) {
 	    case 022:		/* ^R */
 		/* search next */
@@ -1114,6 +1126,7 @@ readline(const char *prompt)
 		search_result_width = 0;
 		search_mode = FALSE;
 		break;
+	    }
 	    }
 	}
     }
