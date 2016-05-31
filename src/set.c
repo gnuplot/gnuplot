@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.459.2.25 2016/01/01 00:51:12 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.459.2.26 2016/01/11 23:32:51 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -3632,8 +3632,10 @@ set_palette()
 
 		c_token++;
 		i = int_expression();
-		if (i<0) int_error(c_token,"non-negative number required");
-		sm_palette.use_maxcolors = i;
+		if (i<0 || i==1)
+		    int_warn(c_token,"maxcolors must be > 1");
+		else
+		    sm_palette.use_maxcolors = i;
 		--c_token;
 		continue;
 	    }

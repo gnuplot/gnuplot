@@ -1,3 +1,10 @@
+2016-05-31  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* set/set.c (set_palette):  Disallow "set palette maxcolors 1" because
+	this causes divide-by-zero errors during color smoothing.
+	Reported originally as an Octave bug
+	https://bugzilla.redhat.com/show_bug.cgi?id=1340660 
+
 2016-05-23  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/datafile.c:  partial "every" specifiers are not compatible with

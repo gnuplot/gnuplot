@@ -6,6 +6,7 @@ Changes in 5.0.4
 * CHANGE (Windows only) open piped output using mode "wb" rather than "w"
 * CHANGE backport 5.1 use of "lc variable" to color boxplot factors
 * CHANGE gnuplot_svg.js now remaps coords for svg image embedded in larger object
+* CHANGE disallow "set palette maxcolors 1" (which has never worked)
 * FIX placement of objects and labels using linked secondary axis coordinates
 * FIX 'set term qt <N> close' acts immediately rather than after next mouse event
 * FIX emf terminal could lose track of bold/italic/etc font properties
