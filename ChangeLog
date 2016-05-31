@@ -1,3 +1,10 @@
+2016-05-31  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* set/set.c (set_palette):  Disallow "set palette maxcolors 1" because
+	this causes divide-by-zero errors during color smoothing.
+	Reported originally as an Octave bug
+	https://bugzilla.redhat.com/show_bug.cgi?id=1340660 
+
 2016-05-27  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/readline.c src/gnuplot.doc:  ^R starts a backward-search through
@@ -16,7 +23,7 @@
 
 	- Turn all the log/delog macros into no-ops, including z2cb.
 	This reduces the size of the gnuplot executable by 1-2% and removes
-	any behavioral dependence on the axis->log flag.
+	any behavioral dependence on the axis->log flag in the core code.
 
 	- Repurpose the axis->log flag to special-case nonlinear axes that
 	were set up using the "set log" command.  This makes the save and show
@@ -41,7 +48,7 @@
 	Bug #10 Bug #1250 
 
 	- Minor axis tics now work as expected over all logscale axis ranges.
-	Bug #1749
+	Bug #1748
 
 	- The new code is slightly slower.  Speed will be recovered in a
 	separate patch.
