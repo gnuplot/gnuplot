@@ -21,6 +21,7 @@ Changes not in 5.0
 * CHANGE Store and reuse x,y dimensions from the time image data is read in
 * CHANGE Some STATS_* variables are of type integer rather than real (complex) 
 * CHANGE ^R starts a backward search when using the built-in readline
+* CHANGE Only update axis->data_min/max if the point being stored is INRANGE
 * FIX cairo.trm - reset terminal font after printing an enhanced text string
 * FIX autoscaling of data with "smooth cnorm"
 * FIX Built-in readline handles S-JIS encoding

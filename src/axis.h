@@ -1,5 +1,5 @@
 /*
- * $Id: axis.h,v 1.148 2016/05/26 20:53:49 sfeam Exp $
+ * $Id: axis.h,v 1.149 2016/05/27 04:20:23 sfeam Exp $
  *
  */
 
@@ -569,8 +569,6 @@ do {									  \
 	if (axis->link_udf->at) 					  \
 	    curval = eval_link_function(axis, curval);			  \
     } 									  \
-    if ( curval < axis->data_min )					  \
-	axis->data_min = curval;					  \
     if (   (curval < axis->min)						  \
         && ((curval <= axis->max) || (axis->max == -VERYLARGE))		  \
        ) {								  \
@@ -593,8 +591,6 @@ do {									  \
 	    break;							  \
 	}								  \
     }									  \
-    if ( curval > axis->data_max )					  \
-	axis->data_max = curval;					  \
     if ( curval > axis->max						  \
     &&  (curval >= axis->min || axis->min == VERYLARGE)) {		  \
 	if (axis->autoscale & AUTOSCALE_MAX)	{			  \
@@ -614,6 +610,13 @@ do {									  \
 	    TYPE = OUTRANGE;						  \
 	    OUT_ACTION;							  \
 	}								  \
+    }									  \
+    /* Only update data min/max if the point is INRANGE Jun 2016 */	  \
+    if (TYPE == INRANGE) { 						  \
+	if (axis->data_min > curval)					  \
+	    axis->data_min = curval;					  \
+	if (axis->data_max < curval)					  \
+	    axis->data_max = curval;					  \
     }									  \
 } while(0)
 
