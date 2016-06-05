@@ -1,5 +1,5 @@
 /*
- * $Id: axis.h,v 1.149 2016/05/27 04:20:23 sfeam Exp $
+ * $Id: axis.h,v 1.150 2016/06/04 21:51:45 sfeam Exp $
  *
  */
 
@@ -531,6 +531,11 @@ do {									\
  * NOAUTOSCALE is per-plot property, whereas AUTOSCALE_XXX is per-axis.
  * Note: see the particular implementation for COLOR AXIS below.
  */
+#if defined(NONLINEAR_AXES) && (NONLINEAR_AXES > 0)
+#define OPTIMIZE_LOG 1
+#else
+#define OPTIMIZE_LOG 0
+#endif
 
 #define ACTUAL_STORE_WITH_LOG_AND_UPDATE_RANGE(STORE, VALUE, TYPE, AXIS,  \
 					       NOAUTOSCALE, OUT_ACTION,   \
@@ -547,16 +552,16 @@ do {									  \
     }									  \
     if (axis->log) {							  \
 	if (curval < 0.0) {						  \
-	    STORE = not_a_number();					  \
+	    if (!OPTIMIZE_LOG) STORE = not_a_number();			  \
 	    TYPE = UNDEFINED;						  \
 	    UNDEF_ACTION;						  \
 	    break;							  \
 	} else if (curval == 0.0) {					  \
-	    STORE = -VERYLARGE;						  \
+	    if (!OPTIMIZE_LOG) STORE = -VERYLARGE;			  \
 	    TYPE = OUTRANGE;						  \
 	    OUT_ACTION;							  \
 	    break;							  \
-	} else {							  \
+	} else if (!OPTIMIZE_LOG) {					  \
 	    STORE = axis_do_log(axis, curval);				  \
 	}								  \
     }									  \

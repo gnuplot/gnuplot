@@ -1,3 +1,10 @@
+2016-06-05  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/axis.h (ACTUAL_STORE_WITH_LOG_AND_UPDATE_RANGE):
+	Since we now store the data value itself rather than log(value), there
+	is no longer a need to replace non-positive values with NaN on input.
+	Nonlinear axes part 15
+
 2016-06-04  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/axis.h (ACTUAL_STORE_WITH_LOG_AND_UPDATE_RANGE):
