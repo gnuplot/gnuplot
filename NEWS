@@ -16,6 +16,7 @@ Changes in 5.0.4
 * FIX transposition of row/column count in plotting ascii x/y/z data "with image"
 * FIX 7-column input to "splot ... with vectors"
 * FIX ignore incomplete "every" spec for image plots
+* FIX placement of xyplane does not depend on having tics or grid lines enabled
 
 Changes in 5.0.3
 ================

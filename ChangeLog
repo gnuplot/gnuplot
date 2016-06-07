@@ -1,3 +1,9 @@
+2016-06-07  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/graph3d.c:  Uniform treatment of xyplane regardless of whether 
+	tics or grid lines are present.
+	Bug #1809
+
 2016-05-31  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* set/set.c (set_palette):  Disallow "set palette maxcolors 1" because

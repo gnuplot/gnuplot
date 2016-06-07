@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.311.2.10 2015/10/31 04:39:18 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.311.2.11 2016/04/16 05:06:53 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -648,17 +648,13 @@ do_3dplot(
 	base_z = Z_AXIS.min - (Z_AXIS.max - Z_AXIS.min) * xyplane.z;
 
     /* If we are to draw the bottom grid make sure zmin is updated properly. */
-    if (X_AXIS.ticmode || Y_AXIS.ticmode || some_grid_selected()) {
-	if (Z_AXIS.min > Z_AXIS.max) {
-	    floor_z = GPMAX(Z_AXIS.min, base_z);
-	    ceiling_z = GPMIN(Z_AXIS.max, base_z);
-	} else {
-	    floor_z = GPMIN(Z_AXIS.min, base_z);
-	    ceiling_z = GPMAX(Z_AXIS.max, base_z);
-	}
+    /* Now we _always_ do this (Bug #1809) */
+    if (Z_AXIS.min > Z_AXIS.max) {
+	floor_z = GPMAX(Z_AXIS.min, base_z);
+	ceiling_z = GPMIN(Z_AXIS.max, base_z);
     } else {
-	floor_z = Z_AXIS.min;
-	ceiling_z = Z_AXIS.max;
+	floor_z = GPMIN(Z_AXIS.min, base_z);
+	ceiling_z = GPMAX(Z_AXIS.max, base_z);
     }
 
     /*  see comment accompanying similar tests of x_min/x_max and y_min/y_max
