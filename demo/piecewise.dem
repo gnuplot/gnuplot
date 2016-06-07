@@ -57,15 +57,16 @@ reset
 set border 16
 unset xtics
 unset ytics
+set xyplane at 0
 set style data lines
 set key center at screen 0.5, screen 0.15
 set title font ",15"
 set title "Piecewise function of one parameter in 3D"
 
 splot [-2:2][-2:2] sample \
-   [h=1:5]   '+' using (cos(h)):(sin(h)):(h), \
-   [h=5:10]  '+' using (cos(h)):(sin(h)):(h), \
-   [h=10:15] '+' using (cos(h)):(sin(h)):(h)
+   [h=1:5]   '+' using (cos(h)):(sin(h)):(h) lw 2, \
+   [h=5:10]  '+' using (cos(h)):(sin(h)):(h) lw 4, \
+   [h=10:15] '+' using (cos(h)):(sin(h)):(h) lw 2
 
 pause -1 "Hit <cr> to continue"
 

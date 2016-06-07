@@ -1,7 +1,7 @@
 2016-06-07  Ethan A Merritt  <merritt@u.washington.edu>
 
-	* src/graph3d.c:  Uniform treatment of xyplane regardless of whether 
-	tics or grid lines are present.
+	* src/graph3d.c demo/piecewise.dem:  Uniform treatment of xyplane
+	regardless of whether tics or grid lines are present.
 	Bug #1809
 
 2016-06-05  Ethan A Merritt  <merritt@u.washington.edu>
