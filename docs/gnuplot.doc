@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.989 2016/05/23 14:54:41 markisch Exp $
+C RCS $Id: gnuplot.doc,v 1.990 2016/05/27 14:01:45 markisch Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -13630,12 +13630,7 @@ Ffigure_missing
  The form `set xyplane relative <frac>` places the xy plane below the range in
  Z, where the distance from the xy plane to Zmin is given as a fraction of the
  total range in z.  The default value is 0.5.  Negative values are permitted,
- but tic labels on the three axes may overlap.  The older, deprecated, form
- `set ticslevel` is retained for backwards compatibility.
-
- To place the xy-plane at a position 'pos' on the z-axis, `ticslevel` may
- be set equal to  (pos - zmin) / (zmin - zmax).  However, this position will
- change if the z range is changed.
+ but tic labels on the three axes may overlap.
 
  The alternative form `set xyplane at <zvalue>` fixes the placement of the
  xy plane at a specific Z value regardless of the current z range. Thus to

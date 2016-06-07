@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.339 2016/05/07 00:12:45 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.340 2016/05/09 03:32:27 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -665,19 +665,15 @@ do_3dplot(
 	base_z = base_z1;
     }
 
-    /* If we are to draw the bottom grid make sure zmin is updated properly. */
-    if (X_AXIS.ticmode || Y_AXIS.ticmode || some_grid_selected()) {
-	if (primary_z->min > primary_z->max) {
-	    floor_z1 = GPMAX(primary_z->min, base_z1);
-	    ceiling_z1 = GPMIN(primary_z->max, base_z1);
-	} else {
-	    floor_z1 = GPMIN(primary_z->min, base_z1);
-	    ceiling_z1 = GPMAX(primary_z->max, base_z1);
-	}
+    /* June 2016:  As of now we _always_ execute this code. Bug #1809 */
+    if (primary_z->min > primary_z->max) {
+	floor_z1 = GPMAX(primary_z->min, base_z1);
+	ceiling_z1 = GPMIN(primary_z->max, base_z1);
     } else {
-	floor_z1 = primary_z->min;
-	ceiling_z1 = primary_z->max;
+	floor_z1 = GPMIN(primary_z->min, base_z1);
+	ceiling_z1 = GPMAX(primary_z->max, base_z1);
     }
+    
     if (nonlinear(&Z_AXIS)) {
 	floor_z = eval_link_function(&Z_AXIS, floor_z1);
 	ceiling_z = eval_link_function(&Z_AXIS, ceiling_z1);
