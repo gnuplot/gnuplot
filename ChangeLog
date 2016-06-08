@@ -1,3 +1,9 @@
+2016-06-08  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/stats.c:  
+	Since we now store the data value itself rather than log(value), there
+	is no longer a problem running stats while the axes are log-scaled.
+
 2016-06-07  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graph3d.c demo/piecewise.dem:  Uniform treatment of xyplane

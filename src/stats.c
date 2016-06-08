@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: stats.c,v 1.25 2016/02/10 06:01:07 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: stats.c,v 1.26 2016/03/01 05:28:57 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - stats.c */
@@ -814,8 +814,10 @@ statsrequest(void)
 	    array_data = TRUE;
 
 	/* For all these below: we could save the state, switch off, then restore */
-	if ( axis_array[FIRST_X_AXIS].log || axis_array[FIRST_Y_AXIS].log )
+#if !defined(NONLINEAR_AXES) || (NONLINEAR_AXES == 0)
+	if (axis_array[FIRST_X_AXIS].log || axis_array[FIRST_Y_AXIS].log)
 	    int_error( NO_CARET, "Stats command not available with logscale active");
+#endif
 
 	if (axis_array[FIRST_X_AXIS].datatype == DT_TIMEDATE
 	||  axis_array[FIRST_Y_AXIS].datatype == DT_TIMEDATE )
