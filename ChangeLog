@@ -4,6 +4,9 @@
 	Since we now store the data value itself rather than log(value), there
 	is no longer a problem running stats while the axes are log-scaled.
 
+	* src/stats.c:  An unreadable line in a data file should not be a fatal
+	error in "stats".  Print a warning and keep going.
+
 2016-06-07  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graph3d.c demo/piecewise.dem:  Uniform treatment of xyplane
