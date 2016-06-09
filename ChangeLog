@@ -4,6 +4,9 @@
 	plot output to an existing file.  "set print" already works this way.
 	    set table "outfile" {append}
 
+	* src/multiplot.c (multiplot_start):  Remove alarming warning messages
+	if default values for inter-plot spacing are used.
+
 2016-06-08  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/stats.c:  

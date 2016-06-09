@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: multiplot.c,v 1.3 2014/10/01 04:40:53 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: multiplot.c,v 1.4 2015/01/10 05:28:45 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -415,15 +415,12 @@ multiplot_start()
 		mp_layout.auto_layout_margins = TRUE;
 	    else
 		int_error(NO_CARET, "must give positive margin and spacing values");
-	} else if (set_spacing) {
-	    int_warn(NO_CARET, "must give margins and spacing, continue with auto margins.");
 	} else if (set_margins) {
 	    mp_layout.auto_layout_margins = TRUE;
 	    mp_layout.xspacing.scalex = screen;
 	    mp_layout.xspacing.x = 0.05;
 	    mp_layout.yspacing.scalex = screen;
 	    mp_layout.yspacing.x = 0.05;
-	    int_warn(NO_CARET, "must give margins and spacing, continue with spacing of 0.05");
 	}
 	/* Sanity check that screen tmargin is > screen bmargin */
 	if (mp_layout.bmargin.scalex == screen && mp_layout.tmargin.scalex == screen)
