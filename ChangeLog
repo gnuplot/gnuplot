@@ -7,6 +7,8 @@
 	* src/multiplot.c (multiplot_start):  Remove alarming warning messages
 	if default values for inter-plot spacing are used.
 
+	* src/axis.c src/axis.h src/plot3d.c:  Remove unused macro definitions.
+
 2016-06-08  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/stats.c:  

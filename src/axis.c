@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.197 2016/05/18 21:19:21 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.198 2016/05/26 20:53:49 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -941,8 +941,7 @@ setup_tics(struct axis *this, int max)
 /* }}} */
 
 /* {{{  gen_tics */
-/* We use any of GRID_X/Y/X2/Y2/Z and  _MX/_MX2/etc - caller is expected
- * to clear the irrelevent fields from global grid bitmask.
+/*
  * Mar 2015: Modified to take an axis pointer rather than an index into axis_array[].
  */
 void

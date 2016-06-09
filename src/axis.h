@@ -1,5 +1,5 @@
 /*
- * $Id: axis.h,v 1.150 2016/06/04 21:51:45 sfeam Exp $
+ * $Id: axis.h,v 1.151 2016/06/05 17:58:46 sfeam Exp $
  *
  */
 
@@ -179,28 +179,6 @@ typedef enum en_minitics_status {
  */
 #define MAX_TICLEVEL 5
 extern double ticscale[MAX_TICLEVEL];
-
-#if 0 /* HBB 20010806 --- move GRID flags into axis struct */
-/* Need to allow user to choose grid at first and/or second axes tics.
- * Also want to let user choose circles at x or y tics for polar grid.
- * Also want to allow user rectangular grid for polar plot or polar
- * grid for parametric plot. So just go for full configurability.
- * These are bitmasks
- */
-#define GRID_OFF    0
-#define GRID_X      (1<<0)
-#define GRID_Y      (1<<1)
-#define GRID_Z      (1<<2)
-#define GRID_X2     (1<<3)
-#define GRID_Y2     (1<<4)
-#define GRID_MX     (1<<5)
-#define GRID_MY     (1<<6)
-#define GRID_MZ     (1<<7)
-#define GRID_MX2    (1<<8)
-#define GRID_MY2    (1<<9)
-#define GRID_CB     (1<<10)
-#define GRID_MCB    (1<<11)
-#endif /* 0 */
 
 /* HBB 20010610: new type for storing autoscale activity. Effectively
  * two booleans (bits) in a single variable, so I'm using an enum with
@@ -433,20 +411,6 @@ extern AXIS_INDEX x_axis, y_axis, z_axis;
     (int) ((axis)->term_lower + ((variable) - (axis)->min) * (axis)->term_scale + 0.5)
 #define axis_mapback(axis, pos) \
     (((double)(pos) - axis->term_lower)/axis->term_scale + axis->min)
-
-/* write current min/max_array contents into the set/show status
- * variables */
-#define AXIS_WRITEBACK(axis)			\
-do {						\
-    AXIS *this = axis_array + axis;		\
-						\
-    if (this->range_flags & RANGE_WRITEBACK) {	\
-	if (this->autoscale & AUTOSCALE_MIN)	\
-	    this->set_min = this->min;		\
-	if (this->autoscale & AUTOSCALE_MAX)	\
-	    this->set_max = this->max;		\
-    }						\
-} while(0)
 
 #if defined(NONLINEAR_AXES) && (NONLINEAR_AXES > 0)
 
