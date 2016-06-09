@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.990 2016/05/27 14:01:45 markisch Exp $
+C RCS $Id: gnuplot.doc,v 1.991 2016/06/08 04:30:39 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -12532,15 +12532,16 @@ Ffigure_missing
  (see `set samples` and `set dgrid3d`).
 
  Syntax:
-       set table {"outfile" | $datablock}
+       set table {"outfile" | $datablock} {append}
        plot <whatever>
        unset table
 
- Tabular output is written to the named file, if any, otherwise it is written
- to the current value of `set output`.  Alternatively, tabular output can be
- redirected to a named data block. Data block names start with '$', see also
- `inline data`. You must explicitly `unset table` in order to go back to normal
- plotting on the current terminal.
+ Subsequent tabular output is written to "outfile", if specified, otherwise it
+ is written to stdout or other current value of `set output`.  If `outfile`
+ exists it will be replaced unless the `append` keyword is given.
+ Alternatively, tabular output can be redirected to a named data block.
+ Data block names start with '$', see also `inline data`. You must explicitly
+ `unset table` in order to go back to normal plotting on the current terminal.
 
  To avoid any style-dependent processing of the input data (smoothing,
  errorbar expansion, secondary range checking, etc), or to increase the number

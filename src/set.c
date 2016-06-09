@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.520 2016/05/27 04:20:23 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.521 2016/06/01 04:03:43 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -4675,8 +4675,7 @@ static void
 set_table()
 {
     char *tablefile;
-
-    c_token++;
+    int filename_token = ++c_token;
 
     if (table_outfile) {
 	fclose(table_outfile);
@@ -4694,8 +4693,14 @@ set_table()
 
     } else if ((tablefile = try_to_get_string())) {  /* file name */
 	/* 'set table "foo"' creates a new output file */
-	if (!(table_outfile = fopen(tablefile, "w")))
-	   os_error(c_token, "cannot open table output file");
+	/* 'set table "foo" append' writes to the end of an existing output file */
+	TBOOLEAN append = FALSE;
+	if (equals(c_token,"append")) {
+	    c_token++;
+	    append = TRUE;
+	}
+	if (!(table_outfile = fopen(tablefile, (append ? "a" : "w"))))
+	   os_error(filename_token, "cannot open table output file");
 	free(tablefile);
     }
 

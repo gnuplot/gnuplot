@@ -15,6 +15,7 @@ Changes not in 5.0
 * NEW wgnuplot handles Unicode (BMP) input and converts it according to
       current `set encoding`, including UTF-8.
 * NEW 'set term svg standalone' embeds images rather than including by reference
+* NEW 'set table OUTFILE {append}'
 * CHANGE Revise placement of axis labels in 3D plots
 * CHANGE Track font/enhanced for key title separately from the key entries
 * CHANGE order of margins in `set margins <left>, <right>, <bottom>, <top>`

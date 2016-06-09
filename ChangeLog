@@ -1,3 +1,9 @@
+2016-06-09  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/set.c (set_table) docs/gnuplot.doc:  New option to append tabular
+	plot output to an existing file.  "set print" already works this way.
+	    set table "outfile" {append}
+
 2016-06-08  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/stats.c:  
@@ -9,7 +15,7 @@
 
 2016-06-07  Ethan A Merritt  <merritt@u.washington.edu>
 
-	* src/graph3d.c demo/piecewise.dem:  Uniform treatment of xyplane
+	* src/graph3d.c demo/piecewise.dem:  Consistent placement of xyplane
 	regardless of whether tics or grid lines are present.
 	Bug #1809
 
