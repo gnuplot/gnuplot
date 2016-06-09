@@ -1,6 +1,12 @@
+2016-06-09  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/stats.c:  Change most file-reading errors in "stats" to warnings
+	rather than error, so that a script can continue after trying to stat a
+	file the contains bad data.
+
 2016-06-07  Ethan A Merritt  <merritt@u.washington.edu>
 
-	* src/graph3d.c:  Uniform treatment of xyplane regardless of whether 
+	* src/graph3d.c:  Consistent placement of xyplane regardless of whether
 	tics or grid lines are present.
 	Bug #1809
 

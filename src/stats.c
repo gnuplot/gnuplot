@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: stats.c,v 1.14.2.6 2015/08/01 05:07:25 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: stats.c,v 1.14.2.7 2016/02/10 17:39:44 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - stats.c */
@@ -786,8 +786,12 @@ statsrequest(void)
 	df_set_plot_mode(MODE_PLOT);		/* Used for matrix datafiles */
 	columns = df_open(file_name, 2, NULL);	/* up to 2 using specs allowed */
 
-	if (columns < 0)
-	    int_error(NO_CARET, "Can't read data file");
+	if (columns < 0) {
+	    int_warn(NO_CARET, "Can't read data file");
+	    while (!END_OF_COMMAND)
+		c_token++;
+	    goto stats_cleanup;
+	}
 
 	/* For all these below: we could save the state, switch off, then restore */
 	if ( axis_array[FIRST_X_AXIS].log || axis_array[FIRST_Y_AXIS].log )
@@ -845,7 +849,7 @@ statsrequest(void)
 	      continue;
 
 	    case 0:
-	      int_error( NO_CARET, "bad data on line %d of file %s",
+	      int_warn( NO_CARET, "bad data on line %d of file %s",
 	  		df_line_number, df_filename ? df_filename : "" );
 	      break;
 
@@ -885,9 +889,12 @@ statsrequest(void)
     /* No data! Try to explain why. */
     if ( n == 0 ) {
 	if ( out_of_range > 0 )
-	    int_error( NO_CARET, "All points out of range" );
+	    int_warn( NO_CARET, "All points out of range" );
 	else
-	    int_error( NO_CARET, "No valid data points found in file" );
+	    int_warn( NO_CARET, "No valid data points found in file" );
+	/* Skip rest of command line and return error */
+	while (!END_OF_COMMAND) c_token++;
+	goto stats_cleanup;
     }
 
     /* Parse the remainder of the command line: 0 to 2 tokens possible */
@@ -968,6 +975,7 @@ statsrequest(void)
     }
 
     /* Cleanup */
+    stats_cleanup:
 
     free(data_x);
     free(data_y);
