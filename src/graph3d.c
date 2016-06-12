@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.340 2016/05/09 03:32:27 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.341 2016/06/08 04:30:39 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -665,15 +665,20 @@ do_3dplot(
 	base_z = base_z1;
     }
 
-    /* June 2016:  As of now we _always_ execute this code. Bug #1809 */
-    if (primary_z->min > primary_z->max) {
-	floor_z1 = GPMAX(primary_z->min, base_z1);
-	ceiling_z1 = GPMIN(primary_z->max, base_z1);
+    /* If we are to draw some portion of the xyplane make sure zmin is updated properly. */
+    if (X_AXIS.ticmode || Y_AXIS.ticmode || draw_border & 0x00F) {
+	if (primary_z->min > primary_z->max) {
+	    floor_z1 = GPMAX(primary_z->min, base_z1);
+	    ceiling_z1 = GPMIN(primary_z->max, base_z1);
+	} else {
+	    floor_z1 = GPMIN(primary_z->min, base_z1);
+	    ceiling_z1 = GPMAX(primary_z->max, base_z1);
+	}
     } else {
-	floor_z1 = GPMIN(primary_z->min, base_z1);
-	ceiling_z1 = GPMAX(primary_z->max, base_z1);
+	floor_z1 = primary_z->min;
+	ceiling_z1 = primary_z->max;
     }
-    
+
     if (nonlinear(&Z_AXIS)) {
 	floor_z = eval_link_function(&Z_AXIS, floor_z1);
 	ceiling_z = eval_link_function(&Z_AXIS, ceiling_z1);
@@ -2243,7 +2248,9 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid,
 #define VERTICAL(mask,x,y,i,j,bottom,top)			\
 		if (draw_border&mask) {				\
 		    draw3d_line(bottom,top, &border_lp);	\
-		} else if (height[i][j] != depth[i][j]) {	\
+		} else if (height[i][j] != depth[i][j] &&	\
+			   (X_AXIS.ticmode || Y_AXIS.ticmode ||	\
+			    draw_border & 0x00F)) {		\
 		    vertex a, b;				\
 		    map3d_xyz(x,y,depth[i][j],&a);		\
 		    map3d_xyz(x,y,height[i][j],&b);		\
