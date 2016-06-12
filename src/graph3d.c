@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.311.2.11 2016/04/16 05:06:53 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.311.2.12 2016/06/08 04:30:50 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -648,13 +648,17 @@ do_3dplot(
 	base_z = Z_AXIS.min - (Z_AXIS.max - Z_AXIS.min) * xyplane.z;
 
     /* If we are to draw the bottom grid make sure zmin is updated properly. */
-    /* Now we _always_ do this (Bug #1809) */
-    if (Z_AXIS.min > Z_AXIS.max) {
-	floor_z = GPMAX(Z_AXIS.min, base_z);
-	ceiling_z = GPMIN(Z_AXIS.max, base_z);
+    if (X_AXIS.ticmode || Y_AXIS.ticmode || (draw_border & 0x00f)) {
+	if (Z_AXIS.min > Z_AXIS.max) {
+	    floor_z = GPMAX(Z_AXIS.min, base_z);
+	    ceiling_z = GPMIN(Z_AXIS.max, base_z);
+	} else {
+	    floor_z = GPMIN(Z_AXIS.min, base_z);
+	    ceiling_z = GPMAX(Z_AXIS.max, base_z);
+	}
     } else {
-	floor_z = GPMIN(Z_AXIS.min, base_z);
-	ceiling_z = GPMAX(Z_AXIS.max, base_z);
+	floor_z = Z_AXIS.min;
+	ceiling_z = Z_AXIS.max;
     }
 
     /*  see comment accompanying similar tests of x_min/x_max and y_min/y_max
@@ -2185,7 +2189,9 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid,
 #define VERTICAL(mask,x,y,i,j,bottom,top)			\
 		if (draw_border&mask) {				\
 		    draw3d_line(bottom,top, &border_lp);	\
-		} else if (height[i][j] != depth[i][j]) {	\
+		} else if (height[i][j] != depth[i][j] && 	\
+			(X_AXIS.ticmode || Y_AXIS.ticmode ||	\
+			 draw_border & 0x00f)) {		\
 		    vertex a, b;				\
 		    map3d_xyz(x,y,depth[i][j],&a);		\
 		    map3d_xyz(x,y,height[i][j],&b);		\
