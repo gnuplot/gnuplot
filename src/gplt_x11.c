@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.251 2015/02/15 16:39:21 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.252 2015/06/02 00:37:09 sfeam Exp $"); }
 #endif
 
 #define MOUSE_ALL_WINDOWS 1
@@ -516,6 +516,7 @@ static int fontset_transsep __PROTO((char *, char *, int));
 #endif /* USE_X11_MULTIBYTE */
 static int gpXTextWidth __PROTO((XFontStruct *, const char *, int));
 static int gpXTextHeight __PROTO((XFontStruct *));
+static int gpXTextExtents __PROTO((XFontStruct *, char *, int, XCharStruct *));
 static void gpXSetFont __PROTO((Display *, GC, Font));
 static void gpXDrawImageString __PROTO((Display *, Drawable, GC, int, int, const char *, int));
 static void gpXDrawString __PROTO((Display *, Drawable, GC, int, int, const char *, int));
@@ -2456,10 +2457,9 @@ exec_cmd(plot_struct *plot, char *command)
 #ifdef EAM_BOXED_TEXT
 	    if (boxing) {
 		/* Request bounding box information for this string */
-		int direction, ascent, descent;
 		unsigned int bb[4];
 		XCharStruct overall;
-		XTextExtents(font, str, sl, &direction, &ascent, &descent, &overall);
+		gpXTextExtents(font, str, sl, &overall);
 		bb[0] = X(x) + overall.lbearing + sj;
 		bb[2] = X(x) + overall.rbearing + sj;
 		bb[1] = Y(y) - overall.ascent  + v_offset;
@@ -5680,6 +5680,27 @@ int gpXTextHeight (XFontStruct *cfont)
     } else
 #endif
 	return cfont->ascent + cfont->descent;
+}
+
+int gpXTextExtents (XFontStruct *cfont, char *str, int nchar, 
+		    XCharStruct *overall)
+{
+    int direction, ascent, decent; 
+#ifdef USE_X11_MULTIBYTE
+    if (usemultibyte) {
+	int ret;
+	XRectangle o_ink, o_logical;
+	ret = XmbTextExtents(mbfont, str, nchar, &o_ink, &o_logical);
+	overall->lbearing = o_logical.x;
+	overall->rbearing = o_logical.x + o_logical.width;
+	overall->width = o_logical.width;
+	overall->ascent = - o_logical.y;
+	overall->descent = o_logical.height + o_logical.y;
+	return ret;
+    }
+#endif
+    return XTextExtents(cfont, str, nchar, &direction, &ascent, 
+			&decent, overall);
 }
 
 void gpXSetFont (Display *disp, GC gc, Font fontid)

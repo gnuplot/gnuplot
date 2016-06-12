@@ -1,3 +1,8 @@
+2016-06-12  Shigeharu Takeno  <shige@iee.niit.ac.jp>
+
+	* src/gplt_x11.c (gpXTextExtents):  Wrap call to XTextExtents() in a
+	routine that checks first for multibyte support.
+
 2016-06-09  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/set.c (set_table) docs/gnuplot.doc:  New option to append tabular
