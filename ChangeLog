@@ -1,3 +1,8 @@
+2016-06-13  Daniel J Sebald <daniel.sebald@ieee.org>
+
+	* term/tkcanvas.trm:  Error check for ftruncate().
+	Bug #1798
+
 2016-06-12  Daniel J Sebald <daniel.sebald@ieee.org>
 
 	* src/graph3d.c:  Better fix for bug #1809 (placement of xyplane

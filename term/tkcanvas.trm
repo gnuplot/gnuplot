@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: tkcanvas.trm,v 1.34 2016/02/14 08:48:15 markisch Exp $
+ * $Id: tkcanvas.trm,v 1.35 2016/03/07 06:32:11 markisch Exp $
  *
  */
 
@@ -556,7 +556,8 @@ TK_graphics()
     /* rather than corrupting it.					*/
     fseek(gpoutfile, 0L, SEEK_SET);
     fflush(gpoutfile);
-    ftruncate(fileno(gpoutfile), (off_t)0);
+    if (ftruncate(fileno(gpoutfile), (off_t)0) != 0)
+	int_error(NO_CARET,"Error re-writing output file: %s", strerror(errno));
 
     if (!tk_standalone && 
 	((tk_script_language == TK_LANG_PERL) || (tk_script_language == TK_LANG_PERLTKX)))
