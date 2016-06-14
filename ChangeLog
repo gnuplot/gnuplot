@@ -6,6 +6,10 @@
 	returned an unexpected value to the user.  Limit the special case to 
 	a single magic value and let all other N<0 return "" as expected.
 
+	* src/axis.h (ACTUAL_STORE_WITH_LOG_AND_UPDATE_RANGE):
+	Only update axis->data_min/max if the point being stored is INRANGE.
+	Bug #1804
+
 2016-06-12  Daniel J Sebald <daniel.sebald@ieee.org>
 
 	* src/graph3d.c:  Better fix for bug #1809 (placement of xyplane

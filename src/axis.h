@@ -1,5 +1,5 @@
 /*
- * $Id: axis.h,v 1.103.2.3 2015/04/04 01:08:32 sfeam Exp $
+ * $Id: axis.h,v 1.103.2.4 2015/11/10 03:51:20 sfeam Exp $
  *
  */
 
@@ -561,8 +561,6 @@ do {									  \
 	if (axis->link_udf->at) 					  \
 	    curval = eval_link_function(AXIS - SECOND_AXES, curval);	  \
     } 									  \
-    if ( curval < axis->data_min )					  \
-	axis->data_min = curval;					  \
     if ( curval < axis->min						  \
     &&  (curval <= axis->max || axis->max == -VERYLARGE)) {		  \
 	if (axis->autoscale & AUTOSCALE_MIN)	{			  \
@@ -584,8 +582,6 @@ do {									  \
 	    break;							  \
 	}								  \
     }									  \
-    if ( curval > axis->data_max )					  \
-	axis->data_max = curval;					  \
     if ( curval > axis->max						  \
     &&  (curval >= axis->min || axis->min == VERYLARGE)) {		  \
 	if (axis->autoscale & AUTOSCALE_MAX)	{			  \
@@ -606,6 +602,13 @@ do {									  \
 	    OUT_ACTION;							  \
 	}								  \
     }									  \
+    /* Only update data min/max if the point is INRANGE Jun 2016 */	  \
+    if (TYPE == INRANGE) {						  \
+	if (axis->data_min > curval)					  \
+	    axis->data_min = curval;					  \
+	if (axis->data_max < curval)					  \
+	    axis->data_max = curval;					  \
+	}								  \
 } while(0)
 
 /* normal calls go though this macro, marked as not being a color axis */
