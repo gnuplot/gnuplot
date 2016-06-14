@@ -202,6 +202,7 @@
 
 /* Define if you are using the GNU readline library. */
 /* #undef HAVE_LIBREADLINE */
+/* Don't change it here -- this define is set in config/mingw/Makefile. */
 
 /* Define if you have zlib. */
 /* #undef HAVE_LIBZ */
@@ -463,13 +464,13 @@
 /* #undef MALLOC_ZERO_RETURNS_ZERO */
 
 /* Define if your libreadline has no rl_ding */
-#define MISSING_RL_DING 1
+/* #undef MISSING_RL_DING */
 
 /* Define if your libreadline has no rl_force_update_display */
-#define MISSING_RL_FORCED_UPDATE_DISPLAY 1
+/* #undef MISSING_RL_FORCED_UPDATE_DISPLAY */
 
 /* Define if your libreadline has no rl_complete_with_tilde_expansion */
-#define MISSING_RL_TILDE_EXPANSION 1
+/* #undef MISSING_RL_TILDE_EXPANSION */
 
 /* Define if this is an MSDOS system. */
 /* #undef MSDOS */
@@ -515,7 +516,8 @@
 /* #undef QTTERM */
 
 /* Define if you want to use the included readline function. */
-#define READLINE 1
+/* #undef READLINE */
+/* Don't change it here -- this define is set in config/mingw/Makefile. */
 
 /* Define to the type of arg 1 for `select'. */
 #define SELECT_TYPE_ARG1 int

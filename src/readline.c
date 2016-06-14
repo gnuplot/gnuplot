@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: readline.c,v 1.71 2016/05/27 14:01:45 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: readline.c,v 1.72 2016/05/28 05:28:02 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - readline.c */
@@ -61,6 +61,9 @@ static char *RCSid() { return RCSid("$Id: readline.c,v 1.71 2016/05/27 14:01:45 
 #ifdef HAVE_WCHAR_H
 #include <wchar.h>
 #endif
+#ifdef WGP_CONSOLE
+#include "win/winmain.h"
+#endif
 
 #if defined(HAVE_LIBREADLINE) || defined(HAVE_LIBEDITLINE)
 int
@@ -75,12 +78,16 @@ getc_wrapper(FILE* fp)
 	}
 	else
 #endif
+#if defined(WGP_CONSOLE)
+	    c = ConsoleGetch();
+#else
 	if (fp)
 	    c = getc(fp);
 	else
 	    c = getchar(); /* HAVE_LIBEDITLINE */
 	if (c == EOF && errno == EINTR)
 	    continue;
+#endif
 	return c;
     }
 }

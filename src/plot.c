@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot.c,v 1.167 2016/05/06 12:12:52 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot.c,v 1.168 2016/05/25 14:20:47 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - plot.c */
@@ -325,7 +325,7 @@ main(int argc, char **argv)
     unsigned int status[2] = { 1, 0 };
 #endif
 
-#if defined(PIPE_IPC) && (defined(HAVE_LIBREADLINE) || (defined(HAVE_LIBEDITLINE) && defined(X11)))
+#if (defined(PIPE_IPC) || defined(_WIN32)) && (defined(HAVE_LIBREADLINE) || (defined(HAVE_LIBEDITLINE) && defined(X11)))
     /* Editline needs this to be set before the very first call to readline(). */
     /* Support for rl_getc_function is broken for utf-8 in editline. Since it is only
        really required for X11, disable this section when building without X11. */
@@ -525,7 +525,7 @@ main(int argc, char **argv)
 
 	if (interactive && term != 0) {		/* not unknown */
 #ifdef GNUPLOT_HISTORY
-#if defined(HAVE_LIBREADLINE) || defined(HAVE_LIBEDITLINE)
+#if (defined(HAVE_LIBREADLINE) || defined(HAVE_LIBEDITLINE)) && !defined(_WIN32)
 	    expanded_history_filename = tilde_expand(GNUPLOT_HISTORY_FILE);
 #else
 	    expanded_history_filename = gp_strdup(GNUPLOT_HISTORY_FILE);

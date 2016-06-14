@@ -1,5 +1,5 @@
 # Hello, emacs: this is a -*- Makefile -*-
-# $Id: Makefile,v 1.60 2016/04/21 23:42:14 sfeam Exp $
+# $Id: Makefile,v 1.61 2016/05/13 07:04:13 markisch Exp $
 #
 # GNUPLOT Makefile for MinGW/MSYS or MinGW-w64/MSYS2 on Windows 
 # This assumes a typical installation of the MinGW toolkit, the free
@@ -131,6 +131,9 @@ ICONV=1
 # Uncomment if you have libcerf
 # http://sourceforge.net/projects/libcerf/
 CERF=1
+
+# Uncomment if console mode gnuplot should use GNU readline
+#GNUREADLINE=1
 
 # Below you can adapt paths according to your software setup:
 
@@ -484,6 +487,17 @@ endif
 ifdef CERF
 	CFLAGS += -DHAVE_LIBCERF -DNEED_CEXP
 	TERMLIBS += -lcerf -lm
+endif
+
+ifdef GNUREADLINE
+ifeq ($(TARGET),gnuplot.exe)
+	CFLAGS += -DHAVE_LIBREADLINE -D HAVE_READLINE_READLINE_H -DHAVE_READLINE_HISTORY_H -DHAVE_READLINE_RESET
+	TERMLIBS += -lreadline -lncurses
+else
+	CFLAGS += -DREADLINE
+endif
+else
+	CFLAGS += -DREADLINE
 endif
 
 ifdef GNU_RC

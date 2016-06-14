@@ -1,3 +1,10 @@
+2016-06-14  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/readline.c src/plot.c config/config.mgw config/mingw/Makefile:
+	Allow console mode gnuplot on Windows to use GNU readline, which is
+	more powerful than the builtin code, but still does not handle Unicode
+	input on Windows.
+
 2016-06-13  Daniel J Sebald <daniel.sebald@ieee.org>
 
 	* term/tkcanvas.trm:  Error check for ftruncate().
