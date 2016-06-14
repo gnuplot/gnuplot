@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: internal.c,v 1.79.2.1 2014/09/09 03:36:48 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: internal.c,v 1.79.2.2 2016/01/06 23:46:20 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - internal.c */
@@ -1238,13 +1238,16 @@ f_range(union argument *arg)
     gpfree_string(&full);
 }
 
+/* Magic number! */
+#define RETURN_WORD_COUNT (-17*23*61)
+
 void
 f_words(union argument *arg)
 {
     struct value a;
 
-    /* "words(s)" is implemented as "word(s,-1)" */
-    push(Ginteger(&a, -1));
+    /* "words(s)" is implemented as "word(s,RETURN_WORD_COUNT)" */
+    push(Ginteger(&a, RETURN_WORD_COUNT));
     f_word(arg);
 }
 
@@ -1293,13 +1296,15 @@ f_word(union argument *arg)
 	}
     }
 
-    if (ntarget < 0)
-	/* words(s) = word(s,-1) = # of words in string */
+    /* words(s) = word(s,magic_number) = # of words in string */
+    if (ntarget == RETURN_WORD_COUNT)
 	Ginteger(&result, nwords);
 
     push(&result);
     gpfree_string(&a);
 }
+#undef RETURN_WORD_COUNT
+
 
 /* EAM July 2004  (revised to dynamic buffer July 2005)
  * There are probably an infinite number of things that can

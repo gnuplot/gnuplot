@@ -1,3 +1,11 @@
+2016-06-14  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/internal.c (f_word f_words):  The implementation of word(string,N)
+	returned the total number of words for any N<0.  This was used internally
+	to implement words(string) as word(string,-1) but meant that any N<0
+	returned an unexpected value to the user.  Limit the special case to 
+	a single magic value and let all other N<0 return "" as expected.
+
 2016-06-12  Daniel J Sebald <daniel.sebald@ieee.org>
 
 	* src/graph3d.c:  Better fix for bug #1809 (placement of xyplane
