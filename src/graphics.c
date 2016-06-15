@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.525 2016/04/23 19:18:27 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.526 2016/05/08 04:17:25 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -4333,7 +4333,7 @@ process_image(void *plot, t_procimg_action action)
 
     /* Detours necessary to handle 3D plots */
     TBOOLEAN project_points = FALSE;		/* True if 3D plot */
-    int image_x_axis, image_y_axis, image_z_axis;
+    int image_x_axis, image_y_axis;
 
     if ((((struct surface_points *)plot)->plot_type == DATA3D)
     ||  (((struct surface_points *)plot)->plot_type == FUNC3D))
@@ -4347,7 +4347,6 @@ process_image(void *plot, t_procimg_action action)
 	nrows = ((struct surface_points *)plot)->image_properties.nrows;
 	image_x_axis = FIRST_X_AXIS;
 	image_y_axis = FIRST_Y_AXIS;
-	image_z_axis = FIRST_Z_AXIS;	/* FIXME:  Not sure this is correct */
     } else {
 	points = ((struct curve_points *)plot)->points;
 	p_count = ((struct curve_points *)plot)->p_count;
@@ -4356,7 +4355,6 @@ process_image(void *plot, t_procimg_action action)
 	nrows = ((struct curve_points *)plot)->image_properties.nrows;
 	image_x_axis = ((struct curve_points *)plot)->x_axis;
 	image_y_axis = ((struct curve_points *)plot)->y_axis;
-	image_z_axis = ((struct curve_points *)plot)->z_axis;
     }
 
     if (p_count < 1) {
@@ -4383,7 +4381,7 @@ process_image(void *plot, t_procimg_action action)
      */
 #define GRIDX(X) AXIS_DE_LOG_VALUE(image_x_axis,points[X].x)
 #define GRIDY(Y) AXIS_DE_LOG_VALUE(image_y_axis,points[Y].y)
-#define GRIDZ(Z) AXIS_DE_LOG_VALUE(image_z_axis,points[Z].z)
+#define GRIDZ(Z) AXIS_DE_LOG_VALUE(project_points ? FIRST_Z_AXIS : ((struct curve_points *)plot)->z_axis, points[Z].z)
 
     if (project_points) {
 	map3d_xy_double(points[0].x, points[0].y, points[0].z, &p_start_corner[0], &p_start_corner[1]);

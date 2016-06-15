@@ -4,6 +4,9 @@
 	string in a csv file (previous check assumed the string was followed by
 	whitespace rather than a field separator).
 
+	* src/graphics.c:  Rearrange code to avoid compiler warning about
+	unused variable image_z_axis.
+
 2016-06-14  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/readline.c src/plot.c config/config.mgw config/mingw/Makefile:
