@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.328 2016/05/23 15:35:58 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.329 2016/05/24 18:14:58 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -2707,11 +2707,17 @@ f_timecolumn(union argument *arg)
 static int
 check_missing(char *s)
 {
+    /* Match the string specified by 'set datafile missing' */
     if (missing_val != NULL) {
 	size_t len = strlen(missing_val);
-	if (strncmp(s, missing_val, len) == 0 &&
-	    (isspace((unsigned char) s[len]) || !s[len]))
-	    return 1;   /* store undefined point in plot */
+	if (strncmp(s, missing_val, len) == 0) {
+	    s += len;
+	    if (!(*s))
+		return 1;
+	    if (!df_separators && isspace((unsigned char) *s))
+		return 1;
+	    /* s now points to the character after the "missing" sequence */
+	}
     }
     /* April 2013 - Treat an empty csv field as "missing" */
     if (df_separators && strchr(df_separators,*s))

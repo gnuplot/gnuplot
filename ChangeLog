@@ -1,3 +1,9 @@
+2016-06-15  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/datafile.c (check_missing):  Fix test for explicit 'set missing'
+	string in a csv file (previous check assumed the string was followed by
+	whitespace rather than a field separator).
+
 2016-06-14  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/readline.c src/plot.c config/config.mgw config/mingw/Makefile:
