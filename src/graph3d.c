@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.341 2016/06/08 04:30:39 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.342 2016/06/13 05:04:07 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -2533,6 +2533,7 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid,
 	 * two-part grid drawing process: */
 	&& (FRONTGRID != whichgrid)
 	&& (splot_map == FALSE)
+	&& (surface_rot_x != 0)
 	&& (draw_surface
 	    || (draw_contour & CONTOUR_SRF)
 	    || strchr(pm3d.where,'s') != NULL

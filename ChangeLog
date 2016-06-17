@@ -1,3 +1,8 @@
+2016-06-17  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/graph3d.c (draw_3d_graphbox): Don't draw ztics or tic labels 
+	at view angle rot_x=0 (projection along z axis).
+
 2016-06-15  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/datafile.c (check_missing):  Fix test for explicit 'set missing'
