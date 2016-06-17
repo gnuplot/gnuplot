@@ -19,6 +19,7 @@ Changes in 5.0.4
 * FIX ignore incomplete "every" spec for image plots
 * FIX placement of xyplane does not depend on having tics or grid lines enabled
 * FIX early program exit on replot+resize with inline data
+* FIX bad plot iteration with negative increment, e.g. plot for [i=9:1:-1] foo(i)
 
 Changes in 5.0.3
 ================

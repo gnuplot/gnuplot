@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.231.2.5 2016/01/11 23:32:51 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.231.2.6 2016/05/17 19:12:36 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -1933,7 +1933,7 @@ eval_3dplots()
 	    if (empty_iteration(plot_iterator))
 		this_plot->plot_type = NODATA;
 	    if (forever_iteration(plot_iterator) && (this_plot->plot_type == NODATA)) {
-		highest_iteration = plot_iterator->iteration_current;
+		highest_iteration = plot_iterator->iteration;
 		eof_during_iteration = TRUE;
 	    }
 	    if (forever_iteration(plot_iterator) && (this_plot->plot_type == FUNC3D)) {
@@ -1955,7 +1955,7 @@ eval_3dplots()
 	    /* Nothing to do */ ;
 	} else if (next_iteration(plot_iterator)) {
 	    c_token = start_token;
-	    highest_iteration = plot_iterator->iteration_current;
+	    highest_iteration = plot_iterator->iteration;
 	    continue;
 	}
 
@@ -2138,7 +2138,7 @@ eval_3dplots()
 
 	    /* Iterate-over-plot mechanism */
 	    if (crnt_param == 0 && next_iteration(plot_iterator)) {
-		if (plot_iterator->iteration_current <= highest_iteration) {
+		if (plot_iterator->iteration <= highest_iteration) {
 		    c_token = start_token;
 		    continue;
 		}

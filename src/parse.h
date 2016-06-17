@@ -1,5 +1,5 @@
 /*
- * $Id: parse.h,v 1.29.2.1 2014/09/19 06:02:18 sfeam Exp $
+ * $Id: parse.h,v 1.29.2.2 2016/01/11 23:32:50 sfeam Exp $
  */
 
 /* GNUPLOT - parse.h */
@@ -95,8 +95,8 @@ typedef struct iterator {
 	int iteration_start;
 	int iteration_end;
 	int iteration_increment;
-	int iteration_current;
-	int iteration;
+	int iteration_current;	/* start + increment * iteration */
+	int iteration;		/* runs from 0 to (end-start)/increment */
 	TBOOLEAN done;
 	TBOOLEAN really_done;
 	TBOOLEAN empty_iteration;
