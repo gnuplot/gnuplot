@@ -42,6 +42,9 @@ I.e., the last point is the main question: where to put pm3d/contrib/* files?
 
 Or put them to gnuplot web page?
 
+Or get rid of them.  The plot in the demo can be accomplished with no
+fancy use of awk/pm3d.  See for example the plots in varcolor.dem.
+
 
 INSTALLATION --- LINUX:
 =======================
@@ -104,10 +107,11 @@ Ethan's List (2016):
 - add additional tic levels, possibly to appear only when zoomed
 - configuration/build options to create
 	javascript/emscripten executable
-	qt only support for pdf, svg, png, etc (Lodewick patches)
+	qt-based support for pdf, svg, png, etc (Lodewick patches)
+	configure option for a qt-only build (no cairo, no x11, no wxt)
 - better tracking of wrapped input lines by the builtin readline code
+- 64-bit integer arithmetic
 
 - Remove obsolete files.  But are they truly obsolete?
    term/pc.trm config/makefile.emx
-   term/openstep.trm term/next.trm src/OpenStep/ src/NeXT/
 

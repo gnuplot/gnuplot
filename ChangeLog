@@ -1,4 +1,10 @@
 2016-06-17  Ethan A Merritt  <merritt@u.washington.edu>
+	
+	* parse.h plot2d.c plot3d.c:  Tracking of the wrong iteration 
+	variable (iteration_current rather than iteration) caused plot
+	command iteration with a negative increment failed to iterate at all.
+	E.g. 'plot for [i=9:1:-1] foo' plotted only the single plot with i=9.  
+	Bug #1819
 
 	* src/graph3d.c (draw_3d_graphbox): Don't draw ztics or tic labels 
 	at view angle rot_x=0 (projection along z axis).
