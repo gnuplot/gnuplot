@@ -18,6 +18,7 @@ Changes in 5.0.4
 * FIX 7-column input to "splot ... with vectors"
 * FIX ignore incomplete "every" spec for image plots
 * FIX placement of xyplane does not depend on having tics or grid lines enabled
+* FIX early program exit on replot+resize with inline data
 
 Changes in 5.0.3
 ================

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: mouse.c,v 1.168.2.8 2015/06/25 21:31:42 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: mouse.c,v 1.168.2.9 2015/07/13 04:08:34 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - mouse.c */
@@ -2239,7 +2239,7 @@ do_event(struct gp_event_t *ge)
 	    break;
 	if (multiplot)
 	    break;
-	do_string("replot");
+	do_string_replot("");
 	break;
     case GE_reset:
 	event_reset(ge);
