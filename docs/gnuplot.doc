@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.902.2.54 2016/03/22 04:40:26 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.902.2.55 2016/06/08 04:30:50 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -514,8 +514,8 @@ C
 ^</table>
 2 Comments
 ?comments
- Comments are supported as follows: a `#` may appear in most places in a line
- and `gnuplot` will ignore the rest of the line.  It will not have this effect
+ Comments are supported as follows: a `#` may appear in most places in a command
+ line. `gnuplot` will ignore the rest of the line.  It will not have this effect
  inside quotes, inside numbers (including complex numbers), inside command
  substitutions, etc.  In short, it works anywhere it makes sense to work.
 
