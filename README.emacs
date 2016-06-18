@@ -1,7 +1,6 @@
 Older versions of gnuplot included a lisp subdirectory containing
 a copy of Bruce Ravel's gnuplot-mode plugin for emacs.
-This is now maintained and distributed elsewhere.
-From the (2013) source:
+This is now maintained and distributed separately.
 
 ================================================================
 The emacs gnuplot-mode is a major mode for composing gnuplot scripts and

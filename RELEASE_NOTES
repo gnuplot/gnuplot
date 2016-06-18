@@ -1,37 +1,51 @@
-		GNUPLOT Version 5.0.3 Release Notes
+		GNUPLOT Version 5.0.4 Release Notes
 		===================================
 
 Gnuplot version 5.0 was initially released in January 2015.
 Please see the NEWS and ChangeLog files for a complete list of bug fixes
 and minor changes accummulated since then.
 
-These release notes are for version 5.0 patchlevel 3 (5.0.3).
-This release is primarily to update four terminals (qt, aqua, wxt, tkcanvas)
-that had bugs or missing features in the previous release 5.0.2.
+These release notes are for version 5.0 patchlevel 4 (5.0.4).
+This release contains bug-fixes and a few changes back-ported from the
+development version.
 
-Release Notes date: 21-Feb-2016
+Release Notes date: 18-Jun-2016
 
-This patchlevel 5.0.3 incremental release includes
+This patchlevel 5.0.4 incremental release includes
 ==================================================
 
-* NEW open-ended iteration over data:  plot for [i=1:*] datafile index i
-* CHANGE update aquaterm to support version 5 custom dashtypes
-* CHANGE backport new image bookkeeping from 5.1 to fix bugs #1607 #1703 #1709
-* CHANGE qt terminal: toggle plots on/off only on left-click
-* CHANGE wholesale upgrade of old tkcanvas terminal (version 3.7 -> version 5.0)
-* FIX reevaluate fill color for each polygon in data for "with filledcurves"
-* FIX multiple wxt terminal font problems
+* CHANGE minimum linewidth of all cairo terminals is now 0.2 pt
+* CHANGE in-line datablock lines are not limited to 1024 characters
+* CHANGE do not truncate or renumber history items in the active session
+* CHANGE (Windows only) open piped output using mode "wb" rather than "w"
+* CHANGE backport 5.1 use of "lc variable" to color boxplot factors
+* CHANGE gnuplot_svg.js now remaps coords for svg image embedded in larger object
+* CHANGE disallow "set palette maxcolors 1" (which has never worked)
+* CHANGE data-input errors in "stats" now generate a warning rather than an error
+* FIX placement of objects and labels using linked secondary axis coordinates
+* FIX 'set term qt <N> close' acts immediately rather than after next mouse event
+* FIX emf terminal could lose track of bold/italic/etc font properties
+* FIX emf terminal text placement of UTF-8 strings
+* FIX regression that caused "set log x; plot '-'; replot" to mess up autoscaling
+* FIX regression in v5 that mangled 3D arrows defined by "from ... rto ..."
+* FIX transposition of row/column count in plotting ascii x/y/z data "with image"
+* FIX 7-column input to "splot ... with vectors"
+* FIX ignore incomplete "every" spec for image plots
+* FIX placement of xyplane does not depend on having tics or grid lines enabled
+* FIX early program exit on replot+resize with inline data
+* FIX bad plot iteration with negative increment, e.g. plot for [i=9:1:-1] foo(i)
 
 
-NOTABLE NEW FEATURES IN VERSION 5.0.3
-=====================================
+NOTABLE NEW FEATURES IN PATCHLEVEL 5.0.4
+========================================
 
-Incremental releases 5.0.1, 5.0.2, etc are primarily intended to provide bug
-fixes rather than new features.
+None.
+Incremental releases 5.0.1, 5.0.2, etc are primarily intended to provide
+bug fixes rather than new features.
 
 
-FEATURES INTRODUCED IN VERSION 5.0
-==================================
+FEATURES INTRODUCED IN VERSION 5
+================================
 
 * New plot styles "with parallelaxes" and labeled contours.
 
@@ -178,11 +192,6 @@ KNOWN ISSUES
   executable, but only one of these two output modes can be used in any
   given gnuplot session.
 
-* Mac OSX ships with a terminal input library that appears to be GNU
-  libreadline, but isn't really.  The program tries to cope with this, but
-  you may get better results by configuring gnuplot to use either its own
-  built-in readline routines or the real GNU libreadline.
-
 * The gnuplot build system is not very good at figuring out where to find
   or install LaTeX-related files.  This can affect use of the lua/tikz
   and ConTeXt terminals.
@@ -278,7 +287,7 @@ Options for generating interactive plots for web display
 Installation
 ------------
 
-You can download a source tarball for gnuplot version 5.0.3 from the 
+You can download a source tarball for gnuplot version 5.0.4 from the 
 gnuplot development site on SourceForge.
 	http://sourceforge.net/projects/gnuplot
 
@@ -286,7 +295,7 @@ Installation instructions are available in the source itself; the short
 version for linux/unix-like systems is to unpack the tarball and then
 <PRE>
 build it:
-      cd gnuplot-5.0.3 ; ./configure ; make
+      cd gnuplot-5.0.4 ; ./configure ; make
 test it:
       make check
 install it:
