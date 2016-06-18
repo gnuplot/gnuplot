@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.993 2016/06/17 20:06:18 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.994 2016/06/18 00:13:35 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -546,7 +546,7 @@ C
 ?comments
  The comment character `#` may appear almost anywhere in a command line, and
  `gnuplot` will ignore the rest of that line. A `#` does not have this effect
- inside a quoted string. Note that if a comment line ends in '\' then the
+ inside a quoted string. Note that if a commented line ends in '\' then the
  subsequent line is also treated as part of the comment.
 
  See also `set datafile commentschars` for specifying a comment character for
@@ -8362,9 +8362,9 @@ Ffigure_missing
 4 set datafile commentschars
 ?set datafile commentschars
 ?commentschars
- The `set datafile commentschars` tells `gnuplot` what characters are used in a
- data file to begin comment lines. If the first non-blank character on a line is
- one of the specified characters then the rest of the input line is ignored.
+ The command `set datafile commentschars` specifies what characters can be used
+ in a data file to begin comment lines. If the first non-blank character on a
+ line is one of these characters then the rest of the data line is ignored.
  Default value of the string is "#!" on VMS and "#" otherwise.
 
  Syntax:
@@ -8376,9 +8376,8 @@ Ffigure_missing
      # 1 2 3 4
  but the following
      1 # 3 4
- produces a rather unexpected plot unless
-     set datafile missing '#'
- is specified as well.
+ will be interpreted as garbage in the 2nd column followed by valid data in
+ the 3rd and 4th columns.
 
  Example:
        set datafile commentschars "#!%"
