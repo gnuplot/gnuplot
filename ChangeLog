@@ -1,5 +1,10 @@
+2016-06-20  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/win/wtext.c (UpdateCaretPos):  Fix a resource leak which occurred
+	only if the encondig is set to utf8 or sjis.
+
 2016-06-17  Ethan A Merritt  <merritt@u.washington.edu>
-	
+
 	* parse.h plot2d.c plot3d.c:  Tracking the wrong iteration 
 	variable (iteration_current rather than iteration) caused plot
 	command iteration with a negative increment to fail to iterate at all.

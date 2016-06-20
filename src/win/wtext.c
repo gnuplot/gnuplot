@@ -1,5 +1,5 @@
 /*
- * $Id: wtext.c,v 1.62 2016/05/21 05:29:31 markisch Exp $
+ * $Id: wtext.c,v 1.63 2016/05/23 14:59:24 markisch Exp $
  */
 
 /* GNUPLOT - win/wtext.c */
@@ -1246,7 +1246,7 @@ WndParentProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 	lptw->CharSize.y = tm.tmHeight;
 	lptw->CharSize.x = tm.tmAveCharWidth;
 	lptw->CharAscent = tm.tmAscent;
-	ReleaseDC(hwnd,hdc);
+	ReleaseDC(hwnd, hdc);
 
 	if ((lptw->DragPre != NULL) && (lptw->DragPost != NULL))
 	    DragAcceptFiles(hwnd, TRUE);
@@ -1328,6 +1328,7 @@ UpdateCaretPos(LPTW lptw)
 	hdc = GetDC(lptw->hWndText);
 	SelectObject(hdc, lptw->hfont);
 	GetTextExtentPoint32W(hdc, line->str + start, len, &size);
+	ReleaseDC(lptw->hWndText, hdc);
     } else {
 	size.cx = len * lptw->CharSize.x;
     }
