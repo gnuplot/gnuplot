@@ -13,6 +13,9 @@
 	spaces when saving to a file.  Index of history_get is zero-based
 	relative to history_base.
 
+	* src/readline.c (write_history_list):  Let the built-in readline use
+	the same code as is used for GNU readline and libedit.
+
 2016-06-17  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* parse.h plot2d.c plot3d.c:  Tracking the wrong iteration
