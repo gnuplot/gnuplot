@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: readline.c,v 1.72 2016/05/28 05:28:02 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: readline.c,v 1.73 2016/06/14 18:25:39 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - readline.c */
@@ -944,8 +944,8 @@ readline(const char *prompt)
 	    delete_previous_word();
 #endif /* VWERASE */
 #ifdef VREPRINT
-	} else if (cur_char == term_chars[VREPRINT]) {	/* ^R? */
 #if 0 /* conflict with reverse-search */
+	} else if (cur_char == term_chars[VREPRINT]) {	/* ^R? */
 	    putc(NEWLINE, stderr);	/* go to a fresh line */
 	    redraw_line(prompt);
 #endif
@@ -1165,7 +1165,7 @@ print_search_result(const struct hist * result)
     }
 
     /* overwrite previous search result, and the line might
-       just have gotten 1 double-wdith character shorter */
+       just have gotten 1 double-width character shorter */
     for (i = 0; i < search_result_width - width + 2; i++)
 	putc(SPACE, stderr);
     for (i = 0; i < search_result_width - width + 2; i++)
