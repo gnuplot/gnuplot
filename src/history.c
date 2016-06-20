@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: history.c,v 1.37 2016/05/27 15:22:00 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: history.c,v 1.38 2016/06/20 08:27:58 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - history.c */
@@ -477,7 +477,6 @@ write_history_n(const int n, const char *filename, const char *mode)
  *
  * Peter Weilbacher, 28Jun2004
  */
-
 void
 write_history_list(const int num, const char *const filename, const char *mode)
 {
@@ -488,43 +487,41 @@ write_history_list(const int num, const char *const filename, const char *mode)
     int is_quiet = 0;
     int i, istart;
 
-    if (filename && filename[0] ) {
-        /* good filename given and not quiet */
+    if (filename && filename[0]) {
+	/* good filename given and not quiet */
 #ifdef PIPES
-        if (filename[0]=='|') {
+	if (filename[0] == '|') {
 	    restrict_popen();
-            out = popen(filename+1, "w");
-            is_pipe = 1;
-        } else
+	    out = popen(filename + 1, "w");
+	    is_pipe = 1;
+	} else
 #endif
 	{
-            if (! (out = fopen(filename, mode) ) ) {
-                int_warn(NO_CARET, "Cannot open file to save history, using standard output.\n");
-                out = stdout;
-            } else {
+	    if (!(out = fopen(filename, mode))) {
+		int_warn(NO_CARET, "Cannot open file to save history, using standard output.\n");
+		out = stdout;
+	    } else {
 		is_file = 1;
 	    }
-        }
+	}
+    } else if (filename && !filename[0]) {
+	is_quiet = 1;
+    }
 
-    } else if (filename && !filename[0])
-        is_quiet = 1;
-
-    /* Determine starting point and output in loop.
-     * For some reason the readline functions append_history() 
-     * and write_history() do not work they way I thought they did...
-     */
+    /* Determine starting point and output in loop. */
     if (num > 0)
-        istart = history_length - num;
+	istart = history_length - num - 1;
     else
-	istart = 1;
-    if (istart <= 0 || istart > history_length)
-	istart = 1;
+	istart = 0;
+    if (istart < 0 || istart > history_length)
+	istart = 0;
 
-    for (i = istart; (list_entry = history_get(i)); i++) {
-        /* don't add line numbers when writing to file to make file loadable */
+    for (i = istart; (list_entry = history_get(i + history_base)); i++) {
+	/* don't add line numbers when writing to file to make file loadable */
 	if (!is_file && !is_quiet)
-	    fprintf(out, "%5i ", i + history_base - 1);
-	fprintf(out, "  %s\n", list_entry->line);
+	    fprintf(out, "%5i   %s\n", i + history_base - 1, list_entry->line);
+	else
+	    fprintf(out, "%s\n", list_entry->line);
     }
 
 #ifdef PIPES
@@ -532,6 +529,7 @@ write_history_list(const int num, const char *const filename, const char *mode)
 #endif
     if (is_file) fclose(out);
 }
+
 
 /* This is the function getting called in command.c */
 void

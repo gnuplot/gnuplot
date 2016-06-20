@@ -9,6 +9,10 @@
 	* src/history.c (gp_read_history):  Cast argument of isspace() to
 	unsigned char.
 
+	* src/readline.c (write_history_list):  Avoid adding extra leading
+	spaces when saving to a file.  Index of history_get is zero-based
+	relative to history_base.
+
 2016-06-17  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* parse.h plot2d.c plot3d.c:  Tracking the wrong iteration
