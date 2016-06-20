@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: history.c,v 1.36 2016/05/25 21:28:39 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: history.c,v 1.37 2016/05/27 15:22:00 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - history.c */
@@ -282,7 +282,6 @@ remove_history(int which)
 
 
 #if defined(READLINE) || defined(HAVE_LIBEDITLINE)
-//  FIXME: Feature test in configure
 histdata_t 
 free_history_entry(HIST_ENTRY *histent)
 {
@@ -377,7 +376,7 @@ gp_read_history(const char *filename)
 
 		/* skip leading whitespace */
 		pline = line;
-		while (isspace((unsigned int) *pline))
+		while (isspace((unsigned char) *pline))
 		    pline++;
 
 		/* avoid adding empty lines */
