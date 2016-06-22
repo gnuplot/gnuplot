@@ -1,3 +1,9 @@
+2016-06-22  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* RELEASE_NOTES demo/plugin/Makefile.am:  Note compiler flags needed
+	to build gnuplot using Solaris SunPro C compiler.
+	Bugs #1786 #1821
+	
 2016-06-20  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/win/wtext.c (UpdateCaretPos):  Fix a resource leak which occurred
