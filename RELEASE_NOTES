@@ -182,6 +182,10 @@ KNOWN ISSUES
   you may need to set the environmental variable TERMLIBS:
     TERMLIBS="-lX11"  ./configure
 
+* Compilation on Solaris may require adding -liconv to LIB_FLAGS
+  Building the plugin demo with a SunPro Compiler requires changing the
+  build flags as shown in comments in ./demo/plugin/Makefile.am
+
 * Font initialization on OSX can be very slow, causing the qt terminal to
   issue warning or error messages for the first plot command.
 
