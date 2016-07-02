@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.324 2016/03/20 20:34:54 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.325 2016/04/15 17:55:49 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -103,18 +103,16 @@ long mouse_mode = 0;
 char* mouse_alt_string = NULL;
 #endif
 
-#ifdef WIN32
-/* FIXME: Prototypes are in win/wcommon.h */
-FILE *open_printer __PROTO((void));     /* in wprinter.c */
-void close_printer __PROTO((FILE * outfile));
+#ifdef _WIN32
 # include "win/winmain.h"
+# include "win/wcommon.h"
 # ifdef __MSC__
 #  include <malloc.h>
 #  include <io.h>
 # else
 #  include <alloc.h>
 # endif                         /* MSC */
-#endif /* _Windows */
+#endif /* _WIN32 */
 
 static int termcomp __PROTO((const generic * a, const generic * b));
 
@@ -2958,7 +2956,7 @@ check_for_mouse_events()
     /* On Windows, Ctrl-C only sets this flag. */
     /* The next block duplicates the behaviour of inter(). */
     if (ctrlc_flag) {
-    ctrlc_flag = FALSE;
+	ctrlc_flag = FALSE;
 	term_reset();
 	putc('\n', stderr);
 	fprintf(stderr, "Ctrl-C detected!\n");
