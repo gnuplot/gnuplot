@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.336 2016/05/25 21:28:39 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.337 2016/05/26 20:53:49 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -2600,7 +2600,10 @@ changedir(char *path)
     return 0;			/* should report error with setdrive also */
 
 #elif defined(_WIN32)
-    return !(SetCurrentDirectory(path));
+    LPWSTR pathw = UnicodeText(path, encoding);
+    int ret = !SetCurrentDirectoryW(pathw);
+    free(pathw);
+    return ret;
 #elif defined(__EMX__) && defined(OS2)
     return _chdir2(path);
 #else

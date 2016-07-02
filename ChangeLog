@@ -1,5 +1,7 @@
 2016-07-02  Bastian Maerkisch  <bmaerkisch@web.de>
 
+	* src/command.c (changedir):  Handle encodings (Windows).
+
 	* src/term.c:  Replace local function prototypes with proper include.
 
 	* src/win/wtext.c:  Ctrl-C copies text to clipboard if there's
