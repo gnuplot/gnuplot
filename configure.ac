@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot on Unix.
 dnl
-dnl $Id: configure.ac,v 1.20 2016/05/18 21:19:21 sfeam Exp $
+dnl $Id: configure.ac,v 1.21 2016/05/23 19:02:18 markisch Exp $
 dnl
 dnl this is actually major.minor ...
 dnl note that for a non-beta release, we need to disable DEVELOPMENT_RELEASE
@@ -444,10 +444,14 @@ if test "$with_readline" != no; then
         LDFLAGS="$LDFLAGS -L$with_readline/lib"
       fi
       dnl Could be either libedit or readline!
-      AC_CHECK_HEADERS(editline/readline.h,[with_readline=bsd],,)
-      if test "$with_readline" = bsd; then
-        AC_MSG_WARN([Path contains libedit, not readline!])
-      fi  
+      if test ! -d $with_readline/include/readline; then
+        if test -d $with_readline/include/editline; then
+          AC_MSG_WARN([$with_readline contains libedit, not readline!])
+          with_readline=bsd
+        else
+          AC_MSG_ERROR([No readline found in $with_readline])
+        fi
+      fi
     fi
 
     if test "$with_readline" = bsd; then

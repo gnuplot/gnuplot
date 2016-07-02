@@ -1,9 +1,16 @@
+2016-07-02  Jun Takimoto <takimoto-j@kba.biglobe.ne.jp>
+
+	* configure.ac:  The change of 2016/05/23 to the --with-readline=DIR
+	code did not properly handle the case when libedit is installed and thus
+	found by AC_CHECK_HEADERS, but we really want to point to GNU readline
+	installed in DIR.
+
 2016-06-22  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* RELEASE_NOTES demo/plugin/Makefile.am:  Note compiler flags needed
 	to build gnuplot using Solaris SunPro C compiler.
 	Bugs #1786 #1821
-	
+
 2016-06-20  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/win/wtext.c (UpdateCaretPos):  Fix a resource leak which occurred
