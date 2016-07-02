@@ -1,5 +1,5 @@
 /*
- * $Id: wtext.c,v 1.64 2016/06/20 08:03:34 markisch Exp $
+ * $Id: wtext.c,v 1.65 2016/07/02 06:35:12 markisch Exp $
  */
 
 /* GNUPLOT - win/wtext.c */
@@ -1617,9 +1617,17 @@ WndTextProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 	if (GetKeyState(VK_CONTROL) < 0) {
 	    switch(wParam) {
 	    case VK_INSERT:
-	    case 'C':
 		/* Ctrl-Insert: copy to clipboard */
 		SendMessage(lptw->hWndText, WM_COMMAND, M_COPY_CLIP, (LPARAM)0);
+		break;
+	    case 'C':
+		/* Ctrl-C: copy to clipboard, if there's selected text,
+		           otherwise indicate the Ctrl-C (break) flag */
+		if ((lptw->MarkBegin.x != lptw->MarkEnd.x) ||
+		    (lptw->MarkBegin.y != lptw->MarkEnd.y))
+		    SendMessage(lptw->hWndText, WM_COMMAND, M_COPY_CLIP, (LPARAM)0);
+		else
+		    ctrlc_flag = TRUE;
 		break;
 	    case 'V':
 		/* Ctrl-V: paste clipboard */

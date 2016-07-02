@@ -1,6 +1,9 @@
 2016-07-02  Bastian Maerkisch  <bmaerkisch@web.de>
 
-	* src/win/wtext.c  (UpdateScrollBars):  The size of the scroll bar
+	* src/win/wtext.c:  Ctrl-C copies text to clipboard if there's
+	selected text or sets the Ctrl-C (break) flag otherwise.
+
+	* src/win/wtext.c (UpdateScrollBars):  The size of the scroll bar
 	thumb reflects the length or width of the scrollable area.
 
 2016-07-02  Jun Takimoto <takimoto-j@kba.biglobe.ne.jp>
