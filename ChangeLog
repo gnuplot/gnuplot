@@ -1,3 +1,8 @@
+2016-07-02  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/win/wtext.c  (UpdateScrollBars):  The size of the scroll bar
+	thumb reflects the length or width of the scrollable area.
+
 2016-07-02  Jun Takimoto <takimoto-j@kba.biglobe.ne.jp>
 
 	* configure.ac:  The change of 2016/05/23 to the --with-readline=DIR

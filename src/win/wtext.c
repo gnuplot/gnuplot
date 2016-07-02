@@ -1,5 +1,5 @@
 /*
- * $Id: wtext.c,v 1.63 2016/05/23 14:59:24 markisch Exp $
+ * $Id: wtext.c,v 1.64 2016/06/20 08:03:34 markisch Exp $
  */
 
 /* GNUPLOT - win/wtext.c */
@@ -425,6 +425,7 @@ static void
 UpdateScrollBars(LPTW lptw)
 {
     signed int length;  /* this must be signed for this to work! */
+    SCROLLINFO si;
 
     /* horizontal scroll bar */
     length = sb_max_line_length(&(lptw->ScreenBuffer)) + 1;
@@ -432,8 +433,17 @@ UpdateScrollBars(LPTW lptw)
 	/* maximum horizontal scroll position is given by maximum line length */
 	lptw->ScrollMax.x = max(0, lptw->CharSize.x * length - lptw->ClientSize.x);
 	lptw->ScrollPos.x = min(lptw->ScrollPos.x, lptw->ScrollMax.x);
-	SetScrollRange(lptw->hWndText, SB_HORZ, 0, lptw->ScrollMax.x, FALSE);
-	SetScrollPos(lptw->hWndText, SB_HORZ, lptw->ScrollPos.x, TRUE);
+
+	/* update scroll bar page size, range and position */
+	si.cbSize = sizeof(SCROLLINFO);
+	si.fMask = SIF_PAGE | SIF_RANGE | SIF_POS;
+	si.nPage = lptw->ClientSize.x;
+	si.nMin = 0;
+	/* The maximum reported scroll position will be (nMax - (nPage - 1)),
+	   so we need to set nMax to the full range. */
+	si.nMax = lptw->CharSize.x * length;
+	si.nPos = lptw->ScrollPos.x;
+	SetScrollInfo(lptw->hWndText, SB_HORZ, &si, TRUE);
 	ShowScrollBar(lptw->hWndText, SB_HORZ, TRUE);
     } else {
 	lptw->ScrollMax.x = 0;
@@ -446,8 +456,17 @@ UpdateScrollBars(LPTW lptw)
     if (length >= lptw->ScreenSize.y) {
 	lptw->ScrollMax.y = max(0, lptw->CharSize.y * length - lptw->ClientSize.y);
 	lptw->ScrollPos.y = min(lptw->ScrollPos.y, lptw->ScrollMax.y);
-	SetScrollRange(lptw->hWndText, SB_VERT, 0, lptw->ScrollMax.y, FALSE);
-	SetScrollPos(lptw->hWndText, SB_VERT, lptw->ScrollPos.y, TRUE);
+
+	/* update scroll bar page size, range and position */
+	si.cbSize = sizeof(SCROLLINFO);
+	si.fMask = SIF_PAGE | SIF_RANGE | SIF_POS;
+	si.nPage = lptw->ClientSize.y;
+	si.nMin = 0;
+	/* The maximum reported scroll position will be (nMax - (nPage - 1)),
+	   so we need to set nMax to the full range. */
+	si.nMax = lptw->CharSize.y * length;
+	si.nPos = lptw->ScrollPos.y;
+	SetScrollInfo(lptw->hWndText, SB_VERT, &si, TRUE);
 	ShowScrollBar(lptw->hWndText, SB_VERT, TRUE);
     } else {
 	lptw->ScrollMax.y = 0;
@@ -1182,8 +1201,8 @@ WndParentProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
     case WM_GETMINMAXINFO:
     {
 	POINT * MMinfo = (POINT *)lParam;
-        MMinfo[3].x = GetSystemMetrics(SM_CXVSCROLL) + 2*GetSystemMetrics(SM_CXFRAME);
-	MMinfo[3].y = GetSystemMetrics(SM_CYHSCROLL) + 2*GetSystemMetrics(SM_CYFRAME)
+        MMinfo[3].x = GetSystemMetrics(SM_CXVSCROLL) + 2 * GetSystemMetrics(SM_CXFRAME);
+	MMinfo[3].y = GetSystemMetrics(SM_CYHSCROLL) + 2 * GetSystemMetrics(SM_CYFRAME)
 	    + GetSystemMetrics(SM_CYCAPTION) + GetSystemMetrics(SM_CYMENU);
 	if (lptw) {
 	    MMinfo[3].x += ScreenMinSize.x * lptw->CharSize.x;
