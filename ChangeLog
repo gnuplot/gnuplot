@@ -1,3 +1,18 @@
+2016-07-03  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/util.c (print_line_with_error):  Replace macros
+	PRINT_MESSAGE_TO_STDERR PRINT_SPACES_UPTO_TOKEN PRINT_FILE_AND_LINE
+	with new utility routine.  Add code to reconstruct the original input
+	line number by counting \n characters embedded in the command line
+	(e.g. from concatenation of successive lines in a bracketed clause).
+
+	* src/graphics.c(plot_betweencurves):  The filled curve options
+	y=foo, below y=foo, etc were reworked to piggyback on the 'fill between'
+	code by loading ymax with foo on data input.  However this mechanism
+	breaks if the curve is smoothed because ymax is lost during smoothing.
+	Revert the case of smooth + filledcurves + y=foo to use the original
+	FILLEDCURVES_ATY1 code.
+
 2016-07-02  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/command.c (changedir):  Handle encodings (Windows).

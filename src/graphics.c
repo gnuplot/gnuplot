@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.526 2016/05/08 04:17:25 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.527 2016/06/15 18:02:33 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -1275,8 +1275,13 @@ plot_betweencurves(struct curve_points *plot)
     /* Jan 2015: We are now using the plot_between code to also handle option
      * y=atval, but the style option in the plot header does not reflect this.
      * Change it here so that finish_filled_curve() doesn't get confused.
+     * Jun 2016: However smoothing may have trashed the original contents of
+     * y2, so FILLEDCURVES_BETWEEN will not work. Best would be to refill y2
+     * or change the order so that the smoothing happens before filling it
+     * the first time, but for now try falling back to the old code path.
      */
-    plot->filledcurves_options.closeto = FILLEDCURVES_BETWEEN;
+    if (!plot->plot_smooth)
+	plot->filledcurves_options.closeto = FILLEDCURVES_BETWEEN;
 
     /*
      * Fill the region one quadrilateral at a time.
