@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: util.c,v 1.139 2016/05/05 15:23:03 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: util.c,v 1.140 2016/05/05 18:59:34 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - util.c */
@@ -72,6 +72,12 @@ char *numeric_locale = NULL;
 char *current_locale = NULL;
 
 const char *current_prompt = NULL; /* to be set by read_line() */
+
+/* TRUE if command just typed; becomes FALSE whenever we
+ * send some other output to screen.  If FALSE, the command line
+ * will be echoed to the screen before the ^ error message.
+ */
+TBOOLEAN screen_ok;
 
 /* internal prototypes */
 
@@ -951,13 +957,6 @@ done:
 /* some macros for the error and warning functions below
  * may turn this into a utility function later
  */
-#define PRINT_MESSAGE_TO_STDERR				\
-do {							\
-    fprintf(stderr, "\n%s%s\n",				\
-	    current_prompt ? current_prompt : "",	\
-	    gp_input_line);				\
-} while (0)
-
 #define PRINT_SPACES_UNDER_PROMPT		\
 do {						\
     const char *p;				\
@@ -968,28 +967,62 @@ do {						\
 	(void) fputc(' ', stderr);		\
 } while (0)
 
-#define PRINT_SPACES_UPTO_TOKEN						\
-do {									\
-    int i;								\
-									\
-    for (i = 0; i < token[t_num].start_index; i++)			\
-	(void) fputc((gp_input_line[i] == '\t') ? '\t' : ' ', stderr);	\
-} while(0)
-
-#define PRINT_CARET fputs("^\n",stderr);
-
-#define PRINT_FILE_AND_LINE						\
-if (!interactive) {							\
-    if (lf_head && lf_head->name)                                       \
-	fprintf(stderr, "\"%s\", line %d: ", lf_head->name, inline_num);\
-    else fprintf(stderr, "line %d: ", inline_num);			\
-}
-
-/* TRUE if command just typed; becomes FALSE whenever we
- * send some other output to screen.  If FALSE, the command line
- * will be echoed to the screen before the ^ error message.
+/*
+ * Echo back the command or data line that triggered an error,
+ * possibly with a caret indicating the token the was not accepted.
  */
-TBOOLEAN screen_ok;
+static void
+print_line_with_error(int t_num)
+{
+    int i;
+
+    if (t_num == DATAFILE) {
+	/* Print problem line from data file to the terminal */
+	df_showdata();
+
+    } else {
+
+	/* If the current line was built by concatenation of lines inside */
+	/* a {bracketed clause}, try to reconstruct the true line number  */
+	char *minimal_input_line = gp_input_line;
+	char *trunc;
+	while ((trunc = strrchr(gp_input_line, '\n')) != NULL) {
+	    int current = (t_num == NO_CARET) ? c_token : t_num;
+	    if (trunc < &gp_input_line[token[current].start_index]) {
+		minimal_input_line = trunc+1;
+		t_num = NO_CARET;
+		break;
+	    }
+	    *trunc = '\0';
+	    inline_num--;
+	}
+
+	if (t_num != NO_CARET) {
+	    /* Refresh current command line */
+	    if (!screen_ok)
+		fprintf(stderr, "\n%s%s\n",
+		    current_prompt ? current_prompt : "",
+		    minimal_input_line);
+
+	    PRINT_SPACES_UNDER_PROMPT;
+
+	    /* Print spaces up to token */
+	    for (i = 0; i < token[t_num].start_index; i++)
+		fputc((minimal_input_line[i] == '\t') ? '\t' : ' ', stderr);
+
+	    /* Print token */
+	    fputs("^\n",stderr);
+	}
+    }
+
+    PRINT_SPACES_UNDER_PROMPT;
+
+    if (!interactive) {
+	if (lf_head && lf_head->name)
+	    fprintf(stderr, "\"%s\", ", lf_head->name);
+	fprintf(stderr, "line %d: ", inline_num);
+    }
+}
 
 /*
  * os_error() is just like int_error() except that it calls perror().
@@ -1010,17 +1043,8 @@ os_error(int t_num, const char *str, va_dcl)
 #endif /* VMS */
 
     /* reprint line if screen has been written to */
+    print_line_with_error(t_num);
 
-    if (t_num == DATAFILE) {
-	df_showdata();
-    } else if (t_num != NO_CARET) {	/* put caret under error */
-	if (!screen_ok)
-	    PRINT_MESSAGE_TO_STDERR;
-
-	PRINT_SPACES_UNDER_PROMPT;
-	PRINT_SPACES_UPTO_TOKEN;
-	PRINT_CARET;
-    }
     PRINT_SPACES_UNDER_PROMPT;
 
 #ifdef VA_START
@@ -1035,9 +1059,6 @@ os_error(int t_num, const char *str, va_dcl)
     fprintf(stderr, str, a1, a2, a3, a4, a5, a6, a7, a8);
 #endif
     putc('\n', stderr);
-
-    PRINT_SPACES_UNDER_PROMPT;
-    PRINT_FILE_AND_LINE;
 
 #ifdef VMS
     status[1] = vaxc$errno;
@@ -1067,19 +1088,7 @@ int_error(int t_num, const char str[], va_dcl)
     char error_message[128] = {'\0'};
 
     /* reprint line if screen has been written to */
-
-    if (t_num == DATAFILE) {
-	df_showdata();
-    } else if (t_num != NO_CARET) { /* put caret under error */
-	if (!screen_ok)
-	    PRINT_MESSAGE_TO_STDERR;
-
-	PRINT_SPACES_UNDER_PROMPT;
-	PRINT_SPACES_UPTO_TOKEN;
-	PRINT_CARET;
-    }
-    PRINT_SPACES_UNDER_PROMPT;
-    PRINT_FILE_AND_LINE;
+    print_line_with_error(t_num);
 
 #ifdef VA_START
     VA_START(args, str);
@@ -1133,19 +1142,7 @@ int_warn(int t_num, const char str[], va_dcl)
 #endif
 
     /* reprint line if screen has been written to */
-
-    if (t_num == DATAFILE) {
-	df_showdata();
-    } else if (t_num != NO_CARET) { /* put caret under error */
-	if (!screen_ok)
-	    PRINT_MESSAGE_TO_STDERR;
-
-	PRINT_SPACES_UNDER_PROMPT;
-	PRINT_SPACES_UPTO_TOKEN;
-	PRINT_CARET;
-    }
-    PRINT_SPACES_UNDER_PROMPT;
-    PRINT_FILE_AND_LINE;
+    print_line_with_error(t_num);
 
     fputs("warning: ", stderr);
 #ifdef VA_START
