@@ -1,5 +1,5 @@
 /*
- * $Id: screenbuf.c,v 1.2 2014/03/30 18:33:49 markisch Exp $
+ * $Id: screenbuf.c,v 1.3 2016/05/06 13:17:24 markisch Exp $
  */
 
 /* GNUPLOT - screenbuf.c 
@@ -99,6 +99,7 @@ lb_copy(LPLB dest, LPLB src)
     dest->attr = src->attr;
     dest->size = src->size;
     dest->len = src->len;
+    dest->def_attr = src->def_attr;
 }
 
 
@@ -136,10 +137,13 @@ lb_insert_str(LPLB lb, uint pos, LPCWSTR s, uint count)
     /* enlarge string buffer if necessary */
     if (lb->size <= (pos + count)) {
 	LPWSTR newstr;
+	PBYTE  newattr;
 	uint newsize = (((pos + count + 8) / 8) * 8 + 32);
-	newstr = (LPWSTR) realloc(lb->str, newsize  * sizeof(WCHAR));
-	if (newstr) {
+	newstr = (LPWSTR) realloc(lb->str, newsize * sizeof(WCHAR));
+	newattr = (PBYTE) realloc(lb->attr, newsize * sizeof(BYTE));
+	if (newstr && newattr) {
 	    lb->str = newstr;
+	    lb->attr = newattr;
 	    lb->size = newsize;
 	} else {
 	    /* memory allocation failed */
@@ -151,13 +155,17 @@ lb_insert_str(LPLB lb, uint pos, LPCWSTR s, uint count)
     }
     
     /* fill up with spaces */
-    if (pos > lb->len)
+    if (pos > lb->len) {
 	wmemset(lb->str + lb->len, L' ', pos - lb->len);
+	memset(lb->attr + lb->len, lb->def_attr, pos - lb->len);
+    }
 
     /* copy characters */
     wmemcpy(lb->str + pos, s, count);
+    memset(lb->attr + pos, lb->def_attr, count);
     lb->len = GPMAX(pos + count, lb->len);
     lb->str[lb->len] = NUL;
+    lb->attr[lb->len] = NUL;
 }
 
 
@@ -190,6 +198,45 @@ lb_substr(LPLB lb, uint offset, uint count)
     }
     retval[count] = NUL;
     return retval;
+}
+
+
+/*  lb_subattr:
+ *  get a sub-range of attribute from the line buffer, 
+ *  this result has to bee free'd afterwards!
+ */
+PBYTE
+lb_subattr(LPLB lb, uint offset, uint count)
+{
+    uint len;
+    PBYTE retval;
+
+    len = (lb != NULL) ? lb->len : 0;
+
+    /* allocate return string */
+    retval = (PBYTE) malloc((count + 1) * sizeof(BYTE));
+    if (retval == NULL)
+	return NULL;
+
+    if (offset >= len) {
+	memset(retval, lb->def_attr, count);
+    } else {
+	if (len >= (count + offset)) {
+	    memcpy(retval, lb->attr + offset, count);    
+	} else {
+	    memcpy(retval, lb->attr + offset, len - offset);
+	    memset(retval + len - offset, lb->def_attr, count + offset - len);
+	}
+    }
+    retval[count] = NUL;
+    return retval;
+}
+
+
+void
+lb_set_attr(LPLB lb, BYTE attr)
+{
+    lb->def_attr = attr;
 }
 
 
@@ -316,6 +363,7 @@ sb_get(LPSB sb, uint index)
 	    if (lb->str) {
 		sb->current_line->len = count;
 		sb->current_line->str = lb->str + start;
+		sb->current_line->attr = lb->attr + start;
 		//lb_insert_str(sb->current_line, 0, lb->str + start, count);
 	    }
 

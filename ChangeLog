@@ -1,3 +1,10 @@
+2016-07-04  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/win/screenbuf.c|h src/win/wtext.c:  Handling of color attributes
+	was lost during the revision of the text window internals for version
+	4.6 in 2011.  It turns out that it isn't too difficult to re-add that
+	feature again.
+
 2016-07-03  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/util.c (print_line_with_error):  Replace macros

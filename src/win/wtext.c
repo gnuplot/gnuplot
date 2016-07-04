@@ -1,5 +1,5 @@
 /*
- * $Id: wtext.c,v 1.65 2016/07/02 06:35:12 markisch Exp $
+ * $Id: wtext.c,v 1.66 2016/07/02 08:28:00 markisch Exp $
  */
 
 /* GNUPLOT - win/wtext.c */
@@ -120,12 +120,11 @@ static const COLORREF TextColorTable[16] = {
 	RGB(255,255,0),		/* yellow */
 	RGB(255,255,255),	/* white */
 };
-#define NOTEXT 0xF0
+#define NOTEXT 0xF0 /* black on white */
 #define MARKFORE RGB(255,255,255)
 #define MARKBACK RGB(0,0,128)
-#define TextFore(attr) TextColorTable[(attr) & 15]
-#define TextBack(attr) TextColorTable[(attr>>4) & 15]
-
+#define TextFore(attr) TextColorTable[(attr     ) & 0x0f]
+#define TextBack(attr) TextColorTable[(attr >> 4) & 0x0f]
 
 
 void
@@ -205,14 +204,14 @@ TextInit(LPTW lptw)
     if (!lptw->nCmdShow)
 	lptw->nCmdShow = SW_SHOWNORMAL;
     if (!lptw->Attr)
-	lptw->Attr = 0xf0;	/* black on white */
+	lptw->Attr = NOTEXT;
 
     /* init ScreenBuffer, add emtpy line buffer,
        initial size has already been read from wgnuplot.ini
     */
     sb_init(&(lptw->ScreenBuffer), lptw->ScreenBuffer.size);
-    /* TODO: add attribute support (NOTEXT) */
     lb_init(&lb);
+    lb_set_attr(&lb, NOTEXT);
     sb_append(&(lptw->ScreenBuffer), &lb);
 
     hglobal = GlobalAlloc(LHND, lptw->KeyBufSize);
@@ -269,10 +268,8 @@ TextInit(LPTW lptw)
     AppendMenu(lptw->hPopMenu, MF_STRING, M_PASTE, "&Paste\tShift-Ins");
     AppendMenu(lptw->hPopMenu, MF_SEPARATOR, 0, NULL);
     AppendMenu(lptw->hPopMenu, MF_STRING, M_CHOOSE_FONT, "Choose &Font...");
-/*  FIXME: Currently not implemented
     AppendMenu(lptw->hPopMenu, MF_STRING | (lptw->bSysColors ? MF_CHECKED : MF_UNCHECKED),
 	       M_SYSCOLORS, "&System Colors");
-*/
     AppendMenu(lptw->hPopMenu, MF_STRING | (lptw->bWrap ? MF_CHECKED : MF_UNCHECKED),
 	       M_WRAP, "&Wrap long lines");
     if (lptw->IniFile != (LPSTR)NULL) {
@@ -383,10 +380,11 @@ NewLine(LPTW lptw)
     /* append an empty line buffer,
        dismiss previous lines if necessary */
     lplb = sb_get_last(&(lptw->ScreenBuffer));
+    lb_set_attr(lplb, NOTEXT);
     lb_init(&lb);
+    lb_set_attr(&lb, NOTEXT);
     /* return value is the number of lines which got dismissed */
     ycorr = sb_append(&(lptw->ScreenBuffer), &lb);
-    /* TODO: add attribute support (NOTEXT) */
 
     last_lines = sb_lines(&(lptw->ScreenBuffer), lplb);
     lptw->CursorPos.x = 0;
@@ -500,9 +498,6 @@ UpdateText(LPTW lptw, int count)
 	SetTextColor(hdc, GetSysColor(COLOR_WINDOWTEXT));
 	SetBkColor(hdc, GetSysColor(COLOR_WINDOW));
     } else {
-	/* ignore attribute settings for now */
-	/* TODO: remove the following line when attribute support is added again */
-	lptw->Attr = 0xf0;
 	SetTextColor(hdc, TextFore(lptw->Attr));
 	SetBkColor(hdc, TextBack(lptw->Attr));
     }
@@ -531,7 +526,7 @@ UpdateText(LPTW lptw, int count)
 	    DoLine(lptw, hdc, 0, ypos, 0, y + yofs, width);
 	}
     } else {
-	LPLB   lb;
+	LPLB lb;
 	LPWSTR wstr;
 	int width, ypos;
 
@@ -676,6 +671,7 @@ TextPutChW(LPTW lptw, WCHAR ch)
 	    break;
 	case '\t': {
 	    uint tab = 8 - (lptw->CursorPos.x  % 8);
+	    lb_set_attr(sb_get_last(&(lptw->ScreenBuffer)), lptw->Attr);
 	    sb_last_insert_str(&(lptw->ScreenBuffer), lptw->CursorPos.x, L"        ", tab);
 	    UpdateText(lptw, tab);
 	    if (lptw->bSuspend == 0) {
@@ -695,8 +691,8 @@ TextPutChW(LPTW lptw, WCHAR ch)
 		lptw->CursorPos.y = 0;
 	    break;
 	default:
+	    lb_set_attr(sb_get_last(&(lptw->ScreenBuffer)), lptw->Attr);
 	    sb_last_insert_str(&(lptw->ScreenBuffer), lptw->CursorPos.x, &ch, 1);
-	    /* TODO: add attribute support */
 	    UpdateText(lptw, 1);
 	    if (lptw->bSuspend == 0) {
 		/* maximum line size may have changed, so update scroll bars */
@@ -719,6 +715,7 @@ TextPutStr(LPTW lptw, LPSTR str)
     w_save = w = UnicodeText(str, encoding);
     while (*w != NUL) {
 	idx = lptw->CursorPos.x;
+	lb_set_attr(sb_get_last(&(lptw->ScreenBuffer)), lptw->Attr);
 	for (count = 0, n = 0; (*w != NUL) && (iswprint(*w) || (*w == L'\t')); w++) {
 	    if (*w == L'\t') {
 		uint tab;
@@ -726,7 +723,6 @@ TextPutStr(LPTW lptw, LPSTR str)
 		tab = 8 - ((lptw->CursorPos.x + count + n) % 8);
 		sb_last_insert_str(&(lptw->ScreenBuffer), idx, w - n, n);
 		sb_last_insert_str(&(lptw->ScreenBuffer), idx + n, L"        ", tab);
-		/* TODO: add attribute support (lptw->Attr) */
 		idx += n + tab;
 		count += n + tab;
 		n = 0;
@@ -833,34 +829,31 @@ DoLine(LPTW lptw, HDC hdc, int xpos, int ypos, int x, int y, int count)
     int idx, num;
     LPLB lb;
     LPWSTR w;
+    PBYTE  a, pa;
+    BYTE attr;
 
     idx = 0;
-    num = count;
     if (y <= sb_length(&(lptw->ScreenBuffer))) {
 	lb = sb_get(&(lptw->ScreenBuffer), y);
+	if (lb  == NULL)
+	   return;
 	w = lb_substr(lb, x + idx, count - idx);
+	/* This sets the default color for "empty" cells. */
+	lb_set_attr(lb, NOTEXT);
+	a = lb_subattr(lb, x + idx, count - idx);
     } else {
 	/* FIXME: actually, we could just do nothing in this case */
 	w = (LPWSTR) malloc(sizeof(WCHAR) * (count + 1));
+	a = (PBYTE) malloc(sizeof(PBYTE) * (count + 1));
 	wmemset(w, L' ', count);
+	memset(a, NOTEXT, count);
 	w[count] = NUL;
+	a[count] = NUL;
     }
 
-    /* TODO: add attribute support */
-#if 1
-    if (lptw->bSysColors) {
-	SetTextColor(hdc, GetSysColor(COLOR_WINDOWTEXT));
-	SetBkColor(hdc, GetSysColor(COLOR_WINDOW));
-    } else {
-	/* ignore user color right now */
-	SetTextColor(hdc, TextFore(0xf0));
-	SetBkColor(hdc, TextBack(0xf0));
-    }
-    TextOutW(hdc, xpos, ypos, w, count - idx);
-    free(w);
-#else
+    num = count;
+    pa = a;
     while (num > 0) {
-	num = 0;
 	attr = *pa;
 	while ((num > 0) && (attr == *pa)) {
 	    /* skip over bytes with same attribute */
@@ -875,14 +868,13 @@ DoLine(LPTW lptw, HDC hdc, int xpos, int ypos, int x, int y, int count)
 	    SetTextColor(hdc, TextFore(attr));
 	    SetBkColor(hdc, TextBack(attr));
 	}
-	outp = lb_substr(lb, x + idx, count - num - idx);
-	TextOut(hdc, xpos, ypos, outp, count - num - idx);
-	free(outp);
+	TextOutW(hdc, xpos, ypos, w + idx, count - num - idx);
 
 	xpos += lptw->CharSize.x * (count - num - idx);
-	idx = count-num;
+	idx = count - num;
     }
-#endif
+    free(w);
+    free(a);
     TextUpdateStatus(lptw);
 }
 
