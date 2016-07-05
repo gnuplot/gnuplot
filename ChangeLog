@@ -1,24 +1,19 @@
-2016-07-04  Bastian Maerkisch  <bmaerkisch@web.de>
-
-	* src/win/screenbuf.c|h src/win/wtext.c:  Handling of color attributes
-	was lost during the revision of the text window internals for version
-	4.6 in 2011.  It turns out that it isn't too difficult to re-add that
-	feature again.
-
 2016-07-03  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/util.c (print_line_with_error):  Replace macros
 	PRINT_MESSAGE_TO_STDERR PRINT_SPACES_UPTO_TOKEN PRINT_FILE_AND_LINE
 	with new utility routine.  Add code to reconstruct the original input
-	line number by counting \n characters embedded in the command line
-	(e.g. from concatenation of successive lines in a bracketed clause).
+	line number by counting \n characters embedded in a command line
+	produced by concatenation of successive lines in a bracketed clause.
 
-	* src/graphics.c(plot_betweencurves):  The filled curve options
-	y=foo, below y=foo, etc were reworked to piggyback on the 'fill between'
-	code by loading ymax with foo on data input.  However this mechanism
+	* src/graphics.c(plot_betweencurves):  The filled curve options y=foo,
+	below y=foo, etc were reworked to piggyback on the 'fill between' code
+	by pre-loading ymax with foo on data input.  However this mechanism
 	breaks if the curve is smoothed because ymax is lost during smoothing.
 	Revert the case of smooth + filledcurves + y=foo to use the original
-	FILLEDCURVES_ATY1 code.
+	FILLEDCURVES_ATY1 code.  This original rationale (IIRC) was to get
+	better clipping but since we now have good general case polygon
+	clipping perhaps all the piggyback cases should be reverted.
 
 2016-07-02  Bastian Maerkisch  <bmaerkisch@web.de>
 
