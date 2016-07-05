@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.464.2.28 2016/05/11 18:39:44 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.464.2.29 2016/07/03 04:59:41 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -763,10 +763,18 @@ do_plot(struct curve_points *plots, int pcount)
 		break;
 
 	    case FILLEDCURVES:
-		if (this_plot->filledcurves_options.closeto == FILLEDCURVES_ATY1
+		if (this_plot->filledcurves_options.closeto == FILLEDCURVES_BETWEEN) {
+		    plot_betweencurves(this_plot);
+		} else if (!this_plot->plot_smooth &&
+		   (this_plot->filledcurves_options.closeto == FILLEDCURVES_ATY1
 		||  this_plot->filledcurves_options.closeto == FILLEDCURVES_ATY2
-		||  this_plot->filledcurves_options.closeto == FILLEDCURVES_ATR
-		||  this_plot->filledcurves_options.closeto == FILLEDCURVES_BETWEEN) {
+		||  this_plot->filledcurves_options.closeto == FILLEDCURVES_ATR)) {
+		    /* Smoothing may have trashed the original contents	*/
+		    /* of the 2nd y data column, so piggybacking on the	*/
+		    /* code for FILLEDCURVES_BETWEEN will not work.	*/
+		    /* FIXME: Maybe piggybacking is always a bad idea?		*/
+		    /* IIRC the original rationale was to get better clipping	*/
+		    /* but the general polygon clipping code should now work.	*/
 		    plot_betweencurves(this_plot);
 		} else {
 		    plot_filledcurves(this_plot);
@@ -1276,13 +1284,8 @@ plot_betweencurves(struct curve_points *plot)
     /* Jan 2015: We are now using the plot_between code to also handle option
      * y=atval, but the style option in the plot header does not reflect this.
      * Change it here so that finish_filled_curve() doesn't get confused.
-     * Jun 2016: However smoothing may have trashed the original contents of
-     * y2, so FILLEDCURVES_BETWEEN will not work. Best would be to refill y2
-     * or change the order so that the smoothing happens before filling it
-     * the first time, but for now try falling back to the old code path.
      */
-    if (!plot->plot_smooth)
-	plot->filledcurves_options.closeto = FILLEDCURVES_BETWEEN;
+    plot->filledcurves_options.closeto = FILLEDCURVES_BETWEEN;
 
     /*
      * Fill the region one quadrilateral at a time.

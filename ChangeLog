@@ -1,11 +1,13 @@
-2016-07-03  Ethan A Merritt  <merritt@u.washington.edu>
+2016-07-05  Ethan A Merritt  <merritt@u.washington.edu>
 
-	* src/graphics.c(plot_betweencurves):  The filled curve options
-	y=foo, below y=foo, etc were reworked to piggyback on the 'fill between'
-	code by loading ymax with foo on data input.  However this mechanism
+	* src/graphics.c(plot_betweencurves):  The filled curve options y=foo,
+	below y=foo, etc were reworked to piggyback on the 'fill between' code
+	by pre-loading ymax with foo on data input.  However this mechanism
 	breaks if the curve is smoothed because ymax is lost during smoothing.
 	Revert the case of smooth + filledcurves + y=foo to use the original
-	FILLEDCURVES_ATY1 code.
+	FILLEDCURVES_ATY1 code.  This original rationale (IIRC) was to get
+	better clipping but since we now have good general case polygon
+	clipping perhaps all the piggyback cases should be reverted.
 
 2016-06-22  Ethan A Merritt  <merritt@u.washington.edu>
 
