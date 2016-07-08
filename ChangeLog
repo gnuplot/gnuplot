@@ -5,6 +5,9 @@
 
 	* term/pslatex.trm: Implement textbox margins.
 
+	* src/qtterminal/qt_term.cpp src/qtterminal/QtGnuplotScene.cpp:
+	Implement textbox margins.
+
 	* src/wxterminal/gp_cairo.c (gp_cairo_boxed_text): Reduce textbox
 	margin size and linewidth to better match other terminals.
 

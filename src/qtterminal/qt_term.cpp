@@ -1514,7 +1514,10 @@ void qt_hypertext( int type, const char *text )
 #ifdef EAM_BOXED_TEXT
 void qt_boxed_text(unsigned int x, unsigned int y, int option)
 {
-	qt->out << GETextBox << qt_termCoordF(x, y) << option;
+	if (option == TEXTBOX_MARGINS)
+	    qt->out << GETextBox << QPointF((double)x/(100*qt_oversamplingF), (double)y/(100*qt_oversamplingF)) << option;
+	else
+	    qt->out << GETextBox << qt_termCoordF(x, y) << option;
 }
 #endif
 
