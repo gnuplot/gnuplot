@@ -5,6 +5,9 @@
 
 	* term/pslatex.trm: Implement textbox margins.
 
+	* src/wxterminal/gp_cairo.c (gp_cairo_boxed_text): Reduce textbox
+	margin size and linewidth to better match other terminals.
+
 2016-07-03  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/util.c (print_line_with_error):  Replace macros
