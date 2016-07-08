@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: pslatex.trm,v 1.90.2.2 2015/07/11 22:03:10 sfeam Exp $
+ * $Id: pslatex.trm,v 1.90.2.3 2015/08/01 22:59:21 broeker Exp $
  */
 
 /* GNUPLOT - pslatex.trm */
@@ -141,8 +141,10 @@ TERM_PUBLIC void cairotrm_set_color __PROTO ((t_colorspec *colorspec));
 
 /* State variables for boxed text */
 static TBOOLEAN PSLATEX_inbox = FALSE;
+static TBOOLEAN PSLATEX_saved = FALSE;
 static int PSLATEX_xbox, PSLATEX_ybox;
-
+static double PSLATEX_xmargin = 1.0;
+static double PSLATEX_ymargin = 1.0;
 
 /* Common functions for epslatex and ps(la)tex */
 
@@ -537,6 +539,7 @@ EPSLATEX_common_init()
 
             fputs("\
 % Load packages\n\
+\\usepackage{calc}\n\
 \\usepackage{graphicx}\n\
 \\usepackage{color}\n", gpoutfile);
 
@@ -750,9 +753,18 @@ EPSLATEX_put_text(unsigned int x, unsigned int y, const char *str)
 	    tex_color_synced = TRUE;
 	}
 	if (PSLATEX_inbox) {
-	    fprintf(gpoutfile, "      \\savebox{\\gptboxtext}{%s}\n", str);
+	    if (PSLATEX_saved)
+		return;
+	    fprintf(gpoutfile,
+		"      \\settowidth{\\gptboxwidth}{\\widthof{%s}}\n", str);
+	    fprintf(gpoutfile, "\t\\advance\\gptboxwidth by %d\\fboxsep\n",
+		(int)(2. * PSLATEX_xmargin + 0.5));
+	    fprintf(gpoutfile,
+		"      \\savebox{\\gptboxtext}{\\parbox[c][\\totalheight+%d\\fboxsep]{\\gptboxwidth}{\\centering{%s}}}\n", 
+		(int)(2. * PSLATEX_ymargin + 0.5), str);
 	    PSLATEX_xbox = x;
 	    PSLATEX_ybox = y;
+	    PSLATEX_saved = TRUE;
 	} else {
 	    fprintf(gpoutfile, "      \\put(%d,%d){", x, y);
 	    if (ps_ang)
@@ -985,6 +997,7 @@ EPSLATEX_boxed_text(unsigned int x, unsigned int y, int option)
     case TEXTBOX_INIT:
 	/* Initialize bounding box for this text string */
 	PSLATEX_inbox = TRUE;
+	PSLATEX_saved = FALSE;
 	break;
     case TEXTBOX_FINISH:
 	PSLATEX_inbox = FALSE;
@@ -1025,7 +1038,10 @@ EPSLATEX_boxed_text(unsigned int x, unsigned int y, int option)
 	    fprintf(gpoutfile, "{\\colorbox{white}{\\usebox{\\gptboxtext}}}}\n");
 	    break;
 	}
+	break;
     case TEXTBOX_MARGINS:
+	PSLATEX_xmargin = (double)x / 100.;
+	PSLATEX_ymargin = (double)y / 100.;
 	break;
     default:
 	break;

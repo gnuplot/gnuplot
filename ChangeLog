@@ -1,3 +1,18 @@
+2016-07-08  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/gadgets.c (write_label): Consolidate code to create a textbox for
+	this label.
+
+	* term/pslatex.trm: Implement textbox margins for epslatex.
+	Note that textbox margins are undocumented and not yet completely
+	implemented.
+
+	* src/qtterminal/qt_term.cpp src/qtterminal/QtGnuplotScene.cpp:
+	Implement textbox margins for qt.
+
+	* src/wxterminal/gp_cairo.c (gp_cairo_boxed_text): Reduce textbox
+	margin size and linewidth to better match other terminals.
+
 2016-07-05  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c(plot_betweencurves):  The filled curve options y=foo,

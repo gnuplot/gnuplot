@@ -109,6 +109,7 @@ private:
 	bool    m_preserve_visibility;
 	bool	m_inTextBox;
 	QRectF	m_currentTextBox;
+	QPointF m_textMargin;
 	QList<QGraphicsItem*> m_currentGroup;
 	QtGnuplotPoints* m_currentPointsItem;
 
