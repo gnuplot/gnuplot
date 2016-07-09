@@ -1,3 +1,7 @@
+2016-07-09  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* Bump PATCHLEVEL to 5.0.4
+
 2016-07-08  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/gadgets.c (write_label): Consolidate code to create a textbox for
