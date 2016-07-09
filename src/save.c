@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.303 2016/05/08 04:22:46 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.304 2016/05/27 04:20:23 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -1210,8 +1210,10 @@ save_num_or_time_input(FILE *fp, double x, struct axis *this_axis)
 void
 save_style_parallel(FILE *fp)
 {
+    if (fp == stderr)
+	fputs("\t",fp);
     fprintf(fp, "set style parallel %s ",
-	    parallel_axis_style.layer == LAYER_BACK ? "back" : "front");
+	parallel_axis_style.layer == LAYER_BACK ? "back" : "front");
     save_linetype(fp, &(parallel_axis_style.lp_properties), FALSE);
     fprintf(fp, "\n");
 }
