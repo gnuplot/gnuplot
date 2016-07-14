@@ -11,6 +11,7 @@ if (strstrt(GPVAL_TERMINALS, " windows ") == 0) {
 } else {
    fontspec = "Times New Roman,12"
 }
+MANUAL_FIGURES = 1
 
 if (!exists("winhelp")) winhelp = 0
 if (winhelp == 0) {
@@ -583,6 +584,14 @@ set jitter over 0.5 spread 1.9 square
 set title "square"
 replot
 unset multiplot
+
+# Custom key placement
+reset
+set output out . 'figure_multiple_keys' . ext
+set xtics font ",6"  offset 0,1
+set label 1 font ",10"
+set key font ",9" spacing 0.5
+load '../demo/custom_key.dem'
 
 # close last file
 unset outp

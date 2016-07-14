@@ -208,6 +208,8 @@ C
 
  * Support for nonlinear axes (see `set nonlinear`).
 
+ * Customized plot legends (see `plot title`, `set key`, `multiple keys`)
+
 3 Version 5.0
 
  * The dot-dash pattern of a line can now be specified independent of other
@@ -6920,9 +6922,8 @@ Ffigure_jitter
 ?plot title
 ?splot title
 ?columnheader
- By default each plot is labeled in the key using the corresponding function or
- file name.  The `title` option lets you provide instead an explicit plot label
- to appear in the key.
+ By default each plot is listed in the key by the corresponding function or file
+ name. You can give an explicit plot title instead using the `title` option.
 
  Syntax:
        title <text> | notitle [<ignored text>]
@@ -9541,9 +9542,9 @@ Ffigure_missing
 ?key
 ?nokey
 ?legend
- The `set key` command enables a key (or legend) containing a title and a
- sample (line, point, box) for each plot in the graph. The key may be turned off
- by requesting `set key off` or `unset key`.  Individual key entries may be
+ The `set key` command enable generation of a key (or legend) containing a title
+ and a sample line (or point, box, etc) for each plot in the graph. The key may
+ be turned off by `set key off` or `unset key`.  Individual key entries may be
  turned off by using the `notitle` keyword in the corresponding plot command.
  The text of the titles is controlled by the `set key autotitle` option or by
  the `title` keyword of individual `plot` and `splot` commands.
@@ -9680,6 +9681,10 @@ Ffigure_missing
 ?commands set key placement
 ?set key placement
 ?key placement
+ This section describes placement of the primary, auto-generated key.
+ To construct a secondary key or place plot titles elsewhere, see
+ `multiple keys`.
+
  To understand positioning, the best concept is to think of a region, i.e.,
  inside/outside, or one of the margins.  Along with the region, keywords
  `left/center/right` (l/c/r) and `top/center/bottom` (t/c/b) control where
@@ -9768,6 +9773,25 @@ Ffigure_missing
  putting a box around the key and you are using control characters in the text.
  `gnuplot` simply counts the number of characters in the string when computing
  the box width; this allows you to correct it.
+4 multiple keys
+?multiple keys
+?set key multiple keys
+?key multiple keys
+=legend
+Ffigure_multiple_keys
+ It is possible to construct a legend/key manually rather than having the plot
+ titles all appear in the auto-generated key. This allows, for example, creating
+ a single legend for the component panels in a multiplot.
+ Here is an example:
+        set multiplot layout 3,2 columnsfirst
+        set style data boxes
+        plot $D using 0:6  lt 1 title at 0.75, 0.20
+        plot $D using 0:12 lt 2 title at 0.75, 0.17
+        plot $D using 0:13 lt 3 title at 0.75, 0.14
+        plot $D using 0:14 lt 4 title at 0.75, 0.11
+        set style data linespoints
+        plot $D using 0:(tot(6,12,13,14)) title "total"
+        unset multiplot
 3 label
 ?commands set label
 ?commands unset label

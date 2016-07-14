@@ -1,3 +1,8 @@
+2016-07-14  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* docs/gnuplot.doc docs/plotstyles.gnu demo/custom_key.dem:
+	Add custom key demo figure to the documentation.
+
 2016-07-08  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/gadgets.c (write_label): Consolidate code to create a textbox for

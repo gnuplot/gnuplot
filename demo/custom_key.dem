@@ -11,21 +11,23 @@ unset xtics
 set xrange [-0.5:7.5]
 set offset 0,0,graph .1,0
 
-set label 1 at screen 0.75, screen 0.24 "Custom key area for plot titles" font ":Bold" center
+set label 1 at screen 0.75, screen 0.22 "{/:Bold Custom combined key area}" center
 set key autotitle columnhead nobox title "  "
 set multiplot layout 3,2 columnsfirst \
               title "{/:Bold Illustrate use of a custom key area}" \
               margins 0.05, 0.95, 0.05, 0.90 spacing 0.0, 0.0
 
-plot 'immigration.dat' using 0:6   lt 1 title at 0.75, 0.20
-plot 'immigration.dat' using 0:12  lt 2 title at 0.75, 0.17
-plot 'immigration.dat' using 0:13  lt 3 title at 0.75, 0.14
-plot 'immigration.dat' using 0:14  lt 4 title at 0.75, 0.11
-set xtics scale 0
+plot 'immigration.dat' using 0:6   lt 1 title at 0.75, 0.18
+plot 'immigration.dat' using 0:12  lt 2 title at 0.75, 0.15
+plot 'immigration.dat' using 0:13  lt 3 title at 0.75, 0.12
+plot 'immigration.dat' using 0:14  lt 4 title at 0.75, 0.09
+set xtics scale 0 font ",8"
+
 plot 'immigration.dat' using 0:($6+$12+$13+$14):xtic(strcol(1)[6:]) with linespoints \
                                    lt black pt 7 title "total"
 
 unset multi
-pause -1 "Hit return to continue"
+
+if (!exists("MANUAL_FIGURES")) pause -1 "Hit return to continue"
 
 reset
