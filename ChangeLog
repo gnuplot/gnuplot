@@ -3,6 +3,16 @@
 	* docs/gnuplot.doc docs/plotstyles.gnu demo/custom_key.dem:
 	Add custom key demo figure to the documentation.
 
+	* src/boundary.c (do_key_layout):
+	The command 'set key spacing <foo>' adjusts the vertical spacing of
+	entries in the key.  However a complicated minimum size test caused the
+	result to be discontinuous as a function of <foo>.
+	I.e. 'set key spacing 2' came out the same as 'set key spacing 1' 
+	but both were smaller than 'set key spacing 1.8'.
+	This patch makes the vertical spacing a simple multiplier for
+	character height in the current font.  It also dissociates the
+	height of the key sample itself from the line spacing.
+
 2016-07-08  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/gadgets.c (write_label): Consolidate code to create a textbox for

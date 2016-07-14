@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.998 2016/07/14 19:12:24 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.999 2016/07/15 03:28:14 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -9542,9 +9542,9 @@ Ffigure_missing
 ?key
 ?nokey
 ?legend
- The `set key` command enable generation of a key (or legend) containing a title
- and a sample line (or point, box, etc) for each plot in the graph. The key may
- be turned off by `set key off` or `unset key`.  Individual key entries may be
+ The `set key` command enables a key (or legend) containing a title and a
+ sample (line, point, box) for each plot in the graph. The key may be turned off
+ by requesting `set key off` or `unset key`.  Individual key entries may be
  turned off by using the `notitle` keyword in the corresponding plot command.
  The text of the titles is controlled by the `set key autotitle` option or by
  the `title` keyword of individual `plot` and `splot` commands.
@@ -9559,7 +9559,7 @@ Ffigure_missing
              {{no}enhanced}
              {{no}opaque}
              {{no}reverse} {{no}invert}
-             {samplen <sample_length>} {spacing <vertical_spacing>}
+             {samplen <sample_length>} {spacing <line_spacing>}
              {width <width_increment>} {height <height_increment>}
              {{no}autotitle {columnheader}}
              {title {"<text>"} {{no}enhanced} {center | left | right}}
@@ -9634,7 +9634,7 @@ Ffigure_missing
  `left`
 
  The defaults for `set key` are `on`, `right`, `top`, `vertical`, `Right`,
- `noreverse`, `noinvert`, `samplen 4`, `spacing 1.25`, `title ""`, and
+ `noreverse`, `noinvert`, `samplen 4`, `spacing 1`, `notitle`, and
  `nobox`.  The default <linetype> is the same as that used for the plot
  borders.  Entering `set key default` returns the key to its default
  configuration.
@@ -9763,10 +9763,8 @@ Ffigure_missing
  the key since these are drawn at the midpoint of the sample line, even if
  the sample line itself is not drawn.
 
- The vertical spacing between lines is controlled by `spacing`.  The spacing
- is set equal to the product of the pointsize, the vertical tic size, and
- <vertical_spacing>.  The program will guarantee that the vertical spacing is
- no smaller than the character height.
+ Key entry lines are single-spaced based on the current font size.
+ This can be adjusted by `set key spacing <line-spacing>`.
 
  The <width_increment> is a number of character widths to be added to or
  subtracted from the length of the string.  This is useful only when you are
@@ -9789,10 +9787,8 @@ Ffigure_multiple_keys
         plot $D using 0:12 lt 2 title at 0.75, 0.17
         plot $D using 0:13 lt 3 title at 0.75, 0.14
         plot $D using 0:14 lt 4 title at 0.75, 0.11
-        set style data linespoints
-        set label 1 at screen 0.75, screen 0.22
-        set label 1 "Custom combined key area"
-        plot $D using 0:($6+$12+$13+$14) title "total"
+        set label 1 at screen 0.75, screen 0.22 "Custom combined key area"
+        plot $D using 0:($6+$12+$13+$14) with linespoints title "total"
         unset multiplot
 3 label
 ?commands set label

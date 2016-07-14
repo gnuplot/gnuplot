@@ -1,5 +1,5 @@
 /*
- * $Id: boundary.c,v 1.31 2016/03/09 04:40:01 sfeam Exp $
+ * $Id: boundary.c,v 1.32 2016/05/09 03:32:27 sfeam Exp $
  */
 
 /* GNUPLOT - boundary.c */
@@ -48,6 +48,7 @@ static int xlablin, x2lablin, ylablin, y2lablin, titlelin, xticlin, x2ticlin;
 
 /*{{{  local and global variables */
 static int key_sample_width;	/* width of line sample */
+static int key_sample_height;	/* sample itself; does not scale with "set key spacing" */
 static int key_sample_left;	/* offset from x for left of line sample */
 static int key_sample_right;	/* offset from x for right of line sample */
 static int key_text_left;	/* offset from x for left-justified text */
@@ -982,9 +983,8 @@ do_key_layout(legend_key *key)
 	key_sample_width = 0;
     }
 
-    key_entry_height = t->v_tic * 1.25 * key->vert_factor;
-    if (key_entry_height < t->v_char)
-	key_entry_height = t->v_char * key->vert_factor;
+    key_sample_height = GPMAX( t->v_tic, t->v_char );
+    key_entry_height = key_sample_height * key->vert_factor;
     /* HBB 20020122: safeguard to prevent division by zero later */
     if (key_entry_height == 0)
 	key_entry_height = 1;
@@ -1229,16 +1229,16 @@ do_key_sample(
 	struct fill_style_type *fs = &this_plot->fill_properties;
 	int style = style_from_fill(fs);
 	unsigned int x = xl + key_sample_left;
-	unsigned int y = yl - key_entry_height/4;
+	unsigned int y = yl - key_sample_height/4;
 	unsigned int w = key_sample_right - key_sample_left;
-	unsigned int h = key_entry_height/2;
+	unsigned int h = key_sample_height/2;
 
 #ifdef EAM_OBJECTS
 	if (this_plot->plot_style == CIRCLES && w > 0) {
-	    do_arc(xl + key_point_offset, yl, key_entry_height/4, 0., 360., style, FALSE);
+	    do_arc(xl + key_point_offset, yl, key_sample_height/4, 0., 360., style, FALSE);
 	    /* Retrace the border if the style requests it */
 	    if (need_fill_border(fs)) {
-	        do_arc(xl + key_point_offset, yl, key_entry_height/4, 0., 360., 0, FALSE);
+	        do_arc(xl + key_point_offset, yl, key_sample_height/4, 0., 360., 0, FALSE);
 	    }
 	} else if (this_plot->plot_style == ELLIPSES && w > 0) {
 	    t_ellipse *key_ellipse = (t_ellipse *) gp_alloc(sizeof(t_ellipse),
@@ -1267,14 +1267,14 @@ do_key_sample(
 	    ||   style == FS_EMPTY
 	    ||   need_fill_border(fs)) {
 		newpath();
-		draw_clip_line( xl + key_sample_left,  yl - key_entry_height/4,
-			    xl + key_sample_right, yl - key_entry_height/4);
-		draw_clip_line( xl + key_sample_right, yl - key_entry_height/4,
-			    xl + key_sample_right, yl + key_entry_height/4);
-		draw_clip_line( xl + key_sample_right, yl + key_entry_height/4,
-			    xl + key_sample_left,  yl + key_entry_height/4);
-		draw_clip_line( xl + key_sample_left,  yl + key_entry_height/4,
-			    xl + key_sample_left,  yl - key_entry_height/4);
+		draw_clip_line( xl + key_sample_left,  yl - key_sample_height/4,
+				xl + key_sample_right, yl - key_sample_height/4);
+		draw_clip_line( xl + key_sample_right, yl - key_sample_height/4,
+				xl + key_sample_right, yl + key_sample_height/4);
+		draw_clip_line( xl + key_sample_right, yl + key_sample_height/4,
+				xl + key_sample_left,  yl + key_sample_height/4);
+		draw_clip_line( xl + key_sample_left,  yl + key_sample_height/4,
+				xl + key_sample_left,  yl - key_sample_height/4);
 		closepath();
 	    }
 	    if (fs->fillstyle != FS_EMPTY && fs->fillstyle != FS_DEFAULT
