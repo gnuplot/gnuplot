@@ -1,5 +1,5 @@
 /*
- * $Id: wgdiplus.cpp,v 1.21 2016/03/06 19:25:15 markisch Exp $
+ * $Id: wgdiplus.cpp,v 1.22 2016/05/06 10:22:53 markisch Exp $
  */
 
 /*
@@ -889,6 +889,9 @@ drawgraph_gdiplus(LPGW lpgw, HDC hdc, LPRECT rect)
 				GraphChangeFont(lpgw, lpgw->fontname, save_fontsize, hdc, *rect);
 				SetFont(lpgw, hdc);
 				lpgw->fontsize = save_fontsize;
+
+				/* Set GDI text color */
+				SetTextColor(hdc, last_color);
 
 				draw_enhanced_text(lpgw, hdc, rect, xdash, ydash, str);
 				draw_get_enhanced_text_extend(&extend);
