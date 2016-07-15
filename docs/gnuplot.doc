@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.996 2016/07/06 04:44:10 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.998 2016/07/14 19:12:24 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -9790,7 +9790,9 @@ Ffigure_multiple_keys
         plot $D using 0:13 lt 3 title at 0.75, 0.14
         plot $D using 0:14 lt 4 title at 0.75, 0.11
         set style data linespoints
-        plot $D using 0:(tot(6,12,13,14)) title "total"
+        set label 1 at screen 0.75, screen 0.22
+        set label 1 "Custom combined key area"
+        plot $D using 0:($6+$12+$13+$14) title "total"
         unset multiplot
 3 label
 ?commands set label
