@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: readline.c,v 1.61 2014/02/12 20:42:53 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: readline.c,v 1.62 2014/05/09 22:14:12 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - readline.c */
@@ -552,15 +552,18 @@ fn_completion(size_t anchor_pos, int direction)
 	start = cur_line + anchor_pos;
 	if (anchor_pos > 0) {
 	    /* first, look for a quote to start the string */
-	    for ( ; start > cur_line; start--) {
+	    for ( ; start >= cur_line; start--) {
 	        if ((*start == '"') || (*start == '\'')) {
 		    start++;
+		    /* handle pipe commands */
+		    if ((*start == '<') || (*start == '|'))
+			start++;
 		    break;
 		}
 	    }
-	    /* if not found, search for a space instead */
-	    if (start == cur_line) {
-		for (start = cur_line + anchor_pos ; start > cur_line; start--) {
+	    /* if not found, search for a space or a system command '!' instead */
+	    if (start <= cur_line) {
+		for (start = cur_line + anchor_pos; start >= cur_line; start--) {
 		    if ((*start == ' ') || (*start == '!')) {
 			start++;
 			break;

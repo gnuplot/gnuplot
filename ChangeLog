@@ -5,6 +5,12 @@
 
 2016-07-31  Bastian Maerkisch  <bmaerkisch@web.de>
 
+	Backport bug-fixes from 5.1
+
+	* src/readline.c (fn_completion):  Allow filename completion for system
+	commands '!' and after pipe symbols '<', '|'.
+	Bug #1747
+
 	* src/win/wgraph.c (drawgraph) src/win/wgdiplus.cpp(drawgraph_gdiplus):
 	Missing cleanup of cached point symbols caused a sizeable resource
 	leak. Bugfix.
@@ -32,6 +38,12 @@
 	invoked by "plot $foo with image pixels".  Set the terminal flag
 	TERM_POLYGON_PIXELS so that the image processing code will call
 	term->filled_polygon() in preference to term->fillbox().
+
+2016-07-15  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/win/wgdiplus.cpp (W_enhanced_text):  Apply text color to enhanced
+	text.
+	Bug #1829
 
 2016-07-09  Ethan A Merritt  <merritt@u.washington.edu>
 
