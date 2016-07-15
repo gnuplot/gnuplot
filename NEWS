@@ -21,7 +21,7 @@ Changes in 5.0.4
 * FIX early program exit on replot+resize with inline data
 * FIX bad plot iteration with negative increment, e.g. plot for [i=9:1:-1] foo(i)
 * FIX smoothed curves could not be plotted as filledcurves; now they can be
-* FIX win terminal enhanced text color
+* FIX win terminal apply color to enhanced text
 
 Changes in 5.0.3
 ================

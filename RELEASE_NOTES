@@ -9,7 +9,7 @@ These release notes are for version 5.0 patchlevel 4 (5.0.4).
 This release contains bug-fixes and a few changes back-ported from the
 development version.
 
-Release Notes date: 18-Jun-2016
+Release Notes date: 15-Jul-2016
 
 This patchlevel 5.0.4 incremental release includes
 ==================================================
@@ -35,6 +35,7 @@ This patchlevel 5.0.4 incremental release includes
 * FIX early program exit on replot+resize with inline data
 * FIX bad plot iteration with negative increment, e.g. plot for [i=9:1:-1] foo(i)
 * FIX smoothed curves could not be plotted as filledcurves; now they can be
+* FIX win terminal apply color to enhanced text
 
 
 NOTABLE NEW FEATURES IN PATCHLEVEL 5.0.4
