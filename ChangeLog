@@ -1,3 +1,9 @@
+2016-07-15  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	src/win/wgdiplus.cpp (W_enhanced_text):  Apply text color to enhanced
+	text.
+	Bug #1829
+
 2016-07-14  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* docs/gnuplot.doc docs/plotstyles.gnu demo/custom_key.dem:
@@ -25,6 +31,13 @@
 
 	* src/wxterminal/gp_cairo.c (gp_cairo_boxed_text): Reduce textbox
 	margin size and linewidth to better match other terminals.
+
+2016-07-04  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/win/screenbuf.c|h src/win/wtext.c:  Handling of colored text
+	was lost when re-working the text window's internals for the 4.6
+	release in 2011.  Turns out that it is not too hard to re-enable
+	that again.
 
 2016-07-03  Ethan A Merritt  <merritt@u.washington.edu>
 
@@ -79,11 +92,11 @@
 	* src/history.c (gp_read_history):  Cast argument of isspace() to
 	unsigned char.
 
-	* src/readline.c (write_history_list):  Avoid adding extra leading
+	* src/history.c (write_history_list):  Avoid adding extra leading
 	spaces when saving to a file.  Index of history_get is zero-based
 	relative to history_base.
 
-	* src/readline.c (write_history_list):  Let the built-in readline use
+	* src/history.c (write_history_list):  Let the built-in readline use
 	the same code as is used for GNU readline and libedit.
 
 2016-06-17  Ethan A Merritt  <merritt@u.washington.edu>
