@@ -1,3 +1,11 @@
+2016-07-19  Jun Takimoto <takimoto-j@kba.biglobe.ne.jp>
+
+	* term/aquaterm.trm:  The AQUA_boxfill() routine scales very badly 
+	with the total number of rectangles, making it horribly slow when 
+	invoked by "plot $foo with image pixels".  Set the terminal flag
+	TERM_POLYGON_PIXELS so that the image processing code will call
+	term->filled_polygon() in preference to term->fillbox().
+
 2016-07-09  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* Bump PATCHLEVEL to 5.0.4
@@ -11,8 +19,8 @@
 	Note that textbox margins are undocumented and not yet completely
 	implemented.
 
-	* src/qtterminal/qt_term.cpp src/qtterminal/QtGnuplotScene.cpp:
-	Implement textbox margins for qt.
+	* src/qtterminal/qt_term.cpp src/qtterminal/QtGnuplotScene.cpp
+	src/qtterminal/QtGnuplotScene.h:  Implement textbox margins for qt.
 
 	* src/wxterminal/gp_cairo.c (gp_cairo_boxed_text): Reduce textbox
 	margin size and linewidth to better match other terminals.

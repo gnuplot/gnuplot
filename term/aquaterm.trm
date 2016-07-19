@@ -1,5 +1,5 @@
 /* -*- objc -*-
- * $Id: aquaterm.trm,v 1.51.2.3 2016/01/12 22:08:18 sfeam Exp $
+ * $Id: aquaterm.trm,v 1.51.2.4 2016/03/10 01:41:41 sfeam Exp $
  *
  */
 
@@ -659,6 +659,9 @@ AQUA_boxfill(int style, unsigned int x1, unsigned int y1, unsigned int width, un
   }
 
   NSRect scaledRect = NSMakeRect(x1/AQUA_RESOLUTION, y1/AQUA_RESOLUTION, width/AQUA_RESOLUTION, height/AQUA_RESOLUTION);
+  /* FIXME: Aquaterm eraseRect scales very badly with the total number of rectangles.
+   *        It is probably fixable, but is the erase operation necessary at all?
+   */
   [adapter eraseRect:scaledRect];
   [adapter addFilledRect:scaledRect];
   
@@ -956,7 +959,8 @@ TERM_TABLE_START(aqua_driver)
   /* optionals */
   AQUA_text_angle,
   AQUA_justify_text, AQUA_point, do_arrow, AQUA_set_font,
-  AQUA_pointsize, TERM_CAN_MULTIPLOT|TERM_NO_OUTPUTFILE|TERM_CAN_DASH,
+  AQUA_pointsize,
+  TERM_CAN_MULTIPLOT|TERM_NO_OUTPUTFILE|TERM_CAN_DASH|TERM_POLYGON_PIXELS,
   AQUA_suspend, AQUA_resume,
   AQUA_boxfill, AQUA_linewidth
 #ifdef USE_MOUSE
