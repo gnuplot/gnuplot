@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: history.c,v 1.39 2016/06/20 08:50:00 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: history.c,v 1.40 2016/06/20 08:54:17 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - history.c */
@@ -442,7 +442,7 @@ write_history_list(const int num, const char *const filename, const char *mode)
     for (i = istart; (list_entry = history_get(i + history_base)); i++) {
 	/* don't add line numbers when writing to file to make file loadable */
 	if (!is_file && !is_quiet)
-	    fprintf(out, "%5i   %s\n", i + history_base - 1, list_entry->line);
+	    fprintf(out, "%5i   %s\n", i + history_base, list_entry->line);
 	else
 	    fprintf(out, "%s\n", list_entry->line);
     }

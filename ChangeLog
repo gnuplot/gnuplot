@@ -1,3 +1,10 @@
+2016-07-20  Ethan A Merritt  <merritt@u.washington.edu>
+
+	* src/history.c (write_history_list):  Recent regression caused the 
+	the history list numbering to be off-by-one. E.g. "history !N"
+	mistakenly re-executed command N-1 rather than command N.
+	See also Bug #1763
+
 2016-07-19  Jun Takimoto <takimoto-j@kba.biglobe.ne.jp>
 
 	* term/aquaterm.trm:  The AQUA_boxfill() routine scales very badly 
