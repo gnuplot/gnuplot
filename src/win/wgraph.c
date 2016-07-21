@@ -1,5 +1,5 @@
 /*
- * $Id: wgraph.c,v 1.203 2016/05/07 09:26:36 markisch Exp $
+ * $Id: wgraph.c,v 1.204 2016/05/07 11:48:56 markisch Exp $
  */
 
 /* GNUPLOT - win/wgraph.c */
@@ -320,7 +320,7 @@ void
 GraphOp(LPGW lpgw, UINT op, UINT x, UINT y, LPCSTR str)
 {
 	if (str)
-		GraphOpSize(lpgw, op, x, y, str, _fstrlen(str)+1);
+		GraphOpSize(lpgw, op, x, y, str, strlen(str) + 1);
 	else
 		GraphOpSize(lpgw, op, x, y, NULL, 0);
 }
@@ -1685,7 +1685,6 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 	int polyi = 0;				/* number of points in ppt */
 	POINT *ppt;					/* storage of polyline/polygon-points */
 	unsigned int lastop=-1;		/* used for plotting last point on a line */
-	POINT cpoint;				/* current GDI location */
 
 	/* filled polygons and boxes */
 	unsigned int fillstyle = 0;	/* current fill style */
@@ -1830,37 +1829,6 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 		xdash = MulDiv(curptr->x, rr-rl-1, lpgw->xmax) + rl;
 		ydash = MulDiv(curptr->y, rt-rb+1, lpgw->ymax) + rb - 1;
 
-		/* ignore superfluous moves - see bug #1523 */
-		/* FIXME: we should do this in win.trm, not here */
-		if ((lastop == W_vect) && (curptr->op == W_move) && (xdash == ppt[polyi -1].x) && (ydash == ppt[polyi -1].y)) {
-		    curptr->op = 0;
-		}
-
-		/* finish last polygon / polyline */
-		if ((lastop == W_vect) && (curptr->op != W_vect) && (curptr->op != 0)) {
-			if (polyi >= 2) {
-#ifdef HAVE_GDIPLUS
-				if (lpgw->antialiasing)
-					gdiplusPolyline(hdc, ppt, polyi, &cur_penstruct, alpha_c);
-				else
-#endif
-					Polyline(hdc, ppt, polyi);
-				/* move internal GDI state to last point */
-				MoveTo(hdc, ppt[polyi-1].x, ppt[polyi-1].y);
-				cpoint = ppt[polyi-1];
-			} else if (polyi == 1) {
-				/* degenerate case e.g. when using 'linecolor variable' */
-#ifdef HAVE_GDIPLUS
-				if (lpgw->antialiasing)
-					gdiplusLine(hdc, cpoint, ppt[0], &cur_penstruct, alpha_c);
-				else
-#endif
-					LineTo(hdc, ppt[0].x, ppt[0].y);
-				cpoint = ppt[0];
-			}
-			polyi = 0;
-		}
-
 		/* handle layer commands first */
 		if (curptr->op == W_layer) {
 			t_termlayer layer = curptr->x;
@@ -1937,34 +1905,33 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 		case W_layer: /* already handled above */
 			break;
 
-		case W_move:
-			ppt[0].x = xdash;
-			ppt[0].y = ydash;
-			polyi = 1;
-			if (keysample)
-				draw_update_keybox(lpgw, plotno, xdash, ydash);
-			break;
-
-		case W_vect:
-			ppt[polyi].x = xdash;
-			ppt[polyi].y = ydash;
-			polyi++;
+		case W_polyline: {
+			POINTL * poly = (POINTL *) LocalLock(curptr->htext);
+			polyi = curptr->x;
 			if (polyi >= polymax) {
-#ifdef HAVE_GDIPLUS
-				if (lpgw->antialiasing)
-					gdiplusPolyline(hdc, ppt, polyi, &cur_penstruct, alpha_c);
-				else
-#endif
-					Polyline(hdc, ppt, polyi);
-				MoveTo(hdc, xdash, ydash);
-				ppt[0].x = xdash;
-				ppt[0].y = ydash;
-				polyi = 1;
-				cpoint = ppt[0];
+				const int step = 200;
+				polymax  = (polyi + step) / step;
+				polymax *= step;
+				ppt = (POINT *)LocalReAllocPtr(ppt, LHND, (polymax + 1) * sizeof(POINT));
 			}
-			if (keysample)
-				draw_update_keybox(lpgw, plotno, xdash, ydash);
+			for (i = 0; i < polyi; i++) {
+				/* transform the coordinates */
+				ppt[i].x = MulDiv(poly[i].x, rr-rl-1, lpgw->xmax) + rl;
+				ppt[i].y = MulDiv(poly[i].y, rt-rb+1, lpgw->ymax) + rb - 1;
+			}
+			LocalUnlock(poly);
+#ifdef HAVE_GDIPLUS
+			if (lpgw->antialiasing)
+				gdiplusPolyline(hdc, ppt, polyi, &cur_penstruct, alpha_c);
+			else
+#endif
+				Polyline(hdc, ppt, polyi);
+			if (keysample) {
+				draw_update_keybox(lpgw, plotno, ppt[0].x, ppt[0].y);
+				draw_update_keybox(lpgw, plotno, ppt[polyi - 1].x, ppt[polyi - 1].y);
+			}
 			break;
+		}
 
 		case W_line_type: {
 			int cur_pen = (int)curptr->x % WGNUMPENS;
@@ -2275,6 +2242,8 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 			fillstyle = curptr->x;
 			transparent = FALSE;
 			alpha = 0.;
+			/* FIXME: This shouldn't be necessary... */
+			polyi = 0;
 			switch (fillstyle & 0x0f) {
 			case FS_TRANSPARENT_SOLID:
 				alpha = (fillstyle >> 4) / 100.;
@@ -2351,6 +2320,11 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 				/* Leave the current brush and color in place */
 				break;
 			}
+			break;
+
+		case W_move:
+			ppt[0].x = xdash;
+			ppt[0].y = ydash;
 			break;
 
 		case W_boxfill: {  /* ULIG */
@@ -2955,14 +2929,6 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 			curptr = (struct GWOP *)blkptr->gwop;
 		}
     }
-    if (polyi >= 2) {
-#ifdef HAVE_GDIPLUS
-		if (lpgw->antialiasing)
-			gdiplusPolyline(hdc, ppt, polyi, &cur_penstruct, alpha_c);
-		else
-#endif
-			Polyline(hdc, ppt, polyi);
-	}
     LocalFreePtr(ppt);
 }
 

@@ -1,3 +1,10 @@
+2016-07-21  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/win/wgdiplus.c wrc/win/wgnuplib.h src/win/wgraph.c term/win.trm:
+	Aggregate related move/vector requests in a polyline.  This saves
+	space in the internal list of drawing commands and accelerates
+	re-drawing since the terminal code does not have to do this repeatedly.
+
 2016-07-20  Ethan A Merritt  <merritt@u.washington.edu>
 
 	* src/history.c (write_history_list):  Recent regression caused the 

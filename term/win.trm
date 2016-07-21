@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: win.trm,v 1.133 2014/12/18 14:35:40 broeker Exp $
+ * $Id: win.trm,v 1.134 2016/05/23 19:14:14 markisch Exp $
  */
 
 /* GNUPLOT - win.trm */
@@ -152,10 +152,54 @@ static struct gen_table WIN_opts[] =
     { NULL, WIN_OTHER }
 };
 
+typedef struct {
+	unsigned n;
+	unsigned max;
+	POINT * point;
+} path_points;
+
 static int WIN_last_linetype = LT_NODRAW; /* HBB 20000813: linetype caching */
 termentry * WIN_term = NULL;
 char WIN_inifontname[MAXFONTNAME] = WINFONT;
 int WIN_inifontsize = WINFONTSIZE;
+static path_points WIN_poly = {0, 0, NULL};
+
+static void WIN_add_path_point(path_points * poly, int x, int y);
+static void WIN_flush_line(path_points * poly);
+
+
+static void
+WIN_add_path_point(path_points * poly, int x, int y)
+{
+	/* Enlarge size of array of polygon points */
+	if (poly->n >= poly->max) {
+		poly->max += 10;
+		poly->point = (POINT *) gp_realloc(poly->point, poly->max * sizeof(POINT), "points");
+	}
+	/* Store point */
+	poly->point[poly->n].x = x;
+	poly->point[poly->n].y = y;
+	poly->n++;
+	FPRINTF((stderr, "new polygon/polyline point: %i %i\n", x, y));
+}
+
+
+static void
+WIN_flush_line(path_points * poly)
+{
+	if (poly) {
+		if (poly->n > 1)
+			GraphOpSize(graphwin, W_polyline, poly->n, 0, (void *) poly->point, poly->n * sizeof(POINT));
+		if (poly->n > 0) {
+			/* Save last path point in case there's a vector command without preceeding move. */
+			poly->point[0].x = poly->point[poly->n - 1].x;
+			poly->point[0].y = poly->point[poly->n - 1].y;
+			/* Reset counter */
+			poly->n = 0;
+		}
+	}
+}
+
 
 TERM_PUBLIC void
 WIN_options()
@@ -510,7 +554,8 @@ WIN_reset()
 TERM_PUBLIC void
 WIN_text()
 {
-    GraphEnd(graphwin);
+	WIN_flush_line(&WIN_poly);
+	GraphEnd(graphwin);
 }
 
 
@@ -533,14 +578,29 @@ WIN_graphics()
 TERM_PUBLIC void
 WIN_move(unsigned int x, unsigned int y)
 {
-	GraphOp(graphwin, W_move, x, y, NULL);
+	/* terminate current path only if we move to a disconnected position */
+	if ((WIN_poly.n > 0) &&
+		((WIN_poly.point[WIN_poly.n - 1].x != x) ||
+		 (WIN_poly.point[WIN_poly.n - 1].y != y))) {
+			WIN_flush_line(&WIN_poly);
+	}
+	WIN_add_path_point(&WIN_poly, x, y);
 }
 
 
 TERM_PUBLIC void
 WIN_vector(unsigned int x, unsigned int y)
 {
-	GraphOp(graphwin, W_vect, x, y, NULL);
+	if ((WIN_poly.n == 0) ||
+	    (WIN_poly.point[WIN_poly.n - 1].x != x) ||
+	    (WIN_poly.point[WIN_poly.n - 1].y != y)) {
+		if (WIN_poly.n == 0) {
+			/* vector command without preceeding move: e.g. in "with line lc variable" */
+			/* Coordinates were saved with last flush already. */
+			WIN_poly.n++;
+		}
+		WIN_add_path_point(&WIN_poly, x, y);
+	}
 }
 
 
@@ -548,6 +608,8 @@ TERM_PUBLIC void
 WIN_linetype(int lt)
 {
 	if (lt != WIN_last_linetype) {
+		WIN_flush_line(&WIN_poly);
+
 		GraphOp(graphwin, W_line_type, lt, 0, NULL);
 		WIN_last_linetype = lt;
 	}
@@ -557,6 +619,8 @@ WIN_linetype(int lt)
 TERM_PUBLIC void
 WIN_dashtype(int dt, t_dashtype *custom_dash_pattern)
 {
+	WIN_flush_line(&WIN_poly);
+
 	GraphOpSize(graphwin, W_dash_type, dt, 0, (char *) custom_dash_pattern, sizeof(t_dashtype));
 }
 
@@ -564,6 +628,8 @@ WIN_dashtype(int dt, t_dashtype *custom_dash_pattern)
 TERM_PUBLIC void
 WIN_put_text(unsigned int x, unsigned int y, const char *str)
 {
+	WIN_flush_line(&WIN_poly);
+
 	if ((str == NULL) || !strlen(str)) return;
 
 	/* If no enhanced text processing is needed, we can use the plain  */
@@ -595,6 +661,8 @@ WIN_text_angle(int ang)
 TERM_PUBLIC void
 WIN_point(unsigned int x, unsigned int y, int number)
 {
+	WIN_flush_line(&WIN_poly);
+
 	/* draw point shapes later to save memory */
 	/* HBB 20010411: secure against pointtype -1 or lower */
 	if (number < -1)
@@ -625,6 +693,9 @@ WIN_set_pointsize(double s)
 TERM_PUBLIC void
 WIN_linewidth(double linewidth)
 {
+	// TODO: line width caching
+	WIN_flush_line(&WIN_poly);
+
 	WIN_last_linetype = LT_NODRAW;        /* invalidate cached linetype */
 	GraphOp(graphwin, W_line_width, (int) 100 * linewidth, 0, NULL);
 }
@@ -690,6 +761,8 @@ WIN_image(unsigned int M, unsigned int N, coordval *image,
 	PBYTE rgb_image;
 	unsigned int image_size;
 	unsigned int pad_bytes;
+
+	WIN_flush_line(&WIN_poly);
 
 	/* BM: IC_PALETTE, IC_RGB and IC_RGBA images are converted to a format
 	   suitable for Windows:
@@ -795,6 +868,9 @@ WIN_make_palette(t_sm_palette *palette)
 TERM_PUBLIC void
 WIN_set_color(t_colorspec *colorspec)
 {
+	// TODO: color caching
+	WIN_flush_line(&WIN_poly);
+
 	switch (colorspec->type ) {
 		case TC_FRAC: {
 			/* Immediately translate palette index to RGB colour */
@@ -840,6 +916,8 @@ WIN_boxfill(
     unsigned int xleft, unsigned int ybottom,
     unsigned int width, unsigned int height)
 {
+	WIN_flush_line(&WIN_poly);
+
 	/* split into multiple commands to squeeze through all the necessary info */
 	GraphOp(graphwin, W_fillstyle, style, 0, NULL);
 	GraphOp(graphwin, W_move, xleft, ybottom, NULL);
@@ -905,8 +983,10 @@ WIN_enhanced_flush()
 TERM_PUBLIC void
 WIN_layer(t_termlayer syncpoint)
 {
+	WIN_flush_line(&WIN_poly);
+
 	/* ignore LAYER_RESET in multiplot mode */
-    if (((syncpoint == TERM_LAYER_RESET) ||
+	if (((syncpoint == TERM_LAYER_RESET) ||
 	     (syncpoint == TERM_LAYER_RESET_PLOTNO)) &&
 		multiplot)
 				return;
@@ -917,6 +997,7 @@ WIN_layer(t_termlayer syncpoint)
 TERM_PUBLIC void
 WIN_hypertext(int type, const char * text)
 {
+	WIN_flush_line(&WIN_poly);
 	GraphOp(graphwin, W_hypertext, type, 0, text);
 }
 
@@ -950,7 +1031,7 @@ TERM_TABLE_START(win_driver)
     WIN_justify_text, WIN_point, do_arrow, WIN_set_font,
     WIN_set_pointsize,
     TERM_CAN_MULTIPLOT|TERM_NO_OUTPUTFILE|TERM_ALPHA_CHANNEL|TERM_CAN_DASH
-        |TERM_LINEWIDTH|TERM_FONTSCALE | TERM_ENHANCED_TEXT,
+        |TERM_LINEWIDTH|TERM_FONTSCALE|TERM_ENHANCED_TEXT,
     WIN_text /* suspend */ , WIN_resume,
     WIN_boxfill, WIN_linewidth,
 #ifdef USE_MOUSE

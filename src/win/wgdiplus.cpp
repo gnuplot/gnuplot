@@ -1,5 +1,5 @@
 /*
- * $Id: wgdiplus.cpp,v 1.22 2016/05/06 10:22:53 markisch Exp $
+ * $Id: wgdiplus.cpp,v 1.23 2016/07/15 04:20:55 sfeam Exp $
  */
 
 /*
@@ -53,6 +53,7 @@ const int pattern_num = 8;
 static Color gdiplusCreateColor(COLORREF color, double alpha);
 static Pen * gdiplusCreatePen(UINT style, float width, COLORREF color, double alpha);
 static void gdiplusPolyline(Graphics &graphics, Pen &pen, POINT *ppt, int polyi);
+static void gdiplusPolyline(Graphics &graphics, Pen &pen, Point *points, int polyi);
 static void gdiplusFilledPolygon(Graphics &graphics, Brush &brush, POINT *ppt, int polyi);
 static Brush * gdiplusPatternBrush(int style, COLORREF color, double alpha, COLORREF backcolor, BOOL transparent);
 static void gdiplusDot(Graphics &graphics, Brush &brush, int x, int y);
@@ -238,8 +239,8 @@ gdiplusCircleEx(HDC hdc, POINT * p, int radius, UINT style, float width, COLORRE
 /* ****************  GDI+ only functions ********************************** */
 
 
-void
-gdiplusPolyline(Graphics &graphics, Pen &pen, POINT *ppt, int polyi)
+static void
+gdiplusPolyline(Graphics &graphics, Pen &pen, Point *points, int polyi)
 {
 	// Dash patterns get scaled with line width, in contrast to GDI.
 	// Avoid smearing out caused by antialiasing for small line widths.
@@ -247,20 +248,28 @@ gdiplusPolyline(Graphics &graphics, Pen &pen, POINT *ppt, int polyi)
 	if ((mode != SmoothingModeNone) && (pen.GetDashStyle() != DashStyleSolid) && (pen.GetWidth() < 2))
 		graphics.SetSmoothingMode(SmoothingModeNone);
 
+	if ((points[0].X != points[polyi - 1].X) ||
+		(points[0].Y != points[polyi - 1].Y))
+		graphics.DrawLines(&pen, points, polyi);
+	else
+		graphics.DrawPolygon(&pen, points, polyi - 1);
+
+	/* restore */
+	if (mode != SmoothingModeNone)
+		graphics.SetSmoothingMode(mode);
+}
+
+
+void
+gdiplusPolyline(Graphics &graphics, Pen &pen, POINT *ppt, int polyi)
+{
 	Point * points = new Point[polyi];
 	for (int i = 0; i < polyi; i++) {
 		points[i].X = ppt[i].x;
 		points[i].Y = ppt[i].y;
 	}
-	if ((ppt[0].x != ppt[polyi - 1].x) || (ppt[0].y != ppt[polyi - 1].y))
-		graphics.DrawLines(&pen, points, polyi);
-	else
-		graphics.DrawPolygon(&pen, points, polyi - 1);
+	gdiplusPolyline(graphics, pen, points, polyi);
 	delete [] points;
-
-	/* restore */
-	if (mode != SmoothingModeNone)
-		graphics.SetSmoothingMode(mode);
 }
 
 
@@ -427,7 +436,6 @@ drawgraph_gdiplus(LPGW lpgw, HDC hdc, LPRECT rect)
 	int last_polyi = 0;			/* number of points in last_poly */
 	POINT * last_poly = NULL;	/* storage of last filled polygon */
 	unsigned int lastop = -1;	/* used for plotting last point on a line */
-	POINT cpoint;				/* current GDI location */
 
 	/* filled polygons and boxes */
 	int last_fillstyle = -1;
@@ -590,26 +598,6 @@ drawgraph_gdiplus(LPGW lpgw, HDC hdc, LPRECT rect)
 		xdash = MulDiv(curptr->x, rr-rl-1, lpgw->xmax) + rl;
 		ydash = MulDiv(curptr->y, rt-rb+1, lpgw->ymax) + rb - 1;
 
-		/* ignore superfluous moves - see bug #1523 */
-		/* FIXME: we should do this in win.trm, not here */
-		if ((lastop == W_vect) && (curptr->op == W_move) && (xdash == ppt[polyi -1].x) && (ydash == ppt[polyi -1].y)) {
-		    curptr->op = 0;
-		}
-
-		/* finish last polygon / polyline */
-		if ((lastop == W_vect) && (curptr->op != W_vect) && (curptr->op != 0)) {
-			if (polyi >= 2) {
-				gdiplusPolyline(graphics, pen, ppt, polyi);
-				/* move internal state to last point */
-				cpoint = ppt[polyi - 1];
-			} else if (polyi == 1) {
-				/* degenerate case e.g. when using 'linecolor variable' */
-				graphics.DrawLine(&pen, (INT) cpoint.x, cpoint.y, ppt[0].x, ppt[0].y);
-				cpoint = ppt[0];
-			}
-			polyi = 0;
-		}
-
 		/* finish last filled polygon */
 		if ((last_poly != NULL) &&
 			(((lastop == W_filled_polygon_draw) && (curptr->op != W_fillstyle)) ||
@@ -720,28 +708,23 @@ drawgraph_gdiplus(LPGW lpgw, HDC hdc, LPRECT rect)
 		case W_layer: /* already handled above */
 			break;
 
-		case W_move:
-			ppt[0].x = xdash;
-			ppt[0].y = ydash;
-			polyi = 1;
-			if (keysample)
-				draw_update_keybox(lpgw, plotno, xdash, ydash);
-			break;
-
-		case W_vect:
-			ppt[polyi].x = xdash;
-			ppt[polyi].y = ydash;
-			polyi++;
-			if (polyi >= polymax) {
-				gdiplusPolyline(graphics, pen, ppt, polyi);
-				ppt[0].x = xdash;
-				ppt[0].y = ydash;
-				polyi = 1;
-				cpoint = ppt[0];
+		case W_polyline: {
+			POINTL * poly = (POINTL *) LocalLock(curptr->htext);
+			polyi = curptr->x;
+			Point * points = new Point[polyi];
+			for (int i = 0; i < polyi; i++) {
+				/* transform the coordinates */
+				points[i].X = MulDiv(poly[i].x, rr-rl-1, lpgw->xmax) + rl;
+				points[i].Y = MulDiv(poly[i].y, rt-rb+1, lpgw->ymax) + rb - 1;
 			}
-			if (keysample)
-				draw_update_keybox(lpgw, plotno, xdash, ydash);
+			LocalUnlock(poly);
+			gdiplusPolyline(graphics, pen, points, polyi);
+			if (keysample) {
+				draw_update_keybox(lpgw, plotno, points[0].X, points[0].Y);
+				draw_update_keybox(lpgw, plotno, points[polyi - 1].X, points[polyi - 1].Y);
+			}
 			break;
+		}
 
 		case W_line_type: {
 			int cur_pen = (int)curptr->x % WGNUMPENS;
@@ -1055,6 +1038,7 @@ drawgraph_gdiplus(LPGW lpgw, HDC hdc, LPRECT rect)
 			 * parameters of a filled box call through the bottleneck
 			 * of the fixed number of parameters in GraphOp() and
 			 * struct GWOP, respectively. */
+			/* FIXME: resetting polyi here should not be necessary */
 			polyi = 0; /* start new sequence */
 			int fillstyle = curptr->x;
 
@@ -1120,6 +1104,11 @@ drawgraph_gdiplus(LPGW lpgw, HDC hdc, LPRECT rect)
 			last_fill_alpha = alpha_c;
 			break;
 		}
+
+		case W_move:
+			ppt[0].x = xdash;
+			ppt[0].y = ydash;
+			break;
 
 		case W_boxfill: {
 			/* NOTE: the x and y passed with this call are the coordinates of the
@@ -1549,9 +1538,6 @@ drawgraph_gdiplus(LPGW lpgw, HDC hdc, LPRECT rect)
 				break;
 			curptr = (struct GWOP *)blkptr->gwop;
 		}
-	}
-	if (polyi >= 2) {
-		gdiplusPolyline(graphics, pen, ppt, polyi);
 	}
 	if (pattern_brush) delete pattern_brush;
 	LocalFreePtr(ppt);
