@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.362 2016/05/25 15:02:28 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.363 2016/07/21 09:07:44 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -1098,12 +1098,12 @@ show_version(FILE *fp)
 		helpfile = HELPFILE;
 	    fprintf(stderr, "HELPFILE           = \"%s\"\n", helpfile);
 #else
-	    fprintf(stderr, "HELPFILE           = \"%ls\"\n", winhelpname);
+	    fprintf(stderr, "HELPFILE           = \"" TCHARFMT "\"\n", winhelpname);
 #endif
 	}
 
 #if defined(_WIN32) && !defined(WGP_CONSOLE)
-	fprintf(stderr, "MENUNAME           = \"%ls\"\n", szMenuName);
+	fprintf(stderr, "MENUNAME           = \"" TCHARFMT "\"\n", szMenuName);
 #endif
 
 #ifdef HAVE_LIBCACA

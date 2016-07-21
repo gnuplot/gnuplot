@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: win.trm,v 1.135 2016/07/21 07:35:52 markisch Exp $
+ * $Id: win.trm,v 1.136 2016/07/21 09:07:44 markisch Exp $
  */
 
 /* GNUPLOT - win.trm */
@@ -515,22 +515,12 @@ WIN_update_options()
 	set_fontsize = (graphwin->deffontsize != WIN_inifontsize);
 	set_font = (_tcscmp(graphwin->deffontname, WIN_inifontname) != 0);
 	if (set_font || set_fontsize) {
-		/* We need two cases below because there's no appropriate format specifier. Really? */
-		char * fontstring = (char*) gp_alloc(_tcslen(graphwin->deffontname) + 24, "win font");
+		char * fontstring = (char *) gp_alloc(_tcslen(graphwin->deffontname) + 24, "win font");
 		if (!set_fontsize) {
-#ifdef UNICODE
-			sprintf(fontstring, " font \"%ws\"", graphwin->deffontname);
-#else
-			sprintf(fontstring, " font \"%s\"", graphwin->deffontname);
-#endif
+			sprintf(fontstring, " font \"" TCHARFMT "\"", graphwin->deffontname);
 		} else {
-#ifdef UNICODE
-			sprintf(fontstring, " font \"%ws, %d\"",
+			sprintf(fontstring, " font \"" TCHARFMT ", %d\"",
 				set_font ? graphwin->deffontname : TEXT(""), graphwin->deffontsize);
-#else
-			sprintf(fontstring, " font \"%s, %d\"",
-				set_font ? graphwin->deffontname : TEXT(""), graphwin->deffontsize);
-#endif
 		}
 		strcat(term_options, fontstring);
 		free(fontstring);

@@ -31,6 +31,12 @@
 	* src/external.c|h:  Use the dll_open_w() also for console mode gnuplot
 	on Windows.
 
+	* src/command.c src/show.c src/win/wgnuplib.h src/win/wgraph.c
+	term/win.trm:  Define TCHARFMT to abstract the format string required
+	for printf etc. for TCHAR strings.  Use it to fix a few format strings.
+	Note that Mingw64 seems to accept %ls but not %ws which according
+	to MSDN are supposed to mean the same thing.
+
 2016-07-21  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/win/wgdiplus.c wrc/win/wgnuplib.h src/win/wgraph.c term/win.trm:

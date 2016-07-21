@@ -1,5 +1,5 @@
 /*
- * $Id: wgraph.c,v 1.205 2016/07/21 07:35:52 markisch Exp $
+ * $Id: wgraph.c,v 1.206 2016/07/21 09:07:44 markisch Exp $
  */
 
 /* GNUPLOT - win/wgraph.c */
@@ -965,26 +965,29 @@ MakeFonts(LPGW lpgw, LPRECT lprect, HDC hdc)
 		IsWindowsXPorLater() && lpgw->antialiasing ? CLEARTYPE_QUALITY : PROOF_QUALITY;
 
 	if (!TryCreateFont(lpgw, NULL, hdc)) {
+		static const char warn_font_not_available[] = 
+			"Warning:  font \"" TCHARFMT "\" not available, trying \"" TCHARFMT "\" instead.\n";
+		static const char err_giving_up[] = "Error:  could not substitute another font. Giving up.\n";
 		if (_tcscmp(lpgw->fontname, lpgw->deffontname) != 0) {
-			fprintf(stderr, "Warning:  font \"%ws\" not available, trying \"%ws\" instead.\n", lpgw->fontname, lpgw->deffontname);
+			fprintf(stderr, warn_font_not_available, lpgw->fontname, lpgw->deffontname);
 			if (!TryCreateFont(lpgw, lpgw->deffontname, hdc)) {
 				if (_tcscmp(lpgw->deffontname, GraphDefaultFont()) != 0) {
-					fprintf(stderr, "Warning:  font \"%s\" not available, trying \"%s\" instead.\n", lpgw->deffontname, GraphDefaultFont());
+					fprintf(stderr, warn_font_not_available, lpgw->deffontname, GraphDefaultFont());
 					if (!TryCreateFont(lpgw, GraphDefaultFont(), hdc)) {
-						fprintf(stderr, "Error:  could not substitute another font. Giving up.\n");
+						fprintf(stderr, err_giving_up);
 					}
 				} else {
-					fprintf(stderr, "Error:  could not substitute another font. Giving up.\n");
+					fprintf(stderr, err_giving_up);
 				}
 			}
 		} else {
 			if (_tcscmp(lpgw->fontname, GraphDefaultFont()) != 0) {
-				fprintf(stderr, "Warning:  font \"%s\" not available, trying \"%s\" instead.\n", lpgw->fontname, GraphDefaultFont());
+				fprintf(stderr, warn_font_not_available, lpgw->fontname, GraphDefaultFont());
 				if (!TryCreateFont(lpgw, GraphDefaultFont(), hdc)) {
-					fprintf(stderr, "Error:  could not substitute another font. Giving up.\n");
+					fprintf(stderr, err_giving_up);
 				}
 			} else {
-				fprintf(stderr, "Error:  font \"%s\" not available, but don't know which font to substitute.\n", lpgw->fontname);
+				fprintf(stderr, "Error:  font \"" TCHARFMT "\" not available, but don't know which font to substitute.\n", lpgw->fontname);
 			}
 		}
 	}
@@ -2951,8 +2954,8 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 				return;
 			curptr = (struct GWOP *)blkptr->gwop;
 		}
-    }
-    LocalFreePtr(ppt);
+	}
+	LocalFreePtr(ppt);
 }
 
 /* ================================== */

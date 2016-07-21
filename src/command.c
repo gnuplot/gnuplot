@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.338 2016/07/02 09:41:18 markisch Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.339 2016/07/21 09:07:44 markisch Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -2893,7 +2893,7 @@ help_command()
     if (help_window == NULL) {
 	help_window = HtmlHelp(parent, winhelpname, HH_DISPLAY_TOPIC, (DWORD_PTR)NULL);
 	if (help_window == NULL) {
-	    fprintf(stderr, "Error: Could not open help file \"%ls\"\n", winhelpname);
+	    fprintf(stderr, "Error: Could not open help file \"" TCHARFMT "\"\n", winhelpname);
 	    return;
 	}
     }

@@ -1,5 +1,5 @@
 /*
- * $Id: wgnuplib.h,v 1.78 2016/07/21 07:35:52 markisch Exp $
+ * $Id: wgnuplib.h,v 1.79 2016/07/21 09:07:44 markisch Exp $
  */
 
 /* GNUPLOT - win/wgnuplib.h */
@@ -61,6 +61,13 @@ extern "C" {
 /* For WIN32 API's */
 /* #define DEFAULT_CHARSET ANSI_CHARSET */
 # define MoveTo(hdc,x,y) MoveToEx(hdc,x,y,(LPPOINT)NULL);
+
+/* printf format for TCHAR arguments */ 
+#ifdef UNICODE
+# define TCHARFMT "%ls"
+#else
+# define TCHARFMT "%s"
+#endif
 
 /* ================================== */
 /* wprinter.c - windows printer routines */
