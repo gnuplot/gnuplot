@@ -1,5 +1,5 @@
 /*
- * $Id: external.h,v 1.1 2014/02/28 00:24:20 sfeam Exp $
+ * $Id: external.h,v 1.2 2016/05/08 13:19:44 markisch Exp $
  */
 /* GNUPLOT - external.h */
 
@@ -85,11 +85,7 @@ typedef void *gp_dll_t;
 
 # define DLL_PATHSEP "\\"
 # define DLL_EXT  ".dll"
-# ifndef WGP_CONSOLE
-#  define DLL_OPEN(f) dll_open_w(f);
-# else
-#  define DLL_OPEN(f) ((void *)LoadLibrary((f)));
-# endif
+# define DLL_OPEN(f) dll_open_w(f);
 # define DLL_CLOSE(dl) ((void)FreeLibrary((HINSTANCE)dl))
 # define DLL_SYM(dl, sym) ((void *)GetProcAddress((HINSTANCE)dl, (sym)))
 # define DLL_ERROR(dl) "dynamic library error"

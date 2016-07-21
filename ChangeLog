@@ -3,7 +3,7 @@
 	Enable UNICODE build on Windows.
 	Patch #727
 
-	src/command.c src/show.c src/win/wcommon.h src/win/wgdiplus.cpp
+	* src/command.c src/show.c src/win/wcommon.h src/win/wgdiplus.cpp
 	src/win/wgnuplib.c|h src/win/wgraph.c src/win/winmain.c|h
 	src/win/wprinter.c src/win/wtext.c term/gd.trm term/win.trm
 	config/mingw/Makefile config/watcom/Makefile:
@@ -25,8 +25,11 @@
 	In addition we now explicitly call "ANSI" functions, or provide
 	conversions from CHAR to WCHAR or vice versa in some cases.
 
-	src/show.c (show_version):  Add UNICODE build information to output of
+	* src/show.c (show_version):  Add UNICODE build information to output of
 	"show version long".
+
+	* src/external.c|h:  Use the dll_open_w() also for console mode gnuplot
+	on Windows.
 
 2016-07-21  Bastian Maerkisch  <bmaerkisch@web.de>
 

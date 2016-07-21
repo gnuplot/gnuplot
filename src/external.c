@@ -1,5 +1,5 @@
 /*
- * $Id: external.c,v 1.1 2014/02/28 00:24:20 sfeam Exp $
+ * $Id: external.c,v 1.2 2016/05/08 13:19:44 markisch Exp $
  */
 /* GNUPLOT - external.c */
 
@@ -98,7 +98,7 @@ f_calle(union argument *x)
 }
 
 
-#if defined(_WIN32) && !defined(WGP_CONSOLE)
+#ifdef _WIN32
 static void *
 dll_open_w(const char *f)
 {
